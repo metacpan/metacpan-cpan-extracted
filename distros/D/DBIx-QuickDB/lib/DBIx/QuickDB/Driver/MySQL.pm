@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::MySQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000041';
+our $VERSION = '0.000042';
 
 use Capture::Tiny qw/capture/;
 use Carp qw/confess croak/;
@@ -67,7 +67,7 @@ sub provider_info {
 
     for my $bin ($this->install_bin_list) {
         if (my $install = can_run($bin)) {
-            my ($stdout, $stderr) = capture { system($install) };
+            my ($stdout, $stderr) = capture { system($install, '--help') };
             my $output = $stdout . "\n" .  $stderr;
             unless ($output =~ m/is deprecated/) {
                 $found{install_bin} = $install;

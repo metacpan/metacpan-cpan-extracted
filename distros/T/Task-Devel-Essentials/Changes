@@ -1,5 +1,10 @@
 Revision history for Task-Devel-Essentials
 
+0.017   Mon, 25 May 2026 15:42:33 +0200
+        upgrade versions
+        add CPAN::DistnameInfo
+        move repository and issue tracker to codeberg
+
 0.016   Sun, 22 May 2022 08:28:47 +0200
         upgraded versions
         added provides metadata

@@ -12,7 +12,7 @@ use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
 use vars qw($VERSION $_fh_seq);
-$VERSION = '0.12';
+$VERSION = '0.13';
 $VERSION = $VERSION;
 $_fh_seq = 0;
 

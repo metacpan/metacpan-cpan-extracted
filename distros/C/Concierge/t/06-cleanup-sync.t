@@ -4,13 +4,13 @@ use lib 'lib';
 use Test2::V0;
 use File::Temp qw(tempdir);
 
-use Concierge::Setup;
+use Concierge::Desk::Setup;
 use Concierge;
 
 # Setup test desk
 my $test_dir = tempdir(CLEANUP => 1);
 
-Concierge::Setup::build_quick_desk($test_dir);
+Concierge::Desk::Setup::build_quick_desk($test_dir);
 my $desk = Concierge->open_desk($test_dir);
 my $concierge = $desk->{concierge};
 
@@ -80,7 +80,7 @@ subtest 'open_desk performs cleanup synchronization' => sub {
     # Create new desk
     my $temp_dir = tempdir(CLEANUP => 1);
 
-    Concierge::Setup::build_quick_desk($temp_dir);
+    Concierge::Desk::Setup::build_quick_desk($temp_dir);
     my $desk1 = Concierge->open_desk($temp_dir);
     my $conc = $desk1->{concierge};
 
@@ -115,7 +115,7 @@ subtest 'open_desk performs cleanup synchronization' => sub {
 subtest 'cleanup handles empty user_keys gracefully' => sub {
     my $temp_dir = tempdir(CLEANUP => 1);
 
-    Concierge::Setup::build_quick_desk($temp_dir);
+    Concierge::Desk::Setup::build_quick_desk($temp_dir);
 
     # Open desk with no users (empty user_keys)
     my $result = Concierge->open_desk($temp_dir);
@@ -127,7 +127,7 @@ subtest 'cleanup handles empty user_keys gracefully' => sub {
 subtest 'cleanup preserves active user_keys' => sub {
     my $temp_dir = tempdir(CLEANUP => 1);
 
-    Concierge::Setup::build_quick_desk($temp_dir);
+    Concierge::Desk::Setup::build_quick_desk($temp_dir);
     my $desk = Concierge->open_desk($temp_dir);
     my $conc = $desk->{concierge};
 

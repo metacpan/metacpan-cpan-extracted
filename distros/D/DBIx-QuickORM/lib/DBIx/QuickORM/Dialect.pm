@@ -6,32 +6,160 @@ use Carp qw/croak confess/;
 use Scalar::Util qw/blessed/;
 use DBI();
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000020';
 
 use DBIx::QuickORM::Util qw/load_class find_modules/;
 
-use DBIx::QuickORM::Util::HashBase qw{
+use Object::HashBase qw{
     <dbh
     <db_name
 };
 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::QuickORM::Dialect - Base class for database-specific dialects.
+
+=head1 DESCRIPTION
+
+A dialect adapts the ORM to a specific database engine. It owns the live
+database handle, knows how to build a DSN, introspects schema metadata from
+the live database, generates SQL from a schema, and brokers transactions,
+savepoints, and (where supported) async queries.
+
+This class is the abstract base: most of its database-specific methods are
+stubs that C<confess>/C<croak> until overridden by a concrete subclass such
+as L<DBIx::QuickORM::Dialect::SQLite> or L<DBIx::QuickORM::Dialect::PostgreSQL>.
+
+=head1 SYNOPSIS
+
+    my $dialect = DBIx::QuickORM::Dialect::SQLite->new(dbh => $dbh, db_name => $name);
+
+    my $schema = $dialect->build_schema_from_db(autofill => $autofill);
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item dbh
+
+The live C<DBI> database handle.
+
+=item db_name
+
+Name of the database this dialect is connected to.
+
+=back
+
+=cut
+
+=pod
+
+=head1 PUBLIC METHODS
+
+=over 4
+
+=item $field = $dialect->dsn_socket_field
+
+Name of the DSN field used to specify a unix socket. Defaults to C<host>.
+
+=item $name = $dialect->dialect_name
+
+Short name of the dialect, derived from the class name.
+
+=item $value = $dialect->quote_binary_data
+
+DBI bind type/attribute used to quote binary data.
+
+=item $bool = $dialect->supports_returning_update
+
+=item $bool = $dialect->supports_returning_insert
+
+=item $bool = $dialect->supports_returning_delete
+
+True if the dialect supports a C<RETURNING> clause on the relevant statement.
+
+=item $stype = $dialect->supports_type($type)
+
+Returns the database-native type name if the dialect supports the given
+logical type, otherwise nothing.
+
+=cut
+
+# {{{ Feature flags and simple accessors
+
 sub dsn_socket_field { 'host' }
 
-sub dbi_driver { confess "Not Implemented" }
-sub db_version { confess "Not Implemented" }
-
-sub start_txn          { croak "$_[0]->start_txn() is not implemented" }
-sub commit_txn         { croak "$_[0]->commit_txn() is not implemented" }
-sub rollback_txn       { croak "$_[0]->rollback_txn() is not implemented" }
-sub create_savepoint   { croak "$_[0]->create_savepoint() is not implemented" }
-sub commit_savepoint   { croak "$_[0]->commit_savepoint() is not implemented" }
-sub rollback_savepoint { croak "$_[0]->rollback_savepoint() is not implemented" }
-
-sub quote_binary_data         { DBI::SQL_BINARY() }
+sub quote_binary_data         { my $self = shift; DBI::SQL_BINARY() }
 sub supports_returning_update { 0 }
 sub supports_returning_insert { 0 }
 sub supports_returning_delete { 0 }
+
 sub supports_type { }
+
+sub datetime_formatter { my $self = shift; croak "No datetime formatter is defined for the '" . $self->dialect_name . "' dialect" }
+
+sub dialect_name {
+    my $self_or_class = shift;
+    my $class = blessed($self_or_class) || $self_or_class;
+    $class =~ s/^DBIx::QuickORM::Dialect:://;
+    $class =~ s/::.*$//g;
+    return $class;
+}
+
+# }}} Feature flags and simple accessors
+
+=pod
+
+=item $driver = $dialect->dbi_driver
+
+The C<DBD::*> driver class for this dialect. Stub; subclasses override.
+
+=item $version = $dialect->db_version
+
+The server/engine version. Stub; subclasses override.
+
+=cut
+
+sub dbi_driver { my $self = shift; confess "Not Implemented" }
+sub db_version { my $self = shift; confess "Not Implemented" }
+
+=pod
+
+=item $dialect->start_txn(%params)
+
+=item $dialect->commit_txn(%params)
+
+=item $dialect->rollback_txn(%params)
+
+=item $dialect->create_savepoint(%params)
+
+=item $dialect->commit_savepoint(%params)
+
+=item $dialect->rollback_savepoint(%params)
+
+Transaction and savepoint control. Stubs; subclasses override.
+
+=cut
+
+sub start_txn          { my $self = shift; croak "$self->start_txn() is not implemented" }
+sub commit_txn         { my $self = shift; croak "$self->commit_txn() is not implemented" }
+sub rollback_txn       { my $self = shift; croak "$self->rollback_txn() is not implemented" }
+sub create_savepoint   { my $self = shift; croak "$self->create_savepoint() is not implemented" }
+sub commit_savepoint   { my $self = shift; croak "$self->commit_savepoint() is not implemented" }
+sub rollback_savepoint { my $self = shift; croak "$self->rollback_savepoint() is not implemented" }
+
+=pod
+
+=item $bool = $dialect->in_txn(%params)
+
+True if a transaction is currently in progress on the handle (the C<dbh>
+parameter, or the dialect's own handle).
+
+=cut
 
 sub in_txn {
     my $self = shift;
@@ -43,20 +171,29 @@ sub in_txn {
     return 1;
 }
 
-sub dialect_name {
-    my $self_or_class = shift;
-    my $class = blessed($self_or_class) || $self_or_class;
-    $class =~ s/^DBIx::QuickORM::Dialect:://;
-    $class =~ s/::.*$//g;
-    return $class;
-}
+=pod
+
+=item $dialect->init
+
+Validates that C<dbh> and C<db_name> were provided.
+
+=cut
 
 sub init {
     my $self = shift;
 
     croak "A 'dbh' is required"      unless $self->{+DBH};
-    croak "A 'db_name' is arequired" unless $self->{+DB_NAME};
+    croak "A 'db_name' is required" unless $self->{+DB_NAME};
 }
+
+=pod
+
+=item $dsn = $dialect->dsn($db)
+
+Builds a DSN string from a database config object, loading the driver as
+needed.
+
+=cut
 
 sub dsn {
     my $self_or_class = shift;
@@ -86,6 +223,15 @@ sub dsn {
     return $dsn;
 }
 
+=pod
+
+=item $sql = $dialect->upsert_statement($pk)
+
+Returns the SQL fragment implementing an upsert keyed on the given primary
+key columns.
+
+=cut
+
 sub upsert_statement {
     my $self = shift;
     my ($pk) = @_;
@@ -95,6 +241,15 @@ sub upsert_statement {
 ###############################################################################
 # {{{ Schema Builder Code
 ###############################################################################
+
+=pod
+
+=item $schema = $dialect->build_schema_from_db(%params)
+
+Introspects the live database and returns a L<DBIx::QuickORM::Schema>.
+Requires an C<autofill> object.
+
+=cut
 
 sub build_schema_from_db {
     my $self = shift;
@@ -114,36 +269,67 @@ sub build_schema_from_db {
     );
 }
 
-sub build_tables_from_db     { confess "Not Implemented" }
-sub build_table_keys_from_db { confess "Not Implemented" }
-sub build_columns_from_db    { confess "Not Implemented" }
-sub build_indexes_from_db    { confess "Not Implemented" }
+=pod
+
+=item $tables = $dialect->build_tables_from_db(%params)
+
+=item ($pk, $unique, $links) = $dialect->build_table_keys_from_db($table, %params)
+
+=item $columns = $dialect->build_columns_from_db($table, %params)
+
+=item $indexes = $dialect->build_indexes_from_db($table, %params)
+
+Per-table introspection helpers. Stubs; subclasses override.
+
+=cut
+
+sub build_tables_from_db     { my $self = shift; confess "Not Implemented" }
+sub build_table_keys_from_db { my $self = shift; confess "Not Implemented" }
+sub build_columns_from_db    { my $self = shift; confess "Not Implemented" }
+sub build_indexes_from_db    { my $self = shift; confess "Not Implemented" }
+
+=pod
+
+=back
+
+=cut
 
 ###############################################################################
 # }}} Schema Builder Code
 ###############################################################################
 
-###############################################################################
-# {{{ SQL Builder Code
-###############################################################################
-
-sub build_sql_from_schema {
-    my $self = shift;
-    my ($schema, %params) = @_;
-
-    my @sections;
-
-    push @sections => @{$params{prefix} // []};
-    push @sections => $self->build_table_sql_from_schema(@_);
-    push @sections => @{$params{postfix} // []};
-
-    return join "\n" => @sections;
-}
-
-sub build_table_sql_from_schema { confess "Not Implemented" }
-
-###############################################################################
-# }}} SQL Builder Code
-###############################################################################
-
 1;
+
+__END__
+
+=head1 SOURCE
+
+The source code repository for DBIx::QuickORM can be found at
+L<https://github.com/exodist/DBIx-QuickORM>.
+
+=head1 MAINTAINERS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut

@@ -6,10 +6,13 @@ use v5.10.1;
 use Exporter qw[import];
 
 BEGIN {
-  our $VERSION     = '0.86';
+  our $VERSION     = '0.87';
   our @EXPORT_OK   = qw[ leap_year
                          month_days
+                         nth_dow_in_month
                          valid_ymd
+                         yd_to_md
+                         ymd_to_doy
                          ymd_to_dow
                          ymd_to_rdn
                          rdn_to_ymd

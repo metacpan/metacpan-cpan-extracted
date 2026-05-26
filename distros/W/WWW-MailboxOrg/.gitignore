@@ -13,6 +13,8 @@ WWW-MailboxOrg-*/
 *.pm
 !bin/
 !lib/
+!t/lib/
+!t/lib/**/*.pm
 
 # Test
 *.tmp

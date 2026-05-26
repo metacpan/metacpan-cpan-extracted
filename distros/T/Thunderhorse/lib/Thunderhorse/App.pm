@@ -1,5 +1,5 @@
 package Thunderhorse::App;
-$Thunderhorse::App::VERSION = '0.103';
+$Thunderhorse::App::VERSION = '0.105';
 use v5.40;
 use Mooish::Base -standard;
 

@@ -28,7 +28,7 @@ my %WriteMakefileArgs = (
     "JSON::MaybeXS" => 0,
     "Log::Handler" => 0,
     "Mooish::Base" => "1.005",
-    "PAGI" => "0.001020",
+    "PAGI" => "0.001023",
     "Path::Tiny" => 0,
     "Template::Toolkit" => 0,
     "URI" => 0
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test2::V1" => 0
   },
-  "VERSION" => "0.103",
+  "VERSION" => "0.105",
   "test" => {
     "TESTS" => "t/*.t t/location/*.t t/module/*.t"
   }
@@ -52,7 +52,7 @@ my %FallbackPrereqs = (
   "JSON::MaybeXS" => 0,
   "Log::Handler" => 0,
   "Mooish::Base" => "1.005",
-  "PAGI" => "0.001020",
+  "PAGI" => "0.001023",
   "Path::Tiny" => 0,
   "Template::Toolkit" => 0,
   "Test2::V1" => 0,

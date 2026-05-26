@@ -4,13 +4,13 @@ use lib 'lib';
 use Test2::V0;
 use File::Temp qw(tempdir);
 
-use Concierge::Setup;
+use Concierge::Desk::Setup;
 use Concierge;
 
 # Setup test desk
 my $test_dir = tempdir(CLEANUP => 1);
 
-Concierge::Setup::build_quick_desk($test_dir, ['theme', 'role']);
+Concierge::Desk::Setup::build_quick_desk($test_dir, ['theme', 'role']);
 my $desk = Concierge->open_desk($test_dir);
 my $concierge = $desk->{concierge};
 

@@ -15,9 +15,11 @@ our @EXPORT = qw{
     mariadb
     percona
     sqlite
+    duckdb
     debug
 
     do_for_all_dbs
+    dialect_has_savepoints
 };
 
 sub psql     { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'PostgreSQL', @args}) } or diag(clean_err($@)) }
@@ -26,18 +28,78 @@ sub mysqlcom { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools
 sub mariadb  { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'MariaDB',    @args}) } or diag(clean_err($@)) }
 sub percona  { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'Percona',    @args}) } or diag(clean_err($@)) }
 sub sqlite   { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'SQLite',     @args}) } or diag(clean_err($@)) }
+sub duckdb   { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'DuckDB',     @args}) } or diag(clean_err($@)) }
 
-my @SETS = (
-    {name => 'system_postgresql', ver => '',   db => \&psql,     dialect => 'PostgreSQL',       dbi => ['Pg'],               quickdb => 'PostgreSQL', env => {}},
-    {name => 'postgresql9',       ver => '9',  db => \&psql,     dialect => 'PostgreSQL',       dbi => ['Pg'],               quickdb => 'PostgreSQL', env => {PATH => "$ENV{HOME}/dbs/postgresql9/bin:$ENV{PATH}"}},
-    {name => 'postgresql17',      ver => '17', db => \&psql,     dialect => 'PostgreSQL',       dbi => ['Pg'],               quickdb => 'PostgreSQL', env => {PATH => "$ENV{HOME}/dbs/postgresql17/bin:$ENV{PATH}"}},
-    {name => 'sqlite',            ver => '',   db => \&sqlite,   dialect => 'SQLite',           dbi => ['SQLite'],           quickdb => 'SQLite',     env => {}},
-    {name => 'system_mysql',      ver => '',   db => \&mysql,    dialect => 'MySQL',            dbi => ['mysql', 'MariaDB'], quickdb => 'MySQL',      env => {}},
-    {name => 'mariadb10',         ver => '10', db => \&mariadb,  dialect => 'MySQL::MariaDB',   dbi => ['mysql', 'MariaDB'], quickdb => 'MariaDB',    env => {PATH => "$ENV{HOME}/dbs/mariadb10/bin:$ENV{PATH}"}},
-    {name => 'mariadb11',         ver => '11', db => \&mariadb,  dialect => 'MySQL::MariaDB',   dbi => ['mysql', 'MariaDB'], quickdb => 'MariaDB',    env => {PATH => "$ENV{HOME}/dbs/mariadb11/bin:$ENV{PATH}"}},
-    {name => 'percona8',          ver => '8',  db => \&percona,  dialect => 'MySQL::Percona',   dbi => ['mysql', 'MariaDB'], quickdb => 'Percona',    env => {PATH => "$ENV{HOME}/dbs/percona8/bin:$ENV{PATH}"}},
-    {name => 'mysqlcom8',         ver => '8',  db => \&mysqlcom, dialect => 'MySQL::Community', dbi => ['mysql', 'MariaDB'], quickdb => 'MySQLCom',   env => {PATH => "$ENV{HOME}/dbs/mysql8/bin:$ENV{PATH}"}},
+# Static sets that do not live under ~/dbs: the system-installed servers and
+# sqlite. These are always offered (and skipped at runtime if unavailable).
+my @STATIC_SETS = (
+    {name => 'system_postgresql', ver => '', db => \&psql,   dialect => 'PostgreSQL', dbi => ['Pg'],               quickdb => 'PostgreSQL', env => {}},
+    {name => 'sqlite',            ver => '', db => \&sqlite, dialect => 'SQLite',     dbi => ['SQLite'],           quickdb => 'SQLite',     env => {}},
+    {name => 'duckdb',            ver => '', db => \&duckdb, dialect => 'DuckDB',     dbi => ['DuckDB'],           quickdb => 'DuckDB',     env => {}},
+    {name => 'system_mysql',      ver => '', db => \&mysql,  dialect => 'MySQL',      dbi => ['mysql', 'MariaDB'], quickdb => 'MySQL',      env => {}},
 );
+
+# The quickdb name of the set currently running under do_for_all_dbs.
+our $CURRENT_QDB;
+
+# DuckDB has no savepoints, so it cannot run the nested-transaction (savepoint)
+# subtests. Tests that exercise nested transactions guard them with this.
+sub dialect_has_savepoints { ($CURRENT_QDB // '') ne 'DuckDB' }
+
+# Maps the engine prefix of a "~/dbs/<engine>-<version>" directory to its driver
+# metadata. 'server' is the binary that must exist under bin/ for the install to
+# count.
+my %ENGINE = (
+    postgresql => {db => \&psql,     dialect => 'PostgreSQL',       dbi => ['Pg'],               quickdb => 'PostgreSQL', server => 'postgres'},
+    mariadb    => {db => \&mariadb,  dialect => 'MySQL::MariaDB',   dbi => ['mysql', 'MariaDB'], quickdb => 'MariaDB',    server => 'mariadbd'},
+    mysql      => {db => \&mysqlcom, dialect => 'MySQL::Community', dbi => ['mysql', 'MariaDB'], quickdb => 'MySQLCom',   server => 'mysqld'},
+    percona    => {db => \&percona,  dialect => 'MySQL::Percona',   dbi => ['mysql', 'MariaDB'], quickdb => 'Percona',    server => 'mysqld'},
+);
+
+# Discover every versioned database install under ~/dbs. Each is a directory
+# named "<engine>-<version>" (e.g. postgresql-17.9, mariadb-12.2) holding a bin/
+# with the server binary; that bin/ is prepended to PATH so QuickDB boots that
+# exact version. 'ver' is the major version, used to pick a version-specific SQL
+# schema file (e.g. postgresql17.sql) when one exists, falling back otherwise.
+sub discover_db_sets {
+    my $root = "$ENV{HOME}/dbs";
+    return () unless -d $root;
+
+    opendir(my $dh, $root) or return ();
+    my @dirs = readdir($dh);
+    closedir($dh);
+
+    my @sets;
+    for my $dir (@dirs) {
+        next unless $dir =~ m/^([a-z]+)-(\d+(?:\.\d+)*)$/;
+        my ($engine, $version) = ($1, $2);
+        my $meta = $ENGINE{$engine} or next;
+
+        my $bin = "$root/$dir/bin";
+        next unless -d $bin && -x "$bin/$meta->{server}";
+
+        my ($major) = split /\./, $version;
+
+        push @sets => {
+            name    => $dir,
+            ver     => $major,
+            db      => $meta->{db},
+            dialect => $meta->{dialect},
+            dbi     => $meta->{dbi},
+            quickdb => $meta->{quickdb},
+            env     => {PATH => "$bin:$ENV{PATH}"},
+        };
+    }
+
+    # Stable order: engine name, then numeric major, then full dir name.
+    return sort {
+        my ($ae) = $a->{name} =~ m/^([a-z]+)/;
+        my ($be) = $b->{name} =~ m/^([a-z]+)/;
+        $ae cmp $be || $a->{ver} <=> $b->{ver} || $a->{name} cmp $b->{name};
+    } @sets;
+}
+
+my @SETS = (@STATIC_SETS, discover_db_sets());
 
 sub clean_err {
     my $err = shift;
@@ -62,7 +124,7 @@ sub do_for_all_dbs(&;@) {
     my %only = map { $_ => 1 } @_;
     require Parallel::Runner;
     my $pr = Parallel::Runner->new(
-        $ENV{DBIXQORM_TEST_CONCURRENCY} // ($ENV{USER} eq 'exodist' ? 16 : 4),
+        $ENV{DBIXQORM_TEST_CONCURRENCY} // 4,
         iteration_callback => \&cull,
     );
 
@@ -73,7 +135,15 @@ sub do_for_all_dbs(&;@) {
         for my $dbi (@{$set->{dbi}}) {
             cull();
             $pr->run(sub {
+                # Re-seed in the forked child. Test2::V0 seeds srand
+                # deterministically (from the date), and fork inherits that
+                # state, so sibling children otherwise produce identical
+                # File::Temp 'DB-QUICK-XXXX' names -> two databases collide on
+                # one temp dir -> initdb / disk I/O failures under concurrency.
+                srand();
+
                 subtest "$set->{name} x DBD::$dbi" => sub {
+                    local $CURRENT_QDB = $set->{quickdb};
                     $ENV{$_} = $set->{env}->{$_} for keys %{$set->{env}};
                     my $qdb = "DBIx::QuickDB::Driver::$set->{quickdb}";
                     my $have_qdb = eval { require "DBIx/QuickDB/Driver/$set->{quickdb}.pm"; my ($v, $why) = $qdb->viable({load_sql => 1, bootstrap => 1}); $v || die $why } or note $@;

@@ -9,7 +9,7 @@ Time::TZif - TZif timezone file parser with configurable local time resolution
     use Time::TZif;
     
     my $tz = Time::TZif->new(
-      filename       => '/usr/share/zoneinfo/US/Eastern',
+      filename       => '/usr/share/zoneinfo/America/New_York',
       gap_policy     => 'later',      # default policy for gaps
       overlap_policy => 'earlier',    # default policy for overlaps
     );
@@ -46,13 +46,13 @@ UTC, because DST transitions create two problematic cases:
 =item B<Gaps> (spring forward)
 
 When clocks spring forward, a range of local times does not exist. For
-example, in US/Eastern on 2024-03-10, local times 02:00:00 through
+example, in America/New_York on 2024-03-10, local times 02:00:00 through
 02:59:59 do not exist because clocks jump from 02:00 EST to 03:00 EDT.
 
 =item B<Overlaps> (fall back)
 
 When clocks fall back, a range of local times occurs twice. For example,
-in US/Eastern on 2024-11-03, local times 01:00:00 through 01:59:59 occur
+in America/New_York on 2024-11-03, local times 01:00:00 through 01:59:59 occur
 once in EDT and again in EST.
 
 =back
@@ -76,7 +76,7 @@ Creates a new C<Time::TZif> object by parsing the specified TZif file.
 
 =item C<filename> (required)
 
-Path to a TZif binary timezone file (e.g., C</usr/share/zoneinfo/US/Eastern>).
+Path to a TZif binary timezone file (e.g., C</usr/share/zoneinfo/America/New_York>).
 
 =item C<gap_policy> (optional, default: C<'reject'>)
 
@@ -245,10 +245,6 @@ offset:
       overlap_policy => 'earlier',
     );
 
-B<Note:> C<Time::Local> assumes DST transitions of at least 60 minutes.
-Zones with smaller transitions (e.g., C<Australia/Lord_Howe>, 30 minutes)
-may not resolve correctly.
-
 =head2 L<POSIX>
 
 The behaviour of C<POSIX::mktime()> with C<tm_isdst = -1> for
@@ -302,7 +298,7 @@ This guard prevents excessive memory allocation from malformed files.
 
 The TZif file declares more type records than the compiled limit of 256.
 
-=item C<Unable to parse TZif: too many chars: %d (max: %d)>
+=item C<Unable to parse TZif: too many abbreviation characters: %d (max: %d)>
 
 The TZif file declares more abbreviation characters than the compiled
 limit of 256.
@@ -345,6 +341,10 @@ transition and the C<overlap_policy> policy is set to C<'reject'>.
 =head2 Usage errors
 
 =over 4
+
+=item C<Usage: %s>
+
+A method was called with an incorrect number of arguments.
 
 =item C<Parameter 'filename' is required>
 

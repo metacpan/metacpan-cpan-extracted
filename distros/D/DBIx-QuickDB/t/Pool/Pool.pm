@@ -145,7 +145,7 @@ ref_is_not($foo1, $foo2, "Each 'foo' is a clone, not the same ref");
 isnt($foo1->dir, $foo2->dir, "Both instances have different directories");
 
 ok(!QDB_POOL()->{databases}->{foo}->{db}->started, "The original 'foo' is stopped")
-    unless $driver eq 'SQLite';
+    unless $driver eq 'SQLite' || $driver eq 'DuckDB';
 
 my $fooh1 = $foo1->connect();
 my $fooh2 = $foo2->connect();

@@ -3,16 +3,16 @@ use strict;
 use warnings;
 use feature qw/state/;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000020';
 
-use Carp qw/confess croak cluck/;
+use Carp qw/confess croak cluck carp/;
 use Scalar::Util qw/blessed weaken/;
 use DBIx::QuickORM::Util qw/load_class/;
 
 use DBIx::QuickORM::Handle;
 use DBIx::QuickORM::Connection::Transaction;
 
-use DBIx::QuickORM::Util::HashBase qw{
+use Object::HashBase qw{
     <orm
     <dbh
     <dialect
@@ -29,6 +29,132 @@ use DBIx::QuickORM::Util::HashBase qw{
     <default_internal_txn
     <default_handle_class
 };
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::QuickORM::Connection - ORM connection to database.
+
+=head1 DESCRIPTION
+
+This module is the primary interface when using the ORM to connect to a
+database. This contains the database connection itself, a clone of the original
+schema along with any connection specific changes (temp tables, etc). You use
+this class to interact with the database, manage transactions, and get
+L<DBIx::QuickORM::Handle> objects that can be used to make queries against the
+database.
+
+=head1 SYNOPSIS
+
+    use My::Orm qw/orm/;
+
+    # Get a connection to the orm
+    # Note: This will return the same connection each time, no need to cache it yourself.
+    my $orm = orm('my_orm');
+
+    # Do something to all rows in the 'people' table.
+    my $people_handle = $orm->handle('people');
+    for my $person ($people_handle->all) {
+        ...
+    }
+
+    # Find all people with the surname 'smith' and print their first names.
+    my $smith_handle = $people_handle->where({surname => 'smith'});
+    for my $person ($handle->all) {
+        print $person->field('first_name') . "\n"
+    }
+
+    # Do a transaction that is managed by the ORM.
+    $con->txn(sub {
+        my $txn = shift;
+
+        ...
+
+        if (good()) {
+            # Can call commit or rollback manually. Or, if all is good just let
+            # the sub exit and the transaction will commit itself.
+            $txn->commit; # This will exit the subroutine
+        }
+        else {
+            # Can call rollback manually, or if the sub exits due to an
+            # exception being thrown, rollback will happen automatically.
+            $txn->rollback; # This will exit the subroutine
+        }
+    });
+
+=head1 ATTRIBUTES
+
+These are accessed via read-only accessors of the same name.
+
+=over 4
+
+=item orm
+
+The L<DBIx::QuickORM::ORM> object this connection belongs to.
+
+=item dbh
+
+The C<DBI> database handle for this connection.
+
+=item dialect
+
+The L<DBIx::QuickORM::Dialect> subclass instance for this connection.
+
+=item pid
+
+The PID the connection was established under.
+
+=item schema
+
+The connection-local L<DBIx::QuickORM::Schema> (a clone of the ORM's schema).
+
+=item transactions
+
+Arrayref forming the active transaction/savepoint stack. Internal use only.
+
+=item manager
+
+The L<DBIx::QuickORM::RowManager> instance managing row cache and state.
+
+=item in_async
+
+The active L<DBIx::QuickORM::STH::Async> object, if an async query is running.
+
+=item asides
+
+Hashref of active "aside" queries.
+
+=item forks
+
+Hashref of active "forked" queries.
+
+=item default_sql_builder
+
+Default SQL builder, normally L<DBIx::QuickORM::SQLBuilder::SQLAbstract>.
+
+=item default_internal_txn
+
+Boolean default for whether handles may use internal transactions.
+
+=item default_handle_class
+
+Default handle class, normally L<DBIx::QuickORM::Handle>.
+
+=back
+
+=head1 PUBLIC METHODS
+
+=over 4
+
+=item $con->init
+
+Object construction hook invoked by L<Object::HashBase>. Establishes the
+database handle, dialect, schema, and row manager. Not called directly.
+
+=cut
 
 sub init {
     my $self = shift;
@@ -86,6 +212,37 @@ sub init {
 ########################
 # {{{ Async/Aside/Fork #
 ########################
+
+=pod
+
+=item $con->set_async($async)
+
+Change state to be inside an async query, argument must be an
+L<DBIx::QuickORM::STH::Async> instance.
+
+=item $con->add_aside($aside)
+
+Register an "aside" query.
+
+=item $con->add_fork($fork)
+
+Register a "forked" query.
+
+=item $con->clear_async($async)
+
+Change state to be outside of an async query. The argument must be an
+L<DBIx::QuickORM::STH::Async> instance, and it must be the same object as the
+one returned by C<in_async()>.
+
+=item $con->clear_aside($aside)
+
+Clear a previously registered "aside" query.
+
+=item $con->clear_fork($fork)
+
+Clear a previously registered "forked" query.
+
+=cut
 
 sub set_async {
     my $self = shift;
@@ -157,6 +314,23 @@ sub clear_fork {
 # {{{ SANITY CHECKS #
 #####################
 
+=pod
+
+=item $con->pid_and_async_check
+
+Throws an exception if the PID does not match, or if there is an async query
+running.
+
+=item $con->pid_check
+
+Throws an exception if the current PID does not match the connection's PID.
+
+=item $con->async_check
+
+Throws an exception if there is an async query running.
+
+=cut
+
 sub pid_and_async_check {
     my $self = shift;
     return $self->pid_check && $self->async_check;
@@ -185,6 +359,18 @@ sub async_check {
 # {{{ SIMPLE ACCESSORS #
 ########################
 
+=pod
+
+=item $db = $con->db
+
+Shortcut for C<< $con->orm->db >>. Returns an L<DBIx::QuickORM::DB> object.
+
+=item $dbh = $con->aside_dbh
+
+Returns a completely new and independent C<$dbh> connected to the database.
+
+=cut
+
 sub db { $_[0]->{+ORM}->db }
 sub aside_dbh { $_[0]->{+ORM}->db->new_dbh }
 
@@ -196,6 +382,14 @@ sub aside_dbh { $_[0]->{+ORM}->db->new_dbh }
 # {{{ STATE CHANGES #
 #####################
 
+=pod
+
+=item $con->reconnect
+
+Used to reconnect after forking.
+
+=cut
+
 sub reconnect {
     my $self = shift;
 
@@ -205,8 +399,6 @@ sub reconnect {
 
     $self->{+PID} = $$;
     $self->{+DBH} = $self->{+ORM}->db->new_dbh;
-
-
 }
 
 #####################
@@ -216,6 +408,75 @@ sub reconnect {
 ###########################
 # {{{ TRANSACTION METHODS #
 ###########################
+
+=pod
+
+=item $txn = $con->transaction(sub { my $txn = shift; ... })
+
+=item $txn = $con->txn(sub { my $txn = shift; ... })
+
+=item $txn = $con->transaction(%params)
+
+=item $txn = $con->txn(%params)
+
+This will start a transaction or create a savepoint to emulate nested
+transactions. Calls to this method can be nested.
+
+    $con->txn(sub {
+        $con->txn(sub { ... }); # Nested! uses savepoints
+    });
+
+If an action sub is provided then the transaction will be started, and the
+action sub will be executed. If the action sub returns then the transaction
+will be commited. If the action sub throws an exception the transaction will be
+rolled back.
+
+You can also manually commit/rollback which will exit the action subroutine.
+
+    $txn->commmit;
+    $txn->rollback;
+
+If you need to start a transaction that is not limited to a single subroutine,
+you can call this method without an action sub, it will return an
+L<DBIx::QuickORM::Connection::Transaction> instance that can be used to commmit
+or rollback the transaction when you are ready. If the object falls completely
+out of scope and is destroyed then the transaction will be rolled back.
+
+All possible arguments:
+
+    my $txn = $con->txn(
+        # Action sub for this transaction, transaction ends when sub does.
+        action => sub { my $txn = shift; ... },
+
+        # Used to force a transaction even if there are aside or forked queries running.
+        force        => $BOOL, # Basically a combination of the next 2 options
+        ignore_aside => $BOOL, # Allow a transaction even if an aside query is active
+        ignore_forks => $BOOL, # Allow a transaction even if a forked query is active
+
+        # Things to run at the end of the transaction.
+        on_fail       => sub { ... }, # Only runs if the txn is rolled back
+        on_success    => sub { ... }, # Only runs if the txn is commited
+        on_completion => sub { ... }, # Runs whent he txn is done regardless of status.
+
+        # Same as above, except you are adding them to a direct parent txn (if one exists, otherwise they are no-ops)
+        on_parent_fail       => sub { ... },
+        on_parent_success    => sub { ... },
+        on_parent_completion => sub { ... },
+
+        # Same as above, except they are applied to the root transaction, no
+        # matter how deeply nested it is.
+        on_root_fail       => sub { ... },
+        on_root_success    => sub { ... },
+        on_root_completion => sub { ... },
+    );
+
+An L<DBIx::QuickORM::Connection::Transaction> instance is always returned. If
+an action callback was provided then the instance will already be complete, but
+you can check and see what the status was. If you did not provide an action
+callback then the txn will be "live" and you can use the instance to commit it
+or roll it back.
+
+=cut
 
 {
     no warnings 'once';
@@ -294,12 +555,12 @@ sub txn {
             if $self->{+IN_ASYNC} && !$self->{+IN_ASYNC}->done;
 
         $txnx->throw("Internal Error: Transaction stack mismatch")
-            unless @$txns && ($txnx->in_destroy && !$txns->[-1]) || $txns->[-1] == $txnx;
+            unless @$txns && (($txnx->in_destroy && !$txns->[-1]) || $txns->[-1] == $txnx);
 
         pop @$txns;
 
-        my $rolled_back = $txnx->rolled_back;
-        my $res         = $ok && !$rolled_back;
+        my $aborted = $txnx->aborted;
+        my $res     = $ok && !$aborted;
 
         if ($sp) {
             if   ($res) { $dialect->commit_savepoint(savepoint => $sp) }
@@ -317,6 +578,18 @@ sub txn {
         }
 
         return if $ok;
+
+        # When the transaction fell out of scope, DESTROY runs this as a safety
+        # net and has already rolled it back. We cannot propagate an exception
+        # from a destructor (Perl turns it into a noisy "(in cleanup)" stack
+        # trace), so warn concisely instead of confessing.
+        if ($txnx->in_destroy) {
+            my $trace = $txnx->trace // [];
+            carp "Transaction started at $trace->[1] line $trace->[2] fell out of scope and was rolled back"
+                if @$trace > 2;
+            return;
+        }
+
         $txnx->throw(join "\n" => @errors);
     };
 
@@ -332,10 +605,25 @@ sub txn {
         1;
     };
 
+    # The body threw - record the exception that forced the rollback.
+    $txn->set_exception($@) unless $ok;
+
     $finalize->($txn, $ok, $@);
 
     return $txn;
 }
+
+=pod
+
+=item $bool_or_txn = $con->in_transaction
+
+=item $bool_or_txn = $con->in_txn
+
+Returns true if there is a transaction active. If the transaction is managed by
+L<DBIx::QuickORM> then the L<DBIx::QuickORM::Connection::Transaction> object
+will be returned.
+
+=cut
 
 {
     no warnings 'once';
@@ -345,6 +633,19 @@ sub in_txn {
     my $self = shift;
     return $self->current_txn // $self->dialect->in_txn;
 }
+
+=pod
+
+=item $txn = $con->current_transaction
+
+=item $txn = $con->current_txn
+
+Return the current L<DBIx::QuickORM::Connection::Transaction> if one is active.
+
+B<Note:> Do not use this to check for a transaction, it will return false if
+there is a transaction that is not managed by L<DBIx::QuickORM>.
+
+=cut
 
 {
     no warnings 'once';
@@ -360,6 +661,26 @@ sub current_txn {
 
     return undef;
 }
+
+=pod
+
+=item $con->auto_retry_txn(sub { my $txn = shift; ... })
+
+=item $con->auto_retry_txn(\%params, sub { my $txn = shift; ... })
+
+=item $con->auto_retry_txn(%params, action => sub { my $txn = shift; ... })
+
+Run the specified action in a transaction, retry if an exception is thrown.
+
+This is a convenience method that boils down to:
+
+    $con->auto_retry(sub { $con->txn(sub { ... }) });
+
+C<< count => $NUM >> can be used to specify a maximum number of retries, the default is 1.
+
+All other params are passed to C<txn()>.
+
+=cut
 
 sub auto_retry_txn {
     my $self = shift;
@@ -408,6 +729,21 @@ sub auto_retry_txn {
 # {{{ UTILITY METHODS #
 #######################
 
+=pod
+
+=item $res = $con->auto_retry(sub { ... })
+
+=item $res = $con->auto_retry($count, sub { ... })
+
+Run the provided sub multiple times until it succeeds or the count is exceeded.
+Default count is 1. An exception will be thrown if it never succeeds. Cannot be
+used inside a transaction.
+
+Returns whatever the provided coderef returns; scalar context is always
+assumed.
+
+=cut
+
 sub auto_retry {
     my $self  = shift;
     my $cb    = pop;
@@ -430,6 +766,20 @@ sub auto_retry {
 
     return $out;
 }
+
+=pod
+
+=item $source = $con->source($in, %params)
+
+Resolve C<$in> to an object implementing L<DBIx::QuickORM::Role::Source>. C<$in>
+may be such an object, a scalar reference (treated as literal SQL), or a table
+name looked up in the schema. Croaks on failure unless C<< no_fatal => 1 >> is
+passed, in which case it returns undef.
+
+This is B<NOT> like calling C<source()> from L<DBIx::Class>; you cannot use the
+source directly to make queries, look at the C<handle()> method instead.
+
+=cut
 
 sub source {
     my $self = shift;
@@ -466,6 +816,24 @@ sub source {
 # {{{ HANDLE OPERATIONS #
 #########################
 
+=pod
+
+See L<DBIx::QuickORM::Handle> for more information on handles.
+
+=item $h = $con->handle(...)
+
+Get an L<DBIx::QuickORM::Handle> object that operates on this connection. Any
+argument accepted by the C<new()> or C<handle()> methods on
+L<DBIx::QuickORM::Handle> can be provided here as arguments.
+
+B<Note:> unlike C<source()>, C<handle()> does not accept a scalar reference
+(literal SQL) directly; passing one throws. Build the source first and pass
+the object:
+
+    $con->handle($con->source(\$sql))->all;
+
+=cut
+
 sub handle {
     my $self = shift;
     my ($in, @args) = @_;
@@ -479,131 +847,7 @@ sub handle {
     return $self->{+DEFAULT_HANDLE_CLASS}->handle(connection => $self, @_);
 }
 
-sub async  { shift->handle(@_)->async }
-sub aside  { shift->handle(@_)->aside }
-sub forked { shift->handle(@_)->forked }
-
-sub all      { shift->handle(@_)->all }
-sub iterator { shift->handle(@_)->iterator }
-sub any      { shift->handle(@_)->any }
-sub first    { shift->handle(@_)->first }
-sub one      { shift->handle(@_)->one }
-sub count    { shift->handle(@_)->count }
-sub delete   { shift->handle(@_)->delete }
-
-sub by_id   { my $arg = pop; shift->handle(@_)->by_id($arg) }
-sub iterate { my $arg = pop; shift->handle(@_)->iterate($arg) }
-sub insert  { my $arg = pop; shift->handle(@_)->insert($arg) }
-sub vivify  { my $arg = pop; shift->handle(@_)->vivify($arg) }
-sub update  { my $arg = pop; shift->handle(@_)->update($arg) }
-
-sub update_or_insert { my $arg = pop; shift->handle(@_)->update_or_insert($arg) }
-sub find_or_insert   { my $arg = pop; shift->handle(@_)->update_or_insert($arg) }
-
-sub by_ids {
-    my $self = shift;
-    my ($from, @ids) = @_;
-
-    my $handle;
-    if (blessed($from) && $from->isa('DBIx::QuickORM::Handle')) {
-        $handle = $from;
-    }
-    else {
-        $handle = $self->handle(source => $from);
-    }
-
-    return $handle->by_ids(@ids);
-}
-
-#########################
-# }}} HANDLE OPERATIONS #
-#########################
-
-########################
-# {{{ STATE OPERATIONS #
-########################
-
-sub state_does_cache   { $_[0]->{+MANAGER}->does_cache }
-sub state_delete_row   { my $self = shift; $self->{+MANAGER}->delete(connection => $self, @_) }
-sub state_insert_row   { my $self = shift; $self->{+MANAGER}->insert(connection => $self, @_) }
-sub state_select_row   { my $self = shift; $self->{+MANAGER}->select(connection => $self, @_) }
-sub state_update_row   { my $self = shift; $self->{+MANAGER}->update(connection => $self, @_) }
-sub state_vivify_row   { my $self = shift; $self->{+MANAGER}->vivify(connection => $self, @_) }
-sub state_invalidate   { my $self = shift; $self->{+MANAGER}->invalidate(connection => $self, @_) }
-sub state_cache_lookup { $_[0]->{+MANAGER}->do_cache_lookup($_[1], undef, undef, $_[2]) }
-
-########################
-# }}} STATE OPERATIONS #
-########################
-
-1;
-
-__END__
-
-=head1 NAME
-
-DBIx::QuickORM::Connection - ORM connection to database.
-
-=head1 DESCRIPTION
-
-This module is the primary interface when using the ORM to connect to a
-database. This contains the database connection itself, a clone of the original
-schema along with any connection specific changes (temp tables, etc). You use
-this class to interact with the database, manage transactions, and get
-L<DBIx::QuickORM::Handle> objects that can be used to make queries against the
-database.
-
-=head1 SYNOPSIS
-
-    use My::Orm qw/orm/;
-
-    # Get a connection to the orm
-    # Note: This will return the same connection each time, no need to cache it yourself.
-    my $orm = orm('my_orm');
-
-    # Do something to all rows in the 'people' table.
-    my $people_handle = $orm->handle('people');
-    for my $person ($people_handle->all) {
-        ...
-    }
-
-    # Find all people with the surname 'smith' and print their first names.
-    my $smith_handle = $people_handle->where({surname => 'smith'});
-    for my $person ($handle->all) {
-        print $person->field('first_name') . "\n"
-    }
-
-    # Do a transaction that is managed by the ORM.
-    $con->txn(sub {
-        my $txn = shift;
-
-        ...
-
-        if (good()) {
-            # Can call commit or rollback manually. Or, if all is good just let
-            # the sub exit and the transaction will commit itself.
-            $txn->commit; # This will exit the subroutine
-        }
-        else {
-            # Can call rollback manually, or if the sub exits due to an
-            # exception being thrown, rollback will happen automatically.
-            $txn->rollback; # This will exit the subroutine
-        }
-    });
-
-=head1 METHODS
-
-=head2 HANDLE OPERATIONS
-
-See L<DBIx::QuickORM::Handle> for more information on handles
-
-=over 4
-
-=item $h = $con->handle(...)
-
-Get an L<DBIx::QuickORM::Handle> object with that operates on this connection.
-Any argument accepted by the C<new()> or C<handle()> methods on
-L<DBIx::QuickORM::Handle> can be provided here as arguments.
+=pod
 
 =item $h = $con->async(@handle_constructor_args)
 
@@ -651,13 +895,39 @@ These are convenience methods that simply proxy to handle objects:
 
 See the methods in L<DBIx::QuickORM::Handle> for more info.
 
+=cut
+
+sub async  { my $self = shift; $self->handle(@_)->async }
+sub aside  { my $self = shift; $self->handle(@_)->aside }
+sub forked { my $self = shift; $self->handle(@_)->forked }
+
+sub all      { my $self = shift; $self->handle(@_)->all }
+sub iterator { my $self = shift; $self->handle(@_)->iterator }
+sub any      { my $self = shift; $self->handle(@_)->any }
+sub first    { my $self = shift; $self->handle(@_)->first }
+sub one      { my $self = shift; $self->handle(@_)->one }
+sub count    { my $self = shift; $self->handle(@_)->count }
+sub delete   { my $self = shift; $self->handle(@_)->delete }
+
+sub by_id   { my $self = shift; my $arg = pop; $self->handle(@_)->by_id($arg) }
+sub iterate { my $self = shift; my $arg = pop; $self->handle(@_)->iterate($arg) }
+sub insert  { my $self = shift; my $arg = pop; $self->handle(@_)->insert($arg) }
+sub vivify  { my $self = shift; my $arg = pop; $self->handle(@_)->vivify($arg) }
+sub update  { my $self = shift; my $arg = pop; $self->handle(@_)->update($arg) }
+
+sub update_or_insert { my $self = shift; my $arg = pop; $self->handle(@_)->upsert($arg) }
+sub find_or_insert   { my $self = shift; my $arg = pop; my $h = $self->handle(@_); $h->one($arg) // $h->insert($arg) }
+
+=pod
+
 =item $rows_arrayref = $con->by_ids($source, @ids)
 
 Fetch rows in the specified source by their ids.
 
 B<NOTE:> If all the specified rows are already cached, no DB query will occur.
 
-C<$source> can be a table name, or any object that implements L<DBIx::QuickORM::Role::Source>.
+C<$source> can be a table name, or any object that implements
+L<DBIx::QuickORM::Role::Source>.
 
 C<@ids> contains one or more row primary keys. The keys may be a scalar value
 such as C<12> if the primary key is a single column. If the source has a
@@ -666,288 +936,46 @@ or a hashref with the C<< field => val >> pairs.
 
 An arrayref of L<DBIx::QuickORM::Row> objects will be returned.
 
-This is a convenience method that boild down to this:
+This is a convenience method that boils down to this:
 
     $con->handle($source)->by_ids(@ids);
 
-=back
-
-=head2 TRANSACTION MANAGEMENT
-
-=over 4
-
-=item $txn = $con->transaction(sub { my $txn = shift; ... })
-
-=item $txn = $con->txn(sub { my $txn = shift; ... })
-
-=item $txn = $con->transaction(%params)
-
-=item $txn = $con->txn(%params)
-
-This will start a transaction or create a savepoint to emulate nested
-transactions. Call to this method can be nested.
-
-    $con->txn(sub {
-        $con->txn(sub { ... }); # Nested! uses savepoints
-    });
-
-If an action sub is provided then the transaction will be started, and the
-action sub will be executed. If the action sub returns then the transaction
-will be commited. If the action sub throws an exception the transaction will be
-rolled back.
-
-You can also manually commit/rollback which will exit the action subroutine.
-
-    $txn->commmit;
-    $txn->rollback;
-
-If you need to start a transaction that is not limited to a single subroutine,
-you can call this method without an action sub, it will return an
-L<DBIx::QuickORM::Connection::Transaction> instance that can be used to commmit
-or rollback the transaction when you are ready. If the object falls completely
-out of scope and is destroyed then the transaction will be rolled back.
-
-All possible arguments:
-
-    my $txn = $con->txn(
-        # Action sub for this transaction, transaction ends when sub does.
-        action => sub { my $txn = shift; ... },
-
-        # Used to force a transaction even if there are aside or forked queries running.
-        force        => $BOOL, # Basically a combination of the next 2 options
-        ignore_aside => $BOOL, # Allow a transaction even if an aside query is active
-        ignore_forks => $BOOL, # Allow a transaction even if a forked query is active
-
-        # Things to run at the end of the transaction.
-        on_fail       => sub { ... }, # Only runs if the txn is rolled back
-        on_success    => sub { ... }, # Only runs if the txn is commited
-        on_completion => sub { ... }, # Runs whent he txn is done regardless of status.
-
-        # Same as above, except you are adding them to a direct parent txn (if one exists, otherwise they are no-ops)
-        on_parent_fail       => sub { ... },
-        on_parent_success    => sub { ... },
-        on_parent_completion => sub { ... },
-
-        # Same as above, except they are applied to the root transaction, no
-        # matter how deeply nested it is.
-        on_root_fail       => sub { ... },
-        on_root_success    => sub { ... },
-        on_root_completion => sub { ... },
-    );
-
-An L<DBIx::QuickORM::Connection::Transaction> instance is always returned. If
-an action callback was provided then the instance will already be complete, but
-you can check and see what the status was. If you did not provide an action
-callback then the txn will be "live" and you can use the instance to commit it
-or roll it back.
-
-=item $bool_or_txn = $con->in_transaction
-
-=item $bool_or_txn = $con->in_txn
-
-Returns true if there is a transaction active. If the transaction is managed by
-L<DBIx::QuickORM> then the L<DBIx::QuickORM::Connection::Transaction> object
-will be returned.
-
-=item $txn = $con->current_transaction
-
-=item $txn = $con->current_txn
-
-Return the current L<DBIx::QuickORM::Connection::Transaction> if one is active.
-
-B<Note:> Do not use this to check for a transaction, it will return false if
-there is a transaction that is not managed by L<DBIx::QuickORM>.
-
-=item $con->auto_retry_txn(sub { my $txn = shift; ... })
-
-=item $con->auto_retry_txn(\%params, sub { my $txn = shift; ... })
-
-=item $con->auto_retry_txn(%params, action => sub { my $txn = shift; ... })
-
-Run the specified action in a transaction, retry if an exception is thrown.
-
-Run the subroutine is a convenience method that boild down to:
-
-    $con->auto_retry(sub { $con->txn(sub { ... }) });
-
-C<< count => $NUM >> can be used to specify a maximum number of retries, the default is 1.
-
-All other params are passed to C<txn()>.
-
-=back
-
-=head2 UTILITY
-
-=over 4
-
-=item $db = $con->db
-
-Shortcut for C<< $con->orm->db >>.
-
-This returns an L<DBIx::QuickORM::DB> object.
-
-=item $dbh = $con->dbh
-
-Shortcut for C<< $con->orm->dbh >>.
-
-Returns the $dbh object used for this connection.
-
-=item $dbh = $con->aside_dbh
-
-Shortcut for C<< $con->orm->db->new_db >>.
-
-Returns a completely new and independant $dbh connected to the database.h
-
-=item $res = $con->auto_retry(sub { ... })
-
-=item $res = $con->auto_retry($count, sub { ... })
-
-Run the provided sub multiple times until it succeeds or the count is exceeded.
-
-Default count is 1.
-
-An exception will be thrown if it never succeeds.
-
-Cannot be used inside a transaction.
-
-Returns whatever the provided coderef returns, scalar context is always
-assumed.
-
-=item $class = $con->default_handle_class
-
-Get the default handle class for this connection. Default is
-L<DBIx::QuickORM::Handle>.
-
-=item $bool = $con->default_internal_txn
-
-Used by handles to know if they should default to allowing internal
-transactions, that is temporary transactions the handles use under the hood
-without the user necessarily being aware of them.
-
-=item $class = $con->default_sql_builder
-
-Default SQL Builder class to use. Normally
-L<DBIx::QuickORM::SQLBuilder::SQLAbstract>.
-
-=item $dialect = $con->dialect
-
-Returns the L<DBIx::QuickORM::Dialect> subclass for the connection.
-
-=item $manager = $con->manager
-
-Returns the L<DBIx::QuickORM::RowManager> subclass to use for managing cache
-and other row state.
-
-=item $orm = $con->orm
-
-Returns the L<DBIx::QuickORM::ORM> object associated with this connection.
-
-=item $pid = $con->pid
-
-Retusn the PID the connection is associated with.
-
-=item $schema = $con->schema
-
-Returns the L<DBIx::QuickORM::Schema> object for this connection. This is a
-deep clone of the one from the L<DBIx::QuickORM::ORM>'s schema object, with
-connections pecific changes such as local tables being added.
-
-Modifying this will B<NOT> modify the schema in the root ORM object.
-
-=item $source = $con->source
-
-Returns the soure object. The source object should implement the
-L<DBIx::QuickORM::Role::Source> role. It will usually be an
-L<DBIx::QuickORM::Schema::Table> instance, but could also be an
-L<DBIx::QuickORM::Join> or other object implementing the role.
-
-This is B<NOT> like calling C<source()> from L<DBIx::Class>, you cannot use the
-source directly to make queries, look at the C<handle()> method instead.
-
-=back
-
-=head2 SANITY CHECKS
-
-These are sanity checks that will throw exceptions if invalid conditions are
-detected.
-
-=over 4
-
-=item $con->pid_check
-
-Throws an exception if the current PID does not match the connections PID.
-
-=item $con->async_check
-
-Throws an exception if there is an async query running.
-
-=item $con->pid_and_async_check
-
-Throws an exception if the PID does not match, or if there is an async query
-running.
-
-=back
-
-=head2 INTERNAL STATE MANAGEMENT
-
-=over 4
-
-=item $con->set_async($async)
-
-Change state to be inside an async query, argument must be an
-L<DBIx::QuickORM::STH::Async> instance.
-
-=item $con->clear_async($async)
-
-Change state to be outside of an async query. The argument must be an
-L<DBIx::QuickORM::STH::Async> instance, and it must be the same object as the
-one returned by C<in_async()>.
-
-=item $obj = $con->in_async
-
-Returns the active L<DBIx::QuickORM::STH::Async> object if there is an active
-async query. Returns undef if there is no active async query.
-
-=item $con->add_aside($aside)
-
-=item $con->asides
-
-=item $con->clear_aside($aside)
-
-Used to add or clear 'aside' queries.
-
-=item $con->add_fork($fork)
-
-=item $con->forks
-
-=item $con->clear_fork($fork)
-
-Used to add or clear 'forked' queries.
-
-=item $con->reconnect
-
-Used to reconnect after forking.
-
-=item $arrayref = $con->transactions
-
-For internal use only.
-
-=back
-
-=head1 ROW STATE MANAGEMENT
-
-=over 4
+=cut
+
+sub by_ids {
+    my $self = shift;
+    my ($from, @ids) = @_;
+
+    my $handle;
+    if (blessed($from) && $from->isa('DBIx::QuickORM::Handle')) {
+        $handle = $from;
+    }
+    else {
+        $handle = $self->handle(source => $from);
+    }
+
+    return $handle->by_ids(@ids);
+}
+
+#########################
+# }}} HANDLE OPERATIONS #
+#########################
+
+########################
+# {{{ STATE OPERATIONS #
+########################
+
+=pod
 
 =item $bool = $con->state_does_cache
 
-Check if the current rowmanager handles caching of rows.
+Check if the current row manager handles caching of rows.
 
 =item $row = $con->state_cache_lookup($source, $pk)
 
 Find an in-cache row by source and primary key. Source can be a table name or
-object that implements L<DBIx::QuickORM::Role::Source>.
-
-The primary key should be a hashref:
+object that implements L<DBIx::QuickORM::Role::Source>. The primary key should
+be a hashref:
 
     {pk_field1 => $pk_val1, pk_field2 => $pk_val2, ... }
 
@@ -969,10 +997,41 @@ These are shortcuts for:
 
 =back
 
+=cut
+
+sub state_does_cache   { $_[0]->{+MANAGER}->does_cache }
+sub state_delete_row   { my $self = shift; $self->{+MANAGER}->delete(connection => $self, @_) }
+sub state_insert_row   { my $self = shift; $self->{+MANAGER}->insert(connection => $self, @_) }
+sub state_select_row   { my $self = shift; $self->{+MANAGER}->select(connection => $self, @_) }
+sub state_update_row   { my $self = shift; $self->{+MANAGER}->update(connection => $self, @_) }
+sub state_vivify_row   { my $self = shift; $self->{+MANAGER}->vivify(connection => $self, @_) }
+sub state_invalidate   { my $self = shift; $self->{+MANAGER}->invalidate(connection => $self, @_) }
+sub state_cache_lookup {
+    my $self = shift;
+    my ($in, $pk) = @_;
+
+    my $source = $self->source($in);
+
+    if (ref($pk) eq 'HASH') {
+        my $fields = $source->primary_key // [];
+        $pk = [map { $pk->{$_} } @$fields];
+    }
+
+    return $self->{+MANAGER}->do_cache_lookup($source, undef, undef, $pk);
+}
+
+########################
+# }}} STATE OPERATIONS #
+########################
+
+1;
+
+__END__
+
 =head1 SOURCE
 
-The source code repository for DBIx-QuickORM can be found at
-L<http://github.com/exodist/DBIx-QuickORM/>.
+The source code repository for DBIx::QuickORM can be found at
+L<https://github.com/exodist/DBIx-QuickORM>.
 
 =head1 MAINTAINERS
 
@@ -997,6 +1056,6 @@ Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See L<http://dev.perl.org/licenses/>
+See L<https://dev.perl.org/licenses/>
 
 =cut

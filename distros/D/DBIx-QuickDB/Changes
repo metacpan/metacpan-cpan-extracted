@@ -1,3 +1,19 @@
+0.000042  2026-05-25 17:30:00-07:00 America/Los_Angeles
+
+    - Add DuckDB driver (optional DBD::DuckDB + duckdb CLI; tests skip if absent)
+
+    - Add [PruneCruft] to dist.ini so build artifacts (blib/,
+      pm_to_blib, MYMETA.*) no longer leak into release tarballs.
+
+    - Fix provider_info running mariadb-install-db with no args, which created a
+      143MB 'data' dir in CWD (GH #11)
+    - Exclude 'data/' from dist tarball via GatherDir as a safeguard
+    - Fix DB-QUICK-CLONE temp dirs and server processes leaking after tests (GH #10)
+      - Set SIGTERM/SIGINT to SIG_IGN before watcher exec to prevent race
+        condition where watcher is killed before signal handlers are installed
+      - Add fallback in Driver::DESTROY to kill server directly and clean up
+        dir if watcher fails to do so
+
 0.000041  2026-04-07 17:13:03-07:00 America/Los_Angeles
 
     - Fix clone_dir cp fallback copying source dir into dest instead of contents

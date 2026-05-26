@@ -9,6 +9,8 @@ Time::Str::Calendar - Gregorian calendar validation and computation
 =head1 SYNOPSIS
 
     use Time::Str::Calendar qw( valid_ymd ymd_to_rdn ymd_to_dow
+                                ymd_to_doy yd_to_ymd
+                                nth_dow_in_month
                                 rdn_to_ymd resolve_century );
 
     # Validate a date
@@ -16,16 +18,22 @@ Time::Str::Calendar - Gregorian calendar validation and computation
     valid_ymd(2023, 2, 29);  # false
 
     # Rata Die Number
-    my $rdn = ymd_to_rdn(2024, 12, 24);  # 739244
+    my $rdn = ymd_to_rdn(2024, 12, 24);      # 739244
 
     # Day of week (1=Mon .. 7=Sun)
-    my $dow = ymd_to_dow(2024, 12, 24);  # 2 (Tuesday)
+    my $dow = ymd_to_dow(2024, 12, 24);      # 2 (Tuesday)
+
+    # Day of year (1-366)
+    my $doy = ymd_to_doy(2024, 12, 24);      # 359
+
+    # Day of year to date
+    my ($m, $d) = yd_to_md(2024, 359);       # (12, 24)
 
     # Rata Die to date
-    my ($y, $m, $d) = rdn_to_ymd(739244);  # (2024, 12, 24)
+    my ($y, $m, $d) = rdn_to_ymd(739244);    # (2024, 12, 24)
 
     # Resolve two-digit year
-    my $year = resolve_century(24, 1950);  # 2024
+    my $year = resolve_century(24, 1950);    # 2024
 
 =head1 DESCRIPTION
 
@@ -87,6 +95,30 @@ Returns the day of week for the given Rata Die Number as an integer
 
 Croaks if C<rdn> is out of range [1, 3652059].
 
+=head2 ymd_to_doy
+
+    my $doy = ymd_to_doy($year, $month, $day);
+
+Returns the day of year (1-366) for the given date.
+
+Croaks if C<year> is out of range [1, 9999], C<month> is out of
+range [1, 12], or C<day> is out of range [1, 31].
+
+The date is not validated; use C<valid_ymd> first if the input is
+untrusted.
+
+=head2 yd_to_md
+
+    my ($month, $day) = yd_to_md($year, $day);
+
+Converts a year and day of year (1-366) to a Gregorian date.
+
+Croaks if C<year> is out of range [1, 9999], or C<day> is out of 
+range [1, 366].
+
+The date is not validated; use C<valid_yd> first if the input is
+untrusted.
+
 =head2 ymd_to_dow
 
     my $dow = ymd_to_dow($year, $month, $day);
@@ -98,6 +130,42 @@ range [1, 12], or C<day> is out of range [1, 31].
 
 The date is not validated; use C<valid_ymd> first if the input is
 untrusted.
+
+=head2 nth_dow_in_month
+
+    my $day = nth_dow_in_month($year, $month, $ord, $dow);
+
+Returns the day of month for the I<ord>-th occurrence of weekday
+I<dow> in the given month and year.
+
+C<$dow> uses the ISO convention (1=Monday .. 7=Sunday).
+
+C<$ord> is a signed ordinal:
+
+=over 4
+
+=item * B<1> to B<4> count forward from the start of the month.
+
+=item * B<-1> to B<-4> count backward from the end of the month
+(C<-1> = last, C<-2> = second-to-last, etc.).
+
+=back
+
+    # 2nd Sunday of March 2024 (US spring forward)
+    nth_dow_in_month(2024, 3, 2, 7)    # 10
+
+    # Last Sunday of October 2024 (EU fall back)
+    nth_dow_in_month(2024, 10, -1, 7)  # 27
+
+    # 4th Thursday of November 2024 (US Thanksgiving)
+    nth_dow_in_month(2024, 11, 4, 4)   # 28
+
+    # Last Monday of May 2024 (US Memorial Day)
+    nth_dow_in_month(2024, 5, -1, 1)   # 27
+
+Croaks if C<year> is out of range [1, 9999], C<month> is out of
+range [1, 12], C<ord> is out of range [-4, -1] or [1, 4], or
+C<dow> is out of range [1, 7].
 
 =head2 resolve_century
 

@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{Perl7::Handy},
-    'VERSION'   => q{0.12},
+    'VERSION'   => q{0.13},
     'ABSTRACT'  => q{Handy Perl7 scripting environment on Perl5},
     'PREREQ_PM' => {
         'Fcntl' => '1.03',
@@ -46,7 +46,7 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'Perl7::Handy' => {
                 'file'    => 'lib/Perl7/Handy.pm',
-                'version' => '0.12',
+                'version' => '0.13',
             }
         },
     };

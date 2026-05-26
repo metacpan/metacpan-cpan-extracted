@@ -1,5 +1,8 @@
 Revision history for Concierge-Sessions
 
+v0.11.1  2026-05-25
+    - Expand test coverage across all test files
+
 v0.11.0  2026-02-15
     - Fixed distribution issue with MANIFEST.SKIP
 

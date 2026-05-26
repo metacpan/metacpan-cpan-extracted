@@ -3,12 +3,9 @@ package WWW::MailboxOrg::API::Mailinglist;
 # ABSTRACT: Mailing list API
 
 use Moo;
-use MooX::Singleton;
-use Carp qw(croak);
-use Params::ValidationCompiler qw(validation_for);
-use Types::Standard qw(Str ArrayRef HashRef Bool);
-
-our $VERSION = '0.001';
+with 'WWW::MailboxOrg::Role::API';
+use Params::ValidationCompiler qw( validation_for );
+use Types::Standard qw( Str ArrayRef HashRef Bool );
 
 has client => (
     is       => 'ro',
@@ -16,19 +13,13 @@ has client => (
     weak_ref => 1,
 );
 
-sub _rpc {
-    my ($self, $method, @params) = @_;
-    my $client = $self->client or croak "No client set";
-    return $client->call($method, @params);
-}
-
 my %validators = (
     add => validation_for(
         params => {
-            account => { type => Str, optional => 0 },
-            list    => { type => Str, optional => 0 },
+            account  => { type => Str, optional => 0 },
+            list     => { type => Str, optional => 0 },
             password => { type => Str, optional => 0 },
-            memo    => { type => Str, optional => 1 },
+            memo     => { type => Str, optional => 1 },
         },
     ),
     del => validation_for(
@@ -43,17 +34,13 @@ my %validators = (
             list    => { type => Str, optional => 0 },
         },
     ),
-    list => validation_for(
-        params => {
-            account => { type => Str, optional => 1 },
-        },
-    ),
+    list => validation_for( params => { account => { type => Str, optional => 1 } } ),
     set => validation_for(
         params => {
-            account => { type => Str, optional => 0 },
-            list    => { type => Str, optional => 0 },
+            account  => { type => Str, optional => 0 },
+            list     => { type => Str, optional => 0 },
             password => { type => Str, optional => 1 },
-            memo    => { type => Str, optional => 1 },
+            memo     => { type => Str, optional => 1 },
         },
     ),
     add_member => validation_for(
@@ -78,60 +65,68 @@ my %validators = (
     ),
 );
 
+
 sub add {
-    my ($self, %params) = @_;
+    my ( $self, %params ) = @_;
     my $v = $validators{'add'};
     %params = $v->(%params) if $v;
-    return $self->_rpc('mailinglist.add', \%params);
+    return $self->_rpc( 'mailinglist.add', \%params );
 }
+
 
 sub del {
-    my ($self, %params) = @_;
+    my ( $self, %params ) = @_;
     my $v = $validators{'del'};
     %params = $v->(%params) if $v;
-    return $self->_rpc('mailinglist.del', \%params);
+    return $self->_rpc( 'mailinglist.del', \%params );
 }
+
 
 sub get {
-    my ($self, %params) = @_;
+    my ( $self, %params ) = @_;
     my $v = $validators{'get'};
     %params = $v->(%params) if $v;
-    return $self->_rpc('mailinglist.get', \%params);
+    return $self->_rpc( 'mailinglist.get', \%params );
 }
+
 
 sub list {
-    my ($self, %params) = @_;
+    my ( $self, %params ) = @_;
     my $v = $validators{'list'};
     %params = $v->(%params) if $v;
-    return $self->_rpc('mailinglist.list', \%params);
+    return $self->_rpc( 'mailinglist.list', \%params );
 }
+
 
 sub set {
-    my ($self, %params) = @_;
+    my ( $self, %params ) = @_;
     my $v = $validators{'set'};
     %params = $v->(%params) if $v;
-    return $self->_rpc('mailinglist.set', \%params);
+    return $self->_rpc( 'mailinglist.set', \%params );
 }
+
 
 sub add_member {
-    my ($self, %params) = @_;
+    my ( $self, %params ) = @_;
     my $v = $validators{'add_member'};
     %params = $v->(%params) if $v;
-    return $self->_rpc('mailinglist.add_member', \%params);
+    return $self->_rpc( 'mailinglist.add_member', \%params );
 }
+
 
 sub del_member {
-    my ($self, %params) = @_;
+    my ( $self, %params ) = @_;
     my $v = $validators{'del_member'};
     %params = $v->(%params) if $v;
-    return $self->_rpc('mailinglist.del_member', \%params);
+    return $self->_rpc( 'mailinglist.del_member', \%params );
 }
 
+
 sub list_members {
-    my ($self, %params) = @_;
+    my ( $self, %params ) = @_;
     my $v = $validators{'list_members'};
     %params = $v->(%params) if $v;
-    return $self->_rpc('mailinglist.list_members', \%params);
+    return $self->_rpc( 'mailinglist.list_members', \%params );
 }
 
 1;
@@ -148,11 +143,7 @@ WWW::MailboxOrg::API::Mailinglist - Mailing list API
 
 =head1 VERSION
 
-version 0.001
-
-=head1 NAME
-
-WWW::MailboxOrg::API::Mailinglist - Mailing list API
+version 0.100
 
 =head2 add
 
@@ -230,14 +221,12 @@ Remove a member from a mailing list.
 
 List all members of a mailing list.
 
-=cut
-
 =head1 SUPPORT
 
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/getty/p5-www-mailboxorg/issues>.
+L<https://github.com/Getty/p5-www-mailboxorg/issues>.
 
 =head2 IRC
 

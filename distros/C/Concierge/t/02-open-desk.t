@@ -4,14 +4,14 @@ use lib 'lib';
 use Test2::V0;
 use File::Temp qw(tempdir);
 
-use Concierge::Setup;
+use Concierge::Desk::Setup;
 use Concierge;
 
 # Create temporary desk for testing
 my $test_dir = tempdir(CLEANUP => 1);
 
 # Build desk first
-my $build = Concierge::Setup::build_quick_desk(
+my $build = Concierge::Desk::Setup::build_quick_desk(
     $test_dir,
     ['field1'],
 );
@@ -52,7 +52,7 @@ subtest 'open_desk fails for nonexistent directory' => sub {
 subtest 'open_desk fails with invalid JSON config' => sub {
     use File::Spec;
     my $bad_dir = tempdir(CLEANUP => 1);
-    Concierge::Setup::build_quick_desk($bad_dir);
+    Concierge::Desk::Setup::build_quick_desk($bad_dir);
 
     # Overwrite concierge.conf with invalid JSON
     my $conf_file = File::Spec->catfile($bad_dir, 'concierge.conf');
@@ -69,7 +69,7 @@ subtest 'open_desk runs cleanup_sessions' => sub {
     # Create desk and add expired session manually (if needed)
     my $temp_dir = tempdir(CLEANUP => 1);
 
-    Concierge::Setup::build_quick_desk($temp_dir);
+    Concierge::Desk::Setup::build_quick_desk($temp_dir);
 
     # Open desk - should run cleanup_sessions
     my $result = Concierge->open_desk($temp_dir);

@@ -6,14 +6,12 @@
 use strict;
 use warnings;
 
-use Getopt::Long::Descriptive qw( describe_options Usage );
+use Getopt::Long::Descriptive qw( describe_options );
 use Pod::Usage qw( pod2usage );
 use File::HomeDir;
 use Path::Tiny qw( path );
 
 use WWW::MailboxOrg;
-
-our $VERSION = '0.001';
 
 my @config_files = (
     File::HomeDir->my_home . '/.mailboxrc',
@@ -23,11 +21,11 @@ my @config_files = (
 my $config = {};
 
 for my $file (@config_files) {
-    if (path($file)->exists) {
+    if ( path($file)->exists ) {
         my $content = path($file)->slurp_utf8;
-        for my $line (split /\n/, $content) {
+        for my $line ( split /\n/, $content ) {
             $line =~ s/\s*#.*//;
-            if ($line =~ /^\s*(\w+)\s*=\s*(.+)\s*$/) {
+            if ( $line =~ /^\s*(\w+)\s*=\s*(.+)\s*$/ ) {
                 $config->{$1} = $2;
             }
         }
@@ -36,20 +34,29 @@ for my $file (@config_files) {
 
 my ( $opt, $usage ) = describe_options(
     '%c %o [command] [options]',
-    [ 'user|u=s', 'Mailbox.org username or email', { default => $config->{user} } ],
-    [ 'password|p=s', 'Mailbox.org password', { default => $config->{password} } ],
-    [ 'base_url|b=s', 'API base URL', { default => $config->{base_url} // 'https://api.mailbox.org/v1' } ],
-    [ 'verbose|v', 'Be verbose' ],
-    [ 'help|h', 'Show help' ],
-    [ 'version|V', 'Show version' ],
+    [ 'user|u=s',     'Mailbox.org username or email', { default => $config->{user} } ],
+    [ 'password|p=s', 'Mailbox.org password',          { default => $config->{password} } ],
+    [ 'base_url|b=s', 'API base URL',                  { default => $config->{base_url} // $ENV{WWW_MAILBOXORG_BASE_URL} // 'https://api.mailbox.org/v1' } ],
+    [ 'verbose|v',    'Be verbose' ],
+    [ 'help|h',       'Show help' ],
+    [ 'version|V',    'Show version' ],
     [],
     [ 'Commands:' ],
-    [ 'login', 'Login to Mailbox.org API' ],
-    [ 'logout', 'Logout from Mailbox.org API' ],
-    [ 'account', 'Account management commands' ],
-    [ 'domain', 'Domain management commands' ],
-    [ 'mail', 'Mail operations' ],
-    [ 'system', 'System information' ],
+    [ 'login',        'Login to Mailbox.org API' ],
+    [ 'logout',       'Logout from Mailbox.org API' ],
+    [ 'account',      'Account management (list, get, add, del, set)' ],
+    [ 'domain',       'Domain management (list, get, add, del, set)' ],
+    [ 'mail',         'Mail operations (list, find)' ],
+    [ 'mailinglist',  'Mailing list management' ],
+    [ 'blacklist',    'Blacklist management' ],
+    [ 'spamprotect',  'Spam protection (status, set)' ],
+    [ 'videochat',    'Video chat rooms (status, create_room, list_rooms, delete_room)' ],
+    [ 'backup',       'Backup operations (list, create, restore, delete)' ],
+    [ 'invoice',      'Invoice operations (list, get, download)' ],
+    [ 'passwordreset', 'Password reset (request, set)' ],
+    [ 'validate',     'Validate email address' ],
+    [ 'utils',        'Utils (parse_headers, parse_date, generate_message_id)' ],
+    [ 'system',       'System info (hello, test, capabilities)' ],
 );
 
 if ( $opt->help ) {
@@ -57,7 +64,7 @@ if ( $opt->help ) {
 }
 
 if ( $opt->version ) {
-    print "mborg version $VERSION\n";
+    print "mborg version " . WWW::MailboxOrg->VERSION . "\n";
     exit 0;
 }
 
@@ -67,8 +74,8 @@ if ( !@ARGV ) {
 
 my $command = shift @ARGV;
 my %api_options = (
-    user => $opt->user // $ENV{MAILBOX_USER},
-    password => $opt->password // $ENV{MAILBOX_PASSWORD},
+    user     => $opt->user     // $ENV{WWW_MAILBOXORG_USER},
+    password => $opt->password // $ENV{WWW_MAILBOXORG_PASSWORD},
     base_url => $opt->base_url,
 );
 
@@ -88,163 +95,709 @@ if ( !$api_options{user} && !$api_options{password} && $command eq 'login' ) {
 }
 
 if ( !$api_options{user} || !$api_options{password} ) {
-    die "Error: user and password required. Use --user and --password, or set MAILBOX_USER/MAILBOX_PASSWORD environment variables.\n";
+    die "Error: user and password required. Use --user and --password, or set WWW_MAILBOXORG_USER/WWW_MAILBOXORG_PASSWORD environment variables.\n";
 }
 
 my $api = WWW::MailboxOrg->new(%api_options);
 
-sub run_login {
+sub pp {
+    require Data::Printer;
+    shift if ref $_[0] eq 'WWW::MailboxOrg';
+    Data::Printer->new( indent => 2, colored => 1 )->p(@_);
+}
+
+# ─────────────────────────────────────────────────────────────────────────
+# Account
+# ─────────────────────────────────────────────────────────────────────────
+
+sub cmd_account_list {
+    my @args = @_;
+    my $result = $api->account->list( @args ? @args : () );
+    pp($result);
+}
+
+sub cmd_account_get {
+    my ($account) = @_;
+    die "Usage: mborg account get <email>\n" unless $account;
+    my $result = $api->account->get( account => $account );
+    pp($result);
+}
+
+sub cmd_account_add {
+    my %args = @_;
+    die "Usage: mborg account add account=<email> password=<pw> plan=<basic|profi|profixl|reseller> [tarifflimits=JSON] [memo=NOTE]\n"
+        unless $args{account} && $args{password} && $args{plan};
+    my $result = $api->account->add(%args);
+    pp($result);
+}
+
+sub cmd_account_del {
+    my ($account) = @_;
+    die "Usage: mborg account del <email>\n" unless $account;
+    my $result = $api->account->del( account => $account );
+    pp($result);
+}
+
+sub cmd_account_set {
+    my %args = @_;
+    die "Usage: mborg account set account=<email> [password=<pw>] [plan=<plan>] [memo=<note>] [address_payment_first_name=<n>] [address_payment_last_name=<n>] ...\n"
+        unless $args{account};
+    my $result = $api->account->set(%args);
+    pp($result);
+}
+
+# ─────────────────────────────────────────────────────────────────────────
+# Domain
+# ─────────────────────────────────────────────────────────────────────────
+
+sub cmd_domain_list {
+    my %args = @_;
+    my $result = $api->domain->list(%args);
+    pp($result);
+}
+
+sub cmd_domain_get {
+    my ($domain) = @_;
+    die "Usage: mborg domain get <domain>\n" unless $domain;
+    my $result = $api->domain->get( domain => $domain );
+    pp($result);
+}
+
+sub cmd_domain_add {
+    my %args = @_;
+    die "Usage: mborg domain add account=<email> domain=<domain> password=<pw> [context_id=<id>] [create_new_context_id=1] [memo=<note>]\n"
+        unless $args{account} && $args{domain} && $args{password};
+    my $result = $api->domain->add(%args);
+    pp($result);
+}
+
+sub cmd_domain_del {
+    my %args = @_;
+    die "Usage: mborg domain del account=<email> domain=<domain>\n"
+        unless $args{account} && $args{domain};
+    my $result = $api->domain->del(%args);
+    pp($result);
+}
+
+sub cmd_domain_set {
+    my %args = @_;
+    die "Usage: mborg domain set domain=<domain> [password=<pw>] [context_id=<id>] [create_new_context_id=1] [memo=<note>]\n"
+        unless $args{domain};
+    my $result = $api->domain->set(%args);
+    pp($result);
+}
+
+# ─────────────────────────────────────────────────────────────────────────
+# Mail
+# ─────────────────────────────────────────────────────────────────────────
+
+sub cmd_mail_list {
+    my %args = @_;
+    my $result = $api->mail->list(%args);
+    pp($result);
+}
+
+sub cmd_mail_find {
+    my ($query) = @_;
+    die "Usage: mborg mail find <query>\n" unless $query;
+    my $result = $api->mail->find( query => $query );
+    pp($result);
+}
+
+# ─────────────────────────────────────────────────────────────────────────
+# Mailinglist
+# ─────────────────────────────────────────────────────────────────────────
+
+sub cmd_mailinglist_list {
+    my %args = @_;
+    my $result = $api->mailinglist->list(%args);
+    pp($result);
+}
+
+sub cmd_mailinglist_get {
+    my %args = @_;
+    die "Usage: mborg mailinglist get account=<email> list=<listaddress>\n"
+        unless $args{account} && $args{list};
+    my $result = $api->mailinglist->get(%args);
+    pp($result);
+}
+
+sub cmd_mailinglist_add {
+    my %args = @_;
+    die "Usage: mborg mailinglist add account=<email> list=<listaddress> password=<pw> [memo=<note>]\n"
+        unless $args{account} && $args{list} && $args{password};
+    my $result = $api->mailinglist->add(%args);
+    pp($result);
+}
+
+sub cmd_mailinglist_del {
+    my %args = @_;
+    die "Usage: mborg mailinglist del account=<email> list=<listaddress>\n"
+        unless $args{account} && $args{list};
+    my $result = $api->mailinglist->del(%args);
+    pp($result);
+}
+
+sub cmd_mailinglist_set {
+    my %args = @_;
+    die "Usage: mborg mailinglist set account=<email> list=<listaddress> [password=<pw>] [memo=<note>]\n"
+        unless $args{account} && $args{list};
+    my $result = $api->mailinglist->set(%args);
+    pp($result);
+}
+
+sub cmd_mailinglist_add_member {
+    my %args = @_;
+    die "Usage: mborg mailinglist add_member account=<email> list=<listaddress> email=<member>\n"
+        unless $args{account} && $args{list} && $args{email};
+    my $result = $api->mailinglist->add_member(%args);
+    pp($result);
+}
+
+sub cmd_mailinglist_del_member {
+    my %args = @_;
+    die "Usage: mborg mailinglist del_member account=<email> list=<listaddress> email=<member>\n"
+        unless $args{account} && $args{list} && $args{email};
+    my $result = $api->mailinglist->del_member(%args);
+    pp($result);
+}
+
+sub cmd_mailinglist_list_members {
+    my %args = @_;
+    die "Usage: mborg mailinglist list_members account=<email> list=<listaddress>\n"
+        unless $args{account} && $args{list};
+    my $result = $api->mailinglist->list_members(%args);
+    pp($result);
+}
+
+# ─────────────────────────────────────────────────────────────────────────
+# Blacklist
+# ─────────────────────────────────────────────────────────────────────────
+
+sub cmd_blacklist_list {
+    my %args = @_;
+    die "Usage: mborg blacklist list account=<email>\n"
+        unless $args{account};
+    my $result = $api->blacklist->list(%args);
+    pp($result);
+}
+
+sub cmd_blacklist_add {
+    my %args = @_;
+    die "Usage: mborg blacklist add account=<email> email=<spamaddress>\n"
+        unless $args{account} && $args{email};
+    my $result = $api->blacklist->add(%args);
+    pp($result);
+}
+
+sub cmd_blacklist_del {
+    my %args = @_;
+    die "Usage: mborg blacklist del account=<email> email=<spamaddress>\n"
+        unless $args{account} && $args{email};
+    my $result = $api->blacklist->del(%args);
+    pp($result);
+}
+
+# ─────────────────────────────────────────────────────────────────────────
+# Spamprotect
+# ─────────────────────────────────────────────────────────────────────────
+
+sub cmd_spamprotect_status {
+    my %args = @_;
+    die "Usage: mborg spamprotect status account=<email>\n"
+        unless $args{account};
+    my $result = $api->spamprotect->status(%args);
+    pp($result);
+}
+
+sub cmd_spamprotect_set {
+    my %args = @_;
+    die "Usage: mborg spamprotect set account=<email> active=<0|1>\n"
+        unless $args{account} && defined $args{active};
+    my $result = $api->spamprotect->set(%args);
+    pp($result);
+}
+
+# ─────────────────────────────────────────────────────────────────────────
+# Videochat
+# ─────────────────────────────────────────────────────────────────────────
+
+sub cmd_videochat_status {
+    my %args = @_;
+    die "Usage: mborg videochat status account=<email>\n"
+        unless $args{account};
+    my $result = $api->videochat->status(%args);
+    pp($result);
+}
+
+sub cmd_videochat_create_room {
+    my %args = @_;
+    die "Usage: mborg videochat create_room account=<email> name=<roomname>\n"
+        unless $args{account} && $args{name};
+    my $result = $api->videochat->create_room(%args);
+    pp($result);
+}
+
+sub cmd_videochat_list_rooms {
+    my %args = @_;
+    die "Usage: mborg videochat list_rooms account=<email>\n"
+        unless $args{account};
+    my $result = $api->videochat->list_rooms(%args);
+    pp($result);
+}
+
+sub cmd_videochat_delete_room {
+    my %args = @_;
+    die "Usage: mborg videochat delete_room account=<email> name=<roomname>\n"
+        unless $args{account} && $args{name};
+    my $result = $api->videochat->delete_room(%args);
+    pp($result);
+}
+
+# ─────────────────────────────────────────────────────────────────────────
+# Backup
+# ─────────────────────────────────────────────────────────────────────────
+
+sub cmd_backup_list {
+    my %args = @_;
+    die "Usage: mborg backup list account=<email>\n"
+        unless $args{account};
+    my $result = $api->backup->list(%args);
+    pp($result);
+}
+
+sub cmd_backup_create {
+    my %args = @_;
+    die "Usage: mborg backup create account=<email>\n"
+        unless $args{account};
+    my $result = $api->backup->create(%args);
+    pp($result);
+}
+
+sub cmd_backup_restore {
+    my %args = @_;
+    die "Usage: mborg backup restore account=<email> backup=<backupid>\n"
+        unless $args{account} && $args{backup};
+    my $result = $api->backup->restore(%args);
+    pp($result);
+}
+
+sub cmd_backup_delete {
+    my %args = @_;
+    die "Usage: mborg backup delete account=<email> backup=<backupid>\n"
+        unless $args{account} && $args{backup};
+    my $result = $api->backup->delete(%args);
+    pp($result);
+}
+
+# ─────────────────────────────────────────────────────────────────────────
+# Invoice
+# ─────────────────────────────────────────────────────────────────────────
+
+sub cmd_invoice_list {
+    my %args = @_;
+    my $result = $api->invoice->list(%args);
+    pp($result);
+}
+
+sub cmd_invoice_get {
+    my %args = @_;
+    die "Usage: mborg invoice get account=<email> invoice=<invoiceid>\n"
+        unless $args{account} && $args{invoice};
+    my $result = $api->invoice->get(%args);
+    pp($result);
+}
+
+sub cmd_invoice_download {
+    my %args = @_;
+    die "Usage: mborg invoice download account=<email> invoice=<invoiceid>\n"
+        unless $args{account} && $args{invoice};
+    my $result = $api->invoice->download(%args);
+    pp($result);
+}
+
+# ─────────────────────────────────────────────────────────────────────────
+# Passwordreset
+# ─────────────────────────────────────────────────────────────────────────
+
+sub cmd_passwordreset_request {
+    my %args = @_;
+    die "Usage: mborg passwordreset request account=<email>\n"
+        unless $args{account};
+    my $result = $api->passwordreset->request(%args);
+    pp($result);
+}
+
+sub cmd_passwordreset_set {
+    my %args = @_;
+    die "Usage: mborg passwordreset set account=<email> token=<token> newpassword=<pw>\n"
+        unless $args{account} && $args{token} && $args{newpassword};
+    my $result = $api->passwordreset->set(%args);
+    pp($result);
+}
+
+# ─────────────────────────────────────────────────────────────────────────
+# Validate
+# ─────────────────────────────────────────────────────────────────────────
+
+sub cmd_validate_email {
+    my %args = @_;
+    die "Usage: mborg validate email=<address>\n"
+        unless $args{email};
+    my $result = $api->validate->email(%args);
+    pp($result);
+}
+
+# ─────────────────────────────────────────────────────────────────────────
+# Utils
+# ─────────────────────────────────────────────────────────────────────────
+
+sub cmd_utils_parse_headers {
+    my %args = @_;
+    die "Usage: mborg utils parse_headers headers=<raw_headers>\n"
+        unless $args{headers};
+    my $result = $api->utils->parse_headers(%args);
+    pp($result);
+}
+
+sub cmd_utils_parse_date {
+    my %args = @_;
+    die "Usage: mborg utils parse_date date=<date_string>\n"
+        unless $args{date};
+    my $result = $api->utils->parse_date(%args);
+    pp($result);
+}
+
+sub cmd_utils_generate_message_id {
+    my %args = @_;
+    my $result = $api->utils->generate_message_id( %args ? %args : () );
+    pp($result);
+}
+
+# ─────────────────────────────────────────────────────────────────────────
+# System
+# ─────────────────────────────────────────────────────────────────────────
+
+sub cmd_system_hello {
+    my $result = $api->system->hello;
+    pp($result);
+}
+
+sub cmd_system_test {
+    my $result = $api->system->test;
+    pp($result);
+}
+
+sub cmd_system_capabilities {
+    my $result = $api->system->capabilities;
+    pp($result);
+}
+
+# ─────────────────────────────────────────────────────────────────────────
+# Parse key=value arguments from @ARGV
+# ─────────────────────────────────────────────────────────────────────────
+
+sub parse_kv {
+    my %args;
+    while ( @ARGV && $ARGV[0] =~ /^(\w+)=(.+)$/ ) {
+        $args{$1} = $2;
+        shift @ARGV;
+    }
+    return %args;
+}
+
+# ─────────────────────────────────────────────────────────────────────────
+# Dispatch
+# ─────────────────────────────────────────────────────────────────────────
+
+if ( $command eq 'login' ) {
     print "Logging in...\n" if $opt->verbose;
     my $result = $api->login;
     print "Logged in successfully.\n" if $opt->verbose;
     print "Session: $result->{session}\n" if $result && $result->{session};
-    return $result;
 }
-
-sub run_logout {
+elsif ( $command eq 'logout' ) {
     print "Logging out...\n" if $opt->verbose;
     $api->logout;
     print "Logged out successfully.\n" if $opt->verbose;
 }
-
-sub run_hello {
-    my $result = $api->system->hello;
-    require Data::Printer;
-    p $result;
-}
-
-sub run_test {
-    my $result = $api->system->test;
-    require Data::Printer;
-    p $result;
-}
-
-sub run_capabilities {
-    my $result = $api->system->capabilities;
-    require Data::Printer;
-    p $result;
-}
-
-sub run_account_list {
-    my $result = $api->account->list;
-    require Data::Printer;
-    p $result;
-}
-
-sub run_account_get {
-    my ($account) = @_;
-    my $result = $api->account->get(account => $account);
-    require Data::Printer;
-    p $result;
-}
-
-sub run_domain_list {
-    my %args = @_;
-    my $result = $api->domain->list(%args);
-    require Data::Printer;
-    p $result;
-}
-
-sub run_domain_get {
-    my ($domain) = @_;
-    my $result = $api->domain->get(domain => $domain);
-    require Data::Printer;
-    p $result;
-}
-
-sub run_mail_list {
-    my %args = @_;
-    my $result = $api->mail->list(%args);
-    require Data::Printer;
-    p $result;
-}
-
-sub run_mail_find {
-    my ($query) = @_;
-    my $result = $api->mail->find(query => $query);
-    require Data::Printer;
-    p $result;
-}
-
-if ( $command eq 'login' ) {
-    run_login;
-}
-elsif ( $command eq 'logout' ) {
-    run_logout;
-}
-elsif ( $command eq 'hello' ) {
-    run_hello;
-}
-elsif ( $command eq 'test' ) {
-    run_test;
-}
-elsif ( $command eq 'capabilities' ) {
-    run_capabilities;
-}
 elsif ( $command eq 'account' ) {
-    my $subcmd = shift @ARGV;
+    my $subcmd = shift @ARGV or die "Usage: mborg account [list|get|add|del|set]\n";
+    my %kv = parse_kv();
     if ( $subcmd eq 'list' ) {
-        run_account_list;
+        cmd_account_list(%kv);
     }
     elsif ( $subcmd eq 'get' ) {
         my $account = shift @ARGV;
-        die "Usage: mborg --user X --password Y account get <email>\n" unless $account;
-        run_account_get($account);
+        cmd_account_get($account);
+    }
+    elsif ( $subcmd eq 'add' ) {
+        my %args = ( account => shift @ARGV, password => shift @ARGV, plan => shift @ARGV );
+        %args = ( %args, parse_kv() );
+        cmd_account_add(%args);
+    }
+    elsif ( $subcmd eq 'del' ) {
+        my $account = shift @ARGV;
+        cmd_account_del($account);
+    }
+    elsif ( $subcmd eq 'set' ) {
+        my $account = shift @ARGV;
+        my %args = ( account => $account, parse_kv() );
+        cmd_account_set(%args);
     }
     else {
-        die "Unknown account subcommand: $subcmd. Use: list, get\n";
+        die "Unknown account subcommand: $subcmd\n";
     }
 }
 elsif ( $command eq 'domain' ) {
-    my $subcmd = shift @ARGV;
+    my $subcmd = shift @ARGV or die "Usage: mborg domain [list|get|add|del|set]\n";
+    my %kv = parse_kv();
     if ( $subcmd eq 'list' ) {
-        run_domain_list;
+        cmd_domain_list(%kv);
     }
     elsif ( $subcmd eq 'get' ) {
         my $domain = shift @ARGV;
-        die "Usage: mborg --user X --password Y domain get <domain>\n" unless $domain;
-        run_domain_get($domain);
+        cmd_domain_get($domain);
+    }
+    elsif ( $subcmd eq 'add' ) {
+        my %args = ( account => shift @ARGV, domain => shift @ARGV, password => shift @ARGV );
+        %args = ( %args, parse_kv() );
+        cmd_domain_add(%args);
+    }
+    elsif ( $subcmd eq 'del' ) {
+        my $account = shift @ARGV;
+        my $domain  = shift @ARGV;
+        cmd_domain_del( account => $account, domain => $domain );
+    }
+    elsif ( $subcmd eq 'set' ) {
+        my $domain = shift @ARGV;
+        my %args = ( domain => $domain, parse_kv() );
+        cmd_domain_set(%args);
     }
     else {
-        die "Unknown domain subcommand: $subcmd. Use: list, get\n";
+        die "Unknown domain subcommand: $subcmd\n";
     }
 }
 elsif ( $command eq 'mail' ) {
-    my $subcmd = shift @ARGV;
+    my $subcmd = shift @ARGV or die "Usage: mborg mail [list|find]\n";
+    my %kv = parse_kv();
     if ( $subcmd eq 'list' ) {
-        my %args;
-        while (@ARGV && $ARGV[0] =~ /^(\w+)=(.+)$/) {
-            $args{$1} = $2;
-            shift @ARGV;
-        }
-        run_mail_list(%args);
+        cmd_mail_list(%kv);
     }
     elsif ( $subcmd eq 'find' ) {
         my $query = shift @ARGV;
-        die "Usage: mborg --user X --password Y mail find <query>\n" unless $query;
-        run_mail_find($query);
+        cmd_mail_find($query);
     }
     else {
-        die "Unknown mail subcommand: $subcmd. Use: list, find\n";
+        die "Unknown mail subcommand: $subcmd\n";
+    }
+}
+elsif ( $command eq 'mailinglist' ) {
+    my $subcmd = shift @ARGV or die "Usage: mborg mailinglist [list|get|add|del|set|add_member|del_member|list_members]\n";
+    if ( $subcmd eq 'list' ) {
+        my %kv = parse_kv();
+        cmd_mailinglist_list(%kv);
+    }
+    elsif ( $subcmd eq 'get' ) {
+        my $account = shift @ARGV;
+        my $list    = shift @ARGV;
+        cmd_mailinglist_get( account => $account, list => $list );
+    }
+    elsif ( $subcmd eq 'add' ) {
+        my $account  = shift @ARGV;
+        my $list     = shift @ARGV;
+        my $password = shift @ARGV;
+        my %args = ( account => $account, list => $list, password => $password, parse_kv() );
+        cmd_mailinglist_add(%args);
+    }
+    elsif ( $subcmd eq 'del' ) {
+        my $account = shift @ARGV;
+        my $list    = shift @ARGV;
+        cmd_mailinglist_del( account => $account, list => $list );
+    }
+    elsif ( $subcmd eq 'set' ) {
+        my $account = shift @ARGV;
+        my $list    = shift @ARGV;
+        my %args = ( account => $account, list => $list, parse_kv() );
+        cmd_mailinglist_set(%args);
+    }
+    elsif ( $subcmd eq 'add_member' ) {
+        my $account = shift @ARGV;
+        my $list    = shift @ARGV;
+        my $email   = shift @ARGV;
+        cmd_mailinglist_add_member( account => $account, list => $list, email => $email );
+    }
+    elsif ( $subcmd eq 'del_member' ) {
+        my $account = shift @ARGV;
+        my $list    = shift @ARGV;
+        my $email   = shift @ARGV;
+        cmd_mailinglist_del_member( account => $account, list => $list, email => $email );
+    }
+    elsif ( $subcmd eq 'list_members' ) {
+        my $account = shift @ARGV;
+        my $list    = shift @ARGV;
+        cmd_mailinglist_list_members( account => $account, list => $list );
+    }
+    else {
+        die "Unknown mailinglist subcommand: $subcmd\n";
+    }
+}
+elsif ( $command eq 'blacklist' ) {
+    my $subcmd = shift @ARGV or die "Usage: mborg blacklist [list|add|del]\n";
+    if ( $subcmd eq 'list' ) {
+        my $account = shift @ARGV;
+        cmd_blacklist_list( account => $account );
+    }
+    elsif ( $subcmd eq 'add' ) {
+        my $account = shift @ARGV;
+        my $email   = shift @ARGV;
+        cmd_blacklist_add( account => $account, email => $email );
+    }
+    elsif ( $subcmd eq 'del' ) {
+        my $account = shift @ARGV;
+        my $email   = shift @ARGV;
+        cmd_blacklist_del( account => $account, email => $email );
+    }
+    else {
+        die "Unknown blacklist subcommand: $subcmd\n";
+    }
+}
+elsif ( $command eq 'spamprotect' ) {
+    my $subcmd = shift @ARGV or die "Usage: mborg spamprotect [status|set]\n";
+    if ( $subcmd eq 'status' ) {
+        my $account = shift @ARGV;
+        cmd_spamprotect_status( account => $account );
+    }
+    elsif ( $subcmd eq 'set' ) {
+        my $account = shift @ARGV;
+        my $active  = shift @ARGV;
+        cmd_spamprotect_set( account => $account, active => $active );
+    }
+    else {
+        die "Unknown spamprotect subcommand: $subcmd\n";
+    }
+}
+elsif ( $command eq 'videochat' ) {
+    my $subcmd = shift @ARGV or die "Usage: mborg videochat [status|create_room|list_rooms|delete_room]\n";
+    if ( $subcmd eq 'status' ) {
+        my $account = shift @ARGV;
+        cmd_videochat_status( account => $account );
+    }
+    elsif ( $subcmd eq 'create_room' ) {
+        my $account = shift @ARGV;
+        my $name    = shift @ARGV;
+        cmd_videochat_create_room( account => $account, name => $name );
+    }
+    elsif ( $subcmd eq 'list_rooms' ) {
+        my $account = shift @ARGV;
+        cmd_videochat_list_rooms( account => $account );
+    }
+    elsif ( $subcmd eq 'delete_room' ) {
+        my $account = shift @ARGV;
+        my $name    = shift @ARGV;
+        cmd_videochat_delete_room( account => $account, name => $name );
+    }
+    else {
+        die "Unknown videochat subcommand: $subcmd\n";
+    }
+}
+elsif ( $command eq 'backup' ) {
+    my $subcmd = shift @ARGV or die "Usage: mborg backup [list|create|restore|delete]\n";
+    if ( $subcmd eq 'list' ) {
+        my $account = shift @ARGV;
+        cmd_backup_list( account => $account );
+    }
+    elsif ( $subcmd eq 'create' ) {
+        my $account = shift @ARGV;
+        cmd_backup_create( account => $account );
+    }
+    elsif ( $subcmd eq 'restore' ) {
+        my $account = shift @ARGV;
+        my $backup  = shift @ARGV;
+        cmd_backup_restore( account => $account, backup => $backup );
+    }
+    elsif ( $subcmd eq 'delete' ) {
+        my $account = shift @ARGV;
+        my $backup  = shift @ARGV;
+        cmd_backup_delete( account => $account, backup => $backup );
+    }
+    else {
+        die "Unknown backup subcommand: $subcmd\n";
+    }
+}
+elsif ( $command eq 'invoice' ) {
+    my $subcmd = shift @ARGV or die "Usage: mborg invoice [list|get|download]\n";
+    my %kv = parse_kv();
+    if ( $subcmd eq 'list' ) {
+        cmd_invoice_list(%kv);
+    }
+    elsif ( $subcmd eq 'get' ) {
+        my $account = shift @ARGV;
+        my $invoice = shift @ARGV;
+        cmd_invoice_get( account => $account, invoice => $invoice );
+    }
+    elsif ( $subcmd eq 'download' ) {
+        my $account = shift @ARGV;
+        my $invoice = shift @ARGV;
+        cmd_invoice_download( account => $account, invoice => $invoice );
+    }
+    else {
+        die "Unknown invoice subcommand: $subcmd\n";
+    }
+}
+elsif ( $command eq 'passwordreset' ) {
+    my $subcmd = shift @ARGV or die "Usage: mborg passwordreset [request|set]\n";
+    if ( $subcmd eq 'request' ) {
+        my $account = shift @ARGV;
+        cmd_passwordreset_request( account => $account );
+    }
+    elsif ( $subcmd eq 'set' ) {
+        my $account     = shift @ARGV;
+        my $token       = shift @ARGV;
+        my $newpassword = shift @ARGV;
+        cmd_passwordreset_set( account => $account, token => $token, newpassword => $newpassword );
+    }
+    else {
+        die "Unknown passwordreset subcommand: $subcmd\n";
+    }
+}
+elsif ( $command eq 'validate' ) {
+    my $subcmd = shift @ARGV or die "Usage: mborg validate [email]\n";
+    if ( $subcmd eq 'email' ) {
+        my $email = shift @ARGV;
+        cmd_validate_email( email => $email );
+    }
+    else {
+        die "Unknown validate subcommand: $subcmd\n";
+    }
+}
+elsif ( $command eq 'utils' ) {
+    my $subcmd = shift @ARGV or die "Usage: mborg utils [parse_headers|parse_date|generate_message_id]\n";
+    my %kv = parse_kv();
+    if ( $subcmd eq 'parse_headers' ) {
+        my $headers = shift @ARGV;
+        cmd_utils_parse_headers( headers => $headers );
+    }
+    elsif ( $subcmd eq 'parse_date' ) {
+        my $date = shift @ARGV;
+        cmd_utils_parse_date( date => $date );
+    }
+    elsif ( $subcmd eq 'generate_message_id' ) {
+        cmd_utils_generate_message_id(%kv);
+    }
+    else {
+        die "Unknown utils subcommand: $subcmd\n";
     }
 }
 elsif ( $command eq 'system' ) {
-    my $subcmd = shift @ARGV;
-    if ( $subcmd eq 'hello' ) {
-        run_hello;
-    }
-    elsif ( $subcmd eq 'test' ) {
-        run_test;
-    }
-    elsif ( $subcmd eq 'capabilities' ) {
-        run_capabilities;
-    }
-    else {
-        die "Unknown system subcommand: $subcmd. Use: hello, test, capabilities\n";
-    }
+    my $subcmd = shift @ARGV or die "Usage: mborg system [hello|test|capabilities]\n";
+    if ( $subcmd eq 'hello' )           { cmd_system_hello; }
+    elsif ( $subcmd eq 'test' )        { cmd_system_test; }
+    elsif ( $subcmd eq 'capabilities' ) { cmd_system_capabilities; }
+    else { die "Unknown system subcommand: $subcmd\n"; }
 }
 else {
-    die "Unknown command: $command. Available: login, logout, account, domain, mail, system\n";
+    die "Unknown command: $command. Available: login, logout, account, domain, mail, mailinglist, blacklist, spamprotect, videochat, backup, invoice, passwordreset, validate, utils, system\n";
 }
 
 __END__
@@ -259,84 +812,537 @@ mborg - Command-line interface for Mailbox.org API
 
 =head1 VERSION
 
-version 0.001
+version 0.100
 
 =head1 SYNOPSIS
 
     mborg --user=user@example.com --password=secret login
 
-    # Read credentials from environment
-    MAILBOX_USER=user@example.com MAILBOX_PASSWORD=secret mborg login
+    # Credentials via environment
+    WWW_MAILBOXORG_USER=user@example.com WWW_MAILBOXORG_PASSWORD=secret mborg login
 
-    # Read credentials from config file (~/.mailboxrc)
+    # Credentials via config file (~/.mailboxrc)
     mborg login
 
-    # Run commands
     mborg account list
+    mborg account get user@example.com
+    mborg account add user@example.com secret123 basic
+    mborg account del user@example.com
+    mborg account set user@example.com plan=profi memo="Updated"
+
     mborg domain list
+    mborg domain get example.com
+    mborg domain add admin@example.com example.com secret123
+    mborg domain del admin@example.com example.com
+    mborg domain set example.com password=newsecret
+
+    mborg mail list folder=INBOX unseen_only=1
     mborg mail find "from:user@example.com"
+
+    mborg mailinglist list
+    mborg mailinglist get admin@example.com list@example.com
+    mborg mailinglist add admin@example.com list@example.com secret123
+    mborg mailinglist del admin@example.com list@example.com
+    mborg mailinglist set admin@example.com list@example.com password=newsecret
+    mborg mailinglist add_member admin@example.com list@example.com member@example.com
+    mborg mailinglist del_member admin@example.com list@example.com member@example.com
+    mborg mailinglist list_members admin@example.com list@example.com
+
+    mborg blacklist list admin@example.com
+    mborg blacklist add admin@example.com spam@example.com
+    mborg blacklist del admin@example.com spam@example.com
+
+    mborg spamprotect status admin@example.com
+    mborg spamprotect set admin@example.com 1
+
+    mborg videochat status admin@example.com
+    mborg videochat create_room admin@example.com "My Room"
+    mborg videochat list_rooms admin@example.com
+    mborg videochat delete_room admin@example.com "My Room"
+
+    mborg backup list admin@example.com
+    mborg backup create admin@example.com
+    mborg backup restore admin@example.com backup-id
+    mborg backup delete admin@example.com backup-id
+
+    mborg invoice list
+    mborg invoice get admin@example.com INV-2024-001
+    mborg invoice download admin@example.com INV-2024-001
+
+    mborg passwordreset request user@example.com
+    mborg passwordreset set user@example.com token-from-email newsecret123
+
+    mborg validate email=user@example.com
+
+    mborg utils parse_headers "From: user@example.com"
+    mborg utils parse_date "Mon, 01 Jan 2024 12:00:00 +0000"
+    mborg utils generate_message_id
+
+    mborg system hello
+    mborg system test
+    mborg system capabilities
+
+=head1 DESCRIPTION
+
+B<mborg> is the command-line interface for L<WWW::MailboxOrg>.
+It provides access to all Mailbox.org API endpoints via subcommands.
+
+Credentials can be provided via:
+
+=over 4
+
+=item *
+
+C<--user> and C<--password> command-line options
+
+=item *
+
+Environment variables C<WWW_MAILBOXORG_USER> and C<WWW_MAILBOXORG_PASSWORD>
+
+=item *
+
+Configuration file F<~/.mailboxrc> with C<user=> and C<password=> entries
+
+=back
 
 =head1 NAME
 
-mborg - Command-line interface for Mailbox.org API
+mborg - Command-line interface for L<WWW::MailboxOrg>
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--user>, B<-u>
+
+Mailbox.org username or email address.
+
+=item B<--password>, B<-p>
+
+Mailbox.org password.
+
+=item B<--base_url>, B<-b>
+
+API base URL. Defaults to C<https://api.mailbox.org/v1>.
+
+=item B<--verbose>, B<-v>
+
+Be verbose — print progress messages.
+
+=item B<--help>, B<-h>
+
+Show this help message.
+
+=item B<--version>, B<-V>
+
+Show version number.
+
+=back
+
+=head1 COMMANDS
+
+=head2 login
+
+    mborg login
+
+Authenticate with Mailbox.org API and establish a session.
+Credentials are required (see L</OPTIONS>).
+
+=head2 logout
+
+    mborg logout
+
+End the current session.
+
+=head2 account
+
+    mborg account list
+    mborg account get <email>
+    mborg account add <email> <password> <plan>
+    mborg account del <email>
+    mborg account set <email> [key=value ...]
+
+Manage Mailbox.org accounts.
+
+=over 4
+
+=item list
+
+List all accounts, optionally filtered by account.
+
+=item get
+
+Get details for a specific account.
+
+=item add
+
+Create a new account. Required: C<account>, C<password>, C<plan>
+(C<basic>, C<profi>, C<profixl>, or C<reseller>).
+
+=item del
+
+Delete an account.
+
+=item set
+
+Update account settings. At minimum C<account> is required.
+Additional parameters: C<password>, C<plan>, C<tarifflimits>,
+C<address_payment_*>, C<av_contract_accept_name>, C<memo>.
+
+=back
+
+=head2 domain
+
+    mborg domain list [account=<email>]
+    mborg domain get <domain>
+    mborg domain add <account> <domain> <password> [key=value ...]
+    mborg domain del <account> <domain>
+    mborg domain set <domain> [key=value ...]
+
+Manage domains.
+
+=over 4
+
+=item list
+
+List domains, optionally filtered by account.
+
+=item get
+
+Get details for a specific domain.
+
+=item add
+
+Add a new domain. Required: C<account>, C<domain>, C<password>.
+Optional: C<context_id>, C<create_new_context_id>, C<memo>.
+
+=item del
+
+Delete a domain.
+
+=item set
+
+Update domain settings. At minimum C<domain> is required.
+Optional: C<password>, C<context_id>, C<create_new_context_id>, C<memo>.
+
+=back
+
+=head2 mail
+
+    mborg mail list [key=value ...]
+    mborg mail find <query>
+
+Email operations.
+
+=over 4
+
+=item list
+
+List emails. Options: C<account>, C<folder>, C<order_by>, C<page>,
+C<per_page>, C<result_mode>, C<unseen_only>.
+
+=item find
+
+Search emails. Required: C<query> string.
+
+=back
+
+=head2 mailinglist
+
+    mborg mailinglist list [account=<email>]
+    mborg mailinglist get <account> <list>
+    mborg mailinglist add <account> <list> <password> [key=value ...]
+    mborg mailinglist del <account> <list>
+    mborg mailinglist set <account> <list> [key=value ...]
+    mborg mailinglist add_member <account> <list> <email>
+    mborg mailinglist del_member <account> <list> <email>
+    mborg mailinglist list_members <account> <list>
+
+Mailing list management.
+
+=over 4
+
+=item list
+
+List mailing lists, optionally filtered by account.
+
+=item get
+
+Get mailing list details.
+
+=item add
+
+Create a mailing list. Required: C<account>, C<list>, C<password>.
+Optional: C<memo>.
+
+=item del
+
+Delete a mailing list.
+
+=item set
+
+Update mailing list. Required: C<account>, C<list>.
+Optional: C<password>, C<memo>.
+
+=item add_member
+
+Add a member to a mailing list. Required: C<account>, C<list>, C<email>.
+
+=item del_member
+
+Remove a member from a mailing list.
+Required: C<account>, C<list>, C<email>.
+
+=item list_members
+
+List all members of a mailing list.
+Required: C<account>, C<list>.
+
+=back
+
+=head2 blacklist
+
+    mborg blacklist list <account>
+    mborg blacklist add <account> <email>
+    mborg blacklist del <account> <email>
+
+Manage email blacklist entries.
+
+=over 4
+
+=item list
+
+List blacklist entries for an account. Required: C<account>.
+
+=item add
+
+Add an email to the blacklist. Required: C<account>, C<email>.
+
+=item del
+
+Remove an email from the blacklist.
+Required: C<account>, C<email>.
+
+=back
+
+=head2 spamprotect
+
+    mborg spamprotect status <account>
+    mborg spamprotect set <account> <0|1>
+
+Spam protection management.
+
+=over 4
+
+=item status
+
+Get spam protection status. Required: C<account>.
+
+=item set
+
+Enable or disable spam protection.
+Required: C<account>, C<active> (C<0> or C<1>).
+
+=back
+
+=head2 videochat
+
+    mborg videochat status <account>
+    mborg videochat create_room <account> <name>
+    mborg videochat list_rooms <account>
+    mborg videochat delete_room <account> <name>
+
+Video chat room management.
+
+=over 4
+
+=item status
+
+Get video chat status. Required: C<account>.
+
+=item create_room
+
+Create a video chat room. Required: C<account>, C<name>.
+
+=item list_rooms
+
+List video chat rooms. Required: C<account>.
+
+=item delete_room
+
+Delete a video chat room. Required: C<account>, C<name>.
+
+=back
+
+=head2 backup
+
+    mborg backup list <account>
+    mborg backup create <account>
+    mborg backup restore <account> <backupid>
+    mborg backup delete <account> <backupid>
+
+Backup operations.
+
+=over 4
+
+=item list
+
+List backups for an account. Required: C<account>.
+
+=item create
+
+Create a backup. Required: C<account>.
+
+=item restore
+
+Restore a backup. Required: C<account>, C<backup>.
+
+=item delete
+
+Delete a backup. Required: C<account>, C<backup>.
+
+=back
+
+=head2 invoice
+
+    mborg invoice list [account=<email>]
+    mborg invoice get <account> <invoice>
+    mborg invoice download <account> <invoice>
+
+Invoice operations.
+
+=over 4
+
+=item list
+
+List invoices, optionally filtered by account.
+
+=item get
+
+Get invoice details. Required: C<account>, C<invoice>.
+
+=item download
+
+Download an invoice. Required: C<account>, C<invoice>.
+
+=back
+
+=head2 passwordreset
+
+    mborg passwordreset request <account>
+    mborg passwordreset set <account> <token> <newpassword>
+
+Password reset operations.
+
+=over 4
+
+=item request
+
+Request a password reset. Required: C<account>.
+
+=item set
+
+Set a new password using a reset token.
+Required: C<account>, C<token>, C<newpassword>.
+
+=back
+
+=head2 validate
+
+    mborg validate email=<address>
+
+Validate an email address.
+
+=over 4
+
+=item email
+
+Validate an email address. Required: C<email>.
+
+=back
+
+=head2 utils
+
+    mborg utils parse_headers headers=<raw>
+    mborg utils parse_date date=<string>
+    mborg utils generate_message_id [account=<email>]
+
+Utility functions.
+
+=over 4
+
+=item parse_headers
+
+Parse raw email headers. Required: C<headers>.
+
+=item parse_date
+
+Parse an email date string. Required: C<date>.
+
+=item generate_message_id
+
+Generate a message ID. Optional: C<account>.
+
+=back
+
+=head2 system
+
+    mborg system hello
+    mborg system test
+    mborg system capabilities
+
+System information.
+
+=over 4
+
+=item hello
+
+Get API hello response.
+
+=item test
+
+Test API connection.
+
+=item capabilities
+
+Get API capabilities.
+
+=back
 
 =head1 CONFIGURATION
 
-Create a F<~/.mailboxrc> file:
+Create a F<~/.mailboxrc> file in your home directory:
 
     user=user@example.com
     password=secret
     base_url=https://api.mailbox.org/v1
 
-=head1 COMMANDS
+Lines starting with C<#> are comments.
+
+=head1 ENVIRONMENT
+
+All environment variables are namespaced with the C<WWW_MAILBOXORG_> prefix.
+Command-line options and the F<~/.mailboxrc> config file take precedence.
 
 =over 4
 
-=item login
+=item C<WWW_MAILBOXORG_USER>
 
-Authenticate with Mailbox.org API.
+Mailbox.org username or email address.
 
-=item logout
+=item C<WWW_MAILBOXORG_PASSWORD>
 
-End the current session.
+Mailbox.org password.
 
-=item account list
+=item C<WWW_MAILBOXORG_BASE_URL>
 
-List all accounts.
-
-=item account get <email>
-
-Get account details.
-
-=item domain list [--account=email]
-
-List domains.
-
-=item domain get <domain>
-
-Get domain details.
-
-=item mail list [--account=email] [--folder=INBOX] [--unseen_only=1]
-
-List emails.
-
-=item mail find <query>
-
-Search emails.
-
-=item system hello
-
-Get API hello response.
-
-=item system test
-
-Test API connection.
-
-=item system capabilities
-
-Get API capabilities.
+API base URL. Defaults to C<https://api.mailbox.org/v1>.
 
 =back
+
+=head1 SEE ALSO
+
+L<WWW::MailboxOrg>, L<https://api.mailbox.org/v1/doc/methods/index.html>
 
 =cut
 
@@ -345,7 +1351,7 @@ Get API capabilities.
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/getty/p5-www-mailboxorg/issues>.
+L<https://github.com/Getty/p5-www-mailboxorg/issues>.
 
 =head2 IRC
 

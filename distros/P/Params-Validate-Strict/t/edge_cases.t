@@ -32,6 +32,14 @@ use Params::Validate::Strict qw(validate_strict);
 	sub DESTROY {}
 }
 
+# Minimal logger that captures error calls for inspection
+{
+	package Edge::Logger;
+	sub new    { bless { errors => [] }, shift }
+	sub error  { push @{$_[0]{errors}}, join('', @_[1..$#_]) }
+	sub errors { @{$_[0]{errors}} }
+}
+
 # ══════════════════════════════════════════════════════════════════════════════
 # String boundary conditions
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1007,4 +1015,752 @@ subtest 'input immutability: coercion returns new values, original input unchang
 	is($input->{active}, 'true', 'original input active is still a string');
 };
 
+# ══════════════════════════════════════════════════════════════════════════════
+# Scalar type edge cases
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'scalar: "0" (Perl-false) is a valid scalar' => sub {
+	my $r = validate_strict(schema => { x => { type => 'scalar' } }, input => { x => '0' });
+	is($r->{x}, '0', '"0" accepted as scalar');
+	ok(!$r->{x}, '…and it is Perl-false');
+};
+
+subtest 'scalar: empty string is a valid scalar' => sub {
+	my $r = validate_strict(schema => { x => { type => 'scalar' } }, input => { x => '' });
+	is($r->{x}, '', 'empty string accepted as scalar');
+};
+
+subtest 'scalar: numeric zero is a valid scalar' => sub {
+	my $r = validate_strict(schema => { x => { type => 'scalar' } }, input => { x => 0 });
+	is($r->{x}, 0, 'numeric zero accepted as scalar');
+	ok(!$r->{x}, '…and it is Perl-false');
+};
+
+subtest 'scalar: single space is a valid scalar' => sub {
+	my $r = validate_strict(schema => { x => { type => 'scalar' } }, input => { x => ' ' });
+	is($r->{x}, ' ', 'single space accepted as scalar');
+};
+
+subtest 'scalar: undef value passes through (next guard fires)' => sub {
+	# The scalar handler does 'next' on undef, consistent with all other type handlers.
+	my $r = validate_strict(schema => { x => { type => 'scalar' } }, input => { x => undef });
+	ok(exists $r->{x},   'scalar key present in result even when value is undef');
+	ok(!defined $r->{x}, '…but the value is undef');
+};
+
+subtest 'scalar: no coercion — value returned unchanged' => sub {
+	# type => 'scalar' performs no coercion, unlike type => 'integer'
+	my $r = validate_strict(schema => { x => { type => 'scalar' } }, input => { x => '007' });
+	is($r->{x}, '007', '"007" returned unchanged — leading zero preserved, no numification');
+};
+
+subtest 'scalar: integer literal accepted without coercion' => sub {
+	my $r = validate_strict(schema => { x => { type => 'scalar' } }, input => { x => 42 });
+	is($r->{x}, 42, 'integer literal accepted as plain scalar');
+};
+
+subtest 'scalar: embedded NUL byte accepted' => sub {
+	my $s = "hel\x00lo";
+	my $r = validate_strict(schema => { x => { type => 'scalar' } }, input => { x => $s });
+	is($r->{x}, $s, 'string with embedded NUL byte accepted as scalar');
+};
+
+subtest 'scalar: very long string accepted' => sub {
+	my $big = 'X' x 1_000_000;
+	my $r = validate_strict(schema => { x => { type => 'scalar' } }, input => { x => $big });
+	is(length($r->{x}), 1_000_000, '1M-character string accepted as scalar');
+};
+
+subtest 'scalar: arrayref rejected — error mentions ARRAY' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => [] })
+	} qr/must be a scalar.*not a ARRAY/, 'arrayref rejected; ARRAY appears in message';
+};
+
+subtest 'scalar: hashref rejected — error mentions HASH' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => {} })
+	} qr/must be a scalar.*not a HASH/, 'hashref rejected; HASH appears in message';
+};
+
+subtest 'scalar: coderef rejected — error mentions CODE' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => sub {} })
+	} qr/must be a scalar.*not a CODE/, 'coderef rejected; CODE appears in message';
+};
+
+subtest 'scalar: scalar reference rejected — error mentions SCALAR' => sub {
+	my $n = 42;
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => \$n })
+	} qr/must be a scalar.*not a SCALAR/, 'scalar ref rejected; SCALAR appears in message';
+};
+
+subtest 'scalar: REF-of-REF rejected — error mentions REF' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => \[] })
+	} qr/must be a scalar.*not a REF/, 'ref-of-ref rejected; REF appears in message';
+};
+
+subtest 'scalar: GLOB reference rejected' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => \*STDOUT })
+	} qr/must be a scalar/, 'GLOB reference rejected for scalar type';
+};
+
+subtest 'scalar: Regexp object rejected' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => qr/foo/ })
+	} qr/must be a scalar/, 'Regexp reference rejected for scalar type';
+};
+
+subtest 'scalar: blessed object (Edge::Overloaded) rejected — class name in error' => sub {
+	my $obj = Edge::Overloaded->new;
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => $obj })
+	} qr/must be a scalar.*Edge::Overloaded/,
+	  'blessed object rejected; class name appears in error (ref() returns class, not reftype)';
+};
+
+subtest 'scalar: blessed coderef rejected — bless class in error, not CODE' => sub {
+	my $bcr = bless sub { 42 }, 'MyCallable';
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => $bcr })
+	} qr/must be a scalar.*MyCallable/,
+	  'blessed coderef rejected; class name (not CODE) in error because ref() returns bless class';
+};
+
+subtest 'scalar: custom error_msg overrides default' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalar', error_msg => 'Only plain scalars please!' } },
+			input  => { x => [] },
+		)
+	} qr/Only plain scalars please!/, 'custom error_msg used for scalar type violation';
+};
+
+subtest 'scalar: transform returning plain scalar — accepted' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => 'scalar', transform => sub { uc $_[0] } } },
+		input  => { x => 'hello' },
+	);
+	is($r->{x}, 'HELLO', 'transform applied; uppercased plain scalar passes type check');
+};
+
+subtest 'scalar: transform returning a reference — rejected after transform' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalar', transform => sub { [] } } },
+			input  => { x => 'hello' },
+		)
+	} qr/must be a scalar/, 'transform returning arrayref rejected for scalar type';
+};
+
+subtest 'scalar: transform returning undef — passes through (undef next-guard fires)' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => 'scalar', transform => sub { undef } } },
+		input  => { x => 'hello' },
+	);
+	ok(exists $r->{x},   'key present after transform-to-undef');
+	ok(!defined $r->{x}, 'value is undef (next guard fired, no type error raised)');
+};
+
+subtest 'scalar: schema reuse after rejection — schema not corrupted' => sub {
+	my $schema = { x => { type => 'scalar' } };
+	throws_ok {
+		validate_strict(schema => $schema, input => { x => [] })
+	} qr/must be a scalar/, 'first call with arrayref fails correctly';
+	my $r = validate_strict(schema => $schema, input => { x => 'fine' });
+	is($r->{x}, 'fine', 'schema intact after failed call; second call with string succeeds');
+};
+
+subtest 'scalar: union type [scalar, arrayref] — plain value matches scalar branch' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => ['scalar', 'arrayref'] } },
+		input  => { x => 'hello' },
+	);
+	is($r->{x}, 'hello', 'plain string accepted via scalar branch of union type');
+};
+
+subtest 'scalar: union type [scalar, arrayref] — arrayref matches arrayref branch' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => ['scalar', 'arrayref'] } },
+		input  => { x => [1, 2, 3] },
+	);
+	is_deeply($r->{x}, [1, 2, 3], 'arrayref accepted via arrayref branch of union type');
+};
+
+# -- "meaningless rule" error branches (category 1) ---------------------------
+# Each of these hits an else-branch that only fires when the rule is combined
+# with a type it does not understand.  None were previously reachable.
+
+subtest 'scalar: min rule — meaningless min value error' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalar', min => 3 } },
+			input  => { x => 'hi' },
+		)
+	} qr/meaningless min value/, 'min with scalar type croaks "meaningless min value"';
+};
+
+subtest 'scalar: max rule — meaningless max value error' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalar', max => 10 } },
+			input  => { x => 'hi' },
+		)
+	} qr/meaningless max value/, 'max with scalar type croaks "meaningless max value"';
+};
+
+subtest 'scalar: isa rule — meaningless isa value error' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalar', isa => 'SomeClass' } },
+			input  => { x => 'hello' },
+		)
+	} qr/meaningless isa value/, 'isa with scalar type croaks "meaningless isa value"';
+};
+
+subtest 'scalar: can rule — meaningless can value error' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalar', can => 'some_method' } },
+			input  => { x => 'hello' },
+		)
+	} qr/meaningless can value/, 'can with scalar type croaks "meaningless can value"';
+};
+
+subtest 'scalar: element_type rule — meaningless element_type value error' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalar', element_type => 'string' } },
+			input  => { x => 'hello' },
+		)
+	} qr/meaningless element_type value/, 'element_type with scalar type croaks "meaningless element_type value"';
+};
+
+# -- post-type rule interactions (category 2) ----------------------------------
+# These run after the type block.  All existing tests use string/integer/array
+# types; testing them with scalar exercises distinct branches.
+
+subtest 'scalar: matches rule — matching value accepted' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => 'scalar', matches => qr/^\w+$/ } },
+		input  => { x => 'hello123' },
+	);
+	is($r->{x}, 'hello123', 'scalar value matching pattern accepted');
+};
+
+subtest 'scalar: matches rule — non-matching value rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalar', matches => qr/^\d+$/ } },
+			input  => { x => 'abc' },
+		)
+	} qr/must match pattern/, 'scalar value not matching pattern rejected';
+};
+
+subtest 'scalar: nomatch rule — non-matching value accepted' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => 'scalar', nomatch => qr/bad/ } },
+		input  => { x => 'good' },
+	);
+	is($r->{x}, 'good', 'scalar value not matching nomatch pattern accepted');
+};
+
+subtest 'scalar: nomatch rule — matching value rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalar', nomatch => qr/bad/ } },
+			input  => { x => 'bad_value' },
+		)
+	} qr/must not match pattern/, 'scalar value matching nomatch pattern rejected';
+};
+
+subtest 'scalar: memberof rule — valid member accepted via string comparison' => sub {
+	# type => 'scalar' is not integer/number/float, so memberof uses string equality,
+	# not numeric comparison — this exercises the string branch of the memberof handler.
+	my $r = validate_strict(
+		schema => { x => { type => 'scalar', memberof => ['alpha', 'beta', 'gamma'] } },
+		input  => { x => 'beta' },
+	);
+	is($r->{x}, 'beta', 'scalar value in memberof list accepted via string comparison path');
+};
+
+subtest 'scalar: memberof rule — invalid member rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalar', memberof => ['alpha', 'beta', 'gamma'] } },
+			input  => { x => 'delta' },
+		)
+	} qr/must be one of/, 'scalar value not in memberof list rejected';
+};
+
+subtest 'scalar: notmemberof rule — non-blacklisted value accepted' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => 'scalar', notmemberof => ['banned', 'forbidden'] } },
+		input  => { x => 'allowed' },
+	);
+	is($r->{x}, 'allowed', 'scalar value not in notmemberof blacklist accepted');
+};
+
+subtest 'scalar: notmemberof rule — blacklisted value rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalar', notmemberof => ['banned', 'forbidden'] } },
+			input  => { x => 'banned' },
+		)
+	} qr/must not be one of/, 'scalar value in notmemberof blacklist rejected';
+};
+
+subtest 'scalar: notmemberof with case_sensitive => 0 — case-insensitive blacklist check' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalar', notmemberof => ['BANNED'], case_sensitive => 0 } },
+			input  => { x => 'banned' },
+		)
+	} qr/must not be one of/, 'case-insensitive notmemberof rejects value regardless of case';
+};
+
+# -- lifecycle paths (category 3) ----------------------------------------------
+
+subtest 'scalar: required field absent — "Required parameter missing" error' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalar' } },
+			input  => {},
+		)
+	} qr/Required parameter 'x' is missing/, 'absent required scalar field triggers "Required parameter missing"';
+};
+
+subtest 'scalar: optional field absent — key not in result' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => 'scalar', optional => 1 } },
+		input  => {},
+	);
+	ok(!exists $r->{x}, 'absent optional scalar field not present in result');
+};
+
+subtest 'scalar: optional field with default — default applied when absent' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => 'scalar', optional => 1, default => 'fallback' } },
+		input  => {},
+	);
+	is($r->{x}, 'fallback', 'default value applied when optional scalar field absent');
+};
+
+subtest 'scalar: description field — appears in type-violation error message' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalar', description => 'MyScalarField' } },
+			input  => { x => [] },
+		)
+	} qr/MyScalarField/, 'description appears in scalar type violation error';
+};
+
+subtest 'scalar: logger receives error message on type violation' => sub {
+	my $logger = Edge::Logger->new;
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalar' } },
+			input  => { x => [] },
+			logger => $logger,
+		)
+	} qr/must be a scalar/, 'scalar type violation still croaks when logger present';
+	my @errs = $logger->errors;
+	is(scalar @errs, 1, 'logger received exactly one error');
+	like($errs[0], qr/must be a scalar.*ARRAY/, 'logger error message mentions scalar and ARRAY');
+};
+
+# -- other rule interactions (category 4) -------------------------------------
+
+subtest 'scalar: callback applied — passing callback allows value through' => sub {
+	my $seen;
+	my $r = validate_strict(
+		schema => { x => {
+			type     => 'scalar',
+			callback => sub { $seen = $_[0]; 1 },
+		} },
+		input => { x => 'test_value' },
+	);
+	is($r->{x}, 'test_value', 'callback passes: scalar value returned');
+	is($seen, 'test_value',   'callback received the plain scalar value');
+};
+
+subtest 'scalar: callback applied — failing callback rejects value' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => {
+				type     => 'scalar',
+				callback => sub { 0 },
+			} },
+			input => { x => 'anything' },
+		)
+	} qr/failed custom validation/, 'false-returning callback rejects scalar value';
+};
+
+subtest 'scalar: nullable => 1 is synonym for optional — absent key not in result' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => 'scalar', nullable => 1 } },
+		input  => {},
+	);
+	ok(!exists $r->{x}, 'nullable scalar field absent from input not present in result');
+};
+
+subtest 'scalar: positional argument — plain value accepted' => sub {
+	my $r = validate_strict(
+		schema => { name => { type => 'scalar', position => 0 } },
+		input  => ['hello'],
+	);
+	is(ref($r),  'ARRAY',   'positional scalar returns arrayref');
+	is($r->[0], 'hello',    'positional scalar value correct at position 0');
+};
+
+subtest 'scalar: positional argument — reference rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { name => { type => 'scalar', position => 0 } },
+			input  => [[1, 2, 3]],
+		)
+	} qr/must be a scalar/, 'positional arrayref argument rejected for scalar type';
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Scalarref type edge cases
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'scalarref: reference to string accepted' => sub {
+	my $s = 'hello';
+	my $r = validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => \$s });
+	is($r->{x}, \$s, 'ref to string accepted and returned unchanged');
+};
+
+subtest 'scalarref: reference to integer accepted' => sub {
+	my $n = 42;
+	my $r = validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => \$n });
+	is($r->{x}, \$n, 'ref to integer accepted');
+};
+
+subtest 'scalarref: reference to zero (Perl-false number) accepted' => sub {
+	my $z = 0;
+	my $r = validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => \$z });
+	is($r->{x}, \$z, 'ref to zero accepted');
+	ok(!${$r->{x}}, '…and the dereferenced value is Perl-false');
+};
+
+subtest 'scalarref: reference to empty string accepted' => sub {
+	my $e = '';
+	my $r = validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => \$e });
+	is($r->{x}, \$e, 'ref to empty string accepted');
+};
+
+subtest 'scalarref: reference to undef (scalar ref to undef) accepted' => sub {
+	my $u;    # undef
+	my $r = validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => \$u });
+	is(ref($r->{x}), 'SCALAR', 'ref to undef is a SCALAR ref — accepted');
+	ok(!defined ${$r->{x}}, '…and the dereferenced value is undef');
+};
+
+subtest 'scalarref: undef parameter value passes through (next guard fires)' => sub {
+	my $r = validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => undef });
+	ok(exists $r->{x},   'scalarref key present in result even when value is undef');
+	ok(!defined $r->{x}, '…but the value is undef');
+};
+
+subtest 'scalarref: value returned unchanged — no coercion' => sub {
+	my $s = '007';
+	my $ref = \$s;
+	my $r = validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => $ref });
+	is($r->{x}, $ref, 'same reference identity returned — scalarref type does not copy or coerce');
+};
+
+subtest 'scalarref: NUL byte in referenced string accepted' => sub {
+	my $s = "hel\x00lo";
+	my $r = validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => \$s });
+	is(${$r->{x}}, $s, 'ref to string containing NUL byte accepted');
+};
+
+subtest 'scalarref: plain string rejected — error mentions "plain scalar"' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => 'hello' })
+	} qr/must be a scalar reference.*plain scalar/, 'plain string rejected; "plain scalar" in error';
+};
+
+subtest 'scalarref: plain integer rejected — error mentions "plain scalar"' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => 42 })
+	} qr/must be a scalar reference.*plain scalar/, 'plain integer rejected; "plain scalar" in error';
+};
+
+subtest 'scalarref: arrayref rejected — error mentions ARRAY' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => [] })
+	} qr/must be a scalar reference.*ARRAY/, 'arrayref rejected; ARRAY in error';
+};
+
+subtest 'scalarref: hashref rejected — error mentions HASH' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => {} })
+	} qr/must be a scalar reference.*HASH/, 'hashref rejected; HASH in error';
+};
+
+subtest 'scalarref: coderef rejected — error mentions CODE' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => sub {} })
+	} qr/must be a scalar reference.*CODE/, 'coderef rejected; CODE in error';
+};
+
+subtest 'scalarref: REF-of-REF rejected — error mentions REF' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => \[] })
+	} qr/must be a scalar reference.*REF/, 'ref-of-ref rejected; REF in error';
+};
+
+subtest 'scalarref: GLOB reference rejected' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => \*STDOUT })
+	} qr/must be a scalar reference/, 'GLOB reference rejected for scalarref type';
+};
+
+subtest 'scalarref: Regexp object rejected' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => qr/foo/ })
+	} qr/must be a scalar reference/, 'Regexp reference rejected for scalarref type';
+};
+
+subtest 'scalarref: blessed object rejected — class name in error' => sub {
+	my $obj = Edge::Overloaded->new;
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => $obj })
+	} qr/must be a scalar reference.*Edge::Overloaded/,
+	  'blessed object rejected; class name appears in error';
+};
+
+subtest 'scalarref: blessed scalar ref rejected — class name, not SCALAR, in error' => sub {
+	my $n = 99;
+	my $bref = bless \$n, 'MyScalarBox';
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => $bref })
+	} qr/must be a scalar reference.*MyScalarBox/,
+	  'blessed scalar ref rejected; class name (not SCALAR) in error because ref() returns bless class';
+};
+
+subtest 'scalarref: custom error_msg overrides default' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalarref', error_msg => 'Only scalar refs allowed!' } },
+			input  => { x => 'oops' },
+		)
+	} qr/Only scalar refs allowed!/, 'custom error_msg used for scalarref type violation';
+};
+
+subtest 'scalarref: transform returning a scalarref — accepted' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => 'scalarref', transform => sub { my $v = uc ${$_[0]}; \$v } } },
+		input  => { x => \'hello' },
+	);
+	is(${$r->{x}}, 'HELLO', 'transform applied; uppercased scalarref passes type check');
+};
+
+subtest 'scalarref: transform returning a plain scalar — rejected after transform' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalarref', transform => sub { ${$_[0]} } } },
+			input  => { x => \'hello' },
+		)
+	} qr/must be a scalar reference/, 'transform returning plain scalar rejected for scalarref type';
+};
+
+subtest 'scalarref: schema reuse after rejection — schema not corrupted' => sub {
+	my $schema = { x => { type => 'scalarref' } };
+	throws_ok {
+		validate_strict(schema => $schema, input => { x => 'oops' })
+	} qr/must be a scalar reference/, 'first call with plain scalar fails correctly';
+	my $s = 'ok';
+	my $r = validate_strict(schema => $schema, input => { x => \$s });
+	is($r->{x}, \$s, 'schema intact after failed call; second call with scalarref succeeds');
+};
+
+subtest 'scalarref: union type [scalarref, arrayref] — scalarref matches scalarref branch' => sub {
+	my $s = 'hello';
+	my $r = validate_strict(
+		schema => { x => { type => ['scalarref', 'arrayref'] } },
+		input  => { x => \$s },
+	);
+	is($r->{x}, \$s, 'scalarref accepted via scalarref branch of union type');
+};
+
+subtest 'scalarref: union type [scalarref, arrayref] — arrayref matches arrayref branch' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => ['scalarref', 'arrayref'] } },
+		input  => { x => [1, 2, 3] },
+	);
+	is_deeply($r->{x}, [1, 2, 3], 'arrayref accepted via arrayref branch of union type');
+};
+
+# -- "meaningless rule" error branches for scalarref ---------------------------
+
+subtest 'scalarref: min rule — meaningless min value error' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalarref', min => 3 } },
+			input  => { x => \'hi' },
+		)
+	} qr/meaningless min value/, 'min with scalarref type croaks "meaningless min value"';
+};
+
+subtest 'scalarref: max rule — meaningless max value error' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalarref', max => 10 } },
+			input  => { x => \'hi' },
+		)
+	} qr/meaningless max value/, 'max with scalarref type croaks "meaningless max value"';
+};
+
+subtest 'scalarref: isa rule — meaningless isa value error' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalarref', isa => 'SomeClass' } },
+			input  => { x => \'hello' },
+		)
+	} qr/meaningless isa value/, 'isa with scalarref type croaks "meaningless isa value"';
+};
+
+subtest 'scalarref: can rule — meaningless can value error' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalarref', can => 'some_method' } },
+			input  => { x => \'hello' },
+		)
+	} qr/meaningless can value/, 'can with scalarref type croaks "meaningless can value"';
+};
+
+subtest 'scalarref: element_type rule — meaningless element_type value error' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalarref', element_type => 'string' } },
+			input  => { x => \'hello' },
+		)
+	} qr/meaningless element_type value/, 'element_type with scalarref type croaks "meaningless element_type value"';
+};
+
+# -- lifecycle paths for scalarref --------------------------------------------
+
+subtest 'scalarref: required field absent — "Required parameter missing" error' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalarref' } },
+			input  => {},
+		)
+	} qr/Required parameter 'x' is missing/, 'absent required scalarref field triggers "Required parameter missing"';
+};
+
+subtest 'scalarref: optional field absent — key not in result' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => 'scalarref', optional => 1 } },
+		input  => {},
+	);
+	ok(!exists $r->{x}, 'absent optional scalarref field not present in result');
+};
+
+subtest 'scalarref: optional field with default — default applied when absent' => sub {
+	my $default = \'fallback';
+	my $r = validate_strict(
+		schema => { x => { type => 'scalarref', optional => 1, default => $default } },
+		input  => {},
+	);
+	is($r->{x}, $default, 'default scalar reference applied when optional scalarref field absent');
+};
+
+subtest 'scalarref: description field — appears in type-violation error message' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalarref', description => 'MyScalarRefField' } },
+			input  => { x => 'oops' },
+		)
+	} qr/MyScalarRefField/, 'description appears in scalarref type violation error';
+};
+
+subtest 'scalarref: logger receives error message on type violation' => sub {
+	my $logger = Edge::Logger->new;
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalarref' } },
+			input  => { x => 'oops' },
+			logger => $logger,
+		)
+	} qr/must be a scalar reference/, 'scalarref type violation still croaks when logger present';
+	my @errs = $logger->errors;
+	is(scalar @errs, 1, 'logger received exactly one error');
+	like($errs[0], qr/must be a scalar reference.*plain scalar/, 'logger error message mentions scalar reference and plain scalar');
+};
+
+# -- other rule interactions for scalarref ------------------------------------
+
+subtest 'scalarref: callback applied — passing callback allows value through' => sub {
+	my $seen;
+	my $s = 'test_value';
+	my $r = validate_strict(
+		schema => { x => {
+			type     => 'scalarref',
+			callback => sub { $seen = ${$_[0]}; 1 },
+		} },
+		input => { x => \$s },
+	);
+	is($r->{x}, \$s,        'callback passes: scalarref returned');
+	is($seen, 'test_value', 'callback received the dereferenced value');
+};
+
+subtest 'scalarref: callback applied — failing callback rejects value' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => {
+				type     => 'scalarref',
+				callback => sub { 0 },
+			} },
+			input => { x => \'anything' },
+		)
+	} qr/failed custom validation/, 'false-returning callback rejects scalarref value';
+};
+
+subtest 'scalarref: nullable => 1 — absent key not in result' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => 'scalarref', nullable => 1 } },
+		input  => {},
+	);
+	ok(!exists $r->{x}, 'nullable scalarref field absent from input not present in result');
+};
+
+subtest 'scalarref: memberof rule — same reference identity accepted via string comparison' => sub {
+	# type => 'scalarref' is not integer/number/float, so memberof uses string equality.
+	# References stringify to their address, so only the identical reference matches.
+	my $val = \'beta';
+	my $r = validate_strict(
+		schema => { x => { type => 'scalarref', memberof => [$val] } },
+		input  => { x => $val },
+	);
+	is($r->{x}, $val, 'identical scalarref identity matched in memberof list via string comparison path');
+};
+
+subtest 'scalarref: positional argument — scalarref accepted' => sub {
+	my $s = 'hello';
+	my $r = validate_strict(
+		schema => { name => { type => 'scalarref', position => 0 } },
+		input  => [\$s],
+	);
+	is(ref($r),   'ARRAY',  'positional scalarref returns arrayref');
+	is($r->[0], \$s,        'positional scalarref value correct at position 0');
+};
+
+subtest 'scalarref: positional argument — plain value rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { name => { type => 'scalarref', position => 0 } },
+			input  => ['hello'],
+		)
+	} qr/must be a scalar reference/, 'positional plain string rejected for scalarref type';
+};
+
 done_testing;
+

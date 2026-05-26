@@ -95,7 +95,7 @@ sub end_testing {
 sub _slurp {
     my ($path) = @_;
     local *FH;
-    open FH, "< $path" or return '';
+    CORE::open(FH, "< $path") or return '';
     local $/;
     my $c = <FH>;
     close FH;
@@ -105,7 +105,7 @@ sub _slurp {
 sub _slurp_lines {
     my ($path) = @_;
     local *FH;
-    open FH, "< $path" or return ();
+    CORE::open(FH, "< $path") or return ();
     my @lines = <FH>;
     close FH;
     return @lines;
@@ -135,7 +135,7 @@ sub _find_pm {
 sub _manifest_files {
     my ($root) = @_;
     local *MFH;
-    open MFH, "< $root/MANIFEST" or return ();
+    CORE::open(MFH, "< $root/MANIFEST") or return ();
     my @lines = <MFH>;
     close MFH;
     my @files;
@@ -390,7 +390,7 @@ sub check_C {
             next;
         }
         local *FH;
-        open FH, "< $abs" or do { ok(0, "C - US-ASCII: $f (cannot open)"); next };
+        CORE::open(FH, "< $abs") or do { ok(0, "C - US-ASCII: $f (cannot open)"); next };
         binmode FH;
         my $bad = 0;
         while (<FH>) { if (/[^\x00-\x7F]/) { $bad = 1; last } }

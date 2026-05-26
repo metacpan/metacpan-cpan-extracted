@@ -9,8 +9,6 @@ use JSON::MaybeXS qw(decode_json encode_json);
 use Carp qw(croak);
 use Log::Any qw($log);
 
-our $VERSION = '0.001';
-
 
 requires 'token';
 requires 'base_url';
@@ -90,7 +88,7 @@ WWW::MailboxOrg::Role::HTTP - JSON-RPC HTTP client role
 
 =head1 VERSION
 
-version 0.001
+version 0.100
 
 =head1 SYNOPSIS
 
@@ -154,7 +152,7 @@ L<Log::Any>
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/getty/p5-www-mailboxorg/issues>.
+L<https://github.com/Getty/p5-www-mailboxorg/issues>.
 
 =head2 IRC
 

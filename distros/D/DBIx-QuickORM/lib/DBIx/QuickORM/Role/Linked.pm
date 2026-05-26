@@ -2,10 +2,11 @@ package DBIx::QuickORM::Role::Linked;
 use strict;
 use warnings;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000020';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
+use DBIx::QuickORM::Util qw/column_key/;
 
 use constant 'LINKS'          => '__links__';
 use constant 'BUILT'          => 'built';
@@ -17,12 +18,90 @@ use constant 'BY_TABLE_KEY'   => 'by_table_key';
 
 use Role::Tiny;
 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::QuickORM::Role::Linked - Role for sources that expose links.
+
+=head1 DESCRIPTION
+
+Provides link-resolution for sources that know about
+L<DBIx::QuickORM::Link> objects. Given a link specification (a name, alias,
+table, column set, or an existing link object), C<resolve_link> finds the
+matching link, building and caching a set of lookup indexes the first time
+it is needed.
+
+=head1 SYNOPSIS
+
+    package My::Source;
+    use Role::Tiny::With;
+    with 'DBIx::QuickORM::Role::Linked';
+
+    sub links { ... }
+
+    my $link = $source->resolve_link('author');
+
+=head1 REQUIRED METHODS
+
+Consumers must provide C<links>, returning the arrayref of
+L<DBIx::QuickORM::Link> objects this source knows about.
+
+=cut
+
 requires qw{
     links
 };
 
+=pod
+
+=head1 PUBLIC METHODS
+
+=over 4
+
+=item $source->connection
+
+=item $source->from
+
+Default no-op accessors; consumers override them when they have a
+connection or can resolve a sub-source by name.
+
+=back
+
+=cut
+
 sub connection {}
 sub from {}
+
+=pod
+
+=over 4
+
+=item $link = $source->resolve_link($spec, %params)
+
+=item $link = $source->resolve_link(%params)
+
+Resolve a link from a specification. Accepts an existing
+L<DBIx::QuickORM::Link> (returned as-is), a reference (a hashref/arrayref
+parsed into a link), or a name/alias/table/column lookup. Croaks when the
+specification cannot be resolved or is ambiguous.
+
+A bare string spec is a B<fuzzy> lookup: it is matched against aliases, then
+table names, then column keys, and the first hit wins. To force a particular
+dimension, pass it by keyword instead:
+
+    $source->resolve_link(alias => 'author');           # by link alias only
+    $source->resolve_link(table => 'users');            # by destination table only
+    $source->resolve_link(table => 'users', columns => ['user_id']);  # by table + columns
+
+C<alias> and C<table> resolve standalone; C<columns> (or a precomputed
+C<key>) is scoped to a table, so pass it together with C<table>.
+
+=back
+
+=cut
 
 sub resolve_link {
     my $self = shift;
@@ -64,6 +143,22 @@ sub resolve_link {
         '',
     );
 }
+
+=pod
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item $link = $source->_link_from_name(%params)
+
+Look a link up in the cached indexes by table, alias, key, or columns,
+building the indexes on first use. Returns a single link, an arrayref of
+candidates, or undef.
+
+=back
+
+=cut
 
 sub _link_from_name {
     my $self = shift;
@@ -119,115 +214,36 @@ sub _link_from_name {
 
 1;
 
-
 __END__
 
-        $found //= $source->links_by_alias->{$link} if $source->can('links_by_alias');
+=head1 SOURCE
 
-        if ($source->can('links_by_table')) {
-            if (my $set = $source->links_by_table->{$link}) {
-                my $count = keys %$set;
-                croak "Could not find any links to table '$link'" unless $count;
-                if ($count > 1) {
-                    use Data::Dumper;
-                    croak "Found $count links to table '$link', you need to be more specific: " . Dumper($set);
-                }
-                ($found) = values %$set;
-            }
-        }
+The source code repository for DBIx::QuickORM can be found at
+L<https://github.com/exodist/DBIx-QuickORM>.
 
-sub _links { delete $_[0]->{+_LINKS} }
+=head1 MAINTAINERS
 
-sub links_by_table { $_[0]->{+LINKS} }
+=over 4
 
-sub links {
-    my $self = shift;
-    my ($table) = @_;
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
 
-    my @tables = $table ? ($table) : keys %{ $self->{+LINKS} };
+=back
 
-    return map { values %{ $self->{+LINKS}->{$_} // {}} } @tables;
-}
+=head1 AUTHORS
 
-sub link {
-    my $self = shift;
-    my %params = @_;
+=over 4
 
-    if (my $table = $params{table}) {
-        my $links = $self->{+LINKS}->{$table} or return undef;
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
 
-        if (my $cols = $params{columns} // $params{cols}) {
-            my $key = column_key(@$cols);
-            return $links->{$key} // undef;
-        }
+=back
 
-        for my $key (sort keys %$links) {
-            return $links->{$key} // undef;
-        }
+=head1 COPYRIGHT
 
-        return undef;
-    }
-    elsif (my $alias = $params{name}) {
-        return $self->{+LINKS_BY_ALIAS}->{$alias} // undef;
-    }
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 
-    croak "Need a link name or table";
-}
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
 
-sub parse_link {
-    my $self = shift;
-    my ($link) = @_;
+See L<https://dev.perl.org/licenses/>
 
-    return $link if blessed($link) && $link->isa('DBIx::QuickORM::Link');
-
-    my $ref = ref($link);
-
-    return $self->source->links_by_alias->{$link} // croak "'$link' is not a valid link alias for table '" . $self->source->name . "'"
-        unless $ref;
-
-    return DBIx::QuickORM::Link->parse(
-        source => $self->source,
-        connection  => $self->connection,
-        link        => $link,
-    );
-}
-
-# TODO move this to a role, ::Row uses it too.
-sub _parse_link {
-    my $self = shift;
-    my ($link, %params) = @_;
-
-    return $link if blessed($link) && $link->isa('DBIx::QuickORM::Link');
-
-    my $ref = ref($link);
-    my $found;
-
-    unless ($ref) {
-        my $source = $self->{+SOURCE};
-        $source = $self->{+SOURCE}->from($params{from}) if $params{from} && $source->can('from');
-
-        $found //= $source->links_by_alias->{$link} if $source->can('links_by_alias');
-
-        if ($source->can('links_by_table')) {
-            if (my $set = $source->links_by_table->{$link}) {
-                my $count = keys %$set;
-                croak "Could not find any links to table '$link'" unless $count;
-                if ($count > 1) {
-                    use Data::Dumper;
-                    croak "Found $count links to table '$link', you need to be more specific: " . Dumper($set);
-                }
-                ($found) = values %$set;
-            }
-        }
-
-        croak "Could not resolve link '$link'" unless $found;
-    }
-
-    return DBIx::QuickORM::Link->parse(
-        source => $self->{+SOURCE},
-        connection  => $self->{+CONNECTION},
-        link        => $found // $link,
-    );
-}
-
-
+=cut

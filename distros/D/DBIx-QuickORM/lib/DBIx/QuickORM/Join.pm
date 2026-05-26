@@ -2,7 +2,7 @@ package DBIx::QuickORM::Join;
 use strict;
 use warnings;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000020';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
@@ -13,7 +13,7 @@ use Role::Tiny::With qw/with/;
 with 'DBIx::QuickORM::Role::Source';
 with 'DBIx::QuickORM::Role::Linked';
 
-use DBIx::QuickORM::Util::HashBase qw{
+use Object::HashBase qw{
     <schema
     <primary_source
     <join_as
@@ -24,10 +24,85 @@ use DBIx::QuickORM::Util::HashBase qw{
     <components
 };
 
-sub primary_key     { }
-sub fields_to_omit  { }
-sub source_orm_name   { 'JOIN' }
-sub fields_list_all { croak "Not Supported" }
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::QuickORM::Join - A query source built from joined tables.
+
+=head1 DESCRIPTION
+
+A source (see L<DBIx::QuickORM::Role::Source>) representing one or more tables
+joined together. Each component table is given a short alias; the primary
+source is the first component, and additional tables are added with the
+C<join> / C<left_join> / C<right_join> / C<inner_join> methods, each of which
+returns a clone of the join with the new component added.
+
+The join produces aliased SQL via C<source_db_moniker> and aliased fetch
+fields via C<fields_to_fetch>, and can fracture a flat fetched row back into
+per-alias data with C<fracture>. Joins have no primary key and are not
+directly cachable.
+
+=head1 SYNOPSIS
+
+    my $join = DBIx::QuickORM::Join->new(
+        schema         => $schema,
+        primary_source => $table,
+    );
+
+    my $joined = $join->left_join($link);
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item schema
+
+The schema the joined tables belong to.
+
+=item primary_source
+
+The first/anchor table of the join.
+
+=item join_as
+
+Internal alias generator state (the next alias to hand out).
+
+=item row_class
+
+Row class used for fetched rows; defaults to L<DBIx::QuickORM::Join::Row>.
+
+=item order
+
+Arrayref of component aliases in join order.
+
+=item lookup
+
+Hashref mapping a table's db moniker to the aliases it has been joined as.
+
+=item components
+
+Hashref mapping each alias to its component spec (table, link, from, type).
+
+=back
+
+=cut
+
+# {{{ Role::Source interface
+
+sub source_orm_name { 'JOIN' }
+
+sub primary_key    { }
+sub fields_to_omit { }
+
+sub fields_list_all {
+    my $self = shift;
+    croak "Not Supported";
+}
+
+# }}} Role::Source interface
 
 sub init {
     my $self = shift;
@@ -47,6 +122,20 @@ sub init {
 
     $self->{+ROW_CLASS} //= 'DBIx::QuickORM::Join::Row';
 }
+
+=pod
+
+=head1 PUBLIC METHODS
+
+=over 4
+
+=item $parts = $join->fracture(\%row)
+
+Split a flat fetched row (with C<alias.field> keys) into an arrayref of
+per-component pieces, one per alias that has any non-null value. Each piece
+carries the component source, its data, alias, and link.
+
+=cut
 
 sub fracture {
     my $self = shift;
@@ -69,6 +158,15 @@ sub fracture {
     return $out;
 }
 
+=pod
+
+=item $copy = $join->clone(%overrides)
+
+Return a shallow copy of the join with the order, lookup, and components
+containers duplicated so the copy can be extended independently.
+
+=cut
+
 sub clone {
     my $self   = shift;
     my %params = @_;
@@ -86,6 +184,15 @@ sub clone {
         $class,
     );
 }
+
+=pod
+
+=item $ref = $join->source_db_moniker
+
+Return a scalar reference to the SQL C<FROM> fragment for the join, including
+each aliased table and its C<ON> conditions.
+
+=cut
 
 sub source_db_moniker {
     my $self = shift;
@@ -121,6 +228,15 @@ sub source_db_moniker {
     return \$out;
 }
 
+=pod
+
+=item ($from, $table, $field) = $join->_field_source($proto, %params)
+
+Resolve a C<alias.field> (or bare C<field>) proto into its alias, table, and
+field name. Croaks if the field cannot be resolved unless C<no_fatal> is set.
+
+=cut
+
 sub _field_source {
     my $self = shift;
     my ($proto, %params) = @_;
@@ -143,6 +259,19 @@ sub _field_source {
     croak "This join does not have a '$field' field";
 }
 
+=pod
+
+=item $type = $join->field_type($proto)
+
+=item $affinity = $join->field_affinity($proto, $dialect)
+
+=item $bool = $join->has_field($proto)
+
+Delegate field type, affinity, and existence checks to the component table
+that owns the given C<alias.field> (or bare C<field>) proto.
+
+=cut
+
 sub field_type {
     my $self = shift;
     my ($proto) = @_;
@@ -164,6 +293,15 @@ sub has_field {
     return $t->has_field($field);
 }
 
+=pod
+
+=item $sql = $join->fields_to_fetch
+
+Return a comma-joined list of aliased select expressions covering every
+component table's fetch fields, each aliased as C<"alias.field">.
+
+=cut
+
 sub fields_to_fetch {
     my $self = shift;
 
@@ -178,6 +316,14 @@ sub fields_to_fetch {
     return join(', ' => @fields);
 }
 
+=pod
+
+=item $links = $join->links
+
+Return an arrayref of all links from every component table in the join.
+
+=cut
+
 sub links {
     my $self = shift;
 
@@ -190,6 +336,15 @@ sub links {
 
     return \@out;
 }
+
+=pod
+
+=item $table = $join->from($alias_or_name)
+
+Resolve an alias or table name to its component table. Croaks when a table
+name is ambiguous (joined more than once) or cannot be resolved.
+
+=cut
 
 sub from {
     my $self = shift;
@@ -212,12 +367,31 @@ sub from {
     croak "Unable to resolve '$from' it does not appear to be a table name or an alias";
 }
 
+=pod
+
+=item %params = $join->_join_params(@args)
+
+Normalize join arguments: a single argument is treated as the C<link>,
+otherwise the arguments are taken as a key/value list.
+
+=cut
+
 sub _join_params {
     my $self = shift;
 
     return (link => $_[0]) if @_ == 1;
     return @_;
 }
+
+=pod
+
+=item $copy = $join->_join(%params)
+
+Clone the join and add a new component for the given link, resolving its
+alias and source-of-join (C<from>) and appending it to the order, lookup, and
+components. Returns the new join.
+
+=cut
 
 sub _join {
     my $self = shift;
@@ -276,6 +450,23 @@ sub _join {
     return $self;
 }
 
+=pod
+
+=item $copy = $join->join($link, ...)
+
+=item $copy = $join->left_join($link, ...)
+
+=item $copy = $join->right_join($link, ...)
+
+=item $copy = $join->inner_join($link, ...)
+
+Return a clone of the join with another table added via the given link. The
+named variants set the join type (plain, C<LEFT>, C<RIGHT>, C<INNER>). A
+single argument is taken as the link; otherwise pass C<link>, C<as>,
+C<from>, etc. as key/value pairs.
+
+=cut
+
 sub left_join {
     my $self = shift;
     my %params = $self->_join_params(@_);
@@ -306,4 +497,44 @@ sub inner_join {
     };
 }
 
+=pod
+
+=back
+
+=cut
+
 1;
+
+__END__
+
+=head1 SOURCE
+
+The source code repository for DBIx::QuickORM can be found at
+L<https://github.com/exodist/DBIx-QuickORM>.
+
+=head1 MAINTAINERS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut

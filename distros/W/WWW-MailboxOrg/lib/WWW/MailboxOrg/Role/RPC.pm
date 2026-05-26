@@ -4,8 +4,6 @@ package WWW::MailboxOrg::Role::RPC;
 
 use Moo::Role;
 
-our $VERSION = '0.001';
-
 requires 'client';
 
 sub _rpc {
@@ -28,20 +26,14 @@ WWW::MailboxOrg::Role::RPC - Role for RPC API controllers
 
 =head1 VERSION
 
-version 0.001
-
-=head1 NAME
-
-WWW::MailboxOrg::Role::RPC - Role for RPC API controllers
-
-=cut
+version 0.100
 
 =head1 SUPPORT
 
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/getty/p5-www-mailboxorg/issues>.
+L<https://github.com/Getty/p5-www-mailboxorg/issues>.
 
 =head2 IRC
 

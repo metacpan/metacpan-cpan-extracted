@@ -307,4 +307,233 @@ subtest 'Readonly fields in validation' => sub {
     is($updated->{user}{email}, 'updated@example.com', 'Email updated');
 };
 
+
+# ==============================================================================
+# Test Group 9: USERS_SKIP_VALIDATION Environment Variable
+# ==============================================================================
+subtest 'USERS_SKIP_VALIDATION environment variable' => sub {
+    my ($users, $storage_dir) = setup_test_env('database');
+
+    local $ENV{USERS_SKIP_VALIDATION} = 1;
+
+    my $result = $users->register_user({
+        user_id  => 'skiptest',
+        moniker  => 'SkipTest',
+        email    => 'not-an-email',
+        phone    => '123',
+    });
+    ok($result->{success}, 'register_user succeeds when USERS_SKIP_VALIDATION is set');
+    ok(!$result->{warnings}, 'No warnings generated when validation skipped');
+
+    my $user = $users->get_user('skiptest');
+    is($user->{user}{email}, 'not-an-email', 'Invalid data stored as-is when validation skipped');
+};
+
+# ==============================================================================
+# Test Group 10: Date Validator
+# ==============================================================================
+subtest 'Date validator (term_ends)' => sub {
+    my $storage_dir = tempdir(CLEANUP => 1);
+    my $config = {
+        storage_dir             => $storage_dir,
+        backend                 => 'database',
+        include_standard_fields => [qw/ term_ends /],
+    };
+    my $setup_result = Concierge::Users->setup($config);
+    my $users = Concierge::Users->new($setup_result->{config_file});
+
+    # Valid date
+    my $result1 = $users->register_user({
+        user_id   => 'datetest1',
+        moniker   => 'DateTest1',
+        term_ends => '2027-12-31',
+    });
+    ok($result1->{success}, 'Accepts valid YYYY-MM-DD date');
+    ok(!$result1->{warnings}, 'No warnings for valid date');
+
+    my $check1 = $users->get_user('datetest1');
+    is($check1->{user}{term_ends}, '2027-12-31', 'Date stored correctly');
+
+    # Invalid date format (must_validate=0 for term_ends, so warns rather than fails)
+    my $result2 = $users->register_user({
+        user_id   => 'datetest2',
+        moniker   => 'DateTest2',
+        term_ends => '31/12/2027',
+    });
+    ok($result2->{success}, 'Succeeds with invalid date format (must_validate=0)');
+    ok($result2->{warnings}, 'Has warnings about invalid date format');
+    like($result2->{warnings}[0], qr/date/i, 'Warning mentions date');
+};
+
+# ==============================================================================
+# Test Group 11: Timestamp Validator
+# ==============================================================================
+subtest 'Timestamp validator (last_login_date)' => sub {
+    my $storage_dir = tempdir(CLEANUP => 1);
+    my $config = {
+        storage_dir             => $storage_dir,
+        backend                 => 'database',
+        include_standard_fields => [qw/ last_login_date /],
+    };
+    my $setup_result = Concierge::Users->setup($config);
+    my $users = Concierge::Users->new($setup_result->{config_file});
+
+    # Valid space-separated timestamp
+    my $result1 = $users->register_user({
+        user_id         => 'tstest1',
+        moniker         => 'TSTest1',
+        last_login_date => '2027-06-15 14:30:00',
+    });
+    ok($result1->{success}, 'Accepts valid YYYY-MM-DD HH:MM:SS timestamp');
+    ok(!$result1->{warnings}, 'No warnings for valid timestamp');
+
+    my $check1 = $users->get_user('tstest1');
+    is($check1->{user}{last_login_date}, '2027-06-15 14:30:00', 'Timestamp stored correctly');
+
+    # Valid ISO 8601 T-separated timestamp
+    my $result2 = $users->register_user({
+        user_id         => 'tstest2',
+        moniker         => 'TSTest2',
+        last_login_date => '2027-06-15T14:30:00',
+    });
+    ok($result2->{success}, 'Accepts ISO 8601 T-separated timestamp');
+
+    # Invalid timestamp format (must_validate=0, so warns)
+    my $result3 = $users->register_user({
+        user_id         => 'tstest3',
+        moniker         => 'TSTest3',
+        last_login_date => '2027-06-15 14:30',
+    });
+    ok($result3->{success}, 'Succeeds with invalid timestamp format (must_validate=0)');
+    ok($result3->{warnings}, 'Has warnings about invalid timestamp');
+    like($result3->{warnings}[0], qr/timestamp/i, 'Warning mentions timestamp');
+};
+
+# ==============================================================================
+# Test Group 12: Boolean Validator
+# ==============================================================================
+subtest 'Boolean validator (text_ok)' => sub {
+    my $storage_dir = tempdir(CLEANUP => 1);
+    my $config = {
+        storage_dir             => $storage_dir,
+        backend                 => 'database',
+        include_standard_fields => [qw/ text_ok /],
+    };
+    my $setup_result = Concierge::Users->setup($config);
+    my $users = Concierge::Users->new($setup_result->{config_file});
+
+    # Valid boolean: 1
+    my $result1 = $users->register_user({
+        user_id => 'booltest1',
+        moniker => 'BoolTest1',
+        text_ok => '1',
+    });
+    ok($result1->{success}, 'Accepts boolean value 1');
+    ok(!$result1->{warnings}, 'No warnings for boolean 1');
+
+    my $check1 = $users->get_user('booltest1');
+    is($check1->{user}{text_ok}, '1', 'Boolean 1 stored correctly');
+
+    # Valid boolean: 0
+    my $result2 = $users->register_user({
+        user_id => 'booltest2',
+        moniker => 'BoolTest2',
+        text_ok => '0',
+    });
+    ok($result2->{success}, 'Accepts boolean value 0');
+
+    # Invalid boolean value (must_validate=0, so warns)
+    my $result3 = $users->register_user({
+        user_id => 'booltest3',
+        moniker => 'BoolTest3',
+        text_ok => 'yes',
+    });
+    ok($result3->{success}, 'Succeeds with invalid boolean (must_validate=0)');
+    ok($result3->{warnings}, 'Has warnings about invalid boolean');
+    like($result3->{warnings}[0], qr/boolean/i, 'Warning mentions boolean');
+};
+
+# ==============================================================================
+# Test Group 13: Integer Validator
+# ==============================================================================
+subtest 'Integer validator (app field)' => sub {
+    my $storage_dir = tempdir(CLEANUP => 1);
+    my $config = {
+        storage_dir             => $storage_dir,
+        backend                 => 'database',
+        include_standard_fields => [],
+        app_fields              => [
+            { field_name => 'score', type => 'integer', required => 0, label => 'Score' },
+        ],
+    };
+    my $setup_result = Concierge::Users->setup($config);
+    my $users = Concierge::Users->new($setup_result->{config_file});
+
+    # Valid integer
+    my $result1 = $users->register_user({
+        user_id => 'inttest1',
+        moniker => 'IntTest1',
+        score   => '42',
+    });
+    ok($result1->{success}, 'Accepts valid integer');
+    ok(!$result1->{warnings}, 'No warnings for valid integer');
+
+    my $check1 = $users->get_user('inttest1');
+    is($check1->{user}{score}, '42', 'Integer stored correctly');
+
+    # Valid negative integer
+    my $result2 = $users->register_user({
+        user_id => 'inttest2',
+        moniker => 'IntTest2',
+        score   => '-5',
+    });
+    ok($result2->{success}, 'Accepts valid negative integer');
+
+    # Invalid: float (must_validate not set, so warns)
+    my $result3 = $users->register_user({
+        user_id => 'inttest3',
+        moniker => 'IntTest3',
+        score   => '3.14',
+    });
+    ok($result3->{success}, 'Succeeds with non-integer value (no must_validate)');
+    ok($result3->{warnings}, 'Has warnings about invalid integer');
+    like($result3->{warnings}[0], qr/whole number/i, 'Warning mentions whole number');
+};
+
+# ==============================================================================
+# Test Group 14: Enum Validator (user_status and access_level)
+# ==============================================================================
+subtest 'Enum validator (user_status and access_level)' => sub {
+    my ($users, $storage_dir) = setup_test_env('database');
+
+    # Valid user_status
+    my $result1 = $users->register_user({
+        user_id     => 'enumtest1',
+        moniker     => 'EnumTest1',
+        user_status => 'OK',
+    });
+    ok($result1->{success}, 'Accepts valid user_status value');
+
+    my $check1 = $users->get_user('enumtest1');
+    is($check1->{user}{user_status}, 'OK', 'Valid user_status stored correctly');
+
+    # Invalid user_status (must_validate=1, so fails)
+    my $result2 = $users->register_user({
+        user_id     => 'enumtest2',
+        moniker     => 'EnumTest2',
+        user_status => 'banned',
+    });
+    ok(!$result2->{success}, 'Rejects invalid user_status value (must_validate=1)');
+    like($result2->{message}, qr/must be one of/i, 'Error mentions valid options');
+
+    # Valid access_level
+    my $result3 = $users->register_user({
+        user_id      => 'enumtest3',
+        moniker      => 'EnumTest3',
+        access_level => 'admin',
+    });
+    ok($result3->{success}, 'Accepts valid access_level value');
+};
+
 done_testing();
+

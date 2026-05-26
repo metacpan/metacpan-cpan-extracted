@@ -2,7 +2,7 @@ package DBIx::QuickDB::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.000041';
+our $VERSION = '0.000042';
 
 use File::Path qw/remove_tree/;
 use IPC::Cmd qw/can_run/;

@@ -30,9 +30,14 @@ BEGIN { if ($] < 5.006 && !defined(&warnings::import)) {
         eval 'package warnings; sub import {}' } }
 use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
-use FindBin ();
-use lib "$FindBin::Bin/../lib";
-use lib "$FindBin::Bin/lib";
+use File::Spec ();
+BEGIN {
+    my $t_dir = (File::Spec->splitpath(__FILE__))[1];
+    $t_dir = File::Spec->curdir() unless defined $t_dir && $t_dir ne '';
+    my $root = File::Spec->catdir($t_dir, File::Spec->updir());
+    unshift @INC, File::Spec->catdir($root, 'lib');
+    unshift @INC, File::Spec->catdir($t_dir, 'lib');
+}
 
 ######################################################################
 # Minimal TAP harness

@@ -9,6 +9,7 @@ use Util qw[throws_ok];
 
 BEGIN {
   use_ok('Time::Str::Util', qw[ lower_bound
+                                range_bounds
                                 upper_bound ]);
 }
 
@@ -141,6 +142,91 @@ is(upper_bound(\@arr, 30), lower_bound(\@arr, 30) + 1,
   my @dup = (10, 20, 20, 20, 30);
   is(upper_bound(\@dup, 20) - lower_bound(\@dup, 20), 3,
     'upper - lower = count of duplicates');
+}
+
+## range_bounds
+
+throws_ok { range_bounds() }
+  qr/^Usage: range_bounds/,
+  'range_bounds: no arguments';
+
+throws_ok { range_bounds("not_a_ref", 10, 20) }
+  qr/must be an array reference/,
+  'range_bounds: non-ref argument';
+
+throws_ok { range_bounds(\@arr, 30, 20) }
+  qr/Parameter 'min_value' must not exceed 'max_value'/,
+  'range_bounds: min > max';
+
+# basic range
+{
+  my ($lo, $hi) = range_bounds(\@arr, 15, 35);
+  is($lo, 1, 'range_bounds: lo for [15, 35]');
+  is($hi, 3, 'range_bounds: hi for [15, 35]');
+}
+
+# exact match on boundaries
+{
+  my ($lo, $hi) = range_bounds(\@arr, 20, 40);
+  is($lo, 1, 'range_bounds: lo for [20, 40]');
+  is($hi, 4, 'range_bounds: hi for [20, 40]');
+}
+
+# range covers all elements
+{
+  my ($lo, $hi) = range_bounds(\@arr, 5, 55);
+  is($lo, 0, 'range_bounds: lo for full range');
+  is($hi, 5, 'range_bounds: hi for full range');
+}
+
+# range below all elements
+{
+  my ($lo, $hi) = range_bounds(\@arr, 1, 5);
+  is($lo, 0, 'range_bounds: lo for range below all');
+  is($hi, 0, 'range_bounds: hi for range below all');
+}
+
+# range above all elements
+{
+  my ($lo, $hi) = range_bounds(\@arr, 55, 60);
+  is($lo, 5, 'range_bounds: lo for range above all');
+  is($hi, 5, 'range_bounds: hi for range above all');
+}
+
+# single element match
+{
+  my ($lo, $hi) = range_bounds(\@arr, 30, 30);
+  is($lo, 2, 'range_bounds: lo for single value');
+  is($hi, 3, 'range_bounds: hi for single value');
+}
+
+# no elements in range
+{
+  my ($lo, $hi) = range_bounds(\@arr, 21, 29);
+  is($lo, 2, 'range_bounds: lo for gap range');
+  is($hi, 2, 'range_bounds: hi for gap range');
+}
+
+# empty array
+{
+  my ($lo, $hi) = range_bounds([], 10, 20);
+  is($lo, 0, 'range_bounds: lo for empty array');
+  is($hi, 0, 'range_bounds: hi for empty array');
+}
+
+# duplicates
+{
+  my @dup = (10, 20, 20, 20, 30);
+  my ($lo, $hi) = range_bounds(\@dup, 20, 20);
+  is($lo, 1, 'range_bounds: lo for duplicates');
+  is($hi, 4, 'range_bounds: hi for duplicates');
+}
+
+# consistency: range_bounds matches lower_bound + upper_bound
+{
+  my ($lo, $hi) = range_bounds(\@arr, 15, 35);
+  is($lo, lower_bound(\@arr, 15), 'range_bounds: lo matches lower_bound');
+  is($hi, upper_bound(\@arr, 35), 'range_bounds: hi matches upper_bound');
 }
 
 ## negative values

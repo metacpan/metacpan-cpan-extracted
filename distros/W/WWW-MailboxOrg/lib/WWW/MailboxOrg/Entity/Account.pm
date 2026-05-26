@@ -4,8 +4,6 @@ package WWW::MailboxOrg::Entity::Account;
 
 use Moo;
 
-our $VERSION = '0.001';
-
 has _client => (
     is       => 'ro',
     required => 1,
@@ -44,8 +42,9 @@ has is_locked => (
 
 
 has data => (
-    is       => 'ro',
-    builder  => '_build_data',
+    is      => 'ro',
+    lazy    => 1,
+    builder => '_build_data',
 );
 
 sub _build_data {
@@ -74,7 +73,7 @@ WWW::MailboxOrg::Entity::Account - Account entity object
 
 =head1 VERSION
 
-version 0.001
+version 0.100
 
 =head2 account
 
@@ -100,10 +99,6 @@ Whether the account is locked.
 
 Returns a hashref of the entity data.
 
-=head1 NAME
-
-WWW::MailboxOrg::Entity::Account - Account entity object
-
 =head1 SEE ALSO
 
 L<WWW::MailboxOrg>
@@ -115,7 +110,7 @@ L<WWW::MailboxOrg>
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/getty/p5-www-mailboxorg/issues>.
+L<https://github.com/Getty/p5-www-mailboxorg/issues>.
 
 =head2 IRC
 

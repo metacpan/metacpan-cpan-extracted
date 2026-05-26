@@ -50,23 +50,23 @@ WriteMakefile(
         provides => {
             'Concierge::Users' => {
                 file    => 'lib/Concierge/Users.pm',
-                version => 'v0.8.0',
+                version => 'v0.8.2',
             },
             'Concierge::Users::Meta' => {
                 file    => 'lib/Concierge/Users/Meta.pm',
-                version => 'v0.8.0',
+                version => 'v0.8.2',
             },
             'Concierge::Users::Database' => {
                 file    => 'lib/Concierge/Users/Database.pm',
-                version => 'v0.8.0',
+                version => 'v0.8.2',
             },
             'Concierge::Users::File' => {
                 file    => 'lib/Concierge/Users/File.pm',
-                version => 'v0.8.0',
+                version => 'v0.8.2',
             },
             'Concierge::Users::YAML' => {
                 file    => 'lib/Concierge/Users/YAML.pm',
-                version => 'v0.8.0',
+                version => 'v0.8.2',
             },
         },
     },
@@ -74,3 +74,10 @@ WriteMakefile(
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Concierge-Users-*' },
 );
+
+sub MY::postamble {
+    return <<'MAKE_FRAG';
+cover :
+	cover -test
+MAKE_FRAG
+}

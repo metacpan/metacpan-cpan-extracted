@@ -49,23 +49,23 @@ WriteMakefile(
         provides => {
             'Concierge::Sessions' => {
                 file    => 'lib/Concierge/Sessions.pm',
-                version => 'v0.11.0',
+                version => 'v0.11.1',
             },
             'Concierge::Sessions::Base' => {
                 file    => 'lib/Concierge/Sessions/Base.pm',
-                version => 'v0.11.0',
+                version => 'v0.11.1',
             },
             'Concierge::Sessions::Session' => {
                 file    => 'lib/Concierge/Sessions/Session.pm',
-                version => 'v0.11.0',
+                version => 'v0.11.1',
             },
             'Concierge::Sessions::SQLite' => {
                 file    => 'lib/Concierge/Sessions/SQLite.pm',
-                version => 'v0.11.0',
+                version => 'v0.11.1',
             },
             'Concierge::Sessions::File' => {
                 file    => 'lib/Concierge/Sessions/File.pm',
-                version => 'v0.11.0',
+                version => 'v0.11.1',
             },
         },
     },
@@ -73,3 +73,10 @@ WriteMakefile(
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Concierge-Sessions-*' },
 );
+
+sub MY::postamble {
+    return <<'MAKE_FRAG';
+cover :
+	cover -test
+MAKE_FRAG
+}

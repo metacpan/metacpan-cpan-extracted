@@ -5,9 +5,10 @@ use warnings;
 use Test::More;
 
 use lib 't';
-use Util qw[find_tzdir throws_ok];
+use Util            qw[ throws_ok ];
+use Time::Str::Util qw[ find_tzdb_directory ];
 
-my $TZDIR = find_tzdir();
+my $TZDIR = find_tzdb_directory();
 
 # Skip all tests if zoneinfo is not available
 unless (defined $TZDIR) {

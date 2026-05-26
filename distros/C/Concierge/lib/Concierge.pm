@@ -1,7 +1,7 @@
-package Concierge v0.7.0;
+package Concierge v0.8.0;
 use v5.36;
 
-our $VERSION = 'v0.7.0';
+our $VERSION = 'v0.8.0';
 
 # ABSTRACT: Service layer orchestrator for authentication, sessions, and user data
 
@@ -14,7 +14,7 @@ use Params::Filter qw< make_filter >;
 use Concierge::Auth;
 use Concierge::Sessions;
 use Concierge::Users;
-use Concierge::User;
+use Concierge::Desk::User;
 
 # === PARAMETER FILTERS ===
 # Shared filters for secure data segregation
@@ -456,7 +456,7 @@ sub admit_visitor ($self) {
 		or return { success => 0, message => "Couldn't generate visitor ID" };
 
 	# Create user object for visitor (no session, no user_data, no backend access)
-	my $user = Concierge::User->enable_user($visitor_id, {
+	my $user = Concierge::Desk::User->enable_user($visitor_id, {
 		user_key => $visitor_id,  # Use visitor_id as user_key
 	});
 
@@ -489,7 +489,7 @@ sub checkin_guest ($self, $session_opts={}) {
 	my $session_id = $session->session_id();
 
 	# Create user object for guest (no user_data, no backend closures)
-	my $user = Concierge::User->enable_user($guest_id, {
+	my $user = Concierge::Desk::User->enable_user($guest_id, {
 		session  => $session,
 		user_key => $guest_id,  # Use guest_id as user_key for simplicity
 	});
@@ -596,7 +596,7 @@ sub restore_user ($self, $user_key) {
     if ($user_result->{success}) {
         # Logged-in user: rebuild with user data and backend closures
         my ($get, $update) = $self->_make_user_closures($user_id);
-        my $user = Concierge::User->enable_user($user_id, {
+        my $user = Concierge::Desk::User->enable_user($user_id, {
             session           => $session,
             user_data         => $user_result->{user},
             user_key          => $user_key,
@@ -612,7 +612,7 @@ sub restore_user ($self, $user_key) {
     }
     else {
         # Guest: session only, no user data
-        my $user = Concierge::User->enable_user($user_id, {
+        my $user = Concierge::Desk::User->enable_user($user_id, {
             session  => $session,
             user_key => $user_key,
         });
@@ -659,7 +659,7 @@ sub login_user ($self, $credentials, $session_opts={}) {
 
     # Create user object for logged-in user
     my ($get, $update) = $self->_make_user_closures($user_id);
-    my $user = Concierge::User->enable_user($user_id, {
+    my $user = Concierge::Desk::User->enable_user($user_id, {
         session           => $session,
         user_data         => $user_result->{user},
         _get_user_data    => $get,
@@ -786,13 +786,13 @@ Concierge - Service layer orchestrator for authentication, sessions, and user da
 
 =head1 VERSION
 
-v0.7.0
+v0.8.0
 
 =head1 SYNOPSIS
 
     use Concierge;
 
-    # Open an existing desk (created by Concierge::Setup)
+    # Open an existing desk (created by Concierge::Desk::Setup)
     my $desk = Concierge->open_desk('./desk');
     my $concierge = $desk->{concierge};
 
@@ -804,7 +804,7 @@ v0.7.0
         password => 'secret123',
     });
 
-    # Log in -- returns a Concierge::User object
+    # Log in -- returns a Concierge::Desk::User object
     my $login = $concierge->login_user({
         user_id  => 'alice',
         password => 'secret123',
@@ -837,19 +837,47 @@ Concierge coordinates three component modules behind a single API:
 
 =back
 
-Applications interact only with Concierge and the L<Concierge::User> objects
+Applications interact only with Concierge and the L<Concierge::Desk::User> objects
 it returns. The component modules are never exposed directly.
+
+=head2 What the Suite Provides
+
+Concierge handles orchestration -- coordinating components, managing the
+user_key mapping, and returning consistent structured results. The
+capabilities of the suite live in the three components:
+
+B<Authentication> (L<Concierge::Auth>): Argon2id password hashing and
+verification; no plaintext credentials are ever written to disk. Also
+provides random token, UUID, word-passphrase, and hex-ID generators. The
+component is substitutable: any replacement implementing the same method
+contract (C<checkPwd>, C<setPwd>, C<resetPwd>, etc.) can replace it for
+LDAP, OAuth, or any other scheme.
+
+B<Sessions> (L<Concierge::Sessions>): Full session lifecycle -- creation,
+retrieval, expiry, and cleanup -- with SQLite, file, or in-memory backends.
+Sessions carry arbitrary key/value data. A single-session-per-user policy
+is enforced: creating a new session automatically removes any prior session
+for that user. Expired sessions are cleaned up each time a desk is opened.
+
+B<User Records> (L<Concierge::Users>): User data store with a configurable
+field schema. Standard fields (C<moniker>, C<email>, C<phone>,
+C<access_level>, C<user_status>, C<term_ends>, and others) are built in and
+can be selectively overridden. Applications add their own fields via
+C<app_fields> at setup time. Supports SQLite, YAML, and CSV/TSV backends,
+with filtering and listing operations.
+
+For the full API of any component, see its own documentation.
 
 =head2 Desks
 
 A I<desk> is a storage directory containing the configuration and data files
-for all three components. Use L<Concierge::Setup> to create a desk, then
+for all three components. Use L<Concierge::Desk::Setup> to create a desk, then
 C<open_desk()> to load it at runtime.
 
 =head2 User Participation Levels
 
 Concierge provides three graduated levels of user participation, each
-returning a L<Concierge::User> object:
+returning a L<Concierge::Desk::User> object:
 
 =over 4
 
@@ -892,6 +920,40 @@ C<message>:
     # Failure
     { success => 0, message => 'error description' }
 
+Success responses include additional fields relevant to the operation:
+
+=over 4
+
+=item *
+
+User lifecycle methods (C<login_user()>, C<restore_user()>, C<checkin_guest()>,
+C<admit_visitor()>, C<login_guest()>) return C<user>, a L<Concierge::Desk::User>
+object. Guest and visitor results also set C<is_guest> or C<is_visitor> to 1.
+
+=item *
+
+C<open_desk()> returns C<concierge>, the ready-to-use Concierge object.
+
+=item *
+
+User management methods return C<user_id>. C<remove_user()> also returns
+C<deleted_from> (arrayref of component names) and, if any deletion failed,
+C<warnings> (arrayref).
+
+=item *
+
+C<verify_user()> returns C<verified> (0 or 1), C<exists_in_auth>, and
+C<exists_in_users>.
+
+=item *
+
+C<list_users()> returns C<user_ids> (arrayref) and C<count>. With
+C<< include_data => 1 >>, also returns C<users> (hashref keyed by user_id).
+
+=back
+
+See the individual method descriptions below for the complete field list.
+
 Methods never C<croak> during normal operation. The one exception is
 C<open_desk()>, which croaks if the desk directory does not exist.
 
@@ -913,7 +975,7 @@ These three are tightly orchestrated: a single C<login_user()> call
 authenticates via Auth, retrieves a record from Users, and creates a
 session through Sessions.  This coordination is the purpose of
 Concierge -- applications interact with the Concierge API and the
-L<Concierge::User> objects it returns, not with the components
+L<Concierge::Desk::User> objects it returns, not with the components
 directly.
 
 The identity core is designed to be sufficient on its own, but the
@@ -933,7 +995,7 @@ L</EXTENSIBILITY> for details.
     my $result = Concierge->open_desk($desk_location);
     my $concierge = $result->{concierge};
 
-Opens an existing desk directory created by L<Concierge::Setup>. Reads
+Opens an existing desk directory created by L<Concierge::Desk::Setup>. Reads
 the configuration file, instantiates all component modules, loads the
 user_keys mapping, and runs session cleanup.
 
@@ -946,7 +1008,7 @@ Returns C<< { success => 1, concierge => $obj } >> on success.
 =head3 admit_visitor
 
     my $result = $concierge->admit_visitor();
-    my $user = $result->{user};    # Concierge::User (visitor)
+    my $user = $result->{user};    # Concierge::Desk::User (visitor)
 
 Creates a visitor with a generated identifier. No session is created
 and no data is stored.
@@ -954,7 +1016,7 @@ and no data is stored.
 =head3 checkin_guest
 
     my $result = $concierge->checkin_guest(\%session_opts);
-    my $user = $result->{user};    # Concierge::User (guest)
+    my $user = $result->{user};    # Concierge::Desk::User (guest)
 
 Creates a guest with a generated identifier and a session. The optional
 C<%session_opts> hashref may include C<timeout> (in seconds; defaults to
@@ -963,7 +1025,7 @@ C<%session_opts> hashref may include C<timeout> (in seconds; defaults to
 =head3 login_user
 
     my $result = $concierge->login_user(\%credentials, \%session_opts);
-    my $user = $result->{user};    # Concierge::User (logged-in)
+    my $user = $result->{user};    # Concierge::Desk::User (logged-in)
 
 Authenticates C<user_id> and C<password> from C<%credentials>, retrieves
 the user's data record, creates a session, and returns a fully-equipped
@@ -973,7 +1035,7 @@ session is replaced.
 =head3 restore_user
 
     my $result = $concierge->restore_user($user_key);
-    my $user = $result->{user};    # Concierge::User (guest or logged-in)
+    my $user = $result->{user};    # Concierge::Desk::User (guest or logged-in)
 
 Reconstructs a User object from a C<user_key> (typically stored in a cookie
 or URL token). Looks up the key in the concierge mapping, validates the
@@ -992,7 +1054,7 @@ also include C<< is_guest => 1 >>.
 =head3 login_guest
 
     my $result = $concierge->login_guest(\%credentials, $guest_user_key);
-    my $user = $result->{user};    # Concierge::User (logged-in)
+    my $user = $result->{user};    # Concierge::Desk::User (logged-in)
 
 Converts a guest to a logged-in user. Authenticates with C<%credentials>,
 transfers any data from the guest's session to the new session, then
@@ -1069,6 +1131,10 @@ method.
 
 =head2 Password Operations
 
+Initial password registration is handled by C<add_user()>, which sets the
+password atomically with user creation. The methods here operate on passwords
+for existing users.
+
 =head3 verify_password
 
     my $result = $concierge->verify_password($user_id, $password);
@@ -1136,13 +1202,13 @@ B<Sessions> -- Concierge calls:
 
 =item C<< Concierge::Sessions->new(%args) >> -- constructor; accepts C<storage_dir> and C<backend>
 
-=item C<< $sessions->new_session(%args) >> -- returns C<{ success => 1, session => $obj }>
+=item C<< $sessions->new_session(%args) >> -- returns C<< { success => 1, session => $obj } >>
 
-=item C<< $sessions->get_session($session_id) >> -- returns C<{ success => 1, session => $obj }>
+=item C<< $sessions->get_session($session_id) >> -- returns C<< { success => 1, session => $obj } >>
 
-=item C<< $sessions->delete_session($session_id) >> -- returns C<{ success => 1|0, ... }>
+=item C<< $sessions->delete_session($session_id) >> -- returns C<< { success => 1|0, ... } >>
 
-=item C<< $sessions->cleanup_sessions() >> -- returns C<{ success => 1, deleted_count => N, active => [...] }>
+=item C<< $sessions->cleanup_sessions() >> -- returns C<< { success => 1, deleted_count => N, active => [...] } >>
 
 =back
 
@@ -1152,15 +1218,15 @@ B<Users> -- Concierge calls:
 
 =item C<< Concierge::Users->new($config_file) >> -- constructor
 
-=item C<< $users->register_user(\%data) >> -- returns C<{ success => 1|0, message => '...' }>
+=item C<< $users->register_user(\%data) >> -- returns C<< { success => 1|0, message => '...' } >>
 
-=item C<< $users->get_user($user_id) >> -- returns C<{ success => 1, user => \%data }>
+=item C<< $users->get_user($user_id) >> -- returns C<< { success => 1, user => \%data } >>
 
-=item C<< $users->update_user($user_id, \%updates) >> -- returns C<{ success => 1|0, ... }>
+=item C<< $users->update_user($user_id, \%updates) >> -- returns C<< { success => 1|0, ... } >>
 
-=item C<< $users->delete_user($user_id) >> -- returns C<{ success => 1|0, ... }>
+=item C<< $users->delete_user($user_id) >> -- returns C<< { success => 1|0, ... } >>
 
-=item C<< $users->list_users($filter) >> -- returns C<{ success => 1, user_ids => [...] }>
+=item C<< $users->list_users($filter) >> -- returns C<< { success => 1, user_ids => [...] } >>
 
 =back
 
@@ -1179,8 +1245,8 @@ To add a new records-store component (Organizations, Assets, Catalog, etc.):
 
 =item 1.
 
-Subclass L<Concierge::Base> and implement its seven stub methods.
-C<Concierge::Base> documents the method signatures and the
+Subclass L<Concierge::Desk::Base> and implement its seven stub methods.
+C<Concierge::Desk::Base> documents the method signatures and the
 C<{ success => 1|0, message => '...' }> return convention.
 
 =item 2.
@@ -1231,18 +1297,18 @@ the component pattern enables:
 
 If you build a component that might be useful to others, contributions to the
 C<Concierge::> namespace on CPAN are welcome.  The conventions to follow are:
-subclass L<Concierge::Base>, use the C<{ success => 1|0, message => '...' }>
+subclass L<Concierge::Desk::Base>, use the C<{ success => 1|0, message => '...' }>
 return convention, accept a desk config block via C<setup()>, and include
 comprehensive tests and POD.  Open an issue or pull request at
 L<https://github.com/bwva/Concierge> to discuss before publishing.
 
 =head1 SEE ALSO
 
-L<Concierge::Setup> -- desk creation and configuration
+L<Concierge::Desk::Setup> -- desk creation and configuration
 
-L<Concierge::User> -- user objects returned by lifecycle methods
+L<Concierge::Desk::User> -- user objects returned by lifecycle methods
 
-L<Concierge::Base> -- records-store base class for additional components
+L<Concierge::Desk::Base> -- records-store base class for additional components
 
 L<Concierge::Auth>, L<Concierge::Sessions>, L<Concierge::Users> -- component modules
 

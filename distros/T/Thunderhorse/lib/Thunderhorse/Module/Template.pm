@@ -1,5 +1,5 @@
 package Thunderhorse::Module::Template;
-$Thunderhorse::Module::Template::VERSION = '0.103';
+$Thunderhorse::Module::Template::VERSION = '0.105';
 use v5.40;
 use Mooish::Base -standard;
 

@@ -26,6 +26,7 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
+  requires "DBD::DuckDB" => "0.16";
   requires "DBD::MariaDB" => "1.00";
   requires "DBD::Pg" => "v3.5.0";
   requires "DBD::SQLite" => "1.44";

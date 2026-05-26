@@ -398,4 +398,90 @@ subtest 'Readonly field protection' => sub {
     is($updated->{user}{email}, 'updated@test.com', 'Allowed field updated');
 };
 
+
+# ==============================================================================
+# Test Group 13: parse_filter_string Edge Cases
+# ==============================================================================
+subtest 'parse_filter_string edge cases' => sub {
+    my ($users, $storage_dir) = setup_test_env('database');
+
+    # Register some users to ensure the backend is initialized
+    $users->register_user({ user_id => 'pfs1', moniker => 'PFS1' });
+
+    # Test 1: Valid filter works
+    my $valid = $users->parse_filter_string('user_id=pfs1');
+    ok($valid->{or_groups}, 'Valid filter returns or_groups');
+
+    # Test 2: Unknown field in filter generates warning (carp) and is skipped
+    use Test2::Tools::Warnings qw/ warning /;
+    my $w = warning {
+        $users->parse_filter_string('nosuchfield=value');
+    };
+    like($w, qr/Unknown field 'nosuchfield'/i, 'Warning for unknown field in filter');
+
+    my $unknown = $users->parse_filter_string('nosuchfield=value');
+    ok(!$unknown->{or_groups}, 'Returns {} (no or_groups) when all conditions use unknown fields');
+    is(ref $unknown, 'HASH', 'Returns hashref');
+
+    # Test 3: Invalid filter condition syntax generates warning
+    my $w2 = warning {
+        $users->parse_filter_string('this_is_not_valid');
+    };
+    like($w2, qr/Invalid filter condition/i, 'Warning for invalid filter condition');
+
+    my $invalid = $users->parse_filter_string('this_is_not_valid');
+    ok(!$invalid->{or_groups}, 'Returns {} when condition has no valid operator');
+
+    # Test 4: Mixed valid and invalid conditions - valid part is kept
+    my $mixed = $users->parse_filter_string('user_id=pfs1;nosuchfield=x');
+    ok($mixed->{or_groups}, 'Mixed filter: valid conditions kept');
+    is(scalar @{$mixed->{or_groups}[0]}, 1, 'Only valid condition in AND group');
+};
+
+# ==============================================================================
+# Test Group 14: validate_user_data Direct Edge Cases
+# ==============================================================================
+subtest 'validate_user_data direct edge cases' => sub {
+    my ($users, $storage_dir) = setup_test_env('database');
+
+    # Test 1: Unknown field in user data - gets warning, field skipped
+    my $result1 = $users->validate_user_data({ completely_unknown => 'value' });
+    ok($result1->{success}, 'validate_user_data succeeds with unknown field');
+    ok($result1->{warnings}, 'Has warning for unknown field');
+    like($result1->{warnings}[0], qr/not recognized/i, 'Warning mentions not recognized');
+
+    # Test 2: Field with no available validator (user_id has type=system, no validator)
+    # user_id is a known field but has no validator in type_validator_map
+    my $result2 = $users->validate_user_data({ user_id => 'testvalue' });
+    ok($result2->{success}, 'validate_user_data succeeds when field has no validator');
+    ok($result2->{warnings}, 'Has warning for no-validator field');
+    like($result2->{warnings}[0], qr/Validator not found/i, 'Warning mentions no validator');
+
+    # Test 3: USERS_SKIP_VALIDATION via validate_user_data directly
+    local $ENV{USERS_SKIP_VALIDATION} = 1;
+    my $result3 = $users->validate_user_data({ email => 'not-valid' });
+    ok($result3->{success}, 'validate_user_data skips validation with env var');
+    like($result3->{message}, qr/USERS_SKIP_VALIDATION/i, 'Message mentions env var');
+};
+
+# ==============================================================================
+# Test Group 15: DESTROY Without Backend
+# ==============================================================================
+subtest 'DESTROY without backend' => sub {
+    # Create a Users-like object without a backend set
+    my $obj = bless { fields => [], field_definitions => {} }, 'Concierge::Users';
+
+    # DESTROY should not crash when backend is not set
+    ok(lives { $obj->DESTROY() }, 'DESTROY does not die when backend is absent');
+
+    # Also verify backend with no disconnect method doesn't crash
+    my $obj2 = bless {
+        backend          => bless({}, 'FakeBackendNoDisco'),
+        fields           => [],
+        field_definitions => {},
+    }, 'Concierge::Users';
+    ok(lives { $obj2->DESTROY() }, 'DESTROY does not die when backend lacks disconnect');
+};
+
 done_testing();
+

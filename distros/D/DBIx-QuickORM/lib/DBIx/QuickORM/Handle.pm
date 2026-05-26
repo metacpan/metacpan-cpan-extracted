@@ -3,13 +3,15 @@ use strict;
 use warnings;
 use feature qw/state/;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000020';
 
 use Carp qw/confess croak carp/;
 use Sub::Util qw/set_subname/;
 use List::Util qw/mesh/;
 use Scalar::Util qw/blessed/;
 use DBIx::QuickORM::Util qw{debug};
+
+use Atomic::Pipe();
 
 use DBIx::QuickORM::STH();
 use DBIx::QuickORM::STH::Fork();
@@ -22,7 +24,7 @@ sub new;
 use Role::Tiny::With qw/with/;
 with 'DBIx::QuickORM::Role::Handle';
 
-use DBIx::QuickORM::Util::HashBase qw{
+use Object::HashBase qw{
     +connection
     +source
     +sql_builder
@@ -49,11 +51,172 @@ use DBIx::QuickORM::Util::HashBase qw{
     +target
 };
 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::QuickORM::Handle - A handle for building and executing queries.
+
+=head1 DESCRIPTION
+
+This object is the equivelent of the L<DBIx::Class::ResultSet> provided by
+L<DBIx::Class>. It is not identical, and not intended to be a drop in
+replacement.
+
+A handle object allows you to compose queries, and execute them.
+
+Handles are immutable. Two families of builder methods return a B<new> handle
+rather than modifying the original:
+
+=over 4
+
+=item Immutators
+
+Always return a new handle whose state copies the original except where the
+arguments mutate it. The original is never modified.
+
+=item Immucessors
+
+Return their current value when called without arguments, or a new handle with
+the value set when called with an argument.
+
+=back
+
+C<new()>, C<handle()>, and C<clone()> are interchangeable aliases for the
+constructor and may be called on the class or an existing instance. See the
+constructor argument and flag documentation for the full set of accepted
+arguments.
+
+=head1 SYNOPSIS
+
+    use My::Orm qw/orm/;
+
+    # Get a connection to the orm
+    my $orm = orm('my_orm');
+
+    # Get a handle on the 'people' table. This does NOT execute a query
+    my $people_handle = $orm->handle('people');
+
+    # Do something for all rows in the people table. This DOES execute a query.
+    for my $person ($people_handle->all) {
+        ...
+    }
+
+    # A handle for all people witht he 'smith' surname.
+    my $smith_handle = $people_handle->where({surname => 'smith'});
+
+    # print the first names of all people with the 'smith' surname.
+    for my $person ($handle->all) {
+        print $person->field('first_name') . "\n"
+    }
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item connection
+
+The L<DBIx::QuickORM::Connection> the handle operates through.
+
+=item source
+
+The query source (table, view, join, or literal) implementing
+L<DBIx::QuickORM::Role::Source>.
+
+=item sql_builder
+
+=item sql_builder_cache
+
+The L<DBIx::QuickORM::Role::SQLBuilder> implementation, when set directly, and
+the cached default builder.
+
+=item row
+
+The row this handle is bound to, if any.
+
+=item where
+
+=item order_by
+
+=item limit
+
+=item fields
+
+=item omit
+
+Query-composition state: WHERE clause, ORDER BY, LIMIT, fields to fetch, and
+fields to omit.
+
+=item async
+
+=item aside
+
+=item forked
+
+Mutually exclusive execution-mode flags.
+
+=item auto_refresh
+
+When true, inserts refresh the full row from the database afterward.
+
+=item data_only
+
+When true, fetches return plain hashrefs instead of blessed row objects.
+
+=item internal_transactions
+
+Whether the handle may open its own transactions for multi-query operations.
+
+=item target
+
+The pending insert/update/upsert data or target for the next operation.
+
+=back
+
+=head1 PUBLIC METHODS
+
+=over 4
+
+=item $dialect = $h->dialect
+
+Return the L<DBIx::QuickORM::Dialect> object for the connection.
+
+=back
+
+=cut
+
 sub dialect { $_[0]->{+CONNECTION}->dialect }
 
 ########################################
 # {{{ Initialization and normalization #
 ########################################
+
+=pod
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item $h->init
+
+Validate and normalize attributes after construction. Resolves mutually
+exclusive options, derives the WHERE clause from a bound row, and reconciles
+C<fields> with C<omit>.
+
+=item $omit = $h->_normalize_omit($omit, $pk_fields)
+
+Coerce an C<omit> specification into a hashref and reject attempts to omit
+primary key fields.
+
+=item $builder = $h->_sql_builder
+
+Resolve the default SQL builder, preferring one carried by the WHERE clause.
+
+=back
+
+=cut
 
 sub init {
     my $self = shift;
@@ -119,7 +282,7 @@ sub _normalize_omit {
     my $r = ref($omit);
     #<<<
     if    ($r eq 'HASH')  {                                           } # Do nothing
-    elsif ($r eq 'ARRAY') { $omit = map { ($_ => 1) } @$omit          } # Turn list into hash
+    elsif ($r eq 'ARRAY') { $omit = { map { ($_ => 1) } @$omit }       } # Turn list into hash
     elsif (!$r)           { $omit =    {$omit => 1}                   } # Turn single into hash
     else                  { croak "$omit is not a valid 'omit' value" } # oops
     #>>>
@@ -152,15 +315,58 @@ sub _sql_builder {
 # {{{ Joining #
 ###############
 
+=pod
+
+=head1 PUBLIC METHODS
+
+=over 4
+
+=item $new_h = $h->join(@args)
+
+Create a join handle against the named link. Returns a new handle whose source
+is a L<DBIx::QuickORM::Join>; fetch methods then yield
+L<DBIx::QuickORM::Join::Row> objects.
+
+=item $new_h = $h->left_join(@args)
+
+=item $new_h = $h->right_join(@args)
+
+=item $new_h = $h->inner_join(@args)
+
+=item $new_h = $h->full_join(@args)
+
+=item $new_h = $h->cross_join(@args)
+
+Shortcuts for C<< $h->join(type => $DIRECTION, @args) >>.
+
+=back
+
+=cut
+
 {
     no warnings 'once';
     *join = \&_join;
 }
-sub left_join  { shift->_join(@_, type => 'LEFT') }
-sub right_join { shift->_join(@_, type => 'RIGHT') }
-sub inner_join { shift->_join(@_, type => 'INNER') }
-sub full_join  { shift->_join(@_, type => 'FULL') }
-sub cross_join { shift->_join(@_, type => 'CROSS') }
+sub left_join  { my $self = shift; $self->_join(@_, type => 'LEFT') }
+sub right_join { my $self = shift; $self->_join(@_, type => 'RIGHT') }
+sub inner_join { my $self = shift; $self->_join(@_, type => 'INNER') }
+sub full_join  { my $self = shift; $self->_join(@_, type => 'FULL') }
+sub cross_join { my $self = shift; $self->_join(@_, type => 'CROSS') }
+
+=pod
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item $new_h = $h->_join($link, %params)
+
+Implementation behind C<join> and the directional join shortcuts. Resolves the
+link against the source and returns a clone whose source is the resulting join.
+
+=back
+
+=cut
 
 sub _join {
     my $self = shift;
@@ -197,9 +403,274 @@ sub _join {
 # {{{ Immutators #
 ##################
 
-sub new { shift->handle(@_) }
+=pod
 
-sub clone { shift->handle(@_) }
+=head1 PUBLIC METHODS
+
+=head2 CONSTRUCTORS
+
+=over 4
+
+=item $new_h = DBIx::QuickORM::Handle->new(@params)
+
+=item $new_h = $h->clone(@params)
+
+=item $new_h = $h->handle(@params)
+
+C<new()>, C<handle()>, and C<clone()> are all aliases for the same
+functionality. They can be used interchangably.
+
+This can be used to duplicate an existing handle, or create a new one. So you
+can call any of these on an existing instance, or on the handle class.
+
+=back
+
+=head3 CONSTRUCTOR ARGS
+
+B<Note:> Some of these are mutually exclusive, an exception will be thrown if
+you provide conflicting arguments.
+
+B<Note:> Most of these are better documented in the L</"Immutators"> and
+L</"Immucessors"> sections.
+
+=over 4
+
+=item Blessed Object that implements L<DBIx::QuickORM::Role::Source>
+
+If a source object is in the args it is treated as the source.
+
+=item Blessed Object that implements L<DBIx::QuickORM::Role::Row>
+
+If a row object is in the args it will be set as the row the handle operates
+on. This will also set the WHERE clause, and an exception will be thrown if you
+attempt to set both. This will also set the SOURCE to be the rows source, an
+exception will be thrown if you provide a source other than the one in the row.
+
+=item Blessed Object that implements L<DBIx::QuickORM::Role::SQLBuilder>
+
+Specify what L<DBIx::QuickORM::Role::SQLBuilder> implementation will be used.
+The default is L<DBIx::QuickORM::SQLBuilder::SQLAbstract>.
+
+=item Blessed Object that subclasses L<DBIx::QuickORM::Connection>
+
+Sets the connection the handle should use.
+
+=item \%hash - Where Clause
+
+If a hashref is provided it will be used as the WHERE clause.
+
+=item \@array - Order by
+
+If an arrayref is provided it will be used as the ORDER_BY.
+
+=item INTEGER - Limit
+
+If a simple integer is provided it will be used as the query LIMIT.
+
+=item $table_name - source
+
+If a string is provided that does not match any other string, it will be
+asusmed to be a table name and will be used as the source.
+
+=item \$sql - NOT accepted directly
+
+A scalar reference (literal SQL) is B<not> a valid handle argument and will
+throw C<Not sure what to do with 'SCALAR(...)'>. Build the literal source
+first and pass the resulting object:
+
+    my $src = $con->source(\$sql);    # a DBIx::QuickORM::LiteralSource
+    $con->handle($src)->all;
+
+See L<DBIx::QuickORM::Connection/source> and L<DBIx::QuickORM::LiteralSource>.
+
+=item connection => $CONNECTION
+
+You can specify the connection using the C<connection> key in a key/value pair.
+
+=item source => $SOURCE
+
+You can specify the source using the C<source> key in a key/value pair.
+
+=item sql_builder => $SQL_BUILDER
+
+You can specify the sql_builder using the C<sql_builder> key in a key/value pair.
+
+=item row => $ROW
+
+You can specify the row using the C<row> key in a key/value pair.
+
+=item where => $WHERE
+
+You can specify the where using the C<where> key in a key/value pair.
+
+=item order_by => \@ORDER_BY
+
+You can specify the order_by using the C<order_by> key in a key/value pair.
+
+=item limit => $LIMIT
+
+You can specify the limit using the C<limit> key in a key/value pair.
+
+=item fields => \@FIELDS
+
+You can specify the fields using the C<fields> key in a key/value pair.
+
+=item omit => \@FIELDS
+
+You can specify the omit using the C<omit> key in a key/value pair.
+
+=item async => $BOOL
+
+You can use the 'async' key and a boolean value to toggle async on/off.
+
+=item aside => $BOOL
+
+You can use the 'aside' key and a boolean value to toggle aside on/off.
+
+=item forked => $BOOL
+
+You can use the 'forked' key and a boolean value to toggle forked on/off.
+
+=item auto_refresh => $BOOL
+
+You can use the C<auto_refresh> key and a boolean to turn auto_refresh on and
+off.
+
+=item data_only => $BOOL
+
+You can use the C<data_only> key and a boolean to turn data_only on and off.
+
+=item internal_transactions => $BOOL
+
+You can use the C<internal_transactions> key and a boolean to turn
+internal_transactions on and off.
+
+=item -FLAG => sub { ... }
+
+This can be used to modify the behavior or error messages of the constructor.
+
+=back
+
+=head3 CONSTRUCTOR FLAGS
+
+The following flags are all available to modify constructor behavior.
+
+These are primarily useful for custom methods that modify or extend handle
+behavior.
+
+=over 4
+
+=item -allow_override => $BOOL
+
+Defaults to true.
+
+This allows overriding values from the original handle when cloning it:
+
+    my $h1 = DBIx::QuickORM::Handle->new(where => { id => 1 });
+    my $h2 = $h1->handle({id => 2});
+
+The above is fine when allow_override is set to true. In most cases this is the
+behavior you want.
+
+The following will die and tell you that you tried to set the where clause when
+the handle you are cloning already had one set:
+
+    my $h1 = DBIx::QuickORM::Handle->new(where => { id => 1 });
+    my $h2 = $h1->handle(-allow_override => 0, {id => 2});
+
+=item -array => sub { my ($new_h, $arrayref) = @_; ...; return $bool }
+
+You can use this flag to provide alternate behavior for when an arrayref is
+provided as an argument. Normally it is treated as an ORDER_BY. You can provide
+a callback that implements alternate behavior. Your callback will receive the
+new handle and the arg as arguments. The sub should return true if the
+alternate behavior handled the argument, it should return false to fallback to
+the default behavior of treating it as an ORDER_BY.
+
+    -array => sub {
+        my ($new_h, $arrayref) = @_;
+
+        $did_alternate_behavior = ...;
+
+        return 1 if $did_alternate_behavior;
+        return 0;
+    },
+
+=item -bad_override => sub { ($handle, $key, @args) = @_; die "..." }
+
+This allows you to override what happens when someone does a bad override (IE
+-allow_override is set to false, and an override was attempted)
+
+=item -hash => sub { my ($new_h, $hashref) = @_; ...; return $bool }
+
+You can use this flag to provide alternate behavior for when an hashref is
+provided as an argument. Normally it is treated as an WHERE. You can provide a
+callback that implements alternate behavior. Your callback will receive the new
+handle and the arg as arguments. The sub should return true if the alternate
+behavior handled the argument, it should return false to fallback to the
+default behavior of treating it as an WHERE.
+
+    -hash => sub {
+        my ($new_h, $hashref) = @_;
+
+        $did_alternate_behavior = ...;
+
+        return 1 if $did_alternate_behavior;
+        return 0;
+    },
+
+=item -integer
+
+You can use this flag to provide alternate behavior for when an integer is
+provided as an argument. Normally it is treated as a LIMIT. You can provide a
+callback that implements alternate behavior. Your callback will receive the new
+handle and the arg as arguments. The sub should return true if the alternate
+behavior handled the argument, it should return false to fallback to the
+default behavior of treating it as a LIMIT.
+
+    -integer => sub {
+        my ($new_h, $integer) = @_;
+
+        $did_alternate_behavior = ...;
+
+        return 1 if $did_alternate_behavior;
+        return 0;
+    },
+
+=item -row_and_source => sub { my ($h) = @_; die "..." }
+
+What to do when someone provides both a row, and a source that does not match
+the rows source. Normally it throws an exception.
+
+=item -row_and_where => sub { my ($h) = @_; die "..." }
+
+What to do when someone provides both a row, and a WHERE condition. Normally an
+exception is thrown.
+
+=item -scalar => sub { my ($h, $arg, $args) = @_; ...; return $bool }
+
+This provides an opportunity to override what is done if a scalar argument is
+encountered. Return false to fallback to original behavior.
+
+This is a place to inject custom C<< my_arg => $my_val >> options for the
+constructor to process.
+
+=item -unknown_arg => sub { my ($h, $arg) = @_; die ... }
+
+=item -unknown_object => sub { my ($h, $arg) = @_; die ... }
+
+=item -unknown_ref => sub { my ($h, $arg) = @_; die ... }
+
+These allow custom handlers for unknown arguments. The defaults throw
+exceptions.
+
+=back
+
+=cut
+
+sub new { my $proto = shift; $proto->handle(@_) }
+
+sub clone { my $self = shift; $self->handle(@_) }
 
 sub handle {
     my $in = shift;
@@ -313,7 +784,7 @@ sub handle {
             my $flag = $1;
             my $val = shift @_;
             $flags{$flag} = $val;
-            if ($arg eq 'unknown') {
+            if ($flag eq 'unknown') {
                 $flags{$_} = $val for qw/unknown_object unknown_ref unknown_arg/;
             }
             next;
@@ -373,6 +844,89 @@ sub handle {
     $new->init();
     return $new;
 }
+
+=pod
+
+=head2 Immutators
+
+These always return a new handle instance with a state that copies the original
+except where arguments would mutate it. The original handle is never modified.
+
+=over 4
+
+=item $new_h = $h->auto_refresh()
+
+=item $new_h = $h->no_auto_refresh()
+
+Toggle auto_refresh on and off.
+
+auto_refresh applies only to insert operations. If true then all row fields
+will be refreshed from the database after the insert is complete. Without
+auto_refresh only the primary key fields are pulled from the database
+post-insert, the rest of the fields in the row are assumed to contain the
+values used for insert. The auto-refresh behavior is desirable if triggers or
+other behaviors might modify the data once it is inserted.
+
+=item $new_h = $h->sync()
+
+Turn off async, aside, and forked flags returning a synchronous handle.
+
+=item $new_h = $h->async()
+
+The newly returned handle will run async operations.
+
+=item $new_h = $h->aside()
+
+The newly returned handle will run aside operations (async, but with a seperate
+DB connection)
+
+=item $new_h = $h->forked()
+
+The newly returned handle will run 'forked' operartions. This means the query
+is executed in a forked process with a new db connection, the results will be
+returned to the parent.
+
+This can be used to emulate async operations on databases that do not support
+them, such as L<DBD::SQlite>.
+
+=item $new_h = $h->data_only()
+
+The newly returned handle will return hashrefs instead of blessed row objects.
+
+=item $new_h = $h->all_fields()
+
+Make sure the handle selects all fields when fetching rows. Normally some rows
+may be omitted by default based on if they have an C<omit> flag set.
+
+=item $new_h = $h->and($WHERE)
+
+Create a new handle that has a union of the original WHERE clause and the additional WHERE clause
+
+    SELECT ... WHERE old_where AND new_where
+
+=item $new_h = $h->or($WHERE)
+
+Create a new handle that has a union of the original WHERE clause or the additional WHERE clause
+
+    SELECT ... WHERE old_where OR new_where
+
+=item $new_h = $h->internal_txns()
+
+=item $new_h = $h->internal_transactions()
+
+Enable internal transactions. These are mainly used in cases where an operation
+needs multiple queries.
+
+=item $new_h = $h->no_internal_txns()
+
+=item $new_h = $h->no_internal_transactions()
+
+Disable internal transactions. These are mainly used in cases where an operation
+needs multiple queries.
+
+=back
+
+=cut
 
 sub auto_refresh {
     my $self = shift;
@@ -463,6 +1017,89 @@ sub no_internal_transactions { $_[0]->{+INTERNAL_TRANSACTIONS} = defined($_[1]) 
 ###################
 # {{{ Immucessors #
 ###################
+
+=pod
+
+=head2 Immucessors
+
+These are methods that return their value if called without arguments, but
+return a clone of the handle with the new value set when provided with an
+argument.
+
+=over 4
+
+=item $sql_builder = $h->sql_builder()
+
+=item $new_h = $h->sql_builder($sql_builder)
+
+Can be used to get the SQL Builder that is already set, or create a clone fo
+the handle with a new sql_builder set.
+
+=item $connection = $h->connection()
+
+=item $new_h = $h->connection($connection)
+
+Can be used to get the connection of a handle, or to create a clone of the
+handle that uses a new connection.
+
+=item $source = $h->source()
+
+=item $new_h = $h->source($source)
+
+Can be used to get the connection of a source, or to create a clone of the
+source that uses a new connection.
+
+=item $row = $h->row()
+
+=item $new_h = $h->row($row)
+
+Can be used to get the connection of a row, or to create a clone of the
+row that uses a new connection.
+
+=item $fields = $h->fields()
+
+=item $new_h = $h->fields(\@fields)
+
+Can be used to get the fields of a handle, or to create a clone of the
+handle that uses the new fields.
+
+=item $omit = $h->omit()
+
+=item $new_h = $h->omit(\@omit)
+
+Can be used to get the omitted fields of a handle, or to create a clone of the
+handle that uses the new omitted fields.
+
+=item $limit = $h->limit()
+
+=item $new_h = $h->limit($limit)
+
+Can be used to get the limit of a handle, or to create a clone of the
+handle that uses the new limit.
+
+=item $where = $h->where()
+
+=item $new_h = $h->where($where)
+
+Can be used to get the where condition of a handle, or to create a clone of the
+handle that uses the new where condition.
+
+=item $target = $h->target()
+
+=item $new_h = $h->target($target)
+
+Get the pending operation target, or create a clone with a new target set.
+
+=item $order_by = $h->order_by()
+
+=item $new_h = $h->order_by(\@order_by)
+
+Can be used to get the order_by of a handle, or to create a clone of the
+handle that uses the new order_by.
+
+=back
+
+=cut
 
 sub sql_builder {
     my $self = shift;
@@ -556,6 +1193,38 @@ sub order_by {
 # {{{ State Accessors #
 #######################
 
+=pod
+
+=head2 State Accessors
+
+=over 4
+
+=item $bool = $h->is_sync
+
+True if the handle is synchronous.
+
+=item $bool = $h->is_async
+
+True if the handle is async.
+
+=item $bool = $h->is_aside
+
+True if the handle uses 'aside' operations (async but on a seperate db
+connection).
+
+=item $bool = $h->is_forked
+
+True if the handle uses 'forked' operations, (queries run in a child process on
+a second connection).
+
+=item $bool = $h->using_internal_transactions
+
+True if the handle is allowed to use internal transactions.
+
+=back
+
+=cut
+
 sub is_sync   { !($_[0]->{+FORKED} || $_[0]->{+ASYNC} || $_[0]->{+ASIDE}) }
 sub is_async  { $_[0]->{+ASYNC} }
 sub is_aside  { $_[0]->{+ASIDE} }
@@ -569,6 +1238,42 @@ sub using_internal_transactions { $_[0]->{+INTERNAL_TRANSACTIONS} ? 1 : 0 }
 ####################
 # {{{ STH BUILDERS #
 ####################
+
+=pod
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item $pk_fields = $h->_has_pk
+
+Return the source's primary key field list if it has one, otherwise false.
+
+=item $sth = $h->_make_sth($sql, %params)
+
+Dispatch to the sync, async/aside, or forked statement builder based on the
+handle's execution mode.
+
+=item ($sth, $res) = $h->_execute($dbh, $sql, @prepare_args)
+
+Prepare, bind, and execute a statement.
+
+=item $sth = $h->_do_binds($sth, $sql)
+
+Bind parameters, applying type deflation and binary-data quoting per the
+dialect.
+
+=item $sth = $h->_make_sync_sth($sql, %params)
+
+=item $sth = $h->_make_async_sth($sql, %params)
+
+=item $sth = $h->_make_forked_sth($sql, %params)
+
+Build a statement handle for the corresponding execution mode.
+
+=back
+
+=cut
 
 sub _has_pk {
     my $self = shift;
@@ -702,12 +1407,13 @@ sub _make_forked_sth {
 
     my $con = $self->{+CONNECTION};
 
-    my ($rh, $wh);
-    pipe($rh, $wh) or die "Could not create pipe: $!";
+    # Rows are zstd-compressed before crossing the pipe: more rows fit before
+    # the pipe buffer fills, and less is written to the wire.
+    my ($rh, $wh) = Atomic::Pipe->pair(compression => 'zstd');
     my $pid = fork // die "Could not fork: $!";
 
     if ($pid) {    # Parent
-        close($wh);
+        undef $wh;    # Drop the writer end so the reader sees EOF when the child exits.
 
         my $fork = DBIx::QuickORM::STH::Fork->new(
             %params,
@@ -729,26 +1435,26 @@ sub _make_forked_sth {
         print STDERR "Escaped Scope in forked query at $caller[1] line $caller[2].\n";
         POSIX::_exit(255);
     });
-    close($rh);
+    undef $rh;
 
     my $json = Cpanel::JSON::XS->new->utf8(1)->convert_blessed(1)->allow_nonref(1);
     my $dbh = $con->aside_dbh;
 
     my ($sth, $res) = $self->_execute($dbh, $sql);
-    print $wh $json->encode({result => $res}), "\n";
+    $wh->write_message($json->encode({result => $res}));
 
     eval {
         if (my $on_ready = $params{on_ready}) {
             if (my $fetch = $on_ready->($dbh, $sth, $res, $sql)) {
                 while (my $row = $fetch->()) {
-                    print $wh $json->encode($row), "\n";
+                    $wh->write_message($json->encode($row));
                 }
             }
         }
 
-        close($wh);
+        undef $wh;
         1;
-    } or warn $@;
+    } or do { warn $@; $guard->dismiss(); POSIX::_exit(1) };
     $guard->dismiss();
     POSIX::_exit(0);
 }
@@ -760,6 +1466,26 @@ sub _make_forked_sth {
 ###########################
 # {{{ Transaction Related #
 ###########################
+
+=pod
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item $txn = $h->_start_internal_txn(%params)
+
+Begin an internal transaction when allowed and not already inside one,
+otherwise warn/die per the supplied params.
+
+=item $result = $h->_internal_txn($cb, %params)
+
+Run the callback inside an internal transaction when allowed, otherwise warn or
+die per params, or run it without one.
+
+=back
+
+=cut
 
 sub _start_internal_txn {
     my $self = shift;
@@ -807,11 +1533,55 @@ sub _internal_txn {
 # {{{ Results Fetchers #
 ########################
 
+=pod
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item $h->_fixture_arg($arg)
+
+Store the argument as the handle's pending operation target.
+
+=back
+
+=cut
+
 sub _fixture_arg {
     my $self = shift;
     my ($arg) = @_;
     $self->{+TARGET} = $arg;
 }
+
+=pod
+
+=head1 PUBLIC METHODS
+
+=head2 Results Fetchers
+
+=over 4
+
+=item $row = $h->by_id($id)
+
+=item $row = $h->by_id(\@id_vals)
+
+=item $row = $h->by_id({field => $val})
+
+Fetch a row by ID. If the row is already in cache no database query is needed.
+
+=item $h->by_ids(@ids)
+
+A convenience method for fetching several rows by ID. See C<by_id()> above for
+ID formats.
+
+=item $row = $h->vivify(\%ROW_DATA)
+
+Create a row object witht he provided data. The Row will NOT be inserted into
+the database unless you call C<< $row->insert >> or C<< $row->save >>.
+
+=back
+
+=cut
 
 sub by_id {
     my $id = pop;
@@ -858,6 +1628,26 @@ sub vivify {
     );
 }
 
+=pod
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item $args = $h->_builder_args
+
+Collect the source, where, limit, order_by, fields, and dialect into the
+argument hashref passed to the SQL builder.
+
+=item $h2 = $h->_row_or_hashref($meth, @args)
+
+Normalize a trailing row object or hashref (or key/value pairs) into a clone
+via the named setter, returning the handle unchanged when no args are given.
+
+=back
+
+=cut
+
 sub _builder_args {
     my $self = shift;
 
@@ -891,6 +1681,44 @@ sub _row_or_hashref {
     return $self->$meth({ @_ });
 }
 
+=pod
+
+=head1 PUBLIC METHODS
+
+=head2 Results Fetchers
+
+=over 4
+
+=item $row = $h->upsert(\%ROW_DATA)
+
+=item $row = $h->upsert_and_refresh(\%ROW_DATA)
+
+These will either insert or update the row depending on if it already exists in
+the database.
+
+Depending on SQL dialect  it will usually result in a sql statement like one of these:
+
+    INSERT INTO example (id, name) VALUES (?, ?) ON CONFLICT(id) DO UPDATE SET name = ? RETURNING id
+    INSERT INTO example (id, name) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = ? RETURNING id
+    INSERT INTO example (id, name) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = ?
+
+=item $row = $h->insert(\%ROW_DATA)
+
+Insert the data into the database and return a proper row object for it.
+
+=item $row = $h->insert_and_refresh(\%ROW_DATA)
+
+Insert the data into the database and return a proper row object. The row will
+be refreshed to contain the actual stored data, including data modified by
+triggers. If the database supports 'returning on insert' then that will be
+used, otherwise the insert and fetch operations are wrapped in a single
+transaction, unless internal transactions are disabled in which case an
+exception may be thrown.
+
+=back
+
+=cut
+
 sub upsert {
     my $self = shift->_row_or_hashref(TARGET() => @_);
     return $self->_insert_and_refresh(upsert => 1) if $self->{+AUTO_REFRESH};
@@ -912,6 +1740,26 @@ sub insert_and_refresh {
     my $self = shift->_row_or_hashref(TARGET() => @_);
     return $self->_insert_and_refresh();
 }
+
+=pod
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item $row = $h->_insert_and_refresh(%params)
+
+Insert and then refresh the row, using 'returning on insert' when available or
+a fetch (wrapped in a transaction for sync handles) otherwise.
+
+=item $row = $h->_insert(%params)
+
+Build and execute the insert (or upsert) statement and construct the resulting
+row, applying per-column defaults and returning-clause handling.
+
+=back
+
+=cut
 
 sub _insert_and_refresh {
     my $self = shift;
@@ -1034,6 +1882,41 @@ sub _insert {
         row     => $self->{+ROW},
     );
 }
+
+=pod
+
+=head1 PUBLIC METHODS
+
+=head2 Results Fetchers
+
+=over 4
+
+=item $h->delete
+
+=item $h->delete($row)
+
+=item $h->delete($where)
+
+If no arguments are provided the handle will delete all applicable rows.
+
+If a row is provided it will be deleted
+
+If a where clause is provided then all rows it would find will be deleted.
+
+If a row or where condition are provided they will override any that are
+already associated with the handle.
+
+=item $h->update(\%CHANGES)
+
+Apply the changes (field names and new values) to all rows matching the where condition.
+
+=item $h->update($row_obj)
+
+Write pending changes to the row.
+
+=back
+
+=cut
 
 sub delete {
     my $self = shift->_row_or_hashref(WHERE() => @_);
@@ -1226,6 +2109,21 @@ sub update {
     return undef;
 }
 
+=pod
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item $sth = $h->_do_select(%params)
+
+Build and execute the SELECT statement, returning a statement handle whose
+C<on_ready> yields one fetched hashref per call.
+
+=back
+
+=cut
+
 sub _do_select {
     my $self = shift;
 
@@ -1248,6 +2146,68 @@ sub _do_select {
         @_,
     );
 }
+
+=pod
+
+=head1 PUBLIC METHODS
+
+=head2 Results Fetchers
+
+=over 4
+
+=item $row = $h->one()
+
+Return a row matching the conditions on the handle, if any. Will return undef
+if there are no matching rows. Will throw an exception if the query returns
+more than 1 row.
+
+In dat_only mode this will return the hashref of the returned row.
+
+=item $row = $h->first()
+
+Similar to one() above, but will not die if more than 1 row matches the query.
+
+In dat_only mode this will return the hashref of the returned row.
+
+=item @rows = $h->all
+
+Return all matching rows.
+
+This cannot be used in async mode, use iterator() instead as it provides
+mechanisms to check if the async query is ready.
+
+In data_only mode this will return a list of hashrefs instead of blessed row
+objects.
+
+=item my $iter = $h->iterator
+
+Returns an L<DBIx::QuickORM::Iterator> object that can be used to iterate over all rows.
+
+    my $iter = $h->iterator;
+    while (my $row = $iter->next) {
+        ...;
+    }
+
+If used in data_only mode then the rows will be hashrefs instead of blessed
+objects.
+
+In Async mode the iterator will heve a C<< $iter->ready() >> method you can use
+to check if the query is ready. For sync queries C<ready()> will always return
+true.
+
+=item $number = $h->count
+
+Get the number of rows that the query would return.
+
+=item $h->iterate(sub { my $row = shift; ... })
+
+Run the callback for each row found.
+
+In data_only mode this will provide hashrefs instead of blessed row objects.
+
+=back
+
+=cut
 
 sub one {
     my $self = shift->_row_or_hashref(WHERE() => @_);
@@ -1387,705 +2347,10 @@ sub iterate {
 
 __END__
 
-=head1 NAME
-
-DBIx::QuickORM::Handle - A handle for building and executing queries.
-
-=head1 DESCRIPTION
-
-This object is the equivelent of the L<DBIx::Class::ResultSet> provided by
-L<DBIx::Class>. It is not identical, and not intended to be a drop in
-replacement.
-
-A handle object allows you to compose queries, and execute them.
-
-=head1 SYNOPSIS
-
-    use My::Orm qw/orm/;
-
-    # Get a connection to the orm
-    my $orm = orm('my_orm');
-
-    # Get a handle on the 'people' table. This does NOT execute a query
-    my $people_handle = $orm->handle('people');
-
-    # Do something for all rows in the people table. This DOES execute a query.
-    for my $person ($people_handle->all) {
-        ...
-    }
-
-    # A handle for all people witht he 'smith' surname.
-    my $smith_handle = $people_handle->where({surname => 'smith'});
-
-    # print the first names of all people with the 'smith' surname.
-    for my $person ($handle->all) {
-        print $person->field('first_name') . "\n"
-    }
-
-=head1 METHODS
-
-=head2 CONSTRUCTORS
-
-=over 4
-
-=item $new_h = DBIx::QuickORM::Handle->new(@params)
-
-=item $new_h = $h->clone(@params)
-
-=item $new_h = $h->handle(@params)
-
-C<new()>, C<handle()>, and C<clone()> are all aliases for the same
-functionality. They can be used interchangably.
-
-This can be used to duplicate an existing handle, or create a new one. So you
-can call any of these on an existing instance, or on the handle class.
-
-=back
-
-=head3 CONSTRUCTOR ARGS
-
-B<Note:> Some of these are mutually exclusive, an exception will be thrown if
-you provide conflicting arguments.
-
-B<Note:> Most of these are better documented in the L</"Immutators"> and
-L</"Immucessors"> sections.
-
-=over 4
-
-=item Blessed Object that implements L<DBIx::QuickORM::Role::Source>
-
-If a source object is in the args it is treated as the source.
-
-=item Blessed Object that implements L<DBIx::QuickORM::Role::Row>
-
-If a row object is in the args it will be set as the row the handle operates
-on. This will also set the WHERE clause, and an exception will be thrown if you
-attempt to set both. This will also set the SOURCE to be the rows source, an
-exception will be thrown if you provide a source other than the one in the row.
-
-=item Blessed Object that implements L<DBIx::QuickORM::Role::SQLBuilder>
-
-Specify what L<DBIx::QuickORM::Role::SQLBuilder> implementation will be used.
-The default is L<DBIx::QuickORM::SQLBuilder::SQLAbstract>.
-
-=item Blessed Object that subclasses L<DBIx::QuickORM::Connection>
-
-Sets the connection the handle should use.
-
-=item \%hash - Where Clause
-
-If a hashref is provided it will be used as the WHERE clause.
-
-=item \@array - Order by
-
-If an arrayref is provided it will be used as the ORDER_BY.
-
-=item INTEGER - Limit
-
-If a simple integer is provided it will be used as the query LIMIT.
-
-=item $table_name - source
-
-If a string is provided that does not match any other string, it will be
-asusmed to be a table name and will be used as the source.
-
-=item connection => $CONNECTION
-
-You can specify the connection using the C<connection> key in a key/value pair.
-
-=item source => $SOURCE
-
-You can specify the source using the C<source> key in a key/value pair.
-
-=item sql_builder => $SQL_BUILDER
-
-You can specify the sql_builder using the C<sql_builder> key in a key/value pair.
-
-=item row => $ROW
-
-You can specify the row using the C<row> key in a key/value pair.
-
-=item where => $WHERE
-
-You can specify the where using the C<where> key in a key/value pair.
-
-=item order_by => \@ORDER_BY
-
-You can specify the order_by using the C<order_by> key in a key/value pair.
-
-=item limit => $LIMIT
-
-You can specify the limit using the C<limit> key in a key/value pair.
-
-=item fields => \@FIELDS
-
-You can specify the fields using the C<fields> key in a key/value pair.
-
-=item omit => \@FIELDS
-
-You can specify the omit using the C<omit> key in a key/value pair.
-
-=item async => $BOOL
-
-You can use the 'async' key and a boolean value to toggle async on/off.
-
-=item aside => $BOOL
-
-You can use the 'aside' key and a boolean value to toggle aside on/off.
-
-=item forked => $BOOL
-
-You can use the 'forked' key and a boolean value to toggle forked on/off.
-
-=item auto_refresh => $BOOL
-
-You can use the C<auto_refresh> key and a boolean to turn auto_refresh on and
-off.
-
-=item data_only => $BOOL
-
-You can use the C<data_only> key and a boolean to turn data_only on and off.
-
-=item internal_transactions => $BOOL
-
-You can use the C<internal_transactions> key and a boolean to turn
-internal_transactions on and off.
-
-=item -FLAG => sub { ... }
-
-This can be used to modify the behavior or error messages of the constructor.
-
-=back
-
-=head3 CONSTRUCTOR FLAGS
-
-The following flags are all available to modify constructor behavior.
-
-These are primarily useful for custom methods that modify or extend handle
-behavior.
-
-=over 4
-
-=item -allow_override => $BOOL
-
-Defaults to true.
-
-This allows overriding values from the original handle when cloning it:
-
-    my $h1 = DBIx::QuickORM::Handle->new(where => { id => 1 });
-    my $h2 = $h1->handle({id => 2});
-
-The above is fine when allow_override is set to true. In most cases this is the
-behavior you want.
-
-The following will die and tell you that you tried to set the where clause when
-the handle you are cloning already had one set:
-
-    my $h1 = DBIx::QuickORM::Handle->new(where => { id => 1 });
-    my $h2 = $h1->handle(-allow_override => 0, {id => 2});
-
-=item -array => sub { my ($new_h, $arrayref) = @_; ...; return $bool }
-
-You can use this flag to provide alternate behavior for when an arrayref is
-provided as an argument. Normally it is treated as an ORDER_BY. You can provide
-a callback that implements alternate behavior. Your callback will receive the
-new handle and the arg as arguments. The sub should return true if the
-alternate behavior handled the argument, it should return false to fallback to
-the default behavior of treating it as an ORDER_BY.
-
-    -array => sub {
-        my ($new_h, $arrayref) = @_;
-
-        $did_alternate_behavior = ...;
-
-        return 1 if $did_alternate_behavior;
-        return 0;
-    },
-
-=item -bad_override => sub { ($handle, $key, @args) = @_; die "..." }
-
-This allows you to override what happens when someone does a bad override (IE
--allow_override is set to false, and an override was attempted)
-
-=item -hash => sub { my ($new_h, $hashref) = @_; ...; return $bool }
-
-You can use this flag to provide alternate behavior for when an hashref is
-provided as an argument. Normally it is treated as an WHERE. You can provide a
-callback that implements alternate behavior. Your callback will receive the new
-handle and the arg as arguments. The sub should return true if the alternate
-behavior handled the argument, it should return false to fallback to the
-default behavior of treating it as an WHERE.
-
-    -hash => sub {
-        my ($new_h, $hashref) = @_;
-
-        $did_alternate_behavior = ...;
-
-        return 1 if $did_alternate_behavior;
-        return 0;
-    },
-
-=item -integer
-
-You can use this flag to provide alternate behavior for when an integer is
-provided as an argument. Normally it is treated as a LIMIT. You can provide a
-callback that implements alternate behavior. Your callback will receive the new
-handle and the arg as arguments. The sub should return true if the alternate
-behavior handled the argument, it should return false to fallback to the
-default behavior of treating it as a LIMIT.
-
-    -integer => sub {
-        my ($new_h, $integer) = @_;
-
-        $did_alternate_behavior = ...;
-
-        return 1 if $did_alternate_behavior;
-        return 0;
-    },
-
-=item -row_and_source => sub { my ($h) = @_; die "..." }
-
-What to do when someone provides both a row, and a source that does not match
-the rows source. Normally it throws an exception.
-
-=item -row_and_where => sub { my ($h) = @_; die "..." }
-
-What to do when someone provides both a row, and a WHERE condition. Normally an
-exception is thrown.
-
-=item -scalar => sub { my ($h, $arg, $args) = @_; ...; return $bool }
-
-This provides an opportunity to override what is done if a scalar argument is
-encountered. Return false to fallback to original behavior.
-
-This is a place to inject custom C<< my_arg => $my_val >> options for the
-constructor to process.
-
-=item -unknown_arg => sub { my ($h, $arg) = @_; die ... }
-
-=item -unknown_object => sub { my ($h, $arg) = @_; die ... }
-
-=item -unknown_ref => sub { my ($h, $arg) = @_; die ... }
-
-These allow custom handlers for unknown arguments. The defaults throw
-exceptions.
-
-=back
-
-=head2 SHORTCUTS
-
-=over 4
-
-=item $dialect = $h->dialect
-
-Return the L<DBIx::QuickORM::Dialect> object.
-
-=back
-
-=head2 Joining
-
-=over 4
-
-=item $new_h = $h->join(@args)
-
-Used to create a join handle.
-
-=item $new_h = $h->left_join(@args)
-
-=item $new_h = $h->right_join(@args)
-
-=item $new_h = $h->inner_join(@args)
-
-=item $new_h = $h->full_join(@args)
-
-=item $new_h = $h->cross_join(@args)
-
-These are all shortcuts for:
-
-    $new_h = $h->join(type => $DIRECTION, @args);
-
-Then you can get L<DBIx::QuickORM::Join::Row> objects:
-
-    my $jrow = $h->first;
-
-    my @jrows = $h->all;
-
-=back
-
-Here is an example, here is some schema:
-
-    CREATE TABLE foo (
-        foo_id  SERIAL      NOT NULL PRIMARY KEY,
-        name    VARCHAR(20) NOT NULL,
-        UNIQUE(name)
-    );
-
-    CREATE TABLE bar (
-        bar_id  SERIAL      NOT NULL PRIMARY KEY,
-        name    VARCHAR(20) NOT NULL,
-        foo_id  INTEGER     DEFAULT NULL REFERENCES foo(foo_id),
-        UNIQUE(name)
-    );
-
-    CREATE TABLE baz (
-        baz_id  SERIAL      NOT NULL PRIMARY KEY,
-        name    VARCHAR(20) NOT NULL,
-        foo_id  INTEGER     DEFAULT NULL REFERENCES foo(foo_id),
-        bar_id  INTEGER     DEFAULT NULL REFERENCES bar(bar_id),
-        UNIQUE(name)
-    );
-
-Define the ORM:
-
-    orm my_orm => sub {
-        db 'mydb';
-        autofill sub {
-            autorow 'My::Test::Row';
-        };
-    };
-
-Insert some data and use join:
-
-    my $con = orm('my_orm');
-
-    # Insert a row into foo
-    my $foo_a = $con->insert(foo => {name => 'a'});
-
-    # Insert 3 rows into bar that link to foo.
-    my $bar_a1 = $con->insert(bar => {name => 'a1', foo_id => $foo_a->foo_id});
-    my $bar_a2 = $con->insert(bar => {name => 'a2', foo_id => $foo_a->foo_id});
-    my $bar_a3 = $con->insert(bar => {name => 'a3', foo_id => $foo_a->foo_id});
-
-    # Insert a row into baz linked to foo_a and bar_a1
-    my $baz = $con->insert(baz => {name => 'a', foo_id => $foo_a->foo_id, bar_id => $bar_a1->bar_id});
-
-    my $h = $con->handle('foo')->left_join('bar')->left_join('baz', from => 'foo')->order_by(qw/a.foo_id b.bar_id c.baz_id/);
-
-The handle can be used to fetch L<DBIx::QuickORM::Join::Row> instances, that lets you get each component row object by alias:
-
-    my $one = $iter->first;
-
-Getting component rows using C<by_alias()> will return regular row objects,
-they will be the same references if the rows have already been fetched and are
-in memory/cache.
-
-    use Test2::V0 qw/ref_is/;
-
-    ref_is($one->by_alias('a'), $foo_a,  "Got the foo_a reference");
-    ref_is($one->by_alias('b'), $bar_a1, "Got the bar_a reference");
-    ref_is($one->by_alias('c'), $baz,    "Got the baz reference");
-
-You can also directly access fields:
-
-    my $a_name = $one->field('a.name');
-
-=head2 Immutators
-
-These always return a new handle instance with a state that copies the original
-except where arguments would mutate it. The original handle is never modified.
-
-=over 4
-
-=item $new_h = $h->auto_refresh()
-
-=item $new_h = $h->no_auto_refresh()
-
-Toggle auto_refresh on and off.
-
-auto_refresh applies only to insert operations. If true then all row fields
-will be refreshed from the database after the insert is complete. Without
-auto_refresh only the primary key fields are pulled from the database
-post-insert, the rest of the fields in the row are assumed to contain the
-values used for insert. The auto-refresh behavior is desirable if triggers or
-other behaviors might modify the data once it is inserted.
-
-=item $new_h = $h->sync()
-
-Turn off async, aside, and forked flags returning a synchronous handle.
-
-=item $new_h = $h->async()
-
-The newly returned handle will run async operations.
-
-=item $new_h = $h->aside()
-
-The newly returned handle will run aside operations (async, but with a seperate
-DB connection)
-
-=item $new_h = $h->forked()
-
-The newly returned handle will run 'forked' operartions. This means the query
-is executed in a forked process with a new db connection, the results will be
-returned to the parent.
-
-This can be used to emulate async operations on databases that do not support
-them, such as L<DBD::SQlite>.
-
-=item $new_h = $h->data_only()
-
-The newly returned handle will return hashrefs instead of blessed row objects.
-
-=item $new_h = $h->all_fields()
-
-Make sure the handle selects all fields when fetching rows. Normally some rows
-may be omitted by default based on if they have an C<omit> flag set.
-
-=item $new_h = $h->and($WHERE)
-
-Create a new handle that has a union of the original WHERE clause and the additional WHERE clause
-
-    SELECT ... WHERE old_where AND new_where
-
-=item $new_h = $h->or($WHERE)
-
-Create a new handle that has a union of the original WHERE clause or the additional WHERE clause
-
-    SELECT ... WHERE old_where OR new_where
-
-=item $new_h = $h->internal_txns()
-
-=item $new_h = $h->internal_transactions()
-
-Enable internal transactions. These are mainly used in cases where an operation
-needs multiple queries.
-
-=item $new_h = $h->no_internal_txns()
-
-=item $new_h = $h->no_internal_transactions()
-
-Disable internal transactions. These are mainly used in cases where an operation
-needs multiple queries.
-
-=back
-
-=head2 Immucessors
-
-These are methods that return their value if called without arguments, but
-return a clone of the handle with the new value set when provided with an
-argument.
-
-=over 4
-
-=item $sql_builder = $h->sql_builder()
-
-=item $new_h = $h->sql_builder($sql_builder)
-
-Can be used to get the SQL Builder that is already set, or create a clone fo
-the handle with a new sql_builder set.
-
-=item $connection = $h->connection()
-
-=item $new_h = $h->connection($connection)
-
-Can be used to get the connection of a handle, or to create a clone of the
-handle that uses a new connection.
-
-=item $source = $h->source()
-
-=item $new_h = $h->source($source)
-
-Can be used to get the connection of a source, or to create a clone of the
-source that uses a new connection.
-
-=item $row = $h->row()
-
-=item $new_h = $h->row($row)
-
-Can be used to get the connection of a row, or to create a clone of the
-row that uses a new connection.
-
-=item $fields = $h->fields()
-
-=item $new_h = $h->fields(\@fields)
-
-Can be used to get the fields of a handle, or to create a clone of the
-handle that uses the new fields.
-
-=item $omit = $h->omit()
-
-=item $new_h = $h->omit(\@omit)
-
-Can be used to get the omitted fields of a handle, or to create a clone of the
-handle that uses the new omitted fields.
-
-=item $limit = $h->limit()
-
-=item $new_h = $h->limit($limit)
-
-Can be used to get the limit of a handle, or to create a clone of the
-handle that uses the new limit.
-
-=item $where = $h->where()
-
-=item $new_h = $h->where($where)
-
-Can be used to get the where condition of a handle, or to create a clone of the
-handle that uses the new where condition.
-
-=item $order_by = $h->order_by()
-
-=item $new_h = $h->order_by(\@order_by)
-
-Can be used to get the order_by of a handle, or to create a clone of the
-handle that uses the new order_by.
-
-=back
-
-=head2 State Accessors
-
-=over 4
-
-=item $bool = $h->is_sync
-
-True if the handle is synchronous.
-
-=item $bool = $h->is_async
-
-True if the handle is async.
-
-=item $bool = $h->is_aside
-
-True if the handle uses 'aside' operations (async but on a seperate db
-connection).
-
-=item $bool = $h->is_forked
-
-True if the handle uses 'forked' operations, (queries run in a child process on
-a second connection).
-
-=item $bool = $h->using_internal_transactions
-
-True if the handle is allowed to use internal transactions.
-
-=back
-
-=head2 Results Fetchers
-
-=over 4
-
-=item $row = $h->by_id($id)
-
-=item $row = $h->by_id(\@id_vals)
-
-=item $row = $h->by_id({field => $val})
-
-Fetch a row by ID. If the row is already in cache no database query is needed.
-
-=item $h->by_ids(@ids)
-
-A convenience method for fetching several rows by ID. See C<by_id()> above for
-ID formats.
-
-=item $row = $h->vivify(\%ROW_DATA)
-
-Create a row object witht he provided data. The Row will NOT be inserted into
-the database unless you call C<< $row->insert >> or C<< $row->save >>.
-
-=item $row = $h->insert(\%ROW_DATA)
-
-Insert the data into the database and return a proper row object for it.
-
-=item $row = $h->insert_and_refresh(\%ROW_DATA)
-
-Insert the data into the database and return a proper row object. The row will
-be refreshed to contain the actual stored data, including data modified by
-triggers. If the database supports 'returning on insert' then that will be
-used, otherwise the insert and fetch operations are wrapped in a single
-transaction, unless internal transactions are disabled in which case an
-exception may be thrown.
-
-=item $h->update(\%CHANGES)
-
-Apply the changes (field names and new values) to all rows matching the where condition.
-
-=item $h->update($row_obj)
-
-Write pending changes to the row.
-
-=item $row = $h->upsert(\%ROW_DATA)
-
-=item $row = $h->upsert_and_refresh(\%ROW_DATA)
-
-These will either insert or update the row depending on if it already exists in
-the database.
-
-Depending on SQL dialect  it will usually result in a sql statement like one of these:
-
-    INSERT INTO example (id, name) VALUES (?, ?) ON CONFLICT(id) DO UPDATE SET name = ? RETURNING id
-    INSERT INTO example (id, name) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = ? RETURNING id
-    INSERT INTO example (id, name) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = ?
-
-=item $h->delete
-
-=item $h->delete($row)
-
-=item $h->delete($where)
-
-If no arguments are provided the handle will delete all applicable rows.
-
-If a row is provided it will be deleted
-
-If a where clause is provided then all rows it would find will be deleted.
-
-If a row or where condition are provided they will override any that are
-already associated with the handle.
-
-=item $row = $h->one()
-
-Return a row matching the conditions on the handle, if any. Will return undef
-if there are no matching rows. Will throw an exception if the query returns
-more than 1 row.
-
-In dat_only mode this will return the hashref of the returned row.
-
-=item $row = $h->first()
-
-Similar to one() above, but will not die if more than 1 row matches the query.
-
-In dat_only mode this will return the hashref of the returned row.
-
-=item @rows = $h->all
-
-Return all matching rows.
-
-This cannot be used in async mode, use iterator() instead as it provides
-mechanisms to check if the async query is ready.
-
-In data_only mode this will return a list of hashrefs instead of blessed row
-objects.
-
-=item my $iter = $h->iterator
-
-Returns an L<DBIx::QuickORM::Iterator> object that can be used to iterate over all rows.
-
-    my $iter = $h->iterator;
-    while (my $row = $iter->next) {
-        ...;
-    }
-
-If used in data_only mode then the rows will be hashrefs instead of blessed
-objects.
-
-In Async mode the iterator will heve a C<< $iter->ready() >> method you can use
-to check if the query is ready. For sync queries C<ready()> will always return
-true.
-
-=item $number = $h->count
-
-Get the number of rows that the query would return.
-
-=item $h->iterate(sub { my $row = shift; ... })
-
-Run the callback for each row found.
-
-In data_only mode this will provide hashrefs instead of blessed row objects.
-
-=back
-
 =head1 SOURCE
 
-The source code repository for DBIx-QuickORM can be found at
-L<http://github.com/exodist/DBIx-QuickORM/>.
+The source code repository for DBIx::QuickORM can be found at
+L<https://github.com/exodist/DBIx-QuickORM>.
 
 =head1 MAINTAINERS
 
@@ -2110,6 +2375,6 @@ Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
 This program is free software; you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
-See L<http://dev.perl.org/licenses/>
+See L<https://dev.perl.org/licenses/>
 
 =cut

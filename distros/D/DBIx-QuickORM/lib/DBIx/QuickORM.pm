@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use feature qw/state/;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000020';
 
 use Carp qw/croak confess/;
 $Carp::Internal{ (__PACKAGE__) }++;
@@ -143,11 +143,8 @@ sub unimport_from {
 
     my $stash = do { no strict 'refs'; \%{"$caller\::"} };
 
-    for my $item (@EXPORT) {
-        my $export = $class->can($item)  or next;
-        my $sub    = $caller->can($item) or next;
-
-        next unless $export == $sub;
+    for my $item (@EXPORT, 'builder') {
+        next unless exists $stash->{$item} && defined(*{$stash->{$item}}{CODE});
 
         my $glob = delete $stash->{$item};
 
@@ -177,6 +174,170 @@ sub new {
     $params{+SERVERS} //= {};
 
     return bless(\%params, $class);
+}
+
+sub quick {
+    my $class = shift;
+    my %params = @_;
+
+    my $creds   = delete $params{credentials};
+    my $connect = delete $params{connect};
+    my $types   = delete $params{auto_types} // [];
+    my $dialect = delete $params{dialect};
+    my $autorow = delete $params{autorow};    # 0 = off (default), 1 = generated namespace, or a class-name prefix
+    my $row_manager = delete $params{row_manager} // 'DBIx::QuickORM::RowManager::Cached';
+
+    croak "Unknown parameter(s) to quick(): " . join(', ', sort keys %params) if keys %params;
+
+    croak "quick() requires exactly one of 'credentials' or 'connect'"
+        unless (($creds ? 1 : 0) + ($connect ? 1 : 0)) == 1;
+
+    croak "'credentials' must be a hashref" if $creds   && ref($creds) ne 'HASH';
+    croak "'connect' must be a coderef"     if $connect && ref($connect) ne 'CODE';
+    croak "'auto_types' must be an arrayref" if ref($types) ne 'ARRAY';
+
+    my ($dialect_class, $db_name) = $class->_quick_detect($dialect, $creds, $connect);
+
+    require DBIx::QuickORM::DB;
+    my %db_params = (dialect => $dialect_class, db_name => $db_name);
+    if ($creds) {
+        $db_params{dsn}        = $creds->{dsn}   if defined $creds->{dsn};
+        $db_params{user}       = $creds->{user}  if defined $creds->{user};
+        $db_params{pass}       = $creds->{pass}  if defined $creds->{pass};
+        $db_params{attributes} = $creds->{attrs} if defined $creds->{attrs};
+        $db_params{dbi_driver} = $creds->{dbd}   if defined $creds->{dbd};
+    }
+    else {
+        $db_params{connect} = $connect;
+    }
+    my $db = DBIx::QuickORM::DB->new(%db_params);
+
+    my (%type_map, %affinities);
+    for my $type (@$types) {
+        my $type_class = load_class($type, 'DBIx::QuickORM::Type') or croak "Could not load type '$type': $@";
+        $type_class->qorm_register_type(\%type_map, \%affinities);
+    }
+
+    my %autofill_args = (types => \%type_map, affinities => \%affinities, hooks => {}, skip => {});
+    if ($autorow) {
+        my $base = "$autorow" eq '1' ? $class->_generate_autorow_base : $autorow;
+        $autofill_args{autorow} = $base;
+        $autofill_args{hooks}{post_table} = [$class->_autorow_hook($base, undef, (caller)[1])];
+    }
+    my $autofill = DBIx::QuickORM::Schema::Autofill->new(%autofill_args);
+
+    load_class($row_manager) or croak "Could not load row_manager '$row_manager': $@"
+        unless ref $row_manager;
+
+    require DBIx::QuickORM::ORM;
+    my $orm = DBIx::QuickORM::ORM->new(db => $db, autofill => $autofill, row_manager => $row_manager);
+
+    return $orm->connection;
+}
+
+sub _generate_autorow_base {
+    my $class = shift;
+    state $counter = 0;
+    $counter++;
+    return "DBIx::QuickORM::Row::Auto${counter}";
+}
+
+sub _autorow_hook {
+    my $class = shift;
+    my ($base, $name_to_class, $caller_file) = @_;
+
+    $name_to_class //= sub {
+        my $name = shift;
+        my @parts = split /_/, $name;
+        return join '' => map { ucfirst(lc($_)) } @parts;
+    };
+
+    local $@;
+    my $parent = load_class($base) // load_class('DBIx::QuickORM::Row') or die $@;
+
+    return sub {
+        my %params = @_;
+        my $autofill = $params{autofill};
+        my $table = $params{table};
+
+        my $postfix = $name_to_class->($table->{name});
+        my $package = "$base\::$postfix";
+
+        local $@;
+        load_class($package);
+
+        my $isa = do { no strict 'refs'; \@{"$package\::ISA"} };
+        push @$isa => $parent unless @$isa;
+
+        my $file = $package;
+        $file =~ s{::}{/};
+        $file .= ".pm";
+        $INC{$file} ||= $caller_file;
+
+        $table->{row_class} = $package;
+        $table->{row_class_autofill} = $autofill;
+    };
+}
+
+sub _quick_detect {
+    my $class = shift;
+    my ($explicit, $creds, $connect) = @_;
+
+    my ($driver, $name_source);
+    if ($creds) {
+        $name_source = $creds->{dsn};
+        if (my $dbd = $creds->{dbd}) {
+            ($driver = $dbd) =~ s/^DBD:://;
+        }
+        elsif (my $dsn = $creds->{dsn}) {
+            ($driver) = $dsn =~ m/^dbi:([^:]+):/i
+                or croak "Could not parse a driver from the dsn '$dsn'";
+        }
+        elsif (!$explicit) {
+            croak "quick() credentials need a 'dsn' or 'dbd' to detect the dialect, or pass an explicit 'dialect'";
+        }
+    }
+    else {
+        my $dbh = $connect->() or croak "The 'connect' callback did not return a database handle";
+        $driver      = $dbh->{Driver}->{Name};
+        $name_source = $dbh->{Name};
+        $dbh->disconnect;
+    }
+
+    my $dialect;
+    if ($explicit) {
+        $dialect = load_class($explicit, 'DBIx::QuickORM::Dialect') // croak "Could not load dialect '$explicit': $@";
+    }
+    else {
+        my $dialect_name = $class->_dialect_for_driver($driver)
+            or croak "Could not determine a dialect for driver '$driver'; pass an explicit 'dialect'";
+        $dialect = load_class($dialect_name, 'DBIx::QuickORM::Dialect') // croak "Could not load dialect '$dialect_name': $@";
+    }
+
+    my $db_name = $class->_quick_dbname($name_source) // 'quickorm';
+
+    return ($dialect, $db_name);
+}
+
+sub _quick_dbname {
+    my $class = shift;
+    my ($source) = @_;
+
+    return undef unless defined $source;
+    return $1 if $source =~ m/(?:dbname|database|db)=([^;]+)/i;
+    return undef;
+}
+
+sub _dialect_for_driver {
+    my $class = shift;
+    my ($driver) = @_;
+
+    return undef unless defined $driver;
+    return 'SQLite'     if $driver =~ m/^SQLite$/i;
+    return 'PostgreSQL' if $driver =~ m/^Pg/i;
+    return 'MySQL'      if $driver =~ m/^(?:mysql|MariaDB)$/i;
+    return 'DuckDB'     if $driver =~ m/^DuckDB$/i;
+    return undef;
 }
 
 sub import_into {
@@ -410,38 +571,9 @@ sub autorow {
 
     my $caller = $self->_caller;
 
-    $name_to_class //= sub {
-        my $name = shift;
-        my @parts = split /_/, $name;
-        return join '' => map { ucfirst(lc($_)) } @parts;
-    };
-
     $top->{autorow} = $base;
 
-    local $@;
-    my $parent = load_class($base) // load_class('DBIx::QuickORM::Row') or die $@;
-    $self->autohook(post_table => sub {
-        my %params = @_;
-        my $autofill = $params{autofill};
-        my $table = $params{table};
-
-        my $postfix = $name_to_class->($table->{name});
-        my $package = "$base\::$postfix";
-
-        local $@;
-        my $loaded = load_class($package);
-
-        my $isa = do { no strict 'refs'; \@{"$package\::ISA"} };
-        push @$isa => $parent unless @$isa;
-
-        my $file = $package;
-        $file =~ s{::}{/};
-        $file .= ".pm";
-        $INC{$file} ||= $caller->[1];
-
-        $table->{row_class} = $package;
-        $table->{row_class_autofill} = $autofill;
-    });
+    $self->autohook(post_table => $self->_autorow_hook($base, $name_to_class, $caller->[1]));
 
     return;
 }
@@ -587,9 +719,10 @@ sub creds {
     my ($in) = @_;
 
     croak "creds() accepts only a coderef as an argument" unless $in && ref($in) eq 'CODE';
-    my $data = $in->();
 
     my $top = $self->_in_builder(qw{db server});
+
+    my $data = $in->();
 
     croak "The subroutine passed to creds() must return a hashref" unless $data && ref($data) eq 'HASH';
 
@@ -937,7 +1070,7 @@ sub type {
 sub omit     { defined(wantarray) ? (($_[1] // 1) ? 'omit'     : ())         : ($_[0]->_in_builder('column')->{meta}->{omit}     = $_[1] // 1) }
 sub identity { defined(wantarray) ? (($_[1] // 1) ? 'identity' : ())         : ($_[0]->_in_builder('column')->{meta}->{identity} = $_[1] // 1) }
 sub nullable { defined(wantarray) ? (($_[1] // 1) ? 'nullable' : 'not_null') : ($_[0]->_in_builder('column')->{meta}->{nullable} = $_[1] // 1) }
-sub not_null { defined(wantarray) ? (($_[1] // 1) ? 'not_null' : 'nullable') : ($_[0]->_in_builder('column')->{meta}->{nullable} = $_[1] ? 0 : 1) }
+sub not_null { defined(wantarray) ? (($_[1] // 1) ? 'not_null' : 'nullable') : ($_[0]->_in_builder('column')->{meta}->{nullable} = ($_[1] // 1) ? 0 : 1) }
 
 sub default {
     my $self = shift;
@@ -1322,412 +1455,20 @@ With this ORM builder you can specify:
 
 =back
 
-=head1 SEE ALSO
-
-L<DBIx::QuickORM::Manual> - Documentation hub.
-
-=head1 SYNOPSIS
-
-The common use case is to create an ORM package for your app, then use that ORM
-package any place in the app that needs ORM access.
-
-=head2 YOUR ORM PACKAGE
-
-=head3 MANUAL SCHEMA
-
-    package My::ORM;
-    use DBIx::QuickORM;
-
-    # Define your ORM
-    orm my_orm => sub {
-        # Define your object
-        db my_db => sub {
-            dialect 'PostgreSQL'; # Or MySQL, MariaDB, SQLite
-            host 'mydb.mydomain.com';
-            port 1234;
-
-            # Best not to hardcode these, read them from a secure place and pass them in here.
-            user $USER;
-            pass $PASS;
-        };
-
-        # Define your schema
-        schema myschema => sub {
-            table my_table => sub {
-                column id => sub {
-                    identity;
-                    primary_key;
-                    not_null;
-                };
-
-                column name => sub {
-                    type \'VARCHAR(128)';    # Exact SQL for the type
-                    affinity 'string';       # required if other information does not make it obvious to DBIx::QuickORM
-                    unique;
-                    not_null;
-                };
-
-                column added => sub {
-                    type 'Stamp';            # Short for DBIx::QuickORM::Type::Stamp
-                    not_null;
-
-                    # Exact SQL to use if DBIx::QuickORM generates the table SQL
-                    default \'NOW()';
-
-                    # Perl code to generate a default value when rows are created by DBIx::QuickORM
-                    default sub { ... };
-                };
-            };
-        };
-    };
-
-=head3 AUTOMAGIC SCHEMA
-
-    package My::ORM;
-    use DBIx::QuickORM;
-
-    # Define your ORM
-    orm my_orm => sub {
-        # Define your object
-        db my_db => sub {
-            dialect 'PostgreSQL'; # Or MySQL, MariaDB, SQLite
-            host 'mydb.mydomain.com';
-            port 1234;
-
-            # Best not to hardcode these, read them from a secure place and pass them in here.
-            user $USER;
-            pass $PASS;
-        };
-
-        # Define your schema
-        schema myschema => sub {
-            # The class name is optional, the one shown here is the default
-            autofill 'DBIx::QuickORM::Schema::Autofill' => sub {
-                autotype 'UUID';    # Automatically handle UUID fields
-                autotype 'JSON';    # Automatically handle JSON fields
-
-                # Do not autofill these tables
-                autoskip table => qw/foo bar baz/;
-
-                # Will automatically create My::Row::Table classes for you with
-                # accessors for links and fields If My::Table::Row can be
-                # loaded (IE My/Row/Table.pm exists) it will load it then
-                # autofill anything missing.
-                autorow 'My::Row';
-
-                # autorow can also take a subref that accepts a table name as
-                # input and provides the class name for it, here is the default
-                # one used if none if provided:
-                autorow 'My::Row' => sub {
-                    my $name = shift;
-                    my @parts = split /_/, $name;
-                    return join '' => map { ucfirst(lc($_)) } @parts;
-                };
-
-                # You can provide custom names for tables. It will still refer
-                # to the correct name in queries, but will provide an alternate
-                # name for the orm to use in perl code.
-                autoname table => sub {
-                    my %params = @_;
-                    my $table_hash = $params{table}; # unblessed ref that will become a table
-                    my $name = $params{name}; # The name of the table
-                    ...
-                    return $new_name;
-                };
-
-                # You can provide custom names for link (foreign key) accessors when using autorow
-                autoname link_accessor => sub {
-                    my %params = @_;
-                    my $link = $params{link};
-
-                    return "obtain_" . $link->other_table if $params{link}->unique;
-                    return "select_" . $link->other_table . "s";
-                };
-
-                # You can provide custom names for field accessors when using autorow
-                autoname field_accessor => sub {
-                    my %params = @_;
-                    return "get_$params{name}";
-                };
-            };
-        };
-    };
-
-=head2 YOUR APP CODE
-
-    package My::App;
-    use My::Orm qw/orm/;
-
-    # Get a connection to the orm
-    # Note: This will return the same connection each time, no need to cache it yourself.
-    # See DBIx::QuickORM::Connection for more info.
-    my $orm = orm('my_orm');
-
-    # See DBIx::QuickORM::Handle for more info.
-    my $h = $orm->handle('people', {surname => 'smith'});
-    for my $person ($handle->all) {
-        print $person->field('first_name') . "\n"
-    }
-
-    my $new_h = $h->limit(5)->order_by('surname')->omit(@large_fields);
-    my $iterator = $new_h->iterator; # Query is actually sent to DB here.
-    while (my $row = $iterator->next) {
-        ...
-    }
-
-    # Start an async query
-    my $async = $h->async->iterator;
-
-    while (!$async->ready) {
-        do_something_else();
-    }
-
-    while (my $item = $iterator->next) {
-        ...
-    }
-
-See L<DBIx::QuickORM::Connection> for details on the object returned by
-C<< my $orm = orm('my_orm'); >>.
-
-See L<DBIx::QuickORM::Handle> for more details on handles, which are similar to
-ResultSets from L<DBIx::Class>.
-
-=head1 RECIPES
-
-=head2 DEFINE DB LATER
-
-In some cases you may want to define your orm/schema before you have your
-database credentials. Then you want to add the database later in an app/script
-bootstrap process.
-
-Schema:
-
-    package My::Schema;
-    use DBIx::QuickORM;
-
-    orm MyORM => sub {
-        autofill;
-    };
-
-Bootstrap process:
-
-    package My::Bootstrap;
-    use DBIx::QuickORM only => [qw/db db_name host port user pass/];
-    use My::Schema;
-
-    sub import {
-        # Get the orm (the `orm => ...` param is required to prevent it from attempting a connection now)
-        my $orm = qorm(orm => 'MyORM');
-
-        return if $orm->db; # Already bootstrapped
-
-        my %db_params = decrypt_creds();
-
-        # Define the DB
-        my $db = db {
-            db_name 'quickdb';
-            host $db_params{host};
-            port $db_params{port};
-            user $db_params{user};
-            pass $db_params{pass};
-        };
-
-        # Set the db on the ORM:
-        $orm->db($db);
-    }
-
-Your app:
-
-    package My::App;
-
-    # Get the qorm() subroutine
-    use My::Schema;
-
-    # This will do the db bootstrap
-    use My::Bootstrap;
-
-    # Connect to the database with the ORM
-    my $con = qorm('MyORM');
-
-=head2 RENAMING EXPORTS
-
-When importing L<DBIx::QuickORM> you can provide
-C<< rename => { name => new_name } >> mapping to rename exports.
-
-    package My::ORM;
-    use DBIx::QuickORM rename => {
-        pass  => 'password',
-        user  => 'username',
-        table => 'build_table',
-    };
-
-B<Note> If you do not want to bring in the C<import()> method that normally
-gets produced, you can also add C<< type => 'porcelain' >>.
-
-    use DBIx::QuickORM type => 'porcelain';
-
-Really any 'type' other than 'orm' and undef (which becomes 'orm' by default)
-will work to prevent C<import()> from being exported to your namespace.
-
-=head2 DEFINE TABLES IN THEIR OWN PACKAGES/FILES
-
-If you have many tables, or want each to have a custom row class (custom
-methods for items returned by tables), then you probably want to define tables
-in their own files.
-
-When you follow this example you create the table C<My::ORM::Table::Foo>. The
-package will automatically subclass L<DBIx::QuickORM::Row> unless you use
-C<row_class()> to set an alternative base.
-
-Any methods added in the file will be callable on the rows returned when
-querying this table.
-
-First create F<My/ORM/Table/Foo.pm>:
-
-    package My::ORM::Table::Foo;
-    use DBIx::QuickORM type => 'table';
-
-    # Calling this will define the table. It will also:
-    #  * Remove all functions imported from DBIx::QuickORM
-    #  * Set the base class to DBIx::QuickORM::Row, or to whatever class you specify with 'row_class'.
-    table foo => sub {
-        column a => sub { ... };
-        column b => sub { ... };
-        column c => sub { ... };
-
-        ....
-
-        # This is the default, but you can change it to set an alternate base class.
-        row_class 'DBIx::QuickORM::Row';
-    };
-
-    sub custom_row_method {
-        my $self = shift;
-        ...
-    }
-
-Then in your ORM package:
-
-    package My::ORM;
-
-    schema my_schema => sub {
-        table 'My::ORM::Table::Foo'; # Bring in the table
-    };
-
-Or if you have many tables and want to load all the tables under C<My::ORM::Table::> at once:
-
-    schema my_schema => sub {
-        tables 'My::ORM::Table';
-    };
-
-=head2 APP THAT CAN USE NEARLY IDENTICAL MYSQL AND POSTGRESQL DATABASES
-
-Lets say you have a test app that can connect to nearly identical MySQL or
-PostgreSQL databases. The schemas are the same apart from minor differences required by
-the database engine. You want to make it easy to access whichever one you want,
-or even both.
-
-    package My::ORM;
-    use DBIx::QuickORM;
-
-    orm my_orm => sub {
-        db myapp => sub {
-            alt mysql => sub {
-                dialect 'MySQL';
-                driver '+DBD::mysql';     # Or 'mysql', '+DBD::MariaDB', 'MariaDB'
-                host 'mysql.myapp.com';
-                user $MYSQL_USER;
-                pass $MYSQL_PASS;
-                db_name 'myapp_mysql';    # In MySQL the db is named myapp_mysql
-            };
-            alt pgsql => sub {
-                dialect 'PostgreSQL';
-                host 'pgsql.myapp.com';
-                user $PGSQL_USER;
-                pass $PGSQL_PASS;
-                db_name 'myapp_pgsql';    # In PostgreSQL the db is named myapp_pgsql
-            };
-        };
-
-        schema my_schema => sub {
-            table same_on_both => sub { ... };
-
-            # Give the name 'differs' that can always be used to refer to this table, despite each db giving it a different name
-            table differs => sub {
-                # Each db has a different name for the table
-                alt mysql => sub { db_name 'differs_mysql' };
-                alt pgsql => sub { db_name 'differs_pgsql' };
-
-                # Name for the column that the code can always use regardless of which db is in use
-                column foo => sub {
-                    # Each db also names this column differently
-                    alt mysql => sub { db_name 'foo_mysql' };
-                    alt pgsql => sub { db_name 'foo_pgsql' };
-                    ...;
-                };
-
-                ...;
-            };
-        };
-    };
-
-Then to use it:
-
-    use My::ORM;
-
-    my $orm_mysql = orm('my_orm:mysql');
-    my $orm_pgsql = orm('my_orm:pgsql');
-
-Each ORM object is a complete and self-contained ORM with its own caching and
-db connection. One connects to MySQL and one connects to PostgreSQL. Both can
-ask for rows in the C<differs> table, on MySQL it will query the
-C<differs_mysql>, on PostgreSQL it will query the C<differs_pgsql> table. You can
-use them both at the same time in the same code.
-
-=head2 ADVANCED COMPOSING
-
-You can define databases and schemas on their own and create multiple ORMs that
-combine them. You can also define a C<server> that has multiple databases.
-
-    package My::ORM;
-    use DBIx::QuickORM;
-
-    server pg => sub {
-        dialect 'PostgreSQL';
-        host 'pg.myapp.com';
-        user $USER;
-        pass $PASS;
-
-        db 'myapp';       # Points at the 'myapp' database on this db server
-        db 'otherapp';    # Points at the 'otherapp' database on this db server
-    };
-
-    schema myapp => sub { ... };
-    schema otherapp => sub { ... };
-
-    orm myapp => sub {
-        db 'pg.myapp';
-        schema 'myapp';
-    };
-
-    orm otherapp => sub {
-        db 'pg.otherapp';
-        schema 'otherapp';
-    };
-
-Then to use them:
-
-    use My::ORM;
-
-    my $myapp    = orm('myapp');
-    my $otherapp = orm('otherapp');
-
-Also note that C<< alt(variant => sub { ... }) >> can be used in any of the
-above builders to create MySQL/PostgreSQL/etc. variants on the databases and
-schemas. Then access them like:
-
-    my $myapp_pgsql = orm('myapp:pgsql');
-    my $myapp_mysql = orm('myapp:myql');
+=head1 DOCUMENTATION
+
+The best place to start is L<DBIx::QuickORM::Manual::QuickStart>, which walks
+you through connecting to a database and working with rows as objects in just
+a few lines. Broader documentation - tutorials, guides, recipes, and worked
+examples - lives in L<DBIx::QuickORM::Manual>, the documentation hub. For a
+brief index of every feature with links to where each is documented, see
+L<DBIx::QuickORM::Manual::Features>.
+
+The C<DBIx::QuickORM> module itself exports a DSL (a set of builder functions)
+for defining ORMs, databases, servers, schemas, tables, columns, and links.
+The rest of this document is the reference for those DSL functions: what each
+one does and how they nest. It is intentionally function-focused rather than
+an end-to-end guide - for that, start with the manual.
 
 =head1 ORM BUILDER EXPORTS
 
@@ -1776,6 +1517,9 @@ You can also compose using databases or schemas you defined previously:
         schema 'myschema1';
     };
 
+Used at the top level. Can contain C<db>, C<schema>, C<handle_class>,
+C<autofill>, plus C<alt>, C<plugin>, C<plugins>, C<meta>, and C<build_class>.
+
 =item C<< alt $VARIANT => sub { ... } >>
 
 Can be used to add variations to any builder:
@@ -1821,6 +1565,9 @@ This works in C<orm()>, C<db()>, C<schema()>, C<table()>, and C<row()> builders.
 cascade, so if you ask for the C<mysql> variant of an ORM, it will also give you
 the C<mysql> variants of the database, schema, tables and rows.
 
+Can be nested under any builder. Can contain whatever the builder it is nested
+under can contain.
+
 =item C<< db $NAME >>
 
 =item C<< db $NAME => sub { ... } >>
@@ -1850,6 +1597,10 @@ Can also be used to tell an ORM which database to use:
         db 'mydb';
         ...
     };
+
+Used at the top level, or nested under C<orm> or C<server>. Can contain
+C<driver>, C<dialect>, C<connect>, C<attributes>, C<creds>, C<dsn>, C<host>,
+C<port>, C<socket>, C<user>, C<pass>, and C<db_name>.
 
 =item C<dialect '+DBIx::QuickORM::Dialect::PostgreSQL'>
 
@@ -1908,7 +1659,15 @@ For interacting with the Community Edition of MySQL.
 
 For interacting with SQLite databases.
 
+=item L<DuckDB|DBIx::QuickORM::Dialect::DuckDB>
+
+For interacting with DuckDB databases. DuckDB is embedded (like SQLite) and
+supports C<RETURNING> on all DML, but does B<not> support savepoints, so
+nested transactions are unavailable.
+
 =back
+
+Can be nested under C<db> or C<server>.
 
 =item C<driver '+DBD::Pg'>
 
@@ -1932,6 +1691,8 @@ B<NOTE:> DBIx::QuickORM can use either L<DBD::mysql> or L<DBD::MariaDB> to
 connect to any of the MySQL variants. It will default to L<DBD::MariaDB> if it
 is installed and you have not requested L<DBD::mysql> directly.
 
+Can be nested under C<db> or C<server>.
+
 =item C<< attributes \%HASHREF >>
 
 =item C<< attributes(attr => val, ...) >>
@@ -1952,6 +1713,8 @@ Or:
         attributes foo => 1;
     };
 
+Can be nested under C<db> or C<server>.
+
 =item C<host $HOSTNAME>
 
 =item C<hostname $HOSTNAME>
@@ -1962,6 +1725,8 @@ Provide a hostname or IP address for database connections
         host 'mydb.mydomain.com';
     };
 
+Can be nested under C<db> or C<server>.
+
 =item C<port $PORT>
 
 Provide a port number for database connection.
@@ -1970,6 +1735,8 @@ Provide a port number for database connection.
         port 1234;
     };
 
+Can be nested under C<db> or C<server>.
+
 =item C<socket $SOCKET_PATH>
 
 Provide a socket instead of a host+port
@@ -1977,6 +1744,8 @@ Provide a socket instead of a host+port
     db mydb => sub {
         socket '/path/to/db.socket';
     };
+
+Can be nested under C<db> or C<server>.
 
 =item C<user $USERNAME>
 
@@ -1988,6 +1757,8 @@ provide a database username
         user 'bob';
     };
 
+Can be nested under C<db> or C<server>.
+
 =item C<pass $PASSWORD>
 
 =item C<password $PASSWORD>
@@ -1997,6 +1768,8 @@ provide a database password
     db mydb => sub {
         pass 'hunter2'; # Do not store any real passwords in plaintext in code!!!!
     };
+
+Can be nested under C<db> or C<server>.
 
 =item C<creds sub { return \%CREDS }>
 
@@ -2009,6 +1782,8 @@ and you have a method to decrypt and read it returning it as a hash.
     db mydb => sub {
         creds sub { ... };
     };
+
+Can be nested under C<db> or C<server>.
 
 =item C<connect sub { ... }>
 
@@ -2024,6 +1799,8 @@ B<MUST NOT> cache it!
         connect sub { ... };
     };
 
+Can be nested under C<db> or C<server>.
+
 =item C<dsn $DSN>
 
 Specify the DSN used to connect to the database. If not provided then an
@@ -2033,6 +1810,8 @@ available.
     db mydb => sub {
         dsn "dbi:Pg:dbname=foo";
     };
+
+Can be nested under C<db> or C<server>.
 
 =item C<< server $NAME => sub { ... } >>
 
@@ -2071,6 +1850,10 @@ Example:
         ...;
     };
 
+Used at the top level. Can contain C<db> plus the same connection settings a
+C<db> can contain (C<driver>, C<dialect>, C<connect>, C<attributes>, C<creds>,
+C<dsn>, C<host>, C<port>, C<socket>, C<user>, C<pass>).
+
 =item C<< schema $NAME => sub { ... } >>
 
 =item C<< $schema = schema($NAME) >>
@@ -2108,6 +1891,9 @@ it adds it to the ORM class.
         db(...);
     };
 
+Used at the top level, or nested under C<orm>. Can contain C<table>, C<view>,
+C<tables>, C<row_class>, C<sql>, and C<link>.
+
 =item C<< table $NAME => sub { ... } >>
 
 =item C<< table $CLASS >>
@@ -2138,6 +1924,28 @@ appears in the name.  Otherwise it assumes you are defining a new table.
 This means it is not possible to load top-level packages as table classes,
 which is a feature, not a bug.
 
+Can be nested under C<schema>. Can contain C<column>, C<columns>,
+C<primary_key>, C<unique>, C<index>, C<db_name>, C<row_class>, C<sql>, and
+C<link>.
+
+=item C<< view $NAME => sub { ... } >>
+
+=item C<< view $CLASS >>
+
+=item C<< view $CLASS => sub { ... } >>
+
+Used to define a view, or load a view class. Behaves exactly like C<table>
+above, but produces a view instead of a table.
+
+    schema my_schema => sub {
+        view active_users => sub {
+            column id   => sub { ... };
+            column name => sub { ... };
+        };
+    };
+
+Can be nested under C<schema>. Can contain the same things as C<table>.
+
 =item C<tables 'Table::Namespace'>
 
 Used to load all tables in the specified namespace:
@@ -2146,6 +1954,8 @@ Used to load all tables in the specified namespace:
         # Load My::Table::Foo, My::Table::Bar, etc.
         tables 'My::Table';
     };
+
+Can be nested under C<schema>.
 
 =item C<row_class '+My::Row::Class'>
 
@@ -2181,6 +1991,8 @@ In a table class:
         row_class '+My::Row::Class';
     };
 
+Can be nested under C<table> or C<schema>.
+
 =item C<db_name $NAME>
 
 Sometimes you want the ORM to use one name for a table or database, but the
@@ -2200,6 +2012,8 @@ orm from its actual name on the server:
     db theapp => sub {    # Name in the orm
         db_name 'myapp'    # Actual name on the server;
     };
+
+Can be nested under C<table> or C<db>.
 
 =item C<< column NAME => sub { ... } >>
 
@@ -2226,6 +2040,10 @@ Another simple way to do everything above:
 
     column foo => ('not_null', 'identity', \'BIGINT');
 
+Can be nested under C<table>. Can contain C<omit>, C<nullable>, C<not_null>,
+C<identity>, C<affinity>, C<type>, C<sql>, C<default>, C<primary_key>,
+C<unique>, and C<link>.
+
 =item C<omit>
 
 When set on a column, the column will be omitted from C<SELECT>s by default. When
@@ -2240,6 +2058,8 @@ In a non-void context it will return the string C<omit> for use in a column
 specification without a builder.
 
     column bar => omit();
+
+Can be nested under C<column>.
 
 =item C<nullable()>
 
@@ -2271,6 +2091,8 @@ builder.
     column foo => nullable();
     column bar => not_null();
 
+Can be nested under C<column>.
+
 =item C<identity()>
 
 =item C<identity(1)>
@@ -2296,6 +2118,8 @@ is provided.
 
     column foo => identity();
 
+Can be nested under C<column>.
+
 =item C<affinity('string')>
 
 =item C<affinity('numeric')>
@@ -2316,6 +2140,8 @@ is only useful for checking for typos as it will throw an exception if you use
 an invalid affinity type.
 
     column foo => affinity('string');
+
+Can be nested under C<column>.
 
 =item C<< type(\$sql) >>
 
@@ -2346,6 +2172,8 @@ In scalar context this will return the constructed type object.
 
     column foo => type('MyType');
 
+Can be nested under C<column>.
+
 =item C<< sql($sql) >>
 
 =item C<< sql(infix => $sql) >>
@@ -2363,6 +2191,8 @@ Infix will prevent the typical SQL from being generated, the infix will be used
 instead.
 
 If no *fix is specified then C<infix> is assumed.
+
+Can be nested under C<schema>, C<table>, or C<column>.
 
 =item C<default(\$sql)>
 
@@ -2395,6 +2225,8 @@ In the above cases they return:
     (sql_default => "NOW()")
     (perl_default => sub { 123 })
 
+Can be nested under C<column>.
+
 =item C<columns(@names)>
 
 =item C<columns(@names, \%attrs)>
@@ -2403,6 +2235,8 @@ In the above cases they return:
 
 Define multiple columns at a time. If any attrs hashref or sub builder are
 specified they will be applied to B<all> provided column names.
+
+Can be nested under C<table>.
 
 =item C<primary_key>
 
@@ -2428,6 +2262,8 @@ Or to make a single column the primary key:
         };
     };
 
+Can be nested under C<table> or C<column>.
+
 =item C<unique>
 
 =item C<unique(@COLUMNS)>
@@ -2452,6 +2288,53 @@ Or to make a single column unique:
         };
     };
 
+Can be nested under C<table> or C<column>.
+
+=item C<< index $NAME => \@COLUMNS >>
+
+=item C<< index $NAME => \@COLUMNS, \%PARAMS >>
+
+=item C<< my $index = index(...) >>
+
+Define an index on a table. Pass the index name, an arrayref of columns, and an
+optional hashref of extra parameters.
+
+    table mytable => sub {
+        column a => sub { ... };
+        column b => sub { ... };
+
+        index my_idx => ['a', 'b'];
+    };
+
+In a non-void context it returns the index hashref instead of attaching it to
+the table.
+
+Can be nested under C<table>.
+
+=item C<< link \@LOCAL => \@OTHER >>
+
+=item C<< link [$table => \@columns] >>
+
+Define a foreign-key style link/relationship. The exact arguments depend on
+context: under a C<schema> you provide both the local and the foreign side;
+under a C<column> the local side is taken to be the current column and you
+provide only the side being linked to.
+
+    # In a schema, linking two tables:
+    schema my_schema => sub {
+        ...
+        link ['foo', ['foo_id']] => ['bar', ['id']];
+    };
+
+    # In a column, linking just this column:
+    table foo => sub {
+        column bar_id => sub {
+            link ['bar', ['id']];
+        };
+    };
+
+Can be nested under C<schema> or C<column>.
+
 =item C<build_class $CLASS>
 
 Use this to override the class being built by a builder.
@@ -2461,6 +2344,8 @@ Use this to override the class being built by a builder.
 
         ...
     };
+
+Can be nested under any builder.
 
 =item C<my $meta = meta>
 
@@ -2472,6 +2357,8 @@ Get the current builder meta hashref
         # This is what db_name('foo') would do!
         $meta->{name} = 'foo';
     };
+
+Can be nested under any builder.
 
 =item C<< plugin '+My::Plugin' >>
 
@@ -2502,6 +2389,8 @@ Or provide construction args:
     plugin '+My::Plugin' => (foo => 1, bar => 2);
     plugin '+MyPlugin'   => {foo => 1, bar => 2};
 
+Can be used at the top level or nested under any builder.
+
 =item C<< $plugins = plugins() >>
 
 =item C<< plugins '+My::Plugin', 'MyPlugin' => \%ARGS, My::Plugin->new(...), ... >>
@@ -2511,6 +2400,25 @@ used as construction arguments.
 
 Can also be used with no arguments to return an arrayref of all active plugins
 for the current scope.
+
+Can be used at the top level or nested under any builder.
+
+=item C<handle_class '+My::Handle::Class'>
+
+=item C<handle_class 'MyHandleClass'>
+
+Set the default handle class for the ORM. Handles are the objects returned when
+you query the ORM for rows.
+
+If the class name has a plus C<+> it will be stripped off and the class name
+will not be altered further. If there is no C<+> then C<DBIx::QuickORM::Handle>
+is assumed.
+
+    orm my_orm => sub {
+        handle_class '+My::Handle::Class';
+    };
+
+Can be nested under C<orm>.
 
 =item C<< autofill() >>
 
@@ -2551,6 +2459,9 @@ a subref and call them:
         autohook HOOK => sub { ... };           # Run behavior at specific hook points
     };
 
+Can be nested under C<orm>. Can contain C<autotype>, C<autoskip>, C<autorow>,
+C<autoname>, and C<autohook>.
+
 =item C<autotype $TYPE_CLASS>
 
 =item C<autotype 'JSON'>
@@ -2565,11 +2476,15 @@ Load custom L<DBIx::QuickORM::Type> subclasses. If a column is found with the
 right type then the type class will be used to inflate/deflate the values
 automatically.
 
+Can be nested under C<autofill>.
+
 =item C<autoskip table => qw/table1 table2 .../>
 
 =item C<autoskip column => qw/col1 col2 .../>
 
 Skip defining schema entries for the specified tables or columns.
+
+Can be nested under C<autofill>.
 
 =item C<autorow 'My::App::Row'>
 
@@ -2581,6 +2496,8 @@ a F<My/App/Row/TABLE.pm> file it will be loaded as well.
 If you define a C<My::App::Row> class it will be loaded and all table rows will
 use it as a base class. If no such class is found the new classes will use
 L<DBIx::QuickORM::Row> as a base class.
+
+Can be nested under C<autofill>.
 
 =item C<< autoname link_accessor => sub { ... } >>
 
@@ -2644,9 +2561,13 @@ You can also set aliases for links before they are constructed:
         return $alias;
     };
 
+Can be nested under C<autofill>.
+
 =item C<autohook HOOK => sub { my %params = @_; ... }>
 
 See L<DBIx::QuickORM::Schema::Autofill> for a list of hooks and their params.
+
+Can be nested under C<autofill>.
 
 =back
 

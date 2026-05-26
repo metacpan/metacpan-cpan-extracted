@@ -1,9 +1,10 @@
+.perl-version
 Changes
 CONTRIBUTING.md
 lib/Concierge.pm
-lib/Concierge/Base.pm
-lib/Concierge/Setup.pm
-lib/Concierge/User.pm
+lib/Concierge/Desk/Base.pm
+lib/Concierge/Desk/Setup.pm
+lib/Concierge/Desk/User.pm
 LICENSE
 Makefile.PL
 MANIFEST

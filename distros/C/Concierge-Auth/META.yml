@@ -21,10 +21,10 @@ no_index:
 provides:
   Concierge::Auth:
     file: lib/Concierge/Auth.pm
-    version: v0.4.3
+    version: v0.4.5
   Concierge::Auth::Generators:
     file: lib/Concierge/Auth/Generators.pm
-    version: v0.4.3
+    version: v0.4.5
 requires:
   Carp: '0'
   Crypt::PRNG: '0'
@@ -39,5 +39,5 @@ requires:
 resources:
   bugtracker: https://github.com/bwva/Concierge-Auth/issues
   repository: https://github.com/bwva/Concierge-Auth.git
-version: v0.4.3
+version: v0.4.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -8,7 +8,8 @@ Time::Str::Time - Time validation and epoch conversion
 
 =head1 SYNOPSIS
 
-    use Time::Str::Time qw( timegm_modern 
+    use Time::Str::Time qw( gmtime_modern
+                            timegm_modern 
                             timegm_posix
                             valid_hms
                             valid_hms60 );
@@ -21,6 +22,10 @@ Time::Str::Time - Time validation and epoch conversion
     # Convert date/time to Unix epoch (modern convention)
     my $epoch = timegm_modern(0, 0, 0, 24, 12, 2024);
     # 2024-12-24T00:00:00Z => 1735005600
+    
+    # Convert Unix epoch to broken-down time (modern convention)
+    my @tm = gmtime_modern(1735005600);
+    # (0, 0, 0, 24, 12, 2024, 2, 358, 0)
     
     # Convert date/time to Unix epoch (POSIX convention)
     my $epoch = timegm_posix(0, 0, 0, 24, 11, 124);
@@ -48,6 +53,23 @@ minute (0-59), second (0-59).
 Returns true if the given time components are valid: hour (0-23),
 minute (0-59), second (0-60). The extended second range accommodates
 leap seconds.
+
+=head2 gmtime_modern
+
+    my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst)
+      = gmtime_modern($time);
+
+Converts a Unix epoch value (seconds since 1970-01-01T00:00:00Z) to
+a broken-down UTC time. Returns nine values like Perl's built-in
+C<gmtime> but with modern conventions: C<$mon> is 1-12 (not 0-11)
+and C<$year> is the full year (not years since 1900).
+
+C<$wday> is the day of week (0=Sunday, 1=Monday .. 6=Saturday).
+C<$yday> is the zero-based day of year (0-365). C<$isdst> is always 0.
+
+Croaks if C<$time> is out of range.
+
+This is the inverse of C<timegm_modern>.
 
 =head2 timegm_modern
 

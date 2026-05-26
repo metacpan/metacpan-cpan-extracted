@@ -1,3 +1,8 @@
+0.07  2026-05-26
+    - Improve error message on OpenBSD, which is not a supported platform.
+    - Bail out earlier in the build on unsupported platforms, not just during
+      'make test'.
+
 0.06  2026-05-04
     - Switch from h2ph to hardcoded syscall numbers. Removes the h2ph and
       system header build requirements and makes the module fatpackable, but

@@ -1,3 +1,10 @@
+v6.0.0    2026-05-26 02:50:43 EDT
+  - Add support for Minion cron-style recurring jobs with schedule, unschedule, pause_schedule, resume_schedule,
+    list_schedules, and dispatch_schedules methods.
+  - Support returning lock ID in list_locks method.
+  - Support specifying tasks to dequeue for task limits.
+  - Remove experimental status from lax dependency support and expiring jobs feature.
+
 v5.0.7    2022-08-13 13:00:35 EDT
   - Add workers field to stats method (#21, Oliver Kurz)
 

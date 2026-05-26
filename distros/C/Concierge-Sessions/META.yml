@@ -21,19 +21,19 @@ no_index:
 provides:
   Concierge::Sessions:
     file: lib/Concierge/Sessions.pm
-    version: v0.11.0
+    version: v0.11.1
   Concierge::Sessions::Base:
     file: lib/Concierge/Sessions/Base.pm
-    version: v0.11.0
+    version: v0.11.1
   Concierge::Sessions::File:
     file: lib/Concierge/Sessions/File.pm
-    version: v0.11.0
+    version: v0.11.1
   Concierge::Sessions::SQLite:
     file: lib/Concierge/Sessions/SQLite.pm
-    version: v0.11.0
+    version: v0.11.1
   Concierge::Sessions::Session:
     file: lib/Concierge/Sessions/Session.pm
-    version: v0.11.0
+    version: v0.11.1
 requires:
   Carp: '0'
   Crypt::PRNG: '0'
@@ -46,5 +46,5 @@ requires:
 resources:
   bugtracker: https://github.com/bwva/Concierge-Sessions/issues
   repository: https://github.com/bwva/Concierge-Sessions.git
-version: v0.11.0
+version: v0.11.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

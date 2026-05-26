@@ -2,13 +2,54 @@ package DBIx::QuickORM::Role::Row;
 use strict;
 use warnings;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000020';
 
 use Carp qw/croak/;
 use List::Util qw/zip/;
 use Scalar::Util qw/blessed/;
 
 use Role::Tiny;
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::QuickORM::Role::Row - Role defining the common row interface.
+
+=head1 DESCRIPTION
+
+Shared behavior for row objects. Consumers provide the low-level state and
+field accessors (storage state, desync tracking, the various field views);
+this role builds the higher-level operations on top of them: insert / save /
+delete, primary-key helpers, field metadata lookups, and link traversal
+(C<follow>, C<obtain>, C<insert_related>, C<siblings>).
+
+=head1 SYNOPSIS
+
+    package My::Row;
+    use Role::Tiny::With;
+    with 'DBIx::QuickORM::Role::Row';
+
+    sub source { ... }
+    # ...and the other required methods
+
+    $row->save;
+    my @sibs = $row->siblings('some_link');
+
+=head1 REQUIRED METHODS
+
+Consumers must provide the state predicates and accessors (C<source>,
+C<connection>, C<is_invalid>, C<is_valid>, C<in_storage>, C<is_desynced>,
+C<has_pending>), the sync check (C<check_sync>), the manipulation primitives
+(C<force_sync>, C<refresh>, C<discard>, C<update>), and the field views
+(C<field>, C<raw_field>, C<fields>, C<raw_fields>, C<stored_field>,
+C<pending_field>, C<raw_stored_field>, C<raw_pending_field>,
+C<stored_fields>, C<pending_fields>, C<raw_stored_fields>,
+C<raw_pending_fields>, C<field_is_desynced>).
+
+=cut
 
 requires qw{
     source
@@ -19,6 +60,38 @@ requires qw{
     is_desynced
     has_pending
 };
+
+=pod
+
+=head1 PUBLIC METHODS
+
+=over 4
+
+=item $bool = $row->track_desync
+
+=item $bool = $row->is_stored
+
+=item $dialect = $row->dialect
+
+=item $bool = $row->has_field($name)
+
+=item $affinity = $row->field_affinity($name)
+
+=item @fields = $row->primary_key_field_list
+
+=item @values = $row->primary_key_value_list
+
+=item %pk = $row->primary_key_hash
+
+=item $pk = $row->primary_key_hashref
+
+Convenience accessors and primary-key helpers built on the source and
+connection. C<has_field> croaks without a field name; the C<primary_key_*>
+helpers croak (via C<check_pk>) when the source has no primary key.
+
+=back
+
+=cut
 
 sub track_desync { 0 }
 sub is_stored    { $_[0]->in_storage }
@@ -34,16 +107,52 @@ sub primary_key_hash       { map { $_ => $_[0]->raw_stored_field($_) // undef } 
 sub primary_key_hashref    { +{ $_[0]->primary_key_hash } }
 #>>>
 
+=pod
+
+=over 4
+
+=item $handle = $row->handle(@args)
+
+Return a handle scoped to this row's source and row.
+
+=back
+
+=cut
+
 sub handle {
     my $self = shift;
     $self->connection->handle(source => $self->source, row => $self)->handle(@_);
 }
+
+=pod
+
+=over 4
+
+=item $str = $row->display
+
+Human-readable identifier: the source name plus the primary-key values.
+
+=back
+
+=cut
 
 sub display {
     my $self = shift;
     my $source = $self->source;
     return $source->source_orm_name . "(" . join(', ' => $self->primary_key_value_list) . ")";
 }
+
+=pod
+
+=over 4
+
+=item %args = $row->conflate_args($field, $value)
+
+Return the argument list used for inflate/deflate of a single field value.
+
+=back
+
+=cut
 
 sub conflate_args {
     my $self = shift;
@@ -59,6 +168,18 @@ sub conflate_args {
 requires qw{
     check_sync
 };
+
+=pod
+
+=over 4
+
+=item $row = $row->check_pk
+
+Return the row if its source has a primary key, otherwise croak.
+
+=back
+
+=cut
 
 sub check_pk {
     return $_[0] if $_[0]->source->primary_key;
@@ -80,6 +201,31 @@ requires qw{
     discard
     update
 };
+
+=pod
+
+=over 4
+
+=item $row = $row->insert_or_save
+
+Save the row if it is already stored, or insert it if it has pending data.
+
+=item $row = $row->insert
+
+Insert a not-yet-stored row that has pending data; croaks otherwise.
+
+=item $row = $row->save
+
+Write pending changes for a stored row. Checks the primary key and sync
+state first; a no-op when there is nothing pending.
+
+=item $row->delete
+
+Delete the row from storage (requires a primary key).
+
+=back
+
+=cut
 
 sub insert_or_save {
     my $self = shift;
@@ -157,6 +303,32 @@ requires qw{
 # {{{ Link methods #
 ####################
 
+=pod
+
+=over 4
+
+=item $handle = $row->follow($link)
+
+Return a handle for the rows reached by following C<$link> from this row.
+
+=item $row = $row->obtain($link)
+
+Like C<follow>, but for a unique link: returns the single related row.
+
+=item $row->insert_related($link, \%row_data)
+
+Insert a related row across C<$link>, filling in the linking columns from
+this row.
+
+=item $handle = $row->siblings($link_or_fields)
+
+Return a handle for rows sharing the same values on the given link's local
+columns (or an explicit arrayref of fields); includes this row.
+
+=back
+
+=cut
+
 sub follow {
     my $self = shift;
     my ($link) = @_;
@@ -221,3 +393,37 @@ sub siblings { # This includes the original
 ####################
 
 1;
+
+__END__
+
+=head1 SOURCE
+
+The source code repository for DBIx::QuickORM can be found at
+L<https://github.com/exodist/DBIx-QuickORM>.
+
+=head1 MAINTAINERS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut

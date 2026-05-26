@@ -24,7 +24,7 @@ do_for_all_dbs {
             user $db->username;
             pass $db->password;
         }
-        elsif (curdialect() =~ m/SQLite/) {
+        elsif (curdialect() =~ m/SQLite|DuckDB/) {
             db_name 'quickdb';
             db_name $db->dir . '/quickdb';
         }

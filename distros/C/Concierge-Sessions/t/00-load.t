@@ -3,6 +3,7 @@
 use strict;
 use warnings;
 use Test2::V0;
+use Test2::Tools::Exception;
 use lib 'lib';
 
 # Test that all Concierge::Sessions modules can be loaded and have correct versions
@@ -39,5 +40,19 @@ can_ok('Concierge::Sessions::SQLite',
 # Backend interface methods for File
 can_ok('Concierge::Sessions::File',
     qw(new create_session get_session_info update_session delete_session delete_user_session cleanup_sessions));
+
+# Verify Base abstract stub methods die when called directly on Base object
+my $base = Concierge::Sessions::Base->new();
+like(dies { $base->create_session() }, qr/Subclass must implement create_session/, 'create_session stub dies');
+like(dies { $base->get_session_info() }, qr/Subclass must implement get_session_info/, 'get_session_info stub dies');
+like(dies { $base->update_session() }, qr/Subclass must implement update_session/, 'update_session stub dies');
+like(dies { $base->delete_session() }, qr/Subclass must implement delete_session/, 'delete_session stub dies');
+like(dies { $base->cleanup_sessions() }, qr/Subclass must implement cleanup_sessions/, 'cleanup_sessions stub dies');
+like(dies { $base->delete_user_session() }, qr/Subclass must implement delete_user_session/, 'delete_user_session stub dies');
+
+# Verify generate_session_id works directly
+my $id = Concierge::Sessions::Base->generate_session_id();
+ok($id, 'generate_session_id returns a value');
+like($id, qr/^[a-f0-9]{40}$/, 'generate_session_id returns 40-char hex string');
 
 done_testing;

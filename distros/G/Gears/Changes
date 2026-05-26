@@ -1,5 +1,8 @@
 Revision history for Gears
 
+0.102 - 2026-05-25
+	- Fix package Gears::X::Logger (bad namespace name)
+
 0.101 - 2026-01-14
 	- Fix failing generator tests
 

@@ -1,6 +1,5 @@
 use Test2::V0 -target => 'DBIx::QuickORM', '!meta', '!pass';
 use DBIx::QuickORM;
-use Carp::Always;
 
 use lib 't/lib';
 use DBIx::QuickORM::Test;

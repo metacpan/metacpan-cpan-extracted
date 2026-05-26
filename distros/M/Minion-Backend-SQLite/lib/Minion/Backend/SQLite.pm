@@ -2,13 +2,15 @@ package Minion::Backend::SQLite;
 use Mojo::Base 'Minion::Backend';
 
 use Carp 'croak';
+use DBD::SQLite::Constants ':result_codes';
 use List::Util 'min';
+use Minion::Util 'next_cron_time';
 use Mojo::SQLite;
 use Mojo::Util 'steady_time';
 use Sys::Hostname 'hostname';
 use Time::HiRes 'usleep';
 
-our $VERSION = 'v5.0.7';
+our $VERSION = 'v6.0.0';
 
 has dequeue_interval => 0.5;
 has 'sqlite';
@@ -44,20 +46,66 @@ sub dequeue {
   return $job || $self->_try($id, $options);
 }
 
-sub enqueue {
-  my ($self, $task, $args, $options) = (shift, shift, shift || [], shift || {});
+sub dispatch_schedules {
+  my $self = shift;
 
-  return $self->sqlite->db->query(
-    q{insert into minion_jobs
-       (args, attempts, delayed, expires, lax, notes, parents, priority, queue, task)
-      values (?, ?, datetime('now', ? || ' seconds'),
-      case when ? is not null then datetime('now', ? || ' seconds') end,
-      ?, ?, ?, ?, ?, ?)},
-    {json => $args}, $options->{attempts} // 1, $options->{delay} // 0,
-    @$options{qw(expire expire)}, $options->{lax} ? 1 : 0, {json => $options->{notes} || {}},
-    {json => ($options->{parents} || [])}, $options->{priority} // 0,
-    $options->{queue} // 'default', $task
-  )->last_insert_id;
+  my $db = $self->sqlite->db;
+  my $timeout = $db->dbh->sqlite_busy_timeout // 0;
+  $db->dbh->sqlite_busy_timeout(1000);
+  my ($tx, $errored, $error);
+  {
+    local $@;
+    unless (eval { $tx = $db->begin('immediate'); 1 }) {
+      my $errcode = $db->dbh->err;
+      if ($errcode and $errcode == SQLITE_BUSY) {
+        $db->dbh->sqlite_busy_timeout($timeout);
+        $db->dbh->rollback; # clear internal transaction state
+        return [];
+      } else {
+        $errored = 1;
+        $error = $@;
+      }
+    }
+  }
+  $db->dbh->sqlite_busy_timeout($timeout);
+  die $error if $errored;
+
+  my $due = $db->query(
+    q{select id, args, attempts, cron, expire, lax, name, strftime('%s',next_run) as next_run,
+        strftime('%s','now') as now, notes, priority, queue, task
+      from minion_schedules where next_run <= datetime('now') and not paused}
+  )->expand(json => [qw(args notes)])->hashes;
+
+  my @dispatched;
+  for my $s (@$due) {
+    my $job_id = $self->_enqueue(
+      $db,
+      $s->{task},
+      $s->{args},
+      {
+        attempts => $s->{attempts},
+        expire   => $s->{expire},
+        lax      => $s->{lax},
+        notes    => $s->{notes},
+        priority => $s->{priority},
+        queue    => $s->{queue}
+      }
+    );
+    my $basis = $s->{next_run} > $s->{now} ? $s->{next_run} : $s->{now};
+    my $next  = next_cron_time $s->{cron}, $basis;
+    $db->query(q{update minion_schedules set last_job = ?, last_run = datetime('now'),
+      next_run = datetime(?,'unixepoch') where id = ?},
+      $job_id, $next, $s->{id});
+    push @dispatched, {id => $s->{id}, name => $s->{name}, job => $job_id};
+  }
+  $tx->commit;
+
+  return \@dispatched;
+}
+
+sub enqueue {
+  my $self = shift;
+  return $self->_enqueue($self->sqlite->db, @_);
 }
 
 sub fail_job   { shift->_update(1, @_) }
@@ -171,7 +219,7 @@ sub list_locks {
   my $where_str = 'where ' . join(' and ', @where);
   
   my $locks = $self->sqlite->db->query(
-    qq{select name, strftime('%s',expires) as expires from minion_locks
+    qq{select id, name, strftime('%s',expires) as expires from minion_locks
        $where_str order by id desc limit ? offset ?},
     @where_params, $limit, $offset
   )->hashes->to_array;
@@ -180,6 +228,42 @@ sub list_locks {
     $where_str}, @where_params)->arrays->first->[0];
   
   return {locks => $locks, total => $total};
+}
+
+sub list_schedules {
+  my ($self, $offset, $limit, $options) = @_;
+
+  my (@where, @where_params);
+  if (defined(my $before = $options->{before})) {
+    push @where, 'id < ?';
+    push @where_params, $before;
+  }
+  if (defined(my $ids = $options->{ids})) {
+    my $ids_in = join ',', ('?')x@$ids;
+    push @where, @$ids ? "id in ($ids_in)" : 'id is null';
+    push @where_params, @$ids;
+  }
+  if (defined(my $names = $options->{names})) {
+    my $names_in = join ',', ('?')x@$names;
+    push @where, @$names ? "name in ($names_in)" : 'name is null';
+    push @where_params, @$names;
+  }
+
+  my $where_str = @where ? 'where ' . join(' and ', @where) : '';
+
+  my $schedules = $self->sqlite->db->query(
+    qq{select id, args, attempts, strftime('%s',created) as created, cron, expire, last_job,
+        strftime('%s',last_run) as last_run, lax, name, strftime('%s',next_run) as next_run, notes, paused,
+        priority, queue, task
+      from minion_schedules
+      $where_str order by id desc limit ? offset ?},
+      @where_params, $limit, $offset
+  )->expand(json => [qw(args notes)])->hashes->to_array;
+
+  my $total = $self->sqlite->db->query(qq{select count(*) from minion_schedules
+    $where_str}, @where_params)->arrays->first->[0];
+
+  return {schedules => $schedules, total => $total};
 }
 
 sub list_workers {
@@ -255,6 +339,8 @@ sub note {
   )->rows;
 }
 
+sub pause_schedule { shift->_set_paused(shift, 1) }
+
 sub receive {
   my ($self, $id) = @_;
   my $db = $self->sqlite->db;
@@ -328,14 +414,17 @@ sub reset {
     my $tx = $db->begin;
     $db->query('delete from minion_jobs');
     $db->query('delete from minion_locks');
+    $db->query('delete from minion_schedules');
     $db->query('delete from minion_workers');
     $db->query(q{delete from sqlite_sequence
-      where name in ('minion_jobs','minion_locks','minion_workers')});
+      where name in ('minion_jobs','minion_locks','minion_schedules','minion_workers')});
     $tx->commit;
   } elsif ($options->{locks}) {
     $db->query('delete from minion_locks');
   }
 }
+
+sub resume_schedule { shift->_set_paused(shift, 0) }
 
 sub retry_job {
   my ($self, $id, $retries, $options) = (shift, shift, shift, shift || {});
@@ -357,6 +446,25 @@ sub retry_job {
   )->rows;
 }
 
+sub schedule {
+  my ($self, $name, $cron, $task, $args, $options) = (shift, shift, shift, shift, shift || [], shift || {});
+
+  my $db   = $self->sqlite->db;
+  my $next = next_cron_time $cron, $db->query(q{select strftime('%s','now')})->array->[0];
+
+  return $db->query(
+    q{insert into minion_schedules (args, attempts, cron, expire, lax, name, next_run, notes, priority, queue, task)
+      values (?, ?, ?, ?, ?, ?, datetime(?,'unixepoch'), ?, ?, ?, ?)
+      on conflict (name) do update set
+        args = excluded.args, attempts = excluded.attempts, cron = excluded.cron, expire = excluded.expire,
+        lax = excluded.lax, notes = excluded.notes, priority = excluded.priority, queue = excluded.queue,
+        task = excluded.task,
+        next_run = case when minion_schedules.cron = excluded.cron then minion_schedules.next_run else excluded.next_run end
+      returning id}, {json => $args}, $options->{attempts} // 1, $cron, $options->{expire}, $options->{lax} ? 1 : 0,
+    $name, $next, {json => $options->{notes} || {}}, $options->{priority} // 0, $options->{queue} // 'default', $task
+  )->hash->{id};
+}
+
 sub stats {
   my $self = shift;
 
@@ -369,6 +477,8 @@ sub stats {
       (select count(*) from minion_jobs where state = 'finished') as finished_jobs,
       (select count(*) from minion_jobs where state = 'inactive' and delayed > datetime('now')) as delayed_jobs,
       (select count(*) from minion_locks where expires > datetime('now')) as active_locks,
+      (select count(*) from minion_schedules where not paused) as schedules,
+      (select count(*) from minion_schedules where paused) as inactive_schedules,
       (select count(distinct(worker)) from minion_jobs where state = 'active') as active_workers,
       ifnull((select seq from sqlite_sequence where name = 'minion_jobs'), 0) as enqueued_jobs,
       (select count(*) from minion_workers) as workers,
@@ -392,12 +502,37 @@ sub unregister_worker {
   shift->sqlite->db->query('delete from minion_workers where id = ?', shift);
 }
 
+sub unschedule {
+  return shift->sqlite->db->query('delete from minion_schedules where name = ?', shift)->rows > 0;
+}
+
+sub _enqueue {
+  my ($self, $db, $task, $args, $options) = (shift, shift, shift, shift || [], shift || {});
+
+  return $db->query(
+    q{insert into minion_jobs
+       (args, attempts, delayed, expires, lax, notes, parents, priority, queue, task)
+      values (?, ?, datetime('now', ? || ' seconds'),
+      case when ? is not null then datetime('now', ? || ' seconds') end,
+      ?, ?, ?, ?, ?, ?)},
+    {json => $args}, $options->{attempts} // 1, $options->{delay} // 0,
+    @$options{qw(expire expire)}, $options->{lax} ? 1 : 0, {json => $options->{notes} || {}},
+    {json => ($options->{parents} || [])}, $options->{priority} // 0,
+    $options->{queue} // 'default', $task
+  )->last_insert_id;
+}
+
+sub _set_paused {
+  my ($self, $name, $paused) = @_;
+  return $self->sqlite->db->query('update minion_schedules set paused = ? where name = ?', $paused, $name)->rows > 0;
+}
+
 sub _try {
   my ($self, $id, $options) = @_;
 
   my $db = $self->sqlite->db;
   my $queues = $options->{queues} || ['default'];
-  my $tasks = [keys %{$self->minion->tasks}];
+  my $tasks = $options->{tasks} || [keys %{$self->minion->tasks}];
   return undef unless @$queues and @$tasks;
   my $queues_in = join ',', ('?')x@$queues;
   my $tasks_in = join ',', ('?')x@$tasks;
@@ -556,6 +691,12 @@ Do not dequeue jobs with a lower priority.
 
 One or more queues to dequeue jobs from, defaults to C<default>.
 
+=item tasks
+
+  tasks => ['foo', 'bar']
+
+One or more tasks to dequeue jobs for, defaults to all tasks.
+
 =back
 
 These fields are currently available:
@@ -588,6 +729,16 @@ Task name.
 
 =back
 
+=head2 dispatch_schedules
+
+  my $dispatched = $backend->dispatch_schedules;
+
+Enqueue jobs for all schedules whose firing time has been reached, advance their firing times to the next match, and
+return information about each dispatch as an array reference. A SQLite reserved lock is held for the duration of the
+dispatch cycle so that multiple workers ticking at the same time will not produce duplicate enqueues.
+
+Each entry contains C<id>, C<job> and C<name>.
+
 =head2 enqueue
 
   my $job_id = $backend->enqueue('foo');
@@ -617,16 +768,14 @@ Delay job for this many seconds (from now).
 
   expire => 300
 
-Job is valid for this many seconds (from now) before it expires. Note that this
-option is B<EXPERIMENTAL> and might change without warning!
+Job is valid for this many seconds (from now) before it expires.
 
 =item lax
 
   lax => 1
 
 Existing jobs this job depends on may also have transitioned to the C<failed>
-state to allow for it to be processed, defaults to C<false>. Note that this
-option is B<EXPERIMENTAL> and might change without warning!
+state to allow for it to be processed, defaults to C<false>.
 
 =item notes
 
@@ -646,6 +795,8 @@ transitioned to the state C<finished> before it can be processed.
   priority => 5
 
 Job priority, defaults to C<0>. Jobs with a higher priority get performed first.
+Priorities can be positive or negative, but should be in the range between
+C<100> and C<-100>.
 
 =item queue
 
@@ -915,11 +1066,157 @@ These fields are currently available:
 
 Epoch time this lock will expire.
 
+=item id
+
+  id => 1
+
+Lock id.
+
 =item name
 
   name => 'foo'
 
 Lock name.
+
+=back
+
+=head2 list_schedules
+
+  my $results = $backend->list_schedules($offset, $limit);
+  my $results = $backend->list_schedules($offset, $limit, {names => ['daily']});
+
+Returns information about schedules in batches.
+
+  # Get the total number of results (without limit)
+  my $num = $backend->list_schedules(0, 100)->{total};
+
+  # Check next firing time
+  my $results = $backend->list_schedules(0, 1, {names => ['daily']});
+  my $next    = $results->{schedules}[0]{next_run};
+
+These options are currently available:
+
+=over 2
+
+=item before
+
+  before => 23
+
+List only schedules before this id.
+
+=item ids
+
+  ids => ['23', '24']
+
+List only schedules with these ids.
+
+=item names
+
+  names => ['foo', 'bar']
+
+List only schedules with these names.
+
+=back
+
+These fields are currently available:
+
+=over 2
+
+=item args
+
+  args => ['foo', 'bar']
+
+Job arguments used for each enqueued job.
+
+=item attempts
+
+  attempts => 25
+
+Number of attempts each enqueued job will get.
+
+=item created
+
+  created => 784111777
+
+Epoch time the schedule was created.
+
+=item cron
+
+  cron => '0 9 * * 1-5'
+
+Cron expression.
+
+=item expire
+
+  expire => 300
+
+Expiration in seconds for each enqueued job.
+
+=item id
+
+  id => 23
+
+Schedule id.
+
+=item last_job
+
+  last_job => '10025'
+
+Id of the most recently enqueued job, or C<undef> if the schedule has not fired yet.
+
+=item last_run
+
+  last_run => 784111777
+
+Epoch time the schedule last fired, or C<undef> if it has not fired yet.
+
+=item lax
+
+  lax => 0
+
+Lax dependency setting for each enqueued job.
+
+=item name
+
+  name => 'daily'
+
+Schedule name.
+
+=item next_run
+
+  next_run => 784111777
+
+Epoch time the schedule will fire next.
+
+=item notes
+
+  notes => {foo => 'bar'}
+
+Hash reference with arbitrary metadata applied to each enqueued job.
+
+=item paused
+
+  paused => 0
+
+True if the schedule is paused and will not fire.
+
+=item priority
+
+  priority => 0
+
+Priority of each enqueued job.
+
+=item queue
+
+  queue => 'default'
+
+Queue each enqueued job is placed in.
+
+=item task
+
+  task => 'foo'
+
+Task name.
 
 =back
 
@@ -1033,6 +1330,13 @@ Change one or more metadata fields for a job. Setting a value to C<undef> will
 remove the field. It is currently an error to attempt to set a metadata field
 with a name containing the characters C<.>, C<[>, or C<]>.
 
+=head2 pause_schedule
+
+  my $bool = $backend->pause_schedule('daily');
+
+Pause a schedule by name so it stops firing until resumed. Returns true on success, false if the schedule does not
+exist.
+
 =head2 receive
 
   my $commands = $backend->receive($worker_id);
@@ -1096,6 +1400,12 @@ Reset only locks.
 
 =back
 
+=head2 resume_schedule
+
+  my $bool = $backend->resume_schedule('daily');
+
+Resume a previously paused schedule. Returns true on success, false if the schedule does not exist.
+
 =head2 retry_job
 
   my $bool = $backend->retry_job($job_id, $retries);
@@ -1124,16 +1434,14 @@ Delay job for this many seconds (from now).
 
   expire => 300
 
-Job is valid for this many seconds (from now) before it expires. Note that this
-option is B<EXPERIMENTAL> and might change without warning!
+Job is valid for this many seconds (from now) before it expires.
 
 =item lax
 
   lax => 1
 
 Existing jobs this job depends on may also have transitioned to the C<failed>
-state to allow for it to be processed, defaults to C<false>. Note that this
-option is B<EXPERIMENTAL> and might change without warning!
+state to allow for it to be processed, defaults to C<false>.
 
 =item parents
 
@@ -1152,6 +1460,58 @@ Job priority.
   queue => 'important'
 
 Queue to put job in.
+
+=back
+
+=head2 schedule
+
+  my $id = $backend->schedule('daily', '0 4 * * *', 'cleanup');
+  my $id = $backend->schedule('daily', '0 4 * * *', 'cleanup', [@args]);
+  my $id = $backend->schedule(
+    'daily', '0 4 * * *', 'cleanup', [@args], {priority => 5});
+
+Create or replace a schedule by unique name. Updating a schedule with the same cron expression preserves its current
+firing time; changing the expression recomputes it.
+
+These options are currently available:
+
+=over 2
+
+=item attempts
+
+  attempts => 25
+
+Number of times performing each enqueued job will be attempted, defaults to C<1>.
+
+=item expire
+
+  expire => 300
+
+Each enqueued job is valid for this many seconds before it expires.
+
+=item lax
+
+  lax => 1
+
+Existing jobs each enqueued job depends on may also have transitioned to the C<failed> state, defaults to C<false>.
+
+=item notes
+
+  notes => {foo => 'bar'}
+
+Hash reference with arbitrary metadata applied to each enqueued job.
+
+=item priority
+
+  priority => 5
+
+Priority of each enqueued job, defaults to C<0>.
+
+=item queue
+
+  queue => 'important'
+
+Queue to put each enqueued job in, defaults to C<default>.
 
 =back
 
@@ -1214,11 +1574,23 @@ Number of jobs in C<finished> state.
 
 Number of jobs in C<inactive> state.
 
+=item inactive_schedules
+
+  inactive_schedules => 100
+
+Number of schedules that are currently paused.
+
 =item inactive_workers
 
   inactive_workers => 100
 
 Number of workers that are currently not processing a job.
+
+=item schedules
+
+  schedules => 100
+
+Number of schedules that are currently active.
 
 =item uptime
 
@@ -1245,6 +1617,12 @@ Release a named lock.
   $backend->unregister_worker($worker_id);
 
 Unregister worker.
+
+=head2 unschedule
+
+  my $bool = $backend->unschedule('daily');
+
+Remove a schedule by name. Returns true on success, false if the schedule does not exist.
 
 =head1 BUGS
 
@@ -1394,3 +1772,30 @@ drop table minion_jobs;
 alter table minion_jobs_NEW rename to minion_jobs;
 create index if not exists minion_jobs_state_priority_id on minion_jobs (state, priority desc, id);
 create index minion_jobs_expires on minion_jobs (expires);
+
+-- 11 up
+create index if not exists minion_jobs_finished_state on minion_jobs (finished, state);
+create table if not exists minion_schedules (
+  id       integer not null primary key autoincrement,
+  args     text not null
+    check(json_valid(args) and json_type(args) = 'array') default '[]',
+  attempts integer not null default 1,
+  created  text not null default current_timestamp,
+  cron     text not null,
+  expire   integer,
+  last_job integer,
+  last_run text,
+  lax      boolean not null default 0,
+  name     text not null unique,
+  next_run text not null,
+  notes    text not null
+    check(json_valid(notes) and json_type(notes) = 'object') default '{}',
+  paused   boolean not null default 0,
+  priority integer not null default 0,
+  queue    text not null default 'default',
+  task     text not null
+);
+create index minion_schedules_next_run on minion_schedules (next_run) where not paused;
+
+-- 11 down
+drop table if exists minion_schedules;

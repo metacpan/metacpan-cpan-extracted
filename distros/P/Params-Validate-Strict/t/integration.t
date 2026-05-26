@@ -8,6 +8,7 @@
 use strict;
 use warnings;
 use Test::Most;
+use Test::Mockingbird qw(spy restore_all);
 use Encode     qw(encode);		# for byte-string tests
 use Scalar::Util qw(blessed looks_like_number);
 use List::Util 1.33;	# version check; called as List::Util::any() below to avoid
@@ -917,8 +918,341 @@ subtest 'Data::Processor compat: error_msg from schema used in failure' => sub {
 			},
 			input => { count => 0 },
 		)
-	} qr/must be at least|Widget validation error/,
-	  'error from members schema reported with context';
+	} qr/must be a positive|Widget validation error/, 'error from members schema reported with context';
 };
 
-done_testing;
+# ══════════════════════════════════════════════════════════════════════════════
+# Type: scalar — integration with Scalar::Util, Carp, and feature combinations
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'Scalar::Util + type scalar: blessed ref rejected' => sub {
+	ok(blessed($user), 'Int::User is blessed (Scalar::Util confirms)');
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => $user })
+	} qr/must be a scalar/, 'blessed ref rejected for type scalar';
+};
+
+subtest 'Scalar::Util + type scalar: plain values have no ref type and are all accepted' => sub {
+	for my $val (42, 'text', 0, '', '3.14') {
+		ok(!ref($val), "Scalar::Util: '$val' has no ref type");
+		my $r = validate_strict(
+			schema => { x => { type => 'scalar' } },
+			input  => { x => $val },
+		);
+		is($r->{x}, $val, "value '$val' returned unchanged by type scalar");
+	}
+};
+
+# Spy on the imported croak in Params::Validate::Strict to verify the exact
+# error path — the spy still calls the original so throws_ok still fires.
+subtest 'spy: croak called with must-be-a-scalar message when arrayref supplied' => sub {
+	my $spy = spy('Params::Validate::Strict::croak');
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => [1, 2, 3] })
+	} qr/must be a scalar/;
+	my @calls = $spy->();
+	restore_all();
+	ok(scalar @calls > 0,
+		'croak was called once when arrayref supplied for scalar type');
+	my $msg = join('', @{$calls[0]}[1 .. $#{$calls[0]}]);
+	like($msg, qr/must be a scalar/, 'croak message says "must be a scalar"');
+	like($msg, qr/ARRAY/,            'croak message identifies the ARRAY ref type');
+};
+
+subtest 'spy: croak called with HASH type name when hashref supplied' => sub {
+	my $spy = spy('Params::Validate::Strict::croak');
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => {} })
+	} qr/must be a scalar/;
+	my @calls = $spy->();
+	restore_all();
+	is(scalar @calls, 1, 'croak called exactly once for single-field scalar failure');
+	my $msg = join('', @{$calls[0]}[1 .. $#{$calls[0]}]);
+	like($msg, qr/HASH/, 'croak message names the HASH ref type');
+};
+
+subtest 'spy: croak called with CODE type name when coderef supplied' => sub {
+	my $spy = spy('Params::Validate::Strict::croak');
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => sub {} })
+	} qr/must be a scalar/;
+	my @calls = $spy->();
+	restore_all();
+	my $msg = join('', @{$calls[0]}[1 .. $#{$calls[0]}]);
+	like($msg, qr/CODE/, 'croak message names the CODE ref type');
+};
+
+subtest 'spy: croak not called when valid scalar supplied' => sub {
+	my $spy = spy('Params::Validate::Strict::croak');
+	lives_ok {
+		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => 'hello' })
+	} 'no croak for valid scalar';
+	my @calls = $spy->();
+	restore_all();
+	is(scalar @calls, 0, 'croak not called for valid scalar input');
+};
+
+subtest 'spy: croak arguments include module name and line number' => sub {
+	my $spy = spy('Params::Validate::Strict::croak');
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => [] })
+	} qr/must be a scalar/;
+	my @calls = $spy->();
+	restore_all();
+	my $msg = join('', @{$calls[0]}[1 .. $#{$calls[0]}]);
+	like($msg, qr/Params::Validate::Strict/, 'croak message includes module name');
+	like($msg, qr/line \d+/,                'croak message includes a line number');
+};
+
+# ── Stateful: schema reuse with scalar type ────────────────────────────────────
+
+subtest 'stateful: scalar schema reused across diverse plain values' => sub {
+	my $schema = { tag => { type => 'scalar' }, count => { type => 'scalar' } };
+
+	for my $pair (['alpha', 1], ['beta', 0], ['gamma', ''], ['delta', '3.14']) {
+		my ($tag, $count) = @$pair;
+		my $r = validate_strict(schema => $schema, input => { tag => $tag, count => $count });
+		is($r->{tag},   $tag,   "tag '$tag' returned correctly on schema reuse");
+		is($r->{count}, $count, "count '$count' returned correctly on schema reuse");
+	}
+};
+
+subtest 'stateful: scalar schema not mutated across a reject-then-accept cycle' => sub {
+	my $schema = { x => { type => 'scalar' } };
+
+	throws_ok {
+		validate_strict(schema => $schema, input => { x => [] })
+	} qr/must be a scalar/, 'first call: arrayref correctly rejected';
+
+	my $r = validate_strict(schema => $schema, input => { x => 'ok' });
+	is($r->{x}, 'ok', 'second call: valid scalar accepted after earlier rejection, schema intact');
+};
+
+# ── Concurrency: multiple schema instances must not interfere ─────────────────
+
+subtest 'concurrent instances: two schemas with scalar fields are fully independent' => sub {
+	my $schema_a = { x => { type => 'scalar', optional => 1, default => 'alpha_default' } };
+	my $schema_b = { x => { type => 'scalar', optional => 1, default => 'beta_default'  } };
+
+	# Interleave calls to both schemas
+	my $ra1 = validate_strict(schema => $schema_a, input => { x => 'A' });
+	my $rb1 = validate_strict(schema => $schema_b, input => { x => 'B' });
+	my $ra2 = validate_strict(schema => $schema_a, input => {});
+	my $rb2 = validate_strict(schema => $schema_b, input => {});
+
+	is($ra1->{x}, 'A',             'schema A: explicit value returned');
+	is($rb1->{x}, 'B',             'schema B: explicit value returned');
+	is($ra2->{x}, 'alpha_default', 'schema A default not contaminated by schema B');
+	is($rb2->{x}, 'beta_default',  'schema B default not contaminated by schema A');
+};
+
+subtest 'concurrent instances: rejection in one schema does not affect another' => sub {
+	my $schema_a = { val => { type => 'scalar' } };
+	my $schema_b = { val => { type => 'scalar' } };
+
+	throws_ok {
+		validate_strict(schema => $schema_a, input => { val => [] })
+	} qr/must be a scalar/, 'schema A correctly rejects arrayref';
+
+	my $r = validate_strict(schema => $schema_b, input => { val => 'fine' });
+	is($r->{val}, 'fine', 'schema B unaffected by schema A rejection');
+
+	my $r2 = validate_strict(schema => $schema_a, input => { val => 'also fine' });
+	is($r2->{val}, 'also fine', 'schema A still accepts valid scalar after earlier rejection');
+};
+
+subtest 'concurrent instances: three schemas round-robin, each with distinct defaults' => sub {
+	my @schemas = map {
+		my $default = "default_$_";
+		{ v => { type => 'scalar', optional => 1, default => $default } }
+	} 1 .. 3;
+
+	for my $i (0 .. 2) {
+		my $r = validate_strict(schema => $schemas[$i], input => {});
+		is($r->{v}, "default_" . ($i + 1),
+			"schema " . ($i + 1) . " returns its own default after round-robin use");
+	}
+};
+
+# ── Feature combinations ───────────────────────────────────────────────────────
+
+subtest 'combination: scalar + transform — transform applied before type check' => sub {
+	my $r = validate_strict(
+		schema => { code => {
+			type      => 'scalar',
+			transform => sub { uc $_[0] },
+		} },
+		input => { code => 'abc' },
+	);
+	is($r->{code}, 'ABC', 'transform uppercased the scalar value before validation');
+};
+
+subtest 'combination: scalar + transform returning ref — type check rejects result' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => {
+				type      => 'scalar',
+				transform => sub { [split /,/, $_[0]] },	# returns arrayref
+			} },
+			input => { x => 'a,b,c' },
+		)
+	} qr/must be a scalar/, 'transform-produced arrayref correctly rejected by scalar type';
+};
+
+subtest 'combination: scalar in union type [scalar, hashref]' => sub {
+	my $schema = { data => { type => ['scalar', 'hashref'] } };
+
+	my $r1 = validate_strict(schema => $schema, input => { data => 'flat value' });
+	is($r1->{data}, 'flat value', 'scalar branch of [scalar, hashref] union accepted');
+
+	my $r2 = validate_strict(schema => $schema, input => { data => { k => 'v' } });
+	is_deeply($r2->{data}, { k => 'v' }, 'hashref branch of [scalar, hashref] union accepted');
+
+	throws_ok {
+		validate_strict(schema => $schema, input => { data => [1, 2, 3] })
+	} qr/must be one of/, 'arrayref rejected by [scalar, hashref] union';
+};
+
+subtest 'combination: scalar + optional + default' => sub {
+	my $r1 = validate_strict(
+		schema => { tag => { type => 'scalar', optional => 1, default => 'unset' } },
+		input  => {},
+	);
+	is($r1->{tag}, 'unset', 'default applied for absent optional scalar');
+
+	my $r2 = validate_strict(
+		schema => { tag => { type => 'scalar', optional => 1, default => 'unset' } },
+		input  => { tag => 'custom' },
+	);
+	is($r2->{tag}, 'custom', 'supplied scalar wins over default');
+};
+
+subtest 'combination: scalar + callback — callback receives the raw scalar value' => sub {
+	my @cb_args;
+	validate_strict(
+		schema => { n => {
+			type     => 'scalar',
+			callback => sub { @cb_args = @_; 1 },
+		} },
+		input => { n => 'hello' },
+	);
+	is($cb_args[0], 'hello', 'callback receives the scalar value as first arg');
+	is(ref($cb_args[1]), 'HASH', 'callback receives the full input hashref as second arg');
+};
+
+# ── Real-world scenario: flexible metadata field ───────────────────────────────
+
+subtest 'scenario: metadata field accepting any plain scalar value' => sub {
+	my $schema = {
+		id       => { type => 'integer', min => 1 },
+		name     => { type => 'string',  min => 1 },
+		metadata => { type => 'scalar',  optional => 1 },
+	};
+
+	for my $meta ('a note', 42, 0, '', '3.14') {
+		my $r = validate_strict(
+			schema => $schema,
+			input  => { id => 1, name => 'item', metadata => $meta },
+		);
+		is($r->{metadata}, $meta, "metadata value '$meta' accepted as scalar");
+	}
+
+	for my $bad ([], {}, sub {}, $user) {
+		throws_ok {
+			validate_strict(
+				schema => $schema,
+				input  => { id => 1, name => 'item', metadata => $bad },
+			)
+		} qr/must be a scalar/, ref($bad) . " rejected as metadata for type scalar";
+	}
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Type: scalarref — integration with Scalar::Util, Carp, and feature combinations
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'Scalar::Util + type scalarref: plain values have ref type "" and are all rejected' => sub {
+	for my $val (42, 'text', 0, '', '3.14') {
+		ok(!ref($val), "Scalar::Util: '$val' has no ref type");
+		throws_ok {
+			validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => $val })
+		} qr/must be a scalar reference/, "plain value '$val' rejected by type scalarref";
+	}
+};
+
+subtest 'Scalar::Util + type scalarref: blessed scalar ref rejected with class name' => sub {
+	my $n = 99;
+	my $bref = bless \$n, 'MyScalar';
+	ok(ref($bref) eq 'MyScalar', 'blessed scalar ref has class name, not SCALAR');
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => $bref })
+	} qr/must be a scalar reference/, 'blessed scalar ref rejected (ref() returns class, not SCALAR)';
+};
+
+subtest 'spy: croak called with must-be-a-scalar-reference message when plain scalar supplied' => sub {
+	my $spy = spy('Params::Validate::Strict::croak');
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => 'hello' })
+	} qr/must be a scalar reference/;
+	my @calls = $spy->();
+	restore_all();
+	ok(scalar @calls > 0, 'croak was called when plain scalar supplied for scalarref type');
+	my $msg = join('', @{$calls[0]}[1 .. $#{$calls[0]}]);
+	like($msg, qr/must be a scalar reference/, 'croak message says "must be a scalar reference"');
+	like($msg, qr/plain scalar/,               'croak message identifies value as plain scalar');
+};
+
+subtest 'spy: croak called with ARRAY type name when arrayref supplied to scalarref' => sub {
+	my $spy = spy('Params::Validate::Strict::croak');
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => [] })
+	} qr/must be a scalar reference/;
+	my @calls = $spy->();
+	restore_all();
+	is(scalar @calls, 1, 'croak called exactly once for single-field scalarref failure');
+	my $msg = join('', @{$calls[0]}[1 .. $#{$calls[0]}]);
+	like($msg, qr/ARRAY/, 'croak message names the ARRAY ref type');
+};
+
+subtest 'spy: croak not called when valid scalarref supplied' => sub {
+	my $s = 'ok';
+	my $spy = spy('Params::Validate::Strict::croak');
+	lives_ok {
+		validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => \$s })
+	} 'no croak for valid scalarref';
+	my @calls = $spy->();
+	restore_all();
+	is(scalar @calls, 0, 'croak not called for valid scalarref input');
+};
+
+subtest 'combination: scalarref + optional + default' => sub {
+	my $default = \'default_value';
+	my $r1 = validate_strict(
+		schema => { ptr => { type => 'scalarref', optional => 1, default => $default } },
+		input  => {},
+	);
+	is($r1->{ptr}, $default, 'default scalar reference applied for absent optional scalarref');
+
+	my $supplied = \'custom';
+	my $r2 = validate_strict(
+		schema => { ptr => { type => 'scalarref', optional => 1, default => $default } },
+		input  => { ptr => $supplied },
+	);
+	is($r2->{ptr}, $supplied, 'supplied scalarref wins over default');
+};
+
+subtest 'scenario: pass-by-reference field for large data' => sub {
+	my $big = 'X' x 1_000_000;
+	my $schema = {
+		id   => { type => 'integer', min => 1 },
+		data => { type => 'scalarref' },
+	};
+	my $r = validate_strict(schema => $schema, input => { id => 1, data => \$big });
+	is(${$r->{data}}, $big, 'large scalar passed by reference survives validation unchanged');
+
+	throws_ok {
+		validate_strict(schema => $schema, input => { id => 1, data => $big })
+	} qr/must be a scalar reference/, 'plain (non-ref) large string rejected for scalarref type';
+};
+
+done_testing();

@@ -88,6 +88,15 @@ static inline void tstr_sv_ymd(pTHX_ SV *sv_y, SV *sv_m, SV *sv_d,
   *dp = tstr_sv_day(aTHX_ sv_d);
 }
 
+static inline void tstr_sv_yd(pTHX_ SV *sv_y, SV *sv_d,
+                               int *yp, int *dp) {
+  *yp = tstr_sv_year(aTHX_ sv_y);
+  int v = (int)SvIV(sv_d);
+  if (v < 1 || v > 366)
+    croak("Parameter 'day' is out of range [1, 366]");
+  *dp = v;
+}
+
 static inline HV * tstr_sv_parsed_to_hv(pTHX_ const tstr_parsed_t *p,
                                         tstr_sv_keys_t *k) {
   HV *hv = newHV();

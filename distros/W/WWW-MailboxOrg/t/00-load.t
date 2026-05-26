@@ -65,16 +65,27 @@ subtest 'WWW::MailboxOrg::JSONRPCResponse' => sub {
     ok(!$err_res->is_success);
 };
 
-subtest 'WWW::MailboxOrg::Types' => sub {
+subtest 'WWW::MailboxOrg::Types - gültige Werte' => sub {
     use WWW::MailboxOrg::Types qw(EmailAddress DomainName);
 
-    lives_ok {
-        my $check = EmailAddress->check('test@example.com');
-    };
+    ok( EmailAddress->check('test@example.com'),    'gültige E-Mail-Adresse' );
+    ok( EmailAddress->check('user+tag@sub.host.io'), 'E-Mail mit Plus und Subdomains' );
+    ok( DomainName->check('example.com'),           'gültige Domain' );
+    ok( DomainName->check('sub.example.co.uk'),     'Domain mit Subdomains' );
+};
 
-    lives_ok {
-        my $check = DomainName->check('example.com');
-    };
+subtest 'WWW::MailboxOrg::Types - ungültige Werte' => sub {
+    use WWW::MailboxOrg::Types qw(EmailAddress DomainName);
+
+    ok( !EmailAddress->check('not-an-email'),    '"not-an-email" wird abgelehnt' );
+    ok( !EmailAddress->check('@example.com'),    '"@example.com" wird abgelehnt' );
+    ok( !EmailAddress->check('user@'),           '"user@" wird abgelehnt' );
+    ok( !EmailAddress->check(''),                'leerer String wird abgelehnt' );
+
+    ok( !DomainName->check('not a domain'),      'Domain mit Leerzeichen abgelehnt' );
+    ok( !DomainName->check(''),                  'leerer String wird abgelehnt' );
+    ok( !DomainName->check('example'),           'TLD fehlt → abgelehnt' );
+    ok( !DomainName->check('-example.com'),      'führender Bindestrich → abgelehnt' );
 };
 
 subtest 'WWW::MailboxOrg::API::Base requires client' => sub {

@@ -10,11 +10,11 @@ BEGIN {
     package DBIx::QuickORM::DB::Fake;
     $INC{'DBIx/QuickORM/DB/Fake.pm'} = __FILE__;
     our @ISA = ('DBIx::QuickORM::DB');
-    use DBIx::QuickORM::Util::HashBase;
+    use Object::HashBase;
 
     package DBIx::QuickORM::Type::MyType;
     $INC{'DBIx/QuickORM/Type/MyType.pm'} = __FILE__;
-    use DBIx::QuickORM::Util::HashBase;
+    use Object::HashBase;
     use Role::Tiny::With qw/with/;
     with 'DBIx::QuickORM::Role::Type';
     sub qorm_inflate  { }
@@ -26,17 +26,17 @@ BEGIN {
     package DBIx::QuickORM::Row::ClassA;
     $INC{'DBIx/QuickORM/Row/ClassA.pm'} = __FILE__;
     our @ISA = ('DBIx::QuickORM::Row');
-    use DBIx::QuickORM::Util::HashBase;
+    use Object::HashBase;
 
     package DBIx::QuickORM::Row::ClassB;
     $INC{'DBIx/QuickORM/Row/ClassB.pm'} = __FILE__;
     our @ISA = ('DBIx::QuickORM::Row');
-    use DBIx::QuickORM::Util::HashBase;
+    use Object::HashBase;
 
     package DBIx::QuickORM::Plugin::My::Plugin;
     $INC{'DBIx/QuickORM/Plugin/My/Plugin.pm'} = __FILE__;
     our @ISA = ('DBIx::QuickORM::Plugin');
-    use DBIx::QuickORM::Util::HashBase;
+    use Object::HashBase;
 
     package DBIx::QuickORM::Handle::TestHandle;
     $INC{'DBIx/QuickORM/Handle/TestHandle.pm'} = __FILE__;

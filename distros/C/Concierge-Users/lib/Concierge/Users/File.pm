@@ -1,4 +1,4 @@
-package Concierge::Users::File v0.8.0;
+package Concierge::Users::File v0.8.2;
 use v5.36;
 use Carp qw/ croak /;
 use Text::CSV;
@@ -508,7 +508,7 @@ Concierge::Users
 
 =head1 VERSION
 
-v0.7.4
+v0.8.2
 
 =head1 SYNOPSIS
 

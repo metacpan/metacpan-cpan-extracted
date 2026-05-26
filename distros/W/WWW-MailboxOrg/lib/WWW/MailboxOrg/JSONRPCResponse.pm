@@ -4,8 +4,6 @@ package WWW::MailboxOrg::JSONRPCResponse;
 
 use Moo;
 
-our $VERSION = '0.001';
-
 
 has result => (
     is       => 'ro',
@@ -45,7 +43,7 @@ WWW::MailboxOrg::JSONRPCResponse - JSON-RPC 2.0 response object
 
 =head1 VERSION
 
-version 0.001
+version 0.100
 
 =head1 SYNOPSIS
 
@@ -81,7 +79,7 @@ Returns true if the response is successful.
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/getty/p5-www-mailboxorg/issues>.
+L<https://github.com/Getty/p5-www-mailboxorg/issues>.
 
 =head2 IRC
 

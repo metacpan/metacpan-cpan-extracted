@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 9;
+plan tests => 10;
 
 my @module_files = (
     'Time/Str.pm',
@@ -15,7 +15,8 @@ my @module_files = (
     'Time/Str/Time.pm',
     'Time/Str/Token.pm',
     'Time/Str/Util.pm',
-    'Time/TZif.pm'
+    'Time/TZif.pm',
+    'Time/TZif/POSIX.pm'
 );
 
 

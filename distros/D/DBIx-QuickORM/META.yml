@@ -3,38 +3,35 @@ abstract: 'Composable ORM builder.'
 author:
   - 'Chad Granum <exodist@cpan.org>'
 build_requires:
-  Carp::Always: '0'
+  Hash::Merge: '0'
   Parallel::Runner: '0'
-  Test2::Require::Module: '0'
-  Test2::Tools::QuickDB: '0.000037'
-  Test2::Tools::Subtest: '0'
+  Test2::Tools::QuickDB: '0.000042'
   Test2::Util: '0'
   Test2::V0: '0'
-  Test::More: '0'
   ok: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: DBIx-QuickORM
 requires:
+  Atomic::Pipe: '0.029'
   Carp: '0'
-  Class::Method::Modifiers: '0'
+  Compress::Zstd: '0'
   Cpanel::JSON::XS: '0'
   DBD::SQLite: '0'
   DBI: '0'
   Data::Dumper: '0'
   DateTime: '0'
   DateTime::Format::SQLite: '0'
-  Hash::Util: '0'
-  IO::Select: '0'
   Importer: '0'
   List::Util: '0'
   Module::Pluggable: '0'
+  Object::HashBase: '0.016'
   POSIX: '0'
   Role::Tiny: '0'
   Role::Tiny::With: '0'
@@ -45,7 +42,6 @@ requires:
   Sub::Util: '0'
   Time::HiRes: '0'
   UUID: '0.36'
-  base: '0'
   constant: '0'
   overload: '0'
   parent: '0'
@@ -53,7 +49,7 @@ requires:
 resources:
   bugtracker: https://github.com/exodist/DBIx-QuickORM/issues
   repository: https://github.com/exodist/DBIx-QuickORM/
-version: '0.000019'
-x_generated_by_perl: v5.40.1
+version: '0.000020'
+x_generated_by_perl: v5.42.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

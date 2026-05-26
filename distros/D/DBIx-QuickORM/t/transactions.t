@@ -3,7 +3,6 @@ use lib 't/lib';
 use Test2::V0 -target => 'DBIx::QuickORM', '!meta', '!pass';
 use DBIx::QuickORM;
 use DBIx::QuickORM::Test;
-use Carp::Always;
 
 do_for_all_dbs {
     my $db = shift;
@@ -47,7 +46,14 @@ do_for_all_dbs {
         subtest scope_end => sub {
             my $txn = $con->txn;
             ok($txn, "got txn object");
-            ok(lives { $txn = undef }, "Can undef rollbacked txn");
+
+            # Falling out of scope without an explicit commit/rollback rolls the
+            # transaction back as a safety net and warns once (no exception, no
+            # stack trace).
+            my $warnings = warnings { $txn = undef };
+            is(@$warnings, 1, "one warning when the txn fell out of scope");
+            like($warnings->[0], qr/fell out of scope and was rolled back/, "warned about the scope-exit rollback");
+
             ok(!$con->in_txn, "Not in a txn anymore");
         };
     };
@@ -104,6 +110,12 @@ do_for_all_dbs {
         ok($row_b->is_valid, "Row is valid");
         ok($row_b->is_stored, "Row is in storage");
 
+        # Nested transactions are implemented via savepoints; skip on dialects
+        # (DuckDB) that do not support them.
+      SKIP: {
+        skip "Dialect does not support savepoints (nested transactions)", 12
+            unless dialect_has_savepoints();
+
         my $row_c;
         $con->txn(sub {
             $con->txn(sub {
@@ -145,6 +157,7 @@ do_for_all_dbs {
             qr/This row is invalid/,
             "Cannot use an invalid row"
         );
+      }
     };
 
     subtest rollback => sub {
@@ -173,7 +186,9 @@ do_for_all_dbs {
         ok(defined($txn->result), "Result is defined");
         ok(!$txn->result, "Result is false");
         ok($txn->complete, "txn is complete");
-        is($txn->rolled_back, "${ \__FILE__ } line $line", "Recorded where the rollback happened");
+        ok($txn->rolled_back, "rolled_back is true");
+        ok(!$txn->committed, "committed is false");
+        ok(!defined($txn->exception), "no exception recorded for an explicit rollback");
 
         $warns = warnings {
             $con->txn(sub {
@@ -186,7 +201,7 @@ do_for_all_dbs {
         };
 
         is($warns, ["Transaction 'will fail 2' rolled back in ${ \__FILE__ } line $line (Cause I said so)\n"], "Got verbose warning");
-        is($txn->rolled_back, "Cause I said so in ${ \__FILE__ } line $line", "Recorded where the rollback happened");
+        ok($txn->rolled_back, "rolled_back is true");
     };
 
     subtest commit => sub {
@@ -215,7 +230,8 @@ do_for_all_dbs {
         ok(defined($txn->result), "Result is defined");
         ok($txn->result, "Result is true");
         ok($txn->complete, "txn is complete");
-        is($txn->committed, "${ \__FILE__ } line $line", "Recorded where the commit happened");
+        ok($txn->committed, "committed is true");
+        ok(!$txn->rolled_back, "rolled_back is false");
 
         $warns = warnings {
             $con->txn(sub {
@@ -228,7 +244,7 @@ do_for_all_dbs {
         };
 
         is($warns, ["Transaction 'will work 2' committed in ${ \__FILE__ } line $line (Cause I said so)\n"], "Got verbose warning");
-        is($txn->committed, "Cause I said so in ${ \__FILE__ } line $line", "Recorded where the commit happened");
+        ok($txn->committed, "committed is true");
 
     };
 
@@ -252,6 +268,7 @@ do_for_all_dbs {
 
         like($exception, qr{oops I did it again}, "Propogated exception");
         like($txn->errors, [qr{oops I did it again}], "Stored error");
+        like($txn->exception, qr{oops I did it again}, "Recorded the exception that forced the rollback");
 
         ok(!$row_e->is_valid,  "Row is not valid anymore");
         ok(!$row_e->is_stored, "Row is not in storage anymore");

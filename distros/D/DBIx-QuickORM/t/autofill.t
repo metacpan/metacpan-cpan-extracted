@@ -334,6 +334,61 @@ my %OVERRIDES = (
             },
         },
     },
+    DuckDB => {
+        tables => {
+            aliases => {
+                columns => {
+                    alias_id => {type => \'INTEGER'},
+                    light_id => {type => \'INTEGER'},
+                    name     => {type => \'VARCHAR'},
+                },
+                indexes => [
+                    {columns => ['alias_id'], name => 'aliases:pk',        unique => 1},
+                    {columns => ['name'],     name => 'aliases:uniq:name', unique => 1},
+                ],
+            },
+            complex_keys => {
+                columns => {
+                    name_a => {type => \'VARCHAR'},
+                    name_b => {type => \'VARCHAR'},
+                    name_c => {type => \'VARCHAR'},
+                },
+                indexes => [
+                    {columns => ['name_a', 'name_b'], name => 'complex_keys:pk', unique => 1},
+                    {columns => ['name_a', 'name_b', 'name_c'], name => 'complex_keys:uniq:name_a, name_b, name_c', unique => 1},
+                ],
+            },
+            complex_ref => {
+                columns => {
+                    name_a => {type => \'VARCHAR'},
+                    name_b => {type => \'VARCHAR'},
+                    extras => {type => \'VARCHAR'},
+                },
+                indexes => [
+                    {columns => ['name_a', 'name_b'], name => 'complex_ref:pk', unique => 1},
+                ],
+            },
+            light_by_name => {
+                columns => {
+                    name     => {type => \'VARCHAR'},
+                    alias_id => {type => \'INTEGER'},
+                    light_id => {type => \'INTEGER'},
+                    stamp    => {type => \'TIMESTAMP WITH TIME ZONE'},
+                    color    => {type => \'ENUM'},
+                },
+            },
+            lights => {
+                columns => {
+                    light_id => {type => \'INTEGER'},
+                    stamp    => {type => \'TIMESTAMP WITH TIME ZONE'},
+                    color    => {type => \'ENUM'},
+                },
+                indexes => [
+                    {columns => ['light_id'], name => 'lights:pk', unique => 1},
+                ],
+            },
+        },
+    },
 );
 
 $OVERRIDES{'MySQL::Percona'}   = $OVERRIDES{'MySQL'};

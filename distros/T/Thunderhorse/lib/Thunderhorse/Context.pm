@@ -1,5 +1,5 @@
 package Thunderhorse::Context;
-$Thunderhorse::Context::VERSION = '0.103';
+$Thunderhorse::Context::VERSION = '0.105';
 use v5.40;
 use Mooish::Base -standard;
 
@@ -9,6 +9,8 @@ use Thunderhorse::Request;
 use Thunderhorse::Response;
 use Thunderhorse::WebSocket;
 use Thunderhorse::SSE;
+use PAGI::Stash;
+use PAGI::Session;
 
 extends 'Gears::Context';
 
@@ -26,7 +28,6 @@ has field 'match' => (
 has field 'req' => (
 	(STRICT ? (isa => InstanceOf ['Thunderhorse::Request']) : ()),
 	default => sub ($self) { Thunderhorse::Request->new(context => $self) },
-	handles => [qw(stash)],
 );
 
 has field 'res' => (
@@ -46,6 +47,16 @@ has field 'sse' => (
 	(STRICT ? (isa => InstanceOf ['Thunderhorse::SSE']) : ()),
 	predicate => 1,
 	lazy => sub ($self) { Thunderhorse::SSE->new(context => $self) },
+);
+
+has field 'stash' => (
+	(STRICT ? (isa => InstanceOf ['PAGI::Stash']) : ()),
+	lazy => sub ($self) { PAGI::Stash->new($self) },
+);
+
+has field 'session' => (
+	(STRICT ? (isa => InstanceOf ['PAGI::Session']) : ()),
+	lazy => sub ($self) { PAGI::Session->new($self) },
 );
 
 has field '_consumed' => (
@@ -110,7 +121,8 @@ Thunderhorse::Context - Request handling context
 	async sub show ($self, $ctx, $id)
 	{
 		my $query_param = $ctx->req->query('name');
-		my $stashed_value = $ctx->stash->{key};
+		my $stashed_value = $ctx->stash->get('key');
+		my $session_value = $ctx->session->get('key');
 
 		await $ctx->res->text("Hello World");
 	}
@@ -176,6 +188,20 @@ Events scope.
 
 B<predicate:> C<has_sse>
 
+=head3 stash
+
+The L<PAGI::Stash> object for this context. Created lazily when first accessed.
+
+=head3 session
+
+The L<PAGI::Session> object for this context. Created lazily when first
+accessed.
+
+Note that for session to work properly, L<PAGI::Middleware::Session> must be
+used, or other middleware that will populate C<pagi.session> scope key.
+L<PAGI::Session> will throw an exception if C<pagi.session> is not present in
+scope.
+
 =head2 Methods
 
 =head3 new
@@ -184,10 +210,6 @@ B<predicate:> C<has_sse>
 
 Standard Mooish constructor. Consult L</Attributes> section for available
 constructor arguments.
-
-=head3 stash
-
-Delegated method for L<PAGI::Request/stash>
 
 =head3 scope
 

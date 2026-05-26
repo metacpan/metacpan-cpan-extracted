@@ -8,7 +8,12 @@ use lib 'lib';
 use File::Temp qw(tempdir);
 use File::Path qw(remove_tree);
 
+use DBI;
+use File::Spec;
+
 use Concierge::Sessions;
+use Concierge::Sessions::SQLite;
+use Concierge::Sessions::File;
 
 # Create temporary directory for test storage
 my $temp_dir = tempdir(CLEANUP => 1);
@@ -367,6 +372,239 @@ subtest 'File backend cleanup' => sub {
 
     ok($cleanup_result->{success}, 'File cleanup completed');
     ok(exists $cleanup_result->{deleted_count}, 'Returns deleted_count');
+};
+
+# ===================================================================
+# delete_user_session() manager-level tests
+# ===================================================================
+
+subtest 'delete_user_session() without user_id fails' => sub {
+    my $manager = Concierge::Sessions->new(
+        backend     => 'database',
+        storage_dir => $temp_dir,
+    );
+
+    my $result = $manager->delete_user_session();
+
+    is($result->{success}, 0, 'delete_user_session fails without user_id');
+    like($result->{message}, qr/user_id required/, 'Error message mentions user_id');
+};
+
+subtest 'delete_user_session() with valid user_id' => sub {
+    my $manager = Concierge::Sessions->new(
+        backend     => 'database',
+        storage_dir => $temp_dir,
+    );
+
+    $manager->new_session(user_id => 'user_del_by_uid');
+    my $result = $manager->delete_user_session('user_del_by_uid');
+
+    ok($result->{success}, 'delete_user_session succeeds');
+    ok(exists $result->{deleted_count}, 'Returns deleted_count');
+    is($result->{deleted_count}, 1, 'One session deleted');
+};
+
+subtest 'delete_user_session() for user with no sessions returns deleted_count 0' => sub {
+    my $manager = Concierge::Sessions->new(
+        backend     => 'database',
+        storage_dir => $temp_dir,
+    );
+
+    # User has no sessions - exercises 0E0 → 0 conversion in SQLite backend
+    my $result = $manager->delete_user_session('user_with_no_sessions_xyz');
+
+    ok($result->{success}, 'delete_user_session succeeds even for user with no sessions');
+    is($result->{deleted_count}, 0, 'deleted_count is 0 for user with no sessions');
+};
+
+# ===================================================================
+# SQLite backend direct error-path tests
+# ===================================================================
+
+subtest 'SQLite create_session without user_id' => sub {
+    my $backend = Concierge::Sessions::SQLite->new(storage_dir => $temp_dir);
+
+    my $result = $backend->create_session(session_timeout => 3600);
+
+    is($result->{success}, 0, 'create_session fails without user_id');
+    like($result->{message}, qr/Cannot create session without user_id/, 'Error message explains requirement');
+};
+
+subtest 'SQLite get_session_info without session_id' => sub {
+    my $backend = Concierge::Sessions::SQLite->new(storage_dir => $temp_dir);
+
+    my $result = $backend->get_session_info(undef);
+
+    is($result->{success}, 0, 'get_session_info fails without session_id');
+    like($result->{message}, qr/Session ID required/, 'Error message mentions session_id');
+};
+
+subtest 'SQLite update_session without session_id' => sub {
+    my $backend = Concierge::Sessions::SQLite->new(storage_dir => $temp_dir);
+
+    my $result = $backend->update_session(undef, { data => {} });
+
+    is($result->{success}, 0, 'update_session fails without session_id');
+    like($result->{message}, qr/Session ID required/, 'Error message mentions session_id');
+};
+
+subtest 'SQLite update_session without updates returns success' => sub {
+    my $backend = Concierge::Sessions::SQLite->new(storage_dir => $temp_dir);
+    my $create_result = $backend->create_session(
+        user_id         => 'sqlite_update_noop_user',
+        session_timeout => 3600,
+    );
+
+    my $result = $backend->update_session($create_result->{session_id}, undef);
+
+    ok($result->{success}, 'update_session with no updates returns success');
+};
+
+subtest 'SQLite delete_user_session without user_id' => sub {
+    my $backend = Concierge::Sessions::SQLite->new(storage_dir => $temp_dir);
+
+    my $result = $backend->delete_user_session(undef);
+
+    is($result->{success}, 0, 'delete_user_session fails without user_id');
+    like($result->{message}, qr/user_id required/, 'Error message mentions user_id');
+};
+
+# ===================================================================
+# File backend direct error-path tests
+# ===================================================================
+
+subtest 'File backend create_session without user_id' => sub {
+    my $file_dir = "$temp_dir/file_create_err";
+    my $backend = Concierge::Sessions::File->new(storage_dir => $file_dir);
+
+    my $result = $backend->create_session(session_timeout => 3600);
+
+    is($result->{success}, 0, 'File create_session fails without user_id');
+    like($result->{message}, qr/Cannot create session without user_id/, 'Error message explains requirement');
+};
+
+subtest 'File backend delete_session for non-existent file returns success' => sub {
+    my $file_dir = "$temp_dir/file_del_nonexist";
+    my $backend = Concierge::Sessions::File->new(storage_dir => $file_dir);
+
+    my $result = $backend->delete_session('session-id-that-does-not-exist');
+
+    ok($result->{success}, 'File delete_session returns success for non-existent session');
+};
+
+subtest 'File backend get_session_info without session_id' => sub {
+    my $file_dir = "$temp_dir/file_info_err";
+    my $backend = Concierge::Sessions::File->new(storage_dir => $file_dir);
+
+    my $result = $backend->get_session_info(undef);
+
+    is($result->{success}, 0, 'File get_session_info fails without session_id');
+    like($result->{message}, qr/Session ID required/, 'Error message mentions session_id');
+};
+
+subtest 'File backend update_session without session_id' => sub {
+    my $file_dir = "$temp_dir/file_upd_err";
+    my $backend = Concierge::Sessions::File->new(storage_dir => $file_dir);
+
+    my $result = $backend->update_session(undef, { data => {} });
+
+    is($result->{success}, 0, 'File update_session fails without session_id');
+    like($result->{message}, qr/Session ID required/, 'Error message mentions session_id');
+};
+
+subtest 'File backend update_session without updates returns success' => sub {
+    my $file_dir = "$temp_dir/file_upd_noop";
+    my $backend = Concierge::Sessions::File->new(storage_dir => $file_dir);
+    my $create_result = $backend->create_session(
+        user_id         => 'file_update_noop_user',
+        session_timeout => 3600,
+    );
+
+    my $result = $backend->update_session($create_result->{session_id}, undef);
+
+    ok($result->{success}, 'File update_session with no updates returns success');
+};
+
+subtest 'File backend delete_user_session without user_id' => sub {
+    my $file_dir = "$temp_dir/file_del_uid_err";
+    my $backend = Concierge::Sessions::File->new(storage_dir => $file_dir);
+
+    my $result = $backend->delete_user_session(undef);
+
+    is($result->{success}, 0, 'File delete_user_session fails without user_id');
+    like($result->{message}, qr/user_id required/, 'Error message mentions user_id');
+};
+
+# ===================================================================
+# File backend: edge cases in get_session_info and update_session
+# ===================================================================
+
+subtest 'File get_session_info with invalid JSON content' => sub {
+    my $file_dir = "$temp_dir/file_bad_json";
+    my $backend = Concierge::Sessions::File->new(storage_dir => $file_dir);
+
+    # Create a file with invalid JSON content using a known session ID
+    my $fake_id = 'aabbccdd' x 5;  # 40-char hex-like string
+    my $session_file = File::Spec->catfile($file_dir, $fake_id);
+    open my $fh, '>', $session_file or die "Cannot create test file: $!";
+    print $fh "{ this is not valid json }";
+    close $fh;
+
+    my $result = $backend->get_session_info($fake_id);
+
+    is($result->{success}, 0, 'get_session_info fails for invalid JSON');
+    like($result->{message}, qr/Invalid JSON/, 'Error message mentions Invalid JSON');
+};
+
+subtest 'File get_session_info with missing required fields (none present)' => sub {
+    my $file_dir = "$temp_dir/file_missing_fields";
+    my $backend = Concierge::Sessions::File->new(storage_dir => $file_dir);
+
+    # Valid JSON but missing session_id, created_at, expires_at
+    my $fake_id = 'bbccddee' x 5;  # 40-char hex-like string
+    my $session_file = File::Spec->catfile($file_dir, $fake_id);
+    open my $fh, '>', $session_file or die "Cannot create test file: $!";
+    print $fh '{"user_id":"test","data":{}}';
+    close $fh;
+
+    my $result = $backend->get_session_info($fake_id);
+
+    is($result->{success}, 0, 'get_session_info fails for file missing all system fields');
+    like($result->{message}, qr/missing system status fields/, 'Error message mentions missing fields');
+};
+
+subtest 'File get_session_info with missing expires_at field' => sub {
+    my $file_dir = "$temp_dir/file_missing_expiry";
+    my $backend = Concierge::Sessions::File->new(storage_dir => $file_dir);
+
+    # JSON with session_id and created_at but no expires_at
+    my $fake_id = 'ddeeff00' x 5;
+    my $session_file = File::Spec->catfile($file_dir, $fake_id);
+    open my $fh, '>', $session_file or die "Cannot create test file: $!";
+    print $fh '{"session_id":"test","created_at":1234567890,"data":{}}';
+    close $fh;
+
+    my $result = $backend->get_session_info($fake_id);
+
+    is($result->{success}, 0, 'get_session_info fails with missing expires_at');
+    like($result->{message}, qr/missing system status fields/, 'Error message mentions missing fields');
+};
+
+subtest 'File update_session with invalid JSON content in file' => sub {
+    my $file_dir = "$temp_dir/file_upd_bad_json";
+    my $backend = Concierge::Sessions::File->new(storage_dir => $file_dir);
+
+    # Create a file with invalid JSON
+    my $fake_id = 'ccddee11' x 5;
+    my $session_file = File::Spec->catfile($file_dir, $fake_id);
+    open my $fh, '>', $session_file or die "Cannot create test file: $!";
+    print $fh "{ this is not valid json }";
+    close $fh;
+
+    my $result = $backend->update_session($fake_id, { data => { key => 'val' } });
+
+    is($result->{success}, 0, 'update_session fails for file with invalid JSON');
+    like($result->{message}, qr/Invalid JSON/, 'Error message mentions Invalid JSON');
 };
 
 done_testing;

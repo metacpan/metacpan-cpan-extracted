@@ -30,6 +30,7 @@ t/integration.t
 t/lib/Test/Logger.pm
 t/lib/TestLogger.pm
 t/memberof.t
+t/mutant_killers.t
 t/nested.t
 t/notmemberof.t
 t/pod-cm.t

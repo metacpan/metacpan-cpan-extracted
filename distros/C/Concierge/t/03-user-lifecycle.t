@@ -4,13 +4,13 @@ use lib 'lib';
 use Test2::V0;
 use File::Temp qw(tempdir);
 
-use Concierge::Setup;
+use Concierge::Desk::Setup;
 use Concierge;
 
 # Setup test desk
 my $test_dir = tempdir(CLEANUP => 1);
 
-Concierge::Setup::build_quick_desk($test_dir, ['theme']);
+Concierge::Desk::Setup::build_quick_desk($test_dir, ['theme']);
 my $desk = Concierge->open_desk($test_dir);
 my $concierge = $desk->{concierge};
 
@@ -19,7 +19,7 @@ subtest 'Visitor lifecycle' => sub {
 
     ok $result->{success}, 'admit_visitor succeeds';
     ok $result->{is_visitor}, 'is_visitor flag set';
-    isa_ok $result->{user}, ['Concierge::User'], 'returns User object';
+    isa_ok $result->{user}, ['Concierge::Desk::User'], 'returns User object';
 
     my $visitor = $result->{user};
 
@@ -37,7 +37,7 @@ subtest 'Guest lifecycle' => sub {
 
     ok $result->{success}, 'checkin_guest succeeds';
     ok $result->{is_guest}, 'is_guest flag set';
-    isa_ok $result->{user}, ['Concierge::User'], 'returns User object';
+    isa_ok $result->{user}, ['Concierge::Desk::User'], 'returns User object';
 
     my $guest = $result->{user};
 
@@ -69,7 +69,7 @@ subtest 'Logged-in user lifecycle' => sub {
     });
 
     ok $login_result->{success}, 'login_user succeeds';
-    isa_ok $login_result->{user}, ['Concierge::User'], 'returns User object';
+    isa_ok $login_result->{user}, ['Concierge::Desk::User'], 'returns User object';
 
     my $user = $login_result->{user};
 
@@ -105,9 +105,9 @@ subtest 'Logged-in user status and access fields' => sub {
 };
 
 subtest 'enable_user without options argument' => sub {
-    use Concierge::User;
-    my $user = Concierge::User->enable_user('bare_user');
-    isa_ok $user, ['Concierge::User'], 'returns User object';
+    use Concierge::Desk::User;
+    my $user = Concierge::Desk::User->enable_user('bare_user');
+    isa_ok $user, ['Concierge::Desk::User'], 'returns User object';
     is $user->user_id(),    'bare_user', 'user_id set';
     is $user->is_visitor(), 1,           'is_visitor when no options given';
 };
@@ -128,7 +128,7 @@ subtest 'Guest to logged-in conversion' => sub {
     );
 
     ok $convert_result->{success}, 'login_guest succeeds';
-    isa_ok $convert_result->{user}, ['Concierge::User'], 'returns User object';
+    isa_ok $convert_result->{user}, ['Concierge::Desk::User'], 'returns User object';
 
     my $user = $convert_result->{user};
     is $user->user_id(), 'converter', 'converted to correct user';

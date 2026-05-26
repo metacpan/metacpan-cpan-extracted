@@ -3,10 +3,7 @@ package WWW::MailboxOrg::API::System;
 # ABSTRACT: System API (hello, test, capabilities)
 
 use Moo;
-use MooX::Singleton;
-use Carp qw(croak);
-
-our $VERSION = '0.001';
+with 'WWW::MailboxOrg::Role::API';
 
 has client => (
     is       => 'ro',
@@ -14,26 +11,14 @@ has client => (
     weak_ref => 1,
 );
 
-sub _rpc {
-    my ($self, $method, @params) = @_;
-    my $client = $self->client or croak "No client set";
-    return $client->call($method, @params);
-}
 
-sub hello {
-    my ($self) = @_;
-    return $self->_rpc('hello');
-}
+sub hello       { shift->_rpc('hello') }
 
-sub test {
-    my ($self) = @_;
-    return $self->_rpc('test');
-}
 
-sub capabilities {
-    my ($self) = @_;
-    return $self->_rpc('capabilities');
-}
+sub test        { shift->_rpc('test') }
+
+
+sub capabilities { shift->_rpc('capabilities') }
 
 1;
 
@@ -49,11 +34,7 @@ WWW::MailboxOrg::API::System - System API (hello, test, capabilities)
 
 =head1 VERSION
 
-version 0.001
-
-=head1 NAME
-
-WWW::MailboxOrg::API::System - System API (hello, test, capabilities)
+version 0.100
 
 =head2 hello
 
@@ -73,14 +54,12 @@ Test API connection. Returns test result.
 
 Get API capabilities. Returns capability list.
 
-=cut
-
 =head1 SUPPORT
 
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/getty/p5-www-mailboxorg/issues>.
+L<https://github.com/Getty/p5-www-mailboxorg/issues>.
 
 =head2 IRC
 

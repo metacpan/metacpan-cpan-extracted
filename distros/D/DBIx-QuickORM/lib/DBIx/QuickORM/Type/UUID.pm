@@ -2,7 +2,7 @@ package DBIx::QuickORM::Type::UUID;
 use strict;
 use warnings;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000020';
 
 use Role::Tiny::With qw/with/;
 with 'DBIx::QuickORM::Role::Type';
@@ -13,21 +13,47 @@ use Scalar::Util qw/blessed/;
 use UUID qw/uuid7 parse unparse/;
 use Carp qw/croak/;
 
-sub new { uuid7() }
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::QuickORM::Type::UUID - UUID inflate/deflate type.
+
+=head1 DESCRIPTION
+
+A L<DBIx::QuickORM::Role::Type> implementation for UUID columns. Values
+inflate to the canonical hyphenated string form. Deflation honors the
+column affinity: C<string> produces the hyphenated form, C<binary>
+produces the packed 16-byte form.
+
+C<qorm_affinity> picks C<string> for native C<uuid> types (and by default),
+C<binary> for binary/blob storage. C<qorm_sql_type> uses a native C<uuid>
+type when available, otherwise C<VARCHAR(36)>. When registered for autofill
+this type claims the C<uuid> SQL type and any column whose name contains
+"uuid".
+
+C<new> returns a fresh v7 UUID string; it is handy as a Perl default for a
+UUID column.
+
+=cut
+
+sub new { shift; uuid7() }
 
 sub qorm_inflate {
     my $params = parse_conflate_args(@_);
-    my $val    = $params->{value} or return undef;
-    my $class  = $params->{class} // __PACKAGE__;
-
+    my $val    = $params->{value};
     return undef unless defined $val;
+    my $class  = $params->{class} // __PACKAGE__;
 
     return $class->looks_like_uuid($val) // $class->looks_like_bin($val) // croak "'$val' does not look like a UUID";
 }
 
 sub qorm_deflate {
     my $params   = parse_conflate_args(@_);
-    my $val      = $params->{value}    or return undef;
+    my $val      = $params->{value};
+    return undef unless defined $val;
     my $affinity = $params->{affinity} or croak "Could not determine affinity";
     my $class    = $params->{class} // __PACKAGE__;
 
@@ -91,6 +117,8 @@ sub qorm_sql_type {
     return 'VARCHAR(36)';
 }
 
+# looks_like_bin / looks_like_uuid take their argument via pop so they work
+# both as functions (looks_like_uuid($v)) and as methods ($class->looks_like_uuid($v)).
 sub looks_like_bin {
     my $in = pop;
     use bytes;
@@ -102,7 +130,9 @@ sub looks_like_bin {
 
 sub looks_like_uuid {
     my $in = pop;
-    return $in if $in && $in =~ m/^[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}$/i;
+    # Return the canonical (lowercase) hyphenated form so inflation and
+    # comparison are case-insensitive and match the form produced from binary.
+    return lc($in) if $in && $in =~ m/^[A-F0-9]{8}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{4}-[A-F0-9]{12}$/i;
     return undef;
 }
 
@@ -130,3 +160,37 @@ sub qorm_register_type {
 }
 
 1;
+
+__END__
+
+=head1 SOURCE
+
+The source code repository for DBIx::QuickORM can be found at
+L<https://github.com/exodist/DBIx-QuickORM>.
+
+=head1 MAINTAINERS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut

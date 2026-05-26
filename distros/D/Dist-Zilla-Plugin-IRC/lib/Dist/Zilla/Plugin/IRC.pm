@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::IRC;
-$Dist::Zilla::Plugin::IRC::VERSION = '0.001';
+$Dist::Zilla::Plugin::IRC::VERSION = '0.002';
 use 5.020;
 use warnings;
 
@@ -39,7 +39,7 @@ around BUILDARGS => sub($orig, $class, $args) {
 
 my %web_for = (
 	'irc.libera.org'    => 'https://web.libera.chat/#%s',
-	'chat.freenode.org' => 'http://webchat.freenode.net/?channels=%23'
+	'chat.freenode.org' => 'http://webchat.freenode.net/?channels=%%23%s',
 );
 
 sub metadata($self) {
@@ -71,7 +71,7 @@ Dist::Zilla::Plugin::IRC - Add a IRC channel resource to your dist
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

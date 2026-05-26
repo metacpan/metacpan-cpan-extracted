@@ -1,5 +1,12 @@
 Revision history for Concierge-Users
 
+v0.8.2  2026-05-25
+    - Replace real personal data in examples/__DATA__ with mock data
+      (fictional names, 555- phone numbers, @example.com addresses)
+
+v0.8.1  2026-05-25
+    - Expand test coverage across all test files
+
 v0.8.0  2026-02-15
     - Fixed distribution issue with MANIFEST.SKIP
 

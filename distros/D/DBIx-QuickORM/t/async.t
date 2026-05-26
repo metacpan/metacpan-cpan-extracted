@@ -1,6 +1,5 @@
 use Test2::V0 -target => 'DBIx::QuickORM', '!meta', '!pass';
 use DBIx::QuickORM;
-use Carp::Always;
 
 use Scalar::Util qw/blessed/;
 use Time::HiRes qw/sleep/;
@@ -11,8 +10,8 @@ use DBIx::QuickORM::Test;
 do_for_all_dbs {
     my $db = shift;
 
-    if (curdialect() =~ m/sqlite/i) {
-        skip_all "Skipping for sqlite...";
+    if (curdialect() =~ m/sqlite|duckdb/i) {
+        skip_all "Skipping for sqlite/duckdb (no async support)...";
         return;
     }
 

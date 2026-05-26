@@ -2,7 +2,7 @@ package DBIx::QuickORM::Connection::RowData;
 use strict;
 use warnings;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000020';
 
 use Carp qw/confess croak carp/;
 use List::Util qw/first/;
@@ -23,15 +23,114 @@ our @EXPORT_OK = qw{
     ROW_DATA
 };
 
-use DBIx::QuickORM::Util::HashBase qw{
+use Object::HashBase qw{
     +connection
     +source
     +stack
     +invalid
 };
 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::QuickORM::Connection::RowData - Per-row state tracked across a
+transaction stack.
+
+=head1 DESCRIPTION
+
+Holds the mutable state behind a single row for one connection: the stored
+(as-fetched) data, pending (unsaved) changes, and a desync map flagging
+fields whose stored value changed underneath a pending edit. The state is
+kept as a stack of frames keyed by transaction, so that committing or rolling
+back a transaction merges or discards the right frame.
+
+A row becomes invalid when the transaction it was created in rolls back, or
+when explicitly invalidated; an invalid row has an empty stack and a reason.
+
+The state-frame keys (C<STORED>, C<PENDING>, C<DESYNC>, C<TRANSACTION>,
+C<ROW_DATA>) are available as exported constants.
+
+=head1 SYNOPSIS
+
+    my $data = DBIx::QuickORM::Connection::RowData->new(
+        source     => $source,
+        connection => $connection,
+    );
+
+    my $stored  = $data->stored_data;
+    my $pending = $data->pending_data;
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item connection
+
+The owning L<DBIx::QuickORM::Connection>, stored internally as a coderef and
+returned resolved by the C<connection> method.
+
+=item source
+
+The row's source object (consumes C<DBIx::QuickORM::Role::Source>), stored
+internally as a coderef and returned resolved by the C<source> method.
+
+=item stack
+
+Arrayref of state frames, newest first. Empty when the row is invalid.
+
+=item invalid
+
+The reason string when the row has been invalidated.
+
+=back
+
+=head1 EXPORTS
+
+Nothing is exported by default. The following state-frame key constants may
+be imported by name:
+
+=over 4
+
+=item STORED
+
+=item PENDING
+
+=item DESYNC
+
+=item TRANSACTION
+
+=item ROW_DATA
+
+=back
+
+=head1 PUBLIC METHODS
+
+=over 4
+
+=item $bool = $data->valid
+
+True when the row has a live active state.
+
+=item $reason = $data->invalid
+
+False when the row is valid, otherwise the invalidation reason string.
+
+=cut
+
 sub valid      { $_[0]->active(no_fatal => 1) ? 1 : 0 }
 sub invalid    { $_[0]->active(no_fatal => 1) ? 0 : ($_[0]->{+INVALID} //= 'Unknown') }
+
+=pod
+
+=item $data->invalidate(reason => $why)
+
+Marks the row invalid with the given reason (defaulting to the call site),
+clears the state stack, and warns if pending data was discarded.
+
+=cut
 
 sub invalidate {
     my $self = shift;
@@ -55,6 +154,30 @@ sub invalidate {
 
     $self->{+STACK} = [];
 }
+
+=pod
+
+=item $source = $data->source
+
+The resolved source object.
+
+=item $connection = $data->connection
+
+The resolved connection object.
+
+=item $href = $data->stored_data
+
+=item $href = $data->pending_data
+
+=item $href = $data->desync_data
+
+=item $txn = $data->transaction
+
+The respective fields of the active state frame.
+
+=back
+
+=cut
 
 sub source     { $_[0]->{+SOURCE}->() }
 sub connection { $_[0]->{+CONNECTION}->() }
@@ -101,6 +224,20 @@ sub init {
     $self->{+STACK} //= [];
 }
 
+=pod
+
+=over 4
+
+=item $frame = $data->active
+
+=item $frame = $data->active(no_fatal => 1)
+
+Returns the active (top) state frame, first resolving the stack: completed
+transactions are merged down or discarded as appropriate. Confesses when the
+row is invalid unless C<no_fatal> is set, in which case it returns nothing.
+
+=cut
+
 sub active {
     my $self = shift;
     my %params = @_;
@@ -132,6 +269,18 @@ sub active {
     confess "This row is invalid (Reason: $self->{+INVALID})";
 }
 
+=pod
+
+=item $data->change_state($state)
+
+Applies a new state frame: merges it into the active frame when they share a
+transaction (or neither has one), otherwise pushes it as a new frame. Croaks
+when asked to merge down a rolled-back transaction.
+
+=back
+
+=cut
+
 sub change_state {
     my $self = shift;
     my ($state) = @_;
@@ -148,7 +297,7 @@ sub change_state {
 
     my $merge = 0;
     $merge ||= !($row_txn || $state_txn);
-    $merge ||= $state_txn == $row_txn;
+    $merge ||= $state_txn && $row_txn && $state_txn == $row_txn;
 
     if ($merge) {
         # If the transactions are the same, or if there are no txns for eather, just merge.
@@ -161,6 +310,19 @@ sub change_state {
     return $self;
 }
 
+=pod
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item $data->_up_state($state)
+
+Pushes a new state frame onto the stack. Croaks when there is already a base
+state and the new frame carries no transaction.
+
+=cut
+
 sub _up_state {
     my $self = shift;
     my ($state) = @_;
@@ -170,6 +332,17 @@ sub _up_state {
     unshift @$stack => $state;
     return $self;
 }
+
+=pod
+
+=item $data->_merge_state($merge)
+
+Merges a state frame into the active frame, reconciling stored, pending, and
+desync fields.
+
+=back
+
+=cut
 
 sub _merge_state {
     my $self = shift;
@@ -206,8 +379,8 @@ sub _merge_state {
 
     my $desync = $merge->{+DESYNC};
     if (my $pending = $merge->{+PENDING}) {
-        $into->{+PENDING} = $into->{+PENDING} ? {%{$self->{+PENDING}}, %$pending} : $pending;
-        $into->{+DESYNC}  = $into->{+DESYNC}  ? {%{$self->{+DESYNC}},  %$desync}  : $desync if $desync;
+        $into->{+PENDING} = $into->{+PENDING} ? {%{$into->{+PENDING}}, %$pending} : $pending;
+        $into->{+DESYNC}  = $into->{+DESYNC}  ? {%{$into->{+DESYNC}},  %$desync}  : $desync if $desync;
     }
     elsif (exists $merge->{+PENDING}) {
         delete $into->{+PENDING};
@@ -218,6 +391,22 @@ sub _merge_state {
 
     return $self;
 }
+
+=pod
+
+=head1 PUBLIC METHODS
+
+=over 4
+
+=item $bool = $data->compare_field($field, \%a, \%b)
+
+Returns true when the named field compares equal between two field hashes,
+using the field's type comparator when one exists and otherwise comparing by
+affinity. Treats existence and definedness mismatches as unequal.
+
+=back
+
+=cut
 
 sub compare_field {
     my $self = shift;
@@ -250,3 +439,37 @@ sub compare_field {
 }
 
 1;
+
+__END__
+
+=head1 SOURCE
+
+The source code repository for DBIx::QuickORM can be found at
+L<https://github.com/exodist/DBIx-QuickORM>.
+
+=head1 MAINTAINERS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut

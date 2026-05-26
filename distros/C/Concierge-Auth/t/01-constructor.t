@@ -61,4 +61,30 @@ subtest 'new with nonexistent directory croaks' => sub {
     like( $died, qr/Can't/, 'error message mentions failure' );
 };
 
+# --- new({ file => $existing_file }) opens existing file (does not truncate) ---
+
+subtest 'new with existing file' => sub {
+    my $dir  = tempdir( CLEANUP => 1 );
+    my $file = "$dir/auth.pwd";
+
+    # Create the file and put a record in it
+    open my $fh, '>', $file or die "Cannot create test file: $!";
+    print $fh "alice\tsomehash\t|\n";
+    close $fh;
+
+    ok( -e $file, 'file exists before new()' );
+
+    my $auth = Concierge::Auth->new({ file => $file });
+
+    ok( defined $auth, 'constructor returns defined value for existing file' );
+    isa_ok( $auth, ['Concierge::Auth'], 'object is a Concierge::Auth' );
+    ok( -e $file, 'file still exists after new()' );
+
+    # Existing content must not have been erased
+    open my $rfh, '<', $file or die $!;
+    my $contents = do { local $/; <$rfh> };
+    close $rfh;
+    like( $contents, qr/alice/, 'existing file content is preserved' );
+};
+
 done_testing;

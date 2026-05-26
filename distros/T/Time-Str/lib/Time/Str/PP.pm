@@ -19,10 +19,13 @@ use Exporter qw[import];
 
   our @EXPORT_OK = qw[ month_days
                        leap_year
+                       nth_dow_in_month
+                       yd_to_md
                        rdn_to_dow
                        rdn_to_ymd
                        resolve_century
                        valid_ymd
+                       ymd_to_doy
                        ymd_to_dow
                        ymd_to_rdn ];
 
@@ -76,6 +79,50 @@ use Exporter qw[import];
        + $d + ((979 * $m - 2918) >> 5) - 306;
    }
 
+   {
+     my @CumDays = (0,  0,  31,  59,  90, 120, 151, 
+                      181, 212, 243, 273, 304, 334);
+
+     sub ymd_to_doy {
+       @_ == 3 or croak q/Usage: ymd_to_doy(year, month, day)/;
+       my ($y, $m, $d) = @_;
+
+       ($y >= 1 && $y <= 9999)
+         or croak q/Parameter 'year' is out of range [1, 9999]/;
+       ($m >= 1 && $m <= 12)
+         or croak q/Parameter 'month' is out of range [1, 12]/;
+       ($d >= 1 && $d <= 31)
+         or croak q/Parameter 'day' is out of range [1, 31]/;
+
+       return $CumDays[$m] + $d + ($m > 2 && leap_year($y));
+     }
+   }
+
+   sub yd_to_md {
+     @_ == 2 or croak q/Usage: yd_to_md(year, day)/;
+     my ($y, $doy) = @_;
+
+     ($y >= 1 && $y <= 9999)
+       or croak q/Parameter 'year' is out of range [1, 9999]/;
+     ($doy >= 1 && $doy <= 366)
+       or croak qq/Parameter 'day' is out of range [1, 366]/;
+
+     use integer;
+     my $jan_feb = 59 + leap_year($y);
+     if ($doy <= 31) {
+       return (1, $doy);
+     }
+     elsif ($doy <= $jan_feb) {
+       return (2, $doy - 31);
+     }
+     else {
+       my $C = $doy - $jan_feb;
+       my $m = (535 * $C + 48950) >> 14;
+       my $d = $C - ((979 * $m - 2918) >> 5);
+       return ($m, $d);
+     }
+   }
+
    sub rdn_to_ymd {
      @_ == 1 or croak q/Usage: rdn_to_ymd(rdn)/;
      my ($rdn) = @_;
@@ -125,6 +172,30 @@ use Exporter qw[import];
          $y--;
        }
        return 1 + ($y + $y/4 - $y/100 + $y/400 + $DayOffset[$m] + $d) % 7;
+     }
+   }
+
+   sub nth_dow_in_month {
+     @_ == 4 or croak q/Usage: nth_dow_in_month(year, month, ord, dow)/;
+     my ($y, $m, $ord, $dow) = @_;
+
+     ($y >= 1 && $y <= 9999)
+       or croak q/Parameter 'year' is out of range [1, 9999]/;
+     ($m >= 1 && $m <= 12)
+       or croak q/Parameter 'month' is out of range [1, 12]/;
+     ($ord >= -4 && $ord <= 4 && $ord != 0)
+       or croak q/Parameter 'ord' is out of range [-4, -1] or [1, 4]/;
+     ($dow >= 1 && $dow <= 7)
+       or croak q/Parameter 'dow' is out of range [1, 7]/;
+
+     if ($ord > 0) {
+       my $days = 7 * --$ord;
+       return 1 + $days + ($dow - ymd_to_dow($y, $m, 1)) % 7;
+     }
+     else {
+       my $days  = 7 * ++$ord;
+       my $mdays = month_days($y, $m);
+       return $mdays + $days - (ymd_to_dow($y, $m, $mdays) - $dow) % 7;
      }
    }
 
@@ -322,7 +393,9 @@ use Exporter qw[import];
   package
   Time::Str::PP::Time; # hide from PAUSE/indexers
 
-  our @EXPORT_OK = qw[ timegm_posix
+  our @EXPORT_OK = qw[ gmtime_modern
+                       gmtime_year
+                       timegm_posix
                        timegm_modern
                        valid_hms
                        valid_hms60 ];
@@ -330,7 +403,9 @@ use Exporter qw[import];
   use Carp     qw[croak];
   use Exporter qw[import];
 
-  use constant RDN_UNIX_EPOCH => 719163; # 1970-01-01
+  use constant MIN_TIME       => -62135596800; # 0001-01-01T00:00:00Z
+  use constant MAX_TIME       => 253402300799; # 9999-12-31T23:59:59Z
+  use constant RDN_UNIX_EPOCH => 719163;       # 1970-01-01
 
   sub valid_hms {
     @_ == 3 or croak q/Usage: valid_hms(hour, minute, second)/;
@@ -379,7 +454,34 @@ use Exporter qw[import];
   sub timegm_posix {
     @_ == 6 or croak q/Usage: timegm_posix(sec, min, hour, mday, mon, year)/;
     my ($S, $M, $H, $d, $m, $y) = @_;
+    ($y >= -1899 && $y <= 8099)
+      or croak q/Parameter 'year' is out of range [-1899, 8099]/;
+    ($m >= 0 && $m <= 11)
+      or croak q/Parameter 'month' is out of range [0, 11]/;
     return timegm_modern($S, $M, $H, $d, $m + 1, $y + 1900);
+  }
+
+  sub gmtime_modern {
+    @_ == 1 or croak q/Usage: gmtime_modern(time)/;
+    my ($time) = @_;
+
+    ($time >= MIN_TIME && $time <= MAX_TIME)
+      or croak q/Parameter 'time' is out of range/;
+
+    my @tm = gmtime($time);
+    $tm[5] += 1900;
+    $tm[4] += 1;
+    return @tm;
+  }
+
+  sub gmtime_year {
+    @_ == 1 or croak q/Usage: gmtime_year(time)/;
+    my ($time) = @_;
+
+    ($time >= MIN_TIME && $time <= MAX_TIME)
+      or croak q/Parameter 'time' is out of range/;
+
+    return (gmtime($time))[5] + 1900;
   }
 }
 
@@ -388,6 +490,7 @@ use Exporter qw[import];
   Time::Str::PP::Util; # hide from PAUSE/indexers
 
   our @EXPORT_OK = qw[ lower_bound
+                       range_bounds
                        upper_bound ];
 
   use Carp     qw[croak];
@@ -408,6 +511,23 @@ use Exporter qw[import];
       else                           { $hi = $mid     }
     }
     return $lo;
+  }
+
+  sub range_bounds {
+    @_ == 3 or croak q/Usage: range_bounds(array, min_value, max_value)/;
+    my ($array, $min_value, $max_value) = @_;
+
+    ref $array eq 'ARRAY'
+      or croak q/Parameter 'array' must be an array reference/;
+    ($min_value <= $max_value)
+      or croak q/Parameter 'min_value' must not exceed 'max_value'/;
+
+    my $lo = lower_bound($array, $min_value);
+    my $hi = $lo;
+    while ($hi < @$array && $array->[$hi] <= $max_value) {
+      $hi++;
+    }
+    return ($lo, $hi);
   }
 
   sub upper_bound {

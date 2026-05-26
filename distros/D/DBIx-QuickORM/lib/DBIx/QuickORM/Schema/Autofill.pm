@@ -2,18 +2,70 @@ package DBIx::QuickORM::Schema::Autofill;
 use strict;
 use warnings;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000020';
 
-use List::Util qw/first/;
 use DBIx::QuickORM::Util qw/load_class/;
 
-use DBIx::QuickORM::Util::HashBase qw{
+use Object::HashBase qw{
     <types
     <affinities
     <hooks
     <autorow
     +skip
 };
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::QuickORM::Schema::Autofill - Autofill configuration for schema introspection.
+
+=head1 DESCRIPTION
+
+Holds the type maps, affinity callbacks, and hooks used while autofilling a
+schema from a live database. It maps introspected SQL types to
+L<DBIx::QuickORM::Type> classes, runs user-supplied hooks at well-known points,
+and generates field and link accessors on autovivified row classes.
+
+=head1 SYNOPSIS
+
+    my $autofill = DBIx::QuickORM::Schema::Autofill->new(
+        types      => {...},
+        affinities => {...},
+        hooks      => {...},
+    );
+
+    $autofill->define_autorow($row_class, $table);
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item types
+
+Hashref mapping SQL type names to type objects/classes.
+
+=item affinities
+
+Hashref mapping affinity names to arrayrefs of callbacks.
+
+=item hooks
+
+Hashref mapping hook names to arrayrefs of callbacks.
+
+=item autorow
+
+The autovivified row class configuration.
+
+=item skip
+
+Nested hashref describing what to skip during autofill.
+
+=back
+
+=cut
 
 my %HOOKS = (
     column         => 1,
@@ -32,7 +84,31 @@ my %HOOKS = (
     field_accessor => 1,
 );
 
-sub is_valid_hook { $HOOKS{$_[-1]} ? 1 : 0 }
+=pod
+
+=head1 PUBLIC METHODS
+
+=over 4
+
+=item $bool = $autofill->is_valid_hook($name)
+
+True if C<$name> is a recognized hook name.
+
+=cut
+
+sub is_valid_hook {
+    my ($self, $hook) = @_;
+    return $HOOKS{$hook} ? 1 : 0;
+}
+
+=pod
+
+=item $out = $autofill->hook($name, \%args, $seed)
+
+Run every callback registered for the named hook, threading the result through
+each call starting from C<$seed>, and return the final value.
+
+=cut
 
 sub hook {
     my $self = shift;
@@ -41,6 +117,15 @@ sub hook {
     $out = $_->(%$args, autofill => $self) for @{$self->{+HOOKS}->{$hook} // []};
     return $out;
 }
+
+=pod
+
+=item $val = $autofill->skip(@path)
+
+Walk the nested C<skip> hashref along C<@path>, returning the value found or
+false (0) as soon as any step is missing.
+
+=cut
 
 sub skip {
     my $self = shift;
@@ -51,6 +136,16 @@ sub skip {
     }
     return $from;
 }
+
+=pod
+
+=item $autofill->process_column(\%col)
+
+Resolve the column's scalar-ref type into a real type object, using the type map
+first and then affinity callbacks. Updates the column's C<type> and C<affinity>
+in place when a match is found.
+
+=cut
 
 sub process_column {
     my $self = shift;
@@ -79,13 +174,25 @@ sub process_column {
     $col->{affinity} = $new_type->qorm_affinity(sql_type => $$type);
 }
 
+=pod
+
+=item $autofill->define_autorow($row_class, $table)
+
+Load (or autovivify) the row class, then install field accessors for each column
+and link accessors for each link, honoring the C<field_accessor> and
+C<link_accessor> hooks and never clobbering accessors that already exist.
+
+=back
+
+=cut
+
 sub define_autorow {
     my $self = shift;
     my ($row_class, $table) = @_;
 
     unless(load_class($row_class)) {
         my $err = $@;
-        die $@ unless $@ =~ m/Can't locate.*in \@INC/;
+        die $err unless $err =~ m/Can't locate.*in \@INC/;
         my $row_file = $row_class;
         $row_file =~ s{::}{/}g;
         $row_file .= ".pm";
@@ -106,9 +213,7 @@ sub define_autorow {
         my $to = $link->other_table;
         my $aliases = $link->aliases;
 
-        unless ($aliases && @$aliases) {
-            $aliases = [$link->unique ? $to : "${to}s" ];
-        }
+        $aliases = [$link->unique ? $to : "${to}s"] unless $aliases && @$aliases;
 
         for my $alias (@$aliases) {
             my $accessor = $self->hook(link_accessor => {table => $table, linked_table => $link->other_table, name => $alias, link => $link}, $alias);
@@ -124,4 +229,34 @@ sub define_autorow {
 
 __END__
 
+=head1 SOURCE
 
+The source code repository for DBIx::QuickORM can be found at
+L<https://github.com/exodist/DBIx-QuickORM>.
+
+=head1 MAINTAINERS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut

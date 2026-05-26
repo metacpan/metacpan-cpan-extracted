@@ -1,5 +1,15 @@
 Revision history for Thunderhorse
 
+0.105 - 2026-05-25
+	[Changes]
+	- Context's stash is now created lazily
+	- Add session (PAGI::Session) object to Context
+	- Fix documentation showcasing bad usage of session
+
+0.104 - 2026-05-25
+	[Fixes]
+	- Fix an error caused by PAGI moving stash from request to PAGI::Stash
+
 0.103 - 2026-03-24
 	[Fixes]
 	- Fix an error caused by Path::Tiny import, ++lschierer

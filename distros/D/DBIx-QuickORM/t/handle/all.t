@@ -1,6 +1,5 @@
 use Test2::V0 -target => 'DBIx::QuickORM', '!meta', '!pass';
 use DBIx::QuickORM;
-use Carp::Always;
 
 use lib 't/lib';
 use DBIx::QuickORM::Test;
@@ -56,7 +55,7 @@ do_for_all_dbs {
     );
 
     # sqlite does not support async
-    unless (curdialect() =~ m/sqlite/i) {
+    unless (curdialect() =~ m/sqlite|duckdb/i) {
         subtest async => sub {
             like(
                 dies { $h->async->all },

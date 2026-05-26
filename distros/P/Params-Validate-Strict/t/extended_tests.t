@@ -208,7 +208,7 @@ subtest 'integer min with float boundary: 0.5 → 1 passes, 0 fails' => sub {
 			schema => { n => { type => 'integer', min => 0.5 } },
 			input  => { n => '0' },
 		)
-	} qr/must be at least/, 'integer 0 fails float min => 0.5';
+	} qr/must be a positive/, 'integer 0 fails float min => 0.5';
 };
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1213,6 +1213,1615 @@ subtest 'max: custom error_msg used when string exceeds max (COND_INV_1459)' => 
 			input  => { s => 'toolong' },
 		)
 	} qr/too long/, 'default error message fires when no error_msg set';
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# A. Systematic type × min  — every type that supports min, pass and fail
+# ══════════════════════════════════════════════════════════════════════════════
+
+for my $c (
+	{ type => 'string',  min => 3, pass => 'hello', fail => 'hi',  pass_re => undef, fail_re => qr/too short/ },
+	{ type => 'integer', min => 5, pass => '10',    fail => '3',   pass_re => undef, fail_re => qr/must be at least 5/ },
+	{ type => 'number',  min => 2, pass => '3.5',   fail => '1.0', pass_re => undef, fail_re => qr/must be at least 2/ },
+	{ type => 'float',   min => 2, pass => '3.5',   fail => '1.0', pass_re => undef, fail_re => qr/must be at least 2/ },
+	{ type => 'arrayref',min => 2, pass => [1,2,3], fail => [1],   pass_re => undef, fail_re => qr/must be at least length 2/ },
+	{ type => 'hashref', min => 2, pass => {a=>1,b=>2}, fail => {a=>1}, pass_re => undef, fail_re => qr/must contain at least 2/ },
+) {
+	my ($type, $min) = @{$c}{'type','min'};
+	subtest "type $type + min=$min: value above min accepted" => sub {
+		my $r = validate_strict(
+			schema => { x => { type => $type, min => $min } },
+			input  => { x => $c->{pass} },
+		);
+		ok(defined $r->{x}, "type $type: value >= min returned");
+	};
+	subtest "type $type + min=$min: value below min rejected" => sub {
+		throws_ok {
+			validate_strict(
+				schema => { x => { type => $type, min => $min } },
+				input  => { x => $c->{fail} },
+			)
+		} $c->{fail_re}, "type $type: value < min rejected";
+	};
+}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# B. Systematic type × max  — every type that supports max, pass and fail
+# ══════════════════════════════════════════════════════════════════════════════
+
+for my $c (
+	{ type => 'string',  max => 5, pass => 'hi',    fail => 'toolongvalue', fail_re => qr/too long/ },
+	{ type => 'integer', max => 10, pass => '7',    fail => '15',           fail_re => qr/must be no more than 10/ },
+	{ type => 'number',  max => 5,  pass => '3.5',  fail => '6.0',          fail_re => qr/must be no more than 5/ },
+	{ type => 'float',   max => 5,  pass => '3.5',  fail => '6.0',          fail_re => qr/must be no more than 5/ },
+	{ type => 'arrayref',max => 3,  pass => [1,2],  fail => [1,2,3,4],      fail_re => qr/must contain no more than 3/ },
+	{ type => 'hashref', max => 2,  pass => {a=>1}, fail => {a=>1,b=>2,c=>3}, fail_re => qr/must contain no more than 2/ },
+) {
+	my ($type, $max) = @{$c}{'type','max'};
+	subtest "type $type + max=$max: value within max accepted" => sub {
+		my $r = validate_strict(
+			schema => { x => { type => $type, max => $max } },
+			input  => { x => $c->{pass} },
+		);
+		ok(defined $r->{x}, "type $type: value <= max returned");
+	};
+	subtest "type $type + max=$max: value exceeding max rejected" => sub {
+		throws_ok {
+			validate_strict(
+				schema => { x => { type => $type, max => $max } },
+				input  => { x => $c->{fail} },
+			)
+		} $c->{fail_re}, "type $type: value > max rejected";
+	};
+}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# C. Systematic type × min × max  — in-range, below-min, above-max
+# ══════════════════════════════════════════════════════════════════════════════
+
+for my $c (
+	{ type => 'string',  min=>3, max=>8,
+	  ok=>'hello', low=>'hi', high=>'toolongstr',
+	  lo_re=>qr/too short/, hi_re=>qr/too long/ },
+	{ type => 'integer', min=>5, max=>15,
+	  ok=>'10', low=>'3', high=>'20',
+	  lo_re=>qr/must be at least 5/, hi_re=>qr/must be no more than 15/ },
+	{ type => 'number',  min=>1, max=>5,
+	  ok=>'3.0', low=>'0.5', high=>'6.0',
+	  lo_re=>qr/must be at least 1/, hi_re=>qr/must be no more than 5/ },
+	{ type => 'float',   min=>1, max=>5,
+	  ok=>'3.0', low=>'0.5', high=>'6.0',
+	  lo_re=>qr/must be at least 1/, hi_re=>qr/must be no more than 5/ },
+	{ type => 'arrayref',min=>2, max=>4,
+	  ok=>[1,2,3], low=>[1], high=>[1,2,3,4,5],
+	  lo_re=>qr/must be at least length 2/, hi_re=>qr/must contain no more than 4/ },
+	{ type => 'hashref', min=>2, max=>3,
+	  ok=>{a=>1,b=>2}, low=>{a=>1}, high=>{a=>1,b=>2,c=>3,d=>4},
+	  lo_re=>qr/must contain at least 2/, hi_re=>qr/must contain no more than 3/ },
+) {
+	my ($type, $min, $max) = @{$c}{'type','min','max'};
+	subtest "type $type + min=$min + max=$max: in-range value accepted" => sub {
+		my $r = validate_strict(
+			schema => { x => { type => $type, min => $min, max => $max } },
+			input  => { x => $c->{ok} },
+		);
+		ok(defined $r->{x}, "type $type in-range accepted");
+	};
+	subtest "type $type + min=$min + max=$max: below-min rejected" => sub {
+		throws_ok {
+			validate_strict(
+				schema => { x => { type => $type, min => $min, max => $max } },
+				input  => { x => $c->{low} },
+			)
+		} $c->{lo_re}, "type $type: below min rejected";
+	};
+	subtest "type $type + min=$min + max=$max: above-max rejected" => sub {
+		throws_ok {
+			validate_strict(
+				schema => { x => { type => $type, min => $min, max => $max } },
+				input  => { x => $c->{high} },
+			)
+		} $c->{hi_re}, "type $type: above max rejected";
+	};
+}
+
+# ══════════════════════════════════════════════════════════════════════════════
+# D. type × matches  — string, integer, number
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'string + matches: matching value accepted' => sub {
+	my $r = validate_strict(
+		schema => { s => { type => 'string', matches => qr/^\d{3}$/ } },
+		input  => { s => '123' },
+	);
+	is($r->{s}, '123', 'three-digit string matches pattern');
+};
+
+subtest 'string + matches: non-matching value rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { s => { type => 'string', matches => qr/^\d{3}$/ } },
+			input  => { s => 'abc' },
+		)
+	} qr/must match pattern/, 'non-matching string rejected';
+};
+
+subtest 'string + matches as plain string (literal match): substring present → accepted' => sub {
+	# Plain string matches are compiled with quotemeta, so special chars become literal.
+	# Use a simple word without anchors or regex metacharacters.
+	my $r = validate_strict(
+		schema => { s => { type => 'string', matches => 'hello' } },
+		input  => { s => 'say hello there' },
+	);
+	is($r->{s}, 'say hello there', 'plain string matches: literal substring found → accepted');
+};
+
+subtest 'integer + matches: integer stringifies and matches pattern' => sub {
+	my $r = validate_strict(
+		schema => { n => { type => 'integer', matches => qr/^1/ } },
+		input  => { n => '12' },
+	);
+	is($r->{n}, 12, 'integer starting with 1 matches pattern');
+};
+
+subtest 'integer + matches: integer not matching pattern rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { n => { type => 'integer', matches => qr/^1/ } },
+			input  => { n => '25' },
+		)
+	} qr/must match pattern/, 'integer not matching pattern rejected';
+};
+
+subtest 'number + matches: number matching pattern accepted' => sub {
+	my $r = validate_strict(
+		schema => { n => { type => 'number', matches => qr/^3/ } },
+		input  => { n => '3.14' },
+	);
+	ok(abs($r->{n} - 3.14) < 1e-9, 'number matching pattern accepted');
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# E. type × nomatch
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'string + nomatch: non-matching value accepted' => sub {
+	my $r = validate_strict(
+		schema => { s => { type => 'string', nomatch => qr/admin/ } },
+		input  => { s => 'alice' },
+	);
+	is($r->{s}, 'alice', 'value not matching nomatch pattern accepted');
+};
+
+subtest 'string + nomatch: matching value rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { s => { type => 'string', nomatch => qr/admin/ } },
+			input  => { s => 'admin' },
+		)
+	} qr/must not match pattern/, 'value matching nomatch pattern rejected';
+};
+
+subtest 'integer + nomatch: integer not matching pattern accepted' => sub {
+	my $r = validate_strict(
+		schema => { n => { type => 'integer', nomatch => qr/^0/ } },
+		input  => { n => '42' },
+	);
+	is($r->{n}, 42, 'integer not matching nomatch pattern accepted');
+};
+
+subtest 'integer + nomatch: integer matching pattern rejected' => sub {
+	# '99' coerces to 99; 99 stringifies as '99' which matches /^9/
+	throws_ok {
+		validate_strict(
+			schema => { n => { type => 'integer', nomatch => qr/^9/ } },
+			input  => { n => '99' },
+		)
+	} qr/must not match pattern/, 'integer matching nomatch pattern rejected';
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# F. type × memberof  — string case-sensitive, case-insensitive, numeric types
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'string + memberof: exact-case match accepted' => sub {
+	my $r = validate_strict(
+		schema => { s => { type => 'string', memberof => ['alpha','beta','gamma'] } },
+		input  => { s => 'beta' },
+	);
+	is($r->{s}, 'beta', 'exact string match in memberof accepted');
+};
+
+subtest 'string + memberof: value not in list rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { s => { type => 'string', memberof => ['alpha','beta','gamma'] } },
+			input  => { s => 'delta' },
+		)
+	} qr/must be one of/, 'string not in memberof list rejected';
+};
+
+subtest 'string + memberof: wrong case rejected when case_sensitive=1 (default)' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { s => { type => 'string', memberof => ['Alpha','Beta'], case_sensitive => 1 } },
+			input  => { s => 'alpha' },
+		)
+	} qr/must be one of/, 'wrong-case string rejected (case-sensitive default)';
+};
+
+subtest 'string + memberof + case_sensitive=0: wrong case accepted' => sub {
+	my $r = validate_strict(
+		schema => { s => { type => 'string', memberof => ['Alpha','Beta'], case_sensitive => 0 } },
+		input  => { s => 'ALPHA' },
+	);
+	is($r->{s}, 'ALPHA', 'wrong-case string accepted with case_sensitive=0; original case preserved');
+};
+
+subtest 'string + memberof + case_sensitive=0: value not in list still rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { s => { type => 'string', memberof => ['Alpha','Beta'], case_sensitive => 0 } },
+			input  => { s => 'gamma' },
+		)
+	} qr/must be one of/, 'value absent from list rejected even with case_sensitive=0';
+};
+
+subtest 'integer + memberof: numeric match accepted' => sub {
+	my $r = validate_strict(
+		schema => { n => { type => 'integer', memberof => [1,2,3,4,5] } },
+		input  => { n => '3' },
+	);
+	is($r->{n}, 3, 'integer memberof: numeric match accepted');
+};
+
+subtest 'integer + memberof: value not in list rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { n => { type => 'integer', memberof => [1,2,3,4,5] } },
+			input  => { n => '6' },
+		)
+	} qr/must be one of/, 'integer not in memberof list rejected';
+};
+
+subtest 'number + memberof: floating-point numeric match accepted' => sub {
+	my $r = validate_strict(
+		schema => { n => { type => 'number', memberof => [0.5, 1.0, 1.5, 2.0] } },
+		input  => { n => '1.5' },
+	);
+	ok(abs($r->{n} - 1.5) < 1e-9, 'number memberof: 1.5 accepted');
+};
+
+subtest 'number + memberof: value not in list rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { n => { type => 'number', memberof => [0.5, 1.0, 1.5] } },
+			input  => { n => '2.5' },
+		)
+	} qr/must be one of/, 'number not in memberof list rejected';
+};
+
+subtest 'float + memberof: numeric match accepted (float synonym for number)' => sub {
+	my $r = validate_strict(
+		schema => { n => { type => 'float', memberof => [1.0, 2.0, 3.0] } },
+		input  => { n => '2.0' },
+	);
+	ok(abs($r->{n} - 2.0) < 1e-9, 'float memberof: 2.0 accepted');
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# G. type × notmemberof
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'string + notmemberof: value not in blacklist accepted' => sub {
+	my $r = validate_strict(
+		schema => { s => { type => 'string', notmemberof => ['admin','root','system'] } },
+		input  => { s => 'alice' },
+	);
+	is($r->{s}, 'alice', 'string not in notmemberof blacklist accepted');
+};
+
+subtest 'string + notmemberof: value in blacklist rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { s => { type => 'string', notmemberof => ['admin','root','system'] } },
+			input  => { s => 'root' },
+		)
+	} qr/must not be one of/, 'blacklisted string rejected';
+};
+
+subtest 'string + notmemberof + case_sensitive=1: different case NOT blacklisted' => sub {
+	my $r = validate_strict(
+		schema => { s => { type => 'string', notmemberof => ['Admin'], case_sensitive => 1 } },
+		input  => { s => 'admin' },
+	);
+	is($r->{s}, 'admin', 'different-case value passes notmemberof when case_sensitive=1');
+};
+
+subtest 'string + notmemberof + case_sensitive=0: any case blacklisted' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { s => { type => 'string', notmemberof => ['admin'], case_sensitive => 0 } },
+			input  => { s => 'ADMIN' },
+		)
+	} qr/must not be one of/, 'case-insensitive notmemberof rejects any-case match';
+};
+
+subtest 'integer + notmemberof: value not in blacklist accepted' => sub {
+	my $r = validate_strict(
+		schema => { n => { type => 'integer', notmemberof => [22,80,443] } },
+		input  => { n => '8080' },
+	);
+	is($r->{n}, 8080, 'integer not in blacklist accepted');
+};
+
+subtest 'integer + notmemberof: value in blacklist rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { n => { type => 'integer', notmemberof => [22,80,443] } },
+			input  => { n => '80' },
+		)
+	} qr/must not be one of/, 'blacklisted integer rejected';
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# H. memberof cannot be combined with min or max
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'memberof + min → "makes no sense" error' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { n => { type => 'integer', memberof => [1,2,3], min => 1 } },
+			input  => { n => '2' },
+		)
+	} qr/makes no sense with memberof/, 'memberof + min combination rejected';
+};
+
+subtest 'memberof + max → "makes no sense" error' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { n => { type => 'integer', memberof => [1,2,3], max => 3 } },
+			input  => { n => '2' },
+		)
+	} qr/makes no sense with memberof/, 'memberof + max combination rejected';
+};
+
+subtest 'enum + min → "makes no sense" error (enum is a synonym for memberof)' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { n => { type => 'integer', enum => [1,2,3], min => 1 } },
+			input  => { n => '2' },
+		)
+	} qr/makes no sense with memberof/, 'enum + min combination rejected';
+};
+
+subtest 'values + max → "makes no sense" error (values is a synonym for memberof)' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { n => { type => 'integer', values => [1,2,3], max => 3 } },
+			input  => { n => '2' },
+		)
+	} qr/makes no sense with memberof/, 'values + max combination rejected';
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# I. optional × default  — multiple types
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'string + optional: absent field not in result' => sub {
+	my $r = validate_strict(
+		schema => { s => { type => 'string', optional => 1 } },
+		input  => {},
+	);
+	ok(!exists $r->{s}, 'absent optional string field not in result');
+};
+
+subtest 'string + optional + default: absent field gets default' => sub {
+	my $r = validate_strict(
+		schema => { s => { type => 'string', optional => 1, default => 'guest' } },
+		input  => {},
+	);
+	is($r->{s}, 'guest', 'default string applied when field absent');
+};
+
+subtest 'string + optional + default: present value wins over default' => sub {
+	my $r = validate_strict(
+		schema => { s => { type => 'string', optional => 1, default => 'guest' } },
+		input  => { s => 'alice' },
+	);
+	is($r->{s}, 'alice', 'supplied value wins over default');
+};
+
+subtest 'integer + optional: absent field not in result' => sub {
+	my $r = validate_strict(
+		schema => { n => { type => 'integer', optional => 1 } },
+		input  => {},
+	);
+	ok(!exists $r->{n}, 'absent optional integer field not in result');
+};
+
+subtest 'integer + optional + default=0: absent field gets default 0' => sub {
+	my $r = validate_strict(
+		schema => { n => { type => 'integer', optional => 1, default => 0 } },
+		input  => {},
+	);
+	is($r->{n}, 0, 'default 0 applied for absent optional integer');
+};
+
+subtest 'boolean + optional + default: absent field gets default (default is not validated)' => sub {
+	# Defaults are not validated/coerced, so use a raw 0/1 rather than a boolean string.
+	my $r = validate_strict(
+		schema => { flag => { type => 'boolean', optional => 1, default => 0 } },
+		input  => {},
+	);
+	is($r->{flag}, 0, 'default 0 applied for absent optional boolean field');
+};
+
+subtest 'arrayref + optional: absent field not in result' => sub {
+	my $r = validate_strict(
+		schema => { items => { type => 'arrayref', optional => 1 } },
+		input  => {},
+	);
+	ok(!exists $r->{items}, 'absent optional arrayref field not in result');
+};
+
+subtest 'arrayref + optional + default: absent field gets default arrayref' => sub {
+	my $r = validate_strict(
+		schema => { items => { type => 'arrayref', optional => 1, default => [] } },
+		input  => {},
+	);
+	is_deeply($r->{items}, [], 'default empty arrayref applied for absent field');
+};
+
+subtest 'hashref + optional + default: absent field gets default hashref' => sub {
+	my $r = validate_strict(
+		schema => { meta => { type => 'hashref', optional => 1, default => {} } },
+		input  => {},
+	);
+	is_deeply($r->{meta}, {}, 'default empty hashref applied for absent field');
+};
+
+subtest 'nullable as synonym for optional: absent field not in result' => sub {
+	my $r = validate_strict(
+		schema => { s => { type => 'string', nullable => 1 } },
+		input  => {},
+	);
+	ok(!exists $r->{s}, 'nullable=1 behaves like optional: absent field not in result');
+};
+
+subtest 'optional as coderef: returns 1 (optional) → absent field not in result' => sub {
+	my $r = validate_strict(
+		schema => { s => { type => 'string', optional => sub { 1 } } },
+		input  => {},
+	);
+	ok(!exists $r->{s}, 'optional coderef returning 1: absent field not in result');
+};
+
+subtest 'optional as coderef: returns 0 (required) → absent field causes error' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { s => { type => 'string', optional => sub { 0 } } },
+			input  => {},
+		)
+	} qr/Required parameter 's'/, 'optional coderef returning 0: absent required field croaks';
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# J. transform × other rules  — transform happens before all other checks
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'transform + type=string: value transformed then type-checked' => sub {
+	my $r = validate_strict(
+		schema => { s => { type => 'string', transform => sub { uc $_[0] } } },
+		input  => { s => 'hello' },
+	);
+	is($r->{s}, 'HELLO', 'transform applied; uppercased value passes string type check');
+};
+
+subtest 'transform + type=integer: transform rounds to integer first, then type check passes' => sub {
+	my $r = validate_strict(
+		schema => { n => { type => 'integer', transform => sub { int($_[0] + 0.5) } } },
+		input  => { n => '3.7' },
+	);
+	is($r->{n}, 4, 'transform rounds 3.7 → 4; integer type check passes');
+};
+
+subtest 'transform + min: transform reduces value below min → min fails' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { n => { type => 'integer', transform => sub { $_[0] - 10 }, min => 5 } },
+			input  => { n => '8' },
+		)
+	} qr/must be at least 5/, 'transform (8-10=-2) reduces value below min=5 → rejected';
+};
+
+subtest 'transform + min: transform raises value above min → passes' => sub {
+	my $r = validate_strict(
+		schema => { n => { type => 'integer', transform => sub { $_[0] + 10 }, min => 5 } },
+		input  => { n => '1' },
+	);
+	is($r->{n}, 11, 'transform raises 1+10=11 above min=5 → accepted');
+};
+
+subtest 'transform + max: transform raises value above max → rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { n => { type => 'integer', transform => sub { $_[0] * 3 }, max => 10 } },
+			input  => { n => '5' },
+		)
+	} qr/must be no more than 10/, 'transform (5*3=15) raises value above max=10 → rejected';
+};
+
+subtest 'transform + matches: transform normalises, then pattern check' => sub {
+	my $r = validate_strict(
+		schema => { s => {
+			type      => 'string',
+			transform => sub { lc $_[0] },
+			matches   => qr/^[a-z]+$/,
+		} },
+		input => { s => 'HELLO' },
+	);
+	is($r->{s}, 'hello', 'transform lowercases value; lowercased form matches pattern');
+};
+
+subtest 'transform + memberof: transform normalises, then memberof check' => sub {
+	my $r = validate_strict(
+		schema => { s => {
+			type      => 'string',
+			transform => sub { lc $_[0] },
+			memberof  => ['draft','published','archived'],
+		} },
+		input => { s => 'DRAFT' },
+	);
+	is($r->{s}, 'draft', 'transform lowercases; lowercased form found in memberof list');
+};
+
+subtest 'transform + notmemberof: transform normalises, then notmemberof check' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { s => {
+				type        => 'string',
+				transform   => sub { lc $_[0] },
+				notmemberof => ['admin','root'],
+			} },
+			input => { s => 'ADMIN' },
+		)
+	} qr/must not be one of/, 'transform lowercases ADMIN → admin; notmemberof rejects it';
+};
+
+subtest 'transform returning wrong type: type check then fails' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { s => { type => 'string', transform => sub { [] } } },
+			input  => { s => 'hello' },
+		)
+	} qr/must be a string/, 'transform returning arrayref fails string type check';
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# K. callback combinations
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'string + callback: passing callback returns value' => sub {
+	my $seen;
+	my $r = validate_strict(
+		schema => { s => { type => 'string', callback => sub { $seen = $_[0]; 1 } } },
+		input  => { s => 'hello' },
+	);
+	is($r->{s}, 'hello', 'string value returned when callback passes');
+	is($seen, 'hello', 'callback received the string value');
+};
+
+subtest 'string + callback: failing callback rejects value' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { s => { type => 'string', callback => sub { 0 } } },
+			input  => { s => 'hello' },
+		)
+	} qr/failed custom validation/, 'false-returning callback rejects string value';
+};
+
+subtest 'integer + callback: callback receives coerced integer value' => sub {
+	my $seen;
+	my $r = validate_strict(
+		schema => { n => { type => 'integer', callback => sub { $seen = $_[0]; 1 } } },
+		input  => { n => '42' },
+	);
+	is($r->{n}, 42, 'integer value returned');
+	is($seen, 42, 'callback receives coerced integer, not original string');
+};
+
+subtest 'integer + callback: callback has access to full input via second arg' => sub {
+	my $received_args;
+	validate_strict(
+		schema => {
+			a => { type => 'integer' },
+			b => { type => 'integer', callback => sub { $received_args = $_[1]; 1 } },
+		},
+		input => { a => '1', b => '2' },
+	);
+	ok(ref($received_args) eq 'HASH', 'callback second arg is a hashref');
+	ok(exists $received_args->{a}, 'callback can see other validated fields');
+};
+
+subtest 'integer + min + callback: all rules pass together' => sub {
+	my $r = validate_strict(
+		schema => { n => {
+			type     => 'integer',
+			min      => 1,
+			callback => sub { $_[0] % 2 == 0 },
+		} },
+		input => { n => '4' },
+	);
+	is($r->{n}, 4, 'integer 4 passes min=1 and even-number callback');
+};
+
+subtest 'arrayref + callback: callback receives reference to the array' => sub {
+	my $seen;
+	my $r = validate_strict(
+		schema => { items => {
+			type     => 'arrayref',
+			callback => sub { $seen = $_[0]; 1 },
+		} },
+		input => { items => [1,2,3] },
+	);
+	is_deeply($seen, [1,2,3], 'callback receives the arrayref value');
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# L. validate / validator  (per-field full-input validation)
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'validate: returning undef → passes' => sub {
+	my $r = validate_strict(
+		schema => {
+			password => { type => 'string' },
+			user     => { type => 'string',
+				validate => sub { my $p = shift; $p->{password} eq 'secret' ? undef : 'wrong password' }
+			},
+		},
+		input => { password => 'secret', user => 'alice' },
+	);
+	is($r->{user}, 'alice', 'validate returning undef passes');
+};
+
+subtest 'validate: returning error string → croaks' => sub {
+	throws_ok {
+		validate_strict(
+			schema => {
+				password => { type => 'string' },
+				user     => { type => 'string',
+					validate => sub { my $p = shift; $p->{password} eq 'secret' ? undef : 'wrong password' }
+				},
+			},
+			input => { password => 'wrong', user => 'alice' },
+		)
+	} qr/wrong password/, 'validate returning error string causes croak';
+};
+
+subtest 'validator synonym: same as validate, returning undef → passes' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => 'string', validator => sub { undef } } },
+		input  => { x => 'hello' },
+	);
+	is($r->{x}, 'hello', 'validator synonym: undef return passes validation');
+};
+
+subtest 'validator synonym: returning error string → croaks' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'string', validator => sub { 'not allowed' } } },
+			input  => { x => 'hello' },
+		)
+	} qr/not allowed/, 'validator synonym: error string return causes croak';
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# M. description  — appears in error messages for different rule failures
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'description + type failure: description in error' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'integer', description => 'UserAge' } },
+			input  => { x => 'bad' },
+		)
+	} qr/UserAge/, 'description appears in type-failure error';
+};
+
+subtest 'description + min failure: description in error' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'integer', min => 18, description => 'UserAge' } },
+			input  => { x => '10' },
+		)
+	} qr/UserAge/, 'description appears in min-failure error';
+};
+
+subtest 'description + max failure: description in error' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'string', max => 5, description => 'Slug' } },
+			input  => { x => 'toolongvalue' },
+		)
+	} qr/Slug/, 'description appears in max-failure error';
+};
+
+subtest 'description + matches failure: description in error' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'string', matches => qr/^\d+$/, description => 'PostCode' } },
+			input  => { x => 'abc' },
+		)
+	} qr/PostCode/, 'description appears in matches-failure error';
+};
+
+subtest 'description + memberof failure: description in error' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'string', memberof => ['a','b'], description => 'Choice' } },
+			input  => { x => 'c' },
+		)
+	} qr/Choice/, 'description appears in memberof-failure error';
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# N. Union types  — type => [t1, t2]
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest "union [string, integer]: string value accepted via string branch" => sub {
+	my $r = validate_strict(
+		schema => { x => { type => ['string','integer'] } },
+		input  => { x => 'hello' },
+	);
+	is($r->{x}, 'hello', 'string matches string branch of union');
+};
+
+subtest "union [string, integer]: integer-string coerced via integer branch" => sub {
+	my $r = validate_strict(
+		schema => { x => { type => ['string','integer'] } },
+		input  => { x => '42' },
+	);
+	# '42' matches string (string wins left-to-right), so returned as string
+	ok(defined $r->{x}, "'42' accepted by union [string, integer]");
+};
+
+subtest "union [integer, string]: integer wins left-to-right over string" => sub {
+	my $r = validate_strict(
+		schema => { x => { type => ['integer','string'] } },
+		input  => { x => '10' },
+	);
+	is($r->{x}, 10, 'integer branch wins; value coerced to integer');
+};
+
+subtest "union [arrayref, hashref]: arrayref matched via arrayref branch" => sub {
+	my $r = validate_strict(
+		schema => { x => { type => ['arrayref','hashref'] } },
+		input  => { x => [1,2,3] },
+	);
+	is_deeply($r->{x}, [1,2,3], 'arrayref accepted via arrayref branch of union');
+};
+
+subtest "union [arrayref, hashref]: hashref matched via hashref branch" => sub {
+	my $r = validate_strict(
+		schema => { x => { type => ['arrayref','hashref'] } },
+		input  => { x => {a=>1} },
+	);
+	is_deeply($r->{x}, {a=>1}, 'hashref accepted via hashref branch of union');
+};
+
+subtest "union [arrayref, hashref]: string rejected by both branches" => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => ['arrayref','hashref'] } },
+			input  => { x => 'nope' },
+		)
+	} qr/must be one of/, 'string rejected by both arrayref and hashref branches';
+};
+
+subtest "union [scalar, scalarref]: plain string accepted via scalar branch" => sub {
+	my $r = validate_strict(
+		schema => { x => { type => ['scalar','scalarref'] } },
+		input  => { x => 'plain' },
+	);
+	is($r->{x}, 'plain', 'plain string accepted via scalar branch of union');
+};
+
+subtest "union [scalar, scalarref]: scalarref accepted via scalarref branch" => sub {
+	my $s = 'hello';
+	my $r = validate_strict(
+		schema => { x => { type => ['scalar','scalarref'] } },
+		input  => { x => \$s },
+	);
+	is($r->{x}, \$s, 'scalarref accepted via scalarref branch of union');
+};
+
+subtest "union [scalar, scalarref]: arrayref rejected by both branches" => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => ['scalar','scalarref'] } },
+			input  => { x => [] },
+		)
+	} qr/must be one of/, 'arrayref rejected by both scalar and scalarref branches';
+};
+
+subtest "union [string, object]: string accepted via string branch" => sub {
+	my $r = validate_strict(
+		schema => { x => { type => ['string','object'] } },
+		input  => { x => 'just a string' },
+	);
+	is($r->{x}, 'just a string', 'string accepted via string branch of [string,object] union');
+};
+
+subtest "union [string, object]: blessed object accepted via object branch" => sub {
+	my $obj = Ext::Base->new;
+	my $r = validate_strict(
+		schema => { x => { type => ['string','object'] } },
+		input  => { x => $obj },
+	);
+	is($r->{x}, $obj, 'blessed object accepted via object branch of [string,object] union');
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# O. isa and can  — fail cases, multi-method, combined
+# ══════════════════════════════════════════════════════════════════════════════
+
+{ package Ext::Dog; our @ISA = ('Ext::Base'); sub new { bless {}, shift } sub speak { 'woof' } sub fetch { 1 } }
+{ package Ext::Cat; our @ISA = ('Ext::Base'); sub new { bless {}, shift } sub speak { 'meow' } }
+{ package Ext::Robot; sub new { bless {}, shift } sub speak { 'beep' } sub compute { 1 } }
+
+subtest 'isa: object of wrong class rejected' => sub {
+	my $obj = Ext::Robot->new;
+	throws_ok {
+		validate_strict(
+			schema => { o => { type => 'object', isa => 'Ext::Base' } },
+			input  => { o => $obj },
+		)
+	} qr/must be a 'Ext::Base'/, 'object of wrong class rejected by isa check';
+};
+
+subtest 'isa: subclass satisfies isa check for parent' => sub {
+	my $dog = Ext::Dog->new;
+	lives_ok {
+		validate_strict(
+			schema => { o => { type => 'object', isa => 'Ext::Base' } },
+			input  => { o => $dog },
+		)
+	} 'Ext::Dog ISA Ext::Base → isa for Ext::Base passes';
+};
+
+subtest 'can: single method present → passes' => sub {
+	my $dog = Ext::Dog->new;
+	lives_ok {
+		validate_strict(
+			schema => { o => { type => 'object', can => 'speak' } },
+			input  => { o => $dog },
+		)
+	} 'object with "speak" method passes can=speak check';
+};
+
+subtest 'can: single method absent → fails' => sub {
+	my $cat = Ext::Cat->new;
+	throws_ok {
+		validate_strict(
+			schema => { o => { type => 'object', can => 'fetch' } },
+			input  => { o => $cat },
+		)
+	} qr/understands/, 'object missing "fetch" method rejected by can=fetch check';
+};
+
+subtest 'can as arrayref: all methods present → passes' => sub {
+	my $dog = Ext::Dog->new;
+	lives_ok {
+		validate_strict(
+			schema => { o => { type => 'object', can => ['speak','fetch'] } },
+			input  => { o => $dog },
+		)
+	} 'object with all listed methods passes can=[speak,fetch]';
+};
+
+subtest 'can as arrayref: one method absent → fails' => sub {
+	my $cat = Ext::Cat->new;
+	throws_ok {
+		validate_strict(
+			schema => { o => { type => 'object', can => ['speak','fetch'] } },
+			input  => { o => $cat },
+		)
+	} qr/understands/, 'cat missing "fetch" fails can=[speak,fetch]';
+};
+
+subtest 'isa + can: both satisfied → passes' => sub {
+	my $dog = Ext::Dog->new;
+	lives_ok {
+		validate_strict(
+			schema => { o => { type => 'object', isa => 'Ext::Base', can => 'speak' } },
+			input  => { o => $dog },
+		)
+	} 'Ext::Dog passes both isa=Ext::Base and can=speak';
+};
+
+subtest 'isa + can: isa satisfied but can fails → rejects' => sub {
+	my $base = Ext::Base->new;	# is Ext::Base but has no speak method
+	throws_ok {
+		validate_strict(
+			schema => { o => { type => 'object', isa => 'Ext::Base', can => 'speak' } },
+			input  => { o => $base },
+		)
+	} qr/understands/, 'Ext::Base passes isa but fails can=speak';
+};
+
+subtest 'isa + can: isa fails (wrong class) → rejects' => sub {
+	my $robot = Ext::Robot->new;	# not an Ext::Base
+	throws_ok {
+		validate_strict(
+			schema => { o => { type => 'object', isa => 'Ext::Base', can => 'speak' } },
+			input  => { o => $robot },
+		)
+	} qr/must be a 'Ext::Base'/, 'Ext::Robot fails isa=Ext::Base check';
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# P. element_type × min × max
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'arrayref + element_type=string + min: all-string array above min passes' => sub {
+	my $r = validate_strict(
+		schema => { tags => { type => 'arrayref', element_type => 'string', min => 2 } },
+		input  => { tags => ['alpha','beta','gamma'] },
+	);
+	is(scalar @{$r->{tags}}, 3, 'string element_type + min: 3-element array accepted');
+};
+
+subtest 'arrayref + element_type=string + min: below-min array rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { tags => { type => 'arrayref', element_type => 'string', min => 3 } },
+			input  => { tags => ['only_one'] },
+		)
+	} qr/must be at least length 3/, 'element_type + min: short array rejected';
+};
+
+subtest 'arrayref + element_type=string + max: all-string array within max passes' => sub {
+	my $r = validate_strict(
+		schema => { tags => { type => 'arrayref', element_type => 'string', max => 3 } },
+		input  => { tags => ['a','b'] },
+	);
+	is(scalar @{$r->{tags}}, 2, 'element_type + max: 2-element array within max=3 accepted');
+};
+
+subtest 'arrayref + element_type=string + max: over-max array rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { tags => { type => 'arrayref', element_type => 'string', max => 2 } },
+			input  => { tags => ['a','b','c'] },
+		)
+	} qr/must contain no more than 2/, 'element_type + max: over-max array rejected';
+};
+
+subtest 'arrayref + element_type=integer: non-integer element rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { ids => { type => 'arrayref', element_type => 'integer' } },
+			input  => { ids => [1, 2, 'oops', 4] },
+		)
+	} qr/can only contain integers/, 'non-integer element in integer element_type array rejected';
+};
+
+subtest 'arrayref + element_type=integer + min + max: all rules satisfied' => sub {
+	my $r = validate_strict(
+		schema => { ids => { type => 'arrayref', element_type => 'integer', min => 2, max => 4 } },
+		input  => { ids => ['1','2','3'] },
+	);
+	is(scalar @{$r->{ids}}, 3, 'integer element_type + min=2 + max=4: 3-element array accepted');
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Q. Nested schema  — fail cases and deeper nesting
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'hashref + schema: required inner field missing → croaks' => sub {
+	throws_ok {
+		validate_strict(
+			schema => {
+				user => {
+					type   => 'hashref',
+					schema => { name => { type => 'string' }, age => { type => 'integer' } },
+				},
+			},
+			input => { user => { name => 'Alice' } },	# age missing
+		)
+	} qr/Required parameter 'age'/, 'missing required inner field croaks';
+};
+
+subtest 'hashref + schema: inner field type mismatch → croaks' => sub {
+	throws_ok {
+		validate_strict(
+			schema => {
+				user => {
+					type   => 'hashref',
+					schema => { name => { type => 'string' }, age => { type => 'integer' } },
+				},
+			},
+			input => { user => { name => 'Alice', age => 'not_a_number' } },
+		)
+	} qr/must be (?:an integer|a number)/, 'inner field type mismatch croaks';
+};
+
+subtest 'hashref + schema: all inner fields valid → coercion applied' => sub {
+	my $r = validate_strict(
+		schema => {
+			user => {
+				type   => 'hashref',
+				schema => { name => { type => 'string' }, age => { type => 'integer' } },
+			},
+		},
+		input => { user => { name => 'Alice', age => '30' } },
+	);
+	is($r->{user}{name}, 'Alice', 'inner name correct');
+	is($r->{user}{age},  30,      'inner age coerced to integer');
+};
+
+subtest 'deeply nested: hashref containing hashref → all levels validated' => sub {
+	my $r = validate_strict(
+		schema => {
+			config => {
+				type   => 'hashref',
+				schema => {
+					db => {
+						type   => 'hashref',
+						schema => {
+							host => { type => 'string' },
+							port => { type => 'integer', min => 1, max => 65535 },
+						},
+					},
+				},
+			},
+		},
+		input => { config => { db => { host => 'localhost', port => '5432' } } },
+	);
+	is($r->{config}{db}{host}, 'localhost', 'deeply nested host correct');
+	is($r->{config}{db}{port}, 5432,        'deeply nested port coerced');
+};
+
+subtest 'hashref + min + schema: min key count and inner schema both applied' => sub {
+	throws_ok {
+		validate_strict(
+			schema => {
+				meta => {
+					type   => 'hashref',
+					min    => 3,
+					schema => { a => { type => 'string', optional => 1 }, b => { type => 'string', optional => 1 } },
+				},
+			},
+			input => { meta => { a => 'x' } },	# only 1 key, min is 3
+		)
+	} qr/must contain at least 3/, 'hashref min key count enforced alongside inner schema';
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# R. Cross-validation  — fail cases
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'cross_validation: failing validator → croaks with returned message' => sub {
+	throws_ok {
+		validate_strict(
+			schema => {
+				password         => { type => 'string' },
+				password_confirm => { type => 'string' },
+			},
+			input => { password => 'secret', password_confirm => 'different' },
+			cross_validation => {
+				passwords_match => sub {
+					my $p = shift;
+					$p->{password} eq $p->{password_confirm} ? undef : "Passwords don't match";
+				},
+			},
+		)
+	} qr/Passwords don't match/, 'cross_validation failure croaks with returned message';
+};
+
+subtest 'cross_validation: multiple validators, one fails → croaks' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { a => { type => 'integer' }, b => { type => 'integer' } },
+			input  => { a => '10', b => '5' },
+			cross_validation => {
+				a_lt_b => sub { my $p = shift; $p->{a} < $p->{b} ? undef : 'a must be less than b' },
+				b_gt_0 => sub { my $p = shift; $p->{b} > 0 ? undef : 'b must be positive' },
+			},
+		)
+	} qr/a must be less than b/, 'cross_validation: first failing validator stops processing';
+};
+
+subtest 'cross_validation: receives coerced (post-transform) values' => sub {
+	my $seen_a;
+	validate_strict(
+		schema => { a => { type => 'integer' } },
+		input  => { a => '99' },
+		cross_validation => {
+			capture => sub { $seen_a = shift->{a}; undef },
+		},
+	);
+	is($seen_a, 99, 'cross_validation receives coerced integer, not original string');
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# S. Relationships  — fail cases
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'required_group: none of the group present → fails' => sub {
+	throws_ok {
+		validate_strict(
+			schema => {
+				email => { type => 'string', optional => 1 },
+				phone => { type => 'string', optional => 1 },
+			},
+			input        => {},
+			relationships => [{ type => 'required_group', params => ['email','phone'] }],
+		)
+	} qr/at least one of|required_group/i, 'required_group fails when no member present';
+};
+
+subtest 'required_group: one present → passes' => sub {
+	lives_ok {
+		validate_strict(
+			schema => {
+				email => { type => 'string', optional => 1 },
+				phone => { type => 'string', optional => 1 },
+			},
+			input        => { email => 'a@b.com' },
+			relationships => [{ type => 'required_group', params => ['email','phone'] }],
+		)
+	} 'required_group: one member present → passes';
+};
+
+subtest 'conditional_requirement: if-param present, then_required absent → fails' => sub {
+	throws_ok {
+		validate_strict(
+			schema => {
+				async    => { type => 'string',  optional => 1 },
+				callback => { type => 'string',  optional => 1 },
+			},
+			input        => { async => 'yes' },
+			relationships => [{
+				type          => 'conditional_requirement',
+				if            => 'async',
+				then_required => 'callback',
+			}],
+		)
+	} qr/callback/, 'conditional_requirement: trigger present but required absent → fails';
+};
+
+subtest 'conditional_requirement: if-param + then_required both present → passes' => sub {
+	lives_ok {
+		validate_strict(
+			schema => {
+				async    => { type => 'string', optional => 1 },
+				callback => { type => 'string', optional => 1 },
+			},
+			input        => { async => 'yes', callback => 'my_cb' },
+			relationships => [{
+				type          => 'conditional_requirement',
+				if            => 'async',
+				then_required => 'callback',
+			}],
+		)
+	} 'conditional_requirement: both trigger and required present → passes';
+};
+
+subtest 'value_conditional: if-param matches equals, then_required absent → fails' => sub {
+	throws_ok {
+		validate_strict(
+			schema => {
+				mode => { type => 'string', optional => 1 },
+				key  => { type => 'string', optional => 1 },
+			},
+			input        => { mode => 'secure' },	# key absent but required when mode=secure
+			relationships => [{
+				type          => 'value_conditional',
+				if            => 'mode',
+				equals        => 'secure',
+				then_required => 'key',
+			}],
+		)
+	} qr/key/, 'value_conditional: condition met but required field absent → fails';
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# T. Positional arguments
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'positional: single arg at position 0 → result is arrayref' => sub {
+	my $r = validate_strict(
+		schema => { name => { type => 'string', position => 0 } },
+		input  => ['Alice'],
+	);
+	is(ref($r),  'ARRAY',  'single positional arg: result is arrayref');
+	is($r->[0], 'Alice',   'value at position 0 correct');
+};
+
+subtest 'positional: single arg wrong type → fails' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { name => { type => 'string', position => 0 } },
+			input  => [[]],
+		)
+	} qr/must be a string/, 'positional arg with wrong type rejected';
+};
+
+subtest 'positional: two args, both pass with coercion' => sub {
+	my $r = validate_strict(
+		schema => {
+			name  => { type => 'string',  position => 0 },
+			score => { type => 'integer', position => 1 },
+		},
+		input => ['Alice', '95'],
+	);
+	is($r->[0], 'Alice', 'positional name correct');
+	is($r->[1], 95,      'positional score coerced to integer');
+};
+
+subtest 'positional: integer coercion at position 0' => sub {
+	my $r = validate_strict(
+		schema => { count => { type => 'integer', position => 0 } },
+		input  => ['42'],
+	);
+	is($r->[0], 42, 'positional integer string coerced to 42');
+};
+
+subtest 'positional: three args, middle one optional and absent → gap in array' => sub {
+	my $r = validate_strict(
+		schema => {
+			a => { type => 'string',  position => 0 },
+			b => { type => 'string',  position => 1, optional => 1 },
+			c => { type => 'string',  position => 2 },
+		},
+		input => ['first', undef, 'third'],
+	);
+	is($r->[0], 'first', 'position 0 correct');
+	is($r->[2], 'third', 'position 2 correct');
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# U. Synonym rules
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'regex synonym for matches: matching value accepted' => sub {
+	my $r = validate_strict(
+		schema => { s => { type => 'string', regex => qr/^\d+$/ } },
+		input  => { s => '123' },
+	);
+	is($r->{s}, '123', 'regex synonym: matching value accepted');
+};
+
+subtest 'regex synonym for matches: non-matching value rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { s => { type => 'string', regex => qr/^\d+$/ } },
+			input  => { s => 'abc' },
+		)
+	} qr/must match pattern/, 'regex synonym: non-matching value rejected';
+};
+
+subtest 'enum synonym for memberof: accepted value passes' => sub {
+	my $r = validate_strict(
+		schema => { s => { type => 'string', enum => ['red','green','blue'] } },
+		input  => { s => 'green' },
+	);
+	is($r->{s}, 'green', 'enum synonym: value in list accepted');
+};
+
+subtest 'enum synonym for memberof: rejected value fails' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { s => { type => 'string', enum => ['red','green','blue'] } },
+			input  => { s => 'yellow' },
+		)
+	} qr/must be one of/, 'enum synonym: value not in list rejected';
+};
+
+subtest 'values synonym for memberof: accepted value passes' => sub {
+	my $r = validate_strict(
+		schema => { s => { type => 'string', values => ['x','y','z'] } },
+		input  => { s => 'y' },
+	);
+	is($r->{s}, 'y', 'values synonym: value in list accepted');
+};
+
+subtest 'values synonym for memberof: rejected value fails' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { s => { type => 'string', values => ['x','y','z'] } },
+			input  => { s => 'w' },
+		)
+	} qr/must be one of/, 'values synonym: value not in list rejected';
+};
+
+subtest 'str synonym for string: valid string accepted' => sub {
+	my $r = validate_strict(
+		schema => { s => { type => 'str', min => 2 } },
+		input  => { s => 'hi' },
+	);
+	is($r->{s}, 'hi', 'str synonym accepted with min constraint');
+};
+
+subtest 'bool synonym for boolean: "yes" accepted and coerced' => sub {
+	my $r = validate_strict(
+		schema => { b => { type => 'bool' } },
+		input  => { b => 'yes' },
+	);
+	ok($r->{b}, 'bool synonym: "yes" coerced to truthy');
+};
+
+subtest 'float synonym for number: float value passes min/max range' => sub {
+	my $r = validate_strict(
+		schema => { n => { type => 'float', min => 1.0, max => 10.0 } },
+		input  => { n => '3.14' },
+	);
+	ok(abs($r->{n} - 3.14) < 1e-9, 'float synonym: value in range accepted and coerced');
+};
+
+subtest 'minimum synonym for min: string below minimum rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { s => { type => 'string', minimum => 5 } },
+			input  => { s => 'hi' },
+		)
+	} qr/too short/, 'minimum synonym rejects short string';
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# V. min as coderef  — dynamic minimum based on other parameters
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'min as coderef: dynamic minimum satisfied → passes' => sub {
+	my $r = validate_strict(
+		schema => {
+			country => { type => 'string' },
+			age     => {
+				type => 'integer',
+				min  => sub {
+					my ($value, $all_params) = @_;
+					$all_params->{country} eq 'US' ? 21 : 18;
+				},
+			},
+		},
+		input => { country => 'US', age => '21' },
+	);
+	is($r->{age}, 21, 'dynamic min (US → 21): age 21 passes');
+};
+
+subtest 'min as coderef: dynamic minimum not satisfied → fails' => sub {
+	throws_ok {
+		validate_strict(
+			schema => {
+				country => { type => 'string' },
+				age     => {
+					type => 'integer',
+					min  => sub {
+						my ($value, $all_params) = @_;
+						$all_params->{country} eq 'US' ? 21 : 18;
+					},
+				},
+			},
+			input => { country => 'US', age => '18' },
+		)
+	} qr/must be at least 21/, 'dynamic min (US → 21): age 18 fails';
+};
+
+subtest 'min as coderef: different country gives lower dynamic minimum' => sub {
+	my $r = validate_strict(
+		schema => {
+			country => { type => 'string' },
+			age     => {
+				type => 'integer',
+				min  => sub {
+					my ($value, $all_params) = @_;
+					$all_params->{country} eq 'US' ? 21 : 18;
+				},
+			},
+		},
+		input => { country => 'UK', age => '18' },
+	);
+	is($r->{age}, 18, 'dynamic min (UK → 18): age 18 passes');
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# W. Complex multi-rule combinations
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'string + min + max + matches: all rules satisfied' => sub {
+	my $r = validate_strict(
+		schema => { code => {
+			type    => 'string',
+			min     => 3,
+			max     => 8,
+			matches => qr/^[a-z0-9]+$/,
+		} },
+		input => { code => 'abc123' },
+	);
+	is($r->{code}, 'abc123', 'string + min + max + matches: all pass');
+};
+
+subtest 'string + min + max + matches: below min rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { code => { type => 'string', min => 3, max => 8, matches => qr/^[a-z]+$/ } },
+			input  => { code => 'ab' },
+		)
+	} qr/too short/, 'string + min + max + matches: below-min rejected';
+};
+
+subtest 'string + min + max + matches: above max rejected' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { code => { type => 'string', min => 3, max => 8, matches => qr/^[a-z]+$/ } },
+			input  => { code => 'toolongstring' },
+		)
+	} qr/too long/, 'string + min + max + matches: above-max rejected';
+};
+
+subtest 'string + min + max + matches: pattern fails' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { code => { type => 'string', min => 3, max => 8, matches => qr/^[a-z]+$/ } },
+			input  => { code => 'abc123' },
+		)
+	} qr/must match pattern/, 'string + min + max + matches: pattern mismatch rejected';
+};
+
+subtest 'string + min + max + matches + nomatch: all rules satisfied' => sub {
+	my $r = validate_strict(
+		schema => { user => {
+			type    => 'string',
+			min     => 3,
+			max     => 20,
+			matches => qr/^[a-z0-9_]+$/,
+			nomatch => qr/admin/,
+		} },
+		input => { user => 'alice_99' },
+	);
+	is($r->{user}, 'alice_99', 'string + min + max + matches + nomatch: all pass');
+};
+
+subtest 'integer + min + max + callback: all rules satisfied' => sub {
+	my $r = validate_strict(
+		schema => { n => {
+			type     => 'integer',
+			min      => 2,
+			max      => 100,
+			callback => sub { $_[0] % 2 == 0 },
+		} },
+		input => { n => '8' },
+	);
+	is($r->{n}, 8, 'integer + min + max + callback: all pass');
+};
+
+subtest 'string + transform + min + matches: transform applied, then min and matches checked' => sub {
+	my $r = validate_strict(
+		schema => { tag => {
+			type      => 'string',
+			transform => sub { lc $_[0] },
+			min       => 3,
+			matches   => qr/^[a-z]+$/,
+		} },
+		input => { tag => 'HELLO' },
+	);
+	is($r->{tag}, 'hello', 'transform + min + matches: all pass after lowercase transform');
+};
+
+subtest 'arrayref + min + max + element_type: all rules satisfied' => sub {
+	my $r = validate_strict(
+		schema => { ids => {
+			type         => 'arrayref',
+			min          => 2,
+			max          => 5,
+			element_type => 'integer',
+		} },
+		input => { ids => ['1','2','3'] },
+	);
+	is(scalar @{$r->{ids}}, 3, 'arrayref + min + max + element_type: 3-element array accepted');
+};
+
+subtest 'arrayref + min + max + element_type: element type fails' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { ids => { type => 'arrayref', min => 1, max => 5, element_type => 'integer' } },
+			input  => { ids => [1, 'bad', 3] },
+		)
+	} qr/can only contain integers/, 'arrayref element_type failure inside min+max combo';
+};
+
+subtest 'hashref + min + max + schema: all constraints satisfied' => sub {
+	my $r = validate_strict(
+		schema => { cfg => {
+			type   => 'hashref',
+			min    => 2,
+			max    => 4,
+			schema => {
+				host => { type => 'string' },
+				port => { type => 'integer', min => 1 },
+			},
+		} },
+		input => { cfg => { host => 'localhost', port => '3306' } },
+	);
+	is($r->{cfg}{host}, 'localhost', 'hashref + min + max + schema: host correct');
+	is($r->{cfg}{port}, 3306,        'hashref + min + max + schema: port coerced');
+};
+
+subtest 'string + notmemberof + min + max + matches: all pass' => sub {
+	my $r = validate_strict(
+		schema => { username => {
+			type        => 'string',
+			min         => 3,
+			max         => 20,
+			matches     => qr/^[a-z0-9_]+$/,
+			notmemberof => ['admin','root','system'],
+		} },
+		input => { username => 'alice_42' },
+	);
+	is($r->{username}, 'alice_42', 'string + notmemberof + min + max + matches: all pass');
+};
+
+subtest 'string + memberof + description + error_msg: error_msg overrides default' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { status => {
+				type        => 'string',
+				memberof    => ['draft','published'],
+				description => 'ArticleStatus',
+				error_msg   => 'Invalid status value',
+			} },
+			input => { status => 'deleted' },
+		)
+	} qr/Invalid status value/, 'error_msg overrides default memberof failure message';
+};
+
+subtest 'integer + min + max + matches + notmemberof: all pass together' => sub {
+	my $r = validate_strict(
+		schema => { port => {
+			type        => 'integer',
+			min         => 1024,
+			max         => 65535,
+			matches     => qr/^\d+$/,
+			notmemberof => [22, 80, 443],
+		} },
+		input => { port => '8080' },
+	);
+	is($r->{port}, 8080, 'integer + min + max + matches + notmemberof: port 8080 passes all');
+};
+
+subtest 'two-field schema with cross-dependencies via callback' => sub {
+	my $r = validate_strict(
+		schema => {
+			start => { type => 'integer' },
+			end   => {
+				type     => 'integer',
+				callback => sub {
+					my ($val, $all) = @_;
+					$val > $all->{start};
+				},
+			},
+		},
+		input => { start => '5', end => '10' },
+	);
+	is($r->{start}, 5,  'start coerced');
+	is($r->{end},   10, 'end accepted: > start');
+};
+
+subtest 'two-field schema: callback rejects when end <= start' => sub {
+	throws_ok {
+		validate_strict(
+			schema => {
+				start => { type => 'integer' },
+				end   => {
+					type     => 'integer',
+					callback => sub { my ($val, $all) = @_; $val > $all->{start} },
+				},
+			},
+			input => { start => '10', end => '5' },
+		)
+	} qr/failed custom validation/, 'end <= start fails callback';
 };
 
 done_testing;

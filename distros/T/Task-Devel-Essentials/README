@@ -1,5 +1,5 @@
-Task-Devel-Essentials version 0.016
-===================================
+Task-Devel-Essentials
+=====================
 
 Task::Devel::Essentials is a bundle of modules useful for developers.
 
@@ -22,7 +22,12 @@ are still present.
 
 LICENSE AND COPYRIGHT
 
-Copyright (c) 2013-2022 by Martin Becker, Blaubeuren.
+Copyright (c) 2013-2026 by Martin Becker, Blaubeuren.
 
 This bundle is free software; you can redistribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+The license grants freedom for related software development but does
+not cover incorporating code or documentation into AI training material.
+Please contact the copyright holder if you want to use the library whole
+or in part for other purposes than stated in the license.

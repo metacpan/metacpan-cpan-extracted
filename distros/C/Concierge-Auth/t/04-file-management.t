@@ -83,4 +83,59 @@ subtest 'clearFile - clear and recreate' => sub {
     ok( !$gone, 'user is gone after clearFile' );
 };
 
+# ========== setFile - edge cases ==========
+
+subtest 'setFile - empty string rejected' => sub {
+    my ($ok, $msg) = $auth->setFile('');
+    ok( !$ok, 'setFile rejects empty string' );
+    like( $msg, qr/No filename/i, 'message mentions no filename' );
+};
+
+subtest 'setFile - whitespace-only string rejected' => sub {
+    my ($ok, $msg) = $auth->setFile('   ');
+    ok( !$ok, 'setFile rejects whitespace-only string' );
+    like( $msg, qr/No filename/i, 'message mentions no filename' );
+};
+
+subtest 'setFile - existing file' => sub {
+    # Create the file ahead of time so the -e branch is taken
+    my $existing = "$dir/pre_existing.pwd";
+    open my $fh, '>', $existing or die "Cannot create: $!";
+    print $fh "pre-existing content\n";
+    close $fh;
+
+    my ($ok, $msg) = $auth->setFile($existing);
+    ok( $ok, 'setFile succeeds for an existing file' );
+    ok( -e $existing, 'file still exists' );
+
+    # Content should be intact (setFile reads, does not truncate)
+    open my $rfh, '<', $existing or die $!;
+    my $contents = do { local $/; <$rfh> };
+    close $rfh;
+    like( $contents, qr/pre-existing/, 'existing file content preserved' );
+
+    # Restore original file for any remaining tests
+    $auth->setFile($file);
+};
+
+# ========== rmFile - no file configured ==========
+
+subtest 'rmFile - no file configured' => sub {
+    my $nf;
+    my $w = warnings { $nf = Concierge::Auth->new({ no_file => 1 }) };
+    my ($result, $msg) = $nf->rmFile();
+    ok( !$result, 'rmFile returns false when no file is set' );
+    like( $msg, qr/No valid file/i, 'message mentions no valid file' );
+};
+
+# ========== clearFile - no file configured ==========
+
+subtest 'clearFile - no file configured' => sub {
+    my $nf;
+    my $w = warnings { $nf = Concierge::Auth->new({ no_file => 1 }) };
+    my ($ok, $msg) = $nf->clearFile();
+    ok( !$ok, 'clearFile returns false when no file is set' );
+    like( $msg, qr/No valid file/i, 'message reflects rmFile failure' );
+};
+
 done_testing;

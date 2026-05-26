@@ -5,12 +5,12 @@ use Test2::V0;
 
 # Test module loading
 ok lives { require Concierge }, 'Concierge loads';
-ok lives { require Concierge::User }, 'Concierge::User loads';
-ok lives { require Concierge::Setup }, 'Concierge::Setup loads';
+ok lives { require Concierge::Desk::User }, 'Concierge::Desk::User loads';
+ok lives { require Concierge::Desk::Setup }, 'Concierge::Desk::Setup loads';
 
 # Test version is defined
 ok defined $Concierge::VERSION, 'Concierge version is defined';
-ok defined $Concierge::User::VERSION, 'Concierge::User version is defined';
+ok defined $Concierge::Desk::User::VERSION, 'Concierge::Desk::User version is defined';
 
 # Test that accessor methods exist
 can_ok 'Concierge', [qw(
@@ -37,7 +37,7 @@ can_ok 'Concierge', [qw(
 )];
 
 # Test User object methods exist
-can_ok 'Concierge::User', [qw(
+can_ok 'Concierge::Desk::User', [qw(
     enable_user
     user_id
     user_key
@@ -58,7 +58,7 @@ can_ok 'Concierge::User', [qw(
 )];
 
 # Test Setup methods exist
-can_ok 'Concierge::Setup', [qw(
+can_ok 'Concierge::Desk::Setup', [qw(
     build_quick_desk
     build_desk
     validate_setup_config

@@ -1,6 +1,5 @@
 use Test2::V0 -target => 'DBIx::QuickORM', '!meta', '!pass';
 use DBIx::QuickORM;
-use Carp::Always;
 use Scalar::Util qw/blessed/;
 use Time::HiRes qw/sleep/;
 
@@ -48,7 +47,7 @@ do_for_all_dbs {
     };
 
     # sqlite does not support async
-    unless (curdialect() =~ m/sqlite/i) {
+    unless (curdialect() =~ m/sqlite|duckdb/i) {
         subtest async => sub {
             my $iter = $h->async->iterator;
             sleep 0.2 until $iter->ready;

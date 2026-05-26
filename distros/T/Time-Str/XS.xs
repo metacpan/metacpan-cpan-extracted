@@ -449,6 +449,29 @@ ymd_to_rdn(...)
     mPUSHi((IV)tstr_calendar_ymd_to_rdn(y, m, d));
 
 void
+ymd_to_doy(...)
+  PREINIT:
+    int y, m, d;
+  PPCODE:
+    if (items != 3)
+      croak("Usage: ymd_to_doy(year, month, day)");
+    tstr_sv_ymd(aTHX_ ST(0), ST(1), ST(2), &y, &m, &d);
+    mPUSHi(tstr_calendar_ymd_to_doy(y, m, d));
+
+void
+yd_to_md(...)
+  PREINIT:
+    int y, doy, m, d;
+  PPCODE:
+    if (items != 2)
+      croak("Usage: yd_to_md(year, day)");
+    tstr_sv_yd(aTHX_ ST(0), ST(1), &y, &doy);
+    tstr_calendar_yd_to_md(y, doy, &m, &d);
+    EXTEND(SP, 2);
+    mPUSHi(m);
+    mPUSHi(d);
+
+void
 rdn_to_ymd(...)
   PREINIT:
     IV rdn;
@@ -486,6 +509,27 @@ ymd_to_dow(...)
       croak("Usage: ymd_to_dow(year, month, day)");
     tstr_sv_ymd(aTHX_ ST(0), ST(1), ST(2), &y, &m, &d);
     mPUSHi(tstr_calendar_ymd_to_dow(y, m, d));
+
+void
+nth_dow_in_month(...)
+  PREINIT:
+    int y, m, ord, dow, day;
+  PPCODE:
+    if (items != 4)
+      croak("Usage: nth_dow_in_month(year, month, ord, dow)");
+    y   = (int)SvIV(ST(0));
+    m   = (int)SvIV(ST(1));
+    ord = (int)SvIV(ST(2));
+    dow = (int)SvIV(ST(3));
+    if (y < 1 || y > 9999)
+      croak("Parameter 'year' is out of range [1, 9999]");
+    if (m < 1 || m > 12)
+      croak("Parameter 'month' is out of range [1, 12]");
+    if (ord < -4 || ord > 4 || ord == 0)
+      croak("Parameter 'ord' is out of range [-4, -1] or [1, 4]");
+    if (dow < 1 || dow > 7)
+      croak("Parameter 'dow' is out of range [1, 7]");
+    mPUSHi(tstr_calendar_nth_dow_in_month(y, m, ord, dow));
 
 void
 resolve_century(...)
@@ -554,6 +598,52 @@ timegm_modern(...)
 #endif
 
 void
+gmtime_modern(...)
+  PREINIT:
+    int y, m, d, H, M, S, wday, yday;
+    int64_t epoch;
+  PPCODE:
+    if (items != 1)
+      croak("Usage: gmtime_modern(time)");
+#if IVSIZE >= 8
+    epoch = (int64_t)SvIV(ST(0));
+#else
+    epoch = (int64_t)SvNV(ST(0));
+#endif
+    if (epoch < TSTR_TIME_EPOCH_MIN || epoch > TSTR_TIME_EPOCH_MAX)
+      croak("Parameter 'time' is out of range");
+    tstr_time_gmtime(epoch, &y, &m, &d, &H, &M, &S, &wday, &yday);
+    EXTEND(SP, 9);
+    mPUSHi(S);
+    mPUSHi(M);
+    mPUSHi(H);
+    mPUSHi(d);
+    mPUSHi(m);
+    mPUSHi(y);
+    mPUSHi(wday);
+    mPUSHi(yday);
+    mPUSHi(0);
+
+void
+gmtime_year(...)
+  PREINIT:
+    int y;
+    int64_t epoch;
+  PPCODE:
+    if (items != 1)
+      croak("Usage: gmtime_modern(time)");
+#if IVSIZE >= 8
+    epoch = (int64_t)SvIV(ST(0));
+#else
+    epoch = (int64_t)SvNV(ST(0));
+#endif
+    if (epoch < TSTR_TIME_EPOCH_MIN || epoch > TSTR_TIME_EPOCH_MAX)
+      croak("Parameter 'time' is out of range");
+    tstr_time_gmtime(epoch, &y, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    EXTEND(SP, 1);
+    mPUSHi(y);
+
+void
 timegm_posix(...)
   PREINIT:
     int y, m, d, H, M, S;
@@ -564,12 +654,14 @@ timegm_posix(...)
     M = (int)SvIV(ST(1));
     H = (int)SvIV(ST(2));
     d = (int)SvIV(ST(3));
-    m = (int)SvIV(ST(4)) + 1;
-    y = (int)SvIV(ST(5)) + 1900;
-    if (y < 1 || y > 9999)
-      croak("Parameter 'year' is out of range [1, 9999]");
-    if (m < 1 || m > 12)
-      croak("Parameter 'month' is out of range [1, 12]");
+    m = (int)SvIV(ST(4));
+    y = (int)SvIV(ST(5));
+    if (y < -1899 || y > 8099)
+      croak("Parameter 'year' is out of range [-1899, 8099]");
+    y += 1900;
+    if (m < 0 || m > 11)
+      croak("Parameter 'month' is out of range [0, 11]");
+    m += 1;
     if (d < 1 || d > tstr_calendar_month_days(y, m))
       croak("Parameter 'day' is out of range");
     if (H < 0 || H > 23)
@@ -622,6 +714,48 @@ lower_bound(...)
       }
     }
     mPUSHi(lo);
+
+void
+range_bounds(...)
+  PREINIT:
+    AV *av;
+    IV min_value, max_value, lo, hi, mid, len;
+  PPCODE:
+    if (items != 3)
+      croak("Usage: range_bounds(array, min_value, max_value)");
+    if (!SvROK(ST(0)) || SvTYPE(SvRV(ST(0))) != SVt_PVAV)
+      croak("Parameter 'array' must be an array reference");
+    av = (AV *)SvRV(ST(0));
+    min_value = SvIV(ST(1));
+    max_value = SvIV(ST(2));
+    if (min_value > max_value)
+      croak("Parameter 'min_value' must not exceed 'max_value'");
+    len = av_len(av) + 1;
+    // lower_bound for min_value
+    lo = 0;
+    hi = len;
+    while (lo < hi) {
+      mid = (lo + hi) >> 1;
+      {
+        SV **elem = av_fetch(av, mid, 0);
+        if (elem && SvIV(*elem) < min_value)
+          lo = mid + 1;
+        else
+          hi = mid;
+      }
+    }
+    // linear scan for upper bound
+    hi = lo;
+    while (hi < len) {
+      SV **elem = av_fetch(av, hi, 0);
+      if (elem && SvIV(*elem) <= max_value)
+        hi++;
+      else
+        break;
+    }
+    EXTEND(SP, 2);
+    mPUSHi(lo);
+    mPUSHi(hi);
 
 void
 upper_bound(...)

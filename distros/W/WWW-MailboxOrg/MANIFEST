@@ -37,9 +37,17 @@ lib/WWW/MailboxOrg/Entity/Domain.pm
 lib/WWW/MailboxOrg/JSONRPCRequest.pm
 lib/WWW/MailboxOrg/JSONRPCResponse.pm
 lib/WWW/MailboxOrg/LWPIO.pm
+lib/WWW/MailboxOrg/Role/API.pm
 lib/WWW/MailboxOrg/Role/HTTP.pm
 lib/WWW/MailboxOrg/Role/IO.pm
 lib/WWW/MailboxOrg/Role/RPC.pm
 lib/WWW/MailboxOrg/Types.pm
 t/00-load.t
+t/01-http.t
+t/02-controllers.t
+t/03-entities.t
+t/04-env.t
+t/05-live.t
 t/author-pod-syntax.t
+t/lib/WWW/MailboxOrg/MockIO.pm
+t/release-changes_has_content.t

@@ -2,7 +2,7 @@ package DBIx::QuickORM::Type::JSON;
 use strict;
 use warnings;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000020';
 
 use DBIx::QuickORM::Util qw/parse_conflate_args/;
 
@@ -13,15 +13,46 @@ with 'DBIx::QuickORM::Role::Type';
 
 use Cpanel::JSON::XS qw/decode_json/;
 
-my $JSON = Cpanel::JSON::XS->new->utf8(1)->convert_blessed(1)->allow_nonref(1);
-sub JSON { $JSON }
+=pod
 
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::QuickORM::Type::JSON - JSON inflate/deflate type.
+
+=head1 DESCRIPTION
+
+A L<DBIx::QuickORM::Role::Type> implementation that stores Perl data
+structures as JSON. Inflation decodes the stored JSON to a Perl reference;
+deflation encodes a reference back to JSON. Comparison is done on a
+canonical encoding so structurally identical values compare equal.
+
+The affinity is C<string>. C<qorm_sql_type> prefers a native C<jsonb>/
+C<json> column type and falls back to C<longtext>/C<text>.
+
+When registered for autofill (C<qorm_register_type>) this type claims the
+C<json>/C<jsonb> SQL types and any string column whose name contains
+"json".
+
+=cut
+
+# {{{ Shared JSON encoders
+
+my $JSON  = Cpanel::JSON::XS->new->utf8(1)->convert_blessed(1)->allow_nonref(1);
 my $CJSON = Cpanel::JSON::XS->new->utf8(1)->convert_blessed(1)->allow_nonref(1)->canonical(1);
-sub CJSON { $CJSON }
+
+sub JSON  { shift; $JSON }
+sub CJSON { shift; $CJSON }
+
+# }}} Shared JSON encoders
+
+sub qorm_affinity { 'string' }
 
 sub qorm_inflate {
     my $params = parse_conflate_args(@_);
-    my $val    = $params->{value} or return undef;
+    my $val    = $params->{value};
+    return undef unless defined $val;
     my $class  = $params->{class} // __PACKAGE__;
 
     return $val if ref($val);
@@ -30,7 +61,8 @@ sub qorm_inflate {
 
 sub qorm_deflate {
     my $params   = parse_conflate_args(@_);
-    my $val      = $params->{value}    or return undef;
+    my $val      = $params->{value};
+    return undef unless defined $val;
     my $affinity = $params->{affinity} or croak "Could not determine affinity";
     my $class    = $params->{class} // __PACKAGE__;
 
@@ -60,8 +92,6 @@ sub qorm_compare {
     return $a cmp $b;
 }
 
-sub qorm_affinity { 'string' }
-
 sub qorm_sql_type {
     my $self = shift;
     my ($dialect) = @_;
@@ -70,8 +100,9 @@ sub qorm_sql_type {
         return $stype;
     }
 
-    return $dialect->supports_type('longtext') // $dialect->supports_type('text');
-    die "Could not find usable type for json, no json type, no longtest, and no text";
+    my $fallback = $dialect->supports_type('longtext') // $dialect->supports_type('text');
+    return $fallback if $fallback;
+    die "Could not find usable type for json, no json type, no longtext, and no text";
 }
 
 sub qorm_register_type {
@@ -92,3 +123,37 @@ sub qorm_register_type {
 }
 
 1;
+
+__END__
+
+=head1 SOURCE
+
+The source code repository for DBIx::QuickORM can be found at
+L<https://github.com/exodist/DBIx-QuickORM>.
+
+=head1 MAINTAINERS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut

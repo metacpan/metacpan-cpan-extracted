@@ -8,7 +8,8 @@ use lib 't';
 use Util qw[throws_ok];
 
 BEGIN {
-  use_ok('Time::Str::Time', qw[ timegm_posix
+  use_ok('Time::Str::Time', qw[ gmtime_modern
+                                timegm_posix
                                 timegm_modern
                                 valid_hms
                                 valid_hms60 ]);
@@ -163,6 +164,14 @@ is(timegm_posix(59, 59, 23, 31, 11, 8099), timegm_modern(59, 59, 23, 31, 12, 999
   'timegm_posix: year 9999 (posix: 8099)');
 
 # parameter validation
+throws_ok { timegm_posix(0, 0, 0, 1, 1, -1900) }
+  qr/Parameter 'year' is out of range/,
+  'timegm_posix: year -1900';
+
+throws_ok { timegm_posix(0, 0, 0, 1, 1, 8100) }
+  qr/Parameter 'year' is out of range/,
+  'timegm_posix: year 8100';
+
 throws_ok { timegm_posix(0, 0, 0, 1, -1, 70) }
   qr/Parameter 'month' is out of range/,
   'timegm_posix: month -1 (posix)';
@@ -170,5 +179,132 @@ throws_ok { timegm_posix(0, 0, 0, 1, -1, 70) }
 throws_ok { timegm_posix(0, 0, 0, 1, 12, 70) }
   qr/Parameter 'month' is out of range/,
   'timegm_posix: month 12 (posix)';
+
+## gmtime_modern
+
+throws_ok { gmtime_modern() }
+  qr/^Usage: gmtime_modern/,
+  'gmtime_modern: no arguments';
+
+# Unix epoch: 1970-01-01 is Thursday (wday=4), yday=0
+{
+  my @t = gmtime_modern(0);
+  is_deeply(\@t, [0, 0, 0, 1, 1, 1970, 4, 0, 0],
+    'gmtime_modern: epoch 0 = 1970-01-01T00:00:00Z');
+}
+
+# One second after epoch
+{
+  my @t = gmtime_modern(1);
+  is_deeply(\@t, [1, 0, 0, 1, 1, 1970, 4, 0, 0],
+    'gmtime_modern: epoch 1');
+}
+
+# One second before epoch: 1969-12-31 is Wednesday (wday=3), yday=364
+{
+  my @t = gmtime_modern(-1);
+  is_deeply(\@t, [59, 59, 23, 31, 12, 1969, 3, 364, 0],
+    'gmtime_modern: epoch -1 = 1969-12-31T23:59:59Z');
+}
+
+# 2000-01-01 is Saturday (wday=6), yday=0
+{
+  my @t = gmtime_modern(946684800);
+  is_deeply(\@t, [0, 0, 0, 1, 1, 2000, 6, 0, 0],
+    'gmtime_modern: 2000-01-01T00:00:00Z');
+}
+
+# 2024-12-24 is Tuesday (wday=2), yday=358
+{
+  my @t = gmtime_modern(1735041600);
+  is_deeply(\@t, [0, 0, 12, 24, 12, 2024, 2, 358, 0],
+    'gmtime_modern: 2024-12-24T12:00:00Z');
+}
+
+# Apollo 11: 1969-07-20 is Sunday (wday=0), yday=200
+{
+  my @t = gmtime_modern(-14182940);
+  is_deeply(\@t, [40, 17, 20, 20, 7, 1969, 0, 200, 0],
+    'gmtime_modern: 1969-07-20T20:17:40Z (Apollo 11)');
+}
+
+# Y2K38 boundary: 2038-01-19 is Tuesday (wday=2), yday=18
+{
+  my @t = gmtime_modern(2147483647);
+  is_deeply(\@t, [7, 14, 3, 19, 1, 2038, 2, 18, 0],
+    'gmtime_modern: 2038-01-19T03:14:07Z (max signed 32-bit)');
+}
+
+{
+  my @t = gmtime_modern(2147483648);
+  is_deeply(\@t, [8, 14, 3, 19, 1, 2038, 2, 18, 0],
+    'gmtime_modern: 2038-01-19T03:14:08Z (32-bit overflow)');
+}
+
+# Year range boundaries
+# 0001-01-01 is Monday (wday=1), yday=0
+{
+  my @t = gmtime_modern(-62135596800);
+  is_deeply(\@t, [0, 0, 0, 1, 1, 1, 1, 0, 0],
+    'gmtime_modern: 0001-01-01T00:00:00Z');
+}
+
+# 9999-12-31 is Friday (wday=5), yday=364
+{
+  my @t = gmtime_modern(253402300799);
+  is_deeply(\@t, [59, 59, 23, 31, 12, 9999, 5, 364, 0],
+    'gmtime_modern: 9999-12-31T23:59:59Z');
+}
+
+# Leap year: 2024-02-29 is Thursday (wday=4), yday=59
+{
+  my @t = gmtime_modern(timegm_modern(0, 0, 0, 29, 2, 2024));
+  is_deeply(\@t, [0, 0, 0, 29, 2, 2024, 4, 59, 0],
+    'gmtime_modern: Feb 29 leap year');
+}
+
+# Round-trip: timegm_modern -> gmtime_modern (first 6 values)
+{
+  for my $case (
+    [ 0,  0,  0,  1,  1, 1970],
+    [59, 59, 23, 31, 12, 2024],
+    [30, 15,  6, 15,  6, 2000],
+    [ 0,  0,  0,  1,  3, 2024],
+    [ 0,  0,  0, 28,  2, 2023],
+  ) {
+    my $epoch = timegm_modern(@$case);
+    my @got = gmtime_modern($epoch);
+    is_deeply([@got[0..5]], $case,
+      "gmtime_modern: round-trip $case->[5]-$case->[4]-$case->[3]T$case->[2]:$case->[1]:$case->[0]");
+  }
+}
+
+# Midnight boundary
+{
+  my @t = gmtime_modern(86399);
+  is_deeply([@t[0..5]], [59, 59, 23, 1, 1, 1970],
+    'gmtime_modern: 1970-01-01T23:59:59Z');
+}
+
+{
+  my @t = gmtime_modern(86400);
+  is_deeply([@t[0..5]], [0, 0, 0, 2, 1, 1970],
+    'gmtime_modern: 1970-01-02T00:00:00Z');
+}
+
+# isdst is always 0
+{
+  my @t = gmtime_modern(timegm_modern(0, 0, 12, 15, 7, 2024));
+  is($t[8], 0, 'gmtime_modern: isdst always 0');
+}
+
+# parameter validation
+throws_ok { gmtime_modern(-62135596801) }
+  qr/Parameter 'time' is out of range/,
+  'gmtime_modern: below min epoch';
+
+throws_ok { gmtime_modern(253402300800) }
+  qr/Parameter 'time' is out of range/,
+  'gmtime_modern: above max epoch';
 
 done_testing;

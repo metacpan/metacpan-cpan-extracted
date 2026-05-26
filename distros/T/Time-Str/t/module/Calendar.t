@@ -10,7 +10,10 @@ use Util qw[throws_ok];
 BEGIN {
   use_ok('Time::Str::Calendar', qw[ leap_year
                                     month_days
+                                    nth_dow_in_month
                                     valid_ymd
+                                    yd_to_md
+                                    ymd_to_doy
                                     ymd_to_dow
                                     ymd_to_rdn
                                     rdn_to_ymd
@@ -337,6 +340,115 @@ throws_ok { ymd_to_dow(2024, 1, 32) }
   qr/Parameter 'day' is out of range/,
   'ymd_to_dow: day 32';
 
+## ymd_to_doy
+
+throws_ok { ymd_to_doy() }
+  qr/^Usage: ymd_to_doy/,
+  'ymd_to_doy: no arguments';
+
+# known values
+is(ymd_to_doy(2024,  1,  1),   1, 'ymd_to_doy: 2024-01-01 = 1');
+is(ymd_to_doy(2024,  1, 31),  31, 'ymd_to_doy: 2024-01-31 = 31');
+is(ymd_to_doy(2024,  2,  1),  32, 'ymd_to_doy: 2024-02-01 = 32');
+is(ymd_to_doy(2024,  2, 29),  60, 'ymd_to_doy: 2024-02-29 = 60 (leap year)');
+is(ymd_to_doy(2024,  3,  1),  61, 'ymd_to_doy: 2024-03-01 = 61 (leap year)');
+is(ymd_to_doy(2024, 12, 24), 359, 'ymd_to_doy: 2024-12-24 = 359');
+is(ymd_to_doy(2024, 12, 31), 366, 'ymd_to_doy: 2024-12-31 = 366 (leap year)');
+
+# non-leap year
+is(ymd_to_doy(2023,  3,  1),  60, 'ymd_to_doy: 2023-03-01 = 60 (non-leap)');
+is(ymd_to_doy(2023, 12, 31), 365, 'ymd_to_doy: 2023-12-31 = 365 (non-leap)');
+
+# boundaries
+is(ymd_to_doy(   1,  1,  1),   1, 'ymd_to_doy: 0001-01-01 = 1');
+is(ymd_to_doy(   1, 12, 31), 365, 'ymd_to_doy: 0001-12-31 = 365');
+is(ymd_to_doy(9999,  1,  1),   1, 'ymd_to_doy: 9999-01-01 = 1');
+is(ymd_to_doy(9999, 12, 31), 365, 'ymd_to_doy: 9999-12-31 = 365');
+
+# consistency: ymd_to_doy should equal ymd_to_rdn - rdn(Jan 1) + 1
+foreach my $date ([2024, 6, 15], [2000, 2, 29], [1970, 1, 1], [1, 1, 1]) {
+  my ($y, $m, $d) = @$date;
+  my $expected = ymd_to_rdn($y, $m, $d) - ymd_to_rdn($y, 1, 1) + 1;
+  is(ymd_to_doy($y, $m, $d), $expected,
+    "ymd_to_doy: $y-$m-$d consistent with ymd_to_rdn");
+}
+
+throws_ok { ymd_to_doy(0, 1, 1) }
+  qr/Parameter 'year' is out of range/,
+  'ymd_to_doy: year 0';
+
+throws_ok { ymd_to_doy(10000, 1, 1) }
+  qr/Parameter 'year' is out of range/,
+  'ymd_to_doy: year 10000';
+
+throws_ok { ymd_to_doy(2024, 0, 1) }
+  qr/Parameter 'month' is out of range/,
+  'ymd_to_doy: month 0';
+
+throws_ok { ymd_to_doy(2024, 13, 1) }
+  qr/Parameter 'month' is out of range/,
+  'ymd_to_doy: month 13';
+
+throws_ok { ymd_to_doy(2024, 1, 0) }
+  qr/Parameter 'day' is out of range/,
+  'ymd_to_doy: day 0';
+
+throws_ok { ymd_to_doy(2024, 1, 32) }
+  qr/Parameter 'day' is out of range/,
+  'ymd_to_doy: day 32';
+
+
+## yd_to_md
+
+throws_ok { yd_to_md() }
+  qr/^Usage: yd_to_md/,
+  'yd_to_md: no arguments';
+
+# known values
+is_deeply([yd_to_md(2024,   1)], [ 1,  1], 'yd_to_md: 2024 day 1');
+is_deeply([yd_to_md(2024,  31)], [ 1, 31], 'yd_to_md: 2024 day 31');
+is_deeply([yd_to_md(2024,  32)], [ 2,  1], 'yd_to_md: 2024 day 32');
+is_deeply([yd_to_md(2024,  60)], [ 2, 29], 'yd_to_md: 2024 day 60 (leap)');
+is_deeply([yd_to_md(2024,  61)], [ 3,  1], 'yd_to_md: 2024 day 61 (leap)');
+is_deeply([yd_to_md(2024, 359)], [12, 24], 'yd_to_md: 2024 day 359');
+is_deeply([yd_to_md(2024, 366)], [12, 31], 'yd_to_md: 2024 day 366 (leap)');
+
+# non-leap year
+is_deeply([yd_to_md(2023,  60)], [ 3,  1], 'yd_to_md: 2023 day 60 (non-leap)');
+is_deeply([yd_to_md(2023, 365)], [12, 31], 'yd_to_md: 2023 day 365 (non-leap)');
+
+# boundaries
+is_deeply([yd_to_md(   1,   1)], [ 1,  1], 'yd_to_md: 0001 day 1');
+is_deeply([yd_to_md(   1, 365)], [12, 31], 'yd_to_md: 0001 day 365');
+is_deeply([yd_to_md(9999,   1)], [ 1,  1], 'yd_to_md: 9999 day 1');
+is_deeply([yd_to_md(9999, 365)], [12, 31], 'yd_to_md: 9999 day 365');
+
+# round-trip: ymd_to_doy -> yd_to_md
+foreach my $date ([2024,  1,  1], [2024,  2, 29], [2024,  6, 15],
+                  [2024, 12, 31], [2023,  3,  1], [   1,  1,  1], 
+                  [9999, 12, 31]) {
+  my ($y, $m, $d) = @$date;
+  my $doy = ymd_to_doy($y, $m, $d);
+  is_deeply([yd_to_md($y, $doy)], [$m, $d],
+    "yd_to_md: round-trip $y-$m-$d (doy=$doy)");
+}
+
+throws_ok { yd_to_md(0, 1) }
+  qr/Parameter 'year' is out of range/,
+  'yd_to_md: year 0';
+
+throws_ok { yd_to_md(10000, 1) }
+  qr/Parameter 'year' is out of range/,
+  'yd_to_md: year 10000';
+
+throws_ok { yd_to_md(2024, 0) }
+  qr/Parameter 'day' is out of range/,
+  'yd_to_md: day 0';
+
+throws_ok { yd_to_md(2024, 367) }
+  qr/Parameter 'day' is out of range/,
+  'yd_to_md: day 367';
+
 ## resolve_century
 
 throws_ok { resolve_century() }
@@ -385,5 +497,135 @@ throws_ok { resolve_century(0, -1) }
 throws_ok { resolve_century(0, 9900) }
   qr/Parameter 'pivot_year' is out of range/,
   'resolve_century: pivot_year 9900';
+
+## nth_dow_in_month
+
+throws_ok { nth_dow_in_month() }
+  qr/^Usage: nth_dow_in_month/,
+  'nth_dow_in_month: no arguments';
+
+throws_ok { nth_dow_in_month(0, 1, 1, 1) }
+  qr/Parameter 'year' is out of range/,
+  'nth_dow_in_month: year 0';
+
+throws_ok { nth_dow_in_month(10000, 1, 1, 1) }
+  qr/Parameter 'year' is out of range/,
+  'nth_dow_in_month: year 10000';
+
+throws_ok { nth_dow_in_month(2024, 0, 1, 1) }
+  qr/Parameter 'month' is out of range/,
+  'nth_dow_in_month: month 0';
+
+throws_ok { nth_dow_in_month(2024, 13, 1, 1) }
+  qr/Parameter 'month' is out of range/,
+  'nth_dow_in_month: month 13';
+
+throws_ok { nth_dow_in_month(2024, 1, 0, 1) }
+  qr/Parameter 'ord' is out of range/,
+  'nth_dow_in_month: ord 0';
+
+throws_ok { nth_dow_in_month(2024, 1, 5, 1) }
+  qr/Parameter 'ord' is out of range/,
+  'nth_dow_in_month: ord 5';
+
+throws_ok { nth_dow_in_month(2024, 1, -5, 1) }
+  qr/Parameter 'ord' is out of range/,
+  'nth_dow_in_month: ord -5';
+
+throws_ok { nth_dow_in_month(2024, 1, 1, 0) }
+  qr/Parameter 'dow' is out of range/,
+  'nth_dow_in_month: dow 0';
+
+throws_ok { nth_dow_in_month(2024, 1, 1, 8) }
+  qr/Parameter 'dow' is out of range/,
+  'nth_dow_in_month: dow 8';
+
+# US Eastern: 2nd Sunday (7) of March 2024 → Mar 10
+is(nth_dow_in_month(2024, 3, 2, 7), 10,
+  'nth_dow_in_month: 2nd Sun Mar 2024');
+
+# US Eastern: 1st Sunday (7) of November 2024 → Nov 3
+is(nth_dow_in_month(2024, 11, 1, 7), 3,
+  'nth_dow_in_month: 1st Sun Nov 2024');
+
+# EU: last Sunday (7) of March 2024 → Mar 31
+is(nth_dow_in_month(2024, 3, -1, 7), 31,
+  'nth_dow_in_month: last Sun Mar 2024');
+
+# EU: last Sunday (7) of October 2024 → Oct 27
+is(nth_dow_in_month(2024, 10, -1, 7), 27,
+  'nth_dow_in_month: last Sun Oct 2024');
+
+# 1st Monday (1) of January 2024 → Jan 1 (Monday)
+is(nth_dow_in_month(2024, 1, 1, 1), 1,
+  'nth_dow_in_month: 1st Mon Jan 2024');
+
+# 4th Thursday (4) of November 2024 (US Thanksgiving) → Nov 28
+is(nth_dow_in_month(2024, 11, 4, 4), 28,
+  'nth_dow_in_month: 4th Thu Nov 2024');
+
+# last Monday of May 2024 (US Memorial Day) → May 27
+is(nth_dow_in_month(2024, 5, -1, 1), 27,
+  'nth_dow_in_month: last Mon May 2024');
+
+# 1st Friday (5) of every month in 2024
+{
+  my @expected = (5, 2, 1, 5, 3, 7, 5, 2, 6, 4, 1, 6);
+  for my $m (1..12) {
+    is(nth_dow_in_month(2024, $m, 1, 5), $expected[$m - 1],
+      "nth_dow_in_month: 1st Fri 2024-$m");
+  }
+}
+
+# last Friday (5) of every month in 2024
+{
+  my @expected = (26, 23, 29, 26, 31, 28, 26, 30, 27, 25, 29, 27);
+  for my $m (1..12) {
+    is(nth_dow_in_month(2024, $m, -1, 5), $expected[$m - 1],
+      "nth_dow_in_month: last Fri 2024-$m");
+  }
+}
+
+# Negative ordinals: -2 = second-to-last
+is(nth_dow_in_month(2024, 3, -2, 7), 24,
+  'nth_dow_in_month: 2nd-last Sun Mar 2024');
+
+# -3 = third-to-last
+is(nth_dow_in_month(2024, 3, -3, 7), 17,
+  'nth_dow_in_month: 3rd-last Sun Mar 2024');
+
+# -4 = fourth-to-last
+is(nth_dow_in_month(2024, 3, -4, 7), 10,
+  'nth_dow_in_month: 4th-last Sun Mar 2024');
+
+# Cross-check: nth_dow_in_month result has correct day-of-week
+{
+  for my $dow (1..7) {
+    for my $ord (1..4) {
+      my $day = eval { nth_dow_in_month(2024, 6, $ord, $dow) };
+      next unless defined $day;
+      is(ymd_to_dow(2024, 6, $day), $dow,
+        "nth_dow_in_month: cross-check ord=$ord dow=$dow Jun 2024");
+    }
+  }
+}
+
+# Feb 2023 (28 days, non-leap): verify all ordinals
+{
+  # Sundays in Feb 2023: 5,12,19,26
+  is(nth_dow_in_month(2023, 2,  1, 7),  5, 'nth_dow_in_month: 1st Sun Feb 2023');
+  is(nth_dow_in_month(2023, 2,  4, 7), 26, 'nth_dow_in_month: 4th Sun Feb 2023');
+  is(nth_dow_in_month(2023, 2, -1, 7), 26, 'nth_dow_in_month: last Sun Feb 2023');
+  is(nth_dow_in_month(2023, 2, -4, 7),  5, 'nth_dow_in_month: 4th-last Sun Feb 2023');
+}
+
+# 2025: verify a few well-known dates
+# US Labor Day: 1st Monday of September → Sep 1
+is(nth_dow_in_month(2025, 9, 1, 1), 1,
+  'nth_dow_in_month: Labor Day 2025');
+
+# US Thanksgiving 2025: 4th Thursday of November → Nov 27
+is(nth_dow_in_month(2025, 11, 4, 4), 27,
+  'nth_dow_in_month: Thanksgiving 2025');
 
 done_testing();

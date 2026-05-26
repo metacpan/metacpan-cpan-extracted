@@ -4,7 +4,7 @@ use lib 'lib';
 use Test2::V0;
 use File::Temp qw(tempdir);
 
-use Concierge::Setup;
+use Concierge::Desk::Setup;
 use Concierge;
 
 # Real-time session timeout tests -- uses actual sleep() calls.
@@ -17,7 +17,7 @@ skip_all 'Skipping real-time timeout tests under AUTOMATED_TESTING'
 
 my $test_dir = tempdir(CLEANUP => 1);
 
-Concierge::Setup::build_quick_desk($test_dir, ['pref']);
+Concierge::Desk::Setup::build_quick_desk($test_dir, ['pref']);
 my $desk = Concierge->open_desk($test_dir);
 my $concierge = $desk->{concierge};
 

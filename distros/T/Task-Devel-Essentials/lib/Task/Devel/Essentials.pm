@@ -10,11 +10,11 @@ Task::Devel::Essentials - Bundle of modules useful for developers
 
 =head1 VERSION
 
-Version 0.016
+Version 0.017
 
 =cut
 
-our $VERSION = '0.016';
+our $VERSION = '0.017';
 
 =head1 SYNOPSIS
 
@@ -40,6 +40,8 @@ our $VERSION = '0.016';
 =item L<Contextual::Return>
 
 =item L<CPAN>
+
+=item L<CPAN::DistnameInfo>
 
 =item L<CPAN::Reporter>
 
@@ -209,10 +211,15 @@ Martin Becker C<< <mhasch at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2013-2022 by Martin Becker, Blaubeuren.
+Copyright (c) 2013-2026 by Martin Becker, Blaubeuren.
 
 This library is free software; you can redistribute it and/or modify it
 under the terms of the Artistic License 2.0 (see the LICENSE file).
+
+The license grants freedom for related software development but does
+not cover incorporating code or documentation into AI training material.
+Please contact the copyright holder if you want to use the library whole
+or in part for other purposes than stated in the license.
 
 =cut
 

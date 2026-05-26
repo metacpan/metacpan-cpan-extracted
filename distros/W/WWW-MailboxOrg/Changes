@@ -1,3 +1,26 @@
+0.100     2026-05-25 21:05:48Z
+
+  - Refactor: extract shared _rpc method into WWW::MailboxOrg::Role::API
+  - POD: move =method documentation inline above each method definition
+    (replaces =method blocks in __END__ sections)
+  - POD: add =attr inline above attribute declarations in main class
+  - mborg CLI: add =method POD for all subcommands (login, logout,
+    account, domain, mail, mailinglist, blacklist, spamprotect,
+    videochat, backup, invoice, passwordreset, validate, utils, system)
+  - Tests: comprehensive suite (HTTP/RPC layer, all 14 API controllers,
+    entities, ENV fallback) using a pluggable WWW::MailboxOrg::MockIO backend
+  - Tests: optional live integration test (t/05-live.t), run only when
+    TEST_WWW_MAILBOXORG_USER and TEST_WWW_MAILBOXORG_PASSWORD are set
+  - Fix: logout/DEMOLISH called a non-existent _clear_token (now clear_token)
+  - Fix: Entity::Account/Domain data() was built before its attributes were
+    populated (added lazy => 1 to the data attribute)
+  - POD: remove duplicate manual =head1 NAME blocks (PodWeaver generates them)
+  - ENV (incompatible): rename credential variables to the WWW_MAILBOXORG_
+    namespace prefix — WWW_MAILBOXORG_USER and WWW_MAILBOXORG_PASSWORD
+    replace MAILBOX_USER and MAILBOX_PASSWORD
+  - ENV: add WWW_MAILBOXORG_BASE_URL and WWW_MAILBOXORG_TOKEN; every
+    constructor attribute now falls back to its WWW_MAILBOXORG_* variable
+
 0.001     2026-05-07 03:36:59Z
 
   - Initial release with full Mailbox.org API support

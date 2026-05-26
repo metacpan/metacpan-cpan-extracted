@@ -3,10 +3,10 @@ use strict;
 use warnings;
 use v5.10;
 
-our $VERSION = '0.86';
+our $VERSION = '0.87';
 
 use Carp            qw[croak];
-use Time::Str::Util qw[lower_bound upper_bound];
+use Time::Str::Util qw[range_bounds upper_bound];
 
 my %ValidPolicy = (
   earlier => 1, later => 1, std => 1, dst => 1, reject => 1
@@ -214,6 +214,12 @@ sub _parse_data {
   $self->{types} = \@resolved;
 }
 
+sub transitions_times {
+  @_ == 1 or croak q/Usage: $tz->transitions_times()/;
+  my ($self) = @_;
+  return wantarray ? @{ $self->{times} } : [ @{ $self->{times} } ];
+}
+
 sub offset_for_utc {
   @_ == 2 or croak q/Usage: $tz->offset_for_utc($time)/;
   my ($self, $time) = @_;
@@ -270,8 +276,7 @@ sub _resolve_local {
   # Find transitions within ±24 hours of the local time.
   # Since UTC offsets are bounded by (-86400, 86400), any transition
   # that could affect this local time must fall within this range.
-  my $lo = lower_bound($times, $time - 86400);
-  my $hi = upper_bound($times, $time + 86400, $lo);
+  my ($lo, $hi) = range_bounds($times, $time - 86400, $time + 86400);
 
   # No transitions nearby
   return $types->[$lo] if $lo >= $hi;

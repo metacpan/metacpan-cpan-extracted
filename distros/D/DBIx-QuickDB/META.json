@@ -21,6 +21,7 @@
       },
       "develop" : {
          "requires" : {
+            "DBD::DuckDB" : "0.16",
             "DBD::MariaDB" : "1.00",
             "DBD::Pg" : "v3.5.0",
             "DBD::SQLite" : "1.44",
@@ -62,7 +63,7 @@
          "url" : "https://github.com/exodist/DBIx-QuickDB/"
       }
    },
-   "version" : "0.000041",
+   "version" : "0.000042",
    "x_generated_by_perl" : "v5.42.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

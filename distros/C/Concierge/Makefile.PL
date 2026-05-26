@@ -25,10 +25,10 @@ WriteMakefile(
     EXE_FILES => [],
 
     PM => {
-        'lib/Concierge.pm'       => '$(INST_LIB)/Concierge.pm',
-        'lib/Concierge/Base.pm'  => '$(INST_LIB)/Concierge/Base.pm',
-        'lib/Concierge/Setup.pm' => '$(INST_LIB)/Concierge/Setup.pm',
-        'lib/Concierge/User.pm'  => '$(INST_LIB)/Concierge/User.pm',
+        'lib/Concierge.pm'            => '$(INST_LIB)/Concierge.pm',
+        'lib/Concierge/Desk/Base.pm'  => '$(INST_LIB)/Concierge/Desk/Base.pm',
+        'lib/Concierge/Desk/Setup.pm' => '$(INST_LIB)/Concierge/Desk/Setup.pm',
+        'lib/Concierge/Desk/User.pm'  => '$(INST_LIB)/Concierge/Desk/User.pm',
     },
 
     META_MERGE => {
@@ -46,19 +46,19 @@ WriteMakefile(
         provides => {
             'Concierge' => {
                 file    => 'lib/Concierge.pm',
-                version => 'v0.7.0',
+                version => 'v0.8.0',
             },
-            'Concierge::Base' => {
-                file    => 'lib/Concierge/Base.pm',
-                version => 'v0.7.0',
+            'Concierge::Desk::Base' => {
+                file    => 'lib/Concierge/Desk/Base.pm',
+                version => 'v0.8.0',
             },
-            'Concierge::Setup' => {
-                file    => 'lib/Concierge/Setup.pm',
-                version => 'v0.7.0',
+            'Concierge::Desk::Setup' => {
+                file    => 'lib/Concierge/Desk/Setup.pm',
+                version => 'v0.8.0',
             },
-            'Concierge::User' => {
-                file    => 'lib/Concierge/User.pm',
-                version => 'v0.7.0',
+            'Concierge::Desk::User' => {
+                file    => 'lib/Concierge/Desk/User.pm',
+                version => 'v0.8.0',
             },
         },
     },

@@ -11,7 +11,7 @@ use DBIx::QuickORM::Util qw/column_key/;
 use DBIx::QuickORM::Affinity();
 use DBIx::QuickORM::Link();
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000020';
 
 use DBIx::QuickORM::Connection::RowData qw{
     STORED
@@ -20,12 +20,94 @@ use DBIx::QuickORM::Connection::RowData qw{
     TRANSACTION
 };
 
-use DBIx::QuickORM::Util::HashBase qw{
+use Object::HashBase qw{
     +row_data
 };
 
 use Role::Tiny::With qw/with/;
 with 'DBIx::QuickORM::Role::Row';
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::QuickORM::Row - A single row of data backed by a source and connection.
+
+=head1 DESCRIPTION
+
+The concrete row class. It consumes L<DBIx::QuickORM::Role::Row>, which
+supplies the higher-level operations (insert / save, primary-key helpers,
+link traversal); this class supplies the low-level state and field
+accessors that role builds on.
+
+Row state is held in a row-data object (see
+L<DBIx::QuickORM::Connection::RowData>) that tracks three views of the
+data: C<STORED> (raw values as last seen in the database), C<PENDING>
+(unsaved changes), and C<DESYNC> (fields whose stored value changed out
+from under pending changes). Values are inflated/deflated through the
+source's field types on demand.
+
+=head1 SYNOPSIS
+
+    my $name = $row->field('name');
+    $row->field(name => 'New Name');
+    $row->save;
+
+    my $raw  = $row->raw_field('name');
+    my $all  = $row->fields;
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item row_data
+
+The row-data object holding the C<STORED> / C<PENDING> / C<DESYNC> views
+and transaction tracking. Required at construction.
+
+=back
+
+=head1 PUBLIC METHODS
+
+=over 4
+
+=item $bool = $row->track_desync
+
+=item $source = $row->source
+
+=item $conn = $row->connection
+
+=item $obj = $row->row_data_obj
+
+=item $data = $row->row_data
+
+=item $stored = $row->stored_data
+
+=item $pending = $row->pending_data
+
+=item $desynced = $row->desynced_data
+
+=item $bool = $row->is_invalid
+
+=item $bool = $row->is_valid
+
+=item $bool = $row->in_storage
+
+=item $bool = $row->is_stored
+
+=item $bool = $row->is_desynced
+
+=item $bool = $row->has_pending
+
+State predicates and accessors over the row-data object. C<row_data_obj>
+returns the row-data object itself; C<row_data> returns its currently
+active view.
+
+=back
+
+=cut
 
 sub track_desync { 1 }
 
@@ -53,6 +135,19 @@ sub init {
     confess "No 'row_data' provided" unless $self->{+ROW_DATA};
 }
 
+=pod
+
+=over 4
+
+=item $new = $row->clone(%overrides)
+
+Return a new, unstored row carrying this row's data minus its primary-key
+fields, deep-cloned, with any C<%overrides> applied on top.
+
+=back
+
+=cut
+
 sub clone {
     my $self      = shift;
     my %overrides = @_;
@@ -76,8 +171,22 @@ sub clone {
 # {{{ Sanity Checks #
 #####################
 
+=pod
+
+=over 4
+
+=item $row = $row->check_sync
+
+Croak if the row is out of sync (refreshed while it had pending changes)
+or was fetched outside the current transaction stack; otherwise return the
+row.
+
+=back
+
+=cut
+
 sub check_sync {
-    croak <<"    EOT" if $_[0]->{+DESYNC} && !$_[0]->track_desync;
+    croak <<"    EOT" if $_[0]->row_data->{+DESYNC} && !$_[0]->track_desync;
 
 This row is out of sync, this means it was refreshed while it had pending
 changes and the data retrieved from the database does not match what was in
@@ -111,6 +220,39 @@ You can do this with a call to ->refresh().
 ############################
 # {{{ Manipulation Methods #
 ############################
+
+=pod
+
+=over 4
+
+=item $row = $row->force_sync
+
+Clear the desync flags so the row can be saved despite a detected
+discrepancy.
+
+=item $row = $row->refresh
+
+Re-fetch the row from the database (requires a stored row with a primary
+key).
+
+=item $row = $row->discard
+
+Drop pending changes and clear desync flags.
+
+=item $row = $row->update(\%changes)
+
+=item $row = $row->update(%changes)
+
+Apply changes to the pending data and save the row.
+
+=item $row->delete
+
+Delete the row from the database (requires a stored row with a primary
+key).
+
+=back
+
+=cut
 
 sub force_sync {
     my $self = shift;
@@ -178,11 +320,56 @@ sub update {
 # {{{ Field methods #
 #####################
 
-sub field     { shift->_field(_inflated_field => @_) }
-sub raw_field { shift->_field(_raw_field      => @_) }
+=pod
 
-sub fields     { my $d = $_[0]->row_data; $_[0]->_fields(_field     => $d->{+PENDING}, $d->{+STORED}) }
-sub raw_fields { my $d = $_[0]->row_data; $_[0]->_fields(_raw_field => $d->{+PENDING}, $d->{+STORED}) }
+=over 4
+
+=item $val = $row->field($name)
+
+=item $row->field($name => $value)
+
+=item $val = $row->raw_field($name)
+
+Get (or, with a value, set) a single field. C<field> returns the inflated
+value; C<raw_field> returns the deflated/raw value.
+
+=item $hash = $row->fields
+
+=item $hash = $row->raw_fields
+
+=item $val = $row->stored_field($name)
+
+=item $val = $row->pending_field($name)
+
+=item $val = $row->raw_stored_field($name)
+
+=item $val = $row->raw_pending_field($name)
+
+=item $hash = $row->stored_fields
+
+=item $hash = $row->pending_fields
+
+=item $hash = $row->raw_stored_fields
+
+=item $hash = $row->raw_pending_fields
+
+The various field views: C<fields> merges pending over stored; the
+C<stored_*> / C<pending_*> variants read only that view, and the C<raw_*>
+variants return deflated values instead of inflated ones.
+
+=item $bool = $row->field_is_desynced($name)
+
+True if the named field is marked out of sync.
+
+=back
+
+=cut
+
+sub field     { my $self = shift; $self->_field(_inflated_field => @_) }
+sub raw_field { my $self = shift; $self->_field(_raw_field      => @_) }
+
+sub fields     { my $d = $_[0]->row_data; $_[0]->_fields(_inflated_field => $d->{+PENDING}, $d->{+STORED}) }
+sub raw_fields { my $d = $_[0]->row_data; $_[0]->_fields(_raw_field      => $d->{+PENDING}, $d->{+STORED}) }
 
 sub stored_field  { $_[0]->_inflated_field($_[0]->row_data->{+STORED},  $_[1]) }
 sub pending_field { $_[0]->_inflated_field($_[0]->row_data->{+PENDING}, $_[1]) }
@@ -190,10 +377,10 @@ sub pending_field { $_[0]->_inflated_field($_[0]->row_data->{+PENDING}, $_[1]) }
 sub raw_stored_field  { $_[0]->_raw_field($_[0]->row_data->{+STORED},  $_[1]) }
 sub raw_pending_field { $_[0]->_raw_field($_[0]->row_data->{+PENDING}, $_[1]) }
 
-sub stored_fields      { $_[0]->_fields(_field     => $_[0]->row_data->{+STORED}) }
-sub pending_fields     { $_[0]->_fields(_field     => $_[0]->row_data->{+PENDING}) }
-sub raw_stored_fields  { $_[0]->_fields(_raw_field => $_[0]->row_data->{+STORED}) }
-sub raw_pending_fields { $_[0]->_fields(_raw_field => $_[0]->row_data->{+PENDING}) }
+sub stored_fields      { $_[0]->_fields(_inflated_field => $_[0]->row_data->{+STORED}) }
+sub pending_fields     { $_[0]->_fields(_inflated_field => $_[0]->row_data->{+PENDING}) }
+sub raw_stored_fields  { $_[0]->_fields(_raw_field      => $_[0]->row_data->{+STORED}) }
+sub raw_pending_fields { $_[0]->_fields(_raw_field      => $_[0]->row_data->{+PENDING}) }
 
 sub field_is_desynced {
     my $self = shift;
@@ -204,6 +391,38 @@ sub field_is_desynced {
     my $desync = $self->row_data->{+DESYNC} or return 0;
     return $desync->{$field} // 0;
 }
+
+=pod
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item $val = $row->_field($view_method, $name)
+
+=item $row->_field($view_method, $name => $value)
+
+Shared getter/setter behind C<field> / C<raw_field>: resolves the value
+from pending or stored data (fetching a missing stored field on demand)
+and runs it through C<$view_method>.
+
+=item $hash = $row->_fields($view_method, @data_hashes)
+
+Build a field-name to value hash from the given data hashes using
+C<$view_method>, earlier hashes winning.
+
+=item $val = $row->_inflated_field($from, $name)
+
+Return the inflated value of C<$name> from data hash C<$from>, inflating
+and caching via the source's field type when needed.
+
+=item $val = $row->_raw_field($from, $name)
+
+Return the deflated/raw value of C<$name> from data hash C<$from>.
+
+=back
+
+=cut
 
 sub _field {
     my $self  = shift;
@@ -294,3 +513,37 @@ sub _raw_field {
 #####################
 
 1;
+
+__END__
+
+=head1 SOURCE
+
+The source code repository for DBIx::QuickORM can be found at
+L<https://github.com/exodist/DBIx-QuickORM>.
+
+=head1 MAINTAINERS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut

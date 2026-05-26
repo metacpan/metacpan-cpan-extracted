@@ -2,7 +2,7 @@ package DBIx::QuickORM::STH::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000020';
 
 use Role::Tiny::With qw/with/;
 with 'DBIx::QuickORM::Role::STH';
@@ -12,15 +12,77 @@ use Carp qw/croak/;
 use Time::HiRes qw/sleep/;
 
 use parent 'DBIx::QuickORM::STH';
-use DBIx::QuickORM::Util::HashBase qw{
+use Object::HashBase qw{
     <got_result
 };
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::QuickORM::STH::Async - Driver-level asynchronous statement handle.
+
+=head1 DESCRIPTION
+
+A L<DBIx::QuickORM::STH> subclass for queries running asynchronously at the
+driver level. The result is deferred: C<ready> polls the driver and C<result>
+blocks until the result arrives. Finalizing the handle releases the async
+slot on the owning connection, and (where the dialect supports it) an
+in-flight query can be cancelled.
+
+=head1 SYNOPSIS
+
+    $sth->wait;
+    while (my $row_hr = $sth->next) { ... }
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item got_result
+
+The driver result once it has arrived; absent until then.
+
+=back
+
+=head1 PUBLIC METHODS
+
+=over 4
+
+=item $bool = $sth->deferred_result
+
+Always true: the result is fetched lazily.
+
+=item $bool = $sth->cancel_supported
+
+True when the dialect supports cancelling an in-flight async query.
+
+=item $sth->clear
+
+Release the async slot on the owning connection.
+
+=cut
+
+# {{{ Role::STH / Role::Async interface
 
 sub deferred_result { 1 }
 
 sub cancel_supported { $_[0]->dialect->async_cancel_supported }
 
 sub clear { $_[0]->{+CONNECTION}->clear_async($_[0]) }
+
+# }}} Role::STH / Role::Async interface
+
+=pod
+
+=item $sth->cancel
+
+Cancel the in-flight query (when no result has arrived yet) and finalize the
+handle.
+
+=cut
 
 sub cancel {
     my $self = shift;
@@ -34,9 +96,17 @@ sub cancel {
     $self->set_done;
 }
 
+=pod
+
+=item $result = $sth->result
+
+Block until the driver result is available, caching and returning it.
+
+=cut
+
 sub result {
     my $self = shift;
-    return $self->{+GOT_RESULT} if $self->{+GOT_RESULT};
+    return $self->{+GOT_RESULT} if exists $self->{+GOT_RESULT};
 
     # Blocking
     $self->{+GOT_RESULT} = $self->dialect->async_result(sth => $self->{+STH}, dbh => $self->{+DBH});
@@ -49,6 +119,17 @@ sub result {
 
     return $self->{+GOT_RESULT};
 }
+
+=pod
+
+=item $bool = $sth->ready
+
+Poll the driver; true once the result is available. Drains a no-row statement
+on first readiness.
+
+=back
+
+=cut
 
 sub ready {
     my $self = shift;
@@ -65,3 +146,37 @@ sub ready {
 }
 
 1;
+
+__END__
+
+=head1 SOURCE
+
+The source code repository for DBIx::QuickORM can be found at
+L<https://github.com/exodist/DBIx-QuickORM>.
+
+=head1 MAINTAINERS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut

@@ -74,9 +74,9 @@ print STDERR "\n";
 
 {
     my @mods = qw{
-        Carp::Always
         Class::XSAccessor
         Cpanel::JSON::XS
+        DBD::DuckDB
         DBD::MariaDB
         DBD::Pg
         DBD::SQLite
@@ -87,7 +87,7 @@ print STDERR "\n";
         DateTime::Format::Pg
         DateTime::Format::SQLite
         ExtUtils::MakeMaker
-        IO::Select
+        Hash::Merge
         Importer
         Parallel::Runner
         Role::Tiny

@@ -2,7 +2,7 @@ package DBIx::QuickORM::Dialect::MySQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000020';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
@@ -17,23 +17,122 @@ use DBIx::QuickORM::Schema::Table::Column;
 use DBIx::QuickORM::Schema::View;
 
 use parent 'DBIx::QuickORM::Dialect';
-use DBIx::QuickORM::Util::HashBase qw{
+use Object::HashBase qw{
     +dbi_driver
 };
 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::QuickORM::Dialect::MySQL - MySQL-family dialect for DBIx::QuickORM.
+
+=head1 DESCRIPTION
+
+Dialect implementation for the MySQL family of databases, covering both the
+C<DBD::mysql> and C<DBD::MariaDB> drivers. It provides async query support,
+transaction and savepoint control, and live schema introspection from
+C<information_schema>.
+
+At C<init> time a generic instance promotes itself to a vendor-specific
+subclass (MariaDB, Percona, or Community) when the running server's vendor can
+be detected, falling back to this class with a warning otherwise.
+
+=head1 SYNOPSIS
+
+    my $dialect = DBIx::QuickORM::Dialect::MySQL->new(dbh => $dbh, db_name => $name);
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item dbi_driver
+
+The C<DBD::*> driver class backing the connection (C<DBD::mysql> or
+C<DBD::MariaDB>), resolved lazily from the live handle.
+
+=back
+
+=cut
+
+=pod
+
+=head1 PUBLIC METHODS
+
+=over 4
+
+=item $bool = $dialect->async_supported
+
+=item $bool = $dialect->async_cancel_supported
+
+Feature flags for async query support.
+
+=item %args = $dialect->async_prepare_args(%params)
+
+=item $bool = $dialect->async_ready(sth => $sth)
+
+=item $res = $dialect->async_result(sth => $sth)
+
+=item $dialect->async_cancel
+
+Driver-appropriate async query helpers. C<async_cancel> always croaks: the
+MySQL family cannot cancel an in-flight async query.
+
+=cut
+
+sub datetime_formatter     { 'DateTime::Format::MySQL' }
+
 sub async_supported        { 1 }
 sub async_cancel_supported { 0 }
-sub async_prepare_args     { my ($s, %p) = @_; $s->dbi_driver eq 'DBD::mysql' ? (async => 1) : (mariadb_async => 1) }
-sub async_ready            { my ($s, %p) = @_; $s->dbi_driver eq 'DBD::mysql' ? $p{sth}->mysql_async_ready() : $p{sth}->mariadb_async_ready() }
-sub async_result           { my ($s, %p) = @_; $s->dbi_driver eq 'DBD::mysql' ? $p{sth}->mysql_async_result() : $p{sth}->mariadb_async_result() }
-sub async_cancel           { croak "Dialect '" . $_[0]->dialect_name . "' does not support canceling async queries" }
+sub async_prepare_args     { my ($self, %params) = @_; $self->dbi_driver eq 'DBD::mysql' ? (async => 1) : (mariadb_async => 1) }
+sub async_ready            { my ($self, %params) = @_; $self->dbi_driver eq 'DBD::mysql' ? $params{sth}->mysql_async_ready() : $params{sth}->mariadb_async_ready() }
+sub async_result           { my ($self, %params) = @_; $self->dbi_driver eq 'DBD::mysql' ? $params{sth}->mysql_async_result() : $params{sth}->mariadb_async_result() }
+sub async_cancel           { my $self = shift; croak "Dialect '" . $self->dialect_name . "' does not support canceling async queries" }
 
-sub start_txn          { my ($s, %p) = @_; my $dbh = $p{dbh} // $s->dbh; $dbh->begin_work }
-sub commit_txn         { my ($s, %p) = @_; my $dbh = $p{dbh} // $s->dbh; $dbh->commit }
-sub rollback_txn       { my ($s, %p) = @_; my $dbh = $p{dbh} // $s->dbh; $dbh->rollback }
-sub create_savepoint   { my ($s, %p) = @_; my $dbh = $p{dbh} // $s->dbh; $dbh->do("SAVEPOINT $p{savepoint}") }
-sub commit_savepoint   { my ($s, %p) = @_; my $dbh = $p{dbh} // $s->dbh; $dbh->do("RELEASE SAVEPOINT $p{savepoint}") }
-sub rollback_savepoint { my ($s, %p) = @_; my $dbh = $p{dbh} // $s->dbh; $dbh->do("ROLLBACK TO SAVEPOINT $p{savepoint}") }
+=pod
+
+=item $dialect->start_txn(%params)
+
+=item $dialect->commit_txn(%params)
+
+=item $dialect->rollback_txn(%params)
+
+=item $dialect->create_savepoint(%params)
+
+=item $dialect->commit_savepoint(%params)
+
+=item $dialect->rollback_savepoint(%params)
+
+Transaction and savepoint control. Each accepts an optional C<dbh> parameter,
+defaulting to the dialect's own handle; savepoint methods take a C<savepoint>
+name.
+
+=cut
+
+sub start_txn          { my ($self, %params) = @_; my $dbh = $params{dbh} // $self->dbh; $dbh->begin_work }
+sub commit_txn         { my ($self, %params) = @_; my $dbh = $params{dbh} // $self->dbh; $dbh->commit }
+sub rollback_txn       { my ($self, %params) = @_; my $dbh = $params{dbh} // $self->dbh; $dbh->rollback }
+sub create_savepoint   { my ($self, %params) = @_; my $dbh = $params{dbh} // $self->dbh; my $sp = $dbh->quote_identifier($params{savepoint}); $dbh->do("SAVEPOINT $sp") }
+sub commit_savepoint   { my ($self, %params) = @_; my $dbh = $params{dbh} // $self->dbh; my $sp = $dbh->quote_identifier($params{savepoint}); $dbh->do("RELEASE SAVEPOINT $sp") }
+sub rollback_savepoint { my ($self, %params) = @_; my $dbh = $params{dbh} // $self->dbh; my $sp = $dbh->quote_identifier($params{savepoint}); $dbh->do("ROLLBACK TO SAVEPOINT $sp") }
+
+=pod
+
+=item $name = $dialect->dialect_name
+
+Returns C<'MySQL'>.
+
+=cut
+
+sub dialect_name { 'MySQL' }
+
+=pod
+
+=back
+
+=cut
 
 BEGIN {
     my $mariadb = eval { require DBD::MariaDB; 1 };
@@ -43,6 +142,21 @@ BEGIN {
 
     *DEFAULT_DBI_DRIVER = $mariadb ? sub() { 'DBD::MariaDB' } : sub() { 'DBD::mysql' };
 }
+
+=pod
+
+=head1 PUBLIC METHODS (continued)
+
+=over 4
+
+=item $driver = $dialect->dbi_driver
+
+=item $driver = DBIx::QuickORM::Dialect::MySQL->dbi_driver
+
+The C<DBD::*> driver class. As a class method returns the installed default;
+as an instance method resolves and caches it from the live handle.
+
+=cut
 
 sub dbi_driver {
     my $in = shift;
@@ -56,6 +170,15 @@ sub dbi_driver {
     return $in->{+DBI_DRIVER} = "DBD::" . $dbh->{Driver}->{Name};
 }
 
+=pod
+
+=item $val = $dialect->quote_binary_data
+
+Driver-appropriate bind type for binary data: C<undef> for C<DBD::mysql>,
+C<DBI::SQL_BINARY> for C<DBD::MariaDB>.
+
+=cut
+
 sub quote_binary_data {
     my $self = shift;
     my $driver = $self->dbi_driver;
@@ -63,6 +186,15 @@ sub quote_binary_data {
     return DBI::SQL_BINARY if $driver eq 'DBD::MariaDB';
     croak "Unknown DBD::Driver '$driver'";
 }
+
+=pod
+
+=item $dialect->init
+
+Validates the connection and, for a generic instance, promotes it to a
+vendor-specific subclass when the server vendor can be detected.
+
+=cut
 
 sub init {
     my $self = shift;
@@ -87,7 +219,13 @@ sub init {
     return $self->SUPER::init();
 }
 
-sub dialect_name { 'MySQL' }
+=pod
+
+=item $field = $dialect->dsn_socket_field($driver)
+
+DSN field name used to specify a unix socket for the given driver.
+
+=cut
 
 sub dsn_socket_field {
     my $this = shift;
@@ -97,7 +235,15 @@ sub dsn_socket_field {
     return 'mysql_socket' if $driver eq 'DBD::mysql';
 
     $this->SUPER::dsn_socket_field($driver);
-};
+}
+
+=pod
+
+=item $version = $dialect->db_version
+
+Server version string from C<SELECT version()>.
+
+=cut
 
 sub db_version {
     my $self = shift;
@@ -110,6 +256,15 @@ sub db_version {
     my ($ver) = $sth->fetchrow_array;
     return $ver;
 }
+
+=pod
+
+=item $vendor = $dialect->db_vendor
+
+Detects the server vendor (C<MariaDB>, C<Percona>, or C<Community>) from the
+version strings, or C<undef> when it cannot be determined.
+
+=cut
 
 sub db_vendor {
     my $self = shift;
@@ -140,16 +295,47 @@ sub db_vendor {
     return undef;
 }
 
+=pod
+
+=item $sql = $dialect->upsert_statement($pk)
+
+Returns the MySQL upsert clause C<ON DUPLICATE KEY UPDATE>.
+
+=back
+
+=cut
+
 sub upsert_statement {
     my $self = shift;
     my ($pk) = @_;
     return "ON DUPLICATE KEY UPDATE";
 }
 
-
 ###############################################################################
 # {{{ Schema Builder Code
 ###############################################################################
+
+=pod
+
+=head1 SCHEMA INTROSPECTION METHODS
+
+=over 4
+
+=item $tables = $dialect->build_tables_from_db(%params)
+
+=item ($pk, $unique, $links) = $dialect->build_table_keys_from_db($table, %params)
+
+=item $columns = $dialect->build_columns_from_db($table, %params)
+
+=item $indexes = $dialect->build_indexes_from_db($table, %params)
+
+Introspect tables, keys, columns, and indexes for the connected database from
+C<information_schema>, invoking the C<autofill> hooks supplied in C<%params> as
+each piece of metadata is built.
+
+=back
+
+=cut
 
 my %TABLE_TYPES = (
     'BASE TABLE' => 'DBIx::QuickORM::Schema::Table',
@@ -241,9 +427,6 @@ sub build_table_keys_from_db {
         if ($type eq 'foreign key') {
             push @links => $item->{link};
         }
-        elsif ($type eq 'unique') {
-            $unique{column_key(@{$item->{columns}})} = $item->{columns};
-        }
         elsif ($type eq 'unique' || $type eq 'primary key') {
             $unique{column_key(@{$item->{columns}})} = $item->{columns};
             $pk = $item->{columns} if $type eq 'primary key';
@@ -302,6 +485,21 @@ sub build_columns_from_db {
     return \%columns;
 }
 
+=pod
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item $bool = $dialect->_col_field_to_bool($val)
+
+Interprets an C<information_schema> string field as a boolean, treating
+C<no>/C<undef>/C<never> and empty/undefined values as false.
+
+=back
+
+=cut
+
 sub _col_field_to_bool {
     my $self = shift;
     my ($val) = @_;
@@ -340,7 +538,7 @@ sub build_indexes_from_db {
         push @{$idx->{columns}} => $col;
     }
 
-    return [map { $params{autofill}->hook(index => $out{$_}, table_name => $table); $out{$_} } sort keys %out];
+    return [map { $params{autofill}->hook(index => {index => $out{$_}, table_name => $table}); $out{$_} } sort keys %out];
 }
 
 ###############################################################################
@@ -348,3 +546,37 @@ sub build_indexes_from_db {
 ###############################################################################
 
 1;
+
+__END__
+
+=head1 SOURCE
+
+The source code repository for DBIx::QuickORM can be found at
+L<https://github.com/exodist/DBIx-QuickORM>.
+
+=head1 MAINTAINERS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut

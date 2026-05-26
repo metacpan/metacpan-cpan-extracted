@@ -548,4 +548,45 @@ subtest 'get_data() and set_data() with complex structures' => sub {
     is($get_result->{value}{metadata}{count}, 2, 'Nested hash preserved');
 };
 
+subtest 'is_active() returns 0 when state is not active' => sub {
+    my $manager = create_manager();
+
+    my $result = $manager->new_session(user_id => 'test_inactive_direct');
+    my $session = $result->{session};
+
+    # No public API to change state - manipulate directly to cover the false branch
+    $session->{status}{state} = 'suspended';
+
+    is($session->is_active(), 0, 'is_active() returns 0 for non-active state');
+    is($session->is_valid(), 0, 'is_valid() returns 0 when not active');
+};
+
+subtest 'is_active() returns 0 when state is undef' => sub {
+    my $manager = create_manager();
+
+    my $result = $manager->new_session(user_id => 'test_undef_state');
+    my $session = $result->{session};
+
+    # Delete the state to exercise the || '' fallback in is_active()
+    delete $session->{status}{state};
+
+    is($session->is_active(), 0, 'is_active() returns 0 when state is undef');
+};
+
+subtest 'status() returns default hashref when status not set' => sub {
+    my $manager = create_manager();
+
+    my $result = $manager->new_session(user_id => 'test_status_default');
+    my $session = $result->{session};
+
+    # Delete the status field to trigger the || fallback in status()
+    delete $session->{status};
+
+    my $status = $session->status();
+
+    ref_ok($status, 'HASH', 'status() returns a hashref even when field not set');
+    is($status->{state}, 'active', 'Default state is active');
+    is($status->{dirty}, 0, 'Default dirty is 0');
+};
+
 done_testing;

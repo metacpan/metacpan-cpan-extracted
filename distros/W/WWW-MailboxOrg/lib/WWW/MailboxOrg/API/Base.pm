@@ -3,12 +3,9 @@ package WWW::MailboxOrg::API::Base;
 # ABSTRACT: Base API controller for auth and search
 
 use Moo;
-use MooX::Singleton;
-use Carp qw(croak);
-use Params::ValidationCompiler qw(validation_for);
-use Types::Standard qw(Str);
-
-our $VERSION = '0.001';
+with 'WWW::MailboxOrg::Role::API';
+use Params::ValidationCompiler qw( validation_for );
+use Types::Standard qw( Str );
 
 has client => (
     is       => 'ro',
@@ -16,43 +13,31 @@ has client => (
     weak_ref => 1,
 );
 
-sub _rpc {
-    my ($self, $method, @params) = @_;
-    my $client = $self->client or croak "No client set";
-    return $client->call($method, @params);
-}
-
 my %validators = (
-    auth => validation_for(
-        params => {
-            user => { type => Str, optional => 0 },
-            pass => { type => Str, optional => 0 },
-        },
-    ),
-    search => validation_for(
-        params => {
-            query => { type => Str, optional => 0 },
-        },
-    ),
+    auth   => validation_for( params => { user => { type => Str, optional => 0 }, pass => { type => Str, optional => 0 } } ),
+    search => validation_for( params => { query => { type => Str, optional => 0 } } ),
 );
 
+
 sub auth {
-    my ($self, %params) = @_;
+    my ( $self, %params ) = @_;
     my $v = $validators{'auth'};
     %params = $v->(%params) if $v;
-    return $self->_rpc('auth', \%params);
+    return $self->_rpc( 'auth', \%params );
 }
 
+
 sub deauth {
-    my ($self) = @_;
+    my ( $self ) = @_;
     return $self->_rpc('deauth');
 }
 
+
 sub search {
-    my ($self, %params) = @_;
+    my ( $self, %params ) = @_;
     my $v = $validators{'search'};
     %params = $v->(%params) if $v;
-    return $self->_rpc('search', \%params);
+    return $self->_rpc( 'search', \%params );
 }
 
 1;
@@ -69,11 +54,7 @@ WWW::MailboxOrg::API::Base - Base API controller for auth and search
 
 =head1 VERSION
 
-version 0.001
-
-=head1 NAME
-
-WWW::MailboxOrg::API::Base - Base API controller for auth and search
+version 0.100
 
 =head2 auth
 
@@ -93,14 +74,12 @@ End the current session.
 
 Search across the API. Required: C<query>.
 
-=cut
-
 =head1 SUPPORT
 
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/getty/p5-www-mailboxorg/issues>.
+L<https://github.com/Getty/p5-www-mailboxorg/issues>.
 
 =head2 IRC
 

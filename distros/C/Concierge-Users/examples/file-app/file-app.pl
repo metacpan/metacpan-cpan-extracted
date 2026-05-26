@@ -294,18 +294,18 @@ die "Unknown command: $command\n";
 
 
 __DATA__
-user_id	last_login_date	last_mod_date	organization	first_name	last_name	moniker	phone	text_ok	email	user_status	access_level	term_ends	first_act	
-bva	2025-09-09T19:44:59	2021-07-25 12:15:54		Bruce	Van Allen	BVA	831-332-3649		bva@cruzio.com	OK	admin	2026-01-01		
-bw	2025-10-20T10:35:30			Bruce	Wright	BW	8314291688		bva@cruzio.com	OK	staff	2026-01-01		
-js	2025-09-09T20:54:49			Jeffrey	Smedberg	JS	831-612-2414‬		santacruz4bernie@gmail.com	OK	staff	2026-01-03		
-nh	2025-07-15T18:10:02			Nora	Hochman	NH	831-334-2003		nolden98@comcast.net	OK	staff	2025-12-31		
-rs	2025-08-28T16:21:03			Roland	Saher	RS	831-251-2793		rolandsaher@gmail.com	OK	staff	2025-12-31		
-lm	2025-08-21T17:06:26			Lynda	Marin	LM	831-840-4176		lmarin@cruzio.com	OK	staff	2025-12-31		
-et	2025-07-29T16:16:47			Etta	Tyler	ET	831-345-1664		ettatyler@gmail.com	OK	staff	2025-12-31		
-lg	2025-09-15T16:15:11			Lorna	Grundeman	LG	831-234-7459		lornagrundeman@comcast.net	OK	staff	2025-12-31		
-kw	2025-07-03T11:52:13			Kira	Walker	KW	412-720-5997		kirawalker2017@gmail.com	OK	staff	2025-12-31		
-sc4b	2025-10-19T07:02:35			SC4B	Admin	SC4B			santacruz4bernie@gmail.com	OK	admin	2026-01-04		
-NK	2025-06-28T16:37:17			Nancy 	Krusoe	NK	831-566-4421		nkrusoe@cruzio.com	OK	staff	2026-01-06		
-CK	2025-07-28T13:22:40			Chris	Krohn	CK	831-454-6170		ckrohn@cruzio.com	OK	staff	2026-01-04		
-is	2025-08-12T10:04:21			Irana	Shepherd	IS	8313259566		roni@cruzio.com	OK	staff	2026-01-04		
-ge	2025-08-13T11:53:57			Gerda	Endemann	GE	650-814-4914		gerda.endemann@gmail.com	OK	staff	2026-01-04		
+user_id	last_login_date	last_mod_date	organization	first_name	last_name	moniker	phone	text_ok	email	user_status	access_level	term_ends	first_act
+alice	2025-09-09T19:44:59	2025-07-25 12:15:54		Alice	Archer	AA	555-100-0001		alice@example.com	OK	admin	2027-01-01
+bob	2025-10-20T10:35:30			Bob	Baker	BB	555-100-0002		bob@example.com	OK	staff	2027-01-01
+carol	2025-09-09T20:54:49			Carol	Chen	CC	555-100-0003		carol@example.com	OK	staff	2027-01-03
+dave	2025-07-15T18:10:02			Dave	Davis	DD	555-100-0004		dave@example.com	OK	staff	2026-12-31
+eve	2025-08-28T16:21:03			Eve	Evans	EE	555-100-0005		eve@example.com	OK	staff	2026-12-31
+frank	2025-08-21T17:06:26			Frank	Foster	FF	555-100-0006		frank@example.com	OK	staff	2026-12-31
+grace	2025-07-29T16:16:47			Grace	Green	GG	555-100-0007		grace@example.com	OK	staff	2026-12-31
+henry	2025-09-15T16:15:11			Henry	Hall	HH	555-100-0008		henry@example.com	OK	staff	2026-12-31
+iris	2025-07-03T11:52:13			Iris	Ingram	II	555-100-0009		iris@example.com	OK	staff	2026-12-31
+jack	2025-10-19T07:02:35			Jack	Jones	JJ	555-100-0010		jack@example.com	OK	admin	2027-01-04
+kate	2025-06-28T16:37:17			Kate	Kim	KK	555-100-0011		kate@example.com	OK	staff	2027-01-06
+liam	2025-07-28T13:22:40			Liam	Lee	LL	555-100-0012		liam@example.com	OK	staff	2027-01-04
+maya	2025-08-12T10:04:21			Maya	Moore	MM	555-100-0013		maya@example.com	OK	staff	2027-01-04
+nina	2025-08-13T11:53:57			Nina	Nash	NN	555-100-0014		nina@example.com	OK	staff	2027-01-04

@@ -24,7 +24,7 @@ use strict;
 use vars qw[$DEBUG $error $VERSION $WARN $FOLLOW_SYMLINK $CHOWN $CHMOD
             $DO_NOT_USE_PREFIX $HAS_PERLIO $HAS_IO_STRING $SAME_PERMISSIONS
             $INSECURE_EXTRACT_MODE $ZERO_PAD_NUMBERS @ISA @EXPORT $RESOLVE_SYMLINK
-            $EXTRACT_BLOCK_SIZE $EXTRACT_HARDLINK
+            $EXTRACT_BLOCK_SIZE $EXTRACT_HARDLINK $MAX_FILE_SIZE
          ];
 
 @ISA                    = qw[Exporter];
@@ -32,7 +32,7 @@ use vars qw[$DEBUG $error $VERSION $WARN $FOLLOW_SYMLINK $CHOWN $CHMOD
 $DEBUG                  = 0;
 $WARN                   = 1;
 $FOLLOW_SYMLINK         = 0;
-$VERSION                = "3.08";
+$VERSION                = "3.10";
 $CHOWN                  = 1;
 $CHMOD                  = 1;
 $SAME_PERMISSIONS       = $> == 0 ? 1 : 0;
@@ -42,6 +42,7 @@ $ZERO_PAD_NUMBERS       = 0;
 $RESOLVE_SYMLINK        = $ENV{'PERL5_AT_RESOLVE_SYMLINK'} || 'speed';
 $EXTRACT_BLOCK_SIZE     = 1024 * 1024 * 1024;
 $EXTRACT_HARDLINK       = 0;
+$MAX_FILE_SIZE          = 1024 * 1024 * 1024;
 
 BEGIN {
     use Config;
@@ -444,6 +445,14 @@ sub _read_tar {
             }
 
             my $block = BLOCK_SIZE->( $entry->size );
+
+            if ( $MAX_FILE_SIZE && $entry->size > $MAX_FILE_SIZE ) {
+                $self->_error( qq[Entry '] . $entry->full_path .
+                    qq[' declared size ] . $entry->size .
+                    qq[ bytes exceeds \$Archive::Tar::MAX_FILE_SIZE ] .
+                    qq[($MAX_FILE_SIZE); refusing to allocate] );
+                next LOOP;
+            }
 
             $data = $entry->get_content_by_ref;
 
@@ -2223,6 +2232,13 @@ writing files during extraction. It defaults to 1 GiB. Please note that this
 cannot be arbitrarily large since some operating systems limit the number of
 bytes that can be written in one call to C<write(2)>, so if this is too large,
 extraction may fail with an error.
+
+=head2 $Archive::Tar::MAX_FILE_SIZE
+
+This variable holds an upper bound on the per-entry declared size that
+C<Archive::Tar> will accept when reading an archive. Entries whose header
+claims a larger size are refused with an error before any read allocation.
+Defaults to 1 GiB. Set to 0 to disable the cap.
 
 =cut
 

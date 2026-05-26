@@ -3,24 +3,15 @@ package WWW::MailboxOrg::API::Passwordreset;
 # ABSTRACT: Password reset API
 
 use Moo;
-use MooX::Singleton;
-use Carp qw(croak);
-use Params::ValidationCompiler qw(validation_for);
-use Types::Standard qw(Str);
-
-our $VERSION = '0.001';
+with 'WWW::MailboxOrg::Role::API';
+use Params::ValidationCompiler qw( validation_for );
+use Types::Standard qw( Str );
 
 has client => (
     is       => 'ro',
     required => 1,
     weak_ref => 1,
 );
-
-sub _rpc {
-    my ($self, $method, @params) = @_;
-    my $client = $self->client or croak "No client set";
-    return $client->call($method, @params);
-}
 
 my %validators = (
     request => validation_for(
@@ -30,25 +21,27 @@ my %validators = (
     ),
     set => validation_for(
         params => {
-            account    => { type => Str, optional => 0 },
-            token     => { type => Str, optional => 0 },
+            account     => { type => Str, optional => 0 },
+            token       => { type => Str, optional => 0 },
             newpassword => { type => Str, optional => 0 },
         },
     ),
 );
 
+
 sub request {
-    my ($self, %params) = @_;
+    my ( $self, %params ) = @_;
     my $v = $validators{'request'};
     %params = $v->(%params) if $v;
-    return $self->_rpc('passwordreset.request', \%params);
+    return $self->_rpc( 'passwordreset.request', \%params );
 }
 
+
 sub set {
-    my ($self, %params) = @_;
+    my ( $self, %params ) = @_;
     my $v = $validators{'set'};
     %params = $v->(%params) if $v;
-    return $self->_rpc('passwordreset.set', \%params);
+    return $self->_rpc( 'passwordreset.set', \%params );
 }
 
 1;
@@ -65,11 +58,7 @@ WWW::MailboxOrg::API::Passwordreset - Password reset API
 
 =head1 VERSION
 
-version 0.001
-
-=head1 NAME
-
-WWW::MailboxOrg::API::Passwordreset - Password reset API
+version 0.100
 
 =head2 request
 
@@ -80,21 +69,19 @@ Request password reset. Required: C<account>.
 =head2 set
 
     $api->passwordreset->set(
-        account      => 'user@example.com',
-        token        => 'reset-token-from-email',
-        newpassword  => 'newsecret123',
+        account     => 'user@example.com',
+        token       => 'reset-token-from-email',
+        newpassword => 'newsecret123',
     );
 
 Set new password. Required: C<account>, C<token>, C<newpassword>.
-
-=cut
 
 =head1 SUPPORT
 
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/getty/p5-www-mailboxorg/issues>.
+L<https://github.com/Getty/p5-www-mailboxorg/issues>.
 
 =head2 IRC
 

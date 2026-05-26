@@ -95,9 +95,71 @@ subtest 'gen_word_phrase - functional' => sub {
     like($phrase_sep, qr/-/, 'separator is present in phrase');
 };
 
+subtest 'gen_random_token - non-numeric length falls back to 13' => sub {
+    my ($tok, $msg) = gen_random_token('abc');
+    ok( defined $tok, 'returns a value for non-numeric length' );
+    is( length($tok), 13, 'falls back to default length of 13' );
+};
+
+subtest 'gen_word_phrase - word count with separator' => sub {
+    my ($phrase, $msg) = gen_word_phrase(4, 4, 7, '-');
+    ok( defined $phrase, 'returns a value' );
+    my @words = split /-/, $phrase;
+    is( scalar @words, 4, 'exactly 4 words when using hyphen separator' );
+    for my $word (@words) {
+        ok( length($word) >= 4 && length($word) <= 7,
+            "word '$word' length is within 4-7" );
+    }
+};
+
+subtest 'g_success and g_error internal helpers' => sub {
+    # Called directly to cover the default-message branches.
+    my ($val, $msg) = Concierge::Auth::Generators::g_success('test_value');
+    is( $val, 'test_value', 'g_success returns the value' );
+    like( $msg, qr/successful/i, 'g_success uses default message when none given' );
+
+    my $scalar_val = Concierge::Auth::Generators::g_success('x');
+    is( $scalar_val, 'x', 'g_success scalar context returns the value' );
+
+    my ($undef_val, $err_msg) = Concierge::Auth::Generators::g_error();
+    ok( !defined $undef_val, 'g_error returns undef' );
+    like( $err_msg, qr/failed/i, 'g_error uses default message when none given' );
+
+    my $scalar_err = Concierge::Auth::Generators::g_error();
+    ok( !defined $scalar_err, 'g_error scalar context returns undef' );
+};
+
+subtest 'gen_word_phrase - impossible length triggers g_error' => sub {
+    # This path is only reachable when the dictionary file opens successfully
+    # but yields no words matching the length criteria. On systems without
+    # /usr/share/dict/web2, the fallback generates random strings instead,
+    # so the g_error path cannot be triggered.
+    plan skip_all => 'requires /usr/share/dict/web2'
+        unless -e '/usr/share/dict/web2';
+
+    # No dictionary word is 999+ chars; wordlist will be empty,
+    # causing gen_word_phrase to call g_error and return undef.
+    my ($result, $msg) = gen_word_phrase(4, 999, 999);
+    ok( !defined $result, 'returns undef when no words match length criteria' );
+    like( $msg, qr/No words available/i, 'error message mentions no words available' );
+};
+
+subtest 'gen_token deprecated alias - functional' => sub {
+    my $tok = Concierge::Auth::Generators::gen_token();
+    ok( defined $tok, 'gen_token alias returns a value' );
+    is( length($tok), 13, 'default length is 13' );
+};
+
+subtest 'gen_crypt_token deprecated alias - functional' => sub {
+    my $tok = Concierge::Auth::Generators::gen_crypt_token();
+    ok( defined $tok, 'gen_crypt_token alias returns a value' );
+    is( length($tok), 13, 'default length is 13' );
+};
+
 ## OO interface tests (Auth.pm wrappers)
 
-my $auth = Concierge::Auth->new({ no_file => 1 });
+my $auth;
+my $w = warnings { $auth = Concierge::Auth->new({ no_file => 1 }) };
 
 subtest 'gen_uuid - OO' => sub {
     my ($ok, $msg) = $auth->gen_uuid();
@@ -133,6 +195,25 @@ subtest 'gen_word_phrase - OO' => sub {
     my ($ok, $msg) = $auth->gen_word_phrase();
     ok($ok, 'returns truthy');
     ok(length($ok) > 0, 'non-empty phrase');
+};
+
+subtest 'gen_word_phrase - OO custom params' => sub {
+    my ($phrase, $msg) = $auth->gen_word_phrase(3, 4, 6, '_');
+    ok( $phrase, 'returns truthy' );
+    my @words = split /_/, $phrase;
+    is( scalar @words, 3, 'correct word count via OO' );
+};
+
+subtest 'gen_token deprecated alias - OO' => sub {
+    my ($ok, $msg) = $auth->gen_token();
+    ok( $ok, 'gen_token OO alias returns truthy' );
+    is( length($ok), 13, 'default length 13' );
+};
+
+subtest 'gen_crypt_token deprecated alias - OO' => sub {
+    my ($ok, $msg) = $auth->gen_crypt_token();
+    ok( $ok, 'gen_crypt_token OO alias returns truthy' );
+    is( length($ok), 13, 'default length 13' );
 };
 
 done_testing;

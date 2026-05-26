@@ -2,7 +2,7 @@ package DBIx::QuickORM::Dialect::SQLite;
 use strict;
 use warnings;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000020';
 
 use DBD::SQLite 1.0;
 
@@ -11,18 +11,90 @@ use DBIx::QuickORM::Affinity qw/affinity_from_type/;
 use DBIx::QuickORM::Util qw/column_key/;
 
 use parent 'DBIx::QuickORM::Dialect';
-use DBIx::QuickORM::Util::HashBase;
+use Object::HashBase;
 
 use DBIx::QuickORM::Schema;
 use DBIx::QuickORM::Schema::Table;
 use DBIx::QuickORM::Schema::Table::Column;
 use DBIx::QuickORM::Schema::View;
 
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::QuickORM::Dialect::SQLite - SQLite dialect for DBIx::QuickORM.
+
+=head1 DESCRIPTION
+
+The SQLite-specific L<DBIx::QuickORM::Dialect>. Introspects schema metadata
+from SQLite's C<pragma_*> tables and C<sqlite_schema>, drives transactions
+and savepoints via the SQLite driver, and reports SQLite's feature set
+(C<RETURNING> support, no async support).
+
+=head1 SYNOPSIS
+
+    my $dialect = DBIx::QuickORM::Dialect::SQLite->new(dbh => $dbh, db_name => $name);
+
+=cut
+
+=pod
+
+=head1 PUBLIC METHODS
+
+=over 4
+
+=item $ver = $dialect->fallback_ver
+
+=item $ver = $dialect->oldest_ver
+
+=item $ver = $dialect->latest_ver
+
+=item $driver = $dialect->dbi_driver
+
+=item $name = $dialect->dialect_name
+
+=item $bool = $dialect->supports_returning_update
+
+=item $bool = $dialect->supports_returning_insert
+
+=item $bool = $dialect->supports_returning_delete
+
+=item $bool = $dialect->async_supported
+
+=item $bool = $dialect->async_cancel_supported
+
+=item $bool = $dialect->version_search
+
+Feature flags and constants describing the SQLite dialect. SQLite has no
+versioned dialect variants and does not support async queries.
+
+=item $dialect->async_prepare_args
+
+=item $dialect->async_ready
+
+=item $dialect->async_result
+
+=item $dialect->async_cancel
+
+SQLite does not support async queries; these C<croak>.
+
+=item $version = $dialect->db_version
+
+The installed C<DBD::SQLite> version.
+
+=cut
+
+# {{{ Feature flags, version info, and async stubs
+
 sub fallback_ver { 1 }
 sub oldest_ver   { 1 }
 sub latest_ver   { 1 }
 sub dbi_driver   { 'DBD::SQLite' }
 sub dialect_name { 'SQLite' }
+
+sub datetime_formatter { 'DateTime::Format::SQLite' }
 
 sub supports_returning_update { 1 }
 sub supports_returning_insert { 1 }
@@ -35,16 +107,52 @@ sub async_ready            { croak "Dialect '" . $_[0]->dialect_name . "' does n
 sub async_result           { croak "Dialect '" . $_[0]->dialect_name . "' does not support async queries" }
 sub async_cancel           { croak "Dialect '" . $_[0]->dialect_name . "' does not support async queries" }
 
-sub start_txn          { my ($s, %p) = @_; my $dbh = $p{dbh} // $s->dbh; $dbh->begin_work }
-sub commit_txn         { my ($s, %p) = @_; my $dbh = $p{dbh} // $s->dbh; $dbh->commit }
-sub rollback_txn       { my ($s, %p) = @_; my $dbh = $p{dbh} // $s->dbh; $dbh->rollback }
-sub create_savepoint   { my ($s, %p) = @_; my $dbh = $p{dbh} // $s->dbh; $dbh->do("SAVEPOINT $p{savepoint}") }
-sub commit_savepoint   { my ($s, %p) = @_; my $dbh = $p{dbh} // $s->dbh; $dbh->do("RELEASE SAVEPOINT $p{savepoint}") }
-sub rollback_savepoint { my ($s, %p) = @_; my $dbh = $p{dbh} // $s->dbh; $dbh->do("ROLLBACK TO SAVEPOINT $p{savepoint}") }
-
 sub version_search { 0 }
 
-sub db_version { DBD::SQLite->VERSION }
+sub db_version { my $self = shift; DBD::SQLite->VERSION }
+
+# }}} Feature flags, version info, and async stubs
+
+=pod
+
+=item $dialect->start_txn(%params)
+
+=item $dialect->commit_txn(%params)
+
+=item $dialect->rollback_txn(%params)
+
+=item $dialect->create_savepoint(%params)
+
+=item $dialect->commit_savepoint(%params)
+
+=item $dialect->rollback_savepoint(%params)
+
+Transaction and savepoint control via the SQLite driver. Each accepts an
+optional C<dbh> parameter, defaulting to the dialect's own handle; savepoint
+methods take a C<savepoint> name.
+
+=cut
+
+# {{{ Transactions and savepoints
+
+sub start_txn          { my ($self, %p) = @_; my $dbh = $p{dbh} // $self->dbh; $dbh->begin_work }
+sub commit_txn         { my ($self, %p) = @_; my $dbh = $p{dbh} // $self->dbh; $dbh->commit }
+sub rollback_txn       { my ($self, %p) = @_; my $dbh = $p{dbh} // $self->dbh; $dbh->rollback }
+sub create_savepoint   { my ($self, %p) = @_; my $dbh = $p{dbh} // $self->dbh; my $sp = $dbh->quote_identifier($p{savepoint}); $dbh->do("SAVEPOINT $sp") }
+sub commit_savepoint   { my ($self, %p) = @_; my $dbh = $p{dbh} // $self->dbh; my $sp = $dbh->quote_identifier($p{savepoint}); $dbh->do("RELEASE SAVEPOINT $sp") }
+sub rollback_savepoint { my ($self, %p) = @_; my $dbh = $p{dbh} // $self->dbh; my $sp = $dbh->quote_identifier($p{savepoint}); $dbh->do("ROLLBACK TO SAVEPOINT $sp") }
+
+# }}} Transactions and savepoints
+
+=pod
+
+=item $dsn = $dialect->dsn($db)
+
+Builds a SQLite DSN string from a database config object.
+
+=back
+
+=cut
 
 sub dsn {
     my $self_or_class = shift;
@@ -67,6 +175,19 @@ my %TABLE_TYPES = (
     'table' => 'DBIx::QuickORM::Schema::Table',
     'view'  => 'DBIx::QuickORM::Schema::View',
 );
+
+=pod
+
+=head1 PUBLIC METHODS
+
+=over 4
+
+=item $tables = $dialect->build_tables_from_db(%params)
+
+Introspects all tables and views (including temp ones) and returns a hashref
+of name to schema-table object.
+
+=cut
 
 sub build_tables_from_db {
     my $self = shift;
@@ -109,6 +230,14 @@ sub build_tables_from_db {
 
     return \%tables;
 }
+
+=pod
+
+=item ($pk, $unique, $links) = $dialect->build_table_keys_from_db($table, %params)
+
+Introspects a table's primary key, unique keys, and foreign-key links.
+
+=cut
 
 sub build_table_keys_from_db {
     my $self = shift;
@@ -174,6 +303,14 @@ sub build_table_keys_from_db {
     return($pk, \%unique, \@links);
 }
 
+=pod
+
+=item $bool = $dialect->table_has_autoinc($table)
+
+True if the named table declares an C<AUTOINCREMENT> column.
+
+=cut
+
 sub table_has_autoinc {
     my $self = shift;
     my ($table) = @_;
@@ -187,6 +324,15 @@ sub table_has_autoinc {
 
     return $res ? 1 : 0;
 }
+
+=pod
+
+=item $columns = $dialect->build_columns_from_db($table, %params)
+
+Introspects a table's columns and returns a hashref of column name to
+column object.
+
+=cut
 
 sub build_columns_from_db {
     my $self = shift;
@@ -228,6 +374,16 @@ sub build_columns_from_db {
     return \%columns;
 }
 
+=pod
+
+=item $indexes = $dialect->build_indexes_from_db($table, %params)
+
+Introspects a table's indexes and returns an arrayref of index specs.
+
+=back
+
+=cut
+
 sub build_indexes_from_db {
     my $self = shift;
     my ($table, %params) = @_;
@@ -258,6 +414,20 @@ sub build_indexes_from_db {
     return [map { $params{autofill}->hook(index => {index => $out{$_}, table_name => $table}); $out{$_} } sort keys %out];
 }
 
+=pod
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item @cols = $dialect->_primary_key($table)
+
+Returns the primary-key column names for a table, ordered by key position.
+
+=back
+
+=cut
+
 sub _primary_key {
     my $self = shift;
     my ($table) = @_;
@@ -278,3 +448,37 @@ sub _primary_key {
 ###############################################################################
 
 1;
+
+__END__
+
+=head1 SOURCE
+
+The source code repository for DBIx::QuickORM can be found at
+L<https://github.com/exodist/DBIx-QuickORM>.
+
+=head1 MAINTAINERS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut

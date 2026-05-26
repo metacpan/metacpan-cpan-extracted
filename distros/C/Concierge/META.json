@@ -50,19 +50,19 @@
    "provides" : {
       "Concierge" : {
          "file" : "lib/Concierge.pm",
-         "version" : "v0.7.0"
+         "version" : "v0.8.0"
       },
-      "Concierge::Base" : {
-         "file" : "lib/Concierge/Base.pm",
-         "version" : "v0.7.0"
+      "Concierge::Desk::Base" : {
+         "file" : "lib/Concierge/Desk/Base.pm",
+         "version" : "v0.8.0"
       },
-      "Concierge::Setup" : {
-         "file" : "lib/Concierge/Setup.pm",
-         "version" : "v0.7.0"
+      "Concierge::Desk::Setup" : {
+         "file" : "lib/Concierge/Desk/Setup.pm",
+         "version" : "v0.8.0"
       },
-      "Concierge::User" : {
-         "file" : "lib/Concierge/User.pm",
-         "version" : "v0.7.0"
+      "Concierge::Desk::User" : {
+         "file" : "lib/Concierge/Desk/User.pm",
+         "version" : "v0.8.0"
       }
    },
    "release_status" : "stable",
@@ -76,6 +76,6 @@
          "web" : "https://github.com/bwva/Concierge"
       }
    },
-   "version" : "v0.7.0",
+   "version" : "v0.8.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

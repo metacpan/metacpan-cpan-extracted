@@ -375,4 +375,250 @@ subtest 'Reserved field name handling' => sub {
     ok((grep { $_ eq 'custom1' } @{$field_meta->{fields}}), 'custom1 accepted');
 };
 
+
+# ==============================================================================
+# Test Group 10: Timestamp and Date Utilities
+# ==============================================================================
+subtest 'Timestamp and date utility methods' => sub {
+    my $date = Concierge::Users::Meta::current_date();
+    ok($date, 'current_date returns a value');
+    like($date, qr/^\d{4}-\d{2}-\d{2}$/, 'current_date returns YYYY-MM-DD format');
+
+    my $ts = Concierge::Users::Meta::current_timestamp();
+    ok($ts, 'current_timestamp returns a value');
+    like($ts, qr/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/, 'current_timestamp returns YYYY-MM-DD HH:MM:SS');
+
+    my $archive_ts = Concierge::Users::Meta::archive_timestamp();
+    ok($archive_ts, 'archive_timestamp returns a value');
+    like($archive_ts, qr/^\d{8}_\d{6}$/, 'archive_timestamp returns YYYYMMDD_HHMMSS format');
+};
+
+# ==============================================================================
+# Test Group 11: Backend config() Methods
+# ==============================================================================
+subtest 'Backend config() methods' => sub {
+    # Test database backend config()
+    my $db_dir = tempdir(CLEANUP => 1);
+    my $db_result = Concierge::Users->setup({
+        storage_dir => $db_dir, backend => 'database',
+        include_standard_fields => [],
+    });
+    my $db_users = Concierge::Users->new($db_result->{config_file});
+    my $db_config = $db_users->{backend}->config();
+    ok($db_config, 'Database backend config() returns data');
+    ok($db_config->{storage_dir}, 'Database config has storage_dir');
+
+    # Test file backend config()
+    my $file_dir = tempdir(CLEANUP => 1);
+    my $file_result = Concierge::Users->setup({
+        storage_dir => $file_dir, backend => 'file',
+        include_standard_fields => [],
+    });
+    my $file_users = Concierge::Users->new($file_result->{config_file});
+    my $file_config = $file_users->{backend}->config();
+    ok($file_config, 'File backend config() returns data');
+    ok($file_config->{storage_dir}, 'File config has storage_dir');
+
+    # Test YAML backend config()
+    my $yaml_dir = tempdir(CLEANUP => 1);
+    my $yaml_result = Concierge::Users->setup({
+        storage_dir => $yaml_dir, backend => 'yaml',
+        include_standard_fields => [],
+    });
+    my $yaml_users = Concierge::Users->new($yaml_result->{config_file});
+    my $yaml_config = $yaml_users->{backend}->config();
+    ok($yaml_config, 'YAML backend config() returns data');
+    ok($yaml_config->{storage_dir}, 'YAML config has storage_dir');
+};
+
+# ==============================================================================
+# Test Group 12: Class Array Methods
+# ==============================================================================
+subtest 'Class array access methods' => sub {
+    my @core    = Concierge::Users::Meta::user_core_fields();
+    my @standard = Concierge::Users::Meta::user_standard_fields();
+    my @system  = Concierge::Users::Meta::user_system_fields();
+
+    ok(scalar @core > 0, 'user_core_fields returns fields');
+    ok((grep { $_ eq 'user_id'  } @core), 'user_id in core fields');
+    ok((grep { $_ eq 'moniker'  } @core), 'moniker in core fields');
+
+    ok(scalar @standard > 0, 'user_standard_fields returns fields');
+    ok((grep { $_ eq 'email' }  @standard), 'email in standard fields');
+    ok((grep { $_ eq 'phone' }  @standard), 'phone in standard fields');
+
+    ok(scalar @system > 0, 'user_system_fields returns fields');
+    ok((grep { $_ eq 'created_date'  } @system), 'created_date in system fields');
+    ok((grep { $_ eq 'last_mod_date' } @system), 'last_mod_date in system fields');
+};
+
+# ==============================================================================
+# Test Group 11: get_user_fields
+# ==============================================================================
+subtest 'get_user_fields' => sub {
+    my $storage_dir = tempdir(CLEANUP => 1);
+    my $config = {
+        storage_dir             => $storage_dir,
+        backend                 => 'database',
+        include_standard_fields => [qw/ email phone /],
+    };
+    my $result = Concierge::Users->setup($config);
+    my $users  = Concierge::Users->new($result->{config_file});
+
+    my $fields = $users->get_user_fields();
+
+    ok($fields, 'get_user_fields returns a value');
+    is(ref $fields, 'ARRAY', 'get_user_fields returns arrayref');
+    ok((grep { $_ eq 'user_id' } @$fields), 'user_id in fields');
+    ok((grep { $_ eq 'email'   } @$fields), 'email in fields');
+    ok((grep { $_ eq 'phone'   } @$fields), 'phone in fields');
+};
+
+# ==============================================================================
+# Test Group 12: show_config
+# ==============================================================================
+subtest 'show_config' => sub {
+    my $storage_dir = tempdir(CLEANUP => 1);
+    my $config = {
+        storage_dir             => $storage_dir,
+        backend                 => 'database',
+        include_standard_fields => [qw/ email /],
+    };
+    my $setup_result = Concierge::Users->setup($config);
+    my $users = Concierge::Users->new($setup_result->{config_file});
+
+    # Test 1: Success case - capture stdout to avoid polluting test output
+    my $output = '';
+    {
+        open(local *STDOUT, '>', \$output) or die "Cannot redirect STDOUT: $!";
+        my $result = $users->show_config();
+        ok($result->{success}, 'show_config returns success');
+        ok($result->{config_file}, 'show_config returns config_file path');
+    }
+    like($output, qr/Configuration|Field Definitions/i, 'show_config prints YAML content');
+
+    # Test 2: Error case - non-existent output_path
+    my $err_result = $users->show_config(output_path => '/nonexistent/path/to/file.yaml');
+    ok(!$err_result->{success}, 'show_config fails with non-existent yaml file');
+    like($err_result->{message}, qr/not found/i, 'Error message mentions not found');
+
+    # Test 3: Error case - called on non-backend object
+    my $bare = bless {}, 'Concierge::Users';
+    my $bare_result = $bare->show_config();
+    ok(!$bare_result->{success}, 'show_config fails without backend');
+    like($bare_result->{message}, qr/must be called on a Users instance/i, 'Error mentions instance requirement');
+};
+
+# ==============================================================================
+# Test Group 13: show_default_config
+# ==============================================================================
+subtest 'show_default_config' => sub {
+    # Capture stdout to avoid polluting test output
+    my $output = '';
+    {
+        open(local *STDOUT, '>', \$output) or die "Cannot redirect STDOUT: $!";
+        Concierge::Users::Meta->show_default_config();
+    }
+    # show_default_config reads from __DATA__ and prints it
+    # Just verify it doesn't die and produces some output (or DATA was already consumed)
+    ok(1, 'show_default_config does not die');
+};
+
+# ==============================================================================
+# Test Group 14: init_field_meta with string-form include_standard_fields
+# ==============================================================================
+subtest 'init_field_meta with comma-separated string' => sub {
+    my $config = {
+        include_standard_fields => 'email, phone, first_name',
+        app_fields => [],
+    };
+
+    my $field_meta = Concierge::Users::Meta::init_field_meta($config);
+
+    ok($field_meta, 'init_field_meta returns data for string input');
+    ok((grep { $_ eq 'email'      } @{$field_meta->{fields}}), 'email field included');
+    ok((grep { $_ eq 'phone'      } @{$field_meta->{fields}}), 'phone field included');
+    ok((grep { $_ eq 'first_name' } @{$field_meta->{fields}}), 'first_name field included');
+    ok(!(grep { $_ eq 'last_name' } @{$field_meta->{fields}}), 'last_name excluded (not requested)');
+
+    # Also test semicolon separator
+    my $config2 = {
+        include_standard_fields => 'email;phone',
+        app_fields => [],
+    };
+    my $field_meta2 = Concierge::Users::Meta::init_field_meta($config2);
+    ok((grep { $_ eq 'email' } @{$field_meta2->{fields}}), 'Semicolon-separated: email included');
+    ok((grep { $_ eq 'phone' } @{$field_meta2->{fields}}), 'Semicolon-separated: phone included');
+};
+
+# ==============================================================================
+# Test Group 15: init_field_meta non-standard field warning
+# ==============================================================================
+subtest 'init_field_meta non-standard field name warning' => sub {
+    use Test2::Tools::Warnings qw/ warning /;
+
+    my $config = {
+        include_standard_fields => [qw/ email nosuchfield /],
+        app_fields => [],
+    };
+
+    # carp generates a warning - verify it happens
+    my $w = warning {
+        Concierge::Users::Meta::init_field_meta($config);
+    };
+
+    like($w, qr/Non-standard field requested: nosuchfield/i,
+        'Warning generated for unknown standard field name');
+
+    # Only valid fields should be included
+    my $field_meta = Concierge::Users::Meta::init_field_meta($config);
+    ok((grep { $_ eq 'email'       } @{$field_meta->{fields}}), 'Valid field email included');
+    ok(!(grep { $_ eq 'nosuchfield'} @{$field_meta->{fields}}), 'Unknown field excluded from fields list');
+};
+
+# ==============================================================================
+# Test Group 16: labelize edge cases
+# ==============================================================================
+subtest 'labelize edge cases' => sub {
+    # Normal case
+    my $label1 = Concierge::Users::Meta::labelize('first_name');
+    is($label1, 'First Name', 'Converts underscore to title case');
+
+    my $label2 = Concierge::Users::Meta::labelize('user_id');
+    is($label2, 'User Id', 'Converts user_id correctly');
+
+    # Edge case: undef argument
+    my $label3 = Concierge::Users::Meta::labelize(undef);
+    ok(!defined $label3, 'Returns undef for undef input');
+
+    # Edge case: empty string
+    my $label4 = Concierge::Users::Meta::labelize('');
+    ok(!defined $label4, 'Returns undef for empty string input');
+};
+
+# ==============================================================================
+# Test Group 17: _yaml_scalar_value edge cases
+# ==============================================================================
+subtest '_yaml_scalar_value edge cases' => sub {
+    # undef
+    is(Concierge::Users::Meta::_yaml_scalar_value(undef),  'null', 'undef becomes null');
+
+    # empty string
+    is(Concierge::Users::Meta::_yaml_scalar_value(''),     '""',   'Empty string becomes ""');
+
+    # integer
+    is(Concierge::Users::Meta::_yaml_scalar_value(42),     '42',   'Integer passes through');
+
+    # Simple word (no spaces)
+    is(Concierge::Users::Meta::_yaml_scalar_value('hello'), 'hello', 'Simple word passes through');
+
+    # String with spaces gets quoted
+    is(Concierge::Users::Meta::_yaml_scalar_value('hello world'), '"hello world"',
+        'String with spaces is quoted');
+
+    # Negative integer
+    is(Concierge::Users::Meta::_yaml_scalar_value(-5), '-5', 'Negative integer passes through');
+};
+
 done_testing();
+

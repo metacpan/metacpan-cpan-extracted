@@ -20,8 +20,7 @@ use WWW::MailboxOrg::API::Utils;
 use WWW::MailboxOrg::API::System;
 use namespace::clean;
 
-our $VERSION = '0.001';
-
+our $VERSION = '0.100';
 
 has user => (
     is       => 'ro',
@@ -47,10 +46,22 @@ has base_url => (
 );
 
 
+around BUILDARGS => sub {
+    my ( $orig, $class, @args ) = @_;
+    my $args = $class->$orig( @args );
+
+    $args->{user}     = $ENV{WWW_MAILBOXORG_USER}     if !defined $args->{user}     && defined $ENV{WWW_MAILBOXORG_USER};
+    $args->{password} = $ENV{WWW_MAILBOXORG_PASSWORD} if !defined $args->{password} && defined $ENV{WWW_MAILBOXORG_PASSWORD};
+    $args->{base_url} = $ENV{WWW_MAILBOXORG_BASE_URL} if !defined $args->{base_url} && defined $ENV{WWW_MAILBOXORG_BASE_URL};
+    $args->{token}    = $ENV{WWW_MAILBOXORG_TOKEN}    if !defined $args->{token}    && defined $ENV{WWW_MAILBOXORG_TOKEN};
+
+    return $args;
+};
+
 with 'WWW::MailboxOrg::Role::HTTP';
 
 sub _set_auth_header {
-    my ($self, $headers) = @_;
+    my ( $self, $headers ) = @_;
     $headers->{'HPLS-AUTH'} = $self->token if $self->token;
 }
 
@@ -58,17 +69,17 @@ sub _set_auth_header {
 sub login {
     my ($self) = @_;
 
-    my $result = $self->call('auth', {
+    my $result = $self->call( 'auth', {
         user => $self->user,
         pass => $self->password,
-    });
+    } );
 
-    if (ref $result && $result->{session}) {
-        $self->_set_token($result->{session});
+    if ( ref $result && $result->{session} ) {
+        $self->_set_token( $result->{session} );
         return $result;
     }
 
-    croak "Login failed: " . ($result // 'no session returned');
+    croak "Login failed: " . ( $result // 'no session returned' );
 }
 
 
@@ -76,7 +87,7 @@ sub logout {
     my ($self) = @_;
 
     $self->call('deauth') if $self->token;
-    $self->_clear_token;
+    $self->clear_token;
 }
 
 sub DEMOLISH {
@@ -85,87 +96,88 @@ sub DEMOLISH {
 }
 
 # Resource accessors
+
 has base => (
     is      => 'lazy',
-    builder => sub { WWW::MailboxOrg::API::Base->new(client => shift) },
+    builder => sub { WWW::MailboxOrg::API::Base->new( client => shift ) },
 );
 
 
 has account => (
     is      => 'lazy',
-    builder => sub { WWW::MailboxOrg::API::Account->new(client => shift) },
+    builder => sub { WWW::MailboxOrg::API::Account->new( client => shift ) },
 );
 
 
 has domain => (
     is      => 'lazy',
-    builder => sub { WWW::MailboxOrg::API::Domain->new(client => shift) },
+    builder => sub { WWW::MailboxOrg::API::Domain->new( client => shift ) },
 );
 
 
 has mail => (
     is      => 'lazy',
-    builder => sub { WWW::MailboxOrg::API::Mail->new(client => shift) },
+    builder => sub { WWW::MailboxOrg::API::Mail->new( client => shift ) },
 );
 
 
 has mailinglist => (
     is      => 'lazy',
-    builder => sub { WWW::MailboxOrg::API::Mailinglist->new(client => shift) },
+    builder => sub { WWW::MailboxOrg::API::Mailinglist->new( client => shift ) },
 );
 
 
 has blacklist => (
     is      => 'lazy',
-    builder => sub { WWW::MailboxOrg::API::Blacklist->new(client => shift) },
+    builder => sub { WWW::MailboxOrg::API::Blacklist->new( client => shift ) },
 );
 
 
 has spamprotect => (
     is      => 'lazy',
-    builder => sub { WWW::MailboxOrg::API::Spamprotect->new(client => shift) },
+    builder => sub { WWW::MailboxOrg::API::Spamprotect->new( client => shift ) },
 );
 
 
 has videochat => (
     is      => 'lazy',
-    builder => sub { WWW::MailboxOrg::API::Videochat->new(client => shift) },
+    builder => sub { WWW::MailboxOrg::API::Videochat->new( client => shift ) },
 );
 
 
 has backup => (
     is      => 'lazy',
-    builder => sub { WWW::MailboxOrg::API::Backup->new(client => shift) },
+    builder => sub { WWW::MailboxOrg::API::Backup->new( client => shift ) },
 );
 
 
 has invoice => (
     is      => 'lazy',
-    builder => sub { WWW::MailboxOrg::API::Invoice->new(client => shift) },
+    builder => sub { WWW::MailboxOrg::API::Invoice->new( client => shift ) },
 );
 
 
 has passwordreset => (
     is      => 'lazy',
-    builder => sub { WWW::MailboxOrg::API::Passwordreset->new(client => shift) },
+    builder => sub { WWW::MailboxOrg::API::Passwordreset->new( client => shift ) },
 );
 
 
 has validate => (
     is      => 'lazy',
-    builder => sub { WWW::MailboxOrg::API::Validate->new(client => shift) },
+    builder => sub { WWW::MailboxOrg::API::Validate->new( client => shift ) },
 );
 
 
 has utils => (
     is      => 'lazy',
-    builder => sub { WWW::MailboxOrg::API::Utils->new(client => shift) },
+    builder => sub { WWW::MailboxOrg::API::Utils->new( client => shift ) },
 );
 
 
 has system => (
     is      => 'lazy',
-    builder => sub { WWW::MailboxOrg::API::System->new(client => shift) },
+    builder => sub { WWW::MailboxOrg::API::System->new( client => shift ) },
 );
 
 
@@ -183,7 +195,7 @@ WWW::MailboxOrg - Perl client for Mailbox.org API
 
 =head1 VERSION
 
-version 0.001
+version 0.100
 
 =head1 SYNOPSIS
 
@@ -194,14 +206,9 @@ version 0.001
         password => 'secret123',
     );
 
-    # Authenticate and get session
     $api->login;
-
-    # List accounts
     my $accounts = $api->account->list;
-
-    # Get domain info
-    my $domain = $api->domain->get(domain => 'example.com');
+    my $domain   = $api->domain->get(domain => 'example.com');
 
 =head1 DESCRIPTION
 
@@ -211,30 +218,36 @@ Uses JSON-RPC 2.0 over HTTPS with session-based authentication.
 =head2 user
 
 Mailbox.org username or email address.
+B<Required>.
 
 =head2 password
 
 Mailbox.org password.
+B<Required>.
 
 =head2 token
 
 Session token (HPLS-AUTH). Set after successful login.
+Managed automatically by L</login> and L</logout>.
 
 =head2 base_url
 
-Base URL for the API. Defaults to C<https://api.mailbox.org/v1>.
+Base URL for the API.
+Defaults to C<https://api.mailbox.org/v1>.
 
 =head2 login
 
     $api->login;
 
 Authenticate with username/password and store session token.
+Called automatically when needed, but can be called explicitly.
 
 =head2 logout
 
     $api->logout;
 
 End the current session.
+Called automatically on object destruction if a token is set.
 
 =head2 base
 
@@ -292,9 +305,34 @@ Returns L<WWW::MailboxOrg::API::Utils> for utility functions.
 
 Returns L<WWW::MailboxOrg::API::System> for system info (hello, test).
 
+=head1 ENVIRONMENT
+
+All environment variables are namespaced with the C<WWW_MAILBOXORG_> prefix,
+reflecting the module namespace. A value passed explicitly to L</new> always
+takes precedence over the corresponding environment variable.
+
+=head2 WWW_MAILBOXORG_USER
+
+Default for L</user> when not passed to L</new>.
+
+=head2 WWW_MAILBOXORG_PASSWORD
+
+Default for L</password> when not passed to L</new>.
+
+=head2 WWW_MAILBOXORG_BASE_URL
+
+Default for L</base_url> when not passed to L</new>.
+
+=head2 WWW_MAILBOXORG_TOKEN
+
+Pre-set session L</token> when not passed to L</new>. Lets you reuse an
+existing session instead of calling L</login>.
+
 =head1 SEE ALSO
 
 L<https://api.mailbox.org/v1/doc/methods/index.html> - Mailbox.org API docs
+
+L<bin/mborg> - Command-line interface
 
 =cut
 
@@ -303,7 +341,7 @@ L<https://api.mailbox.org/v1/doc/methods/index.html> - Mailbox.org API docs
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/getty/p5-www-mailboxorg/issues>.
+L<https://github.com/Getty/p5-www-mailboxorg/issues>.
 
 =head2 IRC
 

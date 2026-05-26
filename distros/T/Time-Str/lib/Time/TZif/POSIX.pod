@@ -1,0 +1,348 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Time::TZif::POSIX - POSIX TZ string parser with configurable local time resolution
+
+=head1 SYNOPSIS
+
+    use Time::TZif::POSIX;
+
+    my $tz = Time::TZif::POSIX->new(
+      tz_string      => 'EST5EDT,M3.2.0,M11.1.0',
+      gap_policy     => 'later',      # default policy for gaps
+      overlap_policy => 'earlier',    # default policy for overlaps
+    );
+
+    # UTC to offset (always unambiguous)
+    my $offset = $tz->offset_for_utc($epoch);
+
+    # Local time to offset (uses constructor defaults)
+    my $offset = $tz->offset_for_local($epoch);
+
+    # Local time to offset (override per call)
+    my $offset = $tz->offset_for_local($epoch, gap_policy => 'reject');
+
+    # Full type info: ($offset, $is_dst, $abbreviation)
+    my ($off, $dst, $abbr) = $tz->type_info_for_utc($epoch);
+    my ($off, $dst, $abbr) = $tz->type_info_for_local($epoch, gap_policy => 'std');
+
+=head1 DESCRIPTION
+
+B<Note:> This module is experimental and may change without prior notice.
+
+C<Time::TZif::POSIX> parses POSIX TZ strings as defined in
+IEEE Std 1003.1 (POSIX.1) and RFC 8536 E<sect>3.3.1, and provides
+the same API as L<Time::TZif> for resolving UTC and local times to
+UTC offsets.
+
+A POSIX TZ string encodes timezone rules algorithmically, without
+storing individual transition timestamps.  In TZif v2/v3 files, a
+POSIX TZ string appears as a footer and describes the rules that apply
+after the last stored transition.  This module implements those rules
+as a standalone parser.
+
+=head2 POSIX TZ String Format
+
+The general form is:
+
+    std offset [dst [offset] , start [/time] , end [/time]]
+
+=over 4
+
+=item B<std>, B<dst>
+
+Timezone designation (abbreviation). Unquoted names consist of three
+or more ASCII letters (e.g., C<EST>). Quoted names are enclosed in
+angle brackets and may include letters, digits, C<+>, and C<->
+(e.g., C<E<lt>+05E<gt>>).  A minimum of three characters is required
+inside the brackets.
+
+=item B<offset>
+
+UTC offset in the form C<[+-]hh[:mm[:ss]]>. Hours E<lt>= 24,
+minutes E<lt>= 59, seconds E<lt>= 59, total E<lt>= E<plusmn>86400.
+Note the B<POSIX sign convention>: a positive offset indicates a zone
+I<west> of Greenwich (the sign is inverted internally to yield the
+conventional UTC offset).
+
+If the DST offset is omitted, it defaults to one hour ahead of
+standard time.
+
+=item B<start>, B<end>
+
+Transition rules specifying when DST begins (I<start>) and ends
+(I<end>). Three rule forms are supported:
+
+=over 4
+
+=item C<Mm.w.d>
+
+The I<d>-th day of week (0=Sunday .. 6=Saturday) of the I<w>-th week
+of month I<m> (1-12). I<w>=5 means the last occurrence of that day in
+the month.
+
+=item C<Jn>
+
+Julian day I<n> (1-365). February 29 is B<never> counted, so day 60
+is always March 1.
+
+=item C<n>
+
+Zero-based day of year (0-365). February 29 B<is> counted in leap
+years.
+
+=back
+
+=item B<time>
+
+The wall-clock time at which the transition occurs, in the form
+C<[+-]hh[:mm[:ss]]>.  Defaults to C<02:00:00> if omitted.
+Hours may range up to 167 (RFC 8536 E<sect>3.3.1 extension).
+
+=back
+
+=head2 Examples
+
+    EST5EDT,M3.2.0,M11.1.0            US Eastern
+    CET-1CEST,M3.5.0/2,M10.5.0/3      Central European
+    <+05>-5                           Fixed UTC+5 (no DST)
+    NZST-12NZDT,M9.5.0,M4.1.0/3       New Zealand
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+    my $tz = Time::TZif::POSIX->new(
+      tz_string      => $string,
+      gap_policy     => 'reject',    # optional, default: 'reject'
+      overlap_policy => 'reject',    # optional, default: 'reject'
+    );
+
+Creates a new C<Time::TZif::POSIX> object by parsing the given POSIX
+TZ string.
+
+=over 4
+
+=item C<tz_string> (required)
+
+A POSIX TZ string (e.g., C<'EST5EDT,M3.2.0,M11.1.0'>).
+
+=item C<gap_policy> (optional, default: C<'reject'>)
+
+Default policy for resolving non-existing local times (during
+spring-forward gaps). See L<Time::TZif/POLICIES>. Can be overridden
+per call in C<offset_for_local> and C<type_info_for_local>.
+
+=item C<overlap_policy> (optional, default: C<'reject'>)
+
+Default policy for resolving ambiguous local times (during fall-back
+overlaps). See L<Time::TZif/POLICIES>. Can be overridden per call in
+C<offset_for_local> and C<type_info_for_local>.
+
+=back
+
+Croaks if the string cannot be parsed or contains out-of-range values.
+
+=head1 METHODS
+
+=head2 offset_for_utc
+
+    my $offset = $tz->offset_for_utc($time);
+
+Returns the UTC offset in seconds for the given UTC epoch time.  This
+is always unambiguous.
+
+=head2 offset_for_local
+
+    my $offset = $tz->offset_for_local($time);
+    my $offset = $tz->offset_for_local($time, %opts);
+
+Returns the UTC offset in seconds for the given local epoch time (i.e.,
+the epoch value obtained by treating the wall-clock time as if it were
+UTC).
+
+=head3 Options
+
+=over 4
+
+=item C<gap_policy> (default: constructor value)
+
+Policy for non-existing local times. See L<Time::TZif/POLICIES>.
+
+=item C<overlap_policy> (default: constructor value)
+
+Policy for ambiguous local times. See L<Time::TZif/POLICIES>.
+
+=back
+
+=head2 type_info_for_utc
+
+    my ($offset, $is_dst, $abbreviation) = $tz->type_info_for_utc($time);
+
+Returns the full type information for the given UTC epoch time:
+
+=over 4
+
+=item C<$offset> - UTC offset in seconds
+
+=item C<$is_dst> - 1 if daylight saving time, 0 otherwise
+
+=item C<$abbreviation> - timezone abbreviation (e.g., C<"EST">, C<"EDT">)
+
+=back
+
+=head2 type_info_for_local
+
+    my ($offset, $is_dst, $abbreviation) = $tz->type_info_for_local($time, %opts);
+
+Returns the full type information for the given local epoch time.
+Accepts the same C<gap_policy> and C<overlap_policy> options as
+C<offset_for_local>.
+
+=head2 tz_string
+
+    my $string = $tz->tz_string;
+
+Returns the POSIX TZ string used to construct the object.
+
+=head2 gap_policy
+
+    my $policy = $tz->gap_policy;
+
+Returns the default gap policy set in the constructor.
+
+=head2 overlap_policy
+
+    my $policy = $tz->overlap_policy;
+
+Returns the default overlap policy set in the constructor.
+
+=head1 CROSS-YEAR TRANSITIONS
+
+When a transition rule combined with its time and offset causes the
+computed UTC epoch to fall in an adjacent year (e.g., a late December
+rule with a large positive time, or a January rule with a negative
+time), the module correctly handles this by computing transitions for
+the target year and both adjacent years, sorting them by UTC epoch,
+and walking the full list.
+
+=head1 DIAGNOSTICS
+
+All error messages are thrown as exceptions via C<Carp::croak>.
+
+=head2 Unable to parse POSIX TZ string
+
+=over 4
+
+=item C<Unable to parse POSIX TZ string: '%s'>
+
+The string does not match the expected POSIX TZ format.
+
+=item C<Unable to parse POSIX TZ string: invalid offset '%s'>
+
+An offset component could not be parsed.
+
+=item C<Unable to parse POSIX TZ string: offset time is out of range: %s>
+
+The offset exceeds the allowed range (hours E<lt>= 24, minutes E<lt>= 59,
+seconds E<lt>= 59).
+
+=item C<Unable to parse POSIX TZ string: standard offset out of range: %d>
+
+The computed standard offset exceeds E<plusmn>86400 seconds.
+
+=item C<Unable to parse POSIX TZ string: daylight offset out of range: %d>
+
+The computed daylight offset exceeds E<plusmn>86400 seconds.
+
+=item C<Unable to parse POSIX TZ string: invalid rule time '%s'>
+
+A transition rule time could not be parsed.
+
+=item C<Unable to parse POSIX TZ string: rule time is out of range: %s>
+
+The rule time exceeds the allowed range (hours E<lt>= 167, minutes E<lt>= 59, 
+seconds E<lt>= 59).
+
+=item C<Unable to parse POSIX TZ string: invalid rule '%s'>
+
+A transition date rule could not be parsed.
+
+=item C<Unable to parse POSIX TZ string: rule month out of range [1, 12]: %d>
+
+The month in an C<Mm.w.d> rule is outside the valid range.
+
+=item C<Unable to parse POSIX TZ string: Julian day out of range [1, 365]: %d>
+
+The day in a C<Jn> rule is outside the valid range.
+
+=item C<Unable to parse POSIX TZ string: zero-based day out of range [0, 365]: %d>
+
+The day in an C<n> rule is outside the valid range.
+
+=back
+
+=head2 Unable to resolve local time
+
+=over 4
+
+=item C<Unable to resolve local time: non-existing time (gap)>
+
+The given local time falls within a gap created by a spring-forward
+transition and the C<gap_policy> is set to C<'reject'>.
+
+=item C<Unable to resolve local time: ambiguous time (overlap)>
+
+The given local time falls within an overlap created by a fall-back
+transition and the C<overlap_policy> is set to C<'reject'>.
+
+=back
+
+=head2 Usage errors
+
+=over 4
+
+=item C<Usage: %s>
+
+A method was called with an incorrect number of arguments.
+
+=item C<Parameter 'tz_string' is required>
+
+The C<new> constructor was called without the required C<tz_string>
+parameter.
+
+=item C<Invalid policy value for the parameter '%s'>
+
+The value given for C<gap_policy> or C<overlap_policy> is not one of
+the recognised policies (C<earlier>, C<later>, C<std>, C<dst>,
+C<reject>). See L<Time::TZif/POLICIES>.
+
+=item C<Unrecognised named parameter: '%s'>
+
+An unrecognised named parameter was given.
+
+=back
+
+=head1 SEE ALSO
+
+L<Time::TZif> - TZif binary timezone file parser
+
+L<IEEE Std 1003.1|https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap08.html> -
+POSIX.1 environment variables (TZ specification)
+
+L<RFC 8536|https://datatracker.ietf.org/doc/html/rfc8536> - The Time
+Zone Information Format (TZif)
+
+=head1 AUTHOR
+
+Christian Hansen
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 by Christian Hansen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

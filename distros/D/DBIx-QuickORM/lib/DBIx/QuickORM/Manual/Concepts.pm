@@ -2,6 +2,8 @@ package DBIx::QuickORM::Manual::Concepts;
 use strict;
 use warnings;
 
+our $VERSION = '0.000020';
+
 1;
 
 __END__

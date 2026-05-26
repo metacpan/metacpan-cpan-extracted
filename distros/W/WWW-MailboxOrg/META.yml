@@ -14,6 +14,82 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: WWW-MailboxOrg
+provides:
+  WWW::MailboxOrg:
+    file: lib/WWW/MailboxOrg.pm
+    version: '0.100'
+  WWW::MailboxOrg::API::Account:
+    file: lib/WWW/MailboxOrg/API/Account.pm
+    version: '0.100'
+  WWW::MailboxOrg::API::Backup:
+    file: lib/WWW/MailboxOrg/API/Backup.pm
+    version: '0.100'
+  WWW::MailboxOrg::API::Base:
+    file: lib/WWW/MailboxOrg/API/Base.pm
+    version: '0.100'
+  WWW::MailboxOrg::API::Blacklist:
+    file: lib/WWW/MailboxOrg/API/Blacklist.pm
+    version: '0.100'
+  WWW::MailboxOrg::API::Domain:
+    file: lib/WWW/MailboxOrg/API/Domain.pm
+    version: '0.100'
+  WWW::MailboxOrg::API::Invoice:
+    file: lib/WWW/MailboxOrg/API/Invoice.pm
+    version: '0.100'
+  WWW::MailboxOrg::API::Mail:
+    file: lib/WWW/MailboxOrg/API/Mail.pm
+    version: '0.100'
+  WWW::MailboxOrg::API::Mailinglist:
+    file: lib/WWW/MailboxOrg/API/Mailinglist.pm
+    version: '0.100'
+  WWW::MailboxOrg::API::Passwordreset:
+    file: lib/WWW/MailboxOrg/API/Passwordreset.pm
+    version: '0.100'
+  WWW::MailboxOrg::API::Spamprotect:
+    file: lib/WWW/MailboxOrg/API/Spamprotect.pm
+    version: '0.100'
+  WWW::MailboxOrg::API::System:
+    file: lib/WWW/MailboxOrg/API/System.pm
+    version: '0.100'
+  WWW::MailboxOrg::API::Utils:
+    file: lib/WWW/MailboxOrg/API/Utils.pm
+    version: '0.100'
+  WWW::MailboxOrg::API::Validate:
+    file: lib/WWW/MailboxOrg/API/Validate.pm
+    version: '0.100'
+  WWW::MailboxOrg::API::Videochat:
+    file: lib/WWW/MailboxOrg/API/Videochat.pm
+    version: '0.100'
+  WWW::MailboxOrg::Entity::Account:
+    file: lib/WWW/MailboxOrg/Entity/Account.pm
+    version: '0.100'
+  WWW::MailboxOrg::Entity::Domain:
+    file: lib/WWW/MailboxOrg/Entity/Domain.pm
+    version: '0.100'
+  WWW::MailboxOrg::JSONRPCRequest:
+    file: lib/WWW/MailboxOrg/JSONRPCRequest.pm
+    version: '0.100'
+  WWW::MailboxOrg::JSONRPCResponse:
+    file: lib/WWW/MailboxOrg/JSONRPCResponse.pm
+    version: '0.100'
+  WWW::MailboxOrg::LWPIO:
+    file: lib/WWW/MailboxOrg/LWPIO.pm
+    version: '0.100'
+  WWW::MailboxOrg::Role::API:
+    file: lib/WWW/MailboxOrg/Role/API.pm
+    version: '0.100'
+  WWW::MailboxOrg::Role::HTTP:
+    file: lib/WWW/MailboxOrg/Role/HTTP.pm
+    version: '0.100'
+  WWW::MailboxOrg::Role::IO:
+    file: lib/WWW/MailboxOrg/Role/IO.pm
+    version: '0.100'
+  WWW::MailboxOrg::Role::RPC:
+    file: lib/WWW/MailboxOrg/Role/RPC.pm
+    version: '0.100'
+  WWW::MailboxOrg::Types:
+    file: lib/WWW/MailboxOrg/Types.pm
+    version: '0.100'
 requires:
   Carp: '0'
   File::HomeDir: '0'
@@ -31,10 +107,10 @@ requires:
 resources:
   IRC: irc://irc.perl.org/#perl-help
   IRC_user: Getty
-  bugtracker: https://github.com/getty/p5-www-mailboxorg/issues
-  homepage: https://github.com/getty/p5-www-mailboxorg
-  repository: https://github.com/getty/p5-www-mailboxorg.git
-version: '0.001'
+  bugtracker: https://github.com/Getty/p5-www-mailboxorg/issues
+  homepage: https://github.com/Getty/p5-www-mailboxorg
+  repository: https://github.com/Getty/p5-www-mailboxorg.git
+version: '0.100'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -117,6 +193,30 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Author::GETTY/PodSyntaxTests'
       version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::Test::ChangesHasContent
+      name: '@Author::GETTY/Test::ChangesHasContent'
+      version: '0.011'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '6.037'
+          include_underscores: 0
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
+      name: '@Author::GETTY/MetaProvides::Package'
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@Author::GETTY/GithubMeta'
@@ -243,8 +343,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::RewriteVersion:
           add_tarball_name: 0
           finders:
-            - ':ExecFiles'
-            - ':InstallModules'
+            - ':MainModule'
           global: 0
           skip_version_provider: 0
         Dist::Zilla::Plugin::RewriteVersion::Transitional: {}
@@ -289,7 +388,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.001'
+          tag: '0.100'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -304,8 +403,7 @@ x_Dist_Zilla:
       config:
         Dist::Zilla::Plugin::BumpVersionAfterRelease:
           finders:
-            - ':ExecFiles'
-            - ':InstallModules'
+            - ':MainModule'
           global: 0
           munge_makefile_pl: 1
         Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional: {}
@@ -350,6 +448,10 @@ x_Dist_Zilla:
       name: '@Author::GETTY/Git::Push'
       version: '2.052'
     -
+      class: Dist::Zilla::Plugin::GitHub::CreateRelease
+      name: '@Author::GETTY/GitHub::CreateRelease'
+      version: '0.0008'
+    -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
       version: '6.037'
@@ -388,6 +490,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
       version: '6.037'
   zilla:
     class: Dist::Zilla::Dist::Builder

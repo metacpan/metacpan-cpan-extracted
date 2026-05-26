@@ -1,3 +1,18 @@
+0.87 2026-05-26
+  - Add Time::TZif::POSIX module for algorithmic POSIX TZ string
+    parsing (IEEE Std 1003.1 / RFC 8536 §3.3.1). Same API as
+    Time::TZif. Supports Mm.w.d, Jn, and n rule forms, quoted
+    designations, extended rule times, and cross-year transitions.
+  - Add gmtime_modern to Time::Str::Time for converting Unix epoch
+    to broken-down UTC time. Returns nine values like Perl's gmtime
+    but with modern conventions (month 1-12, full year). PP and XS
+    implementations with range validation.
+  - Add nth_dow_in_month to Time::Str::Calendar for computing the
+    nth occurrence of a weekday in a month. Supports forward (1–4)
+    and backward (-1 to -4) ordinals with ISO weekday numbering.
+  - Add find_tzdb_directory to Time::Str::Util for locating the
+    system timezone database directory.
+
 0.86 2026-05-23
   - Add Time::TZif module for parsing TZif binary timezone files
     (RFC 8536) with configurable local time resolution policies for

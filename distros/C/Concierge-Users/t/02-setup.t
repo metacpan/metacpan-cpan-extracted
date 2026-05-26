@@ -512,4 +512,84 @@ subtest 'Field overrides - combined with app fields' => sub {
     remove_tree($storage_dir);
 };
 
+
+# ==============================================================================
+# Test Group 13: Re-setup Archives Existing Data (all backends)
+# ==============================================================================
+subtest 'Re-setup archives existing data' => sub {
+
+    # Test 1: Database backend - archive when table has data
+    my $db_dir = "$temp_base/db-archive";
+
+    my $r1 = Concierge::Users->setup(make_config($db_dir, 'database'));
+    ok($r1->{success}, 'First database setup succeeds');
+
+    my $u1 = Concierge::Users->new($r1->{config_file});
+    $u1->{skip_validation} = 1;
+    $u1->register_user({ user_id => 'archivetest', moniker => 'ArchiveTest' });
+
+    # Second setup on same storage_dir - should archive the existing data
+    my $r2 = Concierge::Users->setup(make_config($db_dir, 'database'));
+    ok($r2->{success}, 'Second database setup succeeds (data archived)');
+
+    my $u2 = Concierge::Users->new($r2->{config_file});
+    $u2->{skip_validation} = 1;
+    is($u2->list_users()->{total_count}, 0, 'New table starts empty after archive');
+
+    remove_tree($db_dir);
+
+    # Test 2: Database backend - re-setup with empty table (no data to archive)
+    my $db_dir2 = "$temp_base/db-empty-reuse";
+
+    my $r3 = Concierge::Users->setup(make_config($db_dir2, 'database'));
+    ok($r3->{success}, 'First database setup (no users added)');
+
+    # Second setup without any users - triggers empty-table drop path
+    my $r4 = Concierge::Users->setup(make_config($db_dir2, 'database'));
+    ok($r4->{success}, 'Second database setup with empty table succeeds');
+
+    remove_tree($db_dir2);
+
+    # Test 3: File backend - archive when CSV has data
+    my $file_dir = "$temp_base/file-archive";
+
+    my $r5 = Concierge::Users->setup(make_config($file_dir, 'file', { file_format => 'csv' }));
+    ok($r5->{success}, 'First file setup succeeds');
+
+    my $u3 = Concierge::Users->new($r5->{config_file});
+    $u3->{skip_validation} = 1;
+    $u3->register_user({ user_id => 'filearchive', moniker => 'FileArchive' });
+
+    # Second setup - archives the CSV with data
+    my $r6 = Concierge::Users->setup(make_config($file_dir, 'file', { file_format => 'csv' }));
+    ok($r6->{success}, 'Second file setup succeeds (data archived)');
+
+    my $u4 = Concierge::Users->new($r6->{config_file});
+    $u4->{skip_validation} = 1;
+    is($u4->list_users()->{total_count}, 0, 'New CSV starts empty after archive');
+
+    remove_tree($file_dir);
+
+    # Test 4: YAML backend - archive when YAML files exist
+    my $yaml_dir = "$temp_base/yaml-archive";
+
+    my $r7 = Concierge::Users->setup(make_config($yaml_dir, 'yaml'));
+    ok($r7->{success}, 'First YAML setup succeeds');
+
+    my $u5 = Concierge::Users->new($r7->{config_file});
+    $u5->{skip_validation} = 1;
+    $u5->register_user({ user_id => 'yamlarchive', moniker => 'YAMLArchive' });
+
+    # Second setup - archives existing YAML files
+    my $r8 = Concierge::Users->setup(make_config($yaml_dir, 'yaml'));
+    ok($r8->{success}, 'Second YAML setup succeeds (data archived)');
+
+    my $u6 = Concierge::Users->new($r8->{config_file});
+    $u6->{skip_validation} = 1;
+    is($u6->list_users()->{total_count}, 0, 'New YAML storage starts empty after archive');
+
+    remove_tree($yaml_dir);
+};
+
 done_testing();
+

@@ -1,4 +1,4 @@
-package Concierge::Auth v0.4.3;
+package Concierge::Auth v0.4.5;
 use v5.36;
 
 # ABSTRACT: Concierge authorization using Crypt::Passphrase
@@ -444,10 +444,12 @@ sub gen_random_id {
 		: reject("gen_random_id: Failed to generate random ID");
 }
 
+# Deprecated
 sub gen_token {
 	goto &gen_random_token;
 }
 
+# Deprecated
 sub gen_crypt_token {
 	goto &gen_random_token;
 }
@@ -489,7 +491,7 @@ Concierge::Auth - Password authentication and token generation using Crypt::Pass
 
 =head1 VERSION
 
-v0.4.3
+v0.4.5
 
 =head1 SYNOPSIS
 

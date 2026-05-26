@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver;
 use strict;
 use warnings;
 
-our $VERSION = '0.000041';
+our $VERSION = '0.000042';
 
 use Carp qw/croak confess/;
 use File::Path qw/remove_tree/;
@@ -381,7 +381,24 @@ sub DESTROY {
     return unless $self->{+ROOT_PID} && $self->{+ROOT_PID} == $$;
 
     if (my $watcher = delete $self->{+WATCHER}) {
+        my $server_pid = $watcher->server_pid;
         $watcher->eliminate();
+        # Watcher::DESTROY (triggered by $watcher going out of scope) calls
+        # wait(), which blocks until the watcher process exits. After that,
+        # the server should be stopped and the dir cleaned up. But as a
+        # fallback, kill the server directly if it's still alive.
+        undef $watcher;
+
+        if ($server_pid && kill(0, $server_pid)) {
+            kill('TERM', $server_pid);
+            my $start = time;
+            while (kill(0, $server_pid)) {
+                last if time - $start > 5;
+                sleep 0.1;
+            }
+            kill('KILL', $server_pid) if kill(0, $server_pid);
+        }
+        $self->cleanup() if $self->should_cleanup;
     }
     elsif ($self->should_cleanup) {
         $self->cleanup();

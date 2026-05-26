@@ -2,27 +2,29 @@ package DBIx::QuickORM::Role::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000020';
 
 use Time::HiRes qw/sleep/;
 use Role::Tiny;
 
 with 'DBIx::QuickORM::Role::STH';
 
-requires qw{
-    source
-    only_one
-    dialect
-    ready
-    done
-    set_done
-    cancel
-    cancel_supported
-    next
-    result
-    got_result
-    clear
-};
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::QuickORM::Role::Async - Role for asynchronous statement handles.
+
+=head1 DESCRIPTION
+
+Extends L<DBIx::QuickORM::Role::STH> for statement handles whose results
+arrive asynchronously (driver-level async or a forked child). Provides
+C<wait> (poll C<ready> until the result is available) and a C<DESTROY> that
+cancels or drains an unfinished handle so it never leaks an in-flight query.
+
+=cut
 
 sub wait { sleep 0.1 until $_[0]->ready }
 
@@ -44,3 +46,37 @@ sub DESTROY {
 }
 
 1;
+
+__END__
+
+=head1 SOURCE
+
+The source code repository for DBIx::QuickORM can be found at
+L<https://github.com/exodist/DBIx-QuickORM>.
+
+=head1 MAINTAINERS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut

@@ -26,6 +26,8 @@ lib/Time/Str/Util.pm
 lib/Time/Str/Util.pod
 lib/Time/TZif.pm
 lib/Time/TZif.pod
+lib/Time/TZif/POSIX.pm
+lib/Time/TZif/POSIX.pod
 prereqs.yml
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
@@ -54,6 +56,7 @@ t/format/UnixStamp.t
 t/format/W3CDTF.t
 t/module/Calendar.t
 t/module/Regexp.t
+t/module/TZif-POSIX.t
 t/module/TZif.t
 t/module/Time.t
 t/module/Token.t

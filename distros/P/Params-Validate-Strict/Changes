@@ -1,5 +1,27 @@
 Revision history for Params-Validate-Strict
 
+0.33	Mon May 25 09:21:12 EDT 2026
+
+  [Enhancements]
+  - More informative boundary messages
+  - New type 'scalar': accepts any plain scalar value but rejects references
+  - New type 'scalarref': accepts a reference to a scalar (\$var) but rejects
+    plain scalars, arrayrefs, hashrefs, coderefs, and objects; error message
+    distinguishes "a plain scalar" from other reference kinds
+
+  [Tests]
+  - Comprehensive combinatorial test suite (t/extended_tests.t) covering every
+    type paired with every applicable rule: type×min, type×max, type×min×max
+    for string/integer/number/float/arrayref/hashref; type×matches,
+    type×nomatch, type×memberof (case-sensitive and case-insensitive),
+    type×notmemberof; optional×default for all types; transform combined with
+    min/max/matches/memberof/notmemberof; callback with coercion and
+    cross-field access; validate/validator; description in errors; union types;
+    isa/can fail cases and multi-method arrays; element_type×min×max; nested
+    schema fail cases; cross-validation and relationship fail cases;
+    positional argument coercion; all rule synonyms (regex, enum, values, str,
+    bool, float, minimum); min-as-coderef; and complex multi-rule combinations
+
 0.32	Mon May 11 20:34:23 EDT 2026
 
   [Enhancements]

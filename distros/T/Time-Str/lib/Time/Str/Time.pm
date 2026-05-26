@@ -6,8 +6,10 @@ use v5.10.1;
 use Exporter qw[import];
 
 BEGIN {
-  our $VERSION     = '0.86';
-  our @EXPORT_OK   = qw[ timegm_posix
+  our $VERSION     = '0.87';
+  our @EXPORT_OK   = qw[ gmtime_modern
+                         gmtime_year
+                         timegm_posix
                          timegm_modern
                          valid_hms
                          valid_hms60 ];

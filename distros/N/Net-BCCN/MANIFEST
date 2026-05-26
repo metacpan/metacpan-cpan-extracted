@@ -1,0 +1,10 @@
+MANIFEST
+COPYING
+Changes
+README
+Makefile.PL
+lib/Net/BCCN.pm
+t/try-bccn-send.pl
+t/try-bccn-recv.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

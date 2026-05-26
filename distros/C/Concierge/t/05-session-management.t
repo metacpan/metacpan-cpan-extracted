@@ -6,13 +6,13 @@ use File::Temp qw(tempdir);
 use File::Spec;
 use DBI;
 
-use Concierge::Setup;
+use Concierge::Desk::Setup;
 use Concierge;
 
 # Setup test desk
 my $test_dir = tempdir(CLEANUP => 1);
 
-Concierge::Setup::build_quick_desk($test_dir, ['pref']);
+Concierge::Desk::Setup::build_quick_desk($test_dir, ['pref']);
 my $desk = Concierge->open_desk($test_dir);
 my $concierge = $desk->{concierge};
 
@@ -30,7 +30,7 @@ subtest 'login_user creates session' => sub {
     });
 
     ok $result->{success}, 'login succeeds';
-    isa_ok $result->{user}, ['Concierge::User'], 'returns User object';
+    isa_ok $result->{user}, ['Concierge::Desk::User'], 'returns User object';
 
     my $user = $result->{user};
     ok $user->session_id(), 'session_id assigned';
@@ -143,7 +143,7 @@ subtest 'restore_user restores logged-in user' => sub {
     ok $result->{success}, 'restore_user succeeds';
 
     my $restored = $result->{user};
-    isa_ok $restored, ['Concierge::User'], 'returns User object';
+    isa_ok $restored, ['Concierge::Desk::User'], 'returns User object';
     is $restored->user_id(), 'sessiontest', 'user_id correct';
     is $restored->user_key(), $user_key, 'user_key preserved';
     is $restored->session_id(), $session_id, 'session_id preserved';

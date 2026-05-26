@@ -1,5 +1,11 @@
 Revision history for Authen-OATH
 
+3.000000  2026-05-25 20:28:30Z
+   - Bumped to version 3.000000 and adopted decimal versioning.
+   - Fixed arbitrary code execution vulnerability via the digest attribute.
+   - Replaced eval STRING module loads in tests with Test::Needs.
+   - Added Convert::Base32 as a develop prereq.
+
 2.0.1     2017-04-12 11:59:11-04:00 America/Toronto
    - Bumped to next major version (2.0.0) because digest now defaults to
      Digest::SHA rather than Digest::SHA1.  See

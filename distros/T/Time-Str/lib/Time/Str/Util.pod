@@ -4,11 +4,15 @@
 
 =head1 NAME
 
-Time::Str::Util - Binary search utilities for sorted arrays
+Time::Str::Util - Binary search and time zone database utilities
 
 =head1 SYNOPSIS
 
-    use Time::Str::Util qw( lower_bound upper_bound );
+    use Time::Str::Util qw( find_tzdb_directory
+                            lower_bound upper_bound range_bounds );
+
+    # Locate system zoneinfo directory
+    my $tzdir = find_tzdb_directory();  # /usr/share/zoneinfo or undef
 
     my @sorted = (10, 20, 30, 40, 50);
 
@@ -18,15 +22,21 @@ Time::Str::Util - Binary search utilities for sorted arrays
     # With optional bounds
     my $k = lower_bound(\@sorted, 25, 1, 4);  # search within [1, 4)
 
+    # Range query: indices of elements in [15, 35]
+    my ($lo, $hi) = range_bounds(\@sorted, 15, 35);  # (1, 3)
+
 =head1 DESCRIPTION
 
-This module provides binary search functions for sorted integer arrays,
-following the C++ STL convention. All functions are exportable on request.
-Use C<:all> to import everything.
+This module provides binary search functions for sorted integer arrays
+and utilities for locating the system's IANA Time Zone Database.
+All functions are exportable on request. Use C<:all> to import
+everything.
 
 =head1 FUNCTIONS
 
-=head2 lower_bound
+=head2 Binary Search
+
+=head3 lower_bound
 
     my $index = lower_bound($arrayref, $value);
     my $index = lower_bound($arrayref, $value, $lo, $hi);
@@ -38,7 +48,22 @@ C<$value>, returns the length of the array (one past the last index).
 Optional C<$lo> and C<$hi> parameters restrict the search to the
 half-open range C<[$lo, $hi)>. Defaults to C<[0, length)>.
 
-=head2 upper_bound
+=head3 range_bounds
+
+    my ($lo, $hi) = range_bounds($arrayref, $min_value, $max_value);
+
+Returns a pair of indices C<($lo, $hi)> defining the half-open range
+C<[$lo, $hi)> of elements within C<[$min_value, $max_value]>.
+C<$lo> is the index of the first element E<gt>= C<$min_value> (via
+binary search), and C<$hi> is the index of the first element
+E<gt> C<$max_value> (via linear scan from C<$lo>).
+
+This is optimized for cases where few elements fall within the range,
+as the linear scan avoids a second binary search.
+
+Croaks if C<$min_value> E<gt> C<$max_value>.
+
+=head3 upper_bound
 
     my $index = upper_bound($arrayref, $value);
     my $index = upper_bound($arrayref, $value, $lo, $hi);
@@ -49,6 +74,31 @@ equal to C<$value>, returns the length of the array.
 
 Optional C<$lo> and C<$hi> parameters restrict the search to the
 half-open range C<[$lo, $hi)>. Defaults to C<[0, length)>.
+
+=head2 Time Zone Database
+
+=head3 find_tzdb_directory
+
+    my $dir = find_tzdb_directory();
+
+Returns the path to the system's IANA Time Zone Database directory
+(zoneinfo), or C<undef> if no valid directory is found.
+
+The search order is:
+
+=over 4
+
+=item 1. C<$ENV{TZDIR}> if set and the directory exists.
+
+=item 2. Well-known paths: F</usr/share/zoneinfo>, F</usr/lib/zoneinfo>,
+F</usr/share/lib/zoneinfo>, F</etc/zoneinfo>, F</usr/share/zoneinfo.default>.
+
+=item 3. macOS: F</var/db/timezone/zoneinfo> (symlink to the active version).
+
+=back
+
+A candidate directory is accepted only if it exists and contains a
+F<UTC> file.
 
 =head1 SEE ALSO
 

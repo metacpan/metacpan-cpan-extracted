@@ -1,5 +1,5 @@
 package Thunderhorse;
-$Thunderhorse::VERSION = '0.103';
+$Thunderhorse::VERSION = '0.105';
 ##################################
 # ~~~~~~~~~~~~ Ride ~~~~~~~~~~~~ #
 # ~~~~~~~~~~~~ Ride ~~~~~~~~~~~~ #
@@ -531,7 +531,7 @@ to avoid consuming the context by accident:
 	sub check_admin ($self, $ctx)
 	{
 		await $self->render_error($ctx, 403)
-			unless $ctx->req->session->{is_admin};
+			unless $ctx->session->get('is_admin', false);
 
 		# if context is not consumed, continue to next match
 		return undef;
@@ -982,7 +982,7 @@ Loading the module:
 			root => 'public',
 		},
 		Session => {
-			store => 'file',
+			secret => 'XXXXXXXXXXXX',
 		},
 	});
 
@@ -995,7 +995,7 @@ the order explicitly, use the C<_order> key in middleware configuration:
 
 	$self->load_module('Middleware' => {
 		Static => { path => '/static', root => 'public', _order => 1 },
-		Session => { store => 'file', _order => 2 },
+		Session => { secret => 'XXXXXXXXXXXX', _order => 2 },
 	});
 
 Lower C<_order> values are applied first, higher values are

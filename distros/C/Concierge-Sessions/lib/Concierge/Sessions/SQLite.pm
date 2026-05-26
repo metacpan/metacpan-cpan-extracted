@@ -1,4 +1,4 @@
-package Concierge::Sessions::SQLite v0.11.0;
+package Concierge::Sessions::SQLite v0.11.1;
 use v5.36;
 
 use parent 'Concierge::Sessions::Base';
@@ -304,7 +304,7 @@ Concierge::Sessions::SQLite - SQLite backend for session storage
 
 =head1 VERSION
 
-v0.9.0
+v0.11.1
 
 =head1 SYNOPSIS
 

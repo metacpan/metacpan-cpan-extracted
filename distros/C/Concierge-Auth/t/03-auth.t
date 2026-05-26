@@ -133,4 +133,96 @@ subtest 'validation failures - bad password' => sub {
     ok( !$ok, 'resetPwd rejects short password' );
 };
 
+subtest 'validation failures - undef/empty password arg' => sub {
+    # Exercises the `my $passwd = shift || ''` branch in setPwd/resetPwd
+    # when the caller passes an empty string or no second argument.
+    my ($ok, $msg) = $auth->setPwd('someuser', '');
+    ok( !$ok, 'setPwd rejects empty string password' );
+    like( $msg, qr/empty/i, 'message mentions empty' );
+
+    ($ok, $msg) = $auth->resetPwd('someuser', '');
+    ok( !$ok, 'resetPwd rejects empty string password' );
+    like( $msg, qr/empty/i, 'message mentions empty' );
+};
+
+# ========== confirm/reject/reply response helpers ==========
+# These are undocumented package functions used internally;
+# tested here to cover their default-message branches.
+
+subtest 'confirm - default message' => sub {
+    my ($ok, $msg) = Concierge::Auth::confirm();
+    ok( $ok, 'confirm() with no arg returns true' );
+    like( $msg, qr/confirmation/i, 'default confirmation message used' );
+};
+
+subtest 'reject - default message' => sub {
+    my ($ok, $msg) = Concierge::Auth::reject();
+    ok( !$ok, 'reject() with no arg returns false' );
+    like( $msg, qr/rejection/i, 'default rejection message used' );
+};
+
+subtest 'reply - single-arg forms' => sub {
+    # With no message arg, the ternary picks the default based on $bool
+    my ($r1, $m1) = Concierge::Auth::reply(1);
+    ok( $r1, 'reply(1) returns true' );
+    like( $m1, qr/confirmation/i, 'truthy bool gives confirmation default' );
+
+    my ($r0, $m0) = Concierge::Auth::reply(0);
+    ok( !$r0, 'reply(0) returns false' );
+    like( $m0, qr/rejection/i, 'falsy bool gives rejection default' );
+
+    # No args at all — $bool defaults to 0 via //
+    my ($rn, $mn) = Concierge::Auth::reply();
+    ok( !$rn, 'reply() with no args returns false' );
+};
+
+# ========== encryptPwd ==========
+
+subtest 'encryptPwd - valid password' => sub {
+    my $hash = $auth->encryptPwd('password123');
+    ok( $hash, 'encryptPwd returns a truthy value' );
+    like( $hash, qr/^\$argon2/, 'hash has Argon2 format' );
+};
+
+subtest 'encryptPwd - invalid password rejected' => sub {
+    my $result = $auth->encryptPwd('short');
+    ok( !$result, 'encryptPwd returns falsy for invalid password' );
+
+    my ($ok, $msg) = $auth->encryptPwd('short');
+    ok( !$ok, 'list context: encryptPwd returns false for invalid password' );
+    like( $msg, qr/between/i, 'message mentions length requirement' );
+};
+
+# ========== no-file error paths ==========
+
+subtest 'checkID - no file configured' => sub {
+    my $nf;
+    my $w = warnings { $nf = Concierge::Auth->new({ no_file => 1 }) };
+    my ($ok, $msg) = $nf->checkID('alice');
+    ok( !$ok, 'checkID fails when no file is set' );
+    like( $msg, qr/No auth file/i, 'message mentions no auth file' );
+};
+
+subtest 'checkPwd - no file configured' => sub {
+    my $nf;
+    my $w = warnings { $nf = Concierge::Auth->new({ no_file => 1 }) };
+    my ($ok, $msg) = $nf->checkPwd('alice', 'password123');
+    ok( !$ok, 'checkPwd fails when no file is set' );
+};
+
+subtest 'deleteID - no file configured' => sub {
+    my $nf;
+    my $w = warnings { $nf = Concierge::Auth->new({ no_file => 1 }) };
+    my ($ok, $msg) = $nf->deleteID('alice');
+    ok( !$ok, 'deleteID fails when no file is set' );
+};
+
+subtest 'resetPwd - no file configured' => sub {
+    my $nf;
+    my $w = warnings { $nf = Concierge::Auth->new({ no_file => 1 }) };
+    my ($ok, $msg) = $nf->resetPwd('alice', 'password123');
+    ok( !$ok, 'resetPwd fails when no file is set' );
+    like( $msg, qr/Not OK/i, 'message reflects file validation failure' );
+};
+
 done_testing;

@@ -1,3 +1,62 @@
+0.000020  2026-05-25 22:18:44-07:00 America/Los_Angeles
+
+    Features:
+    - Add DBIx::QuickORM->quick(), a DSL-free interface returning a ready ORM/connection.
+    - quick() gains autorow, row_manager, and auto_types options.
+    - Add a DuckDB dialect (DBIx::QuickORM::Dialect::DuckDB), auto-selected for DBD::DuckDB.
+    - Add Type::DateTime, a lazy DateTime type with database-string stringification.
+    - Add Util::Mask, a lazy object-hiding wrapper that keeps values out of stack traces.
+    - Add a subquery option to LiteralSource to wrap a full statement as a derived table.
+    - Use Atomic::Pipe with zstd compression for forked-query IPC.
+
+    Documentation:
+    - Rebuild the Manual: hub plus QuickStart, Concepts, guides, recipes, features, and a DBIx::Class concept-map page.
+    - Document the DateTime type and value masking in Manual::Types.
+    - Complete and annotate the DSL export reference; move examples into the Manual.
+    - Add inline POD across nearly all modules.
+
+    Internal / cleanup:
+    - Drop the inlined HashBase and use Object::HashBase directly.
+    - Make transaction state authoritative from the result; add an exception attribute.
+    - Resolve links by keyword (table/alias/columns) and drop the broken scalar-ref spec.
+    - Remove the vestigial, never-implemented schema->DDL generation scaffolding from Dialect.
+    - Align declared prereqs with actual usage.
+    - Default do_for_all_dbs test concurrency to 4.
+    - Exclude dev-only files (old*/, agent_scripts/, AI_DOCS/, *.md) from the build tarball.
+    - Add [PruneCruft] to dist.ini so build artifacts no longer leak into release tarballs.
+
+    Fixes:
+    - Fix compare_affinity_values: boolean comparison was inverted; handle both-undef without warnings.
+    - Fix Link::merge clobbering the created note and aliases of the merged link.
+    - Fix Row field-hash accessors passing the wrong view method.
+    - Fix Connection::state_cache_lookup to honor its documented arguments.
+    - Fix LiteralSource::new: copy the SQL instead of blessing the caller's scalar ref.
+    - Fix UUID and JSON types to use defined checks instead of truthiness for values.
+    - Fix Autofill define_autorow to use the saved error instead of $@ directly.
+    - Quote savepoint names in MySQL and SQLite transaction statements.
+    - Fix the forked-query child to exit non-zero on error and reap it to avoid zombies.
+    - Fix STH::Fork::cancel to handle an already-exited child gracefully.
+    - Fix STH::next to finalize before throwing on too-many-rows.
+    - Fix STH::Async/STH::Fork result() to use exists instead of truthiness.
+    - Fix Transaction DESTROY to roll back (not commit) when falling out of scope.
+    - Fix creds() to validate the builder context before invoking the credential callback.
+    - Fix Connection update_or_insert and find_or_insert delegating to nonexistent methods.
+    - Fix Cached::uncache to extract values from the primary-key hashref.
+    - Fix Cached::uncache and _merge_state to read existing state from the target row.
+    - Fix PostgreSQL build_tables_from_db to use the current table name after hooks.
+    - Fix MySQL build_table_keys_from_db and build_indexes_from_db argument handling.
+    - Fix Table::merge to fall back to the other side's primary key when missing.
+    - Fix Column affinity() to return after the scalar-ref-type branch.
+    - Fix not_null to default nullable to 0 when called with no arguments.
+    - Fix Row::Async::can() and check_sync after the row swaps itself out.
+    - Fix Iterator to use the READY() constant for its hash key.
+    - Fix Handle -unknown flag comparison and fork child error exit.
+    - Fix transaction stack mismatch precedence and undef-safe state comparisons.
+    - Fix merge_hash_of_objs default params and value dereference.
+    - Fix _normalize_omit to build a hashref instead of a scalar-context map count.
+    - Fix Join::Row missing List::Util import; JSON qorm_sql_type reachable die.
+    - Fix unimport_from to remove exported subs; typo in a Dialect error message.
+
 0.000019  2025-08-22 16:17:34-07:00 America/Los_Angeles
 
     - Add report test

@@ -6,8 +6,6 @@ use Type::Library -base, -declare => qw( EmailAddress DomainName );
 use Type::Utils -all;
 use Types::Standard -types;
 
-our $VERSION = '0.001';
-
 my $meta = __PACKAGE__->meta;
 
 declare EmailAddress,
@@ -36,7 +34,7 @@ WWW::MailboxOrg::Types - Custom types for Mailbox.org API
 
 =head1 VERSION
 
-version 0.001
+version 0.100
 
 =head1 SYNOPSIS
 
@@ -62,7 +60,7 @@ Valid domain name format.
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/getty/p5-www-mailboxorg/issues>.
+L<https://github.com/Getty/p5-www-mailboxorg/issues>.
 
 =head2 IRC
 

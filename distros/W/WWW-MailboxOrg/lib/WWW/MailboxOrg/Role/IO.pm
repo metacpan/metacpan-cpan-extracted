@@ -4,8 +4,6 @@ package WWW::MailboxOrg::Role::IO;
 
 use Moo::Role;
 
-our $VERSION = '0.001';
-
 requires 'call';
 
 1;
@@ -22,7 +20,7 @@ WWW::MailboxOrg::Role::IO - Interface role for pluggable JSON-RPC backends
 
 =head1 VERSION
 
-version 0.001
+version 0.100
 
 =head1 SYNOPSIS
 
@@ -61,7 +59,7 @@ Must return a L<WWW::MailboxOrg::JSONRPCResponse>.
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/getty/p5-www-mailboxorg/issues>.
+L<https://github.com/Getty/p5-www-mailboxorg/issues>.
 
 =head2 IRC
 

@@ -1,10 +1,13 @@
 package Authen::OATH;
-$Authen::OATH::VERSION = '2.0.1';
+
 use warnings;
 use strict;
 
+our $VERSION = '3.000000';
+
 use Digest::HMAC;
 use Math::BigInt;
+use Module::Runtime qw( is_module_name require_module );
 use Moo 2.002004;
 use Types::Standard qw( Int Str );
 
@@ -32,15 +35,16 @@ sub totp {
     $secret = join( "", map chr( hex($_) ), $secret =~ /(..)/g )
         if $secret =~ /^[a-fA-F0-9]{32,}$/;
     my $mod = $self->digest;
-    if ( eval "require $mod" ) {
-        $mod->import();
-    }
+    die "Invalid digest module name: $mod"
+        unless defined $mod && is_module_name($mod);
+    require_module($mod);
+    $mod->import;
     my $time = $manual_time || time();
-    my $T = Math::BigInt->new( int( $time / $self->timestep ) );
+    my $T    = Math::BigInt->new( int( $time / $self->timestep ) );
     die "Must request at least 6 digits" if $self->digits < 6;
     ( my $hex = $T->as_hex ) =~ s/^0x(.*)/"0"x(16 - length $1) . $1/e;
     my $bin_code = join( "", map chr( hex($_) ), $hex =~ /(..)/g );
-    my $otp = $self->_process( $secret, $bin_code );
+    my $otp      = $self->_process( $secret, $bin_code );
     return $otp;
 }
 
@@ -50,14 +54,15 @@ sub hotp {
     $secret = join( "", map chr( hex($_) ), $secret =~ /(..)/g )
         if $secret =~ /^[a-fA-F0-9]{32,}$/;
     my $mod = $self->digest;
-    if ( eval "require $mod" ) {
-        $mod->import();
-    }
+    die "Invalid digest module name: $mod"
+        unless defined $mod && is_module_name($mod);
+    require_module($mod);
+    $mod->import;
     $c = Math::BigInt->new($c);
     die "Must request at least 6 digits" if $self->digits < 6;
     ( my $hex = $c->as_hex ) =~ s/^0x(.*)/"0"x(16 - length $1) . $1/e;
     my $bin_code = join( "", map chr( hex($_) ), $hex =~ /(..)/g );
-    my $otp = $self->_process( $secret, $bin_code );
+    my $otp      = $self->_process( $secret, $bin_code );
     return $otp;
 }
 
@@ -95,7 +100,7 @@ Authen::OATH - OATH One Time Passwords
 
 =head1 VERSION
 
-version 2.0.1
+version 3.000000
 
 =head1 SYNOPSIS
 

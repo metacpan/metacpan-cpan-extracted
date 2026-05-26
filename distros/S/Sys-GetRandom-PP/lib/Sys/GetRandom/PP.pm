@@ -19,7 +19,7 @@ use constant do {
     );
     my $getrandom = $bits_getrandom{$^O} || do {
         require Config;
-        my ($arch) = $Config::Config{archname} =~ m{^(\w+-\w+)};
+        my ($arch) = $Config::Config{archname} =~ m{^([^\-]+-[^\-]+)};
         $bits_getrandom{$arch} || die "Unsupported platform: $arch"
     };
     +{
@@ -29,7 +29,7 @@ use constant do {
     }
 };
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 our @EXPORT_OK = qw(
     GRND_RANDOM

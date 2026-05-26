@@ -1,5 +1,12 @@
 Revision history for Concierge-Auth
 
+v0.4.5  2026-05-25
+    - Fix t/05-generators.t: skip dict-dependent subtest on systems without
+      /usr/share/dict/web2 (Linux CPAN tester failure)
+
+v0.4.4  2026-05-25
+    - Expand test coverage across all test files
+
 v0.4.3  2026-02-17
     - Version Bump for CPAN
 

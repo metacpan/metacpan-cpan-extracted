@@ -229,6 +229,199 @@ subtest 'type hashref: arrayref rejected' => sub {
 };
 
 # ══════════════════════════════════════════════════════════════════════════════
+# Type: scalar
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'type scalar: plain string accepted' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => 'scalar' } },
+		input  => { x => 'hello' },
+	);
+	is($r->{x}, 'hello', 'string returned unchanged');
+};
+
+subtest 'type scalar: integer value accepted unchanged' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => 'scalar' } },
+		input  => { x => 42 },
+	);
+	is($r->{x}, 42, 'integer returned unchanged — scalar type does not coerce');
+};
+
+subtest 'type scalar: zero accepted' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => 'scalar' } },
+		input  => { x => 0 },
+	);
+	is($r->{x}, 0, 'zero (falsy scalar) accepted');
+};
+
+subtest 'type scalar: empty string accepted' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => 'scalar' } },
+		input  => { x => '' },
+	);
+	is($r->{x}, '', 'empty string accepted');
+};
+
+subtest 'type scalar: arrayref rejected' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => [] })
+	} qr/must be a scalar/, 'croaks when arrayref passed as scalar';
+};
+
+subtest 'type scalar: hashref rejected' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => {} })
+	} qr/must be a scalar/, 'croaks when hashref passed as scalar';
+};
+
+subtest 'type scalar: coderef rejected' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => sub {} })
+	} qr/must be a scalar/, 'croaks when coderef passed as scalar';
+};
+
+subtest 'type scalar: blessed object rejected' => sub {
+	my $obj = Unit::Searcher->new;
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => $obj })
+	} qr/must be a scalar/, 'croaks when blessed object passed as scalar';
+};
+
+subtest 'type scalar: logger receives error when reference supplied' => sub {
+	my $logger = MockLogger->new;
+	my @logged;
+	my $m = mock_scoped('MockLogger', 'error',
+		sub { push @logged, join('', @_[1 .. $#_]) });
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalar' } },
+			input  => { x => [] },
+			logger => $logger,
+		)
+	} qr/must be a scalar/, 'still croaks with logger present';
+	ok(scalar @logged > 0,                 'logger->error called on scalar type failure');
+	like($logged[0], qr/must be a scalar/, 'logger receives the error message');
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Type: scalarref
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'type scalarref: reference to scalar accepted' => sub {
+	my $s = 'hello';
+	my $r = validate_strict(
+		schema => { x => { type => 'scalarref' } },
+		input  => { x => \$s },
+	);
+	is($r->{x}, \$s, 'scalar reference returned unchanged');
+};
+
+subtest 'type scalarref: reference to integer accepted' => sub {
+	my $n = 42;
+	my $r = validate_strict(
+		schema => { x => { type => 'scalarref' } },
+		input  => { x => \$n },
+	);
+	is($r->{x}, \$n, 'reference to integer returned unchanged — scalarref does not coerce');
+};
+
+subtest 'type scalarref: plain scalar rejected' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => 'hello' })
+	} qr/must be a scalar reference/, 'croaks when plain scalar passed as scalarref';
+};
+
+subtest 'type scalarref: arrayref rejected' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => [] })
+	} qr/must be a scalar reference/, 'croaks when arrayref passed as scalarref';
+};
+
+subtest 'type scalarref: hashref rejected' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => {} })
+	} qr/must be a scalar reference/, 'croaks when hashref passed as scalarref';
+};
+
+subtest 'type scalarref: coderef rejected' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => sub {} })
+	} qr/must be a scalar reference/, 'croaks when coderef passed as scalarref';
+};
+
+subtest 'type scalarref: blessed object rejected' => sub {
+	my $obj = Unit::Searcher->new;
+	throws_ok {
+		validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => $obj })
+	} qr/must be a scalar reference/, 'croaks when blessed object passed as scalarref';
+};
+
+subtest 'type scalarref: logger receives error when non-scalarref supplied' => sub {
+	my $logger = MockLogger->new;
+	my @logged;
+	my $m = mock_scoped('MockLogger', 'error',
+		sub { push @logged, join('', @_[1 .. $#_]) });
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'scalarref' } },
+			input  => { x => [] },
+			logger => $logger,
+		)
+	} qr/must be a scalar reference/, 'still croaks with logger present';
+	ok(scalar @logged > 0,                          'logger->error called on scalarref type failure');
+	like($logged[0], qr/must be a scalar reference/, 'logger receives the error message');
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Union type: ['scalar', 'scalarref']
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest "union ['scalar','scalarref']: plain string accepted via scalar branch" => sub {
+	my $r = validate_strict(
+		schema => { x => { type => ['scalar', 'scalarref'] } },
+		input  => { x => 'hello' },
+	);
+	is($r->{x}, 'hello', 'plain string accepted via scalar branch of union');
+};
+
+subtest "union ['scalar','scalarref']: integer accepted via scalar branch" => sub {
+	my $r = validate_strict(
+		schema => { x => { type => ['scalar', 'scalarref'] } },
+		input  => { x => 42 },
+	);
+	is($r->{x}, 42, 'integer accepted via scalar branch of union');
+};
+
+subtest "union ['scalar','scalarref']: scalar reference accepted via scalarref branch" => sub {
+	my $s = 'hello';
+	my $r = validate_strict(
+		schema => { x => { type => ['scalar', 'scalarref'] } },
+		input  => { x => \$s },
+	);
+	is($r->{x}, \$s, 'scalar reference accepted via scalarref branch of union');
+};
+
+subtest "union ['scalar','scalarref']: arrayref rejected by both branches" => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => ['scalar', 'scalarref'] } },
+			input  => { x => [] },
+		)
+	} qr/must be one of/, 'arrayref rejected by both scalar and scalarref branches';
+};
+
+subtest "union ['scalar','scalarref']: hashref rejected by both branches" => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => ['scalar', 'scalarref'] } },
+			input  => { x => {} },
+		)
+	} qr/must be one of/, 'hashref rejected by both scalar and scalarref branches';
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
 # Type: coderef
 # ══════════════════════════════════════════════════════════════════════════════
 

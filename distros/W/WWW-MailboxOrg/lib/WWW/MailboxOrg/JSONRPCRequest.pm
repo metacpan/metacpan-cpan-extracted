@@ -4,8 +4,6 @@ package WWW::MailboxOrg::JSONRPCRequest;
 
 use Moo;
 
-our $VERSION = '0.001';
-
 
 has jsonrpc => (
     is      => 'ro',
@@ -70,7 +68,7 @@ WWW::MailboxOrg::JSONRPCRequest - JSON-RPC 2.0 request object
 
 =head1 VERSION
 
-version 0.001
+version 0.100
 
 =head1 SYNOPSIS
 
@@ -121,7 +119,7 @@ Returns a hashref representation for JSON encoding.
 =head2 Issues
 
 Please report bugs and feature requests on GitHub at
-L<https://github.com/getty/p5-www-mailboxorg/issues>.
+L<https://github.com/Getty/p5-www-mailboxorg/issues>.
 
 =head2 IRC
 

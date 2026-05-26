@@ -1,4 +1,4 @@
-package Concierge::Auth::Generators v0.4.3;
+package Concierge::Auth::Generators v0.4.5;
 use v5.36;
 
 # ABSTRACT: Value generation utilities for Concierge::Auth
@@ -67,11 +67,6 @@ sub gen_random_id {
     return g_success($id, "Random ID generated ($bytes bytes).");
 }
 
-## gen_token: deprecated alias for gen_random_token
-sub gen_token {
-    goto &gen_random_token;
-}
-
 ## gen_random_token: generate random alphanumeric token
 ## use random_string() from Crypt::PRNG
 ## Parameters: length (optional, default 13)
@@ -82,11 +77,6 @@ sub gen_random_token {
 
     my $token = random_string($length);
     return g_success($token, "Random token generated ($length chars).");
-}
-
-## gen_crypt_token: deprecated, now an alias for gen_random_token
-sub gen_crypt_token {
-    goto &gen_random_token;
 }
 
 ## gen_random_string: generate random string from optional charset
@@ -167,6 +157,17 @@ sub gen_word_phrase {
 
     return g_success($phrase, $msg);
 }
+
+## gen_token: deprecated alias for gen_random_token
+sub gen_token {
+    goto &gen_random_token;
+}
+
+## gen_crypt_token: deprecated, now an alias for gen_random_token
+sub gen_crypt_token {
+    goto &gen_random_token;
+}
+
 
 1;
 

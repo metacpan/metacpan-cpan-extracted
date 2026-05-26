@@ -641,6 +641,204 @@ subtest 'validate_strict: type hashref — arrayref rejected' => sub {
 };
 
 # ══════════════════════════════════════════════════════════════════════════════
+# validate_strict — type: scalar
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'validate_strict: type scalar — plain string accepted' => sub {
+	my $r = _vs({
+		schema => { x => { type => 'scalar' } },
+		input  => { x => 'hello' },
+	});
+	is($r->{x}, 'hello', 'plain string returned unchanged');
+};
+
+subtest 'validate_strict: type scalar — integer accepted' => sub {
+	my $r = _vs({
+		schema => { x => { type => 'scalar' } },
+		input  => { x => 42 },
+	});
+	is($r->{x}, 42, 'integer returned unchanged');
+};
+
+subtest 'validate_strict: type scalar — zero accepted' => sub {
+	my $r = _vs({
+		schema => { x => { type => 'scalar' } },
+		input  => { x => 0 },
+	});
+	is($r->{x}, 0, 'zero (falsy scalar) accepted and returned unchanged');
+};
+
+subtest 'validate_strict: type scalar — empty string accepted' => sub {
+	my $r = _vs({
+		schema => { x => { type => 'scalar' } },
+		input  => { x => '' },
+	});
+	is($r->{x}, '', 'empty string accepted and returned unchanged');
+};
+
+subtest 'validate_strict: type scalar — undef skips validation, _error not called' => sub {
+	my @error_calls;
+	my $m_err = mock_scoped('Params::Validate::Strict', '_error',
+		sub { push @error_calls, 1; die join('', @_[1 .. $#_]) . "\n" });
+	lives_ok {
+		_vs({
+			schema => { x => { type => 'scalar', optional => 1 } },
+			input  => { x => undef },
+		});
+	} 'undef value for optional scalar field does not croak';
+	is(scalar @error_calls, 0, '_error not called when value is undef');
+};
+
+subtest 'validate_strict: type scalar — arrayref rejected, error names ARRAY type' => sub {
+	my @errors;
+	my $m_err = mock_scoped('Params::Validate::Strict', '_error',
+		sub { push @errors, join('', @_[1 .. $#_]); die join('', @_[1 .. $#_]) . "\n" });
+	throws_ok {
+		_vs({ schema => { x => { type => 'scalar' } }, input => { x => [1, 2, 3] } });
+	} qr/must be a scalar/, 'croaks when arrayref supplied';
+	like($errors[0], qr/ARRAY/, 'error message identifies the ARRAY reference type');
+};
+
+subtest 'validate_strict: type scalar — hashref rejected, error names HASH type' => sub {
+	my @errors;
+	my $m_err = mock_scoped('Params::Validate::Strict', '_error',
+		sub { push @errors, join('', @_[1 .. $#_]); die join('', @_[1 .. $#_]) . "\n" });
+	throws_ok {
+		_vs({ schema => { x => { type => 'scalar' } }, input => { x => { a => 1 } } });
+	} qr/must be a scalar/, 'croaks when hashref supplied';
+	like($errors[0], qr/HASH/, 'error message identifies the HASH reference type');
+};
+
+subtest 'validate_strict: type scalar — coderef rejected, error names CODE type' => sub {
+	my @errors;
+	my $m_err = mock_scoped('Params::Validate::Strict', '_error',
+		sub { push @errors, join('', @_[1 .. $#_]); die join('', @_[1 .. $#_]) . "\n" });
+	throws_ok {
+		_vs({ schema => { x => { type => 'scalar' } }, input => { x => sub {} } });
+	} qr/must be a scalar/, 'croaks when coderef supplied';
+	like($errors[0], qr/CODE/, 'error message identifies the CODE reference type');
+};
+
+subtest 'validate_strict: type scalar — blessed object rejected, error names class' => sub {
+	my $obj = PVS::Test::Searcher->new;
+	my @errors;
+	my $m_err = mock_scoped('Params::Validate::Strict', '_error',
+		sub { push @errors, join('', @_[1 .. $#_]); die join('', @_[1 .. $#_]) . "\n" });
+	throws_ok {
+		_vs({ schema => { x => { type => 'scalar' } }, input => { x => $obj } });
+	} qr/must be a scalar/, 'croaks when blessed object supplied';
+	like($errors[0], qr/PVS::Test::Searcher/, 'error message identifies the object class');
+};
+
+subtest 'validate_strict: type scalar — error_msg overrides default message' => sub {
+	my @errors;
+	my $m_err = mock_scoped('Params::Validate::Strict', '_error',
+		sub { push @errors, join('', @_[1 .. $#_]); die join('', @_[1 .. $#_]) . "\n" });
+	throws_ok {
+		_vs({ schema => { x => { type => 'scalar', error_msg => 'not a plain value' } },
+		      input  => { x => [] } });
+	} qr/not a plain value/, 'custom error_msg used when reference supplied';
+	is($errors[0], 'not a plain value', '_error called with only the custom message, no reference type appended');
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# validate_strict — type: scalarref
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'validate_strict: type scalarref — reference to string accepted' => sub {
+	my $s = 'hello';
+	my $r = _vs({
+		schema => { x => { type => 'scalarref' } },
+		input  => { x => \$s },
+	});
+	is($r->{x}, \$s, 'scalar reference returned unchanged');
+};
+
+subtest 'validate_strict: type scalarref — reference to integer accepted' => sub {
+	my $n = 42;
+	my $r = _vs({
+		schema => { x => { type => 'scalarref' } },
+		input  => { x => \$n },
+	});
+	is($r->{x}, \$n, 'reference to integer returned unchanged');
+};
+
+subtest 'validate_strict: type scalarref — undef skips validation, _error not called' => sub {
+	my @error_calls;
+	my $m_err = mock_scoped('Params::Validate::Strict', '_error',
+		sub { push @error_calls, 1; die join('', @_[1 .. $#_]) . "\n" });
+	lives_ok {
+		_vs({
+			schema => { x => { type => 'scalarref', optional => 1 } },
+			input  => { x => undef },
+		});
+	} 'undef value for optional scalarref field does not croak';
+	is(scalar @error_calls, 0, '_error not called when value is undef');
+};
+
+subtest 'validate_strict: type scalarref — plain scalar rejected, error says "plain scalar"' => sub {
+	my @errors;
+	my $m_err = mock_scoped('Params::Validate::Strict', '_error',
+		sub { push @errors, join('', @_[1 .. $#_]); die join('', @_[1 .. $#_]) . "\n" });
+	throws_ok {
+		_vs({ schema => { x => { type => 'scalarref' } }, input => { x => 'hello' } });
+	} qr/must be a scalar reference/, 'croaks when plain scalar supplied';
+	like($errors[0], qr/plain scalar/, 'error message identifies value as a plain scalar');
+};
+
+subtest 'validate_strict: type scalarref — arrayref rejected, error names ARRAY type' => sub {
+	my @errors;
+	my $m_err = mock_scoped('Params::Validate::Strict', '_error',
+		sub { push @errors, join('', @_[1 .. $#_]); die join('', @_[1 .. $#_]) . "\n" });
+	throws_ok {
+		_vs({ schema => { x => { type => 'scalarref' } }, input => { x => [1, 2, 3] } });
+	} qr/must be a scalar reference/, 'croaks when arrayref supplied';
+	like($errors[0], qr/ARRAY/, 'error message identifies the ARRAY reference type');
+};
+
+subtest 'validate_strict: type scalarref — hashref rejected, error names HASH type' => sub {
+	my @errors;
+	my $m_err = mock_scoped('Params::Validate::Strict', '_error',
+		sub { push @errors, join('', @_[1 .. $#_]); die join('', @_[1 .. $#_]) . "\n" });
+	throws_ok {
+		_vs({ schema => { x => { type => 'scalarref' } }, input => { x => { a => 1 } } });
+	} qr/must be a scalar reference/, 'croaks when hashref supplied';
+	like($errors[0], qr/HASH/, 'error message identifies the HASH reference type');
+};
+
+subtest 'validate_strict: type scalarref — coderef rejected, error names CODE type' => sub {
+	my @errors;
+	my $m_err = mock_scoped('Params::Validate::Strict', '_error',
+		sub { push @errors, join('', @_[1 .. $#_]); die join('', @_[1 .. $#_]) . "\n" });
+	throws_ok {
+		_vs({ schema => { x => { type => 'scalarref' } }, input => { x => sub {} } });
+	} qr/must be a scalar reference/, 'croaks when coderef supplied';
+	like($errors[0], qr/CODE/, 'error message identifies the CODE reference type');
+};
+
+subtest 'validate_strict: type scalarref — blessed object rejected, error names class' => sub {
+	my $obj = PVS::Test::Searcher->new;
+	my @errors;
+	my $m_err = mock_scoped('Params::Validate::Strict', '_error',
+		sub { push @errors, join('', @_[1 .. $#_]); die join('', @_[1 .. $#_]) . "\n" });
+	throws_ok {
+		_vs({ schema => { x => { type => 'scalarref' } }, input => { x => $obj } });
+	} qr/must be a scalar reference/, 'croaks when blessed object supplied';
+	like($errors[0], qr/PVS::Test::Searcher/, 'error message identifies the object class');
+};
+
+subtest 'validate_strict: type scalarref — error_msg overrides default message' => sub {
+	my @errors;
+	my $m_err = mock_scoped('Params::Validate::Strict', '_error',
+		sub { push @errors, join('', @_[1 .. $#_]); die join('', @_[1 .. $#_]) . "\n" });
+	throws_ok {
+		_vs({ schema => { x => { type => 'scalarref', error_msg => 'give me a ref!' } },
+		      input  => { x => 'oops' } });
+	} qr/give me a ref!/, 'custom error_msg used when plain scalar supplied';
+	is($errors[0], 'give me a ref!', '_error called with only the custom message');
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
 # validate_strict — type: boolean
 # ══════════════════════════════════════════════════════════════════════════════
 

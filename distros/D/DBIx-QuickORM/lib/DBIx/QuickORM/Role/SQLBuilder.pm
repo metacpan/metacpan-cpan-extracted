@@ -2,9 +2,40 @@ package DBIx::QuickORM::Role::SQLBuilder;
 use strict;
 use warnings;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000020';
 
 use Role::Tiny;
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::QuickORM::Role::SQLBuilder - Role for SQL statement builders.
+
+=head1 DESCRIPTION
+
+Interface implemented by SQL builders that turn ORM sources, field lists, and
+where-clauses into statement/bind pairs. Consumers provide the per-statement
+builders; this role supplies a helper for building a row's primary-key
+where-clause.
+
+=head1 SYNOPSIS
+
+    package My::SQLBuilder;
+    use Role::Tiny::With;
+    with 'DBIx::QuickORM::Role::SQLBuilder';
+
+    sub qorm_select { ... }
+    # ...and the other required methods
+
+=head1 REQUIRED METHODS
+
+Consumers must provide C<qorm_select>, C<qorm_insert>, C<qorm_update>,
+C<qorm_delete>, C<qorm_where>, C<qorm_and>, and C<qorm_or>.
+
+=cut
 
 requires qw{
     qorm_select
@@ -17,33 +48,59 @@ requires qw{
     qorm_or
 };
 
+=pod
+
+=head1 PUBLIC METHODS
+
+=over 4
+
+=item $where = $builder->qorm_where_for_row($row)
+
+Return a where-clause (the row's primary-key hashref) that uniquely
+identifies the given row.
+
+=back
+
+=cut
+
 sub qorm_where_for_row {
     my $self = shift;
     my ($row) = @_;
     return $row->primary_key_hashref;
 }
 
-
 1;
 
 __END__
 
+=head1 SOURCE
 
+The source code repository for DBIx::QuickORM can be found at
+L<https://github.com/exodist/DBIx-QuickORM>.
 
+=head1 MAINTAINERS
 
-lib/DBIx/QuickORM/Role/Handle.pm:17:sub sqla      { shift->connection->sqla(@_) }
-lib/DBIx/QuickORM/SQLAbstract.pm:1:package DBIx::QuickORM::SQLAbstract;
-lib/DBIx/QuickORM/Connection.pm:19:use DBIx::QuickORM::SQLAbstract;
-lib/DBIx/QuickORM/Connection.pm:55:    +sqla
-lib/DBIx/QuickORM/Connection.pm:171:sub sqla {
-lib/DBIx/QuickORM/Connection.pm:173:    return $self->{+SQLA}->() if $self->{+SQLA};
-lib/DBIx/QuickORM/Connection.pm:175:    my $sqla = DBIx::QuickORM::SQLAbstract->new(bindtype => 'columns');
-lib/DBIx/QuickORM/Connection.pm:177:    $self->{+SQLA} = sub { $sqla };
-lib/DBIx/QuickORM/Connection.pm:179:    return $sqla;
-lib/DBIx/QuickORM/Connection.pm:619:    my ($stmt, $bind) = $self->sqla->qorm_select($source, $query->{+QUERY_FIELDS}, $query->{+QUERY_WHERE}, $query->{+QUERY_ORDER_BY});
-lib/DBIx/QuickORM/Connection.pm:643:    my ($stmt, $bind) = $self->sqla->qorm_select($source, $pk_fields, $where);
-lib/DBIx/QuickORM/Connection.pm:721:        my ($stmt, $bind) = $self->sqla->qorm_insert($source, $data, $ret ? {returning => $source->fields_to_fetch} : ());
-lib/DBIx/QuickORM/Connection.pm:811:        my ($stmt, $bind) = $self->sqla->qorm_update($source, $changes, $query->{+QUERY_WHERE});
-lib/DBIx/QuickORM/Connection.pm:821:        my ($stmt, $bind) = $self->sqla->qorm_update($source, $changes, $where, $ret ? {returning => $fields} : ());
-lib/DBIx/QuickORM/Connection.pm:840:                my ($stmt, $bind) = $self->sqla->qorm_select($source, $fields, $where);
-lib/DBIx/QuickORM/Connection.pm:889:        my ($stmt, $bind) = $self->sqla->qorm_delete($source, $where, $ret ? $pk_fields : ());
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut

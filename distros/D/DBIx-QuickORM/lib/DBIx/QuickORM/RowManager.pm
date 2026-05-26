@@ -2,7 +2,7 @@ package DBIx::QuickORM::RowManager;
 use strict;
 use warnings;
 
-our $VERSION = '0.000019';
+our $VERSION = '0.000020';
 
 use Carp qw/confess croak/;
 use Scalar::Util qw/weaken/;
@@ -18,10 +18,52 @@ use DBIx::QuickORM::Connection::RowData qw{
     ROW_DATA
 };
 
-use DBIx::QuickORM::Util::HashBase qw{
+use Object::HashBase qw{
     transactions
     connection
 };
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DBIx::QuickORM::RowManager - Base row manager mediating row state and storage.
+
+=head1 DESCRIPTION
+
+A row manager turns fetched/pending data sets into row objects and drives
+their state transitions for insert, update, delete, and select against a
+connection. It tracks the current transaction stack so newly created rows
+are tagged with the active transaction.
+
+This base class implements no caching: C<does_cache> is false and the cache
+hooks are no-ops. L<DBIx::QuickORM::RowManager::Cached> subclasses it to add
+a per-source identity cache.
+
+=head1 SYNOPSIS
+
+    my $mgr = DBIx::QuickORM::RowManager->new(connection => $connection);
+
+    my $row = $mgr->select(source => $source, fetched => \%data);
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item transactions
+
+Arrayref of the connection's active transactions; defaults from the
+connection. The last entry is the innermost active transaction.
+
+=item connection
+
+The owning connection (held weakly).
+
+=back
+
+=cut
 
 sub init {
     my $self = shift;
@@ -32,21 +74,66 @@ sub init {
     weaken($self->{+CONNECTION});
 }
 
+=pod
+
+=head1 PUBLIC METHODS
+
+=over 4
+
+=item $bool = $mgr->does_cache
+
+True if this manager keeps a row cache. False for the base class.
+
+=item $mgr->cache($source, $row, $old_pk, $new_pk)
+
+=item $row = $mgr->uncache($source, $row, $old_pk, $new_pk)
+
+Cache hooks. No-ops in the base class; overridden by caching subclasses.
+
+=cut
+
 sub does_cache { 0 }
 
 sub cache   { }
 sub uncache { }
+
+=pod
+
+=item $row = $mgr->cache_lookup(source => $source, ...)
+
+Look up a row in the cache by its parsed parameters. Returns the cached row
+or undef.
+
+=cut
 
 sub cache_lookup {
     my $self = shift;
     return $self->do_lookup($self->parse_params({@_}));
 }
 
+=pod
+
+=item $row = $mgr->do_cache_lookup($source, $fetched, $old_pk, $new_pk, $row)
+
+Backend cache lookup. Returns undef in the base class; caching subclasses
+override it.
+
+=cut
+
 sub do_cache_lookup {
     my $self = shift;
     my ($source, $fetched, $old_pk, $new_pk, $row) = @_;
     return undef;
 }
+
+=pod
+
+=item $mgr->invalidate(source => $source, ...)
+
+Mark a row's data invalid, both on any passed-in row and on the cached copy,
+recording a reason (defaulting to the caller's file and line).
+
+=cut
 
 sub invalidate {
     my $self = shift;
@@ -68,6 +155,14 @@ sub invalidate {
     return;
 }
 
+=pod
+
+=item $state = $mgr->_state(%params)
+
+Build a row-state hashref, tagging it with the innermost active transaction.
+
+=cut
+
 sub _state {
     my $self = shift;
     my %params = @_;
@@ -76,6 +171,15 @@ sub _state {
 
     return \%params;
 }
+
+=pod
+
+=item $row = $mgr->_vivify($source, $state)
+
+Construct a new row object of the appropriate row class wrapping fresh row
+data for the given state.
+
+=cut
 
 sub _vivify {
     my $self = shift;
@@ -86,6 +190,15 @@ sub _vivify {
     return $row_class->new(ROW_DATA() => $row_data);
 }
 
+=pod
+
+=item $row = $mgr->vivify(source => $source, ...)
+
+Return an existing matching row, or create a new row with the fetched data
+as its pending (unsaved) state.
+
+=cut
+
 sub vivify {
     my $self = shift;
     my ($source, $fetched, $old_pk, $new_pk, $row) = $self->parse_params({@_}, fetched => 1);
@@ -93,6 +206,33 @@ sub vivify {
 
     return $row;
 }
+
+=pod
+
+=item $row = $mgr->insert(source => $source, fetched => \%data, ...)
+
+=item $row = $mgr->update(source => $source, fetched => \%data, ...)
+
+=item $row = $mgr->delete(source => $source, fetched => \%data, ...)
+
+=item $row = $mgr->select(source => $source, fetched => \%data, ...)
+
+Apply the named storage operation to a row (creating one if needed),
+updating the cache accordingly, and return the row.
+
+=item $row = $mgr->do_insert($source, $fetched, $old_pk, $new_pk, $row)
+
+=item $row = $mgr->do_update($source, $fetched, $old_pk, $new_pk, $row)
+
+=item $row = $mgr->do_delete($source, $fetched, $old_pk, $new_pk, $row)
+
+=item $row = $mgr->do_select($source, $fetched, $old_pk, $new_pk, $row)
+
+Backend state transitions invoked by the matching public method, after
+parameters have been parsed. They change the row's state and skip cache
+maintenance.
+
+=cut
 
 sub insert {
     my $self = shift;
@@ -188,6 +328,17 @@ sub do_select {
     return $row;
 }
 
+=pod
+
+=item ($source, $fetched, $old_pk, $new_pk, $row, $params) = $mgr->parse_params(\%params, %skip)
+
+Validate and normalize the common operation parameters: confirm the source
+role, extract old/new primary keys from the fetched data, validate any
+passed-in row against the source and connection, and resolve a cached row.
+Returns the unpacked values plus the original params hashref.
+
+=cut
+
 sub parse_params {
     my $self = shift;
     my ($params, %skip) = @_;
@@ -244,4 +395,44 @@ sub parse_params {
     return ($source, $fetched, $old_pk, $new_pk, $row, $params);
 }
 
+=pod
+
+=back
+
+=cut
+
 1;
+
+__END__
+
+=head1 SOURCE
+
+The source code repository for DBIx::QuickORM can be found at
+L<https://github.com/exodist/DBIx-QuickORM>.
+
+=head1 MAINTAINERS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 AUTHORS
+
+=over 4
+
+=item Chad Granum E<lt>exodist@cpan.orgE<gt>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright Chad Granum E<lt>exodist7@gmail.comE<gt>.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<https://dev.perl.org/licenses/>
+
+=cut

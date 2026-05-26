@@ -1,4 +1,4 @@
-package Concierge::Users::Meta v0.8.0;
+package Concierge::Users::Meta v0.8.2;
 use v5.36;
 use Carp qw/ croak carp /;
 use YAML::Tiny;
@@ -1102,7 +1102,7 @@ utilities for Concierge::Users
 
 =head1 VERSION
 
-v0.7.4
+v0.8.2
 
 =head1 SYNOPSIS
 
@@ -1677,7 +1677,7 @@ __DATA__
 ################################################################################
 
 Configuration:
-  Version: v0.7.4
+  Version: v0.8.2
   Backend: Concierge::Users::Database  # Default; can be 'database', 'file', or 'yaml'
   Storage Directory: /path/to/storage  # Set during setup
   Generated: 2026-01-06 19:10:18

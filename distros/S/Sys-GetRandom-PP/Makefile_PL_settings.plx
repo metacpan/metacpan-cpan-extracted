@@ -2,6 +2,9 @@
 use strict;
 use warnings;
 
+require './lib/Sys/GetRandom/PP.pm'
+    unless $ENV{PERL_SYS_GETRANDOM_PP_FORCE_INSTALL};
+
 return {
     NAME   => 'Sys::GetRandom::PP',
     AUTHOR => q{Lukas Mai <l.mai@web.de>},
@@ -18,6 +21,10 @@ return {
         'constant' => '1.03',
         'strict'   => 0,
         'warnings' => 0,
+    },
+    DEVELOP_REQUIRES => {
+        'Pod::Markdown::Githubert' => 0,
+        'Test::Pod'                => 1.22,
     },
 
     REPOSITORY => [ codeberg => 'mauke' ],
