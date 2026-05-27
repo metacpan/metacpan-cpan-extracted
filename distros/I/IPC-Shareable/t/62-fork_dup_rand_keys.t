@@ -8,6 +8,7 @@ use strict;
 # hash from two procs didn't update the global_register properly
 
 use IPC::Shareable qw(:lock);
+IPC::Shareable->testing_set('IPC::Shareable');
 use Test::More;
 use Test::SharedFork;
 

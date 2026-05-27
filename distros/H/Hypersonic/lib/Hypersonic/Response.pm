@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 # JIT-compiled Response object using array-based slots for maximum speed
 # Generates XS accessors at compile time via XS::JIT::Builder
@@ -75,7 +75,7 @@ sub compile_accessors {
       ->line('SV** ary = AvARRAY((AV*)SvRV(ST(0)));')
       ->if('items > 1')
         ->line('SvREFCNT_dec(ary[' . SLOT_BODY . ']);')
-        ->line('ary[' . SLOT_BODY . '] = newSVsv(ST(1));')
+        ->line('ary[' . SLOT_BODY . '] = SvREFCNT_inc(ST(1));')
       ->endif
       ->line('ST(0) = ST(0);')
       ->xs_return('1')
@@ -89,7 +89,7 @@ sub compile_accessors {
       ->if('items > 2')
         ->line('STRLEN klen;')
         ->line('const char* key = SvPV(ST(1), klen);')
-        ->line('SV* val = newSVsv(ST(2));')
+        ->line('SV* val = SvREFCNT_inc(ST(2));')
         ->line('hv_store(headers, key, klen, val, 0);')
       ->endif
       ->line('ST(0) = ST(0);')
@@ -118,7 +118,7 @@ sub compile_accessors {
       ->line('SV** ary = AvARRAY((AV*)SvRV(ST(0)));')
       ->line('AV* cookies = (AV*)SvRV(ary[' . SLOT_COOKIES . ']);')
       ->if('items > 1')
-        ->line('av_push(cookies, newSVsv(ST(1)));')
+        ->line('av_push(cookies, SvREFCNT_inc(ST(1)));')
       ->endif
       ->line('ST(0) = ST(0);')
       ->xs_return('1')
@@ -160,7 +160,7 @@ sub compile_accessors {
       ->if('items > 1')
         ->line('hv_store(headers, "Content-Type", 12, newSVpv("text/plain", 10), 0);')
         ->line('SvREFCNT_dec(ary[' . SLOT_BODY . ']);')
-        ->line('ary[' . SLOT_BODY . '] = newSVsv(ST(1));')
+        ->line('ary[' . SLOT_BODY . '] = SvREFCNT_inc(ST(1));')
       ->endif
       ->line('ST(0) = ST(0);')
       ->xs_return('1')
@@ -174,7 +174,7 @@ sub compile_accessors {
       ->if('items > 1')
         ->line('hv_store(headers, "Content-Type", 12, newSVpv("text/html", 9), 0);')
         ->line('SvREFCNT_dec(ary[' . SLOT_BODY . ']);')
-        ->line('ary[' . SLOT_BODY . '] = newSVsv(ST(1));')
+        ->line('ary[' . SLOT_BODY . '] = SvREFCNT_inc(ST(1));')
       ->endif
       ->line('ST(0) = ST(0);')
       ->xs_return('1')
@@ -188,7 +188,7 @@ sub compile_accessors {
       ->if('items > 1')
         ->line('hv_store(headers, "Content-Type", 12, newSVpv("application/xml", 15), 0);')
         ->line('SvREFCNT_dec(ary[' . SLOT_BODY . ']);')
-        ->line('ary[' . SLOT_BODY . '] = newSVsv(ST(1));')
+        ->line('ary[' . SLOT_BODY . '] = SvREFCNT_inc(ST(1));')
       ->endif
       ->line('ST(0) = ST(0);')
       ->xs_return('1')
@@ -200,7 +200,7 @@ sub compile_accessors {
       ->line('SV** ary = AvARRAY((AV*)SvRV(ST(0)));')
       ->line('HV* headers = (HV*)SvRV(ary[' . SLOT_HEADERS . ']);')
       ->if('items > 1')
-        ->line('hv_store(headers, "Content-Type", 12, newSVsv(ST(1)), 0);')
+        ->line('hv_store(headers, "Content-Type", 12, SvREFCNT_inc(ST(1)), 0);')
       ->endif
       ->line('ST(0) = ST(0);')
       ->xs_return('1')
@@ -212,7 +212,7 @@ sub compile_accessors {
       ->line('SV** ary = AvARRAY((AV*)SvRV(ST(0)));')
       ->line('HV* headers = (HV*)SvRV(ary[' . SLOT_HEADERS . ']);')
       ->if('items > 1')
-        ->line('hv_store(headers, "Location", 8, newSVsv(ST(1)), 0);')
+        ->line('hv_store(headers, "Location", 8, SvREFCNT_inc(ST(1)), 0);')
         ->line('SvREFCNT_dec(ary[' . SLOT_STATUS . ']);')
         # Check items > 2 AND ST(2) is defined (not undef)
         ->if('items > 2 && SvOK(ST(2))')

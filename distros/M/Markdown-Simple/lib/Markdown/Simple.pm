@@ -3,8 +3,9 @@ package Markdown::Simple;
 use 5.006;
 use strict;
 use warnings;
-our $VERSION = '0.11';
-use parent qw(Exporter);
+our $VERSION = '0.12';
+use Exporter ();
+our @ISA = qw(Exporter);
 
 require XSLoader;
 XSLoader::load('Markdown::Simple', $Markdown::Simple::VERSION);
@@ -19,6 +20,8 @@ __END__
 
 Markdown::Simple - Markdown to HTML
 
+=encoding utf8
+
 =head1 VERSION
 
 Version 0.11
@@ -27,77 +30,160 @@ Version 0.11
 
 =head1 SYNOPSIS
 
-This module was 100% generated using co-pilot with the prompt:
-
-"create a simple markdown to html perl XS module that allows you to optionally enable each element of markdown. For example I can disable the parsing of image"
-
-then:
-
-"great now extend with table and a few of the other options like task list"
-
-A few more prompts were needed to add ordered and unordered lists.
-
   use Markdown::Simple;
 
-  markdown_to_html($markdown);
+  # Functional interface. GFM by default (tables, strikethrough,
+  # task lists, autolinks, disallow-raw-html). Output is
+  # CommonMark/GFM-conformant HTML.
+  my $html = markdown_to_html($markdown);
 
-  markdown_to_html($markdown, {
-    images => 0, # disable images
-    code => 0, # disable code blocks
-    links => 0, # disable links
-  });
+  # Strict CommonMark.
+  my $cm = markdown_to_html($markdown, { gfm => 0 });
+
+  # Opt-out an individual extension.
+  my $no_tables = markdown_to_html($markdown, { tables => 0 });
+
+  # Extras off by default.
+  my $hb = markdown_to_html($markdown, { hard_breaks => 1 });
 
   my $plain = strip_markdown($markdown);
 
+  # Object interface — keeps the parser's arena warm between
+  # render() calls. Use this when converting many documents in a
+  # loop with the same options.
+  my $md = Markdown::Simple->new({ gfm => 1 });
+  for my $doc (@docs) {
+      print $md->render($doc);
+  }
+
 =head1 DESCRIPTION
 
-Markdown::Simple is a simple Perl XS module that converts Markdown text to HTML. It allows you to enable or disable specific Markdown features such as images, code blocks, links, and more.
+Markdown::Simple is a Perl XS module that converts Markdown text to HTML.
+The default rendering mode is GitHub Flavored Markdown (GFM); options
+let you switch to strict CommonMark or toggle individual extensions.
+
+Two entry points are provided: the exported procedural function
+L</markdown_to_html>, and the object-oriented L</new> / L</render>
+pair, which is preferable when you intend to render many documents in
+the same process because it reuses the underlying parser arena.
 
 =head1 FUNCTIONS
 
 =head2 markdown_to_html
 
+  markdown_to_html($markdown);
   markdown_to_html($markdown, \%options);
 
-Converts the given Markdown text to HTML. The second argument is an optional hash reference that allows you to enable or disable specific Markdown features.
+Converts the given Markdown text to HTML. The optional second argument is
+a hash reference of feature flags.
 
 The available options are:
+
+=over 12
+
+=item * gfm - preset switch. Defaults to enabled. C<< gfm => 0 >> selects
+strict CommonMark (turns tables, strikethrough, task lists, autolink, and
+disallow-raw-html off). Individual feature toggles below still override.
+
+=item * tables - GFM tables (default: on in GFM mode)
+
+=item * strikethrough - GFM C<~~strike~~> rendering (default: on in GFM mode)
+
+=item * tasklist - GFM C<- [ ]> task list items (default: on in GFM mode)
+
+=item * autolink - GFM bare-URL autolink scanner (default: on in GFM mode)
+
+=item * disallow_raw_html - escape disallowed raw HTML tags (default: on in GFM mode)
+
+=item * hard_breaks - emit C<< <br /> >> for soft line breaks (default: off)
+
+=item * unsafe - allow C<javascript:>, C<vbscript:>, C<data:> URLs and other
+otherwise-stripped dangerous content (default: off)
+
+=item * no_simd - disable SIMD fast paths (default: off; useful for debugging)
+
+=item * strict_utf8 - reject input that is not well-formed UTF-8 with a
+fatal C<croak> instead of silently producing best-effort output (default: off)
+
+=back
+
+=head3 Per-syntax disables
+
+Pass any of the following with a false value (C<< feature => 0 >>) to make
+the corresponding Markdown construct fall through as literal text instead
+of being recognised. All default to enabled.
+
+=over 12
+
+=item * headers - ATX (C<#>) and Setext (C<===>/C<--->) headings
+
+=item * thematic_break - C<--->, C<***>, C<___> horizontal rules
+
+=item * fenced_code - C<```> / C<~~~> fenced code blocks
+
+=item * indented_code - 4-space indented code blocks
+
+=item * blockquote - C<< > >> quoted blocks
+
+=item * ordered_lists - C<1.>, C<2.> ordered lists
+
+=item * unordered_lists - C<->, C<*>, C<+> bullet lists
+
+=item * html - raw HTML blocks and inline HTML
+
+=item * references - link reference definitions (C<[id]: url>)
+
+=item * bold - C<**strong**> / C<__strong__>
+
+=item * italic - C<*em*> / C<_em_>
+
+=item * code - inline C<< `code` >> spans
+
+=item * links - C<[text](url)> and reference links
+
+=item * images - C<< ![alt](src) >>
+
+=back
 
 =head2 strip_markdown
 
   strip_markdown($markdown);
 
 Removes all Markdown formatting from the given text, returning plain text.
+List markers, table pipes, and table separator rows are preserved so that
+the output stays scan-readable; bold/italic/strike/code/link/image
+delimiters are stripped while their textual content is retained.
 
-=over 12
+=head1 OBJECT INTERFACE
 
-=item * preprocess - Enable or disable preprocessing (default: enabled). Replaces \r\n with \n
+For workloads that render many documents in succession, the object
+interface keeps the parser's internal arena and scratch buffers warm
+between calls, eliminating the per-render C<malloc>/C<free> traffic
+incurred by the procedural entry point.
 
-=item * headers - Enable or disable header parsing (default: enabled)
+=head2 new
 
-=item * images - Enable or disable image parsing (default: enabled)
+  my $md = Markdown::Simple->new(\%options);
+  my $md = Markdown::Simple->new;            # GFM defaults
 
-=item * code - Enable or disable code block parsing (default: enabled)
+Constructs a persistent renderer. C<\%options> is the same hash
+reference accepted by L</markdown_to_html>; flags are decoded once at
+construction and reused on every C<render> call.
 
-=item * links - Enable or disable link parsing (default: enabled)
+=head2 render
 
-=item * fenced_code - Enable or disable fenced code block parsing (default: enabled)
+  my $html = $md->render($markdown);
 
-=item * bold - Enable or disable bold text parsing (default: enabled)
+Converts C<$markdown> to HTML using the options bound at construction
+time. The arena's head page is reset (not freed) between calls so that
+allocations within a typical document complete without touching the
+system allocator.
 
-=item * italic - Enable or disable italic text parsing (default: enabled)
+=head2 DESTROY
 
-=item * strikethrough - Enable or disable strikethrough text parsing (default: enabled)
-
-=item * task_lists - Enable or disable task list parsing (default: enabled)
-
-=item * unordered_lists - Enable or disable unordered list parsing (default: enabled)
-
-=item * ordered_lists - Enable or disable ordered list parsing (default: enabled)
-
-=item * tables - Enable or disable table parsing (default: enabled)
-
-=back
+Releases the C-side arena and scratch buffers. Called automatically by
+Perl when the object goes out of scope; you do not need to invoke it
+explicitly.
 
 =head1 EXAMPLES
 
@@ -105,11 +191,14 @@ Removes all Markdown formatting from the given text, returning plain text.
 
   my $markdown = "This is **bold** text and this is *italic* text.";
   my $html = markdown_to_html($markdown);
-  print $html; # Outputs: This is <strong>bold</strong> text and this is <em>italic</em> text.
+  print $html; # <p>This is <strong>bold</strong> text and this is <em>italic</em> text.</p>
 
-  my $markdown_with_options = "![alt text](image.jpg)";
-  my $html_with_options = markdown_to_html($markdown_with_options, { images => 0 });
-  print $html_with_options; # Outputs: ![alt text](image.jpg)
+  # Switch to strict CommonMark (no GFM extensions).
+  my $cm = markdown_to_html("see http://x\n", { gfm => 0 });
+
+  # Reuse a single parser for many documents.
+  my $md = Markdown::Simple->new;
+  print $md->render($_) for @docs;
 
 =head1 AUTHOR
 
@@ -141,9 +230,6 @@ L<https://rt.cpan.org/NoAuth/Bugs.html?Dist=Markdown-Simple>
 L<https://metacpan.org/release/Markdown-Simple>
 
 =back
-
-
-=head1 ACKNOWLEDGEMENTS
 
 
 =head1 LICENSE AND COPYRIGHT

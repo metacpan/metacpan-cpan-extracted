@@ -7,7 +7,7 @@ use IPC::Run3 qw{};
 use RPM::Query::Package;
 use RPM::Query::Capability;
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 =head1 NAME
 

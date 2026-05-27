@@ -1,0 +1,163 @@
+ClickHouse-Encoder
+==================
+
+Fast XS encoder for ClickHouse Native format. Builds a binary block from a
+Perl arrayref of rows; the result is the request body for an
+`insert ... format native` operation over HTTP, the native TCP protocol,
+or via stdin to clickhouse-client.
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+REQUIREMENTS
+    A 64-bit Perl (Config{ivsize} >= 8). No external C library is required;
+    the encoder is implemented entirely in XS.
+
+SUPPORTED TYPES
+    Int8/16/32/64, UInt8/16/32/64, Float32/64, BFloat16, String, FixedString(N),
+    Date, Date32, DateTime, DateTime('tz'), DateTime64(p),
+    Decimal32(s), Decimal64(s), Decimal128(s), Decimal256(s), Decimal(P, S),
+    Enum8(...), Enum16(...),
+    Bool / Boolean, UUID, IPv4, IPv6,
+    Map(K, V), LowCardinality(String|FixedString|Nullable(...)),
+    Variant(T1, T2, ...) (CH 24.1+),
+    SimpleAggregateFunction(func, T),
+    Tuple(T1, T2, ...) including named: Tuple(a Int32, b String),
+    Geo: Point, Ring, LineString, MultiLineString, Polygon, MultiPolygon,
+    Array(T), Nullable(T),
+    JSON / Object('json') (CH 24.8+): hashref input with nested hashref
+    auto-flattening to dotted paths; per-path types inferred from
+    Perl SV flags (Int64, Float64, Bool, String) and arrayref leaves
+    encoded as Array(T) variants. Symmetric on decode (unflattens).
+    Dynamic: standalone Dynamic column, same wire format as one JSON
+    path's Dynamic sub-column without the Object wrapper.
+    DateTime / DateTime64 strings accept ISO 8601 with timezone offsets
+    (Z, +HH:MM, -HH:MM, +HHMM); the offset is applied to convert to UTC.
+    See `perldoc ClickHouse::Encoder` for value coercion rules and limits.
+
+OUTPUT APIS
+    encode(\@rows)                        return Native bytes for one block
+    encode_into(\$buf, \@rows)            append a block to an existing scalar
+    encode_columns(\%cols)                column-oriented input (same bytes)
+    encode_to_handle($fh, \@rows)         direct write to a filehandle
+    stream(\&iter, \&writer, batch_size=>N)  pull rows from iter, emit blocks
+    streamer(\&writer, batch_size=>N)        ->push_row($r); ...; ->finish
+                                              ->reset / ->buffered_count
+                                              / ->is_empty
+    validate_rows(\@rows)                 [{row=>N,error=>...}] for bad rows
+    encode_to_command(\@cmd, \@rows)      pipe encoded bytes into a child cmd
+    compressed_writer($mode, \&writer)    wrap a writer with gzip/zstd
+    flatten_nested(\@cols)                expand Nested(...) -> flat name.field
+    encode_row_binary(\@rows)             RowBinary body (row-major format)
+    decode_row_binary($bytes)             decode a RowBinary byte string
+
+HTTP insert
+    ClickHouse::Encoder->insert_http(host=>..., port=>..., table=>..., rows=>...)
+    one-shot HTTP insert (POSTs Native bytes, optional zstd/gzip).
+    ClickHouse::Encoder->bulk_inserter(host=>..., table=>..., columns=>...)
+    long-lived inserter with auto-flush at batch_size, retries on
+    transient errors, keep-alive, optional compression. ->summary
+    rolls up CH X-ClickHouse-Summary stats across batches;
+    ->last_response gives the most recent flush's HTTP response with
+    parsed CH metadata attached at ->{ch}{query-id,server,summary,...}.
+    ClickHouse::Encoder->for_query($select_sql, host=>..., port=>...)
+    runs describe ($select_sql) and returns an encoder configured for
+    that result shape; useful when the schema isn't a real table.
+    ClickHouse::Encoder->ping(host=>..., port=>...)
+    liveness probe via /ping; returns 1 or croaks.
+
+    All HTTP entry points accept scheme=>'https' (needs IO::Socket::SSL
+    + Net::SSLeay), ssl_options/verify_SSL pass-throughs to HTTP::Tiny,
+    settings=>{...} for per-query CH settings, and dedup_token=>$id for
+    idempotent inserts.
+
+SCHEMA INTROSPECTION
+    ClickHouse::Encoder->for_table($table, via => 'client', ...)
+    ClickHouse::Encoder->for_table($table, via => 'http', port => 8123, ...)
+    ClickHouse::Encoder->server_version(host => ..., port => ...)
+    fetches select version() over HTTP, returns {major,minor,patch,...}.
+    ClickHouse::Encoder->types                  list of supported type names
+    ClickHouse::Encoder->schema_diff(\@a, \@b)  {added,removed,changed}
+    ClickHouse::Encoder->apply_schema_diff($diff, table=>...)
+                                                alter table statements
+                                                (drops -> modifies -> adds)
+    ClickHouse::Encoder->format_create_table(table=>..., columns=>...)
+                                                create table SQL; columns
+                                                accept codec/ttl/default/...
+    ClickHouse::Encoder->parse_create_table($ddl)
+                                                show create table -> hashref
+                                                {database,table,columns,...}
+    ClickHouse::Encoder->parse_wkt($wkt)        WKT -> Geo arrayref shape
+    $enc->estimate_size($nrows)                 byte-size hint for sizing
+
+DECIMAL HELPERS
+    ClickHouse::Encoder->decimal128_str($n) / ->decimal256_str($n)
+    format a 16- or 32-byte little-endian decimal value as a signed
+    base-10 string (host bigint avoidance for big precisions).
+
+DECODER
+    ClickHouse::Encoder->decode_block($bytes) / ->decode_rows($bytes)
+    are the XS-side decoder for select ... format native responses.
+    Supports every type encode handles; round-trips are symmetric.
+    ->decode_blocks($bytes) walks a concatenated multi-block stream
+    (also accepts a callback). ->decode_blocks_iter($bytes) returns
+    a coderef iterator. ->decode_stream($fh, $cb) pulls bytes
+    incrementally from a filehandle - memory bounded by one block at
+    a time. ->decode_block($bytes, $offset, \%keep) skips data for
+    unwanted columns (memory win on wide select *).
+
+DOCUMENTATION
+    See `perldoc ClickHouse::Encoder` after install, or the POD in
+    lib/ClickHouse/Encoder.pm.
+
+EXAMPLES
+    eg/insert_http.pl              - end-to-end insert over HTTP::Tiny
+    eg/insert_streaming.pl         - reuse one encoder across many batches
+    eg/for_table.pl                - schema discovery via clickhouse-client
+    eg/from_csv.pl                 - read CSV, encode, insert via HTTP
+    eg/insert_clickhouse_local.pl  - server-less ingest to Parquet/ORC
+    eg/etl_dbi.pl                  - DBI -> Native -> insert pipeline
+    eg/insert_compressed.pl        - zstd/gzip compression on the wire
+    eg/insert_async_ev.pl          - non-blocking concurrent inserts via EV
+    eg/insert_with_lowcardinality.pl - LC(String) wire-size demo
+    eg/json_lines_ingest.pl          - NDJSON streaming -> for_table -> insert
+    eg/streaming_aggregate.pl        - pre-aggregate, flush to SummingMergeTree
+    eg/postgres_to_clickhouse.pl     - DBD::Pg -> Native -> insert, streaming
+    eg/clickhouse_replication.pl     - CH -> CH replication via Native pipe
+    eg/parallel_loader.pl            - fork N workers, parallel partition load
+    eg/redis_to_clickhouse.pl        - drain a Redis stream/list into a CH table
+    eg/syslog_ingest.pl              - parse RFC 5424 syslog lines, ingest
+    eg/json_streaming.pl             - NDJSON -> JSON column via streamer
+    eg/json_query.pl                 - select format native -> decode_blocks -> walk
+    eg/json_aggregate.pl             - group-by aggregation pipeline over JSON
+    eg/migrate_table.pl              - copy CH -> CH, schema auto-detected
+    eg/replay.pl                     - replay a captured Native byte stream
+    eg/native_to_jsonl.pl            - convert Native stream to NDJSON
+    eg/select_blocks_streaming.pl    - streaming select via select_blocks
+    eg/json_path_projection.pl       - column projection on JSON select
+    eg/csv_export.pl                 - select Native -> CSV writer
+    eg/migrate_with_transform.pl     - CH -> CH ETL with row transform
+    eg/replay_pcap.pl                - off-line dump of captured Native bytes
+    eg/tcp_compressed_pipeline.pl    - TCP insert with negotiated LZ4 compression
+    eg/rowbinary_insert.pl           - insert via the RowBinary format
+    eg/async_insert.pl               - server-side async insert via settings
+    eg/geo_from_wkt.pl               - WKT geometry -> Geo columns via parse_wkt
+    eg/insert_with_settings.pl       - per-query settings + dedup token
+    eg/ping_healthcheck.pl           - wait-for-server readiness gate via ping
+    eg/observability.pl              - read X-ClickHouse summary/progress stats
+    eg/schema_migrate.pl             - show create -> diff -> alter table
+
+BENCHMARKS
+    See bench/. Native is typically 2-5x faster than TabSeparated for
+    insert ingestion.
+
+WIRE format
+    See doc/wire-format.md for a working reference of the subset of the
+    ClickHouse Native binary format this module emits.
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.

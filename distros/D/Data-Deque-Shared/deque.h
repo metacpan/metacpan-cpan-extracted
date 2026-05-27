@@ -41,6 +41,11 @@
 #define DEQ_VERSION     2
 #define DEQ_ERR_BUFLEN  256
 
+/* Drain-time recovery: how long to wait for a slot stuck in WRITING before
+ * declaring its pusher dead and force-skipping. Matches the slot-stuck
+ * recovery timeout used in sister Data-*-Shared modules (e.g. Stack). */
+#define DEQ_DRAIN_RECOVERY_SEC  2
+
 #define DEQ_VAR_INT   0
 #define DEQ_VAR_STR   1
 
@@ -79,7 +84,7 @@ typedef struct {
     uint64_t stat_timeouts;    /* 104 */
     uint32_t push_wake_seq;    /* 112: bumped by every pop, futex word for pushers */
     uint32_t pop_wake_seq;     /* 116: bumped by every push, futex word for poppers */
-    uint8_t  _pad1[8];         /* 120-127 */
+    uint64_t stat_recoveries;  /* 120: drain-time recovery of stuck slots (WRITING or EMPTY) */
 } DeqHeader;
 
 #define DEQ_CURSOR(head, tail)  (((uint64_t)(head) << 32) | (uint32_t)(tail))
@@ -157,9 +162,20 @@ static inline uint64_t deq_slot_claim_write(uint64_t *ctl_word) {
     }
 }
 
-/* Publish written value: WRITING -> FILLED at same generation. */
+/* Publish written value: WRITING@gen -> FILLED@gen. Implemented as CAS
+ * (not a plain store) so that if deq_drain force-recovered the slot mid-
+ * write — bumping it to EMPTY@(gen+1) — this publish is a no-op rather
+ * than clobbering the recovered state back to FILLED@gen. That would
+ * leave a phantom FILLED at a stale gen which the next pusher's
+ * deq_slot_claim_write (waits on EMPTY) could never advance past,
+ * deadlocking that slot forever. The caller's cursor CAS was already
+ * committed, so on lost-race the value is silently dropped — matching
+ * the documented drain-recovery semantics. */
 static inline void deq_slot_publish(uint64_t *ctl_word, uint64_t gen) {
-    __atomic_store_n(ctl_word, (gen << 2) | DEQ_SLOT_FILLED, __ATOMIC_RELEASE);
+    uint64_t expected = (gen << 2) | DEQ_SLOT_WRITING;
+    uint64_t desired  = (gen << 2) | DEQ_SLOT_FILLED;
+    (void)__atomic_compare_exchange_n(ctl_word, &expected, desired,
+            0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
 }
 
 /* Claim a slot for reading: spin CAS until we observe FILLED and mark READING. */
@@ -435,6 +451,14 @@ static inline int deq_validate_header(const DeqHeader *hdr, uint64_t file_size,
     if (hdr->variant_id != expected_variant) return 0;
     if (hdr->elem_size == 0 || hdr->capacity == 0) return 0;
     if (hdr->capacity > 0x7FFFFFFFu) return 0;
+    /* Variant-specific elem_size sanity: prevents buffer overflows in the
+     * XS push paths if a corrupted/tampered file claims an impossibly-small
+     * elem_size (e.g. < 4 for a Str variant where push writes a 4-byte
+     * length prefix). */
+    if (expected_variant == DEQ_VAR_INT && hdr->elem_size != sizeof(int64_t))
+        return 0;
+    if (expected_variant == DEQ_VAR_STR && hdr->elem_size < sizeof(uint32_t) + 1)
+        return 0;
     if (hdr->total_size != file_size) return 0;
     if (hdr->data_off != sizeof(DeqHeader)) return 0;
     if (hdr->ctl_off != deq_ctl_offset(hdr->elem_size, hdr->capacity)) return 0;
@@ -558,7 +582,22 @@ static void deq_clear(DeqHandle *h) {
 }
 
 /* Concurrency-safe drain: CAS cursor to advance head to tail, then release
- * each drained slot through the state machine so future pushes can reuse. */
+ * each drained slot through the state machine so future pushes can reuse.
+ *
+ * Crash-recovery: a pusher that won the cursor CAS but died (SIGKILL/crash)
+ * before completing its write leaves its slot stuck in a non-FILLED state.
+ * Two distinct stall windows:
+ *   1. cursor CAS done, claim_write not yet succeeded — slot is still in
+ *      EMPTY@gen (or briefly READING@gen if a prior popper is finishing).
+ *   2. claim_write done, publish not yet done — slot is WRITING@gen.
+ * In either case plain deq_slot_claim_read would spin forever. We bound the
+ * per-slot wait to ~2s; on timeout we CAS the current state -> EMPTY@(gen+1)
+ * so the slot is reclaimed. The lock-free design doesn't track per-slot
+ * owner PID so we cannot distinguish "dead writer" from "live but extremely
+ * slow writer"; a 2s threshold is far longer than any legitimate slot fill.
+ * A falsely-recovered live writer's late deq_slot_publish is a CAS keyed on
+ * the original gen, so it observes the bump and silently no-ops rather than
+ * resurrecting a phantom FILLED slot. */
 static inline uint32_t deq_drain(DeqHandle *h) {
     DeqHeader *hdr = h->hdr;
     uint32_t cap = (uint32_t)hdr->capacity;
@@ -572,14 +611,58 @@ static inline uint32_t deq_drain(DeqHandle *h) {
                 1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
             for (uint32_t i = 0; i < count; i++) {
                 uint32_t idx = (hd + i) % cap;
-                uint64_t gen = deq_slot_claim_read(&h->ctl[idx]);
-                deq_slot_release(&h->ctl[idx], gen);
+                uint64_t *ctl_word = &h->ctl[idx];
+                int recovered = 0;
+                int dl_set = 0;
+                uint32_t spins = 0;
+                struct timespec dl;
+                for (;;) {
+                    uint64_t cw = __atomic_load_n(ctl_word, __ATOMIC_ACQUIRE);
+                    uint32_t st = DEQ_SLOT_STATE(cw);
+                    if (st == DEQ_SLOT_FILLED) {
+                        uint64_t nw = (DEQ_SLOT_GEN(cw) << 2) | DEQ_SLOT_READING;
+                        if (__atomic_compare_exchange_n(ctl_word, &cw, nw,
+                                0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
+                            deq_slot_release(ctl_word, DEQ_SLOT_GEN(cw));
+                            break;
+                        }
+                        continue;
+                    }
+                    /* Non-FILLED: hot-spin first, then short sleeps; on
+                     * timeout force the slot to EMPTY@(gen+1) regardless of
+                     * current state (covers both stall windows above). */
+                    deq_spin_pause();
+                    if ((++spins & 0x3F) == 0) {
+                        if (!dl_set) {
+                            deq_make_deadline((double)DEQ_DRAIN_RECOVERY_SEC, &dl);
+                            dl_set = 1;
+                        }
+                        struct timespec rem;
+                        if (!deq_remaining(&dl, &rem)) {
+                            uint64_t nw = ((DEQ_SLOT_GEN(cw) + 1) << 2) | DEQ_SLOT_EMPTY;
+                            if (__atomic_compare_exchange_n(ctl_word, &cw, nw,
+                                    0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
+                                recovered = 1;
+                                break;
+                            }
+                            /* CAS lost: state advanced concurrently
+                             * (publish/release/another recoverer). Re-observe. */
+                            continue;
+                        }
+                        /* Short sleep to keep CPU usage low during the long wait. */
+                        struct timespec ts = { 0, 100000L }; /* 100us */
+                        nanosleep(&ts, NULL);
+                    }
+                }
+                if (recovered)
+                    __atomic_add_fetch(&hdr->stat_recoveries, 1, __ATOMIC_RELAXED);
             }
             /* drain freed `count` slots at once — wake up to that many. */
             if (__atomic_load_n(&hdr->waiters_push, __ATOMIC_RELAXED) > 0) {
                 __atomic_add_fetch(&hdr->push_wake_seq, 1, __ATOMIC_RELEASE);
                 syscall(SYS_futex, &hdr->push_wake_seq, FUTEX_WAKE,
-                        (int)count, NULL, NULL, 0);
+                        count < INT_MAX ? (int)count : INT_MAX,
+                        NULL, NULL, 0);
             }
             return count;
         }

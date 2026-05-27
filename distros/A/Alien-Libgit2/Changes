@@ -1,0 +1,10 @@
+Revision history for Alien-Libgit2
+
+0.001     2026-05-27 03:14:28Z
+
+  - Update CI workflows to use the shared dzil-test composite action from
+    [@Author::GETTY]; removes Test::Pod from cpanfile on-test block (it is
+    now correctly installed as a develop prereq via listdeps --author)
+  - Provides libgit2 via pkg-config (system, >= 1.5) or bundled source build (share)
+  - Bundles libgit2-1.9.3.tar.gz — no network access required at build time
+  - Tested on: Debian bookworm, Alpine 3.19, macOS (Homebrew)

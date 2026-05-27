@@ -25,5 +25,5 @@ requires:
   Cpanel::JSON::XS: '0'
   XS::JIT: '0.24'
   perl: '5.010'
-version: '0.15'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

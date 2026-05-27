@@ -7,10 +7,10 @@ use IPC::Shareable ();
 # -- Expected exports by tag --
 
 my %expected = (
-    all         => [qw(LOCK_EX LOCK_SH LOCK_NB LOCK_UN SEM_MARKER SEM_READERS SEM_WRITERS SEM_PROTECTED)],
+    all         => [qw(LOCK_EX LOCK_SH LOCK_NB LOCK_UN SEM_MARKER SEM_READERS SEM_WRITERS SEM_PROTECTED SEM_TESTING)],
     lock        => [qw(LOCK_EX LOCK_SH LOCK_NB LOCK_UN)],
     flock       => [qw(LOCK_EX LOCK_SH LOCK_NB LOCK_UN)],
-    semaphores  => [qw(SEM_MARKER SEM_READERS SEM_WRITERS SEM_PROTECTED)],
+    semaphores  => [qw(SEM_MARKER SEM_READERS SEM_WRITERS SEM_PROTECTED SEM_TESTING)],
 );
 
 # Unique, sorted list of every exportable symbol

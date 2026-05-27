@@ -47,7 +47,7 @@ sub run_fuzz {
     my @statuses;
     for my $pid (@pids) { waitpid($pid, 0); push @statuses, $? >> 8 }
     ok($m->size <= 200, "$pkg fuzz: size within keyspace (" . $m->size . ")");
-    ok(!grep { $_ != 0 } @statuses, "$pkg fuzz: all children exited cleanly");
+    ok(!(grep { $_ != 0 } @statuses), "$pkg fuzz: all children exited cleanly");
     unlink $path;
 }
 

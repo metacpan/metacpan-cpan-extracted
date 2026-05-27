@@ -1,0 +1,35 @@
+use alienfile;
+use Path::Tiny;
+
+# Prefer the system libgit2 if pkg-config can find it (>= 1.5).
+# Falls back to building from the bundled source tarball.
+# (Min raised when we start using post-1.5 APIs in Git::Libgit2.)
+
+plugin 'PkgConfig' => (
+  pkg_name        => 'libgit2',
+  minimum_version => '1.5',
+);
+
+share {
+  start_url 'file://' . Path::Tiny->cwd->child('share/libgit2-1.9.3.tar.gz')->stringify;
+  plugin 'Fetch::Local';
+  plugin 'Extract' => 'tar.gz';
+  plugin 'Build::CMake';
+
+  build [
+    [ '%{cmake}',
+      '-DCMAKE_INSTALL_PREFIX=%{.install.prefix}',
+      '-DCMAKE_INSTALL_LIBDIR=lib',
+      '-DCMAKE_BUILD_TYPE=Release',
+      '-DBUILD_TESTS=OFF',
+      '-DBUILD_CLAR=OFF',
+      '-DBUILD_EXAMPLES=OFF',
+      '-DUSE_SSH=ON',
+      '-DUSE_HTTPS=OpenSSL',
+      '-DREGEX_BACKEND=builtin',
+      '%{.install.extract}',
+    ],
+    '%{make}',
+    '%{make} install',
+  ];
+};

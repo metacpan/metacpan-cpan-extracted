@@ -1,7 +1,7 @@
 package Data::Stack::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('Data::Stack::Shared', $VERSION);
@@ -67,10 +67,16 @@ reading the value. C<peek> is a seqlock-style read: it retries if the
 slot transitions during the read and returns false if the top changes
 concurrently beyond the retry budget.
 
-C<drain> is safe under concurrent C<push>/C<pop>, but it spin-waits on
-slots whose pusher is mid-publish; a pusher crash between its position
-CAS and the publish leaves drain blocked on that slot. Use C<drain> for
-orderly draining, not as a crash-recovery primitive.
+C<drain> is safe under concurrent C<push>/C<pop>. It bounds the per-slot
+wait to ~2s and, on timeout, force-resets a slot still in the C<writing>
+state to C<empty> (with generation bumped) so a pusher that crashed
+between its position CAS and publish cannot wedge drain forever. Because
+the slot control word does not encode owner PID, this recovery cannot
+distinguish a crashed pusher from one stalled longer than 2s; if a live
+pusher is falsely reclaimed, its later publish observes the bumped
+generation and is silently dropped (the value is lost — equivalent to a
+crash). A legitimate publish-in-flight delay is many orders of magnitude
+shorter than the threshold under normal load.
 
 =head2 Compatibility
 

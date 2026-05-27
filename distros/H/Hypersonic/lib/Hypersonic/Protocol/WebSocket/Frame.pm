@@ -13,7 +13,7 @@ use Hypersonic::JIT::Util;
 #
 # All C code generated at compile time for JIT compilation.
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 # WebSocket opcodes (RFC 6455 Section 5.2)
 use constant {

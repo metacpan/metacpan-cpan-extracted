@@ -1,5 +1,14 @@
 Revision history for Data::Deque::Shared
 
+0.04  2026-05-26
+    - drain: bounded recovery (~2s) for slots stuck after a crashed pusher
+      (covers both WRITING and pre-claim_write EMPTY@gen windows)
+    - slot publish is now CAS-only — prevents a stalled pusher from
+      clobbering a slot drain force-recovered to EMPTY
+    - new stats->{recoveries} counter for drain-time force-skips
+    - header validation rejects files with elem_size invalid for the
+      variant (Int = 8, Str ≥ 5)
+
 0.03  2026-04-26
     - MPMC per-slot state machine + file format v2
     - strict fd validation

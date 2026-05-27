@@ -18,6 +18,10 @@ ansiencode examples/usa.ans
 
 ![Divider](../pics/pink.jpg?raw=true "Divider")
 
+## ANSI Encode Logo
+
+![ANSI Encode Logo](../pics/ansi-encode-logo.png)
+
 ## Atari Logo
 
 ![Atari Logo](../pics/atari.png?raw=true "Atari Logo")

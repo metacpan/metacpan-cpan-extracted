@@ -1,5 +1,11 @@
 Revision history for Data-Buffer-Shared
 
+0.04  2026-05-26
+    - Dead-reader rwlock recovery: SIGKILL'd reader no longer pins the counter;
+      1024-slot per-process mirror drains dead contributions on wrlock timeout
+    - BUF_VERSION 1 → 2 (header adds reader_slots_off); existing 0.03 maps
+      must be recreated
+
 0.03  2026-04-26
     - new from fd dups fd; sync/stats/memfd aliases
     - rwlock writers waiting split + crash recovery

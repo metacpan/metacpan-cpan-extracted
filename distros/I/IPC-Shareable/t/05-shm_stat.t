@@ -4,6 +4,7 @@ use warnings;
 use Data::Dumper;
 use Test::More;
 use IPC::Shareable;
+IPC::Shareable->testing_set('IPC::Shareable');
 
 my $segs_before = IPC::Shareable::seg_count();
 my $sems_before = IPC::Shareable::sem_count();

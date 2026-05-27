@@ -3,6 +3,7 @@ use strict;
 
 use Config;
 use IPC::Shareable;
+IPC::Shareable->testing_set('IPC::Shareable');
 use Test::More;
 
 BEGIN {

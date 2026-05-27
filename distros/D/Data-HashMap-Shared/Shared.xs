@@ -21,13 +21,12 @@
 /* ---- Exception-safe lock guard for rdlock held across Perl API calls ---- */
 
 static void shm_rdunlock_cleanup(pTHX_ void *ptr) {
-    ShmHeader *hdr = (ShmHeader *)ptr;
-    shm_rwlock_rdunlock(hdr);
+    shm_rwlock_rdunlock((ShmHandle *)ptr);
 }
 
-#define RDLOCK_GUARD(hdr) \
-    shm_rwlock_rdlock(hdr); \
-    SAVEDESTRUCTOR_X(shm_rdunlock_cleanup, (void*)(hdr))
+#define RDLOCK_GUARD(handle) \
+    shm_rwlock_rdlock(handle); \
+    SAVEDESTRUCTOR_X(shm_rdunlock_cleanup, (void*)(handle))
 
 /* ---- Helper macros ---- */
 

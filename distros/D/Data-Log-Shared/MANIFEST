@@ -23,6 +23,7 @@ t/03-edge-cases.t
 t/eventfd_set.t
 t/pod_synopsis.t
 t/version_check.t
+xt/abandoned_slot.t
 xt/abi_skew.t
 xt/asan.t
 xt/cloexec.t

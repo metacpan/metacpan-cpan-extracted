@@ -21,6 +21,7 @@ t/02-mpmc-state-machine.t
 t/03-file-format.t
 t/04-str.t
 t/05-edges.t
+t/06-drain-stuck-writer.t
 t/eventfd_set.t
 t/pod_synopsis.t
 t/version_check.t

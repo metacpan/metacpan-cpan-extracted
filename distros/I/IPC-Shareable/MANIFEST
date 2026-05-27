@@ -1,3 +1,4 @@
+.claude/settings.local.json
 Changes
 COPYING
 CREDITS
@@ -8,8 +9,6 @@ lib/IPC/Shareable/SharedMem.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-META_new.yml
-README.md
 Shareable.xs
 t/00-base.t
 t/02-create.t
@@ -29,8 +28,9 @@ t/21-lock_coderef.t
 t/22-lock_semaphore.t
 t/23-lock_sh_enforcement.t
 t/24-lock_fork_blocking.t
-t/25-fetch_read_warn.t
+t/25-fetch_nested_lock.t
 t/26-ipcav.t
+t/27-fetch_read_warn.t
 t/28-ipchv.t
 t/30-ipcref.t
 t/32-obj.t
@@ -55,6 +55,7 @@ t/65-clean_protected.t
 t/66-protected_persist.t
 t/67-storable_fallback.t
 t/68-encode_fail.t
+t/69-testing_flag.t
 t/70-global_register.t
 t/71-sysv_info.t
 t/72-shm_segments.t

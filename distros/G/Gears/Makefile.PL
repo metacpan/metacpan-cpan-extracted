@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Gears",
   "PREREQ_PM" => {
     "Devel::StrictMode" => 0,
-    "Mooish::Base" => "1.001",
+    "Mooish::Base" => "1.005",
     "Path::Tiny" => 0,
     "URI" => 0,
     "Value::Diff" => 0
@@ -26,7 +26,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test2::V1" => 0
   },
-  "VERSION" => "0.102",
+  "VERSION" => "0.104",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Devel::StrictMode" => 0,
-  "Mooish::Base" => "1.001",
+  "Mooish::Base" => "1.005",
   "Path::Tiny" => 0,
   "Test2::V1" => 0,
   "URI" => 0,

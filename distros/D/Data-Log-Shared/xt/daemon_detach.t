@@ -35,14 +35,13 @@ if ($pid == 0) {
 }
 waitpid($pid, 0);
 
-# Give the grandchild time to finish
+# Give the grandchild time to finish — poll the log's actual entry
+# count instead of the file size (which never changes after ftruncate).
+my $l = Data::Log::Shared->new($path, 4096);
 for (1..50) {
-    last if -s $path > 200;   # rough — has at least 2 entries
+    last if $l->entry_count >= 2;
     select(undef, undef, undef, 0.05);
 }
-
-# Parent reopens and reads
-my $l = Data::Log::Shared->new($path, 4096);
 my @entries;
 my $off = 0;
 while (my ($d, $next) = $l->read_entry($off)) {

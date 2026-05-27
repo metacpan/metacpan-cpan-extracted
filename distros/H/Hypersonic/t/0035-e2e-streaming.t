@@ -93,8 +93,13 @@ my ($pid, $log) = spawn_server(sub {
     $server->run(port => $port, workers => 1);
 });
 
-# Parent - wait for server to start
-wait_for_port($port, { pid => $pid, log => $log, tries => 50 })
+# Parent - wait for server to start. This test compiles the largest
+# JIT module of the suite (regular + streaming + 2 SSE routes + 2
+# websocket routes); on smokers with -O0 -g debugging perls the gcc
+# invocation alone can take 30-60s, which is why earlier 5s/10s
+# timeouts produced the "child wrote no output" bailouts on CPAN
+# testers (host k93msid, perl 5.12 .. 5.42).
+wait_for_port($port, { pid => $pid, log => $log, tries => 600, sleep => 0.2 })
     or BAIL_OUT("server child failed to bind port $port (see diag above)");
 
 # ============================================================

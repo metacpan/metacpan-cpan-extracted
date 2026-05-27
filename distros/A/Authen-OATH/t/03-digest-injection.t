@@ -1,14 +1,17 @@
-use strict;
-use warnings;
+use Test2::V0;
 
 use Authen::OATH ();
-use Test::More tests => 2;
 
 our $PWNED = 0;
 my $payload = q{Digest::SHA; $main::PWNED = 1; #};
 
 my $oath = Authen::OATH->new( digest => $payload );
-eval { $oath->totp( 'a' x 16 ) };
 
-like( $@, qr/Invalid digest module name/, 'malicious digest is rejected' );
+like(
+    dies { $oath->totp( 'a' x 16 ) },
+    qr/Invalid digest module name/,
+    'malicious digest is rejected'
+);
 is( $PWNED, 0, 'injected code did not execute' );
+
+done_testing;

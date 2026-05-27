@@ -1,0 +1,57 @@
+name: 'dzil test (Author::GETTY)'
+description: >-
+  Bootstrap Dist::Zilla, install every author and distribution prerequisite
+  (including develop-phase deps such as Test::Pod that the author tests need),
+  and run a dzil command. Drop this into any [@Author::GETTY] distribution's CI
+  job after actions/checkout and any system-library setup.
+author: 'Torsten Raudssus <getty@cpan.org>'
+branding:
+  icon: 'box'
+  color: 'blue'
+
+inputs:
+  command:
+    description: 'dzil command to run (e.g. test, build, smoke).'
+    required: false
+    default: 'test'
+  install-type:
+    description: >-
+      Value for ALIEN_INSTALL_TYPE (e.g. "share" to force a vendored build of an
+      Alien dist). Leave empty to let the dist probe for a system library.
+    required: false
+    default: ''
+  cpanm-opts:
+    description: 'Extra options for cpanm, passed via PERL_CPANM_OPT.'
+    required: false
+    default: '--mirror http://cpan.metacpan.org --mirror-only'
+
+runs:
+  using: composite
+  steps:
+    - name: Install Dist::Zilla
+      shell: bash
+      env:
+        PERL_CPANM_OPT: ${{ inputs.cpanm-opts }}
+      run: cpanm -nq Dist::Zilla
+
+    - name: Install author deps (dist.ini plugins + bundle)
+      shell: bash
+      env:
+        PERL_CPANM_OPT: ${{ inputs.cpanm-opts }}
+      run: |
+        set -euo pipefail
+        dzil authordeps --missing | cpanm -nq
+
+    - name: Install distribution deps (incl. develop/author prereqs)
+      shell: bash
+      env:
+        PERL_CPANM_OPT: ${{ inputs.cpanm-opts }}
+      run: |
+        set -euo pipefail
+        dzil listdeps --author --missing | cpanm -nq
+
+    - name: Run dzil ${{ inputs.command }}
+      shell: bash
+      env:
+        ALIEN_INSTALL_TYPE: ${{ inputs.install-type }}
+      run: dzil ${{ inputs.command }}

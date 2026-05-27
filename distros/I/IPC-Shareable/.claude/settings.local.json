@@ -1,0 +1,42 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -sL \"https://vagrantcloud.com/api/v2/box/generic/openbsd7\")",
+      "Bash(python3 -c ' *)",
+      "Bash(curl -sL -o /tmp/openbsd7-test.box https://vagrantcloud.com/generic/boxes/openbsd7/versions/4.3.12/providers/qemu/amd64/vagrant.box)",
+      "Read(//tmp/**)",
+      "Read(//private/tmp/**)",
+      "Bash(tar xzf *)",
+      "Bash(limactl delete *)",
+      "Bash(./ci/openbsd-test.sh)",
+      "Read(//opt/homebrew/Cellar/qemu/11.0.0/share/qemu/**)",
+      "Read(//opt/homebrew/Cellar/qemu/**)",
+      "Bash(limactl --version)",
+      "Bash(limactl create *)",
+      "WebSearch",
+      "WebFetch(domain:lima-vm.io)",
+      "Bash(limactl stop *)",
+      "Bash(limactl list *)",
+      "Bash(kill 31723 31886 31911)",
+      "Bash(cp ~/.lima/_cache/openbsd7.qcow2 ~/.lima/openbsd-ipc/disk)",
+      "Bash(mkdir -p /tmp/fb-vkey)",
+      "Bash(chmod 600 /tmp/fb-vkey/vagrant_key)",
+      "Bash(ssh-keygen -l -f /tmp/fb-vkey/vagrant_key)",
+      "Bash(ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o ConnectTimeout=5 -o PasswordAuthentication=no -o BatchMode=yes -i /tmp/fb-vkey/vagrant_key -p 60222 vagrant@127.0.0.1 true)",
+      "Bash(echo \"SSH failed \\(rc=$?\\)\")",
+      "Bash(ssh *)",
+      "Bash(python3 *)",
+      "Bash(DISPLAY=dummy SSH_ASKPASS=\"$ASKPASS\" SSH_ASKPASS_REQUIRE=force ssh *)",
+      "Bash(limactl start *)",
+      "Bash(limactl shell *)",
+      "Bash(./ci/solaris-test.sh t/00-base.t)",
+      "Bash(echo \"PID: $!\")",
+      "Bash(./ci/vm-tests.sh *)",
+      "Bash(bunzip2 -k /tmp/dfly-test.img.bz2)",
+      "Bash(fdisk /tmp/dfly-test.img)",
+      "Read(//Users/steve/.lima/dragonfly-ipc/**)",
+      "Bash(rm ~/.lima/dragonfly-ipc/.first-boot-done)",
+      "Bash(qemu-img snapshot *)"
+    ]
+  }
+}

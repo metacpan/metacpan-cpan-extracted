@@ -4,6 +4,7 @@ use strict;
 use Carp;
 use Data::Dumper;
 use IPC::Shareable;
+IPC::Shareable->testing_set('IPC::Shareable');
 use IPC::Shareable::SharedMem;
 use Mock::Sub;
 use Test::More;

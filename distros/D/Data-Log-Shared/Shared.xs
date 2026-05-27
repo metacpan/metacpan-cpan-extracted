@@ -91,7 +91,7 @@ append(self, data)
     RETVAL
 
 void
-read_entry(self, offset)
+read_entry(self, offset, ...)
     SV *self
     UV offset
   PREINIT:
@@ -100,11 +100,21 @@ read_entry(self, offset)
     const uint8_t *out_data;
     uint32_t out_len;
     uint64_t next_off;
-    if (log_read(h, offset, &out_data, &out_len, &next_off)) {
+    /* Optional third arg: abandon_wait_us (default LOG_ABANDON_WAIT_US).
+     * Pass 0 to immediately treat any uncommitted slot as abandoned. */
+    uint64_t wait_us = (items > 2) ? (uint64_t)SvUV(ST(2)) : (uint64_t)LOG_ABANDON_WAIT_US;
+    int rc = log_read_ex(h, offset, &out_data, &out_len, &next_off, wait_us);
+    if (rc == LOG_READ_OK) {
         EXTEND(SP, 2);
         PUSHs(sv_2mortal(newSVpvn((const char *)out_data, out_len)));
         PUSHs(sv_2mortal(newSVuv((UV)next_off)));
+    } else if (rc == LOG_READ_ABANDONED) {
+        /* Signal "skip this slot" — data is undef, next_off is set. */
+        EXTEND(SP, 2);
+        PUSHs(sv_newmortal());  /* undef */
+        PUSHs(sv_2mortal(newSVuv((UV)next_off)));
     }
+    /* LOG_READ_EMPTY: return empty list. */
 
 UV
 tail_offset(self)

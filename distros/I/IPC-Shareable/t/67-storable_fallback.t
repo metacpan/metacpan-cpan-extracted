@@ -3,6 +3,7 @@ use strict;
 
 use Test::More;
 use IPC::Shareable;
+IPC::Shareable->testing_set('IPC::Shareable');
 
 # Tests for the Storable-to-JSON auto-detection fallback:
 # When a segment was written with serializer => 'storable' and is later

@@ -47,8 +47,10 @@ do { my $x = {
                                    'Digest::SHA' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'Test2::Require::Module' => '0',
+                                   'Test2::V0' => '0',
                                    'Test::More' => '0',
-                                   'Test::Needs' => '0',
+                                   'bignum' => '0',
                                    'perl' => '5.006'
                                  }
                  }

@@ -1,5 +1,11 @@
 Revision history for Data-Sync-Shared
 
+0.05  2026-05-26
+    - RWLock dead-reader recovery: SIGKILL'd reader no longer pins the
+      counter; 1024-slot per-process mirror drains dead contributions on
+      wrlock timeout
+    - SYNC_VERSION 1 → 2 (RWLock files only); existing maps must be recreated
+
 0.04  2026-04-26
     - RWLock write-preferring + writers waiting split
     - Barrier broken-on-timeout + is broken()

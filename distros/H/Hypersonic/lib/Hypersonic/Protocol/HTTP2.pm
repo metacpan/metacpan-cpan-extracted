@@ -8,7 +8,7 @@ use warnings;
 # using nghttp2 for binary framing and HPACK compression.
 # All methods generate C code - zero runtime overhead.
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 # Cache nghttp2 detection result
 my $_nghttp2_info;

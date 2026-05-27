@@ -3,7 +3,7 @@ on 'test' => sub {
 };
 
 requires 'perl' => '5.040';
-requires 'Mooish::Base' => '1.001';
+requires 'Mooish::Base' => '1.005';
 requires 'Path::Tiny' => 0;
 requires 'Value::Diff' => 0;
 requires 'Devel::StrictMode' => 0;

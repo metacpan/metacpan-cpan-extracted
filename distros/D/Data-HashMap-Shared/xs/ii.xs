@@ -84,12 +84,12 @@ set_multi(SV* self_sv, ...)
                 count += shm_ii_put(h, (int64_t)SvIV(ST(i)), (int64_t)SvIV(ST(i + 1)));
         } else {
             ShmHeader *hdr = h->hdr;
-            shm_rwlock_wrlock(hdr);
+            shm_rwlock_wrlock(h);
             shm_seqlock_write_begin(&hdr->seq);
             for (int i = 1; i < items; i += 2)
                 count += shm_ii_put_inner(h, (int64_t)SvIV(ST(i)), (int64_t)SvIV(ST(i + 1)), SHM_TTL_USE_DEFAULT);
             shm_seqlock_write_end(&hdr->seq);
-            shm_rwlock_wrunlock(hdr);
+            shm_rwlock_wrunlock(h);
         }
         RETVAL = count;
     OUTPUT:
@@ -105,13 +105,13 @@ remove_multi(SV* self_sv, ...)
                 count += shm_ii_remove(h, (int64_t)SvIV(ST(i)));
         } else {
             ShmHeader *hdr = h->hdr;
-            shm_rwlock_wrlock(hdr);
+            shm_rwlock_wrlock(h);
             shm_seqlock_write_begin(&hdr->seq);
             for (int i = 1; i < items; i++)
                 count += shm_ii_remove_inner(h, (int64_t)SvIV(ST(i)));
             if (count) shm_ii_maybe_shrink(h);
             shm_seqlock_write_end(&hdr->seq);
-            shm_rwlock_wrunlock(hdr);
+            shm_rwlock_wrunlock(h);
         }
         RETVAL = count;
     OUTPUT:
@@ -142,7 +142,7 @@ get_multi(SV* self_sv, ...)
             uint32_t *hashes = NULL;
             Newx(hashes, nkeys, uint32_t);
             SAVEFREEPV(hashes);
-            RDLOCK_GUARD(hdr);
+            RDLOCK_GUARD(h);
             uint32_t mask = hdr->table_cap - 1;
             for (int i = 0; i < nkeys; i++) {
                 hashes[i] = shm_hash_int64((int64_t)SvIV(ST(i + 1)));
@@ -332,7 +332,7 @@ keys(SV* self_sv)
             ShmHeader *hdr = sh->hdr;
             ShmNodeII *nodes = (ShmNodeII *)sh->nodes;
             uint32_t now = sh->expires_at ? shm_now() : 0;
-            RDLOCK_GUARD(hdr);
+            RDLOCK_GUARD(sh);
             EXTEND(SP, hdr->size);
             for (uint32_t i = 0; i < hdr->table_cap; i++) {
                 if (SHM_IS_LIVE(sh->states[i]) && !SHM_IS_EXPIRED(sh, i, now))
@@ -350,7 +350,7 @@ values(SV* self_sv)
             ShmHeader *hdr = sh->hdr;
             ShmNodeII *nodes = (ShmNodeII *)sh->nodes;
             uint32_t now = sh->expires_at ? shm_now() : 0;
-            RDLOCK_GUARD(hdr);
+            RDLOCK_GUARD(sh);
             EXTEND(SP, hdr->size);
             for (uint32_t i = 0; i < hdr->table_cap; i++) {
                 if (SHM_IS_LIVE(sh->states[i]) && !SHM_IS_EXPIRED(sh, i, now))
@@ -368,7 +368,7 @@ items(SV* self_sv)
             ShmHeader *hdr = sh->hdr;
             ShmNodeII *nodes = (ShmNodeII *)sh->nodes;
             uint32_t now = sh->expires_at ? shm_now() : 0;
-            RDLOCK_GUARD(hdr);
+            RDLOCK_GUARD(sh);
             EXTEND(SP, hdr->size * 2);
             for (uint32_t i = 0; i < hdr->table_cap; i++) {
                 if (SHM_IS_LIVE(sh->states[i]) && !SHM_IS_EXPIRED(sh, i, now)) {
@@ -417,7 +417,7 @@ to_hash(SV* self_sv)
             ShmHeader *hdr = sh->hdr;
             ShmNodeII *nodes = (ShmNodeII *)sh->nodes;
             uint32_t now = sh->expires_at ? shm_now() : 0;
-            RDLOCK_GUARD(hdr);
+            RDLOCK_GUARD(sh);
             for (uint32_t i = 0; i < hdr->table_cap; i++) {
                 if (SHM_IS_LIVE(sh->states[i]) && !SHM_IS_EXPIRED(sh, i, now)) {
                     SV* val = newSViv(nodes[i].value);
@@ -658,18 +658,14 @@ path(SV* self_sv)
 bool
 unlink(SV* self_or_class, ...)
     CODE:
-        const char *p;
         if (SvROK(self_or_class) && SvOBJECT(SvRV(self_or_class))) {
             ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_or_class)));
             if (!h) croak("Attempted to use a destroyed Data::HashMap::Shared::II object");
-            p = h->path;
+            RETVAL = shm_unlink_sharded(h);
         } else {
             if (items < 2) croak("Usage: Data::HashMap::Shared::II->unlink($path)");
-            p = SvPV_nolen(ST(1));
+            RETVAL = shm_unlink_path(SvPV_nolen(ST(1)));
         }
-        RETVAL = (SvROK(self_or_class) && SvOBJECT(SvRV(self_or_class))) ?
-            shm_unlink_sharded(INT2PTR(ShmHandle*, SvIV(SvRV(self_or_class)))) :
-            shm_unlink_path(p);
     OUTPUT:
         RETVAL
 

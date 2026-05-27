@@ -1,5 +1,11 @@
 Revision history for Perl extension RPM::Query.
 
+0.05 2026-05-26
+  - Updated t/002_query.t test to skip test when CPAN Testers don't have kernal installed via RPM
+
+0.04 2026-05-26
+  - Updated tests fixes #1 Test suite fails on fedora
+
 0.03 2023-06-12
   - skip tests unless perl is installed by rpm
 

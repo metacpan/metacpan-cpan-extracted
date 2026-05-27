@@ -384,6 +384,61 @@ waitpid($rpid, 0);
 
 is $rpool->used, 0, "concurrent recovery freed all 20 stale slots";
 
+# --- Recovery + concurrent alloc race ---
+#
+# Stress the recoverer's owner-CAS / bitmap-CAS window: while recovery
+# is running, fresh allocators churn the bitmap. Verify post-conditions
+# stay coherent (no slot is "owned" by a live pid but with bit cleared,
+# no orphan bits set with owner 0).
+{
+    my $rrpath = tmpnam() . '.shm';
+    my $rrpool = Data::Pool::Shared::I64->new($rrpath, 64);
+
+    # Create 16 stale slots from a dead child.
+    my $pid = fork // die "fork: $!";
+    if ($pid == 0) {
+        my $c = Data::Pool::Shared::I64->new($rrpath, 64);
+        $c->alloc for 1..16;
+        _exit(0);
+    }
+    waitpid($pid, 0);
+    is $rrpool->used, 16, "16 stale slots seeded";
+
+    # Fork allocators + recoverers concurrently.
+    my @kids;
+    for my $w (1..4) {
+        my $p = fork // die "fork: $!";
+        if ($p == 0) {
+            my $c = Data::Pool::Shared::I64->new($rrpath, 64);
+            for (1..20) {
+                $c->recover_stale if $w % 2 == 0;
+                my $s = $c->try_alloc;
+                if (defined $s) {
+                    $c->set($s, $$);
+                    $c->free($s);
+                }
+            }
+            _exit(0);
+        }
+        push @kids, $p;
+    }
+    waitpid($_, 0) for @kids;
+
+    # Final cleanup pass.
+    $rrpool->recover_stale;
+
+    # All slots from dead processes should be recovered; live alloc/free
+    # cycles balance to net zero. used must equal exactly what we hold.
+    is $rrpool->used, 0, "no orphan slots after race";
+
+    # Sanity: every allocated bit has a live owner (parent only after
+    # cleanup means no allocated bits remain).
+    my $slots = $rrpool->allocated_slots;
+    is scalar @$slots, 0, "no allocated bits left";
+
+    unlink $rrpath;
+}
+
 # --- cmpxchg / xchg ---
 
 my $cx = Data::Pool::Shared::I64->new(undef, 4);

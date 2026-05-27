@@ -1,0 +1,663 @@
+#!/usr/bin/env perl
+use strictures 2;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use open ':std', ':utf8';
+
+use Net::DHCPv6;
+use Net::DHCPv6::Constants qw(
+    $ADVERTISE
+    $DUID_EN
+    $DUID_LL
+    $DUID_LLT
+    $DUID_UUID
+    $OPTION_CLIENTID
+    $OPTION_DNS_SERVERS
+    $OPTION_DOMAIN_LIST
+    $OPTION_ELAPSED_TIME
+    $OPTION_IA_NA
+    $OPTION_IAADDR
+    $OPTION_NTP_SERVER
+    $OPTION_ORO
+    $OPTION_PREFERENCE
+    $OPTION_SERVERID
+    $REPLY
+    $REQUEST
+    $SOLICIT
+);
+use Text::ASCIITable;
+use Socket qw(AF_INET6 inet_ntop);
+
+# ── Helpers ──────────────────────────────────────────────────────
+
+sub hexbytes { unpack 'H*', $_[0] }
+
+sub _fmt_mac { join ':', unpack '(H2)*', $_[0] }
+
+sub _fmt_ts {
+    my $ts = shift;
+    my ( $sec, $min, $hour, $mday, $mon, $year ) = gmtime $ts;
+    return sprintf '%04d-%02d-%02dT%02d:%02d:%02dZ', $year + 1900, $mon + 1, $mday, $hour, $min, $sec;
+}
+
+sub _fmt_id {
+    my $id = shift;
+    return '' unless CORE::length $id;
+    if ( $id =~ m/^[[:print:]]+$/ ) {
+        return $id;
+    }
+    return unpack 'H*', $id;
+}
+
+sub show_packet {
+    my ( $heading, $msg, $align ) = @_;
+    $align ||= 'left';
+    my $t = Text::ASCIITable->new( { headingText => $heading, hide_HeadLine => 1, headingAlign => $align } );
+    $t->setCols( 'Field', 'Value' );
+    $t->alignCol( 'Value', 'right' );
+    $t->alignColName( 'Value', 'right' );
+    $t->addRow( 'msg_type',       $msg->msg_type_name . ' (' . $msg->msg_type . ')' );
+    $t->addRow( 'transaction_id', sprintf( '0x%06x', $msg->transaction_id ) );
+
+    if ( $msg->can( 'hop_count' ) ) {
+        $t->addRow( 'hop_count', $msg->hop_count );
+        $t->addRow( 'link_addr', $msg->link_addr );
+        $t->addRow( 'peer_addr', $msg->peer_addr );
+    }
+    for my $opt ( @{ $msg->options->options } ) {
+        my $code = $opt->code;
+        my $name = Net::DHCPv6::Constants::option_name( $code ) // 'OPTION_UNKNOWN';
+        $t->addRow( "$name ($code)", _opt_value( $opt ) );
+    }
+    print $t;
+}
+
+sub _opt_value {
+    my ( $opt ) = @_;
+    if ( $opt->can( 'duid' ) ) {
+        my $d = $opt->duid;
+        my $t = $d->duid_type;
+        if ( $t == $DUID_LLT ) {
+            return sprintf(
+                'DUID-LLT hw-type=%d time=%s mac=%s',
+                $d->link_layer_type,
+                _fmt_ts( $d->time ),
+                _fmt_mac( $d->identifier )
+            );
+        }
+        if ( $t == $DUID_EN ) {
+            return sprintf( 'DUID-EN ent=%d id=%s', $d->enterprise_number, _fmt_id( $d->identifier ) );
+        }
+        if ( $t == $DUID_LL ) {
+            return sprintf( 'DUID-LL hw-type=%d mac=%s', $d->link_layer_type, _fmt_mac( $d->identifier ) );
+        }
+        if ( $t == $DUID_UUID ) {
+            return sprintf( 'DUID-UUID %s', _fmt_id( $d->identifier ) );
+        }
+        return sprintf( 'DUID-type%d %s', $t, _fmt_id( $d->identifier // '' ) );
+    }
+    if ( $opt->can( 'servers' ) ) {
+        return join( ', ', map { inet_ntop( AF_INET6, $_ ) } @{ $opt->servers } );
+    }
+    if ( $opt->can( 'domains' ) ) {
+        return join( ', ', @{ $opt->domains } );
+    }
+    if ( $opt->can( 'requested_options' ) ) {
+        return join( ', ', map { Net::DHCPv6::Constants::option_name( $_ ) // "opt$_" } @{ $opt->requested_options } );
+    }
+    if ( $opt->can( 'domain_name' ) ) {
+        my $name = $opt->domain_name;
+        return 'none' unless CORE::length $name;
+        return $name . ' (flags 0x' . sprintf( '%02x', $opt->flags ) . ')';
+    }
+    if ( $opt->can( 'centiseconds' ) ) {
+        return $opt->centiseconds . ' cs';
+    }
+    if ( $opt->can( 'value' ) ) {
+        return $opt->value;
+    }
+    if ( $opt->can( 'data' ) ) {
+        my $d = $opt->data;
+        return '(empty)' unless CORE::length $d;
+        return unpack( 'H*', $d );
+    }
+    return '(no value)';
+}
+
+# ── Client ────────────────────────────────────────────────────────
+
+package DHCPv6Client {
+    use Net::DHCPv6;
+    use Net::DHCPv6::Constants;
+    use Net::DHCPv6::DUID;
+    use Net::DHCPv6::Option::ClientFqdn;
+    use Net::DHCPv6::Option::ClientId;
+    use Net::DHCPv6::Option::ElapsedTime;
+    use Net::DHCPv6::Option::Generic;
+    use Net::DHCPv6::Option::IANA;
+    use Net::DHCPv6::Option::IAAddr;
+    use Net::DHCPv6::OptionList;
+
+    sub new {
+        my ( $class, %args ) = @_;
+        my $mac = $args{mac}
+            || join( '', map { sprintf '%02x', int( rand 256 ) } 1 .. 6 );
+        my $time = time();
+        bless {
+            transaction_id => int( rand( 0xffffff ) ),
+            client_mac     => $mac,
+            client_duid    => Net::DHCPv6::DUID->new_llt( 1, $time, pack( 'H*', $mac ) ),
+            iaid           => $args{iaid}    // 42,
+            verbose        => $args{verbose} // 1,
+            server_id      => undef,
+            lease          => undef,
+        }, $class;
+    }
+
+    sub build_solicit {
+        my $self = shift;
+        my $msg  = Net::DHCPv6::Message::Solicit->new( transaction_id => $self->{transaction_id}, );
+        $msg->add_option(
+            Net::DHCPv6::Option::ClientId->new(
+                duid => $self->{client_duid}
+            )
+        );
+        $msg->add_option(
+            Net::DHCPv6::Option::ElapsedTime->new(
+                centiseconds => 0
+            )
+        );
+        $msg->add_option(
+            Net::DHCPv6::Option::ClientFqdn->new(
+                flags       => 0x01,
+                domain_name => 'client.example.com',
+            )
+        );
+        $msg->add_option(
+            Net::DHCPv6::Option::Generic->new(
+                code => $OPTION_USER_CLASS,
+                data => 'android-dhcp-14',
+            )
+        );
+        $msg->add_option(
+            Net::DHCPv6::Option::ORO->new(
+                requested_options => [ $OPTION_DNS_SERVERS, $OPTION_NTP_SERVER, $OPTION_DOMAIN_LIST, ],
+            )
+        );
+        my $iana = Net::DHCPv6::Option::IANA->new( iaid => $self->{iaid} );
+        $msg->add_option( $iana );
+        return $msg;
+    }
+
+    sub handle_advertise {
+        my ( $self, $msg ) = @_;
+        $self->{server_id} = $msg->get_option( $OPTION_SERVERID );
+        my $iana = $msg->get_option( $OPTION_IA_NA );
+        if ( $iana ) {
+            my $iaaddr = $iana->get_option( $OPTION_IAADDR );
+            if ( $iaaddr ) {
+                $self->{offered_addr} = $iaaddr->address;
+            }
+        }
+        return $self;
+    }
+
+    sub build_request {
+        my $self = shift;
+        my $msg  = Net::DHCPv6::Message::Request->new( transaction_id => $self->{transaction_id}, );
+        $msg->add_option(
+            Net::DHCPv6::Option::ClientId->new(
+                duid => $self->{client_duid}
+            )
+        );
+        $msg->add_option(
+            Net::DHCPv6::Option::ServerId->new(
+                duid => $self->{server_id}->duid
+            )
+        );
+        my $iana = Net::DHCPv6::Option::IANA->new( iaid => $self->{iaid} );
+        $msg->add_option( $iana );
+        return $msg;
+    }
+
+    sub handle_reply {
+        my ( $self, $msg ) = @_;
+        my $iana = $msg->get_option( $OPTION_IA_NA );
+        if ( $iana ) {
+            my $iaaddr = $iana->get_option( $OPTION_IAADDR );
+            if ( $iaaddr ) {
+                my $dns  = $msg->get_option( $OPTION_DNS_SERVERS );
+                my $ntp  = $msg->get_option( $OPTION_NTP_SERVER );
+                my $sdom = $msg->get_option( $OPTION_DOMAIN_LIST );
+                $self->{lease} = {
+                    ia                 => $iana->iaid,
+                    t1                 => $iana->t1,
+                    t2                 => $iana->t2,
+                    address            => $iaaddr->address,
+                    preferred_lifetime => $iaaddr->preferred_lifetime,
+                    valid_lifetime     => $iaaddr->valid_lifetime,
+                    domain_servers     => $dns  ? $dns->servers  : undef,
+                    ntp_servers        => $ntp  ? $ntp->servers  : undef,
+                    domain_search      => $sdom ? $sdom->domains : undef,
+                };
+            }
+        }
+        return $self;
+    }
+
+    sub has_lease { defined $_[0]->{lease} }
+    sub lease     { $_[0]->{lease} }
+
+    sub build_renew {
+        my $self = shift;
+        return unless $self->{lease};
+        my $msg = Net::DHCPv6::Message::Renew->new( transaction_id => int( rand( 0xffffff ) ), );
+        $msg->add_option(
+            Net::DHCPv6::Option::ClientId->new(
+                duid => $self->{client_duid}
+            )
+        );
+        $msg->add_option(
+            Net::DHCPv6::Option::ServerId->new(
+                duid => $self->{server_id}->duid
+            )
+        );
+        my $ia = Net::DHCPv6::Option::IANA->new(
+            iaid    => $self->{iaid},
+            t1      => $self->{lease}{preferred_lifetime},
+            t2      => $self->{lease}{valid_lifetime},
+            options => do {
+                my $ol = Net::DHCPv6::OptionList->new;
+                $ol->add_option(
+                    Net::DHCPv6::Option::IAAddr->new(
+                        address            => $self->{lease}{address},
+                        preferred_lifetime => $self->{lease}{preferred_lifetime},
+                        valid_lifetime     => $self->{lease}{valid_lifetime},
+                    )
+                );
+                $ol;
+            },
+        );
+        $msg->add_option( $ia );
+        return $msg;
+    }
+
+    sub build_release {
+        my $self = shift;
+        return unless $self->{lease};
+        my $msg = Net::DHCPv6::Message::Release->new( transaction_id => int( rand( 0xffffff ) ), );
+        $msg->add_option(
+            Net::DHCPv6::Option::ClientId->new(
+                duid => $self->{client_duid}
+            )
+        );
+        $msg->add_option(
+            Net::DHCPv6::Option::ServerId->new(
+                duid => $self->{server_id}->duid
+            )
+        );
+        my $ia = Net::DHCPv6::Option::IANA->new(
+            iaid    => $self->{iaid},
+            options => do {
+                my $ol = Net::DHCPv6::OptionList->new;
+                $ol->add_option(
+                    Net::DHCPv6::Option::IAAddr->new(
+                        address            => $self->{lease}{address},
+                        preferred_lifetime => 0,
+                        valid_lifetime     => 0,
+                    )
+                );
+                $ol;
+            },
+        );
+        $msg->add_option( $ia );
+        return $msg;
+    }
+}
+
+# ── Server ────────────────────────────────────────────────────────
+
+package DHCPv6Server {
+    use Net::DHCPv6::Constants;
+    use Net::DHCPv6::DUID;
+    use Net::DHCPv6::Option::ServerId;
+    use Net::DHCPv6::Option::Preference;
+    use Net::DHCPv6::Option::DomainList;
+    use Net::DHCPv6::Option::DnsServers;
+    use Net::DHCPv6::Option::IANA;
+    use Net::DHCPv6::Option::IAAddr;
+    use Net::DHCPv6::Option::ClientId;
+    use Net::DHCPv6::Option::NtpServer;
+    use Net::DHCPv6::OptionList;
+    use Socket qw(AF_INET6 inet_pton);
+
+    sub new {
+        my ( $class, %args ) = @_;
+        bless {
+            server_duid    => Net::DHCPv6::DUID->new_en( 42, 'server1' ),
+            pool_prefix    => $args{pool_prefix}    // '2001:db8::',
+            domain_servers => $args{domain_servers} // [ pack( 'H*', '20010db8000000000000000000000001' ),
+                pack( 'H*', '20010db8000000000000000000000002' ), ],
+            ntp_servers   => $args{ntp_servers}   // [ pack( 'H*', '20010db8000000000000000000000003' ), ],
+            domain_search => $args{domain_search} // [ 'example.com', 'example.net' ],
+            preference    => $args{preference}    // 255,
+            verbose       => $args{verbose}       // 1,
+        }, $class;
+    }
+
+    sub handle {
+        my ( $self, $msg ) = @_;
+        my %dispatch = (
+            $SOLICIT => \&handle_solicit,
+            $REQUEST => \&handle_request,
+            $RENEW   => \&handle_request,
+            $RELEASE => \&handle_release,
+        );
+        my $sub = $dispatch{ $msg->msg_type } or return;
+        return $self->$sub( $msg );
+    }
+
+    sub handle_solicit {
+        my ( $self, $msg ) = @_;
+        my $client_id = $msg->get_option( $OPTION_CLIENTID )
+            or return;
+        my $reply = Net::DHCPv6::Message::Advertise->new( transaction_id => $msg->transaction_id, );
+        $reply->add_option(
+            Net::DHCPv6::Option::ServerId->new(
+                duid => $self->{server_duid}
+            )
+        );
+        $reply->add_option(
+            Net::DHCPv6::Option::ClientId->new(
+                duid => $client_id->duid
+            )
+        );
+        $reply->add_option(
+            Net::DHCPv6::Option::Preference->new(
+                value => $self->{preference}
+            )
+        );
+        $reply->add_option(
+            Net::DHCPv6::Option::DnsServers->new(
+                servers => $self->{domain_servers}
+            )
+        );
+        $reply->add_option(
+            Net::DHCPv6::Option::NtpServer->new(
+                servers => $self->{ntp_servers}
+            )
+        );
+        $reply->add_option(
+            Net::DHCPv6::Option::DomainList->new(
+                domains => $self->{domain_search}
+            )
+        );
+        my $ia = $self->_allocate_ia( $msg, $OPTION_IA_NA );
+        $reply->add_option( $ia ) if $ia;
+        return $reply;
+    }
+
+    sub handle_request {
+        my ( $self, $msg ) = @_;
+        my $client_id = $msg->get_option( $OPTION_CLIENTID )
+            or return;
+        my $reply = Net::DHCPv6::Message::Reply->new( transaction_id => $msg->transaction_id, );
+        $reply->add_option(
+            Net::DHCPv6::Option::ServerId->new(
+                duid => $self->{server_duid}
+            )
+        );
+        $reply->add_option(
+            Net::DHCPv6::Option::ClientId->new(
+                duid => $client_id->duid
+            )
+        );
+        $reply->add_option(
+            Net::DHCPv6::Option::DnsServers->new(
+                servers => $self->{domain_servers}
+            )
+        );
+        $reply->add_option(
+            Net::DHCPv6::Option::NtpServer->new(
+                servers => $self->{ntp_servers}
+            )
+        );
+        $reply->add_option(
+            Net::DHCPv6::Option::DomainList->new(
+                domains => $self->{domain_search}
+            )
+        );
+        my $ia = $self->_allocate_ia( $msg, $OPTION_IA_NA );
+        $reply->add_option( $ia ) if $ia;
+        return $reply;
+    }
+
+    sub handle_release {
+        my ( $self, $msg ) = @_;
+        my $client_id = $msg->get_option( $OPTION_CLIENTID )
+            or return;
+        my $reply = Net::DHCPv6::Message::Reply->new( transaction_id => $msg->transaction_id, );
+        $reply->add_option(
+            Net::DHCPv6::Option::ServerId->new(
+                duid => $self->{server_duid}
+            )
+        );
+        $reply->add_option(
+            Net::DHCPv6::Option::ClientId->new(
+                duid => $client_id->duid
+            )
+        );
+        return $reply;
+    }
+
+    sub _allocate_ia {
+        my ( $self, $msg, $code ) = @_;
+        my $req_ia     = $msg->get_option( $code ) or return;
+        my $addr_bytes = $self->{lease}{address};
+        if ( !$addr_bytes ) {
+            my $prefix = inet_pton( AF_INET6, $self->{pool_prefix} );
+            my $suffix = pack( 'N', int( rand( 2**32 ) ) );
+            $addr_bytes = substr( $prefix, 0, 12 ) . $suffix;
+            $self->{lease}{address} = $addr_bytes;
+        }
+        return Net::DHCPv6::Option::IANA->new(
+            iaid    => $req_ia->iaid,
+            t1      => 3600,
+            t2      => 5400,
+            options => do {
+                my $ol = Net::DHCPv6::OptionList->new;
+                $ol->add_option(
+                    Net::DHCPv6::Option::IAAddr->new(
+                        address            => $addr_bytes,
+                        preferred_lifetime => 7200,
+                        valid_lifetime     => 86400,
+                    )
+                );
+                $ol;
+            },
+        );
+    }
+}
+
+# ── Stage subroutines ──────────────────────────────────────────────
+
+package main;
+
+use feature 'say';
+
+sub run_solicit_advertise {
+    my ( $client, $server ) = @_;
+    my $msg       = $client->build_solicit;
+    my $msg_bytes = $msg->as_bytes;
+    say "\x{2500}\x{2500}> Client sends SOLICIT";
+    printf "    client_mac: %s\n", join( ':', unpack( '(A2)*', $client->{client_mac} ) );
+    say "    wire: @{[hexbytes($msg_bytes)]}";
+    show_packet( 'Client SOLICIT', $msg, 'left' );
+    say "";
+    my ( $decoded, $err ) = Net::DHCPv6->decode_with_error( $msg_bytes );
+    die "Decode error: $err" if $err;
+    my $adv       = $server->handle( $decoded );
+    my $adv_bytes = $adv->as_bytes;
+    say "<\x{2500}\x{2500} Server responds ADVERTISE";
+    say "    wire: @{[hexbytes($adv_bytes)]}";
+    show_packet( 'Server ADVERTISE', $adv, 'right' );
+    say "";
+    return ( $msg_bytes, $adv_bytes );
+}
+
+sub run_request_reply {
+    my ( $client, $server, $adv_bytes ) = @_;
+    my ( $decoded_adv ) = Net::DHCPv6->decode_with_error( $adv_bytes );
+    $client->handle_advertise( $decoded_adv );
+    my $msg       = $client->build_request;
+    my $msg_bytes = $msg->as_bytes;
+    say "\x{2500}\x{2500}> Client sends REQUEST";
+    say "    wire: @{[hexbytes($msg_bytes)]}";
+    show_packet( 'Client REQUEST', $msg, 'left' );
+    say "";
+    my ( $decoded_req ) = Net::DHCPv6->decode_with_error( $msg_bytes );
+    my $reply           = $server->handle( $decoded_req );
+    my $reply_bytes     = $reply->as_bytes;
+    say "<\x{2500}\x{2500} Server responds REPLY";
+    say "    wire: @{[hexbytes($reply_bytes)]}";
+    show_packet( 'Server REPLY', $reply, 'right' );
+    say "";
+    my ( $decoded_rep ) = Net::DHCPv6->decode_with_error( $reply_bytes );
+    $client->handle_reply( $decoded_rep );
+    return ( $msg_bytes, $reply_bytes );
+}
+
+sub show_lease_result {
+    my $client = shift;
+    do {
+        my $t = Text::ASCIITable->new( { headingText => 'Lease Result', hide_HeadLine => 1, headingAlign => 'right' } );
+        $t->setCols( 'Field', 'Value' );
+        $t->alignCol( 'Value', 'right' );
+        $t->alignColName( 'Value', 'right' );
+        if ( $client->has_lease ) {
+            my $l = $client->lease;
+            my $dns =
+                $l->{domain_servers}
+                ? join( ', ', map { inet_ntop( AF_INET6, $_ ) } @{ $l->{domain_servers} } )
+                : '-';
+            my $ntp =
+                $l->{ntp_servers}
+                ? join( ', ', map { inet_ntop( AF_INET6, $_ ) } @{ $l->{ntp_servers} } )
+                : '-';
+            my $sdom =
+                $l->{domain_search}
+                ? join( ', ', @{ $l->{domain_search} } )
+                : '-';
+            $t->addRow( 'iaid',               sprintf( '0x%08x', $l->{ia} ) );
+            $t->addRow( 't1',                 $l->{t1} . 's' );
+            $t->addRow( 't2',                 $l->{t2} . 's' );
+            $t->addRow( 'address',            inet_ntop( AF_INET6, $l->{address} ) );
+            $t->addRow( 'preferred_lifetime', $l->{preferred_lifetime} . 's' );
+            $t->addRow( 'valid_lifetime',     $l->{valid_lifetime} . 's' );
+            $t->addRow( 'dns_servers',        $dns );
+            $t->addRow( 'ntp_servers',        $ntp );
+            $t->addRow( 'domain_search',      $sdom );
+        }
+        else {
+            $t->addRow( 'NO LEASE', '' );
+        }
+        print $t;
+    };
+}
+
+sub run_renew {
+    my ( $client, $server ) = @_;
+    my $msg       = $client->build_renew;
+    my $msg_bytes = $msg->as_bytes;
+    say "\x{2500}\x{2500}> Client sends RENEW (extending lease)";
+    say "    wire: @{[hexbytes($msg_bytes)]}";
+    show_packet( 'Client RENEW', $msg, 'left' );
+    say "";
+    my ( $decoded ) = Net::DHCPv6->decode_with_error( $msg_bytes );
+    my $reply       = $server->handle( $decoded );
+    my $rep_bytes   = $reply->as_bytes;
+    say "<\x{2500}\x{2500} Server responds REPLY (renew confirmed)";
+    say "    wire: @{[hexbytes($rep_bytes)]}";
+    show_packet( 'Server RENEW-REPLY', $reply, 'right' );
+    say "";
+    return ( $msg_bytes, $rep_bytes );
+}
+
+sub run_release {
+    my ( $client, $server ) = @_;
+    my $msg       = $client->build_release;
+    my $msg_bytes = $msg->as_bytes;
+    say "\x{2500}\x{2500}> Client sends RELEASE (returning lease)";
+    say "    wire: @{[hexbytes($msg_bytes)]}";
+    show_packet( 'Client RELEASE', $msg, 'left' );
+    say "";
+    my ( $decoded ) = Net::DHCPv6->decode_with_error( $msg_bytes );
+    my $reply       = $server->handle( $decoded );
+    my $rep_bytes   = $reply->as_bytes;
+    say "<\x{2500}\x{2500} Server responds REPLY (release acknowledged)";
+    say "    wire: @{[hexbytes($rep_bytes)]}";
+    show_packet( 'Server RELEASE-REPLY', $reply, 'right' );
+    say "";
+    return ( $msg_bytes, $rep_bytes );
+}
+
+sub run_roundtrip_validation {
+    my @pairs = @_;
+    do {
+        my $t = Text::ASCIITable->new(
+            { headingText => 'Round-trip Validation', hide_HeadLine => 1, headingAlign => 'right' } );
+        $t->setCols( 'Message', 'Result' );
+        for my $pair ( @pairs ) {
+            my ( $label, $bytes ) = @$pair;
+            my ( $msg,   $err )   = Net::DHCPv6->decode_with_error( $bytes );
+            if ( $err ) {
+                $t->addRow( $label, "FAILED -- $err" );
+            }
+            else {
+                my $re_encoded = $msg->as_bytes;
+                if ( $re_encoded eq $bytes ) {
+                    $t->addRow( $label, 'OK (round-trip)' );
+                }
+                else {
+                    $t->addRow( $label, 'MISMATCH' );
+                }
+            }
+        }
+        print $t;
+    };
+}
+
+# ── Main ───────────────────────────────────────────────────────────
+
+my $verbose = shift // 1;
+my $client  = DHCPv6Client->new( verbose => $verbose );
+my $server  = DHCPv6Server->new( verbose => $verbose );
+
+do {
+    my $t = Text::ASCIITable->new(
+        { headingText => 'DHCPv6 Lease Simulation', hide_HeadLine => 1, headingAlign => 'right' } );
+    $t->setCols( '' );
+    print $t;
+};
+say "";
+
+my ( $solicit_bytes, $adv_bytes )   = run_solicit_advertise( $client, $server );
+my ( $req_bytes,     $reply_bytes ) = run_request_reply( $client, $server, $adv_bytes );
+show_lease_result( $client );
+say "";
+my ( $renew_bytes,   $renew_reply_bytes )   = run_renew( $client, $server );
+my ( $release_bytes, $release_reply_bytes ) = run_release( $client, $server );
+run_roundtrip_validation(
+    [ 'SOLICIT'       => $solicit_bytes ],
+    [ 'ADVERTISE'     => $adv_bytes ],
+    [ 'REQUEST'       => $req_bytes ],
+    [ 'REPLY'         => $reply_bytes ],
+    [ 'RENEW'         => $renew_bytes ],
+    [ 'RENEW-REPLY'   => $renew_reply_bytes ],
+    [ 'RELEASE'       => $release_bytes ],
+    [ 'RELEASE-REPLY' => $release_reply_bytes ],
+);
+
+say "";
+say "Done.";

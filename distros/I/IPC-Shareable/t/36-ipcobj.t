@@ -3,6 +3,7 @@ use strict;
 
 use Carp;
 use IPC::Shareable;
+IPC::Shareable->testing_set('IPC::Shareable');
 use Test::More;
 
 my $segs_before = IPC::Shareable::seg_count();

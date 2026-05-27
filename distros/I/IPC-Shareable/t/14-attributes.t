@@ -14,7 +14,9 @@ my $k = tie my $sv, 'IPC::Shareable', 'testing', {create => 1, destroy => 1, ser
 my $attrs_tied = (tied $sv)->attributes;
 is ref $attrs_tied, 'HASH', "tied var attributes() returns a hash ref ok";
 
-my $attrs = $k->attributes;
+my $attrs = { %{ $k->attributes } };
+
+$k->testing_set('IPC::Shareable');
 
 is ref $attrs, 'HASH', "attributes() returns a hash ref ok";
 
@@ -25,6 +27,7 @@ my @attr_list = qw(
     serializer
     size
     protected
+    testing
     limit
     magic
     mode
@@ -50,6 +53,7 @@ is $attrs->{key},       'testing', "key is set ok";
 is $attrs->{serializer},'storable', "serializer is set ok";
 is $attrs->{size},      65536, "size is set ok";
 is $attrs->{protected}, 0, "protected is set ok";
+is $attrs->{testing},   0, "testing is set ok";
 is $attrs->{limit},     1, "limit is set ok";
 is $attrs->{magic},     0, "magic is set ok";
 is $attrs->{mode},      438, "mode is set ok";

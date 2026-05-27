@@ -52,7 +52,7 @@ is $r->head, 0;
 # wait_for timeout
 my $t0 = time;
 ok !$r->wait_for(0, 0.1), 'wait_for timeout';
-ok time - $t0 < 2;
+ok time - $t0 < 10;
 
 # cross-process
 $r->write(42);

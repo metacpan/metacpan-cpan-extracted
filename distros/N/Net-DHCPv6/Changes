@@ -1,0 +1,8 @@
+Revision history for Net-DHCPv6
+
+0.001    2026-05-26
+    - Initial release: DHCPv6 packet codec
+    - Encode/decode message types (Solicit, Advertise, Request, etc.)
+    - Encode/decode options (ClientId, ServerId, IANA, IAAddr, etc.)
+    - DUID parsing and construction (LLT, EN, LL, UUID)
+    - Three-tier error handling: decode_or_croak, decode_or_null, decode_with_error

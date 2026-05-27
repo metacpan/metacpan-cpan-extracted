@@ -22,7 +22,7 @@ name: Test-MockModule
 provides:
   Test::MockModule:
     file: lib/Test/MockModule.pm
-    version: v0.185.0
+    version: v0.185.1
 requires:
   Carp: '0'
   SUPER: '1.20'
@@ -33,5 +33,5 @@ resources:
   homepage: https://github.com/geofffranks/test-mockmodule
   license: http://dev.perl.org/licenses/
   repository: git://github.com/geofffranks/test-mockmodule.git
-version: v0.185.0
+version: v0.185.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

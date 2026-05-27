@@ -88,16 +88,16 @@ set_multi(SV* self_sv, ...)
             }
         } else {
             ShmHeader *hdr = h->hdr;
-            shm_rwlock_wrlock(hdr);
+            shm_rwlock_wrlock(h);
             shm_seqlock_write_begin(&hdr->seq);
             for (int i = 1; i < items; i += 2) {
                 STRLEN _klen; const char *_kstr = SvPV(ST(i), _klen);
                 bool _kutf8 = SvUTF8(ST(i)) ? 1 : 0;
-                if (_klen > SHM_MAX_STR_LEN) { shm_seqlock_write_end(&hdr->seq); shm_rwlock_wrunlock(hdr); croak("key too long"); }
+                if (_klen > SHM_MAX_STR_LEN) { shm_seqlock_write_end(&hdr->seq); shm_rwlock_wrunlock(h); croak("key too long"); }
                 count += shm_si16_put_inner(h, _kstr, (uint32_t)_klen, _kutf8, (int16_t)SvIV(ST(i + 1)), SHM_TTL_USE_DEFAULT);
             }
             shm_seqlock_write_end(&hdr->seq);
-            shm_rwlock_wrunlock(hdr);
+            shm_rwlock_wrunlock(h);
         }
         RETVAL = count;
     OUTPUT:
@@ -117,17 +117,17 @@ remove_multi(SV* self_sv, ...)
             }
         } else {
             ShmHeader *hdr = h->hdr;
-            shm_rwlock_wrlock(hdr);
+            shm_rwlock_wrlock(h);
             shm_seqlock_write_begin(&hdr->seq);
             for (int i = 1; i < items; i++) {
                 STRLEN _kl; const char *_ks = SvPV(ST(i), _kl);
                 bool _ku = SvUTF8(ST(i)) ? 1 : 0;
-                if (_kl > SHM_MAX_STR_LEN) { shm_seqlock_write_end(&hdr->seq); shm_rwlock_wrunlock(hdr); croak("key too long (max 2GB)"); }
+                if (_kl > SHM_MAX_STR_LEN) { shm_seqlock_write_end(&hdr->seq); shm_rwlock_wrunlock(h); croak("key too long (max 2GB)"); }
                 count += shm_si16_remove_inner(h, _ks, (uint32_t)_kl, _ku);
             }
             if (count) shm_si16_maybe_shrink(h);
             shm_seqlock_write_end(&hdr->seq);
-            shm_rwlock_wrunlock(hdr);
+            shm_rwlock_wrunlock(h);
         }
         RETVAL = count;
     OUTPUT:
@@ -156,7 +156,7 @@ get_multi(SV* self_sv, ...)
             uint8_t *states = h->states;
             char *arena = h->arena;
             uint32_t now = h->expires_at ? shm_now() : 0;
-            RDLOCK_GUARD(hdr);
+            RDLOCK_GUARD(h);
             uint32_t mask = hdr->table_cap - 1;
             for (int i = 0; i < nkeys; i++) {
                 STRLEN _kl; const char *_ks = SvPV(ST(i + 1), _kl);
@@ -377,7 +377,7 @@ keys(SV* self_sv)
             ShmHeader *hdr = sh->hdr;
             ShmNodeSI16 *nodes = (ShmNodeSI16 *)sh->nodes;
             uint32_t now = sh->expires_at ? shm_now() : 0;
-            RDLOCK_GUARD(hdr);
+            RDLOCK_GUARD(sh);
             EXTEND(SP, hdr->size);
             for (uint32_t i = 0; i < hdr->table_cap; i++) {
                 if (SHM_IS_LIVE(sh->states[i]) && !SHM_IS_EXPIRED(sh, i, now)) {
@@ -400,7 +400,7 @@ values(SV* self_sv)
             ShmHeader *hdr = sh->hdr;
             ShmNodeSI16 *nodes = (ShmNodeSI16 *)sh->nodes;
             uint32_t now = sh->expires_at ? shm_now() : 0;
-            RDLOCK_GUARD(hdr);
+            RDLOCK_GUARD(sh);
             EXTEND(SP, hdr->size);
             for (uint32_t i = 0; i < hdr->table_cap; i++) {
                 if (SHM_IS_LIVE(sh->states[i]) && !SHM_IS_EXPIRED(sh, i, now))
@@ -418,7 +418,7 @@ items(SV* self_sv)
             ShmHeader *hdr = sh->hdr;
             ShmNodeSI16 *nodes = (ShmNodeSI16 *)sh->nodes;
             uint32_t now = sh->expires_at ? shm_now() : 0;
-            RDLOCK_GUARD(hdr);
+            RDLOCK_GUARD(sh);
             EXTEND(SP, hdr->size * 2);
             for (uint32_t i = 0; i < hdr->table_cap; i++) {
                 if (SHM_IS_LIVE(sh->states[i]) && !SHM_IS_EXPIRED(sh, i, now)) {
@@ -474,7 +474,7 @@ to_hash(SV* self_sv)
             ShmHeader *hdr = sh->hdr;
             ShmNodeSI16 *nodes = (ShmNodeSI16 *)sh->nodes;
             uint32_t now = sh->expires_at ? shm_now() : 0;
-            RDLOCK_GUARD(hdr);
+            RDLOCK_GUARD(sh);
             for (uint32_t i = 0; i < hdr->table_cap; i++) {
                 if (SHM_IS_LIVE(sh->states[i]) && !SHM_IS_EXPIRED(sh, i, now)) {
                     char _ib[SHM_INLINE_MAX]; uint32_t klen;
@@ -706,18 +706,14 @@ path(SV* self_sv)
 bool
 unlink(SV* self_or_class, ...)
     CODE:
-        const char *p;
         if (SvROK(self_or_class) && SvOBJECT(SvRV(self_or_class))) {
             ShmHandle* h = INT2PTR(ShmHandle*, SvIV(SvRV(self_or_class)));
             if (!h) croak("Attempted to use a destroyed Data::HashMap::Shared::SI16 object");
-            p = h->path;
+            RETVAL = shm_unlink_sharded(h);
         } else {
             if (items < 2) croak("Usage: Data::HashMap::Shared::SI16->unlink($path)");
-            p = SvPV_nolen(ST(1));
+            RETVAL = shm_unlink_path(SvPV_nolen(ST(1)));
         }
-        RETVAL = (SvROK(self_or_class) && SvOBJECT(SvRV(self_or_class))) ?
-            shm_unlink_sharded(INT2PTR(ShmHandle*, SvIV(SvRV(self_or_class)))) :
-            shm_unlink_path(p);
     OUTPUT:
         RETVAL
 

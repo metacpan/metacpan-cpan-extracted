@@ -4,6 +4,7 @@ use warnings;
 use Data::Dumper;
 use Test::More;
 use IPC::Shareable;
+IPC::Shareable->testing_set('IPC::Shareable');
 
 use constant {
     LOCK_SH => 1,

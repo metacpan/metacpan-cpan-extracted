@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 use IPC::Shareable;
+IPC::Shareable->testing_set('IPC::Shareable');
 use Test::More;
 
 # Determine the shm segment limit for this platform.

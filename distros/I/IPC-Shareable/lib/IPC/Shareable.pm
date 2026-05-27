@@ -25,17 +25,13 @@ use Scalar::Util;
 use String::CRC32;
 use Storable 0.6 qw(freeze thaw);
 
-our $VERSION;
-our $_have_xs;
+our $VERSION = '1.15';
 
-BEGIN {
-    $VERSION  = '1.14';
-    $_have_xs = ! $ENV{IPC_SHAREABLE_NO_XS} && eval {
-        require XSLoader;
-        XSLoader::load('IPC::Shareable', $VERSION);
-        1;
-    } // 0;
-}
+our $_have_xs = ! $ENV{IPC_SHAREABLE_NO_XS} && eval {
+    require XSLoader;
+    XSLoader::load('IPC::Shareable', $VERSION);
+    1;
+} // 0;
 
 use constant {
     # Locking
@@ -51,12 +47,13 @@ use constant {
     SHMMAX_BYTES          => 1073741824, # ~1 GB
     SHM_EXISTS            => 1,
 
-    # Semaphore slots
+    # Semaphore slots (4 slots always; 5th slot added when 'testing' is set)
 
     SEM_MARKER            => 0,
     SEM_READERS           => 1,
     SEM_WRITERS           => 2,
     SEM_PROTECTED         => 3,
+    SEM_TESTING           => 4,
 
     # Perl sends in a double as opposed to an integer to shmat(), and on some
     # systems, this causes the IPC system to round down to the maximum integer
@@ -86,15 +83,16 @@ our @EXPORT_OK = qw(
     SEM_READERS
     SEM_WRITERS
     SEM_PROTECTED
+    SEM_TESTING
 );
 our %EXPORT_TAGS = (
     all         => [
         qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN ),
-        qw( SEM_MARKER SEM_READERS SEM_WRITERS SEM_PROTECTED ),
+        qw( SEM_MARKER SEM_READERS SEM_WRITERS SEM_PROTECTED SEM_TESTING ),
     ],
     lock        => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     flock       => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
-    semaphores  => [qw( SEM_MARKER SEM_READERS SEM_WRITERS SEM_PROTECTED )],
+    semaphores  => [qw( SEM_MARKER SEM_READERS SEM_WRITERS SEM_PROTECTED SEM_TESTING )],
 );
 
 # Locking scheme copied from IPC::ShareLite (with minor modifications)
@@ -140,6 +138,7 @@ my %default_options = (
     mode                        => 0666,
     size                        => SHM_BUFSIZ,
     protected                   => 0,
+    testing                     => 0,
     limit                       => 1,
     graceful                    => 0,
     warn                        => 0,
@@ -155,6 +154,7 @@ my %default_options = (
 my %global_register;
 my %process_register;
 my %used_ids;
+my $_testing_dist = '';
 
 # "Magic" methods
 
@@ -244,8 +244,10 @@ sub FETCH {
             $global_register{$inner->seg->id} = $inner;
         }
 
-        my $s = $inner->seg;
-        $inner->{_data} = $knot->_decode($s);
+        unless ($inner->{_lock}) {
+            my $s = $inner->seg;
+            $inner->{_data} = $knot->_decode($s);
+        }
     }
     return $val;
 
@@ -662,6 +664,10 @@ sub shm_segments {
             # BSD/macOS format: m <shmid> <key> ...
             ($id, $raw_key) = ($1, $2);
         }
+        elsif ($line =~ /^\s*(\d+)\s+(0x[0-9a-fA-F]+)\s+/) {
+            # DragonFly BSD format: <shmid> <hex_key> ... (no 'm' type column)
+            ($id, $raw_key) = ($1, $2);
+        }
         elsif ($line =~ /^\s*(\S+)\s+(\d+)\s+\S+/) {
             # Linux format: <key> <shmid> ...
             ($raw_key, $id) = ($1, $2);
@@ -695,7 +701,11 @@ sub shm_segments {
             ? ( $Config{longsize} == 8
             ? unpack('x[32] Q', $stat_buf)   # 64-bit Solaris (ipc_perm=28 + pad 4)
             : unpack('x[44] L', $stat_buf) ) # 32-bit Solaris (ipc_perm=44)
-            : unpack('x[24] Q', $stat_buf);  # macOS/32-bit BSD
+            : $^O eq 'openbsd' && $Config{longsize} == 8
+            ? unpack('x[32] L', $stat_buf)   # 64-bit OpenBSD: segsz is int (4 bytes)
+            : $^O eq 'dragonfly' && $Config{longsize} == 8
+            ? unpack('x[32] Q', $stat_buf)   # 64-bit DragonFly (ipc_perm=28 + pad 4; segsz=size_t=8)
+            : unpack('x[24] Q', $stat_buf);  # macOS
 
         next unless $segsz;
 
@@ -757,8 +767,12 @@ sub seg_count {
     open my $ipcs_fh, '-|', 'ipcs', '-m' or die "ipcs -m: $!";
     while (my $line = <$ipcs_fh>) {
         # BSD/macOS format: m <shmid> <key> ...
+        # DragonFly BSD:    <shmid> <hex_key> ... (no type-letter column)
         # Linux format:     <key> <shmid> ...
         if ($line =~ /^\s*m\s+\d+\s+\S+/) {
+            $count++;
+        }
+        elsif ($line =~ /^\s*\d+\s+0x[0-9a-fA-F]+\s+/) {
             $count++;
         }
         elsif ($line =~ /^\s*(?:0x[0-9a-fA-F]+|\d+)\s+\d+\s+\S+/) {
@@ -775,8 +789,12 @@ sub sem_count {
     open my $ipcs_fh, '-|', 'ipcs', '-s' or die "ipcs -s: $!";
     while (my $line = <$ipcs_fh>) {
         # BSD/macOS format: s <semid> <key> ...
+        # DragonFly BSD:    <semid> <hex_key> ... (no type-letter column)
         # Linux format:     <key> <semid> ...
         if ($line =~ /^\s*s\s+\d+\s+\S+/) {
+            $count++;
+        }
+        elsif ($line =~ /^\s*\d+\s+0x[0-9a-fA-F]+\s+/) {
             $count++;
         }
         elsif ($line =~ /^\s*(?:0x[0-9a-fA-F]+|\d+)\s+\d+\s+\S+/) {
@@ -1107,6 +1125,81 @@ sub remove {
         delete $process_register{$id};
         delete $global_register{$id};
     }
+}
+
+# Unit testing
+
+sub testing_set {
+    my ($class, $dist_name) = @_;
+    croak "testing_set() requires a distribution name string"
+        unless defined $dist_name && length $dist_name;
+    $_testing_dist = $dist_name;
+}
+sub clean_up_testing {
+    shift if @_ > 1 && ! ref $_[0] && defined $_[0] && UNIVERSAL::isa($_[0], __PACKAGE__);
+
+    my ($dist_name) = @_;
+
+    croak "clean_up_testing() requires a distribution name string"
+        unless defined $dist_name && length $dist_name;
+
+    my $target  = _testing_semaphore_key_hash($dist_name);
+    my $removed = 0;
+
+    # Scan ipcs -m for segment IDs and keys directly. We cannot use
+    # shm_segments() here because it filters by the 'IPC::Shareable' 14-byte
+    # tag, which is only written during STORE operations — empty tied segments
+    # have no tag and would be invisible. The authoritative identifier for a
+    # testing-tagged segment is the SEM_TESTING value on its semaphore set,
+    # not the segment content.
+
+    open my $ipcs_fh, '-|', 'ipcs', '-m' or die "ipcs -m: $!";
+    while (my $line = <$ipcs_fh>) {
+        my ($id, $raw_key);
+
+        if ($line =~ /^\s*m\s+(\d+)\s+(\S+)/) {
+            # BSD/macOS: m <shmid> <key> ...
+            ($id, $raw_key) = ($1, $2);
+        }
+        elsif ($line =~ /^\s*(\d+)\s+(0x[0-9a-fA-F]+)\s+/) {
+            # DragonFly BSD: <shmid> <hex_key> ... (no type-letter column)
+            ($id, $raw_key) = ($1, $2);
+        }
+        elsif ($line =~ /^\s*(\S+)\s+(\d+)\s+\S+/) {
+            # Linux: <key> <shmid> ...
+            ($raw_key, $id) = ($1, $2);
+        }
+        else {
+            next;
+        }
+
+        my $key_int = $raw_key =~ /^0x[0-9a-fA-F]+$/
+            ? hex($raw_key)
+            : $raw_key =~ /^-?\d+$/
+            ? int($raw_key)
+            : next;
+
+        # IPC_PRIVATE segments cannot be re-attached across processes
+        next if $key_int == 0;
+
+        my $sem = IPC::Semaphore->new($key_int, 0, 0);
+        next unless defined $sem;
+
+        next unless _testing_semaphore_value($sem) == $target;
+
+        if (shmctl($id, IPC_RMID, 0)) {
+            $sem->remove;
+            delete $process_register{$id};
+            delete $global_register{$id};
+            $removed++;
+        }
+        else {
+            warn "clean_up_testing(): could not remove shm segment $id: $!";
+        }
+    }
+    close $ipcs_fh;
+
+    return $removed;
 }
 
 # Private methods
@@ -1463,11 +1556,12 @@ sub _tie {
     # Try to attach to an existing semaphore set first using nsems=0, which
     # avoids EINVAL on macOS/BSD when the existing set has fewer slots than
     # the requested count. If the set does not exist yet, fall through to
-    # create a new 4-slot set (SEM_MARKER=0, SEM_PROTECTED=1, shared/write
-    # lock counters=2/3).
+    # create a new semaphore set: 5 slots when the 'testing' attribute is set
+    # (adds SEM_TESTING at index 4), 4 slots otherwise.
 
+    my $nsems = $knot->attributes('testing') ? 5 : 4;
     my $sem = IPC::Semaphore->new($key, 0, $seg->flags & 0777)
-           // IPC::Semaphore->new($key, 4, $seg->flags);
+           // IPC::Semaphore->new($key, $nsems, $seg->flags);
 
     if (! defined $sem){
         croak "Could not create semaphore set: $!\n";
@@ -1541,18 +1635,28 @@ sub _tie {
 
         $sem->setval(SEM_PROTECTED, $knot->attributes('protected'));
 
+        if ($knot->attributes('testing')) {
+            $sem->setval(SEM_TESTING, _testing_semaphore_key_hash($knot->attributes('testing')));
+        }
+
         if (! $sem->setval(SEM_MARKER, SHM_EXISTS)){
             croak "Couldn't set semaphore during object creation: $!";
         }
     }
     else {
-        # Segment already existed — restore the protected attribute from the
-        # semaphore so that clean_up_all() in this process correctly skips it
-        # even when the caller did not explicitly pass protected => N.
+        # Segment already existed — restore the protected and testing
+        # attributes from the semaphore so that clean_up_all() / clean_up_testing()
+        # in this process work correctly even when the caller did not explicitly
+        # pass them on tie.
 
         my $stored_protected = $sem->getval(SEM_PROTECTED);
         $knot->{attributes}{protected} = $stored_protected
             if defined $stored_protected && $stored_protected != 0;
+
+        my $stored_testing = _testing_semaphore_value($sem);
+        if ($stored_testing) {
+            $knot->{attributes}{testing} = $stored_testing;
+        }
     }
 
     $sem->op(@{ $semop_args{(LOCK_SH|LOCK_UN)} });
@@ -1993,12 +2097,35 @@ sub _write_permitted {
     return 1;
 }
 
+# Unit testing support
+
+sub _testing_semaphore_key_hash {
+    my ($dist_name) = @_;
+    # SysV SEMVMX caps semaphore values at 32767 on most platforms (incl.
+    # macOS, BSD); mask the CRC32 to 15 bits so setval() never silently fails.
+    # 0 is reserved to mean "not a testing segment", so we shift any zero
+    # collision off slot 0.
+    my $h = String::CRC32::crc32($dist_name) & 0x7FFF;
+    return $h || 1;
+}
+sub _testing_semaphore_value {
+    my ($sem) = @_;
+    my $stat = $sem->stat or return 0;
+    return 0 if $stat->nsems < 5;
+    return $sem->getval(SEM_TESTING) // 0;
+}
+
 # Misc
 
 sub _parse_args {
     my ($opts) = @_;
 
     $opts  = defined $opts  ? $opts  : { %default_options };
+
+    # Note caller's explicit intent BEFORE defaults are merged in. A caller
+    # who passes testing => 0 wants to opt out of auto-tagging; we must not
+    # treat that as "absent" after defaulting.
+    my $testing_explicit = exists $opts->{testing};
 
     for my $k (keys %default_options) {
         if (not defined $opts->{$k}) {
@@ -2015,6 +2142,13 @@ sub _parse_args {
     }
     $opts->{owner} = ($opts->{owner} or $$);
     $opts->{magic} = ($opts->{magic} or 0);
+
+    # Inherit the process-level testing tag set by testing_set(), unless the
+    # caller explicitly passed a testing value (including testing => 0).
+    if ($_testing_dist && ! $testing_explicit) {
+        $opts->{testing} = $_testing_dist;
+    }
+
     return $opts;
 }
 sub _end {
@@ -2108,6 +2242,12 @@ IPC::Shareable - Use shared memory backed variables across processes
     IPC::Shareable::clean_up;
     IPC::Shareable::clean_up_all;
     IPC::Shareable::clean_up_protected;
+
+    # Tag all segments in this process for test-suite cleanup, then purge
+    # any orphaned branded segments from previous crashed runs
+
+    IPC::Shareable->testing_set('My::Distribution');
+    IPC::Shareable::clean_up_testing('My::Distribution');
 
     # Get the actual IPC::Shareable tied object you can make method calls on
     # instead of using the tied object like the examples above
@@ -2290,6 +2430,27 @@ implementation (typically 0-32767; 0 means unprotected).
 
 Default: B<0>
 
+=head2 testing
+
+Set this to a non-empty string (conventionally the distribution name, e.g.
+C<'IPC::Shareable'>) to brand the segment as belonging to a particular test
+suite. At segment-creation time the CRC32 hash of the string is stored in a
+fifth semaphore slot (C<SEM_TESTING>). This makes it possible for
+L</clean_up_testing($dist_name)> to find and remove every such segment
+system-wide -- including orphans from previous crashed runs -- without needing
+them to be in C<%global_register>.
+
+The integer hash (not the original string) is persisted in the semaphore set.
+When a process re-attaches to a segment that was created with C<testing>, the
+stored integer is restored into C<< attributes('testing') >>.
+
+Rather than setting C<testing> on every individual C<tie()>, call
+L</testing_set($dist_name)> once at the top of the test file; all subsequent
+ties in that process (and in forked children spawned after the call) inherit it
+automatically.
+
+Default: B<0> (disabled)
+
 =head2 limit
 
 This field will allow you to set a segment size larger than the default maximum
@@ -2391,6 +2552,7 @@ Default values for options are:
     mode                        => 0666,
     size                        => IPC::Shareable::SHM_BUFSIZ(), # 65536
     protected                   => 0,
+    testing                     => 0,
     limit                       => 1,
     destroy                     => 0,
     graceful                    => 0,
@@ -3006,6 +3168,75 @@ Return: Hash reference, or C<undef> if the platform is not supported or no data
 could be read.
 
 
+=head1 METHODS - UNIT TESTING
+
+
+=head2 testing_set($dist_name)
+
+    IPC::Shareable->testing_set('My::Distribution');
+
+Sets a process-level tag so that every subsequent C<tie()> in the same process
+automatically receives C<< testing => 'My::Distribution' >> without needing it
+on each individual tie.  The tag propagates to nested-segment children (created
+automatically when a reference is stored into a tied variable) and to any
+processes forked B<after> the call, because C<fork()> copies the parent's memory.
+
+Call this once at the top of each test file (or from a shared helper module
+loaded with C<use>).
+
+This flag can also be set with the L</testing> flag in the initial tie params.
+
+Parameters:
+
+    $dist_name
+
+Mandatory, non-empty string: conventionally the distribution name.
+
+Croaks if C<$dist_name> is undefined or empty.
+
+
+=head2 clean_up_testing($dist_name)
+
+    IPC::Shareable::clean_up_testing('My::Distribution');
+
+    # or as a method:
+
+    IPC::Shareable->clean_up_testing('My::Distribution');
+
+Performs a B<system-wide> scan for every IPC::Shareable segment whose
+C<SEM_TESTING> semaphore slot contains the CRC32 hash of C<$dist_name>, then
+unconditionally removes each matching segment and its semaphore set.
+
+Unlike L</clean_up_all>, this function is not limited to segments in
+C<%global_register>: it will find and remove orphaned segments from previous
+crashed test runs.  Unlike L<clean_up_protected|/clean_up_protected($protect_key)>,
+it deliberately ignores the C<protected> attribute -- segments tagged with
+C<testing> are always removed.
+
+The typical usage is at the top of the first test file (before any segments are
+created) to clear orphans, and optionally at the end of the last test file as a
+belt-and-suspenders cleanup:
+
+    # t/00-base.t
+    IPC::Shareable->testing_set('My::Distribution');
+    my $n = IPC::Shareable::clean_up_testing('My::Distribution');
+    note "Removed $n orphaned segments from previous run" if $n;
+
+Parameters:
+
+    $dist_name
+
+Mandatory, non-empty string: the same string passed to L</testing_set($dist_name)>
+or the C<testing> tie attribute.
+
+Return: integer count of removed segments.
+
+B<Note>: C<attributes('testing')> on a re-attached segment returns the stored
+integer hash, not the original string.  This is intentional: the hash is
+sufficient for cleanup comparisons and the original string is never stored on
+the system.
+
+
 =head1 LOCKING
 
 IPC::Shareable provides methods to implement application-level advisory and
@@ -3327,9 +3558,10 @@ created, it simply reconnects.
 
 =head1 SEMAPHORES
 
-Each memory segment that we utilize comes with it a semaphore set of four
-individual semaphores. These semaphores keep state information about the segment
-itself, and manages the locking aspects.
+Each memory segment that we utilize comes with it a semaphore set of four or
+five individual semaphores. These semaphores keep state information about the
+segment itself, and manages the locking aspects.  A fifth slot (C<SEM_TESTING>)
+is added only when the segment is created with the L</testing> attribute.
 
 =head2 SEM_MARKER
 
@@ -3352,6 +3584,13 @@ and C<0> if not.
 Semaphore slot ID 3. Used to keep track of the C<protected> option value for
 protected segments. See L</protected>.
 
+=head2 SEM_TESTING
+
+Semaphore slot ID 4. Present only on segments created with the L</testing>
+attribute.  Stores the CRC32 hash of the distribution name (masked to a
+positive 31-bit integer) so that L</clean_up_testing($dist_name)> can
+identify and remove all matching segments system-wide.  Zero on segments
+that were not created with C<testing>.
 
 =head1 DESTRUCTION
 

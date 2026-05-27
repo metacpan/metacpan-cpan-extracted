@@ -18,11 +18,11 @@ Log::Abstraction - Logging Abstraction Layer
 
 =head1 VERSION
 
-0.28
+0.29
 
 =cut
 
-our $VERSION = 0.28;
+our $VERSION = 0.29;
 
 =head1 SYNOPSIS
 
@@ -112,7 +112,7 @@ The code will be called with a hashref containing:
 
 =item * message - an arrayref of messages
 
-=item * ctx - passed to C<new()>, a argument that can help to give context to the caller
+=item * ctx - passed to C<new()>, an argument that can help to give context to the caller
 
 =back
 
@@ -124,6 +124,14 @@ The code will be called with a hashref containing:
 
 To send an e-mail,
 you need L<require Email::Simple>, L<require Email::Sender::Simple> and L<Email::Sender::Transport::SMTP>.
+
+The C<sendmail> hash also accepts a C<min_interval> key (seconds).
+When set, at most one email is sent per C<min_interval> seconds; any
+messages that arrive during the cooldown are still logged to other
+backends but do not trigger a new email.
+The send time is stored in C<_last_email_sent> on the object, so each
+instance has its own cooldown window; cloned objects inherit the
+parent's last-send timestamp at the moment of cloning.
 
 =item * array - a reference to an array
 
@@ -418,42 +426,50 @@ sub _log {
 			}
 			if(exists($logger->{'sendmail'}) && exists($logger->{'sendmail'}->{'to'})) {
 				# Send an email
-				# TODO: throttle the number of emails
 				if((!defined($logger->{'sendmail'}->{'level'})) ||
 				   ($syslog_values{$level} <= $syslog_values{$logger->{'sendmail'}->{'level'}})) {
-					eval {
-						require Email::Simple;
-						require Email::Sender::Simple;
-						require Email::Sender::Transport::SMTP;
+					my $throttled = 0;
+					if(my $min_interval = $logger->{'sendmail'}->{'min_interval'}) {
+						my $now = time();
+						# _last_email_sent: epoch time of the most recent successfully sent email
+						$throttled = defined($self->{_last_email_sent}) && ($now - $self->{_last_email_sent}) < $min_interval;
+					}
+					if(!$throttled) {
+						eval {
+							require Email::Simple;
+							require Email::Sender::Simple;
+							require Email::Sender::Transport::SMTP;
 
-						Email::Simple->import();
-						Email::Sender::Simple->import('sendmail');
-						Email::Sender::Transport::SMTP->import();
+							Email::Simple->import();
+							Email::Sender::Simple->import('sendmail');
+							Email::Sender::Transport::SMTP->import();
 
-						my $email = Email::Simple->new('');
-						$email->header_set('to', _sanitize_email_header($logger->{'sendmail'}->{'to'}));
-						if(my $from = $logger->{'sendmail'}->{'from'}) {
-							$email->header_set('from', _sanitize_email_header($from));
-						} else {
-							$email->header_set('from', 'noreply@localhost');
+							my $email = Email::Simple->new('');
+							$email->header_set('to', _sanitize_email_header($logger->{'sendmail'}->{'to'}));
+							if(my $from = $logger->{'sendmail'}->{'from'}) {
+								$email->header_set('from', _sanitize_email_header($from));
+							} else {
+								$email->header_set('from', 'noreply@localhost');
+							}
+							if(my $subject = $logger->{'sendmail'}->{'subject'}) {
+								$email->header_set('subject', _sanitize_email_header($subject));
+							}
+							$email->body_set(join(' ', @messages));
+
+							# Configure SMTP transport (adjust for your SMTP server)
+							my $transport = Email::Sender::Transport::SMTP->new({
+								host => $logger->{'sendmail'}->{'host'} || 'localhost',
+								port => $logger->{'sendmail'}->{'port'} || 25
+							});
+
+							sendmail($email, { transport => $transport });
+						};
+
+						if ($@) {
+							Carp::carp("Failed to send email: $@");
+							return;
 						}
-						if(my $subject = $logger->{'sendmail'}->{'subject'}) {
-							$email->header_set('subject', _sanitize_email_header($subject));
-						}
-						$email->body_set(join(' ', @messages));
-
-						# Configure SMTP transport (adjust for your SMTP server)
-						my $transport = Email::Sender::Transport::SMTP->new({
-							host => $logger->{'sendmail'}->{'host'} || 'localhost',
-							port => $logger->{'sendmail'}->{'port'} || 25
-						});
-
-						sendmail($email, { transport => $transport });
-					};
-
-					if ($@) {
-						Carp::carp("Failed to send email: $@");
-						return;
+						$self->{_last_email_sent} = time();	# record send time for throttle
 					}
 				}
 			}

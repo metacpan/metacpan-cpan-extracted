@@ -578,10 +578,10 @@ rdlock(self, ...)
   CODE:
     if (items > 1) {
         double timeout = SvNV(ST(1));
-        if (!sync_rwlock_rdlock_timed(h->hdr, timeout))
+        if (!sync_rwlock_rdlock_timed(h, timeout))
             croak("rdlock: timeout");
     } else {
-        sync_rwlock_rdlock(h->hdr);
+        sync_rwlock_rdlock(h);
     }
     __atomic_add_fetch(&h->hdr->stat_acquires, 1, __ATOMIC_RELAXED);
 
@@ -591,7 +591,7 @@ try_rdlock(self)
   PREINIT:
     EXTRACT_HANDLE("Data::Sync::Shared::RWLock", self);
   CODE:
-    RETVAL = sync_rwlock_try_rdlock(h->hdr);
+    RETVAL = sync_rwlock_try_rdlock(h);
     if (RETVAL)
         __atomic_add_fetch(&h->hdr->stat_acquires, 1, __ATOMIC_RELAXED);
   OUTPUT:
@@ -604,7 +604,7 @@ rdlock_timed(self, timeout)
   PREINIT:
     EXTRACT_HANDLE("Data::Sync::Shared::RWLock", self);
   CODE:
-    RETVAL = sync_rwlock_rdlock_timed(h->hdr, timeout);
+    RETVAL = sync_rwlock_rdlock_timed(h, timeout);
     if (RETVAL)
         __atomic_add_fetch(&h->hdr->stat_acquires, 1, __ATOMIC_RELAXED);
   OUTPUT:
@@ -616,7 +616,7 @@ rdunlock(self)
   PREINIT:
     EXTRACT_HANDLE("Data::Sync::Shared::RWLock", self);
   CODE:
-    sync_rwlock_rdunlock(h->hdr);
+    sync_rwlock_rdunlock(h);
     __atomic_add_fetch(&h->hdr->stat_releases, 1, __ATOMIC_RELAXED);
 
 void
@@ -627,10 +627,10 @@ wrlock(self, ...)
   CODE:
     if (items > 1) {
         double timeout = SvNV(ST(1));
-        if (!sync_rwlock_wrlock_timed(h->hdr, timeout))
+        if (!sync_rwlock_wrlock_timed(h, timeout))
             croak("wrlock: timeout");
     } else {
-        sync_rwlock_wrlock(h->hdr);
+        sync_rwlock_wrlock(h);
     }
     __atomic_add_fetch(&h->hdr->stat_acquires, 1, __ATOMIC_RELAXED);
 
@@ -640,7 +640,7 @@ try_wrlock(self)
   PREINIT:
     EXTRACT_HANDLE("Data::Sync::Shared::RWLock", self);
   CODE:
-    RETVAL = sync_rwlock_try_wrlock(h->hdr);
+    RETVAL = sync_rwlock_try_wrlock(h);
     if (RETVAL)
         __atomic_add_fetch(&h->hdr->stat_acquires, 1, __ATOMIC_RELAXED);
   OUTPUT:
@@ -653,7 +653,7 @@ wrlock_timed(self, timeout)
   PREINIT:
     EXTRACT_HANDLE("Data::Sync::Shared::RWLock", self);
   CODE:
-    RETVAL = sync_rwlock_wrlock_timed(h->hdr, timeout);
+    RETVAL = sync_rwlock_wrlock_timed(h, timeout);
     if (RETVAL)
         __atomic_add_fetch(&h->hdr->stat_acquires, 1, __ATOMIC_RELAXED);
   OUTPUT:
@@ -665,7 +665,7 @@ wrunlock(self)
   PREINIT:
     EXTRACT_HANDLE("Data::Sync::Shared::RWLock", self);
   CODE:
-    sync_rwlock_wrunlock(h->hdr);
+    sync_rwlock_wrunlock(h);
     __atomic_add_fetch(&h->hdr->stat_releases, 1, __ATOMIC_RELAXED);
 
 void
@@ -674,7 +674,7 @@ downgrade(self)
   PREINIT:
     EXTRACT_HANDLE("Data::Sync::Shared::RWLock", self);
   CODE:
-    sync_rwlock_downgrade(h->hdr);
+    sync_rwlock_downgrade(h);
     __atomic_add_fetch(&h->hdr->stat_releases, 1, __ATOMIC_RELAXED);
     __atomic_add_fetch(&h->hdr->stat_acquires, 1, __ATOMIC_RELAXED);
 

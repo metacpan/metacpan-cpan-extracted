@@ -4,11 +4,29 @@
  * Multiple writers append variable-length entries via CAS on tail offset.
  * Readers replay from any offset. Entries persist until explicit reset.
  *
- * Entry format: [uint32_t length][data bytes][padding to 4-byte alignment].
- * length is written AFTER data, acting as a commit flag (0 = uncommitted).
- * Padding ensures the next uint32_t length is naturally aligned — required
- * for atomic load/store on strict-alignment ISAs (ARM64 LDAR/STLR trap on
- * unaligned addresses with SIGBUS).
+ * Entry format: [uint32_t reserve_size][uint32_t length][data][padding to 4B].
+ *   reserve_size = total slot size (header + data + padding); written by
+ *     the writer immediately after CAS-reserving the slot, before any
+ *     data is copied. Lets readers locate the next slot even if the
+ *     writer crashes before committing len.
+ *   length = data length; written AFTER data via RELEASE store as a
+ *     commit flag (0 = uncommitted/abandoned).
+ *
+ * Crash recovery: if a writer dies after CAS but before committing len,
+ * the slot has reserve_size > 0 and len == 0. log_read_ex returns
+ * LOG_READ_ABANDONED for such slots (no data, next_off advances by
+ * reserve_size), letting readers skip past gaps. A bounded spin gives
+ * in-flight writers time to commit before declaring abandonment.
+ *
+ * The narrow window between CAS-reserve and the reserve_size store
+ * (typically a few CPU instructions) is NOT recoverable: if a writer
+ * dies there, the slot's size is unknown and readers cannot skip past
+ * it. Callers must reset/recreate the log. This is extremely rare in
+ * practice given the small instruction window.
+ *
+ * Padding ensures the next slot header is 4-byte aligned — required
+ * for atomic load/store on strict-alignment ISAs (ARM64 LDAR/STLR
+ * trap on unaligned addresses with SIGBUS).
  */
 
 #ifndef LOG_H
@@ -30,10 +48,22 @@
 #include <linux/futex.h>
 #include <sys/eventfd.h>
 
-#define LOG_MAGIC       0x4C4F4731U  /* "LOG1" */
-#define LOG_VERSION     1
+#define LOG_MAGIC       0x4C4F4732U  /* "LOG2" — v2 entry format with reserve_size */
+#define LOG_VERSION     2
 #define LOG_ERR_BUFLEN  256
-#define LOG_ENTRY_HDR   sizeof(uint32_t)
+/* Slot header: reserve_size (u32) + len (u32) = 8 bytes. */
+#define LOG_ENTRY_HDR   (2 * sizeof(uint32_t))
+/* Default bounded-spin (microseconds) for an in-flight writer to commit
+ * len before a reader declares the slot abandoned. Override per call via
+ * log_read_ex; this affects only the rare crash-recovery path. */
+#ifndef LOG_ABANDON_WAIT_US
+#define LOG_ABANDON_WAIT_US 2000000  /* 2s */
+#endif
+
+/* log_read / log_read_ex return codes */
+#define LOG_READ_EMPTY     0  /* no entry at offset (end / uncommitted in flight) */
+#define LOG_READ_OK        1  /* valid entry — out_data, out_len, next_off set */
+#define LOG_READ_ABANDONED 2  /* slot abandoned — next_off set, no data */
 
 /* ================================================================
  * Header (128 bytes)
@@ -92,7 +122,9 @@ static inline int log_remaining(const struct timespec *dl, struct timespec *rem)
 }
 
 /* ================================================================
- * Append — CAS reserve space, then write data, then commit (len)
+ * Append — CAS reserve space, publish reserve_size, write data,
+ * commit (len). reserve_size is published BEFORE data so a crashed
+ * writer leaves a recoverable slot boundary for readers.
  * ================================================================ */
 
 static inline int64_t log_append(LogHandle *h, const void *data, uint32_t len) {
@@ -100,8 +132,8 @@ static inline int64_t log_append(LogHandle *h, const void *data, uint32_t len) {
 
     LogHeader *hdr = h->hdr;
     if (len > UINT32_MAX - LOG_ENTRY_HDR - 3U) return -1;
-    /* Pad total entry size up to 4-byte boundary so the next entry's
-     * length field is naturally aligned for atomic ops on ARM64. */
+    /* Pad total slot size up to 4-byte boundary so the next slot's
+     * header words are naturally aligned for atomic ops on ARM64. */
     uint32_t entry_size = (LOG_ENTRY_HDR + len + 3U) & ~3U;
 
     for (;;) {
@@ -111,10 +143,21 @@ static inline int64_t log_append(LogHandle *h, const void *data, uint32_t len) {
         if (__atomic_compare_exchange_n(&hdr->tail, &t, t + entry_size,
                 1, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED)) {
             uint8_t *slot = h->data + t;
-            /* write data first */
+            /* Explicitly zero len before publishing reserve_size. In the
+             * common case the slot is already zero (fresh log_init or
+             * post-reset memset), but this defensive RELAXED store
+             * tolerates user code that bypasses log_reset's zeroing or
+             * concurrent edge cases. Release fence comes via the
+             * subsequent reserve_size store. */
+            __atomic_store_n((uint32_t *)(slot + sizeof(uint32_t)), 0U, __ATOMIC_RELAXED);
+            /* Publish slot boundary so readers can skip past us on crash.
+             * RELEASE so any reader observing reserve_size > 0 also sees
+             * the len=0 store above and correctly classifies the slot. */
+            __atomic_store_n((uint32_t *)slot, entry_size, __ATOMIC_RELEASE);
+            /* Write payload. */
             memcpy(slot + LOG_ENTRY_HDR, data, len);
-            /* commit: atomic release store of len — readers acquire-load it. */
-            __atomic_store_n((uint32_t *)slot, len, __ATOMIC_RELEASE);
+            /* Commit: RELEASE store of len publishes the data. */
+            __atomic_store_n((uint32_t *)(slot + sizeof(uint32_t)), len, __ATOMIC_RELEASE);
 
             __atomic_add_fetch(&hdr->count, 1, __ATOMIC_RELEASE);
             __atomic_add_fetch(&hdr->stat_appends, 1, __ATOMIC_RELAXED);
@@ -129,30 +172,89 @@ static inline int64_t log_append(LogHandle *h, const void *data, uint32_t len) {
 }
 
 /* ================================================================
- * Read — read entry at offset
+ * Read — read entry at offset.
+ *
+ * Returns:
+ *   LOG_READ_OK        — entry found; out_data/out_len/next_off set.
+ *   LOG_READ_ABANDONED — slot was reserved but never committed (writer
+ *                       crashed mid-append); next_off advanced past it,
+ *                       no out_data. abandon_wait_us caps the wait for
+ *                       an in-flight writer before declaring abandonment.
+ *   LOG_READ_EMPTY     — no entry (past tail, truncated, or in-flight
+ *                       writer not yet timed out).
  * ================================================================ */
 
+static inline int log_read_ex(LogHandle *h, uint64_t offset,
+                              const uint8_t **out_data, uint32_t *out_len,
+                              uint64_t *next_off,
+                              uint64_t abandon_wait_us) {
+    uint64_t trunc = __atomic_load_n(&h->hdr->truncation, __ATOMIC_ACQUIRE);
+    if (offset < trunc) return LOG_READ_EMPTY;  /* truncated */
+    uint64_t t = __atomic_load_n(&h->hdr->tail, __ATOMIC_ACQUIRE);
+    if (offset >= t) return LOG_READ_EMPTY;
+    if (offset + LOG_ENTRY_HDR > h->hdr->data_size) return LOG_READ_EMPTY;
+
+    uint8_t *slot = h->data + offset;
+    /* Load reserve_size FIRST. ACQUIRE pairs with the writer's RELEASE-
+     * store of reserve_size, which happens-after the RELAXED store of
+     * len=0. So observing reserve_size > 0 guarantees the writer's
+     * len=0 is also visible — we can then trust the subsequent len-load.
+     *
+     * This is the "happens-before chain": reserve_size release -> reader
+     * acquire -> len load. Without it, a freshly-CAS-reserved slot could
+     * race with a reader observing a stale len from an earlier epoch
+     * before the writer has had a chance to overwrite it. */
+    uint64_t waited = 0;
+    const uint64_t step_us = 1000;  /* 1ms */
+    uint32_t reserve_size = 0;
+    for (;;) {
+        reserve_size = __atomic_load_n((const uint32_t *)slot, __ATOMIC_ACQUIRE);
+        if (reserve_size > 0) {
+            uint32_t len = __atomic_load_n(
+                (const uint32_t *)(slot + sizeof(uint32_t)), __ATOMIC_ACQUIRE);
+            if (len > 0) {
+                if (offset + LOG_ENTRY_HDR + len > t) return LOG_READ_EMPTY;
+                *out_data = slot + LOG_ENTRY_HDR;
+                *out_len = len;
+                *next_off = offset + (((uint64_t)LOG_ENTRY_HDR + len + 3U) & ~(uint64_t)3U);
+                return LOG_READ_OK;
+            }
+        }
+        if (waited >= abandon_wait_us) break;
+        struct timespec ts = { 0, (long)(step_us * 1000) };
+        nanosleep(&ts, NULL);
+        waited += step_us;
+    }
+
+    /* Wait elapsed. Two outcomes:
+     *   reserve_size == 0: writer either hasn't published it yet (very
+     *     narrow window between CAS and the reserve_size store) or
+     *     crashed before publishing. We can't determine slot length so
+     *     signal EMPTY — caller must retry or give up.
+     *   reserve_size > 0, len == 0: writer crashed after publishing the
+     *     boundary but before committing data. Skip via reserve_size. */
+    if (reserve_size == 0) return LOG_READ_EMPTY;
+    /* Sanity-check reserve_size: must be aligned, larger than the header
+     * (len=0 is rejected by the writer, so a valid slot has reserve_size
+     * > LOG_ENTRY_HDR), and within both the data region and committed tail. */
+    if (reserve_size <= LOG_ENTRY_HDR
+        || (reserve_size & 3U) != 0
+        || offset + reserve_size > h->hdr->data_size
+        || offset + reserve_size > t)
+        return LOG_READ_EMPTY;
+
+    *next_off = offset + reserve_size;
+    return LOG_READ_ABANDONED;
+}
+
+/* Backwards-compatible read: returns 1 for OK, 0 for EMPTY or ABANDONED.
+ * Use log_read_ex if you need to distinguish abandoned slots. */
 static inline int log_read(LogHandle *h, uint64_t offset,
                             const uint8_t **out_data, uint32_t *out_len,
                             uint64_t *next_off) {
-    uint64_t trunc = __atomic_load_n(&h->hdr->truncation, __ATOMIC_ACQUIRE);
-    if (offset < trunc) return 0;  /* truncated */
-    uint64_t t = __atomic_load_n(&h->hdr->tail, __ATOMIC_ACQUIRE);
-    if (offset >= t) return 0;
-    if (offset + LOG_ENTRY_HDR > h->hdr->data_size) return 0;
-
-    uint8_t *slot = h->data + offset;
-    /* Atomic acquire-load pairs with writer's __atomic_store_n RELEASE. */
-    uint32_t len = __atomic_load_n((const uint32_t *)slot, __ATOMIC_ACQUIRE);
-    if (len == 0) return 0;  /* uncommitted */
-
-    if (offset + LOG_ENTRY_HDR + len > t) return 0;
-
-    *out_data = slot + LOG_ENTRY_HDR;
-    *out_len = len;
-    /* Advance past entry + alignment padding (matches log_append). */
-    *next_off = offset + (((uint64_t)LOG_ENTRY_HDR + len + 3U) & ~(uint64_t)3U);
-    return 1;
+    int rc = log_read_ex(h, offset, out_data, out_len, next_off,
+                         LOG_ABANDON_WAIT_US);
+    return rc == LOG_READ_OK ? 1 : 0;
 }
 
 /* ================================================================
@@ -226,18 +328,41 @@ static inline void log_init_header(void *base, uint64_t total, uint64_t data_siz
     __atomic_thread_fence(__ATOMIC_SEQ_CST);
 }
 
-/* Validate a mapped header (shared by log_create reopen and log_open_fd). */
-static inline int log_validate_header(const LogHeader *hdr, uint64_t file_size) {
-    if (hdr->magic != LOG_MAGIC) return 0;
-    if (hdr->version != LOG_VERSION) return 0;
-    if (hdr->data_size == 0) return 0;
-    if (hdr->data_size > UINT64_MAX - sizeof(LogHeader)) return 0;
-    if (hdr->total_size != file_size) return 0;
-    if (hdr->data_off != sizeof(LogHeader)) return 0;
-    if (hdr->total_size != sizeof(LogHeader) + hdr->data_size) return 0;
+/* Validate a mapped header (shared by log_create reopen and log_open_fd).
+ * On failure, writes a diagnostic to errbuf (if non-NULL). */
+static inline int log_validate_header(const LogHeader *hdr, uint64_t file_size,
+                                      char *errbuf) {
+    if (hdr->magic != LOG_MAGIC) {
+        /* Recognize a v1 log specifically so users get a clear migration hint. */
+        if (hdr->magic == 0x4C4F4731U) {
+            LOG_ERR("v1 log file (LOG1) not compatible with v0.04+ (LOG2): recreate");
+        } else {
+            LOG_ERR("bad magic: 0x%08x (expected 0x%08x)",
+                    (unsigned)hdr->magic, (unsigned)LOG_MAGIC);
+        }
+        return 0;
+    }
+    if (hdr->version != LOG_VERSION) {
+        LOG_ERR("version mismatch: %u (expected %u)",
+                (unsigned)hdr->version, (unsigned)LOG_VERSION);
+        return 0;
+    }
+    if (hdr->data_size == 0) { LOG_ERR("data_size = 0"); return 0; }
+    if (hdr->data_size > UINT64_MAX - sizeof(LogHeader)) {
+        LOG_ERR("data_size too large"); return 0;
+    }
+    if (hdr->total_size != file_size) {
+        LOG_ERR("total_size mismatch"); return 0;
+    }
+    if (hdr->data_off != sizeof(LogHeader)) {
+        LOG_ERR("data_off mismatch"); return 0;
+    }
+    if (hdr->total_size != sizeof(LogHeader) + hdr->data_size) {
+        LOG_ERR("size invariant broken"); return 0;
+    }
     /* Runtime-state sanity: tail and truncation must not exceed data_size. */
-    if (hdr->tail > hdr->data_size) return 0;
-    if (hdr->truncation > hdr->data_size) return 0;
+    if (hdr->tail > hdr->data_size) { LOG_ERR("tail > data_size"); return 0; }
+    if (hdr->truncation > hdr->data_size) { LOG_ERR("truncation > data_size"); return 0; }
     return 1;
 }
 
@@ -292,8 +417,8 @@ static LogHandle *log_create(const char *path, uint64_t data_size, char *errbuf)
         base = mmap(NULL, map_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
         if (base == MAP_FAILED) { LOG_ERR("mmap: %s", strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
         if (!is_new) {
-            if (!log_validate_header((LogHeader *)base, (uint64_t)st.st_size)) {
-                LOG_ERR("invalid log file"); munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
+            if (!log_validate_header((LogHeader *)base, (uint64_t)st.st_size, errbuf)) {
+                munmap(base, map_size); flock(fd, LOCK_UN); close(fd); return NULL;
             }
             flock(fd, LOCK_UN); close(fd);
             return log_setup(base, map_size, path, -1);
@@ -327,8 +452,8 @@ static LogHandle *log_open_fd(int fd, char *errbuf) {
     size_t ms = (size_t)st.st_size;
     void *base = mmap(NULL, ms, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
     if (base == MAP_FAILED) { LOG_ERR("mmap: %s", strerror(errno)); return NULL; }
-    if (!log_validate_header((LogHeader *)base, (uint64_t)st.st_size)) {
-        LOG_ERR("invalid log"); munmap(base, ms); return NULL;
+    if (!log_validate_header((LogHeader *)base, (uint64_t)st.st_size, errbuf)) {
+        munmap(base, ms); return NULL;
     }
     int myfd = fcntl(fd, F_DUPFD_CLOEXEC, 0);
     if (myfd < 0) { LOG_ERR("fcntl: %s", strerror(errno)); munmap(base, ms); return NULL; }
@@ -344,8 +469,16 @@ static void log_destroy(LogHandle *h) {
     free(h);
 }
 
-/* NOT concurrency-safe — caller must ensure no concurrent access */
+/* NOT concurrency-safe — caller must ensure no concurrent access.
+ *
+ * Zeros the data region before rewinding tail. This is required for
+ * correctness: a stale slot at offset 0 could otherwise leak old
+ * data to readers that see the new tail before the new writer
+ * publishes a fresh reserve_size. The header SEQ_CST fence below
+ * publishes the zeroed region to all subsequent loads. */
 static void log_reset(LogHandle *h) {
+    memset(h->data, 0, (size_t)h->hdr->data_size);
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     __atomic_store_n(&h->hdr->truncation, 0, __ATOMIC_RELEASE);
     __atomic_store_n(&h->hdr->tail, 0, __ATOMIC_RELEASE);
     __atomic_store_n(&h->hdr->count, 0, __ATOMIC_RELEASE);

@@ -1,3 +1,4 @@
+pics/ansi-encode-logo.png
 pics/Sample.png
 pics/TinyPrint.jpg
 pics/amd.png
@@ -23,6 +24,7 @@ pics/timex-sinclair.png
 pics/usa.png
 pics/windows.png
 examples/amd.ans
+examples/ansi-encode.ans
 examples/commodore.ans
 examples/atari.ans
 examples/ibm.ans

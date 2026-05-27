@@ -198,7 +198,7 @@ static inline int64_t pool_alloc(PoolHandle *h, double timeout) {
 
     for (;;) {
         uint32_t cur_used = __atomic_load_n(&hdr->used, __ATOMIC_RELAXED);
-        if (cur_used < (uint32_t)hdr->capacity) {
+        if ((uint64_t)cur_used < hdr->capacity) {
             slot = pool_try_alloc(h);
             if (slot >= 0) return slot;
         }
@@ -206,7 +206,7 @@ static inline int64_t pool_alloc(PoolHandle *h, double timeout) {
         __atomic_add_fetch(&hdr->waiters, 1, __ATOMIC_RELEASE);
 
         cur_used = __atomic_load_n(&hdr->used, __ATOMIC_ACQUIRE);
-        if (cur_used >= (uint32_t)hdr->capacity) {
+        if ((uint64_t)cur_used >= hdr->capacity) {
             struct timespec *pts = NULL;
             if (has_deadline) {
                 if (!pool_remaining_time(&deadline, &remaining)) {
@@ -365,7 +365,21 @@ static inline uint32_t pool_recover_stale(PoolHandle *h) {
                 0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
             continue;
 
-        /* We now own the right to free this slot's bitmap bit */
+        /* We now own the right to free this slot's bitmap bit.
+         *
+         * Race window: between our owner-CAS and the bitmap-CAS below,
+         * the bitmap word can transition via concurrent allocators (or,
+         * with API misuse, a free+alloc cycle on the same bit). The bit
+         * may be reset by an allocator before our CAS reaches it, or our
+         * CAS may clear a bit a fresh allocator has just claimed.
+         *
+         * Mitigation: pre-CAS owner check (narrows window) + post-CAS
+         * recovery accounting (always decrement used, since our CAS
+         * succeeded against an "expected = bit set" state — that bit is
+         * gone from popcount). If post-CAS observes an owner already
+         * stored, an allocator's CAS landed inside our window; we restore
+         * the bit so their slot stays claimed. Their own used++ pairs
+         * with our used-- to keep the counter in sync with popcount. */
         uint32_t widx = (uint32_t)(slot / 64);
         int bit = (int)(slot % 64);
         uint64_t mask = (uint64_t)1 << bit;
@@ -373,10 +387,28 @@ static inline uint32_t pool_recover_stale(PoolHandle *h) {
         for (;;) {
             uint64_t word = __atomic_load_n(&h->bitmap[widx], __ATOMIC_RELAXED);
             if (!(word & mask)) break;
+
+            /* Pre-CAS: if a new allocator already populated owner, abort */
+            if (__atomic_load_n(&h->owners[slot], __ATOMIC_ACQUIRE) != 0)
+                break;
+
             uint64_t new_word = word & ~mask;
             if (__atomic_compare_exchange_n(&h->bitmap[widx], &word, new_word,
                     1, __ATOMIC_RELEASE, __ATOMIC_RELAXED)) {
-                __atomic_sub_fetch(&h->hdr->used, 1, __ATOMIC_RELEASE);
+                /* Post-CAS: if owner is now non-zero, a live allocator's
+                 * CAS landed inside our window. Restore the bit so their
+                 * claim stays valid; their used++ already happened. */
+                if (__atomic_load_n(&h->owners[slot], __ATOMIC_ACQUIRE) != 0)
+                    __atomic_or_fetch(&h->bitmap[widx], mask, __ATOMIC_RELEASE);
+                /* Account for the stale slot's bit we just cleared. Use a
+                 * saturating decrement: if a prior allocator was killed
+                 * between owner-store and used++, used may already reflect
+                 * fewer "real" allocations than popcount suggests, and a
+                 * plain sub would underflow on subsequent recoveries. */
+                uint32_t cur = __atomic_load_n(&h->hdr->used, __ATOMIC_RELAXED);
+                while (cur > 0 && !__atomic_compare_exchange_n(&h->hdr->used,
+                            &cur, cur - 1, 1, __ATOMIC_RELEASE, __ATOMIC_RELAXED))
+                    ; /* CAS failed: cur reloaded with current value; retry */
                 __atomic_add_fetch(&h->hdr->stat_frees, 1, __ATOMIC_RELAXED);
                 if (__atomic_load_n(&h->hdr->waiters, __ATOMIC_RELAXED) > 0)
                     syscall(SYS_futex, &h->hdr->used, FUTEX_WAKE, 1, NULL, NULL, 0);

@@ -1,0 +1,50 @@
+name: macos
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+jobs:
+  # System libgit2 via Homebrew (probe path).
+  brew-libgit2:
+    runs-on: macos-14
+    env:
+      # Help FFI::Platypus find Homebrew libs (Apple Silicon path).
+      # Job-level so it reaches the composite action's dzil step.
+      DYLD_FALLBACK_LIBRARY_PATH: /opt/homebrew/lib:/usr/local/lib
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Homebrew libgit2
+        run: brew install libgit2 pkg-config
+      - name: Set up Perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+      - name: perl -V
+        run: perl -V
+      - name: dzil test
+        uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+
+  # Share build (vendored libgit2).
+  share-build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install build prerequisites
+        run: brew install cmake openssl@3 libssh2 pkg-config
+      - name: Set up Perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+      # Build::CMake injects Alien::cmake3 as a *dynamic* configure prereq only
+      # for share builds, so it never reaches the static metadata that the
+      # dzil-test action installs from. Install it explicitly here; it picks up
+      # the brew cmake above and builds nothing.
+      - name: Install Alien::cmake3 (dynamic share-build prereq)
+        run: cpanm -nq Alien::cmake3
+      - name: dzil test (share build)
+        uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+        with:
+          install-type: share

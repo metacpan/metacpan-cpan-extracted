@@ -5,7 +5,7 @@ use warnings;
 use 5.010;
 use Carp;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use XS::JIT::Builder;
 

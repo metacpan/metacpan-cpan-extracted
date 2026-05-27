@@ -2,472 +2,77 @@
 #include "perl.h"
 #include "XSUB.h"
 
-typedef struct {
-	int enable_preprocess;
-	int enable_headers;
-	int enable_bold;
-	int enable_italic;
-	int enable_links;
-	int enable_images;
-	int enable_code;
-	int enable_tables;
-	int enable_tasklist;
-	int enable_fenced_code;
-	int enable_strikethrough;
-	int enable_ordered_lists;
-	int enable_unordered_lists;
-} MarkdownOptions;
+/* ------------------------------------------------------------------ */
+/* Unity build: the parser sources live in src/ and are pulled in below
+ * so the per-xs Makefile doesn't need extra OBJECT entries. Order
+ * matters: headers first, then .c bodies. All symbols here are static
+ * to the compilation unit except mds_render_html_to_sv, which the XS
+ * glue at the bottom of this file calls.
+ */
+#define MDS_UNITY_BUILD 1
+#include "../../src/mds_arena.c"
+#include "../../src/mds_buf.c"
+#include "../../src/mds_linkref.c"
+#include "../../src/mds_footnote.c"
+#include "../../src/mds_block.c"
+#include "../../src/mds_inline.c"
+#include "../../src/mds_render_html.c"
+#include "../../src/mds_gfm.c"
+#include "../../src/mds.c"
 
-static SV* markdown_to_html(const char* input, MarkdownOptions* opts) {
-	SV* out = newSVpv("", 0);
-	const char* p = input;
+/* SIMD foundation: always build the scalar + dispatch units. The
+ * AVX2/SSE2/NEON files compile only when their feature macro is set. */
+#include "../../src/simd/mds_simd_scalar.c"
+#ifdef MDS_HAVE_SSE2
+#  include "../../src/simd/mds_simd_sse2.c"
+#endif
+#ifdef MDS_HAVE_AVX2
+#  include "../../src/simd/mds_simd_avx2.c"
+#endif
+#ifdef MDS_HAVE_NEON
+#  include "../../src/simd/mds_simd_neon.c"
+#endif
+#include "../../src/simd/mds_simd_dispatch.c"
+#include "../../src/simd/mds_dispatch.c"
+/* ------------------------------------------------------------------ */
 
-	/* Escape all non-ASCII UTF-8 characters (do not escape HTML) */
-	while (*p) {
-		unsigned char c = (unsigned char)*p;
-		if (c >= 0x80) {
-			// Start of a UTF-8 multibyte sequence
-			int len = 1;
-			if ((c & 0xE0) == 0xC0) len = 2;
-			else if ((c & 0xF0) == 0xE0) len = 3;
-			else if ((c & 0xF8) == 0xF0) len = 4;
-			else { p++; continue; } // Invalid, skip
-
-			UV codepoint = 0;
-			if (len == 2 && (p[1] & 0xC0) == 0x80) {
-				codepoint = ((p[0] & 0x1F) << 6) | (p[1] & 0x3F);
-			} else if (len == 3 && (p[1] & 0xC0) == 0x80 && (p[2] & 0xC0) == 0x80) {
-				codepoint = ((p[0] & 0x0F) << 12) | ((p[1] & 0x3F) << 6) | (p[2] & 0x3F);
-			} else if (len == 4 && (p[1] & 0xC0) == 0x80 && (p[2] & 0xC0) == 0x80 && (p[3] & 0xC0) == 0x80) {
-				codepoint = ((p[0] & 0x07) << 18) | ((p[1] & 0x3F) << 12) | ((p[2] & 0x3F) << 6) | (p[3] & 0x3F);
-			} else {
-				p++;
-				continue;
-			}
-			sv_catpvf(out, "&#x%X;", (unsigned int)codepoint);
-			p += len;
-			continue;
-		}
-		// Do not escape HTML here, just copy ASCII
-		sv_catpvf(out, "%c", *p);
-		p++;
-	}
-	input = SvPV_nolen(out);
-	p = input; // prevent further processing, as we've already handled all input
-
-	/* Preprocess: replace \r\n with \n in input */
-	if (opts->enable_preprocess) {
-		SV* pre = newSVpv("", 0);
-		const char* q = input;
-		while (*q) {
-			if (*q == '\r' && *(q+1) == '\n') {
-				sv_catpv(pre, "\n");
-				q += 2;
-			} else {
-				sv_catpvf(pre, "%c", *q);
-				q++;
-			}
-		}
-		input = SvPV_nolen(pre);
-		p = input;
-	}
-	out = newSVpv("", 0);
-
-	while (*p) {
-		// Fenced code block
-		if (opts->enable_fenced_code && *p == '`' && *(p+1) == '`' && *(p+2) == '`') {
-			p += 3;
-			// Optional language specifier
-			const char* lang_start = p;
-			while (*p && *p != '\n' && *p != ' ') p++;
-			int lang_len = (int)(p-lang_start);
-			while (*p && *p != '\n') p++;
-			//if (*p == '\n') p++;
-			const char* code_start = p;
-			const char* fence = strstr(p, "```");
-			int code_len = fence ? (int)(fence - code_start) : (int)strlen(code_start);
-			if (lang_len > 0) {
-				sv_catpvf(out, "<pre><code class=\"language-%.*s\">%.*s</code></pre>\n", lang_len, lang_start, code_len, code_start);
-			} else {
-				sv_catpvf(out, "<pre><code>%.*s</code></pre>\n", code_len, code_start);
-			}
-			if (fence) p = fence + 3;
-			continue;
-		}
-		// Strikethrough
-		if (opts->enable_strikethrough && *p == '~' && *(p+1) == '~') {
-			p += 2;
-			const char* start = p;
-			while (*p && !(*p == '~' && *(p+1) == '~')) p++;
-			sv_catpvf(out, "<del>%.*s</del>", (int)(p-start), start);
-			if (*p == '~' && *(p+1) == '~') p += 2;
-			continue;
-		}
-		// Headers
-		if (opts->enable_headers && *p == '#' && (*(p+1) == ' ' || *(p+1) == '#')) {
-			int level = 0;
-			while (*p == '#') { level++; p++; }
-			if (*p == ' ') p++;
-			const char* start = p;
-			while (*p && *p != '\n') p++;
-			sv_catpvf(out, "<h%d>%.*s</h%d>\n", level, (int)(p-start), start, level);
-			if (*p == '\n') p++;
-			continue;
-		}
-		// Task list
-		if (opts->enable_tasklist && *p == '-' && *(p+1) == ' ' && *(p+2) == '[' && (*(p+3) == ' ' || *(p+3) == 'x' || *(p+3) == 'X') && *(p+4) == ']') {
-			int checked = (*(p+3) == 'x' || *(p+3) == 'X');
-			p += 5;
-			if (*p == ' ') p++;
-			const char* start = p;
-			while (*p && *p != '\n') p++;
-			sv_catpvf(out, "<li><input type=\"checkbox\"%s disabled /> %.*s</li>\n", checked ? " checked" : "", (int)(p-start), start);
-			if (*p == '\n') p++;
-			continue;
-		}
-		// Table (very basic, only supports header row and one or more data rows)
-		if (opts->enable_tables && *p == '|' && strchr(p, '\n')) {
-			// Check if next line is a separator (|---|---|)
-			const char* row_start = p;
-			const char* nl = strchr(p, '\n');
-			if (!nl) break;
-			const char* sep = nl + 1;
-			if (*sep == '|') {
-				const char* sep_nl = strchr(sep, '\n');
-				if (sep_nl && strstr(sep, "---") < sep_nl) {
-					// Parse header
-					sv_catpvf(out, "<table>\n<tr>");
-					const char* cell = row_start + 1;
-					while (cell < nl) {
-						const char* pipe = strchr(cell, '|');
-						if (!pipe || pipe > nl) pipe = nl;
-						while (*cell == ' ') cell++;
-						const char* cell_end = pipe;
-						while (cell_end > cell && (*(cell_end-1) == ' ')) cell_end--;
-						// Recursively process header cell content for inline markdown (bold, italic, links, etc.)
-						SV* cell_sv = newSVpv("", 0);
-						sv_catpvf(cell_sv, "%.*s", (int)(cell_end-cell), cell);
-						SV* cell_html = markdown_to_html(SvPV_nolen(cell_sv), opts);
-						const char* html_str = SvPV_nolen(cell_html);
-						STRLEN html_len = strlen(html_str);
-						// Remove wrapping <div>...</div> if present
-						if (html_len > 11 && strncmp(html_str, "<div>", 5) == 0 && strncmp(html_str + html_len - 6, "</div>", 6) == 0) {
-							SV* trimmed = newSVpv("", 0);
-							sv_catpvn(trimmed, html_str + 5, html_len - 11);
-							SvREFCNT_dec(cell_html);
-							cell_html = trimmed;
-						}
-						sv_catpvf(out, "<th>%s</th>", SvPV_nolen(cell_html));
-						SvREFCNT_dec(cell_sv);
-						SvREFCNT_dec(cell_html);
-						cell = pipe + 1;
-					}
-					sv_catpvf(out, "</tr>\n");
-					// Parse rows
-					const char* row = sep_nl + 1;
-					while (*row == '|' && row) {
-						const char* row_nl = strchr(row, '\n');
-						if (!row_nl) row_nl = row + strlen(row);
-						sv_catpvf(out, "<tr>");
-						const char* cell = row + 1;
-						while (cell < row_nl) {
-							const char* pipe = strchr(cell, '|');
-							if (!pipe || pipe > row_nl) pipe = row_nl;
-							while (*cell == ' ') cell++;
-							const char* cell_end = pipe;
-							while (cell_end > cell && (*(cell_end-1) == ' ')) cell_end--;
-							// Recursively process table cell content for inline markdown (bold, italic, links, etc.)
-							SV* cell_sv = newSVpv("", 0);
-							sv_catpvf(cell_sv, "%.*s", (int)(cell_end-cell), cell);
-							SV* cell_html = markdown_to_html(SvPV_nolen(cell_sv), opts);
-							const char* html_str = SvPV_nolen(cell_html);
-							STRLEN html_len = strlen(html_str);
-							// Remove wrapping <div>...</div> if present
-							if (html_len > 11 && strncmp(html_str, "<div>", 5) == 0 && strncmp(html_str + html_len - 6, "</div>", 6) == 0) {
-								SV* trimmed = newSVpv("", 0);
-								sv_catpvn(trimmed, html_str + 5, html_len - 11);
-								SvREFCNT_dec(cell_html);
-								cell_html = trimmed;
-							}
-							sv_catpvf(out, "<td>%s</td>", SvPV_nolen(cell_html));
-							SvREFCNT_dec(cell_sv);
-							SvREFCNT_dec(cell_html);
-							cell = pipe + 1;
-						}
-						sv_catpvf(out, "</tr>\n");
-						if (*row_nl == '\0') break;
-						row = row_nl + 1;
-					}
-					sv_catpvf(out, "</table>\n");
-					p = row;
-					continue;
-				}
-			}
-		}
-		// Bold
-		if (opts->enable_bold && (
-				(*p == '*' && *(p+1) == '*') ||
-				(*p == '_' && *(p+1) == '_')
-			)) {
-			p += 2;
-			const char* start = p;
-			while (*p && !(
-				((*p == '*' && *(p+1) == '*')) ||
-				((*p == '_' && *(p+1) == '_'))
-			)) p++;
-			sv_catpvf(out, "<strong>%.*s</strong>", (int)(p-start), start);
-			if ((*p == '*' && *(p+1) == '*') || (*p == '_' && *(p+1) == '_')) p += 2;
-			continue;
-		}
-		// Italic
-		if (opts->enable_italic && ((*p == '*' && *(p+1) != ' ') || (*p == '_' && *(p+1) != ' '))) {
-			p++;
-			const char* start = p;
-			char end_marker = *(p-1); // either '*' or '_'
-			while (*p && *p != end_marker) p++;
-			sv_catpvf(out, "<em>%.*s</em>", (int)(p-start), start);
-			if (*p == end_marker) p++;
-			continue;
-		}
-		// Inline code
-		if (opts->enable_code && *p == '`') {
-			p++;
-			const char* start = p;
-			while (*p && *p != '`') p++;
-			sv_catpvf(out, "<code>%.*s</code>", (int)(p-start), start);
-			if (*p == '`') p++;
-			continue;
-		}
-		// Images
-		if (opts->enable_images && *p == '!' && *(p+1) == '[') {
-			p += 2;
-			const char* alt_start = p;
-			while (*p && *p != ']') p++;
-			int alt_len = (int)(p-alt_start);
-			if (*p == ']') p++;
-			if (*p == '(') {
-				p++;
-				const char* url_start = p;
-				while (*p && *p != ')') p++;
-				int url_len = (int)(p-url_start);
-				sv_catpvf(out, "<img alt=\"%.*s\" src=\"%.*s\" />", alt_len, alt_start, url_len, url_start);
-				if (*p == ')') p++;
-				continue;
-			}
-		}
-		// Links
-		if (opts->enable_links && *p == '[') {
-			p++;
-			const char* text_start = p;
-			while (*p && *p != ']') p++;
-			int text_len = (int)(p-text_start);
-			if (*p == ']') p++;
-			if (*p == '(') {
-				p++;
-				const char* url_start = p;
-				while (*p && *p != ')') p++;
-				int url_len = (int)(p-url_start);
-				sv_catpvf(out, "<a href=\"%.*s\">%.*s</a>", url_len, url_start, text_len, text_start);
-				if (*p == ')') p++;
-				continue;
-			}
-		}
-		// Ordered lists
-		// Ordered lists (support multiple consecutive lines as one <ol>)
-		if (opts->enable_ordered_lists && 
-			(p == input || *(p-1) == '\n') && 
-			*p >= '1' && *p <= '9' && 
-			(*(p+1) == '.' || *(p+1) == ')')) {
-			sv_catpvf(out, "<ol>\n");
-			while (opts->enable_ordered_lists && *p >= '1' && *p <= '9' && (*(p+1) == '.' || *(p+1) == ')')) {
-				p += 2; // Skip number and dot/parenthesis
-				if (*p == ' ') p++; // Skip space
-				const char* start = p;
-				while (*p && *p != '\n') p++;
-				// Recursively process the list item content for inline markdown (bold, italic, links, etc.)
-				SV* item_sv = newSVpv("", 0);
-				sv_catpvf(item_sv, "%.*s", (int)(p-start), start);
-				SV* item_html = markdown_to_html(SvPV_nolen(item_sv), opts);
-				/* Remove wrapping <div>...</div> if present */
-				const char* html_str = SvPV_nolen(item_html);
-				STRLEN html_len = strlen(html_str);
-				if (html_len > 11 && strncmp(html_str, "<div>", 5) == 0 && strncmp(html_str + html_len - 6, "</div>", 6) == 0) {
-					SV* trimmed = newSVpv("", 0);
-					sv_catpvn(trimmed, html_str + 5, html_len - 11);
-					SvREFCNT_dec(item_html);
-					item_html = trimmed;
-				}
-				sv_catpvf(out, "<li>%s</li>\n", SvPV_nolen(item_html));
-				SvREFCNT_dec(item_sv);
-				SvREFCNT_dec(item_html);
-				if (*p == '\n') p++;
-				// Skip blank lines between list items
-				const char* lookahead = p;
-				while (*lookahead == '\n') lookahead++;
-				if (!(*lookahead >= '1' && *lookahead <= '9' && (*(lookahead+1) == '.' || *(lookahead+1) == ')')))
-					break;
-				p = lookahead;
-			}
-			sv_catpvf(out, "</ol>\n");
-			continue;
-		}
-		// Unordered lists
-		// Unordered lists (support multiple consecutive lines as one <ul>)
-		if (opts->enable_unordered_lists && 
-			(p == input || *(p-1) == '\n') && 
-			(*p == '-' || *p == '*' || *p == '+') && (*(p+1) == ' ')) {
-			sv_catpvf(out, "<ul>\n");
-			while (opts->enable_unordered_lists && (*p == '-' || *p == '*' || *p == '+') && (*(p+1) == ' ')) {
-				p++; // Skip marker
-				if (*p == ' ') p++; // Skip space
-				const char* start = p;
-				while (*p && *p != '\n') p++;
-				// Recursively process the list item content for inline markdown (bold, italic, links, etc.)
-				SV* item_sv = newSVpv("", 0);
-				sv_catpvf(item_sv, "%.*s", (int)(p-start), start);
-				SV* item_html = markdown_to_html(SvPV_nolen(item_sv), opts);
-				SvREFCNT_dec(item_html);
-				item_html = markdown_to_html(SvPV_nolen(item_sv), opts);
-				/* Remove wrapping <div>...</div> if present */
-				const char* html_str = SvPV_nolen(item_html);
-				STRLEN html_len = strlen(html_str);
-				if (html_len > 11 && strncmp(html_str, "<div>", 5) == 0 && strncmp(html_str + html_len - 6, "</div>", 6) == 0) {
-					SV* trimmed = newSVpv("", 0);
-					sv_catpvn(trimmed, html_str + 5, html_len - 11);
-					SvREFCNT_dec(item_html);
-					item_html = trimmed;
-				}
-				sv_catpvf(out, "<li>%s</li>\n", SvPV_nolen(item_html));
-				SvREFCNT_dec(item_sv);
-				SvREFCNT_dec(item_html);
-				if (*p == '\n') p++;
-				// Skip blank lines between list items
-				const char* lookahead = p;
-				while (*lookahead == '\n') lookahead++;
-				if (!(*lookahead == '-' || *lookahead == '*' || *lookahead == '+'))
-					break;
-				p = lookahead;
-			}
-			sv_catpvf(out, "</ul>\n");
-			continue;
-		}
-		// Default: copy character
-		sv_catpvf(out, "%c", *p);
-		p++;
-	}
-
-	/* Split output on double newlines and wrap each part in <div>...</div> */
-	STRLEN len;
-	char* html = SvPV(out, len);
-
-	/* Unescape all UTF-8 characters (convert &#x...; back to UTF-8), but do not touch HTML entities */
-	SV* unescaped = newSVpv("", 0);
-	char* scan = html;
-	while (*scan) {
-		if (scan[0] == '&' && scan[1] == '#' && scan[2] == 'x') {
-			char* semi = strchr(scan, ';');
-			if (semi && semi - scan < 10) {
-				unsigned int codepoint = 0;
-				if (sscanf(scan + 3, "%X", &codepoint) == 1) {
-					/* Write codepoint as UTF-8 */
-					unsigned char utf8buf[4];
-					int utf8len = 0;
-					if (codepoint <= 0x7F) {
-						utf8buf[0] = (unsigned char)codepoint;
-						utf8len = 1;
-					} else if (codepoint <= 0x7FF) {
-						utf8buf[0] = 0xC0 | ((codepoint >> 6) & 0x1F);
-						utf8buf[1] = 0x80 | (codepoint & 0x3F);
-						utf8len = 2;
-					} else if (codepoint <= 0xFFFF) {
-						utf8buf[0] = 0xE0 | ((codepoint >> 12) & 0x0F);
-						utf8buf[1] = 0x80 | ((codepoint >> 6) & 0x3F);
-						utf8buf[2] = 0x80 | (codepoint & 0x3F);
-						utf8len = 3;
-					} else if (codepoint <= 0x10FFFF) {
-						utf8buf[0] = 0xF0 | ((codepoint >> 18) & 0x07);
-						utf8buf[1] = 0x80 | ((codepoint >> 12) & 0x3F);
-						utf8buf[2] = 0x80 | ((codepoint >> 6) & 0x3F);
-						utf8buf[3] = 0x80 | (codepoint & 0x3F);
-						utf8len = 4;
-					}
-					sv_catpvn(unescaped, (char*)utf8buf, utf8len);
-					scan = semi + 1;
-					continue;
-				}
-			}
-		}
-		sv_catpvn(unescaped, scan, 1);
-		scan++;
-	}
-	html = SvPV_nolen(unescaped);
-
-	SV* final = newSVpv("", 0);
-	char* start = html;
-	char* end;
-	while ((end = strstr(start, "\n\n"))) {
-		int part_len = (int)(end - start);
-		if (part_len > 0) {
-			sv_catpvf(final, "<div>%.*s</div>", part_len, start);
-		}
-		start = end + 2;
-	}
-	if (*start) {
-		sv_catpvf(final, "<div>%s</div>", start);
-	}
-	/* Remove all newlines from the final output */
-	STRLEN final_len;
-	char* final_html = SvPV(final, final_len);
-	SV* no_newlines = newSVpv("", 0);
-	int in_code = 0;
-	for (STRLEN i = 0; i < final_len; ) {
-		// Detect start of code block
-		if (!in_code && i + 5 < final_len && strncmp(final_html + i, "<pre><code", 10) == 0) {
-			in_code = 1;
-		}
-		// Detect end of code block
-		if (in_code && i + 13 < final_len && strncmp(final_html + i, "</code></pre>", 13) == 0) {
-			in_code = 0;
-		}
-		STRLEN char_len = 1;
-		unsigned char c = (unsigned char)final_html[i];
-		if (c >= 0x80) {
-			if ((c & 0xE0) == 0xC0) char_len = 2;
-			else if ((c & 0xF0) == 0xE0) char_len = 3;
-			else if ((c & 0xF8) == 0xF0) char_len = 4;
-		}
-		if (in_code || (final_html[i] != '\n' && final_html[i] != '\r')) {
-			sv_catpvn(no_newlines, final_html + i, char_len);
-		}
-		i += char_len;
-	}
-	SvREFCNT_dec(final);
-	final = no_newlines;
-	SvREFCNT_dec(out);
-	out = final;
-	return out;
+/* Special-byte table used by strip_markdown_except_lists_tables to skip
+ * over runs of ordinary text quickly. Bytes here are the ones that can
+ * START a markdown construct in that pass. */
+static unsigned char mds_special[256];
+static int mds_special_init = 0;
+static void mds_build_special(void) {
+	if (mds_special_init) return;
+	mds_special[(unsigned char)'#']  = 1;
+	mds_special[(unsigned char)'`']  = 1;
+	mds_special[(unsigned char)'*']  = 1;
+	mds_special[(unsigned char)'_']  = 1;
+	mds_special[(unsigned char)'~']  = 1;
+	mds_special[(unsigned char)'[']  = 1;
+	mds_special[(unsigned char)'!']  = 1;
+	mds_special[(unsigned char)'|']  = 1;
+	mds_special[(unsigned char)'\n'] = 1;
+	mds_special[(unsigned char)'\r'] = 1;
+	mds_special_init = 1;
 }
-
 
 static SV* strip_markdown_except_lists_tables(const char* input) {
 	SV* out = newSVpv("", 0);
 	const char* p = input;
 
+	mds_build_special();
+
 	while (*p) {
-		// Ordered lists: keep numbers and text, remove ". " or ") "
-		if ((p == input || *(p-1) == '\n') && *p >= '1' && *p <= '9' && (*(p+1) == '.' || *(p+1) == ')')) {
-			// Copy number
-			sv_catpvn(out, p, 1);
-			sv_catpvn(out, " ", 1); // Keep space after number	
-			p += 2;
-			if (*p == ' ') p++;
-			continue;
-		}
 		// Unordered lists: keep marker, remove space
 		if ((p == input || *(p-1) == '\n') && (*p == '-' || *p == '*' || *p == '+') && *(p+1) == ' ') {
 			sv_catpvn(out, p, 1);
 			sv_catpvn(out, " ", 1); // Keep space after marker
 			p += 2;
+			// Task list [ ] or [x] immediately after bullet — strip the box.
+			if (*p == '[' && (*(p+1) == ' ' || *(p+1) == 'x' || *(p+1) == 'X') && *(p+2) == ']') {
+				p += 3;
+				if (*p == ' ') p++;
+			}
 			continue;
 		}
 		// Tables: just copy everything (including pipes and dashes)
@@ -497,21 +102,33 @@ static SV* strip_markdown_except_lists_tables(const char* input) {
 			p += 2;
 			continue;
 		}
-		// Remove inline code (`) and fenced code (```)
+		// Remove inline code (`) and fenced code (```) — keep content, drop fences
 		if (*p == '`') {
 			if (*(p+1) == '`' && *(p+2) == '`') {
+				// Fenced block: drop the opening fence line entirely
+				// (but preserve one newline so surrounding text stays
+				// on its own line).
 				p += 3;
-				// Skip until closing ```
+				while (*p && *p != '\n') p++;
+				// keep the '\n' that terminated the fence line in output
+				if (*p == '\n') { sv_catpvn(out, "\n", 1); p++; }
 				const char* fence = strstr(p, "```");
+				const char* body_end = fence ? fence : p + strlen(p);
+				if (body_end > p)
+					sv_catpvn(out, p, (STRLEN)(body_end - p));
 				if (fence) {
 					p = fence + 3;
+					// drop the rest of the closing fence line
+					while (*p && *p != '\n') p++;
 				} else {
-					p += strlen(p);
+					p = body_end;
 				}
 			} else {
 				p++;
-				// Skip until closing `
+				const char* code_start = p;
 				while (*p && *p != '`') p++;
+				if (p > code_start)
+					sv_catpvn(out, code_start, (STRLEN)(p - code_start));
 				if (*p == '`') p++;
 			}
 			continue;
@@ -556,11 +173,112 @@ static SV* strip_markdown_except_lists_tables(const char* input) {
 			if (*p == ' ') p++;
 			continue;
 		}
-		// Default: copy character
-		sv_catpvn(out, p, 1);
-		p++;
+		// Default: emit a single special byte, OR batch a run of non-special.
+		/* Special set for strip is the markdown special set PLUS '|', '-', '+',
+		 * and ASCII digits (all line-start-conditional in this function). */
+		if (mds_special[(unsigned char)*p]
+		    || *p == '|' || *p == '-' || *p == '+'
+		    || (*p >= '1' && *p <= '9')) {
+			sv_catpvn(out, p, 1);
+			p++;
+		} else {
+			const char* run = p;
+			do { p++; } while (*p && !mds_special[(unsigned char)*p]
+			                       && *p != '|' && *p != '-' && *p != '+'
+			                       && !(*p >= '1' && *p <= '9'));
+			sv_catpvn(out, run, (STRLEN)(p - run));
+		}
 	}
 	return out;
+}
+
+/* Shared options-hash decoder used by both the procedural
+ * markdown_to_html entry point and the persistent session render path.
+ * GFM is the default; an `hv` of NULL returns the GFM preset unchanged. */
+static unsigned mds_flags_from_hv(pTHX_ HV* h) {
+	unsigned flags = MDS_FLAGS_GFM;
+	SV** v;
+	if (!h) return flags;
+	if ((v = hv_fetch(h, "gfm", 3, 0)) && !SvTRUE(*v)) flags = MDS_FLAGS_COMMONMARK;
+	if ((v = hv_fetch(h, "tables", 6, 0)))            flags = SvTRUE(*v) ? (flags | MDS_FLAG_TABLES)            : (flags & ~MDS_FLAG_TABLES);
+	if ((v = hv_fetch(h, "strikethrough", 13, 0)))     flags = SvTRUE(*v) ? (flags | MDS_FLAG_STRIKE)            : (flags & ~MDS_FLAG_STRIKE);
+	if ((v = hv_fetch(h, "tasklist", 8, 0)))           flags = SvTRUE(*v) ? (flags | MDS_FLAG_TASKLIST)          : (flags & ~MDS_FLAG_TASKLIST);
+	if ((v = hv_fetch(h, "autolink", 8, 0)))           flags = SvTRUE(*v) ? (flags | MDS_FLAG_AUTOLINK)          : (flags & ~MDS_FLAG_AUTOLINK);
+	if ((v = hv_fetch(h, "disallow_raw_html", 17, 0))) flags = SvTRUE(*v) ? (flags | MDS_FLAG_DISALLOW_RAW_HTML) : (flags & ~MDS_FLAG_DISALLOW_RAW_HTML);
+	if ((v = hv_fetch(h, "hard_breaks", 11, 0)) && SvTRUE(*v))     flags |= MDS_FLAG_HARD_BREAKS;
+	if ((v = hv_fetch(h, "unsafe", 6, 0))      && SvTRUE(*v))      flags |= MDS_FLAG_UNSAFE;
+	if ((v = hv_fetch(h, "no_simd", 7, 0))     && SvTRUE(*v))      flags |= MDS_FLAG_NO_SIMD;
+	if ((v = hv_fetch(h, "strict_utf8", 11, 0)) && SvTRUE(*v))     flags |= MDS_FLAG_STRICT_UTF8;
+	if ((v = hv_fetch(h, "headers",         7,  0)) && !SvTRUE(*v)) flags |= MDS_FLAG_NO_HEADINGS;
+	if ((v = hv_fetch(h, "italic",          6,  0)) && !SvTRUE(*v)) flags |= MDS_FLAG_NO_EMPH;
+	if ((v = hv_fetch(h, "bold",            4,  0)) && !SvTRUE(*v)) flags |= MDS_FLAG_NO_STRONG;
+	if ((v = hv_fetch(h, "code",            4,  0)) && !SvTRUE(*v)) flags |= MDS_FLAG_NO_CODE;
+	if ((v = hv_fetch(h, "links",           5,  0)) && !SvTRUE(*v)) flags |= MDS_FLAG_NO_LINKS;
+	if ((v = hv_fetch(h, "images",          6,  0)) && !SvTRUE(*v)) flags |= MDS_FLAG_NO_IMAGES;
+	if ((v = hv_fetch(h, "ordered_lists",   13, 0)) && !SvTRUE(*v)) flags |= MDS_FLAG_NO_ORDERED_LISTS;
+	if ((v = hv_fetch(h, "unordered_lists", 15, 0)) && !SvTRUE(*v)) flags |= MDS_FLAG_NO_UNORDERED_LISTS;
+	if ((v = hv_fetch(h, "blockquote",      10, 0)) && !SvTRUE(*v)) flags |= MDS_FLAG_NO_QUOTES;
+	if ((v = hv_fetch(h, "thematic_break",  14, 0)) && !SvTRUE(*v)) flags |= MDS_FLAG_NO_THEMATIC_BREAK;
+	if ((v = hv_fetch(h, "fenced_code",     11, 0)) && !SvTRUE(*v)) flags |= MDS_FLAG_NO_FENCED_CODE;
+	if ((v = hv_fetch(h, "indented_code",   13, 0)) && !SvTRUE(*v)) flags |= MDS_FLAG_NO_INDENTED_CODE;
+	if ((v = hv_fetch(h, "html",            4,  0)) && !SvTRUE(*v)) flags |= MDS_FLAG_NO_HTML;
+	if ((v = hv_fetch(h, "references",      10, 0)) && !SvTRUE(*v)) flags |= MDS_FLAG_NO_REFERENCES;
+	return flags;
+}
+
+/* Persistent session struct. The arena's head page is kept warm between
+ * render() calls by mds_arena_reset, eliminating the per-parse malloc
+ * for sub-page workloads, and the block-scanner scratch buffers are
+ * persisted alongside so realloc traffic is amortised. */
+typedef struct mds_session {
+	mds_arena         arena;
+	mds_block_scratch scratch;
+	unsigned          flags;
+} mds_session;
+
+/* Magic glue: a Markdown::Simple object is a blessed SVRV whose IV slot
+ * holds an mds_session* pointer. The pointer is owned by an
+ * ext-magic record attached to that IV, so the session is released
+ * automatically when the SV is destroyed (covering scope exit, undef,
+ * and global destruction without a Perl-level DESTROY method).
+ */
+static int mds_session_mg_free(pTHX_ SV* sv, MAGIC* mg) {
+	PERL_UNUSED_ARG(sv);
+	mds_session* s = (mds_session*)mg->mg_ptr;
+	if (s) {
+		mds_arena_free(&s->arena);
+		mds_block_scratch_free(&s->scratch);
+		free(s);
+		mg->mg_ptr = NULL;
+	}
+	return 0;
+}
+
+static MGVTBL mds_session_mg_vtbl = {
+	NULL,                  /* get   */
+	NULL,                  /* set   */
+	NULL,                  /* len   */
+	NULL,                  /* clear */
+	mds_session_mg_free,   /* free  */
+	NULL,                  /* copy  */
+	NULL,                  /* dup   */
+	NULL                   /* local */
+};
+
+/* Look up the session pointer from a blessed SVRV ($self). Croaks on
+ * mismatch so misuse fails loudly rather than dereferencing garbage. */
+static mds_session* mds_session_from_self(pTHX_ SV* self, const char* who) {
+	SV* iv;
+	MAGIC* mg;
+	if (!self || !SvROK(self))
+		croak("%s: invalid invocant (expected a Markdown::Simple object)", who);
+	iv = SvRV(self);
+	for (mg = SvMAGIC(iv); mg; mg = mg->mg_moremagic) {
+		if (mg->mg_type == PERL_MAGIC_ext && mg->mg_virtual == &mds_session_mg_vtbl)
+			return (mds_session*)mg->mg_ptr;
+	}
+	croak("%s: invocant has no Markdown::Simple session attached", who);
+	return NULL; /* not reached */
 }
 
 MODULE = Markdown::Simple    PACKAGE = Markdown::Simple
@@ -575,28 +293,337 @@ OUTPUT:
 
 SV*
 markdown_to_html(input, ...)
-	const char* input
-PREINIT:
-	MarkdownOptions opts = {1, 1,1,1,1,1,1,1,1,1,1,1,1};
-	HV* options;
-	SV** val;
+	SV* input;
 CODE:
-	if (items > 1 && SvOK(ST(1)) && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV) {
-		options = (HV*)SvRV(ST(1));
-		if ((val = hv_fetch(options, "headers", 7, 0)) && SvOK(*val)) opts.enable_headers = SvTRUE(*val);
-		if ((val = hv_fetch(options, "bold", 4, 0)) && SvOK(*val)) opts.enable_bold = SvTRUE(*val);
-		if (val = hv_fetch(options, "italic", 6, 0)) opts.enable_italic = SvTRUE(*val);
-		if (val = hv_fetch(options, "links", 5, 0)) opts.enable_links = SvTRUE(*val);
-		if (val = hv_fetch(options, "images", 6, 0)) opts.enable_images = SvTRUE(*val);
-		if (val = hv_fetch(options, "code", 4, 0)) opts.enable_code = SvTRUE(*val);
-		if (val = hv_fetch(options, "tables", 6, 0)) opts.enable_tables = SvTRUE(*val);
-		if (val = hv_fetch(options, "tasklist", 8, 0)) opts.enable_tasklist = SvTRUE(*val);
-		if (val = hv_fetch(options, "fenced_code", 11, 0)) opts.enable_fenced_code = SvTRUE(*val);
-		if (val = hv_fetch(options, "strikethrough", 13, 0)) opts.enable_strikethrough = SvTRUE(*val);
-		if (val = hv_fetch(options, "ordered_lists", 13, 0)) opts.enable_ordered_lists = SvTRUE(*val);
-		if (val = hv_fetch(options, "unordered_lists", 15, 0)) opts.enable_unordered_lists = SvTRUE(*val);
-		if (val = hv_fetch(options, "preprocess", 10, 0)) opts.enable_preprocess = SvTRUE(*val);
+{
+	STRLEN n;
+	const char* s = SvPV(input, n);
+	SV* out = newSVpv("", 0);
+	HV* h = (items > 1 && SvOK(ST(1)) && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV)
+		? (HV*)SvRV(ST(1)) : NULL;
+	unsigned flags = mds_flags_from_hv(aTHX_ h);
+	mds_render_html_to_sv(aTHX_ s, n, flags, out);
+	if (SvCUR(out) == 0 && (flags & MDS_FLAG_STRICT_UTF8) && n) {
+		/* Distinguish "empty input" from "rejected as malformed UTF-8". */
+		const mds_simd_ops* ops = (flags & MDS_FLAG_NO_SIMD)
+			? mds_simd_ops_scalar() : mds_simd_get();
+		if (!ops->validate_utf8(s, n))
+			croak("markdown_to_html: input is not valid UTF-8");
 	}
-	RETVAL = markdown_to_html(input, &opts);
+	RETVAL = out;
+}
 OUTPUT:
 	RETVAL
+
+# ---- Persistent session (reusable arena) -------------------------------
+# Markdown::Simple->new(\%opts) -> blessed object owning a warm parser
+# $self->render($markdown)       -> SV with rendered HTML
+# $self->flags                   -> integer flag mask (read-only)
+#
+# The session is released by SV magic when the object goes out of scope;
+# no explicit DESTROY method is required.
+
+SV*
+new(class, opts = NULL)
+	SV* class;
+	SV* opts;
+PREINIT:
+	HV* h = NULL;
+	HV* stash;
+	mds_session* s;
+	SV* iv;
+	SV* rv;
+	const char* klass;
+CODE:
+{
+	if (opts && SvOK(opts)) {
+		if (!SvROK(opts) || SvTYPE(SvRV(opts)) != SVt_PVHV)
+			croak("Markdown::Simple::new: options must be a HASH reference");
+		h = (HV*)SvRV(opts);
+	}
+	if (!SvOK(class))
+		croak("Markdown::Simple::new: missing class name");
+	klass = SvROK(class) ? sv_reftype(SvRV(class), 1) : SvPV_nolen(class);
+	stash = gv_stashpv(klass, GV_ADD);
+
+	s = (mds_session*)malloc(sizeof(mds_session));
+	if (!s) croak("Markdown::Simple::new: out of memory");
+	mds_arena_init(&s->arena);
+	memset(&s->scratch, 0, sizeof s->scratch);
+	s->flags = mds_flags_from_hv(aTHX_ h);
+
+	iv = newSViv(0);
+	sv_magicext(iv, NULL, PERL_MAGIC_ext, &mds_session_mg_vtbl, (const char*)s, 0);
+	rv = newRV_noinc(iv);
+	sv_bless(rv, stash);
+	RETVAL = rv;
+}
+OUTPUT:
+	RETVAL
+
+SV*
+render(self, input)
+	SV* self;
+	SV* input;
+PREINIT:
+	mds_session* s;
+	STRLEN n;
+	const char* in;
+	SV* out;
+CODE:
+{
+	s = mds_session_from_self(aTHX_ self, "Markdown::Simple::render");
+	in = SvOK(input) ? SvPV(input, n) : (n = 0, "");
+	out = newSVpv("", 0);
+	mds_render_html_to_sv_ex(aTHX_ in, n, s->flags, out, &s->arena, &s->scratch);
+	if (SvCUR(out) == 0 && (s->flags & MDS_FLAG_STRICT_UTF8) && n) {
+		const mds_simd_ops* ops = (s->flags & MDS_FLAG_NO_SIMD)
+			? mds_simd_ops_scalar() : mds_simd_get();
+		if (!ops->validate_utf8(in, n))
+			croak("render: input is not valid UTF-8");
+	}
+	RETVAL = out;
+}
+OUTPUT:
+	RETVAL
+
+UV
+flags(self)
+	SV* self;
+CODE:
+{
+	mds_session* s = mds_session_from_self(aTHX_ self, "Markdown::Simple::flags");
+	RETVAL = (UV)s->flags;
+}
+OUTPUT:
+	RETVAL
+
+# ---- SIMD backend introspection ----------------------------------------
+
+SV*
+_simd_backend()
+CODE:
+{
+	RETVAL = newSVpv(mds_simd_backend(), 0);
+}
+OUTPUT:
+	RETVAL
+
+void
+_simd_force_scalar(on)
+	int on;
+CODE:
+{
+	mds_simd_force_scalar(on);
+}
+
+# ---- Classifier introspection (test-only) ------------------------------
+# _classify_structural($bytes)        -- runs the *active* backend
+# _classify_structural_scalar($bytes) -- runs the scalar reference
+# Both return a byte string of ceil(len/8) bytes; bit i (LSB-first within
+# each byte) is set iff input byte i is structural.
+
+SV*
+_classify_structural(input)
+	SV* input;
+CODE:
+{
+	STRLEN n; const char* s = SvPV(input, n);
+	size_t words = (n + 63) >> 6;
+	if (!words) words = 1;
+	uint64_t* bm = (uint64_t*)calloc(words, sizeof(uint64_t));
+	if (!bm) croak("oom");
+	mds_simd_get()->classify_structural(s, n, bm);
+	size_t out_bytes = (n + 7) >> 3;
+	RETVAL = newSVpvn((const char*)bm, out_bytes);
+	free(bm);
+}
+OUTPUT:
+	RETVAL
+
+SV*
+_classify_structural_scalar(input)
+	SV* input;
+CODE:
+{
+	STRLEN n; const char* s = SvPV(input, n);
+	size_t words = (n + 63) >> 6;
+	if (!words) words = 1;
+	uint64_t* bm = (uint64_t*)calloc(words, sizeof(uint64_t));
+	if (!bm) croak("oom");
+	mds_simd_ops_scalar()->classify_structural(s, n, bm);
+	size_t out_bytes = (n + 7) >> 3;
+	RETVAL = newSVpvn((const char*)bm, out_bytes);
+	free(bm);
+}
+OUTPUT:
+	RETVAL
+
+# ---- UTF-8 validator + line scanner (test-only) ------------------------
+
+int
+_validate_utf8(input)
+	SV* input;
+CODE:
+{
+	STRLEN n; const char* s = SvPV(input, n);
+	RETVAL = mds_simd_get()->validate_utf8(s, n);
+}
+OUTPUT:
+	RETVAL
+
+int
+_validate_utf8_scalar(input)
+	SV* input;
+CODE:
+{
+	STRLEN n; const char* s = SvPV(input, n);
+	RETVAL = mds_simd_ops_scalar()->validate_utf8(s, n);
+}
+OUTPUT:
+	RETVAL
+
+# Both _find_newlines variants return:
+#   - undef when the offset table overflows the provided cap, or
+#   - a packed string of native-endian uint32_t values (one per '\n').
+SV*
+_find_newlines(input)
+	SV* input;
+CODE:
+{
+	STRLEN n; const char* s = SvPV(input, n);
+	size_t cap = n ? n : 1;
+	uint32_t* offs = (uint32_t*)malloc(cap * sizeof(uint32_t));
+	if (!offs) croak("oom");
+	size_t k = mds_simd_get()->find_newlines(s, n, offs, cap);
+	if (k == (size_t)-1) { free(offs); XSRETURN_UNDEF; }
+	RETVAL = newSVpvn((const char*)offs, k * sizeof(uint32_t));
+	free(offs);
+}
+OUTPUT:
+	RETVAL
+
+SV*
+_find_newlines_scalar(input)
+	SV* input;
+CODE:
+{
+	STRLEN n; const char* s = SvPV(input, n);
+	size_t cap = n ? n : 1;
+	uint32_t* offs = (uint32_t*)malloc(cap * sizeof(uint32_t));
+	if (!offs) croak("oom");
+	size_t k = mds_simd_ops_scalar()->find_newlines(s, n, offs, cap);
+	if (k == (size_t)-1) { free(offs); XSRETURN_UNDEF; }
+	RETVAL = newSVpvn((const char*)offs, k * sizeof(uint32_t));
+	free(offs);
+}
+OUTPUT:
+	RETVAL
+
+# Bounded-cap variant for testing the overflow sentinel path.
+SV*
+_find_newlines_capped(input, cap)
+	SV* input;
+	int cap;
+CODE:
+{
+	STRLEN n; const char* s = SvPV(input, n);
+	size_t cc = cap < 0 ? 0 : (size_t)cap;
+	uint32_t* offs = cc ? (uint32_t*)malloc(cc * sizeof(uint32_t)) : NULL;
+	size_t k = mds_simd_get()->find_newlines(s, n, offs, cc);
+	if (k == (size_t)-1) { free(offs); XSRETURN_UNDEF; }
+	RETVAL = newSVpvn(offs ? (const char*)offs : "", k * sizeof(uint32_t));
+	free(offs);
+}
+OUTPUT:
+	RETVAL
+
+# ---- Arena profile from the last parse ---------------------------------
+# Returns a hashref describing arena usage from the most recent call to
+# mds_render_html_to_sv. Intended for bench/profile_arena.pl; not
+# thread-safe (the underlying snapshot is a single static).
+
+SV*
+_last_arena_profile()
+CODE:
+{
+	HV* h = newHV();
+	hv_stores(h, "total_alloc",    newSVuv((UV)mds_last_arena_profile.total_alloc));
+	hv_stores(h, "page_count",     newSVuv((UV)mds_last_arena_profile.page_count));
+	hv_stores(h, "big_count",      newSVuv((UV)mds_last_arena_profile.big_count));
+	hv_stores(h, "big_bytes",      newSVuv((UV)mds_last_arena_profile.big_bytes));
+	hv_stores(h, "head_used_last", newSVuv((UV)mds_last_arena_profile.head_used_last));
+	hv_stores(h, "head_cap_last",  newSVuv((UV)mds_last_arena_profile.head_cap_last));
+	hv_stores(h, "page_size",      newSVuv((UV)MDS_ARENA_PAGE));
+	hv_stores(h, "big_threshold",  newSVuv((UV)MDS_ARENA_BIG));
+	RETVAL = newRV_noinc((SV*)h);
+}
+OUTPUT:
+	RETVAL
+
+# ---- Arena + buffer self-tests -----------------------------------------
+
+SV*
+_arena_test()
+CODE:
+{
+	/* Exercise alignment, page chaining, and the big-alloc path. */
+	mds_arena a;
+	mds_arena_init(&a);
+
+	/* 1. Alignment: every returned pointer is MDS_ARENA_ALIGN-aligned. */
+	int aligned_ok = 1;
+	for (int i = 0; i < 64; i++) {
+		void* p = mds_arena_alloc(&a, 1 + (i * 7));
+		if (((uintptr_t)p) & (MDS_ARENA_ALIGN - 1)) { aligned_ok = 0; break; }
+	}
+
+	/* 2. Page chaining: allocate enough to force a second page. */
+	for (size_t i = 0; i < 200; i++) mds_arena_alloc(&a, 1024);
+	int chained_ok = (a.head && a.head->next != NULL);
+
+	/* 3. Big-alloc: > MDS_ARENA_BIG goes to dedicated page. */
+	void* big = mds_arena_alloc(&a, MDS_ARENA_BIG * 2);
+	int big_ok = (big != NULL && a.big != NULL);
+
+	/* 4. Reset: walks back to single warm page, no big pages. */
+	mds_arena_reset(&a);
+	int reset_ok = (a.head && a.head->next == NULL && a.big == NULL);
+
+	mds_arena_free(&a);
+
+	HV* h = newHV();
+	hv_stores(h, "aligned",  newSViv(aligned_ok));
+	hv_stores(h, "chained",  newSViv(chained_ok));
+	hv_stores(h, "big",      newSViv(big_ok));
+	hv_stores(h, "reset",    newSViv(reset_ok));
+	RETVAL = newRV_noinc((SV*)h);
+}
+OUTPUT:
+	RETVAL
+
+SV*
+_buf_test()
+CODE:
+{
+	/* Exercise mds_buf: grows, preserves contents, finalises SvCUR. */
+	SV* out = newSVpv("", 0);
+	mds_buf b;
+	mds_buf_init(aTHX_ &b, out, 8);   /* tiny hint to force growth */
+	for (int i = 0; i < 1000; i++) mds_buf_write(aTHX_ &b, "abcdef", 6);
+	mds_buf_finalize(aTHX_ &b);
+
+	int len_ok = (SvCUR(out) == 6000);
+	const char* p = SvPVX(out);
+	int data_ok = (memcmp(p, "abcdef", 6) == 0 &&
+	               memcmp(p + 5994, "abcdef", 6) == 0);
+
+	HV* h = newHV();
+	hv_stores(h, "len",  newSViv(len_ok));
+	hv_stores(h, "data", newSViv(data_ok));
+	SvREFCNT_dec(out);
+	RETVAL = newRV_noinc((SV*)h);
+}
+OUTPUT:
+	RETVAL
+

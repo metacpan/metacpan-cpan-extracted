@@ -12,7 +12,7 @@ $eumm_version =~ s/_//;
 
 my $module = 'DBIx::RunSQL';
 (my $main_file = "lib/$module.pm" ) =~ s!::!/!g;
-(my $distbase = $module) =~ s!::!-!g;
+(my $distbase = $module) =~ s!::!--!g;
 my $distlink = $distbase;
 
 my @tests = map { glob $_ } 't/*.t', 't/*/*.t';

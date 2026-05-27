@@ -18,7 +18,7 @@ sub bench {
 
 printf "Data::Log::Shared single-process benchmark (%d ops)\n\n", $N;
 
-# small entries
+# small entries — v2 slot = 8 header + 12 data = 20B (already aligned)
 my $log = Data::Log::Shared->new(undef, $N * 20);
 bench "append (12B entries)", $N, sub {
     $log->append("hello world!") for 1..$N;
@@ -33,10 +33,10 @@ bench "read_entry sequential", $N, sub {
     }
 };
 
-# larger entries — separate log sized for 200B payloads
+# larger entries — v2 slot = 8 header + 200 data + 4 pad = 212B
 my $big = "x" x 200;
 my $big_n = int($N / 5);
-my $big_log = Data::Log::Shared->new(undef, $big_n * 210);
+my $big_log = Data::Log::Shared->new(undef, $big_n * 212);
 bench "append (200B entries)", $big_n, sub {
     $big_log->append($big) for 1..$big_n;
 };

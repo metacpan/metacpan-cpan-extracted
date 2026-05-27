@@ -1,5 +1,5 @@
 package Gears;
-$Gears::VERSION = '0.102';
+$Gears::VERSION = '0.104';
 ###################################################
 # ~~~~~~~~~~ We fear not our mortality ~~~~~~~~~~ #
 # ~~~~ We'll serve to the best of our ability ~~~ #

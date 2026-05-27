@@ -16,6 +16,7 @@ use strict;
 # readable once the shared lock is granted.
 
 use IPC::Shareable qw(:lock);
+IPC::Shareable->testing_set('IPC::Shareable');
 use Test::More;
 use Test::SharedFork;
 use Time::HiRes qw(time);

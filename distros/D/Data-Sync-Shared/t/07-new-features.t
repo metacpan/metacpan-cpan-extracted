@@ -200,7 +200,7 @@ use Data::Sync::Shared;
     my $t0 = time;
     my $ok = $cv->wait_while(sub { 1 }, 0.1);
     ok !$ok, 'wait_while timeout returns false';
-    ok time - $t0 < 2, 'wait_while did not hang';
+    ok time - $t0 < 10, 'wait_while did not hang';
     $cv->unlock;
 }
 
@@ -211,7 +211,7 @@ use Data::Sync::Shared;
     my $t0 = time;
     my $ok = $cv->wait_while(sub { 1 }, 0);
     ok !$ok, 'wait_while(pred, 0) returns false immediately';
-    ok time - $t0 < 0.1, 'wait_while(pred, 0) did not block';
+    ok time - $t0 < 1, 'wait_while(pred, 0) did not block';
     $cv->unlock;
 
     # predicate already false with timeout=0

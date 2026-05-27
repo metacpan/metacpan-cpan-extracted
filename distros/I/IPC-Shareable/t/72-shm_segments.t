@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 use IPC::Shareable;
+IPC::Shareable->testing_set('IPC::Shareable');
 use IPC::SysV qw(IPC_CREAT IPC_RMID);
 use Test::More;
 

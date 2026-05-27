@@ -10,7 +10,7 @@ use parent 'Crypt::Passphrase::Validator';
 use Digest 1.19  ();
 use MIME::Base64 ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # ABSTRACT: Validate against Crypt::SaltedHash hashes with Crypt::Passphrase
 
@@ -30,6 +30,8 @@ my  %DIGESTS = (
     SHA512  => [ 512, "SHA-512" ],
 );
 
+my $ALGS = join( "|", keys %DIGESTS );
+
 
 sub new {
     my $class = shift;
@@ -38,14 +40,14 @@ sub new {
 
 sub accepts_hash {
     my ( $self,     $hash ) = @_;
-    my ( $has_salt, $alg )  = $hash =~ /^\{(S)?(\w+)\}/ or return;
+    my ( $has_salt, $alg )  = $hash =~ /^\{(S)?(${ALGS})\}/ or return;
     return exists $DIGESTS{ uc $alg };
 }
 
 sub verify_password {
     my ( $self, $password, $hash ) = @_;
 
-    my ( $has_salt, $alg ) = $hash =~ /^\{(S)?(\w+)\}/ or return;
+    my ( $has_salt, $alg ) = $hash =~ /^\{(S)?(${ALGS})\}/ or return;
     my $meta = $DIGESTS{ uc $alg } or return;
 
     my $name   = $meta->[1] || $alg;
@@ -75,7 +77,7 @@ Crypt::Passphrase::SaltedHash - Validate against Crypt::SaltedHash hashes with C
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 

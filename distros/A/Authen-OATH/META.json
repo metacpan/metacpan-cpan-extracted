@@ -69,8 +69,10 @@
             "Digest::SHA" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
+            "Test2::Require::Module" : "0",
+            "Test2::V0" : "0",
             "Test::More" : "0",
-            "Test::Needs" : "0",
+            "bignum" : "0",
             "perl" : "5.006"
          }
       }
@@ -87,7 +89,7 @@
          "web" : "https://github.com/oalders/authen-oath"
       }
    },
-   "version" : "3.000000",
+   "version" : "3.000001",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.042002"
@@ -647,7 +649,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v3.000000",
+                  "tag" : "v3.000001",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -825,6 +827,7 @@
       }
    },
    "x_contributors" : [
+      "dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
       "John Wittkoski <jwittkoski@gmail.com>",
       "Kurt Kincaid <sifukurt@yahoo.com>",
       "Olaf Alders <olaf@wundersolutions.com>"

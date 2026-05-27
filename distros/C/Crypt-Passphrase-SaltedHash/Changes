@@ -1,8 +1,18 @@
 Revision history for Crypt-Passphrase-SaltedHash:
 
+0.03      2026-05-26 17:56:57+01:00 Europe/London
+  [Bug Fixes]
+  - Handle hashes without salts.
+
+  [Documentation]
+  - Amended Changes.
+
+  [Tests]
+  - Added test cases.
+
 0.02      2026-05-23 16:31:44+01:00 Europe/London
   [Tests]
-  - Changed Crypt::SaltedHash to be an optional prerequisite.
+  - Changed Crypt::SaltedHash to be an optional prerequisite. ++@leont
 
 0.01      2026-05-23 07:22:47+01:00 Europe/London
   - Initial version released.

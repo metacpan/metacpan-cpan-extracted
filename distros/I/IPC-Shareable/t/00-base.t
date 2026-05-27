@@ -8,6 +8,9 @@ BEGIN {
     use_ok('IPC::Shareable');
 };
 
+IPC::Shareable->clean_up_testing('IPC::Shareable');
+IPC::Shareable->testing_set('IPC::Shareable');
+
 my $segs_before = IPC::Shareable::seg_count();
 my $sems_before = IPC::Shareable::sem_count();
 warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};

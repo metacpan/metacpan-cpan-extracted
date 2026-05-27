@@ -2,6 +2,7 @@ use warnings;
 use strict;
 
 use IPC::Shareable;
+IPC::Shareable->testing_set('IPC::Shareable');
 use Test::More;
 
 my $mod = 'IPC::Shareable';

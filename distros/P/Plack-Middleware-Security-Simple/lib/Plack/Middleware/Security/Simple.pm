@@ -17,7 +17,7 @@ use Plack::Util::Accessor qw( rules handler status );
 
 # RECOMMEND PREREQ: Ref::Util::XS
 
-our $VERSION = 'v0.13.0';
+our $VERSION = 'v0.13.1';
 
 
 sub prepare_app {
@@ -79,7 +79,7 @@ Plack::Middleware::Security::Simple - A simple security filter for Plack
 
 =head1 VERSION
 
-version v0.13.0
+version v0.13.1
 
 =head1 SYNOPSIS
 
@@ -105,7 +105,7 @@ applications, so that you can filter out obvious exploit-seeking
 scripts.
 
 Note that as an alternative, you may want to consider using something like
-L<modsecurity|https://modsecurity.org/> as a filter in a reverse proxy.
+L<https://modsecurity.org|modsecurity> as a filter in a reverse proxy.
 
 =head1 ATTRIBUTES
 
@@ -136,7 +136,7 @@ The message is of the form
 
   Plack::Middleware::Security::Simple Blocked $ip $method $path_query HTTP $status
 
-This can be used if you are writing L<fail2ban> filters.
+This can be used if you are writing L<https://github.com/fail2ban/fail2ban|fail2ban> filters.
 
 =head2 status
 
@@ -160,7 +160,7 @@ L<PSGI>
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/robrwo/Plack-Middleware-Security-Simple>
-and may be cloned from L<git://github.com/robrwo/Plack-Middleware-Security-Simple.git>
+and may be cloned from L<https://github.com/robrwo/Plack-Middleware-Security-Simple.git>
 
 =head1 BUGS
 
@@ -178,11 +178,11 @@ report security vulnerabilities.
 
 =head1 AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014,2018-2025 by Robert Rothenberg.
+This software is Copyright (c) 2014,2018-2026 by Robert Rothenberg.
 
 This is free software, licensed under:
 

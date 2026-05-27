@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::Author::GETTY::Docker;
 # ABSTRACT: Docker image subsection for @Author::GETTY
-our $VERSION = '0.312';
+our $VERSION = '0.315';
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
 
@@ -42,7 +42,7 @@ sub configure {
   $plugin_args{_network_mode} = $payload->{network_mode} if defined $payload->{network_mode};
 
   for my $k (qw(
-    dockerfile build_arg label platform release_load
+    dockerfile build_arg label platform release_load build_verbose
     pull no_cache rm force_rm fail_if_tag_exists skip_latest_on_trial
   )) {
     $plugin_args{$k} = $payload->{$k} if exists $payload->{$k};
@@ -75,7 +75,7 @@ Dist::Zilla::PluginBundle::Author::GETTY::Docker - Docker image subsection for @
 
 =head1 VERSION
 
-version 0.312
+version 0.315
 
 =head1 SYNOPSIS
 
@@ -149,7 +149,7 @@ Image label. Multi-value.
 
 Target platform (C<--platform>). Multi-value.
 
-=head2 release_load, pull, no_cache, rm, force_rm, fail_if_tag_exists, skip_latest_on_trial
+=head2 release_load, build_verbose, pull, no_cache, rm, force_rm, fail_if_tag_exists, skip_latest_on_trial
 
 Passed through directly to L<Dist::Zilla::Plugin::Docker::API>.
 

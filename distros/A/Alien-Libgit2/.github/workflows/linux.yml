@@ -1,0 +1,68 @@
+name: linux
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+jobs:
+  # System libgit2 via pkg-config (probe path).
+  system-libgit2:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        codename:
+          - bookworm
+        perl-version:
+          - '5.36'
+          - '5.38'
+          - '5.40'
+    container:
+      image: perl:${{ matrix.perl-version }}-${{ matrix.codename }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix safe.directory
+        run: git config --global --add safe.directory /__w/p5-alien-libgit2/p5-alien-libgit2
+      - name: perl -V
+        run: perl -V
+      - name: Install build prerequisites
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            libgit2-dev pkg-config git
+      - name: dzil test
+        uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+
+  # Share build (vendored libgit2 + cmake).
+  share-build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        codename:
+          - bookworm
+        perl-version:
+          - '5.40'
+    container:
+      image: perl:${{ matrix.perl-version }}-${{ matrix.codename }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix safe.directory
+        run: git config --global --add safe.directory /__w/p5-alien-libgit2/p5-alien-libgit2
+      - name: Install build prerequisites
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            cmake build-essential libssl-dev libssh2-1-dev zlib1g-dev pkg-config git
+      # Build::CMake injects Alien::cmake3 as a *dynamic* configure prereq only
+      # for share builds, so it never reaches the static metadata that the
+      # dzil-test action installs from. Install it explicitly here; it picks up
+      # the apt cmake above and builds nothing.
+      - name: Install Alien::cmake3 (dynamic share-build prereq)
+        run: cpanm -nq Alien::cmake3
+      - name: dzil test (share build)
+        uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+        with:
+          install-type: share

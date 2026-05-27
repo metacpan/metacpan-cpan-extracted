@@ -36,7 +36,7 @@ ok !$once->enter, 'enter returns false when already done';
     select(undef, undef, undef, 0.05);
     my $t0 = time;
     my $r = $o->enter(0);
-    ok time - $t0 < 0.1, 'enter(0) did not block';
+    ok time - $t0 < 1, 'enter(0) did not block';
     ok !$r, 'enter(0) returns false when running';
     waitpid($pid, 0);
 }

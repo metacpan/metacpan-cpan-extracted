@@ -1,5 +1,5 @@
 package Gears::Router;
-$Gears::Router::VERSION = '0.102';
+$Gears::Router::VERSION = '0.104';
 use v5.40;
 use Mooish::Base -standard;
 
@@ -11,6 +11,11 @@ with qw(Gears::Router::Proto);
 has extended 'router' => (
 	init_arg => undef,
 	default => sub ($self) { $self },
+);
+
+has param 'pattern_separator' => (
+	isa => Str,
+	default => '/',
 );
 
 # base route is an empty string
@@ -195,6 +200,17 @@ An array reference of L<Gears::Router::Location> objects representing the
 registered route patterns.
 
 I<Not available in constructor>
+
+=head3 pattern_separator
+
+A string used as a separator for patterns - when a location is added under
+another location, their patterns will be joined using this separator, and
+trailing separator from parent and leading separator from child will be
+stripped.
+
+By default, C</> character is used.
+
+I<Available in constructor>
 
 =head2 Methods
 

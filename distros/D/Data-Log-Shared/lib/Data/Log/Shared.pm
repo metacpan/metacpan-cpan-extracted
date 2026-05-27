@@ -1,19 +1,20 @@
 package Data::Log::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 require XSLoader;
 XSLoader::load('Data::Log::Shared', $VERSION);
 
 sub each_entry {
-    my ($self, $cb, $from) = @_;
+    my ($self, $cb, $from, $abandon_wait_us) = @_;
     $from //= 0;
     my $trunc = $self->truncation;
     $from = $trunc if $from < $trunc;
+    my @wait = defined $abandon_wait_us ? ($abandon_wait_us) : ();
     while (1) {
-        my ($data, $next) = $self->read_entry($from);
-        last unless defined $data;
-        $cb->($data, $from);
+        my ($data, $next) = $self->read_entry($from, @wait);
+        last unless defined $next;            # end of log / uncommitted in-flight
+        $cb->($data, $from) if defined $data; # skip abandoned slots silently
         $from = $next;
     }
     return $from;
@@ -36,15 +37,19 @@ Data::Log::Shared - Append-only shared-memory log (WAL) for Linux
     my $off = $log->append("first entry");
     $log->append("second entry");
 
-    # replay from beginning
+    # replay from beginning (each_entry skips abandoned slots silently)
+    $log->each_entry(sub {
+        my ($data, $offset) = @_;
+        say "offset=$offset: $data";
+    });
+
+    # or manually — guard with `defined $data` since a slot from a
+    # crashed writer is reported as (undef, $next)
     my $pos = 0;
     while (my ($data, $next) = $log->read_entry($pos)) {
-        say "offset=$pos: $data";
+        say "offset=$pos: $data" if defined $data;
         $pos = $next;
     }
-
-    # iterate
-    $log->each_entry(sub { say $_[0] });
 
     # tail: block until new entries
     my $count = $log->entry_count;
@@ -79,12 +84,40 @@ is the internal uncommitted marker).
 =head2 Read
 
     my ($data, $next_off) = $log->read_entry($offset);
-    # returns () if no entry at offset (end of log or uncommitted)
+    my ($data, $next_off) = $log->read_entry($offset, $abandon_wait_us);
+    # returns () if no entry at offset (end of log or in-flight writer)
+    # returns (undef, $next_off) if slot was abandoned by a crashed writer
+
+C<read_entry> distinguishes three cases:
+
+=over
+
+=item * B<Entry available>: returns C<($data, $next_off)> where C<$data>
+is defined.
+
+=item * B<End / in-flight>: returns the empty list. The caller should
+stop iterating (or wait via C<wait_for>) and retry.
+
+=item * B<Abandoned slot>: a writer reserved the slot via CAS but died
+before committing C<len>. After a bounded wait (default 2s, configurable
+via the optional second argument C<$abandon_wait_us>) the reader skips
+the slot, returning C<(undef, $next_off)>. Pass C<0> to skip immediately
+without waiting.
+
+=back
+
+C<each_entry> handles all three cases internally, silently skipping
+abandoned slots:
 
     my $final_pos = $log->each_entry(sub {
         my ($data, $offset) = @_;
     });
     my $final_pos = $log->each_entry(\&cb, $start_offset);
+    my $final_pos = $log->each_entry(\&cb, $start_offset, $abandon_wait_us);
+
+C<$abandon_wait_us> is forwarded to C<read_entry>; pass C<0> to skip
+uncommitted slots immediately rather than waiting up to 2s for an
+in-flight writer.
 
 =head2 Status
 
@@ -120,9 +153,10 @@ C<read_entry> or C<each_entry> will skip them. However, truncation
 does B<not> free physical space: the tail offset keeps advancing,
 and the log will eventually fill regardless of truncation.
 
-C<reset> reclaims all space by zeroing the tail, but is B<not>
-concurrency-safe — it must only be called when no other process is
-reading or writing.
+C<reset> reclaims all space by zeroing the tail and the data region.
+It is B<not> concurrency-safe — it must only be called when no other
+process is reading or writing. Cost is O(data_size) because the slot
+region is zeroed to prevent stale-data hazards for subsequent readers.
 
 Typical pattern for long-running logs: size the log generously,
 truncate periodically to discard old entries from readers, and

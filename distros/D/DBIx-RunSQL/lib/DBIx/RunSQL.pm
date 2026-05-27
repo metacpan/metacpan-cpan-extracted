@@ -6,7 +6,7 @@ use DBI;
 use Module::Load 'load';
 use Carp 'croak';
 
-our $VERSION = '0.26';
+our $VERSION = '0.27';
 
 =encoding utf8
 

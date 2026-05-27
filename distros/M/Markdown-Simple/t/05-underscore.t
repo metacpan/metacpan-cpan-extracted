@@ -1,16 +1,13 @@
+use strict;
+use warnings;
 use Test::More;
-
 use Markdown::Simple;
 
-my $markdown = q{
-__bold__ _italic_
+# Underscore variants of emphasis.
 
-- __bold__
-- _italic_
-};
+my $html = markdown_to_html("__bold__ _italic_\n\n- __bold__\n- _italic_\n");
+like $html, qr|<p><strong>bold</strong> <em>italic</em></p>|, 'underscore emphasis in paragraph';
+like $html, qr|<li><strong>bold</strong></li>|,              'underscore bold in list';
+like $html, qr|<li><em>italic</em></li>|,                    'underscore italic in list';
 
-my $html = markdown_to_html($markdown);
-
-is($html, '<div><strong>bold</strong> <em>italic</em></div><div><ul><li><strong>bold</strong></li><li><em>italic</em></li></ul></div>');
-
-done_testing();
+done_testing;

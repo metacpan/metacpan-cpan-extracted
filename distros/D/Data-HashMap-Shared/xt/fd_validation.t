@@ -6,7 +6,7 @@ use File::Temp qw(tempfile);
 use Data::HashMap::Shared::II;
 
 my $SHM_MAGIC   = 0x53484D31;   # SHM1
-my $SHM_VERSION = 7;
+my $SHM_VERSION = 9;
 my $SHM_VAR_II  = 3;            # shm_ii.h SHM_VARIANT_ID
 
 # 1. /dev/null rejection
@@ -14,7 +14,7 @@ SKIP: {
     open(my $fh, '<', '/dev/null') or skip "no /dev/null", 1;
     my $r = eval { Data::HashMap::Shared::II->new_from_fd(fileno($fh)) };
     ok !defined($r), '/dev/null rejected';
-    like $@, qr/(too small|invalid|fstat)/i, 'meaningful error';
+    like $@, qr/(too small|invalid|fstat|corrupt|bad magic|mismatch)/i, 'meaningful error';
 }
 
 # 2. Valid magic but bogus nodes_off/states_off

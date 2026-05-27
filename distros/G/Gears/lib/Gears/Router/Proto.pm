@@ -1,5 +1,5 @@
 package Gears::Router::Proto;
-$Gears::Router::Proto::VERSION = '0.102';
+$Gears::Router::Proto::VERSION = '0.104';
 use v5.40;
 use Mooish::Base -standard, -role;
 
@@ -19,10 +19,15 @@ has field 'locations' => (
 
 sub add ($self, $pattern, $data = {})
 {
+	my $sep = $self->router->pattern_separator;
+	my $full_pattern = ($self->pattern =~ s{\Q$sep\E$}{}r) . $sep . ($pattern =~ s{^\Q$sep\E}{}r);
+	$full_pattern =~ s{\Q$sep\E$}{}
+		unless $full_pattern eq $sep;
+
 	my $location = $self->router->_build_location(
 		$data->%*,
 		router => $self->router,
-		pattern => $self->pattern . $pattern,
+		pattern => $full_pattern,
 	);
 
 	push $self->locations->@*, $location;

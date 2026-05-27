@@ -1,6 +1,11 @@
 Revision history for Perl extension Net::DNS::Resolver::Unbound.
 
 
+**** 1.37  [unreleased]
+	Add DNSSEC example script.
+	Add TLS example script.
+
+
 **** 1.36  Jan 30, 2026
 	Add DNSSEC validation test script.
 

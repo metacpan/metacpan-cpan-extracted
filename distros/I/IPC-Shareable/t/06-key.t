@@ -3,6 +3,7 @@ use strict;
 
 use Data::Dumper;
 use IPC::Shareable;
+IPC::Shareable->testing_set('IPC::Shareable');
 use Mock::Sub;
 use Test::More;
 

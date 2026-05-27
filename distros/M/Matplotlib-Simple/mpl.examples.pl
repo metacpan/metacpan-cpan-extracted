@@ -1185,27 +1185,6 @@ plt({
 			  W => 'marker = "d", color = "green"'
 			},
 		},
-		{          # multiple-set scatter, labels are "X" and "Y"
-			data => {    # 8th plot,
-				X => {    # 1st data set; label is "X"
-					A => @e,    # x-axis
-					B => @b,    # y-axis
-					C => @a,    # color
-				},
-				Y => {    # 2nd data set; label is "Y"
-					A => generate_normal_dist( 100, 15, 210 ),    # x-axis
-					B => generate_normal_dist( 100, 15, 210 ),    # y-axis
-					C => generate_normal_dist( 100, 15, 210 ),    # color
-				},
-			},
-			'plot.type'   => 'scatter',
-			title         => 'Multiple Set Scatter w/ colorbar',
-			'set.options' => {    # arguments to ax.scatter, for each set in data
-				X => 'marker = "."',
-				Y => 'marker = "d"'     # diamond
-			},
-			color_key => 'Z',
-		},
 		{ # multiple-set scatter, labels are "X" and "Y"
 			data => {    # 8th plot,
 				X => {    # 1st data set; label is "X"
@@ -1730,6 +1709,49 @@ plt({
 	],
 	'output.file' => '/tmp/simple.arr.not.hash.svg'
 });
+plt({
+	data => {
+		rf => {
+		     MSE => [
+		         59709365.9463344, 59654498.901993,
+		         59735999.6104052, 59432384.4879875, 58988506.3229073,
+		     ],
+		     R2 => [
+		         0.0611943940556245, 0.0620570642245824,
+		         0.0607756350763545, 0.0655493514683765,
+		         0.0725284125106284,
+		     ],
+		     Spearman_rho => [
+		         0.295576700910224, 0.295879819192539,
+		         0.293366727260099, 0.298729938578399,
+		         0.29986932439962,
+		     ]
+		 },
+		 xgb => {
+		     MSE => [
+		         63731484.7389403, 66398497.7766184,
+		         66684906.4779721, 64244385.4014047,
+		         64190258.9460872,
+		     ],
+		     R2 => [
+		         -0.00204505942754252, -0.043978293036979,
+		         -0.0484814742408084,  -0.0101093556997043,
+		         -0.00925832975299401,
+		     ],
+		     Spearman_rho => [
+		         0.249657682686612, 0.210122890976946,
+		         0.212149227834186, 0.242231388004253,
+		         0.242916384549555,
+		     ]
+		 }
+    },
+	fh          => $fh,
+	execute     => 0,
+	'plot.type' => 'scatter',
+	color_key   => 'MSE',
+	'output.file' => '/tmp/scatter.multiset.colorkey.svg'
+});
+
 plt({
 	fh                => $fh,
 	execute           => 1,

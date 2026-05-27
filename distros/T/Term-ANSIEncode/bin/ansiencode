@@ -25,7 +25,7 @@ use constant {
 };
 
 use Time::HiRes      qw( sleep );
-use Term::ANSIEncode qw( ansi_colors );
+use Term::ANSIEncode; # qw( ansi_colors );
 use Getopt::Long;
 use List::Util qw(max);
 use Text::Format;
@@ -45,12 +45,13 @@ my $tokens     = FALSE;
 my $rawtokens  = FALSE;
 my $symbols    = FALSE;
 my $unicode    = FALSE;
-my $colors     = FALSE;
+                                                                                                                                                                                                                                                                                              my $colors     = FALSE;
 my $Dump       = FALSE;
 my $frames     = FALSE;
 my $rules      = FALSE;
 my $ansi_modes = FALSE;
-my $width      = 80, my $baud = 0;
+my $width      = 80;
+my $baud       = 0;
 my $speed      = 0;
 
 GetOptions(
@@ -78,53 +79,282 @@ if ($baud > 0) {
 
 my $ansi = Term::ANSIEncode->new('baud' => $baud, 'speed' => $speed, 'columns' => $width);
 
-my $header = '[% CLS %]For Best results, make sure your terminal type supports 256 (or more)
+my $header = <<'HEADER';
+[% CLS %]For Best results, make sure your terminal type supports 256 (or more)
 colors like "xterm-256color".  You should be using the "Awesome" fonts for
 access to all Unicode characters and symbols:
 
     http://github.com/gabrielelana/awesome-terminal-fonts
 
 I suggest "SourceCodePro-Powerline-Awesome" when selecting a font
-';
+
+HEADER
 
 ###
 
+# Only applicable unicode characters are used on lists.
 our @list = (0x20 .. 0x7F, 0xA0 .. 0xFF, 0x2010 .. 0x205F, 0x2070 .. 0x242F, 0x2440 .. 0x244F, 0x2460 .. 0x29FF, 0x1F300 .. 0x1F8BF, 0x1F900 .. 0x1FBBF, 0x1FBC0 .. 0x1FBCF, 0x1FBF0 .. 0x1FBFF,);
 
-my $bar = '[% BRIGHT GREEN %]│[% RESET %]';
+my $bar = q{[% BRIGHT GREEN %]│[% RESET %]};
 
 $| = 1;
 if ($version) {
     $ansi->ansi_output($ansi->get_version());
 } elsif ($ansi_modes) {
-    my $out = "\n[% B_YELLOW %][% BOLD %][% BLACK %]      ANSI Modes supported       [% RESET %]\n";
-    if ($ansi->{'CAPS'}->{'3 BIT'}) {
-        $out .= "    ANSI  3 BIT:  [% GREEN %]Supported[% RESET %]\n";
-    } else {
-        $out .= "    ANSI  3 BIT:  [% RED %]Not Supported[% RESET %]\n";
-    }
-    if ($ansi->{'CAPS'}->{'4 BIT'}) {
-        $out .= "    ANSI  4 BIT:  [% GREEN %]Supported[% RESET %]\n";
-    } else {
-        $out .= "    ANSI  4 BIT:  [% RED %]Not Supported[% RESET %]\n";
-    }
-    if ($ansi->{'CAPS'}->{'8 BIT'}) {
-        $out .= "    ANSI  8 BIT:  [% GREEN %]Supported[% RESET %]\n";
-    } else {
-        $out .= "    ANSI  8 BIT:  [% RED %]Not Supported[% RESET %]\n";
-    }
-    if ($ansi->{'CAPS'}->{'24 BIT'}) {
-        $out .= "    ANSI 24 BIT:  [% GREEN %]Supported[% RESET %]\n";
-    } else {
-        $out .= "    ANSI 24 BIT:  [% RED %]Not Supported[% RESET %]\n";
-    }
-    $out .= "[% B_YELLOW %]                                 [% RESET %]\n\n";
-    $ansi->ansi_output($out);
+    $ansi->ansi_output(ansi_mode_text());
 } elsif ($help) {
     $ansi->ansi_output(help_text());
 } elsif ($tokens) {
     $ansi->ansi_output($ansi->expand_tokens());
 } elsif ($frames) {
+    $ansi->ansi_output($header . frames_text());
+} elsif ($rules) {
+    $ansi->ansi_output($header . horizontal_rules_text() . "\rCan be all colors your terminal supports.\n\n");
+} elsif ($rawtokens) {
+    $ansi->ansi_output(raw_tokens());
+} elsif ($Dump) {
+    $ansi->ansi_output(dump_chars());
+} elsif ($unicode) {
+    print "\nAssembling unicode glyphs...";
+    $ansi->ansi_output(unicode_text());
+} elsif ($symbols) {
+    print "\nAssembling symbols...";
+	$ansi->ansi_output(symbols_text());
+} elsif ($colors) {
+    $ansi->ansi_output($ansi->ansi_colors({ '3 BIT' => $ansi->{'CAPS'}->{'3 BIT'}, '4 BIT' => $ansi->{'CAPS'}->{'4 BIT'}, '8 BIT' => $ansi->{'CAPS'}->{'8 BIT'}, '24 BIT' => $ansi->{'CAPS'}->{'24 BIT'} }));
+} else {    # Output file to STDOUT
+    my $file = $ARGV[0];
+    if (defined $file and -e $file) {
+        open my $fh, '<:encoding(UTF-8)', $file
+          or do { warn "Could not open file '$file': $!\n"; exit 2; };
+
+        # Stream the file to the output renderer to avoid huge memory usage.
+        while (my $chunk = <$fh>) {
+            $ansi->ansi_output($chunk);
+        }
+        close $fh;
+    } else {
+        $ansi->ansi_output(help_text());
+        $| = 1;
+    }
+}
+
+exit(0);
+
+sub calc_speed {
+    my $baud = shift;
+    return (1 / ($baud / 8));
+}
+
+sub symbols_text {
+    my @names;
+    my $search = (scalar(@ARGV)) ? uc(pop(@ARGV)) : undef;
+    my $size   = 0;
+    if (defined($search) and $search ne '') {
+        if ($search =~ /^U\+/) {
+            $search = substr($search, 2);
+            foreach my $code (@list) {
+                my $ucode = sprintf('%X', $code);
+                if ($ucode =~ /^$search/i) {
+                    my $name = charnames::viacode($code);
+                    push(@names, $name);
+                    $size = max($size, length($name));
+                }
+            }
+        } else {
+            foreach my $code (@list) {
+                my $name = charnames::viacode($code);
+                if (defined($name) and $name =~ /$search/i) {
+                    push(@names, $name);
+                    $size = max($size, length($name));
+                }
+            }
+        }
+    } else {
+        foreach my $code (@list) {
+            my $name = charnames::viacode($code);
+            if (defined($name)) {
+                push(@names, $name);
+                $size = max($size, length($name));
+            }
+        }
+    }
+    if (scalar(@names)) {
+        my $text = "\nNOTE:  Not all terminals will support all characters\n" . q{[% COLOR 52 %]╭─────────┬─} . '─' x $size . q{─╮[% RESET %]} . "\n";
+        $text .= q{[% COLOR 52 %]│[% B_BLACK %][% CYAN %] Unicode [% RESET %][% COLOR 52 %]│[% B_BLACK %]} . ' ' x ($size - 20) . q{[% BRIGHT YELLOW %]Character Token Names [% RESET %]} . q{[% COLOR 52 %]│[% RESET %]} . "\n";
+        $text .= q{[% COLOR 52 %]├─────────┼─} . '─' x $size . q{─┤[% RESET %]} . "\n";
+        while (scalar(@names)) {
+            my $name = shift(@names);
+            if ($name ne '') {
+                if ($name =~ /^COMBINING/) {
+                    $text .= sprintf(q{%s│ %s%-5X %s│%s %} . $size . q{s %s│%s   %s}, q{[% COLOR 52 %]}, q{[% RESET %]U}, charnames::vianame($name), q{[% COLOR 52 %]}, q{[% RESET %]}, $name, q{[% COLOR 52 %]}, q{[% RESET %]}, charnames::string_vianame($name)) . "\n";
+                } else {
+                    $text .= sprintf(q{%s│ %s%-5X %s│%s %} . $size . q{s %s│%s %s}, q{[% COLOR 52 %]}, q{[% RESET %]U+}, charnames::vianame($name), q{[% COLOR 52 %]}, q{[% RESET %]}, $name, q{[% COLOR 52 %]}, q{[% RESET %]}, charnames::string_vianame($name)) . "\n";
+                }
+            }
+        }
+        $text .= q{[% COLOR 52 %]╰─────────┴─} . '─' x $size . q{─╯[% RESET %]} . "\n\n";
+        return($text);
+    } else {
+        return("\nNothing found for $search\n\n");
+    }
+}
+
+sub unicode_text {
+    my $search = (scalar(@ARGV)) ? uc(pop(@ARGV)) : undef;
+    my $text   = "\n\nNOTE:  Not all terminals will support all characters\n" . q{[% COLOR 52 %]╭─────────╮[% RESET %]} . "\n";
+    if (defined($search)) {
+        $text .= q{[% COLOR 52 %]│ [% BRIGHT CYAN %]Unicode[% COLOR 52 %] │[% RESET %]} . "\n";
+        $text .= q{[% COLOR 52 %]├─────────┼─────[% RESET %]} . "\n";
+		$text .= q{[% COLOR 52 %]│[% BRIGHT WHITE %]} . sprintf('U+%05s', $search) . q{ [% COLOR 52 %]│[% RESET %] } . charnames::string_vianame(charnames::viacode(hex($search)));
+		$text .= "\n";
+        $text .= q{[% COLOR 52 %]╰─────────┴─────[% RESET %]} . "\n\n";
+    } else {
+        $text .= q{[% COLOR 52 %]│ [% BRIGHT CYAN %]Unicode[% COLOR 52 %] │[% RESET %][% BRIGHT WHITE %] 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F[% RESET %]} . "\n";
+        $text .= q{[% COLOR 52 %]├─────────┼} . '─' x 65 . q{[% RESET %]} . "\n";
+        my $count = 0;
+        foreach my $code (@list) {
+            my ($name, $char, $hcode);
+            $name = charnames::viacode($code);
+            if (defined($name) and $name ne '') {
+                $char  = charnames::string_vianame($name) || ' ';
+                $hcode = sprintf('U+%-5s', substr(sprintf('0x%05X', $code), 2));
+                if ($hcode ne '') {
+                    unless ($count) {
+                        $text .= q{[% COLOR 52 %]│[% BRIGHT WHITE %] } . $hcode . q{ [% COLOR 52 %]│[% RESET %] } . $char;
+                    } else {
+                        $text .= '  ' . $char;
+                    }
+                    $count++;
+                    if ($count > 15) {
+                        $count = 0;
+                        $text .= "\n";
+                        $text .= q{[% COLOR 52 %]├─────────┼} . '─' x 65 . q{[% RESET %]} . "\n" if ($code < 0x1FBFF);
+                    }
+                }
+            }
+        }
+        $text .= "\n";
+        $text .= q{[% COLOR 52 %]╰─────────┴} . '─' x 65 . q{[% RESET %]} . "\n\n";
+    }
+    return($text);
+}
+
+sub ansi_modes_text {
+    my $out = "\n" . q{[% B_YELLOW %][% BOLD %][% BLACK %]      ANSI Modes supported       [% RESET %]} . "\n";
+    if ($ansi->{'CAPS'}->{'3 BIT'}) {
+        $out .= q{    ANSI  3 BIT:  [% GREEN %]Supported[% RESET %]};
+    } else {
+        $out .= q{    ANSI  3 BIT:  [% RED %]Not Supported[% RESET %]};
+    }
+	$out .= "\n";
+    if ($ansi->{'CAPS'}->{'4 BIT'}) {
+        $out .= q{    ANSI  4 BIT:  [% GREEN %]Supported[% RESET %]};
+    } else {
+        $out .= q{    ANSI  4 BIT:  [% RED %]Not Supported[% RESET %]};
+    }
+	$out .= "\n";
+    if ($ansi->{'CAPS'}->{'8 BIT'}) {
+        $out .= q{    ANSI  8 BIT:  [% GREEN %]Supported[% RESET %]};
+    } else {
+        $out .= q{    ANSI  8 BIT:  [% RED %]Not Supported[% RESET %]};
+    }
+	$out .= "\n";
+    if ($ansi->{'CAPS'}->{'24 BIT'}) {
+        $out .= q{    ANSI 24 BIT:  [% GREEN %]Supported[% RESET %]};
+    } else {
+        $out .= q{    ANSI 24 BIT:  [% RED %]Not Supported[% RESET %]};
+    }
+    $out .= "\n" . q{[% B_YELLOW %]                                 [% RESET %]} . "\n\n";
+
+	return($out);
+}
+
+sub dump_chars {
+    my $temp = "\n\n";
+    my @names;
+    my $search = (scalar(@ARGV)) ? uc(pop(@ARGV)) : undef;
+    if (defined($search) and $search ne '') {
+        $temp .= charnames::string_vianame($search);
+    } else {
+        print "\nAssembling character dump...";
+        my $start = $ansi->{'start'};
+        foreach my $code (@list) {
+            my $name = charnames::viacode($code);
+            if (defined($name)) {
+                $temp .= charnames::string_vianame($name) . ' ';
+            }
+        }
+    }
+	return($temp);
+}
+
+sub raw_tokens {
+    my $width = 2;
+    my $text  = "\n";
+    if ($width == 2) {
+        $text .= q{[% GREEN %]╔} . '═' x 65 . q{╗[% RESET %]} . "\n";
+        $text .= q{[% GREEN %]║[% B_BLACK %][% BRIGHT YELLOW %]} . ' ' x 13 . 'THE FOLLOWING ARE THE AVAILABLE TOKENS' . ' ' x 14 . q{[% RESET %][% GREEN %]║[% RESET %]} . "\n";
+        $text .= q{[% GREEN %]╠} . '═' x 32 . '╦' . '═' x 32 . q{╣[% RESET %]} . "\n";
+    } else {
+        $text .= q{[% GREEN %]╔} . '═' x 131 . q{╗[% RESET %]} . "\n";
+        $text .= q{[% GREEN %]║[% B_BLACK %][% BRIGHT YELLOW %]} . ' ' x 46 . 'THE FOLLOWING ARE THE AVAILABLE TOKENS' . ' ' x 47 . q{[% RESET %][% GREEN %]║[% RESET %]} . "\n";
+        $text .= q{[% GREEN %]╠} . '═' x 32 . '╦' . '═' x 32 . '╦' . '═' x 32 . '╦' . '═' x 32 . q{╣[% RESET %]} . "\n";
+    }
+    $text .= q{[% GREEN %]║[% RESET %]};
+    my $count = 1;
+    foreach my $codes ('clear', 'cursor', 'attributes', 'foreground', 'background') {
+        foreach my $token (sort(keys %{ $ansi->{'ansi_meta'}->{$codes} })) {
+            $text .= sprintf(' %-31s', $token);
+            $count++;
+            if ($count > $width) {
+                $count = 1;
+                $text .= q{[% GREEN %]║[% RESET %]} . "\n" . q{[% GREEN %]║[% RESET %]};
+            } else {
+                $text .= q{[% GREEN %]║[% RESET %]};
+            }
+        } ## end foreach my $token (sort(keys...))
+    } ## end foreach my $codes ('clear',...)
+    if ($width == 2) {
+        $text .= "\r" . q{[% GREEN %]║[% RESET %]} .
+		  sprintf(' %-31s',                                                  'JUSTIFIED') .
+		  q{[% GREEN %]║[% RESET %]} .
+		  sprintf(' %-31s', 'ENDJUSTIFIED') . q{[% GREEN %]║[% RESET %]} . "\n";
+        $text .= q{[% GREEN %]║[% RESET %]} .
+		  sprintf(' %-31s', 'WRAP') . q{[% GREEN %]║[% RESET %]} .
+		  sprintf(' %-31s', 'ENDWRAP') . q{[% GREEN %]║[% RESET %]} . "\n";
+        $text .= q{[% GREEN %]╚} . '═' x 32 . '╩' . '═' x 32 . q{╝[% RESET %]} . "\n\n";
+    } else {
+        $text .= "\r" . q{[% GREEN %]║[% RESET %]} .
+		  sprintf(' %-31s', 'JUSTIFIED') . q{[% GREEN %]║[% RESET %]} .
+		  sprintf(' %-31s', 'ENDJUSTIFIED') . q{[% GREEN %]║[% RESET %]} .
+		  sprintf(' %-31s', 'WRAP') . q{[% GREEN %]║[% RESET %]} .
+		  sprintf(' %-31s', 'ENDWRAP') . q{[% GREEN %]║[% RESET %]} . "\n";
+        $text .= q{[% GREEN %]╚} . '═' x 32 . '╩' . '═' x 32 . '╩' . '═' x 32 . '╩' . '═' x 32 . q{╝[% RESET %]} . "\n\n";
+    }
+    return($text);
+}
+
+sub horizontal_rules_text {
+    my $sample_horizontal_rules = <<'HRULE';
+Horizontal rules
+
+[% HORIZONTAL RULE PINK       %][% BLACK %][% B_PINK       %] PINK[% RESET       %]
+[% HORIZONTAL RULE GREEN      %][% BLACK %][% B_GREEN      %] GREEN[% RESET      %]
+[% HORIZONTAL RULE ORANGE     %][% BLACK %][% B_ORANGE     %] ORANGE[% RESET     %]
+[% HORIZONTAL RULE MAGENTA    %][% BLACK %][% B_MAGENTA    %] MAGENTA[% RESET    %]
+[% HORIZONTAL RULE CYAN       %][% BLACK %][% B_CYAN       %] CYAN[% RESET       %]
+[% HORIZONTAL RULE BLUE       %][% WHITE %][% B_BLUE       %] BLUE[% RESET       %]
+[% HORIZONTAL RULE RED        %][% WHITE %][% B_RED        %] RED[% RESET        %]
+[% HORIZONTAL RULE YELLOW     %][% BLACK %][% B_YELLOW     %] YELLOW[% RESET     %]
+[% HORIZONTAL RULE NAVY       %][% WHITE %][% B_NAVY       %] NAVY[% RESET       %]
+[% HORIZONTAL RULE ROYAL BLUE %][% WHITE %][% B_ROYAL BLUE %] ROYAL BLUE[% RESET %]
+HRULE
+
+	return($sample_horizontal_rules);
+}
+
+sub frames_text {
 ###
     my $sample_frames = <<'FRAMES';
 
@@ -153,228 +383,57 @@ if ($version) {
 
 FRAMES
 ###
-    $ansi->ansi_output("$header\n$sample_frames");
-} elsif ($rules) {
-    my $sample_horizontal_rules = "Horizontal rules\n\n" . '[% HORIZONTAL RULE PINK       %][% BLACK %][% B_PINK       %] PINK[% RESET       %]' . "\n" . '[% HORIZONTAL RULE GREEN      %][% BLACK %][% B_GREEN      %] GREEN[% RESET      %]' . "\n" . '[% HORIZONTAL RULE ORANGE     %][% BLACK %][% B_ORANGE     %] ORANGE[% RESET     %]' . "\n" . '[% HORIZONTAL RULE MAGENTA    %][% BLACK %][% B_MAGENTA    %] MAGENTA[% RESET    %]' . "\n" . '[% HORIZONTAL RULE CYAN       %][% BLACK %][% B_CYAN       %] CYAN[% RESET       %]' . "\n" . '[% HORIZONTAL RULE BLUE       %][% WHITE %][% B_BLUE       %] BLUE[% RESET       %]' . "\n" . '[% HORIZONTAL RULE RED        %][% WHITE %][% B_RED        %] RED[% RESET        %]' . "\n" . '[% HORIZONTAL RULE YELLOW     %][% BLACK %][% B_YELLOW     %] YELLOW[% RESET     %]' . "\n" . '[% HORIZONTAL RULE NAVY       %][% WHITE %][% B_NAVY       %] NAVY[% RESET       %]' . "\n" . '[% HORIZONTAL RULE ROYAL BLUE %][% WHITE %][% B_ROYAL BLUE %] ROYAL BLUE[% RESET %]' . "\n\n";
-    $ansi->ansi_output("$header\n$sample_horizontal_rules\rCan be all colors your terminal supports.\n\n");
-} elsif ($rawtokens) {
-    my $width = 2;
-    my $text  = "\n";
-    if ($width == 2) {
-        $text .= '[% GREEN %]╔' . '═' x 65 . '╗[% RESET %]' . "\n";
-        $text .= '[% GREEN %]║[% B_BLACK %][% BRIGHT YELLOW %]' . ' ' x 13 . 'THE FOLLOWING ARE THE AVAILABLE TOKENS' . ' ' x 14 . '[% RESET %][% GREEN %]║[% RESET %]' . "\n";
-        $text .= '[% GREEN %]╠' . '═' x 32 . '╦' . '═' x 32 . '╣[% RESET %]' . "\n";
-    } else {
-        $text .= '[% GREEN %]╔' . '═' x 131 . '╗[% RESET %]' . "\n";
-        $text .= '[% GREEN %]║[% B_BLACK %][% BRIGHT YELLOW %]' . ' ' x 46 . 'THE FOLLOWING ARE THE AVAILABLE TOKENS' . ' ' x 47 . '[% RESET %][% GREEN %]║[% RESET %]' . "\n";
-        $text .= '[% GREEN %]╠' . '═' x 32 . '╦' . '═' x 32 . '╦' . '═' x 32 . '╦' . '═' x 32 . '╣[% RESET %]' . "\n";
-    }
-    $text .= '[% GREEN %]║[% RESET %]';
-    my $count = 1;
-    foreach my $codes ('clear', 'cursor', 'attributes', 'foreground', 'background') {
-        foreach my $token (sort(keys %{ $ansi->{'ansi_meta'}->{$codes} })) {
-            $text .= sprintf(' %-31s', $token);
-            $count++;
-            if ($count > $width) {
-                $count = 1;
-                $text .= '[% GREEN %]║[% RESET %]' . "\n" . '[% GREEN %]║[% RESET %]';
-            } else {
-                $text .= '[% GREEN %]║[% RESET %]';
-            }
-        } ## end foreach my $token (sort(keys...))
-    } ## end foreach my $codes ('clear',...)
-    if ($width == 2) {
-        $text .= "\r" . '[% GREEN %]║[% RESET %]' . sprintf(' %-31s',                                                  'JUSTIFIED') . '[% GREEN %]║[% RESET %]' . sprintf(' %-31s', 'ENDJUSTIFIED') . '[% GREEN %]║[% RESET %]' . "\n";
-        $text .= '[% GREEN %]║[% RESET %]' . sprintf(' %-31s', 'WRAP') . '[% GREEN %]║[% RESET %]' . sprintf(' %-31s', 'ENDWRAP') . '[% GREEN %]║[% RESET %]' . "\n";
-        $text .= '[% GREEN %]╚' . '═' x 32 . '╩' . '═' x 32 . '╝[% RESET %]' . "\n\n";
-    } else {
-        $text .= "\r" . '[% GREEN %]║[% RESET %]' . sprintf(' %-31s', 'JUSTIFIED') . '[% GREEN %]║[% RESET %]' . sprintf(' %-31s', 'ENDJUSTIFIED') . '[% GREEN %]║[% RESET %]' . sprintf(' %-31s', 'WRAP') . '[% GREEN %]║[% RESET %]' . sprintf(' %-31s', 'ENDWRAP') . '[% GREEN %]║[% RESET %]' . "\n";
-        $text .= '[% GREEN %]╚' . '═' x 32 . '╩' . '═' x 32 . '╩' . '═' x 32 . '╩' . '═' x 32 . '╝[% RESET %]' . "\n\n";
-    }
-    $ansi->ansi_output($text);
-} elsif ($Dump) {
-    my $temp = "\n\n";
-    my @names;
-    my $search = (scalar(@ARGV)) ? uc(pop(@ARGV)) : undef;
-    if (defined($search) && $search ne '') {
-        $temp .= charnames::string_vianame($search);
-    } else {
-        print "\nAssembling character dump...";
-        my $start = $ansi->{'start'};
-        foreach my $code (@list) {
-            my $name = charnames::viacode($code);
-            if (defined($name)) {
-                $temp .= charnames::string_vianame($name) . ' ';
-            }
-        } ## end foreach my $code (@list)
-    } ## end else [ if (defined($search) &&...)]
-    $ansi->ansi_output("$temp\n");
-} elsif ($unicode) {
-    print "\nAssembling unicode glyphs...";
-    my $search = (scalar(@ARGV)) ? uc(pop(@ARGV)) : undef;
-    my $text   = "\n\nNOTE:  Not all terminals will support all characters\n" . '[% COLOR 52 %]╭─────────╮[% RESET %]' . "\n";
-    if (defined($search)) {
-        $text .= '[% COLOR 52 %]│ [% BRIGHT CYAN %]Unicode[% COLOR 52 %] │[% RESET %]' . "\n";
-        $text .= '[% COLOR 52 %]├─────────┼─────[% RESET %]' . "\n";
-        $text .= '[% COLOR 52 %]│[% BRIGHT WHITE %]' . sprintf('U+%05s', $search) . ' [% COLOR 52 %]│[% RESET %] ' . charnames::string_vianame(charnames::viacode(hex($search)));
-        $text .= "\n";
-        $text .= '[% COLOR 52 %]╰─────────┴─────[% RESET %]' . "\n\n";
-    } else {
-        $text .= '[% COLOR 52 %]│ [% BRIGHT CYAN %]Unicode[% COLOR 52 %] │[% RESET %][% BRIGHT WHITE %] 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F[% RESET %]' . "\n";
-        $text .= '[% COLOR 52 %]├─────────┼' . '─' x 65 . '[% RESET %]' . "\n";
-        my $count = 0;
-        foreach my $code (@list) {
-            my ($name, $char, $hcode);
-            $name = charnames::viacode($code);
-            if (defined($name) && $name ne '') {
-                $char  = charnames::string_vianame($name) || ' ';
-                $hcode = sprintf('U+%-5s', substr(sprintf('0x%05X', $code), 2));
-                if ($hcode ne '') {
-                    unless ($count) {
-                        $text .= '[% COLOR 52 %]│[% BRIGHT WHITE %] ' . $hcode . ' [% COLOR 52 %]│[% RESET %] ' . $char;
-                    } else {
-                        $text .= '  ' . $char;
-                    }
-                    $count++;
-                    if ($count > 15) {
-                        $count = 0;
-                        $text .= "\n";
-                        $text .= '[% COLOR 52 %]├─────────┼' . '─' x 65 . '[% RESET %]' . "\n" if ($code < 0x1FBFF);
-                    }
-                } ## end if ($hcode ne '')
-            } ## end if (defined($name) && ...)
-        } ## end foreach my $code (@list)
-        $text .= "\n";
-        $text .= '[% COLOR 52 %]╰─────────┴' . '─' x 65 . '[% RESET %]' . "\n\n";
-    } ## end else [ if (defined($search)) ]
-    $ansi->ansi_output($text);
-} elsif ($symbols) {
-    print "\nAssembling symbols...";
-    my @names;
-    my $search = (scalar(@ARGV)) ? uc(pop(@ARGV)) : undef;
-    my $size   = 0;
-    if (defined($search) && $search ne '') {
-        if ($search =~ /^U\+/) {
-            $search = substr($search, 2);
-            foreach my $code (@list) {
-                my $ucode = sprintf('%X', $code);
-                if ($ucode =~ /^$search/i) {
-                    my $name = charnames::viacode($code);
-                    push(@names, $name);
-                    $size = max($size, length($name));
-                }
-            } ## end foreach my $code (@list)
-        } else {
-            foreach my $code (@list) {
-                my $name = charnames::viacode($code);
-                if (defined($name) && $name =~ /$search/i) {
-                    push(@names, $name);
-                    $size = max($size, length($name));
-                }
-            } ## end foreach my $code (@list)
-        } ## end else [ if ($search =~ /^U\+/)]
-    } else {
-        foreach my $code (@list) {
-            my $name = charnames::viacode($code);
-            if (defined($name)) {
-                push(@names, $name);
-                $size = max($size, length($name));
-            }
-        } ## end foreach my $code (@list)
-    } ## end else [ if (defined($search) &&...)]
-    if (scalar(@names)) {
-        my $text = "\nNOTE:  Not all terminals will support all characters\n" . '[% COLOR 52 %]╭─────────┬─' . '─' x $size . '─╮[% RESET %]' . "\n";
-        $text .= '[% COLOR 52 %]│[% B_BLACK %][% CYAN %] Unicode [% RESET %][% COLOR 52 %]│[% B_BLACK %]' . ' ' x ($size - 20) . '[% BRIGHT YELLOW %]Character Token Names [% RESET %]' . "[% COLOR 52 %]│[% RESET %]\n";
-        $text .= '[% COLOR 52 %]├─────────┼─' . '─' x $size . "─┤[% RESET %]\n";
-        while (scalar(@names)) {
-            my $name = shift(@names);
-            if ($name ne '') {
-                if ($name =~ /^COMBINING/) {
-                    $text .= sprintf('%s│ %s%-5X %s│%s %' . $size . 's %s│%s   %s', '[% COLOR 52 %]', '[% RESET %]U+', charnames::vianame($name), '[% COLOR 52 %]', '[% RESET %]', $name, '[% COLOR 52 %]', '[% RESET %]', charnames::string_vianame($name)) . "\n";
-                } else {
-                    $text .= sprintf('%s│ %s%-5X %s│%s %' . $size . 's %s│%s %s', '[% COLOR 52 %]', '[% RESET %]U+', charnames::vianame($name), '[% COLOR 52 %]', '[% RESET %]', $name, '[% COLOR 52 %]', '[% RESET %]', charnames::string_vianame($name)) . "\n";
-                }
-            } ## end if ($name ne '')
-        } ## end while (scalar(@names))
-        $text .= '[% COLOR 52 %]╰─────────┴─' . '─' x $size . '─╯[% RESET %]' . "\n\n";
-        $ansi->ansi_output($text);
-    } else {
-        print "\nNothing found for $search\n\n";
-    }
-} elsif ($colors) {
-    $ansi->ansi_output($ansi->ansi_colors({ '3 BIT' => $ansi->{'CAPS'}->{'3 BIT'}, '4 BIT' => $ansi->{'CAPS'}->{'4 BIT'}, '8 BIT' => $ansi->{'CAPS'}->{'8 BIT'}, '24 BIT' => $ansi->{'CAPS'}->{'24 BIT'} }));
-} else {    # Output file to STDOUT
-    my $file = $ARGV[0];
-    if (defined $file && -e $file) {
-        open my $fh, '<:encoding(UTF-8)', $file
-          or do { warn "Could not open file '$file': $!\n"; exit 2; };
-
-        # Stream the file to the output renderer to avoid huge memory usage.
-        while (my $chunk = <$fh>) {
-            $ansi->ansi_output($chunk);
-        }
-        close $fh;
-    } else {
-        $ansi->ansi_output(help_text());
-        $| = 1;
-    }
-} ## end else [ if ($version) ]
-
-exit(0);
-
-sub calc_speed {
-    my $baud = shift;
-    return (1 / ($baud / 8));
+    return($sample_frames);
 }
 
 sub help_text {
     my $help_text = <<'SMALL';
 
-[% CLS %]╔═══════════════════════════════════════════════════════════════════════════╗
-║[% B_BLACK %]                 [% RED %]┏━┓ [% BRIGHT YELLOW %]┏┓╻ [% GREEN %]┏━┓ [% BRIGHT BLUE %]╻     [% BRIGHT WHITE %]┏━╸ ┏┓╻ ┏━╸ ┏━┓ ╺┳┓ ┏━╸                 [% RESET %]║
-║[% B_BLACK %]                 [% RED %]┣━┫ [% BRIGHT YELLOW %]┃┗┫ [% GREEN %]┗━┓ [% BRIGHT BLUE %]┃     [% BRIGHT WHITE %]┣╸  ┃┗┫ ┃   ┃ ┃  ┃┃ ┣╸                  [% RESET %]║
-║[% B_BLACK %]                 [% RED %]╹ ╹ [% BRIGHT YELLOW %]╹ ╹ [% GREEN %]┗━┛ [% BRIGHT BLUE %]╹     [% BRIGHT WHITE %]┗━╸ ╹ ╹ ┗━╸ ┗━┛ ╺┻┛ ┗━╸                 [% RESET %]║
-╠═══════════════════════════════════════════════════════════════════════════╣
-║[% B_COLOR 52 %][% BRIGHT YELLOW %] DESCRIPTION                                                               [% RESET %]║
-║     Markup text to ANSI encoder.                                          ║
-╟───────────────────────────────────────────────────────────────────────────╢
-║[% B_COLOR 52 %][% BRIGHT YELLOW %] USAGE                                                                     [% RESET %]║
-║     [% CYAN %]ansiencode[% RESET %] [options] [text file]                                      ║
-╟───────────────────────────────────────────────────────────────────────────╢
-║[% B_COLOR 52 %][% BRIGHT YELLOW %] OPTIONS                                                                   [% RESET %]║
-║     -[% BRIGHT CYAN %]a[% RESET %] or --[% BRIGHT CYAN %]ansi-modes[% RESET %]                                                    ║
-║         Show supported ANSI color modes                                   ║
-║                                                                           ║
-║     --[% BRIGHT CYAN %]baud[% RESET %]=speed                                                          ║
-║         "speed" can be any baud rate. Default is full speed.              ║
-║                                                                           ║
-║     -[% BRIGHT CYAN %]c[% RESET %] or --[% BRIGHT CYAN %]colors[% RESET %]                                                        ║
-║         Show available colors                                             ║
-║                                                                           ║
-║     -[% BRIGHT CYAN %]d[% RESET %] or --[% BRIGHT CYAN %]dump[% RESET %] [search]                                                 ║
-║         Dump available sysmbols                                           ║
-║                                                                           ║
-║     -[% BRIGHT CYAN %]f[% RESET %] or --[% BRIGHT CYAN %]frames[% RESET %]                                                        ║
-║         Show sample frame types                                           ║
-║                                                                           ║
-║     -[% BRIGHT CYAN %]h[% RESET %] or --[% BRIGHT CYAN %]horizontal-rules[% RESET %]                                              ║
-║         Show sample horizontal rules                                      ║
-║                                                                           ║
-║     -[% BRIGHT CYAN %]r[% RESET %] or --[% BRIGHT CYAN %]rawtokens[% RESET %]                                                     ║
-║         Raw dump of available tokens.                                     ║
-║                                                                           ║
-║     -[% BRIGHT CYAN %]s[% RESET %] or --[% BRIGHT CYAN %]symbols[% RESET %] [search]                                              ║
-║         Show available symbols and character tokens by name               ║
-║                                                                           ║
-║     -[% BRIGHT CYAN %]t[% RESET %] or --[% BRIGHT CYAN %]tokens[% RESET %]                                                        ║
-║         Show most used tokens                                             ║
-║                                                                           ║
-║     -[% BRIGHT CYAN %]u[% RESET %] or --[% BRIGHT CYAN %]unicode[% RESET %] [search]                                              ║
+[% CLS %]╔[% CHAR ═,75 %]╗
+║[% B_BLACK %][% SPACES 17 %][% RED %]┏━┓ [% BRIGHT YELLOW %]┏┓╻ [% GREEN %]┏━┓ [% BRIGHT BLUE %]╻     [% BRIGHT WHITE %]┏━╸ ┏┓╻ ┏━╸ ┏━┓ ╺┳┓ ┏━╸[% SPACES 17 %][% RESET %]║
+║[% B_BLACK %][% SPACES 17 %][% RED %]┣━┫ [% BRIGHT YELLOW %]┃┗┫ [% GREEN %]┗━┓ [% BRIGHT BLUE %]┃     [% BRIGHT WHITE %]┣╸  ┃┗┫ ┃   ┃ ┃  ┃┃ ┣╸[% SPACES 18 %][% RESET %]║
+║[% B_BLACK %][% SPACES 17 %][% RED %]╹ ╹ [% BRIGHT YELLOW %]╹ ╹ [% GREEN %]┗━┛ [% BRIGHT BLUE %]╹     [% BRIGHT WHITE %]┗━╸ ╹ ╹ ┗━╸ ┗━┛ ╺┻┛ ┗━╸[% SPACES 17 %][% RESET %]║
+╠[% CHAR ═,75 %]╣
+║[% B_COLOR 52 %][% BRIGHT YELLOW %] DESCRIPTION[% SPACES 63 %][% RESET %]║
+║     Markup text to ANSI encoder.[% SPACES 42 %]║
+╟[% CHAR ─,75 %]╢
+║[% B_COLOR 52 %][% BRIGHT YELLOW %] USAGE[% SPACES 69 %][% RESET %]║
+║     [% CYAN %]ansiencode[% RESET %] [options] [text file][% SPACES 38 %]║
+╟[% CHAR ─,75 %]╢
+║[% B_COLOR 52 %][% BRIGHT YELLOW %] OPTIONS[% SPACES 67 %][% RESET %]║
+║     -[% BRIGHT CYAN %]a[% RESET %] or --[% BRIGHT CYAN %]ansi-modes[% RESET %][% SPACES 52 %]║
+║         Show supported ANSI color modes[% SPACES 35 %]║
+║[% SPACES 75 %]║
+║     --[% BRIGHT CYAN %]baud[% RESET %]=speed[% SPACES 58 %]║
+║         "speed" can be any baud rate. Default is full speed.[% SPACES 14 %]║
+║[% SPACES 75 %]║
+║     -[% BRIGHT CYAN %]c[% RESET %] or --[% BRIGHT CYAN %]colors[% RESET %][% SPACES 56 %]║
+║         Show available colors[% SPACES 45 %]║
+║[% SPACES 75 %]║
+║     -[% BRIGHT CYAN %]d[% RESET %] or --[% BRIGHT CYAN %]dump[% RESET %] [search][% SPACES 49 %]║
+║         Dump available sysmbols[% SPACES 43 %]║
+║[% SPACES 75 %]║
+║     -[% BRIGHT CYAN %]f[% RESET %] or --[% BRIGHT CYAN %]frames[% RESET %][% SPACES 56 %]║
+║         Show sample frame types[% SPACES 43 %]║
+║[% SPACES 75 %]║
+║     -[% BRIGHT CYAN %]h[% RESET %] or --[% BRIGHT CYAN %]horizontal-rules[% RESET %][% SPACES 46 %]║
+║         Show sample horizontal rules[% SPACES 38 %]║
+║[% SPACES 75 %]║
+║     -[% BRIGHT CYAN %]r[% RESET %] or --[% BRIGHT CYAN %]rawtokens[% RESET %][% SPACES 53 %]║
+║         Raw dump of available tokens.[% SPACES 37 %]║
+║[% SPACES 75 %]║
+║     -[% BRIGHT CYAN %]s[% RESET %] or --[% BRIGHT CYAN %]symbols[% RESET %] [search][% SPACES 46 %]║
+║         Show available symbols and character tokens by name[% SPACES 15 %]║
+║[% SPACES 75 %]║
+║     -[% BRIGHT CYAN %]t[% RESET %] or --[% BRIGHT CYAN %]tokens[% RESET %][% SPACES 56 %]║
+║         Show most used tokens[% SPACES 45 %]║
+║[% SPACES 75 %]║
+║     -[% BRIGHT CYAN %]u[% RESET %] or --[% BRIGHT CYAN %]unicode[% RESET %] [search][% SPACES 46 %]║
 ║         Show available symbols and character tokens by unicode            ║
-║                                                                           ║
-║     -[% BRIGHT CYAN %]v[% RESET %] or --[% BRIGHT CYAN %]version[% RESET %]                                                       ║
-║         Shows version and licensing info                                  ║
-╚═══════════════════════════════════════════════════════════════════════════╝
+║[% SPACES 75 %]║
+║     -[% BRIGHT CYAN %]v[% RESET %] or --[% BRIGHT CYAN %]version[% RESET %][% SPACES 55 %]║
+║         Shows version and licensing info[% SPACES 34 %]║
+╚[% CHAR ═,75 %]╝
 SMALL
 ###
     return ($help_text);

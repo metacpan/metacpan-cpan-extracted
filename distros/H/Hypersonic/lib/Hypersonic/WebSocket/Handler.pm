@@ -8,7 +8,7 @@ use warnings;
 # This module generates XS functions callable from Perl.
 # Object-oriented API: $conn = Handler->new($fd, $ws); $conn->send($msg);
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 # Maximum concurrent WebSocket connections
 use constant MAX_CONNECTIONS => 65536;

@@ -4,7 +4,7 @@ Log::Abstraction - Logging Abstraction Layer
 
 # VERSION
 
-0.28
+0.29
 
 # SYNOPSIS
 
@@ -83,7 +83,7 @@ The following arguments can be provided:
         - line
         - level
         - message - an arrayref of messages
-        - ctx - passed to `new()`, a argument that can help to give context to the caller
+        - ctx - passed to `new()`, an argument that can help to give context to the caller
 
     - an object
     - a hash of options
@@ -91,6 +91,14 @@ The following arguments can be provided:
 
         To send an e-mail,
         you need ["require Email::Simple"](#require-email-simple), ["require Email::Sender::Simple"](#require-email-sender-simple) and [Email::Sender::Transport::SMTP](https://metacpan.org/pod/Email%3A%3ASender%3A%3ATransport%3A%3ASMTP).
+
+        The `sendmail` hash also accepts a `min_interval` key (seconds).
+        When set, at most one email is sent per `min_interval` seconds; any
+        messages that arrive during the cooldown are still logged to other
+        backends but do not trigger a new email.
+        The send time is stored in `_last_email_sent` on the object, so each
+        instance has its own cooldown window; cloned objects inherit the
+        parent's last-send timestamp at the moment of cloning.
 
     - array - a reference to an array
     - fd - containing a file descriptor to log to

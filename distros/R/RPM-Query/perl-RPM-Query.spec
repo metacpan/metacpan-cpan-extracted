@@ -1,5 +1,5 @@
 Name:           perl-RPM-Query
-Version:        0.03
+Version:        0.05
 Release:        1%{?dist}
 Summary:        Perl object overlay of the RPM query command
 License:        MIT
@@ -12,9 +12,11 @@ BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(IPC::Run3)
 BuildRequires:  perl(List::Util) >= 1.45
 BuildRequires:  perl(Package::New)
+BuildRequires:  rpm
 Requires:       perl(IPC::Run3)
 Requires:       perl(List::Util) >= 1.45
 Requires:       perl(Package::New)
+Requires:       rpm
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description

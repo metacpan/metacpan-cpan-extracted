@@ -22,6 +22,6 @@ truncate($path, $sz - 1) or die;
 
 my $r = eval { Data::Log::Shared->new($path, 4096) };
 ok !$r, "reopen of file-truncated log rejected";
-like $@, qr/invalid|incompatible|too small/i, "meaningful error";
+like $@, qr/invalid|incompatible|too small|mismatch|broken/i, "meaningful error";
 
 done_testing;

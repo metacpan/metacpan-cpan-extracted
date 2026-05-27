@@ -6,7 +6,7 @@ use 5.010;
 
 use parent 'Hypersonic::Event::Role';
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 sub name { 'select' }
 

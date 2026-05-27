@@ -22,6 +22,16 @@ subtest 'router should produce valid locations' => sub {
 	is $loc2->build, '/test/deep', 'build method works';
 };
 
+subtest 'router should use / character as separator by default' => sub {
+	$r->clear;
+
+	my $loc1 = $r->add('/');
+	my $loc2 = $loc1->add('/');
+
+	is $loc1->pattern, '/', 'bridge ok';
+	is $loc2->pattern, '/', 'location ok';
+};
+
 subtest 'router should match locations' => sub {
 	$r->clear;
 
@@ -31,8 +41,9 @@ subtest 'router should match locations' => sub {
 	my $t1l3 = $t1->add('/12');
 
 	my $t2 = $r->add('/test2');
-	my $t2l1 = $t2->add('');
-	my $t2l2 = $t2->add('/1');
+	my $t2l1 = $t2->add('/');
+	my $t2l2 = $t2->add('/');
+	my $t2l3 = $t2->add('/1');
 
 	my $t2f = $r->add('/test2/1');
 
@@ -43,8 +54,8 @@ subtest 'router should match locations' => sub {
 	_match('/test1/123', [[$t1]], 'match too long path ok');
 
 	# NOTE: routes should always be matched in the order of declaration and nesting
-	_match('/test2', [[$t2, $t2l1]], 'match empty subpath ok');
-	_match('/test2/1', [[$t2, $t2l2], $t2f], 'match across locations ok');
+	_match('/test2', [[$t2, $t2l1, $t2l2]], 'match empty subpath ok');
+	_match('/test2/1', [[$t2, $t2l3], $t2f], 'match across locations ok');
 };
 
 subtest 'router should match overlapping locations' => sub {

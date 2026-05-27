@@ -1,55 +1,78 @@
-#!perl
+use Test2::V0;
+use Test2::Require::Module 'bignum';
 
-use strict;
-use warnings;
+# Exercises Authen::OATH with Math::BigInt inputs: the `bignum`
+# pragma in scope coerces numeric literals in this file to BigInts,
+# so the method-input literals below are passed in as BigInts.
+#
+# A related historical concern (perl < 5.18 / bignum < 0.33) was
+# that `bignum`'s `hex` and `oct` overrides leaked outside their
+# lexical scope into Authen::OATH itself. That scenario cannot be
+# exercised from caller scope on a correctly-scoped perl, so we
+# don't try; see perl5180delta for context.
 
-#
-# Same tests as 01-cases.t except use bignum first.
-#
-# On perl < 5.18 or bignum < 0.33 the overrides of
-# hex and oct were not scoped properly and would
-# interfere with certain uses of hex.
-# From perl5180delta:
-# "Using any of these three pragmata would cause hex
-# and oct anywhere else in the program to evaluate their
-# arguments in list context and prevent them from
-# inferring $_ when called without arguments."
-#
+use bignum;
 
 use Authen::OATH ();
 use Digest::SHA  ();
-use Test::More;
-use Test::Needs 'bignum';
 
-my $pwd  = '12345678901234567890';
-my $oath = Authen::OATH->new();
-my $OATH = Authen::OATH->new( 'digits' => 8 );
-ok( defined $oath,              'successfully created new object' );
-ok( $oath->isa('Authen::OATH'), 'correct class.' );
-ok( $oath->digits == 6,         'default digits set to 6' );
-ok(
-    $oath->digest eq 'Digest::SHA',
-    'default digest set to Digest::SHA'
-);
-ok( $oath->{'timestep'} == 30, 'default timestep set to 30' );
+my $pwd = '12345678901234567890';
 
-print "Checking test vectors for totp()...\n";
-ok( $OATH->totp( $pwd, 59 ) eq '94287082' );
-ok( $OATH->totp( $pwd, 1111111109 ) eq '07081804' );
-ok( $OATH->totp( $pwd, 1111111111 ) eq '14050471' );
-ok( $OATH->totp( $pwd, 1234567890 ) eq '89005924' );
-ok( $OATH->totp( $pwd, 2000000000 ) eq '69279037' );
+subtest 'totp test vectors (RFC 6238) under bignum' => sub {
 
-print "Checking test vectors for hotp()...\n";
-ok( $oath->hotp( $pwd, 0 ) eq '755224' );
-ok( $oath->hotp( $pwd, 1 ) eq '287082' );
-ok( $oath->hotp( $pwd, 2 ) eq '359152' );
-ok( $oath->hotp( $pwd, 3 ) eq '969429' );
-ok( $oath->hotp( $pwd, 4 ) eq '338314' );
-ok( $oath->hotp( $pwd, 5 ) eq '254676' );
-ok( $oath->hotp( $pwd, 6 ) eq '287922' );
-ok( $oath->hotp( $pwd, 7 ) eq '162583' );
-ok( $oath->hotp( $pwd, 8 ) eq '399871' );
-ok( $oath->hotp( $pwd, 9 ) eq '520489' );
+    # digits => '8' is string-quoted so bignum doesn't coerce the
+    # literal into a Math::BigInt, which would fail Type::Tiny's
+    # Int constraint on the Moo accessor.
+    my $oath  = Authen::OATH->new( digits => '8' );
+    my @cases = (
+        [ 59,         '94287082' ],
+        [ 1111111109, '07081804' ],
+        [ 1111111111, '14050471' ],
+        [ 1234567890, '89005924' ],
+        [ 2000000000, '69279037' ],
+    );
+    for my $case (@cases) {
+        my ( $time, $expected ) = @{$case};
+        is(
+            $oath->totp( $pwd, $time ), $expected,
+            "totp at time $time"
+        );
+    }
+};
 
-done_testing();
+subtest 'hotp test vectors (RFC 4226) under bignum' => sub {
+    my $oath  = Authen::OATH->new;
+    my @cases = (
+        [ 0, '755224' ],
+        [ 1, '287082' ],
+        [ 2, '359152' ],
+        [ 3, '969429' ],
+        [ 4, '338314' ],
+        [ 5, '254676' ],
+        [ 6, '287922' ],
+        [ 7, '162583' ],
+        [ 8, '399871' ],
+        [ 9, '520489' ],
+    );
+    for my $case (@cases) {
+        my ( $counter, $expected ) = @{$case};
+        is(
+            $oath->hotp( $pwd, $counter ), $expected,
+            "hotp counter $counter"
+        );
+    }
+};
+
+subtest 'BigInt digits constructor arg is rejected' => sub {
+
+    # Locks in current behavior: Type::Tiny's Int rejects refs, and
+    # under bignum the literal 8 is a Math::BigInt ref. If the type
+    # is ever loosened or coerced, update the POD too.
+    like(
+        dies { Authen::OATH->new( digits => 8 ) },
+        qr/did not pass type constraint/,
+        'Math::BigInt literal as digits is rejected by Int constraint'
+    );
+};
+
+done_testing;

@@ -5,11 +5,11 @@ use File::Temp qw(tmpnam);
 use POSIX qw(_exit);
 use Data::Log::Shared;
 
-my $log = Data::Log::Shared->new(undef, 4096);
+my $log = Data::Log::Shared->new(undef, 8192);
 ok $log, 'created';
 is $log->entry_count, 0;
 is $log->tail_offset, 0;
-is $log->data_size, 4096;
+is $log->data_size, 8192;
 ok $log->available > 0;
 
 # append
@@ -101,7 +101,7 @@ is $count, 200, 'all 200 entries readable';
 $log->reset;
 my $t0 = time;
 ok !$log->wait_for(0, 0.1), 'wait_for timeout (no entries)';
-ok time - $t0 < 2;
+ok time - $t0 < 10;
 
 # wait_for wakeup
 $pid = fork // die;

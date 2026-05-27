@@ -9,6 +9,8 @@ BEGIN {
     use_ok( 'IPC::Shareable' ) || print "Bail out!\n";
 }
 
+IPC::Shareable->testing_set('IPC::Shareable');
+
 my %store;
 my $seg_ok = eval {
     tie %store, 'IPC::Shareable', {key => 'async_tests', destroy => 1, serializer => 'storable'};

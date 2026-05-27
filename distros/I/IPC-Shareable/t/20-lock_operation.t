@@ -3,7 +3,10 @@ use strict;
 
 use Carp;
 use Data::Dumper;
+use IPC::Semaphore;
 use IPC::Shareable;
+IPC::Shareable->testing_set('IPC::Shareable');
+use IPC::SysV qw(IPC_CREAT);
 use Mock::Sub;
 use Test::More;
 use Test::SharedFork;
@@ -11,6 +14,32 @@ use Test::SharedFork;
 my $segs_before = IPC::Shareable::seg_count();
 my $sems_before = IPC::Shareable::sem_count();
 warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
+
+# Probe for adequate semaphore resources. OpenBSD defaults to semmni=10
+# (max 10 concurrent semaphore sets system-wide), so we only probe with 3
+# to avoid consuming the entire system capacity for the probe itself.
+{
+    my @tmp_sems;
+    my $probe_ok = eval {
+        for (1..3) {
+            my $s = IPC::Semaphore->new(
+                IPC::Shareable::_shm_key(undef, "_probe_20_$_"),
+                4,
+                IPC_CREAT | 0600
+            );
+            die "semaphore creation returned undef\n" unless defined $s;
+            push @tmp_sems, $s;
+        }
+        1;
+    };
+    $_->remove for grep { defined $_ } @tmp_sems;
+
+    if (! $probe_ok) {
+        diag "Semaphore resources exhausted; skipping t/20-lock_operation.t";
+        done_testing();
+        exit 0;
+    }
+}
 
 my $sv;
 
@@ -310,6 +339,8 @@ my $sv;
     is $a[0], 99, "LOCK_EX array ops: all changes written back on unlock";
 }
 
+IPC::Shareable::_end;  # flush cleanup to stay under OpenBSD semmni=10
+
 # LOCK_SH: hash read ops skip _decode when already locked (EXISTS, FIRSTKEY)
 {
     my $k = tie my %h, 'IPC::Shareable', { key => 'T6', create => 1, destroy => 1 , serializer => 'storable' };
@@ -381,6 +412,8 @@ my $sv;
     like $lock_warns[0], qr/exclusively locked/, "enforced_write_locking array ops: warning mentions 'exclusively locked'";
     like $lock_warns[0], qr/${\$k2->uuid}/, "enforced_write_locking array ops: warning contains k2 UUID";
 }
+
+IPC::Shareable::_end;  # flush cleanup to stay under OpenBSD semmni=10
 
 # enforced_write_locking: hash CLEAR and DELETE blocked when another knot holds LOCK_EX
 {

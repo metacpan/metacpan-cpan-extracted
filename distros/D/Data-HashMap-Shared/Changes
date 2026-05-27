@@ -1,5 +1,14 @@
 Revision history for Data-HashMap-Shared
 
+0.09  2026-05-26
+    - Dead-reader rwlock recovery: SIGKILL'd worker holding rdlock no longer
+      pins the counter; 1024-slot per-process mirror enables wrlock ETIMEDOUT
+      to drain dead PIDs' contributions and force-reset when safe
+    - LRU rebuild on writer recovery if a dead writer left the chain inconsistent
+    - Cursor fixes: iter_pos/gen reset on cursor_seek shard switch;
+      double-decrement of iterating on exhausted cursor destroy/reset/seek
+    - SHM_VERSION 7 → 9 (header layout); existing 0.08 maps must be recreated
+
 0.08  2026-05-18
     - New ops: cas (string values), add_ttl, update_ttl, cas_take,
       remove_multi (method), get_with_ttl (method)

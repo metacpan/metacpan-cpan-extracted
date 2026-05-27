@@ -1,9 +1,10 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use warnings;
 
 use FindBin;
+use Cwd qw(abs_path);
 
 # search for Module in same directory where this script is
 # use File::Spec;
@@ -14,7 +15,7 @@ use OcToolkit;
 
 use Data::Dumper;
 
-my $projectDir =  "$FindBin::Bin"."/";
+my $projectDir = abs_path(".")."/";
 my $customCallbacksObj;
 eval {
     unshift @INC, $projectDir;

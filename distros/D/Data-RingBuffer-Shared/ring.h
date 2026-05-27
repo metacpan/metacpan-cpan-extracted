@@ -30,6 +30,8 @@
 #include <sys/syscall.h>
 #include <linux/futex.h>
 #include <sys/eventfd.h>
+#include <time.h>
+#include <limits.h>
 
 #define RING_MAGIC       0x524E4732U  /* "RNG2" — v2 layout: per-slot publication seq */
 #define RING_VERSION     2
@@ -37,6 +39,14 @@
 
 #define RING_VAR_INT  0
 #define RING_VAR_F64  1
+
+/* Bounded wait for an abandoned WRITING mark (~2s, matches sister-module
+ * SHM_LOCK_TIMEOUT_SEC). Without per-slot PID tracking we can't detect a
+ * dead writer directly; instead, a writer that lands on a slot still odd
+ * after this many monotonic-coarse ticks (seconds) assumes the prior
+ * writer is dead/abandoned and CAS-takes the slot, overwriting any
+ * partial data. Readers detect the epoch change via the seqlock retry. */
+#define RING_WRITER_RECOVERY_SEC 2
 
 /* ================================================================
  * Header (128 bytes)
@@ -100,22 +110,58 @@ static inline uint64_t ring_write(RingHandle *h, const void *val, uint32_t vlen)
     RingHeader *hdr = h->hdr;
     /* Claim a unique position via fetch_add — ring overwrites, no capacity check. */
     uint64_t pos = __atomic_fetch_add(&hdr->head, 1, __ATOMIC_ACQ_REL);
-    uint32_t slot_idx = (uint32_t)(pos % hdr->capacity);
+    uint64_t slot_idx = pos % hdr->capacity;
     uint64_t my_writing = ((pos + 1) << 1) | 1;   /* odd: writing for pos */
     uint64_t my_done    = (pos + 1) << 1;         /* even: pos is committed */
 
     /* CAS per-slot seq from a committed (even) mark to our writing-mark.
      * If another writer is in progress (odd), spin until they commit —
      * otherwise we'd race data writes to the same slot. If a newer writer
-     * has already committed (seq >> 1 > pos+1), skip: their data wins. */
+     * has already committed (seq >> 1 > pos+1), skip: their data wins.
+     *
+     * Bounded WRITING-wait for abandoned slots: a writer that CAS'd seq
+     * even→odd but died before publishing would otherwise strand this
+     * slot forever (every capacity-th write thereafter would spin). We
+     * track wall-clock seconds via CLOCK_MONOTONIC_COARSE; if the slot
+     * stays odd past RING_WRITER_RECOVERY_SEC the prior writer is treated
+     * as abandoned and we CAS over its odd mark, overwriting any partial
+     * data. Readers detect the epoch change via seqlock retry. */
     uint64_t cur = __atomic_load_n(&h->seq[slot_idx], __ATOMIC_ACQUIRE);
     int wrote = 0;
+    time_t recovery_deadline = 0;  /* 0 = not yet armed (lazy syscall) */
     for (;;) {
         if (cur & 1) {
-            /* Another writer owns the slot; wait for them to publish. */
+            /* In-progress writer's pos = (cur >> 1) - 1. If that pos is
+             * past ours, their data supersedes ours — skip entirely. */
+            if ((cur >> 1) > pos + 1) break;
+            /* Another writer owns the slot. Wait briefly; if it stays
+             * odd past the deadline, take over (assume abandoned). */
+            if (recovery_deadline == 0) {
+                struct timespec ts;
+                clock_gettime(CLOCK_MONOTONIC_COARSE, &ts);
+                recovery_deadline = ts.tv_sec + RING_WRITER_RECOVERY_SEC;
+            } else {
+                struct timespec ts;
+                clock_gettime(CLOCK_MONOTONIC_COARSE, &ts);
+                if (ts.tv_sec >= recovery_deadline) {
+                    /* CAS over the odd mark. If it succeeds, we own the
+                     * slot and proceed to write. If it fails, someone
+                     * else (the original writer or another recoverer)
+                     * raced us — reload and continue normally. */
+                    if (__atomic_compare_exchange_n(&h->seq[slot_idx], &cur, my_writing,
+                            0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
+                        wrote = 1; break;
+                    }
+                    /* CAS failed: cur is now refreshed by the CAS. Reset
+                     * the deadline so we re-arm against the new state. */
+                    recovery_deadline = 0;
+                    continue;
+                }
+            }
             cur = __atomic_load_n(&h->seq[slot_idx], __ATOMIC_ACQUIRE);
             continue;
         }
+        recovery_deadline = 0;  /* slot became even; abandon any recovery clock */
         uint64_t cur_committed = cur >> 1;
         if (cur_committed > pos + 1) break;   /* newer writer already here */
         if (__atomic_compare_exchange_n(&h->seq[slot_idx], &cur, my_writing,
@@ -156,7 +202,7 @@ static inline int ring_read_seq(RingHandle *h, uint64_t seq, void *out) {
     uint64_t oldest = (head > h->hdr->capacity) ? head - h->hdr->capacity : 0;
     if (seq < oldest) return 0;  /* already overwritten */
 
-    uint32_t slot_idx = (uint32_t)(seq % h->hdr->capacity);
+    uint64_t slot_idx = seq % h->hdr->capacity;
     uint64_t expected = (seq + 1) << 1;  /* even mark: pos=seq committed */
 
     for (int retry = 0; retry < 8; retry++) {

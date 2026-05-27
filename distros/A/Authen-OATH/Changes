@@ -1,8 +1,17 @@
 Revision history for Authen-OATH
 
+3.000001  2026-05-26 21:01:25Z
+   - Note: the 3.000000 release was a fix for CVE-2026-9569.
+   - Converted the test suite to Test2::V0.
+   - Removed redundant t/00-load.t (every other test already loads
+     Authen::OATH).
+   - t/02-bignum.t now actually loads bignum; the previous use of
+     Test::Needs only gated on availability without importing it.
+
 3.000000  2026-05-25 20:28:30Z
    - Bumped to version 3.000000 and adopted decimal versioning.
-   - Fixed arbitrary code execution vulnerability via the digest attribute.
+   - Fixed arbitrary code execution vulnerability via the digest attribute
+     (CVE-2026-9569).
    - Replaced eval STRING module loads in tests with Test::Needs.
    - Added Convert::Base32 as a develop prereq.
 

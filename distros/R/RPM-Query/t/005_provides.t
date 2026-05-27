@@ -24,10 +24,13 @@ SKIP: {
   my $cap = $list->[0];
   isa_ok($cap, 'RPM::Query::Capability');
   is($cap->name, 'perl');
-  is($cap->version, '4:5.16.3-299.el7_9'); #not protable
+  my @version = grep {m/\Aperl *= */} qx{rpm --query --provides perl}; #e.g. perl = 4:5.32.1-481.1.el9_6
+  chomp @version;
+  $version[0] =~ s/\Aperl *= *//;
+  is($cap->version, $version[0]);
 
   my $pkg = $cap->package;
   isa_ok($pkg, 'RPM::Query::Package');
-  diag(Dumper $cap);
+  #diag(Dumper $cap);
   is($pkg->name, 'perl');
 }

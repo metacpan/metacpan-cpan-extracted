@@ -1,7 +1,7 @@
 package Data::HashMap::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 require XSLoader;
 XSLoader::load('Data::HashMap::Shared', $VERSION);
@@ -81,7 +81,7 @@ B<Linux-only>. Requires 64-bit Perl.
 
 =item * Opt-in LRU eviction and per-key TTL (lock-free reads via clock eviction)
 
-=item * Stale lock recovery (automatic detection of dead lock holders via PID tracking)
+=item * Stale lock recovery for both writers and readers (dead PIDs detected and drained automatically)
 
 =back
 
@@ -217,7 +217,7 @@ C<i32s>, C<is>, C<si16>, C<si32>, C<si>, C<ss>.
     my $ok = shm_xx_put $map, $key, $value;   # insert or overwrite
     my $ok = shm_xx_add $map, $key, $value;   # insert only if key absent
     my $ok = shm_xx_update $map, $key, $value; # overwrite only if key exists
-    my $old = shm_xx_swap $map, $key, $value; # put + return old value (undef if new)
+    my $old = shm_xx_swap $map, $key, $value; # put + return old value (undef if new); on TTL maps, refreshes TTL for keys that already had one and assigns default_ttl on insert (permanent entries stay permanent)
     my $ok = shm_xx_cas $map, $key, $expected, $desired; # compare-and-swap
     my $v  = shm_xx_cas_take $map, $key, $expected; # compare-and-remove; returns value on match, undef otherwise
     my $n  = $map->set_multi($k, $v, ...);   # batch put under single lock, returns count
@@ -315,17 +315,35 @@ File management:
 =head2 Crash Safety
 
 If a process dies (e.g., SIGKILL, OOM kill) while holding the write lock,
-other processes will detect the stale lock within 2 seconds via PID tracking
-and automatically recover. The writer's PID is encoded in the rwlock word
-itself (single atomic CAS, no crash window), so recovery is reliable even if
-the process is killed mid-acquisition. On timeout, waiters check
-C<kill($pid, 0)> and CAS-release the lock if the holder is dead.
+other processes detect the stale lock within 2 seconds and automatically
+recover. The writer's PID is encoded in the rwlock word itself (single
+atomic CAS, no crash window). On C<FUTEX_WAIT> timeout, waiters
+C<kill($pid, 0)> the holder and CAS-release the lock if it's dead.
 
-B<Limitation>: PID-based recovery assumes all processes share the same PID
-namespace. Cross-container sharing (different PID namespaces) is not supported.
+Reader-side recovery uses a 1024-slot table in the shared mmap (one slot
+per process, claimed lazily on first lock; fork()'d children claim a
+fresh slot via C<pthread_atfork>).  On a writer-lock timeout the recovery
+scan CAS-claims each dead PID's slot, drains the waiter counts, and
+force-resets the reader counter once no live reader holds it — so a
+worker killed mid-C<incr_by> no longer pins the rwlock indefinitely.
+If a live reader is concurrently present, the dead slot is left intact
+for the next recovery cycle (preserves the only record of the stuck
+counter).  Beyond 1024 simultaneous handles per map, new handles skip
+slot tracking and fall back to the slow per-timeout drain.
 
-After recovery from a mid-mutation crash, the map data may be inconsistent.
-Calling C<clear> after detecting a stale lock recovery is recommended for
+The same path validates and rebuilds the LRU doubly-linked list if a
+dead writer left it inconsistent.  C<stat_recoveries> in C<stats> counts
+every recovery event.
+
+B<Limitation>: PID-based recovery assumes all processes share the same
+PID namespace. Cross-container sharing (different PID namespaces) is not
+supported.
+
+After recovery from a mid-mutation crash, the map data may be partially
+inconsistent (e.g., one entry was being updated when the writer died).
+Map structure (locks, LRU, free lists, counters) is restored, but the
+specific entry being mutated may have stale or partial bytes. Calling
+C<clear> after detecting a stale lock recovery is recommended for
 safety-critical applications.
 
 =head1 BENCHMARKS

@@ -1,0 +1,14 @@
+^Encoder\.c$
+\.o$
+^Encoder\.bs$
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^pm_to_blib$
+^blib/
+\.tar\.gz$
+^MANIFEST\.bak$
+^\.git/
+^\.gitignore$
+^\.github/
+^\.claude/

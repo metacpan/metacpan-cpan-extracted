@@ -4,7 +4,7 @@ Authen::OATH - OATH One Time Passwords
 
 # VERSION
 
-version 3.000000
+version 3.000001
 
 # SYNOPSIS
 

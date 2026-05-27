@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 # ABSTRACT: BeLike::GETTY when you build your dists
-our $VERSION = '0.312';
+our $VERSION = '0.315';
 use Moose;
 use Dist::Zilla;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -95,14 +95,45 @@ has no_github => (
   is      => 'ro',
   isa     => 'Bool',
   lazy    => 1,
-  default => sub { $_[0]->payload->{no_github} },
+  default => sub {
+    my $self = shift;
+    return $self->payload->{no_github} if defined $self->payload->{no_github};
+    return $self->_has_github_remote ? 0 : 1;
+  },
 );
 
 has no_github_release => (
   is      => 'ro',
   isa     => 'Bool',
   lazy    => 1,
-  default => sub { $_[0]->payload->{no_github_release} },
+  default => sub {
+    my $self = shift;
+    return $self->payload->{no_github_release} if defined $self->payload->{no_github_release};
+    return $self->_has_github_remote ? 0 : 1;
+  },
+);
+
+# Look at .git/config (relative to the cwd, which dzil sets to the dist root)
+# and return true if any remote URL points at github.com. Used to auto-disable
+# the GitHub-specific plugins when the dist lives somewhere else (GitLab,
+# Codeberg, a private Gitea, no remote at all, ...).
+has _has_github_remote => (
+  is      => 'ro',
+  isa     => 'Bool',
+  lazy    => 1,
+  default => sub {
+    my $config = '.git/config';
+    return 0 unless -e $config;
+    open my $fh, '<', $config or return 0;
+    while (my $line = <$fh>) {
+      if ($line =~ m{^\s*url\s*=.*\bgithub\.com\b}i) {
+        close $fh;
+        return 1;
+      }
+    }
+    close $fh;
+    return 0;
+  },
 );
 
 has no_cpan => (
@@ -236,6 +267,13 @@ has xs_object => (
   default => sub { $_[0]->payload->{xs_object} || '' },
 );
 
+has version_finder => (
+  is      => 'ro',
+  isa     => 'ArrayRef[Str]',
+  lazy    => 1,
+  default => sub { defined $_[0]->payload->{version_finder} ? $_[0]->payload->{version_finder} : [] },
+);
+
 
 my @gather_array_options = qw( exclude_filename exclude_match );
 my @gather_array_attributes = map { 'gather_'.$_ } @gather_array_options;
@@ -308,7 +346,7 @@ has alien_bin_requires => (
   default => sub { defined $_[0]->payload->{alien_bin_requires} ? $_[0]->payload->{alien_bin_requires} : [] },
 );
 
-sub mvp_multivalue_args { @run_attributes, @gather_array_attributes, 'alien_bin_requires', @alien_array_attributes, 'commit_files_after_release' }
+sub mvp_multivalue_args { @run_attributes, @gather_array_attributes, 'alien_bin_requires', @alien_array_attributes, 'commit_files_after_release', 'version_finder' }
 
 sub effective_gather_exclude_filename {
   my ($self) = @_;
@@ -348,6 +386,10 @@ sub configure {
     -bundle => '@Basic',
     -remove => [@removes],
   });
+
+  if ($self->no_install) {
+    $self->add_plugins('MakeMaker::SkipInstall');
+  }
 
   if ($self->xs) {
     $self->add_plugins(qw(
@@ -416,7 +458,11 @@ sub configure {
 
   # PkgVersion only when NOT using @Git::VersionManager (which uses RewriteVersion)
   if ($self->is_task || $self->manual_version) {
-    $self->add_plugins('PkgVersion');
+    $self->add_plugins(
+      @{ $self->version_finder }
+        ? [ 'PkgVersion' => { finder => $self->version_finder } ]
+        : 'PkgVersion'
+    );
   }
 
   $self->add_plugins(qw(
@@ -425,6 +471,14 @@ sub configure {
     PodSyntaxTests
     Test::ChangesHasContent
   ));
+
+  $self->add_plugins([
+    'MetaProvides::Package' => {
+      inherit_version => 1,
+      inherit_missing => 1,
+      meta_noindex    => 1,
+    }
+  ]);
 
   $self->add_plugins($self->no_github ? 'Repository' : [ 'GithubMeta' => { issues => 1 } ]);
 
@@ -518,6 +572,10 @@ sub configure {
       'Git::Tag.tag_format' => '%v',
       $self->no_changes ? ( 'NextRelease.format' => '' ) : (),
       @{ $self->commit_files_after_release } ? ( commit_files_after_release => $self->commit_files_after_release ) : (),
+      @{ $self->version_finder } ? (
+        'RewriteVersion::Transitional.finder' => $self->version_finder,
+        'BumpVersionAfterRelease.finder'      => $self->version_finder,
+      ) : (),
     });
     $self->add_plugins([
       'Git::Push' => { push_to => 'origin' }
@@ -538,9 +596,16 @@ sub configure {
     ]);
   }
 
-  # Docker support is delivered exclusively via [@Author::GETTY::Docker / name]
-  # subsections. The docker_image / docker_tags / docker_local attributes on
-  # this bundle only act as defaults that subsections inherit.
+  # Docker support: if docker_image is set on this bundle, auto-add a single
+  # default [@Author::GETTY::Docker] subsection so the dist has a working
+  # Releaser without any extra config. Users who want multiple targets via
+  # explicit [@Author::GETTY::Docker / name] subsections can opt out with
+  # docker_default = 0 to suppress the auto-default.
+  if (defined $self->payload->{docker_image}
+      && length $self->payload->{docker_image}
+      && ($self->payload->{docker_default} // 1)) {
+    $self->add_bundle('@Author::GETTY::Docker' => {});
+  }
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -559,7 +624,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.312
+version 0.315
 
 =head1 SYNOPSIS
 
@@ -604,6 +669,10 @@ In default configuration it is equivalent to:
   [PkgVersion]
   [MetaConfig]
   [MetaJSON]
+  [MetaProvides::Package]
+  inherit_version = 1
+  inherit_missing = 1
+  meta_noindex    = 1
   [PodSyntaxTests]
   [GithubMeta]
 
@@ -718,10 +787,18 @@ If set to 1, this attribute will disable L<Dist::Zilla::Plugin::GithubMeta> and
 will add L<Dist::Zilla::Plugin::Repository> instead. It also disables
 L<Dist::Zilla::Plugin::GitHub::CreateRelease>.
 
+When unset, the bundle auto-detects whether the repository has a remote
+pointing at C<github.com> (by scanning F<.git/config>). If no GitHub remote is
+found — e.g. the dist lives on GitLab, Codeberg, a private Gitea, or has no
+remote at all — C<no_github> defaults to 1 so that the GitHub-specific plugins
+are skipped entirely. Set C<no_github = 0> explicitly to force GitHub plugins
+on even without a detected remote.
+
 =head2 no_github_release
 
 If set to 1, L<Dist::Zilla::Plugin::GitHub::CreateRelease> will not be used
-even though GitHub integration is otherwise active.
+even though GitHub integration is otherwise active. Like L</no_github>, this
+defaults to 1 when no GitHub remote is detected in F<.git/config>.
 
 When this option is B<not> set (the default), C<dzil release> will create a
 GitHub Release for the new tag and attach the CPAN tarball. This requires a
@@ -876,6 +953,153 @@ to override:
 Override the XS object name when using B<xs_alien>. By default, the object
 name is derived from the Alien module name (the last component after C<::>).
 
+=head2 version_finder
+
+Restrict which files get a C<$VERSION> rewrite. Multi-value; accepts any
+file finder name understood by the underlying version plugins (e.g.
+C<:MainModule>, C<:InstallModules>, C<:ExecFiles>, or a custom
+L<FileFinder|Dist::Zilla::Role::FileFinderUser/default_finders>).
+
+By default this is unset and the version plugins use their own defaults
+(C<:InstallModules> and C<:ExecFiles>). When you set it, the value is
+forwarded to:
+
+=over 4
+
+=item *
+
+L<Dist::Zilla::Plugin::PkgVersion> (used when B<task> or B<manual_version>
+is set)
+
+=item *
+
+L<Dist::Zilla::Plugin::RewriteVersion::Transitional> and
+L<Dist::Zilla::Plugin::BumpVersionAfterRelease> (used via
+L<@Git::VersionManager|Dist::Zilla::PluginBundle::Git::VersionManager> on
+the default release path)
+
+=back
+
+Typical use is restricting the rewrite to the main module so sibling
+F<.pm> files in F<lib/> are not touched:
+
+  [@Author::GETTY]
+  version_finder = :MainModule
+
+=head1 CONTINUOUS INTEGRATION
+
+Every distribution using C<[@Author::GETTY]> can share the same CI mechanics
+via a composite GitHub Action hosted in this bundle's repository:
+
+  Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test
+
+The action installs L<Dist::Zilla>, bootstraps all C<dist.ini> plugins via
+C<dzil authordeps>, and then installs distribution prerequisites with
+C<dzil listdeps --author>.  The C<--author> flag is essential: it includes
+C<develop>-phase prerequisites such as L<Test::Pod>, which
+L<Dist::Zilla::Plugin::PodSyntaxTests> (always active in this bundle) registers
+as a C<develop requires>.  Without it, author tests will fail with a missing
+module — do B<not> paper over this by adding C<Test::Pod> to the cpanfile's
+C<on test> block.
+
+=head2 Pure-Perl distributions
+
+A minimal workflow for a pure-Perl dist (no system libraries required):
+
+  # .github/workflows/ci.yml
+  name: ci
+  on:
+    push:
+      branches: ['*']
+      tags-ignore: ['*']
+    pull_request:
+  jobs:
+    test:
+      runs-on: ubuntu-latest
+      strategy:
+        fail-fast: false
+        matrix:
+          perl-version: ['5.36', '5.38', '5.40']
+      container:
+        image: perl:${{ matrix.perl-version }}-bookworm
+      steps:
+        - uses: actions/checkout@v4
+        - name: Fix safe.directory
+          run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+        - name: perl -V
+          run: perl -V
+        - uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+
+=head2 Alien / XS distributions (system libraries)
+
+When the distribution wraps a C library, add system-library installation
+before the shared action, and a second job that forces a vendored build:
+
+  jobs:
+    system-lib:
+      runs-on: ubuntu-latest
+      container:
+        image: perl:5.40-bookworm
+      steps:
+        - uses: actions/checkout@v4
+        - name: Fix safe.directory
+          run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+        - run: apt-get update && apt-get install -y libfoo-dev pkg-config
+        - uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+
+    share-build:
+      runs-on: ubuntu-latest
+      container:
+        image: perl:5.40-bookworm
+      steps:
+        - uses: actions/checkout@v4
+        - name: Fix safe.directory
+          run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+        - run: apt-get update && apt-get install -y cmake build-essential
+        - uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+          with:
+            install-type: share
+
+The C<install-type: share> input sets C<ALIEN_INSTALL_TYPE=share>, which forces
+the dist to build and vendor the C library instead of using a system-provided one.
+
+=head2 Forgejo / self-hosted Gitea
+
+The composite action is forge-neutral (plain shell + cpanm + dzil).  On a
+Forgejo instance, reference it with a fully-qualified URL so the action is
+always fetched from GitHub regardless of the instance's
+C<DEFAULT_ACTIONS_URL> setting:
+
+  - uses: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+
+Alternatively, set C<DEFAULT_ACTIONS_URL = https://github.com> in the
+Forgejo C<app.ini> and use the short form as on GitHub.
+
+Forgejo reads workflow files from F<.github/workflows/> as well as
+F<.forgejo/workflows/>, so the same YAML file works on both forges.
+
+To verify that your Forgejo instance resolves the composite action correctly,
+push a minimal probe workflow and watch the job log:
+
+  # .forgejo/workflows/probe.yml
+  name: probe
+  on: [push]
+  jobs:
+    probe:
+      runs-on: ubuntu-latest
+      container:
+        image: perl:5.40-bookworm
+      steps:
+        - uses: https://github.com/actions/checkout@v4
+        - uses: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+
+If the action step fails to resolve (Forgejo does not yet support cross-repo
+composite actions via subdirectory paths in all configurations), the fallback
+is to vendor a copy of F<.github/actions/dzil-test/action.yml> directly into
+each distribution repository and reference it locally:
+
+  - uses: ./.github/actions/dzil-test
+
 =head1 SEE ALSO
 
 L<Dist::Zilla::Plugin::Alien>
@@ -898,6 +1122,8 @@ L<Dist::Zilla::Plugin::MakeMaker::Awesome>
 
 L<Dist::Zilla::Plugin::MakeMaker::SkipInstall>
 
+L<Dist::Zilla::Plugin::MetaProvides::Package>
+
 L<Dist::Zilla::Plugin::PodWeaver>
 
 L<Dist::Zilla::Plugin::Repository>
@@ -908,13 +1134,25 @@ L<Dist::Zilla::Plugin::TaskWeaver>
 
 =head2 Docker Support
 
-The bundle supports Docker image building via L<Dist::Zilla::Plugin::Docker::API>
-through C<[@Author::GETTY::Docker / name]> subsections. Each subsection produces
-one independent C<Docker::API> plugin:
+The bundle supports Docker image building via L<Dist::Zilla::Plugin::Docker::API>.
+The simplest form is a single image — set C<docker_image> on the bundle and a
+default Docker build/release pipeline is wired in for you:
 
   [@Author::GETTY]
   docker_image = registry/app
   docker_tags  = latest %v
+
+That alone gives you a working Releaser (no separate C<[UploadToCPAN]> needed
+for non-CPAN dists) — C<dzil build> builds the image, C<dzil release> tags
+and pushes it.
+
+For multi-target builds, add explicit C<[@Author::GETTY::Docker / name]>
+subsections — each produces one independent C<Docker::API> plugin:
+
+  [@Author::GETTY]
+  docker_image    = registry/app
+  docker_tags     = latest %v
+  docker_default  = 0    ; suppress the auto-default; subsections handle it
 
   [@Author::GETTY::Docker / runtime-root]
   target = runtime-root
@@ -928,6 +1166,32 @@ Subsections inherit C<image>, C<tags>, and C<local> from the parent's
 C<docker_image>, C<docker_tags>, and C<docker_local> settings, but each
 subsection can override them individually. See
 L<Dist::Zilla::PluginBundle::Author::GETTY::Docker> for the full attribute list.
+
+=head2 docker_image
+
+Docker image repository to publish to. When set, the bundle auto-adds a
+single default L<Dist::Zilla::Plugin::Docker::API> plugin (via
+L<[@Author::GETTY::Docker]|Dist::Zilla::PluginBundle::Author::GETTY::Docker>)
+so C<dzil release> has a working Releaser without any extra config. Also
+acts as the inherited default for any explicit C<[@Author::GETTY::Docker /
+name]> subsections.
+
+=head2 docker_tags
+
+Whitespace-separated list of tags applied to the image. Default: C<latest
+%V %v>. Inherited by subsections.
+
+=head2 docker_local
+
+If true, the image is built and tagged but not pushed. Inherited by
+subsections.
+
+=head2 docker_default
+
+Defaults to true. Set to C<0> to suppress the auto-default plugin when
+C<docker_image> is set — use this when you configure your Docker builds
+exclusively through explicit C<[@Author::GETTY::Docker / name]> subsections
+and don't want an extra plugin added behind your back.
 
 =head1 SUPPORT
 

@@ -3,6 +3,7 @@ use strict;
 
 use Data::Dumper;
 use IPC::Shareable;
+IPC::Shareable->testing_set('IPC::Shareable');
 use Test::More;
 
 # Verify that overwriting a tied child value with a new reference removes

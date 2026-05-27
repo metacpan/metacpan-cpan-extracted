@@ -1,3 +1,42 @@
+0.315     2026-05-27 01:49:07Z
+
+  - Add shared composite GitHub Action (.github/actions/dzil-test) that
+    centralises Dist::Zilla CI mechanics (authordeps, listdeps --author,
+    dzil test) for all [@Author::GETTY] distributions. The --author flag
+    installs develop-phase prereqs (e.g. Test::Pod from [PodSyntaxTests])
+    so they no longer need to be faked into cpanfile's on-test block.
+  - Add .github/workflows/ci.yml — the bundle's own CI dogfoods the action
+    via a local path reference.
+  - Add CONTINUOUS INTEGRATION section to POD: documents how to use the
+    shared action for pure-Perl dists, Alien/XS dists (system libs +
+    share-build job), and Forgejo/self-hosted Gitea (full HTTPS URL + probe).
+
+0.314     2026-05-26 15:49:39Z
+
+  - Add Dist::Zilla::Plugin::Test::ChangesHasContent to cpanfile; the
+    bundle has been adding [Test::ChangesHasContent] but the prereq was
+    missing.
+  - [@Author::GETTY]: no_install works again. The wiring that adds
+    [MakeMaker::SkipInstall] was accidentally dropped in the Dec 2014
+    Git::GatherDir refactor (acc5f0e), while the option, its docs and the
+    no_makemaker conflict check were all left in place.
+
+0.313     2026-05-26 13:32:34Z
+
+  - [@Author::GETTY]: new version_finder option restricts which files
+    get a $VERSION rewrite. Forwards to PkgVersion (task/manual_version
+    path) and to RewriteVersion::Transitional / BumpVersionAfterRelease
+    via @Git::VersionManager. Typical use: `version_finder = :MainModule`
+    to bump only the main module instead of every .pm in lib/.
+  - [@Author::GETTY]: docker_image now auto-adds a single default
+    [@Author::GETTY::Docker] subsection so dists without an explicit
+    Docker subsection still get a working Releaser. Set
+    docker_default = 0 to suppress this when configuring Docker
+    builds exclusively through explicit subsections.
+  - [@Author::GETTY::Docker]: forward the new build_verbose option
+    to [Docker::API]. Default off — the build log shows only step
+    headers, not the full per-command output.
+
 0.312     2026-05-18 19:54:12Z
 
   - [@Author::GETTY::Docker]: default `tags` is now `latest %V %v`

@@ -8,6 +8,7 @@ use Test::More;
 #plan skip_all => "TEST FILE NOT READY";
 
 use IPC::Shareable;
+IPC::Shareable->testing_set('IPC::Shareable');
 
 my $segs_before = IPC::Shareable::seg_count();
 my $sems_before = IPC::Shareable::sem_count();

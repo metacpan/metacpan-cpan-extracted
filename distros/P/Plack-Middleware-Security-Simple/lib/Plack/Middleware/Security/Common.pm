@@ -23,6 +23,7 @@ our @EXPORT = qw(
    header_injection
    ip_address_referer
    misc_extensions
+   misc_vulns
    non_printable_chars
    null_or_escape
    protocol_in_path_or_referer
@@ -35,7 +36,7 @@ our @EXPORT = qw(
    wordpress
 );
 
-our $VERSION = 'v0.13.0';
+our $VERSION = 'v0.13.1';
 
 
 
@@ -114,8 +115,9 @@ sub fake_extensions {
 
 
 sub header_injection {
-    my $re = qr{(?:\%20HTTP/[0-9]|%0d%0a)}i;
+    my $re = qr{(?:\%20HTTP/[0-9]|%0[ad]|[\r\n])}i;
     return (
+        REQUEST_URI  => $re,
         PATH_INFO    => $re,
     );
 }
@@ -136,6 +138,13 @@ sub misc_extensions {
         PATH_INFO    => $re,
         QUERY_STRING => $re,
     )
+}
+
+
+
+sub misc_vulns {
+    my $re = qr{^/(?:shell)};
+    return ( PATH_INFO => $re, );
 }
 
 
@@ -228,13 +237,15 @@ __END__
 
 =encoding UTF-8
 
+=for stopwords CMS WebDAV misspelt wordpress
+
 =head1 NAME
 
 Plack::Middleware::Security::Common - A simple security filter for Plack with common rules.
 
 =head1 VERSION
 
-version v0.13.0
+version v0.13.1
 
 =head1 SYNOPSIS
 
@@ -353,7 +364,7 @@ Added in v0.5.1.
 
 =head2 header_injection
 
-This blocks requests that attept to inject a header in the response. e.g.
+This blocks requests that attempt to inject a header in the response. e.g.
 C<GET /%20HTTP/1.1%0d%0aX-Auth:%20accepted%0d%0a>.
 
 Any path with an HTTP protocol suffix or newline plus carriage return
@@ -363,18 +374,24 @@ Added in v0.7.0.
 
 =head2 ip_address_referer
 
-This blocks all requests where the HTTP referer is an IP4 or IP6
+This blocks all requests where the HTTP referrer is an IP4 or IP6
 address.
 
 Added in v0.5.0.
 
+Note: the method is misspelt for consistency with the HTTP Header.
+
 =head2 misc_extensions
 
-This blocks requests with miscellenious extensions in the path or
+This blocks requests with miscellaneous extensions in the path or
 query string.
 
 This includes common extensions and suffixes for backups, includes,
 configuration files, or temporary files.
+
+=head2 misc_vulns
+
+Block miscellaneous vulnerabilities.
 
 =head2 non_printable_chars
 
@@ -382,13 +399,13 @@ This blocks requests with non-printable characters in the path.
 
 =head2 null_or_escape
 
-This blocks requests with nulls or escape chatacters in the path or
+This blocks requests with nulls or escape characters in the path or
 query string.
 
 =head2 protocol_in_path_or_referer
 
 This blocks requests that have non-web protocols like C<file>, C<dns>,
-C<jndi>, C<unix>, C<ldap> or C<php> in the path, query string or referer.
+C<jndi>, C<unix>, C<ldap> or C<php> in the path, query string or referrer.
 
 Added in v0.5.1.
 
@@ -435,7 +452,7 @@ This blocks requests for WordPress-related pages.
 =head1 SOURCE
 
 The development version is on github at L<https://github.com/robrwo/Plack-Middleware-Security-Simple>
-and may be cloned from L<git://github.com/robrwo/Plack-Middleware-Security-Simple.git>
+and may be cloned from L<https://github.com/robrwo/Plack-Middleware-Security-Simple.git>
 
 =head1 BUGS
 
@@ -455,11 +472,11 @@ report security vulnerabilities
 
 =head1 AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2014,2018-2025 by Robert Rothenberg.
+This software is Copyright (c) 2014,2018-2026 by Robert Rothenberg.
 
 This is free software, licensed under:
 

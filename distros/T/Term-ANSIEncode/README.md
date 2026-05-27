@@ -30,18 +30,18 @@
    my $string = '[% CLS %]Some markup encoded string' . "\n";
    $string .= '[% CHAR =,80 %]' . "\n"; # A line of ==== 80 columns long
 
-   $string .= '[% RED     %]Red foreground[% RESET %]' . "\n";
-   $string .= '[% YELLOW  %]Yellow foreground[% RESET %]' . "\n";
-   $string .= '[% GREEN   %]Green foreground[% RESET %]' . "\n";
-   $string .= '[% CYAN    %]Cyan foreground[% RESET %]' . "\n";
-   $string .= '[% BLUE    %]Blue foreground[% RESET %]' . "\n";
+   $string .= '[% RED     %]Red foreground[%     RESET %]' . "\n";
+   $string .= '[% YELLOW  %]Yellow foreground[%  RESET %]' . "\n";
+   $string .= '[% GREEN   %]Green foreground[%   RESET %]' . "\n";
+   $string .= '[% CYAN    %]Cyan foreground[%    RESET %]' . "\n";
+   $string .= '[% BLUE    %]Blue foreground[%    RESET %]' . "\n";
    $string .= '[% MAGENTA %]Magenta foreground[% RESET %]' . "\n";
 
-   $string .= '[% BLACK %][% B_RED     %]Red background black foreground[% RESET %]' . "\n";
-   $string .= '[% BLACK %][% B_YELLOW  %]Yellow background black foreground[% RESET %]' . "\n";
-   $string .= '[% BLACK %][% B_GREEN   %]Green background black foreground[% RESET %]' . "\n";
-   $string .= '[% BLACK %][% B_CYAN    %]Cyan background black foreground[% RESET %]' . "\n";
-   $string .= '[% BLACK %][% B_BLUE    %]Blue background black foreground[% RESET %]' . "\n";
+   $string .= '[% BLACK %][% B_RED     %]Red background black foreground[%     RESET %]' . "\n";
+   $string .= '[% BLACK %][% B_YELLOW  %]Yellow background black foreground[%  RESET %]' . "\n";
+   $string .= '[% BLACK %][% B_GREEN   %]Green background black foreground[%   RESET %]' . "\n";
+   $string .= '[% BLACK %][% B_CYAN    %]Cyan background black foreground[%    RESET %]' . "\n";
+   $string .= '[% BLACK %][% B_BLUE    %]Blue background black foreground[%    RESET %]' . "\n";
    $string .= '[% BLACK %][% B_MAGENTA %]Magenta background black foreground[% RESET %]' . "\n";
 
    $string .= '[% RGB 255,105,180 %]Hot Pink foreground[% RESET %]' . "\n";
@@ -51,6 +51,7 @@
 
    $ansi->ansi_output($string);
    ```
+### Output From Above Code
 
 ![Code Sample](pics/Sample.png)
 
@@ -319,11 +320,17 @@
    | B_GREY 0 - B_GREY 23 | Levels of grey |
    | B_RGB red,green,blue | 24 bit background colors |
 
-   ### HORIZONTAL RULES
+   ### MACROS
 
-   | **Token** | **Description** |
-   | --- | --- |
-   | HORIZONTAL RULE token | A solid line of background in the color defined by "token" |
+   | **Token** | **End Token** | **Description** |
+   | --- | --- | --- |
+   | BLOCK count | ENDBLOCK | Duplicate a block of text for "count" number of times between the tokens |
+   | BOX color,column,rowm,width,height,type | ENDBOX | Wrapped text inside a box |
+   | CHAR char,count | | Duplicate "char" "count" number of times |
+   | HORIZONTAL RULE token | | A solid line of background in the color defined by "token" |
+   | JUSTIFIED | ENDJUSTIFIED | Justify text inside the two tokens |
+   | SPACES count | | Replace token with "count" number of spaces |
+   | WRAP | ENDWRAP | Wrap text inside the two tokens |
 
 ![Divider](pics/pink.jpg?raw=true "Divider")
 

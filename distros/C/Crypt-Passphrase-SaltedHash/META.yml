@@ -34,7 +34,7 @@ name: Crypt-Passphrase-SaltedHash
 provides:
   Crypt::Passphrase::SaltedHash:
     file: lib/Crypt/Passphrase/SaltedHash.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Crypt::Passphrase::Validator: '0'
   Digest: '1.19'
@@ -46,7 +46,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/perl-Crypt-Passphrase-SaltedHash/issues
   repository: git://github.com/robrwo/perl-Crypt-Passphrase-SaltedHash.git
-version: '0.02'
+version: '0.03'
 x_authority: cpan:RRWO
 x_generated_by_perl: v5.42.1
 x_serialization_backend: 'YAML::Tiny version 1.76'

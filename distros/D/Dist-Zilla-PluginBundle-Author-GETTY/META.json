@@ -30,9 +30,11 @@
       },
       "runtime" : {
          "requires" : {
+            "Alien::Build" : "1.00",
             "App::cpanminus" : "1.7049",
             "Dist::Zilla" : "6.037",
             "Dist::Zilla::Plugin::Alien" : "0.024",
+            "Dist::Zilla::Plugin::AlienBuild" : "0.33",
             "Dist::Zilla::Plugin::Authority" : "1.006",
             "Dist::Zilla::Plugin::Deprecated" : "0.007",
             "Dist::Zilla::Plugin::Docker::API" : "0.103",
@@ -42,12 +44,14 @@
             "Dist::Zilla::Plugin::InstallRelease" : "0.008",
             "Dist::Zilla::Plugin::MakeMaker::Awesome" : "0.49",
             "Dist::Zilla::Plugin::MakeMaker::SkipInstall" : "1.201",
+            "Dist::Zilla::Plugin::MetaProvides::Package" : "2.004003",
             "Dist::Zilla::Plugin::ModuleBuildTiny" : "0.020",
             "Dist::Zilla::Plugin::PodWeaver" : "4.010",
             "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0.08",
             "Dist::Zilla::Plugin::Repository" : "0.25",
             "Dist::Zilla::Plugin::Run" : "0.050",
             "Dist::Zilla::Plugin::TaskWeaver" : "0.101629",
+            "Dist::Zilla::Plugin::Test::ChangesHasContent" : "0.011",
             "Dist::Zilla::PluginBundle::Git" : "2.052",
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007",
             "Pod::Elemental" : "0.103006",
@@ -62,6 +66,24 @@
          }
       }
    },
+   "provides" : {
+      "Dist::Zilla::PluginBundle::Author::GETTY" : {
+         "file" : "lib/Dist/Zilla/PluginBundle/Author/GETTY.pm",
+         "version" : "0.315"
+      },
+      "Dist::Zilla::PluginBundle::Author::GETTY::Docker" : {
+         "file" : "lib/Dist/Zilla/PluginBundle/Author/GETTY/Docker.pm",
+         "version" : "0.315"
+      },
+      "Pod::Elemental::Transformer::Author::GETTY" : {
+         "file" : "lib/Pod/Elemental/Transformer/Author/GETTY.pm",
+         "version" : "0.315"
+      },
+      "Pod::Weaver::PluginBundle::Author::GETTY" : {
+         "file" : "lib/Pod/Weaver/PluginBundle/Author/GETTY.pm",
+         "version" : "0.315"
+      }
+   },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
@@ -74,7 +96,7 @@
          "web" : "https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty"
       }
    },
-   "version" : "0.312",
+   "version" : "0.315",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -198,6 +220,33 @@
             "class" : "Dist::Zilla::Plugin::Test::ChangesHasContent",
             "name" : "@Author::GETTY/Test::ChangesHasContent",
             "version" : "0.011"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaProvides::Package" : {
+                  "finder_objects" : [
+                     {
+                        "class" : "Dist::Zilla::Plugin::FinderCode",
+                        "name" : "@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+                        "version" : "6.037"
+                     }
+                  ],
+                  "include_underscores" : 0
+               },
+               "Dist::Zilla::Role::MetaProvider::Provider" : {
+                  "$Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.002004",
+                  "inherit_missing" : 1,
+                  "inherit_version" : 1,
+                  "meta_noindex" : 1
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000037",
+                  "version" : "0.006"
+               }
+            },
+            "name" : "@Author::GETTY/MetaProvides::Package",
+            "version" : "2.004003"
          },
          {
             "class" : "Dist::Zilla::Plugin::GithubMeta",
@@ -417,7 +466,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.312",
+                  "tag" : "0.315",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -553,6 +602,11 @@
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
+            "version" : "6.037"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : "@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
             "version" : "6.037"
          }
       ],

@@ -134,8 +134,19 @@ static inline uint64_t stk_slot_claim_write(uint64_t *ctl_word) {
     }
 }
 
+/* Publish WRITING@gen -> FILLED@gen. Implemented as CAS (not a plain store)
+ * so that if stk_drain force-recovered the slot mid-write — bumping it to
+ * EMPTY@(gen+1) — this publish is a no-op rather than clobbering the
+ * recovered state back to FILLED@gen. That would leave a phantom FILLED at
+ * a stale gen which the next pusher's stk_slot_claim_write (waits on EMPTY)
+ * could never advance past, deadlocking that slot forever. The caller's
+ * top CAS was already committed, so on lost-race the value is silently
+ * dropped — matching the documented drain-recovery semantics. */
 static inline void stk_slot_publish(uint64_t *ctl_word, uint64_t gen) {
-    __atomic_store_n(ctl_word, (gen << 2) | STK_SLOT_FILLED, __ATOMIC_RELEASE);
+    uint64_t expected = (gen << 2) | STK_SLOT_WRITING;
+    uint64_t desired  = (gen << 2) | STK_SLOT_FILLED;
+    (void)__atomic_compare_exchange_n(ctl_word, &expected, desired,
+            0, __ATOMIC_RELEASE, __ATOMIC_RELAXED);
 }
 
 static inline uint64_t stk_slot_claim_read(uint64_t *ctl_word) {
@@ -491,14 +502,67 @@ static void stk_clear(StkHandle *h) {
 }
 
 /* Concurrency-safe drain: atomically swap top to 0, then release each
- * drained slot through the state machine. Returns count drained. */
+ * drained slot through the state machine. Returns count drained.
+ *
+ * Crash-recovery: a pusher that won the top CAS but died (SIGKILL/segfault)
+ * between stk_slot_claim_write and stk_slot_publish leaves the slot stuck
+ * in WRITING. Plain stk_slot_claim_read would spin forever. We bound the
+ * wait at ~2s per slot; on timeout we CAS WRITING -> EMPTY (gen bumped) so
+ * the slot is reclaimed.
+ *
+ * Limitation: slot ctl encodes only (gen << 2) | state — no PID — so we
+ * cannot distinguish a crashed pusher from a merely slow one. A live pusher
+ * stalled > 2s would be falsely reclaimed; its subsequent publish is a CAS
+ * (see stk_slot_publish) so it observes the gen bump and silently no-ops
+ * rather than resurrecting a phantom FILLED slot. The pusher's value is
+ * dropped — equivalent to a crashed pusher. In practice the gap between
+ * claim_write and publish is sub-microsecond memcpy time, so the false-
+ * positive threshold is many orders of magnitude away from normal latency. */
 static inline uint32_t stk_drain(StkHandle *h) {
     StkHeader *hdr = h->hdr;
     uint32_t t = __atomic_exchange_n(&hdr->top, 0, __ATOMIC_ACQ_REL);
     if (t == 0) return 0;
+    /* Wall-clock deadline for the per-slot wait. We hot-spin first, then
+     * fall back to short sleeps to avoid burning a core for 2s on a stuck
+     * slot. The deadline is checked periodically (every 64 iterations) to
+     * keep the steady-state cost ~zero. */
     for (uint32_t i = 0; i < t; i++) {
-        uint64_t gen = stk_slot_claim_read(&h->ctl[i]);
-        stk_slot_release(&h->ctl[i], gen);
+        struct timespec dl;
+        int dl_set = 0;
+        uint32_t spins = 0;
+        for (;;) {
+            uint64_t c = __atomic_load_n(&h->ctl[i], __ATOMIC_ACQUIRE);
+            uint32_t st = STK_SLOT_STATE(c);
+            if (st == STK_SLOT_FILLED) {
+                uint64_t nc = (STK_SLOT_GEN(c) << 2) | STK_SLOT_READING;
+                if (__atomic_compare_exchange_n(&h->ctl[i], &c, nc,
+                        0, __ATOMIC_ACQUIRE, __ATOMIC_RELAXED)) {
+                    stk_slot_release(&h->ctl[i], STK_SLOT_GEN(c));
+                    break;
+                }
+                continue;
+            }
+            stk_spin_pause();
+            if ((++spins & 0x3F) == 0) {
+                if (!dl_set) { stk_make_deadline(2.0, &dl); dl_set = 1; }
+                struct timespec rem;
+                if (!stk_remaining(&dl, &rem)) {
+                    /* Treat as abandoned (crashed writer/reader): force the
+                     * slot back to EMPTY with gen bumped. If CAS succeeds we
+                     * skipped the slot; if it fails, the writer just published
+                     * (or another recoverer fixed it) — loop and re-observe so
+                     * a FILLED value is not leaked. */
+                    uint64_t nc = ((STK_SLOT_GEN(c) + 1) << 2) | STK_SLOT_EMPTY;
+                    if (__atomic_compare_exchange_n(&h->ctl[i], &c, nc,
+                            0, __ATOMIC_ACQ_REL, __ATOMIC_RELAXED))
+                        break;
+                    continue;
+                }
+                /* Short sleep to keep CPU usage low during the long wait. */
+                struct timespec ts = { 0, 100000L }; /* 100us */
+                nanosleep(&ts, NULL);
+            }
+        }
     }
     /* drain freed `t` slots at once — wake up to that many. */
     if (__atomic_load_n(&hdr->waiters_push, __ATOMIC_RELAXED) > 0) {

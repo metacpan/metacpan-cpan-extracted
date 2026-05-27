@@ -1,5 +1,10 @@
 Revision history for Data::Stack::Shared
 
+0.04  2026-05-26
+    - drain: bounded recovery (~2s) for slots stuck WRITING after a crashed pusher
+    - slot publish is now CAS-only — prevents a stalled-but-live pusher from
+      clobbering a slot drain force-recovered to EMPTY
+
 0.03  2026-04-26
     - MPMC per-slot state machine + file format v2
     - strict fd validation; drain() test coverage

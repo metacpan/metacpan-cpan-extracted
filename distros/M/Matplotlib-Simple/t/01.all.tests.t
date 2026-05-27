@@ -1,5 +1,6 @@
 #!/usr/bin/env perl
 
+require 5.010;
 use strict;
 use warnings FATAL => 'all';
 use autodie ':all';
@@ -1409,27 +1410,6 @@ plt({
 			  W => 'marker = "d", color = "green"'
 			},
 		},
-		{          # multiple-set scatter, labels are "X" and "Y"
-			data => {    # 8th plot,
-				X => {    # 1st data set; label is "X"
-					A => @e,    # x-axis
-					B => @b,    # y-axis
-					C => @a,    # color
-				},
-				Y => {    # 2nd data set; label is "Y"
-					A => generate_normal_dist( 100, 15, 210 ),    # x-axis
-					B => generate_normal_dist( 100, 15, 210 ),    # y-axis
-					C => generate_normal_dist( 100, 15, 210 ),    # color
-				},
-			},
-			'plot.type'   => 'scatter',
-			title         => 'Multiple Set Scatter w/ colorbar',
-			'set.options' => {    # arguments to ax.scatter, for each set in data
-				X => 'marker = "."',
-				Y => 'marker = "d"'     # diamond
-			},
-			color_key => 'Z',
-		},
 		{ # multiple-set scatter, labels are "X" and "Y"
 			data => {    # 8th plot,
 				X => {    # 1st data set; label is "X"
@@ -1935,6 +1915,69 @@ hist({
 	'output.file' => '/tmp/hist.arr.svg',
 });
 plt({
+	execute => 0,
+	fh      => $fh,
+	ncol    => 3,
+	plots   => [
+		{
+			'plot.type' => 'violin',
+			data        => [0..3]
+		},
+		{
+			'plot.type' => 'hist',
+			data        => [0..3]
+		},
+		{
+			'plot.type' => 'boxplot',
+			data        => [0..3]
+		},
+	],
+	'output.file' => '/tmp/simple.arr.not.hash.svg'
+});
+plt({
+	data => {
+		rf => {
+		     MSE => [
+		         59709365.9463344, 59654498.901993,
+		         59735999.6104052, 59432384.4879875, 58988506.3229073,
+		     ],
+		     R2 => [
+		         0.0611943940556245, 0.0620570642245824,
+		         0.0607756350763545, 0.0655493514683765,
+		         0.0725284125106284,
+		     ],
+		     Spearman_rho => [
+		         0.295576700910224, 0.295879819192539,
+		         0.293366727260099, 0.298729938578399,
+		         0.29986932439962,
+		     ]
+		 },
+		 xgb => {
+		     MSE => [
+		         63731484.7389403, 66398497.7766184,
+		         66684906.4779721, 64244385.4014047,
+		         64190258.9460872,
+		     ],
+		     R2 => [
+		         -0.00204505942754252, -0.043978293036979,
+		         -0.0484814742408084,  -0.0101093556997043,
+		         -0.00925832975299401,
+		     ],
+		     Spearman_rho => [
+		         0.249657682686612, 0.210122890976946,
+		         0.212149227834186, 0.242231388004253,
+		         0.242916384549555,
+		     ]
+		 }
+    },
+	fh          => $fh,
+	execute     => 0,
+	'plot.type' => 'scatter',
+	color_key   => 'MSE',
+	'output.file' => '/tmp/scatter.multiset.colorkey.svg'
+});
+
+plt({
 	fh                => $fh,
 	execute           => 1,
 	ncols             => 3,
@@ -2032,7 +2075,7 @@ plt({
 	'output.file' => '/tmp/hist2d.svg',
 });
 # σὺ δὲ τῇ πίστει ἕστηκας. μὴ ὑψηλὰ φρόνει, ἀλλὰ φοβοῦ
-my @output_files = ('/tmp/add.single.svg', '/tmp/single.wide.svg', '/tmp/single.array.svg', '/tmp/wide.subplots.svg', '/tmp/single.pie.svg', '/tmp/pie.svg', '/tmp/single.boxplot.svg', '/tmp/boxplot.svg', '/tmp/single.violinplot.svg', '/tmp/violin.svg', '/tmp/single.barplot.svg', '/tmp/single.hexbin.svg', '/tmp/single.hist2d.svg', '/tmp/hexbin.svg', '/tmp/plots.svg', '/tmp/plot.single.svg', '/tmp/plot.single.arr.svg', '/tmp/barplots.svg', '/tmp/single.hist.svg', '/tmp/histogram.svg', '/tmp/single.scatter.svg', '/tmp/scatterplots.svg', '/tmp/imshow.single.svg', '/tmp/imshow.multiple.svg', '/tmp/single.tab.svg', '/tmp/single.bonds.svg', '/tmp/hlines.svg', '/tmp/dssp.single.svg', '/tmp/dssp.multiple.svg', '/tmp/hist2d.pads.svg', '/tmp/twinx.arr.svg', '/tmp/twinx.hash.svg', '/tmp/key.colors.bar.svg', '/tmp/bar.sub.svg', '/tmp/bar.sub.self.svg', '/tmp/barh.sub.svg', '/tmp/boxplot.sub.svg', '/tmp/hexbin.sub.svg', '/tmp/hist.sub.svg', '/tmp/hist2d.sub.svg', '/tmp/plot.sub.svg', '/tmp/newline_fail.svg', '/tmp/hist2d.logscale.svg', '/tmp/scatter.logscale.svg', '/tmp/hist.arr.svg', '/tmp/hist2d.svg');
+my @output_files = ('/tmp/add.single.svg', '/tmp/single.wide.svg', '/tmp/single.array.svg', '/tmp/wide.subplots.svg', '/tmp/single.pie.svg', '/tmp/pie.svg', '/tmp/single.boxplot.svg', '/tmp/boxplot.svg', '/tmp/single.violinplot.svg', '/tmp/violin.svg', '/tmp/single.barplot.svg', '/tmp/single.hexbin.svg', '/tmp/single.hist2d.svg', '/tmp/hexbin.svg', '/tmp/plots.svg', '/tmp/plot.single.svg', '/tmp/plot.single.arr.svg', '/tmp/barplots.svg', '/tmp/single.hist.svg', '/tmp/histogram.svg', '/tmp/single.scatter.svg', '/tmp/scatterplots.svg', '/tmp/imshow.single.svg', '/tmp/imshow.multiple.svg', '/tmp/single.tab.svg', '/tmp/single.bonds.svg', '/tmp/hlines.svg', '/tmp/dssp.single.svg', '/tmp/dssp.multiple.svg', '/tmp/hist2d.pads.svg', '/tmp/twinx.arr.svg', '/tmp/twinx.hash.svg', '/tmp/key.colors.bar.svg', '/tmp/bar.sub.svg', '/tmp/bar.sub.self.svg', '/tmp/barh.sub.svg', '/tmp/boxplot.sub.svg', '/tmp/hexbin.sub.svg', '/tmp/hist.sub.svg', '/tmp/hist2d.sub.svg', '/tmp/plot.sub.svg', '/tmp/newline_fail.svg', '/tmp/hist2d.logscale.svg', '/tmp/scatter.logscale.svg', '/tmp/hist.arr.svg', '/tmp/simple.arr.not.hash.svg', '/tmp/scatter.multiset.colorkey.svg', '/tmp/hist2d.svg');
 my %file2SHA;
 open my $tsv, '<', $sha_sum_filename;
 while (<$tsv>) {
@@ -2068,7 +2111,7 @@ sub check_SHA_sum {
 my %check_files = map {'/tmp/' . "$_.svg" => 1} ('add.single', 'barplots',
 'imshow.multiple','imshow.single', 'plot.single', 'plots',
 'single.bonds', 'single.tab', 'barplots', 'single.barplot', 'hlines',
-'dssp.single', 'dssp.multiple', 'plot.single.arr', 'hist2d.pads', 'twinx.arr', 'twinx.hash', 'key.colors.bar', 'newline_fail', 'barh.sub', 'bar.sub', 'bar.sub.self', 'boxplot.sub', 'hexbin.sub', 'hist2d.sub', 'plot.sub', 'hist2d.logscale', 'scatter.logscale');
+'dssp.single', 'dssp.multiple', 'plot.single.arr', 'hist2d.pads', 'twinx.arr', 'twinx.hash', 'key.colors.bar', 'newline_fail', 'barh.sub', 'bar.sub', 'bar.sub.self', 'boxplot.sub', 'hexbin.sub', 'hist2d.sub', 'plot.sub', 'hist2d.logscale', 'scatter.logscale', );
 
 foreach my $file (@output_files) {
 	if (defined $check_files{$file}) {

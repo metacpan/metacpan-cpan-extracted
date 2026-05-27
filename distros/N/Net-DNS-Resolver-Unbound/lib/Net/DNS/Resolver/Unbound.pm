@@ -4,18 +4,13 @@ use strict;
 use warnings;
 use integer;
 
-use Net::DNS;
+use Net::DNS 1.46;
 use base qw(Net::DNS::Resolver::Base DynaLoader);
-
-use constant OS_SPEC => "Net::DNS::Resolver::$^O";
-use constant OS_UNIX => "Net::DNS::Resolver::UNIX";
-use constant OS_CONF => grep eval "require $_", OS_SPEC, OS_UNIX;	## no critic
-use base (OS_CONF)[0];			## backward compatibility only
 
 our $VERSION;
 
 BEGIN {
-	$VERSION = '1.36';
+	$VERSION = '1.37';
 	eval { __PACKAGE__->bootstrap($VERSION) };
 }
 
@@ -50,8 +45,8 @@ Net::DNS::Resolver::Unbound - Net::DNS resolver based on libunbound
 =head1 DESCRIPTION
 
 Net::DNS::Resolver::Unbound is designed as an extension to an existing
-Net::DNS installation which facilitates DNS(SEC) name resolution using
-the libunbound library developed by NLnet Labs.
+Net::DNS installation which facilitates DNS name resolution and DNSSEC
+validation using the libunbound library developed by NLnet Labs.
 
 Net::DNS::Resolver::Unbound replaces the resolver send() and bgsend()
 functionality in the Net::DNS::Resolver::Base implementation.

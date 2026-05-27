@@ -12,7 +12,7 @@ use 5.010;
 #   $ws->send($data);
 #   $ws->close();
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Scalar::Util ();
 use Hypersonic::Protocol::WebSocket;

@@ -8,11 +8,9 @@ README.md
 README.pod
 arg.type.pl
 arr.pl
-change.log.txt
 css4.colors.txt
 dist.ini
 lib/Matplotlib/Simple.pm
-lib/Matplotlib/bu.Simple.pm
 make.subs.pl
 md2pod.pl
 methods.txt
@@ -89,6 +87,7 @@ t/output.images/plot.single.svg
 t/output.images/plot.sub.svg
 t/output.images/plots.svg
 t/output.images/scatter.logscale.svg
+t/output.images/scatter.multiset.colorkey.svg
 t/output.images/scatterplots.svg
 t/output.images/single.array.svg
 t/output.images/single.barplot.svg

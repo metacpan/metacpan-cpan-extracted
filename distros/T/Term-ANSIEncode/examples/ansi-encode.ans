@@ -1,0 +1,7 @@
+[% B_BLACK %][% BRIGHT RED %]   ___  [% BRIGHT YELLOW %] _   _ [% BRIGHT GREEN %] _____ [% BRIGHT BLUE %]_____  [% BRIGHT WHITE %] _____                        _       [% RESET %]
+[% B_BLACK %][% BRIGHT RED %]  / _ \ [% BRIGHT YELLOW %]| \ | |[% BRIGHT GREEN %]/  ___|[% BRIGHT BLUE %]_   _| [% BRIGHT WHITE %]|  ___|                      | |      [% RESET %]
+[% B_BLACK %][% BRIGHT RED %] / /_\ \[% BRIGHT YELLOW %]|  \| |[% BRIGHT GREEN %]\ `--. [% BRIGHT BLUE %] | | [% WHITE %]⦁⦁[% BRIGHT WHITE %]| |__ _ __   ___ ___   ___ __| | ___  [% RESET %]
+[% B_BLACK %][% BRIGHT RED %] |  _  |[% BRIGHT YELLOW %]| . ` |[% BRIGHT GREEN %] `--. \[% BRIGHT BLUE %] | |   [% BRIGHT WHITE %]|  __| '_ \ / __/ _ \ / __/ _` |/ _ \ [% RESET %]
+[% B_BLACK %][% BRIGHT RED %] | | | |[% BRIGHT YELLOW %]| |\  |[% BRIGHT GREEN %]/\__/ /[% BRIGHT BLUE %]_| |_[% WHITE %]⦁⦁[% BRIGHT WHITE %]| |__| | | | (_| (_) | (_| (_| |  __/ [% RESET %]
+[% B_BLACK %][% BRIGHT RED %] \_| |_/[% BRIGHT YELLOW %]\_| \_/[% BRIGHT GREEN %]\____/ [% BRIGHT BLUE %]\___/  [% BRIGHT WHITE %]\____/_| |_|\___\___/ \___\__,_|\___| [% RESET %]
+[% B_BLACK %]                                                                    [% RESET %]

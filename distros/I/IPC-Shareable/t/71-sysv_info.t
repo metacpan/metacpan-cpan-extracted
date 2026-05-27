@@ -4,6 +4,7 @@ use strict;
 use Data::Dumper;
 use File::Temp qw(tempdir);
 use IPC::Shareable;
+IPC::Shareable->testing_set('IPC::Shareable');
 use Test::More;
 
 my $segs_before = IPC::Shareable::seg_count();

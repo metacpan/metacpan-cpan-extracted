@@ -1,7 +1,7 @@
 package Data::Deque::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 require XSLoader;
 XSLoader::load('Data::Deque::Shared', $VERSION);
 @Data::Deque::Shared::Int::ISA = ('Data::Deque::Shared');
@@ -64,11 +64,14 @@ A consumer that claims position C<n> via the head/tail CAS therefore
 always observes the publication transition of the corresponding push
 before reading the value.
 
-C<drain> is safe under concurrent C<push>/C<pop>, but it will spin-wait
-on any slot whose pusher is mid-publish; if that pusher has crashed
-between winning its position CAS and publishing the slot value, drain
-will block indefinitely on that slot. Use C<drain> for orderly draining,
-not as a crash-recovery primitive.
+C<drain> is safe under concurrent C<push>/C<pop>: it spin-waits on any
+slot whose pusher is mid-publish, then releases each slot through the
+state machine. If a pusher crashes after winning its position CAS but
+before publishing the value (i.e. anywhere in the cursor-CAS to publish
+window), drain waits ~2 seconds and then force-recovers the slot via
+a generation bump (counted in C<stats-E<gt>{recoveries}>). A stalled-
+but-live pusher whose slot was force-recovered will silently drop its
+late publish rather than resurrect the slot as FILLED.
 
 =head2 Compatibility
 
@@ -92,7 +95,7 @@ usage is unaffected.
     $dq->size;  $dq->capacity;  $dq->is_empty;  $dq->is_full;
     $dq->clear;    # NOT concurrency-safe
     my $n = $dq->drain;  # concurrency-safe, returns count drained
-    $dq->stats;    # {size, capacity, pushes, pops, waits, timeouts, mmap_size}
+    $dq->stats;    # {size, capacity, pushes, pops, waits, timeouts, recoveries, mmap_size}
 
 =head2 Common
 
@@ -106,7 +109,10 @@ usage is unaffected.
 =head1 STATS
 
 C<stats()> returns: C<size>, C<capacity>, C<pushes>, C<pops>,
-C<waits>, C<timeouts>, C<mmap_size>.
+C<waits>, C<timeouts>, C<recoveries>, C<mmap_size>.
+C<recoveries> counts slots that drain force-skipped because a pusher
+crashed (or stalled > 2s) between winning the cursor CAS and
+publishing the value.
 
 =head1 SECURITY
 

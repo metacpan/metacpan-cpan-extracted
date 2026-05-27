@@ -40,6 +40,7 @@ copyright_holder = Test
 
 [@Author::GETTY]
 docker_image = myregistry/myapp
+docker_default = 0
 
 [@Author::GETTY::Docker / runtime-root]
 target = runtime-root
@@ -64,6 +65,7 @@ copyright_holder = Test
 [@Author::GETTY]
 docker_image = myregistry/myapp
 docker_tags = latest %v
+docker_default = 0
 
 [@Author::GETTY::Docker / runtime-root]
 target = runtime-root
@@ -88,6 +90,7 @@ copyright_holder = Test
 [@Author::GETTY]
 docker_image = myregistry/myapp
 docker_tags = latest %v
+docker_default = 0
 
 [@Author::GETTY::Docker / runtime-root]
 target = runtime-root
@@ -134,6 +137,7 @@ copyright_holder = Test
 
 [@Author::GETTY]
 docker_image = myregistry/myapp
+docker_default = 0
 
 [@Author::GETTY::Docker / runtime-root]
 image = other-registry/otherapp
@@ -156,6 +160,7 @@ copyright_holder = Test
 
 [@Author::GETTY]
 docker_image = myregistry/myapp
+docker_default = 0
 
 [@Author::GETTY::Docker / runtime-root]
 target = runtime-root
@@ -203,6 +208,81 @@ CONF
     qr/needs either `image = \.\.\.` in this subsection or `docker_image = \.\.\.`/,
     "two image-less subsections also fail with the same message",
   );
+}
+
+# Test 8: docker_image alone (no subsections) auto-adds one Docker::API plugin
+{
+  my $config = <<'CONF';
+name = Test-Dist
+author = Test <test@test.de>
+license = Perl_5
+copyright_holder = Test
+
+[@Author::GETTY]
+docker_image = myregistry/myapp
+CONF
+
+  my $tzil = build_dist($config);
+  my @docker_plugins = grep { $_->plugin_name =~ /Docker::API/ } @{$tzil->plugins};
+
+  is(scalar(@docker_plugins), 1, "docker_image alone auto-adds one Docker::API plugin");
+  is($docker_plugins[0]->image, 'myregistry/myapp', "auto-default plugin uses docker_image");
+}
+
+# Test 9: docker_image + docker_default = 0 suppresses the auto-default
+{
+  my $config = <<'CONF';
+name = Test-Dist
+author = Test <test@test.de>
+license = Perl_5
+copyright_holder = Test
+
+[@Author::GETTY]
+docker_image = myregistry/myapp
+docker_default = 0
+CONF
+
+  my $tzil = build_dist($config);
+  my @docker_plugins = grep { $_->plugin_name =~ /Docker::API/ } @{$tzil->plugins};
+
+  is(scalar(@docker_plugins), 0, "docker_default = 0 suppresses the auto-default plugin");
+}
+
+# Test 10: no docker_image, no auto-default
+{
+  my $config = <<'CONF';
+name = Test-Dist
+author = Test <test@test.de>
+license = Perl_5
+copyright_holder = Test
+
+[@Author::GETTY]
+CONF
+
+  my $tzil = build_dist($config);
+  my @docker_plugins = grep { $_->plugin_name =~ /Docker::API/ } @{$tzil->plugins};
+
+  is(scalar(@docker_plugins), 0, "no docker_image means no Docker::API plugin");
+}
+
+# Test 11: auto-default picks up docker_tags
+{
+  my $config = <<'CONF';
+name = Test-Dist
+author = Test <test@test.de>
+license = Perl_5
+copyright_holder = Test
+
+[@Author::GETTY]
+docker_image = myregistry/myapp
+docker_tags  = latest %v
+CONF
+
+  my $tzil = build_dist($config);
+  my @docker_plugins = grep { $_->plugin_name =~ /Docker::API/ } @{$tzil->plugins};
+
+  is(scalar(@docker_plugins), 1, "one Docker::API plugin via auto-default");
+  is_deeply($docker_plugins[0]->tag, ['latest', '%v'], "auto-default plugin uses docker_tags");
 }
 
 done_testing;

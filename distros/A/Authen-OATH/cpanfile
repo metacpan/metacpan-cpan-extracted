@@ -14,8 +14,10 @@ on 'test' => sub {
   requires "Digest::SHA" => "0";
   requires "ExtUtils::MakeMaker" => "0";
   requires "File::Spec" => "0";
+  requires "Test2::Require::Module" => "0";
+  requires "Test2::V0" => "0";
   requires "Test::More" => "0";
-  requires "Test::Needs" => "0";
+  requires "bignum" => "0";
   requires "perl" => "5.006";
 };
 

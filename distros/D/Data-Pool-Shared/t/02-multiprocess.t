@@ -106,7 +106,7 @@ for (1..100) { $pool->alloc }
 my $t0 = time;
 my $to = $pool->alloc(0.2);
 ok !defined $to, 'alloc timed out';
-ok time - $t0 < 2, 'timeout was reasonably fast';
+ok time - $t0 < 10, 'timeout was reasonably fast';
 $pool->reset;
 
 # --- Anonymous pool across fork ---

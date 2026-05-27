@@ -11,6 +11,7 @@ my $skip = 1;
 foreach (1) {
   last unless $^O eq 'linux';
   last unless qx{rpm -q perl};
+  last unless qx{rpm -q kernel};
   last if $?;
   $skip = 0;
 }

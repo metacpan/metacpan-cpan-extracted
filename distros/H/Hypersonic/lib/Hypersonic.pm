@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 use Scalar::Util qw(blessed);
 use XS::JIT;
@@ -878,7 +878,24 @@ sub compile {
             unless $ld =~ /-lws2_32\b/;
     }
 
-    my $ok = XS::JIT->compile(%compile_opts);
+    # Emit a visible breadcrumb BEFORE the (potentially slow) gcc/cc
+    # invocation so smoker logs never show "(child wrote no output)"
+    # when wait_for_port times out mid-compile.
+    if ($ENV{HYPERSONIC_COMPILE_DIAG} || $ENV{AUTOMATED_TESTING}) {
+        print STDERR "# Hypersonic: compiling JIT module $module_name ...\n";
+    }
+
+    # The JIT boot xsub installs Hypersonic::Stream::* xsubs into
+    # the same package that Hypersonic/Stream.pm already lives in,
+    # which Perl reports as "Subroutine ... redefined". This is
+    # expected (the .pm defines is_streaming_handler and the .so
+    # provides the rest at compile time, or - on a second compile()
+    # in the same process - it reinstalls them). Silence the noise.
+    my $ok;
+    {
+        no warnings 'redefine';
+        $ok = XS::JIT->compile(%compile_opts);
+    }
     die "XS::JIT->compile failed for $module_name (check liburing/zlib/openssl "
       . "are installed and linkable; extra_ldflags='"
       . ($compile_opts{extra_ldflags} // '') . "')"

@@ -1,5 +1,9 @@
 Revision history for Data::RingBuffer::Shared
 
+0.03  2026-05-26
+    - Bounded recovery (~2s) for slots abandoned in WRITING after a dead writer
+    - slot_idx widened to uint64_t (was truncating for capacity > UINT32_MAX)
+
 0.02  2026-04-26
     - memfd sealing + factored validate header
     - dedicated futex word

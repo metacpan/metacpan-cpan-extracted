@@ -5,7 +5,7 @@ use warnings;
 use Config;
 use Carp qw(croak);
 
-our $VERSION = '0.15';
+our $VERSION = '0.16';
 
 # =============================================================================
 # Cache Directory Management

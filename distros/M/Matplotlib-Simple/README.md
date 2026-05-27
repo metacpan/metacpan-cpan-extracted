@@ -1911,3 +1911,100 @@ all files will be written to `$fh->filename`; be sure to put `execute => 0` unle
         fh                => $fh,
         execute           => 1,
     });
+
+# Change log
+
+## 0.27
+
+Better warnings for undefined data in `scatter`
+
+`color_key` didn't work properly for multiple sets of data in `scatter`, which has now been fixed
+
+## 0.26
+
+`ncol` & `nrow` are synonymous with `ncols` and `nrows` respectively; testing now reflects these two specifically numeric options
+
+no longer exports Data::Printer and Devel::Confess with the module, but is still used inside the module
+
+'show.legend' option added to "hist", which is automatically turned off if there is only 1 group
+
+"add" group is no longer deleted
+
+"boxplot", "hist", and "violin" can take a single array, simplifying calls without requiring useless single keys when calling a single distribution
+
+`cb_min` and `cb_max` now work for colored_table
+
+"write_data" is no longer used in hist, as it prints numbers as strings (python3's types are a headache)
+
+Instead, all values are checked in hist for being numeric before being sent to "write_data"
+
+re-use undefined error array in hist_helper (slightly less RAM use)
+
+## 0.25
+
+re-used error array in scatter_helper
+
+better warnings for undefined values in multiple-set scatterplots
+
+fixed bug in scatterplot, where different sets would have the same label
+
+"logscale" now available with "boxplot, "hist", "plot", "scatter"
+
+$VERSION now prints with metadata for SVG output files, which required minor changes to testing
+
+slightly better warnings in plot_helper
+
+removed duplicate check from hist2d_helper
+
+better warnings if wrong data types are given to "add"
+
+Fixed bug in scatterplot, where color key could repeat on axes
+
+colorbar can now be in logscale for colored_table
+---
+## 0.24
+---
+Newlines are now possible in key names for barplot and pie; other characters may be fixed too
+
+@prop_cycle is only now taking RAM/valid where it's needed
+
+new dependencies in JSON::MaybeXS and MIME::Base64 to prevent errors in key names
+
+slight improvement in violinplot: "print" changed to "say" (1 less concatenation)
+
+dynamic method wrappers are used, which save ~120 lines of code
+
+re-used error array in "plt" to save RAM
+
+better warning for non-File::Temp objects
+
+more tests for wrapper subroutines
+
+duplicate check removed from hexbin_helper
+
+removed whiskers option from boxplot_helper, which didn't work the way that I thought that it did
+
+removed shebang, which isn't necessary in .pm files
+
+hist2d was missing an option for logscale on the axes, which it now has
+---
+## 0.23
+---
+colors for bar plots can be defined by hashes; e.g. colors => {A => 'red', B => 'green'}, etc
+---
+## 0.22
+---
+minor under-the-hood changes; "execute" subroutine, which was only called once, is now built into "plt" to save a function call; execution should be slightly faster/more efficient
+---
+## 0.21
+---
+"show" now works; files are still output if specified
+---
+## 0.20
+---
+better warnings for incomplete data in "plot"
+"plot" can plot with "twinx" when data is given in array or hash form
+"tick_params" is removed from plt methods
+fewer "my" for error arrays, using empty arrays from earlier; should increase efficiency slightly
+added tests for twinx in plot for both array and hash variants
+

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010_000;
 
-our $VERSION = '2.099000';
+our $VERSION = '2.099001';
 use App::Netdisco::Configuration;
 
 =head1 NAME
@@ -48,7 +48,7 @@ interactive requests such as changing port or device properties.
 
 =item *
 
-See the demo at: L<https://netdisco2-demo.herokuapp.com/>
+See the demo at: L<https://netdisco-demo-jyxhs.ondigitalocean.app/>
 
 =item *
 

@@ -8,9 +8,11 @@ use Data::Log::Shared;
 
 plan skip_all => 'AUTHOR_TESTING not set' unless $ENV{AUTHOR_TESTING};
 
-# SIGKILL a process mid-append. Reopen the file. Verify state is either
-# "append happened (entry readable)" or "append didn't happen (tail
-# advanced but commit word still 0, treated as invalid)". Never half-torn.
+# SIGKILL a process mid-append. Reopen the file. Verify every readable
+# entry is intact (50 bytes or "anchor"). After v0.04, abandoned slots
+# (writer killed after CAS but before len commit) are reported as
+# (undef, $next_off) so readers can skip past them — that's expected,
+# not a torn read. Pass abandon_wait_us=0 to skip immediately.
 
 my $path = tmpnam() . '.log';
 # Prime: write a known anchor entry
@@ -35,12 +37,13 @@ for my $trial (1..20) {
     waitpid($pid, 0);
     $kills++;
 
-    # Parent reopens and walks. Every entry read must be intact.
+    # Parent reopens and walks. Every readable entry must be intact;
+    # abandoned slots (undef data) are expected and skipped.
     my $log = Data::Log::Shared->new($path, 1024 * 1024);
     my $off = 0;
     my $walked_ok = 1;
-    while (my ($d, $next) = $log->read_entry($off)) {
-        if (length($d) != 50 && $d ne "anchor") {
+    while (my ($d, $next) = $log->read_entry($off, 0)) {
+        if (defined $d && length($d) != 50 && $d ne "anchor") {
             $walked_ok = 0;
             $torn++;
             last;

@@ -1,5 +1,21 @@
 Revision history for Hypersonic
 
+0.16    2026-05-26
+	- Fix CPAN-tester bailouts on t/0035-e2e-streaming.t (perl
+	  5.12..5.42 on the k93msid smoker): bumped wait_for_port
+	  default from 5s to 60s and t/0035 to 120s so slow debugging
+	  perls have time to JIT-compile the largest test server
+	  (regular + streaming + 2 SSE + 2 WebSocket routes)
+	- HypersonicTest spawn_server now sets HYPERSONIC_COMPILE_DIAG
+	  so the child prints a 'compiling JIT module ...' breadcrumb
+	  before the slow gcc invocation; wait_for_port diag is no
+	  longer empty when the timeout hits mid-compile
+	- Hypersonic compile() wraps XS::JIT->compile() in
+	  'no warnings "redefine"' to silence the
+	  'Subroutine Hypersonic::Stream::* redefined at
+	   Hypersonic.pm line 881' noise when the boot xsub installs
+	  its xsubs into the same package as Hypersonic/Stream.pm
+
 0.15    2026-05-22
 	- Requires XS::JIT with the functions_already_loaded() fix
 	- Hypersonic compile() now verifies the dispatch xsub is

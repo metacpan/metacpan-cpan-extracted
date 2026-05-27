@@ -1,0 +1,80 @@
+
+BEGIN {
+    unless ( $ENV{AUTHOR_TESTING} ) {
+        print qq{1..0 # SKIP these tests are for testing by the author\n};
+        exit;
+    }
+}
+
+use strict;
+use warnings;
+
+# this test was generated with Dist::Zilla::Plugin::Test::EOL 0.19
+
+use Test::More 0.88;
+use Test::EOL;
+
+my @files = (
+    'Build.PL',                                     'Changes',
+    'LICENSE',                                      'META.json',
+    'META.yml',                                     'Makefile.PL',
+    'README.md',                                    'cpanfile',
+    'eg/dhcpv6-decode',                             'eg/dhcpv6-lease-sim',
+    'lib/Net/DHCPv6.pm',                            'lib/Net/DHCPv6/Constants.pm',
+    'lib/Net/DHCPv6/DUID.pm',                       'lib/Net/DHCPv6/Message/Advertise.pm',
+    'lib/Net/DHCPv6/Message/Confirm.pm',            'lib/Net/DHCPv6/Message/Decline.pm',
+    'lib/Net/DHCPv6/Message/InformationRequest.pm', 'lib/Net/DHCPv6/Message/Rebind.pm',
+    'lib/Net/DHCPv6/Message/Reconfigure.pm',        'lib/Net/DHCPv6/Message/RelayForw.pm',
+    'lib/Net/DHCPv6/Message/RelayReply.pm',         'lib/Net/DHCPv6/Message/Release.pm',
+    'lib/Net/DHCPv6/Message/Renew.pm',              'lib/Net/DHCPv6/Message/Reply.pm',
+    'lib/Net/DHCPv6/Message/Request.pm',            'lib/Net/DHCPv6/Message/Solicit.pm',
+    'lib/Net/DHCPv6/Option.pm',                     'lib/Net/DHCPv6/Option/AftrName.pm',
+    'lib/Net/DHCPv6/Option/Auth.pm',                'lib/Net/DHCPv6/Option/BootfileParam.pm',
+    'lib/Net/DHCPv6/Option/BootfileUrl.pm',         'lib/Net/DHCPv6/Option/CaptivePortal.pm',
+    'lib/Net/DHCPv6/Option/ClientArchType.pm',      'lib/Net/DHCPv6/Option/ClientFqdn.pm',
+    'lib/Net/DHCPv6/Option/ClientId.pm',            'lib/Net/DHCPv6/Option/ClientLinkLayerAddr.pm',
+    'lib/Net/DHCPv6/Option/DnsServers.pm',          'lib/Net/DHCPv6/Option/DomainList.pm',
+    'lib/Net/DHCPv6/Option/ElapsedTime.pm',         'lib/Net/DHCPv6/Option/Generic.pm',
+    'lib/Net/DHCPv6/Option/IAAddr.pm',              'lib/Net/DHCPv6/Option/IANA.pm',
+    'lib/Net/DHCPv6/Option/IAPD.pm',                'lib/Net/DHCPv6/Option/IAPrefix.pm',
+    'lib/Net/DHCPv6/Option/IATA.pm',                'lib/Net/DHCPv6/Option/InfMaxRt.pm',
+    'lib/Net/DHCPv6/Option/InfoRefreshTime.pm',     'lib/Net/DHCPv6/Option/InterfaceId.pm',
+    'lib/Net/DHCPv6/Option/MudUrl.pm',              'lib/Net/DHCPv6/Option/NewPosixTimezone.pm',
+    'lib/Net/DHCPv6/Option/NewTzdbTimezone.pm',     'lib/Net/DHCPv6/Option/NisDomainName.pm',
+    'lib/Net/DHCPv6/Option/NisServers.pm',          'lib/Net/DHCPv6/Option/NispDomainName.pm',
+    'lib/Net/DHCPv6/Option/NispServers.pm',         'lib/Net/DHCPv6/Option/NtpServer.pm',
+    'lib/Net/DHCPv6/Option/ORO.pm',                 'lib/Net/DHCPv6/Option/PdExclude.pm',
+    'lib/Net/DHCPv6/Option/Preference.pm',          'lib/Net/DHCPv6/Option/RSOO.pm',
+    'lib/Net/DHCPv6/Option/RapidCommit.pm',         'lib/Net/DHCPv6/Option/ReconfAccept.pm',
+    'lib/Net/DHCPv6/Option/ReconfMsg.pm',           'lib/Net/DHCPv6/Option/RelayMsg.pm',
+    'lib/Net/DHCPv6/Option/RemoteId.pm',            'lib/Net/DHCPv6/Option/ServerId.pm',
+    'lib/Net/DHCPv6/Option/SipServerA.pm',          'lib/Net/DHCPv6/Option/SipServerD.pm',
+    'lib/Net/DHCPv6/Option/SolMaxRt.pm',            'lib/Net/DHCPv6/Option/StatusCode.pm',
+    'lib/Net/DHCPv6/Option/SubscriberId.pm',        'lib/Net/DHCPv6/Option/Unicast.pm',
+    'lib/Net/DHCPv6/Option/UserClass.pm',           'lib/Net/DHCPv6/Option/VendorClass.pm',
+    'lib/Net/DHCPv6/Option/VendorOpts.pm',          'lib/Net/DHCPv6/OptionList.pm',
+    'lib/Net/DHCPv6/Packet.pm',                     'lib/Net/DHCPv6/Packet/Relay.pm',
+    'lib/Net/DHCPv6/X.pm',                          'lib/Net/DHCPv6/X/BadDUID.pm',
+    'lib/Net/DHCPv6/X/BadMessage.pm',               'lib/Net/DHCPv6/X/BadOption.pm',
+    'lib/Net/DHCPv6/X/Internal.pm',                 'lib/Net/DHCPv6/X/Truncated.pm',
+    't/00-compile.t',                               't/001-constants.t',
+    't/002-duid.t',                                 't/003-option.t',
+    't/004-packet.t',                               't/005-decoder.t',
+    't/006-streaming.t',                            't/007-new-options.t',
+    't/008-warnings.t',                             't/030-constants-coverage.t',
+    't/100-pcap-wireshark.t',                       't/101-pcap-ztp.t',
+    't/102-pcap-ia-pd.t',                           't/103-pcap-ntp-server.t',
+    't/104-pcap-aftr-name.t',                       't/105-pcap-ia-ta.t',
+    't/106-pcap-mud.t',                             't/107-pcap-sip-server-d.t',
+    't/author-clean-namespaces.t',                  't/author-distmeta.t',
+    't/author-eof.t',                               't/author-eol.t',
+    't/author-no-breakpoints.t',                    't/author-no-tabs.t',
+    't/author-pod-coverage.t',                      't/author-pod-syntax.t',
+    't/author-portability.t',                       't/extract_pcap.pl',
+    't/lib/Test/Net/DHCPv6.pm',                     't/release-kwalitee.t',
+    't/release-pause-permissions.t',                't/release-test-legal.t',
+    't/release-unused-vars.t'
+);
+
+eol_unix_ok( $_, { trailing_whitespace => 1 } ) foreach @files;
+done_testing;

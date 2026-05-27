@@ -1,5 +1,26 @@
 Revision history for Perl extension IPC::Shareable.
 
+1.15    2026-05-26
+    - Refactor how we initialize $VERSION. It's no longer in a BEGIN block. That
+      broke Dist::Mgr
+    - Fixes #60: Fix FETCH deadlock when inner child re-decode acquires SH lock
+      against LOCK_EX cascade held by _lock_children
+    - Fix OpenBSD 64-bit shmid_ds binary layout (verified via offsetof on 7.4):
+      segsz is int (4B not 8B), nattch is short (2B), and struct has nanosecond
+      fields between time_t values.  Updated t/80-SharedMem.t synthetic test and
+      shm_segments() segsz extraction to match.
+    - Added OpenBSD test VM infrastructure
+    - t/20-lock_operation.t: probe for adequate semaphore resources before
+      running, skip gracefully on low-limit platforms (OpenBSD semmni=10).
+      Added periodic _end() cleanup calls so peak semaphore usage stays within
+      the default limit on OpenBSD.
+    - Added 'testing' flag; allows bulk cleanup of leaked segs/sems from a
+      previous test run. This was implemented in this distribution's unit test
+      suite
+    - Add Firefly unit test VM infrastructure
+    - Fix t/80-SharedMem.t: skip 64-bit tests on 32-bit Perl where the 'q' pack
+      template is unavailable (Raspian OS specifically)
+
 1.14     2026-05-22
     - Modify remove() to properly catch a non "0 but true" case when trying
       to destroy segments and semaphores so warnings are displayed properly

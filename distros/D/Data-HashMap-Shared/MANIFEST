@@ -1,5 +1,6 @@
 .gitignore
 bench/stress.pl
+bench/rdlock_bench.pl
 bench/vs.pl
 Changes
 eg/aggregator.pl
@@ -42,13 +43,10 @@ shm_ss.h
 t/01-ii.t
 t/02-ss.t
 t/03-si.t
-t/04-lru-ttl.t
 t/05-cursor.t
 t/06-stats.t
 t/07-variants.t
-t/08-take-flush-mmap.t
 t/09-touch-reserve-stats.t
-t/10-edge-cases.t
 t/11-anonymous.t
 t/12-utf8-flag.t
 t/13-memfd.t
@@ -56,6 +54,7 @@ t/14-add-ttl.t
 t/15-new-ops.t
 t/16-fork-multiproc.t
 t/17-resize.t
+t/18-dead-reader-recovery.t
 t/pod_synopsis.t
 t/version_check.t
 typemap
@@ -75,10 +74,12 @@ xt/concurrent_open.t
 xt/crash_recovery.t
 xt/eacces.t
 xt/eg_runs.t
+xt/edge-cases.t
 xt/fd_leak.t
 xt/fd_validation.t
 xt/fork_live.t
 xt/invalid_args.t
+xt/lru-ttl.t
 xt/manifest_vs_git.t
 xt/memfd_pass.t
 xt/memfd_seal.t
@@ -88,6 +89,7 @@ xt/new_ops_fuzz.t
 xt/reader_starvation_guard.t
 xt/rwlock_scaling.t
 xt/stale_recovery_crash.t
+xt/take-flush-mmap.t
 xt/torn_write.t
 xt/truncation.t
 xt/tsan.t

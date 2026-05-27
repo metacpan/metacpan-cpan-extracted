@@ -115,6 +115,34 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
+# Sharded cursor_seek (exercises the target != c->current branch where
+# v0.09 added the iter_pos/gen reset for the target shard).
+{
+    my $prefix = tmpfile();
+    my $map = Data::HashMap::Shared::II->new_sharded($prefix, 4, 1000);
+    shm_ii_put $map, $_, $_ * 10 for 1..50;
+
+    my $cur = shm_ii_cursor $map;
+    # Advance the cursor at least once so iter_pos/shard_idx are non-default.
+    my ($k0, $v0) = shm_ii_cursor_next $cur;
+    ok(defined $k0, 'sharded cursor advanced before seek');
+
+    # Seek a key that exists (very likely on a different shard).
+    ok((shm_ii_cursor_seek $cur, 42), 'sharded cursor_seek found key 42');
+    my ($k, $v) = shm_ii_cursor_next $cur;
+    is($k, 42, 'cursor_next after sharded seek returns sought key');
+    is($v, 420, 'cursor_next after sharded seek returns correct value');
+
+    # Seek a key that doesn't exist (covers iter_pos reset path).
+    ok(!(shm_ii_cursor_seek $cur, 99999), 'sharded seek missing key returns false');
+    # cursor_next must still return forward entries (not crash, not stall).
+    my $more = 0;
+    while (my ($k2, $v2) = shm_ii_cursor_next $cur) { $more++ }
+    cmp_ok($more, '>=', 0, 'cursor_next after sharded seek-miss completes without stall');
+
+    unlink glob "$prefix*";
+}
+
 # cursor_seek with TTL expired key
 {
     my $path = tmpfile();

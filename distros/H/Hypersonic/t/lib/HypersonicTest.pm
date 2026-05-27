@@ -53,6 +53,9 @@ sub spawn_server {
         # Make sure any C-level stdio buffers get flushed if the
         # child dies via croak/exit/SIGPIPE rather than reaching the
         # explicit exit() below.
+        # Force Hypersonic to print a breadcrumb before JIT compile so
+        # the captured log is never empty if wait_for_port gives up.
+        local $ENV{HYPERSONIC_COMPILE_DIAG} = 1;
         eval { $child_code->(); };
         my $err = $@;
         STDOUT->flush;
@@ -74,9 +77,16 @@ sub spawn_server {
 sub wait_for_port {
     my ($port, $opts) = @_;
     $opts //= {};
-    my $max_tries = $opts->{tries} // 50;
+    # Default: 60 seconds (300 tries x 0.2s). The JIT compile of a
+    # full Hypersonic server (all event backends + TLS + HTTP/2 +
+    # WebSocket + SSE + streaming) can take >30s on a debugging-perl
+    # smoke host (gcc -O0 -g), and on older perls/hosts even longer.
+    # The previous 5s default caused t/0035-e2e-streaming.t bailouts
+    # in CPAN tester reports on the k93msid host for perl 5.12..5.42.
+    my $max_tries = $opts->{tries} // 300;
+    my $sleep     = $opts->{sleep} // 0.2;
 
-    for (1 .. $max_tries) {
+    for my $try (1 .. $max_tries) {
         my $sock = IO::Socket::INET->new(
             PeerAddr => '127.0.0.1',
             PeerPort => $port,
@@ -84,7 +94,7 @@ sub wait_for_port {
             Timeout  => 0.1,
         );
         if ($sock) { close $sock; return 1; }
-        select undef, undef, undef, 0.1;
+        select undef, undef, undef, $sleep;
     }
 
     # Server didn't come up - surface as much detail as we can.

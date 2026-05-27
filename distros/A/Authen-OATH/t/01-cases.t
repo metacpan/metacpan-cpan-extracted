@@ -1,41 +1,57 @@
-#!perl
+use Test2::V0;
 
-use strict;
-use warnings;
+use Authen::OATH ();
+use Digest::SHA  ();
 
-use Authen::OATH;
-use Digest::SHA;
-use Test::More;
+my $pwd = '12345678901234567890';
 
-my $pwd  = '12345678901234567890';
-my $oath = Authen::OATH->new();
-my $OATH = Authen::OATH->new( 'digits' => 8 );
-ok( defined $oath,              'successfully created new object' );
-ok( $oath->isa('Authen::OATH'), 'correct class.' );
-ok( $oath->digits == 6,         'default digits set to 6' );
-ok(
-    $oath->digest eq 'Digest::SHA',
-    'default digest set to Digest::SHA'
-);
-ok( $oath->{'timestep'} == 30, 'default timestep set to 30' );
+subtest 'defaults' => sub {
+    my $oath = Authen::OATH->new;
+    isa_ok( $oath, ['Authen::OATH'] );
+    is( $oath->digits,   6,             'default digits is 6' );
+    is( $oath->digest,   'Digest::SHA', 'default digest is Digest::SHA' );
+    is( $oath->timestep, 30,            'default timestep is 30' );
+};
 
-print "Checking test vectors for totp()...\n";
-ok( $OATH->totp( $pwd, 59 ) eq '94287082' );
-ok( $OATH->totp( $pwd, 1111111109 ) eq '07081804' );
-ok( $OATH->totp( $pwd, 1111111111 ) eq '14050471' );
-ok( $OATH->totp( $pwd, 1234567890 ) eq '89005924' );
-ok( $OATH->totp( $pwd, 2000000000 ) eq '69279037' );
+subtest 'totp test vectors (RFC 6238)' => sub {
+    my $oath  = Authen::OATH->new( digits => 8 );
+    my @cases = (
+        [ 59,         '94287082' ],
+        [ 1111111109, '07081804' ],
+        [ 1111111111, '14050471' ],
+        [ 1234567890, '89005924' ],
+        [ 2000000000, '69279037' ],
+    );
+    for my $case (@cases) {
+        my ( $time, $expected ) = @{$case};
+        is(
+            $oath->totp( $pwd, $time ), $expected,
+            "totp at time $time"
+        );
+    }
+};
 
-print "Checking test vectors for hotp()...\n";
-ok( $oath->hotp( $pwd, 0 ) eq '755224' );
-ok( $oath->hotp( $pwd, 1 ) eq '287082' );
-ok( $oath->hotp( $pwd, 2 ) eq '359152' );
-ok( $oath->hotp( $pwd, 3 ) eq '969429' );
-ok( $oath->hotp( $pwd, 4 ) eq '338314' );
-ok( $oath->hotp( $pwd, 5 ) eq '254676' );
-ok( $oath->hotp( $pwd, 6 ) eq '287922' );
-ok( $oath->hotp( $pwd, 7 ) eq '162583' );
-ok( $oath->hotp( $pwd, 8 ) eq '399871' );
-ok( $oath->hotp( $pwd, 9 ) eq '520489' );
+subtest 'hotp test vectors (RFC 4226)' => sub {
+    my $oath  = Authen::OATH->new;
+    my @cases = (
+        [ 0, '755224' ],
+        [ 1, '287082' ],
+        [ 2, '359152' ],
+        [ 3, '969429' ],
+        [ 4, '338314' ],
+        [ 5, '254676' ],
+        [ 6, '287922' ],
+        [ 7, '162583' ],
+        [ 8, '399871' ],
+        [ 9, '520489' ],
+    );
+    for my $case (@cases) {
+        my ( $counter, $expected ) = @{$case};
+        is(
+            $oath->hotp( $pwd, $counter ), $expected,
+            "hotp counter $counter"
+        );
+    }
+};
 
-done_testing();
+done_testing;

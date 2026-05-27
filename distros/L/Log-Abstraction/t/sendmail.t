@@ -52,4 +52,77 @@ Test::Mockingbird::unmock('Email::Sender::Transport::SMTP', 'send_email');
 
 cmp_ok($called, '==', 1, 'sendmail was called just once');
 
+# ---------------------------------------------------------------------------
+# Throttle: min_interval
+# ---------------------------------------------------------------------------
+
+subtest 'min_interval suppresses emails within cooldown' => sub {
+	my $sent = 0;
+	Test::Mockingbird::mock('Email::Sender::Transport::SMTP', 'send_email', sub { $sent++; return 1 });
+
+	my $log = Log::Abstraction->new({
+		logger => {
+			sendmail => {
+				host => 'localhost',
+				to   => 'alerts@example.com',
+				min_interval => 300,
+			}
+		},
+		level => 'warning'
+	});
+
+	$log->warn('first warning');
+	$log->warn('second warning — should be throttled');
+	$log->warn('third warning — should be throttled');
+
+	cmp_ok($sent, '==', 1, 'only one email sent despite three warn calls');
+
+	Test::Mockingbird::unmock('Email::Sender::Transport::SMTP', 'send_email');
+};
+
+subtest 'no min_interval means every eligible message sends' => sub {
+	my $sent = 0;
+	Test::Mockingbird::mock('Email::Sender::Transport::SMTP', 'send_email', sub { $sent++; return 1 });
+
+	my $log = Log::Abstraction->new({
+		logger => {
+			sendmail => {
+				host => 'localhost',
+				to   => 'alerts@example.com',
+			}
+		},
+		level => 'warning'
+	});
+
+	$log->warn('first');
+	$log->warn('second');
+
+	cmp_ok($sent, '==', 2, 'both emails sent when no min_interval set');
+
+	Test::Mockingbird::unmock('Email::Sender::Transport::SMTP', 'send_email');
+};
+
+subtest 'min_interval=0 does not throttle' => sub {
+	my $sent = 0;
+	Test::Mockingbird::mock('Email::Sender::Transport::SMTP', 'send_email', sub { $sent++; return 1 });
+
+	my $log = Log::Abstraction->new({
+		logger => {
+			sendmail => {
+				host => 'localhost',
+				to   => 'alerts@example.com',
+				min_interval => 0,
+			}
+		},
+		level => 'warning'
+	});
+
+	$log->warn('first');
+	$log->warn('second');
+
+	cmp_ok($sent, '==', 2, 'both emails sent when min_interval is 0');
+
+	Test::Mockingbird::unmock('Email::Sender::Transport::SMTP', 'send_email');
+};
+
 done_testing();

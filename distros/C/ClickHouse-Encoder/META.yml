@@ -1,0 +1,38 @@
+---
+abstract: 'Encode data to ClickHouse native format'
+author:
+  - vividsnow
+build_requires:
+  Digest::SHA: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Temp: '0'
+  IO::Socket::INET: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ClickHouse-Encoder
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  Compress::LZ4: '0'
+  Compress::Zstd: '0'
+  IO::Compress::Gzip: '0'
+requires:
+  HTTP::Tiny: '0'
+  Math::BigInt: '0'
+  Time::HiRes: '0'
+  XSLoader: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/vividsnow/perl5-clickhouse-encoder/issues
+  repository: https://github.com/vividsnow/perl5-clickhouse-encoder.git
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

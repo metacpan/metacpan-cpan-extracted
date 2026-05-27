@@ -1,0 +1,82 @@
+#! /usr/bin/env perl
+use strictures 2;
+use FindBin;
+use lib "$FindBin::Bin/../lib";    # locate the module from the repo
+
+use Net::DHCPv6;                   # top-level decode/encode API
+
+# ── Input ──────────────────────────────────────────────────────────
+# Read hex strings from command-line args, or from STDIN if none given
+
+my @hexes = @ARGV;
+if ( !@hexes ) {
+    local $/;    # slurp mode
+    @hexes = split /\s+/, <STDIN>;
+}
+
+# ── Decode ─────────────────────────────────────────────────────────
+
+for my $hex ( @hexes ) {
+
+    # Normalise the hex string:
+    $hex =~ s/\s+//g;     # drop whitespace
+    $hex =~ s/\\x//gi;    # drop common \x prefix
+
+    # decode_with_error returns ($msg, $error).
+    # $msg is a Net::DHCPv6::Packet (or one of its subclasses).
+    my ( $msg, $err ) = Net::DHCPv6->decode_with_error( pack( 'H*', $hex ) );
+
+    if ( $err ) {
+        print "ERROR: $err\n";
+        next;
+    }
+
+    # All packet types carry a numeric msg_type (1-13) and a 24-bit
+    # transaction_id.  msg_type_name() returns the RFC name, e.g.
+    # "SOLICIT" for 1, "REPLY" for 7.
+    printf "msg_type: %s (%d)\n", $msg->msg_type_name // 'UNKNOWN', $msg->msg_type;
+    printf "transaction_id: 0x%06x\n", $msg->transaction_id;
+
+    # RELAY-FORW (12) and RELAY-REPLY (13) use a different wire
+    # format with hop_count, link_addr, peer_addr and an inner
+    # encapsulated message.
+    if ( $msg->can( 'hop_count' ) ) {
+        printf "hop_count: %d\n", $msg->hop_count;
+        printf "link_addr: %s\n", $msg->link_addr;
+        printf "peer_addr: %s\n", $msg->peer_addr;
+        my $inner = $msg->message;
+        if ( $inner ) {
+            printf "  relayed:\n";
+            printf "    msg_type: %s (%d)\n", $inner->msg_type_name // 'UNKNOWN', $inner->msg_type;
+        }
+    }
+
+    # options returns the OptionList container object.
+    # calling ->options on that returns an arrayref of Option objects.
+    my $opts    = $msg->options;
+    my $options = $opts->options;
+    if ( @$options ) {
+        print "options:\n";
+        for my $opt ( @$options ) {
+            my $code = $opt->code;    # numeric option code, e.g. 1, 23
+            my $name = Net::DHCPv6::Constants::option_name( $code ) // 'OPTION_UNKNOWN';
+            printf "  %s (%d): %s\n", $name, $code, _opt_value( $opt );
+        }
+    }
+
+    print "\n" if @hexes > 1;
+}
+
+# ── Helper: option value / sub-option inspection ───────────────────
+# Dispatches on capability to give a human-readable representation.
+
+sub _opt_value {
+    my ( $opt ) = @_;
+    if ( $opt->can( 'servers' ) )           { return '[' . join( ', ', @{ $opt->servers } ) . ']' }
+    if ( $opt->can( 'domains' ) )           { return '[' . join( ', ', @{ $opt->domains } ) . ']' }
+    if ( $opt->can( 'requested_options' ) ) { return '[' . join( ', ', @{ $opt->requested_options } ) . ']' }
+    if ( $opt->can( 'enterprise_number' ) ) { return sprintf 'enterprise=%d', $opt->enterprise_number }
+    if ( $opt->can( 'value' ) )             { return $opt->value }
+    if ( $opt->can( 'data' ) )              { return unpack( 'H*', $opt->data ) }
+    return '(no value)';
+}

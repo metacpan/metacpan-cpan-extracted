@@ -67,6 +67,7 @@ t/08-eventfd.t
 t/09-review-fixes.t
 t/10-coverage-gaps.t
 t/11-sync-stats.t
+t/12-dead-reader-recovery.t
 t/pod_synopsis.t
 t/version_check.t
 xs/f32.xs

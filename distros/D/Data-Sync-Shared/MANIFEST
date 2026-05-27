@@ -51,6 +51,7 @@ xt/cloexec_exec.t
 xt/concurrent_open.t
 xt/cppcheck.t
 xt/crash_recovery.t
+xt/dead_reader_recovery.t
 xt/eg_runs.t
 xt/eintr.t
 xt/ev_eventfd.t

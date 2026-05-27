@@ -8,7 +8,7 @@ use Config;
 use Errno qw(EEXIST EPERM);
 use IPC::SysV qw(IPC_RMID IPC_STAT);
 
-our $VERSION = '1.14';
+our $VERSION = '1.15';
 
 use constant {
     DEFAULT_SEG_SIZE    => 1024,
@@ -243,8 +243,41 @@ sub stat {
                 = unpack('L4 L x[24] L l l x[4] L x[4] l x[4] l x[4] l x[20]', $data);
         }
     }
+    elsif ($^O eq 'openbsd' && $Config{longsize} == 8) {
+        # 64-bit OpenBSD shmid_ds (104 bytes), struct layout from sys/shm.h:
+        #   ipc_perm (32 bytes): uid(4) gid(4) cuid(4) cgid(4) mode(4/int)
+        #             +12 bytes (key/seq/pad)
+        #   segsz(4/int) lpid(4/pid_t) cpid(4/pid_t) nattch(2/shmatt_t) [pad 2]
+        #   atime(8/time_t) __shm_atimensec(8/long)
+        #   dtime(8/time_t) __shm_dtimensec(8/long)
+        #   ctime(8/time_t) __shm_ctimensec(8/long)
+        #   shm_internal(8/ptr)
+
+        @values{qw(uid gid cuid cgid mode segsz lpid cpid nattch atime dtime ctime)}
+            = unpack('L L L L L x[12] L l l S x[2] q x[8] q x[8] q', $data);
+    }
+    elsif ($^O eq 'dragonfly' && $Config{longsize} == 8) {
+        # 64-bit DragonFly BSD shmid_ds, struct layout from sys/sys/shm.h and
+        # sys/sys/ipc.h (DragonFly forked from FreeBSD 4.x; key_t = int, not long).
+        #
+        # ipc_perm (28 bytes):
+        #   uid(4) gid(4) cuid(4) cgid(4) mode(4/uint32_t) _seq(2) [2 pad] _key(4/int)
+        # [4 bytes struct padding to align segsz to 8-byte boundary]
+        # shmid_ds:
+        #   segsz(8/size_t) lpid(4/pid_t) cpid(4/pid_t)
+        #   nattch(8/shmatt_t=ulong) atime(8/time_t) __shm_atimensec(8/long)
+        #   dtime(8/time_t) __shm_dtimensec(8/long)
+        #   ctime(8/time_t) __shm_ctimensec(8/long) shm_internal(4/int32_t)
+        #
+        # Offsets: ipc_perm@0(28) pad@28(4) segsz@32(8) lpid@40(4) cpid@44(4)
+        #          nattch@48(8) atime@56(8) atimensec@64(8) dtime@72(8)
+        #          dtimensec@80(8) ctime@88(8) ctimensec@96(8) internal@104(4)
+
+        @values{qw(uid gid cuid cgid mode segsz lpid cpid nattch atime dtime ctime)}
+            = unpack('L L L L L x[12] Q l l Q q x[8] q x[8] q', $data);
+    }
     else {
-        # macOS/BSD shmid_ds / ipc_perm layout:
+        # macOS shmid_ds / ipc_perm layout (XNU kernel):
         #
         # ipc_perm (24 bytes): uid(4) gid(4) cuid(4) cgid(4) mode(2/ushort) seq(2) key(4)
         # shmid_ds: segsz(8) lpid(4) cpid(4) nattch(2/ushort) [pad 2] atime(8) dtime(8) ctime(8)

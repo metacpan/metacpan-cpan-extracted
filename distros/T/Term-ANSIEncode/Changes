@@ -437,3 +437,19 @@
 2.02    May 18, 2026
 
         Improved the capability of the CHAR token.
+
+2.03    May 26, 2026
+
+        Refactored the code.  Discovered a bizarre bug that only happens
+		with the "ansiencode" script, but not the module itself.
+
+        The bug?  The token "BLOCK" and "ENDBLOCK" are not processed from the
+		"ansiencode" script, but works just fine from using the
+		"Term::ANSIEncode" script.  I don't get it and A.I. doesn't get it.
+		It doesn't make any sense.  So I shrug my shoulders and accept it.
+
+2.04    May 27, 2026
+
+        Macros added.
+		Documentation improved.
+		Additional testing on build.

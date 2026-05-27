@@ -1,6 +1,17 @@
 Revision history for Log-Abstraction
 
-0.28
+0.29	Tue May 26 20:36:13 EDT 2026
+
+	[ Enhancements ]
+	- Added min_interval throttle to sendmail backend: at most one email per
+	  configured interval (seconds); cooldown state stored in _last_email_sent
+	  on the object and inherited by clones
+
+	[ Bug Fixes]
+	- Bump minimum Test::Mockingbird version to fix https://www.cpantesters.org/cpan/report/f148a3e6-50a2-11f1-8224-a122dd379578
+
+0.28 Fri May 15 20:28:07 EDT 2026
+
 	[ Enhancements ]
 	- Added context (ctx) to code ref logger callbacks
 

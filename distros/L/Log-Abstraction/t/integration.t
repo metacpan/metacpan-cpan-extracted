@@ -652,6 +652,75 @@ subtest 'sendmail — sendmail() not called below configured level' => sub {
 	is($sent, 0, 'sendmail() not called when message below sendmail level');
 };
 
+subtest 'sendmail — min_interval throttles repeated emails' => sub {
+	plan tests => 1;
+
+	my $sent = 0;
+	my $g    = mock_scoped 'Email::Sender::Simple::sendmail' => sub { $sent++ };
+
+	my $logger = Log::Abstraction->new(
+		logger => {
+			sendmail => {
+				to           => 'ops@example.com',
+				host         => 'localhost',
+				min_interval => 300,
+			},
+		},
+		level => 'warning',
+	);
+
+	$logger->warn('first alert');
+	$logger->warn('second alert — should be throttled');
+	$logger->warn('third alert — should be throttled');
+
+	is($sent, 1, 'only first email sent within min_interval window');
+};
+
+subtest 'sendmail — no min_interval sends every eligible message' => sub {
+	plan tests => 1;
+
+	my $sent = 0;
+	my $g    = mock_scoped 'Email::Sender::Simple::sendmail' => sub { $sent++ };
+
+	my $logger = Log::Abstraction->new(
+		logger => {
+			sendmail => {
+				to   => 'ops@example.com',
+				host => 'localhost',
+			},
+		},
+		level => 'warning',
+	);
+
+	$logger->warn('first');
+	$logger->warn('second');
+
+	is($sent, 2, 'both emails sent when no min_interval configured');
+};
+
+subtest 'sendmail — min_interval=0 does not throttle' => sub {
+	plan tests => 1;
+
+	my $sent = 0;
+	my $g    = mock_scoped 'Email::Sender::Simple::sendmail' => sub { $sent++ };
+
+	my $logger = Log::Abstraction->new(
+		logger => {
+			sendmail => {
+				to           => 'ops@example.com',
+				host         => 'localhost',
+				min_interval => 0,
+			},
+		},
+		level => 'warning',
+	);
+
+	$logger->warn('first');
+	$logger->warn('second');
+
+	is($sent, 2, 'both emails sent when min_interval is 0');
+};
+
 # ============================================================
 # 12. Config-file constructor path
 # ============================================================

@@ -29,10 +29,12 @@ my %WriteMakefileArgs = (
     "Digest::SHA" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::Spec" => 0,
+    "Test2::Require::Module" => 0,
+    "Test2::V0" => 0,
     "Test::More" => 0,
-    "Test::Needs" => 0
+    "bignum" => 0
   },
-  "VERSION" => "3.000000",
+  "VERSION" => "3.000001",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,9 +49,11 @@ my %FallbackPrereqs = (
   "Math::BigInt" => 0,
   "Module::Runtime" => 0,
   "Moo" => "2.002004",
+  "Test2::Require::Module" => 0,
+  "Test2::V0" => 0,
   "Test::More" => 0,
-  "Test::Needs" => 0,
   "Types::Standard" => 0,
+  "bignum" => 0,
   "strict" => 0,
   "warnings" => 0
 );

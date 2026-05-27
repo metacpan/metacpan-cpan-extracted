@@ -22,5 +22,5 @@ SKIP: {
   is(@$whatprovides, 1, 'size of whatprovides');
   my $package = $whatprovides->[0];
   isa_ok($package, 'RPM::Query::Package');
-  is($package->name, 'perl', 'name');
+  like($package->name, qr/\Aperl(-libs)?\Z/, 'name');
 }

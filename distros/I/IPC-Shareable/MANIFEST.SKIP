@@ -47,3 +47,5 @@ agent.txt
 ^nytprof.out$
 profiling/
 ^plans/
+TESTING.md
+^[^/]+\.md$

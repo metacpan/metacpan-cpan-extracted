@@ -14,7 +14,7 @@ build_requires:
   POSIX: '0'
   Readonly: '0'
   Test::DescribeMe: '0'
-  Test::Mockingbird: '0'
+  Test::Mockingbird: '0.1'
   Test::Most: '0'
   Test::Needs: '0'
   Test::Returns: '0'
@@ -49,5 +49,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Abstraction
   homepage: https://metacpan.org/pod/Log::Abstraction
   repository: git://github.com/nigelhorne/Log-Abstraction.git
-version: 0.28
+version: 0.29
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

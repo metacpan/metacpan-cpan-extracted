@@ -63,8 +63,8 @@ DESCRIPTION
     *   Opt-in LRU eviction and per-key TTL (lock-free reads via clock
         eviction)
 
-    *   Stale lock recovery (automatic detection of dead lock holders via
-        PID tracking)
+    *   Stale lock recovery for both writers and readers (dead PIDs detected
+        and drained automatically)
 
   Variants
     Data::HashMap::Shared::I16 - int16 to int16
@@ -274,20 +274,34 @@ DESCRIPTION
 
   Crash Safety
     If a process dies (e.g., SIGKILL, OOM kill) while holding the write
-    lock, other processes will detect the stale lock within 2 seconds via
-    PID tracking and automatically recover. The writer's PID is encoded in
-    the rwlock word itself (single atomic CAS, no crash window), so recovery
-    is reliable even if the process is killed mid-acquisition. On timeout,
-    waiters check "kill($pid, 0)" and CAS-release the lock if the holder is
+    lock, other processes detect the stale lock within 2 seconds and
+    automatically recover. The writer's PID is encoded in the rwlock word
+    itself (single atomic CAS, no crash window). On "FUTEX_WAIT" timeout,
+    waiters "kill($pid, 0)" the holder and CAS-release the lock if it's
     dead.
+
+    Reader-side recovery uses a 1024-slot table in the shared mmap (one slot
+    per process, claimed lazily on first lock; fork()'d children claim a
+    fresh slot via "pthread_atfork"). On a writer-lock timeout the recovery
+    scan drains every dead PID's reader and waiter counts, so a worker
+    killed mid-"incr_by" no longer pins the rwlock indefinitely. Beyond 1024
+    simultaneous handles per map, new handles skip slot tracking and fall
+    back to the slow per-timeout drain.
+
+    The same path validates and rebuilds the LRU doubly-linked list if a
+    dead writer left it inconsistent. "stat_recoveries" in "stats" counts
+    every recovery event.
 
     Limitation: PID-based recovery assumes all processes share the same PID
     namespace. Cross-container sharing (different PID namespaces) is not
     supported.
 
-    After recovery from a mid-mutation crash, the map data may be
-    inconsistent. Calling "clear" after detecting a stale lock recovery is
-    recommended for safety-critical applications.
+    After recovery from a mid-mutation crash, the map data may be partially
+    inconsistent (e.g., one entry was being updated when the writer died).
+    Map structure (locks, LRU, free lists, counters) is restored, but the
+    specific entry being mutated may have stale or partial bytes. Calling
+    "clear" after detecting a stale lock recovery is recommended for
+    safety-critical applications.
 
 BENCHMARKS
     Throughput versus other shared-memory / on-disk solutions, 25K entries,

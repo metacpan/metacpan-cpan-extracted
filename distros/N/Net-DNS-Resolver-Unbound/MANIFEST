@@ -16,6 +16,7 @@ t/30-asynchronous.t
 t/35-bgread.t
 t/40-DNSSEC-validate.t
 t/trust_anchor
+ex/DNSSECexample.pl
 ex/TLSexample.pl
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
