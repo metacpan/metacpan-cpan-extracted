@@ -2,8 +2,8 @@ NAME
     Filename::Timestamp - Extract date/timestamp from filename, if any
 
 VERSION
-    This document describes version 0.003 of Filename::Timestamp (from Perl
-    distribution Filename-Timestamp), released on 2025-10-20.
+    This document describes version 0.004 of Filename::Timestamp (from Perl
+    distribution Filename-Timestamp), released on 2026-05-27.
 
 SYNOPSIS
      use Filename::Timestamp qw(extract_timestamp_from_filename);
@@ -40,6 +40,7 @@ FUNCTIONS
            second    => 48,
            tz_offset => 25200,
            year      => 2024,
+           ymd       => 20240908,
          }
 
     *   Example #2:
@@ -59,6 +60,7 @@ FUNCTIONS
            second      => 44,
            tz          => "floating",
            year        => 2024,
+           ymd         => 20240908,
          }
 
     *   Example #3:
@@ -78,6 +80,7 @@ FUNCTIONS
            second      => 26,
            tz          => "floating",
            year        => 2024,
+           ymd         => 20240908,
          }
 
     *   Example #4:
@@ -97,6 +100,7 @@ FUNCTIONS
            second      => 44,
            tz          => "floating",
            year        => 2024,
+           ymd         => 20240901,
          }
 
     *   Example #5:
@@ -116,6 +120,7 @@ FUNCTIONS
            second      => 0,
            tz          => "floating",
            year        => 2024,
+           ymd         => 20241204,
          }
 
     *   Example #6:
@@ -178,7 +183,8 @@ CONTRIBUTING
     required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+    This software is copyright (c) 2026, 2025 by perlancar
+    <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

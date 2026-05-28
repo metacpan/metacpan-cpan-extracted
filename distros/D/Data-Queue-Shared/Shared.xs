@@ -652,7 +652,7 @@ push_multi(self, ...)
         pushed++;
     }
     queue_mutex_unlock(h->hdr);
-    if (pushed) queue_wake_consumers(h->hdr);
+    if (pushed) queue_wake_consumers_n(h->hdr, pushed);
     RETVAL = pushed;
   OUTPUT:
     RETVAL
@@ -673,6 +673,10 @@ pop_multi(self, count)
     UV n = 0;
     int last_r = 0;
     int oom = 0;
+    /* Cap count at capacity: the queue can't hold more than capacity items,
+     * so a single pop_multi can't return more than that. This also prevents
+     * size_t overflow in the items_buf allocation for adversarial inputs. */
+    if (count > h->capacity) count = h->capacity;
     if (count > 0) {
         items_buf = (void *)malloc((size_t)count * sizeof(*items_buf));
         if (!items_buf) croak("Data::Queue::Shared::Str: out of memory");
@@ -690,7 +694,7 @@ pop_multi(self, count)
         n++;
     }
     queue_mutex_unlock(h->hdr);
-    queue_wake_producers(h->hdr);
+    if (n) queue_wake_producers_n(h->hdr, (uint32_t)n);
     EXTEND(SP, (SSize_t)n);
     for (UV j = 0; j < n; j++) {
         SV *sv = newSVpvn(items_buf[j].buf, items_buf[j].len);
@@ -885,7 +889,7 @@ drain(self, ...)
         drained_n++;
     }
     queue_mutex_unlock(h->hdr);
-    queue_wake_producers(h->hdr);
+    if (drained_n) queue_wake_producers_n(h->hdr, (uint32_t)drained_n);
     EXTEND(SP, (SSize_t)drained_n);
     while (drained_head) {
         struct drain_item *it = drained_head; drained_head = it->next;

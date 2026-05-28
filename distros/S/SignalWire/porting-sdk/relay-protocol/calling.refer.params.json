@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.refer` (params). Extracted from switchblade `PublicCallReferParams.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "device": {
+      "additionalProperties": true,
+      "properties": {
+        "params": {
+          "additionalProperties": true,
+          "properties": {
+            "headers": {
+              "type": "object"
+            },
+            "to": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "to"
+          ],
+          "type": "object"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "params"
+      ],
+      "type": "object"
+    },
+    "node_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id",
+    "device"
+  ],
+  "title": "calling.refer params",
+  "type": "object",
+  "x-method": "calling.refer",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallReferParams.cs"
+}

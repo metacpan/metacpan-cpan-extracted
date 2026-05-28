@@ -1,0 +1,29 @@
+{
+  "positional": {
+    "classes": {
+      "Greeter": {
+        "methods": {
+          "greet": {
+            "params": [
+              {
+                "name": "self",
+                "kind": "self"
+              },
+              {
+                "name": "name",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "count",
+                "type": "int",
+                "required": true
+              }
+            ],
+            "returns": "string"
+          }
+        }
+      }
+    }
+  }
+}

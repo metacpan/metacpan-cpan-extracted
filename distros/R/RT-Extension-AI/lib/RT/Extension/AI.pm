@@ -3,13 +3,14 @@ use warnings;
 
 package RT::Extension::AI;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 require RT::Extension::AI::Provider;
 require RT::Extension::AI::Provider::OpenAI;
 require RT::Extension::AI::Provider::Gemini;
 
 RT->AddJavaScript('rt-extension-ai.js');
+RT->AddJavaScript('ai-chat.js');
 RT->AddStyleSheets('rt-extension-ai.css');
 
 if ( RT->Config->can('RegisterPluginConfig') ) {
@@ -24,6 +25,203 @@ if ( RT->Config->can('RegisterPluginConfig') ) {
             RT_AI_Provider       => { Type => 'HASH' },
         }
     );
+}
+
+=head2 GenerateTicketSummary
+
+Generate a formatted summary of ticket conversations for AI processing. This function
+extracts Create and Correspond transactions from a ticket and formats them using
+XML-like tags similar to the context file format.
+
+=cut
+
+sub GenerateTicketSummary {
+    my %args = @_;
+    my $ticket = $args{TicketObj} or return '';
+    my $type = $args{TransactionType} || 'Correspond';
+    my $include_create = defined $args{IncludeCreate} ? $args{IncludeCreate} : 1;
+    my $transaction_limit = 20; # Maximum number of transactions to include (excluding Create)
+
+    # Get Create transaction separately if requested
+    my $create_transaction = '';
+    if ($include_create) {
+        my $create_txns = $ticket->Transactions;
+        $create_txns->Limit(FIELD => 'Type', VALUE => 'Create', OPERATOR => '=');
+        $create_txns->OrderBy(FIELD => 'Created', ORDER => 'ASC');
+        if (my $create_txn = $create_txns->First) {
+            my $content = $create_txn->Content || '';
+            $content = CleanTransactionContent($content);
+            if ($content) {
+                my $creator_id = $create_txn->CreatorObj->Id;
+                my $creator = $create_txn->CreatorObj;
+                my $privilege_type = $creator->Privileged ? 'Privileged' : 'Unprivileged';
+                $create_transaction = sprintf "<InitialRequest user=\"User1\" privilege=\"%s\" sequence=\"1\">%s</InitialRequest>\n",
+                    $privilege_type, $content;
+            }
+        }
+    }
+
+    # Get the most recent transactions of the specified type (limit 20)
+    my $transactions = $ticket->Transactions;
+    if ($type ne 'Create') {
+        $transactions->Limit(FIELD => 'Type', VALUE => $type, OPERATOR => '=');
+    } else {
+        # If only Create is requested and already handled above, return early
+        return $create_transaction;
+    }
+    $transactions->OrderBy(FIELD => 'Created', ORDER => 'DESC');
+    $transactions->RowsPerPage($transaction_limit);
+
+    # Collect transactions in reverse order (most recent first) then reverse for chronological
+    my @txn_list = ();
+    while (my $txn = $transactions->Next) {
+        push @txn_list, $txn;
+    }
+    @txn_list = reverse @txn_list; # Now in chronological order (oldest first)
+
+    my $conversation = '';
+    my $sequence = $include_create ? 2 : 1; # Start at 2 if Create transaction exists
+
+    # Track users for anonymization (reserve User1 for Create if it exists)
+    my %user_map = ();
+    my $user_counter = $include_create ? 2 : 1;
+
+    for my $txn (@txn_list) {
+        my $creator_id = $txn->CreatorObj->Id;
+        my $creator = $txn->CreatorObj;
+        my $content = $txn->Content || '';
+
+        # Skip empty content
+        next unless $content;
+
+        # Create anonymous user mapping with privilege info
+        unless (exists $user_map{$creator_id}) {
+            my $privilege_type = $creator->Privileged ? 'Privileged' : 'Unprivileged';
+            $user_map{$creator_id} = {
+                name => "User$user_counter",
+                privileged => $privilege_type
+            };
+            $user_counter++;
+        }
+
+        my $user_info = $user_map{$creator_id};
+
+        # Clean up the content (remove RT's standard headers, etc.)
+        $content = CleanTransactionContent($content);
+
+        if ($content) {
+            $conversation .= sprintf "<Message user=\"%s\" privilege=\"%s\" sequence=\"%d\">%s</Message>\n",
+                $user_info->{name},
+                $user_info->{privileged},
+                $sequence,
+                $content;
+            $sequence++;
+        }
+    }
+
+    return $create_transaction . $conversation;
+}
+
+=head2 CleanTransactionContent
+
+Clean up transaction content by removing RT email headers, signatures, and excessive
+whitespace. Also escapes XML characters for safe inclusion in XML output.
+
+=cut
+
+sub CleanTransactionContent {
+    my $content = shift;
+    return '' unless $content;
+
+    # Remove common RT email headers and signatures
+    $content =~ s/^>.*$//gm;  # Remove quoted lines starting with >
+    $content =~ s/^On.*wrote:.*$//gm;  # Remove "On ... wrote:" lines
+    $content =~ s/^\s*--\s*\n.*$//ms;  # Remove signature blocks starting with --
+
+    # Remove excessive whitespace
+    $content =~ s/\n\s*\n/\n\n/g;  # Normalize multiple blank lines to double newlines
+    $content =~ s/^\s+//;  # Remove leading whitespace
+    $content =~ s/\s+$//;  # Remove trailing whitespace
+
+    # Escape XML characters
+    $content =~ s/&/&amp;/g;
+    $content =~ s/</&lt;/g;
+    $content =~ s/>/&gt;/g;
+
+    return $content;
+}
+
+=head2 LoadContextFile
+
+Load and return the contents of a context file for AI processing. This function
+searches for relevant context files in the configured directory and returns
+the content for inclusion in AI API requests.
+
+=cut
+
+sub LoadContextFile {
+    my %args = @_;
+    my $config = $args{config} || {};
+    my $queue = $args{queue} || 'Default';
+    my $ticket_id = $args{ticket_id};
+
+    # Check if context files are enabled
+    return undef unless $config->{use_context_files};
+    return undef unless $config->{context_file_path};
+
+    my $context_dir = $config->{context_file_path};
+
+    # Ensure the directory exists
+    unless (-d $context_dir) {
+        RT->Logger->debug("Context file directory does not exist: $context_dir");
+        return undef;
+    }
+
+    # Look for context files in the directory
+    # Priority order: queue-specific files, then general files
+    my @potential_files = ();
+
+    if (opendir(my $dh, $context_dir)) {
+        my @files = grep { /\.txt$|\.xml$/ && -f "$context_dir/$_" } readdir($dh);
+        closedir($dh);
+
+        # Sort files by modification time (newest first)
+        @files = sort {
+            (stat("$context_dir/$b"))[9] <=> (stat("$context_dir/$a"))[9]
+        } @files;
+
+        # Prefer queue-specific files if available
+        for my $file (@files) {
+            if ($file =~ /\Q$queue\E/i) {
+                unshift @potential_files, $file;
+            } else {
+                push @potential_files, $file;
+            }
+        }
+    } else {
+        RT->Logger->error("Cannot read context file directory: $context_dir");
+        return undef;
+    }
+
+    # Try to load the most suitable context file
+    for my $filename (@potential_files) {
+        my $filepath = "$context_dir/$filename";
+
+        if (open(my $fh, '<:encoding(UTF-8)', $filepath)) {
+            my $content = do { local $/; <$fh> };
+            close($fh);
+
+            if ($content && length($content) > 0) {
+                RT->Logger->debug("Loaded context file: $filename");
+                return $content;
+            }
+        } else {
+            RT->Logger->debug("Cannot read context file: $filepath");
+        }
+    }
+
+    RT->Logger->debug("No suitable context file found in: $context_dir");
+    return undef;
 }
 
 =head1 NAME
@@ -100,6 +298,10 @@ Here is a sample configuration with Gemini:
                 autocomplete_text => 'Predict the next three words based on the input text without explanations.',
              },
              editor_features => [ 'adjust_tone', 'suggest_response', 'translate_content', 'autocomplete_text' ],
+             queue_creation_assistant => 1,  # Set to 0 to disable the AI queue creation assistant
+             use_context_files => 0,  # Set to 1 to enable context file usage for suggest_response
+             context_file_path => "$RT::EtcPath/ai/context",  # Directory containing context files
+             suggest_response_context_prompt => "Here are examples of similar previous conversations for context:",  # Text that introduces the context
           },
     );
 
@@ -130,6 +332,10 @@ Below shows a sample configuration with OpenAI:
                 autocomplete_text => 'Predict the next three words based on the input text without explanations.',
             },
             editor_features => [ 'adjust_tone', 'suggest_response', 'translate_content', 'autocomplete_text' ],
+            queue_creation_assistant => 1,  # Set to 0 to disable the AI queue creation assistant
+            use_context_files => 0,  # Set to 1 to enable context file usage for suggest_response
+            context_file_path => "$RT::EtcPath/ai/context",  # Directory containing context files
+            suggest_response_context_prompt => "Context: The following are complete conversation histories from similar resolved support tickets. Use these examples to understand typical issue patterns, effective troubleshooting approaches, and professional response tone. Each <Ticket> contains chronological messages between users (customers/requesters) and support staff (privileged users). Apply these patterns to craft an appropriate response:",  # Text that introduces the context
           },
     );
 
@@ -185,6 +391,32 @@ every request to the AI for the defined feature. You will likely need to
 experiment with your selected AI to find wording that correctly processes the
 prompt along with the content sent in each request.
 
+=head2 Context Files
+
+The AI response suggestion feature can optionally use context files generated by the
+C<rt-build-context-files> utility. These files contain structured conversation data
+from similar tickets to help the AI generate more contextually appropriate responses.
+
+To enable context file usage:
+
+    use_context_files => 1,
+    context_file_path => "$RT::EtcPath/ai/context",
+    suggest_response_context_prompt => "Context: The following are complete conversation histories from similar resolved support tickets. Use these examples to understand typical issue patterns, effective troubleshooting approaches, and professional response tone. Each <Ticket> contains chronological messages between users (customers/requesters) and support staff (privileged users). Apply these patterns to craft an appropriate response:",
+
+When enabled, the C<suggest_response> feature will look for relevant context files
+in the specified directory and include that information in AI requests to improve
+response quality. The C<suggest_response_context_prompt> setting allows you to customize the
+introductory text that explains the context to the AI for suggest_response requests.
+
+=head2 Queue Creation Assistant
+
+To enable the queue creation assistant, add the following to your provider
+configuration:
+
+    queue_creation_assistant => 1,
+
+See L</Queue Creation Assistant> under FEATURES below for details.
+
 =head2 CKEditor Integration
 
 Some AI features are integrated into RT's editor and are accessible via
@@ -193,6 +425,10 @@ configuration is needed. It is provided in the sample C<etc/RT_AI_Config.pm>
 file and should be loaded automatically when you enable the extension. If
 you don't see the AI button, you can copy the configuration into your local
 site configuration.
+
+The AI Suggestion feature works directly within the editor, inserting responses
+at the end of existing content rather than replacing it. This allows users to
+quote parts of incoming messages and have AI suggestions appended appropriately.
 
 =head1 FEATURES
 
@@ -253,6 +489,8 @@ tone to something different.
 =item AI Suggestion
 
 Your AI provider can suggest a response to the current question on the ticket.
+The AI response is inserted directly into the editor at the end of any existing
+content, preserving paragraph structure and newlines.
 
 =item Translate
 
@@ -260,6 +498,16 @@ Translate the provided content from the current language to another selected
 language.
 
 =back
+
+=head2 Queue Creation Assistant
+
+An interactive chat interface under Admin > Queues > Create with AI that
+guides administrators through setting up a new queue. Through a multi-turn
+conversation, the AI gathers workflow details and generates a complete
+configuration including a custom lifecycle, queue, groups, custom fields, ACL
+rights, and queue watchers. The admin reviews a summary of the proposed
+configuration and creates all objects with a single click. See
+L</Queue Creation Assistant> above for configuration details.
 
 =head1 DEVELOPER
 
@@ -302,12 +550,54 @@ Or via the web at: L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Nam
 
 =head1 COPYRIGHT
 
-This extension is Copyright (C) 2013-2025 Best Practical Solutions, LLC.
+This extension is Copyright (C) 2013-2026 Best Practical Solutions, LLC.
 
 This is free software, licensed under:
 
   The GNU General Public License, Version 2, June 1991
 
 =cut
+
+=head2 LoadQueueCreationPrompt
+
+Load the system prompt for the queue creation assistant from
+F<etc/ai/prompts/create-queue.md>. Searches the local etc directory,
+the default etc directory, and installed plugin paths.
+
+=cut
+
+sub LoadQueueCreationPrompt {
+    my @search_paths = (
+        "$RT::LocalEtcPath/ai/prompts/create-queue.md",
+        "$RT::EtcPath/ai/prompts/create-queue.md",
+    );
+
+    # Also check plugin paths
+    my @plugins = RT->Config->Get('Plugins');
+    for my $plugin ( @plugins ) {
+        next unless $plugin =~ /AI/;
+        my $dir = RT->Config->Get('PluginPath') || '';
+        if ( $dir ) {
+            push @search_paths, "$dir/$plugin/etc/ai/prompts/create-queue.md";
+        }
+    }
+
+    # Check installed plugin location
+    push @search_paths, map {
+        "$_/etc/ai/prompts/create-queue.md"
+    } RT->PluginDirs('');
+
+    for my $path ( @search_paths ) {
+        if ( -f $path && open( my $fh, '<:encoding(UTF-8)', $path ) ) {
+            my $content = do { local $/; <$fh> };
+            close $fh;
+            RT->Logger->debug("Loaded queue creation prompt from $path");
+            return $content;
+        }
+    }
+
+    RT->Logger->error("Could not find queue creation prompt (create-queue.md) in any search path");
+    return undef;
+}
 
 1;

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.collect.start_input_timers` (params). Extracted from switchblade `PublicCallCollectStartInputTimersParams.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "control_id": {
+      "type": "string"
+    },
+    "node_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id",
+    "control_id"
+  ],
+  "title": "calling.collect.start_input_timers params",
+  "type": "object",
+  "x-method": "calling.collect.start_input_timers",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallCollectStartInputTimersParams.cs"
+}

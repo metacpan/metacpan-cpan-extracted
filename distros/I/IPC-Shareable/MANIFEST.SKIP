@@ -49,3 +49,4 @@ profiling/
 ^plans/
 TESTING.md
 ^[^/]+\.md$
+^\.claude/

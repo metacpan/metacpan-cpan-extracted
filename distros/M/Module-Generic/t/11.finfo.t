@@ -110,7 +110,17 @@ SKIP:
 # Refresh
 @finfo = CORE::stat( $file );
 diag( "Checking finfo atime (", $f->atime, ") against file atime (", $finfo[ FINFO_ATIME ], ")." ) if( $DEBUG );
-is( $f->atime, $finfo[ FINFO_ATIME ], 'atime' );
+# is( $f->atime, $finfo[ FINFO_ATIME ], 'atime' );
+# NOTE: Cygwin does not guarantee a reliable, stable access time. Its atime granularity
+# and update semantics differ from native Unix, and the value can change between two
+# consecutive reads, so this assertion is not portable there. We skip it rather than
+# weakening it with an arbitrary tolerance that could hide a real regression on other
+# platforms.
+SKIP:
+{
+    skip( 'atime is not reliable on Cygwin', 1 ) if( $^O =~ /^cygwin$/i );
+    is( $f->atime, $finfo[ FINFO_ATIME ], 'atime' );
+}
 
 is( $f->mtime, $finfo[ FINFO_MTIME ], 'mtime' );
 

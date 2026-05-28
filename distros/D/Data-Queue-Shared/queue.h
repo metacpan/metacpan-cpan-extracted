@@ -138,6 +138,7 @@ typedef struct {
     char        *path;
     int          notify_fd;  /* eventfd for event-loop integration, -1 if disabled */
     int          backing_fd; /* memfd fd, -1 for file-backed/anonymous */
+    int          notify_fd_owned; /* 1 if we created notify_fd and must close it */
 } QueueHandle;
 
 /* ================================================================
@@ -236,20 +237,38 @@ static inline void queue_mutex_unlock(QueueHeader *hdr) {
         syscall(SYS_futex, &hdr->mutex, FUTEX_WAKE, 1, NULL, NULL, 0);
 }
 
-/* Wake blocked consumers (after push) */
-static inline void queue_wake_consumers(QueueHeader *hdr) {
+/* Wake up to `n` blocked consumers (after batch push). Each woken
+ * consumer pops at most one item, so batch publishers must wake `n`
+ * (not 1) to drain a multi-item commit without leaving consumers
+ * sleeping on still-available items. */
+static inline void queue_wake_consumers_n(QueueHeader *hdr, uint32_t n) {
+    if (n == 0) return;
     if (__atomic_load_n(&hdr->pop_waiters, __ATOMIC_RELAXED) > 0) {
         __atomic_add_fetch(&hdr->pop_futex, 1, __ATOMIC_RELEASE);
-        syscall(SYS_futex, &hdr->pop_futex, FUTEX_WAKE, 1, NULL, NULL, 0);
+        syscall(SYS_futex, &hdr->pop_futex, FUTEX_WAKE,
+                n > (uint32_t)INT_MAX ? INT_MAX : (int)n, NULL, NULL, 0);
     }
 }
 
-/* Wake blocked producers (after pop) */
-static inline void queue_wake_producers(QueueHeader *hdr) {
+/* Wake blocked consumers (after single push) */
+static inline void queue_wake_consumers(QueueHeader *hdr) {
+    queue_wake_consumers_n(hdr, 1);
+}
+
+/* Wake up to `n` blocked producers (after batch pop). See
+ * queue_wake_consumers_n for the batching rationale. */
+static inline void queue_wake_producers_n(QueueHeader *hdr, uint32_t n) {
+    if (n == 0) return;
     if (__atomic_load_n(&hdr->push_waiters, __ATOMIC_RELAXED) > 0) {
         __atomic_add_fetch(&hdr->push_futex, 1, __ATOMIC_RELEASE);
-        syscall(SYS_futex, &hdr->push_futex, FUTEX_WAKE, 1, NULL, NULL, 0);
+        syscall(SYS_futex, &hdr->push_futex, FUTEX_WAKE,
+                n > (uint32_t)INT_MAX ? INT_MAX : (int)n, NULL, NULL, 0);
     }
+}
+
+/* Wake blocked producers (after single pop) */
+static inline void queue_wake_producers(QueueHeader *hdr) {
+    queue_wake_producers_n(hdr, 1);
 }
 
 /* Compute remaining timespec from absolute deadline. Returns 0 if deadline passed. */
@@ -577,7 +596,9 @@ static QueueHandle *queue_open_fd(int fd, uint32_t mode, char *errbuf) {
 
 static void queue_destroy(QueueHandle *h) {
     if (!h) return;
-    if (h->notify_fd >= 0) close(h->notify_fd);
+    /* Only close notify_fd if we own it; caller-supplied fds (via
+     * queue_eventfd_set) remain the caller's responsibility. */
+    if (h->notify_fd >= 0 && h->notify_fd_owned) close(h->notify_fd);
     if (h->backing_fd >= 0) close(h->backing_fd);
     if (h->hdr) munmap(h->hdr, h->mmap_size);
     free(h->copy_buf);
@@ -660,9 +681,18 @@ static int queue_##PFX##_push_wait(QueueHandle *h, VTYPE value,               \
     int has_deadline = (timeout > 0);                                         \
     if (has_deadline) queue_make_deadline(timeout, &deadline);                 \
     for (;;) {                                                                \
-        uint32_t fseq = __atomic_load_n(&hdr->push_futex, __ATOMIC_ACQUIRE); \
-        if (queue_##PFX##_try_push(h, value)) return 1;                       \
+        /* Announce waiter BEFORE sampling fseq and re-checking the         \
+         * condition. The reverse order races with a waker that pops       \
+         * between our check and our announce: the waker reads             \
+         * push_waiters==0, skips the push_futex bump, and our subsequent  \
+         * FUTEX_WAIT then sleeps on an unchanged seq with no future       \
+         * waker to wake it. */                                             \
         __atomic_add_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);          \
+        uint32_t fseq = __atomic_load_n(&hdr->push_futex, __ATOMIC_ACQUIRE); \
+        if (queue_##PFX##_try_push(h, value)) {                               \
+            __atomic_sub_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);      \
+            return 1;                                                         \
+        }                                                                     \
         struct timespec *pts = NULL;                                          \
         if (has_deadline) {                                                    \
             if (!queue_remaining_time(&deadline, &remaining)) {               \
@@ -688,9 +718,15 @@ static int queue_##PFX##_pop_wait(QueueHandle *h, VTYPE *value,               \
     int has_deadline = (timeout > 0);                                         \
     if (has_deadline) queue_make_deadline(timeout, &deadline);                 \
     for (;;) {                                                                \
-        uint32_t fseq = __atomic_load_n(&hdr->pop_futex, __ATOMIC_ACQUIRE);  \
-        if (queue_##PFX##_try_pop(h, value)) return 1;                        \
+        /* Announce BEFORE sampling fseq / checking condition; see        \
+         * queue_##PFX##_push_wait for the missed-wakeup race this        \
+         * ordering closes. */                                             \
         __atomic_add_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);           \
+        uint32_t fseq = __atomic_load_n(&hdr->pop_futex, __ATOMIC_ACQUIRE);  \
+        if (queue_##PFX##_try_pop(h, value)) {                                \
+            __atomic_sub_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);       \
+            return 1;                                                         \
+        }                                                                     \
         struct timespec *pts = NULL;                                          \
         if (has_deadline) {                                                    \
             if (!queue_remaining_time(&deadline, &remaining)) {               \
@@ -859,11 +895,18 @@ static int queue_str_push_wait(QueueHandle *h, const char *str,
     if (has_deadline) queue_make_deadline(timeout, &deadline);
 
     for (;;) {
+        /* Announce BEFORE sampling seq and re-trying; otherwise a popper
+         * that drains between try_push and waiters++ reads waiters==0,
+         * skips the push_futex bump, and our FUTEX_WAIT then sleeps on
+         * an unchanged seq with no future waker. */
+        __atomic_add_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);
         uint32_t seq = __atomic_load_n(&hdr->push_futex, __ATOMIC_ACQUIRE);
         r = queue_str_try_push(h, str, len, utf8);
-        if (r != 0) return r;
+        if (r != 0) {
+            __atomic_sub_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);
+            return r;
+        }
 
-        __atomic_add_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);
         struct timespec *pts = NULL;
         if (has_deadline) {
             if (!queue_remaining_time(&deadline, &remaining)) {
@@ -893,11 +936,15 @@ static int queue_str_pop_wait(QueueHandle *h, const char **out_str,
     if (has_deadline) queue_make_deadline(timeout, &deadline);
 
     for (;;) {
+        /* Announce BEFORE sampling seq / re-trying; see push_wait. */
+        __atomic_add_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);
         uint32_t seq = __atomic_load_n(&hdr->pop_futex, __ATOMIC_ACQUIRE);
         r = queue_str_try_pop(h, out_str, out_len, out_utf8);
-        if (r != 0) return r;
+        if (r != 0) {
+            __atomic_sub_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);
+            return r;
+        }
 
-        __atomic_add_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);
         struct timespec *pts = NULL;
         if (has_deadline) {
             if (!queue_remaining_time(&deadline, &remaining)) {
@@ -1046,11 +1093,15 @@ static int queue_str_push_front_wait(QueueHandle *h, const char *str,
     if (has_deadline) queue_make_deadline(timeout, &deadline);
 
     for (;;) {
+        /* Announce BEFORE sampling seq / re-trying; see push_wait. */
+        __atomic_add_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);
         uint32_t seq = __atomic_load_n(&hdr->push_futex, __ATOMIC_ACQUIRE);
         r = queue_str_push_front(h, str, len, utf8);
-        if (r != 0) return r;
+        if (r != 0) {
+            __atomic_sub_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);
+            return r;
+        }
 
-        __atomic_add_fetch(&hdr->push_waiters, 1, __ATOMIC_RELEASE);
         struct timespec *pts = NULL;
         if (has_deadline) {
             if (!queue_remaining_time(&deadline, &remaining)) {
@@ -1129,11 +1180,15 @@ static int queue_str_pop_back_wait(QueueHandle *h, const char **out_str,
     if (has_deadline) queue_make_deadline(timeout, &deadline);
 
     for (;;) {
+        /* Announce BEFORE sampling seq / re-trying; see pop_wait. */
+        __atomic_add_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);
         uint32_t seq = __atomic_load_n(&hdr->pop_futex, __ATOMIC_ACQUIRE);
         r = queue_str_pop_back(h, out_str, out_len, out_utf8);
-        if (r != 0) return r;
+        if (r != 0) {
+            __atomic_sub_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);
+            return r;
+        }
 
-        __atomic_add_fetch(&hdr->pop_waiters, 1, __ATOMIC_RELEASE);
         struct timespec *pts = NULL;
         if (has_deadline) {
             if (!queue_remaining_time(&deadline, &remaining)) {
@@ -1163,13 +1218,18 @@ static inline int queue_sync(QueueHandle *h) {
 static inline int queue_eventfd_create(QueueHandle *h) {
     if (h->notify_fd >= 0) return h->notify_fd;
     h->notify_fd = eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
+    if (h->notify_fd >= 0) h->notify_fd_owned = 1;
     return h->notify_fd;
 }
 
+/* Replace the current notify fd. Closes the old fd ONLY if we created
+ * it ourselves via queue_eventfd_create — caller-supplied fds remain
+ * the caller's property. */
 static inline void queue_eventfd_set(QueueHandle *h, int fd) {
-    if (h->notify_fd >= 0 && h->notify_fd != fd)
+    if (h->notify_fd >= 0 && h->notify_fd != fd && h->notify_fd_owned)
         close(h->notify_fd);
     h->notify_fd = fd;
+    h->notify_fd_owned = 0;
 }
 
 /* Signal that data is available. Called after successful push. */

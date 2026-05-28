@@ -2,7 +2,7 @@ package DBIx::QuickORM::Type::JSON;
 use strict;
 use warnings;
 
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 
 use DBIx::QuickORM::Util qw/parse_conflate_args/;
 

@@ -1,0 +1,203 @@
+<%init>
+use JSON;
+use File::Temp;
+
+$r->content_type('application/json; charset=utf-8');
+
+my $result = { success => 0, error => 'Unknown error' };
+
+# Parse the initialdata JSON from the form parameter
+my $initialdata;
+eval { $initialdata = decode_json($initialdata_json) };
+if ( $@ || !$initialdata ) {
+    $result->{error} = 'Invalid initialdata: ' . ($@ || 'empty');
+    $m->out( encode_json($result) );
+    $m->abort();
+}
+
+# Check feature flag
+my $ai_config = RT->Config->Get('RT_AI_Provider');
+my $default_config = $ai_config ? ( $ai_config->{Default} || {} ) : {};
+unless ( $default_config->{queue_creation_assistant} ) {
+    $result->{error} = 'AI queue creation assistant is not enabled';
+    $m->out( encode_json($result) );
+    $m->abort();
+}
+
+my @messages;
+my $current_user = $session{CurrentUser};
+
+# Handle lifecycle separately — it's not part of standard initialdata.
+# We write the full lifecycle config directly into the Lifecycles hash
+# and save in one shot, matching how the Admin UI works across
+# Create.html (creates bare entry) + Modify.html (sets config).
+if ( my $lifecycle_def = delete $initialdata->{Lifecycle} ) {
+    my $lc_name = $lifecycle_def->{name};
+    if ( $lc_name ) {
+        my @existing = RT::Lifecycle->ListAll('ticket');
+        if ( grep { $_ eq $lc_name } @existing ) {
+            push @messages, "Lifecycle '$lc_name' already exists, skipping creation";
+        }
+        else {
+            my $lifecycles = RT->Config->Get('Lifecycles');
+
+            # RT stores statuses as top-level initial/active/inactive,
+            # not nested under a "statuses" key
+            my $statuses = $lifecycle_def->{statuses} || {};
+            my $new_config = {
+                type        => 'ticket',
+                initial     => $statuses->{initial} || [],
+                active      => $statuses->{active} || [],
+                inactive    => $statuses->{inactive} || [],
+                transitions => $lifecycle_def->{transitions} || {},
+                defaults    => $lifecycle_def->{defaults} || {},
+            };
+            $new_config->{actions} = $lifecycle_def->{actions} if $lifecycle_def->{actions};
+            $new_config->{colors} = $lifecycle_def->{colors} if $lifecycle_def->{colors};
+            $new_config->{rights} = $lifecycle_def->{rights} if $lifecycle_def->{rights};
+
+            $lifecycles->{$lc_name} = $new_config;
+
+            my ($ok, $msg) = RT::Lifecycle->_SaveLifecycles( $lifecycles, $current_user );
+            if ( $ok ) {
+                # Force cache rebuild so InsertData sees the new lifecycle
+                RT->System->MaybeRebuildLifecycleCache();
+                push @messages, "Created lifecycle '$lc_name'";
+            }
+            else {
+                $result->{error} = "Failed to create lifecycle '$lc_name': $msg";
+                $m->out( encode_json($result) );
+                $m->abort();
+            }
+        }
+    }
+}
+
+# Extract watchers (not part of initialdata format)
+my $watchers = delete $initialdata->{Watchers};
+
+# Strip invalid fields from queue definitions that the AI might include
+if ( $initialdata->{Queues} ) {
+    for my $queue_def ( @{ $initialdata->{Queues} } ) {
+        delete $queue_def->{AdminCc};
+        delete $queue_def->{Cc};
+    }
+}
+
+# Write remaining initialdata to a temp file and process via InsertData
+my $queue_url;
+
+if ( keys %$initialdata ) {
+    # Ensure InitialdataFormatHandlers includes JSON
+    my $handlers = RT->Config->Get('InitialdataFormatHandlers') || ['perl'];
+    my $has_json = grep { $_ eq 'RT::Initialdata::JSON' } @$handlers;
+    unless ( $has_json ) {
+        RT->Config->Set( 'InitialdataFormatHandlers', [ @$handlers, 'RT::Initialdata::JSON' ] );
+    }
+
+    my $json_content = encode_json($initialdata);
+
+    my $tmpfile = File::Temp->new( SUFFIX => '.json', UNLINK => 1 );
+    print $tmpfile $json_content;
+    close $tmpfile;
+
+    my ($ok, $msg) = $RT::Handle->InsertData( $tmpfile->filename, undef, disconnect_after => 0 );
+
+    if ( $ok ) {
+        push @messages, "Configuration applied successfully";
+
+        # Find the newly created queue to build a link
+        if ( $initialdata->{Queues} && @{ $initialdata->{Queues} } ) {
+            my $queue_name = $initialdata->{Queues}[0]{Name};
+            if ( $queue_name ) {
+                my $queue_obj = RT::Queue->new( $current_user );
+                $queue_obj->Load( $queue_name );
+                if ( $queue_obj->Id ) {
+                    $queue_url = RT->Config->Get('WebPath') . '/Admin/Queues/Modify.html?id=' . $queue_obj->Id;
+                    push @messages, "Queue '$queue_name' created (id: " . $queue_obj->Id . ")";
+                }
+            }
+        }
+
+        if ( $initialdata->{Groups} ) {
+            for my $group_def ( @{ $initialdata->{Groups} } ) {
+                push @messages, "Group '$group_def->{Name}' created" if $group_def->{Name};
+            }
+        }
+
+        if ( $initialdata->{CustomFields} ) {
+            for my $cf_def ( @{ $initialdata->{CustomFields} } ) {
+                push @messages, "Custom field '$cf_def->{Name}' created" if $cf_def->{Name};
+            }
+        }
+
+        if ( $initialdata->{ACL} ) {
+            push @messages, scalar(@{ $initialdata->{ACL} }) . " rights entries granted";
+        }
+
+        # Apply queue watchers if specified
+        if ( $watchers && $initialdata->{Queues} ) {
+            my $queue_name = $initialdata->{Queues}[0]{Name};
+            my $queue_obj = RT::Queue->new( $current_user );
+            $queue_obj->Load( $queue_name );
+            if ( $queue_obj->Id ) {
+                for my $type ( qw(Cc AdminCc) ) {
+                    for my $name ( @{ $watchers->{$type} || [] } ) {
+                        # Try loading as a group first, then as a user
+                        my $principal_id;
+                        my $group = RT::Group->new( $current_user );
+                        $group->LoadUserDefinedGroup( $name );
+                        if ( $group->Id ) {
+                            $principal_id = $group->PrincipalId;
+                        }
+                        else {
+                            my $user = RT::User->new( $current_user );
+                            $user->Load( $name );
+                            $user->LoadByEmail( $name ) unless $user->Id;
+                            $principal_id = $user->PrincipalId if $user->Id;
+                        }
+
+                        if ( $principal_id ) {
+                            my ($ok, $msg) = $queue_obj->AddWatcher(
+                                Type        => $type,
+                                PrincipalId => $principal_id,
+                            );
+                            if ( $ok ) {
+                                push @messages, "Added '$name' as $type watcher on queue";
+                            }
+                            else {
+                                push @messages, "Failed to add '$name' as $type watcher: $msg";
+                            }
+                        }
+                        else {
+                            push @messages, "Could not find group or user '$name' for $type watcher";
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else {
+        $result->{error} = "Failed to apply configuration: $msg";
+        $m->out( encode_json($result) );
+        $m->abort();
+    }
+
+    unless ( $has_json ) {
+        RT->Config->Set( 'InitialdataFormatHandlers', $handlers );
+    }
+}
+
+$result = {
+    success   => 1,
+    messages  => \@messages,
+    queue_url => $queue_url,
+};
+
+$m->out( encode_json($result) );
+$m->abort();
+</%init>
+<%args>
+$initialdata_json => ''
+$session_id       => ''
+</%args>

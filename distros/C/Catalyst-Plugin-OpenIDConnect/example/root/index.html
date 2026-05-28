@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OpenID Connect Provider</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 50px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h1 { color: #333; margin-bottom: 20px; }
+        p { color: #666; line-height: 1.6; margin-bottom: 15px; }
+        .button { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 4px; margin-top: 10px; }
+        .button:hover { background: #0056b3; }
+        .code { background: #f0f0f0; border-left: 3px solid #007bff; padding: 10px 15px; margin: 15px 0; font-family: monospace; overflow-x: auto; }
+        .info { background: #e3f2fd; border-left: 4px solid #2196f3; padding: 12px; margin: 15px 0; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>OpenID Connect Provider Example</h1>
+        
+        <p>This is an example implementation of an OpenID Connect provider using Catalyst and the Catalyst::Plugin::OpenIDConnect.</p>
+
+        <div class="info">
+            <strong>About this provider:</strong><br>
+            - Issues OpenID Connect compliant ID tokens<br>
+            - Implements OAuth 2.0 authorization code flow<br>
+            - Provides user information via userinfo endpoint<br>
+            - Supports token refresh
+        </div>
+
+        <h2>Quick Links</h2>
+        <ul>
+            <li><a href="/.well-known/openid-configuration">.well-known/openid-configuration</a> - Discovery endpoint</li>
+            <li><a href="/openidconnect/jwks">/openidconnect/jwks</a> - JSON Web Key Set</li>
+            <li><a href="/protected">/protected</a> - Protected resource</li>
+        </ul>
+
+        <h2>Test OpenID Connect Flow</h2>
+        <p>To test the OpenID Connect flow, you can use the example client or create a test client.</p>
+
+        <div class="code">
+GET /openidconnect/authorize?
+  response_type=code&
+  client_id=example-client&
+  redirect_uri=http://localhost:3000/callback&
+  scope=openid%20profile%20email&
+  state=random-state-123&
+  nonce=random-nonce-456
+        </div>
+
+        <p><a href="/login" class="button">Login</a></p>
+    </div>
+</body>
+</html>

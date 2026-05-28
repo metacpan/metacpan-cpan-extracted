@@ -1,5 +1,11 @@
 Revision history for Perl module Module::Generic
 
+v1.5.1 2026-05-27T10:04:51+0900
+    - Changed clone() in Module::Generic to allow it to take optional argument of
+      reference to clone, instead of the the instance itself.
+    - Improved Module::Generic::Global
+    - Improved test units
+
 v1.5.0 2026-05-19T22:06:32+0900
     - Updated to be compliant with perl v5.16.0. Before it required v5.28.0
       Older perls (5.14 and below) suffer from a core bug in the interaction between

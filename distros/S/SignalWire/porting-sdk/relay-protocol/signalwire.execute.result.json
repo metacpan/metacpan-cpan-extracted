@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the Blade envelope `signalwire.execute` (result). Extracted from switchblade `Messages/ExecuteResult.cs`.",
+  "properties": {
+    "requester_nodeid": {
+      "type": "string"
+    },
+    "responder_nodeid": {
+      "type": "string"
+    },
+    "result": {}
+  },
+  "required": [
+    "requester_nodeid",
+    "responder_nodeid"
+  ],
+  "title": "signalwire.execute result",
+  "type": "object",
+  "x-method": "signalwire.execute",
+  "x-phase": "result",
+  "x-source": "blade",
+  "x-source-file": "switchblade/Messages/ExecuteResult.cs"
+}

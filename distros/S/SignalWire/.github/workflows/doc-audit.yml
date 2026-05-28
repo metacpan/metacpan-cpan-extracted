@@ -1,0 +1,105 @@
+name: Doc Audit (Layer C)
+
+# Layer C doc/example alignment audit -- cross-checks that every method-call
+# reference in the Perl SDK's docs and examples resolves to a real symbol in
+# `port_surface.json`. Catches phantom APIs (docs promising methods that were
+# never implemented, as Java/C++ shipped with `assign_phone_route`) before
+# they reach users.
+#
+# Entries that should be skipped (Python-SDK cross-references shown for
+# conceptual parity, Python stdlib, regex false positives, etc) live in
+# DOC_AUDIT_IGNORE.md with a rationale per line.
+#
+# Also parse-checks every bundled example (`perl -c`) so syntax breaks can
+# never slip in silently.
+
+env:
+  # Opt into Node.js 24 ahead of GitHub's 2026-06-02 default switch.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'rest/docs/**'
+      - 'relay/docs/**'
+      - 'examples/**'
+      - 'rest/examples/**'
+      - 'relay/examples/**'
+      - 'lib/**'
+      - 'scripts/enumerate_surface.pl'
+      - 'DOC_AUDIT_IGNORE.md'
+      - '.github/workflows/doc-audit.yml'
+      - 'cpanfile'
+  push:
+    branches: [main]
+  schedule:
+    # Nightly at 06:45 UTC (shortly after surface-audit) so upstream
+    # porting-sdk script changes are exercised against our docs each day.
+    - cron: '45 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Perl SDK
+        uses: actions/checkout@v5
+
+      - name: Checkout porting-sdk (tooling)
+        uses: actions/checkout@v5
+        with:
+          repository: signalwire/porting-sdk
+          path: porting-sdk
+          fetch-depth: 1
+          token: ${{ secrets.PORTING_SDK_TOKEN }}
+
+      - name: Setup Perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.38'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Perl dependencies
+        run: cpanm --notest --quiet --installdeps .
+
+      - name: Enumerate Perl surface (fresh snapshot)
+        run: perl scripts/enumerate_surface.pl --output port_surface.json
+
+      - name: Parse-check every example (perl -c)
+        run: |
+          set -e
+          shopt -s nullglob
+          fail=0
+          for f in examples/*.pl rest/examples/*.pl relay/examples/*.pl; do
+            if ! perl -Ilib -c "$f" 2>&1 | tee /tmp/out-$$ | grep -q "syntax OK"; then
+              echo "::error file=$f::example failed to parse"
+              cat /tmp/out-$$
+              fail=1
+            fi
+          done
+          exit $fail
+
+      - name: Run Layer C doc audit
+        run: |
+          python3 porting-sdk/scripts/audit_docs.py \
+            --root . \
+            --surface port_surface.json \
+            --ignore DOC_AUDIT_IGNORE.md
+
+      - name: Run Perl test suite (doc audit smoke tests)
+        run: PERL5LIB="lib:t/lib" prove -r t/54_doc_audit.t
+
+      - name: Upload surface snapshot on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: doc-audit-debug-${{ github.sha }}
+          path: |
+            port_surface.json
+            DOC_AUDIT_IGNORE.md
+          retention-days: 14

@@ -1,0 +1,2 @@
+[console_scripts]
+mock-signalwire = mock_signalwire.cli:main

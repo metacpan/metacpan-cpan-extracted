@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.bind_digit` (params). Extracted from switchblade `PublicCallBindDigitParams.cs`.",
+  "properties": {
+    "bind_method": {
+      "type": "string"
+    },
+    "call_id": {
+      "type": "string"
+    },
+    "digits": {
+      "type": "string"
+    },
+    "max_triggers": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "node_id": {
+      "type": "string"
+    },
+    "params": {},
+    "realm": {
+      "type": "string"
+    },
+    "swml": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id",
+    "digits",
+    "bind_method"
+  ],
+  "title": "calling.bind_digit params",
+  "type": "object",
+  "x-method": "calling.bind_digit",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallBindDigitParams.cs"
+}

@@ -13,11 +13,24 @@ use feature 'bitwise';
 
 use Carp;
 use List::Util qw(none);
+use Data::Identifier;
+use Data::Identifier::Util v0.23;
+use SIRTX::Datecode;
+use Encode ();
+
 #use parent 'Data::Identifier::Interface::Userdata';
 
+use constant UTF_8 => Encode::find_encoding('UTF-8');
+
 use constant {
-    MAGIC               => pack('CCCCCCCC', 0x00, 0x07, ord('S'), ord('F'), 0x0d, 0x0a, 0xc0, 0x0a),
-    DATA_START_MARKER   => 0x0600,
+    MAGIC                   => pack('CCCCCCCC', 0x00, 0x07, ord('S'), ord('F'), 0x0d, 0x0a, 0xc0, 0x0a),
+    DATA_BIT                => 0x40,
+    DATA_START_MARKER       => 0x0600,
+    HEADER_MASTER           => 0x00,
+    HEADER_EARLY_HINTS      => 0x81,
+    HEADER_GEOMETRY_HINTS   => 0x82,
+    HEADER_IDENTIFIER       => 0xC3,
+    HEADER_DISPLAYINFO      => 0x84,
 };
 
 my %_metadata_types = (
@@ -26,7 +39,15 @@ my %_metadata_types = (
         qw(baseline vmiddleline hmiddleline),
         qw(version_major version_minor),
     ),
-    version_type => ['devel', 'beta', 'rc', 'stable'],
+    version_type        => ['devel',  'beta',   'rc',      'stable'],
+    weight              => ['normal', 'bold',   'thin',    'other'],
+    slant               => ['roman',  'italic', 'oblique', 'other'],
+    reverse_slant       => 'bool',
+    last_modification   => 'SIRTX::Datecode',
+    font_tag            => 'Data::Identifier',
+    font_name           => 'string',
+    icontext            => 'codepoint',
+    displaycolour       => 'Data::Identifier',
 );
 
 my %_metadata_constrains = (
@@ -214,7 +235,25 @@ $_default_alias_lists{'common-all'} = {
     0x00A0 => 0x0020, # NO-BREAK SPACE      -> SPACE
 };
 
-our $VERSION = v0.06;
+my %_drawing_single = (
+    l       => 0x2574,
+    t       => 0x2575,
+    r       => 0x2576,
+    b       => 0x2577,
+    tb      => 0x2502,
+    lr      => 0x2500,
+    br      => 0x250C,
+    bl      => 0x2510,
+    tr      => 0x2514,
+    tl      => 0x2518,
+    tbr     => 0x251C,
+    tbl     => 0x2524,
+    blr     => 0x252C,
+    tlr     => 0x2534,
+    tblr    => 0x253C,
+);
+
+our $VERSION = v0.07;
 
 
 
@@ -226,6 +265,7 @@ sub new {
         bits    => undef,
         glyphs  => [],
         chars   => {},
+        util    => Data::Identifier::Util->new,
     }, $pkg;
 
     croak 'Stray options passed' if scalar @args;
@@ -277,7 +317,7 @@ sub _check_constrains {
             my ($cmp, $ref) = @{$constraint};
             my $res;
 
-            if ($ref =~ /^[0-9]+$/) {
+            if ($ref =~ /^[0-9]+\z/) {
                 $ref = int($ref);
             } else {
                 $ref = $self->{$ref} // next;
@@ -315,8 +355,24 @@ sub _set_value {
     if ($type eq 'uint') {
         croak 'Not a valid value for key: '.$key.': '.$value unless $value =~ /^(?:0|[1-9][0-9]*)\z/;
         $value = int($value);
+    } elsif ($type eq 'bool') {
+        $value = lc($value);
+        $value = 0 if $value eq 'no' || $value eq 'nein' || $value eq 'false' || $value eq 'off';
+        $value = $value ? 1 : 0;
+    } elsif ($type eq 'string') {
+        $value =~ s/^\s+//;
+        $value =~ s/\s+\z//;
+        if (length($value) == 0) {
+            croak 'Not a valid string: string is empty';
+        }
+    } elsif ($type eq 'codepoint') {
+        $value = $self->_parse_codepoint($value);
     } elsif (ref $type) {
         croak 'Value not part of enum: '.$key.': '.$value if none {$_ eq $value} @{$type};
+    } elsif (eval {$value->isa($type)}) {
+        # all good.
+    } elsif ($type eq 'Data::Identifier' && !eval{$value->isa('Data::Identifier')}) {
+        $value = Data::Identifier->new(from => $value);
     } else {
         croak 'BUG';
     }
@@ -381,6 +437,11 @@ sub set_attribute {
     my ($self, $key, $value, @opts) = @_;
 
     croak 'Stray options passed' if scalar @opts;
+
+    if ($key =~ s/:rgb\z//) {
+        require Data::Identifier::Generate;
+        $value = Data::Identifier::Generate->colour($value);
+    }
 
     $self->_set_value($key, $value);
 }
@@ -542,6 +603,9 @@ sub add_default_aliases {
     # Retry: Add forward aliases:
     $chars->{$_} //= $chars->{$level->{$_}} foreach keys %{$level};
 
+    # The above might have added undef values, so remove them now:
+    delete $chars->{$_} foreach grep {!defined($chars->{$_})} keys %{$chars};
+
     return $self;
 }
 
@@ -551,22 +615,112 @@ sub read {
     my $chars = $self->{chars};
     my $glyphs = $self->{glyphs};
     my $offset = scalar @{$glyphs};
-    my ($marker, $w, $h, $b, $count);
+    my $bits;
+    my $count;
     my $entry_size;
     local $/ = \8;
 
     $in->binmode;
 
     croak 'Bad magic' unless scalar(<$in>) eq MAGIC;
-    ($marker, $w, $h, $b, $count) = unpack('nCCCxn', scalar(<$in>));
-    croak 'Bad marker' unless $marker == DATA_START_MARKER;
-    croak 'Bits value is not 1' unless $b == 1;
 
-    $self->width($w);
-    $self->height($h);
-    $self->bits($b);
+    # Read headers, one at a time:
+    while (defined(my $header = <$in>)) {
+        my ($marker, $va, $vb, $vc, $type, $vx) = unpack('nCCCCn', $header);
+        my $extra;
 
-    $entry_size = (int($w / 8) + ($w & 0x7 ? 1 : 0)) * $h;
+        croak 'Bad marker' unless $marker == DATA_START_MARKER;
+
+        if ($type & 0x40) {
+            my $len = 8 * $vc;
+            my $got;
+
+            if ($len) {
+                read($in, $extra, $len);
+            } else {
+                $extra = '';
+            }
+
+            $got = length($extra);
+            croak sprintf('Cannot read extra from header: got %u, expected %u', $got, $len) if $got != $len;
+        }
+
+        if ($type == HEADER_MASTER) {
+            $self->width($va);
+            $self->height($vb);
+            $self->bits($vc);
+            $count = $vx;
+            last; # Master header is always the last one, in fact it marks the end of the header section
+        } elsif ($type == HEADER_EARLY_HINTS) {
+            $self->width($va);
+            $self->height($vb);
+            $self->_apply_font_flags($vx);
+        } elsif ($type == HEADER_GEOMETRY_HINTS) {
+            $self->set_attribute(hmiddleline => $va);
+            $self->set_attribute(vmiddleline => $vb);
+            $self->set_attribute(baseline    => $vc);
+            $self->_apply_font_flags($vx);
+        } elsif ($type == HEADER_IDENTIFIER) {
+            $self->set_attribute(version_major => $va);
+            $self->set_attribute(version_minor => $vb >> 2);
+
+            if (($vb & 0x3) == 3) {
+                $self->set_attribute(version_type => 'stable');
+            } elsif (($vb & 0x3) == 2) {
+                $self->set_attribute(version_type => 'rc');
+            } elsif (($vb & 0x3) == 1) {
+                $self->set_attribute(version_type => 'beta');
+            } elsif (($vb & 0x3) == 0) {
+                $self->set_attribute(version_type => 'devel');
+            }
+
+            $self->set_attribute(last_modification => SIRTX::Datecode->new(datecode => $vx)) if $vx;
+
+            if (length($extra) >= 16) {
+                my $uuid = substr($extra, 0, 16);
+                $self->set_attribute(font_tag => $self->{util}->unpack(uuid128 => $uuid)) if $uuid ne (chr(0) x 16);
+            }
+
+            if (length($extra) > 16) {
+                my $name = substr($extra, 16);
+                $name =~ s/[\0\xff]+\z//;
+                $self->set_attribute(font_name => UTF_8->decode($name));
+            }
+        } elsif ($type == HEADER_DISPLAYINFO || $type == (HEADER_DISPLAYINFO|DATA_BIT)) {
+            my $icontext = ($va << 8) | $vb;
+            my $displaycolour = $vx != 0 && $vx != 0xFFFF ? eval {
+                require Data::Identifier::Wellknown;
+                Data::Identifier::Wellknown->import(':all');
+                $self->{util}->unpack('4+12', pack('n', $vx));
+            } : undef;
+            $self->set_attribute(icontext => $icontext) if $icontext != 0 && $icontext < 0xFFFD; # We exclude some extra characters here as well, as they might be an error.
+            $self->set_attribute(displaycolour => $displaycolour) if defined $displaycolour;
+
+            if (length($extra) >= 8) {
+                my ($eic, $ergb) = unpack('NN', $extra);
+
+                $self->set_attribute(icontext => $eic) if $eic <= 0x10FFFF;
+
+                if ($ergb <= 0xFFFFFF) {
+                    require Data::Identifier::Generate;
+                    $self->set_attribute(displaycolour => Data::Identifier::Generate->colour('#'.unpack('H6', substr($extra, 5, 3))));
+                }
+            }
+        } elsif ($type & 0x80) {
+            carp sprintf('Unsupported optional header type: 0x%02X', $type);
+        } else {
+            croak sprintf('Unsupported header type: 0x%02X', $type);
+        }
+    }
+
+    croak 'No Master header found' unless defined $count;
+    croak 'Bits value is not 1' unless $self->bits == 1;
+
+    {
+        my $w = $self->width;
+        my $h = $self->height;
+        $entry_size = (int($w / 8) + ($w & 0x7 ? 1 : 0)) * $h;
+    }
 
     while (defined(my $data = <$in>)) {
         my ($char, $len, $glyph) = unpack('Nnn', $data);
@@ -596,6 +750,7 @@ sub write {
     my @list = sort {$a <=> $b} keys %{$chars};
     my %index_update;
     my @runs;
+    my @extra_headers;
 
     {
         my $next_index = 0;
@@ -619,10 +774,22 @@ sub write {
 
     }
 
+    $self->set_attribute(last_modification => SIRTX::Datecode->now);
+
+    push(@extra_headers, eval { $self->_render_geometry_hints });
+    push(@extra_headers, eval { $self->_render_identity });
+    push(@extra_headers, eval { $self->_render_displayinfo });
+    @extra_headers = grep {defined} @extra_headers;
+
     $out->binmode;
 
+    # Write magic:
     print $out MAGIC;
+    eval { print $out $self->_render_early_hints(scalar(@extra_headers)) } if scalar(@extra_headers);
+    print $out $_ foreach @extra_headers;
+    # Write master header:
     print $out pack('nCCCxn', DATA_START_MARKER, $self->width, $self->height, $self->bits, scalar(keys %index_update));
+    # Write codepoint -> glyph map:
     print $out pack('Nnn', @{$_}) foreach @runs;
     print $out pack('Nnn', 0xFFFFFFFF, 0, 0);
 
@@ -663,17 +830,12 @@ sub _import_glyph_wbmp {
     return scalar(@{$self->{glyphs}}) - 1;
 }
 
-
-sub import_alias_map {
-    my ($self, $filename, %opts) = @_;
-    my $chars = $self->{chars};
-
-    croak 'Stray options passed' if scalar keys %opts;
+sub _read_kv_file {
+    my ($self, $filename, $cb) = @_;
 
     open(my $in, '<:utf8', $filename) or croak 'Cannot open: '.$filename.': '.$!;
     while (defined(my $line = <$in>)) {
         my ($pg, $sg);
-        my $primary;
 
         $line =~ s/\r?\n$//;
         $line =~ s/^\s+//;
@@ -681,27 +843,57 @@ sub import_alias_map {
         $line =~ s/^(?:;|\/\/|#).*$//;
         $line =~ s/\s+/ /g;
 
-        ($pg, $sg) = $line =~ /^(.+?\S)(?:\s+(?:--|<-|->|=>|<=)\s+(\S.+))?$/;
+        ($pg, $sg) = $line =~ /^(.+?\S)(?:\s+(?:--|<-|->|=>|<=|=)\s+(\S.*))?$/;
 
         croak 'Invalid format' unless defined $pg;
 
-        $_ = [map {$self->_parse_codepoint($_)} grep {length} split/\s*,\s*|\s+/, $_ // ''] foreach $pg, $sg;
+        $cb->($pg, $sg);
 
-        croak 'Invalid primary list: list is empty' unless scalar @{$pg};
-
-        # Alias all of primary, and then primary to secondary.
-        foreach my $char (@{$pg}) {
-            $primary //= $chars->{$char};
-        }
-        if (defined $primary) {
-            $chars->{$pg->[0]} = $primary;
-            foreach my $char (@{$pg}, @{$sg}) {
-                $chars->{$char} //= $primary;
-            }
-        }
     }
 
     return $self;
+}
+
+
+sub import_alias_map {
+    my ($self, $filename, %opts) = @_;
+    my $chars = $self->{chars};
+
+    croak 'Stray options passed' if scalar keys %opts;
+
+    $self->_read_kv_file($filename => sub {
+            my ($pg, $sg) = @_;
+            my $primary;
+
+            $_ = [map {$self->_parse_codepoint($_)} grep {length} split/\s*,\s*|\s+/, $_ // ''] foreach $pg, $sg;
+
+            croak 'Invalid primary list: list is empty' unless scalar @{$pg};
+
+            # Alias all of primary, and then primary to secondary.
+            foreach my $char (@{$pg}) {
+                $primary //= $chars->{$char};
+            }
+            if (defined $primary) {
+                $chars->{$pg->[0]} = $primary;
+                foreach my $char (@{$pg}, @{$sg}) {
+                    $chars->{$char} //= $primary;
+                }
+            }
+        });
+
+    return $self;
+}
+
+
+sub import_attributes {
+    my ($self, $filename, %opts) = @_;
+
+    croak 'Stray options passed' if scalar keys %opts;
+
+    return $self->_read_kv_file($filename, sub {
+            my ($pg, $sg) = @_;
+            $self->set_attribute($pg, $sg);
+        });
 }
 
 
@@ -712,7 +904,7 @@ sub import_psf {
     my $data;
 
     if (!ref $in) {
-        my $gz = $in =~ s/\.gz$//;
+        my $gz = $in =~ /\.gz$/;
         my $fh;
 
         open($fh, '<', $in) or croak $!;
@@ -805,6 +997,56 @@ sub import_psf {
 }
 
 
+sub import_hex {
+    my ($self, $in, %opts) = @_;
+    my $cur = scalar(@{$self->{glyphs}});
+    my $chars = $self->{chars};
+    my $height;
+    my $wb;
+
+    if (!ref $in) {
+        my $gz = $in =~ /\.gz$/;
+        my $fh;
+
+        open($fh, '<', $in) or croak $!;
+        $fh->binmode;
+        $fh->binmode('gzip') if $gz;
+        $in = $fh;
+    }
+
+    $self->bits(1);
+    $self->height(16);
+
+    {
+        my $w  = $self->width;
+        $wb = int($w/8) + (($w % 8) ? 1 : 0);
+    }
+    $height = $self->height;
+
+    while (defined(my $line = <$in>)) {
+        my ($cp, $pixel) = $line =~ /^([0-9A-F]{4,}):([0-9A-F]+)$/ or next;
+        my $pixel_count;
+
+        $cp = hex($cp);
+        $pixel = pack('H*', $pixel);
+
+        $pixel_count = length($pixel) / $height;
+
+        if ($pixel_count == $wb) {
+            # no-op
+        } elsif ($pixel_count == 1 && $wb == 2) {
+            # We need to fill the right side with zeros.
+            $pixel = pack('v*', unpack('C*', $pixel));
+        } else {
+            next; # we cannot match this.
+        }
+
+        push(@{$self->{glyphs}}, ~. $pixel);
+        $chars->{$cp} = $cur++;
+    }
+}
+
+
 sub import_directory {
     my ($self, $directory, %opts) = @_;
     my $chars = $self->{chars};
@@ -830,6 +1072,16 @@ sub import_directory {
         }
     }
     closedir($dir);
+
+    {
+        my $fullname = File::Spec->catfile($directory, 'font-attributes.txt');
+        $self->import_attributes($fullname) if -f $fullname;
+    }
+
+    {
+        my $fullname = File::Spec->catfile($directory, 'alias-map.txt');
+        $self->import_alias_map($fullname) if -f $fullname;
+    }
 
     return $self;
 }
@@ -880,6 +1132,8 @@ sub make_up_glyphs {
     my ($self) = @_;
     my $w  = $self->width;
     my $h  = $self->height;
+    my $vmiddleline = eval {$self->get_attribute('vmiddleline')};
+    my $hmiddleline = eval {$self->get_attribute('hmiddleline')};
     my $h8 = $h/8;
     my $w8 = $w/8;
     my $wb = int($w8) + (($w % 8) ? 1 : 0);
@@ -937,6 +1191,29 @@ sub make_up_glyphs {
         # U+2595 RIGHT ONE EIGHTH BLOCK
         $pattern = pack('n', ((~(0xFFFF >> (16-$w8))) & (0xFFFE << (16 - $w)) & 0xFFFF));
         $self->_make_up_glyphs_add_one(0x2595 => [map {$pattern} 1..$h]);
+    }
+
+    if (defined($vmiddleline) && defined($hmiddleline)) {
+        my @init = map {0xFFFF} 1..$h;
+        foreach my $key (keys %_drawing_single) {
+            my @lines = @init;
+            my $vbit = 0xFFFF ^ (0x8000 >> $vmiddleline);
+
+            $lines[$hmiddleline] &= 0xFFFF >> $vmiddleline if $key =~ /l/;
+            $lines[$hmiddleline] &= 0xFFFF << (16 - $vmiddleline) if $key =~ /r/;
+            if ($key =~ /t/) {
+                $lines[$_] &= $vbit foreach 0..$hmiddleline;
+            }
+            if ($key =~ /b/) {
+                $lines[$_] &= $vbit foreach $hmiddleline..($h-1);
+            }
+
+            if ($wb == 1) {
+                $self->_make_up_glyphs_add_one($_drawing_single{$key} => [map {pack('C', ($_ >> 8) & 0xFF)} @lines]);
+            } elsif ($wb == 2) {
+                $self->_make_up_glyphs_add_one($_drawing_single{$key} => [map {pack('n', $_)} @lines]);
+            }
+        }
     }
 }
 
@@ -1038,7 +1315,7 @@ sub analyse {
                     my $d = ($l | $mask) ^ $empty; # only set pixels are now set in $d
 
                     for (my $i = 0; $i < $w; $i++) {
-                        if ($d & (1 << $i)) {
+                        if ($d & ($msb >> $i)) {
                             if (defined($vpixel) && $vpixel != $i) {
                                 $vpixel = undef;
                                 last mid;
@@ -1067,7 +1344,7 @@ sub analyse {
 
 
                 if (defined $vpixel) {
-                    $vpixel = $w - $vpixel;
+                    $vpixel = $vpixel;
                     if (defined $vmiddleline) {
                         $vmatches++ if $vmiddleline == $vpixel;
                     } else {
@@ -1157,6 +1434,212 @@ sub render {
     return $p;
 }
 
+# TODO: This is not yet part of public API. make it public. reconsider how it should work before doing so.
+sub list_info {
+    my ($self, $list) = @_;
+    my $chars = $_char_lists{$list};
+    return undef unless defined $chars;
+    return {
+        name => $list,
+        characters => scalar(@{$chars}),
+    };
+}
+
+# ---- Private helpers ----
+
+sub _render_font_flags {
+    my ($self) = @_;
+    my $slant = $self->get_attribute('slant');
+    my $weight = $self->get_attribute('weight');
+    my $res = 0;
+
+    $res |= $self->has_all_codepoints_from('important') ? 1 << 5 : 0;
+    $res |= $self->get_attribute('reverse_slant')       ? 0      : 1 << 4;
+
+    if ($slant eq 'roman') {
+        $res |= 3 << 2;
+    } elsif ($slant eq 'italic') {
+        $res |= 1 << 2;
+    } elsif ($slant eq 'oblique') {
+        $res |= 2 << 2;
+    } else {
+        $res |= 0;
+    }
+
+    if ($weight eq 'normal') {
+        $res |= 3;
+    } elsif ($slant eq 'bold') {
+        $res |= 1;
+    } elsif ($slant eq 'thin') {
+        $res |= 2;
+    } else {
+        $res |= 0;
+    }
+
+    return 0xFF40 | $res;
+}
+
+sub _apply_font_flags {
+    my ($self, $flags) = @_;
+
+    # lower byte:
+    if (($flags & 0xC0) == 0x40) {
+        # Data in this byte
+        my $slant  = $flags & 0x0C;
+        my $weight = $flags & 0x03;
+        $self->set_attribute(reverse_slant => ($flags & 0x10) == 0);
+
+        if ($slant == 0x0C) {
+            $self->set_attribute(slant => 'roman');
+        } elsif ($slant == 0x04) {
+            $self->set_attribute(slant => 'italic');
+        } elsif ($slant == 0x08) {
+            $self->set_attribute(slant => 'oblique');
+        } else {
+            $self->set_attribute(slant => 'other');
+        }
+
+        if ($weight == 0x03) {
+            $self->set_attribute(weight => 'normal');
+        } elsif ($weight == 0x01) {
+            $self->set_attribute(weight => 'bold');
+        } elsif ($weight == 0x02) {
+            $self->set_attribute(weight => 'thin');
+        } else {
+            $self->set_attribute(weight => 'other');
+        }
+    } elsif (($flags & 0xC0) == 0xC0 || ($flags & 0xC0) == 0x00) {
+        # no-op, no data
+    } else {
+        croak sprintf('Invalid or unsupported font flags: 0x%04X', $flags);
+    }
+
+    # upper byte:
+    if (($flags & 0xC000) == 0xC000 || ($flags & 0xC000) == 0x0000) {
+        # no-op, no data
+    } else {
+        croak sprintf('Invalid or unsupported font flags: 0x%04X', $flags);
+    }
+}
+
+sub _render_early_hints {
+    my ($self, $skips) = @_;
+
+    $skips //= 0;
+
+    return pack('nCCCCn', DATA_START_MARKER,
+        $self->width, $self->height,
+        $skips,
+        HEADER_EARLY_HINTS,
+        $self->_render_font_flags,
+    );
+}
+
+sub _render_geometry_hints {
+    my ($self) = @_;
+    return pack('nCCCCn', DATA_START_MARKER,
+        $self->get_attribute('hmiddleline'), $self->get_attribute('vmiddleline'),
+        $self->get_attribute('baseline'),
+        HEADER_GEOMETRY_HINTS,
+        $self->_render_font_flags,
+    );
+}
+
+sub _render_identity {
+    my ($self) = @_;
+    my $minor = $self->get_attribute('version_minor') << 2;
+    my $version_type = $self->get_attribute('version_type');
+    my $uuid = eval {$self->{util}->pack(uuid128 => $self->get_attribute('font_tag'))};
+    my $extra = '';
+
+    if ($version_type eq 'stable') {
+        $minor |= 3;
+    } elsif ($version_type eq 'rc') {
+        $minor |= 2;
+    } elsif ($version_type eq 'beta') {
+        $minor |= 1;
+    } elsif ($version_type eq 'devel') {
+        $minor |= 0;
+    } else {
+        croak 'Invalid version type: '.$version_type;
+    }
+
+    if (defined $uuid) {
+        $extra = $uuid;
+    }
+
+    if (defined(my $name = eval {$self->get_attribute('font_name')})) {
+        my $len;
+
+        if (length($extra) != 16) {
+            $extra = chr(0) x 16;
+        }
+
+        $name = UTF_8->encode($name);
+        $len = length($name);
+
+        if ($len % 8) {
+            $name .= chr(0);
+            $len++;
+            if ($len % 8) {
+                $name .= chr(0xFF) x (8 - ($len % 8));
+            }
+        }
+
+        $extra .= $name;
+    }
+
+    # TODO: Add support to write name of font
+
+    return pack('nCCCCn', DATA_START_MARKER,
+        $self->get_attribute('version_major'),
+        $minor,
+        length($extra) / 8,
+        HEADER_IDENTIFIER,
+        $self->get_attribute('last_modification')->datecode,
+    ).$extra;
+}
+
+sub _render_displayinfo {
+    my ($self) = @_;
+    my $icontext = eval {$self->get_attribute('icontext')};
+    my $displaycolour = eval {$self->get_attribute('displaycolour')};
+    my $displaycolour_412;
+    my $displaycolour_rgb;
+    my $icontext_16;
+    my $extra = '';
+
+    return unless defined($icontext) || defined($displaycolour);
+
+    $icontext //= 0xFFFFFFFF;
+
+    if (defined $displaycolour) {
+        require Data::Identifier::Wellknown;
+        Data::Identifier::Wellknown->import(':all');
+    }
+    $displaycolour_412   = defined($displaycolour) ? eval {$self->{util}->pack('4+12', $displaycolour)} : undef;
+    $displaycolour_412 //= pack('n', 0);
+    $icontext_16 = $icontext >= 0xFFFF ? 0xFFFF : $icontext;
+
+    if (defined($displaycolour) && eval { $displaycolour->generator->eq('55febcc4-6655-4397-ae3d-2353b5856b34') } ) {
+        eval {
+            $displaycolour_rgb = pack('xH6', substr($displaycolour->request, 1));
+        };
+    }
+
+    if ((defined($icontext) && $icontext >= 0xFFFD) || defined($displaycolour_rgb)) {
+        $extra .= defined($icontext) ? pack('N', $icontext & 0xFFFFFF) : chr(255) x 4;
+        $extra .= defined($displaycolour_rgb) ? $displaycolour_rgb : chr(255) x 4;
+    }
+
+    return pack('nnCCa2', DATA_START_MARKER,
+        $icontext_16,
+        length($extra) / 8,
+        HEADER_DISPLAYINFO | ($extra ne '' ? DATA_BIT : 0),
+        $displaycolour_412,
+    ).$extra;
+}
+
 1;
 
 __END__
@@ -1171,7 +1654,7 @@ SIRTX::Font - module for working with SIRTX font files
 
 =head1 VERSION
 
-version v0.06
+version v0.07
 
 =head1 SYNOPSIS
 
@@ -1238,6 +1721,135 @@ Code page 858 (often used on more modern DOS systems).
 =item C<cp-437>
 
 Code page 437 (original IBM PC character set).
+
+=back
+
+=head1 ATTRIBUTES
+
+The following font attributes are currently supported.
+See L</set_attribute> for details.
+Unless otherwise given all values are counted from top-left, starting with 0.
+
+=over
+
+=item C<width>, C<height>, C<bits>
+
+Integer values, see L</width>, L</height>, and L</bits> for details.
+
+=item C<baseline>
+
+The baseline of the font. This is the lowest scanline most capital latin letters sit on.
+
+=item C<vmiddleline>
+
+The vertical middle line is the column that represents the visual middle of the font.
+It is used mostly by box drawing characters when a vertical line is required.
+
+=item C<hmiddleline>
+
+The horizontal middle line is the scanline that represents the visual middle of the font.
+It is used mostly by box drawing characters when a horizontal line is required.
+
+=item C<version_major>
+
+The major part of the version.
+The value is in range 0 to 255.
+The value 255 has the special meaning of being later than any other version.
+This means that if the font is in version greater than 254 the value is always 255.
+
+=item C<version_minor>
+
+The minor part of the version.
+The value is in range 0 to 63.
+The value of 63 has the special meaning of being later than any other version.
+This means that if the font has more minor versions than 63, all versions 63 or later are stored as 63.
+
+=item C<version_type>
+
+The version type.
+One of C<devel> (development), C<beta> (beta version), C<rc> (release candidate), or C<stable>.
+The type is applied in a I<towards> way:
+e.g. version C<2.5-beta> is lower than C<2.5-stable>, but greater than C<2.4-stable>.
+
+=item C<weight>
+
+The font weight defines the "boldness" of the font.
+One of C<normal>, C<bold>, C<thin>, or C<other>.
+
+=item C<slant>
+
+The slant defines how upright a font is.
+One of C<roman> (upright), C<italic> (leaning), C<oblique> (sheared), or C<other>.
+
+=item C<reverse_slant>
+
+Boolean indicating if the slant is reverse (towards left, C<true>) or normal (towards right, C<false>).
+Fonts with a C<roman> slant are always non-reverse-slant.
+
+=item C<last_modification>
+
+The timestamp of the last modification.
+This value is updated internally and should only be read.
+
+As of v0.07 this is a L<SIRTX::Datecode>.
+
+=item C<font_tag>
+
+The permanent tag for this font.
+This tag stays the same with all versions of this font, but is updated for variants (e.g. forked projects) of the same font.
+It can be used (together with the version or alone) to identify the font uniquely and globally.
+
+As of v0.07 this is a L<Data::Identifier> which must allow for L<Data::Identifier/uuid>.
+
+=item C<font_name>
+
+The name of the font.
+This string is mostly used to present to the user.
+It should not be used to identify the font. See L</font_tag> for that.
+
+The font name can contain any unicode characters.
+However the following recommendations should be considered:
+
+=over
+
+=item *
+
+The font should contain all characters needed to render it's own name.
+
+=item *
+
+Any control characters, overly complicated characters, or composite characters should be avoided.
+
+=item *
+
+Spaces should be preferred over dashes or underscores. This is a name, not an identifier.
+
+=item *
+
+The font name should be kept short but precise. It should not contain a the name of the foundry, artist, or creator.
+
+=back
+
+=item C<icontext>
+
+(experimental since v0.07)
+
+A codepoint that is used as icontext.
+This is commonly unset.
+It can be any code point.
+However it is recommended that the font includes given character.
+
+=item C<displaycolour>
+
+(experimental since v0.07)
+
+A colour to be used to represent the font.
+This can be used to aid the user finding the corresponding font faster.
+
+As of v0.07 this is a L<Data::Identifier>.
+The value might or might not require to have a assigned SNI, SID, or RGB value.
+
+It might be useful to import L<Data::Identifier::Wellknown> with C<:all> so SNI and SID values are known.
 
 =back
 
@@ -1493,6 +2105,18 @@ Each part is a list of codepoints in C<U+NNNN> format, seperated by space, comma
 
 This method will ignore if a mapped glyph does not exists alike L</default_glyph_for>.
 
+=head2 import_attributes
+
+    $font->import_attributes($filename);
+
+(experimental, since v0.07)
+
+Imports an font attributes from the given file.
+
+The format consist of simple key-value-pairs separated by a single C<=>, optionally with spaces.
+
+Possible keys and values are the same as for L</set_attribute>.
+
 =head2 import_psf
 
     $font->import_psf($filename);
@@ -1504,6 +2128,19 @@ Imports a PC Screen Font (PSF) file into the font.
 Supports PSF1, and PSF2 files at this point.
 
 Note that files without a Unicode table might import incorrectly.
+
+=head2 import_hex
+
+    $font->import_hex($filename);
+
+(since v0.07)
+
+Imports Roman's .hex format. This supports both 8 and 16 pixel width glyphs.
+If the font is set to pixel width 8 pixel glyphs are extended with space to match 16 pixel.
+
+B<Note:>
+The font must be set to 8 or 16 pixel width before this function is called.
+See L</width> for details.
 
 =head2 import_directory
 

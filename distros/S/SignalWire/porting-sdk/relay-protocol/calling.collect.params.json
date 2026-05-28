@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.collect` (params). Extracted from switchblade `PublicCallCollectParams.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "continue": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "continuous": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "control_id": {
+      "type": "string"
+    },
+    "digits": {
+      "additionalProperties": true,
+      "properties": {
+        "digit_timeout": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "max": {
+          "type": "integer"
+        },
+        "min": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "terminators": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "max"
+      ],
+      "type": "object"
+    },
+    "initial_timeout": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "node_id": {
+      "type": "string"
+    },
+    "partial_results": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "send_start_of_input": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "speech": {
+      "additionalProperties": true,
+      "properties": {
+        "end_silence_timeout": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "hints": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "language": {
+          "type": "string"
+        },
+        "model": {
+          "type": "string"
+        },
+        "speech_timeout": {
+          "type": [
+            "number",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "start_input_timers": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id",
+    "control_id"
+  ],
+  "title": "calling.collect params",
+  "type": "object",
+  "x-method": "calling.collect",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallCollectParams.cs"
+}

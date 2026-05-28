@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Placeholder schema for the FreeSWITCH-side `calling.call` method. Registered via `swclt_sess_register_protocol_method(..., \"call\", ...)` in mod_infrastructure/relay.c but not exposed as a switchblade Params/Result class. The mock accepts any payload for this method.",
+  "title": "calling.call result",
+  "type": "object",
+  "x-method": "calling.call",
+  "x-permissive": true,
+  "x-phase": "result",
+  "x-source": "mod_infrastructure",
+  "x-source-file": "mod_infrastructure/relay.c"
+}

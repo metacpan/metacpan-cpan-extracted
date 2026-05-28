@@ -1,0 +1,38 @@
+{
+  "varargs": {
+    "classes": {
+      "Logger": {
+        "methods": {
+          "log": {
+            "params": [
+              {
+                "name": "self",
+                "kind": "self"
+              },
+              {
+                "name": "level",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "args",
+                "kind": "var_positional",
+                "type": "string",
+                "required": false,
+                "default": "()"
+              },
+              {
+                "name": "kwargs",
+                "kind": "var_keyword",
+                "type": "int",
+                "required": false,
+                "default": {}
+              }
+            ],
+            "returns": "void"
+          }
+        }
+      }
+    }
+  }
+}

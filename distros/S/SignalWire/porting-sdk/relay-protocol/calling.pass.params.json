@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.pass` (params). Extracted from switchblade `PublicCallPassParams.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "node_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id"
+  ],
+  "title": "calling.pass params",
+  "type": "object",
+  "x-method": "calling.pass",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallPassParams.cs"
+}

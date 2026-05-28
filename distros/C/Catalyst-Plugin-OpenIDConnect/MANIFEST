@@ -1,0 +1,36 @@
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+dist.ini
+cpanfile
+README.md
+QUICKSTART.md
+IMPLEMENTATION_GUIDE.md
+DEPLOYMENT.md
+API_REFERENCE.md
+CHANGELOG.md
+LICENSE
+lib/Catalyst/Plugin/OpenIDConnect.pm
+lib/Catalyst/Plugin/OpenIDConnect/Context.pm
+lib/Catalyst/Plugin/OpenIDConnect/Controller/Root.pm
+lib/Catalyst/Plugin/OpenIDConnect/Role/Store.pm
+lib/Catalyst/Plugin/OpenIDConnect/Utils/JWT.pm
+lib/Catalyst/Plugin/OpenIDConnect/Utils/Store.pm
+lib/Catalyst/Plugin/OpenIDConnect/Utils/Store/Redis.pm
+t/01_jwt.t
+t/02_store.t
+t/03_plugin.t
+t/04_store_redis.t
+t/05_logout.t
+t/06_pkce.t
+t/07_security_headers.t
+t/10_pod.t
+t/11_podcoverage.t
+example/app.pl
+example/generate_keys.sh
+example/lib/OIDCExample/Controller/OpenIDConnect.pm
+example/root/index.html
+example/root/login.html
+example/root/protected.html
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

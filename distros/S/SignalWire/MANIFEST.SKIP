@@ -1,0 +1,56 @@
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+\bSCCS\b
+,v$
+\B\.svn\b
+\B\.git\b
+\B\.gitignore\b
+\b_darcs\b
+\B\.cvsignore$
+
+# Avoid VMS Specific Files
+\bDescrip.mms\b
+\bDESCRIP.MMS\b
+\bdescrip.mms\b
+
+# Avoid Makemaker generated and target files.
+\bMANIFEST\.bak
+\bMakefile$
+\bMakefile\.old$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+\bblibdirs\.ts$
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+\.tmp$
+\.rej$
+
+# Avoid OS-specific files/dirs
+# Mac OSX metadata
+\B\.DS_Store
+# Mac OSX SMB mount  metadata files
+\B\._
+
+# Avoid archives of this distribution
+\bSignalWire-Agents-[\d\.]+
+
+# Avoid local/ installed dependencies
+^local/
+
+# Avoid MYMETA files
+^MYMETA\.
+
+# Avoid Claude/editor config
+^\.claude/
+^CLAUDE\.md$
+
+# Avoid cpanfile (not needed in dist)
+^cpanfile$

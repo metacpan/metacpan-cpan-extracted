@@ -11,7 +11,7 @@ use DBIx::QuickORM::Util qw/column_key/;
 use DBIx::QuickORM::Affinity();
 use DBIx::QuickORM::Link();
 
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 
 use DBIx::QuickORM::Connection::RowData qw{
     STORED
@@ -302,8 +302,12 @@ sub update {
 
     $self->check_pk;
 
+    my $source = $self->source;
     my $row_data = $self->row_data;
     for my $field (keys %$changes) {
+        croak "Cannot set field '$field': it is a database-generated column"
+            if $source->field_is_generated($field);
+
         $row_data->{+PENDING}->{$field} = $changes->{$field};
         delete $row_data->{+DESYNC}->{$field} if $row_data->{+DESYNC};
     }
@@ -332,6 +336,11 @@ sub update {
 
 Get (or, with a value, set) a single field. C<field> returns the inflated
 value; C<raw_field> returns the deflated/raw value.
+
+Setting a field whose column is database-generated (C<GENERATED ALWAYS>,
+stored or virtual) croaks: the database owns the value, so the ORM refuses to
+stage a write that would be rejected at C<INSERT> / C<UPDATE> time. Reads are
+unaffected.
 
 =item $hash = $row->fields
 
@@ -434,6 +443,9 @@ sub _field {
     my $row_data = $self->row_data;
 
     if (@_) {
+        croak "Cannot set field '$field': it is a database-generated column"
+            if $self->source->field_is_generated($field);
+
         $self->check_pk if $row_data->{+STORED};    # We can set a field if the row has not been inserted yet, or if it has a pk
         $row_data->{+PENDING}->{$field} = shift;
     }

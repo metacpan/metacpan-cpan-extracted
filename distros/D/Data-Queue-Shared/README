@@ -177,7 +177,7 @@ DESCRIPTION
     $timeout is seconds (-1 = infinite, 0 = try once).
 
    Status
-        my $n   = $q->size;         # approximate for Int (lock-free), exact for Str
+        my $n   = $q->size;         # approximate under concurrent access
         my $cap = $q->capacity;     # max elements
         my $ok  = $q->is_empty;
         my $ok  = $q->is_full;

@@ -1,0 +1,81 @@
+name: linux
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+jobs:
+  debian:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        codename:
+          - bookworm
+        perl-version:
+          - '5.36'
+          - '5.38'
+          - '5.40'
+    container:
+      image: perl:${{ matrix.perl-version }}-${{ matrix.codename }}
+    env:
+      # Test-time gitconfig isolation is handled inside t/lib/TestRepo.pm
+      # (sets GIT_CONFIG_GLOBAL/SYSTEM per process). Do NOT set those here:
+      # at job level they also hit actions/checkout and the Fix safe.directory
+      # step, sending their --global writes to /dev/null and breaking the
+      # dubious-ownership guard inside the container.
+      #
+      # Hits a real public GitHub repo over HTTPS — exercises the network +
+      # TLS + ref-listing path end-to-end. No token needed.
+      TEST_GIT_NATIVE_HTTPS_URL: https://github.com/getty/p5-www-chain.git
+    steps:
+      - uses: actions/checkout@v4
+      # Git::Libgit2 and Alien::Libgit2 are on CPAN, but CI builds them from
+      # the sibling repos' HEAD so a fix here is exercised before its release.
+      - name: Checkout Alien::Libgit2
+        uses: actions/checkout@v4
+        with:
+          repository: getty/p5-alien-libgit2
+          path: vendor/alien-libgit2
+      - name: Checkout Git::Libgit2
+        uses: actions/checkout@v4
+        with:
+          repository: getty/p5-git-libgit2
+          path: vendor/git-libgit2
+      - name: Fix safe.directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: perl -V
+        run: perl -V
+      - name: Install build prerequisites
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            libgit2-dev pkg-config git
+      - name: Install Dist::Zilla
+        env:
+          PERL_CPANM_OPT: --mirror http://cpan.metacpan.org --mirror-only
+        run: cpanm -nq Dist::Zilla
+      - name: Install Alien::Libgit2 from sibling repo
+        working-directory: vendor/alien-libgit2
+        env:
+          PERL_CPANM_OPT: --mirror http://cpan.metacpan.org --mirror-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          dzil authordeps --missing | cpanm -nq
+          dzil listdeps --author --missing | cpanm -nq
+          dzil install
+      - name: Install Git::Libgit2 from sibling repo
+        working-directory: vendor/git-libgit2
+        env:
+          PERL_CPANM_OPT: --mirror http://cpan.metacpan.org --mirror-only
+        shell: bash
+        run: |
+          set -euo pipefail
+          dzil authordeps --missing | cpanm -nq
+          dzil listdeps --author --missing | cpanm -nq
+          dzil install
+      - name: dzil test
+        uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main

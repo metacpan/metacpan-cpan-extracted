@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.ai_message` (params). Extracted from switchblade `PublicCallAiMessageParams.cs`.",
+  "properties": {
+    "async": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "call_id": {
+      "type": "string"
+    },
+    "global_data": {},
+    "message_text": {
+      "type": "string"
+    },
+    "node_id": {
+      "type": "string"
+    },
+    "reset": {},
+    "role": {
+      "type": "string"
+    },
+    "swml": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id"
+  ],
+  "title": "calling.ai_message params",
+  "type": "object",
+  "x-method": "calling.ai_message",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallAiMessageParams.cs"
+}

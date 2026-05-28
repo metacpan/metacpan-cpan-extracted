@@ -11,8 +11,9 @@ $translateTo    => 'Spanish'
 use JSON;
 
 my $queue = 'Default';
+my $TicketObj;
 if ( $ARGS{id} ) {
-    my $TicketObj = LoadTicket($ARGS{id});
+    $TicketObj = LoadTicket($ARGS{id});
     $queue = $TicketObj->QueueObj->Name;
 }
 elsif ( $ARGS{QueueId} ) {
@@ -34,12 +35,40 @@ if ($config) {
         $prompt .= " Translate from $translateFrom to $translateTo.";
     }
 
+    # Handle suggest_response specific processing
+    my $context_content = '';
+    my $full_text = $rawText;
+    if ($callType eq 'suggest_response') {
+        # Load context file
+        my $context = RT::Extension::AI::LoadContextFile(
+            config => $config,
+            queue => $queue
+        );
+
+        if ($context) {
+            my $prompt_text = $config->{suggest_response_context_prompt} || "Here are examples of similar previous conversations for context:";
+            $context_content = "\n\n" . $prompt_text . "\n\n" . $context . "\n\n---\n\nCurrent ticket requiring response:";
+            RT->Logger->debug("Added context file content for suggest_response (length: " . length($context) . ")");
+        }
+
+        # Include current ticket content
+        if ($TicketObj) {
+            my $ticket_summary = RT::Extension::AI::GenerateTicketSummary(
+                TicketObj       => $TicketObj,
+                TransactionType => 'Correspond'
+            );
+            if ($ticket_summary) {
+                $full_text = $ticket_summary . "\n\n" . $rawText;
+            }
+        }
+    }
+
     my $provider_class = "RT::Extension::AI::Provider::" . $config->{name};
     my $provider_instance = $provider_class->new(config => $config);
 
     my $response = $provider_instance->process_request(
-        prompt       => $prompt,
-        raw_text     => $rawText,
+        prompt       => $context_content . $prompt,
+        raw_text     => $full_text,
         model_config => $callType eq 'autocomplete_text' ? $config->{autocomplete_model} : $config->{default_model},
     );
 

@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: Perl7-Handy
-version: 0.13
+version: 0.14
 abstract: Handy Perl7 scripting environment on Perl5
 author:
   - ina <ina@cpan.org>
@@ -22,7 +22,7 @@ minimum_perl_version: 5.00503
 provides:
   Perl7::Handy:
     file: lib/Perl7/Handy.pm
-    version: 0.13
+    version: 0.14
 resources:
   license: http://dev.perl.org/licenses/
   bugtracker: https://github.com/ina-cpan/Perl7-Handy/issues

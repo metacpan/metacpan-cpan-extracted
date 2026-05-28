@@ -35,6 +35,11 @@
 #define HEAP_MUTEX_BIT   0x80000000U
 #define HEAP_MUTEX_PID   0x7FFFFFFFU
 
+/* Indices into the heap data are uint32_t (sift_up/down).  Cap capacity
+ * to UINT32_MAX so size++ in heap_push cannot wrap and the (uint32_t)
+ * cast against hdr->capacity in the capacity check cannot truncate. */
+#define HEAP_MAX_CAPACITY ((uint64_t)UINT32_MAX)
+
 typedef struct {
     int64_t priority;
     int64_t value;
@@ -291,8 +296,7 @@ static inline void heap_init_header(void *base, uint64_t total, uint64_t capacit
 static inline int heap_validate_header(const HeapHeader *hdr, uint64_t file_size) {
     if (hdr->magic != HEAP_MAGIC) return 0;
     if (hdr->version != HEAP_VERSION) return 0;
-    if (hdr->capacity == 0) return 0;
-    if (hdr->capacity > (UINT64_MAX - sizeof(HeapHeader)) / sizeof(HeapEntry)) return 0;
+    if (hdr->capacity == 0 || hdr->capacity > HEAP_MAX_CAPACITY) return 0;
     if (hdr->total_size != file_size) return 0;
     if (hdr->data_off != sizeof(HeapHeader)) return 0;
     uint64_t exp_total = sizeof(HeapHeader) + hdr->capacity * sizeof(HeapEntry);
@@ -305,7 +309,11 @@ static inline int heap_validate_header(const HeapHeader *hdr, uint64_t file_size
 static inline HeapHandle *heap_setup(void *base, size_t ms, const char *path, int bfd) {
     HeapHeader *hdr = (HeapHeader *)base;
     HeapHandle *h = (HeapHandle *)calloc(1, sizeof(HeapHandle));
-    if (!h) { munmap(base, ms); return NULL; }
+    if (!h) {
+        munmap(base, ms);
+        if (bfd >= 0) close(bfd);
+        return NULL;
+    }
     h->hdr = hdr;
     h->data = (HeapEntry *)((uint8_t *)base + hdr->data_off);
     h->mmap_size = ms;
@@ -318,6 +326,7 @@ static inline HeapHandle *heap_setup(void *base, size_t ms, const char *path, in
 static HeapHandle *heap_create(const char *path, uint64_t capacity, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
     if (capacity == 0) { HEAP_ERR("capacity must be > 0"); return NULL; }
+    if (capacity > HEAP_MAX_CAPACITY) { HEAP_ERR("capacity too large (max %u)", (unsigned)HEAP_MAX_CAPACITY); return NULL; }
     if (capacity > (UINT64_MAX - sizeof(HeapHeader)) / sizeof(HeapEntry)) {
         HEAP_ERR("capacity overflow"); return NULL;
     }
@@ -365,6 +374,7 @@ static HeapHandle *heap_create(const char *path, uint64_t capacity, char *errbuf
 static HeapHandle *heap_create_memfd(const char *name, uint64_t capacity, char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
     if (capacity == 0) { HEAP_ERR("capacity must be > 0"); return NULL; }
+    if (capacity > HEAP_MAX_CAPACITY) { HEAP_ERR("capacity too large (max %u)", (unsigned)HEAP_MAX_CAPACITY); return NULL; }
     if (capacity > (UINT64_MAX - sizeof(HeapHeader)) / sizeof(HeapEntry)) {
         HEAP_ERR("capacity overflow"); return NULL;
     }

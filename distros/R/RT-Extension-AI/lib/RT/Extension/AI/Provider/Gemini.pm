@@ -18,7 +18,7 @@ sub process_request {
 
     my $request_payload = {
         contents => [
-            {   role  => "user",
+            {
                 parts =>
                     [ { text => $args{prompt} . "\n" . $args{raw_text} } ],
             }

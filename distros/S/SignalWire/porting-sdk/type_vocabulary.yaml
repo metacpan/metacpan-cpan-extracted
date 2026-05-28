@@ -1,0 +1,65 @@
+# type_vocabulary.yaml
+#
+# The canonical type vocabulary for the cross-language signature audit.
+# Every per-port adapter (see ADAPTER_CONTRACT.md) MUST emit types from this
+# vocabulary, never from its native type system. Types not in this vocabulary
+# are a hard error: the adapter MUST raise (loud failure with file:line) so
+# the missing case becomes a documented decision (extend vocabulary, add to
+# type_aliases.yaml, or list in PORT_SIGNATURE_OMISSIONS.md), never a silent
+# fallback to "any".
+#
+# Why so small: the SignalWire SDK uses ~15 types in its public API. Keeping
+# the vocabulary tight keeps cross-language diffing tractable. New entries
+# require evidence that the SDK actually uses the type — not speculation.
+
+version: "1"
+
+# Primitive types — atoms with no parameters.
+primitives:
+  - string       # Python str, .NET string, Java String, Ruby String, JS string, etc.
+  - int          # 64-bit integer is the canonical assumption
+  - float        # IEEE 754 double precision
+  - bool         # true/false
+  - bytes        # raw byte sequence (Python bytes, .NET byte[], etc.)
+  - datetime     # canonical ISO-8601 timestamp; per-port representation in type_aliases.yaml
+  - any          # erased / dynamic / Object type. Use sparingly — only when the
+                 # Python reference itself uses Any. Not a fallback for unknown.
+  - void         # procedure return type (Python None when used as return,
+                 # .NET void, Java void, TS void). Distinct from null/None as a value.
+
+# Parameterized types — emit with angle brackets, e.g. list<string>,
+# dict<string,any>. Recursive: parameters are themselves canonical types.
+parameterized:
+  list:
+    arity: 1
+    description: "Ordered sequence. list<T>."
+  dict:
+    arity: 2
+    description: "Map / hash table. dict<K,V>."
+  optional:
+    arity: 1
+    description: "Nullable: optional<T> means T or null. Distinct from union<T,void>."
+  union:
+    arity: "2+"
+    description: "One of N alternatives. union<string,int> matches Python str | int."
+  tuple:
+    arity: "1+"
+    description: "Fixed-length heterogeneous tuple. tuple<int,string,bool>. Use list<T> when the length is variable."
+  callable:
+    arity: 2
+    description: "callable<args,ret> where args is a list<...> of param types and ret is a canonical type. Example: callable<list<string>,void> = a function taking one string param and returning void."
+
+# Class references — pointers into the canonical Python module hierarchy.
+# Form: class:<dotted-module>.<ClassName>
+# Example: class:signalwire.core.agent_base.AgentBase
+class_ref:
+  prefix: "class:"
+  description: "Reference to a class defined elsewhere in the canonical inventory. The dotted name MUST resolve to a class entry in some module of python_signatures.json or in the port's own surface (for port-specific additions documented in PORT_ADDITIONS.md)."
+
+# Reserved / explicitly excluded — cases adapters might be tempted to emit.
+# If you find yourself wanting one of these, the answer is "extend the
+# vocabulary with a justification" or "use union<...>", not "fall back to any".
+not_in_vocabulary:
+  - generic_typevar    # Python TypeVar, .NET T, Rust generic<T>. Not modelled in v1; adapters MUST resolve generic methods to a canonical instantiation or list in PORT_SIGNATURE_OMISSIONS.md.
+  - never              # Python NoReturn, TS never. Out of v1 scope; rare in SDK code. Reopen if SDK starts using it.
+  - structural         # TypeScript-style structural types ({ x: int, y: int }). Use class:<...> instead by naming the type, or list as PORT_SIGNATURE_OMISSIONS.md entry.

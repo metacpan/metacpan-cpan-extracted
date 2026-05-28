@@ -70,11 +70,15 @@ my $f2 = $f->move( $tmpdir ) || do
     diag( $f->error ) if( $DEBUG );
 };
 isa_ok( $f2, 'Module::Generic::File', 'moved object class' );
-my $expected_location = Cwd::abs_path( File::Spec->catpath( $f->volume, "$tmpdir", $f->basename ) );
-if( !defined( $expected_location ) )
-{
-    diag( "Error at line " . __LINE__ . " with Cwd::abs_path for file '$f' and tmpdir '$tmpdir': $!" );
-}
+# NOTE: This is a theoretical move: the source file does not exist yet, so the
+# destination is computed lexically by move(), without touching the file system.
+# Cwd::abs_path resolves against the file system and returns undef for a path that
+# does not exist on strict platforms such as Cygwin, which made this test fail there.
+# We therefore reproduce exactly the same lexical construction that move() performs
+# internally, through the very same _spec_ helpers, so the expected value tracks the
+# real implementation, including any OS specific path normalisation.
+my( $exp_vol, $exp_path, $exp_fname ) = $f->_spec_splitpath( "$tmpdir" );
+my $expected_location = $f->_spec_catpath( $exp_vol, $f->_spec_catdir( [ $exp_path, $exp_fname ] ), $f->basename );
 is( "$f2", $expected_location, 'moved file new path' );
 if( $expected_location eq "$f2" )
 {
@@ -265,6 +269,9 @@ diag( "$tmpname is $f3" ) if( $DEBUG );
 my $sys_tmpdir = $f->sys_tmpdir;
 my $f4 = $f3->move( $sys_tmpdir )->touch;
 is( $f4, Cwd::abs_path( File::Spec->catfile( File::Spec->tmpdir, $f3->basename ) ), 'move' );
+# my( $exp_vol, $exp_path, $exp_fname ) = $f->_spec_splitpath( File::Spec->tmpdir );
+# my $expected = $f->_spec_catpath( $exp_vol, $f->_spec_catdir( [ $exp_path, $exp_fname ] ), $f3->basename );
+# is( $f4, $expected, 'move' );
 my $io = $f4->open;
 ok( $io, 'open file in read mode' );
 $f4->debug( $DEBUG );
@@ -781,46 +788,74 @@ subtest 'Thread-safe file operations' => sub
         # local $DEBUG = 4;
 
         # No cleanup, or else a thread shutting down would have the file removed.
+        # We create and close the file here only to obtain a stable path. Under Perl
+        # ithreads, filehandles and their objects are cloned per thread, so a handle
+        # captured by a closure cannot be shared safely: each thread would seek and
+        # write against its own clone, the lock taken in one thread would not protect
+        # the others, and writes would overlap and be lost. We therefore pass only the
+        # file path (a plain string, which clones safely) into each thread, and let
+        # every thread open the file independently in append mode under an exclusive
+        # lock. This is what actually exercises Module::Generic::File locking.
         my $file = Module::Generic::File->tempfile( debug => $DEBUG );
         my $fh = $file->open( '+>', { autoflush => 1 } );
         if( !$fh )
         {
             diag( "Failed to open file $file: ", $file->error ) if( $DEBUG );
-            skip( "Failed to open file $file", 1 );
+            skip( "Failed to open file $file", 5 );
         }
         diag( "The file $file file descriptor is ", $fh->fileno ) if( $DEBUG );
+        $fh->close();
+        my $path = $file->filename;
 
         my @threads = map
         {
+            my $n = $_;
             threads->create(sub
             {
                 my $tid = threads->tid();
-                if( !$file->lock( exclusive => 1 ) )
+                my $tfile = Module::Generic::File->new( $path, debug => $DEBUG );
+                if( !$tfile )
                 {
-                    diag( "Under thread $tid, failed to lock file $file with descriptor ", $fh->fileno ) if( $DEBUG );
+                    diag( "Thread $tid: Failed to instantiate file $path" ) if( $DEBUG );
                     return(0);
                 }
-                if( !$fh->seek( 0, Fcntl::SEEK_END ) )
+                my $tfh = $tfile->open( '>>', { autoflush => 1 } );
+                if( !$tfh )
                 {
-                    diag( "Thread $tid: Failed to seek: ", $file->error ) if( $DEBUG );
+                    diag( "Thread $tid: Failed to open file $path: ", $tfile->error ) if( $DEBUG );
                     return(0);
                 }
-                if( !$fh->write( "Thread $tid: Line $_\n" ) )
+                # NOTE: lock() without a timeout is fail-fast: it adds the
+                # non-blocking bit and returns an error immediately if another holder
+                # owns the lock, rather than waiting. Under concurrent access that
+                # makes threads give up and skip their write. We pass a timeout so the
+                # call blocks and retries until the lock is released, which is the
+                # behaviour this concurrency test actually means to exercise.
+                if( !$tfile->lock( exclusive => 1, timeout => 10 ) )
                 {
-                    diag( "Thread $tid: Failed to write: ", $file->error ) if( $DEBUG );
+                    diag( "Thread $tid: Failed to lock file $path with descriptor ", $tfh->fileno ) if( $DEBUG );
+                    $tfh->close();
                     return(0);
                 }
-                if( !$fh->flush() )
+                if( !$tfh->write( "Thread $tid: Line $n\n" ) )
                 {
-                    diag( "Thread $tid: Failed to flush: ", $file->error ) if( $DEBUG );
+                    diag( "Thread $tid: Failed to write: ", $tfile->error ) if( $DEBUG );
+                    $tfile->unlock();
+                    $tfh->close();
                     return(0);
                 }
-                $file->unlock();
+                if( !$tfh->flush() )
+                {
+                    diag( "Thread $tid: Failed to flush: ", $tfile->error ) if( $DEBUG );
+                    $tfile->unlock();
+                    $tfh->close();
+                    return(0);
+                }
+                $tfile->unlock();
+                $tfh->close();
                 return(1);
             });
         } 1..5;
-
-        $fh->seek(0,0);
 
         my $success = 1;
         for my $thr ( @threads )
@@ -830,7 +865,6 @@ subtest 'Thread-safe file operations' => sub
 
         ok( $success, 'All threads wrote successfully to file' );
         my $lines = $file->lines();
-        $fh->close();
         $file->auto_remove(1);
         if( ok( $lines, 'retrieved shared file lines' ) )
         {

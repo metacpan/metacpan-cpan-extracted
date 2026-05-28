@@ -1,0 +1,86 @@
+name: Surface Audit (Layer B)
+
+# Layer B symbol-level surface audit — enumerates the Perl SDK's public API
+# (packages, public subs) and diffs it against the porting-sdk's reference
+# python_surface.json. Any unexcused drift (missing or extra symbol) fails
+# the build. Deliberate non-implementations go in PORT_OMISSIONS.md and
+# port-only extensions go in PORT_ADDITIONS.md.
+#
+# See CHECKLIST_TEMPLATE.md § Symbol-level surface parity in
+# https://github.com/signalwire/porting-sdk for the contract.
+
+env:
+  # Opt into Node.js 24 ahead of GitHub's 2026-06-02 default switch.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+on:
+  pull_request:
+    paths:
+      - 'lib/**'
+      - 'scripts/enumerate_surface.pl'
+      - 'PORT_OMISSIONS.md'
+      - 'PORT_ADDITIONS.md'
+      - '.github/workflows/surface-audit.yml'
+      - 'cpanfile'
+  push:
+    branches: [main]
+  schedule:
+    # Nightly at 06:30 UTC to catch drift from upstream Python reference
+    # updates that land in porting-sdk between our PRs.
+    - cron: '30 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Perl SDK
+        uses: actions/checkout@v5
+
+      - name: Checkout porting-sdk (reference)
+        uses: actions/checkout@v5
+        with:
+          repository: signalwire/porting-sdk
+          path: porting-sdk
+          fetch-depth: 1
+          token: ${{ secrets.PORTING_SDK_TOKEN }}
+
+      - name: Setup Perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.38'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Perl dependencies
+        run: cpanm --notest --quiet --installdeps .
+
+      - name: Enumerate Perl surface
+        run: perl scripts/enumerate_surface.pl --output port_surface.json
+
+      - name: Sanity check — port_surface.json was written
+        run: |
+          test -s port_surface.json
+          python3 -c "import json; d=json.load(open('port_surface.json')); assert d['version']=='1'; print('modules:', len(d['modules']))"
+
+      - name: Diff against Python reference
+        run: |
+          python3 porting-sdk/scripts/diff_port_surface.py \
+            --reference porting-sdk/python_surface.json \
+            --port-surface port_surface.json \
+            --omissions PORT_OMISSIONS.md \
+            --additions PORT_ADDITIONS.md
+
+      - name: Run Perl test suite (surface audit smoke tests)
+        run: PERL5LIB="lib:t/lib" prove -r t/53_surface_audit.t
+
+      - name: Upload surface snapshot on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: port-surface-${{ github.sha }}
+          path: port_surface.json
+          retention-days: 14

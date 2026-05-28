@@ -16,8 +16,10 @@ my %opt=(
 	type =>undef,
 	paths=>[],
 	debug=>'',
+	quiet=>undef,
 	#
 	profile=>undef,
+	verbose=>undef,
 	# force  =>undef, # force all timestamps to 'newer', force delete, etc.?
 );
 GetOptions(
@@ -27,8 +29,10 @@ GetOptions(
 	'file=s'   =>\$opt{file},
 	'type=s'   =>\$opt{type},
 	'debug=s'  =>\$opt{debug},
+	'quiet!'   =>\$opt{quiet},
 	#
 	'profile=s'=>\$opt{profile},
+	'verbose=s'=>\$opt{verbose},
 	#
 	'<>'       =>sub { my ($x)=@_; push @{$opt{paths}},$x },
 );
@@ -41,7 +45,7 @@ if($opt{file})     { $criticdb=App::CriticDB->new(file=>$opt{file},type=>$opt{ty
 if(!$criticdb)     { die 'No database specified' }
 if(@{$opt{paths}}) { $criticdb->collect(@{$opt{paths}}) }
 
-$criticdb->report();
+$opt{quiet} || $criticdb->report(verbose=>$opt{verbose});
 
 __END__
 
@@ -55,13 +59,32 @@ perlcriticdb - Commandline interface to Critic violations database
 
   perlcriticdb
     [ --file=violations.ext [ --type=storable ] ]
-    [ --profile=file ]
+    [ --quiet ] [ --debug ]
     [ --man | --help ]
+
+    # Supported perlcritic options
+    [ --profile=file ]
+    [ --verbose ... ]
+
     [ FILE | DIRECTORY ]
 
 =head1 DESCRIPTION
 
 C<perlcriticdb> is a tool to invoke C<perlcritic>, store violations in a local datastore, and build reports from of collected L<Perl::Critic> violation data.
+
+=head1 OPTIONS
+
+=head2 Storage Engine
+
+Currently, only L<Storable> files are supported and can be specified by providing C<--file=violations.ext>.
+
+=head2 Reporting
+
+After critiquing any listed C<FILE> and C<DIRECTORY> entries, by default the full list of violations will be reported.  The C<--quiet> option can be used to skip reporting of violations.
+
+=head2 perlcritic options
+
+The C<--profile> and C<--verbose> options are passed directly to C<perlcritic>.  Note that the profile should I<always be specified> or subsequent runs may use the system/default profile.
 
 =head1 AUTHORS
 

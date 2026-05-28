@@ -47,4 +47,11 @@ is $entries[0]{action}, 'pick', 'first by time: pick by agent-a';
 is $entries[1]{action}, 'pick', 'second: pick by agent-b';
 is $entries[2]{action}, 'handoff', 'third: handoff by agent-a';
 
+# Cmd::Log enumerates log refs natively via Git::Native list_refs.
+# Regression: it previously called a nonexistent _git_cmd and would have
+# died as soon as any refs/karr/log/* ref existed.
+my @log_refs = sort $git->list_refs('refs/karr/log/');
+is scalar @log_refs, 2, 'list_refs finds both log refs';
+is_deeply \@log_refs, [ sort( $ref_a, $ref_b ) ], 'log ref names match';
+
 done_testing;

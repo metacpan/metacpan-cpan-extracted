@@ -15,7 +15,6 @@ jobs:
         codename:
           - bookworm
         perl-version:
-          - '5.32'
           - '5.36'
           - '5.38'
           - '5.40'
@@ -29,6 +28,8 @@ jobs:
         with:
           repository: getty/p5-alien-libgit2
           path: vendor/alien-libgit2
+      - name: Fix safe.directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
       - name: perl -V
         run: perl -V
       - name: Install build prerequisites
@@ -37,16 +38,18 @@ jobs:
           apt-get install -y --no-install-recommends \
             libgit2-dev pkg-config git
       - name: Install Dist::Zilla
-        run: cpanm -nq Dist::Zilla Dist::Zilla::PluginBundle::Author::GETTY
+        env:
+          PERL_CPANM_OPT: --mirror http://cpan.metacpan.org --mirror-only
+        run: cpanm -nq Dist::Zilla
       - name: Install Alien::Libgit2 from sibling repo
         working-directory: vendor/alien-libgit2
+        env:
+          PERL_CPANM_OPT: --mirror http://cpan.metacpan.org --mirror-only
+        shell: bash
         run: |
+          set -euo pipefail
           dzil authordeps --missing | cpanm -nq
-          dzil listdeps --missing | cpanm -nq
+          dzil listdeps --author --missing | cpanm -nq
           dzil install
-      - name: Install dependencies
-        run: |
-          dzil authordeps --missing | cpanm -nq
-          dzil listdeps --missing | cpanm -nq
-      - name: Run tests
-        run: dzil test
+      - name: dzil test
+        uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main

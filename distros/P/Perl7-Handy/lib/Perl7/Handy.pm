@@ -12,7 +12,7 @@ use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
 use vars qw($VERSION $_fh_seq);
-$VERSION = '0.13';
+$VERSION = '0.14';
 $VERSION = $VERSION;
 $_fh_seq = 0;
 
@@ -381,7 +381,7 @@ Perl7::Handy - Handy Perl7 scripting environment on Perl5
 
 =head1 VERSION
 
-Version 0.12
+Version 0.14
 
 =head1 SYNOPSIS
 

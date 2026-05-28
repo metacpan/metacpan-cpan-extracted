@@ -2,7 +2,7 @@ package DBIx::QuickORM::Dialect::DuckDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 
 use DBD::DuckDB;
 use DBI ();
@@ -358,6 +358,8 @@ sub build_columns_from_db {
     my $sth = $dbh->prepare("SELECT * FROM pragma_table_info(?)");
     $sth->execute($table);
 
+    my %generated = $self->_generated_columns($table);
+
     my %columns;
     while (my $res = $sth->fetchrow_hashref) {
         my $col = {};
@@ -371,6 +373,8 @@ sub build_columns_from_db {
         # A PK column defaulting from a sequence is database-generated.
         $col->{identity} = 1
             if $res->{pk} && defined($res->{dflt_value}) && $res->{dflt_value} =~ /nextval/i;
+
+        $col->{generated} = 1 if $generated{lc $res->{name}};
 
         my $type = $res->{type};
         $type =~ s/\(.*$//;
@@ -387,6 +391,31 @@ sub build_columns_from_db {
     }
 
     return \%columns;
+}
+
+# DuckDB does not surface a generated flag in pragma_table_info,
+# duckdb_columns(), or information_schema.columns. Parse the table's stored
+# DDL instead and look for `<col> ... GENERATED ALWAYS AS (...)` clauses.
+sub _generated_columns {
+    my $self = shift;
+    my ($table) = @_;
+
+    my $dbh = $self->{+DBH};
+    my ($ddl) = $dbh->selectrow_array(
+        "SELECT sql FROM duckdb_tables() WHERE table_name = ?",
+        undef, $table,
+    );
+
+    return unless defined $ddl && length $ddl;
+
+    my %out;
+    while ($ddl =~ /(?:^|[(,])\s*("[^"]+"|`[^`]+`|\w+)\b[^,]*?\bGENERATED\s+ALWAYS\s+AS\s*\(/sgi) {
+        my $name = $1;
+        $name =~ s/\A["`]|["`]\z//g;
+        $out{lc $name} = 1;
+    }
+
+    return %out;
 }
 
 =pod

@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.join_conference` (params). Extracted from switchblade `PublicCallJoinConferenceParams.cs`.",
+  "properties": {
+    "acl": {
+      "type": "string"
+    },
+    "beep": {
+      "type": "string"
+    },
+    "call_id": {
+      "type": "string"
+    },
+    "coach": {
+      "type": "string"
+    },
+    "end_on_exit": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "max_participants": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "muted": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "node_id": {
+      "type": "string"
+    },
+    "record": {
+      "type": "string"
+    },
+    "recording_status_callback": {
+      "type": "string"
+    },
+    "recording_status_callback_event": {
+      "type": "string"
+    },
+    "recording_status_callback_event_type": {
+      "type": "string"
+    },
+    "recording_status_callback_method": {
+      "type": "string"
+    },
+    "region": {
+      "type": "string"
+    },
+    "start_on_enter": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "status_callback": {
+      "type": "string"
+    },
+    "status_callback_event": {
+      "type": "string"
+    },
+    "status_callback_event_type": {
+      "type": "string"
+    },
+    "status_callback_method": {
+      "type": "string"
+    },
+    "stream": {},
+    "swml": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "trim": {
+      "type": "string"
+    },
+    "wait_url": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id",
+    "name"
+  ],
+  "title": "calling.join_conference params",
+  "type": "object",
+  "x-method": "calling.join_conference",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallJoinConferenceParams.cs"
+}

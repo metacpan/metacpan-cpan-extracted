@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Schema for the inner params of a `messaging.receive` signalwire.event.",
+  "properties": {
+    "body": {
+      "type": "string"
+    },
+    "context": {
+      "type": "string"
+    },
+    "direction": {
+      "enum": [
+        "inbound"
+      ],
+      "type": "string"
+    },
+    "from_number": {
+      "type": "string"
+    },
+    "media": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "message_id": {
+      "type": "string"
+    },
+    "message_state": {
+      "enum": [
+        "received"
+      ],
+      "type": "string"
+    },
+    "segments": {
+      "type": "integer"
+    },
+    "tags": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "to_number": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "message_id",
+    "direction",
+    "message_state"
+  ],
+  "title": "messaging.receive event payload",
+  "type": "object",
+  "x-method": "messaging.receive",
+  "x-phase": "event",
+  "x-source": "messaging-python",
+  "x-source-file": "signalwire/relay/client.py"
+}

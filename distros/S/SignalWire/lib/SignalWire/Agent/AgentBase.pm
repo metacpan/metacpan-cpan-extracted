@@ -1,0 +1,1683 @@
+package SignalWire::Agent::AgentBase;
+# Copyright (c) 2025 SignalWire
+# Licensed under the MIT License.
+
+use strict;
+use warnings;
+use Moo;
+use SignalWire::SWML::Service;
+extends 'SignalWire::SWML::Service';
+use JSON qw(encode_json decode_json);
+use MIME::Base64 qw(encode_base64 decode_base64);
+use Digest::SHA qw(hmac_sha256_hex);
+use POSIX qw(strftime);
+use Scalar::Util qw(blessed reftype);
+use Storable qw(dclone);
+use Carp qw(croak carp);
+
+# ---------- attributes ----------
+
+# name, route, host, port, basic_auth_user, basic_auth_password, document,
+# tools, tool_order, routing_callbacks are inherited from Service.
+# Override AgentBase's defaults where they diverge from Service's:
+has '+name' => (default => sub { 'agent' });
+has '+port' => (default => sub { $ENV{PORT} || 3000 });
+has '+basic_auth_user' => (
+    lazy => 1,
+    builder => '_build_basic_auth_user',
+);
+has '+basic_auth_password' => (
+    lazy => 1,
+    builder => '_build_basic_auth_password',
+);
+
+# Call settings
+has auto_answer   => (is => 'rw', default => sub { 1 });
+has record_call   => (is => 'rw', default => sub { 0 });
+has record_format => (is => 'rw', default => sub { 'mp4' });
+has record_stereo => (is => 'rw', default => sub { 1 });
+
+# Prompt system
+has prompt_text         => (is => 'rw', default => sub { '' });
+has post_prompt         => (is => 'rw', default => sub { '' });
+has use_pom             => (is => 'rw', default => sub { 1 });
+has pom_sections        => (is => 'rw', default => sub { [] });
+
+# Tool registry — `tools` and `tool_order` are now declared on Service
+# (lifted so non-agent SWML services can host SWAIG functions). Inherited.
+
+# AI config
+has hints              => (is => 'rw', default => sub { [] });
+has pattern_hints      => (is => 'rw', default => sub { [] });
+has languages          => (is => 'rw', default => sub { [] });
+has pronunciations     => (is => 'rw', default => sub { [] });
+has params             => (is => 'rw', default => sub { {} });
+has global_data        => (is => 'rw', default => sub { {} });
+has native_functions   => (is => 'rw', default => sub { [] });
+
+# Internal settings
+has internal_fillers     => (is => 'rw', default => sub { undef });
+has debug_events_level   => (is => 'rw', default => sub { 0 });
+
+# Includes and LLM params
+has function_includes       => (is => 'rw', default => sub { [] });
+has prompt_llm_params       => (is => 'rw', default => sub { {} });
+has post_prompt_llm_params  => (is => 'rw', default => sub { {} });
+
+# Verb insertion points
+has pre_answer_verbs   => (is => 'rw', default => sub { [] });
+has post_answer_verbs  => (is => 'rw', default => sub { [] });
+has post_ai_verbs      => (is => 'rw', default => sub { [] });
+has answer_config      => (is => 'rw', default => sub { {} });
+
+# Context system (lazy)
+has context_builder => (
+    is      => 'rw',
+    lazy    => 1,
+    builder => '_build_context_builder',
+);
+
+# Callbacks
+has dynamic_config_callback => (is => 'rw', default => sub { undef });
+has summary_callback        => (is => 'rw', default => sub { undef });
+has debug_event_handler     => (is => 'rw', default => sub { undef });
+
+# URLs
+has webhook_url       => (is => 'rw', default => sub { undef });
+has post_prompt_url   => (is => 'rw', default => sub { undef });
+has proxy_url_base    => (is => 'rw', lazy => 1, builder => '_build_proxy_url_base');
+has swaig_query_params => (is => 'rw', default => sub { {} });
+
+# Session manager (built in BUILD)
+has session_manager => (is => 'rw');
+
+# Webhook signature validation. When set (or SIGNALWIRE_SIGNING_KEY env
+# is non-empty), the PSGI app auto-mounts SignalWire::Security::WebhookMiddleware
+# on POST /, POST /swaig, POST /post_prompt and rejects unsigned/invalid
+# requests with 403. When unset, AgentBase logs a prominent startup
+# warning the first time psgi_app is built.
+has signing_key => (
+    is      => 'rw',
+    lazy    => 1,
+    builder => '_build_signing_key',
+);
+
+sub _build_signing_key {
+    my ($self) = @_;
+    return $ENV{SIGNALWIRE_SIGNING_KEY};
+}
+
+# Skill manager
+has skill_manager => (is => 'rw', lazy => 1, builder => '_build_skill_manager');
+
+# MCP integration
+has mcp_servers        => (is => 'rw', default => sub { [] });
+has mcp_server_enabled => (is => 'rw', default => sub { 0 });
+
+# ---------- builders ----------
+
+sub _build_basic_auth_user {
+    my ($self) = @_;
+    return $ENV{SWML_BASIC_AUTH_USER} || $self->name;
+}
+
+sub _build_basic_auth_password {
+    my ($self) = @_;
+    return $ENV{SWML_BASIC_AUTH_PASSWORD} if $ENV{SWML_BASIC_AUTH_PASSWORD};
+
+    my $password = _generate_random_password();
+    # Warn loudly so external callers (tests, RPC clients, MCP) know why
+    # they are getting HTTP 401. This is the silent cause of every
+    # external caller failing when .env wasn't loaded — the password
+    # lives only in this process and changes on every restart.
+    carp "basic_auth_password_autogenerated: username=\""
+        . ($self->basic_auth_user || $self->name) . "\". "
+        . "No SWML_BASIC_AUTH_PASSWORD found in environment and no "
+        . "basic_auth_password passed to the agent constructor. The SDK "
+        . "generated a random password that exists only in this process; "
+        . "external callers will get HTTP 401 unless they read the value "
+        . "from this process's env. To fix, set SWML_BASIC_AUTH_USER and "
+        . "SWML_BASIC_AUTH_PASSWORD in your environment, or pass "
+        . "basic_auth_user => ... , basic_auth_password => ... to "
+        . "AgentBase->new(...).";
+    return $password;
+}
+
+sub _build_proxy_url_base {
+    return $ENV{SWML_PROXY_URL_BASE} || undef;
+}
+
+sub _build_context_builder {
+    require SignalWire::Contexts::ContextBuilder;
+    return SignalWire::Contexts::ContextBuilder->new;
+}
+
+sub _build_skill_manager {
+    my ($self) = @_;
+    require SignalWire::Skills::SkillManager;
+    return SignalWire::Skills::SkillManager->new(agent => $self);
+}
+
+sub BUILD {
+    my ($self) = @_;
+
+    # Strip trailing slash from route
+    my $r = $self->route;
+    $r =~ s{/+$}{} if $r ne '/';
+    $self->route($r);
+
+    # Initialize session manager
+    require SignalWire::Security::SessionManager;
+    $self->session_manager(
+        SignalWire::Security::SessionManager->new(token_expiry_secs => 3600)
+    );
+}
+
+# ---------- Prompt methods ----------
+
+sub set_prompt_text {
+    my ($self, $text) = @_;
+    $self->prompt_text($text);
+    return $self;
+}
+
+sub set_post_prompt {
+    my ($self, $text) = @_;
+    $self->post_prompt($text);
+    return $self;
+}
+
+sub prompt_add_section {
+    my ($self, $title, $body, %opts) = @_;
+    my $section = {
+        title => $title,
+        body  => $body // '',
+    };
+    $section->{bullets} = $opts{bullets} if $opts{bullets};
+    push @{ $self->pom_sections }, $section;
+    return $self;
+}
+
+sub prompt_add_subsection {
+    my ($self, $parent_title, $title, $body, %opts) = @_;
+    for my $sec (@{ $self->pom_sections }) {
+        if ($sec->{title} eq $parent_title) {
+            $sec->{subsections} //= [];
+            my $sub = { title => $title, body => $body // '' };
+            $sub->{bullets} = $opts{bullets} if $opts{bullets};
+            push @{ $sec->{subsections} }, $sub;
+            last;
+        }
+    }
+    return $self;
+}
+
+sub prompt_add_to_section {
+    my ($self, $title, %opts) = @_;
+    for my $sec (@{ $self->pom_sections }) {
+        if ($sec->{title} eq $title) {
+            if ($opts{body}) {
+                $sec->{body} .= "\n" . $opts{body};
+            }
+            if ($opts{bullets}) {
+                $sec->{bullets} //= [];
+                push @{ $sec->{bullets} }, @{ $opts{bullets} };
+            }
+            last;
+        }
+    }
+    return $self;
+}
+
+sub prompt_has_section {
+    my ($self, $title) = @_;
+    for my $sec (@{ $self->pom_sections }) {
+        return 1 if $sec->{title} eq $title;
+    }
+    return 0;
+}
+
+sub get_prompt {
+    my ($self) = @_;
+    if ($self->use_pom && @{ $self->pom_sections }) {
+        return $self->pom_sections;
+    }
+    return $self->prompt_text;
+}
+
+# Read-only snapshot of the agent's POM as a typed
+# SignalWire::POM::PromptObjectModel object.
+#
+# Python parity: ``agent.pom`` instance attribute (agent_base.py
+# line 209) — Python returns a PromptObjectModel instance built from
+# ``pom_sections`` (or None when ``use_pom`` is false). This Perl port
+# mirrors that contract: undef when use_pom is off, otherwise a fresh
+# PromptObjectModel constructed from a deep-cloned copy of the
+# internal section list so caller mutations cannot leak back.
+sub pom {
+    my ($self) = @_;
+    return undef unless $self->use_pom;
+    require Storable;
+    require SignalWire::POM::PromptObjectModel;
+    my $cloned = Storable::dclone($self->pom_sections);
+    # Empty pom_sections still returns a PromptObjectModel (Python
+    # parity: ``self.pom = PromptObjectModel()`` even when no sections
+    # have been added).
+    return SignalWire::POM::PromptObjectModel->new if !@$cloned;
+    return SignalWire::POM::PromptObjectModel->_from_data($cloned);
+}
+
+# Returns the post-prompt text whatever set_post_prompt stored, or
+# the empty string when none has been set.
+#
+# Mirrors Python's PromptManager.get_post_prompt /
+# PromptMixin.get_post_prompt — used by SWML rendering when a
+# post-prompt is configured.
+sub get_post_prompt {
+    my ($self) = @_;
+    return $self->post_prompt;
+}
+
+# Returns the raw prompt text whatever set_prompt_text stored, or the
+# empty string when no raw prompt has been set. Distinct from
+# get_prompt which may return the POM array when use_pom is true.
+#
+# Mirrors Python's PromptManager.get_raw_prompt.
+sub get_raw_prompt {
+    my ($self) = @_;
+    return $self->prompt_text;
+}
+
+# Sets the prompt as a list of POM section hashes. Each section hash
+# supports keys "title", "body", "bullets", "numbered",
+# "numbered_bullets", and "subsections". Switches the agent to POM
+# mode.
+#
+# Mirrors Python's PromptManager.set_prompt_pom — accepts a list of
+# section dicts and stores them in pom_sections.
+sub set_prompt_pom {
+    my ($self, $pom) = @_;
+    $self->use_pom(1);
+    $pom //= [];
+    $self->pom_sections([ @$pom ]);
+    return $self;
+}
+
+# Returns the contexts dictionary as a hashref of serialised SWML, or
+# undef when no contexts have been defined yet.
+#
+# Mirrors Python's PromptManager.get_contexts which returns the
+# contexts dict or None.
+sub get_contexts {
+    my ($self) = @_;
+    my $cb = $self->context_builder;
+    return undef unless defined $cb;
+    return $cb->to_hash;
+}
+
+# ---------- Tool methods ----------
+
+#
+# define_tool — register a SWAIG tool (function) that the AI can invoke
+# during a call.
+#
+# HOW THIS BECOMES A TOOL THE MODEL SEES
+#
+# A SWAIG function is EXACTLY THE SAME CONCEPT as a "tool" in native
+# OpenAI / Anthropic tool calling. On every LLM turn, the SDK renders
+# each registered SWAIG function into the OpenAI tool schema:
+#
+#   {
+#     "type": "function",
+#     "function": {
+#       "name":        "your_name_here",
+#       "description": "your description text",
+#       "parameters":  { ... your JSON schema ... }
+#     }
+#   }
+#
+# That schema is sent to the model as part of the same API call that
+# produces the next assistant message. The model reads:
+#
+#   - the function `description` to decide WHEN to call this tool
+#   - each parameter `description` (inside parameters) to decide HOW
+#     to fill in that argument from the user's utterance
+#
+# This means DESCRIPTIONS ARE PROMPT ENGINEERING, not developer
+# comments. A vague description is the #1 cause of "the model has the
+# right tool but doesn't call it" failures.
+#
+# BAD vs GOOD descriptions:
+#
+#   BAD : description => 'Lookup function'
+#   GOOD: description => 'Look up a customer\'s account details by '
+#                      . 'account number. Use this BEFORE quoting any '
+#                      . 'account-specific info (balance, plan, '
+#                      . 'status). Do not use for general product '
+#                      . 'questions.'
+#
+#   BAD : parameters => { id => { type=>'string', description=>'the id' } }
+#   GOOD: parameters => { account_number => { type=>'string',
+#             description => 'The customer\'s 8-digit account number, '
+#                          . 'no dashes or spaces. Ask the user if they '
+#                          . 'don\'t provide it.' } }
+#
+# TOOL COUNT MATTERS: LLM tool selection accuracy degrades past ~7-8
+# simultaneously-active tools per call. Use Step->set_functions() to
+# partition tools across steps so only the relevant subset is active at
+# any moment. See SignalWire::Contexts.
+#
+# define_tool, register_swaig_function, define_tools, on_function_call are
+# provided by SignalWire::SWML::Service (parent). Inherited via `extends`.
+
+# Mint a per-call SWAIG-function token via the agent's SessionManager.
+#
+# Python parity: state_mixin.StateMixin._create_tool_token —
+# delegates to SessionManager->create_tool_token and returns "" on any
+# raised error (Python catches all exceptions and returns "").
+sub create_tool_token {
+    my ($self, $tool_name, $call_id) = @_;
+    my $token = '';
+    eval {
+        $token = $self->session_manager->create_tool_token($tool_name, $call_id);
+        1;
+    } or do {
+        return '';
+    };
+    return $token;
+}
+
+# Validate a per-call SWAIG-function token. Returns false (0) when the
+# function is not registered, when the SessionManager rejects the token,
+# or on any underlying exception.
+#
+# Python parity: state_mixin.StateMixin.validate_tool_token —
+# rejects unknown function names up-front and swallows errors.
+sub validate_tool_token {
+    my ($self, $function_name, $token, $call_id) = @_;
+    return 0 unless $self->has_function($function_name);
+    my $result = 0;
+    eval {
+        # Note: Perl SessionManager's validate_token signature is
+        # (call_id, function_name, token), not the Python order. The
+        # AgentBase facade keeps the Python order so callers can write
+        # the same code across languages.
+        $result = $self->session_manager->validate_token($call_id, $function_name, $token);
+        1;
+    } or do {
+        return 0;
+    };
+    return $result ? 1 : 0;
+}
+
+# ---------- AI Config methods ----------
+
+sub add_hint {
+    my ($self, $hint) = @_;
+    push @{ $self->hints }, $hint;
+    return $self;
+}
+
+sub add_hints {
+    my ($self, $hints) = @_;
+    # Python parity: add_hints(hints: List[str]). Accept an arrayref
+    # as the canonical form. Backward-compat: also accept slurpy
+    # (``add_hints('a', 'b', 'c')``) when the first arg is a string.
+    if (ref $hints eq 'ARRAY') {
+        for my $h (@$hints) {
+            push @{ $self->hints }, $h if defined $h && !ref($h) && length $h;
+        }
+    } else {
+        # Slurpy form — re-grab @_ skipping $self.
+        my @rest = @_;
+        shift @rest;
+        for my $h (@rest) {
+            push @{ $self->hints }, $h if defined $h && !ref($h) && length $h;
+        }
+    }
+    return $self;
+}
+
+sub add_pattern_hint {
+    my ($self, $pattern) = @_;
+    push @{ $self->pattern_hints }, $pattern;
+    return $self;
+}
+
+sub add_language {
+    my ($self, %lang) = @_;
+    # Per-language params (engine-specific tuning, voice settings, etc.).
+    # Python parity (commit 029ca6f): only emit the ``params`` key when
+    # the supplied hashref is non-empty so SWML stays byte-identical for
+    # existing callers who don't pass params. Treat an explicit empty
+    # hashref the same as "not passed".
+    if (exists $lang{params}) {
+        my $p = $lang{params};
+        if (!defined $p || ref($p) ne 'HASH' || !%$p) {
+            delete $lang{params};
+        }
+    }
+    push @{ $self->languages }, \%lang;
+    return $self;
+}
+
+sub set_languages {
+    my ($self, $langs) = @_;
+    $self->languages($langs);
+    return $self;
+}
+
+# Set (or replace) the per-language ``params`` hashref on an
+# already-added language. Python parity (commit 029ca6f): empty hashref
+# removes the key; unknown ``code`` is a no-op; always returns $self
+# for chaining.
+sub set_language_params {
+    my ($self, $code, $params) = @_;
+    for my $language (@{ $self->languages }) {
+        next unless defined $language->{code} && $language->{code} eq $code;
+        if (defined $params && ref($params) eq 'HASH' && %$params) {
+            $language->{params} = $params;
+        } else {
+            delete $language->{params};
+        }
+        last;
+    }
+    return $self;
+}
+
+# Read the per-language ``params`` hashref for a previously-added
+# language. Returns undef when the code is unknown or when params were
+# never set — no exception path (matches Python's ``return None``).
+sub get_language_params {
+    my ($self, $code) = @_;
+    for my $language (@{ $self->languages }) {
+        next unless defined $language->{code} && $language->{code} eq $code;
+        return $language->{params};
+    }
+    return undef;
+}
+
+sub add_pronunciation {
+    my ($self, %pron) = @_;
+    push @{ $self->pronunciations }, \%pron;
+    return $self;
+}
+
+sub set_pronunciations {
+    my ($self, $prons) = @_;
+    $self->pronunciations($prons);
+    return $self;
+}
+
+sub set_param {
+    my ($self, $key, $value) = @_;
+    $self->params->{$key} = $value;
+    return $self;
+}
+
+sub set_params {
+    my ($self, $p) = @_;
+    $self->params({ %{ $self->params }, %$p });
+    return $self;
+}
+
+sub set_global_data {
+    my ($self, $data) = @_;
+    $self->global_data($data);
+    return $self;
+}
+
+sub update_global_data {
+    my ($self, $data) = @_;
+    $self->global_data({ %{ $self->global_data }, %$data });
+    return $self;
+}
+
+sub set_native_functions {
+    my ($self, $funcs) = @_;
+    $self->native_functions($funcs);
+    return $self;
+}
+
+#
+# The complete set of internal SWAIG function names that accept fillers,
+# matching the SWAIGInternalFiller schema definition. Any name outside
+# this set is silently ignored by the runtime — set_internal_fillers and
+# add_internal_filler warn if you pass an unknown name.
+#
+# Notable absences: change_step, gather_submit, and arbitrary user-defined
+# SWAIG function names are NOT supported.
+#
+our %SUPPORTED_INTERNAL_FILLER_NAMES = (
+    hangup                   => 1,  # AI is hanging up the call
+    check_time               => 1,  # AI is checking the time
+    wait_for_user            => 1,  # AI is waiting for user input
+    wait_seconds             => 1,  # deliberate pause / wait period
+    adjust_response_latency  => 1,  # AI is adjusting response timing
+    next_step                => 1,  # transitioning between steps in prompt.contexts
+    change_context           => 1,  # switching between contexts in prompt.contexts
+    get_visual_input         => 1,  # processing visual input (enable_vision)
+    get_ideal_strategy       => 1,  # thinking (enable_thinking)
+);
+
+#
+# set_internal_fillers — set internal fillers for native SWAIG functions.
+#
+# Internal fillers are short phrases the AI agent speaks (via TTS) while
+# an internal/native function is running, so the caller doesn't hear
+# dead air during transitions or background work.
+#
+# Supported function names (match the SWAIGInternalFiller schema):
+#   hangup, check_time, wait_for_user, wait_seconds,
+#   adjust_response_latency, next_step, change_context,
+#   get_visual_input, get_ideal_strategy
+#
+# Notably NOT supported: change_step, gather_submit, or arbitrary
+# user-defined SWAIG function names. The runtime only honors fillers for
+# the names listed above; everything else is silently ignored at the
+# SWML level. This method warns at registration time if you pass an
+# unknown name so you catch the typo early.
+#
+# Expected format:
+#   { function_name => { language_code => [ phrase1, phrase2, ... ] } }
+#
+sub set_internal_fillers {
+    my ($self, $fillers) = @_;
+    if (ref $fillers eq 'HASH') {
+        my @unknown = sort grep { !exists $SUPPORTED_INTERNAL_FILLER_NAMES{$_} }
+                           keys %$fillers;
+        if (@unknown) {
+            my @supported = sort keys %SUPPORTED_INTERNAL_FILLER_NAMES;
+            carp "unknown_internal_filler_names: ["
+                . join(', ', map { "'$_'" } @unknown)
+                . "]. set_internal_fillers received names that the SWML "
+                . "schema does not recognize. Those entries will be "
+                . "ignored by the runtime. Supported names: ["
+                . join(', ', map { "'$_'" } @supported) . "].";
+        }
+    }
+    $self->internal_fillers($fillers);
+    return $self;
+}
+
+#
+# add_internal_filler — add a single internal filler entry.
+#
+# See set_internal_fillers for the complete list of supported internal
+# function names and what fillers do. Calling with a function name
+# outside the supported set logs a warning but the entry is still stored.
+#
+# Three calling conventions are supported:
+#
+#   $agent->add_internal_filler('plain text')       # legacy: raw scalar
+#   $agent->add_internal_filler({ ... })             # legacy: raw hashref
+#   $agent->add_internal_filler($function_name, $lang_code, \@phrases)
+#
+sub add_internal_filler {
+    my ($self, @args) = @_;
+
+    # Legacy forms: single scalar or single hashref — preserve existing
+    # behavior (push onto the flat arrayref).
+    if (@args == 1) {
+        my $filler = $args[0];
+        if (!defined $self->internal_fillers) {
+            $self->internal_fillers([]);
+        }
+        my $store = $self->internal_fillers;
+        push @$store, $filler if ref $store eq 'ARRAY';
+        return $self;
+    }
+
+    # New form: (function_name, language_code, fillers_arrayref)
+    my ($function_name, $language_code, $fillers) = @args;
+    if (!exists $SUPPORTED_INTERNAL_FILLER_NAMES{$function_name}) {
+        my @supported = sort keys %SUPPORTED_INTERNAL_FILLER_NAMES;
+        carp "unknown_internal_filler_name: '$function_name'. "
+            . "add_internal_filler received a function name the SWML "
+            . "schema does not recognize. The entry will be stored but "
+            . "the runtime will not play these fillers. Supported "
+            . "names: [" . join(', ', map { "'$_'" } @supported) . "].";
+    }
+    # Initialise as a hashref if empty or legacy list.
+    my $store = $self->internal_fillers;
+    if (!defined $store || ref $store ne 'HASH') {
+        $store = {};
+        $self->internal_fillers($store);
+    }
+    $store->{$function_name} //= {};
+    $store->{$function_name}{$language_code} = $fillers;
+    return $self;
+}
+
+sub enable_debug_events {
+    my ($self, $level) = @_;
+    $level //= 1;
+    $self->debug_events_level($level);
+    return $self;
+}
+
+sub add_function_include {
+    my ($self, $include) = @_;
+    push @{ $self->function_includes }, $include;
+    return $self;
+}
+
+sub set_function_includes {
+    my ($self, $includes) = @_;
+    $self->function_includes($includes);
+    return $self;
+}
+
+sub set_prompt_llm_params {
+    my ($self, %p) = @_;
+    $self->prompt_llm_params({ %{ $self->prompt_llm_params }, %p });
+    return $self;
+}
+
+sub set_post_prompt_llm_params {
+    my ($self, %p) = @_;
+    $self->post_prompt_llm_params({ %{ $self->post_prompt_llm_params }, %p });
+    return $self;
+}
+
+# ---------- Verb management ----------
+
+sub add_pre_answer_verb {
+    my ($self, $verb_name, $verb_config) = @_;
+    push @{ $self->pre_answer_verbs }, { $verb_name => $verb_config };
+    return $self;
+}
+
+sub add_post_answer_verb {
+    my ($self, $verb_name, $verb_config) = @_;
+    push @{ $self->post_answer_verbs }, { $verb_name => $verb_config };
+    return $self;
+}
+
+sub add_post_ai_verb {
+    my ($self, $verb_name, $verb_config) = @_;
+    push @{ $self->post_ai_verbs }, { $verb_name => $verb_config };
+    return $self;
+}
+
+sub clear_pre_answer_verbs {
+    my ($self) = @_;
+    $self->pre_answer_verbs([]);
+    return $self;
+}
+
+sub clear_post_answer_verbs {
+    my ($self) = @_;
+    $self->post_answer_verbs([]);
+    return $self;
+}
+
+sub clear_post_ai_verbs {
+    my ($self) = @_;
+    $self->post_ai_verbs([]);
+    return $self;
+}
+
+sub set_answer_config {
+    my ($self, $config) = @_;
+    $self->answer_config($config);
+    return $self;
+}
+
+# ---------- Contexts ----------
+
+#
+# define_contexts — return this agent's ContextBuilder, attaching the
+# agent so that ContextBuilder->validate can check user-defined tool
+# names against reserved native tool names (next_step, change_context,
+# gather_submit). See SignalWire::Contexts::ContextBuilder.
+#
+sub define_contexts {
+    my ($self, $contexts) = @_;
+    # Python parity: PromptMixin.define_contexts(contexts=None).
+    #   - When called with no arg (legacy / Perl idiom), returns the
+    #     ContextBuilder for fluent chaining (``$agent->define_contexts->add_context(...)``).
+    #   - When called with a hashref or ContextBuilder, applies that
+    #     configuration via context_builder and returns $self for chaining.
+    if (defined $contexts) {
+        if (ref $contexts eq 'HASH') {
+            # Apply each top-level context name -> config pair.
+            my $cb = $self->context_builder;
+            $cb->attach_agent($self) if $cb->can('attach_agent');
+            for my $name (keys %$contexts) {
+                my $cfg = $contexts->{$name};
+                my $ctx = $cb->add_context($name);
+                # Best-effort: if config is a hashref, apply known keys.
+                if (ref $cfg eq 'HASH') {
+                    if (defined $cfg->{steps} && ref $cfg->{steps} eq 'HASH') {
+                        for my $sname (keys %{ $cfg->{steps} }) {
+                            $ctx->add_step($sname, %{ $cfg->{steps}{$sname} });
+                        }
+                    }
+                }
+            }
+            return $self;
+        }
+        # ContextBuilder-like object: assume $contexts->to_hash is the
+        # canonical projection; replace this agent's builder with it.
+        if (ref $contexts && $contexts->can('to_hash')) {
+            $self->{_external_context_builder} = $contexts;
+            $contexts->attach_agent($self) if $contexts->can('attach_agent');
+            return $self;
+        }
+        die "define_contexts: contexts must be a hashref or a ContextBuilder";
+    }
+    # No-arg form: return the (memoized) ContextBuilder.
+    my $cb = $self->context_builder;
+    $cb->attach_agent($self) if $cb->can('attach_agent');
+    return $cb;
+}
+
+#
+# reset_contexts — remove all contexts, returning the agent to a
+# no-contexts state. Convenience wrapper around
+# define_contexts()->reset(). Use in a dynamic config callback when
+# you need to rebuild contexts from scratch for a specific request.
+#
+sub reset_contexts {
+    my ($self) = @_;
+    if ($self->context_builder->can('reset')) {
+        $self->context_builder->reset;
+    }
+    return $self;
+}
+
+#
+# list_tool_names — return the names of every registered SWAIG tool in
+# insertion order. Used by SignalWire::Contexts::ContextBuilder->validate
+# to detect collisions with reserved native tool names.
+#
+sub list_tool_names {
+    my ($self) = @_;
+    return @{ $self->tool_order };
+}
+
+sub contexts {
+    my ($self) = @_;
+    return $self->context_builder;
+}
+
+# ---------- Skills ----------
+
+sub add_skill {
+    my ($self, $skill_name, $params) = @_;
+    $params //= {};
+    return $self->skill_manager->load_skill($skill_name, undef, $params);
+}
+
+sub remove_skill {
+    my ($self, $skill_name) = @_;
+    return $self->skill_manager->unload_skill($skill_name);
+}
+
+sub list_skills {
+    my ($self) = @_;
+    return $self->skill_manager->list_skills;
+}
+
+sub has_skill {
+    my ($self, $skill_name) = @_;
+    return $self->skill_manager->has_skill($skill_name);
+}
+
+# ---------- Web / callback setters ----------
+
+sub set_dynamic_config_callback {
+    my ($self, $cb) = @_;
+    $self->dynamic_config_callback($cb);
+    return $self;
+}
+
+sub set_web_hook_url {
+    my ($self, $url) = @_;
+    $self->webhook_url($url);
+    return $self;
+}
+
+sub set_post_prompt_url {
+    my ($self, $url) = @_;
+    $self->post_prompt_url($url);
+    return $self;
+}
+
+sub manual_set_proxy_url {
+    my ($self, $url) = @_;
+    $self->proxy_url_base($url);
+    return $self;
+}
+
+sub add_swaig_query_params {
+    my ($self, %params) = @_;
+    $self->swaig_query_params({ %{ $self->swaig_query_params }, %params });
+    return $self;
+}
+
+sub clear_swaig_query_params {
+    my ($self) = @_;
+    $self->swaig_query_params({});
+    return $self;
+}
+
+sub on_summary {
+    my ($self, $summary, $raw_data) = @_;
+    # Python parity: AgentBase.on_summary(summary, raw_data=None).
+    #
+    # Two invocation forms:
+    #   1. Registration form (Perl idiom):
+    #        $agent->on_summary(sub { my ($summary, $raw) = @_; ... });
+    #      A coderef as the first arg installs that handler as the
+    #      summary callback and returns $self for chaining.
+    #   2. Dispatch form (Python parity):
+    #        $agent->on_summary($summary, $raw_data);
+    #      Anything else is treated as the summary payload itself
+    #      and dispatches to the registered callback. Default
+    #      implementation is a no-op (matches Python's pass).
+    if (ref $summary eq 'CODE') {
+        $self->summary_callback($summary);
+        return $self;
+    }
+    my $cb = $self->summary_callback;
+    if ($cb) {
+        return $cb->($summary, $raw_data);
+    }
+    return undef;
+}
+
+sub on_debug_event {
+    my ($self, $cb) = @_;
+    $self->debug_event_handler($cb);
+    return $self;
+}
+
+# ---------- MCP integration ----------
+
+sub add_mcp_server {
+    my ($self, $url, %opts) = @_;
+    my $server = { url => $url };
+    $server->{headers}       = $opts{headers}       if $opts{headers};
+    $server->{resources}     = JSON::true            if $opts{resources};
+    $server->{resource_vars} = $opts{resource_vars}  if $opts{resource_vars};
+    push @{ $self->mcp_servers }, $server;
+    return $self;
+}
+
+sub enable_mcp_server {
+    my ($self) = @_;
+    $self->mcp_server_enabled(1);
+    return $self;
+}
+
+sub _build_mcp_tool_list {
+    my ($self) = @_;
+    my @tools;
+    for my $fname (@{ $self->tool_order }) {
+        my $tool = $self->tools->{$fname};
+        next unless $tool;
+        my $t = {
+            name        => $fname,
+            description => $tool->{description} || $fname,
+        };
+        if ($tool->{parameters} && %{ $tool->{parameters} }) {
+            my $params = $tool->{parameters};
+            if ($params->{type} && $params->{type} eq 'object') {
+                $t->{inputSchema} = $params;
+            } else {
+                $t->{inputSchema} = { type => 'object', properties => $params };
+            }
+        } else {
+            $t->{inputSchema} = { type => 'object', properties => {} };
+        }
+        push @tools, $t;
+    }
+    return \@tools;
+}
+
+sub _handle_mcp_request {
+    my ($self, $body) = @_;
+    my $jsonrpc = $body->{jsonrpc} // '';
+    my $method  = $body->{method}  // '';
+    my $req_id  = $body->{id};
+    my $params  = $body->{params}  // {};
+
+    if ($jsonrpc ne '2.0') {
+        return _mcp_error($req_id, -32600, 'Invalid JSON-RPC version');
+    }
+
+    # Initialize
+    if ($method eq 'initialize') {
+        return {
+            jsonrpc => '2.0', id => $req_id,
+            result => {
+                protocolVersion => '2025-06-18',
+                capabilities   => { tools => {} },
+                serverInfo     => { name => $self->name, version => '1.0.0' },
+            },
+        };
+    }
+
+    # Initialized notification
+    if ($method eq 'notifications/initialized') {
+        return { jsonrpc => '2.0', id => $req_id, result => {} };
+    }
+
+    # List tools
+    if ($method eq 'tools/list') {
+        return {
+            jsonrpc => '2.0', id => $req_id,
+            result => { tools => $self->_build_mcp_tool_list },
+        };
+    }
+
+    # Call tool
+    if ($method eq 'tools/call') {
+        my $tool_name = $params->{name} // '';
+        my $arguments = $params->{arguments} // {};
+
+        my $tool = $self->tools->{$tool_name};
+        unless ($tool && $tool->{_handler}) {
+            return _mcp_error($req_id, -32602, "Unknown tool: $tool_name");
+        }
+
+        my $result = eval {
+            my $raw_data = {
+                function => $tool_name,
+                argument => { parsed => [$arguments] },
+            };
+            $tool->{_handler}->($arguments, $raw_data);
+        };
+
+        if ($@) {
+            return {
+                jsonrpc => '2.0', id => $req_id,
+                result => {
+                    content => [{ type => 'text', text => "Error: $@" }],
+                    isError => JSON::true,
+                },
+            };
+        }
+
+        my $response_text = '';
+        if (blessed($result) && $result->can('to_hash')) {
+            my $h = $result->to_hash;
+            $response_text = $h->{response} // '';
+        } elsif (ref $result eq 'HASH') {
+            $response_text = $result->{response} // '';
+        } elsif (defined $result) {
+            $response_text = "$result";
+        }
+
+        return {
+            jsonrpc => '2.0', id => $req_id,
+            result => {
+                content => [{ type => 'text', text => $response_text }],
+                isError => JSON::false,
+            },
+        };
+    }
+
+    # Ping
+    if ($method eq 'ping') {
+        return { jsonrpc => '2.0', id => $req_id, result => {} };
+    }
+
+    return _mcp_error($req_id, -32601, "Method not found: $method");
+}
+
+sub _mcp_error {
+    my ($req_id, $code, $message) = @_;
+    return {
+        jsonrpc => '2.0',
+        id      => $req_id,
+        error   => { code => $code, message => $message },
+    };
+}
+
+# ---------- URL construction ----------
+
+sub _build_webhook_url {
+    my ($self, $request_env) = @_;
+    # If explicit override set, use it
+    return $self->webhook_url if defined $self->webhook_url;
+
+    my $base = $self->_detect_proxy_url($request_env);
+    my $route = $self->route eq '/' ? '' : $self->route;
+    my $url = $base . $route . '/swaig';
+
+    # Append query params
+    if (%{ $self->swaig_query_params }) {
+        my @parts;
+        for my $k (sort keys %{ $self->swaig_query_params }) {
+            push @parts, "$k=" . ($self->swaig_query_params->{$k} // '');
+        }
+        $url .= '?' . join('&', @parts);
+    }
+
+    return $url;
+}
+
+sub _build_post_prompt_url {
+    my ($self, $request_env) = @_;
+    return $self->post_prompt_url if defined $self->post_prompt_url;
+    my $base = $self->_detect_proxy_url($request_env);
+    my $route = $self->route eq '/' ? '' : $self->route;
+    return $base . $route . '/post_prompt';
+}
+
+sub _detect_proxy_url {
+    my ($self, $env) = @_;
+
+    return $self->proxy_url_base if defined $self->proxy_url_base;
+
+    $env //= {};
+
+    # Check X-Forwarded headers
+    my $proto = $env->{HTTP_X_FORWARDED_PROTO};
+    my $fhost = $env->{HTTP_X_FORWARDED_HOST};
+    if ($proto && $fhost) {
+        return "${proto}://${fhost}";
+    }
+
+    # Check X-Original-URL
+    my $orig = $env->{HTTP_X_ORIGINAL_URL};
+    return $orig if $orig;
+
+    # Fallback to server config
+    my $scheme = ($env->{HTTPS} || $env->{'psgi.url_scheme'} || 'http');
+    $scheme = 'https' if $scheme eq 'on';
+    my $host = $env->{HTTP_HOST} || $self->host . ':' . $self->port;
+    return "${scheme}://${host}";
+}
+
+sub get_full_url {
+    my ($self, %opts) = @_;
+    my $base = $self->proxy_url_base // ('http://' . $self->host . ':' . $self->port);
+    my $route = $self->route eq '/' ? '' : $self->route;
+    my $url = $base . $route;
+    if ($opts{include_auth}) {
+        my $user = $self->basic_auth_user;
+        my $pass = $self->basic_auth_password;
+        $url =~ s{^(https?://)}{$1${user}:${pass}\@};
+    }
+    return $url;
+}
+
+# ---------- render_swml (5-phase pipeline) ----------
+
+sub render_swml {
+    my ($self, $request_env) = @_;
+    $request_env //= {};
+
+    my $webhook_url     = $self->_build_webhook_url($request_env);
+    my $post_prompt_url = $self->_build_post_prompt_url($request_env);
+
+    # Embed auth credentials in webhook URL
+    my $auth_user = $self->basic_auth_user;
+    my $auth_pass = $self->basic_auth_password;
+    $webhook_url =~ s{^(https?://)}{$1${auth_user}:${auth_pass}\@}
+        unless $webhook_url =~ /\@/;
+    $post_prompt_url =~ s{^(https?://)}{$1${auth_user}:${auth_pass}\@}
+        unless $post_prompt_url =~ /\@/;
+
+    my @main_section;
+
+    # Phase 1: Pre-answer verbs
+    push @main_section, @{ $self->pre_answer_verbs };
+
+    # Phase 2: Answer verb
+    if ($self->auto_answer) {
+        my %answer_params = (max_duration => 14400);
+        %answer_params = (%answer_params, %{ $self->answer_config }) if %{ $self->answer_config };
+        push @main_section, { answer => \%answer_params };
+    }
+
+    # Record call if enabled
+    if ($self->record_call) {
+        push @main_section, { record_call => {
+            format => $self->record_format,
+            stereo => $self->record_stereo ? JSON::true : JSON::false,
+        }};
+    }
+
+    # Phase 3: Post-answer verbs
+    push @main_section, @{ $self->post_answer_verbs };
+
+    # Phase 4: AI verb
+    my $ai = $self->_build_ai_verb($webhook_url, $post_prompt_url);
+    push @main_section, { ai => $ai };
+
+    # Phase 5: Post-AI verbs
+    push @main_section, @{ $self->post_ai_verbs };
+
+    my $doc = {
+        version  => '1.0.0',
+        sections => { main => \@main_section },
+    };
+
+    return $doc;
+}
+
+sub _build_ai_verb {
+    my ($self, $webhook_url, $post_prompt_url) = @_;
+
+    my %ai;
+
+    # Prompt
+    my $prompt = $self->get_prompt;
+    if (ref $prompt eq 'ARRAY') {
+        # POM mode
+        $ai{prompt} = { pom => $prompt };
+    } else {
+        $ai{prompt} = { text => $prompt } if $prompt;
+    }
+
+    # Merge prompt LLM params
+    if (%{ $self->prompt_llm_params }) {
+        $ai{prompt} //= {};
+        for my $k (keys %{ $self->prompt_llm_params }) {
+            $ai{prompt}{$k} = $self->prompt_llm_params->{$k};
+        }
+    }
+
+    # Post prompt
+    if ($self->post_prompt && $self->post_prompt ne '') {
+        $ai{post_prompt} = { text => $self->post_prompt };
+        if (%{ $self->post_prompt_llm_params }) {
+            for my $k (keys %{ $self->post_prompt_llm_params }) {
+                $ai{post_prompt}{$k} = $self->post_prompt_llm_params->{$k};
+            }
+        }
+    }
+
+    $ai{post_prompt_url} = $post_prompt_url if $post_prompt_url;
+
+    # Params
+    $ai{params} = { %{ $self->params } } if %{ $self->params };
+
+    # Hints
+    my @all_hints = @{ $self->hints };
+    push @all_hints, @{ $self->pattern_hints };
+    $ai{hints} = \@all_hints if @all_hints;
+
+    # Languages
+    $ai{languages} = $self->languages if @{ $self->languages };
+
+    # Pronunciations
+    $ai{pronounce} = $self->pronunciations if @{ $self->pronunciations };
+
+    # SWAIG
+    my $swaig = {};
+
+    # Build function list
+    my @functions;
+    for my $fname (@{ $self->tool_order }) {
+        my $tool = $self->tools->{$fname};
+        next unless $tool;
+        my %func = %$tool;
+        delete $func{_handler};    # Don't include handler in SWML
+        $func{web_hook_url} //= $webhook_url;
+        push @functions, \%func;
+    }
+    $swaig->{functions} = \@functions if @functions;
+
+    # Native functions
+    $swaig->{native_functions} = $self->native_functions
+        if @{ $self->native_functions };
+
+    # Includes
+    $swaig->{includes} = $self->function_includes
+        if @{ $self->function_includes };
+
+    $ai{SWAIG} = $swaig if %$swaig;
+
+    # Global data
+    $ai{global_data} = { %{ $self->global_data } }
+        if %{ $self->global_data };
+
+    # Internal fillers
+    if (defined $self->internal_fillers) {
+        $ai{params} //= {};
+        $ai{params}{internal_fillers} = $self->internal_fillers;
+    }
+
+    # Debug events
+    if ($self->debug_events_level > 0) {
+        $ai{params} //= {};
+        $ai{params}{debug_events} = $self->debug_events_level;
+    }
+
+    # Contexts — go under ai.prompt.contexts per Python's
+    # PromptManager.to_dict() behavior (signalwire-python /core/swml_handler.py
+    # build_config:172, /core/agent/prompt/manager.py:_contexts).
+    if ($self->context_builder && $self->context_builder->has_contexts) {
+        $ai{prompt} //= {};
+        $ai{prompt}{contexts} = $self->context_builder->to_hash;
+    }
+
+    # MCP servers
+    if (@{ $self->mcp_servers }) {
+        $ai{mcp_servers} = [ @{ $self->mcp_servers } ];
+    }
+
+    return \%ai;
+}
+
+# ---------- PSGI / Plack ----------
+
+sub psgi_app {
+    my ($self) = @_;
+    return $self->_build_psgi_app;
+}
+
+sub _build_psgi_app {
+    my ($self) = @_;
+    require Plack::Request;
+
+    my $route = $self->route;
+    $route = '' if $route eq '/';
+
+    my $agent = $self;
+
+    # Build the core app as a plain PSGI sub
+    my $core_app = sub {
+        my $env = shift;
+        my $req = Plack::Request->new($env);
+        my $path = $req->path_info;
+
+        # Normalize path
+        $path =~ s{/+$}{} unless $path eq '/';
+
+        # Health/ready endpoints (no auth)
+        if ($path eq '/health') {
+            return [200, ['Content-Type' => 'application/json'],
+                [encode_json({ status => 'healthy', agent => $agent->name })]];
+        }
+        if ($path eq '/ready') {
+            return [200, ['Content-Type' => 'application/json'],
+                [encode_json({ status => 'ready' })]];
+        }
+
+        # Auth check for protected routes
+        my $expected_route  = $route eq '' ? '/' : $route;
+        my $is_swaig       = ($path eq "$route/swaig");
+        my $is_post_prompt  = ($path eq "$route/post_prompt");
+        my $is_mcp          = ($path eq "$route/mcp");
+        my $is_main         = ($path eq $expected_route || ($route ne '' && $path eq "$route/"));
+
+        # Root agent: treat '/' as main
+        if ($route eq '' && $path eq '/') {
+            $is_main = 1;
+        }
+
+        if ($is_main || $is_swaig || $is_post_prompt) {
+            my $auth_ok = $agent->_check_auth($env);
+            unless ($auth_ok) {
+                return [401,
+                    ['Content-Type' => 'text/plain', 'WWW-Authenticate' => 'Basic realm="SignalWire Agent"'],
+                    ['Unauthorized']];
+            }
+        }
+
+        # Route dispatch
+        if ($is_main && ($req->method eq 'GET' || $req->method eq 'POST')) {
+            return $agent->_handle_swml($env, $req);
+        }
+        elsif ($is_swaig && $req->method eq 'POST') {
+            return $agent->_handle_swaig($env, $req);
+        }
+        elsif ($is_post_prompt && $req->method eq 'POST') {
+            return $agent->_handle_post_prompt($env, $req);
+        }
+        elsif ($is_mcp && $req->method eq 'POST') {
+            return $agent->_handle_mcp_endpoint($env, $req);
+        }
+
+        return [404, ['Content-Type' => 'text/plain'], ['Not Found']];
+    };
+
+    # Maximum request body size: 1MB
+    my $max_body_size = 1_048_576;
+
+    # Wrap with body size limit and security headers middleware
+    my $app_with_middleware = sub {
+        my $env = shift;
+
+        # Enforce body size limit by actually reading the body
+        if ($env->{REQUEST_METHOD} eq 'POST' || $env->{REQUEST_METHOD} eq 'PUT') {
+            my $input = $env->{'psgi.input'};
+            if ($input) {
+                my $body = '';
+                my $total = 0;
+                my $buf;
+                while (my $read = $input->read($buf, 8192)) {
+                    $total += $read;
+                    if ($total > $max_body_size) {
+                        return [413, ['Content-Type' => 'application/json',
+                                      'X-Content-Type-Options' => 'nosniff',
+                                      'X-Frame-Options' => 'DENY',
+                                      'Cache-Control' => 'no-store'],
+                            [encode_json({ error => 'Request body too large' })]];
+                    }
+                    $body .= $buf;
+                }
+                # Replace psgi.input with the buffered content so handlers can re-read
+                open my $new_input, '<', \$body;
+                $env->{'psgi.input'} = $new_input;
+                $env->{CONTENT_LENGTH} = length($body);
+            }
+        }
+
+        my $res = $core_app->($env);
+        if (ref $res eq 'ARRAY') {
+            push @{ $res->[1] },
+                'X-Content-Type-Options' => 'nosniff',
+                'X-Frame-Options'        => 'DENY',
+                'Cache-Control'          => 'no-store';
+        }
+        return $res;
+    };
+
+    # Signed-webhook gate — wraps the entire app so unsigned / invalid
+    # requests on POST /, POST $route/swaig, POST $route/post_prompt
+    # are rejected with 403 before any other handling. Passthrough when
+    # signing_key is empty (the startup-warning code below logs once
+    # so callers know validation is disabled).
+    my $signing_key = $self->signing_key;
+    if (defined $signing_key && $signing_key ne '') {
+        require SignalWire::Security::WebhookMiddleware;
+        my $main_path = ($route eq '' || $route eq '/') ? '/' : $route;
+        my @gated_paths = ($main_path);
+        push @gated_paths, "$route/swaig", "$route/post_prompt"
+            if $route ne '';
+        push @gated_paths, '/swaig', '/post_prompt'
+            if $route eq '' || $route eq '/';
+        # De-dup
+        my %seen;
+        @gated_paths = grep { !$seen{$_}++ } @gated_paths;
+
+        my $signed_app = SignalWire::Security::WebhookMiddleware->wrap(
+            app         => $app_with_middleware,
+            signing_key => $signing_key,
+            paths       => \@gated_paths,
+            methods     => ['POST'],
+            trust_proxy => 1,
+        );
+        return $signed_app;
+    }
+    else {
+        $self->_warn_signing_key_disabled_once;
+    }
+
+    return $app_with_middleware;
+}
+
+# Emit a one-time startup warning when signing_key is unset. Mirrors
+# the Python and Node SDKs: webhook signature validation is OFF unless
+# you pass signing_key or set SIGNALWIRE_SIGNING_KEY.
+sub _warn_signing_key_disabled_once {
+    my ($self) = @_;
+    return if $self->{_signing_warning_emitted};
+    $self->{_signing_warning_emitted} = 1;
+    carp "[signalwire] webhook signature validation is disabled — "
+        . "set signing_key or SIGNALWIRE_SIGNING_KEY to enable";
+}
+
+sub _check_auth {
+    my ($self, $env) = @_;
+    my $auth_header = $env->{HTTP_AUTHORIZATION} // '';
+    return 0 unless $auth_header =~ /^Basic\s+(.+)$/i;
+    my $decoded = eval { decode_base64($1) } // '';
+    my ($user, $pass) = split(/:/, $decoded, 2);
+    return 0 unless defined $user && defined $pass;
+
+    # Timing-safe comparison using HMAC (constant-time, no length leak)
+    my $expected_user = $self->basic_auth_user;
+    my $expected_pass = $self->basic_auth_password;
+
+    my $user_ok = _timing_safe_eq($user, $expected_user);
+    my $pass_ok = _timing_safe_eq($pass, $expected_pass);
+
+    return ($user_ok && $pass_ok) ? 1 : 0;
+}
+
+sub _timing_safe_eq {
+    my ($a, $b) = @_;
+    # HMAC-based constant-time comparison: no length leak
+    my $key = 'signalwire-timing-safe-comparison';
+    my $hmac_a = hmac_sha256_hex($a, $key);
+    my $hmac_b = hmac_sha256_hex($b, $key);
+    return $hmac_a eq $hmac_b;
+}
+
+sub _handle_swml {
+    my ($self, $env, $req) = @_;
+
+    my $agent = $self;
+
+    # If dynamic config callback is set, clone and apply
+    if ($self->dynamic_config_callback) {
+        $agent = $self->_clone_for_request;
+        my $query_params = $req->query_parameters->as_hashref_mixed;
+        my $body_params  = {};
+        if ($req->method eq 'POST' && $req->content_length) {
+            eval { $body_params = decode_json($req->content) };
+        }
+        my $headers = {};
+        for my $k (keys %$env) {
+            if ($k =~ /^HTTP_(.+)/) {
+                $headers->{lc($1)} = $env->{$k};
+            }
+        }
+        $self->dynamic_config_callback->($query_params, $body_params, $headers, $agent);
+    }
+
+    my $swml = $agent->render_swml($env);
+    my $json = encode_json($swml);
+
+    return [200, ['Content-Type' => 'application/json'], [$json]];
+}
+
+sub _handle_swaig {
+    my ($self, $env, $req) = @_;
+
+    my $body = eval { decode_json($req->content) };
+    unless ($body && ref $body eq 'HASH') {
+        return [400, ['Content-Type' => 'application/json'],
+            [encode_json({ error => 'Invalid JSON' })]];
+    }
+
+    my $func_name = $body->{function};
+    unless ($func_name && exists $self->tools->{$func_name}) {
+        return [404, ['Content-Type' => 'application/json'],
+            [encode_json({ error => 'Function not found' })]];
+    }
+
+    # Extract args
+    my $args = {};
+    if ($body->{argument} && ref $body->{argument}{parsed} eq 'ARRAY'
+        && @{ $body->{argument}{parsed} }) {
+        $args = $body->{argument}{parsed}[0] // {};
+    }
+
+    my $result = $self->on_function_call($func_name, $args, $body);
+    unless (defined $result) {
+        return [500, ['Content-Type' => 'application/json'],
+            [encode_json({ error => 'Handler returned no result' })]];
+    }
+
+    # Serialize result
+    my $response;
+    if (blessed($result) && $result->can('to_hash')) {
+        $response = $result->to_hash;
+    } elsif (ref $result eq 'HASH') {
+        $response = $result;
+    } else {
+        # Neither a FunctionResult-like object nor a hashref. Warn and
+        # fall back to wrapping the stringified value, matching Python's
+        # web_mixin / serverless_mixin / tool_mixin behavior.
+        my $type = ref($result) || 'SCALAR';
+        carp "unexpected_function_result_type: function=\"$func_name\" "
+            . "result_type=\"$type\". SWAIG function returned a value "
+            . "that is neither a FunctionResult (blessed with to_hash) "
+            . "nor a hashref; falling back to wrapping the stringified "
+            . "value. The AI will see the stringified value as its "
+            . "tool response. Return a "
+            . "SignalWire::SWAIG::FunctionResult object or a hashref "
+            . "with at least a 'response' key.";
+        $response = { response => "$result" };
+    }
+
+    return [200, ['Content-Type' => 'application/json'], [encode_json($response)]];
+}
+
+sub _handle_post_prompt {
+    my ($self, $env, $req) = @_;
+
+    my $body = eval { decode_json($req->content) };
+    $body //= {};
+
+    if ($self->summary_callback) {
+        my $summary = undef;
+        if ($body->{post_prompt_data}) {
+            $summary = $body->{post_prompt_data}{parsed}
+                    // $body->{post_prompt_data}{raw};
+        }
+        $self->summary_callback->($summary, $body);
+    }
+
+    return [200, ['Content-Type' => 'application/json'],
+        [encode_json({ status => 'ok' })]];
+}
+
+sub _handle_mcp_endpoint {
+    my ($self, $env, $req) = @_;
+
+    unless ($self->mcp_server_enabled) {
+        return [404, ['Content-Type' => 'application/json'],
+            [encode_json({ error => 'MCP server not enabled' })]];
+    }
+
+    my $body = eval { decode_json($req->content) };
+    unless ($body && ref $body eq 'HASH') {
+        return [400, ['Content-Type' => 'application/json'],
+            [encode_json(_mcp_error(undef, -32700, 'Parse error'))]];
+    }
+
+    my $resp = $self->_handle_mcp_request($body);
+    return [200, ['Content-Type' => 'application/json'], [encode_json($resp)]];
+}
+
+# ---------- Clone for dynamic config ----------
+
+sub _clone_for_request {
+    my ($self) = @_;
+    my %init;
+    for my $attr (qw(name route host port auto_answer record_call record_format
+                     record_stereo prompt_text post_prompt use_pom
+                     debug_events_level)) {
+        $init{$attr} = $self->$attr;
+    }
+    # Deep copy complex attributes
+    $init{pom_sections}        = dclone($self->pom_sections);
+    $init{tools}               = dclone($self->tools);
+    $init{tool_order}          = [ @{ $self->tool_order } ];
+    $init{hints}               = [ @{ $self->hints } ];
+    $init{pattern_hints}       = [ @{ $self->pattern_hints } ];
+    $init{languages}           = dclone($self->languages);
+    $init{pronunciations}      = dclone($self->pronunciations);
+    $init{params}              = { %{ $self->params } };
+    $init{global_data}         = dclone($self->global_data);
+    $init{native_functions}    = [ @{ $self->native_functions } ];
+    $init{function_includes}   = dclone($self->function_includes);
+    $init{prompt_llm_params}   = { %{ $self->prompt_llm_params } };
+    $init{post_prompt_llm_params} = { %{ $self->post_prompt_llm_params } };
+    $init{pre_answer_verbs}    = dclone($self->pre_answer_verbs);
+    $init{post_answer_verbs}   = dclone($self->post_answer_verbs);
+    $init{post_ai_verbs}       = dclone($self->post_ai_verbs);
+    $init{answer_config}       = { %{ $self->answer_config } };
+    $init{swaig_query_params}  = { %{ $self->swaig_query_params } };
+    $init{basic_auth_user}     = $self->basic_auth_user;
+    $init{basic_auth_password} = $self->basic_auth_password;
+    $init{webhook_url}         = $self->webhook_url;
+    $init{post_prompt_url}     = $self->post_prompt_url;
+    $init{proxy_url_base}      = $self->proxy_url_base;
+    $init{internal_fillers}    = defined $self->internal_fillers
+                                    ? dclone($self->internal_fillers) : undef;
+    $init{session_manager}     = $self->session_manager;
+    $init{mcp_servers}         = dclone($self->mcp_servers);
+    $init{mcp_server_enabled}  = $self->mcp_server_enabled;
+
+    my $clone = (ref $self)->new(%init);
+    return $clone;
+}
+
+# ---------- run / serve ----------
+
+sub run {
+    my ($self, %opts) = @_;
+    $self->serve(%opts);
+}
+
+sub serve {
+    my ($self, %opts) = @_;
+    my $app  = $self->psgi_app;
+    my $host = $opts{host} // $self->host;
+    my $port = $opts{port} // $self->port;
+
+    require Plack::Runner;
+    my $runner = Plack::Runner->new;
+    $runner->parse_options(
+        '--host'   => $host,
+        '--port'   => $port,
+        '--server' => 'HTTP::Server::PSGI',
+    );
+    $runner->run($app);
+}
+
+# ---------- helpers ----------
+
+sub _generate_random_password {
+    # Use /dev/urandom for cryptographically secure random bytes.
+    # Die on failure rather than falling back to a weak password.
+    my $bytes = '';
+    if (open my $fh, '<:raw', '/dev/urandom') {
+        my $read = read($fh, $bytes, 32);
+        close $fh;
+        if (defined $read && $read == 32) {
+            # Convert to hex string (64 chars)
+            return unpack('H*', $bytes);
+        }
+    }
+    die "FATAL: Cannot generate secure random password - /dev/urandom unavailable or read failed. "
+      . "Set SWML_BASIC_AUTH_PASSWORD environment variable instead.\n";
+}
+
+sub extract_sip_username {
+    my ($class_or_self, $body) = @_;
+    # Extract SIP username from a request body (hashref).
+    # Looks in standard SignalWire fields for the SIP caller identity.
+    return undef unless ref $body eq 'HASH';
+
+    # Check call.from field (e.g., "sip:user@domain")
+    my $from = $body->{call}{from}
+            // $body->{sip_from}
+            // $body->{from}
+            // '';
+
+    if ($from =~ m{^sip:([^@]+)\@}i) {
+        return $1;
+    }
+
+    # Check for a direct caller_id_number
+    if (my $cid = $body->{call}{caller_id_number} // $body->{caller_id_number}) {
+        return $cid;
+    }
+
+    return undef;
+}
+
+1;

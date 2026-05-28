@@ -30,6 +30,7 @@ lib/DBIx/QuickORM/Join/Row.pm
 lib/DBIx/QuickORM/Link.pm
 lib/DBIx/QuickORM/LiteralSource.pm
 lib/DBIx/QuickORM/Manual.pm
+lib/DBIx/QuickORM/Manual/Aliasing.pm
 lib/DBIx/QuickORM/Manual/Async.pm
 lib/DBIx/QuickORM/Manual/Caching.pm
 lib/DBIx/QuickORM/Manual/Concepts.pm
@@ -40,6 +41,7 @@ lib/DBIx/QuickORM/Manual/Querying.pm
 lib/DBIx/QuickORM/Manual/QuickStart.pm
 lib/DBIx/QuickORM/Manual/Recipes.pm
 lib/DBIx/QuickORM/Manual/Relations.pm
+lib/DBIx/QuickORM/Manual/SQLBuilder.pm
 lib/DBIx/QuickORM/Manual/Schema.pm
 lib/DBIx/QuickORM/Manual/Transactions.pm
 lib/DBIx/QuickORM/Manual/Types.pm
@@ -78,6 +80,13 @@ t/AI/caching.t
 t/AI/connection.t
 t/AI/datetime.t
 t/AI/dialect_duckdb.t
+t/AI/generated.t
+t/AI/generated/duckdb.sql
+t/AI/generated/mysql.sql
+t/AI/generated/postgresql.sql
+t/AI/generated/postgresql10.sql
+t/AI/generated/postgresql11.sql
+t/AI/generated/sqlite.sql
 t/AI/handle_builder.t
 t/AI/iterator.t
 t/AI/link.t
@@ -214,6 +223,9 @@ t/remap/mysql_mariadb.sql
 t/remap/mysql_percona.sql
 t/remap/postgresql.sql
 t/remap/sqlite.sql
+t/remap_join.t
+t/remap_merge.t
+t/remap_sql.t
 t/transactions.t
 t/transactions/duckdb.sql
 t/transactions/mysql.sql

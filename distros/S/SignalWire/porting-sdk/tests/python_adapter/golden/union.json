@@ -1,0 +1,29 @@
+{
+  "union": {
+    "classes": {
+      "Coercer": {
+        "methods": {
+          "coerce": {
+            "params": [
+              {
+                "name": "self",
+                "kind": "self"
+              },
+              {
+                "name": "value",
+                "type": "union<string,int>",
+                "required": true
+              },
+              {
+                "name": "fallback",
+                "type": "union<float,bool>",
+                "required": true
+              }
+            ],
+            "returns": "string"
+          }
+        }
+      }
+    }
+  }
+}

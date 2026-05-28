@@ -1,0 +1,25 @@
+# Version control
+^\.git/
+^\.gitignore
+
+# Editor/IDE
+^\.vscode/
+~$
+
+# Build artifacts
+^blib/
+^Makefile$
+^Makefile.old$
+^pm_to_blib$
+^MYMETA\.
+^Catalyst-Plugin-OpenIDConnect-/
+
+# Generated keys (use example/generate_keys.sh to create)
+^example/keys/(?!generate_keys\.sh)
+
+# Distribution artifacts
+^dist/
+^\.build/
+
+# Backup files
+.*~$

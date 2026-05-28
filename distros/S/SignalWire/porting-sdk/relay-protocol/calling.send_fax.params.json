@@ -1,0 +1,37 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.send_fax` (params). Extracted from switchblade `PublicCallSendFaxParams.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "control_id": {
+      "type": "string"
+    },
+    "document": {
+      "type": "string"
+    },
+    "header_info": {
+      "type": "string"
+    },
+    "identity": {
+      "type": "string"
+    },
+    "node_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id",
+    "control_id",
+    "document"
+  ],
+  "title": "calling.send_fax params",
+  "type": "object",
+  "x-method": "calling.send_fax",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallSendFaxParams.cs"
+}

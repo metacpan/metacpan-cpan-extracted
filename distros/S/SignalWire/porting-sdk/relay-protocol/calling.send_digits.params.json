@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.send_digits` (params). Extracted from switchblade `PublicCallSendDigitsParams.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "control_id": {
+      "type": "string"
+    },
+    "digits": {
+      "type": "string"
+    },
+    "node_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id",
+    "control_id",
+    "digits"
+  ],
+  "title": "calling.send_digits params",
+  "type": "object",
+  "x-method": "calling.send_digits",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallSendDigitsParams.cs"
+}

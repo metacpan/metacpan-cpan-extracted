@@ -47,10 +47,25 @@ Functions added past the karr MVP so this isn't karr-specific on CPAN:
 `git_status_options_init`/`_foreach`/`_foreach_ext`/`_file`,
 `git_diff_options_init`/`_tree_to_tree`/`_tree_to_workdir`/`_tree_to_index`/`_index_to_workdir`/`_num_deltas`/`_get_delta`/`_free`,
 `git_repository_index`/`git_index_free`,
+`git_repository_set_head`,
 `git_strarray_free`.
 
 `*_options_init` is preferred over the deprecated `*_init_options` (the
 latter is removed in libgit2 1.7+).
+
+### Group A — accessor/predicate complements
+
+Obvious read-side complements to the existing surface (no new FFI patterns,
+all native-type returns):
+
+`git_repository_head`/`_head_unborn`/`_head_detached`,
+`git_reference_symbolic_create`/`_symbolic_target`/`_symbolic_set_target`/
+`_set_target`/`_resolve`/`_shorthand`/`_is_branch`/`_is_remote`/`_is_tag`,
+`git_commit_id`/`_time`/`_time_offset`/`_summary`.
+
+The remaining unbound surface (merge/diff-text/index-conflict/stash-iter/
+blame/describe/submodule/worktree/…) is catalogued in `TODO.md` with
+per-family FFI gotchas.
 
 ## Phase 4 Network + Auth additions
 

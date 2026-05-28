@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - ~/lib/DateTime/Lite.pm
-## Version v0.7.1
+## Version v0.7.2
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/04/03
-## Modified 2026/05/20
+## Modified 2026/05/21
 ## All rights reserved
 ## 
 ## 
@@ -40,7 +40,7 @@ BEGIN
         'ne'     => '_string_not_equals_overload',
     );
 
-    our $VERSION = 'v0.7.1';
+    our $VERSION = 'v0.7.2';
 
     @MonthLengths = ( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
     @LeapYearMonthLengths = @MonthLengths;
@@ -3198,7 +3198,7 @@ sub _string_compare_overload
 sub _string_equals_overload
 {
     my( $class, $dt1, $dt2 ) = ref( $_[0] ) ? ( undef, @_ ) : @_;
-    return( "$dt1" eq "$dt2" ) unless( $dt2->can( 'utc_rd_values' ) );
+    return( "$dt1" eq "$dt2" ) unless( $dt2 && Scalar::Util::blessed( $dt2 ) && $dt2->can( 'utc_rd_values' ) );
     $class ||= ref( $dt1 );
     return( !$class->compare( $dt1, $dt2 ) );
 }
@@ -3497,7 +3497,7 @@ DateTime::Lite - Lightweight, low-dependency drop-in replacement for DateTime
 
 =head1 VERSION
 
-    v0.7.1
+    v0.7.2
 
 =head1 DESCRIPTION
 

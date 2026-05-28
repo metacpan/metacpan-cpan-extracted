@@ -1,0 +1,75 @@
+{
+  "summary": {
+    "total_public_methods": 997,
+    "covered_methods": 5,
+    "coverage_pct": 0.502,
+    "audits_passed": [
+      "audit_http_swml",
+      "audit_relay_handshake",
+      "audit_rest_transport",
+      "audit_skills_dispatch"
+    ]
+  },
+  "per_audit": {
+    "audit_http_swml": {
+      "covered_methods": [
+        "signalwire.core.swml_service.SWMLService.render_swml",
+        "signalwire.core.swml_service.SWMLService.on_function_call"
+      ],
+      "missing_methods": [
+        "signalwire.core.swml_service.SWMLService.handle_request"
+      ],
+      "ran_and_passed": true
+    },
+    "audit_relay_handshake": {
+      "covered_methods": [],
+      "missing_methods": [
+        "signalwire.relay.client.RelayClient.connect",
+        "signalwire.relay.client.RelayClient.subscribe",
+        "signalwire.relay.client.RelayClient.disconnect"
+      ],
+      "ran_and_passed": true
+    },
+    "audit_skills_dispatch": {
+      "covered_methods": [
+        "signalwire.skills.wikipedia_search.skill.WikipediaSearchSkill.search_wiki",
+        "signalwire.skills.datasphere.skill.DataSphereSkill.search_knowledge",
+        "signalwire.skills.spider.skill.SpiderSkill.scrape_url"
+      ],
+      "missing_methods": [
+        "signalwire.skills.web_search.skill.WebSearchSkill.web_search",
+        "signalwire.skills.api_ninjas_trivia.skill.ApiNinjasTriviaSkill.get_trivia",
+        "signalwire.skills.weather_api.skill.WeatherApiSkill.get_weather"
+      ],
+      "ran_and_passed": true
+    },
+    "audit_rest_transport": {
+      "covered_methods": [],
+      "missing_methods": [
+        "signalwire.rest.namespaces._crud_with_addresses.CrudWithAddresses.list",
+        "signalwire.rest.namespaces._crud_with_addresses.CrudWithAddresses.create",
+        "signalwire.rest.namespaces._crud_with_addresses.CrudWithAddresses.fetch",
+        "signalwire.rest.namespaces._crud_with_addresses.CrudWithAddresses.update",
+        "signalwire.rest.namespaces._crud_with_addresses.CrudWithAddresses.delete"
+      ],
+      "ran_and_passed": true
+    }
+  },
+  "covered_method_to_audits": {
+    "signalwire.core.swml_service.SWMLService.render_swml": [
+      "audit_http_swml"
+    ],
+    "signalwire.core.swml_service.SWMLService.on_function_call": [
+      "audit_http_swml"
+    ],
+    "signalwire.skills.wikipedia_search.skill.WikipediaSearchSkill.search_wiki": [
+      "audit_skills_dispatch"
+    ],
+    "signalwire.skills.datasphere.skill.DataSphereSkill.search_knowledge": [
+      "audit_skills_dispatch"
+    ],
+    "signalwire.skills.spider.skill.SpiderSkill.scrape_url": [
+      "audit_skills_dispatch"
+    ]
+  }
+}

@@ -130,7 +130,55 @@ my @scripts = ();
 # The user can pass the environment variable 'NO_MOD_PERL' to explicitly state there is no modperl, and 'MG_DEBUG' as a debug level for the Apache/modperl unit tests
 
 my $MY_DEBUG = $ENV{MG_DEBUG} // 0;
-if( !$@ && !$ENV{NO_MOD_PERL} )
+
+# NOTE: mod_perl detection by Perl capability
+# We deliberately test whether the mod_perl Perl modules are installed and loadable,
+# rather than inspecting Apache's runtime state. 'apache2 -M' and 'apachectl -D
+# DUMP_MODULES' both apply the full configuration first, so any syntax error in a
+# sites-enabled file (for example a missing SSL certificate) makes them fail before
+# any module is listed. Looking for a mods-enabled load file is no better, as that
+# layout is Debian specific and not guaranteed elsewhere. The presence of the
+# mod_perl Perl modules is what actually lets the t/TEST harness run, and it does not
+# depend on Apache starting up. We only run the whole Apache test preparation below
+# when these modules are present, which also avoids spurious Apache warnings on hosts
+# that have no mod_perl.
+my $has_modperl = 0;
+if( !$ENV{NO_MOD_PERL} )
+{
+    local $@;
+    # mod_perl 2.x, by far the most common case today
+    eval
+    {
+        require ModPerl::Util;
+        require Apache2::Const;
+        require Apache2::ServerUtil;
+    };
+    if( !$@ )
+    {
+        $has_modperl = 2;
+        print( STDERR "mod_perl 2.x detected (ModPerl::Util + Apache2::Const + Apache2::ServerUtil)\n" ) if( $MY_DEBUG );
+    }
+    else
+    {
+        # mod_perl 1.x, rare nowadays
+        local $@;
+        eval
+        {
+            require Apache::Constants;
+        };
+        if( !$@ )
+        {
+            $has_modperl = 1;
+            print( STDERR "mod_perl 1.x detected (Apache::Constants)\n" ) if( $MY_DEBUG );
+        }
+        else
+        {
+            print( STDERR "mod_perl not detected through its Perl modules\n" ) if( $MY_DEBUG );
+        }
+    }
+}
+
+if( !$@ && !$ENV{NO_MOD_PERL} && $has_modperl )
 {
     print( STDERR "Generating Makefile including modperl\n" ) if( $MY_DEBUG );
     Apache::TestMM->import( qw(test clean) ); #enable 'make test'

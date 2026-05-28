@@ -1,5 +1,10 @@
 Revision history for this software.
 
+0.14  2026-05-28 00:00:00
+  - remove t/9001-load.t
+  - add t/9001-load1.t for Section 1
+  - add t/9002-load2.t for Section 2
+
 0.13  2026-05-25 00:00:00
   - t/9001-load.t: replace FindBin with __FILE__-based lib path (Perl 5.10.1 compatibility)
   - t/lib/INA_CPAN_Check.pm: use CORE::open() to avoid bareword::filehandles pragma pollution

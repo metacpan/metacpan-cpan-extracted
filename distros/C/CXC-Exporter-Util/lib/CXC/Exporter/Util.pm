@@ -7,22 +7,43 @@ use v5.22;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+#<<<
+our $VERSION = '0.11';
+#>>>
 
 use Scalar::Util 'reftype';
 use List::Util 1.45 'uniqstr';
 use Import::Into;
 use experimental 'signatures', 'postderef', 'lexical_subs';
 
-use Exporter 'import';
+use constant HAVE_EXPORTER_TINY => eval { require Exporter::Tiny; 1; };    ## no critic ( ReturnValueOfEval )
+use if HAVE_EXPORTER_TINY,  parent   => 'Exporter::Tiny';
+use if !HAVE_EXPORTER_TINY, Exporter => 'import';
 
-our %EXPORT_TAGS = (
-    default   => [qw( install_EXPORTS  )],
-    constants => [qw( install_CONSTANTS )],
-    utils     => [qw( install_constant_tag install_constant_func )],
+use constant UI_HELPERS => 'ui_helpers';
+
+our %EXPORT_TAGS;
+
+BEGIN {
+
+    %EXPORT_TAGS = (
+        default   => [qw( install_EXPORTS  )],
+        constants => [qw( install_CONSTANTS )],
+        utils     => [qw( install_constant_tag install_constant_func )],
+    );
+
+    if ( HAVE_EXPORTER_TINY ) {
+        $EXPORT_TAGS{ +UI_HELPERS }
+          = [qw( ui_list_constants ui_coerce_constant ui_assert_coerce_constant )];
+    }
+
+}
+
+my %REGISTRY = (
+    HOOK           => {},
+    CONSTANTS_TAGS => {},
+    UI             => {},
 );
-
-our %HOOK;
 
 install_EXPORTS();
 
@@ -30,6 +51,7 @@ my sub _croak {
     require Carp;
     goto \&Carp::croak;
 }
+
 
 my sub _EXPORT_TAGS ( $caller = scalar caller ) {
     no strict 'refs';    ## no critic (TestingAndDebugging::ProhibitNostrict)
@@ -126,7 +148,7 @@ sub install_EXPORTS {
     my $install_all = delete $options{all};
 
     # run hooks.
-    if ( defined( my $hooks = delete $HOOK{$package}{pre} ) ) {
+    if ( defined( my $hooks = delete $REGISTRY{HOOK}{$package}{pre} ) ) {
         $_->() for values $hooks->%*;
     }
 
@@ -146,6 +168,10 @@ sub install_EXPORTS {
         }
     }
 
+    if ( defined( my $hooks = delete $REGISTRY{HOOK}{$package}{post} ) ) {
+        $_->() for values $hooks->%*;
+    }
+
     # Exporter::Tiny handles the 'all' tag, as does Sub::Exporter, but
     # I don't know how to detect when the latter is being used.
     $install_all = !$package->isa( 'Exporter::Tiny' )
@@ -162,6 +188,8 @@ sub install_EXPORTS {
 
     _EXPORT( $package )->@*    = ( $EXPORT_TAGS->{default} // [] )->@*;
     _EXPORT_OK( $package )->@* = uniqstr map { $_->@* } values $EXPORT_TAGS->%*;
+
+    delete $REGISTRY{HOOK}{$package};
 }
 
 
@@ -462,10 +490,9 @@ sub install_constant_tag ( $id, $constants, $package = scalar caller ) {
         @names = keys $constants->%*;
     }
     elsif ( reftype( $constants ) eq 'ARRAY' ) {
-        my @copy = $constants->@*;
-        while ( my ( $name ) = splice( @copy, 0, 2 ) ) {
-            push @names, $name;
-        }
+        # the list of names must be returned in the order specified,
+        # hence this bizzarity
+        @names     = $constants->@[ map { $_ * 2 } 0 .. $constants->$#* / 2 ];
         $constants = { $constants->@* };
     }
     else {
@@ -476,7 +503,7 @@ sub install_constant_tag ( $id, $constants, $package = scalar caller ) {
 
     push( ( _EXPORT_TAGS( $package )->{$tag} //= [] )->@*, @names );
 
-    $HOOK{$package}{pre}{$fn_values} //= sub {
+    $REGISTRY{HOOK}{$package}{pre}{$fn_values} //= sub {
         my $fqdn = join q{::}, $package, $fn_values;
         _croak( "Error: attempt to redefine enumerating function $fqdn" )
           if exists &{$fqdn};
@@ -486,13 +513,17 @@ sub install_constant_tag ( $id, $constants, $package = scalar caller ) {
         install_constant_func( $fn_values, \@values, $package );
     };
 
-    $HOOK{$package}{pre}{$fn_names} //= sub {
+    $REGISTRY{HOOK}{$package}{pre}{$fn_names} //= sub {
         my $fqdn = join q{::}, $package, $fn_names;
         _croak( "Error: attempt to redefine enumerating function $fqdn" )
           if exists &{$fqdn};
         add_constant_to_tag( 'constant_name_funcs', $fn_names,
             [ _EXPORT_TAGS( $package )->{$tag}->@* ], $package );
 
+    };
+
+    $REGISTRY{HOOK}{$package}{pre}{"register_tag:$tag"} //= sub {
+        ( $REGISTRY{CONSTANTS_TAGS}{$package} //= {} )->{$tag} = $fn_names;
     };
 
 }
@@ -597,6 +628,92 @@ sub add_constant_to_tag ( $tag, $name, $values, $caller = scalar caller ) {
     push( ( _EXPORT_TAGS( $caller )->{$tag} //= [] )->@*, $name );
 }
 
+my sub ui_entry ( $target, $tag, $pfx ) {
+
+    my $tags = $REGISTRY{CONSTANTS_TAGS}{$target}
+      // _croak( "Can't find any constant tags associated with '$target'" );
+
+    my $names = $tags->{$tag} // _croak( "unknown constant tag '$tag'" );
+
+    exists $REGISTRY{UI}{$target}{$tag}{$pfx}
+      and return $REGISTRY{UI}{$target}{$tag}{$pfx};
+
+    my $entry = $REGISTRY{UI}{$target}{$tag}{$pfx} = {};
+
+    my $sub = $target->can( $names )
+      or die( "internal error: Can't find subroutine ${target}::$names" )
+      ;    # yes, die. so error points to this line.
+
+    my %values;
+    my %valsubs;
+    my @names;
+
+    # Copy each returned name before mutation; $sub is generated by
+    # the 'constant' pragma, and may return aliases to the actual
+    # constants, which cannot be mutated.
+    for my $const_name ( $sub->() ) {
+        my $name = $const_name;
+
+        my $valsub = $valsubs{$name} //= do {
+            my $coderef = $target->can( $name )
+              or die( "internal error: Can't find subroutine ${target}::$name" );
+            sub { $coderef->() };
+        };
+
+        defined $pfx
+          and length $pfx
+          and $name =~ s/^\Q${pfx}\E_?//;
+
+        my %names;
+        $name = lc $name;
+        @names{$name} = ();
+        $name =~ s/_/-/g;
+        @names{$name} = ();
+        my @lnames = keys %names;
+        push @names, @lnames;
+        @values{@lnames} = ( $valsub ) x @lnames;
+    }
+    $entry->{names}  = [ sort @names ];
+    $entry->{values} = \%values;
+
+    return $entry;
+}
+
+sub _exporter_expand_tag ( $class, $name, $value, $globals ) {
+
+    if ( $name eq UI_HELPERS or $name eq 'all' ) {
+        my $target = $globals->{into};
+        $REGISTRY{HOOK}{$target}{post}{add_helpers} //= sub {
+            _EXPORT_TAGS( $target )->{ +UI_HELPERS } = [ $EXPORT_TAGS{ +UI_HELPERS }->@* ];
+        };
+    }
+    $class->SUPER::_exporter_expand_tag( $name, $value, $globals );
+}
+
+sub _generate_ui_list_constants ( $class, $name, $args, $globals ) {
+    my $target = $globals->{into};
+    sub ( $tag, $pfx = q{} ) {
+        return ui_entry( $target, $tag, $pfx )->{names}->@*;
+    };
+}
+
+sub _generate_ui_coerce_constant ( $class, $name, $args, $globals ) {
+    my $target = $globals->{into};
+    sub ( $name, $tag, $pfx = q{} ) {
+        my $valsub = ui_entry( $target, $tag, $pfx )->{values}{$name} // return $name;
+        return $valsub->();
+    };
+}
+
+sub _generate_ui_assert_coerce_constant ( $class, $name, $args, $globals ) {
+    my $target = $globals->{into};
+    sub ( $name, $tag, $pfx = q{} ) {
+        my $valsub = ui_entry( $target, $tag, $pfx )->{values}{$name}
+          // _croak( "unknown constant $tag: $name" );
+        return $valsub->();
+    };
+}
+
 1;
 
 #
@@ -613,7 +730,7 @@ __END__
 
 =pod
 
-=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory mistyped
+=for :stopwords Diab Jerius Smithsonian Astrophysical Observatory mistyped ui ui_helpers
 
 =head1 NAME
 
@@ -621,7 +738,7 @@ CXC::Exporter::Util - Tagged Based Exporting
 
 =head1 VERSION
 
-version 0.08
+version 0.11
 
 =head1 SYNOPSIS
 
@@ -802,6 +919,93 @@ should be done in a L<BEGIN> block:
 
 For more complex situations, the lower level L</install_constant_tag>
 and L</install_constant_func> routines may be useful.
+
+=head2 UI Helpers
+
+I<Note>: These subroutines are available only if L<Exporter::Tiny> is
+installed.
+
+The UI Helper routines make it easier to expose constants' names to
+users and convert them to constant values.  For example, say the
+constants are for colors,
+
+   install_CONSTANTS( { COLORS =>
+                          { RED => 0xFF0000, YELLOW_GREEN => 0x00FFFF } } );
+
+and the application provides a C<--color> command line option.  The
+application can accept lower-case, user-friendly representations of the
+constant names and convert them back to constant values.
+
+Each helper takes the constant tag name (as used by
+L</install_CONSTANTS> or L</install_constant_tag>) and an optional
+C<$prefix>, which strips a common literal constant-name prefix before
+aliases are generated. For example, with a prefix of C<COLOR>,
+C<COLOR_YELLOW_GREEN> is exposed as C<yellow_green> and
+C<yellow-green>.
+
+L</ui_list_constants> returns a list of accepted human-friendly aliases
+for the constants' names.
+
+The UI can use these to provide the user with values for C<--color>, e.g.
+
+   if ( $opt{color} eq '-list' ) {
+     say join( "\n", ui_list_constants( 'colors' ) );
+     exit (0);
+   }
+
+or as parameters for L<Type::Tiny::Enum>.
+
+L</ui_coerce_constant> and L</ui_assert_coerce_constant> match the
+passed constant name alias to the constant value.  They differ in that
+L</ui_coerce_constant> returns the original passed name if there is
+no match, while L</ui_assert_coerce_constant> throws an exception.
+
+To make these helpers available to users of a constants module, import
+the C<ui_helpers> tag (or the C<all> tag) from C<CXC::Exporter::Util>
+into that module:
+
+  package My::Constants;
+  use parent 'Exporter::Tiny';
+  use CXC::Exporter::Util 'install_CONSTANTS', 'install_EXPORTS', ':ui_helpers';
+
+  install_CONSTANTS( { COLORS =>
+                         { RED => 0xFF0000, YELLOW_GREEN => 0x00FFFF } } );
+  install_EXPORTS;
+
+This adds a C<ui_helpers> export tag to C<My::Constants>.  Users of
+C<My::Constants> may then import all of the UI helpers with
+
+  use My::Constants ':ui_helpers';
+
+or import them individually.
+
+=over
+
+=item ui_list_constants
+
+  @names = ui_list_constants( $tag, ?$prefix );
+
+Returns a list of accepted names for the constants with the given
+C<$tag>.  These names are lower-case alternatives with underscores
+preserved and with underscores translated to hyphens.  The optional
+C<$prefix> strips a common literal constant-name prefix before aliases
+are generated.
+
+=item ui_coerce_constant
+
+  $value = ui_coerce_constant( $name, $tag, ?$prefix );
+
+Maps an accepted constant name alias (see L</ui_list_constants>) to
+the constant's value, returning unknown values unchanged.
+
+=item ui_assert_coerce_constant
+
+  $value = ui_assert_coerce_constant( $name, $tag, ?$prefix );
+
+Performs the same coercion as L</ui_coerce_constant>, but throws an
+exception for unknown values.
+
+=back
 
 =head1 SUBROUTINES
 
@@ -1273,11 +1477,11 @@ Please report any bugs or feature requests to bug-cxc-exporter-util@rt.cpan.org 
 
 Source is available at
 
-  https://gitlab.com/djerius/cxc-exporter-util
+  https://codeberg.org/CXC-Optics/p5-CXC-Exporter-Util
 
 and may be cloned from
 
-  https://gitlab.com/djerius/cxc-exporter-util.git
+  https://codeberg.org/CXC-Optics/p5-CXC-Exporter-Util.git
 
 =head1 SEE ALSO
 

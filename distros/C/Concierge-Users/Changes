@@ -1,5 +1,21 @@
 Revision history for Concierge-Users
 
+v0.8.3  2026-05-27
+    - get_field_hints: add default, null, and validate_as to returned hashref;
+      document required semantics (service-layer, not app-level conditional)
+    - Enum options: support value:Label syntax; v_options and default detection
+      strip :Label suffix to extract bare stored value
+    - show_default_config / show_config: return service hashrefs
+      { success, config, ... } instead of printing to STDOUT
+    - Separate data type from operational role: user_id type=>text +
+      field_use=>identity; last_mod_date / created_date type=>timestamp +
+      field_use=>system
+    - Add %Concierge::Users::Meta::field_types with the eight canonical data
+      types; moniker and name remain in type_validator_map as validate_as
+      targets only
+    - config_to_yaml: emit field_use when present
+    - __DATA__: fix inconsistent tab indentation on validate_as lines
+
 v0.8.2  2026-05-25
     - Replace real personal data in examples/__DATA__ with mock data
       (fictional names, 555- phone numbers, @example.com addresses)

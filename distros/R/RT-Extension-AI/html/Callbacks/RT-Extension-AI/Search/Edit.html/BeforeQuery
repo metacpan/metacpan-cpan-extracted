@@ -1,0 +1,41 @@
+% if ( RT->Config->Get('RT_AI_Provider') ) {
+<div class="card mb-3 border-start border-primary border-4" id="natural-language-search-card">
+  <div class="card-body">
+    <h5 class="card-title"><&|/l&>Natural Language Search</&></h5>
+    <p class="text-muted small"><&|/l&>Describe the tickets you want to find in plain language, and AI will generate the search query and display format for you.</&></p>
+
+    <form
+      id="natural-language-search-form"
+      class="mb-0"
+      hx-post="<% RT->Config->Get('WebPath') %>/Helpers/AISearch/GenerateTicketSQL"
+      hx-trigger="submit"
+      hx-target="#natural-language-search-result"
+      hx-swap="none"
+    >
+      <div class="mb-3">
+        <div class="input-group">
+          <input
+            type="text"
+            class="form-control"
+            id="natural-language-input"
+            name="naturalLanguageQuery"
+            placeholder="<&|/l&>e.g., Show me open tickets in the Support queue with owner and due date</&>"
+            aria-label="<&|/l&>Natural language search query</&>"
+          />
+          <button
+            type="submit"
+            class="btn btn-primary"
+            id="generate-ticketsql-btn"
+          >
+            <&|/l&>Generate Search</&>
+          </button>
+        </div>
+      </div>
+
+      <div id="nl-search-error" class="alert alert-danger d-none" role="alert"></div>
+      <div id="nl-search-message" class="alert alert-success d-none" role="alert"></div>
+      <div id="natural-language-search-result" class="d-none"></div>
+    </form>
+  </div>
+</div>
+% }

@@ -1,0 +1,234 @@
+name: Cross-port
+
+# Layer 2 of the CI plan (CI_PLAN.md §1).
+#
+# A change to porting-sdk (regenerated python_signatures.json /
+# python_surface.json, RELAY schema regen, type alias edits, mock harness
+# code, audit script changes) affects every downstream port. Without this
+# gate, breakage only surfaces when one of the 9 port repos runs its own
+# CI against the new oracle — by which point the porting-sdk PR has
+# already merged.
+#
+# This workflow checks out porting-sdk @ PR-SHA, signalwire-python @ main
+# (the reference oracle target), and each signalwire-<lang> port @ main,
+# then invokes that port's `bash scripts/run-ci.sh` (TEST -> SIGNATURES
+# -> DRIFT -> NO-CHEAT) under the new porting-sdk. The full per-port
+# gate set runs against the candidate porting-sdk before merge.
+#
+# The `psdk-tests` job that mirrors `run-cross-port-ci.sh` step 1 is
+# already covered by .github/workflows/test.yml, which fires on the same
+# triggers; this workflow contains only the per-port matrix.
+#
+# Auth: porting-sdk is private but `actions/checkout@v4` defaults to
+# `${{ github.token }}` which has read access to its own repo. The 9
+# port repos are public so they need no token either. No
+# `secrets.PORTING_SDK_TOKEN` required for Layer 2 (unlike Layer 1
+# inside each port repo, where porting-sdk is foreign).
+
+env:
+  # Opt into Node.js 24 ahead of GitHub's 2026-06-02 default switch.
+  # Without this, actions/setup-java@v4, setup-python@v5, gradle/actions, etc.
+  # log a deprecation warning on every run.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  schedule:
+    # Layer 3 of CI_PLAN.md: nightly full-matrix at 09:00 UTC. Each
+    # matrix entry pulls its port at main HEAD (same as Layer 2), so
+    # this catches drift introduced by port-repo merges that happened
+    # after the last porting-sdk PR ran.
+    - cron: "0 9 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  per-port-audit:
+    name: ${{ matrix.port }}
+    runs-on: ubuntu-latest
+    strategy:
+      # Surface every breaking port, not just the first one — Layer 2's
+      # whole job is to give a complete picture before merge.
+      fail-fast: false
+      matrix:
+        port: [go, typescript, java, php, ruby, perl, rust, cpp, dotnet]
+    steps:
+      - name: Check out porting-sdk @ PR SHA
+        # The change being audited. github.token has read access to its
+        # own private repo, so no special token needed.
+        uses: actions/checkout@v4
+        with:
+          path: porting-sdk
+
+      - name: Check out signalwire-python @ main
+        uses: actions/checkout@v4
+        with:
+          repository: signalwire/signalwire-python
+          path: signalwire-python
+          ref: main
+
+      - name: Check out signalwire-${{ matrix.port }} @ main
+        uses: actions/checkout@v4
+        with:
+          repository: signalwire/signalwire-${{ matrix.port }}
+          path: signalwire-${{ matrix.port }}
+          ref: main
+
+      # ------------------------------------------------------------------
+      # Python (always — needed for audit scripts + mock harnesses)
+      # ------------------------------------------------------------------
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python test harnesses (mock_signalwire + mock_relay)
+        run: |
+          pip install -e porting-sdk/test_harness/mock_relay
+          pip install -e porting-sdk/test_harness/mock_signalwire
+
+      # ------------------------------------------------------------------
+      # Per-port toolchain setup (CI_PLAN.md §3 + per-port test.yml)
+      # ------------------------------------------------------------------
+
+      - name: Set up Go
+        if: matrix.port == 'go'
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: signalwire-go/go.mod
+          cache: true
+
+      - name: Set up Node 24 (vitest 4.x requires node:util.styleText)
+        if: matrix.port == 'typescript'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: signalwire-typescript/package-lock.json
+
+      - name: npm ci (TypeScript deps)
+        if: matrix.port == 'typescript'
+        working-directory: signalwire-typescript
+        run: npm ci
+
+      - name: Set up JDK 21
+        if: matrix.port == 'java'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Set up Gradle
+        if: matrix.port == 'java'
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Pre-build Java JAR (adapter reads reflection metadata from JAR)
+        # The Java adapter at scripts/enumerate_signatures.py reflects on
+        # the built JAR, not the source tree. Without a fresh build the
+        # adapter wouldn't see new methods. run-ci.sh's SIGNATURES gate
+        # rebuilds before re-running enumerate_signatures.py, but doing
+        # it once here also warms gradle's cache.
+        if: matrix.port == 'java'
+        working-directory: signalwire-java
+        run: ./gradlew --no-daemon build -x test
+
+      - name: Set up PHP 8.3
+        if: matrix.port == 'php'
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: json, openssl, mbstring
+          coverage: none
+          tools: composer:v2
+
+      - name: Composer install (PHP deps)
+        if: matrix.port == 'php'
+        working-directory: signalwire-php
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Set up Ruby
+        if: matrix.port == 'ruby'
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+          working-directory: signalwire-ruby
+
+      - name: Set up Perl 5.38
+        if: matrix.port == 'perl'
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.38'
+
+      - name: Install Perl deps from cpanfile
+        if: matrix.port == 'perl'
+        working-directory: signalwire-perl
+        run: |
+          cpanm --notest --installdeps .
+
+      - name: Set up Rust stable
+        if: matrix.port == 'rust'
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Set up Rust nightly (rustdoc-json for SIGNATURES gate)
+        if: matrix.port == 'rust'
+        uses: dtolnay/rust-toolchain@nightly
+
+      - name: Cache cargo registry + target
+        if: matrix.port == 'rust'
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            signalwire-rust/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('signalwire-rust/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Install C++ toolchain + Python libclang bindings
+        # apt libclang-dev provides /usr/lib/x86_64-linux-gnu/libclang.so
+        # (symlink to libclang-NN.so.1). Pin the clang Python bindings to
+        # version 18 to match Ubuntu 24.04's libclang-18 system version,
+        # avoiding "undefined symbol" errors from version drift. Export
+        # the system .so via SW_LIBCLANG_PATH so the cpp enumerator's
+        # explicit-override branch finds it deterministically.
+        if: matrix.port == 'cpp'
+        run: |
+          sudo apt-get update
+          # libclang-18-dev (matches pinned pip clang==18.1.8). The
+          # libclang-dev metapackage may install libclang-16 on some
+          # runner images so be explicit.
+          sudo apt-get install -y cmake g++ libssl-dev libclang-18-dev
+          pip install 'clang==18.1.8'
+          SYS_LC=/usr/lib/x86_64-linux-gnu/libclang-18.so.1
+          test -f "$SYS_LC" || { echo "ERROR: $SYS_LC missing"; ls -la /usr/lib/x86_64-linux-gnu/libclang*; exit 1; }
+          echo "system libclang.so: $SYS_LC"
+          echo "SW_LIBCLANG_PATH=$SYS_LC" >> "$GITHUB_ENV"
+
+      - name: Set up .NET SDKs (net8.0 / net9.0 / net10.0)
+        # setup-dotnet@v4 puts dotnet on PATH so run-ci.sh's per-framework
+        # loop prefers the host install over docker (commit 2e4938a in
+        # signalwire-dotnet). enumerate_signatures.py also shells out to
+        # `dotnet run` for SignatureDump and resolves via shutil.which.
+        if: matrix.port == 'dotnet'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+            10.0.x
+
+      # ------------------------------------------------------------------
+      # The actual gate set: per-port run-ci.sh against this PR's porting-sdk
+      # ------------------------------------------------------------------
+      - name: Run CI gate script (TEST -> SIGNATURES -> DRIFT -> NO-CHEAT)
+        working-directory: signalwire-${{ matrix.port }}
+        env:
+          PORTING_SDK: ${{ github.workspace }}/porting-sdk
+        run: bash scripts/run-ci.sh

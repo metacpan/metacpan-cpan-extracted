@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.leave_room` (params). Extracted from switchblade `PublicCallLeaveRoomParams.cs`.",
+  "properties": {
+    "async": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "call_id": {
+      "type": "string"
+    },
+    "node_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id"
+  ],
+  "title": "calling.leave_room params",
+  "type": "object",
+  "x-method": "calling.leave_room",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallLeaveRoomParams.cs"
+}

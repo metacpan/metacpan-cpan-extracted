@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.record.pause` (params). Extracted from switchblade `PublicCallRecordPauseParams.cs`.",
+  "properties": {
+    "behavior": {
+      "type": "string"
+    },
+    "call_id": {
+      "type": "string"
+    },
+    "control_id": {
+      "type": "string"
+    },
+    "node_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id",
+    "control_id"
+  ],
+  "title": "calling.record.pause params",
+  "type": "object",
+  "x-method": "calling.record.pause",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallRecordPauseParams.cs"
+}

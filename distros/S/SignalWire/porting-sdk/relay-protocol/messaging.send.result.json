@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Permissive schema for the messaging.send RPC response. The message_id from the response is used to route subsequent messaging.state events.",
+  "properties": {
+    "code": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    },
+    "message_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "code",
+    "message_id"
+  ],
+  "title": "messaging.send result",
+  "type": "object",
+  "x-method": "messaging.send",
+  "x-phase": "result",
+  "x-source": "messaging-python",
+  "x-source-file": "signalwire/relay/client.py"
+}

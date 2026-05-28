@@ -1,0 +1,5 @@
+run = "perl -Ilib -MSignalWire -e 'print $SignalWire::VERSION'"
+entrypoint = "README.md"
+
+[nix]
+channel = "stable-24_05"

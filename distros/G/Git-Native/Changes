@@ -1,0 +1,32 @@
+Revision history for Git-Native
+
+0.003     2026-05-27 18:55:00Z
+  - New Git::Native::Config class - get_string / set_string / snapshot
+  - Repository: config (live), config_snapshot (read-only), and a
+    config_string($key) convenience that reads off a fresh snapshot
+  - Git::Native->reference_name_is_valid($name) - static refname
+    validator, no repository handle required
+
+0.002     2026-05-27 18:02:46Z
+  - Initial release
+  - Moo-based high-level wrapper around Git::Libgit2 / libgit2 — no
+    fork/exec, no XS
+  - Tests: Error throw/catch (t/11-error.t), Credential constructors
+    (t/35-credential.t), compile-check of all modules (t/00-load.t)
+  - Core classes: Repository, Reference, Config, Blob, Tree, TreeBuilder,
+    Commit, Signature, Oid, Object, Error (Throwable)
+  - Remote class with fetch/push, wildcard-push expansion (libgit2 quirk),
+    push --prune via connect+ls diff
+  - Credential class for SSH key/agent, HTTPS userpass, default, username
+  - General-purpose surface: clone (non-bare), Revwalker, Branch, Tag,
+    status, status_for_path
+  - Reference accessors/predicates: resolve, shorthand, symbolic_target,
+    is_branch/is_remote/is_tag, plus set_target / symbolic_set_target
+  - Repository HEAD surface: head, head_unborn, head_detached, set_head,
+    reference_symbolic_create; init(initial_branch => 'main') pins HEAD
+  - Commit accessors: summary, time (epoch), time_offset (minutes)
+  - RAII handle ownership via DESTROY -> git_*_free, child objects hold
+    strong ref to parent to prevent use-after-free
+  - All tests run with GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null
+    to avoid polluting the user's gitconfig
+  - Live SSH/HTTPS auth tests (opt-in via TEST_GIT_NATIVE_* env vars)

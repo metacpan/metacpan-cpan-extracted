@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.record.resume` (result). Extracted from switchblade `PublicCallRecordResumeResult.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "code": {
+      "type": "string"
+    },
+    "control_id": {
+      "type": "string"
+    },
+    "data": {},
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "code"
+  ],
+  "title": "calling.record.resume result",
+  "type": "object",
+  "x-method": "calling.record.resume",
+  "x-phase": "result",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallRecordResumeResult.cs"
+}

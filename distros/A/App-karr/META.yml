@@ -16,8 +16,119 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: App-karr
+provides:
+  App::karr:
+    file: lib/App/karr.pm
+    version: '0.300'
+  App::karr::ActivityLog:
+    file: lib/App/karr/ActivityLog.pm
+    version: '0.300'
+  App::karr::BoardStore:
+    file: lib/App/karr/BoardStore.pm
+    version: '0.300'
+  App::karr::Cmd::AgentName:
+    file: lib/App/karr/Cmd/AgentName.pm
+    version: '0.300'
+  App::karr::Cmd::Archive:
+    file: lib/App/karr/Cmd/Archive.pm
+    version: '0.300'
+  App::karr::Cmd::Backup:
+    file: lib/App/karr/Cmd/Backup.pm
+    version: '0.300'
+  App::karr::Cmd::Board:
+    file: lib/App/karr/Cmd/Board.pm
+    version: '0.300'
+  App::karr::Cmd::Config:
+    file: lib/App/karr/Cmd/Config.pm
+    version: '0.300'
+  App::karr::Cmd::Context:
+    file: lib/App/karr/Cmd/Context.pm
+    version: '0.300'
+  App::karr::Cmd::Create:
+    file: lib/App/karr/Cmd/Create.pm
+    version: '0.300'
+  App::karr::Cmd::Delete:
+    file: lib/App/karr/Cmd/Delete.pm
+    version: '0.300'
+  App::karr::Cmd::Destroy:
+    file: lib/App/karr/Cmd/Destroy.pm
+    version: '0.300'
+  App::karr::Cmd::Edit:
+    file: lib/App/karr/Cmd/Edit.pm
+    version: '0.300'
+  App::karr::Cmd::GetRefs:
+    file: lib/App/karr/Cmd/GetRefs.pm
+    version: '0.300'
+  App::karr::Cmd::Handoff:
+    file: lib/App/karr/Cmd/Handoff.pm
+    version: '0.300'
+  App::karr::Cmd::Init:
+    file: lib/App/karr/Cmd/Init.pm
+    version: '0.300'
+  App::karr::Cmd::List:
+    file: lib/App/karr/Cmd/List.pm
+    version: '0.300'
+  App::karr::Cmd::Log:
+    file: lib/App/karr/Cmd/Log.pm
+    version: '0.300'
+  App::karr::Cmd::Move:
+    file: lib/App/karr/Cmd/Move.pm
+    version: '0.300'
+  App::karr::Cmd::Pick:
+    file: lib/App/karr/Cmd/Pick.pm
+    version: '0.300'
+  App::karr::Cmd::Restore:
+    file: lib/App/karr/Cmd/Restore.pm
+    version: '0.300'
+  App::karr::Cmd::SetRefs:
+    file: lib/App/karr/Cmd/SetRefs.pm
+    version: '0.300'
+  App::karr::Cmd::Show:
+    file: lib/App/karr/Cmd/Show.pm
+    version: '0.300'
+  App::karr::Cmd::Skill:
+    file: lib/App/karr/Cmd/Skill.pm
+    version: '0.300'
+  App::karr::Cmd::Sync:
+    file: lib/App/karr/Cmd/Sync.pm
+    version: '0.300'
+  App::karr::Config:
+    file: lib/App/karr/Config.pm
+    version: '0.300'
+  App::karr::Foundation:
+    file: lib/App/karr/Foundation.pm
+    version: '0.300'
+  App::karr::Git:
+    file: lib/App/karr/Git.pm
+    version: '0.300'
+  App::karr::Lock:
+    file: lib/App/karr/Lock.pm
+    version: '0.300'
+  App::karr::Role::BoardAccess:
+    file: lib/App/karr/Role/BoardAccess.pm
+    version: '0.300'
+  App::karr::Role::BoardDiscovery:
+    file: lib/App/karr/Role/BoardDiscovery.pm
+    version: '0.300'
+  App::karr::Role::ClaimTimeout:
+    file: lib/App/karr/Role/ClaimTimeout.pm
+    version: '0.300'
+  App::karr::Role::Output:
+    file: lib/App/karr/Role/Output.pm
+    version: '0.300'
+  App::karr::Role::SyncLifecycle:
+    file: lib/App/karr/Role/SyncLifecycle.pm
+    version: '0.300'
+  App::karr::SyncGuard:
+    file: lib/App/karr/SyncGuard.pm
+    version: '0.300'
+  App::karr::Task:
+    file: lib/App/karr/Task.pm
+    version: '0.300'
 requires:
   File::ShareDir: '0'
+  Git::Libgit2: '0.004'
+  Git::Native: '0.003'
   JSON::MaybeXS: '0'
   Moo: '0'
   MooX::Cmd: '0'
@@ -26,6 +137,7 @@ requires:
   Term::ANSIColor: '0'
   Text::Table::Tiny: '0'
   Time::Piece: '0'
+  Try::Tiny: '0'
   YAML::XS: '0'
 resources:
   IRC: irc://irc.perl.org/#langertha
@@ -33,7 +145,7 @@ resources:
   bugtracker: https://github.com/Getty/karr/issues
   homepage: https://github.com/Getty/karr
   repository: https://github.com/Getty/karr.git
-version: '0.205'
+version: '0.300'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -120,6 +232,26 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::ChangesHasContent
       name: '@Author::GETTY/Test::ChangesHasContent'
       version: '0.011'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '6.037'
+          include_underscores: 0
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
+      name: '@Author::GETTY/MetaProvides::Package'
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@Author::GETTY/GithubMeta'
@@ -292,7 +424,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.205'
+          tag: '0.300'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -358,6 +490,10 @@ x_Dist_Zilla:
       version: '0.0008'
     -
       class: Dist::Zilla::Plugin::Docker::API
+      name: '@Author::GETTY/@Author::GETTY::Docker/Docker::API'
+      version: '0.103'
+    -
+      class: Dist::Zilla::Plugin::Docker::API
       name: runtime-root/Docker::API
       version: '0.103'
     -
@@ -403,6 +539,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
       version: '6.037'
   zilla:
     class: Dist::Zilla::Dist::Builder

@@ -1,0 +1,17 @@
+<%init>
+use JSON;
+
+$r->content_type('application/json; charset=utf-8');
+
+# Create new session, clearing old history
+my $new_id = time() . '-' . int(rand(100000));
+
+$session{'AIChat_session_id'} = $new_id;
+RT::Interface::Web::Session::Set( Key => 'AIChat_session_id', Value => $new_id );
+
+$session{'AIChat_history'} = [];
+RT::Interface::Web::Session::Set( Key => 'AIChat_history', Value => [] );
+
+$m->out( encode_json({ success => 1, session_id => $new_id }) );
+$m->abort();
+</%init>

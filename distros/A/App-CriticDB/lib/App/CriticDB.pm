@@ -6,8 +6,9 @@ use Carp qw/confess/;
 
 use App::CriticDB::Collector;
 use App::CriticDB::DB;
+use App::CriticDB::Report;
 
-our $VERSION='0.0.3';
+our $VERSION='0.0.4';
 
 sub new {
 	my ($ref,%opt)=@_;
@@ -44,13 +45,8 @@ sub collect {
 sub report {
 	my ($self,%opt)=@_;
 	$self->_load();
-	while(my ($fn,$record)=each %{$$self{db}{store}{file}}) {
-	foreach my $violation (@{$$record{violations}}) {
-		print sprintf("%s: %s at line %d, column %d.  (Severity: %d)\n"
-			,$fn
-			,@$violation{qw/desc line col sev/}
-			);
-	} }
+	my $report=App::CriticDB::Report->new(verbose=>$opt{verbose});
+	while(my $violation=$$self{db}->report()) { print $report->text($violation) }
 	return $self;
 }
 
@@ -66,7 +62,7 @@ App::CriticDB - Manage a database of Perl::Critic violations
 
 =head1 VERSION
 
-Version 0.0.3
+Version 0.0.4
 
 =head1 SYNOPSIS
 
@@ -76,6 +72,10 @@ Version 0.0.3
   );
   $criticdb->collect(pathspec, ...);
   $criticdb->report();
+
+Or called via commandline
+
+  perlcriticdb --file=filename.stor --profile=perlcritic.rc /path/to/files
 
 =head1 DESCRIPTION
 
@@ -101,9 +101,13 @@ Note that L<Data::Dumper> files can be useful for debugging purposes but are not
 
 =head1 REPORTING
 
-Currently only emits formatted violations to standard output, similar to C<perlcritic>.
+Output similar to C<perlcritic> can be produced by calling as
 
-More information and options coming soon.
+  $criticdb->report(verbose=>'... format ...')
+
+This supports both numeric and the string format specifiers from C<perlcritic>.
+
+Currently only reporting to STDOUT is supported.
 
 =head1 FILE UPDATES
 
@@ -129,19 +133,15 @@ DBD::*. Plain file input (such as the lines produced by perlcritic normally).
 
 =head2 Reporting
 
-Support for proper C<perlcritic> C<--format> strings.
-
 Support named-module hooks that handle each violation.  This will be useful for filename remapping, addition of org-specific data, and rerouting to metrics collectors.
 
 Behavior of "OK" files is not currently defined, as the datastore retains violations only.
 
 =head2 Commandline tool
 
-The script should support filter/selection similar to `perlcritic`, specifically severity selection and include/exclude.  File aggregation may also be useful, but should not be the default.  Suppose a --nodelete option to prevent removal of missing files.
+The script should support filter/selection similar to `perlcritic`, specifically severity selection and include/exclude.  File aggregation may also be useful, but should not be the default.  Support a --nodelete option to prevent removal of missing files.
 
-=head1 BUGS
-
-There may be issues with C<perlcritic --format>, which could affect the parser/collector and the reporting step.
+From the commandline, the profile must always be specified, which permits migration to new profiles.  In the common use case, however, the profile file should likely be retained in the datastore so subsequent execution can be performed without the explicit commandline argument.
 
 =head1 SEE ALSO
 

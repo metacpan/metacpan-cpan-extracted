@@ -1,3 +1,21 @@
+v0.07  2026-05-28Z
+    - Improved output of sf-to-html significantly
+    - Added new font attributes:
+        weight, slant, reverse_slant, last_modification, font_tag, font_name, icontext, and displaycolour
+    - Fixed add_default_aliases()
+    - Added import_attributes()
+    - Updated import_directory() to read font-attributes.txt, and alias-map.txt
+    - Added support for headers:
+        geometry hint, early hints, identity, displayinfo
+    - Addes support for analyse() in sf-merge
+    - Create more characters in make_up_glyphs()
+    - Updated dependencies
+    - Added --eigen-missing to sf-to-html
+    - Improved documentation
+    - Added import_hex() (imports Roman's .hex format)
+    - Fixed import_psf() with gzipped files
+    - Added --attribute to sf-merge
+
 v0.06  2026-02-24Z
     - Added support to import PSF 1 and 2 files
     - Improved HTML rendering in sf-to-html

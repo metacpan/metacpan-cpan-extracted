@@ -2,7 +2,7 @@ package DBIx::QuickORM::Dialect::MySQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
@@ -469,6 +469,14 @@ sub build_columns_from_db {
         $col->{nullable} = $self->_col_field_to_bool($res->{IS_NULLABLE});
 
         $col->{identity} = 1 if $res->{EXTRA} && $res->{EXTRA} eq 'auto_increment';
+
+        # Both MySQL (5.7+) and MariaDB (10.2+) populate GENERATION_EXPRESSION
+        # for stored/virtual GENERATED columns and leave it null/empty for
+        # ordinary columns. EXTRA strings vary between vendors and may include
+        # DEFAULT_GENERATED (a default expression, not a generated column), so
+        # GENERATION_EXPRESSION is the canonical signal.
+        $col->{generated} = 1
+            if defined($res->{GENERATION_EXPRESSION}) && length $res->{GENERATION_EXPRESSION};
 
         $col->{affinity} //= affinity_from_type($res->{DATA_TYPE});
         $col->{affinity} //= 'string'  if grep { $self->_col_field_to_bool($res->{$_}) } grep { m/CHARACTER/ } keys %$res;

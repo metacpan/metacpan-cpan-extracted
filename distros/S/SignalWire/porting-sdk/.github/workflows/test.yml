@@ -1,0 +1,88 @@
+name: Test
+
+# Smoke tests for porting-sdk's own audit machinery: the pytest suite
+# under tests/ exercises the mock_signalwire and mock_relay HTTP servers
+# plus the audit_coverage_smoke checks against a live signalwire-python
+# checkout. Without this gate, breakage in the mock harnesses or audit
+# scripts only surfaces when a downstream port repo runs a workflow that
+# imports them.
+#
+# Mirrors step 1 of scripts/run-cross-port-ci.sh:
+#     python3 -m pytest --import-mode=importlib \
+#         tests/mock_signalwire/ tests/mock_relay/ tests/audit_coverage_smoke.py
+#
+# Plus the relay-schema-sync check (step 2 of the aggregator).
+
+env:
+  # Opt into Node.js 24 ahead of GitHub's 2026-06-02 default switch.
+  # Without this, actions/setup-java@v4, setup-python@v5, gradle/actions, etc.
+  # log a deprecation warning on every run.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+on:
+  pull_request:
+    paths:
+      - "scripts/**"
+      - "test_harness/**"
+      - "tests/**"
+      - "rest-apis/**"
+      - "relay-protocol/**"
+      - "python_signatures.json"
+      - "python_surface.json"
+      - "type_aliases.yaml"
+      - "type_vocabulary.yaml"
+      - "surface_schema_v2.json"
+      - ".github/workflows/test.yml"
+  push:
+    branches:
+      - main
+  schedule:
+    # Nightly at 06:30 UTC — catches drift between mock harness deps
+    # and any upstream package the harnesses lean on.
+    - cron: "30 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out porting-sdk
+        uses: actions/checkout@v4
+
+      - name: Check out signalwire-python reference
+        # tests/audit_coverage_smoke.py walks signalwire-python; the relay
+        # schema check needs the python source too.
+        uses: actions/checkout@v4
+        with:
+          repository: signalwire/signalwire-python
+          path: signalwire-python
+          ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install signalwire-python (smoke tests import the SDK directly)
+        run: pip install -e ./signalwire-python
+
+      - name: Install mock harnesses + pytest
+        run: |
+          pip install -e ./test_harness/mock_relay
+          pip install -e ./test_harness/mock_signalwire
+          pip install pytest pytest-timeout requests websockets
+
+      - name: Run mock_signalwire / mock_relay / audit_coverage smoke tests
+        run: |
+          python3 -m pytest --import-mode=importlib \
+              tests/mock_signalwire/ \
+              tests/mock_relay/ \
+              tests/audit_coverage_smoke.py \
+              -v
+        env:
+          # audit_coverage_smoke walks the signalwire-python source
+          PYTHON_SDK: ${{ github.workspace }}/signalwire-python
+

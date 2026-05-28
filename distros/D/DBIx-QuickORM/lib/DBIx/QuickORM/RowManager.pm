@@ -2,7 +2,7 @@ package DBIx::QuickORM::RowManager;
 use strict;
 use warnings;
 
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 
 use Carp qw/confess croak/;
 use Scalar::Util qw/weaken/;
@@ -353,6 +353,13 @@ sub parse_params {
         my @pk_vals;
         confess "'fetched' is a required parameter" unless $fetched;
         confess "'$fetched' is not a valid fetched data set" unless ref($fetched) eq 'HASH';
+
+        # Rows come back keyed by database column name; restore ORM names so the
+        # rest of the row layer is uniformly ORM-keyed. field_orm_name is
+        # idempotent, so data that is already ORM-keyed is unaffected. Skip the
+        # rebuild entirely when the source has no aliased columns.
+        $fetched = $params->{fetched} = { map { $source->field_orm_name($_) => $fetched->{$_} } keys %$fetched }
+            if $source->source_has_aliases;
 
         if (my $pk_fields = $source->primary_key) {
             my @bad;

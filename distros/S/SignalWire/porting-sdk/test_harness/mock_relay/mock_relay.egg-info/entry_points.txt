@@ -1,0 +1,2 @@
+[console_scripts]
+mock-relay = mock_relay.cli:main

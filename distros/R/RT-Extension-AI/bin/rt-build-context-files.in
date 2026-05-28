@@ -1,0 +1,198 @@
+#!/usr/bin/env perl
+### before: #!@PERL@
+
+use strict;
+use warnings;
+
+package RT::AI::Build::Context::Run;
+
+BEGIN {
+### after:     use lib qw(@RT_LIB_PATH@);
+use lib '/opt/rt6/local/lib /opt/rt6/lib';
+use RT;
+RT::LoadConfig;
+RT::Init;
+}
+
+use RT::Extension::AI;
+use RT::Interface::CLI qw(Init);
+use File::Spec;
+use File::Path qw(make_path);
+use POSIX qw(strftime);
+
+my %OPT = (
+);
+
+Init(
+    \%OPT,
+    'debug',
+    'quiet',
+    'ticket-sql=s',
+    'output-file=s',
+    );
+
+unless ($OPT{'ticket-sql'}) {
+    print "\nProvide a TicketSQL query to select tickets for context\n";
+    exit 0;
+}
+
+__PACKAGE__->run(@ARGV) unless caller;
+
+sub run{
+    my ($class, @args) = @_;
+
+    print "Running ticket context builder\n";
+    print "TicketSQL: " . $OPT{'ticket-sql'} . "\n";
+
+    # Determine output file path
+    my $output_file = $OPT{'output-file'};
+    unless ($output_file) {
+        # Default to RT etc/ai/context directory with date-based filename
+        my $date_str = strftime("%Y-%m-%d", localtime);
+        my $default_dir = File::Spec->catdir($RT::EtcPath, 'ai', 'context');
+        $output_file = File::Spec->catfile($default_dir, "context-$date_str.txt");
+    }
+
+    # Extract directory from output file path
+    my ($volume, $dir, $filename) = File::Spec->splitpath($output_file);
+    my $output_dir = File::Spec->catpath($volume, $dir, '');
+
+    # If no directory specified, use current directory
+    if (!$output_dir || $output_dir eq '') {
+        $output_dir = '.';
+    }
+
+    # Create directory if it doesn't exist
+    unless (-d $output_dir) {
+        eval { make_path($output_dir); };
+        if ($@) {
+            print STDERR "Error creating output directory '$output_dir': $@\n";
+            exit 1;
+        }
+    }
+
+    # Test if we can write to the directory
+    unless (-w $output_dir) {
+        print STDERR "Cannot write to output directory: $output_dir\n";
+        exit 1;
+    }
+
+    print "Output file: $output_file\n\n";
+
+    # Open output file for writing
+    open my $output_fh, '>', $output_file
+        or die "Cannot open output file '$output_file' for writing: $!\n";
+
+    # Create RT::Tickets collection
+    my $tickets = RT::Tickets->new(RT->SystemUser);
+
+    # Execute the provided TicketSQL query
+    my ($ok, $msg) = $tickets->FromSQL($OPT{'ticket-sql'});
+    unless ($ok) {
+        print STDERR "Error parsing TicketSQL: $msg\n";
+        close $output_fh;
+        exit 1;
+    }
+
+    # Display results and write to file
+    my $count = $tickets->Count;
+    print "Found $count tickets matching the query\n";
+    print $output_fh "RT Ticket Context Export\n";
+    print $output_fh "Generated: " . strftime("%Y-%m-%d %H:%M:%S", localtime) . "\n";
+    print $output_fh "TicketSQL: " . $OPT{'ticket-sql'} . "\n";
+    print $output_fh "Total Tickets: $count\n\n";
+
+    if ($count > 0) {
+        print "\nWriting ticket conversations to $output_file...\n";
+
+        while (my $ticket = $tickets->Next) {
+            print $output_fh "<Ticket>\n";
+            printf $output_fh "<!-- Ticket ID: %d, Subject: %s, Status: %s, Queue: %s -->\n",
+                $ticket->Id,
+                $ticket->Subject || '(no subject)',
+                $ticket->Status,
+                $ticket->QueueObj->Name;
+
+            # Generate formatted conversation using the centralized function
+            my $conversation = RT::Extension::AI::GenerateTicketSummary(
+                TicketObj => $ticket,
+                TransactionType => 'Correspond',
+                IncludeCreate => 1
+            );
+
+            if ($conversation) {
+                print $output_fh $conversation;
+            }
+
+            print $output_fh "</Ticket>\n\n";
+        }
+    }
+
+    close $output_fh;
+    print "Context file written successfully to: $output_file\n";
+
+    return;
+}
+
+
+1;
+
+__END__
+
+=head1 NAME
+
+rt-build-context-files - Extract RT ticket conversations for AI context processing
+
+=head1 SYNOPSIS
+
+    rt-build-context-files --ticket-sql "Queue = 'General' AND Status = 'open'" [OPTIONS]
+
+    rt-build-context-files --ticket-sql "id = 144" --output-file "contexts/ticket-144.txt"
+
+    rt-build-context-files --ticket-sql "Created > '1 month ago'" --output-file "recent-tickets.xml"
+
+=head1 DESCRIPTION
+
+This script extracts ticket conversations from RT (Request Tracker) and formats them as
+AI-ready context files. It processes Create and Correspond transactions from tickets
+matching the provided TicketSQL query and outputs structured XML containing the complete
+conversation history.
+
+The output format is optimized for AI systems to generate contextually appropriate
+response suggestions. Each ticket's conversation is presented chronologically with user
+anonymization and privilege information to help AI understand the context and
+generate appropriate responses.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--ticket-sql> QUERY
+
+Required. A TicketSQL query string that selects which tickets to process.
+Examples:
+
+    --ticket-sql "Queue = 'Support' AND Status != 'resolved'"
+    --ticket-sql "id = 123 OR id = 456"
+    --ticket-sql "Created > '2024-01-01' AND Owner = 'alice'"
+
+=item B<--output-file> PATH
+
+Optional. Specifies the output file path. If not provided, defaults to
+"context-YYYY-MM-DD.txt" in "$RT::EtcPath/ai/context/". The script will create
+any necessary parent directories.
+
+Examples:
+
+    --output-file "/opt/rt6/etc/ai/context/support-tickets.xml"
+    --output-file "/tmp/ticket-export.txt"
+
+=item B<--debug>
+
+Optional. Enable debug output for troubleshooting.
+
+=item B<--quiet>
+
+Optional. Suppress non-error output messages.
+
+=back

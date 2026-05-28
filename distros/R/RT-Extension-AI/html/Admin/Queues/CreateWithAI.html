@@ -1,0 +1,137 @@
+<& /Admin/Elements/Header, Title => loc('Create Queue with AI') &>
+<& /Elements/Tabs &>
+<& /Elements/ListActions, actions => \@results &>
+
+<div class="mx-auto max-width-lg">
+% if ( $enabled ) {
+<&| /Widgets/TitleBox, title => loc('AI Queue Creation Assistant'), content_class => 'p-0' &>
+
+<div id="ai-chat-container"
+     data-user-avatar="<% $user_avatar_html |h %>"
+     data-ai-avatar="<% $ai_avatar_html |h %>">
+  <div id="ai-chat-messages" class="ai-chat-messages p-3 border rounded">
+% if ( @$history ) {
+%   # Render the welcome message first, then the stored conversation
+    <div class="d-flex mb-2 align-items-start gap-2">
+      <% $ai_avatar_html |n %>
+      <div class="ai-chat-message-content bg-body-secondary border rounded-3 py-2 px-3">
+        <% loc("Hello! I'm here to help you set up a new queue. Tell me about the work your team handles. What kind of requests come in, and how does your team process them?") %>
+      </div>
+    </div>
+%   for my $entry ( @$history ) {
+%     if ( $entry->{role} eq 'user' ) {
+    <div class="d-flex mb-2 align-items-start gap-2 flex-row-reverse">
+      <div class="flex-shrink-0"><% $user_avatar_html |n %></div>
+      <div class="ai-chat-message-content bg-primary text-white rounded-3 py-2 px-3"><% $entry->{content} |h %></div>
+    </div>
+%     } else {
+    <div class="d-flex mb-2 align-items-start gap-2">
+      <div class="flex-shrink-0"><% $ai_avatar_html |n %></div>
+      <div class="ai-chat-message-content bg-body-secondary border rounded-3 py-2 px-3"><% $entry->{content} |h %></div>
+    </div>
+%     }
+%   }
+% } else {
+    <div class="d-flex mb-2 align-items-start gap-2">
+      <% $ai_avatar_html |n %>
+      <div class="ai-chat-message-content bg-body-secondary border rounded-3 py-2 px-3">
+        <% loc("Hello! I'm here to help you set up a new queue. Tell me about the work your team handles. What kind of requests come in, and how does your team process them?") %>
+      </div>
+    </div>
+% }
+  </div>
+
+  <div id="ai-chat-apply-section" style="display: none;">
+    <div class="border-bottom p-3">
+      <h6 class="text-muted mb-2"><% loc('Review Configuration') %></h6>
+      <div id="ai-chat-initialdata-preview" class="bg-body-secondary border rounded p-3 mb-2">
+      </div>
+      <div class="mb-2">
+        <a class="small text-decoration-none" data-bs-toggle="collapse" href="#ai-chat-raw-json" role="button" aria-expanded="false" aria-controls="ai-chat-raw-json">
+          <% loc('Show raw JSON') %> &#9662;
+        </a>
+        <div class="collapse mt-2" id="ai-chat-raw-json">
+          <pre class="bg-body-secondary border rounded p-2 small" style="max-height: 300px; overflow: auto;"><code id="ai-chat-raw-json-content"></code></pre>
+        </div>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <button id="ai-chat-apply" class="btn btn-primary btn-sm" type="button">
+          <% loc('Create Queue') %>
+        </button>
+        <span class="text-muted small"><% loc('or reply below to request changes') %></span>
+      </div>
+      <div id="ai-chat-apply-results" class="mt-2" style="display: none;">
+      </div>
+    </div>
+  </div>
+
+  <div class="p-3">
+    <div class="input-group">
+      <textarea id="ai-chat-input" class="form-control" rows="2"
+                placeholder="<% loc('Describe your workflow...') %>"
+                aria-label="<% loc('Chat message') %>"
+                style="resize: none;"></textarea>
+      <button id="ai-chat-send" class="btn btn-primary" type="button">
+        <% loc('Send') %>
+      </button>
+    </div>
+  </div>
+</div>
+
+</&>
+
+<input type="hidden" id="ai-chat-session-id" value="<% $session_id %>" />
+% } else {
+<div class="alert alert-info">
+  <% loc("The AI queue creation assistant is not enabled. To enable it, set [_1] in your AI provider configuration.", 'queue_creation_assistant => 1') %>
+</div>
+% }
+</div>
+
+<%init>
+my @results;
+
+my $config = RT->Config->Get('RT_AI_Provider');
+my $default_config = $config ? ( $config->{Default} || {} ) : {};
+my $enabled = $default_config->{queue_creation_assistant} ? 1 : 0;
+
+my $session_id = '';
+my $user_avatar_html = '';
+my $ai_avatar_html = '';
+my $history = [];
+
+if ( $enabled ) {
+    # Start a new chat if requested via ?new=1, then redirect to clean URL
+    if ( $ARGS{new} ) {
+        my $new_id = time() . '-' . int(rand(100000));
+        $session{'AIChat_session_id'} = $new_id;
+        RT::Interface::Web::Session::Set( Key => 'AIChat_session_id', Value => $new_id );
+        $session{'AIChat_history'} = [];
+        RT::Interface::Web::Session::Set( Key => 'AIChat_history', Value => [] );
+        RT::Interface::Web::Redirect( RT->Config->Get('WebURL') . 'Admin/Queues/CreateWithAI.html' );
+    }
+    else {
+        $session_id = $session{'AIChat_session_id'} || '';
+        unless ( $session_id ) {
+            $session_id = time() . '-' . int(rand(100000));
+            $session{'AIChat_session_id'} = $session_id;
+            RT::Interface::Web::Session::Set( Key => 'AIChat_session_id', Value => $session_id );
+            $session{'AIChat_history'} = [];
+            RT::Interface::Web::Session::Set( Key => 'AIChat_history', Value => [] );
+        }
+    }
+    $history = $session{'AIChat_history'} || [];
+
+    # User avatar — RT picks uploaded image or initials fallback
+    my $user = $session{CurrentUser}->UserObj;
+    $user_avatar_html = $m->scomp('/Elements/ShowUser',
+        User              => $user,
+        ShowOnlyUserAvatar => 1,
+        Link              => 0,
+        ShowPopover       => 0,
+    );
+
+    # AI avatar
+    $ai_avatar_html = '<span class="rt-user-avatar ai-chat-ai-avatar rounded d-inline-flex align-items-center justify-content-center rt-blue rt-user-privileged">AI</span>';
+}
+</%init>

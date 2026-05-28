@@ -17,7 +17,12 @@ BEGIN
     our $IS_SUPPORTED = 1;
     if( !Module::Generic::SharedMem->supported ||
         # Some smokers do not have share memory, so running this test is useless
-        ( $ENV{PERL_CR_SMOKER_CURRENT} && $Config{osname} eq 'freebsd' ) )
+        ( $ENV{PERL_CR_SMOKER_CURRENT} && $Config{osname} eq 'freebsd' ) ||
+        # Cygwin only emulates SysV IPC, and that emulation requires the cygserver
+        # daemon to be running. Without it, shared memory operations partially fail
+        # rather than being cleanly unavailable, which produces spurious failures.
+        # We skip on Cygwin; this can be revisited once cygserver detection is added.
+        $^O =~ /^cygwin$/i )
     {
         # plan skip_all => 'IPC::SysV not supported on this system';
         $IS_SUPPORTED = 0;

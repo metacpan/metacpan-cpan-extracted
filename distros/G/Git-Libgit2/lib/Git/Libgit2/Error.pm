@@ -1,6 +1,7 @@
 # ABSTRACT: Wraps git_error_last() into a Perl structure
 
 package Git::Libgit2::Error;
+our $VERSION = '0.002';
 use strict;
 use warnings;
 use FFI::Platypus 2.00;
@@ -28,6 +29,7 @@ sub _decode {
   return ( $msg, 0 );
 }
 
+
 sub last {
   my ( $class, $rc ) = @_;
   $rc //= -1;
@@ -41,9 +43,15 @@ sub last {
   }, $class;
 }
 
+
 sub code    { $_[0]->{code} }
+
+
 sub klass   { $_[0]->{klass} }
+
+
 sub message { $_[0]->{message} }
+
 
 sub stringify {
   my $self = shift;
@@ -69,7 +77,7 @@ Git::Libgit2::Error - Wraps git_error_last() into a Perl structure
 
 =head1 VERSION
 
-version 0.001
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -80,8 +88,47 @@ version 0.001
 
 =head1 DESCRIPTION
 
-Plain object with C<code>, C<klass>, C<message>. Stringifies via overload.
-Used by L<Git::Native> to construct typed exceptions.
+Error object wrapping libgit2's thread-local C<git_error_last>. Provides
+C<code>, C<klass>, and C<message> accessors. Stringifies to a human-readable
+message via overload. Used by L<Git::Native> to construct typed exceptions.
+
+=head2 last
+
+    die Git::Libgit2::Error->last($rc);
+
+Construct an error object from libgit2's current thread-local error state
+(C<git_error_last>). C<$rc> is the return code that triggered the lookup and
+defaults to C<-1>. Always returns a blessed object, even when libgit2 reports
+no error — C<message> is then C<< <no error> >>.
+
+=head2 code
+
+    my $rc = $error->code;
+
+The libgit2 return code that triggered this error.
+
+=head2 klass
+
+    my $klass = $error->klass;
+
+The libgit2 error class (C<git_error_t> category). Currently always C<0> — the
+C<klass> field is not yet decoded from the C<git_error> struct.
+
+=head2 message
+
+    my $msg = $error->message;
+
+The human-readable libgit2 error message, or C<< <no error> >> when libgit2
+reported none.
+
+=head2 stringify
+
+    my $str = $error->stringify;
+    print "$error";   # same, via overloaded stringification
+
+Format the error as C<"libgit2 error CODE (klass KLASS): MESSAGE">. Also wired
+up as the C<""> overload, so the object stringifies to this in interpolation
+and when thrown.
 
 =head1 SUPPORT
 

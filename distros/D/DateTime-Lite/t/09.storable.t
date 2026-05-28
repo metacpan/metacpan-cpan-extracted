@@ -75,7 +75,26 @@ subtest 'Non-UTC timezone round-trip' => sub
 # NOTE: TO_JSON
 subtest 'TO_JSON' => sub
 {
-    require JSON;
+    my $json_class;
+    if( eval{ require Cpanel::JSON::XS; 1 } )
+    {
+        $json_class = 'Cpanel::JSON::XS';
+    }
+    elsif( eval{ require JSON::XS; 1 } )
+    {
+        $json_class = 'JSON::XS';
+    }
+    elsif( eval{ require JSON::PP; 1 } )
+    {
+        $json_class = 'JSON::PP';
+    }
+    else
+    {
+        require JSON;
+        $json_class = 'JSON';
+    }
+    diag( "Using $json_class for JSON encoding test" );
+
     my $dt = DateTime::Lite->new(
         year      => 2026,
         month     => 4,
@@ -86,7 +105,7 @@ subtest 'TO_JSON' => sub
         time_zone => 'UTC',
     );
     is( $dt->TO_JSON, '2026-04-03T14:30:45', 'TO_JSON() returns ISO 8601 string' );
-    my $json = JSON->new->convert_blessed(1)->encode($dt);
+    my $json = $json_class->new->convert_blessed(1)->encode($dt);
     is( $json, '"2026-04-03T14:30:45"', 'JSON encoder uses TO_JSON()' );
 };
 

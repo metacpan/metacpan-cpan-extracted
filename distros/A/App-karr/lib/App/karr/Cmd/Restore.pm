@@ -1,7 +1,7 @@
 # ABSTRACT: Restore the ref-backed karr board from YAML
 
 package App::karr::Cmd::Restore;
-our $VERSION = '0.205';
+our $VERSION = '0.300';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -80,7 +80,7 @@ App::karr::Cmd::Restore - Restore the ref-backed karr board from YAML
 
 =head1 VERSION
 
-version 0.205
+version 0.300
 
 =head1 SYNOPSIS
 

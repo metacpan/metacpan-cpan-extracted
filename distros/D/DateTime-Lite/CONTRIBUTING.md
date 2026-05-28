@@ -1,7 +1,7 @@
 ## How to contribute
  
 Thank you for considering contributing to this distribution.
-I welcome any contribution to DateTime::Lite::TimeZone, including, but not limited to bug reports, feature requests, general comments, and patches.
+I welcome any contribution to DateTime::Lite, including, but not limited to bug reports, feature requests, general comments, and patches.
 
 Feel free to clone it from its gitlab repository at <https://gitlab.com/jackdeguest/DateTime-Lite> and issue a pull request.
 
@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://gitlab.com/jackde
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/DateTime-Lite-TimeZone-v0.5.7/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/DateTime-Lite-v0.7.1/README.md)
 
 ## Author
 

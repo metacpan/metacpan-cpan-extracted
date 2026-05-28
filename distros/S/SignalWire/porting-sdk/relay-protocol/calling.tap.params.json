@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.tap` (params). Extracted from switchblade `PublicCallTapParams.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "control_id": {
+      "type": "string"
+    },
+    "device": {
+      "additionalProperties": true,
+      "properties": {
+        "params": {},
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
+    "node_id": {
+      "type": "string"
+    },
+    "tap": {
+      "additionalProperties": true,
+      "properties": {
+        "params": {
+          "type": "object"
+        },
+        "type": {}
+      },
+      "required": [
+        "type",
+        "params"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id",
+    "control_id",
+    "tap",
+    "device"
+  ],
+  "title": "calling.tap params",
+  "type": "object",
+  "x-method": "calling.tap",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallTapParams.cs"
+}

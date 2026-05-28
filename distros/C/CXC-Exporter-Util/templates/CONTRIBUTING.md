@@ -1,6 +1,6 @@
 CONTRIBUTING
 ============
- 
+
 Thanks for considering contributing to this distribution.
 
 (Please note that numbers in square brackets, for example `[0]` refer to references
@@ -20,7 +20,6 @@ more welcome.
 
     my $vcs = $dist->distmeta->{resources}{repository}{type};
 
-
 if ((my $link = $repo ) =~ /github/) { <<~EOF
    The public repository for this code is managed with $vcs and is hosted at GitHub.
    It is available via the web at:
@@ -31,8 +30,8 @@ if ((my $link = $repo ) =~ /github/) { <<~EOF
    changes to your clone, and then submitting a pull request. Detailed
    instructions for doing that is available here:
 
-     https://help.github.com/
-     https://help.github.com/articles/creating-a-pull-request
+       https://help.github.com/
+       https://help.github.com/articles/creating-a-pull-request
    EOF
 }
 
@@ -46,16 +45,30 @@ elsif ((my $link = $repo ) =~ /gitlab/) { <<~EOF
    changes to your clone, and then submitting a merge request. Detailed
    instructions for doing that is available here:
 
-     https://docs.gitlab.com/ee/user
-     https://docs.gitlab.com/ee/user/project/merge_requests/getting_started.html
+       https://docs.gitlab.com/ee/user
+       https://docs.gitlab.com/ee/user/project/merge_requests/getting_started.html
    EOF
 }
 
+elsif ((my $link = $repo ) =~ /codeberg/) { <<~EOF
+   The public repository for this code is managed with $vcs and is hosted at Codeberg.
+   It is available via the web at:
+
+     $repo
+
+   You can submit code changes by forking the repository, pushing your code
+   changes to your clone, and then submitting a merge request. Detailed
+   instructions for doing that is available here:
+
+       https://docs.codeberg.org/
+       https://docs.codeberg.org/collaborating/pull-requests-and-git-flow/
+   EOF
+}
 else { <<~EOF
 
   The public repository for this code is managed with $vcs and is found here:
 
-      $repo 
+      $repo
   EOF
 }
 
@@ -72,14 +85,14 @@ Dependencies for this module are recorded in the `META.json` file.
 Installation is most easily done with `cpanminus`[1], which can be
 made available locally via:
 
-  $ curl -L https://cpanmin.us/ -o cpanm
-  $ chmod +x cpanm
+    $ curl -L https://cpanmin.us/ -o cpanm
+    $ chmod +x cpanm
 
 To install the dependencies into a local directory (to avoid polluting
 your Perl distribution),
 
-  $ export PERL5LIB=${PERL5LIB}:$PWD/local
-  $ cpanm -l local --installdeps --with-recommends --with-develop .
+    $ export PERL5LIB=${PERL5LIB}:$PWD/local
+    $ cpanm -l local --installdeps --with-recommends --with-develop .
 
 This installs the dependencies into the `./local` directory.  Be sure
 to clean up the PERL5LIB environment variable when you are done!
@@ -96,41 +109,41 @@ is in your `PERL5LIB` path.
 
 Then, as usual,
 
-  $ perl Build.PL
-  $ ./Build
-  $ ./Build test
+    $ perl Build.PL
+    $ ./Build
+    $ ./Build test
 
 Working with Dist::Zilla
 ------------------------
- 
+
 `Dist::Zilla` is a tool whose flexibility is derived from a wide range
 of plugins.  The first step is to install `Dist::Zilla` itself:
 
-  $ cpanm Dist::Zilla
+    $ cpanm Dist::Zilla
 
 Then, install the plugins that this module requires.  In this example
 they are stored locally, to avoid polluting your Perl distribution.
 If you haven't already done so, add the local directory to your
 `PERL5LIB` path:
 
-  $ export PERL5LIB=${PERL5LIB}:$PWD/local
-  $ dzil authordeps --missing | cpanm -l local
+    $ export PERL5LIB=${PERL5LIB}:$PWD/local
+    $ dzil authordeps --missing | cpanm -l local
 
 You should then also install any additional requirements not needed by the
 dzil build but may be needed by tests or other development:
- 
-  $ dzil listdeps --author --missing | cpanm -l local
-  $ dzil listdeps --develop --missing | cpanm -l local
-  $ cpanm -l local --installdeps --with-develop .
- 
+
+    $ dzil listdeps --author --missing | cpanm -l local
+    $ dzil listdeps --develop --missing | cpanm -l local
+    $ cpanm -l local --installdeps --with-develop .
+
 Once installed, here are some dzil commands you might try:
- 
-  $ dzil build
-  $ dzil test
-  $ dzil xtest
- 
+
+    $ dzil build
+    $ dzil test
+    $ dzil xtest
+
 You can learn more about `Dist::Zilla` at http://dzil.org/.
- 
+
 Submitting Patches
 ------------------
 
@@ -141,7 +154,7 @@ Submitting Bug Reports
 ----------------------
 
 If you have found a bug, but do not have an accompanying patch to fix it, you
-can submit an issue report 
+can submit an issue report
 
 {{ my ( $what, @where );
    if ( $what = $dist->distmeta->{resources}{bugtracker}{web} ) {
@@ -156,7 +169,6 @@ can submit an issue report
    join( "\n\nor ", @where );
 }}
 
-
 Idiosyncracies
 --------------
 
@@ -165,11 +177,9 @@ Idiosyncracies
 
 * Modify `templates/CONTRIBUTING.md` to change `CONTRIBUTING.md`
 
-
 References
 ==========
 
 [0] http://dzil.org/.
 
 [1] https://github.com/miyagawa/cpanminus
- 

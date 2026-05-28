@@ -1,0 +1,214 @@
+% $r->content_type('application/json; charset=utf-8');
+% $m->out($output);
+% $m->abort();
+<%ARGS>
+$naturalLanguageQuery => ''
+</%ARGS>
+<%INIT>
+use JSON;
+
+my $output = '';
+my $result = { success => 0, query => '', format => '', message => '' };
+
+# Create a named block for easy exit on error conditions
+PROCESS: {
+    # Get the AI provider configuration
+    my $all_configs = RT->Config->Get('RT_AI_Provider');
+    my $config;
+    my $config_name;
+
+    # First, try to find 'Default' configuration
+    if ($all_configs->{Default}) {
+        $config = $all_configs->{Default};
+        $config_name = 'Default';
+        RT->Logger->debug("Using 'Default' AI provider configuration");
+    }
+
+    # If no Default, search for any configuration with generate_ticketsql prompt
+    unless ($config) {
+        for my $name (keys %$all_configs) {
+            if ($all_configs->{$name}{prompts} && $all_configs->{$name}{prompts}{generate_ticketsql}) {
+                $config = $all_configs->{$name};
+                $config_name = $name;
+                RT->Logger->debug("Using '$name' AI provider configuration (first found with generate_ticketsql)");
+                last;
+            }
+        }
+    }
+
+    unless ($config) {
+        RT->Logger->error("No AI provider configuration found with generate_ticketsql prompt");
+        $result->{message} = "AI provider not configured";
+        last PROCESS;
+    }
+
+    # Check if we have a prompt for generate_ticketsql
+    my $prompt = $config->{prompts}{generate_ticketsql};
+    unless ($prompt) {
+        RT->Logger->error("No generate_ticketsql prompt configured in '$config_name'");
+        $result->{message} = "generate_ticketsql prompt not configured";
+        last PROCESS;
+    }
+
+    # Read the TicketSQL grammar file from RT
+    my $ticketsql_grammar = '';
+    for my $dir ( $RT::LocalEtcPath, $RT::EtcPath ) {
+        my $ticketsql_grammar_file = "$dir/ai/syntax/ticketsql_grammar.md";
+        if ( -f $ticketsql_grammar_file && -r $ticketsql_grammar_file ) {
+            if ( open my $fh, '<', $ticketsql_grammar_file ) {
+                local $/;
+                $ticketsql_grammar = <$fh>;
+                close $fh;
+                RT->Logger->debug("Successfully loaded TicketSQL grammar file from: $ticketsql_grammar_file");
+                last;
+            }
+            else {
+                RT->Logger->error("Could not read TicketSQL grammar file: $!");
+            }
+        }
+        elsif ( $dir eq $RT::EtcPath ) {
+            RT->Logger->error("TicketSQL grammar file not found at: $ticketsql_grammar_file");
+        }
+    }
+
+    unless ($ticketsql_grammar) {
+        RT->Logger->error("TicketSQL grammar content is empty");
+        $result->{message} = "TicketSQL grammar not available";
+        last PROCESS;
+    }
+
+    # Read the Format grammar file from RT
+    my $format_grammar = '';
+
+    for my $dir ( $RT::LocalEtcPath, $RT::EtcPath ) {
+        my $format_grammar_file = "$dir/ai/syntax/format_grammar.md";
+        if ( -f $format_grammar_file && -r $format_grammar_file ) {
+            if ( open my $fh, '<', $format_grammar_file ) {
+                local $/;
+                $format_grammar = <$fh>;
+                close $fh;
+                RT->Logger->debug("Successfully loaded Format grammar file from: $format_grammar_file");
+                last;
+            }
+            else {
+                RT->Logger->warning("Could not read Format grammar file: $!");
+            }
+        }
+        elsif ( $dir eq $RT::EtcPath ) {
+            RT->Logger->warning("Format grammar file not found at: $format_grammar_file");
+        }
+    }
+
+    # Build the full prompt with both grammars
+    my $full_prompt = <<"END_PROMPT";
+$prompt
+
+# TicketSQL Grammar Reference
+
+$ticketsql_grammar
+
+END_PROMPT
+
+    # Add Format grammar if available
+    if ($format_grammar) {
+        $full_prompt .= <<"END_FORMAT_GRAMMAR";
+
+# Format Grammar Reference
+
+$format_grammar
+
+END_FORMAT_GRAMMAR
+    }
+
+    # The prompt for the expected response format is inline below because the
+    # code expects a specific JSON structure. If set in the configuration file,
+    # users might unintentionally change the response format and break the code
+    # parsing the response.
+    $full_prompt .= <<"END_REQUEST";
+
+# User Request
+
+$naturalLanguageQuery
+
+# Response Format
+
+You MUST respond with valid JSON in this exact format (no markdown, no explanation):
+{"query": "YOUR_TICKETSQL_QUERY", "format": "YOUR_FORMAT_STRING", "message": "Brief explanation of what the search does"}
+
+The "query" field contains the TicketSQL query.
+The "format" field contains the Format string for displaying results. Use the Format Grammar Reference above to construct an appropriate format based on what the user wants to see. If the user doesn't specify display preferences, use a sensible default format with clickable ID and Subject links.
+The "message" field contains a brief (1-2 sentence) explanation of what tickets will be found and what columns will be displayed.
+END_REQUEST
+
+    # Initialize the AI provider
+    my $provider_class = "RT::Extension::AI::Provider::" . $config->{name};
+    my $provider_instance = $provider_class->new(config => $config);
+
+    # Process the request
+    my $response = $provider_instance->process_request(
+        prompt       => $full_prompt,
+        raw_text     => '',  # The query is in the prompt
+        model_config => $config->{default_model},
+    );
+
+    if ($response->{success}) {
+        my $ai_response = $response->{result};
+
+        # Try to parse as JSON
+        my $parsed;
+        eval {
+            # Remove markdown code blocks if present
+            $ai_response =~ s/```json\s*//g;
+            $ai_response =~ s/```\s*//g;
+            $ai_response =~ s/^\s+|\s+$//g;
+
+            RT->Logger->debug("AI response after cleanup: $ai_response");
+
+            $parsed = JSON::decode_json($ai_response);
+        };
+
+        # Use default format when AI doesn't provide one
+        my $user_prefs = $session{'CurrentUser'}->UserObj->Preferences("SearchDisplay") || {};
+        my $default_search_format = $user_prefs->{'Format'}  || RT->Config->Get('DefaultSearchResultFormat');
+
+        if ($@ || !$parsed) {
+            RT->Logger->warning("AI response was not valid JSON, attempting to extract TicketSQL. Error: $@");
+            RT->Logger->debug("Failed to parse as JSON, raw response was: $ai_response");
+
+            # Fallback: try to extract TicketSQL the old way
+            my $ticketsql = $ai_response;
+            $ticketsql =~ s/```ticketsql\s*//g;
+            $ticketsql =~ s/```\s*//g;
+            $ticketsql =~ s/^\s+|\s+$//g;
+
+            # If multiline, find the query line
+            if ($ticketsql =~ /\n/) {
+                my @lines = split /\n/, $ticketsql;
+                for my $line (@lines) {
+                    next if $line =~ /^\s*$/;
+                    next if $line =~ /^(here|this|the|note|explanation|search)/i;
+                    if ($line =~ /(Queue|Status|Owner|Priority|Subject|Created|Due|Requestor|Content)\s*[=!<>]|AND|OR/i) {
+                        $ticketsql = $line;
+                        last;
+                    }
+                }
+            }
+
+            $result->{success} = 1;
+            $result->{query} = $ticketsql;
+            $result->{format} = $default_search_format;
+            $result->{message} = "Search generated (using default display format)";
+        } else {
+            $result->{success} = 1;
+            $result->{query} = $parsed->{query} // '';
+            $result->{format} = $parsed->{format} // $default_search_format;
+            $result->{message} = $parsed->{message} // '';
+        }
+    } else {
+        RT->Logger->error("AI request failed: " . $response->{error});
+        $result->{message} = $response->{error} || "Unknown error";
+    }
+}
+
+$output = JSON::encode_json($result);
+</%INIT>

@@ -13,6 +13,7 @@ use v5.16;
 use Carp;
 use Fcntl qw(SEEK_SET);
 use Getopt::Long;
+use Unicode::UCD;
 use SIRTX::Font;
 use Template;
 use URI;
@@ -31,6 +32,7 @@ my %config = (
     show_found      => 1,
     show_missing    => [],
     also_missing    => [],
+    eigen_missing   => undef,
 );
 
 {
@@ -44,6 +46,7 @@ my %config = (
     $opts{'show-found!'}        = \$config{show_found};
     $opts{'show-missing=s@'}    = \$config{show_missing};
     $opts{'also-missing=s@'}    = \$config{also_missing};
+    $opts{'eigen-missing!'}     = \$config{eigen_missing};
 
     $opts{'help|h'} = sub {
         printf("Usage: %s [OPTIONS] -o output.html --font=input.sf\n", $0);
@@ -73,6 +76,17 @@ if (defined $config{output}) {
     my %rows;
     my %missing_counts;
     my %extra_attributes;
+    my $example;
+
+    eval {
+        my $img = $font->render("The quick brown fox jumps over the lazy dog!\nFranz jagt im komplett verwahrlosten Taxi quer durch Bayern.");
+        my $uri = URI->new('data:');
+
+        $uri->media_type('image/png');
+        $uri->data($img->ImageToBlob(magick => 'png'));
+
+        $example = $uri;
+    };
 
     if ($config{show_found}) {
         foreach my $codepoint (keys %{$font->{chars}}) { # TODO: FIXME! Internal API!
@@ -88,17 +102,18 @@ if (defined $config{output}) {
     }
 
     foreach my $list (@{$config{show_missing}}) {
-        $missing_counts{$list} //= 0;
+        $missing_counts{$list} //= $font->list_info($list);
+        $missing_counts{$list}{missing} //= 0;
 
         foreach my $codepoint ($font->missing_codepoints_from($list)) {
             my $cp = build_codepoint($codepoint => \%rows);
             $cp->{classes} = 'missing';
             push(@{$cp->{missing_in} //= []}, $list);
-            $missing_counts{$list}++;
+            $missing_counts{$list}{missing}++;
         }
     }
     foreach my $list (@{$config{also_missing}}) {
-        $missing_counts{'also-missing'} //= 0;
+        $missing_counts{'also-missing'} //= {characters => 0, missing => 0};
         foreach my $codepoint_pair (split /(?:\s*,\s*|\s+)/, $list) {
             my ($start, $end);
 
@@ -111,20 +126,83 @@ if (defined $config{output}) {
             $end //= $start;
             for (my $codepoint = $start; $codepoint <= $end; $codepoint++) {
                 my $cp = build_codepoint($codepoint => \%rows);
+                $missing_counts{'also-missing'}{characters}++;
                 unless (defined $cp->{uri}) {
                     $cp->{classes} = 'missing';
-                    $missing_counts{'also-missing'}++;
+                    $missing_counts{'also-missing'}{missing}++;
                 }
             }
         }
     }
+    if ($config{eigen_missing}) {
+        my $counts = $missing_counts{'eigen-missing'} //= {characters => 0, missing => 0};
+        my $str = '';
+        my %chars;
+
+        eval { $str .= $font->get_attribute('font_name') };
+        eval { $str .= $font->get_attribute('font_tag')->uuid };
+
+        eval { $chars{$font->get_attribute('icontext')} = undef };
+
+        $chars{ord $_} = undef foreach split //, $str;
+
+        foreach my $codepoint (keys %chars) {
+            my $cp = build_codepoint($codepoint => \%rows);
+            $counts->{characters}++;
+            unless (defined $cp->{uri}) {
+                $cp->{classes} = 'missing';
+                $counts->{missing}++;
+            }
+        }
+    }
+    foreach my $list (values %missing_counts) {
+        $list->{found}      = $list->{characters} - $list->{missing};
+        $list->{found_pc}   = sprintf('%.1f%%', 100 * $list->{found}   / $list->{characters});
+        $list->{missing_pc} = sprintf('%.1f%%', 100 * $list->{missing} / $list->{characters});
+    }
 
     foreach my $key ($font->list_attributes) {
         my $v = eval {$font->get_attribute($key)} // next;
+        my $as_string;
+        my $entry;
 
         next if $key eq 'height' || $key eq 'width' || $key eq 'bits'; # handled specifically
 
-        $extra_attributes{$key} = $v;
+        $entry = $extra_attributes{$key} = {
+            value => $v,
+        };
+
+        if ($key eq 'reverse_slant') {
+            $as_string = $v ? 'true' : 'false';
+        } elsif ($key eq 'icontext') {
+            $as_string = sprintf('U+%04X "%s"', $v, chr($v));
+            $entry->{anchor} = sprintf('#U+%04X', $v);
+        } elsif (ref $v) {
+            if (eval {$v->isa('SIRTX::Datecode')}) {
+                $as_string = $v->iso8601;
+            } elsif (eval {$v->isa('Data::Identifier')}) {
+                $as_string = $v->ise;
+
+                if (defined(my $generator = $v->generator(default => undef, no_defaults => 1)) && defined(my $request = $v->request(default => undef, no_defaults => 1))) {
+                    if ($generator->eq('55febcc4-6655-4397-ae3d-2353b5856b34')) {
+                        $entry->{rgb} = $request;
+                    }
+                }
+            }
+        }
+
+        eval {
+            my $img = $font->render($as_string // $v);
+            my $uri = URI->new('data:');
+
+            $uri->media_type('image/png');
+            $uri->data($img->ImageToBlob(magick => 'png'));
+
+            $entry->{as_img} = $uri;
+        };
+
+        $entry->{as_string} = $as_string // $v;
+
     }
 
     open(my $out, '>:utf8', $config{output}) or croak 'Cannot open output: '.$config{output};
@@ -138,12 +216,16 @@ if (defined $config{output}) {
                 glyphs => scalar($font->glyphs),
                 scale => $font->height <= 16 ? 2 : undef,
             },
+            example => $example,
             missing_counts => \%missing_counts,
             missing_counts_keys => [sort keys %missing_counts],
             rows => [sort {$a->{first} <=> $b->{first}} values %rows],
             extra_attributes => \%extra_attributes,
             extra_attributes_keys => [sort keys %extra_attributes],
             attribute_names => \%_attribute_names,
+            ucd => {
+                version => scalar(Unicode::UCD::UnicodeVersion()),
+            },
     }, $out);
 }
 
@@ -164,7 +246,7 @@ __DATA__
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Character list</title>
+        <title>Font Information[% IF extra_attributes.font_name %] for "[% extra_attributes.font_name.as_string | html %]"[% END %]</title>
         <meta charset="utf-8">
         <style>
 :root {
@@ -197,9 +279,13 @@ td, th:not([colspan]) {
     text-align: left;
 }
 
-td:hover {
+#character-table td:hover {
     scale: 2;
     outline: 1px solid black;
+}
+
+.numbercell {
+    text-align: right;
 }
 
 .sf img {
@@ -211,6 +297,26 @@ td:hover {
     padding: 1px;
     margin: 3px;
 }
+.example img {
+    scale: 1 !important;
+}
+span.example img {
+    margin: 0 3px;
+[% IF extra_attributes.baseline %]
+    vertical-align: baseline;
+    margin-bottom: -[% (info.height - extra_attributes.baseline.value + 1) | html %]px;
+[% ELSE %]
+    vertical-align: bottom;
+[% END %]
+}
+
+.colour-chip {
+    display: inline-block;
+    border: 2px outset black;
+    border-radius: 5px;
+    width: 1em;
+    height: 1em;
+}
 
 .char {
     font-size: 150%;
@@ -218,6 +324,10 @@ td:hover {
 
 .name, .utf8, .missing-in {
     font-size: 50%;
+}
+
+.nobr {
+    white-space: pre;
 }
 
 .charinfo {
@@ -233,7 +343,7 @@ td:hover {
 .missing {
     background-color: #FFC0C0;
 }
-:target {
+#character-table :target {
     background-color: #C0C0FF;
 }
 .nonprint {
@@ -247,7 +357,7 @@ td:hover {
         </style>
     </head>
     <body>
-        <h1>Font Information</h1>
+        <h1 id="top">Font Information[% IF extra_attributes.font_name %] for "[% extra_attributes.font_name.as_string | html %]"[% END %]</h1>
         <table>
             <tr>
                 <th>Key</th>
@@ -274,30 +384,47 @@ td:hover {
                 <th colspan="2">Extra attributes</th>
             </tr>
             [% FOREACH key IN extra_attributes_keys %]
+            [% attr = extra_attributes.$key %]
             <tr>
                 <th>[% IF attribute_names.$key %][% attribute_names.$key | html %][% ELSE %]<code>[% key | html %]</code>[% END %]</th>
-                <td>[% extra_attributes.$key | html %]</td>
+                <td>
+                [% attr.as_string | html %]
+                [% IF attr.as_img %]<span class="sf example"><img src="[% attr.as_img | html %]"></span>[% END %]
+                [% IF attr.rgb %][<span class="colour-chip" style="background-color: [% attr.rgb | html %]">&nbsp;</span> [% attr.rgb | html %]][% END %]
+                [% IF attr.anchor %]<a href="[% attr.anchor | html %]">&#10515;</a>[% END %]
+                </td>
             </tr>
             [% END %]
             [% END %]
         </table>
         [% IF missing_counts_keys.0 %]
-        <h2>Missing counts</h2>
+        <h2 id="missing">Missing counts</h2>
         <table>
             <tr>
                 <th>List</th>
-                <th>Count</th>
+                <th>Total</th>
+                <th>Found</th>
+                <th>Missing</th>
+                <th>Progress</th>
             </tr>
             [% FOREACH key IN missing_counts_keys %]
+            [% list = missing_counts.$key %]
             <tr>
                 <th>[% key | html %]</th>
-                <td>[% missing_counts.$key | html %]</td>
+                <td class="numbercell">[% list.characters | html %]</td>
+                <td class="numbercell">[% list.found | html %] ([% list.found_pc | html %])</td>
+                <td class="numbercell">[% list.missing | html %] ([% list.missing_pc | html %])</td>
+                <td><progress value="[% list.found | html %]" max="[% list.characters | html %]"></td>
             </tr>
             [% END %]
         </table>
         [% END %]
-        <h2>Character list</h2>
-        <table>
+        [% IF example %]
+        <h2 id="example">Example</h2>
+        <div class="sf example"><img src="[% example | html %]"></div>
+        [% END %]
+        <h2 id="characters">Character list</h2>
+        <table id="character-table">
             <tr>
                 <th>&nbsp;</th>
                 [% FOREACH x IN [0..15] %]
@@ -317,7 +444,7 @@ td:hover {
                         [% IF cp.uri %]<div class="sf"><img src="[% cp.uri | html %]"></div>[% END %]
                         <div class="utf8">"[% cp.as_utf8 | html %]"</div>
                         <div class="name">[% cp.name | html %]</div>
-                        [% IF cp.missing_in %]<div class="missing-in">[% FOREACH list IN cp.missing_in %][% list | html %] [% END %]</div>[% END %]
+                        [% IF cp.missing_in %]<div class="missing-in">[% FOREACH list IN cp.missing_in %]<span class="nobr">[% list | html %]</span> [% END %]</div>[% END %]
                     </a>
                 </td>
                 [% ELSE %]
@@ -327,5 +454,6 @@ td:hover {
             </tr>
             [% END %]
         </table>
+        <p>Generated using UCD version <code>[% ucd.version | html %]</code>.</p>
     </body>
 </html>

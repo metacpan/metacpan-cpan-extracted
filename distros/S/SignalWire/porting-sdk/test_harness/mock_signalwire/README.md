@@ -1,0 +1,130 @@
+# mock-signalwire
+
+A schema-driven mock SignalWire REST API server. Loads the 13 OpenAPI specs
+under `porting-sdk/rest-apis/` and synthesizes responses from them. The same
+server is the REST test backend for every language port of the SignalWire SDK
+(Python, Go, TypeScript, Java, PHP, Ruby, Perl, Rust, C++).
+
+## Why
+
+We have nine SDK ports. Without a shared mock, each port re-implements its own
+HTTP test fixture using the local language's mocking libraries (`requests-mock`,
+`nock`, `httpmock`, etc.). That means nine different fixtures going stale at
+nine different rates — which, when the API changes, results in nine different
+flavours of "looks like it works."
+
+Instead, we run one mock HTTP server. Every port's REST tests point at it.
+The OpenAPI specs are the single source of truth.
+
+## Install
+
+```bash
+cd porting-sdk/test_harness/mock_signalwire
+pip install -e .
+```
+
+This installs the `mock-signalwire` console script and the `mock_signalwire`
+Python package.
+
+## Run
+
+```bash
+mock-signalwire
+# or
+python -m mock_signalwire
+```
+
+By default it binds `127.0.0.1:8765`. Override with flags or environment:
+
+```bash
+mock-signalwire --host 0.0.0.0 --port 9000
+MOCK_SIGNALWIRE_PORT=9000 mock-signalwire
+```
+
+`--spec-root` overrides the location of the OpenAPI specs (default:
+`porting-sdk/rest-apis/`).
+
+## Use from a test
+
+Any HTTP client, in any language, that points at `http://localhost:8765` and
+sends `Authorization: Basic <base64(project:token)>` will get a synthesized
+JSON response.
+
+For Python:
+
+```python
+from mock_signalwire import MockServer
+
+srv = MockServer(port=8765).start()
+try:
+    import requests
+    r = requests.get(
+        f"{srv.url}/api/laml/2010-04-01/Accounts",
+        auth=("test_proj", "test_tok"),
+    )
+    assert r.status_code == 200
+    assert "accounts" in r.json()
+finally:
+    srv.stop()
+```
+
+## Control plane
+
+A handful of `/__mock__/*` endpoints let tests interact with the server:
+
+| Method  | Path                                  | Purpose                                                      |
+|---------|---------------------------------------|--------------------------------------------------------------|
+| `GET`   | `/__mock__/health`                    | `{"status": "ok", "specs_loaded": 13, ...}`                  |
+| `GET`   | `/__mock__/journal`                   | List of every recorded request                               |
+| `POST`  | `/__mock__/journal/reset`             | Clear the journal                                            |
+| `GET`   | `/__mock__/scenarios`                 | Active scenario overrides                                    |
+| `POST`  | `/__mock__/scenarios/<endpoint_id>`   | Push one override; consumed on next matching request         |
+| `POST`  | `/__mock__/scenarios/reset`           | Clear all overrides                                          |
+
+`endpoint_id` is `<spec>.<operationId>` when the spec defines one, otherwise
+`<METHOD>.<path_template>`.
+
+The journal is a 1000-entry ring buffer. Scenarios are FIFO consume-once: push
+one override, the next matching request returns it, and the route reverts to
+default. Push N overrides, get N consume-once responses.
+
+## What it actually does
+
+1. **Loads specs at startup** — every `openapi.yaml` under `rest-apis/` (or
+   `--spec-root`). Spec load errors don't crash the server; they're surfaced
+   in `/__mock__/health`.
+2. **Builds a route table** — `(METHOD, path_template) -> RouteEntry`. The
+   path template is the spec's server-URL prefix joined with the operation
+   path: a `compatibility` spec path of `/Accounts/{AccountSid}` becomes
+   `/api/laml/2010-04-01/Accounts/{AccountSid}`.
+3. **Routes incoming requests** — strict matches first (no `{...}`),
+   templated matches second, ranked by literal-segment count.
+4. **Authenticates** — every non-`/__mock__/*` request needs `Authorization:
+   Basic <base64(project:token)>` with non-empty fields. Missing/malformed
+   auth returns 401 + `{"errors": [{"code": "AUTH_REQUIRED", ...}]}`.
+5. **Synthesizes the response body** — preference order:
+   1. `responses[2xx].content[application/json].example`
+   2. First entry of `.examples`
+   3. Schema's own `example` / `examples[0]`
+   4. Walk the schema, emit deterministic synthetic values
+6. **Substitutes path params in the body** — if the path was
+   `/Accounts/AC123` and the response body contains `"sid": "{AccountSid}"`,
+   it becomes `"sid": "AC123"`.
+
+Synthesized strings/numbers/dates use fixed deterministic values
+(`00000000-0000-4000-8000-000000000000` for UUIDs, `2024-01-01T00:00:00Z`
+for date-times, etc.) so tests can pin to specific values when the spec
+doesn't supply an example.
+
+## Caveats
+
+- **Auth is open by design.** Any non-empty project + token pair is accepted;
+  the mock doesn't validate them against anything. If you need to test 401
+  handling, push a 401 scenario.
+- **`Content-Type` is always `application/json`** for synthesized responses.
+  Endpoints that produce TwiML or binary in the real API will need scenario
+  overrides.
+- **No HTTPS.** Real clients pointing at `https://localhost:...` will fail.
+  Configure your client to use `http://`.
+- **`Location` header on 201** is best-effort. Set it via a scenario if you
+  need a specific value.

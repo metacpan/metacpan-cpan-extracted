@@ -16,7 +16,9 @@ my @files = (
     't/bugs/backcompat.t',
     't/constants.t',
     't/lib/My/Test/Utils.pm',
-    't/types.t'
+    't/regressions/ui_helpers_single_constant.t',
+    't/types.t',
+    't/ui_helpers.t'
 );
 
 notabs_ok($_) foreach @files;

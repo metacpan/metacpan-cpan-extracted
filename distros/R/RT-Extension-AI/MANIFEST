@@ -1,15 +1,24 @@
+bin/rt-build-context-files.in
 Changes
+etc/ai/prompts/create-queue.md
 etc/initialdata
 etc/RTExtensionAI_Config.pm
+html/Admin/Queues/CreateWithAI.html
 html/AI/AdjustToneForm
 html/AI/ModalContent
 html/AI/SuggestionForm
 html/AI/TranslateForm
 html/Callbacks/RT-Extension-AI/Elements/JavascriptConfig/Data
+html/Callbacks/RT-Extension-AI/Elements/Tabs/Privileged
+html/Callbacks/RT-Extension-AI/Search/Edit.html/BeforeQuery
 html/Callbacks/RT-Extension-AI/Ticket/Create.html/FormStart
 html/Callbacks/RT-Extension-AI/Ticket/Update.html/FormStart
 html/Callbacks/RT-Extension-AI/Ticket/Widgets/Create/Message/AfterMessageBox
 html/Elements/AIJavascriptConfig
+html/Helpers/AIChat/ApplyInitialdata
+html/Helpers/AIChat/NewSession
+html/Helpers/AIChat/SendMessage
+html/Helpers/AISearch/GenerateTicketSQL
 html/Helpers/AISuggestion/ProcessAIRequest
 html/Helpers/AISuggestion/ShowModal
 inc/Module/Install.pm
@@ -22,6 +31,7 @@ inc/Module/Install/Metadata.pm
 inc/Module/Install/ReadmeFromPod.pm
 inc/Module/Install/RTx.pm
 inc/Module/Install/RTx/Runtime.pm
+inc/Module/Install/Substitute.pm
 inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 inc/YAML/Tiny.pm
@@ -43,10 +53,11 @@ README
 src/aiUtils.js
 src/index.js
 src/modalUtils.js
+src/naturalLanguageSearch.js
 src/rtextensionai.js
 src/suggestion.js
 static/css/rt-extension-ai.css
+static/js/ai-chat.js
 static/js/rt-extension-ai.js
 theme/icons/ai-icon.svg
 vite.config.js
-SIGNATURE                                Public-key signature (added by MakeMaker)

@@ -1,5 +1,10 @@
 Revision history for Data::Heap::Shared
 
+0.04  2026-05-27
+    - Cap capacity at UINT32_MAX; (uint32_t) cast in capacity check
+      no longer silently truncates oversized files
+    - heap_setup closes backing fd on calloc OOM (memfd/dup leak fix)
+
 0.03  2026-04-26
     - memfd sealing + factored validate header
     - stale-mutex wake; stat recoveries uint64 t

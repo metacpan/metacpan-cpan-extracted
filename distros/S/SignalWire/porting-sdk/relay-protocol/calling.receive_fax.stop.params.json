@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.receive_fax.stop` (params). Extracted from switchblade `PublicCallReceiveFaxStopParams.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "control_id": {
+      "type": "string"
+    },
+    "node_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id",
+    "control_id"
+  ],
+  "title": "calling.receive_fax.stop params",
+  "type": "object",
+  "x-method": "calling.receive_fax.stop",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallReceiveFaxStopParams.cs"
+}

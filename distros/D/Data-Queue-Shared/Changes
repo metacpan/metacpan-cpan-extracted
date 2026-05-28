@@ -1,5 +1,13 @@
 Revision history for Data-Queue-Shared
 
+0.04  2026-05-27
+    - *_wait: fix missed-wakeup race (announce waiter before sampling seq)
+    - batch ops (push_multi/pop_multi/drain) wake N waiters, not 1
+    - pop_multi caps requested count at capacity (bound malloc, avoid
+      size_t overflow on adversarial input)
+    - eventfd_set no longer closes caller-supplied fds
+
+
 0.03  2026-04-26
     - create: init under flock; mutex recovery wakes 1
     - queue str clear wakes all producers/consumers

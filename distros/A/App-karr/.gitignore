@@ -28,6 +28,11 @@ AGENTS.md
 
 # karr materialized task view — never commit
 tasks/
+# karr-foundation per-repo state files — local machine only, never commit
+.karr
+.karr.state
+.karr.lock
+.karr.log
 
 App-karr-*
 *.bak

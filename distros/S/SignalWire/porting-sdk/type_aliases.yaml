@@ -1,0 +1,348 @@
+# type_aliases.yaml
+#
+# Cross-language type alias table. Each per-port adapter consumes its native
+# language's types and translates them to the canonical vocabulary
+# (type_vocabulary.yaml). This file documents every documented mapping so
+# diff_port_signatures.py knows that, e.g., .NET's `String` and Python's
+# `str` are the same canonical type and shouldn't fail the diff.
+#
+# Starter table — populated for the types the SignalWire SDK actually uses
+# in its Python reference. Grows during Phase 2+ when each port's adapter
+# encounters native types not yet in the table. New entries require:
+#   - The native type name as the adapter sees it.
+#   - The canonical type from type_vocabulary.yaml.
+#   - A one-line rationale.
+#
+# An adapter that encounters a native type with no entry here MUST fail
+# loudly (per ADAPTER_CONTRACT.md). Do NOT silently fall back to `any`.
+
+version: "1"
+
+# Each entry maps "<lang>.<native_type_pattern>" -> canonical type.
+# native_type_pattern uses the form the language tool emits, not the
+# source-level form (e.g. for .NET, the System.Reflection FullName).
+
+aliases:
+
+  # ----- Python (reference; mostly identity) -----
+  python:
+    str: string
+    int: int
+    float: float
+    bool: bool
+    bytes: bytes
+    None: void                    # only when used as a return-type annotation
+    NoneType: void                # equivalent
+    datetime.datetime: datetime
+    typing.Any: any
+    builtins.str: string
+    builtins.int: int
+    builtins.float: float
+    builtins.bool: bool
+    builtins.bytes: bytes
+    # Bare unparameterized generics (PEP 585 — `dict` instead of `Dict`).
+    # Modern Python source uses these as type annotations meaning "any
+    # dict / list / etc." with no element constraints.
+    dict: "dict<any,any>"
+    list: "list<any>"
+    tuple: "tuple<any>"
+    set: "list<any>"
+    frozenset: "list<any>"
+    type: "any"
+    object: any
+    datetime: datetime              # bare alias when source uses ``import datetime; def f(x: datetime)``
+    "...": any                      # Ellipsis literal in annotations (``Tuple[int, ...]`` etc.)
+    Ellipsis: any
+
+  # ----- .NET (System.Reflection FullName) -----
+  dotnet:
+    System.String: string
+    System.Int32: int
+    System.Int64: int
+    System.Double: float
+    System.Single: float
+    System.Boolean: bool
+    System.Byte[]: bytes
+    System.DateTime: datetime
+    System.DateTimeOffset: datetime
+    System.Object: any            # plain object as type annotation = any
+    System.Void: void
+    string: string                # short forms emitted by some adapter paths
+    int: int
+    long: int
+    bool: bool
+    # Bare Task with no generic args = async procedure → void.
+    # Generic Task<T> is unwrapped to T inside translate_dotnet_type.
+    System.Threading.Tasks.Task: void
+    System.Threading.Tasks.ValueTask: void
+    System.Threading.CancellationToken: any
+    System.Uri: string
+    System.Net.Http.HttpClient: any
+    System.Exception: any                      # exception types are out-of-band; treat as any
+    System.Text.Json.JsonElement: any          # dynamic JSON value
+    System.Text.Json.JsonNode: any
+    System.Text.Json.JsonObject: "dict<string,any>"
+    System.Text.Json.JsonArray: "list<any>"
+    System.Net.IPAddress: any                  # IP-address value (test-only helper)
+    # IAsyncEnumerator<T> is the async enumerator type returned by
+    # GetAsyncEnumerator(); inside generic translation we unwrap to its
+    # element type (matches Python iterator/generator yielding T).
+    System.Collections.Generic.IAsyncEnumerator: any
+
+  # ----- Java -----
+  java:
+    java.lang.String: string
+    java.lang.CharSequence: string
+    java.lang.Integer: int
+    int: int
+    long: int
+    short: int
+    byte: int
+    char: string                       # canonical Java char represents one code point; map to string
+    java.lang.Long: int
+    java.lang.Short: int
+    java.lang.Byte: int
+    java.lang.Character: string
+    java.lang.Double: float
+    double: float
+    float: float
+    java.lang.Float: float
+    java.lang.Boolean: bool
+    boolean: bool
+    "byte[]": bytes
+    java.time.Instant: datetime
+    java.time.OffsetDateTime: datetime
+    java.time.LocalDateTime: datetime
+    java.lang.Object: any
+    java.lang.Class: any               # ClassLiteral / type token; not in Python
+    "java.lang.Class<?>": any
+    java.lang.Throwable: any           # exception types — out-of-band, not part of Python signatures
+    java.lang.Exception: any
+    java.lang.RuntimeException: any
+    "?": any                           # unbounded wildcard
+    com.google.gson.JsonObject: any    # internal JSON dynamic value
+    com.google.gson.JsonElement: any
+    com.google.gson.JsonArray: "list<any>"
+    void: void
+    java.lang.Void: void
+    # JDK built-in HTTP server types — used by the Java port's framework
+    # adapters (AgentServer, AgentBase) for request/response plumbing.
+    # The Python reference uses framework-agnostic abstractions so these
+    # always erase to `any` for cross-port comparison.
+    com.sun.net.httpserver.HttpExchange: any
+    com.sun.net.httpserver.HttpServer: any
+    # Servlet API (javax.servlet, Servlet 4.x). Used by the WebhookFilter
+    # adapter; Python's reference middleware uses FastAPI Request/Response,
+    # which also erase to `any` cross-port.
+    javax.servlet.Filter: any
+    javax.servlet.FilterChain: any
+    javax.servlet.FilterConfig: any
+    javax.servlet.ServletRequest: any
+    javax.servlet.ServletResponse: any
+    javax.servlet.ServletInputStream: any
+    javax.servlet.http.HttpServletRequest: any
+    javax.servlet.http.HttpServletResponse: any
+    javax.servlet.http.HttpServletRequestWrapper: any
+    # java.io types occasionally surface as parameter / return types on
+    # filter wrappers (BufferedReader, InputStream, etc.) and should erase
+    # to `any` for cross-port comparison.
+    java.io.BufferedReader: any
+    java.io.InputStream: any
+    java.io.OutputStream: any
+
+  # ----- TypeScript (api-extractor TypeReference / canonicalReference form) -----
+  typescript:
+    string: string
+    number: float                 # JavaScript number → canonical float (JSON safe int range OK; widen later if SDK needs distinct int)
+    boolean: bool
+    Uint8Array: bytes
+    Buffer: bytes
+    Date: datetime
+    "any": any
+    "unknown": any
+    void: void
+    null: void                    # only as a return type; otherwise use optional<T>
+    undefined: void
+    object: "dict<string,any>"
+    Object: "dict<string,any>"
+    Function: "callable<list<any>,any>"
+    RegExp: string
+    URL: string
+    Error: any
+    Response: any                 # Web Response — third-party / non-SDK
+    Request: any                  # Web Request — third-party / non-SDK
+    Hono: any                     # third-party HTTP framework type used internally by TS port
+
+  # ----- Rust (rustdoc-types resolved type names) -----
+  rust:
+    "&str": string
+    str: string                       # primitive str (rustdoc-json emits the bare primitive name)
+    String: string
+    "alloc::string::String": string
+    "std::string::String": string
+    i8: int
+    i16: int
+    i32: int
+    i64: int
+    i128: int
+    isize: int
+    u8: int
+    u16: int
+    u32: int
+    u64: int
+    u128: int
+    usize: int
+    f32: float
+    f64: float
+    bool: bool
+    char: string                      # single Unicode scalar; canonical "string"
+    "Vec<u8>": bytes
+    "&[u8]": bytes
+    "()": void
+    never: any                        # `!` — rustdoc emits as "never"
+    PathBuf: string
+    Path: string
+    "std::path::PathBuf": string
+    "std::path::Path": string
+    OsString: string
+    "std::ffi::OsString": string
+    "std::ffi::OsStr": string
+    "std::time::Duration": int
+    "std::time::SystemTime": datetime
+    "chrono::DateTime": datetime
+    "serde_json::Value": any
+    "serde_json::Map": "dict<string,any>"
+    # rustdoc-json emits the full module path; serde_json's Map lives in
+    # the ``serde_json::map`` submodule, so alias both spellings.
+    "serde_json::map::Map": "dict<string,any>"
+    Map: "dict<string,any>"
+
+  # ----- Go (go/types / apidiff canonical names) -----
+  go:
+    string: string
+    int: int
+    int32: int
+    int64: int
+    uint: int
+    uint32: int
+    uint64: int
+    float32: float
+    float64: float
+    bool: bool
+    byte: int
+    rune: int
+    "[]byte": bytes
+    "time.Time": datetime
+    "time.Duration": int
+    "interface{}": any
+    "any": any
+    error: any                # Go's built-in error interface; out-of-band, not part of Python signatures
+    "context.Context": any    # context cancellation channel; not in Python public API
+    # SchemaUtils ValidationResult — Go-side struct that wraps the
+    # ``(bool, []string)`` return of ValidateVerb / ValidateDocument so
+    # the cross-language audit sees Python's canonical
+    # ``tuple<bool,list<string>>`` return shape.
+    ValidationResult: "tuple<bool,list<string>>"
+    "swml.ValidationResult": "tuple<bool,list<string>>"
+
+    # Fabric resource subtypes — Go uses thin type aliases over the generic
+    # CrudResource / CrudWithAddresses / AutoMaterializedWebhookResource so
+    # cross-language audits see the same class names Python emits.
+    FabricResource: "class:signalwire.rest.namespaces.fabric.FabricResource"
+    FabricResourcePUT: "class:signalwire.rest.namespaces.fabric.FabricResourcePUT"
+    SwmlWebhooksResource: "class:signalwire.rest.namespaces.fabric.SwmlWebhooksResource"
+    CxmlWebhooksResource: "class:signalwire.rest.namespaces.fabric.CxmlWebhooksResource"
+
+  # ----- PHP (phpDocumentor/Reflection FQSEN form) -----
+  php:
+    string: string
+    int: int
+    float: float
+    bool: bool
+    "string|null": "optional<string>"   # adapter emits the canonical form directly when seeing nullable
+    array: any                          # bare 'array' type — narrow to dict<...> / list<...> if PHPdoc disambiguates
+    object: any
+    void: void
+    null: void
+    DateTime: datetime
+    "DateTimeImmutable": datetime
+    mixed: any                          # PHP 8.0+ pseudo-type
+    iterable: "list<any>"
+    callable: "callable<list<any>,any>"
+    Closure: "callable<list<any>,any>"
+    self: any                           # fluent-API return; same-class reference erased to any (handled by PORT_SIGNATURE_OMISSIONS)
+    static: any
+    parent: any
+    "true": bool                        # PHP 8.2 literal-true / literal-false types
+    "false": bool
+    Throwable: any
+    Exception: any
+    "RuntimeException": any
+    "InvalidArgumentException": any
+    Stringable: string
+
+  # ----- Ruby (Method#parameters returns symbols, types from yard/rbs) -----
+  ruby:
+    String: string
+    Integer: int
+    Fixnum: int               # legacy
+    Bignum: int               # legacy
+    Float: float
+    TrueClass: bool
+    FalseClass: bool
+    "TrueClass | FalseClass": bool
+    Hash: any                 # bare Hash; adapter should disambiguate to dict<...> via yard/rbs annotations
+    Array: any
+    NilClass: void
+    Time: datetime
+    DateTime: datetime
+    Object: any
+
+  # ----- Perl (Type::Tiny constraint names from Types::Standard) -----
+  perl:
+    Str: string
+    Int: int
+    Num: float
+    Bool: bool
+    HashRef: any              # bare HashRef; adapter should consume parameterized HashRef[T] when present
+    ArrayRef: any
+    CodeRef: "callable<list<any>,any>"
+    Undef: void
+    Defined: any
+
+  # ----- C++ (clang canonical type spelling) -----
+  cpp:
+    "std::string": string
+    "const std::string&": string
+    "char const*": string
+    "const char*": string
+    # std::string_view — non-owning view of a string. Treated as the
+    # same canonical type as std::string for cross-language signature
+    # matching (Python's ``str`` covers both).
+    "std::string_view": string
+    "std::basic_string_view<char>": string
+    "const std::string_view&": string
+    # ``std::basic_string<char>`` is the canonical (typedef-expanded)
+    # form of ``std::string``; libclang reports this when we ask for
+    # canonical types via ``Type::get_canonical()``.
+    "std::basic_string<char>": string
+    "std::basic_string<char, std::char_traits<char>, std::allocator<char>>": string
+    int: int
+    "std::int32_t": int
+    "std::int64_t": int
+    long: int
+    double: float
+    float: float
+    bool: bool
+    "std::vector<std::uint8_t>": bytes
+    "std::chrono::system_clock::time_point": datetime
+    void: void
+    # nlohmann::json — opaque JSON-shape type (mirrors Rust's
+    # ``serde_json::Value``).  libclang sometimes resolves the bare
+    # ``json`` typedef to ``int`` when the include path doesn't expose
+    # the upstream definition; alias both spellings so set_param /
+    # set_global_data / set_prompt_pom etc. translate as ``any``.
+    "nlohmann::json": any
+    "nlohmann::basic_json<>": any
+    "nlohmann::basic_json": any
+    json: any

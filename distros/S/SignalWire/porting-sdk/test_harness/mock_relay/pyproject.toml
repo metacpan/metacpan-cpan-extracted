@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mock-relay"
+version = "0.1.0"
+description = "Schema-driven mock SignalWire RELAY WebSocket server. Shared test backend for every SignalWire SDK port."
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+authors = [
+  { name = "SignalWire SDK Porting Team", email = "support@signalwire.com" },
+]
+
+# Pinned versions — the mock server is a test artefact, not a library
+# dependency, so we want reproducible installs.
+dependencies = [
+  "starlette==0.46.2",
+  "uvicorn==0.34.2",
+  "websockets>=13",
+  "jsonschema>=4.20",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8",
+  "pytest-asyncio>=0.23",
+  "requests>=2.31",
+]
+
+[project.scripts]
+mock-relay = "mock_relay.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["mock_relay*"]
+
+[tool.setuptools.package-data]
+mock_relay = ["py.typed"]

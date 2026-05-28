@@ -1,0 +1,395 @@
+openapi: 3.1.0
+info:
+  title: Project API
+  version: 1.0.0
+  contact:
+    name: SignalWire
+    url: https://support.signalwire.com/portal/en/newticket?departmentId=1029313000000006907&layoutId=1029313000000074011
+    email: support@signalwire.com
+  license:
+    name: MIT
+    url: https://github.com/signalwire/docs/blob/main/LICENSE
+  termsOfService: https://signalwire.com/legal/signalwire-cloud-agreement
+  description: An API to programmatically manage your SignalWire projects.
+externalDocs:
+  url: https://signalwire.com/docs/apis
+  description: Find more information about this and other SignalWire APIs.
+tags:
+  - name: Tokens
+    description: Manage API tokens for authentication.
+    externalDocs:
+      url: https://signalwire.com/docs/apis
+      description: Developer documentation on SignalWire REST APIs
+paths:
+  /tokens:
+    post:
+      operationId: create_token
+      summary: Generate a new API Token
+      description: |-
+        Generate an API Token for a project to be used to authenticate requests within the project.
+
+        #### Permissions
+
+        The API token used to authenticate must have the following scope(s) enabled to make a successful request: _Management_.
+
+        [Learn more about API scopes](/docs/platform/your-signalwire-api-space).
+
+        #### Token Permissions
+
+        You must set the functions allowed by this API Token by selecting which types of requests this API Token is allowed to make.
+
+        Valid options are: calling, chat, datasphere, fax, management, messaging, numbers, pubsub, storage, tasking, and video
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode401'
+        '422':
+          description: The request contains invalid parameters. See errors for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenStatusCode422'
+        '500':
+          description: An internal server error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode500'
+      tags:
+        - Tokens
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTokenRequest'
+  /tokens/{token_id}:
+    patch:
+      operationId: update_token
+      summary: Update an API Token
+      description: |-
+        Update an API Token's name or permissions.
+
+        #### Permissions
+
+        The API token used to authenticate must have the following scope(s) enabled to make a successful request: _Management_.
+
+        [Learn more about API scopes](/docs/platform/your-signalwire-api-space).
+
+        #### Token Permissions
+
+        You can modify the functions allowed by this API Token by selecting which types of requests this API Token is allowed to make.
+
+        Valid options are: calling, chat, datasphere, fax, management, messaging, numbers, pubsub, storage, tasking, and video
+      parameters:
+        - name: token_id
+          in: path
+          required: true
+          description: The unique identifier of the token to update.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode401'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode404'
+        '422':
+          description: The request contains invalid parameters. See errors for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenStatusCode422'
+        '500':
+          description: An internal server error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode500'
+      tags:
+        - Tokens
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTokenRequest'
+    delete:
+      operationId: delete_token
+      summary: Delete an API Token
+      description: |-
+        Delete an API Token. This action cannot be undone.
+
+        #### Permissions
+
+        The API token used to authenticate must have the following scope(s) enabled to make a successful request: _Management_.
+
+        [Learn more about API scopes](/docs/platform/your-signalwire-api-space).
+      parameters:
+        - name: token_id
+          in: path
+          required: true
+          description: The unique identifier of the token that you want to delete.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode401'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode404'
+        '500':
+          description: An internal server error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode500'
+      tags:
+        - Tokens
+security:
+  - SignalWireBasicAuth: []
+components:
+  schemas:
+    CreateTokenRequest:
+      type: object
+      required:
+        - name
+        - permissions
+      properties:
+        name:
+          type: string
+          description: The name representing the API token.
+          examples:
+            - John Doe's Token
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/TokenPermission'
+          minItems: 1
+          description: The permissions you would like to enable for this token. Valid permissions are calling, chat, datasphere, fax, management, messaging, numbers, pubsub, storage, tasking, and video
+          examples:
+            - - calling
+              - fax
+              - messaging
+        subproject_id:
+          type: string
+          format: uuid
+          description: The unique identifier of the subproject you would like to create a token for. The subproject passed must be a child of the project used to authenticate the request.
+          examples:
+            - 9a7fc048-984f-11ee-b9d1-0242ac120002
+      description: Request body for creating a new API Token.
+    TokenPermission:
+      type: string
+      enum:
+        - calling
+        - chat
+        - datasphere
+        - fax
+        - management
+        - messaging
+        - numbers
+        - pubsub
+        - storage
+        - tasking
+        - video
+      description: Valid permission types for API tokens.
+    TokenResponse:
+      type: object
+      required:
+        - id
+        - name
+        - permissions
+        - token
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The ID of the created API Token.
+          examples:
+            - ea14556a-984f-11ee-b9d1-0242ac120002
+        name:
+          type: string
+          description: The name of the created API Token.
+          examples:
+            - John Doe's Token
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/TokenPermission'
+          description: The permissions enabled for this token.
+          examples:
+            - - calling
+              - fax
+              - messaging
+        token:
+          type: string
+          description: The API token that can be used along with the project ID for basic authentication
+          examples:
+            - PT037258e533e87ac63174ee136ed0798dc85d4f4f9e6d7191
+      title: API Token Response
+    TokenStatusCode422:
+      type: object
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Types.StatusCodes.RestApiErrorItem'
+          description: List of validation errors.
+      description: The request contains invalid parameters. See errors for details.
+      examples:
+        - statusCode: 422
+          errors:
+            - type: validation_error
+              code: invalid_parameter
+              message: Name must be present
+              attribute: name
+              url: https://signalwire.com/docs/apis/error-codes
+    Types.StatusCodes.RestApiErrorItem:
+      type: object
+      required:
+        - type
+        - code
+        - message
+        - url
+      properties:
+        type:
+          type: string
+          description: The category of error.
+          examples:
+            - validation_error
+        code:
+          type: string
+          description: A specific error code.
+          examples:
+            - invalid_parameter
+        message:
+          type: string
+          description: A description of what caused the error.
+          examples:
+            - Name must be present
+        attribute:
+          anyOf:
+            - type: string
+            - type: 'null'
+          description: The request parameter that caused the error, if applicable.
+          examples:
+            - name
+        url:
+          type: string
+          description: A link to documentation about this error.
+          examples:
+            - https://signalwire.com/docs/apis/error-codes
+      description: Details about a specific error.
+    Types.StatusCodes.StatusCode401:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          enum:
+            - Unauthorized
+      description: Access is unauthorized.
+    Types.StatusCodes.StatusCode404:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          enum:
+            - Not Found
+      description: The server cannot find the requested resource.
+    Types.StatusCodes.StatusCode500:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          enum:
+            - Internal Server Error
+      description: An internal server error occurred.
+    UpdateTokenRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name representing the API token.
+          examples:
+            - John Doe's Token
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/TokenPermission'
+          description: The permissions you would like to enable for this token. Valid permissions are calling, chat, datasphere, fax, management, messaging, numbers, pubsub, storage, tasking, and video
+          examples:
+            - - calling
+              - fax
+              - messaging
+      description: Request body for updating an API Token.
+  securitySchemes:
+    SignalWireBasicAuth:
+      type: http
+      scheme: Basic
+      description: |-
+        SignalWire Basic Authentication using Project ID and API Token.
+
+        The client sends HTTP requests with the Authorization header containing
+        the word Basic followed by a space and a base64-encoded string of project_id:token.
+        The project ID will be used as the username and the API token as the password.
+
+        Example:
+        ```
+        Authorization: Basic base64(project_id:token)
+        ```
+      x-fern-basic:
+        username:
+          name: project_id
+          env: SIGNALWIRE_PROJECT_ID
+        password:
+          name: api_token
+          env: SIGNALWIRE_API_TOKEN
+servers:
+  - url: https://{space_name}.signalwire.com/api/project
+    description: Endpoint
+    variables:
+      space_name:
+        default: '{your_space_name}'
+        description: The domain of the users SignalWire space.

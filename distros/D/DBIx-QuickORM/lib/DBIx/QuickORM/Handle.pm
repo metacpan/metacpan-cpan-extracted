@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use feature qw/state/;
 
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 
 use Carp qw/confess croak carp/;
 use Sub::Util qw/set_subname/;
@@ -1702,9 +1702,19 @@ Depending on SQL dialect  it will usually result in a sql statement like one of 
     INSERT INTO example (id, name) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = ? RETURNING id
     INSERT INTO example (id, name) VALUES (?, ?) ON DUPLICATE KEY UPDATE name = ?
 
+Keys in C<%ROW_DATA> that name a database-generated column (stored or virtual
+C<GENERATED>) are silently dropped from both the C<INSERT> column list and the
+conflict C<UPDATE SET> clause. The database computes the value and will reject
+an explicit write, so passing one is treated as a no-op rather than an error.
+The generated column is still readable on the returned row.
+
 =item $row = $h->insert(\%ROW_DATA)
 
 Insert the data into the database and return a proper row object for it.
+
+Keys in C<%ROW_DATA> that name a database-generated column are silently dropped
+from the C<INSERT> column list (see C<upsert> above for rationale). The
+generated column is still readable on the returned row.
 
 =item $row = $h->insert_and_refresh(\%ROW_DATA)
 
@@ -1714,6 +1724,9 @@ triggers. If the database supports 'returning on insert' then that will be
 used, otherwise the insert and fetch operations are wrapped in a single
 transaction, unless internal transactions are disabled in which case an
 exception may be thrown.
+
+Generated-column keys in C<%ROW_DATA> are dropped per C<insert>; the refreshed
+row's view of the generated column reflects the database-computed value.
 
 =back
 
@@ -1819,6 +1832,11 @@ sub _insert {
         $data->{$name} = $def->() unless exists $data->{$name};
     }
 
+    # Database-generated columns reject any write the ORM tries to send.
+    # Drop them silently so callers can pass a generic row hash without
+    # having to know which columns the database owns.
+    delete $data->{$_} for grep { $source->field_is_generated($_) } keys %$data;
+
     my $has_pk = $self->_has_pk;
     my $has_ret = $dialect->supports_returning_insert;
 
@@ -1849,7 +1867,7 @@ sub _insert {
             if ($builder_args->{returning}) {
                 $row_data = {
                     %$data,
-                    %{$sth->fetchrow_hashref},
+                    %{$self->sql_builder->qorm_row_to_orm($self->{+SOURCE}, $sth->fetchrow_hashref)},
                 };
             }
             elsif($has_pk) {
@@ -1909,6 +1927,10 @@ already associated with the handle.
 =item $h->update(\%CHANGES)
 
 Apply the changes (field names and new values) to all rows matching the where condition.
+
+Keys in C<%CHANGES> that name a database-generated column are silently dropped
+before SQL generation. If filtering leaves no fields to write, C<update>
+croaks with "Changes may not be empty".
 
 =item $h->update($row_obj)
 
@@ -2026,13 +2048,20 @@ sub update {
 
     croak "No changes for update"                    unless $changes;
     croak "Changes must be a hashref (got $changes)" unless ref($changes) eq 'HASH';
-    croak "Changes may not be empty"                 unless keys %$changes;
 
     my $sync              = $self->is_sync;
     my $dialect           = $self->dialect;
     my $pk_fields         = $self->_has_pk;
     my $builder_args      = $self->_builder_args;
     my $source            = $self->{+SOURCE};
+
+    # Drop database-generated columns from the update set; the database will
+    # reject any explicit write, and they cannot end up as legitimate pending
+    # data (the row layer croaks if a setter targets one), so silently
+    # filtering keeps the contract symmetric with insert/upsert.
+    $changes = { map { $_ => $changes->{$_} } grep { !$source->field_is_generated($_) } keys %$changes };
+
+    croak "Changes may not be empty" unless keys %$changes;
     my $do_cache          = $pk_fields && @$pk_fields && $con->state_does_cache;
     my $changes_pk_fields = $pk_fields ? (grep { $changes->{$_} } @$pk_fields) : ();
 
@@ -2095,7 +2124,7 @@ sub update {
             sub {
                 my $row_sql = $self->sql_builder->qorm_select(%$builder_args, fields => $pk_fields);
                 my ($row_sth, $row_res) = $self->_execute($self->{+CONNECTION}->dbh, $row_sql);
-                $rows = $row_sth->fetchall_arrayref({});
+                $rows = [ map { $self->sql_builder->qorm_row_to_orm($source, $_) } @{$row_sth->fetchall_arrayref({})} ];
                 $sth = $self->_make_sth($sql, on_ready => $finish, no_rows => 1);
             },
             die => "Cannot update without a specific row on a when internal transactions are disabled",
@@ -2137,11 +2166,15 @@ sub _do_select {
     my $builder_args = $self->_builder_args;
 
     my $sql = $self->sql_builder->qorm_select(%$builder_args);
+    my $builder = $self->sql_builder;
     return $self->_make_sth(
         $sql,
         on_ready => sub {
             my ($dbh, $sth) = @_;
-            return sub { $sth->fetchrow_hashref };
+            return sub {
+                my $fetched = $sth->fetchrow_hashref or return undef;
+                return $builder->qorm_row_to_orm($source, $fetched);
+            };
         },
         @_,
     );
@@ -2269,7 +2302,10 @@ sub all {
 
     my $sth = $self->_do_select();
 
-    return @{$sth->sth->fetchall_arrayref({})} if $self->{+DATA_ONLY};
+    if ($self->{+DATA_ONLY}) {
+        my $builder = $self->sql_builder;
+        return map { $builder->qorm_row_to_orm($self->{+SOURCE}, $_) } @{$sth->sth->fetchall_arrayref({})};
+    }
 
     my @out;
     while (my $fetched = $sth->next) {

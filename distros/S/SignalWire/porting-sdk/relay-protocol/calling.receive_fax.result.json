@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.receive_fax` (result). Extracted from switchblade `PublicCallReceiveFaxResult.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "code": {
+      "type": "string"
+    },
+    "control_id": {
+      "type": "string"
+    },
+    "data": {},
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "code"
+  ],
+  "title": "calling.receive_fax result",
+  "type": "object",
+  "x-method": "calling.receive_fax",
+  "x-phase": "result",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallReceiveFaxResult.cs"
+}

@@ -1,0 +1,1234 @@
+openapi: 3.1.0
+info:
+  title: Datasphere API
+  description: An AI-powered API for document search.
+  version: 0.0.0
+tags:
+  - name: Chunks
+    description: Manage chunks within Datasphere documents.
+    externalDocs:
+      url: https://signalwire.com/docs/apis
+      description: Developer documentation on SignalWire REST APIs
+  - name: Documents
+    description: Manage Datasphere documents.
+    externalDocs:
+      url: https://signalwire.com/docs/apis
+      description: Developer documentation on SignalWire REST APIs
+paths:
+  /documents:
+    get:
+      operationId: list_documents
+      summary: List Documents
+      description: |-
+        A list of Datasphere Documents.
+
+        #### Permissions
+
+        The API token used to authenticate must have the following scope(s) enabled to make a successful request: _DataSphere_.
+
+        [Learn more about API scopes](/docs/platform/your-signalwire-api-space).
+      parameters:
+        - $ref: '#/components/parameters/DocumentListQuery.page_number'
+        - $ref: '#/components/parameters/DocumentListQuery.page_size'
+        - $ref: '#/components/parameters/DocumentListQuery.page_token'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentListResponse'
+        '400':
+          description: The request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode400'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode401'
+        '422':
+          description: The request contains invalid parameters. See errors for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListStatusCode422'
+        '500':
+          description: An internal server error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode500'
+      tags:
+        - Documents
+    post:
+      operationId: create_document
+      summary: Create a Document
+      description: |-
+        Creates a Datasphere Document.
+
+        #### Permissions
+
+        The API token used to authenticate must have the following scope(s) enabled to make a successful request: _DataSphere_.
+
+        [Learn more about API scopes](/docs/platform/your-signalwire-api-space).
+      parameters: []
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created as a result.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '400':
+          description: The request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode400'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode401'
+        '422':
+          description: The request contains invalid parameters. See errors for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateStatusCode422'
+        '500':
+          description: An internal server error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode500'
+      tags:
+        - Documents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentCreateRequest'
+  /documents/search:
+    post:
+      operationId: search_documents
+      summary: Search Documents
+      description: |-
+        Search Datasphere Documents.
+
+        #### Permissions
+
+        The API token used to authenticate must have the following scope(s) enabled to make a successful request: _DataSphere_.
+
+        [Learn more about API scopes](/docs/platform/your-signalwire-api-space).
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchResponse'
+        '400':
+          description: The request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode400'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode401'
+        '422':
+          description: The request contains invalid parameters. See errors for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SearchStatusCode422'
+        '500':
+          description: An internal server error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode500'
+      tags:
+        - Documents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentSearchRequest'
+  /documents/{documentId}/chunks:
+    get:
+      operationId: list_document_chunks
+      summary: List Chunks
+      description: |-
+        A list of chunks for a Datasphere Document.
+
+        #### Permissions
+
+        The API token used to authenticate must have the following scope(s) enabled to make a successful request: _DataSphere_.
+
+        [Learn more about API scopes](/docs/platform/your-signalwire-api-space).
+      parameters:
+        - $ref: '#/components/parameters/DocumentPathID'
+        - $ref: '#/components/parameters/ChunkListQuery.page_number'
+        - $ref: '#/components/parameters/ChunkListQuery.page_size'
+        - $ref: '#/components/parameters/ChunkListQuery.page_token'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChunkListResponse'
+        '400':
+          description: The request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode400'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode401'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode404'
+        '422':
+          description: The request contains invalid parameters. See errors for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListStatusCode422'
+        '500':
+          description: An internal server error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode500'
+      tags:
+        - Chunks
+  /documents/{documentId}/chunks/{chunkId}:
+    get:
+      operationId: get_document_chunk
+      summary: Retrieve Chunk
+      description: |-
+        Retrieves a specific chunk for a Datasphere Document by ID.
+
+        #### Permissions
+
+        The API token used to authenticate must have the following scope(s) enabled to make a successful request: _DataSphere_.
+
+        [Learn more about API scopes](/docs/platform/your-signalwire-api-space).
+      parameters:
+        - $ref: '#/components/parameters/ChunkPathID.documentId'
+        - $ref: '#/components/parameters/ChunkPathID.chunkId'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChunkResponse'
+        '400':
+          description: The request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode400'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode401'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode404'
+        '500':
+          description: An internal server error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode500'
+      tags:
+        - Chunks
+    delete:
+      operationId: delete_document_chunk
+      summary: Delete Chunk
+      description: |-
+        Deletes a specific chunk for a Datasphere Document by ID.
+
+        #### Permissions
+
+        The API token used to authenticate must have the following scope(s) enabled to make a successful request: _DataSphere_.
+
+        [Learn more about API scopes](/docs/platform/your-signalwire-api-space).
+      parameters:
+        - $ref: '#/components/parameters/ChunkPathID.documentId'
+        - $ref: '#/components/parameters/ChunkPathID.chunkId'
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '400':
+          description: The request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode400'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode401'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode404'
+        '500':
+          description: An internal server error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode500'
+      tags:
+        - Chunks
+  /documents/{id}:
+    get:
+      operationId: get_document
+      summary: Get a Document
+      description: |-
+        Retrieves a Datasphere Document by ID.
+
+        #### Permissions
+
+        The API token used to authenticate must have the following scope(s) enabled to make a successful request: _DataSphere_.
+
+        [Learn more about API scopes](/docs/platform/your-signalwire-api-space).
+      parameters:
+        - $ref: '#/components/parameters/PathID'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '400':
+          description: The request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode400'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode401'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode404'
+        '500':
+          description: An internal server error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode500'
+      tags:
+        - Documents
+    patch:
+      operationId: update_document
+      summary: Update a Document
+      description: |-
+        Updates a Datasphere Document by ID.
+
+        #### Permissions
+
+        The API token used to authenticate must have the following scope(s) enabled to make a successful request: _DataSphere_.
+
+        [Learn more about API scopes](/docs/platform/your-signalwire-api-space).
+      parameters:
+        - $ref: '#/components/parameters/PathID'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Document'
+        '400':
+          description: The request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode400'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode401'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode404'
+        '422':
+          description: The request contains invalid parameters. See errors for details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateStatusCode422'
+        '500':
+          description: An internal server error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode500'
+      tags:
+        - Documents
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocumentUpdateRequest'
+    delete:
+      operationId: delete_document
+      summary: Delete a Document
+      description: |-
+        Deletes a Datasphere Document by ID.
+
+        #### Permissions
+
+        The API token used to authenticate must have the following scope(s) enabled to make a successful request: _DataSphere_.
+
+        [Learn more about API scopes](/docs/platform/your-signalwire-api-space).
+      parameters:
+        - $ref: '#/components/parameters/PathID'
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+        '400':
+          description: The request is invalid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode400'
+        '401':
+          description: Access is unauthorized.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode401'
+        '404':
+          description: The server cannot find the requested resource.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode404'
+        '500':
+          description: An internal server error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Types.StatusCodes.StatusCode500'
+      tags:
+        - Documents
+security:
+  - SignalWireBasicAuth: []
+components:
+  parameters:
+    ChunkListQuery.page_number:
+      name: page_number
+      in: query
+      required: false
+      description: The page number to retrieve (0-indexed).
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        default: 0
+      explode: false
+    ChunkListQuery.page_size:
+      name: page_size
+      in: query
+      required: false
+      description: Specify the number of results to return on a single page. The default page size is `50` and the maximum is `1000`.
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 1000
+        default: 50
+      explode: false
+    ChunkListQuery.page_token:
+      name: page_token
+      in: query
+      required: false
+      description: Token for cursor-based pagination. Required when `page_number` > 0.
+      schema:
+        type: string
+      explode: false
+    ChunkPathID.chunkId:
+      name: chunkId
+      in: path
+      required: true
+      description: Unique ID of a Chunk.
+      schema:
+        $ref: '#/components/schemas/uuid'
+    ChunkPathID.documentId:
+      name: documentId
+      in: path
+      required: true
+      description: Unique ID of the parent Document.
+      schema:
+        $ref: '#/components/schemas/docid'
+    DocumentListQuery.page_number:
+      name: page_number
+      in: query
+      required: false
+      description: The page number to retrieve (0-indexed).
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+        default: 0
+      explode: false
+    DocumentListQuery.page_size:
+      name: page_size
+      in: query
+      required: false
+      description: Specify the number of results to return on a single page. The default page size is `50` and the maximum is `1000`.
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 1000
+        default: 50
+      explode: false
+    DocumentListQuery.page_token:
+      name: page_token
+      in: query
+      required: false
+      description: Token for cursor-based pagination. Required when `page_number` > 0.
+      schema:
+        type: string
+      explode: false
+    DocumentPathID:
+      name: documentId
+      in: path
+      required: true
+      description: Unique ID of the Document.
+      schema:
+        $ref: '#/components/schemas/docid'
+    PathID:
+      name: id
+      in: path
+      required: true
+      description: Unique ID of a Document.
+      schema:
+        $ref: '#/components/schemas/docid'
+  schemas:
+    Chunk:
+      type: object
+      required:
+        - text
+        - document_id
+      properties:
+        text:
+          type: string
+          description: A search result.
+          examples:
+            - Cristiano Ronaldo is the highest-paid football player in the world in 2024
+        document_id:
+          allOf:
+            - $ref: '#/components/schemas/docid'
+          description: Unique ID of the Document.
+          examples:
+            - acaa5c49-be5e-4477-bce0-48f4b23b7720
+    ChunkListResponse:
+      type: object
+      required:
+        - data
+        - links
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChunkResponse'
+          description: A list of chunks.
+        links:
+          allOf:
+            - $ref: '#/components/schemas/ChunkPaginationResponse'
+          description: Pagination links.
+    ChunkPaginationResponse:
+      type: object
+      required:
+        - self
+        - first
+      properties:
+        self:
+          type: string
+          format: uri
+          description: Link of the current page.
+          examples:
+            - https://{space_name}.signalwire.com/api/datasphere/documents/{document_id}/chunks?page_number=0&page_size=50
+        first:
+          type: string
+          format: uri
+          description: Link to the first page.
+          examples:
+            - https://{space_name}.signalwire.com/api/datasphere/documents/{document_id}/chunks?page_number=0&page_size=50
+        next:
+          type: string
+          format: uri
+          description: Link to the next page. Only present when there are more results.
+          examples:
+            - https://{space_name}.signalwire.com/api/datasphere/documents/{document_id}/chunks?page_number=1&page_size=50&page_token=PAbff61159-faab-48b3-959a-3021a8f5beca
+        prev:
+          type: string
+          format: uri
+          description: Link to the previous page. Only present when not on the first page.
+          examples:
+            - https://{space_name}.signalwire.com/api/datasphere/documents/{document_id}/chunks?page_number=0&page_size=50&page_token=PBbff61159-faab-48b3-959a-3021a8f5beca
+    ChunkResponse:
+      type: object
+      required:
+        - id
+        - datasphere_document_id
+        - project_id
+        - status
+        - tags
+        - content
+        - created_at
+        - updated_at
+      properties:
+        id:
+          allOf:
+            - $ref: '#/components/schemas/uuid'
+          description: Unique ID of the chunk.
+          examples:
+            - acaa5c49-be5e-4477-bce0-48f4b23b7720
+        datasphere_document_id:
+          allOf:
+            - $ref: '#/components/schemas/uuid'
+          description: Unique ID of the chunk's datasphere document.
+          examples:
+            - acaa5c49-be5e-4477-bce0-48f4b23b7720
+        project_id:
+          allOf:
+            - $ref: '#/components/schemas/uuid'
+          description: Unique ID of the project.
+          examples:
+            - d369a402-7b43-4512-8735-9d5e1f387814
+        status:
+          allOf:
+            - $ref: '#/components/schemas/ChunkStatus'
+          description: Status of the chunk.
+          examples:
+            - completed
+        tags:
+          type: array
+          items:
+            type: string
+          description: The tags of the document associated with the chunk.
+          examples:
+            - - sports
+              - football
+              - game
+        content:
+          type: string
+          description: Content of the chunk.
+          examples:
+            - This is the content from the original document that was chunked.
+        created_at:
+          type: string
+          format: date-time
+          description: Chunk Creation Date.
+          examples:
+            - 2024-05-06T12:20-12Z
+        updated_at:
+          type: string
+          format: date-time
+          description: Chunk Update Date.
+          examples:
+            - 2024-05-06T12:20-12Z
+    ChunkStatus:
+      type: string
+      enum:
+        - submitted
+        - in_progress
+        - completed
+        - failed
+      description: The current Status of the Chunk.
+    ChunkingStrategy:
+      type: string
+      enum:
+        - sentence
+        - paragraph
+        - page
+        - sliding
+      description: Strategy to use when chunking the document.
+    CreateStatusCode422:
+      type: object
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Types.StatusCodes.RestApiErrorItem'
+          description: List of validation errors.
+      description: The request contains invalid parameters. See errors for details.
+      examples:
+        - statusCode: 422
+          errors:
+            - type: validation_error
+              code: invalid_parameter
+              message: Invalid chunking_strategy
+              attribute: chunking_strategy
+              url: https://signalwire.com/docs/apis/error-codes
+    Document:
+      type: object
+      required:
+        - id
+        - filename
+        - status
+        - tags
+        - chunking_strategy
+        - max_sentences_per_chunk
+        - split_newlines
+        - overlap_size
+        - chunk_size
+        - number_of_chunks
+        - chunks_uri
+        - created_at
+        - updated_at
+      properties:
+        id:
+          allOf:
+            - $ref: '#/components/schemas/docid'
+          description: Unique ID of the Document.
+          examples:
+            - acaa5c49-be5e-4477-bce0-48f4b23b7720
+        filename:
+          type: string
+          description: Name of the Document.
+          examples:
+            - player_list.pdf
+        status:
+          allOf:
+            - $ref: '#/components/schemas/DocumentStatus'
+          description: Status of the Document.
+          examples:
+            - in_progress
+        tags:
+          type: array
+          items:
+            type: string
+          description: Document tags.
+          examples:
+            - - sports
+              - football
+              - game
+        chunking_strategy:
+          allOf:
+            - $ref: '#/components/schemas/ChunkingStrategy'
+          description: Strategy used to chunk the document.
+          examples:
+            - sentence
+        max_sentences_per_chunk:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          description: Max Sentences per Chunk. Only present when chunking strategy is 'sentence', null otherwise.
+          examples:
+            - 80
+        split_newlines:
+          anyOf:
+            - type: boolean
+            - type: 'null'
+          description: Split on Newlines. Only present when chunking strategy is 'sentence', null otherwise.
+          examples:
+            - true
+        overlap_size:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          description: Overlap Size. Only present when chunking strategy is 'sliding', null otherwise.
+          examples:
+            - 10
+        chunk_size:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          description: Chunk Size. Only present when chunking strategy is 'sliding', null otherwise.
+          examples:
+            - 50
+        number_of_chunks:
+          type: integer
+          description: Number of Chunks in the Document.
+          examples:
+            - 2345
+        chunks_uri:
+          type: string
+          description: URI path to the chunks for this document.
+          examples:
+            - /api/rest/datasphere/documents/acaa5c49-be5e-4477-bce0-48f4b23b7720/chunks
+        created_at:
+          type: string
+          format: date-time
+          description: Document Creation Date.
+          examples:
+            - 2024-05-06T12:20-12Z
+        updated_at:
+          type: string
+          format: date-time
+          description: Document Update Date.
+          examples:
+            - 2024-05-06T12:20-12Z
+    DocumentCreatePageRequest:
+      type: object
+      properties:
+        chunking_strategy:
+          type: string
+          enum:
+            - page
+          description: Strategy for chunking the document
+          examples:
+            - page
+      allOf:
+        - $ref: '#/components/schemas/DocumentCreateRequestBase'
+      title: Page strategy
+    DocumentCreateParagraphRequest:
+      type: object
+      properties:
+        chunking_strategy:
+          type: string
+          enum:
+            - paragraph
+          description: Strategy for chunking the document
+          examples:
+            - paragraph
+      allOf:
+        - $ref: '#/components/schemas/DocumentCreateRequestBase'
+      title: Paragraph strategy
+    DocumentCreateRequest:
+      oneOf:
+        - $ref: '#/components/schemas/DocumentCreateSentenceRequest'
+        - $ref: '#/components/schemas/DocumentCreateSlidingRequest'
+        - $ref: '#/components/schemas/DocumentCreatePageRequest'
+        - $ref: '#/components/schemas/DocumentCreateParagraphRequest'
+    DocumentCreateRequestBase:
+      type: object
+      required:
+        - url
+      properties:
+        url:
+          type: string
+          format: uri
+          description: URL of the document.
+          examples:
+            - https://example.com/document.pdf
+        tags:
+          type: array
+          items:
+            type: string
+          description: Document tags.
+          examples:
+            - - sports
+              - football
+              - game
+    DocumentCreateSentenceRequest:
+      type: object
+      properties:
+        max_sentences_per_chunk:
+          type: integer
+          description: Maximum number of sentences per chunk.
+          examples:
+            - 40
+          default: 50
+        chunking_strategy:
+          type: string
+          enum:
+            - sentence
+          description: Strategy for chunking the document
+          examples:
+            - sentence
+        split_newlines:
+          type: boolean
+          description: |-
+            Whether to split chunks on new lines.
+
+
+
+            **Default value:** `false`
+          examples:
+            - false
+          default: false
+      allOf:
+        - $ref: '#/components/schemas/DocumentCreateRequestBase'
+      title: Sentence strategy
+    DocumentCreateSlidingRequest:
+      type: object
+      properties:
+        chunk_size:
+          type: integer
+          description: Number of words per chunk.
+          examples:
+            - 50
+          default: 50
+        chunking_strategy:
+          type: string
+          enum:
+            - sliding
+          description: Strategy for chunking the document
+          examples:
+            - sliding
+        overlap_size:
+          type: integer
+          description: Amount of overlap between chunks, in number of words.
+          examples:
+            - 10
+          default: 10
+      allOf:
+        - $ref: '#/components/schemas/DocumentCreateRequestBase'
+      title: Sliding strategy
+    DocumentListResponse:
+      type: object
+      required:
+        - data
+        - links
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/Document'
+          description: A list of documents.
+        links:
+          allOf:
+            - $ref: '#/components/schemas/PaginationResponse'
+          description: Pagination links.
+    DocumentSearchRequest:
+      type: object
+      required:
+        - query_string
+      properties:
+        tags:
+          type: array
+          items:
+            type: string
+          description: Document tags.
+          examples:
+            - - sports
+              - football
+              - game
+        document_id:
+          allOf:
+            - $ref: '#/components/schemas/docid'
+          description: Unique ID of a Document.
+          examples:
+            - acaa5c49-be5e-4477-bce0-48f4b23b7720
+        query_string:
+          type: string
+          description: Search term.
+          examples:
+            - Most paid athlete
+        distance:
+          type: number
+          minimum: 0
+          maximum: 78.3836717690617
+          description: Specifies how closely related the query is to the document. Low distance means high relevance and similarity. High distance means low relevance and similarity.
+          examples:
+            - 2
+        count:
+          type: integer
+          minimum: 1
+          description: Specifies number of returned Chunks.
+          examples:
+            - 5
+          default: 5
+        language:
+          type: string
+          description: Language of the Document.
+          examples:
+            - fr
+          default: en
+        pos_to_expand:
+          type: array
+          items:
+            type: string
+          description: Part of Speech considered for expansion or analysis.
+          examples:
+            - - NOUN
+              - VERB
+          default:
+            - NOUN
+            - VERB
+            - ADJ
+            - ADV
+        max_synonyms:
+          type: integer
+          minimum: 1
+          description: Maximum number of synonyms to consider.
+          examples:
+            - 7
+          default: 10
+    DocumentStatus:
+      type: string
+      enum:
+        - submitted
+        - in_progress
+        - completed
+        - failed
+      description: The current Status of the Document.
+    DocumentUpdateRequest:
+      type: object
+      required:
+        - tags
+      properties:
+        tags:
+          type: array
+          items:
+            type: string
+          description: Document tags.
+          examples:
+            - - sports
+              - football
+              - game
+    ListStatusCode422:
+      type: object
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Types.StatusCodes.RestApiErrorItem'
+          description: List of validation errors.
+      description: The request contains invalid parameters. See errors for details.
+      examples:
+        - statusCode: 422
+          errors:
+            - type: validation_error
+              code: invalid_parameter
+              message: Invalid page_token
+              attribute: page_token
+              url: https://signalwire.com/docs/apis/error-codes
+    PaginationResponse:
+      type: object
+      required:
+        - self
+        - first
+      properties:
+        self:
+          type: string
+          format: uri
+          description: Link of the current page.
+          examples:
+            - https://{space_name}.signalwire.com/api/datasphere/documents?page_number=0&page_size=50
+        first:
+          type: string
+          format: uri
+          description: Link to the first page.
+          examples:
+            - https://{space_name}.signalwire.com/api/datasphere/documents?page_number=0&page_size=50
+        next:
+          type: string
+          format: uri
+          description: Link to the next page. Only present when there are more results.
+          examples:
+            - https://{space_name}.signalwire.com/api/datasphere/documents?page_number=1&page_size=50&page_token=PAbff61159-faab-48b3-959a-3021a8f5beca
+        prev:
+          type: string
+          format: uri
+          description: Link to the previous page. Only present when not on the first page.
+          examples:
+            - https://{space_name}.signalwire.com/api/datasphere/documents?page_number=0&page_size=50&page_token=PBbff61159-faab-48b3-959a-3021a8f5beca
+    SearchResponse:
+      type: object
+      required:
+        - chunks
+      properties:
+        chunks:
+          type: array
+          items:
+            $ref: '#/components/schemas/Chunk'
+          description: A list of search result chunks.
+    SearchStatusCode422:
+      type: object
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Types.StatusCodes.RestApiErrorItem'
+          description: List of validation errors.
+      description: The request contains invalid parameters. See errors for details.
+      examples:
+        - statusCode: 422
+          errors:
+            - type: validation_error
+              code: invalid_parameter
+              message: Invalid tags
+              attribute: tags
+              url: https://signalwire.com/docs/apis/error-codes
+    Types.StatusCodes.RestApiErrorItem:
+      type: object
+      required:
+        - type
+        - code
+        - message
+        - url
+      properties:
+        type:
+          type: string
+          description: The category of error.
+          examples:
+            - validation_error
+        code:
+          type: string
+          description: A specific error code.
+          examples:
+            - invalid_parameter
+        message:
+          type: string
+          description: A description of what caused the error.
+          examples:
+            - Name must be present
+        attribute:
+          anyOf:
+            - type: string
+            - type: 'null'
+          description: The request parameter that caused the error, if applicable.
+          examples:
+            - name
+        url:
+          type: string
+          description: A link to documentation about this error.
+          examples:
+            - https://signalwire.com/docs/apis/error-codes
+      description: Details about a specific error.
+    Types.StatusCodes.StatusCode400:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          enum:
+            - Bad Request
+      description: The request is invalid.
+    Types.StatusCodes.StatusCode401:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          enum:
+            - Unauthorized
+      description: Access is unauthorized.
+    Types.StatusCodes.StatusCode404:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          enum:
+            - Not Found
+      description: The server cannot find the requested resource.
+    Types.StatusCodes.StatusCode500:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          enum:
+            - Internal Server Error
+      description: An internal server error occurred.
+    UpdateStatusCode422:
+      type: object
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Types.StatusCodes.RestApiErrorItem'
+          description: List of validation errors.
+      description: The request contains invalid parameters. See errors for details.
+      examples:
+        - statusCode: 422
+          errors:
+            - type: validation_error
+              code: invalid_parameter
+              message: Invalid tags
+              attribute: tags
+              url: https://signalwire.com/docs/apis/error-codes
+    docid:
+      type: string
+      format: uuid
+      description: Unique ID of a Document.
+    uuid:
+      type: string
+      format: uuid
+      description: Universal Unique Identifier.
+  securitySchemes:
+    SignalWireBasicAuth:
+      type: http
+      scheme: Basic
+      description: |-
+        SignalWire Basic Authentication using Project ID and API Token.
+
+        The client sends HTTP requests with the Authorization header containing
+        the word Basic followed by a space and a base64-encoded string of project_id:token.
+        The project ID will be used as the username and the API token as the password.
+
+        Example:
+        ```
+        Authorization: Basic base64(project_id:token)
+        ```
+      x-fern-basic:
+        username:
+          name: project_id
+          env: SIGNALWIRE_PROJECT_ID
+        password:
+          name: api_token
+          env: SIGNALWIRE_API_TOKEN
+servers:
+  - url: https://{space_name}.signalwire.com/api/datasphere
+    description: Endpoint
+    variables:
+      space_name:
+        default: '{Your_Space_Name}'

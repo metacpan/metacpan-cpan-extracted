@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the Blade envelope `signalwire.connect` (params). Extracted from switchblade `Messages/ConnectParams.cs`.",
+  "properties": {
+    "agent": {
+      "type": "string"
+    },
+    "authentication": {
+      "type": "object"
+    },
+    "host": {
+      "type": "string"
+    },
+    "identity": {
+      "type": "string"
+    },
+    "params": {
+      "type": "object"
+    },
+    "protocols": {
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "protocol": {
+            "type": "string"
+          },
+          "rank": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "protocol",
+          "rank"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "version": {
+      "additionalProperties": true,
+      "properties": {
+        "major": {
+          "type": "integer"
+        },
+        "minor": {
+          "type": "integer"
+        },
+        "revision": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "major",
+        "minor",
+        "revision"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "version"
+  ],
+  "title": "signalwire.connect params",
+  "type": "object",
+  "x-method": "signalwire.connect",
+  "x-phase": "params",
+  "x-source": "blade",
+  "x-source-file": "switchblade/Messages/ConnectParams.cs"
+}

@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the Blade envelope `signalwire.disconnect` (result). Extracted from switchblade `Messages/DisconnectResult.cs`.",
+  "properties": {},
+  "title": "signalwire.disconnect result",
+  "type": "object",
+  "x-method": "signalwire.disconnect",
+  "x-phase": "result",
+  "x-source": "blade",
+  "x-source-file": "switchblade/Messages/DisconnectResult.cs"
+}

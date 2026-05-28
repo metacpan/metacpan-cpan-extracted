@@ -1,7 +1,7 @@
 # ABSTRACT: Show activity log
 
 package App::karr::Cmd::Log;
-our $VERSION = '0.205';
+our $VERSION = '0.300';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -43,18 +43,14 @@ sub execute {
         return;
     }
 
-    # Read all log refs
-    my $refs_output = $git->_git_cmd('for-each-ref', '--format=%(refname)', 'refs/karr/log/');
+    # Read all log refs (refs/karr/log/*) natively via Git::Native.
     my @entries;
-
-    if ($refs_output) {
-        for my $ref (split /\n/, $refs_output) {
-            my $content = $git->read_ref($ref);
-            next unless $content;
-            for my $line (split /\n/, $content) {
-                my $entry = eval { decode_json($line) };
-                push @entries, $entry if $entry;
-            }
+    for my $ref ($git->list_refs('refs/karr/log/')) {
+        my $content = $git->read_ref($ref);
+        next unless $content;
+        for my $line (split /\n/, $content) {
+            my $entry = eval { decode_json($line) };
+            push @entries, $entry if $entry;
         }
     }
 
@@ -108,7 +104,7 @@ App::karr::Cmd::Log - Show activity log
 
 =head1 VERSION
 
-version 0.205
+version 0.300
 
 =head1 SYNOPSIS
 

@@ -111,7 +111,20 @@ my %WriteMakefileArgs = (
         # available, this will complain and die.
         # 'DateTime::TimeZone'         => '2.44',
         # 2010-04-02
-        'JSON'                       => '2.20',
+        # 'JSON'                       => '2.20',
+        # JSON backend dependency.
+        # JSON::PP is in core since Perl 5.14, so we only need to declare a JSON
+        # dependency on older Perls. We use JSON (the wrapper) on Perl 5.10/5.12 because
+        # it transparently uses JSON::XS or JSON::PP at runtime, and is available on all
+        # CPAN mirrors.
+        # On Perl 5.14+, JSON::PP is in core. We still auto-detect faster backends
+        # (Cpanel::JSON::XS, JSON::XS) at runtime in DateTime::Lite::TimeZone, but neither
+        # is required.
+        ( $] < 5.014
+            # 2010-04-02
+            ? ( 'JSON' => '2.20' )
+            : ()
+        ),
         'Locale::Unicode'            => 'v0.4.0',
         'POSIX'                      => 0,
         'Scalar::Util'               => 0,

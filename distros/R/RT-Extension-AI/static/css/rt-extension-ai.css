@@ -1,3 +1,53 @@
 #aiModal {
     overflow-y: scroll;
 }
+
+#ai-progress-indicator {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 10000;
+    pointer-events: none;
+}
+
+@keyframes ai-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.ai-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid var(--bs-border-color, #dee2e6);
+    border-top: 2px solid var(--bs-primary, #0d6efd);
+    border-radius: 50%;
+    animation: ai-spin 1s linear infinite;
+}
+
+/* AI Chat - only what Bootstrap can't handle */
+.ai-chat-messages {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.ai-chat-message-content {
+    max-width: 80%;
+}
+
+.ai-chat-messages .rt-user-avatar,
+.ai-chat-messages .rt-user-image {
+    width: 38px;
+    height: 38px;
+    font-size: 1em;
+}
+
+.ai-chat-ai-avatar {
+    width: 38px;
+    height: 38px;
+    font-size: 1em;
+    font-weight: bold;
+}
+
+#ai-chat-initialdata-preview dl {
+    font-size: inherit;
+}

@@ -1,5 +1,12 @@
 Revision history for Perl extension IPC::Shareable.
 
+1.16    2026-05-27
+    - POD: Promoted the signal handling note into its own section under
+      DESTRUCTION
+    - Fully implement Dragonfly BSD unit test VM infrastructure
+    - Fix shmid_ds unpack for Dragonfly BSD
+    - Prevent macOS extended attributes from leaking into dist tarballs
+
 1.15    2026-05-26
     - Refactor how we initialize $VERSION. It's no longer in a BEGIN block. That
       broke Dist::Mgr
@@ -17,7 +24,6 @@ Revision history for Perl extension IPC::Shareable.
     - Added 'testing' flag; allows bulk cleanup of leaked segs/sems from a
       previous test run. This was implemented in this distribution's unit test
       suite
-    - Add Firefly unit test VM infrastructure
     - Fix t/80-SharedMem.t: skip 64-bit tests on 32-bit Perl where the 'q' pack
       template is unavailable (Raspian OS specifically)
 

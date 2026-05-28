@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.send_digits` (result). Extracted from switchblade `PublicCallSendDigitsResult.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "code": {
+      "type": "string"
+    },
+    "control_id": {
+      "type": "string"
+    },
+    "data": {},
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "code"
+  ],
+  "title": "calling.send_digits result",
+  "type": "object",
+  "x-method": "calling.send_digits",
+  "x-phase": "result",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallSendDigitsResult.cs"
+}

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the Blade envelope `signalwire.ping` (result). Extracted from switchblade `Messages/PingResult.cs`.",
+  "properties": {
+    "payload": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": [
+        "number",
+        "null"
+      ]
+    }
+  },
+  "title": "signalwire.ping result",
+  "type": "object",
+  "x-method": "signalwire.ping",
+  "x-phase": "result",
+  "x-source": "blade",
+  "x-source-file": "switchblade/Messages/PingResult.cs"
+}

@@ -1,5 +1,11 @@
 Revision history for RT-Extension-AI
 
+0.06 2026-05-27
+ - Add AI queue setup assistant feature
+ - Accept a natural language search query and generate TicketSQL
+ - Support to generate context for AI
+ - Make UI backgrounds adapt to dark theme
+
 0.05 2025-08-13
  - Pass queue info to AI endpoints for ticket create page
  - Support to customize AI editor features from config

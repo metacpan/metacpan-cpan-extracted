@@ -2,7 +2,7 @@ package DBIx::QuickORM::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 
 use Data::Dumper;
 use Scalar::Util qw/blessed/;

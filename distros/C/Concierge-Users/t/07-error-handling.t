@@ -450,12 +450,17 @@ subtest 'validate_user_data direct edge cases' => sub {
     ok($result1->{warnings}, 'Has warning for unknown field');
     like($result1->{warnings}[0], qr/not recognized/i, 'Warning mentions not recognized');
 
-    # Test 2: Field with no available validator (user_id has type=system, no validator)
-    # user_id is a known field but has no validator in type_validator_map
+    # Test 2: user_id has type=text; validates successfully via text validator
     my $result2 = $users->validate_user_data({ user_id => 'testvalue' });
-    ok($result2->{success}, 'validate_user_data succeeds when field has no validator');
-    ok($result2->{warnings}, 'Has warning for no-validator field');
-    like($result2->{warnings}[0], qr/Validator not found/i, 'Warning mentions no validator');
+    ok($result2->{success}, 'validate_user_data succeeds for user_id (type=text)');
+
+    # Test 2b: Field with unmapped type generates 'Validator not found' warning
+    $users->{field_definitions}{user_id}{type} = 'unmapped_type_xyz';
+    my $result2b = $users->validate_user_data({ user_id => 'testvalue' });
+    $users->{field_definitions}{user_id}{type} = 'text';  # restore
+    ok($result2b->{success}, 'validate_user_data succeeds when field has no validator');
+    ok($result2b->{warnings}, 'Has warning for no-validator field');
+    like($result2b->{warnings}[0], qr/Validator not found/i, 'Warning mentions no validator');
 
     # Test 3: USERS_SKIP_VALIDATION via validate_user_data directly
     local $ENV{USERS_SKIP_VALIDATION} = 1;

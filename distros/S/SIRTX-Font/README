@@ -1,1 +1,8 @@
 This package contains a modules to manipulate SIRTX font files.
+
+SIRTX font files are bitmap fonts used by the SIRTX operating system.
+
+This package contains SIRTX::Font to manipulate such font files and basic tools to allow such operation from the command line:
+- sf-merge to manipulate files
+- sf-to-html to generate nice HTML summaries of fonts
+- sf-render which performs a very basic (and limited) rendering using the given font

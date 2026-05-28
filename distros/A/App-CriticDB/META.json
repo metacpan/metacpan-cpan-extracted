@@ -1,5 +1,5 @@
 {
-	"version" : "0.0.3",
+	"version" : "0.0.4",
 	"name"    : "App-CriticDB",
 	"author"  : ["Brian Blackmore <brian@mediaalpha.com>"],
 	"abstract": "Store Perl::Critic violations",
@@ -26,6 +26,7 @@
 		"test": {
 			"requires": {
 				"File::Temp": "0.2301",
+				"PPI": "0",
 				"Test::More": "0.61"
 			}
 		}

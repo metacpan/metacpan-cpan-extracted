@@ -2,7 +2,7 @@ package DBIx::QuickORM::Dialect::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 
 use Carp qw/croak/;
 use DBIx::QuickORM::Util qw/column_key/;
@@ -334,6 +334,10 @@ sub build_columns_from_db {
 
         $col->{identity} //= 1 if grep { $self->_col_field_to_bool($res->{$_}) } grep { m/identity/ } keys %$res;
         $col->{identity} //= 1 if $res->{column_default} && $res->{column_default} =~ m/^nextval\(/;
+
+        # is_generated is 'ALWAYS' for stored generated columns and 'NEVER'
+        # otherwise; _col_field_to_bool treats 'NEVER' as false.
+        $col->{generated} = 1 if $self->_col_field_to_bool($res->{is_generated});
 
         $col->{affinity} //= affinity_from_type($res->{udt_name}) // affinity_from_type($res->{data_type});
         $col->{affinity} //= 'string'  if grep { $self->_col_field_to_bool($res->{$_}) } grep { m/character/ } keys %$res;

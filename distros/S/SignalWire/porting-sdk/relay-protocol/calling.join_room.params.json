@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.join_room` (params). Extracted from switchblade `PublicCallJoinRoomParams.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "hagrid_json_api_url": {
+      "type": "string"
+    },
+    "hagrid_node_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "node_id": {
+      "type": "string"
+    },
+    "status_url": {
+      "type": "string"
+    },
+    "swml": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id",
+    "name"
+  ],
+  "title": "calling.join_room params",
+  "type": "object",
+  "x-method": "calling.join_room",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallJoinRoomParams.cs"
+}

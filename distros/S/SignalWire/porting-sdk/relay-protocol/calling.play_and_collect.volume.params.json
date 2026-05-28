@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.play_and_collect.volume` (params). Extracted from switchblade `PublicCallPlayAndCollectVolumeParams.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "control_id": {
+      "type": "string"
+    },
+    "node_id": {
+      "type": "string"
+    },
+    "volume": {
+      "type": "number"
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id",
+    "control_id",
+    "volume"
+  ],
+  "title": "calling.play_and_collect.volume params",
+  "type": "object",
+  "x-method": "calling.play_and_collect.volume",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallPlayAndCollectVolumeParams.cs"
+}

@@ -1,7 +1,7 @@
-package Concierge::Desk::Setup v0.8.0;
+package Concierge::Desk::Setup v0.8.1;
 use v5.36;
 
-our $VERSION = 'v0.8.0';
+our $VERSION = 'v0.8.1';
 
 # ABSTRACT: Setup and configuration for Concierge desk initialization
 
@@ -261,7 +261,7 @@ Concierge::Desk::Setup - One-time desk creation and configuration for Concierge
 
 =head1 VERSION
 
-v0.8.0
+v0.8.1
 
 =head1 SYNOPSIS
 
@@ -684,27 +684,32 @@ validation (2-24 alphanumeric characters).
 After building a desk, the field schema can be inspected at runtime
 through L<Concierge::Users> (inherited from L<Concierge::Users::Meta>):
 
-    # Before setup: view built-in default field definitions
-    Concierge::Users::Meta->show_default_config();
+    # Before setup: retrieve built-in default field definitions
+    my $default = Concierge::Users::Meta->show_default_config();
+    print $default->{config} if $default->{success};
 
-    # After setup: view the active schema for this desk
+    # After setup: retrieve the active schema for this desk
     my $users = Concierge::Users->new('./makerspace-desk/users-config.json');
-    $users->show_config();
+    my $cfg = $users->show_config();
+    print $cfg->{config} if $cfg->{success};
 
     # Get UI-friendly hints for building forms dynamically
     my $hints = $users->get_field_hints('membership_tier');
-    # Returns: { label, type, options, max_length, description, required }
+    # Returns: { label, type, validate_as, options, max_length,
+    #            description, required, default, null }
 
     # Get the ordered field list for this schema
     my $fields = $users->get_user_fields();
 
-C<show_default_config()> prints the built-in field template to STDOUT --
-useful for reviewing available standard fields before writing a setup
-script.  C<show_config()> prints the YAML configuration generated
-during C<setup()>, reflecting the actual schema including any overrides
-and application fields.  C<get_field_hints()> returns a hashref of
-display-ready attributes for a single field, suitable for generating
-form elements programmatically.
+C<show_default_config()> returns a service hashref
+C<< { success => 1, config => $yaml_string } >> containing the built-in
+field template -- useful for reviewing available standard fields before
+writing a setup script.  C<show_config()> returns
+C<< { success => 1, config => $yaml_string, config_file => $path } >>
+reflecting the actual schema including any overrides and application
+fields.  C<get_field_hints()> returns a hashref of display-ready
+attributes for a single field, suitable for generating form elements
+programmatically.
 
 =head3 Data Archiving
 

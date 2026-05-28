@@ -1,3 +1,20 @@
+Revision history for Data-ReqRep-Shared
+
+0.04  2026-05-27
+    - slot_acquire: owner_pid CAS gates the state CAS, ACQUIRE on loads
+      (fixes recovery ABA where a fresh free+acquire could clobber a live owner)
+    - reply: re-check generation before publishing CAS and recover post-CAS
+      via gen bump (fixes TOCTOU where cancel+re-acquire could let a reply
+      land on the wrong owner's slot)
+    - slot_release: two-step CAS (owner_pid mypid→0, then state from→FREE)
+      prevents blind state-store from clobbering a freshly-acquired slot
+    - compute_layout: resp_stride in uint64 (was wrapping for resp_data_max
+      near UINT32_MAX → replies overflowing into next slot)
+    - validate_header: reject files with resp_stride too small for slot data
+    - size(): read head before tail and clamp tail<head to 0
+    - plug mmap/fd leak in create_int / create_int_memfd on calloc OOM
+
+
 0.03  2026-04-26
     - arena underflow guard; init under flock
     - strict fd validation; harden DESTROY

@@ -2,7 +2,7 @@ package DBIx::QuickORM::SQLBuilder::SQLAbstract;
 use strict;
 use warnings;
 
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 
 use Carp qw/croak confess/;
 use Sub::Util qw/set_subname/;
@@ -95,6 +95,8 @@ BEGIN {
 
             my $source = delete $params{source} or croak "No source provided";
 
+            $self->_translate_params($source, \%params) if blessed($source);
+
             my @args = $self->$arg_meth(\%params);
 
             my ($stmt, @bind);
@@ -141,11 +143,12 @@ sub qorm_upsert {
 
     my $sql = $self->qorm_insert(%params, insert => $data);
 
-    my $pk = $params{source}->primary_key;
+    my $source = $params{source};
+    my $pk = $source->primary_key;
     confess "upsert cannot be used on a table without a primary key" unless $pk && @$pk;
 
     my $changes = { %$data };
-    my $where = { map {$_ => delete $changes->{$_}} @$pk };
+    delete $changes->{$_} for @$pk;
 
     my $binds = $sql->{bind} //= [];
     my $counter = @$binds + 1;
@@ -154,12 +157,14 @@ sub qorm_upsert {
     my $statement = $sql->{statement};
     $returning = $1 if $statement =~ s/\s+(returning.*)$//is;
 
-    my $conf = $params{dialect}->upsert_statement($pk);
+    my $pk_db = [ map { $source->field_db_name($_) } @$pk ];
+    my $conf = $params{dialect}->upsert_statement($pk_db);
     my @inject;
     for my $field (sort keys %$changes) {
-        push @inject => "$field = ?";
+        my $db_field = $source->field_db_name($field);
+        push @inject => "$db_field = ?";
         push @$binds => {
-            field => $field,
+            field => $db_field,
             value => $changes->{$field},
             type  => 'field',
             param => $counter++,
@@ -294,9 +299,172 @@ sub _format_insert_and_update_data {
     return $data;
 }
 
-1;
+=pod
+
+=head1 PRIVATE METHODS
+
+These translate caller-facing ORM column names into database column names so
+that generated SQL always uses database names. They build fresh structures and
+never mutate the caller's data. Literal SQL (scalar refs and array-of-literal
+refs) is left untouched, and unknown names pass through unchanged.
+
+=over 4
+
+=item $builder->_translate_params($source, \%params)
+
+Rewrite the C<insert>, C<update>, C<where>, C<fields>, C<returning>, and
+C<order_by> params in place (each replaced with a freshly built structure)
+from ORM names to database names for the given source.
+
+=cut
+
+sub _translate_params {
+    my $self = shift;
+    my ($source, $params) = @_;
+
+    return unless $source->source_has_aliases;
+
+    $params->{insert}    = $self->_translate_data($source, $params->{insert})     if $params->{insert};
+    $params->{update}    = $self->_translate_data($source, $params->{update})     if $params->{update};
+    $params->{fields}    = $self->_translate_fields($source, $params->{fields})   if $params->{fields};
+    $params->{returning} = $self->_translate_fields($source, $params->{returning}) if $params->{returning};
+    $params->{where}     = $self->_translate_where($source, $params->{where})     if defined $params->{where};
+    $params->{order_by}  = $self->_translate_order($source, $params->{order_by})  if defined $params->{order_by};
+
+    return;
+}
 
 =pod
+
+=item $db_name = $builder->_field_to_db($source, $name)
+
+Translate a single field name to its database name, leaving references (literal
+SQL) untouched.
+
+=cut
+
+sub _field_to_db {
+    my $self = shift;
+    my ($source, $name) = @_;
+    return $name if ref $name;
+    return $source->field_db_name($name);
+}
+
+=pod
+
+=item $hash = $builder->_translate_data($source, \%data)
+
+Return a new data hashref with its keys translated to database names.
+
+=cut
+
+sub _translate_data {
+    my $self = shift;
+    my ($source, $data) = @_;
+    return $data unless ref($data) eq 'HASH';
+    return { map { $source->field_db_name($_) => $data->{$_} } keys %$data };
+}
+
+=pod
+
+=item $fields = $builder->_translate_fields($source, \@fields)
+
+Return a new field-list arrayref with each plain-scalar field translated to its
+database name.
+
+=cut
+
+sub _translate_fields {
+    my $self = shift;
+    my ($source, $fields) = @_;
+    return $fields unless ref($fields) eq 'ARRAY';
+    return [ map { $self->_field_to_db($source, $_) } @$fields ];
+}
+
+=pod
+
+=item $where = $builder->_translate_where($source, $where)
+
+Recursively walk a C<SQL::Abstract> where-structure, returning a new structure
+with field-name hash keys translated to database names. A hash key is treated
+as a field when the source recognizes it; logic operators (C<-and>, C<-or>,
+C<-not>, ...) are recursed into. Operator-expression values under a field key
+(e.g. C<< { '>' => 5 } >>) and value arrayrefs are left as-is.
+
+=cut
+
+sub _translate_where {
+    my $self = shift;
+    my ($source, $where) = @_;
+
+    my $ref = ref $where;
+
+    if ($ref eq 'HASH') {
+        my %out;
+        for my $key (keys %$where) {
+            my $val = $where->{$key};
+            if ($key =~ m/^-/) {
+                $out{$key} = ref($val) ? $self->_translate_where($source, $val) : $self->_field_to_db($source, $val);
+            }
+            else {
+                $out{$self->_field_to_db($source, $key)} = $val;
+            }
+        }
+        return \%out;
+    }
+
+    if ($ref eq 'ARRAY') {
+        return [ map { $self->_translate_where($source, $_) } @$where ];
+    }
+
+    return $where;
+}
+
+=pod
+
+=item $order = $builder->_translate_order($source, $order_by)
+
+Return a new C<order_by> structure with column names translated to database
+names. Handles a bare column, an arrayref of columns, and the
+C<< { -asc => ... } >> / C<< { -desc => ... } >> hash forms (where the column
+lives in the value). Literal SQL refs are left untouched.
+
+=back
+
+=cut
+
+sub _translate_order {
+    my $self = shift;
+    my ($source, $order) = @_;
+
+    my $ref = ref $order;
+
+    return $self->_field_to_db($source, $order) unless $ref;
+
+    if ($ref eq 'ARRAY') {
+        return [ map { $self->_translate_order($source, $_) } @$order ];
+    }
+
+    if ($ref eq 'HASH') {
+        my %out;
+        for my $key (keys %$order) {
+            my $val = $order->{$key};
+            if (ref($val) eq 'ARRAY') {
+                $out{$key} = [ map { $self->_field_to_db($source, $_) } @$val ];
+            }
+            else {
+                $out{$key} = $self->_field_to_db($source, $val);
+            }
+        }
+        return \%out;
+    }
+
+    return $order;
+}
+
+1;
+
+__END__
 
 =head1 SOURCE
 
@@ -329,47 +497,3 @@ modify it under the same terms as Perl itself.
 See L<https://dev.perl.org/licenses/>
 
 =cut
-
-__END__
-
-our $IN_TARGET = 0;
-sub _render_insert_clause_target {
-    my $self = shift;
-
-    local $IN_TARGET = 1;
-
-    $self->SUPER::_render_insert_clause_target(@_);
-}
-
-sub _render_ident {
-    my $self = shift;
-    my (undef, $ident) = @_;
-
-    unless ($IN_TARGET) {
-        if (my $s = $self->{source}) {
-            if (my $db_name = $s->field_db_name($ident->[0])) {
-                $ident->[0] = $db_name;
-            }
-        }
-    }
-
-    $self->SUPER::_render_ident(@_);
-}
-
- -value => HASH    should work, no need for this
-sub _expand_insert_value {
-    my ($self, $v) = @_;
-
-    my $k = $SQL::Abstract::Cur_Col_Meta;
-
-    if (my $s = $self->{source}) {
-        my $r = ref($v);
-        if ($r eq 'HASH' || $r eq 'ARRAY') {
-            if (my $type = $s->field_type($k)) {
-                return +{-bind => [$k, $v]};
-            }
-        }
-    }
-
-    return $self->SUPER::_expand_insert_value($v);
-}

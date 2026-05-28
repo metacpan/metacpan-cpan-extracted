@@ -13,6 +13,16 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Git-Libgit2
+provides:
+  Git::Libgit2:
+    file: lib/Git/Libgit2.pm
+    version: '0.004'
+  Git::Libgit2::Error:
+    file: lib/Git/Libgit2/Error.pm
+    version: '0.004'
+  Git::Libgit2::FFI:
+    file: lib/Git/Libgit2/FFI.pm
+    version: '0.004'
 requires:
   Alien::Libgit2: '0.001'
   Carp: '0'
@@ -23,7 +33,7 @@ resources:
   bugtracker: https://github.com/Getty/p5-git-libgit2/issues
   homepage: https://github.com/Getty/p5-git-libgit2
   repository: https://github.com/Getty/p5-git-libgit2.git
-version: '0.001'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -110,6 +120,26 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::ChangesHasContent
       name: '@Author::GETTY/Test::ChangesHasContent'
       version: '0.011'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '6.037'
+          include_underscores: 0
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
+      name: '@Author::GETTY/MetaProvides::Package'
+      version: '2.004003'
     -
       class: Dist::Zilla::Plugin::GithubMeta
       name: '@Author::GETTY/GithubMeta'
@@ -277,7 +307,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.001'
+          tag: '0.004'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -379,6 +409,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
+      version: '6.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
       version: '6.037'
   zilla:
     class: Dist::Zilla::Dist::Builder

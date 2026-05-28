@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.clear_digit_bindings` (result). Extracted from switchblade `PublicCallClearDigitBindingsResult.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "code": {
+      "type": "string"
+    },
+    "data": {},
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "code"
+  ],
+  "title": "calling.clear_digit_bindings result",
+  "type": "object",
+  "x-method": "calling.clear_digit_bindings",
+  "x-phase": "result",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallClearDigitBindingsResult.cs"
+}

@@ -1,0 +1,103 @@
+name: Audit checklist + surface against Python SDK
+
+# Every PR that touches the checklist / spec docs / surface snapshot must
+# still match the Python reference SDK. Nightly run catches drift when the
+# Python SDK changes and nobody updates the porting-sdk.
+#
+#   Layer A — audit_checklist.py: file-level inventory (skills, prefabs,
+#             namespaces, docs, examples). Fails if checklist and Python
+#             file lists diverge.
+#   Layer B — enumerate_python.py --check: symbol-level inventory
+#             (classes + public methods + module functions). Fails if
+#             python_surface.json is stale relative to signalwire-python.
+
+env:
+  # Opt into Node.js 24 ahead of GitHub's 2026-06-02 default switch.
+  # Without this, actions/setup-java@v4, setup-python@v5, gradle/actions, etc.
+  # log a deprecation warning on every run.
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+
+on:
+  pull_request:
+    paths:
+      - CHECKLIST_TEMPLATE.md
+      - PORTING_GUIDE.md
+      - README.md
+      - SKILLS_MANIFEST.md
+      - python_surface.json
+      - scripts/audit_checklist.py
+      - scripts/enumerate_python.py
+      - scripts/diff_port_surface.py
+      - scripts/audit_docs.py
+      - .github/workflows/audit-checklist.yml
+  push:
+    branches:
+      - main
+  schedule:
+    # Nightly at 07:00 UTC (~2am ET) — catches upstream Python drift.
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out porting-sdk
+        uses: actions/checkout@v4
+        with:
+          path: porting-sdk
+
+      - name: Check out signalwire-python reference
+        uses: actions/checkout@v4
+        with:
+          repository: signalwire/signalwire-python
+          path: signalwire-python
+          ref: main
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Layer A — file-level checklist audit
+        working-directory: porting-sdk
+        run: |
+          python3 scripts/audit_checklist.py \
+            --python-sdk ../signalwire-python \
+            --checklist CHECKLIST_TEMPLATE.md
+
+      - name: Layer B — symbol-level surface snapshot check
+        working-directory: porting-sdk
+        run: |
+          python3 scripts/enumerate_python.py \
+            --python-sdk ../signalwire-python \
+            --output python_surface.json \
+            --check
+
+      - name: Emit JSON drift reports on failure
+        if: failure()
+        working-directory: porting-sdk
+        run: |
+          python3 scripts/audit_checklist.py \
+            --python-sdk ../signalwire-python \
+            --checklist CHECKLIST_TEMPLATE.md \
+            --json > checklist-drift.json || true
+          python3 scripts/enumerate_python.py \
+            --python-sdk ../signalwire-python > python_surface.live.json
+          diff -u python_surface.json python_surface.live.json > surface-drift.diff || true
+          echo "::group::Checklist drift (JSON)"
+          cat checklist-drift.json || true
+          echo "::endgroup::"
+          echo "::group::Surface drift (unified diff)"
+          cat surface-drift.diff || true
+          echo "::endgroup::"
+
+      - name: Upload drift reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: drift-reports
+          path: |
+            porting-sdk/checklist-drift.json
+            porting-sdk/surface-drift.diff
+            porting-sdk/python_surface.live.json

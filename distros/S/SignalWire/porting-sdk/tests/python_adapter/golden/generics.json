@@ -1,0 +1,43 @@
+{
+  "generics": {
+    "classes": {
+      "Store": {
+        "methods": {
+          "put": {
+            "params": [
+              {
+                "name": "self",
+                "kind": "self"
+              },
+              {
+                "name": "key",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "value",
+                "type": "dict<string,int>",
+                "required": true
+              }
+            ],
+            "returns": "void"
+          },
+          "query": {
+            "params": [
+              {
+                "name": "self",
+                "kind": "self"
+              },
+              {
+                "name": "filters",
+                "type": "dict<string,list<int>>",
+                "required": true
+              }
+            ],
+            "returns": "list<tuple<string,int>>"
+          }
+        }
+      }
+    }
+  }
+}

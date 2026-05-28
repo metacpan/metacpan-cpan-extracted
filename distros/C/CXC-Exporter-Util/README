@@ -1,149 +1,613 @@
-CXC::Exporter::Util
+NAME
+    CXC::Exporter::Util - Tagged Based Exporting
 
-"CXC::Exporter::Util" provides *tag-centric* utilities for modules which
-export symbols. It doesn't provide exporting services; its sole purpose
-is to manipulate the data structures used by exporting modules which
-follow the API provided by Perl's core Exporter module (e.g.
-Exporter::Tiny).
+VERSION
+    version 0.11
 
-In particular, it treats %EXPORT_TAGS as the definitive source for
-information about exportable symbols and uses it to generate @EXPORT_OK
-and @EXPORT. Consolidation of symbol information in one place avoids
-errors of omission.
+SYNOPSIS
+    In the exporting code:
+
+      package My::Exporter;
+      use CXC::Exporter::Util ':all';
+
+      use parent 'Exporter' # or Exporter::Tiny
+
+      # install sets of constants, with automatically generated
+      # enumerating functions
+      install_CONSTANTS( {
+            DETECTORS => {
+                ACIS => 'ACIS',
+                HRC  => 'HRC',
+            },
+
+            AGGREGATES => {
+                ALL  => 'all',
+                NONE => 'none',
+                ANY  => 'any',
+            },
+        } );
+
+      # install some functions
+      install_EXPORTS(
+                { fruit => [ 'tomato', 'apple' ],
+                  nut   => [ 'almond', 'walnut' ],
+                } );
+
+    In importing code:
+
+      use My::Exporter   # import ...
+       ':fruit',         # the 'fruit' functions
+       ':detector',      # the 'detector' functions
+       'DETECTORS'       # the function enumerating the DETECTORS constants  values
+       'DETECTORS_NAMES' # the function enumerating the DETECTORS constants' names
+       ;
+
+      # print the DETECTORS constants' values;
+      say $_ for DETECTORS;
+
+      # print the DETECTORS constants' names;
+      say $_ for DETECTORS_NAMES;
+
+DESCRIPTION
+    "CXC::Exporter::Util" provides *tag-centric* utilities for modules which
+    export symbols. It doesn't provide exporting services; its sole purpose
+    is to manipulate the data structures used by exporting modules which
+    follow the API provided by Perl's core Exporter module (e.g.
+    Exporter::Tiny).
+
+    In particular, it treats %EXPORT_TAGS as the definitive source for
+    information about exportable symbols and uses it to generate @EXPORT_OK
+    and @EXPORT. Consolidation of symbol information in one place avoids
+    errors of omission.
 
   Exporting Symbols
+    At it simplest, the exporting module calls "install_EXPORTS" with a hash
+    specifying tags and their symbols sets, e.g.,
 
-At it simplest, the exporting module calls "install_EXPORTS" with a hash
-specifying tags and their symbols sets, e.g.,
+      package My::Exporter;
+      use CXC::Exporter::Util;
 
-  package My::Exporter;
-  use CXC::Exporter::Util;
+      use parent 'Exporter'; # or your favorite compatible exporter
 
-  use parent 'Exporter'; # or your favorite compatible exporter
+      install_EXPORTS(
+                { fruit => [ 'tomato', 'apple' ],
+                  nut   => [ 'almond', 'walnut' ],
+                } );
 
-  install_EXPORTS(
-            { fruit => [ 'tomato', 'apple' ],
-              nut   => [ 'almond', 'walnut' ],
-            } );
+      sub tomato {...}
+      sub apple  {...}
+      sub almond {...}
+      sub walnut {...}
 
-  sub tomato {...}
-  sub apple  {...}
-  sub almond {...}
-  sub walnut {...}
+    An importing module could use this via
 
-An importing module could use this via
+      use My::ExportingModule ':fruit'; # import tomato, apple
+      use My::ExportingModule ':nut';   # import almond, walnut
+      use My::ExportingModule ':all';   # import tomato, apple,
+                                        #        almond, walnut,
 
-  use My::ExportingModule ':fruit'; # import tomato, apple
-  use My::ExportingModule ':nut';   # import almond, walnut
-  use My::ExportingModule ':all';   # import tomato, apple,
-                                    #        almond, walnut,
+    For more complicated setups, %EXPORT_TAGS may be specified first:
 
-For more complicated setups, %EXPORT_TAGS may be specified first:
+      package My::ExportingModule;
+      use CXC::Exporter::Util;
 
-  package My::ExportingModule;
-  use CXC::Exporter::Util;
+      use parent 'Exporter';
+      our %EXPORT_TAGS = ( tag => [ 'Symbol1', 'Symbol2' ] );
+      install_EXPORTS;
 
-  use parent 'Exporter';
-  our %EXPORT_TAGS = ( tag => [ 'Symbol1', 'Symbol2' ] );
-  install_EXPORTS;
-
-"install_EXPORTS" may be called multiple times
+    "install_EXPORTS" may be called multiple times
 
   Exporting Constants
+    "CXC::Exporter::Util" provides additional support for creating,
+    organizing and installing constants via "install_CONSTANTS". Constants
+    are created via Perl's constant pragma.
 
-"CXC::Exporter::Util" provides additional support for creating,
-organizing and installing constants via "install_CONSTANTS". Constants
-are created via Perl's constant pragma.
+    "install_CONSTANTS" is passed sets of constants grouped by tags, e.g.:
 
-"install_CONSTANTS" is passed sets of constants grouped by tags, e.g.:
-
-  install_CONSTANTS( {
-        DETECTORS => {
-            ACIS => 'ACIS',
-            HRC  => 'HRC',
-        },
-
-        AGGREGATES => {
-            ALL  => 'all',
-            NONE => 'none',
-            ANY  => 'any',
-        },
-   });
-
-   # A call to install_EXPORTS (with or without arguments) must follow
-   # install_CONSTANTS;
-   install_EXPORTS;
-
-This results in the definition of
-
-*   the constant functions, i.e.,
-
-      ACIS HRC ALL NONE ANY
-
-    returning their specified values,
-
-*   functions enumerating the constants' values, i.e.
-
-      DETECTORS -> ( 'ACIS', 'HRC' )
-      AGGGREGATES -> ( 'all', 'none', 'any' )
-
-*   functions enumerating the constants' names, i.e.
-
-      DETECTORS_NAMES -> ( 'ACIS', 'HRC' )
-      AGGGREGATES_NAMES -> ( 'ALL', 'NONE', 'ANY' )
-
-The enumerating functions are useful for generating enumerated types via
-e.g. Type::Tiny:
-
-  Enum[ DETECTORS ]
-
-or iterating:
-
-  say $_ for DETECTORS;
-
-"install_CONSTANTS" may be called multiple times. If the constants are
-used later in the module for other purposes, constant definition should
-be done in a BEGIN block:
-
-  BEGIN {
       install_CONSTANTS( {
-          CCD => {nCCDColumns  => 1024, minCCDColumn => 0,},
-      } );
-  }
+            DETECTORS => {
+                ACIS => 'ACIS',
+                HRC  => 'HRC',
+            },
 
-  install_CONSTANTS( {
-      CCD => {
-          maxCCDColumn => minCCDColumn + nCCDColumns - 1,
-      } }
-  );
+            AGGREGATES => {
+                ALL  => 'all',
+                NONE => 'none',
+                ANY  => 'any',
+            },
+       });
 
-  install_EXPORTS;
+       # A call to install_EXPORTS (with or without arguments) must follow
+       # install_CONSTANTS;
+       install_EXPORTS;
 
-For more complex situations, the lower level "install_constant_tag" and
-"install_constant_func" routines may be useful.
+    This results in the definition of
 
-INSTALLATION
+    *   the constant functions, i.e.,
 
-This is a Perl module distribution. It should be installed with whichever
-tool you use to manage your installation of Perl, e.g. any of
+          ACIS HRC ALL NONE ANY
 
-  cpanm .
-  cpan  .
-  cpanp -i .
+        returning their specified values,
 
-Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
-Should you wish to install this module manually, the procedure is
+    *   functions enumerating the constants' values, i.e.
 
-  perl Build.PL
-  ./Build
-  ./Build test
-  ./Build install
+          DETECTORS -> ( 'ACIS', 'HRC' )
+          AGGGREGATES -> ( 'all', 'none', 'any' )
+
+    *   functions enumerating the constants' names, i.e.
+
+          DETECTORS_NAMES -> ( 'ACIS', 'HRC' )
+          AGGGREGATES_NAMES -> ( 'ALL', 'NONE', 'ANY' )
+
+    The enumerating functions are useful for generating enumerated types via
+    e.g. Type::Tiny:
+
+      Enum[ DETECTORS ]
+
+    or iterating:
+
+      say $_ for DETECTORS;
+
+    "install_CONSTANTS" may be called multiple times. If the constants are
+    used later in the module for other purposes, constant definition should
+    be done in a BEGIN block:
+
+      BEGIN {
+          install_CONSTANTS( {
+              CCD => {nCCDColumns  => 1024, minCCDColumn => 0,},
+          } );
+      }
+
+      install_CONSTANTS( {
+          CCD => {
+              maxCCDColumn => minCCDColumn + nCCDColumns - 1,
+          } }
+      );
+
+      install_EXPORTS;
+
+    For more complex situations, the lower level "install_constant_tag" and
+    "install_constant_func" routines may be useful.
+
+  UI Helpers
+    *Note*: These subroutines are available only if Exporter::Tiny is
+    installed.
+
+    The UI Helper routines make it easier to expose constants' names to
+    users and convert them to constant values. For example, say the
+    constants are for colors,
+
+       install_CONSTANTS( { COLORS =>
+                              { RED => 0xFF0000, YELLOW_GREEN => 0x00FFFF } } );
+
+    and the application provides a "--color" command line option. The
+    application can accept lower-case, user-friendly representations of the
+    constant names and convert them back to constant values.
+
+    Each helper takes the constant tag name (as used by "install_CONSTANTS"
+    or "install_constant_tag") and an optional $prefix, which strips a
+    common literal constant-name prefix before aliases are generated. For
+    example, with a prefix of "COLOR", "COLOR_YELLOW_GREEN" is exposed as
+    "yellow_green" and "yellow-green".
+
+    "ui_list_constants" returns a list of accepted human-friendly aliases
+    for the constants' names.
+
+    The UI can use these to provide the user with values for "--color", e.g.
+
+       if ( $opt{color} eq '-list' ) {
+         say join( "\n", ui_list_constants( 'colors' ) );
+         exit (0);
+       }
+
+    or as parameters for Type::Tiny::Enum.
+
+    "ui_coerce_constant" and "ui_assert_coerce_constant" match the passed
+    constant name alias to the constant value. They differ in that
+    "ui_coerce_constant" returns the original passed name if there is no
+    match, while "ui_assert_coerce_constant" throws an exception.
+
+    To make these helpers available to users of a constants module, import
+    the "ui_helpers" tag (or the "all" tag) from "CXC::Exporter::Util" into
+    that module:
+
+      package My::Constants;
+      use parent 'Exporter::Tiny';
+      use CXC::Exporter::Util 'install_CONSTANTS', 'install_EXPORTS', ':ui_helpers';
+
+      install_CONSTANTS( { COLORS =>
+                             { RED => 0xFF0000, YELLOW_GREEN => 0x00FFFF } } );
+      install_EXPORTS;
+
+    This adds a "ui_helpers" export tag to "My::Constants". Users of
+    "My::Constants" may then import all of the UI helpers with
+
+      use My::Constants ':ui_helpers';
+
+    or import them individually.
+
+    ui_list_constants
+          @names = ui_list_constants( $tag, ?$prefix );
+
+        Returns a list of accepted names for the constants with the given
+        $tag. These names are lower-case alternatives with underscores
+        preserved and with underscores translated to hyphens. The optional
+        $prefix strips a common literal constant-name prefix before aliases
+        are generated.
+
+    ui_coerce_constant
+          $value = ui_coerce_constant( $name, $tag, ?$prefix );
+
+        Maps an accepted constant name alias (see "ui_list_constants") to
+        the constant's value, returning unknown values unchanged.
+
+    ui_assert_coerce_constant
+          $value = ui_assert_coerce_constant( $name, $tag, ?$prefix );
+
+        Performs the same coercion as "ui_coerce_constant", but throws an
+        exception for unknown values.
+
+SUBROUTINES
+  install_EXPORTS
+      install_EXPORTS( [\%export_tags], [$package], [\%options]  );
+
+    Populate $package's @EXPORT and @EXPORT_OK arrays based upon
+    %EXPORT_TAGS and %export_tags.
+
+    If not specified, $package defaults to the caller's package.
+
+    Available Options:
+
+    overwrite => [Boolean]
+        If the "overwrite" option is true, the contents of %export_tags will
+        overwrite %EXPORT_TAGS in $package, otherwise %export_tags is merged
+        into %EXPORT_TAGS.
+
+        Note that overwriting will remove the tags and symbols installed
+        into %EXPORT_TAGS by previous calls to "install_CONSTANTS".
+
+        This defaults to false.
+
+    package => [Package Name]
+        This provides another means of indicating which package to install
+        into. Setting this overrides the optional $package argument.
+
+    all => [Boolean | 'auto' ]
+        This determines whether "install_EXPORTS" creates an "all" tag based
+        on the contents of %EXPORT_TAGS in $package. Some exporters, such as
+        Exporter::Tiny and Sub::Exporter automatically handle the "all" tag,
+        but Perl's default Exporter does not.
+
+        If set to "auto" (the default), it will install the "all" tag if
+        $package is *not* a subclass of Exporter::Tiny.
+
+        (At present I don't know how to determine if Sub::Exporter is used).
+
+    This routine does the following in $package based upon %EXPORT_TAGS in
+    $package:
+
+    *   Install the symbols specified via the $EXPORT_TAGS{default} tag into
+        @EXPORT.
+
+    *   Install all of the symbols in %EXPORT_TAGS into @EXPORT_OK.
+
+  install_CONSTANTS
+      install_CONSTANTS( @specs, ?$package  );
+
+    Create sets of constants and make them available for export in $package.
+
+    If not specified, $package defaults to the caller's package.
+
+    The passed @specs arguments are either hashrefs or arrayrefs and contain
+    one or more set specifications. A set specification consists of a unique
+    identifier and a list of name-value pairs, specified either as a hash or
+    an array. For example,
+
+      @spec = ( { $id1 => \%set1, $id2 => \@set2 },
+                [ $id3 => \%set3, $id4 => \@set4 ],
+              );
+
+    The identifier is used to create an export tag for the set, as well as
+    to name enumerating functions returning constant's names and values. The
+    individual $id, $set pairs are passed to "install_constant_tag"; see
+    that function for more information on how the identifiers are used.
+
+    A call to "install_EXPORTS" *must* be made after the last call to
+    "install_CONSTANTS" or
+
+    *   The constants won't be added to the exports.
+
+    *   The enumerating functions won't be created.
+
+    "install_CONSTANTS" may be called more than once to add symbols to a
+    tag, but don't split those calls across a call to "install_EXPORTS".
+
+    In other words,
+
+      # DON'T DO THIS, IT'LL THROW
+      install_CONSTANTS( { Foo => { bar => 1 } } );
+      install_EXPORTS;
+      install_CONSTANTS( { Foo => { baz => 1 } } );
+      install_EXPORTS;
+
+      # DO THIS
+      install_CONSTANTS( { Foo => { bar => 1 } } );
+      install_CONSTANTS( { Foo => { baz => 1 } } );
+      install_EXPORTS;
+
+    Each call to "install_EXPORTS" installs the enumerating functions for
+    sets modified since the last call to it, and each enumerating function
+    can only be added once.
+
+  install_constant_tag
+    Create and install constant functions for a set of constants. Called
+    either as
+
+    install_constant_tag( \@names, $constants, [$package] )
+        where @names contains
+
+          $tag,
+          $fn_values, # optional name of function returning constants' values
+          $fn_names,  # optional name of function returning constants' names
+
+        and, if not specified,
+
+          $fn_values //= uc($tag);
+          $fn_names //= $fn_values . '_NAMES';
+
+    install_constant_tag( $fn_values, $constants, [$package] )
+        where
+
+          $tag = lc($fn_values);
+          $fn_names = $fn_values . '_NAMES';
+
+    where
+
+    $tag
+        is the name of the tag representing the set of constants
+
+    $fn_values
+        is the name of the function which will return a list of the
+        constants' values
+
+    $fn_names
+        is the name of the function which will return a list of the
+        constants' names
+
+    $constants
+        specifies the constants' names and values, as either a hashref or an
+        arrayref containing *name* - *value* pairs.
+
+    $package
+        is the name of the package (the eventual exporter) into which the
+        constants will be installed. It defaults to the package of the
+        caller.
+
+    "install_constant_tag" will
+
+    1   use Perl's constant pragma to create a function named *name*
+        returning *value* for each *name*-*value* pair in $constants.
+
+        The functions are installed in $package and their names appended to
+        the symbols in %EXPORT_TAGS with export tag $tag. If $constants is
+        an arrayref they are appended in the ordered specified in the array,
+        otherwise they are appended in random order.
+
+    2   Add a hook so that the next time "install_EXPORTS" is called, Perl's
+        constant pragma will be used to create
+
+        *   an enumerating function named $fn_values which returns a list of
+            the *values* of the constants associated with $tag, in the order
+            they were added to $EXPORT_TAGS{$tag}.
+
+        *   an enumerating function named $fn_names which returns a list of
+            the *names* of the constants associated with $tag, in the order
+            they were added to $EXPORT_TAGS{$tag}.
+
+        These enumerating functions are added to the symbols in %EXPORT_TAGS
+        tagged with "contant_funcs".
+
+        Just as you shouldn't interleave calls to "install_CONSTANTS" for a
+        single tag with calls to "install_EXPORTS", don't interleave calls
+        to "install_constant_tag" with calls to "install_EXPORTS".
+
+    For example, after
+
+      $id = 'AGGREGATES';
+      $constants = { ALL => 'all', NONE => 'none', ANY => 'any' };
+      install_constant_tag( $id, $constants );
+      install_EXPORTS:
+
+    1   The constant functions, "ALL", "NONE", "ANY" will be created and
+        installed in the calling package.
+
+        A new element will be added to %EXPORT_TAGS with an export tag of
+        "aggregates".
+
+          $EXPORT_TAGS{aggregates} = [ 'ALL', 'NONE', 'ANY ];
+
+    2   A function named "AGGREGATES" will be created and installed in the
+        calling package. "AGGREGATES" will return the values
+
+          'all', 'none', 'any'
+
+        (in a random order, as $constants is a hashref).
+
+        "AGGREGATES" will be added to the symbols tagged by "constant_funcs"
+        in %EXPORT_TAGS
+
+    3   A function named "AGGREGATES_NAMES" will be created and installed in
+        the calling package. "AGGREGATES_NAMES" will return the values
+
+          'ALL', 'NONE', 'ANY'
+
+        (in a random order, as $constants is a hashref).
+
+        "AGGREGATES_NAMES" will be added to the symbols tagged by
+        "constant_name_funcs" in %EXPORT_TAGS
+
+    After this, a package importing from $package can
+
+    *   import the constant functions "ALL", "NONE", "ANY" via the
+        "aggregate" tag:
+
+           use Package ':aggregate';
+
+    *   import the enumerating function "AGGREGATES" directly, via
+
+          use Package 'AGGREGATES';
+
+    *   import "AGGREGATES" via the "constant_funcs" tag:
+
+          use Package ':constant_funcs';
+
+    As mentioned above, if the first argument to "install_constant_tag" is
+    an arrayref, $tag, $fn_values, and $fn_names may be specified directly.
+    For example,
+
+      $id = [ 'Critters', 'Animals', 'Animal_names' ];
+      $constants = { HORSE => 'horse', GOAT   => 'goat' };
+      install_constant_tag( $id, $constants );
+
+    will create the export tag "Critters" for the "GOAT" and "HORSE"
+    constant functions, an enumerating function called "Animals" returning
+
+      ( 'horse', 'goat' )
+
+    and a function called "Animal_names" returning
+
+      ( 'HORSE', 'GOAT')
+
+    "install_constant_tag" uses "install_constant_func" to create and
+    install the constant functions which return the constant values.
+
+    Because of when enumerating functions are created, all enumerating
+    functions associated with a set will return all of the set's values,
+    regardless of when the function was specified. For example,
+
+      install_constant_tag( 'TAG', { HIGH => 'high' }  );
+      install_constant_tag( [ 'TAG', 'ATAG' ], { LOW => 'low' } );
+
+    will create functions "TAG" and "ATAG" which both return "high", "low".
+
+  install_constant_func( $name, \@values, $caller )
+    This routine does the following in $package, which defaults to the
+    caller's package.
+
+    1   Create a constant subroutine named $name which returns @values;
+
+    2   Adds $name to the "constant_funcs" tag in %EXPORT_TAGS.
+
+    For example, after calling
+
+      install_constant_func( 'AGGREGATES', [ 'all', 'none', 'any' ]  );
+
+    1   The function "AGGREGATES" will return "all", "none", "any".
+
+    2   A package importing from $package can import the "AGGREGATE"
+        constant function via the "constant_funcs" tag:
+
+          use Package ':constant_funcs';
+
+        or directly
+
+          use Package 'AGGREGATES';
+
+BUGS
+    No attempt is made to complain if enumerating functions' names clash
+    with constant function names.
+
+EXAMPLES
+    Alternate constant generation modules.
+        To use an alternate constant generation function bypass
+        "install_CONSTANTS" and load things manually.
+
+        For example, using enum:
+
+          package My::Exporter;
+
+          use CXC::Exporter::Util ':all';
+
+          our @DaysOfWeek;
+          BEGIN{ @DaysOfWeek = qw( Sun Mon Tue Wed Thu Fri Sat ) }
+          use enum @DaysOfWeek;
+          use constant DaysOfWeek => map { &$_ } @DaysOfWeek;
+          install_EXPORTS( { days_of_week => \@DaysOfWeek,
+                             constant_funcs => [ 'DaysOfWeek' ],
+                            });
+
+        and then
+
+          use My::Exporter -days_of_week;
+
+          say Sun | Mon;
+
+    Using a constant in the exporting module
+        When a constant is used in an exporting module (to create another
+        constant, for example), it's tempting to do something like this:
+
+          # DON'T DO THIS
+          %CCD = ( minCCDColumn => 0, nCCDColumns = 1024 );
+          $CCD{maxCCDColumn} = $CCD{minCCDColumn} + $CCD{nCCDColumns} - 1;
+          install_CONSTANTS( { CCD => \%CCD } );
+          install_EXPORTS;
+
+        Not only is this noisy code, if the hash keys are mistyped, there's
+        an error, which is exactly what constants are supposed to avoid.
+
+        Instead, create an initial set of constants in a BEGIN block, which
+        will make them available for the rest of the code:
+
+          BEGIN {
+              install_CONSTANTS( {
+                  CCD => {nCCDColumns  => 1024, minCCDColumn => 0,},
+              } );
+          }
+
+          install_CONSTANTS( {
+              CCD => {
+                  maxCCDColumn => minCCDColumn + nCCDColumns - 1,
+              } }
+          );
+
+          install_EXPORTS;
+
+        A bit more verbose, but it uses the generated constant functions and
+        avoids errors.
+
+SUPPORT
+  Bugs
+    Please report any bugs or feature requests to
+    bug-cxc-exporter-util@rt.cpan.org or through the web interface at:
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=CXC-Exporter-Util>
+
+  Source
+    Source is available at
+
+      https://codeberg.org/CXC-Optics/p5-CXC-Exporter-Util
+
+    and may be cloned from
+
+      https://codeberg.org/CXC-Optics/p5-CXC-Exporter-Util.git
+
+SEE ALSO
+    Please see those modules/websites for more information related to this
+    module.
+
+    *   Exporter
+
+    *   Exporter::Tiny
+
+    *   Exporter::Almighty
+
+AUTHOR
+    Diab Jerius <djerius@cpan.org>
 
 COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2022 by Smithsonian Astrophysical
+    Observatory.
 
-This software is Copyright (c) 2022 by Smithsonian Astrophysical
-Observatory.
+    This is free software, licensed under:
 
-This is free software, licensed under:
+      The GNU General Public License, Version 3, June 2007
 
-  The GNU General Public License, Version 3, June 2007

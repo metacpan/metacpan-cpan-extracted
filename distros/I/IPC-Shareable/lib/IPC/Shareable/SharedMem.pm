@@ -8,7 +8,7 @@ use Config;
 use Errno qw(EEXIST EPERM);
 use IPC::SysV qw(IPC_RMID IPC_STAT);
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 use constant {
     DEFAULT_SEG_SIZE    => 1024,
@@ -257,24 +257,25 @@ sub stat {
             = unpack('L L L L L x[12] L l l S x[2] q x[8] q x[8] q', $data);
     }
     elsif ($^O eq 'dragonfly' && $Config{longsize} == 8) {
-        # 64-bit DragonFly BSD shmid_ds, struct layout from sys/sys/shm.h and
-        # sys/sys/ipc.h (DragonFly forked from FreeBSD 4.x; key_t = int, not long).
-        #
+        # 64-bit DragonFly BSD shmid_ds (sys/sys/shm.h, sys/sys/ipc.h).
         # ipc_perm (28 bytes):
-        #   uid(4) gid(4) cuid(4) cgid(4) mode(4/uint32_t) _seq(2) [2 pad] _key(4/int)
-        # [4 bytes struct padding to align segsz to 8-byte boundary]
+        #   uid(4) gid(4) cuid(4) cgid(4) mode(4) _seq(2) [2 pad] _key(4)
+        # [4 pad to align segsz]
         # shmid_ds:
-        #   segsz(8/size_t) lpid(4/pid_t) cpid(4/pid_t)
-        #   nattch(8/shmatt_t=ulong) atime(8/time_t) __shm_atimensec(8/long)
-        #   dtime(8/time_t) __shm_dtimensec(8/long)
-        #   ctime(8/time_t) __shm_ctimensec(8/long) shm_internal(4/int32_t)
+        #   segsz(8) lpid(4) cpid(4) nattch(8)
+        #   atime(8) [atimensec(8)?] dtime(8) [dtimensec(8)?] ctime(8)
         #
-        # Offsets: ipc_perm@0(28) pad@28(4) segsz@32(8) lpid@40(4) cpid@44(4)
-        #          nattch@48(8) atime@56(8) atimensec@64(8) dtime@72(8)
-        #          dtimensec@80(8) ctime@88(8) ctimensec@96(8) internal@104(4)
+        # Some DragonFly versions include __shm_*timensec fields (108 bytes
+        # total), others omit them (88 bytes).  Detect via data length.
 
-        @values{qw(uid gid cuid cgid mode segsz lpid cpid nattch atime dtime ctime)}
-            = unpack('L L L L L x[12] Q l l Q q x[8] q x[8] q', $data);
+        if (length($data) > 96) {
+            @values{qw(uid gid cuid cgid mode segsz lpid cpid nattch atime dtime ctime)}
+                = unpack('L L L L L x[12] Q l l Q q x[8] q x[8] q', $data);
+        }
+        else {
+            @values{qw(uid gid cuid cgid mode segsz lpid cpid nattch atime dtime ctime)}
+                = unpack('L L L L L x[12] Q l l Q q q q', $data);
+        }
     }
     else {
         # macOS shmid_ds / ipc_perm layout (XNU kernel):
@@ -373,6 +374,17 @@ L<< IPC::Shareable >> library.
 <a href='https://coveralls.io/github/stevieb9/ipc-shareable?branch=master'><img src='https://coveralls.io/repos/stevieb9/ipc-shareable/badge.svg?branch=master&service=github' alt='Coverage Status' /></a>
 
 =head1 SYNOPSIS
+
+    use IPC::Shareable::SharedMem;
+
+    my $seg = IPC::Shareable::SharedMem->new(
+        key  => 1234,
+        size => 65536,
+    );
+
+    $seg->shmwrite($data);
+
+    my $data = $seg->data;
 
 =head1 METHODS
 
@@ -542,9 +554,8 @@ stored "hello" in a 1024 byte segment, the ASCII text wouldn't match).
 Typically this method is used when you want all blocks of the segment, such as
 if you've stored binary data.
 
-For text/ASCII data, use the L</data> method.
-
-Send in a true value as this parameter and we'll clean the NULLs for you.
+For text/ASCII data, use the L</data> method which automatically strips NULL
+pad bytes.
 
 I<Return>: The data if any is stored, empty string if no data has been stored
 yet, and C<undef> if a failure to read occurs.
@@ -577,6 +588,6 @@ Steve Bertrand <steveb@cpan.org>
 
 =head1 SEE ALSO
 
-L<IPC::Shareable>, L<IPC::Shareable::SharedMem> L<IPC::ShareLite>
+L<IPC::Shareable>, L<IPC::Shareable::SharedMem>, L<IPC::ShareLite>
 
 =cut

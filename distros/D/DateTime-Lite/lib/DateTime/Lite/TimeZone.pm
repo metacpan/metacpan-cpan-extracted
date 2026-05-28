@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - ~/lib/DateTime/Lite/TimeZone.pm
-## Version v0.5.8
+## Version v0.5.9
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/04/03
-## Modified 2026/05/20
+## Modified 2026/05/21
 ## All rights reserved
 ## 
 ## 
@@ -56,6 +56,7 @@ BEGIN
         $DB_FILE $DBH $STHS
         $FALLBACK_TO_DT_TZ
         $HAS_CONSTANTS
+        $JSON_CLASS
         $MISSING_AUTO_UTF8_DECODING
         $SQLITE_HAS_MATH_FUNCTIONS
         $USE_MEM_CACHE $_CACHE
@@ -87,7 +88,7 @@ BEGIN
     #     time_zone => 'UTC',
     # )->utc_rd_as_seconds == 62_135_683_200
     use constant UNIX_TO_RD => 62_135_683_200;
-    our $VERSION = 'v0.5.8';
+    our $VERSION = 'v0.5.9';
     our $DEBUG   = 0;
     our $DBH     = {};
     # Cached prepared statements, keyed by db file path then by statement ID:
@@ -172,6 +173,23 @@ BEGIN
         $HAS_CONSTANTS = ( version->parse( $DBD::SQLite::VERSION ) >= version->parse( '1.48' ) ) ? 1 : 0;
         # Native UTF-8 string mode available since 1.68
         $MISSING_AUTO_UTF8_DECODING = ( version->parse( $DBD::SQLite::VERSION ) < version->parse( '1.68' ) ) ? 1 : 0;
+    }
+
+    # JSON backend detection: prefer Cpanel::JSON::XS (fastest, most rigorous), fall back
+    # to JSON::XS, then JSON::PP (core since Perl 5.14).
+    our $JSON_CLASS;
+    if( eval{ require Cpanel::JSON::XS; 1 } )
+    {
+        $JSON_CLASS   = 'Cpanel::JSON::XS';
+    }
+    elsif( eval{ require JSON::XS; 1 } )
+    {
+        $JSON_CLASS   = 'JSON::XS';
+    }
+    else
+    {
+        require JSON::PP;
+        $JSON_CLASS   = 'JSON::PP';
     }
 };
 
@@ -1986,8 +2004,7 @@ sub _decode_sql_array
         die( "\$cldr->_decode_sql_array( \$data )" );
     }
 
-    require JSON;
-    my $j = JSON->new->relaxed;
+    my $j = $JSON_CLASS->new->relaxed;
     local $@;
     my $decoded = eval
     {
@@ -1995,7 +2012,7 @@ sub _decode_sql_array
     };
     if( $@ )
     {
-        warn( "Warning only: error attempting to decode JSON array: $@" );
+        warn( "Warning only: error attempting to decode $JSON_CLASS array: $@" );
         $decoded = [];
     }
     return( $decoded );
@@ -2022,8 +2039,7 @@ sub _decode_sql_arrays
         die( "\$cldr->_decode_sql_arrays( \$array_ref_of_array_fields, \$data )" );
     }
 
-    require JSON;
-    my $j = JSON->new->relaxed;
+    my $j = $JSON_CLASS->new->relaxed;
     local $@;
     if( ref( $ref ) eq 'HASH' )
     {
@@ -2039,7 +2055,7 @@ sub _decode_sql_arrays
                 };
                 if( $@ )
                 {
-                    warn( "Warning only: error attempting to decode JSON array in field \"${field}\" for value '", $ref->{ $field }, "': $@" );
+                    warn( "Warning only: error attempting to decode $JSON_CLASS array in field \"${field}\" for value '", $ref->{ $field }, "': $@" );
                     $ref->{ $field } = [];
                 }
                 else
@@ -3469,7 +3485,7 @@ DateTime::Lite::TimeZone - Lightweight timezone support for DateTime::Lite
 
 =head1 VERSION
 
-    v0.5.8
+    v0.5.9
 
 =head1 DESCRIPTION
 
@@ -3975,15 +3991,49 @@ Returns the last L<exception object|DateTime::Lite::Exception>, if any.
 
 This can be called as an instance method, or as a class function.
 
-This returns a hash of all the extended zones aliases to their corresponding canonical names.
+This returns a hash whose keys are timezone abbreviations (such as C<JST>,
+C<CET>, C<EST>) and whose values are the canonical IANA timezone name most
+commonly associated with that abbreviation.
 
 For example:
 
     JST -> Asia/Tokyo
+    CET -> Europe/Paris
+    EST -> America/New_York
 
-In scalar context, it returns an hash reference, and in list context, it returns an hash.
+In scalar context, it returns a hash reference, and in list context, it returns a hash.
 
 If an error occurred, this sets an L<exception object|DateTime::Lite::Exception>, and returns C<undef> in scalar context, and an empty list in list context. The exception object can then be retrieved with L</error>
+
+=head3 Caveats and limitations
+
+Timezone abbreviations are inherently ambiguous, and this method exposes only one representative IANA zone per abbreviation. Callers should be aware of the following limitations before using this mapping for anything more than convenience lookups:
+
+=over 4
+
+=item * B<Abbreviations are not unique to a single zone.>
+
+C<CST> denotes both Central Standard Time (North America) and China Standard Time. C<IST> denotes Indian, Irish, and Israel Standard Time. The returned mapping selects only one representative zone per abbreviation and does not indicate alternatives.
+
+=item * B<DST rules differ across zones sharing the same abbreviation.>
+
+Algeria (C<Africa/Algiers>) has used CET year-round with no DST since 1981.
+Mapping C<CET> to C<Europe/Paris> applies French DST rules to Algerian timestamps, producing a one-hour error during summer months.
+
+=item * B<Historical DST adoption was not uniform.>
+
+Sweden (C<Europe/Stockholm>) observed no DST from 1917 to 1979, while France resumed DST in 1976. A summer 1977 timestamp labelled "CET" in Sweden was UTC+1, but C<< CET => Europe/Paris >> would interpret it as UTC+2.
+
+=item * B<DST transition dates have changed over time.>
+
+In 1996, the EU harmonised the fall-back transition to the last Sunday in October (previously the last Sunday in September in several countries).
+Historical timestamps near these transitions may be misinterpreted.
+
+=back
+
+For accurate timezone handling, prefer IANA canonical names (C<Europe/Stockholm>, C<America/New_York>) over abbreviations whenever the canonical name is available. This method is intended for convenience when processing external input (legacy log files, RFC 5322 email headers, user-typed values, etc.) where only an abbreviation is available, and where the caller accepts the loss of geographic and historical precision.
+
+For richer abbreviation lookups, including all known zones for a given abbreviation, see L</resolve_abbreviation>.
 
 =head2 fatal
 

@@ -1,4 +1,4 @@
-package Concierge::Users v0.8.2;
+package Concierge::Users v0.8.3;
 use v5.36;
 
 use Carp		qw/ croak carp /;
@@ -374,7 +374,7 @@ Concierge::Users - User data management with multiple storage backends
 
 =head1 VERSION
 
-v0.8.2
+v0.8.3
 
 =head1 SYNOPSIS
 
@@ -629,20 +629,24 @@ Deletes a user record. Fails if the user does not exist.
 
 =head2 show_default_config
 
-    Concierge::Users::Meta->show_default_config();
+    my $result = Concierge::Users::Meta->show_default_config();
+    print $result->{config} if $result->{success};
 
-Prints the built-in default field configuration template to STDOUT.
-Can be called as a class or instance method (inherited from
-L<Concierge::Users::Meta>).
+Returns C<< { success => 1, config => $yaml_string } >> containing the
+built-in default field configuration template.  Always succeeds.
+Callers decide how to use the string.  Can be called as a class or
+instance method (inherited from L<Concierge::Users::Meta>).
 
 =head2 show_config
 
-    $users->show_config();
-    $users->show_config(output_path => '/tmp/my-config.yaml');
+    my $result = $users->show_config();
+    my $result = $users->show_config(output_path => '/tmp/my-config.yaml');
+    print $result->{config} if $result->{success};
 
-Prints the active YAML configuration for this instance to STDOUT.
-Must be called on an instance (after C<new>).  Inherited from
-L<Concierge::Users::Meta>.
+Returns C<< { success => 1, config => $yaml_string, config_file => $path } >>
+with the active YAML configuration for this instance.  Callers decide
+how to use the string.  Must be called on an instance (after C<new>).
+Inherited from L<Concierge::Users::Meta>.
 
 =head1 SEE ALSO
 

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.tap` (result). Extracted from switchblade `PublicCallTapResult.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "code": {
+      "type": "string"
+    },
+    "control_id": {
+      "type": "string"
+    },
+    "data": {},
+    "message": {
+      "type": "string"
+    },
+    "source_device": {
+      "additionalProperties": true,
+      "properties": {
+        "params": {},
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "code"
+  ],
+  "title": "calling.tap result",
+  "type": "object",
+  "x-method": "calling.tap",
+  "x-phase": "result",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallTapResult.cs"
+}

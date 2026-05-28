@@ -1,4 +1,4 @@
-package Concierge::Users::Meta v0.8.2;
+package Concierge::Users::Meta v0.8.3;
 use v5.36;
 use Carp qw/ croak carp /;
 use YAML::Tiny;
@@ -232,14 +232,16 @@ sub init_field_meta {
 	push @fields, @system_fields;
 
 	# Auto-set defaults for enum fields that don't have explicit defaults
-	# Also create v_options (validated options) without asterisks for internal use
+	# Also create v_options (validated options) for internal use:
+	#   - strip leading '*' (default marker)
+	#   - strip ':Label' suffix (display label; stored value precedes the colon)
 	foreach my $field_name (keys %merged_definitions) {
 		my $def = $merged_definitions{$field_name};
 
-		# Process enum options: create v_options without asterisks
+		# Process enum options: create v_options with markers stripped
 		if ($def->{type} eq 'enum' && $def->{options}) {
-			# Create clean options list for validation (strip leading asterisk and any following spaces)
-			my @clean_options = map { s/^\*\s*//r } $def->{options}->@*;
+			# Strip '*' prefix then ':Label' suffix to get bare stored values
+			my @clean_options = map { (s/^\*\s*//r) =~ s/:.*$//r } $def->{options}->@*;
 			$merged_definitions{$field_name}{v_options} = \@clean_options;
 
 			# Auto-set default from * designated option for enum fields
@@ -247,8 +249,9 @@ sub init_field_meta {
 			if (!$def->{default} || $def->{default} eq '') {
 				my $default_option	= '';
 				for my $opt ($def->{options}->@*) {
-					if ($opt =~ /^\*(.+)\s*$/) {
-						$default_option = $1; # OK if it's ''
+					# Capture stored value only (before any ':Label' suffix)
+					if ($opt =~ /^\*([^:]*?)(?::.*)?$/) {
+						$default_option = $1;
 						last;
 					}
 				}
@@ -292,6 +295,19 @@ sub init_field_meta {
 	name      => '',
 );
 
+# Canonical field data types -- use for validating 'type' attribute values.
+# moniker and name are validate_as targets only, not data types.
+%Concierge::Users::Meta::field_types = (
+	text      => 1,
+	boolean   => 1,
+	integer   => 1,
+	enum      => 1,
+	email     => 1,
+	phone     => 1,
+	date      => 1,
+	timestamp => 1,
+);
+
 # Get field validator - returns validator based on validate_as or type
 sub get_field_validator {
 	my ($self, $field) = @_;
@@ -315,7 +331,11 @@ sub get_field_validator {
 }
 
 # Get UI-friendly field hints for calling applications
-# Returns hashref with: label, type, max_length, options, description, required
+# Returns hashref with: label, type, validate_as, max_length, options,
+#   description, required, default, null
+# 'null' is the field's null_value (the sentinel for "no data").
+# 'required' means operationally required at the service layer -- always,
+#   regardless of channel -- not app-level conditional required logic.
 sub get_field_hints {
 	my ($self, $field) = @_;
 
@@ -323,12 +343,15 @@ sub get_field_hints {
 	return unless $field_def;
 
 	return {
-		label => $field_def->{label} || labelize($field_def->{field_name} || $field),
-		type => $field_def->{type},
-		max_length => $field_def->{max_length},
-		options => $field_def->{options},
+		label       => $field_def->{label} || labelize($field_def->{field_name} || $field),
+		type        => $field_def->{type},
+		validate_as => $field_def->{validate_as},
+		max_length  => $field_def->{max_length},
+		options     => $field_def->{options},
 		description => $field_def->{description},
-		required => $field_def->{required},
+		required    => $field_def->{required},
+		default     => $field_def->{default},
+		null        => $field_def->{null_value},
 	};
 }
 
@@ -430,6 +453,7 @@ sub config_to_yaml {
 			$yaml .= "    $field:\n";
 			$yaml .= "      field_name: $def->{field_name}\n";
 			$yaml .= "      type: $def->{type}\n";
+			$yaml .= "      field_use: $def->{field_use}\n" if $def->{field_use};
 			$yaml .= "      required: $def->{required}\n";
 
 			# Only show validate_as if it's different from type
@@ -485,16 +509,17 @@ sub _yaml_scalar_value {
 	return "\"$value\"";
 }
 
-# Show default configuration (from __DATA__ section)
-# Can be called as class method or instance method
-# Parameters (optional hash):
-#   output_path => '/path/to/file.yaml'  # Save to file instead of STDOUT
+# Return default configuration (from __DATA__ section) as a service hashref.
+# Can be called as class method or instance method.
+# Returns: { success => 1, config => $yaml_string }
 sub show_default_config {
 	my ($self, %params) = @_;
 
-	# Read from __DATA__ section
-    my @data        = <DATA>;
-	say @data;
+	my @data = <DATA>;
+	return {
+		success => 1,
+		config  => join('', @data),
+	};
 }
 
 # Show configuration for an existing setup
@@ -533,7 +558,7 @@ sub show_config {
 		};
 	}
 
-	# Read and display the YAML file
+	# Read the YAML file and return its content
 	my $yaml_content;
 	eval {
 		open my $fh, '<', $yaml_file or croak "Cannot open $yaml_file: $!";
@@ -548,13 +573,10 @@ sub show_config {
 		};
 	}
 
-	# Print to STDOUT
-	print $yaml_content;
-
 	return {
-		success => 1,
-		message => "Configuration displayed from $yaml_file",
-		config_file => $yaml_file
+		success     => 1,
+		config      => $yaml_content,
+		config_file => $yaml_file,
 	};
 }
 
@@ -754,7 +776,8 @@ sub validate_name_field {
 		field_name => 'user_id',
 		label => 'User ID',
 		description => 'User login ID - Primary authentication identifier',
-		type => 'system',
+		type => 'text',
+		field_use => 'identity',
 		required => 1,
 		options => [],
 		default => '',
@@ -965,7 +988,8 @@ sub validate_name_field {
 		field_name => 'last_mod_date',
 		label => 'Last Modification Date',
 		description => 'Timestamp of last profile modification',
-		type => 'system',
+		type => 'timestamp',
+		field_use => 'system',
 		required => 0,
 		options => [],
 		default => '0000-00-00 00:00:00',
@@ -977,7 +1001,8 @@ sub validate_name_field {
 		field_name => 'created_date',
 		label => 'Created Date',
 		description => 'Timestamp when user account was created',
-		type => 'system',
+		type => 'timestamp',
+		field_use => 'system',
 		required => 1,
 		options => [],
 		default => '0000-00-00 00:00:00',
@@ -1102,7 +1127,7 @@ utilities for Concierge::Users
 
 =head1 VERSION
 
-v0.8.2
+v0.8.3
 
 =head1 SYNOPSIS
 
@@ -1148,7 +1173,8 @@ Always present in every setup.
 
 Primary authentication identifier.
 
-    type:          system
+    type:          text
+    field_use:     identity
     required:      1
     max_length:    30
     default:       ""
@@ -1269,10 +1295,10 @@ cannot be set through the public API.  Protected from overrides.
 
 =over 4
 
-=item B<last_mod_date> -- type C<system>, timestamp updated on every write
+=item B<last_mod_date> -- type C<timestamp>, C<field_use =E<gt> 'system'>, updated on every write
 
-=item B<created_date> -- type C<system>, timestamp set once on creation,
-C<required =E<gt> 1>
+=item B<created_date> -- type C<timestamp>, C<field_use =E<gt> 'system'>, set once on
+creation, C<required =E<gt> 1>
 
 =back
 
@@ -1289,7 +1315,12 @@ column/file identifier.
 Set automatically; protected from overrides.
 
 =item C<type> -- Data type: C<text>, C<email>, C<phone>, C<date>,
-C<timestamp>, C<boolean>, C<integer>, C<enum>, C<system>.
+C<timestamp>, C<boolean>, C<integer>, C<enum>.
+
+=item C<field_use> -- Operational role of the field.  Omitted for normal
+user-writable fields.  C<identity> marks fields set once at creation and
+never changed (e.g. C<user_id>).  C<system> marks fields auto-managed by
+the backend (e.g. C<created_date>, C<last_mod_date>).
 
 =item C<validate_as> -- Validator to use if different from C<type>.
 See L</VALIDATOR TYPES>.
@@ -1386,6 +1417,10 @@ prefix stripped).
 
     null_value: ""
 
+C<moniker> is a C<validate_as> target only, not a data type.  Use
+C<< type => 'text', validate_as => 'moniker' >> for fields that need
+this pattern.
+
 =item B<name>
 
 Letters (including accented), hyphens, apostrophes, and internal
@@ -1393,7 +1428,14 @@ spaces.
 
     null_value: ""
 
+C<name> is a C<validate_as> target only, not a data type.  Use
+C<< type => 'text', validate_as => 'name' >> for name fields.
+
 =back
+
+The eight canonical data types (C<text>, C<boolean>, C<integer>, C<enum>,
+C<email>, C<phone>, C<date>, C<timestamp>) are enumerated in
+C<%Concierge::Users::Meta::field_types>.
 
 =head2 validate_as vs type
 
@@ -1579,9 +1621,12 @@ definitions).  Called internally by C<< Concierge::Users->setup() >>.
 
 =head3 show_default_config
 
-    Concierge::Users::Meta->show_default_config();
+    my $result = Concierge::Users::Meta->show_default_config();
+    print $result->{config} if $result->{success};
 
-Prints the built-in default field configuration template to STDOUT.
+Returns C<< { success => 1, config => $yaml_string } >> containing the
+built-in default field configuration template.  Always succeeds.
+Callers decide how to use the string (print, log, display, etc.).
 
 =head2 Instance Methods
 
@@ -1603,8 +1648,16 @@ C<validate_as> or C<type>, or C<undef> if no validator is available.
 
     my $hints = $users->get_field_hints('email');
 
-Returns a hashref of UI-friendly attributes: C<label>, C<type>,
-C<max_length>, C<options>, C<description>, C<required>.
+Returns a hashref of consumer-friendly attributes for a field:
+C<label>, C<type>, C<validate_as>, C<max_length>, C<options>,
+C<description>, C<required>, C<default>, C<null>.
+
+C<null> is the field's null value (the sentinel for "no data").
+
+C<required> means operationally required at the service layer -- always,
+regardless of channel (web form, CLI, programmatic).  It is distinct
+from app-level conditional required logic, which calling applications
+manage independently.
 
 =head3 get_user_fields
 
@@ -1630,11 +1683,19 @@ backend list methods.  See L</FILTER DSL>.
 
 =head3 show_config
 
-    $users->show_config();
-    $users->show_config(output_path => '/tmp/config.yaml');
+    my $result = $users->show_config();
+    print $result->{config} if $result->{success};
 
-Prints the active YAML configuration file for this instance to STDOUT.
-Must be called on a L<Concierge::Users> instance (not a class method).
+    my $result = $users->show_config(output_path => '/path/to/other.yaml');
+
+Returns C<< { success => 1, config => $yaml_string, config_file => $path } >>
+with the active YAML configuration for this instance.  Callers decide
+how to use the string.  Must be called on a L<Concierge::Users> instance
+(not a class method).
+
+Returns C<< { success => 0, message => $reason } >> if the instance has
+no backend, the storage directory cannot be determined, or the YAML
+file is missing or unreadable.
 
 =head3 config_to_yaml
 
@@ -1677,7 +1738,7 @@ __DATA__
 ################################################################################
 
 Configuration:
-  Version: v0.8.2
+  Version: v0.8.3
   Backend: Concierge::Users::Database  # Default; can be 'database', 'file', or 'yaml'
   Storage Directory: /path/to/storage  # Set during setup
   Generated: 2026-01-06 19:10:18
@@ -1686,7 +1747,8 @@ Field Definitions:
   Core Fields:
     user_id:
       field_name: user_id
-      type: system
+      type: text
+      field_use: identity
       required: 1
       default: ""
       description: "User login ID - Primary authentication identifier"
@@ -1731,7 +1793,7 @@ Field Definitions:
         - admin
       description: "Permission level for feature access"
       max_length: 20
-	  validate_as: enum
+      validate_as: enum
       must_validate: 1
       null_value: ""
 
@@ -1787,7 +1849,7 @@ Field Definitions:
         - Madam
       description: "Name prefix or title"
       max_length: 10
-	  validate_as: enum
+      validate_as: enum
       null_value: ""
 
     suffix:
@@ -1809,7 +1871,7 @@ Field Definitions:
         - Esq
       description: "Name suffix or professional designation"
       max_length: 10
-	  validate_as: enum
+      validate_as: enum
       null_value: ""
 
     organization:
@@ -1819,7 +1881,7 @@ Field Definitions:
       default: ""
       description: "User's organization or affiliation"
       max_length: 100
-	  validate_as: text
+      validate_as: text
       null_value: ""
 
     title:
@@ -1829,7 +1891,7 @@ Field Definitions:
       default: ""
       description: "User's position or job title"
       max_length: 100
-	  validate_as: text
+      validate_as: text
       null_value: ""
 
     email:
@@ -1839,7 +1901,7 @@ Field Definitions:
       default: ""
       description: "Email address for notifications"
       max_length: 255
-	  validate_as: email
+      validate_as: email
       null_value: ""
 
     phone:
@@ -1849,7 +1911,7 @@ Field Definitions:
       default: ""
       description: "Phone number with country code"
       max_length: 20
-	  validate_as: phone
+      validate_as: phone
       null_value: ""
 
     text_ok:
@@ -1859,7 +1921,7 @@ Field Definitions:
       default: ""
       description: "Consent for text messages (1=yes, 0=no)"
       max_length: 1
-	  validate_as: boolean
+      validate_as: boolean
       null_value: ""
 
     last_login_date:
@@ -1869,7 +1931,7 @@ Field Definitions:
       default: "0000-00-00 00:00:00"
       description: "Timestamp of last successful login"
       max_length: 19
-	  validate_as: timestamp
+      validate_as: timestamp
       null_value: "0000-00-00 00:00:00"
 
     term_ends:
@@ -1879,26 +1941,26 @@ Field Definitions:
       default: ""
       description: "Account expiration date (YYYY-MM-DD)"
       max_length: 10
-	  validate_as: date
+      validate_as: date
       null_value: 0000-00-00
 
   System Fields:
     last_mod_date:
       field_name: last_mod_date
-      type: system
+      type: timestamp
+      field_use: system
       required: 0
       default: "0000-00-00 00:00:00"
       description: "Timestamp of last profile modification"
       max_length: 19
-	  validate_as: timestamp
       null_value: "0000-00-00 00:00:00"
 
     created_date:
       field_name: created_date
-      type: system
+      type: timestamp
+      field_use: system
       required: 1
       default: "0000-00-00 00:00:00"
       description: "Timestamp when user account was created"
       max_length: 19
-	  validate_as: timestamp
       null_value: "0000-00-00 00:00:00"

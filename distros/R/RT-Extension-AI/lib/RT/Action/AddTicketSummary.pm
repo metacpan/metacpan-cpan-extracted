@@ -17,25 +17,12 @@ sub Commit {
     my $ticket    = $self->TicketObj;
     my $ticket_id = $ticket->id;
 
-    my $transactions = $ticket->Transactions;
-
-    $transactions->Limit( FIELD => 'Type', OPERATION => '=', VALUE => 'Correspond' );
-
-    my $conversation = '';
-    my $max_chars    = 3000;
-
-    while ( my $txn = $transactions->Next ) {
-        my $content = $txn->Content;
-        next unless $content;
-
-        # TODO: identify privileged vs. unprivileged users
-        # TODO: make $max_chars configurable
-
-        $conversation .= "User: " . $txn->CreatorObj->Name . " ";
-        $conversation .= "Reply: " . $content . "\n";
-
-        last if length($conversation) > $max_chars;
-    }
+    # Generate formatted conversation using the centralized function
+    my $conversation = RT::Extension::AI::GenerateTicketSummary(
+        TicketObj => $ticket,
+        TransactionType => 'Correspond',
+        IncludeCreate => 1
+    );
 
     unless ($conversation) {
         RT->Logger->info("No content to summarize for ticket #$ticket_id.");

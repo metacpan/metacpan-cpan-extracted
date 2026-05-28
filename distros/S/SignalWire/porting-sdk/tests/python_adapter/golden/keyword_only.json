@@ -1,0 +1,38 @@
+{
+  "keyword_only": {
+    "classes": {
+      "Server": {
+        "methods": {
+          "serve": {
+            "params": [
+              {
+                "name": "self",
+                "kind": "self"
+              },
+              {
+                "name": "host",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "port",
+                "kind": "keyword",
+                "type": "int",
+                "required": false,
+                "default": 8000
+              },
+              {
+                "name": "debug",
+                "kind": "keyword",
+                "type": "bool",
+                "required": false,
+                "default": false
+              }
+            ],
+            "returns": "void"
+          }
+        }
+      }
+    }
+  }
+}

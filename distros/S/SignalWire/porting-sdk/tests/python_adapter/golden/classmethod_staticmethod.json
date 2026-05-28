@@ -1,0 +1,34 @@
+{
+  "classmethod_staticmethod": {
+    "classes": {
+      "Builder": {
+        "methods": {
+          "from_string": {
+            "params": [
+              {
+                "name": "cls",
+                "kind": "cls"
+              },
+              {
+                "name": "source",
+                "type": "string",
+                "required": true
+              }
+            ],
+            "returns": "class:Builder"
+          },
+          "parse_version": {
+            "params": [
+              {
+                "name": "text",
+                "type": "string",
+                "required": true
+              }
+            ],
+            "returns": "int"
+          }
+        }
+      }
+    }
+  }
+}

@@ -2,7 +2,7 @@ package DBIx::QuickORM::Dialect::SQLite;
 use strict;
 use warnings;
 
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 
 use DBD::SQLite 1.0;
 
@@ -341,13 +341,21 @@ sub build_columns_from_db {
     croak "A table name is required" unless $table;
     my $dbh = $self->{+DBH};
 
-    my $sth = $dbh->prepare("SELECT * FROM pragma_table_info(?)");
+    # pragma_table_xinfo (SQLite 3.31.0+, 2020-01-22) lists every column
+    # including hidden virtual-table columns and GENERATED columns; the
+    # older pragma_table_info silently omits them. The `hidden` flag
+    # distinguishes them: 0 ordinary, 1 hidden virtual-table column,
+    # 2 virtual generated column, 3 stored generated column.
+    my $sth = $dbh->prepare("SELECT * FROM pragma_table_xinfo(?)");
     $sth->execute($table);
 
     my $has_autoinc = $self->table_has_autoinc($table);
 
     my (%columns, @links);
     while (my $res = $sth->fetchrow_hashref) {
+        my $hidden = $res->{hidden} // 0;
+        next if $hidden == 1;    # hidden virtual-table columns are not part of the ORM schema
+
         my $col = {};
 
         $params{autofill}->hook(pre_column => {column => $col, table_name => $table, column_info => $res});
@@ -355,7 +363,8 @@ sub build_columns_from_db {
         $col->{name}    = $res->{name};
         $col->{db_name} = $res->{name};
         $col->{order}   = $res->{cid} + 1;
-        $col->{identity} = 1 if $has_autoinc && $res->{pk};
+        $col->{identity}  = 1 if $has_autoinc && $res->{pk};
+        $col->{generated} = 1 if $hidden >= 2;
 
         my $type = $res->{type};
         $type =~ s/\(.*$//;
@@ -432,7 +441,7 @@ sub _primary_key {
     my $self = shift;
     my ($table) = @_;
 
-    my $sth = $self->dbh->prepare("SELECT name FROM pragma_table_info(?) WHERE pk > 0 ORDER BY pk ASC");
+    my $sth = $self->dbh->prepare("SELECT name FROM pragma_table_xinfo(?) WHERE pk > 0 AND (hidden IS NULL OR hidden < 2) ORDER BY pk ASC");
     $sth->execute($table);
 
     my @out;

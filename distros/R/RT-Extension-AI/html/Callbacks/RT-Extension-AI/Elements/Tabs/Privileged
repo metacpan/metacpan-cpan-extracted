@@ -1,0 +1,54 @@
+<%init>
+return unless $Path =~ m{^/Admin/Queues};
+
+my $current_user = $session{CurrentUser};
+return unless $current_user && $current_user->HasRight( Object => RT->System, Right => 'AdminQueue' );
+
+my $config = RT->Config->Get('RT_AI_Provider');
+return unless $config && ( $config->{Default} || keys %$config );
+
+my $default_config = $config->{Default} || {};
+return unless $default_config->{queue_creation_assistant};
+
+# Top-level admin menu: Admin > Queues > Create with AI
+if ( my $queues = Menu()->child('admin') ) {
+    if ( $queues = $queues->child('queues') ) {
+        $queues->child(
+            'create-ai',
+            title => loc('Create with AI'),
+            path  => '/Admin/Queues/CreateWithAI.html',
+        );
+    }
+}
+
+# Page menu — only on the queue index and CreateWithAI pages,
+# not on individual queue admin pages
+my $args = $HTML::Mason::Commands::DECODED_ARGS || {};
+my $has_id = $args->{'id'} && $args->{'id'} =~ /^\d+$/;
+return if $has_id;
+
+my $page = PageMenu();
+return unless $page;
+
+if ( $Path =~ m{CreateWithAI\.html$} ) {
+    # On CreateWithAI, MenuBuilder created a "Queues" dropdown with
+    # Select/Create under it. Remove it and add all three as flat
+    # siblings in the page menu.
+    $page->delete('select') if $page->child('select');
+    $page->delete('queues') if $page->child('queues');
+    $page->child( select      => title => loc('Select'),         path => '/Admin/Queues/' );
+    $page->child( create      => title => loc('Create'),         path => '/Admin/Queues/Modify.html?Create=1' );
+    $page->child( 'create-ai' => title => loc('New Chat'), path => '/Admin/Queues/CreateWithAI.html?new=1' );
+}
+else {
+    # On the index page, Select/Create are already direct children
+    $page->child(
+        'create-ai',
+        title => loc('Create with AI'),
+        path  => '/Admin/Queues/CreateWithAI.html',
+    );
+}
+</%init>
+<%args>
+$Path
+</%args>

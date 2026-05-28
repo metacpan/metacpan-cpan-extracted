@@ -1,0 +1,24 @@
+name: ci
+on:
+  push:
+    branches: ['*']
+    tags-ignore: ['*']
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        perl-version: ['5.36', '5.38', '5.40']
+    container:
+      image: perl:${{ matrix.perl-version }}-bookworm
+    steps:
+      - uses: actions/checkout@v5
+      - name: Fix safe.directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: perl -V
+        run: perl -V
+      - name: Install libgit2 (system)
+        run: apt-get update && apt-get install -y libgit2-dev pkg-config
+      - uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main

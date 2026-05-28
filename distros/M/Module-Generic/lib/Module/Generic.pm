@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.5.0
+## Version v1.5.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2026/05/19
+## Modified 2026/05/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -116,7 +116,7 @@ BEGIN
         *_in_global_destruction = sub{ ${B::main_cv()} == 0 };
     }
 
-    our $VERSION   = 'v1.5.0';
+    our $VERSION   = 'v1.5.1';
 };
 
 # Load the XS shared library (Generic.so) which provides faster implementations of
@@ -10989,20 +10989,45 @@ sub clone
     my $new;
     # try-catch
     local $@;
-    eval
+    if( @_ )
     {
-        if( $self->_is_object( $self ) )
+        if( scalar( @_ ) > 1 )
         {
-            $new = Clone::clone( $self );
+            return( $self->error( "clone() requires zero or 1 argument, at most, and it must be a reference." ) );
         }
-        else
+        elsif( !defined( $_[0] ) )
         {
-            $new = $self->new;
+            # So, we return undef too.
+            return;
         }
-    };
-    if( $@ )
+        elsif( !ref( $_[0] ) )
+        {
+            return( $self->error( "The value provided is not a reference." ) );
+        }
+        my $this = shift( @_ );
+        $new = eval{ Clone::clone( $this ) };
+        if( $@ )
+        {
+            return( $self->error( "Error cloning reference provided \"", $self->_str_val( $this ), "\": $@" ) );
+        }
+    }
+    else
     {
-        return( $self->error( "Error cloning object \"", $self->_str_val( $self // 'undef' ), "\": $@" ) );
+        $new = eval
+        {
+            if( $self->_is_object( $self ) )
+            {
+                Clone::clone( $self );
+            }
+            else
+            {
+                $self->new;
+            }
+        };
+        if( $@ )
+        {
+            return( $self->error( "Error cloning object \"", $self->_str_val( $self // 'undef' ), "\": $@" ) );
+        }
     }
     return( $new );
 }
@@ -13315,7 +13340,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.5.0
+    v1.5.1
 
 =head1 DESCRIPTION
 

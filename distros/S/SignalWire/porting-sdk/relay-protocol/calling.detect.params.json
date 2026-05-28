@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.detect` (params). Extracted from switchblade `PublicCallDetectParams.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "control_id": {
+      "type": "string"
+    },
+    "detect": {
+      "additionalProperties": true,
+      "properties": {
+        "params": {
+          "type": "object"
+        },
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "params"
+      ],
+      "type": "object"
+    },
+    "node_id": {
+      "type": "string"
+    },
+    "timeout": {
+      "type": [
+        "number",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id",
+    "control_id",
+    "detect"
+  ],
+  "title": "calling.detect params",
+  "type": "object",
+  "x-method": "calling.detect",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallDetectParams.cs"
+}

@@ -3,8 +3,10 @@
 
 requires "Carp" => "1.35";
 requires "perl" => "v5.20.0";
+recommends "Data::Identifier" => "v0.29.0";
 recommends "File::Spec" => "3.84";
 recommends "Image::Magick" => "0";
+recommends "SIRTX::Datecode" => "v0.7.0";
 
 on 'test' => sub {
   requires "Test::Exception" => "0.30";

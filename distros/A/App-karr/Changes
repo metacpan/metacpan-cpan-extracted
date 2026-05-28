@@ -1,6 +1,54 @@
-0.205     2026-05-17 23:00:03Z
+0.300     2026-05-27 20:43:23Z
 
-    - Docker Release Test
+    - Docker: bundle libgit2 (Alien::Libgit2 share build) so the runtime
+      image is self-contained. Builder installs cmake/pkg-config/zlib/
+      libssh2 dev headers and sets ALIEN_INSTALL_TYPE=share; runtime-base
+      installs libssl3/libssh2-1/zlib1g (the shared libs the vendored
+      libgit2.so links against). Needed since Git::Native moved to
+      Git::Libgit2 (libgit2 FFI).
+    - Add .github/workflows/ci.yml (perl 5.36/5.38/5.40) using the
+      [@Author::GETTY] dzil-test composite action; installs libgit2-dev so
+      Alien::Libgit2 links the system libgit2 (>= 1.5) in CI.
+    - Git.pm: read git config (user.name/email) and validate helper ref
+      names through Git::Native (Config + reference_name_is_valid) instead
+      of poking Git::Libgit2::FFI directly. New Git.pm `ref_oids` helper.
+    - karr-foundation: detect board changes via Git::Native instead of
+      shelling out to `git for-each-ref` — no git binary needed for that
+      path anymore. Sync (`--pull`) and open-task detection now run
+      in-process via App::karr::Git/BoardStore instead of forking the
+      `karr` CLI.
+    - karr-foundation: drain each board instead of a single run — invoke
+      the agent command repeatedly until no actionable task (non-terminal
+      and unblocked) remains. A task the agent claims but never moves is
+      auto-blocked after `max_attempts` stalls (default 2) so the drain
+      always terminates; the agent's own `--block` reason still wins.
+      Observable common errors (non-zero/timeout exit, or a log match
+      against rate-limit/auth/network/5xx patterns, extensible via
+      `error_patterns`) never penalize a task and instead trigger an
+      exponential per-repo cooldown (1, 2, 4, … minutes, capped). New
+      `.karr` keys: `drain`, `max_attempts`, `max_iterations`,
+      `cooldown_base`, `cooldown_max`, `error_patterns`.
+    - cpanfile: require Git::Native 0.003 and Git::Libgit2 0.004.
+    - Fix `karr context` / `karr context --json` crashing with
+      "Can't locate object method 'strftime' via package 'Sun May ...'":
+      Cmd::Context now `use Time::Piece`, so `gmtime` returns a
+      Time::Piece object instead of a plain string. Added t/07-context.t
+      covering the plain, --json, and recently-completed cutoff paths.
+    - Fix `karr config show` (and get/set) crashing with
+      "Can't locate object method 'board_dir'": Cmd::Config now builds
+      its config via `$self->store->effective_config` and persists with
+      `$self->store->save_config`, instead of calling the non-existent
+      `board_dir` on itself. Added t/06-config-cmd.t.
+    - Drop hard-coded `tags = latest` / `tags = user` in the Docker
+      subsections so the new `[@Author::GETTY::Docker]` default
+      (`latest %V %v`) applies. `runtime-user` keeps a `-user`
+      suffix on each tag.
+    - Add `karr-foundation` binary and `App::karr::Foundation` module:
+      single-shot daemon for periodic agent execution across multiple karr
+      boards. Reads `~/.config/karr-foundation/config.yml` (dirs: / scan:),
+      checks each repo for board changes or open tasks, and invokes the
+      per-repo `.karr` command. Supports `--force`, `--dry-run`, `--verbose`.
+      Per-repo state in `.karr.state` / `.karr.lock` / `.karr.log` (gitignored).
 
 0.202     2026-05-17 05:17:07Z
 

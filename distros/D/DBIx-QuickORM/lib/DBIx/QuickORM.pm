@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use feature qw/state/;
 
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 
 use Carp qw/croak confess/;
 $Carp::Internal{ (__PACKAGE__) }++;
@@ -1110,7 +1110,7 @@ sub db_name {
     my $self = shift;
     my ($db_name) = @_;
 
-    my $top = $self->_in_builder(qw{table db});
+    my $top = $self->_in_builder(qw{table db column});
 
     $top->{meta}->{db_name} = $db_name;
 }
@@ -2013,16 +2013,23 @@ orm from its actual name on the server:
         db_name 'myapp'    # Actual name on the server;
     };
 
-Can be nested under C<table> or C<db>.
+It works the same way for an individual column, letting the ORM use one name
+for a column while the database uses another:
+
+    column people_id => sub {    # Name in the orm
+        db_name 'id';            # Actual column name in the table
+    };
+
+Can be nested under C<table>, C<db>, or C<column>.
 
 =item C<< column NAME => sub { ... } >>
 
 =item C<< column NAME => %SPECS >>
 
-Define a column with the given name. The name will be used both as the name the
-ORM uses for the column, and the actual name of the column in the database.
-Currently having a column use a different name in the ORM vs the table is not
-supported.
+Define a column with the given name. By default the name is used both as the
+name the ORM uses for the column and as the actual name of the column in the
+database. To have the ORM use a different name from the database column, set
+C<db_name> inside the column.
 
     column foo => sub {
         type \'BIGINT'; # Specify a type in raw SQL (can also accept DBIx::QuickORM::Type::*)
@@ -2042,7 +2049,7 @@ Another simple way to do everything above:
 
 Can be nested under C<table>. Can contain C<omit>, C<nullable>, C<not_null>,
 C<identity>, C<affinity>, C<type>, C<sql>, C<default>, C<primary_key>,
-C<unique>, and C<link>.
+C<unique>, C<link>, and C<db_name>.
 
 =item C<omit>
 

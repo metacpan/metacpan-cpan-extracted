@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.receive` (result). Extracted from switchblade `PublicCallReceiveResult.cs`.",
+  "properties": {
+    "code": {
+      "type": "string"
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "code"
+  ],
+  "title": "calling.receive result",
+  "type": "object",
+  "x-method": "calling.receive",
+  "x-phase": "result",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallReceiveResult.cs"
+}

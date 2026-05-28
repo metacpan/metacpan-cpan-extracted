@@ -1,0 +1,11 @@
+{
+  "coverage_pct": 0.502,
+  "covered_methods": 5,
+  "covered_method_list": [
+    "signalwire.core.swml_service.SWMLService.on_function_call",
+    "signalwire.core.swml_service.SWMLService.render_swml",
+    "signalwire.skills.datasphere.skill.DataSphereSkill.search_knowledge",
+    "signalwire.skills.spider.skill.SpiderSkill.scrape_url",
+    "signalwire.skills.wikipedia_search.skill.WikipediaSearchSkill.search_wiki"
+  ]
+}

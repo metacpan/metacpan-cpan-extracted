@@ -30,6 +30,7 @@ my @modules = qw(
   App::karr::Cmd::Log
   App::karr::Cmd::SetRefs
   App::karr::Cmd::GetRefs
+  App::karr::Foundation
 );
 
 for my $mod (@modules) {

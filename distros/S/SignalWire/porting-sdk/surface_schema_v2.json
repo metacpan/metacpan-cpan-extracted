@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/signalwire/porting-sdk/surface_schema_v2.json",
+  "title": "Cross-language SDK signature inventory (canonical shape)",
+  "description": "JSON Schema for the canonical signature inventory each port emits. The Python reference (signalwire-python) is the oracle; every other port's adapter normalizes its native API surface into this exact shape so that diff_port_signatures.py can compare against python_signatures.json. See ADAPTER_CONTRACT.md for the per-adapter contract that produces a document conforming to this schema.",
+  "type": "object",
+  "required": ["version", "modules"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "description": "Schema version. Bumped when the canonical shape itself changes (not when types or aliases change).",
+      "const": "2"
+    },
+    "generated_from": {
+      "description": "Free-form string identifying the source — e.g. 'griffe 2.0.2' or 'rustdoc-types 0.x via cargo-public-api'. Optional; helps debugging adapter regressions.",
+      "type": "string"
+    },
+    "modules": {
+      "description": "Map from canonical Python-style dotted module name (e.g. 'signalwire.core.agent_base') to its inventory. Ports MUST translate native module / namespace names to the Python reference's dotted form at adapter time so diffs line up.",
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/module" }
+    }
+  },
+  "$defs": {
+    "module": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "classes": {
+          "description": "Map from canonical class name (PascalCase, matches Python reference) to its method inventory.",
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/classEntry" }
+        },
+        "functions": {
+          "description": "Module-level (free) functions. Map from canonical function name (snake_case) to its signature.",
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/signature" }
+        }
+      }
+    },
+    "classEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "methods": {
+          "description": "Map from canonical method name (snake_case) to its signature.",
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/signature" }
+        }
+      }
+    },
+    "signature": {
+      "type": "object",
+      "required": ["params", "returns"],
+      "additionalProperties": false,
+      "properties": {
+        "params": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/param" }
+        },
+        "returns": {
+          "description": "Return type as a canonical type string (see type_vocabulary.yaml). Use 'void' for procedures with no meaningful return value.",
+          "$ref": "#/$defs/canonicalType"
+        }
+      }
+    },
+    "param": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "description": "Canonical parameter name (snake_case in Python reference). Adapters MUST translate native names (e.g. JavaScript camelCase) to the Python reference's snake_case at adapter time.",
+          "type": "string",
+          "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+        },
+        "type": {
+          "description": "Canonical type string from type_vocabulary.yaml. Required for every parameter except the receiver itself.",
+          "$ref": "#/$defs/canonicalType"
+        },
+        "kind": {
+          "description": "How the parameter is passed. 'self' for the implicit receiver in instance methods (Python self, Ruby self, .NET this). 'cls' for class-method receivers (Python @classmethod). 'positional' (default) for ordinary positional or positional-or-keyword params. 'keyword' for keyword-only params (Python after a bare *). 'var_positional' for *args. 'var_keyword' for **kwargs.",
+          "enum": ["self", "cls", "positional", "keyword", "var_positional", "var_keyword"]
+        },
+        "required": {
+          "description": "True if the parameter has no default and the caller MUST supply a value. Defaults to true if omitted.",
+          "type": "boolean"
+        },
+        "default": {
+          "description": "Default value as a JSON-serializable representation, or null if the default is null/None. Omit entirely if the parameter is required (has no default).",
+          "type": ["string", "number", "boolean", "null", "array", "object"]
+        }
+      },
+      "allOf": [
+        {
+          "comment": "If kind == self or cls, type and default are not meaningful; required is implicitly true.",
+          "if": { "properties": { "kind": { "enum": ["self", "cls"] } }, "required": ["kind"] },
+          "then": { "not": { "anyOf": [
+            { "required": ["type"] },
+            { "required": ["default"] }
+          ] } }
+        },
+        {
+          "comment": "Every non-receiver param MUST have a type.",
+          "if": {
+            "anyOf": [
+              { "properties": { "kind": { "enum": ["positional", "keyword", "var_positional", "var_keyword"] } }, "required": ["kind"] },
+              { "not": { "required": ["kind"] } }
+            ]
+          },
+          "then": { "required": ["type"] }
+        }
+      ]
+    },
+    "canonicalType": {
+      "description": "A canonical type string. Form: a primitive ('string', 'int', 'float', 'bool', 'bytes', 'datetime', 'any', 'void'), a parameterized type with angle brackets ('list<string>', 'dict<string,any>', 'optional<int>', 'union<string,int>', 'tuple<int,int>', 'callable<list<any>,void>'), or a class reference ('class:signalwire.core.agent_base.AgentBase'). The full enumeration of legal forms is in type_vocabulary.yaml. Adapters that emit a value not matching this grammar MUST fail loudly at adapter time, not silently emit 'any'.",
+      "type": "string",
+      "pattern": "^(string|int|float|bool|bytes|datetime|any|void|list<.+>|dict<.+,.+>|optional<.+>|union<.+>|tuple<.+>|callable<.+>|class:[A-Za-z_][A-Za-z0-9_.]*)$"
+    }
+  }
+}

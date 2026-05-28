@@ -85,7 +85,8 @@ subtest 'Field definitions structure' => sub {
     ok($defs->{user_id}, 'user_id has definition');
     is($defs->{user_id}{field_name}, 'user_id', 'field_name correct');
     is($defs->{user_id}{label}, 'User ID', 'label correct');
-    is($defs->{user_id}{type}, 'system', 'type correct');
+    is($defs->{user_id}{type}, 'text', 'type correct');
+    is($defs->{user_id}{field_use}, 'identity', 'field_use correct');
     ok($defs->{user_id}{required}, 'required flag set');
     is($defs->{user_id}{max_length}, 30, 'max_length set');
 
@@ -96,7 +97,8 @@ subtest 'Field definitions structure' => sub {
 
     # Test 3: System field definitions
     ok($defs->{created_date}, 'created_date has definition');
-    is($defs->{created_date}{type}, 'system', 'created_date type correct');
+    is($defs->{created_date}{type}, 'timestamp', 'created_date type correct');
+    is($defs->{created_date}{field_use}, 'system', 'created_date field_use correct');
     is($defs->{created_date}{null_value}, '0000-00-00 00:00:00', 'null_value set');
 
     # Test 4: Enum field with auto-default
@@ -265,7 +267,8 @@ subtest 'get_field_definition' => sub {
     # Test 3: Get system field definition
     my $created_def = $users->get_field_definition('created_date');
     ok($created_def, 'Got created_date definition');
-    is($created_def->{type}, 'system', 'created_date is system type');
+    is($created_def->{type}, 'timestamp', 'created_date is timestamp type');
+    is($created_def->{field_use}, 'system', 'created_date field_use is system');
 
     # Test 4: Non-existent field
     my $missing = $users->get_field_definition('nonexistent');
@@ -487,15 +490,11 @@ subtest 'show_config' => sub {
     my $setup_result = Concierge::Users->setup($config);
     my $users = Concierge::Users->new($setup_result->{config_file});
 
-    # Test 1: Success case - capture stdout to avoid polluting test output
-    my $output = '';
-    {
-        open(local *STDOUT, '>', \$output) or die "Cannot redirect STDOUT: $!";
-        my $result = $users->show_config();
-        ok($result->{success}, 'show_config returns success');
-        ok($result->{config_file}, 'show_config returns config_file path');
-    }
-    like($output, qr/Configuration|Field Definitions/i, 'show_config prints YAML content');
+    # Test 1: Success case
+    my $result = $users->show_config();
+    ok($result->{success}, 'show_config returns success');
+    ok($result->{config_file}, 'show_config returns config_file path');
+    like($result->{config}, qr/Configuration|Field Definitions/i, 'show_config returns YAML content');
 
     # Test 2: Error case - non-existent output_path
     my $err_result = $users->show_config(output_path => '/nonexistent/path/to/file.yaml');

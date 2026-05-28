@@ -1,7 +1,7 @@
 package Data::Queue::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('Data::Queue::Shared', $VERSION);
@@ -233,7 +233,7 @@ C<$timeout> is seconds (C<-1> = infinite, C<0> = try once).
 
 =head3 Status
 
-    my $n   = $q->size;         # approximate for Int (lock-free), exact for Str
+    my $n   = $q->size;         # approximate under concurrent access
     my $cap = $q->capacity;     # max elements
     my $ok  = $q->is_empty;
     my $ok  = $q->is_full;

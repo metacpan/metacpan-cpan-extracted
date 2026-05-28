@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.disconnect` (params). Extracted from switchblade `PublicCallDisconnectParams.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "node_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id"
+  ],
+  "title": "calling.disconnect params",
+  "type": "object",
+  "x-method": "calling.disconnect",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallDisconnectParams.cs"
+}

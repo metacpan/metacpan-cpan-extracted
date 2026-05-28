@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the Blade envelope `signalwire.connect` (result). Extracted from switchblade `Messages/ConnectResult.cs`.",
+  "properties": {
+    "accesses": {
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "authentication": {
+            "type": "string"
+          },
+          "nodeid": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "nodeid",
+          "authentication"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "authorization": {
+      "type": "object"
+    },
+    "authorizations": {
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "authentication": {
+            "type": "string"
+          },
+          "authorization": {
+            "type": "object"
+          }
+        },
+        "required": [
+          "authentication",
+          "authorization"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "host": {
+      "type": "string"
+    },
+    "ice_servers": {
+      "items": {},
+      "type": "array"
+    },
+    "identity": {
+      "type": "string"
+    },
+    "master_nodeid": {
+      "type": "string"
+    },
+    "nodeid": {
+      "type": "string"
+    },
+    "protocol": {
+      "type": "string"
+    },
+    "protocols": {
+      "items": {
+        "additionalProperties": true,
+        "properties": {},
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "protocols_uncertified": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "result": {},
+    "session_restored": {
+      "type": "boolean"
+    },
+    "sessionid": {
+      "type": "string"
+    },
+    "subscriptions": {
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "command": {
+            "type": "string"
+          },
+          "failed_channels": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "protocol": {
+            "type": "string"
+          },
+          "subscribe_channels": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "protocol",
+          "command"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "session_restored",
+    "sessionid",
+    "nodeid",
+    "master_nodeid"
+  ],
+  "title": "signalwire.connect result",
+  "type": "object",
+  "x-method": "signalwire.connect",
+  "x-phase": "result",
+  "x-source": "blade",
+  "x-source-file": "switchblade/Messages/ConnectResult.cs"
+}

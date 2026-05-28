@@ -48,5 +48,5 @@ requires:
 resources:
   bugtracker: https://github.com/bwva/Concierge-Users/issues
   repository: https://github.com/bwva/Concierge-Users.git
-version: v0.8.2
+version: v0.8.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

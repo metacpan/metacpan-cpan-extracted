@@ -28,8 +28,11 @@ ok( index( $config, "target = runtime-root" ) >= 0 && index( $config, "image = r
 ok( index( $config, "target = runtime-user" ) >= 0 && index( $config, "image = raudssus/karr" ) >= 0,
     'runtime-user has target and image' );
 
-ok( index( $config, "tags = latest" ) >= 0,
-    'runtime-root has latest tag' );
+# runtime-root carries no explicit tags line — it relies on the
+# [@Author::GETTY::Docker] default (latest %V %v).
+my ($root_block) = $config =~ /^\[\@Author::GETTY::Docker \/ runtime-root\](.*?)(?=^\[|\z)/ms;
+ok( defined $root_block && $root_block !~ /^\s*tags\s*=/m,
+    'runtime-root has no hard-coded tags (uses default latest %V %v)' );
 
 ok( index( $config, "tags = user" ) >= 0,
     'runtime-user has user tag' );

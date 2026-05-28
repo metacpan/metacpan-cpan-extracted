@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.receive` (params). Extracted from switchblade `PublicCallReceiveParams.cs`.",
+  "properties": {
+    "context": {
+      "type": "string"
+    },
+    "contexts": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "title": "calling.receive params",
+  "type": "object",
+  "x-method": "calling.receive",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallReceiveParams.cs"
+}

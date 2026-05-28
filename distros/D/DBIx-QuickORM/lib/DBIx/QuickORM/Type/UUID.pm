@@ -2,7 +2,7 @@ package DBIx::QuickORM::Type::UUID;
 use strict;
 use warnings;
 
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 
 use Role::Tiny::With qw/with/;
 with 'DBIx::QuickORM::Role::Type';

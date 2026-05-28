@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.record` (params). Extracted from switchblade `PublicCallRecordParams.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "control_id": {
+      "type": "string"
+    },
+    "node_id": {
+      "type": "string"
+    },
+    "record": {
+      "additionalProperties": true,
+      "properties": {
+        "audio": {
+          "additionalProperties": true,
+          "properties": {
+            "direction": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id",
+    "control_id",
+    "record"
+  ],
+  "title": "calling.record params",
+  "type": "object",
+  "x-method": "calling.record",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallRecordParams.cs"
+}

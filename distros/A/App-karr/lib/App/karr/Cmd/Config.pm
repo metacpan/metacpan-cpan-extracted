@@ -1,7 +1,7 @@
 # ABSTRACT: View or modify board configuration
 
 package App::karr::Cmd::Config;
-our $VERSION = '0.205';
+our $VERSION = '0.300';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -26,9 +26,7 @@ sub execute {
 
   $self->sync_before if $action eq 'set';
 
-  my $config = App::karr::Config->new(
-    file => $self->board_dir->child('config.yml'),
-  );
+  my $config = App::karr::Config->from_merged($self->store->effective_config);
 
   if ($action eq 'show') {
     $self->_show_all($config);
@@ -123,7 +121,7 @@ sub _set_key {
     $d->{$key} = $val;
   }
 
-  $config->save;
+  $self->store->save_config($d);
 
   if ($self->json) {
     $self->print_json({ key => $key, value => $val });
@@ -165,7 +163,7 @@ App::karr::Cmd::Config - View or modify board configuration
 
 =head1 VERSION
 
-version 0.205
+version 0.300
 
 =head1 SYNOPSIS
 

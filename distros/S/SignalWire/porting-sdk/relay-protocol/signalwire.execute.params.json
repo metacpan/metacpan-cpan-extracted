@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the Blade envelope `signalwire.execute` (params). Extracted from switchblade `Messages/ExecuteParams.cs`.",
+  "properties": {
+    "attempted": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "method": {
+      "type": "string"
+    },
+    "params": {},
+    "protocol": {
+      "type": "string"
+    },
+    "requester_identity": {
+      "type": "string"
+    },
+    "requester_nodeid": {
+      "type": "string"
+    },
+    "responder_identity": {
+      "type": "string"
+    },
+    "responder_nodeid": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "protocol",
+    "method"
+  ],
+  "title": "signalwire.execute params",
+  "type": "object",
+  "x-method": "signalwire.execute",
+  "x-phase": "params",
+  "x-source": "blade",
+  "x-source-file": "switchblade/Messages/ExecuteParams.cs"
+}

@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.connect` (params). Extracted from switchblade `PublicCallConnectParams.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "devices": {
+      "items": {
+        "items": {
+          "additionalProperties": true,
+          "properties": {
+            "params": {},
+            "type": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "type": "array"
+    },
+    "max_duration": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "max_price_per_minute": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "node_id": {
+      "type": "string"
+    },
+    "ringback": {
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "params": {
+            "type": "object"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "params"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "tag": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id",
+    "devices"
+  ],
+  "title": "calling.connect params",
+  "type": "object",
+  "x-method": "calling.connect",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallConnectParams.cs"
+}

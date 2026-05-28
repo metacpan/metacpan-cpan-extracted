@@ -1,5 +1,13 @@
 Revision history for Data-PubSub-Shared
 
+0.05  2026-05-27
+    - poll_wait: fix missed-wakeup race; increment sub_waiters before
+      polling and use SEQ_CST ordering with publisher fence
+    - Str: reject capacity * (msg_size+8) > 4GB at create to preserve
+      arena safety invariant (silent UINT32_MAX cap could let a publish
+      to slot K overwrite slot N's still-current data)
+
+
 0.04  2026-04-26
     - create: init header under flock
     - harden DESTROY (handles + subscribers)

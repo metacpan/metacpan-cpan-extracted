@@ -21,12 +21,15 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "App-karr",
   "EXE_FILES" => [
-    "bin/karr"
+    "bin/karr",
+    "bin/karr-foundation"
   ],
   "LICENSE" => "perl",
   "NAME" => "App::karr",
   "PREREQ_PM" => {
     "File::ShareDir" => 0,
+    "Git::Libgit2" => "0.004",
+    "Git::Native" => "0.003",
     "JSON::MaybeXS" => 0,
     "Moo" => 0,
     "MooX::Cmd" => 0,
@@ -35,6 +38,7 @@ my %WriteMakefileArgs = (
     "Term::ANSIColor" => 0,
     "Text::Table::Tiny" => 0,
     "Time::Piece" => 0,
+    "Try::Tiny" => 0,
     "YAML::XS" => 0
   },
   "TEST_REQUIRES" => {
@@ -42,7 +46,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.205",
+  "VERSION" => "0.300",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -52,6 +56,8 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "File::ShareDir" => 0,
   "File::Temp" => 0,
+  "Git::Libgit2" => "0.004",
+  "Git::Native" => "0.003",
   "JSON::MaybeXS" => 0,
   "Moo" => 0,
   "MooX::Cmd" => 0,
@@ -62,6 +68,7 @@ my %FallbackPrereqs = (
   "Test::More" => 0,
   "Text::Table::Tiny" => 0,
   "Time::Piece" => 0,
+  "Try::Tiny" => 0,
   "YAML::XS" => 0
 );
 

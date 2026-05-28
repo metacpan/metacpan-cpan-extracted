@@ -1,12 +1,15 @@
-# ABSTRACT: Git operations for karr sync (via CLI)
+# ABSTRACT: Git operations for karr sync (all-native via Git::Native + libgit2)
 
 package App::karr::Git;
-our $VERSION = '0.205';
+our $VERSION = '0.300';
 use strict;
 use warnings;
 use Path::Tiny qw( path );
-use IPC::Open2;
+use Try::Tiny;
 use YAML::XS qw( Dump Load );
+use Git::Native;
+use Git::Native::Signature;
+use Git::Native::Credential;
 
 
 sub new {
@@ -21,59 +24,69 @@ sub dir {
     return path( $self->{dir} );
 }
 
-sub _git_cmd {
-    my ($self, @cmd) = @_;
-    my $dir = $self->dir->stringify;
-    my $pid = open(my $fh, '-|');
-    if (!defined $pid) {
-        die "fork failed: $!";
-    }
-    if (!$pid) {
-        open(STDERR, '>', '/dev/null');
-        chdir $dir or die "chdir $dir: $!";
-        exec('git', @cmd) or die "exec git: $!";
-    }
-    my $output = do { local $/; <$fh> };
-    close $fh;
-    my $ok = $? == 0;
-    chomp $output if defined $output;
-    return wantarray ? ($output, $ok) : $output;
+# ----- Native repository handle (lazy) -----
+
+sub _repo {
+    my ($self) = @_;
+    return $self->{_repo} if $self->{_repo};
+    return undef unless $self->is_repo;
+    $self->{_repo} = Git::Native->open_ext( $self->dir->stringify );
+    return $self->{_repo};
 }
 
-sub _git_cmd_stdin {
-    my ($self, $input, @cmd) = @_;
-    my $dir = $self->dir->stringify;
-    my $pid = open2(my $out_fh, my $in_fh, 'git', '-C', $dir, @cmd);
-    print $in_fh $input;
-    close $in_fh;
-    my $output = do { local $/; <$out_fh> };
-    waitpid($pid, 0);
-    chomp $output if defined $output;
-    return $output;
+sub _signature {
+    my ($self) = @_;
+    # Reuse one signature per process; falls back if user.name/email unset.
+    return $self->{_sig} if $self->{_sig};
+    my $repo = $self->_repo or return;
+    $self->{_sig} = try { $repo->signature_default }
+                    catch {
+                      Git::Native::Signature->new(
+                        name  => $self->git_user_name  || 'karr',
+                        email => $self->git_user_email || 'karr@localhost',
+                      );
+                    };
+    return $self->{_sig};
 }
+
+# ----- Repo discovery -----
 
 sub is_repo {
     my ($self) = @_;
-    my ($out, $ok) = $self->_git_cmd('rev-parse', '--show-toplevel');
+    my $ok = try {
+        # open_ext walks up to find a .git; throws on miss.
+        Git::Native->open_ext( $self->dir->stringify );
+        1;
+    } catch { 0 };
     return $ok;
 }
 
 sub repo_root {
     my ($self) = @_;
-    my ( $out, $ok ) = $self->_git_cmd( 'rev-parse', '--show-toplevel' );
-    return $ok ? path($out) : undef;
+    my $repo = $self->_repo or return undef;
+    # workdir is undef for bare repos; in that case fall back to gitdir.
+    my $root = $repo->workdir // $repo->gitdir;
+    $root =~ s{/+\z}{};
+    return path($root);
+}
+
+# ----- User identity (read via native config, not via CLI) -----
+
+sub _config_string {
+    my ( $self, $key ) = @_;
+    my $repo = $self->_repo or return '';
+    my $val = try { $repo->config_string($key) } catch { undef };
+    return defined $val ? $val : '';
 }
 
 sub git_user_email {
     my ($self) = @_;
-    my ($email, $ok) = $self->_git_cmd('config', '--get', 'user.email');
-    return $ok ? $email : '';
+    return $self->_config_string('user.email');
 }
 
 sub git_user_name {
     my ($self) = @_;
-    my ($name, $ok) = $self->_git_cmd('config', '--get', 'user.name');
-    return $ok ? $name : '';
+    return $self->_config_string('user.name');
 }
 
 sub git_user_identity {
@@ -83,6 +96,8 @@ sub git_user_identity {
     return "$name <$email>" if $name && $email;
     return $email || $name || '';
 }
+
+# ----- Ref name validation -----
 
 sub normalize_ref_name {
     my ( $self, $ref ) = @_;
@@ -111,97 +126,191 @@ sub validate_helper_ref {
     die "Ref '$full_ref' is in a protected namespace\n"
         if $full_ref eq 'refs/stash' || index( $full_ref, 'refs/stash/' ) == 0;
 
-    my ( undef, $ok ) = $self->_git_cmd( 'check-ref-format', $full_ref );
-    die "Ref '$full_ref' is not a valid git ref name\n" unless $ok;
+    # Native validity check via Git::Native.
+    die "Ref '$full_ref' is not a valid git ref name\n"
+        unless Git::Native->reference_name_is_valid($full_ref);
 
     return $full_ref;
 }
 
+# ----- Ref CRUD (the hotspot — was 4 fork/exec per write_ref) -----
+
 sub write_ref {
     my ( $self, $ref, $content ) = @_;
+    my $repo = $self->_repo or return;
 
-    # Create blob from content via stdin
-    my $blob = $self->_git_cmd_stdin($content, 'hash-object', '-w', '--stdin');
-    return unless $blob;
+    my $blob_oid = $repo->blob_create_frombuffer($content);
+    my $tb       = $repo->tree_builder;
+    $tb->insert(name => 'data', oid => $blob_oid, mode => 0100644);
+    my $tree_oid = $tb->write;
 
-    # Create tree containing the blob as "data"
-    my $tree_line = sprintf("100644 blob %s\tdata", $blob);
-    my $tree = $self->_git_cmd_stdin($tree_line, 'mktree');
-    return unless $tree;
+    my $sig = $self->_signature;
+    my $commit_oid = $repo->commit_create(
+        tree       => $tree_oid,
+        parents    => [],
+        message    => 'karr ref update',
+        author     => $sig,
+        committer  => $sig,
+    );
 
-    # Create commit wrapping the tree
-    my $commit = $self->_git_cmd('commit-tree', $tree, '-m', 'karr ref update');
-    return unless $commit;
-
-    # Point ref at commit
-    $self->_git_cmd('update-ref', $ref, $commit);
+    $repo->reference_create( $ref, $commit_oid, force => 1 );
     return 1;
 }
 
 sub read_ref {
     my ( $self, $ref ) = @_;
-    my ($content, $ok) = $self->_git_cmd('cat-file', '-p', "$ref:data");
-    return $ok ? $content : '';
+    my $repo = $self->_repo or return '';
+    my $content = try {
+        return '' unless $repo->reference_exists($ref);
+        my $r      = $repo->reference($ref);
+        my $oid    = $r->target;
+        return '' unless $oid;
+        my $commit = $repo->commit($oid);
+        my $tree   = $commit->tree;
+        my $entry  = $tree->entry_by_name('data');
+        return '' unless $entry;
+        return $repo->blob( $entry->{oid} )->content;
+    } catch { '' };
+    # Match historical CLI behaviour: cat-file's trailing newline was chomped.
+    chomp $content if defined $content;
+    return $content;
 }
 
 sub ref_exists {
     my ( $self, $ref ) = @_;
-    my ( undef, $ok ) = $self->_git_cmd( 'show-ref', '--verify', '--quiet', $ref );
-    return $ok ? 1 : 0;
+    my $repo = $self->_repo or return 0;
+    return $repo->reference_exists($ref) ? 1 : 0;
 }
 
 sub delete_ref {
     my ( $self, $ref ) = @_;
-    $self->_git_cmd('update-ref', '-d', $ref);
+    my $repo = $self->_repo or return 0;
+    try { $repo->reference_delete($ref) };
     return 1;
 }
+
+# ----- Remote / network ops: native via Git::Native::Remote -----
 
 sub has_remote {
     my ( $self, $remote ) = @_;
     $remote //= 'origin';
-    my ( undef, $ok ) = $self->_git_cmd( 'remote', 'get-url', $remote );
-    return $ok ? 1 : 0;
+    my $repo = $self->_repo or return 0;
+    return $repo->has_remote($remote);
+}
+
+# Default credentials callback: SSH-agent → ~/.ssh/id_ed25519 → ~/.ssh/id_rsa
+# → default → fail. Matches CLI `git`'s implicit auth chain.
+sub _default_credentials_cb {
+    my @tried;
+    return sub {
+        my (%args) = @_;
+        my $user  = $args{username_from_url} || 'git';
+        my $types = $args{allowed_types}    || 0;
+
+        # GIT_CREDENTIAL_SSH_KEY = 1<<1 = 2
+        if ( $types & 2 ) {
+            return Git::Native::Credential->ssh_agent( username => $user )
+                unless $tried[0]++;
+            for my $k (qw( id_ed25519 id_rsa )) {
+                my $priv = "$ENV{HOME}/.ssh/$k";
+                next unless -r $priv;
+                next if $tried[1]{$k}++;
+                return Git::Native::Credential->ssh_key(
+                    username    => $user,
+                    private_key => $priv,
+                    public_key  => "$priv.pub",
+                    passphrase  => '',
+                );
+            }
+        }
+        # GIT_CREDENTIAL_DEFAULT = 1<<3 = 8
+        if ( ( $types & 8 ) && !$tried[2]++ ) {
+            return Git::Native::Credential->default;
+        }
+        return undef;   # PASSTHROUGH — give up
+    };
 }
 
 sub fetch {
     my ( $self, $remote ) = @_;
     $remote //= 'origin';
-    my (undef, $ok) = $self->_git_cmd('fetch', $remote);
-    return $ok;
+    my $repo = $self->_repo or return 0;
+    return 1 unless $repo->has_remote($remote);
+    return try {
+        my $r = $repo->remote($remote);
+        $r->fetch(
+            refspecs    => [],   # use configured refspecs
+            credentials => _default_credentials_cb(),
+        );
+        1;
+    } catch { 0 };
 }
 
 sub push {
     my ( $self, $remote, $refspec ) = @_;
     $remote //= 'origin';
-    return 1 unless $self->has_remote($remote);
+    my $repo = $self->_repo or return 0;
+    return 1 unless $repo->has_remote($remote);
     $refspec //= '+refs/karr/*:refs/karr/*';
-    my (undef, $ok) = $self->_git_cmd('push', '--prune', $remote, $refspec);
-    return $ok;
+    return try {
+        my $r = $repo->remote($remote);
+        $r->push(
+            refspecs    => [$refspec],
+            credentials => _default_credentials_cb(),
+            prune       => 1,
+        );
+        1;
+    } catch { 0 };
 }
 
 sub pull {
     my ( $self, $remote ) = @_;
     $remote //= 'origin';
-    return 1 unless $self->has_remote($remote);
-    my (undef, $ok) = $self->_git_cmd('fetch', $remote, 'refs/karr/*:refs/karr/*');
-    return $ok;
+    my $repo = $self->_repo or return 0;
+    return 1 unless $repo->has_remote($remote);
+    return try {
+        my $r = $repo->remote($remote);
+        $r->fetch(
+            refspecs    => ['refs/karr/*:refs/karr/*'],
+            credentials => _default_credentials_cb(),
+        );
+        1;
+    } catch { 0 };
 }
 
 sub push_ref {
     my ( $self, $ref, $remote ) = @_;
     $remote //= 'origin';
     $ref = $self->validate_helper_ref($ref);
-    my ( undef, $ok ) = $self->_git_cmd( 'push', $remote, "+$ref:$ref" );
-    return $ok;
+    my $repo = $self->_repo or return 0;
+    return 1 unless $repo->has_remote($remote);
+    return try {
+        my $r = $repo->remote($remote);
+        $r->push(
+            refspecs    => ["+$ref:$ref"],
+            credentials => _default_credentials_cb(),
+        );
+        1;
+    } catch { 0 };
 }
 
 sub pull_ref {
     my ( $self, $ref, $remote ) = @_;
     $remote //= 'origin';
     $ref = $self->validate_helper_ref($ref);
-    my ( undef, $ok ) = $self->_git_cmd( 'fetch', $remote, "$ref:$ref" );
-    return $ok;
+    my $repo = $self->_repo or return 0;
+    return 1 unless $repo->has_remote($remote);
+    return try {
+        my $r = $repo->remote($remote);
+        $r->fetch(
+            refspecs    => ["$ref:$ref"],
+            credentials => _default_credentials_cb(),
+        );
+        1;
+    } catch { 0 };
 }
+
+# ----- Task / config refs (sit on top of write_ref/read_ref) -----
 
 sub save_task_ref {
   my ($self, $task) = @_;
@@ -212,19 +321,17 @@ sub save_task_ref {
 sub load_task_ref {
   my ($self, $id) = @_;
   my $ref = "refs/karr/tasks/$id/data";
-    my $content = $self->read_ref($ref);
-    return undef unless $content;
+  my $content = $self->read_ref($ref);
+  return undef unless $content;
   require App::karr::Task;
   return App::karr::Task->from_string($content);
 }
 
 sub list_task_refs {
   my ($self) = @_;
-  my $output = $self->_git_cmd('for-each-ref', '--format=%(refname)', 'refs/karr/tasks/');
-    return () unless $output;
-    my %ids;
-    for (split /\n/, $output) {
-        $ids{$1} = 1 if m{refs/karr/tasks/(\d+)/};
+  my %ids;
+  for my $ref ( $self->list_refs('refs/karr/tasks/') ) {
+    $ids{$1} = 1 if $ref =~ m{refs/karr/tasks/(\d+)/};
   }
   return sort { $a <=> $b } keys %ids;
 }
@@ -232,9 +339,25 @@ sub list_task_refs {
 sub list_refs {
     my ( $self, $prefix ) = @_;
     $prefix //= 'refs/karr/';
-    my $output = $self->_git_cmd( 'for-each-ref', '--format=%(refname)', $prefix );
-    return () unless $output;
-    return grep { length } split /\n/, $output;
+    my $repo = $self->_repo or return ();
+    # Glob to scope the iterator server-side.
+    my $names = $repo->reference_names( glob => "$prefix*" );
+    return @$names;
+}
+
+sub ref_oids {
+    my ( $self, $prefix ) = @_;
+    $prefix //= 'refs/karr/';
+    my $repo = $self->_repo or return undef;
+    my %oids;
+    for my $ref ( $self->list_refs($prefix) ) {
+        my $oid = try {
+            my $t = $repo->reference($ref)->target;
+            $t ? $t->hex : undef;
+        } catch { undef };
+        $oids{$ref} = $oid if defined $oid;
+    }
+    return \%oids;
 }
 
 sub read_config_ref {
@@ -280,11 +403,11 @@ __END__
 
 =head1 NAME
 
-App::karr::Git - Git operations for karr sync (via CLI)
+App::karr::Git - Git operations for karr sync (all-native via Git::Native + libgit2)
 
 =head1 VERSION
 
-version 0.205
+version 0.300
 
 =head1 SYNOPSIS
 
@@ -297,13 +420,15 @@ version 0.205
 =head1 DESCRIPTION
 
 L<App::karr::Git> provides the low-level Git interface used by C<karr> for
-syncing board state through C<refs/karr/*>. It can store task content and board
-configuration as Git objects without relying on regular commits or branches.
+syncing board state through C<refs/karr/*>. Everything — local object/ref
+ops and network fetch/push — runs natively via L<Git::Native> (FFI to
+libgit2). No fork/exec per op. SSH-agent and HTTPS-token credentials are
+supplied through the libgit2 credential-acquire callback.
 
 =head1 SEE ALSO
 
 L<karr>, L<App::karr>, L<App::karr::BoardStore>, L<App::karr::Task>,
-L<App::karr::Config>
+L<App::karr::Config>, L<Git::Native>
 
 =head1 SUPPORT
 

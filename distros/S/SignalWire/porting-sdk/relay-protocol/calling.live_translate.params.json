@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.live_translate` (params). Extracted from switchblade `PublicCallLiveTranslateParams.cs`.",
+  "properties": {
+    "action": {},
+    "async": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "call_id": {
+      "type": "string"
+    },
+    "node_id": {
+      "type": "string"
+    },
+    "status_url": {
+      "type": "string"
+    },
+    "swml": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id",
+    "action"
+  ],
+  "title": "calling.live_translate params",
+  "type": "object",
+  "x-method": "calling.live_translate",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallLiveTranslateParams.cs"
+}

@@ -1,12 +1,13 @@
 # ABSTRACT: Generate board context summary for embedding
 
 package App::karr::Cmd::Context;
-our $VERSION = '0.205';
+our $VERSION = '0.300';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
   usage_string => 'USAGE: karr context [--write-to FILE] [--sections LIST] [--days N] [--json]',
 );
+use Time::Piece;
 use App::karr::Role::BoardAccess;
 use App::karr::Role::Output;
 use App::karr::Task;
@@ -210,7 +211,7 @@ App::karr::Cmd::Context - Generate board context summary for embedding
 
 =head1 VERSION
 
-version 0.205
+version 0.300
 
 =head1 SYNOPSIS
 

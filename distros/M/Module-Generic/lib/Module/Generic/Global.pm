@@ -48,6 +48,17 @@ BEGIN
     use constant ERROR_DELAY => ( ( $ENV{MG_ERROR_DELAY} && $ENV{MG_ERROR_DELAY} =~ /^\d+$/ ) ? $ENV{MG_ERROR_DELAY} : 5_000 );   # 5ms (faster for errors)
     # use constant CAN_THREADS => ( $Config{useithreads} ? 1 : 0 );
     sub CAN_THREADS () { CORE::return( $PerlConfig->{useithreads} ? 1 : 0 ); }
+    # NOTE: Broken threads::shared ABI detection
+    # Perl built with both -Duseithreads and -Duselongdouble (or -Dusequadmath) has a
+    # defect in threads::shared on older releases (5.16.0 and earlier are known to be
+    # affected): locking or marking a variable as shared triggers the assertion
+    # 'SvTYPE(_svmagic) >= SVt_PVMG' at shared.xs and aborts the interpreter with
+    # SIGABRT. The boundary below is set empirically from CPAN Testers reports, since
+    # no single upstream ticket pins the exact release where this was resolved. It can
+    # be raised later should a newer long double build report the same abort.
+    # On such a build we must not promote our global repositories to :shared unless
+    # threads are genuinely in use.
+    sub BROKEN_SHARED_ABI () { CORE::return( $PerlConfig->{useithreads} && ( $PerlConfig->{uselongdouble} || $PerlConfig->{usequadmath} ) && $] < 5.018000 ? 1 : 0 ); }
     # The following 2 constants are defined as not immutable, because whether threads has been loaded or not could change during runtime. Using 'constant' would not cut it.
     sub HAS_THREADS () { CORE::return( $PerlConfig->{useithreads} && $INC{'threads.pm'} ? 1 : 0 ); }
 
@@ -58,7 +69,12 @@ BEGIN
     my $mpm;
     my $mpm_threaded    = 0;
     my $use_mutex       = 0;
-    my $need_shared     = CAN_THREADS();
+    # NOTE: We promote our globals to :shared only when the running Perl can use
+    # threads and is not affected by the broken threads::shared ABI described above.
+    # On an affected build, all sharing is deferred to genuine thread usage, which is
+    # gated elsewhere on HAS_THREADS, so a single-threaded process never triggers the
+    # abort.
+    my $need_shared     = ( CAN_THREADS() && !BROKEN_SHARED_ABI() ) ? 1 : 0;
     our( $MUTEX, $LOCK_MUTEX );
     # The user data repository
     our $REPO           = {};

@@ -2,7 +2,7 @@ package DBIx::QuickORM::Schema::Table;
 use strict;
 use warnings;
 
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
@@ -25,6 +25,8 @@ use Object::HashBase qw{
     <indexes
     <primary_key
     +_links
+    +db_to_orm
+    +has_aliases
 };
 
 =pod
@@ -158,7 +160,11 @@ sub column {
 
 =item $new_table = $table->merge($other, %params)
 
-Merge two table objects into a third.
+Merge two table objects into a third. The other table provides the ORM column
+names; columns in this table (typically introspected and keyed by database
+name) are re-keyed onto those ORM names when they refer to the same database
+column, and the primary key is translated to ORM names, so the merged table is
+uniformly ORM-keyed.
 
 =cut
 
@@ -166,11 +172,23 @@ sub merge {
     my $self = shift;
     my ($other, %params) = @_;
 
-    $params{+COLUMNS}     //= merge_hash_of_objs($self->{+COLUMNS}, $other->{+COLUMNS}) if $self->{+COLUMNS}     || $other->{+COLUMNS};
-    $params{+UNIQUE}      //= merge_hash_of_objs($self->{+UNIQUE}, $other->{+UNIQUE})   if $self->{+UNIQUE}      || $other->{+UNIQUE};
-    $params{+LINKS}       //= [@{$self->{+LINKS}}, @{$other->{+LINKS}}]                 if $self->{+LINKS}       || $other->{+LINKS};
-    $params{+INDEXES}     //= [@{$self->{+INDEXES}}, @{$other->{+INDEXES}}]             if $self->{+INDEXES}     || $other->{+INDEXES};
-    $params{+PRIMARY_KEY} //= [@{$self->{+PRIMARY_KEY} // $other->{+PRIMARY_KEY}}]        if $self->{+PRIMARY_KEY} || $other->{+PRIMARY_KEY};
+    my $mine   = $self->{+COLUMNS};
+    my $theirs = $other->{+COLUMNS};
+
+    my $db_to_orm = $theirs ? $other->_db_to_orm : {};
+
+    if (!$params{+COLUMNS} && ($mine || $theirs)) {
+        $params{+COLUMNS} = merge_hash_of_objs($self->_rekey_columns($mine // {}, $db_to_orm), $theirs // {});
+    }
+
+    $params{+UNIQUE}  //= merge_hash_of_objs($self->_retranslate_unique($self->{+UNIQUE}, $db_to_orm), $other->{+UNIQUE}) if $self->{+UNIQUE} || $other->{+UNIQUE};
+    $params{+LINKS}   //= [@{$self->{+LINKS}}, @{$other->{+LINKS}}]                                                      if $self->{+LINKS} || $other->{+LINKS};
+    $params{+INDEXES} //= [@{$self->_retranslate_indexes($self->{+INDEXES}, $db_to_orm)}, @{$other->{+INDEXES} // []}]   if $self->{+INDEXES} || $other->{+INDEXES};
+
+    if (!$params{+PRIMARY_KEY} && ($self->{+PRIMARY_KEY} || $other->{+PRIMARY_KEY})) {
+        my $pk = $self->{+PRIMARY_KEY} // $other->{+PRIMARY_KEY};
+        $params{+PRIMARY_KEY} = [ map { $db_to_orm->{$_} // $_ } @$pk ];
+    }
 
     return blessed($self)->new(%$self, %$other, %params);
 }
@@ -202,6 +220,11 @@ sub clone {
 sub init {
     my $self = shift;
 
+    # Drop derived caches carried in from a merge/clone; they are rebuilt lazily
+    # from this object's own columns.
+    delete $self->{+DB_TO_ORM};
+    delete $self->{+HAS_ALIASES};
+
     $self->{+DB_NAME} //= $self->{+NAME};
     $self->{+NAME}    //= $self->{+DB_NAME};
     croak "The 'name' attribute is required" unless $self->{+NAME};
@@ -211,9 +234,23 @@ sub init {
     my $cols = $self->{+COLUMNS} //= {};
     croak "The 'columns' attribute must be a hashref${debug}" unless ref($cols) eq 'HASH';
 
+    my %db_to_orm;
     for my $cname (sort keys %$cols) {
         my $cval = $cols->{$cname} or croak "Column '$cname' is empty${debug}";
         croak "Columns '$cname' is not an instance of 'DBIx::QuickORM::Schema::Table::Column', got: '$cval'$debug" unless blessed($cval) && $cval->isa('DBIx::QuickORM::Schema::Table::Column');
+
+        my $db = $cval->db_name;
+        if (defined(my $other = $db_to_orm{$db})) {
+            croak "Columns '$other' and '$cname' both map to database column '$db'${debug}";
+        }
+        $db_to_orm{$db} = $cname;
+
+        # A column's database name must not collide with a different column's
+        # ORM name, or lookups (which resolve ORM name first) would silently
+        # shadow this column's database name.
+        if ($db ne $cname && $cols->{$db}) {
+            croak "Column '$cname' has database name '$db', which is also the ORM name of another column${debug}";
+        }
     }
 
     if (my $pk = $self->{+PRIMARY_KEY}) {
@@ -256,7 +293,30 @@ The table's schema (ORM) name.
 
 =item $bool = $table->has_field($name)
 
-True if the table has a column with the given name.
+True if the table has a column with the given name. Accepts either the column's
+ORM name or its database name.
+
+=item $db_name = $table->field_db_name($name)
+
+The database column name for a field. Accepts either the ORM name or the
+database name and always returns the database name; an unknown name is returned
+unchanged.
+
+=item $orm_name = $table->field_orm_name($name)
+
+The ORM column name for a field. Accepts either the ORM name or the database
+name and always returns the ORM name; an unknown name is returned unchanged.
+
+=item $bool = $table->field_is_generated($name)
+
+True if the named field is a database-generated column (C<GENERATED ALWAYS>,
+stored or virtual). Accepts either the ORM or database name. Unknown names
+return false.
+
+=item $bool = $table->source_has_aliases()
+
+True when any column's ORM name differs from its database name. Cached. Lets
+callers skip name translation entirely when there is nothing to translate.
 
 =cut
 
@@ -266,7 +326,30 @@ sub source_orm_name   { $_[0]->{+NAME} }
 # row_class     # In HashBase at top of file
 # primary_key   # In HashBase at top of file
 
-sub has_field { $_[0]->{+COLUMNS}->{$_[1]} ? 1 : 0 }
+sub has_field { $_[0]->_column($_[1]) ? 1 : 0 }
+
+sub source_has_aliases { $_[0]->{+HAS_ALIASES} //= (grep { $_->name ne $_->db_name } values %{$_[0]->{+COLUMNS}}) ? 1 : 0 }
+
+sub field_db_name {
+    my $self = shift;
+    my ($name) = @_;
+    my $col = $self->_column($name) or return $name;
+    return $col->db_name;
+}
+
+sub field_orm_name {
+    my $self = shift;
+    my ($name) = @_;
+    my $col = $self->_column($name) or return $name;
+    return $col->name;
+}
+
+sub field_is_generated {
+    my $self = shift;
+    my ($name) = @_;
+    my $col = $self->_column($name) or return 0;
+    return $col->generated ? 1 : 0;
+}
 
 =pod
 
@@ -300,7 +383,7 @@ no type object.
 sub field_type {
     my $self = shift;
     my ($field) = @_;
-    my $col = $self->{+COLUMNS}->{$field} or croak "No column '$field' in table '$self->{+NAME}' ($self->{+DB_NAME})";
+    my $col = $self->_column($field) or croak "No column '$field' in table '$self->{+NAME}' ($self->{+DB_NAME})";
     my $type = $col->type or return undef;
     return undef if ref($type);
     return $type if $type->DOES('DBIx::QuickORM::Role::Type');
@@ -320,7 +403,7 @@ The affinity for a field, optionally for a specific dialect.
 sub field_affinity {
     my $self = shift;
     my ($field, $dialect) = @_;
-    my $col = $self->{+COLUMNS}->{$field} or croak "No column '$field' in table '$self->{+NAME}' ($self->{+DB_NAME})";
+    my $col = $self->_column($field) or croak "No column '$field' in table '$self->{+NAME}' ($self->{+DB_NAME})";
     return $col->affinity($dialect);
 }
 
@@ -336,11 +419,122 @@ sub field_affinity {
 
 Internal accessor that fetches and clears the pending raw link definitions.
 
+=item $col_or_undef = $table->_column($name)
+
+Resolve a column object by either its ORM name or its database name.
+
+=item $map = $table->_db_to_orm()
+
+Lazily-built hashref mapping each column's database name to its ORM name.
+
+=item $hashref = $table->_rekey_columns(\%columns, \%db_to_orm)
+
+Return a copy of a columns hashref re-keyed so each column lands under the ORM
+name its database name maps to, falling back to the original key when there is
+no mapping.
+
+=item $hashref = $table->_retranslate_unique(\%unique, \%db_to_orm)
+
+Return a copy of a unique-constraint hashref with each constraint's column list
+(and its C<column_key> key) translated from database names to ORM names.
+
+=item $arrayref = $table->_retranslate_indexes(\@indexes, \%db_to_orm)
+
+Return a copy of an index list with each index's column list translated from
+database names to ORM names. Index entries may be arrayrefs of column names or
+hashrefs with a C<columns> arrayref; other shapes pass through.
+
+=item $bool = $table->_has_alias(\%db_to_orm)
+
+True when any database name in the map differs from its ORM name, i.e. real
+aliasing is present.
+
 =back
 
 =cut
 
 sub _links { delete $_[0]->{+_LINKS} }
+
+sub _rekey_columns {
+    my $self = shift;
+    my ($cols, $db_to_orm) = @_;
+
+    my %out;
+    for my $key (keys %$cols) {
+        my $col = $cols->{$key};
+        my $orm = $db_to_orm->{$col->db_name} // $key;
+        $out{$orm} = $col;
+    }
+
+    return \%out;
+}
+
+sub _retranslate_unique {
+    my $self = shift;
+    my ($unique, $db_to_orm) = @_;
+
+    return $unique unless $unique && $self->_has_alias($db_to_orm);
+
+    my %out;
+    for my $key (keys %$unique) {
+        my $val = $unique->{$key};
+        unless (ref($val) eq 'ARRAY') {
+            $out{$key} = $val;
+            next;
+        }
+        my @orm = map { $db_to_orm->{$_} // $_ } @$val;
+        $out{column_key(@orm)} = \@orm;
+    }
+
+    return \%out;
+}
+
+sub _retranslate_indexes {
+    my $self = shift;
+    my ($indexes, $db_to_orm) = @_;
+
+    return $indexes // [] unless $indexes && @$indexes && $self->_has_alias($db_to_orm);
+
+    return [
+        map {
+            my $ref = ref($_);
+            if ($ref eq 'ARRAY') {
+                [ map { $db_to_orm->{$_} // $_ } @$_ ];
+            }
+            elsif ($ref eq 'HASH') {
+                my %spec = %$_;
+                $spec{columns} = [ map { $db_to_orm->{$_} // $_ } @{$spec{columns}} ] if ref($spec{columns}) eq 'ARRAY';
+                \%spec;
+            }
+            else {
+                $_;
+            }
+        } @$indexes
+    ];
+}
+
+sub _has_alias {
+    my $self = shift;
+    my ($db_to_orm) = @_;
+    return 0 unless $db_to_orm;
+    for my $db (keys %$db_to_orm) {
+        return 1 if $db ne $db_to_orm->{$db};
+    }
+    return 0;
+}
+
+sub _db_to_orm { $_[0]->{+DB_TO_ORM} //= { map { $_->db_name => $_->name } values %{$_[0]->{+COLUMNS}} } }
+
+sub _column {
+    my $self = shift;
+    my ($name) = @_;
+
+    my $cols = $self->{+COLUMNS};
+    return $cols->{$name} if $cols->{$name};
+
+    my $orm = $self->_db_to_orm->{$name} or return undef;
+    return $cols->{$orm};
+}
 
 1;
 

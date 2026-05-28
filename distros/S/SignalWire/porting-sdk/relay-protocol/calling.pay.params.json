@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.pay` (params). Extracted from switchblade `PublicCallPayParams.cs`.",
+  "properties": {
+    "bank_account_type": {},
+    "call_id": {
+      "type": "string"
+    },
+    "charge_amount": {
+      "type": "string"
+    },
+    "control_id": {
+      "type": "string"
+    },
+    "currency": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "input": {},
+    "language": {
+      "type": "string"
+    },
+    "max_attempts": {
+      "type": "string"
+    },
+    "min_postal_code_length": {
+      "type": "string"
+    },
+    "node_id": {
+      "type": "string"
+    },
+    "parameters": {
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "value": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "value"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "payment_connector_url": {
+      "type": "string"
+    },
+    "payment_method": {},
+    "postal_code": {
+      "type": "string"
+    },
+    "prompts": {
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "actions": {
+            "items": {
+              "additionalProperties": true,
+              "properties": {
+                "phrase": {
+                  "type": "string"
+                },
+                "type": {}
+              },
+              "required": [
+                "type",
+                "phrase"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "attempt": {
+            "type": "string"
+          },
+          "card_type": {
+            "type": "string"
+          },
+          "error_type": {
+            "type": "string"
+          },
+          "for": {},
+          "require_matching_inputs": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "for"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "security_code": {
+      "type": "string"
+    },
+    "status_url": {
+      "type": "string"
+    },
+    "timeout": {
+      "type": "string"
+    },
+    "token_type": {},
+    "valid_card_types": {
+      "type": "string"
+    },
+    "voice": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id",
+    "control_id",
+    "payment_connector_url"
+  ],
+  "title": "calling.pay params",
+  "type": "object",
+  "x-method": "calling.pay",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallPayParams.cs"
+}

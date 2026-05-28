@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.begin` (params). Extracted from switchblade `PublicCallBeginParams.cs`.",
+  "properties": {
+    "device": {
+      "additionalProperties": true,
+      "properties": {
+        "params": {},
+        "type": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "type": "object"
+    },
+    "max_duration": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "node_id": {
+      "type": "string"
+    },
+    "region": {
+      "type": "string"
+    },
+    "tag": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "device"
+  ],
+  "title": "calling.begin params",
+  "type": "object",
+  "x-method": "calling.begin",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallBeginParams.cs"
+}

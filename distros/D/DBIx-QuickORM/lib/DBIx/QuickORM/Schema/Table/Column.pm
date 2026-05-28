@@ -2,7 +2,7 @@ package DBIx::QuickORM::Schema::Table::Column;
 use strict;
 use warnings;
 
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 
 use Carp qw/croak confess/;
 use Scalar::Util qw/blessed/;
@@ -20,10 +20,12 @@ use Object::HashBase qw{
     <order
     <nullable
     <identity
+    <generated
     +affinity
     <type
     <created
     <compiled
+    +db_name
 };
 
 =pod
@@ -60,7 +62,11 @@ where the other column's values win.
 
 =item name
 
-The column name.
+The column's ORM (schema) name. Defaults to C<db_name>.
+
+=item db_name
+
+The column's name in the database. Defaults to C<name>.
 
 =item sql_default
 
@@ -86,6 +92,13 @@ True if the column accepts NULL.
 
 True if the column is an identity / auto-increment column.
 
+=item generated
+
+True if the column's value is computed by the database (a stored or virtual
+C<GENERATED> column). Generated columns are readable on fetch but are excluded
+from C<INSERT> and C<UPDATE> column lists, and setting one via the row layer
+croaks.
+
 =item affinity
 
 Storage affinity; resolved from C<type> on demand if not given.
@@ -106,10 +119,14 @@ Cached compiled form of the column.
 
 =cut
 
-sub name { $_[0]->{+NAME} }
+sub name    { $_[0]->{+NAME}    //= $_[0]->{+DB_NAME} }
+sub db_name { $_[0]->{+DB_NAME} //= $_[0]->{+NAME} }
 
 sub init {
     my $self = shift;
+
+    $self->{+DB_NAME} //= $self->{+NAME};
+    $self->{+NAME}    //= $self->{+DB_NAME};
 
     my $debug = $self->{+CREATED} ? " (defined in $self->{+CREATED})" : "";
 
@@ -125,7 +142,11 @@ sub init {
 
 =item $name = $col->name
 
-The column name.
+The column's ORM (schema) name.
+
+=item $name = $col->db_name
+
+The column's name in the database.
 
 =item $affinity = $col->affinity($dialect)
 

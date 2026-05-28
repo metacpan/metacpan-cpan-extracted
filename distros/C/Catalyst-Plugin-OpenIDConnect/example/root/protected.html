@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Protected Resource</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; }
+        .container { max-width: 600px; margin: 50px auto; padding: 40px; background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h1 { color: #333; margin-bottom: 30px; }
+        .user-info { background: #f0f9ff; border-left: 4px solid #007bff; padding: 15px; margin: 20px 0; border-radius: 4px; }
+        .user-info dt { font-weight: 600; margin-top: 10px; }
+        .user-info dd { margin-left: 20px; color: #666; }
+        .button { display: inline-block; padding: 10px 20px; background: #007bff; color: white; text-decoration: none; border-radius: 4px; margin-right: 10px; }
+        .button.logout { background: #6c757d; }
+        .button:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Protected Resource</h1>
+        <p>You have successfully authenticated!</p>
+
+        <div class="user-info">
+            <h2>User Information</h2>
+            <dl>
+                <dt>ID</dt>
+                <dd>[% user.id %]</dd>
+                <dt>Username</dt>
+                <dd>[% user.username %]</dd>
+                <dt>Name</dt>
+                <dd>[% user.name %]</dd>
+                <dt>Email</dt>
+                <dd>[% user.email %]</dd>
+            </dl>
+        </div>
+
+        <p>
+            <a href="/" class="button">Home</a>
+            <a href="/logout" class="button logout">Logout</a>
+        </p>
+    </div>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.answer` (params). Extracted from switchblade `PublicCallAnswerParams.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "max_duration": {
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "node_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id"
+  ],
+  "title": "calling.answer params",
+  "type": "object",
+  "x-method": "calling.answer",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallAnswerParams.cs"
+}

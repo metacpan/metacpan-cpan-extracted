@@ -1,0 +1,123 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.play_and_collect` (params). Extracted from switchblade `PublicCallPlayAndCollectParams.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "collect": {
+      "additionalProperties": true,
+      "properties": {
+        "digits": {
+          "additionalProperties": true,
+          "properties": {
+            "digit_timeout": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "max": {
+              "type": "integer"
+            },
+            "min": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "terminators": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "max"
+          ],
+          "type": "object"
+        },
+        "initial_timeout": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "speech": {
+          "additionalProperties": true,
+          "properties": {
+            "end_silence_timeout": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "hints": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "language": {
+              "type": "string"
+            },
+            "model": {
+              "type": "string"
+            },
+            "speech_timeout": {
+              "type": [
+                "number",
+                "null"
+              ]
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "control_id": {
+      "type": "string"
+    },
+    "node_id": {
+      "type": "string"
+    },
+    "play": {
+      "items": {
+        "additionalProperties": true,
+        "properties": {
+          "params": {
+            "type": "object"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "params"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "volume": {
+      "type": [
+        "number",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id",
+    "control_id",
+    "play",
+    "collect"
+  ],
+  "title": "calling.play_and_collect params",
+  "type": "object",
+  "x-method": "calling.play_and_collect",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallPlayAndCollectParams.cs"
+}

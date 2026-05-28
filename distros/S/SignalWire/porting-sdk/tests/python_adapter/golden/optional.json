@@ -1,0 +1,36 @@
+{
+  "optional": {
+    "classes": {
+      "Config": {
+        "methods": {
+          "configure": {
+            "params": [
+              {
+                "name": "self",
+                "kind": "self"
+              },
+              {
+                "name": "host",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "port",
+                "type": "optional<int>",
+                "required": false,
+                "default": null
+              },
+              {
+                "name": "log_level",
+                "type": "optional<string>",
+                "required": false,
+                "default": "info"
+              }
+            ],
+            "returns": "void"
+          }
+        }
+      }
+    }
+  }
+}

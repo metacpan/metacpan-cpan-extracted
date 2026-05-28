@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.end` (params). Extracted from switchblade `PublicCallEndParams.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "node_id": {
+      "type": "string"
+    },
+    "reason": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id"
+  ],
+  "title": "calling.end params",
+  "type": "object",
+  "x-method": "calling.end",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallEndParams.cs"
+}

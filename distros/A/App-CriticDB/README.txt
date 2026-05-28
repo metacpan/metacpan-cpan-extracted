@@ -1,13 +1,14 @@
-"App::CriticDB" Version 0.0.3
+"App::CriticDB" Version 0.0.4
 
 Abstract:
 ---------
 This package provides a mechanism to store and retrieve Perl::Critic violations for a collection of files.
 
-What's new in version 0.0.3:
+What's new in version 0.0.4:
 ----------------------------
-* Handle deleted files
-* Use file mtime versus current time
+* Proper violation formatting/reporting
+* Support perlcritic's --verbose option
+* Support --quiet mode for collection only
 
 Copyright & License:
 --------------------

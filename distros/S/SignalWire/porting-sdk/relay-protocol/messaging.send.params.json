@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Permissive schema for the messaging.send RPC params. Switchblade forwards the JObject as-is to the messaging gateway, so the schema is derived from the Python relay client (``signalwire/relay/client.py:send_message``). At least one of `body` or `media` is required.",
+  "properties": {
+    "body": {
+      "type": "string"
+    },
+    "context": {
+      "type": "string"
+    },
+    "from_number": {
+      "type": "string"
+    },
+    "media": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "region": {
+      "type": "string"
+    },
+    "tags": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "to_number": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "context",
+    "to_number",
+    "from_number"
+  ],
+  "title": "messaging.send params",
+  "type": "object",
+  "x-method": "messaging.send",
+  "x-phase": "params",
+  "x-source": "messaging-python",
+  "x-source-file": "signalwire/relay/client.py"
+}

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.dial` (params). Extracted from switchblade `PublicCallDialParams.cs`.",
+  "properties": {
+    "devices": {
+      "items": {
+        "items": {
+          "additionalProperties": true,
+          "properties": {
+            "params": {},
+            "type": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "type"
+          ],
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "type": "array"
+    },
+    "max_price_per_minute": {
+      "type": [
+        "number",
+        "null"
+      ]
+    },
+    "node_id": {
+      "type": "string"
+    },
+    "region": {
+      "type": "string"
+    },
+    "tag": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "devices"
+  ],
+  "title": "calling.dial params",
+  "type": "object",
+  "x-method": "calling.dial",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallDialParams.cs"
+}

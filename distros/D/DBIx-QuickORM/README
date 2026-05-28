@@ -578,16 +578,23 @@ ORM BUILDER EXPORTS
               db_name 'myapp'    # Actual name on the server;
           };
 
-      Can be nested under table or db.
+      It works the same way for an individual column, letting the ORM use
+      one name for a column while the database uses another:
+
+          column people_id => sub {    # Name in the orm
+              db_name 'id';            # Actual column name in the table
+          };
+
+      Can be nested under table, db, or column.
 
     column NAME => sub { ... }
 
     column NAME => %SPECS
 
-      Define a column with the given name. The name will be used both as
-      the name the ORM uses for the column, and the actual name of the
-      column in the database. Currently having a column use a different
-      name in the ORM vs the table is not supported.
+      Define a column with the given name. By default the name is used both
+      as the name the ORM uses for the column and as the actual name of the
+      column in the database. To have the ORM use a different name from the
+      database column, set db_name inside the column.
 
           column foo => sub {
               type \'BIGINT'; # Specify a type in raw SQL (can also accept DBIx::QuickORM::Type::*)
@@ -606,8 +613,8 @@ ORM BUILDER EXPORTS
           column foo => ('not_null', 'identity', \'BIGINT');
 
       Can be nested under table. Can contain omit, nullable, not_null,
-      identity, affinity, type, sql, default, primary_key, unique, and
-      link.
+      identity, affinity, type, sql, default, primary_key, unique, link,
+      and db_name.
 
     omit
 

@@ -33,7 +33,7 @@ The Go implementation at `../kanban-md/` is the feature reference. Key docs:
 - `lib/App/karr/Task.pm` — Task object: parse/write Markdown+YAML frontmatter
 - `lib/App/karr/Config.pm` — Board config management (defaults + helpers)
 - `lib/App/karr/SyncGuard.pm` — Push insurance on die/croak
-- `lib/App/karr/Git.pm` — Low-level Git operations via CLI
+- `lib/App/karr/Git.pm` — Low-level Git operations, all-native via Git::Native (libgit2, no fork/exec)
 - `lib/App/karr/BoardStore.pm` — Ref-backed board storage (load_tasks, save_task, effective_config)
 - `lib/App/karr/Lock.pm` — Advisory task locking via refs
 

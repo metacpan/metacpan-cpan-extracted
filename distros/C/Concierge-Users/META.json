@@ -83,6 +83,6 @@
          "web" : "https://github.com/bwva/Concierge-Users"
       }
    },
-   "version" : "v0.8.2",
+   "version" : "v0.8.3",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

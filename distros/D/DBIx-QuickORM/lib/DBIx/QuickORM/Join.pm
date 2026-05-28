@@ -2,7 +2,7 @@ package DBIx::QuickORM::Join;
 use strict;
 use warnings;
 
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
@@ -100,6 +100,40 @@ sub fields_to_omit { }
 sub fields_list_all {
     my $self = shift;
     croak "Not Supported";
+}
+
+sub field_db_name {
+    my $self = shift;
+    my ($proto) = @_;
+    my ($from, $t, $field) = $self->_field_source($proto, no_fatal => 1);
+    return $proto unless $t;
+    my $db = $t->field_db_name($field);
+    return defined($from) ? "$from.$db" : $db;
+}
+
+sub field_orm_name {
+    my $self = shift;
+    my ($proto) = @_;
+    my ($from, $t, $field) = $self->_field_source($proto, no_fatal => 1);
+    return $proto unless $t;
+    my $orm = $t->field_orm_name($field);
+    return defined($from) ? "$from.$orm" : $orm;
+}
+
+sub field_is_generated {
+    my $self = shift;
+    my ($proto) = @_;
+    my (undef, $t, $field) = $self->_field_source($proto, no_fatal => 1);
+    return 0 unless $t;
+    return $t->field_is_generated($field);
+}
+
+sub source_has_aliases {
+    my $self = shift;
+    for my $as (@{$self->{+ORDER}}) {
+        return 1 if $self->{+COMPONENTS}->{$as}->{table}->source_has_aliases;
+    }
+    return 0;
 }
 
 # }}} Role::Source interface
@@ -242,17 +276,20 @@ sub _field_source {
     my ($proto, %params) = @_;
     my ($field, $from) = reverse split /\./, $proto;
 
-    if ($from) {
-        my $c = $self->{+COMPONENTS}->{$from} or croak "'$from' is not an alias in this join";
-        my $t = $c->{table};
-        return ($from, $t, $field);
+    if (defined $from) {
+        my $c = $self->{+COMPONENTS}->{$from};
+        unless ($c) {
+            return undef if $params{no_fatal};
+            croak "'$from' is not an alias in this join";
+        }
+        return ($from, $c->{table}, $field);
     }
 
     for my $alias (@{$self->{+ORDER}}) {
-        my $c = $self->{+COMPONENTS}->{$from};
+        my $c = $self->{+COMPONENTS}->{$alias};
         my $t = $c->{table};
         next unless $t->has_field($field);
-        return ($from, $t, $field);
+        return ($alias, $t, $field);
     }
 
     return undef if $params{no_fatal};
@@ -290,6 +327,7 @@ sub has_field {
     my $self = shift;
     my ($proto) = @_;
     my ($from, $t, $field) = $self->_field_source($proto, no_fatal => 1);
+    return 0 unless $t;
     return $t->has_field($field);
 }
 
@@ -310,7 +348,7 @@ sub fields_to_fetch {
     for my $as (@{$self->{+ORDER}}) {
         my $c = $self->{+COMPONENTS}->{$as};
         my $t = $c->{table};
-        push @fields => map { qq{$as.$_ AS "$as.$_"} } @{$t->fields_to_fetch};
+        push @fields => map { my $db = $t->field_db_name($_); qq{$as.$db AS "$as.$db"} } @{$t->fields_to_fetch};
     }
 
     return join(', ' => @fields);
@@ -435,13 +473,15 @@ sub _join {
         }
     }
 
+    my $joined = $self->schema->table($link->other_table);
+
     push @{$self->{+ORDER}} => $as;
 
     push @{$self->{+LOOKUP}->{$link->other_table}} => $as;
 
     $self->{+COMPONENTS}->{$as} = {
         as    => $as,
-        table => $self->schema->table($link->other_table),
+        table => $joined,
         link  => $link,
         from  => $from,
         type  => $type,

@@ -25,7 +25,7 @@ use Scalar::Util;
 use String::CRC32;
 use Storable 0.6 qw(freeze thaw);
 
-our $VERSION = '1.15';
+our $VERSION = '1.16';
 
 our $_have_xs = ! $ENV{IPC_SHAREABLE_NO_XS} && eval {
     require XSLoader;
@@ -3472,12 +3472,12 @@ returned.
 
 =item *
 
-B<Read warns> iff C<ER = 1> AND C<WR = 1> AND another process holds
+B<Read warns> if C<ER = 1> AND C<WR = 1> AND another process holds
 C<LOCK_EX>.
 
 =item *
 
-B<Write blocks> iff C<EW = 1> AND (another process holds C<LOCK_EX> OR has
+B<Write blocks> if C<EW = 1> AND (another process holds C<LOCK_EX> OR has
 active C<LOCK_SH> readers OR the caller itself holds only C<LOCK_SH>).
 
 =item *
@@ -3528,9 +3528,18 @@ that held that data is automatically cleaned up and freed.
 
 =head2 Storable
 
-The child knot object (which holds _key, _type, etc.) is frozen in-place
-inside the parent's serialized byte blob. On thaw, the child knot is
-reconstructed from those bytes and re-attached to the existing child segment.
+With the Storable serializer, nested references are handled transparently.
+Storable natively freezes the entire Perl data structure (including internal
+tie information for child segments) into a single binary blob. On thaw,
+child segments are automatically re-attached without any explicit markers in
+the serialized data.
+
+This means that unlike JSON, there are no C<__ics__> placeholder objects in
+the stored data. The trade-off is that Storable output is Perl-specific and
+not portable across different Perl versions or platforms.
+
+See the C<serializer> option under L</OPTIONS> to choose between C<json> and
+C<storable>.
 
 =head2 JSON
 
@@ -3571,7 +3580,7 @@ been initialized and is ready for use. C<1> if it is, C<0> if it isn't.
 =head2 SEM_READERS
 
 Semaphore slot ID 1. Specifies the current number of readers holding a
-C<LOCK_SH>. A write lock (C<LOCK_EX> can't be obtained until this value is
+C<LOCK_SH>. A write lock (C<LOCK_EX>) can't be obtained until this value is
 reduced to C<0>.
 
 =head2 SEM_WRITERS
@@ -3602,21 +3611,18 @@ segment.
 L<IPC::Shareable> therefore provides several options to control the timing of
 removal of shared memory segments.
 
+B<Note>: The destruction is handled in an C<END> block. Only those memory
+segments that are tied to the current process will be removed.
+
 =head2 destroy Option
 
 As described in L</OPTIONS>, specifying the B<destroy> option when
 C<tie()>ing a variable coerces L<IPC::Shareable> to remove the underlying
 shared memory segment when the process calling C<tie()> exits gracefully.
 
-=head2 Notes
+=head2 Signal handlers
 
-B<Note>: The destruction is handled in an C<END> block. Only those memory
-segments that are tied to the current process will be removed.
-
-B<Note>: If the segment was created with its L</protected> attribute set,
-it will not be removed in the C<END> block, even if C<destroy> is set.
-
-B<Note>: The C<END> block only runs on a I<clean> exit (normal program
+The C<END> block only runs on a I<clean> exit (normal program
 end, C<die>, or C<exit>). It does B<not> run for untrapped signals
 (C<SIGTERM>, C<SIGINT>, etc.) or for C<SIGKILL>. If your process may be
 terminated by a signal and you want C<destroy> cleanup to run, install
@@ -3627,6 +3633,11 @@ signal handlers that call C<exit>:
 This causes the C<END> block to fire on those signals. C<SIGKILL> cannot
 be caught; any segments left behind by it can be recovered with
 C<IPC::Shareable-E<gt>clean_up_all>.
+
+=head2 Notes
+
+B<Note>: If the segment was created with its L</protected> attribute set,
+it will not be removed in the C<END> block, even if C<destroy> is set.
 
 B<Note>: Advisory locks (C<lock()>/C<unlock()>) are I<always> released
 automatically when a process dies, even on C<SIGKILL>, because the

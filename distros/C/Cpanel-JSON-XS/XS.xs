@@ -366,7 +366,6 @@ mingw_modfl(long double x, long double *ip)
 #define F_REQUIRE_TYPES   0x01000000UL
 #define F_TYPE_ALL_STRING 0x02000000UL
 #define F_DUPKEYS_AS_AREF 0x04000000UL
-#define F_DUPKEYS_FIRST   0x08000000UL /* internal only */
 #define F_HOOK            0x80000000UL /* some hooks exist, so slow-path processing */
 
 #define F_PRETTY    F_INDENT | F_SPACE_BEFORE | F_SPACE_AFTER
@@ -426,7 +425,9 @@ enum {
   INCR_M_BS,     /* inside backslash */
   INCR_M_C0,     /* inside comment in initial whitespace sequence */
   INCR_M_C1,     /* inside comment in other places */
-  INCR_M_JSON    /* outside anything, count nesting */
+  INCR_M_JSON,   /* outside anything, count nesting */
+  INCR_M_SQSTR,  /* inside single-quoted string (allow_singlequote) */
+  INCR_M_SQBS    /* inside backslash inside single-quoted string */
 };
 
 #define INCR_DONE(json) ((json)->incr_nest <= 0 && (json)->incr_mode == INCR_M_JSON)
@@ -3924,7 +3925,7 @@ decode_hv (pTHX_ dec_t *dec, SV *typesv)
   int allow_barekey = dec->json.flags & F_ALLOW_BAREKEY;
   int allow_dupkeys = dec->json.flags & F_ALLOW_DUPKEYS;
   int dupkeys_as_arrayref = dec->json.flags & F_DUPKEYS_AS_AREF;
-  int dupkeys_first = dec->json.flags & F_DUPKEYS_FIRST;
+  HV *dupkeys_seen = NULL;
   char endstr = '"';
 
   DEC_INC_DEPTH;
@@ -3978,9 +3979,11 @@ decode_hv (pTHX_ dec_t *dec, SV *typesv)
           for (;;)
             {
               /* the >= 0x80 is false on most architectures */
-              if (UNLIKELY(!is_bare &&
+              /* !*p must be checked before !is_bare: a bare-key scan has no
+                 bounds guard and would run one byte past dec->end otherwise */
+              if (UNLIKELY(!*p || (!is_bare &&
                   (p == e || *p < 0x20 || *(U8*)p >= 0x80 || *p == '\\'
-                   || allow_squote)))
+                   || allow_squote))))
                 {
                   /* slow path, back up and use decode_str */
                   /* utf8 hash keys are handled here */
@@ -3996,16 +3999,21 @@ decode_hv (pTHX_ dec_t *dec, SV *typesv)
                       // extend the value to arrayref or push
                       old_value = HeVAL(hv_fetch_ent (hv, keysv, 0, 0));
                       SvREFCNT_inc (old_value);
-                      if (dupkeys_first) {
-                        AV *av = newAV ();
-                        av_extend (av, 2);
-                        if (av_store(av, 0, old_value))
-                          old_value = newRV ((SV*)av);
-                      } else if (SvTYPE (old_value) != SVt_RV &&
-                                 SvTYPE (SvRV (old_value)) != SVt_PVAV) {
-                        // not an AvREF
-                        ERR ("Invalid dupkeys_as_arrayref hash key");
-                      }
+                      if (!dupkeys_seen
+                          || !hv_exists_ent (dupkeys_seen, keysv, 0))
+                        {
+                          AV *av = newAV ();
+                          av_extend (av, 2);
+                          if (av_store (av, 0, old_value))
+                            old_value = newRV ((SV*)av);
+                          if (!dupkeys_seen)
+                            {
+                              dupkeys_seen = newHV ();
+                              sv_2mortal ((SV *)dupkeys_seen);
+                            }
+                          (void)hv_store_ent (dupkeys_seen, keysv,
+                                              newSV (0), 0);
+                        }
                     } // else overwrite it below
                   }
                   decode_ws (dec);
@@ -4029,11 +4037,6 @@ decode_hv (pTHX_ dec_t *dec, SV *typesv)
                     {
                       av_push ((AV*)SvRV (old_value), value);
                       (void)hv_store_ent (hv, keysv, old_value, 0);
-                      if (dupkeys_first)
-                        {
-                          dupkeys_first = 0;
-                          dec->json.flags &= ~F_DUPKEYS_FIRST;
-                        }
                     }
                   else
                     {
@@ -4067,16 +4070,21 @@ decode_hv (pTHX_ dec_t *dec, SV *typesv)
                       SV** rv = hv_fetch (hv, key, len, 0);
                       old_value = *rv;
                       SvREFCNT_inc (old_value);
-                      if (dupkeys_first) {
-                        AV *av = newAV ();
-                        av_extend (av, 2);
-                        if (av_store(av, 0, old_value))
-                          old_value = newRV ((SV*)av);
-                      } else if (SvTYPE (old_value) != SVt_RV &&
-                                 SvTYPE (SvRV (old_value)) != SVt_PVAV) {
-                        // not an AvREF
-                        ERR ("Invalid dupkeys_as_arrayref hash key");
-                      }
+                      if (!dupkeys_seen
+                          || !hv_exists (dupkeys_seen, key, len))
+                        {
+                          AV *av = newAV ();
+                          av_extend (av, 2);
+                          if (av_store (av, 0, old_value))
+                            old_value = newRV ((SV*)av);
+                          if (!dupkeys_seen)
+                            {
+                              dupkeys_seen = newHV ();
+                              sv_2mortal ((SV *)dupkeys_seen);
+                            }
+                          (void)hv_store (dupkeys_seen, key, len,
+                                          newSV (0), 0);
+                        }
                     } // else overwrite it below
                   }
 
@@ -4101,11 +4109,6 @@ decode_hv (pTHX_ dec_t *dec, SV *typesv)
                     {
                       av_push ((AV*)SvRV (old_value), value);
                       hv_store_str (aTHX_ hv, key, len, old_value);
-                      if (dupkeys_first)
-                        {
-                          dupkeys_first = 0;
-                          dec->json.flags &= ~F_DUPKEYS_FIRST;
-                        }
                     }
                   else
                     {
@@ -4503,8 +4506,6 @@ decode_json (pTHX_ SV *string, JSON *json, STRLEN *offset_return, SV *typesv)
         converted = 1 + (json->flags & F_UTF8);
         json->flags |= F_UTF8;
         offset = 3;
-        SvPV_set(string, SvPVX_mutable (string) + 3);
-        SvCUR_set(string, len - 3);
         SvUTF8_on(string);
         /* omitting the endian name will skip the BOM in the result */
       } else if (len >= 4 && memEQc(s, UTF32BOM)) {
@@ -4539,7 +4540,7 @@ decode_json (pTHX_ SV *string, JSON *json, STRLEN *offset_return, SV *typesv)
     SvGROW (string, SvCUR (string) + 1);
 
   dec.json  = *json;
-  dec.cur   = SvPVX (string);
+  dec.cur   = SvPVX (string) + offset;
   dec.end   = SvEND (string);
   dec.err   = 0;
   dec.depth = 0;
@@ -4553,10 +4554,11 @@ decode_json (pTHX_ SV *string, JSON *json, STRLEN *offset_return, SV *typesv)
   sv = decode_sv (aTHX_ &dec, typesv);
 
   if (offset_return) {
-    if (dec.cur < SvPVX (string) || dec.cur > SvEND (string))
+    char *base = SvPVX (string) + offset;
+    if (dec.cur < base || dec.cur > SvEND (string))
       *offset_return = 0;
     else
-      *offset_return = dec.cur - SvPVX (string);
+      *offset_return = dec.cur - base;
   }
 
   if (!(offset_return || !sv))
@@ -4571,12 +4573,6 @@ decode_json (pTHX_ SV *string, JSON *json, STRLEN *offset_return, SV *typesv)
           sv = NULL;
         }
     }
-  /* restore old utf8 string with BOM */
-  if (UNLIKELY(offset)) {
-    SvPV_set(string, SvPVX_mutable (string) - offset);
-    SvCUR_set(string, len);
-  }
-
   if (!sv)
     {
       SV *uni = sv_newmortal ();
@@ -4667,6 +4663,15 @@ incr_parse (JSON *self)
             self->incr_mode = INCR_M_STR;
             goto incr_m_str;
 
+          /* skip a single char inside a single-quoted string (for \\-processing) */
+          case INCR_M_SQBS:
+            if (!*p)
+              goto interrupt;
+
+            ++p;
+            self->incr_mode = INCR_M_SQSTR;
+            goto incr_m_sqstr;
+
           /* inside #-style comments */
           case INCR_M_C0:
           case INCR_M_C1:
@@ -4717,6 +4722,37 @@ incr_parse (JSON *self)
                 ++p;
               }
 
+          /* inside a single-quoted string (allow_singlequote) */
+          case INCR_M_SQSTR:
+          incr_m_sqstr:
+            for (;;)
+              {
+                if (*p == '\'')
+                  {
+                    ++p;
+                    self->incr_mode = INCR_M_JSON;
+
+                    if (!self->incr_nest)
+                      goto interrupt;
+
+                    goto incr_m_json;
+                  }
+                else if (*p == '\\')
+                  {
+                    ++p;
+
+                    if (!*p)
+                      {
+                        self->incr_mode = INCR_M_SQBS;
+                        goto interrupt;
+                      }
+                  }
+                else if (!*p)
+                  goto interrupt;
+
+                ++p;
+              }
+
           /* after initial ws, outside string */
           case INCR_M_JSON:
           incr_m_json:
@@ -4742,6 +4778,14 @@ incr_parse (JSON *self)
                     case '"':
                       self->incr_mode = INCR_M_STR;
                       goto incr_m_str;
+
+                    case '\'':
+                      if (self->flags & F_ALLOW_SQUOTE)
+                        {
+                          self->incr_mode = INCR_M_SQSTR;
+                          goto incr_m_sqstr;
+                        }
+                      break;
 
                     case '[':
                     case '{':
@@ -4886,7 +4930,7 @@ void ascii (JSON *self, int enable = 1)
         # Turning on DUPKEYS_AS_AREF also turns on ALLOW_DUPKEYS
         # But turning off DUPKEYS_AS_AREF does not
         if (ix == F_DUPKEYS_AS_AREF && enable != 0)
-          self->flags |= F_ALLOW_DUPKEYS | F_DUPKEYS_FIRST;
+          self->flags |= F_ALLOW_DUPKEYS;
         XPUSHs (ST (0));
 
 void get_ascii (JSON *self)

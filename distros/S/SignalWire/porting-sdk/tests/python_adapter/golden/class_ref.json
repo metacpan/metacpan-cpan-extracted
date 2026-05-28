@@ -1,0 +1,24 @@
+{
+  "class_ref": {
+    "classes": {
+      "Engine": {
+        "methods": {
+          "run": {
+            "params": [
+              {
+                "name": "self",
+                "kind": "self"
+              },
+              {
+                "name": "target",
+                "type": "class:Result",
+                "required": true
+              }
+            ],
+            "returns": "class:Result"
+          }
+        }
+      }
+    }
+  }
+}

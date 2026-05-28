@@ -1,12 +1,28 @@
 Revision history for Perl distribution DateTime-Lite
 
+v0.7.2 2026-05-28T13:25:43+0900
+    [Improvement]
+    - Improved POD documentation for DateTime::Lite::TimeZone::extended_aliases with
+      explicit caveats and limitations regarding those timezone abbreviation ambiguities.
+    - DateTime::Lite::TimeZone now dynamically loads the fastest available JSON backend
+      at load time: Cpanel::JSON::XS, then JSON::XS, with a final fallback JSON::PP
+      (core since Perl 5.14).
+      JSON (JSON::PP) is now declared as a runtime dependency only on Perl < 5.14
+      (thanks to Toby Inkster for the suggestion).
+
+    [Bug Fixes]
+    - Corrected private method _string_equals_overload in DateTime::Lite by more
+      thoroughly checking if the second argument provided is a blessed object.
+
 v0.7.1 2026-05-20T08:36:01+0900
     [Improvement]
-    - Minor corrections in method pass_error in DateTime::Lite, DateTime::Lite::TimeZone, and DateTime::Lite::Duration
+    - Minor corrections in method pass_error in DateTime::Lite, DateTime::Lite::TimeZone,
+      and DateTime::Lite::Duration
 
 v0.7.0 2026-05-17T21:29:35+0900
     [New Feature]
-    - Added the method extended_aliases in DateTime::Lite::TimeZone to retrieve all extended timezone aliases.
+    - Added the method extended_aliases in DateTime::Lite::TimeZone to retrieve all
+      extended timezone aliases.
     - Added Japanese localisation for the POD documentation for all modules.
 
 v0.6.7 2026-05-05T21:08:09+0900

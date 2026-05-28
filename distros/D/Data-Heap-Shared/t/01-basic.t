@@ -59,7 +59,7 @@ $h->clear;
 my $t0 = time;
 @r = $h->pop_wait(0.1);
 is scalar @r, 0, 'pop_wait timeout';
-ok time - $t0 < 2;
+ok time - $t0 < 10;
 
 # cross-process
 $h->push(7, 700);

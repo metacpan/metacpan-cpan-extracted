@@ -1,0 +1,29 @@
+{
+  "callable": {
+    "classes": {
+      "Dispatcher": {
+        "methods": {
+          "register": {
+            "params": [
+              {
+                "name": "self",
+                "kind": "self"
+              },
+              {
+                "name": "name",
+                "type": "string",
+                "required": true
+              },
+              {
+                "name": "handler",
+                "type": "callable<list<string,int>,bool>",
+                "required": true
+              }
+            ],
+            "returns": "void"
+          }
+        }
+      }
+    }
+  }
+}

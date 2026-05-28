@@ -1,0 +1,9 @@
+{
+  "name": "signalwire-perl",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "features": {
+    "ghcr.io/devcontainers/features/common-utils:2": {}
+  },
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y perl cpanminus && cpanm --installdeps --notest .",
+  "forwardPorts": [3000, 8000]
+}

@@ -8,9 +8,9 @@ use Exporter 'import';
 use Time::Local qw(timelocal_posix timegm_posix);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2025-10-20'; # DATE
+our $DATE = '2026-05-27'; # DATE
 our $DIST = 'Filename-Timestamp'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our @EXPORT_OK = qw(extract_timestamp_from_filename);
 
@@ -163,6 +163,10 @@ sub extract_timestamp_from_filename {
         );
     }
 
+    if (defined $res->{year} && defined $res->{month} && defined $res->{day}) {
+        $res->{ymd} = sprintf("%04d%02d%02d", $res->{year}, $res->{month}, $res->{day});
+    }
+
     $res;
 }
 
@@ -181,7 +185,7 @@ Filename::Timestamp - Extract date/timestamp from filename, if any
 
 =head1 VERSION
 
-This document describes version 0.003 of Filename::Timestamp (from Perl distribution Filename-Timestamp), released on 2025-10-20.
+This document describes version 0.004 of Filename::Timestamp (from Perl distribution Filename-Timestamp), released on 2026-05-27.
 
 =head1 SYNOPSIS
 
@@ -225,6 +229,7 @@ Result:
    second    => 48,
    tz_offset => 25200,
    year      => 2024,
+   ymd       => 20240908,
  }
 
 =item * Example #2:
@@ -244,6 +249,7 @@ Result:
    second      => 44,
    tz          => "floating",
    year        => 2024,
+   ymd         => 20240908,
  }
 
 =item * Example #3:
@@ -263,6 +269,7 @@ Result:
    second      => 26,
    tz          => "floating",
    year        => 2024,
+   ymd         => 20240908,
  }
 
 =item * Example #4:
@@ -282,6 +289,7 @@ Result:
    second      => 44,
    tz          => "floating",
    year        => 2024,
+   ymd         => 20240901,
  }
 
 =item * Example #5:
@@ -301,6 +309,7 @@ Result:
    second      => 0,
    tz          => "floating",
    year        => 2024,
+   ymd         => 20241204,
  }
 
 =item * Example #6:
@@ -375,7 +384,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026, 2025 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

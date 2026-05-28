@@ -12,10 +12,12 @@ BEGIN
     use Test::More;
     use Module::Generic;
     use Scalar::Util qw( refaddr );
-    # USE_LONG_DOUBLE changes the internal ABI of perl; this is set for extreme tests under some cpan tests smokers.
-    if( $Config{uselongdouble} && $Config{useithreads} )
+    # USE_LONG_DOUBLE changes the internal ABI of perl; older threaded long double
+    # builds (5.16.0 and earlier) abort in threads::shared. This matches the
+    # BROKEN_SHARED_ABI condition in Module::Generic::Global.
+    if( $Config{useithreads} && ( $Config{uselongdouble} || $Config{usequadmath} ) && $] < 5.018000 )
     {
-        plan( skip_all => 'Known crash on Perl compiled with USE_LONG_DOUBLE + useithreads' );
+        plan( skip_all => 'Known crash on Perl compiled with USE_LONG_DOUBLE + useithreads on releases up to 5.16.0' );
     }
     eval
     {

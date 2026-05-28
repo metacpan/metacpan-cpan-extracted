@@ -1,0 +1,56 @@
+{
+  "version": "2",
+  "generated_from": "hand-written smoke sample",
+  "modules": {
+    "signalwire.core.agent_base": {
+      "classes": {
+        "AgentBase": {
+          "methods": {
+            "__init__": {
+              "params": [
+                { "name": "self", "kind": "self" },
+                { "name": "name", "type": "string", "required": true },
+                { "name": "route", "type": "string", "required": false, "default": "/" },
+                { "name": "host", "type": "string", "required": false, "default": "0.0.0.0" },
+                { "name": "port", "type": "optional<int>", "required": false, "default": null }
+              ],
+              "returns": "void"
+            },
+            "set_prompt": {
+              "params": [
+                { "name": "self", "kind": "self" },
+                { "name": "text", "type": "string", "required": true },
+                { "name": "pom", "type": "optional<list<dict<string,any>>>", "required": false, "default": null }
+              ],
+              "returns": "void"
+            },
+            "define_tool": {
+              "params": [
+                { "name": "self", "kind": "self" },
+                { "name": "name", "type": "string", "required": true },
+                { "name": "description", "type": "string", "required": true },
+                { "name": "parameters", "type": "dict<string,any>", "required": true },
+                { "name": "handler", "type": "callable<list<any>,class:signalwire.swaig.function_result.FunctionResult>", "required": true },
+                { "name": "secure", "type": "bool", "required": false, "default": false }
+              ],
+              "returns": "void"
+            }
+          }
+        }
+      },
+      "functions": {}
+    },
+    "signalwire.core.contexts": {
+      "classes": {},
+      "functions": {
+        "create_simple_context": {
+          "params": [
+            { "name": "name", "type": "string", "required": true },
+            { "name": "data", "type": "optional<dict<string,any>>", "required": false, "default": null }
+          ],
+          "returns": "class:signalwire.core.contexts.Context"
+        }
+      }
+    }
+  }
+}

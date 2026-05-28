@@ -2,7 +2,7 @@ package DBIx::QuickORM::Manual;
 use strict;
 use warnings;
 
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 
 1;
 
@@ -52,6 +52,11 @@ relationships, ...) to their DBIx::QuickORM equivalents.
 Use the DSL to compose schemas, tables, columns, and whole ORMs - including
 defining tables in their own files and advanced composition.
 
+=item L<DBIx::QuickORM::Manual::Aliasing>
+
+Give a database, table, or column a different name in the ORM than it has in
+the database.
+
 =item L<DBIx::QuickORM::Manual::Querying>
 
 Fetch, create, update, and delete rows with handles: where clauses, ordering,
@@ -82,6 +87,11 @@ How the per-connection row cache keeps one copy of each row in memory.
 =item L<DBIx::QuickORM::Manual::Connections>
 
 The connection lifecycle: reconnecting, fork safety, and the ORM's connection.
+
+=item L<DBIx::QuickORM::Manual::SQLBuilder>
+
+Replace the SQL builder: the builder contract, the statement/bind structure,
+how the SQL::Abstract builder works, and how to write your own.
 
 =item L<DBIx::QuickORM::Manual::Recipes>
 

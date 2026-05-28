@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.amazon_bedrock` (params). Extracted from switchblade `PublicCallAmazonBedrockParams.cs`.",
+  "properties": {
+    "SWAIG": {},
+    "async": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "call_id": {
+      "type": "string"
+    },
+    "global_data": {},
+    "node_id": {
+      "type": "string"
+    },
+    "params": {},
+    "post_prompt": {},
+    "post_prompt_url": {
+      "type": "string"
+    },
+    "prompt": {},
+    "swml": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id"
+  ],
+  "title": "calling.amazon_bedrock params",
+  "type": "object",
+  "x-method": "calling.amazon_bedrock",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallAmazonBedrockParams.cs"
+}

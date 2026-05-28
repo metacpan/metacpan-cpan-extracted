@@ -43,7 +43,7 @@ export default class RtExtensionAi extends CKEDITOR.Plugin {
                 dropdownItems.add(this.createDropdownItem('Adjust Tone/Voice', 'adjust_tone'));
             }
             if ( RT.AIEditorFeatures.includes('suggest_response') ) {
-                dropdownItems.add(this.createDropdownItem('AI Suggestion', 'suggest_response'));
+                dropdownItems.add(this.createDropdownItem('AI Suggestion', 'suggest_response_direct'));
             }
             if ( RT.AIEditorFeatures.includes('translate_content') ) {
                 dropdownItems.add(this.createDropdownItem('Translate', 'translate_content'));
@@ -63,7 +63,11 @@ export default class RtExtensionAi extends CKEDITOR.Plugin {
                 const { id } = evt.source;
                 const { content, isSelected: isSelectedText } = getEditorSelectionOrContent(editor);
 
-                createSuggestionModal(content, editor, id, isSelectedText);
+                if (id === 'suggest_response_direct') {
+                    this.generateAIResponseDirectly(editor, content);
+                } else {
+                    createSuggestionModal(content, editor, id, isSelectedText);
+                }
             });
 
             return dropdownView;
@@ -103,6 +107,108 @@ export default class RtExtensionAi extends CKEDITOR.Plugin {
                 }
             }, 500);
         });
+    }
+
+    /**
+     * Generates AI response directly in the editor without modal.
+     */
+    async generateAIResponseDirectly(editor, selectedText = '') {
+        // Show progress indicator
+        this.showProgressIndicator(editor);
+
+        try {
+            const response = await fetchAiResults(selectedText, 'suggest_response');
+            this.hideProgressIndicator();
+
+            if (response && response.trim()) {
+                this.insertAIResponseInEditor(editor, response.trim());
+            } else {
+                this.showErrorMessage('No response received from AI service');
+            }
+        } catch (error) {
+            this.hideProgressIndicator();
+            console.error('AI request failed:', error);
+            this.showErrorMessage('AI request failed: ' + error.message);
+        }
+    }
+
+    /**
+     * Shows a progress indicator in the editor.
+     */
+    showProgressIndicator(editor) {
+        const indicator = document.createElement('div');
+        indicator.id = 'ai-progress-indicator';
+        indicator.className = 'card border shadow-sm p-3';
+
+        indicator.innerHTML = `
+            <div class="d-flex align-items-center gap-2">
+                <div class="ai-spinner"></div>
+                <span class="fw-medium">Generating response...</span>
+            </div>
+        `;
+
+        document.body.appendChild(indicator);
+    }
+
+    /**
+     * Hides the progress indicator.
+     */
+    hideProgressIndicator() {
+        const indicator = document.getElementById('ai-progress-indicator');
+        if (indicator) {
+            indicator.remove();
+        }
+    }
+
+    /**
+     * Inserts AI response directly into the editor.
+     */
+    insertAIResponseInEditor(editor, response) {
+        editor.model.change(writer => {
+            const root = editor.model.document.getRoot();
+
+            // Split response by double newlines (paragraphs) or single newlines
+            const paragraphs = response.split(/\n\s*\n/).map(text => text.trim()).filter(text => text.length > 0);
+
+            // If no double newlines found, split by single newlines
+            const lines = paragraphs.length === 1 ? response.split('\n').map(text => text.trim()).filter(text => text.length > 0) : paragraphs;
+
+            // Find position at the end of existing content
+            let insertPosition = writer.createPositionAt(root, 'end');
+
+            // Add a blank line separator if there's existing content
+            if (root.childCount > 0) {
+                const separatorParagraph = writer.createElement('paragraph');
+                writer.insert(separatorParagraph, insertPosition);
+                insertPosition = writer.createPositionAfter(separatorParagraph);
+            }
+
+            // Create and insert paragraph elements for AI response
+            lines.forEach((text, index) => {
+                const paragraph = writer.createElement('paragraph');
+                writer.insertText(text, paragraph);
+                writer.insert(paragraph, insertPosition);
+
+                // Update position for next paragraph
+                insertPosition = writer.createPositionAfter(paragraph);
+            });
+
+            // Set cursor at the end of the last inserted paragraph
+            if (lines.length > 0) {
+                const lastParagraph = root.getChild(root.childCount - 1);
+                const endPosition = writer.createPositionAt(lastParagraph, 'end');
+                writer.setSelection(endPosition);
+            }
+        });
+    }
+
+    /**
+     * Shows an error message to the user.
+     */
+    showErrorMessage(message) {
+        console.error(message);
+        // You could implement a toast notification or other user-friendly error display
+        alert('Error: ' + message);
     }
 
     /**

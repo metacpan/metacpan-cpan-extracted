@@ -1,5 +1,10 @@
 Revision history for Concierge
 
+v0.8.1  2026-05-27
+    - Desk::Setup POD: update show_default_config/show_config examples and
+      prose to reflect service-hashref returns (Concierge::Users v0.8.3);
+      add validate_as, default, null to get_field_hints return-value comment
+
 v0.8.0  2026-05-25
     - Rename Concierge::Setup, ::User, ::Base into Concierge::Desk:: namespace
       (Concierge::Desk::Setup, ::User, ::Base)

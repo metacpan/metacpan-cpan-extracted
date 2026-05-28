@@ -1,10 +1,15 @@
 FROM perl:5.40-slim AS builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential libssl-dev git \
+    build-essential cmake pkg-config \
+    libssl-dev zlib1g-dev libssh2-1-dev git \
     && rm -rf /var/lib/apt/lists/*
 
 COPY . /tmp/karr-src
+
+# Force Alien::Libgit2 to vendor libgit2 (share build) so the runtime image is
+# self-contained — the slim runtime has no system libgit2 to dynamically link.
+ENV ALIEN_INSTALL_TYPE=share
 
 RUN cpanm --notest --installdeps /tmp/karr-src \
     && cpanm --notest /tmp/karr-src \
@@ -12,7 +17,11 @@ RUN cpanm --notest --installdeps /tmp/karr-src \
 
 FROM perl:5.40-slim AS runtime-base
 
-RUN apt-get update && apt-get install -y --no-install-recommends git gosu passwd \
+# git + runtime shared libs the vendored libgit2.so links against
+# (OpenSSL for HTTPS, libssh2 for SSH, zlib for compression).
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git gosu passwd \
+    libssl3 libssh2-1 zlib1g \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /usr/local/lib/perl5/site_perl/ /usr/local/lib/perl5/site_perl/

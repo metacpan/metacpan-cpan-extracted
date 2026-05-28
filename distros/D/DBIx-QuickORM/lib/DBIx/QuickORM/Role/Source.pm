@@ -2,7 +2,7 @@ package DBIx::QuickORM::Role::Source;
 use strict;
 use warnings;
 
-our $VERSION = '0.000020';
+our $VERSION = '0.000021';
 
 use Carp qw/croak confess/;
 
@@ -44,6 +44,30 @@ The abstract source kind: C<TABLE>, C<VIEW>, C<JOIN>, or C<LITERAL>.
 =item $aff = $source->field_affinity($field, $dialect)
 
 =item $bool = $source->has_field($field)
+
+=item $db_name = $source->field_db_name($field)
+
+The database name for a field, given either its ORM or database name. Idempotent
+and used by the SQL builder to emit database names; an unknown field is returned
+unchanged.
+
+=item $orm_name = $source->field_orm_name($field)
+
+The ORM name for a field, given either its ORM or database name. Idempotent and
+used to remap fetched result keys back to ORM names; an unknown field is
+returned unchanged.
+
+=item $bool = $source->field_is_generated($field)
+
+True if the named field is a database-generated column (stored or virtual
+C<GENERATED>). Used by the row and SQL layers to keep generated columns out of
+C<INSERT> / C<UPDATE> column lists. Unknown fields return false.
+
+=item $bool = $source->source_has_aliases
+
+True when the source has any column whose ORM name differs from its database
+name. Lets the SQL and row layers skip name translation entirely when there is
+nothing to translate.
 
 =item $fields = $source->fields_to_fetch
 

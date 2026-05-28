@@ -1,0 +1,150 @@
+<%init>
+use JSON;
+
+$r->content_type('application/json; charset=utf-8');
+
+my $result = { success => 0, error => 'Unknown error' };
+
+# Validate session
+unless ( $session_id ) {
+    $result->{error} = 'Invalid chat session';
+    $m->out( encode_json($result) );
+    $m->abort();
+}
+
+# Load session history
+my $history = $session{'AIChat_history'} || [];
+
+# Load AI config
+my $config = RT->Config->Get('RT_AI_Provider');
+$config = $config->{Default};
+
+unless ( $config && $config->{queue_creation_assistant} ) {
+    $result->{error} = 'AI queue creation assistant is not enabled';
+    $m->out( encode_json($result) );
+    $m->abort();
+}
+
+# Load system prompt
+my $system_prompt = RT::Extension::AI::LoadQueueCreationPrompt();
+unless ( $system_prompt ) {
+    $result->{error} = 'Could not load queue creation prompt';
+    $m->out( encode_json($result) );
+    $m->abort();
+}
+
+# Build raw_text from conversation history + new message
+my $raw_text = '';
+for my $entry ( @$history ) {
+    if ( $entry->{role} eq 'user' ) {
+        $raw_text .= "User: " . $entry->{content} . "\n\n";
+    }
+    else {
+        $raw_text .= "Assistant: " . $entry->{content} . "\n\n";
+    }
+}
+$raw_text .= "User: " . $message . "\n";
+
+# Call the AI provider (user message added to history only on success)
+my $provider_class = "RT::Extension::AI::Provider::" . $config->{name};
+my $provider_instance = $provider_class->new( config => $config );
+
+unless ( $provider_instance ) {
+    $result->{error} = 'Could not create AI provider';
+    $m->out( encode_json($result) );
+    $m->abort();
+}
+
+my $model_config = $config->{default_model} || { name => $config->{name}, max_tokens => 4096, temperature => 0.5 };
+
+my $max_retries = 2;
+my $response;
+for my $attempt ( 0 .. $max_retries ) {
+    $response = $provider_instance->process_request(
+        prompt       => $system_prompt,
+        raw_text     => $raw_text,
+        model_config => $model_config,
+    );
+    last if $response->{success};
+    RT->Logger->warning("AI chat attempt " . ($attempt + 1) . " failed: " . ($response->{error} || 'unknown'));
+    sleep 2 ** $attempt if $attempt < $max_retries;  # exponential backoff: 1, 2, 4...
+}
+
+if ( $response->{success} ) {
+    my $ai_response = $response->{result};
+
+    # Add both user and assistant messages to history on success
+    push @$history, { role => 'user', content => $message };
+    push @$history, { role => 'assistant', content => $ai_response };
+    RT::Interface::Web::Session::Set( Key => 'AIChat_history', Value => $history );
+
+    RT->Logger->debug("AIChat raw response length: " . length($ai_response));
+    RT->Logger->debug("AIChat raw response (first 2000): " . substr($ai_response, 0, 2000));
+
+    # Check for initialdata JSON block
+    # Try explicit json-initialdata fence first, then any JSON block
+    # containing initialdata keys (Queues, Groups, ACL, etc.)
+    my $has_initialdata = 0;
+    my $initialdata;
+    my $json_text;
+
+    if ( $ai_response =~ /```json-initialdata\s*\n(.*?)\n```/s ) {
+        RT->Logger->debug("AIChat: matched json-initialdata fence");
+        $json_text = $1;
+    }
+    elsif ( $ai_response =~ /```(?:json)?\s*\n(\{.*?\})\n```/s ) {
+        RT->Logger->debug("AIChat: matched generic code fence with JSON object");
+        $json_text = $1;
+    }
+    elsif ( $ai_response =~ /(\{\s*\n\s*"(?:Queues|Groups|ACL|CustomFields)".*\})/s ) {
+        RT->Logger->debug("AIChat: matched bare JSON with initialdata keys");
+        $json_text = $1;
+    }
+    else {
+        RT->Logger->debug("AIChat: no JSON block detected in response");
+    }
+
+    if ( $json_text ) {
+        # Strip JavaScript-style comments that some AI models add
+        $json_text =~ s{//[^\n]*}{}g;
+        $json_text =~ s{/\*.*?\*/}{}gs;
+        # Strip trailing commas before ] or }
+        $json_text =~ s/,\s*([\]\}])/$1/g;
+
+        RT->Logger->debug("AIChat extracted JSON (first 500): " . substr($json_text, 0, 500));
+        eval {
+            my $parsed = decode_json($json_text);
+            # Validate it looks like initialdata (has at least Queues or ACL)
+            if ( ref $parsed eq 'HASH' && ( $parsed->{Queues} || $parsed->{ACL} || $parsed->{Groups} ) ) {
+                $initialdata = $parsed;
+                $has_initialdata = 1;
+                RT->Logger->debug("AIChat: valid initialdata detected, keys: " . join(', ', keys %$parsed));
+            }
+            else {
+                RT->Logger->debug("AIChat: JSON parsed but missing initialdata keys");
+            }
+        };
+        if ( $@ ) {
+            RT->Logger->warning("AI returned invalid initialdata JSON: $@");
+        }
+    }
+
+    $result = {
+        success         => 1,
+        response        => $ai_response,
+        has_initialdata => $has_initialdata,
+    };
+    $result->{initialdata} = $initialdata if $has_initialdata;
+}
+else {
+    $result->{error} = $response->{error} || 'AI request failed';
+    RT->Logger->error("AI chat request failed: " . $response->{error});
+}
+
+$m->out( encode_json($result) );
+$m->abort();
+</%init>
+<%args>
+$message    => ''
+$session_id => ''
+</%args>

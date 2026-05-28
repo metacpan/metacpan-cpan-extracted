@@ -254,6 +254,12 @@ static inline void pubsub_mutex_unlock(PubSubHeader *hdr) {
 }
 
 static inline void pubsub_wake_subscribers(PubSubHeader *hdr) {
+    /* SEQ_CST fence pairs with consumer's SEQ_CST waiters increment in
+     * poll_wait. Without it, the RELAXED load below may be reordered
+     * before the prior RELEASE store of the slot sequence on weak-memory
+     * architectures, letting us observe waiters == 0 even when a consumer
+     * has already incremented it after publishing the data. */
+    __atomic_thread_fence(__ATOMIC_SEQ_CST);
     if (__atomic_load_n(&hdr->sub_waiters, __ATOMIC_RELAXED) > 0) {
         __atomic_add_fetch(&hdr->sub_futex, 1, __ATOMIC_RELEASE);
         syscall(SYS_futex, &hdr->sub_futex, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
@@ -359,7 +365,9 @@ static void pubsub_init_header(void *base, uint32_t mode, uint32_t cap,
     hdr->arena_cap = arena_cap;
 }
 
-static void pubsub_calc_layout(uint32_t cap, uint32_t mode, uint32_t msg_size,
+/* Returns 1 on success, 0 if the requested capacity * msg_size would
+ * exceed the 32-bit arena addressing limit (out_arena_cap is set to 0). */
+static int pubsub_calc_layout(uint32_t cap, uint32_t mode, uint32_t msg_size,
                                 uint64_t *out_slots_off, uint64_t *out_data_off,
                                 uint64_t *out_arena_cap, uint64_t *out_total_size) {
     uint64_t slots_off = sizeof(PubSubHeader);
@@ -373,7 +381,17 @@ static void pubsub_calc_layout(uint32_t cap, uint32_t mode, uint32_t msg_size,
         uint64_t slots_end = slots_off + (uint64_t)cap * slot_size;
         data_off = (slots_end + 63) & ~(uint64_t)63;
         arena_cap = (uint64_t)cap * ((uint64_t)msg_size + 8);
-        if (arena_cap > UINT32_MAX) arena_cap = UINT32_MAX;
+        /* Safety invariant: in any window of `capacity` consecutive publishes
+         * (one full slot-ring wrap), the arena must not wrap. Otherwise a
+         * publish to slot K could overwrite slot N's still-current arena
+         * region without bumping slot N's sequence -- the seqlock would
+         * not catch the corruption. arena_cap = capacity*(msg_size+8)
+         * guarantees this; silently capping to UINT32_MAX would break the
+         * invariant for extreme (capacity, msg_size) combinations. */
+        if (arena_cap > UINT32_MAX) {
+            *out_arena_cap = 0;
+            return 0;
+        }
         total_size = data_off + arena_cap;
     } else {
         total_size = slots_off + (uint64_t)cap * slot_size;
@@ -383,6 +401,7 @@ static void pubsub_calc_layout(uint32_t cap, uint32_t mode, uint32_t msg_size,
     *out_data_off   = data_off;
     *out_arena_cap  = arena_cap;
     *out_total_size = total_size;
+    return 1;
 }
 
 static PubSubHandle *pubsub_create(const char *path, uint32_t capacity,
@@ -398,7 +417,10 @@ static PubSubHandle *pubsub_create(const char *path, uint32_t capacity,
         msg_size = PUBSUB_DEFAULT_MSG_SIZE;
 
     uint64_t slots_off, data_off, arena_cap, total_size;
-    pubsub_calc_layout(cap, mode, msg_size, &slots_off, &data_off, &arena_cap, &total_size);
+    if (!pubsub_calc_layout(cap, mode, msg_size, &slots_off, &data_off, &arena_cap, &total_size)) {
+        PUBSUB_ERR("capacity * (msg_size+8) exceeds 4GB arena limit");
+        return NULL;
+    }
 
     int anonymous = (path == NULL);
     size_t map_size;
@@ -484,7 +506,10 @@ static PubSubHandle *pubsub_create_memfd(const char *name, uint32_t capacity,
         msg_size = PUBSUB_DEFAULT_MSG_SIZE;
 
     uint64_t slots_off, data_off, arena_cap, total_size;
-    pubsub_calc_layout(cap, mode, msg_size, &slots_off, &data_off, &arena_cap, &total_size);
+    if (!pubsub_calc_layout(cap, mode, msg_size, &slots_off, &data_off, &arena_cap, &total_size)) {
+        PUBSUB_ERR("capacity * (msg_size+8) exceeds 4GB arena limit");
+        return NULL;
+    }
 
     int fd = memfd_create(name ? name : "pubsub", MFD_CLOEXEC | MFD_ALLOW_SEALING);
     if (fd < 0) { PUBSUB_ERR("memfd_create: %s", strerror(errno)); return NULL; }
@@ -685,21 +710,30 @@ static int pubsub_##PFX##_poll_wait(PubSubSub *sub, VTYPE *value,              \
     int has_deadline = (timeout > 0);                                          \
     if (has_deadline) pubsub_make_deadline(timeout, &deadline);                 \
     for (;;) {                                                                 \
-        uint32_t fseq = __atomic_load_n(&hdr->sub_futex, __ATOMIC_ACQUIRE);    \
+        /* Increment waiters BEFORE loading fseq/polling. SEQ_CST pairs       \
+         * with publisher's SEQ_CST fence in pubsub_wake_subscribers so a     \
+         * publisher that races our poll() either sees waiters > 0 and       \
+         * wakes us, or publishes data we observe in the post-increment      \
+         * poll. Without this ordering, we could sleep forever on an         \
+         * unchanged fseq while data sits in the ring. */                     \
+        __atomic_add_fetch(&hdr->sub_waiters, 1, __ATOMIC_SEQ_CST);           \
+        uint32_t fseq = __atomic_load_n(&hdr->sub_futex, __ATOMIC_ACQUIRE);   \
         r = pubsub_##PFX##_poll(sub, value);                                   \
-        if (r != 0) return r;                                                  \
-        __atomic_add_fetch(&hdr->sub_waiters, 1, __ATOMIC_RELEASE);            \
+        if (r != 0) {                                                          \
+            __atomic_sub_fetch(&hdr->sub_waiters, 1, __ATOMIC_SEQ_CST);       \
+            return r;                                                          \
+        }                                                                      \
         struct timespec *pts = NULL;                                           \
         if (has_deadline) {                                                     \
             if (!pubsub_remaining_time(&deadline, &remaining)) {               \
-                __atomic_sub_fetch(&hdr->sub_waiters, 1, __ATOMIC_RELEASE);    \
+                __atomic_sub_fetch(&hdr->sub_waiters, 1, __ATOMIC_SEQ_CST);   \
                 return 0;                                                      \
             }                                                                  \
             pts = &remaining;                                                  \
         }                                                                      \
         long rc = syscall(SYS_futex, &hdr->sub_futex, FUTEX_WAIT,             \
                           fseq, pts, NULL, 0);                                 \
-        __atomic_sub_fetch(&hdr->sub_waiters, 1, __ATOMIC_RELEASE);            \
+        __atomic_sub_fetch(&hdr->sub_waiters, 1, __ATOMIC_SEQ_CST);           \
         r = pubsub_##PFX##_poll(sub, value);                                   \
         if (r != 0) return r;                                                  \
         if (rc == -1 && errno == ETIMEDOUT) return 0;                          \
@@ -843,22 +877,26 @@ static int pubsub_str_poll_wait(PubSubSub *sub, const char **out_str,
     if (has_deadline) pubsub_make_deadline(timeout, &deadline);
 
     for (;;) {
+        /* See pubsub_int_poll_wait above for the SEQ_CST ordering rationale. */
+        __atomic_add_fetch(&hdr->sub_waiters, 1, __ATOMIC_SEQ_CST);
         uint32_t fseq = __atomic_load_n(&hdr->sub_futex, __ATOMIC_ACQUIRE);
         r = pubsub_str_poll(sub, out_str, out_len, out_utf8);
-        if (r != 0) return r;
+        if (r != 0) {
+            __atomic_sub_fetch(&hdr->sub_waiters, 1, __ATOMIC_SEQ_CST);
+            return r;
+        }
 
-        __atomic_add_fetch(&hdr->sub_waiters, 1, __ATOMIC_RELEASE);
         struct timespec *pts = NULL;
         if (has_deadline) {
             if (!pubsub_remaining_time(&deadline, &remaining)) {
-                __atomic_sub_fetch(&hdr->sub_waiters, 1, __ATOMIC_RELEASE);
+                __atomic_sub_fetch(&hdr->sub_waiters, 1, __ATOMIC_SEQ_CST);
                 return 0;
             }
             pts = &remaining;
         }
         long rc = syscall(SYS_futex, &hdr->sub_futex, FUTEX_WAIT,
                           fseq, pts, NULL, 0);
-        __atomic_sub_fetch(&hdr->sub_waiters, 1, __ATOMIC_RELEASE);
+        __atomic_sub_fetch(&hdr->sub_waiters, 1, __ATOMIC_SEQ_CST);
 
         r = pubsub_str_poll(sub, out_str, out_len, out_utf8);
         if (r != 0) return r;

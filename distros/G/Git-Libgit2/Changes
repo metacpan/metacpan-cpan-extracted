@@ -1,5 +1,42 @@
 Revision history for Git-Libgit2
 
+0.004     2026-05-27 17:06:23Z
+  - Fix git_tag_create binding: the oid out-param is a caller-allocated
+    git_oid buffer, so it must be declared 'opaque' (not 'opaque*') like
+    the lightweight/from_buffer variants. The old declaration made every
+    git_tag_create call fail with "failed to create tag annotation". The
+    existing test only exercised git_tag_create_from_buffer, so it slipped
+    through; t/13-tag.t now also covers git_tag_create directly.
+
+0.003     2026-05-27 14:53:34Z
+  - New binding git_repository_set_head: pin HEAD at a (possibly unborn)
+    branch, e.g. to force 'main' on a freshly init'd repo regardless of the
+    compiled-in default or ambient init.defaultBranch
+  - Group A accessor/predicate complements:
+    repository_head/head_unborn/head_detached,
+    reference_symbolic_create/symbolic_target/symbolic_set_target/set_target/
+    resolve/shorthand/is_branch/is_remote/is_tag,
+    commit_id/time/time_offset/summary
+  - Add TODO.md cataloguing the remaining unbound libgit2 1.5.1 surface
+    (Group B: merge content-level, diff/patch text, index conflicts, stash
+    iteration, branch upstream, typed config, remote management; Group C:
+    blame, describe, submodule, worktree, notes, apply, attr/ignore,
+    pathspec, mailmap) with per-family FFI gotchas
+  - CI: pin the sibling Alien::Libgit2 install step to bash (the perl
+    container falls back to dash, which lacks 'set -o pipefail')
+  - Fix t/01 workdir comparison on macOS (resolve the /var -> /private/var
+    symlink so it matches libgit2's canonical path)
+
+0.002     2026-05-27 12:43:29Z
+  - Update CI workflows to use the shared dzil-test composite action from
+    [@Author::GETTY]; fixes missing Test::Pod by using listdeps --author
+    in the sibling Alien::Libgit2 install step
+  - Comprehensive POD pass: document every FFI function with =func, every
+    Error method with =method, add section headers per group, add README.md
+    with full function tables and architecture overview
+  - Fix three POD transcription typos in FFI.pm (broken code examples in
+    git_revwalk_hide_ref, git_credential_username_new, git_graph_ahead_behind)
+
 0.001     2026-05-24 17:56:31Z
   - Initial release
   - Low-level FFI::Platypus bindings to libgit2 (via Alien::Libgit2)

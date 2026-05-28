@@ -1,7 +1,7 @@
 # ABSTRACT: Low-level FFI bindings to libgit2
 
 package Git::Libgit2;
-our $VERSION = '0.001';
+our $VERSION = '0.004';
 use strict;
 use warnings;
 use Carp ();
@@ -53,12 +53,14 @@ sub init_lib {
   return $rc;
 }
 
+
 sub shutdown_lib {
   return 0 unless $initialised;
   my $rc = Git::Libgit2::FFI::git_libgit2_shutdown();
   $initialised = $rc;
   return $rc;
 }
+
 
 sub version {
   Git::Libgit2::FFI::ffi();
@@ -67,15 +69,14 @@ sub version {
   return wantarray ? ( $maj, $min, $rev ) : "$maj.$min.$rev";
 }
 
+
 sub check_rc {
   my ($rc) = @_;
   return $rc if $rc >= 0;
   die Git::Libgit2::Error->last($rc);
 }
 
-# oid_from_hex returns a Perl scalar holding the raw 20 bytes.
-# Callers must keep the scalar alive for as long as the OID pointer
-# is needed by libgit2 — the C side just gets a pointer into the PV.
+
 sub oid_from_hex {
   my ($hex) = @_;
   Carp::croak "oid_from_hex: expected 40-char hex, got '$hex'"
@@ -86,6 +87,7 @@ sub oid_from_hex {
   return $raw;
 }
 
+
 sub oid_to_hex {
   my ($oid_ptr) = @_;
   my $buf = "\0" x ( GIT_OID_HEXSZ + 1 );
@@ -94,6 +96,7 @@ sub oid_to_hex {
   $buf =~ s/\0.*//s;
   return $buf;
 }
+
 
 # Get a raw pointer to a Perl scalar's bytes (for passing as 'opaque').
 sub _scalar_ptr {
@@ -115,7 +118,7 @@ Git::Libgit2 - Low-level FFI bindings to libgit2
 
 =head1 VERSION
 
-version 0.001
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -136,6 +139,57 @@ L<Alien::Libgit2>.
 
 This module is intentionally close to the C surface. Use L<Git::Native>
 for an idiomatic Moo wrapper with RAII handle management.
+
+=head2 init_lib
+
+    init_lib();
+
+Initialise the libgit2 library (wraps C<git_libgit2_init>). Safe to call
+repeatedly — libgit2 reference-counts initialisations and returns the new
+count, which this returns too. Croaks if the count comes back below C<1>.
+
+=head2 shutdown_lib
+
+    shutdown_lib();
+
+Decrement libgit2's initialisation count (wraps C<git_libgit2_shutdown>) and
+return the remaining count. A no-op returning C<0> if L</init_lib> was never
+called. Call once per matching L</init_lib>.
+
+=head2 version
+
+    my $string            = version();   # "1.9.0"
+    my ($maj, $min, $rev) = version();    # (1, 9, 0)
+
+Return the libgit2 library version (wraps C<git_libgit2_version>). In scalar
+context returns a dotted C<"major.minor.revision"> string; in list context
+returns the three numeric components.
+
+=head2 check_rc
+
+    my $rc = check_rc( some_libgit2_call(...) );
+
+Pass a libgit2 return code straight through when it is non-negative. On a
+negative code, throw the corresponding L<Git::Libgit2::Error> (built from
+C<git_error_last>); the exception stringifies to the libgit2 error message.
+
+=head2 oid_from_hex
+
+    my $raw = oid_from_hex('39a3c8...');   # 40 hex chars
+
+Convert a 40-character hex OID into a Perl scalar holding the raw 20 bytes
+(wraps C<git_oid_fromstr>). Croaks unless the input is exactly 40 hex digits.
+
+B<Lifetime:> the returned scalar I<is> the OID buffer — libgit2 is handed a
+pointer into its PV. Keep the scalar alive for as long as any libgit2 call
+still needs the OID.
+
+=head2 oid_to_hex
+
+    my $hex = oid_to_hex($oid_ptr);
+
+Convert a C<git_oid> pointer into its 40-character hex string (wraps
+C<git_oid_tostr>).
 
 =head1 EXPORTS
 

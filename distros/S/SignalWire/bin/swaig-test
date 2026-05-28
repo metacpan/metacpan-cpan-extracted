@@ -1,0 +1,506 @@
+#!/usr/bin/env perl
+# Copyright (c) 2025 SignalWire
+# Licensed under the MIT License.
+#
+# swaig-test - CLI tool for testing SWAIG agent endpoints
+#
+# Usage:
+#   swaig-test --url http://user:pass@host:port/route --dump-swml
+#   swaig-test --url http://user:pass@host:port/route --list-tools
+#   swaig-test --url http://user:pass@host:port/route --exec tool_name --param key=value
+#
+# File mode (no HTTP — load a Perl example/script in-process and read
+# the runtime SWAIG tool registry):
+#   swaig-test --file examples/swmlservice_swaig_standalone.pl --list-tools
+#
+
+use strict;
+use warnings;
+use Getopt::Long;
+use JSON ();
+use HTTP::Tiny;
+use URI;
+use MIME::Base64 qw(encode_base64);
+use File::Spec;
+use Scalar::Util qw(blessed);
+
+my $VERSION = '1.0.0';
+
+# --- Parse CLI options ---
+my ($url, $file, $dump_swml, $list_tools, $exec_name, @params, $raw, $verbose, $help);
+
+GetOptions(
+    'url=s'       => \$url,
+    'file=s'      => \$file,
+    'dump-swml'   => \$dump_swml,
+    'list-tools'  => \$list_tools,
+    'exec=s'      => \$exec_name,
+    'param=s@'    => \@params,
+    'raw'         => \$raw,
+    'verbose'     => \$verbose,
+    'help|h'      => \$help,
+) or usage_exit();
+
+if ($help) {
+    usage_exit(0);
+}
+
+unless ($url || $file) {
+    print STDERR "Error: --url or --file is required\n\n";
+    usage_exit(1);
+}
+
+if ($url && $file) {
+    print STDERR "Error: --url and --file are mutually exclusive\n\n";
+    usage_exit(1);
+}
+
+unless ($dump_swml || $list_tools || $exec_name) {
+    print STDERR "Error: one of --dump-swml, --list-tools, or --exec NAME is required\n\n";
+    usage_exit(1);
+}
+
+# --- File mode: load Perl script in-process and walk runtime tool registry ---
+if ($file) {
+    do_file_mode();
+    exit 0;
+}
+
+# --- URL mode: HTTP path ---
+my $uri = URI->new($url);
+my $userinfo = $uri->userinfo // '';
+my ($auth_user, $auth_pass) = split(/:/, $userinfo, 2);
+
+# Build base URL without credentials
+my $clean_uri = $uri->clone;
+$clean_uri->userinfo(undef);
+my $base_url = $clean_uri->as_string;
+
+# Remove trailing slash
+$base_url =~ s{/$}{};
+
+my $http = HTTP::Tiny->new(timeout => 30);
+
+# --- Execute the requested operation ---
+
+if ($dump_swml) {
+    do_dump_swml();
+}
+elsif ($list_tools) {
+    do_list_tools();
+}
+elsif ($exec_name) {
+    do_exec($exec_name);
+}
+
+exit 0;
+
+# ============================================================
+# Operations
+# ============================================================
+
+sub do_dump_swml {
+    my $response = http_get($base_url);
+    if ($raw) {
+        print $response->{content};
+        print "\n" unless $response->{content} =~ /\n$/;
+    } else {
+        my $data = eval { JSON::decode_json($response->{content}) };
+        if ($@) {
+            die "Error: Failed to parse JSON response: $@\n";
+        }
+        print JSON->new->utf8->pretty->canonical->encode($data);
+    }
+}
+
+sub do_list_tools {
+    my $response = http_get($base_url);
+    my $data = eval { JSON::decode_json($response->{content}) };
+    if ($@) {
+        die "Error: Failed to parse JSON response: $@\n";
+    }
+
+    # Extract SWAIG functions from the SWML document
+    my @functions;
+
+    # Navigate the SWML structure to find AI verb functions
+    if (my $sections = $data->{sections}) {
+        for my $section_name (keys %$sections) {
+            my $verbs = $sections->{$section_name};
+            next unless ref $verbs eq 'ARRAY';
+            for my $verb (@$verbs) {
+                if (ref $verb eq 'HASH' && exists $verb->{ai}) {
+                    my $ai = $verb->{ai};
+                    if (my $swaig = $ai->{SWAIG}) {
+                        if (my $funcs = $swaig->{functions}) {
+                            push @functions, @$funcs;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (!@functions) {
+        print "No SWAIG functions found.\n";
+        return;
+    }
+
+    print_tool_list(\@functions);
+}
+
+sub do_exec {
+    my ($func_name) = @_;
+
+    # Parse --param key=value pairs
+    my %args;
+    for my $p (@params) {
+        if ($p =~ /^([^=]+)=(.*)$/) {
+            $args{$1} = $2;
+        } else {
+            die "Error: Invalid --param format '$p'. Use key=value\n";
+        }
+    }
+
+    my $swaig_url = $base_url . '/swaig';
+
+    my $payload = {
+        function  => $func_name,
+        argument  => {
+            parsed => [ \%args ],
+        },
+    };
+
+    my $json_body = JSON::encode_json($payload);
+
+    if ($verbose) {
+        print STDERR ">>> POST $swaig_url\n";
+        print STDERR ">>> Body: $json_body\n";
+    }
+
+    my $response = http_post($swaig_url, $json_body);
+
+    if ($verbose) {
+        print STDERR "<<< Status: $response->{status}\n";
+        print STDERR "<<< Body: $response->{content}\n";
+    }
+
+    if ($raw) {
+        print $response->{content};
+        print "\n" unless $response->{content} =~ /\n$/;
+    } else {
+        my $data = eval { JSON::decode_json($response->{content}) };
+        if ($@) {
+            print $response->{content};
+            print "\n" unless $response->{content} =~ /\n$/;
+        } else {
+            print JSON->new->utf8->pretty->canonical->encode($data);
+        }
+    }
+}
+
+# ============================================================
+# File mode: in-process loader
+# ============================================================
+
+sub do_file_mode {
+    unless (-f $file) {
+        die "Error: --file '$file' does not exist or is not a regular file\n";
+    }
+
+    # Resolve to absolute path so `do` doesn't depend on @INC.
+    my $abs = File::Spec->rel2abs($file);
+
+    if ($verbose) {
+        print STDERR ">>> do '$abs'\n";
+    }
+
+    # Run the file. The example scripts guard their server-start with
+    # `unless caller`, so loading via `do` does NOT spin a server.
+    my $rv = do $abs;
+    if (my $e = $@) {
+        die "Error: failed to compile '$file': $e\n";
+    }
+    if (!defined $rv && $!) {
+        die "Error: failed to read '$file': $!\n";
+    }
+
+    my $svc = _resolve_service_instance($rv);
+    unless ($svc) {
+        die "Error: could not locate a SignalWire::SWML::Service instance in '$file'.\n"
+          . "Hint: define a build_service() sub that returns an instance, return one as\n"
+          . "the file's last value, or declare a package that ISA SignalWire::SWML::Service.\n";
+    }
+
+    if ($dump_swml) {
+        do_file_dump_swml($svc);
+    }
+    elsif ($list_tools) {
+        do_file_list_tools($svc);
+    }
+    elsif ($exec_name) {
+        do_file_exec($svc, $exec_name);
+    }
+}
+
+# Resolve a Service instance from the loaded script. Strategy, in order:
+#   1. If the file's last value (the result of `do`) is itself a
+#      SignalWire::SWML::Service object, use that.
+#   2. If main::build_service exists, call it.
+#   3. Scan %:: for packages that ISA SignalWire::SWML::Service (skip
+#      Service and AgentBase themselves) and instantiate one.
+sub _resolve_service_instance {
+    my ($do_rv) = @_;
+
+    if (blessed($do_rv) && $do_rv->isa('SignalWire::SWML::Service')) {
+        if ($verbose) {
+            print STDERR ">>> using service instance returned by file (" . ref($do_rv) . ")\n";
+        }
+        return $do_rv;
+    }
+
+    if (my $builder = main->can('build_service')) {
+        if ($verbose) {
+            print STDERR ">>> calling main::build_service\n";
+        }
+        my $svc = $builder->();
+        if (blessed($svc) && $svc->isa('SignalWire::SWML::Service')) {
+            return $svc;
+        }
+    }
+
+    # Walk the symbol table for user subclasses of Service.
+    my @candidates = _find_service_subclasses();
+    for my $pkg (@candidates) {
+        if ($verbose) {
+            print STDERR ">>> attempting parameterless construction of $pkg\n";
+        }
+        my $svc = eval { $pkg->new };
+        if (!$@ && blessed($svc) && $svc->isa('SignalWire::SWML::Service')) {
+            return $svc;
+        }
+    }
+
+    return undef;
+}
+
+sub _find_service_subclasses {
+    my @found;
+    my %seen;
+
+    # Recursive walk of %:: → all loaded packages.
+    my $walk;
+    $walk = sub {
+        my ($stash, $prefix) = @_;
+        for my $entry (keys %$stash) {
+            next unless $entry =~ /::$/;
+            my $name = $entry;
+            $name =~ s/::$//;
+            next if $name eq '' || $name eq 'main';
+            my $pkg = $prefix ? "${prefix}::${name}" : $name;
+            next if $seen{$pkg}++;
+
+            # Only treat as a class if it has any symbols at all.
+            no strict 'refs';
+            my $sub_stash = \%{ "${pkg}::" };
+            use strict 'refs';
+
+            if (eval { $pkg->isa('SignalWire::SWML::Service') }
+                && $pkg ne 'SignalWire::SWML::Service'
+                && $pkg ne 'SignalWire::Agent::AgentBase')
+            {
+                push @found, $pkg;
+            }
+            $walk->($sub_stash, $pkg);
+        }
+    };
+    $walk->(\%::, '');
+    return @found;
+}
+
+sub do_file_dump_swml {
+    my ($svc) = @_;
+    # Render the SWML document the same way the PSGI handler does. We
+    # pass a minimal env hash so dynamic renderers don't blow up.
+    my $doc = $svc->render_main_swml({});
+    if ($raw) {
+        print JSON::encode_json($doc), "\n";
+    } else {
+        print JSON->new->utf8->pretty->canonical->encode($doc);
+    }
+}
+
+sub do_file_list_tools {
+    my ($svc) = @_;
+    my @names = $svc->list_tool_names;
+    my $registry = $svc->tools // {};
+
+    if (!@names) {
+        print "No SWAIG functions found.\n";
+        return;
+    }
+
+    my @functions = map { $registry->{$_} } @names;
+    print_tool_list(\@functions);
+}
+
+sub do_file_exec {
+    my ($svc, $func_name) = @_;
+
+    my %args;
+    for my $p (@params) {
+        if ($p =~ /^([^=]+)=(.*)$/) {
+            $args{$1} = $2;
+        } else {
+            die "Error: Invalid --param format '$p'. Use key=value\n";
+        }
+    }
+
+    my $payload = {
+        function => $func_name,
+        argument => { parsed => [ \%args ] },
+    };
+
+    my $result = $svc->on_function_call($func_name, \%args, $payload);
+    unless (defined $result) {
+        die "Error: function '$func_name' is not registered or returned undef.\n";
+    }
+
+    my $hash;
+    if (ref $result eq 'HASH') {
+        $hash = $result;
+    } elsif (blessed($result) && $result->can('to_hash')) {
+        $hash = $result->to_hash;
+    } else {
+        $hash = { response => "$result" };
+    }
+
+    if ($raw) {
+        print JSON::encode_json($hash), "\n";
+    } else {
+        print JSON->new->utf8->pretty->canonical->encode($hash);
+    }
+}
+
+# ============================================================
+# Shared rendering
+# ============================================================
+
+sub print_tool_list {
+    my ($functions) = @_;
+    if ($raw) {
+        for my $f (@$functions) {
+            printf "%s\t%s\n", $f->{function} // 'unnamed', $f->{description} // '';
+        }
+    } else {
+        printf "Found %d SWAIG function(s):\n\n", scalar @$functions;
+        for my $f (@$functions) {
+            my $name = $f->{function} // 'unnamed';
+            my $desc = $f->{description} // '(no description)';
+            printf "  %-30s %s\n", $name, $desc;
+
+            # Show parameters if any
+            if (my $params_schema = $f->{parameters}) {
+                if (my $props = $params_schema->{properties}) {
+                    my $required = $params_schema->{required} // [];
+                    my %required_map = map { $_ => 1 } @$required;
+                    for my $pname (sort keys %$props) {
+                        my $ptype = $props->{$pname}{type} // 'any';
+                        my $pdesc = $props->{$pname}{description} // '';
+                        my $req_marker = $required_map{$pname} ? '*' : ' ';
+                        printf "    %s %-20s %-10s %s\n", $req_marker, $pname, "($ptype)", $pdesc;
+                    }
+                }
+            }
+            print "\n";
+        }
+    }
+}
+
+# ============================================================
+# HTTP helpers
+# ============================================================
+
+sub _auth_headers {
+    my %headers;
+    if (defined $auth_user && defined $auth_pass) {
+        my $encoded = encode_base64("$auth_user:$auth_pass", '');
+        $headers{Authorization} = "Basic $encoded";
+    }
+    return %headers;
+}
+
+sub http_get {
+    my ($target_url) = @_;
+    my %headers = _auth_headers();
+
+    if ($verbose) {
+        print STDERR ">>> GET $target_url\n";
+    }
+
+    my $response = $http->get($target_url, { headers => \%headers });
+
+    if ($verbose) {
+        print STDERR "<<< Status: $response->{status}\n";
+    }
+
+    unless ($response->{success}) {
+        die sprintf("Error: HTTP %s %s\n%s\n",
+            $response->{status}, $response->{reason}, $response->{content} // '');
+    }
+
+    return $response;
+}
+
+sub http_post {
+    my ($target_url, $body) = @_;
+    my %headers = _auth_headers();
+    $headers{'Content-Type'} = 'application/json';
+
+    my $response = $http->post($target_url, {
+        headers => \%headers,
+        content => $body,
+    });
+
+    unless ($response->{success}) {
+        die sprintf("Error: HTTP %s %s\n%s\n",
+            $response->{status}, $response->{reason}, $response->{content} // '');
+    }
+
+    return $response;
+}
+
+sub usage_exit {
+    my ($code) = @_;
+    $code //= 1;
+    print STDERR <<'USAGE';
+swaig-test - CLI tool for testing SWAIG agent endpoints
+
+Usage:
+  swaig-test --url URL  [OPTIONS]
+  swaig-test --file PATH [OPTIONS]
+
+Options:
+  --url URL           Agent URL with embedded auth (http://user:pass@host:port/route)
+  --file PATH         Path to a Perl script that builds an SWML::Service /
+                      AgentBase instance. Loads the file in-process (no HTTP)
+                      and reads the runtime tool registry.
+  --dump-swml         Fetch and display the SWML document
+  --list-tools        List available SWAIG functions
+  --exec NAME         Execute a SWAIG function by name
+  --param key=value   Parameter for --exec (repeatable)
+  --raw               Output compact JSON (no pretty-printing)
+  --verbose           Show request/response details on stderr
+  --help, -h          Show this help message
+
+Examples:
+  swaig-test --url http://user:pass@localhost:3000/ --dump-swml
+  swaig-test --url http://user:pass@localhost:3000/ --list-tools
+  swaig-test --url http://user:pass@localhost:3000/ --exec get_weather --param location=London
+  swaig-test --url http://user:pass@localhost:3000/ --exec get_weather --param location=London --raw
+
+  swaig-test --file examples/swmlservice_swaig_standalone.pl --list-tools
+  swaig-test --file examples/swmlservice_swaig_standalone.pl --exec lookup_competitor --param competitor=ACME
+USAGE
+    exit $code;
+}

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "description": "Wire schema for the JSON payload of `calling.echo` (params). Extracted from switchblade `PublicCallEchoParams.cs`.",
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "node_id": {
+      "type": "string"
+    },
+    "status_url": {
+      "type": "string"
+    },
+    "swml": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "timeout": {
+      "type": [
+        "number",
+        "null"
+      ]
+    }
+  },
+  "required": [
+    "node_id",
+    "call_id"
+  ],
+  "title": "calling.echo params",
+  "type": "object",
+  "x-method": "calling.echo",
+  "x-phase": "params",
+  "x-source": "switchblade",
+  "x-source-file": "RelayPlugin/Calling/PublicCallEchoParams.cs"
+}

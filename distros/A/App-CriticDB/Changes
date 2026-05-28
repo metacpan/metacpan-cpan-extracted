@@ -1,5 +1,10 @@
 Revision history for App::CriticDB
 
+0.0.4 - 2026-05-27
+	- Proper violation formatting/reporting
+	- Support perlcritic's --verbose option
+	- Support --quiet mode for collection only
+
 0.0.3 - 2026-05-18
 	- Handle deleted files
 	- Use file mtime versus current time
