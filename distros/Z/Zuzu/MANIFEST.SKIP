@@ -1,0 +1,6 @@
+(?:^|/)\.git[^/]*(?:/|$)
+(?:^|/)AGENTS\.md$
+(?:^|/)\.agents(?:/|$)
+^docs(?:/|$)
+zuzu-test.sock
+MANIFEST.bak

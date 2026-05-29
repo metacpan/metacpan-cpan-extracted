@@ -1,0 +1,4 @@
+// Phase-0 design fixture (not yet enforced by runtime):
+// indexing should return one-byte BinaryString.
+plan(1);
+ok(1, "phase0 fixture placeholder: index return type");

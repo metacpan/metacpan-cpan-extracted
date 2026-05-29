@@ -1,0 +1,194 @@
+from test/more import *;
+
+requires_capability( "gui" );
+requires_capability( "fs" );
+
+from std/eval import eval;
+from std/gui import *;
+from std/io import Path;
+
+let xml := "<Window xmlns=\"https://zuzulang.org/ns/std/gui\""
+	_ " title=\"Phase 4\">"
+	_ "<Menu id=\"file-menu\" text=\"File\">"
+	_ "<MenuItem id=\"save-item\" text=\"Save\" disabled=\"true\" />"
+	_ "</Menu>"
+	_ "<VBox id=\"root\" gap=\"6\" padding=\"2\">"
+	_ "<Input id=\"name\" value=\"Ada\" required=\"yes\""
+	_ " meta.model=\"person.name\" />"
+	_ "<Slider id=\"volume\" value=\"25\" min=\"0\" max=\"100\""
+	_ " step=\"5\" />"
+	_ "<Progress id=\"progress\" value=\"30\" max=\"200\""
+	_ " show_text=\"on\" />"
+	_ "<DatePicker id=\"date\" value=\"2026-04-26\""
+	_ " min=\"2020-01-01\" max=\"2030-12-31\""
+	_ " first_day_of_week=\"1\" />"
+	_ "<Tabs id=\"tabs\" selected=\"details\">"
+	_ "<Tab id=\"summary\" title=\"Summary\" value=\"summary\" />"
+	_ "<Tab id=\"details\" title=\"Details\" value=\"details\""
+	_ " icon=\"details.png\" closable=\"true\" />"
+	_ "</Tabs>"
+	_ "<TreeView id=\"tree\" multiple=\"true\" selected_path=\"0,1\" />"
+	_ "</VBox>"
+	_ "</Window>";
+
+let ui := gui_from_xml(xml);
+let styled := gui_from_xml(
+	"<Window><Button id=\"styled\" text=\"Styled\""
+		_ " style.color=\"red\" /></Window>",
+);
+is( ui.title(), "Phase 4", "gui_from_xml builds Window" );
+is( ui.menus().length(), 1, "XML Window preserves Menu child" );
+is( ui.menus()[0].text(), "File", "XML Menu text parsed" );
+is(
+	ui.find_by_id("save-item").disabled(),
+	true,
+	"XML MenuItem disabled coerces bool",
+);
+is( ui.find_by_id("root").gap(), 6, "XML layout number coerces" );
+is( ui.find_by_id("name").required(), true, "XML bool yes coerces" );
+is(
+	ui.find_by_id("name").meta("model"),
+	"person.name",
+	"XML meta.* maps to widget meta",
+);
+is(
+	styled.find_by_id("styled").style("color"),
+	"red",
+	"XML style.* maps to widget style",
+);
+is( ui.find_by_id("volume").value(), 25, "XML Slider value coerces" );
+is( ui.find_by_id("volume").step(), 5, "XML Slider step coerces" );
+is(
+	ui.find_by_id("progress").show_text(),
+	true,
+	"XML Progress show_text coerces bool",
+);
+is(
+	ui.find_by_id("date").first_day_of_week(),
+	1,
+	"XML DatePicker first_day_of_week coerces",
+);
+is(
+	ui.find_by_id("date").min(),
+	"2020-01-01",
+	"DatePicker min stays string",
+);
+is(
+	ui.find_by_id("tabs").selected(),
+	"details",
+	"XML Tabs selected parsed",
+);
+is(
+	ui.find_by_id("details").icon(),
+	"details.png",
+	"XML Tab icon parsed",
+);
+is( ui.find_by_id("details").closable(), true, "XML Tab closable parsed" );
+is( ui.find_by_id("tree").multiple(), true, "XML TreeView multiple parsed" );
+is(
+	ui.find_by_id("tree").selected_path()[1],
+	1,
+	"XML TreeView selected_path coerces to int list",
+);
+
+let out := gui_to_xml(ui);
+ok(
+	out ~ /xmlns=\"https:\/\/zuzulang\.org\/ns\/std\/gui\"/,
+	"gui_to_xml writes namespace",
+);
+ok( out ~ /meta\.model=\"person\.name\"/, "gui_to_xml writes meta attrs" );
+ok(
+	gui_to_xml(styled) ~ /style\.color=\"red\"/,
+	"gui_to_xml writes style attrs",
+);
+ok( out ~ /show_text=\"true\"/, "gui_to_xml writes coerced bool attrs" );
+ok( out ~ /selected_path=\"0,1\"/, "gui_to_xml writes selected paths" );
+
+let roundtrip := gui_from_xml(out);
+is(
+	roundtrip.find_by_id("name").meta("model"),
+	"person.name",
+	"gui_to_xml output parses again",
+);
+is(
+	roundtrip.find_by_id("details").icon(),
+	"details.png",
+	"round-trip preserves Tab icon",
+);
+is(
+	roundtrip.find_by_id("tree").selected_path()[1],
+	1,
+	"round-trip preserves selected_path",
+);
+
+let prefixed := "<gui:Window"
+	_ " xmlns:gui=\"https://zuzulang.org/ns/std/gui\""
+	_ " title=\"Prefixed\"><gui:Button id=\"ok\" text=\"OK\" />"
+	_ "</gui:Window>";
+is(
+	gui_from_xml(prefixed).find_by_id("ok").text(),
+	"OK",
+	"gui_from_xml accepts prefixed GUI namespace",
+);
+
+let file := Path.tempfile();
+file.spew_utf8(
+	"<Window title=\"From file\"><Button id=\"ok\" text=\"OK\" /></Window>",
+);
+let from_file := gui_from_xml_file(file);
+is( from_file.title(), "From file", "gui_from_xml_file loads Path input" );
+is(
+	gui_from_xml_file(file.to_String()).find_by_id("ok").text(),
+	"OK",
+	"gui_from_xml_file loads string paths",
+);
+
+let denied := exception( function () {
+	eval(
+		"from std/gui import *; gui_from_xml_file(\"missing.xml\");",
+		deny_fs: true,
+	);
+} );
+ok( denied instanceof Exception, "gui_from_xml_file denied fs throws" );
+ok(
+	denied{message} ~ /XML\.load is denied by runtime policy/,
+	"denied fs error is deterministic",
+);
+
+let unknown_attr := exception( function () {
+	gui_from_xml("<Window surprise=\"x\" />");
+} );
+ok( unknown_attr instanceof Exception, "unknown XML attr throws" );
+ok(
+	unknown_attr{message} ~ /GUI_XML_ATTR_UNKNOWN/,
+	"unknown XML attr error includes code",
+);
+
+let bad_bool := exception( function () {
+	gui_from_xml("<Input required=\"maybe\" />");
+} );
+ok( bad_bool instanceof Exception, "bad XML bool throws" );
+ok(
+	bad_bool{message} ~ /GUI_XML_ATTR_TYPE/,
+	"bad XML bool error includes type code",
+);
+
+let bad_number := exception( function () {
+	gui_from_xml("<Slider value=\"loud\" />");
+} );
+ok( bad_number instanceof Exception, "bad XML number throws" );
+ok(
+	bad_number{message} ~ /GUI_XML_ATTR_TYPE/,
+	"bad XML number error includes type code",
+);
+
+let bad_namespace := exception( function () {
+	gui_from_xml("<Window xmlns=\"urn:not-gui\" />");
+} );
+ok( bad_namespace instanceof Exception, "bad XML namespace throws" );
+ok(
+	bad_namespace{message} ~ /GUI_XML_STRUCTURE/,
+	"bad XML namespace error includes structure code",
+);
+
+done_testing();

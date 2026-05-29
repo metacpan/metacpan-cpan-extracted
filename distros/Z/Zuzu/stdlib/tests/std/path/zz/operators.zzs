@@ -1,0 +1,304 @@
+from std/path/zz/operators import Operator, STANDARD_OPERATORS;
+from test/more import *;
+
+ok( typeof Operator eq "Class", "Operator class is importable" );
+ok( typeof STANDARD_OPERATORS eq "Array", "STANDARD_OPERATORS is importable" );
+is( STANDARD_OPERATORS.length(), 73, "phase 4.8 operator table is populated" );
+
+function find_op ( spelling ) {
+	return STANDARD_OPERATORS.first( fn op → op.get_spelling() eq spelling );
+}
+
+function find_unary ( spelling ) {
+	return STANDARD_OPERATORS.first(
+		fn op → op.get_spelling() eq spelling and op.is_unary()
+	);
+}
+
+function find_binary ( spelling ) {
+	return STANDARD_OPERATORS.first(
+		fn op → op.get_spelling() eq spelling and op.is_binary()
+	);
+}
+
+for ( let spelling in [ "+", "-", "√", "!", "¬", "~" ] ) {
+	let op := find_unary(spelling);
+	ok( op ≢ null, `unary ${spelling} operator exists` );
+	ok( op.is_unary(), `unary ${spelling} is marked unary` );
+	ok( not op.is_binary(), `unary ${spelling} is not binary` );
+	is( op.get_precedence(), 20, `unary ${spelling} precedence is set` );
+	ok( op{f} ≢ null, `unary ${spelling} has implementation callback` );
+}
+
+ok(
+	find_unary("!"){f} ≡ find_unary("¬"){f},
+	"logical negation aliases share an implementation callback",
+);
+
+for ( let spelling in [ "**" ] ) {
+	let op := find_binary(spelling);
+	ok( op ≢ null, `binary ${spelling} operator exists` );
+	ok( op.is_binary(), `binary ${spelling} is marked binary` );
+	is( op.get_precedence(), 13, `binary ${spelling} precedence is set` );
+	ok( op.is_right_associative(), `binary ${spelling} is right-associative` );
+	ok( op.requires_whitespace(), `binary ${spelling} enforces whitespace` );
+	ok( op{f} ≢ null, `binary ${spelling} has implementation callback` );
+}
+
+for ( let spelling in [ "×", "*", "÷", "/", "mod" ] ) {
+	let op := find_binary(spelling);
+	ok( op ≢ null, `binary ${spelling} operator exists` );
+	ok( op.is_binary(), `binary ${spelling} is marked binary` );
+	is( op.get_precedence(), 12, `binary ${spelling} precedence is set` );
+	ok( op{f} ≢ null, `binary ${spelling} has implementation callback` );
+}
+
+ok( find_binary("*").requires_whitespace(), "binary * enforces whitespace" );
+ok( find_binary("/").requires_whitespace(), "binary / enforces whitespace" );
+ok(
+	find_binary("×"){f} ≡ find_binary("*"){f},
+	"multiplication aliases share an implementation callback",
+);
+ok(
+	find_binary("÷"){f} ≡ find_binary("/"){f},
+	"division aliases share an implementation callback",
+);
+
+for ( let spelling in [ "+", "-" ] ) {
+	let op := find_binary(spelling);
+	ok( op ≢ null, `binary ${spelling} operator exists` );
+	ok( op.is_binary(), `binary ${spelling} is marked binary` );
+	is( op.get_precedence(), 11, `binary ${spelling} precedence is set` );
+	ok( op.requires_whitespace(), `binary ${spelling} enforces whitespace` );
+	ok( op{f} ≢ null, `binary ${spelling} has implementation callback` );
+}
+
+for ( let spelling in [
+	"=",
+	"≠",
+	"<",
+	">",
+	"≤",
+	"<=",
+	"≥",
+	">=",
+	"≶",
+	"<=>",
+	"≷",
+] ) {
+	let op := find_binary(spelling);
+	ok( op ≢ null, `binary ${spelling} operator exists` );
+	ok( op.is_binary(), `binary ${spelling} is marked binary` );
+	is( op.get_precedence(), 5, `binary ${spelling} precedence is set` );
+	ok( op{f} ≢ null, `binary ${spelling} has implementation callback` );
+}
+
+ok(
+	find_binary("≤"){f} ≡ find_binary("<="){f},
+	"less-than-or-equal aliases share an implementation callback",
+);
+ok(
+	find_binary("≥"){f} ≡ find_binary(">="){f},
+	"greater-than-or-equal aliases share an implementation callback",
+);
+ok(
+	find_binary("≶"){f} ≡ find_binary("<=>"){f},
+	"numeric comparison aliases share an implementation callback",
+);
+ok(
+	find_binary("≷"){f} ≡ find_binary("<=>"){f},
+	"reverse numeric comparison alias shares an implementation callback",
+);
+
+{
+	let op := find_binary("_");
+	ok( op ≢ null, "binary _ operator exists" );
+	ok( op.is_binary(), "binary _ is marked binary" );
+	is( op.get_precedence(), 10, "binary _ precedence is set" );
+	ok( op.requires_whitespace(), "binary _ enforces whitespace" );
+	ok( op{f} ≢ null, "binary _ has implementation callback" );
+}
+
+for ( let spelling in [
+	"eq",
+	"ne",
+	"gt",
+	"ge",
+	"lt",
+	"le",
+	"cmp",
+	"eqi",
+	"nei",
+	"gti",
+	"gei",
+	"lti",
+	"lei",
+	"cmpi",
+	"~",
+] ) {
+	let op := find_binary(spelling);
+	ok( op ≢ null, `binary ${spelling} operator exists` );
+	ok( op.is_binary(), `binary ${spelling} is marked binary` );
+	is( op.get_precedence(), 5, `binary ${spelling} precedence is set` );
+	ok( op{f} ≢ null, `binary ${spelling} has implementation callback` );
+}
+
+ok( not find_binary("~").requires_whitespace(), "binary ~ does not require whitespace" );
+ok(
+	find_binary("~"){f} ≢ find_unary("~"){f},
+	"binary ~ and unary ~ have distinct implementation callbacks",
+);
+
+for ( let spec in [
+	[ "&", 8 ],
+	[ "^", 7 ],
+	[ "|", 6 ],
+] ) {
+	let spelling := spec[0];
+	let op := find_binary(spelling);
+	ok( op ≢ null, `binary ${spelling} operator exists` );
+	ok( op.is_binary(), `binary ${spelling} is marked binary` );
+	is( op.get_precedence(), spec[1], `binary ${spelling} precedence is set` );
+	ok( op{f} ≢ null, `binary ${spelling} has implementation callback` );
+}
+
+for ( let spec in [
+	[ "⋀", 3 ],
+	[ "and", 3 ],
+	[ "⊼", 3 ],
+	[ "nand", 3 ],
+	[ "⊻", 2 ],
+	[ "xor", 2 ],
+	[ "⋁", 1 ],
+	[ "or", 1 ],
+] ) {
+	let spelling := spec[0];
+	let op := find_binary(spelling);
+	ok( op ≢ null, `binary ${spelling} operator exists` );
+	ok( op.is_binary(), `binary ${spelling} is marked binary` );
+	is( op.get_precedence(), spec[1], `binary ${spelling} precedence is set` );
+	ok( op{f} ≢ null, `binary ${spelling} has implementation callback` );
+}
+
+ok(
+	find_binary("⋀"){f} ≡ find_binary("and"){f},
+	"logical and aliases share an implementation callback",
+);
+ok(
+	find_binary("⊼"){f} ≡ find_binary("nand"){f},
+	"logical nand aliases share an implementation callback",
+);
+ok(
+	find_binary("⊻"){f} ≡ find_binary("xor"){f},
+	"logical xor aliases share an implementation callback",
+);
+ok(
+	find_binary("⋁"){f} ≡ find_binary("or"){f},
+	"logical or aliases share an implementation callback",
+);
+
+for ( let spec in [
+	[ "⋃", 9 ],
+	[ "union", 9 ],
+	[ "⋂", 9 ],
+	[ "intersection", 9 ],
+	[ "∖", 9 ],
+	[ "\\", 9 ],
+	[ "∈", 5 ],
+	[ "in", 5 ],
+	[ "∉", 5 ],
+	[ "⊂", 5 ],
+	[ "subsetof", 5 ],
+	[ "⊃", 5 ],
+	[ "supersetof", 5 ],
+	[ "⊂⊃", 5 ],
+	[ "equivalentof", 5 ],
+] ) {
+	let spelling := spec[0];
+	let op := find_binary(spelling);
+	ok( op ≢ null, `binary ${spelling} operator exists` );
+	ok( op.is_binary(), `binary ${spelling} is marked binary` );
+	is( op.get_precedence(), spec[1], `binary ${spelling} precedence is set` );
+	ok( op{f} ≢ null, `binary ${spelling} has implementation callback` );
+}
+
+ok(
+	find_binary("⋃"){f} ≡ find_binary("union"){f},
+	"set union aliases share an implementation callback",
+);
+ok(
+	find_binary("⋂"){f} ≡ find_binary("intersection"){f},
+	"set intersection aliases share an implementation callback",
+);
+ok(
+	find_binary("∖"){f} ≡ find_binary("\\"){f},
+	"set difference aliases share an implementation callback",
+);
+ok( find_binary("\\").requires_whitespace(), "binary \\ enforces whitespace" );
+ok(
+	find_binary("∈"){f} ≡ find_binary("in"){f},
+	"membership aliases share an implementation callback",
+);
+ok(
+	find_binary("⊂"){f} ≡ find_binary("subsetof"){f},
+	"subset aliases share an implementation callback",
+);
+ok(
+	find_binary("⊃"){f} ≡ find_binary("supersetof"){f},
+	"superset aliases share an implementation callback",
+);
+ok(
+	find_binary("⊂⊃"){f} ≡ find_binary("equivalentof"){f},
+	"set equivalence aliases share an implementation callback",
+);
+
+for ( let spec in [
+	[ "≡", 4 ],
+	[ "==", 4 ],
+	[ "≢", 4 ],
+	[ "!=", 4 ],
+	[ "can", 5 ],
+] ) {
+	let spelling := spec[0];
+	let op := find_binary(spelling);
+	ok( op ≢ null, `binary ${spelling} operator exists` );
+	ok( op.is_binary(), `binary ${spelling} is marked binary` );
+	is( op.get_precedence(), spec[1], `binary ${spelling} precedence is set` );
+	ok( op{f} ≢ null, `binary ${spelling} has implementation callback` );
+}
+
+ok(
+	find_binary("≡"){f} ≡ find_binary("=="){f},
+	"type-aware equality aliases share an implementation callback",
+);
+ok(
+	find_binary("≢"){f} ≡ find_binary("!="){f},
+	"type-aware inequality aliases share an implementation callback",
+);
+
+for ( let spelling in [
+	"sqrt",
+	"not",
+	"abs",
+	"floor",
+	"ceil",
+	"round",
+	"int",
+	"uc",
+	"lc",
+	"length",
+	"typeof",
+] ) {
+	is( find_op(spelling), null, `word-like unary ${spelling} is not supported` );
+}
+
+{
+	let op := find_binary("?:");
+	ok( op ≢ null, "Elvis operator exists" );
+	is( op.get_kind(), "ELVIS", "Elvis operator kind is set" );
+	is( op.get_precedence(), 1, "Elvis operator precedence is set" );
+	ok( op.lexer_should_ignore(), "Elvis is handled by the guarded lexer branch" );
+	is( op{f}, null, "Elvis operator uses parser and evaluator support" );
+}
+
+done_testing();

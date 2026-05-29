@@ -1,0 +1,8 @@
+from test/c22/model import TaggedEntity;
+from test/more import *;
+
+let e := new TaggedEntity( name: "Rin" );
+
+is( e.describe(), "tag:Rin:class", "class super() dispatches to imported trait method" );
+
+done_testing();

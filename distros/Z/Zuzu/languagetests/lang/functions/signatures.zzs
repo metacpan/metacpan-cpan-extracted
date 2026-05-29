@@ -1,0 +1,34 @@
+from test/more import *;
+
+function pair ( a, b ) {
+	return a + b;
+}
+
+function describe ( Number id, String label?, String suffix := "none", ... more ) {
+	return id _":" _( label ?: "none" ) _":" _ suffix _":" _ more.length();
+}
+
+function total () {
+	return pair( 1,,, 2, );
+}
+
+function typed_sum ( Number a, Number b ) {
+	return a + b;
+}
+
+function optional_count ( x, y? ) {
+	return __argc__;
+}
+
+is( pair( 2, 3 ), 5, "fixed-arity functions evaluate" );
+is( total(), 3, "function calls allow loose and trailing commas" );
+is( describe(4), "4:none:none:0", "optional/default/varargs can be combined" );
+is( describe( 4, "pet", "ok", 7, 8 ), "4:pet:ok:2", "optional/default/varargs bind in order" );
+is( typed_sum( 7, 8 ), 15, "typed parameters accept matching args" );
+is( optional_count(1), 1, "__argc__ tracks omitted optional args" );
+is( optional_count( 1, null ), 2, "__argc__ tracks explicit null args" );
+like( exception( function() {
+	pair(1);
+}
+), /Wrong number of arguments/, "fixed-arity functions reject missing args", );
+done_testing();

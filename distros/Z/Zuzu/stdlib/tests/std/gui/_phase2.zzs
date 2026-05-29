@@ -1,0 +1,140 @@
+from test/more import *;
+
+requires_capability( "gui" );
+
+from std/gui import *;
+
+let ui := Window(
+	title: "Phase 2",
+	VBox(
+		id: "root",
+		Frame(
+			id: "frame",
+			label: "Profile",
+			collapsible: true,
+			Text( id: "plain", value: "hello", wrap: false ),
+			RichText( id: "rich", value: "<b>hi</b>" ),
+			Image( id: "logo", src: "logo.png", alt: "Logo", fit: "contain" ),
+		),
+		HBox(
+			Label( text: "Name", ("for"): "name" ),
+			Input( id: "name", value: "Ada" ),
+		),
+		Checkbox( id: "active", label: "Active", checked: true ),
+		RadioGroup(
+			id: "choice",
+			name: "choice",
+			value: "b",
+			Radio( id: "ra", label: "A", value: "a" ),
+			Radio( id: "rb", label: "B", value: "b" ),
+		),
+		Select(
+			id: "select",
+			value: "one",
+			options: [
+				{ label: "One", value: "one" },
+				{ label: "Two", value: "two", disabled: true },
+			],
+		),
+		Button( id: "go", text: "Go", variant: "primary" ),
+	),
+);
+
+ok( ui.find_by_id("frame") instanceof Widget, "Frame is a Widget" );
+is( ui.find_by_id("frame").label(), "Profile", "Frame label getter" );
+is( ui.find_by_id("frame").collapsible(), true, "Frame collapsible getter" );
+is(
+	ui.find_by_id("frame").collapsed(false),
+	ui.find_by_id("frame"),
+	"Frame bool setter returns self",
+);
+
+let plain := ui.find_by_id("plain");
+is( plain.value(), "hello", "Text value getter" );
+is( plain.value("bye"), plain, "Text value setter returns self" );
+is( plain.value(), "bye", "Text value setter updates value" );
+is( plain.wrap(), false, "Text wrap getter" );
+
+let rich := ui.find_by_id("rich");
+is( rich.value(), "<b>hi</b>", "RichText value getter" );
+is( rich.readonly(), true, "RichText readonly default" );
+let bad_rich_format := exception( function () {
+	RichText( format: "html" );
+} );
+ok( bad_rich_format instanceof Exception, "RichText format prop is retired" );
+ok(
+	bad_rich_format{message} ~ /GUI_PROP_UNKNOWN/,
+	"RichText retired format prop error includes code",
+);
+
+let logo := ui.find_by_id("logo");
+is( logo.src(), "logo.png", "Image src getter" );
+is( logo.alt(), "Logo", "Image alt getter" );
+is( logo.fit(), "contain", "Image fit getter" );
+
+let label := ui.content().find_by_id("root").children()[1].children()[0];
+is( label.for_id(), "name", "Label supports dynamic for prop" );
+
+let input := ui.find_by_id("name");
+is( input.select_all(), input, "Input select_all returns self" );
+is( input.placeholder("Name"), input, "Input placeholder setter returns self" );
+is( input.placeholder(), "Name", "Input placeholder getter" );
+ok( input.enter(function () {} ) instanceof ListenerToken, "enter alias registers listener" );
+
+let cb := ui.find_by_id("active");
+is( cb.checked(), true, "Checkbox checked getter" );
+is( cb.checked(false), cb, "Checkbox checked setter returns self" );
+is( cb.checked(), false, "Checkbox checked setter updates state" );
+is( cb.indeterminate(true), cb, "Checkbox indeterminate setter returns self" );
+is( cb.indeterminate(), true, "Checkbox indeterminate getter" );
+
+let group := ui.find_by_id("choice");
+let ra := ui.find_by_id("ra");
+let rb := ui.find_by_id("rb");
+is( group.options().length(), 2, "RadioGroup options returns radios" );
+is( group.value(), "b", "RadioGroup initial value" );
+is( rb.checked(), true, "RadioGroup initial value checks matching radio" );
+is( group.value("a"), group, "RadioGroup value setter returns self" );
+is( group.value(), "a", "RadioGroup value setter updates value" );
+is( ra.checked(), true, "RadioGroup value setter checks selected radio" );
+is( rb.checked(), false, "RadioGroup value setter unchecks previous radio" );
+rb.checked(true);
+is( group.value(), "b", "Radio checked setter updates parent group value" );
+
+let select := ui.find_by_id("select");
+is( select.value(), "one", "Select value getter" );
+is( select.options().length(), 2, "Select options getter" );
+is( select.value("two"), select, "Select value setter returns self" );
+is( select.value(), "two", "Select value setter updates value" );
+is(
+	select.add_option( { label: "Three", value: "three" } ),
+	select,
+	"Select add_option returns self",
+);
+is( select.options().length(), 3, "Select add_option mutates options" );
+is( select.clear_options(), select, "Select clear_options returns self" );
+is( select.options().length(), 0, "Select clear_options removes options" );
+
+let button := ui.find_by_id("go");
+is( button.variant(), "primary", "Button variant getter" );
+
+let changed := [];
+select.change( function ( e ) {
+	changed.push( e.name() );
+} );
+select.change();
+is( changed[0], "change", "change alias emits normalized event name" );
+
+let bad_variant := exception( function () {
+	Button( variant: "loud" );
+} );
+ok( bad_variant instanceof Exception, "invalid enum prop throws" );
+ok( bad_variant{message} ~ /GUI_PROP_TYPE/, "invalid enum error includes code" );
+
+let bad_option_type := exception( function () {
+	Select( options: "nope" );
+} );
+ok( bad_option_type instanceof Exception, "invalid options type throws" );
+ok( bad_option_type{message} ~ /GUI_PROP_TYPE/, "invalid options type includes code" );
+
+done_testing();

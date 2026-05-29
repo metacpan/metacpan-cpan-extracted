@@ -1,0 +1,102 @@
+from std/path/z/lexer import Lexer;
+from std/path/z/evaluate import Evaluator;
+from std/path/z/operators import Operator;
+from test/more import *;
+
+let e := new Evaluator();
+
+function token_kinds ( src ) {
+	let lx := new Lexer( src: src, allowed_operators: e.operator_definitions() );
+	let out := [];
+	while ( true ) {
+		let t := lx.next_tok();
+		out.push( t{k} );
+		last if t{k} ≡ "EOF";
+	}
+	return out;
+}
+
+let lx := new Lexer( src: "..*", allowed_operators: e.operator_definitions() );
+is( lx.peek_kind(), "DOTDOTSTAR", "peek_kind on first token" );
+is( lx.peek_kind_n(1), "EOF", "peek_kind_n sees lookahead" );
+is( lx.next_tok(){k}, "DOTDOTSTAR", "next_tok returns token" );
+is( lx.expect( "EOF" ){k}, "EOF", "expect returns matching token" );
+
+let quoted := new Lexer( src: "@name == \"a\\\\b\\\"c\"", allowed_operators: e.operator_definitions() );
+while ( quoted.peek_kind() ≢ "STRING" ) {
+	quoted.next_tok();
+}
+let st := quoted.next_tok();
+is( st{v}, "a\\b\"c", "double-quoted string supports \\\\, \\\"" );
+is( st{q}, "\"", "string token records quote type (double)" );
+
+let squoted := new Lexer( src: "@name == 'a\\\\b\\\'c'", allowed_operators: e.operator_definitions() );
+while ( squoted.peek_kind() ≢ "STRING" ) {
+	squoted.next_tok();
+}
+let st2 := squoted.next_tok();
+is( st2{v}, "a\\b'c", "single-quoted string supports \\\\, \\\'" );
+is( st2{q}, "'", "string token records quote type (single)" );
+
+let neg := new Lexer( src: "items/#-12", allowed_operators: e.operator_definitions() );
+while ( neg.peek_kind() ≢ "INDEX" ) {
+	neg.next_tok();
+}
+is( neg.next_tok(){v}, -12, "index token accepts negative numbers" );
+
+let elvis := new Lexer(
+	src: "value ?: fallback",
+	allowed_operators: [
+		new Operator(
+			spelling: "?:",
+			kind: "ELVIS",
+			precedence: 1,
+		),
+	],
+);
+while ( elvis.peek_kind() ≢ "ELVIS" ) {
+	elvis.next_tok();
+}
+is( elvis.next_tok(){v}, "?:", "Elvis opt-in operator tokenizes as one token" );
+
+like(
+	exception( function () {
+		new Lexer( src: "value ?: fallback", allowed_operators: e.operator_definitions() );
+	} ),
+	/Ternary operator '\?' requires whitespace/,
+	"ZPath operator table does not opt in to Elvis tokenization",
+);
+
+let op_lx := new Lexer( src: "a && b", allowed_operators: e.operator_definitions() );
+let op_table := op_lx.known_operators();
+ok( op_table.length() > 0, "known_operators returns operator table" );
+is( op_table[1]{spelling}, "&&", "operator table includes spelling" );
+is( op_table[1]{kind}, "ANDAND", "operator table includes kind" );
+
+let custom_chars := [ "i", "s", "S", "a", "m", "e", "A", "s" ];
+let custom_op := op_lx._operator_at(
+	custom_chars,
+	0,
+	custom_chars.length(),
+	[ { spelling: "isSameAs", kind: "SAMEAS", require_ws: true } ],
+);
+is( custom_op{kind}, "SAMEAS", "arbitrary-length operator matches via table" );
+
+let examples := [
+	"..*",
+	"../tr[index() == 0]/td",
+	"body[**/tr[count(td) == 2]]",
+	"car[!age || type(age) == \"null\"]",
+	"union(**/bowl/*, **/fruit)",
+	"table[@class == \"defn\"]",
+	"[@* == \"defn\"]",
+	"list/*[index() % 2 == 0]",
+];
+
+for ( let sample in examples ) {
+	let kinds := token_kinds(sample);
+	ok( kinds.length() > 1, `tokenized example: ${sample}` );
+	is( kinds[ kinds.length() - 1 ], "EOF", `example ends with EOF: ${sample}` );
+}
+
+done_testing();

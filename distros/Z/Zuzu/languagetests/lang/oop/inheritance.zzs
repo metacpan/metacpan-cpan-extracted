@@ -1,0 +1,28 @@
+from test/more import *;
+
+class Animal {
+	let name;
+	const species := "Canis";
+
+	method get_name () {
+		return name;
+	}
+}
+
+class Dog extends Animal{ let breed := "Unknown";
+
+method describe () {
+	return self.get_name() _":" _ breed _":" _ self { species };
+}
+} let dog := new Dog( name: "Bluey", breed: "Heeler" );
+is( dog.describe(), "Bluey:Heeler:Canis", "extends supports inherited fields and methods" );
+class BailOutException extends Exception;
+let msg := "";
+try {
+	throw new BailOutException( message: "boom" );
+}
+catch ( Exception e ) {
+	msg := e{message};
+}
+is( msg, "boom", "builtin subclasses preserve catch(Exception) behavior" );
+done_testing();

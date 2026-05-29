@@ -1,0 +1,16 @@
+from test/more import *;
+from std/colour import parse_colour;
+
+is( parse_colour("#336699"), "#336699", "six-digit hex passes through" );
+is( parse_colour("#ABC"), "#aabbcc", "three-digit hex expands" );
+is( parse_colour("red"), "#ff0000", "basic keyword parses" );
+is( parse_colour("LightGrey"), "#d3d3d3", "keywords are case-insensitive" );
+is( parse_colour("darkslategray"), "#2f4f4f", "gray variant parses" );
+is( parse_colour("darkslategrey"), "#2f4f4f", "grey variant parses" );
+
+let bad := exception( function () {
+	parse_colour("not-a-colour");
+} );
+ok( bad instanceof Exception, "invalid colour throws" );
+
+done_testing();

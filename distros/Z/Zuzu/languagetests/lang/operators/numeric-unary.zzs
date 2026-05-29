@@ -1,0 +1,13 @@
+from test/more import *;
+is( +7, 7, "unary + works" );
+is( -7, -7, "unary - works" );
+is( abs -7, 7, "abs works" );
+is( sqrt 9, 3, "sqrt works" );
+is( √ 16, 4, "√ works" );
+is( floor 2.9, 2, "floor works" );
+is( ⌊ 2.9 ⌋, 2, "⌊x⌋ floor form works" );
+is( ceil 2.1, 3, "ceil works" );
+is( ⌈ 2.1 ⌉, 3, "⌈x⌉ ceil form works" );
+is( round 2.6, 3, "round works" );
+is( int 2.9, 2, "int works" );
+done_testing();

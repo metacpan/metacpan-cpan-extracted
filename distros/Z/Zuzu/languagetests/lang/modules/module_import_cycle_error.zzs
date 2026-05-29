@@ -1,0 +1,11 @@
+from std/eval import eval;
+from test/more import *;
+
+let cyc_err := exception( function () {
+	eval( "from test/c31/a import CycleA;" );
+} );
+
+ok( cyc_err ≢ false, "cyclic module import raises deterministic error" );
+like( cyc_err, /cycle|circular|recurs|already loading|import/i, "cyclic import error message is descriptive" );
+
+done_testing();

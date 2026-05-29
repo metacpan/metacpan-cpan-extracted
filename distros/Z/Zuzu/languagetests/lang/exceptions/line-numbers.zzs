@@ -1,0 +1,19 @@
+from test/more import *;
+
+let err_file;
+let err_line;
+try {
+	throw new Exception( message: "metadata" );
+}
+catch ( Exception e ) {
+	err_file := e{file};
+	err_line := e{line};
+}
+
+ok(
+	typeof err_file eq "String" and length err_file > 0,
+	"throw fills Exception.file",
+);
+ok( err_line > 0, "throw fills Exception.line" );
+
+done_testing();

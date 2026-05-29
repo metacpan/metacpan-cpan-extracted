@@ -1,0 +1,26 @@
+from std/path/z/operators import Operator, STANDARD_OPERATORS;
+from test/more import *;
+
+ok( typeof Operator eq "Class", "Operator class is importable" );
+ok( typeof STANDARD_OPERATORS eq "Array", "STANDARD_OPERATORS is importable" );
+ok( STANDARD_OPERATORS.length() > 0, "STANDARD_OPERATORS is non-empty" );
+
+let eq_op := STANDARD_OPERATORS.first( fn op → op.get_spelling() eq "==" );
+ok( eq_op ≢ null, "comparison operator exists" );
+is( eq_op.get_kind(), "EQEQ", "operator metadata is present" );
+
+let plus_op := STANDARD_OPERATORS.first( fn op → op.get_spelling() eq "+" );
+ok( plus_op ≢ null, "plus operator exists" );
+ok( plus_op.requires_whitespace(), "plus operator enforces whitespace" );
+
+let not_op := STANDARD_OPERATORS.first( fn op → op.get_spelling() eq "!" );
+ok( not_op ≢ null, "not operator exists" );
+ok( not_op.is_unary(), "not operator is unary" );
+ok( not_op{f} ≢ null, "not operator has an implementation callback" );
+
+let bnot_op := STANDARD_OPERATORS.first( fn op → op.get_spelling() eq "~" );
+ok( bnot_op ≢ null, "bitwise not operator exists" );
+ok( bnot_op.is_unary(), "bitwise not operator is unary" );
+ok( bnot_op{f} ≢ null, "bitwise not operator has an implementation callback" );
+
+done_testing();

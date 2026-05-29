@@ -1,0 +1,28 @@
+from test/more import *;
+
+requires_capability( "fs" );
+requires_capability( "db" );
+
+from std/db import DB;
+from std/io import Path;
+from std/string/base64 import decode, encode;
+
+let payload := ~to_binary("A\u0000B\u0001C\u00ff");
+let bin_file := Path.tempfile();
+bin_file.spew(payload);
+let raw := bin_file.slurp();
+
+let dbh := DB.temp();
+dbh.prepare( "create table blobs (id integer, b64 text)" ).execute();
+let ins := dbh.prepare( "insert into blobs (id, b64) values (?, ?)" );
+ins.execute( 1, encode(raw) );
+
+let q := dbh.prepare( "select b64 from blobs where id = 1" );
+q.execute();
+let stored := q.next_array()[0];
+let decoded := decode(stored);
+
+is( typeof decoded, "BinaryString", "decoded db payload is BinaryString" );
+ok( decoded == raw, "binary payload roundtrips through db base64 storage" );
+
+done_testing();

@@ -1,0 +1,209 @@
+=encoding utf8
+
+=head1 NAME
+
+test/parser - Parse TAP output and summarize test counts.
+
+=head1 SYNOPSIS
+
+  from test/parser import parse;
+
+  let tap := "ok 1 - alpha\nnot ok 2 - beta\n1..2\n";
+  let summary := parse( tap );
+
+  # Top-level counts
+  say( summary{top_level}{passed} );
+
+  # All assertions, including nested subtests
+  say( summary{assertions}{failed} );
+
+  # Top-level plan, if present
+  say( summary{planned} );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+C<test/parser> parses lines in TAP (Test Anything Protocol) format and
+returns a summary dictionary.
+
+The summary tracks:
+
+=over
+
+=item * Top-level assertion outcomes.
+
+A top-level assertion is any C<ok ...> or C<not ok ...> line with no
+subtest indentation. A subtest block therefore counts as one
+top-level test via the parent assertion line.
+
+=item * Total assertion outcomes across all levels.
+
+This includes assertions inside subtests, including nested subtests.
+
+=item * Planned top-level test count.
+
+This is the final number from a top-level C<1..N> plan line, or
+C<null> if no top-level plan is present.
+
+=item * Parsed test assertion rows.
+
+Each parsed assertion is appended to C<tests>, including whether it is
+at top level and its parsed number/description metadata.
+
+=back
+
+Outcome buckets are mutually exclusive and reported as C<passed>,
+C<failed>, C<todo>, and C<skipped>. If an assertion line has a TODO or
+SKIP directive, it is counted in that bucket rather than pass/fail.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item C<< parse(String tap) >>
+
+Parameters: C<tap> is TAP output text. Returns: C<Dict>. Parses a TAP
+string and returns a summary dictionary.
+
+=item C<< parse_lines(Array lines) >>
+
+Parameters: C<lines> is an array of TAP lines. Returns: C<Dict>. Parses
+TAP from already-split lines and returns the same summary dictionary as
+C<parse>.
+
+=back
+
+=cut
+
+from std/string import split, substr, trim;
+
+function _new_counts () {
+	return {
+		passed: 0,
+		failed: 0,
+		todo: 0,
+		skipped: 0,
+		total: 0,
+	};
+}
+
+function _strip_indent ( String line ) {
+	let rest := line;
+	while ( rest ~ /^    / ) {
+		rest := substr( rest, 4 );
+	}
+	return rest;
+}
+
+function _bucket_for_assertion ( String line ) {
+	if ( line ~ /#\s*todo\b/i ) {
+		return "todo";
+	}
+	if ( line ~ /#\s*skip\b/i ) {
+		return "skipped";
+	}
+	if ( line ~ /^ok\b/ ) {
+		return "passed";
+	}
+	return "failed";
+}
+
+function _count_assertion ( Dict counts, String bucket ) {
+	counts.set( "total", counts.get( "total", 0 ) + 1 );
+	if ( bucket ≡ "passed" ) {
+		counts.set( "passed", counts.get( "passed", 0 ) + 1 );
+	}
+	else if ( bucket ≡ "failed" ) {
+		counts.set( "failed", counts.get( "failed", 0 ) + 1 );
+	}
+	else if ( bucket ≡ "todo" ) {
+		counts.set( "todo", counts.get( "todo", 0 ) + 1 );
+	}
+	else if ( bucket ≡ "skipped" ) {
+		counts.set( "skipped", counts.get( "skipped", 0 ) + 1 );
+	}
+}
+
+function _parse_test_row ( String body, String bucket, Boolean is_top_level ) {
+	let ok := body ~ /^ok\b/;
+	let rest := ok ? substr( body, 3 ): substr( body, 7 );
+	let number := null;
+	let description := "";
+
+	let parts := split( rest, " - ", 2 );
+	if ( parts.length() > 0 ) {
+		number := trim( parts [0] ) + 0;
+	}
+	if ( parts.length() > 1 ) {
+		let desc_parts := split( parts [1], " #", 2 );
+		description := trim( desc_parts [0] );
+	}
+
+	return {
+		ok: ok,
+		number: number,
+		description: description,
+		bucket: bucket,
+		top_level: is_top_level,
+		raw: body,
+	};
+}
+
+function parse_lines ( Array lines ) {
+	let top_level := _new_counts();
+	let assertions := _new_counts();
+	let planned := null;
+	let tests := [];
+
+	for ( let line in lines ) {
+		if ( line ≡ "" ) {
+			next;
+		}
+
+		let is_top_level := not ( line ~ /^    / );
+		let body := _strip_indent( line );
+
+		if ( body ~ /^\d+\.\.\d+\b/ ) {
+			if ( is_top_level ) {
+				let parts := split( body, "..", 2 );
+				planned := parts.get( 1, "" ) + 0;
+			}
+			next;
+		}
+
+		if ( body ~ /^ok\b/ or body ~ /^not ok\b/ ) {
+			let bucket := _bucket_for_assertion( body );
+			_count_assertion( assertions, bucket );
+			if ( is_top_level ) {
+				_count_assertion( top_level, bucket );
+			}
+			tests.push( _parse_test_row( body, bucket, is_top_level ) );
+		}
+	}
+
+	return {
+		top_level: top_level,
+		assertions: assertions,
+		planned: planned,
+		tests: tests,
+	};
+}
+
+function parse ( String tap ) {
+	return parse_lines( split( tap, /\r?\n/ ) );
+}
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< test/parser >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut

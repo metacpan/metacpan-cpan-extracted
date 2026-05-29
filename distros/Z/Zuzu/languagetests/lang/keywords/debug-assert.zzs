@@ -1,0 +1,15 @@
+from test/more import *;
+
+skip_all("Test skipped in DEBUG mode") if DEBUG > 0;
+
+function explode () {
+	die "should not evaluate";
+}
+
+debug 999, explode();
+pass( "debug above DEBUG level does not evaluate message expression" );
+
+assert explode();
+pass( "assert at DEBUG 0 does not evaluate expression" );
+
+done_testing();

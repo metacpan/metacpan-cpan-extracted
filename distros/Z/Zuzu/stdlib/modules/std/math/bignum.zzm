@@ -1,0 +1,98 @@
+=encoding utf8
+
+=head1 NAME
+
+std/math/bignum - Arbitrary precision BigNum class.
+
+=head1 SYNOPSIS
+
+  from std/math/bignum import BigNum;
+
+  let n := BigNum.from_dec("12345");
+  let m := BigNum.from_hex("0xABCDEF");
+  let p := BigNum.from_dec("-12345.6789");
+
+  say m.badd(n).to_dec;
+  say p.babs.to_dec;
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module exports C<BigNum>, a class for working with integers and
+floating-point numbers at arbitrary precision.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<BigNum>
+
+Runtime-supported arbitrary precision number class.
+
+=over
+
+=item C<< BigNum.from_dec(String text) >>
+
+Parameters: C<text> is a decimal number string. Returns: C<BigNum>.
+Constructs a big number from decimal text.
+
+=item C<< BigNum.from_hex(String text) >>
+
+Parameters: C<text> is a hexadecimal integer string. Returns:
+C<BigNum>. Constructs a big number from hexadecimal text.
+
+=item C<< value.is_int() >>
+
+Parameters: none. Returns: C<Boolean>. Returns true when the value is an
+integer.
+
+=item C<< value.bcmp(other) >>, C<< value.beq(other) >>, C<< value.bne(other) >>, C<< value.blt(other) >>, C<< value.ble(other) >>, C<< value.bgt(other) >>, C<< value.bge(other) >>
+
+Parameters: C<other> is a number-like value. Returns: C<Number> for
+C<bcmp> and C<Boolean> for the predicate methods. Compares two big
+numbers.
+
+=item C<< value.babs() >>, C<< value.bneg() >>, C<< value.binv() >>
+
+Parameters: none. Returns: C<BigNum>. Returns the absolute value,
+negation, or reciprocal.
+
+=item C<< value.bsin() >>, C<< value.bcos() >>, C<< value.btan() >>, C<< value.bsqrt() >>
+
+Parameters: none. Returns: C<BigNum>. Returns the trigonometric or
+square-root result.
+
+=item C<< value.bround() >>, C<< value.bfloor() >>, C<< value.bceil() >>
+
+Parameters: none. Returns: C<BigNum>. Rounds the big number.
+
+=item C<< value.badd(other) >>, C<< value.bsub(other) >>, C<< value.bmul(other) >>, C<< value.bdiv(other) >>, C<< value.bmod(other) >>, C<< value.bpow(other) >>
+
+Parameters: C<other> is a number-like value. Returns: C<BigNum>.
+Performs arithmetic with another value.
+
+=item C<< value.to_hex() >>, C<< value.to_dec() >>, C<< value.to_String() >>
+
+Parameters: none. Returns: C<String>. Converts the big number to text.
+
+=item C<< value.to_Number() >>
+
+Parameters: none. Returns: C<Number>. Converts the big number to a
+native number.
+
+=back
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/math/bignum >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.

@@ -1,0 +1,5 @@
+from test/c35/errors import raise_custom_error;
+
+function invoke_custom_error () {
+	raise_custom_error();
+}

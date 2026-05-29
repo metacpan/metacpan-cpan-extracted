@@ -1,0 +1,65 @@
+from std/path/z import ZPath;
+from test/more import *;
+
+function compile  (    p    ) { return new ZPath(path: p) }
+function query    ( d, p    ) { return compile(p).query(d) }
+function first    ( d, p, f ) { return compile(p).first(d, f) }
+function exists   ( d, p    ) { return compile(p).exists(d) }
+
+let data := {
+	users: [
+		{
+			name: "Ada",
+			roles: [ "admin", "writer" ],
+		},
+		{
+			name: "Bob",
+			roles: [ "reader" ],
+		},
+	],
+	meta: {
+		enabled: true,
+	},
+};
+
+let wildcard_parent_roundtrip := query( data, "/users/*/name/../name" );
+is( wildcard_parent_roundtrip.length(), 2, "* preserves parent metadata for .. round-trip" );
+is( wildcard_parent_roundtrip[0], "Ada", "* metadata parent round-trip first entry" );
+is( wildcard_parent_roundtrip[1], "Bob", "* metadata parent round-trip second entry" );
+
+let descendant_parent_roundtrip := query( data, "/**/name/../name" );
+ok( descendant_parent_roundtrip.length() >= 2, "** preserves parent metadata for .. round-trip" );
+
+let named_index_roundtrip := query( data, "/users/*/name/../../#0/name" );
+is( named_index_roundtrip.length(), 1, "#n can resolve from parent metadata after named segment" );
+is( named_index_roundtrip[0], "Ada", "#n round-trip first anchor resolves first user" );
+
+let ancestors_reanchor := query( data, "/users/#1/name/..*/users/#0/name" );
+is( ancestors_reanchor.length(), 1, "..* keeps ancestor chain for re-anchoring" );
+is( ancestors_reanchor[0], "Ada", "..* re-anchor resolves first user" );
+
+let key_after_parent := query( data, "/users/#1/name/../*[key() == \"roles\"]/#0" );
+is( key_after_parent.length(), 1, "key metadata survives .. followed by *" );
+is( key_after_parent[0], "reader", "key metadata selects roles from parent" );
+
+function _query_throws ( String path ) {
+	try {
+		query( data, path );
+		return false;
+	}
+	catch {
+		return true;
+	}
+}
+
+ok(
+	_query_throws( "/users/*[(index() == 0)?name:\"x\"]" ),
+	"ternary punctuation requires whitespace in filters"
+);
+is(
+	query( data, "/users/*[index() == 1]/name" )[0],
+	"Bob",
+	"spaced binary operators remain valid"
+);
+
+done_testing();

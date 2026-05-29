@@ -1,0 +1,44 @@
+from std/task import sleep;
+from test/more import *;
+from test/worker_contract import require_worker_phase, await_cancelled;
+
+let Worker := require_worker_phase(4);
+
+async function main () {
+	let task := Worker.spawn(
+		async function () {
+			from std/task import yield;
+			let i := 0;
+			while ( i < 1000000 ) {
+				i := i + 1;
+				if ( i mod 100 = 0 ) {
+					await {
+						yield();
+					};
+				}
+			}
+			return "finished";
+		},
+		[],
+	);
+
+	await {
+		sleep(0.02);
+	};
+	task.cancel("checkpoint");
+
+	let err := await {
+		await_cancelled(task);
+	};
+	like(
+		err.to_String(),
+		/checkpoint/,
+		"worker observes cancellation at std/task.yield checkpoint",
+	);
+}
+
+await {
+	main();
+};
+
+done_testing();

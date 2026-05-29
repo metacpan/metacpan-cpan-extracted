@@ -1,0 +1,72 @@
+from std/eval import eval;
+from std/math import Math;
+from test/more import *;
+
+let counter := 1;
+is( eval("counter + 1;"), 2, "eval reads caller variables" );
+eval("counter += 4;");
+is( counter, 5, "eval assignment mutates existing caller variable" );
+
+const String locked := "fixed";
+let const_error := exception( function () {
+	eval( "locked := \"changed\";" );
+} );
+ok(
+	const_error instanceof Exception,
+	"eval respects caller const bindings",
+);
+is( locked, "fixed", "failed eval assignment leaves caller const unchanged" );
+
+eval("let eval_local := 42;");
+let leak_error := exception( function () {
+	eval("eval_local;");
+} );
+ok(
+	leak_error instanceof Exception,
+	"eval let declarations do not leak to caller scope",
+);
+
+let collision_result := null;
+let collision_error := exception( function () {
+	collision_result := eval(
+		"from std/math import Math; Math.pi;"
+	);
+} );
+ok(
+	collision_error ≡ null,
+	"eval imports do not collide with caller imports",
+);
+is(
+	collision_result,
+	Math.pi,
+	"eval import collision expression still returns result",
+);
+
+eval("from std/string import split;");
+let import_leak_error := exception( function () {
+	eval( "split(\"a,b\", \",\");" );
+} );
+ok(
+	import_leak_error instanceof Exception,
+	"eval imports do not leak to caller scope",
+);
+
+eval("function eval_helper () { return 9; }");
+let function_leak_error := exception( function () {
+	eval("eval_helper();");
+} );
+ok(
+	function_leak_error instanceof Exception,
+	"eval function declarations do not leak to caller scope",
+);
+
+eval("class EvalLocalThing;");
+let class_leak_error := exception( function () {
+	eval("new EvalLocalThing();");
+} );
+ok(
+	class_leak_error instanceof Exception,
+	"eval class declarations do not leak to caller scope",
+);
+
+done_testing();

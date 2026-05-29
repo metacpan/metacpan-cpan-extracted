@@ -1,0 +1,49 @@
+from test/more import *;
+
+requires_capability("db");
+requires_capability("proc");
+
+from std/cache/lru import Cache;
+from std/db import DB;
+from std/proc import sleep_async;
+from std/task import all;
+
+let dbh := DB.temp();
+dbh.prepare( "create table kv (k text, v text)" ).execute();
+dbh.prepare( "insert into kv (k, v) values ('a', 'alpha')" ).execute();
+dbh.prepare( "insert into kv (k, v) values ('b', 'beta')" ).execute();
+
+let lookups := 0;
+let cache := new Cache( capacity: 8 );
+
+function db_lookup ( key ) {
+	lookups++;
+	let q := dbh.prepare( "select v from kv where k = ?" );
+	q.execute(key);
+	let row := q.next_array();
+	return row[0];
+}
+
+async function fetch_cached ( key ) {
+	await {
+		sleep_async(0.01);
+	};
+	return cache.get( key, db_lookup );
+}
+
+let values := await {
+	all(
+		[
+			fetch_cached("a"),
+			fetch_cached("a"),
+			fetch_cached("b"),
+			fetch_cached("a"),
+		],
+	);
+};
+
+is( values[0], "alpha", "first cached lookup resolves from db" );
+is( values[2], "beta", "second key resolves from db" );
+is( lookups, 2, "cache wraps db lookups under concurrent async calls" );
+
+done_testing();

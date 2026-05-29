@@ -1,0 +1,5 @@
+trait TaggedName {
+	method describe () {
+		return "tag:" _ self.get_name();
+	}
+}

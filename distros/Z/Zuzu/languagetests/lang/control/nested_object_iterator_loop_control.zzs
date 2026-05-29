@@ -1,0 +1,35 @@
+from test/more import *;
+
+class Stepper {
+	let Number current;
+	let Number stop;
+
+	method to_Iterator () {
+		let n := current;
+		let end := stop;
+		return function () {
+			throw new ExhaustedException() if n > end;
+			return n++;
+		};
+	}
+}
+
+let trace := [];
+for ( let outer in [ 1, 2, 3 ] ) {
+	for ( let inner in new Stepper( current: 1, stop: 3 ) ) {
+		if ( outer == 2 and inner == 1 ) {
+			next;
+		}
+		if ( outer == 3 and inner == 2 ) {
+			last;
+		}
+		trace.push( outer _ ":" _ inner );
+	}
+}
+
+ok( "1:1" in trace, "baseline tuple from first outer iteration exists" );
+ok( "2:1" ∉ trace, "next skips targeted inner tuple" );
+ok( "2:2" in trace and "2:3" in trace, "inner loop continues after next for same outer iteration" );
+ok( "3:2" ∉ trace and "3:3" ∉ trace, "last stops later inner tuples for outer=3" );
+
+done_testing();

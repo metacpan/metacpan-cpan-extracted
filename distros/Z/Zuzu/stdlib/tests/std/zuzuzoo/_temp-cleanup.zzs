@@ -1,0 +1,204 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/archive import Archive;
+from std/io import Path;
+from std/proc import Env;
+from std/zuzuzoo import Zuzuzoo, load_distribution;
+
+function ensure_dir ( path ) {
+	return true if path.exists();
+	let parent := path.parent();
+	ensure_dir(parent) if not parent.exists();
+	path.mkdir();
+	return true;
+}
+
+function root () {
+	let dir := Path.tempdir();
+	let lib := dir.child("lib");
+	let bin := dir.child("bin");
+	let meta := dir.child("meta");
+	ensure_dir(lib);
+	ensure_dir(bin);
+	ensure_dir(meta);
+	return {
+		dir_obj: dir,
+		lib_dir: lib.to_String(),
+		bin_dir: bin.to_String(),
+		meta_dir: meta.to_String(),
+	};
+}
+
+class FakeRequest {
+	let target_url := null;
+	let download_path := null;
+
+	method download_to ( path ) {
+		download_path := path;
+		return self;
+	}
+
+	method url () {
+		return target_url;
+	}
+
+	method path () {
+		return download_path;
+	}
+}
+
+class FakeResponse {
+	let final_url := null;
+
+	method expect_success () {
+		return self;
+	}
+
+	method url () {
+		return final_url;
+	}
+}
+
+class FakeUserAgent {
+	let payloads := {};
+
+	method build_request ( http_method, url ) {
+		return new FakeRequest( target_url: url );
+	}
+
+	method send ( request ) {
+		( new Path( request.path() ) ).spew(
+			payloads.get( request.url() ),
+		);
+		return new FakeResponse( final_url: request.url() );
+	}
+}
+
+function module_archive ( dist_name, version, module_name, status ) {
+	return Archive.encode(
+		{
+			entries: [
+				{
+					path: dist_name _ "-" _ version _
+						"/zuzu-distribution.json",
+					data: to_binary(
+						"{\"name\":\"" _ dist_name _
+						"\",\"version\":\"" _ version _
+						"\",\"author\":\"Example\"," _
+						"\"license\":\"MIT\"," _
+						"\"status\":\"" _ status _ "\"}\n",
+					),
+				},
+				{
+					path: dist_name _ "-" _ version _
+						"/modules/" _ module_name _ ".zzm",
+					data: to_binary("// module\n"),
+				},
+			],
+		},
+		"zip",
+	);
+}
+
+let archive := Path.tempfile();
+Archive.dump(
+	archive,
+	{
+		entries: [
+			{
+				path: "cleanup-app-1.0.0/zuzu-distribution.json",
+				data: to_binary(
+					"{\"name\":\"cleanup-app\",\"version\":\"1.0.0\"," _
+					"\"author\":\"Example\",\"license\":\"MIT\"}\n",
+				),
+			},
+			{
+				path: "cleanup-app-1.0.0/modules/cleanup/app.zzm",
+				data: to_binary("// cleanup\n"),
+			},
+			{
+				path: "cleanup-app-1.0.0/tests/fail.zzs",
+				data: to_binary("say \"1..1\"; say \"not ok 1\";\n"),
+			},
+		],
+	},
+	"zip",
+);
+
+let target := root();
+let temp_root := Path.tempdir();
+let result := ( new Zuzuzoo(
+	lib_dir: target{lib_dir},
+	bin_dir: target{bin_dir},
+	meta_dir: target{meta_dir},
+	home: Path.tempdir().to_String(),
+) ).install(
+	archive.to_String(),
+	{
+		zuzu_command: ( new Path( path: Env.get( "ZUZU", "./bin/zuzu" ) ) ).to_String(),
+		temp_root: temp_root.to_String(),
+	},
+);
+
+is( result{ok}, false, "failing distribution tests fail install" );
+is(
+	temp_root.children().length(),
+	0,
+	"install cleans work directories after test failure",
+);
+
+let load_temp_root := Path.tempdir();
+let loaded := load_distribution(
+	archive.to_String(),
+	{ temp_root: load_temp_root.to_String() },
+);
+is( loaded{metadata}{name}, "cleanup-app", "load_distribution returns metadata" );
+is(
+	load_temp_root.children().length(),
+	0,
+	"load_distribution cleans work directories by default",
+);
+
+let trial_temp_root := Path.tempdir();
+let trial_root := root();
+let trial_error := "";
+try {
+	( new Zuzuzoo(
+		lib_dir: trial_root{lib_dir},
+		bin_dir: trial_root{bin_dir},
+		meta_dir: trial_root{meta_dir},
+		home: Path.tempdir().to_String(),
+		base_url: "https://packages.test",
+		user_agent: new FakeUserAgent(
+			payloads: {
+				"https://packages.test/module/trial/app": module_archive(
+					"trial-app",
+					"1.0.0",
+					"trial/app",
+					"trial",
+				),
+			},
+		),
+	) ).plan_install(
+		"trial/app",
+		{ temp_root: trial_temp_root.to_String() },
+	);
+}
+catch ( Exception e ) {
+	trial_error := e.to_String();
+}
+
+like(
+	trial_error,
+	/Trial distributions are not available/,
+	"trial module endpoint is rejected",
+);
+is(
+	trial_temp_root.children().length(),
+	0,
+	"plan_install cleans source and extraction dirs after trial rejection",
+);
+
+done_testing();

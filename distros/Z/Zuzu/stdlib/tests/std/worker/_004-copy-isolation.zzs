@@ -1,0 +1,31 @@
+from test/more import *;
+from test/worker_contract import require_worker_phase;
+
+let Worker := require_worker_phase(1);
+
+async function main () {
+	let data := [ 1, 2 ];
+	let task := Worker.spawn(
+		function ( copy ) {
+			return [ copy[0], copy.length(), copy.get( 2, "missing" ) ];
+		},
+		[ data ],
+	);
+
+	data[0] := 9;
+	data.push(3);
+
+	is(
+		await {
+			task;
+		},
+		[ 1, 2, "missing" ],
+		"worker receives marshalled copy from spawn time",
+	);
+}
+
+await {
+	main();
+};
+
+done_testing();

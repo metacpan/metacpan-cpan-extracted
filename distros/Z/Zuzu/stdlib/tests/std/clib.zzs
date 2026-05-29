@@ -1,0 +1,164 @@
+from test/more import *;
+requires_capability( "proc" );
+requires_capability( "fs" );
+requires_capability( "clib" );
+
+from std/clib import CLib;
+from std/io import Path;
+from std/proc import Env, Proc;
+
+let fixture_root := Env.get("FIXTURE_DIR");
+if ( fixture_root ≡ null or fixture_root eq "" ) {
+	skip_all( "FIXTURE_DIR is not set" );
+}
+let clib_root := fixture_root _ "/example_clib";
+let lib_path := clib_root _ "/libgreet.so";
+let lib_file := new Path(lib_path);
+
+if ( lib_file.exists() ) {
+	pass("example C library exists");
+}
+else {
+	let build := Proc.run(
+		"gcc",
+		[
+			"-O2",
+			"-Wall",
+			"-Wextra",
+			"-Wpedantic",
+			"-fPIC",
+			"-I" _ clib_root _ "/include",
+			"-shared",
+			"-o",
+			lib_path,
+			clib_root _ "/src/greet.c"
+		],
+		{
+			capture_stdout: true,
+			capture_stderr: true
+		},
+	);
+
+	ok( Proc.is_success(build), "built example C library with gcc" );
+	if ( not Proc.is_success(build) ) {
+		diag( build{stdout} );
+		diag( build{stderr} );
+		diag( Proc.status_text(build) );
+		bail_out("could not build example C library");
+	}
+}
+
+let lib := CLib.open(lib_path);
+
+let greet := lib.func(
+	"greet",
+	[],
+	{
+		type: "binary",
+		terminated_by: "nul",
+		free: "greet_free"
+	},
+);
+
+let greet_person := lib.func(
+	"greet_person",
+	[ { type: "binary", terminated_by: "nul", nullable: true } ],
+	{
+		type: "binary",
+		terminated_by: "nul",
+		free: "greet_free"
+	},
+);
+
+let add_i64 := lib.func(
+	"greet_add_i64",
+	[ { type: "int", bits: 64 }, { type: "int", bits: 64 } ],
+	{ type: "int", bits: 64 },
+);
+
+let add_f64 := lib.func(
+	"greet_add_f64",
+	[ { type: "float", bits: 64 }, { type: "float", bits: 64 } ],
+	{ type: "float", bits: 64 },
+);
+
+let bool_not := lib.func(
+	"greet_not",
+	[ "bool" ],
+	"bool",
+);
+
+let noop := lib.func(
+	"greet_noop",
+	[],
+	"null",
+);
+
+let free_count := lib.func(
+	"greet_free_count",
+	[],
+	{ type: "int", bits: 64 },
+);
+
+let reset_free_count := lib.func(
+	"greet_reset_free_count",
+	[],
+	"null",
+);
+
+let return_null := lib.func(
+	"greet_return_null",
+	[],
+	{ type: "binary", terminated_by: "nul" },
+);
+
+let copy_bytes := lib.func(
+	"greet_copy_bytes",
+	[ "binary", { type: "int", bits: 64 } ],
+	{ type: "binary", length_arg: 1, free: "greet_free" },
+);
+
+let count_bytes := lib.func(
+	"greet_count_bytes",
+	[ { type: "binary", nullable: true }, { type: "int", bits: 64 } ],
+	{ type: "int", bits: 64 },
+);
+
+reset_free_count.call();
+
+is( to_string(greet.call()), "Hello, world!", "greet returns bytes", );
+is(
+	to_string( greet_person.call(to_binary("Alice")) ),
+	"Hello, Alice!",
+	"greet_person accepts BinaryString",
+);
+is(
+	to_string( greet_person.call(null) ),
+	"Hello, world!",
+	"greet_person accepts nullable binary parameter",
+);
+is( add_i64.call(40, 2), 42, "int64 parameters and return", );
+is( add_f64.call(1.25, 2.5), 3.75, "float64 parameters and return", );
+is( bool_not.call(true), false, "bool parameter and return", );
+is( bool_not.call(false), true, "bool false parameter and return", );
+is( noop.call(), null, "void return maps to null", );
+is( return_null.call(), null, "null pointer binary return maps to null", );
+
+let payload := to_binary("ABC");
+is(
+	to_string( copy_bytes.call(payload, 3) ),
+	"ABC",
+	"binary bytes round trip",
+);
+is(
+	count_bytes.call(payload, 3),
+	3,
+	"binary parameter with explicit length",
+);
+is( count_bytes.call(null, 0), 0, "nullable binary parameter accepts null", );
+is( free_count.call(), 4, "configured free function runs for owned returns", );
+ok( lib.has_symbol("greet"), "has_symbol detects exported symbol", );
+is( lib.close(), null, "close returns null", );
+is( lib.close(), null, "double close returns null", );
+
+done_testing();

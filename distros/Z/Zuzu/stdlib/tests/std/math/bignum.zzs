@@ -1,0 +1,46 @@
+from test/more import *;
+from std/math/bignum import *;
+
+plan(29);
+
+let n := BigNum.from_dec("12345");
+let m := BigNum.from_hex("0xABCDEF");
+let p := BigNum.from_dec("-12345.6789");
+
+is( n.is_int, true, "from_dec integer reports is_int" );
+is( p.is_int, false, "from_dec decimal reports not is_int" );
+
+is( n.bcmp(m), -1, "bcmp works" );
+is( n.beq(m), false, "beq works" );
+is( n.bne(m), true, "bne works" );
+is( n.blt(m), true, "blt works" );
+is( n.ble(m), true, "ble works" );
+is( m.bgt(n), true, "bgt works" );
+is( m.bge(n), true, "bge works" );
+
+is( p.babs.to_dec, "12345.6789", "babs works" );
+is( p.bneg.to_dec, "12345.6789", "bneg works" );
+
+is( n.badd(5).to_dec, "12350", "badd works" );
+is( n.bsub(45).to_dec, "12300", "bsub works" );
+is( n.bmul(2).to_dec, "24690", "bmul works" );
+is( n.bdiv(3).to_dec, 4115, "bdiv works" );
+is( n.bmod(10).to_dec, 5, "bmod works" );
+is( BigNum.from_dec("2").bpow(10).to_dec, 1024, "bpow works" );
+is( n.binv.to_dec, n.binv.to_dec, "binv works" );
+
+is( BigNum.from_dec("0").bsin.to_dec, "0", "bsin works" );
+is( BigNum.from_dec("0").bcos.to_dec, 1, "bcos works" );
+is( BigNum.from_dec("0").btan.to_dec, "0", "btan works" );
+
+is( BigNum.from_dec("16").bsqrt.to_dec, 4, "bsqrt works" );
+is( BigNum.from_dec("1.5").bround.to_dec, 2, "bround works" );
+is( BigNum.from_dec("1.5").bfloor.to_dec, 1, "bfloor works" );
+is( BigNum.from_dec("1.5").bceil.to_dec, 2, "bceil works" );
+
+is( m.to_hex, "0xabcdef", "to_hex works" );
+is( m.to_dec, 11259375, "to_dec works" );
+is( m.to_String, 11259375, "to_String alias works" );
+is( m.to_Number, 11259375, "to_Number works" );
+
+done_testing();

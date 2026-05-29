@@ -1,0 +1,109 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/data/json import JSON;
+from std/io import Path;
+from std/zuzuzoo import Zuzuzoo;
+
+function ensure_dir ( path ) {
+	return true if path.exists();
+	let parent := path.parent();
+	ensure_dir(parent) if not parent.exists();
+	path.mkdir();
+	return true;
+}
+
+function root () {
+	let dir := Path.tempdir();
+	let lib := dir.child("lib");
+	let bin := dir.child("bin");
+	let meta := dir.child("meta");
+	ensure_dir(lib);
+	ensure_dir(bin);
+	ensure_dir(meta);
+	return {
+		dir_obj: dir,
+		lib_obj: lib,
+		bin_obj: bin,
+		meta_obj: meta,
+		lib_dir: lib.to_String(),
+		bin_dir: bin.to_String(),
+		meta_dir: meta.to_String(),
+	};
+}
+
+function module_entry ( install_as ) {
+	return {
+		source: "modules/" _ install_as,
+		install_as: install_as,
+		sha256: "old",
+	};
+}
+
+function write_installed ( target, name, version, modules ) {
+	( new JSON( pretty: true ) ).dump(
+		target{meta_obj}.child( name _ "-" _ version _ ".json" ),
+		{
+			name: name,
+			version: version,
+			author: "Example",
+			license: "MIT",
+			status: "stable",
+			dependencies: {},
+			installed: {
+				zdf: "ZDF-1",
+				lib_dir: target{lib_dir},
+				bin_dir: target{bin_dir},
+				meta_dir: target{meta_dir},
+				modules: modules,
+				scripts: [],
+			},
+		},
+	);
+}
+
+let target := root();
+ensure_dir( target{lib_obj}.child("dry") );
+target{lib_obj}.child("dry").child("run.zzm").spew_utf8("// dry\n");
+write_installed(
+	target,
+	"dry-remove",
+	"1.0.0",
+	[ module_entry("dry/run.zzm") ],
+);
+
+let zoo := new Zuzuzoo(
+	lib_dir: target{lib_dir},
+	bin_dir: target{bin_dir},
+	meta_dir: target{meta_dir},
+	home: Path.tempdir().to_String(),
+);
+let result := zoo.remove( "dry/run", { dry_run: true } );
+
+ok( result{ok}, "dry-run remove returns ok" );
+ok( result{dry_run}, "dry-run flag is returned" );
+is( result{removed}, [], "dry run removes nothing" );
+is( result{warnings}, [], "dry run has no missing-file warnings" );
+like( result{plan_text}, /dry-remove/, "dry run returns formatted plan" );
+is(
+	target{lib_obj}.child("dry").child("run.zzm").exists(),
+	true,
+	"dry run leaves module file in place",
+);
+is(
+	target{meta_obj}.child("dry-remove-1.0.0.json").exists(),
+	true,
+	"dry run leaves metadata in place",
+);
+
+let failed := zoo.remove( "dry/missing", { dry_run: true } );
+is( failed{ok}, false, "invalid dry-run plan is not ok" );
+is( failed{removed}, [], "invalid dry-run plan does not mutate" );
+is(
+	target{meta_obj}.child("dry-remove-1.0.0.json").exists(),
+	true,
+	"metadata remains after invalid dry-run remove",
+);
+
+done_testing();

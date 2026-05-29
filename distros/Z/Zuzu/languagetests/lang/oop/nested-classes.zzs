@@ -1,0 +1,21 @@
+from test/more import *;
+
+class Box {
+
+	class Widget {
+		let id;
+
+		method get_id () {
+			return id;
+		}
+	}
+
+	method build (x) {
+		return new self { Widget }( id: x );
+	}
+}
+
+let box := new Box();
+let widget := box.build(42);
+is( widget.get_id(), 42, "nested classes can be constructed from methods" );
+done_testing();

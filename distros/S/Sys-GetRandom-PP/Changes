@@ -1,3 +1,8 @@
+0.08  2026-05-29
+    - Implement getrandom's 4th parameter ("offset"), mimicking Sys::GetRandom
+      more closely.
+    - Explicitly list supported platforms in the documentation.
+
 0.07  2026-05-26
     - Improve error message on OpenBSD, which is not a supported platform.
     - Bail out earlier in the build on unsupported platforms, not just during

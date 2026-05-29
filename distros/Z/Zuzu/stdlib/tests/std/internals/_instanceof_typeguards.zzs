@@ -1,0 +1,33 @@
+from test/more import *;
+from std/path/z/node import Node;
+
+{
+	class Array {
+		let label := "not a collection";
+	}
+
+	let wrapped := Node.wrap( new Array() );
+	ok(
+		not wrapped.can_have_indexed_children(),
+		"ZPath Node.wrap does not treat a shadow Array class as builtin Array",
+	);
+}
+
+{
+	class TaggedValue {
+		let tag := 6;
+		let value := "not a CBOR tag";
+	}
+
+	let wrapped := Node.wrap( new TaggedValue() );
+	ok(
+		wrapped.raw() instanceof TaggedValue,
+		"ZPath Node.wrap does not unwrap a shadow TaggedValue class",
+	);
+	ok(
+		not wrapped.has_tagged(),
+		"ZPath Node.wrap does not attach CBOR tag metadata to shadow TaggedValue",
+	);
+}
+
+done_testing();

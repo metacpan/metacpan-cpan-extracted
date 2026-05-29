@@ -1,0 +1,13 @@
+from test/more import *;
+
+requires_capability( "js" );
+requires_module( "javascript" );
+
+from javascript import *;
+
+let r := JS.eval("[ 7, 8, 9 ]");
+ok( r instanceof JSResult, "JS.eval returns JSResult", );
+is( r.eval(" this[1] ").value(), 8, "JSResult.eval", );
+is( JS.eval( "let x = { answer: 42 }; x" ).toJSON(), "{\"answer\":42}", "JSResult.toJSON", );
+
+done_testing();

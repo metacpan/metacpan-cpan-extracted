@@ -1,0 +1,14 @@
+from test/c30/a import *;
+from test/c30/b import SharedClass as SharedClassB, SharedTrait as SharedTraitB;
+from test/more import *;
+
+class Blended extends SharedClass with SharedTraitB;
+
+let blended := new Blended();
+
+is( SharedClass.origin(), "A", "star-imported class remains addressable" );
+is( SharedClassB.origin(), "B", "aliased class import resolves name collision" );
+is( blended.side_a(), "A-trait", "blended class keeps methods from star-imported trait" );
+is( blended.side_b(), "B-trait", "blended class gains methods from aliased colliding trait" );
+
+done_testing();

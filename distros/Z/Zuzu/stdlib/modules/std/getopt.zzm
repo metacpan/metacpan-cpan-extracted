@@ -1,0 +1,432 @@
+=encoding utf8
+
+=head1 NAME
+
+std/getopt - Parse command line arguments.
+
+=head1 SYNOPSIS
+
+  from std/getopt import Getopt;
+
+  function __main__ (argv) {
+    let parsed := Getopt.parse(
+      argv,
+      [ "help|h", "verbose|v", "count|c=i", "name|n=s" ]
+    );
+
+    if ( not parsed{ok} ) {
+      say( parsed{error} );
+      return 2;
+    }
+
+    let opts := parsed{options};
+    let rest := parsed{argv};
+
+    if ( opts{help} ) {
+      say( "usage: tool [--count N] [--name STR] args..." );
+      return 0;
+    }
+
+    say( "remaining args = " + rest.length() );
+    return 0;
+  }
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module parses command-line option arrays for ZuzuScript programs.
+
+Use C<Getopt.parse(argv, specs, config?)> and pass the C<argv> array
+that your C<__main__> function receives.
+
+It intentionally does not read a host process argument global.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<Getopt>
+
+Static methods:
+
+=over
+
+=item * C<parse(Array argv, Array specs, Array config?)>
+
+Parameters: C<argv> is the command-line argument array, C<specs> is an
+option-spec array, and C<config> is optional parser configuration.
+Returns: C<Dict>. Parses arguments into options and remaining
+positional arguments.
+
+=item * C<schema(Array argv, Array schema, Array config?)>
+
+Parameters: C<argv> is the command-line argument array, C<schema> is an
+array of option schema dictionaries, and C<config> is optional parser
+configuration. Returns: C<Dict>. Parses arguments using structured
+option metadata and produces errors and usage text.
+
+Schema entries use fields such as C<name>, C<short>,
+C<type> (for example C<Number>, C<String>, C<Boolean>),
+C<required> (Boolean), C<default>, C<multiple>, and C<desc>.
+
+Returns a dictionary:
+
+=over
+
+=item * C<ok> (Boolean-like Number)
+
+=item * C<options> (Dict)
+
+=item * C<argv> (remaining positional args)
+
+=item * C<error> (String or null)
+
+=item * C<errors> (Array, for C<schema>)
+
+=item * C<usage> (String, for C<schema>)
+
+=back
+
+=back
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/getopt >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/string import split, substr, starts_with, ends_with, join;
+
+
+function _spec_kind_from_suffix ( suffix ) {
+	if ( suffix ≡ "i" ) {
+		return "integer";
+	}
+	if ( suffix ≡ "f" ) {
+		return "number";
+	}
+	if ( suffix ≡ "s" ) {
+		return "string";
+	}
+	return "flag";
+}
+
+function _normalize_schema_type ( raw_type ) {
+	if ( raw_type ≡ null ) {
+		return "Boolean";
+	}
+	if ( raw_type instanceof Function ) {
+		let function_name := null;
+		try {
+			function_name := raw_type.name;
+		}
+		catch {
+		}
+		if (
+			function_name ≡ "Boolean" or
+			function_name ≡ "Number" or
+			function_name ≡ "String"
+		) {
+			return function_name;
+		}
+	}
+	if ( raw_type ≡ Boolean ) {
+		return "Boolean";
+	}
+	if ( raw_type ≡ Number ) {
+		return "Number";
+	}
+	if ( raw_type ≡ String ) {
+		return "String";
+	}
+	let type_name := "" _ raw_type;
+	if ( type_name ≡ "" ) {
+		return "Boolean";
+	}
+	return type_name;
+}
+
+function _schema_type_suffix ( type_name ) {
+	let lowered := lc( "" _ type_name );
+	if ( lowered ≡ "boolean" or lowered ≡ "bool" ) {
+		return "";
+	}
+	if ( lowered ≡ "number" or lowered ≡ "num" ) {
+		return "=f";
+	}
+	if ( lowered ≡ "int" or lowered ≡ "integer" ) {
+		return "=i";
+	}
+	return "=s";
+}
+
+function _parse_spec ( spec ) {
+	let out := {
+		name: "",
+		short: "",
+		suffix: "",
+		kind: "flag",
+		multiple: 0,
+	};
+
+	let base := "" _ spec;
+	let spec_parts := split(base, "=");
+	let names_part := spec_parts[0];
+	if ( spec_parts.length() > 1 ) {
+		let rhs := spec_parts[1];
+		if ( rhs ≢ null and rhs ≢ "" ) {
+			out{suffix} := substr(rhs, 0, 1);
+		}
+	}
+
+	let aliases := split(names_part, "|");
+	if ( aliases.length() > 0 and aliases[0] ≢ null ) {
+		out{name} := "" _ aliases[0];
+	}
+	if ( aliases.length() > 1 and aliases[1] ≢ null ) {
+		out{short} := "" _ aliases[1];
+	}
+
+	if ( ends_with(base, "@") ) {
+		out{multiple} := 1;
+	}
+
+	out{kind} := _spec_kind_from_suffix( out{suffix} );
+	return out;
+}
+
+function _coerce_value ( kind, raw ) {
+	if ( kind ≡ "flag" ) {
+		return 1;
+	}
+	if ( kind ≡ "integer" ) {
+		return int(raw);
+	}
+	if ( kind ≡ "number" ) {
+		return 0 + raw;
+	}
+	return "" _ raw;
+}
+
+function _parse_from_specs ( argv, specs ) {
+	let parsed_specs := [];
+	let long_lookup := {};
+	let short_lookup := {};
+	for ( let spec_text in specs ) {
+		let spec := _parse_spec(spec_text);
+		if ( spec{name} ≡ "" ) {
+			next;
+		}
+		parsed_specs.push(spec);
+			long_lookup{( spec{name} )} := spec;
+			if ( spec{short} ≢ "" ) {
+				short_lookup{( spec{short} )} := spec;
+			}
+	}
+
+	let remaining := [];
+	let options := {};
+	let parse_error := null;
+	let i := 0;
+	while ( i < argv.length() ) {
+		let arg := "" _ argv[i];
+		if ( arg ≡ "--" ) {
+			let j := i + 1;
+			while ( j < argv.length() ) {
+				remaining.push( "" _ argv[j] );
+				j++;
+			}
+			last;
+		}
+
+		if ( starts_with(arg, "--") and length arg > 2 ) {
+			let raw := substr(arg, 2);
+			let name := raw;
+			let inline_value := null;
+			if ( raw ~ /=/ ) {
+				let parts := split(raw, "=");
+				name := parts[0];
+				inline_value := join( "=", parts.slice(1) );
+			}
+			if ( not( name in long_lookup ) ) {
+				parse_error := `Unknown option --${name}`;
+				last;
+			}
+				let spec := long_lookup{( name )};
+			if ( spec{kind} ≡ "flag" ) {
+				options{( spec{name} )} := 1;
+				i++;
+				next;
+			}
+
+			let value_text := inline_value;
+			if ( value_text ≡ null ) {
+				if ( i + 1 >= argv.length() ) {
+					parse_error := `Option --${name} requires a value`;
+					last;
+				}
+				value_text := "" _ argv[i + 1];
+				i++;
+			}
+
+			let coerced := _coerce_value( spec{kind}, value_text );
+			if ( spec{multiple} ) {
+				if ( not( spec{name} in options ) ) {
+					options{( spec{name} )} := [];
+				}
+				options{( spec{name} )}.push(coerced);
+			}
+			else {
+				options{( spec{name} )} := coerced;
+			}
+			i++;
+			next;
+		}
+
+		if ( starts_with(arg, "-") and length arg > 1 ) {
+			let short_name := substr(arg, 1);
+			if ( not( short_name in short_lookup ) ) {
+				parse_error := `Unknown option -${short_name}`;
+				last;
+			}
+				let spec := short_lookup{( short_name )};
+			if ( spec{kind} ≡ "flag" ) {
+				options{( spec{name} )} := 1;
+				i++;
+				next;
+			}
+			if ( i + 1 >= argv.length() ) {
+				parse_error := `Option -${short_name} requires a value`;
+				last;
+			}
+			let coerced := _coerce_value( spec{kind}, "" _ argv[i + 1] );
+			if ( spec{multiple} ) {
+				if ( not( spec{name} in options ) ) {
+					options{( spec{name} )} := [];
+				}
+				options{( spec{name} )}.push(coerced);
+			}
+			else {
+				options{( spec{name} )} := coerced;
+			}
+			i += 2;
+			next;
+		}
+
+		remaining.push(arg);
+		i++;
+	}
+
+	return {
+		ok: parse_error ≡ null ? 1: 0,
+		options: options,
+		argv: remaining,
+		error: parse_error,
+		specs: parsed_specs,
+	};
+}
+
+class Getopt {
+	static method parse ( argv, specs, config? ) {
+		let parsed_argv := argv instanceof Array ? argv: [];
+		let parsed_specs := specs instanceof Array ? specs: [];
+		let _cfg := config;
+		let result := _parse_from_specs( parsed_argv, parsed_specs );
+		return {
+			ok: result{ok},
+			options: result{options},
+			argv: result{argv},
+			error: result{error},
+		};
+	}
+
+	static method schema ( argv, schema, config? ) {
+		let parsed_argv := argv instanceof Array ? argv: [];
+		let parsed_schema := schema instanceof Array ? schema: [];
+		let _cfg := config;
+		let specs := [];
+		let usage_lines := [];
+		let meta := {};
+
+		for ( let entry in parsed_schema ) {
+			if ( not( entry instanceof Dict ) ) {
+				next;
+			}
+			if ( not( "name" in entry ) ) {
+				next;
+			}
+			let name := "" _ entry{name};
+			if ( name ≡ "" ) {
+				next;
+			}
+			let short := entry{short} ≡ null ? "": "" _ entry{short};
+			let type_name := _normalize_schema_type( entry{type} );
+			let suffix := _schema_type_suffix(type_name);
+			let is_multiple := entry{multiple} ? 1: 0;
+			if ( is_multiple ) {
+				suffix _= "@";
+			}
+			let spec := short ≡ "" ? `${name}${suffix}`: `${name}|${short}${suffix}`;
+			specs.push(spec);
+			meta{name} := {
+				required: entry{required} ? 1: 0,
+				has_default: "default" in entry ? 1: 0,
+				default_value: entry{default},
+			};
+
+			let usage := `  --${name}`;
+			if ( short ≢ "" ) {
+				usage _= `, -${short}`;
+			}
+			let lowered := lc(type_name);
+			if ( lowered ≢ "boolean" and lowered ≢ "bool" ) {
+				usage _= ` <${type_name}>`;
+			}
+			if ( entry{required} ) {
+				usage _= " (required)";
+			}
+			if ( entry{desc} ≢ null and entry{desc} ≢ "" ) {
+				usage _= `  ${entry{desc}}`;
+			}
+			usage_lines.push(usage);
+		}
+
+		let result := _parse_from_specs( parsed_argv, specs );
+		let errors := [];
+		if ( result{error} ≢ null ) {
+			errors.push(result{error});
+		}
+
+		for ( let name in meta.keys() ) {
+			let entry := meta{name};
+			if ( not( name in result{options} ) and entry{has_default} ) {
+				result{options}{name} := entry{default_value};
+			}
+			if ( entry{required} and not( name in result{options} ) ) {
+				errors.push( `missing required option --${name}` );
+			}
+		}
+
+		let ok := errors.length() > 0 ? 0: result{ok};
+		return {
+			ok: ok,
+			options: result{options},
+			argv: result{argv},
+			error: errors.length() > 0 ? join( "\n", errors ): null,
+			errors: errors,
+			usage: join( "\n", usage_lines ),
+			specs: specs,
+		};
+	}
+}

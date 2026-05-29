@@ -1,0 +1,6 @@
+basicConstraints = critical,CA:FALSE
+keyUsage = critical,digitalSignature
+extendedKeyUsage = serverAuth
+subjectAltName = DNS:wrong.example
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer

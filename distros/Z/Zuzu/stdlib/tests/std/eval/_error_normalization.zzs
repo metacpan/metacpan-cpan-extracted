@@ -1,0 +1,58 @@
+from std/eval import eval;
+from test/more import *;
+
+let syntax_error := exception( function () {
+	eval("let := ;");
+} );
+ok(
+	syntax_error instanceof Exception,
+	"eval syntax errors are catchable as Exception",
+);
+like(
+	syntax_error{message},
+	/Expected/,
+	"eval syntax error exposes message",
+);
+is(
+	syntax_error{file},
+	"<std/eval>",
+	"eval syntax error exposes eval filename",
+);
+is(
+	syntax_error{line},
+	1,
+	"eval syntax error exposes source line",
+);
+like(
+	syntax_error{code},
+	/^E_COMPILE_/,
+	"eval syntax error exposes compile code",
+);
+
+let type_error := exception( function () {
+	eval("let Number n := \"text\";");
+} );
+ok(
+	type_error instanceof TypeException,
+	"eval runtime type errors keep TypeException class",
+);
+like(
+	type_error{message},
+	/(TypeException: )?'n' must be Number, got String/,
+	"eval runtime type error exposes message",
+);
+
+let named_error := exception( function () {
+	eval( "true;", deny_unknown: true );
+} );
+ok(
+	named_error instanceof Exception,
+	"eval named argument errors are catchable as Exception",
+);
+like(
+	named_error{message},
+	/Unknown named argument 'deny_unknown' for eval/,
+	"eval named argument error exposes message",
+);
+
+done_testing();

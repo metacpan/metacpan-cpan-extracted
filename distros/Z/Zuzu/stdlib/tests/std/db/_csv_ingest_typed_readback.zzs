@@ -1,0 +1,56 @@
+from test/more import *;
+
+requires_capability( "db" );
+requires_capability( "fs" );
+
+from std/db import DB;
+from std/io import Path;
+from std/string import split, trim;
+
+let input := Path.tempfile();
+input.spew_utf8(
+	"id,name,score,active\n"
+	_ "1,Ada,9,true\n"
+	_ "2,Bob,7,false\n",
+);
+
+let rows := [];
+let first := true;
+input.each_line( function ( line ) {
+	if ( first ) {
+		first := false;
+		return null;
+	}
+	let parts := split( trim(line), "," );
+	rows.push(
+		{
+			id: int( parts[0] ),
+			name: parts[1],
+			score: int( parts[2] ),
+			active: parts[3] == "true",
+		},
+	);
+} );
+
+let dbh := DB.temp();
+dbh.prepare(
+	"create table users (id integer, name text, score integer, active integer)",
+).execute();
+let insert := dbh.prepare(
+	"insert into users (id, name, score, active) values (?, ?, ?, ?)",
+);
+
+for ( let row in rows ) {
+	insert.execute( row{id}, row{name}, row{score}, row{active} );
+}
+
+let q := dbh.prepare( "select id, name, score, active from users order by id" );
+q.execute();
+let typed := q.all_typed_dict();
+
+is( typed.length(), 2, "csv rows inserted into database" );
+is( typed[0]{id}, 1, "typed readback keeps integer id" );
+is( typed[0]{score}, 9, "typed readback keeps integer score" );
+is( typed[1]{active}, 0, "typed readback stores boolean-like integer" );
+
+done_testing();

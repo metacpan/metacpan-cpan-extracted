@@ -1,0 +1,8 @@
+{
+  "benchmark": "core1-baseline",
+  "allowed_regression_percent": 20,
+  "minimum_ops_per_second": {
+    "parse": 12,
+    "run_hot": 35
+  }
+}

@@ -1,0 +1,50 @@
+from test/more import *;
+
+requires_capability( "proc" );
+
+from std/proc import Proc, sleep_async;
+from std/task import all;
+
+async function main () {
+	let run := await {
+		Proc.run_async(
+			"perl",
+			[ "-e", "my $x = <STDIN>; print uc($x);" ],
+			{ stdin: "ok\n" },
+		);
+	};
+	ok( run{ok}, "run_async reports successful process" );
+	is( run{stdout}, "OK\n", "run_async captures stdout" );
+
+	let pipeline := await {
+		Proc.pipeline_async(
+			[
+				[ "perl", "-e", "print qq<hello>" ],
+				[ "perl", "-pe", "s/hello/HELLO/" ],
+			],
+		);
+	};
+	ok( pipeline{ok}, "pipeline_async reports successful pipeline" );
+	is( pipeline{stdout}, "HELLO", "pipeline_async pipes stdout" );
+	is( pipeline{steps}.length(), 2, "pipeline_async records steps" );
+
+	await {
+		sleep_async(0.01);
+	};
+	ok( true, "sleep_async can be awaited" );
+
+	let both := await {
+		all( [
+			Proc.run_async( "perl", [ "-e", "print qq<a>" ] ),
+			Proc.run_async( "perl", [ "-e", "print qq<b>" ] ),
+		] );
+	};
+	is( both[0]{stdout}, "a", "first run_async result composes with all" );
+	is( both[1]{stdout}, "b", "second run_async result composes with all" );
+}
+
+await {
+	main();
+};
+
+done_testing();

@@ -1,0 +1,56 @@
+from std/digest/sha import *;
+from test/more import *;
+
+let payload := to_binary("abc");
+let hmac_payload := to_binary("The quick brown fox jumps over the lazy dog");
+let hmac_key := to_binary("key");
+
+is( sha1_hex(payload), "a9993e364706816aba3e25717850c26c9cd0d89d", "sha1_hex matches known vector", );
+is( sha224_hex(payload), "23097d223405d8228642a477bda255b32aadbce4bda0b3f7e36c9da7", "sha224_hex matches known vector", );
+is( sha256_hex(payload), "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad", "sha256_hex matches known vector", );
+is( sha384_hex(payload), "cb00753f45a35e8bb5a03d699ac65007272c32ab0eded1631a8b605a43ff5bed8086072ba1e7cc2358baeca134c825a7", "sha384_hex matches known vector", );
+is( sha512_hex(payload), "ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f", "sha512_hex matches known vector", );
+
+is( sha1_b64(payload), "qZk+NkcGgWq6PiVxeFDCbJzQ2J0", "sha1_b64 matches known vector", );
+is( sha256_b64(payload), "ungWv48Bz+pBQUDeXa4iI7ADYaOWF3qctBD/YfIAFa0", "sha256_b64 matches known vector", );
+is( sha512_b64(payload), "3a81oZNherrMQXNJriBBMRLm+k6JqX6iCp7u5ktV05ohkpkqJ0/BqDa6PCOj/uu9RU1EI2Q86A4qmslPpUyknw", "sha512_b64 matches known vector", );
+
+is( length sha1(payload), 20, "sha1 returns 20-byte BinaryString", );
+is( length sha224(payload), 28, "sha224 returns 28-byte BinaryString", );
+is( length sha256(payload), 32, "sha256 returns 32-byte BinaryString", );
+is( length sha384(payload), 48, "sha384 returns 48-byte BinaryString", );
+is( length sha512(payload), 64, "sha512 returns 64-byte BinaryString", );
+
+is( typeof sha1(payload), "BinaryString", "sha1 returns BinaryString", );
+
+is( hmac_sha1_hex( hmac_payload, hmac_key ), "de7c9b85b8b78aa6bc8a7a36f70a90701c9db4d9", "hmac_sha1_hex matches known vector", );
+is( hmac_sha224_hex( hmac_payload, hmac_key ), "88ff8b54675d39b8f72322e65ff945c52d96379988ada25639747e69", "hmac_sha224_hex matches known vector", );
+is( hmac_sha256_hex( hmac_payload, hmac_key ), "f7bc83f430538424b13298e6aa6fb143ef4d59a14946175997479dbc2d1a3cd8", "hmac_sha256_hex matches known vector", );
+is( hmac_sha384_hex( hmac_payload, hmac_key ), "d7f4727e2c0b39ae0f1e40cc96f60242d5b7801841cea6fc592c5d3e1ae50700582a96cf35e1e554995fe4e03381c237", "hmac_sha384_hex matches known vector", );
+is( hmac_sha512_hex( hmac_payload, hmac_key ), "b42af09057bac1e2d41708e48a902e09b5ff7f12ab428a4fe86653c73dd248fb82f948a549f7b791a5b41915ee4d1ec3935357e4e2317250d0372afa2ebeeb3a", "hmac_sha512_hex matches known vector", );
+
+is( hmac_sha256_b64( hmac_payload, hmac_key ), "97yD9DBThCSxMpjmqm+xQ+9NWaFJRhdZl0edvC0aPNg", "hmac_sha256_b64 matches known vector", );
+is( length hmac_sha256( hmac_payload, hmac_key ), 32, "hmac_sha256 returns 32-byte BinaryString", );
+is( typeof hmac_sha256( hmac_payload, hmac_key ), "BinaryString", "hmac_sha256 returns BinaryString", );
+
+like( exception( function() {
+	sha256("abc");
+} ), /TypeException: sha256 expects BinaryString, got String/, "sha256 rejects String input", );
+
+like( exception( function() {
+	sha256_hex("abc");
+} ), /TypeException: sha256_hex expects BinaryString, got String/, "sha256_hex rejects String input", );
+
+like( exception( function() {
+	sha256_b64("abc");
+} ), /TypeException: sha256_b64 expects BinaryString, got String/, "sha256_b64 rejects String input", );
+
+like( exception( function() {
+	hmac_sha256("abc", hmac_key);
+} ), /TypeException: hmac_sha256 expects BinaryString, got String/, "hmac_sha256 rejects String payload input", );
+
+like( exception( function() {
+	hmac_sha256( hmac_payload, "key" );
+} ), /TypeException: hmac_sha256 expects BinaryString key, got String/, "hmac_sha256 rejects String key input", );
+
+done_testing();

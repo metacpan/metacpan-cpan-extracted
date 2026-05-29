@@ -1,0 +1,21 @@
+from test/more import *;
+requires_capability( "fs" );
+
+from std/data/yaml import *;
+from std/io import Path;
+
+let y := new YAML( pretty: false, canonical: true );
+let path := Path.tempfile();
+y.dump( path, { answer: 42, ok: true } );
+is( y.load(path){answer}, 42, "YAML.load reads YAML from Path" );
+like( path.slurp_utf8(), /answer: 42\nok: true/, "YAML.dump writes YAML to file" );
+like( exception( function() {
+	y.dump( "data.yaml", { answer: 7 } );
+}
+), /TypeException: YAML.dump expects Path as first argument/, "YAML.dump rejects non-Path target" );
+like( exception( function() {
+	y.load("data.yaml");
+}
+), /TypeException: YAML.load expects Path as first argument/, "YAML.load rejects non-Path target" );
+
+done_testing();

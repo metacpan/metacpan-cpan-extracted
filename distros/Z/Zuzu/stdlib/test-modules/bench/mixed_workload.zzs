@@ -1,0 +1,64 @@
+class Mixer {
+	let salt;
+
+	method combine ( Number left, Number right ) {
+		return ( left * 17 + right * 31 + salt ) mod 1009;
+	}
+}
+
+function stringify_triplet ( Number i, Number j, Number value ) {
+	return "i=" _ i _ ";j=" _ j _ ";v=" _ value;
+}
+
+function run_round ( Number outer_limit, Number inner_limit ) {
+	let mixer := new Mixer( salt: 11 );
+	let unique := <<>>;
+	let shifted := <<>>;
+	let checksum := 0;
+
+	let i := 0;
+	while ( i < outer_limit ) {
+		let j := 0;
+		while ( j < inner_limit ) {
+			let value := mixer.combine(i, j);
+			let line := stringify_triplet(i, j, value);
+
+			checksum += value;
+			checksum += line cmp "";
+
+			unique.add(value);
+			if ( value mod 5 = 0 ) {
+				shifted.add(value + 1);
+			}
+
+			j++;
+		}
+		i++;
+	}
+
+	let overlap := unique.intersection(shifted);
+	let merged := unique.union(shifted);
+	let delta := merged.difference(overlap);
+	let symmetric := unique.symmetric_difference(shifted);
+
+	checksum += unique.length();
+	checksum += shifted.length();
+	checksum += overlap.length();
+	checksum += delta.length();
+	checksum += symmetric.length();
+
+	return checksum;
+}
+
+function __main__ ( argv ) {
+	let total := 0;
+	let cycle := 0;
+	while ( cycle < 2 ) {
+		total += run_round(8, 15);
+		cycle++;
+	}
+
+	if ( total < 1 ) {
+		die "unexpected benchmark result";
+	}
+}

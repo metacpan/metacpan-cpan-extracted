@@ -1,0 +1,32 @@
+from test/more import *;
+
+class Parent {
+
+	method describe () {
+		return "parent";
+	}
+
+	static method label () {
+		return "parent-static";
+	}
+	static method score () {
+		return 42;
+	}
+	static method via_self () {
+		return self.score();
+	}
+}
+
+class Child extends Parent{ method describe () {
+	return super() _ ":child";
+}
+static method label () {
+	return super() _ ":child-static";
+}
+static method score () {
+	return super() / 2;
+}
+} is( new Child().describe(), "parent:child", "instance overrides can call super()" );
+is( Child.label(), "parent-static:child-static", "static overrides can call super()" );
+is( Child.via_self(), 21, "static self dispatch stays late-bound on subclass" );
+done_testing();

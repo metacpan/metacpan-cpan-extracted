@@ -1,0 +1,122 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/archive import Archive;
+from std/io import Path;
+from std/zuzuzoo import Zuzuzoo;
+
+class FakeRequest {
+	let target_url := null;
+	let download_path := null;
+
+	method download_to ( path ) {
+		download_path := path;
+		return self;
+	}
+
+	method url () {
+		return target_url;
+	}
+
+	method path () {
+		return download_path;
+	}
+}
+
+class FakeResponse {
+	method expect_success () {
+		return self;
+	}
+
+	method url () {
+		return "";
+	}
+}
+
+class FakeUserAgent {
+	let payloads := {};
+
+	method build_request ( http_method, url ) {
+		return new FakeRequest( target_url: url );
+	}
+
+	method send ( request ) {
+		( new Path( request.path() ) ).spew(
+			payloads.get( request.url() ),
+		);
+		return new FakeResponse();
+	}
+}
+
+function throws_like ( f, rx, name ) {
+	let got := "";
+	try {
+		f();
+	}
+	catch ( Exception e ) {
+		got := e.to_String();
+	}
+	like( got, rx, name );
+}
+
+function archive_bytes ( dist_name, module_name, dependencies ) {
+	return Archive.encode(
+		{
+			entries: [
+				{
+					path: dist_name _ "-1.0.0/zuzu-distribution.json",
+					data: to_binary(
+						"{\"name\":\"" _ dist_name _
+						"\",\"version\":\"1.0.0\"," _
+						"\"author\":\"Example\"," _
+						"\"license\":\"MIT\"," _
+						"\"status\":\"stable\"," _
+						"\"dependencies\":" _ dependencies _
+						"}\n",
+					),
+				},
+				{
+					path: dist_name _ "-1.0.0/modules/" _
+						module_name _ ".zzm",
+					data: to_binary("// module\n"),
+				},
+			],
+		},
+		"zip",
+	);
+}
+
+let ua := new FakeUserAgent(
+	payloads: {
+		"https://packages.test/module/cycle/a": archive_bytes(
+			"cycle-a",
+			"cycle/a",
+			"{\"cycle/b\":\"1.0.0\"}",
+		),
+		"https://packages.test/module/cycle/b": archive_bytes(
+			"cycle-b",
+			"cycle/b",
+			"{\"cycle/a\":\"1.0.0\"}",
+		),
+	},
+);
+let root := Path.tempdir();
+let zoo := new Zuzuzoo(
+	lib_dir: root.child("lib").to_String(),
+	bin_dir: root.child("bin").to_String(),
+	meta_dir: root.child("meta").to_String(),
+	home: root.child("home").to_String(),
+	base_url: "https://packages.test",
+	user_agent: ua,
+);
+
+throws_like(
+	function () {
+		zoo.plan_install("cycle/a");
+	},
+	/cycle\/a -> cycle\/b -> cycle\/a/,
+	"dependency cycles report the cycle path",
+);
+
+done_testing();

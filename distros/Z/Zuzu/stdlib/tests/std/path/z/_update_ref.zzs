@@ -1,0 +1,184 @@
+from std/internals import setprop;
+from std/path/z import ZPath;
+from test/more import *;
+
+setprop( "paths", ZPath );
+
+function fresh_report () {
+	return {
+		meta: {
+			count: 4,
+			title: "Read 2026",
+		},
+		users: [
+			{
+				age: 1,
+				name: "Ada",
+			},
+			{
+				age: 2,
+				name: "Bob",
+			},
+		],
+	};
+}
+
+{
+	let sample := fresh_report();
+	is( ( sample @ "/meta/count" )++, 4, "@ postfix ++ returns old scalar" );
+	is( sample{meta}{count}, 5, "@ postfix ++ mutates focused target" );
+}
+
+{
+	let sample := fresh_report();
+	is( ++( sample @ "/meta/count" ), 5, "@ prefix ++ returns new scalar" );
+	is( sample{meta}{count}, 5, "@ prefix ++ mutates focused target" );
+}
+
+{
+	let sample := fresh_report();
+	is( ( sample @ "/meta/count" )--, 4, "@ postfix -- returns old scalar" );
+	is( sample{meta}{count}, 3, "@ postfix -- mutates focused target" );
+}
+
+{
+	let sample := fresh_report();
+	is( --( sample @ "/meta/count" ), 3, "@ prefix -- returns new scalar" );
+	is( sample{meta}{count}, 3, "@ prefix -- mutates focused target" );
+}
+
+{
+	let sample := fresh_report();
+	is(
+		( sample @@ "/users/*/age" )++,
+		[ 1, 2 ],
+		"@@ postfix ++ returns array of old values",
+	);
+	is( sample{users}[0]{age}, 2, "@@ postfix ++ mutates first target" );
+	is( sample{users}[1]{age}, 3, "@@ postfix ++ mutates later target" );
+}
+
+{
+	let sample := fresh_report();
+	is(
+		++( sample @@ "/users/*/age" ),
+		[ 2, 3 ],
+		"@@ prefix ++ returns array of new values",
+	);
+	is( sample{users}[0]{age}, 2, "@@ prefix ++ mutates first target" );
+	is( sample{users}[1]{age}, 3, "@@ prefix ++ mutates later target" );
+}
+
+{
+	let sample := fresh_report();
+	is(
+		( sample @@ "/users/*/age" )--,
+		[ 1, 2 ],
+		"@@ postfix -- returns array of old values",
+	);
+	is( sample{users}[0]{age}, 0, "@@ postfix -- mutates first target" );
+	is( sample{users}[1]{age}, 1, "@@ postfix -- mutates later target" );
+}
+
+{
+	let sample := fresh_report();
+	is(
+		--( sample @@ "/users/*/age" ),
+		[ 0, 1 ],
+		"@@ prefix -- returns array of new values",
+	);
+	is( sample{users}[0]{age}, 0, "@@ prefix -- mutates first target" );
+	is( sample{users}[1]{age}, 1, "@@ prefix -- mutates later target" );
+}
+
+{
+	let sample := fresh_report();
+	ok( ( sample @? "/meta/count" )++, "@? postfix ++ returns true on match" );
+	is( sample{meta}{count}, 5, "@? postfix ++ mutates matched target" );
+}
+
+{
+	let sample := fresh_report();
+	ok( ++( sample @? "/meta/count" ), "@? prefix ++ returns true on match" );
+	is( sample{meta}{count}, 5, "@? prefix ++ mutates matched target" );
+}
+
+{
+	let sample := fresh_report();
+	ok( ( sample @? "/meta/count" )--, "@? postfix -- returns true on match" );
+	is( sample{meta}{count}, 3, "@? postfix -- mutates matched target" );
+}
+
+{
+	let sample := fresh_report();
+	ok( --( sample @? "/meta/count" ), "@? prefix -- returns true on match" );
+	is( sample{meta}{count}, 3, "@? prefix -- mutates matched target" );
+}
+
+{
+	let sample := fresh_report();
+	let miss := exception( function () {
+		++( sample @ "/meta/missing" );
+	} );
+	isnt( miss, null, "@ update throws on selector miss" );
+}
+
+{
+	let sample := fresh_report();
+	is(
+		++( sample @@ "/users/*/missing" ),
+		[],
+		"@@ prefix ++ returns empty array on selector miss",
+	);
+}
+
+{
+	let sample := fresh_report();
+	ok( not ++( sample @? "/meta/missing" ), "@? prefix ++ returns false on selector miss" );
+}
+
+{
+	let sample := fresh_report();
+	let title_ref := \( sample @ "/meta/title" );
+	is( title_ref(), "Read 2026", "\\ @ returns one ref getter" );
+	is( title_ref("Done"), "Done", "\\ @ ref setter returns assigned value" );
+	is( sample{meta}{title}, "Done", "\\ @ ref setter mutates target" );
+}
+
+{
+	let sample := fresh_report();
+	let age_refs := \( sample @@ "/users/*/age" );
+	is( age_refs.length(), 2, "\\ @@ returns one ref per selected target" );
+	is( age_refs[0](), 1, "\\ @@ refs follow traversal order" );
+	is( age_refs[1]( 9 ), 9, "\\ @@ refs remain assignable" );
+	is( sample{users}[1]{age}, 9, "\\ @@ ref setter mutates selected target" );
+}
+
+{
+	let sample := fresh_report();
+	let maybe_ref := \( sample @? "/meta/title" );
+	isnt( maybe_ref, null, "\\ @? returns ref on match" );
+	is( maybe_ref(), "Read 2026", "\\ @? returned ref is assignable" );
+}
+
+{
+	let sample := fresh_report();
+	let miss_refs := \( sample @@ "/users/*/missing" );
+	is( miss_refs.length(), 0, "\\ @@ returns [] on selector miss" );
+}
+
+{
+	let sample := fresh_report();
+	let maybe_ref := \( sample @? "/meta/missing" );
+	is( maybe_ref, null, "\\ @? returns null on selector miss" );
+}
+
+{
+	let sample := fresh_report();
+	let miss := exception( function () {
+		\( sample @ "/meta/missing" );
+	} );
+	isnt( miss, null, "\\ @ throws on selector miss" );
+}
+
+done_testing();

@@ -1,0 +1,149 @@
+=encoding utf8
+
+=head1 NAME
+
+std/result - A simple Result object for explicit success and failure values.
+
+=head1 SYNOPSIS
+
+  from std/result import Result;
+
+  let r := Result.ok(42);
+
+  if ( r.is_ok() ) {
+    say r.unwrap();
+  }
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+C<Result> is a small, subclassable object modelled on a simplified version
+of Rust's C<Result> concept. It is useful when a function, task, or worker
+wants to return an explicit success or failure value without throwing an
+exception.
+
+It is a normal ZuzuScript class. Workers do not require C<Result>; any value
+supported by C<std/marshal> may be returned.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<Result>
+
+Container for either an ok value or an error value.
+
+=over
+
+=item C<< Result.ok(value) >>
+
+Parameters: C<value> is any success value. Returns: C<Result>. Creates an
+ok result wrapping C<value>.
+
+=item C<< Result.err(error) >>
+
+Parameters: C<error> is any error value. Returns: C<Result>. Creates an
+error result wrapping C<error>.
+
+=item C<< result.is_ok() >>
+
+Parameters: none. Returns: C<Boolean>. Returns true when the result is an
+ok value.
+
+=item C<< result.is_err() >>
+
+Parameters: none. Returns: C<Boolean>. Returns true when the result is an
+error value.
+
+=item C<< result.value() >>
+
+Parameters: none. Returns: value. Returns the stored ok value, or
+C<null> for an error result.
+
+=item C<< result.error() >>
+
+Parameters: none. Returns: value. Returns the stored error value, or
+C<null> for an ok result.
+
+=item C<< result.unwrap() >>
+
+Parameters: none. Returns: value. Returns the ok value, or throws if the
+result is an error.
+
+=item C<< result.unwrap_err() >>
+
+Parameters: none. Returns: value. Returns the error value, or throws if
+the result is ok.
+
+=back
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/result >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+class Result {
+	let Boolean _is_ok := true;
+	let _value := null;
+	let _error := null;
+
+	static method ok ( value ) {
+		return new self(
+			_is_ok: true,
+			_value: value,
+			_error: null,
+		);
+	}
+
+	static method err ( error ) {
+		return new self(
+			_is_ok: false,
+			_value: null,
+			_error: error,
+		);
+	}
+
+	method is_ok () {
+		return _is_ok;
+	}
+
+	method is_err () {
+		return not _is_ok;
+	}
+
+	method value () {
+		return _value;
+	}
+
+	method error () {
+		return _error;
+	}
+
+	method unwrap () {
+		if ( _is_ok ) {
+			return _value;
+		}
+
+		die `called Result.unwrap() on an err value: ${_error}`;
+	}
+
+	method unwrap_err () {
+		if ( not _is_ok ) {
+			return _error;
+		}
+
+		die `called Result.unwrap_err() on an ok value: ${_value}`;
+	}
+}

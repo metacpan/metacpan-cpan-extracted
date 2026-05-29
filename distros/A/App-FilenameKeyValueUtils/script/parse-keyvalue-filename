@@ -1,0 +1,467 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /Filename/KeyValue/parse_keyvalue_filename
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2026-05-28'; # DATE
+our $DIST = 'App-FilenameKeyValueUtils'; # DIST
+our $VERSION = '0.002'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/Filename/KeyValue/parse_keyvalue_filename",
+    program_name => "parse-keyvalue-filename",
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Parse filename using the KeyValue naming scheme
+# PODNAME: parse-keyvalue-filename
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+parse-keyvalue-filename - Parse filename using the KeyValue naming scheme
+
+=head1 VERSION
+
+This document describes version 0.002 of parse-keyvalue-filename (from Perl distribution App-FilenameKeyValueUtils), released on 2026-05-28.
+
+=head1 SYNOPSIS
+
+B<parse-keyvalue-filename> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<parse-keyvalue-filename> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<parse-keyvalue-filename> [B<L<--array-value|/"--array-value=s">>=I<int>] [B<L<--decode-value|/"--no-decode-value">>|B<L<--no-decode-value|/"--no-decode-value">>|B<L<--nodecode-value|/"--no-decode-value">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<filename|/"--filename=s*">>E<gt>
+
+
+
+See examples in the L</EXAMPLES> section.
+
+=head1 DESCRIPTION
+
+The KeyValue naming scheme puts key=value pairs at the end of filename. Filename
+must match this regex:
+
+ /\A
+  (?:
+   (.+?)                                 # optional prefix (part before the first key)
+   -
+  )?
+  (
+  (?:
+    ([A-Za-z_][A-Za_z0-9_]*)              # key
+    =
+    ([^-]*)                               # value
+  )
+  (?:
+    -
+    ([A-Za-z_][A-Za_z0-9_]*)
+    =
+    ([^-]*)
+  )*
+  (\.\w+)?                                # optional filename extension
+  \z/x
+
+KeyValue naming scheme is used in the AssetView media assets organization scheme
+(see L<Media::AssetView>).
+
+This routine parses a filename and return a structure containing parsed
+elements.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--array-value>=I<s>
+
+Always/never/maybe return value as array.
+
+Default value:
+
+ 1
+
+Valid values:
+
+ [0,1,2]
+
+The default (1) is to return a scalar when there is a single value, or an array
+if there are multiple values, for example:
+
+ foo-kw1=val1-kw2=val2,val2b-kw3=val3-kw1=val1b.jpg
+
+then:
+
+ kw1 = ['val1', 'val1b']
+ kw2 = ['val2', 'val2b']
+ kw3 = 'val3'
+
+The setting 0 means to never return array, so will return a comma-separated
+string instead. However, if the value is URI-decoded then this can potentially
+be ambiguous:
+
+ kw1=val1,val2-kw1=val3%2cval4.jpg
+
+under array_value=0 and decode_value=1 will return:
+
+ kw1 = 'val1,val2,val3,val4'
+
+while under array_value=1 or 2 will return 3 elements:
+
+ kw1 = ['val1', 'val2', 'val3,val4']
+
+
+=item B<--filename>=I<s>*
+
+(No description)
+
+
+Can also be specified as the 1st command-line argument.
+
+=item B<--no-decode-value>
+
+(No description)
+
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C parse-keyvalue-filename parse-keyvalue-filename
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete parse-keyvalue-filename 'p/*/`parse-keyvalue-filename`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 EXAMPLES
+
+=head2 No key=value pairs
+
+ % parse-keyvalue-filename foo.jpg
+ [
+    200,
+    "OK",
+    {
+       "ext" : "jpg",
+       "kv" : {},
+       "kv_raw" : "",
+       "prefix" : "foo"
+    },
+    {}
+ ]
+
+=head2 A single key=value pair
+
+ % parse-keyvalue-filename 'foo-bar-kw1=val1.jpg'
+ [
+    200,
+    "OK",
+    {
+       "ext" : "jpg",
+       "kv" : {
+          "kw1" : [
+             "val1"
+          ]
+       },
+       "kv_raw" : "kw1=val1",
+       "prefix" : "foo-bar-"
+    },
+    {}
+ ]
+
+=head2 Two key=value pairs
+
+ % parse-keyvalue-filename 'foo-bar-kw1=val1-kw2=val2.jpg'
+ [
+    200,
+    "OK",
+    {
+       "ext" : "jpg",
+       "kv" : {
+          "kw1" : [
+             "val1"
+          ],
+          "kw2" : [
+             "val2"
+          ]
+       },
+       "kv_raw" : "kw1=val1-kw2=val2",
+       "prefix" : "foo-bar-"
+    },
+    {}
+ ]
+
+=head2 A single key=value pair containing two values
+
+ % parse-keyvalue-filename 'foo-bar-kw1=val1,val1b.jpg'
+ [
+    200,
+    "OK",
+    {
+       "ext" : "jpg",
+       "kv" : {
+          "kw1" : [
+             "val1",
+             "val1b"
+          ]
+       },
+       "kv_raw" : "kw1=val1,val1b",
+       "prefix" : "foo-bar-"
+    },
+    {}
+ ]
+
+=head2 Three key=value pairs, one containing multiple values
+
+ % parse-keyvalue-filename 'foo-bar-kw1=val1-kw2=val2,val2b,val2c-kw3=val3.jpg'
+ [
+    200,
+    "OK",
+    {
+       "ext" : "jpg",
+       "kv" : {
+          "kw1" : [
+             "val1"
+          ],
+          "kw2" : [
+             "val2",
+             "val2b",
+             "val2c"
+          ],
+          "kw3" : [
+             "val3"
+          ]
+       },
+       "kv_raw" : "kw1=val1-kw2=val2,val2b,val2c-kw3=val3",
+       "prefix" : "foo-bar-"
+    },
+    {}
+ ]
+
+=head2 Empty key=value pairs
+
+ % parse-keyvalue-filename 'foo-bar-kw1=-kw2=-kw3=val.jpg'
+ [
+    200,
+    "OK",
+    {
+       "ext" : "jpg",
+       "kv" : {
+          "kw3" : [
+             "val"
+          ]
+       },
+       "kv_raw" : "kw1=-kw2=-kw3=val",
+       "prefix" : "foo-bar-"
+    },
+    {}
+ ]
+
+=head2 A value containing dash
+
+ % parse-keyvalue-filename 'foo-bar-kw1_containing_dash=containing%2ddash-kw2_also_containing_dash=containing%2Dtwo%2Ddashes.jpg'
+ [
+    200,
+    "OK",
+    {
+       "ext" : "jpg",
+       "kv" : {
+          "kw1_containing_dash" : [
+             "containing-dash"
+          ],
+          "kw2_also_containing_dash" : [
+             "containing-two-dashes"
+          ]
+       },
+       "kv_raw" : "kw1_containing_dash=containing%2ddash-kw2_also_containing_dash=containing%2Dtwo%2Ddashes",
+       "prefix" : "foo-bar-"
+    },
+    {}
+ ]
+
+=head2 A value containing comma
+
+ % parse-keyvalue-filename 'foo-bar-kw1=containing%2ccomma.jpg'
+ [
+    200,
+    "OK",
+    {
+       "ext" : "jpg",
+       "kv" : {
+          "kw1" : [
+             "containing",
+             "comma"
+          ]
+       },
+       "kv_raw" : "kw1=containing%2ccomma",
+       "prefix" : "foo-bar-"
+    },
+    {}
+ ]
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-FilenameKeyValueUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-FilenameKeyValueUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-FilenameKeyValueUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

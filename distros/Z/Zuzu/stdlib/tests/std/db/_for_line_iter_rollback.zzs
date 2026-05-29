@@ -1,0 +1,48 @@
+from test/more import *;
+
+requires_capability( "db" );
+requires_capability( "fs" );
+
+from std/db import DB;
+from std/io import Path;
+
+let dbh := DB.temp( { auto_commit: true } );
+dbh.prepare( "create table items (line text)" ).execute();
+let insert := dbh.prepare( "insert into items (line) values (?)" );
+
+let src := Path.tempfile();
+src.spew_utf8(
+	"ok-1\n"
+	_ "boom\n"
+	_ "ok-2\n",
+);
+
+function next_line_or_exhausted () {
+	let line := src.next_line();
+	throw new ExhaustedException() if line == null;
+	return line;
+}
+
+let caught := "";
+dbh.begin();
+try {
+	for ( let line in next_line_or_exhausted ) {
+		if ( line == "boom\n" ) {
+			throw new Exception( message: "stop" );
+		}
+		insert.execute(line);
+	}
+	dbh.commit();
+}
+catch ( Exception e ) {
+	caught := e{message};
+	dbh.rollback();
+}
+
+let q := dbh.prepare( "select count(*) from items" );
+q.execute();
+
+like( caught, /stop/, "for-loop error is caught" );
+is( q.next_array()[0], 0, "rollback removes rows inserted before failure" );
+
+done_testing();

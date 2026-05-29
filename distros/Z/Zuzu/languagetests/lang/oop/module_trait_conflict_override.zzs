@@ -1,0 +1,8 @@
+from test/c21/model import Diamondish;
+from test/more import *;
+
+let d := new Diamondish();
+
+is( d.conflict_name(), "override", "explicit override resolves trait conflict" );
+
+done_testing();

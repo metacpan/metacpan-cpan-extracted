@@ -1,0 +1,62 @@
+=encoding utf8
+
+=head1 NAME
+
+std/template/zz - ZZPath-backed template engine.
+
+=head1 SYNOPSIS
+
+  from std/template/zz import ZZTemplate;
+
+  let tmpl := new ZZTemplate(
+    string: "Hello {{ name ?: \"friend\" }}!",
+  );
+  say( tmpl.process( { name: "Ada" } ) );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Node and
+Electron. It is partially supported by zuzu-js in the browser:
+filesystem-backed template loading is unsupported.
+
+=head1 DESCRIPTION
+
+C<std/template/zz> provides C<ZZTemplate>, a subclass of
+C<std/template/z>'s C<ZTemplate> which renders template expressions
+using C<std/path/zz> instead of C<std/path/z>.
+
+The parser, escaping, include handling, and rendering machinery are
+inherited from C<ZTemplate>.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<< ZZTemplate({ string?: String, file?, escape?: String, includes?: Boolean }) >>
+
+Constructs a template that evaluates expressions with C<std/path/zz>.
+Returns: C<ZZTemplate>. It inherits C<process(data)> from C<ZTemplate>,
+which takes a model value and returns rendered C<String> output.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/template/zz >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/template/z import ZTemplate;
+from std/path/zz import ZZPath;
+
+class ZZTemplate extends ZTemplate {
+	method _compile_path ( expr_src ) {
+		return new ZZPath( path: expr_src );
+	}
+}

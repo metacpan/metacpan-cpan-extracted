@@ -1,0 +1,196 @@
+=encoding utf8
+
+=head1 NAME
+
+std/digest/crc32 - CRC32 digests for BinaryString values.
+
+=head1 SYNOPSIS
+
+  from std/digest/crc32 import *;
+
+  let payload := to_binary( "hello" );
+
+  let raw := crc32(payload);
+  let hex := crc32_hex(payload);
+  let b64 := crc32_b64(payload);
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module provides CRC32 digest helpers implemented in pure
+ZuzuScript.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item * C<crc32(BinaryString value)>
+
+Parameters: C<value> is binary input data. Returns: C<BinaryString>.
+Returns the raw 4-byte CRC32 digest.
+
+=item * C<crc32_hex(BinaryString value)>
+
+Parameters: C<value> is binary input data. Returns: C<String>. Returns
+the digest as lowercase hexadecimal text.
+
+=item * C<crc32_b64(BinaryString value)>
+
+Parameters: C<value> is binary input data. Returns: C<String>. Returns
+the digest as Base64 text without trailing C<=> padding.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/digest/crc32 >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/string/base64 import encode, decode;
+from std/string import substr, index;
+
+let _HEX := "0123456789abcdef";
+let _B64_ALPHABET := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+function _div_floor ( Number n, Number d ) {
+	return floor( n / d );
+}
+
+function _bytes_to_binary ( Array bytes ) {
+	let out := "";
+	let i := 0;
+	let n := bytes.length();
+
+	while ( i < n ) {
+		let b0 := bytes[i];
+		let b1 := null;
+		let b2 := null;
+		if ( i + 1 < n ) {
+			b1 := bytes[i + 1];
+		}
+		if ( i + 2 < n ) {
+			b2 := bytes[i + 2];
+		}
+
+		let c0 := _div_floor( b0, 4 );
+		let c1 := ( b0 & 3 ) * 16;
+		let c2 := 64;
+		let c3 := 64;
+
+		if ( b1 ≢ null ) {
+			c1 += _div_floor( b1, 16 );
+			c2 := ( b1 & 15 ) * 4;
+			if ( b2 ≢ null ) {
+				c2 += _div_floor( b2, 64 );
+				c3 := b2 & 63;
+			}
+		}
+
+		out _= substr( _B64_ALPHABET, c0, 1 );
+		out _= substr( _B64_ALPHABET, c1, 1 );
+		out _= c2 ≡ 64 ? "=": substr( _B64_ALPHABET, c2, 1 );
+		out _= c3 ≡ 64 ? "=": substr( _B64_ALPHABET, c3, 1 );
+		i += 3;
+	}
+
+	return decode(out);
+}
+
+function _u32_to_binary ( Number n ) {
+	let b0 := _div_floor( n, 16777216 ) & 255;
+	let b1 := _div_floor( n, 65536 ) & 255;
+	let b2 := _div_floor( n, 256 ) & 255;
+	let b3 := n & 255;
+	return _bytes_to_binary( [ b0, b1, b2, b3 ] );
+}
+
+function _byte_to_hex ( Number b ) {
+	let hi := _div_floor( b, 16 ) & 15;
+	let lo := b & 15;
+	return substr( _HEX, hi, 1 ) _ substr( _HEX, lo, 1 );
+}
+
+
+function _binary_to_bytes ( BinaryString raw ) {
+	let b64 := encode(raw);
+	let out := [];
+	let i := 0;
+	let n := length b64;
+
+	while ( i < n ) {
+		let c0 := index( _B64_ALPHABET, substr( b64, i, 1 ) );
+		let c1 := index( _B64_ALPHABET, substr( b64, i + 1, 1 ) );
+		let ch2 := substr( b64, i + 2, 1 );
+		let ch3 := substr( b64, i + 3, 1 );
+		let c2 := -1;
+		let c3 := -1;
+		if ( ch2 ≢ "=" ) {
+			c2 := index( _B64_ALPHABET, ch2 );
+		}
+		if ( ch3 ≢ "=" ) {
+			c3 := index( _B64_ALPHABET, ch3 );
+		}
+
+		out.push( c0 * 4 + _div_floor( c1, 16 ) );
+		if ( c2 >= 0 ) {
+			out.push( ( c1 & 15 ) * 16 + _div_floor( c2, 4 ) );
+		}
+		if ( c3 >= 0 ) {
+			out.push( ( c2 & 3 ) * 64 + c3 );
+		}
+
+		i += 4;
+	}
+
+	return out;
+}
+
+function crc32 ( BinaryString value ) {
+	let bytes := _binary_to_bytes(value);
+	let crc := 4294967295;
+
+	for ( let b in bytes ) {
+		crc := crc ^ b;
+		let i := 0;
+		while ( i < 8 ) {
+			if ( ( crc & 1 ) ≡ 1 ) {
+				crc := _div_floor( crc, 2 ) ^ 3988292384;
+			}
+			else {
+				crc := _div_floor( crc, 2 );
+			}
+			i++;
+		}
+	}
+
+	crc := ( ~crc ) & 4294967295;
+
+	return _u32_to_binary(crc);
+}
+
+function crc32_hex ( BinaryString value ) {
+	let digest := _binary_to_bytes( crc32(value) );
+	let out := "";
+	for ( let b in digest ) {
+		out _= _byte_to_hex(b);
+	}
+	return out;
+}
+
+function crc32_b64 ( BinaryString value ) {
+	let out := encode( crc32(value) );
+	while ( length out > 0 and substr( out, length out - 1, 1 ) ≡ "=" ) {
+		out := substr( out, 0, length out - 1 );
+	}
+	return out;
+}

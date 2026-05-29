@@ -1,0 +1,9 @@
+from test/c29/model import AliasDevice as DeviceAlias;
+from test/more import *;
+
+let d := new DeviceAlias( name: "Unit-7" );
+
+is( d.get_name(), "Unit-7", "aliased class constructor works" );
+is( DeviceAlias.family(), "device-family", "aliased class static method works" );
+
+done_testing();

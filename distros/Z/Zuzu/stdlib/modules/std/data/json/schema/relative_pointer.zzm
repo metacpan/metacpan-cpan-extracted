@@ -1,0 +1,299 @@
+=encoding utf8
+
+=head1 NAME
+
+std/data/json/schema/relative_pointer - Relative JSON Pointer parser.
+
+=head1 SYNOPSIS
+
+  from std/data/json/schema/relative_pointer import RelativeJSONPointer;
+
+  let doc := {
+    people: [
+      { name: "Ada" },
+      { name: "Grace" },
+    ],
+  };
+
+  let pointer := new RelativeJSONPointer( path: "1/name" );
+  say( pointer.first( doc, "/people/0/age", "(missing)" ) );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This Pure Zuzu module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+Relative JSON Pointer describes a target by starting from a context location,
+climbing zero or more levels, optionally shifting an array index, and then
+optionally applying a normal JSON Pointer suffix. JSON Schema uses the
+syntax for the C<relative-json-pointer> format.
+
+This module evaluates relative pointers against a root document and a
+context pointer. The context pointer must itself be a JSON Pointer string.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<RelativeJSONPointer>
+
+Construct with C<< new RelativeJSONPointer( path: "0/foo" ) >>. Invalid
+syntax throws during construction.
+
+Methods:
+
+=over
+
+=item C<expression()>
+
+Returns the original pointer expression.
+
+=item C<up()>
+
+Returns the number of levels the pointer climbs from the context location.
+
+=item C<index_change()>
+
+Returns the array-index offset, or C<null> when none was supplied.
+
+=item C<pointer()>
+
+Returns the JSON Pointer suffix, or C<null> for a C<#> key request.
+
+=item C<key_request()>
+
+Returns true for C<#> pointers that request the key or array index at the
+target location.
+
+=item C<< target_pointer( context_pointer := "" ) >>
+
+Returns the absolute JSON Pointer reached by climbing and applying any index
+offset, before the suffix is applied.
+
+=item C<< evaluate( root, context_pointer := "" ) >>
+
+Evaluates the relative pointer. Normal pointers return the same array of
+matches as I<std/path/jsonpointer>'s C<query>. C<#> key requests return the
+key or index string directly, or C<null> when the request names the document
+root.
+
+=item C<< get( root, context_pointer := "" ) >>
+
+Alias for C<evaluate>.
+
+=item C<< first( root, context_pointer := "", fallback := null ) >>
+
+Returns the first matched value, or C<fallback> when no value is found. For
+C<#> key requests, C<fallback> is returned only when the key request returns
+C<null>.
+
+=item C<< exists( root, context_pointer := "" ) >>
+
+Returns true when evaluation finds a value. For C<#> key requests, the
+document root key is treated as absent.
+
+=back
+
+=back
+
+=head2 Functions
+
+=over
+
+=item C<< valid_relative_json_pointer( text ) >>
+
+Returns true when C<text> parses as a Relative JSON Pointer.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/data/json/schema/relative_pointer >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/path/jsonpointer import JSONPointer;
+from std/data/json/schema/model import jschema_pointer_join;
+from std/string import replace, split, substr;
+
+function _rjp_decode_token ( String raw ) {
+	return raw
+		▷ replace( ^^, "~1", "/", "g" )
+		▷ replace( ^^, "~0", "~", "g" );
+}
+
+function _rjp_tokens ( String pointer ) {
+	if ( pointer ne "" and substr( pointer, 0, 1 ) ne "/" ) {
+		die "Relative JSON Pointer context path must be a JSON Pointer";
+	}
+	if ( pointer eq "" ) {
+		return [];
+	}
+
+	let raw := split( substr( pointer, 1 ), "/" );
+	let out := [];
+	for ( let token in raw ) {
+		out.push( _rjp_decode_token(token) );
+	}
+	return out;
+}
+
+function _rjp_pointer_from_tokens ( Array tokens ) {
+	let out := "";
+	for ( let token in tokens ) {
+		out := jschema_pointer_join( out, token );
+	}
+	return out;
+}
+
+class RelativeJSONPointer {
+	let String path;
+	let Number up := 0;
+	let index_change := null;
+	let pointer := null;
+	let Boolean key_request := false;
+
+	method __build__ () {
+		let i := 0;
+		let n := length path;
+		if ( n == 0 ) {
+			die "Relative JSON Pointer parse error: empty pointer";
+		}
+		if ( not( substr( path, 0, 1 ) ~ /[0-9]/ ) ) {
+			die "Relative JSON Pointer parse error: missing non-negative integer";
+		}
+		if ( n > 1 and substr( path, 0, 1 ) eq "0" and substr( path, 1, 1 ) ~ /[0-9]/ ) {
+			die "Relative JSON Pointer parse error: leading zero";
+		}
+		while ( i < n and substr( path, i, 1 ) ~ /[0-9]/ ) {
+			i++;
+		}
+		up := int( substr( path, 0, i ) );
+
+		if ( i < n and substr( path, i, 1 ) ~ /[+-]/ ) {
+			let sign := substr( path, i, 1 );
+			i++;
+			let start := i;
+			if ( i >= n or not( substr( path, i, 1 ) ~ /[0-9]/ ) ) {
+				die "Relative JSON Pointer parse error: missing index offset";
+			}
+			while ( i < n and substr( path, i, 1 ) ~ /[0-9]/ ) {
+				i++;
+			}
+			let offset := int( substr( path, start, i - start ) );
+			index_change := sign eq "-" ? 0 - offset : offset;
+		}
+
+		if ( i == n ) {
+			pointer := "";
+			return;
+		}
+
+		if ( substr( path, i, 1 ) eq "#" ) {
+			if ( i + 1 ≢ n ) {
+				die "Relative JSON Pointer parse error: trailing text after '#'";
+			}
+			key_request := true;
+			return;
+		}
+
+		let rest := substr( path, i );
+		new JSONPointer( path: rest );
+		pointer := rest;
+	}
+
+	method expression () { return path; }
+	method pointer () { return pointer; }
+	method up () { return up; }
+	method index_change () { return index_change; }
+	method key_request () { return key_request; }
+
+	method target_pointer ( String context_pointer := "" ) {
+		let tokens := _rjp_tokens(context_pointer);
+		if ( up > tokens.length() ) {
+			die "Relative JSON Pointer climbs above the document root";
+		}
+
+		let target_len := tokens.length() - up;
+		let target := [];
+		let i := 0;
+		while ( i < target_len ) {
+			target.push(tokens[i]);
+			i++;
+		}
+
+		if ( index_change ≢ null ) {
+			if (
+				target.length() == 0
+				or not( target[target.length() - 1] ~ /^(0|[1-9][0-9]*)$/ )
+			) {
+				die "Relative JSON Pointer index manipulation needs an array index";
+			}
+			let idx := int( target[target.length() - 1] ) + index_change;
+			if ( idx < 0 ) {
+				die "Relative JSON Pointer index manipulation produced negative index";
+			}
+			target[target.length() - 1] := "" _ idx;
+		}
+
+		return _rjp_pointer_from_tokens(target);
+	}
+
+	method evaluate ( root, String context_pointer := "" ) {
+		if ( key_request ) {
+			let tokens := _rjp_tokens(context_pointer);
+			if ( up > tokens.length() ) {
+				die "Relative JSON Pointer climbs above the document root";
+			}
+			if ( tokens.length() == up ) {
+				return null;
+			}
+			return tokens[ tokens.length() - up - 1 ];
+		}
+
+		let base := self.target_pointer(context_pointer);
+		let full := base;
+		if ( pointer ≢ null and pointer ne "" ) {
+			let suffix := pointer;
+			full := base eq "" ? suffix : base _ suffix;
+		}
+		return new JSONPointer( path: full ).query(root);
+	}
+
+	method get ( root, String context_pointer := "" ) {
+		return self.evaluate( root, context_pointer );
+	}
+
+	method first ( root, String context_pointer := "", fallback := null ) {
+		if ( key_request ) {
+			let key := self.evaluate( root, context_pointer );
+			return key ≡ null ? fallback : key;
+		}
+		let out := self.evaluate( root, context_pointer );
+		return out.length() == 0 ? fallback : out[0];
+	}
+
+	method exists ( root, String context_pointer := "" ) {
+		if ( key_request ) {
+			return self.evaluate( root, context_pointer ) ≢ null;
+		}
+		return self.evaluate( root, context_pointer ).length() > 0;
+	}
+}
+
+function valid_relative_json_pointer ( String text ) {
+	try {
+		new RelativeJSONPointer( path: text );
+		return true;
+	}
+	catch {
+		return false;
+	}
+}

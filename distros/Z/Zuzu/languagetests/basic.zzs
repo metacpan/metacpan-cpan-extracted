@@ -1,0 +1,25 @@
+from test/more import *;
+isnt( 6, 7 );
+is( "Math", "Math", "Math is Math" );
+
+function make_adder ( Number x ) {
+
+	function adder ( Number y ) {
+		return x + y;
+	}
+
+	return adder;
+}
+
+let add_one := make_adder(1);
+is( add_one(41), 42, "returning an internal function works" );
+
+subtest( "truthiness", function() {
+	ok( 1, "yes" );
+	ok( true, "yep" );
+	ok( "!", "yeh" );
+	ok( [1], "yee" );
+} );
+
+ok( not false, "after subtest" );
+done_testing();

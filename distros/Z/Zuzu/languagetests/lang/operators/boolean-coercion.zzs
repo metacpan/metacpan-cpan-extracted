@@ -1,0 +1,103 @@
+from test/more import *;
+
+class Booleanish {
+	let value := false;
+
+	method to_Boolean () {
+		return value;
+	}
+}
+
+class PlainTruthy {
+}
+
+function fn_truthy () {
+	return true;
+}
+
+function truthy_if ( value ) {
+	if ( value ) {
+		return 1;
+	}
+	else {
+		return 0;
+	}
+}
+
+function truthy_while_count ( value ) {
+	let count := 0;
+	let condition := value;
+	while ( condition ) {
+		count += 1;
+		condition := false;
+	}
+	return count;
+}
+
+is( !null, 1, "! treats null as false" );
+is( !false, 1, "! treats false as false" );
+is( !0, 1, "! treats zero as false" );
+is( !"", 1, "! treats empty strings as false" );
+is( !true, 0, "! treats true as true" );
+is( !1, 0, "! treats non-zero numbers as true" );
+is( !"0", 0, "! treats non-empty strings as true" );
+is( !/x/, 0, "! treats regexps as true" );
+is( ![ ], 1, "! treats empty arrays as false" );
+is( ![ 1 ], 0, "! treats non-empty arrays as true" );
+is( !<<< >>>, 1, "! treats empty bags as false" );
+is( !<<< 1 >>>, 0, "! treats non-empty bags as true" );
+is( !<< >>, 1, "! treats empty sets as false" );
+is( !<< 1 >>, 0, "! treats non-empty sets as true" );
+is( !new PairList(), 1, "! treats empty pairlists as false" );
+is( !new PairList( [ "x", 1 ] ), 0, "! treats non-empty pairlists as true" );
+is( !{}, 1, "! treats empty dicts as false" );
+is( !{ x: 1 }, 0, "! treats non-empty dicts as true" );
+is( !fn_truthy, 0, "! treats functions as true" );
+is( !PlainTruthy, 0, "! treats classes as true" );
+is( !new PlainTruthy(), 0, "! treats plain objects as true" );
+is( !new Booleanish( value: false ), 1, "! calls to_Boolean on objects" );
+is( !new Booleanish( value: true ), 0, "! accepts true to_Boolean results" );
+is( !new Booleanish( value: "" ), 1, "! boolifies to_Boolean results" );
+
+is( ¬0, 1, "¬ uses boolean coercion" );
+is( not "", 1, "not uses boolean coercion" );
+
+is( "" and true, 0, "and boolifies lhs" );
+is( "x" and true, 1, "and boolifies truthy strings" );
+is( true ⋀ 0, 0, "⋀ boolifies rhs" );
+is( false or "x", 1, "or boolifies rhs" );
+is( "" ⋁ "x", 1, "⋁ boolifies both operands" );
+is( "x" xor 0, 1, "xor boolifies both operands" );
+is( "x" ⊻ 1, 0, "⊻ boolifies both operands" );
+is( "x" nand 1, 0, "nand boolifies both operands" );
+is( "" ⊼ "x", 1, "⊼ boolifies both operands" );
+is( new Booleanish( value: false ) or false, 0, "or calls to_Boolean" );
+is( new Booleanish( value: true ) and true, 1, "and calls to_Boolean" );
+
+is( null ? 1: 2, 2, "ternary treats null as false" );
+is( false ? 1: 2, 2, "ternary treats false as false" );
+is( 0 ? 1: 2, 2, "ternary treats zero as false" );
+is( "" ? 1: 2, 2, "ternary treats empty strings as false" );
+is( "0" ? 1: 2, 1, "ternary treats non-empty strings as true" );
+is( new Booleanish( value: false ) ? 1: 2, 2, "ternary calls to_Boolean" );
+
+is( truthy_if(null), 0, "if treats null as false" );
+is( truthy_if(false), 0, "if treats false as false" );
+is( truthy_if(0), 0, "if treats zero as false" );
+is( truthy_if(""), 0, "if treats empty strings as false" );
+is( truthy_if("0"), 1, "if treats non-empty strings as true" );
+is( truthy_if(new Booleanish( value: false )), 0, "if calls to_Boolean" );
+is( truthy_if(new PlainTruthy()), 1, "if treats plain objects as true" );
+
+is( truthy_while_count(null), 0, "while treats null as false" );
+is( truthy_while_count(false), 0, "while treats false as false" );
+is( truthy_while_count(0), 0, "while treats zero as false" );
+is( truthy_while_count(""), 0, "while treats empty strings as false" );
+is( truthy_while_count("x"), 1, "while treats non-empty strings as true" );
+is(
+	truthy_while_count(new Booleanish( value: false )),
+	0,
+	"while calls to_Boolean",
+);
+
+done_testing();

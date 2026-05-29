@@ -1,0 +1,17 @@
+from test/more import *;
+class SpecialBag extends Bag{ method is_special () {
+	return true;
+}
+} class BailOutException extends Exception;
+let bag := new SpecialBag( 1, 2, 3 );
+is( 2 in bag, 1, "builtin collection subclasses work with collection operators" );
+ok( bag.is_special(), "builtin collection subclasses keep custom methods" );
+let caught := "";
+try {
+	throw new BailOutException( message: "boom" );
+}
+catch ( Exception e ) {
+	caught := e{message};
+}
+is( caught, "boom", "builtin Exception subclasses are catch-compatible" );
+done_testing();

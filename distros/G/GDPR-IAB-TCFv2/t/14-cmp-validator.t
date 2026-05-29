@@ -133,7 +133,7 @@ subtest "Validator integration: cmp_validator object" => sub {
 
   my $bad = $validator->validate($tc_unknown);
   ok !$bad->is_valid, "validation fails when CMP is unknown";
-  is(($bad->reasons)[0], "CMP 888 is not valid/disclosed", "reason names the bad CMP");
+  is(($bad->reasons)[0], "CMP 888 is not valid/disclosed (unknown)", "reason names the bad CMP");
 };
 
 subtest "Validator integration: cmp_validator hashref auto-instantiates" => sub {
@@ -302,6 +302,20 @@ subtest "CMPValidator: env_proxy is honored on the default client" => sub {
     GDPR::IAB::TCFv2::CMPValidator->new(url => 'http://example.invalid/cmp.json', network_ok => 1, timeout => 2,);
   }
   qr/Failed to fetch CMP list/, "fetch fails with the unreachable proxy in env (env_proxy was applied)";
+};
+
+subtest 'lifecycle state: active / deleted / unknown' => sub {
+  my $now = 1776254400;                            # 2026-04-15
+  my $v   = GDPR::IAB::TCFv2::CMPValidator->new(
+    now  => $now,
+    data => '{"lastUpdated":"2026-04-10T00:00:00Z","cmps":{'
+      . '"21":{"id":21},'
+      . '"22":{"id":22,"deletedDate":"2020-01-01T00:00:00Z"}' . '}}',
+  );
+
+  is($v->state(21, $now), 'active',  'present, no deletedDate => active');
+  is($v->state(22, $now), 'deleted', 'present, past deletedDate => deleted');
+  is($v->state(99, $now), 'unknown', 'absent => unknown');
 };
 
 done_testing;

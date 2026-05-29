@@ -1,0 +1,36 @@
+from test/more import *;
+
+requires_capability( "net" );
+requires_capability( "db" );
+
+from std/db import DB;
+from std/net/http import UserAgent;
+
+let dbh := DB.temp();
+dbh.prepare( "create table responses (status integer, success integer, body text)" ).execute();
+let insert := dbh.prepare(
+	"insert into responses (status, success, body) values (?, ?, ?)",
+);
+
+async function main () {
+	let ua := new UserAgent( timeout: 1 );
+	let response := await {
+		ua.get_async( "http://127.0.0.1:1/" );
+	};
+	insert.execute( response.status(), response.success(), response.content() );
+}
+
+await {
+	main();
+};
+
+let q := dbh.prepare( "select status, success, body from responses" );
+q.execute();
+let row := q.next_dict();
+
+ok( row ≢ null, "async http response inserted into db" );
+ok( row{status} > 0, "stored status code is numeric" );
+ok( row{success} == 0 or row{success} == 1, "stored success flag is boolean-like" );
+ok( row{body} ≢ null, "stored body is defined" );
+
+done_testing();

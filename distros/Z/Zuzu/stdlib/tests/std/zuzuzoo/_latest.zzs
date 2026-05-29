@@ -1,0 +1,106 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/io import Path;
+from std/zuzuzoo import Zuzuzoo, latest;
+
+class FakeRequest {
+	let req_method := "";
+	let req_url := "";
+
+	method get_method () {
+		return req_method;
+	}
+
+	method get_url () {
+		return req_url;
+	}
+}
+
+class FakeResponse {
+	let payload := null;
+	let response_url := "";
+
+	method expect_success () {
+		return self;
+	}
+
+	method json () {
+		return payload;
+	}
+
+	method url () {
+		return response_url;
+	}
+}
+
+class FakeUserAgent {
+	let requests := [];
+	let response := null;
+
+	method build_request ( verb, url ) {
+		let request := new FakeRequest( req_method: verb, req_url: url );
+		requests.push(request);
+		return request;
+	}
+
+	method send ( request ) {
+		return response;
+	}
+
+	method last_request () {
+		return requests[ requests.length() - 1 ];
+	}
+}
+
+let ua := new FakeUserAgent(
+	response: new FakeResponse(
+		response_url: "https://mirror.example/module/remote/app.json",
+		payload: {
+			name: "remote-app",
+			version: "1.2.3",
+			author: "Example",
+			license: "MIT",
+			status: "stable",
+		},
+	),
+);
+let opts := {
+	lib_dir: Path.tempdir().to_String(),
+	bin_dir: Path.tempdir().to_String(),
+	meta_dir: Path.tempdir().to_String(),
+	home: Path.tempdir().to_String(),
+	base_url: "https://packages.example/",
+	user_agent: ua,
+};
+
+let result := latest( "remote/app", opts );
+
+is( result{status}, "not-installed", "latest reports not-installed" );
+is( result{installed_version}, null, "installed version is null" );
+is( result{remote_version}, "1.2.3", "remote version is reported" );
+is( result{can_upgrade}, false, "not-installed is not an upgrade" );
+is(
+	ua.last_request().get_url(),
+	"https://packages.example/module/remote/app.json",
+	"latest uses stable module metadata endpoint",
+);
+is( ua.last_request().get_method(), "GET", "latest fetches with GET" );
+is(
+	result{remote_url},
+	"https://mirror.example/module/remote/app.json",
+	"response url is recorded",
+);
+
+let zoo := new Zuzuzoo(
+	lib_dir: opts{lib_dir},
+	bin_dir: opts{bin_dir},
+	meta_dir: opts{meta_dir},
+	home: opts{home},
+	base_url: opts{base_url},
+	user_agent: ua,
+);
+is( zoo.latest("remote/app"){remote_distribution}, "remote-app", "method latest works" );
+
+done_testing();

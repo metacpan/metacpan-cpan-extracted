@@ -1,0 +1,39 @@
+from test/more import *;
+
+requires_capability( "db" );
+requires_capability( "fs" );
+
+from std/db import DB;
+from std/io import Path;
+from std/string import split, trim;
+
+let dir := Path.tempdir();
+dir.child("one.txt").spew_utf8("alpha:1\n");
+dir.child("two.txt").spew_utf8("beta:2\n");
+dir.child("three.txt").spew_utf8("alpha:9\n");
+
+let dbh := DB.temp();
+dbh.prepare( "create table kv (k text primary key, v integer)" ).execute();
+let upsert := dbh.prepare(
+	"insert into kv (k, v) values (?, ?) "
+	_ "on conflict(k) do update set v = excluded.v",
+);
+
+let iter := dir.iterator();
+let path := iter.next();
+while ( path ≢ null ) {
+	let parts := split( trim( path.slurp_utf8() ), ":" );
+	upsert.execute( parts[0], int( parts[1] ) );
+	path := iter.next();
+}
+
+let q := dbh.prepare( "select k, v from kv order by k" );
+q.execute();
+let rows := q.all_dict();
+
+is( rows.length(), 2, "upsert collapses duplicate keys from directory input" );
+is( rows[0]{k}, "alpha", "alpha key exists after directory iteration" );
+is( rows[0]{v}, 9, "latest alpha value wins upsert" );
+is( rows[1]{v}, 2, "beta key preserved" );
+
+done_testing();

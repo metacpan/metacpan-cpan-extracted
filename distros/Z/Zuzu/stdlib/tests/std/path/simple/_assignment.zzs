@@ -1,0 +1,363 @@
+from std/path/simple import SimplePath;
+from test/more import *;
+
+let report := {
+	store: {
+		title: "Before",
+		books: [
+			{
+				author: "Ada",
+				role: "admin",
+				tags: [ "math", "logic" ],
+			},
+			{
+				author: "Bob",
+				role: "reader",
+				tags: [ "ops" ],
+			},
+			{
+				author: "Cara",
+				role: "reader",
+				tags: [ "docs", "qa" ],
+			},
+		],
+	},
+};
+
+is( report @ "/store/title", "Before", "outer scope still uses ZPath before SimplePath.use" );
+
+{
+	SimplePath.use();
+
+	let focused_title := report @ "store.title" := "After";
+	is( focused_title, "After", "@ assignment returns assigned value in SimplePath scope" );
+	is( report{store}{title}, "After", "@ assignment updates dict target in SimplePath scope" );
+
+	let focused_author := report @ "store.books[*].author" := "ALPHA";
+	is( focused_author, "ALPHA", "@ assignment through [*] returns assigned value" );
+	is( report{store}{books}[0]{author}, "ALPHA", "@ assignment updates first wildcard match" );
+	is( report{store}{books}[1]{author}, "Bob", "@ assignment leaves later wildcard matches untouched" );
+	is( report{store}{books}[2]{author}, "Cara", "@ assignment keeps final wildcard match unchanged" );
+
+	let nested_tag := report @ "store.books[2].tags[1]" := "testing";
+	is( nested_tag, "testing", "@ assignment reaches nested array index target" );
+	is( report{store}{books}[2]{tags}[1], "testing", "@ assignment mutates nested array index target" );
+
+	let bulk_roles := report @@ "store.books[*].role" := "member";
+	is( bulk_roles, "member", "@@ assignment returns assigned value in SimplePath scope" );
+	is( report{store}{books}[0]{role}, "member", "@@ assignment updates first role" );
+	is( report{store}{books}[1]{role}, "member", "@@ assignment updates second role" );
+	is( report{store}{books}[2]{role}, "member", "@@ assignment updates third role" );
+
+	let bulk_tag_heads := report @@ "store.books[*].tags[0]" := "core";
+	is( bulk_tag_heads, "core", "@@ assignment updates repeated nested array targets" );
+	is( report{store}{books}[0]{tags}[0], "core", "@@ assignment updates first nested array head" );
+	is( report{store}{books}[1]{tags}[0], "core", "@@ assignment updates second nested array head" );
+	is( report{store}{books}[2]{tags}[0], "core", "@@ assignment updates third nested array head" );
+
+	let bulk_miss := report @@ "store.books[99].role" := "ghost";
+	is( bulk_miss, "ghost", "@@ assignment with no matches still returns assigned value" );
+	is( report{store}{books}[0]{role}, "member", "@@ no-match leaves first role unchanged" );
+	is( report{store}{books}[1]{role}, "member", "@@ no-match leaves second role unchanged" );
+	is( report{store}{books}[2]{role}, "member", "@@ no-match leaves third role unchanged" );
+
+	let focused_miss := exception( function () {
+		report @ "store.books[99].role" := "ghost";
+	} );
+	isnt( focused_miss, null, "@ assignment throws when SimplePath selector has no matches" );
+	like( focused_miss{message}, /SimplePath assignment found no matches/, "@ no-match exception message is stable in SimplePath scope" );
+
+	function fresh_compound_report () {
+		return {
+			store: {
+				plus: 8,
+				minus: 8,
+				mul: 4,
+				div: 8,
+				pow: 2,
+				maybe: null,
+				text: "AB",
+				title: "Read 2026",
+				books: [
+					{
+						plus: 1,
+						minus: 5,
+						mul: 2,
+						div: 8,
+						pow: 2,
+						maybe: null,
+						text: "A",
+						name: "Ada 10",
+					},
+					{
+						plus: 2,
+						minus: 7,
+						mul: 3,
+						div: 12,
+						pow: 3,
+						maybe: null,
+						text: "B",
+						name: "Bob 20",
+					},
+				],
+			},
+		};
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is( sample @ "store.plus" += 2, 10, "SimplePath @ += returns new value" );
+		is( sample{store}{plus}, 10, "SimplePath @ += mutates focused target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is( sample @ "store.minus" -= 3, 5, "SimplePath @ -= returns new value" );
+		is( sample{store}{minus}, 5, "SimplePath @ -= mutates focused target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is( sample @ "store.mul" *= 3, 12, "SimplePath @ *= returns new value" );
+		is( sample{store}{mul}, 12, "SimplePath @ *= mutates focused target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is( sample @ "store.mul" ×= 3, 12, "SimplePath @ ×= returns new value" );
+		is( sample{store}{mul}, 12, "SimplePath @ ×= mutates focused target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is( sample @ "store.div" /= 2, 4, "SimplePath @ /= returns new value" );
+		is( sample{store}{div}, 4, "SimplePath @ /= mutates focused target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is( sample @ "store.div" ÷= 2, 4, "SimplePath @ ÷= returns new value" );
+		is( sample{store}{div}, 4, "SimplePath @ ÷= mutates focused target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is( sample @ "store.pow" **= 3, 8, "SimplePath @ **= returns new value" );
+		is( sample{store}{pow}, 8, "SimplePath @ **= mutates focused target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is( sample @ "store.text" _= "!", "AB!", "SimplePath @ _= returns new value" );
+		is( sample{store}{text}, "AB!", "SimplePath @ _= mutates focused target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is( sample @ "store.maybe" ?:= 9, 9, "SimplePath @ ?:= returns assigned value when target is null" );
+		is( sample{store}{maybe}, 9, "SimplePath @ ?:= mutates focused null target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is( sample @@ "store.books[*].plus" += 2, 2, "SimplePath @@ += returns RHS contract" );
+		is( sample{store}{books}[0]{plus}, 3, "SimplePath @@ += mutates first selected target" );
+		is( sample{store}{books}[1]{plus}, 4, "SimplePath @@ += mutates later selected target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is( sample @@ "store.books[*].minus" -= 2, 2, "SimplePath @@ -= returns RHS contract" );
+		is( sample{store}{books}[0]{minus}, 3, "SimplePath @@ -= mutates first selected target" );
+		is( sample{store}{books}[1]{minus}, 5, "SimplePath @@ -= mutates later selected target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is( sample @@ "store.books[*].mul" *= 2, 2, "SimplePath @@ *= returns RHS contract" );
+		is( sample{store}{books}[0]{mul}, 4, "SimplePath @@ *= mutates first selected target" );
+		is( sample{store}{books}[1]{mul}, 6, "SimplePath @@ *= mutates later selected target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is( sample @@ "store.books[*].mul" ×= 2, 2, "SimplePath @@ ×= returns RHS contract" );
+		is( sample{store}{books}[0]{mul}, 4, "SimplePath @@ ×= mutates first selected target" );
+		is( sample{store}{books}[1]{mul}, 6, "SimplePath @@ ×= mutates later selected target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is( sample @@ "store.books[*].div" /= 2, 2, "SimplePath @@ /= returns RHS contract" );
+		is( sample{store}{books}[0]{div}, 4, "SimplePath @@ /= mutates first selected target" );
+		is( sample{store}{books}[1]{div}, 6, "SimplePath @@ /= mutates later selected target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is( sample @@ "store.books[*].div" ÷= 2, 2, "SimplePath @@ ÷= returns RHS contract" );
+		is( sample{store}{books}[0]{div}, 4, "SimplePath @@ ÷= mutates first selected target" );
+		is( sample{store}{books}[1]{div}, 6, "SimplePath @@ ÷= mutates later selected target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is( sample @@ "store.books[*].pow" **= 2, 2, "SimplePath @@ **= returns RHS contract" );
+		is( sample{store}{books}[0]{pow}, 4, "SimplePath @@ **= mutates first selected target" );
+		is( sample{store}{books}[1]{pow}, 9, "SimplePath @@ **= mutates later selected target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is( sample @@ "store.books[*].text" _= "!", "!", "SimplePath @@ _= returns RHS contract" );
+		is( sample{store}{books}[0]{text}, "A!", "SimplePath @@ _= mutates first selected target" );
+		is( sample{store}{books}[1]{text}, "B!", "SimplePath @@ _= mutates later selected target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is( sample @@ "store.books[*].maybe" ?:= 7, 7, "SimplePath @@ ?:= returns RHS contract" );
+		is( sample{store}{books}[0]{maybe}, 7, "SimplePath @@ ?:= mutates first selected null target" );
+		is( sample{store}{books}[1]{maybe}, 7, "SimplePath @@ ?:= mutates later selected null target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		ok( sample @? "store.plus" += 2, "SimplePath @? += returns true on match" );
+		is( sample{store}{plus}, 10, "SimplePath @? += mutates matched target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		ok( sample @? "store.minus" -= 3, "SimplePath @? -= returns true on match" );
+		is( sample{store}{minus}, 5, "SimplePath @? -= mutates matched target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		ok( sample @? "store.mul" *= 3, "SimplePath @? *= returns true on match" );
+		is( sample{store}{mul}, 12, "SimplePath @? *= mutates matched target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		ok( sample @? "store.mul" ×= 3, "SimplePath @? ×= returns true on match" );
+		is( sample{store}{mul}, 12, "SimplePath @? ×= mutates matched target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		ok( sample @? "store.div" /= 2, "SimplePath @? /= returns true on match" );
+		is( sample{store}{div}, 4, "SimplePath @? /= mutates matched target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		ok( sample @? "store.div" ÷= 2, "SimplePath @? ÷= returns true on match" );
+		is( sample{store}{div}, 4, "SimplePath @? ÷= mutates matched target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		ok( sample @? "store.pow" **= 3, "SimplePath @? **= returns true on match" );
+		is( sample{store}{pow}, 8, "SimplePath @? **= mutates matched target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		ok( sample @? "store.text" _= "!", "SimplePath @? _= returns true on match" );
+		is( sample{store}{text}, "AB!", "SimplePath @? _= mutates matched target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		ok( sample @? "store.maybe" ?:= 9, "SimplePath @? ?:= returns true on match" );
+		is( sample{store}{maybe}, 9, "SimplePath @? ?:= mutates matched target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is(
+			sample @ "store.title" ~= /([A-Za-z]+) ([0-9]+)/ -> `${m[1]}:${m[2]}`,
+			"Read:2026",
+			"SimplePath @ ~= supports captures",
+		);
+		is( sample{store}{title}, "Read:2026", "SimplePath @ ~= mutates focused target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is(
+			sample @@ "store.books[*].name" ~= /([A-Za-z]+) ([0-9]+)/ -> do {
+				let who := m[1];
+				let digits := m[2];
+				who _ ":" _ digits;
+			},
+			"Bob:20",
+			"SimplePath @@ ~= returns last replaced value",
+		);
+		is( sample{store}{books}[0]{name}, "Ada:10", "SimplePath @@ ~= mutates first selected target" );
+		is( sample{store}{books}[1]{name}, "Bob:20", "SimplePath @@ ~= mutates later selected target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		ok(
+			sample @? "store.title" ~= /([A-Za-z]+) ([0-9]+)/ -> `${m[1]}:${m[2]}`,
+			"SimplePath @? ~= returns true on match",
+		);
+		is( sample{store}{title}, "Read:2026", "SimplePath @? ~= mutates matched target" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		let miss := exception( function () {
+			sample @ "store.missing" += 2;
+		} );
+		isnt( miss, null, "SimplePath @ += throws on selector miss" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is( sample @@ "store.missing" += 2, 2, "SimplePath @@ += no-match still returns RHS" );
+		is( sample{store}{plus}, 8, "SimplePath @@ += no-match leaves structure unchanged" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is(
+			sample @? "store.missing" += 2,
+			false,
+			"SimplePath @? += returns false on selector miss",
+		);
+		is( sample{store}{plus}, 8, "SimplePath @? += no-match leaves structure unchanged" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		let miss := exception( function () {
+			sample @ "store.missing" ~= /x/ -> "y";
+		} );
+		isnt( miss, null, "SimplePath @ ~= throws on selector miss" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		sample @@ "store.missing" ~= /x/ -> "y";
+		is( sample{store}{title}, "Read 2026", "SimplePath @@ ~= no-match leaves structure unchanged" );
+	}
+
+	{
+		let sample := fresh_compound_report();
+		is(
+			sample @? "store.missing" ~= /x/ -> "y",
+			false,
+			"SimplePath @? ~= returns false on selector miss",
+		);
+		is( sample{store}{title}, "Read 2026", "SimplePath @? ~= no-match leaves structure unchanged" );
+	}
+}
+
+is( report @ "/store/title", "After", "outer scope falls back to ZPath after SimplePath block" );
+
+done_testing();

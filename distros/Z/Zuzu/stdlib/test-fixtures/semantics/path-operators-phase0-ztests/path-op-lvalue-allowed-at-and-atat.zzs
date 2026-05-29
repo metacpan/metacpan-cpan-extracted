@@ -1,0 +1,4 @@
+// Phase-0 design fixture placeholder for path operators.
+// Case: path-op-lvalue-allowed-at-and-atat
+plan(1);
+ok(1, "phase0 placeholder: path-op-lvalue-allowed-at-and-atat");

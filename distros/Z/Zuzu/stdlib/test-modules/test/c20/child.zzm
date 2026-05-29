@@ -1,0 +1,6 @@
+from test/c20/parent import ParentRecord;
+from test/c20/traits import NamedRecord;
+
+class ChildRecord extends ParentRecord with NamedRecord {
+	let String name with get, set;
+}

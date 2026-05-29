@@ -1,0 +1,14 @@
+from test/more import *;
+
+class Animal {
+	let name;
+
+	method get_name () {
+		return name;
+	}
+}
+
+let dog := new Animal( name: "Bluey" );
+is( dog.get_name(), "Bluey", "class fields and methods work" );
+is( dog instanceof Animal, 1, "new constructs class instances" );
+done_testing();

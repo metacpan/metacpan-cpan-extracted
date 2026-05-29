@@ -1,0 +1,124 @@
+from std/data/kdl import KDL, KDLDocument, KDLNode, KDLValue;
+from std/data/kdl/xml import kdl_to_xml, xml_to_kdl;
+from std/data/xml import XML;
+from test/more import *;
+
+let kdl := new KDL();
+
+let link_kdl := kdl.decode( """a href="http://example.com" "here's a link"
+""" );
+let link_xml := kdl_to_xml(link_kdl);
+let link_root := link_xml.documentElement();
+is( link_root.nodeName(), "a", "kdl_to_xml creates element" );
+is(
+	link_root.getAttribute("href"),
+	"http://example.com",
+	"kdl_to_xml creates attributes",
+);
+is(
+	link_root.textContent(),
+	"here's a link",
+	"kdl_to_xml creates text argument",
+);
+
+let mixed_kdl := kdl.decode( """span {
+	- "some "
+	b "bold"
+	- " text"
+}
+""" );
+let mixed_xml := kdl_to_xml(mixed_kdl);
+is(
+	mixed_xml.documentElement().childNodes().length(),
+	3,
+	"mixed text creates sibling nodes",
+);
+is(
+	mixed_xml.documentElement().textContent(),
+	"some bold text",
+	"mixed text content is preserved",
+);
+
+let comment_kdl := kdl.decode( """root {
+	! " comment! "
+}
+""" );
+let comment_xml := kdl_to_xml(comment_kdl);
+is(
+	comment_xml.findnodes("/root/comment()").length(),
+	1,
+	"comment node becomes XML comment",
+);
+
+let xml_doc := XML.parse(
+	"""<root id="r"><item enabled="yes">alpha</item><empty/></root>"""
+);
+let roundtrip_kdl := xml_to_kdl(xml_doc);
+is( roundtrip_kdl.nodes().length(), 1, "xml_to_kdl returns document" );
+is(
+	roundtrip_kdl.nodes()[0].name(),
+	"root",
+	"xml_to_kdl preserves element name",
+);
+is(
+	roundtrip_kdl.nodes()[0].props().get("id").native_value(),
+	"r",
+	"xml_to_kdl preserves attributes",
+);
+is(
+	roundtrip_kdl.nodes()[0].children().length(),
+	2,
+	"xml_to_kdl preserves element children",
+);
+is(
+	roundtrip_kdl.nodes()[0].children()[0].args()[0].native_value(),
+	"alpha",
+	"xml_to_kdl uses final string argument for text-only elements",
+);
+
+let mixed_roundtrip := xml_to_kdl(
+	XML.parse( """<span>some <b>bold</b> text</span>""" ),
+);
+is(
+	mixed_roundtrip.nodes()[0].children().map( fn n -> n.name() ),
+	[ "-", "b", "-" ],
+	"xml_to_kdl uses dash nodes for mixed text",
+);
+is(
+	mixed_roundtrip.nodes()[0].children()[1].args()[0].native_value(),
+	"bold",
+	"xml_to_kdl preserves mixed child text",
+);
+
+like(
+	exception( function () {
+		kdl_to_xml( kdl.decode( """span "bad" {
+	b "mix"
+}
+""" ) );
+	} ),
+	/cannot mix text argument and children/,
+	"kdl_to_xml rejects invalid mixed text encoding",
+);
+
+let built_props := new PairList();
+built_props.add( "lang", new KDLValue( type: "string", value: "en" ) );
+let built := new KDLDocument( nodes: [
+	new KDLNode(
+		name: "root",
+		props: built_props,
+		children: [
+			new KDLNode(
+				name: "-",
+				args: [ new KDLValue( type: "string", value: "hello" ) ],
+			),
+		],
+	),
+] );
+is(
+	kdl_to_xml(built).documentElement().textContent(),
+	"hello",
+	"kdl_to_xml accepts constructed KDLDocument objects",
+);
+
+done_testing();

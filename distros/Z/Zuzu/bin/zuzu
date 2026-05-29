@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+
+if [ "${ZUZU+x}" = x ] && [ -n "$ZUZU" ]; then
+  export ZUZU
+  exec "$ZUZU" "$@"
+fi
+
+for ZUZU in zuzu-rust zuzu.pl zuzu-js; do
+  if command -v "$ZUZU" >/dev/null 2>&1; then
+    export ZUZU
+    exec "$ZUZU" "$@"
+  fi
+done
+
+echo "zuzu: no ZuzuScript implementation found in PATH" >&2
+exit 127

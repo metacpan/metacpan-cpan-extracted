@@ -1,0 +1,3960 @@
+=encoding utf8
+
+=head1 NAME
+
+std/zuzuzoo - Plan and install Zuzu distributions.
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Node and
+Electron. It is not supported by zuzu-js in the browser.
+
+=head1 DESCRIPTION
+
+C<std/zuzuzoo> provides the package-management engine used by the
+command-line C<zuzuzoo> tool. It supports installed distribution
+metadata queries, source archive inspection, dependency-aware install
+planning, distribution test execution, file installation, planned
+target-root removal execution, installed metadata writing, standalone
+safe removal planning and execution, installed-file verification,
+latest-version checks, upgrade checks, and canonical pretty JSON
+formatting.
+
+The command-line C<zuzuzoo> wrapper delegates package behaviour to this
+module and handles argument parsing, user prompts, output formatting,
+JSON output selection, and exit-code translation.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item C<< compare_versions(left, right) >>
+
+Parameters: C<left> and C<right> are version strings. Returns:
+C<Number>. Compares two versions, returning a negative, zero, or
+positive value.
+
+=item C<< list_installed(options?) >>, C<< query(module_name, options?) >>, C<< query_distribution(distribution_name, options?) >>
+
+Parameters: names identify installed modules or distributions and
+C<options> controls roots and output. Returns: value. Reads installed
+distribution metadata.
+
+=item C<< is_installed(module_name, min_version?, options?) >>, C<< installed_version(module_name, options?) >>
+
+Parameters: C<module_name> identifies a module, C<min_version> is
+optional, and C<options> controls roots. Returns: C<Boolean> or
+C<String>/C<null>. Checks installed module state.
+
+=item C<< pretty_json(value, options?) >>, C<< format_json(value, options?) >>
+
+Parameters: C<value> is JSON-encodable data and C<options> controls
+formatting. Returns: C<String>. Formats canonical JSON output.
+
+=item C<< fetch_source(target, options?) >>, C<< load_distribution(target, options?) >>
+
+Parameters: C<target> identifies a source archive or distribution and
+C<options> controls fetch/load behaviour. Returns: value. Fetches or
+loads distribution metadata.
+
+=item C<< dependency_roots(options?) >>, C<< find_dependency(module_name, min_version?, options?) >>
+
+Parameters: C<options> controls search roots and C<module_name> names a
+dependency. Returns: value. Locates dependency sources.
+
+=item C<< plan_install(targets, options?) >>, C<< plan_remove(targets, options?) >>
+
+Parameters: C<targets> is an array of requested modules or
+distributions. Returns: C<Dict>. Builds an install or removal plan.
+
+=item C<< verify(targets, options?) >>, C<< latest(module_name, options?) >>, C<< can_upgrade(module_name, options?) >>
+
+Parameters: C<targets> or C<module_name> identify installed or remote
+items. Returns: value. Verifies installation state or checks available
+versions.
+
+=item C<< install(targets, options?) >>, C<< remove(targets, options?) >>
+
+Parameters: C<targets> is an array of modules or distributions. Returns:
+C<Dict>. Executes installation or removal.
+
+=item C<< run_distribution_tests(install_action, options?) >>, C<< execute_removal(removal_action, options?) >>
+
+Parameters: action dictionaries come from plans and C<options> controls
+execution. Returns: C<Dict>. Runs tests or executes one removal action.
+
+=item C<< format_install_plan(plan, options?) >>, C<< format_remove_plan(plan, options?) >>
+
+Parameters: C<plan> is a plan dictionary. Returns: C<String>. Formats a
+plan for display.
+
+=back
+
+=head2 Classes
+
+=over
+
+=item C<ZuzuzooLock>
+
+Filesystem lock object.
+
+=over
+
+=item C<< lock.release() >>
+
+Parameters: none. Returns: C<null>. Releases the lock.
+
+=back
+
+=item C<Zuzuzoo>
+
+Stateful package-management helper. Its methods correspond to the
+module-level functions and take the same parameters, without the final
+C<options> argument where object configuration already supplies defaults.
+
+=over
+
+=item C<< zoo.config() >>
+
+Parameters: none. Returns: C<Dict>. Returns the effective configuration.
+
+=item C<< zoo.acquire_lock(operation, options?) >>
+
+Parameters: C<operation> names the operation and C<options> controls
+locking. Returns: C<ZuzuzooLock>. Acquires an operation lock.
+
+=item C<< zoo.find_installed_module(module_name, options?) >>
+
+Parameters: C<module_name> identifies a module and C<options> controls
+roots. Returns: C<Dict> or C<null>. Finds installed metadata for a
+module.
+
+=item C<< zoo.find_installed_distribution(distribution_name, options?) >>
+
+Parameters: C<distribution_name> identifies a distribution and
+C<options> controls roots. Returns: C<Dict> or C<null>. Finds installed
+metadata for a distribution.
+
+=back
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/zuzuzoo >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/data/json import JSON;
+from std/archive import Archive;
+from std/digest/sha import sha256_hex;
+from std/io import Path, STDERR, STDOUT;
+from std/net/http import UserAgent;
+from std/proc import Env, Proc, sleep;
+from std/string import contains, ends_with, join, split, starts_with, substr;
+from std/time import Time;
+from test/parser import parse as parse_tap;
+
+
+function _opt ( options, key, fallback := null ) {
+	if ( options instanceof Dict and options.exists(key) ) {
+		return options.get(key);
+	}
+	return fallback;
+}
+
+function _progress ( options, message ) {
+	if ( _opt( options, "progress", false ) ) {
+		STDERR.say( "zuzuzoo: " _ message );
+	}
+	return true;
+}
+
+function _response_success ( response ) {
+	return response.success() if response can "success";
+	return true;
+}
+
+function _response_status_text ( response ) {
+	let status := ( response can "status" ) ? response.status() : "?";
+	let reason := ( response can "reason" ) ? response.reason() : "";
+	return "" _ status _ " " _ reason;
+}
+
+function _archive_url_from_latest ( latest_info ) {
+	let metadata := latest_info{remote_metadata};
+	if (
+		( metadata instanceof Dict or metadata instanceof PairList ) and
+		metadata.exists("archive_url")
+	) {
+		return metadata{archive_url};
+	}
+
+	let remote_url := latest_info{remote_url};
+	if ( ends_with( remote_url, ".json" ) ) {
+		return substr( remote_url, 0, length remote_url - 5 ) _ ".tar.gz";
+	}
+
+	die(
+		"Latest metadata URL does not identify a source archive " _
+		"(remote_url=" _ remote_url _ ")"
+	);
+}
+
+function _push_unique_string ( items, seen, value ) {
+	let key := "" _ value;
+	return false if key eq "";
+	return false if seen.exists(key);
+	seen.add( key, true );
+	items.push(key);
+	return true;
+}
+
+function _copy_options_with ( options, key, value ) {
+	let out := {};
+	if ( options instanceof Dict ) {
+		for ( let existing_key in options.keys() ) {
+			out.set( existing_key, options.get(existing_key) );
+		}
+	}
+	out.set( key, value );
+	return out;
+}
+
+function _is_windows_platform () {
+	if ( "platform" in __system__ ) {
+		let platform := lc( "" _ __system__.get("platform") );
+		return platform eq "windows" or platform eq "mswin32";
+	}
+	return false;
+}
+
+function _join_dir ( String base, String child, Boolean windows ) {
+	let sep := windows ? "\\": "/";
+	return base _ sep _ child;
+}
+
+function _require_text ( obj, String key, String where ) {
+	if ( not( obj instanceof Dict ) or not obj.exists(key) ) {
+		die `Invalid installed metadata ${where}: missing ${key}`;
+	}
+	let value := obj.get(key);
+	if ( not( value instanceof String ) or value eq "" ) {
+		die `Invalid metadata ${where}: ${key} must be a string`;
+	}
+	return value;
+}
+
+function _require_object ( obj, String key, String where ) {
+	if ( not( obj instanceof Dict ) or not obj.exists(key) ) {
+		die `Invalid installed metadata ${where}: missing ${key}`;
+	}
+	let value := obj.get(key);
+	if ( not( value instanceof Dict ) ) {
+		die `Invalid metadata ${where}: ${key} must be an object`;
+	}
+	return value;
+}
+
+function _require_array ( obj, String key, String where ) {
+	if ( not( obj instanceof Dict ) or not obj.exists(key) ) {
+		die `Invalid installed metadata ${where}: missing ${key}`;
+	}
+	let value := obj.get(key);
+	if ( not( value instanceof Array ) ) {
+		die `Invalid metadata ${where}: ${key} must be an array`;
+	}
+	return value;
+}
+
+function _source_require_text ( obj, String key, String where ) {
+	if ( not( obj instanceof Dict ) and not( obj instanceof PairList ) ) {
+		die `Invalid source metadata ${where}: root must be an object`;
+	}
+	if ( not obj.exists(key) ) {
+		die `Invalid source metadata ${where}: missing ${key}`;
+	}
+	let value := obj.get(key);
+	if ( not( value instanceof String ) or value eq "" ) {
+		die `Invalid source metadata ${where}: ${key} must be a string`;
+	}
+	return value;
+}
+
+function _validate_dependency_pair ( key, value, String where ) {
+	if ( not( key instanceof String ) or key eq "" ) {
+		die `Invalid source metadata ${where}: bad dependency name`;
+	}
+	if ( not( value instanceof String ) or value eq "" ) {
+		die `Invalid source metadata ${where}: bad dependency version`;
+	}
+	return true;
+}
+
+function _validate_dependencies ( meta, String where ) {
+	if ( not meta.exists("dependencies") ) {
+		return true;
+	}
+	let deps := meta.get("dependencies");
+	if ( not( deps instanceof Dict ) ) {
+		die `Invalid metadata ${where}: dependencies must be an object`;
+	}
+	for ( let key in deps.keys() ) {
+		if ( not( key instanceof String ) or key eq "" ) {
+			die `Invalid metadata ${where}: bad dependency name`;
+		}
+		let value := deps.get(key);
+		if ( not( value instanceof String ) or value eq "" ) {
+			die `Invalid metadata ${where}: bad dependency version`;
+		}
+	}
+	return true;
+}
+
+function _validate_source_dependencies ( meta, String where ) {
+	if ( not meta.exists("dependencies") ) {
+		return true;
+	}
+	let deps := meta.get("dependencies");
+	if ( deps instanceof Dict ) {
+		for ( let key in deps.keys() ) {
+			_validate_dependency_pair( key, deps.get(key), where );
+		}
+		return true;
+	}
+	if ( deps instanceof PairList ) {
+		let keys := deps.keys();
+		let values := deps.values();
+		let i := 0;
+		while ( i < keys.length() ) {
+			_validate_dependency_pair( keys[i], values[i], where );
+			i++;
+		}
+		return true;
+	}
+	die `Invalid source metadata ${where}: dependencies must be an object`;
+}
+
+function _validate_source_metadata ( meta, String metadata_file ) {
+	if ( not( meta instanceof Dict ) and not( meta instanceof PairList ) ) {
+		die `Invalid source metadata ${metadata_file}: root must be an object`;
+	}
+	if ( meta.exists("installed") ) {
+		die `Invalid source metadata ${metadata_file}: installed is not allowed`;
+	}
+	if ( meta.exists("modules") or meta.exists("scripts") ) {
+		die(
+			`Invalid source metadata ${metadata_file}: top-level ` _
+			"modules/scripts are not allowed"
+		);
+	}
+
+	_source_require_text( meta, "name", metadata_file );
+	_source_require_text( meta, "version", metadata_file );
+	_source_require_text( meta, "author", metadata_file );
+	_source_require_text( meta, "license", metadata_file );
+
+	if ( meta.exists("status") ) {
+		let status := _source_require_text( meta, "status", metadata_file );
+		if ( status ne "stable" and status ne "trial" ) {
+			die `Invalid source metadata ${metadata_file}: bad status ${status}`;
+		}
+	}
+	_validate_source_dependencies( meta, metadata_file );
+
+	if ( meta instanceof Dict ) {
+		meta.set( "metadata_file", metadata_file );
+	}
+	else {
+		meta.add( "metadata_file", metadata_file );
+	}
+	return meta;
+}
+
+function _validate_entry ( entry, String kind, String where ) {
+	if ( not( entry instanceof Dict ) ) {
+		die `Invalid metadata ${where}: bad ${kind} entry`;
+	}
+	_require_text( entry, "source", where );
+	_require_text( entry, "install_as", where );
+	_require_text( entry, "sha256", where );
+	if ( kind eq "script" and entry.exists("wrappers") ) {
+		let wrappers := entry.get("wrappers");
+		if ( not( wrappers instanceof Array ) ) {
+			die `Invalid metadata ${where}: bad script wrappers`;
+		}
+		for ( let wrapper in wrappers ) {
+			if ( not( wrapper instanceof String ) or wrapper eq "" ) {
+				die `Invalid metadata ${where}: bad wrapper`;
+			}
+		}
+	}
+	return true;
+}
+
+function _validate_installed_metadata ( meta, String metadata_file ) {
+	if ( not( meta instanceof Dict ) ) {
+		die `Invalid metadata ${metadata_file}: root must be an object`;
+	}
+	if ( meta.exists("modules") or meta.exists("scripts") ) {
+		die(
+			`Invalid metadata ${metadata_file}: top-level ` _
+			"modules/scripts are not allowed"
+		);
+	}
+
+	_require_text( meta, "name", metadata_file );
+	_require_text( meta, "version", metadata_file );
+	_require_text( meta, "author", metadata_file );
+	_require_text( meta, "license", metadata_file );
+	let status := _require_text( meta, "status", metadata_file );
+	if ( status ne "stable" and status ne "trial" ) {
+		die `Invalid metadata ${metadata_file}: bad status ${status}`;
+	}
+	_validate_dependencies( meta, metadata_file );
+
+	let installed := _require_object( meta, "installed", metadata_file );
+	let zdf := _require_text( installed, "zdf", metadata_file );
+	if ( zdf ne "ZDF-1" ) {
+		die `Invalid metadata ${metadata_file}: bad installed.zdf`;
+	}
+	_require_text( installed, "lib_dir", metadata_file );
+	_require_text( installed, "bin_dir", metadata_file );
+	_require_text( installed, "meta_dir", metadata_file );
+
+	let modules := _require_array( installed, "modules", metadata_file );
+	let scripts := _require_array( installed, "scripts", metadata_file );
+	if ( modules.length() + scripts.length() = 0 ) {
+		die `Invalid metadata ${metadata_file}: no installed files`;
+	}
+
+	for ( let module in modules ) {
+		_validate_entry( module, "module", metadata_file );
+	}
+	for ( let script in scripts ) {
+		_validate_entry( script, "script", metadata_file );
+	}
+
+	meta.set( "metadata_file", metadata_file );
+	return meta;
+}
+
+function _parse_version ( version ) {
+	let text := "" _ version;
+	let nums := [];
+	let i := 0;
+	let n := length text;
+
+	while ( i < n and substr( text, i, 1 ) ~ /^[0-9]$/ ) {
+		let start := i;
+		while ( i < n and substr( text, i, 1 ) ~ /^[0-9]$/ ) {
+			i++;
+		}
+		nums.push( int( substr( text, start, i - start ) ) );
+
+		if (
+			i < n - 1 and
+			substr( text, i, 1 ) eq "." and
+			substr( text, i + 1, 1 ) ~ /^[0-9]$/
+		) {
+			i++;
+			next;
+		}
+		last;
+	}
+
+	return {
+		nums: nums,
+		suffix: substr( text, i ),
+	};
+}
+
+function compare_versions ( left, right ) {
+	let a := _parse_version(left);
+	let b := _parse_version(right);
+	let max := a{nums}.length() > b{nums}.length()
+		? a{nums}.length()
+		: b{nums}.length();
+
+	let i := 0;
+	while ( i < max ) {
+		let av := i < a{nums}.length() ? a{nums}[i]: 0;
+		let bv := i < b{nums}.length() ? b{nums}[i]: 0;
+		return av <=> bv if av != bv;
+		i++;
+	}
+
+	if ( a{suffix} eq "" and b{suffix} ne "" ) {
+		return 1;
+	}
+	if ( a{suffix} ne "" and b{suffix} eq "" ) {
+		return -1;
+	}
+	return a{suffix} cmp b{suffix};
+}
+
+function _module_key ( module_name ) {
+	let text := "" _ module_name;
+	if ( ends_with( text, ".zzm" ) ) {
+		return substr( text, 0, length text - 4 );
+	}
+	return text;
+}
+
+function _is_url ( String target ) {
+	return (
+		starts_with( target, "http://" ) or
+		starts_with( target, "https://" )
+	);
+}
+
+function _trim_right_slash ( String text ) {
+	let out := text;
+	while ( length out > 0 and substr( out, length out - 1, 1 ) eq "/" ) {
+		out := substr( out, 0, length out - 1 );
+	}
+	return out;
+}
+
+function _safe_archive_root ( archive, String where ) {
+	if ( not( archive instanceof Dict ) or not( archive.get("entries") instanceof Array ) ) {
+		die `Invalid archive ${where}: entries must be an array`;
+	}
+
+	let seen := {};
+	let root := null;
+	for ( let entry in archive{entries} ) {
+		if ( not( entry instanceof Dict ) or not( entry.get("path") instanceof String ) ) {
+			die `Invalid archive ${where}: bad entry path`;
+		}
+		let path := entry{path};
+		if ( path eq "" ) {
+			die `Invalid archive ${where}: empty path`;
+		}
+		if ( starts_with( path, "/" ) or contains( path, "\\" ) ) {
+			die `Invalid archive ${where}: unsafe path ${path}`;
+		}
+		if ( seen.exists(path) ) {
+			die `Invalid archive ${where}: duplicate path ${path}`;
+		}
+		seen.add( path, true );
+
+		let parts := split( path, "/" );
+		if ( parts.length() == 0 or parts[0] eq "" ) {
+			die `Invalid archive ${where}: empty path component`;
+		}
+		for ( let part in parts ) {
+			if ( part eq "" or part eq "." or part eq ".." ) {
+				die `Invalid archive ${where}: unsafe path ${path}`;
+			}
+		}
+		if ( root instanceof Null ) {
+			root := parts[0];
+		}
+		else if ( root ne parts[0] ) {
+			die `Invalid archive ${where}: multiple top-level roots`;
+		}
+	}
+
+	die `Invalid archive ${where}: no entries` if root instanceof Null;
+	return root;
+}
+
+function _ensure_dir ( path ) {
+	return true if path.exists();
+	let parent := path.parent();
+	_ensure_dir(parent) if not parent.exists();
+	path.mkdir();
+	return true;
+}
+
+function _mkdir_parent ( path ) {
+	_ensure_dir( path.parent() );
+	return true;
+}
+
+function _extract_archive ( archive, String root_name, root_dir ) {
+	for ( let entry in archive{entries} ) {
+		let parts := split( entry{path}, "/" );
+		let out := root_dir;
+		let i := 1;
+		while ( i < parts.length() ) {
+			out := out.child(parts[i]);
+			i++;
+		}
+		_mkdir_parent(out);
+		out.spew(entry{data});
+	}
+	return true;
+}
+
+function _relative_path ( root, path ) {
+	let prefix := root.to_String() _ "/";
+	let text := path.to_String();
+	if ( starts_with( text, prefix ) ) {
+		return substr( text, length prefix );
+	}
+	return path.basename();
+}
+
+function _discover_files ( root, dir_name, extension ) {
+	let base := root.child(dir_name);
+	return [] if not base.exists();
+	return [] if not base.is_dir();
+
+	let found := [];
+	function walk ( path ) {
+		for ( let child in path.children() ) {
+			if ( child.is_dir() ) {
+				walk(child);
+			}
+			else if ( child.is_file() and ends_with( child.basename(), extension ) ) {
+				found.push( _relative_path( root, child ) );
+			}
+		}
+	}
+	walk(base);
+	return found.sort( fn ( a, b ) -> a cmp b );
+}
+
+function _has_extension ( String basename ) {
+	return contains( basename, "." );
+}
+
+function _has_zuzu_shebang ( path ) {
+	let text := "";
+	try {
+		text := path.slurp_utf8();
+	}
+	catch {
+		return false;
+	}
+
+	let lines := split( text, "\n" );
+	let first_line := lines.length() == 0 ? "" : lines[0];
+	return starts_with( first_line, "#!" ) and contains( first_line, "zuzu" );
+}
+
+function _discover_scripts ( root ) {
+	let base := root.child("scripts");
+	return [] if not base.exists();
+	return [] if not base.is_dir();
+
+	let found := [];
+	function walk ( path ) {
+		for ( let child in path.children() ) {
+			if ( child.is_dir() ) {
+				walk(child);
+			}
+			else if ( child.is_file() ) {
+				let basename := child.basename();
+				if (
+					ends_with( basename, ".zzs" ) or
+					(
+						not _has_extension(basename) and
+						_has_zuzu_shebang(child)
+					)
+				) {
+					found.push( _relative_path( root, child ) );
+				}
+			}
+		}
+	}
+	walk(base);
+	return found.sort( fn ( a, b ) -> a cmp b );
+}
+
+function _module_install_name ( String source ) {
+	return substr( source, length "modules/" );
+}
+
+function _script_install_name ( String source ) {
+	return substr( source, length "scripts/" );
+}
+
+function _target_list ( targets ) {
+	return targets instanceof Array ? targets : [ targets ];
+}
+
+function _root_key ( root ) {
+	return (
+		root{lib_dir} _ "\n" _
+		root{bin_dir} _ "\n" _
+		root{meta_dir}
+	);
+}
+
+function _root_from_config ( String name, String kind, cfg ) {
+	return {
+		name: name,
+		kind: kind,
+		lib_dir: cfg{lib_dir},
+		bin_dir: cfg{bin_dir},
+		meta_dir: cfg{meta_dir},
+		global: cfg{global},
+		windows: cfg{windows},
+	};
+}
+
+function _require_root_text ( root, String key, String where ) {
+	if ( not( root instanceof Dict ) or not root.exists(key) ) {
+		die `Invalid dependency root ${where}: missing ${key}`;
+	}
+	let value := root.get(key);
+	if ( not( value instanceof String ) or value eq "" ) {
+		die `Invalid dependency root ${where}: ${key} must be a string`;
+	}
+	return value;
+}
+
+function _custom_root ( root, String where ) {
+	return {
+		name: _require_root_text( root, "name", where ),
+		kind: "custom",
+		lib_dir: _require_root_text( root, "lib_dir", where ),
+		bin_dir: _require_root_text( root, "bin_dir", where ),
+		meta_dir: _require_root_text( root, "meta_dir", where ),
+		global: root.exists("global") ? root{global} : false,
+		windows: root.exists("windows") ? root{windows} : false,
+	};
+}
+
+function _root_override ( root, String name, String kind, String where ) {
+	return {
+		name: name,
+		kind: kind,
+		lib_dir: _require_root_text( root, "lib_dir", where ),
+		bin_dir: _require_root_text( root, "bin_dir", where ),
+		meta_dir: _require_root_text( root, "meta_dir", where ),
+		global: root.exists("global") ? root{global} : false,
+		windows: root.exists("windows") ? root{windows} : false,
+	};
+}
+
+function _add_root ( roots, seen, root ) {
+	let key := _root_key(root);
+	return false if seen.exists(key);
+	seen.add( key, true );
+	roots.push(root);
+	return true;
+}
+
+function _path_join ( String base, String child, Boolean windows ) {
+	let sep := windows ? "\\": "/";
+	return base _ sep _ child;
+}
+
+function _path_child ( String base, String relative ) {
+	let out := new Path(base);
+	for ( let part in split( relative, "/" ) ) {
+		out := out.child(part) if part ne "";
+	}
+	return out;
+}
+
+function _relative_basename ( String relative ) {
+	let parts := split( relative, "/" );
+	return parts[ parts.length() - 1 ];
+}
+
+function _replace_script_suffix ( String relative, String suffix ) {
+	if ( ends_with( relative, ".zzs" ) ) {
+		return substr( relative, 0, length relative - 4 ) _ suffix;
+	}
+	return relative _ suffix;
+}
+
+function _installed_at () {
+	return ( new Time() ).strftime("%Y-%m-%dT%H:%M:%SZ");
+}
+
+function _now_epoch () {
+	return ( new Time() ).epoch();
+}
+
+function _temp_parent ( options? ) {
+	let temp_root := _opt( options, "temp_root", null );
+	if ( temp_root instanceof Null ) {
+		return null;
+	}
+	let root := new Path(temp_root);
+	_ensure_dir(root);
+	return root;
+}
+
+function _unique_temp_path ( parent, String prefix, String suffix ) {
+	let base := prefix _ Proc.pid() _ "-" _ _now_epoch();
+	let i := 0;
+	while ( true ) {
+		let candidate := parent.child( base _ "-" _ i _ suffix );
+		return candidate if not candidate.exists();
+		i++;
+	}
+}
+
+function _new_temp_dir ( options?, String prefix := "zuzuzoo-" ) {
+	let parent := _temp_parent(options);
+	if ( parent instanceof Null ) {
+		return Path.tempdir();
+	}
+
+	let i := 0;
+	while ( true ) {
+		let candidate := _unique_temp_path(
+			parent,
+			prefix,
+			".d",
+		);
+		if ( candidate.mkdir_exclusive() ) {
+			return candidate;
+		}
+		i++;
+		die `Could not allocate temporary directory in ${parent}`
+			if i > 1000;
+	}
+}
+
+function _cleanup_path ( path ) {
+	return false if path instanceof Null;
+	try {
+		if ( path.exists() ) {
+			if ( path.is_dir() ) {
+				path.remove_tree();
+			}
+			else {
+				path.remove();
+			}
+			return true;
+		}
+	}
+	catch ( Exception e ) {
+		return false;
+	}
+	return false;
+}
+
+function _cleanup_source ( source, options? ) {
+	return false if source instanceof Null;
+	return false if _opt( options, "keep_work_dirs", false );
+	if ( source.exists("temp_dir") ) {
+		return _cleanup_path(source{temp_dir});
+	}
+	return false;
+}
+
+function _cleanup_install_action ( install_action, options? ) {
+	return false if _opt( options, "keep_work_dirs", false );
+	_cleanup_source( install_action{source}, options )
+		if install_action.exists("source");
+	_cleanup_path( install_action{work_dir_obj} )
+		if install_action.exists("work_dir_obj");
+	return true;
+}
+
+function _cleanup_plan_work_dirs ( plan, options? ) {
+	return false if plan instanceof Null;
+	return false if _opt( options, "keep_work_dirs", false );
+	for ( let install_action in plan.get( "installs", [] ) ) {
+		_cleanup_install_action( install_action, options );
+	}
+	return true;
+}
+
+function _cleanup_loaded_work_dirs ( loaded, options? ) {
+	return false if _opt( options, "keep_work_dirs", false );
+	for ( let item in loaded ) {
+		_cleanup_install_action( item, options );
+	}
+	return true;
+}
+
+function _atomic_temp_sibling ( path, String suffix := ".tmp" ) {
+	return _unique_temp_path(
+		path.parent(),
+		"." _ path.basename() _ ".",
+		suffix,
+	);
+}
+
+function _atomic_json_write ( path, value ) {
+	_mkdir_parent(path);
+	let temp := _atomic_temp_sibling(path);
+	let codec := new JSON( pretty: true, canonical: true );
+	try {
+		codec.dump( temp, value );
+		codec.load(temp);
+		temp.move(path);
+	}
+	catch ( Exception e ) {
+		_cleanup_path(temp);
+		throw e;
+	}
+	return path;
+}
+
+function _copy_file_atomic ( source, destination, chmod_mode? ) {
+	_mkdir_parent(destination);
+	let temp := _atomic_temp_sibling(destination);
+	try {
+		source.copy(temp);
+		let temp_sha := sha256_hex(temp.slurp());
+		temp.chmod(chmod_mode) if not( chmod_mode instanceof Null );
+		temp.move(destination);
+		let final_bytes := destination.slurp();
+		let final_sha := sha256_hex(final_bytes);
+		if ( final_sha ne temp_sha ) {
+			die(
+				`Atomic install verification failed for ${destination}: ` _
+				`expected ${temp_sha}, got ${final_sha}`
+			);
+		}
+		return {
+			sha256: final_sha,
+			size: destination.size(),
+		};
+	}
+	catch ( Exception e ) {
+		_cleanup_path(temp);
+		throw e;
+	}
+}
+
+function _spew_utf8_atomic ( destination, String text ) {
+	_mkdir_parent(destination);
+	let temp := _atomic_temp_sibling(destination);
+	try {
+		temp.spew_utf8(text);
+		temp.move(destination);
+	}
+	catch ( Exception e ) {
+		_cleanup_path(temp);
+		throw e;
+	}
+	return destination;
+}
+
+function _source_context ( source ) {
+	let parts := [
+		"target=" _ source{value},
+		"source_type=" _ source{type},
+	];
+	parts.push( "url=" _ source{url} ) if source.exists("url");
+	parts.push( "resolved_url=" _ source{resolved_url} )
+		if source.exists("resolved_url");
+	parts.push( "path=" _ source{path} ) if source.exists("path");
+	return join( ", ", parts );
+}
+
+function _corrupt_archive_error ( source, underlying ) {
+	return (
+		"Corrupt source archive (" _ _source_context(source) _
+		"): " _ underlying.to_String()
+	);
+}
+
+function _cache_key ( String url ) {
+	return sha256_hex(to_binary(url));
+}
+
+function _cache_paths ( String cache_dir, String url ) {
+	let dir := new Path(cache_dir);
+	_ensure_dir(dir);
+	let key := _cache_key(url);
+	return {
+		dir: dir,
+		key: key,
+		archive: dir.child(key _ ".archive"),
+		sidecar: dir.child(key _ ".json"),
+	};
+}
+
+function _delete_cache_entry ( paths ) {
+	_cleanup_path(paths{archive});
+	_cleanup_path(paths{sidecar});
+	return true;
+}
+
+function _validate_cache_entry ( paths ) {
+	return false if not paths{archive}.exists();
+	return false if not paths{sidecar}.exists();
+
+	let sidecar := null;
+	try {
+		sidecar := ( new JSON() ).load(paths{sidecar});
+	}
+	catch ( Exception e ) {
+		return false;
+	}
+
+	let bytes := paths{archive}.slurp();
+	let actual_sha := sha256_hex(bytes);
+	if ( sidecar.get( "archive_sha256", "" ) ne actual_sha ) {
+		return false;
+	}
+	if ( sidecar.get( "byte_size", -1 ) != paths{archive}.size() ) {
+		return false;
+	}
+	try {
+		Archive.decode(bytes);
+	}
+	catch ( Exception e ) {
+		return false;
+	}
+	return sidecar;
+}
+
+function _write_cache_entry ( paths, source, temp_path ) {
+	let bytes := temp_path.slurp();
+	let sidecar := {
+		original_url: source{url},
+		resolved_url: source{resolved_url},
+		downloaded_at: _installed_at(),
+		archive_sha256: sha256_hex(bytes),
+		byte_size: temp_path.size(),
+	};
+	Archive.decode(bytes);
+	let archive_temp := _atomic_temp_sibling(paths{archive});
+	let sidecar_temp := _atomic_temp_sibling(paths{sidecar});
+	try {
+		temp_path.copy(archive_temp);
+		archive_temp.move(paths{archive});
+		( new JSON( pretty: true, canonical: true ) ).dump(
+			sidecar_temp,
+			sidecar,
+		);
+		( new JSON() ).load(sidecar_temp);
+		sidecar_temp.move(paths{sidecar});
+	}
+	catch ( Exception e ) {
+		_cleanup_path(archive_temp);
+		_cleanup_path(sidecar_temp);
+		_delete_cache_entry(paths);
+		throw e;
+	}
+	return sidecar;
+}
+
+function _check_expected_source_sha ( source, expected_sha256 ) {
+	return true if expected_sha256 instanceof Null;
+	let actual := sha256_hex( ( new Path(source{path}) ).slurp() );
+	if ( actual ne expected_sha256 ) {
+		die(
+			"Source checksum mismatch (" _ _source_context(source) _
+			`): expected ${expected_sha256}, got ${actual}`
+		);
+	}
+	return true;
+}
+
+function _dependency_chain ( stack, dependency_of, module_name ) {
+	let chain := [];
+	for ( let item in stack ) {
+		chain.push(item);
+	}
+	if ( not( dependency_of instanceof Null ) ) {
+		chain.push(dependency_of{metadata}{name});
+	}
+	chain.push(module_name);
+	return join( " -> ", chain );
+}
+
+function _dependency_conflict_message (
+	dep,
+	dependency_of,
+	stack,
+	planned_action,
+	conflicting_dist
+) {
+	let requested_by := dependency_of instanceof Null
+		? "<requested target>"
+		: dependency_of{metadata}{name};
+	let planned_text := planned_action instanceof Null
+		? "none"
+		: planned_action{metadata}{name} _ " " _
+			planned_action{metadata}{version};
+	let conflicting_text := conflicting_dist{metadata}{name} _ " " _
+		conflicting_dist{metadata}{version};
+	return (
+		"Dependency conflict: requested dependency " _
+		dep{module_name} _ " >= " _ dep{min_version} _
+		"; requester chain " _
+		_dependency_chain(
+			stack,
+			dependency_of,
+			dep{module_name},
+		) _
+		"; requested by " _ requested_by _
+		"; planned/provided version " _ planned_text _
+		"; conflicting planned/provided version " _
+		conflicting_text
+	);
+}
+
+function _planned_version_conflict_message (
+	String dist_name,
+	existing,
+	dist,
+	String target_text
+) {
+	return (
+		`Conflicting planned versions for ${dist_name}: ` _
+		existing{metadata}{version} _ " and " _
+		dist{metadata}{version} _
+		"; existing target " _ existing{target} _
+		"; conflicting target " _ target_text _
+		"; existing metadata " _
+		existing{metadata}{metadata_file} _
+		"; conflicting metadata " _
+		dist{metadata}{metadata_file}
+	);
+}
+
+function _copy_dependencies ( metadata ) {
+	let out := {};
+	return out if not metadata.exists("dependencies");
+	let deps := metadata{dependencies};
+	if ( deps instanceof PairList ) {
+		let keys := deps.keys();
+		let values := deps.values();
+		let i := 0;
+		while ( i < keys.length() ) {
+			out.set( keys[i], values[i] );
+			i++;
+		}
+		return out;
+	}
+	for ( let key in deps.keys() ) {
+		out.set( key, deps.get(key) );
+	}
+	return out;
+}
+
+function _copy_source_record ( source ) {
+	let out := {
+		type: source{type},
+		value: source{value},
+	};
+	out{url} := source{url} if source.exists("url");
+	out{resolved_url} := source{resolved_url}
+		if source.exists("resolved_url");
+	out{path} := source{path} if source.exists("path");
+	return out;
+}
+
+function _copy_source_metadata ( metadata ) {
+	let out := {};
+	for ( let key in metadata.keys() ) {
+		next if key eq "metadata_file";
+		if ( key eq "dependencies" ) {
+			out.set( key, _copy_dependencies(metadata) );
+		}
+		else {
+			out.set( key, metadata.get(key) );
+		}
+	}
+	out.set( "status", "stable" ) if not out.exists("status");
+	out.set( "dependencies", {} ) if not out.exists("dependencies");
+	return out;
+}
+
+function _test_ok ( parsed, run_result ) {
+	return false if not Proc.is_success(run_result);
+	return false if parsed{planned} instanceof Null;
+	return false if parsed{assertions}{failed} > 0;
+	return true;
+}
+
+function _dependency_entries ( metadata ) {
+	let out := [];
+	return out if not metadata.exists("dependencies");
+
+	let deps := metadata{dependencies};
+	if ( deps instanceof PairList ) {
+		let keys := deps.keys();
+		let values := deps.values();
+		let i := 0;
+		while ( i < keys.length() ) {
+			out.push(
+				{
+					module_name: keys[i],
+					min_version: values[i],
+				},
+			);
+			i++;
+		}
+		return out;
+	}
+
+	let keys := deps.keys();
+	for ( let key in keys ) {
+		out.push(
+			{
+				module_name: key,
+				min_version: deps.get(key),
+			},
+		);
+	}
+	return out;
+}
+
+function _version_satisfies ( version, min_version ) {
+	return true if min_version instanceof Null;
+	return true if "" _ min_version eq "0";
+	return compare_versions( version, min_version ) >= 0;
+}
+
+function _provides_module ( dist, module_name, min_version ) {
+	return false if not _version_satisfies( dist{version}, min_version );
+	let wanted := _module_key(module_name);
+	for ( let module in dist{installed}{modules} ) {
+		return true if _module_key( module{install_as} ) eq wanted;
+	}
+	return false;
+}
+
+function _planned_provides_module ( install_action, module_name, min_version ) {
+	return false if not _version_satisfies(
+		install_action{metadata}{version},
+		min_version,
+	);
+	let wanted := _module_key(module_name);
+	for ( let module in install_action{modules} ) {
+		return true if _module_key( module{install_as} ) eq wanted;
+	}
+	return false;
+}
+
+function _loaded_distribution_provides ( dist, module_name, min_version ) {
+	return false if not _version_satisfies(
+		dist{metadata}{version},
+		min_version,
+	);
+	let wanted := _module_key(module_name);
+	for ( let module in dist{modules} ) {
+		return true if _module_key( module{install_as} ) eq wanted;
+	}
+	return false;
+}
+
+function _metadata_files_in_dir ( String meta_dir ) {
+	let dir := new Path(meta_dir);
+	return [] if not dir.exists();
+	die `Metadata path is not a directory: ${dir}`
+		if not dir.is_dir();
+
+	let files := [];
+	for ( let child in dir.children() ) {
+		if (
+			child.is_file() and
+			ends_with( child.basename(), ".json" )
+		) {
+			files.push(child);
+		}
+	}
+	return files.sort(
+		fn ( a, b ) -> a.to_String() cmp b.to_String()
+	);
+}
+
+function _list_installed_in_root ( root ) {
+	let codec := new JSON();
+	let installed := [];
+	for ( let file in _metadata_files_in_dir( root{meta_dir} ) ) {
+		let data := codec.load(file);
+		let valid := _validate_installed_metadata(
+			data,
+			file.to_String(),
+		);
+		installed.push(valid);
+	}
+
+	return installed.sort( function ( a, b ) {
+		let name_cmp := a{name} cmp b{name};
+		return name_cmp if name_cmp != 0;
+		return compare_versions( b{version}, a{version} );
+	} );
+}
+
+function _candidate_record (
+	String source,
+	module_name,
+	min_version,
+	version,
+	distribution,
+	root,
+	metadata_file,
+	install_action
+) {
+	let record := {
+		module_name: "" _ module_name,
+		min_version: min_version instanceof Null ? null : "" _ min_version,
+		version: "" _ version,
+		source: source,
+		distribution: distribution,
+		metadata_file: metadata_file,
+	};
+	record{root} := root if not( root instanceof Null );
+	record{install} := install_action if not( install_action instanceof Null );
+	return record;
+}
+
+function _better_dependency_candidate ( current, candidate, root_order ) {
+	return true if current instanceof Null;
+
+	let version_cmp := compare_versions(
+		candidate{version},
+		current{version},
+	);
+	return true if version_cmp > 0;
+	return false if version_cmp < 0;
+
+	let current_order := root_order.exists(current{root}{name})
+		? root_order.get(current{root}{name})
+		: 1000000;
+	let candidate_order := root_order.exists(candidate{root}{name})
+		? root_order.get(candidate{root}{name})
+		: 1000000;
+	return true if candidate_order < current_order;
+	return false if candidate_order > current_order;
+
+	return candidate{metadata_file} lt current{metadata_file};
+}
+
+function _find_dependency_in_roots ( roots, module_name, min_version ) {
+	let root_order := {};
+	let i := 0;
+	while ( i < roots.length() ) {
+		root_order.add( roots[i]{name}, i );
+		i++;
+	}
+
+	let best := null;
+	for ( let root in roots ) {
+		for ( let dist in _list_installed_in_root(root) ) {
+			if ( _provides_module( dist, module_name, min_version ) ) {
+				let candidate := _candidate_record(
+					"root",
+					module_name,
+					min_version,
+					dist{version},
+					dist{name},
+					root,
+					dist{metadata_file},
+					null,
+				);
+				candidate{installed} := dist;
+				if (
+					_better_dependency_candidate(
+						best,
+						candidate,
+						root_order,
+					)
+				) {
+					best := candidate;
+				}
+			}
+		}
+	}
+	return best;
+}
+
+function _find_dependency_in_planned ( planned, module_name, min_version ) {
+	let best := null;
+	for ( let install_action in planned ) {
+		if ( _planned_provides_module( install_action, module_name, min_version ) ) {
+			let candidate := _candidate_record(
+				"planned",
+				module_name,
+				min_version,
+				install_action{metadata}{version},
+				install_action{metadata}{name},
+				install_action{target_root},
+				install_action{metadata}{metadata_file},
+				install_action,
+			);
+			if (
+					best instanceof Null or
+				compare_versions(
+					candidate{version},
+					best{version},
+				) > 0 or
+				(
+					compare_versions(
+						candidate{version},
+						best{version},
+					) == 0 and
+					candidate{metadata_file} lt best{metadata_file}
+				)
+			) {
+				best := candidate;
+			}
+		}
+	}
+	return best;
+}
+
+function _runtime_module_path ( module_name ) {
+	return null if not starts_with( "" _ module_name, "std/" );
+
+	let inc := [];
+	if ( "inc" in __system__ ) {
+		inc := __system__.get("inc");
+	}
+	return null if inc ≡ null;
+	if ( not( inc instanceof Array ) ) {
+		let separator := _is_windows_platform() ? ";" : ":";
+		inc := split( "" _ inc, separator );
+	}
+
+	let relative := module_name _ ".zzm";
+	for ( let root in inc ) {
+		next if root eq "";
+		let path := ( new Path(root) ).child(relative);
+		return path if path.exists() and path.is_file();
+	}
+	return null;
+}
+
+function _runtime_include_dirs () {
+	let out := [];
+	let seen := {};
+	let inc := [];
+	if ( "inc" in __system__ ) {
+		inc := __system__.get("inc");
+	}
+	return out if inc ≡ null;
+	if ( not( inc instanceof Array ) ) {
+		let separator := _is_windows_platform() ? ";" : ":";
+		inc := split( "" _ inc, separator );
+	}
+
+	for ( let root in inc ) {
+		next if root eq "";
+		let path := ( new Path(root) ).absolute();
+		_push_unique_string( out, seen, path.to_String() )
+			if path.exists() and path.is_dir();
+	}
+	return out;
+}
+
+function _find_dependency_in_runtime ( module_name, min_version ) {
+	return null if not _version_satisfies( "0", min_version );
+
+	let module_path := _runtime_module_path(module_name);
+	return null if module_path instanceof Null;
+
+	let root := {
+		name: "runtime",
+		lib_dir: "",
+		bin_dir: "",
+		meta_dir: "",
+	};
+	let candidate := _candidate_record(
+		"runtime",
+		module_name,
+		min_version,
+		"0",
+		"zuzu-runtime",
+		root,
+		module_path.to_String(),
+		null,
+	);
+	candidate{module_file} := module_path.to_String();
+	return candidate;
+}
+
+function _find_dependency_for_plan (
+	planned,
+	roots,
+	module_name,
+	min_version
+) {
+	let found := _find_dependency_in_planned(
+		planned,
+		module_name,
+		min_version,
+	);
+	return found if not( found instanceof Null );
+	found := _find_dependency_in_roots( roots, module_name, min_version );
+	return found if not( found instanceof Null );
+	return _find_dependency_in_runtime( module_name, min_version );
+}
+
+function _cycle_path ( stack, module_name ) {
+	let path := [];
+	let started := false;
+	for ( let item in stack ) {
+		started := true if item eq module_name;
+		path.push(item) if started;
+	}
+	path.push(module_name);
+	return join( " -> ", path );
+}
+
+function _stack_contains ( stack, value ) {
+	for ( let item in stack ) {
+		return true if item eq value;
+	}
+	return false;
+}
+
+function _remove_file_kind_order ( String kind ) {
+	return kind eq "metadata" ? 1 : 0;
+}
+
+function _remove_file_cmp ( a, b ) {
+	let kind_cmp := _remove_file_kind_order(a{kind}) <=>
+		_remove_file_kind_order(b{kind});
+	return kind_cmp if kind_cmp != 0;
+	let path_cmp := a{path} cmp b{path};
+	return path_cmp if path_cmp != 0;
+	return a{kind} cmp b{kind};
+}
+
+function _removal_cmp ( a, b ) {
+	let name_cmp := a{name} cmp b{name};
+	return name_cmp if name_cmp != 0;
+	let version_cmp := compare_versions( b{version}, a{version} );
+	return version_cmp if version_cmp != 0;
+	return a{metadata_file} cmp b{metadata_file};
+}
+
+function _owner_record ( dist ) {
+	return {
+		name: dist{name},
+		version: dist{version},
+		metadata_file: dist{metadata_file},
+	};
+}
+
+function _same_owner ( left, right ) {
+	return left{metadata_file} eq right{metadata_file};
+}
+
+function _owner_list_contains ( owners, owner ) {
+	for ( let item in owners ) {
+		return true if _same_owner( item, owner );
+	}
+	return false;
+}
+
+function _add_owner_to_list ( owners, owner ) {
+	return false if _owner_list_contains( owners, owner );
+	owners.push(owner);
+	return true;
+}
+
+function _add_owner_for_path ( by_path, String path, owner ) {
+	if ( not by_path.exists(path) ) {
+		by_path.add( path, [] );
+	}
+	_add_owner_to_list( by_path.get(path), owner );
+	return true;
+}
+
+function _remove_target_record ( target, options? ) {
+	if ( target instanceof Dict ) {
+		let type := target.exists("type") ? "" _ target{type} : "";
+		let value := target.exists("value") ? "" _ target{value} : "";
+		return {
+			type: type,
+			value: value,
+			raw: target,
+		};
+	}
+	return {
+		type: _opt( options, "dist", false ) ? "distribution" : "module",
+		value: "" _ target,
+		raw: target,
+	};
+}
+
+function _latest_module_name ( module_name ) {
+	if ( not( module_name instanceof String ) ) {
+		die "latest target must be a module name";
+	}
+	if ( module_name eq "" or _is_url(module_name) ) {
+		die "latest target must be a module name";
+	}
+	let path := new Path(module_name);
+	if ( path.exists() ) {
+		die "latest target must be a module name";
+	}
+	return module_name;
+}
+
+function _latest_status ( installed_version, remote_version ) {
+	return "not-installed" if installed_version instanceof Null;
+	let comparison := compare_versions( installed_version, remote_version );
+	return "current" if comparison == 0;
+	return comparison < 0 ? "outdated" : "newer-local";
+}
+
+function _add_verify_target_error ( result, code, target, message ) {
+	result{errors}.push(
+		{
+			code: code,
+			target: target,
+			message: message,
+		},
+	);
+	return true;
+}
+
+class ZuzuzooLock {
+	let lock_path := null;
+	let owner_file := null;
+	let acquired := false;
+
+	method release () {
+		return false if not acquired;
+		_cleanup_path(owner_file);
+		_cleanup_path(lock_path);
+		acquired := false;
+		return true;
+	}
+}
+
+class Zuzuzoo {
+	let lib_dir := null;
+	let bin_dir := null;
+	let meta_dir := null;
+	let global := false;
+	let windows := null;
+	let home := null;
+	let userprofile := null;
+	let base_url := "https://zuzulang.org";
+	let user_agent := null;
+	let zuzu_command := "zuzu";
+	let dependency_roots := [];
+	let global_root := null;
+
+	method _user_agent () {
+		return not( user_agent instanceof Null ) ? user_agent : new UserAgent();
+	}
+
+	method config () {
+		let resolved_windows := windows instanceof Null
+			? _is_windows_platform()
+			: windows;
+		let resolved_global := global ? true: false;
+
+		if ( resolved_windows and resolved_global ) {
+			die "Global Windows installs are not supported";
+		}
+
+		let base_home := not( home instanceof Null ) ? home : Env.get( "HOME", "" );
+		let base_userprofile := not( userprofile instanceof Null )
+			? userprofile
+			: Env.get( "USERPROFILE", "" );
+
+		let resolved_lib := lib_dir;
+		let resolved_bin := bin_dir;
+		let resolved_meta := meta_dir;
+		let needs_default := (
+			resolved_lib instanceof Null or
+			resolved_bin instanceof Null or
+			resolved_meta instanceof Null
+		);
+
+		if ( resolved_windows ) {
+			if ( needs_default ) {
+				die "USERPROFILE required for Windows install"
+					if base_userprofile eq "";
+				let root := _join_dir(
+					base_userprofile,
+					".zuzu",
+					true,
+				);
+				resolved_lib := _join_dir(
+					root,
+					"modules",
+					true,
+				)
+					if resolved_lib instanceof Null;
+				resolved_bin := _join_dir( root, "bin", true )
+					if resolved_bin instanceof Null;
+				resolved_meta := _join_dir( root, "meta", true )
+					if resolved_meta instanceof Null;
+			}
+		}
+		else if ( resolved_global ) {
+			resolved_lib := "/var/lib/zuzu/modules"
+				if resolved_lib instanceof Null;
+			resolved_bin := "/usr/local/bin"
+				if resolved_bin instanceof Null;
+			resolved_meta := "/var/lib/zuzu/meta"
+				if resolved_meta instanceof Null;
+		}
+		else {
+			if ( needs_default ) {
+				die "HOME required for POSIX user install"
+					if base_home eq "";
+				let root := _join_dir(
+					base_home,
+					".zuzu",
+					false,
+				);
+				resolved_lib := _join_dir(
+					root,
+					"modules",
+					false,
+				)
+					if resolved_lib instanceof Null;
+				resolved_bin := _join_dir( root, "bin", false )
+					if resolved_bin instanceof Null;
+				resolved_meta := _join_dir(
+					root,
+					"meta",
+					false,
+				)
+					if resolved_meta instanceof Null;
+			}
+		}
+
+		return {
+			lib_dir: resolved_lib,
+			bin_dir: resolved_bin,
+			meta_dir: resolved_meta,
+			global: resolved_global,
+			windows: resolved_windows,
+		};
+	}
+
+	method acquire_lock ( operation, options? ) {
+		if ( not _opt( options, "lock", true ) ) {
+			return new ZuzuzooLock( acquired: false );
+		}
+
+		let cfg := self.config();
+		let meta_path := new Path(cfg{meta_dir});
+		_ensure_dir(meta_path);
+		let lock_path := meta_path.child(".zuzuzoo.lock");
+		let owner_file := lock_path.child("owner.json");
+		let timeout := _opt( options, "lock_timeout", 30 );
+		let poll := _opt( options, "lock_poll", 0.1 );
+		let started := _now_epoch();
+
+		while ( true ) {
+			if ( lock_path.mkdir_exclusive() ) {
+				let owner := {
+					pid: Proc.pid(),
+					created_at: _installed_at(),
+					meta_dir: cfg{meta_dir},
+					operation: "" _ operation,
+				};
+				try {
+					( new JSON( pretty: true, canonical: true ) ).dump(
+						owner_file,
+						owner,
+					);
+				}
+				catch ( Exception e ) {
+					_cleanup_path(lock_path);
+					throw e;
+				}
+				return new ZuzuzooLock(
+					lock_path: lock_path,
+					owner_file: owner_file,
+					acquired: true,
+				);
+			}
+
+			if ( _now_epoch() - started >= timeout ) {
+				let owner_text := "";
+				try {
+					owner_text := owner_file.slurp_utf8();
+				}
+				catch ( Exception e ) {
+					owner_text := "<unreadable>";
+				}
+				die(
+					`Timed out waiting for Zuzuzoo lock ${lock_path} ` _
+					`after ${timeout} seconds; owner=${owner_text}`
+				);
+			}
+			sleep(poll);
+		}
+	}
+
+	method _metadata_files () {
+		return _metadata_files_in_dir( self.config(){meta_dir} );
+	}
+
+	method list_installed ( options? ) {
+		let codec := new JSON();
+		let installed := [];
+		for ( let file in self._metadata_files() ) {
+			let data := codec.load(file);
+			let valid := _validate_installed_metadata(
+				data,
+				file.to_String(),
+			);
+			installed.push(valid);
+		}
+
+		return installed.sort( function ( a, b ) {
+			let name_cmp := a{name} cmp b{name};
+			return name_cmp if name_cmp != 0;
+			return compare_versions( b{version}, a{version} );
+		} );
+	}
+
+	method find_installed_module ( module_name, options? ) {
+		let wanted := _module_key(module_name);
+		for ( let dist in self.list_installed(options) ) {
+			for ( let module in dist{installed}{modules} ) {
+				let installed_as := _module_key(
+					module{install_as},
+				);
+				if ( installed_as eq wanted ) {
+					return dist;
+				}
+			}
+		}
+		return null;
+	}
+
+	method find_installed_distribution ( distribution_name, options? ) {
+		let wanted := "" _ distribution_name;
+		for ( let dist in self.list_installed(options) ) {
+			return dist if dist{name} eq wanted;
+		}
+		return null;
+	}
+
+	method query ( module_name, options? ) {
+		return self.find_installed_module( module_name, options );
+	}
+
+	method query_distribution ( distribution_name, options? ) {
+		return self.find_installed_distribution(
+			distribution_name,
+			options,
+		);
+	}
+
+	method is_installed ( module_name, min_version? ) {
+		let found := self.find_installed_module(module_name);
+		return false if found instanceof Null;
+		if ( not( min_version instanceof Null ) ) {
+			let comparison := compare_versions(
+				found{version},
+				min_version,
+			);
+			return comparison >= 0;
+		}
+		return true;
+	}
+
+	method installed_version ( module_name ) {
+		let found := self.find_installed_module(module_name);
+		return found instanceof Null ? null : found{version};
+	}
+
+	method pretty_json ( value ) {
+		let codec := new JSON( pretty: true, canonical: true );
+		return codec.encode(value);
+	}
+
+	method format_json ( value, options? ) {
+		return self.pretty_json(value);
+	}
+
+	method _verify_module_file ( result, dist, entry ) {
+		let path := _path_child(
+			dist{installed}{lib_dir},
+			entry{install_as},
+		);
+		let file := {
+			kind: "module",
+			distribution: dist{name},
+			version: dist{version},
+			install_as: entry{install_as},
+			path: path.to_String(),
+			exists: path.exists(),
+			expected_sha256: entry{sha256},
+			expected_size: entry.get( "size", null ),
+			actual_sha256: null,
+			actual_size: null,
+			hash_ok: false,
+			size_ok: null,
+		};
+		if ( path.exists() ) {
+			let bytes := path.slurp();
+			file{actual_sha256} := sha256_hex(bytes);
+			file{actual_size} := path.size();
+			file{hash_ok} := file{actual_sha256} eq entry{sha256};
+			if ( file{expected_size} != null ) {
+				file{size_ok} := file{actual_size} == file{expected_size};
+				if ( not file{size_ok} ) {
+					result{size_mismatches}.push(file);
+				}
+			}
+			if ( not file{hash_ok} ) {
+				result{hash_mismatches}.push(file);
+			}
+		}
+		else {
+			result{missing_files}.push(file);
+		}
+		result{files}.push(file);
+		result{checked_files}.push(file);
+		return file;
+	}
+
+	method _verify_script_file ( result, dist, entry ) {
+		let path := _path_child(
+			dist{installed}{bin_dir},
+			entry{install_as},
+		);
+		let file := {
+			kind: "script",
+			distribution: dist{name},
+			version: dist{version},
+			install_as: entry{install_as},
+			path: path.to_String(),
+			exists: path.exists(),
+			expected_sha256: entry{sha256},
+			expected_size: entry.get( "size", null ),
+			actual_sha256: null,
+			actual_size: null,
+			hash_ok: false,
+			size_ok: null,
+		};
+		if ( path.exists() ) {
+			let bytes := path.slurp();
+			file{actual_sha256} := sha256_hex(bytes);
+			file{actual_size} := path.size();
+			file{hash_ok} := file{actual_sha256} eq entry{sha256};
+			if ( file{expected_size} != null ) {
+				file{size_ok} := file{actual_size} == file{expected_size};
+				if ( not file{size_ok} ) {
+					result{size_mismatches}.push(file);
+				}
+			}
+			if ( not file{hash_ok} ) {
+				result{hash_mismatches}.push(file);
+			}
+		}
+		else {
+			result{missing_files}.push(file);
+		}
+		result{files}.push(file);
+		result{checked_files}.push(file);
+
+		for ( let wrapper in entry.get( "wrappers", [] ) ) {
+			let wrapper_path := _path_child(
+				dist{installed}{bin_dir},
+				wrapper,
+			);
+			let wrapper_file := {
+				kind: "wrapper",
+				distribution: dist{name},
+				version: dist{version},
+				install_as: wrapper,
+				path: wrapper_path.to_String(),
+				exists: wrapper_path.exists(),
+				expected_sha256: null,
+				actual_sha256: null,
+				hash_ok: null,
+			};
+			if ( not wrapper_file{exists} ) {
+				result{missing_files}.push(wrapper_file);
+			}
+			result{files}.push(wrapper_file);
+			result{wrapper_files}.push(wrapper_file);
+		}
+		return file;
+	}
+
+	method verify ( targets, options? ) {
+		let roots := self.dependency_roots(options);
+		let target_root := roots[0];
+		let installed := _list_installed_in_root(target_root);
+		let result := {
+			ok: true,
+			target_root: target_root,
+			targets: [],
+			distributions: [],
+			files: [],
+			checked_files: [],
+			wrapper_files: [],
+			missing_files: [],
+			hash_mismatches: [],
+			size_mismatches: [],
+			skipped_duplicates: [],
+			errors: [],
+		};
+
+		let seen := {};
+		for ( let target in _target_list(targets) ) {
+			let record := _remove_target_record( target, options );
+			if ( record{type} eq "dist" ) {
+				record{type} := "distribution";
+			}
+			record{matches} := [];
+			result{targets}.push(record);
+
+			if (
+				(
+					record{type} ne "module" and
+					record{type} ne "distribution"
+				) or
+				record{value} eq ""
+			) {
+				_add_verify_target_error(
+					result,
+					"invalid-target",
+					record,
+					"verify target must be a module or distribution",
+				);
+				next;
+			}
+
+			let matches := record{type} eq "module"
+				? self._module_remove_matches(
+					installed,
+					record{value},
+				)
+				: self._distribution_remove_matches(
+					installed,
+					record{value},
+				);
+			for ( let match in matches ) {
+				record{matches}.push(
+					{
+						name: match{name},
+						version: match{version},
+						metadata_file: match{metadata_file},
+					},
+				);
+			}
+
+			if ( matches.length() == 0 ) {
+				_add_verify_target_error(
+					result,
+					"missing-target",
+					record,
+					"verify target is not installed",
+				);
+				next;
+			}
+			if ( record{type} eq "module" and matches.length() > 1 ) {
+				_add_verify_target_error(
+					result,
+					"ambiguous-target",
+					record,
+					"module target has multiple owners",
+				);
+				result{errors}[ result{errors}.length() - 1 ]{matches} :=
+					record{matches};
+				next;
+			}
+
+			for ( let dist in matches ) {
+				let key := dist{metadata_file};
+				if ( seen.exists(key) ) {
+					result{skipped_duplicates}.push(
+						{
+							target: record,
+							name: dist{name},
+							version: dist{version},
+							metadata_file: dist{metadata_file},
+						},
+					);
+					next;
+				}
+				seen.add( key, true );
+				result{distributions}.push(
+					{
+						name: dist{name},
+						version: dist{version},
+						metadata_file: dist{metadata_file},
+					},
+				);
+				for ( let module in dist{installed}{modules} ) {
+					self._verify_module_file(
+						result,
+						dist,
+						module,
+					);
+				}
+				for ( let script in dist{installed}{scripts} ) {
+					self._verify_script_file(
+						result,
+						dist,
+						script,
+					);
+				}
+			}
+		}
+
+		result{ok} := (
+			result{errors}.length() == 0 and
+			result{missing_files}.length() == 0 and
+			result{hash_mismatches}.length() == 0 and
+			result{size_mismatches}.length() == 0
+		);
+		return result;
+	}
+
+	method latest ( module_name, options? ) {
+		let module := _latest_module_name(module_name);
+		let base := _trim_right_slash(
+			"" _ _opt( options, "base_url", base_url ),
+		);
+		let url := base _ "/module/" _ module _ ".json";
+		let ua := _opt( options, "user_agent", self._user_agent() );
+		let req := ua.build_request( "GET", url );
+		_progress( options, "downloading latest metadata " _ url );
+		let response := ua.send(req);
+		response.expect_success();
+		let remote_url := url;
+		if ( response can "url" ) {
+			remote_url := response.url();
+		}
+		_progress( options, "received latest metadata " _ remote_url );
+
+		let metadata := _validate_source_metadata(
+			response.json(),
+			remote_url,
+		);
+		if ( not metadata.exists("status") ) {
+			metadata{status} := "stable";
+		}
+		if (
+			metadata.exists("status") and
+			metadata{status} eq "trial"
+		) {
+			die(
+				"Trial distributions are not available through " _
+				"module-name latest endpoints"
+			);
+		}
+
+		let installed := self.find_installed_module( module, options );
+			let installed_version := installed instanceof Null
+			? null
+			: installed{version};
+		let status := _latest_status(
+			installed_version,
+			metadata{version},
+		);
+
+		return {
+			ok: true,
+			module_name: module,
+			status: status,
+			can_upgrade: status eq "outdated",
+			installed_version: installed_version,
+			remote_version: metadata{version},
+			remote_distribution: metadata{name},
+			remote_status: metadata{status},
+			url: url,
+			remote_url: remote_url,
+			installed: installed,
+			remote_metadata: metadata,
+		};
+	}
+
+	method can_upgrade ( module_name, options? ) {
+		return self.latest( module_name, options );
+	}
+
+	method fetch_source ( target, options? ) {
+		let value := "" _ target;
+		let file := new Path(value);
+		if ( file.exists() and file.is_file() ) {
+			_progress( options, "using local archive " _ file.to_String() );
+			let source := {
+				type: "file",
+				value: value,
+				path: file.to_String(),
+				path_obj: file,
+			};
+			_check_expected_source_sha(
+				source,
+				_opt( options, "expected_sha256", null ),
+			);
+			return source;
+		}
+
+		let source_type := _is_url(value) ? "url" : "module";
+		let url := value;
+		if ( source_type eq "module" ) {
+			let base := _trim_right_slash(
+				"" _ _opt( options, "base_url", base_url ),
+			);
+			url := base _ "/module/" _ value;
+		}
+
+		let cache_dir := _opt( options, "cache_dir", null );
+		if ( not( cache_dir instanceof Null ) ) {
+			let paths := _cache_paths( cache_dir, url );
+			let cached := _validate_cache_entry(paths);
+			if ( cached ) {
+				_progress(
+					options,
+					"using cached archive for " _ value _ " from " _
+						paths{archive}.to_String(),
+				);
+				let source := {
+					type: source_type,
+					value: value,
+					url: url,
+					resolved_url: cached{resolved_url},
+					path: paths{archive}.to_String(),
+					path_obj: paths{archive},
+					cache_hit: true,
+					cache_sidecar: paths{sidecar}.to_String(),
+				};
+				_check_expected_source_sha(
+					source,
+					_opt( options, "expected_sha256", null ),
+				);
+				return source;
+			}
+			_delete_cache_entry(paths);
+		}
+
+		let temp_dir := _new_temp_dir( options, "zuzuzoo-source-" );
+		let temp_path := temp_dir.child("source.archive");
+		let ua := _opt( options, "user_agent", self._user_agent() );
+		let req := ua.build_request( "GET", url )
+			.download_to( temp_path.to_String() );
+		_progress( options, "downloading " _ value _ " from " _ url );
+		let response := ua.send(req);
+
+		let download_url := url;
+		if ( not _response_success(response) and source_type eq "module" ) {
+			_progress(
+				options,
+				"module archive download failed from " _ url _ " (" _
+					_response_status_text(response) _
+					"); checking latest metadata",
+			);
+			_cleanup_path(temp_path);
+
+			let latest_info := self.latest( value, options );
+			let archive_url := _archive_url_from_latest(latest_info);
+			req := ua.build_request( "GET", archive_url )
+				.download_to( temp_path.to_String() );
+			_progress(
+				options,
+				"downloading " _ value _ " from " _ archive_url,
+			);
+			response := ua.send(req);
+			download_url := archive_url;
+		}
+
+		if ( not _response_success(response) ) {
+			_cleanup_path(temp_dir);
+			die(
+				"Source download failed (target=" _ value _
+				", source_type=" _ source_type _
+				", url=" _ download_url _
+				"): HTTP request failed (" _
+					_response_status_text(response) _ ")"
+			);
+		}
+
+		let resolved_url := download_url;
+		if ( response can "url" ) {
+			resolved_url := response.url();
+		}
+		_progress(
+			options,
+			"downloaded " _ value _ " from " _ resolved_url _ " to " _
+				temp_path.to_String(),
+		);
+
+		let source := {
+			type: source_type,
+			value: value,
+			url: url,
+			resolved_url: resolved_url,
+			path: temp_path.to_String(),
+			path_obj: temp_path,
+			temp_dir: temp_dir,
+		};
+		_check_expected_source_sha(
+			source,
+			_opt( options, "expected_sha256", null ),
+		);
+
+		if ( not( cache_dir instanceof Null ) ) {
+			let paths := _cache_paths( cache_dir, url );
+			try {
+				let sidecar := _write_cache_entry(
+					paths,
+					source,
+					temp_path,
+				);
+				source{path} := paths{archive}.to_String();
+				source{path_obj} := paths{archive};
+				source{cache_hit} := false;
+				source{cache_sidecar} := paths{sidecar}.to_String();
+				source{cache_metadata} := sidecar;
+				_progress(
+					options,
+					"cached " _ value _ " at " _
+						paths{archive}.to_String(),
+				);
+				_cleanup_path(temp_dir);
+			}
+			catch ( Exception e ) {
+				_cleanup_path(temp_dir);
+				die _corrupt_archive_error( source, e );
+			}
+		}
+
+		return source;
+	}
+
+	method load_distribution ( target, options? ) {
+		let source := null;
+		let work_dir := null;
+		try {
+			source := self.fetch_source( target, options );
+			let source_path := new Path( source{path} );
+			let archive := null;
+			try {
+				archive := Archive.decode( source_path.slurp() );
+			}
+			catch ( Exception e ) {
+				die _corrupt_archive_error( source, e );
+			}
+			let root_name := _safe_archive_root( archive, source{path} );
+			work_dir := _new_temp_dir( options, "zuzuzoo-work-" );
+			let root_dir := work_dir.child(root_name);
+			root_dir.mkdir();
+			_progress(
+				options,
+				"extracting " _ source{path} _ " to " _
+					work_dir.to_String(),
+			);
+			_extract_archive( archive, root_name, root_dir );
+
+			let metadata_file := root_dir.child("zuzu-distribution.json");
+			if ( not metadata_file.exists() ) {
+				die(
+					`Invalid archive ${source{path}}: ` _
+					"missing zuzu-distribution.json"
+				);
+			}
+			let codec := new JSON( pairlists: true );
+			let metadata := _validate_source_metadata(
+				codec.load(metadata_file),
+				metadata_file.to_String(),
+			);
+
+			let expected_root := metadata{name} _ "-" _ metadata{version};
+			if ( root_name ne expected_root ) {
+				die(
+					`Invalid archive ${source{path}}: root ${root_name} ` _
+					`does not match ${expected_root}`
+				);
+			}
+
+			let build_result := null;
+			let build_file := root_dir.child("Build.zzs");
+			if ( build_file.exists() and build_file.is_file() ) {
+				_progress(
+					options,
+					"building " _ metadata{name} _ " " _
+						metadata{version} _ " with Build.zzs",
+				);
+				build_result := Proc.run(
+					_opt( options, "zuzu_command", zuzu_command ),
+					[ "Build.zzs" ],
+					{
+						cwd: root_dir.to_String(),
+						capture_stdout: true,
+						capture_stderr: true,
+					},
+				);
+				if ( not Proc.is_success(build_result) ) {
+					die(
+						"Build.zzs failed: " _
+						Proc.status_text(build_result)
+					);
+				}
+				metadata := _validate_source_metadata(
+					codec.load(metadata_file),
+					metadata_file.to_String(),
+				);
+				let post_build_root := metadata{name} _ "-" _
+					metadata{version};
+				if ( root_name ne post_build_root ) {
+					die(
+						`Invalid archive ${source{path}}: root ${root_name} ` _
+						`does not match ${post_build_root}`
+					);
+				}
+			}
+
+			let module_sources := _discover_files(
+				root_dir,
+				"modules",
+				".zzm",
+			);
+			let script_sources := _discover_scripts(root_dir);
+			let tests := _discover_files( root_dir, "tests", ".zzs" );
+			let modules := module_sources.map( function ( source ) {
+				return {
+					source: source,
+					install_as: _module_install_name(source),
+				};
+			} );
+			let scripts := script_sources.map( function ( source ) {
+				return {
+					source: source,
+					install_as: _script_install_name(source),
+				};
+			} );
+
+			let loaded := {
+				source: source,
+				archive: archive,
+				work_dir: work_dir.to_String(),
+				root: root_dir.to_String(),
+				work_dir_obj: work_dir,
+				root_obj: root_dir,
+				root_name: root_name,
+				metadata: metadata,
+				modules: modules,
+				scripts: scripts,
+				tests: tests,
+				build: build_result,
+			};
+			if ( not _opt( options, "keep_work_dirs", false ) ) {
+				_cleanup_source( source, options );
+				_cleanup_path(work_dir);
+			}
+			return loaded;
+		}
+		catch ( Exception e ) {
+			_cleanup_source( source, options );
+			_cleanup_path(work_dir)
+				if not _opt( options, "keep_work_dirs", false );
+			throw e;
+		}
+	}
+
+	method dependency_roots ( options? ) {
+		let cfg := self.config();
+		let target := _root_from_config( "target", "target", cfg );
+		let roots := [];
+		let seen := {};
+		_add_root( roots, seen, target );
+
+		if ( not cfg{global} and not cfg{windows} ) {
+			let global_override := _opt(
+				options,
+				"global_root",
+				global_root,
+			);
+			let global_dependency_root := null;
+			if ( not( global_override instanceof Null ) ) {
+				global_dependency_root := _root_override(
+					global_override,
+					"global",
+					"global",
+					"global",
+				);
+			}
+			else {
+				let global_cfg := new Zuzuzoo(
+					global: true,
+					windows: false,
+					home: home,
+					userprofile: userprofile,
+				).config();
+				global_dependency_root := _root_from_config(
+					"global",
+					"global",
+					global_cfg,
+				);
+			}
+			_add_root(
+				roots,
+				seen,
+				global_dependency_root,
+			);
+		}
+
+		let user_cfg := new Zuzuzoo(
+			global: false,
+			windows: cfg{windows},
+			home: home,
+			userprofile: userprofile,
+		).config();
+		_add_root(
+			roots,
+			seen,
+			_root_from_config( "user", "user", user_cfg ),
+		);
+
+		let ctor_roots := dependency_roots instanceof Null
+			? []
+			: dependency_roots;
+		for ( let root in ctor_roots ) {
+			let where := (
+				root instanceof Dict and root.exists("name")
+			)
+				? root{name}
+				: "constructor";
+			_add_root(
+				roots,
+				seen,
+				_custom_root( root, where ),
+			);
+		}
+
+		let option_roots := _opt( options, "dependency_roots", [] );
+		for ( let root in option_roots ) {
+			let where := (
+				root instanceof Dict and root.exists("name")
+			)
+				? root{name}
+				: "options";
+			_add_root(
+				roots,
+				seen,
+				_custom_root( root, where ),
+			);
+		}
+
+		return roots;
+	}
+
+	method find_dependency ( module_name, min_version?, options? ) {
+		let planned := _opt( options, "planned_installs", [] );
+		return _find_dependency_for_plan(
+			planned,
+			self.dependency_roots(options),
+			module_name,
+			min_version instanceof Null ? "0" : min_version,
+		);
+	}
+
+	method _add_removal ( removals, removal_seen, dist, root, reason ) {
+		let key := dist{metadata_file};
+		if ( removal_seen.exists(key) ) {
+			removal_seen.get(key){reasons}.push(reason);
+			return false;
+		}
+		let removal := {
+			name: dist{name},
+			version: dist{version},
+			metadata_file: dist{metadata_file},
+			root: root,
+			reasons: [ reason ],
+			distribution: dist,
+		};
+		removal_seen.add( key, removal );
+		removals.push(removal);
+		return true;
+	}
+
+	method _plan_target_root_removals (
+		plan,
+		target_installed,
+		target_root
+	) {
+		let removal_seen := {};
+			for ( let install_action in plan{installs} ) {
+				for ( let dist in target_installed ) {
+					if ( dist{name} eq install_action{metadata}{name} ) {
+						let reason := dist{version} eq install_action{metadata}{version}
+							? "reinstall"
+							: "prior-version";
+					self._add_removal(
+						plan{removals},
+						removal_seen,
+						dist,
+						target_root,
+						reason,
+					);
+				}
+			}
+		}
+
+			for ( let install_action in plan{installs} ) {
+				for ( let module in install_action{modules} ) {
+					let destination := _path_join(
+						target_root{lib_dir},
+					module{install_as},
+					target_root{windows},
+				);
+				for ( let dist in target_installed ) {
+					for ( let owned in dist{installed}{modules} ) {
+						if ( owned{install_as} eq module{install_as} ) {
+							plan{ownership_conflicts}.push(
+									{
+										kind: "module",
+										install_as: module{install_as},
+										destination: destination,
+										planned_distribution: install_action{metadata}{name},
+										planned_version: install_action{metadata}{version},
+										owner_distribution: dist{name},
+									owner_version: dist{version},
+									owner_metadata_file: dist{metadata_file},
+									root: target_root,
+								},
+							);
+							self._add_removal(
+								plan{removals},
+								removal_seen,
+								dist,
+								target_root,
+								"owner-conflict",
+							);
+						}
+					}
+				}
+			}
+
+				for ( let script in install_action{scripts} ) {
+					let destination := _path_join(
+					target_root{bin_dir},
+					script{install_as},
+					target_root{windows},
+				);
+				for ( let dist in target_installed ) {
+					for ( let owned in dist{installed}{scripts} ) {
+						if ( owned{install_as} eq script{install_as} ) {
+							plan{ownership_conflicts}.push(
+									{
+										kind: "script",
+										install_as: script{install_as},
+										destination: destination,
+										planned_distribution: install_action{metadata}{name},
+										planned_version: install_action{metadata}{version},
+										owner_distribution: dist{name},
+									owner_version: dist{version},
+									owner_metadata_file: dist{metadata_file},
+									root: target_root,
+								},
+							);
+							self._add_removal(
+								plan{removals},
+								removal_seen,
+								dist,
+								target_root,
+								"owner-conflict",
+							);
+						}
+					}
+				}
+			}
+		}
+		return plan;
+	}
+
+	method _module_remove_matches ( installed, module_name ) {
+		let wanted := _module_key(module_name);
+		let matches := [];
+		for ( let dist in installed ) {
+			for ( let module in dist{installed}{modules} ) {
+				if ( _module_key( module{install_as} ) eq wanted ) {
+					matches.push(dist);
+					last;
+				}
+			}
+		}
+		return matches;
+	}
+
+	method _distribution_remove_matches ( installed, distribution_name ) {
+		let wanted := "" _ distribution_name;
+		let matches := [];
+		for ( let dist in installed ) {
+			matches.push(dist) if dist{name} eq wanted;
+		}
+		return matches;
+	}
+
+	method _remove_owner_map ( installed, target_root ) {
+		let by_path := {};
+		for ( let dist in installed ) {
+			let owner := _owner_record(dist);
+			for ( let module in dist{installed}{modules} ) {
+				_add_owner_for_path(
+					by_path,
+					_path_join(
+						target_root{lib_dir},
+						module{install_as},
+						target_root{windows},
+					),
+					owner,
+				);
+			}
+			for ( let script in dist{installed}{scripts} ) {
+				_add_owner_for_path(
+					by_path,
+					_path_join(
+						target_root{bin_dir},
+						script{install_as},
+						target_root{windows},
+					),
+					owner,
+				);
+				for ( let wrapper in script.get( "wrappers", [] ) ) {
+					_add_owner_for_path(
+						by_path,
+						_path_join(
+							target_root{bin_dir},
+							wrapper,
+							target_root{windows},
+						),
+						owner,
+					);
+				}
+			}
+		}
+		return by_path;
+	}
+
+	method _add_remove_file (
+		plan,
+		file_seen,
+		owner_map,
+		planned_metadata,
+		kind,
+		path,
+		dist,
+		install_as
+	) {
+		return false if file_seen.exists(path);
+		file_seen.add( path, true );
+
+		let owners := kind eq "metadata"
+			? [ _owner_record(dist) ]
+			: owner_map.get( path, [ _owner_record(dist) ] );
+		let planned_owners := [];
+		let kept_owners := [];
+		for ( let owner in owners ) {
+			if ( planned_metadata.exists(owner{metadata_file}) ) {
+				planned_owners.push(owner);
+			}
+			else {
+				kept_owners.push(owner);
+			}
+		}
+
+		let blocked := kind ne "metadata" and kept_owners.length() > 0;
+		let file := {
+			kind: kind,
+			path: path,
+			exists: ( new Path(path) ).exists(),
+			owners: owners,
+			planned_owners: planned_owners,
+			kept_owners: kept_owners,
+			blocked: blocked,
+		};
+		file{install_as} := install_as if not( install_as instanceof Null );
+		plan{files}.push(file);
+
+		if ( blocked ) {
+			let conflict := {
+				kind: kind,
+				path: path,
+				install_as: install_as,
+				owners: owners,
+				planned_owners: planned_owners,
+				kept_owners: kept_owners,
+			};
+			plan{shared_file_conflicts}.push(conflict);
+			plan{errors}.push(
+				{
+					code: "shared-file-conflict",
+					message: "file is also owned by a kept distribution",
+					path: path,
+					owners: owners,
+					kept_owners: kept_owners,
+				},
+			);
+		}
+		return true;
+	}
+
+	method _build_remove_files ( plan, installed, target_root ) {
+		let owner_map := self._remove_owner_map( installed, target_root );
+		let planned_metadata := {};
+		for ( let removal in plan{removals} ) {
+			planned_metadata.add( removal{metadata_file}, true );
+		}
+
+		let file_seen := {};
+		for ( let removal in plan{removals} ) {
+			let dist := removal{distribution};
+			for ( let module in dist{installed}{modules} ) {
+				self._add_remove_file(
+					plan,
+					file_seen,
+					owner_map,
+					planned_metadata,
+					"module",
+					_path_join(
+						target_root{lib_dir},
+						module{install_as},
+						target_root{windows},
+					),
+					dist,
+					module{install_as},
+				);
+			}
+			for ( let script in dist{installed}{scripts} ) {
+				self._add_remove_file(
+					plan,
+					file_seen,
+					owner_map,
+					planned_metadata,
+					"script",
+					_path_join(
+						target_root{bin_dir},
+						script{install_as},
+						target_root{windows},
+					),
+					dist,
+					script{install_as},
+				);
+				for ( let wrapper in script.get( "wrappers", [] ) ) {
+					self._add_remove_file(
+						plan,
+						file_seen,
+						owner_map,
+						planned_metadata,
+						"wrapper",
+						_path_join(
+							target_root{bin_dir},
+							wrapper,
+							target_root{windows},
+						),
+						dist,
+						wrapper,
+					);
+				}
+			}
+		}
+
+		for ( let removal in plan{removals} ) {
+			self._add_remove_file(
+				plan,
+				file_seen,
+				owner_map,
+				planned_metadata,
+				"metadata",
+				removal{metadata_file},
+				removal{distribution},
+				null,
+			);
+		}
+
+		plan{files} := plan{files}.sort(_remove_file_cmp);
+		plan{shared_file_conflicts} :=
+			plan{shared_file_conflicts}.sort(
+				fn ( a, b ) -> a{path} cmp b{path},
+			);
+		return plan;
+	}
+
+	method plan_remove ( targets, options? ) {
+		let roots := self.dependency_roots(options);
+		let target_root := roots[0];
+		let installed := _list_installed_in_root(target_root);
+		let plan := {
+			ok: true,
+			target_root: target_root,
+			targets: [],
+			removals: [],
+			files: [],
+			shared_file_conflicts: [],
+			skipped_duplicates: [],
+			errors: [],
+		};
+
+		let removal_seen := {};
+		for ( let target in _target_list(targets) ) {
+			let record := _remove_target_record( target, options );
+			if ( record{type} eq "dist" ) {
+				record{type} := "distribution";
+			}
+			record{matches} := [];
+			plan{targets}.push(record);
+
+			if (
+				(
+					record{type} ne "module" and
+					record{type} ne "distribution"
+				) or
+				record{value} eq ""
+			) {
+				plan{errors}.push(
+					{
+						code: "invalid-target",
+						target: record,
+						message: "remove target must be a module or distribution",
+					},
+				);
+				next;
+			}
+
+			let matches := record{type} eq "module"
+				? self._module_remove_matches(
+					installed,
+					record{value},
+				)
+				: self._distribution_remove_matches(
+					installed,
+					record{value},
+				);
+			for ( let match in matches ) {
+				record{matches}.push(
+					{
+						name: match{name},
+						version: match{version},
+						metadata_file: match{metadata_file},
+					},
+				);
+			}
+
+			if ( matches.length() == 0 ) {
+				plan{errors}.push(
+					{
+						code: "missing-target",
+						target: record,
+						message: "remove target is not installed",
+					},
+				);
+				next;
+			}
+			if ( record{type} eq "module" and matches.length() > 1 ) {
+				plan{errors}.push(
+					{
+						code: "ambiguous-target",
+						target: record,
+						message: "module target has multiple owners",
+						matches: record{matches},
+					},
+				);
+				next;
+			}
+
+			for ( let dist in matches ) {
+				let added := self._add_removal(
+					plan{removals},
+					removal_seen,
+					dist,
+					target_root,
+					record{type} eq "module"
+						? "requested-module"
+						: "requested-distribution",
+				);
+				if ( not added ) {
+					plan{skipped_duplicates}.push(
+						{
+							target: record,
+							name: dist{name},
+							version: dist{version},
+							metadata_file: dist{metadata_file},
+						},
+					);
+				}
+			}
+		}
+
+		plan{removals} := plan{removals}.sort(_removal_cmp);
+		self._build_remove_files( plan, installed, target_root );
+		plan{ok} := (
+			plan{errors}.length() == 0 and
+			plan{shared_file_conflicts}.length() == 0
+		);
+		return plan;
+	}
+
+	method plan_install ( targets, options? ) {
+		let roots := self.dependency_roots(options);
+		let target_root := roots[0];
+		let plan := {
+			target_root: target_root,
+			dependency_roots: roots,
+			installs: [],
+			removals: [],
+			satisfied_dependencies: [],
+			dependency_graph: {
+				nodes: [],
+				edges: [],
+			},
+			ownership_conflicts: [],
+		};
+
+		let planned := [];
+		let planned_by_name := {};
+		let status_by_name := {};
+		let seen_targets := {};
+		let loaded_work := [];
+
+		function resolve ( target, requested, dependency_of, min_version, stack ) {
+			let target_text := "" _ target;
+			if ( requested ) {
+				return null if seen_targets.exists(target_text);
+				seen_targets.add( target_text, true );
+			}
+			else {
+				let found := _find_dependency_for_plan(
+					planned,
+					roots,
+					target_text,
+					min_version,
+				);
+				if ( not( found instanceof Null ) ) {
+					if (
+						found{source} eq "planned" and
+						status_by_name.get(found{distribution}, "") eq "visiting"
+					) {
+						die "Dependency cycle detected: " _
+							_cycle_path( stack, target_text );
+					}
+					let satisfied := found;
+					satisfied{requested_by} := dependency_of instanceof Null
+						? null
+						: dependency_of{metadata}{name};
+					plan{satisfied_dependencies}.push(satisfied);
+					return null;
+				}
+				if ( _stack_contains( stack, target_text ) ) {
+					die "Dependency cycle detected: " _
+						_cycle_path( stack, target_text );
+				}
+			}
+
+			let dist := self.load_distribution(
+				target_text,
+				_copy_options_with( options, "keep_work_dirs", true ),
+			);
+			loaded_work.push(dist);
+			if (
+				dist{source}{type} eq "module" and
+				dist{metadata}.exists("status") and
+				dist{metadata}{status} eq "trial"
+			) {
+				die(
+					"Trial distributions are not available through " _
+					"module-name endpoints"
+				);
+			}
+			if (
+				not requested and
+				not _loaded_distribution_provides(
+					dist,
+					target_text,
+					min_version,
+				)
+			) {
+				let dep := {
+					module_name: target_text,
+					min_version: min_version,
+				};
+				_cleanup_source( dist{source}, options );
+				_cleanup_path(dist{work_dir_obj})
+					if not _opt( options, "keep_work_dirs", false );
+				die _dependency_conflict_message(
+					dep,
+					dependency_of,
+					stack,
+					null,
+					dist,
+				);
+			}
+
+			let dist_name := dist{metadata}{name};
+			if ( planned_by_name.exists(dist_name) ) {
+				let existing := planned_by_name.get(dist_name);
+				if (
+					existing{metadata}{version} ne
+					dist{metadata}{version}
+				) {
+					_cleanup_source( dist{source}, options );
+					_cleanup_path(dist{work_dir_obj})
+						if not _opt( options, "keep_work_dirs", false );
+					if ( requested ) {
+						die _planned_version_conflict_message(
+							dist_name,
+							existing,
+							dist,
+							target_text,
+						);
+					}
+					let dep := {
+						module_name: target_text,
+						min_version: min_version,
+					};
+					die _dependency_conflict_message(
+						dep,
+						dependency_of,
+						stack,
+						existing,
+						dist,
+					);
+				}
+				_cleanup_source( dist{source}, options );
+				_cleanup_path(dist{work_dir_obj})
+					if not _opt( options, "keep_work_dirs", false );
+				return existing;
+			}
+
+			let dependencies := _dependency_entries(dist{metadata});
+			let install_action := {
+				action: "install",
+				target: target_text,
+				requested: requested ? true : false,
+				dependency_of: dependency_of instanceof Null
+					? null
+					: dependency_of{metadata}{name},
+				source: dist{source},
+				metadata: dist{metadata},
+				modules: dist{modules},
+				scripts: dist{scripts},
+				tests: dist{tests},
+				dependencies: dependencies,
+				target_root: target_root,
+				root: dist{root},
+				work_dir: dist{work_dir},
+				root_obj: dist{root_obj},
+				work_dir_obj: dist{work_dir_obj},
+			};
+			planned.push(install_action);
+			planned_by_name.add( dist_name, install_action );
+			status_by_name.add( dist_name, "visiting" );
+			plan{dependency_graph}{nodes}.push(
+				{
+					name: dist_name,
+					version: dist{metadata}{version},
+					target: target_text,
+					requested: requested ? true : false,
+				},
+			);
+
+			let next_stack := stack;
+			if ( dist{source}{type} eq "module" ) {
+				next_stack := [];
+				for ( let item in stack ) {
+					next_stack.push(item);
+				}
+				next_stack.push(target_text);
+			}
+
+			for ( let dep in dependencies ) {
+				let found := _find_dependency_for_plan(
+					planned,
+					roots,
+					dep{module_name},
+					dep{min_version},
+				);
+				if ( not( found instanceof Null ) ) {
+					if (
+						found{source} eq "planned" and
+						status_by_name.get(found{distribution}, "") eq "visiting"
+					) {
+						die "Dependency cycle detected: " _
+							_cycle_path( next_stack, dep{module_name} );
+					}
+					let satisfied := found;
+					satisfied{requested_by} := dist_name;
+					plan{satisfied_dependencies}.push(satisfied);
+					plan{dependency_graph}{edges}.push(
+						{
+							from: dist_name,
+							module_name: dep{module_name},
+							min_version: dep{min_version},
+							status: found{source} eq "planned"
+								? "planned"
+								: "satisfied",
+							to: found{distribution},
+							root: found.exists("root") ? found{root} : null,
+						},
+					);
+				}
+				else {
+					let dep_install := resolve(
+						dep{module_name},
+						false,
+						install_action,
+						dep{min_version},
+						next_stack,
+					);
+					plan{dependency_graph}{edges}.push(
+						{
+							from: dist_name,
+							module_name: dep{module_name},
+							min_version: dep{min_version},
+							status: "planned",
+							to: dep_install instanceof Null
+								? null
+								: dep_install{metadata}{name},
+							root: target_root,
+						},
+					);
+				}
+			}
+
+			status_by_name.set( dist_name, "done" );
+			plan{installs}.push(install_action);
+			return install_action;
+		}
+
+		try {
+			for ( let target in _target_list(targets) ) {
+				resolve( target, true, null, "0", [] );
+			}
+		}
+		catch ( Exception e ) {
+			_cleanup_loaded_work_dirs(loaded_work, options);
+			throw e;
+		}
+
+		self._plan_target_root_removals(
+			plan,
+			_list_installed_in_root(target_root),
+			target_root,
+		);
+
+		return plan;
+	}
+
+	method run_distribution_tests ( install_action, options? ) {
+		let results := [];
+		let include_dirs := [];
+		let seen_include_dirs := {};
+		let own_modules := _path_child( install_action{root}, "modules" );
+		_push_unique_string(
+			include_dirs,
+			seen_include_dirs,
+			own_modules.to_String(),
+		) if own_modules.exists() and own_modules.is_dir();
+		for ( let include_dir in _opt( options, "test_include_dirs", [] ) ) {
+			_push_unique_string(
+				include_dirs,
+				seen_include_dirs,
+				include_dir,
+			);
+		}
+
+		for ( let test in install_action{tests} ) {
+			_progress(
+				options,
+				"testing " _ install_action{metadata}{name} _ " " _
+					install_action{metadata}{version} _ ": " _ test,
+			);
+			let argv := include_dirs.map( fn d -> "-I" _ d );
+			argv.push(test);
+			let run_result := Proc.run(
+				_opt( options, "zuzu_command", zuzu_command ),
+				argv,
+				{
+					cwd: install_action{root},
+					capture_stdout: true,
+					capture_stderr: true,
+				},
+			);
+			let parsed := parse_tap(run_result{stdout});
+			results.push(
+				{
+					test: test,
+					ok: _test_ok( parsed, run_result ),
+					status: Proc.status_text(run_result),
+					result: run_result,
+					tap: parsed,
+					stdout: run_result{stdout},
+					stderr: run_result{stderr},
+				},
+			);
+		}
+		let ok := true;
+		for ( let result in results ) {
+			ok := false if not result{ok};
+		}
+		return {
+			ok: ok,
+			tests: results,
+			distribution: install_action{metadata}{name},
+			version: install_action{metadata}{version},
+		};
+	}
+
+	method execute_removal ( removal_action, options? ) {
+		_progress(
+			options,
+			"removing " _ removal_action{name} _ " " _
+				removal_action{version},
+		);
+		let warnings := [];
+		let removed := [];
+		let dist := removal_action{distribution};
+		let root := removal_action{root};
+
+		function remove_file ( path, kind ) {
+			if ( path.exists() ) {
+				path.remove();
+				removed.push(
+					{
+						kind: kind,
+						path: path.to_String(),
+					},
+				);
+			}
+			else {
+				warnings.push(
+					{
+						kind: kind,
+						path: path.to_String(),
+						message: "missing file",
+					},
+				);
+			}
+		}
+
+		for ( let module in dist{installed}{modules} ) {
+			remove_file(
+				_path_child( root{lib_dir}, module{install_as} ),
+				"module",
+			);
+		}
+		for ( let script in dist{installed}{scripts} ) {
+			remove_file(
+				_path_child( root{bin_dir}, script{install_as} ),
+				"script",
+			);
+			for ( let wrapper in script.get( "wrappers", [] ) ) {
+				remove_file(
+					_path_child( root{bin_dir}, wrapper ),
+					"wrapper",
+				);
+			}
+		}
+		remove_file( new Path( removal_action{metadata_file} ), "metadata" );
+
+		return {
+			ok: true,
+			name: removal_action{name},
+			version: removal_action{version},
+			removed: removed,
+			warnings: warnings,
+		};
+	}
+
+	method _install_action ( install_action, installed_at, options? ) {
+		let root := install_action{target_root};
+		let module_records := [];
+		let script_records := [];
+
+		for ( let module in install_action{modules} ) {
+			let source := _path_child(
+				install_action{root},
+				module{source},
+			);
+			let destination := _path_child(
+				root{lib_dir},
+				module{install_as},
+			);
+			_progress(
+				options,
+				"installing module " _ module{install_as} _ " to " _
+					destination.to_String(),
+			);
+			let written := _copy_file_atomic(source, destination, null);
+			module_records.push(
+				{
+					source: module{source},
+					install_as: module{install_as},
+					sha256: written{sha256},
+					size: written{size},
+				},
+			);
+		}
+
+		for ( let script in install_action{scripts} ) {
+			let source := _path_child(
+				install_action{root},
+				script{source},
+			);
+			let destination := _path_child(
+				root{bin_dir},
+				script{install_as},
+			);
+			_progress(
+				options,
+				"installing script " _ script{install_as} _ " to " _
+					destination.to_String(),
+			);
+			let written := _copy_file_atomic(
+				source,
+				destination,
+				root{windows} ? null : 493,
+			);
+
+			let wrappers := [];
+			if ( root{windows} ) {
+				let wrapper_name := _replace_script_suffix(
+					script{install_as},
+					".cmd",
+				);
+				let wrapper := _path_child( root{bin_dir}, wrapper_name );
+				let script_base := _relative_basename(script{install_as});
+				_progress(
+					options,
+					"installing command wrapper " _ wrapper_name _
+						" to " _ wrapper.to_String(),
+				);
+				_spew_utf8_atomic(
+					wrapper,
+					"@echo off\r\n" _
+					"zuzu \"%~dp0" _ script_base _ "\" %*\r\n",
+				);
+				wrappers.push(wrapper_name);
+			}
+
+			script_records.push(
+				{
+					source: script{source},
+					install_as: script{install_as},
+					sha256: written{sha256},
+					size: written{size},
+					wrappers: wrappers,
+				},
+			);
+		}
+
+		let metadata := _copy_source_metadata(install_action{metadata});
+		metadata{installed} := {
+			zdf: "ZDF-1",
+			lib_dir: root{lib_dir},
+			bin_dir: root{bin_dir},
+			meta_dir: root{meta_dir},
+			installed_at: installed_at,
+			source: _copy_source_record(install_action{source}),
+			modules: module_records,
+			scripts: script_records,
+		};
+
+		let metadata_file := _path_child(
+			root{meta_dir},
+			metadata{name} _ "-" _ metadata{version} _ ".json",
+		);
+		_progress(
+			options,
+			"writing metadata for " _ metadata{name} _ " " _
+				metadata{version} _ " to " _ metadata_file.to_String(),
+		);
+		_atomic_json_write( metadata_file, metadata );
+
+		return {
+			name: metadata{name},
+			version: metadata{version},
+			metadata_file: metadata_file.to_String(),
+			modules: module_records,
+			scripts: script_records,
+			metadata: metadata,
+		};
+	}
+
+	method format_install_plan ( plan ) {
+		let lines := [
+			"Install target:",
+			"  lib: " _ plan{target_root}{lib_dir},
+			"  bin: " _ plan{target_root}{bin_dir},
+			"  meta: " _ plan{target_root}{meta_dir},
+			"",
+			"Removals:",
+		];
+
+		let removal_lines := [];
+		for ( let removal in plan{removals} ) {
+			removal_lines.push(
+				"  - " _ removal{name} _ " " _ removal{version} _
+				" [" _ join(
+					", ",
+					removal{reasons}.sort( fn ( a, b ) -> a cmp b ),
+				) _ "]"
+			);
+		}
+		removal_lines := removal_lines.sort( fn ( a, b ) -> a cmp b );
+		if ( removal_lines.length() == 0 ) {
+			lines.push("  none");
+		}
+		else {
+			for ( let line in removal_lines ) {
+				lines.push(line);
+			}
+		}
+
+			lines.push("");
+			lines.push("Installs:");
+			let install_lines := [];
+			for ( let install_action in plan{installs} ) {
+				install_lines.push(
+					"  - " _ install_action{metadata}{name} _ " " _
+					install_action{metadata}{version}
+				);
+				for ( let module in install_action{modules} ) {
+					install_lines.push(
+						"    module " _ module{install_as} _ " -> " _
+					_path_join(
+						plan{target_root}{lib_dir},
+						module{install_as},
+						plan{target_root}{windows},
+					)
+					);
+				}
+				for ( let script in install_action{scripts} ) {
+					install_lines.push(
+						"    script " _ script{install_as} _ " -> " _
+					_path_join(
+						plan{target_root}{bin_dir},
+						script{install_as},
+						plan{target_root}{windows},
+					)
+				);
+			}
+		}
+		if ( install_lines.length() == 0 ) {
+			lines.push("  none");
+		}
+		else {
+			for ( let line in install_lines ) {
+				lines.push(line);
+			}
+		}
+
+		lines.push("");
+		lines.push("Conflicts:");
+		let conflict_lines := [];
+		for ( let conflict in plan{ownership_conflicts} ) {
+			conflict_lines.push(
+				"  - " _ conflict{kind} _ " " _
+				conflict{install_as} _ " owned by " _
+				conflict{owner_distribution} _ " " _
+				conflict{owner_version} _ "; replacing with " _
+				conflict{planned_distribution} _ " " _
+				conflict{planned_version} _ "; destination " _
+				conflict{destination} _ "; owner metadata " _
+				conflict{owner_metadata_file}
+			);
+		}
+		conflict_lines := conflict_lines.sort( fn ( a, b ) -> a cmp b );
+		if ( conflict_lines.length() == 0 ) {
+			lines.push("  none");
+		}
+		else {
+			for ( let line in conflict_lines ) {
+				lines.push(line);
+			}
+		}
+
+		return join( "\n", lines ) _ "\n";
+	}
+
+	method format_remove_plan ( plan ) {
+		let lines := [
+			"Remove target:",
+			"  lib: " _ plan{target_root}{lib_dir},
+			"  bin: " _ plan{target_root}{bin_dir},
+			"  meta: " _ plan{target_root}{meta_dir},
+			"",
+			"Removals:",
+		];
+
+		if ( plan{removals}.length() == 0 ) {
+			lines.push("  none");
+		}
+		else {
+			for ( let removal in plan{removals} ) {
+				lines.push(
+					"  - " _ removal{name} _ " " _
+					removal{version}
+				);
+			}
+		}
+
+		lines.push("");
+		lines.push("Files:");
+		if ( plan{files}.length() == 0 ) {
+			lines.push("  none");
+		}
+		else {
+			for ( let file in plan{files} ) {
+				let status := file{blocked}
+					? "blocked"
+					: ( file{exists} ? "exists" : "missing" );
+				lines.push(
+					"  - " _ file{kind} _ " " _
+					file{path} _ " [" _ status _ "]"
+				);
+			}
+		}
+
+		lines.push("");
+		lines.push("Shared file conflicts:");
+		if ( plan{shared_file_conflicts}.length() == 0 ) {
+			lines.push("  none");
+		}
+		else {
+			for ( let conflict in plan{shared_file_conflicts} ) {
+				let kept := conflict{kept_owners}.map(
+					fn o -> o{name} _ " " _ o{version},
+				).sort( fn ( a, b ) -> a cmp b );
+				lines.push(
+					"  - " _ conflict{path} _
+					" kept by " _ join( ", ", kept )
+				);
+			}
+		}
+
+		lines.push("");
+		lines.push("Errors:");
+		if ( plan{errors}.length() == 0 ) {
+			lines.push("  none");
+		}
+		else {
+			for ( let error in plan{errors} ) {
+				lines.push(
+					"  - " _ error{code} _ ": " _
+					error{message}
+				);
+			}
+		}
+
+		return join( "\n", lines ) _ "\n";
+	}
+
+	method _install_unlocked ( targets, options? ) {
+		_progress(
+			options,
+			"planning install for " _ join( ", ", _target_list(targets) ),
+		);
+		let plan := self.plan_install( targets, options );
+		let plan_text := self.format_install_plan(plan);
+		STDOUT.print(plan_text) if _opt( options, "print_plan", false );
+
+		if ( _opt( options, "dry_run", false ) ) {
+			_cleanup_plan_work_dirs(plan, options);
+			return {
+				ok: true,
+				dry_run: true,
+				plan: plan,
+				plan_text: plan_text,
+				tests: [],
+				removals: [],
+				installs: [],
+				warnings: [],
+			};
+		}
+
+		let test_results := [];
+		let tests_ok := true;
+		if ( not _opt( options, "no_test", false ) ) {
+			let test_include_dirs := [];
+			let seen_test_include_dirs := {};
+			for ( let install_action in plan{installs} ) {
+				let modules_dir := _path_child(
+					install_action{root},
+					"modules",
+				);
+				_push_unique_string(
+					test_include_dirs,
+					seen_test_include_dirs,
+					modules_dir.to_String(),
+				) if modules_dir.exists() and modules_dir.is_dir();
+			}
+			for ( let include_dir in _runtime_include_dirs() ) {
+				_push_unique_string(
+					test_include_dirs,
+					seen_test_include_dirs,
+					include_dir,
+				);
+			}
+			for ( let root in self.dependency_roots(options) ) {
+				_push_unique_string(
+					test_include_dirs,
+					seen_test_include_dirs,
+					root{lib_dir},
+				) if root{lib_dir} ne "";
+			}
+			let test_options := _copy_options_with(
+				options,
+				"test_include_dirs",
+				test_include_dirs,
+			);
+			for ( let install_action in plan{installs} ) {
+				let test_result := self.run_distribution_tests(
+					install_action,
+					test_options,
+				);
+				test_results.push(test_result);
+				tests_ok := false if not test_result{ok};
+			}
+		}
+
+		if ( not tests_ok and not _opt( options, "force", false ) ) {
+			_cleanup_plan_work_dirs(plan, options);
+			return {
+				ok: false,
+				error: "distribution tests failed",
+				dry_run: false,
+				plan: plan,
+				plan_text: plan_text,
+				tests: test_results,
+				removals: [],
+				installs: [],
+				warnings: [],
+			};
+		}
+
+		try {
+			let removals := [];
+			let warnings := [];
+			for ( let removal in plan{removals} ) {
+				let result := self.execute_removal( removal, options );
+				removals.push(result);
+				for ( let warning in result{warnings} ) {
+					warnings.push(warning);
+				}
+			}
+
+			let installs := [];
+			let installed_at := _installed_at();
+			for ( let install_action in plan{installs} ) {
+				installs.push( self._install_action(
+					install_action,
+					installed_at,
+					options,
+				) );
+			}
+
+			_cleanup_plan_work_dirs(plan, options);
+			return {
+				ok: true,
+				dry_run: false,
+				forced: not tests_ok and _opt( options, "force", false ),
+				plan: plan,
+				plan_text: plan_text,
+				tests: test_results,
+				removals: removals,
+				installs: installs,
+				warnings: warnings,
+			};
+		}
+		catch ( Exception e ) {
+			_cleanup_plan_work_dirs(plan, options);
+			throw e;
+		}
+	}
+
+	method install ( targets, options? ) {
+		let lock := self.acquire_lock( "install", options );
+		try {
+			let result := self._install_unlocked( targets, options );
+			lock.release();
+			return result;
+		}
+		catch ( Exception e ) {
+			lock.release();
+			throw e;
+		}
+	}
+
+	method _remove_unlocked ( targets, options? ) {
+		let plan := self.plan_remove( targets, options );
+		let plan_text := self.format_remove_plan(plan);
+		STDOUT.print(plan_text) if _opt( options, "print_plan", false );
+
+		if ( not plan{ok} ) {
+			return {
+				ok: false,
+				dry_run: false,
+				plan: plan,
+				plan_text: plan_text,
+				removed: [],
+				warnings: [],
+				errors: plan{errors},
+			};
+		}
+
+		if ( _opt( options, "dry_run", false ) ) {
+			return {
+				ok: true,
+				dry_run: true,
+				plan: plan,
+				plan_text: plan_text,
+				removed: [],
+				warnings: [],
+				errors: [],
+			};
+		}
+
+		let removed := [];
+		let warnings := [];
+		for ( let file in plan{files} ) {
+			let path := new Path(file{path});
+			if ( path.exists() ) {
+				path.remove();
+				removed.push(
+					{
+						kind: file{kind},
+						path: file{path},
+					},
+				);
+			}
+			else {
+				warnings.push(
+					{
+						kind: file{kind},
+						path: file{path},
+						message: "missing file",
+					},
+				);
+			}
+		}
+
+		return {
+			ok: true,
+			dry_run: false,
+			plan: plan,
+			plan_text: plan_text,
+			removed: removed,
+			warnings: warnings,
+			errors: [],
+		};
+	}
+
+	method remove ( targets, options? ) {
+		let lock := self.acquire_lock( "remove", options );
+		try {
+			let result := self._remove_unlocked( targets, options );
+			lock.release();
+			return result;
+		}
+		catch ( Exception e ) {
+			lock.release();
+			throw e;
+		}
+	}
+}
+
+function _zoo ( options? ) {
+	return new Zuzuzoo(
+		lib_dir: _opt( options, "lib_dir", null ),
+		bin_dir: _opt( options, "bin_dir", null ),
+		meta_dir: _opt( options, "meta_dir", null ),
+		global: _opt( options, "global", false ),
+		windows: _opt( options, "windows", null ),
+		home: _opt( options, "home", null ),
+		userprofile: _opt( options, "userprofile", null ),
+		base_url: _opt( options, "base_url", "https://zuzulang.org" ),
+		user_agent: _opt( options, "user_agent", null ),
+		zuzu_command: _opt( options, "zuzu_command", "zuzu" ),
+		dependency_roots: _opt( options, "dependency_roots", [] ),
+		global_root: _opt( options, "global_root", null ),
+	);
+}
+
+function list_installed ( options? ) {
+	return _zoo(options).list_installed(options);
+}
+
+function query ( module_name, options? ) {
+	return _zoo(options).query( module_name, options );
+}
+
+function query_distribution ( distribution_name, options? ) {
+	return _zoo(options).query_distribution( distribution_name, options );
+}
+
+function is_installed ( module_name, min_version?, options? ) {
+	return _zoo(options).is_installed( module_name, min_version );
+}
+
+function installed_version ( module_name, options? ) {
+	return _zoo(options).installed_version(module_name);
+}
+
+function pretty_json ( value, options? ) {
+	return _zoo(options).pretty_json(value);
+}
+
+function format_json ( value, options? ) {
+	return _zoo(options).format_json( value, options );
+}
+
+function fetch_source ( target, options? ) {
+	return _zoo(options).fetch_source( target, options );
+}
+
+function load_distribution ( target, options? ) {
+	return _zoo(options).load_distribution( target, options );
+}
+
+function dependency_roots ( options? ) {
+	return _zoo(options).dependency_roots(options);
+}
+
+function find_dependency ( module_name, min_version?, options? ) {
+	return _zoo(options).find_dependency(
+		module_name,
+		min_version,
+		options,
+	);
+}
+
+function plan_install ( targets, options? ) {
+	return _zoo(options).plan_install( targets, options );
+}
+
+function plan_remove ( targets, options? ) {
+	return _zoo(options).plan_remove( targets, options );
+}
+
+function verify ( targets, options? ) {
+	return _zoo(options).verify( targets, options );
+}
+
+function latest ( module_name, options? ) {
+	return _zoo(options).latest( module_name, options );
+}
+
+function can_upgrade ( module_name, options? ) {
+	return _zoo(options).can_upgrade( module_name, options );
+}
+
+function install ( targets, options? ) {
+	return _zoo(options).install( targets, options );
+}
+
+function remove ( targets, options? ) {
+	return _zoo(options).remove( targets, options );
+}
+
+function run_distribution_tests ( install_action, options? ) {
+	return _zoo(options).run_distribution_tests( install_action, options );
+}
+
+function execute_removal ( removal_action, options? ) {
+	return _zoo(options).execute_removal( removal_action, options );
+}
+
+function format_install_plan ( plan, options? ) {
+	return _zoo(options).format_install_plan(plan);
+}
+
+function format_remove_plan ( plan, options? ) {
+	return _zoo(options).format_remove_plan(plan);
+}

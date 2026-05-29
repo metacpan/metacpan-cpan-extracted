@@ -1,0 +1,44 @@
+from test/more import *;
+from test/worker_phase5/functions import worker_phase5_imported_add;
+from test/worker_contract import require_worker_phase;
+
+let Worker := require_worker_phase(3);
+
+const worker_phase2_offset := 10;
+
+function worker_phase2_add_offset ( x ) {
+	return x + worker_phase2_offset;
+}
+
+async function main () {
+	let result := await {
+		Worker.spawn(
+			function ( callback, value ) {
+				return callback(value) + 1;
+			},
+			[ worker_phase2_add_offset, 31 ],
+		);
+	};
+
+	is(
+		result,
+		42,
+		"worker receives and calls marshalled user function",
+	);
+
+	let imported_result := await {
+		Worker.spawn( worker_phase5_imported_add, [ 36 ] );
+	};
+
+	is(
+		imported_result,
+		42,
+		"worker receives and calls imported module function",
+	);
+}
+
+await {
+	main();
+};
+
+done_testing();

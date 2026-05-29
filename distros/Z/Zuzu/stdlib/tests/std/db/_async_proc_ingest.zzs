@@ -1,0 +1,47 @@
+from test/more import *;
+
+requires_capability( "proc" );
+requires_capability( "db" );
+
+from std/db import DB;
+from std/proc import Proc;
+
+let dbh := DB.temp();
+dbh.prepare( "create table runs (kind text, ok integer, out text)" ).execute();
+let insert := dbh.prepare( "insert into runs (kind, ok, out) values (?, ?, ?)" );
+
+async function main () {
+	let run := await {
+		Proc.run_async(
+			"perl",
+			[ "-e", "my $x = <STDIN>; print uc($x);" ],
+			{ stdin: "ok\n" },
+		);
+	};
+	insert.execute( "run_async", run{ok}, run{stdout} );
+
+	let pipeline := await {
+		Proc.pipeline_async(
+			[
+				[ "perl", "-e", "print qq<ab>" ],
+				[ "perl", "-pe", "s/ab/AB/" ],
+			],
+		);
+	};
+	insert.execute( "pipeline_async", pipeline{ok}, pipeline{stdout} );
+}
+
+await {
+	main();
+};
+
+let q := dbh.prepare( "select kind, ok, out from runs order by rowid" );
+q.execute();
+let rows := q.all_dict();
+
+is( rows.length(), 2, "async process results persisted to db" );
+is( rows[0]{kind}, "run_async", "first record tagged as run_async" );
+is( rows[0]{out}, "OK\n", "run_async stdout roundtrips" );
+is( rows[1]{out}, "AB", "pipeline_async stdout roundtrips" );
+
+done_testing();

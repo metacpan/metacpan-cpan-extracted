@@ -1,0 +1,83 @@
+from test/more import *;
+from std/eval import eval;
+
+trait LinkedLabel {
+	method label;
+	method suffix;
+
+	method label () {
+		return "trait:" _ self.suffix();
+	}
+
+	method suffix () {
+		return "suffix";
+	}
+}
+
+class Box with LinkedLabel {
+	method first;
+	method second;
+	static method static_first;
+	static method static_second;
+
+	method first () {
+		return self.second();
+	}
+
+	method second () {
+		return "second";
+	}
+
+	static method static_first () {
+		return self.static_second();
+	}
+
+	static method static_second () {
+		return "static-second";
+	}
+}
+
+let box := new Box();
+
+is(
+	box.first(),
+	"second",
+	"instance method predeclaration completes later",
+);
+is(
+	Box.static_first(),
+	"static-second",
+	"static method predeclaration completes later",
+);
+is(
+	box.label(),
+	"trait:suffix",
+	"trait method predeclaration completes later",
+);
+
+like(
+	exception( function () {
+		eval(
+			"class BadMethod { "
+			_ "method duplicate; "
+			_ "method duplicate; "
+			_ "}",
+		);
+	} ),
+	/Redeclaration|redecl/i,
+	"duplicate method predeclaration is rejected",
+);
+like(
+	exception( function () {
+		eval(
+			"class BadStatic { "
+			_ "static method duplicate; "
+			_ "static method duplicate; "
+			_ "}",
+		);
+	} ),
+	/Redeclaration|redecl/i,
+	"duplicate static method predeclaration is rejected",
+);
+
+done_testing();

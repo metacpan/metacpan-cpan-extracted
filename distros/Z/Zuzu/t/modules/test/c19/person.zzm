@@ -1,0 +1,5 @@
+from test/c19/traits import ExternalNamed, ExternalRenamable;
+
+class Person with ExternalNamed, ExternalRenamable {
+	let String name with get, set;
+}

@@ -1,0 +1,5 @@
+class ModuleCustomError extends Exception;
+
+function raise_custom_error () {
+	throw new ModuleCustomError( message: "from-c35" );
+}

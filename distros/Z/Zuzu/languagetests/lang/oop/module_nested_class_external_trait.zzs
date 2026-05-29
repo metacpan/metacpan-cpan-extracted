@@ -1,0 +1,10 @@
+from test/c25/container import ItemContainer;
+from test/more import *;
+
+let c := new ItemContainer();
+let item := c.build_item( "Ada" );
+
+is( item.speak(), "hi Ada", "nested class in imported module composes external trait" );
+is( item.get_name(), "Ada", "nested trait-composed class retains declared accessors" );
+
+done_testing();

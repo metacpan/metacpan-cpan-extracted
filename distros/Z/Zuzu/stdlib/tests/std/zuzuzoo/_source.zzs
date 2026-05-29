@@ -1,0 +1,227 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/archive import Archive;
+from std/io import Path;
+from std/zuzuzoo import Zuzuzoo, fetch_source;
+
+class FakeRequest {
+	let target_url := null;
+	let download_path := null;
+
+	method download_to ( path ) {
+		download_path := path;
+		return self;
+	}
+
+	method url () {
+		return target_url;
+	}
+
+	method path () {
+		return download_path;
+	}
+}
+
+class FakeResponse {
+	let final_url := null;
+	let ok := true;
+	let status_code := 200;
+	let status_reason := "OK";
+	let payload := null;
+
+	method success () {
+		return ok;
+	}
+
+	method status () {
+		return status_code;
+	}
+
+	method reason () {
+		return status_reason;
+	}
+
+	method expect_success () {
+		return self;
+	}
+
+	method json () {
+		return payload;
+	}
+
+	method url () {
+		return final_url;
+	}
+}
+
+class FakeUserAgent {
+	let payload := null;
+	let urls := [];
+
+	method build_request ( http_method, url ) {
+		urls.push(url);
+		return new FakeRequest( target_url: url );
+	}
+
+	method send ( request ) {
+		( new Path( request.path() ) ).spew(payload);
+		return new FakeResponse( final_url: request.url() _ "?final" );
+	}
+
+	method seen () {
+		return urls;
+	}
+}
+
+let archive_bytes := Archive.encode(
+	{
+		entries: [
+			{
+				path: "fetch-dist-1.0.0/zuzu-distribution.json",
+				data: to_binary(
+					"{\"name\":\"fetch-dist\",\"version\":\"1.0.0\"," _
+					"\"author\":\"Example\",\"license\":\"MIT\"}\n",
+				),
+			},
+		],
+	},
+	"zip",
+);
+
+let dir := Path.tempdir();
+let local := dir.child("fetch-dist.zip");
+local.spew(archive_bytes);
+
+let zoo := new Zuzuzoo();
+let local_source := zoo.fetch_source(local.to_String());
+is( local_source{type}, "file", "existing local file resolves first" );
+is( local_source{path}, local.to_String(), "local source keeps original path" );
+
+let url_ua := new FakeUserAgent( payload: archive_bytes );
+let url_source := zoo.fetch_source(
+	"https://example.test/fetch-dist.zip",
+	{ user_agent: url_ua },
+);
+is( url_source{type}, "url", "HTTP URL resolves as URL source" );
+is(
+	url_ua.seen()[0],
+	"https://example.test/fetch-dist.zip",
+	"URL source downloads the requested URL",
+);
+is(
+	url_source{resolved_url},
+	"https://example.test/fetch-dist.zip?final",
+	"URL source records response URL",
+);
+is(
+	( new Path( url_source{path} ) ).slurp(),
+	archive_bytes,
+	"URL source writes downloaded bytes to a temp file",
+);
+
+let module_ua := new FakeUserAgent( payload: archive_bytes );
+let module_source := fetch_source(
+	"acme/widget",
+	{
+		user_agent: module_ua,
+		base_url: "https://packages.example.test/",
+	},
+);
+is( module_source{type}, "module", "module name resolves as module source" );
+is(
+	module_ua.seen()[0],
+	"https://packages.example.test/module/acme/widget",
+	"module source resolves against base_url",
+);
+is(
+	module_source{resolved_url},
+	"https://packages.example.test/module/acme/widget?final",
+	"module source records redirected URL when available",
+);
+
+class StepUserAgent {
+	let steps := [];
+	let urls := [];
+
+	method build_request ( http_method, url ) {
+		urls.push(url);
+		return new FakeRequest( target_url: url );
+	}
+
+	method send ( request ) {
+		let step := steps.shift();
+		if ( step.exists("payload") and typeof request.path() ne "Null" ) {
+			( new Path( request.path() ) ).spew(step{payload});
+		}
+		return new FakeResponse(
+			final_url: step.exists("final_url")
+				? step{final_url}
+				: request.url(),
+			ok: step.exists("ok") ? step{ok} : true,
+			status_code: step.exists("status") ? step{status} : 200,
+			status_reason: step.exists("reason") ? step{reason} : "OK",
+			payload: step.exists("json") ? step{json} : null,
+		);
+	}
+
+	method seen () {
+		return urls;
+	}
+}
+
+let fallback_ua := new StepUserAgent(
+	steps: [
+		{
+			ok: false,
+			status: 404,
+			reason: "Not Found",
+		},
+		{
+			final_url:
+				"https://mirror.example/downloads/acme-fallback-1.0.0.json",
+			json: {
+				name: "acme-fallback",
+				version: "1.0.0",
+				author: "Example",
+				license: "MIT",
+				status: "stable",
+			},
+		},
+		{
+			final_url:
+				"https://mirror.example/downloads/acme-fallback-1.0.0.tar.gz",
+			payload: archive_bytes,
+		},
+	],
+);
+let fallback_source := fetch_source(
+	"acme/fallback",
+	{
+		user_agent: fallback_ua,
+		base_url: "https://packages.example.test",
+	},
+);
+is(
+	fallback_ua.seen()[0],
+	"https://packages.example.test/module/acme/fallback",
+	"module fallback first tries the stable archive endpoint",
+);
+is(
+	fallback_ua.seen()[1],
+	"https://packages.example.test/module/acme/fallback.json",
+	"module fallback checks latest metadata after archive failure",
+);
+is(
+	fallback_ua.seen()[2],
+	"https://mirror.example/downloads/acme-fallback-1.0.0.tar.gz",
+	"module fallback derives archive URL from latest metadata URL",
+);
+is(
+	( new Path( fallback_source{path} ) ).slurp(),
+	archive_bytes,
+	"module fallback writes the derived archive bytes",
+);
+
+done_testing();

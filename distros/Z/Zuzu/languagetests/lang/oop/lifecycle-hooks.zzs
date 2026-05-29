@@ -1,0 +1,36 @@
+from test/more import *;
+
+class Builder {
+	let value := 1;
+
+	method __build__ () {
+		value := value + 9;
+		__global__{build_seen} := value;
+	}
+}
+
+let built := new Builder();
+is( built{value}, 10, "__build__ can mutate freshly built objects" );
+is( __global__{build_seen}, 10, "__build__ runs automatically after new" );
+__global__{demolish_seen} := 0;
+__global__{demolish_marker} := "";
+
+class Temp {
+	let marker := "";
+
+	method __demolish__ () {
+		__global__{demolish_seen} := __global__{demolish_seen} +1;
+		__global__{demolish_marker} := marker;
+	}
+}
+
+function make_temp () {
+	let t := new Temp( marker: "bye" );
+	return 1;
+}
+
+is( __global__{demolish_seen}, 0, "__demolish__ not called while alive" );
+make_temp();
+is( __global__{demolish_seen}, 1, "__demolish__ runs at garbage collection" );
+is( __global__{demolish_marker}, "bye", "__demolish__ can inspect fields" );
+done_testing();

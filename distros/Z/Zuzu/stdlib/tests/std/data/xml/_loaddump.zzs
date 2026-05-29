@@ -1,0 +1,22 @@
+from test/more import *;
+requires_capability( "fs" );
+
+from std/data/xml import *;
+from std/io import Path;
+
+let doc := XML.parse( "<root><info>one</info><info>two</info></root>" );
+let file := Path.tempfile();
+XML.dump( file, doc, true );
+let loaded := XML.load(file);
+is( loaded.findnodes("/root/info").length(), 2, "XML.dump + XML.load with Path" );
+like( file.slurp_utf8(), /\<root\>/, "XML.dump writes XML to file" );
+like( exception( function() {
+	XML.dump( "doc.xml", doc, true );
+}
+), /TypeException: XML.dump expects Path as first argument/, "XML.dump rejects non-Path target" );
+like( exception( function() {
+	XML.load("doc.xml");
+}
+), /TypeException: XML.load expects Path as first argument/, "XML.load rejects non-Path target" );
+
+done_testing();

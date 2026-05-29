@@ -1,0 +1,104 @@
+from test/more import *;
+
+requires_capability( "fs" );
+requires_capability( "db" );
+
+from std/db import DB;
+from std/io import Path;
+from std/string import split;
+from std/web import Request, Response;
+from std/web/session import FileSessionHandler, DbSessionHandler;
+
+function request_with_cookie ( cookie, scheme := "https" ) {
+	let headers := new PairList();
+	headers.add( "Cookie", cookie ) if cookie ≢ null;
+	return new Request(
+		env: {
+			scheme:  scheme,
+			headers: headers,
+		},
+	);
+}
+
+function response_cookie ( response ) {
+	let out := response.finalize();
+	return split( out[1].get("Set-Cookie"), ";" )[0];
+}
+
+let file_dir := Path.tempdir().child("sessions");
+let file_handler := new FileSessionHandler(
+	dir:     file_dir,
+	secret:  "file-secret",
+	max_age: 3600,
+);
+
+Request.set_session_handler(file_handler);
+let file_req1 := request_with_cookie(null);
+let file_session1 := file_req1.session();
+file_session1{data}.set( "name", "Ada" );
+is( file_session1.finalize(), file_session1, "file session finalize returns self" );
+file_session1.finalize();
+is( file_session1.is_finalized(), true, "file session finalize is idempotent" );
+
+let file_cookie := response_cookie( new Response( session: file_session1 ) );
+like(
+	file_cookie,
+	/^zzsession=[A-Za-z0-9_-]+\.[0-9a-f]+$/,
+	"file session response sets signed cookie",
+);
+
+let file_req2 := request_with_cookie(file_cookie);
+let file_session2 := file_req2.session();
+is( file_session2.id(), file_session1.id(), "file session reloads same id" );
+is( file_session2{data}{name}, "Ada", "file session reloads data" );
+
+let tampered_cookie := file_cookie _ "x";
+let file_session3 := request_with_cookie(tampered_cookie).session();
+isnt( file_session3.id(), file_session1.id(), "tampered file cookie is rejected" );
+
+let expired_handler := new FileSessionHandler(
+	dir:     Path.tempdir().child("expired-sessions"),
+	secret:  "file-secret",
+	max_age: -1,
+);
+Request.set_session_handler(expired_handler);
+let expired_session1 := request_with_cookie(null).session();
+let expired_cookie := response_cookie( new Response(
+	session: expired_session1.finalize(),
+) );
+let expired_session2 := request_with_cookie(expired_cookie).session();
+isnt( expired_session2.id(), expired_session1.id(), "expired file session is replaced" );
+
+let dbh := DB.temp();
+let db_handler := new DbSessionHandler(
+	dbh:     dbh,
+	secret:  "db-secret",
+	max_age: 3600,
+);
+
+Request.set_session_handler(db_handler);
+let db_req1 := request_with_cookie(null);
+let db_session1 := db_req1.session();
+db_session1{data}.set( "colour", "blue" );
+let db_cookie := response_cookie( new Response(
+	session: db_session1.finalize(),
+) );
+
+let db_req2 := request_with_cookie(db_cookie);
+let db_session2 := db_req2.session();
+is( db_session2.id(), db_session1.id(), "db session reloads same id" );
+is( db_session2{data}{colour}, "blue", "db session reloads data" );
+
+let insecure_req := request_with_cookie(null, "http");
+let insecure_session := insecure_req.session();
+let insecure_cookie_out := new Response(
+	session: insecure_session.finalize(),
+).finalize();
+unlike(
+	insecure_cookie_out[1].get("Set-Cookie"),
+	/; Secure/,
+	"http sessions do not set Secure by default",
+);
+
+Request.set_session_handler(null);
+done_testing();

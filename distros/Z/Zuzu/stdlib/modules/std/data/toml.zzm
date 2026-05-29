@@ -1,0 +1,756 @@
+=encoding utf8
+
+=head1 NAME
+
+std/data/toml - TOML encoding and decoding for ZuzuScript.
+
+=head1 SYNOPSIS
+
+  from std/data/toml import TOML;
+
+  let codec := new TOML( pretty: true, canonical: true );
+  let text := codec.encode({ answer: 42, name: "Zuzu" });
+  let data := codec.decode(text);
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Node and
+Electron. It is partially supported by zuzu-js in the browser: in-memory
+TOML encode/decode coverage passes, but file-backed load/dump coverage is
+unsupported because browser filesystem capability is unavailable.
+
+=head1 DESCRIPTION
+
+This module provides a pure-Zuzu implementation of TOML parsing and
+serialization, with a user-facing API modelled on C<std/data/json>.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<< TOML({ utf8?: Bool, pretty?: Bool, canonical?: Bool }) >>
+
+Constructs a TOML codec. Returns: C<TOML>.
+
+=item C<< codec.encode(value) >>
+
+Parameters: C<value> is a C<Dict> or compatible mapping. Returns:
+C<String>. Encodes C<value> as TOML text.
+
+=item C<< codec.encode_binarystring(value) >>
+
+Parameters: C<value> is a C<Dict> or compatible mapping. Returns:
+C<BinaryString>. Encodes C<value> as UTF-8 TOML bytes.
+
+=item C<< codec.decode(String text) >>
+
+Parameters: C<text> is TOML text. Returns: C<Dict>. Decodes TOML text
+into a dictionary.
+
+=item C<< codec.decode_binarystring(BinaryString bytes) >>
+
+Parameters: C<bytes> is UTF-8 TOML bytes. Returns: C<Dict>. Decodes TOML
+bytes into a dictionary.
+
+=item C<< codec.load(Path path) >>
+
+Parameters: C<path> is a C<std/io> C<Path>. Returns: C<Dict>. Reads TOML
+text from C<path> and decodes it.
+
+=item C<< codec.dump(Path path, value) >>
+
+Parameters: C<path> is a C<std/io> C<Path> and C<value> is a C<Dict> or
+compatible mapping. Returns: C<null>. Encodes C<value> and writes TOML
+text to C<path>.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/data/toml >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/string import substr, index;
+
+
+function _is_space ( String ch ) {
+	return ch ≡ " " or ch ≡ "\t" or ch ≡ "\r" or ch ≡ "\n";
+}
+
+function _trim ( String text ) {
+	let start := 0;
+	let stop := length text;
+	while ( start < stop and _is_space( substr( text, start, 1 ) ) ) {
+		start++;
+	}
+	while ( stop > start and _is_space( substr( text, stop - 1, 1 ) ) ) {
+		stop--;
+	}
+
+	return substr( text, start, stop - start );
+}
+
+function _strip_comment ( String line ) {
+	let i := 0;
+	let n := length line;
+	let in_string := false;
+	let escaped := false;
+
+	while ( i < n ) {
+		let ch := substr( line, i, 1 );
+
+		if (in_string) {
+			if (escaped) {
+				escaped := false;
+			}
+			else if ( ch ≡ "\\" ) {
+				escaped := true;
+			}
+			else if ( ch ≡ "\"" ) {
+				in_string := false;
+			}
+		}
+
+		else {
+			if ( ch ≡ "\"" ) {
+				in_string := true;
+			}
+			else if ( ch ≡ "#" ) {
+				return substr( line, 0, i );
+			}
+		}
+
+		i++;
+	}
+
+	return line;
+}
+
+function _split_dotted_key ( String raw_key ) {
+	let out := [];
+	let i := 0;
+	let n := length raw_key;
+	let current := "";
+	let in_quote := false;
+	let escaped := false;
+
+	while ( i < n ) {
+		let ch := substr( raw_key, i, 1 );
+
+		if (in_quote) {
+			if (escaped) {
+				current _= ch;
+				escaped := false;
+			}
+			else if ( ch ≡ "\\" ) {
+				escaped := true;
+			}
+			else if ( ch ≡ "\"" ) {
+				in_quote := false;
+			}
+			else {
+				current _= ch;
+			}
+		}
+
+		else {
+			if ( ch ≡ "\"" ) {
+				in_quote := true;
+			}
+
+			else if ( ch ≡".") {
+				let k := _trim(current);
+				die "Invalid empty key path component" if k ≡ "";
+				out.push(k);
+				current := "";
+			}
+
+			else {
+				current _= ch;
+			}
+		}
+
+		i++;
+	}
+
+	let k := _trim(current);
+	die "Invalid empty key path component" if k ≡ "";
+	out.push(k);
+
+	return out;
+}
+
+function _parse_string_value ( String text, Number pos ) {
+	let i := pos + 1;
+	let n := length text;
+	let out := "";
+
+	while ( i < n ) {
+		let ch := substr( text, i, 1 );
+
+		if ( ch ≡ "\\" ) {
+			i++;
+			die "Unterminated escape sequence" if i >= n;
+			let esc := substr( text, i, 1 );
+			if ( esc ≡ "n" ) {
+				out _= "\n";
+				i++;
+				continue;
+			}
+			if ( esc ≡ "r" ) {
+				out _= "\r";
+				i++;
+				continue;
+			}
+			if ( esc ≡ "t" ) {
+				out _= "\t";
+				i++;
+				continue;
+			}
+			if ( esc ≡ "\"" ) {
+				out _= "\"";
+				i++;
+				continue;
+			}
+			if ( esc ≡ "\\" ) {
+				out _= "\\";
+				i++;
+				continue;
+			}
+			die `Unsupported escape: ${esc}`;
+		}
+
+			if ( ch ≡ "\"" ) {
+				let next_pos := i + 1;
+				return [ out, next_pos ];
+		}
+		out _= ch;
+		i++;
+	}
+
+	die "Unterminated string value";
+}
+
+function _skip_inline_ws ( String text, Number pos ) {
+	let i := pos;
+	let n := length text;
+	while ( i < n and _is_space( substr( text, i, 1 ) ) ) {
+		i++;
+	}
+
+	return i;
+}
+
+function _parse_value ( String text, Number pos ) {
+	let i := _skip_inline_ws( text, pos );
+	let n := length text;
+	die "Missing value" if i >= n;
+	let ch := substr( text, i, 1 );
+	if ( ch ≡ "\"" ) {
+		return _parse_string_value( text, i );
+	}
+	if ( ch ≡ "[" ) {
+		let arr := [];
+		i++;
+
+		while (true) {
+			i := _skip_inline_ws( text, i );
+			die "Unterminated array" if i >= n;
+			if ( substr( text, i, 1 ) ≡ "]" ) {
+				let next_pos := i + 1;
+				return [ arr, next_pos ];
+			}
+			let parsed := _parse_value( text, i );
+
+		arr.push( parsed[0] );
+		i := _skip_inline_ws( text, parsed[1] );
+		die "Unterminated array" if i >= n;
+		let sep := substr( text, i, 1 );
+		if ( sep ≡"," ) {
+			i++;
+			}
+			else if ( sep ≡ "]" ) {
+				let next_pos := i + 1;
+				return [ arr, next_pos ];
+			} else {
+				die "Expected ',' or ']' in array";
+			}
+
+		}
+	}
+	if ( ch ≡ "{" ) {
+		let d := {};
+		i++;
+
+		while (true) {
+			i := _skip_inline_ws( text, i );
+			die "Unterminated inline table" if i >= n;
+			if ( substr( text, i, 1 ) ≡ "}" ) {
+				let next_pos := i + 1;
+				return [ d, next_pos ];
+			}
+			let key_start := i;
+
+		let in_q := false;
+		let found_eq := false;
+
+		while ( i < n and not found_eq ) {
+			let kc := substr( text, i, 1 );
+			if ( kc ≡ "\"" ) {
+				in_q := not in_q;
+			}
+			if ( not in_q and kc ≡ "=" ) {
+				found_eq := true;
+			}
+			else {
+				i++;
+			}
+		}
+
+		die "Invalid inline table item" if i >= n;
+		let key_raw := _trim( substr( text, key_start, i - key_start ) );
+		let key := key_raw;
+		if ( key ~ /^".*"$/ ) {
+			key := substr( key, 1, length key - 2 );
+		}
+		i++;
+		let pv := _parse_value( text, i );
+		d.set( key, pv[0] );
+		i := _skip_inline_ws( text, pv[1] );
+		die "Unterminated inline table" if i >= n;
+		let sep := substr( text, i, 1 );
+		if ( sep ≡"," ) {
+			i++;
+			}
+			else if ( sep ≡ "}" ) {
+				let next_pos := i + 1;
+				return [ d, next_pos ];
+			} else {
+				die "Expected ',' or '}' in inline table";
+			}
+		}
+	}
+	let start := i;
+	let done := false;
+	while ( i < n and not done ) {
+		let c := substr( text, i, 1 );
+		if ( _is_space(c) or c ≡"," or c ≡ "]" or c ≡ "}" ) {
+			done := true;
+		}
+		else {
+			i++;
+		}
+	}
+	let token := substr( text, start, i - start );
+	if ( token ≡ "true" ) {
+		return [ true, i ];
+	}
+	if ( token ≡ "false" ) {
+		return [ false, i ];
+	}
+	if ( token ~ /^[+-]?[0-9]+$/ ) {
+		let num := 0 + token;
+		return [ num, i ];
+	}
+	if ( token ~ /^[+-]?[0-9]+\.[0-9]+$/ ) {
+		let num := 0 + token;
+		return [ num, i ];
+	}
+	die `Unsupported TOML token '${token}'`;
+}
+
+function _ensure_table_path ( Dict root, Array path ) {
+	let cursor := root;
+	let i := 0;
+
+	while ( i < path.length() ) {
+		let key := path[i];
+		if ( not cursor.exists(key) ) {
+			cursor.set( key, {} );
+		}
+		else if ( not( cursor.get(key) instanceof Dict ) ) {
+			die `TOML path '${key}' conflicts with non-table value`;
+		}
+		cursor := cursor.get(key);
+		i++;
+	}
+
+	return cursor;
+}
+
+function _set_deep_dict_value ( Dict table, Array path, Number at, value ) {
+	let out := table;
+	let key := path[at];
+	if ( at + 1 >= path.length() ) {
+		out.set( key, value );
+		return out;
+	}
+
+	let child := out.exists(key) ? out.get(key): {};
+	if ( not( child instanceof Dict ) ) {
+		die `TOML path '${key}' conflicts with non-table value`;
+	}
+	let updated_child := _set_deep_dict_value( child, path, at + 1, value );
+	out.set( key, updated_child );
+	return out;
+}
+
+function _assign_path ( Dict root, Array key_path, value, Array current_path ) {
+	let full := [];
+	let i := 0;
+	while ( i < current_path.length() ) {
+		full.push( current_path[i] );
+		i++;
+	}
+	i := 0;
+	while ( i < key_path.length() - 1 ) {
+		full.push( key_path[i] );
+		i++;
+	}
+	let leaf := key_path[ key_path.length() - 1 ];
+	full.push(leaf);
+	let updated_root := _set_deep_dict_value( root, full, 0, value );
+	return updated_root;
+}
+
+function _join_lines ( Array lines ) {
+	let out := "";
+	let i := 0;
+
+	while ( i < lines.length() ) {
+		out _= lines[i];
+		if ( i + 1 < lines.length() ) {
+			out _= "\n";
+		}
+		i++;
+	}
+
+	return out;
+}
+
+function _normalize_for_encoding ( value ) {
+	if ( value instanceof Array ) {
+		let out := [];
+		let i := 0;
+		while ( i < value.length() ) {
+			out.push( _normalize_for_encoding( value[i] ) );
+			i++;
+		}
+		return out;
+	}
+
+	if ( value instanceof Set or value instanceof Bag ) {
+		return _normalize_for_encoding( value.sortstr() );
+	}
+
+	if ( value instanceof PairList ) {
+		let out := {};
+		let pairs := value.to_Array();
+		let i := 0;
+		while ( i < pairs.length() ) {
+			let pair := pairs[i]{pair};
+			let key := pair[0];
+			if ( not out.exists(key) ) {
+				out.set( key, _normalize_for_encoding( pair[1] ) );
+			}
+			i++;
+		}
+		return out;
+	}
+
+	if ( value instanceof Dict ) {
+		let out := {};
+		let keys := value.sorted_keys();
+		let i := 0;
+		while ( i < keys.length() ) {
+			let key := keys[i];
+			out.set( key, _normalize_for_encoding( value.get(key) ) );
+			i++;
+		}
+		return out;
+	}
+
+	return value;
+}
+
+function _escape_string ( String text ) {
+	let out := "";
+	let i := 0;
+	let n := length text;
+
+	while ( i < n ) {
+		let ch := substr( text, i, 1 );
+		if ( ch ≡ "\\" ) {
+			out _= "\\\\";
+			i++;
+			continue;
+		}
+		if ( ch ≡ "\"" ) {
+			out _= "\\\"";
+			i++;
+			continue;
+		}
+		if ( ch ≡ "\n" ) {
+			out _= "\\n";
+			i++;
+			continue;
+		}
+		if ( ch ≡ "\r" ) {
+			out _= "\\r";
+			i++;
+			continue;
+		}
+		if ( ch ≡ "\t" ) {
+			out _= "\\t";
+			i++;
+			continue;
+		}
+		out _= ch;
+		i++;
+	}
+
+	return out;
+}
+
+function _encode_value ( value, pretty, canonical, Number indent_level ) {
+	if ( value instanceof String ) {
+		return `"${_escape_string(value)}"`;
+	}
+	if ( value instanceof Number ) {
+		return "" _ value;
+	}
+	if ( value instanceof Boolean ) {
+		return value ? "true": "false";
+	}
+
+	if ( value instanceof Array ) {
+		let parts := [];
+		let i := 0;
+		while ( i < value.length() ) {
+			parts.push( _encode_value( value[i], pretty, canonical, indent_level + 1 ) );
+			i++;
+		}
+		let sep := pretty ? ", ":",";
+		let out := "[";
+		i := 0;
+
+		while ( i < parts.length() ) {
+			if ( i > 0 ) {
+				out _= sep;
+			}
+			out _= parts[i];
+			i++;
+		}
+
+		out _= "]";
+		return out;
+	}
+
+	if ( value instanceof Dict ) {
+		let keys := canonical ? value.sorted_keys(): value.keys();
+		let out := "{" ;
+		let i := 0;
+
+		while ( i < keys.length() ) {
+			let k := keys[i];
+
+			if ( i > 0 ) {
+				if (pretty) {
+					out _= ", ";
+				}
+				else {
+					out _=",";
+				}
+			}
+
+			let encoded_child := _encode_value( value.get(k), pretty, canonical, indent_level + 1 );
+			out _= k;
+			out _= " = ";
+			out _= encoded_child;
+			i++;
+		}
+
+		out _= "}";
+		return out;
+	}
+
+	die `Unsupported TOML type for encoding: ${typeof value}`;
+}
+
+function _encode_table ( Dict table, Array path, pretty, canonical, Array out ) {
+
+	if ( path.length() > 0 ) {
+		if ( out.length() > 0 and out[ out.length() - 1 ] ≢ "" ) {
+			out.push("");
+		}
+		let title := "";
+		let i := 0;
+
+		while ( i < path.length() ) {
+			if ( i > 0 ) {
+				title _=".";
+			}
+			title _= path[i];
+			i++;
+		}
+
+		out.push( `[${title}]` );
+	}
+
+	let keys := canonical ? table.sorted_keys(): table.keys();
+	let children := [];
+	let i := 0;
+
+	while ( i < keys.length() ) {
+		let key := keys[i];
+		let value := table.get(key);
+		if ( value instanceof Dict ) {
+			children.push(key);
+		}
+		else {
+			let encoded_value := _encode_value( value, pretty, canonical, 0 );
+			out.push( key _ " = " _ encoded_value );
+		}
+		i++;
+	}
+
+	i := 0;
+
+	while ( i < children.length() ) {
+		let child_key := children[i];
+		let child_path := [];
+		let j := 0;
+		while ( j < path.length() ) {
+			child_path.push( path[j] );
+			j++;
+		}
+		child_path.push(child_key);
+		_encode_table( table.get(child_key), child_path, pretty, canonical, out );
+		i++;
+	}
+
+}
+
+function _parse_document ( String text ) {
+	let root := {};
+	let current_table_name := null;
+	let current_table := {};
+	let pos := 0;
+	let n := length text;
+	let done := false;
+
+	function _flush_current_table () {
+		if ( current_table_name ≢ null ) {
+			root.set( current_table_name, current_table );
+		}
+	}
+
+	while ( pos <= n and not done ) {
+		let nl := index( text, "\n", pos );
+		let end;
+		if ( nl < 0 ) {
+			end := n;
+		}
+		else {
+			end := nl;
+		}
+		let raw_line := substr( text, pos, end - pos );
+		let line := _trim( _strip_comment(raw_line) );
+
+		if ( line ≢ "" ) {
+			if ( substr( line, 0, 1 ) ≡ "[" ) {
+				die "Invalid table header" if substr( line, ( length line ) -
+					1, 1 ) ≢ "]";
+				let inside := _trim( substr( line, 1, ( length line ) - 2 ) );
+				_flush_current_table();
+				let parts := _split_dotted_key(inside);
+				current_table_name := parts[0];
+				current_table := {};
+			}
+
+			else {
+				let eq_pos := index( line, "=" );
+				die "Expected key = value" if eq_pos < 0;
+				let key_part := _trim( substr( line, 0, eq_pos ) );
+				let val_part := _trim( substr( line, eq_pos + 1 ) );
+				let key_path := _split_dotted_key(key_part);
+				let parsed := _parse_value( val_part, 0 );
+				let trailing := _trim( substr( val_part, parsed[1] ) );
+				die "Unexpected trailing characters in value" if trailing ≢ "";
+				if ( current_table_name ≡ null ) {
+					root.set( key_path[0], parsed[0] );
+				}
+				else {
+					current_table.set( key_path[0], parsed[0] );
+				}
+			}
+
+		}
+
+		if ( nl < 0 ) {
+			done := true;
+		}
+		else {
+			pos := nl + 1;
+		}
+	}
+	_flush_current_table();
+
+	return root;
+}
+
+class TOML {
+	let Boolean utf8 := true;
+	let Boolean pretty := false;
+	let Boolean canonical := false;
+
+	method encode (value) {
+		let normalized := _normalize_for_encoding(value);
+
+		if ( normalized instanceof Dict ) {
+			let lines := [];
+			_encode_table( normalized, [], pretty, canonical, lines );
+			return _join_lines(lines);
+		}
+
+		die "TOML encoder expects a Dict at top level";
+	}
+
+	method encode_binarystring (value) {
+		return to_binary( self.encode(value) );
+	}
+
+	method decode ( String text ) {
+		let src := text;
+		src := "" if src ≡ null;
+
+		return _parse_document(src);
+	}
+
+	method decode_binarystring ( BinaryString raw ) {
+		return self.decode( to_string(raw) );
+	}
+
+	method load (path) {
+		from std/io import Path;
+		die "TOML.load is denied by runtime policy" if __system__{deny_fs};
+		die "TOML.load expects a std/io Path object" if not( path instanceof Path );
+		return self.decode_binarystring( path.slurp() );
+	}
+
+	method dump ( path, value ) {
+		from std/io import Path;
+		die "TOML.dump is denied by runtime policy" if __system__{deny_fs};
+		die "TOML.dump expects a std/io Path object" if not( path instanceof Path );
+		path.spew( self.encode_binarystring(value) );
+		return path;
+	}
+
+}

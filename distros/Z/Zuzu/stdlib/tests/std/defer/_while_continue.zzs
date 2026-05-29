@@ -1,0 +1,21 @@
+from std/defer import Guard;
+from test/more import *;
+
+let i := 0;
+let cleanup := [];
+while ( i < 4 ) {
+	i++;
+	let step := i;
+	let Object guard := new Guard( callback: function () {
+		cleanup.push(step);
+	} );
+	if ( i mod 2 == 0 ) {
+		next;
+	}
+}
+
+is( cleanup.length(), 4, "defer guard runs on every while iteration including continued branches" );
+is( cleanup[0], 1, "first deferred callback ran" );
+is( cleanup[3], 4, "last deferred callback ran" );
+
+done_testing();

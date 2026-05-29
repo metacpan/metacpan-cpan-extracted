@@ -1,0 +1,180 @@
+from std/template/z import ZTemplate;
+from test/more import *;
+
+ok( exception( function () {
+	new ZTemplate( string: "x", file: "ignored.zt" );
+} ) instanceof Exception,
+	"constructor rejects string+file together without reading files",
+);
+
+ok( exception( function () {
+	new ZTemplate();
+} ) instanceof Exception,
+	"constructor rejects missing source",
+);
+
+ok( exception( function () {
+	new ZTemplate( string: "x", escape: "json" );
+} ) instanceof Exception,
+	"constructor rejects invalid escape mode",
+);
+
+is(
+	new ZTemplate( string: "Hello" ).process( {} ),
+	"Hello",
+	"plain text template renders unchanged",
+);
+
+is(
+	new ZTemplate( string: "Hello {{ name }}!" ).process( { name: "<Ada>" } ),
+	"Hello &lt;Ada&gt;!",
+	"expression output is HTML escaped by default",
+);
+
+is(
+	new ZTemplate( string: "{{ text }}" ).process(
+		{ text: "<tag a=\"b\"> & 'c'" },
+	),
+	"&lt;tag a=&quot;b&quot;&gt; &amp; &#39;c&#39;",
+	"HTML escaping covers markup, quotes, and ampersands",
+);
+
+is(
+	new ZTemplate( string: "{{ text :: raw }}" ).process(
+		{ text: "<tag a=\"b\"> & 'c'" },
+	),
+	"<tag a=\"b\"> & 'c'",
+	"expression-local raw escape override is supported",
+);
+
+is(
+	new ZTemplate( string: "{{ text }}", escape: "raw" ).process(
+		{ text: "<strong>Ada</strong>" },
+	),
+	"<strong>Ada</strong>",
+	"template-level raw escape mode is supported",
+);
+
+let people := {
+	users: [
+		{
+			name: "Ada",
+			role: "admin",
+			active: true,
+			skills: [ "math", "logic" ],
+		},
+		{
+			name: "Bob",
+			role: "reader",
+			active: false,
+			skills: [ "ops" ],
+		},
+		{
+			name: "Cara",
+			role: "reader",
+			active: true,
+			skills: [ "docs", "qa" ],
+		},
+	],
+};
+
+is(
+	new ZTemplate(
+		string: "{{# users/* }}{{ name }}={{ role }};{{/users/*}}",
+	).process(people),
+	"Ada=admin;Bob=reader;Cara=reader;",
+	"block rendering switches context for each selected node",
+);
+
+is(
+	new ZTemplate(
+		string: "{{# users/*[name != \"Bob\"] }}{{ name }};{{/users/*[name != \"Bob\"]}}",
+	).process(people),
+	"Ada;Cara;",
+	"block expressions can filter selected nodes",
+);
+
+is(
+	new ZTemplate(
+		string: "{{# users/* }}{{# skills/* }}{{ ../../name }}:{{.}};{{/skills/*}}{{/users/*}}",
+	).process(people),
+	"Ada:math;Ada:logic;Bob:ops;Cara:docs;Cara:qa;",
+	"nested blocks can navigate back to parent context",
+);
+
+is(
+	new ZTemplate(
+		string: "X{{# users/*[name == \"Nobody\"] }}Y{{/users/*[name == \"Nobody\"]}}Z",
+	).process(people),
+	"XZ",
+	"blocks with no truthy matches render nothing",
+);
+
+let basket := {
+	metadata: {
+		title: "Basket",
+		author: "Me",
+	},
+	items: [
+		{ name: "Foo", price: 1.99, quantity: 3 },
+		{ name: "Bar", price: 2.99, quantity: 2 },
+	],
+};
+
+let table := new ZTemplate( string: """<title>{{ metadata/title }}</title>
+{{# /items/* }}
+{{# is-first() }}<table>{{/is-first()}}
+<tr><td>{{ name }}</td><td>{{ format("%1.2f", price * quantity) }}</td></tr>
+{{# is-last() }}<tr class="total"><td>{{ count() }}</td><td>{{ format("%1.2f", sum(../*/value(number(price) * number(quantity)))) }}</td></tr></table>{{/is-last()}}
+{{/}}""" ).process(basket);
+
+ok( table ~ /<title>Basket<\/title>/, "complex template renders title" );
+ok( table ~ /<table>/, "complex template renders table on first item" );
+ok( table ~ /<tr class=\"total\">/, "complex template renders total row on last item" );
+ok( table ~ /<td>2<\/td>/, "complex template renders count" );
+ok( table ~ /11\.95/, "complex template renders aggregate total" );
+
+ok(
+	exception( function () {
+		new ZTemplate( string: "x" ).process(null);
+	} ) instanceof Exception,
+	"process requires a data model",
+);
+
+ok( exception( function () {
+	new ZTemplate( string: "{{/items}}" );
+} ) instanceof Exception,
+	"parser rejects stray close tag",
+);
+
+ok( exception( function () {
+	new ZTemplate( string: "{{#items}}x" );
+} ) instanceof Exception,
+	"parser rejects missing close tag",
+);
+
+ok( exception( function () {
+	new ZTemplate( string: "{{#items}}x{{/wrong}}" );
+} ) instanceof Exception,
+	"parser rejects mismatched close tag",
+);
+
+ok( exception( function () {
+	new ZTemplate( string: "{{name" );
+} ) instanceof Exception,
+	"parser rejects unterminated tag",
+);
+
+ok( exception( function () {
+	new ZTemplate( string: "{{> partial.zt }}", includes: false );
+} ) instanceof Exception,
+	"parser rejects include tags when includes are disabled",
+);
+
+ok( exception( function () {
+	new ZTemplate( string: "{{ \"foo::bar\" :: raw }}" );
+} ) == null,
+	"parser keeps :: inside quotes while parsing escape override",
+);
+
+done_testing();

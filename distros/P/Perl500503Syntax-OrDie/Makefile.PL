@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{Perl500503Syntax::OrDie},
-    'VERSION'   => q{0.01},
+    'VERSION'   => q{0.02},
     'ABSTRACT'  => q{Validate Perl 5.005_03 source compatibility},
     'PREREQ_PM' => {
         'perl' => '5.005_03',
@@ -44,7 +44,7 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'Perl500503Syntax::OrDie' => {
                 'file'    => 'lib/Perl500503Syntax/OrDie.pm',
-                'version' => '0.01',
+                'version' => '0.02',
             }
         },
     };

@@ -1,0 +1,5 @@
+trait SpeciesLabel {
+	method species_label () {
+		return self{species};
+	}
+}

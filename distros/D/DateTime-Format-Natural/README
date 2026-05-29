@@ -56,16 +56,17 @@ CONSTRUCTOR
     options and not necessarily required.
 
      $parser = DateTime::Format::Natural->new(
-               datetime      => DateTime->new(...),
-               lang          => 'en',
-               format        => 'mm/dd/yy',
-               prefer_future => [0|1],
-               demand_future => [0|1],
-               time_zone     => 'floating',
-               daytime       => { morning   => 06,
-                                  afternoon => 13,
-                                  evening   => 20,
-                                },
+               datetime       => DateTime->new(...),
+               lang           => 'en',
+               format         => 'mm/dd/yy',
+               prefer_future  => [0|1],
+               demand_future  => [0|1],
+               time_zone      => 'floating',
+               calendar_class => 'DateTime::Calendar::Julian',
+               daytime        => { morning   => 06,
+                                   afternoon => 13,
+                                   evening   => 20,
+                                 },
      );
 
       * datetime
@@ -114,6 +115,11 @@ CONSTRUCTOR
 
       The time zone to use when parsing and for output. Accepts any time
       zone recognized by DateTime. Defaults to 'floating'.
+
+      * calendar_class
+
+      The calendar class used for fixed-date holidays such as christmas
+      day. Accepts DateTime::Calendar::Julian. Defaults to 'gregorian'.
 
       * daytime
 

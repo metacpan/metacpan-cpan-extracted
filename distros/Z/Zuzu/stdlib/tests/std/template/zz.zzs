@@ -1,0 +1,38 @@
+from std/template/z import ZTemplate;
+from std/template/zz import ZZTemplate;
+from test/more import *;
+
+ok( typeof ZZTemplate eq "Class", "ZZTemplate class is importable" );
+
+let tmpl := new ZZTemplate( string: "Hello {{ name }}!" );
+ok( tmpl instanceof ZZTemplate, "constructed template is a ZZTemplate" );
+ok( tmpl instanceof ZTemplate, "ZZTemplate subclasses ZTemplate" );
+is(
+	tmpl.process( { name: "Ada" } ),
+	"Hello Ada!",
+	"ZZTemplate inherits basic template rendering",
+);
+
+let elvis := new ZZTemplate( string: "{{ zero ?: fallback }}" );
+is(
+	elvis.process( { zero: 0, fallback: "fallback" } ),
+	"fallback",
+	"ZZTemplate expressions use ZZPath Elvis operator",
+);
+
+let function_template := new ZZTemplate(
+	string: "{{# users/*[contains(name, \"a\")] }}{{ name }};{{/users/*[contains(name, \"a\")] }}",
+);
+is(
+	function_template.process( {
+		users: [
+			{ name: "Ada" },
+			{ name: "Bob" },
+			{ name: "Cara" },
+		],
+	} ),
+	"Ada;Cara;",
+	"ZZTemplate expressions use ZZPath functions",
+);
+
+done_testing();

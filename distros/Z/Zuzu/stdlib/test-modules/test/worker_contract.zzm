@@ -1,0 +1,50 @@
+=encoding utf8
+
+=head1 NAME
+
+test/worker_contract - Helpers for std/worker contract tests.
+
+=cut
+
+from std/worker try import Worker;
+from test/more import skip_all;
+
+function require_worker () {
+	if ( Worker ≡ null ) {
+		skip_all( "module std/worker is unavailable" );
+	}
+
+	return Worker;
+}
+
+function require_worker_phase ( Number phase ) {
+	let Worker := require_worker();
+	return Worker;
+}
+
+async function await_worker_failure ( task ) {
+	try {
+		let result := await {
+			task;
+		};
+		die `worker task unexpectedly succeeded: ${result}`;
+	}
+	catch ( Exception e ) {
+		return e;
+	}
+}
+
+async function await_cancelled ( task ) {
+	try {
+		let result := await {
+			task;
+		};
+		die `worker task unexpectedly succeeded: ${result}`;
+	}
+	catch ( CancelledException e ) {
+		return e;
+	}
+	catch ( Exception e ) {
+		die `worker task rejected with non-cancellation: ${e}`;
+	}
+}

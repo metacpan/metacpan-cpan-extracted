@@ -1,0 +1,85 @@
+from test/more import *;
+
+let text := "Hello";
+let got := null;
+let read_error := exception( function () {
+	got := text[1:3];
+} );
+is( read_error, null, "string slices can be read without throwing" );
+is( got, "ell", "string slice read uses start and length" );
+
+{
+	let mutable := "Hello World";
+	let assign_error := exception( function () {
+		mutable[1:3] := "app";
+	} );
+	is( assign_error, null, "string slices can be assigned without throwing" );
+	is( mutable, "Happo World", "string slice assignment replaces length slice" );
+}
+
+{
+	let mutable := "Hello World";
+	let assign_error := exception( function () {
+		mutable[1:3] := "p";
+	} );
+	is( assign_error, null, "string slices can be assigned without throwing" );
+	is( mutable, "Hpo World", "string slice assignment can shorten string" );
+}
+
+{
+	let mutable := "Hello World";
+	let assign_error := exception( function () {
+		mutable[1:3] := "appapp";
+	} );
+	is( assign_error, null, "string slices can be assigned without throwing" );
+	is( mutable, "Happappo World", "string slice assignment can lengthen string" );
+}
+
+{
+	let mutable := "Hello World";
+	let assign_error := exception( function () {
+		mutable[3:0] := " inserted";
+	} );
+	is( assign_error, null, "string slices can be assigned without throwing" );
+	is( mutable, "Hel insertedlo World", "zero-length slice inserts text" );
+}
+
+{
+	let mutable := "Hello World";
+	let assign_error := exception( function () {
+		mutable[-5:5] := "Mars";
+	} );
+	is( assign_error, null, "string slices can be assigned without throwing" );
+	is( mutable, "Hello Mars", "negative slice assignment counts back from end" );
+}
+
+is( "abcdef"[-3:2], "de", "negative slice read counts back from end" );
+
+{
+	let mutable := "Hello World";
+	let assign_error := exception( function () {
+		mutable[1] := "app";
+	} );
+	is( assign_error, null, "string index can be assigned without throwing" );
+	is( mutable, "Happllo World", "string index assignment can lengthen string" );
+}
+
+{
+	let mutable := "Hello World";
+	let assign_error := exception( function () {
+		mutable[2] := "";
+	} );
+	is( assign_error, null, "string index can be assigned without throwing" );
+	is( mutable, "Helo World", "string index assignment can shorten string" );
+}
+
+{
+	let mutable := "abcdef";
+	let assign_error := exception( function () {
+		mutable[-2] := "XY";
+	} );
+	is( assign_error, null, "negative string index can be assigned without throwing" );
+	is( mutable, "abcdXYf", "negative string index assignment counts back from end" );
+}
+
+done_testing();

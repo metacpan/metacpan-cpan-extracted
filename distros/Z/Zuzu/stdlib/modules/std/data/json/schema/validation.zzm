@@ -1,0 +1,1503 @@
+=encoding utf8
+
+=head1 NAME
+
+std/data/json/schema/validation - JSON Schema 2020-12 evaluator.
+
+=head1 SYNOPSIS
+
+  from std/data/json/schema/validation import JSONSchema, validate, valid;
+
+  let schema := new JSONSchema(
+    schema: {
+      type: "array",
+      items: { type: "integer" },
+    },
+  );
+
+  say( schema.is_valid([ 1, 2, 3 ]) );
+
+  let result := validate( { minimum: 10 }, 4 );
+  say( result.errors()[0].error() );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This Pure Zuzu module is supported by all implementations of ZuzuScript.
+Network loading requires C<std/net/http> through
+I<std/data/json/schema/core>.
+
+=head1 DESCRIPTION
+
+This module contains the JSON Schema 2020-12 evaluator. It is normally used
+through the facade module I<std/data/json/schema>, which re-exports the
+public API and the error classes.
+
+The evaluator supports boolean schemas, object schemas, references,
+applicators, object and array validation, numeric and string constraints,
+dependent keywords, content keywords, and format validation. It validates
+decoded Zuzu values and uses I<std/data/json/schema/model> to project native
+C<PairList>, C<Set>, and C<Bag> values into the JSON data model where that
+is meaningful.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<JSONSchema>
+
+Compiled schema wrapper. Construct with C<< new JSONSchema( schema: ... ) >>.
+Pass C<options> as a named field when configuration is needed.
+
+=over
+
+=item C<< is_valid( instance ) >>
+
+Returns C<true> or C<false>. This mode stops after the first failure.
+
+=item C<< validate( instance ) >>
+
+Returns a C<ValidationResult> and collects independent failures as
+C<ValidationError> objects.
+
+=back
+
+=back
+
+=head2 Functions
+
+=over
+
+=item C<< valid( schema, instance, options := {} ) >>
+
+Constructs a temporary C<JSONSchema> and returns
+C<< is_valid(instance) >>.
+
+=item C<< validate( schema, instance, options := {} ) >>
+
+Constructs a temporary C<JSONSchema> and returns
+C<< validate(instance) >>.
+
+=back
+
+=head1 OPTIONS
+
+C<options> may be a C<Dict> or C<PairList>.
+
+=over
+
+=item C<base_uri>
+
+Base URI for the root schema.
+
+=item C<registry>
+
+C<SchemaRegistry> used for references. If omitted, a new registry is
+created and the root schema is registered in it.
+
+=item C<loader>
+
+Callable or object with C<load(uri)> used to load missing referenced
+resources. A string result is decoded as JSON.
+
+=item C<allow_network>
+
+When true and C<loader> is not supplied, uses C<HTTPResourceLoader>.
+
+=item C<formats> or C<format_registry>
+
+C<FormatRegistry> used for C<format> checks.
+
+=item C<format_assert>
+
+Boolean. Defaults to false. When false, C<format> never makes validation
+fail.
+
+=item C<unknown_format>
+
+Defaults to C<ignore>. Use C<fail> to report unknown asserted formats.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/data/json/schema/validation >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/internals import to_Regexp_with_flags;
+from std/string import join, substr;
+from std/data/json/schema/core import
+	HTTPResourceLoader,
+	SchemaRegistry,
+	jschema_uri_resolve,
+	jschema_url_split;
+from std/data/json/schema/format import FormatRegistry;
+from std/data/json/schema/model import
+	jschema_array_items,
+	jschema_array_length,
+	jschema_deep_equal,
+	jschema_is_arrayish,
+	jschema_is_object,
+	jschema_is_ordered_array,
+	jschema_is_unordered_array,
+	jschema_object_entries,
+	jschema_object_get,
+	jschema_object_get_all,
+	jschema_object_has,
+	jschema_object_keys,
+	jschema_object_unique_keys,
+	jschema_pointer_join,
+	jschema_type_matches,
+	jschema_type_name;
+from std/data/json/schema/output import
+	AdditionalItemsError,
+	AdditionalPropertiesError,
+	AllOfError,
+	AnyOfError,
+	ConstMismatchError,
+	ContentEncodingError,
+	ContentMediaTypeError,
+	DependentRequiredPropertyError,
+	EnumMismatchError,
+	ExclusiveMaximumError,
+	ExclusiveMinimumError,
+	FalseSchemaError,
+	FormatError,
+	IfThenElseError,
+	MaxContainsError,
+	MaximumError,
+	MaxItemsError,
+	MaxLengthError,
+	MaxPropertiesError,
+	MinContainsError,
+	MinimumError,
+	MinItemsError,
+	MinLengthError,
+	MinPropertiesError,
+	MultipleOfError,
+	NotMatchedError,
+	OneOfError,
+	PatternError,
+	PropertyNamesError,
+	ReferenceResolutionError,
+	RequiredPropertyError,
+	SubschemaError,
+	TypeMismatchError,
+	UnevaluatedItemsError,
+	UnevaluatedPropertiesError,
+	UnexpectedValueError,
+	UniqueItemsError,
+	UnknownFormatError,
+	ValidationResult;
+
+function _jschema_opt ( options, String key, fallback := null ) {
+	if ( options ≡ null ) {
+		return fallback;
+	}
+	if ( options instanceof Dict ) {
+		return options.exists(key) ? options.get(key) : fallback;
+	}
+	if ( options instanceof PairList ) {
+		return options.has(key) ? options.get(key) : fallback;
+	}
+	return fallback;
+}
+
+function _jschema_add_unique ( Array out, value ) {
+	if ( not( value in out ) ) {
+		out.push(value);
+	}
+	return out;
+}
+
+function _jschema_validation_vocab_enabled ( schema, registry, String base_uri ) {
+	if (
+		not jschema_is_object(schema)
+		or not jschema_object_has( schema, "$schema" )
+		or not( jschema_object_get( schema, "$schema" ) instanceof String )
+	) {
+		return true;
+	}
+
+	let metaschema;
+	try {
+		metaschema := registry.resolve(
+			jschema_object_get( schema, "$schema" ),
+			base_uri,
+		);
+	}
+	catch {
+		return true;
+	}
+
+	if (
+		jschema_is_object(metaschema)
+		and jschema_object_has( metaschema, "$vocabulary" )
+		and jschema_is_object( jschema_object_get( metaschema, "$vocabulary" ) )
+	) {
+		let vocabulary := jschema_object_get( metaschema, "$vocabulary" );
+		let validation_uri := "https://json-schema.org/draft/2020-12/vocab/validation";
+		if (
+			jschema_object_has( vocabulary, validation_uri )
+			and jschema_object_get( vocabulary, validation_uri ) instanceof Boolean
+		) {
+			return jschema_object_get( vocabulary, validation_uri );
+		}
+		return false;
+	}
+
+	return true;
+}
+
+function _jschema_format_assertion_vocab_enabled ( schema, registry, String base_uri, Boolean fallback ) {
+	if (
+		not jschema_is_object(schema)
+		or not jschema_object_has( schema, "$schema" )
+		or not( jschema_object_get( schema, "$schema" ) instanceof String )
+	) {
+		return fallback;
+	}
+
+	let metaschema;
+	try {
+		metaschema := registry.resolve(
+			jschema_object_get( schema, "$schema" ),
+			base_uri,
+		);
+	}
+	catch {
+		return fallback;
+	}
+
+	if (
+		jschema_is_object(metaschema)
+		and jschema_object_has( metaschema, "$vocabulary" )
+		and jschema_is_object( jschema_object_get( metaschema, "$vocabulary" ) )
+	) {
+		let vocabulary := jschema_object_get( metaschema, "$vocabulary" );
+		let format_assertion_uri := "https://json-schema.org/draft/2020-12/vocab/format-assertion";
+		if ( jschema_object_has( vocabulary, format_assertion_uri ) ) {
+			return true;
+		}
+	}
+
+	return fallback;
+}
+
+class _EvalResult {
+	let Boolean valid := true;
+	let Array errors := [];
+	let Array evaluatedProperties := [];
+	let Array evaluatedItems := [];
+
+	method add_error ( error ) {
+		valid := false;
+		if ( error ≢ null ) {
+			errors.push(error);
+		}
+		return error;
+	}
+
+	method merge ( other ) {
+		if ( not other.valid() ) {
+			valid := false;
+		}
+		for ( let error in other.errors() ) {
+			errors.push(error);
+		}
+		for ( let prop in other.evaluatedProperties() ) {
+			_jschema_add_unique( evaluatedProperties, prop );
+		}
+		for ( let item in other.evaluatedItems() ) {
+			_jschema_add_unique( evaluatedItems, item );
+		}
+		return self;
+	}
+
+	method mark_property ( prop ) {
+		_jschema_add_unique( evaluatedProperties, prop );
+	}
+
+	method mark_item ( item ) {
+		_jschema_add_unique( evaluatedItems, item );
+	}
+
+	method valid () { return valid; }
+	method errors () { return errors; }
+	method evaluatedProperties () { return evaluatedProperties; }
+	method evaluatedItems () { return evaluatedItems; }
+}
+
+function _jschema_regexp ( String pattern ) {
+	return to_Regexp_with_flags(pattern, "u");
+}
+
+class _SchemaEvaluator {
+	let registry;
+	let formats;
+	let Boolean collect := true;
+	let Boolean format_assert := false;
+	let String unknown_format := "ignore";
+	let Boolean validation_enabled := true;
+	let Array dynamic_scope := [];
+
+	method error (
+		Klass,
+		String keyword_location,
+		String instance_location,
+		String message,
+		keyword := null,
+		details := null,
+	) {
+		if ( not collect ) {
+			return null;
+		}
+		return new Klass(
+			keywordLocation: keyword_location,
+			instanceLocation: instance_location,
+			error: message,
+			keyword: keyword,
+			details: details,
+		);
+	}
+
+	method _subschema_error (
+		String keyword_location,
+		String instance_location,
+		Array child_errors,
+		keyword := null,
+	) {
+		if ( not collect ) {
+			return null;
+		}
+		return new SubschemaError(
+			keywordLocation: keyword_location,
+			instanceLocation: instance_location,
+			error: "A subschema had errors.",
+			keyword: keyword,
+		).add_suberrors(child_errors);
+	}
+
+	method _invalid (
+		_EvalResult result,
+		Klass,
+		String keyword_location,
+		String instance_location,
+		String message,
+		keyword := null,
+		details := null,
+	) {
+		result.add_error(
+			self.error(
+				Klass,
+				keyword_location,
+				instance_location,
+				message,
+				keyword,
+				details,
+			),
+		);
+		return result;
+	}
+
+	method _child (
+		schema,
+		instance,
+		String keyword_location,
+		String instance_location,
+		String base_uri,
+	) {
+		return self.evaluate(
+			schema,
+			instance,
+			keyword_location,
+			instance_location,
+			base_uri,
+		);
+	}
+
+	method _finish ( _EvalResult result, Boolean pushed_scope ) {
+		if ( pushed_scope ) {
+			dynamic_scope.pop();
+		}
+		return result;
+	}
+
+	method _dynamic_target ( ref_info ) {
+		let fragment := ref_info{fragment};
+		if (
+			fragment ≡ null
+			or fragment eq ""
+			or substr( fragment, 0, 1 ) eq "/"
+			or not registry.has_dynamic_anchor( ref_info{resource_uri}, fragment )
+		) {
+			return ref_info{target};
+		}
+
+		for ( let resource_uri in dynamic_scope ) {
+			let target := registry.dynamic_anchor( resource_uri, fragment );
+			if ( target ≢ null ) {
+				return target;
+			}
+		}
+
+		return ref_info{target};
+	}
+
+	method evaluate (
+		schema,
+		instance,
+		String keyword_location := "",
+		String instance_location := "",
+		String base_uri := "",
+	) {
+		let result := new _EvalResult();
+		let current_base_uri := base_uri;
+
+		if ( schema instanceof Boolean ) {
+			if ( schema ) {
+				return result;
+			}
+			return self._invalid(
+				result,
+				FalseSchemaError,
+				keyword_location,
+				instance_location,
+				"Boolean false schema does not allow any value.",
+				"false",
+			);
+		}
+
+		if ( not jschema_is_object(schema) ) {
+			return result;
+		}
+
+		let registered_base := registry.schema_base(schema, null);
+		if ( registered_base ≢ null ) {
+			current_base_uri := registered_base;
+		}
+		else if (
+			jschema_object_has( schema, "$id" )
+			and jschema_object_get( schema, "$id" ) instanceof String
+		) {
+			current_base_uri := jschema_uri_resolve(
+				current_base_uri,
+				jschema_object_get( schema, "$id" ),
+			);
+		}
+
+		let scope_resource := jschema_url_split(current_base_uri){baseurl};
+		dynamic_scope.push(scope_resource);
+		let pushed_scope := true;
+
+		if ( jschema_object_has( schema, "$ref" ) ) {
+			let ref := jschema_object_get( schema, "$ref" );
+			if ( ref instanceof String ) {
+				try {
+					let ref_info := registry.resolve_info( ref, current_base_uri );
+					let child := self._child(
+						ref_info{target},
+						instance,
+						jschema_pointer_join( keyword_location, "$ref" ),
+						instance_location,
+						ref_info{resource_uri},
+					);
+					result.merge(child);
+					if ( not child.valid() ) {
+						result.add_error( self._subschema_error(
+							jschema_pointer_join( keyword_location, "$ref" ),
+							instance_location,
+							child.errors(),
+							"$ref",
+						) );
+						if ( not collect ) { return self._finish( result, pushed_scope ); }
+					}
+				}
+				catch ( Exception e ) {
+					self._invalid(
+						result,
+						ReferenceResolutionError,
+						jschema_pointer_join( keyword_location, "$ref" ),
+						instance_location,
+						e{message},
+						"$ref",
+					);
+					if ( not collect ) { return self._finish( result, pushed_scope ); }
+				}
+			}
+		}
+
+		if ( jschema_object_has( schema, "$dynamicRef" ) ) {
+			let ref := jschema_object_get( schema, "$dynamicRef" );
+			if ( ref instanceof String ) {
+				try {
+					let ref_info := registry.resolve_info( ref, current_base_uri );
+					let child := self._child(
+						self._dynamic_target(ref_info),
+						instance,
+						jschema_pointer_join( keyword_location, "$dynamicRef" ),
+						instance_location,
+						ref_info{resource_uri},
+					);
+					result.merge(child);
+					if ( not child.valid() ) {
+						result.add_error( self._subschema_error(
+							jschema_pointer_join( keyword_location, "$dynamicRef" ),
+							instance_location,
+							child.errors(),
+							"$dynamicRef",
+						) );
+						if ( not collect ) { return self._finish( result, pushed_scope ); }
+					}
+				}
+				catch ( Exception e ) {
+					self._invalid(
+						result,
+						ReferenceResolutionError,
+						jschema_pointer_join( keyword_location, "$dynamicRef" ),
+						instance_location,
+						e{message},
+						"$dynamicRef",
+					);
+					if ( not collect ) { return self._finish( result, pushed_scope ); }
+				}
+			}
+		}
+
+		self._validate_type( result, schema, instance, keyword_location, instance_location );
+		if ( not result.valid() and not collect ) { return self._finish( result, pushed_scope ); }
+		self._validate_enum_const( result, schema, instance, keyword_location, instance_location );
+		if ( not result.valid() and not collect ) { return self._finish( result, pushed_scope ); }
+		self._validate_numeric( result, schema, instance, keyword_location, instance_location );
+		if ( not result.valid() and not collect ) { return self._finish( result, pushed_scope ); }
+		self._validate_string( result, schema, instance, keyword_location, instance_location );
+		if ( not result.valid() and not collect ) { return self._finish( result, pushed_scope ); }
+		self._validate_array( result, schema, instance, keyword_location, instance_location, current_base_uri );
+		if ( not result.valid() and not collect ) { return self._finish( result, pushed_scope ); }
+		self._validate_object( result, schema, instance, keyword_location, instance_location, current_base_uri );
+		if ( not result.valid() and not collect ) { return self._finish( result, pushed_scope ); }
+		self._validate_applicators( result, schema, instance, keyword_location, instance_location, current_base_uri );
+		if ( not result.valid() and not collect ) { return self._finish( result, pushed_scope ); }
+		self._validate_unevaluated( result, schema, instance, keyword_location, instance_location, current_base_uri );
+		return self._finish( result, pushed_scope );
+	}
+
+	method _validate_type ( result, schema, instance, kwloc, instloc ) {
+		if ( not validation_enabled ) {
+			return;
+		}
+		if ( not jschema_object_has( schema, "type" ) ) {
+			return;
+		}
+		let spec := jschema_object_get( schema, "type" );
+		let ok := false;
+		let expected := [];
+		if ( spec instanceof String ) {
+			expected := [ spec ];
+		}
+		else if ( spec instanceof Array ) {
+			expected := spec;
+		}
+		for ( let t in expected ) {
+			if ( t instanceof String and jschema_type_matches( instance, t ) ) {
+				ok := true;
+			}
+		}
+		if ( ok ) {
+			return;
+		}
+		self._invalid(
+			result,
+			TypeMismatchError,
+			jschema_pointer_join( kwloc, "type" ),
+			instloc,
+			`Expected ${join( "|", expected )}, got ${jschema_type_name(instance)}.`,
+			"type",
+		);
+	}
+
+	method _validate_enum_const ( result, schema, instance, kwloc, instloc ) {
+		if ( not validation_enabled ) {
+			return;
+		}
+		if ( jschema_object_has( schema, "const" ) ) {
+			if ( jschema_deep_equal(
+				instance,
+				jschema_object_get( schema, "const" ),
+			) ) {
+				return;
+			}
+			self._invalid(
+				result,
+				ConstMismatchError,
+				jschema_pointer_join( kwloc, "const" ),
+				instloc,
+				"Value does not match const.",
+				"const",
+			);
+			if ( not collect ) {
+				return;
+			}
+		}
+
+		if ( jschema_object_has( schema, "enum" ) ) {
+			let allowed := jschema_object_get( schema, "enum" );
+				if ( allowed instanceof Array ) {
+					for ( let option in allowed ) {
+						if ( jschema_deep_equal( instance, option ) ) {
+							return;
+						}
+					}
+				}
+			self._invalid(
+				result,
+				EnumMismatchError,
+				jschema_pointer_join( kwloc, "enum" ),
+				instloc,
+				"Value is not one of the allowed enum values.",
+				"enum",
+			);
+		}
+	}
+
+	method _validate_numeric ( result, schema, instance, kwloc, instloc ) {
+		if ( not validation_enabled ) {
+			return;
+		}
+		if ( not( instance instanceof Number ) ) {
+			return;
+		}
+		if ( jschema_object_has( schema, "multipleOf" ) ) {
+			let n := jschema_object_get( schema, "multipleOf" );
+			let quotient := n instanceof Number and n != 0
+				? instance / n
+				: 0;
+			if (
+				n instanceof Number
+				and n != 0
+				and (
+					quotient > 10 ** 300
+					or quotient < -( 10 ** 300 )
+					or quotient != floor(quotient)
+				)
+			) {
+				self._invalid(
+					result,
+					MultipleOfError,
+					jschema_pointer_join( kwloc, "multipleOf" ),
+					instloc,
+					`Number is not a multiple of ${n}.`,
+					"multipleOf",
+				);
+				if ( not collect ) {
+					return;
+				}
+			}
+		}
+		if (
+			jschema_object_has( schema, "minimum" )
+			and instance < jschema_object_get( schema, "minimum" )
+		) {
+			self._invalid( result, MinimumError, jschema_pointer_join( kwloc, "minimum" ), instloc, "Number is below minimum.", "minimum" );
+			if ( not collect ) {
+				return;
+			}
+		}
+		if (
+			jschema_object_has( schema, "maximum" )
+			and instance > jschema_object_get( schema, "maximum" )
+		) {
+			self._invalid( result, MaximumError, jschema_pointer_join( kwloc, "maximum" ), instloc, "Number is above maximum.", "maximum" );
+			if ( not collect ) {
+				return;
+			}
+		}
+		if (
+			jschema_object_has( schema, "exclusiveMinimum" )
+			and instance <= jschema_object_get( schema, "exclusiveMinimum" )
+		) {
+			self._invalid( result, ExclusiveMinimumError, jschema_pointer_join( kwloc, "exclusiveMinimum" ), instloc, "Number is not above exclusiveMinimum.", "exclusiveMinimum" );
+			if ( not collect ) {
+				return;
+			}
+		}
+		if (
+			jschema_object_has( schema, "exclusiveMaximum" )
+			and instance >= jschema_object_get( schema, "exclusiveMaximum" )
+		) {
+			self._invalid( result, ExclusiveMaximumError, jschema_pointer_join( kwloc, "exclusiveMaximum" ), instloc, "Number is not below exclusiveMaximum.", "exclusiveMaximum" );
+		}
+	}
+
+	method _validate_string ( result, schema, instance, kwloc, instloc ) {
+		if ( not( instance instanceof String or instance instanceof BinaryString ) ) {
+			return;
+		}
+		let text := "" _ instance;
+		if ( validation_enabled ) {
+			if (
+				jschema_object_has( schema, "minLength" )
+				and length text < jschema_object_get( schema, "minLength" )
+			) {
+				self._invalid( result, MinLengthError, jschema_pointer_join( kwloc, "minLength" ), instloc, "String is shorter than minLength.", "minLength" );
+				if ( not collect ) {
+					return;
+				}
+			}
+			if (
+				jschema_object_has( schema, "maxLength" )
+				and length text > jschema_object_get( schema, "maxLength" )
+			) {
+				self._invalid( result, MaxLengthError, jschema_pointer_join( kwloc, "maxLength" ), instloc, "String is longer than maxLength.", "maxLength" );
+				if ( not collect ) {
+					return;
+				}
+			}
+			if ( jschema_object_has( schema, "pattern" ) ) {
+				let pattern := jschema_object_get( schema, "pattern" );
+				if ( pattern instanceof String and not( text ~ _jschema_regexp(pattern) ) ) {
+					self._invalid( result, PatternError, jschema_pointer_join( kwloc, "pattern" ), instloc, "String does not match pattern.", "pattern" );
+					if ( not collect ) {
+						return;
+					}
+				}
+			}
+		}
+		if ( format_assert and jschema_object_has( schema, "format" ) ) {
+			let fmt := jschema_object_get( schema, "format" );
+			if ( fmt instanceof String ) {
+				if ( not formats.has(fmt) ) {
+					if ( unknown_format eq "ignore" ) {
+						return;
+					}
+					self._invalid(
+						result,
+						UnknownFormatError,
+						jschema_pointer_join( kwloc, "format" ),
+						instloc,
+						`Unknown format '${fmt}'.`,
+						"format",
+					);
+					if ( not collect ) {
+						return;
+					}
+				}
+				else if ( not formats.check( fmt, text ) ) {
+					self._invalid(
+						result,
+						FormatError,
+						jschema_pointer_join( kwloc, "format" ),
+						instloc,
+						`String does not match format '${fmt}'.`,
+						"format",
+					);
+				}
+			}
+		}
+		if ( validation_enabled ) {
+			if ( jschema_object_has( schema, "contentEncoding" ) ) {
+				/* Validation of decoded content is intentionally conservative. */
+			}
+			if ( jschema_object_has( schema, "contentMediaType" ) ) {
+				/* The media type keyword is annotation unless content is decoded. */
+			}
+		}
+	}
+
+	method _validate_array ( result, schema, instance, kwloc, instloc, base_uri ) {
+		if ( not jschema_is_arrayish(instance) ) {
+			return;
+		}
+		let items := jschema_array_items(instance);
+		let len := jschema_array_length(instance);
+		if ( validation_enabled ) {
+			if (
+				jschema_object_has( schema, "minItems" )
+				and len < jschema_object_get( schema, "minItems" )
+			) {
+				self._invalid( result, MinItemsError, jschema_pointer_join( kwloc, "minItems" ), instloc, "Array has too few items.", "minItems" );
+				if ( not collect ) {
+					return;
+				}
+			}
+			if (
+				jschema_object_has( schema, "maxItems" )
+				and len > jschema_object_get( schema, "maxItems" )
+			) {
+				self._invalid( result, MaxItemsError, jschema_pointer_join( kwloc, "maxItems" ), instloc, "Array has too many items.", "maxItems" );
+				if ( not collect ) {
+					return;
+				}
+			}
+			if ( jschema_object_get( schema, "uniqueItems", false ) ) {
+				let i := 0;
+				while ( i < items.length() ) {
+					let j := i + 1;
+					while ( j < items.length() ) {
+						if ( jschema_deep_equal( items[i], items[j] ) ) {
+							self._invalid( result, UniqueItemsError, jschema_pointer_join( kwloc, "uniqueItems" ), instloc, "Array items are not unique.", "uniqueItems" );
+							if ( not collect ) {
+								return;
+							}
+						}
+						j++;
+					}
+					i++;
+				}
+			}
+		}
+
+		if ( jschema_is_unordered_array(instance) and jschema_object_has( schema, "prefixItems" ) ) {
+			self._invalid(
+				result,
+				AdditionalItemsError,
+				jschema_pointer_join( kwloc, "prefixItems" ),
+				instloc,
+				"prefixItems cannot be applied to an unordered collection.",
+				"prefixItems",
+			);
+			if ( not collect ) {
+				return;
+			}
+		}
+
+		let evaluated := [];
+		if ( jschema_object_has( schema, "prefixItems" ) and jschema_is_ordered_array(instance) ) {
+			let prefix := jschema_object_get( schema, "prefixItems" );
+			if ( prefix instanceof Array ) {
+				let i := 0;
+				while ( i < prefix.length() and i < items.length() ) {
+					let child := self._child(
+						prefix[i],
+						items[i],
+						jschema_pointer_join( jschema_pointer_join( kwloc, "prefixItems" ), i ),
+						jschema_pointer_join( instloc, i ),
+						base_uri,
+					);
+					evaluated.push(i);
+					result.mark_item( jschema_pointer_join( instloc, i ) );
+					result.merge(child);
+					if ( not child.valid() ) {
+						result.add_error( self._subschema_error(
+							jschema_pointer_join( jschema_pointer_join( kwloc, "prefixItems" ), i ),
+							jschema_pointer_join( instloc, i ),
+							child.errors(),
+							"prefixItems",
+						) );
+						if ( not collect ) {
+							return result;
+						}
+					}
+					i++;
+				}
+			}
+		}
+
+		if ( jschema_object_has( schema, "items" ) ) {
+			let subschema := jschema_object_get( schema, "items" );
+			let start := 0;
+			if (
+				jschema_object_has( schema, "prefixItems" )
+				and jschema_object_get( schema, "prefixItems" ) instanceof Array
+			) {
+				start := jschema_object_get( schema, "prefixItems" ).length();
+			}
+			let i := 0;
+			while ( i < items.length() ) {
+				if ( not jschema_is_ordered_array(instance) or i >= start ) {
+					let child := self._child(
+						subschema,
+						items[i],
+						jschema_pointer_join( kwloc, "items" ),
+						jschema_pointer_join( instloc, i ),
+						base_uri,
+					);
+					result.mark_item( jschema_pointer_join( instloc, i ) );
+					result.merge(child);
+					if ( not child.valid() ) {
+						result.add_error( self._subschema_error(
+							jschema_pointer_join( kwloc, "items" ),
+							jschema_pointer_join( instloc, i ),
+							child.errors(),
+							"items",
+						) );
+						if ( not collect ) {
+							return result;
+						}
+					}
+				}
+				i++;
+			}
+		}
+
+		if ( jschema_object_has( schema, "contains" ) ) {
+			let matches := 0;
+			let i := 0;
+			while ( i < items.length() ) {
+				let child := self._child(
+					jschema_object_get( schema, "contains" ),
+					items[i],
+					jschema_pointer_join( kwloc, "contains" ),
+					jschema_pointer_join( instloc, i ),
+					base_uri,
+				);
+				if ( child.valid() ) {
+					matches++;
+					result.mark_item( jschema_pointer_join( instloc, i ) );
+					result.merge(child);
+				}
+				i++;
+			}
+			let min := jschema_object_get( schema, "minContains", 1 );
+			let max := jschema_object_get( schema, "maxContains", null );
+			if ( validation_enabled and matches < min ) {
+				self._invalid( result, MinContainsError, jschema_pointer_join( kwloc, "minContains" ), instloc, "Array contains too few matching items.", "minContains" );
+				if ( not collect ) {
+					return;
+				}
+			}
+			if ( validation_enabled and max ≢ null and matches > max ) {
+				self._invalid( result, MaxContainsError, jschema_pointer_join( kwloc, "maxContains" ), instloc, "Array contains too many matching items.", "maxContains" );
+				if ( not collect ) {
+					return;
+				}
+			}
+		}
+
+	}
+
+	method _validate_object ( result, schema, instance, kwloc, instloc, base_uri ) {
+		if ( not jschema_is_object(instance) ) {
+			return;
+		}
+		let keys := jschema_object_keys(instance);
+		let unique_keys := jschema_object_unique_keys(instance);
+		if ( validation_enabled ) {
+			if (
+				jschema_object_has( schema, "minProperties" )
+				and keys.length() < jschema_object_get( schema, "minProperties" )
+			) {
+				self._invalid( result, MinPropertiesError, jschema_pointer_join( kwloc, "minProperties" ), instloc, "Object has too few properties.", "minProperties" );
+				if ( not collect ) {
+					return;
+				}
+			}
+			if (
+				jschema_object_has( schema, "maxProperties" )
+				and keys.length() > jschema_object_get( schema, "maxProperties" )
+			) {
+				self._invalid( result, MaxPropertiesError, jschema_pointer_join( kwloc, "maxProperties" ), instloc, "Object has too many properties.", "maxProperties" );
+				if ( not collect ) {
+					return;
+				}
+			}
+			if ( jschema_object_has( schema, "required" ) ) {
+				for ( let key in jschema_object_get( schema, "required" ) ) {
+					if ( not jschema_object_has( instance, key ) ) {
+						self._invalid(
+							result,
+							RequiredPropertyError,
+							jschema_pointer_join( kwloc, "required" ),
+							instloc,
+							`Required property '${key}' is missing.`,
+							"required",
+						);
+						if ( not collect ) {
+							return;
+						}
+					}
+				}
+			}
+			if ( jschema_object_has( schema, "dependentRequired" ) ) {
+				let deps := jschema_object_get( schema, "dependentRequired" );
+				if ( jschema_is_object(deps) ) {
+					for ( let entry in jschema_object_entries(deps) ) {
+						if ( jschema_object_has( instance, entry[0] ) ) {
+							for ( let dep in entry[1] ) {
+								if ( not jschema_object_has( instance, dep ) ) {
+									self._invalid(
+										result,
+										DependentRequiredPropertyError,
+										jschema_pointer_join( kwloc, "dependentRequired" ),
+										instloc,
+										`Dependent property '${dep}' is missing.`,
+										"dependentRequired",
+									);
+									if ( not collect ) {
+										return;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			if ( jschema_object_has( schema, "dependencies" ) ) {
+				let deps := jschema_object_get( schema, "dependencies" );
+				if ( jschema_is_object(deps) ) {
+					for ( let entry in jschema_object_entries(deps) ) {
+						if ( jschema_object_has( instance, entry[0] ) ) {
+							if ( entry[1] instanceof Array ) {
+								for ( let dep in entry[1] ) {
+									if ( not jschema_object_has( instance, dep ) ) {
+										self._invalid(
+											result,
+											DependentRequiredPropertyError,
+											jschema_pointer_join( kwloc, "dependencies" ),
+											instloc,
+											`Dependent property '${dep}' is missing.`,
+											"dependencies",
+										);
+										if ( not collect ) {
+											return;
+										}
+									}
+								}
+							}
+							else {
+								let child := self._child(
+									entry[1],
+									instance,
+									jschema_pointer_join(
+										jschema_pointer_join( kwloc, "dependencies" ),
+										entry[0],
+									),
+									instloc,
+									base_uri,
+								);
+								result.merge(child);
+								if ( not child.valid() ) {
+									result.add_error( self._subschema_error(
+										jschema_pointer_join(
+											jschema_pointer_join( kwloc, "dependencies" ),
+											entry[0],
+										),
+										instloc,
+										child.errors(),
+										"dependencies",
+									) );
+									if ( not collect ) { return result; }
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		let matched_properties := [];
+		if ( jschema_object_has( schema, "properties" ) ) {
+			let props := jschema_object_get( schema, "properties" );
+			if ( jschema_is_object(props) ) {
+				for ( let entry in jschema_object_entries(props) ) {
+					let key := entry[0];
+					if ( jschema_object_has( instance, key ) ) {
+						let ix := 0;
+						for ( let value in jschema_object_get_all( instance, key ) ) {
+							let child := self._child(
+								entry[1],
+								value,
+								jschema_pointer_join( jschema_pointer_join( kwloc, "properties" ), key ),
+								jschema_pointer_join( instloc, key ),
+								base_uri,
+							);
+							_jschema_add_unique( matched_properties, key );
+							result.mark_property( jschema_pointer_join( instloc, key ) );
+							result.merge(child);
+							if ( not child.valid() ) {
+								result.add_error( self._subschema_error(
+									jschema_pointer_join( jschema_pointer_join( kwloc, "properties" ), key ),
+									jschema_pointer_join( instloc, key ),
+									child.errors(),
+									"properties",
+								) );
+								if ( not collect ) { return result; }
+							}
+							ix++;
+						}
+					}
+				}
+			}
+		}
+
+		if ( jschema_object_has( schema, "patternProperties" ) ) {
+			let patterns := jschema_object_get( schema, "patternProperties" );
+			if ( jschema_is_object(patterns) ) {
+				for ( let pentry in jschema_object_entries(patterns) ) {
+					let pattern := pentry[0];
+					for ( let entry in jschema_object_entries(instance) ) {
+						let key := entry[0];
+						if ( key ~ _jschema_regexp(pattern) ) {
+							let child := self._child(
+								pentry[1],
+								entry[1],
+								jschema_pointer_join( jschema_pointer_join( kwloc, "patternProperties" ), pattern ),
+								jschema_pointer_join( instloc, key ),
+								base_uri,
+							);
+							_jschema_add_unique( matched_properties, key );
+							result.mark_property( jschema_pointer_join( instloc, key ) );
+							result.merge(child);
+							if ( not child.valid() ) {
+								result.add_error( self._subschema_error(
+									jschema_pointer_join( jschema_pointer_join( kwloc, "patternProperties" ), pattern ),
+									jschema_pointer_join( instloc, key ),
+									child.errors(),
+									"patternProperties",
+								) );
+								if ( not collect ) { return result; }
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if ( jschema_object_has( schema, "additionalProperties" ) ) {
+			for ( let entry in jschema_object_entries(instance) ) {
+				let key := entry[0];
+				if ( not( key in matched_properties ) ) {
+					let child := self._child(
+						jschema_object_get( schema, "additionalProperties" ),
+						entry[1],
+						jschema_pointer_join( kwloc, "additionalProperties" ),
+						jschema_pointer_join( instloc, key ),
+						base_uri,
+					);
+					result.merge(child);
+					if ( not child.valid() ) {
+						result.add_error( self.error(
+							AdditionalPropertiesError,
+							jschema_pointer_join( kwloc, "additionalProperties" ),
+							jschema_pointer_join( instloc, key ),
+							"Additional property is not allowed.",
+							"additionalProperties",
+						) );
+						if ( not collect ) { return result; }
+					}
+					result.mark_property( jschema_pointer_join( instloc, key ) );
+				}
+			}
+		}
+
+		if ( jschema_object_has( schema, "propertyNames" ) ) {
+			for ( let key in unique_keys ) {
+				let child := self._child(
+					jschema_object_get( schema, "propertyNames" ),
+					key,
+					jschema_pointer_join( kwloc, "propertyNames" ),
+					jschema_pointer_join( instloc, key ),
+					base_uri,
+				);
+				result.merge(child);
+				if ( not child.valid() ) {
+					result.add_error( self.error(
+						PropertyNamesError,
+						jschema_pointer_join( kwloc, "propertyNames" ),
+						jschema_pointer_join( instloc, key ),
+						"Property name does not match schema.",
+						"propertyNames",
+					) );
+					if ( not collect ) { return result; }
+				}
+			}
+		}
+
+		if ( jschema_object_has( schema, "dependentSchemas" ) ) {
+			let deps := jschema_object_get( schema, "dependentSchemas" );
+			if ( jschema_is_object(deps) ) {
+				for ( let entry in jschema_object_entries(deps) ) {
+					if ( jschema_object_has( instance, entry[0] ) ) {
+						let child := self._child(
+							entry[1],
+							instance,
+							jschema_pointer_join( jschema_pointer_join( kwloc, "dependentSchemas" ), entry[0] ),
+							instloc,
+							base_uri,
+						);
+						result.merge(child);
+						if ( not child.valid() ) {
+							result.add_error( self._subschema_error(
+								jschema_pointer_join( jschema_pointer_join( kwloc, "dependentSchemas" ), entry[0] ),
+								instloc,
+								child.errors(),
+								"dependentSchemas",
+							) );
+							if ( not collect ) { return result; }
+						}
+					}
+				}
+			}
+		}
+
+	}
+
+	method _validate_unevaluated ( result, schema, instance, kwloc, instloc, base_uri ) {
+		if (
+			jschema_is_arrayish(instance)
+			and jschema_object_has( schema, "unevaluatedItems" )
+		) {
+			let items := jschema_array_items(instance);
+			let i := 0;
+			while ( i < items.length() ) {
+				if (
+					not( jschema_pointer_join( instloc, i )
+						in result.evaluatedItems() )
+				) {
+					let child := self._child(
+						jschema_object_get( schema, "unevaluatedItems" ),
+						items[i],
+						jschema_pointer_join( kwloc, "unevaluatedItems" ),
+						jschema_pointer_join( instloc, i ),
+						base_uri,
+					);
+					result.merge(child);
+					if ( not child.valid() ) {
+						result.add_error( self.error(
+							UnevaluatedItemsError,
+							jschema_pointer_join( kwloc, "unevaluatedItems" ),
+							jschema_pointer_join( instloc, i ),
+							"Unevaluated array item is not allowed.",
+							"unevaluatedItems",
+						) );
+						if ( not collect ) { return result; }
+					}
+					result.mark_item( jschema_pointer_join( instloc, i ) );
+				}
+				i++;
+			}
+		}
+
+		if (
+			jschema_is_object(instance)
+			and jschema_object_has( schema, "unevaluatedProperties" )
+		) {
+			for ( let entry in jschema_object_entries(instance) ) {
+				let key := entry[0];
+				if (
+					not( jschema_pointer_join( instloc, key )
+						in result.evaluatedProperties() )
+				) {
+					let child := self._child(
+						jschema_object_get( schema, "unevaluatedProperties" ),
+						entry[1],
+						jschema_pointer_join( kwloc, "unevaluatedProperties" ),
+						jschema_pointer_join( instloc, key ),
+						base_uri,
+					);
+					result.merge(child);
+					if ( not child.valid() ) {
+						result.add_error( self.error(
+							UnevaluatedPropertiesError,
+							jschema_pointer_join( kwloc, "unevaluatedProperties" ),
+							jschema_pointer_join( instloc, key ),
+							"Unevaluated property is not allowed.",
+							"unevaluatedProperties",
+						) );
+						if ( not collect ) { return result; }
+					}
+					result.mark_property( jschema_pointer_join( instloc, key ) );
+				}
+			}
+		}
+	}
+
+	method _validate_applicators ( result, schema, instance, kwloc, instloc, base_uri ) {
+		if ( jschema_object_has( schema, "allOf" ) ) {
+			let arr := jschema_object_get( schema, "allOf" );
+			if ( arr instanceof Array ) {
+				let i := 0;
+				while ( i < arr.length() ) {
+					let child := self._child( arr[i], instance, jschema_pointer_join( jschema_pointer_join( kwloc, "allOf" ), i ), instloc, base_uri );
+					if ( child.valid() ) {
+						result.merge(child);
+					}
+					else {
+						result.merge(child);
+						result.add_error( self.error( AllOfError, jschema_pointer_join( jschema_pointer_join( kwloc, "allOf" ), i ), instloc, "allOf subschema failed.", "allOf" ) );
+						if ( not collect ) { return result; }
+					}
+					i++;
+				}
+			}
+		}
+
+		if ( jschema_object_has( schema, "anyOf" ) ) {
+			let arr := jschema_object_get( schema, "anyOf" );
+			if ( arr instanceof Array ) {
+				let ok := false;
+				let child_errors := [];
+				let i := 0;
+				while ( i < arr.length() ) {
+					let child := self._child( arr[i], instance, jschema_pointer_join( jschema_pointer_join( kwloc, "anyOf" ), i ), instloc, base_uri );
+					if ( child.valid() ) {
+						ok := true;
+						result.merge(child);
+					}
+					else {
+						for ( let e in child.errors() ) { child_errors.push(e); }
+					}
+					i++;
+				}
+				if ( not ok ) {
+					result.add_error( self.error( AnyOfError, jschema_pointer_join( kwloc, "anyOf" ), instloc, "No anyOf subschema matched.", "anyOf" ) );
+					result.add_error( self._subschema_error( jschema_pointer_join( kwloc, "anyOf" ), instloc, child_errors, "anyOf" ) );
+					if ( not collect ) { return result; }
+				}
+			}
+		}
+
+		if ( jschema_object_has( schema, "oneOf" ) ) {
+			let arr := jschema_object_get( schema, "oneOf" );
+			if ( arr instanceof Array ) {
+				let matches := 0;
+				let child_errors := [];
+				let i := 0;
+				while ( i < arr.length() ) {
+					let child := self._child( arr[i], instance, jschema_pointer_join( jschema_pointer_join( kwloc, "oneOf" ), i ), instloc, base_uri );
+					if ( child.valid() ) {
+						matches++;
+						result.merge(child);
+					}
+					else {
+						for ( let e in child.errors() ) { child_errors.push(e); }
+					}
+					i++;
+				}
+				if ( matches != 1 ) {
+					result.add_error( self.error( OneOfError, jschema_pointer_join( kwloc, "oneOf" ), instloc, "Expected exactly one oneOf subschema to match.", "oneOf" ) );
+					if ( matches == 0 ) {
+						result.add_error( self._subschema_error( jschema_pointer_join( kwloc, "oneOf" ), instloc, child_errors, "oneOf" ) );
+					}
+					if ( not collect ) { return result; }
+				}
+			}
+		}
+
+		if ( jschema_object_has( schema, "not" ) ) {
+			let child := self._child( jschema_object_get( schema, "not" ), instance, jschema_pointer_join( kwloc, "not" ), instloc, base_uri );
+			if ( child.valid() ) {
+				self._invalid( result, NotMatchedError, jschema_pointer_join( kwloc, "not" ), instloc, "Value matched a forbidden subschema.", "not" );
+				if ( not collect ) { return result; }
+			}
+		}
+
+		if ( jschema_object_has( schema, "if" ) ) {
+			let cond := self._child( jschema_object_get( schema, "if" ), instance, jschema_pointer_join( kwloc, "if" ), instloc, base_uri );
+			if ( cond.valid() ) {
+				result.merge(cond);
+			}
+			if ( cond.valid() and jschema_object_has( schema, "then" ) ) {
+				let child := self._child( jschema_object_get( schema, "then" ), instance, jschema_pointer_join( kwloc, "then" ), instloc, base_uri );
+				result.merge(child);
+				if ( not child.valid() ) {
+					result.add_error( self.error( IfThenElseError, jschema_pointer_join( kwloc, "then" ), instloc, "then subschema failed.", "then" ) );
+					if ( not collect ) { return result; }
+				}
+			}
+			else if ( not cond.valid() and jschema_object_has( schema, "else" ) ) {
+				let child := self._child( jschema_object_get( schema, "else" ), instance, jschema_pointer_join( kwloc, "else" ), instloc, base_uri );
+				result.merge(child);
+				if ( not child.valid() ) {
+					result.add_error( self.error( IfThenElseError, jschema_pointer_join( kwloc, "else" ), instloc, "else subschema failed.", "else" ) );
+					if ( not collect ) { return result; }
+				}
+			}
+		}
+	}
+}
+
+class JSONSchema {
+	let schema;
+	let options := {};
+	let registry;
+	let formats;
+	let String base_uri := "";
+	let Boolean format_assert := false;
+	let String unknown_format := "ignore";
+	let Boolean validation_enabled := true;
+
+	method __build__ () {
+		base_uri := _jschema_opt( options, "base_uri", base_uri );
+		registry := _jschema_opt( options, "registry", null );
+		if ( registry ≡ null ) {
+			registry := new SchemaRegistry();
+		}
+		formats := _jschema_opt( options, "formats", null );
+		if ( formats ≡ null ) {
+			formats := _jschema_opt( options, "format_registry", null );
+		}
+		if ( formats ≡ null ) {
+			formats := new FormatRegistry();
+		}
+		let loader := _jschema_opt( options, "loader", null );
+		if ( loader ≡ null and _jschema_opt( options, "allow_network", false ) ) {
+			loader := new HTTPResourceLoader();
+		}
+		if ( loader ≢ null ) {
+			registry.set_loader(loader);
+		}
+		unknown_format := _jschema_opt( options, "unknown_format", "ignore" );
+		validation_enabled := _jschema_opt(
+			options,
+			"validation_enabled",
+			_jschema_validation_vocab_enabled( schema, registry, base_uri ),
+		);
+		format_assert := _jschema_format_assertion_vocab_enabled(
+			schema,
+			registry,
+			base_uri,
+			_jschema_opt( options, "format_assert", false ),
+		);
+		registry.register( schema, base_uri );
+	}
+
+	method _evaluator ( Boolean collect ) {
+		return new _SchemaEvaluator(
+			registry: registry,
+			formats: formats,
+			collect: collect,
+			format_assert: format_assert,
+			unknown_format: unknown_format,
+			validation_enabled: validation_enabled,
+		);
+	}
+
+	method is_valid ( instance ) {
+		return self._evaluator(false).evaluate(
+			schema,
+			instance,
+			"",
+			"",
+			base_uri,
+		).valid();
+	}
+
+	method validate ( instance ) {
+		let ev := self._evaluator(true).evaluate(
+			schema,
+			instance,
+			"",
+			"",
+			base_uri,
+		);
+		return new ValidationResult(
+			valid: ev.valid(),
+			errors: ev.errors(),
+		);
+	}
+}
+
+function valid ( schema, instance, options := {} ) {
+	return new JSONSchema( schema: schema, options: options ).is_valid(instance);
+}
+
+function validate ( schema, instance, options := {} ) {
+	return new JSONSchema( schema: schema, options: options ).validate(instance);
+}

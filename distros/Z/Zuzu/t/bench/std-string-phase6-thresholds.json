@@ -1,0 +1,9 @@
+{
+  "benchmark": "std-string-phase6",
+  "allowed_regression_percent": 20,
+  "minimum_ops_per_second": {
+    "case_convert": 20,
+    "split_join": 20,
+    "trim_search": 20
+  }
+}

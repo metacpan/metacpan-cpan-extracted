@@ -1,0 +1,1498 @@
+from std/mail import
+	Address,
+	Body,
+	Head,
+	Message,
+	Parser,
+	Serializer,
+	parse_datetime,
+	format_datetime;
+from std/time import Time;
+from test/more import *;
+
+is( typeof Address, "Class", "Address is exported" );
+is( typeof Body, "Class", "Body is exported" );
+is( typeof Head, "Class", "Head is exported" );
+is( typeof Message, "Class", "Message is exported" );
+is( typeof Parser, "Class", "Parser is exported" );
+is( typeof Serializer, "Class", "Serializer is exported" );
+is( typeof parse_datetime, "Function", "parse_datetime is exported" );
+is( typeof format_datetime, "Function", "format_datetime is exported" );
+
+let addr := new Address(
+	local: "alice",
+	domain: "example.test",
+	display_name: "Alice Example",
+);
+is( addr.local(), "alice", "Address local accessor" );
+is( addr.domain(), "example.test", "Address domain accessor" );
+is( addr.address(), "alice@example.test", "Address address()" );
+is(
+	addr.to_header(),
+	"Alice Example <alice@example.test>",
+	"Address to_header display form",
+);
+is( addr.to_String(), addr.to_header(), "Address to_String aliases header" );
+is( addr.to_Dict(){address}, "alice@example.test", "Address to_Dict" );
+
+let plain := Address.parse("bob@example.test");
+is( plain.display_name(), null, "plain address has no display name" );
+is( plain.address(), "bob@example.test", "plain address parses" );
+
+let display := Address.parse("\"Doe, Jane\" <jane@example.test>");
+is( display.display_name(), "Doe, Jane", "quoted display name parses" );
+is(
+	display.to_header(),
+	"\"Doe, Jane\" <jane@example.test>",
+	"quoted display name serializes safely",
+);
+
+let unquoted_display := Address.parse("Ada Lovelace <ada@example.test>");
+is(
+	unquoted_display.display_name(),
+	"Ada Lovelace",
+	"unquoted display name parses",
+);
+
+let quoted_local := Address.parse("\"weird local\"@[127.0.0.1]");
+is( quoted_local.local(), "weird local", "quoted local parses" );
+is( quoted_local.domain(), "[127.0.0.1]", "domain literal parses" );
+is(
+	quoted_local.address(),
+	"\"weird local\"@[127.0.0.1]",
+	"quoted local serializes",
+);
+
+let listed := Address.parse_list(
+	"Team: Ada <ada@example.test>, \"B\" <b@example.test>; solo@example.test",
+);
+is( listed.length(), 3, "address list flattens group syntax" );
+is( listed[0].display_name(), "Ada", "group first display name" );
+is( listed[1].address(), "b@example.test", "group second address" );
+is( listed[2].address(), "solo@example.test", "post-group address" );
+
+let comma_list := Address.parse_list(
+	"\"Doe, Jane\" <jane@example.test>, bob@example.test",
+);
+is(
+	comma_list[0].display_name(),
+	"Doe, Jane",
+	"quoted display name with comma parses inside list",
+);
+is( comma_list[1].address(), "bob@example.test", "list continues after comma" );
+
+let empty_group := Address.parse_list(
+	"Undisclosed recipients:; visible@example.test",
+);
+is( empty_group.length(), 1, "empty group flattens to no addresses" );
+is(
+	empty_group[0].address(),
+	"visible@example.test",
+	"address after empty group parses",
+);
+
+like(
+	exception( function () {
+		Address.parse("bad\nname@example.test");
+	} ).to_String(),
+	/CR or LF/,
+	"Address rejects CRLF injection",
+);
+like(
+	exception( function () {
+		Address.parse_list("alice@example.test,\r\nBcc: evil@example.test");
+	} ).to_String(),
+	/CR or LF/,
+	"Address parse_list rejects CRLF injection",
+);
+like(
+	exception( function () {
+		Address.parse("Ada (comment) <ada@example.test>");
+	} ).to_String(),
+	/comment syntax/,
+	"Address rejects obsolete comment syntax clearly",
+);
+like(
+	exception( function () {
+		Address.parse("<@old.example:ada@example.test>");
+	} ).to_String(),
+	/route syntax/,
+	"Address rejects obsolete route syntax clearly",
+);
+
+let pairs := new PairList();
+pairs.add( "X-Dup", "one" );
+pairs.add( "x-dup", "two" );
+pairs.add( "Subject", "=?UTF-8?Q?Hello?= \t =?UTF-8?Q?_World?=" );
+pairs.add( "X-Latin", "=?ISO-8859-1?B?Q2Fm6Q==?=" );
+pairs.add( "X-Bad", "=?X-UNKNOWN?Q?abc?=" );
+pairs.add(
+	"Content-Type",
+	"text/plain; charset=UTF-8; boundary=\"mail-boundary\"",
+);
+pairs.add( "Content-Transfer-Encoding", "Quoted-Printable" );
+pairs.add( "From", "Ada <ada@example.test>" );
+pairs.add( "To", "Team: Bob <bob@example.test>, cara@example.test;" );
+pairs.add( "Cc", "\"Dee\" <dee@example.test>" );
+pairs.add( "Bcc", "eve@example.test" );
+pairs.add( "Date", "Fri, 08 May 2026 12:00:00 +0000" );
+pairs.add( "Message-ID", "<mail-phase8@example.test>" );
+
+let head := new Head( fields: pairs );
+pairs.add( "X-Dup", "late" );
+is( head.fields()[0], "X-Dup", "Head fields preserve order" );
+is( head.raw_all("x-dup"), [ "one", "two" ], "Head preserves duplicates" );
+is( head.raw("SUBJECT"), pairs.get("Subject"), "Head raw is case-insensitive" );
+is(
+	head.subject(),
+	"Hello World",
+	"Head decodes adjacent RFC 2047 encoded words",
+);
+is( head.get("X-Latin"), "Café", "Head decodes Latin-1 encoded words" );
+is(
+	head.get("X-Bad"),
+	"=?X-UNKNOWN?Q?abc?=",
+	"Head preserves unsupported encoded words",
+);
+is( head.get("Subject"), head.subject(), "Head get aliases decoded" );
+is( head.get_all("X-Dup"), [ "one", "two" ], "Head get_all alias" );
+ok( head.has("message-id"), "Head has is case-insensitive" );
+is( head.content_type(), "text/plain", "Head content_type helper" );
+is( head.charset(), "utf-8", "Head charset helper" );
+is( head.boundary(), "mail-boundary", "Head boundary helper" );
+is(
+	head.content_transfer_encoding(),
+	"quoted-printable",
+	"Head content_transfer_encoding helper",
+);
+is( head.message_id(), "<mail-phase8@example.test>", "message_id helper" );
+is( head.date(), "Fri, 08 May 2026 12:00:00 +0000", "date helper" );
+is( head.from()[0].address(), "ada@example.test", "from helper parses" );
+is( head.to().length(), 2, "to helper parses flattened groups" );
+is( head.cc()[0].display_name(), "Dee", "cc helper parses" );
+is( head.bcc()[0].local(), "eve", "bcc helper parses" );
+
+let copied := head.to_PairList();
+copied.add( "X-Dup", "mutated" );
+is( head.raw_all("X-Dup"), [ "one", "two" ], "to_PairList is defensive" );
+
+let iterated_pairs := [];
+for ( let pair in head.to_Iterator() ) {
+	iterated_pairs.push(pair);
+}
+let first_pair := iterated_pairs[0];
+is( first_pair.key, "X-Dup", "Head iterator yields Pair key" );
+is( first_pair.value, "one", "Head iterator yields Pair value" );
+
+head.set( "x-dup", "replacement" );
+is( head.raw_all("X-Dup"), [ "replacement" ], "Head set replaces duplicates" );
+head.add( "X-Dup", "second" );
+head.remove("X-DUP");
+ok( not head.has("x-dup"), "Head remove is case-insensitive" );
+like(
+	exception( function () {
+		head.add( "Bad:Name", "value" );
+	} ).to_String(),
+	/invalid header name/,
+	"Head rejects invalid header names",
+);
+like(
+	exception( function () {
+		head.add( "X-Bad", "bad\rvalue" );
+	} ).to_String(),
+	/CR or LF/,
+	"Head rejects header value injection",
+);
+
+let b64 := Body.bytes(
+	to_binary("SGVsbG8="),
+	transfer_encoding: "base64",
+	content_type: "text/plain",
+);
+is( b64.is_multipart(), false, "leaf body is not multipart" );
+is( b64.is_nested(), false, "leaf body is not nested" );
+is( to_string( b64.decoded() ), "Hello", "Body decodes base64 leaf" );
+is( to_string( b64.encoded() ), "SGVsbG8=", "Body encoded returns raw bytes" );
+is( b64.content_type(), "text/plain", "Body content_type option" );
+is( b64.transfer_encoding(), "base64", "Body transfer_encoding option" );
+
+let qp := Body.bytes(
+	to_binary("Hello=20world=0D=0A"),
+	transfer_encoding: "quoted-printable",
+);
+is(
+	to_string( qp.decoded() ),
+	"Hello world\r\n",
+	"Body decodes quoted-printable leaf",
+);
+
+let identity := Body.bytes(to_binary("Raw"));
+is(
+	identity.decoded(),
+	identity.bytes(),
+	"identity decoded returns raw bytes",
+);
+
+let part1 := new Message(
+	head: new Head(),
+	body: Body.bytes(to_binary("Part 1")),
+);
+let part2 := new Message(
+	head: new Head(),
+	body: Body.bytes(to_binary("Part 2")),
+);
+let multipart := Body.multipart( [ part1, part2 ], "boundary-1" );
+let parent := new Message( head: new Head(), body: multipart );
+is( multipart.is_multipart(), true, "multipart body reports multipart" );
+is( multipart.count(), 2, "multipart body count" );
+is( multipart.part(1), part2, "multipart part accessor" );
+is( part1.container(), multipart, "multipart child has weak container" );
+is( part1.toplevel(), parent, "part toplevel walks through body owner" );
+let visible_parts := multipart.parts();
+visible_parts.clear();
+is( multipart.count(), 2, "Body parts() returns defensive array" );
+like(
+	exception( function () {
+		multipart.decoded();
+	} ).to_String(),
+	/Phase 10/,
+	"multipart decoded is a clear later-phase error",
+);
+
+let nested_message := new Message(
+	head: new Head(),
+	body: Body.bytes(to_binary("Nested")),
+);
+let nested_body := Body.nested(nested_message);
+let wrapper := new Message( head: new Head(), body: nested_body );
+is( nested_body.is_nested(), true, "nested body reports nested" );
+is( nested_body.nested(), nested_message, "nested body exposes message" );
+is( nested_message.container(), nested_body, "nested message container set" );
+is( nested_message.toplevel(), wrapper, "nested toplevel walks to wrapper" );
+
+let message := new Message(
+	head: new Head(),
+	body: Body.bytes(to_binary("Message")),
+);
+message.set_header( "Subject", "Original" );
+message.add_header( "To", "reader@example.test" );
+is( message.header("Subject"), "Original", "Message header convenience" );
+is( message.subject(), "Original", "Message subject convenience" );
+is( message.to()[0].address(), "reader@example.test", "Message to helper" );
+message.remove_header("Subject");
+is( message.subject(), null, "Message remove_header convenience" );
+is( message.is_part(), false, "top-level message is not a part" );
+is( message.container(), null, "top-level message has no container" );
+is( message.toplevel(), message, "top-level message returns itself" );
+is( message.to_Dict(){body}{kind}, "bytes", "Message to_Dict includes body" );
+
+class FakeMailer {
+	let calls := [];
+	let result := null;
+
+	method __build__ () {
+		result := { status: "sent" } if result == null;
+	}
+
+	method send (
+		envelope_from,
+		envelope_to,
+		headers,
+		body,
+		options
+	) {
+		calls.push(
+			{
+				envelope_from: envelope_from,
+				envelope_to: envelope_to,
+				headers: headers,
+				body: body,
+				options: options,
+			},
+		);
+		return result;
+	}
+
+	method call () {
+		return calls[0];
+	}
+
+	method call_count () {
+		return calls.length();
+	}
+}
+
+function send_header_names ( call ) {
+	let out := [];
+	for ( let pair in call{headers}.to_Array() ) {
+		out.push(pair.key);
+	}
+	return out;
+}
+
+function send_header_pairs ( call ) {
+	let out := [];
+	for ( let pair in call{headers}.to_Array() ) {
+		out.push( pair.key _ "=" _ pair.value );
+	}
+	return out;
+}
+
+let sender_message := new Message(
+	head: new Head(),
+	body: Body.bytes(to_binary("Sender wins\r\n")),
+);
+sender_message.add_header( "Sender", "sender@example.test" );
+sender_message.add_header( "From", "from@example.test" );
+sender_message.add_header( "To", "to@example.test" );
+let sender_mailer := new FakeMailer();
+let sender_result := sender_message.send(sender_mailer);
+is( sender_result, sender_mailer{result}, "Message.send returns mailer result" );
+is(
+	sender_mailer.call(){envelope_from},
+	"sender@example.test",
+	"Message.send prefers Sender over From",
+);
+
+let from_message := new Message(
+	head: new Head(),
+	body: Body.bytes(to_binary("From fallback\r\n")),
+);
+from_message.add_header( "From", "author@example.test" );
+from_message.add_header( "To", "reader@example.test" );
+let from_mailer := new FakeMailer();
+from_message.send(from_mailer);
+is(
+	from_mailer.call(){envelope_from},
+	"author@example.test",
+	"Message.send falls back to From",
+);
+
+let multiple_from := new Message(
+	head: new Head(),
+	body: Body.bytes(to_binary("Bad From\r\n")),
+);
+multiple_from.add_header( "From", "one@example.test" );
+multiple_from.add_header( "From", "two@example.test" );
+multiple_from.add_header( "To", "reader@example.test" );
+like(
+	exception( function () {
+		multiple_from.send( new FakeMailer() );
+	} ).to_String(),
+	/mail\.invalid_address: Message\.send requires exactly one From/,
+	"Message.send rejects multiple From without Sender",
+);
+
+let recipients_message := new Message(
+	head: new Head(),
+	body: Body.bytes(to_binary("Recipients\r\n")),
+);
+recipients_message.add_header( "From", "sender@example.test" );
+recipients_message.add_header(
+	"To",
+	"Team: to@example.test, dup@example.test;",
+);
+recipients_message.add_header( "Cc", "cc@example.test, dup@example.test" );
+recipients_message.add_header( "Bcc", "bcc@example.test" );
+let recipients_mailer := new FakeMailer();
+recipients_message.send(recipients_mailer);
+is(
+	recipients_mailer.call(){envelope_to},
+	[
+		"to@example.test",
+		"dup@example.test",
+		"cc@example.test",
+		"bcc@example.test",
+	],
+	"Message.send derives, flattens, and deduplicates recipients",
+);
+is(
+	send_header_names( recipients_mailer.call() ),
+	[ "From", "To", "Cc" ],
+	"Message.send removes Bcc from delivery headers",
+);
+is(
+	recipients_message.head().raw_all("Bcc"),
+	[ "bcc@example.test" ],
+	"Message.send does not mutate original Bcc header",
+);
+
+let mixed_bcc_message := new Message(
+	head: new Head(),
+	body: Body.bytes(to_binary("Mixed Bcc\r\n")),
+);
+mixed_bcc_message.add_header( "From", "sender@example.test" );
+mixed_bcc_message.add_header( "To", "visible@example.test" );
+mixed_bcc_message.add_header( "bCc", "hidden-one@example.test" );
+mixed_bcc_message.add_header( "BCC", "hidden-two@example.test" );
+let mixed_bcc_mailer := new FakeMailer();
+mixed_bcc_message.send(mixed_bcc_mailer);
+is(
+	mixed_bcc_mailer.call(){envelope_to},
+	[
+		"visible@example.test",
+		"hidden-one@example.test",
+		"hidden-two@example.test",
+	],
+	"Message.send uses case-insensitive Bcc recipients in envelope",
+);
+is(
+	send_header_names( mixed_bcc_mailer.call() ),
+	[ "From", "To" ],
+	"Message.send removes all case-insensitive Bcc headers",
+);
+is(
+	mixed_bcc_message.head().raw_all("Bcc"),
+	[ "hidden-one@example.test", "hidden-two@example.test" ],
+	"Message.send leaves case-insensitive Bcc headers in original head",
+);
+
+let override_message := new Message(
+	head: new Head(),
+	body: Body.bytes(to_binary("Overrides\r\n")),
+);
+override_message.add_header( "From", "header@example.test" );
+let override_mailer := new FakeMailer();
+override_message.send(
+	override_mailer,
+	envelope_from: "bounce@example.test",
+	envelope_to: "override@example.test",
+);
+is(
+	override_mailer.call(){envelope_from},
+	"bounce@example.test",
+	"Message.send accepts explicit envelope_from",
+);
+is(
+	override_mailer.call(){envelope_to},
+	[ "override@example.test" ],
+	"Message.send accepts explicit envelope_to String",
+);
+
+let override_array_mailer := new FakeMailer();
+override_message.send(
+	override_array_mailer,
+	envelope_from: "bounce@example.test",
+	envelope_to: [ "array-one@example.test", "array-two@example.test" ],
+);
+is(
+	override_array_mailer.call(){envelope_to},
+	[ "array-one@example.test", "array-two@example.test" ],
+	"Message.send accepts explicit envelope_to Array",
+);
+
+let send_options := new PairList();
+send_options.add( "reject_partial", true );
+let options_message := new Message(
+	head: new Head(),
+	body: Body.bytes(to_binary("Options\r\n")),
+);
+options_message.add_header( "From", "sender@example.test" );
+options_message.add_header( "To", "reader@example.test" );
+let options_mailer := new FakeMailer();
+options_message.send( options_mailer, send_options: send_options );
+is(
+	options_mailer.call(){options}.get("reject_partial"),
+	true,
+	"Message.send forwards send_options as fifth argument",
+);
+
+let dict_options_mailer := new FakeMailer();
+options_message.send( dict_options_mailer, send_options: { trace: true } );
+is(
+	dict_options_mailer.call(){options}{trace},
+	true,
+	"Message.send forwards Dict send_options as fifth argument",
+);
+
+like(
+	exception( function () {
+		options_message.send( new FakeMailer(), priority: "high" );
+	} ).to_String(),
+	/mail\.send: unsupported option 'priority'/,
+	"Message.send rejects unknown options",
+);
+like(
+	exception( function () {
+		options_message.send( new FakeMailer(), envelope_from: 1 );
+	} ).to_String(),
+	/mail\.send: envelope_from expects String/,
+	"Message.send validates envelope_from option type",
+);
+like(
+	exception( function () {
+		options_message.send( new FakeMailer(), envelope_to: [ "ok", 1 ] );
+	} ).to_String(),
+	/mail\.send: envelope_to expects String or Array of String/,
+	"Message.send validates envelope_to array item type",
+);
+like(
+	exception( function () {
+		options_message.send( new FakeMailer(), send_options: true );
+	} ).to_String(),
+	/mail\.send: send_options expects Dict or PairList/,
+	"Message.send validates send_options type",
+);
+like(
+	exception( function () {
+		options_message.send(null);
+	} ).to_String(),
+	/mail\.unsupported: Message\.send requires a compatible mailer/,
+	"Message.send rejects null mailer",
+);
+like(
+	exception( function () {
+		options_message.send({});
+	} ).to_String(),
+	/mail\.unsupported: Message\.send requires a compatible mailer/,
+	"Message.send rejects incompatible mailer",
+);
+
+let no_sender_message := new Message(
+	head: new Head(),
+	body: Body.bytes(to_binary("No sender\r\n")),
+);
+no_sender_message.add_header( "To", "reader@example.test" );
+like(
+	exception( function () {
+		no_sender_message.send( new FakeMailer() );
+	} ).to_String(),
+	/mail\.invalid_address: Message\.send requires a Sender or From address/,
+	"Message.send rejects missing envelope sender",
+);
+
+let no_recipient_message := new Message(
+	head: new Head(),
+	body: Body.bytes(to_binary("No recipient\r\n")),
+);
+no_recipient_message.add_header( "From", "sender@example.test" );
+like(
+	exception( function () {
+		no_recipient_message.send( new FakeMailer() );
+	} ).to_String(),
+	/mail\.invalid_address: Message\.send requires at least one envelope recipient/,
+	"Message.send rejects missing envelope recipient",
+);
+
+let body_message := new Message(
+	head: new Head(),
+	body: Body.bytes(to_binary("Simple body\r\n")),
+);
+body_message.add_header( "From", "sender@example.test" );
+body_message.add_header( "To", "reader@example.test" );
+let body_mailer := new FakeMailer();
+body_message.send(body_mailer);
+is(
+	to_string( body_mailer.call(){body} ),
+	"Simple body\r\n",
+	"Message.send serializes simple body",
+);
+is(
+	body_mailer.call(){body},
+	( new Serializer() ).serialize_body(body_message),
+	"Message.send simple body exactly matches Serializer.serialize_body",
+);
+
+let send_part1_headers := new PairList();
+send_part1_headers.add( "Content-Type", "text/plain" );
+let send_part2_headers := new PairList();
+send_part2_headers.add( "Content-Type", "text/plain" );
+let multipart_message := new Message(
+	head: new Head(),
+	body: Body.multipart(
+		[
+			new Message(
+				head: new Head( fields: send_part1_headers ),
+				body: Body.bytes(to_binary("One")),
+			),
+			new Message(
+				head: new Head( fields: send_part2_headers ),
+				body: Body.bytes(to_binary("Two")),
+			),
+		],
+		"send-boundary",
+	),
+);
+multipart_message.add_header( "From", "sender@example.test" );
+multipart_message.add_header( "To", "reader@example.test" );
+multipart_message.add_header(
+	"Content-Type",
+	"multipart/mixed; boundary=\"send-boundary\"",
+);
+let multipart_mailer := new FakeMailer();
+multipart_message.send(multipart_mailer);
+is(
+	to_string( multipart_mailer.call(){body} ),
+	"--send-boundary\r\n"
+		_ "Content-Type: text/plain\r\n"
+		_ "\r\n"
+		_ "One\r\n"
+		_ "--send-boundary\r\n"
+		_ "Content-Type: text/plain\r\n"
+		_ "\r\n"
+		_ "Two\r\n"
+		_ "--send-boundary--\r\n",
+	"Message.send serializes multipart body with explicit boundary",
+);
+is(
+	multipart_mailer.call(){body},
+	( new Serializer() ).serialize_body(multipart_message),
+	"Message.send multipart body exactly matches Serializer.serialize_body",
+);
+is(
+	send_header_pairs( multipart_mailer.call() ),
+	[
+		"From=sender@example.test",
+		"To=reader@example.test",
+		"Content-Type=multipart/mixed; boundary=\"send-boundary\"",
+	],
+	"Message.send preserves non-Bcc sending headers",
+);
+
+let missing_send_boundary := new Message(
+	head: new Head(),
+	body: Body.multipart( [ part1 ], "" ),
+);
+missing_send_boundary.add_header( "From", "sender@example.test" );
+missing_send_boundary.add_header( "To", "reader@example.test" );
+missing_send_boundary.add_header(
+	"Content-Type",
+	"multipart/mixed; boundary=\"header-only\"",
+);
+let missing_boundary_mailer := new FakeMailer();
+like(
+	exception( function () {
+		missing_send_boundary.send(missing_boundary_mailer);
+	} ).to_String(),
+	/mail\.serialize: multipart body missing boundary/,
+	"Message.send does not generate a mismatched multipart boundary",
+);
+is(
+	missing_boundary_mailer.call_count(),
+	0,
+	"Message.send does not call mailer after boundary serialization failure",
+);
+
+let parsed_lf := ( new Parser() ).parse( to_binary(
+	"Subject: Hello\n"
+	_ "X-Dup: one\n"
+	_ "X-Dup: two\n"
+	_ "X-Fold: first\n"
+	_ "\tsecond\n"
+	_ "\n"
+	_ "Line 1\nLine 2\n"
+) );
+is( parsed_lf.subject(), "Hello", "Parser reads LF Subject" );
+is(
+	parsed_lf.head().raw_all("X-Dup"),
+	[ "one", "two" ],
+	"Parser preserves duplicate headers",
+);
+is(
+	parsed_lf.head().raw("X-Fold"),
+	"first second",
+	"Parser unfolds folded headers",
+);
+is(
+	to_string( parsed_lf.body().bytes() ),
+	"Line 1\nLine 2\n",
+	"Parser preserves LF leaf body bytes",
+);
+
+let parsed_crlf := ( new Parser() ).parse( to_binary(
+	"Subject: CRLF\r\n"
+	_ "\r\n"
+	_ "First\r\n"
+	_ "\r\n"
+	_ "Second\r\n"
+) );
+is(
+	to_string( parsed_crlf.body().bytes() ),
+	"First\r\n\r\nSecond\r\n",
+	"Parser splits CRLF message on first blank and keeps body blanks",
+);
+
+let parsed_b64 := ( new Parser( decode_transfer: true ) ).parse( to_binary(
+	"Content-Transfer-Encoding: base64\n"
+	_ "\n"
+	_ "SGVsbG8="
+) );
+is(
+	to_string( parsed_b64.body().bytes() ),
+	"SGVsbG8=",
+	"Parser decode_transfer does not decode stored bytes",
+);
+is(
+	to_string( parsed_b64.body().decoded() ),
+	"Hello",
+	"Parser leaves Body.decoded to decode transfer encoding",
+);
+
+let parsed_unknown_cte := ( new Parser() ).parse( to_binary(
+	"Content-Transfer-Encoding: x-token\n"
+	_ "\n"
+	_ "opaque"
+) );
+is(
+	parsed_unknown_cte.body().transfer_encoding(),
+	"x-token",
+	"Parser preserves unknown transfer encoding",
+);
+is(
+	to_string( parsed_unknown_cte.body().bytes() ),
+	"opaque",
+	"Parser keeps unknown transfer body raw",
+);
+
+let parsed_multi := ( new Parser() ).parse( to_binary(
+	"Content-Type: multipart/mixed; boundary=\"mail-b\"\n"
+	_ "\n"
+	_ "--mail-b\n"
+	_ "Content-Type: text/plain\n"
+	_ "\n"
+	_ "Part one\n"
+	_ "--mail-b\n"
+	_ "Content-Type: text/plain\n"
+	_ "\n"
+	_ "Part two\n"
+	_ "--mail-b--\n"
+) );
+ok( parsed_multi.body().is_multipart(), "Parser creates multipart body" );
+is( parsed_multi.body().count(), 2, "Parser preserves multipart order" );
+is(
+	to_string( parsed_multi.body().part(0).body().bytes() ),
+	"Part one",
+	"Parser reads first multipart part body",
+);
+is(
+	to_string( parsed_multi.body().part(1).body().bytes() ),
+	"Part two",
+	"Parser reads second multipart part body",
+);
+is(
+	parsed_multi.body().part(0).container(),
+	parsed_multi.body(),
+	"Parser multipart part has container",
+);
+is(
+	parsed_multi.body().part(0).toplevel(),
+	parsed_multi,
+	"Parser multipart part toplevel is parent message",
+);
+
+let preamble_parser := new Parser();
+let parsed_preamble := preamble_parser.parse( to_binary(
+	"Content-Type: multipart/mixed; boundary=preamble-b\n"
+	_ "\n"
+	_ "ignored preamble\n"
+	_ "--preamble-b\n"
+	_ "\n"
+	_ "Part\n"
+	_ "--preamble-b--\n"
+	_ "ignored epilogue"
+) );
+ok(
+	parsed_preamble.body().is_multipart(),
+	"Parser still parses multipart with preamble and epilogue",
+);
+like(
+	preamble_parser.warnings()[0],
+	/preamble ignored/,
+	"Parser warns when multipart preamble is ignored",
+);
+like(
+	preamble_parser.warnings()[1],
+	/epilogue ignored/,
+	"Parser warns when multipart epilogue is ignored",
+);
+
+let parsed_nested := ( new Parser() ).parse( to_binary(
+	"Content-Type: message/rfc822\n"
+	_ "\n"
+	_ "Subject: Inner\n"
+	_ "\n"
+	_ "Nested body"
+) );
+ok( parsed_nested.body().is_nested(), "Parser creates nested message body" );
+is(
+	parsed_nested.body().nested().subject(),
+	"Inner",
+	"Parser reads nested message headers",
+);
+is(
+	to_string( parsed_nested.body().nested().body().bytes() ),
+	"Nested body",
+	"Parser reads nested message body",
+);
+is(
+	parsed_nested.body().nested().container(),
+	parsed_nested.body(),
+	"Parser nested message has container",
+);
+is(
+	parsed_nested.body().nested().toplevel(),
+	parsed_nested,
+	"Parser nested toplevel is wrapper message",
+);
+
+let encoded_nested_parser := new Parser();
+let encoded_nested := encoded_nested_parser.parse( to_binary(
+	"Content-Type: message/rfc822\n"
+	_ "Content-Transfer-Encoding: base64\n"
+	_ "\n"
+	_ "U3ViamVjdDogSW5uZXIKCkJvZHk="
+) );
+ok(
+	not encoded_nested.body().is_nested(),
+	"Parser keeps encoded message/rfc822 as a leaf body",
+);
+is(
+	encoded_nested.body().transfer_encoding(),
+	"base64",
+	"Parser preserves encoded message/rfc822 transfer encoding",
+);
+like(
+	encoded_nested_parser.warnings()[0],
+	/encoded message\/rfc822/,
+	"Parser warns when encoded message/rfc822 is kept as leaf body",
+);
+like(
+	exception( function () {
+		( new Parser( strict: true ) ).parse( to_binary(
+			"Content-Type: message/rfc822\n"
+			_ "Content-Transfer-Encoding: base64\n"
+			_ "\n"
+			_ "U3ViamVjdDogSW5uZXIKCkJvZHk="
+		) );
+	} ).to_String(),
+	/encoded message\/rfc822/,
+	"Parser strict encoded message/rfc822 throws",
+);
+
+let loose_parser := new Parser();
+let loose_missing_boundary := loose_parser.parse( to_binary(
+	"Content-Type: multipart/mixed\n"
+	_ "\n"
+	_ "--missing\n"
+	_ "\n"
+	_ "Body"
+) );
+ok(
+	not loose_missing_boundary.body().is_multipart(),
+	"Parser non-strict missing boundary falls back to leaf body",
+);
+like(
+	loose_parser.warnings()[0],
+	/boundary/,
+	"Parser non-strict missing boundary records warning",
+);
+
+let loose_malformed_header := new Parser();
+let loose_header_msg := loose_malformed_header.parse( to_binary(
+	"Bad header\n\nBody"
+) );
+ok(
+	not loose_header_msg.body().is_multipart(),
+	"Parser non-strict malformed header falls back to leaf body",
+);
+like(
+	loose_malformed_header.warnings()[0],
+	/malformed header/,
+	"Parser non-strict malformed header records warning",
+);
+
+like(
+	exception( function () {
+		( new Parser( strict: true ) ).parse( to_binary(
+			"Bad header\n\nBody"
+		) );
+	} ).to_String(),
+	/mail\.parse: malformed header/,
+	"Parser strict malformed header throws",
+);
+like(
+	exception( function () {
+		( new Parser( strict: true ) ).parse( to_binary(
+			"Content-Type: multipart/mixed\n"
+			_ "\n"
+			_ "Body"
+		) );
+	} ).to_String(),
+	/missing boundary/,
+	"Parser strict malformed multipart boundary throws",
+);
+like(
+	exception( function () {
+		( new Parser( max_header_bytes: 10 ) ).parse( to_binary(
+			"Subject: too long\n\nBody"
+		) );
+	} ).to_String(),
+	/max_header_bytes/,
+	"Parser enforces max_header_bytes",
+);
+like(
+	exception( function () {
+		( new Parser( max_depth: 0 ) ).parse( to_binary(
+			"Content-Type: multipart/mixed; boundary=z\n"
+			_ "\n"
+			_ "--z\n"
+			_ "\n"
+			_ "Part\n"
+			_ "--z--\n"
+		) );
+	} ).to_String(),
+	/max_depth/,
+	"Parser enforces max_depth",
+);
+
+let s10_headers := new PairList();
+s10_headers.add( "From", "sender@example.test" );
+s10_headers.add( "Subject", "Hello" );
+let s10_message := new Message(
+	head: new Head( fields: s10_headers ),
+	body: Body.bytes( to_binary("Body\n") ),
+);
+let s10_serializer := new Serializer();
+is(
+	to_string( s10_serializer.serialize(s10_message) ),
+	"From: sender@example.test\r\n"
+		_ "Subject: Hello\r\n"
+		_ "\r\n"
+		_ "Body\n",
+	"Serializer emits simple full message with default CRLF",
+);
+is(
+	s10_serializer.serialize_body(s10_message),
+	to_binary("Body\n"),
+	"Serializer emits leaf body only",
+);
+is(
+	to_string( ( new Serializer( newline: "\n" ) ).serialize(s10_message) ),
+	"From: sender@example.test\n"
+		_ "Subject: Hello\n"
+		_ "\n"
+		_ "Body\n",
+	"Serializer supports LF newline option",
+);
+
+let s10_raw_headers := new PairList();
+s10_raw_headers.add( "X-Dup", "one" );
+s10_raw_headers.add( "X-Dup", "two" );
+s10_raw_headers.add(
+	"Subject",
+	"=?UTF-8?Q?Hello?= \t =?UTF-8?Q?_World?=",
+);
+let s10_raw_message := new Message(
+	head: new Head( fields: s10_raw_headers ),
+	body: Body.bytes( to_binary("") ),
+);
+is(
+	to_string( s10_serializer.serialize(s10_raw_message) ),
+	"X-Dup: one\r\n"
+		_ "X-Dup: two\r\n"
+		_ "Subject: =?UTF-8?Q?Hello?= \t =?UTF-8?Q?_World?=\r\n"
+		_ "\r\n",
+	"Serializer preserves duplicate headers and raw encoded words",
+);
+
+let s10_fold_headers := new PairList();
+s10_fold_headers.add( "Subject", "alpha beta gamma delta" );
+let s10_fold_message := new Message(
+	head: new Head( fields: s10_fold_headers ),
+	body: Body.bytes( to_binary("") ),
+);
+is(
+	to_string(
+		( new Serializer( line_length: 24 ) ).serialize(s10_fold_message),
+	),
+	"Subject: alpha beta\r\n"
+		_ "\tgamma delta\r\n"
+		_ "\r\n",
+	"Serializer folds long header values at whitespace",
+);
+is(
+	to_string(
+		( new Serializer(
+			line_length: 24,
+			fold_headers: false,
+		) ).serialize(s10_fold_message),
+	),
+	"Subject: alpha beta gamma delta\r\n\r\n",
+	"Serializer fold_headers false leaves long headers unfolded",
+);
+
+let s10_long_word_headers := new PairList();
+s10_long_word_headers.add( "Subject", "supercalifragilistic" );
+let s10_long_word_message := new Message(
+	head: new Head( fields: s10_long_word_headers ),
+	body: Body.bytes( to_binary("") ),
+);
+is(
+	to_string(
+		( new Serializer( line_length: 12 ) ).serialize(
+			s10_long_word_message,
+		),
+	),
+	"Subject: supercalifragilistic\r\n\r\n",
+	"Serializer does not split words when folding has no safe whitespace",
+);
+
+let s10_qp_message := new Message(
+	head: new Head(),
+	body: Body.bytes(
+		to_binary("Hello=20world=0D=0A"),
+		transfer_encoding: "quoted-printable",
+	),
+);
+is(
+	s10_serializer.serialize_body(s10_qp_message),
+	to_binary("Hello=20world=0D=0A"),
+	"Serializer leaves quoted-printable leaf bytes unchanged",
+);
+let s10_b64_message := new Message(
+	head: new Head(),
+	body: Body.bytes(
+		to_binary("SGVsbG8="),
+		transfer_encoding: "base64",
+	),
+);
+is(
+	s10_serializer.serialize_body(s10_b64_message),
+	to_binary("SGVsbG8="),
+	"Serializer leaves base64 leaf bytes unchanged",
+);
+
+let s10_part1_headers := new PairList();
+s10_part1_headers.add( "Content-Type", "text/plain" );
+let s10_part1 := new Message(
+	head: new Head( fields: s10_part1_headers ),
+	body: Body.bytes(to_binary("Part one")),
+);
+let s10_part2_headers := new PairList();
+s10_part2_headers.add( "Content-Type", "text/plain" );
+let s10_part2 := new Message(
+	head: new Head( fields: s10_part2_headers ),
+	body: Body.bytes(to_binary("Part two")),
+);
+let s10_multi_headers := new PairList();
+s10_multi_headers.add(
+	"Content-Type",
+	"multipart/mixed; boundary=\"s10-b\"",
+);
+let s10_multi_message := new Message(
+	head: new Head( fields: s10_multi_headers ),
+	body: Body.multipart( [ s10_part1, s10_part2 ], "s10-b" ),
+);
+let s10_multi_body := "--s10-b\r\n"
+	_ "Content-Type: text/plain\r\n"
+	_ "\r\n"
+	_ "Part one\r\n"
+	_ "--s10-b\r\n"
+	_ "Content-Type: text/plain\r\n"
+	_ "\r\n"
+	_ "Part two\r\n"
+	_ "--s10-b--\r\n";
+is(
+	to_string( s10_serializer.serialize_body(s10_multi_message) ),
+	s10_multi_body,
+	"Serializer emits exact multipart body framing",
+);
+let s10_multi_roundtrip := ( new Parser() ).parse(
+	s10_serializer.serialize(s10_multi_message),
+);
+ok(
+	s10_multi_roundtrip.body().is_multipart(),
+	"Serializer multipart output parses as multipart",
+);
+is(
+	s10_multi_roundtrip.body().count(),
+	2,
+	"Serializer multipart round-trip preserves part count",
+);
+is(
+	to_string( s10_multi_roundtrip.body().part(1).body().bytes() ),
+	"Part two",
+	"Serializer multipart round-trip preserves part body",
+);
+
+let s10_inner_headers := new PairList();
+s10_inner_headers.add( "Subject", "Inner" );
+let s10_inner := new Message(
+	head: new Head( fields: s10_inner_headers ),
+	body: Body.bytes(to_binary("Nested body")),
+);
+let s10_nested_headers := new PairList();
+s10_nested_headers.add( "Content-Type", "message/rfc822" );
+let s10_nested_message := new Message(
+	head: new Head( fields: s10_nested_headers ),
+	body: Body.nested(s10_inner),
+);
+is(
+	to_string( s10_serializer.serialize_body(s10_nested_message) ),
+	"Subject: Inner\r\n\r\nNested body",
+	"Serializer emits nested message/rfc822 body as complete message",
+);
+let s10_nested_roundtrip := ( new Parser() ).parse(
+	s10_serializer.serialize(s10_nested_message),
+);
+ok(
+	s10_nested_roundtrip.body().is_nested(),
+	"Serializer nested output parses as message/rfc822",
+);
+is(
+	s10_nested_roundtrip.body().nested().subject(),
+	"Inner",
+	"Serializer nested round-trip preserves nested header",
+);
+is(
+	to_string( s10_nested_roundtrip.body().nested().body().bytes() ),
+	"Nested body",
+	"Serializer nested round-trip preserves nested body",
+);
+
+let s10_parsed_source := ( new Parser() ).parse( to_binary(
+	"Subject: Parsed\n"
+	_ "X-Dup: one\n"
+	_ "X-Dup: two\n"
+	_ "X-Fold: alpha\n"
+	_ "\tbeta\n"
+	_ "\n"
+	_ "Payload\n"
+) );
+let s10_reparsed := ( new Parser() ).parse(
+	s10_serializer.serialize(s10_parsed_source),
+);
+is(
+	s10_reparsed.head().raw_all("X-Dup"),
+	[ "one", "two" ],
+	"Parser-serializer-parser preserves duplicate headers",
+);
+is(
+	s10_reparsed.head().raw("X-Fold"),
+	"alpha beta",
+	"Parser-serializer-parser preserves unfolded header semantics",
+);
+is(
+	to_string( s10_reparsed.body().bytes() ),
+	"Payload\n",
+	"Parser-serializer-parser preserves leaf body bytes",
+);
+
+let s10_constructed_headers := new PairList();
+s10_constructed_headers.add( "X-Dup", "left" );
+s10_constructed_headers.add( "X-Dup", "right" );
+let s10_constructed := new Message(
+	head: new Head( fields: s10_constructed_headers ),
+	body: Body.bytes(to_binary("Built")),
+);
+let s10_constructed_parsed := ( new Parser() ).parse(
+	s10_serializer.serialize(s10_constructed),
+);
+is(
+	s10_constructed_parsed.head().raw_all("X-Dup"),
+	[ "left", "right" ],
+	"Serializer-parser preserves duplicate constructed headers",
+);
+is(
+	to_string( s10_constructed_parsed.body().bytes() ),
+	"Built",
+	"Serializer-parser preserves constructed body",
+);
+
+let s10_missing_boundary := new Message(
+	head: new Head(),
+	body: Body.multipart( [ s10_part1 ], "" ),
+);
+like(
+	exception( function () {
+		s10_serializer.serialize_body(s10_missing_boundary);
+	} ).to_String(),
+	/mail\.serialize: multipart body missing boundary/,
+	"Serializer missing multipart boundary throws by default",
+);
+let s10_generated_serializer := new Serializer( generate_boundary: true );
+is(
+	to_string( s10_generated_serializer.serialize_body(s10_missing_boundary) ),
+	"--zuzu-boundary-1\r\n"
+		_ "Content-Type: text/plain\r\n"
+		_ "\r\n"
+		_ "Part one\r\n"
+		_ "--zuzu-boundary-1--\r\n",
+	"Serializer can generate deterministic missing boundary",
+);
+is(
+	to_string( s10_generated_serializer.serialize_body(s10_missing_boundary) ),
+	"--zuzu-boundary-2\r\n"
+		_ "Content-Type: text/plain\r\n"
+		_ "\r\n"
+		_ "Part one\r\n"
+		_ "--zuzu-boundary-2--\r\n",
+	"Serializer generated boundary counter is deterministic",
+);
+let s10_body_only_generated := ( new Serializer(
+	generate_boundary: true,
+) ).serialize_body(s10_missing_boundary);
+let s10_body_only_parsed := ( new Parser() ).parse(s10_body_only_generated);
+ok(
+	not s10_body_only_parsed.body().is_multipart(),
+	"Serializer generated body-only boundary needs matching external header",
+);
+
+let s10_generated_full_headers := new PairList();
+s10_generated_full_headers.add( "X-Keep", "before" );
+s10_generated_full_headers.add( "Content-Type", "multipart/mixed" );
+s10_generated_full_headers.add( "X-Keep", "after" );
+let s10_generated_full_message := new Message(
+	head: new Head( fields: s10_generated_full_headers ),
+	body: Body.multipart( [ s10_part1, s10_part2 ], "" ),
+);
+let s10_generated_full_serializer := new Serializer( generate_boundary: true );
+let s10_generated_full_bytes := s10_generated_full_serializer.serialize(
+	s10_generated_full_message,
+);
+is(
+	to_string(s10_generated_full_bytes),
+	"X-Keep: before\r\n"
+		_ "Content-Type: multipart/mixed; boundary=\"zuzu-boundary-1\"\r\n"
+		_ "X-Keep: after\r\n"
+		_ "\r\n"
+		_ "--zuzu-boundary-1\r\n"
+		_ "Content-Type: text/plain\r\n"
+		_ "\r\n"
+		_ "Part one\r\n"
+		_ "--zuzu-boundary-1\r\n"
+		_ "Content-Type: text/plain\r\n"
+		_ "\r\n"
+		_ "Part two\r\n"
+		_ "--zuzu-boundary-1--\r\n",
+	"Serializer full message writes generated boundary into Content-Type",
+);
+is(
+	s10_generated_full_message.head().raw("Content-Type"),
+	"multipart/mixed",
+	"Serializer generated Content-Type adjustment does not mutate message",
+);
+let s10_generated_full_roundtrip := ( new Parser() ).parse(
+	s10_generated_full_bytes,
+);
+is(
+	s10_generated_full_roundtrip.head().raw_all("X-Keep"),
+	[ "before", "after" ],
+	"Serializer generated Content-Type keeps surrounding duplicate headers",
+);
+ok(
+	s10_generated_full_roundtrip.body().is_multipart(),
+	"Serializer generated-boundary full message parses as multipart",
+);
+is(
+	s10_generated_full_roundtrip.body().count(),
+	2,
+	"Serializer generated-boundary full round-trip preserves parts",
+);
+
+like(
+	exception( function () {
+		new Serializer( newline: 10 );
+	} ).to_String(),
+	/mail\.serialize: newline expects String/,
+	"Serializer validates newline option type",
+);
+like(
+	exception( function () {
+		new Serializer( newline: "\r" );
+	} ).to_String(),
+	/mail\.serialize: newline must be CRLF or LF/,
+	"Serializer validates newline option value",
+);
+like(
+	exception( function () {
+		new Serializer( fold_headers: "yes" );
+	} ).to_String(),
+	/mail\.serialize: fold_headers expects Boolean/,
+	"Serializer validates fold_headers option",
+);
+like(
+	exception( function () {
+		new Serializer( line_length: "wide" );
+	} ).to_String(),
+	/mail\.serialize: line_length expects Number/,
+	"Serializer validates line_length option type",
+);
+like(
+	exception( function () {
+		new Serializer( line_length: 0 );
+	} ).to_String(),
+	/mail\.serialize: line_length must be positive/,
+	"Serializer validates line_length option value",
+);
+like(
+	exception( function () {
+		new Serializer( generate_boundary: "yes" );
+	} ).to_String(),
+	/mail\.serialize: generate_boundary expects Boolean/,
+	"Serializer validates generate_boundary option",
+);
+like(
+	exception( function () {
+		s10_serializer.serialize( s10_message, newline: "\n" );
+	} ).to_String(),
+	/mail\.serialize: unsupported method option/,
+	"Serializer rejects method options in favour of constructor named args",
+);
+
+let rfc_datetime := parse_datetime("Fri, 21 Nov 1997 09:55:06 -0600");
+ok( rfc_datetime instanceof Time, "parse_datetime returns Time" );
+is( rfc_datetime.epoch(), 880127706, "RFC numeric-offset example parses" );
+is(
+	parse_datetime("Fri, 21 Nov 97 09:55:06 -0600").epoch(),
+	880127706,
+	"two-digit year maps 97 to 1997",
+);
+is(
+	parse_datetime("Tue, 15 Nov 1994 08:12:31 GMT").epoch(),
+	784887151,
+	"GMT date parses",
+);
+is(
+	parse_datetime("08 May 26 12:00 UT").epoch(),
+	1778241600,
+	"UT date without weekday or seconds parses",
+);
+is(
+	parse_datetime("Fri, 08 May 2026 12:00:00 UTC").epoch(),
+	1778241600,
+	"UTC zone parses",
+);
+is(
+	parse_datetime("Fri, 08 May 2026 12:00:00 -0000").epoch(),
+	1778241600,
+	"-0000 numeric zone is treated as zero offset",
+);
+is(
+	parse_datetime("Fri, 08 May 2026 14:30:00 +0230").epoch(),
+	1778241600,
+	"positive numeric offset parses",
+);
+is(
+	parse_datetime("Fri, 08 May 2026 07:30:00 -0200").epoch(),
+	1778232600,
+	"negative numeric offset parses",
+);
+is(
+	parse_datetime("Fri, 08 May 2026 07:00:00 EST").epoch(),
+	1778241600,
+	"US legacy zone parses",
+);
+is(
+	parse_datetime("Fri, 08 May 2026 13:00:00 A").epoch(),
+	1778241600,
+	"military A zone parses",
+);
+is(
+	parse_datetime("Fri, 08 May 2026 00:00:00 Y").epoch(),
+	1778241600,
+	"military Y zone parses as negative offset",
+);
+is(
+	parse_datetime("Tue, 08 Sept. 2026 12:00:00 Z").epoch(),
+	1788868800,
+	"month spelling variant and Z zone parse",
+);
+like(
+	exception( function () {
+		parse_datetime("Sat, 29 Feb 2025 12:00:00 +0000");
+	} ).to_String(),
+	/mail\.invalid_datetime: invalid date/,
+	"parse_datetime rejects invalid date",
+);
+like(
+	exception( function () {
+		parse_datetime("Fri, 08 May 2026 24:00:00 +0000");
+	} ).to_String(),
+	/mail\.invalid_datetime: invalid time/,
+	"parse_datetime rejects invalid time",
+);
+like(
+	exception( function () {
+		parse_datetime("Fri, 08 May 2026 12:00:00 J");
+	} ).to_String(),
+	/mail\.invalid_datetime: invalid time zone/,
+	"parse_datetime rejects military J zone",
+);
+like(
+	exception( function () {
+		parse_datetime("Fri, 08 May 2026 12:00:00 +2460");
+	} ).to_String(),
+	/mail\.invalid_datetime: invalid time zone/,
+	"parse_datetime rejects invalid numeric zone",
+);
+like(
+	exception( function () {
+		parse_datetime("Fri, 08 May 2026\r\n 12:00:00 +0000");
+	} ).to_String(),
+	/CR or LF/,
+	"parse_datetime rejects CRLF",
+);
+
+let format_source := new Time(1778241600);
+is(
+	format_datetime(format_source),
+	"Fri, 08 May 2026 12:00:00 +0000",
+	"format_datetime defaults to UTC with weekday",
+);
+is(
+	format_datetime( format_source, offset: "+0100" ),
+	"Fri, 08 May 2026 13:00:00 +0100",
+	"format_datetime supports named offset option",
+);
+is(
+	format_datetime(
+		format_source,
+		{ offset: "-0330", include_weekday: false },
+	),
+	"08 May 2026 08:30:00 -0330",
+	"format_datetime supports dict options and no weekday",
+);
+is(
+	format_datetime( format_source, { include_weekday: false } ),
+	"08 May 2026 12:00:00 +0000",
+	"format_datetime can omit weekday while staying UTC",
+);
+like(
+	exception( function () {
+		format_datetime( format_source, bogus: true );
+	} ).to_String(),
+	/mail\.invalid_datetime: unknown format option/,
+	"format_datetime rejects unknown options",
+);
+like(
+	exception( function () {
+		format_datetime( format_source, utc: true, offset: "+0100" );
+	} ).to_String(),
+	/mail\.invalid_datetime: format options 'utc' and 'offset' conflict/,
+	"format_datetime rejects conflicting utc and offset options",
+);
+like(
+	exception( function () {
+		format_datetime( format_source, offset: "UTC" );
+	} ).to_String(),
+	/mail\.invalid_datetime: format option 'offset'/,
+	"format_datetime rejects non-numeric offset option",
+);
+like(
+	exception( function () {
+		format_datetime(null);
+	} ).to_String(),
+	/mail\.invalid_datetime: format_datetime expects Time/,
+	"format_datetime rejects non-Time input",
+);
+
+let round_trip_text := "Fri, 08 May 2026 13:00:00 +0100";
+let round_trip_time := parse_datetime(round_trip_text);
+is(
+	format_datetime( round_trip_time, offset: "+0100" ),
+	round_trip_text,
+	"parse-format round-trip preserves requested offset",
+);
+
+done_testing();

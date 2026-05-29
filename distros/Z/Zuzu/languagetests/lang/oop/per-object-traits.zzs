@@ -1,0 +1,44 @@
+from test/more import *;
+from std/internals import classof, ref_id;
+from std/marshal import dump, load;
+
+trait Encrypted {
+	method cipher () {
+		return "encrypted:" _ self.get_text();
+	}
+}
+
+trait Signed {
+	method signature () {
+		return "signed:" _ self.get_text();
+	}
+}
+
+class Message {
+	let String text with get, set;
+}
+
+let encrypted := new Message with Encrypted( text: "alpha" );
+let alias := new Message but Encrypted( text: "beta" );
+let both := new Message but Encrypted, Signed( text: "gamma" );
+let again := new Message with Encrypted( text: "delta" );
+
+is( encrypted.cipher(), "encrypted:alpha", "new with composes trait method" );
+is( alias.cipher(), "encrypted:beta", "new but composes trait method" );
+is( both.cipher(), "encrypted:gamma", "first per-object trait works" );
+is( both.signature(), "signed:gamma", "second per-object trait works" );
+is( typeof(encrypted), "Message", "per-object trait object keeps base type name" );
+ok( encrypted instanceof Message, "per-object trait object inherits from base" );
+is( encrypted does Encrypted, 1, "per-object trait object does composed trait" );
+is( both does Signed, 1, "per-object trait object does second trait" );
+is( ref_id(classof(encrypted)), ref_id(classof(again)), "same base and trait list reuses class" );
+ok( not( ref_id(classof(encrypted)) eq ref_id(classof(both)) ), "different trait list uses a different class" );
+
+let roundtrip := load( dump(both) );
+is( typeof(roundtrip), "Message", "marshal preserves per-object trait type name" );
+ok( roundtrip instanceof classof(roundtrip), "marshal restores per-object trait class" );
+is( roundtrip.cipher(), "encrypted:gamma", "marshal preserves first trait method" );
+is( roundtrip.signature(), "signed:gamma", "marshal preserves second trait method" );
+is( roundtrip.get_text(), "gamma", "marshal preserves per-object trait slots" );
+
+done_testing();

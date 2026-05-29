@@ -1,0 +1,95 @@
+from test/more import *;
+
+{
+
+	function x1 ( ... PairList things ) {
+		return things;
+	}
+
+	let got := x1( foo: 1, bar: 2 );
+	ok( got instanceof PairList, "named arguments became a pairlist" );
+	is( got{foo}, 1, "foo argument ok" );
+	is( got{bar}, 2, "bar argument ok" );
+	let e := exception( function() {
+		x1(3);
+	}
+	);
+	ok( e instanceof Exception, "positional arguments cannot be inserted into a pairlist" );
+}
+
+{ function x2 ( ... PairList stuff ) {
+	return stuff;
+}
+let got := x2();
+ok( got instanceof PairList, "named arguments became a pairlist with a different variable name" );
+ok( got.empty(), "and it is created even if no pairs were provided" );
+}{ function x2b ( ... PairList stuff ) {
+	return stuff;
+}
+let dyn := "dyn";
+let got := x2b( "quoted": 7, `tem${"plate"}`: 8,( "ex" _ "pr" ): 9,(dyn): 10, );
+is( got{"quoted"}, 7, "quoted string key works" );
+is( got{"template"}, 8, "template key works" );
+is( got{"expr"}, 9, "expression key works" );
+is( got{"dyn"}, 10, "parenthesized identifier expression key works" );
+}{ function x3 ( quux ... PairList thangs, Array stuff ) {
+	return { quux: quux, thangs: thangs, stuff: stuff };
+}
+let got := x3( 1, 2, 3, foo: true, bar: false, 4 );
+ok( got{quux} instanceof Number );
+is( got{quux}, 1 );
+ok( got{thangs} instanceof PairList );
+is( got{thangs}{foo}, true );
+is( got{thangs}{bar}, false );
+ok( got{stuff} instanceof Array );
+is( got{stuff} [0], 2 );
+is( got{stuff} [1], 3 );
+is( got{stuff} [2], 4 );
+is( got{stuff}.length(), 3 );
+}{ function x4 ( quux ... Array stuff, PairList thangs ) {
+	return { quux: quux, thangs: thangs, stuff: stuff };
+}
+let got := x4( 1, 2, 3, foo: true, bar: false, 4 );
+ok( got{quux} instanceof Number );
+is( got{quux}, 1 );
+ok( got{thangs} instanceof PairList );
+is( got{thangs}{foo}, true );
+is( got{thangs}{bar}, false );
+ok( got{stuff} instanceof Array );
+is( got{stuff} [0], 2 );
+is( got{stuff} [1], 3 );
+is( got{stuff} [2], 4 );
+is( got{stuff}.length(), 3 );
+}{ function x5 ( quux ... Array stuff ) {
+	return { quux: quux, stuff: stuff };
+}
+let got := x5( 1, 2, 3, 4 );
+ok( got{quux} instanceof Number );
+is( got{quux}, 1 );
+ok( got{stuff} instanceof Array );
+is( got{stuff} [0], 2 );
+is( got{stuff} [1], 3 );
+is( got{stuff} [2], 4 );
+is( got{stuff}.length(), 3 );
+let e := exception( function() {
+	x5( 1, 2, 3, 4, foo: true );
+}
+);
+ok( e instanceof Exception, "can't pass named arguments to a function which doesn't accept them" );
+}{ function x6 ( quux ... stuff ) {
+	return { quux: quux, stuff: stuff };
+}
+let got := x6( 1, 2, 3, 4 );
+ok( got{quux} instanceof Number );
+is( got{quux}, 1 );
+ok( got{stuff} instanceof Array );
+is( got{stuff} [0], 2 );
+is( got{stuff} [1], 3 );
+is( got{stuff} [2], 4 );
+is( got{stuff}.length(), 3 );
+let e := exception( function() {
+	x6( 1, 2, 3, 4, foo: true );
+}
+);
+ok( e instanceof Exception, "can't pass named arguments to a function which doesn't accept them" );
+} done_testing();

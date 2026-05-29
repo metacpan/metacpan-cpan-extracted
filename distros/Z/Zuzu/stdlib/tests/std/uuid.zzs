@@ -1,0 +1,13 @@
+from std/uuid import create_uuid, create_uuid_binary;
+from test/more import *;
+
+let text := create_uuid();
+is( typeof text, "String", "create_uuid returns String", );
+is( length text, 36, "UUID text length is 36", );
+like( text, /^[0-9a-f]{8}-[0-9a-f]{4}-1[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/, "UUID text matches v1 + variant layout", );
+
+let raw := create_uuid_binary();
+is( typeof raw, "BinaryString", "create_uuid_binary returns BinaryString", );
+is( length raw, 16, "UUID binary length is 16 bytes", );
+
+done_testing();

@@ -1,0 +1,11 @@
+trait SharedTrait {
+	method side_b () {
+		return "B-trait";
+	}
+}
+
+class SharedClass with SharedTrait {
+	static method origin () {
+		return "B";
+	}
+}

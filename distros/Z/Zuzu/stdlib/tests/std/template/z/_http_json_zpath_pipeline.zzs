@@ -1,0 +1,24 @@
+from std/data/json import JSON;
+from std/net/http import UserAgent;
+from std/template/z import ZTemplate;
+from test/more import *;
+
+let ua := new UserAgent( timeout: 1 );
+let resp := ua.get( "http://127.0.0.1:1/" );
+
+let j := new JSON();
+let payload := j.encode( {
+	status: resp.status(),
+	ok: resp.success(),
+	body: resp.content(),
+} );
+let doc := j.decode(payload);
+
+let status := doc @ "/status";
+let tpl := new ZTemplate( string: "status={{ status }};ok={{ ok }}" );
+let out := tpl.process(doc);
+
+ok( status > 0, "http->json->zpath pipeline yields numeric status" );
+like( out, /status=\d+;ok=/, "template renders fields from zpath-ready payload" );
+
+done_testing();

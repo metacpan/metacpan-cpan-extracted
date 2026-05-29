@@ -1,0 +1,75 @@
+=encoding utf8
+
+=head1 NAME
+
+std/defer - Run a callback when a guard object is demolished.
+
+=head1 SYNOPSIS
+
+  from std/defer import Guard;
+
+  let guard := new Guard( callback: fn () { cleanup(); } );
+  guard.disable();
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+C<Guard> is a small scope guard. It stores a callback and can be armed or
+disarmed before demolition.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<< Guard({ callback: Function, armed?: Boolean }) >>
+
+Constructs a guard that calls C<callback> when the object is demolished.
+The guard starts armed unless C<armed> is supplied as false.
+
+=over
+
+=item C<< guard.enable() >>
+
+Parameters: none. Returns: C<null>. Arms the guard so demolition will run
+the callback.
+
+=item C<< guard.disable() >>
+
+Parameters: none. Returns: C<null>. Disarms the guard so demolition will
+not run the callback.
+
+=back
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/defer >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+class Guard {
+	let Boolean armed := true;
+	let Function callback;
+
+	method enable () {
+		armed := true;
+	}
+
+	method disable () {
+		armed := false;
+	}
+
+	method __demolish__ () {
+		callback();
+	}
+}

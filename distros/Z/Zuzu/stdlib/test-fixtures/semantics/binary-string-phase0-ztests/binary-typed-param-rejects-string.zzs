@@ -1,0 +1,4 @@
+// Phase-0 design fixture (not yet enforced by runtime):
+// BinaryString typed parameter must reject String with TypeException.
+plan(1);
+ok(1, "phase0 fixture placeholder: BinaryString param mismatch");

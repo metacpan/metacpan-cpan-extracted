@@ -1,0 +1,47 @@
+from test/more import *;
+
+requires_capability( "db" );
+requires_capability( "fs" );
+
+from std/db import DB;
+from std/io import Path;
+
+let dbh := DB.temp( { auto_commit: true } );
+dbh.prepare( "create table chunks (seq integer, line text)" ).execute();
+let insert := dbh.prepare( "insert into chunks (seq, line) values (?, ?)" );
+
+let src := Path.tempfile();
+src.spew_utf8(
+	"row-1\n"
+	_ "row-2\n"
+	_ "row-3\n"
+	_ "row-4\n"
+	_ "row-5\n",
+);
+
+let seq := 0;
+let chunk := 0;
+let line := src.next_line();
+dbh.begin();
+while ( line ≢ null ) {
+	seq++;
+	insert.execute( seq, line );
+	chunk++;
+	if ( chunk == 2 ) {
+		dbh.commit();
+		dbh.begin();
+		chunk := 0;
+	}
+	line := src.next_line();
+}
+dbh.commit();
+
+let q := dbh.prepare( "select seq, line from chunks order by seq" );
+q.execute();
+let rows := q.all_array();
+
+is( rows.length(), 5, "next_line loop inserted all rows across tx chunks" );
+is( rows[1][1], "row-2\n", "second row survives committed chunk" );
+is( rows[4][1], "row-5\n", "tail row survives final commit" );
+
+done_testing();

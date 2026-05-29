@@ -1,0 +1,240 @@
+from std/path/zz import ZZPath;
+from test/more import *;
+
+let data := {
+	value: "7",
+	neg: "-4",
+	root: "16",
+	zero: 0,
+	one: 1,
+	two: 2,
+	three: 3,
+	four: 4,
+	five: 5,
+	six: 6,
+	nine: 9,
+	ten: 10,
+	string_five: "5",
+	word: "Alpha",
+	lower_word: "alpha",
+	next_word: "beta",
+	suffix: "Beta",
+	pattern: "^(Al)",
+	mask: 5,
+	mask2: 3,
+	mask3: 8,
+	left_values: [ 1, 2 ],
+	right_values: [ 2, 3 ],
+	superset_values: [ 1, 2, 3 ],
+	same_values: [ 2, 1 ],
+	items: [
+		{ n: 1 },
+		{ n: 0 },
+	],
+};
+
+is( ( new ZZPath( path: "+ value" ) ).first(data), 7, "unary + casts numeric strings" );
+is( ( new ZZPath( path: "- value" ) ).first(data), -7, "unary - negates numeric strings" );
+is( ( new ZZPath( path: "- neg" ) ).first(data), 4, "unary - handles negative operands" );
+is( ( new ZZPath( path: "√ root" ) ).first(data), 4, "unary √ calculates square root" );
+is( ( new ZZPath( path: "! zero" ) ).first(data), true, "unary ! negates falsey values" );
+is( ( new ZZPath( path: "! one" ) ).first(data), false, "unary ! negates truthy values" );
+is( ( new ZZPath( path: "¬ zero" ) ).first(data), true, "unary ¬ negates falsey values" );
+is( ( new ZZPath( path: "~ mask" ) ).first(data), ~5, "unary ~ bitwise-negates numbers" );
+
+is(
+	( new ZZPath( path: "two ** three ** two" ) ).first(data),
+	512,
+	"binary ** is right-associative",
+);
+is( ( new ZZPath( path: "two × three" ) ).first(data), 6, "binary × multiplies" );
+is( ( new ZZPath( path: "two * three" ) ).first(data), 6, "binary * multiplies" );
+is( ( new ZZPath( path: "ten ÷ four" ) ).first(data), 2.5, "binary ÷ divides" );
+is( ( new ZZPath( path: "ten / four" ) ).first(data), 2.5, "binary / divides" );
+is( ( new ZZPath( path: "five mod two" ) ).first(data), 1, "binary mod calculates remainder" );
+is(
+	( new ZZPath( path: "two + three × four" ) ).first(data),
+	14,
+	"multiplication binds tighter than addition",
+);
+is( ( new ZZPath( path: "ten - three" ) ).first(data), 7, "binary - subtracts" );
+is(
+	( new ZZPath( path: "string_five = five" ) ).first(data),
+	true,
+	"binary = compares numerically",
+);
+is(
+	( new ZZPath( path: "string_five ≠ six" ) ).first(data),
+	true,
+	"binary ≠ compares numerically",
+);
+is( ( new ZZPath( path: "two < three" ) ).first(data), true, "binary < compares numerically" );
+is( ( new ZZPath( path: "three > two" ) ).first(data), true, "binary > compares numerically" );
+is( ( new ZZPath( path: "three ≤ three" ) ).first(data), true, "binary ≤ compares numerically" );
+is( ( new ZZPath( path: "three <= four" ) ).first(data), true, "binary <= compares numerically" );
+is( ( new ZZPath( path: "four ≥ three" ) ).first(data), true, "binary ≥ compares numerically" );
+is( ( new ZZPath( path: "four >= four" ) ).first(data), true, "binary >= compares numerically" );
+is( ( new ZZPath( path: "two ≶ three" ) ).first(data), -1, "binary ≶ compares numerically" );
+is( ( new ZZPath( path: "three <=> three" ) ).first(data), 0, "binary <=> compares numerically" );
+is( ( new ZZPath( path: "four ≷ three" ) ).first(data), 1, "binary ≷ compares numerically" );
+
+is( ( new ZZPath( path: "word _ suffix" ) ).first(data), "AlphaBeta", "binary _ concatenates" );
+is( ( new ZZPath( path: "word eq \"Alpha\"" ) ).first(data), true, "binary eq compares strings" );
+is( ( new ZZPath( path: "word ne suffix" ) ).first(data), true, "binary ne compares strings" );
+is( ( new ZZPath( path: "suffix gt word" ) ).first(data), true, "binary gt compares strings" );
+is( ( new ZZPath( path: "suffix ge suffix" ) ).first(data), true, "binary ge compares strings" );
+is( ( new ZZPath( path: "word lt suffix" ) ).first(data), true, "binary lt compares strings" );
+is( ( new ZZPath( path: "word le word" ) ).first(data), true, "binary le compares strings" );
+is( ( new ZZPath( path: "word cmp suffix" ) ).first(data), -1, "binary cmp compares strings" );
+is(
+	( new ZZPath( path: "word eqi lower_word" ) ).first(data),
+	true,
+	"binary eqi compares strings",
+);
+is( ( new ZZPath( path: "word nei suffix" ) ).first(data), true, "binary nei compares strings" );
+is( ( new ZZPath( path: "next_word gti word" ) ).first(data), true, "binary gti compares strings" );
+is(
+	( new ZZPath( path: "word gei lower_word" ) ).first(data),
+	true,
+	"binary gei compares strings",
+);
+is( ( new ZZPath( path: "word lti suffix" ) ).first(data), true, "binary lti compares strings" );
+is(
+	( new ZZPath( path: "word lei lower_word" ) ).first(data),
+	true,
+	"binary lei compares strings",
+);
+is( ( new ZZPath( path: "word cmpi lower_word" ) ).first(data), 0, "binary cmpi compares strings" );
+let regexp_match := ( new ZZPath( path: "word ~ pattern" ) ).first(data);
+is( regexp_match[0], "Al", "binary ~ returns regexp full match" );
+is( regexp_match[1], "Al", "binary ~ returns regexp capture" );
+is( ( new ZZPath( path: "mask & mask2" ) ).first(data), 1, "binary & bitwise-ands numbers" );
+is( ( new ZZPath( path: "mask ^ mask2" ) ).first(data), 6, "binary ^ bitwise-xors numbers" );
+is( ( new ZZPath( path: "mask | mask3" ) ).first(data), 13, "binary | bitwise-ors numbers" );
+is( ( new ZZPath( path: "one | two & three" ) ).first(data), 3, "bitwise precedence is applied" );
+is( ( new ZZPath( path: "one and two" ) ).first(data), 2, "binary and returns truthy RHS" );
+is(
+	( new ZZPath( path: "zero and two" ) ).first(data),
+	false,
+	"binary and short-circuits falsey LHS",
+);
+is( ( new ZZPath( path: "one ⋀ three" ) ).first(data), 3, "binary ⋀ returns truthy RHS" );
+is( ( new ZZPath( path: "one nand zero" ) ).first(data), true, "binary nand negates and" );
+is( ( new ZZPath( path: "one ⊼ two" ) ).first(data), false, "binary ⊼ negates and" );
+is( ( new ZZPath( path: "one xor zero" ) ).first(data), true, "binary xor compares truthiness" );
+is( ( new ZZPath( path: "one ⊻ two" ) ).first(data), false, "binary ⊻ compares truthiness" );
+is( ( new ZZPath( path: "zero or two" ) ).first(data), true, "binary or boolifies RHS" );
+is( ( new ZZPath( path: "one ⋁ zero" ) ).first(data), true, "binary ⋁ short-circuits truthy LHS" );
+is(
+	( new ZZPath( path: "one xor one and zero" ) ).first(data),
+	true,
+	"logical and binds tighter than xor",
+);
+
+let unioned := ( new ZZPath( path: "left_values union right_values" ) ).first(data);
+ok( unioned.contains(3), "binary union includes RHS values" );
+let sign_unioned := ( new ZZPath( path: "left_values ⋃ right_values" ) ).first(data);
+ok( sign_unioned.contains(1), "binary ⋃ includes LHS values" );
+let intersected := ( new ZZPath( path: "left_values intersection right_values" ) ).first(data);
+ok( intersected.contains(2), "binary intersection keeps common values" );
+let sign_intersected := ( new ZZPath( path: "left_values ⋂ right_values" ) ).first(data);
+ok( not sign_intersected.contains(1), "binary ⋂ removes LHS-only values" );
+let differed := ( new ZZPath( path: "superset_values ∖ right_values" ) ).first(data);
+ok( differed.contains(1), "binary ∖ keeps LHS-only values" );
+let ascii_differed := ( new ZZPath( path: "superset_values \\ right_values" ) ).first(data);
+ok( not ascii_differed.contains(2), "binary \\ removes RHS values" );
+is( ( new ZZPath( path: "two in left_values" ) ).first(data), true, "binary in tests membership" );
+is( ( new ZZPath( path: "two ∈ left_values" ) ).first(data), true, "binary ∈ tests membership" );
+is( ( new ZZPath( path: "four ∉ left_values" ) ).first(data), true, "binary ∉ negates membership" );
+is(
+	( new ZZPath( path: "left_values subsetof superset_values" ) ).first(data),
+	true,
+	"binary subsetof tests subsets",
+);
+is(
+	( new ZZPath( path: "left_values ⊂ superset_values" ) ).first(data),
+	true,
+	"binary ⊂ tests subsets",
+);
+is(
+	( new ZZPath( path: "superset_values supersetof left_values" ) ).first(data),
+	true,
+	"binary supersetof tests supersets",
+);
+is(
+	( new ZZPath( path: "superset_values ⊃ left_values" ) ).first(data),
+	true,
+	"binary ⊃ tests supersets",
+);
+is(
+	( new ZZPath( path: "left_values equivalentof same_values" ) ).first(data),
+	true,
+	"binary equivalentof tests set equivalence",
+);
+is(
+	( new ZZPath( path: "left_values ⊂⊃ same_values" ) ).first(data),
+	true,
+	"binary ⊂⊃ tests set equivalence",
+);
+let selected_union := ( new ZZPath( path: "/items/*/n union right_values" ) ).first(data);
+ok( selected_union.contains(0), "set operators accept multi-node path operands" );
+is( ( new ZZPath( path: "five == 5" ) ).first(data), true, "binary == compares type-aware values" );
+is(
+	( new ZZPath( path: "five ≡ string_five" ) ).first(data),
+	false,
+	"binary ≡ keeps type distinctions",
+);
+is(
+	( new ZZPath( path: "five != string_five" ) ).first(data),
+	true,
+	"binary != negates type-aware equality",
+);
+is( ( new ZZPath( path: "five ≢ 5" ) ).first(data), false, "binary ≢ negates type-aware equality" );
+is(
+	( new ZZPath( path: "left_values can \"length\"" ) ).first(data),
+	true,
+	"binary can sees array methods",
+);
+is(
+	( new ZZPath( path: "left_values can \"missing\"" ) ).first(data),
+	false,
+	"binary can rejects missing methods",
+);
+is(
+	( new ZZPath( path: "zero ? one : two" ) ).first(data),
+	2,
+	"full ternary evaluates falsey condition",
+);
+is(
+	( new ZZPath( path: "one ? two : three" ) ).first(data),
+	2,
+	"full ternary evaluates truthy condition",
+);
+is(
+	( new ZZPath( path: "zero ?: two" ) ).first(data),
+	2,
+	"Elvis ternary uses fallback for falsey condition",
+);
+is(
+	( new ZZPath( path: "one ?: two" ) ).first(data),
+	1,
+	"Elvis ternary keeps truthy condition",
+);
+
+let filtered := ( new ZZPath( path: "/items/*[!n]/n" ) ).query(data);
+is( filtered.length(), 1, "unary ! works inside filters" );
+is( filtered[0], 0, "unary ! filter keeps falsey item" );
+
+let binary_filtered := ( new ZZPath( path: "/items/*[n + 1 = 2]/n" ) ).query(data);
+is( binary_filtered.length(), 1, "binary operators work inside filters" );
+is( binary_filtered[0], 1, "binary operator filter keeps matching item" );
+
+like(
+	exception( function () {
+		new ZZPath( path: "sqrt root" ).first(data);
+	} ),
+	/Expected EOF/,
+	"word-like sqrt unary remains unsupported",
+);
+
+done_testing();

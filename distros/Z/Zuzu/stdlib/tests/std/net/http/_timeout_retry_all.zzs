@@ -1,0 +1,30 @@
+from std/net/http import UserAgent;
+from std/task import all;
+from test/more import *;
+
+let ua := new UserAgent( timeout: 0.2 );
+
+async function fetch_with_retry ( url ) {
+	let req := ua.build_request( "GET", url );
+	req.timeout(0.1);
+	req.retries(1);
+	let res := await {
+		ua.send_async(req);
+	};
+	return res.status();
+}
+
+let statuses := await {
+	all(
+		[
+			fetch_with_retry( "http://127.0.0.1:1/" ),
+			fetch_with_retry( "http://127.0.0.1:1/" ),
+		],
+	);
+};
+
+is( statuses.length(), 2, "all() returns both timeout/retry request results" );
+ok( statuses[0] > 0, "first retried request produced status" );
+ok( statuses[1] > 0, "second retried request produced status" );
+
+done_testing();

@@ -1,0 +1,4 @@
+// Phase-0 design fixture placeholder for path operators.
+// Case: path-op-invalid-path-type-errors
+plan(1);
+ok(1, "phase0 placeholder: path-op-invalid-path-type-errors");

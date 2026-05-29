@@ -1,0 +1,60 @@
+from test/more import *;
+
+requires_capability( "gui" );
+
+from std/gui/objects import Window, VBox, Label, Button, Widget, Event, meta;
+from std/internals import setprop;
+from std/path/z import ZPath;
+
+setprop( "paths", ZPath );
+
+function zfirst ( widget, path, fallback? ) {
+	return ( new ZPath( path: path ) ).first( widget, fallback );
+}
+
+ok( meta.exists("backend"), "GUI object metadata includes backend" );
+
+let name_label := new Label( text: "Old", id: "name" );
+let other_label := new Label( text: "Other", id: "other" );
+let button := new Button( text: "OK", id: "ok" );
+let root := new VBox( id: "root", gap: 4, children: [
+	name_label,
+	other_label,
+	button,
+] );
+let w := new Window(
+	title: "Objects",
+	content: root,
+);
+
+ok( w instanceof Widget, "Window object is a Widget" );
+is( w.find_by_id("ok"), button, "find_by_id locates nested widgets" );
+
+is( zfirst( w, "/#0" ), root, "ZPath selects widget child by index" );
+is( zfirst( w, "/VBox" ), root, "ZPath selects widget child by class name" );
+is( zfirst( w, "/VBox/Button#0" ), button, "ZPath selects named widget child by index" );
+is( zfirst( w, "/@title" ), "Objects", "ZPath reads Window title attribute" );
+is( zfirst( w, "/VBox/@gap" ), 4, "ZPath reads layout numeric attribute" );
+is( zfirst( w, "/VBox/Label#0/@text" ), "Old", "ZPath reads label text attribute" );
+
+let assigned_text := w @ "/VBox/Label[@id == 'name']/@text" := "Name";
+is( assigned_text, "Name", "ZPath widget attribute assignment returns assigned value" );
+is( name_label.text(), "Name", "ZPath widget attribute assignment mutates widget" );
+is( other_label.text(), "Other", "ZPath widget attribute assignment respects filters" );
+
+let assigned_enabled := w @ "/VBox/Button#0/@enabled" := false;
+is( assigned_enabled, false, "ZPath assigns widget enabled attribute" );
+is( button.enabled(), false, "ZPath enabled assignment mutates widget" );
+
+let assigned_visible := w @ "/VBox/Button#0/@visible" := false;
+is( assigned_visible, false, "ZPath assigns widget visible attribute" );
+is( button.visible(), false, "ZPath visible assignment mutates widget" );
+
+let seen := [];
+button.on( "click", function ( Event e ) {
+	seen.push( e.name() );
+} );
+button.click();
+is( seen[0], "click", "Event dispatch is available" );
+
+done_testing();

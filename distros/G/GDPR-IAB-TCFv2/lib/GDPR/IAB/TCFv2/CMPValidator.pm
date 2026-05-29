@@ -1,4 +1,4 @@
-package GDPR::IAB::TCFv2::CMPValidator 0.520;
+package GDPR::IAB::TCFv2::CMPValidator 0.530;
 
 use v5.12;
 use warnings;
@@ -129,6 +129,21 @@ sub is_valid {
   }
 
   return 1;
+}
+
+sub state {
+  my ($self, $cmp_id, $now) = @_;
+
+  my $cmp = $self->{cmps}->{$cmp_id};
+  return 'unknown' unless $cmp;
+
+  if ($cmp->{deletedDate}) {
+    my $deleted = $self->_parse_date($cmp->{deletedDate});
+    my $ref     = defined $now ? $now : $self->_now();
+    return 'deleted' if $deleted && $deleted <= $ref;
+  }
+
+  return 'active';
 }
 
 sub last_updated_epoch {

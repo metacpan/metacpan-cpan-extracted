@@ -1,0 +1,257 @@
+from std/data/kdl import KDL;
+from std/data/kdl/json import kdl_to_json, json_to_kdl;
+from std/data/xml import XML;
+from std/time import Time;
+from test/more import *;
+
+let kdl := new KDL();
+
+class StringableThing {
+	method to_String () {
+		return "stringable value";
+	}
+}
+
+class OpaqueThing {
+	let value := 7;
+}
+
+is(
+	kdl_to_json( kdl.decode( """- #true
+""" ) ),
+	true,
+	"kdl_to_json converts literal nodes",
+);
+
+is(
+	kdl_to_json( kdl.decode( """- 1 2 3
+""" ) ),
+	[ 1, 2, 3 ],
+	"kdl_to_json converts argument arrays",
+);
+
+is(
+	kdl_to_json( kdl.decode( """(array)- 1
+""" ) ),
+	[ 1 ],
+	"kdl_to_json respects single-item array annotation",
+);
+
+let object_data := kdl_to_json( kdl.decode( """- foo=1 bar=#true
+""" ) );
+is( object_data.get("foo"), 1, "kdl_to_json converts object properties" );
+is( object_data.get("bar"), true, "kdl_to_json converts boolean properties" );
+
+let nested := kdl_to_json( kdl.decode( """- {
+	foo 1
+	bar 2 {
+		- baz=3
+	}
+	qux 4
+}
+""" ) );
+is( nested.get("foo"), 1, "kdl_to_json converts child literals" );
+is( nested.get("bar")[0], 2, "kdl_to_json converts mixed array child arg" );
+is(
+	nested.get("bar")[1].get("baz"),
+	3,
+	"kdl_to_json converts nested object child",
+);
+is( nested.get("qux"), 4, "kdl_to_json converts trailing child literal" );
+
+let dup_doc := kdl.decode( """(object)- {
+	foo 1
+	foo 2
+}
+""" );
+let dup_pl := kdl_to_json( dup_doc, pairlists: true );
+is( typeof dup_pl, "PairList", "kdl_to_json can return PairLists" );
+is(
+	dup_pl.keys(),
+	[ "foo", "foo" ],
+	"kdl_to_json keeps duplicate PairList keys",
+);
+is( dup_pl.values(), [ 1, 2 ], "kdl_to_json keeps duplicate PairList values" );
+like(
+	exception( function () {
+		kdl_to_json(dup_doc);
+	} ),
+	/Duplicate JSON-in-KDL object key 'foo'/,
+	"kdl_to_json rejects duplicate Dict keys",
+);
+
+is(
+	kdl_to_json( kdl.decode( """(array)-
+""" ) ),
+	[],
+	"kdl_to_json converts empty arrays",
+);
+is(
+	typeof kdl_to_json( kdl.decode( """(object)-
+""" ) ),
+	"Dict",
+	"kdl_to_json converts empty objects",
+);
+
+let native_roundtrip := [ 1, [ 2 ], 3 ];
+is(
+	kdl_to_json( json_to_kdl(native_roundtrip) ),
+	native_roundtrip,
+	"json_to_kdl preserves nested array item order",
+);
+
+let native_obj := {
+	name: "pkg",
+	vals: << 2, 10, 1 >>,
+	bag: <<< 2, 1, 1 >>>,
+};
+let native_kdl := json_to_kdl(native_obj);
+let vals := native_kdl.nodes()[0].children().first(
+	fn n -> n.name() eq "vals",
+);
+let bag := native_kdl.nodes()[0].children().first( fn n -> n.name() eq "bag" );
+is(
+	vals.args().map( fn v -> v.native_value() ),
+	[ 1, 10, 2 ],
+	"json_to_kdl sorts Sets during conversion",
+);
+is(
+	bag.args().map( fn v -> v.native_value() ),
+	[ 1, 1, 2 ],
+	"json_to_kdl sorts Bags during conversion",
+);
+
+let pl := new PairList();
+pl.add( "foo", 1 );
+pl.add( "foo", 2 );
+pl.add( "bar", [ true, false ] );
+let pl_kdl := json_to_kdl(pl);
+is(
+	pl_kdl.nodes()[0].children().map( fn n -> n.name() ),
+	[ "foo", "foo", "bar" ],
+	"json_to_kdl preserves PairList key order and duplicates",
+);
+is(
+	kdl_to_json( pl_kdl, pairlists: true ).values(),
+	[ 1, 2, [ true, false ] ],
+	"PairList roundtrip keeps duplicate values",
+);
+
+let xml_doc := XML.parse(
+	"""<items><item id="a">A</item><item id="b">B</item></items>""",
+);
+let xml_items_kdl := json_to_kdl( xml_doc.documentElement().children() );
+is(
+	xml_items_kdl.nodes()[0].children().map( fn n -> n.name() ),
+	[ "item", "item" ],
+	"json_to_kdl uses xml_to_kdl for arrays of XMLNode objects",
+);
+is(
+	xml_items_kdl.nodes()[0].children()[0].props().get("id").native_value(),
+	"a",
+	"json_to_kdl preserves XML attributes through xml_to_kdl",
+);
+is(
+	xml_items_kdl.nodes()[0].children()[1].args()[0].native_value(),
+	"B",
+	"json_to_kdl preserves XML text through xml_to_kdl",
+);
+
+let xml_dict_kdl := json_to_kdl( {
+	payload: XML.parse( """<payload><status>ok</status></payload>""" )
+		.documentElement(),
+} );
+is(
+	xml_dict_kdl.nodes()[0].children()[0].name(),
+	"payload",
+	"json_to_kdl uses xml_to_kdl for XMLNode values in Dicts",
+);
+
+let time_kdl := json_to_kdl( new Time(0) );
+is(
+	time_kdl.nodes()[0].args()[0].type_annotation(),
+	"date-time",
+	"json_to_kdl annotates Time values as date-time",
+);
+like(
+	time_kdl.nodes()[0].args()[0].native_value(),
+	/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}$/,
+	"json_to_kdl converts Time values to ISO8601 strings",
+);
+
+let time_dict_kdl := json_to_kdl( { updated: new Time(0) } );
+is(
+	time_dict_kdl.nodes()[0].props().get("updated").type_annotation(),
+	"date-time",
+	"json_to_kdl annotates Time properties as date-time",
+);
+
+let opaque_kdl := json_to_kdl( [
+	function () { return 1; },
+	new OpaqueThing(),
+] );
+is(
+	opaque_kdl.nodes()[0].args().map( fn v -> v.type() ),
+	[ "Function", "OpaqueThing" ],
+	"json_to_kdl wraps unrecognized values as typed KDLValues",
+);
+ok(
+	opaque_kdl.nodes()[0].args()[1].native_value() instanceof OpaqueThing,
+	"json_to_kdl keeps opaque native values",
+);
+like(
+	exception( function () {
+		kdl.encode( json_to_kdl( new OpaqueThing() ) );
+	} ),
+	/Cannot serialize KDLValue of type 'OpaqueThing'/,
+	"KDL encoder rejects opaque values without to_String",
+);
+like(
+	kdl.encode( json_to_kdl( new StringableThing() ) ),
+	/- "stringable value"/,
+	"KDL encoder serializes opaque values with to_String as strings",
+);
+
+let existing_doc := kdl.decode( """kept "document"
+""" );
+is(
+	json_to_kdl(existing_doc),
+	existing_doc,
+	"json_to_kdl returns existing KDLDocument as-is",
+);
+is(
+	json_to_kdl( existing_doc.nodes()[0] ),
+	existing_doc.nodes()[0],
+	"json_to_kdl returns existing KDLNode as-is",
+);
+
+let nested_kdl_doc := kdl.decode( """inner 1
+second 2
+""" );
+let kdl_array := json_to_kdl( [ nested_kdl_doc ] );
+is(
+	kdl_array.nodes()[0].children().map( fn n -> n.name() ),
+	[ "inner", "second" ],
+	"json_to_kdl splices nested KDLDocument nodes into arrays",
+);
+
+let kdl_object := json_to_kdl( { foo: nested_kdl_doc } );
+is(
+	kdl_object.nodes()[0].children()[0].name(),
+	"foo",
+	"json_to_kdl wraps nested KDLDocument values under object keys",
+);
+is(
+	kdl_object.nodes()[0].children()[0].children().map( fn n -> n.name() ),
+	[ "inner", "second" ],
+	"json_to_kdl preserves nested KDLDocument children under object keys",
+);
+
+let kdl_node_object := json_to_kdl( { foo: existing_doc.nodes()[0] } );
+is(
+	kdl_node_object.nodes()[0].children()[0].children()[0].name(),
+	"kept",
+	"json_to_kdl preserves nested KDLNode values under object keys",
+);
+
+done_testing();

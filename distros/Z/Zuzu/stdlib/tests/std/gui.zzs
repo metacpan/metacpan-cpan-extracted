@@ -1,0 +1,21 @@
+from test/more import *;
+
+requires_capability( "gui" );
+
+from std/gui import EM, Window, VBox, Label, Button, Widget;
+
+ok( EM > 0, "EM exports the backend font height" );
+
+let w := Window(
+	title: "Owner",
+	VBox(
+		Label( id: "label", text: "Ready" ),
+		Button( id: "ok", text: "OK" ),
+	),
+);
+
+ok( w instanceof Widget, "Window helper returns a Widget" );
+is( w.title(), "Owner", "Window helper forwards properties" );
+is( w.find_by_id("label").text(), "Ready", "GUI tree helpers are available" );
+
+done_testing();

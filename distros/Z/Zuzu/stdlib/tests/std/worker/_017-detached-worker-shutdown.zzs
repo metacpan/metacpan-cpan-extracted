@@ -1,0 +1,16 @@
+from test/more import *;
+from test/worker_contract import require_worker_phase;
+
+let Worker := require_worker_phase(4);
+
+Worker.spawn(
+	function () {
+		from std/task import sleep;
+		return sleep(5);
+	},
+	[],
+);
+
+pass( "detached worker does not block script completion" );
+
+done_testing();

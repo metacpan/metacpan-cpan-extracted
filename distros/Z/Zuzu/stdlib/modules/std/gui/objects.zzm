@@ -1,0 +1,123 @@
+=encoding utf8
+
+=head1 NAME
+
+std/gui/objects - Runtime-supported GUI object classes.
+
+=head1 SYNOPSIS
+
+  from std/gui/objects import Window, VBox, Button;
+
+  let w := new Window( title: "Demo" );
+  let b := new Button( text: "OK", id: "submit" );
+  w.set_content( new VBox( children: [ b ] ) );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Electron.
+It is not supported by zuzu-js on Node or Browser.
+
+=head1 DESCRIPTION
+
+This runtime-supported module provides the C<std/gui> object model.
+Host runtimes provide visible windows and baseline controls where GUI
+support is available, while retaining the same object tree and event API
+for tests and future backends.
+
+=head1 EXPORTS
+
+=head2 Variables
+
+=over
+
+=item C<meta>
+
+Type: C<Dict>. Runtime/backend metadata. Current keys include
+C<backend>, C<font_size_pixels>, C<font_name>, and C<font_point_size>.
+
+=back
+
+=head2 Classes
+
+=over
+
+=item C<Widget>
+
+Base class for GUI objects. Supports C<id>, C<parent>, C<children>,
+C<add_child>, C<remove_child>, C<enabled>, C<set_enabled>,
+C<visible>, C<set_visible>, C<width>, C<height>, C<minwidth>,
+C<minheight>, C<maxwidth>, C<maxheight>, C<classes>, C<add_class>,
+C<remove_class>, C<style>, C<meta>, C<find_by_id>, C<on>, C<once>,
+C<off>, C<emit>, and event shortcuts such as C<click>.
+
+Common widget methods take or return widget state values. Getters return
+the current value; setters return the widget so calls can be chained.
+
+=item C<Window>
+
+Top-level container with C<show>, C<call>, C<close>, C<content>, and
+C<set_content>. In Phase 1, C<show> is non-rendering and C<call>
+returns the current close result.
+
+=item C<VBox>, C<HBox>, C<Frame>
+
+Layout containers.
+
+=item C<Menu>, C<MenuItem>
+
+Window menu bar widgets. C<Menu> widgets are direct C<Window> children;
+C<MenuItem> widgets are direct C<Menu> children.
+
+=item C<Label>, C<Text>, C<RichText>, C<Image>
+
+Content widgets.
+
+=item C<Input>, C<DatePicker>, C<Checkbox>, C<Radio>, C<RadioGroup>,
+C<Select>, C<Button>
+
+Baseline input widgets.
+
+=item C<Separator>, C<Slider>, C<Progress>
+
+Extended baseline controls.
+
+=item C<Tabs>, C<Tab>
+
+Tab container and tab pages. C<Tabs.selected> selects the active C<Tab>.
+
+=item C<ListView>, C<TreeView>
+
+Collection controls with selection and activation events.
+
+=item C<Event>
+
+Event object passed to handlers which accept an argument. Provides
+C<name>, C<target>, C<current_target>, C<window>, C<phase>,
+C<timestamp>, C<data>, C<cancelled>, C<default_prevented>,
+C<stop_propagation>, and C<prevent_default>.
+
+=item C<ListenerToken>
+
+Opaque token returned by C<on> and C<once>, accepted by C<off>.
+
+=item C<native_file_open>, C<native_file_save>, C<native_directory_open>,
+C<native_directory_save>, C<native_alert>, C<native_confirm>,
+C<native_prompt>, C<native_colour_picker>
+
+Backend-native modal file and directory dialogue hooks used by
+C<std/gui/dialogue>. These return selected paths or C<null> when cancelled.
+C<native_alert>, C<native_confirm>, C<native_prompt>, and
+C<native_colour_picker> return C<null> when unsupported so
+C<std/gui/dialogue> can use its shared fallback.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/gui/objects >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut

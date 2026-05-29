@@ -1,0 +1,4 @@
+// Phase-0 design fixture (not yet enforced by runtime):
+// escape support in BinaryString literals: \\, \\', \n, \r, \t, \xNN
+plan(1);
+ok(1, "phase0 fixture placeholder: binary literal escapes");

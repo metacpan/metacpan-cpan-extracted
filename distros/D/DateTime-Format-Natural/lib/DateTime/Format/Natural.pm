@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use base qw(
     DateTime::Format::Natural::Calc
+    DateTime::Format::Natural::Calendar
     DateTime::Format::Natural::Duration
     DateTime::Format::Natural::Expand
     DateTime::Format::Natural::Extract
@@ -24,7 +25,7 @@ use Storable qw(dclone);
 
 use DateTime::Format::Natural::Utils qw(trim);
 
-our $VERSION = '1.25';
+our $VERSION = '1.26';
 
 validation_options(
     on_fail => sub
@@ -54,11 +55,12 @@ sub _init
     my %opts = @_;
 
     my %presets = (
-        lang          => 'en',
-        format        => 'd/m/y',
-        demand_future =>  false,
-        prefer_future =>  false,
-        time_zone     => 'floating',
+        lang           => 'en',
+        format         => 'd/m/y',
+        demand_future  =>  false,
+        prefer_future  =>  false,
+        time_zone      => 'floating',
+        calendar_class =>  undef,
     );
     foreach my $opt (keys %presets) {
         $self->{ucfirst $opt} = $presets{$opt};
@@ -84,6 +86,18 @@ sub _init_check
     my $self = shift;
 
     validate(@_, {
+        calendar_class => {
+            type => SCALAR | UNDEF,
+            optional => true,
+            callbacks => {
+                'calendar class exists' => sub
+                {
+                    my $class = shift;
+                    return true unless defined $class;
+                    return $class eq 'DateTime::Calendar::Julian' && eval "require $class; 1";
+                },
+            },
+        },
         demand_future => {
             # SCALARREF due to boolean.pm's implementation
             type => BOOLEAN | SCALARREF,
@@ -827,16 +841,17 @@ Creates a new C<DateTime::Format::Natural> object. Arguments to C<new()> are opt
 not necessarily required.
 
  $parser = DateTime::Format::Natural->new(
-           datetime      => DateTime->new(...),
-           lang          => 'en',
-           format        => 'mm/dd/yy',
-           prefer_future => [0|1],
-           demand_future => [0|1],
-           time_zone     => 'floating',
-           daytime       => { morning   => 06,
-                              afternoon => 13,
-                              evening   => 20,
-                            },
+           datetime       => DateTime->new(...),
+           lang           => 'en',
+           format         => 'mm/dd/yy',
+           prefer_future  => [0|1],
+           demand_future  => [0|1],
+           time_zone      => 'floating',
+           calendar_class => 'DateTime::Calendar::Julian',
+           daytime        => { morning   => 06,
+                               afternoon => 13,
+                               evening   => 20,
+                             },
  );
 
 =over 4
@@ -887,6 +902,11 @@ Accepts a boolean, defaults to false.
 
 The time zone to use when parsing and for output. Accepts any time zone
 recognized by L<DateTime>. Defaults to 'floating'.
+
+=item * C<calendar_class>
+
+The calendar class used for fixed-date holidays such as C<christmas day>.
+Accepts C<DateTime::Calendar::Julian>. Defaults to 'C<gregorian>'.
 
 =item * C<daytime>
 

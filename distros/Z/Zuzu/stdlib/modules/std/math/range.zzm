@@ -1,0 +1,116 @@
+=encoding utf8
+
+=head1 NAME
+
+std/math/range - Format integer lists as compact display ranges.
+
+=head1 SYNOPSIS
+
+  from std/math/range import abbreviate;
+
+  let values := [ 3, 4, 9, 10, 11, 12, 15 ];
+  let compact := abbreviate( values );
+  # [ "3", "4", "9-12", "15" ]
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module exports C<abbreviate>, which converts a list of test
+numbers into compact range labels.
+
+Only runs of three or more consecutive integers are collapsed into a
+range token like C<9-12>. Single values and two-item runs are emitted
+as individual tokens.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item * C<< abbreviate(Array values) >>
+
+Parameters: C<values> is an array of numbers. Returns: C<Array>. Returns
+compact string labels for the provided numbers.
+
+The input may be unsorted and may contain duplicates; values are
+normalized before abbreviation.
+
+=back
+
+=cut
+
+function _sorted_unique ( Array values ) {
+	let sorted := values.sort( function ( a, b ) {
+		return a <=> b;
+	} );
+	let out := [];
+	let prev := null;
+	for ( let n in sorted ) {
+		if ( prev != null and n = prev ) {
+			next;
+		}
+		out.push( n );
+		prev := n;
+	}
+	return out;
+}
+
+function _push_run ( Array out, Number start, Number end ) {
+	let size := end - start + 1;
+	if ( size >= 3 ) {
+		out.push( `${start}-${end}` );
+		return;
+	}
+	if ( size = 2 ) {
+		out.push( `${start}` );
+		out.push( `${end}` );
+		return;
+	}
+	out.push( `${start}` );
+}
+
+function abbreviate ( Array values ) {
+	if ( values.length() = 0 ) {
+		return [];
+	}
+
+	let normalized := _sorted_unique( values );
+	if ( normalized.length() = 0 ) {
+		return [];
+	}
+
+	let out := [];
+	let start := normalized[0];
+	let prev := normalized[0];
+	let i := 1;
+
+	while ( i < normalized.length() ) {
+		let n := normalized[i];
+		if ( n = prev + 1 ) {
+			prev := n;
+			i++;
+			next;
+		}
+		_push_run( out, start, prev );
+		start := n;
+		prev := n;
+		i++;
+	}
+
+	_push_run( out, start, prev );
+	return out;
+}
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/math/range >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut

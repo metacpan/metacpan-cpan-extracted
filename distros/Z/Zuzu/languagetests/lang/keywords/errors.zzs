@@ -1,0 +1,113 @@
+from test/more import *;
+class Boom {
+	let message;
+}
+class Fatal {
+	let code;
+}
+let thrown := "";
+try {
+	throw new Boom( message: "kapow" );
+}
+catch ( Boom err ) {
+	thrown := err{message};
+}
+let died := 0;
+try {
+	die new Fatal( code: 9 );
+}
+catch ( Fatal err ) {
+	died := err{code};
+}
+let shortcut_default := "";
+try {
+	throw new Exception( message: "shortcut-default" );
+}
+catch {
+	shortcut_default := e{message};
+}
+let shortcut_name_only := "";
+try {
+	throw new Exception( message: "shortcut-name-only" );
+}
+catch (err) {
+	shortcut_name_only := err{message};
+}
+let die_string_message := "";
+let throw_exception_message := "";
+let die_string_type := "";
+let throw_exception_type := "";
+try {
+	die "Bad thing happened";
+}
+catch ( Exception err ) {
+	die_string_message := err{message};
+	die_string_type := typeof err;
+}
+try {
+	throw new Exception( message: "Bad thing happened" );
+}
+catch ( Exception err ) {
+	throw_exception_message := err{message};
+	throw_exception_type := typeof err;
+}
+is( thrown, "kapow", "throw keyword sends values to catch" );
+is( died, 9, "die keyword throws catchable values" );
+is( shortcut_default, "shortcut-default", "catch without signature defaults to Exception e" );
+is( shortcut_name_only, "shortcut-name-only", "catch(name) defaults to Exception" );
+is( die_string_message, throw_exception_message, "die String and throw Exception carry same message" );
+is( die_string_type, "Exception", "die String throws Exception type" );
+is( die_string_type, throw_exception_type, "die String and throw Exception produce same type" );
+const picked := try {
+	die new Fatal( code: 7 );
+	"toml";
+}
+catch ( Any e ) {
+	"ini";
+}
+;
+const direct := try {
+	let n := 40;
+	n + 2;
+}
+catch ( Exception e ) {
+	0;
+}
+;
+const expr_default := try {
+	throw new Exception( message: "expr-default" );
+	0;
+}
+catch {
+	e{message};
+}
+;
+const expr_name_only := try {
+	throw new Exception( message: "expr-name-only" );
+	0;
+}
+catch (err) {
+	err{message};
+}
+;
+is( picked, "ini", "try/catch expression returns catch value" );
+is( direct, 42, "try/catch expression returns try value" );
+is( expr_default, "expr-default", "try expression catch defaults to Exception e" );
+is( expr_name_only, "expr-name-only", "try expression catch(name) defaults type" );
+const codec := do { new Exception( message: "codec" );
+};
+const nested := do { let base := 39;
+do { base + 3;
+};
+};
+is( typeof codec, "Exception", "do expression returns last value" );
+is( nested, 42, "do expression can be nested" );
+
+function xyz () {
+	let something := do { return "aaa";
+	};
+
+	return "bbb";
+}
+is( xyz(), "aaa", "return within do returns from containing function" );
+done_testing();

@@ -1,0 +1,123 @@
+from test/more import *;
+
+class Numberish {
+	let value := 8;
+
+	method to_Number () {
+		return value;
+	}
+}
+
+class OpaqueNumber {
+}
+
+function assert_throws ( Function f, String name ) {
+	isnt( exception(f), null, name );
+}
+
+let nobj := new Numberish( value: 8 );
+
+is( +"7", 7, "unary + casts numeric-looking strings" );
+is( -true, -1, "unary - casts true to one" );
+is( +false, 0, "unary + casts false to zero" );
+is( +null, 0, "unary + casts null to zero" );
+is( +nobj, 8, "unary + calls to_Number on objects" );
+
+is( abs "-7", 7, "abs casts numeric-looking strings" );
+is( sqrt "9", 3, "sqrt casts numeric-looking strings" );
+is( √ new Numberish( value: 16 ), 4, "√ calls to_Number on objects" );
+is( floor "2.9", 2, "floor casts numeric-looking strings" );
+is( ceil true, 1, "ceil casts booleans" );
+is( round "2.5", 3, "round casts numeric-looking strings" );
+is( int "2.9", 2, "int casts numeric-looking strings" );
+is( ⌊ "2.9" ⌋, 2, "floor bracket form casts numeric-looking strings" );
+is( ⌈ "2.1" ⌉, 3, "ceil bracket form casts numeric-looking strings" );
+
+is( "2" + "3", 5, "+ casts both operands" );
+is( true + "3", 4, "+ casts booleans and strings" );
+is( null + "3", 3, "+ casts null and strings" );
+is( nobj + "2", 10, "+ calls to_Number on lhs object" );
+is( "2" + nobj, 10, "+ calls to_Number on rhs object" );
+is( "10" - true, 9, "- casts booleans" );
+is( false - "3", -3, "- casts false to zero" );
+is( "3" * "4", 12, "* casts both operands" );
+is( "3" × true, 3, "× casts booleans" );
+is( "9" / "2", 4.5, "/ casts both operands" );
+is( "9" ÷ true, 9, "÷ casts booleans" );
+is( "17" mod "5", 2, "mod casts both operands" );
+is( "2" ** "5", 32, "** casts both operands" );
+
+is( "2" = 2, 1, "= casts both operands" );
+is( "2" ≠ 3, 1, "≠ casts both operands" );
+is( false < true, 1, "< casts booleans" );
+is( null <= false, 1, "<= casts null and booleans" );
+is( null ≤ "0", 1, "≤ casts null and strings" );
+is( true > null, 1, "> casts booleans and null" );
+is( "1" >= true, 1, ">= casts strings and booleans" );
+is( "1" ≥ null, 1, "≥ casts strings and null" );
+is( "1" <=> true, 0, "<=> casts both operands" );
+is( "9" ≶ new Numberish( value: 1 ), 1, "≶ calls to_Number" );
+is( new Numberish( value: 4 ) ≷ "4", 0, "≷ calls to_Number" );
+
+let x := "4";
+x += true;
+is( x, 5, "+= casts lhs and rhs numerically" );
+x := "4";
+x -= true;
+is( x, 3, "-= casts lhs and rhs numerically" );
+x := "4";
+x *= "3";
+is( x, 12, "*= casts lhs and rhs numerically" );
+x := "4";
+x ×= "3";
+is( x, 12, "×= casts lhs and rhs numerically" );
+x := "9";
+x /= "2";
+is( x, 4.5, "/= casts lhs and rhs numerically" );
+x := "9";
+x ÷= "2";
+is( x, 4.5, "÷= casts lhs and rhs numerically" );
+x := "2";
+x **= "5";
+is( x, 32, "**= casts lhs and rhs numerically" );
+
+x := "4";
+x++;
+is( x, 5, "postfix ++ casts the target numerically" );
+x := "4";
+is( ++x, 5, "prefix ++ casts the target numerically" );
+x := "4";
+x--;
+is( x, 3, "postfix -- casts the target numerically" );
+x := "4";
+is( --x, 3, "prefix -- casts the target numerically" );
+
+assert_throws(
+	function () { let got := +"not a number"; },
+	"unary + rejects non-numeric strings",
+);
+assert_throws( function () { let got := [1] + 2; }, "+ rejects arrays" );
+assert_throws( function () { let got := { x: 1 } - 1; }, "- rejects dicts" );
+assert_throws( function () { let got := /1/ * 2; }, "* rejects regexps" );
+assert_throws(
+	function () { let got := ( fn x -> x ) / 2; },
+	"/ rejects functions",
+);
+assert_throws(
+	function () { let got := OpaqueNumber + 2; },
+	"+ rejects classes",
+);
+assert_throws(
+	function () { let got := new OpaqueNumber() + 2; },
+	"+ rejects objects without to_Number",
+);
+assert_throws(
+	function () { let got := "bad" < 2; },
+	"numeric comparisons reject non-numeric strings",
+);
+assert_throws( function () {
+	let bad := "not a number";
+	bad += 1;
+}, "+= rejects uncastable lhs values" );
+
+done_testing();

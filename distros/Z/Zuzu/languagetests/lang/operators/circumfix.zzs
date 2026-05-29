@@ -1,0 +1,9 @@
+from test/more import *;
+
+is( ⌊let x := (3 + 0.9) * 2⌋, 7 );
+is( x, 7.8 );
+
+is( ⌈let y := (3 + 0.9) * 2⌉, 8 );
+is( y, 7.8 );
+
+done_testing();

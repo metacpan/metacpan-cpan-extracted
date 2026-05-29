@@ -1,0 +1,26 @@
+[
+	{
+		"id": "coercion-string-zero-is-false",
+		"file": "fixture-coercion-zero.zzs",
+		"source": "function __fixture_result () {\n\tif ( \"0\" ) {\n\t\treturn 1;\n\t}\n\treturn 0;\n}\n",
+		"expected": 0
+	},
+	{
+		"id": "coercion-string-number-addition",
+		"file": "fixture-string-number-add.zzs",
+		"source": "function __fixture_result () {\n\treturn \"5\" + 7;\n}\n",
+		"expected": 12
+	},
+	{
+		"id": "runtime-dict-key-order-is-stable",
+		"file": "fixture-dict-keys-sorted.zzs",
+		"source": "function __fixture_result () {\n\tlet keys := { zebra: 1, ant: 2, lemon: 3 }.sorted_keys();\n\treturn keys[0] _ \",\" _ keys[1] _ \",\" _ keys[2];\n}\n",
+		"expected": "ant,lemon,zebra"
+	},
+	{
+		"id": "runtime-set-union-is-deterministic",
+		"file": "fixture-set-union.zzs",
+		"source": "function __fixture_result () {\n\tlet merged := << 2, 1 >> union << 3, 1 >>;\n\treturn merged.length();\n}\n",
+		"expected": 3
+	}
+]

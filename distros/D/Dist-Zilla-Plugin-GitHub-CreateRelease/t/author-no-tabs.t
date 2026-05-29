@@ -25,7 +25,9 @@ my @files = (
     't/author-pod-coverage.t',
     't/author-pod-spell.t',
     't/author-pod-syntax.t',
-    't/release-trailing-space.t'
+    't/extract-changes.t',
+    't/release-trailing-space.t',
+    't/repo-name-from-url.t'
 );
 
 notabs_ok($_) foreach @files;

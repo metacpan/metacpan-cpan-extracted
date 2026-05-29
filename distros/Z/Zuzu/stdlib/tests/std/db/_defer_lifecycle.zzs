@@ -1,0 +1,40 @@
+from test/more import *;
+
+requires_capability( "db" );
+
+from std/db import DB;
+from std/defer import Guard;
+
+let dbh := DB.temp( { auto_commit: true } );
+dbh.prepare( "create table lifecycle (label text)" ).execute();
+let insert := dbh.prepare( "insert into lifecycle (label) values (?)" );
+
+{
+	dbh.begin();
+	let Object rollback_guard := new Guard( callback: function() {
+		dbh.rollback();
+	} );
+	insert.execute("rolled");
+}
+
+{
+	let committed := false;
+	dbh.begin();
+	let Object rollback_guard := new Guard( callback: function() {
+		if ( not committed ) {
+			dbh.rollback();
+		}
+	} );
+	insert.execute("kept");
+	dbh.commit();
+	committed := true;
+}
+
+let q := dbh.prepare( "select label from lifecycle order by rowid" );
+q.execute();
+let rows := q.all_array();
+
+is( rows.length(), 1, "defer guard rolled back uncommitted transaction" );
+is( rows[0][0], "kept", "committed transaction survives guarded scope exit" );
+
+done_testing();

@@ -1,0 +1,14 @@
+const public_value := 41;
+const _secret_value := 99;
+
+function public_add ( Number left, Number right ) {
+	return left + right;
+}
+
+function _secret_add ( Number left, Number right ) {
+	return left + right + _secret_value;
+}
+
+class LoaderProbe {
+	let String label := "probe";
+}

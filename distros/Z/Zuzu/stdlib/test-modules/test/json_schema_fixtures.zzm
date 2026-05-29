@@ -1,0 +1,259 @@
+=encoding utf8
+
+=head1 NAME
+
+test/json_schema_fixtures - Helpers for JSON Schema fixture tests.
+
+=cut
+
+from std/data/json/schema import valid;
+from std/data/json/schema/core import SchemaRegistry;
+from std/io import Path;
+from std/proc import Env;
+from std/string import ends_with, index, substr;
+
+const expected_optional_passes := [
+	"optional/bignum.json",
+	"optional/dynamicRef.json",
+	"optional/anchor.json",
+	"optional/dependencies-compatibility.json",
+	"optional/format/ecmascript-regex.json",
+	"optional/format/date.json",
+	"optional/format/date-time.json",
+	"optional/format/email.json",
+	"optional/format/ipv4.json",
+	"optional/format/idn-email.json",
+	"optional/format/iri.json",
+	"optional/format/iri-reference.json",
+	"optional/format/json-pointer.json",
+	"optional/format/regex.json",
+	"optional/format/relative-json-pointer.json",
+	"optional/format/unknown.json",
+	"optional/format/uri-reference.json",
+	"optional/format/uri-template.json",
+	"optional/format/uuid.json",
+	"optional/format-assertion.json",
+	"optional/id.json",
+	"optional/non-bmp-regex.json",
+	"optional/no-schema.json",
+	"optional/refOfUnknownKeyword.json",
+	"optional/unknownKeyword.json",
+];
+
+function _get ( obj, String key, fallback := null ) {
+	if ( obj instanceof Dict ) {
+		return obj.exists(key) ? obj.get(key) : fallback;
+	}
+	if ( obj instanceof PairList ) {
+		return obj.has(key) ? obj.get(key) : fallback;
+	}
+	return fallback;
+}
+
+function _starts_with ( String text, String prefix ) {
+	return length text >= length prefix
+		and substr( text, 0, length prefix ) eq prefix;
+}
+
+function _strip_prefix ( String text, String prefix ) {
+	return substr( text, length prefix );
+}
+
+function _collect_json_files ( Path root ) {
+	let files := [];
+	for ( let child in root.children() ) {
+		if ( child.is_dir() ) {
+			for ( let file in _collect_json_files(child) ) {
+				files.push(file);
+			}
+		}
+		else if ( child.is_file() and ends_with( child.basename(), ".json" ) ) {
+			files.push(child);
+		}
+	}
+	return files.sort( function ( a, b ) {
+		return a.to_String() cmp b.to_String();
+	} );
+}
+
+class FixtureResourceLoader {
+	let Path root;
+
+	method _path_for_uri ( String uri ) {
+		let no_fragment := uri;
+		if ( no_fragment ~ /#/ ) {
+			no_fragment := substr( no_fragment, 0, index( no_fragment, "#" ) );
+		}
+
+		let localhost := "http://localhost:1234/";
+		if ( _starts_with( no_fragment, localhost ) ) {
+			return root.child("remotes").child(
+				_strip_prefix( no_fragment, localhost ),
+			);
+		}
+
+		let metaschema := "https://json-schema.org/draft/2020-12/schema";
+		if ( no_fragment eq metaschema ) {
+			return root.child("remotes")
+				.child("json-schema.org")
+				.child("draft")
+				.child("2020-12")
+				.child("schema.json");
+		}
+
+		die `No JSON Schema fixture resource mapping for ${uri}`;
+	}
+
+	method load ( String uri ) {
+		let path := self._path_for_uri(uri);
+		if ( path.exists() ) {
+			return path.slurp();
+		}
+		if ( not ends_with( path.basename(), ".json" ) ) {
+			let json_path := new Path( path.to_String() _ ".json" );
+			if ( json_path.exists() ) {
+				return json_path.slurp();
+			}
+		}
+		die `JSON Schema fixture resource not found: ${uri}`;
+	}
+}
+
+function fixture_context () {
+	let fixture_root_env := Env.get("FIXTURE_DIR");
+	if ( fixture_root_env ≡ null or fixture_root_env eq "" ) {
+		return null;
+	}
+
+	let json_schema_root := new Path(fixture_root_env).child("json-schema");
+	let fixture_root := json_schema_root.child("draft2020-12");
+	return {
+		json_schema_root: json_schema_root,
+		fixture_root: fixture_root,
+		loader: new FixtureResourceLoader( root: json_schema_root ),
+	};
+}
+
+function fixture_relative_name ( Path root, Path path ) {
+	let prefix := root.to_String() _ "/";
+	let text := path.to_String();
+	if ( _starts_with( text, prefix ) ) {
+		return _strip_prefix( text, prefix );
+	}
+	return path.basename();
+}
+
+function collect_required_fixture_files ( Path fixture_root ) {
+	let files := [];
+	for ( let child in fixture_root.children() ) {
+		if ( child.is_file() and ends_with( child.basename(), ".json" ) ) {
+			files.push(child);
+		}
+	}
+	return files.sort( function ( a, b ) {
+		return a.basename() cmp b.basename();
+	} );
+}
+
+function collect_optional_fixture_files ( Path fixture_root ) {
+	return _collect_json_files( fixture_root.child("optional") );
+}
+
+function expected_optional_pass_count () {
+	return expected_optional_passes.length();
+}
+
+function is_expected_optional_pass ( String name ) {
+	for ( let expected in expected_optional_passes ) {
+		if ( name eq expected ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function _fixture_options ( loader, Boolean format_assert := false ) {
+	let registry := new SchemaRegistry();
+	return {
+		registry: registry,
+		loader: loader,
+		unknown_format: "ignore",
+		format_assert: format_assert,
+	};
+}
+
+function run_fixture_file ( json, loader, path, String name, reporter ) {
+	let groups := json.decode_binarystring( path.slurp() );
+	if ( not( groups instanceof Array ) ) {
+		reporter(
+			"diag",
+			name,
+			"",
+			null,
+			null,
+			name _ " did not decode to an Array; skipping fixture file",
+			false,
+		);
+		return 0;
+	}
+
+	let ran := 0;
+	let failed := 0;
+	let format_assert := _starts_with( name, "optional/format" );
+	for ( let group in groups ) {
+		let schema := _get( group, "schema" );
+		let description := _get( group, "description", name );
+		let tests := _get( group, "tests", [] );
+		if ( not( tests instanceof Array ) ) {
+			next;
+		}
+		for ( let test in tests ) {
+			let test_name := description _ " - " _ _get( test, "description", "" );
+			let got := null;
+			let expected := _get( test, "valid" );
+			let err := null;
+			try {
+				got := valid(
+					schema,
+					_get( test, "data" ),
+					_fixture_options( loader, format_assert ),
+				);
+			}
+			catch ( Exception e ) {
+				err := e;
+			}
+			if ( err ≢ null ) {
+				reporter(
+					"throw",
+					name,
+					test_name,
+					got,
+					expected,
+					err,
+					false,
+				);
+				failed++;
+			}
+			else {
+				reporter(
+					"result",
+					name,
+					test_name,
+					got,
+					expected,
+					null,
+					got ≢ expected,
+				);
+				if ( got ≢ expected ) {
+					failed++;
+				}
+			}
+			ran++;
+		}
+	}
+
+	return {
+		ran: ran,
+		failed: failed,
+	};
+}

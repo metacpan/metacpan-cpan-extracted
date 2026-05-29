@@ -1,0 +1,212 @@
+from test/more import *;
+
+requires_capability( "fs" );
+requires_capability( "proc" );
+
+from std/archive import Archive;
+from std/data/json import JSON;
+from std/io import Path;
+from std/proc import Env;
+from std/zuzuzoo import Zuzuzoo;
+
+function ensure_dir ( path ) {
+	return true if path.exists();
+	let parent := path.parent();
+	ensure_dir(parent) if not parent.exists();
+	path.mkdir();
+	return true;
+}
+
+function root () {
+	let dir := Path.tempdir();
+	let lib := dir.child("lib");
+	let bin := dir.child("bin");
+	let meta := dir.child("meta");
+	ensure_dir(lib);
+	ensure_dir(bin);
+	ensure_dir(meta);
+	return {
+		dir_obj: dir,
+		lib_dir: lib.to_String(),
+		bin_dir: bin.to_String(),
+		meta_dir: meta.to_String(),
+		lib_obj: lib,
+		meta_obj: meta,
+	};
+}
+
+function archive_path () {
+	let path := Path.tempfile();
+	Archive.dump(
+		path,
+		{
+			entries: [
+				{
+					path: "install-tests-1.0.0/zuzu-distribution.json",
+					data: to_binary(
+						"{\"name\":\"install-tests\",\"version\":\"1.0.0\"," _
+						"\"author\":\"Example\",\"license\":\"MIT\"}\n",
+					),
+				},
+				{
+					path: "install-tests-1.0.0/modules/install/tests.zzm",
+					data: to_binary("// module\n"),
+				},
+				{
+					path: "install-tests-1.0.0/tests/fail.zzs",
+					data: to_binary(
+						"say \"not ok 1 - failing distribution test\";\n" _
+						"say \"1..1\";\n",
+					),
+				},
+			],
+		},
+		"zip",
+	);
+	return path;
+}
+
+function replacement_archive_path () {
+	let path := Path.tempfile();
+	Archive.dump(
+		path,
+		{
+			entries: [
+				{
+					path: "remove-before-tests-2.0.0/zuzu-distribution.json",
+					data: to_binary(
+						"{\"name\":\"remove-before-tests\"," _
+						"\"version\":\"2.0.0\"," _
+						"\"author\":\"Example\",\"license\":\"MIT\"}\n",
+					),
+				},
+				{
+					path: "remove-before-tests-2.0.0/modules/remove/before.zzm",
+					data: to_binary("// new module\n"),
+				},
+				{
+					path: "remove-before-tests-2.0.0/tests/fail.zzs",
+					data: to_binary(
+						"say \"not ok 1 - block mutation\";\n" _
+						"say \"1..1\";\n",
+					),
+				},
+			],
+		},
+		"zip",
+	);
+	return path;
+}
+
+function write_installed_prior ( target ) {
+	ensure_dir( target{lib_obj}.child("remove") );
+	target{lib_obj}.child("remove").child("before.zzm").spew_utf8(
+		"// old module\n",
+	);
+	( new JSON( pretty: true ) ).dump(
+		target{meta_obj}.child("remove-before-tests-1.0.0.json"),
+		{
+			name: "remove-before-tests",
+			version: "1.0.0",
+			author: "Example",
+			license: "MIT",
+			status: "stable",
+			dependencies: {},
+			installed: {
+				zdf: "ZDF-1",
+				lib_dir: target{lib_dir},
+				bin_dir: target{bin_dir},
+				meta_dir: target{meta_dir},
+				modules: [
+					{
+						source: "modules/remove/before.zzm",
+						install_as: "remove/before.zzm",
+						sha256: "old",
+					},
+				],
+				scripts: [],
+			},
+		},
+	);
+}
+
+function zoo_for ( target, zuzu ) {
+	return new Zuzuzoo(
+		lib_dir: target{lib_dir},
+		bin_dir: target{bin_dir},
+		meta_dir: target{meta_dir},
+		home: Path.tempdir().to_String(),
+		zuzu_command: zuzu,
+	);
+}
+
+let archive := archive_path();
+let zuzu := ( new Path( path: Env.get( "ZUZU", "./bin/zuzu" ) ) ).to_String();
+
+let aborted_root := root();
+let aborted := zoo_for( aborted_root, zuzu ).install(archive.to_String());
+is( aborted{ok}, false, "failed tests abort install" );
+is( aborted{tests}[0]{ok}, false, "failed TAP is reported" );
+is(
+	aborted_root{lib_obj}.child("install").child("tests.zzm").exists(),
+	false,
+	"aborted install does not copy module",
+);
+is(
+	aborted_root{meta_obj}.child("install-tests-1.0.0.json").exists(),
+	false,
+	"aborted install does not write metadata",
+);
+
+let forced_root := root();
+let forced := zoo_for( forced_root, zuzu ).install(
+	archive.to_String(),
+	{ force: true },
+);
+ok( forced{ok}, "force installs despite failed tests" );
+ok( forced{forced}, "forced result records test failure override" );
+ok(
+	forced_root{lib_obj}.child("install").child("tests.zzm").exists(),
+	"forced install copies module",
+);
+
+let skipped_root := root();
+let skipped := zoo_for( skipped_root, zuzu ).install(
+	archive.to_String(),
+	{ no_test: true },
+);
+ok( skipped{ok}, "no_test skips distribution tests" );
+is( skipped{tests}, [], "no_test result has no test runs" );
+ok(
+	skipped_root{lib_obj}.child("install").child("tests.zzm").exists(),
+	"no_test install copies module",
+);
+
+let removal_root := root();
+write_installed_prior(removal_root);
+let replacement_archive := replacement_archive_path();
+let blocked := zoo_for( removal_root, zuzu ).install(
+	replacement_archive.to_String(),
+);
+is( blocked{ok}, false, "failed tests abort before planned removals" );
+is( blocked{removals}, [], "no removals are executed after failed tests" );
+is(
+	removal_root{lib_obj}.child("remove").child("before.zzm").slurp_utf8(),
+	"// old module\n",
+	"old file remains after failed tests",
+);
+ok(
+	removal_root{meta_obj}.child(
+		"remove-before-tests-1.0.0.json",
+	).exists(),
+	"old metadata remains after failed tests",
+);
+is(
+	removal_root{meta_obj}.child(
+		"remove-before-tests-2.0.0.json",
+	).exists(),
+	false,
+	"new metadata is not written after failed tests",
+);
+
+done_testing();

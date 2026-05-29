@@ -1,0 +1,54 @@
+=encoding utf8
+
+=head1 NAME
+
+std/digest/md5 - MD5 digests for BinaryString values.
+
+=head1 SYNOPSIS
+
+  from std/digest/md5 import *;
+
+  let payload := to_binary( "hello" );
+
+  let raw := md5(payload);
+  let hex := md5_hex(payload);
+  let b64 := md5_b64(payload);
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module provides MD5 digest helpers.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item * C<md5(BinaryString value)>
+
+Parameters: C<value> is binary input data. Returns: C<BinaryString>.
+Returns the raw 16-byte MD5 digest.
+
+=item * C<md5_hex(BinaryString value)>
+
+Parameters: C<value> is binary input data. Returns: C<String>. Returns
+the digest as lowercase hexadecimal text.
+
+=item * C<md5_b64(BinaryString value)>
+
+Parameters: C<value> is binary input data. Returns: C<String>. Returns
+the digest as Base64 text without trailing C<=> padding.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/digest/md5 >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.

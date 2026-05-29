@@ -1,0 +1,69 @@
+=encoding utf8
+
+=head1 NAME
+
+std/net/url - URL parsing, escaping, and templates.
+
+=head1 SYNOPSIS
+
+  from std/net/url import *;
+
+  let parsed := parse(
+    "https://api.example.com/v1?q=tea%20time"
+  );
+
+  let encoded := escape("tea time");
+  let text := unescape(encoded);
+
+  let url := fill_template(
+    "https://api.example.com/{version}/items/{id}{?q}",
+    { version: "v1", id: 7, q: "tea time" }
+  );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module provides small URL helpers.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item C<< escape(value) >>
+
+Parameters: C<value> is any value. Returns: C<String>. Percent-encodes
+C<value> for use in URLs.
+
+=item C<< unescape(value) >>
+
+Parameters: C<value> is URL-escaped text. Returns: C<String>. Decodes
+percent-escaped text.
+
+=item C<< parse(url) >>
+
+Parameters: C<url> is a URL string. Returns: C<Dict>. Parses C<url> and
+returns a dictionary with:
+C<url>, C<scheme>, C<authority>, C<userinfo>, C<host>,
+C<port>, C<path>, C<query>, C<fragment>, and
+C<query_params>.
+
+=item C<< fill_template(template, values) >>
+
+Parameters: C<template> is an RFC6570-style template and C<values> is a
+dictionary or pair list. Returns: C<String>. Fills the template using
+C<values>.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/net/url >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.

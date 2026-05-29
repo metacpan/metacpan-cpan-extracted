@@ -1,0 +1,278 @@
+=encoding utf8
+
+=head1 NAME
+
+std/net/http - HTTP/web client foundation.
+
+=head1 SYNOPSIS
+
+  from std/net/http import CookieJar, UserAgent;
+
+  let jar := new CookieJar();
+  let ua  := new UserAgent(
+    cookie_jar: jar,
+    agent: "my-app/1.0"
+  );
+
+  let req := ua
+    .build_request("GET", "https://example.com/items")
+    .query({ page: "1" })
+    .auth_bearer("TOKEN");
+
+  let res := ua.send(req);
+  let data := res.expect_success().json();
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Node and
+Electron. It is partially supported by zuzu-js in the browser: asynchronous
+HTTP, cookie jar, header normalization, URL, timeout, and retry coverage
+passes, but synchronous request coverage is unsupported.
+
+=head1 DESCRIPTION
+
+This module provides an HTTP client API with classes for cookie
+handling, request building, retries/timeouts, and JSON-first responses.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<< CookieJar(config?) >>
+
+Creates a cookie jar. Returns: C<CookieJar>.
+
+=over
+
+=item C<< jar.add(String url, String set_cookie) >>
+
+Parameters: C<url> is the source URL and C<set_cookie> is a
+C<Set-Cookie> header value. Returns: C<CookieJar>. Stores cookies from
+the header.
+
+=item C<< jar.cookie_header(String url) >>
+
+Parameters: C<url> is a request URL. Returns: C<String> or C<null>.
+Builds the C<Cookie> header value for C<url>.
+
+=item C<< jar.clear() >>
+
+Parameters: none. Returns: C<CookieJar>. Removes all stored cookies.
+
+=back
+
+=item C<< UserAgent(config?) >>
+
+Creates an HTTP user agent. Returns: C<UserAgent>.
+
+Supported config keys include C<default_headers>, C<cookie_jar>,
+C<max_redirect>, C<timeout>, and TLS policy keys:
+C<tls_identity>, C<tls_ca>, C<tls_verify>, C<tls_server_name>,
+C<tls_min_version>, and C<tls_ciphers>.
+
+C<tls_identity> accepts a C<std/secure> C<TlsIdentity> or C<null>.
+C<tls_ca> accepts a C<std/secure> C<Certificate>, PEM certificate text,
+an array of those, or C<null>. C<tls_verify> defaults to true.
+C<tls_min_version> accepts C<"tls1.2"> or C<"tls1.3">. C<tls_ciphers>
+is a backend-native cipher string.
+
+Backends throw a clear unsupported error for non-default TLS settings
+they cannot honour. JS/Browser does not support script-selected TLS
+client configuration; any non-default TLS policy throws when sending.
+
+Builder and dispatch methods:
+
+=over
+
+=item * C<build_request(method, url)>
+
+Parameters: C<method> is an HTTP method and C<url> is the request URL.
+Returns: C<Request>. Builds a mutable request.
+
+=item * C<send(request)>
+
+Parameters: C<request> is a C<Request>. Returns: C<Response>. Sends the
+request synchronously.
+
+=item * C<send_async(request)>
+
+Parameters: C<request> is a C<Request>. Returns: C<Task>. Sends the
+request asynchronously.
+
+=back
+
+Request methods:
+
+=over
+
+=item * Generic
+
+C<request(method, url, data?, headers?)>
+
+Parameters: C<method> is an HTTP method, C<url> is the request URL,
+C<data> is optional request data, and C<headers> are optional headers.
+Returns: C<Response>. Builds and sends one request.
+
+=item * Async generic
+
+C<request_async(method, url, data?, headers?)>
+
+Parameters: same as C<request>. Returns: C<Task>. Asynchronous request
+helper resolving to C<Response>.
+
+=item * Convenience
+
+C<get>, C<head>, C<delete>, C<options>, C<post>, C<put>,
+C<patch>.
+
+C<get_async>, C<head_async>, C<delete_async>, C<options_async>,
+C<post_async>, C<put_async>, and C<patch_async> return awaitable
+C<Task> values which resolve to C<Response>.
+
+For C<post>, C<put>, and C<patch>, pass data then optional headers.
+For the others, the second argument can be headers.
+
+=back
+
+=item C<Request>
+
+Mutable request builder. Returns: C<Request> when constructed by the
+user agent.
+
+=over
+
+=item C<< request.method(value?) >>, C<< request.url(value?) >>
+
+Parameters: optional C<value> updates the method or URL. Returns:
+C<String> when reading, or C<Request> when setting.
+
+=item C<< request.header(name, value?) >>
+
+Parameters: C<name> is a header name and C<value> is optional. Returns:
+C<String> or C<Request>. Gets or sets one request header.
+
+=item C<< request.headers(value?) >>
+
+Parameters: optional C<value> is header data. Returns: header data or
+C<Request>. Gets or replaces request headers.
+
+=item C<< request.query(values) >>
+
+Parameters: C<values> is query parameter data. Returns: C<Request>.
+Adds query parameters to the request URL.
+
+=item C<< request.body(value?) >>, C<< request.content(value?) >>
+
+Parameters: optional C<value> is request body data. Returns: body value
+or C<Request>. Gets or sets the request body.
+
+=item C<< request.json(value) >>
+
+Parameters: C<value> is JSON-encodable data. Returns: C<Request>. Sets a
+JSON request body and content type.
+
+=item C<< request.auth_bearer(String token) >>
+
+Parameters: C<token> is a bearer token. Returns: C<Request>. Sets the
+C<Authorization> header.
+
+=item C<< request.timeout(Number seconds) >>, C<< request.retries(Number count) >>
+
+Parameters: numeric values configure request behaviour. Returns:
+C<Request>. Sets timeout or retry policy.
+
+=item C<< request.download_to(path) >>, C<< request.upload_from(path) >>
+
+Parameters: C<path> is a C<std/io> C<Path> or compatible path value.
+Returns: C<Request>. Configures response download or request upload.
+
+=item C<< request.tls_identity(identity_or_null) >>
+
+Parameters: C<identity_or_null> is a TLS identity or C<null>. Returns:
+C<Request>. Overrides the user-agent TLS identity for the request.
+
+=item C<< request.multipart(parts) >>
+
+Parameters: C<parts> describes multipart form parts. Returns:
+C<Request>. Sets a multipart request body.
+
+=item C<< request.send(user_agent) >>
+
+Parameters: C<user_agent> is a C<UserAgent>. Returns: C<Response>. Sends
+the request synchronously.
+
+=item C<< request.send_async(user_agent) >>
+
+Parameters: C<user_agent> is a C<UserAgent>. Returns: C<Task>. Sends the
+request asynchronously.
+
+=back
+
+C<tls_identity(identity_or_null)> overrides the user-agent TLS identity
+for that request only. Passing C<null> disables any user-agent identity
+for that request.
+
+=item C<Response>
+
+Represents an HTTP response.
+
+=over
+
+=item C<< response.status() >>, C<< response.reason() >>, C<< response.url() >>
+
+Parameters: none. Returns: C<Number> for C<status>, otherwise
+C<String>. Returns response metadata.
+
+=item C<< response.content() >>
+
+Parameters: none. Returns: C<BinaryString> or value. Returns the
+response body.
+
+=item C<< response.headers() >>
+
+Parameters: none. Returns: header data. Returns response headers.
+
+=item C<< response.header(String name) >>
+
+Parameters: C<name> is a header name. Returns: C<String> or C<null>.
+Returns the first matching response header.
+
+=item C<< response.success() >>
+
+Parameters: none. Returns: C<Boolean>. Returns true for a successful
+HTTP status.
+
+=item C<< response.json() >>
+
+Parameters: none. Returns: value. Decodes the response body as JSON.
+
+=item C<< response.expect_success() >>
+
+Parameters: none. Returns: C<Response>. Returns the response or throws
+for an unsuccessful status.
+
+=item C<< response.to_Dict() >>
+
+Parameters: none. Returns: C<Dict>. Converts the response to a
+dictionary.
+
+=back
+
+=back
+
+=head1 JS/BROWSER SYNCHRONOUS REQUEST SUPPORT
+
+In the JS/Browser implementation, synchronous request methods do not
+perform real network requests. These methods return a C<Response> with
+status C<599> and reason C<Synchronous HTTP is unsupported on
+JS/Browser>. Use the asynchronous methods in JS/Browser.
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/net/http >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.

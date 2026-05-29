@@ -1,0 +1,30 @@
+from test/more import *;
+requires_capability( "fs" );
+
+from std/data/kdl import *;
+from std/io import Path;
+
+let kdl := new KDL();
+let built := new KDLDocument( nodes: [
+	new KDLNode(
+		name: "server",
+		args: [ new KDLValue( type: "string", value: "api" ) ],
+		props: new PairList(
+			[ "enabled", new KDLValue( type: "boolean", value: true ) ],
+			[ "port", new KDLValue( type: "number", kind: "integer", value: 8080 ) ],
+		),
+		children: [
+			new KDLNode( name: "path", args: [ new KDLValue( type: "string", value: "/v1" ) ] ),
+		],
+	),
+] );
+
+let path := Path.tempfile();
+kdl.dump( path, built );
+is(
+	kdl.load(path).nodes()[0].props().get("port").to_Number(),
+	8080,
+	"dump/load Path round trip",
+);
+
+done_testing();

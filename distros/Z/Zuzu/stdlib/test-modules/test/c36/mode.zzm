@@ -1,0 +1,13 @@
+class FileMode {
+	static method read_mode () {
+		return "read";
+	}
+
+	static method write_mode () {
+		return "write";
+	}
+
+	static method append_mode () {
+		return "append";
+	}
+}

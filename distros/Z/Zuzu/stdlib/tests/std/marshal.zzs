@@ -1,0 +1,1031 @@
+from std/marshal import
+	dump,
+	load,
+	safe_to_dump,
+	MarshallingException,
+	UnmarshallingException;
+from std/data/xml import XML;
+from std/internals import object_slots, ref_id;
+from std/io try import Path;
+from std/string/base64 import decode, encode;
+from std/time import Time, TimeZone;
+from test/more import *;
+
+__global__{marshal_phase11_builds} := 0;
+__global__{marshal_hook_log} := "";
+__global__{marshal_on_dump_count} := 0;
+__global__{marshal_on_load_count} := 0;
+
+class MarshalPhase11Box {
+	let String name with get, set := "unset";
+	const kind := "box";
+	let payload;
+
+	method __build__ () {
+		__global__{marshal_phase11_builds} :=
+			__global__{marshal_phase11_builds} + 1;
+	}
+
+	method label () {
+		return name _ ":" _ kind;
+	}
+}
+
+class MarshalHookBox {
+	let name := "";
+	let status := "new";
+	let peer;
+
+	method __on_dump__ () {
+		__global__{marshal_hook_log} :=
+			__global__{marshal_hook_log} _ "dump:" _ name _ ";";
+		__global__{marshal_on_dump_count} :=
+			__global__{marshal_on_dump_count} + 1;
+		status := "dumped";
+	}
+
+	method __on_load__ () {
+		__global__{marshal_hook_log} :=
+			__global__{marshal_hook_log} _ "load:" _ name _ ";";
+		__global__{marshal_on_load_count} :=
+			__global__{marshal_on_load_count} + 1;
+		status := status _ ":loaded";
+		if ( peer ≢ null ) {
+			status := status _ ":peer=" _ peer{name};
+		}
+	}
+}
+
+class MarshalBadDump {
+	method __on_dump__ () {
+		die "bad dump hook";
+	}
+}
+
+class MarshalBadLoad {
+	method __on_load__ () {
+		die "bad load hook";
+	}
+}
+
+function marshal_add_one (x) {
+	return x + 1;
+}
+
+const marshal_bonus := 10;
+let marshal_add_bonus := function (x) {
+	return x + marshal_bonus;
+};
+
+function marshal_add_two (x) {
+	return marshal_add_one( marshal_add_one(x) );
+}
+
+function marshal_load_message (blob) {
+	let message := "";
+	try {
+		load( decode(blob) );
+	}
+	catch ( UnmarshallingException e ) {
+		message := e{message};
+	}
+	return message;
+}
+
+const marshal_phase17_offset := 40;
+
+class MarshalPhase17Point {
+	let Number x := 1;
+	const String label := "point";
+
+	method total ( Number y ) -> Number {
+		return x + y + marshal_phase17_offset;
+	}
+
+	static method tag () -> String {
+		return "point-class";
+	}
+}
+
+class MarshalPhase17Base {
+	let Number base := 40;
+
+	method base_value () -> Number {
+		return base;
+	}
+}
+
+class MarshalPhase17Child extends MarshalPhase17Base {
+	let Number extra := 2;
+
+	method total () -> Number {
+		return self.base_value() + extra;
+	}
+}
+
+class MarshalPhase17Outer {
+	class Inner {
+		let Number value;
+
+		method get_value () -> Number {
+			return value;
+		}
+	}
+
+	static method build ( Number value ) {
+		return new self{"Inner"}( value: value );
+	}
+}
+
+const marshal_phase18_prefix := "label:";
+
+trait MarshalPhase18Labelled {
+	method label () -> String {
+		return marshal_phase18_prefix _ self.get_name();
+	}
+}
+
+class MarshalPhase18Thing with MarshalPhase18Labelled {
+	let String name with get := "Ada";
+}
+
+is( typeof dump, "Function", "dump is exported" );
+is( typeof load, "Function", "load is exported" );
+is( typeof safe_to_dump, "Function", "safe_to_dump is exported" );
+
+is( typeof dump(null), "BinaryString", "dump returns BinaryString" );
+is( load( dump(null) ), null, "null round trip" );
+is( load( dump(true) ), true, "true round trip" );
+is( load( dump(false) ), false, "false round trip" );
+is( load( dump(42) ), 42, "integer number round trip" );
+is( load( dump(-17) ), -17, "negative integer round trip" );
+is( load( dump(3.25) ), 3.25, "float number round trip" );
+is( load( dump("hello") ), "hello", "String round trip" );
+
+let raw := ~to_binary("ABC");
+let raw_roundtrip := load( dump(raw) );
+is( typeof raw_roundtrip, "BinaryString", "BinaryString round trip type" );
+ok( raw_roundtrip == raw, "BinaryString round trip payload" );
+
+let ascii_binary := to_binary("ABC");
+is(
+	typeof load( dump(ascii_binary) ),
+	"BinaryString",
+	"ASCII BinaryString does not load as String",
+);
+is( load( dump("ABC") ), "ABC", "ASCII String still loads as String" );
+
+is(
+	encode( dump([ 1, [ 2 ], "x" ]) ),
+	"2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIKCAoMBggABYXiCAoECgA==",
+	"strong-only dump fixture remains byte-compatible",
+);
+
+is( safe_to_dump(42), true, "safe_to_dump accepts scalar values" );
+is( safe_to_dump([ 1, [ 2 ] ]), true, "safe_to_dump accepts arrays" );
+is( safe_to_dump({ foo: 1 }), true, "safe_to_dump accepts Dicts" );
+is(
+	safe_to_dump( {{ foo: 1, foo: 2 }} ),
+	true,
+	"safe_to_dump accepts PairLists",
+);
+is( safe_to_dump( << 1, 2 >> ), true, "safe_to_dump accepts Sets" );
+is( safe_to_dump( <<< 1, 2, 2 >>> ), true, "safe_to_dump accepts Bags" );
+is(
+	safe_to_dump( new Pair( pair: [ "key", "value" ] ) ),
+	true,
+	"safe_to_dump accepts Pairs",
+);
+is( safe_to_dump( new Time(42) ), true, "safe_to_dump accepts Time" );
+if ( Path ≢ null ) {
+	is(
+		safe_to_dump( new Path("tmp/../file.txt") ),
+		true,
+		"safe_to_dump accepts Path",
+	);
+}
+is(
+	safe_to_dump( new MarshalPhase11Box( name: "safe" ) ),
+	true,
+	"safe_to_dump accepts user objects",
+);
+is( safe_to_dump(dump), false, "safe_to_dump rejects native functions" );
+is(
+	safe_to_dump(marshal_add_one),
+	true,
+	"safe_to_dump accepts user functions",
+);
+is(
+	safe_to_dump(MarshalPhase17Point),
+	true,
+	"safe_to_dump accepts user classes",
+);
+is(
+	safe_to_dump(MarshalPhase18Labelled),
+	true,
+	"safe_to_dump accepts user traits",
+);
+is(
+	safe_to_dump( XML.parse("<root/>") ),
+	false,
+	"safe_to_dump rejects unsupported runtime-backed objects",
+);
+
+let nested := load( dump([ 1, [ 2, 3 ], "four" ]) );
+is( typeof nested, "Array", "array root round trip type" );
+is( nested[0], 1, "array scalar item round trip" );
+is( nested[1][0], 2, "nested array item round trip" );
+is( nested[2], "four", "array string item round trip" );
+
+let shared := [ 7 ];
+let shared_graph := load( dump([ shared, shared ]) );
+is(
+	ref_id( shared_graph[0] ),
+	ref_id( shared_graph[1] ),
+	"shared array references preserve identity",
+);
+
+let cycle := [];
+cycle.push(cycle);
+is(
+	safe_to_dump(cycle),
+	true,
+	"safe_to_dump accepts cyclic arrays",
+);
+
+let cycle_roundtrip := load( dump(cycle) );
+is(
+	ref_id(cycle_roundtrip),
+	ref_id( cycle_roundtrip[0] ),
+	"self-cyclic array preserves identity",
+);
+
+let a := [];
+let b := [a];
+a.push(b);
+a.push(42);
+let a2 := load( dump(a) );
+is(
+	a2[0][0][0][0][1],
+	42,
+	"cyclic array graph reaches value after round trip",
+);
+is(
+	ref_id(a2),
+	ref_id( a2[0][0] ),
+	"cyclic array graph preserves root identity",
+);
+
+let dict_roundtrip := load( dump({ beta: 2, alpha: 1 }) );
+is( typeof dict_roundtrip, "Dict", "Dict round trip type" );
+is( dict_roundtrip.get("alpha"), 1, "Dict key lookup after round trip" );
+is( dict_roundtrip.sorted_keys(), [ "alpha", "beta" ], "Dict keys survive" );
+
+let dict_shared := [ "shared" ];
+let dict_graph := load( dump({ left: dict_shared, right: dict_shared }) );
+is(
+	ref_id( dict_graph{left} ),
+	ref_id( dict_graph{right} ),
+	"Dict nested references preserve identity",
+);
+
+let cyclic_dict := {};
+cyclic_dict.set( "self", cyclic_dict );
+let cyclic_dict_roundtrip := load( dump(cyclic_dict) );
+is(
+	ref_id(cyclic_dict_roundtrip),
+	ref_id( cyclic_dict_roundtrip{self} ),
+	"cyclic Dict preserves identity",
+);
+
+let pairlist_roundtrip := load(
+	dump( {{ foo: 1, bar: 2, foo: 3, foo: 4 }} ),
+);
+is( typeof pairlist_roundtrip, "PairList", "PairList round trip type" );
+is(
+	pairlist_roundtrip.keys(),
+	[ "foo", "bar", "foo", "foo" ],
+	"PairList key order and duplicates survive",
+);
+is(
+	pairlist_roundtrip.get_all("foo"),
+	[ 1, 3, 4 ],
+	"PairList duplicate values survive",
+);
+
+let pairlist_shared := [ "shared" ];
+let pairlist_graph := load(
+	dump( {{ left: pairlist_shared, right: pairlist_shared }} ),
+);
+is(
+	ref_id( pairlist_graph.get("left") ),
+	ref_id( pairlist_graph.get("right") ),
+	"PairList nested references preserve identity",
+);
+
+let cyclic_pairlist := new PairList();
+cyclic_pairlist.add( "self", cyclic_pairlist );
+let cyclic_pairlist_roundtrip := load( dump(cyclic_pairlist) );
+is(
+	ref_id(cyclic_pairlist_roundtrip),
+	ref_id( cyclic_pairlist_roundtrip.get("self") ),
+	"cyclic PairList preserves identity",
+);
+
+let set_roundtrip := load( dump( << 1, 2, 2, 3 >> ) );
+is( typeof set_roundtrip, "Set", "Set round trip type" );
+is( set_roundtrip.length(), 3, "Set round trip keeps unique members" );
+is( set_roundtrip.contains(2), 1, "Set membership survives round trip" );
+
+let set_from_duplicate_payload := load(
+	decode("2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCBYMBAQKA"),
+);
+is(
+	set_from_duplicate_payload.length(),
+	2,
+	"Set load applies normal Set duplicate handling",
+);
+
+let set_shared := [ "shared" ];
+let set_graph := load( dump( << set_shared, [ set_shared ] >> ) );
+let set_items := set_graph.to_Array();
+is(
+	ref_id( set_items[0] ),
+	ref_id( set_items[1][0] ),
+	"Set nested references preserve identity",
+);
+
+let bag_roundtrip := load( dump( <<< 1, 2, 2, 3 >>> ) );
+is( typeof bag_roundtrip, "Bag", "Bag round trip type" );
+is( bag_roundtrip.count(2), 2, "Bag duplicate count survives round trip" );
+is(
+	bag_roundtrip.to_Array(),
+	[ 1, 2, 2, 3 ],
+	"Bag order and duplicate values survive round trip",
+);
+
+let bag_shared := [ "shared" ];
+let bag_graph := load( dump( <<< bag_shared, bag_shared, [ bag_shared ] >>> ) );
+let bag_items := bag_graph.to_Array();
+is(
+	ref_id( bag_items[0] ),
+	ref_id( bag_items[1] ),
+	"Bag repeated references preserve identity",
+);
+is(
+	ref_id( bag_items[0] ),
+	ref_id( bag_items[2][0] ),
+	"Bag nested references preserve identity",
+);
+
+let pair_shared := [ "shared" ];
+let pair := new Pair( pair: [ pair_shared, [ pair_shared ] ] );
+let pair_roundtrip := load( dump(pair) );
+is( typeof pair_roundtrip, "Pair", "Pair round trip type" );
+is( typeof pair_roundtrip.key, "String", "Pair key round trip type is String" );
+is(
+	typeof pair_roundtrip.value[0],
+	"Array",
+	"Pair value nested item type survives",
+);
+is(
+	pair_roundtrip.value[0][0],
+	"shared",
+	"Pair value nested reference survives",
+);
+
+let number_key_pair := load( dump( new Pair( pair: [ 42, "answer" ] ) ) );
+is( number_key_pair.key, "42", "Pair number key survives as String" );
+is( number_key_pair.value, "answer", "Pair value survives" );
+
+let repeated_pair_graph := load( dump([ pair, pair ]) );
+is(
+	ref_id( repeated_pair_graph[0] ),
+	ref_id( repeated_pair_graph[1] ),
+	"repeated Pair identity is preserved",
+);
+
+let time_roundtrip := load( dump( new Time(12345) ) );
+is( typeof time_roundtrip, "Time", "Time round trip type" );
+is( time_roundtrip.epoch(), 12345, "Time epoch survives round trip" );
+let zoned_time_roundtrip := load(
+	dump( new Time( 1778241600, timezone: TimeZone.named("Europe/London") ) ),
+);
+is(
+	zoned_time_roundtrip.timezone().to_String(),
+	"Europe/London",
+	"Time timezone survives round trip",
+);
+
+let repeated_time_graph := load( dump([ time_roundtrip, time_roundtrip ]) );
+is(
+	ref_id( repeated_time_graph[0] ),
+	ref_id( repeated_time_graph[1] ),
+	"repeated Time identity is preserved",
+);
+
+if ( Path ≢ null ) {
+	let path_roundtrip := load( dump( new Path("tmp/../file.txt") ) );
+	is( typeof path_roundtrip, "Path", "Path round trip type" );
+	is(
+		path_roundtrip.to_String(),
+		"tmp/../file.txt",
+		"Path exact string form survives round trip",
+	);
+
+	let repeated_path_graph := load( dump([ path_roundtrip, path_roundtrip ]) );
+	is(
+		ref_id( repeated_path_graph[0] ),
+		ref_id( repeated_path_graph[1] ),
+		"repeated Path identity is preserved",
+	);
+}
+
+let function_roundtrip := load( dump(marshal_add_one) );
+is( typeof function_roundtrip, "Function", "Function round trip type" );
+is( function_roundtrip(41), 42, "Function round trip executes" );
+
+let function_capture_roundtrip := load( dump(marshal_add_bonus) );
+is(
+	function_capture_roundtrip(32),
+	42,
+	"Function scalar const capture survives round trip",
+);
+
+let function_dependency_roundtrip := load( dump(marshal_add_two) );
+is(
+	function_dependency_roundtrip(40),
+	42,
+	"Function internal dependency survives round trip",
+);
+
+let class_roundtrip := load( dump(MarshalPhase17Point) );
+is( typeof class_roundtrip, "Class", "Class round trip type" );
+is(
+	class_roundtrip.tag(),
+	"point-class",
+	"Class static method survives round trip",
+);
+let class_object := new class_roundtrip( x: 1 );
+is(
+	typeof class_object,
+	"MarshalPhase17Point",
+	"Class round trip creates object with original type name",
+);
+is(
+	class_object.total(1),
+	42,
+	"Class method scalar const capture survives round trip",
+);
+is(
+	class_object{label},
+	"point",
+	"Class const typed field survives round trip",
+);
+
+let child_class_roundtrip := load( dump(MarshalPhase17Child) );
+let child_object := new child_class_roundtrip();
+is(
+	child_object.total(),
+	42,
+	"Class parent dependency survives round trip",
+);
+is(
+	child_object.base_value(),
+	40,
+	"Class inherited method survives round trip",
+);
+
+let outer_class_roundtrip := load( dump(MarshalPhase17Outer) );
+let inner_object := outer_class_roundtrip.build(42);
+is(
+	inner_object.get_value(),
+	42,
+	"Class nested class survives round trip",
+);
+
+let trait_roundtrip := load( dump(MarshalPhase18Labelled) );
+class MarshalPhase18LoadedTraitUser with trait_roundtrip {
+	let String name with get := "Bea";
+}
+let loaded_trait_object := new MarshalPhase18LoadedTraitUser();
+is(
+	loaded_trait_object.label(),
+	"label:Bea",
+	"Trait method survives direct trait round trip",
+);
+
+let trait_class_roundtrip := load( dump(MarshalPhase18Thing) );
+let trait_class_object := new trait_class_roundtrip();
+is(
+	trait_class_object.label(),
+	"label:Ada",
+	"Class trait dependency survives round trip",
+);
+
+__global__{marshal_phase11_builds} := 0;
+let object_shared := [ "shared" ];
+let object := new MarshalPhase11Box(
+	name: "Ada",
+	payload: [ object_shared, [ object_shared ] ],
+);
+is( __global__{marshal_phase11_builds}, 1, "new calls user __build__" );
+let object_roundtrip := load( dump(object) );
+is(
+	__global__{marshal_phase11_builds},
+	1,
+	"load does not call user __build__",
+);
+is(
+	typeof object_roundtrip,
+	"MarshalPhase11Box",
+	"user object round trip type",
+);
+is( object_roundtrip{name}, "Ada", "user object string slot survives" );
+is( object_roundtrip{kind}, "box", "user object const slot survives" );
+is( object_roundtrip.label(), "Ada:box", "user object methods still work" );
+is(
+	ref_id( object_roundtrip{payload}[0] ),
+	ref_id( object_roundtrip{payload}[1][0] ),
+	"user object nested references preserve identity",
+);
+let repeated_object_graph := load( dump([ object, object ]) );
+is(
+	ref_id( repeated_object_graph[0] ),
+	ref_id( repeated_object_graph[1] ),
+	"repeated user object identity is preserved",
+);
+object_roundtrip.set_name("Bea");
+is(
+	object_roundtrip.label(),
+	"Bea:box",
+	"user object field accessor metadata survives",
+);
+like(
+	exception( function () {
+		object_roundtrip.set_name(123);
+	} ),
+	/must be String/,
+	"loaded object typed setter metadata survives",
+);
+
+let bound_target := new MarshalPhase11Box( name: "Callie" );
+let bound_method := bound_target{"label"};
+is( typeof bound_method, "Method", "object dict access exposes bound methods" );
+is( safe_to_dump(bound_method), true, "safe_to_dump accepts bound methods" );
+let bound_method_roundtrip := load( dump(bound_method) );
+is( typeof bound_method_roundtrip, "Method", "bound method round trip type" );
+is(
+	bound_method_roundtrip(),
+	"Callie:box",
+	"bound method round trip calls original receiver method",
+);
+let bound_method_graph := load(
+	dump([ bound_target, bound_method, bound_method ]),
+);
+is(
+	ref_id( bound_method_graph[1] ),
+	ref_id( bound_method_graph[2] ),
+	"repeated bound method identity is preserved",
+);
+bound_method_graph[0].set_name("Dana");
+is(
+	bound_method_graph[1](),
+	"Dana:box",
+	"bound method receiver is loaded as a shared strong reference",
+);
+
+__global__{marshal_hook_log} := "";
+__global__{marshal_on_dump_count} := 0;
+__global__{marshal_on_load_count} := 0;
+let hook_obj := new MarshalHookBox( name: "one" );
+let hook_roundtrip := load( dump([ hook_obj, hook_obj ]) );
+is(
+	__global__{marshal_on_dump_count},
+	1,
+	"__on_dump__ runs once per object identity",
+);
+is(
+	hook_obj{status},
+	"dumped",
+	"__on_dump__ may mutate the object before slot encoding",
+);
+is(
+	__global__{marshal_on_load_count},
+	1,
+	"__on_load__ runs once per loaded object identity",
+);
+is(
+	hook_roundtrip[0]{status},
+	"dumped:loaded",
+	"__on_load__ sees state serialized after __on_dump__",
+);
+is(
+	ref_id( hook_roundtrip[0] ),
+	ref_id( hook_roundtrip[1] ),
+	"lifecycle hooks preserve repeated object identity",
+);
+
+__global__{marshal_hook_log} := "";
+__global__{marshal_on_dump_count} := 0;
+__global__{marshal_on_load_count} := 0;
+let first_hook := new MarshalHookBox( name: "first" );
+let second_hook := new MarshalHookBox(
+	name: "second",
+	peer: first_hook,
+);
+let ordered_hooks := load( dump([ first_hook, second_hook ]) );
+is(
+	__global__{marshal_hook_log},
+	"dump:first;dump:second;load:first;load:second;",
+	"marshal lifecycle hooks run in object id order",
+);
+is(
+	ordered_hooks[1]{status},
+	"dumped:loaded:peer=first",
+	"__on_load__ runs after references are reconstructed",
+);
+
+let bad_dump_message := "";
+try {
+	dump( new MarshalBadDump() );
+}
+catch ( MarshallingException e ) {
+	bad_dump_message := e{message};
+}
+like(
+	bad_dump_message,
+	/__on_dump__.*bad dump hook/,
+	"__on_dump__ errors are wrapped as MarshallingException",
+);
+
+let bad_load_message := "";
+try {
+	load( dump( new MarshalBadLoad() ) );
+}
+catch ( UnmarshallingException e ) {
+	bad_load_message := e{message};
+}
+like(
+	bad_load_message,
+	/__on_load__.*bad load hook/,
+	"__on_load__ errors are wrapped as UnmarshallingException",
+);
+
+__global__{marshal_hook_log} := "";
+__global__{marshal_on_dump_count} := 0;
+let safe_hook := new MarshalHookBox( name: "safe-hook" );
+is(
+	safe_to_dump(safe_hook),
+	true,
+	"safe_to_dump accepts supported hook objects",
+);
+is(
+	__global__{marshal_on_dump_count},
+	1,
+	"safe_to_dump calls __on_dump__",
+);
+is(
+	safe_hook{status},
+	"dumped",
+	"safe_to_dump preserves __on_dump__ mutation behaviour",
+);
+is(
+	safe_to_dump( new MarshalBadDump() ),
+	false,
+	"safe_to_dump returns false for __on_dump__ failure",
+);
+
+__global__{marshal_on_dump_count} := 0;
+let strong_edge_hook := new MarshalHookBox( name: "strong-edge" );
+dump([ strong_edge_hook ]);
+is(
+	__global__{marshal_on_dump_count},
+	1,
+	"__on_dump__ runs for objects reached through a strong edge",
+);
+
+let dump_message := "";
+try {
+	dump(/unsupported/);
+}
+catch ( MarshallingException e ) {
+	dump_message := e{message};
+}
+like(
+	dump_message,
+	/not marshalable/,
+	"dump rejects unsupported objects with MarshallingException",
+);
+
+let load_type_message := "";
+try {
+	load("not binary");
+}
+catch ( TypeException e ) {
+	load_type_message := e{message};
+}
+like(
+	load_type_message,
+	/expects BinaryString/,
+	"load rejects non-BinaryString input",
+);
+
+let no_tag_message := "";
+try {
+	load( decode("9g==") );
+}
+catch ( UnmarshallingException e ) {
+	no_tag_message := e{message};
+}
+like(
+	no_tag_message,
+	/Top-level item is not tag 55799/,
+	"load rejects an untagged CBOR item",
+);
+
+like(
+	marshal_load_message("9gA="),
+	/trailing bytes after item/,
+	"load rejects invalid CBOR with trailing bytes",
+);
+
+like(
+	marshal_load_message("2dn3hnBOT1QtWlVaVS1NQVJTSEFMAaD2gIA="),
+	/Envelope magic is invalid/,
+	"load rejects wrong envelope magic",
+);
+
+like(
+	marshal_load_message("2dn3hWxaVVpVLU1BUlNIQUwBoPaA"),
+	/Envelope must contain exactly 6 fields/,
+	"load rejects wrong envelope arity",
+);
+
+like(
+	marshal_load_message("2dn3hmxaVVpVLU1BUlNIQUwBgPaAgA=="),
+	/Envelope options must be a map/,
+	"load rejects wrong envelope options",
+);
+
+let version_message := "";
+try {
+	load( decode("2dn3hmxaVVpVLU1BUlNIQUwCoPaAgA==") );
+}
+catch ( UnmarshallingException e ) {
+	version_message := e{message};
+}
+like(
+	version_message,
+	/Unsupported Zuzu Marshal version/,
+	"load rejects unsupported envelope version",
+);
+
+let root_message := "";
+try {
+	load( decode("2dn3hmxaVVpVLU1BUlNIQUwBoIIAAICA") );
+}
+catch ( UnmarshallingException e ) {
+	root_message := e{message};
+}
+like(
+	root_message,
+	/outside the object table/,
+	"load rejects references outside the object table",
+);
+
+let weak_root_message := "";
+try {
+	load( decode("2dn3hmxaVVpVLU1BUlNIQUwBoIIB9oCA") );
+}
+catch ( UnmarshallingException e ) {
+	weak_root_message := e{message};
+}
+like(
+	weak_root_message,
+	/Envelope root weak storage record is not allowed here/,
+	"load rejects weak storage records at the envelope root",
+);
+
+let weak_array_value := load(
+	decode("2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCAoGCAfaA"),
+);
+is(
+	weak_array_value[0],
+	null,
+	"load accepts weak Array null records",
+);
+
+let nested_weak_message := "";
+try {
+	load( decode("2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCAoGCAYIB9oA=") );
+}
+catch ( UnmarshallingException e ) {
+	nested_weak_message := e{message};
+}
+like(
+	nested_weak_message,
+	/nested weak storage records are invalid/,
+	"load rejects nested weak storage records",
+);
+
+let weak_class_message := "";
+try {
+	load( decode("2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCB4KCAfaAgA==") );
+}
+catch ( UnmarshallingException e ) {
+	weak_class_message := e{message};
+}
+like(
+	weak_class_message,
+	/Object payload 0 class weak storage record is not allowed here/,
+	"load rejects weak storage records in object class position",
+);
+
+like(
+	marshal_load_message(
+		"2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIKCB4KCAAGAggKAgA==",
+	),
+	/Object payload 0 class must resolve to a Class/,
+	"load rejects object class references that do not resolve to classes",
+);
+
+let missing_bound_method_blob :=
+	"2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIOCC4KCAAFnbWlzc2luZ4IH" _
+	"goIAAoCCCYEAgYUCbkJvdW5kTWV0aG9kQm94eDljbGFzcyBCb3Vu" _
+	"ZE1ldGhvZEJveCB7IG1ldGhvZCBsYWJlbCAoKSB7IHJldHVybiAi" _
+	"b2siOyB9IH2AgA==";
+like(
+	marshal_load_message(missing_bound_method_blob),
+	/Bound method object payload 0 method 'missing' was not found/,
+	"load rejects bound method payloads naming missing methods",
+);
+
+let weak_bound_method_receiver_blob :=
+	"2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIOCC4KCAfZlbGFiZWyCB4KC" _
+	"AAKAggmBAIGFAm5Cb3VuZE1ldGhvZEJveHg5Y2xhc3MgQm91bmRN" _
+	"ZXRob2RCb3ggeyBtZXRob2QgbGFiZWwgKCkgeyByZXR1cm4gIm9r" _
+	"IjsgfSB9gIA=";
+like(
+	marshal_load_message(weak_bound_method_receiver_blob),
+	/Bound method object payload 0 receiver weak storage record is not allowed here/,
+	"load rejects weak storage records in bound method receiver position",
+);
+
+like(
+	marshal_load_message(
+		"2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCAYKCAfZhdoA=",
+	),
+	/Pair object payload 0 key must be a text string/,
+	"load rejects weak storage records in Pair key position",
+);
+
+like(
+	marshal_load_message(
+		"2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCAoGBAYA=",
+	),
+	/array must be \[0, id\] or \[1, value\]/,
+	"load rejects bad-arity weak storage records",
+);
+
+let weak_dict_value := load(
+	decode("2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCA4GCYWuCAWF4gA=="),
+);
+is(
+	weak_dict_value{"k"},
+	"x",
+	"load accepts weak Dict value records",
+);
+
+let weak_pairlist_value := load(
+	decode("2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCBIGCYWuCAWF4gA=="),
+);
+is(
+	weak_pairlist_value{"k"},
+	"x",
+	"load accepts weak PairList value records",
+);
+
+let weak_set_value := load(
+	decode("2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCBYGCAYIAAIA="),
+);
+is(
+	weak_set_value.length(),
+	1,
+	"load accepts weak Set member references",
+);
+
+like(
+	marshal_load_message(
+		"2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCBoGCAYIAGGOA",
+	),
+	/outside the object table/,
+	"load rejects bad ids inside weak storage records",
+);
+
+let weak_object_slot_blob :=
+	"2dn3hmxaVVpVLU1BUlNIQUwBoIIAAYKCCYEAggeCggAAgYJjZm9v" _
+	"ggH2gYUCa1dlYWtTbG90Qm94cmNsYXNzIFdlYWtTbG90Qm94O4CA";
+let weak_object_slot_value := load( decode(weak_object_slot_blob) );
+is(
+	object_slots(weak_object_slot_value){"foo"},
+	null,
+	"load accepts weak object slot records",
+);
+
+let weak_code_capture_blob :=
+	"2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCCIEAgYUBYWZ4G2Z1bmN0" _
+	"aW9uICgpIHsgcmV0dXJuIGNhcDsgfYGCY2NhcIIB9oA=";
+like(
+	marshal_load_message(weak_code_capture_blob),
+	/Capture 'cap' in code record 0 weak storage record is not allowed here/,
+	"load rejects weak storage records in code captures",
+);
+
+like(
+	marshal_load_message(
+		"2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCCIGCAfaA",
+	),
+	/Function object payload 0 code id weak storage record is not allowed here/,
+	"load rejects weak storage records in code id positions",
+);
+
+let duplicate_dict_message := "";
+try {
+	load( decode("2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCA4KCY2R1cAGCY2R1cAKA") );
+}
+catch ( UnmarshallingException e ) {
+	duplicate_dict_message := e{message};
+}
+like(
+	duplicate_dict_message,
+	/duplicate key 'dup'/,
+	"load rejects duplicate Dict payload keys",
+);
+
+like(
+	marshal_load_message("2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCGGOAgA=="),
+	/Unsupported object kind 99/,
+	"load rejects unsupported object kinds",
+);
+
+let duplicate_slot_blob :=
+	"2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIKCB4KCAAGCgmF4AYJheAKC" _
+	"CYEAgYUCbU1hcnNoYWxCYWRCb3h4P2NsYXNzIE1hcnNoYWxCYWR" _
+	"Cb3ggeyBsZXQgeDsgbWV0aG9kIGxhYmVsICgpIHsgcmV0dXJuI" _
+	"CJvayI7IH0gfYCA";
+like(
+	marshal_load_message(duplicate_slot_blob),
+	/Object payload 0 contains duplicate slot 'x'/,
+	"load rejects duplicate object slot names",
+);
+
+like(
+	marshal_load_message("2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCCIEBgA=="),
+	/Function object payload 0 code id is outside the code table/,
+	"load rejects invalid function code references",
+);
+
+let unsupported_code_blob :=
+	"2dn3hmxaVVpVLU1BUlNIQUwBoPaAgYUYY25tYXJzaGFsX2JhZF9" _
+	"mbngZZnVuY3Rpb24gKCkgeyByZXR1cm4gMTsgfYCA";
+like(
+	marshal_load_message(unsupported_code_blob),
+	/Unsupported code kind 99/,
+	"load rejects unsupported code records",
+);
+
+let invalid_code_dependency_blob :=
+	"2dn3hmxaVVpVLU1BUlNIQUwBoPaAgYUCbU1hcnNoYWxCYWRCb3h" _
+	"4P2NsYXNzIE1hcnNoYWxCYWRCb3ggeyBsZXQgeDsgbWV0aG9kIG" _
+	"xhYmVsICgpIHsgcmV0dXJuICJvayI7IH0gfYCBggAB";
+like(
+	marshal_load_message(invalid_code_dependency_blob),
+	/failed/,
+	"load rejects invalid code dependency references",
+);
+
+let malformed_code_capture_blob :=
+	"2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCCIEAgYUBbm1hcnNoYWx" _
+	"fYmFkX2ZueBlmdW5jdGlvbiAoKSB7IHJldHVybiAxOyB9gYNjY" _
+	"2FwAQKA";
+like(
+	marshal_load_message(malformed_code_capture_blob),
+	/Capture in code record 0 must be a/,
+	"load rejects malformed code capture records",
+);
+
+let arity_message := "";
+try {
+	safe_to_dump( 1, 2 );
+}
+catch ( TypeException e ) {
+	arity_message := e{message};
+}
+like(
+	arity_message,
+	/expects 1 argument, got 2/,
+	"std/marshal functions check arity",
+);
+
+done_testing();

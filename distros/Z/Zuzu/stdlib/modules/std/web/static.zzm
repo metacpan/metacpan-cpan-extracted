@@ -1,0 +1,329 @@
+=encoding utf8
+
+=head1 NAME
+
+std/web/static - Static file controller for std/web routes.
+
+=head1 SYNOPSIS
+
+  from std/web import Routes;
+  from std/io import Path;
+
+  let routes := new Routes();
+  routes.get("/img/*path").to(
+    controller: "std/web/static#StaticHandler",
+    action: "handle",
+    root: new Path("public/img"),
+  );
+
+=head1 DESCRIPTION
+
+This module provides a lazy-loadable C<std/web> controller for serving
+static files. Configuration is supplied through route defaults, so the
+same C<StaticHandler> class can be shared by multiple static routes.
+
+The handler rejects absolute request paths, path traversal, and paths
+escaping the configured root. Directory listings are disabled unless the
+route enables them.
+
+=head1 EXPORTS
+
+=head2 C<StaticHandler>
+
+Static methods:
+
+=over
+
+=item * C<handle(req)>
+
+Serves the file indicated by the route capture. The route must supply a
+C<root> default. Optional defaults are C<path_param>, C<index_files>,
+C<directory_indexes>, C<cache_control>, and C<content_types>.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/web/static >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/data/xml/escape import escape_xml;
+from std/digest/sha import sha256_hex;
+from std/io import Path;
+from std/net/url import escape;
+from std/string import chr, index, join, rindex, split, substr;
+from std/time import Time, TimeFormat, TimeZone;
+from std/web import Response;
+
+let _MIME_TYPES := {
+	".avif":  "image/avif",
+	".css":   "text/css; charset=UTF-8",
+	".gif":   "image/gif",
+	".html":  "text/html; charset=UTF-8",
+	".htm":   "text/html; charset=UTF-8",
+	".ico":   "image/x-icon",
+	".jpeg":  "image/jpeg",
+	".jpg":   "image/jpeg",
+	".js":    "application/javascript; charset=UTF-8",
+	".json":  "application/json; charset=UTF-8",
+	".map":   "application/json; charset=UTF-8",
+	".mjs":   "application/javascript; charset=UTF-8",
+	".pdf":   "application/pdf",
+	".png":   "image/png",
+	".svg":   "image/svg+xml",
+	".txt":   "text/plain; charset=UTF-8",
+	".wasm":  "application/wasm",
+	".webp":  "image/webp",
+	".woff":  "font/woff",
+	".woff2": "font/woff2",
+	".xml":   "application/xml; charset=UTF-8",
+};
+
+function _response ( status, text ) {
+	return new Response(
+		status: status,
+		headers: { "Content-Type": "text/plain; charset=UTF-8" },
+		body: [ text ],
+	);
+}
+
+function _forbidden () {
+	return _response( 403, "Forbidden\n" );
+}
+
+function _not_found () {
+	return _response( 404, "Not Found\n" );
+}
+
+function _method_not_allowed () {
+	return new Response(
+		status: 405,
+		headers: { Allow: "GET, HEAD" },
+		body: [ "Method Not Allowed\n" ],
+	);
+}
+
+function _as_path ( value ) {
+	return value instanceof Path ? value : new Path( path: "" _ value );
+}
+
+function _stat_number ( stat, key, fallback := 0 ) {
+	let value := stat.get( key, fallback );
+	return value ≡ null ? fallback : value;
+}
+
+function _http_date ( epoch ) {
+	return (
+		new Time( epoch, timezone: TimeZone.offset(0) )
+	).to_rfc5322();
+}
+
+function _etag ( path ) {
+	return "\"" _ sha256_hex( path.slurp() ) _ "\"";
+}
+
+function _extension ( path ) {
+	let name := path.basename();
+	let dot := rindex( name, "." );
+	return "" if dot <= 0;
+	return lc( substr( name, dot ) );
+}
+
+function _content_type ( path, overrides ) {
+	let ext := _extension(path);
+	if ( overrides instanceof Dict ) {
+		return overrides.get( ext, overrides.get( substr( ext, 1 ), null ) )
+			if ext ≢ "";
+	}
+	return _MIME_TYPES.get( ext, "application/octet-stream" );
+}
+
+function _safe_parts ( raw ) {
+	let text := "" _ raw;
+	return null if substr( text, 0, 1 ) ≡ "/";
+	return null if text ~ /^[A-Za-z]:/;
+	return null if index( text, chr(92) ) >= 0;
+
+	let out := [];
+	for ( let part in split( text, "/" ) ) {
+		next if part ≡ "";
+		return null if part ≡ "." or part ≡ "..";
+		out.push(part);
+	}
+	return out;
+}
+
+function _child_path ( root, raw ) {
+	let parts := _safe_parts(raw);
+	return null if parts ≡ null;
+	let out := root;
+	for ( let part in parts ) {
+		out := out.child(part);
+	}
+	return out;
+}
+
+function _under_root ( root, path ) {
+	return false unless path.exists();
+	let root_abs := root.absolute().to_String();
+	let path_real := path.realpath();
+	path_real := path.absolute() if path_real ≡ null;
+	let path_abs := path_real.to_String();
+	return true if path_abs ≡ root_abs;
+	return false unless substr( path_abs, 0, length root_abs ) ≡ root_abs;
+	let sep := substr( path_abs, length root_abs, 1 );
+	if ( sep ≡ "/" ) {
+		return true;
+	}
+	if ( sep ≡ chr(92) ) {
+		return true;
+	}
+	return false;
+}
+
+function _index_files ( req ) {
+	let value := req.param("index_files");
+	return value if value instanceof Array;
+	return [ "index.html", "index.htm" ];
+}
+
+function _find_index ( req, dir ) {
+	for ( let name in _index_files(req) ) {
+		let candidate := dir.child("" _ name);
+		return candidate if candidate.exists() and candidate.is_file();
+	}
+	return null;
+}
+
+function _listing_href ( prefix, name, is_dir ) {
+	let href := escape(name) _ ( is_dir ? "/" : "" );
+	return prefix _ href;
+}
+
+function _listing_prefix ( req, raw_path ) {
+	return "" if raw_path ≡ "";
+	let request_path := req.raw_path();
+	return "" if substr( request_path, length request_path - 1, 1 ) ≡ "/";
+	let parts := split( raw_path, "/" );
+	return escape( parts[ parts.length() - 1 ] ) _ "/";
+}
+
+function _directory_listing ( req, dir, raw_path ) {
+	return _forbidden() unless req.param("directory_indexes");
+
+	let title := "/" _ raw_path;
+	let rows := [];
+	let prefix := _listing_prefix( req, raw_path );
+	for ( let child in dir.children() ) {
+		let is_dir := child.is_dir();
+		let name := child.basename();
+		rows.push(
+			"<li><a href=\"" _
+			escape_xml( _listing_href( prefix, name, is_dir ) ) _
+			"\">" _
+			escape_xml( name _ ( is_dir ? "/" : "" ) ) _
+			"</a></li>",
+		);
+	}
+
+	let body := uc( req.request_method() ) ≡ "HEAD"
+		? []
+		: [
+			"<!doctype html>\n<title>",
+			escape_xml(title),
+			"</title>\n<h1>",
+			escape_xml(title),
+			"</h1>\n<ul>\n",
+			join( "\n", rows ),
+			"\n</ul>\n",
+		];
+
+	return new Response(
+		status: 200,
+		headers: { "Content-Type": "text/html; charset=UTF-8" },
+		body: body,
+	);
+}
+
+function _not_modified_since ( header, mtime ) {
+	return false if header ≡ null;
+	try {
+		return TimeFormat.rfc5322().parse(header).epoch() >= mtime;
+	}
+	catch {
+		return false;
+	}
+}
+
+function _not_modified ( req, etag, mtime ) {
+	return true if req.header("If-None-Match") ≡ etag;
+	return _not_modified_since( req.header("If-Modified-Since"), mtime );
+}
+
+function _file_response ( req, path ) {
+	let stat := path.stat();
+	let size := _stat_number( stat, "size" );
+	let mtime := _stat_number( stat, "mtime" );
+	let etag := _etag(path);
+	let headers := {
+		"Content-Type":   _content_type( path, req.param("content_types") ),
+		"Content-Length": size,
+		"ETag":           etag,
+		"Last-Modified":  _http_date(mtime),
+	};
+	headers.set( "Cache-Control", req.param("cache_control") )
+		if req.param("cache_control") ≢ null;
+
+	if ( _not_modified( req, etag, mtime ) ) {
+		return new Response( status: 304, headers: headers, body: [] );
+	}
+
+	let method_name := uc( req.request_method() );
+	let body := method_name ≡ "HEAD" ? [] : [ path.slurp() ];
+	return new Response( status: 200, headers: headers, body: body );
+}
+
+class StaticHandler {
+	static method handle ( req ) {
+		let method_name := uc( req.request_method() );
+		return _method_not_allowed()
+			unless method_name ≡ "GET" or method_name ≡ "HEAD";
+
+		let root_value := req.param("root");
+		return _not_found() if root_value ≡ null;
+
+		let root := _as_path(root_value);
+		return _not_found() unless root.exists() and root.is_dir();
+
+		let path_param := req.param("path_param");
+		path_param := "path" if path_param ≡ null;
+		let raw_path := req.param(path_param);
+		raw_path := "" if raw_path ≡ null;
+		let path := _child_path( root, raw_path );
+		return _forbidden() if path ≡ null;
+		return _not_found() unless path.exists();
+		return _forbidden() unless _under_root( root, path );
+
+		if ( path.is_dir() ) {
+			let index := _find_index( req, path );
+			if ( index ≢ null ) {
+				return _file_response( req, index );
+			}
+			return _directory_listing( req, path, raw_path );
+		}
+
+		return _not_found() unless path.is_file();
+
+		try {
+			return _file_response( req, path );
+		}
+		catch {
+			return _forbidden();
+		}
+	}
+}

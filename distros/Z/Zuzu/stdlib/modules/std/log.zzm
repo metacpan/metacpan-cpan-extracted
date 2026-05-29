@@ -1,0 +1,169 @@
+=encoding utf8
+
+=head1 NAME
+
+std/log - Structured logging helpers for scripts.
+
+=head1 SYNOPSIS
+
+  from std/log import Log;
+
+  Log.configure( {
+    level: "info",
+    timestamps: 1,
+    stderr_for_errors: 1,
+  } );
+
+  Log.info( "started" );
+  Log.warn( "missing value for ", "foo" );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module provides lightweight structured logging with level
+filtering, optional timestamps, and stderr routing for warnings and
+errors.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<Log>
+
+Static methods:
+
+=over
+
+=item * C<configure(options)>
+
+Parameters: C<options> is a dictionary with optional C<level>,
+C<timestamps>, and C<stderr_for_errors> fields. Returns: C<null>.
+Configures global logging behaviour.
+
+=item * C<level()>
+
+Parameters: none. Returns: C<String>. Returns the current level name.
+
+=item * C<debug(...)>, C<info(...)>, C<warn(...)>, C<error(...)>
+
+Parameters: C<parts> are values to concatenate into the message.
+Returns: C<null>. Writes one log line when the message level is enabled.
+
+=item * C<log(level, ...)>
+
+Parameters: C<level> is a level name and C<parts> are message values.
+Returns: C<null>. Writes one log line at the requested dynamic level.
+
+=back
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/log >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/string import join;
+
+
+let _LEVEL_NUM := {
+	debug: 10,
+	info: 20,
+	warn: 30,
+	error: 40,
+};
+
+let _CURRENT_LEVEL := _LEVEL_NUM{info};
+let _USE_TIMESTAMPS := 1;
+let _ERROR_TO_STDERR := 1;
+
+function _normalize_level ( raw_level ) {
+	let level_name := lc( raw_level ≡ null ? "info": "" _ raw_level );
+	if ( level_name in _LEVEL_NUM ) {
+		return level_name;
+	}
+	return "info";
+}
+
+function _current_level_name () {
+	for ( let name in [ "debug", "info", "warn", "error" ] ) {
+		if ( _LEVEL_NUM{( name )} ≡ _CURRENT_LEVEL ) {
+			return name;
+		}
+	}
+	return "info";
+}
+
+function _emit ( level, parts ) {
+	let normalized := _normalize_level(level);
+	let numeric := _LEVEL_NUM{( normalized )};
+	if ( numeric < _CURRENT_LEVEL ) {
+		return null;
+	}
+
+	let prefix := uc(normalized);
+	if ( _USE_TIMESTAMPS ) {
+		prefix := `TIME ${prefix}`;
+	}
+	let line := prefix _ " " _ join( "", parts );
+	if ( _ERROR_TO_STDERR and numeric >= _LEVEL_NUM{warn} ) {
+		warn(line);
+	}
+	else {
+		say(line);
+	}
+
+	return null;
+}
+
+class Log {
+	static method configure ( options ) {
+		if ( options instanceof Dict ) {
+			if ( "level" in options ) {
+				let level_name := _normalize_level( options{level} );
+				_CURRENT_LEVEL := _LEVEL_NUM{( level_name )};
+			}
+			if ( "timestamps" in options ) {
+				_USE_TIMESTAMPS := options{timestamps} ? 1: 0;
+			}
+			if ( "stderr_for_errors" in options ) {
+				_ERROR_TO_STDERR := options{stderr_for_errors} ? 1: 0;
+			}
+		}
+		return null;
+	}
+
+	static method level () {
+		return _current_level_name();
+	}
+
+	static method log ( level, ...parts ) {
+		return _emit( level, parts );
+	}
+
+	static method debug ( ...parts ) {
+		return _emit( "debug", parts );
+	}
+
+	static method info ( ...parts ) {
+		return _emit( "info", parts );
+	}
+
+	static method warn ( ...parts ) {
+		return _emit( "warn", parts );
+	}
+
+	static method error ( ...parts ) {
+		return _emit( "error", parts );
+	}
+}

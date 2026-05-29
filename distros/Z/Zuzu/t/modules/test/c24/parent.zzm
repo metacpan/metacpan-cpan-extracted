@@ -1,0 +1,5 @@
+class ParentDescribe {
+	method describe () {
+		return "parent";
+	}
+}

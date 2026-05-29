@@ -4,7 +4,9 @@
 # Virtual resolution is ALWAYS 3840 x 2160
 # it will be converted to the actual resolution when drawn
 # The commands are a subset of the actual GFB capabilites
-# Pixel sizes are depreciated
+
+# This may actually develop into a ridumentary language in
+#  the future.
 
 use strict;
 
@@ -18,16 +20,16 @@ use constant {
 # use Data::Dumper::Simple;
 
 BEGIN {
-    our $VERSION = '0.04';
+    our $VERSION = '0.05';
 }
 
 my $delay = 1;
 
 GetOptions(
-    'wait=i' => \$delay,
+    'delay|wait=f' => \$delay,
 );
 
-my $F = Graphics::Framebuffer->new('SPLASH' => 0);
+my $F = Graphics::Framebuffer->new('SPLASH' => 0); # Open without fanfare
 
 $F->cls('OFF');
 $F->graphics_mode();
@@ -401,7 +403,7 @@ foreach my $name (sort(keys %{$cmd})) {
     print STDERR "$name\n";
 }
 parse(@text);
-sleep $delay;
+sleep $delay if ($delay);
 $F->cls('ON');
 $F->text_mode();
 
@@ -429,7 +431,7 @@ sub parse {
             warn "$c not found!";
         }
     } ## end foreach my $line (@cmds)
-    sleep $delay;
+    sleep $delay if ($delay);
 } ## end sub parse
 
 __END__
@@ -642,7 +644,7 @@ Note:  Not many framebuffer drivers support this.
 
 =item B<WAIT> seconds
 
-Waits for the given number of seconds before showing the remaining scripted primitives.  Seconds is an integer.
+Waits for the given number of seconds before showing the remaining scripted primitives.
 
 =item B<XOR_MODE>
 

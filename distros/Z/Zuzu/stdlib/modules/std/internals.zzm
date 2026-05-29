@@ -1,0 +1,139 @@
+=encoding utf8
+
+=head1 NAME
+
+std/internals - Runtime internals helpers for advanced modules.
+
+=head1 SYNOPSIS
+
+  from std/internals import class_name, classof, object_slots, ansi_esc,
+    ref_id, to_String, to_Number, to_Boolean, to_Regexp,
+    to_Regexp_with_flags,
+    make_instance, setprop, getprop, load_module;
+
+  let obj_class := class_name(some_object);
+  let obj_class_value := classof(some_object);
+  let slots := object_slots(some_object);
+  let id := ref_id(some_object);
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module provides low-level reflection helpers used by advanced
+pure-Zuzu modules (for example C<std/dump>). These functions are
+not intended for general application code.
+
+Special properties are lexical metadata, not symbol bindings.
+Calling C<setprop("paths", SomeClass)> does not create an identifier
+named C<paths>.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item * C<class_name(value)>
+
+Parameters: C<value> is any value. Returns: C<String> or C<null>.
+Returns the class name for object instances.
+
+=item * C<classof(value)>
+
+Parameters: C<value> is any value. Returns: class value or C<null>.
+Returns the class value for object and collection values.
+
+=item * C<object_slots(value)>
+
+Parameters: C<value> is any value. Returns: C<Dict> or C<null>. Returns
+a dictionary of object slots, excluding private underscore-prefixed
+slots.
+
+=item * C<ansi_esc()>
+
+Parameters: none. Returns: C<String>. Returns a one-character ANSI
+escape string.
+
+=item * C<ref_id(value)>
+
+Parameters: C<value> is any value. Returns: C<String> or C<null>.
+Returns a stable reference id for reference-like values to support cycle
+detection.
+
+=item * C<to_String(value)>
+
+Parameters: C<value> is any value. Returns: C<String>. Coerces
+C<value> using the same rules as string operators.
+
+=item * C<to_Number(value)>
+
+Parameters: C<value> is any value. Returns: C<Number>. Coerces
+C<value> using the same rules as numeric operators.
+
+=item * C<to_Boolean(value)>
+
+Parameters: C<value> is any value. Returns: C<Boolean>. Coerces
+C<value> using the same rules as logical operators and conditions.
+
+=item * C<to_Regexp(value)>
+
+Parameters: C<value> is a regexp or pattern-like value. Returns:
+C<Regexp>. Returns C<value> unchanged when it is a regexp, otherwise
+coerces it to a string and compiles it as a regexp.
+
+=item * C<to_Regexp_with_flags(value, flags)>
+
+Parameters: C<value> is a regexp or pattern-like value and C<flags> is a
+string of regexp flags. Returns: C<Regexp>. Coerces C<value> to a pattern
+and compiles it using C<flags>.
+
+=item * C<make_instance(klass, dict := null)>
+
+Parameters: C<klass> is a class value and C<dict> is an optional slot
+dictionary. Returns: object. Creates an instance without calling
+C<__build__>.
+
+=item * C<load_module(module, symbol := null)>
+
+Parameters: C<module> is a module name and C<symbol> is an optional
+export name. Returns: C<Dict> or value. Loads a module and returns all
+exports, or one named export.
+
+=item * C<setprop(key, value)>
+
+Parameters: C<key> is a string and C<value> is any value. Returns:
+C<null>. Sets a lexically scoped runtime special property on the current
+frame.
+
+=item * C<getprop(key)>
+
+Parameters: C<key> is a string. Returns: value or C<null>. Returns a
+lexically scoped runtime special property via outward lexical lookup.
+
+=back
+
+=head1 EXAMPLES
+
+  from std/internals import setprop, getprop;
+  from std/path/z import ZPath;
+
+  setprop( "paths", ZPath );
+  say( getprop( "paths" ) );   // Class object
+
+  do {
+    setprop( "paths", null );
+    say( getprop( "paths" ) ); // null (shadowed in this block)
+  };
+
+  say( getprop( "paths" ) );   // ZPath (outer lexical value)
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/internals >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.

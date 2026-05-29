@@ -1,0 +1,74 @@
+from std/data/cbor import CBOR, TaggedValue;
+from std/string/base64 import decode;
+from std/time import Time;
+from test/more import *;
+
+let codec := new CBOR();
+
+let encoded_map := codec.encode( { answer: 42 } );
+is( encoded_map, decode("oWZhbnN3ZXIYKg=="), "encode map to known CBOR bytes", );
+let decoded_map := codec.decode( encoded_map );
+is( decoded_map.get("answer"), 42, "decode returns dict with value", );
+ok( codec.encode_binarystring( { answer: 42 } ) instanceof BinaryString, "encode_binarystring returns BinaryString" );
+is( codec.decode_binarystring(encoded_map).get("answer"), 42, "decode_binarystring decodes CBOR bytes" );
+
+let text := "hello";
+let text_roundtrip := codec.decode( codec.encode(text) );
+is( text_roundtrip, text, "text string roundtrip", );
+
+let bytes := ~to_binary("ABC");
+let bytes_roundtrip := codec.decode( codec.encode(bytes) );
+is( typeof bytes_roundtrip, "BinaryString", "byte string roundtrip keeps BinaryString", );
+ok( bytes_roundtrip == bytes, "byte string roundtrip preserves payload", );
+
+let tagged := new TaggedValue( tag: 1, value: "2026-03-25" );
+let tagged_rt := codec.decode( codec.encode(tagged) );
+ok( tagged_rt instanceof TaggedValue, "decode tagged value into TaggedValue", );
+is( tagged_rt { tag }, 1, "tag preserved", );
+is( tagged_rt { value }, "2026-03-25", "tagged payload preserved", );
+
+let t := new Time( 1711324800 );
+let t_roundtrip := codec.decode( codec.encode(t) );
+ok( t_roundtrip instanceof Time, "tag 0 epoch value decodes as Time", );
+is( t_roundtrip.epoch(), 1711324800, "Time roundtrip keeps epoch seconds", );
+
+let set_encoded := codec.encode( << 3, 2, 1 >> );
+is( set_encoded, decode("2QECgwECAw=="), "Set encodes as tag 258 with sorted array payload", );
+let set_roundtrip := codec.decode(set_encoded);
+is( typeof set_roundtrip, "Set", "tag 258 decodes as Set", );
+is( set_roundtrip.sortnum(), [ 1, 2, 3 ], "Set tagged roundtrip preserves members", );
+
+do {
+	let nested := {{
+		foo: 1,
+		foo: 2,
+		bar: << 3, 2, 1 >>,
+		baz: <<< 3, 2, 1, 1 >>>,
+	}};
+	let expected := {
+		foo: 1,
+		bar: << 1, 2, 3 >>,
+		baz: [ 1, 1, 2, 3 ],
+	};
+	is( codec.decode( codec.encode(nested) ), expected, "CBOR encodes PairList, Set, and Bag as expected" );
+};
+
+let codec2 := new CBOR( pairlists: true );
+
+do {
+	let nested := {{
+		foo: 1,
+		foo: 2,
+		bar: << 3, 2, 1 >>,
+		baz: <<< 3, 2, 1, 1 >>>,
+	}};
+	let expected := {{
+		foo: 1,
+		foo: 2,
+		bar: << 1, 2, 3 >>,
+		baz: [ 1, 1, 2, 3 ],
+	}};
+	is( codec2.decode( codec2.encode(nested) ), expected, "CBOR(pairlists: true) encodes PairList, Set, and Bag as expected" );
+};
+
+done_testing();

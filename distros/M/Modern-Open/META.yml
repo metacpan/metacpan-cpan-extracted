@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: Modern-Open
-version: 0.15
+version: 0.16
 abstract: Autovivification, Autodie, and 3-args open support
 author:
   - ina <ina@cpan.org>
@@ -20,7 +20,7 @@ minimum_perl_version: 5.00503
 provides:
   Modern::Open:
     file: lib/Modern/Open.pm
-    version: 0.15
+    version: 0.16
 resources:
   license: http://dev.perl.org/licenses/
   bugtracker: https://github.com/ina-cpan/Modern-Open/issues

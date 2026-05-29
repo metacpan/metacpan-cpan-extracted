@@ -1,0 +1,33 @@
+from test/more import *;
+is( not true, 0, "keyword not works" );
+is( !0, 1, "! unary alias works" );
+is( ¬false, 1, "¬ unary alias works" );
+ok( true and true, "and works" );
+ok( not( true ⋀ false ), "⋀ works" );
+is( false or true, 1, "or works" );
+is( false ⋁ true, 1, "⋁ works" );
+is( true xor false, 1, "xor works" );
+is( true ⊻ true, 0, "⊻ works" );
+is( true nand true, 0, "nand works" );
+is( true ⊼ false, 1, "⊼ works" );
+
+class Numeric {
+
+	method to_Number () {
+		return 7;
+	}
+}
+
+let numeric := new Numeric();
+is( numeric + 5, 12, "numeric operators use custom to_Number for objects" );
+
+class Flag {
+
+	method to_Boolean () {
+		return 0;
+	}
+}
+
+let flag := new Flag();
+is( flag ? 1: 2, 2, "conditions use custom to_Boolean for objects" );
+done_testing();

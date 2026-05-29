@@ -1,0 +1,48 @@
+from test/more import *;
+
+plan(9);
+
+class Thing {
+	let String  s :=  "S";
+	let Number  n :=   42;
+	let Boolean b := true;
+	
+	method to_String () {
+		return s;
+	}
+	
+	method to_Number () {
+		return n;
+	}
+	
+	method to_Boolean () {
+		return b;
+	}
+}
+
+let a := new Thing ();
+let b := new Thing ( s: "t", n: 2, b: false );
+
+ok( a, "to_Boolean true" );
+ok( not b, "to_Boolean false" );
+
+if ( a ) {
+	pass( "to_Boolean true in if" );
+}
+else {
+	fail( "to_Boolean true in if" );
+}
+
+if ( b ) {
+	fail( "to_Boolean false in if" );
+}
+else {
+	pass( "to_Boolean false in if" );
+}
+
+is( a _ b, "St", "to_String concatenation" );
+is( lc a, "s", "to_String lc" );
+is( uc b, "T", "to_String uc" );
+
+is( a + b, 44, "to_Number addition" );
+is( a × b, 84, "to_Number multiplication" );

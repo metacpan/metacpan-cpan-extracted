@@ -1,0 +1,16 @@
+from std/template/z import ZTemplate;
+from test/c41/child import DisplayChild;
+from test/more import *;
+
+let obj := new DisplayChild( name: "Nori" );
+let data := {
+	label: obj.display_tag(),
+	name: obj.get_name(),
+};
+
+let tpl := new ZTemplate( string: "{{ label }}|{{ name }}" );
+let out := tpl.process(data);
+
+is( out, "tag:Nori|Nori", "template renders data derived from trait-backed method and inherited accessor" );
+
+done_testing();

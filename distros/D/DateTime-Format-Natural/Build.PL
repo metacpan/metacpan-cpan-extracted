@@ -34,7 +34,10 @@ my $build = Module::Build->new
                       'Test::MockTime::HiRes' => 0,
                       'Test::More' => 0,
                     },
-   recommends => { 'Date::Calc' => 0 },
+   recommends => {
+                   'Date::Calc' => 0,
+                   'DateTime::Calendar::Julian' => 0,
+                 },
    script_files => [ 'scripts/dateparse' ],
    license => 'perl',
    create_readme => 1,

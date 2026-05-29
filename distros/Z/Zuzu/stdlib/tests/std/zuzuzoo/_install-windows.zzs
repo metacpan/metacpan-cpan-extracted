@@ -1,0 +1,88 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/archive import Archive;
+from std/data/json import JSON;
+from std/io import Path;
+from std/zuzuzoo import Zuzuzoo;
+
+function ensure_dir ( path ) {
+	return true if path.exists();
+	let parent := path.parent();
+	ensure_dir(parent) if not parent.exists();
+	path.mkdir();
+	return true;
+}
+
+function root () {
+	let dir := Path.tempdir();
+	let lib := dir.child("lib");
+	let bin := dir.child("bin");
+	let meta := dir.child("meta");
+	ensure_dir(lib);
+	ensure_dir(bin);
+	ensure_dir(meta);
+	return {
+		dir_obj: dir,
+		lib_dir: lib.to_String(),
+		bin_dir: bin.to_String(),
+		meta_dir: meta.to_String(),
+		bin_obj: bin,
+		meta_obj: meta,
+	};
+}
+
+let archive := Path.tempfile();
+Archive.dump(
+	archive,
+	{
+		entries: [
+			{
+				path: "windows-app-1.0.0/zuzu-distribution.json",
+				data: to_binary(
+					"{\"name\":\"windows-app\",\"version\":\"1.0.0\"," _
+					"\"author\":\"Example\",\"license\":\"MIT\"}\n",
+				),
+			},
+			{
+				path: "windows-app-1.0.0/scripts/tool.zzs",
+				data: to_binary("say \"windows\";\n"),
+			},
+		],
+	},
+	"zip",
+);
+
+let target := root();
+let result := ( new Zuzuzoo(
+	windows: true,
+	lib_dir: target{lib_dir},
+	bin_dir: target{bin_dir},
+	meta_dir: target{meta_dir},
+	userprofile: target{dir_obj}.child("profile").to_String(),
+) ).install( archive.to_String(), { no_test: true } );
+ok( result{ok}, "Windows install succeeds with explicit roots" );
+ok( target{bin_obj}.child("tool.zzs").exists(), "script is installed" );
+ok( target{bin_obj}.child("tool.cmd").exists(), ".cmd wrapper is created" );
+like(
+	target{bin_obj}.child("tool.cmd").slurp_utf8(),
+	/^@echo off/,
+	"wrapper has cmd content",
+);
+like(
+	target{bin_obj}.child("tool.cmd").slurp_utf8(),
+	/zuzu "%~dp0tool\.zzs" %\*/,
+	"wrapper invokes script path and forwards arguments",
+);
+
+let metadata := ( new JSON() ).load(
+	target{meta_obj}.child("windows-app-1.0.0.json"),
+);
+is(
+	metadata{installed}{scripts}[0]{wrappers},
+	[ "tool.cmd" ],
+	"Windows wrapper is tracked in installed metadata",
+);
+
+done_testing();

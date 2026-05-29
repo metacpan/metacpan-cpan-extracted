@@ -1,0 +1,10 @@
+0.002   2026-05-28  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utilities from Filename::KeyValue 0.003+:
+          modify-keyvalue-filename, normalize-keyvalue-filename,
+          rename-add-keyvalue-filenames, rename-remove-keyvalue-filenames.
+
+
+0.001   2026-04-27  Released-By: PERLANCAR
+
+        - First release.

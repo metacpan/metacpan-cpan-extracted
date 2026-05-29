@@ -1,0 +1,149 @@
+from test/more import *;
+requires_capability( "fs" );
+requires_capability( "proc" );
+
+from std/data/json import JSON;
+from test/json_schema_fixtures import
+	collect_optional_fixture_files,
+	expected_optional_pass_count,
+	fixture_context,
+	fixture_relative_name,
+	is_expected_optional_pass,
+	run_fixture_file;
+
+let context := fixture_context();
+if ( context ≡ null ) {
+	skip_all( "FIXTURE_DIR is not set" );
+}
+
+let fixture_root := context {fixture_root};
+let loader := context {loader};
+
+function _todo_fail ( String name ) {
+	let old_todo := TODO;
+	TODO := "optional fixture not yet required";
+	fail(name);
+	TODO := old_todo;
+}
+
+function _todo_is ( got, expected, String name ) {
+	let old_todo := TODO;
+	TODO := "optional fixture not yet required";
+	is( got, expected, name );
+	TODO := old_todo;
+}
+
+function report_required_optional_assertion (
+	String kind,
+	String name,
+	String test_name,
+	got,
+	expected,
+	err,
+	Boolean failed,
+) {
+	if ( kind eq "diag" ) {
+		diag(err);
+	}
+	else if ( kind eq "throw" ) {
+		fail( name _ ": " _ test_name );
+		diag( "threw: " _ err );
+	}
+	else {
+		is( got, expected, name _ ": " _ test_name );
+	}
+}
+
+function report_diagnostic_optional_assertion (
+	String kind,
+	String name,
+	String test_name,
+	got,
+	expected,
+	err,
+	Boolean failed,
+) {
+	if ( kind eq "diag" ) {
+		diag(err);
+	}
+	else if ( kind eq "throw" ) {
+		_todo_fail( name _ ": " _ test_name );
+		diag( "threw: " _ err );
+	}
+	else {
+		_todo_is( got, expected, name _ ": " _ test_name );
+	}
+}
+
+let optional_files := collect_optional_fixture_files(fixture_root);
+is(
+	optional_files.length(),
+	34,
+	"all optional draft2020-12 fixture files are covered",
+);
+
+let expected_optional_files := [];
+let diagnostic_optional_files := [];
+for ( let path in optional_files ) {
+	let name := fixture_relative_name( fixture_root, path );
+	if ( is_expected_optional_pass(name) ) {
+		expected_optional_files.push(path);
+	}
+	else {
+		diagnostic_optional_files.push(path);
+	}
+}
+
+is(
+	expected_optional_files.length(),
+	expected_optional_pass_count(),
+	"all expected-passing optional draft2020-12 fixture files are covered",
+);
+
+let json := new JSON();
+let optional_ran := 0;
+let expected_optional_ran := 0;
+let expected_optional_failed := 0;
+
+for ( let path in expected_optional_files ) {
+	let name := fixture_relative_name( fixture_root, path );
+	let result := run_fixture_file(
+		json,
+		loader,
+		path,
+		name,
+		report_required_optional_assertion,
+	);
+	optional_ran += result {ran};
+	expected_optional_ran += result {ran};
+	expected_optional_failed += result {failed};
+}
+
+for ( let path in diagnostic_optional_files ) {
+	let result := run_fixture_file(
+		json,
+		loader,
+		path,
+		fixture_relative_name( fixture_root, path ),
+		report_diagnostic_optional_assertion,
+	);
+	optional_ran += result {ran};
+}
+
+is(
+	expected_optional_failed,
+	0,
+	"all expected-passing optional draft2020-12 fixtures pass",
+);
+
+is(
+	expected_optional_ran,
+	400,
+	"all expected-passing optional draft2020-12 fixture assertions ran",
+);
+
+diag(
+	"Ran " _ optional_ran _ " optional JSON Schema draft2020-12 fixture assertions.",
+);
+
+done_testing();

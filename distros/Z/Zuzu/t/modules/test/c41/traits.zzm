@@ -1,0 +1,5 @@
+trait DisplayTag {
+	method display_tag () {
+		return "tag:" _ self.get_name();
+	}
+}

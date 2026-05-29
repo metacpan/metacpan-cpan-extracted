@@ -1,0 +1,23 @@
+from std/digest/md5 import *;
+from test/more import *;
+
+let payload := to_binary("abc");
+
+is( md5_hex(payload), "900150983cd24fb0d6963f7d28e17f72", "md5_hex matches known vector", );
+is( md5_b64(payload), "kAFQmDzST7DWlj99KOF/cg", "md5_b64 matches known vector", );
+is( length md5(payload), 16, "md5 returns 16-byte BinaryString", );
+is( typeof md5(payload), "BinaryString", "md5 returns BinaryString", );
+
+like( exception( function() {
+	md5("abc");
+} ), /TypeException: md5 expects BinaryString, got String/, "md5 rejects String input", );
+
+like( exception( function() {
+	md5_hex("abc");
+} ), /TypeException: md5_hex expects BinaryString, got String/, "md5_hex rejects String input", );
+
+like( exception( function() {
+	md5_b64("abc");
+} ), /TypeException: md5_b64 expects BinaryString, got String/, "md5_b64 rejects String input", );
+
+done_testing();

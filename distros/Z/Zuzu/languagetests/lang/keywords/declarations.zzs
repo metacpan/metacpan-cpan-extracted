@@ -1,0 +1,13 @@
+from test/more import *;
+let score := 5;
+score += 2;
+const label := "zuzu";
+let Number total;
+total := 9;
+total /= 2;
+let Any anything := [ 1, 2, 3 ];
+is( score, 7, "let declarations are mutable" );
+is( label, "zuzu", "const declarations bind values" );
+is( total, 4.5, "typed let declarations enforce numeric storage" );
+is( anything.length(), 3, "Any typed declarations accept arrays" );
+done_testing();

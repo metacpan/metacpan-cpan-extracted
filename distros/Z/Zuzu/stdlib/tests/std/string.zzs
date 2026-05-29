@@ -1,0 +1,70 @@
+from std/string import *;
+from test/more import *;
+is( length "a☃😀z", 4, "length counts characters" );
+is( substr( "abcdef", 1, 3 ), "bcd", "substr with length" );
+is( substr( "abcdef", 2 ), "cdef", "substr without length" );
+is( substr( "a☃😀z", 2, 1 ), "😀", "substr uses character offset" );
+is( substr( "a☃😀z", 3 ), "z", "substr without length uses character offset" );
+is( index( "abcdef", "cd" ), 2, "index finds needle" );
+is( rindex( "ababa", "ba" ), 3, "rindex finds from right" );
+is( index( "a☃😀z", "😀" ), 2, "index returns character offset" );
+is( index( "a☃😀z", "z", 3 ), 3, "index start is character offset" );
+is( rindex( "a☃b☃z", "☃" ), 3, "rindex returns character offset" );
+is( rindex( "a☃b☃z", "☃", 1 ), 1, "rindex limit is character offset" );
+is( contains( "a☃😀z", "☃😀" ), true, "contains finds substring" );
+is( contains( "a☃😀z", "snow" ), false, "contains returns false for miss" );
+is( starts_with( "a☃😀z", "a☃" ), true, "starts_with finds prefix" );
+is( starts_with( "a☃😀z", "☃" ), false, "starts_with rejects non-prefix" );
+is( ends_with( "a☃😀z", "😀z" ), true, "ends_with finds suffix" );
+is( ends_with( "a☃😀z", "😀" ), false, "ends_with rejects non-suffix" );
+is( chr(65), "A", "chr builds ASCII character" );
+is( chr(9731), "☃", "chr builds BMP character" );
+is( chr(128512), "😀", "chr builds astral character" );
+is( ord("A"), 65, "ord returns ASCII code point" );
+is( ord("a☃😀", 1), 9731, "ord indexes by character" );
+is( ord("a☃😀", 2), 128512, "ord returns astral code point" );
+like( exception( function() { chr(55296); } ), /surrogate/, "chr rejects surrogate code points" );
+like( exception( function() { ord("", 0); } ), /range/, "ord rejects out-of-range index" );
+is( search( "Hello World", /world/i ), "World", "search accepts regexp literal" );
+is( search( "abc123", /\d+/ ), "123", "search returns matched text" );
+is( search( "abcdef", /\d+/ ), null, "search returns null on no match" );
+is( matches( "abc123", /\d+/ ), true, "matches returns true for regexp hit" );
+is( matches( "abcdef", /\d+/ ), false, "matches returns false for regexp miss" );
+is( replace( "foo FOO food", /foo/i, "bar" ), "bar FOO food", "replace accepts regexp literal", );
+is( replace( "foo FOO food", /foo/i, "bar", "g" ), "bar bar bard", "replace accepts regex literal with global flag",
+    );
+is( replace( "abc123def", /\d+/, "NUM" ), "abcNUMdef", "replace with regex literal digits", );
+let built := pattern_to_regexp( "fo{2}" );
+is( search( "abcfooxyz", built ), "foo", "pattern_to_regexp builds regexp object" );
+is( "" _ built, "fo{2}", "pattern_to_regexp preserves source pattern" );
+let built_ci := pattern_to_regexp( "fo{2}", true );
+is( search( "abcFOOxyz", built_ci ), "FOO", "pattern_to_regexp supports case-insensitive flag" );
+is(
+	quotemeta( "Zia.+(nap)?/[den]\"'\\" ),
+	```Zia\.\+\(nap\)\?\/\[den\]\"\'\\```,
+	"quotemeta escapes regexp metacharacters, slash, quotes, and backslash",
+);
+let raw_label := "Zia.+";
+ok(
+	"zia.+: sleepy" ~ /^${quotemeta(raw_label)}:/i,
+	"quotemeta output can be interpolated into regexp literals",
+);
+ok(
+	not( "Ziax: sleepy" ~ /^${quotemeta(raw_label)}:/ ),
+	"quotemeta prevents metacharacters from matching as regexp syntax",
+);
+is( sprint( "%s = %d", "count", 7 ), "count = 7", "sprint formats strings", );
+let pieces := split( "alpha,beta,gamma","," );
+is( pieces.length(), 3, "split wrapper" );
+is( pieces.get( 1, "" ), "beta", "split yields expected part" );
+is( join( "|", pieces ), "alpha|beta|gamma", "join wrapper" );
+is( trim("  hello \n"), "hello", "trim wrapper" );
+is( pad( "7", 3, "0", "left" ), "007", "pad left" );
+is( pad( "7", 3, "0" ), "700", "pad right default" );
+is( chomp("line\n"), "line", "chomp removes final newline" );
+is( chomp("line"), "line", "chomp keeps non-newline text" );
+is( title( "hello_world-value" ), "Hello World Value", "title case" );
+is( snake( "HelloWorld value" ), "hello_world_value", "snake case" );
+is( kebab( "HelloWorld value" ), "hello-world-value", "kebab case" );
+is( camel( "hello_world value" ), "helloWorldValue", "camel case" );
+done_testing();

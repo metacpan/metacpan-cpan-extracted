@@ -1,0 +1,19 @@
+from std/net/http import CookieJar, UserAgent;
+from test/more import *;
+
+let jar := new CookieJar();
+let ua := new UserAgent( cookie_jar: jar, timeout: 1 );
+
+await {
+	ua.get_async( "http://127.0.0.1:1/" );
+};
+jar.add( "https://example.com/", "sid=abc123; Path=/" );
+await {
+	ua.get_async( "https://example.com/" );
+};
+
+let header := jar.cookie_header( "https://example.com/" );
+
+like( header, /sid=abc123/, "cookie jar retains cookie across async requests" );
+
+done_testing();

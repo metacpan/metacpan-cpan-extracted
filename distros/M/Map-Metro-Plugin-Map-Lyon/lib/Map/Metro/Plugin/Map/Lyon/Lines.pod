@@ -1,4 +1,3 @@
-
 # PODNAME: Map::Metro::Plugin::Map::Lyon::Lines
 # ABSTRACT: Lines and stations in the Lyon map
 
@@ -14,7 +13,7 @@ Map::Metro::Plugin::Map::Lyon::Lines - Lines and stations in the Lyon map
 
 =head1 VERSION
 
-version 1.000
+version 1.001
 
 =head1 LINES
 
@@ -37,20 +36,22 @@ version 1.000
     Laurent Bonnevay - Astroballe
     Vaulx-en-Velin - La Soie
 
-=head2 Line B: Charpennes - Charles Hernu → Gare d'Oullins [B]
+=head2 Line B: Charpennes - Charles Hernu → Saint-Genis-Laval - Hôpital Lyon Sud [B]
 
 =for HTML <div style="background-color: #007dc5; margin-top: -23px; margin-left: 10px; height: 3px; width: 98%;"></div>
 
-    Charpennes - Charles Hernu          (A)
+    Charpennes - Charles Hernu            (A)
     Brotteaux
     Part-Dieu
     Place Guichard - Bourse du Travail
-    Saxe - Gambetta                     (D)
+    Saxe - Gambetta                       (D)
     Jean Macé
     Place Jean Jaurès
     Debourg
-    Stade de Gerland
+    Stade de Gerland - Le LOU
     Gare d'Oullins
+    Oullins Centre
+    Saint-Genis-Laval - Hôpital Lyon Sud
 
 =head2 Line C: Cuire → Hôtel de Ville - Louis Pradel [C]
 
@@ -94,7 +95,7 @@ Philippe Bruhat (BooK) <book@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Philippe Bruhat (BooK) <book@cpan.org>.
+This software is copyright (c) 2026 by Philippe Bruhat (BooK).
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

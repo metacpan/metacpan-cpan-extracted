@@ -1,0 +1,34 @@
+from test/more import *;
+
+requires_capability( "fs" );
+requires_capability( "db" );
+
+from std/db import DB;
+from std/io import Path;
+from std/string import trim;
+from test/c60/child import WorkerChild as WorkerAlias;
+from test/c60/traits import Labelled;
+
+let worker := new WorkerAlias( name: "Mio" );
+let run := worker.emit_async_line();
+let line := await {
+	run();
+};
+
+let file := Path.tempfile();
+file.spew_utf8(line);
+
+let dbh := DB.temp();
+dbh.prepare( "create table logs (id integer, label text)" ).execute();
+let ins := dbh.prepare( "insert into logs (id, label) values (?, ?)" );
+ins.execute( 1, trim( file.slurp_utf8() ) );
+
+let q := dbh.prepare( "select id, label from logs" );
+q.execute();
+let row := q.next_typed_dict();
+
+is( row{id}, 1, "db typed readback keeps id" );
+is( row{label}, "worker:Mio", "alias import + inheritance + trait + async IO flow persists expected label" );
+ok( worker does Labelled, "worker instance reports composed trait" );
+
+done_testing();

@@ -1,0 +1,20 @@
+from std/net/url import *;
+from test/more import *;
+is( escape( "tea time+milk" ), "tea%20time%2Bmilk", "escape percent-encodes unsafe bytes", );
+is( unescape( "tea%20time%2Bmilk" ), "tea time+milk", "unescape decodes percent escapes", );
+let parsed := parse( "https://user@example.com:8443/a/b?x=1&y=two#frag" );
+is( parsed.get( "url", null ), "https://user@example.com:8443/a/b?x=1&y=two#frag", "parse returns full url",
+    );
+is( parsed.get( "scheme", null ), "https", "parse returns scheme" );
+is( parsed.get( "userinfo", null ), "user", "parse returns userinfo" );
+is( parsed.get( "host", null ), "example.com", "parse returns host" );
+is( parsed.get( "port", null ), "8443", "parse returns port" );
+is( parsed.get( "path", null ), "/a/b", "parse returns path" );
+is( parsed.get( "query", null ), "x=1&y=two", "parse returns query text" );
+is( parsed.get( "fragment", null ), "frag", "parse returns fragment text" );
+is( parsed.get( "query_params", {} ).get( "x", null ), "1", "parse decodes first query field" );
+is( parsed.get( "query_params", {} ).get( "y", null ), "two", "parse decodes second query field" );
+is( fill_template( "https://api.example.com/{version}/users/{id}{?q}", { version: "v1", id: 7, q: "tea time",
+    }, ), "https://api.example.com/v1/users/7?q=tea%20time", "fill_template expands URI templates",
+    );
+done_testing();

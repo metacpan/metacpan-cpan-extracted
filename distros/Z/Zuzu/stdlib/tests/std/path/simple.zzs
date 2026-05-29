@@ -1,0 +1,143 @@
+from std/path/simple import SimplePath;
+from test/more import *;
+
+let data := {
+	store: {
+		books: [
+			{
+				author: "Nigel Rees",
+				title: "Sayings of the Century",
+				price: 8.95,
+			},
+			{
+				author: "J. R. R. Tolkien",
+				title: "The Lord of the Rings",
+				isbn: "0-395-19395-8",
+				price: 22.99,
+			},
+		],
+	},
+};
+
+let p1 := new SimplePath( path: "store.books[*].author" );
+let names := p1.query(data);
+is( names.length(), 2, "query returns both author names" );
+is( names[0], "Nigel Rees", "first author" );
+is( names[1], "J. R. R. Tolkien", "second author" );
+is( p1.get(data).length(), 2, "get aliases query" );
+is( p1.select(data).length(), 2, "select aliases query" );
+is( p1.expression(), "store.books[*].author", "expression returns original path" );
+is( p1.first( data, "n/a" ), "Nigel Rees", "first returns first match" );
+ok( p1.exists(data), "exists true when matches are present" );
+
+let p2 := new SimplePath( path: "store.books[1].title" );
+is( p2.query(data)[0], "The Lord of the Rings", "positive index works" );
+
+let p3 := new SimplePath( path: "store.books[-1].price" );
+is( p3.query(data)[0], 22.99, "negative index counts from end" );
+
+let p4 := new SimplePath( path: "store.*" );
+is( p4.query(data).length(), 1, "dict wildcard yields direct values" );
+is( typeof p4.query(data)[0], "Array", "dict wildcard returned books array value" );
+
+let baggy := {
+	items: [ "x", "y" ].to_Bag(),
+};
+let p5 := new SimplePath( path: "items[*]" );
+let bag_values := p5.query(baggy);
+is( bag_values.length(), 2, "[*] supports Bag" );
+let bag_set := bag_values.to_Set();
+ok( bag_set.contains("x"), "bag wildcard includes x" );
+ok( bag_set.contains("y"), "bag wildcard includes y" );
+
+let p6 := new SimplePath( path: "store.books[99].author" );
+is( p6.query(data).length(), 0, "out-of-range index yields empty result" );
+is( p6.first( data, "fallback" ), "fallback", "first uses fallback when empty" );
+ok( not p6.exists(data), "exists false when no matches" );
+
+let assign_blob := {
+	store: {
+		books: [
+			{ author: "A" },
+			{ author: "B" },
+		],
+	},
+};
+
+let p7 := new SimplePath( path: "store.books[0].author" );
+is( p7.assign_first( assign_blob, "AA" ), "AA", "assign_first returns assigned value" );
+is( assign_blob{store}{books}[0]{author}, "AA", "assign_first mutates first match" );
+
+let p8 := new SimplePath( path: "store.books[*].author" );
+is( p8.assign_all( assign_blob, "Z" ), "Z", "assign_all returns assigned value" );
+is( assign_blob{store}{books}[0]{author}, "Z", "assign_all updates first result" );
+is( assign_blob{store}{books}[1]{author}, "Z", "assign_all updates all results" );
+
+let api_blob := {
+	store: {
+		books: [
+			{ author: "Ada", pages: 10 },
+			{ author: "Bob", pages: 20 },
+		],
+		meta: {
+			title: "Read Me",
+		},
+	},
+};
+
+let p9 := new SimplePath( path: "store.books[0].pages" );
+is(
+	p9.assign_first( api_blob, 5, "+=" ),
+	15,
+	"assign_first accepts compound operator argument",
+);
+is( api_blob{store}{books}[0]{pages}, 15, "compound assign_first mutates selected node" );
+
+let p10 := new SimplePath( path: "store.books[*].author" );
+is(
+	p10.assign_all( api_blob, "!", "_=" ),
+	"!",
+	"assign_all keeps ordinary RHS return contract with operator argument",
+);
+is( api_blob{store}{books}[0]{author}, "Ada!", "compound assign_all mutates first match" );
+is( api_blob{store}{books}[1]{author}, "Bob!", "compound assign_all mutates later match" );
+
+ok(
+	p9.assign_maybe( api_blob, 5, "+=" ),
+	"assign_maybe returns true on match",
+);
+is( api_blob{store}{books}[0]{pages}, 20, "assign_maybe updates first selected node" );
+
+let p11 := new SimplePath( path: "store.books[9].pages" );
+ok(
+	not p11.assign_maybe( api_blob, 1, "+=" ),
+	"assign_maybe returns false on no match",
+);
+
+let p12 := new SimplePath( path: "store.meta.title" );
+is(
+	p12.assign_first(
+		api_blob,
+		[ /read/i, fn m -> "Write" ],
+		"~=",
+	),
+	"Write Me",
+	"assign_first accepts structured ~= payload",
+);
+is( api_blob{store}{meta}{title}, "Write Me", "structured ~= mutates through SimplePath" );
+
+let title_ref := p12.ref_first(api_blob);
+is( title_ref(), "Write Me", "ref_first returns getter/setter closure" );
+is( title_ref("Manual"), "Manual", "ref_first setter returns assigned value" );
+is( api_blob{store}{meta}{title}, "Manual", "ref_first setter mutates target" );
+
+let author_refs := p10.ref_all(api_blob);
+is( author_refs.length(), 2, "ref_all returns one ref per selected target" );
+is( author_refs[1](), "Bob!", "ref_all getter reads later target" );
+author_refs[1]( "Bobby!" );
+is( api_blob{store}{books}[1]{author}, "Bobby!", "ref_all refs remain assignable" );
+
+is( p11.ref_maybe(api_blob), null, "ref_maybe returns null on no match" );
+is( p9.ref_maybe(api_blob)(), 20, "ref_maybe returns ref on match" );
+
+done_testing();

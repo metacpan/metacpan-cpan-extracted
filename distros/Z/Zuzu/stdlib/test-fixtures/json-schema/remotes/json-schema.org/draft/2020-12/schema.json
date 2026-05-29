@@ -1,0 +1,49 @@
+{
+  "$id": "https://json-schema.org/draft/2020-12/schema",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": [
+    "object",
+    "boolean"
+  ],
+  "properties": {
+    "$defs": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#"
+      }
+    },
+    "minLength": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "type": {
+      "anyOf": [
+        {
+          "enum": [
+            "array",
+            "boolean",
+            "integer",
+            "null",
+            "number",
+            "object",
+            "string"
+          ]
+        },
+        {
+          "type": "array",
+          "items": {
+            "enum": [
+              "array",
+              "boolean",
+              "integer",
+              "null",
+              "number",
+              "object",
+              "string"
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

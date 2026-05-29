@@ -1,0 +1,818 @@
+=encoding utf8
+
+=head1 NAME
+
+std/config - High-level configuration loading, merging, and querying.
+
+=head1 SYNOPSIS
+
+  from std/config import Config;
+  from std/io import Path;
+
+  let cfg := Config.load( [
+    Path.join( [ "config", "base.toml" ] ),
+    Path.join( [ "config", "local.json" ] ),
+  ] );
+
+  cfg.merge_flat(
+    {
+      "APP__port": "8080",
+      "APP__debug": "true",
+    },
+    {
+      prefix: "APP__",
+      separator: "__",
+      coerce: true,
+    },
+  );
+
+  let host := cfg @ "/database/host";
+  let port := cfg.get( "/port", 3000 );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Node and
+Electron. It is partially supported by zuzu-js in the browser: environment
+override and multi-format branch selection coverage passes, but the main
+filesystem-backed configuration coverage is unsupported.
+
+=head1 DESCRIPTION
+
+This module provides a C<Config> object for application-style
+configuration loading and overlaying.
+
+Use C<Config.from_data(...)> when you want to wrap an already-built
+Zuzu value instead of loading from files.
+
+It is intentionally geared toward patterns common in higher-level config
+frameworks:
+
+=over
+
+=item *
+
+load one or more files with format auto-detection,
+
+=item *
+
+deep-merge config layers,
+
+=item *
+
+apply flat overlays such as env-style C<FOO__BAR__BAZ> keys,
+
+=item *
+
+query config using ZPath and the C<@>, C<@@>, and C<@?> operators.
+
+=back
+
+The object itself is path-aware, so this works directly:
+
+  let city := cfg @ "/service/address/city";
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<Config>
+
+Static methods:
+
+=over
+
+=item * C<from_data(data, options?)>
+
+Parameters: C<data> is configuration data and C<options> controls
+metadata. Returns: C<Config>. Wraps data in a config object.
+
+=item * C<parse(text, format, options?)>
+
+Parameters: C<text> is config text, C<format> is a format name, and
+C<options> configures parsing. Returns: C<Config>. Parses text into a
+config object.
+
+=item * C<load(path_or_paths, options?)>
+
+Parameters: C<path_or_paths> is one source or an array of sources.
+Returns: C<Config>. Loads and layers config files.
+
+=item * C<detect_format(path_or_name, fallback?)>
+
+Parameters: C<path_or_name> is a path-like value and C<fallback> is
+optional. Returns: C<String> or C<null>. Detects the config format.
+
+=back
+
+Instance methods:
+
+=over
+
+=item * C<type()>, C<can_have_named_children()>, C<can_have_indexed_children()>, C<can_have_named_indexed_children()>, C<children()>, C<attributes()>
+
+Parameters: none. Returns: ZPath node metadata. Provides the inherited
+node API used when a C<Config> is queried as a path root.
+
+=item * C<do_action_on_child(child, action)>, C<ref_on_child(child)>
+
+Parameters: C<child> is a selected node and C<action> is a path action.
+Returns: value or C<Function>. Provides inherited mutation and reference
+support for path assignments.
+
+=item * C<to_data()>, C<clone()>
+
+Parameters: none. Returns: value or C<Config>. Returns raw data or a
+copy of the config.
+
+=item * C<source()>, C<format()>, C<layers()>
+
+Parameters: none. Returns: value. Returns config source metadata.
+
+=item * C<get(path, fallback?)>, C<get_all(path)>, C<select(path)>
+
+Parameters: C<path> is a path expression and C<fallback> is optional.
+Returns: value or C<Array>. Reads config values.
+
+=item * C<exists(path)>, C<require(path, message?)>
+
+Parameters: C<path> is a path expression and C<message> is optional.
+Returns: C<Boolean> or value. Tests for or requires a config value.
+
+=item * C<query(path)>, C<first(path, fallback?)>
+
+Parameters: C<path> is a path expression and C<fallback> is optional.
+Returns: C<Array> or value. Queries config values.
+
+=item * C<assign_first(path, value, op?)>
+
+Parameters: C<path> selects values, C<value> is assigned, and C<op> is
+optional. Returns: value. Updates the first match.
+
+=item * C<assign_all(path, value, op?)>
+
+Parameters: C<path> selects values, C<value> is assigned, and C<op> is
+optional. Returns: value. Updates every match.
+
+=item * C<assign_maybe(path, value, op?)>
+
+Parameters: C<path> selects values, C<value> is assigned, and C<op> is
+optional. Returns: C<Boolean>. Updates the first match when present.
+
+=item * C<ref_first(path)>, C<ref_all(path)>, C<ref_maybe(path)>
+
+Parameters: C<path> is a path expression. Returns: C<Function>,
+C<Array>, or C<null>. Returns reference-like accessors.
+
+=item * C<merge(data_or_config, options?)>, C<overlay(data_or_config, options?)>
+
+Parameters: C<data_or_config> is incoming data and C<options> controls
+merge behaviour. Returns: C<Config>. Merges configuration data.
+
+=item * C<merge_flat(values, options?)>, C<merge_env(values, options?)>
+
+Parameters: C<values> is flat config data and C<options> controls key
+mapping. Returns: C<Config>. Merges flat or environment-style values.
+
+=item * C<set(path, value)>, C<set_default(path, value)>
+
+Parameters: C<path> is a simple path and C<value> is any value. Returns:
+C<Config>. Sets or defaults a config value.
+
+=item * C<encode(format?, options?)>, C<save(path, options?)>
+
+Parameters: C<format>, C<path>, and C<options> control output. Returns:
+C<String> or C<Config>. Encodes or saves configuration data.
+
+=item * C<load_file(path, options?)>
+
+Parameters: C<path> is a config source and C<options> controls parsing.
+Returns: C<Config>. Loads one additional config file into the object.
+
+=back
+
+=back
+
+=head1 NOTES
+
+=over
+
+=item *
+
+C<merge> performs a deep merge for dictionaries.
+
+=item *
+
+Arrays are replaced by default; pass C<< { array_merge: "append" } >>
+to append instead.
+
+=item *
+
+C<set> and C<set_default> create missing parent dictionaries, but only
+for simple absolute paths such as C</server/port>. They intentionally do
+not try to create missing nodes for complex selectors or filters.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/config >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/cache/lru import Cache;
+from std/path/z import ZPath;
+from std/path/z/node import Node;
+from std/string import join, split, substr, trim;
+
+
+const _PATH_CACHE := new Cache( capacity: 50 );
+
+function _opt ( options, key, fallback := null ) {
+	if ( options instanceof Dict and options.exists(key) ) {
+		return options.get(key);
+	}
+	return fallback;
+}
+
+function _unwrap_config_value ( value ) {
+	if (
+		value ≢ null and
+		value can raw and
+		value can query and
+		value can merge
+	) {
+		return value.raw();
+	}
+	return value;
+}
+
+function _stringify_pathish ( pathish ) {
+	from std/io import Path;
+	if ( pathish instanceof Path ) {
+		return pathish.to_String();
+	}
+	return "" _ pathish;
+}
+
+function _normalize_format ( raw_format ) {
+	if ( raw_format ≡ null ) {
+		return null;
+	}
+
+	let fmt := lc( "" _ raw_format );
+	if ( fmt ≡ "yml" ) {
+		return "yaml";
+	}
+	return fmt;
+}
+
+function _detect_format_from_name ( source, fallback := null ) {
+	let text := lc( _stringify_pathish(source) );
+	let dot := null;
+	let i := length text - 1;
+	while ( i >= 0 ) {
+		let ch := substr( text, i, 1 );
+		if ( ch ≡ "." ) {
+			dot := i;
+			last;
+		}
+		if ( ch ≡ "/" or ch ≡ "\\" ) {
+			last;
+		}
+		i--;
+	}
+
+	if ( dot ≡ null or dot = length text - 1 ) {
+		return fallback;
+	}
+
+	return _normalize_format( substr( text, dot + 1 ) ) ?: fallback;
+}
+
+function _codec_for_format ( raw_format, options? ) {
+	let format := _normalize_format(raw_format);
+	if ( _opt( options, "codec", null ) ≢ null ) {
+		return _opt( options, "codec", null );
+	}
+
+	if ( format ≡ "json" ) {
+		from std/data/json import JSON;
+		return new JSON();
+	}
+	if ( format ≡ "yaml" ) {
+		from std/data/yaml import YAML;
+		return new YAML();
+	}
+	if ( format ≡ "toml" ) {
+		from std/data/toml import TOML;
+		return new TOML();
+	}
+	if ( format ≡ "ini" ) {
+		from std/data/ini import INI;
+		return new INI();
+	}
+	if ( format ≡ "toon" ) {
+		from std/data/toon import TOON;
+		return new TOON();
+	}
+
+	die `std/config does not know how to handle format '${format}'`;
+}
+
+function _ensure_path_object ( source ) {
+	from std/io import Path;
+	return source instanceof Path ? source : new Path( "" _ source );
+}
+
+function _compile_path ( pathish ) {
+	if ( pathish instanceof ZPath ) {
+		return pathish;
+	}
+	if (
+		pathish can query and
+		pathish can first and
+		pathish can exists and
+		pathish can assign_first and
+		pathish can ref_first
+	) {
+		return pathish;
+	}
+
+	let expression := "" _ pathish;
+	return _PATH_CACHE.get(
+		expression,
+		fn path_text -> new ZPath( path: path_text ),
+	);
+}
+
+function _coerce_scalar_text ( raw_value, options? ) {
+	if ( not _opt( options, "coerce", false ) ) {
+		return raw_value;
+	}
+
+	if ( not( raw_value instanceof String ) ) {
+		return raw_value;
+	}
+
+	let text := trim(raw_value);
+	let lowered := lc(text);
+
+	if ( lowered ≡ "true" ) {
+		return true;
+	}
+	if ( lowered ≡ "false" ) {
+		return false;
+	}
+	if ( lowered ≡ "null" or lowered ≡ "~" ) {
+		return null;
+	}
+	if ( text ~ /^-?[0-9]+$/ ) {
+		return int(text);
+	}
+	if ( text ~ /^-?(?:[0-9]+\.[0-9]+|\.[0-9]+)$/ ) {
+		return 0 + text;
+	}
+	if (
+		length text >= 2 and
+		(
+			(
+				substr( text, 0, 1 ) ≡ "{" and
+				substr( text, length text - 1, 1 ) ≡ "}"
+			) or
+			(
+				substr( text, 0, 1 ) ≡ "[" and
+				substr( text, length text - 1, 1 ) ≡ "]"
+			)
+		)
+	) {
+		try {
+			from std/data/json import JSON;
+			return new JSON().decode(text);
+		}
+		catch {
+		}
+	}
+
+	return raw_value;
+}
+
+function _merge_values ( left, right, options? ) {
+	let left_value := _unwrap_config_value(left);
+	let right_value := _unwrap_config_value(right);
+
+	if ( left_value instanceof Dict and right_value instanceof Dict ) {
+		for ( let key in right_value.keys() ) {
+			if ( left_value.exists(key) ) {
+				left_value{(key)} := _merge_values(
+					left_value.get(key),
+					right_value.get(key),
+					options,
+				);
+			}
+			else {
+				left_value{(key)} := right_value.get(key);
+			}
+		}
+		return left_value;
+	}
+
+	if (
+		left_value instanceof Array and
+		right_value instanceof Array and
+		_opt( options, "array_merge", "replace" ) ≡ "append"
+	) {
+		for ( let item in right_value ) {
+			left_value.push(item);
+		}
+		return left_value;
+	}
+
+	return right_value;
+}
+
+function _simple_path_parts ( raw_path ) {
+	let text := "" _ raw_path;
+	if ( text ≡ "" ) {
+		return [];
+	}
+	if ( substr( text, 0, 1 ) ≡ "/" ) {
+		text := substr( text, 1 );
+	}
+	if ( text ≡ "" ) {
+		return [];
+	}
+
+	let parts := [];
+	for ( let part in split( text, "/" ) ) {
+		next if part ≡ "";
+		die `std/config simple path cannot contain complex selector '${part}'`
+			if part ~ /[\*\[\]#@\(\)]/;
+		parts.push(part);
+	}
+	return parts;
+}
+
+function _ensure_root_dict ( current ) {
+	if ( current ≡ null ) {
+		return {};
+	}
+	if ( current instanceof Dict ) {
+		return current;
+	}
+	die "std/config expected Dict root for simple path mutation";
+}
+
+class Config extends Node {
+	let _source := null;
+	let _format := null;
+	let _layers := [];
+
+	method __build__ () {
+		self.set_raw( self.raw ≡ null ? {}: self.raw );
+		_layers := _layers ≡ null ? []: _layers;
+		self._build_id();
+	}
+
+	static method detect_format ( source, fallback := null ) {
+		return _detect_format_from_name( source, fallback );
+	}
+
+	static method from_data ( data, options? ) {
+		return new Config(
+			raw: _unwrap_config_value(data),
+			_source: _opt( options, "source", null ),
+			_format: _normalize_format( _opt( options, "format", null ) ),
+			_layers: _opt( options, "layers", [] ),
+		);
+	}
+
+	static method parse ( text, format, options? ) {
+		let codec := _codec_for_format( format, options );
+		let layer_source := _opt( options, "source", null );
+		let decoded := codec.decode(text);
+		return new Config(
+			raw: decoded,
+			_source: layer_source,
+			_format: _normalize_format(format),
+			_layers: [
+				{
+					source: layer_source,
+					format: _normalize_format(format),
+				},
+			],
+		);
+	}
+
+	static method load ( sources, options? ) {
+		let cfg := new Config( raw: {}, _layers: [] );
+		for ( let source in ( sources instanceof Array ? sources : [ sources ] ) ) {
+			cfg.load_file( source, options );
+		}
+		return cfg;
+	}
+
+	method source () {
+		return _source;
+	}
+
+	method format () {
+		return _format;
+	}
+
+	method layers () {
+		return _layers;
+	}
+
+	method to_data () {
+		return self.raw;
+	}
+
+	method clone () {
+		let cloned := new Config( raw: _merge_values( {}, self.raw, {} ) );
+		cloned._layers := _layers.to_Array();
+		cloned._source := _source;
+		cloned._format := _format;
+		return cloned;
+	}
+
+	method _delegate_node () {
+		return Node.from_root( self.raw );
+	}
+
+	method type () {
+		return self._delegate_node().type();
+	}
+
+	method can_have_named_children () {
+		return self._delegate_node().can_have_named_children();
+	}
+
+	method can_have_indexed_children () {
+		return self._delegate_node().can_have_indexed_children();
+	}
+
+	method can_have_named_indexed_children () {
+		return self._delegate_node().can_have_named_indexed_children();
+	}
+
+	method children () {
+		let out := [];
+		for ( let child in self._delegate_node().children() ) {
+			out.push(
+				Node.wrap(
+					child.raw(),
+					self,
+					child.key(),
+					child.ix(),
+				),
+			);
+		}
+		return out;
+	}
+
+	method attributes () {
+		let out := [];
+		for ( let child in self._delegate_node().attributes() ) {
+			out.push(
+				Node.wrap(
+					child.raw(),
+					self,
+					child.key(),
+					child.ix(),
+				),
+			);
+		}
+		return out;
+	}
+
+	method do_action_on_child ( child, action ) {
+		return super( child, action ) if action{op} ne ":=";
+
+		let container := self.raw;
+		if ( container instanceof Dict ) {
+			let key := child.key();
+			die "Path assignment expects string dict key" if key ≡ null;
+			container{(key)} := action{value};
+			return action{value};
+		}
+		if ( container instanceof Array ) {
+			let ix := child.ix();
+			die "Path assignment expects numeric array index" if ix ≡ null;
+			container[ix] := action{value};
+			return action{value};
+		}
+		if ( container instanceof PairList ) {
+			let key := child.key();
+			die "Path assignment expects string pairlist key" if key ≡ null;
+			container.set( key, action{value} );
+			return action{value};
+		}
+		return super( child, action );
+	}
+
+	method ref_on_child ( child ) {
+		let container := self.raw;
+		if ( container instanceof Dict ) {
+			let key := child.key();
+			die "Path assignment expects string dict key" if key ≡ null;
+			return \ container{(key)};
+		}
+		if ( container instanceof Array ) {
+			let ix := child.ix();
+			die "Path assignment expects numeric array index" if ix ≡ null;
+			return \ container[ix];
+		}
+		if ( container instanceof PairList ) {
+			let key := child.key();
+			die "Path assignment expects string pairlist key" if key ≡ null;
+			return \ container{(key)};
+		}
+		return super(child);
+	}
+
+	method query ( pathish ) {
+		return _compile_path(pathish).query(self);
+	}
+
+	method select ( pathish ) {
+		return self.query(pathish);
+	}
+
+	method get_all ( pathish ) {
+		return self.query(pathish);
+	}
+
+	method first ( pathish, fallback? ) {
+		return _compile_path(pathish).first( self, fallback );
+	}
+
+	method get ( pathish, fallback? ) {
+		return self.first( pathish, fallback );
+	}
+
+	method exists ( pathish ) {
+		return _compile_path(pathish).exists(self);
+	}
+
+	method require ( pathish, message? ) {
+		if ( self.exists(pathish) ) {
+			return self.get(pathish);
+		}
+		die(
+			message ?:
+			`std/config required setting not found at '${pathish}'`
+		);
+	}
+
+	method assign_first ( pathish, value, op := ":=", weak := false ) {
+		return _compile_path(pathish).assign_first( self, value, op, weak );
+	}
+
+	method assign_all ( pathish, value, op := ":=", weak := false ) {
+		return _compile_path(pathish).assign_all( self, value, op, weak );
+	}
+
+	method assign_maybe ( pathish, value, op := ":=", weak := false ) {
+		return _compile_path(pathish).assign_maybe( self, value, op, weak );
+	}
+
+	method ref_first ( pathish ) {
+		return _compile_path(pathish).ref_first(self);
+	}
+
+	method ref_all ( pathish ) {
+		return _compile_path(pathish).ref_all(self);
+	}
+
+	method ref_maybe ( pathish ) {
+		return _compile_path(pathish).ref_maybe(self);
+	}
+
+	method merge ( other, options? ) {
+		let incoming := _unwrap_config_value(other);
+		self.set_raw( _merge_values( self.raw, incoming, options ) );
+		return self;
+	}
+
+	method overlay ( other, options? ) {
+		return self.merge( other, options );
+	}
+
+	method merge_flat ( values, options? ) {
+		return self if not( values instanceof Dict );
+
+		let prefix := "" _ _opt( options, "prefix", "" );
+		let separator := "" _ _opt( options, "separator", "__" );
+		let downcase := _opt( options, "lowercase", false );
+
+		for ( let key in values.keys() ) {
+			let name := "" _ key;
+			if ( prefix ≢ "" ) {
+				next if substr( name, 0, length prefix ) ne prefix;
+				name := substr( name, length prefix );
+			}
+			next if name ≡ "";
+
+			let parts := [];
+			for ( let part in split( name, separator ) ) {
+				next if part ≡ "";
+				parts.push( downcase ? lc(part) : part );
+			}
+			next if parts.length() = 0;
+
+			self.set(
+				"/" _ join( "/", parts ),
+				_coerce_scalar_text( values.get(key), options ),
+			);
+		}
+
+		return self;
+	}
+
+	method merge_env ( values, options? ) {
+		return self.merge_flat( values, options );
+	}
+
+	method set ( pathish, value ) {
+		let parts := _simple_path_parts(pathish);
+		if ( parts.length() = 0 ) {
+			self.set_raw(value);
+			return value;
+		}
+
+		self.set_raw( _ensure_root_dict( self.raw ) );
+		let cursor := self.raw;
+		let i := 0;
+		while ( i < parts.length() - 1 ) {
+			let key := parts[i];
+			if ( not cursor.exists(key) or cursor.get(key) ≡ null ) {
+				cursor{(key)} := {};
+			}
+			else if ( not( cursor.get(key) instanceof Dict ) ) {
+				die `std/config cannot create child path below non-Dict setting '${key}'`;
+			}
+			cursor := cursor.get(key);
+			i++;
+		}
+
+		cursor{(parts[parts.length() - 1])} := value;
+		return value;
+	}
+
+	method set_default ( pathish, value ) {
+		if ( not self.exists(pathish) or self.get(pathish) ≡ null ) {
+			return self.set( pathish, value );
+		}
+		return self.get(pathish);
+	}
+
+	method encode ( format?, options? ) {
+		let chosen := _normalize_format(
+			format ?: _format ?: "json"
+		);
+		return _codec_for_format( chosen, options ).encode( self.raw );
+	}
+
+	method save ( destination, options? ) {
+		let path := _ensure_path_object(destination);
+		let chosen := _normalize_format(
+			_opt( options, "format", null ) ?:
+			Config.detect_format( path, _format ?: "json" )
+		);
+		_codec_for_format( chosen, options ).dump( path, self.raw );
+		return path;
+	}
+
+	method load_file ( source, options? ) {
+		let path := _ensure_path_object(source);
+		if ( _opt( options, "optional", false ) and not path.exists() ) {
+			return self;
+		}
+
+		let chosen := _normalize_format(
+			_opt( options, "format", null ) ?:
+			Config.detect_format(path)
+		);
+		die `std/config could not determine format for '${path}'`
+			if chosen ≡ null;
+
+		let decoded := _codec_for_format( chosen, options ).load(path);
+		self.merge( decoded, options );
+
+		_source := path.to_String();
+		_format := chosen;
+		_layers.push(
+			{
+				source: _source,
+				format: chosen,
+			},
+		);
+		return self;
+	}
+}

@@ -1,0 +1,388 @@
+from std/path/z/parser import Parser;
+from std/path/z/evaluate import Evaluator;
+from std/path/z/context import Ctx;
+from std/path/z/operators import Operator;
+from test/more import *;
+from std/dump import Dumper;
+
+function parse_one ( p, src ) {
+	let terms := p.parse_top_level_terms(src);
+	is( terms.length(), 1, `one top-level term: ${src}` );
+	return terms[0];
+}
+
+let e := new Evaluator();
+let p := new Parser( allowed_operators: e.operator_definitions() );
+let elvis_p := new Parser(
+	allowed_operators: [
+		new Operator(
+			spelling: "?:",
+			kind: "ELVIS",
+			precedence: 1,
+		),
+	],
+);
+
+{
+	let ast := parse_one( p, "( 2 + 5 * 1 + 3 ) / 2" );
+	let got := e.eval_expr( ast, null );
+	is( got[0].primitive_value, 5, "evaluated a simple mathematical expression AST" );
+}
+
+{
+	let ctx := new Ctx( root: { x: 1 }, meta: { level: 2, trace: "on" } );
+	let nested := e.nested_ctx( ctx );
+	is( nested.meta(){level}, 3, "nested_ctx increments meta level" );
+	ok( not nested.meta().exists( "trace" ), "nested_ctx meta only keeps level" );
+}
+
+{
+	let ast := parse_one( p, "3 * 3 > 8" );
+	let got := e.eval_expr( ast, null );
+	is( got[0].primitive_value, true, "evaluated a simple true comparison AST" );
+}
+
+{
+	let ast := parse_one( p, "3 > 8" );
+	let got := e.eval_expr( ast, null );
+	is( got[0].primitive_value, false, "evaluated a simple false comparison AST" );
+}
+
+{
+	let ast := parse_one( p, "0 && bad-function()" );
+	let got := e.eval_expr( ast, null );
+	is( got[0].primitive_value, false, "short-circuit with &&" );
+}
+
+{
+	let ast := parse_one( p, "1 || bad-function()" );
+	let got := e.eval_expr( ast, null );
+	is( got[0].primitive_value, true, "short-circuit with ||" );
+}
+
+{
+	let ast := parse_one( elvis_p, "0 ?: 7" );
+	let got := e.eval_expr( ast, null );
+	is( got[0].primitive_value, 7, "opt-in Elvis evaluates fallback for falsey left side" );
+}
+
+{
+	let ast := parse_one( elvis_p, "5 ?: bad-function()" );
+	let got := e.eval_expr( ast, null );
+	is( got[0].primitive_value, 5, "opt-in Elvis short-circuits truthy left side" );
+}
+
+{
+	let ast := parse_one( p, "1|2|4&11" );
+	let got := e.eval_expr( ast, null );
+	is( got[0].primitive_value, 3, "bitwise" );
+}
+
+{
+	let ast := parse_one( p, "!0" );
+	let got := e.eval_expr( ast, null );
+	is( got[0].primitive_value, true, "unary not uses operator callback" );
+}
+
+{
+	let ast := parse_one( p, "~1" );
+	let got := e.eval_expr( ast, null );
+	is( got[0].primitive_value, ~1, "bitwise not uses operator callback" );
+}
+
+{
+	let ast := parse_one( p, "/foo/bar" );
+	let ctx := new Ctx( root: { foo: { bar: "baz" } } );
+	let got := e.eval_expr( ast, ctx );
+	is( got[0].primitive_value, "baz", "simple path" );
+}
+
+{
+	let ast := parse_one( p, "/foo[bar]" );
+	let ctx := new Ctx( root: { foo: { bar: "baz" } } );
+	let got := e.eval_expr( ast, ctx );
+	is( got[0].primitive_value, { bar: "baz" }, "simple path with filter" );
+}
+
+{
+	let ast := parse_one( p, "/foo[bar != \"bat\"]" );
+	let ctx := new Ctx( root: { foo: { bar: "baz" } } );
+	let got := e.eval_expr( ast, ctx );
+	is( got[0].primitive_value, { bar: "baz" }, "simple path with filter and expression" );
+}
+
+{
+	let ast := parse_one( p, "/foo[bar]/type()" );
+	let ctx := new Ctx( root: { foo: { bar: "baz" } } );
+	let got := e.eval_expr( ast, ctx );
+	is( got[0].primitive_value, "map", "simple path with filter and function (type)" );
+}
+
+{
+	let ast := parse_one( p, "/foo[bar]/key()" );
+	let ctx := new Ctx( root: { foo: { bar: "baz" } } );
+	let got := e.eval_expr( ast, ctx );
+	is( got[0].primitive_value, "foo", "simple path with filter and function (key)" );
+}
+
+{
+	let ast := parse_one( p, "key(/foo[bar])" );
+	let ctx := new Ctx( root: { foo: { bar: "baz" } } );
+	let got := e.eval_expr( ast, ctx );
+	is( got[0].primitive_value, "foo", "simple path with filter and function (key) with arg" );
+}
+
+{
+	let ast := parse_one( p, "sum(values/*, mixed/*)" );
+	let ctx := new Ctx(
+		root: {
+			values: [ 1, "2", 3.5 ],
+			mixed: [ 1, "oops", 2.5, null, "7" ],
+		},
+	);
+	let got := e.eval_expr( ast, ctx );
+	is( got[0].primitive_value, 17, "sum() ignores non-numeric nodes across multiple expressions" );
+}
+
+{
+	let ast := parse_one( p, "min(values/*, mixed/*)" );
+	let ctx := new Ctx(
+		root: {
+			values: [ 1, "2", 3.5 ],
+			mixed: [ 1, "oops", 2.5, null, "7" ],
+		},
+	);
+	let got := e.eval_expr( ast, ctx );
+	is( got[0].primitive_value, 1, "min() ignores non-numeric nodes across multiple expressions" );
+}
+
+{
+	let ast := parse_one( p, "max(values/*, mixed/*)" );
+	let ctx := new Ctx(
+		root: {
+			values: [ 1, "2", 3.5 ],
+			mixed: [ 1, "oops", 2.5, null, "7" ],
+		},
+	);
+	let got := e.eval_expr( ast, ctx );
+	is( got[0].primitive_value, 7, "max() ignores non-numeric nodes across multiple expressions" );
+}
+
+{
+	let ast := parse_one( p, "floor(solo, 9.9)" );
+	let ctx := new Ctx( root: { solo: 1.2 } );
+	let got := e.eval_expr( ast, ctx );
+	is( got[0].primitive_value, 1, "floor() supports one-or-more expressions" );
+}
+
+{
+	let ast := parse_one( p, "round(solo, 9.9)" );
+	let ctx := new Ctx( root: { solo: 1.2 } );
+	let got := e.eval_expr( ast, ctx );
+	is( got[0].primitive_value, 1, "round() supports one-or-more expressions" );
+}
+
+{
+	let ast := parse_one( p, "/foo/escape()" );
+	let ctx := new Ctx( root: { foo: "<tag attr=\"x\"> & 'y'" } );
+	let got := e.eval_expr( ast, ctx );
+	is(
+		got[0].primitive_value,
+		"&lt;tag attr=&quot;x&quot;&gt; &amp; &apos;y&apos;",
+		"escape() with zero args uses the current node",
+	);
+}
+
+{
+	let ast := parse_one( p, "escape(left, right)" );
+	let ctx := new Ctx( root: { left: "<l>", right: "\"r\"" } );
+	let got := e.eval_expr( ast, ctx );
+	is( got.length(), 2, "escape() supports one-or-more expressions" );
+	is( got[0].primitive_value, "&lt;l&gt;", "escape() escaped first expression value" );
+	is( got[1].primitive_value, "&quot;r&quot;", "escape() escaped second expression value" );
+}
+
+{
+	let ast := parse_one( p, "/foo/unescape()" );
+	let ctx := new Ctx( root: { foo: "&lt;a&gt;&amp;&quot;b&quot;" } );
+	let got := e.eval_expr( ast, ctx );
+	is( got[0].primitive_value, "<a>&\"b\"", "unescape() with zero args uses the current node" );
+}
+
+{
+	let ast := parse_one( p, "unescape(left, right)" );
+	let ctx := new Ctx(
+		root: {
+			left: "&lt;l&gt;",
+			right: "&apos;r&apos;",
+			dec: "&#65;",
+			hex: "&#x41;",
+		},
+	);
+	let got := e.eval_expr( ast, ctx );
+	is( got.length(), 2, "unescape() supports one-or-more expressions" );
+	is( got[0].primitive_value, "<l>", "unescape() decoded first expression value" );
+	is( got[1].primitive_value, "'r'", "unescape() decoded second expression value" );
+}
+
+{
+	let ast := parse_one( p, "unescape(dec, hex)" );
+	let ctx := new Ctx( root: { dec: "&#65;", hex: "&#x41;" } );
+	let got := e.eval_expr( ast, ctx );
+	is( got.length(), 2, "unescape() decodes numeric XML entities for one-or-more expressions" );
+	is( got[0].primitive_value, "A", "unescape() decodes decimal XML numeric entities" );
+	is( got[1].primitive_value, "A", "unescape() decodes hexadecimal XML numeric entities" );
+}
+
+{
+	let ast := parse_one( p, "/foo/upper-case()" );
+	let ctx := new Ctx( root: { foo: "MiXeD" } );
+	let got := e.eval_expr( ast, ctx );
+	is( got[0].primitive_value, "MIXED", "upper-case() with zero args uses the current node" );
+}
+
+{
+	let ast := parse_one( p, "upper-case(left, right)" );
+	let ctx := new Ctx( root: { left: "Ada", right: "beTa" } );
+	let got := e.eval_expr( ast, ctx );
+	is( got.length(), 2, "upper-case() supports one-or-more expressions" );
+	is( got[0].primitive_value, "ADA", "upper-case() uppercases first expression value" );
+	is( got[1].primitive_value, "BETA", "upper-case() uppercases second expression value" );
+}
+
+{
+	let ast := parse_one( p, "/foo/lower-case()" );
+	let ctx := new Ctx( root: { foo: "MiXeD" } );
+	let got := e.eval_expr( ast, ctx );
+	is( got[0].primitive_value, "mixed", "lower-case() with zero args uses the current node" );
+}
+
+{
+	let ast := parse_one( p, "lower-case(left, right)" );
+	let ctx := new Ctx( root: { left: "Ada", right: "beTa" } );
+	let got := e.eval_expr( ast, ctx );
+	is( got.length(), 2, "lower-case() supports one-or-more expressions" );
+	is( got[0].primitive_value, "ada", "lower-case() lowercases first expression value" );
+	is( got[1].primitive_value, "beta", "lower-case() lowercases second expression value" );
+}
+
+{
+	let ast := parse_one( p, "/foo/index-of(\"cd\")" );
+	let ctx := new Ctx( root: { foo: "abcdef" } );
+	let got := e.eval_expr( ast, ctx );
+	is( got[0].primitive_value, 2, "index-of() with one arg uses the current node-set" );
+}
+
+{
+	let ast := parse_one( p, "index-of(\"na\", values/*)" );
+	let ctx := new Ctx( root: { values: [ "banana", "cabana" ] } );
+	let got := e.eval_expr( ast, ctx );
+	is( got.length(), 2, "index-of() supports explicit expression input" );
+	is( got[0].primitive_value, 2, "index-of() finds first match in first input string" );
+	is( got[1].primitive_value, 4, "index-of() finds first match in second input string" );
+}
+
+{
+	let ast := parse_one( p, "/foo/last-index-of(\"na\")" );
+	let ctx := new Ctx( root: { foo: "banana" } );
+	let got := e.eval_expr( ast, ctx );
+	is( got[0].primitive_value, 4, "last-index-of() with one arg uses the current node-set" );
+}
+
+{
+	let ast := parse_one( p, "last-index-of(\"zz\", values/*)" );
+	let ctx := new Ctx( root: { values: [ "banana", "cabana" ] } );
+	let got := e.eval_expr( ast, ctx );
+	is( got.length(), 2, "last-index-of() supports explicit expression input" );
+	is( got[0].primitive_value, -1, "last-index-of() returns -1 when not found (first input)" );
+	is( got[1].primitive_value, -1, "last-index-of() returns -1 when not found (second input)" );
+}
+
+{
+	let ast := parse_one( p, "/foo/substring(1, 3)" );
+	let ctx := new Ctx( root: { foo: "abcdef" } );
+	let got := e.eval_expr( ast, ctx );
+	is( got[0].primitive_value, "bcd", "substring() with two args uses the current node-set" );
+}
+
+{
+	let ast := parse_one( p, "substring(values/*, 2, 2)" );
+	let ctx := new Ctx( root: { values: [ "banana", "cabana" ] } );
+	let got := e.eval_expr( ast, ctx );
+	is( got.length(), 2, "substring() supports explicit expression input" );
+	is( got[0].primitive_value, "na", "substring() slices first input string" );
+	is( got[1].primitive_value, "ba", "substring() slices second input string" );
+}
+
+{
+	let ast := parse_one( p, "/foo/format(\"[%s]\")" );
+	let ctx := new Ctx( root: { foo: "banana" } );
+	let got := e.eval_expr( ast, ctx );
+	is( got[0].primitive_value, "[banana]", "format() with one arg uses the current node-set" );
+}
+
+{
+	let ast := parse_one( p, "format(\"[%s]\", values/*)" );
+	let ctx := new Ctx( root: { values: [ "banana", "cabana" ] } );
+	let got := e.eval_expr( ast, ctx );
+	is( got.length(), 2, "format() supports explicit expression input" );
+	is( got[0].primitive_value, "[banana]", "format() formats first input string" );
+	is( got[1].primitive_value, "[cabana]", "format() formats second input string" );
+}
+
+{
+	let ast := parse_one( p, "/foo/string-length()" );
+	let ctx := new Ctx( root: { foo: "banana" } );
+	let got := e.eval_expr( ast, ctx );
+	is( got[0].primitive_value, 6, "string-length() with zero args uses the current node-set" );
+}
+
+{
+	let ast := parse_one( p, "string-length(values/*)" );
+	let ctx := new Ctx( root: { values: [ "banana", "cabana" ] } );
+	let got := e.eval_expr( ast, ctx );
+	is( got.length(), 2, "string-length() supports explicit expression input" );
+	is( got[0].primitive_value, 6, "string-length() reports first input length" );
+	is( got[1].primitive_value, 6, "string-length() reports second input length" );
+}
+
+{
+	let ast := parse_one( p, "/foo/match(\"^ba\")" );
+	let ctx := new Ctx( root: { foo: "banana" } );
+	let got := e.eval_expr( ast, ctx );
+	is( got[0].primitive_value, true, "match() with one arg uses the current node-set" );
+}
+
+{
+	let ast := parse_one( p, "match(\"na$\", values/*)" );
+	let ctx := new Ctx( root: { values: [ "banana", "cabana" ] } );
+	let got := e.eval_expr( ast, ctx );
+	is( got.length(), 2, "match() supports explicit expression input" );
+	is( got[0].primitive_value, true, "match() tests first input string" );
+	is( got[1].primitive_value, true, "match() tests second input string" );
+}
+
+{
+	let ast := parse_one( p, "/foo/replace(\"na\", \"NA\")" );
+	let ctx := new Ctx( root: { foo: "banana" } );
+	let got := e.eval_expr( ast, ctx );
+	is( got[0].primitive_value, "baNAna", "replace() with two args uses the current node-set" );
+}
+
+{
+	let ast := parse_one( p, "replace(\"na\", \"NA\", values/*)" );
+	let ctx := new Ctx( root: { values: [ "banana", "cabana" ] } );
+	let got := e.eval_expr( ast, ctx );
+	is( got.length(), 2, "replace() supports explicit expression input" );
+	is( got[0].primitive_value, "baNAna", "replace() transforms first input string" );
+	is( got[1].primitive_value, "cabaNA", "replace() transforms second input string" );
+}
+
+{
+	let ast := parse_one( p, "join(\"|\", values/*)" );
+	let ctx := new Ctx( root: { values: [ "banana", "cabana" ] } );
+	let got := e.eval_expr( ast, ctx );
+	is( got[0].primitive_value, "banana|cabana", "join() supports explicit expression input" );
+}
+
+done_testing();

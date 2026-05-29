@@ -1,0 +1,4 @@
+from test/c41/parent import DisplayParent;
+from test/c41/traits import DisplayTag;
+
+class DisplayChild extends DisplayParent with DisplayTag;

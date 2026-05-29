@@ -1,0 +1,4 @@
+from test/c24/parent import ParentDescribe;
+from test/c24/traits import DescribeSuffix;
+
+class ChildDescribe extends ParentDescribe with DescribeSuffix;

@@ -1,0 +1,139 @@
+from std/string/quoted_printable import encode, decode;
+from std/string/base64 import
+	encode as b64_encode,
+	decode as b64_decode;
+from std/string import chr;
+from test/more import *;
+
+is(
+	typeof encode( to_binary("hello") ),
+	"String",
+	"encode returns String",
+);
+is(
+	typeof decode("hello"),
+	"BinaryString",
+	"decode returns BinaryString",
+);
+is(
+	encode( to_binary("hello") ),
+	"hello",
+	"safe printable ASCII encodes literally",
+);
+is(
+	encode( to_binary("a=b") ),
+	"a=3Db",
+	"equals sign is escaped",
+);
+is(
+	encode( b64_decode("/w=="), binary: true ),
+	"=FF",
+	"uppercase hex is used for non-printable bytes",
+);
+is(
+	encode( to_binary("AZaz09!<>~") ),
+	"AZaz09!<>~",
+	"safe literal byte ranges are preserved",
+);
+is(
+	encode( to_binary("hi \t") ),
+	"hi=20=09",
+	"trailing spaces and tabs are escaped",
+);
+is(
+	encode( to_binary("hi \nthere\t\r\n") ),
+	"hi=20\r\nthere=09\r\n",
+	"trailing whitespace before hard line breaks is escaped",
+);
+is(
+	encode( to_binary("a\rb\nc\r\nd"), newline: "\n" ),
+	"a\nb\nc\nd",
+	"non-binary mode normalizes line breaks",
+);
+is(
+	encode( to_binary("a\r\nb"), binary: true ),
+	"a=0D=0Ab",
+	"binary mode escapes CR and LF bytes",
+);
+is(
+	encode( to_binary("abcdefghijk"), line_length: 10 ),
+	"abcdefghi=\r\njk",
+	"encoder emits soft line breaks at the configured boundary",
+);
+is(
+	to_string( decode("abcdefghi=\r\njk") ),
+	"abcdefghijk",
+	"decoder removes CRLF soft breaks",
+);
+is(
+	to_string( decode("foo=\nbar") ),
+	"foobar",
+	"decoder removes LF soft breaks",
+);
+is(
+	to_string( decode("a=3db=0d=0A") ),
+	"a=b\r\n",
+	"decoder accepts lowercase hex escapes",
+);
+is(
+	to_string( decode("bad=XX=end") ),
+	"bad=XX=end",
+	"non-strict decode preserves malformed escapes literally",
+);
+like(
+	exception( function() {
+		decode( "bad=XX", strict: true );
+	}
+	),
+	/malformed quoted-printable escape/,
+	"strict decode rejects malformed escapes",
+);
+like(
+	exception( function() {
+		encode( to_binary("x"), wrap: 76 );
+	}
+	),
+	/option 'wrap' is not supported/,
+	"unknown options are rejected",
+);
+like(
+	exception( function() {
+		encode( to_binary("x"), line_length: 3 );
+	}
+	),
+	/line_length option must be at least 4/,
+	"line_length is validated",
+);
+like(
+	exception( function() {
+		encode( to_binary("x"), newline: 10 );
+	}
+	),
+	/newline option expects String/,
+	"newline option type is validated",
+);
+like(
+	exception( function() {
+		decode( "caf" _ chr(233) );
+	}
+	),
+	/non-ASCII input/,
+	"decode rejects non-ASCII input text",
+);
+
+let all_bytes := b64_decode(
+	"AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKiss"
+	_ "LS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVW"
+	_ "V1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn+A"
+	_ "gYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmq"
+	_ "q6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU"
+	_ "1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+"
+	_ "/w=="
+);
+is(
+	b64_encode( decode( encode( all_bytes, binary: true ) ) ),
+	b64_encode(all_bytes),
+	"binary quoted-printable round trips every byte value",
+);
+
+done_testing();

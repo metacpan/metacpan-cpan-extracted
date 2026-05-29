@@ -4,14 +4,14 @@ CXC::Exporter::Util - Tagged Based Exporting
 
 # VERSION
 
-version 0.11
+version 0.12
 
 # SYNOPSIS
 
 In the exporting code:
 
     package My::Exporter;
-    use CXC::Exporter::Util ':all';
+    use CXC::Exporter::Util ':constants';
 
     use parent 'Exporter' # or Exporter::Tiny
 
@@ -110,6 +110,8 @@ Constants are created via Perl's [constant](https://metacpan.org/pod/constant) p
 
 ["install\_CONSTANTS"](#install_constants) is passed sets of constants grouped by tags,
 e.g.:
+
+    use CXC::Export::Util ':constants';
 
     install_CONSTANTS( {
           DETECTORS => {
@@ -217,12 +219,11 @@ passed constant name alias to the constant value.  They differ in that
 no match, while ["ui\_assert\_coerce\_constant"](#ui_assert_coerce_constant) throws an exception.
 
 To make these helpers available to users of a constants module, import
-the `ui_helpers` tag (or the `all` tag) from `CXC::Exporter::Util`
-into that module:
+the `ui_helpers` tag from `CXC::Exporter::Util` into that module:
 
     package My::Constants;
     use parent 'Exporter::Tiny';
-    use CXC::Exporter::Util 'install_CONSTANTS', 'install_EXPORTS', ':ui_helpers';
+    use CXC::Exporter::Util ':constants', ':ui_helpers';
 
     install_CONSTANTS( { COLORS =>
                            { RED => 0xFF0000, YELLOW_GREEN => 0x00FFFF } } );
@@ -234,30 +235,6 @@ This adds a `ui_helpers` export tag to `My::Constants`.  Users of
     use My::Constants ':ui_helpers';
 
 or import them individually.
-
-- ui\_list\_constants
-
-        @names = ui_list_constants( $tag, ?$prefix );
-
-    Returns a list of accepted names for the constants with the given
-    `$tag`.  These names are lower-case alternatives with underscores
-    preserved and with underscores translated to hyphens.  The optional
-    `$prefix` strips a common literal constant-name prefix before aliases
-    are generated.
-
-- ui\_coerce\_constant
-
-        $value = ui_coerce_constant( $name, $tag, ?$prefix );
-
-    Maps an accepted constant name alias (see ["ui\_list\_constants"](#ui_list_constants)) to
-    the constant's value, returning unknown values unchanged.
-
-- ui\_assert\_coerce\_constant
-
-        $value = ui_assert_coerce_constant( $name, $tag, ?$prefix );
-
-    Performs the same coercion as ["ui\_coerce\_constant"](#ui_coerce_constant), but throws an
-    exception for unknown values.
 
 # SUBROUTINES
 
@@ -301,10 +278,13 @@ Available Options:
     (At present I don't know how to determine if [Sub::Exporter](https://metacpan.org/pod/Sub%3A%3AExporter) is used).
 
 This routine does the following in `$package` based upon
-`%EXPORT_TAGS` in `$package`:
+the contents of `$package`'s `%EXPORT_TAGS` hash:
 
-- Install the symbols specified via the `$EXPORT_TAGS{default}` tag into `@EXPORT`.
-- Install all of the symbols in `%EXPORT_TAGS` into `@EXPORT_OK`.
+- Copy the symbol names in  `$EXPORT_TAGS{default}` into `@EXPORT`.
+- Copy the symbol names in all of `%EXPORT_TAGS` into `@EXPORT_OK`.
+- Create an `all` tag which includes all of the symbols in
+`%EXPORT_TAGS`.
+- Create a `ui_helper` tag if requested (See ["UI Helpers"](#ui-helpers)).
 
 ## install\_CONSTANTS
 
@@ -528,10 +508,110 @@ constant function via the `constant_funcs` tag:
 
         use Package 'AGGREGATES';
 
-# BUGS
+## ui\_list\_constants
 
-No attempt is made to complain if enumerating functions' names clash
+    @names = ui_list_constants( $tag, ?$prefix );
+
+Returns a list of accepted names for the constants with the given
+`$tag`.  These names are lower-case alternatives with underscores
+preserved and with underscores translated to hyphens.  The optional
+`$prefix` strips a common literal constant-name prefix before aliases
+are generated.
+
+## ui\_coerce\_constant
+
+    $value = ui_coerce_constant( $name, $tag, ?$prefix );
+
+Maps an accepted constant name alias (see ["ui\_list\_constants"](#ui_list_constants)) to
+the constant's value, returning unknown values unchanged.
+
+## ui\_assert\_coerce\_constant
+
+    $value = ui_assert_coerce_constant( $name, $tag, ?$prefix );
+
+Performs the same coercion as ["ui\_coerce\_constant"](#ui_coerce_constant), but throws an
+exception for unknown values.
+
+# EXPORTS
+
+**CXC::Exporter::Util** supports the following export tags
+
+- all _DEPRECATED_
+
+        install_EXPORTS
+        install_CONSTANTS
+        install_constant_tag
+        install_constant_func
+
+    Use of the `all` tag is deprecated. Due to backwards compatibility
+    issues, it does not actually import all of **CXC::Exporter::Util**'s
+    symbols.  Use the other tags instead.
+
+- default, exports
+
+        install_EXPORTS
+
+    These are synonymous:
+
+        use CXC::Exporter::Util;
+        use CXC::Exporter::Util ':default';
+        use CXC::Exporter::Util ':exports';
+
+- constants
+
+        install_EXPORTS
+        install_CONSTANTS
+
+- utils
+
+        install_constant_tag
+        install_constant_func
+
+- ui\_helpers
+
+        ui_list_constants
+        ui_coerce_constant
+        ui_assert_coerce_constant
+
+# BUGS AND INCOMPATIBILITIES
+
+- No attempt is made to complain if enumerating functions' names clash
 with constant function names.
+- [namespace::clean](https://metacpan.org/pod/namespace%3A%3Aclean)
+
+    The ["UI Helpers"](#ui-helpers) routines are exported into your module, and are
+    made available for import by users of your module when they request
+    them directly or via the `ui_helpers` tag.
+
+    When your module uses [namespace::clean](https://metacpan.org/pod/namespace%3A%3Aclean), it's important not to scrub
+    the UI helpers from your module's namespace.  For example,
+
+        package Broken {
+          use parent 'Exporter::Tiny';
+          use CXC::Exporter::Util ':constants', ':ui_helpers';
+          use namespace::clean;
+          ...
+        }
+
+        package Use::Broken {
+          use Foo ':ui_helpers';
+        }
+
+    will fail because the UI helpers have been removed from `Broken`'s
+    namespace, while this works:
+
+        package Working {
+          use parent 'Exporter::Tiny';
+          use CXC::Exporter::Util ':constants';
+          use namespace::clean;
+          use CXC::Exporter::Util ':ui_helpers';
+
+          ...
+        }
+
+        package Use::Working {
+          use Foo ':ui_helpers';
+        }
 
 # EXAMPLES
 

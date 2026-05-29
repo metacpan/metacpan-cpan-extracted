@@ -1,0 +1,37 @@
+from test/more import *;
+
+class Node {
+	let name with get;
+	let parent with get, set, clear, has but weak;
+}
+
+function make_parent () {
+	return new Node( name: "parent" );
+}
+
+function child_with_dead_parent () {
+	let child := new Node( name: "child" );
+	{
+		let parent := make_parent();
+		child.set_parent(parent);
+		is( child.get_parent().get_name(), "parent", "weak accessor reads live parent" );
+		ok( child.has_parent(), "weak has accessor is true while referent lives" );
+	}
+	return child;
+}
+
+let parent := make_parent();
+let child := new Node( name: "child", parent: parent );
+
+is( child.get_parent().get_name(), "parent", "constructor stores weak field through field metadata" );
+child.set_parent(parent);
+is( child.get_parent().get_name(), "parent", "generated setter preserves weak field metadata" );
+child.clear_parent();
+is( child.get_parent(), null, "generated clear writes null normally" );
+ok( not child.has_parent(), "generated has is false after clear" );
+
+let orphan := child_with_dead_parent();
+is( orphan.get_parent(), null, "dead weak field reads as null" );
+ok( not orphan.has_parent(), "weak has accessor is false after referent disappears" );
+
+done_testing();

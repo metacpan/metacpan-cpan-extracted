@@ -1,0 +1,14 @@
+Revision history for Perl extension Net::STOMP::Client::Wrapper.
+
+0.03 2025-05-01
+  - Added stomp_connect_subscribe method
+  - Updated stomp_connect method to no longer subscribe
+  - Added send method
+  - Cleaned up destination property naming and documentation
+  - Fixed management_api_get_queue
+
+0.02 2025-05-01
+  - Added stomp_disconnect method which handles unsubscriptions
+
+0.01 2025-04-30
+  - original version; created by h2xs 1.23

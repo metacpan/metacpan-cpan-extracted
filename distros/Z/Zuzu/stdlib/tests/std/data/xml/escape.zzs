@@ -1,0 +1,28 @@
+from std/data/xml/escape import *;
+from test/more import *;
+
+is(
+	escape_xml( "<tea attr=\"hot\">& 'biscuits'</tea>" ),
+	"&lt;tea attr=&quot;hot&quot;&gt;&amp; &apos;biscuits&apos;&lt;/tea&gt;",
+	"escape_xml escapes XML-special characters",
+);
+
+is(
+	unescape_xml( "&lt;tea&gt;&amp;&quot;&apos;&lt;/tea&gt;" ),
+	"<tea>&\"'</tea>",
+	"unescape_xml decodes named XML entities",
+);
+
+is(
+	unescape_xml( "&#65;&#x41;" ),
+	"AA",
+	"unescape_xml decodes decimal and hexadecimal numeric entities",
+);
+
+is(
+	unescape_xml( "&amp;#65;" ),
+	"&#65;",
+	"unescape_xml keeps escaped numeric entities as one level of unescape",
+);
+
+done_testing();

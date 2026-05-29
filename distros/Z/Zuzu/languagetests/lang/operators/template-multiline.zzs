@@ -1,0 +1,11 @@
+from test/more import *;
+from std/eval import eval;
+
+let got := null;
+let err := exception( function () {
+	got := eval("```hi ${1}```;");
+} );
+is( err, null, "triple-backtick templates parse without throwing" );
+is( got, "hi 1", "triple-backtick templates interpolate expressions" );
+
+done_testing();

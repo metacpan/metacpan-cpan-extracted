@@ -1,0 +1,4 @@
+// Phase-0 design fixture (not yet enforced by runtime):
+// unequal byte lengths for &, |, ^ should throw Exception for now.
+plan(1);
+ok(1, "phase0 fixture placeholder: unequal bitwise lengths");

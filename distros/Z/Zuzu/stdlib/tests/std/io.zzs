@@ -1,0 +1,58 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/io import *;
+
+is( STDOUT can "print", 1, "STDOUT exports print", );
+is( STDOUT can "say", 1, "STDOUT exports say", );
+is( STDERR can "print", 1, "STDERR exports print", );
+is( STDERR can "say", 1, "STDERR exports say", );
+is( STDIN can "next_line", 1, "STDIN exports next_line", );
+is( STDIN can "each_line", 1, "STDIN exports each_line", );
+
+let file := Path.tempfile();
+let dir := Path.tempdir();
+is( ( new Path( path: file.to_String() ) ).to_String(), file.to_String(), "Path constructor accepts named path", );
+file.spew_utf8("one\ntwo\n");
+ok( dir.child("made").mkdir(), "mkdir creates directories", );
+ok( dir.child("made").is_dir(), "mkdir result is a directory", );
+ok(
+	dir.child("exclusive").mkdir_exclusive(),
+	"mkdir_exclusive creates one directory",
+);
+is(
+	dir.child("exclusive").mkdir_exclusive(),
+	false,
+	"mkdir_exclusive returns false for existing path",
+);
+dir.child("a.txt").touchpath();
+dir.child("b.txt").spew_utf8("x\n");
+is( file.is_absolute(), 1, "tempfile absolute", );
+let lines := [];
+file.each_line( function(line) {
+	lines.push(line);
+}
+);
+is( lines.length(), 2, "each_line count", );
+is( lines[0], "one\n", "each_line keeps newline", );
+is( file.next_line(), "one\n", "next_line first", );
+is( file.next_line(), "two\n", "next_line second", );
+is( file.next_line(), null, "next_line eof", );
+let children := dir.children();
+is( children.length() >= 2, 1, "children returns directory entries", );
+let iter := dir.iterator();
+let seen := 0;
+while ( iter.next() ≢ null ) {
+	seen++;
+}
+is( seen >= 2, 1, "iterator yields directory entries", );
+let joined := Path.join( [ dir.to_String(), "sub", "file.txt" ] );
+is( joined.basename(), "file.txt", "Path.join returns composed path", );
+let parts := Path.split( joined.to_String() );
+is( parts.length() >= 3, 1, "Path.split returns path components", );
+let normalized := Path.normalize( dir.child(".").child("a.txt").to_String() );
+is( normalized.basename(), "a.txt", "Path.normalize canonicalizes dotted paths", );
+let globbed := Path.glob( dir.to_String() _ "/*.txt" );
+is( globbed.length() >= 2, 1, "Path.glob finds files", );
+done_testing();

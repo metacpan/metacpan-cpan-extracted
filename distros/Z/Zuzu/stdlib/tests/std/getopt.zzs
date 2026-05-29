@@ -1,0 +1,27 @@
+from std/getopt import Getopt;
+from test/more import *;
+
+function parse_cli_args (argv) {
+	let parsed := Getopt.parse( argv, [ "verbose|v", "count|c=i", "name|n=s" ], );
+	let opts := parsed{options};
+	is( parsed{ok}, 1, "parse reports success" );
+	is( opts{verbose}, 1, "boolean flag is parsed" );
+	is( opts{count}, 7, "integer option is parsed" );
+	is( opts{name}, "zuzu", "string option is parsed" );
+	is( parsed{argv}.length(), 1, "one positional arg remains" );
+	is( parsed{argv} [0], "tail", "remaining positional arg is preserved" );
+
+	return 0;
+}
+
+is( parse_cli_args( [ "--verbose", "--count", "7", "--name", "zuzu", "tail" ] ), 0, "explicit argv parse works",
+    );
+let schema_parsed := Getopt.schema( [ "--count", "9", "tail" ], [ { name: "count", short: "c", type: Number,
+    required: true, desc: "count value" }, { name: "name", short: "n", type: String,
+    default: "anon" }, ], );
+is( schema_parsed{ok}, 1, "schema parse succeeds with defaults" );
+ok( schema_parsed{options}{count} ≢ null, "schema number option parsed" );
+is( schema_parsed{options}{name}, "anon", "schema default applied" );
+is( schema_parsed{argv} [0], "tail", "schema leaves positional args" );
+ok( schema_parsed{usage} ≢ null, "schema generates usage text", );
+done_testing();

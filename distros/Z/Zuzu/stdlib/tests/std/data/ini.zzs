@@ -1,0 +1,32 @@
+from std/data/ini import *;
+from test/more import *;
+let ini := new INI( pretty: true, canonical: true );
+let encoded := ini.encode( { "": { project: "zuzu" }, app: { debug: true, port: 5000, name: "tool" },
+    } );
+like( encoded, /project = "zuzu"\n\n\[app\]\ndebug = true\nname = "tool"\nport = 5000\n/, "INI encode emits canonical sections and keys" );
+let parsed := ini.decode( "project = \"zuzu\"\n[app]\nport = 5000\ndebug = true\nname = \"tool\"\n" );
+is( parsed{""}{project}, "zuzu", "decode reads default section" );
+is( parsed{app}{port}, 5000, "decode reads numeric scalar" );
+is( parsed{app}{ debug }, true, "decode reads boolean scalar" );
+ok( ini.encode_binarystring( { "": { project: "zuzu" } } ) instanceof BinaryString, "encode_binarystring returns BinaryString" );
+let parsed_binary := ini.decode_binarystring( to_binary("project = \"zuzu\"\n[app]\nname = \"café\"\n") );
+is( parsed_binary{app}{name}, "café", "decode_binarystring decodes UTF-8 INI bytes" );
+let setv := [ 3, 2, 1 ].to_Set();
+let bagv := [ 3, 2, 1, 1 ].to_Bag();
+let nested := {
+	"": {{
+		foo: 1,
+		foo: 2,
+		bar: setv,
+		baz: bagv,
+	}},
+};
+let simpler := {
+	"": {
+		foo: 1,
+		bar: [ 1, 2, 3 ],
+		baz: [ 1, 1, 2, 3 ],
+	},
+};
+is( ini.encode(nested), ini.encode(simpler), "INI encodes PairList, Set, and Bag as expected", );
+done_testing();

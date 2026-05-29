@@ -24,8 +24,10 @@ Saxe - Gambetta
 Jean Macé
 Place Jean Jaurès
 Debourg
-Stade de Gerland
+Stade de Gerland - Le LOU % :Stade de Gerland
 Gare d'Oullins
+Oullins Centre
+Saint-Genis-Laval - Hôpital Lyon Sud
 
 # Line C
 Hôtel de Ville - Louis Pradel % :Hôtel de Ville
@@ -81,8 +83,10 @@ MB|Place Guichard - Bourse du Travail|Saxe - Gambetta
 MB|Saxe - Gambetta|Jean Macé
 MB|Jean Macé|Place Jean Jaurès
 MB|Place Jean Jaurès|Debourg
-MB|Debourg|Stade de Gerland
-MB|Stade de Gerland|Gare d'Oullins
+MB|Debourg|Stade de Gerland - Le LOU
+MB|Stade de Gerland - Le LOU|Gare d'Oullins
+MB|Gare d'Oullins|Oullins Centre
+MB|Oullins Centre|Saint-Genis-Laval - Hôpital Lyon Sud
 
 MC|Hôtel de Ville - Louis Pradel|Croix-Paquet
 MC|Croix-Paquet|Croix-Rousse

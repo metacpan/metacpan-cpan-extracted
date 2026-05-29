@@ -1,0 +1,115 @@
+from std/path/z/parser import Parser;
+from std/path/z/evaluate import Evaluator;
+from std/path/z/operators import Operator;
+from test/more import *;
+
+function parse_one ( p, src ) {
+	let terms := p.parse_top_level_terms(src);
+	is( terms.length(), 1, `one top-level term: ${src}` );
+	return terms[0];
+}
+
+let e := new Evaluator();
+let p := new Parser( allowed_operators: e.operator_definitions() );
+
+let custom_term_p := new Parser(
+	allowed_operators: [
+		new Operator(
+			spelling: "===",
+			kind: "SAME",
+			precedence: 12,
+		),
+	],
+);
+
+let custom_term := parse_one( custom_term_p, "/ === other" );
+is( custom_term{t}, "bin", "custom operator terminates root path" );
+is( custom_term{op}, "===", "custom operator spelling is preserved" );
+is( custom_term{l}{t}, "path", "custom operator left side is root path" );
+is( custom_term{r}{s}[0]{n}, "other", "custom operator right side is path" );
+
+let pow_p := new Parser(
+	allowed_operators: [
+		new Operator(
+			spelling: "**",
+			kind: "POW",
+			precedence: 18,
+			require_ws: true,
+			right_assoc: true,
+		),
+	],
+);
+
+let pow := parse_one( pow_p, "2 ** 3 ** 2" );
+is( pow{op}, "**", "custom right-associative operator parses" );
+is( pow{r}{t}, "bin", "right-associative operator groups to the right" );
+is( pow{r}{op}, "**", "right nested operator is preserved" );
+
+let elvis_p := new Parser(
+	allowed_operators: [
+		new Operator(
+			spelling: "?:",
+			kind: "ELVIS",
+			precedence: 1,
+		),
+	],
+);
+
+let elvis_expr := parse_one( elvis_p, "0 ?: 7" );
+is( elvis_expr{t}, "elvis", "custom Elvis operator parses when opted in" );
+is( elvis_expr{c}{v}, 0, "custom Elvis condition is preserved" );
+is( elvis_expr{b}{v}, 7, "custom Elvis fallback is preserved" );
+
+let top_terms := p.parse_top_level_terms(
+	"a, union(**/bowl/*, **/fruit), \"x,y\""
+);
+is( top_terms.length(), 3, "parse_top_level_terms ignores nested commas" );
+is( top_terms[0]{t}, "path", "top-level term 0 parsed as path" );
+is( top_terms[1]{t}, "fn", "top-level term 1 parsed as function" );
+is( top_terms[2]{t}, "str", "top-level term 2 parsed as string" );
+
+let ex1 := parse_one( p, "..*" );
+is( ex1{t}, "path", "..* parses as path" );
+is( ex1{s}[0]{k}, "ancestors", "..* segment kind" );
+
+let ex2 := parse_one( p, "../tr[index() == 0]/td" );
+is( ex2{s}.length(), 3, "relative path has three segments" );
+is( ex2{s}[0]{k}, "parent", "first segment is parent" );
+is( ex2{s}[1]{k}, "name", "second segment is name" );
+is( ex2{s}[2]{n}, "td", "last segment name is td" );
+is( ex2{s}[1]{q}.length(), 1, "tr has one qualifier" );
+is( ex2{s}[1]{q}[0]{t}, "bin", "qualifier expression is binary" );
+
+let ex3 := parse_one( p, "car[!age || type(age) == \"null\"]" );
+is( ex3{s}[0]{k}, "name", "car path starts with name" );
+is( ex3{s}[0]{q}.length(), 1, "car has one qualifier" );
+is( ex3{s}[0]{q}[0]{op}, "||", "qualifier keeps logical-or operator" );
+
+let ex4 := parse_one( p, "union(**/bowl/*, **/fruit)" );
+is( ex4{t}, "fn", "union call parses as function" );
+is( ex4{n}, "union", "function name preserved" );
+is( ex4{a}.length(), 2, "function receives two args" );
+is( ex4{a}[0]{t}, "path", "function arg 0 is path" );
+is( ex4{a}[1]{t}, "path", "function arg 1 is path" );
+
+let ex5 := parse_one( p, "[@* == \"defn\"]" );
+is( ex5{s}[0]{k}, "dot", "leading qualifier implies dot segment" );
+is( ex5{s}[0]{q}[0]{t}, "bin", "dot qualifier parsed as binary" );
+
+let ex6 := parse_one( p, "list/*[index() % 2 == 0]" );
+is( ex6{s}[0]{n}, "list", "first segment is list" );
+is( ex6{s}[1]{k}, "star", "second segment is star" );
+is( ex6{s}[1]{q}.length(), 1, "star has one qualifier" );
+is( ex6{s}[1]{q}[0]{t}, "bin", "star qualifier is binary expression" );
+
+like(
+	exception( function () {
+		parse_one( p, "0 ?: 7" );
+	} ),
+	/Ternary operator '\?' requires whitespace/,
+	"ZPath parser does not opt in to Elvis",
+);
+
+is( p._trim( "  x  " ), "x", "_trim strips surrounding whitespace" );
+
+done_testing();

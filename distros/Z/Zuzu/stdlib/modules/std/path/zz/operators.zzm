@@ -1,0 +1,1036 @@
+=encoding utf8
+
+=head1 NAME
+
+std/path/zz/operators - Operator definitions for ZZPath expressions.
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module extends the base ZPath operator model with
+ZuzuScript-flavoured expression operators.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<Operator>
+
+ZZPath operator class extending C<std/path/z/operators> C<Operator>.
+
+=back
+
+=head2 Functions
+
+=over
+
+=item C<< string_operand(ev, ctx, expr) >>, C<< string_operands(ev, ctx, left, right) >>
+
+Parameters: evaluator, context, and expression AST nodes. Returns:
+C<String> or C<Array>. Evaluates one or two operands as strings.
+
+=item C<< first_eval_value(values) >>, C<< primitive_eval_value(values) >>
+
+Parameters: C<values> is an evaluated node array. Returns: value.
+Extracts the first or primitive value used by ZZPath operators.
+
+=item C<< collection_operand(ev, ctx, expr) >>
+
+Parameters: evaluator, context, and expression AST node. Returns:
+collection value. Evaluates an operand for collection operators.
+
+=item C<< builtin_can(value, method_name) >>
+
+Parameters: C<value> is any value and C<method_name> is a method name.
+Returns: C<Boolean>. Tests whether built-in values support a method.
+
+=back
+
+=head2 Constants
+
+=over
+
+=item C<STANDARD_OPERATORS>
+
+Type: C<Array>. Complete ZZPath operator definition table.
+
+=item C<logical_negation>, C<logical_and>, C<logical_nand>, C<logical_xor>, C<logical_or>
+
+Type: C<Function>. Logical operator implementations.
+
+=item C<numeric_power>, C<numeric_multiplication>, C<numeric_division>, C<numeric_modulus>, C<numeric_addition>, C<numeric_subtraction>, C<numeric_equality>, C<numeric_inequality>, C<numeric_less_than>, C<numeric_greater_than>, C<numeric_less_than_or_equal>, C<numeric_greater_than_or_equal>, C<numeric_compare>
+
+Type: C<Function>. Numeric operator implementations.
+
+=item C<string_concatenation>, C<string_equality>, C<string_inequality>, C<string_greater_than>, C<string_greater_than_or_equal>, C<string_less_than>, C<string_less_than_or_equal>, C<string_compare>, C<string_equality_insensitive>, C<string_inequality_insensitive>, C<string_greater_than_insensitive>, C<string_greater_than_or_equal_insensitive>, C<string_less_than_insensitive>, C<string_less_than_or_equal_insensitive>, C<string_compare_insensitive>
+
+Type: C<Function>. String operator implementations.
+
+=item C<regexp_match>, C<bitwise_and>, C<bitwise_xor>, C<bitwise_or>, C<set_union>, C<set_intersection>, C<set_difference>, C<collection_membership>, C<collection_non_membership>, C<set_subsetof>, C<set_supersetof>, C<set_equivalentof>, C<type_aware_equality>, C<type_aware_inequality>, C<object_can>
+
+Type: C<Function>. Regular expression, bitwise, collection, type-aware,
+and object capability operator implementations.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/path/zz/operators >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/path/z/operators import Operator as ZOperator;
+
+
+class Operator extends ZOperator;
+
+const logical_negation := function ( op, ev, ast, ctx, expr ) {
+	const got := ev.eval_expr( expr, ev.nested_ctx( ctx ) );
+	const value := got.length() > 0 ? got[0] : null;
+	return op.wrap( not ev.truthy(value) );
+};
+
+const numeric_power := function ( op, ev, ast, ctx, left, right ) {
+	const left_val  := op._handle_numeric_operand( ev, ctx, left );
+	const right_val := op._handle_numeric_operand( ev, ctx, right );
+	return op.wrap( left_val ** right_val );
+};
+
+const numeric_multiplication := function ( op, ev, ast, ctx, left, right ) {
+	const left_val  := op._handle_numeric_operand( ev, ctx, left );
+	const right_val := op._handle_numeric_operand( ev, ctx, right );
+	return op.wrap( left_val × right_val );
+};
+
+const numeric_division := function ( op, ev, ast, ctx, left, right ) {
+	const left_val  := op._handle_numeric_operand( ev, ctx, left );
+	const right_val := op._handle_numeric_operand( ev, ctx, right );
+	return op.wrap( left_val ÷ right_val );
+};
+
+const numeric_modulus := function ( op, ev, ast, ctx, left, right ) {
+	const left_val  := op._handle_numeric_operand( ev, ctx, left );
+	const right_val := op._handle_numeric_operand( ev, ctx, right );
+	return op.wrap( left_val mod right_val );
+};
+
+const numeric_addition := function ( op, ev, ast, ctx, left, right ) {
+	const left_val  := op._handle_numeric_operand( ev, ctx, left );
+	const right_val := op._handle_numeric_operand( ev, ctx, right );
+	return op.wrap( left_val + right_val );
+};
+
+const numeric_subtraction := function ( op, ev, ast, ctx, left, right ) {
+	const left_val  := op._handle_numeric_operand( ev, ctx, left );
+	const right_val := op._handle_numeric_operand( ev, ctx, right );
+	return op.wrap( left_val - right_val );
+};
+
+const numeric_equality := function ( op, ev, ast, ctx, left, right ) {
+	const left_val  := op._handle_numeric_operand( ev, ctx, left );
+	const right_val := op._handle_numeric_operand( ev, ctx, right );
+	return op.wrap( left_val = right_val );
+};
+
+const numeric_inequality := function ( op, ev, ast, ctx, left, right ) {
+	const left_val  := op._handle_numeric_operand( ev, ctx, left );
+	const right_val := op._handle_numeric_operand( ev, ctx, right );
+	return op.wrap( left_val ≠ right_val );
+};
+
+const numeric_less_than := function ( op, ev, ast, ctx, left, right ) {
+	const left_val  := op._handle_numeric_operand( ev, ctx, left );
+	const right_val := op._handle_numeric_operand( ev, ctx, right );
+	return op.wrap( left_val < right_val );
+};
+
+const numeric_greater_than := function ( op, ev, ast, ctx, left, right ) {
+	const left_val  := op._handle_numeric_operand( ev, ctx, left );
+	const right_val := op._handle_numeric_operand( ev, ctx, right );
+	return op.wrap( left_val > right_val );
+};
+
+const numeric_less_than_or_equal := function (
+	op,
+	ev,
+	ast,
+	ctx,
+	left,
+	right,
+) {
+	const left_val  := op._handle_numeric_operand( ev, ctx, left );
+	const right_val := op._handle_numeric_operand( ev, ctx, right );
+	return op.wrap( left_val ≤ right_val );
+};
+
+const numeric_greater_than_or_equal := function (
+	op,
+	ev,
+	ast,
+	ctx,
+	left,
+	right,
+) {
+	const left_val  := op._handle_numeric_operand( ev, ctx, left );
+	const right_val := op._handle_numeric_operand( ev, ctx, right );
+	return op.wrap( left_val ≥ right_val );
+};
+
+const numeric_compare := function ( op, ev, ast, ctx, left, right ) {
+	const left_val  := op._handle_numeric_operand( ev, ctx, left );
+	const right_val := op._handle_numeric_operand( ev, ctx, right );
+	return op.wrap( left_val <=> right_val );
+};
+
+function string_operand ( ev, ctx, expr ) {
+	const result := ev.eval_expr( expr, ev.nested_ctx( ctx ) );
+	return "" unless result.length;
+	const value := ev.to_string( result[0] );
+	return value ≡ null ? "" : "" _ value;
+}
+
+function string_operands ( ev, ctx, left, right ) {
+	return [
+		string_operand( ev, ctx, left ),
+		string_operand( ev, ctx, right ),
+	];
+}
+
+const string_concatenation := function ( op, ev, ast, ctx, left, right ) {
+	const values := string_operands( ev, ctx, left, right );
+	return op.wrap( values[0] _ values[1] );
+};
+
+const string_equality := function ( op, ev, ast, ctx, left, right ) {
+	const values := string_operands( ev, ctx, left, right );
+	return op.wrap( values[0] eq values[1] );
+};
+
+const string_inequality := function ( op, ev, ast, ctx, left, right ) {
+	const values := string_operands( ev, ctx, left, right );
+	return op.wrap( values[0] ne values[1] );
+};
+
+const string_greater_than := function ( op, ev, ast, ctx, left, right ) {
+	const values := string_operands( ev, ctx, left, right );
+	return op.wrap( values[0] gt values[1] );
+};
+
+const string_greater_than_or_equal := function ( op, ev, ast, ctx, left, right ) {
+	const values := string_operands( ev, ctx, left, right );
+	return op.wrap( values[0] ge values[1] );
+};
+
+const string_less_than := function ( op, ev, ast, ctx, left, right ) {
+	const values := string_operands( ev, ctx, left, right );
+	return op.wrap( values[0] lt values[1] );
+};
+
+const string_less_than_or_equal := function ( op, ev, ast, ctx, left, right ) {
+	const values := string_operands( ev, ctx, left, right );
+	return op.wrap( values[0] le values[1] );
+};
+
+const string_compare := function ( op, ev, ast, ctx, left, right ) {
+	const values := string_operands( ev, ctx, left, right );
+	return op.wrap( values[0] cmp values[1] );
+};
+
+const string_equality_insensitive := function ( op, ev, ast, ctx, left, right ) {
+	const values := string_operands( ev, ctx, left, right );
+	const left_val := lc values[0];
+	const right_val := lc values[1];
+	return op.wrap( left_val eq right_val );
+};
+
+const string_inequality_insensitive := function ( op, ev, ast, ctx, left, right ) {
+	const values := string_operands( ev, ctx, left, right );
+	const left_val := lc values[0];
+	const right_val := lc values[1];
+	return op.wrap( left_val ne right_val );
+};
+
+const string_greater_than_insensitive := function ( op, ev, ast, ctx, left, right ) {
+	const values := string_operands( ev, ctx, left, right );
+	const left_val := lc values[0];
+	const right_val := lc values[1];
+	return op.wrap( left_val gt right_val );
+};
+
+const string_greater_than_or_equal_insensitive := function (
+	op,
+	ev,
+	ast,
+	ctx,
+	left,
+	right,
+) {
+	const values := string_operands( ev, ctx, left, right );
+	const left_val := lc values[0];
+	const right_val := lc values[1];
+	return op.wrap( left_val ge right_val );
+};
+
+const string_less_than_insensitive := function ( op, ev, ast, ctx, left, right ) {
+	const values := string_operands( ev, ctx, left, right );
+	const left_val := lc values[0];
+	const right_val := lc values[1];
+	return op.wrap( left_val lt right_val );
+};
+
+const string_less_than_or_equal_insensitive := function (
+	op,
+	ev,
+	ast,
+	ctx,
+	left,
+	right,
+) {
+	const values := string_operands( ev, ctx, left, right );
+	const left_val := lc values[0];
+	const right_val := lc values[1];
+	return op.wrap( left_val le right_val );
+};
+
+const string_compare_insensitive := function ( op, ev, ast, ctx, left, right ) {
+	const values := string_operands( ev, ctx, left, right );
+	const left_val := lc values[0];
+	const right_val := lc values[1];
+	return op.wrap( left_val cmp right_val );
+};
+
+const regexp_match := function ( op, ev, ast, ctx, left, right ) {
+	const values := string_operands( ev, ctx, left, right );
+	return op.wrap( values[0] ~ values[1] );
+};
+
+const bitwise_and := function ( op, ev, ast, ctx, left, right ) {
+	const left_val  := op._handle_numeric_operand( ev, ctx, left );
+	const right_val := op._handle_numeric_operand( ev, ctx, right );
+	return op.wrap( left_val & right_val );
+};
+
+const bitwise_xor := function ( op, ev, ast, ctx, left, right ) {
+	const left_val  := op._handle_numeric_operand( ev, ctx, left );
+	const right_val := op._handle_numeric_operand( ev, ctx, right );
+	return op.wrap( left_val ^ right_val );
+};
+
+const bitwise_or := function ( op, ev, ast, ctx, left, right ) {
+	const left_val  := op._handle_numeric_operand( ev, ctx, left );
+	const right_val := op._handle_numeric_operand( ev, ctx, right );
+	return op.wrap( left_val | right_val );
+};
+
+function first_eval_value ( values ) {
+	return values.length() > 0 ? values[0] : null;
+}
+
+function primitive_eval_value ( values ) {
+	const first := first_eval_value(values);
+	return first ≡ null ? null : first.primitive_value();
+}
+
+function collection_operand ( ev, ctx, expr ) {
+	const values := ev.eval_expr( expr, ev.nested_ctx( ctx ) );
+	if ( values.length() = 1 ) {
+		return values[0].primitive_value();
+	}
+	return values.map( fn value → value.primitive_value() );
+}
+
+const logical_and := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	if ( ev.truthy( first_eval_value(left_vals) ) ) {
+		return ev.eval_expr( right, ev.nested_ctx( ctx ) );
+	}
+	return op.wrap(false);
+};
+
+const logical_nand := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	if ( not ev.truthy( first_eval_value(left_vals) ) ) {
+		return op.wrap(true);
+	}
+	const right_vals := ev.eval_expr( right, ev.nested_ctx( ctx ) );
+	return op.wrap( ev.truthy( first_eval_value(right_vals) ) ? false : true );
+};
+
+const logical_xor := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	const right_vals := ev.eval_expr( right, ev.nested_ctx( ctx ) );
+	const left_truth := ev.truthy( first_eval_value(left_vals) );
+	const right_truth := ev.truthy( first_eval_value(right_vals) );
+	return op.wrap( ( left_truth xor right_truth ) ? true : false );
+};
+
+const logical_or := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	if ( ev.truthy( first_eval_value(left_vals) ) ) {
+		return op.wrap(true);
+	}
+	const right_vals := ev.eval_expr( right, ev.nested_ctx( ctx ) );
+	return op.wrap( ev.truthy( first_eval_value(right_vals) ) ? true : false );
+};
+
+const set_union := function ( op, ev, ast, ctx, left, right ) {
+	const left_val := collection_operand( ev, ctx, left );
+	const right_val := collection_operand( ev, ctx, right );
+	return op.wrap( left_val union right_val );
+};
+
+const set_intersection := function ( op, ev, ast, ctx, left, right ) {
+	const left_val := collection_operand( ev, ctx, left );
+	const right_val := collection_operand( ev, ctx, right );
+	return op.wrap( left_val intersection right_val );
+};
+
+const set_difference := function ( op, ev, ast, ctx, left, right ) {
+	const left_val := collection_operand( ev, ctx, left );
+	const right_val := collection_operand( ev, ctx, right );
+	return op.wrap( left_val ∖ right_val );
+};
+
+const collection_membership := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	const left_val := primitive_eval_value(left_vals);
+	const right_val := collection_operand( ev, ctx, right );
+	return op.wrap( left_val in right_val );
+};
+
+const collection_non_membership := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	const left_val := primitive_eval_value(left_vals);
+	const right_val := collection_operand( ev, ctx, right );
+	return op.wrap( left_val ∉ right_val );
+};
+
+const set_subsetof := function ( op, ev, ast, ctx, left, right ) {
+	const left_val := collection_operand( ev, ctx, left );
+	const right_val := collection_operand( ev, ctx, right );
+	return op.wrap( left_val subsetof right_val );
+};
+
+const set_supersetof := function ( op, ev, ast, ctx, left, right ) {
+	const left_val := collection_operand( ev, ctx, left );
+	const right_val := collection_operand( ev, ctx, right );
+	return op.wrap( left_val supersetof right_val );
+};
+
+const set_equivalentof := function ( op, ev, ast, ctx, left, right ) {
+	const left_val := collection_operand( ev, ctx, left );
+	const right_val := collection_operand( ev, ctx, right );
+	return op.wrap( left_val equivalentof right_val );
+};
+
+const type_aware_equality := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	const right_vals := ev.eval_expr( right, ev.nested_ctx( ctx ) );
+	return op.wrap( ev.equals(
+		first_eval_value(left_vals),
+		first_eval_value(right_vals),
+	) );
+};
+
+const type_aware_inequality := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	const right_vals := ev.eval_expr( right, ev.nested_ctx( ctx ) );
+	return op.wrap( not ev.equals(
+		first_eval_value(left_vals),
+		first_eval_value(right_vals),
+	) );
+};
+
+function builtin_can ( value, method_name ) {
+	return false if value ≡ null
+		or method_name ≡ null
+		or method_name eq "";
+
+	if ( value instanceof Array or value instanceof Bag or value instanceof Set ) {
+		return method_name in [
+			"length",
+			"empty",
+			"contains",
+			"push",
+			"to_Array",
+			"to_Bag",
+			"to_Set",
+		];
+	}
+	if ( value instanceof Dict or value instanceof PairList ) {
+		return method_name in [
+			"length",
+			"empty",
+			"exists",
+			"keys",
+			"values",
+			"to_Array",
+		];
+	}
+	if ( value instanceof String or value instanceof BinaryString ) {
+		return method_name in [ "length" ];
+	}
+	return false;
+}
+
+const object_can := function ( op, ev, ast, ctx, left, right ) {
+	const left_vals := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+	const right_vals := ev.eval_expr( right, ev.nested_ctx( ctx ) );
+	const left_val := primitive_eval_value(left_vals);
+	const right_val := primitive_eval_value(right_vals);
+	return op.wrap(
+		( left_val can (right_val) ) or builtin_can( left_val, right_val )
+	);
+};
+
+const STANDARD_OPERATORS := [
+	new Operator(
+		spelling: "?:",
+		kind: "ELVIS",
+		precedence: 1,
+		lex_ignore: true,
+	),
+
+	new Operator(
+		spelling: "+",
+		kind: "UPLUS",
+		unary: true,
+		precedence: 20,
+		f: function ( op, ev, ast, ctx, expr ) {
+			const value := op._handle_numeric_operand( ev, ctx, expr );
+			return op.wrap( +value );
+		},
+	),
+	
+	new Operator(
+		spelling: "-",
+		kind: "UMINUS",
+		unary: true,
+		precedence: 20,
+		f: function ( op, ev, ast, ctx, expr ) {
+			const value := op._handle_numeric_operand( ev, ctx, expr );
+			return op.wrap( -value );
+		},
+	),
+	
+	new Operator(
+		spelling: "√",
+		kind: "SQRT",
+		unary: true,
+		precedence: 20,
+		f: function ( op, ev, ast, ctx, expr ) {
+			const value := op._handle_numeric_operand( ev, ctx, expr );
+			return op.wrap( sqrt value );
+		},
+	),
+	
+	new Operator(
+		spelling: "!",
+		kind: "NOT",
+		unary: true,
+		precedence: 20,
+		f: logical_negation,
+	),
+
+	new Operator(
+		spelling: "¬",
+		kind: "NOTSYM",
+		unary: true,
+		precedence: 20,
+		f: logical_negation,
+	),
+
+	new Operator(
+		spelling: "**",
+		kind: "POW",
+		require_ws: true,
+		right_assoc: true,
+		precedence: 13,
+		f: numeric_power,
+	),
+
+	new Operator(
+		spelling: "×",
+		kind: "TIMES_SIGN",
+		precedence: 12,
+		f: numeric_multiplication,
+	),
+
+	new Operator(
+		spelling: "*",
+		kind: "TIMES",
+		require_ws: true,
+		precedence: 12,
+		lex_ignore: true,
+		alias: "STAR",
+		f: numeric_multiplication,
+	),
+
+	new Operator(
+		spelling: "÷",
+		kind: "DIVIDE_SIGN",
+		precedence: 12,
+		f: numeric_division,
+	),
+
+	new Operator(
+		spelling: "/",
+		kind: "DIVIDE",
+		require_ws: true,
+		precedence: 12,
+		lex_ignore: true,
+		alias: "SLASH",
+		f: numeric_division,
+	),
+
+	new Operator(
+		spelling: "mod",
+		kind: "MOD",
+		precedence: 12,
+		f: numeric_modulus,
+	),
+
+	new Operator(
+		spelling: "+",
+		kind: "PLUS",
+		require_ws: true,
+		precedence: 11,
+		f: numeric_addition,
+	),
+
+	new Operator(
+		spelling: "-",
+		kind: "MINUS",
+		require_ws: true,
+		precedence: 11,
+		f: numeric_subtraction,
+	),
+
+	new Operator(
+		spelling: "=",
+		kind: "EQ",
+		precedence: 5,
+		f: numeric_equality,
+	),
+
+	new Operator(
+		spelling: "≠",
+		kind: "NE",
+		precedence: 5,
+		f: numeric_inequality,
+	),
+
+	new Operator(
+		spelling: "<",
+		kind: "LT",
+		precedence: 5,
+		f: numeric_less_than,
+	),
+
+	new Operator(
+		spelling: ">",
+		kind: "GT",
+		precedence: 5,
+		f: numeric_greater_than,
+	),
+
+	new Operator(
+		spelling: "≤",
+		kind: "LE_SIGN",
+		precedence: 5,
+		f: numeric_less_than_or_equal,
+	),
+
+	new Operator(
+		spelling: "<=",
+		kind: "LE",
+		precedence: 5,
+		f: numeric_less_than_or_equal,
+	),
+
+	new Operator(
+		spelling: "≥",
+		kind: "GE_SIGN",
+		precedence: 5,
+		f: numeric_greater_than_or_equal,
+	),
+
+	new Operator(
+		spelling: ">=",
+		kind: "GE",
+		precedence: 5,
+		f: numeric_greater_than_or_equal,
+	),
+
+	new Operator(
+		spelling: "≶",
+		kind: "CMP_SIGN",
+		precedence: 5,
+		f: numeric_compare,
+	),
+
+	new Operator(
+		spelling: "<=>",
+		kind: "CMP",
+		precedence: 5,
+		f: numeric_compare,
+	),
+
+	new Operator(
+		spelling: "≷",
+		kind: "CMP_REV_SIGN",
+		precedence: 5,
+		f: numeric_compare,
+	),
+
+	new Operator(
+		spelling: "_",
+		kind: "CONCAT",
+		require_ws: true,
+		precedence: 10,
+		f: string_concatenation,
+	),
+
+	new Operator(
+		spelling: "eq",
+		kind: "STR_EQ",
+		precedence: 5,
+		f: string_equality,
+	),
+
+	new Operator(
+		spelling: "ne",
+		kind: "STR_NE",
+		precedence: 5,
+		f: string_inequality,
+	),
+
+	new Operator(
+		spelling: "gt",
+		kind: "STR_GT",
+		precedence: 5,
+		f: string_greater_than,
+	),
+
+	new Operator(
+		spelling: "ge",
+		kind: "STR_GE",
+		precedence: 5,
+		f: string_greater_than_or_equal,
+	),
+
+	new Operator(
+		spelling: "lt",
+		kind: "STR_LT",
+		precedence: 5,
+		f: string_less_than,
+	),
+
+	new Operator(
+		spelling: "le",
+		kind: "STR_LE",
+		precedence: 5,
+		f: string_less_than_or_equal,
+	),
+
+	new Operator(
+		spelling: "cmp",
+		kind: "STR_CMP",
+		precedence: 5,
+		f: string_compare,
+	),
+
+	new Operator(
+		spelling: "eqi",
+		kind: "STR_EQI",
+		precedence: 5,
+		f: string_equality_insensitive,
+	),
+
+	new Operator(
+		spelling: "nei",
+		kind: "STR_NEI",
+		precedence: 5,
+		f: string_inequality_insensitive,
+	),
+
+	new Operator(
+		spelling: "gti",
+		kind: "STR_GTI",
+		precedence: 5,
+		f: string_greater_than_insensitive,
+	),
+
+	new Operator(
+		spelling: "gei",
+		kind: "STR_GEI",
+		precedence: 5,
+		f: string_greater_than_or_equal_insensitive,
+	),
+
+	new Operator(
+		spelling: "lti",
+		kind: "STR_LTI",
+		precedence: 5,
+		f: string_less_than_insensitive,
+	),
+
+	new Operator(
+		spelling: "lei",
+		kind: "STR_LEI",
+		precedence: 5,
+		f: string_less_than_or_equal_insensitive,
+	),
+
+	new Operator(
+		spelling: "cmpi",
+		kind: "STR_CMPI",
+		precedence: 5,
+		f: string_compare_insensitive,
+	),
+
+	new Operator(
+		spelling: "~",
+		kind: "REGEXP_MATCH",
+		precedence: 5,
+		f: regexp_match,
+	),
+
+	new Operator(
+		spelling: "&",
+		kind: "BAND",
+		precedence: 8,
+		f: bitwise_and,
+	),
+
+	new Operator(
+		spelling: "^",
+		kind: "BXOR",
+		precedence: 7,
+		f: bitwise_xor,
+	),
+
+	new Operator(
+		spelling: "|",
+		kind: "BOR",
+		precedence: 6,
+		f: bitwise_or,
+	),
+
+	new Operator(
+		spelling: "⋀",
+		kind: "LAND_SIGN",
+		precedence: 3,
+		f: logical_and,
+	),
+
+	new Operator(
+		spelling: "and",
+		kind: "LAND",
+		precedence: 3,
+		f: logical_and,
+	),
+
+	new Operator(
+		spelling: "⊼",
+		kind: "LNAND_SIGN",
+		precedence: 3,
+		f: logical_nand,
+	),
+
+	new Operator(
+		spelling: "nand",
+		kind: "LNAND",
+		precedence: 3,
+		f: logical_nand,
+	),
+
+	new Operator(
+		spelling: "⊻",
+		kind: "LXOR_SIGN",
+		precedence: 2,
+		f: logical_xor,
+	),
+
+	new Operator(
+		spelling: "xor",
+		kind: "LXOR",
+		precedence: 2,
+		f: logical_xor,
+	),
+
+	new Operator(
+		spelling: "⋁",
+		kind: "LOR_SIGN",
+		precedence: 1,
+		f: logical_or,
+	),
+
+	new Operator(
+		spelling: "or",
+		kind: "LOR",
+		precedence: 1,
+		f: logical_or,
+	),
+
+	new Operator(
+		spelling: "⋃",
+		kind: "SET_UNION_SIGN",
+		precedence: 9,
+		f: set_union,
+	),
+
+	new Operator(
+		spelling: "union",
+		kind: "SET_UNION",
+		precedence: 9,
+		f: set_union,
+	),
+
+	new Operator(
+		spelling: "⋂",
+		kind: "SET_INTERSECTION_SIGN",
+		precedence: 9,
+		f: set_intersection,
+	),
+
+	new Operator(
+		spelling: "intersection",
+		kind: "SET_INTERSECTION",
+		precedence: 9,
+		f: set_intersection,
+	),
+
+	new Operator(
+		spelling: "∖",
+		kind: "SET_DIFFERENCE_SIGN",
+		precedence: 9,
+		f: set_difference,
+	),
+
+	new Operator(
+		spelling: "\\",
+		kind: "SET_DIFFERENCE",
+		precedence: 9,
+		require_ws: true,
+		f: set_difference,
+	),
+
+	new Operator(
+		spelling: "∈",
+		kind: "MEMBER_SIGN",
+		precedence: 5,
+		f: collection_membership,
+	),
+
+	new Operator(
+		spelling: "in",
+		kind: "MEMBER",
+		precedence: 5,
+		f: collection_membership,
+	),
+
+	new Operator(
+		spelling: "∉",
+		kind: "NOT_MEMBER_SIGN",
+		precedence: 5,
+		f: collection_non_membership,
+	),
+
+	new Operator(
+		spelling: "⊂",
+		kind: "SUBSETOF_SIGN",
+		precedence: 5,
+		f: set_subsetof,
+	),
+
+	new Operator(
+		spelling: "subsetof",
+		kind: "SUBSETOF",
+		precedence: 5,
+		f: set_subsetof,
+	),
+
+	new Operator(
+		spelling: "⊃",
+		kind: "SUPERSETOF_SIGN",
+		precedence: 5,
+		f: set_supersetof,
+	),
+
+	new Operator(
+		spelling: "supersetof",
+		kind: "SUPERSETOF",
+		precedence: 5,
+		f: set_supersetof,
+	),
+
+	new Operator(
+		spelling: "⊂⊃",
+		kind: "EQUIVALENTOF_SIGN",
+		precedence: 5,
+		f: set_equivalentof,
+	),
+
+	new Operator(
+		spelling: "equivalentof",
+		kind: "EQUIVALENTOF",
+		precedence: 5,
+		f: set_equivalentof,
+	),
+
+	new Operator(
+		spelling: "≡",
+		kind: "TYPE_EQ_SIGN",
+		precedence: 4,
+		f: type_aware_equality,
+	),
+
+	new Operator(
+		spelling: "==",
+		kind: "TYPE_EQ",
+		precedence: 4,
+		f: type_aware_equality,
+	),
+
+	new Operator(
+		spelling: "≢",
+		kind: "TYPE_NE_SIGN",
+		precedence: 4,
+		f: type_aware_inequality,
+	),
+
+	new Operator(
+		spelling: "!=",
+		kind: "TYPE_NE",
+		precedence: 4,
+		f: type_aware_inequality,
+	),
+
+	new Operator(
+		spelling: "can",
+		kind: "CAN",
+		precedence: 5,
+		f: object_can,
+	),
+
+	new Operator(
+		spelling: "~",
+		kind: "BNOT",
+		unary: true,
+		precedence: 20,
+		f: function ( op, ev, ast, ctx, expr ) {
+			const value := op._handle_numeric_operand( ev, ctx, expr );
+			return op.wrap( ~value );
+		},
+	),
+];

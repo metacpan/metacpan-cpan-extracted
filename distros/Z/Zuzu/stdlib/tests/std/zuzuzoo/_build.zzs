@@ -1,0 +1,76 @@
+from test/more import *;
+
+requires_capability( "fs" );
+requires_capability( "proc" );
+
+from std/archive import Archive;
+from std/io import Path;
+from std/proc import Env;
+from std/zuzuzoo import load_distribution;
+
+let build_script :=
+	"from std/io import Path;\n" _
+	"\n" _
+	"let modules := new Path(\"modules\");\n" _
+	"modules.mkdir() if not modules.exists();\n" _
+	"modules.child(\"remove-me.zzm\").remove();\n" _
+	"\n" _
+	"let built := modules.child(\"built\");\n" _
+	"built.mkdir();\n" _
+	"built.child(\"generated.zzm\").spew_utf8(\"// generated\\n\");\n" _
+	"\n" _
+	"( new Path(\"zuzu-distribution.json\") ).spew_utf8(\n" _
+	"\t\"{\\\"name\\\":\\\"build-dist\\\",\\\"version\\\":\\\"1.0.0\\\",\" _\n" _
+	"\t\"\\\"author\\\":\\\"Example\\\",\" _\n" _
+	"\t\"\\\"license\\\":\\\"Apache-2.0\\\"}\\n\",\n" _
+	");\n";
+
+let archive := Path.tempfile();
+Archive.dump(
+	archive,
+	{
+		entries: [
+			{
+				path: "build-dist-1.0.0/zuzu-distribution.json",
+				data: to_binary(
+					"{\"name\":\"build-dist\",\"version\":\"1.0.0\"," _
+					"\"author\":\"Example\",\"license\":\"MIT\"}\n",
+				),
+			},
+			{
+				path: "build-dist-1.0.0/Build.zzs",
+				data: to_binary(build_script),
+			},
+			{
+				path: "build-dist-1.0.0/modules/remove-me.zzm",
+				data: to_binary("// remove me\n"),
+			},
+			{
+				path: "build-dist-1.0.0/tests/build.zzs",
+				data: to_binary("say \"1..0\";\n"),
+			},
+		],
+	},
+	"zip",
+);
+
+let zuzu := ( new Path( path: Env.get( "ZUZU", "./bin/zuzu" ) ) ).to_String();
+let dist := load_distribution(
+	archive.to_String(),
+	{ zuzu_command: zuzu },
+);
+
+is(
+	dist{metadata}{license},
+	"Apache-2.0",
+	"metadata is reread after Build.zzs",
+);
+ok( dist{build}{ok}, "Build.zzs run result is returned" );
+is(
+	dist{modules}.map( fn m -> m{source} ),
+	[ "modules/built/generated.zzm" ],
+	"post-build discovery sees generated module and skips removed module",
+);
+is( dist{tests}, [ "tests/build.zzs" ], "tests are discovered after build" );
+
+done_testing();

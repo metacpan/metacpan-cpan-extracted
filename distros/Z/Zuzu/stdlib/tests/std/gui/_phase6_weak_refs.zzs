@@ -1,0 +1,37 @@
+from test/more import *;
+
+requires_capability( "gui" );
+
+from std/gui import *;
+
+let parent := VBox(
+	id: "temporary-parent",
+	Button( id: "temporary-child" ),
+);
+let child := parent.children()[0];
+is( child.parent(), parent, "child sees live widget parent" );
+parent := null;
+is( child.parent(), null, "retained child does not keep widget parent alive" );
+
+let w := Window(
+	VBox(
+		id: "root",
+		Button( id: "submit" ),
+	),
+);
+let button := w.find_by_id("submit");
+let seen := [];
+let token := button.on( "click", function ( e ) {
+	seen.push( e.target() );
+	seen.push( e.current_target() );
+	seen.push( e.window() );
+} );
+button.click();
+is( seen[0], button, "event target resolves during dispatch" );
+is( seen[1], button, "event current_target resolves during dispatch" );
+is( seen[2], w, "event window resolves through weak parent links" );
+ok( button.off(token), "listener token can remove live owner listener" );
+button.click();
+is( seen.length(), 3, "removed listener does not fire again" );
+
+done_testing();

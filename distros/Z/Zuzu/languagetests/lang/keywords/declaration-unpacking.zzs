@@ -1,0 +1,118 @@
+from std/eval import eval;
+from test/more import *;
+
+class Owner {
+	let label with get;
+}
+
+function make_owner ( String label ) {
+	return new Owner( label: label );
+}
+
+let shorthand_source := { host: "localhost", port: 8080 };
+let { host, port } := shorthand_source;
+is( host, "localhost", "let unpacking binds shorthand host" );
+is( port, 8080, "let unpacking binds shorthand port" );
+host := "127.0.0.1";
+is( host, "127.0.0.1", "let unpacking result is mutable" );
+
+let const_source := { locked: "fixed" };
+const { locked } := const_source;
+is( locked, "fixed", "const unpacking binds shorthand name" );
+ok(
+	exception( function () {
+		eval( "locked := \"changed\";" );
+	} ) instanceof Exception,
+	"const unpacking result is immutable",
+);
+
+let default_calls := 0;
+function defaulted ( value ) {
+	default_calls += 1;
+	return value;
+}
+
+let default_source := { present: null };
+let {
+	missing := defaulted("fallback"),
+	present := defaulted("wrong"),
+} := default_source;
+is( missing, "fallback", "defaults run for absent keys" );
+is( present, null, "present null does not trigger default" );
+is( default_calls, 1, "defaults are lazy and absent-only" );
+
+let alias_source := { host: "example.test" };
+let { host: alias_host } := alias_source;
+is( alias_host, "example.test", "aliases use key: binding" );
+
+let typed_source := { label: "primary", count: 3 };
+let {
+	String label,
+	count: Number typed_count,
+} := typed_source;
+is( label, "primary", "typed shorthand uses typed-identifier order" );
+is( typed_count, 3, "typed alias uses key: typed binding" );
+
+let key_source := { "x-id": 17, "literal-key": 23 };
+let {
+	"literal-key": literal_key,
+	("x-" _ "id"): computed_key,
+} := key_source;
+is( literal_key, 23, "string keys bind correctly" );
+is( computed_key, 17, "computed keys bind correctly" );
+
+let { absent } := {};
+is( absent, null, "missing key without default binds null" );
+
+let pair_source := {{ item: "first", item: "second" }};
+let { item } := pair_source;
+is( item, "first", "PairList unpacking uses first-value get behaviour" );
+
+let evaluations := 0;
+function source_once () {
+	evaluations += 1;
+	return { once: true };
+}
+let { once } := source_once();
+is( once, true, "source expression binds unpacked value" );
+is( evaluations, 1, "source expression is evaluated once" );
+
+function weak_saved_after_scope () {
+	let source := { owner: make_owner("temporary") };
+	let { owner: saved but weak } := source;
+	is(
+		saved.get_label(),
+		"temporary",
+		"declaration unpacking but weak reads live referent",
+	);
+	source := null;
+	return saved;
+}
+is(
+	weak_saved_after_scope(),
+	null,
+	"declaration unpacking but weak reads null after source drop",
+);
+
+ok(
+	exception( function () {
+		let { bad } := 42;
+	} ) instanceof Exception,
+	"non-Dict/PairList source throws",
+);
+
+ok(
+	exception( function () {
+		eval( "let { a, b: a } := { a: 1, b: 2 };" );
+	} ) instanceof Exception,
+	"duplicate local names throw",
+);
+
+ok(
+	exception( function () {
+		eval( "let target := {}; { a } := target;" );
+	} ) instanceof Exception,
+	"assignment destructuring remains invalid",
+);
+
+done_testing();

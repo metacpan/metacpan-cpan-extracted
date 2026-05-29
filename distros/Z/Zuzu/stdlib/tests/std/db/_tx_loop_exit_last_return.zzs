@@ -1,0 +1,45 @@
+from test/more import *;
+
+requires_capability( "db" );
+
+from std/db import DB;
+
+let dbh := DB.temp( { auto_commit: true } );
+dbh.prepare( "create table events (kind text, value integer)" ).execute();
+let insert := dbh.prepare( "insert into events (kind, value) values (?, ?)" );
+
+let with_last := [ 1, 2, 3, 4 ];
+dbh.begin();
+for ( let v in with_last ) {
+	insert.execute( "last", v );
+	if ( v == 3 ) {
+		last;
+	}
+}
+dbh.commit();
+
+function ingest_with_return ( _insert ) {
+	let values := [ 10, 11, 99, 12 ];
+	for ( let v in values ) {
+		if ( v == 99 ) {
+			return "hit-return";
+		}
+		_insert.execute( "return", v );
+	}
+	return "done";
+}
+
+dbh.begin();
+let ret := ingest_with_return(insert);
+dbh.commit();
+
+let q := dbh.prepare( "select kind, value from events order by rowid" );
+q.execute();
+let rows := q.all_dict();
+
+is( ret, "hit-return", "return exits loop-bearing function early" );
+is( rows.length(), 5, "last and return flows persisted only pre-exit rows" );
+is( rows[2]{value}, 3, "last flow stopped after threshold" );
+is( rows[4]{value}, 11, "return flow stopped before sentinel" );
+
+done_testing();

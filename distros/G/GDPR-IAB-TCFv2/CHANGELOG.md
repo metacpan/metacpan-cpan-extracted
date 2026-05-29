@@ -1,3 +1,20 @@
+## [0.530] - 2026-05-28
+
+### Features
+
+- *(validator)* Cross-language validator parity with the Go lib-gdpr redesign branch (`validator_strict.go`)
+  - Auto-enable `verify_disclosed_vendors` when `min_tcf_policy_version >= 5`, and run the mandatory disclosed-vendors check independently of it (mirrors Go `New` + `yieldMandatoryDisclosedVendors`).
+  - Strictly-after v2.3 deadline boundary (`created > TCF_V23_DEADLINE`) matching Go `created.After(v23Deadline)`; the parser's `is_v23` keeps `>=` for its own strict-parse gate.
+  - Single `PolicyVersionTooLow` when both the policy floor and the v2.3 date rule apply (`_check_policy_version`, mirrors Go `yieldPolicyVersionFailure`).
+  - Global vendor gate emitting `ReasonVendorNotAllowed` when a vendor has neither vendor-consent nor vendor-LI — short-circuits before per-purpose checks in both fail-fast and exhaustive modes.
+  - Flexible-purpose `_flexible_failure` follows Go `runFlexibleCheck`'s effective legal basis: spec carve-out (P1, or P3–6 at policy ≥ 4) forces consent; `RequireConsent`/`RequireLI` override; `NotAllowed` surfaces `ReasonPublisherRestrictionNotAllowed`; carve-out outranks the generic LI reason.
+- *(cmp)* Add `CMPDeleted` / `CMPUnknown` reason codes and `CMPValidator->state` (active/deleted/unknown); validator maps CMP lifecycle state to these reasons.
+- *(tests)* `t/18-go-parity.t` pinning each rule to its Go counterpart; updates to `t/06` and `t/17` for the aligned behavior; validator golden corpus regenerated.
+
+### Documentation
+
+- Claim SLSA Build Level 2
+
 ## [0.520] - 2026-05-18
 
 ### Bug Fixes
@@ -6,6 +23,8 @@
 
 ### Other
 
+- Merge branch 'release/0.520'
+- Update changelog
 - Bump version
 - Remove extra test, not needed
 - Update changelog

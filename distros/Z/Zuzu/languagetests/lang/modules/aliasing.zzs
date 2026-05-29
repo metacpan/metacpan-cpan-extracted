@@ -1,0 +1,9 @@
+from test/more import *;
+from test/skeleton/mutable_alias import counter, bump, read;
+
+is( counter, 1, "imported mutable variable reads initial value" );
+is( bump(), 2, "module function mutates original module variable" );
+is( counter, 2, "imported mutable variable aliases original module slot" );
+is( read(), 2, "module read sees same mutated slot" );
+
+done_testing();

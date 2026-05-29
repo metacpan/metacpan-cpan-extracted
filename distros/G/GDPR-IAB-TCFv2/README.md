@@ -26,6 +26,10 @@
     <a href="https://metacpan.org/dist/GDPR-IAB-TCFv2"><img src="https://img.shields.io/cpan/v/GDPR-IAB-TCFv2.svg" alt='cpan'/></a>
 </div>
 
+<div>
+    <a href="https://github.com/peczenyj/GDPR-IAB-TCFv2/attestations"><img src="https://img.shields.io/badge/SLSA-Build_L2-green.svg" alt='SLSA Build Level 2'/></a>
+</div>
+
 # NAME
 
 GDPR::IAB::TCFv2 - TCF v2.3 distribution: parser, validator, CMP-validator, and CLI

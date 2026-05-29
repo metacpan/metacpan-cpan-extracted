@@ -1,0 +1,9 @@
+{
+  "benchmark": "std-io-phase1",
+  "allowed_regression_percent": 20,
+  "minimum_ops_per_second": {
+    "each_line_utf8": 35,
+    "read_utf8": 50,
+    "spew_utf8": 65
+  }
+}

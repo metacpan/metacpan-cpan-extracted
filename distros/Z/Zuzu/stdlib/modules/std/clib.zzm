@@ -1,0 +1,112 @@
+=encoding utf8
+
+=head1 NAME
+
+std/clib - Dynamic C library loading and scalar FFI calls.
+
+=head1 SYNOPSIS
+
+  from std/clib import CLib;
+
+  let lib := CLib.open("t/fixtures/example_clib/libgreet.so");
+  let greet := lib.func(
+    "greet",
+    [],
+    {
+      type: "binary",
+      terminated_by: "nul",
+      free: "greet_free"
+    }
+  );
+
+  say to_string(greet.call());
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Node and
+Electron. It is not supported by zuzu-js in the browser.
+
+=head1 DESCRIPTION
+
+This runtime-supported module loads C dynamic libraries and calls
+exported C functions through explicitly declared signatures.
+
+The first implementation supports C<null>, booleans, 64-bit integers,
+64-bit floats, and C<BinaryString> byte buffers. Other data types are
+out of scope.
+
+The runtime copies returned binary data before returning it to
+ZuzuScript. If a return descriptor includes C<free>, that symbol is
+called after the copy so libraries can return owned memory safely.
+
+On Unix-like systems, dynamic libraries usually use C<.so> on Linux and
+C<.dylib> on macOS. Windows libraries usually use C<.dll>. Exact
+availability depends on the host runtime. Browser runtimes reject this
+module as unsupported.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<CLib>
+
+Static methods:
+
+=over
+
+=item C<< CLib.open(String path) >>
+
+Parameters: C<path> is a dynamic library path. Returns: C<CLibrary>.
+Loads a dynamic library.
+
+=back
+
+=item C<CLibrary>
+
+Methods:
+
+=over
+
+=item C<< func(String name, Array params, return_type, options?) >>
+
+Parameters: C<name> is a symbol name, C<params> describes parameter
+types, C<return_type> describes the return type, and C<options> is
+optional. Returns: C<CFunction>. Looks up a symbol and returns a
+callable C function wrapper.
+
+=item C<< has_symbol(String name) >>
+
+Parameters: C<name> is a symbol name. Returns: C<Boolean>. Returns
+whether the loaded library exports the named symbol.
+
+=item C<close()>
+
+Parameters: none. Returns: C<null>. Invalidates the library and
+functions created from it.
+
+=back
+
+=item C<CFunction>
+
+Methods:
+
+=over
+
+=item C<call(...)>
+
+Parameters: arguments must match the declared C signature. Returns:
+value. Calls the C function using the declared signature.
+
+=back
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/clib >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.

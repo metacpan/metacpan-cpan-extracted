@@ -1,5 +1,19 @@
 Revision history for CXC-Exporter-Util
 
+0.12      2026-05-28 17:47:34 EDT
+
+  [BUG FIX]
+
+    * v0.11 broke some existing importing packages which
+        * imported CXC::Exporter::Util using the 'all' tag
+        * used Exporter::Tiny
+        * used namespace::clean and wiped the UI helpers
+
+  [API CHANGES]
+
+    * importing CXC::Exporter::Util ':all' no longer imports the UI
+      Helpers,
+
 0.11      2026-05-27 17:26:12 EDT
 
     * No changes from 0.10; promoted to production

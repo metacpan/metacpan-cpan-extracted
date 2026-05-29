@@ -1,0 +1,1003 @@
+=encoding utf8
+
+=head1 NAME
+
+std/path/kdl - KDL Query Language selectors for KDL documents.
+
+=head1 SYNOPSIS
+
+  from std/data/kdl import KDL;
+  from std/path/kdl import KDLQuery;
+
+  let doc := ( new KDL() ).decode( """
+  package {
+    name foo
+    dependencies platform=windows {
+      winapi "1.0.0"
+    }
+  }
+  """ );
+
+  let names := doc @@ new KDLQuery( path: "package >> name" );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+C<KDLQuery> implements the KDL Query Language described in
+C<tmp/QUERY-SPEC.md>. It provides the same read-oriented public API as
+C<std/path/z> and C<std/path/simple>: C<get>, C<select>, C<query>,
+C<first>, C<exists>, and C<expression>. It also supports the assignment
+and reference methods from the path API for replacing selected
+C<KDLNode> objects.
+
+The C<values> and C<props> helper methods extract argument values and
+properties from the selected nodes.
+
+If the query root is not already a C<KDLDocument> or C<KDLNode>, it is
+converted to a C<KDLDocument> using C<std/data/kdl/json>'s
+C<json_to_kdl> mapping before the query runs.
+
+The path operators C<@>, C<@@>, and C<@?> can be set to use this module
+in a lexical scope:
+
+  from std/path/kdl import KDLQuery;
+  KDLQuery.use();
+  let dependencies := doc @@ "package >> dependencies";
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<< KDLQuery({ path: String }) >>
+
+Constructs a KDL Query Language selector. Returns: C<KDLQuery>.
+
+=over
+
+=item C<< KDLQuery.use() >>
+
+Parameters: none. Returns: C<null>. Makes this path class the lexical
+implementation for C<@>, C<@@>, and C<@?>.
+
+=item C<< query.expression() >>
+
+Parameters: none. Returns: C<String>. Returns the original query
+expression.
+
+=item C<< query.get(raw) >>, C<< query.select(raw) >>, C<< query.query(raw) >>
+
+Parameters: C<raw> is a KDL root or JSON-like value. Returns: C<Array>.
+Evaluates the query and returns selected nodes.
+
+=item C<< query.first(raw, fallback?) >>
+
+Parameters: C<raw> is the query root and C<fallback> is optional.
+Returns: value. Returns the first selected node or fallback.
+
+=item C<< query.exists(raw) >>
+
+Parameters: C<raw> is the query root. Returns: C<Boolean>. Returns true
+when the query selects at least one node.
+
+=item C<< query.values(raw) >>
+
+Parameters: C<raw> is the query root. Returns: C<Array>. Returns
+selected node argument values.
+
+=item C<< query.props(raw) >>
+
+Parameters: C<raw> is the query root. Returns: C<Array>. Returns
+selected node property data.
+
+=item C<< query.assign_first(target, value, op := ":=", weak := false) >>
+
+Parameters: C<target> is the query root, C<value> is the assignment
+value, C<op> is an assignment operator, and C<weak> is accepted for path
+API compatibility. Returns: value. Updates the first selected node.
+
+=item C<< query.assign_all(target, value, op := ":=", weak := false) >>
+
+Parameters: same as C<assign_first>. Returns: value. Updates every
+selected node.
+
+=item C<< query.assign_maybe(target, value, op := ":=", weak := false) >>
+
+Parameters: same as C<assign_first>. Returns: C<Boolean>. Updates the
+first selected node when one exists.
+
+=item C<< query.ref_first(target) >>
+
+Parameters: C<target> is the query root. Returns: C<Function>. Returns a
+reference-like getter/setter for the first selected node.
+
+=item C<< query.ref_all(target) >>
+
+Parameters: C<target> is the query root. Returns: C<Array>. Returns
+reference-like getter/setters for all selected nodes.
+
+=item C<< query.ref_maybe(target) >>
+
+Parameters: C<target> is the query root. Returns: C<Function> or
+C<null>. Returns a reference-like getter/setter for the first selected
+node when one exists.
+
+=back
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/path/kdl >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/data/kdl import KDLDocument, KDLNode, _KDLParser;
+from std/data/kdl import _kdl_is_line_space, _kdl_is_newline, _kdl_is_ws;
+from std/data/kdl import _kdl_starts_with;
+from std/data/kdl/json import json_to_kdl;
+from std/internals import ref_id;
+from std/string import index, substr;
+
+class _KDLQueryParser {
+	let String text := "";
+	let Number pos := 0;
+
+	method _eof () {
+		return pos >= length text;
+	}
+
+	method _peek () {
+		return "" if self._eof();
+		return substr( text, pos, 1 );
+	}
+
+	method _starts_with ( String prefix ) {
+		return substr( text, pos, length prefix ) ≡ prefix;
+	}
+
+	method _skip_ws () {
+		let keep := true;
+		while ( keep and not self._eof() ) {
+			keep := false;
+			while ( not self._eof() and _kdl_is_line_space( self._peek() ) ) {
+				pos++;
+				keep := true;
+			}
+			if ( self._skip_block_comment() ) {
+				keep := true;
+			}
+			else if ( self._skip_line_comment() ) {
+				keep := true;
+			}
+			else if ( self._skip_escline() ) {
+				keep := true;
+			}
+		}
+	}
+
+	method _skip_block_comment () {
+		return false if not _kdl_starts_with( text, pos, "/*" );
+		pos += 2;
+		let depth := 1;
+		while ( depth > 0 ) {
+			self._error("unterminated block comment") if self._eof();
+			if ( _kdl_starts_with( text, pos, "/*" ) ) {
+				depth++;
+				pos += 2;
+			}
+			else if ( _kdl_starts_with( text, pos, "*/" ) ) {
+				depth--;
+				pos += 2;
+			}
+			else {
+				pos++;
+			}
+		}
+		return true;
+	}
+
+	method _skip_line_comment () {
+		return false if not _kdl_starts_with( text, pos, "//" );
+		pos += 2;
+		while ( not self._eof() and not _kdl_is_newline( self._peek() ) ) {
+			pos++;
+		}
+		return true;
+	}
+
+	method _skip_escline () {
+		return false if self._peek() ≢ "\\";
+		let save := pos;
+		pos++;
+		let keep := true;
+		while ( keep and not self._eof() ) {
+			keep := false;
+			while ( _kdl_is_ws( self._peek() ) ) {
+				pos++;
+				keep := true;
+			}
+			if ( self._skip_block_comment() ) {
+				keep := true;
+			}
+		}
+		if ( _kdl_is_newline( self._peek() ) or self._eof() ) {
+			while ( not self._eof() and _kdl_is_line_space( self._peek() ) ) {
+				pos++;
+			}
+			return true;
+		}
+		pos := save;
+		return false;
+	}
+
+	method _error ( String message ) {
+		die `KDLQuery parse error at offset ${pos}: ${message}`;
+	}
+
+	method parse () {
+		self._skip_ws();
+		let selectors := [ self._parse_selector(true) ];
+		self._skip_ws();
+		while ( self._starts_with("||") ) {
+			pos += 2;
+			self._skip_ws();
+			selectors.push( self._parse_selector(true) );
+			self._skip_ws();
+		}
+		self._error("unexpected trailing input") if not self._eof();
+		return selectors;
+	}
+
+	method _parse_selector ( Boolean allow_top ) {
+		let first := self._parse_filter(allow_top);
+		let steps := [];
+		self._skip_ws();
+		while ( not self._eof() and not self._starts_with("||") ) {
+			let op := self._parse_selector_operator();
+			self._skip_ws();
+			steps.push( { op: op, filter: self._parse_filter(false) } );
+			self._skip_ws();
+		}
+		return { first: first, steps: steps };
+	}
+
+	method _parse_selector_operator () {
+		if ( self._starts_with(">>") ) {
+			pos += 2;
+			return "descendant";
+		}
+		if ( self._starts_with("++") ) {
+			pos += 2;
+			return "following";
+		}
+		if ( self._starts_with(">") ) {
+			pos++;
+			return "child";
+		}
+		if ( self._starts_with("+") ) {
+			pos++;
+			return "next";
+		}
+		self._error("expected selector operator");
+	}
+
+	method _parse_filter ( Boolean allow_top ) {
+		self._skip_ws();
+		if ( allow_top and self._starts_with("top") ) {
+			let save := pos;
+			pos += 3;
+			self._skip_ws();
+			if ( self._peek() ≡ "(" ) {
+				pos++;
+				self._skip_ws();
+				if ( self._peek() ≡ ")" ) {
+					pos++;
+					return { kind: "top" };
+				}
+			}
+			pos := save;
+		}
+		if ( self._starts_with("top") ) {
+			self._error("top() may only appear at the start of a selector");
+		}
+		return self._parse_matchers();
+	}
+
+	method _parse_matchers () {
+		let type_match := null;
+		let any_type := false;
+		let name := null;
+		let accessors := [];
+
+		if ( self._peek() ≡ "(" ) {
+			pos++;
+			self._skip_ws();
+			if ( self._peek() ≡ ")" ) {
+				any_type := true;
+				pos++;
+			}
+			else {
+				type_match := self._parse_query_string();
+				self._skip_ws();
+				self._error("expected ')' after type matcher") if self._peek() ≢ ")";
+				pos++;
+			}
+			self._skip_ws();
+		}
+
+		if ( self._peek() ≢ "[" and not self._eof() ) {
+			name := self._parse_query_string();
+			self._skip_ws();
+		}
+
+		while ( self._peek() ≡ "[" ) {
+			accessors.push( self._parse_accessor_matcher() );
+			self._skip_ws();
+		}
+
+		if (
+			type_match ≡ null
+			and not any_type
+			and name ≡ null
+			and accessors.empty
+		) {
+			self._error("expected matcher");
+		}
+
+		return {
+			kind: "matchers",
+			type: type_match,
+			any_type: any_type,
+			name: name,
+			accessors: accessors,
+		};
+	}
+
+	method _parse_accessor_matcher () {
+		self._error("expected '['") if self._peek() ≢ "[";
+		pos++;
+		self._skip_ws();
+		if ( self._peek() ≡ "]" ) {
+			pos++;
+			return { kind: "any" };
+		}
+
+		let accessor := self._parse_accessor();
+		self._skip_ws();
+		if ( self._peek() ≡ "]" ) {
+			pos++;
+			return { kind: "exists", accessor: accessor };
+		}
+
+		let op := self._parse_matcher_operator();
+		self._skip_ws();
+		let literal := self._parse_literal();
+		self._skip_ws();
+		self._error("expected ']' after comparison") if self._peek() ≢ "]";
+		pos++;
+		return {
+			kind: "comparison",
+			accessor: accessor,
+			op: op,
+			literal: literal,
+		};
+	}
+
+	method _parse_matcher_operator () {
+		for ( let op in [ "!=", ">=", "<=", "^=", "$=", "*=", "=", ">", "<" ] ) {
+			if ( self._starts_with(op) ) {
+				pos += length op;
+				return op;
+			}
+		}
+		self._error("expected matcher operator");
+	}
+
+	method _parse_accessor () {
+		let name := self._parse_query_string();
+		self._skip_ws();
+		if ( self._peek() ≢ "(" ) {
+			return { kind: "prop", name: name };
+		}
+
+		pos++;
+		self._skip_ws();
+		if ( name ≡ "val" ) {
+			let index := 0;
+			if ( self._peek() ≢ ")" ) {
+				index := self._parse_integer();
+			}
+			self._skip_ws();
+			self._error("expected ')' after val accessor") if self._peek() ≢ ")";
+			pos++;
+			return { kind: "val", index: index };
+		}
+
+		if ( name ≡ "prop" ) {
+			let prop_name := self._parse_query_string();
+			self._skip_ws();
+			self._error("expected ')' after prop accessor") if self._peek() ≢ ")";
+			pos++;
+			return { kind: "prop", name: prop_name };
+		}
+
+		if ( name in [ "name", "tag", "values", "props" ] ) {
+			self._error(`expected empty ${name}() accessor`) if self._peek() ≢ ")";
+			pos++;
+			return { kind: name };
+		}
+
+		self._error(`unknown accessor '${name}'`);
+	}
+
+	method _parse_literal () {
+		if ( self._peek() ≡ "(" ) {
+			pos++;
+			self._skip_ws();
+			let tag := self._parse_query_string();
+			self._skip_ws();
+			self._error("expected ')' after type literal") if self._peek() ≢ ")";
+			pos++;
+			return { kind: "type", value: tag };
+		}
+
+		let p := new _KDLParser( text: substr( text, pos, length text - pos ) );
+		let value := p._parse_value();
+		pos += p{pos};
+		return self._literal_from_kdl_value(value);
+	}
+
+	method _literal_from_kdl_value ( value ) {
+		return {
+			kind: "value",
+			type: value.type(),
+			value: value.native_value(),
+			value_kind: value.kind(),
+		};
+	}
+
+	method _parse_integer () {
+		let p := new _KDLParser( text: substr( text, pos, length text - pos ) );
+		let value := p._parse_number(null);
+		self._error("expected integer")
+			if value.type() ≢ "number" or value.kind() ≢ "integer";
+		pos += p{pos};
+		return value.native_value();
+	}
+
+	method _parse_query_string () {
+		self._skip_ws();
+		let p := new _KDLParser( text: substr( text, pos, length text - pos ) );
+		let value := p._parse_string();
+		pos += p{pos};
+		return value;
+	}
+}
+
+class KDLQuery {
+	let String path;
+	let ast;
+
+	static method use () {
+		from std/internals import setupperprop;
+		setupperprop( 1, "paths", self );
+	}
+
+	method __build__ () {
+		ast ?:= ( new _KDLQueryParser( text: path ) ).parse();
+	}
+
+	method expression () {
+		return path;
+	}
+
+	method _root_nodes ( raw ) {
+		let root := raw;
+		if ( not( root instanceof KDLDocument ) and not( root instanceof KDLNode ) ) {
+			root := json_to_kdl(root);
+		}
+		if ( root instanceof KDLDocument ) {
+			let roots := root.nodes();
+			let parent := {
+				document: true,
+				roots: [],
+				values: roots,
+				parent: null,
+				index: 0,
+			};
+			let out := [];
+			let i := 0;
+			for ( let node in roots ) {
+				let qnode := { node: node, parent: parent, index: i };
+				out.push(qnode);
+				parent{roots}.push(qnode);
+				i++;
+			}
+			return out;
+		}
+		if ( root instanceof KDLNode ) {
+			return [ { node: root, parent: null, index: 0 } ];
+		}
+		die "KDLQuery root could not be converted to KDL";
+	}
+
+	method _children ( qnode ) {
+		if ( qnode.exists("document") and qnode{document} ) {
+			return qnode{roots};
+		}
+		let out := [];
+		let i := 0;
+		for ( let child in qnode{node}.children() ) {
+			out.push( { node: child, parent: qnode, index: i } );
+			i++;
+		}
+		return out;
+	}
+
+	method _descendants ( qnode ) {
+		let out := [];
+		let stack := self._children(qnode);
+		while ( not stack.empty ) {
+			let n := stack.shift();
+			out.push(n);
+			for ( let child in self._children(n) ) {
+				stack.push(child);
+			}
+		}
+		return out;
+	}
+
+	method _all_nodes ( roots ) {
+		let out := [];
+		for ( let root in roots ) {
+			out.push(root);
+			for ( let child in self._descendants(root) ) {
+				out.push(child);
+			}
+		}
+		return out;
+	}
+
+	method _siblings ( qnode ) {
+		return [] if qnode{parent} ≡ null;
+		return self._children( qnode{parent} );
+	}
+
+	method _next_sibling ( qnode ) {
+		for ( let sib in self._siblings(qnode) ) {
+			return sib if sib{index} ≡ qnode{index} + 1;
+		}
+		return null;
+	}
+
+	method _following_siblings ( qnode ) {
+		return self._siblings(qnode).grep( fn sib -> sib{index} > qnode{index} );
+	}
+
+	method _dedup ( nodes ) {
+		let seen := {};
+		let out := [];
+		for ( let n in nodes ) {
+			let id := n.exists("document") and n{document}
+				? "document"
+				: ref_id( n{node} );
+			if ( not seen.exists(id) ) {
+				seen.set( id, true );
+				out.push(n);
+			}
+		}
+		return out;
+	}
+
+	method _evaluate_nodes ( raw ) {
+		let roots := self._root_nodes(raw);
+		let results := [];
+		for ( let selector in ast ) {
+			for ( let n in self._eval_selector( selector, roots ) ) {
+				results.push(n);
+			}
+		}
+		return self._dedup(results);
+	}
+
+	method _eval_selector ( selector, roots ) {
+		let current;
+		if ( selector{first}{kind} ≡ "top" ) {
+			current := selector{steps}.empty
+				? roots
+				: [ { document: true, roots: roots, parent: null, index: 0 } ];
+		}
+		else {
+			current := self._apply_filter(
+				self._all_nodes(roots),
+				selector{first},
+			);
+		}
+
+		for ( let step in selector{steps} ) {
+			let candidates := [];
+			for ( let n in current ) {
+				if ( step{op} ≡ "child" ) {
+					for ( let child in self._children(n) ) {
+						candidates.push(child);
+					}
+				}
+				else if ( step{op} ≡ "descendant" ) {
+					for ( let child in self._descendants(n) ) {
+						candidates.push(child);
+					}
+				}
+				else if ( step{op} ≡ "next" ) {
+					let sib := self._next_sibling(n);
+					candidates.push(sib) if sib ≢ null;
+				}
+				else if ( step{op} ≡ "following" ) {
+					for ( let sib in self._following_siblings(n) ) {
+						candidates.push(sib);
+					}
+				}
+			}
+			current := self._apply_filter( self._dedup(candidates), step{filter} );
+		}
+
+		return current;
+	}
+
+	method _apply_filter ( nodes, filter ) {
+		return nodes if filter{kind} ≡ "top";
+		return nodes.grep( fn n -> self._matches_filter( n, filter ) );
+	}
+
+	method _matches_filter ( qnode, filter ) {
+		let node := qnode{node};
+		if ( filter{name} ≢ null and node.name() ne filter{name} ) {
+			return false;
+		}
+		if ( filter{type} ≢ null and node.type_annotation() ne filter{type} ) {
+			return false;
+		}
+		if ( filter{any_type} and node.type_annotation() ≡ null ) {
+			return false;
+		}
+		for ( let matcher in filter{accessors} ) {
+			next if matcher{kind} ≡ "any";
+			if ( matcher{kind} ≡ "exists" ) {
+				return false if not self._accessor_exists( node, matcher{accessor} );
+				next;
+			}
+			if ( matcher{kind} ≡ "comparison" ) {
+				return false if not self._compare(
+					node,
+					matcher{accessor},
+					matcher{op},
+					matcher{literal},
+				);
+			}
+		}
+		return true;
+	}
+
+	method _accessor_result ( node, accessor ) {
+		if ( accessor{kind} ≡ "val" ) {
+			let index := accessor{index};
+			return { exists: false } if index < 0 or index >= node.args().length();
+			return self._kdl_value_result( node.args()[index] );
+		}
+		if ( accessor{kind} ≡ "prop" ) {
+			let name := accessor{name};
+			return { exists: false } if not node.props().has(name);
+			return self._kdl_value_result( node.props().get(name) );
+		}
+		if ( accessor{kind} ≡ "name" ) {
+			return { exists: true, kind: "plain", type: "string", value: node.name() };
+		}
+		if ( accessor{kind} ≡ "tag" ) {
+			let tag := node.type_annotation();
+			return tag ≡ null
+				? { exists: false }
+				: { exists: true, kind: "plain", type: "string", value: tag };
+		}
+		if ( accessor{kind} ≡ "values" ) {
+			return {
+				exists: node.args().length() > 0,
+				kind: "sequence",
+				values: node.args(),
+			};
+		}
+		if ( accessor{kind} ≡ "props" ) {
+			let values := [];
+			for ( let pair in node.props().to_Array() ) {
+				values.push(pair.value);
+			}
+			return {
+				exists: values.length() > 0,
+				kind: "sequence",
+				values: values,
+			};
+		}
+		return { exists: false };
+	}
+
+	method _kdl_value_result ( value ) {
+		return { exists: true, kind: "kdl-value", value: value };
+	}
+
+	method _accessor_exists ( node, accessor ) {
+		return self._accessor_result( node, accessor ){exists};
+	}
+
+	method _compare ( node, accessor, String op, literal ) {
+		let got := self._accessor_result( node, accessor );
+		return false if not got{exists};
+		let same := self._equals( got, literal );
+		return same if op ≡ "=";
+		return not same if op ≡ "!=";
+
+		if ( op in [ "^=", "$=", "*=" ] ) {
+			return false if literal{kind} ≢ "value" or literal{type} ≢ "string";
+			let needle := literal{value};
+			for ( let s in self._string_values(got) ) {
+				if ( op ≡ "^=" ) {
+					return true if substr( s, 0, length needle ) eq needle;
+				}
+				else if ( op ≡ "$=" ) {
+					return true
+						if length needle <= length s
+							and substr(
+								s,
+								length s - length needle,
+								length needle,
+							) eq needle;
+				}
+				else if ( index( s, needle ) >= 0 ) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		return self._ordered_compare( got, op, literal );
+	}
+
+	method _equals ( got, literal ) {
+		for ( let item in self._result_items(got) ) {
+			return true if self._equals_one( item, literal );
+		}
+		return false;
+	}
+
+	method _equals_one ( got, literal ) {
+		if ( literal{kind} ≡ "type" ) {
+			return false if got{kind} ≢ "kdl-value";
+			return got{value}.type_annotation() eq literal{value};
+		}
+
+		if ( got{kind} ≡ "kdl-value" ) {
+			let v := got{value};
+			return false if v.type() ne literal{type};
+			return v.native_value() ≡ literal{value}
+				if v.type() in [ "null", "boolean" ];
+			if ( v.type() ≡ "number" ) {
+				if ( v.kind() eq "string" or literal{value_kind} eq "string" ) {
+					return v.kind() eq literal{value_kind}
+						and v.native_value() eq literal{value};
+				}
+				return v.native_value() = literal{value};
+			}
+			return v.native_value() eq literal{value};
+		}
+
+		return false if got{kind} ≢ "plain";
+		return false if got{type} ne literal{type};
+		return got{value} eq literal{value};
+	}
+
+	method _result_items ( got ) {
+		if ( got{kind} ≢ "sequence" ) {
+			return [ got ];
+		}
+		let out := [];
+		for ( let value in got{values} ) {
+			out.push( self._kdl_value_result(value) );
+		}
+		return out;
+	}
+
+	method _string_values ( got ) {
+		let out := [];
+		for ( let item in self._result_items(got) ) {
+			if ( item{kind} ≡ "kdl-value" ) {
+				let v := item{value};
+				out.push( v.native_value() ) if v.type() ≡ "string";
+			}
+			else if ( item{kind} ≡ "plain" and item{type} ≡ "string" ) {
+				out.push( item{value} );
+			}
+		}
+		return out;
+	}
+
+	method _ordered_compare ( got, String op, literal ) {
+		return false if literal{kind} ne "value";
+		for ( let item in self._result_items(got) ) {
+			return true if self._ordered_compare_one( item, op, literal );
+		}
+		return false;
+	}
+
+	method _ordered_compare_one ( got, String op, literal ) {
+		let got_type;
+		let got_value;
+		let got_kind := null;
+		if ( got{kind} ≡ "kdl-value" ) {
+			got_type := got{value}.type();
+			got_kind := got{value}.kind();
+			got_value := got{value}.native_value();
+		}
+		else if ( got{kind} ≡ "plain" ) {
+			got_type := got{type};
+			got_value := got{value};
+		}
+		else {
+			return false;
+		}
+
+		return false if got_type ne literal{type};
+		return false if got_kind ≡ "string" or literal{value_kind} ≡ "string";
+		if ( got_type ≡ "number" ) {
+			return got_value > literal{value} if op ≡ ">";
+			return got_value >= literal{value} if op ≡ ">=";
+			return got_value < literal{value} if op ≡ "<";
+			return got_value <= literal{value} if op ≡ "<=";
+		}
+		if ( got_type ≡ "string" ) {
+			let c := got_value cmp literal{value};
+			return c > 0 if op ≡ ">";
+			return c >= 0 if op ≡ ">=";
+			return c < 0 if op ≡ "<";
+			return c <= 0 if op ≡ "<=";
+		}
+		return false;
+	}
+
+	method get ( raw ) {
+		return self._evaluate_nodes(raw).map( fn n -> n{node} );
+	}
+
+	method select ( raw ) {
+		return self.get(raw);
+	}
+
+	method query ( raw ) {
+		return self.get(raw);
+	}
+
+	method first ( raw, fallback? ) {
+		let got := self.get(raw);
+		return got.empty ? fallback : got[0];
+	}
+
+	method exists ( raw ) {
+		return not self.get(raw).empty;
+	}
+
+	method values ( raw ) {
+		let out := [];
+		for ( let node in self.get(raw) ) {
+			for ( let value in node.args() ) {
+				out.push(value);
+			}
+		}
+		return out;
+	}
+
+	method props ( raw ) {
+		let out := new PairList();
+		for ( let node in self.get(raw) ) {
+			for ( let pair in node.props().to_Array() ) {
+				out.add( pair.key, pair.value );
+			}
+		}
+		return out;
+	}
+
+	method _ref_for_node ( node ) {
+		let parent := node{parent};
+		die "KDLQuery assignment target has no parent node"
+			if parent ≡ null;
+
+		if ( parent.exists("document") and parent{document} ) {
+			let roots := parent{values};
+			return \ roots[node{index}];
+		}
+
+		let children := parent{node}.children();
+		return \ children[node{index}];
+	}
+
+	method assign_first ( target, value, op := ":=", weak := false ) {
+		let nodes := self._evaluate_nodes(target);
+		die "KDLQuery assignment found no matches"
+			if nodes.length() ≡ 0;
+		return self._apply_assignment_ref(
+			self._ref_for_node( nodes[0] ),
+			value,
+			op,
+			weak,
+		);
+	}
+
+	method assign_all ( target, value, op := ":=", weak := false ) {
+		let nodes := self._evaluate_nodes(target);
+		if ( nodes.length() ≡ 0 ) {
+			return value;
+		}
+
+		let last_result := value;
+		for ( let node in nodes ) {
+			last_result := self._apply_assignment_ref(
+				self._ref_for_node(node),
+				value,
+				op,
+				weak,
+			);
+		}
+
+		return last_result;
+	}
+
+	method assign_maybe ( target, value, op := ":=", weak := false ) {
+		let nodes := self._evaluate_nodes(target);
+		if ( nodes.length() ≡ 0 ) {
+			return false;
+		}
+
+		self._apply_assignment_ref(
+			self._ref_for_node( nodes[0] ),
+			value,
+			op,
+			weak,
+		);
+		return true;
+	}
+
+	method ref_first ( target ) {
+		let nodes := self._evaluate_nodes(target);
+		die "KDLQuery assignment found no matches"
+			if nodes.length() ≡ 0;
+		return self._ref_for_node( nodes[0] );
+	}
+
+	method ref_all ( target ) {
+		let out := [];
+		for ( let node in self._evaluate_nodes(target) ) {
+			out.push( self._ref_for_node(node) );
+		}
+		return out;
+	}
+
+	method ref_maybe ( target ) {
+		let nodes := self._evaluate_nodes(target);
+		return nodes.length() ≡ 0 ? null : self._ref_for_node( nodes[0] );
+	}
+
+	method _apply_assignment_ref ( ref, value, op := ":=", weak := false ) {
+		die "KDLQuery weak assignment is not supported"
+			if weak;
+
+		die `Unsupported KDLQuery assignment operator '${op}'`
+			if op ≢ ":=";
+		die "KDLQuery assignment value must be a KDLNode"
+			if not( value instanceof KDLNode );
+		return ref(value);
+	}
+}

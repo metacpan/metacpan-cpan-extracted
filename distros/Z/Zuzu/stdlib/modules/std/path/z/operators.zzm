@@ -1,0 +1,445 @@
+=encoding utf8
+
+=head1 NAME
+
+std/path/z/operators - Operator definitions for ZPath.
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module defines the base ZPath operator model and the standard
+operator table used by C<std/path/z>.
+
+=head1 EXPORTS
+
+=head2 Traits
+
+=over
+
+=item C<EvalHelpers>
+
+Shared helpers for operator and function definitions.
+
+=over
+
+=item C<< helper.wrap(value) >>
+
+Parameters: C<value> is any value. Returns: C<Array>. Wraps C<value> as
+a one-item ZPath node array.
+
+=item C<< helper.wrap_for_array(value) >>
+
+Parameters: C<value> is any value. Returns: C<Node>. Wraps C<value> as a
+ZPath node for array results.
+
+=back
+
+=back
+
+=head2 Classes
+
+=over
+
+=item C<< Operator({ spelling: String, kind: String, precedence: Number, ... }) >>
+
+Constructs an operator definition. Returns: C<Operator>.
+
+=over
+
+=item C<< operator.is_unary() >>, C<< operator.is_binary() >>
+
+Parameters: none. Returns: C<Boolean>. Reports whether the operator is
+unary or binary.
+
+=item C<< operator.requires_whitespace() >>
+
+Parameters: none. Returns: C<Boolean>. Reports whether the lexer
+requires whitespace around the operator.
+
+=item C<< operator.lexer_should_ignore() >>
+
+Parameters: none. Returns: C<Boolean>. Reports whether the lexer should
+ignore this operator definition.
+
+=item C<< operator.is_right_associative() >>
+
+Parameters: none. Returns: C<Boolean>. Reports whether the operator is
+right associative.
+
+=item C<< operator.char_length() >>
+
+Parameters: none. Returns: C<Number>. Returns the operator spelling
+length.
+
+=item C<< operator.precedence_is(lvl) >>
+
+Parameters: C<lvl> is a precedence level. Returns: C<Boolean>. Returns
+true when the operator has that precedence.
+
+=back
+
+=back
+
+=head2 Constants
+
+=over
+
+=item C<STANDARD_OPERATORS>
+
+Type: C<Array>. Standard ZPath operator definitions.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/path/z/operators >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/path/z/node import Node;
+
+function _floaty_modulus ( ln, rn ) {
+	let count := floor( ln / rn ); //
+	return ln - ( count * rn );
+}
+
+trait EvalHelpers {
+	method _handle_numeric_operand ( ev, ctx, expr ) {
+		const result := ev.eval_expr( expr, ev.nested_ctx( ctx ) );
+		return 0 unless result.length;
+		return ev.to_number( result[0] );
+	}
+	
+	method _handle_stringy_operand ( ev, ctx, expr ) {
+		const result := ev.eval_expr( expr, ev.nested_ctx( ctx ) );
+		return 0 unless result.length;
+		return ev.to_number( result[0] );
+	}
+	
+	method wrap ( value ) {
+		return [ Node.wrap( value ) ];
+	}
+	
+	method wrap_for_array ( value ) {
+		return Node.wrap( value );
+	}
+}
+
+class Operator with EvalHelpers {
+	let String spelling with get;
+	let String alias with get, has;
+	let String kind with get;
+	let Number precedence with get;
+	let Boolean unary      := false;
+	let Boolean require_ws := false;
+	let Boolean lex_ignore := false;
+	let Boolean right_assoc := false;
+	let Function f;
+	
+	method is_unary () {
+		return unary;
+	}
+	
+	method is_binary () {
+		return not unary;
+	}
+	
+	method requires_whitespace () {
+		return require_ws;
+	}
+	
+	method lexer_should_ignore () {
+		return lex_ignore;
+	}
+
+	method is_right_associative () {
+		return right_assoc;
+	}
+	
+	method char_length () {
+		return length spelling;
+	}
+	
+	method precedence_is ( lvl ) {
+		return precedence = lvl;
+	}
+}
+
+const STANDARD_OPERATORS := [
+	new Operator(
+		spelling: "||",
+		kind: "OROR",
+		precedence: 2,
+		f: function ( op, ev, ast, ctx, left, right ) {
+			const left_val := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+			if ( left_val.length and ev.truthy( left_val[0] ) ) {
+				return op.wrap( true );
+			}
+			const right_val := ev.eval_expr( right, ev.nested_ctx( ctx ) );
+			if ( right_val.length and ev.truthy( right_val[0] ) ) {
+				return op.wrap( true );
+			}
+			return op.wrap( false );
+		},
+	),
+	
+	new Operator(
+		spelling: "&&",
+		kind: "ANDAND",
+		precedence: 4,
+		f: function ( op, ev, ast, ctx, left, right ) {
+			const left_val := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+			if ( left_val.length and ev.truthy( left_val[0] ) ) {
+				const right_val := ev.eval_expr( right, ev.nested_ctx( ctx ) );
+				if ( right_val.length and ev.truthy( right_val[0] ) ) {
+					return op.wrap( true );
+				}
+			}
+			return op.wrap( false );
+		},
+	),
+	
+	new Operator(
+		spelling: "==",
+		kind: "EQEQ",
+		precedence: 12,
+		f: function ( op, ev, ast, ctx, left, right ) {
+			const left_vals  := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+			const right_vals := ev.eval_expr( right, ev.nested_ctx( ctx ) );
+			let is_eq := false;
+			
+			if ( left_vals and right_vals ) {
+				for ( let ln in left_vals ) {
+					last if is_eq;
+					for ( let rn in right_vals ) {
+						last if is_eq;
+						if ( ev.equals( ln, rn ) ) {
+							is_eq := true;
+						}
+					}
+				}
+			}
+			
+			return op.wrap( is_eq );
+		},
+	),
+	
+	new Operator(
+		spelling: "!=",
+		kind: "NEQ",
+		precedence: 12,
+		f: function ( op, ev, ast, ctx, left, right ) {
+			const left_vals  := ev.eval_expr( left, ev.nested_ctx( ctx ) );
+			const right_vals := ev.eval_expr( right, ev.nested_ctx( ctx ) );
+			let is_eq := false;
+			
+			if ( left_vals and right_vals ) {
+				for ( let ln in left_vals ) {
+					last if is_eq;
+					for ( let rn in right_vals ) {
+						last if is_eq;
+						if ( ev.equals( ln, rn ) ) {
+							is_eq := true;
+						}
+					}
+				}
+			}
+			
+			return op.wrap( not is_eq );
+		},
+	),
+	
+	new Operator(
+		spelling: ">=",
+		kind: "GE",
+		precedence: 14,
+		f: function ( op, ev, ast, ctx, left, right ) {
+			let left_val  := op._handle_numeric_operand( ev, ctx, left );
+			let right_val := op._handle_numeric_operand( ev, ctx, right );
+			if ( ( left_val ≡ null ) or ( right_val ≡ null ) ) {
+				left_val  := op._handle_stringy_operand( ev, ctx, left );
+				right_val := op._handle_stringy_operand( ev, ctx, right );
+				return op.wrap( left_val ge right_val );
+			}
+			return op.wrap( left_val ≥ right_val );
+		},
+	),
+	
+	new Operator(
+		spelling: "<=",
+		kind: "LE",
+		precedence: 14,
+		f: function ( op, ev, ast, ctx, left, right ) {
+			let left_val  := op._handle_numeric_operand( ev, ctx, left );
+			let right_val := op._handle_numeric_operand( ev, ctx, right );
+			if ( ( left_val ≡ null ) or ( right_val ≡ null ) ) {
+				left_val  := op._handle_stringy_operand( ev, ctx, left );
+				right_val := op._handle_stringy_operand( ev, ctx, right );
+				return op.wrap( left_val le right_val );
+			}
+			return op.wrap( left_val ≤ right_val );
+		},
+	),
+	
+	new Operator(
+		spelling: "+", 
+		kind: "PLUS",
+		require_ws: true,
+		precedence: 16,
+		f: function ( op, ev, ast, ctx, left, right ) {
+			const left_val  := op._handle_numeric_operand( ev, ctx, left );
+			const right_val := op._handle_numeric_operand( ev, ctx, right );
+			return op.wrap( left_val + right_val );
+		},
+	),
+	
+	new Operator(
+		spelling: "-", 
+		kind: "MINUS",
+		require_ws: true,
+		precedence: 16,
+		f: function ( op, ev, ast, ctx, left, right ) {
+			const left_val  := op._handle_numeric_operand( ev, ctx, left );
+			const right_val := op._handle_numeric_operand( ev, ctx, right );
+			return op.wrap( left_val - right_val );
+		},
+	),
+	
+	new Operator(
+		spelling: "%", 
+		kind: "PCT",
+		require_ws: true,
+		precedence: 18,
+		f: function ( op, ev, ast, ctx, left, right ) {
+			const left_val  := op._handle_numeric_operand( ev, ctx, left );
+			const right_val := op._handle_numeric_operand( ev, ctx, right );
+			if ( ( left_val ~ /\./ ) or ( right_val ~ /\./ ) ) {
+				return op.wrap( _floaty_modulus( left_val, right_val ) );
+			}
+			return op.wrap( left_val mod right_val );
+		},
+	),
+	
+	new Operator(
+		spelling: "*", 
+		kind: "TIMES",
+		require_ws: true,
+		precedence: 18,
+		lex_ignore: true,
+		alias: "STAR",
+		f: function ( op, ev, ast, ctx, left, right ) {
+			const left_val  := op._handle_numeric_operand( ev, ctx, left );
+			const right_val := op._handle_numeric_operand( ev, ctx, right );
+			return op.wrap( left_val × right_val );
+		},
+	),
+	
+	new Operator(
+		spelling: "/", 
+		kind: "DIVIDE",
+		require_ws: true,
+		precedence: 18,
+		lex_ignore: true,
+		alias: "SLASH",
+		f: function ( op, ev, ast, ctx, left, right ) {
+			const left_val  := op._handle_numeric_operand( ev, ctx, left );
+			const right_val := op._handle_numeric_operand( ev, ctx, right );
+			return op.wrap( left_val ÷ right_val );
+		},
+	),
+	
+	new Operator(
+		spelling: "^", 
+		kind: "BXOR",
+		precedence: 8,
+		f: function ( op, ev, ast, ctx, left, right ) {
+			const left_val  := op._handle_numeric_operand( ev, ctx, left );
+			const right_val := op._handle_numeric_operand( ev, ctx, right );
+			return op.wrap( left_val ^ right_val );
+		},
+	),
+	
+	new Operator(
+		spelling: "&", 
+		kind: "BAND",
+		precedence: 10,
+		f: function ( op, ev, ast, ctx, left, right ) {
+			const left_val  := op._handle_numeric_operand( ev, ctx, left );
+			const right_val := op._handle_numeric_operand( ev, ctx, right );
+			return op.wrap( left_val & right_val );
+		},
+	),
+	
+	new Operator(
+		spelling: "|", 
+		kind: "BOR",
+		precedence: 6,
+		f: function ( op, ev, ast, ctx, left, right ) {
+			const left_val  := op._handle_numeric_operand( ev, ctx, left );
+			const right_val := op._handle_numeric_operand( ev, ctx, right );
+			return op.wrap( left_val | right_val );
+		},
+	),
+	
+	new Operator(
+		spelling: ">", 
+		kind: "GT",
+		precedence: 14,
+		f: function ( op, ev, ast, ctx, left, right ) {
+			let left_val  := op._handle_numeric_operand( ev, ctx, left );
+			let right_val := op._handle_numeric_operand( ev, ctx, right );
+			if ( ( left_val ≡ null ) or ( right_val ≡ null ) ) {
+				left_val  := op._handle_stringy_operand( ev, ctx, left );
+				right_val := op._handle_stringy_operand( ev, ctx, right );
+				return op.wrap( left_val gt right_val );
+			}
+			return op.wrap( left_val > right_val );
+		},
+	),
+	
+	new Operator(
+		spelling: "<", 
+		kind: "LT",
+		precedence: 14,
+		f: function ( op, ev, ast, ctx, left, right ) {
+			let left_val  := op._handle_numeric_operand( ev, ctx, left );
+			let right_val := op._handle_numeric_operand( ev, ctx, right );
+			if ( ( left_val ≡ null ) or ( right_val ≡ null ) ) {
+				left_val  := op._handle_stringy_operand( ev, ctx, left );
+				right_val := op._handle_stringy_operand( ev, ctx, right );
+				return op.wrap( left_val le right_val );
+			}
+			return op.wrap( left_val < right_val );
+		},
+	),
+	
+	new Operator(
+		spelling: "!", 
+		kind: "NOT",
+		unary: true,
+		precedence: 20,
+		f: function ( op, ev, ast, ctx, expr ) {
+			const got := ev.eval_expr( expr, ctx );
+			const value := got.length() > 0 ? got[0] : null;
+			return op.wrap( not ev.truthy(value) );
+		},
+	),
+	
+	new Operator(
+		spelling: "~", 
+		kind: "BNOT",
+		unary: true,
+		precedence: 20,
+		f: function ( op, ev, ast, ctx, expr ) {
+			const value := op._handle_numeric_operand( ev, ctx, expr );
+			return op.wrap( ~value );
+		},
+	),
+];

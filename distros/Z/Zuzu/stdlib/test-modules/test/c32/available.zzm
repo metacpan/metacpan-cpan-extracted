@@ -1,0 +1,5 @@
+class DefaultFeature {
+	method feature_name () {
+		return "default";
+	}
+}

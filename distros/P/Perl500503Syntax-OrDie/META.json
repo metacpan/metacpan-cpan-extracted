@@ -1,6 +1,6 @@
 {
     "name" : "Perl500503Syntax-OrDie",
-    "version" : "0.01",
+    "version" : "0.02",
     "abstract" : "Validate Perl 5.005_03 source compatibility",
     "author" : [
         "ina <ina@cpan.org>"
@@ -65,7 +65,7 @@
     "provides" : {
         "Perl500503Syntax::OrDie" : {
             "file" : "lib/Perl500503Syntax/OrDie.pm",
-            "version" : "0.01"
+            "version" : "0.02"
         }
     }
 }

@@ -28,7 +28,8 @@ my %valid_languages = map { $_ => true } @supported_languages;
 sub parse_switches
 {
     my %opts;
-    GetOptions(\%opts, qw(d|datetime=s
+    GetOptions(\%opts, qw(c|calendar_class=s
+                          d|datetime=s
                           e|extract
                           f|format=s
                           h|help
@@ -89,6 +90,7 @@ sub set_values
     }
 
     my %table = (
+        c => 'calendar_class',
         d => 'datetime',
         l => 'lang',
         f => 'format',
@@ -108,17 +110,18 @@ sub usage
 {
     print <<"USAGE";
 Usage: $0 [switches]
-   -d, --datetime=<string>     datetime string
-   -e, --extract               extract expressions
-   -f, --format=<format>       format of numeric dates
-   -h, --help                  this help screen
-   -l, --lang=<code>           language code
-   -p, --prefer_future         prefer future dates
-   -P, --demand_future         demand future dates
-   -s, --supported             list of supported languages
-   -t, --time_zone=<string>    time zone string
-   -T, --trace                 print trace after processing
-   -V, --version               print version
+   -c, --calendar_class=<class>     calendar class
+   -d, --datetime=<string>          datetime string
+   -e, --extract                    extract expressions
+   -f, --format=<format>            format of numeric dates
+   -h, --help                       this help screen
+   -l, --lang=<code>                language code
+   -p, --prefer_future              prefer future dates
+   -P, --demand_future              demand future dates
+   -s, --supported                  list of supported languages
+   -t, --time_zone=<string>         time zone string
+   -T, --trace                      print trace after processing
+   -V, --version                    print version
 USAGE
     exit;
 }
@@ -195,17 +198,18 @@ dateparse - frontend to DateTime::Format::Natural
 =head1 SYNOPSIS
 
  Usage: dateparse [switches]
-   -d, --datetime=<string>     datetime string *
-   -e, --extract               extract expressions
-   -f, --format=<format>       format of numeric dates
-   -h, --help                  this help screen
-   -l, --lang=<code>           language code
-   -p, --prefer_future         prefer future dates
-   -P, --demand_future         demand future dates
-   -s, --supported             list of supported languages
-   -t, --time_zone=<string>    time zone string
-   -T, --trace                 print trace after processing
-   -V, --version               print version
+   -c, --calendar_class=<class>      calendar class
+   -d, --datetime=<string>           datetime string *
+   -e, --extract                     extract expressions
+   -f, --format=<format>             format of numeric dates
+   -h, --help                        this help screen
+   -l, --lang=<code>                 language code
+   -p, --prefer_future               prefer future dates
+   -P, --demand_future               demand future dates
+   -s, --supported                   list of supported languages
+   -t, --time_zone=<string>          time zone string
+   -T, --trace                       print trace after processing
+   -V, --version                     print version
 
 * The date must conform to YYYY-MM-DD and the time to hh:mm:ss(.ms).
 Valid datetime strings consist of either date, date/time or time.

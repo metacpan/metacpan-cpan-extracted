@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Dist::Zilla::Plugin::GitHub::CreateRelease;
-our $VERSION = '0.0008'; # VERSION
+our $VERSION = '0.0009'; # VERSION
 
 # ABSTRACT: Create a GitHub Release
 
@@ -16,7 +16,6 @@ use File::Slurper qw/read_text read_binary/;
 use Exporter qw(import);
 use Moose;
 use Try::Tiny;
-use JSON::MaybeXS 1.004000;
 with 'Dist::Zilla::Role::AfterRelease';
 
 use namespace::autoclean;
@@ -51,7 +50,7 @@ sub _create_release {
 
   my $releases = Pithub::Repos::Releases->new(
     user  => $identity{login} || $self->{username},
-    repo  => $self->_get_repo_name() || $self->{repo},
+    repo  => $self->{repo} || $self->_get_repo_name(),
     token => $identity{token},
   );
   die "Unable to instantiate Pithub::Repos::Releases" if (! defined $releases);
@@ -62,9 +61,9 @@ sub _create_release {
       target_commitish => $branch,
       name             => $title,
       body             => $notes,
-      draft            => $self->{draft} ? JSON::MaybeXS::true : JSON::MaybeXS::false,
-      prerelease       => $self->zilla->is_trial ? JSON::MaybeXS::true : JSON::MaybeXS::false,
-      generate_release_notes => $self->{github_notes} ? JSON::MaybeXS::true : JSON::MaybeXS::false,
+      draft            => $self->{draft} ? \1 : \0,
+      prerelease       => $self->zilla->is_trial ? \1 : \0,
+      generate_release_notes => $self->{github_notes} ? \1 : \0,
     }
   );
   die "Discussion category name is invalid" if  ($release->response eq '404');
@@ -146,13 +145,25 @@ sub _get_repo_name {
     };
   };
 
-  #FIXME there must be a better way...
-  my $basename = uri_unescape( basename(URI->new( $url[0])->path));
-  $basename =~ s/.git//;
+  my $basename = $self->_repo_name_from_url($url[0]);
   $self->log("Release will be created using $basename");
 
   return $basename;
 
+}
+
+sub _repo_name_from_url {
+  my $self = shift;
+  my $url  = shift;
+
+  my $basename = uri_unescape( basename( URI->new($url)->path ) );
+  # Strip only a trailing ".git" suffix.  The old s/.git// matched any
+  # character followed by "git" anywhere in the string, so a repository
+  # whose name contains "git" (e.g. p5-git-libgit2) lost the wrong part
+  # and turned into p5-libgit2.
+  $basename =~ s/\.git$//;
+
+  return $basename;
 }
 
 sub _generate_release_notes {
@@ -186,19 +197,30 @@ sub _get_notes_from_changes {
   my $prev = $tags[1];
 
   my $file = read_text($self->{notes_file});
-  my @lines = split /\n/, $file;
-  my $print = 0;
-  my $notes = "";
-  foreach my $line (@lines) {
-    $print = 1 if ($line =~ /^$vers/);
-    $print = 0 if ($line =~ /^$prev/);
-    $notes .= $line . "\n" if $print;
-  }
+  my $notes = $self->_extract_changes($file, $vers, $prev);
+
   return $self->_as_code($notes) if (! $self->{add_checksum});
 
   $notes .= $self->_get_checksum($filename);
 
   return $self->_as_code($notes);
+}
+
+sub _extract_changes {
+  my ($self, $text, $vers, $prev) = @_;
+
+  my $print = 0;
+  my $notes = "";
+  for my $line (split /\n/, $text) {
+    # On the first release "git for-each-ref --count=2" returns a single
+    # tag, so $prev is undef; guard against it to avoid an uninitialized
+    # warning.  \Q...\E keeps version numbers (e.g. 0.003) from being
+    # treated as regex patterns.
+    $print = 1 if (defined $vers && $line =~ /^\Q$vers\E/);
+    $print = 0 if (defined $prev && $line =~ /^\Q$prev\E/);
+    $notes .= $line . "\n" if $print;
+  }
+  return $notes;
 }
 
 sub _get_notes_from_file {
@@ -338,7 +360,7 @@ Dist::Zilla::Plugin::GitHub::CreateRelease - Create a GitHub Release
 
 =head1 VERSION
 
-version 0.0008
+version 0.0009
 
 =head1 SYNOPSIS
 
@@ -525,7 +547,7 @@ The main processing function that is called automatically after the release is c
 
 =head1 AUTHOR
 
-  Timothy Legge <timlegge@cpan.org>
+  Timothy Legge <timlegge@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 

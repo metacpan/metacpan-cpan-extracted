@@ -1,0 +1,38 @@
+from test/more import *;
+from test/worker_contract import require_worker_phase, await_worker_failure;
+
+let Worker := require_worker_phase(3);
+
+class WorkerPhase2FsLoadBox {
+	method __on_load__ () {
+		from std/io import Path;
+		return new Path("not-read.txt").slurp_utf8();
+	}
+}
+
+async function main () {
+	let err := await {
+		await_worker_failure(
+			Worker.spawn(
+				function ( value ) {
+					return "worker-body-ran";
+				},
+				[ new WorkerPhase2FsLoadBox() ],
+				deny_fs: true,
+			),
+		);
+	};
+
+	ok( err instanceof Exception, "deny_fs load failure rejects task" );
+	like(
+		err.to_String(),
+		/(denied|unavailable|std\/io|fs)/i,
+		"deny_fs is active before worker marshal load hooks",
+	);
+}
+
+await {
+	main();
+};
+
+done_testing();

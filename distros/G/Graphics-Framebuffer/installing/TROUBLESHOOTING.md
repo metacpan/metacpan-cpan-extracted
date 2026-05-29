@@ -110,6 +110,12 @@
 
 ----
 
+### I Upgraded To The Latest Version And Now It Won't Compile
+
+Re-run the install bash script in the "installing" directory.  New versions of Ubuntu have changed how libraries are referenced and rerunning the install script will fix the missing dependencies that newer versions of Ubuntu have created.
+
+----
+
 ### Ask For Help
 
    If none of these ideas work, then send me an email, and I may be able to get it functioning for you.  Please run the ```dump.pl``` script inside the "examples" directory inside this module's package:

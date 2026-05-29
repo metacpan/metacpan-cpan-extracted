@@ -1,0 +1,31 @@
+from test/more import *;
+from test/worker_contract import require_worker_phase, await_worker_failure;
+
+let Worker := require_worker_phase(3);
+
+async function main () {
+	let err := await {
+		await_worker_failure(
+			Worker.spawn(
+				function () {
+					from std/marshal import dump;
+					return dump;
+				},
+				[],
+			),
+		);
+	};
+
+	ok( err instanceof Exception, "unmarshalable return rejects task" );
+	like(
+		err.to_String(),
+		/(MarshallingException|marshal|not marshalable)/i,
+		"unmarshalable return failure identifies marshalling",
+	);
+}
+
+await {
+	main();
+};
+
+done_testing();

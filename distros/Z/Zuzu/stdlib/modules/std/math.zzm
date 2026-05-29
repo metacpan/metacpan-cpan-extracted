@@ -1,0 +1,141 @@
+=encoding utf8
+
+=head1 NAME
+
+std/math - Mathematical constants and functions.
+
+=head1 SYNOPSIS
+
+  from std/math import Math, π;
+
+  let r := 3;
+  let a := π * Math.pow(r, 2);
+  let s := Math.sin(Math.deg2rad(90));
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module exports the C<Math> class with static math helpers and
+also exports the constant C<π>.
+
+=head1 EXPORTS
+
+=head2 Constants
+
+=over
+
+=item C<π>
+
+Type: C<Number>. The value of pi.
+
+=back
+
+=head2 Classes
+
+=over
+
+=item C<Math>
+
+Runtime-supported static math helper class.
+
+=over
+
+=item C<< Math.pi() >>
+
+Parameters: none. Returns: C<Number>. Returns the value of pi.
+
+=item C<< Math.rand(Number max?) >>
+
+Parameters: C<max> is an optional exclusive upper bound. Returns:
+C<Number>. Returns a pseudo-random number, scaled by C<max> when
+provided.
+
+=item C<< Math.exp(Number x) >>, C<< Math.log(Number x) >>, C<< Math.log10(Number x) >>
+
+Parameters: C<x> is a number. Returns: C<Number>. Returns the
+exponential, natural logarithm, or base-10 logarithm of C<x>.
+
+=item C<< Math.pow(Number base, Number exponent) >>
+
+Parameters: C<base> and C<exponent> are numbers. Returns: C<Number>.
+Raises C<base> to C<exponent>.
+
+=item C<< Math.min(...values) >>, C<< Math.max(...values) >>, C<< Math.sum(...values) >>
+
+Parameters: C<values> are numbers or numeric collections. Returns:
+C<Number>. Returns the minimum, maximum, or sum of the supplied values.
+
+=item C<< Math.clamp(Number value, Number min, Number max) >>
+
+Parameters: C<value>, C<min>, and C<max> are numbers. Returns:
+C<Number>. Restricts C<value> to the inclusive range C<min> to C<max>.
+
+=item C<< Math.hypot(...values) >>
+
+Parameters: C<values> are numeric components. Returns: C<Number>.
+Returns the Euclidean norm of the supplied components.
+
+=item C<< Math.deg2rad(Number degrees) >>, C<< Math.rad2deg(Number radians) >>
+
+Parameters: the argument is an angle. Returns: C<Number>. Converts
+between degrees and radians.
+
+=item C<< Math.sin(Number x) >>, C<< Math.cos(Number x) >>, C<< Math.tan(Number x) >>
+
+Parameters: C<x> is an angle in radians. Returns: C<Number>. Returns the
+standard trigonometric function result.
+
+=item C<< Math.cosec(Number x) >>, C<< Math.sec(Number x) >>, C<< Math.cotan(Number x) >>
+
+Parameters: C<x> is an angle in radians. Returns: C<Number>. Returns the
+reciprocal trigonometric function result.
+
+=item C<< Math.asin(Number x) >>, C<< Math.acos(Number x) >>, C<< Math.atan(Number x) >>
+
+Parameters: C<x> is a number. Returns: C<Number>. Returns the inverse
+trigonometric function result in radians.
+
+=item C<< Math.atan2(Number y, Number x) >>
+
+Parameters: C<y> and C<x> are coordinates. Returns: C<Number>. Returns
+the quadrant-aware arctangent in radians.
+
+=item C<< Math.acosec(Number x) >>, C<< Math.asec(Number x) >>, C<< Math.acotan(Number x) >>
+
+Parameters: C<x> is a number. Returns: C<Number>. Returns the inverse
+reciprocal trigonometric function result in radians.
+
+=item C<< Math.sinh(Number x) >>, C<< Math.cosh(Number x) >>, C<< Math.tanh(Number x) >>
+
+Parameters: C<x> is a number. Returns: C<Number>. Returns the standard
+hyperbolic function result.
+
+=item C<< Math.cosech(Number x) >>, C<< Math.sech(Number x) >>, C<< Math.cotanh(Number x) >>
+
+Parameters: C<x> is a number. Returns: C<Number>. Returns the reciprocal
+hyperbolic function result.
+
+=item C<< Math.asinh(Number x) >>, C<< Math.acosh(Number x) >>, C<< Math.atanh(Number x) >>
+
+Parameters: C<x> is a number. Returns: C<Number>. Returns the inverse
+hyperbolic function result.
+
+=item C<< Math.acosech(Number x) >>, C<< Math.asech(Number x) >>, C<< Math.acotanh(Number x) >>
+
+Parameters: C<x> is a number. Returns: C<Number>. Returns the inverse
+reciprocal hyperbolic function result.
+
+=back
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/math >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.

@@ -1,0 +1,5 @@
+trait CrossTrait {
+	method ping () {
+		return "pong";
+	}
+}

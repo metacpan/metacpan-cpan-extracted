@@ -1,0 +1,243 @@
+from std/net/smtp import Mailer, MailResult;
+from test/more import *;
+
+requires_capability("proc");
+
+from std/io import Path;
+
+let caps := Mailer.capabilities();
+ok( "smtp" in caps, "capabilities include smtp" );
+ok( "sendmail" in caps, "capabilities include sendmail" );
+ok( "tls" in caps, "capabilities include tls" );
+ok( "starttls" in caps, "capabilities include starttls" );
+ok( "auth" in caps, "capabilities include auth" );
+ok( "async" in caps, "capabilities include async" );
+
+let dir := Path.tempdir();
+let fixture := dir.child("fake-sendmail.pl");
+let argv_file := dir.child("argv.txt");
+let stdin_file := dir.child("stdin.bin");
+
+fixture.spew_utf8(
+	"my ( $argv_file, $stdin_file, $exit ) = splice @ARGV, 0, 3;\n"
+	_ "open my $afh, '>', $argv_file or die $!;\n"
+	_ "binmode $afh;\n"
+	_ "print {$afh} join qq{\\n}, @ARGV;\n"
+	_ "close $afh;\n"
+	_ "open my $sfh, '>', $stdin_file or die $!;\n"
+	_ "binmode STDIN;\n"
+	_ "binmode $sfh;\n"
+	_ "local $/;\n"
+	_ "print {$sfh} scalar <STDIN>;\n"
+	_ "close $sfh;\n"
+	_ "exit $exit;\n",
+);
+
+let headers := new PairList();
+headers.add( "From", "sender@example.test" );
+headers.add( "To", "header-only@example.test" );
+headers.add( "X-Dup", "one" );
+headers.add( "X-Dup", "two" );
+headers.add( "Message-ID", "<smtp-ztest@example.test>" );
+
+let body := to_binary("Body line\r\n");
+let mailer := new Mailer(
+	transport: "sendmail",
+	sendmail_path: "/usr/bin/env",
+	sendmail_args: [
+		"perl",
+		fixture.to_String(),
+		argv_file.to_String(),
+		stdin_file.to_String(),
+		"0",
+	],
+);
+let result := mailer.send(
+	"sender@example.test",
+	[ "rcpt@example.test" ],
+	headers,
+	body,
+);
+
+ok( result instanceof MailResult, "send returns MailResult" );
+is( result{transport}, "sendmail", "result transport" );
+is( result{accepted}[0], "rcpt@example.test", "accepted recipient" );
+is( result{rejected}.length(), 0, "no rejected recipients" );
+is( result{message_id}, "<smtp-ztest@example.test>", "message id copied" );
+
+is(
+	argv_file.slurp_utf8(),
+	"-i\n-f\nsender@example.test\nrcpt@example.test",
+	"sendmail argv uses envelope recipients only",
+);
+is(
+	to_string( stdin_file.slurp() ),
+	"From: sender@example.test\r\n"
+		_ "To: header-only@example.test\r\n"
+		_ "X-Dup: one\r\n"
+		_ "X-Dup: two\r\n"
+		_ "Message-ID: <smtp-ztest@example.test>\r\n"
+		_ "\r\n"
+		_ "Body line\r\n",
+	"headers and body serialize exactly",
+);
+
+let dict_error := exception( function () {
+	mailer.send(
+		"sender@example.test",
+		"rcpt@example.test",
+		{ From: "sender@example.test" },
+		body,
+	);
+} );
+like(
+	dict_error.to_String(),
+	/headers expects PairList/,
+	"Dict headers are rejected",
+);
+
+let shaped_dict_error := exception( function () {
+	mailer.send(
+		"sender@example.test",
+		"rcpt@example.test",
+		{ list: [] },
+		body,
+	);
+} );
+like(
+	shaped_dict_error.to_String(),
+	/headers expects PairList/,
+	"Dict headers with list keys are rejected",
+);
+
+let body_error := exception( function () {
+	mailer.send(
+		"sender@example.test",
+		"rcpt@example.test",
+		headers,
+		"Body line\r\n",
+	);
+} );
+like(
+	body_error.to_String(),
+	/Mailer\.send body expects BinaryString, got String/,
+	"String body is rejected",
+);
+
+let header_name_error := exception( function () {
+	let bad := new PairList();
+	bad.add( "Bad:Name", "value" );
+	mailer.send(
+		"sender@example.test",
+		"rcpt@example.test",
+		bad,
+		body,
+	);
+} );
+like(
+	header_name_error.to_String(),
+	/invalid header name/,
+	"invalid header names are rejected",
+);
+
+let header_value_error := exception( function () {
+	let bad := new PairList();
+	bad.add( "Subject", "bad\nvalue" );
+	mailer.send(
+		"sender@example.test",
+		"rcpt@example.test",
+		bad,
+		body,
+	);
+} );
+like(
+	header_value_error.to_String(),
+	/value must not contain CR or LF/,
+	"header values cannot contain line breaks",
+);
+
+let header_type_error := exception( function () {
+	let bad := new PairList();
+	bad.add( "X-Number", 7 );
+	mailer.send(
+		"sender@example.test",
+		"rcpt@example.test",
+		bad,
+		body,
+	);
+} );
+like(
+	header_type_error.to_String(),
+	/headers.*String or BinaryString.*Number/,
+	"header values must be strings or binary strings",
+);
+
+let unsafe_args_error := exception( function () {
+	let unsafe_mailer := new Mailer(
+		transport: "sendmail",
+		sendmail_path: "/usr/bin/env",
+		sendmail_args: [ "-t" ],
+	);
+	unsafe_mailer.send(
+		"sender@example.test",
+		"rcpt@example.test",
+		headers,
+		body,
+	);
+} );
+like(
+	unsafe_args_error.to_String(),
+	/sendmail_args.*header-derived recipients/,
+	"sendmail_args cannot enable header-derived recipients",
+);
+
+let security_option_error := exception( function () {
+	let auth_mailer := new Mailer(
+		transport: "sendmail",
+		sendmail_path: "/usr/bin/env",
+		username: "sender@example.test",
+		password: "secret",
+	);
+	auth_mailer.send(
+		"sender@example.test",
+		"rcpt@example.test",
+		headers,
+		body,
+	);
+} );
+like(
+	security_option_error.to_String(),
+	/mail\.auth.*allow_insecure_auth/,
+	"insecure SMTP auth is rejected before delivery",
+);
+
+async function async_send () {
+	let async_stdin := dir.child("async-stdin.bin");
+	let async_argv := dir.child("async-argv.txt");
+	let async_mailer := new Mailer(
+		transport: "sendmail",
+		sendmail_path: "/usr/bin/env",
+		sendmail_args: [
+			"perl",
+			fixture.to_String(),
+			async_argv.to_String(),
+			async_stdin.to_String(),
+			"0",
+		],
+	);
+	return await {
+		async_mailer.send_async(
+			"sender@example.test",
+			"async@example.test",
+			headers,
+			body,
+		);
+	};
+}
+
+let async_result := await {
+	async_send();
+};
+is( async_result{accepted}[0], "async@example.test", "send_async resolves MailResult" );
+
+done_testing();

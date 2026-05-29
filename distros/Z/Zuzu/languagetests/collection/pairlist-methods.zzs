@@ -1,0 +1,62 @@
+from test/more import *;
+
+let pl := {{ foo: 1, bar: 2, foo: 3, foo: 4 }};
+
+is( pl.length(), 4, "pairlist length includes duplicate keys" );
+is( pl.count(), 4, "pairlist count" );
+is( pl.empty(), 0, "pairlist is not empty" );
+is( pl.keys(), [ "foo", "bar", "foo", "foo" ], "pairlist keys keep order" );
+is( pl.values(), [ 1, 2, 3, 4 ], "pairlist values keep order" );
+is(
+	pl.enumerate().first( fn p -> p.key eq "bar" and p.value = 2 ).value,
+	2,
+	"pairlist enumerate exposes pairs",
+);
+is( pl.has("foo"), 1, "pairlist has duplicate key" );
+is( pl.exists("bar"), 1, "pairlist exists" );
+is( pl.defined("foo"), 1, "pairlist defined" );
+is( {{ foo: null }}.defined("foo"), 0, "pairlist defined false for null" );
+is( pl.get("foo"), 1, "pairlist get returns first value" );
+is( pl.get("missing", 99), 99, "pairlist get fallback" );
+is( pl.get_all("foo"), [ 1, 3, 4 ], "pairlist get_all keeps duplicates" );
+is( pl.all("foo").count(), 3, "pairlist all returns every duplicate" );
+is( pl.kv(), [ "foo", 1, "bar", 2, "foo", 3, "foo", 4 ], "pairlist kv" );
+is( pl.sorted_keys(), [ "bar", "foo", "foo", "foo" ], "pairlist sorted_keys" );
+is( pl.to_Array().length(), 4, "pairlist to_Array" );
+is( pl.to_Array().get( 2, null ).value, 3, "pairlist to_Array keeps order" );
+let pl_it := pl.to_Iterator();
+let pl_keys := [ ];
+for ( let k in pl_it ) {
+	pl_keys.push(k);
+}
+is( pl_keys, [ "foo", "bar", "foo", "foo" ], "pairlist to_Iterator" );
+ok(
+	pl == {{ foo: 1, bar: 2, foo: 3, foo: 4 }},
+	"pairlist equality checks ordered key/value pairs",
+);
+ok( pl ≢ {{ foo: 1, foo: 3, bar: 2, foo: 4 }}, "pairlist equality fails when order differs" );
+ok( pl ≢ { foo: 1, bar: 2 }, "pairlist equality requires exact class" );
+let seen_keys := "";
+let seen_values := 0;
+let seen_pairs := "";
+pl.for_each_key( fn k -> seen_keys := seen_keys _ k _ "," );
+pl.for_each_value( fn v -> seen_values := seen_values + v );
+pl.for_each_pair( fn p -> seen_pairs := seen_pairs _ p.key _ ":" _ p.value _ "," );
+is( seen_keys, "foo,bar,foo,foo,", "pairlist for_each_key order" );
+is( seen_values, 10, "pairlist for_each_value order" );
+is( seen_pairs, "foo:1,bar:2,foo:3,foo:4,", "pairlist for_each_pair order" );
+let pl2 := new PairList();
+pl2.add( "foo", 1 );
+pl2.add( "bar", 2 );
+pl2.set( "foo", 3 );
+is( pl2.keys(), [ "foo", "bar", "foo" ], "pairlist add/set append pairs" );
+pl2.remove("foo");
+is( pl2.kv(), [ "bar", 2 ], "pairlist remove key removes all matching pairs" );
+pl.add( "zap", 9 );
+pl.remove( fn p -> p.value mod 2 = 0 );
+is( pl.kv(), [ "foo", 1, "foo", 3, "zap", 9 ], "pairlist remove callback filters pairs" );
+pl.clear();
+is( pl.length(), 0, "pairlist clear" );
+is( pl.empty(), 1, "pairlist empty after clear" );
+
+done_testing();

@@ -1,5 +1,10 @@
 Change log for Graphics::Framebuffer
 
+7.04   May 29, 2026
+
+       C code optimized and refactored
+	   examples/vector.pl improved
+
 7.03   May 14, 2026
 
        Documentation update

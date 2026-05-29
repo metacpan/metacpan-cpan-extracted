@@ -1,0 +1,143 @@
+from std/secure import Certificate, Secure;
+from test/more import *;
+
+let caps := Secure.capabilities();
+
+if ( caps{host} == "browser" ) {
+	is(
+		Secure.has( "certificate", "verify-chain" ),
+		false,
+		"browser does not advertise certificate chain verification",
+	);
+	like(
+		exception( function () {
+			Certificate.verify_chain([]);
+		} ),
+		/unsupported|not supported|verify_chain/,
+		"browser certificate chain verification is unsupported",
+	);
+	done_testing();
+}
+else {
+	let root_pem := "-----BEGIN CERTIFICATE-----\n"
+		_ "MIIBljCCATygAwIBAgICEwEwCgYIKoZIzj0EAwIwIDEeMBwGA1UEAwwVWnV6dSBQ\n"
+		_ "aGFzZSAxMyBSb290IENBMB4XDTI2MDUwNjEzMzQ0MFoXDTM2MDUwMzEzMzQ0MFow\n"
+		_ "IDEeMBwGA1UEAwwVWnV6dSBQaGFzZSAxMyBSb290IENBMFkwEwYHKoZIzj0CAQYI\n"
+		_ "KoZIzj0DAQcDQgAENStz8DDCle13UfBVa8TNrzAQ6wzeyKH7lP0YTT9EZVqnnOoo\n"
+		_ "Sp2y91apGoUUPPwLHFnzqkh1QCRgdVIfYcYSpqNmMGQwEgYDVR0TAQH/BAgwBgEB\n"
+		_ "/wIBATAOBgNVHQ8BAf8EBAMCAQYwHQYDVR0OBBYEFAThnxzncy4sZ7Y/xk9L/XHL\n"
+		_ "00MWMB8GA1UdIwQYMBaAFAThnxzncy4sZ7Y/xk9L/XHL00MWMAoGCCqGSM49BAMC\n"
+		_ "A0gAMEUCIQCxtSw5W590/49E85YzkT4Jk/HfycIsdI/iMwQrffxntwIgPsoK6kku\n"
+		_ "qn2k3hmHute1Y8MrZSOcqSeg5zrjrN5VnQk=\n"
+		_ "-----END CERTIFICATE-----\n";
+	let intermediate_pem := "-----BEGIN CERTIFICATE-----\n"
+		_ "MIIBnTCCAUSgAwIBAgICEwIwCgYIKoZIzj0EAwIwIDEeMBwGA1UEAwwVWnV6dSBQ\n"
+		_ "aGFzZSAxMyBSb290IENBMB4XDTI2MDUwNjEzMzQ0OVoXDTM0MDcyMzEzMzQ0OVow\n"
+		_ "KDEmMCQGA1UEAwwdWnV6dSBQaGFzZSAxMyBJbnRlcm1lZGlhdGUgQ0EwWTATBgcq\n"
+		_ "hkjOPQIBBggqhkjOPQMBBwNCAATY4Ph2+3yoquhbOw38N1C47sEUfaUoNI1LK2pw\n"
+		_ "2LRqTAUVqEhTVqcZQ0fAMhv+MC+eiTNiNDAo+syn90Ngl5QGo2YwZDASBgNVHRMB\n"
+		_ "Af8ECDAGAQH/AgEAMA4GA1UdDwEB/wQEAwIBBjAdBgNVHQ4EFgQUjsjbsKwPNDZO\n"
+		_ "BaC43ZCWy1X6B3YwHwYDVR0jBBgwFoAUBOGfHOdzLixntj/GT0v9ccvTQxYwCgYI\n"
+		_ "KoZIzj0EAwIDRwAwRAIgCmAsmAmz/no7ilX6dt7OvTeDO4BWU0zzG66g469zMrAC\n"
+		_ "IGhbm9KFoXT8m/dsK9L1vsUuCUlT9gwsq3D0HgBHR/Ws\n"
+		_ "-----END CERTIFICATE-----\n";
+	let leaf_pem := "-----BEGIN CERTIFICATE-----\n"
+		_ "MIIBwDCCAWWgAwIBAgICEwMwCgYIKoZIzj0EAwIwKDEmMCQGA1UEAwwdWnV6dSBQ\n"
+		_ "aGFzZSAxMyBJbnRlcm1lZGlhdGUgQ0EwHhcNMjYwNTA2MTMzNDQ5WhcNMjkwMTMw\n"
+		_ "MTMzNDQ5WjAUMRIwEAYDVQQDDAlsb2NhbGhvc3QwWTATBgcqhkjOPQIBBggqhkjO\n"
+		_ "PQMBBwNCAATBaTYLY6mgTjprvPUFy2QIZc/qZ5bEelR6q6RZhGT1eUvP+tW41/s+\n"
+		_ "/zH6x6Ke6HBxLwUnbDL92F/jyhOJlMcDo4GSMIGPMAwGA1UdEwEB/wQCMAAwDgYD\n"
+		_ "VR0PAQH/BAQDAgeAMBMGA1UdJQQMMAoGCCsGAQUFBwMBMBoGA1UdEQQTMBGCCWxv\n"
+		_ "Y2FsaG9zdIcEfwAAATAdBgNVHQ4EFgQUjW7aWilYFBarO1S8REF5Fcct8OIwHwYD\n"
+		_ "VR0jBBgwFoAUjsjbsKwPNDZOBaC43ZCWy1X6B3YwCgYIKoZIzj0EAwIDSQAwRgIh\n"
+		_ "AMNw353gD/bKW+9+tDTze+T5xm+vc3LYXr4d82LRhIcHAiEA0uJevjpSy1RqqWzJ\n"
+		_ "1eogKJtoGHCamZ8KeB3UYz7NnOY=\n"
+		_ "-----END CERTIFICATE-----\n";
+	let wrong_host_pem := "-----BEGIN CERTIFICATE-----\n"
+		_ "MIIBwTCCAWegAwIBAgICEwQwCgYIKoZIzj0EAwIwKDEmMCQGA1UEAwwdWnV6dSBQ\n"
+		_ "aGFzZSAxMyBJbnRlcm1lZGlhdGUgQ0EwHhcNMjYwNTA2MTMzNDQ5WhcNMjkwMTMw\n"
+		_ "MTMzNDQ5WjAYMRYwFAYDVQQDDA13cm9uZy5leGFtcGxlMFkwEwYHKoZIzj0CAQYI\n"
+		_ "KoZIzj0DAQcDQgAESkE7vrgqC/UGqClqgguWLJamrj6ICIuuHxr+xRzzrKZjghzn\n"
+		_ "5AdStuw5SRhrujh7yfI/3kFNjS/Nim/0OhdzMqOBkDCBjTAMBgNVHRMBAf8EAjAA\n"
+		_ "MA4GA1UdDwEB/wQEAwIHgDATBgNVHSUEDDAKBggrBgEFBQcDATAYBgNVHREEETAP\n"
+		_ "gg13cm9uZy5leGFtcGxlMB0GA1UdDgQWBBT4NLaReWqMnU0qsxXGIsPpeji5XTAf\n"
+		_ "BgNVHSMEGDAWgBSOyNuwrA80Nk4FoLjdkJbLVfoHdjAKBggqhkjOPQQDAgNIADBF\n"
+		_ "AiBvzL/ukCXPHMNkDcS8FBoYcq8dkAd7ZkIPoDjo8wjh0gIhANJ0jiVDY2HMPtJN\n"
+		_ "I+I+bRSivkeSPsNBj4wFfhNNFoLY\n"
+		_ "-----END CERTIFICATE-----\n";
+	let untrusted_pem := "-----BEGIN CERTIFICATE-----\n"
+		_ "MIIBvDCCAWOgAwIBAgICExIwCgYIKoZIzj0EAwIwJjEkMCIGA1UEAwwbWnV6dSBQ\n"
+		_ "aGFzZSAxMyBPdGhlciBSb290IENBMB4XDTI2MDUwNjEzMzUxNFoXDTI5MDEzMDEz\n"
+		_ "MzUxNFowFDESMBAGA1UEAwwJbG9jYWxob3N0MFkwEwYHKoZIzj0CAQYIKoZIzj0D\n"
+		_ "AQcDQgAEaB/htP5qMkxyGKgPpmwc5LxTVv3NcQNN/6yq7VQ8B8adK2EC6ddU++Od\n"
+		_ "NCAOgvUIZhEiMzoZJrCJzpv94hTdtqOBkjCBjzAMBgNVHRMBAf8EAjAAMA4GA1Ud\n"
+		_ "DwEB/wQEAwIHgDATBgNVHSUEDDAKBggrBgEFBQcDATAaBgNVHREEEzARgglsb2Nh\n"
+		_ "bGhvc3SHBH8AAAEwHQYDVR0OBBYEFMy+138W+p2h2jc6dH8SaEV/3YqIMB8GA1Ud\n"
+		_ "IwQYMBaAFFVCbnAqiXLarFlF54oGyN2hMk6pMAoGCCqGSM49BAMCA0cAMEQCIFLi\n"
+		_ "q/Zpwvw33juOvJUTWogcVME2875DWvCMQENMYJOzAiA0TYqxHa7vHQri8uy2AJGo\n"
+		_ "zL/xq1MuPWYwoqunN28VZQ==\n"
+		_ "-----END CERTIFICATE-----\n";
+
+	let valid_at := 1778076000;
+	let root := Certificate.parse(root_pem);
+	let chain := Certificate.parse_chain(leaf_pem _ intermediate_pem);
+	let result := Certificate.verify_chain(
+		chain,
+		{ roots: root, hostname: "localhost", time: valid_at },
+	);
+	is( result{valid}, true, "valid explicit-root chain verifies" );
+	is( result{reason}, "ok", "valid chain reason is ok" );
+	is( result{error}, null, "valid chain has null backend error" );
+	is( result{hostname}, "localhost", "hostname is reported" );
+	is( result{verified_at}, valid_at, "verified_at reports epoch seconds" );
+	is( result{chain_length}, 2, "chain_length reports chain size" );
+
+	let pem_root_result := Certificate.verify_chain(
+		chain,
+		{ roots: root_pem, hostname: "localhost", time: valid_at },
+	);
+	is( pem_root_result{valid}, true, "PEM roots are accepted" );
+
+	let expired := Certificate.verify_chain(
+		chain,
+		{ roots: root, hostname: "localhost", time: 4102444800 },
+	);
+	is( expired{valid}, false, "expired chain returns invalid result" );
+	is( expired{reason}, "expired", "expired chain reason is stable" );
+
+	let wrong_host_chain := [
+		Certificate.parse(wrong_host_pem),
+		Certificate.parse(intermediate_pem),
+	];
+	let wrong_host := Certificate.verify_chain(
+		wrong_host_chain,
+		{ roots: root, hostname: "localhost", time: valid_at },
+	);
+	is( wrong_host{valid}, false, "wrong host returns invalid result" );
+	is(
+		wrong_host{reason},
+		"hostname-mismatch",
+		"wrong host reason is stable",
+	);
+
+	let untrusted := Certificate.verify_chain(
+		[ Certificate.parse(untrusted_pem) ],
+		{ roots: root, hostname: "localhost", time: valid_at },
+	);
+	is( untrusted{valid}, false, "untrusted root returns invalid result" );
+	is(
+		untrusted{reason},
+		"untrusted-root",
+		"untrusted root reason is stable",
+	);
+
+	like(
+		exception( function () {
+			Certificate.verify_chain([ "not a certificate" ]);
+		} ),
+		/Certificate/,
+		"non-certificate chain entries throw",
+	);
+
+	done_testing();
+}

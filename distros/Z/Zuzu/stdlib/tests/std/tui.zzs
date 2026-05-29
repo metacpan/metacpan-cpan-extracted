@@ -1,0 +1,40 @@
+from std/tui import ansi_esc, supports_ansi, colour_text;
+from test/more import *;
+
+let esc := ansi_esc();
+
+is( length esc, 1, "ansi_esc returns one character" );
+is( length( esc _ "[0m" ), 4, "ansi_esc composes ANSI sequences" );
+
+if ( supports_ansi() ) {
+	is(
+		colour_text( "Warning", "yellow" ),
+		esc _ "[33mWarning" _ esc _ "[0m",
+		"colour_text wraps yellow when ANSI is supported"
+	);
+	is(
+		colour_text( "Input", "cyan" ),
+		esc _ "[36mInput" _ esc _ "[0m",
+		"colour_text wraps cyan when ANSI is supported"
+	);
+}
+else {
+	is(
+		colour_text( "Warning", "yellow" ),
+		"Warning",
+		"colour_text leaves text unchanged when ANSI is unsupported"
+	);
+	is(
+		colour_text( "Input", "cyan" ),
+		"Input",
+		"colour_text leaves cyan text unchanged when ANSI is unsupported"
+	);
+}
+
+is(
+	colour_text( "Plain", "not-a-colour" ),
+	"Plain",
+	"colour_text ignores unknown colours"
+);
+
+done_testing();

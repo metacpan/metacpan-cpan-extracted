@@ -1,5 +1,20 @@
 Revision history for Dist-Zilla-Plugin-GitHub-CreateRelease
 
+0.0009 -- Thu May 28 19:00:27 ADT 2026
+
+    [Significant Changes from 0.0007]
+    - Bug fixes from @Getty for repo-name detection and uninitialized $prev" warning
+    - Fix smoker issue
+
+    [Detailed Change Log]
+    - 45f92b7 Fixes #3 Bareword JSON::MaybeXS::true not allowed
+    - f09448d Update the version for a release
+    - 64bba06 Replace cpan.org email address
+    - 4fe4acc Add Sigstore signing of module
+    - abac4c6 Fix "uninitialized $prev" warning in ChangeLog release notes
+    - 1cb165e Fix repo-name detection for repositories with "git" in the name
+    - 47dd114 (tag: 0.0008) v0.0008
+
 0.0008 -- Sat Apr 25 10:26:13 ADT 2026
 
     [Significant Changes from 0.0007]

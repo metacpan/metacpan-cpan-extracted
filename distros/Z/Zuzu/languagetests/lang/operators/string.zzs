@@ -1,0 +1,42 @@
+from test/more import *;
+is( "foo" _ "bar", "foobar", "_ concatenation works" );
+is( "abc" eq "abc", 1, "eq works" );
+is( "abc" ne "abd", 1, "ne works" );
+is( "b" gt "a", 1, "gt works" );
+is( "b" ge "b", 1, "ge works" );
+is( "a" lt "b", 1, "lt works" );
+is( "a" le "a", 1, "le works" );
+is( "a" cmp "b", -1, "cmp works" );
+is( "A" eqi "a", 1, "eqi works" );
+is( "A" nei "b", 1, "nei works" );
+is( "B" gti "a", 1, "gti works" );
+is( "B" gei "b", 1, "gei works" );
+is( "a" lti "B", 1, "lti works" );
+is( "a" lei "A", 1, "lei works" );
+is( "a" cmpi "B", -1, "cmpi works" );
+is( uc "MiXeD", "MIXED", "uc works" );
+is( lc "MiXeD", "mixed", "lc works" );
+is( length "hé", 2, "length works" );
+
+class Label {
+	let value;
+
+	method to_String () {
+		return "L:" _ value;
+	}
+}
+
+let label := new Label( value: 7 );
+is( "x=" _ label, "x=L:7", "_ uses to_String for non-string objects" );
+
+class Thing {
+
+	method to_String () {
+		return "THING";
+	}
+}
+
+let thing := new Thing();
+is( `NO${thing}`, "NOTHING", "template interpolation uses custom to_String" );
+is( `m=${ /(foo)(bar)/i }`, "m=(foo)(bar)", "Regexp.to_String works in templates" );
+done_testing();

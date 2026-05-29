@@ -1,0 +1,151 @@
+from std/data/json/schema import *;
+from test/more import *;
+
+ok( valid( { type: "object" }, { name: "Ada" } ), "object validates" );
+ok(
+	not valid( { type: "object" }, [ "Ada" ] ),
+	"boolean mode reports invalid",
+);
+
+let type_result := validate( { type: "string" }, 42 );
+ok( not type_result.valid(), "structured result invalid" );
+ok( type_result.errors()[0] instanceof TypeMismatchError, "type error leaf class" );
+ok( type_result.errors()[0] instanceof WrongValueError, "type error broad class" );
+is( type_result.errors()[0].keywordLocation(), "/type", "keyword location" );
+is( type_result.errors()[0].instanceLocation(), "", "instance location" );
+is( type_result.to_Dict(){valid}, false, "Basic dict valid flag" );
+
+let required_result := validate(
+	{
+		type: "object",
+		required: [ "name" ],
+	},
+	{},
+);
+ok(
+	required_result.errors()[0] instanceof RequiredPropertyError,
+	"required property has explicit class",
+);
+ok(
+	required_result.errors()[0] instanceof MissingValueError,
+	"required property is missing value error",
+);
+
+let schema := {
+	type: "object",
+	properties: {
+		age: { type: "integer", minimum: 18 },
+	},
+};
+let nested := validate( schema, { age: 16 } );
+ok( not nested.valid(), "nested property invalid" );
+ok(
+	nested.errors().any( fn e -> e instanceof MinimumError ),
+	"nested error has specific class",
+);
+let nested_minimum := nested.errors().first( fn e -> e instanceof MinimumError );
+ok(
+	nested.errors().any( fn e -> e instanceof SubschemaError ),
+	"subschema error is emitted",
+);
+let subschema := nested.errors().first( fn e -> e instanceof SubschemaError );
+is( subschema.error(), "A subschema had errors.", "subschema message" );
+ok(
+	subschema.suberrors().any( fn e -> e ≡ nested_minimum ),
+	"weak child link works",
+);
+
+let format_options := {
+	format_assert: true,
+	unknown_format: "fail",
+};
+
+let fmt := validate(
+	{ type: "string", format: "email" },
+	"not email",
+	format_options,
+);
+ok( fmt.errors()[0] instanceof FormatError, "format error class" );
+
+let unknown_fmt := validate(
+	{ type: "string", format: "made-up" },
+	"x",
+	format_options,
+);
+ok( unknown_fmt.errors()[0] instanceof UnknownFormatError, "unknown format class" );
+
+let additional := validate(
+	{
+		type: "object",
+		properties: { known: true },
+		additionalProperties: false,
+	},
+	{ known: 1, other: 2 },
+);
+ok(
+	additional.errors().any( fn e -> e instanceof AdditionalPropertiesError ),
+	"additionalProperties has explicit class",
+);
+
+let registry := new SchemaRegistry();
+registry.register( { type: "string" }, "https://example.test/string" );
+let registry_options := { registry: registry };
+let ref_schema := { "$ref": "https://example.test/string" };
+ok(
+	valid(
+		ref_schema,
+		"ok",
+		registry_options,
+	),
+	"registry resolves absolute ref",
+);
+let reference_invalid := valid( ref_schema, 1, registry_options );
+is( reference_invalid, false, "ref target validates instance" );
+
+ok(
+	new RelativeJSONPointer( path: "1/foo/0" ) instanceof RelativeJSONPointer,
+	"relative JSON pointer parses",
+);
+let rel_doc := {
+	foo: [ "bar", "baz" ],
+	highly: {
+		nested: {
+			objects: true,
+		},
+	},
+};
+is(
+	new RelativeJSONPointer( path: "0" ).first( rel_doc, "/foo/1" ),
+	"baz",
+	"relative pointer 0 returns current value",
+);
+is(
+	new RelativeJSONPointer( path: "1/0" ).first( rel_doc, "/foo/1" ),
+	"bar",
+	"relative pointer can climb then apply JSON Pointer",
+);
+is(
+	new RelativeJSONPointer( path: "0-1" ).first( rel_doc, "/foo/1" ),
+	"bar",
+	"relative pointer index manipulation works",
+);
+is(
+	new RelativeJSONPointer( path: "2/highly/nested/objects" )
+		.first( rel_doc, "/foo/1" ),
+	true,
+	"relative pointer can resolve from root",
+);
+is(
+	new RelativeJSONPointer( path: "0#" ).first( rel_doc, "/foo/1" ),
+	"1",
+	"relative pointer key request returns current key",
+);
+
+let unordered := <<< 1, 2, 3 >>>;
+ok( valid( { type: "array", minItems: 2 }, unordered ), "Bag minItems works" );
+ok(
+	not valid( { prefixItems: [ { type: "number" } ] }, unordered ),
+	"Bag rejects positional prefixItems",
+);
+
+done_testing();

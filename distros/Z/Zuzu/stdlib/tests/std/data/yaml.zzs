@@ -1,0 +1,28 @@
+from std/data/yaml import *;
+from test/more import *;
+let y := new YAML( pretty: false, canonical: true );
+let encoded := y.encode( { answer: 42, tags: [ "a", "b" ], ok: true } );
+like( encoded, /answer: 42\nok: true\ntags:\n- a\n- b/, "YAML.encode emits expected content" );
+let decoded := y.decode( "answer: 42\nok: true\nname: zuzu\n" );
+is( decoded{answer}, 42, "YAML.decode reads number" );
+is( decoded{ok}, true, "YAML.decode reads boolean" );
+is( decoded{name}, "zuzu", "YAML.decode reads string" );
+ok( y.encode_binarystring( { answer: 42 } ) instanceof BinaryString, "YAML.encode_binarystring returns BinaryString" );
+like( to_string( y.encode_binarystring( { answer: 42 } ) ), /answer: 42/, "YAML.encode_binarystring emits UTF-8 YAML bytes" );
+let decoded_binary := y.decode_binarystring( to_binary("answer: 42\nname: café\n") );
+is( decoded_binary{name}, "café", "YAML.decode_binarystring decodes UTF-8 YAML bytes" );
+let setv := [ 3, 2, 1 ].to_Set();
+let bagv := [ 3, 2, 1, 1 ].to_Bag();
+let nested := {{
+	foo: 1,
+	foo: 2,
+	bar: setv,
+	baz: bagv,
+}};
+let simpler := {
+	foo: 1,
+	bar: [ 1, 2, 3 ],
+	baz: [ 1, 1, 2, 3 ],
+};
+is( y.encode(nested), y.encode(simpler), "YAML encodes PairList, Set, and Bag as expected", );
+done_testing();

@@ -1,0 +1,185 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/data/json import JSON;
+from std/io import Path;
+from std/string import split;
+from std/zuzuzoo import Zuzuzoo;
+
+function ensure_dir ( path ) {
+	return true if path.exists();
+	let parent := path.parent();
+	ensure_dir(parent) if not parent.exists();
+	path.mkdir();
+	return true;
+}
+
+function root () {
+	let dir := Path.tempdir();
+	let lib := dir.child("lib");
+	let bin := dir.child("bin");
+	let meta := dir.child("meta");
+	ensure_dir(lib);
+	ensure_dir(bin);
+	ensure_dir(meta);
+	return {
+		dir_obj: dir,
+		lib_obj: lib,
+		bin_obj: bin,
+		meta_obj: meta,
+		lib_dir: lib.to_String(),
+		bin_dir: bin.to_String(),
+		meta_dir: meta.to_String(),
+	};
+}
+
+function module_entry ( install_as ) {
+	return {
+		source: "modules/" _ install_as,
+		install_as: install_as,
+		sha256: "old",
+	};
+}
+
+function script_entry ( install_as ) {
+	return {
+		source: "scripts/" _ install_as,
+		install_as: install_as,
+		sha256: "old",
+		wrappers: [],
+	};
+}
+
+function write_installed ( target, name, version, modules, scripts ) {
+	( new JSON( pretty: true ) ).dump(
+		target{meta_obj}.child( name _ "-" _ version _ ".json" ),
+		{
+			name: name,
+			version: version,
+			author: "Example",
+			license: "MIT",
+			status: "stable",
+			dependencies: {},
+			installed: {
+				zdf: "ZDF-1",
+				lib_dir: target{lib_dir},
+				bin_dir: target{bin_dir},
+				meta_dir: target{meta_dir},
+				modules: modules,
+				scripts: scripts,
+			},
+		},
+	);
+}
+
+function write_module_file ( target, install_as ) {
+	let parts := split( install_as, "/" );
+	let dir := target{lib_obj};
+	let i := 0;
+	while ( i < parts.length() - 1 ) {
+		dir := dir.child(parts[i]);
+		ensure_dir(dir);
+		i++;
+	}
+	dir.child(parts[ parts.length() - 1 ]).spew_utf8("// module\n");
+}
+
+let target := root();
+write_module_file( target, "multi/a.zzm" );
+write_module_file( target, "multi/b.zzm" );
+write_module_file( target, "other/app.zzm" );
+write_module_file( target, "versions/app.zzm" );
+write_module_file( target, "versions/old.zzm" );
+target{bin_obj}.child("multi-tool.zzs").spew_utf8("say \"multi\";\n");
+
+write_installed(
+	target,
+	"multi-app",
+	"1.0.0",
+	[ module_entry("multi/a.zzm"), module_entry("multi/b.zzm") ],
+	[ script_entry("multi-tool.zzs") ],
+);
+write_installed(
+	target,
+	"other-app",
+	"1.0.0",
+	[ module_entry("other/app.zzm") ],
+	[],
+);
+write_installed(
+	target,
+	"versioned-app",
+	"2.0.0",
+	[ module_entry("versions/app.zzm") ],
+	[],
+);
+write_installed(
+	target,
+	"versioned-app",
+	"1.0.0",
+	[ module_entry("versions/old.zzm") ],
+	[],
+);
+
+let zoo := new Zuzuzoo(
+	lib_dir: target{lib_dir},
+	bin_dir: target{bin_dir},
+	meta_dir: target{meta_dir},
+	home: Path.tempdir().to_String(),
+);
+let remove_plan := zoo.plan_remove(
+	[
+		"multi/a",
+		{ type: "distribution", value: "other-app" },
+		"multi/b.zzm",
+		{ type: "distribution", value: "versioned-app" },
+	],
+);
+
+ok( remove_plan{ok}, "multi-target remove plan is ok" );
+is(
+	remove_plan{removals}.map( fn r -> r{name} ).sort(
+		fn ( a, b ) -> a cmp b,
+	),
+	[ "multi-app", "other-app", "versioned-app", "versioned-app" ],
+	"module, distribution, and all distribution versions are planned",
+);
+is(
+	remove_plan{skipped_duplicates}.length(),
+	1,
+	"second module target for same distribution is skipped",
+);
+
+let result := zoo.remove(
+	[
+		"multi/a",
+		{ type: "distribution", value: "other-app" },
+		"multi/b.zzm",
+		{ type: "distribution", value: "versioned-app" },
+	],
+);
+
+ok( result{ok}, "multi-target remove succeeds" );
+is(
+	target{meta_obj}.child("multi-app-1.0.0.json").exists(),
+	false,
+	"multi-app metadata is removed",
+);
+is(
+	target{meta_obj}.child("other-app-1.0.0.json").exists(),
+	false,
+	"other-app metadata is removed",
+);
+is(
+	target{meta_obj}.child("versioned-app-2.0.0.json").exists(),
+	false,
+	"newer distribution version metadata is removed",
+);
+is(
+	target{meta_obj}.child("versioned-app-1.0.0.json").exists(),
+	false,
+	"older distribution version metadata is removed",
+);
+
+done_testing();

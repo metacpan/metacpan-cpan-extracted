@@ -1,0 +1,35 @@
+from std/eval import eval;
+from test/more import *;
+from test/worker_contract import require_worker_phase;
+
+require_worker_phase(2);
+
+let result := eval(
+	"from std/worker import Worker;\n"
+	_ "let worker_result := \"unset\";\n"
+	_ "let task := Worker.spawn(\n"
+	_ "  function () {\n"
+	_ "    from std/io import Path;\n"
+	_ "    return new Path(\"not-read.txt\").slurp_utf8();\n"
+	_ "  },\n"
+	_ "  [],\n"
+	_ "  deny_fs: false,\n"
+	_ ");\n"
+	_ "try {\n"
+	_ "  await { task; };\n"
+	_ "  worker_result := \"unexpected\";\n"
+	_ "}\n"
+	_ "catch ( Exception e ) {\n"
+	_ "  worker_result := e.to_String();\n"
+	_ "}\n"
+	_ "worker_result;\n",
+	deny_fs: true,
+);
+
+like(
+	result,
+	/(denied|unavailable|std\/io|fs)/i,
+	"worker cannot relax inherited deny_fs",
+);
+
+done_testing();

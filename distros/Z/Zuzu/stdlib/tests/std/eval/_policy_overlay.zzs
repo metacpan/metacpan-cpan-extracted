@@ -1,0 +1,104 @@
+from std/eval import eval;
+from test/eval_policy import
+	eval_policy_fs_denied,
+	eval_policy_require_fs;
+from test/more import *;
+
+requires_capability("fs");
+
+is(
+	eval_policy_fs_denied(),
+	false,
+	"test policy helper sees filesystem capability by default",
+);
+is(
+	eval( "__system__{deny_fs};", deny_fs: true ),
+	true,
+	"eval deny_fs is visible to direct eval code",
+);
+is(
+	__system__{deny_fs},
+	false,
+	"eval deny_fs overlay is restored after direct eval",
+);
+let direct_exception := exception( function () {
+	eval( "die \"eval policy restoration check\";", deny_fs: true );
+} );
+ok(
+	direct_exception instanceof Exception,
+	"eval exception path throws while denial overlay is active",
+);
+is(
+	__system__{deny_fs},
+	false,
+	"eval deny_fs overlay is restored after direct eval exception",
+);
+is(
+	eval_policy_require_fs(),
+	"fs-ok",
+	"test policy helper can run before eval overlay",
+);
+
+let clib_result := null;
+let clib_error := exception( function () {
+	clib_result := eval(
+		"__system__{deny_clib};",
+		deny_clib: true,
+	);
+} );
+ok(
+	clib_error ≡ null,
+	"eval accepts deny_clib named policy overlay",
+);
+is(
+	clib_result,
+	true,
+	"eval deny_clib is visible to direct eval code",
+);
+
+let worker_result := null;
+let worker_error := exception( function () {
+	worker_result := eval(
+		"__system__{deny_worker};",
+		deny_worker: true,
+	);
+} );
+ok(
+	worker_error ≡ null,
+	"eval accepts deny_worker named policy overlay",
+);
+is(
+	worker_result,
+	true,
+	"eval deny_worker is visible to direct eval code",
+);
+
+let module_error := exception( function () {
+	eval("eval_policy_require_fs();", deny_fs: true);
+} );
+ok(
+	module_error instanceof Exception,
+	"eval deny_fs is visible to imported module functions",
+);
+like(
+	module_error{message},
+	/TEST_EVAL_POLICY_FS_DENIED/,
+	"module function reports filesystem-denied overlay",
+);
+
+is(
+	eval(
+		"eval(\"__system__{deny_fs};\", deny_fs: false);",
+		deny_fs: true,
+	),
+	true,
+	"nested eval cannot relax an outer deny_fs overlay",
+);
+
+is(
+	__system__{deny_fs},
+	false,
+	"eval deny_fs overlay is restored after nested/module eval",
+);
+
+done_testing();

@@ -1,0 +1,159 @@
+from test/more import *;
+
+requires_capability("fs");
+
+from std/config import Config;
+from std/io import Path;
+
+let cfg := Config.from_data(
+	{
+		app: {
+			name: "zuzu",
+			port: 7000,
+		},
+		database: {
+			host: "db.example.test",
+			pool: 5,
+		},
+		features: {
+			metrics: false,
+		},
+	},
+	{
+		source: "inline",
+		format: "json",
+	},
+);
+
+is( cfg.source(), "inline", "Config.from_data stores source metadata" );
+is( cfg.format(), "json", "Config.from_data stores format metadata" );
+is( cfg.layers().length(), 0, "Config.from_data starts with no file layers" );
+
+is( cfg.get( "/app/name", "x" ), "zuzu", "get returns first matching value" );
+is( cfg @ "/database/host", "db.example.test", "@ reads through Config object" );
+ok( cfg @? "/database/pool", "@? reports existing path on Config object" );
+let app_values := ( cfg @@ "/app/*" ).to_Set();
+ok( app_values.contains("zuzu"), "@@ over Config includes string child value" );
+ok( app_values.contains(7000), "@@ over Config includes numeric child value" );
+
+is( cfg.require("/database/pool"), 5, "require returns present value" );
+
+cfg.merge(
+	{
+		app: {
+			port: 7100,
+			mode: "dev",
+		},
+		database: {
+			ssl: true,
+		},
+	},
+);
+
+is( cfg @ "/app/port", 7100, "merge overlays nested scalar values" );
+is( cfg @ "/app/mode", "dev", "merge adds nested dictionary keys" );
+is( cfg @ "/database/ssl", true, "merge adds sibling keys without dropping existing ones" );
+is( cfg @ "/database/host", "db.example.test", "merge keeps untouched keys" );
+
+cfg.merge(
+	{
+		servers: [ "a", "b" ],
+	},
+);
+cfg.merge(
+	{
+		servers: [ "c" ],
+	},
+	{
+		array_merge: "append",
+	},
+);
+is( cfg @ "/servers/#0", "a", "array append merge keeps earlier array entries" );
+is( cfg @ "/servers/#2", "c", "array append merge appends later array entries" );
+
+cfg.merge_flat(
+	{
+		"APP__database__pool": "9",
+		"APP__features__metrics": "true",
+		"APP__limits__burst": "12.5",
+		"APP__labels": "[\"a\",\"b\"]",
+	},
+	{
+		prefix: "APP__",
+		separator: "__",
+		coerce: true,
+	},
+);
+
+is( cfg @ "/database/pool", 9, "merge_flat coerces integers" );
+is( cfg @ "/features/metrics", true, "merge_flat coerces booleans" );
+is( cfg @ "/limits/burst", 12.5, "merge_flat coerces decimal numbers" );
+is( cfg @ "/labels/#1", "b", "merge_flat can coerce JSON arrays" );
+
+is( cfg.set( "/service/name", "worker" ), "worker", "set returns assigned value" );
+is( cfg @ "/service/name", "worker", "set creates simple nested paths" );
+is( cfg.set_default( "/service/name", "api" ), "worker", "set_default keeps existing non-null values" );
+is( cfg.set_default( "/service/retries", 3 ), 3, "set_default populates missing values" );
+is( cfg @ "/service/retries", 3, "set_default stores missing value" );
+
+is( cfg.assign_first( "/service/retries", 2, "+=" ), 5, "assign_first supports compound operators" );
+is( cfg @ "/service/retries", 5, "assign_first mutates through compiled path" );
+let service_values := ( cfg @@ "/service/*" ).to_Set();
+ok( service_values.contains("worker"), "Config query still includes string child after assignment" );
+ok( service_values.contains(5), "Config query still includes numeric child after assignment" );
+
+let cfg_ref := cfg.ref_first("/service/name");
+is( cfg_ref(), "worker", "ref_first returns getter/setter ref" );
+cfg_ref("jobs");
+is( cfg @ "/service/name", "jobs", "ref_first setter mutates Config data" );
+
+let parsed := Config.parse(
+	"{\"debug\":true,\"nested\":{\"x\":1}}",
+	"json",
+	{
+		source: "inline.json",
+	},
+);
+is( parsed.source(), "inline.json", "parse stores source metadata" );
+is( parsed @ "/debug", true, "parse decodes inline JSON" );
+is( parsed @ "/nested/x", 1, "parse decodes nested values" );
+
+let dir := Path.tempdir();
+let base := dir.child("base.toml");
+let local := dir.child("local.json");
+let out := dir.child("out.json");
+
+base.spew_utf8(
+	"title = \"base\"\n"
+	_ "[database]\n"
+	_ "host = \"db.local\"\n"
+	_ "pool = 3\n",
+);
+local.spew_utf8(
+	"{\"database\":{\"pool\":7},\"feature\":{\"dark\":true}}",
+);
+
+let file_cfg := Config.load( [ base, local ] );
+is( file_cfg.layers().length(), 2, "load records one layer per file" );
+is( file_cfg @ "/title", "base", "load auto-detects TOML format" );
+is( file_cfg @ "/database/host", "db.local", "later overlays keep base-only values" );
+is( file_cfg @ "/database/pool", 7, "later overlays replace earlier scalar values" );
+is( file_cfg @ "/feature/dark", true, "load auto-detects JSON format" );
+
+file_cfg.save(out);
+let roundtrip := Config.load(out);
+is( roundtrip @ "/database/pool", 7, "save writes JSON that can be loaded again" );
+is( roundtrip @ "/feature/dark", true, "roundtrip preserves boolean values" );
+
+ok(
+	try {
+		cfg.require("/missing/value");
+		false;
+	}
+	catch {
+		true;
+	},
+	"require throws for missing config path",
+);
+
+done_testing();

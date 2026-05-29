@@ -1,0 +1,57 @@
+from test/more import *;
+from test/worker_contract import require_worker_phase;
+
+let Worker := require_worker_phase(3);
+
+async function main () {
+	let plain := await {
+		Worker.spawn(
+			function () {
+				return { answer: 42 };
+			},
+			[],
+		);
+	};
+
+	is(
+		plain{answer},
+		42,
+		"worker still returns ordinary marshalable values",
+	);
+
+	let ok_result := await {
+		Worker.spawn(
+			function ( value ) {
+				from std/result import Result;
+				return Result.ok(value + 1);
+			},
+			[ 41 ],
+		);
+	};
+
+	is( typeof ok_result, "Result", "worker may return Result.ok" );
+	is( ok_result.unwrap(), 42, "worker Result.ok unwraps in parent" );
+
+	let err_result := await {
+		Worker.spawn(
+			function () {
+				from std/result import Result;
+				return Result.err("worker-boom");
+			},
+			[],
+		);
+	};
+
+	is( typeof err_result, "Result", "worker may return Result.err" );
+	is(
+		err_result.unwrap_err(),
+		"worker-boom",
+		"worker Result.err unwrap_err works in parent",
+	);
+}
+
+await {
+	main();
+};
+
+done_testing();

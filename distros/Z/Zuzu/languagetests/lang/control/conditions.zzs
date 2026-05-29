@@ -1,0 +1,16 @@
+from test/more import *;
+let x := 0;
+let y := 0;
+if ( let n := 7 ) {
+	x := n;
+}
+if ( y := 3 ) {
+	y += 1;
+}
+let postfix := 0;
+postfix += 2 if true;
+postfix += 100 unless true;
+is( x, 7, "let declaration inside condition works" );
+is( y, 4, "assignment expression inside condition works" );
+is( postfix, 2, "postfix if/unless execute expected paths" );
+done_testing();

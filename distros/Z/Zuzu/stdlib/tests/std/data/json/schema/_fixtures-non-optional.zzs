@@ -1,0 +1,62 @@
+from test/more import *;
+requires_capability( "fs" );
+requires_capability( "proc" );
+
+from std/data/json import JSON;
+from test/json_schema_fixtures import
+	collect_required_fixture_files,
+	fixture_context,
+	run_fixture_file;
+
+let context := fixture_context();
+if ( context ≡ null ) {
+	skip_all( "FIXTURE_DIR is not set" );
+}
+
+let fixture_root := context {fixture_root};
+let loader := context {loader};
+
+function report_fixture_assertion (
+	String kind,
+	String name,
+	String test_name,
+	got,
+	expected,
+	err,
+	Boolean failed,
+) {
+	if ( kind eq "diag" ) {
+		diag(err);
+	}
+	else if ( kind eq "throw" ) {
+		fail( name _ ": " _ test_name );
+		diag( "threw: " _ err );
+	}
+	else {
+		is( got, expected, name _ ": " _ test_name );
+	}
+}
+
+let files := collect_required_fixture_files(fixture_root);
+is( files.length(), 46, "all required draft2020-12 fixture files are covered" );
+
+let json := new JSON();
+let required_ran := 0;
+
+for ( let path in files ) {
+	required_ran += run_fixture_file(
+		json,
+		loader,
+		path,
+		path.basename(),
+		report_fixture_assertion,
+	) {ran};
+}
+
+is(
+	required_ran,
+	1295,
+	"all required draft2020-12 fixture assertions ran",
+);
+
+done_testing();

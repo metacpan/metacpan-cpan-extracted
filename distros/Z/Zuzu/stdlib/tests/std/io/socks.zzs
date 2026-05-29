@@ -1,0 +1,36 @@
+from test/more import *;
+
+requires_capability( "net" );
+requires_capability( "fs" );
+
+from std/io import *;
+from std/io/socks import *;
+from test/more import *;
+let tcp_server := listen_tcp( "127.0.0.1", 0 );
+is( tcp_server ≢ null, 1, "listen_tcp returns TCPServer", );
+let tcp_client := connect_tcp( "127.0.0.1", tcp_server.port() );
+is( tcp_client ≢ null, 1, "connect_tcp returns TCPSocket", );
+let tcp_peer := tcp_server.accept();
+is( tcp_peer ≢ null, 1, "accept returns TCPSocket", );
+tcp_client.say( "hello over tcp" );
+is( tcp_peer.next_line(), "hello over tcp\n", "tcp next_line receives line", );
+tcp_peer.say("pong");
+is( tcp_client.next_line(), "pong\n", "tcp write then read works", );
+tcp_client.close();
+tcp_peer.close();
+tcp_server.close();
+let udp_receiver := bind_udp( "127.0.0.1", 0, 1 );
+is( udp_receiver ≢ null, 1, "bind_udp returns UDPSocket", );
+let udp_sender := connect_udp( "127.0.0.1", udp_receiver.port(), 1 );
+udp_sender.send( "hello over udp" );
+is( udp_receiver.recv(1024), "hello over udp", "udp send and recv works", );
+udp_sender.close();
+udp_receiver.close();
+let sock_path := Path.cwd().child( "zuzu-test.sock" ).to_String();
+let unix_server := listen_unix(sock_path);
+is( unix_server ≢ null, 1, "listen_unix returns UnixServer", );
+let unix_client := connect_unix(sock_path);
+is( unix_client ≢ null, 1, "connect_unix returns UnixSocket", );
+unix_client.close();
+unix_server.close();
+done_testing();

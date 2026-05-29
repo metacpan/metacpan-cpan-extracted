@@ -1,0 +1,224 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/archive import Archive;
+from std/io import Path;
+from std/zuzuzoo import Zuzuzoo;
+
+class FakeRequest {
+	let target_url := null;
+	let download_path := null;
+
+	method download_to ( path ) {
+		download_path := path;
+		return self;
+	}
+
+	method url () {
+		return target_url;
+	}
+
+	method path () {
+		return download_path;
+	}
+}
+
+class FakeResponse {
+	let final_url := null;
+
+	method expect_success () {
+		return self;
+	}
+
+	method url () {
+		return final_url;
+	}
+}
+
+class FakeUserAgent {
+	let payloads := {};
+	let urls := [];
+
+	method build_request ( http_method, url ) {
+		urls.push(url);
+		return new FakeRequest( target_url: url );
+	}
+
+	method send ( request ) {
+		( new Path( request.path() ) ).spew(
+			payloads.get( request.url() ),
+		);
+		return new FakeResponse( final_url: request.url() );
+	}
+
+	method seen () {
+		return urls;
+	}
+}
+
+function archive_bytes (
+	dist_name,
+	version,
+	module_name,
+	dependencies := "{}"
+) {
+	return Archive.encode(
+		{
+			entries: [
+				{
+					path: dist_name _ "-" _ version _
+						"/zuzu-distribution.json",
+					data: to_binary(
+						"{\"name\":\"" _ dist_name _
+						"\",\"version\":\"" _ version _
+						"\",\"author\":\"Example\"," _
+						"\"license\":\"MIT\"," _
+						"\"status\":\"stable\"," _
+						"\"dependencies\":" _ dependencies _
+						"}\n",
+					),
+				},
+				{
+					path: dist_name _ "-" _ version _
+						"/modules/" _ module_name _ ".zzm",
+					data: to_binary("// module\n"),
+				},
+			],
+		},
+		"zip",
+	);
+}
+
+function new_zoo ( ua ) {
+	let root := Path.tempdir();
+	return new Zuzuzoo(
+		lib_dir: root.child("lib").to_String(),
+		bin_dir: root.child("bin").to_String(),
+		meta_dir: root.child("meta").to_String(),
+		home: root.child("home").to_String(),
+		base_url: "https://packages.test",
+		user_agent: ua,
+	);
+}
+
+let ua := new FakeUserAgent(
+	payloads: {
+		"https://packages.test/module/app/main": archive_bytes(
+			"app-main",
+			"1.0.0",
+			"app/main",
+			"{\"dep/lib\":\"1.0.0\"}",
+		),
+		"https://packages.test/module/other/main": archive_bytes(
+			"other-main",
+			"1.0.0",
+			"other/main",
+			"{\"dep/lib\":\"1.0.0\"}",
+		),
+		"https://packages.test/module/dep/lib": archive_bytes(
+			"dep-lib",
+			"1.1.0",
+			"dep/lib",
+			"{\"base/core\":\"1.0.0\"}",
+		),
+		"https://packages.test/module/base/core": archive_bytes(
+			"base-core",
+			"1.0.0",
+			"base/core",
+		),
+	},
+);
+
+let install_plan := new_zoo(ua).plan_install( [ "app/main", "other/main" ] );
+
+is( install_plan{installs}.length(), 4, "recursive dependencies are planned once" );
+is( install_plan{installs}[0]{metadata}{name}, "base-core", "transitive dependency first" );
+is( install_plan{installs}[1]{metadata}{name}, "dep-lib", "dependency before dependants" );
+is( install_plan{installs}[2]{metadata}{name}, "app-main", "first requested target follows" );
+is( install_plan{installs}[3]{metadata}{name}, "other-main", "second requested target follows" );
+is(
+	ua.seen(),
+	[
+		"https://packages.test/module/app/main",
+		"https://packages.test/module/dep/lib",
+		"https://packages.test/module/base/core",
+		"https://packages.test/module/other/main",
+	],
+	"shared planned dependencies are not fetched twice",
+);
+is(
+	install_plan{satisfied_dependencies}[0]{source},
+	"planned",
+	"later shared dependency is satisfied by planned installs first",
+);
+is(
+	install_plan{dependency_graph}{edges}.length(),
+	3,
+	"dependency graph records requested and transitive edges",
+);
+
+let ordered_ua := new FakeUserAgent(
+	payloads: {
+		"https://packages.test/module/ordered/app": archive_bytes(
+			"ordered-app",
+			"1.0.0",
+			"ordered/app",
+			"{\"first/dep\":\"1.0.0\",\"second/dep\":\"1.0.0\"}",
+		),
+		"https://packages.test/module/first/dep": archive_bytes(
+			"first-dep",
+			"1.0.0",
+			"first/dep",
+		),
+		"https://packages.test/module/second/dep": archive_bytes(
+			"second-dep",
+			"1.0.0",
+			"second/dep",
+		),
+	},
+);
+let ordered_plan := new_zoo(ordered_ua).plan_install("ordered/app");
+is(
+	ordered_plan{installs}.map( fn i -> i{metadata}{name} ),
+	[ "first-dep", "second-dep", "ordered-app" ],
+	"PairList dependency order controls recursive install order",
+);
+is(
+	ordered_ua.seen(),
+	[
+		"https://packages.test/module/ordered/app",
+		"https://packages.test/module/first/dep",
+		"https://packages.test/module/second/dep",
+	],
+	"ordered dependencies are fetched in metadata order",
+);
+
+let std_ua := new FakeUserAgent(
+	payloads: {
+		"https://packages.test/module/std/app": archive_bytes(
+			"std-app",
+			"1.0.0",
+			"std/app",
+			"{\"std/math\":\"0\",\"std/string\":\"0\"}",
+		),
+	},
+);
+let std_plan := new_zoo(std_ua).plan_install("std/app");
+is(
+	std_ua.seen(),
+	[ "https://packages.test/module/std/app" ],
+	"bundled stdlib dependencies are not fetched from package site",
+);
+is(
+	std_plan{installs}.map( fn i -> i{metadata}{name} ),
+	[ "std-app" ],
+	"bundled stdlib dependencies do not add install actions",
+);
+is(
+	std_plan{satisfied_dependencies}.map( fn d -> d{source} ),
+	[ "runtime", "runtime" ],
+	"bundled stdlib dependencies are marked satisfied by runtime",
+);
+
+done_testing();

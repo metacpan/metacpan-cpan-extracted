@@ -1,0 +1,4 @@
+from test/c27/parent import NamedParent;
+from test/c27/traits import ParentRenamer;
+
+class NamedChild extends NamedParent with ParentRenamer;

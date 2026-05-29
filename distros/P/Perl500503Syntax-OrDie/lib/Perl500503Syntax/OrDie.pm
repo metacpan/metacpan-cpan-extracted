@@ -15,7 +15,7 @@ use warnings; local $^W = 1;
 
 use vars qw($VERSION @BLACKLIST @REGEX_BLACKLIST @RAW_BLACKLIST $_OPEN_GUARDED $_MKDIR_GUARDED);
 
-$VERSION = '0.01';
+$VERSION = '0.02';
 
 # ======================================================================
 # BLACKLIST
@@ -1063,7 +1063,7 @@ Perl500503Syntax::OrDie - Validate that source code is compatible with Perl 5.00
 
 =head1 VERSION
 
-0.01
+0.02
 
 =head1 SYNOPSIS
 
@@ -1228,11 +1228,11 @@ list if any violations are found; returns normally otherwise.
 
 =item * Reference aliasing in C<foreach> -- Perl 5.22
 
-=item * C<<<>>> double-diamond operator -- Perl 5.22
+=item * C<E<lt>E<lt>E<gt>E<gt>> double-diamond operator -- Perl 5.22
 
 =item * C</n> non-capturing regex flag -- Perl 5.22
 
-=item * C<<<~> indented heredoc -- Perl 5.26
+=item * C<E<lt>E<lt>~> indented heredoc -- Perl 5.26
 
 =item * C<isa> infix operator -- Perl 5.32 (C<-E<gt>isa()> method calls and C<isa()> function calls excluded)
 

@@ -1,0 +1,9 @@
+from std/path/z import ZPath;
+from test/more import *;
+
+plan(1);
+
+let zp   := new ZPath( path: "foo, bar, die()" );
+let data := { bar: 42 };
+
+is( zp.first(data), 42 );

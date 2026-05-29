@@ -1,0 +1,41 @@
+from test/more import *;
+from test/worker_contract import require_worker_phase;
+
+let Worker := require_worker_phase(3);
+
+class WorkerPhase2Box {
+	let Number value with get, set := 0;
+
+	method label ( String prefix ) -> String {
+		return prefix _ ":" _ value;
+	}
+}
+
+async function main () {
+	let box := new WorkerPhase2Box( value: 41 );
+	let result := await {
+		Worker.spawn(
+			function ( copy ) {
+				copy.set_value( copy.get_value() + 1 );
+				return [ copy.label("worker"), copy.get_value() ];
+			},
+			[ box ],
+		);
+	};
+
+	is( result, [ "worker:42", 42 ], "worker calls copied object methods" );
+	is( box.get_value(), 41, "worker object mutation stays isolated" );
+
+	let bound_result := await {
+		Worker.spawn( box{"label"}, [ "bound" ] );
+	};
+
+	is( bound_result, "bound:41", "worker receives bound method callable" );
+	is( box.get_value(), 41, "bound method receiver remains isolated" );
+}
+
+await {
+	main();
+};
+
+done_testing();

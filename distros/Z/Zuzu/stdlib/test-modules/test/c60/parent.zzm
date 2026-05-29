@@ -1,0 +1,3 @@
+class WorkerParent {
+	let String name with get, set;
+}

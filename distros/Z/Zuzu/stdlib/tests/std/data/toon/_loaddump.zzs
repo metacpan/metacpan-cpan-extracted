@@ -1,0 +1,14 @@
+from test/more import *;
+requires_capability( "fs" );
+
+from std/data/toon import TOON;
+from std/io import Path;
+
+let toon := new TOON( strict: true );
+let path := Path.tempfile();
+toon.dump( path, { name: "Ada", age: 32 } );
+let loaded := toon.load(path);
+is( loaded{name}, "Ada", "TOON.load reads TOON from Path" );
+like( path.slurp_utf8(), /name: Ada/, "TOON.dump writes TOON to file" );
+
+done_testing();

@@ -1,0 +1,14 @@
+from std/defer import Guard;
+from test/more import *;
+let String out := "a";
+
+{
+	let Object defer := new Guard( callback: function() {
+		out _= "c";
+	} );
+	out _= "b";
+}
+
+out _= "d";
+is( out, "abcd" );
+done_testing();

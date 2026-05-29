@@ -1,0 +1,10 @@
+from test/c23/model import ChildSpecies, ParentSpecies;
+from test/more import *;
+
+let c := new ChildSpecies();
+
+is( ParentSpecies.lineage(), "root", "parent static method is callable" );
+is( ChildSpecies.lineage(), "root:child", "child static override uses super" );
+is( c.species_label(), "vulpes", "imported trait method sees child static field" );
+
+done_testing();

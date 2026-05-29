@@ -1,0 +1,33 @@
+from test/more import *;
+let value := 0;
+if (true) {
+	value += 1;
+}
+value += 2 unless false;
+if (false) {
+	value += 100;
+}
+else {
+	value += 4;
+}
+let i := 0;
+while ( i < 3 ) {
+	value += 1;
+	i++;
+}
+let sum := 0;
+for ( let x in[ 1, 2, 3 ] ) {
+	sum += x;
+}
+let switched := "none";
+
+switch ( "beta": eq ) {
+	case "alpha": switched := "alpha";
+	case "beta": switched := "beta";
+	default: switched := switched _ "-default";
+}
+
+is( value, 10, "if/else/unless/while keywords work" );
+is( sum, 6, "for keyword works" );
+is( switched, "beta", "switch/case/default keywords work" );
+done_testing();

@@ -505,7 +505,7 @@ sub DESTROY {    # Always clean up after yourself before exiting
     delete($self->{'START_SCREEN'});
     $self->text_mode();
     $self->_screen_close();
-    unlink('/tmp/output.gif') if (-e '/tmp/output.gif');
+    unlink('/tmp/output.gif') if (-e '/tmp/output.gif'); # Get rid of the mplayer temp file.
     _reset()                  if ($self->{'RESET'});       # Exit by calling 'reset' first
 } ## end sub DESTROY
 #

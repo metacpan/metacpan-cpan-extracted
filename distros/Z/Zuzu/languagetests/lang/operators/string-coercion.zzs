@@ -1,0 +1,138 @@
+from test/more import *;
+
+class Stringish {
+	let value := "thing";
+
+	method to_String () {
+		return value;
+	}
+}
+
+class OpaqueString {
+}
+
+function assert_throws ( Function f, String name ) {
+	isnt( exception(f), null, name );
+}
+
+function first_match ( value, pattern ) {
+	let match := value ~ pattern;
+	if ( match ) {
+		return match[0];
+	}
+	return null;
+}
+
+let sobj := new Stringish( value: "Thing" );
+
+is( uc true, "TRUE", "uc stringifies true" );
+is( lc false, "false", "lc stringifies false" );
+is( length null, 0, "length stringifies null as the empty string" );
+is( length 1234, 4, "length stringifies numbers" );
+is( uc sobj, "THING", "uc calls to_String on objects" );
+is(
+	lc new Stringish( value: "MiXeD" ),
+	"mixed",
+	"lc calls to_String on objects",
+);
+
+is( "x" _ true, "xtrue", "_ stringifies true" );
+is( false _ "x", "falsex", "_ stringifies false" );
+is( null _ "x", "x", "_ stringifies null as the empty string" );
+is( "n=" _ 12.5, "n=12.5", "_ stringifies numbers" );
+is( "rx=" _ /foo/i, "rx=foo", "_ stringifies regexps" );
+is( "obj=" _ sobj, "obj=Thing", "_ calls to_String on objects" );
+
+is( true eq "true", 1, "eq stringifies true" );
+is( false ne "true", 1, "ne stringifies false" );
+is( 10 gt 2, 0, "gt compares stringified values" );
+is( 10 ge 10, 1, "ge stringifies numbers" );
+is( 2 lt 10, 0, "lt compares stringified values" );
+is( 2 le 2, 1, "le stringifies numbers" );
+is( 2 cmp 10, 1, "cmp compares stringified values" );
+is( true eqi "TRUE", 1, "eqi stringifies true" );
+is( false nei "TRUE", 1, "nei stringifies false" );
+is( "b" gti "A", 1, "gti lowercases operands" );
+is( "b" gei "B", 1, "gei lowercases operands" );
+is( "a" lti "B", 1, "lti lowercases operands" );
+is( "a" lei "A", 1, "lei lowercases operands" );
+is( "a" cmpi "B", -1, "cmpi lowercases operands" );
+is(
+	new Stringish( value: "Ada" ) eq "Ada",
+	1,
+	"string comparisons call to_String on objects",
+);
+
+is( first_match( "abc", /b/ ), "b", "~ accepts regexp rhs" );
+is( first_match( "abc", "b" ), "b", "~ turns string rhs into a regexp" );
+is( first_match( "a23c", 23 ), "23", "~ stringifies number rhs into a regexp" );
+is(
+	first_match( "true", true ),
+	"true",
+	"~ stringifies boolean rhs into a regexp",
+);
+is(
+	first_match( "abc", null ),
+	"",
+	"~ stringifies null rhs into an empty regexp",
+);
+is(
+	first_match( "abc", new Stringish( value: "b" ) ),
+	"b",
+	"~ calls to_String on rhs objects",
+);
+is(
+	first_match( new Stringish( value: "abc" ), "b" ),
+	"b",
+	"~ stringifies lhs objects",
+);
+
+let text := 12;
+text _= true;
+is( text, "12true", "_= stringifies lhs and rhs" );
+
+let label := new Stringish( value: "foo fOO" );
+label ~= "foo" -> "bar";
+is(
+	label,
+	"bar fOO",
+	"~= stringifies lhs and regexp rhs when rhs is a string",
+);
+
+assert_throws( function () { let got := [1] _ "x"; }, "_ rejects arrays" );
+assert_throws( function () { let got := << 1 >> _ "x"; }, "_ rejects sets" );
+assert_throws( function () { let got := <<< 1 >>> _ "x"; }, "_ rejects bags" );
+assert_throws( function () { let got := { x: 1 } _ "x"; }, "_ rejects dicts" );
+assert_throws(
+	function () { let got := new PairList() _ "x"; },
+	"_ rejects pairlists",
+);
+assert_throws(
+	function () { let got := ( fn x -> x ) _ "x"; },
+	"_ rejects functions",
+);
+assert_throws(
+	function () { let got := OpaqueString _ "x"; },
+	"_ rejects classes",
+);
+assert_throws( function () {
+	let got := Stringish{"to_String"} _ "x";
+}, "_ rejects methods" );
+assert_throws(
+	function () { let got := new OpaqueString() _ "x"; },
+	"_ rejects objects without to_String",
+);
+assert_throws(
+	function () { let got := "abc" ~ "["; },
+	"~ rejects rhs strings that cannot compile as regexps",
+);
+assert_throws(
+	function () { let got := "abc" ~ new OpaqueString(); },
+	"~ rejects rhs objects without to_String",
+);
+assert_throws(
+	function () { let got := new OpaqueString() ~ "x"; },
+	"~ rejects lhs objects without to_String",
+);
+
+done_testing();

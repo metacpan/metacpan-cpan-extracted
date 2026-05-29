@@ -1,0 +1,6 @@
+from std/path/z/functions import replace;
+from test/more import *;
+
+is( replace( "foobar", "(...)(...)", "$2$1" ), "barfoo" );
+
+done_testing();

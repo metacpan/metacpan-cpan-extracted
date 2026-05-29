@@ -1,0 +1,472 @@
+=encoding utf8
+
+=head1 NAME
+
+std/data/ini - INI encoding and decoding for ZuzuScript.
+
+=head1 SYNOPSIS
+
+  from std/data/ini import INI;
+
+  let codec := new INI( pretty: true, canonical: true );
+  let text := codec.encode({
+    app: {
+      name: "zuzu",
+      debug: true,
+      port: 5000,
+    },
+  });
+  let data := codec.decode(text);
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Node and
+Electron. It is partially supported by zuzu-js in the browser: in-memory
+INI encode/decode coverage passes, but file-backed load/dump coverage is
+unsupported because browser filesystem capability is unavailable.
+
+=head1 DESCRIPTION
+
+This module provides a pure-Zuzu implementation of INI parsing and
+serialization, with a user-facing API modelled on C<std/data/json>.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<< INI({ utf8?: Bool, pretty?: Bool, canonical?: Bool }) >>
+
+Constructs an INI codec. Returns: C<INI>.
+
+=item C<< codec.encode(value) >>
+
+Parameters: C<value> is a C<Dict> or compatible mapping. Returns:
+C<String>. Encodes C<value> as INI text.
+
+=item C<< codec.encode_binarystring(value) >>
+
+Parameters: C<value> is a C<Dict> or compatible mapping. Returns:
+C<BinaryString>. Encodes C<value> as UTF-8 INI bytes.
+
+=item C<< codec.decode(String text) >>
+
+Parameters: C<text> is INI text. Returns: C<Dict>. Decodes INI text
+into a dictionary.
+
+=item C<< codec.decode_binarystring(BinaryString bytes) >>
+
+Parameters: C<bytes> is UTF-8 INI bytes. Returns: C<Dict>. Decodes INI
+bytes into a dictionary.
+
+=item C<< codec.load(Path path) >>
+
+Parameters: C<path> is a C<std/io> C<Path>. Returns: C<Dict>. Reads INI
+text from C<path> and decodes it.
+
+=item C<< codec.dump(Path path, value) >>
+
+Parameters: C<path> is a C<std/io> C<Path> and C<value> is a C<Dict> or
+compatible mapping. Returns: C<null>. Encodes C<value> and writes INI
+text to C<path>.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/data/ini >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/string import substr, index;
+
+
+function _is_space ( String ch ) {
+	return ch ≡ " " or ch ≡ "\t" or ch ≡ "\r" or ch ≡ "\n";
+}
+
+function _trim ( String text ) {
+	let start := 0;
+	let stop := length text;
+	while ( start < stop and _is_space( substr( text, start, 1 ) ) ) {
+		start++;
+	}
+	while ( stop > start and _is_space( substr( text, stop - 1, 1 ) ) ) {
+		stop--;
+	}
+
+	return substr( text, start, stop - start );
+}
+
+function _strip_comment ( String line ) {
+	let in_quote := false;
+	let escaped := false;
+	let i := 0;
+	let n := length line;
+
+	while ( i < n ) {
+		let ch := substr( line, i, 1 );
+
+		if (in_quote) {
+			if (escaped) {
+				escaped := false;
+			}
+			else if ( ch ≡ "\\" ) {
+				escaped := true;
+			}
+			else if ( ch ≡ "\"" ) {
+				in_quote := false;
+			}
+		}
+
+		else {
+			if ( ch ≡ "\"" ) {
+				in_quote := true;
+			}
+			else if ( ch ≡";" or ch ≡ "#" ) {
+				return substr( line, 0, i );
+			}
+		}
+
+		i++;
+	}
+
+	return line;
+}
+
+function _unescape_string ( String text ) {
+	let out := "";
+	let i := 0;
+	let n := length text;
+
+	while ( i < n ) {
+		let ch := substr( text, i, 1 );
+
+		if ( ch ≡ "\\" ) {
+			i++;
+			die "Unterminated INI string escape" if i >= n;
+			let esc := substr( text, i, 1 );
+			if ( esc ≡ "n" ) {
+				out _= "\n";
+			}
+			else if ( esc ≡ "r" ) {
+				out _= "\r";
+			}
+			else if ( esc ≡ "t" ) {
+				out _= "\t";
+			}
+			else if ( esc ≡ "\"" ) {
+				out _= "\"";
+			}
+			else if ( esc ≡ "\\" ) {
+				out _= "\\";
+			}
+			else {
+				out _= esc;
+			}
+		}
+
+		else {
+			out _= ch;
+		}
+		i++;
+	}
+
+	return out;
+}
+
+function _parse_value ( String raw ) {
+	let text := _trim(raw);
+	if ( text ≡ "" ) {
+		return "";
+	}
+	if ( substr( text, 0, 1 ) ≡ "\"" and substr( text, length text - 1, 1 ) ≡ "\"" ) {
+		let inner := substr( text, 1, length text - 2 );
+		return _unescape_string(inner);
+	}
+	if ( text ≡ "true" ) {
+		return true;
+	}
+	if ( text ≡ "false" ) {
+		return false;
+	}
+	if ( text ~ /^-?[0-9]+(\.[0-9]+)?$/ ) {
+		return text + 0;
+	}
+
+	return text;
+}
+
+function _escape_string ( String text ) {
+	let out := "";
+	let i := 0;
+	let n := length text;
+
+	while ( i < n ) {
+		let ch := substr( text, i, 1 );
+		if ( ch ≡ "\\" ) {
+			out _= "\\\\";
+		}
+		else if ( ch ≡ "\"" ) {
+			out _= "\\\"";
+		}
+		else if ( ch ≡ "\n" ) {
+			out _= "\\n";
+		}
+		else if ( ch ≡ "\r" ) {
+			out _= "\\r";
+		}
+		else if ( ch ≡ "\t" ) {
+			out _= "\\t";
+		}
+		else {
+			out _= ch;
+		}
+		i++;
+	}
+
+	return out;
+}
+
+function _encode_value (value) {
+	if ( value instanceof Boolean ) {
+		return value ? "true": "false";
+	}
+	if ( value instanceof Number ) {
+		return "" _ value;
+	}
+	if ( value instanceof Array ) {
+		let out := "[";
+		let i := 0;
+		while ( i < value.length() ) {
+			if ( i > 0 ) {
+				out _= ", ";
+			}
+			out _= _encode_value( value[i] );
+			i++;
+		}
+		out _= "]";
+		return out;
+	}
+	if ( value instanceof String ) {
+		return `"${_escape_string(value)}"`;
+	}
+	die `Unsupported INI type for scalar value: ${typeof value}`;
+}
+
+function _join_lines ( Array lines, Boolean pretty ) {
+	let out := "";
+	let i := 0;
+
+	while ( i < lines.length() ) {
+		if ( i > 0 ) {
+			out _= "\n";
+		}
+		out _= lines[i];
+		i++;
+	}
+
+	if (pretty) {
+		out _= "\n";
+	}
+
+	return out;
+}
+
+function _normalize_for_encoding ( value ) {
+	if ( value instanceof Array ) {
+		let out := [];
+		let i := 0;
+		while ( i < value.length() ) {
+			out.push( _normalize_for_encoding( value[i] ) );
+			i++;
+		}
+		return out;
+	}
+
+	if ( value instanceof Set or value instanceof Bag ) {
+		return _normalize_for_encoding( value.sortstr() );
+	}
+
+	if ( value instanceof PairList ) {
+		let out := {};
+		let pairs := value.to_Array();
+		let i := 0;
+		while ( i < pairs.length() ) {
+			let pair := pairs[i]{pair};
+			let key := pair[0];
+			if ( not out.exists(key) ) {
+				out.set( key, _normalize_for_encoding( pair[1] ) );
+			}
+			i++;
+		}
+		return out;
+	}
+
+	if ( value instanceof Dict ) {
+		let out := {};
+		let keys := value.sorted_keys();
+		let i := 0;
+		while ( i < keys.length() ) {
+			let key := keys[i];
+			out.set( key, _normalize_for_encoding( value.get(key) ) );
+			i++;
+		}
+		return out;
+	}
+
+	return value;
+}
+
+function _ensure_section ( Dict root, String section ) {
+	if ( not root.exists(section) ) {
+		root.set( section, {} );
+	}
+	let maybe := root.get(section);
+	die `INI section '${section}' must be a Dict` if not( maybe instanceof Dict );
+
+	return maybe;
+}
+
+function _decode_ini ( String source ) {
+	let root := {};
+	let section := "";
+	_ensure_section( root, section );
+	let pos := 0;
+	let n := length source;
+	let done := false;
+
+	while ( pos <= n and not done ) {
+		let nl := index( source, "\n", pos );
+		let stop;
+		if ( nl < 0 ) {
+			stop := n;
+		}
+		else {
+			stop := nl;
+		}
+		let raw := substr( source, pos, stop - pos );
+		let line := _trim( _strip_comment(raw) );
+
+		if ( line ≢ "" ) {
+
+			if ( substr( line, 0, 1 ) ≡ "[" and substr( line, length line - 1, 1 ) ≡ "]" ) {
+				section := _trim( substr( line, 1, length line - 2 ) );
+				die "Empty INI section name" if section ≡ "";
+				_ensure_section( root, section );
+			}
+
+			else {
+				let eq_pos := index( line, "=" );
+				die "Expected INI key = value" if eq_pos < 0;
+				let key := _trim( substr( line, 0, eq_pos ) );
+				die "Empty INI key" if key ≡ "";
+				let value := _parse_value( substr( line, eq_pos + 1 ) );
+				let sec := _ensure_section( root, section );
+				sec.set( key, value );
+			}
+
+		}
+
+		if ( nl < 0 ) {
+			done := true;
+		}
+		else {
+			pos := nl + 1;
+		}
+	}
+
+	return root;
+}
+
+function _encode_ini ( Dict data, Boolean pretty, Boolean canonical ) {
+	let lines := [];
+	let top := data.exists("") ? data.get(""): {};
+	die "INI top-level default section must be a Dict" if not( top instanceof Dict );
+	let top_keys := canonical ? top.sorted_keys(): top.keys();
+	let i := 0;
+
+	while ( i < top_keys.length() ) {
+		let key := top_keys[i];
+		lines.push( key _ " = " _ _encode_value( top.get(key) ) );
+		i++;
+	}
+
+	let sections := canonical ? data.sorted_keys(): data.keys();
+	i := 0;
+
+	while ( i < sections.length() ) {
+		let section := sections[i];
+		i++;
+
+		if ( section ≢ "" ) {
+			let sec := data.get(section);
+			die `INI section '${section}' must map to Dict` if not( sec instanceof Dict );
+			if ( pretty and lines.length() > 0 ) {
+				lines.push("");
+			}
+			lines.push( "[" _ section _ "]" );
+			let keys := canonical ? sec.sorted_keys(): sec.keys();
+			let j := 0;
+
+			while ( j < keys.length() ) {
+				let key := keys[j];
+				lines.push( key _ " = " _ _encode_value( sec.get(key) ) );
+				j++;
+			}
+
+		}
+
+	}
+
+	return _join_lines( lines, pretty );
+}
+
+class INI {
+	let Boolean utf8 := true;
+	let Boolean pretty := false;
+	let Boolean canonical := false;
+
+	method encode (value) {
+		let normalized := _normalize_for_encoding(value);
+		die "INI encoder expects a Dict at top level" if not( normalized instanceof Dict );
+		return _encode_ini( normalized, pretty, canonical );
+	}
+
+	method encode_binarystring (value) {
+		return to_binary( self.encode(value) );
+	}
+
+	method decode ( String text ) {
+		let src := text;
+		src := "" if src ≡ null;
+
+		return _decode_ini(src);
+	}
+
+	method decode_binarystring ( BinaryString raw ) {
+		return self.decode( to_string(raw) );
+	}
+
+	method load (path) {
+		from std/io import Path;
+		die "INI.load is denied by runtime policy" if __system__{deny_fs};
+		die "INI.load expects a std/io Path object" if not( path instanceof Path );
+		return self.decode_binarystring( path.slurp() );
+	}
+
+	method dump ( path, value ) {
+		from std/io import Path;
+		die "INI.dump is denied by runtime policy" if __system__{deny_fs};
+		die "INI.dump expects a std/io Path object" if not( path instanceof Path );
+		path.spew( self.encode_binarystring(value) );
+
+		return path;
+	}
+
+}

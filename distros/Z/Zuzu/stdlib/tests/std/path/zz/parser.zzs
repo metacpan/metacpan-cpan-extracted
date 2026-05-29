@@ -1,0 +1,202 @@
+from std/path/zz import ZZPath;
+from std/path/z/parser import Parser;
+from std/path/zz/operators import STANDARD_OPERATORS;
+from test/more import *;
+
+function parse_one ( p, src ) {
+	let terms := p.parse_top_level_terms(src);
+	is( terms.length(), 1, `one top-level term: ${src}` );
+	return terms[0];
+}
+
+let p := new Parser( allowed_operators: STANDARD_OPERATORS );
+
+for ( let spelling in [ "+", "-", "√", "!", "¬", "~" ] ) {
+	let ast := parse_one( p, `${spelling} value` );
+	is( ast{t}, "un", `unary ${spelling} parses as unary expression` );
+	is( ast{op}, spelling, `unary ${spelling} spelling is preserved` );
+	is( ast{e}{t}, "path", `unary ${spelling} operand is parsed` );
+}
+
+let nested := parse_one( p, "! - value" );
+is( nested{t}, "un", "nested unary outer expression parses" );
+is( nested{op}, "!", "nested unary outer operator is preserved" );
+is( nested{e}{op}, "-", "nested unary inner operator is preserved" );
+
+for ( let spelling in [
+	"**",
+	"×",
+	"*",
+	"÷",
+	"/",
+	"mod",
+	"+",
+	"-",
+	"=",
+	"≠",
+	"<",
+	">",
+	"≤",
+	"<=",
+	"≥",
+	">=",
+	"≶",
+	"<=>",
+	"≷",
+	"&",
+	"^",
+	"|",
+	"⋀",
+	"and",
+	"⊼",
+	"nand",
+	"⊻",
+	"xor",
+	"⋁",
+	"or",
+	"⋃",
+	"union",
+	"⋂",
+	"intersection",
+	"∖",
+	"\\",
+	"∈",
+	"in",
+	"∉",
+	"⊂",
+	"subsetof",
+	"⊃",
+	"supersetof",
+	"⊂⊃",
+	"equivalentof",
+	"≡",
+	"==",
+	"≢",
+	"!=",
+	"can",
+] ) {
+	let right := spelling eq "can" ? "\"length\"" : "right";
+	let ast := parse_one( p, `left ${spelling} ${right}` );
+	is( ast{t}, "bin", `binary ${spelling} parses as binary expression` );
+	is( ast{op}, spelling, `binary ${spelling} spelling is preserved` );
+	is( ast{l}{t}, "path", `binary ${spelling} left operand is parsed` );
+	ok( ast{r}{t} in [ "path", "str" ], `binary ${spelling} right operand is parsed` );
+}
+
+for ( let spelling in [
+	"_",
+	"eq",
+	"ne",
+	"gt",
+	"ge",
+	"lt",
+	"le",
+	"cmp",
+	"eqi",
+	"nei",
+	"gti",
+	"gei",
+	"lti",
+	"lei",
+	"cmpi",
+	"~",
+] ) {
+	let ast := parse_one( p, `left ${spelling} right` );
+	is( ast{t}, "bin", `binary ${spelling} parses as binary expression` );
+	is( ast{op}, spelling, `binary ${spelling} spelling is preserved` );
+	is( ast{l}{t}, "path", `binary ${spelling} left operand is parsed` );
+	is( ast{r}{t}, "path", `binary ${spelling} right operand is parsed` );
+}
+
+let pow := parse_one( p, "2 ** 3 ** 2" );
+is( pow{op}, "**", "exponentiation parses" );
+is( pow{r}{t}, "bin", "exponentiation groups to the right" );
+is( pow{r}{op}, "**", "right nested exponentiation is preserved" );
+
+let mult_prec := parse_one( p, "2 + 3 × 4" );
+is( mult_prec{op}, "+", "addition is the outer expression" );
+is( mult_prec{r}{op}, "×", "multiplication binds tighter than addition" );
+
+let cmp_prec := parse_one( p, "2 + 3 = 5" );
+is( cmp_prec{op}, "=", "comparison is the outer expression" );
+is( cmp_prec{l}{op}, "+", "addition binds tighter than comparison" );
+
+let concat_prec := parse_one( p, "\"a\" _ \"b\" eq \"ab\"" );
+is( concat_prec{op}, "eq", "string comparison is the outer expression" );
+is( concat_prec{l}{op}, "_", "concatenation binds tighter than comparison" );
+
+let bitwise_prec := parse_one( p, "1 | 2 ^ 3 & 4" );
+is( bitwise_prec{op}, "|", "bitwise or is the outer expression" );
+is( bitwise_prec{r}{op}, "^", "bitwise xor binds tighter than or" );
+is( bitwise_prec{r}{r}{op}, "&", "bitwise and binds tighter than xor" );
+
+let logical_prec := parse_one( p, "a or b xor c and d" );
+is( logical_prec{op}, "or", "logical or is the outer expression" );
+is( logical_prec{r}{op}, "xor", "logical xor binds tighter than or" );
+is( logical_prec{r}{r}{op}, "and", "logical and binds tighter than xor" );
+
+let logical_sign_prec := parse_one( p, "a ⋁ b ⊻ c ⋀ d" );
+is( logical_sign_prec{op}, "⋁", "symbol logical or is the outer expression" );
+is(
+	logical_sign_prec{r}{op},
+	"⊻",
+	"symbol logical xor binds tighter than or",
+);
+is(
+	logical_sign_prec{r}{r}{op},
+	"⋀",
+	"symbol logical and binds tighter than xor",
+);
+
+let set_prec := parse_one( p, "a ⋃ b & c" );
+is( set_prec{op}, "&", "bitwise and is the outer expression" );
+is( set_prec{l}{op}, "⋃", "set union binds tighter than bitwise and" );
+
+let member_prec := parse_one( p, "a ⋃ b ∈ c" );
+is( member_prec{op}, "∈", "membership test is the outer expression" );
+is( member_prec{l}{op}, "⋃", "set union binds tighter than membership" );
+
+let type_eq_prec := parse_one( p, "a ∈ b == c" );
+is( type_eq_prec{op}, "==", "type-aware equality is the outer expression" );
+is( type_eq_prec{l}{op}, "∈", "membership binds tighter than type-aware equality" );
+
+let ternary := parse_one( p, "zero ? one : two" );
+is( ternary{t}, "ternary", "full ternary parses" );
+is( ternary{c}{s}[0]{n}, "zero", "full ternary condition is preserved" );
+is( ternary{a}{s}[0]{n}, "one", "full ternary true branch is preserved" );
+is( ternary{b}{s}[0]{n}, "two", "full ternary false branch is preserved" );
+
+let elvis := parse_one( p, "zero ?: two" );
+is( elvis{t}, "elvis", "Elvis ternary parses" );
+is( elvis{c}{s}[0]{n}, "zero", "Elvis condition is preserved" );
+is( elvis{b}{s}[0]{n}, "two", "Elvis fallback is preserved" );
+
+let desc := parse_one( p, "body[**/value]" );
+is( desc{s}[0]{q}[0]{t}, "path", "descendant path still parses in filters" );
+is( desc{s}[0]{q}[0]{s}[0]{k}, "desc", "bare ** remains a path segment" );
+
+like(
+	exception( function () {
+		parse_one( p, "sqrt value" );
+	} ),
+	/Expected EOF/,
+	"word-like sqrt unary is not a ZZPath operator",
+);
+
+like(
+	exception( function () {
+		new ZZPath( path: "2*3" );
+	} ),
+	/requires whitespace|Expected EOF|Unexpected token/,
+	"path-ambiguous * requires whitespace as a binary operator",
+);
+
+like(
+	exception( function () {
+		new ZZPath( path: "left \\right" );
+	} ),
+	/requires whitespace|Expected EOF|Unexpected token/,
+	"binary \\ requires whitespace as a binary operator",
+);
+
+done_testing();

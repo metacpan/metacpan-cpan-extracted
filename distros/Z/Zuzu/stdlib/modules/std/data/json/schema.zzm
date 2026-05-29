@@ -1,0 +1,306 @@
+=encoding utf8
+
+=head1 NAME
+
+std/data/json/schema - JSON Schema 2020-12 validation.
+
+=head1 SYNOPSIS
+
+  from std/data/json/schema import
+    JSONSchema,
+    RequiredPropertyError,
+    TypeMismatchError,
+    validate,
+    valid;
+
+  let person_schema := {
+    type: "object",
+    required: [ "name" ],
+    properties: {
+      name: { type: "string" },
+      age:  { type: "integer", minimum: 0 },
+    },
+  };
+
+  say( valid( person_schema, { name: "Ada", age: 37 } ) );
+
+  let result := validate( person_schema, { age: -1 } );
+  for ( let error in result.errors() ) {
+    if ( error instanceof RequiredPropertyError ) {
+      say( error.instanceLocation() _ ": " _ error.error() );
+    }
+  }
+
+=head1 IMPLEMENTATION SUPPORT
+
+This Pure Zuzu module is supported by all implementations of ZuzuScript.
+Network reference loading needs C<std/net/http>, so it is available only in
+runtimes that provide that module.
+
+=head1 DESCRIPTION
+
+I<std/data/json/schema> validates native Zuzu values against JSON Schema
+2020-12 schemas. It is intended for already-decoded JSON data: schemas and
+instances are normally C<Dict>, C<Array>, strings, numbers, booleans, and
+C<null>.
+
+The validator also accepts some native collection types where the JSON model
+has a clear equivalent. C<PairList> is treated as an object and preserves
+duplicate keys for keywords that need to inspect them. C<Set> and C<Bag> are
+treated as array-like values when order is not important, though ordered
+tuple validation is meaningful only for C<Array>.
+
+Validation can be requested in two forms. Boolean validation short-circuits
+after the first failure and returns C<true> or C<false>. Full validation
+collects errors and returns a C<ValidationResult> whose errors are proper
+Zuzu objects with methods such as C<keywordLocation()>,
+C<instanceLocation()>, and C<error()>.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item C<< valid( schema, instance, options := {} ) >>
+
+Returns C<true> when C<instance> satisfies C<schema>, otherwise C<false>.
+This mode is the cheapest validation mode and stops as soon as a failure is
+known.
+
+=item C<< validate( schema, instance, options := {} ) >>
+
+Returns a C<ValidationResult>. This mode attempts to collect every
+independent validation error it can find.
+
+=back
+
+=head2 Classes
+
+=over
+
+=item C<JSONSchema>
+
+Compiled schema wrapper. Construct with C<< new JSONSchema( schema: ... ) >>
+or pass C<options> as a named field.
+
+Common methods:
+
+=over
+
+=item C<< is_valid( instance ) >>
+
+Boolean validation with short-circuiting.
+
+=item C<< validate( instance ) >>
+
+Full validation returning a C<ValidationResult>.
+
+=back
+
+=item C<ValidationResult>
+
+The structured result returned by C<validate>. C<valid()> returns the boolean
+status. C<errors()> returns an array of C<ValidationError> objects.
+C<to_Dict()> converts to a Basic-style output shape.
+
+=item C<ValidationError>
+
+Base class for validation errors. The canonical methods are
+C<keywordLocation()>, C<absoluteKeywordLocation()>, C<instanceLocation()>,
+C<error()>, C<keyword()>, C<details()>, and C<to_Dict()>.
+
+Errors are grouped under C<MissingValueError>, C<UnexpectedValueError>, and
+C<WrongValueError>. The module exports specific subclasses for individual
+keywords such as C<RequiredPropertyError>, C<TypeMismatchError>,
+C<MaximumError>, C<PatternError>, C<AdditionalPropertiesError>,
+C<OneOfError>, and C<ReferenceResolutionError>.
+
+=item C<SubschemaError>
+
+Error class used for the message C<A subschema had errors.>. Its
+C<suberrors()> method returns weak links to the errors produced inside the
+subschema.
+
+=item C<SchemaRegistry>
+
+Registry for schema resources, anchors, and references. It is usually
+managed by C<JSONSchema>, but may be supplied in C<options> when several
+schemas share references.
+
+=item C<HTTPResourceLoader>
+
+Reference loader for HTTP and HTTPS resources. It is used only when supplied
+directly or when C<allow_network> is true.
+
+=item C<FormatRegistry>
+
+Registry of C<format> validators. A custom registry may be passed with the
+C<formats> or C<format_registry> option.
+
+=item C<RelativeJSONPointer>
+
+Parser and evaluator for Relative JSON Pointers. This class is exported
+because JSON Schema uses the syntax for the C<relative-json-pointer> format
+and because it is useful with schema-adjacent data tools.
+
+=back
+
+=head1 OPTIONS
+
+The C<options> value may be a C<Dict> or C<PairList>.
+
+=over
+
+=item C<base_uri>
+
+Base URI used when registering the root schema and resolving relative
+references.
+
+=item C<registry>
+
+A C<SchemaRegistry> to use for C<$ref> and C<$dynamicRef>.
+
+=item C<loader>
+
+A callable or object with a C<load(uri)> method used to fetch missing schema
+resources.
+
+=item C<allow_network>
+
+When true and no loader is supplied, C<JSONSchema> creates an
+C<HTTPResourceLoader>.
+
+=item C<formats> or C<format_registry>
+
+A C<FormatRegistry> used for C<format> checks.
+
+=item C<format_assert>
+
+When false, C<format> is treated as an annotation and does not make
+validation fail.
+
+=item C<unknown_format>
+
+Controls unknown formats. The default is C<fail>; C<ignore> treats unknown
+formats as annotations.
+
+=back
+
+=head1 KNOWN OPTIONAL FIXTURE GAPS
+
+The validator covers all required JSON Schema draft 2020-12 fixture files
+and many optional fixture files. The following optional fixture files are not
+yet promoted to the expected-passing set.
+
+=over
+
+=item F<optional/cross-draft.json>
+
+References into older schema drafts are resolved, but draft-specific
+validation semantics for referenced historic drafts are not yet applied.
+
+=item F<optional/float-overflow.json>
+
+Very large numeric values still use the host numeric model, so overflow and
+precision edge cases for C<multipleOf> are not fully handled.
+
+=item F<optional/ecmascript-regex.json>
+
+The JavaScript runtime passes this fixture, but the Perl and Rust runtimes do
+not yet emulate enough ECMAScript regular-expression semantics.
+
+=item F<optional/format/duration.json>
+
+The C<duration> format checker accepts basic duration shapes, but does not
+yet implement the full RFC 3339 duration grammar.
+
+=item F<optional/format/hostname.json>
+
+Hostname validation is intentionally conservative and does not yet fully
+validate A-label, Punycode, and IDNA edge cases.
+
+=item F<optional/format/idn-hostname.json>
+
+Internationalized hostname validation does not yet implement the full IDNA
+Unicode category, normalization, and bidirectional-text rules.
+
+=item F<optional/format/ipv6.json>
+
+IPv6 validation is still simplified and misses some invalid compression and
+group-length edge cases.
+
+=item F<optional/format/time.json>
+
+Time validation handles common RFC 3339 forms, but still has some leap-second
+and timezone-offset edge cases.
+
+=item F<optional/format/uri.json>
+
+URI validation is stricter than a plain string check, but still accepts some
+invalid authority, userinfo, character, and port cases.
+
+=back
+
+=head1 PORTABILITY
+
+The module is pure ZuzuScript. Behaviour that depends on regular expression
+details or HTTP support may vary with the host runtime.
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/data/json/schema >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/data/json/schema/core import HTTPResourceLoader, SchemaRegistry;
+from std/data/json/schema/format import FormatRegistry;
+from std/data/json/schema/output import
+	AdditionalItemsError,
+	AdditionalPropertiesError,
+	AllOfError,
+	AnyOfError,
+	ConstMismatchError,
+	ContentEncodingError,
+	ContentMediaTypeError,
+	DependentRequiredPropertyError,
+	EnumMismatchError,
+	ExclusiveMaximumError,
+	ExclusiveMinimumError,
+	FalseSchemaError,
+	FormatError,
+	IfThenElseError,
+	MaxContainsError,
+	MaximumError,
+	MaxItemsError,
+	MaxLengthError,
+	MaxPropertiesError,
+	MinContainsError,
+	MinimumError,
+	MinItemsError,
+	MinLengthError,
+	MinPropertiesError,
+	MissingValueError,
+	MultipleOfError,
+	NotMatchedError,
+	OneOfError,
+	PatternError,
+	PropertyNamesError,
+	ReferenceResolutionError,
+	RequiredPropertyError,
+	SubschemaError,
+	TypeMismatchError,
+	UnevaluatedItemsError,
+	UnevaluatedPropertiesError,
+	UnexpectedValueError,
+	UniqueItemsError,
+	UnknownFormatError,
+	ValidationError,
+	ValidationResult,
+	WrongValueError;
+from std/data/json/schema/relative_pointer import RelativeJSONPointer;
+from std/data/json/schema/validation import JSONSchema, validate, valid;

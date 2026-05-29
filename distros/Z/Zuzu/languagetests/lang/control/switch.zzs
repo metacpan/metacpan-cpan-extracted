@@ -1,0 +1,27 @@
+from test/more import *;
+let eq_match := "";
+
+switch ( "bar": eq ) {
+	case "foo": eq_match := "foo";
+	case "bar", "baz": eq_match := "bar";
+	continue;
+	default: eq_match := eq_match _ "-default";
+}
+
+let pattern := "";
+
+switch ( "xylophone": ~) {
+	case /x/: pattern := pattern _ "x";
+	continue;
+	case /y/: pattern := pattern _ "y";
+}
+
+let number_case := 0;
+switch (2) {
+	case 1: number_case := 10;
+	case 2: number_case := 20;
+}
+is( eq_match, "bar-default", "switch :eq comparator and continue work" );
+is( pattern, "xy", "switch :~ comparator supports regexp cases" );
+is( number_case, 20, "switch supports numeric case matching" );
+done_testing();

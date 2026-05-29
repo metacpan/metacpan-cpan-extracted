@@ -1,0 +1,13 @@
+from test/more import *;
+requires_capability( "fs" );
+
+from std/data/toml import *;
+from std/io import Path;
+
+let t := new TOML( pretty: false, canonical: true );
+let tf := Path.tempfile();
+t.dump( tf, { title: "Dumped", owner: { name: "File User" } } );
+is( t.load(tf){title}, "Dumped", "load reads TOML from Path" );
+like( tf.slurp_utf8(), /title = "Dumped"/, "dump writes TOML to file" );
+
+done_testing();

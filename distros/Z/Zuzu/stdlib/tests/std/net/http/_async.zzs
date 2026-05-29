@@ -1,0 +1,33 @@
+from std/net/http import *;
+from test/more import *;
+
+async function main () {
+	let ua := new UserAgent( timeout: 1 );
+	let response := await {
+		ua.get_async( "http://127.0.0.1:1/" );
+	};
+	ok( response.status() > 0, "get_async returns a Response" );
+	ok( not response.success(), "get_async preserves failed response status" );
+
+	let request := ua.build_request( "GET", "http://127.0.0.1:1/" );
+	let sent := await {
+		ua.send_async(request);
+	};
+	ok( sent.status() > 0, "send_async returns a Response" );
+
+	let requested := await {
+		ua.request_async( "POST", "http://127.0.0.1:1/", "body" );
+	};
+	ok( requested.status() > 0, "request_async returns a Response" );
+
+	let via_request := await {
+		request.send_async(ua);
+	};
+	ok( via_request.status() > 0, "Request.send_async returns a Response" );
+}
+
+await {
+	main();
+};
+
+done_testing();

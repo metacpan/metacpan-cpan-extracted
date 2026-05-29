@@ -1,0 +1,365 @@
+from std/internals import setprop;
+from std/path/z import ZPath;
+from test/more import *;
+
+setprop( "paths", ZPath );
+
+let report := {
+	meta: {
+		title: "Before",
+		status: "draft",
+	},
+	users: [
+		{
+			name: "Ada",
+			role: "admin",
+			active: true,
+			skills: [ "math", "logic" ],
+		},
+		{
+			name: "Bob",
+			role: "reader",
+			active: false,
+			skills: [ "ops" ],
+		},
+		{
+			name: "Cara",
+			role: "reader",
+			active: true,
+			skills: [ "docs", "qa" ],
+		},
+	],
+	params: {{ tag: "perl", tag: "zuzu", page: 1 }},
+};
+
+let focused_title := report @ "/meta/title" := "After";
+is( focused_title, "After", "@ assignment returns assigned value" );
+is( report{meta}{title}, "After", "@ assignment updates dict target" );
+
+let focused_name := report @ "/users/*/name" := "ALPHA";
+is( focused_name, "ALPHA", "@ assignment through wildcard returns assigned value" );
+is( report{users}[0]{name}, "ALPHA", "@ assignment updates first matching node" );
+is( report{users}[1]{name}, "Bob", "@ assignment leaves later wildcard matches alone" );
+is( report{users}[2]{name}, "Cara", "@ assignment keeps final wildcard match unchanged" );
+
+let filtered_age := report @ "/users/*[name == \"Bob\"]/skills/#0" := "deploy";
+is( filtered_age, "deploy", "@ assignment works through filter-selected node" );
+is( report{users}[1]{skills}[0], "deploy", "@ assignment mutates filter-selected array element" );
+
+let bulk_roles := report @@ "/users/*/role" := "member";
+is( bulk_roles, "member", "@@ assignment returns assigned value" );
+is( report{users}[0]{role}, "member", "@@ assignment updates first role" );
+is( report{users}[1]{role}, "member", "@@ assignment updates second role" );
+is( report{users}[2]{role}, "member", "@@ assignment updates third role" );
+
+let bulk_status := report @@ "/users/*[name != \"Bob\"]/role" := "active-member";
+is( bulk_status, "active-member", "@@ assignment works with filtered multi-match targets" );
+is( report{users}[0]{role}, "active-member", "@@ assignment updates first filtered match" );
+is( report{users}[1]{role}, "member", "@@ assignment leaves filtered-out nodes unchanged" );
+is( report{users}[2]{role}, "active-member", "@@ assignment updates later filtered match" );
+
+let nested_skill := report @ "/users/#2/skills/#1" := "testing";
+is( nested_skill, "testing", "@ assignment reaches nested array index target" );
+is( report{users}[2]{skills}[1], "testing", "@ assignment mutates nested array index target" );
+
+let bulk_skill_heads := report @@ "/users/*/skills/#0" := "core";
+is( bulk_skill_heads, "core", "@@ assignment updates repeated nested array targets" );
+is( report{users}[0]{skills}[0], "core", "@@ assignment updates first nested array head" );
+is( report{users}[1]{skills}[0], "core", "@@ assignment updates second nested array head" );
+is( report{users}[2]{skills}[0], "core", "@@ assignment updates third nested array head" );
+
+let bulk_miss := report @@ "/users/*[name == \"Nobody\"]/role" := "ghost";
+is( bulk_miss, "ghost", "@@ assignment with no matches still returns assigned value" );
+is( report{users}[0]{role}, "active-member", "@@ no-match leaves first user unchanged" );
+is( report{users}[1]{role}, "member", "@@ no-match leaves second user unchanged" );
+is( report{users}[2]{role}, "active-member", "@@ no-match leaves third user unchanged" );
+
+let focused_miss := exception( function () {
+	report @ "/users/*[name == \"Nobody\"]/role" := "ghost";
+} );
+isnt( focused_miss, null, "@ assignment throws when no matches are found" );
+like( focused_miss{message}, /Path assignment \(@\) found no matches/, "@ no-match exception message is stable" );
+
+function fresh_compound_report () {
+	return {
+		meta: {
+			plus: 8,
+			minus: 8,
+			mul: 4,
+			div: 8,
+			pow: 2,
+			maybe: null,
+			text: "AB",
+			title: "Read 2026",
+		},
+		users: [
+			{
+				plus: 1,
+				minus: 5,
+				mul: 2,
+				div: 8,
+				pow: 2,
+				maybe: null,
+				text: "A",
+				name: "Ada 10",
+			},
+			{
+				plus: 2,
+				minus: 7,
+				mul: 3,
+				div: 12,
+				pow: 3,
+				maybe: null,
+				text: "B",
+				name: "Bob 20",
+			},
+		],
+	};
+}
+
+{
+	let sample := fresh_compound_report();
+	is( sample @ "/meta/plus" += 2, 10, "@ += returns new value" );
+	is( sample{meta}{plus}, 10, "@ += mutates focused target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	is( sample @ "/meta/minus" -= 3, 5, "@ -= returns new value" );
+	is( sample{meta}{minus}, 5, "@ -= mutates focused target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	is( sample @ "/meta/mul" *= 3, 12, "@ *= returns new value" );
+	is( sample{meta}{mul}, 12, "@ *= mutates focused target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	is( sample @ "/meta/mul" ×= 3, 12, "@ ×= returns new value" );
+	is( sample{meta}{mul}, 12, "@ ×= mutates focused target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	is( sample @ "/meta/div" /= 2, 4, "@ /= returns new value" );
+	is( sample{meta}{div}, 4, "@ /= mutates focused target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	is( sample @ "/meta/div" ÷= 2, 4, "@ ÷= returns new value" );
+	is( sample{meta}{div}, 4, "@ ÷= mutates focused target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	is( sample @ "/meta/pow" **= 3, 8, "@ **= returns new value" );
+	is( sample{meta}{pow}, 8, "@ **= mutates focused target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	is( sample @ "/meta/text" _= "!", "AB!", "@ _= returns new value" );
+	is( sample{meta}{text}, "AB!", "@ _= mutates focused target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	is( sample @ "/meta/maybe" ?:= 9, 9, "@ ?:= returns assigned value when target is null" );
+	is( sample{meta}{maybe}, 9, "@ ?:= mutates focused null target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	is( sample @@ "/users/*/plus" += 2, 2, "@@ += returns RHS contract" );
+	is( sample{users}[0]{plus}, 3, "@@ += mutates first selected target" );
+	is( sample{users}[1]{plus}, 4, "@@ += mutates later selected target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	is( sample @@ "/users/*/minus" -= 2, 2, "@@ -= returns RHS contract" );
+	is( sample{users}[0]{minus}, 3, "@@ -= mutates first selected target" );
+	is( sample{users}[1]{minus}, 5, "@@ -= mutates later selected target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	is( sample @@ "/users/*/mul" *= 2, 2, "@@ *= returns RHS contract" );
+	is( sample{users}[0]{mul}, 4, "@@ *= mutates first selected target" );
+	is( sample{users}[1]{mul}, 6, "@@ *= mutates later selected target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	is( sample @@ "/users/*/mul" ×= 2, 2, "@@ ×= returns RHS contract" );
+	is( sample{users}[0]{mul}, 4, "@@ ×= mutates first selected target" );
+	is( sample{users}[1]{mul}, 6, "@@ ×= mutates later selected target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	is( sample @@ "/users/*/div" /= 2, 2, "@@ /= returns RHS contract" );
+	is( sample{users}[0]{div}, 4, "@@ /= mutates first selected target" );
+	is( sample{users}[1]{div}, 6, "@@ /= mutates later selected target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	is( sample @@ "/users/*/div" ÷= 2, 2, "@@ ÷= returns RHS contract" );
+	is( sample{users}[0]{div}, 4, "@@ ÷= mutates first selected target" );
+	is( sample{users}[1]{div}, 6, "@@ ÷= mutates later selected target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	is( sample @@ "/users/*/pow" **= 2, 2, "@@ **= returns RHS contract" );
+	is( sample{users}[0]{pow}, 4, "@@ **= mutates first selected target" );
+	is( sample{users}[1]{pow}, 9, "@@ **= mutates later selected target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	is( sample @@ "/users/*/text" _= "!", "!", "@@ _= returns RHS contract" );
+	is( sample{users}[0]{text}, "A!", "@@ _= mutates first selected target" );
+	is( sample{users}[1]{text}, "B!", "@@ _= mutates later selected target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	is( sample @@ "/users/*/maybe" ?:= 7, 7, "@@ ?:= returns RHS contract" );
+	is( sample{users}[0]{maybe}, 7, "@@ ?:= mutates first selected null target" );
+	is( sample{users}[1]{maybe}, 7, "@@ ?:= mutates later selected null target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	ok( sample @? "/meta/plus" += 2, "@? += returns true on match" );
+	is( sample{meta}{plus}, 10, "@? += mutates matched target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	ok( sample @? "/meta/minus" -= 3, "@? -= returns true on match" );
+	is( sample{meta}{minus}, 5, "@? -= mutates matched target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	ok( sample @? "/meta/mul" *= 3, "@? *= returns true on match" );
+	is( sample{meta}{mul}, 12, "@? *= mutates matched target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	ok( sample @? "/meta/mul" ×= 3, "@? ×= returns true on match" );
+	is( sample{meta}{mul}, 12, "@? ×= mutates matched target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	ok( sample @? "/meta/div" /= 2, "@? /= returns true on match" );
+	is( sample{meta}{div}, 4, "@? /= mutates matched target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	ok( sample @? "/meta/div" ÷= 2, "@? ÷= returns true on match" );
+	is( sample{meta}{div}, 4, "@? ÷= mutates matched target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	ok( sample @? "/meta/pow" **= 3, "@? **= returns true on match" );
+	is( sample{meta}{pow}, 8, "@? **= mutates matched target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	ok( sample @? "/meta/text" _= "!", "@? _= returns true on match" );
+	is( sample{meta}{text}, "AB!", "@? _= mutates matched target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	ok( sample @? "/meta/maybe" ?:= 9, "@? ?:= returns true on match" );
+	is( sample{meta}{maybe}, 9, "@? ?:= mutates matched target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	is(
+		sample @ "/meta/title" ~= /([A-Za-z]+) ([0-9]+)/ -> `${m[1]}:${m[2]}`,
+		"Read:2026",
+		"@ ~= supports captures",
+	);
+	is( sample{meta}{title}, "Read:2026", "@ ~= mutates focused target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	is(
+		sample @@ "/users/*/name" ~= /([A-Za-z]+) ([0-9]+)/ -> do {
+			let who := m[1];
+			let digits := m[2];
+			who _ ":" _ digits;
+		},
+		"Bob:20",
+		"@@ ~= returns last replaced value",
+	);
+	is( sample{users}[0]{name}, "Ada:10", "@@ ~= mutates first selected target" );
+	is( sample{users}[1]{name}, "Bob:20", "@@ ~= mutates later selected target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	ok(
+		sample @? "/meta/title" ~= /([A-Za-z]+) ([0-9]+)/ -> `${m[1]}:${m[2]}`,
+		"@? ~= returns true on match",
+	);
+	is( sample{meta}{title}, "Read:2026", "@? ~= mutates matched target" );
+}
+
+{
+	let sample := fresh_compound_report();
+	let miss := exception( function () {
+		sample @ "/meta/missing" += 2;
+	} );
+	isnt( miss, null, "@ += throws on selector miss" );
+}
+
+{
+	let sample := fresh_compound_report();
+	is( sample @@ "/meta/missing" += 2, 2, "@@ += no-match still returns RHS" );
+	is( sample{meta}{plus}, 8, "@@ += no-match leaves structure unchanged" );
+}
+
+{
+	let sample := fresh_compound_report();
+	is( sample @? "/meta/missing" += 2, false, "@? += returns false on selector miss" );
+	is( sample{meta}{plus}, 8, "@? += no-match leaves structure unchanged" );
+}
+
+{
+	let sample := fresh_compound_report();
+	let miss := exception( function () {
+		sample @ "/meta/missing" ~= /x/ -> "y";
+	} );
+	isnt( miss, null, "@ ~= throws on selector miss" );
+}
+
+{
+	let sample := fresh_compound_report();
+	sample @@ "/meta/missing" ~= /x/ -> "y";
+	is( sample{meta}{title}, "Read 2026", "@@ ~= no-match leaves structure unchanged" );
+}
+
+{
+	let sample := fresh_compound_report();
+	is( sample @? "/meta/missing" ~= /x/ -> "y", false, "@? ~= returns false on selector miss" );
+	is( sample{meta}{title}, "Read 2026", "@? ~= no-match leaves structure unchanged" );
+}
+
+done_testing();

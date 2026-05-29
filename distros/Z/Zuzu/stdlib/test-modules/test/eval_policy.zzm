@@ -1,0 +1,18 @@
+=encoding utf8
+
+=head1 NAME
+
+test/eval_policy - Helpers for std/eval policy overlay tests.
+
+=cut
+
+function eval_policy_fs_denied () {
+	return __system__{deny_fs};
+}
+
+function eval_policy_require_fs () {
+	if ( __system__{deny_fs} ) {
+		die "TEST_EVAL_POLICY_FS_DENIED";
+	}
+	return "fs-ok";
+}

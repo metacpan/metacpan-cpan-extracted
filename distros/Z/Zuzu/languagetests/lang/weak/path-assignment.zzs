@@ -1,0 +1,90 @@
+from std/internals import setprop;
+from std/path/z import ZPath;
+from test/more import *;
+
+setprop( "paths", ZPath );
+
+class Node {
+	let name with get;
+}
+
+function weak_first_path_after_scope () {
+	let data := {
+		item: {
+			parent: null,
+		},
+	};
+	{
+		let scoped := new Node( name: "scoped-parent" );
+		data @ "/item/parent" := scoped but weak;
+		is(
+			data{item}{parent}.get_name(),
+			"scoped-parent",
+			"@ weak assignment reads live scoped referent",
+		);
+	}
+	return data;
+}
+
+function weak_all_path_after_scope () {
+	let data := {
+		items: [
+			{ parent: null },
+			{ parent: null },
+		],
+	};
+	{
+		let scoped := new Node( name: "scoped-parent" );
+		data @@ "/items/*/parent" := scoped but weak;
+		is(
+			data{items}[0]{parent}.get_name(),
+			"scoped-parent",
+			"@@ weak assignment reads first live scoped referent",
+		);
+		is(
+			data{items}[1]{parent}.get_name(),
+			"scoped-parent",
+			"@@ weak assignment reads second live scoped referent",
+		);
+	}
+	return data;
+}
+
+let parent := new Node( name: "parent" );
+let data := {
+	item: {
+		parent: null,
+	},
+	items: [
+		{ parent: null },
+		{ parent: null },
+	],
+};
+
+data @ "/item/parent" := parent but weak;
+is( data{item}{parent}.get_name(), "parent", "@ weak assignment stores first selected target weakly" );
+
+data @@ "/items/*/parent" := parent but weak;
+is( data{items}[0]{parent}.get_name(), "parent", "@@ weak assignment stores first repeated target weakly" );
+is( data{items}[1]{parent}.get_name(), "parent", "@@ weak assignment stores second repeated target weakly" );
+
+let weak_first_data := weak_first_path_after_scope();
+is(
+	weak_first_data{item}{parent},
+	null,
+	"@ weak assignment reads null after referent dies",
+);
+
+let weak_all_data := weak_all_path_after_scope();
+is(
+	weak_all_data{items}[0]{parent},
+	null,
+	"@@ weak assignment first target reads null after referent dies",
+);
+is(
+	weak_all_data{items}[1]{parent},
+	null,
+	"@@ weak assignment second target reads null after referent dies",
+);
+
+done_testing();

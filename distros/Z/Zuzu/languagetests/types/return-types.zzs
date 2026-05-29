@@ -1,0 +1,45 @@
+from test/more import *;
+
+function five () → Number {
+	return 5;
+}
+
+function nope () → Number {
+	return "five";
+}
+
+function passthrough ( Any x ) → Any {
+	return x;
+}
+
+class Counter {
+	method value () → Number {
+		return 3;
+	}
+
+	method broken () → Number {
+		return "oops";
+	}
+}
+
+is( five(), 5, "typed function returns Number" );
+is( passthrough("ok"), "ok", "Any return type skips checks" );
+is( new Counter().value(), 3, "typed method returns Number" );
+
+like(
+	exception( function() {
+		nope();
+	} ),
+	/TypeException: 'return value of 'nope'' must be Number, got String/,
+	"function return type mismatch throws TypeException"
+);
+
+like(
+	exception( function() {
+		new Counter().broken();
+	} ),
+	/TypeException: 'return value of 'broken'' must be Number, got String/,
+	"method return type mismatch throws TypeException",
+);
+
+done_testing();

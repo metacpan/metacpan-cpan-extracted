@@ -1,0 +1,8 @@
+from test/c26/parent import CrossParent;
+from test/c26/traits import CrossTrait;
+
+class CrossChild extends CrossParent with CrossTrait {
+	method bark () {
+		return "woof";
+	}
+}

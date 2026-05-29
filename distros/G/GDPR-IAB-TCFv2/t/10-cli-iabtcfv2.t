@@ -229,20 +229,20 @@ subtest 'Short aliases -c (compact) and -s (strict-legal-basis)' => sub {
 
 subtest 'validate subcommand' => sub {
 
-  # The fixture TC string was produced for vendor 32 (it appears in the
-  # vendor consents).  Asking the validator to OK vendor 32 with no
-  # required purposes should always succeed; asking it to OK an
-  # out-of-range vendor (99999) for any required purpose always fails,
-  # which gives stable assertions independent of the GVL contents.
+  # Vendor 21 holds a vendor-level consent bit in the fixture, so it clears
+  # the global vendor gate; with no required purposes it always succeeds.
+  # The same bit-bearing vendor with required purposes it cannot satisfy
+  # (purpose 2 has no consent; purposes 7,8 have no vendor legitimate
+  # interest) always fails, giving stable assertions independent of the GVL.
 
-  my $valid_out  = `$perl -Ilib $bin validate -v 32 $tc_string`;
+  my $valid_out  = `$perl -Ilib $bin validate -v 21 $tc_string`;
   my $valid_data = decode_helper($valid_out);
   ok($valid_data, 'validate emits JSON');
   is($valid_data->{valid},     JSON->can('true') ? JSON->true() : JSON::PP::true(), 'valid case has valid:true');
-  is($valid_data->{vendor_id}, 32,                                                  'valid case echoes vendor_id');
+  is($valid_data->{vendor_id}, 21,                                                  'valid case echoes vendor_id');
 
   # Failure (singular reason, fail-fast default).
-  my $fail_out  = `$perl -Ilib $bin validate -v 99999 -C 1,2 $tc_string`;
+  my $fail_out  = `$perl -Ilib $bin validate -v 21 -C 1,2 $tc_string`;
   my $fail_code = $? >> 8;
   my $fail_data = decode_helper($fail_out);
   ok($fail_data, 'failing validate emits JSON');
@@ -252,7 +252,7 @@ subtest 'validate subcommand' => sub {
   is($fail_code, 1, 'failing validate exits 1');
 
   # --all aggregates reasons.
-  my $all_out  = `$perl -Ilib $bin validate -av 99999 -C 1,2 -L 7,8 $tc_string`;
+  my $all_out  = `$perl -Ilib $bin validate -av 21 -C 1,2 -L 7,8 $tc_string`;
   my $all_data = decode_helper($all_out);
   ok(exists $all_data->{reasons}, '--all uses plural reasons array');
   ok(!exists $all_data->{reason}, '--all does not emit singular reason');
@@ -260,24 +260,24 @@ subtest 'validate subcommand' => sub {
   cmp_ok(scalar @{$all_data->{reasons}}, '>=', 2, '--all aggregates multiple failures');
 
   # --text output paths (success and failure).
-  my $text_ok = `$perl -Ilib $bin validate -tv 32 $tc_string`;
-  like($text_ok, qr/^OK\s+\S+\s+vendor 32/, '--text valid line shape');
+  my $text_ok = `$perl -Ilib $bin validate -tv 21 $tc_string`;
+  like($text_ok, qr/^OK\s+\S+\s+vendor 21/, '--text valid line shape');
 
-  my $text_fail = `$perl -Ilib $bin validate -tv 99999 -C 1 $tc_string`;
-  like($text_fail, qr/^FAIL\s+\S+\s+vendor 99999:/, '--text fail line shape');
+  my $text_fail = `$perl -Ilib $bin validate -tv 21 -C 2 $tc_string`;
+  like($text_fail, qr/^FAIL\s+\S+\s+vendor 21:/, '--text fail line shape');
 
-  my $text_all   = `$perl -Ilib $bin validate -atv 99999 -C 1,2 $tc_string`;
+  my $text_all   = `$perl -Ilib $bin validate -atv 21 -C 2 -L 7 $tc_string`;
   my @text_lines = split /\n/, $text_all;
   cmp_ok(scalar @text_lines, '>=', 2, '--text --all spans multiple lines');
-  like($text_lines[0], qr/^FAIL\s+\S+\s+vendor 99999:$/, '--text --all first line ends with colon');
-  like($text_lines[1], qr/^\s+-\s/,                      '--text --all subsequent lines are indented bullets');
+  like($text_lines[0], qr/^FAIL\s+\S+\s+vendor 21:$/, '--text --all first line ends with colon');
+  like($text_lines[1], qr/^\s+-\s/,                   '--text --all subsequent lines are indented bullets');
 
   # --quiet preserves exit code, suppresses stdout.
-  my $quiet_ok = `$perl -Ilib $bin validate -qv 32 $tc_string`;
+  my $quiet_ok = `$perl -Ilib $bin validate -qv 21 $tc_string`;
   is($quiet_ok, '', '--quiet on success emits nothing');
   is($? >> 8,   0,  '--quiet on success exits 0');
 
-  my $quiet_fail = `$perl -Ilib $bin validate -qv 99999 -C 1 $tc_string`;
+  my $quiet_fail = `$perl -Ilib $bin validate -qv 21 -C 2 $tc_string`;
   is($quiet_fail, '', '--quiet on failure emits nothing');
   is($? >> 8,     1,  '--quiet on failure still exits 1');
 

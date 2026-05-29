@@ -1,0 +1,30 @@
+from test/more import *;
+
+requires_capability( "db" );
+
+from std/data/json import JSON;
+from std/db import DB;
+
+let dbh := DB.temp();
+dbh.prepare( "create table events (id integer, payload text)" ).execute();
+let ins := dbh.prepare( "insert into events (id, payload) values (?, ?)" );
+ins.execute( 1, "{\"score\":8,\"name\":\"Ada\"}" );
+ins.execute( 2, "{\"score\":3,\"name\":\"Bob\"}" );
+
+let q := dbh.prepare( "select id, payload from events order by id" );
+q.execute();
+let rows := q.all_dict();
+let j := new JSON();
+
+let docs := [];
+for ( let row in rows ) {
+	docs.push( { id: row{id}, payload: j.decode( row{payload} ) } );
+}
+
+let data := { rows: docs };
+
+is( data @ "/rows/*/payload/score", 8, "@ returns first score from db-derived payload" );
+is( data @@ "/rows/*/payload/name", [ "Ada", "Bob" ], "@@ returns all names from db-derived payload" );
+is( data @? "/rows/*/payload/name", true, "@? confirms at least one payload name" );
+
+done_testing();

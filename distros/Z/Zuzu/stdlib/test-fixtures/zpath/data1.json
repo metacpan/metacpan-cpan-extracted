@@ -1,0 +1,35 @@
+{
+    "first": "John",
+    "last": "doe",
+    "age": 26,
+    "address": {
+        "street": "naist street",
+        "city": "Nara",
+        "postcode": "630-0192"
+    },
+    "numbers": [
+        {
+            "type": "iPhone",
+            "number": "0123-4567-8888",
+            "things": [ "foo", "bar" ]
+        },
+        {
+            "type": "home",
+            "number": "0123-4567-8910",
+            "things": [ "biff", "boff" ]
+        },
+        {
+            "type": "work",
+            "number": "0123-9999-8910"
+        }
+    ],
+    "typetest": {
+        "numvalue": 30,
+        "samenumvalue": 30,
+        "list": [30, 30, 30, 30, 30, 30],
+        "nullvalue": null,
+        "falsevalue": false,
+        "mediatype0": "application/pdf",
+        "mediatype1": "application/pdf;charset=utf-8"
+    }
+}

@@ -1,0 +1,119 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/zuzuzoo import Zuzuzoo;
+
+function throws_like ( f, rx, name ) {
+	let got := "";
+	try {
+		f();
+	}
+	catch ( Exception e ) {
+		got := e.to_String();
+	}
+	like( got, rx, name );
+}
+
+let posix_user := (
+	new Zuzuzoo( home: "/home/alex" )
+).config();
+is( posix_user{lib_dir}, "/home/alex/.zuzu/modules", "POSIX user lib default" );
+is( posix_user{bin_dir}, "/home/alex/.zuzu/bin", "POSIX user bin default" );
+is( posix_user{meta_dir}, "/home/alex/.zuzu/meta", "POSIX user meta default" );
+is( posix_user{global}, false, "POSIX user global flag" );
+is( posix_user{windows}, false, "POSIX user windows flag" );
+
+let posix_global := ( new Zuzuzoo( global: true ) ).config();
+is(
+	posix_global{lib_dir},
+	"/var/lib/zuzu/modules",
+	"POSIX global lib default",
+);
+is( posix_global{bin_dir}, "/usr/local/bin", "POSIX global bin default" );
+is(
+	posix_global{meta_dir},
+	"/var/lib/zuzu/meta",
+	"POSIX global meta default",
+);
+is( posix_global{global}, true, "POSIX global flag" );
+
+let overrides := (
+	new Zuzuzoo(
+		lib_dir: "/custom/lib",
+		bin_dir: "/custom/bin",
+		meta_dir: "/custom/meta",
+		home: "/home/alex",
+	)
+).config();
+is( overrides{lib_dir}, "/custom/lib", "lib override is preserved" );
+is( overrides{bin_dir}, "/custom/bin", "bin override is preserved" );
+is( overrides{meta_dir}, "/custom/meta", "meta override is preserved" );
+
+let explicit_posix := (
+	new Zuzuzoo(
+		lib_dir: "/explicit/lib",
+		bin_dir: "/explicit/bin",
+		meta_dir: "/explicit/meta",
+		home: "",
+	)
+).config();
+is(
+	explicit_posix{lib_dir},
+	"/explicit/lib",
+	"fully explicit POSIX config does not require HOME",
+);
+
+let windows_user := (
+	new Zuzuzoo(
+		windows: true,
+		userprofile: "C:\\Users\\Ada",
+	)
+).config();
+is(
+	windows_user{lib_dir},
+	"C:\\Users\\Ada\\.zuzu\\modules",
+	"Windows user lib default",
+);
+is(
+	windows_user{bin_dir},
+	"C:\\Users\\Ada\\.zuzu\\bin",
+	"Windows user bin default",
+);
+is(
+	windows_user{meta_dir},
+	"C:\\Users\\Ada\\.zuzu\\meta",
+	"Windows user meta default",
+);
+is( windows_user{windows}, true, "Windows flag is reported" );
+
+let explicit_windows := (
+	new Zuzuzoo(
+		windows: true,
+		lib_dir: "C:\\zuzu\\modules",
+		bin_dir: "C:\\zuzu\\bin",
+		meta_dir: "C:\\zuzu\\meta",
+		userprofile: "",
+	)
+).config();
+is(
+	explicit_windows{meta_dir},
+	"C:\\zuzu\\meta",
+	"fully explicit Windows config does not require USERPROFILE",
+);
+
+throws_like(
+	function () {
+		(
+			new Zuzuzoo(
+				windows: true,
+				global: true,
+				userprofile: "C:\\Users\\Ada",
+			)
+		).config();
+	},
+	/Global Windows installs are not supported/,
+	"Windows global installs throw",
+);
+
+done_testing();

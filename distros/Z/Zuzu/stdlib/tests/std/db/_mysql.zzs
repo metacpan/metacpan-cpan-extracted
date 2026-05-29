@@ -1,0 +1,42 @@
+from test/more import *;
+
+author_testing();
+requires_capability( "db" );
+requires_capability( "proc" );
+
+from std/proc import Env;
+from std/db import DB;
+
+let db_user := Env.get( "USER", "" );
+let dbh := DB.connect( `dbi:mysql:database=zuzutest;user=${db_user}` );
+
+dbh.prepare( "drop table if exists zuzu_author_mysql" ).execute();
+dbh.prepare(
+	```create table zuzu_author_mysql (
+		id integer primary key,
+		name varchar(64) not null
+	)```,
+).execute();
+
+let insert := dbh.prepare(
+	"insert into zuzu_author_mysql (id, name) values (?, ?)",
+);
+insert.execute( 1, "Ada" );
+insert.execute( 2, "Bob" );
+insert.execute( 3, "Cam" );
+
+let query := dbh.prepare(
+	"select id, name from zuzu_author_mysql order by id",
+);
+query.execute();
+let rows := query.all_typed_dict();
+
+is( rows.length(), 3, "MySQL row count" );
+is( rows[0]{id}, 1, "MySQL first id" );
+is( rows[0]{name}, "Ada", "MySQL first name" );
+is( rows[2]{id}, 3, "MySQL last id" );
+is( rows[2]{name}, "Cam", "MySQL last name" );
+
+dbh.prepare( "drop table zuzu_author_mysql" ).execute();
+
+done_testing();

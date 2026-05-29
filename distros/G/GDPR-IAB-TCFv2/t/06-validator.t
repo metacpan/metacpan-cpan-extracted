@@ -7,6 +7,7 @@ use Test::Warn;
 
 use GDPR::IAB::TCFv2;
 use GDPR::IAB::TCFv2::Validator;
+use GDPR::IAB::TCFv2::Validator::Reason  qw<:all>;
 use GDPR::IAB::TCFv2::Constants::Purpose qw<:all>;
 
 subtest "Validator basic usage" => sub {
@@ -69,7 +70,12 @@ subtest "Validator with Disclosed Vendors" => sub {
 
   my $validator = GDPR::IAB::TCFv2::Validator->new(vendor_id => 284, verify_disclosed_vendors => 1,);
 
-  ok $validator->validate($tc_v23), 'pass for disclosed vendor 284';
+  # Vendor 284 is present in the disclosed-vendors segment but has no
+  # vendor-level consent/LI bit in this string, so the global vendor gate
+  # rejects it (the disclosed-vendors rule alone is not enough to pass).
+  my $r284 = $validator->validate($tc_v23);
+  ok !$r284, 'disclosed-but-unconsented vendor 284 fails the global vendor gate';
+  like "$r284", qr/no consent or legitimate interest/, 'fails via the global vendor gate';
 
   my $result = $validator->validate($tc_v23, vendor_id => 9999);
   ok !$result, 'fail for non-disclosed vendor 9999';
@@ -89,12 +95,20 @@ subtest "Validator with Disclosed Vendors" => sub {
       = GDPR::IAB::TCFv2::Validator->new(vendor_id => 1, verify_disclosed_vendors => 1, min_tcf_policy_version => 2,);
     ok $v2->validate($tc_v20), 'missing segment passes when min_tcf_policy_version < 5';
 
-    # 3. min_tcf_policy_version >= 5 -> Failure
+    # 3. min_tcf_policy_version >= 5 against a policy-2 string -> Failure.
+    # Per Go alignment, the policy-based "missing disclosed vendors" rule only
+    # fires when the STRING's own policy version is >= 5 (Go branch b). This
+    # fixture is policy 2, so it fails the policy floor instead -- a real
+    # policy-5 string lacking the segment is covered in t/18-go-parity.t.
     my $v3
       = GDPR::IAB::TCFv2::Validator->new(vendor_id => 1, verify_disclosed_vendors => 1, min_tcf_policy_version => 5,);
     my $r3 = $v3->validate_all($tc_v20);
-    ok !$r3, 'missing segment fails when min_tcf_policy_version >= 5';
-    like "$r3", qr/missing disclosed vendors segment/, 'correct failure reason';
+    ok !$r3, 'policy-2 string fails when min_tcf_policy_version >= 5';
+    like "$r3", qr/policy version 2 is below required minimum 5/, 'fails the policy floor (string policy < 5)';
+
+    my %codes = map { $_ => 1 } $r3->reason_codes;
+    ok !$codes{ReasonMissingDisclosedVendors()},
+      'policy-2 string does not trigger the policy-based MissingDisclosedVendors';
   };
 };
 
@@ -265,16 +279,18 @@ subtest "Validator strict_legal_basis mode override" => sub {
 subtest "Validator validate_all accumulates across rule families" => sub {
   my $tc_string = 'COwAdDhOwAdDhN4ABAENAPCgAAQAAv___wAAAFP_AAp_4AI6ACACAA';
 
-  # Vendor 99 is out of range for this fixture's bitfields (max=10), so
-  # every rule fails uniformly.  Three rules, three reasons:
-  #   - Consent rule:  P1/V99 -> "(consent)"
-  #   - Consent rule:  P6/V99, via flexible default consent -> "(consent)"
-  #   - LI rule:       P10/V99 -> "(legitimate interest)"
+  # Vendor 10 has vendor-level consent/LI bits in this fixture, so it clears
+  # the global vendor gate and we still exercise per-purpose accumulation.
+  # In this fixture purposes 2 and 3 lack consent, and purpose 1 can never use
+  # legitimate interest (spec carve-out). Three rules, three reasons:
+  #   - Consent rule:  P2/V10, via flexible default consent -> "(consent)"
+  #   - Consent rule:  P3/V10                               -> "(consent)"
+  #   - LI rule:       P1/V10 -> "legitimate interest not permitted"
   my $validator = GDPR::IAB::TCFv2::Validator->new(
-    vendor_id                       => 99,
-    consent_purpose_ids             => [1, 6],
-    legitimate_interest_purpose_ids => [10],
-    flexible_purpose_ids            => [6],
+    vendor_id                       => 10,
+    consent_purpose_ids             => [2, 3],
+    legitimate_interest_purpose_ids => [1],
+    flexible_purpose_ids            => [2],
   );
 
   my $result = $validator->validate_all($tc_string);
@@ -282,9 +298,9 @@ subtest "Validator validate_all accumulates across rule families" => sub {
   is scalar($result->reasons), 3, 'three reasons accumulated across consent + LI rules';
 
   my $joined = join '|', $result->reasons;
-  like $joined, qr/\(consent\)/,             'has the consent rule reason';
-  like $joined, qr/\(legitimate interest\)/, 'has the LI rule reason';
-  like $joined, qr/purpose 6 \(consent\)/,   'flexible P6 with default consent reports as a consent failure';
+  like $joined, qr/\(consent\)/,           'has a consent rule reason';
+  like $joined, qr/legitimate interest/,   'has the LI rule reason';
+  like $joined, qr/purpose 2 \(consent\)/, 'flexible P2 with default consent reports as a consent failure';
 };
 
 subtest "Validator per-call list overrides" => sub {
@@ -361,13 +377,13 @@ subtest "Validator per-call list overrides" => sub {
 
   subtest "validate_all with per-call list overrides" => sub {
 
-    # Vendor 99 fails uniformly (out of range). Override all three
-    # lists per call and confirm validate_all reports a reason for
-    # each rule that fails.
-    my $validator = GDPR::IAB::TCFv2::Validator->new(vendor_id => 99, consent_purpose_ids => [6],);
+    # Vendor 10 clears the global vendor gate (it has vendor-level bits), so
+    # per-call list overrides still accumulate per-purpose failures. Purposes
+    # 7 and 8 lack consent; purpose 1 can never use legitimate interest.
+    my $validator = GDPR::IAB::TCFv2::Validator->new(vendor_id => 10, consent_purpose_ids => [6],);
 
     my $result
-      = $validator->validate_all($tc_string, consent_purpose_ids => [7, 8], legitimate_interest_purpose_ids => [9],);
+      = $validator->validate_all($tc_string, consent_purpose_ids => [7, 8], legitimate_interest_purpose_ids => [1],);
     ok !$result, 'validate_all reports failure under overrides';
     is scalar($result->reasons), 3, 'three reasons accumulated (two consent + one LI)';
   };

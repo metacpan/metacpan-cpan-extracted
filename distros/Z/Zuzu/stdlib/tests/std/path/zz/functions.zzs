@@ -1,0 +1,407 @@
+from std/path/z/functions import STANDARD_FUNCTIONS as Z_STANDARD_FUNCTIONS;
+from std/path/zz/functions import Func, STANDARD_FUNCTIONS;
+from std/path/zz import ZZPath;
+from test/more import *;
+
+ok( typeof Func eq "Class", "Func class is importable" );
+ok( typeof STANDARD_FUNCTIONS eq "Array", "STANDARD_FUNCTIONS is importable" );
+is( STANDARD_FUNCTIONS.length(), 59, "ZZPath standard function table is limited" );
+
+function find_z ( spelling ) {
+	return Z_STANDARD_FUNCTIONS.first( fn f → f.has_name(spelling) );
+}
+
+function find_zz ( spelling ) {
+	return STANDARD_FUNCTIONS.first( fn f → f.has_name(spelling) );
+}
+
+for ( let spelling in [
+	"true",
+	"false",
+	"null",
+	"tag",
+	"url",
+	"local-name",
+	"key",
+	"value",
+	"index",
+	"count",
+	"is-first",
+	"is-last",
+	"next",
+	"prev",
+] ) {
+	let z_func := find_z(spelling);
+	let zz_func := find_zz(spelling);
+	ok( zz_func ≢ null, `${spelling}() is included in ZZPath` );
+	ok( zz_func ≡ z_func, `${spelling}() reuses the ZPath definition` );
+}
+
+for ( let spelling in [
+	"abs",
+	"floor",
+	"ceil",
+	"round",
+	"int",
+	"sqrt",
+	"uc",
+	"lc",
+	"length",
+	"not",
+	"typeof",
+	"defined",
+	"empty",
+	"string",
+	"number",
+	"boolean",
+	"regexp",
+	"sum",
+	"min",
+	"max",
+	"clamp",
+	"substr",
+	"index-of",
+	"rindex",
+	"last-index-of",
+	"contains",
+	"chr",
+	"ord",
+	"replace",
+	"search",
+	"starts_with",
+	"ends_with",
+	"matches",
+	"pattern_to_regexp",
+	"quotemeta",
+	"sprint",
+	"split",
+	"join",
+	"trim",
+	"pad",
+	"chomp",
+	"title",
+	"snake",
+	"kebab",
+	"camel",
+] ) {
+	let zz_func := find_zz(spelling);
+	ok( zz_func ≢ null, `${spelling}() is included in ZZPath` );
+}
+is(
+	find_zz("last-index-of"){f},
+	find_zz("rindex"){f},
+	"last-index-of() reuses the rindex() implementation callback",
+);
+
+for ( let spelling in [
+	"type",
+	"union",
+	"intersection",
+	"upper-case",
+	"lower-case",
+	"match",
+] ) {
+	is( find_zz(spelling), null, `${spelling}() is not included yet` );
+}
+
+let data := {
+	neg: -4,
+	float: 2.6,
+	root: 16,
+	zero: 0,
+	word: "Alpha",
+	values: [ 1, 2, 3 ],
+	empty_arr: [],
+	empty_dict: {},
+	empty_set: << >>,
+	users: [
+		{ name: "Ada" },
+		{ name: "Bob" },
+		{ name: "Cara" },
+	],
+	meta: {
+		code: "x",
+	},
+};
+
+is(
+	( new ZZPath( path: "count(/users/*)" ) ).first(data),
+	3,
+	"count() works through ZZPath",
+);
+is(
+	( new ZZPath( path: "/meta/code[key() eq \"code\"]" ) ).first(data),
+	"x",
+	"key() works in ZZPath filters",
+);
+is(
+	( new ZZPath( path: "/users/*[index() = 1]/name" ) ).first(data),
+	"Bob",
+	"index() works in ZZPath filters",
+);
+is(
+	( new ZZPath( path: "/users/*[is-first()]/name" ) ).first(data),
+	"Ada",
+	"is-first() works in ZZPath filters",
+);
+is(
+	( new ZZPath( path: "/users/*[is-last()]/name" ) ).first(data),
+	"Cara",
+	"is-last() works in ZZPath filters",
+);
+is(
+	( new ZZPath( path: "value(/meta/code)" ) ).first(data),
+	"x",
+	"value() works through ZZPath",
+);
+is(
+	( new ZZPath( path: "/users/#0/next()/name" ) ).first(data),
+	"Bob",
+	"next() returns following sibling nodes",
+);
+is(
+	( new ZZPath( path: "/users/#2/prev()/name" ) ).first(data),
+	"Bob",
+	"prev() returns previous sibling nodes",
+);
+
+is(
+	( new ZZPath( path: "type(/meta/code)" ) ).first( data, "fallback" ),
+	"fallback",
+	"unsupported ZPath functions are not inherited by ZZPath",
+);
+
+is( ( new ZZPath( path: "abs(neg)" ) ).first(data), 4, "abs() matches prefix abs" );
+is(
+	( new ZZPath( path: "floor(float)" ) ).first(data),
+	2,
+	"floor() matches prefix floor",
+);
+is(
+	( new ZZPath( path: "ceil(float)" ) ).first(data),
+	3,
+	"ceil() matches prefix ceil",
+);
+is(
+	( new ZZPath( path: "round(float)" ) ).first(data),
+	3,
+	"round() matches prefix round",
+);
+is( ( new ZZPath( path: "int(float)" ) ).first(data), 2, "int() matches prefix int" );
+is( ( new ZZPath( path: "sqrt(root)" ) ).first(data), 4, "sqrt() matches prefix sqrt" );
+is( ( new ZZPath( path: "uc(word)" ) ).first(data), "ALPHA", "uc() matches prefix uc" );
+is( ( new ZZPath( path: "lc(word)" ) ).first(data), "alpha", "lc() matches prefix lc" );
+is(
+	( new ZZPath( path: "length(word)" ) ).first(data),
+	5,
+	"length() matches prefix length",
+);
+is( ( new ZZPath( path: "not(zero)" ) ).first(data), true, "not() matches prefix not" );
+is(
+	( new ZZPath( path: "typeof(word)" ) ).first(data),
+	"String",
+	"typeof() matches prefix typeof",
+);
+is(
+	( new ZZPath( path: "/word[length() = 5]" ) ).first(data),
+	"Alpha",
+	"word-like functions can use the current node",
+);
+is( ( new ZZPath( path: "true()" ) ).first(data), true, "true() returns true" );
+is( ( new ZZPath( path: "false()" ) ).first(data), false, "false() returns false" );
+is( ( new ZZPath( path: "null()" ) ).first(data), null, "null() returns null" );
+is( ( new ZZPath( path: "defined(word)" ) ).first(data), true, "defined() finds values" );
+is(
+	( new ZZPath( path: "defined(null())" ) ).first(data),
+	false,
+	"defined() rejects null",
+);
+is(
+	( new ZZPath( path: "empty(null())" ) ).first(data),
+	true,
+	"empty() treats null as empty",
+);
+is(
+	( new ZZPath( path: "empty(empty_arr)" ) ).first(data),
+	true,
+	"empty() accepts empty arrays",
+);
+is(
+	( new ZZPath( path: "empty(values)" ) ).first(data),
+	false,
+	"empty() accepts non-empty arrays",
+);
+is(
+	( new ZZPath( path: "empty(empty_dict)" ) ).first(data),
+	true,
+	"empty() accepts empty dicts",
+);
+is(
+	( new ZZPath( path: "empty(empty_set)" ) ).first(data),
+	true,
+	"empty() accepts empty sets",
+);
+like(
+	exception( function () {
+		( new ZZPath( path: "empty(word)" ) ).first(data);
+	} ),
+	/Collection/,
+	"empty() rejects scalar values",
+);
+is(
+	( new ZZPath( path: "string(float)" ) ).first(data),
+	"2.6",
+	"string() exposes std/internals to_String",
+);
+is(
+	( new ZZPath( path: "number(\"7\")" ) ).first(data),
+	7,
+	"number() exposes std/internals to_Number",
+);
+is(
+	( new ZZPath( path: "boolean(0)" ) ).first(data),
+	false,
+	"boolean() exposes std/internals to_Boolean",
+);
+is(
+	( new ZZPath( path: "typeof(regexp(\"^Al\"))" ) ).first(data),
+	"Regexp",
+	"regexp() exposes std/internals to_Regexp",
+);
+is( ( new ZZPath( path: "sum(1, 2, 3)" ) ).first(data), 6, "sum() exposes Math.sum" );
+is( ( new ZZPath( path: "min(3, 1, 2)" ) ).first(data), 1, "min() exposes Math.min" );
+is( ( new ZZPath( path: "max(3, 1, 2)" ) ).first(data), 3, "max() exposes Math.max" );
+is(
+	( new ZZPath( path: "clamp(10, 1, 5)" ) ).first(data),
+	5,
+	"clamp() exposes Math.clamp",
+);
+is(
+	( new ZZPath( path: "sum(values/*)" ) ).first(data),
+	6,
+	"math functions accept path result sequences",
+);
+is(
+	( new ZZPath( path: "substr(word, 1, 3)" ) ).first(data),
+	"lph",
+	"substr() exposes std/string.substr",
+);
+is(
+	( new ZZPath( path: "index-of(\"bananas\", \"na\")" ) ).first(data),
+	2,
+	"index-of() exposes std/string.index",
+);
+is(
+	( new ZZPath( path: "rindex(\"bananas\", \"a\")" ) ).first(data),
+	5,
+	"rindex() exposes std/string.rindex",
+);
+is(
+	( new ZZPath( path: "last-index-of(\"bananas\", \"a\")" ) ).first(data),
+	5,
+	"last-index-of() aliases std/string.rindex",
+);
+is(
+	( new ZZPath( path: "contains(word, \"ph\")" ) ).first(data),
+	true,
+	"contains() exposes std/string.contains",
+);
+is(
+	( new ZZPath( path: "chr(65)" ) ).first(data),
+	"A",
+	"chr() exposes std/string.chr",
+);
+is(
+	( new ZZPath( path: "ord(word)" ) ).first(data),
+	65,
+	"ord() exposes std/string.ord",
+);
+is(
+	( new ZZPath( path: "replace(\"foo foo\", \"foo\", \"bar\", \"g\")" ) )
+		.first(data),
+	"bar bar",
+	"replace() exposes std/string.replace",
+);
+is(
+	( new ZZPath( path: "search(\"abc123\", \"[0-9]+\")" ) ).first(data),
+	"123",
+	"search() exposes std/string.search",
+);
+is(
+	( new ZZPath( path: "starts_with(word, \"Al\")" ) ).first(data),
+	true,
+	"starts_with() exposes std/string.starts_with",
+);
+is(
+	( new ZZPath( path: "ends_with(word, \"ha\")" ) ).first(data),
+	true,
+	"ends_with() exposes std/string.ends_with",
+);
+is(
+	( new ZZPath( path: "matches(\"abc123\", \"[0-9]+\")" ) ).first(data),
+	true,
+	"matches() exposes std/string.matches",
+);
+is(
+	( new ZZPath( path: "search(\"Alpha\", pattern_to_regexp(\"Al\"))" ) )
+		.first(data),
+	"Al",
+	"pattern_to_regexp() exposes std/string.pattern_to_regexp",
+);
+is(
+	( new ZZPath( path: "quotemeta(\"Zia.+\")" ) ).first(data),
+	```Zia\.\+```,
+	"quotemeta() exposes std/string.quotemeta",
+);
+is(
+	( new ZZPath( path: "sprint(\"%s = %d\", \"count\", 7)" ) ).first(data),
+	"count = 7",
+	"sprint() exposes std/string.sprint",
+);
+is(
+	( new ZZPath( path: "split(\"a,b,c\", \",\")" ) ).first(data).length(),
+	3,
+	"split() exposes std/string.split",
+);
+is(
+	( new ZZPath( path: "join(\"|\", values/*)" ) ).first(data),
+	"1|2|3",
+	"join() exposes std/string.join",
+);
+is(
+	( new ZZPath( path: "trim(\"  hi  \")" ) ).first(data),
+	"hi",
+	"trim() exposes std/string.trim",
+);
+is(
+	( new ZZPath( path: "pad(\"7\", 3, \"0\", \"left\")" ) ).first(data),
+	"007",
+	"pad() exposes std/string.pad",
+);
+is(
+	( new ZZPath( path: "chomp(\"line\n\")" ) ).first(data),
+	"line",
+	"chomp() exposes std/string.chomp",
+);
+is(
+	( new ZZPath( path: "title(\"hello_world-value\")" ) ).first(data),
+	"Hello World Value",
+	"title() exposes std/string.title",
+);
+is(
+	( new ZZPath( path: "snake(\"HelloWorld value\")" ) ).first(data),
+	"hello_world_value",
+	"snake() exposes std/string.snake",
+);
+is(
+	( new ZZPath( path: "kebab(\"HelloWorld value\")" ) ).first(data),
+	"hello-world-value",
+	"kebab() exposes std/string.kebab",
+);
+is(
+	( new ZZPath( path: "camel(\"hello_world value\")" ) ).first(data),
+	"helloWorldValue",
+	"camel() exposes std/string.camel",
+);
+
+done_testing();

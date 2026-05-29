@@ -1,0 +1,5 @@
+class CrossParent {
+	method base_name () {
+		return "base";
+	}
+}

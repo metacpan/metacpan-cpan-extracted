@@ -1,0 +1,273 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/archive import Archive;
+from std/data/json import JSON;
+from std/io import Path;
+from std/zuzuzoo import Zuzuzoo;
+
+class FakeRequest {
+	let target_url := null;
+	let download_path := null;
+
+	method download_to ( path ) {
+		download_path := path;
+		return self;
+	}
+
+	method url () {
+		return target_url;
+	}
+
+	method path () {
+		return download_path;
+	}
+}
+
+class FakeResponse {
+	method expect_success () {
+		return self;
+	}
+
+	method url () {
+		return "";
+	}
+}
+
+class FakeUserAgent {
+	let payloads := {};
+
+	method build_request ( http_method, url ) {
+		return new FakeRequest( target_url: url );
+	}
+
+	method send ( request ) {
+		( new Path( request.path() ) ).spew(
+			payloads.get( request.url() ),
+		);
+		return new FakeResponse();
+	}
+}
+
+function ensure_dir ( path ) {
+	return true if path.exists();
+	let parent := path.parent();
+	ensure_dir(parent) if not parent.exists();
+	path.mkdir();
+	return true;
+}
+
+function root ( name ) {
+	let dir := Path.tempdir();
+	let lib := dir.child("lib");
+	let bin := dir.child("bin");
+	let meta := dir.child("meta");
+	ensure_dir(lib);
+	ensure_dir(bin);
+	ensure_dir(meta);
+	return {
+		name: name,
+		dir_obj: dir,
+		lib_obj: lib,
+		bin_obj: bin,
+		meta_obj: meta,
+		lib_dir: lib.to_String(),
+		bin_dir: bin.to_String(),
+		meta_dir: meta.to_String(),
+	};
+}
+
+function write_installed ( root, name, version, modules, scripts ) {
+	( new JSON( pretty: true ) ).dump(
+		( new Path( root{meta_dir} ) ).child(
+			name _ "-" _ version _ ".json",
+		),
+		{
+			name: name,
+			version: version,
+			author: "Example",
+			license: "MIT",
+			status: "stable",
+			dependencies: {},
+			installed: {
+				zdf: "ZDF-1",
+				lib_dir: root{lib_dir},
+				bin_dir: root{bin_dir},
+				meta_dir: root{meta_dir},
+				modules: modules,
+				scripts: scripts,
+			},
+		},
+	);
+}
+
+function module_entry ( name ) {
+	return {
+		source: "modules/" _ name _ ".zzm",
+		install_as: name _ ".zzm",
+		sha256: "abc",
+	};
+}
+
+function script_entry ( name ) {
+	return {
+		source: "scripts/" _ name,
+		install_as: name,
+		sha256: "def",
+		wrappers: [],
+	};
+}
+
+function archive_path ( dist_name, version, modules, scripts, deps := "{}" ) {
+	let entries := [
+		{
+			path: dist_name _ "-" _ version _ "/zuzu-distribution.json",
+			data: to_binary(
+				"{\"name\":\"" _ dist_name _
+				"\",\"version\":\"" _ version _
+				"\",\"author\":\"Example\"," _
+				"\"license\":\"MIT\",\"status\":\"stable\"," _
+				"\"dependencies\":" _ deps _ "}\n",
+			),
+		},
+	];
+	for ( let module in modules ) {
+		entries.push(
+			{
+				path: dist_name _ "-" _ version _
+					"/modules/" _ module _ ".zzm",
+				data: to_binary("// module\n"),
+			},
+		);
+	}
+	for ( let script in scripts ) {
+		entries.push(
+			{
+				path: dist_name _ "-" _ version _
+					"/scripts/" _ script,
+				data: to_binary("say \"script\";\n"),
+			},
+		);
+	}
+	let path := Path.tempfile();
+	Archive.dump( path, { entries: entries }, "zip" );
+	return path;
+}
+
+let target := root("target");
+let other := root("other");
+
+write_installed(
+	target,
+	"requested-app",
+	"0.9.0",
+	[ module_entry("old/app") ],
+	[],
+);
+write_installed(
+	target,
+	"replace-owner",
+	"1.0.0",
+	[ module_entry("replace/mod") ],
+	[ script_entry("replace-tool.zzs") ],
+);
+write_installed(
+	target,
+	"dep-owner",
+	"0.5.0",
+	[ module_entry("dep/lib") ],
+	[],
+);
+write_installed(
+	other,
+	"non-target-owner",
+	"1.0.0",
+	[ module_entry("replace/mod") ],
+	[],
+);
+
+let dep_archive := archive_path(
+	"dep-lib",
+	"1.0.0",
+	[ "dep/lib" ],
+	[],
+);
+let ua := new FakeUserAgent(
+	payloads: {
+		"https://packages.test/module/dep/lib": dep_archive.slurp(),
+	},
+);
+let app_archive := archive_path(
+	"requested-app",
+	"1.0.0",
+	[ "replace/mod" ],
+	[ "replace-tool.zzs" ],
+	"{\"dep/lib\":\"1.0.0\"}",
+);
+
+let zoo := new Zuzuzoo(
+	lib_dir: target{lib_dir},
+	bin_dir: target{bin_dir},
+	meta_dir: target{meta_dir},
+	home: Path.tempdir().to_String(),
+	base_url: "https://packages.test",
+	user_agent: ua,
+	dependency_roots: [ other ],
+);
+let install_plan := zoo.plan_install(app_archive.to_String());
+
+is(
+	install_plan{removals}.map( fn r -> r{name} ).sort(
+		fn ( a, b ) -> a cmp b,
+	),
+	[ "dep-owner", "replace-owner", "requested-app" ],
+	"target-root prior versions and owners are planned for removal",
+);
+is(
+	install_plan{ownership_conflicts}.map( fn c -> c{owner_distribution} ).sort(
+		fn ( a, b ) -> a cmp b,
+	),
+	[ "dep-owner", "replace-owner", "replace-owner" ],
+	"ownership conflicts include requested and dependency installs",
+);
+is(
+	install_plan{removals}.map( fn r -> r{name} ).sort(
+		fn ( a, b ) -> a cmp b,
+	).contains("non-target-owner"),
+	false,
+	"non-target dependency roots do not produce removal plans",
+);
+
+let reinstall_target := root("reinstall-target");
+write_installed(
+	reinstall_target,
+	"same-app",
+	"1.0.0",
+	[ module_entry("same/app") ],
+	[],
+);
+let same_archive := archive_path(
+	"same-app",
+	"1.0.0",
+	[ "same/app" ],
+	[],
+);
+let reinstall_plan := ( new Zuzuzoo(
+	lib_dir: reinstall_target{lib_dir},
+	bin_dir: reinstall_target{bin_dir},
+	meta_dir: reinstall_target{meta_dir},
+	home: Path.tempdir().to_String(),
+) ).plan_install(same_archive.to_String());
+is(
+	reinstall_plan{removals}[0]{name},
+	"same-app",
+	"same-version install plans removal of installed distribution",
+);
+is(
+	reinstall_plan{removals}[0]{reasons}.contains("reinstall"),
+	true,
+	"same-version install records reinstall removal reason",
+);
+
+done_testing();

@@ -1,0 +1,43 @@
+from test/more import *;
+
+requires_capability("fs");
+
+from std/digest/crc32 import crc32_hex;
+from std/digest/md5 import md5_hex;
+from std/digest/sha import sha256_hex;
+from std/io import Path;
+
+let file := Path.tempfile();
+let text := "";
+let i := 1;
+while ( i <= 200 ) {
+	let n := i < 10 ? "00" _ i : ( i < 100 ? "0" _ i : "" _ i );
+	text _= "row-" _ n _ ":abcdefghijklmnopqrstuvwxyz0123456789\n";
+	i++;
+}
+file.spew_utf8(text);
+
+let line_count := 0;
+let first_md5 := "";
+let last_sha := "";
+let crc_mix := "";
+
+file.each_line( function ( line ) {
+	line_count++;
+	let raw := to_binary(line);
+	if ( line_count = 1 ) {
+		first_md5 := md5_hex(raw);
+	}
+	last_sha := sha256_hex(raw);
+	crc_mix _= crc32_hex(raw);
+} );
+
+let all_raw := file.slurp();
+
+is( line_count, 200, "each_line iterates full large file" );
+is( first_md5, md5_hex( to_binary( "row-001:abcdefghijklmnopqrstuvwxyz0123456789\n" ) ), "md5 computed from first iterated chunk" );
+is( last_sha, sha256_hex( to_binary( "row-200:abcdefghijklmnopqrstuvwxyz0123456789\n" ) ), "sha256 computed from last iterated chunk" );
+ok( length crc_mix > 200, "crc32 digests produced for each chunk" );
+is( sha256_hex(all_raw), sha256_hex( to_binary(text) ), "whole-file digest matches reconstructed payload" );
+
+done_testing();

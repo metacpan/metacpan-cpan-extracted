@@ -1,0 +1,153 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/archive import Archive;
+from std/io import Path;
+from std/zuzuzoo import Zuzuzoo, plan_install;
+
+class FakeRequest {
+	let target_url := null;
+	let download_path := null;
+
+	method download_to ( path ) {
+		download_path := path;
+		return self;
+	}
+
+	method url () {
+		return target_url;
+	}
+
+	method path () {
+		return download_path;
+	}
+}
+
+class FakeResponse {
+	let final_url := null;
+
+	method expect_success () {
+		return self;
+	}
+
+	method url () {
+		return final_url;
+	}
+}
+
+class FakeUserAgent {
+	let payloads := {};
+
+	method build_request ( http_method, url ) {
+		return new FakeRequest( target_url: url );
+	}
+
+	method send ( request ) {
+		( new Path( request.path() ) ).spew(
+			payloads.get( request.url() ),
+		);
+		return new FakeResponse( final_url: request.url() );
+	}
+}
+
+function throws_like ( f, rx, name ) {
+	let got := "";
+	try {
+		f();
+	}
+	catch ( Exception e ) {
+		got := e.to_String();
+	}
+	like( got, rx, name );
+}
+
+function archive_path ( name, version, status := "stable" ) {
+	let path := Path.tempfile();
+	Archive.dump(
+		path,
+		{
+			entries: [
+				{
+					path: name _ "-" _ version _
+						"/zuzu-distribution.json",
+					data: to_binary(
+						"{\"name\":\"" _ name _
+						"\",\"version\":\"" _ version _
+						"\",\"author\":\"Example\"," _
+						"\"license\":\"MIT\",\"status\":\"" _
+						status _ "\"}\n",
+					),
+				},
+				{
+					path: name _ "-" _ version _
+						"/modules/" _ name _ ".zzm",
+					data: to_binary("// module\n"),
+				},
+			],
+		},
+		"zip",
+	);
+	return path;
+}
+
+function root_options () {
+	let dir := Path.tempdir();
+	return {
+		lib_dir: dir.child("lib").to_String(),
+		bin_dir: dir.child("bin").to_String(),
+		meta_dir: dir.child("meta").to_String(),
+		home: dir.child("home").to_String(),
+	};
+}
+
+function new_zoo () {
+	let opts := root_options();
+	return new Zuzuzoo(
+		lib_dir: opts{lib_dir},
+		bin_dir: opts{bin_dir},
+		meta_dir: opts{meta_dir},
+		home: opts{home},
+	);
+}
+
+let stable := archive_path( "plan-basic", "1.0.0" );
+let install_plan := plan_install( stable.to_String(), root_options() );
+is( install_plan{installs}.length(), 1, "top-level plan_install plans one install" );
+is( install_plan{installs}[0]{metadata}{name}, "plan-basic", "plan includes metadata" );
+is( install_plan{installs}[0]{requested}, true, "requested install is marked" );
+is( install_plan{removals}, [], "fresh planning has no removals" );
+
+let duplicate_plan := new_zoo().plan_install(
+	[ stable.to_String(), stable.to_String() ],
+);
+is( duplicate_plan{installs}.length(), 1, "duplicate targets are de-duped" );
+
+let trial := archive_path( "trial-basic", "0.1.0", "trial" );
+let direct_trial := new_zoo().plan_install( trial.to_String() );
+is(
+	direct_trial{installs}[0]{metadata}{status},
+	"trial",
+	"trial metadata is allowed for direct files",
+);
+
+let ua := new FakeUserAgent(
+	payloads: {
+		"https://packages.test/module/trial/basic": trial.slurp(),
+	},
+);
+throws_like(
+	function () {
+		new_zoo().plan_install(
+			"trial/basic",
+			{
+				base_url: "https://packages.test",
+				user_agent: ua,
+			},
+		);
+	},
+	/Trial distributions/,
+	"trial metadata is rejected for module-name targets",
+);
+
+done_testing();

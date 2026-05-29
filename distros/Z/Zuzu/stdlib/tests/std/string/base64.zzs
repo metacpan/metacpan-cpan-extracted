@@ -1,0 +1,17 @@
+from std/string/base64 import *;
+from std/string import index;
+from test/more import *;
+is( encode( to_binary("hello") ), "aGVsbG8=", "encode returns standard Base64", );
+is( to_string( decode("aGVsbG8=") ), "hello", "decode reverses standard Base64", );
+is( encode_urlsafe( to_binary("A?B/C+D") ), "QT9CL0MrRA", "encode_urlsafe avoids URL-special alphabet",
+    );
+is( to_string( decode_urlsafe("QT9CL0MrRA") ), "A?B/C+D", "decode_urlsafe decodes no-padding form", );
+is( to_string( decode_urlsafe("aGVsbG8") ), "hello", "decode_urlsafe restores missing padding", );
+let safe := encode_urlsafe( to_binary("xFFxEFxBF") );
+ok( index( safe, "+" ) == -1 and index( safe, "/" ) == -1, "urlsafe output never includes + or /", );
+is( to_string( decode_urlsafe(safe) ), "xFFxEFxBF", "urlsafe round trip for binary-like bytes", );
+like( exception( function() {
+	encode("hello");
+}
+), /TypeException: encode expects BinaryString, got String/, "encode rejects String input", );
+done_testing();

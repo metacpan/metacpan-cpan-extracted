@@ -1,0 +1,13 @@
+from test/more import *;
+
+class Adder {
+
+	method plus (x) {
+		return x + 10;
+	}
+}
+
+let method_name := "plus";
+let obj := new Adder();
+is( obj.(method_name)(5), 15, "dynamic member call syntax .(expr)(...) works" );
+done_testing();

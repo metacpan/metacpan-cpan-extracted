@@ -1,0 +1,20 @@
+from test/c36/mode import FileMode;
+from test/more import *;
+
+let MODE_READ := FileMode.read_mode();
+let MODE_WRITE := FileMode.write_mode();
+let MODE_APPEND := FileMode.append_mode();
+
+function classify_mode ( value ) {
+	switch ( value: eq ) {
+		case "read": return "R";
+		case "write": return "W";
+		default: return "OTHER";
+	}
+}
+
+is( classify_mode(MODE_READ), "R", "switch matches imported enum-like READ constant" );
+is( classify_mode(MODE_WRITE), "W", "switch matches imported enum-like WRITE constant" );
+is( classify_mode(MODE_APPEND), "OTHER", "switch default handles other imported constants" );
+
+done_testing();

@@ -24,13 +24,13 @@ Use a Virtual Machine like VirtualBox or Docker to use on Windows, with a Linux 
 
    Sometimes you can force a VESA framebuffer console driver to be loaded by adding a video mode to the grub command line.  You can do this with some proprietary video drivers that don't have their own framebuffer drivers.
 
-   ### ATTENTION CPAN TESTERS!  Please make sure the above is noted before testing (and marking a fail)
+   _ATTENTION CPAN TESTERS!  Please make sure the above is noted before testing (and marking a fail)_
 
    If you want a more detailed instruction than this document, then read ```INSTALL.md```.
 
    I highly recommend you install the system (or package) version of the "Imager" library, as it is already pre-compiled with all the needed C libraries for it to work with this module.  In Yum/dnf (RedHat) and Aptitude (Debian/Ubuntu) this module is called "libimager-perl" (or "perl-libImager").  However, if you desire to install it yourself, please do it manually, and not via CPAN.  When you do it manually, you can see the missing C libraries it is looking for in the ```Makefile.PL``` process and stop it there.  You can then install these libraries until it no longer says something is missing.  You see, it just turns off functionality if it can't find a library (when installing from CPAN), instead of stopping.  Libraries usually missing are those for GIF, JPEG, PNG, TrueType and FreeType fonts.  These are necessary not optional, if you wish to be able to work with fonts and images.
 
-   The "build-essential" tools need to be installed. This is generally a C compiler, linker, and standard C libraries (usually gcc variety).  The module "Inline::C", which this module uses, requires it.  Also, the package "kernel-headers".
+   The "build-essential" tools need to be installed. This is generally a C compiler, linker, and standard C libraries (usually gcc variety).  The module "Inline::C", which this module uses, requires it.  Also, the package "kernel-headers".  Also note, in later Ubuntu versions ```libperl-dev``` is also required.
 
    You should also install typical TTF fonts as well.  I suggest the FreeType fonts, the Windows fonts (fonts-wine), Ubuntu fonts (fonts-ubuntu) and anything else you wish to use.
 

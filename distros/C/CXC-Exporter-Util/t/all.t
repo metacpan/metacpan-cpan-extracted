@@ -64,6 +64,8 @@ for my $class (
 
 for my $class ( 'My::Exporter::Exporter::False', ) {
     subtest "$class" => sub {
+        # quiet Exporter
+        local $SIG{__WARN__} = sub { };
         like(
             dies { export_from( $class, ':all' )->foo },
             qr/can't continue after import errors/i,

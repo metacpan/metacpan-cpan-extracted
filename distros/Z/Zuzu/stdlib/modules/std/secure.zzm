@@ -1,0 +1,606 @@
+=encoding utf8
+
+=head1 NAME
+
+std/secure - Secure runtime services and capability inspection.
+
+=head1 SYNOPSIS
+
+  from std/secure import
+      Secure,
+      SecureRandom,
+      PasswordHash,
+      KeyDerivation,
+      Cipher,
+      KeyAgreement,
+      SigningKey,
+      Certificate,
+      PrivateKey,
+      PublicKey,
+      SealedBox,
+      TlsIdentity;
+
+  let caps := Secure.capabilities();
+  Secure.require( "random", "bytes" );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript, though
+the ciphers, hashes, and other algorithms supported by the module vary
+from platform to platform. Many synchronous operations are unsupported
+by zuzu-js on the browser; using async variants is recommended if you
+need to support that platform.
+
+=head1 DESCRIPTION
+
+This runtime-supported module is the public namespace for secure random
+generation, key derivation, authenticated encryption, password hashing,
+signing, key agreement, certificate handling, and TLS identity objects.
+
+It implements secure random bytes, URL-safe random tokens, unbiased
+random integers, host identification, capability queries, HKDF-SHA256
+key derivation, AES-256-GCM authenticated encryption, password hashing,
+Ed25519 and ECDSA signing, and X25519 key agreement.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<Secure>
+
+Module-level inspection and policy namespace. It currently exposes
+C<capabilities()>, C<has(area, name)>, and C<require(area, name)>.
+
+=item C<SecureRandom>
+
+Namespace for CSPRNG byte, token, and integer helpers.
+
+=item C<PasswordHash>
+
+Namespace for password hashing, verification, rehash detection, and
+passphrase key derivation.
+
+=item C<KeyDerivation>
+
+Namespace for future high-entropy key derivation helpers such as
+HKDF-SHA256.
+
+=item C<Cipher>
+
+Namespace for authenticated symmetric encryption helpers. It currently
+supports AES-256-GCM envelopes.
+
+=item C<KeyAgreement>
+
+Namespace and object type for X25519 key agreement.
+
+=item C<SigningKey> and C<PublicKey>
+
+Namespaces and object types for Ed25519 and ECDSA asymmetric signing,
+verification, and key material handling.
+
+=item C<PrivateKey>
+
+Placeholder object type for future non-signing private-key handling.
+
+=item C<Certificate> and C<TlsIdentity>
+
+C<Certificate> is the X.509 parsing and inspection object type.
+C<TlsIdentity> stores client certificate identity material for future
+TLS integrations.
+
+=item C<SealedBox>
+
+Namespace for future public-key sealed-box encryption recipes.
+
+=back
+
+=head2 Capability Reporting
+
+C<< Secure.capabilities() >> returns a C<Dict> with stable keys:
+
+  {
+      host: "perl",
+      random: true,
+      password_hash: [ "argon2id", "crypt", "pbkdf2-sha256", "scrypt" ],
+      kdf: [ "hkdf-sha256" ],
+      cipher: [
+          "aes-128-gcm",
+          "aes-192-gcm",
+          "aes-256-gcm",
+          "chacha20-poly1305",
+      ],
+      key_agreement: [ "x25519" ],
+      signing: [
+          "ed25519",
+          "ecdsa-p256-sha256",
+          "ecdsa-p384-sha384",
+          "ecdsa-p521-sha512",
+      ],
+      certificate: [
+          "fingerprint-sha256",
+          "fingerprint-sha384",
+          "fingerprint-sha512",
+          "parse-x509",
+          "parse-x509-der",
+          "public-key",
+          "verify-chain",
+      ],
+      tls_identity: [ "pem", "pkcs12" ],
+      async_required: {
+          cipher: false,
+          kdf: false,
+          password_hash: false,
+          signing: false,
+          key_agreement: false,
+      },
+  }
+
+C<host> identifies the runtime host that produced the report. The current
+host names are C<perl>, C<rust>, C<node>, and C<browser>.
+
+Later phases will turn on additional capabilities only after the
+corresponding runtime has a real implementation.
+
+Browser hosts do not advertise C<ed25519> in C<signing> and reject it in
+this phase even when a specific Web Crypto implementation exposes it.
+Browser hosts advertise ECDSA signing and report
+C<async_required.signing> as true. Browser hosts also report
+C<async_required.key_agreement> as true when X25519 is available through
+Web Crypto.
+
+=head2 Capability Vocabulary
+
+Capability areas and names are stable strings. C<random> currently
+supports C<bytes>, C<token>, and C<int>. C<password_hash> always
+supports C<pbkdf2-sha256>; hosts may additionally report C<argon2id>,
+C<scrypt>, or legacy C<crypt>. C<kdf> currently supports
+C<hkdf-sha256>. C<cipher> always supports C<aes-256-gcm>; hosts may add
+C<aes-128-gcm>, C<aes-192-gcm>, or C<chacha20-poly1305>.
+C<key_agreement> currently supports C<x25519>. C<signing> may include
+C<ed25519>, C<ecdsa-p256-sha256>, C<ecdsa-p384-sha384>, and
+C<ecdsa-p521-sha512>. The C<certificate> area reports X.509 parsing,
+fingerprinting, public-key extraction, and chain verification support.
+C<tls_identity> reports C<pem> and, where available, C<pkcs12>.
+
+=over
+
+=item C<< Secure.has(String area, String name) >>
+
+Returns C<true> if the current host supports C<name> within C<area>.
+Unknown, missing, or null values return C<false>.
+
+=item C<< Secure.require(String area, String name) >>
+
+Returns C<true> if the current host supports C<name> within C<area>.
+Otherwise it throws a runtime exception with the unsupported
+C<area/name> pair and the current host name in the message.
+
+=back
+
+=head2 Password Hashing
+
+=over
+
+=item C<< PasswordHash.default_algorithm() >>
+
+Returns C<pbkdf2-sha256>. This is the portable password-hash baseline
+for every host. Hosts may report stronger additional password-hash
+algorithms through C<< Secure.capabilities(){password_hash} >>.
+
+C<scrypt> and especially C<crypt> are exposed for compatibility only and
+are not preferred for new password storage. Treat C<crypt> as a legacy,
+inadequate password-hash mechanism.
+
+=item C<< PasswordHash.hash(String password, Dict options = {}) >>
+
+Returns an encoded password hash. C<options.algorithm> defaults to
+C<pbkdf2-sha256>. C<options.salt> may provide a C<BinaryString> salt for
+tests and deterministic fixtures; ordinary callers should omit it.
+
+The portable encoded PBKDF2 form is:
+
+  $zuzu-pbkdf2-sha256$v=1$i=600000,l=32$base64url_salt$base64url_hash
+
+Argon2id uses PHC-style Argon2id encoding:
+
+  $argon2id$v=19$m=19456,t=2,p=1$base64salt$base64hash
+
+Scrypt uses:
+
+  $scrypt$ln=17,r=8,p=1,l=32$base64url_salt$base64url_hash
+
+Legacy C<crypt> hashes use a host-specific format and are only for
+compatibility with existing password stores.
+
+=item C<< PasswordHash.hash_async(...) >>
+
+Returns a C<Task> resolving to the same encoded hash. Browser hosts
+require this method for password hashing and currently support
+C<pbkdf2-sha256> only.
+
+=item C<< PasswordHash.verify(String password, String encoded_hash) >>
+
+Returns C<true> when C<password> matches C<encoded_hash>. Unknown,
+malformed, or unsupported encoded hashes return C<false>.
+
+=item C<< PasswordHash.verify_async(...) >>
+
+Returns a C<Task> resolving to the same boolean result. Browser hosts
+require this method for password verification.
+
+=item C<< PasswordHash.needs_rehash(String encoded_hash, Dict options = {}) >>
+
+Returns C<true> if C<encoded_hash> is malformed, uses a different
+algorithm from C<options.algorithm>, uses weaker parameters than the
+current options, or uses C<crypt>.
+
+=item C<< PasswordHash.derive_key(String password, Dict options) >>
+
+Derives raw key material from a passphrase and returns it as a
+C<BinaryString>. C<options.salt> is required and must be a
+C<BinaryString>. This method supports PBKDF2, Argon2id, and scrypt where
+the host reports those capabilities; it does not support C<crypt>.
+
+=item C<< PasswordHash.derive_key_async(...) >>
+
+Returns a C<Task> resolving to the same C<BinaryString>. Browser hosts
+require this method for passphrase key derivation.
+
+=back
+
+=head2 Key Derivation
+
+=over
+
+=item C<< KeyDerivation.hkdf_sha256(input_key_material, length, salt, info) >>
+
+Returns C<length> bytes of HKDF-SHA256 output as a C<BinaryString>.
+C<input_key_material> must already be high-entropy key material. This is
+not the password-hashing API.
+
+C<length> must be an integer from C<0> through C<8160>. C<salt> and
+C<info> must be C<BinaryString> values or C<null>. Null salt and info are
+treated as empty values.
+
+=item C<< KeyDerivation.hkdf_sha256_async(...) >>
+
+Returns a C<Task> resolving to the same C<BinaryString> output. Browser
+hosts may use Web Crypto promises internally; CLI hosts may return an
+already fulfilled task.
+
+=back
+
+=head2 Cipher
+
+=over
+
+=item C<< Cipher.generate_key(String algorithm = "aes-256-gcm") >>
+
+Returns a C<BinaryString> key for the requested cipher algorithm.
+C<aes-128-gcm> uses 16-byte keys, C<aes-192-gcm> uses 24-byte keys, and
+C<aes-256-gcm> and C<chacha20-poly1305> use 32-byte keys. Check
+C<Secure.capabilities()> before relying on optional cipher algorithms.
+
+=item C<< Cipher.encrypt(BinaryString plaintext, BinaryString key, Dict options = {}) >>
+
+Encrypts and authenticates C<plaintext>. C<key> must match the selected
+algorithm length. C<options.algorithm> defaults to C<aes-256-gcm>; hosts
+may advertise additional algorithms through C<Secure.capabilities()>.
+C<options.aad> may provide additional authenticated data as a
+C<BinaryString>. The runtime generates a fresh 12-byte nonce for each
+call.
+
+The returned envelope is a C<Dict>:
+
+  {
+      version: 1,
+      algorithm: "aes-256-gcm",
+      nonce: b"...",
+      ciphertext: b"...",
+      tag: b"...",
+  }
+
+C<nonce> is 12 bytes and C<tag> is 16 bytes for the currently supported
+AEAD ciphers.
+
+=item C<< Cipher.decrypt(Dict envelope, BinaryString key, Dict options = {}) >>
+
+Verifies and decrypts a cipher envelope. If C<options.algorithm> is
+provided, it must match C<envelope.algorithm>. Authentication failure,
+including a wrong key, wrong AAD, or tampered envelope, throws an
+exception.
+
+=item C<< Cipher.encrypt_async(...) >>
+
+=item C<< Cipher.decrypt_async(...) >>
+
+Return C<Task> values resolving to the corresponding synchronous result.
+Browser hosts use Web Crypto and require the async methods for cipher
+operations. CLI hosts may return already fulfilled tasks.
+
+=back
+
+=head2 Signing
+
+Signing algorithms are reported through C<Secure.capabilities()>.
+ECDSA P-256 with SHA-256 and ECDSA P-384 with SHA-384 are the portable
+ECDSA names. Some hosts also support Ed25519 or ECDSA P-521 with
+SHA-512. Browser hosts may require async signing methods.
+
+=over
+
+=item C<< SigningKey.generate(String algorithm = "ed25519") >>
+
+Generates a new signing key. Common algorithms are C<ed25519>,
+C<ecdsa-p256-sha256>, C<ecdsa-p384-sha384>, and
+C<ecdsa-p521-sha512>. The default is C<ed25519>.
+C<< SigningKey.generate_async(...) >> returns a C<Task> resolving to the
+same kind of key.
+
+=item C<< SigningKey.import_private(key, Dict options = {}) >>
+
+Imports a private signing key. C<options.format> may be C<raw> or
+C<pem>; when it is omitted, C<BinaryString> keys default to C<raw> and
+C<String> keys default to C<pem>. Raw private keys are 32-byte Ed25519
+seeds, 32-byte P-256 scalars, 48-byte P-384 scalars, or 66-byte P-521
+scalars where supported. Raw ECDSA private-key import should pass
+C<options.algorithm> to avoid ambiguity
+with Ed25519. PEM private keys are importable as Ed25519 PKCS#8, ECDSA
+PKCS#8, or traditional EC private-key PEM where the host supports it.
+
+C<< SigningKey.import_private_async(...) >> returns a C<Task> resolving
+to the same kind of key.
+
+=item C<< SigningKey.import_public(key, Dict options = {}) >>
+
+Imports a public key. Raw Ed25519 public keys are 32 bytes. Raw P-256
+public keys are 65-byte SEC1 uncompressed points, and raw P-384 public
+keys are 97-byte SEC1 uncompressed points. Compressed EC points are not
+supported. PEM public keys use SPKI. C<options.format> follows the same
+rules as C<import_private>.
+
+C<< SigningKey.import_public_async(...) >> returns a C<Task> resolving to
+a C<PublicKey>.
+
+=item C<< SigningKey.public_key() >>
+
+Returns the matching C<PublicKey>.
+
+=item C<< SigningKey.sign(BinaryString message) >>
+
+Signs C<message> and returns a C<BinaryString> signature. Ed25519
+signatures are 64 bytes. ECDSA signatures are DER encoded.
+C<< SigningKey.sign_async(...) >> returns a C<Task> resolving to the same
+signature.
+
+=item C<< SigningKey.export_private(Dict options = {}) >>
+
+Exports private signing-key material. The default C<raw> format returns a
+32-byte Ed25519 seed, 32-byte P-256 scalar, or 48-byte P-384 scalar as a
+C<BinaryString>. C<format: "pem"> returns PEM text where supported.
+
+=item C<< PublicKey.verify(BinaryString message, BinaryString signature) >>
+
+Returns C<true> when C<signature> is a valid signature for C<message>.
+Wrong messages, wrong keys, malformed DER, invalid ECDSA points, and
+algorithm mismatches return C<false>. C<< PublicKey.verify_async(...) >>
+returns a C<Task> resolving to the same boolean result.
+
+=item C<< PublicKey.export(Dict options = {}) >>
+
+Exports public key material. The default C<raw> format returns a 32-byte
+Ed25519 public key, a 65-byte P-256 SEC1 uncompressed point, or a 97-byte
+P-384 SEC1 uncompressed point. For X25519 public keys, it returns the
+32-byte Montgomery public key. C<format: "pem"> returns SPKI PEM as a
+C<String> for signing keys; X25519 public keys only support C<raw> in
+this phase.
+
+=back
+
+=head2 Key Agreement
+
+X25519 key agreement is available as the C<key_agreement/x25519>
+capability. It produces a raw 32-byte shared secret, which applications
+should normally pass through C<KeyDerivation.hkdf_sha256> with
+protocol-specific C<info> before using it as an encryption key.
+
+Browser hosts require the async key-agreement methods when X25519 is
+available through Web Crypto.
+
+=over
+
+=item C<< KeyAgreement.generate(String algorithm = "x25519") >>
+
+Generates a new X25519 key-agreement object. The only supported
+algorithm is C<x25519>. C<< KeyAgreement.generate_async(...) >> returns a
+C<Task> resolving to the same kind of object.
+
+=item C<< KeyAgreement.import_private(BinaryString key, Dict options = {}) >>
+
+Imports a raw 32-byte X25519 private key. C<options.algorithm> may be
+C<x25519>, and C<options.format> may be C<raw>. PEM import is not part of
+this phase.
+
+C<< KeyAgreement.import_private_async(...) >> returns a C<Task> resolving
+to the same kind of object.
+
+=item C<< KeyAgreement.import_public(BinaryString key, Dict options = {}) >>
+
+Imports a raw 32-byte X25519 public key and returns a C<PublicKey>.
+C<< KeyAgreement.import_public_async(...) >> returns a C<Task> resolving
+to a C<PublicKey>.
+
+=item C<< KeyAgreement.public_key() >>
+
+Returns the matching X25519 C<PublicKey>.
+
+=item C<< KeyAgreement.export_private(Dict options = {}) >>
+
+Exports the raw 32-byte X25519 private key as a C<BinaryString>. Only
+C<format: "raw"> is supported.
+
+=item C<< KeyAgreement.derive(PublicKey peer) >>
+
+Derives a raw 32-byte shared secret using a peer X25519 C<PublicKey> and
+returns it as a C<BinaryString>. Signing public keys and other algorithms
+are rejected. C<< KeyAgreement.derive_async(...) >> returns a C<Task>
+resolving to the same shared secret.
+
+=back
+
+=head2 Certificates
+
+X.509 certificate parsing is available as certificate capabilities.
+Hosts may support PEM text, DER bytes, or both. Unsupported formats
+throw clear errors.
+
+=over
+
+=item C<< Certificate.parse(String pem) >>
+
+Parses one PEM certificate and returns a C<Certificate>. This is not
+available on browser hosts.
+
+=item C<< Certificate.parse(BinaryString der) >>
+
+Parses one DER certificate and returns a C<Certificate>.
+
+=item C<< Certificate.parse_chain(String pem) >>
+
+Parses one or more PEM certificates and returns an C<Array> of
+C<Certificate> objects. This is not available on browser hosts.
+
+=item C<< Certificate.parse_chain(BinaryString der) >>
+
+Parses one DER certificate and returns a one-element C<Array>.
+
+=item C<< Certificate.subject() >> and C<< Certificate.issuer() >>
+
+Return string renderings of the certificate subject and issuer names.
+Structured distinguished-name dictionaries are deferred.
+
+=item C<< Certificate.serial_number() >>
+
+Returns the serial number as uppercase hexadecimal text with no
+separators.
+
+=item C<< Certificate.not_before() >> and C<< Certificate.not_after() >>
+
+Return C<std/time> C<Time> objects for the certificate validity bounds.
+
+=item C<< Certificate.fingerprint(String algorithm = "sha256") >>
+
+Returns the certificate fingerprint as a C<BinaryString>. C<sha256> is
+the portable baseline; hosts may also support C<sha384> and C<sha512>.
+
+=item C<< Certificate.to_der() >>
+
+Returns the original DER certificate bytes as a C<BinaryString>.
+
+=item C<< Certificate.to_pem() >>
+
+Returns canonical C<CERTIFICATE> PEM text.
+
+=item C<< Certificate.public_key() >>
+
+Returns a C<PublicKey> for supported certificate public-key algorithms.
+Unsupported algorithms throw clearly.
+
+=item C<< Certificate.verify_chain(Array chain, Dict options = {}) >>
+
+Verifies an X.509 chain where the host supports chain verification.
+C<chain[0]> is the leaf certificate; later entries are intermediates.
+Trust roots are supplied through
+C<options.roots>, which may be a C<Certificate>, PEM C<String>, C<Array>
+of those values, or C<null>. C<options.use_system_roots> defaults to
+C<false>; when true, CLI hosts also use the host system trust store.
+
+C<options.hostname> may be a C<String> or C<null>. C<options.time> may
+be a C<std/time> C<Time>, numeric epoch seconds, or C<null>; omitted or
+null values use the current time.
+
+The method returns a C<Dict> with C<valid>, C<reason>, C<error>,
+C<hostname>, C<verified_at>, and C<chain_length>. Validation failures
+return C<valid: false> with a stable reason such as C<untrusted-root>,
+C<expired>, C<not-yet-valid>, C<hostname-mismatch>, or C<invalid-chain>.
+Bad argument types throw.
+
+=back
+
+=head2 TLS Identities
+
+TLS identity objects are parsed and inspected by C<std/secure> and can
+be supplied to C<std/net/http> C<UserAgent> or C<Request> objects for
+mutual-TLS client authentication. PEM certificate input may contain a
+chain; the first certificate is treated as the leaf certificate. The
+full chain is retained internally for HTTP TLS use, but this phase does
+not expose a public chain accessor.
+
+=over
+
+=item C<< TlsIdentity.from_pem(String certificate_pem, String private_key_pem, String password = null) >>
+
+Parses PEM identity material and returns a C<TlsIdentity>. C<password>
+C<null> means an empty passphrase. Browser hosts accept PEM identities,
+but the identity is inert for signing-key extraction.
+
+=item C<< TlsIdentity.from_pkcs12(BinaryString bytes, String password = null) >>
+
+Parses PKCS#12 identity material where supported. C<password> C<null>
+means an empty passphrase.
+
+=item C<< TlsIdentity.certificate() >>
+
+Returns the leaf certificate as a C<Certificate>.
+
+=item C<< TlsIdentity.private_key() >>
+
+Returns a C<SigningKey> for supported private-key algorithms.
+Unsupported key algorithms throw clearly.
+
+=back
+
+=head2 Secure Random
+
+=over
+
+=item C<< SecureRandom.bytes(Number length) >>
+
+Returns a C<BinaryString> of exactly C<length> bytes from the host CSPRNG.
+C<length> must be a non-negative integer.
+
+=item C<< SecureRandom.token(Number bytes = 32) >>
+
+Returns URL-safe Base64 text with no padding, generated from C<bytes>
+random bytes. C<bytes> must be a non-negative integer.
+
+=item C<< SecureRandom.int(Number max) >>
+
+Returns a number in the range C<0> to C<max - 1>. C<max> must be a
+positive integer no greater than C<2^53>. The implementation uses
+rejection sampling to avoid modulo bias.
+
+=back
+
+=head2 Async Contract
+
+Every supported asynchronous secure operation will expose an async method
+on every runtime. Browser implementations may need async methods for Web
+Crypto promises. CLI implementations may return already completed tasks
+when an operation is naturally synchronous.
+
+C<async_required> reports which areas need asynchronous APIs on the
+current host. The keys are stable even before those areas are implemented.
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/secure >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut

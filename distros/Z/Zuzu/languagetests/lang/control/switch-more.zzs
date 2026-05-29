@@ -1,0 +1,41 @@
+from test/more import *;
+let picked := "";
+
+switch ( "bar": eq ) {
+	case "foo": picked := "foo";
+	case "bar", "baz": picked := "matched";
+	continue;
+	default: picked := picked _ "-default";
+}
+
+is( picked, "matched-default", "switch case with continue fallthrough" );
+let no_fall := 0;
+switch (1) {
+	case 1: no_fall++;
+	case 2: no_fall := 99;
+}
+is( no_fall, 1, "switch does not fall through without continue" );
+let block_form := 0;
+switch ( "foo": eq ) {
+	case "foo": {
+		block_form := block_form + 1;
+	}
+	case "bar", "baz": {
+		block_form := block_form + 100;
+		continue;
+	}
+	default: {
+		block_form := block_form + 10;
+	}
+}
+is( block_form, 1, "switch accepts explicit blocks in case bodies" );
+let pattern := "";
+
+switch ( "xylophone": ~ ) {
+	case /x/: pattern := pattern _ "x";
+	continue;
+	case /y/: pattern := pattern _ "y";
+}
+
+is( pattern, "xy", "switch supports non-equality comparator operators" );
+done_testing();

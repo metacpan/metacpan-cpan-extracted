@@ -1,0 +1,121 @@
+from std/secure import Secure, SecureRandom;
+from test/more import *;
+
+let caps := Secure.capabilities();
+
+is( caps{random}, true, "random capability is true" );
+
+let empty := SecureRandom.bytes(0);
+is( typeof empty, "BinaryString", "bytes returns BinaryString" );
+is( length empty, 0, "bytes accepts zero length" );
+
+let first := SecureRandom.bytes(32);
+let second := SecureRandom.bytes(32);
+is( typeof first, "BinaryString", "bytes returns BinaryString payload" );
+is( length first, 32, "bytes returns requested length" );
+is( length second, 32, "bytes returns requested length again" );
+isnt( first, second, "independent random byte strings differ" );
+
+let token_default := SecureRandom.token();
+let token_null := SecureRandom.token(null);
+let token_16 := SecureRandom.token(16);
+like(
+	token_default,
+	/^[A-Za-z0-9_-]+$/,
+	"default token is URL-safe",
+);
+unlike( token_default, /=/, "default token omits padding" );
+is( length token_null, 43, "null token length uses default bytes" );
+is( length token_16, 22, "16 random bytes encode to 22 URL-safe chars" );
+like( token_16, /^[A-Za-z0-9_-]+$/, "explicit token is URL-safe" );
+
+is( SecureRandom.int(1), 0, "int(1) returns zero" );
+
+let i := 0;
+while ( i < 50 ) {
+	let value := SecureRandom.int(10);
+	ok( value >= 0 and value < 10, "int(10) returns value in range" );
+	i++;
+}
+
+like(
+	exception( function () {
+		SecureRandom.bytes();
+	} ),
+	/(non-negative integer|expects 1 argument)/,
+	"bytes rejects missing length",
+);
+
+like(
+	exception( function () {
+		SecureRandom.bytes("abc");
+	} ),
+	/non-negative integer/,
+	"bytes rejects non-numeric length",
+);
+
+like(
+	exception( function () {
+		SecureRandom.bytes(-1);
+	} ),
+	/non-negative integer/,
+	"bytes rejects negative length",
+);
+
+like(
+	exception( function () {
+		SecureRandom.bytes(1.5);
+	} ),
+	/non-negative integer/,
+	"bytes rejects fractional length",
+);
+
+like(
+	exception( function () {
+		SecureRandom.token(-1);
+	} ),
+	/non-negative integer/,
+	"token rejects negative length",
+);
+
+like(
+	exception( function () {
+		SecureRandom.int("abc");
+	} ),
+	/positive integer/,
+	"int rejects non-numeric max",
+);
+
+like(
+	exception( function () {
+		SecureRandom.int(0);
+	} ),
+	/positive integer/,
+	"int rejects zero max",
+);
+
+like(
+	exception( function () {
+		SecureRandom.int(-3);
+	} ),
+	/positive integer/,
+	"int rejects negative max",
+);
+
+like(
+	exception( function () {
+		SecureRandom.int(2.5);
+	} ),
+	/positive integer/,
+	"int rejects fractional max",
+);
+
+like(
+	exception( function () {
+		SecureRandom.int(18014398509481984);
+	} ),
+	/too large/,
+	"int rejects too-large max",
+);
+
+done_testing();

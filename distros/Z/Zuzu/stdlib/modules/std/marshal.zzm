@@ -1,0 +1,138 @@
+=encoding utf8
+
+=head1 NAME
+
+std/marshal - Serialize and deserialize ZuzuScript values.
+
+=head1 SYNOPSIS
+
+  from std/marshal import dump, load, safe_to_dump;
+
+  let original := {
+      name: "Ada",
+      tags: [ "compiler", "runtime" ],
+  };
+
+  let blob := dump(original);
+  let copy := load(blob);
+
+  if ( safe_to_dump(original) ) {
+      // Store blob, send it to another trusted worker, etc.
+  }
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Node and
+Electron. It is partially supported by zuzu-js in the browser: general
+marshal round-trip coverage passes, but C<Path> round-trip and
+C<safe_to_dump> coverage for paths is unsupported.
+
+=head1 DESCRIPTION
+
+C<std/marshal> exposes the Zuzu Marshal CBOR v1 format. It serializes
+supported ZuzuScript values to a compact C<BinaryString> and loads
+that binary representation back into live values. It is intended for
+trusted persistence, worker/process handoff, RPC between cooperating
+Zuzu runtimes, and implementation interoperability tests.
+
+B<Security warning:> C<load> is not safe for untrusted blobs in version
+1 of the format. Loading may evaluate embedded ZuzuScript code records
+to reconstruct functions, classes, and traits, and it may run user
+C<__on_load__> hooks. Treat a marshal blob from an untrusted source as
+untrusted code. For untrusted data interchange, prefer a data-only
+format such as C<std/data/json>, C<std/data/cbor>, or C<std/data/yaml>
+with your own validation.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item C<< dump(value) >>
+
+Parameters: C<value> is any value. Returns: C<BinaryString>. Serializes
+C<value> to a Zuzu Marshal CBOR v1 blob.
+
+=item C<< load(BinaryString blob) >>
+
+Parameters: C<blob> is a Zuzu Marshal CBOR v1 blob. Returns: value.
+Loads and reconstructs the marshalled value.
+
+=item C<< safe_to_dump(value) >>
+
+Parameters: C<value> is any value. Returns: C<Boolean>. Returns true
+when C<value> can currently be marshalled.
+
+=back
+
+=head2 Supported Values
+
+The implementation currently supports:
+
+=over
+
+=item * Scalar values: C<null>, Booleans, finite Numbers, Strings, and
+BinaryStrings.
+
+=item * Collections and structured values: Pairs, Arrays, Dicts,
+PairLists, Sets, Bags, Times, and Paths.
+
+=item * User-defined functions, classes, and traits when their source
+and dependencies can be reconstructed. Captured values must be
+marshalable scalar constants; internal function/class/trait dependencies
+must be suitable const bindings.
+
+=item * User objects whose class and slot values are marshalable.
+
+=item * Bound methods whose receiver and method identity can be
+reconstructed.
+
+=back
+
+Shared object identity is preserved for non-scalar values. Cyclic
+graphs are supported where every value in the cycle is otherwise
+marshalable. Scalars are loaded as ordinary scalar values rather than
+identity-preserving references.
+
+=head2 Lifecycle Hooks
+
+If an object defines C<__on_dump__>, the hook is called before its slots
+are encoded. If it defines C<__on_load__>, the hook is called after the
+object graph has been reconstructed. C<__build__> is not called during
+load.
+
+Hook failures are wrapped as C<MarshallingException> during C<dump> and
+C<UnmarshallingException> during C<load>.
+
+=head2 Common Failure Modes
+
+C<dump> can throw C<MarshallingException> for values that cannot be
+represented, including native functions, regular expressions, file or
+database handles, unsupported runtime-backed objects, non-finite
+numbers, non-scalar function captures, non-const code dependencies, or
+errors from C<__on_dump__>.
+
+C<load> can throw C<UnmarshallingException> for invalid CBOR, a wrong
+envelope, an unsupported version, invalid object or code references,
+duplicate Dict keys, duplicate object slot names, unsupported object
+kinds, malformed code records, errors from C<__on_load__>, and malformed
+or misplaced weak storage records.
+
+=head2 Weak Storage Records
+
+Zuzu Marshal CBOR v1 uses weak storage records to preserve weak object
+slots and weak collection entries. A loader must not silently load a
+weak storage record as a strong reference, because that would change the
+graph semantics. Weak records in forbidden positions, or nested inside
+other weak records, are rejected with C<UnmarshallingException>.
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/marshal >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut

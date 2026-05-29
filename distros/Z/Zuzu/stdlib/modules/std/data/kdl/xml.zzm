@@ -1,0 +1,387 @@
+=encoding utf8
+
+=head1 NAME
+
+std/data/kdl/xml - XML-in-KDL structure conversion.
+
+=head1 SYNOPSIS
+
+  from std/data/kdl import KDL;
+  from std/data/kdl/xml import kdl_to_xml, xml_to_kdl;
+  from std/data/xml import XML;
+
+  let kdl_doc := ( new KDL() ).decode(
+    "a href=\"http://example.com\" \"here's a link\""
+  );
+  let xml_doc := kdl_to_xml(kdl_doc);
+  let roundtrip := xml_to_kdl(xml_doc);
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module implements the XML-in-KDL (XiK) mapping for parsed Zuzu
+objects. C<kdl_to_xml> accepts a C<KDLDocument> or C<KDLNode> and
+returns an C<XMLDocument>. C<xml_to_kdl> accepts an C<XMLDocument> or
+C<XMLNode> and returns a C<KDLDocument>.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item C<< kdl_to_xml(value) >>
+
+Parameters: C<value> is a C<KDLDocument>, C<KDLNode>, or compatible KDL
+value. Returns: C<XMLDocument>. Converts XML-in-KDL structures into an
+XML document.
+
+=item C<< xml_to_kdl(value) >>
+
+Parameters: C<value> is an C<XMLDocument>, C<XMLNode>, or compatible XML
+value. Returns: C<KDLDocument>. Converts XML data into XML-in-KDL nodes.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/data/kdl/xml >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/data/kdl import KDLDocument, KDLNode, KDLValue;
+from std/data/xml import XML;
+from std/data/xml/escape import escape_xml;
+from std/string import index, substr;
+
+function _xik_starts_with ( String text, String prefix ) {
+	return substr( text, 0, length prefix ) ≡ prefix;
+}
+
+function _xik_has_props ( KDLNode node ) {
+	return node.props().to_Array().length() > 0;
+}
+
+function _xik_string_value ( value, String context ) {
+	die `${context} must be a KDLValue` if not( value instanceof KDLValue );
+	die `${context} must be a string value` if not value.is_string();
+	return value.native_value();
+}
+
+function _xik_single_string_arg ( KDLNode node, String context ) {
+	die `${context} must contain one string argument`
+		if node.args().length() ≢ 1;
+	return _xik_string_value( node.args()[0], context );
+}
+
+function _xik_no_props_or_children ( KDLNode node, String context ) {
+	die `${context} cannot contain properties` if _xik_has_props(node);
+	die `${context} cannot contain children`
+		if node.children().length() > 0;
+}
+
+function _xik_attr_text ( PairList props ) {
+	let out := "";
+	for ( let pair in props.to_Array() ) {
+		let kv := pair{pair};
+		let key := kv[0];
+		let value := _xik_string_value(
+			kv[1],
+			`XML-in-KDL attribute '${key}'`,
+		);
+		out _= ` ${key}="${escape_xml(value)}"`;
+	}
+	return out;
+}
+
+function _xik_comment_text ( KDLNode node ) {
+	_xik_no_props_or_children( node, "XML-in-KDL comment node" );
+	let text := _xik_single_string_arg( node, "XML-in-KDL comment node" );
+	die "XML-in-KDL comment cannot contain '--'" if index( text, "--" ) >= 0;
+	die "XML-in-KDL comment cannot end with '-'"
+		if length text > 0 and substr( text, length text - 1, 1 ) ≡ "-";
+	return "<!--" _ text _ "-->";
+}
+
+function _xik_doctype_text ( KDLNode node ) {
+	_xik_no_props_or_children( node, "XML-in-KDL doctype node" );
+	let text := _xik_single_string_arg( node, "XML-in-KDL doctype node" );
+	die "XML-in-KDL doctype cannot contain '>'" if index( text, ">" ) >= 0;
+	return "<!DOCTYPE " _ text _ ">";
+}
+
+function _xik_pi_text ( KDLNode node ) {
+	die "XML-in-KDL processing instruction cannot contain children"
+		if node.children().length() > 0;
+
+	let target := substr( node.name(), 1, length node.name() - 1 );
+	die "XML-in-KDL processing instruction has an empty target"
+		if target ≡ "";
+
+	let content := "";
+	if ( node.args().length() > 0 ) {
+		_xik_no_props_or_children(
+			node,
+			"XML-in-KDL unstructured processing instruction",
+		);
+		content := _xik_single_string_arg(
+			node,
+			"XML-in-KDL unstructured processing instruction",
+		);
+	}
+	else {
+		content := _xik_attr_text( node.props() );
+		content := substr( content, 1, length content - 1 )
+			if length content > 0;
+	}
+
+	die "XML-in-KDL processing instruction cannot contain '?>'"
+		if index( content, "?>" ) >= 0;
+
+	return content ≡ "" ? `<?${target}?>` : `<?${target} ${content}?>`;
+}
+
+function _xik_text_node_text ( KDLNode node ) {
+	_xik_no_props_or_children( node, "XML-in-KDL text node" );
+	return escape_xml( _xik_single_string_arg( node, "XML-in-KDL text node" ) );
+}
+
+function _xik_node_text;
+
+function _xik_element_text ( KDLNode node ) {
+	die `XML-in-KDL element '${node.name()}' cannot have type annotations`
+		if node.type_annotation() ≢ null;
+
+	let args := node.args();
+	let children := node.children();
+	die `XML-in-KDL element '${node.name()}' cannot contain multiple arguments`
+		if args.length() > 1;
+	die `XML-in-KDL element '${node.name()}' cannot mix text argument and children`
+		if args.length() > 0 and children.length() > 0;
+
+	let attrs := _xik_attr_text( node.props() );
+	if ( args.length() = 0 and children.length() = 0 ) {
+		return `<${node.name()}${attrs}/>`;
+	}
+
+	let body := "";
+	if ( args.length() = 1 ) {
+		body := escape_xml(
+			_xik_string_value(
+				args[0],
+				`XML-in-KDL element '${node.name()}' text argument`,
+			),
+		);
+	}
+	else {
+		for ( let child in children ) {
+			body _= _xik_node_text(child);
+		}
+	}
+
+	return `<${node.name()}${attrs}>${body}</${node.name()}>`;
+}
+
+function _xik_node_text ( KDLNode node ) {
+	let name := node.name();
+	if ( name ≡ "-" ) {
+		return _xik_text_node_text(node);
+	}
+	if ( name ≡ "!" ) {
+		return _xik_comment_text(node);
+	}
+	if ( name ≡ "!doctype" ) {
+		return _xik_doctype_text(node);
+	}
+	if ( _xik_starts_with( name, "?" ) ) {
+		return _xik_pi_text(node);
+	}
+	return _xik_element_text(node);
+}
+
+function _xik_is_element_node ( KDLNode node ) {
+	let name := node.name();
+	return name ≢ "-" and name ≢ "!" and name ≢ "!doctype"
+		and not _xik_starts_with( name, "?" );
+}
+
+function kdl_to_xml ( value ) {
+	let nodes;
+	if ( value instanceof KDLDocument ) {
+		nodes := value.nodes();
+	}
+	else if ( value instanceof KDLNode ) {
+		nodes := [ value ];
+	}
+	else {
+		die "kdl_to_xml expects a KDLDocument or KDLNode";
+	}
+
+	let element_count := 0;
+	let out := "";
+	for ( let node in nodes ) {
+		element_count++ if _xik_is_element_node(node);
+		out _= _xik_node_text(node);
+	}
+
+	die "XML-in-KDL document must contain exactly one top-level element"
+		if element_count ≢ 1;
+
+	return XML.parse(out);
+}
+
+function _xik_kdl_value ( String text ) {
+	return new KDLValue( type: "string", value: text );
+}
+
+function _xik_xml_attrs_to_kdl ( xml_node ) {
+	let props := new PairList();
+	for ( let attr in xml_node.attributes() ) {
+		props.add( attr.nodeName(), _xik_kdl_value( attr.nodeValue() ) );
+	}
+	return props;
+}
+
+function _xik_xml_text_to_kdl ( xml_node ) {
+	return new KDLNode(
+		name: "-",
+		args: [ _xik_kdl_value( xml_node.nodeValue() ?: "" ) ],
+	);
+}
+
+function _xik_xml_comment_to_kdl ( xml_node ) {
+	return new KDLNode(
+		name: "!",
+		args: [ _xik_kdl_value( xml_node.nodeValue() ?: "" ) ],
+	);
+}
+
+function _xik_xml_node_to_kdl;
+
+function _xik_xml_pi_to_kdl ( xml_node ) {
+	return new KDLNode(
+		name: "?" _ xml_node.nodeName(),
+		args: [ _xik_kdl_value( xml_node.nodeValue() ?: "" ) ],
+	);
+}
+
+function _xik_xml_doctype_to_kdl ( xml_node ) {
+	return new KDLNode(
+		name: "!doctype",
+		args: [ _xik_kdl_value( xml_node.nodeValue() ?: xml_node.nodeName() ) ],
+	);
+}
+
+function _xik_xml_element_to_kdl ( xml_node ) {
+	let child_nodes := xml_node.childNodes();
+	let text_only := child_nodes.length() > 0;
+	let text := "";
+
+	for ( let child in child_nodes ) {
+		let kind := 0 + child.nodeType();
+		if ( kind = 3 or kind = 4 ) {
+			text _= child.nodeValue() ?: "";
+		}
+		else {
+			text_only := false;
+		}
+	}
+
+	if ( text_only ) {
+		return new KDLNode(
+			name: xml_node.nodeName(),
+			props: _xik_xml_attrs_to_kdl(xml_node),
+			args: [ _xik_kdl_value(text) ],
+		);
+	}
+
+	let children := [];
+	for ( let child in child_nodes ) {
+		let kdl_child := _xik_xml_node_to_kdl(child);
+		children.push(kdl_child) if kdl_child ≢ null;
+	}
+
+	return new KDLNode(
+		name: xml_node.nodeName(),
+		props: _xik_xml_attrs_to_kdl(xml_node),
+		children: children,
+	);
+}
+
+function _xik_xml_node_to_kdl ( xml_node ) {
+	switch ( 0 + xml_node.nodeType() ) {
+		case 1:
+			return _xik_xml_element_to_kdl(xml_node);
+		case 3, 4:
+			return _xik_xml_text_to_kdl(xml_node);
+		case 7:
+			return _xik_xml_pi_to_kdl(xml_node);
+		case 8:
+			return _xik_xml_comment_to_kdl(xml_node);
+		case 10:
+			return _xik_xml_doctype_to_kdl(xml_node);
+	}
+	return null;
+}
+
+function _xik_xml_document_nodes ( xml_doc ) {
+	let raw_nodes := null;
+	try {
+		raw_nodes := xml_doc.childNodes();
+	}
+	catch {
+		try {
+			raw_nodes := xml_doc.findnodes("/node()");
+		}
+		catch {
+			let root := xml_doc.documentElement();
+			raw_nodes := root ≡ null ? [] : [ root ];
+		}
+	}
+
+	if ( raw_nodes.length() = 0 ) {
+		let root := xml_doc.documentElement();
+		raw_nodes := root ≡ null ? [] : [ root ];
+	}
+
+	let nodes := [];
+	for ( let raw in raw_nodes ) {
+		let node := _xik_xml_node_to_kdl(raw);
+		nodes.push(node) if node ≢ null;
+	}
+	return nodes;
+}
+
+function xml_to_kdl ( value ) {
+	let node_type := null;
+	try {
+		node_type := 0 + value.nodeType();
+	}
+	catch {
+	}
+
+	if ( node_type ≢ null ) {
+		if ( node_type = 9 ) {
+			return new KDLDocument( nodes: _xik_xml_document_nodes(value) );
+		}
+
+		let node := _xik_xml_node_to_kdl(value);
+		die "xml_to_kdl cannot convert this XML node type" if node ≡ null;
+		return new KDLDocument( nodes: [ node ] );
+	}
+
+	try {
+		value.documentElement();
+		return new KDLDocument( nodes: _xik_xml_document_nodes(value) );
+	}
+	catch {
+		die "xml_to_kdl expects an XMLDocument or XMLNode";
+	}
+}

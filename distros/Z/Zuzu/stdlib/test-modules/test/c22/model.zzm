@@ -1,0 +1,11 @@
+from test/c22/traits import TaggedName;
+
+class BaseEntity {
+	let String name with get, set;
+}
+
+class TaggedEntity extends BaseEntity with TaggedName {
+	method describe () {
+		return super() _ ":class";
+	}
+}

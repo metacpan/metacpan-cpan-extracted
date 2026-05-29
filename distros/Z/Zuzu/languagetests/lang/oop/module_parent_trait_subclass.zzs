@@ -1,0 +1,10 @@
+from test/c20/child import ChildRecord;
+from test/more import *;
+
+let rec := new ChildRecord( id: 7, name: "Ada" );
+
+is( rec.base_label(), "id=7", "child inherits parent method from external module" );
+is( rec.full_label(), "id=7:Ada", "child mixes external trait with external parent" );
+is( rec.get_name(), "Ada", "child field accessor remains available" );
+
+done_testing();

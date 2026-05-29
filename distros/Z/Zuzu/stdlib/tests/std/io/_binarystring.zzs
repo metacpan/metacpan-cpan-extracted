@@ -1,0 +1,38 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/io import Path;
+from std/string/base64 import encode, decode;
+
+let file := Path.tempfile();
+let raw := ~to_binary("ABC");
+file.spew(raw);
+let roundtrip := file.slurp();
+is( typeof roundtrip, "BinaryString", "Path.slurp returns BinaryString", );
+is( length roundtrip, length raw, "Binary slurp keeps byte length", );
+ok( roundtrip == raw, "Binary slurp roundtrip preserves bytes", );
+let utf8 := "héllö";
+file.spew_utf8(utf8);
+is( file.slurp_utf8(), utf8, "UTF-8 roundtrip keeps text", );
+is( typeof file.slurp_utf8(), "String", "UTF-8 slurp returns String", );
+is( to_string( to_binary(utf8) ), utf8, "Explicit conversion flow works", );
+let b64 := encode(raw);
+is( typeof b64, "String", "base64 encode returns String", );
+let decoded := decode(b64);
+is( typeof decoded, "BinaryString", "base64 decode returns BinaryString", );
+ok( decoded == raw, "base64 decode roundtrip keeps binary payload", );
+like( exception( function() {
+	file.spew("abc");
+}
+), /TypeException: Path.spew expects BinaryString, got String/, "Path.spew rejects String", );
+like( exception( function() {
+	file.spew_utf8( to_binary("abc") );
+}
+), /TypeException: Path.spew_utf8 expects String, got BinaryString/, "Path.spew_utf8 rejects BinaryString",
+    );
+like( exception( function() {
+	encode("abc");
+}
+), /TypeException: encode expects BinaryString, got String/, "encode rejects String", );
+done_testing();

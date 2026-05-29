@@ -1,0 +1,249 @@
+from test/more import *;
+
+requires_capability( "gui" );
+
+from std/gui import *;
+
+let ui := Window(
+	title: "Phase 3",
+	VBox(
+		id: "root",
+		Separator( id: "sep" ),
+		Slider(
+			id: "slider",
+			value: 25,
+			min: 0,
+			max: 100,
+			step: 5,
+		),
+		Progress(
+			id: "progress",
+			value: 30,
+			max: 200,
+			show_text: true,
+		),
+		DatePicker(
+			id: "date",
+			value: "2026-04-26",
+			min: "2020-01-01",
+			max: "2030-12-31",
+			first_day_of_week: 1,
+		),
+		Tabs(
+			id: "tabs",
+			selected: "details",
+			Tab( id: "summary", title: "Summary", value: "summary" ),
+			Tab(
+				id: "details",
+				title: "Details",
+				value: "details",
+				icon: "details.png",
+				closable: true,
+			),
+		),
+		ListView(
+			id: "list",
+			items: [
+				{ label: "Alpha", value: "a" },
+				{ label: "Beta", value: "b" },
+			],
+			selected_index: 0,
+		),
+		TreeView(
+			id: "tree",
+			multiple: true,
+			items: [
+				{
+					label: "Root",
+					value: "root",
+					children: [
+						{ label: "Child", value: "child" },
+					],
+				},
+			],
+			selected_path: [ 0, 0 ],
+		),
+	),
+);
+
+ok( ui.find_by_id("sep") instanceof Widget, "Separator is a Widget" );
+is(
+	ui.find_by_id("sep").orientation(),
+	"horizontal",
+	"Separator orientation",
+);
+
+let slider := ui.find_by_id("slider");
+is( slider.value(), 25, "Slider value getter" );
+is( slider.value(40), slider, "Slider value setter returns self" );
+is( slider.value(), 40, "Slider value setter updates value" );
+is( slider.min(), 0, "Slider min getter" );
+is( slider.max(), 100, "Slider max getter" );
+is( slider.step(), 5, "Slider step getter" );
+
+let progress := ui.find_by_id("progress");
+is( progress.value(), 30, "Progress value getter" );
+is( progress.max(), 200, "Progress max getter" );
+is( progress.show_text(), true, "Progress show_text getter" );
+is(
+	progress.indeterminate(true),
+	progress,
+	"Progress indeterminate setter returns self",
+);
+is( progress.indeterminate(), true, "Progress indeterminate getter" );
+
+let date := ui.find_by_id("date");
+ok( date instanceof Widget, "DatePicker is a Widget" );
+is( date.value(), "2026-04-26", "DatePicker value getter" );
+is( date.min(), "2020-01-01", "DatePicker min getter" );
+is( date.max(), "2030-12-31", "DatePicker max getter" );
+is(
+	date.first_day_of_week(),
+	1,
+	"DatePicker first_day_of_week getter",
+);
+is( date.value("2026-05-01"), date, "DatePicker value setter returns self" );
+is( date.value(), "2026-05-01", "DatePicker value setter updates value" );
+is(
+	date.set_value("2026-06-01"),
+	date,
+	"DatePicker set_value returns self",
+);
+is( date.value(), "2026-06-01", "DatePicker set_value updates value" );
+is( date.min("2021-01-01"), date, "DatePicker min setter returns self" );
+is( date.min(), "2021-01-01", "DatePicker min setter updates value" );
+is( date.max("2029-12-31"), date, "DatePicker max setter returns self" );
+is( date.max(), "2029-12-31", "DatePicker max setter updates value" );
+is(
+	date.first_day_of_week(0),
+	date,
+	"DatePicker first_day_of_week setter returns self",
+);
+is(
+	date.first_day_of_week(),
+	0,
+	"DatePicker first_day_of_week setter updates value",
+);
+
+let date_changed := [];
+date.change( function ( e ) {
+	date_changed.push( e.name() );
+} );
+date.change();
+is( date_changed[0], "change", "DatePicker change event dispatches" );
+
+let tabs := ui.find_by_id("tabs");
+let summary := ui.find_by_id("summary");
+let details := ui.find_by_id("details");
+is( tabs.tabs().length(), 2, "Tabs returns Tab children" );
+is( tabs.selected(), "details", "Tabs initial selection" );
+is( details.selected(), true, "Tabs initial selection checks matching tab" );
+is( summary.selected(), false, "Tabs initial selection unchecks other tab" );
+is( tabs.selected_tab(), details, "Tabs selected_tab returns selected tab" );
+is( details.closable(), true, "Tab closable getter" );
+is( details.icon(), "details.png", "Tab icon getter" );
+is( tabs.selected("summary"), tabs, "Tabs selected setter returns self" );
+is( summary.selected(), true, "Tabs selected setter checks matching tab" );
+details.selected(true);
+is( tabs.selected(), "details", "Tab selected setter updates parent" );
+
+let list := ui.find_by_id("list");
+is( list.items().length(), 2, "ListView items getter" );
+is( list.selected_index(), 0, "ListView selected_index getter" );
+is( list.selected_item(){label}, "Alpha", "ListView selected item" );
+is(
+	list.selected_index(1),
+	list,
+	"ListView selected_index setter returns self",
+);
+is( list.selected_item(){value}, "b", "ListView selected index updates item" );
+is(
+	list.add_item( { label: "Gamma", value: "g" } ),
+	list,
+	"ListView add_item returns self",
+);
+is( list.items().length(), 3, "ListView add_item mutates items" );
+
+let selected_events := [];
+list.on( "select", function ( e ) {
+	selected_events.push( e.name() );
+} );
+list.emit("select");
+is( selected_events[0], "select", "ListView select event dispatches" );
+
+let activated_events := [];
+list.activate( function ( e ) {
+	activated_events.push( e.name() );
+} );
+is( list.activate_index(2), list, "ListView activate_index returns self" );
+is( activated_events[0], "activate", "ListView activate event dispatches" );
+is( list.clear_items(), list, "ListView clear_items returns self" );
+is( list.items().length(), 0, "ListView clear_items removes items" );
+is( list.selected_index(), null, "ListView clear_items clears selection" );
+
+let tree := ui.find_by_id("tree");
+is( tree.items().length(), 1, "TreeView items getter" );
+is( tree.multiple(), true, "TreeView multiple getter" );
+is( tree.selected_path()[0], 0, "TreeView selected_path first index" );
+is( tree.selected_path()[1], 0, "TreeView selected_path second index" );
+is( tree.selected_item(){value}, "child", "TreeView selected item" );
+is(
+	tree.selected_path([ 0 ]),
+	tree,
+	"TreeView selected_path setter returns self",
+);
+is(
+	tree.selected_item(){value},
+	"root",
+	"TreeView selected_path updates item",
+);
+
+let tree_activated := [];
+let tree_expanded := [];
+let tree_collapsed := [];
+tree.activate( function ( e ) {
+	tree_activated.push( e.name() );
+} );
+tree.expand( function ( e ) {
+	tree_expanded.push( e.name() );
+} );
+tree.collapse( function ( e ) {
+	tree_collapsed.push( e.name() );
+} );
+is(
+	tree.activate_path([ 0, 0 ]),
+	tree,
+	"TreeView activate_path returns self",
+);
+is( tree_activated[0], "activate", "TreeView activate event dispatches" );
+is( tree.collapse_path([ 0 ]), tree, "TreeView collapse_path returns self" );
+is( tree.is_expanded([ 0 ]), false, "TreeView collapse_path mutates state" );
+is( tree_collapsed[0], "collapse", "TreeView collapse event dispatches" );
+is( tree.expand_path([ 0 ]), tree, "TreeView expand_path returns self" );
+is( tree.is_expanded([ 0 ]), true, "TreeView expand_path mutates state" );
+is( tree_expanded[0], "expand", "TreeView expand event dispatches" );
+is(
+	tree.add_item( { label: "Other", value: "other" } ),
+	tree,
+	"TreeView add_item returns self",
+);
+is( tree.items().length(), 2, "TreeView add_item mutates items" );
+is( tree.clear_items(), tree, "TreeView clear_items returns self" );
+is( tree.items().length(), 0, "TreeView clear_items removes items" );
+
+let bad_orientation := exception( function () {
+	Slider( orientation: "diagonal" );
+} );
+ok( bad_orientation instanceof Exception, "invalid enum prop throws" );
+ok(
+	bad_orientation{message} ~ /GUI_PROP_TYPE/,
+	"invalid enum error includes code",
+);
+
+let bad_items := exception( function () {
+	ListView( items: "nope" );
+} );
+ok( bad_items instanceof Exception, "invalid items type throws" );
+ok( bad_items{message} ~ /GUI_PROP_TYPE/, "invalid items type includes code" );
+
+done_testing();

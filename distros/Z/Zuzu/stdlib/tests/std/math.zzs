@@ -1,0 +1,16 @@
+from std/math import *;
+from test/more import *;
+is( round( π × 1000 ), 3142, "pi", );
+is( Math.hex2dec("ff"), "255", "hex2dec converts lowercase hex", );
+is( Math.hex2oct("0X1a"), "32", "hex2oct accepts 0X prefix", );
+is( Math.hex2bin("0x2a"), "101010", "hex2bin accepts 0x prefix", );
+is( Math.dec2hex("255"), "ff", "dec2hex converts decimal string", );
+is( Math.dec2oct("42"), "52", "dec2oct converts decimal string", );
+is( Math.dec2bin("42"), "101010", "dec2bin converts decimal string", );
+is( Math.oct2hex("77"), "3f", "oct2hex converts octal string", );
+is( Math.oct2dec("77"), "63", "oct2dec converts octal string", );
+is( Math.oct2bin("77"), "111111", "oct2bin converts octal string", );
+is( Math.bin2hex("111111"), "3f", "bin2hex converts binary string", );
+is( Math.bin2dec("111111"), "63", "bin2dec converts binary string", );
+is( Math.bin2oct("111111"), "77", "bin2oct converts binary string", );
+done_testing();

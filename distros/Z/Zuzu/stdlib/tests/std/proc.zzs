@@ -1,0 +1,40 @@
+from test/more import *;
+
+requires_capability( "proc" );
+
+from std/proc import Proc, Env, sleep;
+from std/time import Time;
+let pid := Proc.pid();
+ok( pid > 1, "pid returns positive process id", );
+let env_name := "ZUZU_STD_PROC_TEST";
+Env.remove(env_name);
+is( Env.get(env_name), null, "Env.get returns null for unset values", );
+is( Env.get( env_name, "fallback" ), "fallback", "Env.get uses default for unset values", );
+Env.set( env_name, "hello-world" );
+is( Env.get(env_name), "hello-world", "Env.set writes environment values", );
+Env.remove(env_name);
+is( Env.get(env_name), null, "Env.remove clears environment values", );
+let signal_hits := 0;
+Proc.onsignal( "USR1", function() {
+	signal_hits++;
+}
+);
+is( Proc.kill( "USR1", Proc.pid() ), 1, "kill reports one signalled process", );
+let spin := 0;
+while ( signal_hits == 0 and spin < 1000 ) {
+	spin++;
+}
+is( signal_hits > 0, 1, "onsignal callback runs" );
+let run_ok := { exit_code: 0, signal: 0, error: null };
+is( Proc.is_success(run_ok), 1, "is_success identifies successful runs", );
+is( Proc.status_text(run_ok), "exit 0", "status_text describes successful exit", );
+sleep( 1 / 10 );
+pass( "sleep accepts fractional seconds", );
+let before := new Time();
+sleep(2);
+let after := new Time();
+ok(
+	after.epoch() - before.epoch() >= 2,
+	"sleep delays execution for at least two seconds",
+);
+done_testing();

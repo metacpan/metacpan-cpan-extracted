@@ -1,0 +1,34 @@
+from test/more import *;
+let seen := 0;
+if (true) {
+	seen++;
+}
+if ( not false ) {
+	seen++;
+}
+if (false) {
+	seen := seen + 100;
+}
+else {
+	seen++;
+}
+let i := 0;
+while ( i < 3 ) {
+	seen++;
+	i++;
+}
+let sum := 0;
+for ( let x in[ 1, 2, 3 ] ) {
+	sum := sum + x;
+}
+let for_else_hit := 0;
+for ( let x in[] ) {
+	for_else_hit := 99;
+}
+else {
+	for_else_hit := 1;
+}
+is( seen, 6, "if/unless/if-else/while" );
+is( sum, 6, "for" );
+is( for_else_hit, 1, "for/else" );
+done_testing();

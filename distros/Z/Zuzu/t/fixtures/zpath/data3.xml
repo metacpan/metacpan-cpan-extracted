@@ -1,0 +1,30 @@
+<html>
+ <body>
+  <table>
+   <tr id="tr1">
+    <td id="td1.1">TD1.1</td>
+    <td id="td1.2">TD1.2</td>
+   </tr>
+   <tr id="tr2" class="second">
+    <td id="td2.1">TD2.1</td>
+    <td id="td2.2">TD2.2</td>
+   </tr>
+   <tr id="tr3">
+    <td id="td3.1">TD3.1</td>
+    <td id="td3.2">TD3.2</td>
+   </tr>
+  </table>
+  <person>
+   <name>John</name>
+   <age>26</age>
+   <data>mixed <span>content</span> test</data>
+   <items>
+    <item><price>4.50</price><quantity>3</quantity></item><!--9-->
+    <item><price>2.25</price><quantity>4</quantity></item><!--9-->
+   </items>
+  </person>
+  <rdf:seq xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" rdf:about="aboutvalue">
+   <rdf:li>data</rdf:li>
+  </rdf:seq>
+ </body>
+</html>

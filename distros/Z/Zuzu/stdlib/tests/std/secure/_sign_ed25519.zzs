@@ -1,0 +1,153 @@
+from std/secure import Secure, SigningKey;
+from std/string/base64 import decode, encode;
+from test/more import *;
+
+let caps := Secure.capabilities();
+let message := to_binary("phase 8 signed message");
+let wrong_message := to_binary("phase 8 altered message");
+
+if ( Secure.has( "signing", "ed25519" ) ) {
+	is(
+		Secure.require( "signing", "ed25519" ),
+		true,
+		"require returns true for ed25519 signing",
+	);
+	ok(
+		caps{signing}.contains("ed25519"),
+		"capabilities reports ed25519 signing",
+	);
+
+	let signing_key := SigningKey.generate();
+	let public_key := signing_key.public_key();
+	let signature := signing_key.sign(message);
+
+	is( typeof signing_key, "SigningKey", "generate returns a SigningKey" );
+	is( typeof public_key, "PublicKey", "public_key returns a PublicKey" );
+	is( typeof signature, "BinaryString", "sign returns a BinaryString" );
+	is( length signature, 64, "ed25519 signature is 64 bytes" );
+	is(
+		public_key.verify( message, signature ),
+		true,
+		"public key verifies matching message and signature",
+	);
+	is(
+		public_key.verify( wrong_message, signature ),
+		false,
+		"public key rejects a changed message",
+	);
+	is(
+		SigningKey.generate().public_key().verify( message, signature ),
+		false,
+		"another public key rejects the signature",
+	);
+	is(
+		public_key.verify( message, decode("AA==") ),
+		false,
+		"public key rejects a malformed signature",
+	);
+
+	let async_key := await {
+		SigningKey.generate_async();
+	};
+	let async_public := async_key.public_key();
+	let async_signature := await {
+		async_key.sign_async(message);
+	};
+	is(
+		await {
+			async_public.verify_async( message, async_signature );
+		},
+		true,
+		"async signing and verification work",
+	);
+
+	let raw_private := signing_key.export_private();
+	let raw_public := public_key.export();
+	is( typeof raw_private, "BinaryString", "raw private export is binary" );
+	is( typeof raw_public, "BinaryString", "raw public export is binary" );
+	is( length raw_private, 32, "raw private export is 32 bytes" );
+	is( length raw_public, 32, "raw public export is 32 bytes" );
+
+	let imported_private := SigningKey.import_private(raw_private);
+	let imported_public := SigningKey.import_public(raw_public);
+	let imported_signature := imported_private.sign(message);
+	is(
+		imported_public.verify( message, imported_signature ),
+		true,
+		"raw imported keys sign and verify",
+	);
+	is(
+		encode( imported_private.export_private() ),
+		encode(raw_private),
+		"raw private import round-trips",
+	);
+	is(
+		encode( imported_public.export() ),
+		encode(raw_public),
+		"raw public import round-trips",
+	);
+
+	let pem_private := signing_key.export_private({ format: "pem" });
+	let pem_public := public_key.export({ format: "pem" });
+	is( typeof pem_private, "String", "PEM private export is a String" );
+	is( typeof pem_public, "String", "PEM public export is a String" );
+	like(
+		pem_private,
+		/BEGIN PRIVATE KEY/,
+		"PEM private export uses PKCS#8",
+	);
+	like(
+		pem_public,
+		/BEGIN PUBLIC KEY/,
+		"PEM public export uses SPKI",
+	);
+
+	let pem_private_imported := SigningKey.import_private(pem_private);
+	let pem_public_imported := SigningKey.import_public(pem_public);
+	is(
+		pem_public_imported.verify(
+			message,
+			pem_private_imported.sign(message),
+		),
+		true,
+		"PEM imported keys sign and verify",
+	);
+
+	like(
+		exception( function () {
+			SigningKey.generate("rsa-pss-sha256");
+		} ),
+		/not available|only supports/,
+		"generate rejects unsupported signing algorithms",
+	);
+	like(
+		exception( function () {
+			signing_key.sign("not binary");
+		} ),
+		/BinaryString message/,
+		"sign requires a binary message",
+	);
+	like(
+		exception( function () {
+			public_key.verify( message, "not binary" );
+		} ),
+		/BinaryString signature/,
+		"verify requires a binary signature",
+	);
+}
+else {
+	is(
+		caps{signing}.contains("ed25519"),
+		false,
+		"capabilities do not report ed25519 signing",
+	);
+	like(
+		exception( function () {
+			Secure.require( "signing", "ed25519" );
+		} ),
+		/signing\/ed25519/,
+		"require rejects unavailable ed25519 signing",
+	);
+}
+
+done_testing();

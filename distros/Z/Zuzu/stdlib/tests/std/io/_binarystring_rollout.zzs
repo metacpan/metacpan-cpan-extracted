@@ -1,0 +1,22 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/io import Path;
+
+let file := Path.tempfile();
+let raw := ~to_binary("ABC");
+file.spew(raw);
+is( typeof file.slurp(), "BinaryString", "raw slurp returns BinaryString", );
+ok( file.slurp() == raw, "raw slurp roundtrip keeps non-UTF8 bytes", );
+file.spew_utf8("naïve café");
+is( typeof file.slurp_utf8(), "String", "utf8 slurp returns String", );
+is( file.slurp_utf8(), "naïve café", "utf8 slurp preserves multibyte text", );
+like( exception( function() {
+	let bad := "head" _ raw;
+}
+), /Cannot implicitly concatenate non-ASCII BinaryString/, "migration guard: explicit conversion required",
+    );
+let ascii := to_binary("A");
+is( "head" _ to_string(ascii), "headA", "migration path: explicit to_string unblocks concat", );
+done_testing();

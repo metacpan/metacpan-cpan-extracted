@@ -1,0 +1,155 @@
+=encoding utf8
+
+=head1 NAME
+
+std/proc - Process execution, environment, and signals.
+
+=head1 SYNOPSIS
+
+  from std/proc import Proc, Env, sleep;
+
+  let pid := Proc.pid();
+  let home := Env.get("HOME", "");
+
+  let res := Proc.run(
+    "perl",
+    [ "-e", "print qq<ok\\n>;" ]
+  );
+
+  let seen := 0;
+  Proc.onsignal( "USR1", function () {
+    seen++;
+  } );
+  Proc.kill( "USR1", Proc.pid() );
+
+  sleep(0.1);
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Node and
+Electron. It is not supported by zuzu-js in the browser.
+
+=head1 DESCRIPTION
+
+This module provides OS process helpers, environment variable helpers,
+signal send/receive primitives, process-identification helpers, and
+process exit.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<Proc>
+
+Static methods:
+
+=over
+
+=item * C<pid()>
+
+Parameters: none. Returns: C<Number>. Returns the current process id.
+
+=item * C<< exit(code?) >>
+
+Parameters: C<code> is an optional numeric exit status. Returns:
+C<null>. Exits the current process.
+
+=item * C<< run(command, argv?, options?) >>
+
+Parameters: C<command> is an executable, C<argv> is an optional array of
+arguments, and C<options> controls execution. Returns: C<Dict>. Runs one
+process and returns its result.
+
+Options include C<stdin>, C<capture_stdout>, C<capture_stderr>,
+and C<merge_stderr>. Also supports C<env> injection, C<cwd>, and
+C<timeout>.
+
+=item * C<< run_async(command, argv?, options?) >>
+
+Parameters: same as C<run>. Returns: C<Task>. Awaitable version of
+C<run> resolving to the same result dictionary.
+
+=item * C<< pipeline(commands, options?) >>
+
+Parameters: C<commands> is an array of command specs and C<options>
+controls execution. Returns: C<Dict>. Runs commands in sequence, piping
+captured stdout from each step to the next step's stdin.
+
+=item * C<< pipeline_async(commands, options?) >>
+
+Parameters: same as C<pipeline>. Returns: C<Task>. Awaitable version of
+C<pipeline> resolving to the same result dictionary.
+
+=item * C<is_success(result)>
+
+Parameters: C<result> is a process result dictionary. Returns:
+C<Boolean>. Returns true when the command exited successfully.
+
+=item * C<status_text(result)>
+
+Parameters: C<result> is a process result dictionary. Returns:
+C<String>. Formats the process status for display.
+
+=item * C<kill(String signal, Number pid?)>
+
+Parameters: C<signal> is a signal name and C<pid> is an optional process
+id. Returns: C<null>. Sends a signal to a process.
+
+=item * C<onsignal(String signal, Function callback)>
+
+Parameters: C<signal> is a signal name and C<callback> is a handler.
+Returns: C<null>. Registers a process signal callback.
+
+=back
+
+=item C<Env>
+
+Static methods:
+
+=over
+
+=item * C<get(String name, Any default?)>
+
+Parameters: C<name> is an environment variable name and C<default> is an
+optional fallback. Returns: C<String> or value. Returns an environment
+variable value or the fallback.
+
+=item * C<set(String name, String value)>
+
+Parameters: C<name> is an environment variable name and C<value> is its
+new value. Returns: C<null>. Sets an environment variable.
+
+=item * C<remove(String name)>
+
+Parameters: C<name> is an environment variable name. Returns: C<null>.
+Removes an environment variable.
+
+=back
+
+=back
+
+=head2 Functions
+
+=over
+
+=item * C<< sleep(seconds) >>
+
+Parameters: C<seconds> is the delay in seconds. Returns: C<null>.
+Sleeps for the requested time; fractional seconds are allowed.
+
+=item * C<< sleep_async(seconds) >>
+
+Parameters: C<seconds> is the delay in seconds. Returns: C<Task>.
+Returns an awaitable task that completes after the requested delay.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/proc >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.

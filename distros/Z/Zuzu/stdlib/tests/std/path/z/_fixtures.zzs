@@ -1,0 +1,109 @@
+from test/more import *;
+requires_capability( "proc" );
+requires_capability( "fs" );
+
+from std/io import Path;
+from std/proc import Env;
+from std/path/z import ZPath;
+from std/string import chomp, trim, split;
+from std/dump import Dumper;
+
+from std/path/z/evaluate import _do_dump;
+
+let fixture_root := Env.get("FIXTURE_DIR");
+if ( fixture_root ≡ null or fixture_root eq "" ) {
+	skip_all( "FIXTURE_DIR is not set" );
+}
+let zpath_root := fixture_root _ "/zpath";
+let files := [
+	new Path( zpath_root _ "/official.txt" ),
+];
+
+function read_test_data ( ds ) {
+	let loader;
+	
+	if ( ds ~ /\.json$/ ) {
+		from std/data/json import JSON;
+		loader := new JSON();
+	}
+	else if ( ds ~ /\.cbor$/ ) {
+		from std/data/cbor import CBOR;
+		loader := new CBOR();
+	}
+	else if ( ds ~ /\.xml$/ ) {
+		from std/data/xml import XML;
+		loader := XML;
+	}
+	
+	return loader.load(ds) if loader;
+	bail_out( `Unknown data source type: ${ds}` );
+}
+
+for ( let file in files ) {
+	ok( file.exists, `File exists: ${file}` );
+	
+	let data;
+	let data_source;
+	let line_no := 0;
+	file.each_line( function (_line) {
+		line_no++;
+		let line := trim(chomp(_line));
+		
+		if ( line ~ /^\s*$/ ) {
+			// Skip empty lines
+			return;
+		}
+
+		if ( line ~ /^#\s/ ) {
+			// Skip comments
+			return;
+		}
+		
+		let match := ( line ~ /^###\s*FILE:\s*(.+)\s*$/ );
+		if ( match ) {
+			data_source := match[1];
+			data := read_test_data( file.sibling(data_source) );
+			isnt( data, null, `Read data source: ${data_source}` );
+			return;
+		}
+		
+		let parts := split( line, "\t" );
+		let expr1 := trim( parts[0] );
+		let expr2 := trim( parts[-1] );
+		
+		if ( expr2 eq "ERROR" ) {
+			let e := exception( function () {
+				let zp := new ZPath( path: expr1 );
+				let r := zp.query(data);
+			} );
+			isnt( e, null, `${data_source}:${line_no} - ${expr1} (expected ERROR)` );
+		}
+		else if ( expr2 eq "NULL" ) {
+			let e := exception( function () {
+				let zp := new ZPath( path: expr1 );
+				let r := zp.query(data);
+				is( r, [], `${data_source}:${line_no} - ${expr1} (expected NULL)` )
+					or explain(r);
+			} );
+			fail(`${data_source}:${line_no} - ${expr1} (${e})`) if e;
+		}
+		else {
+			let e := exception( function () {
+				let zp1 := new ZPath( path: expr1 );
+				let zp2 := new ZPath( path: expr1 );
+				let zp1r := zp1.query(data);
+				let zp2r := zp2.query(data);
+				if ( zp1r.length and zp2r.length ) {
+					is( zp1r, zp2r, `${data_source}:${line_no} - ${expr1}` )
+						or explain( { zp1r: zp1r, zp2r: zp2r } );
+				}
+				else {
+					fail(`${data_source}:${line_no} - ${expr1} (unexpected NULL)`);
+				}
+			} );
+			fail(`${data_source}:${line_no} - ${expr1} (${e})`) if e;
+		}
+	} );
+}
+
+done_testing();

@@ -1,0 +1,126 @@
+from std/data/toon import TOON;
+from std/data/json import JSON;
+from test/more import *;
+
+let fixture_json := new JSON( pairlists: true );
+let binary_codec := new TOON( pairlists: true );
+ok( binary_codec.encode_binarystring( { name: "Ada" } ) instanceof BinaryString, "encode_binarystring returns BinaryString" );
+is(
+	binary_codec.decode_binarystring( to_binary("name: café\n") ).get("name"),
+	"café",
+	"decode_binarystring decodes UTF-8 TOON bytes",
+);
+
+function _opt ( opts, String key, fallback ) {
+	if ( opts ≡ null ) {
+		return fallback;
+	}
+	if ( typeof opts ≡ "PairList" ) {
+		return opts.has(key) ? opts.get(key) : fallback;
+	}
+	if ( typeof opts ≡ "Dict" ) {
+		return opts.exists(key) ? opts.get(key) : fallback;
+	}
+	return fallback;
+}
+
+function _new_codec ( opts ) {
+	return new TOON(
+		indent: _opt( opts, "indent", 2 ),
+		strict: _opt( opts, "strict", true ),
+		delimiter: _opt( opts, "delimiter", "," ),
+		pairlists: true,
+		expandPaths: _opt( opts, "expandPaths", "off" ),
+		keyFolding: _opt( opts, "keyFolding", "off" ),
+		flattenDepth: _opt( opts, "flattenDepth", 999999 ),
+	);
+}
+
+function _run_fixture_doc ( doc, String label ) {
+	let category := doc.get("category");
+	let tests := doc.get("tests");
+	for ( const t in tests ) {
+
+		subtest( `${label} - ${t.get("name")}`, function () {
+			let opts := t.has("options") ? t.get("options") : null;
+			let codec := _new_codec( opts );
+			let should_error := t.has("shouldError") ? t.get("shouldError") : false;
+			
+			if ( category eq "decode" ) {
+				if ( should_error ) {
+					let e := exception( function () {
+						codec.decode( t.get("input") );
+					} );
+					isnt( e, null, "exception thrown" );
+				}
+				else {
+					let e := exception( function () {
+						let got := codec.decode( t.get("input") );
+						is( got, t.get("expected"), "decoded correctly" );
+					} );
+					is( e, null, "no exception thrown" );
+				}
+			}
+			else {
+				if ( should_error ) {
+					let e := exception( function () {
+						codec.encode( t.get("input") );
+					} );
+					isnt( e, null, "exception thrown" );
+				}
+				else {
+					let e := exception( function () {
+						let got := codec.encode( t.get("input") );
+						is( got, t.get("expected"), "encoded correctly" );
+					} );
+					is( e, null, "no exception thrown" );
+				}
+			}
+		} );
+	}
+}
+
+_run_fixture_doc(
+	fixture_json.decode(
+		"""{
+			"category": "decode",
+			"tests": [
+				{
+					"name": "simple object",
+					"input": "name: Ada\nage: 32\n",
+					"expected": {
+						"name": "Ada",
+						"age": 32
+					}
+				},
+				{
+					"name": "strict malformed input",
+					"input": "tags[2]: a,b,c",
+					"shouldError": true
+				}
+			]
+		}"""
+	),
+	"inline decode",
+);
+
+_run_fixture_doc(
+	fixture_json.decode(
+		"""{
+			"category": "encode",
+			"tests": [
+				{
+					"name": "simple object",
+					"input": {
+						"name": "Ada",
+						"age": 32
+					},
+					"expected": "name: Ada\nage: 32"
+				}
+			]
+		}"""
+	),
+	"inline encode",
+);
+
+done_testing();

@@ -1,0 +1,532 @@
+from test/more import *;
+from std/defer import Guard;
+from std/task import resolved, failed, all, race, sleep, yield, timeout, Channel, CancellationSource;
+
+let cleanup_log := "";
+let yield_log := "";
+
+async function answer () {
+	return await {
+		resolved(42);
+	};
+}
+
+async function doubled ( n ) {
+	await {
+		sleep(0.01);
+	};
+	return n * 2;
+}
+
+async function even ( n ) {
+	await {
+		sleep(0.01);
+	};
+	return n mod 2 = 0;
+}
+
+async function add_after_wait ( left, right ) {
+	await {
+		sleep(0.01);
+	};
+	return left + right;
+}
+
+async function yield_checkpoint () {
+	yield_log := yield_log _ "before";
+	await {
+		yield();
+	};
+	yield_log := yield_log _ ",after";
+	return yield_log;
+}
+
+async function throw_after_wait () {
+	await {
+		sleep(0.01);
+	};
+	throw new Exception( message: "async-boom" );
+}
+
+async function while_control () {
+	let i := 0;
+	let total := 0;
+	while ( i < 5 ) {
+		i := i + 1;
+		await {
+			sleep(0.01);
+		};
+		if ( i = 2 ) {
+			next;
+		}
+		if ( i = 5 ) {
+			last;
+		}
+		total := total + i;
+	}
+	return total;
+}
+
+async function for_control () {
+	let total := 0;
+	for ( let n in [ 1, 2, 3, 4 ] ) {
+		await {
+			sleep(0.01);
+		};
+		if ( n = 2 ) {
+			next;
+		}
+		total := total + n;
+		if ( n = 3 ) {
+			last;
+		}
+	}
+	return total;
+}
+
+async function throwing_mapper ( n ) {
+	await {
+		sleep(0.01);
+	};
+	if ( n = 2 ) {
+		throw new Exception( message: "map-boom" );
+	}
+	return n * 2;
+}
+
+async function throwing_predicate ( n ) {
+	await {
+		sleep(0.01);
+	};
+	if ( n = 3 ) {
+		throw new Exception( message: "grep-boom" );
+	}
+	return n mod 2 = 0;
+}
+
+async function switch_wait ( n ) {
+	let picked := "";
+	switch ( n ) {
+		case 1: {
+			await {
+				sleep(0.01);
+			};
+			picked := "one";
+		}
+		default: {
+			picked := "other";
+		}
+	}
+	return picked;
+}
+
+async function cleanup_worker () {
+	{
+		let guard := new Guard(
+			callback: function () {
+				cleanup_log := cleanup_log _ "clean";
+			},
+		);
+		await {
+			sleep(1);
+		};
+		cleanup_log := cleanup_log _ "late";
+	}
+}
+
+async function main () {
+	let answer_task := answer();
+	is( typeof answer_task, "Task", "async function call returns Task" );
+
+	is(
+		await {
+			answer_task;
+		},
+		42,
+		"async function call can be awaited",
+	);
+
+	let both := await {
+		all( [ resolved("a"), resolved("b") ] );
+	};
+	is( both[0], "a", "all preserves first result" );
+	is( both[1], "b", "all preserves second result" );
+
+	let nested := await {
+		race( [ sleep(0.25), all( [ sleep(0.01), sleep(0.01) ] ) ] );
+	};
+	is( nested.length(), 2, "all can make progress inside race" );
+
+	is(
+		await {
+			race( [ resolved("winner"), sleep(1) ] );
+		},
+		"winner",
+		"race returns first completed task",
+	);
+
+	let race_loser := sleep(1);
+	is(
+		await {
+			race( [ resolved("fast"), race_loser ] );
+		},
+		"fast",
+		"race returns resolved winner",
+	);
+	is( race_loser.status(), "cancelled", "race cancels losing task" );
+
+	let ch := new Channel();
+	let pending := ch.recv();
+	await {
+		ch.send("message");
+	};
+	is(
+		await {
+			pending;
+		},
+		"message",
+		"channel receive can complete after send",
+	);
+
+	let timed_out := false;
+	try {
+		await {
+			timeout( 0.01, ch.recv() );
+		};
+	}
+	catch ( Exception e ) {
+		timed_out := true;
+	}
+	ok( timed_out, "timeout fails pending receive" );
+
+	let t := sleep(1);
+	is( t.status(), "sleeping", "task status reports sleeping" );
+	t.cancel();
+	is( t.status(), "cancelled", "task can be cancelled" );
+	ok( t.is_done(), "cancelled task is done" );
+	ok( t.done(), "done aliases is_done" );
+
+	let cancel_typed := false;
+	try {
+		await {
+			t;
+		};
+	}
+	catch ( CancelledException e ) {
+		cancel_typed := true;
+	}
+	ok( cancel_typed, "cancel throws CancelledException" );
+
+	let closed := new Channel();
+	closed.close();
+	let closed_typed := false;
+	try {
+		await {
+			closed.send("x");
+		};
+	}
+	catch ( ChannelClosedException e ) {
+		closed_typed := true;
+	}
+	ok( closed_typed, "closed channel send throws ChannelClosedException" );
+
+	let timeout_typed := false;
+	let timeout_target := new Channel().recv();
+	try {
+		await {
+			timeout( 0.01, timeout_target );
+		};
+	}
+	catch ( TimeoutException e ) {
+		timeout_typed := true;
+	}
+	ok( timeout_typed, "timeout throws TimeoutException" );
+	is( timeout_target.status(), "cancelled", "timeout cancels wrapped task" );
+
+	let scheduled_all := all( [
+		answer(),
+		doubled(21),
+	] );
+	await {
+		sleep(0.05);
+	};
+	ok(
+		scheduled_all.done(),
+		"scheduled all observes async functions before direct await",
+	);
+	let scheduled_all_values := await {
+		scheduled_all;
+	};
+	is(
+		scheduled_all_values[0],
+		42,
+		"scheduled all preserves first async result",
+	);
+	is(
+		scheduled_all_values[1],
+		42,
+		"scheduled all preserves second async result",
+	);
+
+	let all_rejection_loser := sleep(1);
+	let all_rejection := all( [ failed("all-boom"), all_rejection_loser ] );
+	let all_rejected := false;
+	try {
+		await {
+			all_rejection;
+		};
+	}
+	catch ( Exception e ) {
+		all_rejected := e.to_String() eq "Exception: all-boom";
+	}
+	ok( all_rejected, "all propagates child rejection" );
+	is(
+		all_rejection_loser.status(),
+		"cancelled",
+		"all cancels unfinished tasks after rejection",
+	);
+
+	let scheduled_race_loser := sleep(1);
+	let scheduled_race := race( [ sleep(0.01), scheduled_race_loser ] );
+	await {
+		sleep(0.05);
+	};
+	is(
+		scheduled_race_loser.status(),
+		"cancelled",
+		"scheduled race cancels loser before direct await",
+	);
+	ok(
+		scheduled_race.done(),
+		"scheduled race finishes before direct await",
+	);
+	is(
+		await {
+			scheduled_race;
+		},
+		null,
+		"scheduled race result can be awaited",
+	);
+
+	let thrown := false;
+	try {
+		await {
+			throw_after_wait();
+		};
+	}
+	catch ( Exception e ) {
+		thrown := e.to_String() eq "Exception: async-boom";
+	}
+	ok( thrown, "async function exception propagates through await" );
+
+	is(
+		await {
+			yield_checkpoint();
+		},
+		"before,after",
+		"yield can be awaited and resumes the task",
+	);
+
+	is(
+		await {
+			while_control();
+		},
+		8,
+		"next and last work across await in while loops",
+	);
+
+	is(
+		await {
+			for_control();
+		},
+		4,
+		"next and last work across await in for loops",
+	);
+
+	is(
+		await {
+			switch_wait(1);
+		},
+		"one",
+		"await works inside switch case bodies",
+	);
+
+	let mapped := [ 1, 2, 3 ].map(doubled);
+	is( mapped[0], 2, "async collection mapper first item" );
+	is( mapped[1], 4, "async collection mapper second item" );
+	is( mapped[2], 6, "async collection mapper third item" );
+
+	let filtered := [ 1, 2, 3, 4 ].grep(even);
+	is( filtered[0], 2, "async collection predicate first item" );
+	is( filtered[1], 4, "async collection predicate second item" );
+
+	let inline_mapped := [ 1, 2, 3 ].map(
+		async fn n -> await {
+			resolved(n + 10);
+		},
+	);
+	is( inline_mapped[0], 11, "inline async mapper first item" );
+	is( inline_mapped[2], 13, "inline async mapper last item" );
+
+	let inline_filtered := [ 1, 2, 3, 4 ].grep(
+		async fn n -> await {
+			resolved(n > 2);
+		},
+	);
+	is( inline_filtered[0], 3, "inline async grep predicate first item" );
+	is( inline_filtered[1], 4, "inline async grep predicate second item" );
+
+	let map_thrown := false;
+	try {
+		[ 1, 2, 3 ].map(throwing_mapper);
+	}
+	catch ( Exception e ) {
+		map_thrown := e.to_String() eq "Exception: map-boom";
+	}
+	ok( map_thrown, "async map callback exception propagates" );
+
+	let grep_thrown := false;
+	try {
+		[ 1, 2, 3, 4 ].grep(throwing_predicate);
+	}
+	catch ( Exception e ) {
+		grep_thrown := e.to_String() eq "Exception: grep-boom";
+	}
+	ok( grep_thrown, "async grep callback exception propagates" );
+
+	is(
+		[ 1, 2, 3 ].reduce(add_after_wait),
+		6,
+		"async collection reducer",
+	);
+
+	let nested_error := false;
+	try {
+		await {
+			all( [
+				sleep(0.10),
+				race( [ sleep(0.10), failed("nested-boom") ] ),
+			] );
+		};
+	}
+	catch ( Exception e ) {
+		nested_error := e.to_String() eq "Exception: nested-boom";
+	}
+	ok( nested_error, "nested all/race propagates rejection" );
+
+	let reason_task := sleep(1);
+	reason_task.cancel("custom reason");
+	let custom_reason := false;
+	try {
+		await {
+			reason_task;
+		};
+	}
+	catch ( CancelledException e ) {
+		custom_reason := e.to_String() eq "CancelledException: custom reason";
+	}
+	ok( custom_reason, "task.cancel(reason) wraps plain reasons" );
+
+	let closed_recv := new Channel();
+	closed_recv.close();
+	is(
+		await {
+			closed_recv.recv();
+		},
+		null,
+		"closed drained channel recv resolves null",
+	);
+
+	let source := new CancellationSource();
+	let token := source.token();
+	let watched := sleep(1);
+	token.watch(watched);
+	source.cancel("token reason");
+	ok( token.cancelled(), "cancellation token records cancellation" );
+	let token_reason := false;
+	try {
+		token.throw_if_cancelled();
+	}
+	catch ( CancelledException e ) {
+		token_reason := e.to_String() eq "CancelledException: token reason";
+	}
+	ok( token_reason, "cancellation token throws stored reason" );
+	let watched_reason := false;
+	try {
+		await {
+			watched;
+		};
+	}
+	catch ( CancelledException e ) {
+		watched_reason := e.to_String() eq "CancelledException: token reason";
+	}
+	ok( watched_reason, "cancellation token cancels watched tasks" );
+
+	let cleanup_task := spawn {
+		await {
+			cleanup_worker();
+		};
+	};
+	await {
+		sleep(0.02);
+	};
+	cleanup_task.cancel("stop");
+	try {
+		await {
+			cleanup_task;
+		};
+	}
+	catch ( CancelledException e ) {
+		ok(
+			e.to_String() eq "CancelledException: stop",
+			"cancelled cleanup task throws reason",
+		);
+	}
+	await {
+		sleep(0.02);
+	};
+	is( cleanup_log, "clean", "cancellation runs cleanup without later code" );
+
+	let marker := "before";
+	spawn {
+		throw new Exception( message: "background failure" );
+	};
+	let failing_spawn := spawn {
+		throw new Exception( message: "observed background failure" );
+	};
+	spawn {
+		await {
+			sleep(0.02);
+		};
+		marker := "after";
+	};
+	is( marker, "before", "spawned work does not block parent" );
+	let observed_spawn_failure := false;
+	try {
+		await {
+			failing_spawn;
+		};
+	}
+	catch ( Exception e ) {
+		observed_spawn_failure :=
+			e.to_String() eq "Exception: observed background failure";
+	}
+	ok(
+		observed_spawn_failure,
+		"spawned task failure is observed when awaited",
+	);
+	await {
+		sleep(0.05);
+	};
+	is(
+		marker,
+		"after",
+		"unawaited spawn runs independently until observed or shutdown",
+	);
+}
+
+await {
+	main();
+};
+
+done_testing();

@@ -1,0 +1,194 @@
+from std/secure import Cipher, Secure;
+from std/string/base64 import decode;
+from test/more import *;
+
+let caps := Secure.capabilities();
+let plaintext := to_binary( "classified payload" );
+let aad := to_binary("context");
+let has_chacha := Secure.has( "cipher", "chacha20-poly1305" );
+
+if ( caps{host} == "browser" ) {
+	is(
+		has_chacha,
+		false,
+		"browser does not advertise chacha20-poly1305",
+	);
+	like(
+		exception( function () {
+			Cipher.generate_key( "chacha20-poly1305" );
+		} ),
+		/not available|unsupported/,
+		"browser rejects chacha20-poly1305 key generation",
+	);
+	done_testing();
+}
+else if ( not has_chacha ) {
+	is(
+		has_chacha,
+		false,
+		"host does not advertise unavailable chacha20-poly1305",
+	);
+	like(
+		exception( function () {
+			Secure.require( "cipher", "chacha20-poly1305" );
+		} ),
+		/cipher\/chacha20-poly1305/,
+		"require rejects unavailable chacha20-poly1305",
+	);
+	like(
+		exception( function () {
+			Cipher.generate_key( "chacha20-poly1305" );
+		} ),
+		/not available|unsupported/,
+		"host rejects chacha20-poly1305 key generation",
+	);
+	done_testing();
+}
+else {
+	is(
+		has_chacha,
+		true,
+		"chacha20-poly1305 capability is available",
+	);
+	is(
+		Secure.require( "cipher", "chacha20-poly1305" ),
+		true,
+		"require accepts chacha20-poly1305",
+	);
+
+	let key := Cipher.generate_key( "chacha20-poly1305" );
+	let envelope := Cipher.encrypt(
+		plaintext,
+		key,
+		{ algorithm: "chacha20-poly1305", aad: aad },
+	);
+
+	is( typeof key, "BinaryString", "generate_key returns BinaryString" );
+	is( length key, 32, "generate_key returns a 32-byte key" );
+	is( typeof envelope, "Dict", "encrypt returns an envelope Dict" );
+	is( envelope{version}, 1, "envelope version is stable" );
+	is(
+		envelope{algorithm},
+		"chacha20-poly1305",
+		"envelope algorithm is stable",
+	);
+	is( typeof envelope{nonce}, "BinaryString", "envelope nonce is binary" );
+	is( length envelope{nonce}, 12, "envelope nonce is 12 bytes" );
+	is(
+		typeof envelope{ciphertext},
+		"BinaryString",
+		"envelope ciphertext is binary",
+	);
+	is( typeof envelope{tag}, "BinaryString", "envelope tag is binary" );
+	is( length envelope{tag}, 16, "envelope tag is 16 bytes" );
+	isnt(
+		envelope{ciphertext},
+		plaintext,
+		"ciphertext differs from non-empty plaintext",
+	);
+	is(
+		Cipher.decrypt( envelope, key, { aad: aad } ),
+		plaintext,
+		"decrypt round-trips plaintext",
+	);
+	is(
+		Cipher.decrypt(
+			envelope,
+			key,
+			{ algorithm: "chacha20-poly1305", aad: aad },
+		),
+		plaintext,
+		"decrypt accepts matching options.algorithm",
+	);
+
+	let async_envelope := await {
+		Cipher.encrypt_async(
+			plaintext,
+			key,
+			{ algorithm: "chacha20-poly1305", aad: aad },
+		);
+	};
+	let async_plaintext := await {
+		Cipher.decrypt_async( async_envelope, key, { aad: aad } );
+	};
+	is( async_plaintext, plaintext, "async encrypt/decrypt round-trips" );
+
+	like(
+		exception( function () {
+			Cipher.decrypt( envelope, key, { aad: to_binary("wrong") } );
+		} ),
+		/authentication failed/,
+		"decrypt rejects wrong AAD",
+	);
+
+	like(
+		exception( function () {
+			Cipher.decrypt(
+				envelope,
+				Cipher.generate_key( "chacha20-poly1305" ),
+				{ aad: aad },
+			);
+		} ),
+		/authentication failed/,
+		"decrypt rejects wrong key",
+	);
+
+	let tampered := {
+		version: envelope{version},
+		algorithm: envelope{algorithm},
+		nonce: envelope{nonce},
+		ciphertext: envelope{ciphertext},
+		tag: decode( "AAAAAAAAAAAAAAAAAAAAAA==" ),
+	};
+	like(
+		exception( function () {
+			Cipher.decrypt( tampered, key, { aad: aad } );
+		} ),
+		/authentication failed/,
+		"decrypt rejects tampered tag",
+	);
+
+	like(
+		exception( function () {
+			Cipher.decrypt(
+				envelope,
+				key,
+				{ algorithm: "aes-256-gcm", aad: aad },
+			);
+		} ),
+		/options.algorithm|algorithm/,
+		"decrypt rejects mismatched options.algorithm",
+	);
+
+	let vector_key := decode(
+		"gIGCg4SFhoeIiYqLjI2Oj5CRkpOUlZaXmJmam5ydnp8=",
+	);
+	let vector_aad := decode( "UFFSU8DBwsPExcbH" );
+	let vector_plaintext := decode(
+		"TGFkaWVzIGFuZCBHZW50bGVtZW4gb2YgdGhlIGNsYXNzIG9mICc5OTogSWYgSSBjb3Vs"
+			_ "ZCBvZmZlciB5b3Ugb25seSBvbmUgdGlwIGZvciB0aGUgZnV0dXJlLCBzdW5zY3JlZW4g"
+			_ "d291bGQgYmUgaXQu",
+	);
+	let vector_envelope := {
+		version: 1,
+		algorithm: "chacha20-poly1305",
+		nonce: decode( "BwAAAEBBQkNERUZH" ),
+		ciphertext: decode(
+			"0xqNNGSOYNt7hq+8U+9+wqSt7VEpbgj+qeK1pzbuYtY9vqRejKlnEoL6+2naknKLGnHe"
+				_ "Cp4GCykF1qW2fs07NpLdvX8td4uMmAOu4ygJG1j6syTk+tZ1lFWFgItIMde8P/Te8I5"
+				_ "Lep3ldtJlhs7GS2EW",
+		),
+		tag: decode( "GuELWU8J4mp+kC7L0GAGkQ==" ),
+	};
+	is(
+		Cipher.decrypt(
+			vector_envelope,
+			vector_key,
+			{ algorithm: "chacha20-poly1305", aad: vector_aad },
+		),
+		vector_plaintext,
+		"RFC 7539 test vector decrypts",
+	);
+
+	done_testing();
+}

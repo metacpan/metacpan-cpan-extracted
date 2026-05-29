@@ -1,0 +1,223 @@
+=encoding utf8
+
+=head1 NAME
+
+std/uuid - Pure ZuzuScript UUID v1 generator.
+
+=head1 SYNOPSIS
+
+  from std/uuid import create_uuid, create_uuid_binary;
+
+  let text := create_uuid();
+  let raw := create_uuid_binary();
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module implements UUID version 1 generation using only
+ZuzuScript code.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item * C<create_uuid_binary()>
+
+Parameters: none. Returns: C<BinaryString>. Returns a single UUID as 16
+raw bytes.
+
+=item * C<create_uuid()>
+
+Parameters: none. Returns: C<String>. Returns a single UUID as
+lowercase hexadecimal text with hyphens in the usual C<8-4-4-4-12>
+layout.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/uuid >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/math import Math;
+from std/string import substr;
+from std/string/base64 import decode;
+from std/time import Time;
+
+let _B64_ALPHABET := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+let _HEX_ALPHABET := "0123456789abcdef";
+
+function _div_floor ( Number n, Number d ) {
+	return floor( n / d );
+}
+
+function _mod ( Number n, Number d ) {
+	return n - _div_floor( n, d ) * d;
+}
+
+function _rand_int ( Number max ) {
+	return floor( Math.rand(max) );
+}
+
+function _bytes_to_binary ( Array bytes ) {
+	let out := "";
+	let i := 0;
+	let n := bytes.length();
+
+	while ( i < n ) {
+		let b0 := bytes[i];
+		let b1 := null;
+		let b2 := null;
+		if ( i + 1 < n ) {
+			b1 := bytes[i + 1];
+		}
+		if ( i + 2 < n ) {
+			b2 := bytes[i + 2];
+		}
+
+		let c0 := _div_floor( b0, 4 );
+		let c1 := _mod( b0, 4 ) * 16;
+		let c2 := 64;
+		let c3 := 64;
+
+		if ( b1 ≢ null ) {
+			c1 += _div_floor( b1, 16 );
+			c2 := _mod( b1, 16 ) * 4;
+			if ( b2 ≢ null ) {
+				c2 += _div_floor( b2, 64 );
+				c3 := _mod( b2, 64 );
+			}
+		}
+
+		out _= substr( _B64_ALPHABET, c0, 1 );
+		out _= substr( _B64_ALPHABET, c1, 1 );
+		if ( c2 ≡ 64 ) {
+			out _= "=";
+		}
+		else {
+			out _= substr( _B64_ALPHABET, c2, 1 );
+		}
+		if ( c3 ≡ 64 ) {
+			out _= "=";
+		}
+		else {
+			out _= substr( _B64_ALPHABET, c3, 1 );
+		}
+
+		i += 3;
+	}
+
+	return decode(out);
+}
+
+function _timestamp_words () {
+	// Seconds between 1582-10-15 and 1970-01-01.
+	let epoch_offset := 12219292800;
+	let seconds := new Time().epoch() + epoch_offset;
+	let ticks := _rand_int(10000000);
+
+	let words := [
+		_mod( seconds, 65536 ),
+		_mod( _div_floor( seconds, 65536 ), 65536 ),
+		_mod( _div_floor( seconds, 4294967296 ), 65536 ),
+		0,
+		0,
+	];
+
+	let scale := 10000000;
+	let i := 0;
+	let carry := 0;
+	while ( i < words.length() ) {
+		let product := words[i] * scale + carry;
+		words[i] := _mod( product, 65536 );
+		carry := _div_floor( product, 65536 );
+		i++;
+	}
+
+	let add_i := 0;
+	let add_carry := ticks;
+	while ( add_carry > 0 and add_i < words.length() ) {
+		let sum := words[add_i] + _mod( add_carry, 65536 );
+		words[add_i] := _mod( sum, 65536 );
+		add_carry := _div_floor( add_carry, 65536 ) + _div_floor( sum, 65536 );
+		add_i++;
+	}
+
+	return words;
+}
+
+function _create_uuid_bytes () {
+	let words := _timestamp_words();
+	let time_low := words[0] + words[1] * 65536;
+	let time_mid := words[2];
+	let time_hi_and_version := _mod( words[3], 4096 ) + 4096;
+
+	let clock_seq := _rand_int(16384);
+	let clock_seq_hi_and_reserved := _mod( _div_floor( clock_seq, 256 ), 64 ) + 128;
+	let clock_seq_low := _mod( clock_seq, 256 );
+
+	let node := [];
+	let j := 0;
+	while ( j < 6 ) {
+		node.push( _rand_int(256) );
+		j++;
+	}
+	// Multicast bit set means this is not an IEEE MAC address.
+	node[0] := node[0] | 1;
+
+	return [
+		_mod( _div_floor( time_low, 16777216 ), 256 ),
+		_mod( _div_floor( time_low, 65536 ), 256 ),
+		_mod( _div_floor( time_low, 256 ), 256 ),
+		_mod( time_low, 256 ),
+		_mod( _div_floor( time_mid, 256 ), 256 ),
+		_mod( time_mid, 256 ),
+		_mod( _div_floor( time_hi_and_version, 256 ), 256 ),
+		_mod( time_hi_and_version, 256 ),
+		clock_seq_hi_and_reserved,
+		clock_seq_low,
+		node[0],
+		node[1],
+		node[2],
+		node[3],
+		node[4],
+		node[5],
+	];
+}
+
+function _byte_to_hex ( Number b ) {
+	let hi := _div_floor( b, 16 );
+	let lo := _mod( b, 16 );
+	return substr( _HEX_ALPHABET, hi, 1 ) _ substr( _HEX_ALPHABET, lo, 1 );
+}
+
+function _bytes_to_uuid_text ( Array bytes ) {
+	let out := "";
+	let i := 0;
+	while ( i < 16 ) {
+		out _= _byte_to_hex( bytes[i] );
+		if ( i ≡ 3 or i ≡ 5 or i ≡ 7 or i ≡ 9 ) {
+			out _= "-";
+		}
+		i++;
+	}
+	return out;
+}
+
+function create_uuid_binary () {
+	return _bytes_to_binary( _create_uuid_bytes() );
+}
+
+function create_uuid () {
+	return _bytes_to_uuid_text( _create_uuid_bytes() );
+}

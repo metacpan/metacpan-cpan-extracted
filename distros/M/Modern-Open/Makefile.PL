@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{Modern::Open},
-    'VERSION'   => q{0.15},
+    'VERSION'   => q{0.16},
     'ABSTRACT'  => q{Autovivification, Autodie, and 3-args open support},
     'PREREQ_PM' => {
         'Fcntl' => '1.03',
@@ -44,7 +44,7 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'Modern::Open' => {
                 'file'    => 'lib/Modern/Open.pm',
-                'version' => '0.15',
+                'version' => '0.16',
             }
         },
     };

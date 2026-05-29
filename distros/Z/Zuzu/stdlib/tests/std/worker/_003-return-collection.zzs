@@ -1,0 +1,32 @@
+from test/more import *;
+from test/worker_contract import require_worker_phase;
+
+let Worker := require_worker_phase(1);
+
+async function main () {
+	let result := await {
+		Worker.spawn(
+			function () {
+				return {
+					array: [ 1, 2, 3 ],
+					dict: { name: "Ada", score: 42 },
+					set: << "red", "blue", "red" >>,
+					bag: <<< 1, 1, 2 >>>,
+				};
+			},
+			[],
+		);
+	};
+
+	is( result{array}, [ 1, 2, 3 ], "worker returns array" );
+	is( result{dict}{name}, "Ada", "worker returns dict string field" );
+	is( result{dict}{score}, 42, "worker returns dict number field" );
+	is( result{set}.length(), 2, "worker returns deduplicated set" );
+	is( result{bag}.count(1), 2, "worker returns bag counts" );
+}
+
+await {
+	main();
+};
+
+done_testing();

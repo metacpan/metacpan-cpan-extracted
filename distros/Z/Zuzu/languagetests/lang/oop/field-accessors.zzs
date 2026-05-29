@@ -1,0 +1,24 @@
+from test/more import *;
+
+class Person {
+	let String name with get, set, clear, has := "Anon";
+}
+
+let person := new Person();
+is( person.get_name(), "Anon", "get accessor returns default value" );
+ok( person.has_name(), "has accessor reports non-null value" );
+
+person.set_name("Zia");
+is( person.get_name(), "Zia", "set accessor stores provided value" );
+
+person.clear_name();
+ok( not person.has_name(), "clear accessor marks slot as empty" );
+
+person.clear_name().set_name("Nova");
+is( person.get_name(), "Nova", "slot can be set again after clear" );
+
+like( exception( function() {
+	person.set_name(123);
+} ), /TypeException/, "typed set accessor preserves field type checks" );
+
+done_testing();

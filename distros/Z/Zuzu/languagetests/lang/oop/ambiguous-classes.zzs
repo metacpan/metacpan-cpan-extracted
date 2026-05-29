@@ -1,0 +1,31 @@
+from test/more import *;
+
+let o1;
+let c1 := do {
+	class Foo {
+		method get_id () {
+			return 1;
+		}
+	}
+	o1 := new Foo();
+	Foo;
+};
+
+class Foo {
+	method get_id () {
+		return 2;
+	}
+}
+
+let o2 := new Foo();
+
+is( typeof o1, "Foo" );
+is( typeof o2, "Foo" );
+ok( o1 instanceof c1 );
+ok( not( o1 instanceof Foo ) );
+ok( not( o2 instanceof c1 ) );
+ok( o2 instanceof Foo );
+is( o1.get_id, 1 );
+is( o2.get_id, 2 );
+
+done_testing();

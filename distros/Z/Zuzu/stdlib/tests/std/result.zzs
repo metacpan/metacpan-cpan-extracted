@@ -1,0 +1,71 @@
+from std/result import Result;
+from std/marshal import dump, load;
+from test/more import *;
+
+class LoggedResult extends Result {
+	let String context := "unset";
+
+	method describe () {
+		return context _ ":" _ ( self.is_ok() ? "ok" : "err" );
+	}
+}
+
+let ok_result := Result.ok(42);
+ok( ok_result instanceof Result, "Result.ok returns a Result" );
+is( ok_result.is_ok(), true, "ok result reports is_ok" );
+is( ok_result.is_err(), false, "ok result reports not is_err" );
+is( ok_result.value(), 42, "ok result stores value" );
+is( ok_result.error(), null, "ok result has null error" );
+is( ok_result.unwrap(), 42, "ok result unwrap returns value" );
+like(
+	exception( function () { ok_result.unwrap_err(); } ).to_String(),
+	/unwrap_err/,
+	"ok result unwrap_err throws",
+);
+
+let err_result := Result.err("boom");
+ok( err_result instanceof Result, "Result.err returns a Result" );
+is( err_result.is_ok(), false, "err result reports not is_ok" );
+is( err_result.is_err(), true, "err result reports is_err" );
+is( err_result.value(), null, "err result has null value" );
+is( err_result.error(), "boom", "err result stores error" );
+is( err_result.unwrap_err(), "boom", "err result unwrap_err returns error" );
+like(
+	exception( function () { err_result.unwrap(); } ).to_String(),
+	/unwrap/,
+	"err result unwrap throws",
+);
+
+let subclass_ok := LoggedResult.ok("done");
+subclass_ok{context} := "worker";
+ok( subclass_ok instanceof LoggedResult, "Result.ok is late-bound" );
+ok( subclass_ok instanceof Result, "Result subclass remains a Result" );
+is( subclass_ok.describe(), "worker:ok", "subclass method works" );
+
+let subclass_err := LoggedResult.err("bad");
+subclass_err{context} := "marshal";
+ok( subclass_err instanceof LoggedResult, "Result.err is late-bound" );
+is( subclass_err.describe(), "marshal:err", "err subclass method works" );
+
+let loaded_ok := load( dump(ok_result) );
+is( typeof loaded_ok, "Result", "Result survives marshal round trip" );
+is( loaded_ok.unwrap(), 42, "marshalled Result keeps value" );
+
+let loaded_subclass := load( dump(subclass_err) );
+is(
+	typeof loaded_subclass,
+	"LoggedResult",
+	"Result subclass survives marshal round trip",
+);
+is(
+	loaded_subclass.unwrap_err(),
+	"bad",
+	"marshalled Result subclass keeps error",
+);
+is(
+	loaded_subclass.describe(),
+	"marshal:err",
+	"marshalled Result subclass keeps subclass state",
+);
+
+done_testing();

@@ -1,0 +1,35 @@
+from test/more import *;
+
+requires_capability( "proc" );
+
+from std/db import DB;
+from std/io import Path;
+from std/proc import Proc;
+
+let run := Proc.pipeline(
+	[
+		[ "perl", "-e", "print qq<alpha\\nbeta\\n>" ],
+		[ "perl", "-pe", "s/[a-z]+/$&/" ],
+	],
+);
+
+let tmp := Path.tempfile();
+tmp.spew_utf8( run{stdout} );
+
+let dbh := DB.temp();
+dbh.prepare( "create table lines (line text)" ).execute();
+let ins := dbh.prepare( "insert into lines (line) values (?)" );
+
+tmp.each_line( function ( line ) {
+	ins.execute(line);
+} );
+
+let q := dbh.prepare( "select line from lines order by rowid" );
+q.execute();
+let rows := q.all_array();
+
+is( rows.length(), 2, "pipeline stdout streamed line-by-line into db" );
+is( rows[0][0], "alpha\n", "first streamed line inserted" );
+is( rows[1][0], "beta\n", "second streamed line inserted" );
+
+done_testing();

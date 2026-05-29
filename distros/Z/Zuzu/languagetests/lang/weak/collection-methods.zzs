@@ -1,0 +1,197 @@
+from test/more import *;
+
+class Owner {
+	let label with get;
+}
+
+function make_owner ( String label ) {
+	return new Owner( label: label );
+}
+
+function weak_array_after_scope () {
+	let arr := [];
+	{
+		let scoped := make_owner("weak-array");
+		arr.push_weak(scoped);
+		is(
+			arr[0].get_label(),
+			"weak-array",
+			"Array.push_weak reads live scoped referent",
+		);
+	}
+	return arr;
+}
+
+function strong_array_after_scope () {
+	let arr := [];
+	{
+		let scoped := make_owner("strong-array");
+		arr.push(scoped);
+	}
+	return arr;
+}
+
+function weak_dict_after_scope () {
+	let dict := {};
+	{
+		let scoped := make_owner("weak-dict");
+		dict.set_weak( "owner", scoped );
+		is(
+			dict{"owner"}.get_label(),
+			"weak-dict",
+			"Dict.set_weak reads live scoped referent",
+		);
+	}
+	return dict;
+}
+
+function strong_dict_after_scope () {
+	let dict := {};
+	{
+		let scoped := make_owner("strong-dict");
+		dict.set( "owner", scoped );
+	}
+	return dict;
+}
+
+function weak_pairlist_after_scope () {
+	let pairs := {{ }};
+	{
+		let scoped := make_owner("weak-pairlist");
+		pairs.set_weak( "owner", scoped );
+		is(
+			pairs{"owner"}.get_label(),
+			"weak-pairlist",
+			"PairList.set_weak reads live scoped referent",
+		);
+	}
+	return pairs;
+}
+
+function strong_pairlist_after_scope () {
+	let pairs := {{ }};
+	{
+		let scoped := make_owner("strong-pairlist");
+		pairs.set( "owner", scoped );
+	}
+	return pairs;
+}
+
+function weak_set_after_scope () {
+	let set := << >>;
+	{
+		let scoped := make_owner("weak-set");
+		set.add_weak(scoped);
+		ok( set.contains(scoped), "Set.add_weak contains live scoped referent" );
+	}
+	return set;
+}
+
+function strong_set_after_scope () {
+	let set := << >>;
+	{
+		let scoped := make_owner("strong-set");
+		set.add(scoped);
+	}
+	return set;
+}
+
+function weak_bag_after_scope () {
+	let bag := <<< >>>;
+	{
+		let scoped := make_owner("weak-bag");
+		bag.add_weak(scoped);
+		ok( bag.contains(scoped), "Bag.add_weak contains live scoped referent" );
+	}
+	return bag;
+}
+
+function strong_bag_after_scope () {
+	let bag := <<< >>>;
+	{
+		let scoped := make_owner("strong-bag");
+		bag.add(scoped);
+	}
+	return bag;
+}
+
+let owner := make_owner("owned");
+
+let arr := [];
+arr.push_weak(owner);
+is( arr[0].get_label(), "owned", "Array.push_weak stores a live weak value" );
+arr.set_weak( 1, true );
+is( arr[1], true, "Array.set_weak stores scalar values normally" );
+arr.unshift_weak(owner);
+is( arr[0].get_label(), "owned", "Array.unshift_weak stores a live weak value" );
+
+let dict := {};
+dict.set_weak( "owner", owner );
+is( dict{"owner"}.get_label(), "owned", "Dict.set_weak stores a live weak value" );
+dict.add_weak( "flag", true );
+is( dict{"flag"}, true, "Dict.add_weak stores scalar values normally" );
+
+let set := << >>;
+set.add_weak(owner);
+ok( set.contains(owner), "Set.add_weak stores resolved live values for membership" );
+
+let bag := <<< >>>;
+bag.add_weak(owner);
+ok( bag.contains(owner), "Bag.add_weak stores resolved live values for membership" );
+
+let pairs := {{ }};
+pairs.add_weak( "owner", owner );
+is( pairs{"owner"}.get_label(), "owned", "PairList.add_weak stores a live weak value" );
+pairs.set_weak( "flag", true );
+is( pairs{"flag"}, true, "PairList.set_weak stores scalar values normally" );
+
+let weak_arr := weak_array_after_scope();
+is( weak_arr[0], null, "Array weak entry reads null after referent dies" );
+let strong_arr := strong_array_after_scope();
+is(
+	strong_arr[0].get_label(),
+	"strong-array",
+	"Array.push stores a strong value after scope",
+);
+
+let weak_dict := weak_dict_after_scope();
+is( weak_dict{"owner"}, null, "Dict weak value reads null after referent dies" );
+let strong_dict := strong_dict_after_scope();
+is(
+	strong_dict{"owner"}.get_label(),
+	"strong-dict",
+	"Dict.set stores a strong value after scope",
+);
+
+let weak_pairs := weak_pairlist_after_scope();
+is(
+	weak_pairs{"owner"},
+	null,
+	"PairList weak value reads null after referent dies",
+);
+let strong_pairs := strong_pairlist_after_scope();
+is(
+	strong_pairs{"owner"}.get_label(),
+	"strong-pairlist",
+	"PairList.set stores a strong value after scope",
+);
+
+let weak_set := weak_set_after_scope();
+is( weak_set.to_Array()[0], null, "Set weak member reads null after referent dies" );
+let strong_set := strong_set_after_scope();
+is(
+	strong_set.to_Array()[0].get_label(),
+	"strong-set",
+	"Set.add stores a strong value after scope",
+);
+
+let weak_bag := weak_bag_after_scope();
+is( weak_bag.to_Array()[0], null, "Bag weak item reads null after referent dies" );
+let strong_bag := strong_bag_after_scope();
+is(
+	strong_bag.to_Array()[0].get_label(),
+	"strong-bag",
+	"Bag.add stores a strong value after scope",
+);
+
+done_testing();

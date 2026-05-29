@@ -1,0 +1,156 @@
+=encoding utf8
+
+=head1 NAME
+
+std/data/xml/escape - XML entity escaping helpers.
+
+=head1 SYNOPSIS
+
+  from std/data/xml/escape import
+    escape_xml, unescape_xml;
+
+  let escaped := escape_xml(
+    "<tea attr=\"hot\">& 'biscuits'</tea>"
+  );
+  let text := unescape_xml(
+    "&lt;tea&gt;&#x41;&#65;&lt;/tea&gt;"
+  );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module provides lightweight XML entity
+escaping and unescaping helpers.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item C<< escape_xml(value) >>
+
+Parameters: C<value> is any value. Returns: C<String>. Escapes XML
+special characters C<&>, C<< < >>, C<< > >>, C<">, and C<'>.
+
+=item C<< unescape_xml(value) >>
+
+Parameters: C<value> is any value. Returns: C<String>. Unescapes XML
+named entities C<&lt;>, C<&gt;>, C<&quot;>, C<&apos;>, and C<&amp;>.
+
+Also decodes numeric entities in decimal and hexadecimal
+forms, such as C<&#65;> and C<&#x41;>.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/data/xml/escape >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/string import substr, replace, sprint, index;
+
+function escape_xml ( value ) {
+	let out := value ≡ null ? "" : "" _ value;
+	out := replace( out, "&", "&amp;", "g" );
+	out := replace( out, "<", "&lt;", "g" );
+	out := replace( out, ">", "&gt;", "g" );
+	out := replace( out, "\"", "&quot;", "g" );
+	out := replace( out, "'", "&apos;", "g" );
+	return out;
+}
+
+function _hex_to_number ( String digits ) {
+	let out := 0;
+	let i := 0;
+	let n := length digits;
+
+	while ( i < n ) {
+		let ch := substr( digits, i, 1 );
+		let val := 0;
+
+		if ( ch ~ /[0-9]/ ) {
+			val := 0 + ch;
+		}
+		else {
+			let lower := lc(ch);
+			val := 10 + index( "abcdef", lower );
+		}
+
+		out := out * 16 + val;
+		i++;
+	}
+
+	return out;
+}
+
+function _decode_numeric_xml_entities ( text ) {
+	let out := "";
+	let i := 0;
+	let n := length text;
+
+	while ( i < n ) {
+		let ch := substr( text, i, 1 );
+		if ( ch ≡ "&" and i + 2 < n and substr( text, i, 2 ) ≡ "&#" ) {
+			let j := i + 2;
+			let hex := false;
+
+			if ( j < n ) {
+				let mark := substr( text, j, 1 );
+				if ( mark ≡ "x" or mark ≡ "X" ) {
+					hex := true;
+					j++;
+				}
+			}
+
+			let digits := "";
+			while ( j < n ) {
+				let d := substr( text, j, 1 );
+				last if d ≡ ";";
+
+				if ( hex ) {
+					last unless d ~ /[0-9A-Fa-f]/;
+				}
+				else {
+					last unless d ~ /[0-9]/;
+				}
+
+				digits _= d;
+				j++;
+			}
+
+			if ( digits ≢ "" and j < n and substr( text, j, 1 ) ≡ ";" ) {
+				let code := hex
+					? _hex_to_number( digits )
+					: 0 + digits;
+				out _= sprint( "%c", code );
+				i := j + 1;
+				next;
+			}
+		}
+
+		out _= ch;
+		i++;
+	}
+
+	return out;
+}
+
+function unescape_xml ( value ) {
+	let out := value ≡ null ? "" : "" _ value;
+	out := _decode_numeric_xml_entities( out );
+	out := replace( out, "&lt;", "<", "g" );
+	out := replace( out, "&gt;", ">", "g" );
+	out := replace( out, "&quot;", "\"", "g" );
+	out := replace( out, "&apos;", "'", "g" );
+	out := replace( out, "&amp;", "&", "g" );
+	return out;
+}

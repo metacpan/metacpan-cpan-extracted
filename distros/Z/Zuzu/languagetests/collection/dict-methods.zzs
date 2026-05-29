@@ -1,0 +1,60 @@
+from test/more import *;
+let d := { a: 1, b: 2, n: null };
+is( d.keys().length(), 3, "keys" );
+is( d.values().length(), 3, "values" );
+is( d.enumerate().length(), 3, "enumerate" );
+is( d.sorted_keys(), [ "a", "b", "n" ], "sorted_keys order" );
+is( d.kv(), [ "a", 1, "b", 2, "n", null ], "kv order" );
+is( d.to_Array().length(), 3, "to_Array count" );
+is( d.to_Array().get( 0, null ).key, "a", "to_Array keeps sorted-key order" );
+is( d.values().to_Array(), [ 1, 2, null ], "values follow sorted-key order" );
+is(
+	d.enumerate().first( fn p -> p.key eq "b" and p.value = 2 ).key,
+	"b",
+	"enumerate exposes pairs",
+);
+is( d.has("a"), 1, "has" );
+is( d.exists("b"), 1, "exists" );
+is( d.defined("a"), 1, "defined true" );
+is( d.defined("n"), 0, "defined false for null" );
+is( d.get("a"), 1, "get existing" );
+is( d.get("missing"), null, "get missing returns null" );
+is( d.get( "missing", 9 ), 9, "get default" );
+d.add( "c", 3 );
+d.add( "d", 4 );
+d.add( new Pair( pair: [ "e", 5 ] ) );
+is( d.length(), 5, "add variants" );
+d.set( "f", 6 );
+is( d.get( "f", 0 ), 6, "set" );
+is( d.kv().length(), 12, "kv" );
+is( d.sorted_keys().length(), 6, "sorted_keys" );
+d.remove("a");
+is( d.has("a"), 0, "remove key" );
+d.remove("b");
+is( d.has("b"), 0, "remove key 2" );
+d.remove( new Pair( pair: [ "c", 3 ] ) );
+is( d.has("c"), 1, "remove Pair currently no-op for Pair object" );
+let d2 := { c: 1, a: 2, b: 3 };
+let dict_it := d2.to_Iterator();
+let dict_keys := [ ];
+for ( let k in dict_it ) {
+	dict_keys.push(k);
+}
+is( dict_keys, [ "a", "b", "c" ], "to_Iterator" );
+let keys_seen := "";
+let values_seen := 0;
+let pairs_seen := 0;
+d2.for_each_key( fn k -> keys_seen := keys_seen _ k );
+d2.for_each_value( fn v -> values_seen := values_seen + v );
+d2.for_each_pair( fn p -> pairs_seen := pairs_seen + p.value );
+is( keys_seen, "abc", "for_each_key sorted order" );
+is( values_seen, 6, "for_each_value sorted-key order" );
+is( pairs_seen, 6, "for_each_pair sees each pair" );
+d.remove( fn p -> p.value >= 4 );
+is( d.sorted_keys(), [ "c", "n" ], "remove callback filters pairs" );
+is( d.count(), d.length(), "count" );
+is( d.empty(), 0, "empty false before clear" );
+d.clear();
+is( d.length(), 0, "clear" );
+is( d.empty(), 1, "empty true" );
+done_testing();

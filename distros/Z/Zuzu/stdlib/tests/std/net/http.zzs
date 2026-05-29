@@ -1,0 +1,23 @@
+from std/net/http import *;
+from test/more import *;
+
+if ( __system__{runtime} eq "zuzu-js" and __system__{platform} eq "browser" ) {
+	skip_all( "synchronous std/net/http requests are not supported in JS/Browser" );
+}
+
+let jar := new CookieJar();
+let ua := new UserAgent( agent: "zuzu-test/0.1", default_headers: { accept: "text/html" }, cookie_jar: jar );
+let resp := ua.get( "https://example.com/" );
+ok( resp.status() > 0, "Response has a status code" );
+ok( resp.success() or resp.status() >= 300, "Response knows success" );
+ok( resp.content() ≢ null, "Response has content" );
+ok( resp.header("content-type") ≢ null, "Response header lookup" );
+let post_resp := ua.request( "POST", "https://example.com/", "hello=world", { content_type: "application/x-www-form-urlencoded" }, );
+ok( post_resp.status() > 0, "request() returns Response" );
+let built := ua.build_request( "GET", "https://example.com/" );
+built.query( { page: "1" } );
+built.auth_bearer("abc-token");
+let built_resp := ua.send(built);
+ok( built_resp.status() > 0, "build_request/send workflow works" );
+
+done_testing();

@@ -1,0 +1,83 @@
+=encoding utf8
+
+=head1 NAME
+
+std/digest/sha - SHA digests for BinaryString values.
+
+=head1 SYNOPSIS
+
+  from std/digest/sha import *;
+
+  let payload := to_binary( "hello" );
+  let key := to_binary( "shared-secret" );
+
+  let hex256 := sha256_hex(payload);
+  let raw512 := sha512(payload);
+  let auth := hmac_sha256_hex(payload, key);
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module provides SHA digest and HMAC helpers.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+For each of C<sha1>, C<sha224>, C<sha256>, C<sha384>, and
+C<sha512>, this module exports three function forms:
+
+=over
+
+=item * C<< NAME(BinaryString value) >>
+
+Parameters: C<value> is binary input data. Returns: C<BinaryString>.
+Returns the raw digest.
+
+=item * C<< NAME_hex(BinaryString value) >>
+
+Parameters: C<value> is binary input data. Returns: C<String>. Returns
+lowercase hexadecimal text.
+
+=item * C<< NAME_b64(BinaryString value) >>
+
+Parameters: C<value> is binary input data. Returns: C<String>. Returns
+Base64 text without trailing C<=> padding.
+
+=back
+
+=head2 HMAC Functions
+
+For each of C<hmac_sha1>, C<hmac_sha224>, C<hmac_sha256>,
+C<hmac_sha384>, and C<hmac_sha512>, this module exports:
+
+=over
+
+=item * C<< NAME(BinaryString value, BinaryString key) >>
+
+Parameters: C<value> is binary input data and C<key> is the HMAC key.
+Returns: C<BinaryString>. Returns a raw HMAC digest.
+
+=item * C<< NAME_hex(BinaryString value, BinaryString key) >>
+
+Parameters: C<value> is binary input data and C<key> is the HMAC key.
+Returns: C<String>. Returns lowercase hexadecimal HMAC text.
+
+=item * C<< NAME_b64(BinaryString value, BinaryString key) >>
+
+Parameters: C<value> is binary input data and C<key> is the HMAC key.
+Returns: C<String>. Returns Base64 HMAC text with no trailing C<=>
+padding.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/digest/sha >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.

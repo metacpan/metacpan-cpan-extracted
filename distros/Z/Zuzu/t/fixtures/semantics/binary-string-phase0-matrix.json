@@ -1,0 +1,42 @@
+{
+	"version": 1,
+	"phase": 0,
+	"feature": "binary-string",
+	"notes": [
+		"Design-lock fixture matrix for upcoming runtime work.",
+		"Cases are intentionally staged for Perl, Rust, and JS parity."
+	],
+	"cases": [
+		{
+			"id": "binary-literal-single-quote-escapes",
+			"file": "binary-literal-single-quote-escapes.zzs",
+			"mode": "result",
+			"expected": "A\\nB"
+		},
+		{
+			"id": "binary-index-returns-binary-string",
+			"file": "binary-index-returns-binary-string.zzs",
+			"mode": "result",
+			"expected": "BinaryString"
+		},
+		{
+			"id": "binary-typed-param-rejects-string",
+			"file": "binary-typed-param-rejects-string.zzs",
+			"mode": "call_error",
+			"expected_error_class": "TypeException"
+		},
+		{
+			"id": "string-typed-param-rejects-binary",
+			"file": "string-typed-param-rejects-binary.zzs",
+			"mode": "call_error",
+			"expected_error_class": "TypeException"
+		},
+		{
+			"id": "binary-bitwise-unequal-length-throws",
+			"file": "binary-bitwise-unequal-length-throws.zzs",
+			"mode": "call_error",
+			"expected_error_class": "Exception",
+			"future_note": "Policy may change in a future release."
+		}
+	]
+}

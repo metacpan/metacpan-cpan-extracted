@@ -1,0 +1,17 @@
+from test/c23/traits import SpeciesLabel;
+
+class ParentSpecies {
+	const species := "canid";
+
+	static method lineage () {
+		return "root";
+	}
+}
+
+class ChildSpecies extends ParentSpecies with SpeciesLabel {
+	const species := "vulpes";
+
+	static method lineage () {
+		return super() _ ":child";
+	}
+}

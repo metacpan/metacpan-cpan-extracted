@@ -1,0 +1,528 @@
+=encoding utf8
+
+=head1 NAME
+
+test/more - Write unit tests and integration tests in ZuzuScript.
+
+=head1 SYNOPSIS
+
+  from test/more import *;
+  from my/project import frobnicate;
+  
+  is(frobnicate(21), 42, "frobinated 21 correctly");
+  is(frobnicate(null), null, "frobinate on null input");
+  
+  done_testing();
+
+=cut
+
+
+let Number _COUNT := 0;
+let Number _PASSED := 0;
+let Number _FAILED := 0;
+let Number _LEVEL := 0;
+let Number _PLAN := -1;
+let Number _TODO_FAILED := 0;
+let Number _TODO_PASSED := 0;
+
+let TODO;
+
+function _directive () {
+	if ( TODO ) {
+		if ( TODO instanceof String ) {
+			return ` # TODO ${TODO}`;
+		}
+		else {
+			return " # TODO";
+		}
+	}
+	return "";
+}
+
+function _indent () {
+	let i := _LEVEL;
+	let str := "";
+	while ( i > 0 ) {
+		str _= "    ";
+		i--;
+	}
+
+	return str;
+}
+
+class BailOutException extends Exception;
+class SkipAllException extends Exception;
+
+function _module_name_is_valid ( String module ) {
+	return module ~ /^[A-Za-z_][A-Za-z0-9_]*(\/[A-Za-z_][A-Za-z0-9_]*)*$/;
+}
+
+function _module_is_available ( String module ) {
+	from std/eval import eval;
+
+	try {
+		eval( `do { from ${module} import *; }; true;` );
+		return true;
+	}
+	catch {
+		return false;
+	}
+}
+
+function _capability_is_available ( String capability ) {
+	if ( not( capability ~ /^[A-Za-z_][A-Za-z0-9_]*$/ ) ) {
+		die `Invalid capability name: ${capability}`;
+	}
+
+	let deny_key := `deny_${capability}`;
+	if ( deny_key in __system__ ) {
+		return not __system__.get(deny_key);
+	}
+
+	return false;
+}
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+C<< test/more >> is a module for test-driven development. It can be used
+for writing unit tests and integration tests. It generates output in TAP
+L<https://testanything.org/>.
+
+This module should feel familiar to anybody who has used C<< Test::More >>
+for Perl, though there are some minor differences.
+
+=head2 Functions
+
+=over
+
+=item C<< pass(String name?) >>
+
+Indicates the named test has passed.
+
+=cut
+
+function pass ( String name? ) {
+	++_PASSED;
+	++_COUNT;
+	++_TODO_PASSED if TODO;
+	if ( name ≡ null ) {
+		say `${_indent()}ok ${_COUNT}${_directive()}`;
+	}
+	else {
+		say `${_indent()}ok ${_COUNT} - ${name}${_directive()}`;
+	}
+
+	return true;
+}
+
+=item C<< fail(String name?) >>
+
+Indicates the named test has failed.
+
+=cut
+
+function fail ( String name ) {
+	++_FAILED;
+	++_COUNT;
+	++_TODO_FAILED if TODO;
+	if ( name ≡ null ) {
+		say `${_indent()}not ok ${_COUNT}${_directive()}`;
+	}
+	else {
+		say `${_indent()}not ok ${_COUNT} - ${name}${_directive()}`;
+	}
+
+	return false;
+}
+
+=item C<< ok(expr, String name?) >>
+
+Passes the named test only if C<expr> is truthy.
+
+=cut
+
+function ok ( expr, String name? ) {
+	if (expr) {
+		return pass(name);
+	}
+	else {
+		return fail(name);
+	}
+}
+
+function _coerced_equal ( got, expected ) {
+	if ( got ≡ expected ) {
+		return true;
+	}
+
+	if ( got instanceof Boolean and expected instanceof Number ) {
+		return ( got ? 1: 0 ) = expected;
+	}
+	if ( got instanceof Number and expected instanceof Boolean ) {
+		return got = ( expected ? 1: 0 );
+	}
+
+	return false;
+}
+
+=item C<< is(got, expected, String name?) >>
+
+Passes the named test only if C<< got ≡ expected >>.
+
+=cut
+
+function is ( got, expected, String name? ) {
+
+	if ( not ok( _coerced_equal( got, expected ), name ) ) {
+		from std/dump import Dumper;
+		say `${_indent()}# expected: ${Dumper.dump(expected)}`;
+		say `${_indent()}# got:      ${Dumper.dump(got)}`;
+		return false;
+	}
+
+	return true;
+}
+
+=item C<< isnt(got, unexpected, String name?) >>
+
+Passes the named test only if C<< got ≢ expected >>.
+
+=cut
+
+function isnt ( got, unexpected, String name? ) {
+	return ok( not _coerced_equal( got, unexpected ), name );
+}
+
+=item C<< like(got, expected_re, String name?) >>
+
+Passes the named test only if C<< got ~ expected >>.
+
+=cut
+
+function like ( got, Regexp expected_re, String name? ) {
+
+	if ( not ok( got ~ expected_re, name ) ) {
+		say `${_indent()}# expected (regexp): ${expected_re}`;
+		say `${_indent()}# got:               ${got}`;
+		return false;
+	}
+
+	return true;
+}
+
+=item C<< unlike(got, unexpected_re, String name?) >>
+
+Fails the named test only if C<< got ~ expected >>.
+
+=cut
+
+function unlike ( got, Regexp unexpected_re, String name? ) {
+
+	if ( not ok( not( got ~ unexpected_re ), name ) ) {
+		say `${_indent()}# unexpected (regexp): ${unexpected_re}`;
+		say `${_indent()}# got:                 ${got}`;
+		return false;
+	}
+
+	return true;
+}
+
+=item C<< diag(diagnostic) >>
+
+Outputs the diagnostic.
+
+=cut
+
+function diag (diagnostic) {
+	say `${_indent()}# ${diagnostic}`;
+	return true;
+}
+
+=item C<< explain(value) >>
+
+Combines diag with Dumper.dump();
+
+=cut
+
+function explain (value) {
+	from std/dump import Dumper;
+	return diag( Dumper.dump(value) );
+}
+
+=item C<< bail_out(String message?) >>
+
+Bail out of running further tests.
+
+=cut
+
+function bail_out ( String message? ) {
+	let e;
+	if ( message ≡ null ) {
+		e := new BailOutException( message: "Bail out!" );
+	}
+	else {
+		e := new BailOutException( message: `Bail out! ${message}` );
+	}
+	throw e;
+}
+
+=item C<< skip_all(String reason) >>
+
+Skips the whole test file by emitting a TAP skip-all plan and exiting
+successfully when the runtime provides C<std/proc>.
+
+This is intended for guards at the beginning of a test script, before
+any tests have run. Browser-like hosts without C<std/proc> use a
+special exception fallback that the browser ztest runner treats as a
+skip.
+
+=cut
+
+function skip_all ( String reason ) {
+	die "Cannot skip all tests after tests have already run" if _COUNT > 0;
+	die "Cannot skip all tests in a subtest" if _LEVEL > 0;
+	_PLAN := 0;
+	say `1..${_PLAN} # SKIP: ${reason}`;
+
+	from std/proc try import Proc;
+	Proc.exit(0) if Proc ≢ null;
+	throw new SkipAllException( message: reason );
+}
+
+=item C<< requires_module(String module) >>
+
+Skips the whole test file if the named module cannot be loaded.
+
+=cut
+
+function requires_module ( String module ) {
+	if ( not _module_name_is_valid(module) ) {
+		die `Invalid module name: ${module}`;
+	}
+
+	if ( not _module_is_available(module) ) {
+		skip_all( `module ${module} is unavailable` );
+	}
+
+	return true;
+}
+
+=item C<< requires_capability(String capability) >>
+
+Skips the whole test file if the named runtime capability is not
+available.
+
+=cut
+
+function requires_capability ( String capability ) {
+	if ( not _capability_is_available(capability) ) {
+		skip_all( `capability ${capability} is unavailable` );
+	}
+
+	return true;
+}
+
+=item C<< author_testing() >>
+
+Skips the whole test file unless the C<AUTHOR_TESTING> environment
+variable is set to a true value.
+
+=cut
+
+function author_testing () {
+	requires_capability( "proc" );
+	from std/proc try import Env;
+	if ( Env and Env.get( "AUTHOR_TESTING", false ) ) {
+		return true;
+	}
+	skip_all( "requires AUTHOR_TESTING=1" );
+}
+
+=item C<< extended_testing() >>
+
+Skips the whole test file unless the C<EXTENDED_TESTING> environment
+variable is set to a true value.
+
+=cut
+
+function extended_testing () {
+	requires_capability( "proc" );
+	from std/proc try import Env;
+	if ( Env and Env.get( "EXTENDED_TESTING", false ) ) {
+		return true;
+	}
+	skip_all( "requires EXTENDED_TESTING=1" );
+}
+
+=item C<< plan(Number n) >>
+
+Indicate the number of tests you intend on running, before running any
+tests.
+
+done_testing() can later check the number.
+
+=cut
+
+function plan ( Number n ) {
+	die "Must plan() before running any tests" if _COUNT > 0;
+	die "Cannot plan() in a subtest" if _LEVEL > 0;
+	die "Must plan() at least one test" if n < 1;
+	_PLAN := n;
+	say `1..${_PLAN}`;
+}
+
+=item C<< done_testing(Number n?) >>
+
+Indicates that testing is finished.
+
+You may optionally provide the expected total number of tests, and the
+function will throw an exception if that doesn't match the number of
+tests which were actually run.
+
+Will also throw an error if you called plan() earlier and the actual
+number of tests run differs from your plan.
+
+=cut
+
+function done_testing ( Number n? ) {
+	die "Unexpected done_testing() in subtest" if _LEVEL > 0;
+	die `Expected ${n} tests, but ran ${_COUNT}` if n ≢ null and n ≠ _COUNT;
+	
+	function maybe_fail_count ( should_die ) {
+		if ( _TODO_PASSED > 0 ) {
+			warn `Passed ${_TODO_PASSED} TODO tests!`;
+		}
+		if ( _FAILED > 0 ) {
+			let msg := `Failed ${_FAILED} tests`;
+			msg _= ` (${_TODO_FAILED} todo, ${_FAILED - _TODO_FAILED} true fails)` if _TODO_FAILED > 0;
+			die msg if should_die and ( _FAILED > _TODO_FAILED );
+			warn msg;
+		}
+	}
+	
+	if ( _PLAN < 0 ) {
+		say `1..${_COUNT}`;
+	}
+	else if ( _PLAN ≠ _COUNT ) {
+		maybe_fail_count(false);
+		die `Planned ${_PLAN} tests, but ran ${_COUNT}`;
+	}
+	
+	maybe_fail_count(true);
+	return true;
+}
+
+=item C<< subtest(String name, Function f) >>
+
+Calls f() as a subtest.
+
+Don't use done_testing() within the function.
+
+=cut
+
+function subtest ( String name, Function f ) {
+	let orig_context := {
+		count: _COUNT,
+		passed: _PASSED,
+		failed: _FAILED,
+		level: _LEVEL,
+		todo_passed: _TODO_PASSED,
+		todo_failed: _TODO_FAILED,
+	};
+
+	function restore_context () {
+		_COUNT := orig_context{count};
+		_PASSED := orig_context{passed};
+		_FAILED := orig_context{failed};
+		_LEVEL := orig_context{level};
+		_TODO_PASSED := orig_context{todo_passed};
+		_TODO_FAILED := orig_context{todo_failed};
+	}
+
+	_COUNT := 0;
+	_PASSED := 0;
+	_FAILED := 0;
+	_TODO_PASSED := 0;
+	_TODO_FAILED := 0;
+	_LEVEL++;
+	let is_ok := true;
+
+	try {
+		diag( `Subtest: ${name}` );
+		f();
+		say `${_indent()}1..${_COUNT}`;
+		is_ok := false if _FAILED > _TODO_FAILED;
+		restore_context();
+	}
+	catch ( BailOutException e ) {
+		throw e;
+	}
+	catch ( Exception e ) {
+		is_ok := false;
+		restore_context();
+	}
+
+	return ok( is_ok, name );
+}
+
+=back
+
+=item C<< todo(Boolean c, String reason, Function f) >>
+
+Runs the tests in the given function, but if condition c is true then
+first sets TODO to true.
+
+You can manually set and unset the TODO variable instead.
+
+=cut
+
+function todo ( Boolean c, String reason, Function f ) {
+	let orig := TODO;
+	TODO := reason if c;
+	try {
+		f();
+	}
+	catch {
+	}
+	TODO := orig;
+	return not c;
+}
+
+=back
+
+=item C<< exception(Function f) >>
+
+Calls f() and returns any exception thrown.
+
+Returns null if no exception was thrown.
+
+=cut
+
+function exception ( Function f ) {
+	try {
+		f();
+		return null;
+	}
+	catch ( BailOutException e ) {
+		throw e;
+	}
+	catch ( Exception e ) {
+		return e;
+	}
+}
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< test/more >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut

@@ -1,0 +1,17 @@
+from std/eval import eval;
+from test/more import *;
+
+let out := eval(
+	"from std/math import Math;\n"
+	_ "trait EvalTrait {\n"
+	_ "  method metric () {\n"
+	_ "    return round( Math.pi * 2 );\n"
+	_ "  }\n"
+	_ "}\n"
+	_ "class EvalThing with EvalTrait;\n"
+	_ "new EvalThing().metric();",
+);
+
+is( out, 6, "eval can import module and define trait+class before instantiation" );
+
+done_testing();

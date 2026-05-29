@@ -1,0 +1,10 @@
+from test/more import *;
+is( 1 + 2, 3, "+ works" );
+is( 7 - 10, -3, "- works" );
+is( 3 * 4, 12, "* works" );
+is( 3 × 4, 12, "× alias works" );
+is( 9 / 4, 2.25, "/ works" );
+is( 9 ÷ 4, 2.25, "÷ alias works" );
+is( 2 ** 5, 32, "** works" );
+is( 17 mod 5, 2, "mod works" );
+done_testing();

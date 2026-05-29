@@ -1,0 +1,52 @@
+from std/path/zz import ZZPath, ZZEvaluator;
+from std/path/zz/functions import STANDARD_FUNCTIONS;
+from std/path/zz/operators import Operator, STANDARD_OPERATORS;
+from std/path/z import ZPath;
+from test/more import *;
+
+ok( typeof ZZPath eq "Class", "ZZPath class is importable" );
+ok( typeof ZZEvaluator eq "Class", "ZZEvaluator class is importable" );
+ok( typeof Operator eq "Class", "ZZPath Operator class is importable" );
+ok( typeof STANDARD_OPERATORS eq "Array", "ZZPath operator table is importable" );
+ok( typeof STANDARD_FUNCTIONS eq "Array", "ZZPath function table is importable" );
+ok( STANDARD_OPERATORS.length() > 0, "ZZPath operator table has phase operators" );
+is( STANDARD_FUNCTIONS.length(), 59, "ZZPath function table has initial functions" );
+
+let data := {
+	users: [
+		{ name: "Ada", age: 32 },
+		{ name: "Bob", age: 27 },
+	],
+};
+
+let zp := new ZZPath( path: "/users/#0/name" );
+ok( zp instanceof ZZPath, "compiled path is a ZZPath" );
+ok( zp instanceof ZPath, "ZZPath inherits from ZPath" );
+is( zp.first(data), "Ada", "ZZPath inherits first traversal" );
+is( zp.query( data ).length(), 1, "ZZPath inherits query traversal" );
+
+let ev := zp.get_evaluator();
+ok( ev instanceof ZZEvaluator, "ZZPath uses ZZEvaluator" );
+is(
+	ev.operator_definitions(),
+	STANDARD_OPERATORS,
+	"ZZEvaluator uses std/path/zz operator table",
+);
+is(
+	ev.function_definitions(),
+	STANDARD_FUNCTIONS,
+	"ZZEvaluator uses std/path/zz function table",
+);
+
+{
+	ZZPath.use();
+	is( data @ "/users/#1/name", "Bob", "ZZPath.use configures @ path operator" );
+	is(
+		( data @@ "/users/*/name" ).length(),
+		2,
+		"ZZPath.use configures @@ path operator",
+	);
+	ok( data @? "/users/#0/age", "ZZPath.use configures @? path operator" );
+}
+
+done_testing();

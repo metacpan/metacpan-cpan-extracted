@@ -1,0 +1,139 @@
+=encoding utf8
+
+=head1 NAME
+
+std/io/socks - socket programming helpers for Zuzu.
+
+=head1 SYNOPSIS
+
+  from std/io/socks import *;
+
+  let srv := listen_tcp( "127.0.0.1", 0 );
+  let cli := connect_tcp( "127.0.0.1", srv.port() );
+  let peer := srv.accept();
+
+  cli.say( "hello" );
+  let line := peer.next_line();
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Node and
+Electron. It is not supported by zuzu-js in the browser.
+
+=head1 DESCRIPTION
+
+This module provides a practical API for TCP, UDP, and Unix domain
+sockets.
+
+When possible, method names mirror other stream APIs:
+C<read>, C<write>, C<print>, C<say>, C<next_line>,
+C<each_line>, and C<close>.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item C<< listen_tcp(String host?, Number port?, Number backlog?) >>
+
+Parameters: C<host>, C<port>, and C<backlog> are optional bind
+settings. Returns: C<TCPServer>. Creates a TCP listening socket.
+
+=item C<< connect_tcp(String host, Number port, Bool raw?) >>
+
+Parameters: C<host> and C<port> identify the server, and C<raw> controls
+line decoding. Returns: C<TCPSocket>. Connects to a TCP server.
+
+=item C<< bind_udp(String host?, Number port?, Bool raw?) >>
+
+Parameters: C<host>, C<port>, and C<raw> are optional bind settings.
+Returns: C<UDPSocket>. Binds a UDP socket.
+
+=item C<< connect_udp(String host, Number port, Bool raw?) >>
+
+Parameters: C<host> and C<port> identify the peer, and C<raw> controls
+byte handling. Returns: C<UDPSocket>. Creates a connected UDP socket.
+
+=item C<< listen_unix(String path, Number backlog?) >>
+
+Parameters: C<path> is the socket path and C<backlog> is optional.
+Returns: C<UnixServer>. Creates a Unix domain stream server.
+
+=item C<< connect_unix(String path, Bool raw?) >>
+
+Parameters: C<path> is the socket path and C<raw> controls line
+decoding. Returns: C<UnixSocket>. Connects to a Unix domain stream
+server.
+
+=back
+
+=head2 Classes
+
+=head3 Socket methods
+
+=over
+
+=item C<< socket.read(Number length?) >>
+
+Parameters: C<length> is an optional byte count. Returns:
+C<BinaryString> or C<String>. Reads data from the socket.
+
+=item C<< socket.write(value) >>, C<< socket.print(value) >>, C<< socket.say(value) >>
+
+Parameters: C<value> is data to send. Returns: C<null>. Writes data to
+the socket, with C<say> adding a newline.
+
+=item C<< socket.next_line() >>
+
+Parameters: none. Returns: C<String>, C<BinaryString>, or C<null>.
+Reads the next line.
+
+=item C<< socket.each_line(callback) >>
+
+Parameters: C<callback> is called for each line. Returns: C<null>.
+Iterates over incoming lines.
+
+=item C<< socket.close() >>
+
+Parameters: none. Returns: C<null>. Closes the socket.
+
+=item C<< socket.is_open() >>
+
+Parameters: none. Returns: C<Boolean>. Returns true when the socket is
+open.
+
+=back
+
+=head3 TCPSocket
+
+C<peer_host()> and C<peer_port()> take no parameters and return the
+remote host C<String> and port C<Number>.
+
+=head3 TCPServer
+
+C<accept()> returns C<TCPSocket>, C<port()> returns C<Number>,
+C<host()> returns C<String>, and C<close()> closes the server and
+returns C<null>.
+
+=head3 UDPSocket
+
+C<send(value, host?, port?)> returns C<null>; C<recv()> returns a
+received datagram value; C<port()> and C<host()> return the bound port
+and host; C<close()> closes the socket.
+
+=head3 UnixSocket / UnixServer
+
+Unix sockets support stream methods, and C<UnixServer> offers
+C<accept()> returning C<UnixSocket>, C<path()> returning C<String>, and
+C<close()> returning C<null>.
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/io/socks >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut

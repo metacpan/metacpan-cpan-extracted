@@ -1,0 +1,23 @@
+from test/more import *;
+
+requires_capability( "db" );
+requires_capability( "fs" );
+
+from std/db import DB;
+from std/io import Path;
+
+let dir := Path.tempdir();
+let db_path := dir.child("naïve-数据库.sqlite");
+
+let dbh := DB.open(db_path);
+dbh.prepare( "create table notes (msg text)" ).execute();
+dbh.prepare( "insert into notes (msg) values ('persisted')" ).execute();
+
+let reopened := DB.open( db_path.to_String() );
+let q := reopened.prepare( "select msg from notes" );
+q.execute();
+
+is( q.next_array()[0], "persisted", "unicode filename path works for db open/reopen" );
+ok( db_path.exists(), "unicode db file exists on disk" );
+
+done_testing();

@@ -5,7 +5,7 @@ use warnings;
 
 our ($VERSION, $AUTOLOAD);
 
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 sub __new
 {
@@ -25,6 +25,7 @@ sub __new
     $obj->{duration}        = \%{"${class}::data_duration"};
     $obj->{aliases}         = \%{"${class}::data_aliases"};
     $obj->{rewrite}         = \%{"${class}::data_rewrite"};
+    $obj->{holidays}        = \%{"${class}::data_holidays"};
 
     return bless $obj, $class;
 }

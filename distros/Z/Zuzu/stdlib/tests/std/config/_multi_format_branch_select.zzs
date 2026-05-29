@@ -1,0 +1,36 @@
+from std/data/ini import INI;
+from std/data/toml import TOML;
+from std/data/yaml import YAML;
+from test/more import *;
+
+let yaml_cfg := ( new YAML() ).decode( "service:\n  kind: db\n" );
+let toml_cfg := ( new TOML() ).decode( "[service]\nkind = \"http\"\n" );
+let ini_cfg := ( new INI() ).decode( "[service]\nkind = \"db\"\n" );
+
+/*
+explain(yaml_cfg);
+explain(toml_cfg);
+explain(ini_cfg);
+*/
+
+function branch_for_kind ( kind ) {
+	if ( kind == "db" ) {
+		return "db-branch";
+	}
+	if ( kind == "http" ) {
+		return "http-branch";
+	}
+	return "other";
+}
+
+let branches := [
+	branch_for_kind( yaml_cfg{service}{kind} ),
+	branch_for_kind( toml_cfg{service}{kind} ),
+	branch_for_kind( ini_cfg{service}{kind} ),
+];
+
+is( branches[0], "db-branch", "yaml config selects db branch" );
+is( branches[1], "http-branch", "toml config selects http branch" );
+is( branches[2], "db-branch", "ini config selects db branch" );
+
+done_testing();

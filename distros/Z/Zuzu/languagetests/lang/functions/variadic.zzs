@@ -1,0 +1,51 @@
+from test/more import *;
+
+function legacy_variadic ( x, y ... more ) {
+	return x + y + more.length();
+}
+
+function comma_variadic ( x, y, ... more ) {
+	return x + y + more.length();
+}
+
+function rest_only ( ... args ) {
+	return args.length();
+}
+
+function optional_then_variadic ( prefix, middle := "M", ... more ) {
+	return prefix _ ":" _ middle _ ":" _ more.length();
+}
+
+function typed_variadic ( Number start, ... more ) {
+	let total := start;
+	for ( let item in more ) {
+		total += item;
+	}
+	return total;
+}
+
+is(
+	legacy_variadic( 10, 20, 30, 40 ),
+	32,
+	"legacy variadic syntax binds trailing arguments",
+);
+is(
+	comma_variadic( 10, 20, 30, 40 ),
+	32,
+	"comma variadic syntax binds trailing arguments",
+);
+is( rest_only(), 0, "rest-only variadic function accepts no args" );
+is( rest_only( 1, 2, 3 ), 3, "rest-only variadic function captures args" );
+is(
+	optional_then_variadic( "P" ),
+	"P:M:0",
+	"variadic function can follow defaulted parameter with no extras",
+);
+is(
+	optional_then_variadic( "P", "Q", "x", "y" ),
+	"P:Q:2",
+	"variadic function can follow defaulted parameter with extras",
+);
+is( typed_variadic( 1, 2, 3, 4 ), 10, "typed leading parameter with rest args" );
+
+done_testing();

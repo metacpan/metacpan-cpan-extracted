@@ -1,0 +1,402 @@
+from std/secure import Secure, SigningKey;
+from std/string/base64 import decode, encode;
+from test/more import *;
+
+let message := to_binary("phase 8 ecdsa signed message");
+let wrong_message := to_binary("phase 8 ecdsa altered message");
+let caps := Secure.capabilities();
+
+async function async_exception_message ( Function f ) {
+	try {
+		await {
+			f();
+		};
+		return null;
+	}
+	catch ( Exception e ) {
+		return e{message};
+	}
+}
+
+async function exercise_browser_ecdsa (
+	algorithm,
+	private_length,
+	public_length,
+	compressed,
+) {
+	is(
+		caps{async_required}{signing},
+		true,
+		"browser reports async-required signing support",
+	);
+	like(
+		exception( function () {
+			SigningKey.generate(algorithm);
+		} ),
+		/not available synchronously|generate_async/,
+		"browser rejects synchronous " _ algorithm _ " generation",
+	);
+
+	let signing_key := await {
+		SigningKey.generate_async(algorithm);
+	};
+	let public_key := signing_key.public_key();
+	let signature := await {
+		signing_key.sign_async(message);
+	};
+
+	is(
+		typeof signing_key,
+		"SigningKey",
+		algorithm _ " generate_async returns SigningKey",
+	);
+	is( typeof public_key, "PublicKey", algorithm _ " public_key returns PublicKey" );
+	is( typeof signature, "BinaryString", algorithm _ " sign_async returns BinaryString" );
+	ok( length signature > 60, algorithm _ " signature is DER encoded" );
+	is(
+		await {
+			public_key.verify_async( message, signature );
+		},
+		true,
+		algorithm _ " verifies matching message and signature",
+	);
+	is(
+		await {
+			public_key.verify_async( wrong_message, signature );
+		},
+		false,
+		algorithm _ " rejects a changed message",
+	);
+
+	let other_key := await {
+		SigningKey.generate_async(algorithm);
+	};
+	is(
+		await {
+			other_key.public_key().verify_async( message, signature );
+		},
+		false,
+		algorithm _ " rejects another public key",
+	);
+	is(
+		await {
+			public_key.verify_async( message, decode("AA==") );
+		},
+		false,
+		algorithm _ " rejects malformed DER signature",
+	);
+	like(
+		exception( function () {
+			signing_key.sign(message);
+		} ),
+		/not available synchronously|sign_async/,
+		"browser rejects synchronous " _ algorithm _ " signing",
+	);
+	like(
+		exception( function () {
+			public_key.verify( message, signature );
+		} ),
+		/not available synchronously|verify_async/,
+		"browser rejects synchronous " _ algorithm _ " verification",
+	);
+
+	let raw_private := signing_key.export_private();
+	let raw_public := public_key.export();
+	is( length raw_private, private_length, algorithm _ " raw private length" );
+	is( length raw_public, public_length, algorithm _ " raw public length" );
+
+	let imported_private := await {
+		SigningKey.import_private_async(
+			raw_private,
+			{ algorithm: algorithm },
+		);
+	};
+	let imported_public := await {
+		SigningKey.import_public_async(raw_public);
+	};
+	let imported_signature := await {
+		imported_private.sign_async(message);
+	};
+	is(
+		await {
+			imported_public.verify_async( message, imported_signature );
+		},
+		true,
+		algorithm _ " raw imported keys sign and verify",
+	);
+	is(
+		encode( imported_private.export_private() ),
+		encode(raw_private),
+		algorithm _ " raw private import round-trips",
+	);
+	is(
+		encode( imported_public.export() ),
+		encode(raw_public),
+		algorithm _ " raw public import round-trips",
+	);
+
+	let pem_private := signing_key.export_private({ format: "pem" });
+	let pem_public := public_key.export({ format: "pem" });
+	like(
+		pem_private,
+		/BEGIN (EC )?PRIVATE KEY/,
+		algorithm _ " private PEM is importable",
+	);
+	like(
+		pem_public,
+		/BEGIN PUBLIC KEY/,
+		algorithm _ " public PEM is SPKI",
+	);
+	let pem_private_imported := await {
+		SigningKey.import_private_async(pem_private);
+	};
+	let pem_public_imported := await {
+		SigningKey.import_public_async(pem_public);
+	};
+	is(
+		await {
+			pem_public_imported.verify_async(
+				message,
+				await {
+					pem_private_imported.sign_async(message);
+				},
+			);
+		},
+		true,
+		algorithm _ " PEM imported keys sign and verify",
+	);
+
+	let wrong_algorithm := "ecdsa-p256-sha256";
+	if ( algorithm eq wrong_algorithm ) {
+		wrong_algorithm := "ecdsa-p384-sha384";
+	}
+	like(
+		await {
+			async_exception_message( function () {
+				SigningKey.import_private_async(
+					pem_private,
+					{ algorithm: wrong_algorithm },
+				);
+			} );
+		},
+		/PEM key|private key|algorithm|named curve|unavailable/,
+		algorithm _ " PEM private import rejects algorithm mismatch",
+	);
+	like(
+		await {
+			async_exception_message( function () {
+				SigningKey.import_public_async(
+					compressed,
+					{ algorithm: algorithm },
+				);
+			} );
+		},
+		/uncompressed|public key/,
+		algorithm _ " compressed public point is rejected",
+	);
+}
+
+async function exercise_sync_ecdsa (
+	algorithm,
+	private_length,
+	public_length,
+	compressed,
+) {
+	let signing_key := SigningKey.generate(algorithm);
+	let public_key := signing_key.public_key();
+	let signature := signing_key.sign(message);
+
+	is( typeof signing_key, "SigningKey", algorithm _ " generate returns SigningKey" );
+	is( typeof public_key, "PublicKey", algorithm _ " public_key returns PublicKey" );
+	is( typeof signature, "BinaryString", algorithm _ " sign returns BinaryString" );
+	ok( length signature > 60, algorithm _ " signature is DER encoded" );
+	is(
+		public_key.verify( message, signature ),
+		true,
+		algorithm _ " verifies matching message and signature",
+	);
+	is(
+		public_key.verify( wrong_message, signature ),
+		false,
+		algorithm _ " rejects a changed message",
+	);
+	is(
+		SigningKey.generate(algorithm).public_key().verify(
+			message,
+			signature,
+		),
+		false,
+		algorithm _ " rejects another public key",
+	);
+	is(
+		public_key.verify( message, decode("AA==") ),
+		false,
+		algorithm _ " rejects malformed DER signature",
+	);
+
+	let async_key := await {
+		SigningKey.generate_async(algorithm);
+	};
+	let async_public := async_key.public_key();
+	let async_signature := await {
+		async_key.sign_async(message);
+	};
+	is(
+		await {
+			async_public.verify_async( message, async_signature );
+		},
+		true,
+		algorithm _ " async signing and verification work",
+	);
+
+	let raw_private := signing_key.export_private();
+	let raw_public := public_key.export();
+	is( length raw_private, private_length, algorithm _ " raw private length" );
+	is( length raw_public, public_length, algorithm _ " raw public length" );
+
+	let imported_private := SigningKey.import_private(
+		raw_private,
+		{ algorithm: algorithm },
+	);
+	let imported_public := SigningKey.import_public(raw_public);
+	let imported_signature := imported_private.sign(message);
+	is(
+		imported_public.verify( message, imported_signature ),
+		true,
+		algorithm _ " raw imported keys sign and verify",
+	);
+	is(
+		encode( imported_private.export_private() ),
+		encode(raw_private),
+		algorithm _ " raw private import round-trips",
+	);
+	is(
+		encode( imported_public.export() ),
+		encode(raw_public),
+		algorithm _ " raw public import round-trips",
+	);
+
+	let pem_private := signing_key.export_private({ format: "pem" });
+	let pem_public := public_key.export({ format: "pem" });
+	like(
+		pem_private,
+		/BEGIN (EC )?PRIVATE KEY/,
+		algorithm _ " private PEM is importable",
+	);
+	like(
+		pem_public,
+		/BEGIN PUBLIC KEY/,
+		algorithm _ " public PEM is SPKI",
+	);
+	let pem_private_imported := SigningKey.import_private(pem_private);
+	let pem_public_imported := SigningKey.import_public(pem_public);
+	is(
+		pem_public_imported.verify(
+			message,
+			pem_private_imported.sign(message),
+		),
+		true,
+		algorithm _ " PEM imported keys sign and verify",
+	);
+
+	like(
+		exception( function () {
+			SigningKey.import_private(
+				pem_private,
+				{ algorithm: "ed25519" },
+			);
+		} ),
+		/PEM key|private key/,
+		algorithm _ " PEM private import rejects algorithm mismatch",
+	);
+	like(
+		exception( function () {
+			SigningKey.import_public(
+				compressed,
+				{ algorithm: algorithm },
+			);
+		} ),
+		/uncompressed|public key/,
+		algorithm _ " compressed public point is rejected",
+	);
+}
+
+async function exercise_ecdsa (
+	algorithm,
+	private_length,
+	public_length,
+	compressed,
+) {
+	if ( Secure.has( "signing", algorithm ) ) {
+		is(
+			Secure.require( "signing", algorithm ),
+			true,
+			"require returns true for " _ algorithm,
+		);
+
+		if ( caps{host} == "browser" ) {
+			await {
+				exercise_browser_ecdsa(
+					algorithm,
+					private_length,
+					public_length,
+					compressed,
+				);
+			};
+		}
+		else {
+			is(
+				caps{async_required}{signing},
+				false,
+				"CLI runtimes report synchronous signing support",
+			);
+			await {
+				exercise_sync_ecdsa(
+					algorithm,
+					private_length,
+					public_length,
+					compressed,
+				);
+			};
+		}
+	}
+	else {
+		is(
+			Secure.has( "signing", algorithm ),
+			false,
+			algorithm _ " is not advertised",
+		);
+	}
+}
+
+await {
+	exercise_ecdsa(
+		"ecdsa-p256-sha256",
+		32,
+		65,
+		decode("AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"),
+	);
+};
+await {
+	exercise_ecdsa(
+		"ecdsa-p384-sha384",
+		48,
+		97,
+		decode(
+			"AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+		),
+	);
+};
+await {
+	exercise_ecdsa(
+		"ecdsa-p521-sha512",
+		66,
+		133,
+		decode(
+			"AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+				_ "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+		),
+	);
+};
+
+done_testing();

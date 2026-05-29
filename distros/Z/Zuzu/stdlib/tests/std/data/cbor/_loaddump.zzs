@@ -1,0 +1,13 @@
+from test/more import *;
+requires_capability( "fs" );
+
+from std/data/cbor import CBOR;
+from std/io import Path;
+
+let codec := new CBOR();
+let f := Path.tempfile();
+codec.dump( f, [ 1, 2, 3 ] );
+let loaded := codec.load(f);
+is( loaded, [ 1, 2, 3 ], "dump/load with Path" );
+
+done_testing();

@@ -1,0 +1,8 @@
+from std/log import Log;
+from test/more import *;
+Log.configure( { level: "error", timestamps: 0, stderr_for_errors: 1 } );
+is( Log.level(), "error", "Log.level reports configured level", );
+is( Log.debug("skip me"), null, "debug call returns null", );
+is( Log.info("hidden info"), null, "info call returns null", );
+is( Log.log( "debug", "hidden debug" ), null, "dynamic level logger returns null", );
+done_testing();

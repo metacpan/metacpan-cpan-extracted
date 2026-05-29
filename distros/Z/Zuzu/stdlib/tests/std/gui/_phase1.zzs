@@ -1,0 +1,171 @@
+from test/more import *;
+
+requires_capability( "gui" );
+
+from std/gui import *;
+
+let w := Window(
+	title: "My GUI",
+	Menu(
+		id: "file-menu",
+		text: "File",
+		MenuItem( id: "new-item", text: "New" ),
+		MenuItem( id: "save-item", text: "Save", disabled: true ),
+	),
+	VBox(
+		id: "root",
+		gap: 4,
+		HBox(
+			Label( text: "Name:" ),
+			Input( id: "name", value: "Ada" ),
+		),
+		Button( text: "OK", id: "submit" ),
+	),
+	Menu(
+		id: "help-menu",
+		text: "Help",
+		MenuItem( id: "about-item", text: "About" ),
+	),
+);
+
+ok( w instanceof Widget, "Window is a Widget" );
+is( w.title(), "My GUI", "Window helper passes title" );
+ok( w.content() instanceof Widget, "Window content is set from child" );
+is( w.content().parent(), w, "content parent points at window" );
+is( w.find_by_id("name").value(), "Ada", "find_by_id finds nested input" );
+is( w.find_by_id("missing"), null, "find_by_id returns null when absent" );
+is(
+	w.content().children().length(),
+	2,
+	"children() preserves insertion order",
+);
+is( w.menus().length(), 2, "Window exposes Menu children" );
+is( w.menus()[0].text(), "File", "Menu text getter" );
+is( w.menus()[0].items().length(), 2, "Menu exposes MenuItem children" );
+
+let save_item := w.find_by_id("save-item");
+is( save_item.disabled(), true, "MenuItem disabled getter" );
+is( save_item.disabled(false), save_item, "MenuItem disabled setter returns self" );
+is( save_item.disabled(), false, "MenuItem disabled setter updates state" );
+
+let menu_events := [];
+save_item.click( function ( e ) {
+	menu_events.push( e.name() );
+} );
+save_item.click();
+is( menu_events[0], "click", "MenuItem click event dispatches" );
+
+let name := w.find_by_id("name");
+name.set_value("Grace");
+is( name.value(), "Grace", "Input value mutator returns new value" );
+is( name.set_visible(false), name, "Widget mutators return self" );
+is( name.visible(), false, "visible state mutates" );
+name.add_class("field").add_class("field").add_class("primary");
+is( name.classes().length(), 2, "classes are unique" );
+name.remove_class("field");
+is( name.classes().length(), 1, "remove_class mutates class list" );
+is( name.style("width", 20), name, "style setter returns self" );
+is( name.style("width"), 20, "style getter returns stored value" );
+is( name.meta("model", "person.name"), name, "meta setter returns self" );
+is( name.meta("model"), "person.name", "meta getter returns stored value" );
+
+let events := [];
+let event_checks := [];
+let button := w.find_by_id("submit");
+w.content().on("click", function ( e ) {
+	events.push( "parent:" _ e.phase() );
+	event_checks.push( e.window() );
+	event_checks.push( e.current_target() );
+	event_checks.push( e.target() );
+} );
+button.click( function () {
+	events.push("button");
+} );
+button.click();
+is( events[0], "button", "click shortcut emits target event" );
+is( events[1], "parent:bubble", "event bubbles to parent" );
+is( event_checks[0], w, "Event.window returns owner window" );
+is(
+	event_checks[1],
+	w.content(),
+	"Event.current_target returns handling widget",
+);
+is( event_checks[2], button, "Event.target returns source widget" );
+
+let once_count := 0;
+button.once( "change", function () {
+	once_count++;
+} );
+button.change();
+button.change();
+is( once_count, 1, "once listener is removed after first call" );
+
+let off_count := 0;
+let token := button.on( "input", function () {
+	off_count++;
+} );
+ok( button.off(token), "off removes listener token" );
+button.input();
+is( off_count, 0, "removed listener does not run" );
+ok( not button.off(token), "off returns false for stale token" );
+
+let stopped := [];
+w.content().on( "submit", function () {
+	stopped.push("parent");
+} );
+button.submit( function ( e ) {
+	e.stop_propagation();
+	stopped.push("button");
+} );
+let stopped_event := button.submit();
+is( stopped.length(), 1, "stop_propagation prevents bubbling" );
+is( stopped[0], "button", "target listener still runs before stop" );
+is( stopped_event.cancelled(), true, "stop_propagation marks event cancelled" );
+
+let default_event := button.emit("change");
+default_event.prevent_default();
+is( default_event.default_prevented(), true, "prevent_default marks event" );
+
+let lifecycle := Window( title: "Lifecycle" );
+let lifecycle_events := [];
+lifecycle.once( "close_request", function ( e ) {
+	lifecycle_events.push("request");
+	e.prevent_default();
+} );
+lifecycle.closed( function () {
+	lifecycle_events.push("closed");
+} );
+lifecycle.close("blocked");
+is(
+	lifecycle_events.length(),
+	1,
+	"close_request can cancel Window.close",
+);
+lifecycle.close_request( function () {
+	lifecycle_events.push("request2");
+} );
+lifecycle.close("done");
+is( lifecycle_events[1], "request2", "Window.close emits close_request" );
+is( lifecycle_events[2], "closed", "Window.close emits closed" );
+is( lifecycle.call(), "done", "Window.call returns lifecycle close result" );
+
+let resized := [];
+lifecycle.resize( function ( e ) {
+	resized.push( e.name() );
+} );
+lifecycle.resize();
+is( resized[0], "resize", "resize alias emits lifecycle event" );
+
+button.click( function () {
+	w.close("accepted");
+} );
+button.click();
+is( w.call(), "accepted", "Window.call returns close result" );
+
+let e := exception( function () {
+	Button( surprise: true );
+} );
+ok( e instanceof Exception, "unknown helper prop throws" );
+ok( e{message} ~ /GUI_PROP_UNKNOWN/, "unknown prop error includes code" );
+
+done_testing();

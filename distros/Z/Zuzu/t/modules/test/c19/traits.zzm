@@ -1,0 +1,12 @@
+trait ExternalNamed {
+	method tag () {
+		return "name:" _ self.get_name();
+	}
+}
+
+trait ExternalRenamable {
+	method rename_to ( String value ) {
+		self.set_name( value );
+		return self.get_name();
+	}
+}

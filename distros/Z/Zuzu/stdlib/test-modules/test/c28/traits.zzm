@@ -1,0 +1,9 @@
+trait DynamicActions {
+	method jump () {
+		return "jumped";
+	}
+
+	method wave () {
+		return "waved";
+	}
+}

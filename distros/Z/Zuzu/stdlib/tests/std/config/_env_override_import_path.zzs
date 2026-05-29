@@ -1,0 +1,20 @@
+from std/config import Config;
+from std/eval import eval;
+from test/more import *;
+
+let cfg := Config.from_data( { runtime: { module: "std/string" } } );
+cfg.merge_flat(
+	{ "APP__runtime__module": "std/math" },
+	{ prefix: "APP__", separator: "__", coerce: true },
+);
+
+let module_name := cfg.get( "/runtime/module", "std/string" );
+let code :=
+	"from " _ module_name _ " import Math;\n"
+	_ "round( Math.pi );";
+let result := eval(code);
+
+is( module_name, "std/math", "env-style override updates config module path" );
+is( result, 3, "config-selected module import path executes via eval" );
+
+done_testing();

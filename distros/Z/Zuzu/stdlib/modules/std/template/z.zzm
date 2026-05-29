@@ -1,0 +1,531 @@
+=encoding utf8
+
+=head1 NAME
+
+std/template/z - Pure ZuzuScript template engine.
+
+=head1 SYNOPSIS
+
+  from std/template/z import ZTemplate;
+
+  let inline := new ZTemplate(
+    string: "Hello {{ user/name }}!",
+  );
+  say( inline.process( { user: { name: "Ada" } } ) );
+
+  let file_tmpl := new ZTemplate(
+    file: "templates/page.zt",
+    escape: "html",
+  );
+  say( file_tmpl.process( data ) );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Node and
+Electron. It is partially supported by zuzu-js in the browser: complex,
+HTTP/JSON/ZPath pipeline, self-contained, and trait-object rendering
+coverage passes, but filesystem-backed template loading and database row
+rendering coverage are unsupported.
+
+=head1 DESCRIPTION
+
+C<std/template/z> is a pure ZuzuScript template renderer.
+
+The module compiles template text into a cached parse tree and renders
+it against data using C<std/path/z> expressions.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<< ZTemplate({ string?: String, file?, escape?: String, includes?: Boolean }) >>
+
+Constructs a template from inline text or a file path. Returns:
+C<ZTemplate>.
+
+=over
+
+=item C<< template.process(data) >>
+
+Parameters: C<data> is the model used for path lookups. Returns:
+C<String>. Renders the template.
+
+=back
+
+=back
+
+=head1 TAG FORMS
+
+=over 4
+
+=item * C<{{ expr }}>
+
+Render expression output using template default escaping.
+
+=item * C<{{ expr :: raw }}>, C<{{ expr :: html }}>
+
+Render expression output using per-tag escape override.
+
+=item * C<{{# expr }}> ... C<{{/expr}}>
+
+Block form. Each truthy match renders child nodes.
+
+=item * C<{{> include.zt }}>
+
+Include another template file. Relative include paths resolve from the
+current template's file directory.
+
+=back
+
+=head1 ESCAPING
+
+Default escape mode is C<html>. Supported escape modes are C<html> and
+C<raw>.
+
+C<html> escapes C<&>, C<< < >>, C<E<gt>>, double quotes, and single
+quotes.
+
+=head1 INCLUDE RULES
+
+=over 4
+
+=item * Include processing is enabled by default.
+
+=item * Pass C<includes: false> to disable include tags.
+
+=item * Relative includes require a file-backed template source.
+
+=item * Circular include chains throw a deterministic error.
+
+=back
+
+=head1 KNOWN DIFFERENCES
+
+This module is implemented on top of C<std/path/z>. Parser/rendering
+deltas across runtimes are covered in ztests and should be treated as
+implementation bugs unless explicitly documented.
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/template/z >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/string import index, substr, trim;
+from std/path/z import ZPath;
+
+class ZTemplate {
+	let string;
+	let file;
+	let String escape := "html";
+	let includes := true;
+	let source_file := null;
+	let Array tree := [];
+	let compiled_paths := {};
+
+	method __build__ () {
+		let has_string := string ≢ null;
+		let has_file := file ≢ null;
+
+		if ( has_string and has_file ) {
+			die "Specify only one of \"string\" or \"file\"";
+		}
+		if ( not has_string and not has_file ) {
+			die "Missing template source: provide \"string\" or \"file\"";
+		}
+
+		escape := lc( "" _ escape );
+		if ( escape ≢ "html" and escape ≢ "raw" ) {
+			die `Invalid escape mode "${escape}"`;
+		}
+
+		if ( has_file ) {
+			let loaded := self._read_template_file(file);
+			string := loaded{text};
+			source_file := loaded{file};
+		}
+
+		tree := self._parse_template(
+			template: string ≡ null ? "": string,
+			current_file: source_file,
+			seen_files: {},
+			includes: includes,
+		);
+	}
+
+	method process ( data ) {
+		die "process() requires a data model" if data ≡ null;
+
+		return self._render_nodes(
+			nodes: tree,
+			context: data,
+			eval_meta: {},
+			default_escape: escape,
+		);
+	}
+
+	method _parse_template ( ... PairList args ) {
+		let template := args.get( "template", "" );
+		let current_file := args.get( "current_file", null );
+		let seen_files := args.get( "seen_files", {} );
+		let includes_enabled := args.get( "includes", true );
+		let root := [];
+
+		let stack := [
+			{
+				expr: null,
+				nodes: root,
+			},
+		];
+
+		let pos := 0;
+		while ( true ) {
+			let tag_open := index( template, "{{", pos );
+			last if tag_open < 0;
+
+			let text := substr( template, pos, tag_open - pos );
+			self._push_text( stack[ stack.length() - 1 ]{nodes}, text );
+
+			let tag_close := index( template, "}}", tag_open + 2 );
+			if ( tag_close < 0 ) {
+				die `Unterminated tag at character ${tag_open}`;
+			}
+
+			let raw := substr( template, tag_open + 2, tag_close - tag_open - 2 );
+			let tagged := trim(raw);
+
+			if ( substr( tagged, 0, 1 ) ≡ "#" ) {
+				let inner := trim( substr( tagged, 1 ) );
+				let parsed := self._parse_expression_spec(inner);
+				let block := {
+					type: "block",
+					expr_src: parsed{expr},
+					nodes: [],
+				};
+				stack[ stack.length() - 1 ]{nodes}.push(block);
+				stack.push( {
+					expr: parsed{expr},
+					nodes: block{nodes},
+				} );
+			}
+			else if ( substr( tagged, 0, 1 ) ≡ "/" ) {
+				let inner := trim( substr( tagged, 1 ) );
+				let current := stack.pop();
+				if ( current ≡ null or current{expr} ≡ null ) {
+					die `Mismatched close tag {{/${inner}}}`;
+				}
+				if ( inner ≢ "" ) {
+					let parsed := self._parse_expression_spec(inner);
+					if ( current{expr} ≢ parsed{expr} ) {
+						die `Mismatched close tag {{/${inner}}} for {{${current{expr}}}}`;
+					}
+				}
+			}
+			else if ( tagged ≢ "" ) {
+				if ( substr( tagged, 0, 1 ) ≡ ">" ) {
+					die "Template includes are disabled"
+						if not includes_enabled;
+
+					let include_path := trim( substr( tagged, 1 ) );
+					die "Empty include path in template tag"
+						if include_path ≡ "";
+
+					let resolved := self._resolve_include_path(
+						include_path: include_path,
+						current_file: current_file,
+					);
+
+					let key := self._canonical_path(resolved);
+					if ( seen_files.exists(key) and seen_files.get(key) ) {
+						die `Circular include detected for "${resolved}"`;
+					}
+
+					seen_files.set( key, true );
+					let loaded := self._read_template_file(resolved);
+					let include_nodes := self._parse_template(
+						template: loaded{text},
+						current_file: loaded{file},
+						seen_files: seen_files,
+						includes: includes_enabled,
+					);
+					seen_files.remove(key);
+
+					for ( let node in include_nodes ) {
+						stack[ stack.length() - 1 ]{nodes}.push(node);
+					}
+				}
+				else {
+					let parsed := self._parse_expression_spec(tagged);
+					stack[ stack.length() - 1 ]{nodes}.push( {
+						type: "expr",
+						expr_src: parsed{expr},
+						escape: parsed{escape},
+					} );
+				}
+			}
+
+			pos := tag_close + 2;
+		}
+
+		let tail := substr( template, pos );
+		self._push_text( stack[ stack.length() - 1 ]{nodes}, tail );
+
+		if ( stack.length() > 1 ) {
+			let missing := stack[ stack.length() - 1 ]{expr};
+			die `Missing close tag for {{${missing}}}`;
+		}
+
+		return root;
+	}
+
+	method _push_text ( nodes, text ) {
+		if ( text ≢ "" ) {
+			nodes.push( {
+				type: "text",
+				text: text,
+			} );
+		}
+	}
+
+	method _read_template_file ( raw_file ) {
+		let path_obj := self._to_path(raw_file);
+		let text := path_obj.slurp_utf8();
+		let canonical := self._canonical_path(path_obj);
+
+		return {
+			text: text,
+			file: canonical,
+		};
+	}
+
+	method _to_path ( raw_file ) {
+		from std/io import Path;
+		if ( raw_file instanceof Path ) {
+			return raw_file;
+		}
+		return new Path( "" _ raw_file );
+	}
+
+	method _canonical_path ( path_obj ) {
+		let obj := self._to_path(path_obj);
+		let canonical := obj.realpath();
+		if ( canonical ≡ null ) {
+			canonical := obj.absolute();
+		}
+		if ( canonical ≡ null ) {
+			return obj.to_String;
+		}
+		from std/io import Path;
+		if ( canonical instanceof Path ) {
+			return canonical.to_String;
+		}
+		return "" _ canonical;
+	}
+
+	method _resolve_include_path ( ... PairList args ) {
+		let include_path := args.get( "include_path" );
+		let current_file := args.get( "current_file" );
+
+		let include_obj := self._to_path(include_path);
+		if ( include_obj.is_absolute() ) {
+			return include_obj.to_String;
+		}
+
+		if ( current_file ≡ null ) {
+			die `Relative include path "${include_path}" requires file-based template source`;
+		}
+
+		let base := self._to_path(current_file).parent();
+		return base.child( include_obj.to_String ).to_String;
+	}
+
+	method _parse_expression_spec ( raw ) {
+		let expr := raw;
+		let escape_mode := null;
+
+		let split := self._find_escape_separator(raw);
+		if ( split ≢ null ) {
+			let lhs := split[0];
+			let rhs := split[1];
+			if ( rhs ≡ "html" or rhs ≡ "raw" ) {
+				expr := lhs;
+				escape_mode := rhs;
+			}
+		}
+
+		expr := trim(expr);
+		if ( expr ≡ "" ) {
+			die "Empty expression in template tag";
+		}
+
+		return {
+			expr: expr,
+			escape: escape_mode,
+		};
+	}
+
+	method _find_escape_separator ( text ) {
+		let quote := "";
+		let i := 0;
+		while ( i < length text ) {
+			let ch := substr( text, i, 1 );
+			if ( quote ≢ "" ) {
+				if ( ch ≡ "\\" ) {
+					i += 2;
+					next;
+				}
+				if ( ch ≡ quote ) {
+					quote := "";
+				}
+				i++;
+				next;
+			}
+
+			if ( ch ≡ "\"" or ch ≡ "'" ) {
+				quote := ch;
+				i++;
+				next;
+			}
+
+			if ( ch ≡ ":" and substr( text, i, 2 ) ≡ "::" ) {
+				let lhs := trim( substr( text, 0, i ) );
+				let rhs := lc( trim( substr( text, i + 2 ) ) );
+				return [ lhs, rhs ];
+			}
+
+			i++;
+		}
+
+		return null;
+	}
+
+	method _render_nodes ( ... PairList args ) {
+		let nodes := args.get( "nodes", [] );
+		let context := args.get( "context", null );
+		let eval_meta := args.get( "eval_meta", {} );
+		let default_escape := args.get( "default_escape", "html" );
+		let out := "";
+
+		for ( let node in nodes ) {
+			if ( node{type} ≡ "text" ) {
+				out _= node{text};
+			}
+			else if ( node{type} ≡ "expr" ) {
+				let results := self._evaluate_expression(
+					expr_src: node{expr_src},
+					context: context,
+					eval_meta: eval_meta,
+				);
+				let value := "";
+				for ( let matched in results ) {
+					let sv := matched.string_value();
+					value _= sv ≡ null ? "" : sv;
+				}
+
+				let escape_mode := node{escape};
+				if ( escape_mode ≡ null ) {
+					escape_mode := default_escape;
+				}
+
+				if ( escape_mode ≡ "html" ) {
+					out _= self._escape_html(value);
+				}
+				else {
+					out _= value;
+				}
+			}
+			else if ( node{type} ≡ "block" ) {
+				let results := self._evaluate_expression(
+					expr_src: node{expr_src},
+					context: context,
+					eval_meta: eval_meta,
+				);
+				for ( let matched in results ) {
+					let primitive := matched.primitive_value();
+					next if not self._truthy(primitive);
+
+					let inner_context := context;
+					let inner_meta := eval_meta;
+					if ( self._node_has_identity(matched) ) {
+						inner_context := matched;
+						inner_meta := { parentset: results };
+					}
+
+					out _= self._render_nodes(
+						nodes: node{nodes},
+						context: inner_context,
+						eval_meta: inner_meta,
+						default_escape: default_escape,
+					);
+				}
+			}
+		}
+
+		return out;
+	}
+
+	method _evaluate_expression ( ... PairList args ) {
+		let expr_src := args.get( "expr_src" );
+		let context := args.get( "context" );
+		let eval_meta := args.get( "eval_meta", {} );
+		if ( not compiled_paths.exists(expr_src) ) {
+			compiled_paths.set(
+				expr_src,
+				self._compile_path(expr_src),
+			);
+		}
+		let zpath := compiled_paths.get(expr_src);
+		return zpath.evaluate( context, eval_meta );
+	}
+
+	method _compile_path ( expr_src ) {
+		return new ZPath( path: expr_src );
+	}
+
+	method _node_has_identity ( node ) {
+		let parent := node.parent();
+		if ( parent ≡ null ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	method _truthy ( value ) {
+		return value ? true : false;
+	}
+
+	method _escape_html ( text ) {
+		let out := "";
+		let i := 0;
+		while ( i < length text ) {
+			let ch := substr( text, i, 1 );
+			if ( ch ≡ "&" ) {
+				out _= "&amp;";
+			}
+			else if ( ch ≡ "<" ) {
+				out _= "&lt;";
+			}
+			else if ( ch ≡ ">" ) {
+				out _= "&gt;";
+			}
+			else if ( ch ≡ "\"" ) {
+				out _= "&quot;";
+			}
+			else if ( ch ≡ "'" ) {
+				out _= "&#39;";
+			}
+			else {
+				out _= ch;
+			}
+			i++;
+		}
+		return out;
+	}
+}

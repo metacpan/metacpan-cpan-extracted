@@ -1,0 +1,34 @@
+from test/more import *;
+from test/worker_contract import require_worker_phase, await_worker_failure;
+
+let Worker := require_worker_phase(4);
+
+async function main () {
+	let err := await {
+		await_worker_failure(
+			Worker.spawn(
+				function () {
+					throw new Exception( message: "first worker failed" );
+				},
+				[],
+			),
+		);
+	};
+	like( err.to_String(), /first worker failed/, "first worker failure seen" );
+
+	let result := await {
+		Worker.spawn(
+			function () {
+				return 42;
+			},
+			[],
+		);
+	};
+	is( result, 42, "parent can spawn another worker after failure" );
+}
+
+await {
+	main();
+};
+
+done_testing();

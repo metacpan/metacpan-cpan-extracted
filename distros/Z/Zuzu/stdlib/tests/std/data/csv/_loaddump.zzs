@@ -1,0 +1,226 @@
+from test/more import *;
+requires_capability( "fs" );
+requires_capability( "db" );
+
+from std/data/csv import CSV, CSVReader, CSVWriter;
+from std/db import DB;
+from std/io import Path;
+
+let csv := new CSV(
+	headers: true,
+);
+
+let iter_path := Path.tempfile();
+iter_path.spew_utf8(
+	"name,age\n"
+	_ "Ada,32\n"
+	_ "Bob,27\n"
+	_ "Cam,40\n",
+);
+let reader := csv.open(iter_path);
+ok( reader instanceof CSVReader, "open returns CSVReader" );
+is( reader.headers(), [ "name", "age" ], "reader exposes parsed headers" );
+is( reader.columns(), [ "name", "age" ], "columns aliases headers" );
+is( reader.next(){name}, "Ada", "next returns default row shape" );
+is( reader.row_number(), 1, "row_number tracks consumed rows" );
+let seen := [];
+for ( let row in reader ) {
+	seen.push( row{name} );
+}
+is( seen, [ "Bob", "Cam" ], "reader object is iterable with for loop" );
+reader.close();
+
+let array_reader_path := Path.tempfile();
+array_reader_path.spew_utf8(
+	"skip this line\n"
+	_ "\n"
+	_ "#comment\n"
+	_ "1,2\n"
+	_ "3,4\n",
+);
+let array_reader := ( new CSV(
+	headers: false,
+	skip_lines: 1,
+	skip_empty_rows: true,
+	comment_char: "#",
+) ).open(array_reader_path);
+is(
+	array_reader.next_array(),
+	[ "1", "2" ],
+	"reader skips configured lines, blanks, and comments",
+);
+is( array_reader.all_array(), [ [ "3", "4" ] ], "all_array returns remaining rows" );
+array_reader.close();
+
+let manual_reader_path := Path.tempfile();
+manual_reader_path.spew_utf8( "1,2\n3,4\n" );
+let manual_reader := ( new CSV( headers: false ) ).open(manual_reader_path);
+is(
+	manual_reader.set_columns( [ "x", "y" ] ),
+	[ "x", "y" ],
+	"set_columns installs explicit column names",
+);
+is( manual_reader.next_dict(){y}, "2", "set_columns switches reader to dict rows" );
+manual_reader.close();
+
+let dump_path := Path.tempfile();
+let dump_result := csv.dump(
+	dump_path,
+	[
+		{ name: "Ada", age: "32" },
+		{ name: "Bob", age: "27" },
+	],
+);
+ok( dump_result ≢ null, "dump returns destination path" );
+let loaded_back := csv.load(dump_path);
+is( loaded_back[0]{name}, "Ada", "dump + load roundtrips header-based rows" );
+is( loaded_back[1]{age}, "27", "dump + load roundtrips later row values" );
+
+let writer_path := Path.tempfile();
+let writer := csv.open_writer(writer_path);
+ok( writer instanceof CSVWriter, "open_writer returns CSVWriter" );
+is( writer.write_header( [ "name", "age" ] ), [ "name", "age" ], "write_header returns active columns" );
+is( writer.write_row( { name: "Ada", age: 32 } )[1], 32, "write_row returns serialized field array" );
+is( writer.print_row( { name: "Bob", age: 27 } )[0], "Bob", "print_row aliases write_row" );
+is( writer.row_number(), 2, "writer row_number tracks written rows" );
+writer.close();
+let writer_loaded := csv.load(writer_path);
+is( writer_loaded.length(), 2, "writer output can be loaded back" );
+is( writer_loaded[1]{name}, "Bob", "writer output preserves later row data" );
+
+let append_writer := csv.open_writer(
+	writer_path,
+	{
+		append: true,
+		headers: false,
+		columns: [ "name", "age" ],
+	},
+);
+append_writer.write_row( { name: "Cam", age: 40 } );
+append_writer.close();
+let appended_rows := csv.load(writer_path);
+is( appended_rows.length(), 3, "append writer adds rows without rewriting header" );
+is( appended_rows[2]{name}, "Cam", "append writer adds trailing row" );
+
+like(
+	exception( function() {
+		csv.load("people.csv");
+	} ),
+	/TypeException: CSV.load expects Path as first argument/,
+	"CSV.load rejects non-Path target",
+);
+
+let dbh := DB.temp();
+dbh.prepare( "create table users (id integer, name text, role text)" ).execute();
+dbh.prepare( "insert into users (id, name, role) values (1, 'Ada', 'dev')" ).execute();
+dbh.prepare( "insert into users (id, name, role) values (2, 'Bob', 'ops')" ).execute();
+
+let export_path := Path.tempfile();
+csv.dump_table( export_path, dbh, "users" );
+let exported := csv.load(export_path);
+is( exported.length(), 2, "dump_table writes all database rows" );
+is( exported[0]{name}, "Ada", "dump_table includes first row data" );
+is( exported[1]{role}, "ops", "dump_table includes later row data" );
+
+let export_query_path := Path.tempfile();
+csv.dump_query(
+	export_query_path,
+	dbh,
+	"select name, role from users where id >= ? order by id",
+	[ 2 ],
+	{
+		headers: true,
+	},
+);
+let query_rows := csv.load(export_query_path);
+is( query_rows.length(), 1, "dump_query exports filtered query results" );
+is( query_rows[0]{role}, "ops", "dump_query preserves selected columns" );
+
+let import_path := Path.tempfile();
+import_path.spew_utf8(
+	"name,score,active\n"
+	_ "Ada,9,true\n"
+	_ "Bob,7,false\n",
+);
+let created_count := csv.load_table(
+	import_path,
+	dbh,
+	"scores",
+	{
+		create_table: true,
+		column_types: {
+			name: "text",
+			score: "integer",
+			active: "text",
+		},
+	},
+);
+is( created_count, 2, "load_table reports inserted row count" );
+let scores_q := dbh.prepare( "select name, score, active from scores order by name" );
+scores_q.execute();
+let score_rows := scores_q.all_dict();
+is( score_rows.length(), 2, "load_table inserted rows into new table" );
+is( score_rows[0]{score}, 9, "load_table preserved integer-like value" );
+is( score_rows[1]{active}, "false", "load_table preserved text field" );
+
+let mapped_path := Path.tempfile();
+mapped_path.spew_utf8(
+	"person_name,team_role\n"
+	_ "Eve,qa\n",
+);
+let mapped_count := csv.load_table(
+	mapped_path,
+	dbh,
+	"people_map",
+	{
+		create_table: true,
+		column_map: {
+			person_name: "name",
+			team_role: "role",
+		},
+		column_types: {
+			name: "text",
+			role: "text",
+		},
+		batch_size: 1,
+		transaction: true,
+	},
+);
+is( mapped_count, 1, "load_table supports column mapping and batched transaction import" );
+let mapped_q := dbh.prepare( "select name, role from people_map" );
+mapped_q.execute();
+is( mapped_q.next_dict(){name}, "Eve", "column mapping writes renamed columns" );
+
+let append_path := Path.tempfile();
+append_path.spew_utf8( "3,Cam,qa\n4,Dee,pm\n" );
+let append_count := ( new CSV() ).load_table(
+	append_path,
+	dbh,
+	"users",
+	{
+		headers: false,
+		columns: [ "id", "name", "role" ],
+	},
+);
+is( append_count, 2, "load_table appends rows into existing table" );
+let user_q := dbh.prepare( "select count(*) as total from users" );
+user_q.execute();
+is( user_q.next_dict(){total}, 4, "existing table import increases row count" );
+
+let conflict_path := Path.tempfile();
+conflict_path.spew_utf8( "id,name,role\n1,Ada,lead\n" );
+let conflict_count := csv.load_table(
+	conflict_path,
+	dbh,
+	"users",
+	{
+		conflict: "ignore",
+		transaction: true,
+	},
+);
+is( conflict_count, 1, "load_table reports attempted inserts even with conflict policy" );
+let unchanged_q := dbh.prepare( "select role from users where id = 1" );
+unchanged_q.execute();
+is( unchanged_q.next_dict(){role}, "dev", "conflict ignore leaves existing row unchanged" );
+
+done_testing();

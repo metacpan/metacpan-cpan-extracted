@@ -1,0 +1,381 @@
+#!/usr/bin/env zuzu
+
+from std/getopt import Getopt;
+from std/io import Path;
+from std/math import Math;
+from std/math/range import abbreviate;
+from std/proc import Proc, Env;
+from std/string import join, sprint, replace, substr, starts_with;
+from test/parser import parse;
+
+let String _RESET := "\x1b[0m";
+let String _RED := "\x1b[31m";
+let String _GREEN := "\x1b[32m";
+let String _YELLOW := "\x1b[33m";
+let String _BLUE := "\x1b[34m";
+
+function _is_true ( value ) {
+	if ( value ≡ null ) {
+		return false;
+	}
+	let text := "" _ value;
+	return text ~ /^(1|true|yes|on)$/i;
+}
+
+function _paint ( String text, String tone, Boolean colour_enabled ) {
+	return text if not colour_enabled;
+	return tone _ text _ _RESET;
+}
+
+function _usage () {
+	say( "Usage:" );
+	say( "  scripts/zuzuprove [options] <file-or-directory> [...]" );
+	say( "" );
+	say( "Options:" );
+	say( "  --zuzu PATH          Zuzu executable to test" );
+	say( "  -d[NUM]              Pass debug level to Zuzu (default: -d1)" );
+	say( "  -I DIR               Prepend an include directory" );
+	say( "  --deny=CAPABILITY    Deny a runtime capability" );
+	say( "  --denymodule=NAME    Deny a module" );
+	say( "  -v, --verbose        Show per-test details" );
+	say( "  --no-colour          Disable coloured output" );
+	say( "  -h, --help           Show this help" );
+}
+
+function _normalize_argv ( Array argv ) {
+	let out := [];
+	for ( let arg in argv ) {
+		let text := "" _ arg;
+		if ( starts_with( text, "--zuzu=" ) ) {
+			out.push("--zuzu");
+			out.push( substr( text, 7 ) );
+			next;
+		}
+		if ( starts_with( text, "--include=" ) ) {
+			out.push("--include");
+			out.push( substr( text, 10 ) );
+			next;
+		}
+		if ( starts_with( text, "--deny=" ) ) {
+			out.push("--deny");
+			out.push( substr( text, 7 ) );
+			next;
+		}
+		if ( starts_with( text, "--denymodule=" ) ) {
+			out.push("--denymodule");
+			out.push( substr( text, 13 ) );
+			next;
+		}
+		if ( text eq "-d" ) {
+			out.push("--debug");
+			out.push("1");
+			next;
+		}
+		if ( starts_with( text, "-d=" ) ) {
+			out.push("--debug");
+			out.push( substr( text, 3 ) );
+			next;
+		}
+		if ( starts_with( text, "-d" ) and length(text) > 2 ) {
+			out.push("--debug");
+			out.push( substr( text, 2 ) );
+			next;
+		}
+		if ( starts_with( text, "-I" ) and length(text) > 2 ) {
+			out.push("-I");
+			out.push( substr( text, 2 ) );
+			next;
+		}
+		out.push(text);
+	}
+	return out;
+}
+
+function _effective_argv ( Array argv ) {
+	if ( argv.length() = 0 or argv[0] ne "--" ) {
+		return argv;
+	}
+	let out := [];
+	let i := 1;
+	while ( i < argv.length() ) {
+		out.push( argv[i] );
+		i++;
+	}
+	return out;
+}
+
+function _collect_zzs ( Path dir, Array files ) {
+	let children := dir.children();
+	for ( let child in children ) {
+		if ( child.is_dir() ) {
+			_collect_zzs( child, files );
+			next;
+		}
+		if ( child.is_file() and child.to_String() ~ /\.zzs$/ ) {
+			files.push( child );
+		}
+	}
+}
+
+function _append_target_files ( String target, Array files ) {
+	let root := new Path(target);
+	if ( root.is_dir() ) {
+		let found := [];
+		_collect_zzs( root, found );
+		found := found.sort( function( a, b ) {
+			return a.to_String() cmp b.to_String();
+		} );
+		for ( let file in found ) {
+			files.push(file);
+		}
+		return true;
+	}
+	if ( root.is_file() and root.to_String() ~ /\.zzs$/i ) {
+		files.push(root);
+		return true;
+	}
+	say( `Not a zzs file or directory: ${root}` );
+	return false;
+}
+
+function _parse_failed_tests ( Dict summary, verbose ) {
+	let failed_numbers := [];
+	let failed := [];
+	for ( let test_row in summary{tests} ) {
+		if ( test_row{bucket} ≡ "failed" and test_row{top_level} ) {
+			failed_numbers.push( test_row{number} );
+			if ( verbose ) {
+				let label := test_row{description};
+				if ( label ≡ "" ) {
+					label := `test ${test_row{number}}`;
+				}
+				failed.push( label );
+			}
+		}
+	}
+	if ( verbose ) {
+		return failed;
+	}
+	return abbreviate( failed_numbers );
+}
+
+function _zuzu_command ( Dict opts ) {
+	if ( opts{zuzu} ≢ null and opts{zuzu} ≢ "" ) {
+		return "" _ opts{zuzu};
+	}
+	let env_zuzu := Env.get( "ZUZU", null );
+	if ( env_zuzu ≢ null and env_zuzu ≢ "" ) {
+		return "" _ env_zuzu;
+	}
+	return "zuzu";
+}
+
+function _run_argv (
+	String debug_level,
+	Array denies,
+	Array denied_modules,
+	Array prepended_inc,
+	String file
+) {
+	let argv := [];
+	argv.push( "-d" _ debug_level );
+	for ( let capability in denies ) {
+		argv.push( "--deny=" _ capability );
+	}
+	for ( let module in denied_modules ) {
+		argv.push( "--denymodule=" _ module );
+	}
+	for ( let dir in prepended_inc ) {
+		argv.push( "-I" _ dir );
+	}
+	for ( let dir in __system__{inc} ) {
+		argv.push( "-I" _ dir );
+	}
+	argv.push(file);
+	return argv;
+}
+
+function __main__ ( argv ) {
+	let parsed := Getopt.parse(
+		_normalize_argv( _effective_argv(argv) ),
+		[
+			"verbose|v",
+			"help|h",
+			"no-colour",
+			"no-color",
+			"zuzu=s",
+			"debug=s",
+			"deny=s@",
+			"denymodule=s@",
+			"include|I=s@",
+		],
+	);
+	if ( not parsed{ok} ) {
+		say( parsed{error} );
+		_usage();
+		return 2;
+	}
+
+	if ( parsed{options}{help} ) {
+		_usage();
+		return 0;
+	}
+
+	if ( parsed{argv}.length() = 0 ) {
+		_usage();
+		return 2;
+	}
+
+	let opts := parsed{options};
+	let zuzu_command := _zuzu_command(opts);
+	let debug_level := opts{debug} ≢ null ? "" _ opts{debug}: "1";
+	if ( not( debug_level ~ /^\d+$/ ) ) {
+		say( "-d requires a numeric debug level" );
+		_usage();
+		return 2;
+	}
+	let denies := opts{deny} ≢ null ? opts{deny}: [];
+	let denied_modules := opts{denymodule} ≢ null ? opts{denymodule}: [];
+	let prepended_inc := opts{include} ≢ null ? opts{include}: [];
+	let verbose := _is_true( opts{verbose} );
+	let disable_colour := _is_true( opts{"no-colour"} )
+		or _is_true( opts{"no-color"} )
+		or _is_true( Env.get( "NO_COLOR" ) );
+	let colour_enabled := not disable_colour;
+
+	let files := [];
+	for ( let target in parsed{argv} ) {
+		if ( not _append_target_files( target, files ) ) {
+			return 2;
+		}
+	}
+
+	if ( files.length() = 0 ) {
+		say( _paint( "No .zzs files found.", _YELLOW, colour_enabled ) );
+		return 0;
+	}
+
+	let totals := {
+		files: 0,
+		files_passed: 0,
+		files_failed: 0,
+		tests: 0,
+		passed: 0,
+		failed: 0,
+		todo: 0,
+		skipped: 0,
+	};
+
+	let failures := {};
+	
+	let widest := files.map( fn x → length( x.to_String ) ).sortnum()[-1];
+
+	for ( let file in files ) {
+		let run := Proc.run(
+			zuzu_command,
+			_run_argv(
+				debug_level,
+				denies,
+				denied_modules,
+				prepended_inc,
+				file.to_String(),
+			),
+			{ capture_stdout: true, capture_stderr: true },
+		);
+		let summary := parse( run{stdout} );
+		let file_failed_tests := _parse_failed_tests( summary, verbose );
+
+		totals{files}++;
+		totals{tests} += summary{top_level}{total};
+		totals{passed} += summary{top_level}{passed};
+		totals{failed} += summary{top_level}{failed};
+		totals{todo} += summary{top_level}{todo};
+		totals{skipped} += summary{top_level}{skipped};
+		totals{ass_tests} += summary{assertions}{total};
+		totals{ass_passed} += summary{assertions}{passed};
+		totals{ass_failed} += summary{assertions}{failed};
+		totals{ass_todo} += summary{assertions}{todo};
+		totals{ass_skipped} += summary{assertions}{skipped};
+
+		let file_ok := Proc.is_success( run )
+			and summary{top_level}{total} > 0
+			and summary{top_level}{failed} = 0;
+
+		if ( file_ok ) {
+			totals{files_passed}++;
+		}
+		else {
+			totals{files_failed}++;
+			failures.set( file.to_String(), file_failed_tests );
+		}
+
+		let status_text := file_ok ? _paint( "PASS", _GREEN, colour_enabled )
+			: _paint( "FAIL", _RED, colour_enabled );
+		let counts_text := sprint(
+			`total:%3d  pass:%3d  fail:%3d  todo:%3d  skip:%3d`
+			summary{top_level}{total},
+			summary{top_level}{passed},
+			summary{top_level}{failed},
+			summary{top_level}{todo},
+			summary{top_level}{skipped},
+		);
+			
+		let file_nice := replace(file.to_String, ".zzs", "");
+		
+		say sprint( `%-${widest}s%-54s%s`, file_nice, counts_text, status_text );
+
+		if ( verbose ) {
+			for ( let test_row in summary{tests} ) {
+				let marker := test_row{bucket} ≡ "failed"
+					? _paint( "✗", _RED, colour_enabled )
+					: _paint( "✓", _GREEN, colour_enabled );
+				let desc := test_row{description} ≡ ""
+					? `test ${test_row{number}}`
+					: test_row{description};
+				say( `  ${marker} [${test_row{bucket}}] ${desc}` );
+			}
+		}
+	}
+
+	let grand_ok := totals{files_failed} = 0 and totals{failed} = 0;
+	let headline := grand_ok
+		? _paint( "Result:      PASS", _GREEN, colour_enabled )
+		: _paint( "Result:      FAIL", _RED, colour_enabled );
+	say( headline );
+	say( `Files:       ${totals{files}} (${totals{files_passed}} passed, ${totals{files_failed}} failed)` );
+	say( `Tests:       ${totals{tests}} (pass: ${totals{passed}}  fail: ${totals{failed}}  todo: ${totals{todo}}  skip: ${totals{skipped}})` );
+	say( `Assertions:  ${totals{ass_tests}} (pass: ${totals{ass_passed}}  fail: ${totals{ass_failed}}  todo: ${totals{ass_todo}}  skip: ${totals{ass_skipped}})` );
+
+	if ( not grand_ok ) {
+		say( _paint( "Failures by file:", _BLUE, colour_enabled ) );
+		for ( let file in files ) {
+			let key := file.to_String();
+			let entries := failures.get( key, null );
+			if ( entries ≡ null ) {
+				next;
+			}
+			if ( entries.length() = 0 ) {
+				say( `  ${key}: script failed before TAP assertions` );
+				next;
+			}
+			if ( verbose ) {
+				say( `  ${key}` );
+				for ( let label in entries ) {
+					say( `    - ${label}` );
+				}
+				next;
+			}
+			say( `  ${key}: ${join( ", ", entries )}` );
+		}
+		return 1;
+	}
+
+	if ( Env.get( "ZUZU_EMOJI" ) ) {
+		say( "🦝" );
+	}
+	else {
+		say( "(^_^)" );
+	}
+
+	return 0;
+}

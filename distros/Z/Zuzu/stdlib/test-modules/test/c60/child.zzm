@@ -1,0 +1,16 @@
+from std/proc import sleep_async;
+from test/c60/parent import WorkerParent;
+from test/c60/traits import Labelled;
+
+class WorkerChild extends WorkerParent with Labelled {
+	method emit_async_line () {
+		let line := self.label() _ "\n";
+		async function runner () {
+			await {
+				sleep_async(0.01);
+			};
+			return line;
+		}
+		return runner;
+	}
+}

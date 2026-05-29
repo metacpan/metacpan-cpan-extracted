@@ -1,0 +1,125 @@
+from std/path/z/node import Node;
+from std/path/z import ZPath;
+from std/path/zz import ZZPath;
+from test/more import *;
+
+let root := Node.from_root( {
+	name: "Ada",
+	age: 37,
+	tags: [ "a", "b" ],
+	nested: {
+		name: "Nested",
+		child: {
+			name: "Leaf",
+		},
+	},
+} );
+
+is( root.type(), "map", "root dict is map" );
+
+let kids := root.children();
+ok( kids.length() >= 3, "dict children are wrapped" );
+
+let name_node := null;
+for ( let kid in kids ) {
+	if ( kid.key() ≡ "name" ) {
+		name_node := kid;
+	}
+}
+
+ok( name_node ≢ null, "name child found" );
+is( name_node.type(), "string", "name child type" );
+is( name_node.string_value(), "Ada", "string_value uses primitive conversion" );
+
+let dump := root.dump();
+is( dump{"@type"}, "map", "dump includes type" );
+
+let scoped_root := Node.from_root( {
+	name: "Grace",
+} );
+let scoped_child := scoped_root.children().first( fn kid → kid.key() ≡ "name" );
+is( scoped_child.parent(), scoped_root, "child sees live parent node" );
+scoped_root := null;
+is( scoped_child.parent(), null, "child does not keep parent node alive" );
+
+let string_error := exception( function () {
+	root.find("/name");
+} );
+isnt( string_error, null, "find rejects plain path strings" );
+like(
+	string_error{message},
+	/Node\.find expects a ZPath object/,
+	"find string rejection message is stable",
+);
+
+let found_name := root.find( new ZPath( path: "/name" ) );
+is( found_name.length(), 1, "find accepts compiled ZPath object" );
+is( found_name[0].primitive_value(), "Ada", "find returns selected node value" );
+is( found_name[0].key(), "name", "find preserves selected node key" );
+is( found_name[0].parent(), root, "find preserves parent metadata" );
+is(
+	found_name[0].id(),
+	root.id() _ "/name",
+	"find preserves selected node id",
+);
+
+let zz_found_name := root.find( new ZZPath( path: "/name" ) );
+is( zz_found_name.length(), 1, "find accepts ZZPath subclass object" );
+is( zz_found_name[0].primitive_value(), "Ada", "find uses ZZPath subclass" );
+
+let nested_node := root.find( new ZPath( path: "/nested" ) )[0];
+is(
+	nested_node.find( new ZPath( path: "/name" ) )[0].primitive_value(),
+	"Nested",
+	"absolute find paths are rooted at the receiver node",
+);
+is(
+	nested_node.find( new ZPath( path: "child/name" ) )[0].primitive_value(),
+	"Leaf",
+	"relative find paths start from the receiver node",
+);
+is(
+	nested_node.find( new ZPath( path: "/missing" ) ).length(),
+	0,
+	"find returns empty list for no match",
+);
+
+let pairlist_root := Node.from_root( {{
+	tag: "perl",
+	page: 1,
+	tag: "zuzu",
+}} );
+let pairlist_children := pairlist_root.children();
+is( pairlist_children.length(), 3, "pairlist children enumerate pairs" );
+is( pairlist_children[0].key(), "tag", "first pairlist child keeps key" );
+is( pairlist_children[0].index(), 0, "first pairlist child keeps global index" );
+is( pairlist_children[1].key(), "page", "second pairlist child keeps key" );
+is( pairlist_children[2].key(), "tag", "duplicate pairlist child keeps key" );
+is( pairlist_children[2].index(), 2, "duplicate pairlist child keeps global index" );
+is(
+	pairlist_root.indexed_child(1).raw().value,
+	1,
+	"pairlist indexed_child uses global pair index",
+);
+is(
+	pairlist_root.named_child("tag").raw().value,
+	"perl",
+	"pairlist named_child returns first matching pair",
+);
+is(
+	pairlist_root.named_indexed_child( "tag", 1 ).raw().value,
+	"zuzu",
+	"pairlist named_indexed_child uses per-key occurrence index",
+);
+
+let pair_attrs := pairlist_children[0].attributes();
+is( pair_attrs.length(), 2, "pair node exposes key and value attributes" );
+is( pair_attrs[0].key(), "@key", "pair key attribute is named" );
+is( pair_attrs[1].key(), "@value", "pair value attribute is named" );
+is(
+	pairlist_root.dump(){children}.length(),
+	3,
+	"pairlist dump includes pair children",
+);
+
+done_testing();

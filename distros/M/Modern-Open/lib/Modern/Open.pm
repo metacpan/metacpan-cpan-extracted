@@ -14,7 +14,7 @@ use strict;
 BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub';
         eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
 
-$VERSION = '0.15';
+$VERSION = '0.16';
 $VERSION = $VERSION;
 $_fh_seq = 0;
 
@@ -296,7 +296,7 @@ Modern::Open - Autovivification, Autodie, and 3-args open support
 
 =head1 VERSION
 
-Version 0.15
+Version 0.16
 
 =head1 SYNOPSIS
 
@@ -430,7 +430,7 @@ L<Pre-Modern Perl VS Post-Modern Perl: FIGHT!|http://blogs.perl.org/users/buddy_
 
 =item *
 
-L<perl - open my $fh, "comand |"; # isn't modern|http://blog.livedoor.jp/dankogai/archives/51176081.html> - 404 Blog Not Found
+L<perl - open my $fh, "comand E<verbar>"; # isn't modern|http://blog.livedoor.jp/dankogai/archives/51176081.html> - 404 Blog Not Found
 
 =item *
 

@@ -2,7 +2,7 @@ package DBIx::QuickORM::Dialect::SQLite;
 use strict;
 use warnings;
 
-our $VERSION = '0.000021';
+our $VERSION = '0.000022';
 
 use DBD::SQLite 1.0;
 
@@ -29,7 +29,7 @@ DBIx::QuickORM::Dialect::SQLite - SQLite dialect for DBIx::QuickORM.
 =head1 DESCRIPTION
 
 The SQLite-specific L<DBIx::QuickORM::Dialect>. Introspects schema metadata
-from SQLite's C<pragma_*> tables and C<sqlite_schema>, drives transactions
+from SQLite's C<pragma_*> tables and C<sqlite_master>, drives transactions
 and savepoints via the SQLite driver, and reports SQLite's feature set
 (C<RETURNING> support, no async support).
 
@@ -196,8 +196,8 @@ sub build_tables_from_db {
     my $dbh = $self->{+DBH};
 
     my @queries = (
-        "SELECT name, type, 0 FROM sqlite_schema      WHERE type IN ('table', 'view')",
-        "SELECT name, type, 1 FROM sqlite_temp_schema WHERE type IN ('table', 'view')",
+        "SELECT name, type, 0 FROM sqlite_master      WHERE type IN ('table', 'view')",
+        "SELECT name, type, 1 FROM sqlite_temp_master WHERE type IN ('table', 'view')",
     );
 
     my %tables;

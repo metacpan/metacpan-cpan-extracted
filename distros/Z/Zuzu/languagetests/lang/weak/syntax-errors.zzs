@@ -1,0 +1,40 @@
+from std/eval import eval;
+from test/more import *;
+
+let argument_error := exception( function () {
+	eval( "let x := {}; let arr := []; arr.push(x but weak);" );
+} );
+like(
+	argument_error{message},
+	/function argument marker|but weak|Unexpected token|Expected '\)' after arguments/i,
+	"but weak is rejected as a function argument marker",
+);
+
+let assignment_error := exception( function () {
+	eval( "let x := 1; let y := 2; x += y but weak;" );
+} );
+like(
+	assignment_error{message},
+	/only valid on ':=' assignments|but weak/i,
+	"but weak is rejected on non-:= assignments",
+);
+
+let path_exists_error := exception( function () {
+	eval( "let data := {}; data @? \"/x\" := 1 but weak;" );
+} );
+like(
+	path_exists_error{message},
+	/not valid on \@\?|but weak/i,
+	"but weak is rejected on @? path assignments",
+);
+
+let unknown_modifier_error := exception( function () {
+	eval( "let x := 1 but strong;" );
+} );
+like(
+	unknown_modifier_error{message},
+	/Unknown but modifier|expected 'but weak'|but strong/i,
+	"unknown but modifiers are rejected",
+);
+
+done_testing();

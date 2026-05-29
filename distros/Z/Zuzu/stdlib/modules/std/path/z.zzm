@@ -1,0 +1,403 @@
+=encoding utf8
+
+=head1 NAME
+
+std/path/z - Pure Zuzu implementation of ZPath selectors.
+
+=head1 SYNOPSIS
+
+  from std/path/z import ZPath;
+  from std/time import Time;
+
+  let data := {
+    users: [
+      { name: "Ada", age: 32, updated: new Time() },
+      { name: "Bob", age: 27 },
+    ],
+  };
+
+  let names := query( data, "/users/*/name" );
+  let zp := new ZPath( path: "/users/#0/name" );
+  say( zp.first( data, "n/a" ) );
+  say( exists( data, "/users/#9/name" ) );
+  say( first( data, "/users/#0/updated/@year" ) );
+  say( zp.assign_first( data, "Adele" ) );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+Native (pure-Zuzu) path traversal for structured values.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<< ZPath({ path: String, ast? }) >>
+
+Constructs a compiled ZPath selector. Returns: C<ZPath>.
+
+=over
+
+=item C<< ZPath.use() >>
+
+Parameters: none. Returns: C<null>. Makes this path class the lexical
+implementation for C<@>, C<@@>, and C<@?>.
+
+=item C<< path.get_evaluator() >>
+
+Parameters: none. Returns: C<Evaluator>. Returns the evaluator used for
+this path.
+
+=item C<< path.evaluate(raw, meta := {}) >>
+
+Parameters: C<raw> is the query root and C<meta> is optional evaluation
+metadata. Returns: C<Array>. Evaluates the path and returns selected
+nodes.
+
+=item C<< path.get(raw) >>, C<< path.select(raw) >>, C<< path.query(raw) >>
+
+Parameters: C<raw> is the query root. Returns: C<Array>. Evaluates the
+path and returns selected primitive values.
+
+=item C<< path.first(raw, fallback?) >>
+
+Parameters: C<raw> is the query root and C<fallback> is optional.
+Returns: value. Returns the first selected value or C<fallback>/C<null>.
+
+=item C<< path.exists(raw) >>
+
+Parameters: C<raw> is the query root. Returns: C<Boolean>. Returns true
+when the path selects at least one value.
+
+=item C<< path.assign_first(raw, value, op := ":=", weak := false) >>
+
+Parameters: C<raw> is the query root, C<value> is the assignment value,
+C<op> is an assignment operator, and C<weak> requests weak assignment.
+Returns: value. Updates the first selected node or throws if none match.
+
+=item C<< path.assign_all(raw, value, op := ":=", weak := false) >>
+
+Parameters: same as C<assign_first>. Returns: value. Updates every
+selected node.
+
+=item C<< path.assign_maybe(raw, value, op := ":=", weak := false) >>
+
+Parameters: same as C<assign_first>. Returns: C<Boolean>. Updates the
+first selected node when one exists.
+
+=item C<< path.ref_first(raw) >>
+
+Parameters: C<raw> is the query root. Returns: C<Function>. Returns a
+reference-like getter/setter for the first selected node.
+
+=item C<< path.ref_all(raw) >>
+
+Parameters: C<raw> is the query root. Returns: C<Array>. Returns
+reference-like getter/setters for all selected nodes.
+
+=item C<< path.ref_maybe(raw) >>
+
+Parameters: C<raw> is the query root. Returns: C<Function> or C<null>.
+Returns a reference-like getter/setter for the first selected node when
+one exists.
+
+=back
+
+=back
+
+=head1 USE WITH PATH OPERATORS
+
+The path operators C<@>, C<@@>, and C<@?> can be set to use this module
+in a lexical scope.
+
+  from std/path/z import ZPath;
+
+  function find_usernames (data) {
+    ZPath.use();
+    return data @@ "/users/*/name";
+  }
+
+However, for repeatedly used paths it may be more efficient to compile the
+path once and use many times:
+
+  let _usernames_zpath;
+  function find_usernames (data) {
+    from std/path/z import ZPath;
+    _usernames_zpath ?:= new ZPath( path: "/users/*/name" );
+    return data @@ _usernames_zpath;
+  }
+
+=head1 SUPPORTED TYPES
+
+=over
+
+=item B<Null>, B<Boolean>, B<Number>, B<String>, B<BinaryString>, B<Regexp>
+
+Treated as terminal nodes. These objects cannot have child objects.
+
+=item B<Array>
+
+Array items can be indexed by number.
+
+=item B<Bag>, B<Set>
+
+Items cannot be indexed by number, but can be returned by "*".
+
+=item B<Dict>
+
+Values are named by their key.
+
+=item B<PairList>
+
+Pairs can be indexed by number, named by their key, or use a combination of
+both.
+
+  {{ foo: 11, bar: -1, foo: 22, foo: 33 }}
+
+C<< /#2 >> (0-based index) will retrieve C<< foo: 22 >>.
+C<< /foo >> will retrieve C<< foo: 11 >>, C<< foo: 22 >>, and C<< foo: 33 >>.
+C<< /foo#2 >> (0-based index on just values with key "foo") will retrieve C<< foo: 33 >>.
+
+Note that rather than just retrieving the value, a Pair object is retrieved.
+The selected Pair exposes C<< @key >> and C<< @value >> attributes. Path
+assignment to a selected Pair, or to its C<< @value >> attribute, replaces
+that pair entry's value while preserving pair order and duplicate keys.
+
+=item B<< Pair >>
+
+Pair objects do not have child objects but do have C<< @key >> and
+C<< @value >> attributes.
+
+  let pairlist := {{ foo: 11, bar: -1, foo: 22, foo: 33 }};
+  say( first( pairlist, "/#2/@key" ) );     // "foo"
+  say( first( pairlist, "/#2/@value" ) );   // 22
+
+=item B<< Time >>
+
+Time is treated as a terminal node with attributes C<< @year >>,
+C<< @month >>, C<< @day >>, C<< @hour >>, C<< @min >>, and C<< @sec >>.
+
+See C<< std/time >>.
+
+=item B<< Path >>
+
+Paths representing files are treated as terminal nodes with attributes
+corresponding to the values from the C<stat> system call: C<< @dev >>,
+C<< @ino >>, C<< @mode >>, C<< @nlink >>, C<< @uid >>, C<< @gid >>,
+C<< @rdev >>, C<< @size >>, C<< @atime >>, C<< @mtime >>, C<< @ctime >>,
+C<< @blksize >>, and C<< @blocks >>.
+
+See C<< std/io >>.
+
+=item B<< XMLDocument >>, B<< XMLNode >>, etc.
+
+Are treated roughly how the ZPath specification suggests.
+
+  /html/body/table/tbody/tr     // all rows in the tbody
+  /html/body/table/tbody/tr#0   // the first row in the tbody
+  /html/body/table/tbody/#0     // the child element in the tbody
+  /html/body/table[@id]         // all tables that have an id attribute
+
+See C<< std/data/xml >>.
+
+=back
+
+=head1 SEE ALSO
+
+Specification: L<https://zpath.me>.
+
+ZPath specification: L<https://zpath.me>.
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/path/z >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/path/z/parser import Parser;
+from std/path/z/evaluate import Evaluator;
+from std/path/z/context import Ctx;
+
+let _cache;
+do {
+	from std/cache/lru try import Cache;
+	if ( Cache ) {
+		_cache := new Cache( capacity: 16 );
+	}
+};
+
+class ZPath {
+	let String path;
+	let ast;
+	let ev;
+	
+	static method use () {
+		from std/internals import setupperprop;
+		setupperprop( 1, "paths", self );
+	}
+	
+	method __build__ () {
+		ev := self.get_evaluator;
+		const p := new Parser( allowed_operators: ev.operator_definitions() );
+		ast ?:= _cache
+			? _cache.get( path, fn x → p.parse_top_level_terms(x) )
+			: p.parse_top_level_terms(path);
+	}
+	
+	method get_evaluator () {
+		return new Evaluator();
+	}
+	
+	method evaluate ( raw, meta := {} ) {
+
+		meta.set( "level", 0 ) unless meta.defined( "level" );
+		const ctx := new Ctx(
+			root: raw,
+			nodeset: meta.get( "nodeset", null ),
+			parentset: meta.get( "parentset", null ),
+			meta: meta,
+		);
+
+		const short_circuit := ( meta.get( "want", "all" ) in [ "first", "exists" ] );
+
+		let results := [];
+		for ( let term in ast ) {
+			for ( let node in ev.eval_expr( term, ctx ) ) {
+				let next_node := ev.maybe_apply_action( node, ctx );
+				results.push(next_node);
+				return results if short_circuit;
+			}
+		}
+
+		return results;
+	}
+	
+	method get ( raw ) {
+		return self.evaluate(raw).map( fn r → r.primitive_value );
+	}
+	
+	method select ( raw ) {
+		return self.evaluate(raw).map( fn r → r.primitive_value );
+	}
+	
+	method query ( raw ) {
+		return self.evaluate(raw).map( fn r → r.primitive_value );
+	}
+
+	method first ( raw, fallback? ) {
+		let got := self.evaluate( raw, { want: "first" } );
+		return got.empty ? fallback : got[0].primitive_value;
+	}
+	
+	method exists ( raw ) {
+		let got := self.evaluate( raw, { want: "exists" } );
+		return not got.empty;
+	}
+
+	method _apply_assignment_ref ( ref, value, op := ":=", weak := false ) {
+		if ( op ≡ ":=" ) {
+			return weak ? ref( value, true ) : ref(value);
+		}
+
+		let current := ref();
+
+		if ( op ≡ "+=" ) {
+			current += value;
+		}
+		else if ( op ≡ "-=" ) {
+			current -= value;
+		}
+		else if ( op ≡ "*=" or op ≡ "×=" ) {
+			current *= value;
+		}
+		else if ( op ≡ "/=" or op ≡ "÷=" ) {
+			current /= value;
+		}
+		else if ( op ≡ "**=" ) {
+			current **= value;
+		}
+		else if ( op ≡ "_=" ) {
+			current _= value;
+		}
+		else if ( op ≡ "?:=" ) {
+			current ?:= value;
+		}
+		else if ( op ≡ "~=" ) {
+			current ~= value[0] -> value[1](m);
+		}
+		else {
+			die `Unsupported path assignment operator '${op}'`;
+		}
+
+		ref(current);
+		return current;
+	}
+
+	method _assign_all_result ( value, op, last_result ) {
+		return op ≡ "~=" ? last_result : value;
+	}
+
+	method assign_first ( raw, value, op := ":=", weak := false ) {
+		let got := self.evaluate( raw, { want: "first" } );
+		die "Path assignment (@) found no matches" if got.empty;
+		return self._apply_assignment_ref(
+			got[0].ref(),
+			value,
+			op,
+			weak,
+		);
+	}
+
+	method assign_all ( raw, value, op := ":=", weak := false ) {
+		let got := self.evaluate(raw);
+		if ( got.empty ) {
+			return self._assign_all_result( value, op, value );
+		}
+
+		let last_result := value;
+		for ( let node in got ) {
+			last_result := self._apply_assignment_ref(
+				node.ref(),
+				value,
+				op,
+				weak,
+			);
+		}
+
+		return self._assign_all_result( value, op, last_result );
+	}
+
+	method assign_maybe ( raw, value, op := ":=", weak := false ) {
+		let got := self.evaluate( raw, { want: "first" } );
+		if ( got.empty ) {
+			return false;
+		}
+
+		self._apply_assignment_ref( got[0].ref(), value, op, weak );
+		return true;
+	}
+
+	method ref_first ( raw ) {
+		let got := self.evaluate( raw, { want: "first" } );
+		die "Path assignment (@) found no matches" if got.empty;
+		return got[0].ref();
+	}
+
+	method ref_all ( raw ) {
+		return self.evaluate(raw).map( fn n → n.ref );
+	}
+
+	method ref_maybe ( raw ) {
+		let got := self.evaluate( raw, { want: "first" } );
+		return got.empty ? null : got[0].ref();
+	}
+}

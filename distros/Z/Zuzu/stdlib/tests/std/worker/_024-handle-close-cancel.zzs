@@ -1,0 +1,56 @@
+from test/more import *;
+from test/worker_contract import require_worker, await_cancelled;
+
+let Worker := require_worker();
+
+if ( not( Worker can "spawn_handle" ) ) {
+	skip_all( "Worker.spawn_handle is unavailable" );
+}
+
+async function main () {
+	let closer := Worker.spawn_handle(
+			function ( inbox ) {
+			inbox.close();
+			return "closed";
+		},
+		[],
+	);
+	await {
+		closer.result();
+	};
+	let send_error := null;
+	try {
+		await {
+			closer.send("late");
+		};
+	}
+	catch ( Exception e ) {
+		send_error := e;
+	}
+	like(
+		send_error.to_String(),
+		/ChannelClosedException/,
+		"send after close rejects",
+	);
+
+	let waiting := Worker.spawn_handle(
+			async function ( inbox ) {
+			await {
+				inbox.recv();
+			};
+			return "unexpected";
+		},
+		[],
+	);
+	waiting.cancel("stop");
+	await {
+		await_cancelled( waiting.result() );
+	};
+	ok( waiting.done(), "cancelled handle is done" );
+}
+
+await {
+	main();
+};
+
+done_testing();

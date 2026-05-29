@@ -468,7 +468,7 @@ create_release.pl - Helper script to create a GitHub Release
 
 =head1 VERSION
 
-version 0.0008
+version 0.0009
 
 =head1 AUTHOR
 

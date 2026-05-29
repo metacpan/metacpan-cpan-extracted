@@ -81,4 +81,11 @@ subtest 'ReasonDescription hashref is keyed by constant name' => sub {
   is(ReasonDescription->{NotAReason}, undef, 'unknown name returns undef');
 };
 
+subtest 'CMP lifecycle reason codes' => sub {
+  is(ReasonCMPDeleted,                14,               'ReasonCMPDeleted == 14');
+  is(ReasonCMPUnknown,                15,               'ReasonCMPUnknown == 15');
+  is(reason_string(ReasonCMPDeleted), 'deleted cmp id', 'CMPDeleted string');
+  is(reason_string(ReasonCMPUnknown), 'unknown cmp id', 'CMPUnknown string');
+};
+
 done_testing;

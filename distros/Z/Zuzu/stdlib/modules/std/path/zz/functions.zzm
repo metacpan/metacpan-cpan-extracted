@@ -1,0 +1,828 @@
+=encoding utf8
+
+=head1 NAME
+
+std/path/zz/functions - Function definitions for ZZPath expressions.
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module extends the base ZPath function table with
+ZuzuScript-flavoured path expression helpers.
+
+=head1 EXPORTS
+
+=head2 Constants
+
+=over
+
+=item C<STANDARD_FUNCTION_NAMES>
+
+Type: C<Array>. Names of inherited ZPath functions available to ZZPath.
+
+=item C<STANDARD_FUNCTIONS>
+
+Type: C<Array>. Complete ZZPath function definition table.
+
+=back
+
+=head2 Functions
+
+=over
+
+=item C<< first_arg_node(name, ev, ctx, args) >>
+
+Parameters: function name, evaluator, context, and argument AST nodes.
+Returns: C<Node> or C<null>. Resolves the first argument or current
+context node.
+
+=item C<< first_number_arg(name, ev, ctx, args) >>, C<< nth_number_arg(name, ev, ctx, args, i) >>
+
+Parameters: function name, evaluator, context, arguments, and optional
+index. Returns: C<Number>. Resolves an argument as a number.
+
+=item C<< first_string_arg(name, ev, ctx, args) >>, C<< nth_string_arg(name, ev, ctx, args, i) >>
+
+Parameters: function name, evaluator, context, arguments, and optional
+index. Returns: C<String>. Resolves an argument as a string.
+
+=item C<< nth_value_arg(name, ev, ctx, args, i) >>
+
+Parameters: function name, evaluator, context, arguments, and index.
+Returns: value. Resolves an argument as a primitive value.
+
+=item C<< nth_array_arg(name, ev, ctx, args, i) >>
+
+Parameters: function name, evaluator, context, arguments, and index.
+Returns: C<Array>. Resolves an argument as an array value.
+
+=item C<< number_args(ev, ctx, args) >>
+
+Parameters: evaluator, context, and argument AST nodes. Returns:
+C<Array>. Resolves all arguments as numbers.
+
+=item C<< first_arg_value(name, ev, ctx, args) >>
+
+Parameters: function name, evaluator, context, and arguments. Returns:
+value. Resolves the first argument as a primitive value.
+
+=item C<< z_function(spelling) >>
+
+Parameters: C<spelling> is a base ZPath function name. Returns:
+C<Function>. Returns the inherited function implementation.
+
+=item C<< string_index_of(funk, ev, ast, ctx, args) >>
+
+Parameters: standard ZPath function callback arguments. Returns:
+C<Array>. Implements string C<index-of>.
+
+=item C<< string_rindex(funk, ev, ast, ctx, args) >>
+
+Parameters: standard ZPath function callback arguments. Returns:
+C<Array>. Implements string reverse-index lookup.
+
+=item C<< defined_function(funk, ev, ast, ctx, args) >>
+
+Parameters: standard ZPath function callback arguments. Returns:
+C<Array>. Implements defined-value testing.
+
+=item C<< empty_function(funk, ev, ast, ctx, args) >>
+
+Parameters: standard ZPath function callback arguments. Returns:
+C<Array>. Implements empty-value testing.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/path/zz/functions >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/path/z/functions import Func, STANDARD_FUNCTIONS as Z_STANDARD_FUNCTIONS;
+
+
+const STANDARD_FUNCTION_NAMES := [
+	"true",
+	"false",
+	"null",
+	"tag",
+	"url",
+	"local-name",
+	"key",
+	"value",
+	"index",
+	"count",
+	"is-first",
+	"is-last",
+	"next",
+	"prev",
+];
+
+function first_arg_node ( name, ev, ctx, args ) {
+	if ( args.length() = 0 ) {
+		return ctx.nodeset.get( 0, null );
+	}
+	if ( args.length() = 1 ) {
+		const got := ev.eval_expr( args[0], ev.nested_ctx( ctx ) );
+		return got.get( 0, null );
+	}
+	die `Too many arguments for ${name}()`;
+}
+
+function first_number_arg ( name, ev, ctx, args ) {
+	const node := first_arg_node( name, ev, ctx, args );
+	return ev.to_number(node) ?: 0;
+}
+
+function nth_number_arg ( name, ev, ctx, args, i ) {
+	die `Not enough arguments for ${name}()` if args.length() <= i;
+	const got := ev.eval_expr( args[i], ev.nested_ctx( ctx ) );
+	return ev.to_number( got.get( 0, null ) ) ?: 0;
+}
+
+function nth_string_arg ( name, ev, ctx, args, i ) {
+	die `Not enough arguments for ${name}()` if args.length() <= i;
+	const got := ev.eval_expr( args[i], ev.nested_ctx( ctx ) );
+	const value := ev.to_string( got.get( 0, null ) );
+	return value ≡ null ? "" : "" _ value;
+}
+
+function nth_value_arg ( name, ev, ctx, args, i ) {
+	die `Not enough arguments for ${name}()` if args.length() <= i;
+	const got := ev.eval_expr( args[i], ev.nested_ctx( ctx ) );
+	const node := got.get( 0, null );
+	return node ≡ null ? null : node.primitive_value();
+}
+
+function nth_array_arg ( name, ev, ctx, args, i ) {
+	die `Not enough arguments for ${name}()` if args.length() <= i;
+	const got := ev.eval_expr( args[i], ev.nested_ctx( ctx ) );
+	if ( got.length() = 1 ) {
+		const one := got[0].primitive_value();
+		return one if one instanceof Array;
+	}
+	return got.map( fn node → node.primitive_value() );
+}
+
+function number_args ( ev, ctx, args ) {
+	let nums := [];
+	if ( args.length() = 0 ) {
+		for ( let node in ctx.nodeset ) {
+			const value := ev.to_number(node);
+			nums.push(value) if value instanceof Number;
+		}
+		return nums;
+	}
+	for ( let arg in args ) {
+		const got := ev.eval_expr( arg, ev.nested_ctx( ctx ) );
+		for ( let node in got ) {
+			const value := ev.to_number(node);
+			nums.push(value) if value instanceof Number;
+		}
+	}
+	return nums;
+}
+
+function first_string_arg ( name, ev, ctx, args ) {
+	const node := first_arg_node( name, ev, ctx, args );
+	const value := ev.to_string(node);
+	return value ≡ null ? "" : "" _ value;
+}
+
+function first_arg_value ( name, ev, ctx, args ) {
+	const node := first_arg_node( name, ev, ctx, args );
+	return node ≡ null ? null : node.primitive_value();
+}
+
+function z_function ( spelling ) {
+	const func := Z_STANDARD_FUNCTIONS.first( fn f → f.has_name(spelling) );
+	die `std/path/z/functions is missing ${spelling}()` if func ≡ null;
+	return func;
+}
+
+function string_index_of ( funk, ev, ast, ctx, args ) {
+	from std/string import index;
+	die "Too many arguments for index-of()" if args.length() > 3;
+	if ( args.length() = 2 ) {
+		return funk.wrap( index(
+			nth_string_arg( "index-of", ev, ctx, args, 0 ),
+			nth_string_arg( "index-of", ev, ctx, args, 1 ),
+		) );
+	}
+	return funk.wrap( index(
+		nth_string_arg( "index-of", ev, ctx, args, 0 ),
+		nth_string_arg( "index-of", ev, ctx, args, 1 ),
+		nth_number_arg( "index-of", ev, ctx, args, 2 ),
+	) );
+}
+
+function string_rindex ( funk, ev, ast, ctx, args ) {
+	from std/string import rindex;
+	const name := funk.get_spelling;
+	die `Too many arguments for ${name}()` if args.length() > 3;
+	if ( args.length() = 2 ) {
+		return funk.wrap( rindex(
+			nth_string_arg( name, ev, ctx, args, 0 ),
+			nth_string_arg( name, ev, ctx, args, 1 ),
+		) );
+	}
+	return funk.wrap( rindex(
+		nth_string_arg( name, ev, ctx, args, 0 ),
+		nth_string_arg( name, ev, ctx, args, 1 ),
+		nth_number_arg( name, ev, ctx, args, 2 ),
+	) );
+}
+
+function defined_function ( funk, ev, ast, ctx, args ) {
+	const node := first_arg_node( "defined", ev, ctx, args );
+	return funk.wrap( node ≢ null and node.primitive_value() ≢ null );
+}
+
+function empty_function ( funk, ev, ast, ctx, args ) {
+	const value := first_arg_value( "empty", ev, ctx, args );
+	return funk.wrap( true ) if value ≡ null;
+
+	if (
+		value instanceof Array or
+		value instanceof Bag or
+		value instanceof Set or
+		value instanceof Dict or
+		value instanceof PairList
+	) {
+		return funk.wrap( value.length() = 0 );
+	}
+
+	die `empty() expects a Collection or null, got ${typeof value}`;
+}
+
+// Start with a base of functions inherited from ZPath:
+const STANDARD_FUNCTIONS := STANDARD_FUNCTION_NAMES.map( fn n → z_function(n) );
+
+// Add equivalents for ZuzuScript word-like unary operators:
+STANDARD_FUNCTIONS.push(
+	new Func(
+		spelling: "abs",
+		f: function ( funk, ev, ast, ctx, args ) {
+			return funk.wrap( abs first_number_arg( "abs", ev, ctx, args ) );
+		},
+	),
+	new Func(
+		spelling: "floor",
+		f: function ( funk, ev, ast, ctx, args ) {
+			return funk.wrap( floor first_number_arg( "floor", ev, ctx, args ) );
+		},
+	),
+	new Func(
+		spelling: "ceil",
+		f: function ( funk, ev, ast, ctx, args ) {
+			return funk.wrap( ceil first_number_arg( "ceil", ev, ctx, args ) );
+		},
+	),
+	new Func(
+		spelling: "round",
+		f: function ( funk, ev, ast, ctx, args ) {
+			return funk.wrap( round first_number_arg( "round", ev, ctx, args ) );
+		},
+	),
+	new Func(
+		spelling: "int",
+		f: function ( funk, ev, ast, ctx, args ) {
+			return funk.wrap( int first_number_arg( "int", ev, ctx, args ) );
+		},
+	),
+	new Func(
+		spelling: "sqrt",
+		f: function ( funk, ev, ast, ctx, args ) {
+			return funk.wrap( sqrt first_number_arg( "sqrt", ev, ctx, args ) );
+		},
+	),
+	new Func(
+		spelling: "uc",
+		f: function ( funk, ev, ast, ctx, args ) {
+			return funk.wrap( uc first_string_arg( "uc", ev, ctx, args ) );
+		},
+	),
+	new Func(
+		spelling: "lc",
+		f: function ( funk, ev, ast, ctx, args ) {
+			return funk.wrap( lc first_string_arg( "lc", ev, ctx, args ) );
+		},
+	),
+	new Func(
+		spelling: "length",
+		f: function ( funk, ev, ast, ctx, args ) {
+			return funk.wrap( length first_string_arg( "length", ev, ctx, args ) );
+		},
+	),
+	new Func(
+		spelling: "not",
+		f: function ( funk, ev, ast, ctx, args ) {
+			const node := first_arg_node( "not", ev, ctx, args );
+			return funk.wrap( not ev.truthy(node) );
+		},
+	),
+	new Func(
+		spelling: "typeof",
+		f: function ( funk, ev, ast, ctx, args ) {
+			const node := first_arg_node( "typeof", ev, ctx, args );
+			const value := node ≡ null ? null : node.primitive_value();
+			return funk.wrap( typeof value );
+		},
+	),
+	new Func(
+		spelling: "defined",
+		f: defined_function,
+	),
+	new Func(
+		spelling: "empty",
+		f: empty_function,
+	),
+);
+
+// Functions from std/internals:
+STANDARD_FUNCTIONS.push(
+	new Func(
+		spelling: "string",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/internals import to_String;
+			return funk.wrap( to_String( first_arg_value(
+				"string",
+				ev,
+				ctx,
+				args,
+			) ) );
+		},
+	),
+	new Func(
+		spelling: "number",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/internals import to_Number;
+			return funk.wrap( to_Number( first_arg_value(
+				"number",
+				ev,
+				ctx,
+				args,
+			) ) );
+		},
+	),
+	new Func(
+		spelling: "boolean",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/internals import to_Boolean;
+			return funk.wrap( to_Boolean( first_arg_value(
+				"boolean",
+				ev,
+				ctx,
+				args,
+			) ) );
+		},
+	),
+	new Func(
+		spelling: "regexp",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/internals import to_Regexp;
+			return funk.wrap( to_Regexp( first_arg_value(
+				"regexp",
+				ev,
+				ctx,
+				args,
+			) ) );
+		},
+	),
+);
+
+// Functions from std/math:
+STANDARD_FUNCTIONS.push(
+	new Func(
+		spelling: "sum",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/math import Math;
+			return funk.wrap( Math.sum( number_args( ev, ctx, args ) ) );
+		},
+	),
+	new Func(
+		spelling: "min",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/math import Math;
+			return funk.wrap( Math.min( number_args( ev, ctx, args ) ) );
+		},
+	),
+	new Func(
+		spelling: "max",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/math import Math;
+			return funk.wrap( Math.max( number_args( ev, ctx, args ) ) );
+		},
+	),
+	new Func(
+		spelling: "clamp",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/math import Math;
+			die "Too many arguments for clamp()" if args.length() > 3;
+			return funk.wrap( Math.clamp(
+				nth_number_arg( "clamp", ev, ctx, args, 0 ),
+				nth_number_arg( "clamp", ev, ctx, args, 1 ),
+				nth_number_arg( "clamp", ev, ctx, args, 2 ),
+			) );
+		},
+	),
+);
+
+// Functions from std/string:
+STANDARD_FUNCTIONS.push(
+	new Func(
+		spelling: "substr",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/string import substr;
+			die "Too many arguments for substr()" if args.length() > 3;
+			if ( args.length() = 2 ) {
+				return funk.wrap( substr(
+					nth_string_arg( "substr", ev, ctx, args, 0 ),
+					nth_number_arg( "substr", ev, ctx, args, 1 ),
+				) );
+			}
+			return funk.wrap( substr(
+				nth_string_arg( "substr", ev, ctx, args, 0 ),
+				nth_number_arg( "substr", ev, ctx, args, 1 ),
+				nth_number_arg( "substr", ev, ctx, args, 2 ),
+			) );
+		},
+	),
+	new Func(
+		spelling: "index-of",
+		f: string_index_of,
+	),
+	new Func(
+		spelling: "rindex",
+		f: string_rindex,
+	),
+	new Func(
+		spelling: "last-index-of",
+		f: string_rindex,
+	),
+	new Func(
+		spelling: "contains",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/string import contains;
+			die "Too many arguments for contains()" if args.length() > 2;
+			return funk.wrap( contains(
+				nth_string_arg( "contains", ev, ctx, args, 0 ),
+				nth_string_arg( "contains", ev, ctx, args, 1 ),
+			) );
+		},
+	),
+	new Func(
+		spelling: "chr",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/string import chr;
+			die "Too many arguments for chr()" if args.length() > 1;
+			return funk.wrap( chr( nth_number_arg(
+				"chr",
+				ev,
+				ctx,
+				args,
+				0,
+			) ) );
+		},
+	),
+	new Func(
+		spelling: "ord",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/string import ord;
+			die "Too many arguments for ord()" if args.length() > 2;
+			if ( args.length() = 1 ) {
+				return funk.wrap( ord( nth_string_arg(
+					"ord",
+					ev,
+					ctx,
+					args,
+					0,
+				) ) );
+			}
+			return funk.wrap( ord(
+				nth_string_arg( "ord", ev, ctx, args, 0 ),
+				nth_number_arg( "ord", ev, ctx, args, 1 ),
+			) );
+		},
+	),
+	new Func(
+		spelling: "replace",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/string import replace;
+			die "Too many arguments for replace()" if args.length() > 4;
+			if ( args.length() = 3 ) {
+				return funk.wrap( replace(
+					nth_string_arg( "replace", ev, ctx, args, 0 ),
+					nth_value_arg( "replace", ev, ctx, args, 1 ),
+					nth_string_arg( "replace", ev, ctx, args, 2 ),
+				) );
+			}
+			return funk.wrap( replace(
+				nth_string_arg( "replace", ev, ctx, args, 0 ),
+				nth_value_arg( "replace", ev, ctx, args, 1 ),
+				nth_string_arg( "replace", ev, ctx, args, 2 ),
+				nth_string_arg( "replace", ev, ctx, args, 3 ),
+			) );
+		},
+	),
+	new Func(
+		spelling: "search",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/string import search;
+			die "Too many arguments for search()" if args.length() > 3;
+			if ( args.length() = 2 ) {
+				return funk.wrap( search(
+					nth_string_arg( "search", ev, ctx, args, 0 ),
+					nth_value_arg( "search", ev, ctx, args, 1 ),
+				) );
+			}
+			return funk.wrap( search(
+				nth_string_arg( "search", ev, ctx, args, 0 ),
+				nth_value_arg( "search", ev, ctx, args, 1 ),
+				nth_string_arg( "search", ev, ctx, args, 2 ),
+			) );
+		},
+	),
+	new Func(
+		spelling: "starts_with",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/string import starts_with;
+			die "Too many arguments for starts_with()" if args.length() > 2;
+			return funk.wrap( starts_with(
+				nth_string_arg( "starts_with", ev, ctx, args, 0 ),
+				nth_string_arg( "starts_with", ev, ctx, args, 1 ),
+			) );
+		},
+	),
+	new Func(
+		spelling: "ends_with",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/string import ends_with;
+			die "Too many arguments for ends_with()" if args.length() > 2;
+			return funk.wrap( ends_with(
+				nth_string_arg( "ends_with", ev, ctx, args, 0 ),
+				nth_string_arg( "ends_with", ev, ctx, args, 1 ),
+			) );
+		},
+	),
+	new Func(
+		spelling: "matches",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/string import matches;
+			die "Too many arguments for matches()" if args.length() > 3;
+			if ( args.length() = 2 ) {
+				return funk.wrap( matches(
+					nth_string_arg( "matches", ev, ctx, args, 0 ),
+					nth_value_arg( "matches", ev, ctx, args, 1 ),
+				) );
+			}
+			return funk.wrap( matches(
+				nth_string_arg( "matches", ev, ctx, args, 0 ),
+				nth_value_arg( "matches", ev, ctx, args, 1 ),
+				nth_string_arg( "matches", ev, ctx, args, 2 ),
+			) );
+		},
+	),
+	new Func(
+		spelling: "pattern_to_regexp",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/string import pattern_to_regexp;
+			die "Too many arguments for pattern_to_regexp()"
+				if args.length() > 2;
+			if ( args.length() = 1 ) {
+				return funk.wrap( pattern_to_regexp(
+					nth_string_arg( "pattern_to_regexp", ev, ctx, args, 0 ),
+				) );
+			}
+			return funk.wrap( pattern_to_regexp(
+				nth_string_arg( "pattern_to_regexp", ev, ctx, args, 0 ),
+				nth_value_arg( "pattern_to_regexp", ev, ctx, args, 1 ),
+			) );
+		},
+	),
+	new Func(
+		spelling: "quotemeta",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/string import quotemeta;
+			die "Too many arguments for quotemeta()" if args.length() > 1;
+			return funk.wrap( quotemeta(
+				nth_string_arg( "quotemeta", ev, ctx, args, 0 ),
+			) );
+		},
+	),
+	new Func(
+		spelling: "sprint",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/string import sprint;
+			die "Not enough arguments for sprint()" if args.length() = 0;
+			die "Too many arguments for sprint()" if args.length() > 8;
+
+			const fmt := nth_string_arg( "sprint", ev, ctx, args, 0 );
+			if ( args.length() = 1 ) {
+				return funk.wrap( sprint(fmt) );
+			}
+			if ( args.length() = 2 ) {
+				return funk.wrap( sprint(
+					fmt,
+					nth_value_arg( "sprint", ev, ctx, args, 1 ),
+				) );
+			}
+			if ( args.length() = 3 ) {
+				return funk.wrap( sprint(
+					fmt,
+					nth_value_arg( "sprint", ev, ctx, args, 1 ),
+					nth_value_arg( "sprint", ev, ctx, args, 2 ),
+				) );
+			}
+			if ( args.length() = 4 ) {
+				return funk.wrap( sprint(
+					fmt,
+					nth_value_arg( "sprint", ev, ctx, args, 1 ),
+					nth_value_arg( "sprint", ev, ctx, args, 2 ),
+					nth_value_arg( "sprint", ev, ctx, args, 3 ),
+				) );
+			}
+			if ( args.length() = 5 ) {
+				return funk.wrap( sprint(
+					fmt,
+					nth_value_arg( "sprint", ev, ctx, args, 1 ),
+					nth_value_arg( "sprint", ev, ctx, args, 2 ),
+					nth_value_arg( "sprint", ev, ctx, args, 3 ),
+					nth_value_arg( "sprint", ev, ctx, args, 4 ),
+				) );
+			}
+			if ( args.length() = 6 ) {
+				return funk.wrap( sprint(
+					fmt,
+					nth_value_arg( "sprint", ev, ctx, args, 1 ),
+					nth_value_arg( "sprint", ev, ctx, args, 2 ),
+					nth_value_arg( "sprint", ev, ctx, args, 3 ),
+					nth_value_arg( "sprint", ev, ctx, args, 4 ),
+					nth_value_arg( "sprint", ev, ctx, args, 5 ),
+				) );
+			}
+			if ( args.length() = 7 ) {
+				return funk.wrap( sprint(
+					fmt,
+					nth_value_arg( "sprint", ev, ctx, args, 1 ),
+					nth_value_arg( "sprint", ev, ctx, args, 2 ),
+					nth_value_arg( "sprint", ev, ctx, args, 3 ),
+					nth_value_arg( "sprint", ev, ctx, args, 4 ),
+					nth_value_arg( "sprint", ev, ctx, args, 5 ),
+					nth_value_arg( "sprint", ev, ctx, args, 6 ),
+				) );
+			}
+			return funk.wrap( sprint(
+				fmt,
+				nth_value_arg( "sprint", ev, ctx, args, 1 ),
+				nth_value_arg( "sprint", ev, ctx, args, 2 ),
+				nth_value_arg( "sprint", ev, ctx, args, 3 ),
+				nth_value_arg( "sprint", ev, ctx, args, 4 ),
+				nth_value_arg( "sprint", ev, ctx, args, 5 ),
+				nth_value_arg( "sprint", ev, ctx, args, 6 ),
+				nth_value_arg( "sprint", ev, ctx, args, 7 ),
+			) );
+		},
+	),
+	new Func(
+		spelling: "split",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/string import split;
+			die "Too many arguments for split()" if args.length() > 3;
+			if ( args.length() = 2 ) {
+				return funk.wrap( split(
+					nth_string_arg( "split", ev, ctx, args, 0 ),
+					nth_value_arg( "split", ev, ctx, args, 1 ),
+				) );
+			}
+			return funk.wrap( split(
+				nth_string_arg( "split", ev, ctx, args, 0 ),
+				nth_value_arg( "split", ev, ctx, args, 1 ),
+				nth_number_arg( "split", ev, ctx, args, 2 ),
+			) );
+		},
+	),
+	new Func(
+		spelling: "join",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/string import join;
+			die "Too many arguments for join()" if args.length() > 2;
+			return funk.wrap( join(
+				nth_string_arg( "join", ev, ctx, args, 0 ),
+				nth_array_arg( "join", ev, ctx, args, 1 ),
+			) );
+		},
+	),
+	new Func(
+		spelling: "trim",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/string import trim;
+			die "Too many arguments for trim()" if args.length() > 1;
+			return funk.wrap( trim( first_string_arg(
+				"trim",
+				ev,
+				ctx,
+				args,
+			) ) );
+		},
+	),
+	new Func(
+		spelling: "pad",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/string import pad;
+			die "Too many arguments for pad()" if args.length() > 4;
+			if ( args.length() = 2 ) {
+				return funk.wrap( pad(
+					nth_string_arg( "pad", ev, ctx, args, 0 ),
+					nth_number_arg( "pad", ev, ctx, args, 1 ),
+				) );
+			}
+			if ( args.length() = 3 ) {
+				return funk.wrap( pad(
+					nth_string_arg( "pad", ev, ctx, args, 0 ),
+					nth_number_arg( "pad", ev, ctx, args, 1 ),
+					nth_string_arg( "pad", ev, ctx, args, 2 ),
+				) );
+			}
+			return funk.wrap( pad(
+				nth_string_arg( "pad", ev, ctx, args, 0 ),
+				nth_number_arg( "pad", ev, ctx, args, 1 ),
+				nth_string_arg( "pad", ev, ctx, args, 2 ),
+				nth_string_arg( "pad", ev, ctx, args, 3 ),
+			) );
+		},
+	),
+	new Func(
+		spelling: "chomp",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/string import chomp;
+			die "Too many arguments for chomp()" if args.length() > 1;
+			return funk.wrap( chomp( first_string_arg(
+				"chomp",
+				ev,
+				ctx,
+				args,
+			) ) );
+		},
+	),
+	new Func(
+		spelling: "title",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/string import title;
+			die "Too many arguments for title()" if args.length() > 1;
+			return funk.wrap( title( first_string_arg(
+				"title",
+				ev,
+				ctx,
+				args,
+			) ) );
+		},
+	),
+	new Func(
+		spelling: "snake",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/string import snake;
+			die "Too many arguments for snake()" if args.length() > 1;
+			return funk.wrap( snake( first_string_arg(
+				"snake",
+				ev,
+				ctx,
+				args,
+			) ) );
+		},
+	),
+	new Func(
+		spelling: "kebab",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/string import kebab;
+			die "Too many arguments for kebab()" if args.length() > 1;
+			return funk.wrap( kebab( first_string_arg(
+				"kebab",
+				ev,
+				ctx,
+				args,
+			) ) );
+		},
+	),
+	new Func(
+		spelling: "camel",
+		f: function ( funk, ev, ast, ctx, args ) {
+			from std/string import camel;
+			die "Too many arguments for camel()" if args.length() > 1;
+			return funk.wrap( camel( first_string_arg(
+				"camel",
+				ev,
+				ctx,
+				args,
+			) ) );
+		},
+	),
+);

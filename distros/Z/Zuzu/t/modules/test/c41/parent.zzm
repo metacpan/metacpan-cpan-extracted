@@ -1,0 +1,3 @@
+class DisplayParent {
+	let String name with get, set;
+}

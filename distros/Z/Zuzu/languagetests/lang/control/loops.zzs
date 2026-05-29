@@ -1,0 +1,171 @@
+from test/more import *;
+let array_else := 0;
+for ( let x in[] ) {
+	array_else := 99;
+}
+else {
+	array_else := 1;
+}
+let set_hit := 0;
+for ( let x in << 1, 2 >> ) {
+	set_hit += x;
+}
+else {
+	set_hit := 999;
+}
+let bag_else := 0;
+for ( let x in <<< >>> ) {
+	bag_else := 99;
+}
+else {
+	bag_else := 1;
+}
+let dict_count := 0;
+for ( let item in { a: 1, b: 2 }.enumerate() ) {
+	dict_count += 1;
+}
+let const_total := 0;
+for ( const item in[ 4, 5 ] ) {
+	const_total += item;
+}
+is( array_else, 1, "for-else runs else for empty arrays" );
+ok( set_hit >= 3, "for loops iterate non-empty sets without else" );
+is( bag_else, 1, "for-else runs else for empty bags" );
+is( dict_count, 2, "for loops iterate dict enumerations" );
+is( const_total, 9, "for loop const variables iterate correctly" );
+
+let down := [ ];
+let n := 4;
+function next_down () {
+	throw new ExhaustedException() if n == 0;
+	return n--;
+}
+for ( let v in next_down ) {
+	down.push(v);
+}
+is( down, [ 4, 3, 2, 1 ], "for loops can iterate function iterators" );
+
+function make_reversed () {
+	return [ 1 ... 4 ].reverse();
+}
+let by_call := [ ];
+for ( let v in make_reversed() ) {
+	by_call.push(v);
+}
+is( by_call, [ 4, 3, 2, 1 ], "for loop still iterates called function result as array" );
+
+class WithArray {
+	method to_Array () {
+		return [ 1 ... 4 ].reverse();
+	}
+}
+let from_to_array := [ ];
+for ( let v in new WithArray() ) {
+	from_to_array.push(v);
+}
+is( from_to_array, [ 4, 3, 2, 1 ], "for loop uses object to_Array conversion" );
+
+class WithIterator {
+	let x := 4;
+	method to_Iterator () {
+		let local := x;
+		return function () {
+			throw new ExhaustedException() if local == 0;
+			return local--;
+		};
+	}
+}
+let from_to_iterator := [ ];
+for ( let v in new WithIterator() ) {
+	from_to_iterator.push(v);
+}
+is( from_to_iterator, [ 4, 3, 2, 1 ], "for loop uses object to_Iterator conversion" );
+
+class BothConversions {
+	method to_Array () {
+		return [ 1, 2, 3 ];
+	}
+	method to_Iterator () {
+		let local := 3;
+		return function () {
+			throw new ExhaustedException() if local == 0;
+			return local--;
+		};
+	}
+}
+let prefer_iterator := [ ];
+for ( let v in new BothConversions() ) {
+	prefer_iterator.push(v);
+}
+is( prefer_iterator, [ 3, 2, 1 ], "for loop prefers to_Iterator over to_Array" );
+
+let exhausted_else := 0;
+let empty_iter := function () {
+	throw new ExhaustedException();
+};
+for ( let v in empty_iter ) {
+	exhausted_else := 99;
+}
+else {
+	exhausted_else := 1;
+}
+is( exhausted_else, 1, "for-else runs when iterator is immediately exhausted" );
+
+let implicit_total := 0;
+for ( [ 1, 2, 3 ] ) {
+	implicit_total += ^^;
+}
+is( implicit_total, 6, "bare for loops bind ^^ as the iteration value" );
+
+let implicit_iterator := [ ];
+let implicit_next := 3;
+function next_implicit () {
+	throw new ExhaustedException() if implicit_next == 0;
+	return implicit_next--;
+}
+for ( next_implicit ) {
+	implicit_iterator.push(^^);
+}
+is(
+	implicit_iterator,
+	[ 3, 2, 1 ],
+	"bare for loops work with function iterators",
+);
+
+let implicit_empty_else := 0;
+for ( [ ] ) {
+	implicit_empty_else := 99;
+}
+else {
+	implicit_empty_else := 1;
+}
+is( implicit_empty_else, 1, "bare for loops keep for-else behaviour" );
+
+let postfix_values := [ ];
+postfix_values.push(^^) for [ 1, 2, 3 ];
+is( postfix_values, [ 1, 2, 3 ], "postfix for binds ^^ in its statement" );
+
+let postfix_iterator := [ ];
+let postfix_next := 3;
+function next_postfix () {
+	throw new ExhaustedException() if postfix_next == 0;
+	return postfix_next--;
+}
+postfix_iterator.push(^^) for next_postfix;
+is(
+	postfix_iterator,
+	[ 3, 2, 1 ],
+	"postfix for works with function iterators",
+);
+
+let nested_here := [ ];
+for ( [ 10 ] ) {
+	nested_here.push( 1 |> ^^ + 1 );
+	nested_here.push(^^);
+}
+is(
+	nested_here,
+	[ 2, 10 ],
+	"chains nested in bare loops shadow only the inner ^^",
+);
+done_testing();

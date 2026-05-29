@@ -1,0 +1,31 @@
+from std/dump import Dumper;
+from test/more import *;
+
+class Raccoon {
+	let String name := "";
+
+	method set_name ( String value ) {
+		name := value;
+		return self;
+	}
+}
+
+is( Dumper.dump( [ 1, 2, 3 ] ), "[1,2,3]", "dump array to compact code-like output", );
+let pretty := Dumper.dump( { z: 1, a: 2 }, { pretty: true, sort_keys: true }, );
+like( pretty, /\{\n  "a": 2,\n  "z": 1\n\}/, "pretty + sort_keys formats dict deterministically", );
+let zia := new Raccoon();
+zia.set_name("Zia");
+is( Dumper.dump( { pet: zia }, { sort_keys: true } ), "{\"pet\":new Raccoon(name:\"Zia\")}", "dump object members using constructor-style syntax",
+    );
+let fn_dump := Dumper.dump( { cb: function() {
+	return 1;
+}
+}, { quiet: true, sort_keys: true }, );
+is( fn_dump, "{\"cb\":null}", "undumpable function values become null", );
+let pair := new Pair( pair: [ "k", "v" ] );
+is( Dumper.dump(pair), "new Pair(pair:[\"k\",\"v\"])", "Pair values are dumpable", );
+let plist := new PairList( [ "alpha", 1 ], [ "beta", 2 ] );
+is( Dumper.dump( plist, { sort_keys: true } ), "{{\"alpha\":1,\"beta\":2}}",
+    "PairList values are dumpable", );
+like( Dumper.dump( [1], { colour: true } ), /\x1b\[/, "colour option emits ANSI escape sequences", );
+done_testing();

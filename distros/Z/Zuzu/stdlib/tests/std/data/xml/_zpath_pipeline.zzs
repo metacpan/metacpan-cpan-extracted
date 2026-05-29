@@ -1,0 +1,17 @@
+from std/data/xml import XML;
+from test/more import *;
+
+let doc := XML.parse( "<root><item>Ada</item><item>Bob</item></root>" );
+let nodes := doc.findnodes( "/root/item" );
+let values := [];
+for ( let node in nodes ) {
+	values.push( node.textContent() );
+}
+
+let data := { items: values };
+
+is( data @ "/items/*", "Ada", "zpath @ reads first value extracted from xml" );
+is( data @@ "/items/*", [ "Ada", "Bob" ], "zpath @@ reads all values extracted from xml" );
+is( data @? "/items/*", true, "zpath @? confirms extracted xml values exist" );
+
+done_testing();

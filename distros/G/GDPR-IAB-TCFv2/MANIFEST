@@ -44,6 +44,7 @@ t/14-cmp-validator.t
 t/15-validator-reason.t
 t/16-validator-failures.t
 t/17-v23-deadline.t
+t/18-go-parity.t
 t/90-bugs.t
 t/99-pod.t
 t/corpus/cmp-list.json

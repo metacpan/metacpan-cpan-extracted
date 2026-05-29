@@ -1,0 +1,1455 @@
+=encoding utf8
+
+=head1 NAME
+
+std/path/z/node - Node wrapper used by std/path/z.
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+Objects of this class wrap underlying values and provide traversal and
+coercion helpers used while evaluating ZPath expressions.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<Node>
+
+Base wrapper for values traversed by ZPath.
+
+=over
+
+=item C<< Node.from_root(obj) >>
+
+Parameters: C<obj> is any query root. Returns: C<Node>. Wraps a root
+value for traversal.
+
+=item C<< Node.wrap(obj, parent?, key?, ix?) >>
+
+Parameters: C<obj> is any value, with optional parent, key, and index
+metadata. Returns: C<Node>. Wraps a value in the appropriate node
+subclass.
+
+=item C<< node.hold_parent(owner) >>
+
+Parameters: C<owner> is a parent node. Returns: C<Node>. Retains parent
+metadata on the node.
+
+=item C<< node.raw() >>, C<< node.value() >>, C<< node.primitive_value() >>
+
+Parameters: none. Returns: value. Returns the wrapped raw, node, or
+primitive value.
+
+=item C<< node.parent() >>
+
+Parameters: none. Returns: C<Node> or C<null>. Returns the parent node.
+
+=item C<< node.key() >>, C<< node.ix() >>, C<< node.index() >>, C<< node.id() >>
+
+Parameters: none. Returns: value. Returns traversal key, index, or
+stable node id metadata.
+
+=item C<< node.type() >>, C<< node.name() >>
+
+Parameters: none. Returns: C<String> or C<null>. Returns the node type
+or name.
+
+=item C<< node.tagged() >>
+
+Parameters: none. Returns: C<String> or C<null>. Returns a KDL value
+tag when present.
+
+=item C<< node.has_tagged() >>
+
+Parameters: none. Returns: C<Boolean>. Returns true when tag metadata is
+available.
+
+=item C<< node.string_value() >>, C<< node.number_value() >>
+
+Parameters: none. Returns: C<String>, C<Number>, or C<null>. Coerces the
+node for string or numeric ZPath operations.
+
+=item C<< node.can_have_named_children() >>, C<< node.can_have_indexed_children() >>, C<< node.can_have_named_indexed_children() >>
+
+Parameters: none. Returns: C<Boolean>. Reports supported child lookup
+modes.
+
+=item C<< node.named_child(name) >>, C<< node.indexed_child(i) >>, C<< node.named_indexed_child(name, i) >>
+
+Parameters: C<name> is a child name and C<i> is an index. Returns:
+C<Node> or C<null>. Looks up child nodes.
+
+=item C<< node.next_child(child) >>, C<< node.prev_child(child) >>, C<< node.next_sibling() >>, C<< node.prev_sibling() >>
+
+Parameters: C<child> is a child node where required. Returns: C<Node> or
+C<null>. Traverses adjacent nodes.
+
+=item C<< node.named_attribute(name) >>
+
+Parameters: C<name> is an attribute name. Returns: C<Node> or C<null>.
+Looks up one attribute node.
+
+=item C<< node.children() >>, C<< node.attributes() >>
+
+Parameters: none. Returns: C<Array>. Returns child or attribute nodes.
+
+=item C<< node.dump() >>
+
+Parameters: none. Returns: C<String>. Returns a diagnostic rendering of
+the node.
+
+=item C<< node.find(zpath) >>
+
+Parameters: C<zpath> is a C<ZPath> object or subclass, such as C<ZZPath>.
+Returns: C<Array>. Evaluates a nested path from this node and returns
+selected node objects.
+
+=item C<< node.do_action(action) >>, C<< node.do_action_on_child(child, action) >>
+
+Parameters: C<action> is a path action and C<child> is a child node.
+Returns: value. Applies path mutation actions.
+
+=item C<< node.ref() >>, C<< node.ref_on_child(child) >>
+
+Parameters: C<child> is a child node where required. Returns:
+C<Function>. Returns a reference-like getter/setter.
+
+=back
+
+=item C<SimpleNode>, C<StringNode>, C<NumberNode>, C<BooleanNode>, C<NullNode>
+
+Scalar node wrappers. They inherit the C<Node> API and override
+C<type>, C<string_value>, or C<number_value> where appropriate.
+
+=item C<ArrayNode>, C<SetNode>, C<BagNode>, C<DictNode>, C<PairListNode>, C<PairNode>
+
+Collection node wrappers. They inherit the C<Node> API and override
+child, attribute, assignment, and reference methods appropriate to their
+collection type. PairList children are C<PairNode> objects in pair order;
+C<indexed_child> uses global pair index, while C<named_indexed_child> uses
+the occurrence index among pairs with the same key.
+
+=item C<KDLDocumentNode>, C<KDLNodeNode>, C<KDLValueNode>
+
+KDL node wrappers. They inherit the C<Node> API and expose KDL children,
+attributes, names, value tags, and scalar coercions.
+
+=item C<XmlNodeNode>
+
+XML node wrapper. It inherits the C<Node> API and exposes XML names,
+children, attributes, sibling traversal, and scalar text values.
+
+=item C<TimeNode>
+
+C<std/time> wrapper. It inherits the C<Node> API and exposes time
+attributes plus string and numeric values.
+
+=item C<PathNode>
+
+C<std/io> path wrapper. It inherits the C<Node> API and exposes path
+attributes plus string values.
+
+=item C<WidgetNode>
+
+C<std/gui/objects> widget wrapper. It inherits the C<Node> API and
+exposes widget children by widget class name and index, plus public
+widget properties as assignable attributes.
+
+=back
+
+=head2 Variables
+
+=over
+
+=item C<determine_class>
+
+Type: C<Function>. Chooses the concrete node wrapper class for a raw
+value.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/path/z/node >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/data/cbor import TaggedValue;
+from std/data/kdl import KDLDocument, KDLNode, KDLValue;
+from std/internals import class_name, load_module, ref_id;
+from std/io try import Path;
+from std/math import Math;
+from std/string import substr;
+from std/time import Time;
+
+
+function determine_class;
+let _widget_class_loaded := false;
+let _widget_class := null;
+
+const _WIDGET_ATTRS := [
+	{ name: "id", getter: "id", setter: "set_id" },
+	{ name: "enabled", getter: "enabled", setter: "set_enabled" },
+	{ name: "visible", getter: "visible", setter: "set_visible" },
+	{ name: "width", getter: "width", accessor: true },
+	{ name: "height", getter: "height", accessor: true },
+	{ name: "minwidth", getter: "minwidth", accessor: true },
+	{ name: "minheight", getter: "minheight", accessor: true },
+	{ name: "maxwidth", getter: "maxwidth", accessor: true },
+	{ name: "maxheight", getter: "maxheight", accessor: true },
+	{ name: "classes", getter: "classes" },
+	{ name: "title", getter: "title", setter: "set_title", accessor: true },
+	{ name: "text", getter: "text", setter: "set_text", accessor: true },
+	{ name: "value", getter: "value", setter: "set_value", accessor: true },
+	{ name: "placeholder", getter: "placeholder", setter: "set_placeholder", accessor: true },
+	{ name: "for", getter: "for_id", setter: "set_for_id", accessor: true },
+	{ name: "align", getter: "align", accessor: true },
+	{ name: "gap", getter: "gap", accessor: true },
+	{ name: "padding", getter: "padding", accessor: true },
+	{ name: "label", getter: "label", accessor: true },
+	{ name: "collapsible", getter: "collapsible", accessor: true },
+	{ name: "collapsed", getter: "collapsed", accessor: true },
+	{ name: "wrap", getter: "wrap", accessor: true },
+	{ name: "readonly", getter: "readonly", accessor: true },
+	{ name: "multiline", getter: "multiline", accessor: true },
+	{ name: "password", getter: "password", accessor: true },
+	{ name: "required", getter: "required", accessor: true },
+	{ name: "src", getter: "src", accessor: true },
+	{ name: "alt", getter: "alt", accessor: true },
+	{ name: "fit", getter: "fit", accessor: true },
+	{ name: "checked", getter: "checked", accessor: true },
+	{ name: "indeterminate", getter: "indeterminate", accessor: true },
+	{ name: "name", getter: "name", accessor: true },
+	{ name: "disabled", getter: "disabled", accessor: true },
+	{ name: "group", getter: "group", accessor: true },
+	{ name: "multiple", getter: "multiple", accessor: true },
+	{ name: "min", getter: "min", accessor: true },
+	{ name: "max", getter: "max", accessor: true },
+	{ name: "first_day_of_week", getter: "first_day_of_week", accessor: true },
+	{ name: "orientation", getter: "orientation", accessor: true },
+	{ name: "step", getter: "step", accessor: true },
+	{ name: "show_text", getter: "show_text", accessor: true },
+	{ name: "selected", getter: "selected", accessor: true },
+	{ name: "placement", getter: "placement", accessor: true },
+	{ name: "icon", getter: "icon", setter: "set_icon", accessor: true },
+	{ name: "closable", getter: "closable", accessor: true },
+	{ name: "selected_index", getter: "selected_index", accessor: true },
+	{ name: "selected_path", getter: "selected_path", accessor: true },
+	{ name: "variant", getter: "variant", accessor: true },
+];
+
+function _zpath_widget_class () {
+	if ( not _widget_class_loaded ) {
+		_widget_class_loaded := true;
+		try {
+			_widget_class := load_module( "std/gui/objects", "Widget" );
+		}
+		catch {
+			_widget_class := null;
+		}
+	}
+	return _widget_class;
+}
+
+function _zpath_is_widget ( obj ) {
+	let Widget := _zpath_widget_class();
+	return Widget ≢ null and obj instanceof Widget;
+}
+
+function _zpath_xml_node_type ( obj ) {
+	return null if not( obj can nodeType );
+	try {
+		return int( "" _ obj.nodeType() );
+	}
+	catch {
+	}
+	return null;
+}
+
+function _zpath_is_xml_document ( obj ) {
+	return true if _zpath_xml_node_type(obj) = 9;
+	return false if not( obj can documentElement );
+	try {
+		obj.documentElement();
+		return true;
+	}
+	catch {
+	}
+	return false;
+}
+
+function _zpath_is_xml_node ( obj ) {
+	return true if _zpath_xml_node_type(obj) ≢ null;
+	return _zpath_is_xml_document(obj);
+}
+
+function _zpath_widget_attr_name ( name ) {
+	return ( name ~ /^@/ ) ? substr( name, 1 ) : name;
+}
+
+function _zpath_widget_attr_spec ( name ) {
+	let attr := _zpath_widget_attr_name(name);
+	return _WIDGET_ATTRS.first( fn spec → spec{name} ≡ attr );
+}
+
+function _zpath_widget_attr_applies ( widget, spec ) {
+	let attr := spec{name};
+	if ( attr in [
+		"id",
+		"enabled",
+		"visible",
+		"width",
+		"height",
+		"minwidth",
+		"minheight",
+		"maxwidth",
+		"maxheight",
+		"classes",
+	] ) {
+		return true;
+	}
+
+	switch ( class_name(widget) : eq ) {
+		case "Window":
+			return attr in [ "title" ];
+		case "VBox", "HBox":
+			return attr in [ "align", "gap", "padding" ];
+		case "Frame":
+			return attr in [ "label", "collapsible", "collapsed" ];
+		case "Label":
+			return attr in [ "text", "for" ];
+		case "Text":
+			return attr in [ "value", "multiline", "readonly", "wrap" ];
+		case "RichText":
+			return attr in [ "value", "multiline", "readonly" ];
+		case "Image":
+			return attr in [ "src", "alt", "fit" ];
+		case "Input":
+			return attr in [
+				"value",
+				"placeholder",
+				"multiline",
+				"readonly",
+				"password",
+				"required",
+			];
+		case "DatePicker":
+			return attr in [ "value", "min", "max", "first_day_of_week" ];
+		case "Checkbox":
+			return attr in [ "label", "checked", "indeterminate" ];
+		case "Radio":
+			return attr in [ "label", "value", "group", "checked" ];
+		case "RadioGroup":
+			return attr in [ "name", "value" ];
+		case "Select":
+			return attr in [ "value", "multiple" ];
+		case "Menu":
+			return attr in [ "text" ];
+		case "MenuItem":
+			return attr in [ "text", "disabled" ];
+		case "Button":
+			return attr in [ "text", "variant" ];
+		case "Separator":
+			return attr in [ "orientation" ];
+		case "Slider":
+			return attr in [ "value", "min", "max", "step", "orientation", "readonly" ];
+		case "Progress":
+			return attr in [ "value", "min", "max", "indeterminate", "show_text" ];
+		case "Tabs":
+			return attr in [ "selected", "placement" ];
+		case "Tab":
+			return attr in [ "title", "value", "icon", "selected", "closable" ];
+		case "ListView":
+			return attr in [ "selected_index", "multiple" ];
+		case "TreeView":
+			return attr in [ "selected_path", "multiple" ];
+	}
+
+	return false;
+}
+
+function _zpath_widget_get_attr ( widget, spec ) {
+	let getter := spec{getter};
+	return widget.(getter)();
+}
+
+function _zpath_widget_set_attr ( widget, spec, value ) {
+	let setter := spec.get( "setter", null );
+	if ( setter ≢ null ) {
+		try {
+			return widget.(setter)(value);
+		}
+		catch {
+		}
+	}
+
+	let getter := spec{getter};
+	if ( spec.get( "accessor", false ) ) {
+		try {
+			return widget.(getter)(value);
+		}
+		catch {
+		}
+	}
+
+	die `Widget attribute @${spec{name}} is not assignable`;
+}
+
+class Node {
+	let raw with set := null;
+	let parent but weak := null;
+	let _parent_keepalive := null;
+	let key := null;
+	let id := null;
+	let ix := null;
+	let tagged with set, has := null;
+
+	static method _xml_node_type_code ( value ) {
+		try {
+			return int( "" _ value.nodeType() );
+		}
+		catch {
+			return null;
+		}
+	}
+
+	static method from_root ( obj ) {
+		return self.wrap(obj);
+	}
+
+	static method wrap ( _obj, parent?, key?, ix? ) {
+		
+		let obj := _obj;
+
+		if ( obj instanceof Node ) {
+			return obj;
+		}
+
+		let Klass := determine_class( obj );
+		
+		let n := new Klass(
+			raw: obj,
+			parent: parent,
+			key: key,
+			ix: ix,
+		);
+		
+		if ( obj instanceof TaggedValue ) {
+			n.set_tagged(obj);
+			while ( obj instanceof TaggedValue ) {
+				obj := obj{value}
+			}
+			n.set_raw(obj);
+		}
+		
+		n._build_id_with_parent(parent);
+		
+		return n;
+	}
+
+	method hold_parent ( owner ) {
+		_parent_keepalive := owner;
+		return self;
+	}
+	
+	method _use_ref_as_id () {
+		return false;
+	}
+	
+	method _build_id () {
+		id := self._generate_id;
+	}
+
+	method _build_id_with_parent ( owner ) {
+		id := self._generate_id_with_parent(owner);
+	}
+	
+	method _generate_id () {
+		return self._generate_id_with_parent(parent);
+	}
+
+	method _generate_id_with_parent ( owner ) {
+		
+		if ( self._use_ref_as_id ) {
+			return "ref:" _ ref_id(raw);
+		}
+		
+		if ( owner ≡ null ) {
+			return "root";
+		}
+		
+		if ( ix ≢ null ) {
+			if ( key ≢ null ) {
+				return owner.id _ "/" _ key _ "#" _ ix;
+			}
+			return owner.id _ "/#" _ ix;
+		}
+		
+		if ( key ≢ null ) {
+			return owner.id _ "/" _ key;
+		}
+		
+		return "rand:" _ floor( 1000 * 1000 * 1000 * Math.rand() );
+	}
+	
+	method raw ()    { return raw; }
+	method parent () { return parent; }
+	method key ()    { return key; }
+	method id ()     { return id; }
+	method ix ()     { return ix; }
+	method index ()  { return ix; }
+	method tagged () { return tagged; }
+
+	method type () {
+		return typeof raw;
+	}
+
+	method value () {
+		return raw;
+	}
+
+	method primitive_value () {
+		return raw;
+	}
+
+	method string_value () {
+		let p := self.primitive_value;
+		return p ≡ null ? null : "" _ p;
+	}
+
+	method number_value () {
+		let v := self.primitive_value();
+		return 0 + v if v ~ /^-?(?:[0-9]+(?:\.[0-9]+)?|\.[0-9]+)$/;
+		return null;
+	}
+
+	method can_have_named_children () {
+		return false;
+	}
+
+	method can_have_indexed_children () {
+		return false;
+	}
+
+	method can_have_named_indexed_children () {
+		return false;
+	}
+
+	method named_child ( name ) {
+		self.children.first( fn kid → kid.key ≡ name );
+	}
+
+	method indexed_child ( i ) {
+		self.children.first( fn kid → kid.ix ≡ i );
+	}
+	
+	method named_indexed_child ( name, i ) {
+		self.children.first( fn kid → kid.ix ≡ i and kid.key ≡ name );
+	}
+	
+	method next_child ( child ) {
+		let i := child.ix;
+		return null if i ≡ null; 
+		return self.indexed_child( i + 1 );
+	}
+
+	method prev_child ( child ) {
+		let i := child.ix;
+		return null if i ≡ null; 
+		return null if i = 0;
+		return self.indexed_child( i - 1 );
+	}
+
+	method next_sibling () {
+		return self.parent.next_child( self );
+	}
+
+	method prev_sibling () {
+		return self.parent.prev_child( self );
+	}
+
+	method named_attribute ( name ) {
+		let attrname := ( name ~ /^@/ ) ? name : `@${name}`;
+		self.attributes.first( fn kid → kid.name ≡ attrname );
+	}
+
+	method children () {
+		return [];
+	}
+
+	method attributes () {
+		return [];
+	}
+	
+	method name () {
+		return key;
+	}
+
+	method dump () {
+		return {
+			"@type": self.type(),
+			"@id": self.id(),
+			"@key": self.key(),
+			"@index": self.index(),
+			"@value": self.primitive_value(),
+			children: self.children().map( fn c -> c.dump() ),
+			attributes: self.attributes().map( fn a -> a.dump() ),
+		};
+	}
+
+	method find ( zpath ) {
+		from std/path/z import ZPath;
+
+		die "Node.find expects a ZPath object"
+			unless zpath instanceof ZPath;
+
+		return zpath.evaluate(self);
+	}
+
+	method do_action ( action ) {
+		const container_node := self.parent();
+		die "Path assignment target has no parent node"
+			if container_node ≡ null;
+		return container_node.do_action_on_child( self, action );
+	}
+
+	method ref () {
+		const container_node := self.parent();
+		die "Path assignment target has no parent node"
+			if container_node ≡ null;
+		return container_node.ref_on_child(self);
+	}
+
+	method do_action_on_child ( child, action ) {
+		die `Path assignment target container '${self.type()}' is not assignable`;
+	}
+
+	method ref_on_child ( child ) {
+		die `Path assignment target container '${self.type()}' is not assignable`;
+	}
+}
+
+class SimpleNode extends Node {
+}
+
+class StringNode extends SimpleNode {
+	
+	method string_value () {
+		let raw := self.raw;
+		if ( raw instanceof BinaryString ) {
+			return to_string( raw );
+		}
+		return raw;
+	}
+	
+	method type () {
+		return "string";
+	}
+}
+
+class NumberNode extends SimpleNode {
+	method number_value () {
+		let raw := self.raw;
+		return raw;
+	}
+	
+	method type () {
+		return "number";
+	}
+}
+
+class BooleanNode extends SimpleNode {
+	method type () {
+		return "boolean";
+	}
+}
+
+class NullNode extends SimpleNode {
+	method type () {
+		return "null";
+	}
+}
+
+class ArrayNode extends Node {
+
+	method _use_ref_as_id () {
+		return true;
+	}
+	
+	method type () {
+		return "list";
+	}
+	
+	method children () {
+		let raw := self.raw;
+		let out := [];
+		let i := 0;
+		while ( i < raw.length ) {
+			let child := Node.wrap( raw[i], self, null, i );
+			out.push(child);
+			i++;
+		}
+		return out;
+	}
+	
+	method can_have_indexed_children () {
+		return false;
+	}
+
+	method do_action_on_child ( child, action ) {
+		return super( child, action ) if action{op} ne ":=";
+
+		const ix := child.ix();
+		die "Path assignment expects numeric array index" if ix ≡ null;
+		let container := self.raw();
+		container[ix] := action{value};
+		return action{value};
+	}
+
+	method ref_on_child ( child ) {
+		const ix := child.ix();
+		die "Path assignment expects numeric array index" if ix ≡ null;
+		let container := self.raw();
+		return \ container[ix];
+	}
+}
+
+class SetNode extends Node {
+	
+	method _use_ref_as_id () {
+		return true;
+	}
+
+	method children () {
+		let raw := self.raw;
+		let out := [];
+		let i := 0;
+		while ( i < raw.length ) {
+			let child := Node.wrap( raw[i], self, null, null );
+			out.push(child);
+			i++;
+		}
+		return out;
+	}
+}
+
+class BagNode extends Node {
+	
+	method _use_ref_as_id () {
+		return true;
+	}
+
+	method children () {
+		let raw := self.raw;
+		let out := [];
+		let i := 0;
+		while ( i < raw.length ) {
+			let child := Node.wrap( raw[i], self, null, null );
+			out.push(child);
+			i++;
+		}
+		return out;
+	}
+}
+
+class DictNode extends Node {
+
+	method _use_ref_as_id () {
+		return true;
+	}
+	
+	method type () {
+		return "map";
+	}
+	
+	method children () {
+		let raw := self.raw;
+		let out := [];
+		for ( let k in raw.keys() ) {
+			let child := Node.wrap( raw.get(k), self, k );
+			out.push(child);
+		}
+		return out;
+	}
+	
+	method can_have_named_children () {
+		return true;
+	}
+
+	method do_action_on_child ( child, action ) {
+		return super( child, action ) if action{op} ne ":=";
+
+		const key := child.key();
+		die "Path assignment expects string dict key" if key ≡ null;
+		let container := self.raw();
+		container{(key)} := action{value};
+		return action{value};
+	}
+
+	method ref_on_child ( child ) {
+		const key := child.key();
+		die "Path assignment expects string dict key" if key ≡ null;
+		let container := self.raw();
+		return \ container{(key)};
+	}
+}
+
+class PairListNode extends Node {
+	
+	method _use_ref_as_id () {
+		return true;
+	}
+	
+	method children () {
+		let raw := self.raw;
+		let pairs := raw.to_Array();
+		let out := [];
+		let i := 0;
+		while ( i < pairs.length() ) {
+			let pair := pairs[i];
+			out.push( Node.wrap( pair, self, pair.key, i ) );
+			i++;
+		}
+		return out;
+	}
+	
+	method can_have_named_children () {
+		return true;
+	}
+	
+	method can_have_indexed_children () {
+		return true;
+	}
+	
+	method can_have_named_indexed_children () {
+		return true;
+	}
+
+	method named_child ( name ) {
+		return self.named_indexed_child( name, 0 );
+	}
+
+	method indexed_child ( i ) {
+		let pairs := self.raw().to_Array();
+		return null if i < 0 or i >= pairs.length();
+		let pair := pairs[i];
+		return Node.wrap( pair, self, pair.key, i );
+	}
+
+	method named_indexed_child ( name, i ) {
+		let pairs := self.raw().to_Array();
+		let seen := 0;
+		let pos := 0;
+		while ( pos < pairs.length() ) {
+			let pair := pairs[pos];
+			if ( pair.key ≡ name ) {
+				if ( seen = i ) {
+					return Node.wrap( pair, self, pair.key, pos );
+				}
+				seen++;
+			}
+			pos++;
+		}
+		return null;
+	}
+
+	method _replace_value_at ( pair_ix, value ) {
+		let container := self.raw();
+		let pairs := container.to_Array();
+		die "Path assignment expects numeric pairlist index"
+			if pair_ix ≡ null or pair_ix < 0 or pair_ix >= pairs.length();
+
+		container.clear();
+		let i := 0;
+		while ( i < pairs.length() ) {
+			let pair := pairs[i];
+			container.add( pair.key, i = pair_ix ? value : pair.value );
+			i++;
+		}
+		return value;
+	}
+
+	method do_action_on_child ( child, action ) {
+		return super( child, action ) if action{op} ne ":=";
+
+		return self._replace_value_at( child.ix(), action{value} );
+	}
+
+	method ref_on_child ( child ) {
+		let pair_ix := child.ix();
+		return function ( ... args ) {
+			let current := self.indexed_child(pair_ix);
+			die "Path assignment target pairlist entry no longer exists"
+				if current ≡ null;
+			return current.raw().value if args.length() = 0;
+			return self._replace_value_at( pair_ix, args[0] );
+		};
+	}
+}
+
+class PairNode extends Node {
+	
+	method attributes () {
+		let raw := self.raw;
+		return [ "key", "value" ]
+			.map( fn a → Node.wrap( raw.(a)(), self, `@${a}` ) );
+	}
+
+	method do_action_on_child ( child, action ) {
+		return super( child, action ) if action{op} ne ":=";
+		return super( child, action ) if child.key() ne "@value";
+
+		let container := self.parent();
+		return super( child, action )
+			if container ≡ null or not ( container instanceof PairListNode );
+		return container.do_action_on_child( self, action );
+	}
+
+	method ref_on_child ( child ) {
+		return super(child) if child.key() ne "@value";
+
+		let container := self.parent();
+		return super(child)
+			if container ≡ null or not ( container instanceof PairListNode );
+		return container.ref_on_child(self);
+	}
+}
+
+class KDLDocumentNode extends Node {
+
+	method _use_ref_as_id () {
+		return true;
+	}
+
+	method type () {
+		return "document";
+	}
+
+	method children () {
+		let raw := self.raw;
+		let out := [];
+		let i := 0;
+		while ( i < raw.nodes().length() ) {
+			let child := raw.nodes()[i];
+			out.push( Node.wrap( child, self, child.name(), i ) );
+			i++;
+		}
+		return out;
+	}
+
+	method can_have_named_children () {
+		return true;
+	}
+
+	method can_have_indexed_children () {
+		return true;
+	}
+
+	method can_have_named_indexed_children () {
+		return true;
+	}
+
+	method indexed_child ( i ) {
+		return self.children().get( i, null );
+	}
+
+	method named_indexed_child ( name, i ) {
+		let n := 0;
+		for ( let child in self.children() ) {
+			if ( child.key() ≡ name ) {
+				return child if n ≡ i;
+				n++;
+			}
+		}
+		return null;
+	}
+}
+
+class KDLNodeNode extends Node {
+
+	method _use_ref_as_id () {
+		return true;
+	}
+
+	method type () {
+		return "element";
+	}
+
+	method name () {
+		return self.raw().name();
+	}
+
+	method children () {
+		let raw := self.raw;
+		let out := [];
+		let i := 0;
+		for ( let arg in raw.args() ) {
+			out.push( Node.wrap( arg, self, null, i ) );
+			i++;
+		}
+		for ( let child in raw.children() ) {
+			out.push( Node.wrap( child, self, child.name(), i ) );
+			i++;
+		}
+		return out;
+	}
+
+	method attributes () {
+		let raw := self.raw;
+		let out := [];
+		let i := 0;
+		for ( let pair in raw.props().to_Array() ) {
+			out.push( Node.wrap( pair.value, self, "@" _ pair.key, i ) );
+			i++;
+		}
+		return out;
+	}
+
+	method can_have_named_children () {
+		return true;
+	}
+
+	method can_have_indexed_children () {
+		return true;
+	}
+
+	method can_have_named_indexed_children () {
+		return true;
+	}
+
+	method indexed_child ( i ) {
+		return self.children().get( i, null );
+	}
+
+	method named_indexed_child ( name, i ) {
+		let n := 0;
+		for ( let child in self.children() ) {
+			if ( child.key() ≡ name ) {
+				return child if n ≡ i;
+				n++;
+			}
+		}
+		return null;
+	}
+}
+
+class KDLValueNode extends Node {
+
+	method type () {
+		return self.raw().type();
+	}
+
+	method value () {
+		return self.raw().native_value();
+	}
+
+	method primitive_value () {
+		return self.raw().native_value();
+	}
+
+	method string_value () {
+		return self.raw().to_String();
+	}
+
+	method number_value () {
+		try {
+			return self.raw().to_Number();
+		}
+		catch {
+			return null;
+		}
+	}
+
+	method has_tagged () {
+		return true;
+	}
+
+	method tagged () {
+		let ann := self.raw().type_annotation();
+		return {
+			tag: ann ≡ null ? null : "" _ ann,
+			value: self.raw().native_value(),
+		};
+	}
+}
+
+class XmlNodeNode extends Node {
+
+	method _generate_id () {
+		return
+			try {
+				let i := self.raw.unique_id;
+				i ≡ null ? super() : `xml:${i}`;
+			}
+			catch {
+				super();
+			};
+	}
+
+	method type () {
+		let raw := self.raw;
+		if ( _zpath_is_xml_document(raw) ) {
+			return "document";
+		}
+		switch ( Node._xml_node_type_code(raw) ) {
+			case 1:
+				return "element";
+			case 2, 18:
+				return "attr";
+			case 3, 4:
+				return "text";
+			case 8:
+				return "comment";
+			case 9:
+				return "document";
+		}
+		
+		return super();
+	}
+	
+	method name () {
+		let raw := self.raw;
+		switch ( Node._xml_node_type_code(raw) ) {
+			case 1:
+				return raw.nodeName();
+			case 2, 18:
+				return "@" _ raw.nodeName();
+			case 3, 4:
+				return "#text";
+		}
+		
+		return super();
+	}
+
+	method next_child ( child ) {
+		return child.next_sibling;
+	}
+
+	method prev_child ( child ) {
+		return child.prev_sibling;
+	}
+
+	method next_sibling () {
+		let x := self.raw.nextSibling;
+		return null if x ≡ null;
+		return Node.wrap( x, self.parent, x.nodeName );
+	}
+
+	method prev_sibling () {
+		let x := self.raw.previousSibling;
+		return null if x ≡ null;
+		return Node.wrap( x, self.parent, x.nodeName );
+	}
+
+	method primitive_value () {
+		let raw := self.raw;
+		if ( _zpath_is_xml_document(raw) ) {
+			let de := raw.documentElement();
+			return de ≡ null ? null : de.textContent();
+		}
+		switch ( Node._xml_node_type_code(raw) ) {
+			case 1:
+				return raw.textContent;
+			case 2, 18:
+				return raw.nodeValue();
+			case 3, 4, 8:
+				return raw.data;
+			case 9:
+				let de := raw.documentElement();
+				return de ≡ null ? null : de.textContent();
+		}
+		
+		return super();
+	}
+	
+	method string_value () {
+		let raw := self.raw;
+		if ( _zpath_is_xml_document(raw) ) {
+			let de := raw.documentElement();
+			return de ≡ null ? null : de.textContent();
+		}
+		switch ( Node._xml_node_type_code(raw) ) {
+			case 1:
+				return raw.textContent;
+			case 2, 18:
+				return raw.nodeValue();
+			case 3, 4, 8:
+				return raw.data;
+			case 9:
+				let de := raw.documentElement();
+				return de ≡ null ? null : de.textContent();
+		}
+
+		return super();
+	}
+
+	method can_have_named_children () {
+		return true;
+	}
+	
+	method can_have_indexed_children () {
+		return true;
+	}
+	
+	method can_have_named_indexed_children () {
+		return true;
+	}
+	
+	method children () {
+		let raw := self.raw;
+		if ( _zpath_is_xml_document(raw) ) {
+			let de := raw.documentElement();
+			return de ≡ null ? []
+				: [ Node.wrap( de, self, de.nodeName(), 0 ) ];
+		}
+		let node_type := Node._xml_node_type_code(raw);
+		if ( node_type = 9 ) {
+			let de := raw.documentElement();
+			return de ≡ null ? []
+				: [ Node.wrap( de, self, de.nodeName(), 0 ) ];
+		}
+
+		if ( node_type = 1 ) {
+			let kids := [];
+			let count := {};
+			for ( let child in raw.childNodes() ) {
+				let nm := child.nodeName();
+				let n := count.exists(nm) ? count.get( nm ) : 0;
+				count.set( nm, n + 1 );
+				kids.push( Node.wrap( child, self, nm, n ) );
+			}
+			return kids;
+		}
+
+		return [];
+	}
+
+	method attributes () {
+		let raw := self.raw;
+		let out := super();
+		if ( Node._xml_node_type_code(raw) ≡ 1 ) {
+			for ( let attr in raw.attributes() ) {
+				let n := Node.wrap( attr, self, "@" _ attr.nodeName() );
+				out.push(n);
+			}
+		}
+		return out;
+	}
+}
+
+class TimeNode extends Node {
+	
+	method string_value () {
+		let raw := self.raw;
+		return raw.datetime;
+	}
+	
+	method number_value () {
+		let raw := self.raw;
+		return raw.epoch;
+	}
+	
+	method attributes () {
+		let raw := self.raw;
+		return [ "year", "month", "day", "hour", "min", "sec" ]
+			.map( fn a → Node.wrap( raw.(a)(), self, `@${a}` ) );
+	}
+}
+
+class PathNode extends Node {
+
+	method string_value () {
+		let raw := self.raw;
+		return raw.to_String;
+	}
+	
+	method attributes () {
+		let raw := self.raw;
+		if ( raw.is_file ) {
+			const stat := raw.stat;
+			return stat.keys.map( fn a → Node.wrap( stat{a}, self, `@${a}` ) );
+		}
+		
+		return super();
+	}
+}
+
+class WidgetNode extends Node {
+
+	method _use_ref_as_id () {
+		return true;
+	}
+
+	method type () {
+		return "widget";
+	}
+
+	method name () {
+		return class_name( self.raw() ) ?: "Widget";
+	}
+
+	method can_have_named_children () {
+		return true;
+	}
+
+	method can_have_indexed_children () {
+		return true;
+	}
+
+	method can_have_named_indexed_children () {
+		return true;
+	}
+
+	method children () {
+		let out := [];
+		let i := 0;
+		for ( let child in self.raw().children() ) {
+			let nm := class_name(child) ?: "Widget";
+			out.push( Node.wrap( child, self, nm, i ) );
+			i++;
+		}
+		return out;
+	}
+
+	method indexed_child ( i ) {
+		return self.children().get( i, null );
+	}
+
+	method named_indexed_child ( name, i ) {
+		let n := 0;
+		for ( let child in self.children() ) {
+			if ( child.key() ≡ name ) {
+				return child if n ≡ i;
+				n++;
+			}
+		}
+		return null;
+	}
+
+	method attributes () {
+		let raw := self.raw();
+		let out := [];
+		let i := 0;
+		for ( let spec in _WIDGET_ATTRS ) {
+			next unless _zpath_widget_attr_applies( raw, spec );
+			try {
+				let value := _zpath_widget_get_attr( raw, spec );
+				out.push( Node.wrap( value, self, "@" _ spec{name}, i ) );
+				i++;
+			}
+			catch {
+			}
+		}
+		return out;
+	}
+
+	method do_action_on_child ( child, action ) {
+		return super( child, action ) if action{op} ne ":=";
+
+		let spec := _zpath_widget_attr_spec( child.key() );
+		return super( child, action ) if spec ≡ null;
+
+		_zpath_widget_set_attr( self.raw(), spec, action{value} );
+		return action{value};
+	}
+
+	method ref_on_child ( child ) {
+		let spec := _zpath_widget_attr_spec( child.key() );
+		return super(child) if spec ≡ null;
+
+		let widget := self.raw();
+		return function ( ... args ) {
+			if ( args.length() = 0 ) {
+				return _zpath_widget_get_attr( widget, spec );
+			}
+			_zpath_widget_set_attr( widget, spec, args[0] );
+			return args[0];
+		};
+	}
+}
+
+// Need to define the body of this function late so it can refer back to
+// classes that have been declared.
+
+function determine_class ( obj ) {
+	let Klass;
+	
+	let real_obj := obj;
+	while ( real_obj instanceof TaggedValue ) {
+		real_obj := real_obj{value};
+	}
+	
+	if ( real_obj instanceof Null ) {
+		Klass := NullNode;
+	}
+	else if ( real_obj instanceof Boolean ) {
+		Klass := BooleanNode;
+	}
+	else if ( real_obj instanceof Number ) {
+		Klass := NumberNode;
+	}
+	else if ( real_obj instanceof String or real_obj instanceof BinaryString ) {
+		Klass := StringNode;
+	}
+	else if ( real_obj instanceof Array ) {
+		Klass := ArrayNode;
+	}
+	else if ( real_obj instanceof Bag ) {
+		Klass := BagNode;
+	}
+	else if ( real_obj instanceof Set ) {
+		Klass := SetNode;
+	}
+	else if ( real_obj instanceof Dict ) {
+		Klass := DictNode;
+	}
+	else if ( real_obj instanceof PairList ) {
+		Klass := PairListNode;
+	}
+	else if ( real_obj instanceof Pair ) {
+		Klass := PairNode;
+	}
+	else if ( real_obj instanceof KDLDocument ) {
+		Klass := KDLDocumentNode;
+	}
+	else if ( real_obj instanceof KDLNode ) {
+		Klass := KDLNodeNode;
+	}
+	else if ( real_obj instanceof KDLValue ) {
+		Klass := KDLValueNode;
+	}
+	else if ( _zpath_is_xml_node(real_obj) ) {
+		Klass := XmlNodeNode;
+	}
+	else if ( real_obj instanceof Time ) {
+		Klass := TimeNode;
+	}
+	else if ( Path and ( real_obj instanceof Path ) ) {
+		Klass := PathNode;
+	}
+	else if ( real_obj instanceof Object ) {
+		if ( real_obj can __zpath_node_class__ ) {
+			Klass = real_obj.__zpath_node_class__;
+		}
+	}
+
+	if ( Klass ≡ null and _zpath_is_widget(real_obj) ) {
+		Klass := WidgetNode;
+	}
+
+	if ( Klass ≡ null ) {
+		Klass := XmlNodeNode if _zpath_is_xml_node(real_obj);
+	}
+	
+	return Klass ?: Node;
+}

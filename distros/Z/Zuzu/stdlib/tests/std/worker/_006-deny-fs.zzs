@@ -1,0 +1,94 @@
+from std/eval import eval;
+from test/more import *;
+from test/worker_contract import require_worker_phase, await_worker_failure;
+
+let Worker := require_worker_phase(2);
+
+async function main () {
+	let system_denials := await {
+		Worker.spawn(
+			function () {
+				return [
+					__system__{deny_fs},
+					__system__{deny_net},
+					__system__{deny_perl},
+					__system__{deny_js},
+					__system__{deny_proc},
+					__system__{deny_db},
+					__system__{deny_clib},
+					__system__{deny_gui},
+					__system__{deny_worker},
+				];
+			},
+			[],
+			deny_fs: true,
+			deny_net: true,
+			deny_perl: true,
+			deny_js: true,
+			deny_proc: true,
+			deny_db: true,
+			deny_clib: true,
+			deny_gui: true,
+			deny_worker: true,
+		);
+	};
+
+	is(
+		system_denials,
+		[ true, true, true, true, true, true, true, true, true ],
+		"worker accepts all deny flags reflected in __system__",
+	);
+
+	let import_error := exception( function () {
+		eval( "from std/worker import Worker; true;", deny_worker: true );
+	} );
+	ok(
+		import_error instanceof Exception,
+		"deny_worker prevents std/worker imports",
+	);
+	like(
+		import_error.to_String(),
+		/(denied|unavailable|not found|worker)/i,
+		"deny_worker import failure mentions worker denial",
+	);
+
+	like(
+		exception( function () {
+			Worker.spawn(
+				function () {
+					return true;
+				},
+				[],
+				deny_fs: "true",
+			);
+		} ),
+		/TypeException.*deny_fs.*Boolean/,
+		"worker deny flags reject non-Boolean values",
+	);
+
+	let err := await {
+		await_worker_failure(
+			Worker.spawn(
+				function () {
+					from std/io import Path;
+					return new Path("not-read.txt").slurp_utf8();
+				},
+				[],
+				deny_fs: true,
+			),
+		);
+	};
+
+	ok( err instanceof Exception, "deny_fs worker failure is catchable" );
+	like(
+		err.to_String(),
+		/(denied|unavailable|std\/io|fs)/i,
+		"deny_fs blocks std/io in worker",
+	);
+}
+
+await {
+	main();
+};
+
+done_testing();

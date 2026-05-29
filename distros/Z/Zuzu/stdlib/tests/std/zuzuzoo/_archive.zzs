@@ -1,0 +1,349 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/archive import Archive;
+from std/io import Path;
+from std/string import chr;
+from std/zuzuzoo import Zuzuzoo, load_distribution;
+
+function throws_like ( f, rx, name ) {
+	let got := "";
+	try {
+		f();
+	}
+	catch ( Exception e ) {
+		got := e.to_String();
+	}
+	like( got, rx, name );
+}
+
+function meta ( name := "valid-dist", version := "1.0.0", extra := "" ) {
+	return to_binary(
+		"{\"name\":\"" _ name _ "\",\"version\":\"" _ version _
+		"\",\"author\":\"Example\",\"license\":\"MIT\"" _
+		extra _ "}\n",
+	);
+}
+
+function archive_path ( entries ) {
+	let path := Path.tempfile();
+	Archive.dump( path, { entries: entries }, "zip" );
+	return path;
+}
+
+function tar_archive_path ( entries ) {
+	let path := Path.tempfile();
+	Archive.dump( path, { entries: entries }, "tar" );
+	return path;
+}
+
+function unsafe_component_archive_path ( entries ) {
+	return __system__{runtime} eq "zuzu-js"
+		? tar_archive_path(entries)
+		: archive_path(entries);
+}
+
+let valid := archive_path(
+	[
+		{
+			path: "valid-dist-1.0.0/zuzu-distribution.json",
+			data: meta(),
+		},
+		{
+			path: "valid-dist-1.0.0/modules/valid/dist.zzm",
+			data: to_binary("// module\n"),
+		},
+		{
+			path: "valid-dist-1.0.0/scripts/valid-tool.zzs",
+			data: to_binary("say \"tool\";\n"),
+		},
+		{
+			path: "valid-dist-1.0.0/tests/basic.zzs",
+			data: to_binary("say \"1..0\";\n"),
+		},
+		{
+			path: "valid-dist-1.0.0/README.md",
+			data: to_binary("# Valid Dist\n"),
+		},
+		{
+			path: "valid-dist-1.0.0/Changes.pod",
+			data: to_binary("=head1 Changes\n"),
+		},
+		{
+			path: "valid-dist-1.0.0/notes.txt",
+			data: to_binary("plain text notes\n"),
+		},
+		{
+			path: "valid-dist-1.0.0/LICENSE",
+			data: to_binary("license text\n"),
+		},
+	],
+);
+
+let dist := load_distribution(valid.to_String());
+let abstract_dist := load_distribution(
+	archive_path(
+		[
+			{
+				path: "abstract-dist-1.0.0/zuzu-distribution.json",
+				data: meta(
+					"abstract-dist",
+					"1.0.0",
+					",\"abstract\":\"Short package description\"," _
+					"\"repo\":\"https://github.com/example/abstract-dist\"",
+				),
+			},
+		],
+	).to_String(),
+);
+is( dist{root_name}, "valid-dist-1.0.0", "valid archive root is reported" );
+is( dist{metadata}{name}, "valid-dist", "source metadata is loaded" );
+is(
+	abstract_dist{metadata}{abstract},
+	"Short package description",
+	"source metadata accepts abstract",
+);
+is(
+	abstract_dist{metadata}{repo},
+	"https://github.com/example/abstract-dist",
+	"source metadata accepts repo",
+);
+is(
+	dist{modules}[0]{source},
+	"modules/valid/dist.zzm",
+	"modules are discovered after extraction",
+);
+is(
+	dist{modules}[0]{install_as},
+	"valid/dist.zzm",
+	"module install name strips modules prefix",
+);
+is(
+	dist{scripts}[0]{install_as},
+	"valid-tool.zzs",
+	"script install name strips scripts prefix",
+);
+is( dist{tests}, [ "tests/basic.zzs" ], "tests are discovered" );
+ok(
+	not dist.exists("docs"),
+	"top-level documentation files are tolerated but not discovered",
+);
+
+	throws_like(
+		function () {
+			let path := unsafe_component_archive_path(
+			[
+				{
+					path: "missing-meta-1.0.0/modules/missing.zzm",
+					data: to_binary("// missing\n"),
+				},
+			],
+		);
+		( new Zuzuzoo() ).load_distribution(path.to_String());
+	},
+	/missing zuzu-distribution\.json/,
+	"archive without metadata is rejected",
+);
+
+	throws_like(
+		function () {
+			let path := tar_archive_path(
+			[
+				{
+					path: "one-1.0.0/zuzu-distribution.json",
+					data: meta("one"),
+				},
+				{
+					path: "two-1.0.0/zuzu-distribution.json",
+					data: meta("two"),
+				},
+			],
+		);
+		load_distribution(path.to_String());
+	},
+	/multiple top-level roots/,
+	"archive with multiple roots is rejected",
+);
+
+throws_like(
+	function () {
+		let path := unsafe_component_archive_path(
+			[
+				{
+					path: "/abs/zuzu-distribution.json",
+					data: meta("abs"),
+				},
+			],
+		);
+		load_distribution(path.to_String());
+	},
+	/unsafe path/,
+	"absolute archive path is rejected",
+);
+
+	throws_like(
+		function () {
+			let path := unsafe_component_archive_path(
+					[
+						{
+							path: "dot-1.0.0/./zuzu-distribution.json",
+							data: meta("dot"),
+						},
+					],
+		);
+		load_distribution(path.to_String());
+	},
+	/unsafe path/,
+	"dotted archive path component is rejected",
+);
+
+throws_like(
+	function () {
+		let path := tar_archive_path(
+			[
+				{
+					path: "slash-1.0.0" _ chr(92) _
+						"zuzu-distribution.json",
+					data: meta("slash"),
+				},
+			],
+		);
+		load_distribution(path.to_String());
+	},
+	/unsafe path/,
+	"backslash archive path is rejected",
+);
+
+throws_like(
+	function () {
+		let path := tar_archive_path(
+			[
+				{
+					path: "dup-1.0.0/zuzu-distribution.json",
+					data: meta("dup"),
+				},
+				{
+					path: "dup-1.0.0/zuzu-distribution.json",
+					data: meta("dup"),
+				},
+			],
+		);
+		load_distribution(path.to_String());
+	},
+	/duplicate path/,
+	"duplicate archive path is rejected",
+);
+
+throws_like(
+	function () {
+		let path := archive_path(
+			[
+				{
+					path: "bad-meta-1.0.0/zuzu-distribution.json",
+					data: to_binary(
+						"{\"name\":\"bad-meta\",\"version\":\"1.0.0\"," _
+						"\"license\":\"MIT\"}\n",
+					),
+				},
+			],
+		);
+		load_distribution(path.to_String());
+	},
+	/missing author/,
+	"source metadata requires author",
+);
+
+throws_like(
+	function () {
+		let path := archive_path(
+			[
+				{
+					path: "bad-status-1.0.0/zuzu-distribution.json",
+					data: meta( "bad-status", "1.0.0", ",\"status\":\"old\"" ),
+				},
+			],
+		);
+		load_distribution(path.to_String());
+	},
+	/bad status/,
+	"source metadata rejects unknown status",
+);
+
+throws_like(
+	function () {
+		let path := archive_path(
+			[
+				{
+					path: "bad-deps-1.0.0/zuzu-distribution.json",
+					data: meta(
+						"bad-deps",
+						"1.0.0",
+						",\"dependencies\":{\"\":\"1.0.0\"}",
+					),
+				},
+			],
+		);
+		load_distribution(path.to_String());
+	},
+	/bad dependency name/,
+	"source metadata rejects empty dependency names",
+);
+
+throws_like(
+	function () {
+		let path := archive_path(
+			[
+				{
+					path: "installed-meta-1.0.0/zuzu-distribution.json",
+					data: meta(
+						"installed-meta",
+						"1.0.0",
+						",\"installed\":{}",
+					),
+				},
+			],
+		);
+		load_distribution(path.to_String());
+	},
+	/installed is not allowed/,
+	"source metadata rejects installed metadata",
+);
+
+throws_like(
+	function () {
+		let path := archive_path(
+			[
+				{
+					path: "listed-modules-1.0.0/zuzu-distribution.json",
+					data: meta(
+						"listed-modules",
+						"1.0.0",
+						",\"modules\":[]",
+					),
+				},
+			],
+		);
+		load_distribution(path.to_String());
+	},
+	/top-level modules\/scripts are not allowed/,
+	"source metadata rejects top-level modules",
+);
+
+throws_like(
+	function () {
+		let path := archive_path(
+			[
+				{
+					path: "wrong-root-1.0.0/zuzu-distribution.json",
+					data: meta( "different-name", "1.0.0" ),
+				},
+			],
+		);
+		load_distribution(path.to_String());
+	},
+	/does not match different-name-1\.0\.0/,
+	"root name must equal name-version",
+);
+
+done_testing();

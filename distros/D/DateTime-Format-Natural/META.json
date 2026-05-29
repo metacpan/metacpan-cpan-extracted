@@ -21,7 +21,8 @@
       },
       "runtime" : {
          "recommends" : {
-            "Date::Calc" : "0"
+            "Date::Calc" : "0",
+            "DateTime::Calendar::Julian" : "0"
          },
          "requires" : {
             "Carp" : "0",
@@ -54,11 +55,21 @@
    "provides" : {
       "DateTime::Format::Natural" : {
          "file" : "lib/DateTime/Format/Natural.pm",
-         "version" : "1.25"
+         "version" : "1.26"
       },
       "DateTime::Format::Natural::Calc" : {
          "file" : "lib/DateTime/Format/Natural/Calc.pm",
-         "version" : "1.47"
+         "version" : "1.50"
+      },
+      "DateTime::Format::Natural::Calendar" : {
+         "file" : "lib/DateTime/Format/Natural/Calendar.pm",
+         "version" : "0.02"
+      },
+      "DateTime::Format::Natural::Calendar::gregorian" : {
+         "file" : "lib/DateTime/Format/Natural/Calendar.pm"
+      },
+      "DateTime::Format::Natural::Calendar::julian" : {
+         "file" : "lib/DateTime/Format/Natural/Calendar.pm"
       },
       "DateTime::Format::Natural::Compat" : {
          "file" : "lib/DateTime/Format/Natural/Compat.pm",
@@ -86,15 +97,15 @@
       },
       "DateTime::Format::Natural::Helpers" : {
          "file" : "lib/DateTime/Format/Natural/Helpers.pm",
-         "version" : "0.07"
+         "version" : "0.08"
       },
       "DateTime::Format::Natural::Lang::Base" : {
          "file" : "lib/DateTime/Format/Natural/Lang/Base.pm",
-         "version" : "1.08"
+         "version" : "1.09"
       },
       "DateTime::Format::Natural::Lang::EN" : {
          "file" : "lib/DateTime/Format/Natural/Lang/EN.pm",
-         "version" : "1.75"
+         "version" : "1.77"
       },
       "DateTime::Format::Natural::Rewrite" : {
          "file" : "lib/DateTime/Format/Natural/Rewrite.pm",
@@ -122,6 +133,6 @@
          "url" : "https://github.com/stsc/DateTime-Format-Natural"
       }
    },
-   "version" : "1.25",
+   "version" : "1.26",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

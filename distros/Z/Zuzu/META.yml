@@ -1,0 +1,62 @@
+---
+abstract: 'API helpers for evaluating ZuzuScript'
+author:
+  - 'Toby Inkster'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  HTTP::Request::Common: '0'
+  Test2::Require::AuthorTesting: '0'
+  Test2::V0: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Zuzu
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Archive::Zip: '0'
+  CBOR::Free: '0'
+  Coro: '0'
+  Crypt::OpenSSL::PKCS12: '0'
+  Crypt::OpenSSL::X509: '0'
+  Crypt::URandom: '0'
+  CryptX: '0'
+  DBD::SQLite: '0'
+  DBI: '0'
+  DateTime::Lite: '0'
+  DateTime::Lite::TimeZone: '0'
+  FFI::Platypus: '2.00'
+  File::ShareDir: '0'
+  HTML::Selector::XPath: '0'
+  HTTP::CookieJar: '0'
+  IO::Socket::SSL: '0'
+  IPC::Run: '0'
+  JSON::MultiValueOrdered: '0'
+  Moo: '0'
+  Net::DNS: '0'
+  Net::SSLeay: '0'
+  Path::Tiny: '0'
+  Plack: '0'
+  Prima: '0'
+  Regexp::Util: '0'
+  Term::ReadLine::Perl: '0'
+  Text::CSV_XS: '0'
+  Tie::Hash::MultiValueOrdered: '0'
+  Types::Serialiser: '0'
+  URI: '0'
+  URI::Escape: '0'
+  XML::LibXML: '0'
+  YAML::PP: '0'
+  perl: '5.014'
+resources:
+  repository: https://example.invalid/zuzu
+version: '0.001000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

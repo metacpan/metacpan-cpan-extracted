@@ -19,7 +19,7 @@ use strict;
 use warnings;
 
 package App::PDFLibrarian::TitleAbbr;
-$App::PDFLibrarian::TitleAbbr::VERSION = '6.0.1';
+$App::PDFLibrarian::TitleAbbr::VERSION = '6.0.2';
 use parent 'Exporter';
 
 use Carp::Assert;

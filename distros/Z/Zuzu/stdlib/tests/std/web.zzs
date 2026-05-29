@@ -1,0 +1,303 @@
+from std/web import Request, Response, Routes, Session, SessionHandler;
+from std/template/z import ZTemplate;
+from test/more import *;
+
+class StaticController {
+	static method show ( req ) {
+		return [ "static:", req.param("id") ];
+	}
+}
+
+class ObjectController {
+	method show ( req ) {
+		return [ "object:", req.param("id") ];
+	}
+}
+
+class TemplateLike {
+	method process ( data ) {
+		return "like:" _ data{name};
+	}
+}
+
+class TestSession with Session {
+	let Boolean finalized := false;
+
+	method finalize () {
+		finalized := true;
+		return self;
+	}
+
+	method is_finalized () {
+		return finalized;
+	}
+
+	method id () {
+		return "custom-id";
+	}
+
+	method age () {
+		return 0;
+	}
+
+	method cookie_name () {
+		return "custom_session";
+	}
+
+	method cookie_value () {
+		return "custom-value";
+	}
+
+	method cookie_options () {
+		return { Path: "/", HttpOnly: true };
+	}
+}
+
+class TestSessionHandler with SessionHandler {
+	let session := null;
+
+	method __build__ () {
+		session := new TestSession();
+	}
+
+	method session_for ( request ) {
+		return session;
+	}
+}
+
+let headers := new PairList();
+headers.add( "Content-Type", "application/x-www-form-urlencoded" );
+headers.add( "Cookie", "a=1; b=two+words" );
+headers.add( "X-Test", "ok" );
+
+let req := new Request(
+	env: {
+		method: "POST",
+		scheme: "https",
+		host: "example.test",
+		path: "/submit",
+		raw_path: "/submit",
+		query_string: "q=tea+time&q=second",
+		headers: headers,
+		body: to_binary("form=yes"),
+		body_text: "form=yes",
+		remote_addr: "127.0.0.1",
+		script_name: "/app",
+	},
+);
+
+is( req.request_method(), "POST", "request exposes method" );
+is( req.secure(), true, "request secure follows scheme" );
+is( req.header("x-test"), "ok", "request headers are case-insensitive" );
+is( req.query_parameters().get("q"), "tea time", "query params decode" );
+is( req.query_parameters().get_all("q")[1], "second", "query params keep duplicates" );
+is( req.body_parameters().get("form"), "yes", "form body params decode" );
+is( req.parameters().get("form"), "yes", "merged params include form body" );
+is( req.cookies().get("b"), "two words", "cookies parse and decode" );
+is(
+	req.uri(),
+	"https://example.test/submit?q=tea+time&q=second",
+	"request uri is built from env",
+);
+is( req.base(), "https://example.test/app", "request base includes script name" );
+
+Request.set_session_handler(null);
+is( Request.get_session_handler(), null, "session handler can be cleared" );
+is( req.session(), null, "no handler preserves env session fallback" );
+
+let env_session_req := new Request( env: { session: "middleware-session" } );
+is(
+	env_session_req.session(),
+	"middleware-session",
+	"no handler returns env session value",
+);
+
+let custom_handler := new TestSessionHandler();
+Request.set_session_handler(custom_handler);
+let custom_req := new Request( env: { headers: new PairList() } );
+is(
+	custom_req.session(),
+	custom_handler{session},
+	"configured handler supplies request session",
+);
+is(
+	custom_req.session(),
+	custom_handler{session},
+	"request caches handler session",
+);
+let custom_response := new Response( session: custom_req.session() );
+let custom_out := custom_response.finalize();
+is(
+	custom_handler{session}{finalized},
+	true,
+	"response finalizes attached session",
+);
+is(
+	custom_out[1].get("Set-Cookie"),
+	"custom_session=custom-value; Path=/; HttpOnly",
+	"response uses session cookie contract",
+);
+is(
+	custom_response.finalize()[1].get_all("Set-Cookie").length(),
+	1,
+	"response only sets session cookie once",
+);
+Request.set_session_handler(null);
+
+let response := new Response(
+	status: 201,
+	headers: { "Content-Type": "text/plain" },
+	body: [ "created" ],
+);
+response.header( "X-Test", "yes" );
+response.set_cookie( "sid", "abc 123", { Path: "/", HttpOnly: true } );
+let finalized := response.finalize();
+is( finalized[0], 201, "response finalizes status" );
+is( finalized[1].get("Content-Type"), "text/plain", "response finalizes headers" );
+is( finalized[1].get("X-Test"), "yes", "response header setter works" );
+is( finalized[1].get_all("Set-Cookie").length(), 1, "response sets cookie" );
+like(
+	finalized[1].get("Set-Cookie"),
+	/^sid=abc%20123;/,
+	"response cookie value is escaped",
+);
+
+let rendered := new Response().render(
+	new ZTemplate( string: "Hello {{ name }}!" ),
+	{ name: "Ada" },
+);
+is( rendered.body(), "Hello Ada!", "response renders ZTemplate object" );
+
+let rendered_like := new Response().render(
+	new TemplateLike(),
+	{ name: "Bea" },
+);
+is(
+	rendered_like.body(),
+	"like:Bea",
+	"response renders template-like object",
+);
+
+if ( __system__{deny_fs} ) {
+	pass(
+		"response renders and caches Path templates # SKIP filesystem is unavailable",
+	);
+}
+else {
+	from std/io import Path;
+
+	let template_path := Path.tempfile();
+	template_path.spew_utf8( "Cached {{ name }} {{ count + 1 }}" );
+	let path_rendered := new Response().render(
+		template_path,
+		{ name: "first", count: 2 },
+	);
+	is(
+		path_rendered.body(),
+		"Cached first 3",
+		"response renders Path template with ZZTemplate",
+	);
+
+	template_path.spew_utf8( "Changed {{ name }}" );
+	let cached_rendered := new Response().render(
+		template_path,
+		{ name: "second", count: 9 },
+	);
+	is(
+		cached_rendered.body(),
+		"Cached second 10",
+		"response caches Path templates",
+	);
+}
+
+let json_response := new Response().render_json([ 1, 2, 3 ]);
+is( json_response.body(), "[1,2,3]", "response renders JSON body" );
+is(
+	json_response.content_type(),
+	"application/json; charset=UTF-8",
+	"response render_json sets content type",
+);
+
+let routes := new Routes();
+routes.get("/hello/:name").to(action: fn r -> [ "hello:", r.param("name") ]);
+routes.get("/static/<id:num>").to(
+	controller: StaticController,
+	action: "show",
+);
+routes.get("/object/:id").to(
+	controller: new ObjectController(),
+	action: "show",
+);
+routes.get("/lazy/:name").to(
+	controller: "test/web_controller#WebController",
+	action: "greet",
+);
+let missing_lazy_error := exception( function () {
+	routes.get("/never").to(
+		controller: "test/missing_web_controller#Missing",
+		action: "nope",
+	);
+} );
+routes.post("/submit").to(action: fn r -> new Response( status: 204 ));
+
+let out := routes.dispatch({
+	method: "GET",
+	path: "/hello/Ada",
+	query_string: "",
+	headers: new PairList(),
+});
+is( out[0], 200, "function route returns 200" );
+is( out[2][1], "Ada", "function route sees capture" );
+
+out := routes.dispatch({
+	method: "GET",
+	path: "/static/42",
+	query_string: "",
+	headers: new PairList(),
+});
+is( out[2][0], "static:", "class controller route dispatches" );
+is( out[2][1], "42", "typed placeholder captures" );
+
+out := routes.dispatch({
+	method: "GET",
+	path: "/object/7",
+	query_string: "",
+	headers: new PairList(),
+});
+is( out[2][0], "object:", "object controller route dispatches" );
+is( out[2][1], "7", "object controller sees capture" );
+
+is( missing_lazy_error, null, "string controller is not loaded at definition" );
+out := routes.dispatch({
+	method: "GET",
+	path: "/lazy/Zia",
+	query_string: "",
+	headers: new PairList(),
+});
+is( out[2][0], "lazy:", "lazy controller route dispatches" );
+is( out[2][1], "Zia", "lazy controller sees capture" );
+
+out := routes.dispatch({
+	method: "GET",
+	path: "/static/not-num",
+	query_string: "",
+	headers: new PairList(),
+});
+is( out[0], 404, "typed placeholder rejects non-matches" );
+
+out := routes.dispatch({
+	method: "GET",
+	path: "/submit",
+	query_string: "",
+	headers: new PairList(),
+});
+is( out[0], 405, "method mismatch returns 405" );
+is( out[1].get("Allow"), "POST", "405 includes Allow header" );
+
+is(
+	routes.find("hello_name").render( { name: "Bob Smith" } ),
+	"/hello/Bob%20Smith",
+	"named route can render path",
+);
+
+done_testing();

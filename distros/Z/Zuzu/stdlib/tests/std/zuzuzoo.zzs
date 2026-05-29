@@ -1,0 +1,19 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/io import Path;
+from std/zuzuzoo import Zuzuzoo, list_installed;
+
+let meta_dir := Path.tempdir();
+let zoo := new Zuzuzoo( meta_dir: meta_dir.to_String() );
+
+is( zoo.list_installed(), [], "Zuzuzoo lists no distributions in empty metadata dir" );
+is(
+	list_installed( { meta_dir: meta_dir.to_String() } ),
+	[],
+	"top-level list_installed wrapper uses supplied metadata dir",
+);
+ok( zoo.config(){meta_dir} eq meta_dir.to_String(), "Zuzuzoo exposes resolved config" );
+
+done_testing();

@@ -1,0 +1,460 @@
+=encoding utf8
+
+=head1 NAME
+
+std/data/kdl/json - JSON-in-KDL structure conversion.
+
+=head1 SYNOPSIS
+
+  from std/data/kdl import KDL;
+  from std/data/kdl/json import kdl_to_json, json_to_kdl;
+
+  let kdl_doc := ( new KDL() ).decode( """- foo=1 bar=#true""" );
+  let data := kdl_to_json(kdl_doc);
+  let roundtrip := json_to_kdl(data);
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module implements the JSON-in-KDL (JiK) mapping for parsed Zuzu
+objects. C<kdl_to_json> accepts a C<KDLDocument> or C<KDLNode> and
+returns native Zuzu data structures. C<json_to_kdl> accepts native
+JSON-like data structures and returns a C<KDLDocument>.
+
+C<kdl_to_json(value, pairlists: true)> maps object-like JiK nodes to
+C<PairList> values instead of C<Dict> values, preserving key order and
+duplicate keys.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item C<< kdl_to_json(value, ... PairList opts) >>
+
+Parameters: C<value> is a C<KDLDocument>, C<KDLNode>, or compatible KDL
+value and C<opts> may include C<pairlists>. Returns: value. Converts
+JSON-in-KDL structures into native JSON-like ZuzuScript data.
+
+=item C<< json_to_kdl(value) >>
+
+Parameters: C<value> is a JSON-like ZuzuScript value. Returns:
+C<KDLDocument>. Converts native JSON-like data into JSON-in-KDL nodes.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/data/kdl/json >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/data/kdl import KDLDocument, KDLNode, KDLValue;
+from std/data/kdl/xml import xml_to_kdl;
+from std/time import Time;
+
+
+function _jik_has_props ( KDLNode node ) {
+	return node.props().to_Array().length() > 0;
+}
+
+function _jik_literal_value ( value ) {
+	die "JSON-in-KDL literal must be a KDLValue"
+		if not( value instanceof KDLValue );
+	if ( value.is_number() and value.kind() ≡ "string" ) {
+		die "JSON-in-KDL does not support non-finite KDL number keywords";
+	}
+	return value.native_value();
+}
+
+function _jik_is_time_native ( value ) {
+	return value instanceof Time;
+}
+
+function _jik_pad2 ( value ) {
+	let text := "" _ value;
+	return length text < 2 ? "0" _ text : text;
+}
+
+function _jik_pad4 ( value ) {
+	let text := "" _ value;
+	while ( length text < 4 ) {
+		text := "0" _ text;
+	}
+	return text;
+}
+
+function _jik_time_text ( value ) {
+	return _jik_pad4( value.year() )
+		_ "-" _ _jik_pad2( value.mon() )
+		_ "-" _ _jik_pad2( value.day_of_month() )
+		_ "T" _ _jik_pad2( value.hour() )
+		_ ":" _ _jik_pad2( value.min() )
+		_ ":" _ _jik_pad2( value.sec() );
+}
+
+function _jik_value ( value ) {
+	if ( value instanceof KDLValue ) {
+		return value;
+	}
+	if ( value ≡ null ) {
+		return new KDLValue( type: "null", value: null );
+	}
+
+	if ( value instanceof Boolean ) {
+		return new KDLValue( type: "boolean", value: value );
+	}
+	if ( value instanceof Number ) {
+		return new KDLValue( type: "number", kind: "float", value: value );
+	}
+	if ( value instanceof String or value instanceof BinaryString ) {
+		return new KDLValue( type: "string", value: "" _ value );
+	}
+	if ( _jik_is_time_native(value) ) {
+		return new KDLValue(
+			type: "string",
+			value: _jik_time_text(value),
+			type_annotation: "date-time",
+		);
+	}
+
+	return new KDLValue( type: typeof value, value: value );
+}
+
+function _jik_is_array_native ( value ) {
+	return value instanceof Array or value instanceof Set or value instanceof Bag;
+}
+
+function _jik_is_object_native ( value ) {
+	return value instanceof Dict or value instanceof PairList;
+}
+
+function _jik_is_kdl_native ( value ) {
+	return value instanceof KDLDocument or value instanceof KDLNode;
+}
+
+function _jik_is_xml_native ( value ) {
+	try {
+		if ( value can nodeType ) {
+			return true if value.nodeType() ≢ null;
+		}
+	}
+	catch {
+	}
+
+	try {
+		return false if not( value can documentElement );
+		value.documentElement();
+		return true;
+	}
+	catch {
+	}
+
+	return false;
+}
+
+function _jik_is_opaque_literal_native ( value ) {
+	return not _jik_is_array_native(value)
+		and not _jik_is_object_native(value)
+		and not _jik_is_kdl_native(value)
+		and not _jik_is_xml_native(value);
+}
+
+function _jik_is_literal_native ( value ) {
+	return value ≡ null
+		or value instanceof Boolean
+		or value instanceof Number
+		or value instanceof String
+		or value instanceof BinaryString
+		or _jik_is_time_native(value)
+		or value instanceof KDLValue
+		or _jik_is_opaque_literal_native(value);
+}
+
+function _jik_sorted_array ( value ) {
+	if ( value instanceof Set or value instanceof Bag ) {
+		return value.sortstr();
+	}
+	return value;
+}
+
+function _jik_pairs ( obj ) {
+	let out := [];
+	if ( obj instanceof PairList ) {
+		for ( let p in obj.to_Array() ) {
+			out.push( p{pair} );
+		}
+		return out;
+	}
+
+	for ( let key in obj.sorted_keys() ) {
+		out.push( [ key, obj.get(key) ] );
+	}
+	return out;
+}
+
+function _jik_native_to_node;
+function _jik_native_to_nodes;
+
+function _jik_xml_nodes ( value ) {
+	return xml_to_kdl(value).nodes();
+}
+
+function _jik_kdl_nodes ( value ) {
+	if ( value instanceof KDLDocument ) {
+		return value.nodes();
+	}
+	return [ value ];
+}
+
+function _jik_structural_nodes ( value, String name := "-" ) {
+	let nodes := _jik_is_kdl_native(value)
+		? _jik_kdl_nodes(value)
+		: _jik_xml_nodes(value);
+
+	if ( name ≡ "-" ) {
+		return nodes.length() = 0 ? [ new KDLNode( name: name ) ] : nodes;
+	}
+	return [ new KDLNode( name: name, children: nodes ) ];
+}
+
+function _jik_make_array_node ( value, String name := "-" ) {
+	let items := _jik_sorted_array(value);
+	let all_literals := true;
+	for ( let item in items ) {
+		all_literals := false unless _jik_is_literal_native(item);
+	}
+
+	let annotate := items.length() < 2;
+	if ( all_literals ) {
+		return new KDLNode(
+			name: name,
+			type_annotation: annotate ? "array" : null,
+			args: items.map( fn item -> _jik_value(item) ),
+		);
+	}
+
+	let children := [];
+	for ( let item in items ) {
+		for ( let child in _jik_native_to_nodes( item, "-" ) ) {
+			children.push(child);
+		}
+	}
+
+	return new KDLNode(
+		name: name,
+		type_annotation: annotate ? "array" : null,
+		children: children,
+	);
+}
+
+function _jik_object_needs_annotation ( Array pairs, Boolean pairlist ) {
+	if ( pairs.length() = 0 ) {
+		return true;
+	}
+	if ( pairlist ) {
+		return pairs.all( fn pair -> pair[0] ≡ "-" );
+	}
+	return pairs.length() = 1 and pairs[0][0] ≡ "-"
+		and not _jik_is_literal_native( pairs[0][1] );
+}
+
+function _jik_make_object_node ( value, String name := "-" ) {
+	let pairs := _jik_pairs(value);
+	let pairlist := value instanceof PairList;
+	let props := new PairList();
+	let children := [];
+
+	if ( pairlist ) {
+		for ( let pair in pairs ) {
+			for ( let child in _jik_native_to_nodes( pair[1], pair[0] ) ) {
+				children.push(child);
+			}
+		}
+	}
+	else {
+		for ( let pair in pairs ) {
+			if ( _jik_is_literal_native( pair[1] ) ) {
+				props.add( pair[0], _jik_value( pair[1] ) );
+			}
+			else {
+				for ( let child in _jik_native_to_nodes( pair[1], pair[0] ) ) {
+					children.push(child);
+				}
+			}
+		}
+	}
+
+	return new KDLNode(
+		name: name,
+		type_annotation: _jik_object_needs_annotation( pairs, pairlist )
+			? "object"
+			: null,
+		props: props,
+		children: children,
+	);
+}
+
+function _jik_native_to_node ( value, String name := "-" ) {
+	if ( _jik_is_literal_native(value) ) {
+		return new KDLNode( name: name, args: [ _jik_value(value) ] );
+	}
+	if ( _jik_is_array_native(value) ) {
+		return _jik_make_array_node( value, name );
+	}
+	if ( _jik_is_object_native(value) ) {
+		return _jik_make_object_node( value, name );
+	}
+	if ( _jik_is_kdl_native(value) or _jik_is_xml_native(value) ) {
+		let nodes := _jik_structural_nodes( value, name );
+		return nodes.length() = 1 ? nodes[0] : new KDLNode(
+			name: name,
+			children: nodes,
+		);
+	}
+	die `Cannot convert ${typeof value} to JSON-in-KDL`;
+}
+
+function _jik_native_to_nodes ( value, String name := "-" ) {
+	if ( _jik_is_kdl_native(value) or _jik_is_xml_native(value) ) {
+		return _jik_structural_nodes( value, name );
+	}
+	return [ _jik_native_to_node( value, name ) ];
+}
+
+function _jik_node_has_only_dash_children ( KDLNode node ) {
+	return node.children().all( fn child -> child.name() ≡ "-" );
+}
+
+function _jik_node_kind ( KDLNode node ) {
+	let annotation := node.type_annotation();
+	if ( annotation ≡ "array" or annotation ≡ "object" ) {
+		return annotation;
+	}
+	if ( _jik_has_props(node) ) {
+		return "object";
+	}
+	if ( node.children().length() > 0 ) {
+		if ( _jik_node_has_only_dash_children(node) ) {
+			return "array";
+		}
+		return "object";
+	}
+	if ( node.args().length() = 1 ) {
+		return "literal";
+	}
+	if ( node.args().length() > 1 ) {
+		return "array";
+	}
+	die "Empty JSON-in-KDL node must be annotated as array or object";
+}
+
+function _jik_node_to_native;
+
+function _jik_array_from_node ( KDLNode node, PairList opts ) {
+	die "JSON-in-KDL array node cannot contain properties"
+		if _jik_has_props(node);
+	die "Empty JSON-in-KDL array node must be annotated as array"
+		if node.args().length() = 0
+			and node.children().length() = 0
+			and node.type_annotation() ≢ "array";
+	die "JSON-in-KDL array child nodes must be named '-'"
+		unless _jik_node_has_only_dash_children(node);
+
+	let out := [];
+	for ( let arg in node.args() ) {
+		out.push( _jik_literal_value(arg) );
+	}
+	for ( let child in node.children() ) {
+		out.push( _jik_node_to_native( child, opts ) );
+	}
+	return out;
+}
+
+function _jik_store_object_item ( obj, String key, value, Boolean pairlists ) {
+	if ( pairlists ) {
+		obj.add( key, value );
+		return;
+	}
+	die `Duplicate JSON-in-KDL object key '${key}'` if obj.exists(key);
+	obj.set( key, value );
+}
+
+function _jik_object_from_node ( KDLNode node, PairList opts ) {
+	die "JSON-in-KDL object node cannot contain unnamed arguments"
+		if node.args().length() > 0;
+	die "Empty JSON-in-KDL object node must be annotated as object"
+		if not _jik_has_props(node)
+			and node.children().length() = 0
+			and node.type_annotation() ≢ "object";
+
+	let pairlists := opts.get( "pairlists", false );
+	let out := pairlists ? new PairList() : {};
+
+	for ( let pair in node.props().to_Array() ) {
+		let kv := pair{pair};
+		_jik_store_object_item(
+			out,
+			kv[0],
+			_jik_literal_value( kv[1] ),
+			pairlists,
+		);
+	}
+	for ( let child in node.children() ) {
+		_jik_store_object_item(
+			out,
+			child.name(),
+			_jik_node_to_native( child, opts ),
+			pairlists,
+		);
+	}
+	return out;
+}
+
+function _jik_node_to_native ( KDLNode node, PairList opts ) {
+	let kind := _jik_node_kind(node);
+	if ( kind ≡ "literal" ) {
+		die "JSON-in-KDL literal node must contain one argument only"
+			if node.args().length() ≢ 1
+				or _jik_has_props(node)
+				or node.children().length() > 0;
+		return _jik_literal_value( node.args()[0] );
+	}
+	if ( kind ≡ "array" ) {
+		return _jik_array_from_node( node, opts );
+	}
+	if ( kind ≡ "object" ) {
+		return _jik_object_from_node( node, opts );
+	}
+	die `Unknown JSON-in-KDL node kind '${kind}'`;
+}
+
+function kdl_to_json ( value, ... PairList opts ) {
+	if ( value instanceof KDLNode ) {
+		return _jik_node_to_native( value, opts );
+	}
+	if ( value instanceof KDLDocument ) {
+		die "JSON-in-KDL document must contain exactly one top-level node"
+			if value.nodes().length() ≢ 1;
+		return _jik_node_to_native( value.nodes()[0], opts );
+	}
+	die "kdl_to_json expects a KDLDocument or KDLNode";
+}
+
+function json_to_kdl ( value ) {
+	if ( value instanceof KDLDocument ) {
+		return value;
+	}
+	if ( value instanceof KDLNode ) {
+		return value;
+	}
+	return new KDLDocument( nodes: [ _jik_native_to_node(value) ] );
+}

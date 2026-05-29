@@ -1,0 +1,44 @@
+from test/more import *;
+
+author_testing();
+requires_capability( "db" );
+requires_capability( "proc" );
+
+from std/proc import Env;
+from std/db import DB;
+
+let db_user := Env.get( "USER", "" );
+let dbh := DB.connect(
+	`dbi:Pg:host=/var/run/postgresql;dbname=zuzutest;user=${db_user}`,
+);
+
+dbh.prepare( "drop table if exists zuzu_author_postgresql" ).execute();
+dbh.prepare(
+	```create table zuzu_author_postgresql (
+		id bigint primary key,
+		name text not null
+	)```,
+).execute();
+
+let insert := dbh.prepare(
+	"insert into zuzu_author_postgresql (id, name) values (?, ?)",
+);
+insert.execute( 1, "Ada" );
+insert.execute( 2, "Bob" );
+insert.execute( 3, "Cam" );
+
+let query := dbh.prepare(
+	"select id, name from zuzu_author_postgresql order by id",
+);
+query.execute();
+let rows := query.all_typed_dict();
+
+is( rows.length(), 3, "PostgreSQL row count" );
+is( rows[0]{id}, 1, "PostgreSQL first id" );
+is( rows[0]{name}, "Ada", "PostgreSQL first name" );
+is( rows[2]{id}, 3, "PostgreSQL last id" );
+is( rows[2]{name}, "Cam", "PostgreSQL last name" );
+
+dbh.prepare( "drop table zuzu_author_postgresql" ).execute();
+
+done_testing();

@@ -1,0 +1,21 @@
+from test/more import *;
+
+class Person {
+	let String name;
+
+	method get_name () {
+		return name;
+	}
+}
+
+let a := new Person( name: "Alice" );
+let b := new Person( name: "Bob" );
+let c := new Person( name: "Carol" );
+is( a.get_name, "Alice" );
+is( b.get_name(), "Bob" );
+is( c{name}, "Carol" );
+like( exception( function() {
+	let d := new Person( name: [] );
+}
+), /must be String/ );
+done_testing();

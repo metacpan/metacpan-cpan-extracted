@@ -1,0 +1,31 @@
+from test/more import *;
+
+requires_capability( "db" );
+requires_capability( "fs" );
+
+from std/db import DB;
+from std/io import Path;
+from std/string/base64 import decode, encode;
+
+let payload := ~to_binary("\u0000A\u0000B\u0001C\u00ffZ\u0000");
+let binfile := Path.tempfile();
+binfile.spew(payload);
+let raw := binfile.slurp();
+
+let dbh := DB.temp();
+dbh.prepare( "create table packets (id integer, b64 text, n integer, flag integer)" ).execute();
+let ins := dbh.prepare( "insert into packets (id, b64, n, flag) values (?, ?, ?, ?)" );
+ins.execute( 1, encode(raw), 7, 1 );
+
+let q := dbh.prepare( "select id, b64, n, flag from packets where id = 1" );
+q.execute();
+let row := q.next_typed_dict();
+let decoded := decode( row{b64} );
+
+is( row{id}, 1, "typed retrieval keeps integer id" );
+is( row{n}, 7, "typed retrieval keeps integer field" );
+is( row{flag}, 1, "typed retrieval keeps boolean-like integer" );
+is( typeof decoded, "BinaryString", "base64 decode returns BinaryString" );
+ok( decoded == raw, "binary boundary payload roundtrips through file + db typed retrieval" );
+
+done_testing();

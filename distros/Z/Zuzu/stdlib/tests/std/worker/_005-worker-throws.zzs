@@ -1,0 +1,26 @@
+from test/more import *;
+from test/worker_contract import require_worker_phase, await_worker_failure;
+
+let Worker := require_worker_phase(2);
+
+async function main () {
+	let err := await {
+		await_worker_failure(
+			Worker.spawn(
+				function () {
+					die "worker-boom";
+				},
+				[],
+			),
+		);
+	};
+
+	ok( err instanceof Exception, "worker failure is catchable" );
+	like( err.to_String(), /worker-boom/, "worker failure includes message" );
+}
+
+await {
+	main();
+};
+
+done_testing();

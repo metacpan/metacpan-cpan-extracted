@@ -1,0 +1,162 @@
+{
+	"version": 1,
+	"cases": [
+		{
+			"id": "syntax-if-else-basic",
+			"group": "syntax",
+			"mode": "result",
+			"file": "conf-syntax-if-else.zzs",
+			"source": "function __fixture_result () {\n\tlet n := 2;\n\tif ( n == 2 ) {\n\t\treturn 7;\n\t}\n\treturn 0;\n}\n",
+			"expected": 7
+		},
+		{
+			"id": "syntax-ternary-basic",
+			"group": "syntax",
+			"mode": "result",
+			"file": "conf-syntax-ternary.zzs",
+			"source": "function __fixture_result () {\n\tlet n := 3;\n\treturn n == 3 ? 33 : 99;\n}\n",
+			"expected": 33
+		},
+		{
+			"id": "semantics-string-zero-is-false",
+			"group": "semantics",
+			"mode": "result",
+			"file": "conf-semantics-string-zero.zzs",
+			"source": "function __fixture_result () {\n\tif ( \"0\" ) {\n\t\treturn 1;\n\t}\n\treturn 0;\n}\n",
+			"expected": 0
+		},
+		{
+			"id": "semantics-string-plus-number",
+			"group": "semantics",
+			"mode": "result",
+			"file": "conf-semantics-string-plus-number.zzs",
+			"source": "function __fixture_result () {\n\treturn \"5\" + 7;\n}\n",
+			"expected": 12
+		},
+		{
+			"id": "semantics-nested-equality",
+			"group": "semantics",
+			"mode": "result",
+			"file": "conf-semantics-nested-equality.zzs",
+			"source": "function __fixture_result () {\n\tlet left := [ 1, { b: [ 2, 3 ] } ];\n\tlet right := [ 1, { b: [ 2, 3 ] } ];\n\tif ( left == right ) {\n\t\treturn 1;\n\t}\n\treturn 0;\n}\n",
+			"expected": 1
+		},
+		{
+			"id": "runtime-dict-key-order-is-stable",
+			"group": "runtime",
+			"mode": "result",
+			"file": "conf-runtime-dict-keys.zzs",
+			"source": "function __fixture_result () {\n\tlet keys := { zebra: 1, ant: 2, lemon: 3 }.sorted_keys();\n\treturn keys[0] _ \",\" _ keys[1] _ \",\" _ keys[2];\n}\n",
+			"expected": "ant,lemon,zebra"
+		},
+		{
+			"id": "runtime-set-union-count",
+			"group": "runtime",
+			"mode": "result",
+			"file": "conf-runtime-set-union.zzs",
+			"source": "function __fixture_result () {\n\tlet merged := << 2, 1 >> union << 3, 1 >>;\n\treturn merged.length();\n}\n",
+			"expected": 3
+		},
+		{
+			"id": "runtime-while-loop-sum",
+			"group": "runtime",
+			"mode": "result",
+			"file": "conf-runtime-while-loop.zzs",
+			"source": "function __fixture_result () {\n\tlet i := 0;\n\tlet sum := 0;\n\twhile ( i < 4 ) {\n\t\tsum += i;\n\t\ti++;\n\t}\n\treturn sum;\n}\n",
+			"expected": 6
+		},
+		{
+			"id": "errors-parse-dangling-not",
+			"group": "errors",
+			"mode": "parse_error",
+			"file": "conf-error-parse-dangling-not.zzs",
+			"source": "let bad := not;\n",
+			"error_kind": "compile",
+			"error_code": "E_COMPILE_SYNTAX",
+			"error_message": "Unexpected token in expression: OP ;"
+		},
+		{
+			"id": "errors-parse-unterminated-function",
+			"group": "errors",
+			"mode": "parse_error",
+			"file": "conf-error-parse-unclosed.zzs",
+			"source": "function broken () {\n\treturn 1;\n",
+			"error_kind": "compile",
+			"error_code": "E_COMPILE_SYNTAX",
+			"error_message": "Unterminated block"
+		},
+		{
+			"id": "errors-runtime-non-callable-target",
+			"group": "errors",
+			"mode": "call_error",
+			"entrypoint": "__fixture_run",
+			"file": "conf-error-runtime-call-target.zzs",
+			"source": "function __fixture_run () {\n\tlet n := 9;\n\tn();\n}\n",
+			"error_kind": "runtime",
+			"error_code": "E_RUNTIME_GENERIC",
+			"error_message": "Call target is not a function"
+		},
+		{
+			"id": "errors-runtime-invalid-set-operand",
+			"group": "errors",
+			"mode": "call_error",
+			"entrypoint": "__fixture_run",
+			"file": "conf-error-runtime-set-op.zzs",
+			"source": "function __fixture_run () {\n\treturn 4 union 5;\n}\n",
+			"error_kind": "runtime",
+			"error_code": "E_RUNTIME_GENERIC",
+			"error_message": "Set operator expects Array, Dict, Set, or Bag"
+		},
+		{
+			"id": "errors-compile-missing-module",
+			"group": "errors",
+			"mode": "evaluate_error",
+			"file": "conf-error-missing-module.zzs",
+			"source": "from nowhere/missing import nope;\n",
+			"runtime": {
+				"lib": [],
+				"builtin": {}
+			},
+			"error_kind": "compile",
+			"error_code": "E_COMPILE_GENERIC",
+			"error_message": "Cannot find module 'nowhere/missing' in lib paths"
+		},
+		{
+			"id": "runtime-path-operators-first-and-fanout",
+			"group": "runtime",
+			"mode": "result",
+			"file": "conf-runtime-path-operators-first-fanout.zzs",
+			"source": "function __fixture_result () {\n\tlet payload := { users: [ { name: \"Ada\" }, { name: \"Lin\" } ] };\n\tlet first := payload @ \"/users/#0/name\";\n\tlet all := payload @@ \"/users/*/name\";\n\treturn first _ \":\" _ all.length();\n}\n",
+			"expected": "Ada:2",
+			"runtime": {
+				"lib": [
+					"modules"
+				]
+			}
+		},
+		{
+			"id": "errors-runtime-path-operator-invalid-path-value",
+			"group": "errors",
+			"mode": "call_error",
+			"entrypoint": "__fixture_run",
+			"file": "conf-error-runtime-path-operator-invalid-path.zzs",
+			"source": "function __fixture_run () {\n\tlet payload := { users: [ { name: \"Ada\" } ] };\n\treturn payload @ 7;\n}\n",
+			"error_kind": "runtime",
+			"error_code": "E_RUNTIME_GENERIC",
+			"error_message": "TypeException: path operand must be String or Object, got Number"
+		},
+		{
+			"id": "runtime-path-operators-exists-contract",
+			"group": "runtime",
+			"mode": "result",
+			"file": "conf-runtime-path-operators-exists.zzs",
+			"source": "function __fixture_result () {\n\tlet payload := { users: [ { name: \"Ada\" } ] };\n\tif ( payload @? \"/users/#0/name\" ) {\n\t\treturn 1;\n\t}\n\treturn 0;\n}\n",
+			"expected": 1,
+			"runtime": {
+				"lib": [
+					"modules"
+				]
+			}
+		}
+	]
+}

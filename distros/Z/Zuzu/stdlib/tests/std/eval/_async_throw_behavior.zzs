@@ -1,0 +1,18 @@
+from std/eval import eval;
+from test/more import *;
+
+let err := exception( function () {
+	eval(
+		"async function boom () {\n"
+		_ "  throw new Exception( message: \"async-boom\" );\n"
+		_ "}\n"
+		_ "await {\n"
+		_ "  boom();\n"
+		_ "};",
+	);
+} );
+
+ok( err ≢ false, "eval reports exception from async code path" );
+like( err, /async-boom/, "eval surfaces thrown message from async block" );
+
+done_testing();

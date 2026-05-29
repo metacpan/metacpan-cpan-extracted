@@ -1,5 +1,9 @@
 Revision history for Perl500503Syntax::OrDie
 
+0.02  2026-05-29 JST (Japan Standard Time)
+
+  - Fixed malformed POD interior sequences (C<<<>>>, C<<<~>) that Pod::Checker 1.51-1.73 flagged as errors on perl 5.16-5.24
+
 0.01  2026-05-24 JST (Japan Standard Time)
 
   - original version

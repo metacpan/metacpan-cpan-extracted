@@ -2,7 +2,7 @@ package DBIx::QuickORM::SQLBuilder::SQLAbstract;
 use strict;
 use warnings;
 
-our $VERSION = '0.000021';
+our $VERSION = '0.000022';
 
 use Carp qw/croak confess/;
 use Sub::Util qw/set_subname/;

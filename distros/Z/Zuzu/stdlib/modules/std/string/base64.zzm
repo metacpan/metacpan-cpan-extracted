@@ -1,0 +1,66 @@
+=encoding utf8
+
+=head1 NAME
+
+std/string/base64 - Base64 encoders and decoders.
+
+=head1 SYNOPSIS
+
+  from std/string/base64 import *;
+
+  let raw := to_binary( "Hello, world!" );
+
+  let b64 := encode(raw);
+  let text := decode(b64);
+
+  let safe := encode_urlsafe(raw);
+  let original := decode_urlsafe(safe);
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module provides Base64 encoding and decoding helpers.
+
+The URL-safe variant uses C<-> and C<_> instead of C<+>
+and C</>. It also omits trailing C<=> padding so encoded
+text can be placed into URLs more easily.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item * C<encode(BinaryString value)>
+
+Parameters: C<value> is binary input data. Returns: C<String>. Encodes
+C<value> as standard Base64 text.
+
+=item * C<decode(String value)>
+
+Parameters: C<value> is standard Base64 text. Returns:
+C<BinaryString>. Decodes Base64 text into bytes.
+
+=item * C<encode_urlsafe(BinaryString value)>
+
+Parameters: C<value> is binary input data. Returns: C<String>. Encodes
+C<value> as URL-safe Base64 text without trailing padding.
+
+=item * C<decode_urlsafe(String value)>
+
+Parameters: C<value> is URL-safe Base64 text. Returns:
+C<BinaryString>. Decodes URL-safe Base64 text, adding missing trailing
+padding automatically.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/string/base64 >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.

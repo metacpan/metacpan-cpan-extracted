@@ -1,0 +1,39 @@
+from std/lingua/en import *;
+from test/more import *;
+
+is( english_list( [] ), null, "english_list empty" );
+is( english_list( ["foo"] ), "foo", "english_list one item" );
+is( english_list( [ "foo", "bar" ] ), "foo and bar", "english_list two items" );
+is( english_list( [ "foo", "bar" ], "or" ), "foo or bar", "english_list two with custom joiner" );
+is( english_list( [ "foo", "bar", "baz", "quux" ], "or" ), "foo, bar, baz, or quux", "english_list oxford comma for long lists",
+    );
+is( english_number(0), "nought", "english_number zero" );
+is( english_number(1), "one", "english_number one" );
+is( english_number(12), "twelve", "english_number twelve" );
+is( english_number(51), "fifty-one", "english_number fifty-one" );
+is( english_number(100), "one hundred", "english_number hundred" );
+is( english_number(251), "two hundred and fifty-one", "english_number british and" );
+is( english_number(1000), "one thousand", "english_number thousand" );
+is( english_number(888888), "eight hundred and eighty-eight thousand, eight hundred and eighty-eight",
+    "english_number large", );
+is( english_number(12.25), "twelve point two five", "english_number decimal" );
+is( english_number( -6.1 ), "negative six point one", "english_number negative decimal" );
+is( english_number( 99, 100 ), "ninety-nine", "english_number cutoff below" );
+is( english_number( 100, 100 ), "one hundred", "english_number cutoff equal" );
+is( english_number( 101, 100 ), "101", "english_number cutoff above" );
+is( english_ordinal(1), "first", "english_ordinal first" );
+is( english_ordinal(2), "second", "english_ordinal second" );
+is( english_ordinal(3), "third", "english_ordinal third" );
+is( english_ordinal(4), "fourth", "english_ordinal fourth" );
+is( english_ordinal(21), "twenty-first", "english_ordinal compound" );
+is( english_ordinal(100), "one hundredth", "english_ordinal hundred" );
+is( english_ordinal(888888), "eight hundred and eighty-eight thousand, eight hundred and eighty-eighth",
+    "english_ordinal large", );
+is( english_ordinal( 101, 100 ), "101st", "english_ordinal cutoff above st" );
+is( english_ordinal( 102, 100 ), "102nd", "english_ordinal cutoff above nd" );
+is( english_ordinal( 103, 100 ), "103rd", "english_ordinal cutoff above rd" );
+is( english_ordinal( 104, 100 ), "104th", "english_ordinal cutoff above th" );
+is( english_ordinal( 110, 100 ), "110th", "english_ordinal cutoff 110" );
+is( english_ordinal( 111, 100 ), "111th", "english_ordinal cutoff 111" );
+is( english_ordinal( 1001, 100 ), "1001st", "english_ordinal cutoff 1001" );
+done_testing();

@@ -1,0 +1,573 @@
+=encoding utf8
+
+=head1 NAME
+
+std/data/json/schema/core - JSON Schema resources and reference registry.
+
+=head1 SYNOPSIS
+
+  from std/data/json/schema/core import SchemaRegistry;
+
+  let registry := new SchemaRegistry();
+  registry.register( address_schema, "https://example.test/address" );
+
+  let subschema := registry.resolve(
+    "https://example.test/address#/properties/postcode",
+  );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This Pure Zuzu module is supported by all implementations of ZuzuScript.
+C<HTTPResourceLoader> requires C<std/net/http> and dies at construction time
+when that module is unavailable.
+
+=head1 DESCRIPTION
+
+This module contains the resource and reference support used by
+I<std/data/json/schema>. It registers schemas under base URIs, indexes
+C<$id>, C<$anchor>, and C<$dynamicAnchor>, and resolves references to either
+whole resources or JSON Pointer fragments.
+
+Most callers should use C<JSONSchema> from I<std/data/json/schema>. Import
+this module directly when schemas need to share a registry or when reference
+loading needs to be customised.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<SchemaRegistry>
+
+Stores schema resources and resolves references.
+
+=over
+
+=item C<< register( schema, uri := "" ) >>
+
+Registers C<schema> at C<uri>, indexes nested C<$id> values and anchors, and
+returns the registry.
+
+=item C<< set_loader( loader ) >>
+
+Sets the loader used for missing resources. A loader may be a callable or an
+object with a C<load(uri)> method. Loaded strings are decoded as JSON before
+being registered.
+
+=item C<< resolve( ref, base := "" ) >>
+
+Resolves C<ref> against C<base>. Empty fragments return the resource.
+Anchor fragments use the registry's anchor index. Pointer fragments are
+resolved with I<std/path/jsonpointer>. Failure to find a resource or target
+throws an exception.
+
+=back
+
+=item C<HTTPResourceLoader>
+
+Simple HTTP and HTTPS loader. C<load(uri)> fetches C<uri> with
+C<std/net/http> and returns the response content after requiring a successful
+response.
+
+=back
+
+=head2 Functions
+
+=over
+
+=item C<< jschema_uri_resolve( base, ref ) >>
+
+Resolves the URI reference C<ref> against C<base> for the subset of URI
+resolution needed by this validator.
+
+=item C<< jschema_url_split( url ) >>
+
+Returns a C<Dict> with C<baseurl> and C<fragment>. C<fragment> is C<null>
+when C<url> has no C<#>.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/data/json/schema/core >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/data/json import JSON;
+from std/internals import ref_id;
+from std/net/http try import UserAgent as _HTTPUserAgent;
+from std/path/jsonpointer import JSONPointer;
+from std/string import index, join, ord, split, substr;
+from std/string/base64 import decode as _base64_decode;
+from std/data/json/schema/model import
+	jschema_is_object,
+	jschema_object_entries,
+	jschema_object_get,
+	jschema_object_has;
+
+function jschema_url_split ( String url ) {
+	let hash := index( url, "#" );
+	if ( hash < 0 ) {
+		return {
+			baseurl: url,
+			fragment: null,
+		};
+	}
+	return {
+		baseurl: substr( url, 0, hash ),
+		fragment: substr( url, hash + 1 ),
+	};
+}
+
+let _JSCHEMA_B64_ALPHABET := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	_ "abcdefghijklmnopqrstuvwxyz0123456789+/";
+
+function _jschema_div_floor ( Number n, Number d ) {
+	return floor( n / d );
+}
+
+function _jschema_mod ( Number n, Number d ) {
+	return n - _jschema_div_floor( n, d ) * d;
+}
+
+function _jschema_bytes_to_binary ( Array bytes ) {
+	let out := "";
+	let i := 0;
+	let n := bytes.length();
+
+	while ( i < n ) {
+		let b0 := bytes[i];
+		let b1 := null;
+		let b2 := null;
+		if ( i + 1 < n ) {
+			b1 := bytes[i + 1];
+		}
+		if ( i + 2 < n ) {
+			b2 := bytes[i + 2];
+		}
+
+		let c0 := _jschema_div_floor( b0, 4 );
+		let c1 := _jschema_mod( b0, 4 ) * 16;
+		let c2 := 64;
+		let c3 := 64;
+
+		if ( not( b1 == null ) ) {
+			c1 += _jschema_div_floor( b1, 16 );
+			c2 := _jschema_mod( b1, 16 ) * 4;
+			if ( not( b2 == null ) ) {
+				c2 += _jschema_div_floor( b2, 64 );
+				c3 := _jschema_mod( b2, 64 );
+			}
+		}
+
+		out _= substr( _JSCHEMA_B64_ALPHABET, c0, 1 );
+		out _= substr( _JSCHEMA_B64_ALPHABET, c1, 1 );
+		out _= c2 == 64 ? "=" : substr( _JSCHEMA_B64_ALPHABET, c2, 1 );
+		out _= c3 == 64 ? "=" : substr( _JSCHEMA_B64_ALPHABET, c3, 1 );
+		i += 3;
+	}
+
+	return _base64_decode(out);
+}
+
+function _jschema_hex_value ( String ch ) {
+	if ( ch ~ /[0-9]/ ) {
+		return 0 + ch;
+	}
+
+	return 10 + index( "abcdef", lc(ch) );
+}
+
+function jschema_percent_decode ( String text ) {
+	let bytes := [];
+	let i := 0;
+	let n := length text;
+
+	while ( i < n ) {
+		let ch := substr( text, i, 1 );
+		if (
+			ch ≡ "%"
+			and i + 2 < n
+			and substr( text, i + 1, 1 ) ~ /[0-9A-Fa-f]/
+			and substr( text, i + 2, 1 ) ~ /[0-9A-Fa-f]/
+		) {
+			bytes.push(
+				_jschema_hex_value( substr( text, i + 1, 1 ) ) * 16
+				+ _jschema_hex_value( substr( text, i + 2, 1 ) ),
+			);
+			i += 3;
+			next;
+		}
+
+		let code := ord(ch);
+		die "JSON Schema URI fragment contains non-ASCII literal character"
+			if code > 127;
+		bytes.push(code);
+		i++;
+	}
+
+	return to_string( _jschema_bytes_to_binary(bytes) );
+}
+
+function _jschema_uri_query_split ( String uri ) {
+	let query := index( uri, "?" );
+	if ( query < 0 ) {
+		return {
+			path: uri,
+			query: "",
+		};
+	}
+	return {
+		path: substr( uri, 0, query ),
+		query: substr( uri, query ),
+	};
+}
+
+function _jschema_uri_parts ( String uri ) {
+	let m := uri ~ /^([A-Za-z][A-Za-z0-9+.-]*:\/\/[^\/?#]*)(.*)$/;
+	if ( m ) {
+		return {
+			prefix: m[1],
+			path_query: m[2],
+		};
+	}
+
+	m := uri ~ /^([A-Za-z][A-Za-z0-9+.-]*:)(.*)$/;
+	if ( m ) {
+		return {
+			prefix: m[1],
+			path_query: m[2],
+		};
+	}
+
+	return {
+		prefix: "",
+		path_query: uri,
+	};
+}
+
+function _jschema_remove_dot_segments ( String path ) {
+	let absolute := length path > 0 and substr( path, 0, 1 ) eq "/";
+	let trailing := length path > 1 and substr( path, length path - 1, 1 ) eq "/";
+	let out := [];
+
+	for ( let segment in split( path, "/" ) ) {
+		if ( segment eq "" or segment eq "." ) {
+			next;
+		}
+		if ( segment eq ".." ) {
+			if (
+				out.length() > 0
+				and out[out.length() - 1] ne ".."
+			) {
+				out.pop();
+			}
+			else if ( not absolute ) {
+				out.push(segment);
+			}
+			next;
+		}
+		out.push(segment);
+	}
+
+	let result := join( "/", out );
+	if ( absolute ) {
+		result := "/" _ result;
+	}
+	if ( trailing and result ne "/" ) {
+		result _= "/";
+	}
+	if ( result eq "" and absolute ) {
+		return "/";
+	}
+	return result;
+}
+
+function jschema_uri_resolve ( String base, String ref ) {
+	let split_ref := jschema_url_split(ref);
+	let ref_base := split_ref{baseurl};
+	let fragment := split_ref{fragment} ≡ null
+		? ""
+		: "#" _ split_ref{fragment};
+
+	if ( ref ~ /^[A-Za-z][A-Za-z0-9+.-]*:/ ) {
+		let absolute_parts := _jschema_uri_parts(ref_base);
+		let absolute_query := _jschema_uri_query_split(
+			absolute_parts{path_query},
+		);
+		return absolute_parts{prefix}
+			_ _jschema_remove_dot_segments(absolute_query{path})
+			_ absolute_query{query}
+			_ fragment;
+	}
+	if ( substr( ref, 0, 1 ) eq "#" ) {
+		return jschema_url_split(base){baseurl} _ ref;
+	}
+	if ( base eq "" ) {
+		return ref;
+	}
+
+	let split_base := jschema_url_split(base){baseurl};
+	if ( ref_base eq "" ) {
+		return split_base _ fragment;
+	}
+
+	let base_parts := _jschema_uri_parts(split_base);
+	let base_query := _jschema_uri_query_split(base_parts{path_query});
+	let ref_query := _jschema_uri_query_split(ref_base);
+
+	if ( substr( ref_base, 0, 1 ) eq "?" ) {
+		return base_parts{prefix} _ base_query{path} _ ref_base _ fragment;
+	}
+
+	if ( substr( ref_query{path}, 0, 1 ) eq "/" ) {
+		return base_parts{prefix}
+			_ _jschema_remove_dot_segments(ref_query{path})
+			_ ref_query{query}
+			_ fragment;
+	}
+
+	let slash := -1;
+	let i := 0;
+	while ( i < length base_query{path} ) {
+		if ( substr( base_query{path}, i, 1 ) eq "/" ) {
+			slash := i;
+		}
+		i++;
+	}
+
+	let base_dir := slash >= 0 ? substr( base_query{path}, 0, slash + 1 ) : "";
+	return base_parts{prefix}
+		_ _jschema_remove_dot_segments( base_dir _ ref_query{path} )
+		_ ref_query{query}
+		_ fragment;
+}
+
+class HTTPResourceLoader {
+	let _ua := null;
+
+	method __build__ () {
+		die "std/net/http UserAgent is unavailable in this runtime"
+			if _HTTPUserAgent ≡ null;
+		_ua := new _HTTPUserAgent();
+	}
+
+	method load ( String uri ) {
+		die `JSON Schema network loader only supports HTTP(S): ${uri}`
+			unless uri ~ /^https?:/;
+		return _ua.get(uri).expect_success().content();
+	}
+}
+
+class SchemaRegistry {
+	let _resources := {};
+	let _anchors := {};
+	let _dynamic_anchors := {};
+	let _schema_bases := [];
+	let _loader := null;
+	let Boolean allow_network := false;
+	let _json := null;
+
+	method __build__ () {
+		_json := new JSON();
+	}
+
+	method set_loader ( loader ) {
+		_loader := loader;
+		return self;
+	}
+
+	method register ( schema, String uri := "" ) {
+		_resources.set( uri, schema );
+		self._index_schema( schema, uri );
+		return self;
+	}
+
+	method _index_subschema ( schema, String base ) {
+		if ( jschema_is_object(schema) ) {
+			self._index_schema( schema, base );
+		}
+	}
+
+	method _index_subschema_array ( value, String base ) {
+		if ( not( value instanceof Array ) ) {
+			return;
+		}
+		for ( let item in value ) {
+			self._index_subschema( item, base );
+		}
+	}
+
+	method _index_subschema_map ( value, String base ) {
+		if ( not jschema_is_object(value) ) {
+			return;
+		}
+		for ( let entry in jschema_object_entries(value) ) {
+			self._index_subschema( entry[1], base );
+		}
+	}
+
+	method _index_schema ( schema, String base ) {
+		if ( not jschema_is_object(schema) ) {
+			return;
+		}
+		let current_base := base;
+
+		if (
+			jschema_object_has( schema, "$id" )
+			and jschema_object_get( schema, "$id" ) instanceof String
+		) {
+			current_base := jschema_uri_resolve(
+				current_base,
+				jschema_object_get( schema, "$id" ),
+			);
+			_resources.set( current_base, schema );
+		}
+		_schema_bases.push( {
+			id: ref_id(schema),
+			base: current_base,
+		} );
+		if (
+			jschema_object_has( schema, "$anchor" )
+			and jschema_object_get( schema, "$anchor" ) instanceof String
+		) {
+			_anchors.set(
+				current_base _ "#" _ jschema_object_get( schema, "$anchor" ),
+				schema,
+			);
+		}
+		if (
+			jschema_object_has( schema, "$dynamicAnchor" )
+			and jschema_object_get( schema, "$dynamicAnchor" ) instanceof String
+		) {
+			_anchors.set(
+				current_base _ "#" _ jschema_object_get( schema, "$dynamicAnchor" ),
+				schema,
+			);
+			_dynamic_anchors.set(
+				current_base _ "#" _ jschema_object_get( schema, "$dynamicAnchor" ),
+				schema,
+			);
+		}
+
+		self._index_subschema_map( jschema_object_get( schema, "$defs" ), current_base );
+		self._index_subschema_map( jschema_object_get( schema, "definitions" ), current_base );
+		self._index_subschema_map( jschema_object_get( schema, "properties" ), current_base );
+		self._index_subschema_map( jschema_object_get( schema, "patternProperties" ), current_base );
+		self._index_subschema_map( jschema_object_get( schema, "dependentSchemas" ), current_base );
+
+		if ( jschema_is_object( jschema_object_get( schema, "dependencies" ) ) ) {
+			for ( let entry in jschema_object_entries( jschema_object_get( schema, "dependencies" ) ) ) {
+				self._index_subschema( entry[1], current_base );
+			}
+		}
+
+		self._index_subschema_array( jschema_object_get( schema, "allOf" ), current_base );
+		self._index_subschema_array( jschema_object_get( schema, "anyOf" ), current_base );
+		self._index_subschema_array( jschema_object_get( schema, "oneOf" ), current_base );
+		self._index_subschema_array( jschema_object_get( schema, "prefixItems" ), current_base );
+
+		self._index_subschema( jschema_object_get( schema, "not" ), current_base );
+		self._index_subschema( jschema_object_get( schema, "if" ), current_base );
+		self._index_subschema( jschema_object_get( schema, "then" ), current_base );
+		self._index_subschema( jschema_object_get( schema, "else" ), current_base );
+		self._index_subschema( jschema_object_get( schema, "items" ), current_base );
+		self._index_subschema( jschema_object_get( schema, "contains" ), current_base );
+		self._index_subschema( jschema_object_get( schema, "additionalProperties" ), current_base );
+		self._index_subschema( jschema_object_get( schema, "unevaluatedItems" ), current_base );
+		self._index_subschema( jschema_object_get( schema, "unevaluatedProperties" ), current_base );
+		self._index_subschema( jschema_object_get( schema, "propertyNames" ), current_base );
+		self._index_subschema( jschema_object_get( schema, "contentSchema" ), current_base );
+	}
+
+	method _load_resource ( String uri ) {
+		if ( _loader ≡ null ) {
+			return null;
+		}
+
+		let loaded;
+		if ( _loader can load ) {
+			loaded := _loader.load(uri);
+		}
+		else {
+			loaded := _loader(uri);
+		}
+		if ( loaded instanceof String ) {
+			loaded := _json.decode(loaded);
+		}
+		else if ( loaded instanceof BinaryString ) {
+			loaded := _json.decode_binarystring(loaded);
+		}
+		self.register( loaded, uri );
+		return loaded;
+	}
+
+	method resolve_info ( String ref, String base := "" ) {
+		let absolute_uri := jschema_uri_resolve( base, ref );
+		let split := jschema_url_split(absolute_uri);
+		let resource_uri := split{baseurl};
+		let fragment := split{fragment} ≡ null
+			? null
+			: jschema_percent_decode(split{fragment});
+
+		let resource := _resources.exists(resource_uri)
+			? _resources.get(resource_uri)
+			: self._load_resource(resource_uri);
+		if ( resource ≡ null ) {
+			die `JSON Schema reference not found: ${absolute_uri}`;
+		}
+
+		let target := resource;
+		if ( fragment ≢ null and fragment ne "" ) {
+			let anchor_uri := resource_uri _ "#" _ fragment;
+			if ( _anchors.exists(anchor_uri) ) {
+				target := _anchors.get(anchor_uri);
+			}
+			else {
+				die `JSON Schema reference fragment is not a JSON Pointer: ${absolute_uri}`
+					unless substr( fragment, 0, 1 ) eq "/";
+
+				target := new JSONPointer( path: fragment ).first( resource, null );
+				die `JSON Schema reference target not found: ${absolute_uri}`
+					if target ≡ null;
+			}
+		}
+
+		return {
+			target: target,
+			absolute_uri: absolute_uri,
+			resource_uri: resource_uri,
+			fragment: fragment,
+		};
+	}
+
+	method resolve ( String ref, String base := "" ) {
+		return self.resolve_info( ref, base ){target};
+	}
+
+	method dynamic_anchor ( String resource_uri, String name ) {
+		let key := resource_uri _ "#" _ name;
+		return _dynamic_anchors.exists(key)
+			? _dynamic_anchors.get(key)
+			: null;
+	}
+
+	method has_dynamic_anchor ( String resource_uri, String name ) {
+		return _dynamic_anchors.exists( resource_uri _ "#" _ name );
+	}
+
+	method schema_base ( schema, fallback := null ) {
+		let id := ref_id(schema);
+		for ( let entry in _schema_bases ) {
+			if ( entry{id} ≡ id ) {
+				return entry{base};
+			}
+		}
+		return fallback;
+	}
+}

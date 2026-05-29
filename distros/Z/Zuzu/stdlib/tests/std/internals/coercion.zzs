@@ -1,0 +1,163 @@
+from test/more import *;
+from std/internals import
+	to_String,
+	to_Number,
+	to_Boolean,
+	to_Regexp,
+	to_Regexp_with_flags;
+
+class CoercionProbe {
+
+	method to_String () {
+		return "probe";
+	}
+
+	method to_Number () {
+		return "42";
+	}
+
+	method to_Boolean () {
+		return 0;
+	}
+}
+
+class RegexpProbe {
+
+	method to_String () {
+		return "b+";
+	}
+}
+
+class PlainObject {
+}
+
+function fn_truthy () {
+	return true;
+}
+
+function assert_throws ( Function f, String name ) {
+	isnt( exception(f), null, name );
+}
+
+let probe := new CoercionProbe();
+
+is( to_Number("42.5"), 42.5, "to_Number parses numeric strings" );
+is( to_Number(true), 1, "to_Number casts true to one" );
+is( to_Number(false), 0, "to_Number casts false to zero" );
+is( to_Number(null), 0, "to_Number casts null to zero" );
+is( to_Number(probe), 42, "to_Number calls object to_Number" );
+assert_throws(
+	function() { to_Number("bad"); },
+	"to_Number rejects non-numeric strings",
+);
+assert_throws(
+	function() { to_Number([ 1 ]); },
+	"to_Number rejects uncoercible values",
+);
+assert_throws(
+	function() { to_Number(to_binary("42")); },
+	"to_Number rejects BinaryString",
+);
+
+is( to_String(true), "true", "to_String stringifies true" );
+is( to_String(false), "false", "to_String stringifies false" );
+is( to_String(null), "", "to_String stringifies null as empty string" );
+is( to_String(12.5), "12.5", "to_String stringifies numbers" );
+is( to_String(/foo/i), "foo", "to_String stringifies regexps" );
+is( to_String(probe), "probe", "to_String calls object to_String" );
+assert_throws(
+	function() { to_String([ 1 ]); },
+	"to_String rejects arrays",
+);
+assert_throws(
+	function() { to_String({ x: 1 }); },
+	"to_String rejects dicts",
+);
+assert_throws(
+	function() { to_String(fn_truthy); },
+	"to_String rejects functions",
+);
+assert_throws(
+	function() { to_String(PlainObject); },
+	"to_String rejects classes",
+);
+assert_throws(
+	function() { to_String(new PlainObject()); },
+	"to_String rejects objects without to_String",
+);
+assert_throws(
+	function() { to_String(to_binary("text")); },
+	"to_String rejects BinaryString",
+);
+
+is( to_Boolean(null), false, "to_Boolean treats null as false" );
+is( to_Boolean(false), false, "to_Boolean treats false as false" );
+is( to_Boolean(0), false, "to_Boolean treats zero as false" );
+is( to_Boolean(""), false, "to_Boolean treats empty strings as false" );
+is(
+	to_Boolean(to_binary("")),
+	false,
+	"to_Boolean treats empty BinaryString as false",
+);
+is(
+	to_Boolean(to_binary("x")),
+	true,
+	"to_Boolean treats non-empty BinaryString as true",
+);
+is( to_Boolean([]), false, "to_Boolean treats empty arrays as false" );
+is( to_Boolean(<<< >>>), false, "to_Boolean treats empty bags as false" );
+is( to_Boolean(<< >>), false, "to_Boolean treats empty sets as false" );
+is(
+	to_Boolean(new PairList()),
+	false,
+	"to_Boolean treats empty pairlists as false",
+);
+is( to_Boolean({}), false, "to_Boolean treats empty dicts as false" );
+is( to_Boolean("0"), true, "to_Boolean treats non-empty strings as true" );
+is( to_Boolean([ 1 ]), true, "to_Boolean treats non-empty arrays as true" );
+is( to_Boolean(<<< 1 >>>), true, "to_Boolean treats non-empty bags as true" );
+is( to_Boolean(<< 1 >>), true, "to_Boolean treats non-empty sets as true" );
+is(
+	to_Boolean(new PairList( [ "x", 1 ] )),
+	true,
+	"to_Boolean treats non-empty pairlists as true",
+);
+is( to_Boolean({ x: 1 }), true, "to_Boolean treats non-empty dicts as true" );
+is( to_Boolean(/x/), true, "to_Boolean treats regexps as true" );
+is( to_Boolean(fn_truthy), true, "to_Boolean treats functions as true" );
+is( to_Boolean(PlainObject), true, "to_Boolean treats classes as true" );
+is(
+	to_Boolean(new PlainObject()),
+	true,
+	"to_Boolean treats plain objects as true",
+);
+is( to_Boolean(probe), false, "to_Boolean calls object to_Boolean" );
+
+is( typeof to_Regexp(/x/), "Regexp", "to_Regexp preserves regexps" );
+is( ("abbc" ~ to_Regexp("b+"))[0], "bb", "to_Regexp compiles strings" );
+is(
+	("ABC" ~ to_Regexp_with_flags("abc", "i"))[0],
+	"ABC",
+	"to_Regexp_with_flags compiles strings with flags",
+);
+is(
+	("abbc" ~ to_Regexp(new RegexpProbe()))[0],
+	"bb",
+	"to_Regexp calls to_String",
+);
+is( ("true" ~ to_Regexp(true))[0], "true", "to_Regexp stringifies booleans" );
+is(
+	("abc" ~ to_Regexp(null))[0],
+	"",
+	"to_Regexp stringifies null as empty regexp",
+);
+assert_throws(
+	function() { to_Regexp("["); },
+	"to_Regexp rejects invalid generated patterns",
+);
+assert_throws(
+	function() { to_Regexp(to_binary("x")); },
+	"to_Regexp rejects BinaryString",
+);
+
+done_testing();

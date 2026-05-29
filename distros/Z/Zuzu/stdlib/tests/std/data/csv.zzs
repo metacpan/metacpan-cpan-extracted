@@ -1,0 +1,119 @@
+from test/more import *;
+from std/data/csv import CSV;
+
+let csv := new CSV(
+	headers: true,
+);
+
+let parsed := csv.decode(
+	"name,age\n"
+	_ "\"Ada, A.\",32\n"
+	_ "Bob,27\n",
+);
+is( parsed.length(), 2, "decode returns data rows after header line" );
+is( parsed[0]{name}, "Ada, A.", "decode handles quoted commas" );
+is( parsed[1]{age}, "27", "decode preserves scalar text values" );
+is( csv.encode_row( [ "Ada", 32 ] ), "Ada,32\n", "encode_row writes one delimited row" );
+ok( csv.encode_binarystring( [ { name: "Ada", age: 32 } ] ) instanceof BinaryString, "encode_binarystring returns BinaryString" );
+is( to_string( csv.encode_row_binarystring( [ "Ada", 32 ] ) ), "Ada,32\n", "encode_row_binarystring emits CSV bytes" );
+let binary_rows := csv.decode_binarystring( to_binary("name,city\nAda,Zürich\n") );
+is( binary_rows[0]{city}, "Zürich", "decode_binarystring decodes UTF-8 CSV bytes" );
+
+let sniffed := csv.sniff(
+	"name\tage\n"
+	_ "Ada\t32\n"
+	_ "Bob\t27\n",
+);
+is( sniffed{sep_char}, "\t", "sniff detects tab separator" );
+ok( sniffed{headers}, "sniff detects likely header row" );
+is( csv.sniff_binarystring( to_binary("name\tage\nAda\t32\n") ){sep_char}, "\t", "sniff_binarystring detects tab separator" );
+
+let transposed := csv.transpose(
+	[
+		[ "name", "Ada", "Bob" ],
+		[ "age", "32", "27" ],
+	],
+);
+is( transposed[0][1], "age", "transpose swaps table axes" );
+is( transposed[2][0], "Bob", "transpose keeps later values" );
+
+let typed := new CSV(
+	headers: true,
+	trim_headers: true,
+	lowercase_headers: true,
+	rename_headers: {
+		enabled: "active",
+	},
+	types: {
+		age: "integer",
+		active: "boolean",
+	},
+	defaults: {
+		nickname: "n/a",
+	},
+	required_columns: [ "name", "age", "active" ],
+);
+let typed_rows := typed.decode(
+	" Name ,Age,Enabled\n"
+	_ "Ada,32,true\n"
+	_ "Bob,27,false\n",
+);
+is( typed_rows[0]{age}, 32, "typed decode coerces integer columns" );
+is( typed_rows[1]{active}, 0, "typed decode coerces boolean columns" );
+is( typed_rows[0]{nickname}, "n/a", "typed decode applies defaults" );
+
+let duplicate := new CSV(
+	headers: true,
+	duplicate_headers: "suffix",
+);
+let dup_rows := duplicate.decode(
+	"name,name\n"
+	_ "Ada,A.\n",
+);
+is( dup_rows[0]{name}, "Ada", "duplicate header keeps first field" );
+is( dup_rows[0]{name_2}, "A.", "duplicate header suffixes later field" );
+
+let ragged := new CSV(
+	headers: true,
+	ragged: "fill",
+	fill_value: "x",
+);
+let ragged_rows := ragged.decode(
+	"a,b,c\n"
+	_ "1,2\n",
+);
+is( ragged_rows[0]{c}, "x", "ragged fill pads missing values" );
+
+let report := ( new CSV(
+	headers: true,
+	on_error: "collect",
+) ).decode_report(
+	"name,age\n"
+	_ "Ada,32\n"
+	_ "Bob,\"oops\"x\n"
+	_ "Cam,40\n",
+);
+is( report{rows}.length(), 1, "decode_report keeps good rows before malformed row" );
+ok( report{errors}.length() >= 1, "decode_report collects parse errors" );
+like( report{errors}[0]{message}, /line/, "decode_report error includes line information" );
+let binary_report := ( new CSV( headers: true, on_error: "collect" ) ).decode_report_binarystring(
+	to_binary(
+		"name,age\n"
+		_ "Ada,32\n"
+		_ "Bob,\"oops\"x\n",
+	),
+);
+ok( binary_report{errors}.length() >= 1, "decode_report_binarystring collects parse errors" );
+
+let tsv := new CSV(
+	headers: true,
+	sep_char: "\t",
+);
+let tsv_rows := tsv.decode(
+	"name\trole\n"
+	_ "Ada\tdev\n"
+	_ "Bob\tops\n",
+);
+is( tsv_rows[1]{role}, "ops", "sep_char option supports TSV-style decoding" );
+
+done_testing();

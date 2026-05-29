@@ -1,0 +1,41 @@
+from test/more import *;
+
+requires_capability( "db" );
+requires_capability( "net" );
+
+from std/db import DB;
+from std/defer import Guard;
+from std/net/http import UserAgent;
+
+let dbh := DB.temp( { auto_commit: true } );
+dbh.prepare( "create table hits (status integer)" ).execute();
+let ins := dbh.prepare( "insert into hits (status) values (?)" );
+
+async function run_once () {
+	let committed := false;
+	dbh.begin();
+	let Object guard := new Guard( callback: function () {
+		if ( not committed ) {
+			dbh.rollback();
+		}
+	} );
+
+	let ua := new UserAgent( timeout: 1 );
+	let resp := await {
+		ua.get_async( "http://127.0.0.1:1/" );
+	};
+	ins.execute( resp.status() );
+	dbh.commit();
+	committed := true;
+}
+
+await {
+	run_once();
+};
+
+let q := dbh.prepare( "select count(*) from hits" );
+q.execute();
+
+is( q.next_array()[0], 1, "defer guard with awaited db/http flow keeps committed row" );
+
+done_testing();

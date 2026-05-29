@@ -1,0 +1,55 @@
+{
+   "abstract" : "Stomp Client and RabbitMQ Management API wrapper",
+   "author" : [
+      "Michael R. Davis"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.60, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-STOMP-Client-Wrapper",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::RabbitMQ::Management::API" : "0",
+            "Net::STOMP::Client" : "0",
+            "Package::New" : "0",
+            "URL::Encode" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mrdvt92/perl-Net-STOMP-Client-Wrapper/issues"
+      },
+      "homepage" : "https://github.com/mrdvt92/perl-Net-STOMP-Client-Wrapper",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mrdvt92/perl-Net-STOMP-Client-Wrapper.git"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

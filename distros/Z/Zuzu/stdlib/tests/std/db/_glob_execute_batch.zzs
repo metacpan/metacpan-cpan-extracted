@@ -1,0 +1,36 @@
+from test/more import *;
+
+requires_capability( "db" );
+requires_capability( "fs" );
+
+from std/db import DB;
+from std/io import Path;
+
+let dir := Path.tempdir();
+dir.child("001.txt").spew_utf8("alpha\n");
+dir.child("002.txt").spew_utf8("beta\n");
+dir.child("ignore.dat").spew_utf8("skip\n");
+
+let files := Path.glob( dir.to_String() _ "/*.txt" );
+let rows := [];
+for ( let file in files ) {
+	rows.push( [ file.basename(), file.slurp_utf8() ] );
+}
+
+let dbh := DB.temp();
+dbh.prepare( "create table files (name text, payload text)" ).execute();
+let result := dbh.execute_batch(
+	"insert into files (name, payload) values (?, ?)",
+	rows,
+);
+ok( result ≢ null, "execute_batch returns a database handle" );
+
+let q := dbh.prepare( "select name, payload from files order by name" );
+q.execute();
+let inserted := q.all_array();
+
+is( inserted.length(), 2, "globbed txt files inserted via execute_batch" );
+is( inserted[0][0], "001.txt", "first sorted row name matches" );
+is( inserted[1][1], "beta\n", "second payload roundtrips from file" );
+
+done_testing();

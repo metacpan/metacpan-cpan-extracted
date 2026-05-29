@@ -1,0 +1,13 @@
+from test/c26/child import CrossChild;
+from test/c26/parent import CrossParent;
+from test/c26/traits import CrossTrait;
+from test/more import *;
+
+let c := new CrossChild();
+
+is( c instanceof CrossParent, 1, "instanceof works across module boundaries" );
+is( c does CrossTrait, 1, "does works across module boundaries" );
+is( c can bark, 1, "can checks child methods across modules" );
+is( c can "ping", 1, "can checks trait methods across modules" );
+
+done_testing();

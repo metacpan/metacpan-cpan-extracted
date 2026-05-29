@@ -1,0 +1,13 @@
+from test/more import *;
+requires_capability( "fs" );
+
+from std/data/ini import *;
+from std/io import Path;
+
+let ini := new INI( pretty: true, canonical: true );
+let path := Path.tempfile();
+ini.dump( path, { "": { project: "zuzu" }, app: { name: "writer" } } );
+is( ini.load(path){app}{name}, "writer", "INI.load reads INI from Path" );
+like( path.slurp_utf8(), /\[app\]\nname = "writer"/, "INI.dump writes INI to file" );
+
+done_testing();

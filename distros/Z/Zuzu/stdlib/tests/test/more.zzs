@@ -1,0 +1,34 @@
+from test/more import *;
+
+plan( 9 );
+
+ok( 1, "ok" );
+ok(
+	requires_module("test/more"),
+	"requires_module passes for available module",
+);
+if ( __system__{deny_fs} ) {
+	pass( "requires_capability not probed when fs is unavailable" );
+}
+else {
+	ok(
+		requires_capability("fs"),
+		"requires_capability passes for available capability",
+	);
+}
+is( 1, 1, "is" );
+isnt( 1, 2, "isnt" );
+pass( "pass" );
+
+subtest( "subtest", function () {
+	let e := exception( function () {
+		throw new Exception( message: "testing" );
+	} );
+	isnt( e, null, "exception" );
+	is( e{message}, "testing", "exception message" );
+} );
+
+like( "foo", /FOO/i, "like" );
+unlike( "bar", /FOO/i, "unlike" );
+
+diag( "diag" );

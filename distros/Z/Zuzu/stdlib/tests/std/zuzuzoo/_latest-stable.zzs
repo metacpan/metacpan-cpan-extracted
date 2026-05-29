@@ -1,0 +1,173 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/data/json import JSON;
+from std/io import Path;
+from std/zuzuzoo import Zuzuzoo;
+
+class FakeRequest {
+	let req_method := "";
+	let req_url := "";
+}
+
+class FakeResponse {
+	let payload := null;
+	let response_url := "";
+
+	method expect_success () {
+		return self;
+	}
+
+	method json () {
+		return payload;
+	}
+
+	method url () {
+		return response_url;
+	}
+}
+
+class FakeUserAgent {
+	let response := null;
+
+	method build_request ( verb, url ) {
+		return new FakeRequest( req_method: verb, req_url: url );
+	}
+
+	method send ( request ) {
+		return response;
+	}
+}
+
+function ensure_dir ( path ) {
+	return true if path.exists();
+	let parent := path.parent();
+	ensure_dir(parent) if not parent.exists();
+	path.mkdir();
+	return true;
+}
+
+function root () {
+	let dir := Path.tempdir();
+	let lib := dir.child("lib");
+	let bin := dir.child("bin");
+	let meta := dir.child("meta");
+	ensure_dir(lib);
+	ensure_dir(bin);
+	ensure_dir(meta);
+	return {
+		dir_obj: dir,
+		lib_obj: lib,
+		bin_obj: bin,
+		meta_obj: meta,
+		lib_dir: lib.to_String(),
+		bin_dir: bin.to_String(),
+		meta_dir: meta.to_String(),
+	};
+}
+
+function write_installed ( root, name, version, module_name ) {
+	( new JSON( pretty: true ) ).dump(
+		root{meta_obj}.child( name _ "-" _ version _ ".json" ),
+		{
+			name: name,
+			version: version,
+			author: "Example",
+			license: "MIT",
+			status: "stable",
+			dependencies: {},
+			installed: {
+				zdf: "ZDF-1",
+				lib_dir: root{lib_dir},
+				bin_dir: root{bin_dir},
+				meta_dir: root{meta_dir},
+				modules: [
+					{
+						source: "modules/" _ module_name _ ".zzm",
+						install_as: module_name _ ".zzm",
+						sha256: "abc",
+					},
+				],
+				scripts: [],
+			},
+		},
+	);
+}
+
+function ua_for ( metadata ) {
+	return new FakeUserAgent(
+		response: new FakeResponse(
+			response_url: "https://packages.example/module/stable/app.json",
+			payload: metadata,
+		),
+	);
+}
+
+let target := root();
+write_installed( target, "stable-app", "2.0.0", "stable/app" );
+
+let current := new Zuzuzoo(
+	lib_dir: target{lib_dir},
+	bin_dir: target{bin_dir},
+	meta_dir: target{meta_dir},
+	home: Path.tempdir().to_String(),
+	base_url: "https://packages.example",
+	user_agent: ua_for(
+		{
+			name: "stable-app",
+			version: "2.0.0",
+			author: "Example",
+			license: "MIT",
+			status: "stable",
+		},
+	),
+).latest("stable/app");
+is( current{status}, "current", "latest reports current versions" );
+is( current{can_upgrade}, false, "current cannot upgrade" );
+
+let newer_local := new Zuzuzoo(
+	lib_dir: target{lib_dir},
+	bin_dir: target{bin_dir},
+	meta_dir: target{meta_dir},
+	home: Path.tempdir().to_String(),
+	base_url: "https://packages.example",
+	user_agent: ua_for(
+		{
+			name: "stable-app",
+			version: "1.5.0",
+			author: "Example",
+			license: "MIT",
+			status: "stable",
+		},
+	),
+).latest("stable/app");
+is( newer_local{status}, "newer-local", "latest reports newer local versions" );
+
+let trial_error := exception(
+	function () {
+		new Zuzuzoo(
+			lib_dir: target{lib_dir},
+			bin_dir: target{bin_dir},
+			meta_dir: target{meta_dir},
+			home: Path.tempdir().to_String(),
+			base_url: "https://packages.example",
+			user_agent: ua_for(
+				{
+					name: "trial-app",
+					version: "3.0.0",
+					author: "Example",
+					license: "MIT",
+					status: "trial",
+				},
+			),
+		).latest("stable/app");
+	},
+);
+like(
+	trial_error,
+	/Trial distributions are not available/,
+	"latest rejects trial metadata from module endpoint",
+);
+
+done_testing();

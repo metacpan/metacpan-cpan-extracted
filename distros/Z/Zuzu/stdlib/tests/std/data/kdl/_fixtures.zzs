@@ -1,0 +1,57 @@
+from test/more import *;
+requires_capability( "fs" );
+requires_capability( "proc" );
+
+from std/data/kdl import KDL;
+from std/io import Path;
+from std/proc import Env;
+
+let fixture_root_env := Env.get("FIXTURE_DIR");
+if ( fixture_root_env ≡ null or fixture_root_env eq "" ) {
+	skip_all( "FIXTURE_DIR is not set" );
+}
+let fixture_root := new Path(fixture_root_env);
+let input_root := fixture_root.child("kdl").child("test_cases").child("input");
+let expected_root := fixture_root.child("kdl").child("test_cases").child("expected_kdl");
+let files := Path.glob( input_root.to_String() _ "/*.kdl", { nocheck: false } );
+
+files := files.sort( function ( a, b ) {
+	return a.basename() cmp b.basename();
+} );
+
+ok( files.length() > 0, "KDL fixture files found" );
+
+let canonical := new KDL( canonical: true );
+let parser := new KDL();
+
+for ( let file in files ) {
+	let name := file.basename();
+	let input := file.slurp();
+	let should_fail := name ~ /_fail\.kdl$/;
+	let expected := expected_root.child(name);
+
+	if ( should_fail ) {
+		let e := exception( function () {
+			parser.decode_binarystring(input);
+		} );
+		isnt( e, null, name _ " throws" );
+		next;
+	}
+
+	let doc;
+	let e := exception( function () {
+		doc := parser.decode_binarystring(input);
+	} );
+	is( e, null, name _ " parses" );
+	next if e;
+
+	if ( expected.exists() ) {
+		is(
+			canonical.encode(doc),
+			expected.slurp_utf8(),
+			name _ " canonical serialization",
+		);
+	}
+}
+
+done_testing();

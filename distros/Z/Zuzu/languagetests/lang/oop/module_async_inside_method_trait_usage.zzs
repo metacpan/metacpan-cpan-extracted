@@ -1,0 +1,15 @@
+from test/more import *;
+
+requires_capability( "proc" );
+
+from test/c33/child import AsyncChild;
+
+let c := new AsyncChild( name: "Mio" );
+let runner := c.build_async_tagger();
+let out := await {
+	runner();
+};
+
+is( out, "tag:Mio", "async function built in method can use inherited trait method output" );
+
+done_testing();

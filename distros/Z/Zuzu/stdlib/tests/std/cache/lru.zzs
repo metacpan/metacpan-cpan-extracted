@@ -1,0 +1,42 @@
+from std/cache/lru import Cache;
+from test/more import *;
+
+let calls := 0;
+let cache := new Cache( capacity: 2 );
+
+let v1 := cache.get( "alpha", function ( item_key ) {
+	calls := calls + 1;
+	return item_key _ "-value";
+} );
+
+is( v1, "alpha-value", "cache miss computes value" );
+is( calls, 1, "producer called once on first miss" );
+is( cache.size(), 1, "cache size after first insert" );
+
+let v1_again := cache.get( "alpha", function ( item_key ) {
+	calls := calls + 1;
+	return item_key _ "-recomputed";
+} );
+
+is( v1_again, "alpha-value", "cache hit returns stored value" );
+is( calls, 1, "producer not called on hit" );
+
+cache.set( "beta", "beta-value" );
+cache.get( "alpha", function ( item_key ) {
+	calls := calls + 1;
+	return item_key _ "-value";
+} );
+cache.set( "gamma", "gamma-value" );
+
+is( cache.has("alpha"), 1, "recently used alpha remains" );
+is( cache.has("beta"), 0, "least recently used beta evicted" );
+is( cache.has("gamma"), 1, "new item inserted" );
+is( cache.size(), 2, "size does not exceed capacity" );
+is( cache.capacity(), 2, "capacity accessor" );
+
+cache.empty();
+is( cache.size(), 0, "empty clears all entries" );
+is( cache.has("alpha"), 0, "empty removes alpha" );
+
+
+done_testing();

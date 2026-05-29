@@ -1,0 +1,497 @@
+=encoding utf8
+
+=head1 NAME
+
+std/data/cbor - CBOR encoding and decoding for ZuzuScript.
+
+=head1 SYNOPSIS
+
+  from std/data/cbor import CBOR, TaggedValue;
+  
+  let codec := new CBOR();
+  let bytes := codec.encode({ answer: 42 });
+  let value := codec.decode(bytes);
+  
+  // Decode CBOR maps to Zuzu PairLists instead of Dicts.
+  // This preserves key order and allows duplicate keys.
+  codec := new CBOR( pairlists: true );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Node and
+Electron. It is partially supported by zuzu-js in the browser: in-memory
+CBOR encode/decode coverage passes, but file-backed load/dump coverage is
+unsupported because browser filesystem capability is unavailable.
+
+=head1 DESCRIPTION
+
+Pure-Zuzu implementation of CBOR (RFC 8949).
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<< TaggedValue({ tag: Number, value: value }) >>
+
+Constructs a tagged CBOR value. Returns: C<TaggedValue>. Stores the CBOR
+tag number and associated value.
+
+=item C<< CBOR({ pairlists?: Boolean }) >>
+
+Constructs a CBOR codec. Returns: C<CBOR>. The C<pairlists> option makes
+decoded maps return as C<PairList> values instead of C<Dict> values.
+
+=over
+
+=item C<< codec.encode(value) >>
+
+Parameters: C<value> is any CBOR-encodable ZuzuScript value. Returns:
+C<BinaryString>. Encodes C<value> as CBOR bytes.
+
+=item C<< codec.encode_binarystring(value) >>
+
+Alias for C<codec.encode(value)>.
+
+=item C<< codec.decode(BinaryString raw) >>
+
+Parameters: C<raw> is CBOR data. Returns: value. Decodes CBOR bytes into
+the equivalent ZuzuScript value.
+
+=item C<< codec.decode_binarystring(BinaryString raw) >>
+
+Alias for C<codec.decode(raw)>.
+
+=item C<< codec.load(Path path) >>
+
+Parameters: C<path> is a C<std/io> C<Path>. Returns: value. Reads CBOR
+bytes from C<path> and decodes them.
+
+=item C<< codec.dump(Path path, value) >>
+
+Parameters: C<path> is a C<std/io> C<Path> and C<value> is any
+CBOR-encodable value. Returns: C<null>. Encodes C<value> and writes CBOR
+bytes to C<path>.
+
+=back
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/data/cbor >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/string import substr, index;
+from std/string/base64 import encode, decode;
+from std/time import Time;
+
+
+let _B64_ALPHABET  := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+// Set to "PairList" to return CBOR objects as Zuzu PairLists.
+let _DECODE_MAP_AS := "Dict";
+
+class TaggedValue {
+	let Number tag;
+	let value;
+}
+
+function _div_floor ( Number n, Number d ) {
+	return floor( n / d ); // fix syntax highlighting
+}
+
+function _mod ( Number n, Number d ) {
+	return n - _div_floor( n, d ) * d;
+}
+
+function _bytes_to_binary ( Array bytes ) {
+	let out := "";
+	let i := 0;
+	let n := bytes.length();
+
+	while ( i < n ) {
+		let b0 := bytes[i];
+		let b1 := null;
+		let b2 := null;
+		if ( i + 1 < n ) {
+			b1 := bytes[i + 1];
+		}
+		if ( i + 2 < n ) {
+			b2 := bytes[i + 2];
+		}
+
+		let c0 := _div_floor( b0, 4 );
+		let c1 := _mod( b0, 4 ) * 16;
+		let c2 := 64;
+		let c3 := 64;
+
+		if ( b1 ≢ null ) {
+			c1 += _div_floor( b1, 16 );
+			c2 := _mod( b1, 16 ) * 4;
+			if ( b2 ≢ null ) {
+				c2 += _div_floor( b2, 64 );
+				c3 := _mod( b2, 64 );
+			}
+		}
+
+		out _= substr( _B64_ALPHABET, c0, 1 );
+		out _= substr( _B64_ALPHABET, c1, 1 );
+		if ( c2 ≡ 64 ) {
+			out _= "=";
+		}
+		else {
+			out _= substr( _B64_ALPHABET, c2, 1 );
+		}
+		if ( c3 ≡ 64 ) {
+			out _= "=";
+		}
+		else {
+			out _= substr( _B64_ALPHABET, c3, 1 );
+		}
+		i += 3;
+	}
+
+	return decode(out);
+}
+
+function _binary_to_bytes ( BinaryString raw ) {
+	let b64 := encode(raw);
+	let out := [];
+	let i := 0;
+	let n := length b64;
+
+	while ( i < n ) {
+		let c0 := index( _B64_ALPHABET, substr( b64, i, 1 ) );
+		let c1 := index( _B64_ALPHABET, substr( b64, i + 1, 1 ) );
+		let ch2 := substr( b64, i + 2, 1 );
+		let ch3 := substr( b64, i + 3, 1 );
+		let c2 := -1;
+		let c3 := -1;
+		if ( ch2 ≢ "=" ) {
+			c2 := index( _B64_ALPHABET, ch2 );
+		}
+		if ( ch3 ≢ "=" ) {
+			c3 := index( _B64_ALPHABET, ch3 );
+		}
+
+		out.push( c0 * 4 + _div_floor( c1, 16 ) );
+
+		if ( c2 >= 0 ) {
+			out.push( _mod( c1, 16 ) * 16 + _div_floor( c2, 4 ) );
+		}
+		if ( c3 >= 0 ) {
+			out.push( _mod( c2, 4 ) * 64 + c3 );
+		}
+
+		i += 4;
+	}
+
+	return out;
+}
+
+function _is_int ( value ) {
+	if ( not( value instanceof Number ) ) {
+		return false;
+	}
+
+	return _mod( value, 1 ) ≡ 0;
+}
+
+function _emit_uint ( Array out, Number major, Number n ) {
+	if ( n < 24 ) {
+		out.push( major * 32 + n );
+		return;
+	}
+	if ( n < 256 ) {
+		out.push( major * 32 + 24 );
+		out.push(n);
+		return;
+	}
+	if ( n < 65536 ) {
+		out.push( major * 32 + 25 );
+		out.push( _mod( _div_floor( n, 256 ), 256 ) );
+		out.push( _mod( n, 256 ) );
+		return;
+	}
+	if ( n < 4294967296 ) {
+		out.push( major * 32 + 26 );
+		out.push( _mod( _div_floor( n, 16777216 ), 256 ) );
+		out.push( _mod( _div_floor( n, 65536 ), 256 ) );
+		out.push( _mod( _div_floor( n, 256 ), 256 ) );
+		out.push( _mod( n, 256 ) );
+		return;
+	}
+
+	let hi := _div_floor( n, 4294967296 );
+	let lo := _mod( n, 4294967296 );
+	out.push( major * 32 + 27 );
+	out.push( _mod( _div_floor( hi, 16777216 ), 256 ) );
+	out.push( _mod( _div_floor( hi, 65536 ), 256 ) );
+	out.push( _mod( _div_floor( hi, 256 ), 256 ) );
+	out.push( _mod( hi, 256 ) );
+	out.push( _mod( _div_floor( lo, 16777216 ), 256 ) );
+	out.push( _mod( _div_floor( lo, 65536 ), 256 ) );
+	out.push( _mod( _div_floor( lo, 256 ), 256 ) );
+	out.push( _mod( lo, 256 ) );
+}
+
+function _encode_value ( Array out, value ) {
+	if ( value ≡ null ) {
+		out.push(246);
+		return;
+	}
+	if ( value ≡ true ) {
+		out.push(245);
+		return;
+	}
+	if ( value ≡ false ) {
+		out.push(244);
+		return;
+	}
+
+	if ( value instanceof Number ) {
+		die "CBOR.encode currently supports only integer Number values" if not _is_int(value);
+		if ( value >= 0 ) {
+			_emit_uint( out, 0, value );
+		}
+		else {
+			_emit_uint( out, 1, -1 - value );
+		}
+		return;
+	}
+
+	if ( value instanceof BinaryString ) {
+		let b := _binary_to_bytes(value);
+		_emit_uint( out, 2, b.length() );
+		let i := 0;
+		while ( i < b.length() ) {
+			out.push( b[i] );
+			i++;
+		}
+		return;
+	}
+
+	if ( value instanceof String ) {
+		let b := _binary_to_bytes( to_binary(value) );
+		_emit_uint( out, 3, b.length() );
+		let i := 0;
+		while ( i < b.length() ) {
+			out.push( b[i] );
+			i++;
+		}
+		return;
+	}
+
+	if ( value instanceof Array ) {
+		_emit_uint( out, 4, value.length() );
+		let i := 0;
+		while ( i < value.length() ) {
+			_encode_value( out, value[i] );
+			i++;
+		}
+		return;
+	}
+
+	if ( value instanceof Set ) {
+		_emit_uint( out, 6, 258 );
+		_encode_value( out, value.sortstr() );
+		return;
+	}
+
+	if ( value instanceof Bag ) {
+		_encode_value( out, value.sortstr() );
+		return;
+	}
+
+	if ( value instanceof PairList ) {
+		let pairs := value.to_Array();
+		_emit_uint( out, 5, pairs.length() );
+		let i := 0;
+		while ( i < pairs.length() ) {
+			let pair := pairs[i]{pair};
+			_encode_value( out, pair[0] );
+			_encode_value( out, pair[1] );
+			i++;
+		}
+		return;
+	}
+
+	if ( value instanceof Dict ) {
+		let keys := value.sorted_keys();
+		_emit_uint( out, 5, keys.length() );
+		let i := 0;
+		while ( i < keys.length() ) {
+			let k := keys[i];
+			_encode_value( out, k );
+			_encode_value( out, value.get(k) );
+			i++;
+		}
+		return;
+	}
+
+	if ( value instanceof TaggedValue ) {
+		_emit_uint( out, 6, value { tag } );
+		_encode_value( out, value { value } );
+		return;
+	}
+	if ( value instanceof Time ) {
+		_emit_uint( out, 6, 0 );
+		_encode_value( out, value.epoch() );
+		return;
+	}
+
+	die `CBOR cannot encode value of type ${typeof value}`;
+}
+
+function _read_uint ( Array bytes, Number ai, Number pos ) {
+	if ( ai < 24 ) {
+		return [ ai, pos ];
+	}
+	if ( ai ≡ 24 ) {
+		return [ bytes[pos], pos + 1 ];
+	}
+	if ( ai ≡ 25 ) {
+		return [ bytes[pos] * 256 + bytes[pos + 1], pos + 2 ];
+	}
+	if ( ai ≡ 26 ) {
+		return [ bytes[pos] * 16777216 + bytes[pos + 1] * 65536 + bytes[pos + 2] * 256 + bytes[pos + 3], pos + 4 ];
+	}
+	if ( ai ≡ 27 ) {
+		let hi := bytes[pos] * 16777216 + bytes[pos + 1] * 65536 + bytes[pos + 2] * 256 + bytes[pos + 3];
+		let lo := bytes[pos + 4] * 16777216 + bytes[pos + 5] * 65536 + bytes[pos + 6] * 256 + bytes[pos + 7];
+		return [ hi * 4294967296 + lo, pos + 8 ];
+	}
+
+	die `Unsupported CBOR additional info: ${ai}`;
+}
+
+function _decode_at ( Array bytes, Number pos ) {
+	let head := bytes[pos];
+	let major := _div_floor( head, 32 );
+	let ai := _mod( head, 32 );
+	let parsed := _read_uint( bytes, ai, pos + 1 );
+	let arg := parsed[0];
+	let p := parsed[1];
+
+	if ( major ≡ 0 ) {
+		return [ arg, p ];
+	}
+	if ( major ≡ 1 ) {
+		return [ -1 - arg, p ];
+	}
+	if ( major ≡ 2 ) {
+		let chunk := [];
+		let i := 0;
+		while ( i < arg ) {
+			chunk.push( bytes[p + i] );
+			i++;
+		}
+		return [ _bytes_to_binary(chunk), p + arg ];
+	}
+	if ( major ≡ 3 ) {
+		let chunk := [];
+		let i := 0;
+		while ( i < arg ) {
+			chunk.push( bytes[p + i] );
+			i++;
+		}
+		return [ to_string( _bytes_to_binary(chunk) ), p + arg ];
+	}
+	if ( major ≡ 4 ) {
+		let arr := [];
+		let i := 0;
+		let q := p;
+		while ( i < arg ) {
+			let item := _decode_at( bytes, q );
+			arr.push( item[0] );
+			q := item[1];
+			i++;
+		}
+		return [ arr, q ];
+	}
+	if ( major ≡ 5 ) {
+		let d := _DECODE_MAP_AS eq "PairList" ? new PairList() : new Dict();
+		let i := 0;
+		let q := p;
+		while ( i < arg ) {
+			let k := _decode_at( bytes, q );
+			let v := _decode_at( bytes, k[1] );
+			d.add( k[0], v[0] ) unless _DECODE_MAP_AS eq "Dict" and d.exists( k[0] );
+			q := v[1];
+			i++;
+		}
+		return [ d, q ];
+	}
+	if ( major ≡ 6 ) {
+		let tagged := _decode_at( bytes, p );
+		if ( arg ≡ 0 and tagged[0] instanceof Number ) {
+			return [ new Time( tagged[0] ), tagged[1] ];
+		}
+		if ( arg ≡ 258 and tagged[0] instanceof Array ) {
+			return [ tagged[0].to_Set(), tagged[1] ];
+		}
+		return [ new TaggedValue( tag: arg, value: tagged[0] ), tagged[1] ];
+	}
+	if ( major ≡ 7 ) {
+		if ( ai ≡ 20 ) {
+			return [ false, pos + 1 ];
+		}
+		if ( ai ≡ 21 ) {
+			return [ true, pos + 1 ];
+		}
+		if ( ai ≡ 22 ) {
+			return [ null, pos + 1 ];
+		}
+		die `Unsupported CBOR simple/float value (ai=${ai})`;
+	}
+
+	die `Unsupported CBOR major type: ${major}`;
+}
+
+class CBOR {
+	let pairlists := false;
+	
+	method encode ( value ) {
+		let out := [];
+		_encode_value( out, value );
+		return _bytes_to_binary(out);
+	}
+
+	method encode_binarystring ( value ) {
+		return self.encode(value);
+	}
+
+	method decode ( BinaryString raw ) {
+		_DECODE_MAP_AS := pairlists ? "PairList" : "Dict";
+		let bytes := _binary_to_bytes(raw);
+		let parsed := _decode_at( bytes, 0 );
+		die "Trailing bytes after CBOR value" if parsed[1] < bytes.length();
+		return parsed[0];
+	}
+
+	method decode_binarystring ( BinaryString raw ) {
+		return self.decode(raw);
+	}
+
+	method load ( path ) {
+		from std/io import Path;
+		die "CBOR.load is denied by runtime policy" if __system__{deny_fs};
+		die "CBOR.load expects a std/io Path object" if not( path instanceof Path );
+		return self.decode( path.slurp() );
+	}
+
+	method dump ( path, value ) {
+		from std/io import Path;
+		die "CBOR.dump is denied by runtime policy" if __system__{deny_fs};
+		die "CBOR.dump expects a std/io Path object" if not( path instanceof Path );
+		path.spew( self.encode(value) );
+		return path;
+	}
+}

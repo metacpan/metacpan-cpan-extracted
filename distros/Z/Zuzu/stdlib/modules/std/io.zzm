@@ -1,0 +1,157 @@
+=encoding utf8
+
+=head1 NAME
+
+std/io - Filesystem paths and standard stream helpers.
+
+=head1 SYNOPSIS
+
+  from std/io import Path, STDIN, STDOUT, STDERR;
+
+  let p := new Path("notes.txt");
+  p.spew_utf8("hello\n");
+
+  p.each_line( line => {
+    STDOUT.print(line);
+  } );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Node and
+Electron. It is not supported by zuzu-js in the browser.
+
+=head1 DESCRIPTION
+
+This module provides path objects built on path semantics, an
+iterator for directory traversal, and objects for standard I/O
+streams.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<Path>
+
+Represents a filesystem path.
+
+Construction and conversion:
+
+=over
+
+=item * C<< new Path(String path = "") >>
+
+=item * C<to_String>
+
+=back
+
+Path queries and transforms:
+
+=over
+
+=item * C<basename>, C<canonpath>, C<realpath>, C<volume>
+
+=item * C<absolute>, C<child>, C<parent>, C<sibling>
+
+=item * C<is_absolute>, C<is_relative>, C<is_rootdir>
+
+=item * C<subsumes>, C<exists>, C<is_file>, C<is_dir>
+
+=back
+
+Filesystem actions:
+
+=over
+
+=item * C<copy>, C<move>, C<remove>, C<mkdir>, C<mkdir_exclusive>,
+C<remove_tree>
+
+C<mkdir_exclusive()> performs one non-recursive directory creation
+attempt. It returns true if the directory was created, false if the
+path already exists, and throws for other filesystem errors.
+
+=item * C<touch>, C<touchpath>, C<chmod>
+
+=item * C<size>, C<size_human>, C<stat>, C<lstat>
+
+=back
+
+Text and binary I/O:
+
+=over
+
+=item * C<spew>, C<append>, C<slurp>, C<lines> (BinaryString)
+
+=item * C<spew_utf8>, C<append_utf8>, C<slurp_utf8>, C<lines_utf8> (String)
+
+=item * C<spew_async>, C<append_async>, C<slurp_async>, C<lines_async>
+return awaitable C<Task> values for binary file I/O
+
+=item * C<spew_utf8_async>, C<append_utf8_async>, C<slurp_utf8_async>,
+C<lines_utf8_async> return awaitable C<Task> values for UTF-8 file I/O
+
+=item * C<edit_lines>, C<edit_lines_utf8>
+
+=item * C<each_line(callback, raw?)> where C<raw=true> yields C<BinaryString>
+
+=item * C<next_line(raw?)> where C<raw=true> returns C<BinaryString>
+
+=back
+
+Traversal helpers:
+
+=over
+
+=item * C<children(...)>
+
+=item * C<iterator(...)> returning C<PathIterator>
+
+=item * C<visit(callback, ...)>
+
+=back
+
+Static helpers:
+
+=over
+
+=item * C<Path.cwd()>, C<Path.rootdir()>
+
+=item * C<Path.tempfile(...)>, C<Path.tempdir(...)>
+
+=item * C<Path.glob(pattern, options?)>
+
+=item * C<Path.join(parts)>
+
+=item * C<Path.split(path)>
+
+=item * C<Path.normalize(path)>
+
+=back
+
+=item C<PathIterator>
+
+Directory iterator object with C<next()>.
+
+=item C<STDIN>
+
+Read helpers: C<next_line(raw?)>, C<each_line(callback, raw?)>.
+With C<raw=true>, values are C<BinaryString>; otherwise C<String>.
+
+=item C<STDOUT>
+
+Write helpers: C<print(...)>, C<say(...)>.
+
+=item C<STDERR>
+
+Write helpers: C<print(...)>, C<say(...)>.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/io >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.

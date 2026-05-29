@@ -1,0 +1,388 @@
+=encoding utf8
+
+=head1 NAME
+
+std/web/session - File and database backed sessions for std/web.
+
+=head1 SYNOPSIS
+
+  from std/web import Request, Response;
+  from std/web/session import FileSessionHandler;
+  from std/io import Path;
+  
+  Request.set_session_handler(
+    new FileSessionHandler(
+      dir:     new Path( path: "/tmp/zsessions" ),
+      secret:  "change-me",
+      max_age: 6 * 60 * 60,
+    ),
+  );
+  
+  function __request__ ( env ) {
+    let req := new Request( env: env );
+    let sess := req.session();
+    sess{data}.set( "seen", sess{data}.get( "seen", 0 ) + 1 );
+    return new Response(
+      session: sess.finalize(),
+      body: [ "seen ", sess{data}{seen}, "\n" ],
+    );
+  }
+
+=head1 DESCRIPTION
+
+This module provides server-side session handlers for C<std/web>. The
+contracts C<SessionHandler> and C<Session> are defined by C<std/web>;
+this module imports those traits and provides file and database storage
+implementations.
+
+The browser receives only a signed opaque session id. Session data is
+stored server-side as trusted C<std/marshal> data. Applications which
+need encrypted or separately authenticated server-side storage should
+provide their own C<SessionHandler>.
+
+=head1 EXPORTS
+
+=head2 C<Session>
+
+Concrete session object implementing C<std/web> C<Session>. The public
+C<data> slot contains marshalable application data.
+
+=head2 C<FileSessionHandler>
+
+Stores one marshalled blob per session in the configured C<dir>.
+
+=head2 C<DbSessionHandler>
+
+Stores sessions in the configured database handle. The handler creates
+and manages a C<zuzu_web_sessions> table.
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/web/session >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/digest/sha import hmac_sha256_hex;
+from std/io import Path;
+from std/marshal import dump, load;
+from std/secure import SecureRandom;
+from std/string import split;
+from std/string/base64 import encode, decode;
+from std/time import Time;
+from std/web import Request, Session as WebSession, SessionHandler;
+
+function _now () {
+	return ( new Time() ).epoch();
+}
+
+function _bin ( value ) {
+	return value instanceof BinaryString ? value : to_binary( "" _ value );
+}
+
+function _valid_id ( id ) {
+	return id instanceof String and id ~ /^[A-Za-z0-9_-]+$/;
+}
+
+function _empty_data ( data ) {
+	return data instanceof Dict ? data : {};
+}
+
+class Session with WebSession {
+	let data := {};
+	let String _id := "";
+	let _handler := null;
+	let Number _created := 0;
+	let Number _updated := 0;
+	let Boolean _secure := false;
+	let Boolean _finalized := false;
+
+	method id () {
+		return _id;
+	}
+
+	method handler () {
+		return _handler;
+	}
+
+	method created () {
+		return _created;
+	}
+
+	method updated () {
+		return _updated;
+	}
+
+	method secure () {
+		return _secure;
+	}
+
+	method age () {
+		return _now() - _created;
+	}
+
+	method is_finalized () {
+		return _finalized;
+	}
+
+	method finalize () {
+		if ( not _finalized ) {
+			_handler.save_session(self);
+			_finalized := true;
+		}
+		return self;
+	}
+
+	method __demolish__ () {
+		self.finalize() unless _finalized;
+	}
+
+	method cookie_name () {
+		return _handler._cookie_name();
+	}
+
+	method cookie_value () {
+		return _handler._signed_cookie_value(_id);
+	}
+
+	method cookie_options () {
+		return _handler._cookie_options(self);
+	}
+}
+
+class _SessionHandlerBase with SessionHandler {
+	let secret := null;
+	let String cookie_name := "zzsession";
+	let Number max_age := 21600;
+	let String cookie_path := "/";
+	let cookie_domain := null;
+	let String same_site := "Lax";
+	let secure := null;
+	let Boolean http_only := true;
+
+	method __build__ () {
+		die "session handler secret is required" if secret ≡ null;
+	}
+
+	method _cookie_name () {
+		return cookie_name;
+	}
+
+	method _max_age () {
+		return max_age;
+	}
+
+	method _signature ( id ) {
+		return hmac_sha256_hex( _bin(id), _bin(secret) );
+	}
+
+	method _signed_cookie_value ( id ) {
+		return id _ "." _ self._signature(id);
+	}
+
+	method _cookie_options ( session ) {
+		let out := {
+			Path:     cookie_path,
+			HttpOnly: http_only,
+			SameSite: same_site,
+			"Max-Age": max_age,
+		};
+		out.set( "Domain", cookie_domain ) if cookie_domain ≢ null;
+		out.set(
+			"Secure",
+			secure ≡ null ? session.secure() : secure,
+		);
+		return out;
+	}
+
+	method _cookie_session_id ( Request request ) {
+		let raw := request.cookies().get( cookie_name, null );
+		return null if raw ≡ null;
+
+		let parts := split( raw, "." );
+		return null unless parts.length() = 2;
+
+		let id := parts[0];
+		return null unless _valid_id(id);
+		return null unless parts[1] ≡ self._signature(id);
+
+		return id;
+	}
+
+	method _new_id () {
+		return SecureRandom.token(32);
+	}
+
+	method _session ( Request request, id, created, updated, data ) {
+		return new Session(
+			data:      _empty_data(data),
+			_id:      id,
+			_handler: self,
+			_created: created,
+			_updated: updated,
+			_secure:  request.secure(),
+		);
+	}
+
+	method _new_session ( Request request ) {
+		let now := _now();
+		return self._session( request, self._new_id(), now, now, {} );
+	}
+
+	method _expired ( created ) {
+		return created + max_age < _now();
+	}
+
+	method _maybe_cleanup () {
+		self.cleanup() if SecureRandom.int(100) = 0;
+		return self;
+	}
+
+	method session_for ( Request request ) {
+		self._maybe_cleanup();
+		let id := self._cookie_session_id(request);
+		return self._new_session(request) if id ≡ null;
+		let session := self._load_session( request, id );
+		return session ≢ null ? session : self._new_session(request);
+	}
+
+	method _load_session ( request, id ) {
+		die "_load_session is not implemented";
+	}
+
+	method save_session ( session ) {
+		die "save_session is not implemented";
+	}
+
+	method cleanup () {
+		die "cleanup is not implemented";
+	}
+}
+
+class FileSessionHandler extends _SessionHandlerBase {
+	let dir := null;
+
+	method __build__ () {
+		super();
+		die "FileSessionHandler dir is required" if dir ≡ null;
+		dir.mkdir() unless dir.exists();
+		self.cleanup();
+	}
+
+	method _path ( id ) {
+		die "invalid session id" unless _valid_id(id);
+		return dir.child( id _ ".session" );
+	}
+
+	method _load_blob ( path ) {
+		try {
+			return load( path.slurp() );
+		}
+		catch {
+			return null;
+		}
+	}
+
+	method _load_session ( request, id ) {
+		let path := self._path(id);
+		return null unless path.exists();
+		let blob := self._load_blob(path);
+		if ( blob ≡ null or self._expired( blob{created} ) ) {
+			path.remove();
+			return null;
+		}
+		return self._session(
+			request,
+			id,
+			blob{created},
+			blob.get( "updated", blob{created} ),
+			blob.get( "data", {} ),
+		);
+	}
+
+	method save_session ( session ) {
+		let now := _now();
+		self._path( session.id() ).spew(
+			dump({
+				created: session.created(),
+				updated: now,
+				data:    session{data},
+			}),
+		);
+		return session;
+	}
+
+	method cleanup () {
+		return self unless dir.exists();
+		for ( let child in dir.children() ) {
+			next unless child.basename() ~ /\.session$/;
+			let blob := self._load_blob(child);
+			child.remove()
+				if blob ≡ null or self._expired( blob{created} );
+		}
+		return self;
+	}
+}
+
+class DbSessionHandler extends _SessionHandlerBase {
+	let dbh := null;
+
+	method __build__ () {
+		super();
+		die "DbSessionHandler dbh is required" if dbh ≡ null;
+		dbh.prepare(
+			"create table if not exists zuzu_web_sessions " _
+			"(id text primary key, created real, updated real, data text)",
+		).execute();
+		self.cleanup();
+	}
+
+	method _load_session ( request, id ) {
+		let q := dbh.prepare(
+			"select created, updated, data from zuzu_web_sessions " _
+			"where id = ?",
+		);
+		q.execute(id);
+		let row := q.next_dict();
+		return null if row ≡ null;
+		if ( self._expired( row{created} ) ) {
+			dbh.prepare(
+				"delete from zuzu_web_sessions where id = ?",
+			).execute(id);
+			return null;
+		}
+		return self._session(
+			request,
+			id,
+			row{created},
+			row{updated},
+			load( decode( row{data} ) ),
+		);
+	}
+
+	method save_session ( session ) {
+		dbh.prepare(
+			"delete from zuzu_web_sessions where id = ?",
+		).execute( session.id() );
+		dbh.prepare(
+			"insert into zuzu_web_sessions " _
+			"(id, created, updated, data) values (?, ?, ?, ?)",
+		).execute(
+			session.id(),
+			session.created(),
+			_now(),
+			encode( dump( session{data} ) ),
+		);
+		return session;
+	}
+
+	method cleanup () {
+		dbh.prepare(
+			"delete from zuzu_web_sessions where created + ? < ?",
+		).execute( self._max_age(), _now() );
+		return self;
+	}
+}

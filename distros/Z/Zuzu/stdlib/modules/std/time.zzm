@@ -1,0 +1,188 @@
+=encoding utf8
+
+=head1 NAME
+
+std/time - Time objects, formatting, and parsing.
+
+=head1 SYNOPSIS
+
+  from std/time import Time, TimeZone, Duration, TimeFormat, TimeParser;
+
+  let london := TimeZone.named("Europe/London");
+  let now := new Time(timezone: london);
+  let tomorrow := now.add_days(1);
+  let next_hour := now.add(Duration.hours(1));
+
+  let parsed := Time.parse("2026-03-20T12:00:00", timezone: london);
+  say TimeFormat.rfc3339().format(parsed);
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module provides immutable C<Time> objects for working with instants,
+timezones, calendar arithmetic, parsing, and serialization. C<TimeParser>
+remains available for compatibility with older strptime-style parsing.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<< Time(Number epoch?, timezone: TimeZone|String?) >>
+
+Construct a time from an epoch value in seconds, or use the current
+time when omitted. C<timezone> controls the calendar view used by component
+accessors and calendar arithmetic. Returns: C<Time>.
+
+Common instance methods include:
+
+=over
+
+=item C<< time.sec() >>, C<< time.min() >>, C<< time.hour() >>
+
+Parameters: none. Returns: C<Number>. Returns the seconds, minutes, or
+hours component.
+
+=item C<< time.day_of_month() >>, C<< time.mon() >>, C<< time.month() >>, C<< time.year() >>, C<< time.yy() >>
+
+Parameters: none. Returns: C<Number>. Returns the local calendar date
+component.
+
+=item C<< time.day_of_week() >>, C<< time.day() >>, C<< time.day_of_year() >>, C<< time.month_last_day() >>
+
+Parameters: none. Returns: C<Number>. Returns derived local calendar
+component values.
+
+=item C<< time.epoch() >>
+
+Parameters: none. Returns: C<Number>. Returns epoch seconds.
+
+=item C<< time.timezone() >>
+
+Parameters: none. Returns: C<TimeZone>. Returns the timezone metadata for
+the time object.
+
+=item C<< time.with_timezone(TimeZone|String zone) >>
+
+Parameters: C<zone> is an IANA name, fixed offset, or C<TimeZone>. Returns:
+C<Time>. Keeps the same instant and changes the displayed timezone.
+
+=item C<< time.reinterpret_timezone(TimeZone|String zone) >>
+
+Parameters: C<zone> is an IANA name, fixed offset, or C<TimeZone>. Returns:
+C<Time>. Keeps the same displayed date/time fields and changes the instant.
+
+=item C<< time.hms(separator?) >>, C<< time.ymd(separator?) >>, C<< time.mdy(separator?) >>, C<< time.dmy(separator?) >>
+
+Parameters: C<separator> is an optional separator string. Returns:
+C<String>. Formats a time or date component string.
+
+=item C<< time.date() >>, C<< time.time() >>, C<< time.datetime() >>, C<< time.cdate() >>, C<< time.to_String() >>
+
+Parameters: none. Returns: C<String>. Formats the time using common date
+and time layouts.
+
+=item C<< time.strftime(String format) >>
+
+Parameters: C<format> is a strftime format string. Returns: C<String>.
+Formats the time with C<format>.
+
+=item C<< time.to_iso8601() >>, C<< time.to_rfc3339() >>, C<< time.to_rfc5322(include_weekday: Boolean?) >>
+
+Parameters: C<include_weekday> is an optional Boolean for C<to_rfc5322>.
+Returns: C<String>. Serializes the time using common machine and mail date
+formats. C<to_rfc5322> includes a weekday by default; pass
+C<include_weekday: false> to omit it.
+
+=item C<< time.tzoffset() >>
+
+Parameters: none. Returns: C<Number>. Returns the local timezone offset.
+
+=item C<< time.is_leap_year() >>
+
+Parameters: none. Returns: C<Boolean>. Returns true when the local year
+is a leap year.
+
+=item C<< time.week() >>, C<< time.week_year() >>, C<< time.julian_day() >>
+
+Parameters: none. Returns: C<Number>. Returns week-numbering and Julian
+day values.
+
+=item C<< time.add_seconds(Number n) >>, C<< time.add_minutes(Number n) >>, C<< time.add_hours(Number n) >>, C<< time.add_days(Number n) >>, C<< time.add_weeks(Number n) >>
+
+Parameters: C<n> is the amount to add. Returns: C<Time>. Seconds, minutes,
+and hours are elapsed-time operations. Days and weeks are calendar
+operations in the object's timezone.
+
+=item C<< time.add_months(Number n) >>, C<< time.add_years(Number n) >>
+
+Parameters: C<n> is the amount to add. Returns: C<Time>. Returns a new
+time offset by calendar months or years on supported builds.
+
+=item C<< time.subtract_seconds(Number n) >>, C<< time.subtract_minutes(Number n) >>, C<< time.subtract_hours(Number n) >>, C<< time.subtract_days(Number n) >>, C<< time.subtract_weeks(Number n) >>, C<< time.subtract_months(Number n) >>, C<< time.subtract_years(Number n) >>
+
+Parameters: C<n> is the amount to subtract. Returns: C<Time>.
+
+=item C<< time.add(Duration d) >>, C<< time.subtract(Duration d) >>
+
+Parameters: C<d> is a C<Duration>. Returns: C<Time>.
+
+=item C<< time.elapsed_seconds_until(Time other) >>, C<< time.compare(Time other) >>, C<< time.is_before(Time other) >>, C<< time.is_after(Time other) >>
+
+Parameters: C<other> is another C<Time>. Returns elapsed seconds, ordering,
+or boolean comparison results.
+
+=item C<< Time.parse(String text, timezone: TimeZone|String?) >>
+
+Parameters: C<text> is ISO 8601/RFC 3339 or RFC 5322 text. RFC 5322 input
+accepts common obsolete mail-date spellings including two-digit years,
+legacy US zones, and military zones other than C<J>. Zone-less ISO input
+requires an explicit C<timezone>. Returns: C<Time>.
+
+=item C<< TimeZone.utc() >>, C<< TimeZone.local() >>, C<< TimeZone.named(String name) >>, C<< TimeZone.offset(Number seconds) >>
+
+Returns timezone helper objects. Named zones use IANA timezone names.
+
+=item C<< Duration.seconds(Number n) >>, C<< Duration.minutes(Number n) >>, C<< Duration.hours(Number n) >>, C<< Duration.days(Number n) >>, C<< Duration.weeks(Number n) >>, C<< Duration.months(Number n) >>, C<< Duration.years(Number n) >>
+
+Returns immutable duration helper objects.
+
+=item C<< TimeFormat.iso8601() >>, C<< TimeFormat.rfc3339() >>, C<< TimeFormat.rfc5322() >>, C<< TimeFormat.strftime(String pattern) >>
+
+Returns formatter/parser helper objects.
+
+=item C<< TimeFormat.format(Time time) >>
+
+Parameters: C<time> is a C<Time>. Returns: C<String>. Formats C<time>
+using the helper object's format.
+
+=item C<< TimeFormat.parse(String text, timezone: TimeZone|String?) >>
+
+Parameters: C<text> is date-time text matching the helper object's format.
+RFC 5322 input may carry its own timezone. Zone-less input requires an
+explicit C<timezone>. Returns: C<Time>.
+
+=back
+
+=item C<< TimeParser(String format = "%Y-%m-%d") >>
+
+Creates a parser for the given format string. Returns: C<TimeParser>.
+
+=item C<< TimeParser->parse(String text) >>
+
+Parameters: C<text> is text matching the parser format. Returns:
+C<Time>. Parses text into a time object.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/time >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.

@@ -1,0 +1,127 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/archive import Archive;
+from std/io import Path;
+from std/zuzuzoo import Zuzuzoo;
+
+class FakeRequest {
+	let target_url := null;
+	let download_path := null;
+
+	method download_to ( path ) {
+		download_path := path;
+		return self;
+	}
+
+	method url () {
+		return target_url;
+	}
+
+	method path () {
+		return download_path;
+	}
+}
+
+class FakeResponse {
+	let final_url := null;
+
+	method expect_success () {
+		return self;
+	}
+
+	method url () {
+		return final_url;
+	}
+}
+
+class FakeUserAgent {
+	let payloads := {};
+
+	method build_request ( http_method, url ) {
+		return new FakeRequest( target_url: url );
+	}
+
+	method send ( request ) {
+		( new Path( request.path() ) ).spew(
+			payloads.get( request.url() ),
+		);
+		return new FakeResponse( final_url: request.url() );
+	}
+}
+
+function archive_bytes (
+	dist_name,
+	version,
+	module_name,
+	dependencies := "{}"
+) {
+	return Archive.encode(
+		{
+			entries: [
+				{
+					path: dist_name _ "-" _ version _
+						"/zuzu-distribution.json",
+					data: to_binary(
+						"{\"name\":\"" _ dist_name _
+						"\",\"version\":\"" _ version _
+						"\",\"author\":\"Example\"," _
+						"\"license\":\"MIT\"," _
+						"\"dependencies\":" _ dependencies _
+						"}\n",
+					),
+				},
+				{
+					path: dist_name _ "-" _ version _
+						"/modules/" _ module_name _ ".zzm",
+					data: to_binary("// module\n"),
+				},
+			],
+		},
+		"zip",
+	);
+}
+
+let ua := new FakeUserAgent(
+	payloads: {
+		"https://packages.test/module/app/main": archive_bytes(
+			"app-main",
+			"1.0.0",
+			"app/main",
+			"{\"dep/lib\":\"2.0.0\"}",
+		),
+		"https://packages.test/module/dep/lib": archive_bytes(
+			"dep-lib",
+			"1.0.0",
+			"dep/lib",
+		),
+	},
+);
+
+let root := Path.tempdir();
+let error := "";
+try {
+	( new Zuzuzoo(
+		lib_dir: root.child("lib").to_String(),
+		bin_dir: root.child("bin").to_String(),
+		meta_dir: root.child("meta").to_String(),
+		home: root.child("home").to_String(),
+		base_url: "https://packages.test",
+		user_agent: ua,
+	) ).plan_install("app/main");
+}
+catch ( Exception e ) {
+	error := e.to_String();
+}
+
+like( error, /requested dependency dep\/lib >= 2\.0\.0/, "dependency is named" );
+like( error, /requester chain app\/main -> app-main -> dep\/lib/, "chain is shown" );
+like( error, /planned\/provided version none/, "planned version is shown" );
+like(
+	error,
+	/conflicting planned\/provided version dep-lib 1\.0\.0/,
+	"conflicting version is shown",
+);
+
+done_testing();

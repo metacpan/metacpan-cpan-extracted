@@ -1,0 +1,42 @@
+from test/more import *;
+from test/parser import parse;
+from std/string import join;
+
+let lines := [
+	"TAP version 13",
+	"ok 1 - top pass",
+	"not ok 2 - top fail",
+	"ok 3 - top todo # TODO later",
+	"ok 4 - top skip # SKIP no env",
+	"# Subtest: outer",
+	"    ok 1 - inner pass",
+	"    # Subtest: nested",
+	"        not ok 1 - nested fail",
+	"        ok 2 - nested todo # TODO fix nested",
+	"        1..2",
+	"    ok 2 - nested",
+	"    not ok 3 - inner fail # TODO accepted",
+	"    ok 4 - inner skip # SKIP unsupported",
+	"    1..4",
+	"ok 5 - outer",
+	"1..5",
+	"",
+];
+
+let parsed := parse( join( "\n", lines ) );
+
+is( parsed{top_level}{passed}, 2, "top-level pass count" );
+is( parsed{top_level}{failed}, 1, "top-level fail count" );
+is( parsed{top_level}{todo}, 1, "top-level todo count" );
+is( parsed{top_level}{skipped}, 1, "top-level skip count" );
+is( parsed{top_level}{total}, 5, "top-level total" );
+
+is( parsed{assertions}{passed}, 4, "assertion pass count" );
+is( parsed{assertions}{failed}, 2, "assertion fail count" );
+is( parsed{assertions}{todo}, 3, "assertion todo count" );
+is( parsed{assertions}{skipped}, 2, "assertion skip count" );
+is( parsed{assertions}{total}, 11, "assertion total count" );
+
+is( parsed{planned}, 5, "captures top-level plan" );
+
+done_testing();

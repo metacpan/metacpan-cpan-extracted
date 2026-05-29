@@ -1,0 +1,10 @@
+from test/more import *;
+from std/math import Math, π as PI_ALIAS;
+from std/string import *;
+let rounded := round( Math.sin( Math.pi / 2 ) * 1000 );
+let pi_scaled := round( PI_ALIAS * 1000 );
+let idx := index( "abcdef", "cd" );
+is( rounded, 1000, "from/import keywords load named exports" );
+is( pi_scaled, 3142, "as keyword aliases imported symbols" );
+is( idx, 2, "star import loads module exports" );
+done_testing();

@@ -1,0 +1,18 @@
+from test/c32/missing try import OptionalFeatureClass, OptionalFeatureTrait;
+from test/c32/available import DefaultFeature;
+from test/more import *;
+
+let obj := null;
+if ( OptionalFeatureClass == null ) {
+	obj := new DefaultFeature();
+}
+else {
+	obj := new OptionalFeatureClass();
+}
+
+is( OptionalFeatureClass, null, "optional class import binds null when module is absent" );
+is( OptionalFeatureTrait, null, "optional trait import binds null when module is absent" );
+is( obj.feature_name(), "default", "fallback class path is selected" );
+is( obj can "optional_hook", 0, "feature detection via can confirms optional trait API is absent" );
+
+done_testing();

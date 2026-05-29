@@ -1,0 +1,89 @@
+=encoding utf8
+
+=head1 NAME
+
+std/tui - Terminal UI helpers.
+
+=head1 SYNOPSIS
+
+  from std/tui import supports_ansi, colour_text, readline, write_line;
+
+  write_line( "Warning", "yellow" );
+  let path := readline( "File: ", "", filename_completions );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This runtime-supported module provides small terminal UI primitives for
+standard-library modules that need command-line fallbacks.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item * C<ansi_esc()>
+
+Parameters: none. Returns: C<String>. Returns a one-character ANSI
+escape string.
+
+=item * C<supports_ansi()>
+
+Parameters: none. Returns: C<Boolean>. Returns true when stdout appears
+to be an ANSI-capable terminal.
+
+=item * C<colour_text(text, colour)>
+
+Parameters: C<text> is the value to display and C<colour> is a colour
+name or C<null>. Returns: C<String>. Returns C<text> wrapped in ANSI
+colour escapes when C<supports_ansi()> is true, otherwise returns
+C<text> unchanged.
+
+=item * C<write(text, colour)>
+
+Parameters: C<text> is the value to write and C<colour> is a colour name
+or C<null>. Returns: C<null>. Writes C<text> to stdout, optionally
+coloured.
+
+=item * C<write_line(text, colour)>
+
+Parameters: C<text> is the value to write and C<colour> is a colour name
+or C<null>. Returns: C<null>. Writes C<text> followed by a newline to
+stdout, optionally coloured.
+
+=item * C<readline(prompt, default, completion_callback)>
+
+Parameters: C<prompt> is prompt text, C<default> is the initial value,
+and C<completion_callback> is C<null> or a completion function. Returns:
+C<String> or C<null>. Reads a line from stdin.
+
+=item * C<readline_supports_completion()>
+
+Parameters: none. Returns: C<Boolean>. Returns true when the runtime can
+provide native readline completion.
+
+=item * C<filename_completions(text)>
+
+Parameters: C<text> is the partial path. Returns: C<Array>. Returns file
+and directory path completions for C<text>.
+
+=item * C<directory_completions(text)>
+
+Parameters: C<text> is the partial path. Returns: C<Array>. Returns
+directory path completions for C<text>.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/tui >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut

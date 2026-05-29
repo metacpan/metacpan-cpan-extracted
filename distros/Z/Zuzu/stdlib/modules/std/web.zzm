@@ -1,0 +1,1942 @@
+=encoding utf8
+
+=head1 NAME
+
+std/web - Request, response, and routing helpers for ZuzuScript web apps.
+
+=head1 SYNOPSIS
+
+  from std/web import Request, Response, Routes;
+  
+  class Hello {
+    static method greet ( req ) {
+      return new Response(
+        status: 200,
+        headers: { "Content-Type": "text/plain; charset=UTF-8" },
+        body: [ "Hello ", req.param("name"), "\n" ],
+      );
+    }
+  }
+  
+  let routes := new Routes();
+  routes.get("/hello/:name").to(
+    controller: Hello,
+    action: "greet",
+  );
+  
+  function __request__ ( env ) {
+    return routes.dispatch( new Request( env: env ) );
+  }
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Node and
+Electron. It is partially supported by zuzu-js in the browser (filesystem
+backed template rendering fails).
+
+=head1 DESCRIPTION
+
+This pure ZuzuScript module provides a small web framework layer over the
+raw C<__request__(env)> protocol used by ZuzuScript web hosts. It
+provides request, response, route match, route, and router objects.
+
+=head1 EXPORTS
+
+=head2 C<Request>
+
+C<Request> wraps the web environment C<Dict> passed to
+C<__request__(env)>.
+
+=over
+
+=item * C<set_session_handler(handler)>
+
+Parameters: C<handler> is a C<SessionHandler> object or C<null>.
+Returns: the handler. Sets the process-local session handler used by
+C<session()>.
+
+=item * C<get_session_handler()>
+
+Parameters: none. Returns: C<SessionHandler> or C<null>. Returns the
+process-local session handler.
+
+=item * C<set_route_match(captures, route)>
+
+Parameters: C<captures> is a C<Dict> or C<null>; C<route> is a
+C<Route>. Returns: C<Request>. Stores the route captures and matched
+route on the request. This is normally called by C<Routes.dispatch>.
+
+=item * C<env()>
+
+Parameters: none. Returns: C<Dict>. Returns the original request
+environment.
+
+=item * C<captures()>
+
+Parameters: none. Returns: C<Dict>. Returns captures from the matched
+route.
+
+=item * C<stash()>
+
+Parameters: none. Returns: C<Dict>. Returns a mutable copy of the
+matched route captures for per-request application state.
+
+=item * C<route()>
+
+Parameters: none. Returns: C<Route> or C<null>. Returns the route that
+matched the request.
+
+=item * C<address()>
+
+Parameters: none. Returns: C<String> or C<null>. Returns
+C<remote_addr> from the environment.
+
+=item * C<remote_host()>
+
+Parameters: none. Returns: C<String> or C<null>. Returns
+C<remote_host>, falling back to C<address()>.
+
+=item * C<request_method()>
+
+Parameters: none. Returns: C<String>. Returns the HTTP request method.
+This method is not named C<method()> because C<method> is a ZuzuScript
+keyword.
+
+=item * C<protocol()>
+
+Parameters: none. Returns: C<String>. Returns the HTTP protocol, such
+as C<HTTP/1.1>.
+
+=item * C<request_uri()>
+
+Parameters: none. Returns: C<String>. Returns the original request URI
+when available, or reconstructs it from the raw path and query string.
+
+=item * C<path_info()>
+
+Parameters: none. Returns: C<String>. Returns the request path from the
+environment.
+
+=item * C<path()>
+
+Parameters: none. Returns: C<String>. Returns the request path,
+normalizing an empty path to C</>.
+
+=item * C<raw_path()>
+
+Parameters: none. Returns: C<String>. Returns the undecoded path when
+the host provides one, falling back to C<path()>.
+
+=item * C<query_string()>
+
+Parameters: none. Returns: C<String>. Returns the raw query string
+without a leading question mark.
+
+=item * C<script_name()>
+
+Parameters: none. Returns: C<String>. Returns the mounting path for the
+application, or an empty string.
+
+=item * C<scheme()>
+
+Parameters: none. Returns: C<String>. Returns the URL scheme, usually
+C<http> or C<https>.
+
+=item * C<secure()>
+
+Parameters: none. Returns: C<Boolean>. Returns true when the scheme is
+C<https>.
+
+=item * C<body()>
+
+Parameters: none. Returns: any value or C<null>. Returns the raw body
+value from the environment.
+
+=item * C<input()>
+
+Parameters: none. Returns: any value or C<null>. Alias for C<body()>.
+
+=item * C<content()>
+
+Parameters: none. Returns: any value or C<null>. Alias for C<body()>.
+
+=item * C<raw_body()>
+
+Parameters: none. Returns: any value or C<null>. Alias for C<body()>.
+
+=item * C<body_text()>
+
+Parameters: none. Returns: C<String> or C<null>. Returns the decoded
+request body text when the host provides it.
+
+=item * C<user()>
+
+Parameters: none. Returns: C<String> or C<null>. Returns the remote
+authenticated user from the environment.
+
+=item * C<session()>
+
+Parameters: none. Returns: C<Session>, any value, or C<null>. Returns
+the request session from the configured C<SessionHandler>. If no handler
+is configured, it preserves the middleware/host fallback and returns the
+C<session> environment value.
+
+=item * C<session_options()>
+
+Parameters: none. Returns: any value or C<null>. Returns session
+options supplied by middleware or the host.
+
+=item * C<logger()>
+
+Parameters: none. Returns: any value or C<null>. Returns a logger
+object supplied by middleware or the host.
+
+=item * C<headers()>
+
+Parameters: none. Returns: C<PairList>. Returns request headers.
+
+=item * C<header(name)>
+
+Parameters: C<name> is a C<String>. Returns: C<String> or C<null>.
+Returns the first request header matching C<name>, using
+case-insensitive matching.
+
+=item * C<content_type()>
+
+Parameters: none. Returns: C<String> or C<null>. Returns the
+C<Content-Type> request header.
+
+=item * C<content_length()>
+
+Parameters: none. Returns: C<String> or C<null>. Returns the
+C<Content-Length> request header.
+
+=item * C<content_encoding()>
+
+Parameters: none. Returns: C<String> or C<null>. Returns the
+C<Content-Encoding> request header.
+
+=item * C<referer()>
+
+Parameters: none. Returns: C<String> or C<null>. Returns the
+C<Referer> request header.
+
+=item * C<user_agent()>
+
+Parameters: none. Returns: C<String> or C<null>. Returns the
+C<User-Agent> request header.
+
+=item * C<cookies()>
+
+Parameters: none. Returns: C<Dict>. Parses and returns cookies from the
+C<Cookie> request header.
+
+=item * C<query_parameters()>
+
+Parameters: none. Returns: C<PairList>. Parses and returns query string
+parameters. Duplicate names are preserved.
+
+=item * C<body_parameters()>
+
+Parameters: none. Returns: C<PairList>. Parses and returns
+C<application/x-www-form-urlencoded> body parameters. Duplicate names
+are preserved.
+
+=item * C<parameters()>
+
+Parameters: none. Returns: C<PairList>. Returns query parameters, body
+parameters, and route captures in that order.
+
+=item * C<param(name?)>
+
+Parameters: optional C<name> is a C<String>. Returns: C<String>,
+C<Array>, or C<null>. With a name, returns the first matching merged
+parameter. With no name, returns the available parameter names.
+
+=item * C<uploads()>
+
+Parameters: none. Returns: C<PairList>. Returns uploaded file entries
+from the environment, or an empty C<PairList>.
+
+=item * C<upload(name?)>
+
+Parameters: optional C<name> is a C<String>. Returns: an upload value,
+C<Array>, or C<null>. With a name, returns the first matching upload.
+With no name, returns the available upload names.
+
+=item * C<uri()>
+
+Parameters: none. Returns: C<String>. Builds the full request URI from
+the scheme, host, raw path, and query string.
+
+=item * C<base()>
+
+Parameters: none. Returns: C<String>. Builds the application base URI
+from the scheme, host, and script name.
+
+=item * C<new_response(...args, named)>
+
+Parameters: optional positional values are C<status>, C<headers>, and
+C<body>; optional named values are C<status>, C<headers>, and C<body>.
+Returns: C<Response>. Creates a response associated with the request.
+
+=back
+
+=head2 C<Response>
+
+C<Response> builds the three-item response array returned by the raw web
+protocol.
+
+=over
+
+=item * C<status(value?)>
+
+Parameters: optional C<value> is a C<Number>. Returns: C<Number> when
+reading, or C<Response> when setting. Gets or sets the HTTP status code.
+
+=item * C<code(value?)>
+
+Parameters: optional C<value> is a C<Number>. Returns: C<Number> when
+reading, or C<Response> when setting. Alias for C<status()>.
+
+=item * C<headers(value?)>
+
+Parameters: optional C<value> is a C<PairList> or C<Dict>. Returns:
+C<PairList> when reading, or C<Response> when setting. Gets or replaces
+the response headers.
+
+=item * C<header(name, value?)>
+
+Parameters: C<name> is a C<String>; optional C<value> is a C<String>.
+Returns: C<String> or C<null> when reading, or C<Response> when setting.
+Gets or replaces a response header using case-insensitive matching.
+
+=item * C<body(value?)>
+
+Parameters: optional C<value> is any response body value. Returns: the
+current body when reading, or C<Response> when setting. Gets or sets the
+response body.
+
+=item * C<content(value?)>
+
+Parameters: optional C<value> is any response body value. Returns: the
+current body when reading, or C<Response> when setting. Alias for
+C<body()>.
+
+=item * C<render(template, data := {})>
+
+Parameters: C<template> is a C<ZTemplate>, C<ZZTemplate>, another object
+with a C<process(data)> method, or a C<std/io> C<Path>; C<data> is the
+template data model. Returns: C<Response>. Renders the template with
+C<data> and sets the response body to the rendered string. Path
+templates are compiled as C<ZZTemplate> objects and cached with
+C<std/cache/lru>.
+
+=item * C<content_type(value?)>
+
+Parameters: optional C<value> is a C<String>. Returns: C<String> or
+C<null> when reading, or C<Response> when setting. Gets or sets the
+C<Content-Type> response header.
+
+=item * C<render_json(data)>
+
+Parameters: C<data> is any JSON-encodable value. Returns:
+C<Response>. Encodes C<data> as compact JSON, sets the response body to
+the JSON text, and sets C<Content-Type> to
+C<application/json; charset=UTF-8>.
+
+=item * C<session(value?)>
+
+Parameters: optional C<value> is a C<Session> object. Returns:
+C<Session> or C<Response>. Gets or sets the session object that should
+contribute a response cookie.
+
+=item * C<content_length(value?)>
+
+Parameters: optional C<value> is a C<String> or C<Number>. Returns:
+C<String> or C<null> when reading, or C<Response> when setting. Gets or
+sets the C<Content-Length> response header.
+
+=item * C<content_encoding(value?)>
+
+Parameters: optional C<value> is a C<String>. Returns: C<String> or
+C<null> when reading, or C<Response> when setting. Gets or sets the
+C<Content-Encoding> response header.
+
+=item * C<location(value?)>
+
+Parameters: optional C<value> is a C<String>. Returns: C<String> or
+C<null> when reading, or C<Response> when setting. Gets or sets the
+C<Location> response header.
+
+=item * C<redirect(url, status := 302)>
+
+Parameters: C<url> is a C<String>; optional C<status> is a C<Number>.
+Returns: C<Response>. Sets the redirect status code and C<Location>
+header.
+
+=item * C<cookies()>
+
+Parameters: none. Returns: C<Dict>. Returns the response cookies that
+have been set with C<set_cookie()>.
+
+=item * C<set_cookie(name, value, options := {})>
+
+Parameters: C<name> and C<value> are C<String>; C<options> is a C<Dict>.
+Returns: C<Response>. Adds a C<Set-Cookie> header and stores the cookie
+value. Supported options are C<Path>, C<Domain>, C<Expires>,
+C<Max-Age>, C<HttpOnly>, C<Secure>, and C<SameSite>.
+
+=item * C<finalize()>
+
+Parameters: none. Returns: C<Array>. Finalizes any attached C<Session>,
+sets its cookie, and returns the raw C<[ status, headers, body ]>
+response array.
+
+=back
+
+=head2 C<SessionHandler>
+
+C<SessionHandler> is the trait enforced by C<Request.session()>.
+Implementations return an object that does C<Session>.
+
+=over
+
+=item * C<session_for(request)>
+
+Parameters: C<request> is a C<Request>. Returns: C<Session>. Loads or
+creates the request session.
+
+=back
+
+=head2 C<Session>
+
+C<Session> is the trait enforced by C<Response.finalize()>.
+
+=over
+
+=item * C<finalize()>
+
+Parameters: none. Returns: C<Session>. Writes pending data, is
+idempotent, and returns the session object.
+
+=item * C<is_finalized()>
+
+Parameters: none. Returns: C<Boolean>.
+
+=item * C<id()>
+
+Parameters: none. Returns: C<String>.
+
+=item * C<age()>
+
+Parameters: none. Returns: C<Number>.
+
+=item * C<cookie_name()>
+
+Parameters: none. Returns: C<String>.
+
+=item * C<cookie_value()>
+
+Parameters: none. Returns: C<String>.
+
+=item * C<cookie_options()>
+
+Parameters: none. Returns: C<Dict>. Returns options suitable for
+C<Response.set_cookie()>.
+
+=back
+
+=head2 C<RouteMatch>
+
+C<RouteMatch> is the match object used internally by the router. It has
+no public methods. Its fields are C<route>, C<captures>, and
+C<position>.
+
+=head2 C<Route>
+
+C<Route> represents a route node. Applications usually create route
+nodes through a C<Routes> object.
+
+=over
+
+=item * C<root()>
+
+Parameters: none. Returns: C<Routes> or C<Route>. Returns the root
+router for this route tree.
+
+=item * C<route_types()>
+
+Parameters: none. Returns: C<Dict>. Returns the named placeholder types
+available from the root router.
+
+=item * C<parent()>
+
+Parameters: none. Returns: C<Route> or C<null>. Returns the parent route
+node.
+
+=item * C<children()>
+
+Parameters: none. Returns: C<Array>. Returns child route nodes.
+
+=item * C<pattern()>
+
+Parameters: none. Returns: C<String>. Returns the route pattern for
+this node.
+
+=item * C<methods(...args)>
+
+Parameters: zero or more C<String> methods, or one C<Array> of method
+strings. Returns: C<Array> when reading, or C<Route> when setting. Gets
+or replaces the allowed HTTP methods.
+
+=item * C<name(value?)>
+
+Parameters: optional C<value> is a C<String>. Returns: C<String> when
+reading, or C<Route> when setting. Gets or sets the route name.
+
+=item * C<has_custom_name()>
+
+Parameters: none. Returns: C<Boolean>. Returns true when C<name()> has
+explicitly set the route name.
+
+=item * C<inline(value?)>
+
+Parameters: optional C<value> is a truthy or falsey value. Returns:
+C<Boolean> when reading, or C<Route> when setting. Gets or sets whether
+the route is an inline bridge route created by C<under()>.
+
+=item * C<add_child(route)>
+
+Parameters: C<route> is a C<Route>. Returns: C<Route>. Attaches the
+route as a child and returns the child route.
+
+=item * C<remove()>
+
+Parameters: none. Returns: C<Route>. Detaches the route from its parent.
+
+=item * C<any(...args, named)>
+
+Parameters: optional pattern, route name, action, requirements, and
+named values. Returns: C<Route>. Adds a child route accepting any HTTP
+method.
+
+=item * C<get(...args, named)>
+
+Parameters: optional pattern, route name, action, requirements, and
+named values. Returns: C<Route>. Adds a child route accepting C<GET>.
+
+=item * C<post(...args, named)>
+
+Parameters: optional pattern, route name, action, requirements, and
+named values. Returns: C<Route>. Adds a child route accepting C<POST>.
+
+=item * C<put(...args, named)>
+
+Parameters: optional pattern, route name, action, requirements, and
+named values. Returns: C<Route>. Adds a child route accepting C<PUT>.
+
+=item * C<patch(...args, named)>
+
+Parameters: optional pattern, route name, action, requirements, and
+named values. Returns: C<Route>. Adds a child route accepting C<PATCH>.
+
+=item * C<delete(...args, named)>
+
+Parameters: optional pattern, route name, action, requirements, and
+named values. Returns: C<Route>. Adds a child route accepting
+C<DELETE>.
+
+=item * C<options(...args, named)>
+
+Parameters: optional pattern, route name, action, requirements, and
+named values. Returns: C<Route>. Adds a child route accepting
+C<OPTIONS>.
+
+=item * C<head(...args, named)>
+
+Parameters: optional pattern, route name, action, requirements, and
+named values. Returns: C<Route>. Adds a child route accepting C<HEAD>.
+
+=item * C<under(...args, named)>
+
+Parameters: optional pattern, action, requirements, and named values.
+Returns: C<Route>. Adds an inline child route that can guard or group
+nested routes.
+
+=item * C<parse(pattern, named)>
+
+Parameters: C<pattern> is a C<String>; optional named values are route
+requirements. Returns: C<Route>. Replaces the route pattern and applies
+requirements.
+
+=item * C<requires(value?, named)>
+
+Parameters: optional C<value> is a C<Dict>, C<PairList>, or flat
+C<Array>; optional named values are also requirements. Returns:
+C<Route>. Adds capture, method, host, or header requirements.
+
+=item * C<to(value?, named)>
+
+Parameters: optional C<value> is a controller, C<Function>, C<Dict>, or
+C<PairList>; named values may include C<controller> and C<action>.
+Returns: C<Route>. Sets the route target and stores other named values
+as defaults. String controller targets have the form
+C<module/path#ClassName> and are lazy loaded with
+C<std/internals.load_module>.
+
+=item * C<is_endpoint()>
+
+Parameters: none. Returns: C<Boolean>. Returns true when the route has
+an action or controller target.
+
+=item * C<render(values := {})>
+
+Parameters: C<values> is a C<Dict> or C<PairList>. Returns: C<String>.
+Builds a path by filling route placeholders with defaults and supplied
+values.
+
+=item * C<find(wanted)>
+
+Parameters: C<wanted> is a C<String>. Returns: C<Route> or C<null>.
+Finds a route by name within this route tree.
+
+=item * C<lookup(wanted)>
+
+Parameters: C<wanted> is a C<String>. Returns: C<Route> or C<null>.
+Alias for C<find()>.
+
+=item * C<match(req)>
+
+Parameters: C<req> is a C<Request>. Returns: C<RouteMatch> or C<null>.
+Finds the first route matching the request path, requirements, and HTTP
+method.
+
+=item * C<dispatch(request_or_env)>
+
+Parameters: C<request_or_env> is a C<Request> or environment C<Dict>.
+Returns: C<Array>. Dispatches to the matching action and returns a raw
+C<[ status, headers, body ]> response array. It returns C<404> when no
+route matches and C<405> when only the method is wrong.
+
+=back
+
+=head2 C<Routes>
+
+C<Routes> is the root route node. It inherits the C<Route> methods and
+adds router-wide placeholder type and condition registries.
+
+=over
+
+=item * C<add_type(name, constraint)>
+
+Parameters: C<name> is a C<String>; C<constraint> is a C<Regexp>,
+C<Array>, C<Function>, or comparable value. Returns: C<Routes>. Adds a
+named placeholder type for route patterns such as C<< <id:num> >>.
+
+=item * C<route_types()>
+
+Parameters: none. Returns: C<Dict>. Returns the root router's named
+placeholder type registry. C<num> is registered by default.
+
+=item * C<add_condition(name, condition)>
+
+Parameters: C<name> is a C<String>; C<condition> is any value. Returns:
+C<Routes>. Stores a named condition for application use.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/web >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/internals import load_module;
+from std/cache/lru import Cache;
+from std/data/json import JSON;
+from std/net/url import escape, unescape;
+from std/string import index, join, replace, split, substr;
+from std/template/z import ZTemplate;
+from std/template/zz import ZZTemplate;
+
+
+let _response_template_cache := new Cache( capacity: 64 );
+let _response_json := new JSON();
+let _session_handler := null;
+
+function _s ( value ) {
+	return value ≡ null ? "" : "" _ value;
+}
+
+function _trim_slashes ( String path ) {
+	let out := path;
+	while ( length out > 1 and substr( out, length out - 1, 1 ) ≡ "/" ) {
+		out := substr( out, 0, length out - 1 );
+	}
+	return out;
+}
+
+function _path_segments ( pathish ) {
+	let path := _s(pathish);
+	path := "/" if path ≡ "";
+	path := _trim_slashes(path);
+	path := substr( path, 1 ) if substr( path, 0, 1 ) ≡ "/";
+	return [] if path ≡ "";
+	return split( path, "/" );
+}
+
+function _decode_form_part ( part ) {
+	return unescape( replace( _s(part), /\+/, " ", "g" ) );
+}
+
+function _parse_params ( query ) {
+	let params := new PairList();
+	let text := _s(query);
+	return params if text ≡ "";
+
+	for ( let piece in split( text, "&" ) ) {
+		next if piece ≡ "";
+		let eqpos := index( piece, "=" );
+		let key;
+		let value;
+		if ( eqpos < 0 ) {
+			key := _decode_form_part(piece);
+			value := "";
+		}
+		else {
+			key := _decode_form_part( substr( piece, 0, eqpos ) );
+			value := _decode_form_part( substr( piece, eqpos + 1 ) );
+		}
+		params.add( key, value );
+	}
+
+	return params;
+}
+
+function _parse_cookie_header ( text ) {
+	let cookies := {};
+	for ( let part in split( _s(text), ";" ) ) {
+		let piece := part;
+		while ( length piece > 0 and substr( piece, 0, 1 ) ≡ " " ) {
+			piece := substr( piece, 1 );
+		}
+		let eqpos := index( piece, "=" );
+		next if eqpos <= 0;
+		cookies.set(
+			substr( piece, 0, eqpos ),
+			_decode_form_part( substr( piece, eqpos + 1 ) ),
+		);
+	}
+	return cookies;
+}
+
+function _header_name ( name ) {
+	return lc( _s(name) );
+}
+
+function _headers_from ( value ) {
+	let headers := new PairList();
+	if ( value ≡ null ) {
+		return headers;
+	}
+
+	if ( value instanceof PairList ) {
+		for ( let p in value.enumerate() ) {
+			headers.add( _s( p.key ), _s( p.value ) );
+		}
+		return headers;
+	}
+
+	if ( value instanceof Dict ) {
+		for ( let p in value.enumerate() ) {
+			headers.add( _s( p.key ), _s( p.value ) );
+		}
+		return headers;
+	}
+
+	die "headers must be a PairList or Dict";
+}
+
+function _header_get_all ( PairList headers, name ) {
+	let wanted := _header_name(name);
+	let out := [];
+	for ( let p in headers.enumerate() ) {
+		if ( _header_name( p.key ) ≡ wanted ) {
+			out.push( p.value );
+		}
+	}
+	return out;
+}
+
+function _header_get ( PairList headers, name, fallback := null ) {
+	let all := _header_get_all( headers, name );
+	return all.length() ? all[0] : fallback;
+}
+
+function _header_remove ( PairList headers, name ) {
+	let wanted := _header_name(name);
+	headers.remove( fn p -> _header_name( p.key ) ≡ wanted );
+}
+
+function _looks_like_response_array ( value ) {
+	return (
+		value instanceof Array and
+		value.length() = 3 and
+		value[0] instanceof Number
+	);
+}
+
+function _dict_copy ( value ) {
+	let out := {};
+	if ( value instanceof Dict or value instanceof PairList ) {
+		for ( let p in value.enumerate() ) {
+			out.set( p.key, p.value );
+		}
+	}
+	return out;
+}
+
+function _response_template ( template ) {
+	from std/io try import Path;
+
+	function _response_template_cache_key ( path_obj ) {
+		let canonical := path_obj.realpath();
+		if ( canonical ≡ null ) {
+			canonical := path_obj.absolute();
+		}
+		if ( canonical ≡ null ) {
+			return path_obj.to_String;
+		}
+		if ( canonical instanceof Path ) {
+			return canonical.to_String;
+		}
+		return "" _ canonical;
+	}
+
+	if ( Path ≡ null ) {
+		return template;
+	}
+
+	if ( template instanceof Path ) {
+		let path_obj := template;
+		return _response_template_cache.get(
+			_response_template_cache_key(path_obj),
+			fn key -> new ZZTemplate( file: path_obj ),
+		);
+	}
+	return template;
+}
+
+trait SessionHandler {
+	method session_for ( request ) {
+		die "SessionHandler.session_for is not implemented";
+	}
+}
+
+trait Session {
+	method finalize () {
+		die "Session.finalize is not implemented";
+	}
+
+	method is_finalized () {
+		die "Session.is_finalized is not implemented";
+	}
+
+	method id () {
+		die "Session.id is not implemented";
+	}
+
+	method age () {
+		die "Session.age is not implemented";
+	}
+
+	method cookie_name () {
+		die "Session.cookie_name is not implemented";
+	}
+
+	method cookie_value () {
+		die "Session.cookie_value is not implemented";
+	}
+
+	method cookie_options () {
+		die "Session.cookie_options is not implemented";
+	}
+}
+
+class Response {
+	let Number status := 200;
+	let headers := null;
+	let body := [];
+	let session := null;
+	let Dict cookies := {};
+	let Number _status := 200;
+	let PairList _headers := new PairList();
+	let _body := [];
+	let _session := null;
+	let Dict _cookies := {};
+	let Boolean _session_cookie_set := false;
+
+	method __build__ () {
+		_status := status;
+		_headers := _headers_from(headers);
+		_body := body;
+		_session := session;
+		_cookies := cookies;
+	}
+
+	method status ( value? ) {
+		if ( value ≢ null ) {
+			_status := value;
+		}
+		return _status;
+	}
+
+	method code ( value? ) {
+		return self.status(value);
+	}
+
+	method headers ( value? ) {
+		if ( value ≢ null ) {
+			_headers := _headers_from(value);
+		}
+		return _headers;
+	}
+
+	method header ( name, value? ) {
+		if ( value ≢ null ) {
+			_header_remove( _headers, name );
+			_headers.add( _s(name), _s(value) );
+			return self;
+		}
+		return _header_get( _headers, name );
+	}
+
+	method body ( value? ) {
+		if ( value ≢ null ) {
+			_body := value;
+		}
+		return _body;
+	}
+
+	method content ( value? ) {
+		return self.body(value);
+	}
+
+	method render ( template, data := {} ) {
+		let renderer := _response_template(template);
+		_body := renderer.process(data);
+		return self;
+	}
+
+	method render_json ( data ) {
+		_body := _response_json.encode(data);
+		self.content_type("application/json; charset=UTF-8");
+		return self;
+	}
+
+	method session ( value? ) {
+		if ( value ≢ null ) {
+			_session := value;
+			_session_cookie_set := false;
+			return self;
+		}
+		return _session;
+	}
+
+	method content_type ( value? ) {
+		return value ≡ null
+			? self.header("Content-Type")
+			: self.header( "Content-Type", value );
+	}
+
+	method content_length ( value? ) {
+		return value ≡ null
+			? self.header("Content-Length")
+			: self.header( "Content-Length", value );
+	}
+
+	method content_encoding ( value? ) {
+		return value ≡ null
+			? self.header("Content-Encoding")
+			: self.header( "Content-Encoding", value );
+	}
+
+	method location ( value? ) {
+		return value ≡ null
+			? self.header("Location")
+			: self.header( "Location", value );
+	}
+
+	method redirect ( url, status := 302 ) {
+		_status := status;
+		self.location(url);
+		return self;
+	}
+
+	method cookies () {
+		return _cookies;
+	}
+
+	method set_cookie ( name, value, options := {} ) {
+		let cookie := escape(name) _ "=" _ escape(value);
+		if ( options instanceof Dict ) {
+			for ( let key in [ "Path", "Domain", "Expires", "Max-Age" ] ) {
+				if ( options.exists(key) ) {
+					cookie _= "; " _ key _ "=" _ options.get(key);
+				}
+			}
+			cookie _= "; HttpOnly" if options.get( "HttpOnly", false );
+			cookie _= "; Secure" if options.get( "Secure", false );
+			cookie _= "; SameSite=" _ options.get("SameSite")
+				if options.exists("SameSite");
+		}
+		_cookies.set( name, value );
+		_headers.add( "Set-Cookie", cookie );
+		return self;
+	}
+
+	method _finalize_session () {
+		return self if _session ≡ null or _session_cookie_set;
+		_session := _session.finalize() unless _session.is_finalized();
+		self.set_cookie(
+			_session.cookie_name(),
+			_session.cookie_value(),
+			_session.cookie_options(),
+		);
+		_session_cookie_set := true;
+		return self;
+	}
+
+	method finalize () {
+		self._finalize_session();
+		return [ _status, _headers, _body ];
+	}
+}
+
+class Request {
+	let Dict env := {};
+	let Dict _captures := {};
+	let Dict _stash := {};
+	let _route := null;
+	let _query_parameters := null;
+	let _body_parameters := null;
+	let _parameters := null;
+	let _cookies := null;
+	let _session := null;
+	let Boolean _session_loaded := false;
+
+	static method set_session_handler ( handler ) {
+		_session_handler := handler;
+		return handler;
+	}
+
+	static method get_session_handler () {
+		return _session_handler;
+	}
+
+	method set_route_match ( captures, route ) {
+		_captures := captures ≡ null ? {} : captures;
+		_stash := _dict_copy(_captures);
+		_route := route;
+		return self;
+	}
+
+	method env () {
+		return env;
+	}
+
+	method captures () {
+		return _captures;
+	}
+
+	method stash () {
+		return _stash;
+	}
+
+	method route () {
+		return _route;
+	}
+
+	method address () {
+		return env.get( "remote_addr", null );
+	}
+
+	method remote_host () {
+		return env.get( "remote_host", self.address() );
+	}
+
+	method request_method () {
+		return env.get( "method", "" );
+	}
+
+	method protocol () {
+		return env.get( "protocol", env.get( "server_protocol", "HTTP/1.1" ) );
+	}
+
+	method request_uri () {
+		let raw := env.get( "request_uri", null );
+		return raw if raw ≢ null;
+		let qs := self.query_string();
+		return self.raw_path() _ ( qs ≡ "" ? "" : "?" _ qs );
+	}
+
+	method path_info () {
+		return env.get( "path", "" );
+	}
+
+	method path () {
+		let p := self.path_info();
+		return p ≡ "" ? "/" : p;
+	}
+
+	method raw_path () {
+		return env.get( "raw_path", self.path() );
+	}
+
+	method query_string () {
+		return env.get( "query_string", "" );
+	}
+
+	method script_name () {
+		return env.get( "script_name", "" );
+	}
+
+	method scheme () {
+		return env.get( "scheme", "http" );
+	}
+
+	method secure () {
+		return self.scheme() ≡ "https";
+	}
+
+	method body () {
+		return env.get( "body", null );
+	}
+
+	method input () {
+		return self.body();
+	}
+
+	method content () {
+		return self.body();
+	}
+
+	method raw_body () {
+		return self.body();
+	}
+
+	method body_text () {
+		return env.get( "body_text", null );
+	}
+
+	method user () {
+		return env.get( "remote_user", null );
+	}
+
+	method session () {
+		let handler := Request.get_session_handler();
+		return env.get( "session", null ) if handler ≡ null;
+		if ( not _session_loaded ) {
+			_session := handler.session_for(self);
+			_session_loaded := true;
+		}
+		return _session;
+	}
+
+	method session_options () {
+		return env.get( "session_options", null );
+	}
+
+	method logger () {
+		return env.get( "logger", null );
+	}
+
+	method headers () {
+		return env.get( "headers", new PairList() );
+	}
+
+	method header ( name ) {
+		return _header_get( self.headers(), name );
+	}
+
+	method content_type () {
+		return self.header("Content-Type");
+	}
+
+	method content_length () {
+		return self.header("Content-Length");
+	}
+
+	method content_encoding () {
+		return self.header("Content-Encoding");
+	}
+
+	method referer () {
+		return self.header("Referer");
+	}
+
+	method user_agent () {
+		return self.header("User-Agent");
+	}
+
+	method cookies () {
+		if ( _cookies ≡ null ) {
+			_cookies := _parse_cookie_header( self.header( "Cookie" ) );
+		}
+		return _cookies;
+	}
+
+	method query_parameters () {
+		if ( _query_parameters ≡ null ) {
+			_query_parameters := _parse_params( self.query_string() );
+		}
+		return _query_parameters;
+	}
+
+	method body_parameters () {
+		if ( _body_parameters ≡ null ) {
+			let ct := _s( self.content_type() );
+			_body_parameters := new PairList();
+			if (
+				self.body_text() ≢ null and
+				index( lc(ct), "application/x-www-form-urlencoded" ) = 0
+			) {
+				_body_parameters := _parse_params( self.body_text() );
+			}
+		}
+		return _body_parameters;
+	}
+
+	method parameters () {
+		if ( _parameters ≡ null ) {
+			_parameters := new PairList();
+			for ( let p in self.query_parameters().enumerate() ) {
+				_parameters.add( p.key, p.value );
+			}
+			for ( let p in self.body_parameters().enumerate() ) {
+				_parameters.add( p.key, p.value );
+			}
+			for ( let p in _captures.enumerate() ) {
+				_parameters.add( p.key, p.value );
+			}
+		}
+		return _parameters;
+	}
+
+	method param ( name? ) {
+		if ( name ≡ null ) {
+			return self.parameters().keys();
+		}
+		return self.parameters().get(name);
+	}
+
+	method uploads () {
+		return env.get( "uploads", new PairList() );
+	}
+
+	method upload ( name? ) {
+		if ( name ≡ null ) {
+			return self.uploads().keys();
+		}
+		return self.uploads().get(name);
+	}
+
+	method uri () {
+		let qs := self.query_string();
+		return (
+			self.scheme() _ "://" _
+			env.get( "host", env.get( "server_name", "" ) ) _
+			self.raw_path() _
+			( qs ≡ "" ? "" : "?" _ qs )
+		);
+	}
+
+	method base () {
+		return (
+			self.scheme() _ "://" _
+			env.get( "host", env.get( "server_name", "" ) ) _
+			self.script_name()
+		);
+	}
+
+	method new_response ( ... Array args, PairList named ) {
+		let status := args.length() > 0 ? args[0] : named.get( "status", 200 );
+		let headers := args.length() > 1 ? args[1] : named.get( "headers", null );
+		let body := args.length() > 2 ? args[2] : named.get( "body", null );
+		return new Response(
+			status: status,
+			headers: headers,
+			body: body,
+			session: named.get( "session", null ),
+		);
+	}
+}
+
+function _method_allowed ( Array methods, String method_name ) {
+	return true if methods.empty();
+	let m := uc(method_name);
+	m := "GET" if m ≡ "HEAD";
+	for ( let allowed in methods ) {
+		return true if uc(allowed) ≡ m;
+	}
+	return false;
+}
+
+function _regexp_match ( value, expected ) {
+	if ( typeof expected ≡ "Regexp" ) {
+		return _s(value) ~ expected;
+	}
+	if ( expected instanceof Array ) {
+		return expected.any( fn x -> _s(x) ≡ _s(value) );
+	}
+	if ( expected instanceof Function ) {
+		return expected(value);
+	}
+	return _s(value) ≡ _s(expected);
+}
+
+function _default_route_name ( pattern ) {
+	let parts := _path_segments(pattern);
+	return "root" if parts.empty();
+	return join( "_", parts.map( fn p -> replace( p, /^[:#*<]+|>$/g, "" ) ) );
+}
+
+function _parse_route_segment ( seg ) {
+	if ( substr( seg, 0, 1 ) ≡ ":" ) {
+		return {
+			kind: "placeholder",
+			name: substr( seg, 1 ),
+			style: "standard",
+			type: null,
+		};
+	}
+	if ( substr( seg, 0, 1 ) ≡ "#" ) {
+		return {
+			kind: "placeholder",
+			name: substr( seg, 1 ),
+			style: "relaxed",
+			type: null,
+		};
+	}
+	if ( substr( seg, 0, 1 ) ≡ "*" ) {
+		return {
+			kind: "placeholder",
+			name: substr( seg, 1 ),
+			style: "wildcard",
+			type: null,
+		};
+	}
+	if (
+		substr( seg, 0, 1 ) ≡ "<" and
+		substr( seg, length seg - 1, 1 ) ≡ ">"
+	) {
+		let inner := substr( seg, 1, length seg - 2 );
+		let style := "standard";
+		if ( substr( inner, 0, 1 ) ≡ ":" ) {
+			inner := substr( inner, 1 );
+		}
+		else if ( substr( inner, 0, 1 ) ≡ "#" ) {
+			style := "relaxed";
+			inner := substr( inner, 1 );
+		}
+		else if ( substr( inner, 0, 1 ) ≡ "*" ) {
+			style := "wildcard";
+			inner := substr( inner, 1 );
+		}
+		let colon := index( inner, ":" );
+		let ptype := null;
+		if ( colon >= 0 ) {
+			ptype := substr( inner, colon + 1 );
+			inner := substr( inner, 0, colon );
+		}
+		return {
+			kind: "placeholder",
+			name: inner,
+			style: style,
+			type: ptype,
+		};
+	}
+	return { kind: "literal", text: seg };
+}
+
+function _parse_route_pattern ( pattern ) {
+	let out := [];
+	for ( let seg in _path_segments(pattern) ) {
+		let part := _parse_route_segment(seg);
+		out.push(part);
+	}
+	return out;
+}
+
+function _placeholder_ok ( part, value, types ) {
+	return false if value ≡ "";
+	if ( part{style} ≡ "standard" and index( value, "." ) >= 0 ) {
+		return false;
+	}
+	if ( part{type} ≢ null ) {
+		return false unless types.exists( part{type} );
+		return false unless _regexp_match( value, types.get( part{type} ) );
+	}
+	return true;
+}
+
+function _match_parts ( parts, pi, segs, si, captures, types ) {
+	if ( pi >= parts.length() ) {
+		return { position: si, captures: captures };
+	}
+	return null if si > segs.length();
+
+	let part := parts[pi];
+	if ( part{kind} ≡ "literal" ) {
+		return null if si >= segs.length();
+		return null if unescape( segs[si] ) ≢ part{text};
+		return _match_parts( parts, pi + 1, segs, si + 1, captures, types );
+	}
+
+	if ( part{style} ≡ "wildcard" ) {
+		let end := segs.length();
+		while ( end >= si ) {
+			let copy := _dict_copy(captures);
+			let captured := [];
+			let i := si;
+			while ( i < end ) {
+				captured.push( unescape( segs[i] ) );
+				i++;
+			}
+			copy.set( part{name}, join( "/", captured ) );
+			let matched := _match_parts( parts, pi + 1, segs, end, copy, types );
+			return matched if matched ≢ null;
+			end--;
+		}
+		return null;
+	}
+
+	return null if si >= segs.length();
+	let value := unescape( segs[si] );
+	return null if not _placeholder_ok( part, value, types );
+	let copy := _dict_copy(captures);
+	copy.set( part{name}, value );
+	return _match_parts( parts, pi + 1, segs, si + 1, copy, types );
+}
+
+function _split_controller_string ( spec ) {
+	let hash := index( spec, "#" );
+	die "controller string must be module#ClassName" if hash <= 0;
+	let module := substr( spec, 0, hash );
+	let name := substr( spec, hash + 1 );
+	die "invalid controller module name"
+		unless module ~ /^[A-Za-z_][A-Za-z0-9_]*(\/[A-Za-z_][A-Za-z0-9_]*)*$/;
+	die "invalid controller class name"
+		unless name ~ /^[A-Za-z_][A-Za-z0-9_]*$/;
+	return { module: module, class: name, controller: spec, action: null };
+}
+
+function _response_value ( value ) {
+	return value.finalize() if value instanceof Response;
+	return value if _looks_like_response_array(value);
+	return new Response( status: 204, body: [] ).finalize() if value ≡ null;
+	return new Response( status: 200, body: value ).finalize();
+}
+
+class RouteMatch {
+	let route := null;
+	let captures := {};
+	let Number position := 0;
+}
+
+class Route {
+	let _root := null;
+	let _parent := null;
+	let Array _children := [];
+	let Array _methods := [];
+	let String _pattern := "/";
+	let Array _parts := [];
+	let Dict _defaults := {};
+	let Dict _requires := {};
+	let _target_action := null;
+	let _target_controller := null;
+	let _target_module := null;
+	let _target_class := null;
+	let _loaded_controller := null;
+	let String _name := "";
+	let Boolean _custom_name := false;
+	let Boolean _inline := false;
+
+	method __build__ () {
+		_root := self if _root ≡ null;
+		_parent := null if _parent ≡ self;
+		_parts := _parse_route_pattern(_pattern);
+		_name := _default_route_name(_pattern) if _name ≡ "";
+	}
+
+	method root () {
+		return _root;
+	}
+
+	method route_types () {
+		return {};
+	}
+
+	method parent () {
+		return _parent;
+	}
+
+	method children () {
+		return _children;
+	}
+
+	method pattern () {
+		return _pattern;
+	}
+
+	method methods ( ... Array args ) {
+		if ( args.length() > 0 ) {
+			_methods := [];
+			let raw := args[0];
+			if ( raw instanceof Array ) {
+				for ( let m in raw ) {
+					_methods.push( uc(_s(m)) );
+				}
+			}
+			else {
+				for ( let m in args ) {
+					_methods.push( uc(_s(m)) );
+				}
+			}
+			return self;
+		}
+		return _methods;
+	}
+
+	method name ( value? ) {
+		if ( value ≢ null ) {
+			_name := _s(value);
+			_custom_name := true;
+			return self;
+		}
+		return _name;
+	}
+
+	method has_custom_name () {
+		return _custom_name;
+	}
+
+	method inline ( value? ) {
+		if ( value ≢ null ) {
+			_inline := value ? true : false;
+			return self;
+		}
+		return _inline;
+	}
+
+	method add_child ( Route route ) {
+		route._detach();
+		route._set_parent(self);
+		_children.push(route);
+		return route;
+	}
+
+	method remove () {
+		self._detach();
+		return self;
+	}
+
+	method _detach () {
+		if ( _parent ≢ null ) {
+			_parent.children().remove( fn r -> r ≡ self );
+			_parent := null;
+		}
+		return self;
+	}
+
+	method _set_parent ( parent ) {
+		_parent := parent;
+		_root := parent.root();
+		return self;
+	}
+
+	method any ( ... Array args, PairList named ) {
+		return self._add_route( [], args, named, false );
+	}
+
+	method get ( ... Array args, PairList named ) {
+		return self._add_route( [ "GET" ], args, named, false );
+	}
+
+	method post ( ... Array args, PairList named ) {
+		return self._add_route( [ "POST" ], args, named, false );
+	}
+
+	method put ( ... Array args, PairList named ) {
+		return self._add_route( [ "PUT" ], args, named, false );
+	}
+
+	method patch ( ... Array args, PairList named ) {
+		return self._add_route( [ "PATCH" ], args, named, false );
+	}
+
+	method delete ( ... Array args, PairList named ) {
+		return self._add_route( [ "DELETE" ], args, named, false );
+	}
+
+	method options ( ... Array args, PairList named ) {
+		return self._add_route( [ "OPTIONS" ], args, named, false );
+	}
+
+	method head ( ... Array args, PairList named ) {
+		return self._add_route( [ "HEAD" ], args, named, false );
+	}
+
+	method under ( ... Array args, PairList named ) {
+		return self._add_route( [], args, named, true );
+	}
+
+	method _add_route ( methods, args, named, inline ) {
+		let route := new Route(
+			_root: self.root(),
+			_pattern: "/",
+			_methods: methods,
+			_inline: inline,
+		);
+		let i := 0;
+		if ( args.length() > 0 and args[0] instanceof Array ) {
+			route.methods(args[0]);
+			i := 1;
+		}
+		if ( i < args.length() and args[i] instanceof String ) {
+			route.parse(args[i]);
+			i++;
+		}
+		while ( i < args.length() ) {
+			let item := args[i];
+			if ( item instanceof Dict or item instanceof PairList ) {
+				route.to(item);
+			}
+			else if ( item instanceof Array ) {
+				route._apply_require_array(item);
+			}
+			else if ( item instanceof Function ) {
+				route.to( action: item );
+			}
+			else if ( item instanceof String ) {
+				route.name(item);
+			}
+			i++;
+		}
+		route.requires(named) unless named.empty();
+		self.add_child(route);
+		return route;
+	}
+
+	method parse ( pattern, ... PairList named ) {
+		_pattern := _s(pattern);
+		_parts := _parse_route_pattern(_pattern);
+		_name := _default_route_name(_pattern) unless _custom_name;
+		self.requires(named) unless named.empty();
+		return self;
+	}
+
+	method requires ( value? ... PairList named ) {
+		if ( value ≢ null ) {
+			if ( value instanceof Array ) {
+				self._apply_require_array(value);
+			}
+			else if ( value instanceof Dict or value instanceof PairList ) {
+				for ( let p in value.enumerate() ) {
+					_requires.set( p.key, p.value );
+				}
+			}
+			else {
+				die "requires expects a Dict, PairList, or Array";
+			}
+		}
+		for ( let p in named.enumerate() ) {
+			_requires.set( p.key, p.value );
+		}
+		return self;
+	}
+
+	method _apply_require_array ( Array pairs ) {
+		let i := 0;
+		while ( i + 1 < pairs.length() ) {
+			_requires.set( pairs[i], pairs[ i + 1 ] );
+			i += 2;
+		}
+		return self;
+	}
+
+	method to ( value? ... PairList named ) {
+		if ( value ≢ null ) {
+			if ( value instanceof String and index( value, "#" ) >= 0 ) {
+				let parsed := _split_controller_string(value);
+				named.add( "controller", parsed{controller} );
+				named.add( "action", parsed{action} );
+			}
+			else if ( value instanceof Dict or value instanceof PairList ) {
+				for ( let p in value.enumerate() ) {
+					named.add( p.key, p.value );
+				}
+			}
+			else if ( value instanceof Function ) {
+				named.add( "action", value );
+			}
+			else {
+				named.add( "controller", value );
+			}
+		}
+
+		for ( let p in named.enumerate() ) {
+			if ( p.key ≡ "action" ) {
+				_target_action := p.value;
+			}
+			else if ( p.key ≡ "controller" ) {
+				self._set_controller(p.value);
+			}
+			else {
+				_defaults.set( p.key, p.value );
+			}
+		}
+
+		return self;
+	}
+
+	method _set_controller ( value ) {
+		if ( value instanceof String and index( value, "#" ) >= 0 ) {
+			let parsed := _split_controller_string(value);
+			_target_module := parsed{module};
+			_target_class := parsed{class};
+			_target_controller := null;
+			_loaded_controller := null;
+		}
+		else {
+			_target_controller := value;
+			_target_module := null;
+			_target_class := null;
+			_loaded_controller := null;
+		}
+		return self;
+	}
+
+	method _controller () {
+		return _target_controller if _target_controller ≢ null;
+		return _loaded_controller if _loaded_controller ≢ null;
+		return null if _target_module ≡ null;
+		_loaded_controller := load_module( _target_module, _target_class );
+		return _loaded_controller;
+	}
+
+	method is_endpoint () {
+		return _target_action ≢ null or _target_controller ≢ null
+			or _target_module ≢ null;
+	}
+
+	method render ( values := {} ) {
+		let data := _dict_copy(_defaults);
+		for ( let p in values.enumerate() ) {
+			data.set( p.key, p.value );
+		}
+		let parts := [];
+		for ( let part in _parts ) {
+			if ( part{kind} ≡ "literal" ) {
+				parts.push( part{text} );
+			}
+			else if ( data.exists( part{name} ) ) {
+				parts.push( escape( data.get( part{name} ) ) );
+			}
+		}
+		return "/" _ join( "/", parts );
+	}
+
+	method find ( String wanted ) {
+		return self if _name ≡ wanted;
+		for ( let child in _children ) {
+			let found := child.find(wanted);
+			return found if found ≢ null;
+		}
+		return null;
+	}
+
+	method lookup ( String wanted ) {
+		return self.find(wanted);
+	}
+
+	method match ( Request req ) {
+		let segs := _path_segments( req.path() );
+		return self._dispatch_match( req, segs, 0, {} );
+	}
+
+	method dispatch ( request_or_env ) {
+		let req := request_or_env instanceof Request
+			? request_or_env
+			: new Request( env: request_or_env );
+		let matched := self.match(req);
+		if ( matched ≢ null ) {
+			req.set_route_match( matched{captures}, matched{route} );
+			return _response_value( matched{route}._run(req) );
+		}
+
+		let allowed := self._allowed_methods_for(req);
+		if ( allowed.length() > 0 ) {
+			return new Response(
+				status: 405,
+				headers: { Allow: join( ", ", allowed ) },
+				body: [ "Method Not Allowed\n" ],
+			).finalize();
+		}
+
+		return new Response(
+			status: 404,
+			headers: { "Content-Type": "text/plain; charset=UTF-8" },
+			body: [ "Not Found\n" ],
+		).finalize();
+	}
+
+	method _run ( Request req ) {
+		if ( _target_action instanceof Function ) {
+			return _target_action(req);
+		}
+
+		let controller := self._controller();
+		if ( controller ≡ null ) {
+			die "Route has no controller or action";
+		}
+		if ( not( _target_action instanceof String ) ) {
+			die "Route controller target requires a string action";
+		}
+		return controller.(_target_action)(req);
+	}
+
+	method _dispatch_match ( req, segs, pos, stash ) {
+		for ( let child in _children ) {
+			let local := _dict_copy(stash);
+			let child_match := child._match_self( req, segs, pos, local, false );
+			next if child_match ≡ null;
+
+			if ( child.inline() and child.is_endpoint() ) {
+				req.set_route_match( child_match{captures}, child );
+				next if not child._run(req);
+			}
+
+			let nested := child._dispatch_match(
+				req,
+				segs,
+				child_match{position},
+				child_match{captures},
+			);
+			return nested if nested ≢ null;
+
+			if (
+				child.is_endpoint() and
+				child_match{position} = segs.length() and
+				_method_allowed( child.methods(), req.request_method() )
+			) {
+				child_match{route} := child;
+				return child_match;
+			}
+		}
+		return null;
+	}
+
+	method _match_self ( req, segs, pos, captures, ignore_method ) {
+		let part_match := _match_parts(
+			_parts,
+			0,
+			segs,
+			pos,
+			captures,
+			self.root().route_types(),
+		);
+		return null if part_match ≡ null;
+		return null if not self._requirements_match( req, part_match{captures} );
+		return null if (
+			not ignore_method and
+			self.is_endpoint() and
+			not _method_allowed( _methods, req.request_method() )
+		);
+		for ( let p in _defaults.enumerate() ) {
+			part_match{captures}.set( p.key, p.value )
+				unless part_match{captures}.exists( p.key );
+		}
+		return new RouteMatch(
+			route: self,
+			captures: part_match{captures},
+			position: part_match{position},
+		);
+	}
+
+	method _requirements_match ( req, captures ) {
+		for ( let p in _requires.enumerate() ) {
+			let value := captures.get( p.key, null );
+			if ( value ≡ null ) {
+				if ( p.key ≡ "method" ) {
+					value := req.request_method();
+				}
+				else if ( p.key ≡ "host" ) {
+					value := req.env().get( "host", "" );
+				}
+				else {
+					value := req.header(p.key);
+				}
+			}
+			return false if not _regexp_match( value, p.value );
+		}
+		return true;
+	}
+
+	method _allowed_methods_for ( req ) {
+		let segs := _path_segments( req.path() );
+		let methods := [];
+		self._collect_allowed_methods( req, segs, 0, {}, methods );
+		return methods;
+	}
+
+	method _collect_allowed_methods ( req, segs, pos, stash, methods ) {
+		for ( let child in _children ) {
+			let local := _dict_copy(stash);
+			let child_match := child._match_self( req, segs, pos, local, true );
+			next if child_match ≡ null;
+			child._collect_allowed_methods(
+				req,
+				segs,
+				child_match{position},
+				child_match{captures},
+				methods,
+			);
+			if ( child.is_endpoint() and child_match{position} = segs.length() ) {
+				for ( let m in child.methods() ) {
+					methods.push(m) unless m ∈ methods;
+				}
+			}
+		}
+		return methods;
+	}
+}
+
+class Routes extends Route {
+	let Dict _types := {};
+	let Dict _conditions := {};
+
+	method __build__ () {
+		super();
+		_types.set( "num", /^[0-9]+$/ );
+	}
+
+	method add_type ( name, constraint ) {
+		_types.set( name, constraint );
+		return self;
+	}
+
+	method route_types () {
+		return _types;
+	}
+
+	method add_condition ( name, condition ) {
+		_conditions.set( name, condition );
+		return self;
+	}
+}

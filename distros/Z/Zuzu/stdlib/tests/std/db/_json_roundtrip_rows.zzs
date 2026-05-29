@@ -1,0 +1,37 @@
+from test/more import *;
+
+requires_capability( "db" );
+
+from std/data/json import JSON;
+from std/db import DB;
+
+let dbh := DB.temp();
+dbh.prepare( "create table users (id integer, name text)" ).execute();
+dbh.prepare( "insert into users (id, name) values (1, 'Ada')" ).execute();
+dbh.prepare( "insert into users (id, name) values (2, 'Bob')" ).execute();
+
+let read_q := dbh.prepare( "select id, name from users order by id" );
+read_q.execute();
+let rows := read_q.all_dict();
+
+let j := new JSON( canonical: true );
+let encoded := j.encode(rows);
+let decoded := j.decode(encoded);
+
+let out_db := DB.temp();
+out_db.prepare( "create table users_copy (id integer, name text)" ).execute();
+let ins := out_db.prepare( "insert into users_copy (id, name) values (?, ?)" );
+for ( let row in decoded ) {
+	ins.execute( row{id}, row{name} );
+}
+
+let out_q := out_db.prepare( "select id, name from users_copy order by id" );
+out_q.execute();
+let copied := out_q.all_dict();
+
+is( copied.length(), 2, "json decoded rows inserted into second db" );
+is( copied[0]{name}, "Ada", "first row name survives json roundtrip" );
+is( copied[1]{id}, 2, "second row id survives json roundtrip" );
+like( encoded, /Ada/, "encoded json contains row payload" );
+
+done_testing();

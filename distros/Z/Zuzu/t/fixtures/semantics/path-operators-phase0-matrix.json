@@ -1,0 +1,73 @@
+{
+	"version": 1,
+	"phase": 0,
+	"feature": "path-operators",
+	"notes": [
+		"Phase-0 discovery and contract-lock fixture inventory.",
+		"Cases are staged as placeholders before parser/runtime work."
+	],
+	"cases": [
+		{
+			"id": "special-props-lexical-inheritance",
+			"file": "special-props-lexical-inheritance.zzs",
+			"mode": "result",
+			"expected": "TODO"
+		},
+		{
+			"id": "special-props-shadowing",
+			"file": "special-props-shadowing.zzs",
+			"mode": "result",
+			"expected": "TODO"
+		},
+		{
+			"id": "special-props-missing-null",
+			"file": "special-props-missing-null.zzs",
+			"mode": "result",
+			"expected": "TODO"
+		},
+		{
+			"id": "path-op-string-coercion-default-class",
+			"file": "path-op-string-coercion-default-class.zzs",
+			"mode": "result",
+			"expected": "TODO"
+		},
+		{
+			"id": "path-op-object-coercion",
+			"file": "path-op-object-coercion.zzs",
+			"mode": "result",
+			"expected": "TODO"
+		},
+		{
+			"id": "path-op-return-contract",
+			"file": "path-op-return-contract.zzs",
+			"mode": "result",
+			"expected": "TODO"
+		},
+		{
+			"id": "path-op-parse-precedence-vs-regex-match",
+			"file": "path-op-parse-precedence-vs-regex-match.zzs",
+			"mode": "compile",
+			"expected": "TODO"
+		},
+		{
+			"id": "path-op-lvalue-allowed-at-and-atat",
+			"file": "path-op-lvalue-allowed-at-and-atat.zzs",
+			"mode": "compile",
+			"expected": "TODO"
+		},
+		{
+			"id": "path-op-lvalue-reject-atq",
+			"file": "path-op-lvalue-reject-atq.zzs",
+			"mode": "compile_error",
+			"expected_error_class": "CompileError",
+			"expected": "TODO"
+		},
+		{
+			"id": "path-op-invalid-path-type-errors",
+			"file": "path-op-invalid-path-type-errors.zzs",
+			"mode": "call_error",
+			"expected_error_class": "TypeException",
+			"expected": "TODO"
+		}
+	]
+}

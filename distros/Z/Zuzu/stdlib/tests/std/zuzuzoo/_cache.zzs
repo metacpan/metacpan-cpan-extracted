@@ -1,0 +1,109 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/archive import Archive;
+from std/io import Path;
+from std/zuzuzoo import Zuzuzoo;
+
+class FakeRequest {
+	let target_url := null;
+	let download_path := null;
+
+	method download_to ( path ) {
+		download_path := path;
+		return self;
+	}
+
+	method url () {
+		return target_url;
+	}
+
+	method path () {
+		return download_path;
+	}
+}
+
+class FakeResponse {
+	let final_url := null;
+
+	method expect_success () {
+		return self;
+	}
+
+	method url () {
+		return final_url;
+	}
+}
+
+class FakeUserAgent {
+	let payload := null;
+	let urls := [];
+
+	method build_request ( http_method, url ) {
+		urls.push(url);
+		return new FakeRequest( target_url: url );
+	}
+
+	method send ( request ) {
+		( new Path( request.path() ) ).spew(payload);
+		return new FakeResponse( final_url: request.url() _ "?final" );
+	}
+
+	method seen () {
+		return urls;
+	}
+}
+
+let archive_bytes := Archive.encode(
+	{
+		entries: [
+			{
+				path: "cache-app-1.0.0/zuzu-distribution.json",
+				data: to_binary(
+					"{\"name\":\"cache-app\",\"version\":\"1.0.0\"," _
+					"\"author\":\"Example\",\"license\":\"MIT\"}\n",
+				),
+			},
+		],
+	},
+	"zip",
+);
+
+let cache_dir := Path.tempdir();
+let url := "https://packages.example/cache-app.zip";
+let zoo := new Zuzuzoo();
+let first_ua := new FakeUserAgent( payload: archive_bytes );
+let first := zoo.fetch_source(
+	url,
+	{
+		user_agent: first_ua,
+		cache_dir: cache_dir.to_String(),
+	},
+);
+
+is( first{cache_hit}, false, "first cached fetch downloads" );
+is( first_ua.seen().length(), 1, "first cached fetch uses user agent" );
+ok( ( new Path( first{cache_sidecar} ) ).exists(), "cache sidecar exists" );
+
+let cached_archive := new Path(first{path});
+cached_archive.spew(to_binary("corrupt archive"));
+
+let second_ua := new FakeUserAgent( payload: archive_bytes );
+let second := zoo.fetch_source(
+	url,
+	{
+		user_agent: second_ua,
+		cache_dir: cache_dir.to_String(),
+	},
+);
+
+is( second{cache_hit}, false, "corrupt cache entry is redownloaded" );
+is( second_ua.seen().length(), 1, "redownload happens once" );
+is(
+	( new Path( second{path} ) ).slurp(),
+	archive_bytes,
+	"redownload replaces corrupt cached archive",
+);
+
+done_testing();

@@ -1,0 +1,24 @@
+from std/net/http import UserAgent;
+from std/net/url import fill_template, parse;
+from test/more import *;
+
+let ua := new UserAgent( timeout: 2 );
+let base := fill_template(
+	"https://example.com/search{?q,lang}",
+	{ q: "café", lang: "日本語" },
+);
+let parsed_base := parse(base);
+let qp := parsed_base.get( "query_params", {} );
+
+let req := ua.build_request( "GET", base );
+req.query( { city: "München", term: "naïve" } );
+let resp := await {
+	ua.send_async(req);
+};
+
+ok( qp.get( "q", null ) ≢ null, "url helper emits q query param" );
+ok( qp.get( "lang", null ) ≢ null, "url helper emits lang query param" );
+like( base, /%C3%A9|%E6%97%A5/, "url helper percent-encodes non-ASCII query bytes" );
+ok( resp.status() > 0, "request builder accepts query dict with unicode values" );
+
+done_testing();

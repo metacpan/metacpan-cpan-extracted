@@ -1,0 +1,112 @@
+from test/more import *;
+requires_capability( "fs" );
+requires_capability( "proc" );
+
+from std/data/toon import TOON;
+from std/data/json import JSON;
+from std/io import Path;
+from std/proc import Env;
+
+let fixture_json := new JSON( pairlists: true );
+
+function _opt ( opts, String key, fallback ) {
+	if ( opts ≡ null ) {
+		return fallback;
+	}
+	if ( typeof opts ≡ "PairList" ) {
+		return opts.has(key) ? opts.get(key) : fallback;
+	}
+	if ( typeof opts ≡ "Dict" ) {
+		return opts.exists(key) ? opts.get(key) : fallback;
+	}
+	return fallback;
+}
+
+function _new_codec ( opts ) {
+	return new TOON(
+		indent: _opt( opts, "indent", 2 ),
+		strict: _opt( opts, "strict", true ),
+		delimiter: _opt( opts, "delimiter", "," ),
+		pairlists: true,
+		expandPaths: _opt( opts, "expandPaths", "off" ),
+		keyFolding: _opt( opts, "keyFolding", "off" ),
+		flattenDepth: _opt( opts, "flattenDepth", 999999 ),
+	);
+}
+
+function _run_fixture_file ( path ) {
+	let doc := fixture_json.decode_binarystring( path.slurp() );
+	let category := doc.get("category");
+	let tests := doc.get("tests");
+	for ( const t in tests ) {
+		subtest( `${path.to_String} - ${t.get("name")}`, function () {
+			let opts := t.has("options") ? t.get("options") : null;
+			let codec := _new_codec( opts );
+			let should_error := t.has("shouldError") ? t.get("shouldError") : false;
+
+			if ( category eq "decode" ) {
+				if ( should_error ) {
+					let e := exception( function () {
+						codec.decode( t.get("input") );
+					} );
+					isnt( e, null, "exception thrown" );
+				}
+				else {
+					let e := exception( function () {
+						let got := codec.decode( t.get("input") );
+						is( got, t.get("expected"), "decoded correctly" );
+					} );
+					is( e, null, "no exception thrown" );
+				}
+			}
+			else {
+				if ( should_error ) {
+					let e := exception( function () {
+						codec.encode( t.get("input") );
+					} );
+					isnt( e, null, "exception thrown" );
+				}
+				else {
+					let e := exception( function () {
+						let got := codec.encode( t.get("input") );
+						is( got, t.get("expected"), "encoded correctly" );
+					} );
+					is( e, null, "no exception thrown" );
+				}
+			}
+		} );
+	}
+}
+
+let fixture_root_env := Env.get("FIXTURE_DIR");
+if ( fixture_root_env ≡ null or fixture_root_env eq "" ) {
+	skip_all( "FIXTURE_DIR is not set" );
+}
+let fixture_root := new Path(fixture_root_env);
+let decode_root := fixture_root.child("toon").child("decode");
+let encode_root := fixture_root.child("toon").child("encode");
+let files := Path.glob( decode_root.to_String() _ "/*.json", { nocheck: false } );
+let more_files := Path.glob( encode_root.to_String() _ "/*.json", { nocheck: false } );
+let mf := 0;
+while ( mf < more_files.length() ) {
+	files.push( more_files[mf] );
+	mf++;
+}
+files := files.sort( function ( a, b ) {
+	return a.basename() cmp b.basename();
+} );
+
+ok( files.length() > 0, "TOON fixture files found" );
+
+let j := 0;
+while ( j < files.length() ) {
+	try {
+		_run_fixture_file( files[j] );
+	}
+	catch {
+		diag( `Error for ${ files[j] }: ${e}` );
+	}
+	j++;
+}
+
+done_testing();

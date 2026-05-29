@@ -1,0 +1,549 @@
+=encoding utf8
+
+=head1 NAME
+
+std/path/z/evaluate - Pure Zuzu evaluator for ZPath expressions.
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module provides the pure-Zuzu evaluator used by ZPath.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<Evaluator>
+
+Pure-Zuzu evaluator for parsed ZPath AST values.
+
+=over
+
+=item C<< evaluator.operator_definitions() >>
+
+Parameters: none. Returns: C<Array>. Returns the active operator
+definition table.
+
+=item C<< evaluator.function_definitions() >>
+
+Parameters: none. Returns: C<Array>. Returns the active function
+definition table.
+
+=item C<< evaluator.eval_expr_wrap(ast, ctx) >>
+
+Parameters: C<ast> is an AST node and C<ctx> is a C<Ctx>. Returns:
+C<Array>. Evaluates with optional debug dumping.
+
+=item C<< evaluator.eval_expr(ast, ctx) >>
+
+Parameters: C<ast> is an AST node and C<ctx> is a C<Ctx>. Returns:
+C<Array>. Evaluates an expression to a node set.
+
+=item C<< evaluator.nested_ctx(ctx, ... PairList extras) >>
+
+Parameters: C<ctx> is a C<Ctx> or C<null> and C<extras> are metadata.
+Returns: C<Ctx> or C<null>. Creates a nested evaluation context.
+
+=item C<< evaluator.eval_binop(ast, ctx) >>, C<< evaluator.eval_unop(ast, ctx) >>
+
+Parameters: C<ast> is an operator AST node and C<ctx> is a C<Ctx>.
+Returns: C<Array>. Evaluates a binary or unary operator.
+
+=item C<< evaluator.eval_path(path_ast, ctx) >>
+
+Parameters: C<path_ast> is a path AST node and C<ctx> is a C<Ctx>.
+Returns: C<Array>. Evaluates a path expression to selected nodes.
+
+=item C<< evaluator.maybe_apply_action(node, ctx) >>
+
+Parameters: C<node> is a C<Node> and C<ctx> is a C<Ctx>. Returns:
+C<Node>. Applies any pending path action.
+
+=item C<< evaluator.eval_fn(fn_ast, ctx) >>
+
+Parameters: C<fn_ast> is a function-call AST node and C<ctx> is a
+C<Ctx>. Returns: C<Array>. Evaluates a ZPath function call.
+
+=item C<< evaluator.string_replace(string, pattern, replacement) >>
+
+Parameters: all arguments are strings or regex-like values. Returns:
+C<String>. Applies ZPath string replacement.
+
+=item C<< evaluator.dedup_nodes(nodes) >>
+
+Parameters: C<nodes> is an array of nodes. Returns: C<Array>. Removes
+duplicate nodes while preserving order.
+
+=item C<< evaluator.truthy(n) >>
+
+Parameters: C<n> is a node or value. Returns: C<Boolean>. Applies ZPath
+truthiness.
+
+=item C<< evaluator.to_number(n) >>, C<< evaluator.to_string(n) >>
+
+Parameters: C<n> is a node or value. Returns: C<Number> or C<String>.
+Coerces a ZPath value.
+
+=item C<< evaluator.equals(a, b) >>
+
+Parameters: C<a> and C<b> are nodes or values. Returns: C<Boolean>.
+Compares two ZPath values.
+
+=back
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/path/z/evaluate >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/string import replace, index, substr;
+from std/path/z/node import Node;
+from std/path/z/functions import STANDARD_FUNCTIONS;
+from std/path/z/operators import STANDARD_OPERATORS;
+
+let _do_dump := false;
+
+class Evaluator {
+	let _operator_definitions;
+	let _function_definitions;
+	
+	let ε := 0.000000001;
+	
+	method operator_definitions () {
+		_operator_definitions ?:= STANDARD_OPERATORS;
+		return _operator_definitions;
+	}
+	
+	method function_definitions () {
+		_function_definitions ?:= STANDARD_FUNCTIONS;
+		return _function_definitions;
+	}
+	
+	method eval_expr_wrap ( ast, ctx ) {
+		from std/dump import Dumper;
+		let got := self._real_eval_expr ( ast, ctx );
+		say `AST ${Dumper.dump(ast)} CTX ${Dumper.dump(ctx)} ⇒ GOT ${Dumper.dump(got)}` if _do_dump;
+		return got;
+	}
+	
+	method eval_expr ( ast, ctx ) {
+		
+		switch ( ast{t} : eq ) {
+			case "num":
+				return [ Node.wrap( ast{v} ) ];
+			case "str":
+				return [ Node.wrap( ast{v} ) ];
+			case "path":
+				return self.eval_path( ast, ctx );
+			case "fn":
+				return self.eval_fn( ast, ctx );
+			case "un":
+				return self.eval_unop( ast, ctx );
+			case "bin":
+				return self.eval_binop( ast, ctx );
+			case "ternary":
+				let c  := self.eval_expr( ast{c}, ctx );
+				let ab := self.truthy( c.get(0) ) ? "a" : "b";
+				return self.eval_expr( ast{(ab)}, ctx );
+			case "elvis":
+				let left := self.eval_expr( ast{c}, ctx );
+				return left if self.truthy( left.get(0) );
+				return self.eval_expr( ast{b}, ctx );
+			default:
+				die "Panic! Unknown AST node type!";
+		}
+	}
+
+	method nested_ctx ( ctx, ... PairList extras ) {
+		return null if ctx ≡ null;
+		return ctx.nested( extras );
+	}
+
+	method _hold_parent ( node, parent ) {
+		if ( node ≢ null and parent ≢ null ) {
+			node.hold_parent(parent);
+		}
+		return node;
+	}
+
+	method _children ( node ) {
+		let out := [];
+		for ( let child in node.children() ) {
+			out.push( self._hold_parent( child, node ) );
+		}
+		return out;
+	}
+
+	method _attributes ( node ) {
+		let out := [];
+		for ( let attr in node.attributes() ) {
+			out.push( self._hold_parent( attr, node ) );
+		}
+		return out;
+	}
+
+	method _indexed_child ( node, i ) {
+		return self._hold_parent( node.indexed_child(i), node );
+	}
+
+	method _named_child ( node, name ) {
+		return self._hold_parent( node.named_child(name), node );
+	}
+
+	method _named_indexed_child ( node, name, i ) {
+		return self._hold_parent( node.named_indexed_child( name, i ), node );
+	}
+
+	method eval_binop ( ast, ctx ) {
+		const op := ast{op};
+		const op_def := self.operator_definitions().first(
+			fn x → x.get_spelling eq op and x.is_binary()
+		);
+		if ( op_def and op_def{f} ) {
+			const implementation := op_def{f};
+			return implementation( op_def, self, ast, ctx, ast{l}, ast{r} );
+		}
+		return [];
+	}
+
+	method eval_unop ( ast, ctx ) {
+		const op := ast{op};
+		const op_def := self.operator_definitions().first(
+			fn x → x.get_spelling eq op and x.is_unary()
+		);
+		if ( op_def and op_def{f} ) {
+			const implementation := op_def{f};
+			return implementation( op_def, self, ast, ctx, ast{e} );
+		}
+		return [];
+	}
+
+	method eval_path ( path_ast, ctx ) {
+		let current := [];
+		for ( let n in ctx.nodeset() ) {
+			current.push(n);
+		}
+
+		let parentset := ctx.parentset();
+
+		for ( let seg in path_ast{s} ) {
+			let next_nodes := [];
+
+			if ( seg{k} ≡ "root" ) {
+				next_nodes := [ ctx.root() ];
+			}
+			else if ( seg{k} ≡ "dot" ) {
+				next_nodes := current;
+			}
+			else if ( seg{k} ≡ "parent" ) {
+				for ( let n in current ) {
+					let p := n.parent();
+					if ( p ≢ null ) {
+						next_nodes.push(p);
+					}
+				}
+				next_nodes := self.dedup_nodes(next_nodes);
+			}
+			else if ( seg{k} ≡ "ancestors" ) {
+				let anc := [];
+				for ( let n in current ) {
+					let p := n.parent();
+					while ( p ≢ null ) {
+						anc.push(p);
+						p := p.parent();
+					}
+				}
+				next_nodes := self.dedup_nodes(anc);
+			}
+			else if ( seg{k} ≡ "star" ) {
+				let kids := [];
+				for ( let n in current ) {
+					for ( let child in self._children(n) ) {
+						if ( child.type() ≢ "attr" ) {
+							kids.push(child);
+						}
+					}
+				}
+				next_nodes := self.dedup_nodes(kids);
+			}
+			else if ( seg{k} ≡ "desc" ) {
+				let acc := [];
+				let stack := [];
+				for ( let n in current ) {
+					stack.push(n);
+				}
+
+				while ( stack.length() > 0 ) {
+					let n := stack.shift();
+					acc.push(n);
+					for ( let child in self._children(n) ) {
+						if ( child.type() ≢ "attr" ) {
+							stack.push(child);
+						}
+					}
+				}
+				next_nodes := self.dedup_nodes(acc);
+			}
+			else if ( seg{k} ≡ "index" ) {
+				let idx := seg{i};
+				let kids := [];
+				for ( let n in current ) {
+					let c := self._indexed_child( n, idx );
+					kids.push(c) if c ≢ null;
+				}
+				next_nodes := self.dedup_nodes(kids);
+			}
+			else if ( seg{k} ≡ "fnseg" ) {
+				let out := [];
+				for ( let n in current ) {
+					let seg_ctx := ctx.with_nodeset( [ n ], current );
+					let fn_ast := { t: "fn", n: seg{n}, a: seg{a} };
+					let res := self.eval_fn( fn_ast, seg_ctx );
+					for ( let x in res ) {
+						out.push(x);
+					}
+				}
+				next_nodes := out;
+			}
+			else if ( seg{k} ≡ "name" ) {
+				let name := seg{n};
+
+				if ( name ~ /^\@/ ) {
+					if ( name ≡ "@*" ) {
+						let attrs := [];
+						for ( let n in current ) {
+							for ( let a in self._attributes(n) ) {
+								attrs.push(a);
+							}
+						}
+						next_nodes := self.dedup_nodes(attrs);
+					}
+					else {
+						let attrs := [];
+						for ( let n in current ) {
+							for ( let a in self._attributes(n) ) {
+								if ( a.name() ≡ name ) {
+									attrs.push(a);
+								}
+							}
+						}
+						next_nodes := self.dedup_nodes(attrs);
+					}
+				}
+				else {
+					let kids := [];
+					for ( let n in current ) {
+						if ( n.can_have_named_indexed_children() ) {
+							let idx := 0;
+							while ( true ) {
+								let c := self._named_indexed_child( n, name, idx );
+								last if c ≡ null;
+								kids.push(c);
+								idx++;
+							}
+						}
+						else {
+							let c := self._named_child( n, name );
+							kids.push(c) if c ≢ null;
+						}
+					}
+					next_nodes := self.dedup_nodes(kids);
+				}
+
+				if ( seg.exists("i") and seg{i} ≢ null ) {
+					let idx := seg{i};
+					let picked := [];
+					for ( let n in current ) {
+						let c := self._named_indexed_child( n, name, idx );
+						picked.push(c) if c ≢ null;
+					}
+					next_nodes := self.dedup_nodes(picked);
+				}
+			}
+			else {
+				die "Unknown path segment kind: " _ seg{k};
+			}
+
+			if ( seg.exists("q") and seg{q}.length() > 0 ) {
+				for ( let q in seg{q} ) {
+					if ( q.exists("t") and q{t} ≡ "num" and q{v} ~ /^\d+$/ ) {
+						let idx := 0 + q{v};
+
+						if ( next_nodes.length() > 0 and self._node_is_xml(next_nodes[0]) ) {
+							next_nodes := ( idx ≥ 0 and idx < next_nodes.length() ) ? [ next_nodes[idx] ] : [];
+						}
+						else {
+							let picked := [];
+							for ( let node in next_nodes ) {
+								let ch := self._children(node)
+									.grep( fn c → c.type() ≢ "attr" );
+								if ( idx ≥ 0 and idx < ch.length() ) {
+									picked.push( ch[idx] );
+								}
+							}
+							next_nodes := picked;
+						}
+
+						next;
+					}
+
+					let filtered := [];
+					let i := 0;
+					while ( i < next_nodes.length() ) {
+						let node := next_nodes[i];
+						let ns_ctx := ctx.with_nodeset( next_nodes, current );
+						let filter_ctx := ns_ctx.with_nodeset( [ node ], next_nodes );
+						let r := self.eval_expr( q, self.nested_ctx( filter_ctx, want: "exists" ) );
+
+						let ok := false;
+						if ( q.exists("t") and q{t} ≡ "path" ) {
+							ok := r.length() > 0;
+						}
+						else {
+							ok := self.truthy( r.length() > 0 ? r[0] : null );
+						}
+
+						if ( ok ) {
+							filtered.push(node);
+						}
+						i++;
+					}
+					next_nodes := filtered;
+				}
+			}
+
+			parentset := current;
+			current := next_nodes;
+		}
+
+		return current;
+	}
+
+	method maybe_apply_action ( node, ctx ) {
+		const meta := ctx.meta();
+		return node if not meta.exists( "action" );
+		const action := meta{action};
+		return node if action ≡ null;
+		return node if not action.exists( "op" );
+		node.do_action(action);
+		return node;
+	}
+
+	method eval_fn ( fn_ast, ctx ) {
+		const name := fn_ast{n};
+		const fn_def := self.function_definitions().first( fn f → f.has_name(name) );
+		return fn_def{f}( fn_def, self, fn_ast, ctx, fn_ast{a} ?: [] ) if fn_def;
+		return [];
+	}
+
+	method string_replace ( string, pattern, replacement ) {
+		let text := string ≡ null ? "" : "" _ string;
+		let rep := replacement ≡ null ? "" : "" _ replacement;
+
+		try {
+			return replace( text, pattern, rep, "g" );
+		}
+		catch {
+			return replace( text, "" _ pattern, rep, "g" );
+		}
+	}
+
+	method dedup_nodes ( nodes ) {
+		let seen := {};
+		let out := [];
+		for ( let n in nodes ) {
+			let key := n.id ?: ( "anon:" _ out.length() _ ":" _ ( "" _ n.raw() ) );
+			if ( not seen.exists(key) ) {
+				seen.set( key, true );
+				out.push(n);
+			}
+		}
+		return out;
+	}
+
+	method truthy ( n ) {
+		return false if n ≡ null;
+		let pv := n.primitive_value();
+		return pv ? true : false;
+	}
+
+	method to_number ( n ) {
+		return null if n ≡ null;
+		return n.number_value();
+	}
+
+	method to_string ( n ) {
+		return null if n ≡ null;
+		return n.string_value();
+	}
+
+	method equals ( a, b ) {
+		return false if a ≡ null or b ≡ null;
+
+		let a_type := a.type();
+		let b_type := b.type();
+
+		if ( b_type eq "null" ) {
+			return a_type eq "null";
+		}
+		if ( a_type eq "null" ) {
+			return b_type eq "null";
+		}
+
+		if ( a_type eq "boolean" and b_type eq "boolean" ) {
+			let av := a.primitive_value() ? true : false;
+			let bv := b.primitive_value() ? true : false;
+			return av ≡ bv;
+		}
+
+		if ( a_type ≡ "number" and b_type ≡ "number" ) {
+			let av := a.number_value();
+			let bv := b.number_value();
+			return false if av ≡ null or bv ≡ null;
+
+			if ( ( "" _ av ) ~ /\./ or ( "" _ bv ) ~ /\./ ) {
+				return abs( av - bv ) < ε;
+			}
+
+			return av = bv;
+		}
+
+		let string_like := [ "string", "text", "attr", "comment", "element" ];
+		if ( a_type in string_like and b_type in string_like ) {
+			let av := a.string_value();
+			let bv := b.string_value();
+			return av eq bv;
+		}
+
+		let aid := a.id();
+		let bid := b.id();
+		return false if aid ≡ null or bid ≡ null;
+		return aid eq bid;
+	}
+
+	method _node_is_xml ( n ) {
+		if ( n ≡ null ) {
+			return false;
+		}
+		let raw := n.raw();
+		try {
+			let node_type := raw.nodeType();
+			return node_type ≢ null;
+		}
+		catch {
+			return false;
+		}
+	}
+}

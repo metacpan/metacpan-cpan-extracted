@@ -1,0 +1,1631 @@
+=encoding utf8
+
+=head1 NAME
+
+std/data/kdl - KDL parsing and serialization for ZuzuScript.
+
+=head1 SYNOPSIS
+
+  from std/data/kdl import KDL;
+  
+  let kdl := new KDL();
+  let doc := kdl.decode("""
+    package name="zuzu" { version "0.1.0" }
+  """);
+  let text := kdl.encode(doc);
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Node and
+Electron. It is partially supported by zuzu-js in the browser: in-memory
+KDL parsing and serialization coverage passes, but fixture and load/dump
+coverage is unsupported because browser filesystem capability is
+unavailable.
+
+=head1 DESCRIPTION
+
+This module provides a pure-Zuzu implementation of the KDL document
+model and parser, with a user-facing API modelled on C<std/data/json>.
+
+=head1 EXPORTS
+
+The parser returns explicit KDL model objects rather than generic Dict
+and Array structures.
+
+=head2 C<KDLDocument>
+
+C<KDLDocument> represents a complete parsed KDL document.
+
+Constructor fields:
+
+=over
+
+=item * C<nodes>
+
+An Array of top-level C<KDLNode> objects. Defaults to an empty Array.
+
+=back
+
+Methods:
+
+=over
+
+=item C<nodes()>
+
+Parameters: none. Returns: C<Array>. Returns the Array of top-level
+C<KDLNode> objects.
+
+=item C<to_Iterator()>
+
+Parameters: none. Returns: C<Function>. Returns an iterator over the
+document's top-level nodes.
+
+=back
+
+=head2 C<KDLNode>
+
+C<KDLNode> represents one KDL node.
+
+Constructor fields:
+
+=over
+
+=item * C<name>
+
+The node name as a String.
+
+=item * C<type_annotation>
+
+The node type annotation as a String, or C<null> when unannotated.
+
+=item * C<args>
+
+An Array of unnamed argument C<KDLValue> objects. Defaults to an empty
+Array.
+
+=item * C<props>
+
+A C<PairList> mapping property names to C<KDLValue> objects. Defaults
+to an empty C<PairList>, and preserves duplicate property names.
+
+=item * C<children>
+
+An Array of child C<KDLNode> objects. Defaults to an empty Array.
+
+=back
+
+Methods:
+
+=over
+
+=item C<name()>
+
+Parameters: none. Returns: C<String>. Returns the node name.
+
+=item C<type_annotation()>
+
+Parameters: none. Returns: C<String> or C<null>. Returns the node type
+annotation.
+
+=item C<args()>
+
+Parameters: none. Returns: C<Array>. Returns the unnamed argument
+C<KDLValue> objects.
+
+=item C<props()>
+
+Parameters: none. Returns: C<PairList>. Returns the named property
+C<KDLValue> objects.
+
+=item C<children()>
+
+Parameters: none. Returns: C<Array>. Returns the child C<KDLNode>
+objects.
+
+=item C<to_Iterator()>
+
+Parameters: none. Returns: C<Function>. Returns an iterator over the
+node's arguments followed by its child nodes.
+
+=back
+
+=head2 C<KDLValue>
+
+C<KDLValue> represents an unnamed argument or named property value.
+
+Constructor fields:
+
+=over
+
+=item * C<type>
+
+The KDL value type: C<null>, C<boolean>, C<number>, or C<string>.
+Some conversion helpers may create opaque C<KDLValue> objects with
+other type names; those are not KDL primitives.
+
+=item * C<kind>
+
+For numbers, one of C<integer>, C<float>, or C<string>. C<string> is
+used for KDL number keywords such as C<#inf> that do not have a native
+JSON-like numeric value.
+
+=item * C<value>
+
+The raw native value.
+
+=item * C<type_annotation>
+
+The value type annotation as a String, or C<null> when unannotated.
+
+=item * C<canonical_number>
+
+The canonical numeric spelling used by canonical serialization, or
+C<null>.
+
+=back
+
+Methods:
+
+=over
+
+=item C<type()>
+
+Parameters: none. Returns: C<String>. Returns the value type.
+
+=item C<kind()>
+
+Parameters: none. Returns: C<String> or C<null>. Returns the numeric
+kind for number values.
+
+=item C<value()>
+
+Parameters: none. Returns: value. Returns the raw native value.
+
+=item C<type_annotation()>
+
+Parameters: none. Returns: C<String> or C<null>. Returns the value type
+annotation.
+
+=item C<canonical_number()>
+
+Parameters: none. Returns: C<String> or C<null>. Returns the canonical
+numeric spelling.
+
+=item C<is_null()>, C<is_boolean()>, C<is_number()>, C<is_string()>
+
+Parameters: none. Returns: C<Boolean>. Predicate methods for the four
+KDL primitive value types.
+
+=item C<is_true()>, C<is_false()>
+
+Parameters: none. Returns: C<Boolean>. Predicate methods for boolean
+C<#true> and C<#false> values.
+
+=item C<to_Number()>
+
+Parameters: none. Returns: C<Number>. Returns the native number, or
+throws when the value is not a finite native number.
+
+=item C<to_String()>
+
+Parameters: none. Returns: C<String>. Coerces the value to a string.
+
+=item C<to_Boolean()>
+
+Parameters: none. Returns: C<Boolean>. Coerces the value to a boolean.
+
+=item C<native_value()>
+
+Parameters: none. Returns: value. Returns the raw native value, with KDL
+C<#null> represented as C<null>.
+
+=back
+
+=head2 C<KDL>
+
+C<KDL> is the codec class for KDL text.
+
+=over
+
+=item C<< codec.decode(String text) >>
+
+Parameters: C<text> is KDL text. Returns: C<KDLDocument>. Parses KDL
+text.
+
+=item C<< codec.decode_binarystring(BinaryString bytes) >>
+
+Parameters: C<bytes> is UTF-8 KDL bytes. Returns: C<KDLDocument>.
+Parses KDL bytes.
+
+=item C<< codec.encode(value) >>
+
+Parameters: C<value> is a C<KDLDocument>, C<KDLNode>, or compatible
+value. Returns: C<String>. Serializes KDL data to text.
+
+=item C<< codec.encode_binarystring(value) >>
+
+Parameters: C<value> is a C<KDLDocument>, C<KDLNode>, or compatible
+value. Returns: C<BinaryString>. Serializes KDL data to UTF-8 bytes.
+
+=item C<< codec.load(path) >>
+
+Parameters: C<path> is a C<std/io> C<Path>. Returns: C<KDLDocument>.
+Reads and parses a KDL file.
+
+=item C<< codec.dump(path, value) >>
+
+Parameters: C<path> is a C<std/io> C<Path> and C<value> is KDL data.
+Returns: C<null>. Serializes and writes a KDL file.
+
+=back
+
+=head1 ZPATH
+
+C<KDLDocument>, C<KDLNode>, and C<KDLValue> objects can be queried with
+C<std/path/z>. A KDL document's top-level nodes are exposed as children.
+A KDL node exposes its arguments first, then its child nodes, as ZPath
+children. KDL properties are exposed as ZPath attributes.
+
+  from std/data/kdl import KDL;
+  from std/path/z import ZPath;
+
+  let doc := ( new KDL() ).decode( """
+  (pkg)package "zuzu" (email)"dev@example.test" version="0.1.0" {
+    foo "first"
+    bar "middle"
+    foo "second"
+    foo "third"
+  }
+  """ );
+
+  // The package node's first child is its first argument.
+  say( ( new ZPath( path: "/package/#0" ) ).first(doc) );       // zuzu
+
+  // Properties are attributes.
+  say( ( new ZPath( path: "/package/@version" ) ).first(doc) ); // 0.1.0
+
+  // Child nodes can be selected by name and zero-based occurrence.
+  say( ( new ZPath( path: "/package/foo#2/#0" ) ).first(doc) ); // third
+
+  // tag() exposes type annotations on nodes and values.
+  say( ( new ZPath( path: "tag(/package)" ) ).first(doc) );     // pkg
+  say( ( new ZPath( path: "tag(/package/#1)" ) ).first(doc) );  // email
+
+  // local-name() exposes the node name, like it does for XML elements.
+  say( ( new ZPath( path: "local-name(/package)" ) ).first(doc) );
+  say( ( new ZPath( path: "/package/foo#2/local-name()" ) ).first(doc) );
+
+=head1 COMPATIBILITY
+
+The parser is recursive descent and covers the usual KDL 2.0 document
+model: nodes, arguments, properties, annotations, comments, slashdash,
+strings, booleans, nulls, numbers, and children.
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/data/kdl >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/string import substr, index, chr, ord, sprint;
+
+
+function _kdl_starts_with ( String text, Number pos, String prefix ) {
+	return substr( text, pos, length prefix ) ≡ prefix;
+}
+
+function _kdl_is_newline ( String ch ) {
+	return ch ≡ "\n" or ch ≡ "\r" or ch ≡ chr(11)
+		or ch ≡ chr(133) or ch ≡ chr(8232) or ch ≡ chr(8233);
+}
+
+function _kdl_is_ws ( String ch ) {
+	return false if ch ≡ "";
+	let code := ord(ch);
+	return ch ≡ " " or ch ≡ "\t" or ch ≡ chr(12)
+		or code ≡ 160 or code ≡ 5760 or code ≡ 8239
+		or code ≡ 8287 or code ≡ 12288
+		or ( code >= 8192 and code <= 8202 );
+}
+
+function _kdl_is_line_space ( String ch ) {
+	return _kdl_is_ws(ch) or _kdl_is_newline(ch);
+}
+
+function _kdl_is_digit ( String ch ) {
+	return ch ~ /^[0-9]$/;
+}
+
+function _kdl_is_hex_digit ( String ch ) {
+	return ch ~ /^[0-9a-fA-F]$/;
+}
+
+function _kdl_hex_value ( String ch ) {
+	if ( _kdl_is_digit(ch) ) {
+		return ch + 0;
+	}
+	if ( index( "abcdef", ch ) >= 0 ) {
+		return 10 + index( "abcdef", ch );
+	}
+	if ( index( "ABCDEF", ch ) >= 0 ) {
+		return 10 + index( "ABCDEF", ch );
+	}
+	die `Invalid hexadecimal digit '${ch}'`;
+}
+
+function _kdl_from_hex ( String raw ) {
+	let n := 0;
+	let i := 0;
+	while ( i < length raw ) {
+		n := n * 16 + _kdl_hex_value( substr( raw, i, 1 ) );
+		i++;
+	}
+	return n;
+}
+
+function _kdl_clean_number ( String token ) {
+	let out := "";
+	let i := 0;
+	while ( i < length token ) {
+		let ch := substr( token, i, 1 );
+		out _= ch if ch ≢ "_";
+		i++;
+	}
+	return out;
+}
+
+function _kdl_parse_radix ( String token, Number radix ) {
+	let sign := 1;
+	let i := 0;
+	if ( substr( token, 0, 1 ) ≡ "-" ) {
+		sign := -1;
+		i := 1;
+	}
+	else if ( substr( token, 0, 1 ) ≡ "+" ) {
+		i := 1;
+	}
+	i += 2;
+
+	let n := 0;
+	while ( i < length token ) {
+		let ch := substr( token, i, 1 );
+		if ( ch ≢ "_" ) {
+			let v := radix ≡ 16 ? _kdl_hex_value(ch) : ch + 0;
+			die `Invalid digit '${ch}' for radix ${radix}` if v >= radix;
+			n := n * radix + v;
+		}
+		i++;
+	}
+	return sign * n;
+}
+
+function _kdl_strip_decimal_zeroes ( String raw ) {
+	let i := 0;
+	while ( i < length raw - 1 and substr( raw, i, 1 ) ≡ "0" ) {
+		i++;
+	}
+	return substr( raw, i, length raw - i );
+}
+
+function _kdl_decimal_mul_add ( String raw, Number factor, Number add ) {
+	let out := "";
+	let carry := add;
+	let i := length raw - 1;
+	while ( i >= 0 ) {
+		let n := ( substr( raw, i, 1 ) + 0 ) * factor + carry;
+		out := "" _ ( n mod 10 ) _ out;
+		carry := floor( n / 10 );
+		i--;
+	}
+	while ( carry > 0 ) {
+		out := "" _ ( carry mod 10 ) _ out;
+		carry := floor( carry / 10 );
+	}
+	return _kdl_strip_decimal_zeroes(out);
+}
+
+function _kdl_decimal_from_radix ( String token, Number radix ) {
+	let sign := "";
+	let i := 0;
+	if ( substr( token, 0, 1 ) ≡ "-" ) {
+		sign := "-";
+		i := 1;
+	}
+	else if ( substr( token, 0, 1 ) ≡ "+" ) {
+		i := 1;
+	}
+	i += 2;
+
+	let out := "0";
+	while ( i < length token ) {
+		out := _kdl_decimal_mul_add(
+			out,
+			radix,
+			_kdl_hex_value( substr( token, i, 1 ) ),
+		);
+		i++;
+	}
+	return sign _ out if sign ≢ "" and out ≢ "0";
+	return out;
+}
+
+function _kdl_canonical_decimal_int ( String token ) {
+	let sign := "";
+	let i := 0;
+	if ( substr( token, 0, 1 ) ≡ "-" ) {
+		sign := "-";
+		i := 1;
+	}
+	else if ( substr( token, 0, 1 ) ≡ "+" ) {
+		i := 1;
+	}
+	let body := _kdl_strip_decimal_zeroes(
+		substr( token, i, length token - i )
+	);
+	return sign _ body if sign ≢ "" and body ≢ "0";
+	return body;
+}
+
+function _kdl_canonical_float ( String token ) {
+	let epos := index( token, "e" );
+	epos := index( token, "E" ) if epos < 0;
+	return token if epos < 0;
+
+	let mantissa := substr( token, 0, epos );
+	let exponent := substr( token, epos + 1, length token - epos - 1 );
+	if ( substr( exponent, 0, 1 ) ≢ "+"
+		and substr( exponent, 0, 1 ) ≢ "-"
+	) {
+		exponent := "+" _ exponent;
+	}
+	return mantissa _ "E" _ exponent;
+}
+
+function _kdl_find_multiline_close (
+	String text,
+	String close,
+	Number start,
+	Boolean raw,
+) {
+	let found := index( text, close, start );
+	while ( found >= 0 ) {
+		if ( raw or found = 0 or substr( text, found - 1, 1 ) ≢ "\\" ) {
+			return found;
+		}
+		found := index( text, close, found + 1 );
+	}
+	return -1;
+}
+
+function _kdl_reserved_ident ( String text ) {
+	return text ≡ "true" or text ≡ "false" or text ≡ "null"
+		or text ≡ "inf" or text ≡ "-inf" or text ≡ "nan";
+}
+
+function _kdl_ident_break ( String ch ) {
+	return ch ≡ "" or _kdl_is_line_space(ch)
+		or ch ≡ "\\" or ch ≡ "/" or ch ≡ "(" or ch ≡ ")"
+		or ch ≡ "{" or ch ≡ "}" or ch ≡ ";" or ch ≡ "["
+		or ch ≡ "]" or ch ≡ "\"" or ch ≡ "#" or ch ≡ "=";
+}
+
+function _kdl_forbidden_codepoint ( Number code ) {
+	return code < 32 or code ≡ 127 or code ≡ 65279
+		or code ≡ 8206 or code ≡ 8207
+		or ( code >= 8234 and code <= 8238 )
+		or ( code >= 8294 and code <= 8297 );
+}
+
+function _kdl_is_plain_ident ( String text ) {
+	if ( text ≡ "" or _kdl_reserved_ident(text) ) {
+		return false;
+	}
+	let first := substr( text, 0, 1 );
+	let second := substr( text, 1, 1 );
+	if ( _kdl_is_digit(first) ) {
+		return false;
+	}
+	if ( ( first ≡ "+" or first ≡ "-" ) and _kdl_is_digit(second) ) {
+		return false;
+	}
+	if ( first ≡ "." and _kdl_is_digit(second) ) {
+		return false;
+	}
+	let i := 0;
+	while ( i < length text ) {
+		return false if _kdl_ident_break( substr( text, i, 1 ) );
+		i++;
+	}
+	return true;
+}
+
+function _kdl_escape_string ( String text ) {
+	let out := "";
+	let i := 0;
+	while ( i < length text ) {
+		let ch := substr( text, i, 1 );
+		if ( ch ≡ "\\" ) { out _= "\\\\"; }
+		else if ( ch ≡ "\"" ) { out _= "\\\""; }
+		else if ( ch ≡ chr(8) ) { out _= "\\b"; }
+		else if ( ch ≡ chr(12) ) { out _= "\\f"; }
+		else if ( ch ≡ "\n" ) { out _= "\\n"; }
+		else if ( ch ≡ "\r" ) { out _= "\\r"; }
+		else if ( ch ≡ "\t" ) { out _= "\\t"; }
+		else if ( ord(ch) < 32 ) {
+			out _= "\\u{" _ sprint( "%x", ord(ch) ) _ "}";
+		}
+		else { out _= ch; }
+		i++;
+	}
+	return out;
+}
+
+function _kdl_name ( String text ) {
+	return _kdl_is_plain_ident(text) ? text : `"${_kdl_escape_string(text)}"`;
+}
+
+function _kdl_indent ( Number level, Boolean canonical := false ) {
+	let out := "";
+	let i := 0;
+	let unit := canonical ? "    " : "\t";
+	while ( i < level ) {
+		out _= unit;
+		i++;
+	}
+	return out;
+}
+
+function _kdl_canonical_props ( PairList props ) {
+	let latest := {};
+	for ( let pair in props.to_Array() ) {
+		let kv := pair{pair};
+		latest{(kv[0])} := kv[1];
+	}
+
+	let out := [];
+	for ( let key in latest.sorted_keys() ) {
+		out.push( [ key, latest{(key)} ] );
+	}
+	return out;
+}
+
+class KDLValue {
+	let String type := "null";
+	let kind := null;
+	let value := null;
+	let type_annotation := null;
+	let canonical_number := null;
+
+	method type () { return type; }
+	method kind () { return kind; }
+	method value () { return value; }
+	method type_annotation () { return type_annotation; }
+	method canonical_number () { return canonical_number; }
+
+	method is_null () { return type ≡ "null"; }
+	method is_boolean () { return type ≡ "boolean"; }
+	method is_number () { return type ≡ "number"; }
+	method is_string () { return type ≡ "string"; }
+	method is_true () { return type ≡ "boolean" and value; }
+	method is_false () { return type ≡ "boolean" and not value; }
+
+	method to_Number () {
+		die "KDLValue is not a number" if type ≢ "number";
+		die "KDL keyword number has no native numeric value" if kind ≡ "string";
+		return value;
+	}
+
+	method to_String () {
+		return "" if type ≡ "null";
+		return "" _ value;
+	}
+
+	method to_Boolean () {
+		if ( type ≡ "boolean" ) { return value; }
+		if ( type ≡ "null" ) { return false; }
+		if ( type ≡ "number" ) {
+			return kind ≢ "string" and value ≢ 0;
+		}
+		return value ≢ "";
+	}
+
+	method native_value () {
+		return null if type ≡ "null";
+		return value;
+	}
+}
+
+class KDLNode {
+	let name := "";
+	let type_annotation := null;
+	let args := [];
+	let props := null;
+	let children := [];
+
+	method __build__ () {
+		props := new PairList() if props ≡ null;
+		args := [] if args ≡ null;
+		children := [] if children ≡ null;
+	}
+
+	method name () { return name; }
+	method type_annotation () { return type_annotation; }
+	method args () { return args; }
+	method props () { return props; }
+	method children () { return children; }
+
+	method to_Iterator () {
+		let values := [];
+		for ( let arg in args ) {
+			values.push(arg);
+		}
+		for ( let child in children ) {
+			values.push(child);
+		}
+		return values.to_Iterator();
+	}
+}
+
+class KDLDocument {
+	let nodes := [];
+
+	method __build__ () {
+		nodes := [] if nodes ≡ null;
+	}
+
+	method nodes () { return nodes; }
+
+	method to_Iterator () {
+		return nodes.to_Iterator();
+	}
+}
+
+class _KDLParser {
+	let String text := "";
+	let Number pos := 0;
+
+	method _eof () {
+		return pos >= length text;
+	}
+
+	method _peek () {
+		return "" if self._eof();
+		return substr( text, pos, 1 );
+	}
+
+	method _take () {
+		let ch := self._peek();
+		pos++;
+		return ch;
+	}
+
+	method _error ( String message ) {
+		die `KDL parse error at offset ${pos}: ${message}`;
+	}
+
+	method _skip_newline () {
+		if ( _kdl_starts_with( text, pos, "\r\n" ) ) {
+			pos += 2;
+			return true;
+		}
+		if ( _kdl_is_newline( self._peek() ) ) {
+			pos++;
+			return true;
+		}
+		return false;
+	}
+
+	method _skip_line_comment () {
+		return false if not _kdl_starts_with( text, pos, "//" );
+		pos += 2;
+		while ( not self._eof() and not _kdl_is_newline( self._peek() ) ) {
+			pos++;
+		}
+		self._skip_newline();
+		return true;
+	}
+
+	method _skip_block_comment () {
+		return false if not _kdl_starts_with( text, pos, "/*" );
+		pos += 2;
+		let depth := 1;
+		while ( depth > 0 ) {
+			self._error("Unterminated block comment") if self._eof();
+			if ( _kdl_starts_with( text, pos, "/*" ) ) {
+				depth++;
+				pos += 2;
+			}
+			else if ( _kdl_starts_with( text, pos, "*/" ) ) {
+				depth--;
+				pos += 2;
+			}
+			else {
+				pos++;
+			}
+		}
+		return true;
+	}
+
+	method _skip_line_space () {
+		let moved := false;
+		let keep := true;
+		while ( keep and not self._eof() ) {
+			keep := false;
+			if ( _kdl_is_ws( self._peek() ) ) {
+				pos++;
+				moved := true;
+				keep := true;
+			}
+			else if ( self._skip_newline() ) {
+				moved := true;
+				keep := true;
+			}
+			else if ( self._skip_line_comment() ) {
+				moved := true;
+				keep := true;
+			}
+			else if ( self._skip_block_comment() ) {
+				moved := true;
+				keep := true;
+			}
+			else if ( self._skip_escline() ) {
+				moved := true;
+				keep := true;
+			}
+		}
+		return moved;
+	}
+
+	method _skip_node_space () {
+		let moved := false;
+		let keep := true;
+		while ( keep and not self._eof() ) {
+			keep := false;
+			if ( _kdl_is_ws( self._peek() ) ) {
+				pos++;
+				moved := true;
+				keep := true;
+			}
+			else if ( self._skip_block_comment() ) {
+				moved := true;
+				keep := true;
+			}
+			else if ( self._skip_escline() ) {
+				moved := true;
+				keep := true;
+			}
+		}
+		return moved;
+	}
+
+	method _skip_escline () {
+		return false if self._peek() ≢ "\\";
+		let save := pos;
+		pos++;
+		let keep := true;
+		while ( keep and not self._eof() ) {
+			keep := false;
+			while ( _kdl_is_ws( self._peek() ) ) {
+				pos++;
+				keep := true;
+			}
+			if ( self._skip_block_comment() ) {
+				keep := true;
+			}
+		}
+		if ( self._skip_line_comment() or self._skip_newline() or self._eof() ) {
+			return true;
+		}
+		pos := save;
+		return false;
+	}
+
+	method _parse_document () {
+		if ( _kdl_starts_with( text, pos, chr(65279) ) ) {
+			pos++;
+		}
+		let nodes := self._parse_nodes(false);
+		self._skip_line_space();
+		self._error("Unexpected trailing input") if not self._eof();
+		return new KDLDocument( nodes: nodes );
+	}
+
+	method _parse_nodes ( Boolean in_children ) {
+		let nodes := [];
+		while (true) {
+			self._skip_line_space();
+			if ( self._eof() ) {
+				return nodes;
+			}
+			if ( in_children and self._peek() ≡ "}" ) {
+				return nodes;
+			}
+			if ( _kdl_starts_with( text, pos, "/-" ) ) {
+				self._consume_slashdash();
+				self._parse_node(true);
+			}
+			else {
+				let node := self._parse_node(false);
+				nodes.push(node) if node ≢ null;
+			}
+		}
+		return nodes;
+	}
+
+	method _consume_slashdash () {
+		self._error("Expected slashdash") if not _kdl_starts_with( text, pos, "/-" );
+		pos += 2;
+		self._skip_line_space();
+	}
+
+	method _parse_type_annotation () {
+		return null if self._peek() ≢ "(";
+		pos++;
+		self._skip_node_space();
+		let name := self._parse_string();
+		self._skip_node_space();
+		self._error("Expected ')' after type annotation") if self._peek() ≢ ")";
+		pos++;
+		self._skip_node_space();
+		return name;
+	}
+
+	method _parse_node ( Boolean discard ) {
+		let annotation := self._parse_type_annotation();
+		self._skip_node_space();
+		let name := self._parse_string();
+		let args := [];
+		let props := new PairList();
+		let children := [];
+		let slashdash_child_before_entry := false;
+
+		while (true) {
+			let had_space := self._skip_node_space();
+			if ( self._eof() ) {
+				return discard ? null : new KDLNode(
+					name: name,
+					type_annotation: annotation,
+					args: args,
+					props: props,
+					children: children,
+				);
+			}
+
+			let ch := self._peek();
+			if ( ch ≡ ";" ) {
+				pos++;
+				return discard ? null : new KDLNode(
+					name: name,
+					type_annotation: annotation,
+					args: args,
+					props: props,
+					children: children,
+				);
+			}
+			if ( ch ≡ "}" ) {
+				return discard ? null : new KDLNode(
+					name: name,
+					type_annotation: annotation,
+					args: args,
+					props: props,
+					children: children,
+				);
+			}
+			if ( _kdl_is_newline(ch) ) {
+				self._skip_newline();
+				return discard ? null : new KDLNode(
+					name: name,
+					type_annotation: annotation,
+					args: args,
+					props: props,
+					children: children,
+				);
+			}
+			if ( _kdl_starts_with( text, pos, "//" ) ) {
+				self._skip_line_comment();
+				return discard ? null : new KDLNode(
+					name: name,
+					type_annotation: annotation,
+					args: args,
+					props: props,
+					children: children,
+				);
+			}
+			if ( _kdl_starts_with( text, pos, "/-" ) ) {
+				self._consume_slashdash();
+				if ( self._peek() ≡ "{" ) {
+					self._parse_children();
+					slashdash_child_before_entry := true;
+				}
+				else {
+					self._parse_entry(true, args, props);
+				}
+				next;
+			}
+			if ( ch ≡ "{" ) {
+				self._error("Child block must be the final node field")
+					if children.length() > 0;
+				children := self._parse_children();
+				next;
+			}
+			self._error("Expected whitespace before node field")
+				if not had_space;
+			self._error("Child block must be the final node field")
+				if children.length() > 0;
+			self._error("Discarded child block must not precede node fields")
+				if slashdash_child_before_entry;
+			self._parse_entry(discard, args, props);
+		}
+	}
+
+	method _parse_children () {
+		self._error("Expected '{'") if self._peek() ≢ "{";
+		pos++;
+		let kids := self._parse_nodes(true);
+		self._skip_line_space();
+		self._error("Expected '}' after child block") if self._peek() ≢ "}";
+		pos++;
+		return kids;
+	}
+
+	method _parse_entry ( Boolean discard, Array args, PairList props ) {
+		if ( self._peek() ≡ "(" ) {
+			let value := self._parse_value();
+			args.push(value) if not discard;
+			return;
+		}
+
+		if ( self._peek() ≡ "#" or self._starts_number() ) {
+			let value := self._parse_value();
+			args.push(value) if not discard;
+			return;
+		}
+
+		let key := self._parse_string();
+		let after_key := pos;
+		self._skip_node_space();
+		if ( self._peek() ≡ "=" ) {
+			pos++;
+			self._skip_node_space();
+			let value := self._parse_value();
+			props.add( key, value ) if not discard;
+			return;
+		}
+		pos := after_key;
+
+		let value := new KDLValue( type: "string", value: key );
+		args.push(value) if not discard;
+		return;
+	}
+
+	method _parse_value () {
+		let annotation := self._parse_type_annotation();
+		self._skip_node_space();
+
+		if ( self._peek() ≡ "#" ) {
+			return self._parse_hash_value(annotation);
+		}
+		if ( self._starts_number() ) {
+			return self._parse_number(annotation);
+		}
+		return new KDLValue(
+			type: "string",
+			value: self._parse_string(),
+			type_annotation: annotation,
+		);
+	}
+
+	method _starts_number () {
+		let ch := self._peek();
+		let nxt := substr( text, pos + 1, 1 );
+		return _kdl_is_digit(ch)
+			or ( ( ch ≡ "+" or ch ≡ "-" ) and _kdl_is_digit(nxt) );
+	}
+
+	method _read_token () {
+		let start := pos;
+		while ( not self._eof() ) {
+			let ch := self._peek();
+			last if _kdl_ident_break(ch);
+			pos++;
+		}
+		return substr( text, start, pos - start );
+	}
+
+	method _parse_hash_value ( annotation ) {
+		if ( _kdl_starts_with( text, pos, "#true" ) ) {
+			pos += 5;
+			return new KDLValue(
+				type: "boolean",
+				value: true,
+				type_annotation: annotation,
+			);
+		}
+		if ( _kdl_starts_with( text, pos, "#false" ) ) {
+			pos += 6;
+			return new KDLValue(
+				type: "boolean",
+				value: false,
+				type_annotation: annotation,
+			);
+		}
+		if ( _kdl_starts_with( text, pos, "#null" ) ) {
+			pos += 5;
+			return new KDLValue(
+				type: "null",
+				value: null,
+				type_annotation: annotation,
+			);
+		}
+		if ( _kdl_starts_with( text, pos, "#inf" ) ) {
+			pos += 4;
+			return new KDLValue(
+				type: "number",
+				kind: "string",
+				value: "#inf",
+				type_annotation: annotation,
+			);
+		}
+		if ( _kdl_starts_with( text, pos, "#-inf" ) ) {
+			pos += 5;
+			return new KDLValue(
+				type: "number",
+				kind: "string",
+				value: "#-inf",
+				type_annotation: annotation,
+			);
+		}
+		if ( _kdl_starts_with( text, pos, "#nan" ) ) {
+			pos += 4;
+			return new KDLValue(
+				type: "number",
+				kind: "string",
+				value: "#nan",
+				type_annotation: annotation,
+			);
+		}
+		return new KDLValue(
+			type: "string",
+			value: self._parse_raw_string(),
+			type_annotation: annotation,
+		);
+	}
+
+	method _parse_number ( annotation ) {
+		let token := self._read_token();
+		self._error( `Invalid number '${token}'` )
+			if token ~ /^[+-]?0[xob]_/i or token ~ /\._/;
+		let clean := _kdl_clean_number(token);
+		if ( clean ~ /^[+-]?0x[0-9a-fA-F]+$/ ) {
+			return new KDLValue(
+				type: "number",
+				kind: "integer",
+				value: _kdl_parse_radix( clean, 16 ),
+				canonical_number: _kdl_decimal_from_radix( clean, 16 ),
+				type_annotation: annotation,
+			);
+		}
+		if ( clean ~ /^[+-]?0o[0-7]+$/ ) {
+			return new KDLValue(
+				type: "number",
+				kind: "integer",
+				value: _kdl_parse_radix( clean, 8 ),
+				canonical_number: _kdl_decimal_from_radix( clean, 8 ),
+				type_annotation: annotation,
+			);
+		}
+		if ( clean ~ /^[+-]?0b[01]+$/ ) {
+			return new KDLValue(
+				type: "number",
+				kind: "integer",
+				value: _kdl_parse_radix( clean, 2 ),
+				canonical_number: _kdl_decimal_from_radix( clean, 2 ),
+				type_annotation: annotation,
+			);
+		}
+		if ( clean ~ /^[+-]?[0-9]+$/ ) {
+			return new KDLValue(
+				type: "number",
+				kind: "integer",
+				value: clean + 0,
+				canonical_number: _kdl_canonical_decimal_int(clean),
+				type_annotation: annotation,
+			);
+		}
+		if ( clean ~ /^[+-]?[0-9]+(\.[0-9]+)?([eE][+-]?[0-9]+)?$/ ) {
+			return new KDLValue(
+				type: "number",
+				kind: "float",
+				value: clean + 0,
+				canonical_number: _kdl_canonical_float(clean),
+				type_annotation: annotation,
+			);
+		}
+		self._error( `Invalid number '${token}'` );
+	}
+
+	method _parse_string () {
+		if ( self._peek() ≡ "#" ) {
+			return self._parse_raw_string();
+		}
+		if ( self._peek() ≡ "\"" ) {
+			return self._parse_quoted_string();
+		}
+		return self._parse_identifier_string();
+	}
+
+	method _parse_identifier_string () {
+		let ident := self._read_token();
+		self._error("Expected string") if ident ≡ "";
+		self._error( `Reserved KDL identifier '${ident}'` )
+			if _kdl_reserved_ident(ident);
+		self._error( `Invalid KDL identifier '${ident}'` )
+			if substr( ident, 0, 1 ) ≡ "."
+				and _kdl_is_digit( substr( ident, 1, 1 ) );
+		let i := 0;
+		while ( i < length ident ) {
+			let code := ord( substr( ident, i, 1 ) );
+			self._error( `Forbidden codepoint in KDL identifier '${ident}'` )
+				if _kdl_forbidden_codepoint(code);
+			i++;
+		}
+		return ident;
+	}
+
+	method _parse_quoted_string () {
+		if ( _kdl_starts_with( text, pos, "\"\"\"" ) ) {
+			return self._parse_multiline_string( "", false );
+		}
+		pos++;
+		let out := "";
+		while ( not self._eof() ) {
+			let ch := self._take();
+			if ( ch ≡ "\"" ) {
+				return out;
+			}
+			if ( ch ≡ "\\" ) {
+				out _= self._parse_escape();
+			}
+			else {
+				self._error("Newline in quoted string") if _kdl_is_newline(ch);
+				out _= ch;
+			}
+		}
+		self._error("Unterminated quoted string");
+	}
+
+	method _parse_escape () {
+		self._error("Unterminated string escape") if self._eof();
+		let ch := self._take();
+		if ( ch ≡ "\"" ) { return "\""; }
+		if ( ch ≡ "\\" ) { return "\\"; }
+		if ( ch ≡ "b" ) { return chr(8); }
+		if ( ch ≡ "f" ) { return chr(12); }
+		if ( ch ≡ "n" ) { return "\n"; }
+		if ( ch ≡ "r" ) { return "\r"; }
+		if ( ch ≡ "s" ) { return " "; }
+		if ( ch ≡ "t" ) { return "\t"; }
+		if ( _kdl_is_line_space(ch) ) {
+			while ( _kdl_is_line_space(ch) ) {
+				if ( _kdl_is_newline(ch) ) {
+					self._skip_newline();
+				}
+				ch := self._peek();
+				pos++ if _kdl_is_ws(ch);
+			}
+			return "";
+		}
+		if ( ch ≡ "u" ) {
+			self._error("Expected '{' in Unicode escape") if self._peek() ≢ "{";
+			pos++;
+			let start := pos;
+			while ( not self._eof() and self._peek() ≢ "}" ) {
+				self._error("Invalid Unicode escape") if not _kdl_is_hex_digit( self._peek() );
+				pos++;
+			}
+			self._error("Unterminated Unicode escape") if self._peek() ≢ "}";
+			let raw := substr( text, start, pos - start );
+			self._error("Unicode escape must contain 1 to 6 hex digits")
+				if length raw < 1 or length raw > 6;
+			pos++;
+			let code := _kdl_from_hex(raw);
+			return chr(code);
+		}
+		self._error( `Invalid string escape '\\${ch}'` );
+	}
+
+	method _parse_raw_string () {
+		let hashes := "";
+		while ( self._peek() ≡ "#" ) {
+			hashes _= "#";
+			pos++;
+		}
+		self._error("Expected raw string quotes") if self._peek() ≢ "\"";
+		if ( _kdl_starts_with( text, pos, "\"\"\"" ) ) {
+			return self._parse_multiline_string( hashes, true );
+		}
+		pos++;
+		let close := "\"" _ hashes;
+		let end := index( text, close, pos );
+		self._error("Unterminated raw string") if end < 0;
+		let out := substr( text, pos, end - pos );
+		self._error("Newline in raw string") if out ~ /[\r\n\v]/;
+		pos := end + length close;
+		return out;
+	}
+
+	method _parse_multiline_string ( String hashes, Boolean raw ) {
+		pos += 3;
+		self._error("Expected newline after multiline string opener")
+			if not self._skip_newline();
+		let close := "\"\"\"" _ hashes;
+		let end := _kdl_find_multiline_close( text, close, pos, raw );
+		self._error("Unterminated multiline string") if end < 0;
+		let body := substr( text, pos, end - pos );
+		pos := end + length close;
+
+		let last_nl := -1;
+		let i := length body - 1;
+		while ( i >= 0 and last_nl < 0 ) {
+			if ( substr( body, i, 1 ) ≡ "\n" ) {
+				last_nl := i;
+			}
+			i--;
+		}
+		return "" if last_nl < 0;
+			let content := substr( body, 0, last_nl );
+			let indent := substr( body, last_nl + 1, length body - last_nl - 1 );
+			if ( not raw ) {
+				let bs := 0;
+				while ( bs < length indent
+					and _kdl_is_ws( substr( indent, bs, 1 ) )
+				) {
+					bs++;
+				}
+				if ( bs < length indent and substr( indent, bs, 1 ) ≡ "\\" ) {
+					let k := bs + 1;
+					let only_ws := true;
+					while ( k < length indent ) {
+						only_ws := false
+							if not _kdl_is_ws( substr( indent, k, 1 ) );
+						k++;
+					}
+					indent := substr( indent, 0, bs ) if only_ws;
+				}
+			}
+			if ( indent ≡ "" ) {
+				let min_indent := null;
+				let scan := 0;
+				let scan_start := 0;
+				while ( scan <= length content ) {
+					if ( scan ≡ length content
+						or substr( content, scan, 1 ) ≡ "\n"
+					) {
+						let raw_line := substr(
+							content,
+							scan_start,
+							scan - scan_start,
+						);
+						if ( not( raw_line ~ /^\s*$/ ) ) {
+							let width := 0;
+							while ( width < length raw_line
+								and _kdl_is_ws( substr( raw_line, width, 1 ) )
+							) {
+								width++;
+							}
+							min_indent := width
+								if min_indent ≡ null or width < min_indent;
+						}
+						scan_start := scan + 1;
+					}
+					scan++;
+				}
+				if ( min_indent ≢ null and min_indent > 0 ) {
+					indent := "";
+					let si := 0;
+					while ( si < min_indent ) {
+						indent _= " ";
+						si++;
+					}
+				}
+			}
+			let out := "";
+		i := 0;
+		let line_start := 0;
+			let emitted := false;
+			let continued := false;
+			let last_line_continued_with_text := false;
+			while ( i <= length content ) {
+			if ( i ≡ length content or substr( content, i, 1 ) ≡ "\n" ) {
+				let line := substr( content, line_start, i - line_start );
+				if ( line ~ /^\s*$/ ) {
+					line := "";
+				}
+					else if ( continued ) {
+						if ( length indent > 0
+							and substr( line, 0, length indent ) ≡ indent
+						) {
+							line := substr(
+								line,
+								length indent,
+								length line - length indent,
+							);
+						}
+					}
+					else if ( length indent > 0 and substr( line, 0, length indent ) ≡ indent ) {
+						line := substr( line, length indent, length line - length indent );
+					}
+					else if ( length indent > 0 ) {
+						let k := 0;
+						while ( k < length line
+							and _kdl_is_ws( substr( line, k, 1 ) )
+						) {
+							k++;
+						}
+						let ok_escape_prefix := false;
+						if ( not raw and substr( line, k, 1 ) ≡ "\\" ) {
+							k++;
+							ok_escape_prefix := true;
+							while ( k < length line ) {
+								ok_escape_prefix := false
+									if not _kdl_is_ws( substr( line, k, 1 ) );
+								k++;
+							}
+						}
+						self._error("Multiline string indentation mismatch")
+							if not ok_escape_prefix;
+					}
+
+				let line_continues := false;
+				if ( not raw ) {
+					let j := length line - 1;
+					while ( j >= 0 and _kdl_is_ws( substr( line, j, 1 ) ) ) {
+						j--;
+					}
+					if ( j >= 0 and substr( line, j, 1 ) ≡ "\\" ) {
+						let slashes := 0;
+						while ( j - slashes >= 0
+							and substr( line, j - slashes, 1 ) ≡ "\\"
+						) {
+							slashes++;
+						}
+						if ( slashes mod 2 = 1 ) {
+							line_continues := true;
+							line := substr( line, 0, j );
+						}
+					}
+				}
+				self._error("Invalid final multiline whitespace escape")
+					if line_continues and line ≡ "" and indent ≡ "";
+
+				out _= "\n"
+					if emitted and not continued
+						and not ( line_continues and line ≡ "" );
+				out _= raw ? line : self._unescape_multiline_line(line);
+				emitted := true;
+				continued := line_continues;
+				last_line_continued_with_text := line_continues and line ≢ "";
+				line_start := i + 1;
+			}
+			i++;
+		}
+		self._error("Invalid final multiline whitespace escape")
+			if last_line_continued_with_text;
+		return out;
+	}
+
+	method _unescape_multiline_line ( String line ) {
+		let out := "";
+		let i := 0;
+		while ( i < length line ) {
+			let ch := substr( line, i, 1 );
+			if ( ch ≢ "\\" ) {
+				out _= ch;
+				i++;
+				next;
+			}
+
+			i++;
+			self._error("Unterminated string escape") if i >= length line;
+			ch := substr( line, i, 1 );
+			if ( ch ≡ "\"" ) { out _= "\""; }
+			else if ( ch ≡ "\\" ) { out _= "\\"; }
+			else if ( ch ≡ "b" ) { out _= chr(8); }
+			else if ( ch ≡ "f" ) { out _= chr(12); }
+			else if ( ch ≡ "n" ) { out _= "\n"; }
+			else if ( ch ≡ "r" ) { out _= "\r"; }
+			else if ( ch ≡ "s" ) { out _= " "; }
+			else if ( ch ≡ "t" ) { out _= "\t"; }
+			else if ( _kdl_is_ws(ch) ) {
+				while ( i < length line and _kdl_is_ws( substr( line, i, 1 ) ) ) {
+					i++;
+				}
+				i--;
+			}
+			else if ( ch ≡ "u" ) {
+				self._error("Expected '{' in Unicode escape")
+					if substr( line, i + 1, 1 ) ≢ "{";
+				i += 2;
+				let start := i;
+				while ( i < length line and substr( line, i, 1 ) ≢ "}" ) {
+					self._error("Invalid Unicode escape")
+						if not _kdl_is_hex_digit( substr( line, i, 1 ) );
+					i++;
+				}
+				self._error("Unterminated Unicode escape")
+					if i >= length line;
+				let raw := substr( line, start, i - start );
+				self._error("Unicode escape must contain 1 to 6 hex digits")
+					if length raw < 1 or length raw > 6;
+				let code := _kdl_from_hex(raw);
+				out _= chr(code);
+			}
+			else {
+				self._error( `Invalid string escape '\\${ch}'` );
+			}
+			i++;
+		}
+		return out;
+	}
+}
+
+function _kdl_value ( value ) {
+	if ( value instanceof KDLValue ) {
+		return value;
+	}
+	if ( value ≡ null ) {
+		return new KDLValue( type: "null", value: null );
+	}
+	if ( value instanceof Boolean ) {
+		return new KDLValue( type: "boolean", value: value );
+	}
+	if ( value instanceof Number ) {
+		return new KDLValue( type: "number", kind: "float", value: value );
+	}
+	return new KDLValue( type: "string", value: "" _ value );
+}
+
+function _kdl_encode_value ( value, Boolean canonical := false ) {
+	let v := _kdl_value(value);
+	let prefix := "";
+	if ( v.type_annotation() ≢ null ) {
+		prefix := "(" _ _kdl_name( v.type_annotation() ) _ ")";
+	}
+	if ( v.is_null() ) { return prefix _ "#null"; }
+	if ( v.is_boolean() ) {
+		return prefix _ ( v.native_value() ? "#true" : "#false" );
+	}
+	if ( v.is_number() ) {
+		if ( canonical and v.canonical_number() ≢ null ) {
+			return prefix _ v.canonical_number();
+		}
+		return prefix _ ( v.kind() ≡ "string" ? v.value() : "" _ v.value() );
+	}
+	if ( v.is_string() ) {
+		if ( canonical and _kdl_is_plain_ident( v.native_value() ) ) {
+			return prefix _ v.native_value();
+		}
+		return prefix _ "\"" _ _kdl_escape_string( v.native_value() ) _ "\"";
+	}
+
+	let native := v.native_value();
+	try {
+		if ( native can "to_String" ) {
+			let text := native.to_String();
+			if ( canonical and _kdl_is_plain_ident(text) ) {
+				return prefix _ text;
+			}
+			return prefix _ "\"" _ _kdl_escape_string(text) _ "\"";
+		}
+	}
+	catch {
+	}
+
+	die `Cannot serialize KDLValue of type '${v.type()}'`;
+}
+
+function _kdl_encode_node (
+	KDLNode node,
+	Number level,
+	Boolean canonical := false,
+) {
+	let out := _kdl_indent( level, canonical );
+	if ( node.type_annotation() ≢ null ) {
+		out _= "(" _ _kdl_name( node.type_annotation() ) _ ")";
+	}
+	out _= _kdl_name( node.name() );
+	for ( let arg in node.args() ) {
+		out _= " " _ _kdl_encode_value( arg, canonical );
+	}
+	if ( canonical ) {
+		for ( let kv in _kdl_canonical_props( node.props() ) ) {
+			out _= " " _ _kdl_name(kv[0]) _ "="
+				_ _kdl_encode_value( kv[1], canonical );
+		}
+	}
+	else {
+		for ( let pair in node.props().to_Array() ) {
+			let kv := pair{pair};
+			out _= " " _ _kdl_name(kv[0]) _ "="
+				_ _kdl_encode_value( kv[1], canonical );
+		}
+	}
+	if ( node.children().length() > 0 ) {
+		out _= " {\n";
+		let i := 0;
+		while ( i < node.children().length() ) {
+			out _= _kdl_encode_node(
+				node.children()[i],
+				level + 1,
+				canonical,
+			);
+			out _= "\n";
+			i++;
+		}
+		out _= _kdl_indent( level, canonical ) _ "}";
+	}
+	return out;
+}
+
+function _kdl_encode_document ( KDLDocument doc, Boolean canonical := false ) {
+	let out := "";
+	let i := 0;
+	while ( i < doc.nodes().length() ) {
+		out _= "\n" if i > 0;
+		out _= _kdl_encode_node( doc.nodes()[i], 0, canonical );
+		i++;
+	}
+	out _= "\n" if canonical;
+	return out;
+}
+
+class KDL {
+	let Boolean canonical := false;
+
+	method decode ( String text ) {
+		return new _KDLParser( text: text, pos: 0 )._parse_document();
+	}
+
+	method decode_binarystring ( BinaryString raw ) {
+		return self.decode( to_string(raw) );
+	}
+
+	method encode ( value ) {
+		if ( value instanceof KDLDocument ) {
+			return _kdl_encode_document( value, canonical );
+		}
+		if ( value instanceof KDLNode ) {
+			return _kdl_encode_node( value, 0, canonical );
+		}
+		if ( value instanceof Array ) {
+			return _kdl_encode_document(
+				new KDLDocument( nodes: value ),
+				canonical,
+			);
+		}
+		die "KDL.encode expects a KDLDocument, KDLNode, or Array of KDLNode";
+	}
+
+	method encode_binarystring ( value ) {
+		return to_binary( self.encode(value) );
+	}
+
+	method load ( path ) {
+		from std/io import Path;
+		die "KDL.load is denied by runtime policy" if __system__{deny_fs};
+		die "KDL.load expects a std/io Path object" if not( path instanceof Path );
+		return self.decode_binarystring( path.slurp() );
+	}
+
+	method dump ( path, value ) {
+		from std/io import Path;
+		die "KDL.dump is denied by runtime policy" if __system__{deny_fs};
+		die "KDL.dump expects a std/io Path object" if not( path instanceof Path );
+		path.spew( self.encode_binarystring(value) );
+		return path;
+	}
+}

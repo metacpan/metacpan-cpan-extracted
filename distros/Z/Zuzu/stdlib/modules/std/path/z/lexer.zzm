@@ -1,0 +1,490 @@
+=encoding utf8
+
+=head1 NAME
+
+std/path/z/lexer - Pure Zuzu lexer for ZPath expressions.
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module provides the pure-Zuzu lexer used by ZPath.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<< Lexer({ src: String, allowed_operators: Array }) >>
+
+Constructs a ZPath lexer. Returns: C<Lexer>. Tokenizes C<src> using the
+allowed operator table.
+
+=over
+
+=item C<< lexer.peek() >>
+
+Parameters: none. Returns: C<Dict>. Returns the current token without
+advancing.
+
+=item C<< lexer.peek_n(n) >>
+
+Parameters: C<n> is a zero-based lookahead offset. Returns: C<Dict>.
+Returns a token ahead of the current position.
+
+=item C<< lexer.peek_kind() >>
+
+Parameters: none. Returns: C<String>. Returns the current token kind.
+
+=item C<< lexer.peek_kind_n(n) >>
+
+Parameters: C<n> is a zero-based lookahead offset. Returns: C<String>.
+Returns a token kind ahead of the current position.
+
+=item C<< lexer.next_tok() >>
+
+Parameters: none. Returns: C<Dict>. Consumes and returns the current
+token.
+
+=item C<< lexer.expect(k) >>
+
+Parameters: C<k> is the expected token kind. Returns: C<Dict>. Consumes
+and returns the current token, throwing when it has a different kind.
+
+=item C<< lexer.known_operators() >>
+
+Parameters: none. Returns: C<Array>. Returns the allowed operator
+definitions.
+
+=back
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/path/z/lexer >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/string import substr;
+
+class Lexer {
+	let src := "";
+	let scan_i := 0;
+	let toks := [];
+	let pos := 0;
+	let allowed_operators;
+
+	method __build__ () {
+		die "Expected some operators" unless allowed_operators;
+		toks := self._tokenize(src);
+	}
+
+	method peek () {
+		return toks[pos];
+	}
+	
+	method peek_n ( n ) {
+		return toks[pos + n];
+	}
+	
+	method peek_kind () {
+		return toks[pos]{k};
+	}
+
+	method peek_kind_n ( n ) {
+		return toks[pos + n]{k};
+	}
+
+	method next_tok () {
+		let tok := toks[pos];
+		pos++;
+		return tok;
+	}
+
+	method expect ( k ) {
+		let t := self.next_tok();
+		die `Expected ${k}, got ${t{k}}` if t{k} ≢ k;
+		return t;
+	}
+
+	method _is_ws ( c ) {
+		return c ≢ null and c ~ /\s/;
+	}
+
+	method _prev_sig ( chars, idx ) {
+		let j := idx - 1;
+		while ( j >= 0 ) {
+			if ( chars[j] ~ /\s/ ) {
+				j--;
+				next;
+			}
+			return chars[j];
+		}
+		return null;
+	}
+
+	method _next_sig ( chars, idx, n ) {
+		let j := idx + 1;
+		while ( j < n ) {
+			if ( chars[j] ~ /\s/ ) {
+				j++;
+				next;
+			}
+			return chars[j];
+		}
+		return null;
+	}
+
+	method _is_path_ctx_prev ( c ) {
+		return c ≡ "[" or c ≡ "(" or c ≡ "," or c ≡ ":" or c ≡ "?" or c ≡ "/";
+	}
+
+	method _is_path_ctx_next ( c ) {
+		return c ≡ "]" or c ≡ ")" or c ≡ "," or c ≡ ":" or c ≡ "?" or c ≡ "/";
+	}
+
+	method _ws_on_both ( left, right ) {
+		return self._is_ws(left) and self._is_ws(right);
+	}
+
+	method known_operators () {
+		return allowed_operators;
+	}
+
+	method _sorted_operators () {
+		return self.known_operators()
+			.grep( fn o → not o.lexer_should_ignore )
+			.sort( fn ( x, y ) → y.char_length <=> x.char_length );
+	}
+
+	method _operator_at ( chars, i, n, ops ) {
+		let oi := 0;
+		while ( oi < ops.length ) {
+			let op := ops[oi];
+			let spell := op{spelling};
+			let m := length spell;
+			if ( i + m <= n ) {
+				let got := "";
+				let j := 0;
+				while ( j < m ) {
+					got _= chars[i + j];
+					j++;
+				}
+				if ( got ≡ spell ) {
+					return op;
+				}
+			}
+			oi++;
+		}
+		return null;
+	}
+
+	method _is_name_char ( c ) {
+		return c ~ /[A-Za-z0-9_\-]/;
+	}
+
+	method _allows_operator_kind ( kind ) {
+		return allowed_operators.first( fn op → op.get_kind() ≡ kind )
+			? true
+			: false;
+	}
+
+	method _tokenize ( String source ) {
+		let t := [];
+		let chars := [];
+		let n := length source;
+		let ops := self._sorted_operators();
+		let z := 0;
+		while ( z < n ) {
+			chars.push( substr( source, z, 1 ) );
+			z++;
+		}
+
+		let i := 0;
+		while ( i < n ) {
+			let ch := chars[i];
+
+			if ( ch ~ /\s/ ) {
+				i++;
+				next;
+			}
+
+			let prev := i > 0 ? chars[i - 1] : null;
+			let nxt := i + 1 < n ? chars[i + 1] : null;
+
+			let prev_nonws := self._prev_sig( chars, i );
+			let next_nonws := self._next_sig( chars, i, n );
+
+			function push_token ( tok ) {
+				tok{ws_before} := self._is_ws(prev) ? true : false;
+				tok{ws_after}  := self._is_ws(nxt)  ? true : false;
+				t.push( tok );
+			}
+
+			function push_sized_token ( tok, after ) {
+				tok{ws_before} := self._is_ws(prev) ? true : false;
+				tok{ws_after}  := self._is_ws(after) ? true : false;
+				t.push( tok );
+			}
+
+			if ( ch ≡ "/" ) {
+				if (
+					self._ws_on_both( prev, nxt )
+					and prev_nonws ≢ null and next_nonws ≢ null
+					and not self._is_path_ctx_prev(prev_nonws)
+					and not self._is_path_ctx_next(next_nonws)
+				) {
+					push_token( { k: "SLASH", v: "/" } );
+					i++;
+					next;
+				}
+				if (
+					( self._is_ws(prev) xor self._is_ws(nxt) )
+					and prev_nonws ≢ null and next_nonws ≢ null
+					and not self._is_path_ctx_prev(prev_nonws)
+					and not self._is_path_ctx_next(next_nonws)
+				) {
+					die `Binary operator '/' requires whitespace around it`;
+				}
+				t.push( { k: "SLASH_PATH", v: "/" } );
+				i++;
+				next;
+			}
+
+			let op := self._operator_at( chars, i, n, ops );
+			if ( op ≢ null ) {
+				let spell := op.get_spelling();
+				let need_ws := op.requires_whitespace();
+				let m := length spell;
+				let op_prev := i > 0 ? chars[i - 1] : null;
+				let op_next := i + m < n ? chars[i + m] : null;
+				let path_ambiguous_star :=
+					( spell ≡ "*" or spell ≡ "**" )
+					and not self._ws_on_both( op_prev, op_next );
+
+				let left_name := false;
+				let right_name := false;
+				if ( spell ~ /^[A-Za-z_]/ ) {
+					left_name := op_prev ≢ null and self._is_name_char(op_prev);
+					right_name := op_next ≢ null and self._is_name_char(op_next);
+				}
+
+				if (
+					not path_ambiguous_star
+					and not left_name
+					and not right_name
+				) {
+					if ( need_ws ) {
+						if ( self._ws_on_both( op_prev, op_next ) ) {
+							push_sized_token( { k: op.get_kind(), v: spell }, op_next );
+							i := i + m;
+							next;
+						}
+						die `Binary operator '${spell}' requires whitespace around it`;
+					}
+					push_sized_token( { k: op.get_kind(), v: spell }, op_next );
+					i := i + m;
+					next;
+				}
+			}
+
+			if ( ch ≡ "(" ) { t.push( { k: "LPAREN", v: "(" } ); i++; next; }
+			if ( ch ≡ ")" ) { t.push( { k: "RPAREN", v: ")" } ); i++; next; }
+			if ( ch ≡ "[" ) { t.push( { k: "LBRACK", v: "[" } ); i++; next; }
+			if ( ch ≡ "]" ) { t.push( { k: "RBRACK", v: "]" } ); i++; next; }
+			if ( ch ≡ "," ) { t.push( { k: "COMMA", v: "," } ); i++; next; }
+
+			if ( ch ≡ "." ) {
+				if ( i + 2 < n and chars[i + 1] ≡ "." and chars[i + 2] ≡ "*" ) {
+					push_token( { k: "DOTDOTSTAR", v: "..*" } );
+					i := i + 3;
+					next;
+				}
+				if ( i + 1 < n and chars[i + 1] ≡ "." ) {
+					push_token( { k: "DOTDOT", v: ".." } );
+					i := i + 2;
+					next;
+				}
+				push_token( { k: "DOT", v: "." } );
+				i++;
+				next;
+			}
+
+			if ( ch ≡ "*" and self._ws_on_both( prev, nxt ) ) {
+				push_token( { k: "STAR", v: "*" } );
+				i++;
+				next;
+			}
+
+			if ( ch ≡ "*" ) {
+				if ( i + 1 < n and chars[i + 1] ≡ "*" ) {
+					push_token( { k: "STARSTAR", v: "**" } );
+					i := i + 2;
+					next;
+				}
+				push_token( { k: "STAR_PATH", v: "*" } );
+				i++;
+				next;
+			}
+
+			if ( self._allows_operator_kind( "ELVIS" ) and ch ≡ "?" and nxt ≡ ":" ) {
+				let op_next := i + 2 < n ? chars[i + 2] : null;
+				if ( self._ws_on_both( prev, op_next ) ) {
+					t.push( {
+						k: "ELVIS",
+						v: "?:",
+						ws_before: self._is_ws(prev) ? true : false,
+						ws_after: self._is_ws(op_next) ? true : false,
+					} );
+					i := i + 2;
+					next;
+				}
+				die "Elvis operator '?:' requires whitespace around it";
+			}
+
+			if ( ch ≡ "?" or ch ≡ ":" ) {
+				if ( self._ws_on_both( prev, nxt ) ) {
+					push_token( { k: ch ≡ "?" ? "QMARK" : "COLON", v: ch } );
+					i++;
+					next;
+				}
+				die `Ternary operator '${ch}' requires whitespace around it`;
+			}
+
+			if ( ch ≡ "\"" or ch ≡ "'" ) {
+				let quote := ch;
+				i++;
+				let s := "";
+				let esc := false;
+				while ( i < n ) {
+					let cc := chars[i];
+					i++;
+					if ( esc ) {
+						if ( cc ≡ "\\" or cc ≡ quote or cc ≡ "\"" or cc ≡ "'" ) {
+							s _= cc;
+						}
+						else {
+							s _= self._unescape_char(cc);
+						}
+						esc := false;
+						next;
+					}
+					if ( cc ≡ "\\" ) { esc := true; next; }
+					last if cc ≡ quote;
+					s _= cc;
+				}
+				push_token( { k: "STRING", v: s, q: quote } );
+				next;
+			}
+
+			if ( ch ≡ "#" ) {
+				let j := i + 1;
+				let neg := false;
+				if ( j < n and chars[j] ≡ "-" ) {
+					neg := true;
+					j++;
+				}
+				die "Invalid index '#'" if j >= n or not( chars[j] ~ /\d/ );
+				let num := "";
+				while ( j < n and chars[j] ~ /\d/ ) {
+					num _= chars[j];
+					j++;
+				}
+				let parsed := 0 + num;
+				parsed := 0 - parsed if neg;
+				push_token( { k: "INDEX", v: parsed } );
+				i := j;
+				next;
+			}
+
+			if ( ch ~ /[0-9]/ ) {
+				let j := i;
+				let num := "";
+				while ( j < n and chars[j] ~ /[0-9.]/ ) {
+					num _= chars[j];
+					j++;
+				}
+				push_token( { k: "NUMBER", v: 0 + num } );
+				i := j;
+				next;
+			}
+
+			let name := self._read_name( chars, i );
+			if ( name{v} ≢ "" ) {
+				push_token( { k: "NAME", v: name{v} } );
+				i := name{i};
+				next;
+			}
+
+			die `Unexpected character '${ch}' at position ${i}`;
+		}
+
+		t.push( { k: "EOF", v: "" } );
+		return t;
+	}
+
+	method _unescape_char ( c ) {
+		return "\n" if c ≡ "n";
+		return "\r" if c ≡ "r";
+		return "\t" if c ≡ "t";
+		return c;
+	}
+
+	method _read_name ( chars, start_i ) {
+		let n := chars.length();
+		let delim := {
+			"\n": true,
+			"\r": true,
+			"\t": true,
+			"(": true,
+			")": true,
+			"[": true,
+			"]": true,
+			"/": true,
+			",": true,
+			"=": true,
+			"&": true,
+			"|": true,
+			"!": true,
+			"<": true,
+			">": true,
+			"#": true,
+			" ": true,
+		};
+		let buf := "";
+		let esc := false;
+		let i := start_i;
+
+		while ( i < n ) {
+			let c := chars[i];
+			if ( esc ) {
+				buf _= c;
+				esc := false;
+				i++;
+				next;
+			}
+
+			if ( c ≡ "\\" ) {
+				esc := true;
+				i++;
+				next;
+			}
+
+			last if delim.exists(c);
+			last if c ~ /\s/;
+			buf _= c;
+			i++;
+		}
+
+		return { v: "", i: start_i } if buf ≡ "";
+		return { v: buf, i: i };
+	}
+}

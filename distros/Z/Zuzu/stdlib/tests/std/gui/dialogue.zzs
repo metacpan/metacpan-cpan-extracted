@@ -1,0 +1,18 @@
+from test/more import *;
+
+requires_capability( "gui" );
+
+from std/gui/dialogue import
+	alert,
+	confirm,
+	prompt,
+	alert_window;
+
+is( alert( "Saved", auto_result: true ), null, "alert auto_result returns null" );
+is( confirm( "Continue?", auto_result: true ), true, "confirm auto_result true" );
+is( prompt( "Name:", auto_result: "Ada" ), "Ada", "prompt auto_result" );
+let w := alert_window("Saved");
+is( typeof w, "Window", "alert_window returns a Window" );
+ok( w.find_by_id("ok") ≢ null, "alert_window includes an OK button" );
+
+done_testing();

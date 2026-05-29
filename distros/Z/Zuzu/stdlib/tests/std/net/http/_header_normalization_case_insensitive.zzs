@@ -1,0 +1,23 @@
+from std/net/http import UserAgent;
+from test/more import *;
+
+let ua := new UserAgent( timeout: 2 );
+let url := "https://example.com/";
+if ( __system__{runtime} eq "zuzu-js" and __system__{platform} eq "browser" ) {
+	url := "/__zuzu_browser_ztests/http-fixture";
+}
+let resp := await {
+	ua.get_async(url);
+};
+
+let lower := resp.header( "content-type" );
+let mixed := resp.header( "Content-Type" );
+let as_dict := resp.to_Dict();
+let headers := as_dict.get( "headers", {} );
+
+ok( lower ≢ null, "header lookup returns value for lowercase key" );
+is( mixed, lower, "header lookup is case-insensitive" );
+ok( headers.get( "content-type", null ) ≢ null or headers.get( "Content-Type", null ) ≢ null,
+	"header map exposes content-type under normalized or canonical key", );
+
+done_testing();

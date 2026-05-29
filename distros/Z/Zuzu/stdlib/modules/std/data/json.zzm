@@ -1,0 +1,102 @@
+=encoding utf8
+
+=head1 NAME
+
+std/data/json - JSON encoding and decoding for ZuzuScript.
+
+=head1 SYNOPSIS
+
+  from std/data/json import JSON;
+  
+  let codec := new JSON( pretty: true );
+  let text  := codec.encode({ answer: 42 });
+  let data  := codec.decode(text);
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Node and
+Electron. It is partially supported by zuzu-js in the browser: in-memory
+JSON encode/decode coverage passes, but file-backed load/dump coverage is
+unsupported because browser filesystem capability is unavailable.
+
+=head1 DESCRIPTION
+
+This module provides a C<JSON> class for turning ZuzuScript values
+into JSON text and parsing JSON text back into ZuzuScript values.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<< JSON({ utf8?: Bool, pretty?: Bool, canonical?: Bool }) >>
+
+Constructs a JSON codec. Returns: C<JSON>.
+
+The constructor accepts named options:
+
+=over
+
+=item * C<utf8>
+
+Accepted for compatibility with older runtime implementations. Use
+C<encode_binarystring> when UTF-8 bytes are required.
+
+=item * C<pretty> (default false)
+
+Pretty-print the JSON output.
+
+=item * C<canonical> (default false)
+
+Sort keys in objects while encoding.
+
+=item * C<pairlists> (default false)
+
+Decode JSON objects as PairLists instead of Dicts.
+
+(PairLists will always be encoded into JSON properly; this only affects
+decoding.)
+
+=back
+
+=item C<< codec.encode(value) >>
+
+Parameters: C<value> is any JSON-encodable ZuzuScript value. Returns:
+C<String>. Encodes C<value> as JSON text.
+
+=item C<< codec.encode_binarystring(value) >>
+
+Parameters: C<value> is any JSON-encodable ZuzuScript value. Returns:
+C<BinaryString>. Encodes C<value> as UTF-8 JSON bytes.
+
+=item C<< codec.decode(String json) >>
+
+Parameters: C<json> is JSON text. Returns: value. Decodes JSON into the
+equivalent ZuzuScript value.
+
+=item C<< codec.decode_binarystring(BinaryString json) >>
+
+Parameters: C<json> is UTF-8 JSON bytes. Returns: value. Decodes JSON
+into the equivalent ZuzuScript value.
+
+=item C<< codec.load(Path path) >>
+
+Parameters: C<path> is a C<std/io> C<Path>. Returns: value. Reads JSON
+text from C<path> and decodes it.
+
+=item C<< codec.dump(Path path, value) >>
+
+Parameters: C<path> is a C<std/io> C<Path> and C<value> is any
+JSON-encodable value. Returns: C<null>. Encodes C<value> and writes JSON
+text to C<path>.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/data/json >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.

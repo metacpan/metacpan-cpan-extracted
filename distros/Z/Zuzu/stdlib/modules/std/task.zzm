@@ -1,0 +1,221 @@
+=encoding utf8
+
+=head1 NAME
+
+std/task - task helpers for async ZuzuScript code.
+
+=head1 SYNOPSIS
+
+  from std/task import all, race, sleep, yield, timeout, Channel, CancellationSource;
+
+  async function __main__ () {
+    let a := spawn { await { sleep(0.1); }; "a"; };
+    let b := spawn { await { sleep(0.1); }; "b"; };
+    return await { all( [ a, b ] ); };
+  }
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This runtime-supported module provides the task type, cancellation
+objects, channels, timers, and combinators used with the
+C<await { ... }> and C<spawn { ... }> language forms.
+
+The Phase A model follows JavaScript promises closely: creating a task
+starts independent work, and a spawned task's failure is observed only
+when the task is awaited or passed to a combinator such as C<all>,
+C<race>, or C<timeout>. Unawaited spawned tasks are detached background
+work until the runtime shuts down. Async script entrypoints should be
+written as C<async function __main__ ( argv ) { ... }>; the CLI awaits
+that function after loading the script.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<Task>
+
+The runtime task type.
+
+Tasks are awaitable values. Awaiting a fulfilled task returns its
+result. Awaiting a rejected task throws the rejection value. Awaiting a
+cancelled task throws C<CancelledException> or the stored cancellation
+reason.
+
+=over
+
+=item C<< task.status() >>
+
+Parameters: none. Returns: C<String>. Returns C<pending>, C<running>,
+C<sleeping>, C<waiting>, C<fulfilled>, C<rejected>, or C<cancelled>.
+
+=item C<< task.done() >>
+
+Parameters: none. Returns: C<Boolean>. Returns true when the task has
+fulfilled, rejected, or been cancelled.
+
+=item C<< task.poll() >>
+
+Parameters: none. Returns: C<Boolean>. Makes one non-blocking progress
+check and returns whether the task has completed.
+
+=item C<< task.cancel(reason?) >>
+
+Parameters: C<reason> is an optional cancellation reason. Returns:
+C<Task>. Cancels the task and returns the task.
+
+=back
+
+=item C<Channel>
+
+Construct with C<new Channel()>. Returns a simple channel object with
+C<send>, C<recv>, and C<close>. C<send> returns an immediately completed
+task for the buffered first version, or fails with
+C<ChannelClosedException> if the channel is closed. C<recv> returns a
+pending task when no message is available and resolves to C<null> once a
+closed channel has been drained.
+
+C<null> is the documented end-of-stream result for an empty closed
+channel.
+
+=over
+
+=item C<< channel.send(value) >>
+
+Parameters: C<value> is any value that may be sent through the channel.
+Returns: C<Task>. Sends a value or fails if the channel is closed.
+
+=item C<< channel.recv() >>
+
+Parameters: none. Returns: C<Task>. Resolves to the next value, or to
+C<null> after a closed channel has drained.
+
+=item C<< channel.close() >>
+
+Parameters: none. Returns: C<null>. Closes the channel.
+
+=back
+
+=item C<CancellationToken>
+
+Cancellation signal object.
+
+=over
+
+=item C<< token.cancelled() >>
+
+Parameters: none. Returns: C<Boolean>. Returns true when cancellation
+has been requested.
+
+=item C<< token.reason() >>
+
+Parameters: none. Returns: value or C<null>. Returns the cancellation
+reason.
+
+=item C<< token.throw_if_cancelled() >>
+
+Parameters: none. Returns: C<null>. Throws when cancellation has been
+requested.
+
+=item C<< token.watch(task) >>
+
+Parameters: C<task> is a C<Task>. Returns: C<Task>. Registers C<task>
+for cancellation when the token is cancelled.
+
+=back
+
+=item C<CancellationSource>
+
+Construct with C<new CancellationSource()>. Calling
+C<source.cancel(reason)> marks its token as cancelled, stores the
+cancellation reason, and cancels tasks registered with
+C<source.token().watch(task)>.
+
+=over
+
+=item C<< source.token() >>
+
+Parameters: none. Returns: C<CancellationToken>. Returns the source's
+token.
+
+=item C<< source.cancel(reason?) >>
+
+Parameters: C<reason> is an optional cancellation reason. Returns:
+C<null>. Marks the token cancelled and cancels watched tasks.
+
+=item C<< source.cancelled() >>
+
+Parameters: none. Returns: C<Boolean>. Returns true when the source has
+been cancelled.
+
+=item C<< source.reason() >>
+
+Parameters: none. Returns: value or C<null>. Returns the stored
+cancellation reason.
+
+=back
+
+=back
+
+=head2 Functions
+
+=over
+
+=item C<resolved(value)>
+
+Parameters: C<value> is any value. Returns: C<Task>. Returns a task that
+resolves to C<value>.
+
+=item C<failed(message)>
+
+Parameters: C<message> is a failure value. Returns: C<Task>. Returns a
+task that fails with C<message>.
+
+=item C<sleep(seconds)>
+
+Parameters: C<seconds> is a delay in seconds. Returns: C<Task>. Returns
+a task that completes after the requested delay.
+
+=item C<yield()>
+
+Parameters: none. Returns: C<Task>. Returns a task that completes after
+yielding back to the async scheduler once.
+
+=item C<all(tasks)>
+
+Parameters: C<tasks> is an array of tasks. Returns: C<Task>. Returns a
+task that awaits all tasks and resolves to an array of results in input
+order.
+
+If any input task rejects or is cancelled, the C<all> task rejects or is
+cancelled with that same failure.
+
+=item C<race(tasks)>
+
+Parameters: C<tasks> is an array of tasks. Returns: C<Task>. Returns a
+task that resolves or fails with the first completed input task and
+cancels unfinished losing tasks.
+
+Loser cancellation is part of the public contract. Keep task handles and
+await them separately if later completion is important.
+
+=item C<timeout(seconds, task)>
+
+Parameters: C<seconds> is a timeout in seconds and C<task> is the task
+to await. Returns: C<Task>. Returns a task that fails with
+C<TimeoutException> if C<task> does not complete before the timeout.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/task >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.

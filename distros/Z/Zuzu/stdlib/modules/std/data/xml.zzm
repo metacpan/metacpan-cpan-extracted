@@ -1,0 +1,276 @@
+=encoding utf8
+
+=head1 NAME
+
+std/data/xml - XML parsing and DOM manipulation for ZuzuScript.
+
+=head1 SYNOPSIS
+
+  from std/data/xml import XML;
+
+  let doc := XML.parse(
+    "<root><item id='a'>first</item></root>"
+  );
+
+  let root := doc.documentElement();
+  let item := root.firstChild();
+
+  item.setAttribute("status", "active");
+  root.appendChild( doc.createComment("done") );
+
+  let text := doc.toXML(true);
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Node and
+Electron. It is partially supported by zuzu-js in the browser: core XML
+and ZPath pipeline coverage passes, but file-backed load/dump coverage is
+unsupported because browser filesystem capability is unavailable.
+
+=head1 DESCRIPTION
+
+This module provides in-memory XML parsing and DOM tree operations,
+backed by C<XML::LibXML>.
+
+It supports in-memory parsing plus explicit file load/dump operations
+using C<std/io> C<Path> objects.
+
+=head1 EXPORTS
+
+=over
+
+=item C<XML>
+
+Static DOM entry point.
+
+=over
+
+=item C<< XML.parse(String xml) -> XMLDocument >>
+
+Parse XML text and return a document object.
+
+=item C<< XML.load(Path path) -> XMLDocument >>
+
+Read XML text from a C<std/io> C<Path> and parse it.
+Throws an exception if passed a plain string.
+
+=item C<< XML.dump(Path path, XMLDocument|XMLNode value, Bool pretty?) -> Path >>
+
+Serialize C<value> and write XML to C<path>.
+Throws an exception if passed a plain string.
+
+=back
+
+=item C<XMLDocument>
+
+Document-level methods:
+
+=over
+
+=item * C<documentElement()>
+
+=item * C<createElement(name)>
+
+=item * C<createTextNode(text)>
+
+=item * C<createComment(text)>
+
+=item * C<findnodes(xpath)>
+
+=item * C<findvalue(xpath)>
+
+=item * C<querySelector(selector)>
+
+=item * C<querySelectorAll(selector)>
+
+=item * C<toXML(pretty?)>
+
+=item * C<to_String>
+
+=back
+
+=item C<XMLNode>
+
+Node-level traversal:
+
+=over
+
+=item * C<nodeName()>, C<nodeType()>, C<nodeValue()>, C<textContent()>
+
+=item * C<uniqueKey()> and C<unique_id()>
+
+=item * C<localName()>, C<namespaceURI()>
+
+=item * C<nodeKind()>
+
+=item * C<firstChild()>, C<lastChild()>, C<nextSibling()>
+
+=item * C<previousSibling()>, C<parentNode()>, C<ownerDocument()>
+
+=item * C<childNodes()>
+
+=item * C<children()>, C<hasChildNodes()>, C<normalize()>
+
+=item * C<isSameNode(other)>, C<isEqualNode(other)>, C<contains(other)>
+
+=back
+
+Node mutation:
+
+=over
+
+=item * C<setNodeValue(value)>, C<setTextContent(value)>
+
+=item * C<appendChild(node)>, C<prependChild(node)>
+
+=item * C<insertBefore(newNode, refNode)>
+
+=item * C<replaceChild(newNode, oldNode)>
+
+=item * C<removeChild(childNode)>, C<remove()>
+
+=item * C<cloneNode(deep?)>
+
+=item * C<visitEach(lambda)>, C<findFirst(lambda)>
+
+=back
+
+XPath query:
+
+=over
+
+=item * C<findnodes(xpath)>
+
+=item * C<findvalue(xpath)>
+
+=item * C<querySelector(selector)>
+
+=item * C<querySelectorAll(selector)>
+
+=back
+
+=item C<DOMNode>, C<DOMElement>, C<DOMComment>, C<DOMText>, C<DOMDocument>
+
+Specific subclasses of C<XMLNode> are returned automatically when
+possible. For example, C<documentElement()> returns C<DOMElement>,
+and C<createComment()> returns C<DOMComment>.
+
+Extra methods include:
+
+=over
+
+=item * C<DOMElement.tagName()>, C<DOMElement.id()>, C<DOMElement.setId(value)>
+
+=item * C<DOMElement.getElementsByTagName(name)>
+
+=item * C<DOMComment.data()>, C<DOMComment.setData(value)>
+
+=item * C<DOMText.data()>, C<DOMText.setData(value)>
+
+=back
+
+Document-level extras:
+
+=over
+
+=item * C<createCDATASection(text)>
+
+=item * C<getElementsByTagName(name)>
+
+=item * C<getElementById(id)>
+
+=item * C<visitEach(lambda)>, C<findFirst(lambda)>
+
+=back
+
+Element attribute helpers:
+
+=over
+
+=item * C<getAttribute(name)>, C<setAttribute(name, value)>
+
+=item * C<hasAttribute(name)>, C<removeAttribute(name)>
+
+=item * C<attributeNames()>
+
+=item * C<attributes()>
+
+=back
+
+Serialization:
+
+=over
+
+=item * C<toXML(pretty?)>
+
+=item * C<to_String>
+
+=back
+
+=back
+
+=head1 NOTES
+
+XPath operations use C<XML::LibXML> semantics.
+
+Methods that are meaningful only for element nodes (for example,
+C<setAttribute>) throw a runtime error when called on unsupported node
+types.
+
+=head1 DOM COMPATIBILITY GAPS
+
+For users coming from browser DOM APIs, these are the biggest rough
+edges today:
+
+=over
+
+=item * Querying is XPath-first, not selector-first
+
+C<findnodes> and C<findvalue> are still available and
+C<querySelector>/C<querySelectorAll> now provide CSS-style selector
+queries.
+
+=item * Partial node-type coverage
+
+Only document, element, text, and comment nodes have dedicated classes.
+Other node types (for example processing instructions) are surfaced as
+generic C<DOMNode> values without type-specific helpers.
+
+=item * Missing namespace convenience methods
+
+There are no direct wrappers for methods like
+C<getAttributeNS>, C<setAttributeNS>, C<lookupNamespaceURI>, or
+C<getElementsByTagNameNS>.
+
+=item * No browser-style collection wrappers
+
+C<childNodes>, C<children>, and C<getElementsByTagName> return plain
+arrays rather than DOM-like C<NodeList>/C<HTMLCollection>-style objects.
+That means there are no collection helper methods like C<item()>.
+
+=item * API naming differences from browser DOM
+
+The module exposes methods like C<toXML>, C<setTextContent>,
+C<attributeNames>, C<visitEach>, and C<findFirst>, which are practical
+but are not the same method names that browser users expect.
+
+=item * No parser configuration surface in C<XML.parse>
+
+Parsing is currently C<XML.parse(String)> only, with no exposed options
+for recovery mode, entity handling, whitespace policy, or security
+hardening toggles.
+
+=back
+
+If the goal is easy transfer from browser DOM experience, the highest
+impact improvements would be:
+namespace helpers and a browser-like collection API layer.
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/data/xml >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+

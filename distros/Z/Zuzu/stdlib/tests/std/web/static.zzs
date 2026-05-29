@@ -1,0 +1,173 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/internals import load_module;
+from std/io import Path;
+from std/string import join, split;
+from std/web import Request, Routes;
+
+function env ( method_name, path, headers := null ) {
+	return {
+		method:  method_name,
+		path:    path,
+		headers: headers ≡ null ? new PairList() : headers,
+	};
+}
+
+function header_env ( method_name, path, name, value ) {
+	let headers := new PairList();
+	headers.add( name, value );
+	return env( method_name, path, headers );
+}
+
+function body_text ( response ) {
+	return join(
+		"",
+		response[2].map(
+			fn part -> part instanceof BinaryString ? to_string(part) : "" _ part,
+		),
+	);
+}
+
+let root := Path.tempdir();
+root.child("hello.txt").spew_utf8("hello\n");
+root.child("app.css").spew_utf8("body { color: #333; }\n");
+root.child("photo.thing").spew_utf8("custom\n");
+root.child("docs").mkdir();
+root.child("docs").child("index.html").spew_utf8("<h1>Docs</h1>\n");
+root.child("listing").mkdir();
+root.child("listing").child("one.txt").spew_utf8("one\n");
+
+let routes := new Routes();
+routes.get("/assets/*path").to(
+	controller: "std/web/static#StaticHandler",
+	action: "handle",
+	root: root,
+);
+routes.get("/str/*path").to(
+	controller: "std/web/static#StaticHandler",
+	action: "handle",
+	root: root.to_String(),
+);
+routes.get("/custom/*path").to(
+	controller: "std/web/static#StaticHandler",
+	action: "handle",
+	root: root,
+	content_types: { ".thing": "text/x-thing" },
+);
+routes.get("/files/*file").to(
+	controller: "std/web/static#StaticHandler",
+	action: "handle",
+	root: root,
+	path_param: "file",
+);
+routes.get("/list/*path").to(
+	controller: "std/web/static#StaticHandler",
+	action: "handle",
+	root: root,
+	directory_indexes: true,
+);
+
+let out := routes.dispatch( env( "GET", "/assets/hello.txt" ) );
+is( out[0], 200, "static route serves file" );
+is( body_text(out), "hello\n", "static route returns file body" );
+is(
+	out[1].get("Content-Type"),
+	"text/plain; charset=UTF-8",
+	"static route detects text content type",
+);
+is( out[1].get("Content-Length"), "6", "static route sets content length" );
+like( out[1].get("ETag"), /^"[0-9a-f]+"$/, "static route sets ETag" );
+like(
+	out[1].get("Last-Modified"),
+	/^[A-Z][a-z]{2}, /,
+	"static route sets Last-Modified",
+);
+
+let head := routes.dispatch( env( "HEAD", "/assets/hello.txt" ) );
+is( head[0], 200, "static route accepts HEAD" );
+is( body_text(head), "", "HEAD response has no body" );
+is(
+	head[1].get("Content-Length"),
+	"6",
+	"HEAD response keeps GET content length",
+);
+
+let etag_out := routes.dispatch(
+	header_env( "GET", "/assets/hello.txt", "If-None-Match", out[1].get("ETag") ),
+);
+is( etag_out[0], 304, "matching If-None-Match returns 304" );
+is( body_text(etag_out), "", "304 response has no body" );
+
+let modified_out := routes.dispatch(
+	header_env(
+		"GET",
+		"/assets/hello.txt",
+		"If-Modified-Since",
+		out[1].get("Last-Modified"),
+	),
+);
+is( modified_out[0], 304, "matching If-Modified-Since returns 304" );
+
+let css := routes.dispatch( env( "GET", "/assets/app.css" ) );
+is(
+	css[1].get("Content-Type"),
+	"text/css; charset=UTF-8",
+	"static route detects CSS content type",
+);
+
+let custom := routes.dispatch( env( "GET", "/custom/photo.thing" ) );
+is(
+	custom[1].get("Content-Type"),
+	"text/x-thing",
+	"static route accepts content type overrides",
+);
+
+let string_root := routes.dispatch( env( "GET", "/str/hello.txt" ) );
+is( body_text(string_root), "hello\n", "static route accepts string root" );
+
+let custom_param := routes.dispatch( env( "GET", "/files/hello.txt" ) );
+is( body_text(custom_param), "hello\n", "static route accepts path_param" );
+
+let index := routes.dispatch( env( "GET", "/assets/docs" ) );
+is( index[0], 200, "static route serves directory index file" );
+is( body_text(index), "<h1>Docs</h1>\n", "directory index body is served" );
+
+let no_listing := routes.dispatch( env( "GET", "/assets/listing" ) );
+is( no_listing[0], 403, "directory listing is disabled by default" );
+
+let listing := routes.dispatch( env( "GET", "/list/listing" ) );
+is( listing[0], 200, "directory listing can be enabled" );
+like( body_text(listing), /one\.txt/, "directory listing includes children" );
+like(
+	body_text(listing),
+	/href="listing\/one\.txt"/,
+	"directory listing links resolve under directory paths",
+);
+let listing_head := routes.dispatch( env( "HEAD", "/list/listing" ) );
+is( listing_head[0], 200, "directory listing accepts HEAD" );
+is( body_text(listing_head), "", "directory listing HEAD has no body" );
+
+let missing := routes.dispatch( env( "GET", "/assets/missing.txt" ) );
+is( missing[0], 404, "missing static file returns 404" );
+
+let traversal := routes.dispatch( env( "GET", "/assets/../hello.txt" ) );
+is( traversal[0], 403, "path traversal is forbidden" );
+
+let post := routes.dispatch( env( "POST", "/assets/hello.txt" ) );
+is( post[0], 405, "route rejects unsupported methods" );
+is( post[1].get("Allow"), "GET", "route method response keeps Allow header" );
+
+let StaticHandler := load_module( "std/web/static", "StaticHandler" );
+let direct_req := new Request( env: env( "POST", "/direct" ) );
+direct_req.set_route_match( { root: root, path: "hello.txt" }, null );
+let direct := StaticHandler.handle(direct_req).finalize();
+is( direct[0], 405, "StaticHandler rejects direct non-GET methods" );
+is(
+	direct[1].get("Allow"),
+	"GET, HEAD",
+	"StaticHandler direct 405 advertises GET and HEAD",
+);
+
+done_testing();

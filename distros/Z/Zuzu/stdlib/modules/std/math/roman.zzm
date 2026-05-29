@@ -1,0 +1,156 @@
+=encoding utf8
+
+=head1 NAME
+
+std/math/roman - Roman numeral formatter for ZuzuScript.
+
+=head1 SYNOPSIS
+
+  from std/math/roman import roman;
+
+  say( roman( 2026 ) );   # MMXXVI
+  say( roman( 0 ) );      # N
+  say( roman( 1.6 ) );    # IS·
+  say( roman( 0.5 ) );    # S
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module exports a single pure-Zuzu helper, C<roman>, which
+formats numbers using Roman numerals with twelfth fractions.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item * C<< roman(Number n) >>
+
+Parameters: C<n> is the number to render. Returns: C<String>. Formats
+C<n> as a Roman numeral, returning C<N> for zero.
+
+Whole numbers from 1 to 3999 are formatted with standard Roman
+numeral subtractive notation.
+
+Non-integers are rounded to the nearest twelfth. The fractional
+part is appended using ancient twelfth marks:
+
+  1/12  => ·
+  2/12  => :
+  3/12  => ∴
+  4/12  => ∷
+  5/12  => ⁙
+  6/12  => S
+  7/12  => S·
+  8/12  => S:
+  9/12  => S∴
+  10/12 => S∷
+  11/12 => S⁙
+
+For values whose rounded twelfth part is exactly 12/12, the carry
+is applied to the integer Roman numeral part.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/math/roman >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+function _roman_integer ( Number n ) {
+	if ( n < 1 or n > 3999 ) {
+		die "Roman integer part must be between 1 and 3999";
+	}
+	let values := [ 1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1 ];
+	let numerals := [ "M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I" ];
+	let out := "";
+	let rem := n;
+	let i := 0;
+
+	while ( i < values.length() ) {
+		let value := values[i];
+		while ( rem >= value ) {
+			out _= numerals[i];
+			rem -= value;
+		}
+		i++;
+	}
+
+	return out;
+}
+
+function _twelfth_marker ( Number twelfths ) {
+	if ( twelfths = 0 ) {
+		return "";
+	}
+	if ( twelfths = 1 ) {
+		return "·";
+	}
+	if ( twelfths = 2 ) {
+		return":";
+	}
+	if ( twelfths = 3 ) {
+		return "∴";
+	}
+	if ( twelfths = 4 ) {
+		return "∷";
+	}
+	if ( twelfths = 5 ) {
+		return "⁙";
+	}
+	if ( twelfths = 6 ) {
+		return "S";
+	}
+	if ( twelfths = 7 ) {
+		return "S·";
+	}
+	if ( twelfths = 8 ) {
+		return "S:";
+	}
+	if ( twelfths = 9 ) {
+		return "S∴";
+	}
+	if ( twelfths = 10 ) {
+		return "S∷";
+	}
+	if ( twelfths = 11 ) {
+		return "S⁙";
+	}
+	die "Invalid twelfth marker";
+}
+
+function roman ( Number n ) {
+	let sign := "";
+	let magnitude := n;
+	if ( magnitude < 0 ) {
+		sign := "-";
+		magnitude := abs(magnitude);
+	}
+	let rounded_twelfths := round( magnitude * 12 );
+	let whole := int( rounded_twelfths / 12 );
+	let frac := rounded_twelfths mod 12;
+	if ( whole = 0 and frac = 0 ) {
+		return sign _ "N";
+	}
+	let whole_text := "";
+	if ( whole > 0 ) {
+		whole_text := _roman_integer(whole);
+	}
+	if ( frac = 0 ) {
+		return sign _ whole_text;
+	}
+	if ( whole = 0 ) {
+		return sign _ _twelfth_marker(frac);
+	}
+
+	return sign _ whole_text _ _twelfth_marker(frac);
+}

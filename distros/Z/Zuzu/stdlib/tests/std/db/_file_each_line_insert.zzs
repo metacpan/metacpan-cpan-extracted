@@ -1,0 +1,32 @@
+from test/more import *;
+
+requires_capability( "db" );
+requires_capability( "fs" );
+
+from std/db import DB;
+from std/io import Path;
+
+let dbh := DB.temp();
+dbh.prepare( "create table lines (line text)" ).execute();
+let insert := dbh.prepare( "insert into lines (line) values (?)" );
+
+let src := Path.tempfile();
+src.spew_utf8(
+	"alpha\n"
+	_ "beta\n"
+	_ "gamma\n",
+);
+
+src.each_line( function ( line ) {
+	insert.execute(line);
+} );
+
+let q := dbh.prepare( "select line from lines order by rowid" );
+q.execute();
+let rows := q.all_array();
+
+is( rows.length(), 3, "each_line callback inserted every row" );
+is( rows[0][0], "alpha\n", "first line inserted as read" );
+is( rows[2][0], "gamma\n", "last line inserted as read" );
+
+done_testing();

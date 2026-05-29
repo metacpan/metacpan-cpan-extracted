@@ -1,0 +1,40 @@
+from test/more import *;
+
+function enabled () {
+	return true;
+}
+
+function disabled () {
+	return false;
+}
+
+from extras/not_real try import MissingFeature;
+is( MissingFeature, null, "try import of missing module binds null" );
+
+from extras/not_real import SkippedByIf if disabled();
+is( SkippedByIf, null, "postfix if false skips import and binds null" );
+
+from extras/not_real import SkippedByUnless unless enabled();
+is( SkippedByUnless, null, "postfix unless true skips import and binds null" );
+
+from std/math import Math as MathIf if enabled();
+is(
+	round( MathIf.sin( MathIf.pi / 2 ) * 1000 ),
+	1000,
+	"postfix if true loads import",
+);
+
+from std/math import Math as MathUnless unless disabled();
+is(
+	round( MathUnless.sin( MathUnless.pi / 2 ) * 1000 ),
+	1000,
+	"postfix unless false loads import",
+);
+
+from extras/not_real try import MaybeFeature if enabled();
+is( MaybeFeature, null, "try import combines with postfix if" );
+
+from extras/not_real try import NotAttempted unless enabled();
+is( NotAttempted, null, "try import combines with postfix unless" );
+
+done_testing();

@@ -1,6 +1,6 @@
 # Richard Kelsch
 
-![Author](pics/author.jpg?raw=true "Richard Kelsch")
+[![Author](pics/author.jpg?raw=true "Richard Kelsch")](https://www.youtube.com/watch?v=j5cJD5heaV0)
 
 ![Divider](pics/pink.jpg?raw=true "Divider")
 

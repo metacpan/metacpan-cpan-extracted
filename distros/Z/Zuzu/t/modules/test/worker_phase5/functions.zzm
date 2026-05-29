@@ -1,0 +1,5 @@
+const worker_phase5_import_offset := 6;
+
+function worker_phase5_imported_add ( Number value ) {
+	return value + worker_phase5_import_offset;
+}

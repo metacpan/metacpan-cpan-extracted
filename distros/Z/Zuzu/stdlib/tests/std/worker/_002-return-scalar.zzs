@@ -1,0 +1,28 @@
+from test/more import *;
+from test/worker_contract import require_worker_phase;
+
+let Worker := require_worker_phase(1);
+
+async function main () {
+	let task := Worker.spawn(
+		function ( x ) {
+			return x * 2;
+		},
+		[ 21 ],
+	);
+
+	is( typeof task, "Task", "Worker.spawn returns a Task" );
+	is(
+		await {
+			task;
+		},
+		42,
+		"worker returns scalar result",
+	);
+}
+
+await {
+	main();
+};
+
+done_testing();

@@ -1,0 +1,192 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/archive import Archive;
+from std/data/json import JSON;
+from std/io import Path;
+from std/zuzuzoo import Zuzuzoo, execute_removal;
+
+function ensure_dir ( path ) {
+	return true if path.exists();
+	let parent := path.parent();
+	ensure_dir(parent) if not parent.exists();
+	path.mkdir();
+	return true;
+}
+
+function root ( name ) {
+	let dir := Path.tempdir();
+	let lib := dir.child("lib");
+	let bin := dir.child("bin");
+	let meta := dir.child("meta");
+	ensure_dir(lib);
+	ensure_dir(bin);
+	ensure_dir(meta);
+	return {
+		name: name,
+		dir_obj: dir,
+		lib_dir: lib.to_String(),
+		bin_dir: bin.to_String(),
+		meta_dir: meta.to_String(),
+		lib_obj: lib,
+		bin_obj: bin,
+		meta_obj: meta,
+	};
+}
+
+function module_entry ( source, install_as ) {
+	return {
+		source: source,
+		install_as: install_as,
+		sha256: "old",
+	};
+}
+
+function script_entry ( source, install_as ) {
+	return {
+		source: source,
+		install_as: install_as,
+		sha256: "old",
+		wrappers: [],
+	};
+}
+
+function write_installed ( target, name, version, modules, scripts ) {
+	( new JSON( pretty: true ) ).dump(
+		target{meta_obj}.child( name _ "-" _ version _ ".json" ),
+		{
+			name: name,
+			version: version,
+			author: "Example",
+			license: "MIT",
+			status: "stable",
+			dependencies: {},
+			installed: {
+				zdf: "ZDF-1",
+				lib_dir: target{lib_dir},
+				bin_dir: target{bin_dir},
+				meta_dir: target{meta_dir},
+				modules: modules,
+				scripts: scripts,
+			},
+		},
+	);
+}
+
+function archive_path () {
+	let path := Path.tempfile();
+	Archive.dump(
+		path,
+		{
+			entries: [
+				{
+					path: "replace-app-2.0.0/zuzu-distribution.json",
+					data: to_binary(
+						"{\"name\":\"replace-app\",\"version\":\"2.0.0\"," _
+						"\"author\":\"Example\",\"license\":\"MIT\"}\n",
+					),
+				},
+				{
+					path: "replace-app-2.0.0/modules/replace/app.zzm",
+					data: to_binary("// new app\n"),
+				},
+				{
+					path: "replace-app-2.0.0/modules/shared/mod.zzm",
+					data: to_binary("// new shared\n"),
+				},
+				{
+					path: "replace-app-2.0.0/scripts/replace-tool.zzs",
+					data: to_binary("say \"new\";\n"),
+				},
+			],
+		},
+		"zip",
+	);
+	return path;
+}
+
+let target := root("target");
+ensure_dir( target{lib_obj}.child("replace") );
+ensure_dir( target{lib_obj}.child("shared") );
+target{lib_obj}.child("replace").child("app.zzm").spew_utf8("// old app\n");
+target{lib_obj}.child("shared").child("mod.zzm").spew_utf8("// old shared\n");
+target{bin_obj}.child("replace-tool.zzs").spew_utf8("say \"old\";\n");
+
+write_installed(
+	target,
+	"replace-app",
+	"1.0.0",
+	[ module_entry( "modules/replace/app.zzm", "replace/app.zzm" ) ],
+	[],
+);
+write_installed(
+	target,
+	"shared-owner",
+	"1.0.0",
+	[ module_entry( "modules/shared/mod.zzm", "shared/mod.zzm" ) ],
+	[
+		script_entry(
+			"scripts/replace-tool.zzs",
+			"replace-tool.zzs",
+		),
+	],
+);
+
+let zoo := new Zuzuzoo(
+	lib_dir: target{lib_dir},
+	bin_dir: target{bin_dir},
+	meta_dir: target{meta_dir},
+	home: Path.tempdir().to_String(),
+);
+let archive := archive_path();
+let result := zoo.install( archive.to_String(), { no_test: true } );
+ok( result{ok}, "install with planned removals succeeds" );
+is(
+	target{meta_obj}.child("replace-app-1.0.0.json").exists(),
+	false,
+	"prior-version metadata is removed",
+);
+is(
+	target{meta_obj}.child("shared-owner-1.0.0.json").exists(),
+	false,
+	"owner-conflict metadata is removed",
+);
+is(
+	target{lib_obj}.child("replace").child("app.zzm").slurp_utf8(),
+	"// new app\n",
+	"replacement module is installed after prior removal",
+);
+is(
+	target{lib_obj}.child("shared").child("mod.zzm").slurp_utf8(),
+	"// new shared\n",
+	"owner-conflict module is replaced",
+);
+is(
+	target{bin_obj}.child("replace-tool.zzs").slurp_utf8(),
+	"say \"new\";\n",
+	"owner-conflict script is replaced",
+);
+
+let missing_root := root("missing");
+write_installed(
+	missing_root,
+	"missing-dist",
+	"1.0.0",
+	[ module_entry( "modules/missing.zzm", "missing.zzm" ) ],
+	[],
+);
+let missing_meta := missing_root{meta_obj}.child("missing-dist-1.0.0.json");
+let removal := {
+	name: "missing-dist",
+	version: "1.0.0",
+	metadata_file: missing_meta.to_String(),
+	root: missing_root,
+	distribution: ( new JSON() ).load(missing_meta),
+};
+let removal_result := execute_removal(removal);
+ok( removal_result{ok}, "execute_removal tolerates missing files" );
+is( removal_result{warnings}.length(), 1, "missing file is a warning" );
+is( missing_meta.exists(), false, "metadata is still removed" );
+
+done_testing();

@@ -1,0 +1,155 @@
+from std/data/kdl import *;
+from test/more import *;
+
+let kdl := new KDL();
+let doc := kdl.decode( """// ignored
+(pkg)package "zuzu" version="0.1.0" active=#true count=0x2a {
+	/- disabled "skip"
+	maintainer (email)"dev@example.com"
+	values 1 2.5 #null #false raw=#"a\b"#
+}
+""" );
+
+ok( kdl.encode_binarystring(doc) instanceof BinaryString, "encode_binarystring returns BinaryString" );
+let binary_doc := kdl.decode_binarystring( to_binary("node label=\"café\"\n") );
+is(
+	binary_doc.nodes()[0].props().get("label").native_value(),
+	"café",
+	"decode_binarystring decodes UTF-8 KDL bytes",
+);
+
+is( doc.nodes().length(), 1, "decode returns one top-level node" );
+let package := doc.nodes()[0];
+is( package.name(), "package", "node exposes name" );
+is( package.type_annotation(), "pkg", "node exposes type annotation" );
+is( package.args()[0].type(), "string", "argument exposes type" );
+is( package.args()[0].to_String(), "zuzu", "string argument value" );
+is( package.props().get("version").native_value(), "0.1.0", "property value" );
+is( package.props().get("active").is_true(), true, "boolean property" );
+is( package.props().get("count").kind(), "integer", "radix number kind" );
+is( package.props().get("count").to_Number(), 42, "radix number value" );
+is( package.children().length(), 2, "slashdashed child is ignored" );
+
+let package_iter_types := [];
+for ( let item in package ) {
+	package_iter_types.push( item instanceof KDLNode ? item.name() : item.type() );
+}
+is(
+	package_iter_types,
+	[ "string", "maintainer", "values" ],
+	"KDLNode iterator yields args then children",
+);
+
+let doc_iter_names := [];
+for ( let item in doc ) {
+	doc_iter_names.push( item.name() );
+}
+is( doc_iter_names, [ "package" ], "KDLDocument iterator yields top-level nodes" );
+
+let maintainer := package.children()[0];
+is( maintainer.args()[0].type_annotation(), "email", "value type annotation" );
+is( maintainer.args()[0].native_value(), "dev@example.com", "annotated value" );
+
+let values := package.children()[1];
+is( values.args()[0].kind(), "integer", "integer argument kind" );
+is( values.args()[1].kind(), "float", "float argument kind" );
+ok( values.args()[2].is_null(), "null argument" );
+ok( values.args()[3].is_false(), "false argument" );
+is( values.props().get("raw").native_value(), "a\\b", "raw string property" );
+
+let bs := "\\";
+let escaped := kdl.decode(
+	"node snowman=\"" _ bs _ "u{2603}\" face=\"" _ bs _ "u{1F600}\" controls=\""
+		_ bs _ "b" _ bs _ "f\"\n"
+);
+is(
+	escaped.nodes()[0].props().get("snowman").native_value(),
+	"☃",
+	"KDL decodes BMP Unicode escape",
+);
+is(
+	escaped.nodes()[0].props().get("face").native_value(),
+	"😀",
+	"KDL decodes astral Unicode escape",
+);
+is(
+	length escaped.nodes()[0].props().get("controls").native_value(),
+	2,
+	"KDL decodes control escapes",
+);
+
+let built := new KDLDocument( nodes: [
+	new KDLNode(
+		name: "server",
+		args: [ new KDLValue( type: "string", value: "api" ) ],
+		props: new PairList(
+			[ "enabled", new KDLValue( type: "boolean", value: true ) ],
+			[ "port", new KDLValue( type: "number", kind: "integer", value: 8080 ) ],
+		),
+		children: [
+			new KDLNode( name: "path", args: [ new KDLValue( type: "string", value: "/v1" ) ] ),
+		],
+	),
+] );
+let encoded := kdl.encode(built);
+like( encoded, /server "api" enabled=#true port=8080 \{/, "encode node header" );
+like( encoded, /\n\tpath "\/v1"\n\}/, "encode child node" );
+
+let slashdoc := kdl.decode( """/- removed "top" {
+	child "one"
+	nested {
+		leaf "two"
+	}
+}
+kept "root" {
+	before "ok"
+	/- removed-child flag=#true {
+		inner "skip me"
+		deep {
+			leaf "also skip"
+		}
+	}
+	after "still here"
+}
+""" );
+is( slashdoc.nodes().length(), 1, "top-level slashdash discards a nested node" );
+is( slashdoc.nodes()[0].name(), "kept", "node after top-level slashdash remains" );
+is(
+	slashdoc.nodes()[0].children().map( fn n -> n.name() ),
+	[ "before", "after" ],
+	"nested multi-line slashdash discards the whole child subtree",
+);
+
+let entry_slashdoc := kdl.decode( """node keep=1 /- skip=2 value /- "discarded" #true
+""" );
+is( entry_slashdoc.nodes()[0].props().keys(), [ "keep" ], "slashdash discards a property" );
+is( entry_slashdoc.nodes()[0].args().length(), 2, "slashdash discards one argument" );
+is(
+	entry_slashdoc.nodes()[0].args()[0].native_value(),
+	"value",
+	"argument before slashdash remains",
+);
+is( entry_slashdoc.nodes()[0].args()[1].is_true(), true, "argument after slashdash remains" );
+
+let duplicate_props := kdl.decode( """node key="first" key="second"
+""" );
+is(
+	duplicate_props.nodes()[0].props().get_all("key").map( fn v -> v.native_value() ),
+	[ "first", "second" ],
+	"properties preserve duplicate keys in PairList",
+);
+
+let triple_quote := "\"\"\"";
+let multiline := kdl.decode(
+	"node " _ triple_quote _ """
+		alpha
+		beta
+		""" _ triple_quote _ "\n"
+);
+is(
+	multiline.nodes()[0].args()[0].native_value(),
+	"alpha\nbeta",
+	"multiline string trims closing indentation",
+);
+
+done_testing();

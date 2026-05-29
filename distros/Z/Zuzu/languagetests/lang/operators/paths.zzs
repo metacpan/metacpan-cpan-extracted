@@ -1,0 +1,51 @@
+from std/path/simple import SimplePath;
+from std/path/z import ZPath;
+from test/more import *;
+
+plan(13); // from outer space?
+
+let data := {
+	"store": {
+		"books": [
+			{
+				"author": "Nigel Rees",
+				"title": "Sayings of the Century",
+				"price": 8.95,
+			},
+			{
+				"author": "J. R. R. Tolkien",
+				"title": "The Lord of the Rings",
+				"isbn": "0-395-19395-8",
+				"price": 22.99,
+			}
+		],
+	}
+};
+
+is( data @  "/store/books/*/price",   8.95,          "@  ZZPath" );
+is( data @@ "/store/books/*/price", [ 8.95, 22.99 ], "@@ ZZPath" );
+is( data @? "/store/books/*/price",   true,          "@? ZZPath" );
+is( data @ "store/books/#1/price", 22.99, "default ZZPath supports no-root slash path" );
+is( data @ "store/books/#0/price + 1", 9.95, "default ZZPath supports arithmetic operator" );
+
+{
+	SimplePath.use();
+
+	is( data @  "store.books[*].price",   8.95,          "@  SimplePath" );
+	is( data @@ "store.books[*].price", [ 8.95, 22.99 ], "@@ SimplePath" );
+	is( data @? "store.books[*].price",   true,          "@? SimplePath" );
+}
+
+is( data @  "/store/books/*/price",   8.95,          "@  ZZPath again" );
+is( data @@ "/store/books/*/price", [ 8.95, 22.99 ], "@@ ZZPath again" );
+is( data @? "/store/books/*/price",   true,          "@? ZZPath again" );
+
+{
+	ZPath.use();
+
+	is( data @ "/store/books/*/price", 8.95, "ZPath.use restores ZPath explicitly" );
+}
+
+is( data @ "store/books/#0/price + 1", 9.95, "outer scope falls back to ZZPath" );
+
+done_testing();

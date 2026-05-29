@@ -1,0 +1,17 @@
+from test/c34/failer import CrossModuleFailure;
+from test/more import *;
+
+let err := null;
+try {
+	new CrossModuleFailure().explode();
+}
+catch ( Exception e ) {
+	err := e;
+}
+
+ok( err ≢ null, "exception from imported module is raised" );
+is( err{message}, "boom-from-c34", "exception message is preserved" );
+like( err{file}, /test\/c34\/failer\.zzm/, "exception carries imported module file metadata" );
+is( err{line}, 3, "exception carries imported module line metadata" );
+
+done_testing();

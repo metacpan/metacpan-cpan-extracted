@@ -1,4 +1,4 @@
-package GDPR::IAB::TCFv2 0.520;
+package GDPR::IAB::TCFv2 0.530;
 
 use v5.12;
 use warnings;
@@ -32,6 +32,8 @@ __END__
 =for html <a href="https://github.com/peczenyj/GDPR-IAB-TCFv2/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/GDPR-IAB-TCFv2.svg" alt='license'/></a>
 
 =for html <a href="https://metacpan.org/dist/GDPR-IAB-TCFv2"><img src="https://img.shields.io/cpan/v/GDPR-IAB-TCFv2.svg" alt='cpan'/></a>
+
+=for html <a href="https://github.com/peczenyj/GDPR-IAB-TCFv2/attestations"><img src="https://img.shields.io/badge/SLSA-Build_L2-green.svg" alt='SLSA Build Level 2'/></a>
 
 =pod
 

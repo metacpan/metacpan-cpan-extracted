@@ -1,0 +1,21 @@
+from test/more import *;
+requires_capability( "fs" );
+
+from std/data/json import *;
+from std/io import Path;
+
+let j := new JSON( pretty: false, canonical: true );
+let f := Path.tempfile();
+j.dump( f, { answer: 42 } );
+is( j.load(f){answer}, 42, "j.dump + j.load with Path" );
+like( f.slurp_utf8(), /\{"answer":42\}/, "j.dump writes JSON to file" );
+like( exception( function() {
+	j.dump( "data.json", { answer: 7 } );
+}
+), /TypeException: JSON.dump expects Path as first argument/, "JSON.dump rejects non-Path target" );
+like( exception( function() {
+	j.load("data.json");
+}
+), /TypeException: JSON.load expects Path as first argument/, "JSON.load rejects non-Path target" );
+
+done_testing();

@@ -1,0 +1,22 @@
+from test/more import *;
+
+requires_capability( "db" );
+
+from std/db import DB;
+from std/template/z import ZTemplate;
+
+let dbh := DB.temp();
+dbh.prepare( "create table users (id integer, name text)" ).execute();
+dbh.prepare( "insert into users (id, name) values (1, 'Ada')" ).execute();
+dbh.prepare( "insert into users (id, name) values (2, 'Bob')" ).execute();
+
+let q := dbh.prepare( "select id, name from users order by id" );
+q.execute();
+let rows := q.all_dict();
+
+let tpl := new ZTemplate( string: "{{# users/* }}{{ id }}-{{ name }};{{/users/*}}" );
+let rendered := tpl.process( { users: rows } );
+
+is( rendered, "1-Ada;2-Bob;", "template renders database rows through block context" );
+
+done_testing();

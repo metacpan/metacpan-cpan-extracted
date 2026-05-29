@@ -1,0 +1,36 @@
+from std/task import sleep;
+from test/more import *;
+from test/worker_contract import require_worker_phase, await_cancelled;
+
+let Worker := require_worker_phase(4);
+
+async function main () {
+	let task := Worker.spawn(
+		function () {
+			from std/task import sleep;
+			return sleep(5);
+		},
+		[],
+	);
+
+	await {
+		sleep(0.02);
+	};
+	task.cancel("stop");
+
+	let err := await {
+		await_cancelled(task);
+	};
+	like(
+		err.to_String(),
+		/stop/,
+		"cancelling running worker throws CancelledException with reason",
+	);
+	is( task.status(), "cancelled", "cancelled worker task reports status" );
+}
+
+await {
+	main();
+};
+
+done_testing();

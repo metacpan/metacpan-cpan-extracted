@@ -1,0 +1,20 @@
+from test/more import *;
+
+function assert_stringified ( value, String label ) {
+	let s := "" _ value;
+	is( typeof s, "String", label _ " => String" );
+	ok( s ≢ null, label _ " => non-null" );
+}
+
+let err := new Exception( message: "boom" );
+let rx := /foo/i;
+assert_stringified( null, "Null" );
+assert_stringified( true, "Boolean true" );
+assert_stringified( false, "Boolean false" );
+assert_stringified( 123, "Number int" );
+assert_stringified( 3.14, "Number float" );
+assert_stringified( "abc", "String" );
+assert_stringified( rx, "Regexp" );
+assert_stringified( err, "Exception" );
+is( "" _ err, "Exception: boom", "Exception uses to_String method" );
+done_testing();

@@ -1,0 +1,91 @@
+from test/more import *;
+let x := 1;
+x += 4;
+is( x, 5, "+= works" );
+x := 9;
+x -= 4;
+is( x, 5, "-= works" );
+x := 3;
+x *= 4;
+is( x, 12, "*= works" );
+x := 3;
+x ×= 4;
+is( x, 12, "×= works" );
+x := 9;
+x /= 2;
+is( x, 4.5, "/= works" );
+x := 9;
+x ÷= 2;
+is( x, 4.5, "÷= works" );
+x := 3;
+x **= 3;
+is( x, 27, "**= works" );
+x := "ab";
+x _= "cd";
+is( x, "abcd", "_= works" );
+let y;
+y ?:= 4;
+is( y, 4, "?:= works when undef" );
+y := 0;
+y ?:= 4;
+is( y, 0, "?:= preserves defined zero" );
+let label := "10x20 30x40";
+label ~= /([0-9]+)x([0-9]+)/g -> `${m[1]}y${m[2]}`;
+is( label, "10y20 30y40", "~= supports /g and captures" );
+let mixed := "Foo fOO";
+let m := "outer";
+mixed ~= /foo/i → ( m[0] _ "!" );
+is( mixed, "Foo! fOO", "~= supports unicode arrow and expression replacement" );
+is( m, "outer", "replacement scope variable m does not leak" );
+
+let words := "alpha beta";
+words ~= /([a-z]+)/g -> do {
+	let token := m[1];
+	token ~= /a/ -> do {
+		"@";
+	};
+	let counted := token;
+	counted ~= /@/g -> do {
+		"A";
+	};
+	counted _ ":" _ token;
+};
+is( words, "Alpha:@lpha betA:bet@", "~= supports do{...} replacement expressions" );
+
+let only_first := "aa bb cc";
+only_first ~= /([a-z]+)/ -> do {
+	let token := m[1];
+	if ( token eq "aa" ) {
+		"first";
+	}
+	else {
+		"other";
+	}
+};
+is( only_first, "first bb cc", "~= do{...} replacement can branch and return" );
+x := 1;
+x++;
+is( x, 2, "postfix ++ mutates" );
+x := 1;
+is( ++x, 2, "prefix ++ returns new value" );
+x := 2;
+x--;
+is( x, 1, "postfix -- mutates" );
+x := 2;
+is( --x, 1, "prefix -- returns new value" );
+let box := [ 10, 20 ];
+let slot := \ box[1];
+is( slot(), 20, "\\x getter reads lvalue" );
+is( slot(42), 42, "\\x setter returns assigned value" );
+is( box[1], 42, "\\x setter mutates target lvalue" );
+let dict := { answer: 41 };
+let dict_slot := \ dict{answer};
+is( dict_slot(), 41, "\\dict{key} getter works" );
+dict_slot(42);
+is( dict{answer}, 42, "\\dict{key} setter works" );
+let row := [ 1, 2, 3, 4 ];
+let tail := \ row[ 2: 2 ];
+is( tail(), [ 3, 4 ], "\\slice getter returns current slice value", );
+tail( [ 8, 9 ] );
+is( row, [ 1, 2, 8, 9 ], "\\slice setter replaces slice" );
+done_testing();

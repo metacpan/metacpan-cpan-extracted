@@ -1,0 +1,6 @@
+from test/more import *;
+is( 1 == 1, 1, "== works" );
+is( 1 ≡ 1, 1, "≡ works" );
+is( "1" == 1, 0, "== is type-aware" );
+is( 1 ≢ "1", 1, "≢ works" );
+done_testing();

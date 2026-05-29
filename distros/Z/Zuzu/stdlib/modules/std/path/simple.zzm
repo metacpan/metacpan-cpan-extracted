@@ -1,0 +1,520 @@
+=encoding utf8
+
+=head1 NAME
+
+std/path/simple - Tiny JSONPath/XPath-like traversal helper.
+
+=head1 SYNOPSIS
+
+  from std/path/simple import SimplePath;
+  
+  let data := {
+    store: {
+      books: [
+        { author: "Nigel Rees" },
+        { author: "J. R. R. Tolkien" },
+      ],
+    },
+  };
+  
+  let p := new SimplePath( path: "store.books[*].author" );
+  for ( let name in p.query(data) ) {
+    say name;
+  }
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+C<SimplePath> implements only a tiny subset of path traversal:
+
+=over
+
+=item * C<.something>
+
+Dict/PairList lookup by key.
+
+=item * C<.*>
+
+Dict/PairList wildcard that yields all values.
+
+=item * C<[1]>
+
+Array lookup by numeric index.
+
+=item * C<[-1]>
+
+Negative indexes count from the end of arrays.
+
+=item * C<[*]>
+
+Array/Bag/Set wildcard that yields all items.
+
+=back
+
+No other syntax is supported.
+
+The public API intentionally mirrors key C<std/path/z> methods:
+C<get>, C<select>, C<query>, C<first>, C<exists>,
+C<expression>, C<assign_first>, C<assign_all>, C<assign_maybe>,
+C<ref_first>, C<ref_all>, and C<ref_maybe>.
+
+The path operators C<@>, C<@@>, and C<@?> can be set to use this module
+in a lexical scope:
+
+  from std/path/simple import SimplePath;
+  SimplePath.use();
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<< SimplePath({ path: String }) >>
+
+Constructs a simple path selector. Returns: C<SimplePath>.
+
+=over
+
+=item C<< SimplePath.use() >>
+
+Parameters: none. Returns: C<null>. Makes this path class the lexical
+implementation for C<@>, C<@@>, and C<@?>.
+
+=item C<< path.expression() >>
+
+Parameters: none. Returns: C<String>. Returns the original path
+expression.
+
+=item C<< path.get(value) >>, C<< path.select(value) >>, C<< path.query(value) >>
+
+Parameters: C<value> is the query root. Returns: C<Array>. Evaluates the
+path and returns selected values.
+
+=item C<< path.first(value, fallback) >>
+
+Parameters: C<value> is the query root and C<fallback> is returned when
+there is no match. Returns: value. Returns the first selected value.
+
+=item C<< path.exists(value) >>
+
+Parameters: C<value> is the query root. Returns: C<Boolean>. Returns
+true when the path selects at least one value.
+
+=item C<< path.assign_first(target, value, op := ":=", weak := false) >>
+
+Parameters: C<target> is the query root, C<value> is the assignment
+value, C<op> is an assignment operator, and C<weak> is accepted for path
+API compatibility. Returns: value. Updates the first selected location.
+
+=item C<< path.assign_all(target, value, op := ":=", weak := false) >>
+
+Parameters: same as C<assign_first>. Returns: value. Updates every
+selected location.
+
+=item C<< path.assign_maybe(target, value, op := ":=", weak := false) >>
+
+Parameters: same as C<assign_first>. Returns: C<Boolean>. Updates the
+first selected location when one exists.
+
+=item C<< path.ref_first(target) >>
+
+Parameters: C<target> is the query root. Returns: C<Function>. Returns a
+reference-like getter/setter for the first selected location.
+
+=item C<< path.ref_all(target) >>
+
+Parameters: C<target> is the query root. Returns: C<Array>. Returns
+reference-like getter/setters for all selected locations.
+
+=item C<< path.ref_maybe(target) >>
+
+Parameters: C<target> is the query root. Returns: C<Function> or
+C<null>. Returns a reference-like getter/setter for the first selected
+location when one exists.
+
+=back
+
+=back
+
+=cut
+
+from std/string import substr;
+
+
+class SimplePath {
+	let String path;
+	let Array _steps := [];
+
+	static method use () {
+		from std/internals import setupperprop;
+		setupperprop( 1, "paths", self );
+	}
+
+	method __build__ () {
+		_steps := self._parse(path);
+	}
+
+	method expression () {
+		return path;
+	}
+
+	method _parse ( String raw ) {
+		let text := raw;
+		let steps := [];
+		let i := 0;
+
+		while ( i < length text ) {
+			let ch := substr( text, i, 1 );
+			if ( ch ≡ "." ) {
+				i++;
+				die "SimplePath parse error: expected name or * after '.'"
+					if i >= length text;
+				let after_dot := substr( text, i, 1 );
+				if ( after_dot ≡ "*" ) {
+					steps.push( { kind: "dict_wildcard" } );
+					i++;
+					next;
+				}
+				let start := i;
+				while ( i < length text ) {
+					let c := substr( text, i, 1 );
+					last if c ≡ "." or c ≡ "[" or c ≡ "]";
+					i++;
+				}
+				let key := substr( text, start, i - start );
+				die "SimplePath parse error: empty key"
+					if key ≡ "";
+				steps.push( { kind: "key", value: key } );
+				next;
+			}
+
+			if ( ch ≡ "[" ) {
+				let close := i + 1;
+				while ( close < length text and substr( text, close, 1 ) ≢ "]" ) {
+					close++;
+				}
+				die "SimplePath parse error: missing closing ']'"
+					if close >= length text;
+				let inner := substr( text, i + 1, close - i - 1 );
+				if ( inner ≡ "*" ) {
+					steps.push( { kind: "list_wildcard" } );
+				}
+				else if ( inner ~ /^-?[0-9]+$/ ) {
+					steps.push( { kind: "index", value: int(inner) } );
+				}
+				else {
+					die `SimplePath parse error: unsupported bracket token '[${inner}]'`;
+				}
+				i := close + 1;
+				next;
+			}
+
+			let start := i;
+			while ( i < length text ) {
+				let c := substr( text, i, 1 );
+				last if c ≡ "." or c ≡ "[" or c ≡ "]";
+				i++;
+			}
+			let key := substr( text, start, i - start );
+			die `SimplePath parse error: unexpected token '${ch}'`
+				if key ≡ "";
+			steps.push( { kind: "key", value: key } );
+		}
+
+		return steps;
+	}
+
+	method _node ( value, parent, key ) {
+		return {
+			value: value,
+			parent: parent,
+			key: key,
+		};
+	}
+
+	method _evaluate_nodes ( value ) {
+		let current := [ self._node( value, null, null ) ];
+
+		for ( let step in _steps ) {
+			let next_nodes := [];
+
+			for ( let node in current ) {
+				let v := node{value};
+
+				if ( step{kind} ≡ "key" ) {
+					if ( v instanceof Dict and v.exists( step{value} ) ) {
+						next_nodes.push( self._node( v.get( step{value} ), node, step{value} ) );
+					}
+					else if ( v instanceof PairList ) {
+						for ( let item in v.get_all( step{value} ) ) {
+							next_nodes.push( self._node( item, node, step{value} ) );
+						}
+					}
+					next;
+				}
+
+				if ( step{kind} ≡ "dict_wildcard" ) {
+					if ( v instanceof Dict ) {
+						for ( let k in v.keys() ) {
+							next_nodes.push( self._node( v.get(k), node, k ) );
+						}
+					}
+					else if ( v instanceof PairList ) {
+						for ( let pair in v.to_Array() ) {
+							next_nodes.push( self._node( pair.value, node, pair.key ) );
+						}
+					}
+					next;
+				}
+
+				if ( step{kind} ≡ "index" ) {
+					if ( v instanceof Array ) {
+						let idx := step{value};
+						if ( idx < 0 ) {
+							idx := v.length() + idx;
+						}
+						if ( idx >= 0 and idx < v.length() ) {
+							next_nodes.push( self._node( v[idx], node, idx ) );
+						}
+					}
+					next;
+				}
+
+				if ( step{kind} ≡ "list_wildcard" ) {
+					if ( v instanceof Array ) {
+						let i := 0;
+						while ( i < v.length() ) {
+							next_nodes.push( self._node( v[i], node, i ) );
+							i++;
+						}
+					}
+					else if ( v instanceof Bag or v instanceof Set ) {
+						for ( let item in v.to_Array() ) {
+							next_nodes.push( self._node( item, node, "*" ) );
+						}
+					}
+					next;
+				}
+			}
+
+			current := next_nodes;
+		}
+
+		return current;
+	}
+
+	method _evaluate ( value ) {
+		return self._evaluate_nodes(value).map( fn n -> n{value} );
+	}
+
+	method get ( value ) {
+		return self._evaluate(value);
+	}
+
+	method select ( value ) {
+		return self._evaluate(value);
+	}
+
+	method query ( value ) {
+		return self._evaluate(value);
+	}
+
+	method first ( value, fallback ) {
+		let out := self._evaluate(value);
+		return out.length() = 0 ? fallback : out[0];
+	}
+
+	method exists ( value ) {
+		return self._evaluate(value).length() > 0;
+	}
+
+	method _assign_node ( Dict node, value ) {
+		let parent := node{parent};
+		die "SimplePath assignment target has no parent node"
+			if parent ≡ null;
+
+		let container := parent{value};
+		let key := node{key};
+
+		if ( container instanceof Array ) {
+			die "SimplePath assignment expects numeric array index"
+				if not( key instanceof Number );
+			container[key] := value;
+			return value;
+		}
+
+		if ( container instanceof Dict ) {
+			die "SimplePath assignment expects string dict key"
+				if not( key instanceof String );
+			container{(key)} := value;
+			return value;
+		}
+
+		if ( container instanceof PairList ) {
+			die "SimplePath assignment expects string pairlist key"
+				if not( key instanceof String );
+			container.set( key, value );
+			return value;
+		}
+
+		die `SimplePath assignment target container '${typeof container}' is not assignable`;
+	}
+
+	method _ref_for_node ( Dict node ) {
+		let parent := node{parent};
+		die "SimplePath assignment target has no parent node"
+			if parent ≡ null;
+
+		let container := parent{value};
+		let key := node{key};
+
+		if ( container instanceof Array ) {
+			die "SimplePath assignment expects numeric array index"
+				if not( key instanceof Number );
+			return \ container[key];
+		}
+
+		if ( container instanceof Dict ) {
+			die "SimplePath assignment expects string dict key"
+				if not( key instanceof String );
+			return \ container{(key)};
+		}
+
+		if ( container instanceof PairList ) {
+			die "SimplePath assignment expects string pairlist key"
+				if not( key instanceof String );
+			return \ container{(key)};
+		}
+
+		die `SimplePath assignment target container '${typeof container}' is not assignable`;
+	}
+
+	method _apply_assignment_ref ( ref, value, op := ":=", weak := false ) {
+		die "SimplePath weak assignment is not supported"
+			if weak;
+
+		if ( op ≡ ":=" ) {
+			return ref(value);
+		}
+
+		let current := ref();
+
+		if ( op ≡ "+=" ) {
+			current += value;
+		}
+		else if ( op ≡ "-=" ) {
+			current -= value;
+		}
+		else if ( op ≡ "*=" or op ≡ "×=" ) {
+			current *= value;
+		}
+		else if ( op ≡ "/=" or op ≡ "÷=" ) {
+			current /= value;
+		}
+		else if ( op ≡ "**=" ) {
+			current **= value;
+		}
+		else if ( op ≡ "_=" ) {
+			current _= value;
+		}
+		else if ( op ≡ "?:=" ) {
+			current ?:= value;
+		}
+		else if ( op ≡ "~=" ) {
+			current ~= value[0] -> value[1](m);
+		}
+		else {
+			die `Unsupported path assignment operator '${op}'`;
+		}
+
+		ref(current);
+		return current;
+	}
+
+	method _assign_all_result ( value, op, last_result ) {
+		return op ≡ "~=" ? last_result : value;
+	}
+
+	method assign_first ( target, value, op := ":=", weak := false ) {
+		let nodes := self._evaluate_nodes(target);
+		die "SimplePath assignment found no matches"
+			if nodes.length() ≡ 0;
+		return self._apply_assignment_ref(
+			self._ref_for_node( nodes[0] ),
+			value,
+			op,
+			weak,
+		);
+	}
+
+	method assign_all ( target, value, op := ":=", weak := false ) {
+		let nodes := self._evaluate_nodes(target);
+		if ( nodes.length() ≡ 0 ) {
+			return self._assign_all_result( value, op, value );
+		}
+
+		let i := 0;
+		let last_result := value;
+		while ( i < nodes.length() ) {
+			last_result := self._apply_assignment_ref(
+				self._ref_for_node( nodes[i] ),
+				value,
+				op,
+				weak,
+			);
+			i++;
+		}
+
+		return self._assign_all_result( value, op, last_result );
+	}
+
+	method assign_maybe ( target, value, op := ":=", weak := false ) {
+		let nodes := self._evaluate_nodes(target);
+		if ( nodes.length() ≡ 0 ) {
+			return false;
+		}
+
+		self._apply_assignment_ref(
+			self._ref_for_node( nodes[0] ),
+			value,
+			op,
+			weak,
+		);
+		return true;
+	}
+
+	method ref_first ( target ) {
+		let nodes := self._evaluate_nodes(target);
+		die "SimplePath assignment found no matches"
+			if nodes.length() ≡ 0;
+		return self._ref_for_node( nodes[0] );
+	}
+
+	method ref_all ( target ) {
+		let nodes := self._evaluate_nodes(target);
+		let out := [];
+		for ( let node in nodes ) {
+			out.push( self._ref_for_node(node) );
+		}
+		return out;
+	}
+
+	method ref_maybe ( target ) {
+		let nodes := self._evaluate_nodes(target);
+		return nodes.length() ≡ 0 ? null : self._ref_for_node( nodes[0] );
+	}
+}
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/path/simple >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut

@@ -1,0 +1,23 @@
+from test/more import *;
+
+trait Named {
+	method ping () {
+		return 1;
+	}
+}
+
+class Animal;
+
+class Dog extends Animal with Named {
+	method bark () {
+		return "woof";
+	}
+}
+
+let d := new Dog();
+is( typeof d, "Dog", "typeof reports runtime class name" );
+is( d instanceof Animal, 1, "instanceof matches ancestor classes" );
+is( d does Named, 1, "does matches trait composition" );
+is( d can bark, 1, "can works with bare method names" );
+is( d can "bark", 1, "can works with string method names" );
+done_testing();

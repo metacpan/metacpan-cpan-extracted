@@ -1,0 +1,300 @@
+from std/data/kdl import KDL, KDLNode;
+from std/path/kdl import KDLQuery;
+from std/string import chr;
+from test/more import *;
+
+let doc := ( new KDL() ).decode( """(pkg)package {
+	name foo
+	version "1.0.0"
+	dependencies platform=windows {
+		winapi "1.0.0" path="./crates/my-winapi-fork"
+	}
+	dependencies {
+		miette "2.0.0" dev=#true integrity=(sri)sha512-deadbeef
+	}
+}
+""" );
+
+function query ( d, p ) {
+	return ( new KDLQuery( path: p ) ).query(d);
+}
+
+function first ( d, p, fallback ) {
+	return ( new KDLQuery( path: p ) ).first( d, fallback );
+}
+
+function exists ( d, p ) {
+	return ( new KDLQuery( path: p ) ).exists(d);
+}
+
+let names := query( doc, "package >> name" );
+is( names.length(), 1, "descendant selector returns matching node" );
+is( names[0].name(), "name", "descendant selector keeps node object" );
+
+is(
+	first( doc, "top() > package >> name", null ).name(),
+	"name",
+	"top() constrains selector to document root",
+);
+
+let deps := query( doc, "dependencies" );
+is( deps.length(), 2, "plain selector deep-fetches matching nodes" );
+
+let platform_deps := query( doc, "dependencies[platform]" );
+is( platform_deps.length(), 1, "plain property accessor filters nodes" );
+is(
+	platform_deps[0].props().get("platform").native_value(),
+	"windows",
+	"property filter keeps matching dependency",
+);
+
+is(
+	query( doc, "dependencies[prop(platform)]" ).length(),
+	1,
+	"prop(name) accessor matches plain property accessor",
+);
+
+is(
+	query( doc, "dependencies > []" ).map( fn n -> n.name() ),
+	[ "winapi", "miette" ],
+	"child combinator with wildcard returns direct children",
+);
+
+is(
+	query( doc, "version + dependencies" ).map( fn n -> n.name() ),
+	[ "dependencies" ],
+	"next-sibling combinator returns immediate sibling",
+);
+
+is(
+	query( doc, "name ++ dependencies" ).length(),
+	2,
+	"following-sibling combinator returns later siblings",
+);
+
+is(
+	query( doc, "dependencies > winapi || dependencies > miette" )
+		.map( fn n -> n.name() ),
+	[ "winapi", "miette" ],
+	"selector union combines results",
+);
+
+is(
+	first( doc, "(pkg)package", null ).name(),
+	"package",
+	"type matcher selects node annotation",
+);
+is(
+	first( doc, "()[tag() = pkg]", null ).name(),
+	"package",
+	"tag accessor compares node annotation",
+);
+is(
+	first( doc, "[name() = package]", null ).name(),
+	"package",
+	"name accessor compares node name",
+);
+
+is(
+	query( doc, "dependencies > winapi[val() = \"1.0.0\"]" ).length(),
+	1,
+	"val accessor compares first argument",
+);
+is(
+	query( doc, "dependencies > miette[dev = #true]" ).length(),
+	1,
+	"boolean property comparison works",
+);
+is(
+	query( doc, "dependencies > miette[integrity = (sri)]" ).length(),
+	1,
+	"type literal compares value annotation",
+);
+
+is(
+	query( doc, "dependencies > [val() ^= \"1.\"]" ).map( fn n -> n.name() ),
+	[ "winapi" ],
+	"string prefix comparison works",
+);
+is(
+	query( doc, "dependencies > [val() $= \"0\"]" ).map( fn n -> n.name() ),
+	[ "winapi", "miette" ],
+	"string suffix comparison works",
+);
+is(
+	query( doc, "dependencies > [val() *= \".0.\"]" ).map( fn n -> n.name() ),
+	[ "winapi", "miette" ],
+	"string contains comparison works",
+);
+
+ok(
+	exists( doc, "dependencies > miette[values()]" ),
+	"values() existence accessor",
+);
+ok(
+	exists( doc, "dependencies > miette[props()]" ),
+	"props() existence accessor",
+);
+ok(
+	not exists( doc, "dependencies > winapi[dev]" ),
+	"exists returns false on miss",
+);
+
+let compiled := new KDLQuery( path: "package >> name" );
+is(
+	compiled.expression(),
+	"package >> name",
+	"expression returns source path",
+);
+is( doc @ compiled, names[0], "@ works with compiled KDLQuery" );
+is(
+	( doc @@ new KDLQuery( path: "package >> dependencies > []" ) ).length(),
+	2,
+	"@@ works with compiled KDLQuery",
+);
+ok(
+	doc @? new KDLQuery( path: "dependencies[platform]" ),
+	"@? works with compiled KDLQuery",
+);
+
+let native_data := {
+	package: {
+		name: "zuzu",
+		dependencies: [
+			{ name: "tap" },
+			{ name: "unicode" },
+		],
+	},
+};
+is(
+	query( native_data, "package[name = \"zuzu\"]" ).length(),
+	1,
+	"non-KDL root is converted with json_to_kdl",
+);
+is(
+	query( native_data, "dependencies > -[name = \"unicode\"]" ).length(),
+	1,
+	"converted native arrays can be queried",
+);
+
+KDLQuery.use();
+is(
+	( doc @@ "package >> name" )[0].name(),
+	"name",
+	"KDLQuery.use registers string path operators",
+);
+
+let features := ( new KDL() ).decode( """alpha
+beta
+gamma
+raw #"hello"#
+hex 0x10
+float 1.5e2
+posinf #inf
+multi 1 "x" flag=#true score=2
+#"weird name"# "ok"
+"snow\u{2603}" "cold"
+""" );
+
+is(
+	query( features, "alpha + beta" ).map( fn n -> n.name() ),
+	[ "beta" ],
+	"next-sibling combinator works at document root",
+);
+is(
+	query( features, "alpha ++ gamma" ).map( fn n -> n.name() ),
+	[ "gamma" ],
+	"following-sibling combinator works at document root",
+);
+is(
+	query( features, "raw[val() = #\"hello\"#]" ).length(),
+	1,
+	"raw string literals compare as KDL strings",
+);
+is(
+	query( features, "hex[val() = 0x10]" ).length(),
+	1,
+	"non-decimal integer literals compare as KDL numbers",
+);
+is(
+	query( features, "float[val() = 1.5e2]" ).length(),
+	1,
+	"exponent float literals compare as KDL numbers",
+);
+is(
+	query( features, "posinf[val() = #inf]" ).length(),
+	1,
+	"special number keywords compare by KDL value",
+);
+is(
+	query( features, "multi[values() = \"x\"]" ).length(),
+	1,
+	"values() comparisons are existential over node args",
+);
+is(
+	query( features, "multi[props() = 2]" ).length(),
+	1,
+	"props() comparisons are existential over property values",
+);
+is(
+	query( features, "#\"weird name\"#" )[0].name(),
+	"weird name",
+	"raw string node names use KDL string parsing",
+);
+is(
+	query( features, "\"snow\\u{2603}\"" )[0].name(),
+	"snow" _ chr(9731),
+	"quoted string node names use KDL Unicode escapes",
+);
+is(
+	( new KDLQuery( path: "multi" ) ).values(features)[1].native_value(),
+	"x",
+	"values helper extracts selected node arguments",
+);
+is(
+	( new KDLQuery( path: "multi" ) ).props(features).get("score").native_value(),
+	2,
+	"props helper extracts selected node properties",
+);
+
+let mutable := ( new KDL() ).decode( """root {
+	old
+	again
+}
+""" );
+let replacement := new KDLNode( name: "new" );
+is(
+	( new KDLQuery( path: "root > old" ) ).assign_first(
+		mutable,
+		replacement,
+	),
+	replacement,
+	"assign_first returns replacement node",
+);
+is(
+	query( mutable, "root > new" ).length(),
+	1,
+	"assign_first replaces selected child node",
+);
+let ref := ( new KDLQuery( path: "root > new" ) ).ref_first(mutable);
+ref( new KDLNode( name: "refd" ) );
+is(
+	query( mutable, "root > refd" ).length(),
+	1,
+	"ref_first returns an assignable node reference",
+);
+let op_replacement := new KDLNode( name: "op" );
+let op_query := new KDLQuery( path: "root > again" );
+let op_result := mutable @ op_query := op_replacement;
+is(
+	op_result,
+	op_replacement,
+	"path operator assignment returns replacement node",
+);
+is(
+	query( mutable, "root > op" ).length(),
+	1,
+	"path operator assignment replaces selected child node",
+);
+
+done_testing();

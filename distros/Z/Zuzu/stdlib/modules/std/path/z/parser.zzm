@@ -1,0 +1,359 @@
+=encoding utf8
+
+=head1 NAME
+
+std/path/z/parser - Pure Zuzu parser for ZPath expressions.
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module provides the pure-Zuzu parser used by ZPath.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<< Parser({ lexer_class?, allowed_operators }) >>
+
+Constructs a ZPath parser. Returns: C<Parser>.
+
+=over
+
+=item C<< parser.parse_top_level_terms(src) >>
+
+Parameters: C<src> is a ZPath expression string. Returns: C<Array>.
+Parses comma-separated top-level expression terms.
+
+=item C<< parser.parse_expression(lx) >>
+
+Parameters: C<lx> is a C<Lexer>. Returns: C<Dict>. Parses an expression.
+
+=item C<< parser.parse_ternary(lx) >>
+
+Parameters: C<lx> is a C<Lexer>. Returns: C<Dict>. Parses ternary and
+Elvis expressions.
+
+=item C<< parser.parse_subexpression(lx, min_prec) >>
+
+Parameters: C<lx> is a C<Lexer> and C<min_prec> is a precedence floor.
+Returns: C<Dict>. Parses a precedence-climbing subexpression.
+
+=item C<< parser.parse_primary(lx) >>
+
+Parameters: C<lx> is a C<Lexer>. Returns: C<Dict>. Parses a primary
+expression.
+
+=back
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/path/z/parser >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/string import trim;
+from std/path/z/lexer import Lexer;
+
+class Parser {
+	let lexer_class;
+	let allowed_operators;
+	let _binop_prec := {};
+	let _unop_prec  := {};
+	let _need_ws    := {};
+	let _right_assoc := {};
+	let _path_terminators := {};
+	let _allow_elvis := false;
+
+	method __build__ () {
+		lexer_class ?:= Lexer;
+		self._init_path_terminators();
+		for ( let op in allowed_operators ) {
+			let spell := op.get_spelling();
+			if ( op.is_unary() ) {
+				_unop_prec.set( spell, op.get_precedence() );
+			}
+			else {
+				if ( op.get_kind() ≡ "ELVIS" ) {
+					_allow_elvis := true;
+					_path_terminators.set( op.get_kind(), true );
+					next;
+				}
+				_binop_prec.set( spell, op.get_precedence() );
+				_path_terminators.set( op.get_kind(), true );
+				if ( op.has_alias() ) {
+					_path_terminators.set( op.get_alias(), true );
+				}
+				if ( op.requires_whitespace() ) {
+					_need_ws.set( spell, true );
+				}
+				if ( op.is_right_associative() ) {
+					_right_assoc.set( spell, true );
+				}
+			}
+		}
+	}
+
+	method _init_path_terminators () {
+		for ( let k in [
+			"EOF",
+			"COMMA",
+			"RPAREN",
+			"RBRACK",
+			"QMARK",
+			"COLON",
+		] ) {
+			_path_terminators.set( k, true );
+		}
+	}
+	
+	method parse_top_level_terms ( src ) {
+		let terms := [];
+		let lexer := new lexer_class(
+			src:               src,
+			allowed_operators: allowed_operators,
+		);
+
+		while ( true ) {
+			let expr := self.parse_expression(lexer);
+			terms.push(expr);
+			if ( lexer.peek_kind() ≡ "COMMA" ) {
+				lexer.next_tok();
+				next;
+			}
+			lexer.expect("EOF");
+			last;
+		}
+
+		return terms;
+	}
+
+	method _trim ( s ) {
+		return trim(s);
+	}
+
+	method parse_expression ( lx ) {
+		return self.parse_ternary(lx);
+	}
+
+	method parse_ternary ( lx ) {
+		let cond := self.parse_subexpression( lx, 1 );
+
+		if ( lx.peek_kind() ≡ "QMARK" ) {
+			lx.next_tok();
+			let then := self.parse_expression(lx); // ZZPath should use: self.parse_subexpression( lx, 1 )
+			lx.expect("COLON");
+			let els := self.parse_expression(lx);
+			return { t: "ternary", c: cond, a: then, b: els };
+		}
+		if ( _allow_elvis and lx.peek_kind() ≡ "ELVIS" ) {
+			lx.next_tok();
+			let fallback := self.parse_expression(lx);
+			return { t: "elvis", c: cond, b: fallback };
+		}
+
+		return cond;
+	}
+
+	method parse_subexpression ( lx, min_prec ) {
+		let left := self._parse_maybe_unary( lx, min_prec );
+
+		while ( true ) {
+			let spell := lx.peek{v};
+			let op_prec := _binop_prec.get( spell, null );
+			last if op_prec ≡ null or op_prec < min_prec;
+
+			let op := lx.next_tok;
+			if ( _need_ws.exists( spell ) ) {
+				if ( not ( op{ws_before} and op{ws_after} ) ) {
+					die `Binary operator '${spell}' requires whitespace around it`;
+				}
+			}
+
+			let next_min := _right_assoc.exists(spell) ? op_prec : op_prec + 1;
+			let right := self.parse_subexpression( lx, next_min );
+			left := { t: "bin", op: spell, l: left, r: right };
+		}
+
+		return left;
+	}
+
+	method _parse_maybe_unary ( lx, min_prec ) {
+		let spell := lx.peek{v};
+		let op_prec := _unop_prec.get( spell, null );
+		if ( op_prec ≢ null and op_prec >= min_prec ) {
+			let op := lx.next_tok{v};
+			let e  := self._parse_maybe_unary( lx, op_prec );
+			return { t: "un", op: op, e: e };
+		}
+		return self.parse_primary( lx );
+	}
+
+	method parse_primary ( lx ) {
+		let k := lx.peek_kind;
+
+		if ( k ≡ "NUMBER" ) {
+			return { t: "num", v: lx.next_tok(){v} };
+		}
+		if ( k ≡ "STRING" ) {
+			return { t: "str", v: lx.next_tok(){v} };
+		}
+		if ( k ≡ "LPAREN" ) {
+			lx.next_tok();
+			let e := self.parse_expression(lx);
+			lx.expect("RPAREN");
+			return e;
+		}
+
+		if ( k ≡ "NAME" and lx.peek_kind_n(1) ≡ "LPAREN" ) {
+			let name := lx.next_tok(){v};
+			lx.expect("LPAREN");
+			let args := [];
+			if ( lx.peek_kind() ≢ "RPAREN" ) {
+				args.push( self.parse_expression(lx) );
+				while ( lx.peek_kind() ≡ "COMMA" ) {
+					lx.next_tok();
+					args.push( self.parse_expression(lx) );
+				}
+			}
+			lx.expect("RPAREN");
+			return { t: "fn", n: name, a: args };
+		}
+
+		return self._parse_path_expr(lx);
+	}
+
+	method _is_path_terminator ( k ) {
+		return _path_terminators.exists(k);
+	}
+
+	method _parse_path_expr ( lx ) {
+		let segs := [];
+
+		if ( lx.peek_kind() ≡ "SLASH_PATH" ) {
+			lx.next_tok();
+			let root := { k: "root", q: [] };
+			segs.push(root);
+
+			if ( lx.peek_kind() ≡ "LBRACK" ) {
+				root{q} := self._parse_qualifiers(lx);
+			}
+
+			if ( self._is_path_terminator( lx.peek_kind() ) ) {
+				return { t: "path", s: segs };
+			}
+		}
+		else if ( lx.peek_kind() ≡ "LBRACK" ) {
+			let seg := { k: "dot", q: self._parse_qualifiers(lx) };
+			segs.push(seg);
+			if ( self._is_path_terminator( lx.peek_kind() ) ) {
+				return { t: "path", s: segs };
+			}
+		}
+
+		if (
+			lx.peek_kind() ≢ "SLASH_PATH"
+			and not self._is_path_terminator( lx.peek_kind() )
+		) {
+			segs.push( self._parse_path_segment(lx) );
+		}
+
+		while ( lx.peek_kind() ≡ "SLASH_PATH" ) {
+			lx.next_tok();
+			if ( lx.peek_kind() ≡ "LBRACK" ) {
+				let seg := { k: "star", q: [] };
+				seg{q} := self._parse_qualifiers(lx);
+				segs.push(seg);
+				next;
+			}
+			segs.push( self._parse_path_segment(lx) );
+		}
+
+		return { t: "path", s: segs };
+	}
+
+	method _parse_path_segment ( lx ) {
+		let k := lx.peek_kind();
+		let seg := null;
+
+		if ( k ≡ "DOT" ) {
+			lx.next_tok();
+			seg := { k: "dot" };
+		}
+		else if ( k ≡ "DOTDOT" ) {
+			lx.next_tok();
+			seg := { k: "parent" };
+		}
+		else if ( k ≡ "DOTDOTSTAR" ) {
+			lx.next_tok();
+			seg := { k: "ancestors" };
+		}
+		else if ( k ≡ "STAR_PATH" ) {
+			lx.next_tok();
+			seg := { k: "star" };
+		}
+		else if ( k ≡ "STARSTAR" ) {
+			lx.next_tok();
+			seg := { k: "desc" };
+		}
+		else if ( k ≡ "INDEX" ) {
+			let i := lx.next_tok(){v};
+			seg := { k: "index", i: i };
+		}
+		else if ( k ≡ "NUMBER" ) {
+			let i := lx.next_tok(){v};
+			seg := { k: "index", i: i };
+		}
+		else if ( k ≡ "NAME" and lx.peek_kind_n(1) ≡ "LPAREN" ) {
+			let name := lx.next_tok(){v};
+			lx.expect("LPAREN");
+			let args := [];
+			if ( lx.peek_kind() ≢ "RPAREN" ) {
+				args.push( self.parse_expression(lx) );
+				while ( lx.peek_kind() ≡ "COMMA" ) {
+					lx.next_tok();
+					args.push( self.parse_expression(lx) );
+				}
+			}
+			lx.expect("RPAREN");
+			seg := { k: "fnseg", n: name, a: args };
+		}
+		else if ( k ≡ "NAME" ) {
+			let n := lx.next_tok(){v};
+			seg := { k: "name", n: n };
+		}
+		else {
+			die `Unexpected token in path segment: ${k}`;
+		}
+
+		if ( seg{k} ≡ "name" and lx.peek_kind() ≡ "INDEX" ) {
+			seg{i} := lx.next_tok(){v};
+		}
+
+		seg{q} := self._parse_qualifiers(lx);
+		return seg;
+	}
+
+	method _parse_qualifiers ( lx ) {
+		let q := [];
+
+		while ( lx.peek_kind() ≡ "LBRACK" ) {
+			lx.next_tok();
+			let e := self.parse_expression(lx);
+			lx.expect("RBRACK");
+			q.push(e);
+		}
+
+		return q;
+	}
+}

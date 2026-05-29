@@ -1,0 +1,173 @@
+from std/data/json import JSON;
+from std/path/jsonpointer import JSONPointer, extract_pointer_from_url;
+from std/string import chr;
+from test/more import *;
+
+let json := new JSON();
+let doc := json.decode(
+	"{\"foo\":[\"bar\",\"baz\"],\"\":0,\"a/b\":1,\"c%d\":2," _
+	"\"e^f\":3,\"g|h\":4,\"i\\\\j\":5,\"k\\\"l\":6," _
+	"\" \":7,\"m~n\":8,\"~1\":\"tilde-one\"}",
+);
+
+function pointer ( String path ) {
+	return new JSONPointer( path: path );
+}
+
+function first ( data, String path, fallback? ) {
+	return pointer(path).first( data, fallback );
+}
+
+is( pointer("").query(doc).length(), 1, "root pointer returns one result" );
+is( pointer("").query(doc)[0], doc, "root pointer returns the whole document" );
+is( first( doc, "/foo" )[0], "bar", "RFC example /foo" );
+is( first( doc, "/foo/0" ), "bar", "RFC example /foo/0" );
+is( first( doc, "/" ), 0, "RFC example empty member name" );
+is( first( doc, "/a~1b" ), 1, "RFC example escaped slash" );
+is( first( doc, "/c%d" ), 2, "RFC example percent character" );
+is( first( doc, "/e^f" ), 3, "RFC example caret character" );
+is( first( doc, "/g|h" ), 4, "RFC example pipe character" );
+is( first( doc, "/i\\j" ), 5, "RFC example backslash character" );
+is( first( doc, "/k\"l" ), 6, "RFC example quote character" );
+is( first( doc, "/ " ), 7, "RFC example space character" );
+is( first( doc, "/m~0n" ), 8, "RFC example escaped tilde" );
+is( first( doc, "/~01" ), "tilde-one", "~01 decodes to ~1" );
+
+is( pointer("/foo/0").get(doc)[0], "bar", "get aliases query" );
+is( pointer("/foo/0").select(doc)[0], "bar", "select aliases query" );
+is( pointer("/foo/0").expression(), "/foo/0", "expression returns source" );
+is( first( doc, "/foo/9", "fallback" ), "fallback", "first fallback" );
+ok( pointer("/foo/1").exists(doc), "exists sees present value" );
+ok( not pointer("/foo/9").exists(doc), "exists is false on missing value" );
+
+is( pointer("/foo/01").query(doc).length(), 0, "array leading zero misses" );
+is( pointer("/foo/-").query(doc).length(), 0, "array dash token misses" );
+is( pointer("/foo/name").query(doc).length(), 0, "array non-index misses" );
+is( pointer("/foo/2").query(doc).length(), 0, "array out of range misses" );
+
+let pairlist := {{
+	one: 9,
+	dup: 1,
+	dup: 2,
+}};
+is( first( pairlist, "/one" ), 9, "PairList unique key resolves" );
+is(
+	pointer("/dup").query(pairlist).length(),
+	0,
+	"PairList duplicate key does not resolve",
+);
+
+like(
+	exception( function () { pointer("foo"); } ),
+	/empty or start/,
+	"invalid non-root pointer throws",
+);
+like(
+	exception( function () { pointer("/bad~2"); } ),
+	/invalid '~' escape/,
+	"invalid tilde escape throws",
+);
+like(
+	exception( function () { pointer("/bad~"); } ),
+	/invalid '~' escape/,
+	"trailing tilde escape throws",
+);
+
+let split_root := extract_pointer_from_url("https://example.test/schema#");
+is( split_root{baseurl}, "https://example.test/schema", "base URL before #" );
+is( split_root{pointer}, "", "empty fragment decodes to root pointer" );
+
+let split_key := extract_pointer_from_url(
+	"https://example.test/schema.json#/c%25d",
+);
+is( split_key{baseurl}, "https://example.test/schema.json", "base URL" );
+is( split_key{pointer}, "/c%d", "fragment percent decoding" );
+
+let split_utf8 := extract_pointer_from_url(
+	"https://example.test/schema.json#/caf%C3%A9",
+);
+is( split_utf8{pointer}, "/caf" _ chr(233), "UTF-8 fragment decoding" );
+
+let no_fragment := extract_pointer_from_url("https://example.test/schema.json");
+is( no_fragment{baseurl}, "https://example.test/schema.json", "no # base URL" );
+is( no_fragment{pointer}, null, "no # has null pointer" );
+
+like(
+	exception( function () {
+		extract_pointer_from_url("https://example.test/schema#not-a-pointer");
+	} ),
+	/empty or start/,
+	"invalid URL fragment pointer throws",
+);
+
+let blob := {
+	store: {
+		title: "Before",
+		books: [
+			{
+				author: "Ada",
+				pages: 10,
+			},
+			{
+				author: "Bob",
+				pages: 20,
+			},
+		],
+	},
+};
+
+let title_path := pointer("/store/title");
+is( title_path.assign_first( blob, "After" ), "After", "assign_first return" );
+is( blob{store}{title}, "After", "assign_first mutates dict value" );
+is( pointer("/store/books/0/pages").assign_first( blob, 5, "+=" ), 15, "+=" );
+is(
+	blob{store}{books}[0]{pages},
+	15,
+	"compound assignment mutates array item",
+);
+is(
+	pointer("/store/books/9/pages").assign_all( blob, 1 ),
+	1,
+	"assign_all miss",
+);
+ok(
+	pointer("/store/books/1/pages").assign_maybe( blob, 2, "+=" ),
+	"assign_maybe returns true",
+);
+is( blob{store}{books}[1]{pages}, 22, "assign_maybe mutates selected item" );
+ok(
+	not pointer("/store/books/9/pages").assign_maybe( blob, 1 ),
+	"assign_maybe returns false on miss",
+);
+
+let title_ref := title_path.ref_first(blob);
+is( title_ref(), "After", "ref_first getter" );
+is( title_ref("Done"), "Done", "ref_first setter return" );
+is( blob{store}{title}, "Done", "ref_first setter mutates" );
+
+let page_refs := pointer("/store/books/0/pages").ref_all(blob);
+is( page_refs.length(), 1, "ref_all returns selected ref" );
+is( page_refs[0](), 15, "ref_all getter" );
+is( page_refs[0](16), 16, "ref_all setter return" );
+is( blob{store}{books}[0]{pages}, 16, "ref_all setter mutates" );
+is( pointer("/store/missing").ref_maybe(blob), null, "ref_maybe miss" );
+is( pointer("/store/title").ref_maybe(blob)(), "Done", "ref_maybe hit" );
+
+like(
+	exception( function () { pointer("").assign_first( blob, "root" ); } ),
+	/no parent node/,
+	"root assignment throws because caller binding is unavailable",
+);
+
+{
+	JSONPointer.use();
+
+	is( blob @ "/store/title", "Done", "@ reads first match" );
+	is( blob @ "/store/title" := "Operator", "Operator", "@ assignment return" );
+	is( blob{store}{title}, "Operator", "@ assignment mutates" );
+	is( blob @@ "/store/books/0/author", [ "Ada" ], "@@ returns all matches" );
+	ok( blob @? "/store/books/1/author", "@? sees existing pointer" );
+	ok( not( blob @? "/store/books/9/author" ), "@? sees missing pointer" );
+}
+
+done_testing();

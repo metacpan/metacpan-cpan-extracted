@@ -1,0 +1,5 @@
+trait AsyncTag {
+	method tag () {
+		return "tag:" _ self.get_name();
+	}
+}

@@ -1,0 +1,100 @@
+=encoding utf8
+
+=head1 NAME
+
+std/path/zz - ZuzuScript-flavoured path selectors.
+
+=head1 SYNOPSIS
+
+  from std/path/zz import ZZPath;
+  
+  let data := { users: [ { name: "Ada" } ] };
+  say( ( new ZZPath( path: "/users/#0/name" ) ).first(data) );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module provides the public C<ZZPath> class. It currently reuses the
+ZPath traversal, parser, lexer, assignment, and reference
+machinery while routing expression operators through
+C<std/path/zz/operators> and expression functions through
+C<std/path/zz/functions>.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<ZZEvaluator>
+
+Evaluator class that supplies ZZPath operators and functions.
+
+=over
+
+=item C<< evaluator.operator_definitions() >>
+
+Parameters: none. Returns: C<Array>. Returns ZZPath operator
+definitions.
+
+=item C<< evaluator.function_definitions() >>
+
+Parameters: none. Returns: C<Array>. Returns ZZPath function
+definitions.
+
+=back
+
+=item C<< ZZPath({ path: String }) >>
+
+Constructs a ZZPath query object. Returns: C<ZZPath>. Inherits the
+public query, assignment, and reference methods from C<ZPath>.
+
+=over
+
+=item C<< path.get_evaluator() >>
+
+Parameters: none. Returns: C<ZZEvaluator>. Returns the evaluator used
+for this path.
+
+=item C<< node.find(path) >>
+
+C<ZZPath> inherits from C<ZPath>, so a C<ZZPath> object can be passed to
+C<std/path/z/node> C<Node.find()>.
+
+=back
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/path/zz >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/path/z import ZPath;
+from std/path/z/evaluate import Evaluator as ZEvaluator;
+
+class ZZEvaluator extends ZEvaluator {
+	method operator_definitions () {
+		from std/path/zz/operators import STANDARD_OPERATORS;
+		return STANDARD_OPERATORS;
+	}
+
+	method function_definitions () {
+		from std/path/zz/functions import STANDARD_FUNCTIONS;
+		return STANDARD_FUNCTIONS;
+	}
+}
+
+class ZZPath extends ZPath {
+	method get_evaluator () {
+		return new ZZEvaluator();
+	}
+}

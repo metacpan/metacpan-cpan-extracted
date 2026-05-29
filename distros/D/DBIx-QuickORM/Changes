@@ -1,4 +1,12 @@
-0.000021  2026-05-27 20:29:04-07:00 America/Los_Angeles
+0.000022  2026-05-28 13:26:49-07:00 America/Los_Angeles
+
+    Bug fixes:
+    - SQLite dialect now queries sqlite_master/sqlite_temp_master instead of the modern sqlite_schema/sqlite_temp_schema aliases (which require SQLite 3.33+, 2020). Bump DBD::SQLite minimum to 1.64, which embeds SQLite 3.31.1 and is the first version with pragma_table_xinfo's `hidden` flag for GENERATED columns (relied on by generated-column detection added in 0.000021).
+
+    Internal / cleanup:
+    - Audit dist.ini prereq minimums against actual feature usage. Bump pinned versions where the code uses features that require a specific minimum (List::Util zip/mesh -> 1.56, Sub::Util set_subname -> 1.40, Data::Dumper Trailingcomma -> 2.171, Role::Tiny -> 2.000003, Cpanel::JSON::XS -> 3.0224, etc.). Core / basic-usage modules left at 0.
+
+0.000021  2026-05-27 20:30:06-07:00 America/Los_Angeles
 
     Features:
     - Detect database-generated columns (stored or virtual GENERATED ALWAYS AS) at autofill time across SQLite, PostgreSQL, MySQL/MariaDB, and DuckDB. Generated columns are readable on fetch but excluded from INSERT/UPDATE: handle-level insert/upsert/update silently drop them, row->field and row->update croak.

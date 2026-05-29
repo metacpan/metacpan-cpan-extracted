@@ -1,0 +1,117 @@
+from std/internals import setprop;
+from std/path/z import ZPath;
+from test/more import *;
+
+setprop( "paths", ZPath );
+
+function compile ( p ) { return new ZPath(path: p) }
+function query   ( d, p ) { return compile(p).query(d) }
+function first   ( d, p, f ) { return compile(p).first(d, f) }
+function exists  ( d, p ) { return compile(p).exists(d) }
+
+let data := {
+	users: [
+		{
+			name: "Ada",
+			role: "admin",
+			active: true,
+			score: 9,
+			skills: [ "math", "logic" ],
+		},
+		{
+			name: "Bob",
+			role: "reader",
+			active: false,
+			score: 4,
+			skills: [ "ops" ],
+		},
+		{
+			name: "Cara",
+			role: "reader",
+			active: true,
+			score: 6,
+			skills: [ "docs", "qa" ],
+		},
+	],
+	meta: {
+		title: "Directory",
+		enabled: true,
+	},
+};
+
+let names := query( data, "/users/*/name" );
+is( names.length(), 3, "absolute path traverses arrays and dicts" );
+is( names[0], "Ada", "first wildcard match is returned in order" );
+is( names[2], "Cara", "last wildcard match is returned in order" );
+
+is( first( data, "/users/#1/name", "n/a" ), "Bob", "#index selects array entries" );
+is( first( data, "/users/#9/name", "n/a" ), "n/a", "first uses fallback for missing path" );
+ok( exists( data, "/users/#0/skills/#1" ), "exists sees present nested path" );
+ok( not exists( data, "/users/#9/name" ), "exists returns false for missing path" );
+
+let not_bob_names := query( data, "/users/*[name != \"Bob\"]/name" );
+is( not_bob_names.length(), 2, "inequality filters select matching nodes" );
+is( not_bob_names[0], "Ada", "inequality filter keeps first non-Bob user" );
+is( not_bob_names[1], "Cara", "inequality filter keeps later non-Bob user" );
+
+let reader_names := query( data, "/users/*[role == \"reader\"]/name" );
+is( reader_names.length(), 2, "comparison filters select matching nodes" );
+is( reader_names[0], "Bob", "comparison filter keeps first reader" );
+is( reader_names[1], "Cara", "comparison filter keeps second reader" );
+
+let high_scores := query( data, "/users/*[score >= 6]/name" );
+is( high_scores.length(), 2, "numeric comparison filters select matching nodes" );
+is( high_scores[0], "Ada", "numeric filter keeps highest score" );
+is( high_scores[1], "Cara", "numeric filter keeps boundary score" );
+
+let skill_owners := query( data, "/users/*/skills/*[../../name == \"Ada\"]" );
+is( skill_owners.length(), 2, "filters can navigate to parent context" );
+is( skill_owners[0], "math", "parent filter keeps first child" );
+is( skill_owners[1], "logic", "parent filter keeps second child" );
+
+is( first( data, "count(/users/*)", "n/a" ), 3, "count() counts selected users" );
+is( first( data, "sum(/users/*/score)", "n/a" ), 19, "sum() aggregates numeric paths" );
+is( first( data, "min(/users/*/score)", "n/a" ), 4, "min() aggregates numeric paths" );
+is( first( data, "max(/users/*/score)", "n/a" ), 9, "max() aggregates numeric paths" );
+
+is(
+	first( data, "format(\"%1.2f\", sum(/users/*/score) / count(/users/*))", "n/a" ),
+	"6.33",
+	"format() can render computed numeric expressions",
+);
+
+let parent_roundtrip := query( data, "/users/*/name/../name" );
+is( parent_roundtrip.length(), 3, "parent axis round-trips from child nodes" );
+is( parent_roundtrip[1], "Bob", "parent axis preserves node identity" );
+
+is( data @ "/meta/title", "Directory", "@ path operator returns first match" );
+is( ( data @@ "/users/*/role" ).length(), 3, "@@ path operator returns all matches" );
+ok( data @? "/users/#2/name", "@? path operator sees an existing match" );
+
+let focused_title := data @ "/meta/title" := "Roster";
+is( focused_title, "Roster", "@ assignment returns assigned value" );
+is( data{meta}{title}, "Roster", "@ assignment mutates dict target" );
+
+let focused_skill := data @ "/users/#1/skills/#0" := "deploy";
+is( focused_skill, "deploy", "@ assignment reaches nested array entry" );
+is( data{users}[1]{skills}[0], "deploy", "@ assignment mutates nested array entry" );
+
+let all_roles := data @@ "/users/*/role" := "member";
+is( all_roles, "member", "@@ assignment returns assigned value" );
+is( data{users}[0]{role}, "member", "@@ assignment mutates first selected node" );
+is( data{users}[1]{role}, "member", "@@ assignment mutates later selected node" );
+is( data{users}[2]{role}, "member", "@@ assignment mutates final selected node" );
+
+is( data @ "/users/#0/score" += 1, 10, "compound @ assignment returns new value" );
+is( data{users}[0]{score}, 10, "compound @ assignment mutates selected node" );
+
+is( data @@ "/users/*/score" += 2, 2, "compound @@ assignment returns RHS value" );
+is( data{users}[0]{score}, 12, "compound @@ assignment mutates first selected node" );
+is( data{users}[1]{score}, 6, "compound @@ assignment mutates second selected node" );
+is( data{users}[2]{score}, 8, "compound @@ assignment mutates third selected node" );
+
+ok( data @? "/users/*[name == \"Bob\"]/active" := true, "@? assignment returns true on match" );
+is( data{users}[1]{active}, true, "@? assignment mutates matched node" );
+ok( not( data @? "/users/*[name == \"Nobody\"]/active" := true ), "@? assignment returns false on miss" );
+
+done_testing();

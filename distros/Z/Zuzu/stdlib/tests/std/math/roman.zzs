@@ -1,0 +1,18 @@
+from std/math/roman import roman;
+from test/more import *;
+is( roman(0), "N", "zero is nulla" );
+is( roman(1), "I", "one" );
+is( roman(4), "IV", "subtractive four" );
+is( roman(9), "IX", "subtractive nine" );
+is( roman(58), "LVIII", "fifty-eight" );
+is( roman(944), "CMXLIV", "complex subtractive number" );
+is( roman(3999), "MMMCMXCIX", "upper bound integer" );
+is( roman(0.5), "S", "half is semis marker only" );
+is( roman(1.6), "IS·", "fraction rounded to nearest twelfth" );
+is( roman(2.1666), "II:", "fraction rounds to two twelfths" );
+is( roman(2.249), "II∴", "fraction rounds to three twelfths" );
+is( roman(2.75), "IIS∴", "three quarter value as nine twelfths" );
+is( roman(3.99), "IV", "twelfth carry to next integer" );
+is( roman(0.04), "N", "very small values round to zero" );
+is( roman( -1.5 ), "-IS", "negative values keep sign" );
+done_testing();

@@ -1,0 +1,219 @@
+from std/secure import Certificate, Secure;
+from std/string/base64 import decode, encode;
+from test/more import *;
+
+let caps := Secure.capabilities();
+let der_b64 := "MIIBgjCCASigAwIBAgIHAaKzxNXm9zAKBggqhkjOPQQDAjAdMRswGQYDVQQDDBJa"
+	_ "dXp1IFBoYXNlIDEwIFRlc3QwHhcNMjYwNTA2MDk1MDI3WhcNMzYwNTAzMDk1MDI3"
+	_ "WjAdMRswGQYDVQQDDBJadXp1IFBoYXNlIDEwIFRlc3QwWTATBgcqhkjOPQIBBggq"
+	_ "hkjOPQMBBwNCAAQNhaMBEKKr40vbIIbpk9XaqHPpsVRCG1kXWCMCzZg4P9fjfoMj"
+	_ "/hpxyTrg/6Lt9gjKf2n11W7aLsva3lwoKvApo1MwUTAdBgNVHQ4EFgQUz4hGUwtn"
+	_ "qKFeiRnGXpzKZyov4uIwHwYDVR0jBBgwFoAUz4hGUwtnqKFeiRnGXpzKZyov4uIw"
+	_ "DwYDVR0TAQH/BAUwAwEB/zAKBggqhkjOPQQDAgNIADBFAiEA18V9akgZ8/7gfjk6"
+	_ "rCjYgQXc8ziib4j9ykw9/jmE8vECIAtIe34EJdQlsSKrqtjjwILidcouqpyPofHY"
+	_ "ArmX3qoW";
+let der := decode(der_b64);
+let pem := "-----BEGIN CERTIFICATE-----\n"
+	_ "MIIBgjCCASigAwIBAgIHAaKzxNXm9zAKBggqhkjOPQQDAjAdMRswGQYDVQQDDBJa\n"
+	_ "dXp1IFBoYXNlIDEwIFRlc3QwHhcNMjYwNTA2MDk1MDI3WhcNMzYwNTAzMDk1MDI3\n"
+	_ "WjAdMRswGQYDVQQDDBJadXp1IFBoYXNlIDEwIFRlc3QwWTATBgcqhkjOPQIBBggq\n"
+	_ "hkjOPQMBBwNCAAQNhaMBEKKr40vbIIbpk9XaqHPpsVRCG1kXWCMCzZg4P9fjfoMj\n"
+	_ "/hpxyTrg/6Lt9gjKf2n11W7aLsva3lwoKvApo1MwUTAdBgNVHQ4EFgQUz4hGUwtn\n"
+	_ "qKFeiRnGXpzKZyov4uIwHwYDVR0jBBgwFoAUz4hGUwtnqKFeiRnGXpzKZyov4uIw\n"
+	_ "DwYDVR0TAQH/BAUwAwEB/zAKBggqhkjOPQQDAgNIADBFAiEA18V9akgZ8/7gfjk6\n"
+	_ "rCjYgQXc8ziib4j9ykw9/jmE8vECIAtIe34EJdQlsSKrqtjjwILidcouqpyPofHY\n"
+	_ "ArmX3qoW\n"
+	_ "-----END CERTIFICATE-----\n";
+let p521_der := decode(
+	"MIICFDCCAXWgAwIBAgIDFFUhMAoGCCqGSM49BAMEMCQxIjAgBgNVBAMMGVp1enUg"
+		_ "UGhhc2UgMTQuNSBQNTIxIFRlc3QwHhcNMjYwNTA2MTQzMzUwWhcNMzYwNTAzMTQz"
+		_ "MzUwWjAkMSIwIAYDVQQDDBladXp1IFBoYXNlIDE0LjUgUDUyMSBUZXN0MIGbMBAG"
+		_ "ByqGSM49AgEGBSuBBAAjA4GGAAQBC5nEOlVHOMMpqcJ9bxpldtxbYvqc8K/MBFs6"
+		_ "POYCvEL5knWapZt7G4KDM69kCd+gxvWNGyMpqmIAoN6IgRC2X2IBtpkzfBfo1csK"
+		_ "WLlhZdNd06IR074XxrsDDlypv1mteJfjefeYlH4MMjqlv8BVnlrPDlC7mt8kAmLD"
+		_ "S2rfEokS9bWjUzBRMB0GA1UdDgQWBBTNO/WLWxskVWkj68p3JksqVXqEtjAfBgNV"
+		_ "HSMEGDAWgBTNO/WLWxskVWkj68p3JksqVXqEtjAPBgNVHRMBAf8EBTADAQH/MAoG"
+		_ "CCqGSM49BAMEA4GMADCBiAJCAQkDho2nX18N6P6pzIMbT0GIelPkzpSJQ5b3r5Di"
+		_ "5qRs++FWqKDEdniqN4QWHTQzZD/EDmy5nb1w8Q6CgeD6/atiAkIAoLNp7J7/BgEb"
+		_ "OTA57HxbZxzsIJs1leKBSVvYWjnTh4dAE5xGV/oBElfGxJE+0t/uv6TtxrpMvTf3"
+		_ "vqJbGmx79xo=",
+);
+
+is(
+	Secure.has( "certificate", "parse-x509-der" ),
+	true,
+	"DER X.509 parsing is advertised",
+);
+is(
+	Secure.has( "certificate", "fingerprint-sha256" ),
+	true,
+	"SHA-256 certificate fingerprinting is advertised",
+);
+if ( caps{host} == "perl" ) {
+	is(
+		Secure.has( "certificate", "fingerprint-sha384" ),
+		true,
+		"Perl advertises SHA-384 certificate fingerprinting",
+	);
+	is(
+		Secure.has( "certificate", "fingerprint-sha512" ),
+		true,
+		"Perl advertises SHA-512 certificate fingerprinting",
+	);
+}
+else {
+	is(
+		Secure.has( "certificate", "fingerprint-sha384" ),
+		false,
+		"non-Perl hosts do not advertise SHA-384 certificate fingerprinting",
+	);
+	is(
+		Secure.has( "certificate", "fingerprint-sha512" ),
+		false,
+		"non-Perl hosts do not advertise SHA-512 certificate fingerprinting",
+	);
+}
+if ( caps{host} == "browser" ) {
+	is(
+		Secure.has( "certificate", "verify-chain" ),
+		false,
+		"browser does not advertise certificate chain verification",
+	);
+}
+else {
+	is(
+		Secure.has( "certificate", "verify-chain" ),
+		true,
+		"certificate chain verification is advertised",
+	);
+}
+
+if ( caps{host} == "browser" ) {
+	is(
+		Secure.has( "certificate", "parse-x509" ),
+		false,
+		"browser does not advertise PEM certificate parsing",
+	);
+	is(
+		Secure.has( "certificate", "public-key" ),
+		false,
+		"browser does not advertise certificate public-key extraction",
+	);
+}
+else {
+	is(
+		Secure.has( "certificate", "parse-x509" ),
+		true,
+		"host advertises PEM certificate parsing",
+	);
+	is(
+		Secure.has( "certificate", "public-key" ),
+		true,
+		"host advertises certificate public-key extraction",
+	);
+}
+
+let cert := Certificate.parse(der);
+is( typeof cert, "Certificate", "DER parse returns a Certificate" );
+like( cert.subject(), /Zuzu Phase 10 Test/, "subject contains fixture CN" );
+like( cert.issuer(), /Zuzu Phase 10 Test/, "issuer contains fixture CN" );
+is(
+	cert.serial_number(),
+	"01A2B3C4D5E6F7",
+	"serial number is uppercase hex",
+);
+is( typeof cert.not_before(), "Time", "not_before returns a Time" );
+is( typeof cert.not_after(), "Time", "not_after returns a Time" );
+is( cert.not_before().epoch(), 1778061027, "not_before epoch matches fixture" );
+is( cert.not_after().epoch(), 2093421027, "not_after epoch matches fixture" );
+is(
+	encode( cert.fingerprint("sha256") ),
+	"pvGPojgxS7kYopcpTQv1ImVDg5hxcmNh+7VAzRrKXTw=",
+	"SHA-256 fingerprint matches fixture",
+);
+if ( caps{host} == "perl" ) {
+	is(
+		encode( cert.fingerprint("sha384") ),
+		"yBRB0YhZELumNNeZ2aKA2cBGrrgywgJQ/eHuNNqYfYKi22Rnqb/FzAZMLp6uF0eD",
+		"SHA-384 fingerprint matches fixture",
+	);
+	is(
+		encode( cert.fingerprint("sha512") ),
+		"LKDzARVbFMKgTfhHAvjTR+wWrR9gENNYNiKIAkPE6YpnLVxgUYkc5eFlMgG++rvMLRpGm8qKDHwARHl6u+yYwQ==",
+		"SHA-512 fingerprint matches fixture",
+	);
+}
+is( cert.to_der(), der, "to_der round-trips the DER fixture" );
+like( cert.to_pem(), /BEGIN CERTIFICATE/, "to_pem has certificate header" );
+like( cert.to_pem(), /END CERTIFICATE/, "to_pem has certificate footer" );
+is(
+	Certificate.parse_chain(der).length(),
+	1,
+	"DER parse_chain returns a one-certificate array",
+);
+like(
+	exception( function () {
+		cert.fingerprint("sha1");
+	} ),
+	/not available|sha256/,
+	"unsupported fingerprint algorithms throw clearly",
+);
+
+if ( caps{host} == "browser" ) {
+	like(
+		exception( function () {
+			Certificate.parse(pem);
+		} ),
+		/DER BinaryString/,
+		"browser rejects PEM certificate parsing",
+	);
+	like(
+		exception( function () {
+			Certificate.parse_chain(pem);
+		} ),
+		/DER BinaryString/,
+		"browser rejects PEM certificate chains",
+	);
+	like(
+		exception( function () {
+			cert.public_key();
+		} ),
+		/unsupported|not supported/,
+		"browser public_key is unsupported in phase 10",
+	);
+}
+else {
+	let pem_cert := Certificate.parse(pem);
+	is( typeof pem_cert, "Certificate", "PEM parse returns a Certificate" );
+	is(
+		Certificate.parse_chain(pem _ pem).length(),
+		2,
+		"PEM parse_chain returns all certificates",
+	);
+	is(
+		Certificate.parse( cert.to_pem() ).serial_number(),
+		cert.serial_number(),
+		"canonical PEM can be parsed again",
+	);
+	is(
+		typeof cert.public_key(),
+		"PublicKey",
+		"supported certificate public key returns PublicKey",
+	);
+	if ( caps{host} == "perl" ) {
+		let p521_cert := Certificate.parse(p521_der);
+		let p521_public := p521_cert.public_key();
+		is(
+			typeof p521_public,
+			"PublicKey",
+			"Perl extracts P-521 certificate public key",
+		);
+		is(
+			length p521_public.export(),
+			133,
+			"Perl P-521 certificate public key has raw length",
+		);
+	}
+}
+
+done_testing();

@@ -1,0 +1,49 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/io import Path;
+
+let dir := Path.tempdir();
+let source := dir.child("phase1-source.txt");
+let copy_to := dir.child("phase1-copy.txt");
+let move_to := dir.child("phase1-move.txt");
+
+source.spew_utf8("alpha\nbeta\n");
+is( source.size(), 11, "size reports bytes", );
+ok( source.size_human() ne "", "size_human returns text", );
+
+let st := source.stat();
+ok( st != null, "stat returns metadata", );
+ok( st.get( "size", 0 ) >= 11, "stat includes size", );
+ok( st.get( "mode", -1 ) ≠ -1, "stat includes mode field", );
+ok( st.get( "uid", -1 ) ≠ -1, "stat includes uid field", );
+let lst := source.lstat();
+ok( lst != null, "lstat returns metadata", );
+ok( lst.get( "mode", -1 ) ≠ -1, "lstat includes mode field", );
+
+let chmod_out := source.chmod(420);
+ok( chmod_out >= 0, "chmod returns numeric status", );
+
+let copied := source.copy(copy_to);
+ok( copied.exists(), "copy creates destination", );
+is( copy_to.slurp_utf8(), "alpha\nbeta\n", "copy keeps payload", );
+
+copy_to.move(move_to);
+ok( move_to.exists(), "move creates new path", );
+is( copy_to.exists(), 0, "move removes old path", );
+
+let raw_lines := [];
+source.each_line( function (line) {
+	raw_lines.push( typeof line );
+}, true );
+is( raw_lines[0], "BinaryString", "each_line raw mode yields binary", );
+
+is( typeof source.next_line(true), "BinaryString", "next_line raw mode returns binary", );
+is( typeof source.next_line(), "String", "next_line text mode returns string", );
+
+ok( source.remove(), "remove deletes file", );
+is( source.exists(), 0, "remove updates exists", );
+ok( dir.remove_tree(), "remove_tree removes directory", );
+
+done_testing();

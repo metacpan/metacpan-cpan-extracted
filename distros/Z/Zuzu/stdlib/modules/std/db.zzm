@@ -1,0 +1,173 @@
+=encoding utf8
+
+=head1 NAME
+
+std/db - DBI-powered SQL database access.
+
+=head1 SYNOPSIS
+
+  from std/db import DB;
+  from std/io import Path;
+
+  let dbh := DB.temp({
+    auto_commit: false,
+    isolation_level: "immediate"
+  });
+  dbh.begin();
+  dbh.prepare(
+    "create table users (id integer, name text)"
+  ).execute();
+  dbh.commit();
+
+  let insert := dbh.prepare(
+    "insert into users (id, name) values (?, ?)"
+  );
+  insert.execute(1, "Ari");
+
+  let query := dbh.prepare(
+    "select id, name from users order by id"
+  );
+  query.execute();
+  for ( let row in query ) {
+    say( row{name} );
+  }
+  let cols := query.column_names();
+  let types := query.column_types();
+
+  let file_db := DB.open( new Path("app.sqlite") );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Node and
+Electron. It is not supported by zuzu-js in the browser.
+
+=head1 DESCRIPTION
+
+This module provides a lightweight SQL interface.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<DB>
+
+Static methods:
+
+=over
+
+=item * C<< connect(String dsn, Dict settings?) >>
+
+Parameters: C<dsn> is a database connection string and C<settings>
+contains optional connection settings. Returns: C<DatabaseHandle>.
+Opens a database connection.
+
+=item * C<< temp(Dict settings?) >>
+
+Parameters: C<settings> contains optional connection settings. Returns:
+C<DatabaseHandle>. Opens an in-memory SQLite database.
+
+=item * C<< open(path, Dict settings?) >>
+
+Parameters: C<path> is a string or C<std/io> C<Path> and C<settings>
+contains optional connection settings. Returns: C<DatabaseHandle>.
+Opens a SQLite database file.
+Optional settings keys: C<auto_commit>, C<raise_error>,
+C<print_error>, C<sqlite_unicode>, and C<isolation_level>.
+For SQLite, C<isolation_level> may be C<deferred>,
+C<immediate>, or C<exclusive>.
+
+=back
+
+=item C<DatabaseHandle>
+
+Methods:
+
+=over
+
+=item * C<< prepare(String sql) >>
+
+Parameters: C<sql> is SQL text. Returns: C<StatementHandle>. Prepares a
+statement.
+
+=item * C<< quote(String value) >>
+
+Parameters: C<value> is text. Returns: C<String>. Quotes a string for
+SQL where supported.
+
+=item * C<begin()>, C<commit()>, C<rollback()>
+
+Parameters: none. Returns: C<null>. Controls a transaction.
+
+=item * C<< execute_batch(String sql, Array rows) >>
+
+Parameters: C<sql> is SQL text and C<rows> is an array of bind rows.
+Returns: C<null>. Prepares once, then executes with multiple bind rows.
+
+=back
+
+=item C<StatementHandle>
+
+Methods:
+
+=over
+
+=item * C<execute(...)>
+
+Parameters: bind values match the prepared statement. Returns:
+C<StatementHandle>. Executes the statement.
+
+=item * C<< execute_batch(Array rows) >>
+
+Parameters: C<rows> is an array of bind rows. Returns:
+C<StatementHandle>. Executes the statement for multiple bind rows.
+
+=item * C<column_names()>, C<column_types()>
+
+Parameters: none. Returns: C<Array>. Returns statement column metadata.
+
+=item * C<next_array()>, C<next_dict()>
+
+Parameters: none. Returns: C<Array>, C<Dict>, or C<null>. Fetches the
+next row.
+
+=item * C<all_array()>, C<all_dict()>
+
+Parameters: none. Returns: C<Array>. Fetches all remaining rows.
+
+=item * C<next_typed_array()>, C<next_typed_dict()>
+
+Parameters: none. Returns: C<Array>, C<Dict>, or C<null>. Fetches the
+next row with type coercions.
+
+=item * C<all_typed_array()>, C<all_typed_dict()>
+
+Parameters: none. Returns: C<Array>. Fetches all remaining rows with
+type coercions.
+
+=item * C<to_Iterator()>
+
+Parameters: none. Returns: C<Function>. Returns an iterator function
+suitable for C<for> loops.
+
+=back
+
+=back
+
+=head2 Typed fetches
+
+Typed fetch methods inspect statement metadata and coerce values for
+common SQL numeric and boolean types.
+
+=head1 ERROR HANDLING
+
+Database and SQL errors are raised as exceptions.
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/db >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.

@@ -1,0 +1,157 @@
+from test/more import *;
+
+function positional ( ... args ) {
+	return args;
+}
+
+function named ( ... PairList args ) {
+	return args;
+}
+
+function mixed ( first ... PairList opts, Array rest ) {
+	return {
+		first: first,
+		opts: opts,
+		rest: rest,
+	};
+}
+
+class Receiver {
+
+	method positional ( ... args ) {
+		return args;
+	}
+
+	method mixed ( first ... PairList opts, Array rest ) {
+		return {
+			first: first,
+			opts: opts,
+			rest: rest,
+		};
+	}
+}
+
+class Constructed {
+	let name with get;
+	let count with get;
+}
+
+let seen := [ ];
+
+function remember ( String label, value ) {
+	seen.push(label);
+	return value;
+}
+
+let from_array := positional( 1, ...[ 2, 3 ], 4 );
+is(
+	from_array,
+	[ 1, 2, 3, 4 ],
+	"Array spread expands positional arguments in place",
+);
+
+let from_dict := named( before: 0, ...{ alpha: 1, beta: 2 }, after: 3 );
+is( from_dict{"before"}, 0, "explicit named arg before Dict spread binds" );
+is( from_dict{"alpha"}, 1, "Dict spread expands alpha named arg" );
+is( from_dict{"beta"}, 2, "Dict spread expands beta named arg" );
+is( from_dict{"after"}, 3, "explicit named arg after Dict spread binds" );
+
+let from_pairs := named( ...{{ a: 1, b: 2, a: 3 }} );
+is(
+	from_pairs.keys(),
+	[ "a", "b", "a" ],
+	"PairList spread preserves pair order",
+);
+is(
+	from_pairs.get_all("a"),
+	[ 1, 3 ],
+	"PairList spread preserves duplicate keys",
+);
+
+let duplicate_order := named(
+	key: "first",
+	...{{ key: "middle" }},
+	key: "last",
+);
+is(
+	duplicate_order.get_all("key"),
+	[ "first", "middle", "last" ],
+	"duplicate named args around spread preserve call argument order",
+);
+
+let mixed_got := mixed(
+	"head",
+	...[ "a", "b" ],
+	explicit: "E",
+	...{{ dup: "one", dup: "two" }},
+	"tail",
+);
+is( mixed_got{"first"}, "head", "mixed call keeps leading positional" );
+is(
+	mixed_got{"rest"},
+	[ "a", "b", "tail" ],
+	"mixed call binds Array spread and trailing positional",
+);
+is(
+	mixed_got{"opts"}.keys(),
+	[ "explicit", "dup", "dup" ],
+	"mixed call binds explicit and PairList spread named args",
+);
+
+let receiver := new Receiver();
+is(
+	receiver.positional( "r", ...[ "x", "y" ] ),
+	[ "r", "x", "y" ],
+	"normal method calls accept positional spreads",
+);
+
+let constructed := new Constructed( ...{ count: 7, name: "Ada" } );
+is( constructed.get_name(), "Ada", "constructor accepts Dict spread name" );
+is( constructed.get_count(), 7, "constructor accepts Dict spread count" );
+
+let method_name := "mixed";
+let dynamic_got := receiver.(method_name)(
+	"dynamic",
+	...[ 8 ],
+	...{{ label: "ok" }},
+	9,
+);
+is( dynamic_got{"first"}, "dynamic", "dynamic member call keeps receiver" );
+is( dynamic_got{"rest"}, [ 8, 9 ], "dynamic member call accepts Array spread" );
+is(
+	dynamic_got{"opts"}{"label"},
+	"ok",
+	"dynamic member call accepts PairList spread",
+);
+
+let evaluation_got := mixed(
+	remember( "a", "start" ),
+	...remember( "b", [ "array" ] ),
+	named: remember( "c", "value" ),
+	...remember( "d", {{ extra: "pair" }} ),
+	remember( "e", "end" ),
+);
+is(
+	seen,
+	[ "a", "b", "c", "d", "e" ],
+	"argument operands evaluate left-to-right with spread operands in place",
+);
+is(
+	evaluation_got{"rest"},
+	[ "array", "end" ],
+	"left-to-right spread evaluation still binds positional arguments",
+);
+is(
+	evaluation_got{"opts"}.keys(),
+	[ "named", "extra" ],
+	"left-to-right spread evaluation still binds named arguments",
+);
+
+ok(
+	exception( function () {
+		positional(...23);
+	} ) instanceof Exception,
+	"spreading a Number throws an Exception",
+);
+
+done_testing();

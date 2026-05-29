@@ -1,0 +1,31 @@
+from test/more import *;
+
+requires_capability( "db" );
+
+from std/db import DB;
+
+let dbh := DB.temp();
+dbh.prepare(
+	"create table mixed (id integer, n_int integer, n_real real, flag boolean, note text)",
+).execute();
+let ins := dbh.prepare(
+	"insert into mixed (id, n_int, n_real, flag, note) values (?, ?, ?, ?, ?)",
+);
+
+ins.execute( 1, "001", "2.50", 1, null );
+ins.execute( 2, 7, 3.0, 0, "ok" );
+ins.execute( 3, "-4", "0.125", 1, "007" );
+
+let q := dbh.prepare( "select id, n_int, n_real, flag, note from mixed order by id" );
+q.execute();
+let rows := q.all_typed_dict();
+
+is( rows.length(), 3, "typed fetch returns all mixed rows" );
+is( rows[0]{n_int}, 1, "string integer coerces to integer" );
+is( rows[0]{n_real}, 2.5, "string float coerces to float" );
+is( rows[0]{note}, null, "null value remains null" );
+is( rows[1]{flag}, 0, "boolean-like false stays zero" );
+is( rows[2]{n_int}, -4, "negative numeric text coerces to integer" );
+is( rows[2]{note}, "007", "text value that looks numeric remains text" );
+
+done_testing();

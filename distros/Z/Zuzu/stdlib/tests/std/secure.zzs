@@ -1,0 +1,193 @@
+from std/secure import
+	Secure,
+	SecureRandom,
+	PasswordHash,
+	KeyDerivation,
+	Cipher,
+	KeyAgreement,
+	SigningKey,
+	Certificate,
+	PrivateKey,
+	PublicKey,
+	SealedBox,
+	TlsIdentity;
+from test/more import *;
+
+isnt( Secure, null, "Secure is exported" );
+isnt( SecureRandom, null, "SecureRandom is exported" );
+isnt( PasswordHash, null, "PasswordHash is exported" );
+isnt( KeyDerivation, null, "KeyDerivation is exported" );
+isnt( Cipher, null, "Cipher is exported" );
+isnt( KeyAgreement, null, "KeyAgreement is exported" );
+isnt( SigningKey, null, "SigningKey is exported" );
+isnt( Certificate, null, "Certificate is exported" );
+isnt( PrivateKey, null, "PrivateKey is exported" );
+isnt( PublicKey, null, "PublicKey is exported" );
+isnt( SealedBox, null, "SealedBox is exported" );
+isnt( TlsIdentity, null, "TlsIdentity is exported" );
+
+let caps := Secure.capabilities();
+
+is( typeof caps, "Dict", "capabilities returns a Dict" );
+ok( caps.exists("host"), "capabilities has host key" );
+is( typeof caps{host}, "String", "host capability is a String" );
+ok( length caps{host} > 0, "host capability is non-empty" );
+ok( caps.exists("random"), "capabilities has random key" );
+is( caps{random}, true, "random capability is available" );
+ok( caps.exists("password_hash"), "capabilities has password_hash key" );
+ok(
+	caps{password_hash}.contains("pbkdf2-sha256"),
+	"capabilities reports pbkdf2-sha256",
+);
+is(
+	PasswordHash.default_algorithm(),
+	"pbkdf2-sha256",
+	"default password hash algorithm is portable",
+);
+ok( caps.exists("kdf"), "capabilities has kdf key" );
+ok(
+	caps{kdf}.contains("hkdf-sha256"),
+	"capabilities reports hkdf-sha256",
+);
+ok( caps.exists("cipher"), "capabilities has cipher key" );
+ok(
+	caps{cipher}.contains("aes-256-gcm"),
+	"capabilities reports aes-256-gcm",
+);
+if ( caps{host} == "perl" ) {
+	ok(
+		caps{cipher}.contains("aes-128-gcm"),
+		"Perl capabilities report aes-128-gcm",
+	);
+	ok(
+		caps{cipher}.contains("aes-192-gcm"),
+		"Perl capabilities report aes-192-gcm",
+	);
+}
+else {
+	ok(
+		not caps{cipher}.contains("aes-128-gcm"),
+		"non-Perl capabilities do not report aes-128-gcm",
+	);
+	ok(
+		not caps{cipher}.contains("aes-192-gcm"),
+		"non-Perl capabilities do not report aes-192-gcm",
+	);
+}
+if ( caps{host} == "browser" ) {
+	ok(
+		not caps{cipher}.contains("chacha20-poly1305"),
+		"browser does not report chacha20-poly1305",
+	);
+}
+else if ( caps{host} == "electron" ) {
+	is(
+		caps{cipher}.contains("chacha20-poly1305"),
+		Secure.has( "cipher", "chacha20-poly1305" ),
+		"Electron chacha20-poly1305 availability is host-dependent",
+	);
+}
+else {
+	ok(
+		caps{cipher}.contains("chacha20-poly1305"),
+		"capabilities reports chacha20-poly1305",
+	);
+}
+ok( caps.exists("key_agreement"), "capabilities has key_agreement key" );
+ok(
+	caps{key_agreement}.contains("x25519"),
+	"capabilities reports x25519 key agreement",
+);
+ok( caps.exists("signing"), "capabilities has signing key" );
+if ( caps{host} == "browser" ) {
+	ok(
+		not caps{signing}.contains("ed25519"),
+		"browser does not advertise ed25519 signing",
+	);
+}
+else {
+	ok(
+		caps{signing}.contains("ed25519"),
+		"capabilities reports ed25519 signing",
+	);
+}
+ok(
+	caps{signing}.contains("ecdsa-p256-sha256"),
+	"capabilities reports ecdsa-p256-sha256 signing",
+);
+ok(
+	caps{signing}.contains("ecdsa-p384-sha384"),
+	"capabilities reports ecdsa-p384-sha384 signing",
+);
+if ( caps{host} == "perl" ) {
+	ok(
+		caps{signing}.contains("ecdsa-p521-sha512"),
+		"Perl capabilities report ecdsa-p521-sha512 signing",
+	);
+}
+else {
+	ok(
+		not caps{signing}.contains("ecdsa-p521-sha512"),
+		"non-Perl capabilities do not report ecdsa-p521-sha512 signing",
+	);
+}
+ok( caps.exists("certificate"), "capabilities has certificate key" );
+if ( caps{host} == "perl" ) {
+	ok(
+		caps{certificate}.contains("fingerprint-sha384"),
+		"Perl capabilities report SHA-384 certificate fingerprinting",
+	);
+	ok(
+		caps{certificate}.contains("fingerprint-sha512"),
+		"Perl capabilities report SHA-512 certificate fingerprinting",
+	);
+}
+else {
+	ok(
+		not caps{certificate}.contains("fingerprint-sha384"),
+		"non-Perl capabilities do not report SHA-384 fingerprinting",
+	);
+	ok(
+		not caps{certificate}.contains("fingerprint-sha512"),
+		"non-Perl capabilities do not report SHA-512 fingerprinting",
+	);
+}
+ok( caps.exists("tls_identity"), "capabilities has tls_identity key" );
+ok(
+	caps{tls_identity}.contains("pem"),
+	"capabilities reports PEM TLS identity",
+);
+if ( caps{host} == "browser" ) {
+	ok(
+		not caps{tls_identity}.contains("pkcs12"),
+		"browser does not report PKCS#12 TLS identity",
+	);
+}
+else {
+	ok(
+		caps{tls_identity}.contains("pkcs12"),
+		"capabilities reports PKCS#12 TLS identity",
+	);
+}
+ok( caps.exists("async_required"), "capabilities has async_required key" );
+
+is( typeof caps{async_required}, "Dict", "async_required is a Dict" );
+ok(
+	caps{async_required}.exists("cipher"),
+	"async_required has cipher key",
+);
+ok( caps{async_required}.exists("kdf"), "async_required has kdf key" );
+ok(
+	caps{async_required}.exists("password_hash"),
+	"async_required has password_hash key",
+);
+ok(
+	caps{async_required}.exists("signing"),
+	"async_required has signing key",
+);
+ok(
+	caps{async_required}.exists("key_agreement"),
+	"async_required has key_agreement key",
+);
+
+done_testing();

@@ -1,6 +1,6 @@
 {
     "name" : "Modern-Open",
-    "version" : "0.15",
+    "version" : "0.16",
     "abstract" : "Autovivification, Autodie, and 3-args open support",
     "author" : [
         "ina <ina@cpan.org>"
@@ -65,7 +65,7 @@
     "provides" : {
         "Modern::Open" : {
             "file" : "lib/Modern/Open.pm",
-            "version" : "0.15"
+            "version" : "0.16"
         }
     }
 }

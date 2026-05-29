@@ -1,0 +1,874 @@
+=encoding utf8
+
+=head1 NAME
+
+std/path/z/functions - Function definitions for ZPath.
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module defines the function objects and standard function table used
+by C<std/path/z>.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<< Func({ spelling: String, f: Function }) >>
+
+Constructs a ZPath function definition. Returns: C<Func>.
+
+=over
+
+=item C<< func.has_name(n) >>
+
+Parameters: C<n> is a function name. Returns: C<Boolean>. Returns true
+when C<n> matches the function spelling.
+
+=back
+
+=back
+
+=head2 Functions
+
+=over
+
+=item C<< replace(haystack, needle, replacement) >>
+
+Parameters: C<haystack> is source text, C<needle> is a pattern, and
+C<replacement> is replacement text. Returns: C<String>. Performs ZPath
+replacement with capture substitutions.
+
+=item C<< mk_single_number_function(String name, Function impl) >>
+
+Parameters: C<name> is a ZPath function name and C<impl> maps one
+number. Returns: C<Function>. Builds a function wrapper for per-node
+numeric functions.
+
+=item C<< mk_aggregate_number_function(String name, Function impl) >>
+
+Parameters: C<name> is a ZPath function name and C<impl> maps an array
+of numbers. Returns: C<Function>. Builds a function wrapper for
+aggregate numeric functions.
+
+=item C<< mk_single_string_function(String name, Function impl) >>
+
+Parameters: C<name> is a ZPath function name and C<impl> maps one
+string. Returns: C<Function>. Builds a function wrapper for per-node
+string functions.
+
+=item C<< mk_match_function() >>
+
+Parameters: none. Returns: C<Function>. Builds the standard ZPath
+C<match> function implementation.
+
+=back
+
+=head2 Constants
+
+=over
+
+=item C<STANDARD_FUNCTIONS>
+
+Type: C<Array>. Standard ZPath function definitions.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/path/z/functions >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/path/z/node import KDLNodeNode, KDLValueNode, Node, XmlNodeNode;
+from std/path/z/operators import EvalHelpers;
+from std/data/xml/escape import escape_xml, unescape_xml;
+from std/string import index, rindex, search, sprint, substr, join;
+from std/math import Math;
+
+
+class Func with EvalHelpers {
+	let String spelling with get;
+	let Function f;
+	
+	method has_name ( n ) {
+		return true if self.get_spelling eq n;
+		return false;
+	}
+}
+
+function replace ( haystack, needle, replacement ) {
+	let copy := haystack;
+	
+	if ( replacement ~ /\$[0-9]/ ) {
+		let r := replacement;
+		copy ~= needle → do {
+			let matches := m;
+			r ~= /\$([0-9]+)/g → matches[ m[1] ];
+			r;
+		};
+	}
+	else {
+		copy ~= needle → replacement;
+	}
+	
+	return copy;
+}
+
+function mk_single_number_function ( String name, Function impl ) {
+	return function ( funk, ev, ast, ctx, args ) {
+		let nodes := [];
+		for ( let a in args ) {
+			const got := ev.eval_expr( a, ev.nested_ctx( ctx ) );
+			for ( let n in got ) {
+				nodes.push( n );
+			}
+		}
+		else {
+			nodes := ctx.nodeset;
+		}
+		return nodes
+			.map( fn x → x.number_value )
+			.grep( fn x → x instanceof Number )
+			.map( fn x → funk.wrap_for_array( impl(x) ) );
+	};
+}
+
+function mk_aggregate_number_function ( String name, Function impl ) {
+	return function ( funk, ev, ast, ctx, args ) {
+		let nodes := [];
+		for ( let a in args ) {
+			const got := ev.eval_expr( a, ev.nested_ctx( ctx ) );
+			for ( let n in got ) {
+				nodes.push( n );
+			}
+		}
+		else {
+			nodes := ctx.nodeset;
+		}
+		const nums := nodes
+			.map( fn x → x.number_value )
+			.grep( fn x → x instanceof Number );
+		return funk.wrap( impl( nums ) );
+	};
+}
+
+function mk_single_string_function ( String name, Function impl ) {
+	return function ( funk, ev, ast, ctx, args ) {
+		let nodes := [];
+		for ( let a in args ) {
+			const got := ev.eval_expr( a, ev.nested_ctx( ctx ) );
+			for ( let n in got ) {
+				nodes.push( n );
+			}
+		}
+		else {
+			nodes := ctx.nodeset;
+		}
+		return nodes
+			.map( fn x → x.string_value )
+			.grep( fn x → x instanceof String )
+			.map( fn x → funk.wrap_for_array( impl(x) ) );
+	};
+}
+
+function mk_match_function () {
+	return function ( funk, ev, ast, ctx, args ) {
+		let nodes := [];
+		let re;
+		
+		if ( args.empty ) {
+			die "Not enough arguments for match()";
+		}
+		else {
+			re := try {
+				ev.eval_expr( args[0], ev.nested_ctx( ctx ) )[0].string_value;
+			} catch {
+				"";
+			};
+		}
+		
+		for ( let a in args[1:] ) {
+			const got := ev.eval_expr( a, ev.nested_ctx( ctx ) );
+			for ( let n in got ) {
+				nodes.push( n );
+			}
+		}
+		else {
+			nodes := ctx.nodeset;
+		}
+		
+		return nodes
+			.map( fn x → x.string_value )
+			.grep( fn x → x instanceof String )
+			.map( fn x → funk.wrap_for_array( ( x ~ re ) ? true : false ) );
+	}
+}
+
+const STANDARD_FUNCTIONS := [
+	new Func(
+		spelling: "true",
+		f: function ( funk, ev, ast, ctx, args ) {
+			die "Too many arguments for true()" unless args.empty;
+			return funk.wrap( true );
+		},
+	),
+	
+	new Func(
+		spelling: "false",
+		f: function ( funk, ev, ast, ctx, args ) {
+			die "Too many arguments for false()" unless args.empty;
+			return funk.wrap( false );
+		},
+	),
+	
+	new Func(
+		spelling: "null",
+		f: function ( funk, ev, ast, ctx, args ) {
+			die "Too many arguments for null()" unless args.empty;
+			return funk.wrap( null );
+		},
+	),
+	
+	new Func(
+		spelling: "die",
+		f: function ( funk, ev, ast, ctx, args ) {
+			die "Called 'die' function in zpath";
+		},
+	),
+	
+	new Func(
+		spelling: "count",
+		f: function ( funk, ev, ast, ctx, args ) {
+			let n := 0;
+			for ( let a in args ) {
+				const got := ev.eval_expr( a, ev.nested_ctx( ctx ) );
+				n += got.length;
+			}
+			else {
+				const cur := ctx.parentset ?: ctx.nodeset;
+				n := cur.length;
+			}
+			return funk.wrap( n );
+		},
+	),
+
+	new Func(
+		spelling: "index",
+		f: function ( funk, ev, ast, ctx, args ) {
+			if ( args.length = 0 ) {
+				const cur := ctx.nodeset.get( 0, null );
+				return funk.wrap( cur ? cur.ix : null );
+			}
+			else if ( args.length = 1 ) {
+				const got := ev.eval_expr( args[0], ev.nested_ctx( ctx ) );
+				return got.map( fn x → funk.wrap_for_array(x.ix) );
+			}
+			die "Too many arguments for index()";
+		},
+	),
+	
+	new Func(
+		spelling: "key",
+		f: function ( funk, ev, ast, ctx, args ) {
+			if ( args.length = 0 ) {
+				const cur := ctx.nodeset.get( 0, null );
+				return funk.wrap( cur ? cur.key : null );
+			}
+			else if ( args.length = 1 ) {
+				const got := ev.eval_expr( args[0], ev.nested_ctx( ctx ) );
+				return got.map(
+					fn x → funk.wrap_for_array(
+						x ≡ null ? null : x.key
+					)
+				);
+			}
+			die "Too many arguments for key()";
+		},
+	),
+
+	new Func(
+		spelling: "type",
+		f: function ( funk, ev, ast, ctx, args ) {
+			if ( args.length = 0 ) {
+				const cur := ctx.nodeset.get( 0, null );
+				return funk.wrap( cur ? cur.type : "undefined" );
+			}
+			else if ( args.length = 1 ) {
+				const got := ev.eval_expr( args[0], ev.nested_ctx( ctx ) ).get( 0, null );
+				return funk.wrap( got ? got.type : "undefined" );
+			}
+			die "Too many arguments for type()";
+		},
+	),
+	
+	new Func(
+		spelling: "union",
+		f: function ( funk, ev, ast, ctx, args ) {
+			let out := [];
+			for ( let arg in args ) {
+				const got := ev.eval_expr( arg, ev.nested_ctx( ctx ) );
+				for ( let n in got ) {
+					out.push( n );
+				}
+			}
+			return ev.dedup_nodes( out );
+		},
+	),
+	
+	new Func(
+		spelling: "intersection",
+		f: function ( funk, ev, ast, ctx, args ) {
+			return [] if args.empty;
+
+			let out := ev.eval_expr( args[0], ev.nested_ctx( ctx ) );
+			out := ev.dedup_nodes( out );
+
+			let i := 1;
+			while ( i < args.length() ) {
+				let got := ev.eval_expr( args[i], ev.nested_ctx( ctx ) );
+				got := ev.dedup_nodes( got );
+
+				let seen := {};
+				for ( let n in got ) {
+					let key := n.id();
+					if ( key ≡ null ) {
+						key := "anon:" _ ( "" _ n.raw() );
+					}
+					seen.set( key, true );
+				}
+
+				let next_out := [];
+				for ( let n in out ) {
+					let key := n.id();
+					if ( key ≡ null ) {
+						key := "anon:" _ ( "" _ n.raw() );
+					}
+					if ( seen.exists(key) ) {
+						next_out.push(n);
+					}
+				}
+
+				out := next_out;
+				last if out.empty;
+				i++;
+			}
+
+			return ev.dedup_nodes( out );
+		},
+	),
+	
+	new Func(
+		spelling: "is-first",
+		f: function ( funk, ev, ast, ctx, args ) {
+			if ( args.length = 0 ) {
+				const cur := ctx.nodeset.get( 0, null );
+				return [] unless cur and cur.parent;
+				return funk.wrap( cur.ix = 0 );
+			}
+			die "Too many arguments for is-first()";
+		},
+	),
+
+	new Func(
+		spelling: "is-last",
+		f: function ( funk, ev, ast, ctx, args ) {
+			if ( args.length = 0 ) {
+				const cur := ctx.nodeset.get( 0, null );
+				return [] unless cur and cur.parent and cur.ix ≢ null;
+				const siblings := cur.parent.children
+					.grep( fn kid → kid.key ≡ cur.key );
+				return [] if siblings.empty;
+				let pos := 0;
+				while ( pos < siblings.length ) {
+					const kid := siblings[pos];
+					last if kid.id() ≡ cur.id();
+					pos++;
+				}
+				return [] if pos ≥ siblings.length;
+				return funk.wrap( pos = siblings.length - 1 );
+			}
+			die "Too many arguments for is-last()";
+		},
+	),
+	
+	new Func(
+		spelling: "next",
+		f: function ( funk, ev, ast, ctx, args ) {
+			if ( args.length = 0 ) {
+				const cur := ctx.nodeset.get( 0, null );
+				return [ cur.next_sibling ];
+			}
+			else {
+				let out := [];
+				for ( let arg in args ) {
+					const got := ev.eval_expr( arg, ev.nested_ctx( ctx ) );
+					for ( let n in got ) {
+						out.push( n.next_sibling );
+					}
+				}
+				return out;
+			}
+		},
+	),
+	
+	new Func(
+		spelling: "prev",
+		f: function ( funk, ev, ast, ctx, args ) {
+			if ( args.length = 0 ) {
+				const cur := ctx.nodeset.get( 0, null );
+				return [ cur.prev_sibling ];
+			}
+			else {
+				let out := [];
+				for ( let arg in args ) {
+					const got := ev.eval_expr( arg, ev.nested_ctx( ctx ) );
+					for ( let n in got ) {
+						out.push( n.prev_sibling );
+					}
+				}
+				return out;
+			}
+		},
+	),
+	
+	new Func(
+		spelling: "string",
+		f: function ( funk, ev, ast, ctx, args ) {
+			if ( args.length = 0 ) {
+				const cur := ctx.nodeset.get( 0, null );
+				return [] unless cur;
+				return funk.wrap( cur.string_value );
+			}
+			else {
+				let out := [];
+				for ( let arg in args ) {
+					const got := ev.eval_expr( arg, ev.nested_ctx( ctx ) );
+					for ( let n in got ) {
+						out.push( n );
+					}
+				}
+				return out.map( fn x → funk.wrap_for_array( x.string_value ) );
+			}
+		},
+	),
+
+	new Func(
+		spelling: "number",
+		f: function ( funk, ev, ast, ctx, args ) {
+			if ( args.length = 0 ) {
+				const cur := ctx.nodeset.get( 0, null );
+				return [] unless cur;
+				return funk.wrap( cur.number_value );
+			}
+			else {
+				let out := [];
+				for ( let arg in args ) {
+					const got := ev.eval_expr( arg, ev.nested_ctx( ctx ) );
+					for ( let n in got ) {
+						out.push( n );
+					}
+				}
+				return out.map( fn x → funk.wrap_for_array( x.number_value ) );
+			}
+		},
+	),
+
+	new Func(
+		spelling: "value",
+		f: function ( funk, ev, ast, ctx, args ) {
+			if ( args.length = 0 ) {
+				const cur := ctx.nodeset.get( 0, null );
+				return [] unless cur;
+				return funk.wrap( cur.primitive_value );
+			}
+			else {
+				let out := [];
+				for ( let arg in args ) {
+					const got := ev.eval_expr( arg, ev.nested_ctx( ctx ) );
+					for ( let n in got ) {
+						out.push( n );
+					}
+				}
+				return out.map( fn x → funk.wrap_for_array( x.primitive_value ) );
+			}
+		},
+	),
+
+	new Func(
+		spelling: "ceil",
+		f: mk_single_number_function( "ceil", fn n → ceil n ),
+	),
+
+	new Func(
+		spelling: "floor",
+		f: mk_single_number_function( "floor", fn n → floor n ),
+	),
+
+	new Func(
+		spelling: "round",
+		f: mk_single_number_function( "round", fn n → round n ),
+	),
+
+	new Func(
+		spelling: "sum",
+		f: mk_aggregate_number_function( "sum", fn nums → Math.sum(nums) ),
+	),
+
+	new Func(
+		spelling: "min",
+		f: mk_aggregate_number_function( "min", fn nums → Math.min(nums) ),
+	),
+
+	new Func(
+		spelling: "max",
+		f: mk_aggregate_number_function( "max", fn nums → Math.max(nums) ),
+	),
+
+	new Func(
+		spelling: "escape",
+		f: mk_single_string_function( "escape", fn s → escape_xml(s) ),
+	),
+
+	new Func(
+		spelling: "unescape",
+		f: mk_single_string_function( "unescape", fn s → unescape_xml(s) ),
+	),
+
+	new Func(
+		spelling: "upper-case",
+		f: mk_single_string_function( "upper-case", fn s → uc s ),
+	),
+
+	new Func(
+		spelling: "lower-case",
+		f: mk_single_string_function( "lower-case", fn s → lc s ),
+	),
+
+	new Func(
+		spelling: "index-of",
+		f: function ( funk, ev, ast, ctx, args ) {
+			let nodes := [];
+			let search;
+			
+			if ( args.empty ) {
+				die "Not enough arguments for index-of()";
+			}
+			else {
+				search := try {
+					ev.eval_expr( args[0], ev.nested_ctx( ctx ) )[0].string_value;
+				} catch {
+					"";
+				};
+			}
+			
+			for ( let a in args[1:] ) {
+				const got := ev.eval_expr( a, ev.nested_ctx( ctx ) );
+				for ( let n in got ) {
+					nodes.push( n );
+				}
+			}
+			else {
+				nodes := ctx.nodeset;
+			}
+			
+			return nodes
+				.map( fn x → x.string_value )
+				.grep( fn x → x instanceof String )
+				.map( fn x → funk.wrap_for_array( index(x, search) ) );
+		}
+	),
+
+	new Func(
+		spelling: "last-index-of",
+		f: function ( funk, ev, ast, ctx, args ) {
+			let nodes := [];
+			let search;
+			
+			if ( args.empty ) {
+				die "Not enough arguments for last-index-of()";
+			}
+			else {
+				search := try {
+					ev.eval_expr( args[0], ev.nested_ctx( ctx ) )[0].string_value;
+				} catch {
+					"";
+				};
+			}
+			
+			for ( let a in args[1:] ) {
+				const got := ev.eval_expr( a, ev.nested_ctx( ctx ) );
+				for ( let n in got ) {
+					nodes.push( n );
+				}
+			}
+			else {
+				nodes := ctx.nodeset;
+			}
+			
+			return nodes
+				.map( fn x → x.string_value )
+				.grep( fn x → x instanceof String )
+				.map( fn x → funk.wrap_for_array( rindex(x, search) ) );
+		}
+	),
+
+	new Func(
+		spelling: "substring",
+		f: function ( funk, ev, ast, ctx, args ) {
+
+			let nodes := [];
+			let start;
+			let len;
+			
+			if ( args.length < 2 ) {
+				die "Not enough arguments for substring()";
+			}
+			else {
+				start := try {
+					ev.eval_expr( args[-2], ev.nested_ctx( ctx ) )[0].number_value;
+				} catch {
+					0;
+				};
+				len := try {
+					ev.eval_expr( args[-1], ev.nested_ctx( ctx ) )[0].number_value;
+				} catch {
+					0;
+				};
+			}
+			
+			for ( let a in args[0:-2] ) {
+				const got := ev.eval_expr( a, ev.nested_ctx( ctx ) );
+				for ( let n in got ) {
+					nodes.push( n );
+				}
+			}
+			else {
+				nodes := ctx.nodeset;
+			}
+			
+			return nodes
+				.map( fn x → x.string_value )
+				.grep( fn x → x instanceof String )
+				.map( fn x → funk.wrap_for_array( substr(x, start, len) ) );
+		}
+	),
+
+	new Func(
+		spelling: "format",
+		f: function ( funk, ev, ast, ctx, args ) {
+			let nodes := [];
+			let fmt;
+			
+			if ( args.empty ) {
+				die "Not enough arguments for format()";
+			}
+			else {
+				fmt := try {
+					ev.eval_expr( args[0], ev.nested_ctx( ctx ) )[0].string_value;
+				} catch {
+					"";
+				};
+			}
+			
+			for ( let a in args[1:] ) {
+				const got := ev.eval_expr( a, ev.nested_ctx( ctx ) );
+				for ( let n in got ) {
+					nodes.push( n );
+				}
+			}
+			else {
+				nodes := ctx.nodeset;
+			}
+			
+			return nodes
+				.map( fn x → x.string_value )
+				.grep( fn x → x instanceof String )
+				.map( fn x → funk.wrap_for_array( sprint(fmt, x) ) );
+		}
+	),
+
+	new Func(
+		spelling: "string-length",
+		f: mk_single_string_function( "string-length", fn s → length s ),
+	),
+
+	new Func(
+		spelling: "match",
+		f: mk_match_function(),
+	),
+
+	new Func(
+		spelling: "matches",
+		f: mk_match_function(),
+	),
+
+	new Func(
+		spelling: "replace",
+		f: function ( funk, ev, ast, ctx, args ) {
+			let nodes := [];
+			let pattern;
+			let replacement;
+			
+			if ( args.length < 2 ) {
+				die "Not enough arguments for replace()";
+			}
+			else {
+				pattern := try {
+					ev.eval_expr( args[0], ev.nested_ctx( ctx ) )[0].string_value;
+				} catch {
+					"";
+				};
+				replacement := try {
+					ev.eval_expr( args[1], ev.nested_ctx( ctx ) )[0].string_value;
+				} catch {
+					"";
+				};
+			}
+			
+			for ( let a in args[2:] ) {
+				const got := ev.eval_expr( a, ev.nested_ctx( ctx ) );
+				for ( let n in got ) {
+					nodes.push( n );
+				}
+			}
+			else {
+				nodes := ctx.nodeset;
+			}
+			
+			return nodes
+				.map( fn x → x.string_value )
+				.grep( fn x → x instanceof String )
+				.map( fn x → funk.wrap_for_array( replace( x, pattern, replacement ) ) );
+		}
+	),
+
+	new Func(
+		spelling: "join",
+		f: function ( funk, ev, ast, ctx, args ) {
+			let nodes := [];
+			let joiner;
+			
+			if ( args.empty ) {
+				die "Not enough arguments for format()";
+			}
+			else {
+				joiner := try {
+					ev.eval_expr( args[0], ev.nested_ctx( ctx ) )[0].string_value;
+				} catch {
+					"";
+				};
+			}
+			
+			for ( let a in args[1:] ) {
+				const got := ev.eval_expr( a, ev.nested_ctx( ctx ) );
+				for ( let n in got ) {
+					nodes.push( n );
+				}
+			}
+			else {
+				nodes := ctx.nodeset;
+			}
+			
+			const strings := nodes
+				.map( fn x → x.string_value )
+				.grep( fn x → x instanceof String );
+			return funk.wrap( join( joiner, strings ) );
+		}
+	),
+
+	new Func(
+		spelling: "url",
+		f: function ( funk, ev, ast, ctx, args ) {
+			if ( args.length = 0 ) {
+				const cur := ctx.nodeset.get( 0, null );
+				return [] unless cur;
+				return funk.wrap( cur instanceof XmlNodeNode ? cur.raw.namespaceURI() : null );
+			}
+			else if ( args.length = 1 ) {
+				const got := ev.eval_expr( args[0], ev.nested_ctx( ctx ) );
+				return got.map(
+					fn x → funk.wrap_for_array(
+						x instanceof XmlNodeNode ? x.raw.namespaceURI() : null
+					)
+				);
+			}
+			die "Too many arguments for url()";
+		},
+	),
+
+	new Func(
+		spelling: "local-name",
+		f: function ( funk, ev, ast, ctx, args ) {
+			if ( args.length = 0 ) {
+				const cur := ctx.nodeset.get( 0, null );
+				return [] unless cur;
+				return funk.wrap(
+					cur instanceof XmlNodeNode ? cur.raw.localName()
+						: cur instanceof KDLNodeNode ? cur.name()
+						: null
+				);
+			}
+			else if ( args.length = 1 ) {
+				const got := ev.eval_expr( args[0], ev.nested_ctx( ctx ) );
+				return got.map(
+					fn x → funk.wrap_for_array(
+						x instanceof XmlNodeNode ? x.raw.localName()
+							: x instanceof KDLNodeNode ? x.name()
+							: null
+					)
+				);
+			}
+			die "Too many arguments for local-name()";
+		},
+	),
+
+	new Func(
+		spelling: "tag",
+		f: function ( funk, ev, ast, ctx, args ) {
+			if ( args.length = 0 ) {
+				const cur := ctx.nodeset.get( 0, null );
+				return [] unless cur;
+				if ( cur instanceof KDLNodeNode ) {
+					let ann := cur.raw().type_annotation();
+					return funk.wrap( ann ≡ null ? null : "" _ ann );
+				}
+				if ( cur instanceof KDLValueNode ) {
+					let ann := cur.raw().type_annotation();
+					return funk.wrap( ann ≡ null ? null : "" _ ann );
+				}
+				return funk.wrap( cur.has_tagged ? cur.tagged{tag} : null );
+			}
+			else if ( args.length = 1 ) {
+				const got := ev.eval_expr( args[0], ev.nested_ctx( ctx ) );
+				return got.map(
+					fn x → funk.wrap_for_array(
+						x instanceof KDLNodeNode
+							? (
+								x.raw().type_annotation() ≡ null
+									? null
+									: "" _ x.raw().type_annotation()
+							)
+							: x instanceof KDLValueNode
+							? (
+								x.raw().type_annotation() ≡ null
+									? null
+									: "" _ x.raw().type_annotation()
+							)
+							: x can has_tagged ? x.tagged{tag} : null
+					)
+				);
+			}
+			die "Too many arguments for tag()";
+		},
+	),
+];

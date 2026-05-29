@@ -1,0 +1,387 @@
+from test/more import *;
+
+requires_capability( "gui" );
+
+from std/colour import parse_colour;
+from std/eval import eval;
+
+is( parse_colour("#abc"), "#aabbcc", "parse_colour expands short hex" );
+is( parse_colour("RED"), "#ff0000", "parse_colour normalizes keywords" );
+is( parse_colour("darkgrey"), "#a9a9a9", "parse_colour supports CSS grey" );
+ok(
+	exception( function () { parse_colour("not-a-colour"); } )
+		instanceof Exception,
+	"parse_colour rejects invalid colours",
+);
+
+from std/gui import
+	BindingToken,
+	Button,
+	EM,
+	Input,
+	Widget,
+	bind,
+	native_directory_open,
+	native_directory_save,
+	native_colour_picker,
+	native_file_open,
+	native_file_save,
+	unbind;
+from std/gui/objects import meta as _objects_meta;
+from std/gui/dialogue import *;
+from std/path/simple import SimplePath;
+from std/path/z import ZPath;
+
+is( EM, 16, "std/gui exports EM font unit" );
+if ( __system__{runtime} eq "Zuzu::Runtime" ) {
+	is( _objects_meta{backend}, "Prima", "objects metadata exposes backend" );
+}
+else if ( __system__{runtime} eq "zuzu-js" ) {
+	if ( __system__{platform} eq "browser" ) {
+		is(
+			_objects_meta{backend},
+			"browser-dom",
+			"objects metadata exposes backend",
+		);
+	}
+	else {
+		is(
+			_objects_meta{backend},
+			"electron-dom",
+			"objects metadata exposes backend",
+		);
+	}
+}
+else {
+	is( _objects_meta{backend}, "GTK4", "objects metadata exposes backend" );
+}
+is(
+	_objects_meta{font_size_pixels},
+	EM,
+	"std/gui EM comes from objects metadata",
+);
+ok( _objects_meta{font_name}, "objects metadata exposes font name" );
+is(
+	_objects_meta{font_point_size},
+	__system__{runtime} eq "zuzu-js" ? 12 : 10,
+	"objects metadata exposes font point size",
+);
+is(
+	Button( text: "Foo", width: 3 × EM ).width(),
+	48,
+	"EM can be used for logical pixel sizing",
+);
+is( typeof native_file_open, "Function", "std/gui exports native_file_open" );
+is( typeof native_file_save, "Function", "std/gui exports native_file_save" );
+is(
+	typeof native_directory_open,
+	"Function",
+	"std/gui exports native_directory_open",
+);
+is(
+	typeof native_directory_save,
+	"Function",
+	"std/gui exports native_directory_save",
+);
+is(
+	typeof native_colour_picker,
+	"Function",
+	"std/gui exports native_colour_picker",
+);
+
+let alert_w := alert_window( "Saved", title: "Done" );
+ok( alert_w instanceof Widget, "alert_window returns a Widget" );
+is( alert_w.title(), "Done", "alert_window uses title prop" );
+is(
+	alert_w.find_by_id("buttons").height(),
+	34,
+	"alert button row has compact fixed height",
+);
+is(
+	alert_w.find_by_id("ok").height(),
+	28,
+	"alert OK button has compact fixed height",
+);
+is( alert_w.find_by_id("ok").width(), 88, "alert OK button width" );
+is(
+	alert_w.meta("dialogue.kind"),
+	"alert",
+	"alert_window records dialogue kind",
+);
+alert_w.find_by_id("ok").click();
+is( alert_w.call(), null, "alert OK closes with null result" );
+is( alert( "Saved", auto_result: true ), null, "alert supports auto_result" );
+
+let confirm_w := confirm_window("Continue?");
+is(
+	confirm_w.meta("dialogue.kind"),
+	"confirm",
+	"confirm_window records dialogue kind",
+);
+confirm_w.find_by_id("cancel").click();
+is( confirm_w.call(), false, "confirm cancel closes false" );
+
+confirm_w := confirm_window("Continue?");
+is(
+	confirm_w.find_by_id("cancel").height(),
+	28,
+	"confirm cancel button has compact height",
+);
+confirm_w.find_by_id("ok").click();
+is( confirm_w.call(), true, "confirm OK closes true" );
+is( confirm( "Continue?", auto_result: true ), true, "confirm auto true" );
+is( confirm( "Continue?", auto_result: false ), false, "confirm auto false" );
+
+let prompt_w := prompt_window( "Name:", value: "Ada" );
+is( prompt_w.find_by_id("value").value(), "Ada", "prompt initial value" );
+is(
+	prompt_w.find_by_id("ok").height(),
+	28,
+	"prompt OK button has compact height",
+);
+prompt_w.find_by_id("value").value("Grace");
+prompt_w.find_by_id("ok").click();
+is( prompt_w.call(), "Grace", "prompt OK closes with input value" );
+is(
+	prompt( "Name:", auto_result: "Ada" ),
+	"Ada",
+	"prompt supports auto_result",
+);
+
+let file_w := file_open_window( value: "/tmp/in.txt" );
+is(
+	file_w.meta("dialogue.kind"),
+	"file_open",
+	"file_open_window records dialogue kind",
+);
+file_w.find_by_id("ok").click();
+is( file_w.call(), "/tmp/in.txt", "file_open OK returns path text" );
+is(
+	file_save_window().find_by_id("ok").height(),
+	28,
+	"file_save button has compact height",
+);
+
+let multi_file_w := file_open_window(
+	value: "/tmp/a\n/tmp/b",
+	multiple: true,
+);
+multi_file_w.find_by_id("ok").click();
+is(
+	multi_file_w.call(),
+	[ "/tmp/a", "/tmp/b" ],
+	"file_open multiple mode returns path list",
+);
+if ( __system__{deny_fs} ) {
+	for ( let source in [
+		"from std/gui/dialogue import file_open; file_open(auto_result: \"/tmp/a\");",
+		"from std/gui/dialogue import file_save; file_save(auto_result: \"/tmp/out.txt\");",
+		"from std/gui/dialogue import directory_open; directory_open(auto_result: \"/tmp\");",
+		"from std/gui/dialogue import directory_save; directory_save(auto_result: \"/tmp/new\");",
+	] ) {
+		let e := exception( function () {
+			eval(source);
+		} );
+		ok(
+			e instanceof Exception,
+			"fs-denied file and directory helpers throw",
+		);
+		ok(
+			e{message} ~ /GUI_DIALOGUE_/,
+			"fs-denied file and directory helper errors include code",
+		);
+	}
+}
+else {
+	is(
+		file_open( auto_result: [ "/tmp/a", "/tmp/b" ] ),
+		[ "/tmp/a", "/tmp/b" ],
+		"file_open auto_result can return multiple paths",
+	);
+	is(
+		file_save( auto_result: "/tmp/out.txt" ),
+		"/tmp/out.txt",
+		"file_save supports auto_result",
+	);
+	is(
+		directory_open( auto_result: "/tmp" ),
+		"/tmp",
+		"directory_open supports auto_result",
+	);
+	is(
+		directory_save( auto_result: "/tmp/new" ),
+		"/tmp/new",
+		"directory_save supports auto_result",
+	);
+	for ( let source in [
+		"from std/gui/dialogue import file_open; file_open(auto_result: \"/tmp/a\");",
+		"from std/gui/dialogue import file_save; file_save(auto_result: \"/tmp/out.txt\");",
+		"from std/gui/dialogue import directory_open; directory_open(auto_result: \"/tmp\");",
+		"from std/gui/dialogue import directory_save; directory_save(auto_result: \"/tmp/new\");",
+	] ) {
+		let e := exception( function () {
+			eval( source, deny_fs: true );
+		} );
+		ok(
+			e instanceof Exception,
+			"eval fs-denied file and directory helpers throw",
+		);
+		ok(
+			e{message} ~ /GUI_DIALOGUE_FS_DENIED/,
+			"eval fs-denied file and directory helper errors include code",
+		);
+	}
+}
+
+let colour_w := colour_picker_window();
+let colour_input := colour_w.find_by_id("path");
+let colour_ok := colour_w.find_by_id("ok");
+is(
+	directory_open_window().find_by_id("ok").height(),
+	28,
+	"directory_open button has compact height",
+);
+is(
+	directory_save_window().find_by_id("ok").height(),
+	28,
+	"directory_save button has compact height",
+);
+is(
+	colour_input.value(),
+	"#000000",
+	"colour_picker_window defaults to black",
+);
+is(
+	colour_w.find_by_id("ok").height(),
+	28,
+	"colour_picker button has compact height",
+);
+colour_input.value("not-a-colour");
+colour_input.change();
+is( colour_ok.enabled(), false, "colour_picker disables OK when invalid" );
+colour_input.value("red");
+colour_input.change();
+is( colour_ok.enabled(), true, "colour_picker enables OK when valid" );
+colour_ok.click();
+is( colour_w.call(), "#ff0000", "colour_picker OK normalizes result" );
+is(
+	colour_picker( auto_result: "#abc" ),
+	"#aabbcc",
+	"colour_picker normalizes short auto_result",
+);
+is(
+	colour_picker( auto_result: "red" ),
+	"#ff0000",
+	"colour_picker normalizes keyword auto_result",
+);
+ok(
+	exception( function () {
+		colour_picker( auto_result: "not-a-colour" );
+	} ) instanceof Exception,
+	"colour_picker rejects invalid auto_result",
+);
+
+let model := { person: { name: "Ada" } };
+let input := Input( value: "Before" );
+is( input.height(), null, "Widget height defaults to null" );
+is(
+	Input( width: 10 × EM ).width(),
+	160,
+	"non-button helpers accept geometry props",
+);
+is( input.height(24), input, "Widget height setter returns self" );
+is( input.height(), 24, "Widget height setter updates value" );
+is( input.maxheight(30), input, "Widget maxheight setter returns self" );
+is( input.maxheight(), 30, "Widget maxheight setter updates value" );
+let token := bind( input, "value", model, "/person/name" );
+ok( token instanceof BindingToken, "bind returns BindingToken" );
+is( input.value(), "Ada", "bind uses default ZZPath strings" );
+input.value("Grace");
+input.change();
+is( model{person}{name}, "Grace", "binding change syncs widget to model" );
+is( unbind(token), token, "unbind returns token" );
+ok( not token.is_active(), "unbind marks token inactive" );
+input.value("Ignored");
+input.change();
+is( model{person}{name}, "Grace", "unbound token stops syncing" );
+
+let zz_model := { price: 2 };
+let zz_input := Input( value: "Before" );
+let zz_token := bind( zz_input, "value", zz_model, "price + 1" );
+is( zz_input.value(), "3", "bind default supports ZZPath arithmetic paths" );
+unbind(zz_token);
+
+let object_model := { person: { name: "Ada" } };
+let object_input := Input( value: "Before" );
+let object_token := bind(
+	object_input,
+	"value",
+	object_model,
+	new ZPath( path: "/person/name" ),
+);
+is( object_input.value(), "Ada", "bind accepts compiled path objects" );
+object_input.value("Lovelace");
+object_input.change();
+is(
+	object_model{person}{name},
+	"Lovelace",
+	"compiled path object binding syncs widget changes",
+);
+unbind(object_token);
+
+do {
+	SimplePath.use();
+	let simple_model := { person: { name: "Ada" } };
+	let simple_input := Input( value: "Before" );
+	let simple_token := bind(
+		simple_input,
+		"value",
+		simple_model,
+		"person.name",
+	);
+	is(
+		simple_input.value(),
+		"Ada",
+		"bind string uses active paths flavour",
+	);
+	simple_input.value("Byron");
+	simple_input.change();
+	is(
+		simple_model{person}{name},
+		"Byron",
+		"active paths flavour binding syncs widget changes",
+	);
+	unbind(simple_token);
+};
+
+let model2 := { person: { name: null } };
+let input2 := Input( value: "Widget" );
+let token2 := bind(
+	input2,
+	"value",
+	model2,
+	"/person/name",
+	initial: "widget",
+);
+is( model2{person}{name}, "Widget", "bind can sync widget initially" );
+unbind(token2);
+
+let bad_path := exception( function () {
+	bind( Input(), "value", {}, "/person/[" );
+} );
+ok( bad_path instanceof Exception, "bad binding path throws" );
+ok(
+	bad_path{message} ~ /GUI_BIND_PATH/,
+	"bad binding path error includes code",
+);
+
+let bad_path_object := exception( function () {
+	bind( Input(), "value", {}, [] );
+} );
+ok( bad_path_object instanceof Exception, "bad binding path object throws" );
+ok(
+	bad_path_object{message} ~ /GUI_BIND_PATH/,
+	"bad binding path object error includes code",
+);
+
+done_testing();

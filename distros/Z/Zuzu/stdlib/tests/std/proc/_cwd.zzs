@@ -1,0 +1,152 @@
+from test/more import *;
+
+requires_capability( "fs" );
+requires_capability( "proc" );
+
+from std/io import Path;
+from std/proc import Proc;
+from std/string import contains;
+
+let dir := Path.tempdir();
+dir.child("cwd-marker.txt").spew_utf8("ok\n");
+
+let parent_before := Path.cwd().to_String();
+let missing_dir := dir.child("missing").to_String();
+
+function check_invalid_cwd ( result, name ) {
+	is( result{ok}, 0, name _ " returns a failed result" );
+	is( result{stdout}, "", name _ " does not run child process" );
+	ok( contains( result{error}, "cwd" ), name _ " reports a cwd error" );
+	is(
+		Path.cwd().to_String(),
+		parent_before,
+		name _ " restores parent cwd",
+	);
+}
+
+let run := Proc.run(
+	"perl",
+	[
+		"-e",
+		"print((-f q{cwd-marker.txt}) ? qq{run\\n} : qq{missing\\n});",
+	],
+	{ cwd: dir.to_String() },
+);
+ok( run{ok}, "Proc.run with cwd succeeds" );
+is( run{stdout}, "run\n", "Proc.run uses cwd for child process" );
+is(
+	Path.cwd().to_String(),
+	parent_before,
+	"Proc.run restores parent cwd",
+);
+
+let pipeline := Proc.pipeline(
+	[
+		[
+			"perl",
+			"-e",
+			"print((-f q{cwd-marker.txt}) ? qq{pipeline\\n} : qq{missing\\n});",
+		],
+	],
+	{ cwd: dir.to_String() },
+);
+ok( pipeline{ok}, "Proc.pipeline with cwd succeeds" );
+is( pipeline{stdout}, "pipeline\n", "Proc.pipeline uses cwd for child process" );
+is(
+	Path.cwd().to_String(),
+	parent_before,
+	"Proc.pipeline restores parent cwd",
+);
+
+async function main () {
+	let run_async := await {
+		Proc.run_async(
+			"perl",
+			[
+				"-e",
+				"print((-f q{cwd-marker.txt}) ? qq{async\\n} : qq{missing\\n});",
+			],
+			{ cwd: dir.to_String() },
+		);
+	};
+	ok( run_async{ok}, "Proc.run_async with cwd succeeds" );
+	is( run_async{stdout}, "async\n", "Proc.run_async uses cwd" );
+	is(
+		Path.cwd().to_String(),
+		parent_before,
+		"Proc.run_async restores parent cwd",
+	);
+
+	let pipeline_async := await {
+		Proc.pipeline_async(
+			[
+				[
+					"perl",
+					"-e",
+					"print((-f q{cwd-marker.txt}) ? qq{pipe-async\\n} : qq{missing\\n});",
+				],
+			],
+			{ cwd: dir.to_String() },
+		);
+	};
+	ok( pipeline_async{ok}, "Proc.pipeline_async with cwd succeeds" );
+	is(
+		pipeline_async{stdout},
+		"pipe-async\n",
+		"Proc.pipeline_async uses cwd",
+	);
+	is(
+		Path.cwd().to_String(),
+		parent_before,
+		"Proc.pipeline_async restores parent cwd",
+	);
+}
+
+await {
+	main();
+};
+
+let bad := Proc.run(
+	"perl",
+	[ "-e", "print qq{should-not-run\\n};" ],
+	{ cwd: missing_dir },
+);
+check_invalid_cwd( bad, "Proc.run invalid cwd" );
+
+let bad_pipeline := Proc.pipeline(
+	[
+		[ "perl", "-e", "print qq{should-not-run\\n};" ],
+	],
+	{ cwd: missing_dir },
+);
+check_invalid_cwd( bad_pipeline, "Proc.pipeline invalid cwd" );
+
+async function invalid_main () {
+	let bad_run_async := await {
+		Proc.run_async(
+			"perl",
+			[ "-e", "print qq{should-not-run\\n};" ],
+			{ cwd: missing_dir },
+		);
+	};
+	check_invalid_cwd( bad_run_async, "Proc.run_async invalid cwd" );
+
+	let bad_pipeline_async := await {
+		Proc.pipeline_async(
+			[
+				[ "perl", "-e", "print qq{should-not-run\\n};" ],
+			],
+			{ cwd: missing_dir },
+		);
+	};
+	check_invalid_cwd(
+		bad_pipeline_async,
+		"Proc.pipeline_async invalid cwd",
+	);
+}
+
+await {
+	invalid_main();
+};
+
+done_testing();

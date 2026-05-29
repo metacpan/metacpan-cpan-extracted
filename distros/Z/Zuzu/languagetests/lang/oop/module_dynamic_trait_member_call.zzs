@@ -1,0 +1,11 @@
+from test/c28/model import DynamicPerformer;
+from test/more import *;
+
+let p := new DynamicPerformer();
+let m1 := "jump";
+let m2 := "wave";
+
+is( p.(m1)(), "jumped", "dynamic member call resolves imported trait method 1" );
+is( p.(m2)(), "waved", "dynamic member call resolves imported trait method 2" );
+
+done_testing();

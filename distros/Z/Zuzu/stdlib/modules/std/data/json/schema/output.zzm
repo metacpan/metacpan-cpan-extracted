@@ -1,0 +1,272 @@
+=encoding utf8
+
+=head1 NAME
+
+std/data/json/schema/output - JSON Schema validation output objects.
+
+=head1 SYNOPSIS
+
+  from std/data/json/schema import
+    RequiredPropertyError,
+    TypeMismatchError,
+    validate;
+
+  let result := validate( schema, instance );
+
+  if ( not result.valid() ) {
+    for ( let error in result.errors() ) {
+      say( error.keywordLocation() _ " " _ error.error() );
+      if ( error instanceof TypeMismatchError ) {
+        say( "type problem" );
+      }
+    }
+  }
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module defines the object output model for JSON Schema validation. It
+is modelled on the Basic output shape from JSON Schema Core, but each error
+is a real Zuzu object instead of a plain C<Dict>. The class hierarchy lets
+callers use C<instanceof> to distinguish broad categories and precise
+keyword failures.
+
+The hierarchy starts with C<ValidationError>. Most keyword failures are
+grouped under C<MissingValueError>, C<UnexpectedValueError>, or
+C<WrongValueError>. Applicator keywords can also produce C<SubschemaError>,
+whose children are stored as weak links to avoid retaining a whole validation
+tree only through parent summary errors.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<ValidationResult>
+
+Structured result returned by C<validate>.
+
+=over
+
+=item C<valid()>
+
+Returns the boolean validation status.
+
+=item C<errors()>
+
+Returns an array of C<ValidationError> objects.
+
+=item C<to_Dict()>
+
+Returns a Basic-style C<Dict>. Errors are converted with their own
+C<to_Dict()> method.
+
+=back
+
+=item C<ValidationError>
+
+Base class for all validation errors.
+
+Methods:
+
+=over
+
+=item C<keywordLocation()>
+
+JSON Pointer location of the failing keyword inside the schema.
+
+=item C<absoluteKeywordLocation()>
+
+Absolute keyword URI when known, otherwise C<null>.
+
+=item C<instanceLocation()>
+
+JSON Pointer location of the failing instance value.
+
+=item C<error()>
+
+Human-readable error message.
+
+=item C<keyword()>
+
+The keyword that produced the error, when known.
+
+=item C<details()>
+
+Keyword-specific structured detail, when present.
+
+=item C<to_Dict()>
+
+Converts the error to a Basic-style C<Dict>.
+
+=back
+
+Snake-case aliases are provided for the location methods:
+C<keyword_location()>, C<absolute_keyword_location()>, and
+C<instance_location()>.
+
+=item C<MissingValueError>
+
+Base class for failures where a required value is absent. Subclasses are
+C<RequiredPropertyError>, C<DependentRequiredPropertyError>,
+C<MinItemsError>, C<MinPropertiesError>, and C<MinContainsError>.
+
+=item C<UnexpectedValueError>
+
+Base class for failures where a value is present but not allowed.
+Subclasses are C<AdditionalPropertiesError>,
+C<UnevaluatedPropertiesError>, C<AdditionalItemsError>,
+C<UnevaluatedItemsError>, C<MaxItemsError>, C<MaxPropertiesError>,
+C<MaxContainsError>, and C<NotMatchedError>.
+
+=item C<WrongValueError>
+
+Base class for failures where a value is present but does not meet a
+constraint. Subclasses are C<FalseSchemaError>, C<TypeMismatchError>,
+C<EnumMismatchError>, C<ConstMismatchError>, C<MultipleOfError>,
+C<MinimumError>, C<MaximumError>, C<ExclusiveMinimumError>,
+C<ExclusiveMaximumError>, C<MinLengthError>, C<MaxLengthError>,
+C<PatternError>, C<FormatError>, C<UnknownFormatError>,
+C<UniqueItemsError>, C<PropertyNamesError>, C<ContentEncodingError>,
+C<ContentMediaTypeError>, C<AllOfError>, C<AnyOfError>, C<OneOfError>, and
+C<IfThenElseError>.
+
+=item C<SubschemaError>
+
+Summary error for the message C<A subschema had errors.>. The
+C<suberrors()> method returns live child errors that are still reachable.
+Children are added with C<add_suberror(error)> and
+C<add_suberrors(errors)>.
+
+=item C<ReferenceResolutionError>
+
+Error class for failures while resolving C<$ref> or C<$dynamicRef>.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/data/json/schema/output >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+class ValidationError {
+	let String keywordLocation;
+	let absoluteKeywordLocation := null;
+	let String instanceLocation;
+	let String error;
+	let keyword := null;
+	let details := null;
+
+	method keywordLocation () { return keywordLocation; }
+	method absoluteKeywordLocation () { return absoluteKeywordLocation; }
+	method instanceLocation () { return instanceLocation; }
+	method error () { return error; }
+	method keyword () { return keyword; }
+	method details () { return details; }
+
+	method keyword_location () { return keywordLocation; }
+	method absolute_keyword_location () { return absoluteKeywordLocation; }
+	method instance_location () { return instanceLocation; }
+
+	method to_Dict () {
+		let out := {
+			keywordLocation: keywordLocation,
+			instanceLocation: instanceLocation,
+			error: error,
+		};
+		if ( absoluteKeywordLocation ≢ null ) {
+			out{absoluteKeywordLocation} := absoluteKeywordLocation;
+		}
+		return out;
+	}
+}
+
+class MissingValueError extends ValidationError;
+class UnexpectedValueError extends ValidationError;
+class WrongValueError extends ValidationError;
+
+class SubschemaError extends ValidationError {
+	let _suberrors := [];
+
+	method add_suberror ( child_error ) {
+		_suberrors.push_weak(child_error);
+		return child_error;
+	}
+
+	method add_suberrors ( errors ) {
+		for ( let child_error in errors ) {
+			self.add_suberror(child_error);
+		}
+		return self;
+	}
+
+	method suberrors () {
+		return _suberrors.grep( fn e -> e ≢ null );
+	}
+}
+
+class FalseSchemaError extends WrongValueError;
+
+class RequiredPropertyError extends MissingValueError;
+class DependentRequiredPropertyError extends MissingValueError;
+class MinItemsError extends MissingValueError;
+class MinPropertiesError extends MissingValueError;
+class MinContainsError extends MissingValueError;
+
+class AdditionalPropertiesError extends UnexpectedValueError;
+class UnevaluatedPropertiesError extends UnexpectedValueError;
+class AdditionalItemsError extends UnexpectedValueError;
+class UnevaluatedItemsError extends UnexpectedValueError;
+class MaxItemsError extends UnexpectedValueError;
+class MaxPropertiesError extends UnexpectedValueError;
+class MaxContainsError extends UnexpectedValueError;
+class NotMatchedError extends UnexpectedValueError;
+
+class TypeMismatchError extends WrongValueError;
+class EnumMismatchError extends WrongValueError;
+class ConstMismatchError extends WrongValueError;
+class MultipleOfError extends WrongValueError;
+class MinimumError extends WrongValueError;
+class MaximumError extends WrongValueError;
+class ExclusiveMinimumError extends WrongValueError;
+class ExclusiveMaximumError extends WrongValueError;
+class MinLengthError extends WrongValueError;
+class MaxLengthError extends WrongValueError;
+class PatternError extends WrongValueError;
+class FormatError extends WrongValueError;
+class UnknownFormatError extends FormatError;
+class UniqueItemsError extends WrongValueError;
+class PropertyNamesError extends WrongValueError;
+class ContentEncodingError extends WrongValueError;
+class ContentMediaTypeError extends WrongValueError;
+class AllOfError extends WrongValueError;
+class AnyOfError extends WrongValueError;
+class OneOfError extends WrongValueError;
+class IfThenElseError extends WrongValueError;
+
+class ReferenceResolutionError extends ValidationError;
+
+class ValidationResult {
+	let Boolean valid := true;
+	let Array errors := [];
+
+	method valid () { return valid; }
+	method errors () { return errors; }
+
+	method to_Dict () {
+		let out := { valid: valid };
+		if ( not valid ) {
+			out{errors} := errors.map( fn e -> e.to_Dict() );
+		}
+		return out;
+	}
+}

@@ -1,0 +1,146 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/data/json import JSON;
+from std/io import Path;
+from std/zuzuzoo import Zuzuzoo, remove;
+
+function ensure_dir ( path ) {
+	return true if path.exists();
+	let parent := path.parent();
+	ensure_dir(parent) if not parent.exists();
+	path.mkdir();
+	return true;
+}
+
+function root () {
+	let dir := Path.tempdir();
+	let lib := dir.child("lib");
+	let bin := dir.child("bin");
+	let meta := dir.child("meta");
+	ensure_dir(lib);
+	ensure_dir(bin);
+	ensure_dir(meta);
+	return {
+		dir_obj: dir,
+		lib_obj: lib,
+		bin_obj: bin,
+		meta_obj: meta,
+		lib_dir: lib.to_String(),
+		bin_dir: bin.to_String(),
+		meta_dir: meta.to_String(),
+	};
+}
+
+function module_entry ( install_as ) {
+	return {
+		source: "modules/" _ install_as,
+		install_as: install_as,
+		sha256: "old",
+	};
+}
+
+function script_entry ( install_as, wrappers := [] ) {
+	return {
+		source: "scripts/" _ install_as,
+		install_as: install_as,
+		sha256: "old",
+		wrappers: wrappers,
+	};
+}
+
+function write_installed ( target, name, version, modules, scripts ) {
+	( new JSON( pretty: true ) ).dump(
+		target{meta_obj}.child( name _ "-" _ version _ ".json" ),
+		{
+			name: name,
+			version: version,
+			author: "Example",
+			license: "MIT",
+			status: "stable",
+			dependencies: {},
+			installed: {
+				zdf: "ZDF-1",
+				lib_dir: target{lib_dir},
+				bin_dir: target{bin_dir},
+				meta_dir: target{meta_dir},
+				modules: modules,
+				scripts: scripts,
+			},
+		},
+	);
+}
+
+let target := root();
+ensure_dir( target{lib_obj}.child("remove") );
+target{lib_obj}.child("remove").child("app.zzm").spew_utf8("// app\n");
+target{bin_obj}.child("remove-tool.zzs").spew_utf8("say \"tool\";\n");
+target{bin_obj}.child("remove-tool.cmd").spew_utf8("@echo off\r\n");
+write_installed(
+	target,
+	"remove-app",
+	"1.0.0",
+	[ module_entry("remove/app.zzm") ],
+	[ script_entry( "remove-tool.zzs", [ "remove-tool.cmd" ] ) ],
+);
+
+let zoo := new Zuzuzoo(
+	lib_dir: target{lib_dir},
+	bin_dir: target{bin_dir},
+	meta_dir: target{meta_dir},
+	home: Path.tempdir().to_String(),
+);
+let result := zoo.remove("remove/app");
+
+ok( result{ok}, "remove returns ok" );
+is( result{dry_run}, false, "remove is not a dry run" );
+is( result{removed}.length(), 4, "all files are removed" );
+is(
+	target{lib_obj}.child("remove").child("app.zzm").exists(),
+	false,
+	"module file is removed",
+);
+is(
+	target{bin_obj}.child("remove-tool.zzs").exists(),
+	false,
+	"script file is removed",
+);
+is(
+	target{bin_obj}.child("remove-tool.cmd").exists(),
+	false,
+	"wrapper file is removed",
+);
+is(
+	target{meta_obj}.child("remove-app-1.0.0.json").exists(),
+	false,
+	"metadata file is removed",
+);
+is( result{warnings}.length(), 0, "existing files do not warn" );
+
+let missing := root();
+write_installed(
+	missing,
+	"missing-file",
+	"1.0.0",
+	[ module_entry("missing/file.zzm") ],
+	[],
+);
+let top_result := remove(
+	"missing/file",
+	{
+		lib_dir: missing{lib_dir},
+		bin_dir: missing{bin_dir},
+		meta_dir: missing{meta_dir},
+		home: Path.tempdir().to_String(),
+	},
+);
+ok( top_result{ok}, "top-level remove wrapper works" );
+is( top_result{warnings}.length(), 1, "missing installed file warns" );
+is(
+	missing{meta_obj}.child("missing-file-1.0.0.json").exists(),
+	false,
+	"metadata is removed despite missing owned file",
+);
+
+done_testing();

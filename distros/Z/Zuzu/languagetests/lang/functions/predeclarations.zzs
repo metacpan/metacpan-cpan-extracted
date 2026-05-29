@@ -1,0 +1,122 @@
+from test/more import *;
+from std/eval import eval;
+from std/task import resolved;
+
+function array_label;
+function dict_label;
+
+function array_label ( value ) {
+	if ( value instanceof Dict ) {
+		return dict_label( value );
+	}
+	return "array";
+}
+
+function dict_label ( value ) {
+	if ( value instanceof Array ) {
+		return array_label( value );
+	}
+	return "dict";
+}
+
+function pending_alias;
+
+let alias_before_body := pending_alias;
+
+function pending_alias ( value ) {
+	return "alias:" _ value;
+}
+
+function outer_shadow () {
+	function target;
+	let before := exception( function () {
+		target();
+	} );
+
+	function target () {
+		return "inner";
+	}
+
+	return [
+		before,
+		target(),
+	];
+}
+
+function async_later;
+
+async function async_later () {
+	return await {
+		resolved(17);
+	};
+}
+
+is( array_label( [] ), "array", "predeclared function body completes later" );
+is( dict_label( {} ), "dict", "mutually predeclared function resolves peer" );
+is(
+	dict_label( [] ),
+	"array",
+	"mutually predeclared function can call earlier body",
+);
+is(
+	array_label( {} ),
+	"dict",
+	"mutually predeclared function can call later body",
+);
+is(
+	alias_before_body( "ok" ),
+	"alias:ok",
+	"alias captured before completion observes completed function body",
+);
+
+let shadowed := outer_shadow();
+like(
+	shadowed[0],
+	/no body|bodyless|without a body/i,
+	"calling bodyless function throws",
+);
+is( shadowed[1], "inner", "block-scoped predeclaration completes in block" );
+like(
+	exception( function () {
+		target();
+	} ),
+	/undeclared|not defined/i,
+	"block-scoped predeclaration does not leak",
+);
+
+like(
+	exception( function () {
+		eval( "function duplicate; function duplicate;" );
+	} ),
+	/Redeclaration|redecl/i,
+	"duplicate function predeclaration is rejected",
+);
+like(
+	exception( function () {
+		eval(
+			"function duplicate_body; "
+			_ "function duplicate_body () { return 1; } "
+			_ "function duplicate_body () { return 2; }",
+		);
+	} ),
+	/Redeclaration|redecl/i,
+	"duplicate completed function body is rejected",
+);
+like(
+	exception( function () {
+		eval( "function assigned; assigned := function () { return 1; };" );
+	} ),
+	/const|immutable/i,
+	"assignment to predeclared function is rejected",
+);
+
+let async_value := await {
+	async_later();
+};
+is(
+	async_value,
+	17,
+	"predeclared function can be completed by an async definition",
+);
+
+done_testing();

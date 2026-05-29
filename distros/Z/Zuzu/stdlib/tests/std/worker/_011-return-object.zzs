@@ -1,0 +1,34 @@
+from test/more import *;
+from test/worker_contract import require_worker_phase;
+
+let Worker := require_worker_phase(3);
+
+class WorkerPhase2ReturnBox {
+	let String name with get, set := "unset";
+
+	method label () -> String {
+		return "box:" _ name;
+	}
+}
+
+async function main () {
+	let box := await {
+		Worker.spawn(
+			function ( name ) {
+				return new WorkerPhase2ReturnBox( name: name );
+			},
+			[ "Ada" ],
+		);
+	};
+
+	is( typeof box, "WorkerPhase2ReturnBox", "parent receives user object" );
+	is( box.label(), "box:Ada", "returned object method works in parent" );
+	is( box.set_name("Bea"), box, "returned object setter returns self" );
+	is( box.label(), "box:Bea", "returned object keeps mutable state" );
+}
+
+await {
+	main();
+};
+
+done_testing();

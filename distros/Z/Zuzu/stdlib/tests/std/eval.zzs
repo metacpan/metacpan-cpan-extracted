@@ -1,0 +1,11 @@
+from std/eval import eval;
+from test/more import *;
+
+let x := 41;
+is( eval("x + 1;"), 42, "eval can read caller scope" );
+
+let y := 9;
+eval("y += 2;");
+is( y, 11, "eval can write caller scope" );
+
+done_testing();

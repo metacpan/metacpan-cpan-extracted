@@ -1,0 +1,39 @@
+from test/more import *;
+let seen := [];
+
+for ( let x in[ 1, 2, 3, 4, 5 ] ) {
+	if ( x = 2 ) {
+		next;
+	}
+	if ( x = 4 ) {
+		seen.push(40);
+		last;
+	}
+	seen.push(x);
+}
+
+let continued := "";
+
+switch ( "b": eq ) {
+	case "a": continued := "a";
+	case "b": continued := "b";
+	continue;
+	default: continued := continued _ "c";
+}
+
+function classify (n) {
+	if ( n > 0 ) {
+		return "pos";
+	}
+
+	return "non-pos";
+}
+
+is( seen.length(), 3, "next and last alter loop flow" );
+is( seen[0], 1, "first kept item remains" );
+is( seen[1], 3, "next skips non-matching loop items" );
+is( seen[2], 40, "last exits loop at the expected point" );
+is( continued, "bc", "continue keyword supports switch fallthrough" );
+is( classify(7), "pos", "return exits function early" );
+is( classify(0), "non-pos", "return fallback path works" );
+done_testing();

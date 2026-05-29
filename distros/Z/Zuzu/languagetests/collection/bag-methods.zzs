@@ -1,0 +1,46 @@
+from test/more import *;
+let b := <<< 1, 2, 2 >>>;
+b.add(3);
+b.push(4);
+is( b.length(), 5, "add/push" );
+b.remove(2);
+is( b.count(2), 1, "remove" );
+b.remove_first(2);
+is( b.count(2), 0, "remove_first" );
+is( b.count(), 3, "count total" );
+is( b.empty(), 0, "empty false" );
+is( b.contains(3), 1, "contains" );
+is( b.to_Array().length(), 3, "to_Array" );
+let bag_it := <<< 3, 4, 5 >>>.to_Iterator();
+let bag_total := 0;
+for ( let v in bag_it ) {
+	bag_total += v;
+}
+is( bag_total, 12, "to_Iterator" );
+is( <<< 1, 1, 2 >>>.to_Set().length(), 2, "to_Set" );
+is( <<< 1, 1, 2 >>>.uniq().length(), 2, "uniq" );
+is( <<< "1", "2", 3 >>>.sum(), 6, "sum" );
+is( <<< "2", "3", 4 >>>.product(), 24, "product" );
+let sorted := <<< 1, 3, 2 >>>.sort( function( x, y ) {
+	return y <=> x;
+}
+);
+is( sorted.get( 0, 0 ), 3, "sort" );
+is( <<< 2, 10, 1 >>>.sortstr().get( 1, "" ), 10, "sortstr" );
+is( <<< "2", "10", "1" >>>.sortnum().get( 1, 0 ), 2, "sortnum" );
+let mapped := <<< 1, 2 >>>.map( fn x -> x * 10 );
+is( mapped.contains(20), 1, "map" );
+let grepped := <<< 1, 2, 3 >>>.grep( fn x -> x > 1 );
+is( grepped.length(), 2, "grep" );
+is( <<< 1, 2, 3 >>>.any( fn x -> x = 2 ), 1, "any" );
+is( <<< 2, 4, 6 >>>.all( fn x -> x mod 2 = 0 ), 1, "all" );
+is( <<< 1, 8, 10 >>>.first( fn x -> x > 5 ), 8, "first" );
+let b2 := <<< 1, 2, 3, 4 >>>;
+b2.remove_if( fn x -> x mod 2 = 0 );
+is( b2.length(), 2, "remove_if" );
+let total := 0;
+<<< 1, 2, 3 >>>.for_each_value( fn x -> total := total + x );
+is( total, 6, "for_each_value" );
+b.clear();
+is( b.length(), 0, "clear" );
+done_testing();

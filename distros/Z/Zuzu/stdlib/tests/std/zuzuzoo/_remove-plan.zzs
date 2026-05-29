@@ -1,0 +1,150 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/data/json import JSON;
+from std/io import Path;
+from std/zuzuzoo import Zuzuzoo, format_remove_plan, plan_remove;
+
+function ensure_dir ( path ) {
+	return true if path.exists();
+	let parent := path.parent();
+	ensure_dir(parent) if not parent.exists();
+	path.mkdir();
+	return true;
+}
+
+function root () {
+	let dir := Path.tempdir();
+	let lib := dir.child("lib");
+	let bin := dir.child("bin");
+	let meta := dir.child("meta");
+	ensure_dir(lib);
+	ensure_dir(bin);
+	ensure_dir(meta);
+	return {
+		dir_obj: dir,
+		lib_obj: lib,
+		bin_obj: bin,
+		meta_obj: meta,
+		lib_dir: lib.to_String(),
+		bin_dir: bin.to_String(),
+		meta_dir: meta.to_String(),
+	};
+}
+
+function module_entry ( install_as ) {
+	return {
+		source: "modules/" _ install_as,
+		install_as: install_as,
+		sha256: "old",
+	};
+}
+
+function script_entry ( install_as, wrappers := [] ) {
+	return {
+		source: "scripts/" _ install_as,
+		install_as: install_as,
+		sha256: "old",
+		wrappers: wrappers,
+	};
+}
+
+function write_installed ( target, name, version, modules, scripts ) {
+	( new JSON( pretty: true ) ).dump(
+		target{meta_obj}.child( name _ "-" _ version _ ".json" ),
+		{
+			name: name,
+			version: version,
+			author: "Example",
+			license: "MIT",
+			status: "stable",
+			dependencies: {},
+			installed: {
+				zdf: "ZDF-1",
+				lib_dir: target{lib_dir},
+				bin_dir: target{bin_dir},
+				meta_dir: target{meta_dir},
+				modules: modules,
+				scripts: scripts,
+			},
+		},
+	);
+}
+
+let target := root();
+ensure_dir( target{lib_obj}.child("plan") );
+target{lib_obj}.child("plan").child("app.zzm").spew_utf8("// app\n");
+target{bin_obj}.child("plan-tool.zzs").spew_utf8("say \"tool\";\n");
+target{bin_obj}.child("plan-tool.cmd").spew_utf8("@echo off\r\n");
+write_installed(
+	target,
+	"plan-app",
+	"1.0.0",
+	[ module_entry("plan/app.zzm") ],
+	[ script_entry( "plan-tool.zzs", [ "plan-tool.cmd" ] ) ],
+);
+write_installed(
+	target,
+	"script-only",
+	"1.0.0",
+	[],
+	[ script_entry("script-only.zzs") ],
+);
+
+let opts := {
+	lib_dir: target{lib_dir},
+	bin_dir: target{bin_dir},
+	meta_dir: target{meta_dir},
+	home: Path.tempdir().to_String(),
+};
+let zoo := new Zuzuzoo(
+	lib_dir: opts{lib_dir},
+	bin_dir: opts{bin_dir},
+	meta_dir: opts{meta_dir},
+	home: opts{home},
+);
+let module_plan := zoo.plan_remove("plan/app");
+
+ok( module_plan{ok}, "module remove plan is ok" );
+is( module_plan{removals}.length(), 1, "one distribution is planned" );
+is( module_plan{removals}[0]{name}, "plan-app", "module target resolves" );
+is( module_plan{files}.length(), 4, "module, script, wrapper, and metadata" );
+is( module_plan{files}[3]{kind}, "metadata", "metadata is listed last" );
+is( module_plan{files}[0]{exists}, true, "file existence is recorded" );
+is( module_plan{files}[0]{blocked}, false, "unshared file is not blocked" );
+like(
+	format_remove_plan(module_plan),
+	/Remove target:/,
+	"format_remove_plan wrapper formats the plan",
+);
+
+let suffix_plan := zoo.plan_remove("plan/app.zzm");
+ok( suffix_plan{ok}, ".zzm suffix is tolerated for module targets" );
+
+let dist_plan := plan_remove(
+	"script-only",
+	{
+		lib_dir: target{lib_dir},
+		bin_dir: target{bin_dir},
+		meta_dir: target{meta_dir},
+		home: opts{home},
+		dist: true,
+	},
+);
+ok( dist_plan{ok}, "top-level plan_remove supports dist option" );
+is(
+	dist_plan{removals}[0]{name},
+	"script-only",
+	"distribution target resolves by metadata name",
+);
+
+let missing_plan := zoo.plan_remove("plan/missing");
+is( missing_plan{ok}, false, "missing module makes plan not ok" );
+is(
+	missing_plan{errors}[0]{code},
+	"missing-target",
+	"missing module records an error",
+);
+
+done_testing();

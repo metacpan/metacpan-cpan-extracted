@@ -1,0 +1,526 @@
+=encoding utf8
+
+=head1 NAME
+
+std/path/jsonpointer - RFC 6901 JSON Pointer selectors.
+
+=head1 SYNOPSIS
+
+  from std/path/jsonpointer import JSONPointer;
+
+  let data := {
+    users: [
+      { name: "Ada" },
+      { name: "Bob" },
+    ],
+  };
+
+  let pointer := new JSONPointer( path: "/users/0/name" );
+  say( pointer.first(data) );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+C<JSONPointer> implements JSON Pointer as defined by RFC 6901. It
+provides the same path API shape as C<std/path/simple> and C<std/path/z>:
+C<get>, C<select>, C<query>, C<first>, C<exists>, assignment methods,
+reference methods, and lexical path-operator registration via C<use>.
+
+Syntactically valid pointers that do not resolve return no matches for
+read APIs.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<< JSONPointer({ path: String }) >>
+
+Constructs a JSON Pointer selector. Returns: C<JSONPointer>.
+
+=over
+
+=item C<< JSONPointer.use() >>
+
+Parameters: none. Returns: C<null>. Makes this path class the lexical
+implementation for C<@>, C<@@>, and C<@?>.
+
+=item C<< pointer.expression() >>
+
+Parameters: none. Returns: C<String>. Returns the original pointer
+expression.
+
+=item C<< pointer.get(value) >>, C<< pointer.select(value) >>,
+C<< pointer.query(value) >>
+
+Parameters: C<value> is the query root. Returns: C<Array>. Evaluates the
+pointer and returns selected values.
+
+=item C<< pointer.first(value, fallback?) >>
+
+Parameters: C<value> is the query root and C<fallback> is optional.
+Returns: value. Returns the selected value, or C<fallback>/C<null> when
+there is no match.
+
+=item C<< pointer.exists(value) >>
+
+Parameters: C<value> is the query root. Returns: C<Boolean>. Returns
+true when the pointer resolves to a concrete value.
+
+=item C<< pointer.assign_first(target, value, op := ":=", weak := false) >>
+
+Parameters: C<target> is the query root, C<value> is the assignment
+value, C<op> is an assignment operator, and C<weak> is accepted for path
+API compatibility. Returns: value. Updates the selected location.
+
+=item C<< pointer.assign_all(target, value, op := ":=", weak := false) >>
+
+Parameters: same as C<assign_first>. Returns: value. Updates the
+selected location when it exists.
+
+=item C<< pointer.assign_maybe(target, value, op := ":=", weak := false) >>
+
+Parameters: same as C<assign_first>. Returns: C<Boolean>. Updates the
+selected location when it exists.
+
+=item C<< pointer.ref_first(target) >>
+
+Parameters: C<target> is the query root. Returns: C<Function>. Returns a
+reference-like getter/setter for the selected location.
+
+=item C<< pointer.ref_all(target) >>
+
+Parameters: C<target> is the query root. Returns: C<Array>. Returns a
+single reference-like getter/setter when the pointer resolves, otherwise
+an empty array.
+
+=item C<< pointer.ref_maybe(target) >>
+
+Parameters: C<target> is the query root. Returns: C<Function> or
+C<null>. Returns a reference-like getter/setter when the pointer
+resolves.
+
+=back
+
+=back
+
+=head2 Functions
+
+=over
+
+=item C<< extract_pointer_from_url(url) >>
+
+Parameters: C<url> is a C<String>. Returns: C<Dict>. Splits a URL into
+C<baseurl> and C<pointer>. If the URL contains C<#>, C<baseurl> is the
+text before C<#> and C<pointer> is the URI-fragment percent-decoded JSON
+Pointer. If the URL has no C<#>, C<baseurl> is the full URL and
+C<pointer> is C<null>.
+
+=back
+
+=head1 SEE ALSO
+
+Specification: L<https://www.rfc-editor.org/rfc/rfc6901>.
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/path/jsonpointer >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/string import index, ord, replace, substr;
+from std/string/base64 import decode as _base64_decode;
+
+let _B64_ALPHABET := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	_ "abcdefghijklmnopqrstuvwxyz0123456789+/";
+
+function _jsonpointer_div_floor ( Number n, Number d ) {
+	return floor( n / d );
+}
+
+function _jsonpointer_mod ( Number n, Number d ) {
+	return n - _jsonpointer_div_floor( n, d ) * d;
+}
+
+function _jsonpointer_bytes_to_binary ( Array bytes ) {
+	let out := "";
+	let i := 0;
+	let n := bytes.length();
+
+	while ( i < n ) {
+		let b0 := bytes[i];
+		let b1 := null;
+		let b2 := null;
+		if ( i + 1 < n ) {
+			b1 := bytes[i + 1];
+		}
+		if ( i + 2 < n ) {
+			b2 := bytes[i + 2];
+		}
+
+		let c0 := _jsonpointer_div_floor( b0, 4 );
+		let c1 := _jsonpointer_mod( b0, 4 ) * 16;
+		let c2 := 64;
+		let c3 := 64;
+
+		if ( not( b1 == null ) ) {
+			c1 += _jsonpointer_div_floor( b1, 16 );
+			c2 := _jsonpointer_mod( b1, 16 ) * 4;
+			if ( not( b2 == null ) ) {
+				c2 += _jsonpointer_div_floor( b2, 64 );
+				c3 := _jsonpointer_mod( b2, 64 );
+			}
+		}
+
+		out _= substr( _B64_ALPHABET, c0, 1 );
+		out _= substr( _B64_ALPHABET, c1, 1 );
+		out _= c2 == 64 ? "=" : substr( _B64_ALPHABET, c2, 1 );
+		out _= c3 == 64 ? "=" : substr( _B64_ALPHABET, c3, 1 );
+		i += 3;
+	}
+
+	return _base64_decode(out);
+}
+
+function _jsonpointer_hex_value ( String ch ) {
+	if ( ch ~ /[0-9]/ ) {
+		return 0 + ch;
+	}
+
+	let lower := lc(ch);
+	return 10 + index( "abcdef", lower );
+}
+
+function _jsonpointer_percent_decode ( String text ) {
+	let bytes := [];
+	let i := 0;
+	let n := length text;
+
+	while ( i < n ) {
+		let ch := substr( text, i, 1 );
+		if (
+			ch ≡ "%"
+			and i + 2 < n
+			and substr( text, i + 1, 1 ) ~ /[0-9A-Fa-f]/
+			and substr( text, i + 2, 1 ) ~ /[0-9A-Fa-f]/
+		) {
+			bytes.push(
+				_jsonpointer_hex_value( substr( text, i + 1, 1 ) ) * 16
+				+ _jsonpointer_hex_value( substr( text, i + 2, 1 ) ),
+			);
+			i += 3;
+			next;
+		}
+
+		let code := ord(ch);
+		die "JSONPointer URL fragment contains non-ASCII literal character"
+			if code > 127;
+		bytes.push(code);
+		i++;
+	}
+
+	return to_string( _jsonpointer_bytes_to_binary(bytes) );
+}
+
+function _jsonpointer_decode_token ( String raw ) {
+	let out := replace( raw, "~1", "/", "g" );
+	out := replace( out, "~0", "~", "g" );
+	return out;
+}
+
+function _jsonpointer_parse ( String raw ) {
+	die "JSONPointer parse error: pointer must be empty or start with '/'"
+		if raw ≢ "" and substr( raw, 0, 1 ) ≢ "/";
+
+	let steps := [];
+	return steps if raw ≡ "";
+
+	let i := 1;
+	let start := 1;
+	let n := length raw;
+
+	while ( i <= n ) {
+		if ( i ≡ n or substr( raw, i, 1 ) ≡ "/" ) {
+			let token := substr( raw, start, i - start );
+			let j := 0;
+			while ( j < length token ) {
+				if ( substr( token, j, 1 ) ≡ "~" ) {
+					die "JSONPointer parse error: invalid '~' escape"
+						if j + 1 >= length token;
+					let esc := substr( token, j + 1, 1 );
+					die "JSONPointer parse error: invalid '~' escape"
+						if esc ≢ "0" and esc ≢ "1";
+					j += 2;
+					next;
+				}
+				j++;
+			}
+			steps.push( _jsonpointer_decode_token(token) );
+			start := i + 1;
+		}
+		i++;
+	}
+
+	return steps;
+}
+
+function extract_pointer_from_url ( String url ) {
+	let hash := index( url, "#" );
+	if ( hash < 0 ) {
+		return {
+			baseurl: url,
+			pointer: null,
+		};
+	}
+
+	let pointer := _jsonpointer_percent_decode( substr( url, hash + 1 ) );
+	_jsonpointer_parse(pointer);
+
+	return {
+		baseurl: substr( url, 0, hash ),
+		pointer: pointer,
+	};
+}
+
+class JSONPointer {
+	let String path;
+	let Array _steps := [];
+
+	static method use () {
+		from std/internals import setupperprop;
+		setupperprop( 1, "paths", self );
+	}
+
+	method __build__ () {
+		_steps := _jsonpointer_parse(path);
+	}
+
+	method expression () {
+		return path;
+	}
+
+	method _node ( value, parent, key ) {
+		return {
+			value: value,
+			parent: parent,
+			key: key,
+		};
+	}
+
+	method _evaluate_nodes ( value ) {
+		let current := [ self._node( value, null, null ) ];
+
+		for ( let step in _steps ) {
+			let next_nodes := [];
+
+			for ( let node in current ) {
+				let v := node{value};
+
+				if ( v instanceof Dict ) {
+					if ( v.exists(step) ) {
+						next_nodes.push( self._node( v.get(step), node, step ) );
+					}
+					next;
+				}
+
+				if ( v instanceof PairList ) {
+					let found := v.get_all(step);
+					if ( found.length() ≡ 1 ) {
+						next_nodes.push( self._node( found[0], node, step ) );
+					}
+					next;
+				}
+
+				if ( v instanceof Array ) {
+					if ( step ~ /^(0|[1-9][0-9]*)$/ ) {
+						let idx := int(step);
+						if ( idx < v.length() ) {
+							next_nodes.push( self._node( v[idx], node, idx ) );
+						}
+					}
+					next;
+				}
+			}
+
+			current := next_nodes;
+		}
+
+		return current;
+	}
+
+	method _evaluate ( value ) {
+		return self._evaluate_nodes(value).map( fn n -> n{value} );
+	}
+
+	method get ( value ) {
+		return self._evaluate(value);
+	}
+
+	method select ( value ) {
+		return self._evaluate(value);
+	}
+
+	method query ( value ) {
+		return self._evaluate(value);
+	}
+
+	method first ( value, fallback? ) {
+		let out := self._evaluate(value);
+		return out.length() ≡ 0 ? fallback : out[0];
+	}
+
+	method exists ( value ) {
+		return self._evaluate(value).length() > 0;
+	}
+
+	method _ref_for_node ( Dict node ) {
+		let parent := node{parent};
+		die "JSONPointer assignment target has no parent node"
+			if parent ≡ null;
+
+		let container := parent{value};
+		let key := node{key};
+
+		if ( container instanceof Array ) {
+			die "JSONPointer assignment expects numeric array index"
+				if not( key instanceof Number );
+			return \ container[key];
+		}
+
+		if ( container instanceof Dict ) {
+			die "JSONPointer assignment expects string dict key"
+				if not( key instanceof String );
+			return \ container{(key)};
+		}
+
+		if ( container instanceof PairList ) {
+			die "JSONPointer assignment expects string pairlist key"
+				if not( key instanceof String );
+			return \ container{(key)};
+		}
+
+		die "JSONPointer assignment target container '"
+			_ typeof container
+			_ "' is not assignable";
+	}
+
+	method _apply_assignment_ref ( ref, value, op := ":=", weak := false ) {
+		die "JSONPointer weak assignment is not supported"
+			if weak;
+
+		if ( op ≡ ":=" ) {
+			return ref(value);
+		}
+
+		let current := ref();
+
+		if ( op ≡ "+=" ) {
+			current += value;
+		}
+		else if ( op ≡ "-=" ) {
+			current -= value;
+		}
+		else if ( op ≡ "*=" or op ≡ "×=" ) {
+			current *= value;
+		}
+		else if ( op ≡ "/=" or op ≡ "÷=" ) {
+			current /= value;
+		}
+		else if ( op ≡ "**=" ) {
+			current **= value;
+		}
+		else if ( op ≡ "_=" ) {
+			current _= value;
+		}
+		else if ( op ≡ "?:=" ) {
+			current ?:= value;
+		}
+		else if ( op ≡ "~=" ) {
+			current ~= value[0] -> value[1](m);
+		}
+		else {
+			die `Unsupported path assignment operator '${op}'`;
+		}
+
+		ref(current);
+		return current;
+	}
+
+	method _assign_all_result ( value, op, last_result ) {
+		return op ≡ "~=" ? last_result : value;
+	}
+
+	method assign_first ( target, value, op := ":=", weak := false ) {
+		let nodes := self._evaluate_nodes(target);
+		die "JSONPointer assignment found no matches"
+			if nodes.length() ≡ 0;
+		return self._apply_assignment_ref(
+			self._ref_for_node( nodes[0] ),
+			value,
+			op,
+			weak,
+		);
+	}
+
+	method assign_all ( target, value, op := ":=", weak := false ) {
+		let nodes := self._evaluate_nodes(target);
+		if ( nodes.length() ≡ 0 ) {
+			return self._assign_all_result( value, op, value );
+		}
+
+		let last_result := value;
+		for ( let node in nodes ) {
+			last_result := self._apply_assignment_ref(
+				self._ref_for_node(node),
+				value,
+				op,
+				weak,
+			);
+		}
+
+		return self._assign_all_result( value, op, last_result );
+	}
+
+	method assign_maybe ( target, value, op := ":=", weak := false ) {
+		let nodes := self._evaluate_nodes(target);
+		if ( nodes.length() ≡ 0 ) {
+			return false;
+		}
+
+		self._apply_assignment_ref(
+			self._ref_for_node( nodes[0] ),
+			value,
+			op,
+			weak,
+		);
+		return true;
+	}
+
+	method ref_first ( target ) {
+		let nodes := self._evaluate_nodes(target);
+		die "JSONPointer assignment found no matches"
+			if nodes.length() ≡ 0;
+		return self._ref_for_node( nodes[0] );
+	}
+
+	method ref_all ( target ) {
+		let out := [];
+		for ( let node in self._evaluate_nodes(target) ) {
+			out.push( self._ref_for_node(node) );
+		}
+		return out;
+	}
+
+	method ref_maybe ( target ) {
+		let nodes := self._evaluate_nodes(target);
+		return nodes.length() ≡ 0 ? null : self._ref_for_node( nodes[0] );
+	}
+}

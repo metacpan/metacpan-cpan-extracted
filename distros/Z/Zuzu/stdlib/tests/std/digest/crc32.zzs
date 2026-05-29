@@ -1,0 +1,15 @@
+from std/digest/crc32 import *;
+from test/more import *;
+
+let payload := to_binary("abc");
+
+is( crc32_hex(payload), "352441c2", "crc32_hex matches known vector", );
+is( crc32_b64(payload), "NSRBwg", "crc32_b64 matches known vector", );
+is( length crc32(payload), 4, "crc32 returns 4-byte BinaryString", );
+is( typeof crc32(payload), "BinaryString", "crc32 returns BinaryString", );
+
+like( exception( function() {
+	crc32("abc");
+} ), /TypeException: 'value' must be BinaryString, got String/, "crc32 rejects String input", );
+
+done_testing();

@@ -1,0 +1,50 @@
+from test/more import *;
+
+requires_capability("fs");
+requires_capability("db");
+
+from std/archive import Archive;
+from std/db import DB;
+from std/io import Path;
+from std/string import split, trim;
+
+let source := {
+	entries: [
+		{ path: "batch-a.csv", data: to_binary( "id,name\n1,Ada\n2,Bob\n" ) },
+		{ path: "batch-b.csv", data: to_binary( "id,name\n3,Cia\n" ) },
+	],
+};
+
+let blob := Archive.encode( source, "zip" );
+let decoded := Archive.decode(blob);
+
+let outdir := Path.tempdir();
+for ( let entry in decoded{entries} ) {
+	outdir.child( entry{path} ).spew( entry{data} );
+}
+
+let dbh := DB.temp();
+dbh.prepare( "create table people (id integer, name text)" ).execute();
+let ins := dbh.prepare( "insert into people (id, name) values (?, ?)" );
+
+for ( let path in Path.glob( outdir.to_String() _ "/*.csv" ) ) {
+	let first := true;
+	path.each_line( function ( line ) {
+		if ( first ) {
+			first := false;
+			return null;
+		}
+		let row := split( trim(line), "," );
+		ins.execute( int( row[0] ), row[1] );
+	} );
+}
+
+let q := dbh.prepare( "select id, name from people order by id" );
+q.execute();
+let rows := q.all_typed_dict();
+
+is( rows.length(), 3, "archive decode + extract + glob inserted all CSV rows" );
+is( rows[0]{name}, "Ada", "first decoded row inserted" );
+is( rows[2]{id}, 3, "last decoded row inserted" );
+
+done_testing();

@@ -1,0 +1,69 @@
+from test/more import *;
+from std/eval import eval;
+
+class Adder {
+
+	method plus (x) {
+		return x + 10;
+	}
+}
+
+is( typeof Adder{"plus"}, "Method", "class dict access exposes methods" );
+
+class WidgetBox {
+
+	class Widget {
+		let id;
+
+		method get_id () {
+			return id;
+		}
+	}
+
+	method new_widget (x) {
+		return new Widget( id: x );
+	}
+}
+
+let widget_id := null;
+let widget_error := exception( function () {
+	widget_id := new WidgetBox().new_widget(99).get_id();
+} );
+is(
+	widget_error,
+	null,
+	"nested classes are lexically visible in methods",
+);
+is( widget_id, 99, "nested class constructed by lexical name works" );
+
+class QualifiedWidgetBox {
+
+	class QualifiedWidget {
+		let id;
+	}
+
+	method new_widget (x) {
+		return new self { QualifiedWidget }( id: x );
+	}
+}
+
+is(
+	typeof new QualifiedWidgetBox().new_widget(99),
+	"QualifiedWidgetBox{\"QualifiedWidget\"}",
+	"nested class instance typeof is qualified",
+);
+
+let method_ref := Adder{"plus"};
+let obj := new Adder();
+let dynamic_result := null;
+let dynamic_error := exception( function () {
+	dynamic_result := eval("obj.(method_ref)(5);");
+} );
+is(
+	dynamic_error,
+	null,
+	"dynamic member calls accept Method objects without throwing",
+);
+is( dynamic_result, 15, "dynamic member calls dispatch Method objects" );
+
+done_testing();

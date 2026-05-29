@@ -1,0 +1,75 @@
+from std/result import Result;
+from test/more import *;
+from test/worker_contract import require_worker;
+
+let Worker := require_worker();
+
+if ( not( Worker can "spawn_handle" ) ) {
+	skip_all( "Worker.spawn_handle is unavailable" );
+}
+
+class WorkerHandleBox {
+	let String name with get, set := "unset";
+
+	method label () {
+		return "box:" _ name;
+	}
+}
+
+async function main () {
+	let original := new WorkerHandleBox( name: "Ada" );
+	let result := Result.ok(original);
+	let handle := Worker.spawn_handle(
+		async function ( inbox ) {
+			let packet := await {
+				inbox.recv();
+			};
+			let box := packet.unwrap();
+			box.set_name("Bea");
+			await {
+				inbox.send(
+					[
+						packet,
+						{ nested: [ 1, 2, 3 ] },
+					],
+				);
+			};
+			inbox.close();
+			return null;
+		},
+		[],
+		);
+
+	await {
+		handle.send(result);
+	};
+	let reply := await {
+		handle.recv();
+	};
+
+	is( typeof reply[0], "Result", "worker message may contain Result" );
+	is(
+		reply[0].unwrap().label(),
+		"box:Bea",
+		"object message method works in worker",
+	);
+	is(
+		reply[1]{nested},
+		[ 1, 2, 3 ],
+		"collection message round trips",
+	);
+	is(
+		original.label(),
+		"box:Ada",
+		"message transport preserves copy isolation",
+	);
+	await {
+		handle.result();
+	};
+}
+
+await {
+	main();
+};
+
+done_testing();

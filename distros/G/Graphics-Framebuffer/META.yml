@@ -33,5 +33,5 @@ requires:
   Math::Gradient: '0.03'
   Term::ReadKey: '2.04'
   perl: '5.020000'
-version: '7.03'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '7.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

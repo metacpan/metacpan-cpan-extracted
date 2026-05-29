@@ -1,0 +1,115 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/archive import Archive;
+from std/data/json import JSON;
+from std/digest/sha import sha256_hex;
+from std/io import Path;
+from std/zuzuzoo import Zuzuzoo;
+
+function ensure_dir ( path ) {
+	return true if path.exists();
+	let parent := path.parent();
+	ensure_dir(parent) if not parent.exists();
+	path.mkdir();
+	return true;
+}
+
+function root () {
+	let dir := Path.tempdir();
+	let lib := dir.child("lib");
+	let bin := dir.child("bin");
+	let meta := dir.child("meta");
+	ensure_dir(lib);
+	ensure_dir(bin);
+	ensure_dir(meta);
+	return {
+		dir_obj: dir,
+		lib_dir: lib.to_String(),
+		bin_dir: bin.to_String(),
+		meta_dir: meta.to_String(),
+		lib_obj: lib,
+		bin_obj: bin,
+		meta_obj: meta,
+	};
+}
+
+let archive := Path.tempfile();
+Archive.dump(
+	archive,
+	{
+		entries: [
+			{
+				path: "metadata-app-1.0.0/zuzu-distribution.json",
+				data: to_binary(
+					"{\"name\":\"metadata-app\",\"version\":\"1.0.0\"," _
+					"\"author\":\"Example\",\"license\":\"MIT\"," _
+					"\"status\":\"stable\"}\n",
+				),
+			},
+			{
+				path: "metadata-app-1.0.0/modules/meta/app.zzm",
+				data: to_binary("// metadata module\n"),
+			},
+			{
+				path: "metadata-app-1.0.0/scripts/meta-tool.zzs",
+				data: to_binary("say \"metadata\";\n"),
+			},
+		],
+	},
+	"zip",
+);
+
+let target := root();
+let result := ( new Zuzuzoo(
+	lib_dir: target{lib_dir},
+	bin_dir: target{bin_dir},
+	meta_dir: target{meta_dir},
+	home: Path.tempdir().to_String(),
+) ).install( archive.to_String(), { no_test: true } );
+ok( result{ok}, "install writes metadata" );
+
+let metadata_file := target{meta_obj}.child("metadata-app-1.0.0.json");
+let metadata := ( new JSON() ).load(metadata_file);
+is( metadata.exists("modules"), false, "top-level modules are absent" );
+is( metadata.exists("scripts"), false, "top-level scripts are absent" );
+is( metadata{installed}{zdf}, "ZDF-1", "installed zdf is recorded" );
+is( metadata{installed}{lib_dir}, target{lib_dir}, "lib_dir is recorded" );
+is( metadata{installed}{bin_dir}, target{bin_dir}, "bin_dir is recorded" );
+is( metadata{installed}{meta_dir}, target{meta_dir}, "meta_dir is recorded" );
+like(
+	metadata{installed}{installed_at},
+	/^\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\dZ$/,
+	"installed_at is recorded",
+);
+is( metadata{installed}{source}{type}, "file", "source type is recorded" );
+is(
+	metadata{installed}{modules}[0]{sha256},
+	sha256_hex( target{lib_obj}.child("meta").child("app.zzm").slurp() ),
+	"module sha256 is computed from installed file",
+);
+is(
+	metadata{installed}{scripts}[0]{sha256},
+	sha256_hex( target{bin_obj}.child("meta-tool.zzs").slurp() ),
+	"script sha256 is computed from installed file",
+);
+
+let zoo := new Zuzuzoo(
+	lib_dir: target{lib_dir},
+	bin_dir: target{bin_dir},
+	meta_dir: target{meta_dir},
+	home: Path.tempdir().to_String(),
+);
+is(
+	zoo.list_installed()[0]{name},
+	"metadata-app",
+	"installed metadata is readable by list_installed",
+);
+is(
+	zoo.query("meta/app"){version},
+	"1.0.0",
+	"installed metadata is readable by query",
+);
+
+done_testing();

@@ -1,0 +1,196 @@
+from test/more import *;
+requires_capability( "fs" );
+requires_capability( "proc" );
+
+from std/template/z import ZTemplate;
+from std/io import Path;
+from std/proc import Env;
+
+let fixture_root := Env.get("FIXTURE_DIR");
+if ( fixture_root ≡ null or fixture_root eq "" ) {
+	skip_all( "FIXTURE_DIR is not set" );
+}
+
+ok( exception( function () {
+	new ZTemplate( string: "x", file: fixture_root _ "/zpath/data1.json" );
+} ) instanceof Exception,
+	"constructor rejects string+file together",
+);
+
+ok( exception( function () {
+	new ZTemplate();
+} ) instanceof Exception,
+	"constructor rejects missing source",
+);
+
+ok( exception( function () {
+	new ZTemplate( string: "x", escape: "json" );
+} ) instanceof Exception,
+	"constructor rejects invalid escape mode",
+);
+
+let t1 := new ZTemplate( string: "Hello" );
+is( t1.process( {} ), "Hello", "phase1 parser stores plain text nodes" );
+
+let file := Path.tempfile();
+file.spew_utf8( "From file" );
+let t2 := new ZTemplate( file: file );
+is( t2.process( {} ), "From file", "file source bootstraps parser" );
+
+let render_expr := new ZTemplate(
+	string: "Hello {{ name }}!",
+);
+is(
+	render_expr.process( { name: "<Ada>" } ),
+	"Hello &lt;Ada&gt;!",
+	"phase3 renders expressions with default html escape",
+);
+
+let render_expr_raw := new ZTemplate(
+	string: "Hello {{ name :: raw }}!",
+);
+is(
+	render_expr_raw.process( { name: "<Ada>" } ),
+	"Hello <Ada>!",
+	"phase3 expression local escape override supports raw output",
+);
+
+let render_block := new ZTemplate(
+	string: "{{# users/* }}{{ name }} {{/users/*}}",
+);
+is(
+	render_block.process( { users: [ { name: "Ada" }, { name: "Bob" } ] } ),
+	"Ada Bob ",
+	"phase3 block rendering switches context per matched identity",
+);
+
+let render_block_falsy := new ZTemplate(
+	string: "X{{# items/* }}Y{{/items/*}}Z",
+);
+is(
+	render_block_falsy.process( { items: [] } ),
+	"XZ",
+	"phase3 block rendering skips falsy matches",
+);
+
+ok(
+	exception( function () {
+		new ZTemplate( string: "x" );
+	} ) ≡ null,
+	"constructor accepts valid string source",
+);
+
+function _process_throws_without_data () {
+	return exception( function () {
+		new ZTemplate( string: "x" ).process(null);
+	} ) instanceof Exception;
+}
+
+ok(
+	_process_throws_without_data(),
+	"process requires data model",
+);
+
+ok(
+	exception( function () {
+		new ZTemplate( string: "{{name}}" );
+	} ) ≡ null,
+	"phase2 parser accepts expression tags",
+);
+
+ok( exception( function () {
+	new ZTemplate( string: "{{# items }}A{{/items}}" );
+} ) ≡ null,
+	"phase2 parser accepts matching block tags",
+);
+
+ok( exception( function () {
+	new ZTemplate( string: "{{/items}}" );
+} ) instanceof Exception,
+	"phase2 parser rejects stray close tag",
+);
+
+ok( exception( function () {
+	new ZTemplate( string: "{{#items}}x" );
+} ) instanceof Exception,
+	"phase2 parser rejects missing close tag",
+);
+
+ok( exception( function () {
+	new ZTemplate( string: "{{#items}}x{{/wrong}}" );
+} ) instanceof Exception,
+	"phase2 parser rejects mismatched close tag",
+);
+
+ok( exception( function () {
+	new ZTemplate( string: "{{name", );
+} ) instanceof Exception,
+	"phase2 parser rejects unterminated tag",
+);
+
+let inc_dir := Path.tempdir();
+let inc_a := inc_dir.child("a.zt");
+let inc_b := inc_dir.child("b.zt");
+inc_a.spew_utf8( "A{{> b.zt }}!" );
+inc_b.spew_utf8( "B" );
+
+let inc_ok := new ZTemplate( file: inc_a );
+is( inc_ok.process( {} ), "AB!", "phase2 parser expands relative include files", );
+
+ok( exception( function () {
+	new ZTemplate( string: "{{> b.zt }}", includes: false );
+} ) instanceof Exception,
+	"phase2 parser rejects include tags when includes disabled",
+);
+
+ok( exception( function () {
+	new ZTemplate( string: "{{> b.zt }}" );
+} ) instanceof Exception,
+	"phase2 parser rejects relative include in string source",
+);
+
+let circ_a := inc_dir.child("circ-a.zt");
+let circ_b := inc_dir.child("circ-b.zt");
+circ_a.spew_utf8( "A{{> circ-b.zt }}" );
+circ_b.spew_utf8( "B{{> circ-a.zt }}" );
+ok( exception( function () {
+	new ZTemplate( file: circ_a );
+} ) instanceof Exception,
+	"phase2 parser detects circular includes",
+);
+
+ok( exception( function () {
+	new ZTemplate( string: "{{ \"foo::bar\" :: raw }}" );
+} ) ≡ null,
+	"phase2 parser keeps :: inside quotes while parsing escape override",
+);
+
+
+let e_unterminated := exception( function () {
+	new ZTemplate( string: "{{name" );
+} );
+like(
+	e_unterminated{message},
+	/Unterminated tag at character 0/,
+	"phase4 reports unterminated tag diagnostic with offset",
+);
+
+let e_missing_close := exception( function () {
+	new ZTemplate( string: "{{#items}}x" );
+} );
+like(
+	e_missing_close{message},
+	/Missing close tag for \{\{items\}\}/,
+	"phase4 reports missing close block diagnostic",
+);
+
+let e_mismatch_close := exception( function () {
+	new ZTemplate( string: "{{#items}}x{{/wrong}}" );
+} );
+like(
+	e_mismatch_close{message},
+	/Mismatched close tag \{\{\/wrong\}\} for \{\{items\}\}/,
+	"phase4 reports mismatched close tag diagnostic",
+);
+
+done_testing();

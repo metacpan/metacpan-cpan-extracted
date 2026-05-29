@@ -1,0 +1,95 @@
+{
+  "format": "Zuzu Marshal CBOR v1",
+  "notes": [
+    "The Perl dumper emits weak storage records [1, value] for weak storage slots.",
+    "Valid weak records in stored-value positions load as weak storage.",
+    "Weak records in forbidden positions are rejected instead of being strengthened.",
+    "Strengthening a weak storage record during load would be a format bug."
+  ],
+  "fixtures": [
+    {
+      "name": "strong-only-nested-array",
+      "base64": "2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIKCAoMBggABYXiCAoECgA==",
+      "expect": "loads",
+      "description": "Current Perl dumper output for [ 1, [ 2 ], \"x\" ]; contains only strong references."
+    },
+    {
+      "name": "weak-root-null",
+      "base64": "2dn3hmxaVVpVLU1BUlNIQUwBoIIB9oCA",
+      "expect": "reject",
+      "description": "Weak storage record in the envelope root, which is a forbidden position."
+    },
+    {
+      "name": "weak-array-null",
+      "base64": "2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCAoGCAfaA",
+      "expect": "loads",
+      "description": "Structurally valid weak storage record in an Array item position."
+    },
+    {
+      "name": "weak-array-nested-weak",
+      "base64": "2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCAoGCAYIB9oA=",
+      "expect": "reject",
+      "description": "Nested weak storage record, which is invalid."
+    },
+    {
+      "name": "weak-object-class",
+      "base64": "2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCB4KCAfaAgA==",
+      "expect": "reject",
+      "description": "Weak storage record in an object instance class field, which is a forbidden position."
+    },
+    {
+      "name": "weak-pair-key-null",
+      "base64": "2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCAYKCAfZhdoA=",
+      "expect": "reject",
+      "description": "Structurally valid weak storage record in a Pair key position."
+    },
+    {
+      "name": "weak-array-bad-arity",
+      "base64": "2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCAoGBAYA=",
+      "expect": "reject",
+      "description": "Weak-like array record with invalid arity."
+    },
+    {
+      "name": "weak-dict-scalar",
+      "base64": "2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCA4GCYWuCAWF4gA==",
+      "expect": "loads",
+      "description": "Structurally valid weak storage record in a Dict value position."
+    },
+    {
+      "name": "weak-pairlist-scalar",
+      "base64": "2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCBIGCYWuCAWF4gA==",
+      "expect": "loads",
+      "description": "Structurally valid weak storage record in a PairList value position."
+    },
+    {
+      "name": "weak-set-reference",
+      "base64": "2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCBYGCAYIAAIA=",
+      "expect": "loads",
+      "description": "Structurally valid weak storage record containing a strong reference in a Set member position."
+    },
+    {
+      "name": "weak-bag-bad-id",
+      "base64": "2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCBoGCAYIAGGOA",
+      "expect": "reject",
+      "description": "Weak storage record containing an out-of-range strong reference id."
+    },
+    {
+      "name": "weak-object-slot",
+      "base64": "2dn3hmxaVVpVLU1BUlNIQUwBoIIAAYKCCYEAggeCggAAgYJjZm9vggH2gYUCa1dlYWtTbG90Qm94cmNsYXNzIFdlYWtTbG90Qm94O4CA",
+      "expect": "loads",
+      "description": "Structurally valid weak storage record in a user object slot."
+    },
+    {
+      "name": "weak-code-capture",
+      "base64": "2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCCIEAgYUBYWZ4G2Z1bmN0aW9uICgpIHsgcmV0dXJuIGNhcDsgfYGCY2NhcIIB9oA=",
+      "expect": "reject",
+      "description": "Weak storage record in a code capture value, which is a forbidden position."
+    },
+    {
+      "name": "weak-function-code-id",
+      "base64": "2dn3hmxaVVpVLU1BUlNIQUwBoIIAAIGCCIGCAfaA",
+      "expect": "reject",
+      "description": "Weak storage record in a function object code-id field, which is a forbidden position."
+    }
+  ]
+}

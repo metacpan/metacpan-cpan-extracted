@@ -1,0 +1,18 @@
+from test/c35/errors import ModuleCustomError;
+from test/c35/runner import invoke_custom_error;
+from test/more import *;
+
+let msg := "";
+let is_custom := 0;
+try {
+	invoke_custom_error();
+}
+catch ( Exception e ) {
+	msg := e{message};
+	is_custom := e instanceof ModuleCustomError;
+}
+
+is( msg, "from-c35", "custom exception message propagates across modules" );
+is( is_custom, 1, "custom exception can be caught as parent and identified by type" );
+
+done_testing();

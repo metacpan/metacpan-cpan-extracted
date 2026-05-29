@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: Perl500503Syntax-OrDie
-version: 0.01
+version: 0.02
 abstract: Validate Perl 5.005_03 source compatibility
 author:
   - ina <ina@cpan.org>
@@ -20,7 +20,7 @@ minimum_perl_version: 5.00503
 provides:
   Perl500503Syntax::OrDie:
     file: lib/Perl500503Syntax/OrDie.pm
-    version: 0.01
+    version: 0.02
 resources:
   license: http://dev.perl.org/licenses/
   bugtracker: https://github.com/ina-cpan/Perl500503Syntax-OrDie/issues

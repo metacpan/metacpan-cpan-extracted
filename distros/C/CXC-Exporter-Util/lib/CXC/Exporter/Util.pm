@@ -8,7 +8,7 @@ use strict;
 use warnings;
 
 #<<<
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 #>>>
 
 use Scalar::Util 'reftype';
@@ -28,7 +28,8 @@ BEGIN {
 
     %EXPORT_TAGS = (
         default   => [qw( install_EXPORTS  )],
-        constants => [qw( install_CONSTANTS )],
+        exports   => [qw( install_EXPORTS  )],
+        constants => [qw( install_EXPORTS install_CONSTANTS )],
         utils     => [qw( install_constant_tag install_constant_func )],
     );
 
@@ -69,6 +70,15 @@ my sub _EXPORT ( $caller = scalar caller ) {
 }
 
 my sub add_constant_to_tag;
+
+
+
+
+
+
+
+
+
 
 
 
@@ -681,14 +691,30 @@ my sub ui_entry ( $target, $tag, $pfx ) {
 
 sub _exporter_expand_tag ( $class, $name, $value, $globals ) {
 
-    if ( $name eq UI_HELPERS or $name eq 'all' ) {
-        my $target = $globals->{into};
+    my $target = $globals->{into};
+
+    if ( $name eq UI_HELPERS
+        || ( $name eq 'all' && $class ne __PACKAGE__ ) )
+    {
         $REGISTRY{HOOK}{$target}{post}{add_helpers} //= sub {
             _EXPORT_TAGS( $target )->{ +UI_HELPERS } = [ $EXPORT_TAGS{ +UI_HELPERS }->@* ];
         };
     }
+
     $class->SUPER::_exporter_expand_tag( $name, $value, $globals );
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 sub _generate_ui_list_constants ( $class, $name, $args, $globals ) {
     my $target = $globals->{into};
@@ -697,6 +723,15 @@ sub _generate_ui_list_constants ( $class, $name, $args, $globals ) {
     };
 }
 
+
+
+
+
+
+
+
+
+
 sub _generate_ui_coerce_constant ( $class, $name, $args, $globals ) {
     my $target = $globals->{into};
     sub ( $name, $tag, $pfx = q{} ) {
@@ -704,6 +739,15 @@ sub _generate_ui_coerce_constant ( $class, $name, $args, $globals ) {
         return $valsub->();
     };
 }
+
+
+
+
+
+
+
+
+
 
 sub _generate_ui_assert_coerce_constant ( $class, $name, $args, $globals ) {
     my $target = $globals->{into};
@@ -731,6 +775,7 @@ __END__
 =pod
 
 =for :stopwords Diab Jerius Smithsonian Astrophysical Observatory mistyped ui ui_helpers
+utils
 
 =head1 NAME
 
@@ -738,14 +783,14 @@ CXC::Exporter::Util - Tagged Based Exporting
 
 =head1 VERSION
 
-version 0.11
+version 0.12
 
 =head1 SYNOPSIS
 
 In the exporting code:
 
   package My::Exporter;
-  use CXC::Exporter::Util ':all';
+  use CXC::Exporter::Util ':constants';
 
   use parent 'Exporter' # or Exporter::Tiny
 
@@ -844,6 +889,8 @@ Constants are created via Perl's L<constant> pragma.
 
 L</install_CONSTANTS> is passed sets of constants grouped by tags,
 e.g.:
+
+  use CXC::Export::Util ':constants';
 
   install_CONSTANTS( {
         DETECTORS => {
@@ -961,12 +1008,11 @@ L</ui_coerce_constant> returns the original passed name if there is
 no match, while L</ui_assert_coerce_constant> throws an exception.
 
 To make these helpers available to users of a constants module, import
-the C<ui_helpers> tag (or the C<all> tag) from C<CXC::Exporter::Util>
-into that module:
+the C<ui_helpers> tag from C<CXC::Exporter::Util> into that module:
 
   package My::Constants;
   use parent 'Exporter::Tiny';
-  use CXC::Exporter::Util 'install_CONSTANTS', 'install_EXPORTS', ':ui_helpers';
+  use CXC::Exporter::Util ':constants', ':ui_helpers';
 
   install_CONSTANTS( { COLORS =>
                          { RED => 0xFF0000, YELLOW_GREEN => 0x00FFFF } } );
@@ -978,34 +1024,6 @@ C<My::Constants> may then import all of the UI helpers with
   use My::Constants ':ui_helpers';
 
 or import them individually.
-
-=over
-
-=item ui_list_constants
-
-  @names = ui_list_constants( $tag, ?$prefix );
-
-Returns a list of accepted names for the constants with the given
-C<$tag>.  These names are lower-case alternatives with underscores
-preserved and with underscores translated to hyphens.  The optional
-C<$prefix> strips a common literal constant-name prefix before aliases
-are generated.
-
-=item ui_coerce_constant
-
-  $value = ui_coerce_constant( $name, $tag, ?$prefix );
-
-Maps an accepted constant name alias (see L</ui_list_constants>) to
-the constant's value, returning unknown values unchanged.
-
-=item ui_assert_coerce_constant
-
-  $value = ui_assert_coerce_constant( $name, $tag, ?$prefix );
-
-Performs the same coercion as L</ui_coerce_constant>, but throws an
-exception for unknown values.
-
-=back
 
 =head1 SUBROUTINES
 
@@ -1053,17 +1071,26 @@ C<$package> is I<not> a subclass of L<Exporter::Tiny>.
 =back
 
 This routine does the following in C<$package> based upon
-C<%EXPORT_TAGS> in C<$package>:
+the contents of C<$package>'s C<%EXPORT_TAGS> hash:
 
 =over
 
 =item *
 
-Install the symbols specified via the C<$EXPORT_TAGS{default}> tag into C<@EXPORT>.
+Copy the symbol names in  C<$EXPORT_TAGS{default}> into C<@EXPORT>.
 
 =item *
 
-Install all of the symbols in C<%EXPORT_TAGS> into C<@EXPORT_OK>.
+Copy the symbol names in all of C<%EXPORT_TAGS> into C<@EXPORT_OK>.
+
+=item *
+
+Create an C<all> tag which includes all of the symbols in
+C<%EXPORT_TAGS>.
+
+=item *
+
+Create a C<ui_helper> tag if requested (See L</UI Helpers>).
 
 =back
 
@@ -1355,6 +1382,30 @@ or directly
 
 =back
 
+=head2 ui_list_constants
+
+  @names = ui_list_constants( $tag, ?$prefix );
+
+Returns a list of accepted names for the constants with the given
+C<$tag>.  These names are lower-case alternatives with underscores
+preserved and with underscores translated to hyphens.  The optional
+C<$prefix> strips a common literal constant-name prefix before aliases
+are generated.
+
+=head2 ui_coerce_constant
+
+  $value = ui_coerce_constant( $name, $tag, ?$prefix );
+
+Maps an accepted constant name alias (see L</ui_list_constants>) to
+the constant's value, returning unknown values unchanged.
+
+=head2 ui_assert_coerce_constant
+
+  $value = ui_assert_coerce_constant( $name, $tag, ?$prefix );
+
+Performs the same coercion as L</ui_coerce_constant>, but throws an
+exception for unknown values.
+
 =begin idocs
 
 =sub add_constant_to_tag( $tag, $name, \@values, $caller )
@@ -1397,10 +1448,99 @@ or directly
 
 =end idocs
 
-=head1 BUGS
+=head1 EXPORTS
+
+B<CXC::Exporter::Util> supports the following export tags
+
+=over
+
+=item all I<DEPRECATED>
+
+  install_EXPORTS
+  install_CONSTANTS
+  install_constant_tag
+  install_constant_func
+
+Use of the C<all> tag is deprecated. Due to backwards compatibility
+issues, it does not actually import all of B<CXC::Exporter::Util>'s
+symbols.  Use the other tags instead.
+
+=item default, exports
+
+  install_EXPORTS
+
+These are synonymous:
+
+  use CXC::Exporter::Util;
+  use CXC::Exporter::Util ':default';
+  use CXC::Exporter::Util ':exports';
+
+=item constants
+
+  install_EXPORTS
+  install_CONSTANTS
+
+=item utils
+
+  install_constant_tag
+  install_constant_func
+
+=item ui_helpers
+
+  ui_list_constants
+  ui_coerce_constant
+  ui_assert_coerce_constant
+
+=back
+
+=head1 BUGS AND INCOMPATIBILITIES
+
+=over
+
+=item *
 
 No attempt is made to complain if enumerating functions' names clash
 with constant function names.
+
+=item *
+
+L<namespace::clean>
+
+The L</UI Helpers> routines are exported into your module, and are
+made available for import by users of your module when they request
+them directly or via the C<ui_helpers> tag.
+
+When your module uses L<namespace::clean>, it's important not to scrub
+the UI helpers from your module's namespace.  For example,
+
+  package Broken {
+    use parent 'Exporter::Tiny';
+    use CXC::Exporter::Util ':constants', ':ui_helpers';
+    use namespace::clean;
+    ...
+  }
+
+  package Use::Broken {
+    use Foo ':ui_helpers';
+  }
+
+will fail because the UI helpers have been removed from C<Broken>'s
+namespace, while this works:
+
+  package Working {
+    use parent 'Exporter::Tiny';
+    use CXC::Exporter::Util ':constants';
+    use namespace::clean;
+    use CXC::Exporter::Util ':ui_helpers';
+
+    ...
+  }
+
+  package Use::Working {
+    use Foo ':ui_helpers';
+  }
+
+=back
 
 =head1 EXAMPLES
 

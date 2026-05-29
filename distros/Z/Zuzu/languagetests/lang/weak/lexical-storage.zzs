@@ -1,0 +1,106 @@
+from test/more import *;
+
+class Owner {
+	let label with get;
+}
+
+function make_owner ( String label ) {
+	return new Owner( label: label );
+}
+
+function weak_after_scope () {
+	let saved but weak;
+	{
+		let owner := make_owner("temporary");
+		saved := owner;
+		is( saved.get_label(), "temporary", "weak lexical reads live referent" );
+	}
+	return saved;
+}
+
+function weak_declaration_precedence_after_scope () {
+	let saved := make_owner("first") but weak;
+	{
+		let owner := make_owner("second");
+		saved := owner;
+		is(
+			saved.get_label(),
+			"second",
+			"let assignment weak declaration reads live later referent",
+		);
+	}
+	return saved;
+}
+
+function one_write_after_scope () {
+	let saved := null;
+	{
+		let owner := make_owner("temporary");
+		saved := owner but weak;
+		is(
+			saved.get_label(),
+			"temporary",
+			"one-off weak assignment reads live scoped referent",
+		);
+	}
+	return saved;
+}
+
+function strong_after_one_write_scope () {
+	let saved := null;
+	{
+		let owner := make_owner("temporary");
+		saved := owner but weak;
+	}
+	{
+		let owner := make_owner("strong");
+		saved := owner;
+		is(
+			saved.get_label(),
+			"strong",
+			"plain assignment after one-off weak write is live",
+		);
+	}
+	return saved;
+}
+
+let first := make_owner("first");
+let second := make_owner("second");
+let current := first but weak;
+
+is( current.get_label(), "first", "weak declaration initializer reads live value" );
+current := second;
+is( current.get_label(), "second", "inherently weak lexical remains weak after plain reassignment" );
+is(
+	weak_declaration_precedence_after_scope(),
+	null,
+	"let assignment weak declaration stays weak after later plain assignment",
+);
+
+let one_write := null;
+one_write := first but weak;
+is( one_write.get_label(), "first", "one-off weak assignment reads live value" );
+one_write := second;
+is( one_write.get_label(), "second", "later plain assignment to strong storage remains strong" );
+is( one_write_after_scope(), null, "one-off weak assignment dies after scope" );
+isnt(
+	strong_after_one_write_scope(),
+	null,
+	"later plain assignment after one-off weak write remains strong after scope",
+);
+
+let scalar_slot but weak;
+scalar_slot := true;
+is( scalar_slot, true, "Boolean scalar stores normally in weak storage" );
+scalar_slot := 42;
+is( scalar_slot, 42, "Number scalar stores normally in weak storage" );
+scalar_slot := "text";
+is( scalar_slot, "text", "String scalar stores normally in weak storage" );
+scalar_slot := to_binary("bytes");
+is( to_string(scalar_slot), "bytes", "BinaryString scalar stores normally in weak storage" );
+scalar_slot := null;
+is( scalar_slot, null, "null stores normally in weak storage" );
+
+is( weak_after_scope(), null, "dead weak lexical reads as null" );
+
+done_testing();

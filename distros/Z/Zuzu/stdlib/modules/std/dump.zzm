@@ -1,0 +1,317 @@
+=encoding utf8
+
+=head1 NAME
+
+std/dump - Structured value dumper for ZuzuScript.
+
+=head1 SYNOPSIS
+
+  from std/dump import Dumper;
+
+  let text := Dumper.dump(
+    { nums: [ 1, 2, 3 ] },
+    { pretty: true, sort_keys: true }
+  );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module provides a pure-Zuzu C<Dumper> class which serializes
+Zuzu values into code-like text.
+
+If a value cannot be realistically dumped (for example a function),
+C<Dumper> emits a warning and inserts C<null> in that location.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<Dumper>
+
+Pure-Zuzu structured value dumper.
+
+=over
+
+=item C<< Dumper.dump(value, options?) >>
+
+Parameters: C<value> is any ZuzuScript value and C<options> is an
+optional dictionary. Returns: C<String>. Serializes C<value> into
+code-like text.
+
+=back
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/dump >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/internals import class_name, object_slots, ansi_esc, ref_id;
+from std/string import join, substr;
+
+let _ANSI_RESET := ansi_esc() _ "[0m";
+let _ANSI_NUMBER := ansi_esc() _ "[33m";
+let _ANSI_STRING := ansi_esc() _ "[32m";
+let _ANSI_BOOL := ansi_esc() _ "[35m";
+let _ANSI_NULL := ansi_esc() _ "[90m";
+let _ANSI_PUNC := ansi_esc() _ "[36m";
+let _ANSI_KEYWORD := ansi_esc() _ "[34m";
+
+function _is_true (value) {
+	return value ? true: false;
+}
+
+function _warn_unless_quiet ( String msg, Dict cfg ) {
+	warn msg if not cfg{quiet};
+}
+
+function _indent_pad ( depth, cfg ) {
+	return "" if not cfg{pretty};
+	let out := "";
+	let i := 0;
+	while ( i < depth ) {
+		out _= "  ";
+		i++;
+	}
+
+	return out;
+}
+
+function _colourize ( String text, String tone, Dict cfg ) {
+	return text if not cfg{colour};
+	return tone _ text _ _ANSI_RESET;
+}
+
+function _punc ( String text, Dict cfg ) {
+	return _colourize( text, _ANSI_PUNC, cfg );
+}
+
+function _quote ( String text, Dict cfg ) {
+	let s := text;
+	s := "" if s ≡ null;
+	let out := "";
+	let i := 0;
+	let n := length s;
+
+	while ( i < n ) {
+		let ch := substr( s, i, 1 );
+		if ( ch ≡ "\\" ) {
+			out _= "\\\\";
+		}
+		else if ( ch ≡ "\"" ) {
+			out _= "\\\"";
+		}
+		else if ( ch ≡ "\n" ) {
+			out _= "\\n";
+		}
+		else if ( ch ≡ "\r" ) {
+			out _= "\\r";
+		}
+		else if ( ch ≡ "\t" ) {
+			out _= "\\t";
+		}
+		else {
+			out _= ch;
+		}
+		i++;
+	}
+
+	return _colourize( "\"" _ out _ "\"", _ANSI_STRING, cfg );
+}
+
+function _keys_for ( Dict d, Dict cfg ) {
+	return cfg{sort_keys} ? d.sorted_keys(): d.keys();
+}
+
+function _null_literal ( Dict cfg ) {
+	return _colourize( "null", _ANSI_NULL, cfg );
+}
+
+function _seen_check_and_mark ( value, String label, Dict cfg, Dict state ) {
+	let id := ref_id(value);
+	if ( id ≢ null and state{seen}.exists(id) ) {
+		_warn_unless_quiet( "Dumper: recursive " _ label _ " detected; dumping null", cfg );
+		return true;
+	}
+	if ( id ≢ null ) {
+		state{seen}.set( id, true );
+	}
+
+	return false;
+}
+
+function _dump_value ( value, Dict cfg, Dict state, Number depth ) {
+	if ( value instanceof Null ) {
+		return _null_literal(cfg);
+	}
+	if ( value instanceof Boolean ) {
+		return _colourize( value ? "true": "false", _ANSI_BOOL, cfg );
+	}
+	if ( value instanceof Number ) {
+		return _colourize( "" _ value, _ANSI_NUMBER, cfg );
+	}
+	if ( value instanceof String ) {
+		return _quote( value, cfg );
+	}
+
+	if ( value instanceof Array ) {
+		return _null_literal(cfg) if _seen_check_and_mark( value, "array", cfg, state );
+		if ( value.length() ≡ 0 ) {
+			return _punc( "[", cfg ) _ _punc( "]", cfg );
+		}
+		let pretty := cfg{pretty};
+		let sep := pretty ? _punc( ",\n", cfg ): _punc(",", cfg );
+		let parts := [];
+		for ( let item in value ) {
+			parts.push( _dump_value( item, cfg, state, depth + 1 ) );
+		}
+		if ( not pretty ) {
+			return _punc( "[", cfg ) _ join( sep, parts ) _ _punc( "]", cfg );
+		}
+		let inner := [];
+		for ( let p in parts ) {
+			inner.push( _indent_pad( depth + 1, cfg ) _ p );
+		}
+		return _punc( "[\n", cfg ) _ join( sep, inner ) _ _punc( "\n", cfg ) _ _indent_pad( depth, cfg ) _
+		    _punc( "]", cfg );
+	}
+
+	if ( value instanceof Dict ) {
+		return _null_literal(cfg) if _seen_check_and_mark( value, "dict", cfg, state );
+		let keys := _keys_for( value, cfg );
+		if ( keys.length() ≡ 0 ) {
+			return _punc( "{" , cfg ) _ _punc( "}", cfg );
+		}
+		let pretty := cfg{pretty};
+		let sep := pretty ? _punc( ",\n", cfg ): _punc(",", cfg );
+		let colon := pretty ? _punc( ": ", cfg ): _punc(":", cfg );
+		let entries := [];
+		for ( let key in keys ) {
+			let dumped := _dump_value( value.get(key), cfg, state, depth + 1 );
+			entries.push( _quote( key, cfg ) _ colon _ dumped );
+		}
+		if ( not pretty ) {
+			return _punc( "{" , cfg ) _ join( sep, entries ) _ _punc( "}", cfg );
+		}
+		let inner := [];
+		for ( let e in entries ) {
+			inner.push( _indent_pad( depth + 1, cfg ) _ e );
+		}
+		return _punc( "{\n", cfg ) _ join( sep, inner ) _ _punc( "\n", cfg ) _ _indent_pad( depth, cfg ) _
+		    _punc( "}", cfg );
+	}
+
+	if ( value instanceof PairList ) {
+		return _null_literal(cfg) if _seen_check_and_mark( value, "pairlist", cfg, state );
+		if ( value.empty ) {
+			return _punc( "{{" , cfg ) _ _punc( "}}", cfg );
+		}
+		let pretty := cfg{pretty};
+		let sep := pretty ? _punc( ",\n", cfg ): _punc(",", cfg );
+		let colon := pretty ? _punc( ": ", cfg ): _punc(":", cfg );
+		let entries := [];
+		value.for_each_pair( function (p) {
+			let dumped := _dump_value( p.value, cfg, state, depth + 1 );
+			entries.push( _quote( p.key, cfg ) _ colon _ dumped );
+		} );
+		if ( not pretty ) {
+			return _punc( "{{" , cfg ) _ join( sep, entries ) _ _punc( "}}", cfg );
+		}
+		let inner := [];
+		for ( let e in entries ) {
+			inner.push( _indent_pad( depth + 1, cfg ) _ e );
+		}
+		return _punc( "{{\n", cfg ) _ join( sep, inner ) _ _punc( "\n", cfg ) _ _indent_pad( depth, cfg ) _
+		    _punc( "}}", cfg );
+	}
+
+	if ( value instanceof Set or value instanceof Bag ) {
+		let is_set := value instanceof Set;
+		return _null_literal(cfg)
+			if _seen_check_and_mark( value, is_set ? "set" : "bag", cfg, state );
+		let left := is_set ? "<<": "<<<";
+		let right := is_set ? ">>": ">>>";
+		let sep := cfg{pretty} ? _punc( ", ", cfg ): _punc(",", cfg );
+		let items := [];
+		for ( let item in value ) {
+			items.push( _dump_value( item, cfg, state, depth + 1 ) );
+		}
+		return _punc( left, cfg ) _ join( sep, items ) _ _punc( right, cfg );
+	}
+
+	if ( value instanceof Pair ) {
+		let pair_value := value{pair};
+		if ( not( pair_value instanceof Array ) or pair_value.length() < 2 ) {
+			_warn_unless_quiet( "Dumper: invalid Pair shape; using null", cfg );
+			return _null_literal(cfg);
+		}
+		let first := _dump_value( pair_value[0], cfg, state, depth + 1 );
+		let second := _dump_value( pair_value[1], cfg, state, depth + 1 );
+		let body := _punc( "[", cfg ) _ first _ _punc(",", cfg ) _ second _ _punc( "]", cfg );
+		let kw_new := _colourize( "new", _ANSI_KEYWORD, cfg );
+		return kw_new _ " Pair" _ _punc("(", cfg ) _ "pair" _ _punc(":", cfg ) _ body _ _punc(")", cfg );
+	}
+
+	if (
+		value instanceof Function or
+		value instanceof Class or
+		typeof value ≡ "Regexp" or
+		typeof value ≡ "Method"
+	) {
+		let t := typeof value;
+		_warn_unless_quiet( "Dumper: value of type '" _ t _ "' is not dumpable; using null", cfg, );
+		return _null_literal(cfg);
+	}
+	return _null_literal(cfg) if _seen_check_and_mark( value, "object", cfg, state );
+	let cname := class_name(value);
+	let slots := object_slots(value);
+	if ( cname ≡ null or not( slots instanceof Dict ) ) {
+		_warn_unless_quiet( "Dumper: object internals unavailable; dumping null", cfg );
+		return _null_literal(cfg);
+	}
+	let keys := _keys_for( slots, cfg );
+	let colon := cfg{pretty} ? _punc( ": ", cfg ): _punc(":", cfg );
+	let args := [];
+	for ( let key in keys ) {
+		args.push( key _ colon _ _dump_value( slots.get(key), cfg, state, depth + 1 ) );
+	}
+	let kw_new := _colourize( "new", _ANSI_KEYWORD, cfg );
+	if ( args.length() ≡ 0 ) {
+		return kw_new _ " " _ cname _ _punc( "()", cfg );
+	}
+	if ( not cfg{pretty} ) {
+		return kw_new _ " " _ cname _ _punc("(", cfg ) _ join( _punc(",", cfg ), args ) _ _punc(")", cfg );
+	}
+	let inner := [];
+	for ( let arg in args ) {
+		inner.push( _indent_pad( depth + 1, cfg ) _ arg );
+	}
+	return kw_new _ " " _ cname _ _punc( "(\n", cfg ) _ join( _punc( ",\n", cfg ), inner ) _ _punc( "\n",
+	    cfg ) _ _indent_pad( depth, cfg ) _ _punc(")", cfg );
+}
+
+class Dumper {
+
+	static method dump ( value, options? ) {
+		let cfg := { pretty: false, sort_keys: false, colour: false, quiet: false };
+		if ( options instanceof Dict ) {
+			cfg{pretty} := _is_true( options{pretty} ) if "pretty" in options;
+			cfg{sort_keys} := _is_true( options{sort_keys} ) if "sort_keys" in options;
+			cfg{colour} := _is_true( options{colour} ) if "colour" in options;
+			cfg{quiet} := _is_true( options{quiet} ) if "quiet" in options;
+		}
+		return _dump_value( value, cfg, { seen: {} }, 0 );
+	}
+
+}

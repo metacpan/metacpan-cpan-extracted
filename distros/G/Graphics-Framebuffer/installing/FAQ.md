@@ -20,7 +20,7 @@
 
    If you install the EFI version of Linux, then no need to modify Grub.
 
-   Note:  You can only have this module in emulation mode on MS Windows
+   Note:  You can only have this module in emulation mode natively on MS Windows
 
 ![Divider](../pics/pink.jpg?raw=true "Divider")
 

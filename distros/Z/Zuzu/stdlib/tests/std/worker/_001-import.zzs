@@ -1,0 +1,8 @@
+from test/more import *;
+from test/worker_contract import require_worker_phase;
+
+let Worker := require_worker_phase(1);
+
+ok( Worker can "spawn", "Worker exposes spawn" );
+
+done_testing();

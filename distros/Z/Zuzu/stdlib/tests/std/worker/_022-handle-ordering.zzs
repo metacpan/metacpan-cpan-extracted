@@ -1,0 +1,51 @@
+from test/more import *;
+from test/worker_contract import require_worker;
+
+let Worker := require_worker();
+
+if ( not( Worker can "spawn_handle" ) ) {
+	skip_all( "Worker.spawn_handle is unavailable" );
+}
+
+async function main () {
+	let handle := Worker.spawn_handle(
+		async function ( inbox ) {
+			let first := await {
+				inbox.recv();
+			};
+			let second := await {
+				inbox.recv();
+			};
+			await {
+				inbox.send( second );
+			};
+			await {
+				inbox.send( first );
+			};
+			inbox.close();
+			return [ first, second ];
+		},
+		[],
+	);
+
+	await {
+		handle.send("one");
+	};
+	await {
+		handle.send("two");
+	};
+
+	is( await { handle.recv(); }, "two", "worker reply FIFO first item" );
+	is( await { handle.recv(); }, "one", "worker reply FIFO second item" );
+	is(
+		await { handle.result(); },
+		[ "one", "two" ],
+		"worker sees parent messages in FIFO order",
+	);
+}
+
+await {
+	main();
+};
+
+done_testing();

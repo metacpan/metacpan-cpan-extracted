@@ -1,0 +1,63 @@
+=encoding utf8
+
+=head1 NAME
+
+std/eval - Evaluate Zuzu code in a nested caller scope.
+
+=head1 SYNOPSIS
+
+  from std/eval import eval;
+
+  let x := 2;
+  let y := eval("x + 40;");
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module exports C<eval(str)>, which parses and runs C<str>
+as Zuzu code using the current runtime configuration. The evaluated
+code runs in a fresh nested scope whose parent is the caller's scope.
+It can read and update mutable symbols that already exist in the caller,
+but new declarations, functions, classes, and imports created by eval are
+local to the eval call and are not automatically visible to the caller.
+
+Optional named arguments can further reduce capabilities for the
+evaluated code:
+
+  eval("from std/io import Path;", deny_fs: true);
+
+Supported denials are C<deny_fs>, C<deny_net>, C<deny_perl>,
+C<deny_js>, C<deny_proc>, C<deny_db>, C<deny_clib>, C<deny_gui>, and
+C<deny_worker>.
+Existing runtime denials are always inherited; named denials only add to
+them. Passing a false denial value does not relax a denial from the
+runtime or an outer eval call.
+
+Syntax and runtime errors thrown while evaluating code are catchable as
+normal Zuzu exceptions. Compile exceptions expose eval source metadata,
+including C<message>, C<file>, C<line>, and C<code>.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item C<< eval(String source, ... PairList denials) >>
+
+Parameters: C<source> is ZuzuScript source text and C<denials> are
+optional named capability-denial flags. Returns: value. Parses and
+evaluates C<source> in a nested caller scope.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/eval >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.

@@ -1,4 +1,4 @@
-package iabtcfv2 0.520;
+package iabtcfv2 0.530;
 
 use v5.12;
 use warnings;

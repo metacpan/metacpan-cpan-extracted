@@ -19,7 +19,7 @@ use strict;
 use warnings;
 
 package App::PDFLibrarian::QueryDialog;
-$App::PDFLibrarian::QueryDialog::VERSION = '6.0.1';
+$App::PDFLibrarian::QueryDialog::VERSION = '6.0.2';
 use parent 'Exporter';
 
 use Carp;
@@ -27,6 +27,7 @@ use FindBin qw($Script);
 use Wx qw(:id);
 
 use App::PDFLibrarian;
+use App::PDFLibrarian::QueryDialog::impl;
 use App::PDFLibrarian::Util qw(unique_list);
 
 our @EXPORT_OK = qw(extract_query_values_from_pdf do_query_dialog);

@@ -1,0 +1,83 @@
+from test/more import *;
+
+class Holder {
+	let String label with get, set;
+}
+
+function holder ( String label ) {
+	return new Holder( label: label );
+}
+
+let array_holder := holder("array");
+let array_original := [ array_holder, "seed" ];
+let array_copy := array_original.copy();
+ok( array_copy instanceof Array, "Array.copy returns an Array" );
+is( array_copy, [ array_holder, "seed" ], "Array.copy preserves values" );
+array_copy.push("copy-only");
+is( array_original.length(), 2, "Array.copy creates a new outer collection" );
+array_copy[0].set_label("array-shared");
+is(
+	array_original[0].get_label(),
+	"array-shared",
+	"Array.copy is shallow",
+);
+
+let bag_holder := holder("bag");
+let bag_original := <<< bag_holder, "seed" >>>;
+let bag_copy := bag_original.copy();
+ok( bag_copy instanceof Bag, "Bag.copy returns a Bag" );
+ok( bag_copy.contains("seed"), "Bag.copy preserves scalar values" );
+ok( bag_copy.contains(bag_holder), "Bag.copy preserves object values" );
+bag_copy.add("copy-only");
+is( bag_original.contains("copy-only"), 0, "Bag.copy has independent outer storage" );
+bag_copy.to_Array().first( fn x -> x instanceof Holder ).set_label("bag-shared");
+is( bag_holder.get_label(), "bag-shared", "Bag.copy is shallow" );
+
+let set_holder := holder("set");
+let set_original := << set_holder, "seed" >>;
+let set_copy := set_original.copy();
+ok( set_copy instanceof Set, "Set.copy returns a Set" );
+ok( set_copy.contains("seed"), "Set.copy preserves scalar values" );
+ok( set_copy.contains(set_holder), "Set.copy preserves object values" );
+set_copy.add("copy-only");
+is( set_original.contains("copy-only"), 0, "Set.copy has independent outer storage" );
+set_copy.to_Array().first( fn x -> x instanceof Holder ).set_label("set-shared");
+is( set_holder.get_label(), "set-shared", "Set.copy is shallow" );
+
+let dict_holder := holder("dict");
+let dict_original := { holder: dict_holder, seed: "value" };
+let dict_copy := dict_original.copy();
+ok( dict_copy instanceof Dict, "Dict.copy returns a Dict" );
+is( dict_copy{"seed"}, "value", "Dict.copy preserves scalar values" );
+is( dict_copy{"holder"}, dict_holder, "Dict.copy preserves object values" );
+dict_copy.set( "copy-only", true );
+is( dict_original.has("copy-only"), 0, "Dict.copy has independent outer storage" );
+dict_copy{"holder"}.set_label("dict-shared");
+is( dict_holder.get_label(), "dict-shared", "Dict.copy is shallow" );
+
+let pairs_holder := holder("pairs");
+let pairs_original := {{ holder: pairs_holder, dup: 1, dup: 2, seed: "value" }};
+let pairs_copy := pairs_original.copy();
+ok( pairs_copy instanceof PairList, "PairList.copy returns a PairList" );
+is(
+	pairs_copy.keys(),
+	[ "holder", "dup", "dup", "seed" ],
+	"PairList.copy preserves pair order",
+);
+is(
+	pairs_copy.get_all("dup"),
+	[ 1, 2 ],
+	"PairList.copy preserves duplicate keys",
+);
+is( pairs_copy{"seed"}, "value", "PairList.copy preserves scalar values" );
+is( pairs_copy{"holder"}, pairs_holder, "PairList.copy preserves object values" );
+pairs_copy.add( "copy-only", true );
+is(
+	pairs_original.has("copy-only"),
+	0,
+	"PairList.copy has independent outer storage",
+);
+pairs_copy{"holder"}.set_label("pairs-shared");
+is( pairs_holder.get_label(), "pairs-shared", "PairList.copy is shallow" );
+
+done_testing();

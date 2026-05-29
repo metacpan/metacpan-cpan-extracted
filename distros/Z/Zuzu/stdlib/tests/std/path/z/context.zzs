@@ -1,0 +1,34 @@
+from std/path/z/context import Ctx;
+from std/path/z/node import Node;
+from test/more import *;
+
+let plain := { who: "Ada" };
+let c1 := new Ctx( root: plain );
+
+ok( c1.root() instanceof Node, "new wraps plain root into Node" );
+is( c1.nodeset().length(), 1, "nodeset starts with one item" );
+ok( c1.nodeset()[0] ≡ c1.root(), "nodeset[0] is root" );
+is( c1.parentset(), null, "parentset defaults to null" );
+is( c1.meta(){level}, 0, "meta defaults to level 0" );
+
+let root_node := Node.wrap( { n: 1 } );
+let c2 := new Ctx( root: root_node );
+ok( c2.root() ≡ root_node, "new keeps Node root as-is" );
+
+let ns := [ root_node ];
+let ps := [ c1.root() ];
+let c3 := c2.with_nodeset( ns, ps );
+
+ok( c3 ≢ c2, "with_nodeset returns a new context" );
+ok( c3.root() ≡ c2.root(), "with_nodeset preserves root" );
+ok( c3.nodeset() ≡ ns, "with_nodeset applies nodeset" );
+ok( c3.parentset() ≡ ps, "with_nodeset applies parentset" );
+ok( c3.meta() ≡ c2.meta(), "with_nodeset preserves meta" );
+
+let c4 := new Ctx( root: root_node, meta: { level: 4, tag: "x" } );
+let c5 := c4.nested();
+is( c5.meta(){level}, 5, "nested context increments level" );
+ok( not c5.meta().exists( "tag" ), "nested context meta only keeps level" );
+is( c4.meta(){level}, 4, "nested context does not mutate original meta" );
+
+done_testing();

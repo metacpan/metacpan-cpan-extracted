@@ -1,0 +1,147 @@
+=encoding utf8
+
+=head1 NAME
+
+std/path/z/context - Evaluation context used by std/path/z.
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module provides the pure-Zuzu evaluation context used by ZPath.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<< Ctx({ root, nodeset?, parentset?, meta? }) >>
+
+Constructs a ZPath evaluation context. Returns: C<Ctx>. Wraps C<root>
+as a C<std/path/z/node> C<Node> and stores the active node sets.
+
+=over
+
+=item C<< ctx.with_nodeset(ns, ps) >>
+
+Parameters: C<ns> is the next node set and C<ps> is the parent set.
+Returns: C<Ctx>. Returns a copy of the context with different node
+sets.
+
+=item C<< ctx.nested(extras?) >>
+
+Parameters: C<extras> is optional metadata. Returns: C<Ctx>. Returns a
+nested context with incremented metadata level.
+
+=item C<< ctx.root() >>
+
+Parameters: none. Returns: C<Node>. Returns the root node.
+
+=item C<< ctx.nodeset() >>
+
+Parameters: none. Returns: C<Array>. Returns the current node set.
+
+=item C<< ctx.parentset() >>
+
+Parameters: none. Returns: C<Array> or C<null>. Returns the parent node
+set.
+
+=item C<< ctx.meta() >>
+
+Parameters: none. Returns: C<Dict>. Returns context metadata.
+
+=back
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/path/z/context >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/path/z/node import Node;
+
+class Ctx {
+	let root := null;
+	let nodeset := null;
+	let parentset := null;
+	let meta := null;
+
+	method __build__ () {
+		if ( not ( root instanceof Node ) ) {
+			let root_obj := root;
+			let node_type := null;
+
+			try {
+				node_type := int( "" _ root_obj.nodeType() );
+			}
+			catch {
+			}
+
+			let xml_document := node_type = 9;
+			if ( not xml_document and root_obj can documentElement ) {
+				try {
+					root_obj.documentElement();
+					xml_document := true;
+				}
+				catch {
+				}
+			}
+
+			if ( xml_document ) {
+				try {
+					let de := root_obj.documentElement();
+					root_obj := de if de ≢ null;
+				}
+				catch {
+				}
+			}
+
+			root := Node.wrap( root_obj );
+		}
+
+		nodeset ?:= [ root ];
+		meta ?:= { level: 0 };
+	}
+
+	method with_nodeset ( ns, ps ) {
+		return new Ctx(
+			root: root,
+			nodeset: ns,
+			parentset: ps,
+			meta: meta,
+		);
+	}
+
+	method nested ( extras? ) {
+		let extra_meta := extras ?: {};
+
+		let next_meta := {
+			level: meta.get( "level", 0 ) + 1,
+		};
+
+		for ( let pair in extra_meta.enumerate ) {
+			next_meta.add( pair );
+		}
+
+		return new Ctx(
+			root: root,
+			nodeset: nodeset,
+			parentset: parentset,
+			meta: next_meta,
+		);
+	}
+
+	method root () { return root; }
+	method nodeset () { return nodeset; }
+	method parentset () { return parentset; }
+	method meta () { return meta; }
+}

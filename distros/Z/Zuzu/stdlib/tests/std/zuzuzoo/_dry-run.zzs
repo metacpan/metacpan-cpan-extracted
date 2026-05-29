@@ -1,0 +1,90 @@
+from test/more import *;
+
+requires_capability( "fs" );
+requires_capability( "proc" );
+
+from std/archive import Archive;
+from std/io import Path;
+from std/proc import Env;
+from std/zuzuzoo import Zuzuzoo;
+
+function ensure_dir ( path ) {
+	return true if path.exists();
+	let parent := path.parent();
+	ensure_dir(parent) if not parent.exists();
+	path.mkdir();
+	return true;
+}
+
+function root () {
+	let dir := Path.tempdir();
+	let lib := dir.child("lib");
+	let bin := dir.child("bin");
+	let meta := dir.child("meta");
+	ensure_dir(lib);
+	ensure_dir(bin);
+	ensure_dir(meta);
+	return {
+		dir_obj: dir,
+		lib_dir: lib.to_String(),
+		bin_dir: bin.to_String(),
+		meta_dir: meta.to_String(),
+		lib_obj: lib,
+		meta_obj: meta,
+	};
+}
+
+let archive := Path.tempfile();
+Archive.dump(
+	archive,
+	{
+		entries: [
+			{
+				path: "dry-run-app-1.0.0/zuzu-distribution.json",
+				data: to_binary(
+					"{\"name\":\"dry-run-app\",\"version\":\"1.0.0\"," _
+					"\"author\":\"Example\",\"license\":\"MIT\"}\n",
+				),
+			},
+			{
+				path: "dry-run-app-1.0.0/modules/dry/run.zzm",
+				data: to_binary("// dry run module\n"),
+			},
+			{
+				path: "dry-run-app-1.0.0/tests/fail.zzs",
+				data: to_binary(
+					"say \"not ok 1 - should not run\";\n" _
+					"say \"1..1\";\n",
+				),
+			},
+		],
+	},
+	"zip",
+);
+
+let target := root();
+let result := ( new Zuzuzoo(
+	lib_dir: target{lib_dir},
+	bin_dir: target{bin_dir},
+	meta_dir: target{meta_dir},
+	home: Path.tempdir().to_String(),
+	zuzu_command: ( new Path( path: Env.get( "ZUZU", "./bin/zuzu" ) ) ).to_String(),
+) ).install( archive.to_String(), { dry_run: true } );
+
+ok( result{ok}, "dry run returns ok" );
+ok( result{dry_run}, "dry run flag is returned" );
+is( result{tests}, [], "dry run does not run tests" );
+is( result{installs}, [], "dry run does not install" );
+like( result{plan_text}, /dry-run-app/, "dry run returns formatted plan" );
+is(
+	target{lib_obj}.child("dry").child("run.zzm").exists(),
+	false,
+	"dry run does not copy module",
+);
+is(
+	target{meta_obj}.child("dry-run-app-1.0.0.json").exists(),
+	false,
+	"dry run does not write metadata",
+);
+
+done_testing();

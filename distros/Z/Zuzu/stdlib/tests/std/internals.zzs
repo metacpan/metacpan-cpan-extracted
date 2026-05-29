@@ -1,0 +1,190 @@
+from test/more import *;
+from std/internals import
+	class_name,
+	classof,
+	object_slots,
+	ansi_esc,
+	ref_id,
+	make_instance,
+	setprop,
+	getprop,
+	setupperprop,
+	getupperprop,
+	load_module;
+class Thing {
+	let Number count := 7;
+}
+let x := new Thing();
+is( class_name(x), "Thing", "class_name returns object class name" );
+ok( classof(x) instanceof Class, "classof returns a Class value" );
+ok( classof(x) ≡ Thing, "classof returns object class" );
+is( typeof object_slots(x), "Dict", "object_slots returns dict for objects" );
+is( object_slots(x){count}, 7, "object_slots exposes public members" );
+ok( ref_id(x) ≢ null, "ref_id returns a value for object references" );
+is( class_name(123), null, "class_name returns null for non-objects" );
+is( classof(null), null, "classof returns null for null" );
+is( classof(123), null, "classof returns null for numbers" );
+is( classof("abc"), null, "classof returns null for strings" );
+is( classof(true), null, "classof returns null for booleans" );
+ok( classof([]) ≡ Array, "classof returns Array for arrays" );
+ok( classof({}) ≡ Dict, "classof returns Dict for dicts" );
+let internals_set_class := classof(<< >>);
+ok( internals_set_class instanceof Class, "classof returns a Class for sets" );
+ok(
+	new internals_set_class() instanceof Set,
+	"classof returns constructable Set class for sets",
+);
+ok( classof(<<< >>>) ≡ Bag, "classof returns Bag for bags" );
+ok(
+	classof(new PairList()) ≡ PairList,
+	"classof returns PairList for pairlists",
+);
+ok(
+	classof(new Pair(pair: [ "key", "value" ])) ≡ Pair,
+	"classof returns Pair for pairs",
+);
+is( length ansi_esc(), 1, "ansi_esc returns one character" );
+is( getprop("path-phase"), null, "getprop returns null for missing key" );
+setprop( "path-phase", "root" );
+if ( true ) {
+	is( getprop("path-phase"), "root", "nested block inherits props" );
+	setprop( "path-phase", "child" );
+	is( getprop("path-phase"), "child", "child scope can shadow value" );
+}
+is( getprop("path-phase"), "root", "parent scope is unchanged by child" );
+function set_myprop ( value, level := 1 ) {
+	setupperprop( level, "myprop", value );
+}
+is( getprop("myprop"), null, "myprop starts as null in current scope" );
+{
+	set_myprop(42);
+	is( getprop("myprop"), 42, "setupperprop writes caller scope by level" );
+}
+is( getprop("myprop"), null, "setupperprop did not leak outside block scope" );
+function get_myprop ( level := 1 ) {
+	return getupperprop( level, "myprop" );
+}
+{
+	setprop( "myprop", 99 );
+	is( get_myprop(1), 99, "getupperprop reads caller scope by level" );
+}
+like(
+	exception( function() {
+		setprop( 123, "bad" );
+	} ),
+	/getprop|setprop key must be String/,
+	"setprop rejects non-string keys"
+);
+let loaded_module := load_module( "test/internals_loader" );
+is( typeof loaded_module, "Dict", "load_module returns a Dict" );
+is( loaded_module{public_value}, 41, "load_module exposes public values" );
+is(
+	loaded_module{_secret_value},
+	99,
+	"load_module exposes underscore-prefixed values",
+);
+is(
+	loaded_module{public_add}( 2, 3 ),
+	5,
+	"load_module exposes public functions",
+);
+is(
+	loaded_module{_secret_add}( 1, 2 ),
+	102,
+	"load_module exposes underscore-prefixed functions",
+);
+is(
+	typeof loaded_module{LoaderProbe},
+	"Class",
+	"load_module exposes classes",
+);
+let loaded_add := load_module( "test/internals_loader", "public_add" );
+is( loaded_add( 4, 5 ), 9, "load_module can return one named symbol" );
+is(
+	load_module( "test/internals_loader", "_secret_value" ),
+	99,
+	"load_module can return one underscore-prefixed symbol",
+);
+like(
+	exception( function() {
+		load_module( "test/internals_loader", "missing_symbol" );
+	} ),
+	/no export|not export|missing/i,
+	"load_module throws for a missing symbol",
+);
+like(
+	exception( function() {
+		load_module( "test/internals_missing" );
+	} ),
+	/not found|cannot find|unable to resolve/i,
+	"load_module throws for a missing module",
+);
+__global__{internals_builds} := 0;
+class BuildProbe {
+	let Number value := 5;
+	let String label := "unset";
+
+	method __build__ () {
+		__global__{internals_builds} := __global__{internals_builds} + 1;
+		value := value + 10;
+	}
+
+	method describe () {
+		return label _ ":" _ value;
+	}
+}
+let built := new BuildProbe( label: "new" );
+is( __global__{internals_builds}, 1, "new calls __build__" );
+is( built.describe(), "new:15", "__build__ can mutate normal instances" );
+let raw := make_instance( BuildProbe, { value: 7, label: "raw" } );
+is( __global__{internals_builds}, 1, "make_instance skips __build__" );
+is( class_name(raw), "BuildProbe", "make_instance returns an instance" );
+is( raw.describe(), "raw:7", "make_instance installs slot values" );
+let defaulted := make_instance(BuildProbe);
+is( __global__{internals_builds}, 1, "make_instance without slots skips __build__" );
+is( defaulted.describe(), "unset:5", "make_instance keeps field defaults" );
+__global__{internals_parent_builds} := 0;
+__global__{internals_child_builds} := 0;
+class BuildParent {
+	let Number parent_value := 2;
+
+	method __build__ () {
+		__global__{internals_parent_builds} :=
+			__global__{internals_parent_builds} + 1;
+		parent_value := parent_value + 100;
+	}
+}
+class BuildChild extends BuildParent {
+	let Number child_value := 3;
+
+	method __build__ () {
+		__global__{internals_child_builds} :=
+			__global__{internals_child_builds} + 1;
+		child_value := child_value + 1000;
+	}
+
+}
+let inherited := make_instance(
+	BuildChild,
+	{
+		parent_value: 4,
+		child_value: 6,
+	},
+);
+is(
+	__global__{internals_parent_builds},
+	0,
+	"make_instance skips inherited __build__ hooks",
+);
+is(
+	__global__{internals_child_builds},
+	0,
+	"make_instance skips subclass __build__ hooks",
+);
+let inherited_slots := object_slots(inherited);
+is(
+	inherited_slots{parent_value} + inherited_slots{child_value},
+	10,
+	"make_instance initializes inherited fields",
+);
+done_testing();

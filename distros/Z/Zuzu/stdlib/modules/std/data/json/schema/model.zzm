@@ -1,0 +1,255 @@
+=encoding utf8
+
+=head1 NAME
+
+std/data/json/schema/model - JSON value projection helpers.
+
+=head1 SYNOPSIS
+
+  from std/data/json/schema/model import
+    jschema_is_object,
+    jschema_object_get,
+    jschema_type_name;
+
+  if ( jschema_is_object(value) ) {
+    say( jschema_object_get( value, "title", "(untitled)" ) );
+  }
+
+  say( jschema_type_name(value) );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This Pure Zuzu module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module adapts native Zuzu collection types to the JSON data model used
+by the JSON Schema validator. It is mostly an implementation helper, but its
+functions are exported so related schema tools can share the same treatment
+of objects, arrays, and pointer locations.
+
+C<Dict> and C<PairList> are object-like. C<PairList> preserves duplicate
+keys through C<jschema_object_get_all> and C<jschema_object_entries>. C<Array>
+is ordered array-like. C<Set> and C<Bag> are unordered array-like; they can
+be used for array keywords where order does not matter.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item C<< jschema_is_object( value ) >>
+
+Returns true for C<Dict> and C<PairList>.
+
+=item C<< jschema_is_ordered_array( value ) >>
+
+Returns true for C<Array>.
+
+=item C<< jschema_is_unordered_array( value ) >>
+
+Returns true for C<Set> and C<Bag>.
+
+=item C<< jschema_is_arrayish( value ) >>
+
+Returns true for ordered and unordered array-like values.
+
+=item C<< jschema_type_name( value ) >>
+
+Returns the JSON Schema type name for C<value>: C<null>, C<boolean>,
+C<number>, C<string>, C<array>, C<object>, or C<unknown>.
+
+=item C<< jschema_type_matches( value, expected ) >>
+
+Returns true when C<value> matches the JSON Schema type named by
+C<expected>. C<integer> is accepted for numbers with no fractional part.
+
+=item C<< jschema_object_has( object, key ) >>
+
+Returns true when an object-like value contains C<key>.
+
+=item C<< jschema_object_get( object, key, fallback := null ) >>
+
+Returns the value for C<key>, or C<fallback> when it is missing.
+
+=item C<< jschema_object_get_all( object, key ) >>
+
+Returns all values for C<key>. For C<Dict>, the result has either one value
+or none. For C<PairList>, duplicate keys are preserved.
+
+=item C<< jschema_object_keys( object ) >>
+
+Returns object keys, preserving the underlying collection's key behaviour.
+
+=item C<< jschema_object_unique_keys( object ) >>
+
+Returns object keys with duplicates removed.
+
+=item C<< jschema_object_entries( object ) >>
+
+Returns an array of C<[ key, value ]> pairs.
+
+=item C<< jschema_array_items( value ) >>
+
+Returns the array items for an array-like value. Unordered collections are
+converted with C<to_Array()>.
+
+=item C<< jschema_array_length( value ) >>
+
+Returns the length of an array-like value, or zero for other values.
+
+=item C<< jschema_pointer_escape( token ) >>
+
+Escapes a JSON Pointer token by replacing C<~> and C</>.
+
+=item C<< jschema_pointer_join( base, step ) >>
+
+Appends C<step> to a JSON Pointer path.
+
+=item C<< jschema_deep_equal( left, right ) >>
+
+Compares two values using ZuzuScript equality. The validator uses this for
+C<const>, C<enum>, and uniqueness checks.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/data/json/schema/model >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/string import replace;
+
+function jschema_is_object ( value ) {
+	return value instanceof Dict or value instanceof PairList;
+}
+
+function jschema_is_ordered_array ( value ) {
+	return value instanceof Array;
+}
+
+function jschema_is_unordered_array ( value ) {
+	return value instanceof Set or value instanceof Bag;
+}
+
+function jschema_is_arrayish ( value ) {
+	return jschema_is_ordered_array(value)
+		or jschema_is_unordered_array(value);
+}
+
+function jschema_type_name ( value ) {
+	if ( value ≡ null ) { return "null"; }
+	if ( value instanceof Boolean ) { return "boolean"; }
+	if ( value instanceof Number ) { return "number"; }
+	if ( value instanceof String or value instanceof BinaryString ) {
+		return "string";
+	}
+	if ( jschema_is_arrayish(value) ) { return "array"; }
+	if ( jschema_is_object(value) ) { return "object"; }
+	return "unknown";
+}
+
+function jschema_type_matches ( value, String expected ) {
+	switch ( expected : eq ) {
+		case "null":    return value ≡ null;
+		case "boolean": return value instanceof Boolean;
+		case "number":  return value instanceof Number;
+		case "integer": return value instanceof Number and floor(value) == value;
+		case "string":
+			return value instanceof String or value instanceof BinaryString;
+		case "array":   return jschema_is_arrayish(value);
+		case "object":  return jschema_is_object(value);
+	}
+	return false;
+}
+
+function jschema_object_has ( object, String key ) {
+	if ( object instanceof Dict or object instanceof PairList ) {
+		for ( let existing in object.keys() ) {
+			if ( existing eq key ) { return true; }
+		}
+	}
+	return false;
+}
+
+function jschema_object_get ( object, String key, fallback := null ) {
+	if ( object instanceof Dict or object instanceof PairList ) {
+		return jschema_object_has(object, key) ? object.get(key) : fallback;
+	}
+	return fallback;
+}
+
+function jschema_object_get_all ( object, String key ) {
+	if ( object instanceof Dict ) {
+		return jschema_object_has(object, key) ? [ object.get(key) ] : [];
+	}
+	if ( object instanceof PairList ) {
+		return object.get_all(key);
+	}
+	return [];
+}
+
+function jschema_object_keys ( object ) {
+	if ( object instanceof Dict or object instanceof PairList ) {
+		return object.keys();
+	}
+	return [];
+}
+
+function jschema_object_unique_keys ( object ) {
+	let out := [];
+	for ( let key in jschema_object_keys(object) ) {
+		if ( not( key in out ) ) {
+			out.push(key);
+		}
+	}
+	return out;
+}
+
+function jschema_object_entries ( object ) {
+	let out := [];
+	if ( object instanceof Dict ) {
+		for ( let key in object.keys() ) {
+			out.push( [ key, object.get(key) ] );
+		}
+	}
+	else if ( object instanceof PairList ) {
+		for ( let pair in object.to_Array() ) {
+			out.push( [ pair.key, pair.value ] );
+		}
+	}
+	return out;
+}
+
+function jschema_array_items ( value ) {
+	if ( value instanceof Array ) { return value; }
+	if ( value instanceof Set or value instanceof Bag ) {
+		return value.to_Array();
+	}
+	return [];
+}
+
+function jschema_array_length ( value ) {
+	if ( jschema_is_arrayish(value) ) { return value.length(); }
+	return 0;
+}
+
+function jschema_pointer_escape ( String token ) {
+	return token
+		▷ replace( ^^, "~", "~0", "g" )
+		▷ replace( ^^, "/", "~1", "g" );
+}
+
+function jschema_pointer_join ( String base, step ) {
+	return base _ "/" _ jschema_pointer_escape("" _ step);
+}
+
+function jschema_deep_equal ( left, right ) {
+	return left == right;
+}

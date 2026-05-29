@@ -1,0 +1,480 @@
+#!/usr/bin/env zuzu
+
+from std/getopt import Getopt;
+from std/io import Path, STDERR, STDOUT;
+from std/proc import Env, Proc;
+from std/string import join, starts_with;
+from std/tui import readline;
+from std/zuzuzoo import Zuzuzoo;
+
+function _usage () {
+	return join( "\n", [
+		"Usage:",
+		"  zuzuzoo install [options] TARGET...",
+		"  zuzuzoo remove [options] TARGET...",
+		"  zuzuzoo remove --dist NAME...",
+		"  zuzuzoo list [options]",
+		"  zuzuzoo query [options] MODULE",
+		"  zuzuzoo query --dist NAME",
+		"  zuzuzoo verify [options] MODULE...",
+		"  zuzuzoo verify --dist NAME...",
+		"  zuzuzoo latest [options] MODULE",
+		"  zuzuzoo help",
+		"",
+		"Options:",
+		"  --dry-run       show the plan without changing files",
+		"  --force         continue install when packaged tests fail",
+		"  --no-test       skip packaged tests during install",
+		"  --global        install to the global Zuzu root",
+		"  --lib-dir DIR   override the module installation directory",
+		"  --bin-dir DIR   override the script installation directory",
+		"  --meta-dir DIR  override the metadata directory",
+		"  --cache-dir DIR cache downloaded archives in DIR",
+		"  --lock-timeout SECONDS",
+		"                 fail if the install/remove lock is not acquired",
+		"  --quiet        suppress install/latest progress messages",
+		"  --dist          resolve targets as distribution names",
+		"  --json          print machine-readable JSON where supported",
+		"  --yes           confirm removal without prompting",
+	] ) _ "\n";
+}
+
+function _is_command ( value ) {
+	return (
+		value eq "install" or
+		value eq "remove" or
+		value eq "list" or
+		value eq "query" or
+		value eq "verify" or
+		value eq "latest" or
+		value eq "help"
+	);
+}
+
+function _has_option ( options, key ) {
+	return options.exists(key) and options.get(key);
+}
+
+function _tail ( items ) {
+	let out := [];
+	let i := 1;
+	while ( i < items.length() ) {
+		out.push(items[i]);
+		i++;
+	}
+	return out;
+}
+
+function _zuzu_command () {
+	let configured := Env.get("ZUZU_COMMAND");
+	return configured if configured != null and configured ne "";
+
+	let repo_zuzu := new Path("bin/zuzu");
+	return repo_zuzu.absolute().to_String()
+		if repo_zuzu.exists() and repo_zuzu.is_file();
+
+	return "zuzu";
+}
+
+function _operation_options ( options ) {
+	let out := {
+		zuzu_command: _zuzu_command(),
+	};
+
+	out.add( "dry_run", true ) if _has_option( options, "dry-run" );
+	out.add( "force", true ) if _has_option( options, "force" );
+	out.add( "no_test", true ) if _has_option( options, "no-test" );
+	out.add( "global", true ) if _has_option( options, "global" );
+	out.add( "dist", true ) if _has_option( options, "dist" );
+	out.add( "base_url", options.get("base-url") )
+		if options.exists("base-url");
+	out.add( "lib_dir", options.get("lib-dir") )
+		if options.exists("lib-dir");
+	out.add( "bin_dir", options.get("bin-dir") )
+		if options.exists("bin-dir");
+	out.add( "meta_dir", options.get("meta-dir") )
+		if options.exists("meta-dir");
+	out.add( "cache_dir", options.get("cache-dir") )
+		if options.exists("cache-dir");
+	out.add( "lock_timeout", options.get("lock-timeout") )
+		if options.exists("lock-timeout");
+	out.add( "progress", true )
+		if not _has_option( options, "quiet" );
+
+	return out;
+}
+
+function _looks_like_install_target ( target ) {
+	let text := "" _ target;
+	return true if starts_with( text, "http://" );
+	return true if starts_with( text, "https://" );
+	return true if text ~ /\.(?:tar|tar\.gz|tgz)$/;
+	return true if text ~ /\//;
+
+	let path := new Path(text);
+	return path.exists();
+}
+
+function _valid_implicit_install ( targets ) {
+	return false if targets.length() == 0;
+	for ( let target in targets ) {
+		return false if not _looks_like_install_target(target);
+	}
+	return true;
+}
+
+function _invalid_with_command ( command, options ) {
+	if ( _has_option( options, "dist" ) ) {
+		return "--dist is only valid with remove, query, and verify"
+			if command ne "remove" and command ne "query" and
+				command ne "verify";
+	}
+	if ( _has_option( options, "json" ) ) {
+		return "--json is only valid with list, query, verify, and latest"
+			if command ne "list" and command ne "query" and
+				command ne "verify" and command ne "latest";
+	}
+	if ( _has_option( options, "yes" ) ) {
+		return "--yes is only valid with remove"
+			if command ne "remove";
+	}
+	return null;
+}
+
+function _print_test_output ( result ) {
+	for ( let dist_result in result.get( "tests", [] ) ) {
+		for ( let test_result in dist_result{tests} ) {
+			STDOUT.print(test_result{stdout})
+				if test_result{stdout} ne "";
+			STDERR.print(test_result{stderr})
+				if test_result{stderr} ne "";
+		}
+	}
+}
+
+function _run_install ( zoo, targets, options, raw_options ) {
+	if ( targets.length() == 0 ) {
+		STDERR.say("install requires at least one target");
+		return 2;
+	}
+
+	options.add( "print_plan", true );
+	let result := zoo.install( targets, options );
+	_print_test_output(result);
+
+	if ( not result{ok} ) {
+		STDERR.say(result.get( "error", "install failed" ));
+		return 1;
+	}
+
+	if ( result.get( "forced", false ) ) {
+		say("Test failures ignored due to --force");
+	}
+
+	say( result{dry_run} ? "Dry run complete" : "Install complete" );
+	return 0;
+}
+
+function _confirmed_remove () {
+	let answer := readline(
+		"Remove the planned files? [y/N] ",
+		"n",
+		null,
+	);
+	return ( "" _ answer ) ~ /^(?:y|yes)$/i;
+}
+
+function _run_remove ( zoo, targets, options, raw_options ) {
+	if ( targets.length() == 0 ) {
+		STDERR.say("remove requires at least one target");
+		return 2;
+	}
+
+	let lock := zoo.acquire_lock( "remove", options );
+	try {
+		let locked_options := options;
+		locked_options.set( "lock", false );
+		let plan := zoo.plan_remove( targets, locked_options );
+		STDOUT.print( zoo.format_remove_plan(plan) );
+		if ( not plan{ok} ) {
+			lock.release();
+			return 1;
+		}
+
+		if ( _has_option( raw_options, "dry-run" ) ) {
+			lock.release();
+			say("Dry run complete");
+			return 0;
+		}
+
+		if ( not _has_option( raw_options, "yes" ) ) {
+			if ( not _confirmed_remove() ) {
+				lock.release();
+				say("Remove declined");
+				return 4;
+			}
+		}
+
+		let result := zoo.remove( targets, locked_options );
+		if ( not result{ok} ) {
+			lock.release();
+			STDERR.say("remove failed");
+			return 1;
+		}
+
+		lock.release();
+		say("Remove complete");
+		return 0;
+	}
+	catch ( Exception e ) {
+		lock.release();
+		throw e;
+	}
+}
+
+function _run_list ( zoo, targets, options, raw_options ) {
+	if ( targets.length() != 0 ) {
+		STDERR.say("list does not accept targets");
+		return 2;
+	}
+
+	let installed := zoo.list_installed(options);
+	if ( _has_option( raw_options, "json" ) ) {
+		say( zoo.format_json(installed) );
+		return 0;
+	}
+
+	for ( let dist in installed ) {
+		say(
+			dist{name} _ "\t" _
+			dist{version} _ "\t" _
+			dist{metadata_file}
+		);
+	}
+	return 0;
+}
+
+function _run_query ( zoo, targets, options, raw_options ) {
+	if ( targets.length() != 1 ) {
+		STDERR.say("query requires exactly one target");
+		return 2;
+	}
+
+	let found := _has_option( raw_options, "dist" )
+		? zoo.query_distribution( targets[0], options )
+		: zoo.query( targets[0], options );
+	if ( found == null ) {
+		STDERR.say("query target is not installed");
+		return 1;
+	}
+
+	say( zoo.format_json(found) );
+	return 0;
+}
+
+function _run_verify ( zoo, targets, options, raw_options ) {
+	if ( targets.length() == 0 ) {
+		STDERR.say("verify requires at least one target");
+		return 2;
+	}
+
+	let result := zoo.verify( targets, options );
+	if ( _has_option( raw_options, "json" ) ) {
+		say( zoo.format_json(result) );
+	}
+	else {
+		say( result{ok} ? "Verification ok" : "Verification failed" );
+		say( "Distributions checked: " _ result{distributions}.length() );
+		say( "Files checked: " _ result{checked_files}.length() );
+		say( "Missing files: " _ result{missing_files}.length() );
+		say( "Hash mismatches: " _ result{hash_mismatches}.length() );
+		say( "Errors: " _ result{errors}.length() );
+		for ( let error in result{errors} ) {
+			say( "  - " _ error{code} _ ": " _ error{message} );
+		}
+	}
+	return result{ok} ? 0 : 3;
+}
+
+function _run_latest ( zoo, targets, options, raw_options ) {
+	if ( targets.length() != 1 ) {
+		STDERR.say("latest requires exactly one module target");
+		return 2;
+	}
+
+	let result := zoo.latest( targets[0], options );
+	if ( _has_option( raw_options, "json" ) ) {
+		say( zoo.format_json(result) );
+		return 0;
+	}
+
+	say( "Module: " _ result{module_name} );
+	say( "Latest version: " _ result{remote_version} );
+	say(
+		"Installed version: " _
+		( result{installed_version} == null
+			? "not installed"
+			: result{installed_version} )
+	);
+	say( "Status: " _ result{status} );
+	return 0;
+}
+
+function _contains_version_option ( argv ) {
+	for ( let arg in argv ) {
+		return true if arg eq "--version";
+		return true if starts_with( "" _ arg, "--version=" );
+	}
+	return false;
+}
+
+function _option_specs () {
+	return [
+		"help|h",
+		"dry-run",
+		"force",
+		"no-test",
+		"global",
+		"lib-dir=s",
+		"bin-dir=s",
+		"meta-dir=s",
+		"cache-dir=s",
+		"lock-timeout=f",
+		"quiet|q",
+		"dist",
+		"json",
+		"yes|y",
+		"remove=s",
+		"base-url=s",
+	];
+}
+
+function _merge_options ( base, extra ) {
+	for ( let key in extra.keys() ) {
+		base.set( key, extra.get(key) );
+	}
+	return base;
+}
+
+function _run_command ( argv ) {
+	let effective_argv := (
+		argv.length() > 0 and argv[0] eq "--"
+	) ? _tail(argv) : argv;
+
+	if ( _contains_version_option(effective_argv) ) {
+		STDERR.say(
+			"--version is not supported for removal; use " _
+			"remove --dist NAME to remove an installed distribution"
+		);
+		return 2;
+	}
+
+	let parsed := Getopt.parse(
+		effective_argv,
+		_option_specs(),
+	);
+	if ( not parsed{ok} ) {
+		STDERR.say(parsed{error});
+		STDERR.print(_usage());
+		return 2;
+	}
+
+	let options := parsed{options};
+	let rest := parsed{argv};
+
+	if ( _has_option( options, "help" ) ) {
+		STDOUT.print(_usage());
+		return 0;
+	}
+	if ( rest.length() > 0 and rest[0] eq "help" ) {
+		STDOUT.print(_usage());
+		return 0;
+	}
+
+	let command := "";
+	let targets := [];
+	if ( options.exists("remove") ) {
+		if ( rest.length() != 0 ) {
+			STDERR.say("--remove does not accept positional targets");
+			return 2;
+		}
+		command := "remove";
+		targets := [ options.get("remove") ];
+		options.add( "dist", true );
+		STDERR.say("--remove=NAME is deprecated; use remove --dist NAME");
+	}
+	else if ( rest.length() == 0 ) {
+		STDERR.print(_usage());
+		return 2;
+	}
+	else if ( _is_command(rest[0]) ) {
+		command := rest[0];
+		let command_parsed := Getopt.parse(
+			_tail(rest),
+			_option_specs(),
+		);
+		if ( not command_parsed{ok} ) {
+			STDERR.say(command_parsed{error});
+			STDERR.print(_usage());
+			return 2;
+		}
+		_merge_options( options, command_parsed{options} );
+		targets := command_parsed{argv};
+	}
+	else if ( _valid_implicit_install(rest) ) {
+		command := "install";
+		targets := rest;
+	}
+	else {
+		STDERR.say("Unknown command: " _ rest[0]);
+		STDERR.print(_usage());
+		return 2;
+	}
+
+	let invalid := _invalid_with_command( command, options );
+	if ( invalid != null ) {
+		STDERR.say(invalid);
+		return 2;
+	}
+
+	let operation_options := _operation_options(options);
+	let zoo := new Zuzuzoo(
+		lib_dir: operation_options.get( "lib_dir", null ),
+		bin_dir: operation_options.get( "bin_dir", null ),
+		meta_dir: operation_options.get( "meta_dir", null ),
+		global: operation_options.get( "global", false ),
+		zuzu_command: operation_options.get( "zuzu_command", "zuzu" ),
+	);
+
+	if ( command eq "install" ) {
+		return _run_install( zoo, targets, operation_options, options );
+	}
+	if ( command eq "remove" ) {
+		return _run_remove( zoo, targets, operation_options, options );
+	}
+	if ( command eq "list" ) {
+		return _run_list( zoo, targets, operation_options, options );
+	}
+	if ( command eq "query" ) {
+		return _run_query( zoo, targets, operation_options, options );
+	}
+	if ( command eq "verify" ) {
+		return _run_verify( zoo, targets, operation_options, options );
+	}
+	if ( command eq "latest" ) {
+		return _run_latest( zoo, targets, operation_options, options );
+	}
+
+	STDERR.say("Unknown command: " _ command);
+	return 2;
+}
+
+function __main__ ( argv ) {
+	try {
+		Proc.exit(_run_command(argv));
+	}
+	catch ( Exception e ) {
+		STDERR.say( "zuzuzoo: " _ e{message} );
+		Proc.exit(1);
+	};
+}

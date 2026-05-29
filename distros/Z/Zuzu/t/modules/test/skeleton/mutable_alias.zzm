@@ -1,0 +1,10 @@
+let counter := 1;
+
+function bump () {
+	counter += 1;
+	return counter;
+}
+
+function read () {
+	return counter;
+}

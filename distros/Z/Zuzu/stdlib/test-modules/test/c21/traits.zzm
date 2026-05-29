@@ -1,0 +1,11 @@
+trait LeftName {
+	method conflict_name () {
+		return "left";
+	}
+}
+
+trait RightName {
+	method conflict_name () {
+		return "right";
+	}
+}

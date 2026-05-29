@@ -1,4 +1,4 @@
-package GDPR::IAB::TCFv2::Validator::Reason 0.520;
+package GDPR::IAB::TCFv2::Validator::Reason 0.530;
 use v5.12;
 use warnings;
 
@@ -59,11 +59,14 @@ use constant {
   ReasonDecodeError => 12,
 
   # The consent string's CMP ID is not recognized as a valid (active,
-  # non-deleted) entry in the configured CMP registry. The CMPValidator
-  # rule today returns a single boolean; a future refinement may
-  # introduce ReasonCMPDeleted / ReasonCMPUnknown to distinguish the
-  # lifecycle states (codes reserved for that work).
+  # non-deleted) entry in the configured CMP registry.
   ReasonInvalidCMP => 13,
+
+  # The CMP id is recognized but has been retired (deletedDate in the past).
+  ReasonCMPDeleted => 14,
+
+  # The CMP id is unknown to the registry.
+  ReasonCMPUnknown => 15,
 };
 
 use constant ReasonDescription => {
@@ -81,6 +84,8 @@ use constant ReasonDescription => {
   ReasonPolicyVersionTooLow                           => "tcf policy version too low",
   ReasonDecodeError                                   => "decode error",
   ReasonInvalidCMP                                    => "invalid cmp id",
+  ReasonCMPDeleted                                    => "deleted cmp id",
+  ReasonCMPUnknown                                    => "unknown cmp id",
 };
 
 # Lazily built reverse map: integer code -> human-readable string.
@@ -118,6 +123,8 @@ our @EXPORT_OK = qw<
   ReasonPolicyVersionTooLow
   ReasonDecodeError
   ReasonInvalidCMP
+  ReasonCMPDeleted
+  ReasonCMPUnknown
   ReasonDescription
   reason_string
 >;

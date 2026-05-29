@@ -1,0 +1,11 @@
+from test/c25/traits import NamedSpeak;
+
+class ItemContainer {
+	class Item with NamedSpeak {
+		let String name with get, set;
+	}
+
+	method build_item ( String value ) {
+		return new self { Item }( name: value );
+	}
+}

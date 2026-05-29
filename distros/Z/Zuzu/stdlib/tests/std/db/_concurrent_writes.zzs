@@ -1,0 +1,35 @@
+from test/more import *;
+
+requires_capability( "db" );
+requires_capability( "proc" );
+
+from std/db import DB;
+from std/proc import sleep_async;
+from std/task import all;
+
+let dbh := DB.temp();
+dbh.prepare( "create table writes (value integer)" ).execute();
+let ins := dbh.prepare( "insert into writes (value) values (?)" );
+
+async function write_one ( v ) {
+	await {
+		sleep_async(0.01);
+	};
+	ins.execute(v);
+	return v;
+}
+
+let values := await {
+	all( [ write_one( 1 ), write_one( 2 ), write_one( 3 ), write_one( 4 ) ] );
+};
+
+let q := dbh.prepare( "select value from writes order by value" );
+q.execute();
+let rows := q.all_array();
+
+is( values.length(), 4, "all concurrent tasks resolved" );
+is( rows.length(), 4, "all concurrent writes persisted" );
+is( rows[0][0], 1, "first persisted value is present" );
+is( rows[3][0], 4, "last persisted value is present" );
+
+done_testing();

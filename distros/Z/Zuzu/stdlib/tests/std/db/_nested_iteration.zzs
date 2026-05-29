@@ -1,0 +1,36 @@
+from test/more import *;
+
+requires_capability( "db" );
+requires_capability( "fs" );
+
+from std/db import DB;
+from std/io import Path;
+from std/string import trim;
+
+let dir := Path.tempdir();
+dir.child("a.txt").spew_utf8("group-a\n");
+dir.child("b.txt").spew_utf8("group-b\n");
+
+let dbh := DB.temp();
+dbh.prepare( "create table nums (name text, value integer)" ).execute();
+dbh.prepare( "insert into nums (name, value) values ('group-a', 1)" ).execute();
+dbh.prepare( "insert into nums (name, value) values ('group-a', 2)" ).execute();
+dbh.prepare( "insert into nums (name, value) values ('group-b', 3)" ).execute();
+
+let pairs := [];
+let files := Path.glob( dir.to_String() _ "/*.txt" );
+for ( let file in files ) {
+	let name := trim( file.slurp_utf8() );
+	let stmt := dbh.prepare( "select value from nums where name = ? order by value" );
+	stmt.execute(name);
+	for ( let row in stmt ) {
+		pairs.push( name _ ":" _ row{value} );
+	}
+}
+
+is( pairs.length(), 3, "nested iterator produced all matching db rows" );
+ok( "group-a:1" in pairs, "first nested pair is present" );
+ok( "group-a:2" in pairs, "second nested pair is present" );
+ok( "group-b:3" in pairs, "second group appears from inner db iterator" );
+
+done_testing();

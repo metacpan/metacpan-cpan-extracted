@@ -1,0 +1,146 @@
+from std/secure import Secure, TlsIdentity;
+from std/string/base64 import decode;
+from test/more import *;
+
+let caps := Secure.capabilities();
+let cert_pem := "-----BEGIN CERTIFICATE-----\n"
+	_ "MIIBiTCCATCgAwIBAgIHEaKzxNXm9zAKBggqhkjOPQQDAjAhMR8wHQYDVQQDDBZa\n"
+	_ "dXp1IFBoYXNlIDExIElkZW50aXR5MB4XDTI2MDUwNjEwMTQwMFoXDTM2MDUwMzEw\n"
+	_ "MTQwMFowITEfMB0GA1UEAwwWWnV6dSBQaGFzZSAxMSBJZGVudGl0eTBZMBMGByqG\n"
+	_ "SM49AgEGCCqGSM49AwEHA0IABBqh009HRDMap7KENy3wz6T4BMwm0NGlhDUj2rq2\n"
+	_ "8AV1NNXSPHZVEN7KZL5lEIxtpGCIor7RUwQIh7ZZx6BBbMOjUzBRMB0GA1UdDgQW\n"
+	_ "BBTubhkQTDb7kJ1TAUHfRS9SpoyeZjAfBgNVHSMEGDAWgBTubhkQTDb7kJ1TAUHf\n"
+	_ "RS9SpoyeZjAPBgNVHRMBAf8EBTADAQH/MAoGCCqGSM49BAMCA0cAMEQCIDOWVQ8D\n"
+	_ "O1yB29Gh5hK2NMClbtXOD4MLGZ3DVde8/0BtAiBxzs7F8HP38PM74WglPjqg63c0\n"
+	_ "vep6a0oDQ0c+HxrZYQ==\n"
+	_ "-----END CERTIFICATE-----\n";
+let key_pem := "-----BEGIN EC PRIVATE KEY-----\n"
+	_ "MHcCAQEEIOMgouBB7RG00/bWhg0h6/31QaDuU6JzcxJqOz+t2MjhoAoGCCqGSM49\n"
+	_ "AwEHoUQDQgAEGqHTT0dEMxqnsoQ3LfDPpPgEzCbQ0aWENSPaurbwBXU01dI8dlUQ\n"
+	_ "3spkvmUQjG2kYIiivtFTBAiHtlnHoEFsww==\n"
+	_ "-----END EC PRIVATE KEY-----\n";
+let pkcs12_b64 := "MIIEmQIBAzCCBE8GCSqGSIb3DQEHAaCCBEAEggQ8MIIEODCCArIGCSqGSIb3DQEH"
+	_ "BqCCAqMwggKfAgEAMIICmAYJKoZIhvcNAQcBMFcGCSqGSIb3DQEFDTBKMCkGCSqG"
+	_ "SIb3DQEFDDAcBAjz7GYU+SP7iwICCAAwDAYIKoZIhvcNAgkFADAdBglghkgBZQME"
+	_ "ASoEEMPxKKT8Yoz3oha/j6blrQmAggIwriBX7geC54hq63z1khh9YsCVYx82YVtz"
+	_ "YQ4MR+MJg7TmGIg7RhfQI5zXV6a/DkRqn2dqO+5s3fKf5/Fcp1Mc//tIlAJlLm9a"
+	_ "jVWZuqn38EYEVZLjHMPvi52gYQE7tal629NDECFgwV9ZPOzzHjqzcE1PVjXLELHm"
+	_ "cD/ioM7s2RAWb80o6MWGrdj8v/e6A4wS7ydI9/VHF31OV62ZVwG90+BlhJ+eyBPZ"
+	_ "uUTXCJIDUYTO9uVnY/r1Iv/TQt8lYt2zvUI7fazJAK/x6F/AxavT2Bo88ViqUez8"
+	_ "yi305h71JorQ/igu7rFWkxpyIQKdk1RLcn/RprVonL8hBfjTstoqePVMMHMFSEvC"
+	_ "tpOOl/Gy5Hw1ramIZt6UkX3nedkkFWHFwbhH3rWMgNwZ6TmT355PsRGpKxRNNdeQ"
+	_ "O6Ilc/lBXYtCUSy4Vp7PWo2rRmGvsWRL2mshDHuFgSe2Nf7HZWACKSPs9xjgX/dU"
+	_ "DxFskW/OCPGHZvI2EwG0rqIS6+8Wa8IwHL7WGofQoksBYqiFrRE4eGwR3gJS5wrS"
+	_ "gLrWPwL4LGflifQea9QwML7Q3PPMJIGAa5bV4JHWnPuR1PBXyO6u5IjqjfHdtsyX"
+	_ "gNRLodp/aqDMU9t4puH0BWdfjdQgRB+JFlUqgQ3fxH2Kgo70zE86MlWxMWl7ZE8y"
+	_ "xNKkraEwpEXwiIbnooMfkMPZeXBD04TEwuy7TXevYJMRONhonmQGkCobnVF+QGjy"
+	_ "5enWSmwGs6EwggF+BgkqhkiG9w0BBwGgggFvBIIBazCCAWcwggFjBgsqhkiG9w0B"
+	_ "DAoBAqCB7zCB7DBXBgkqhkiG9w0BBQ0wSjApBgkqhkiG9w0BBQwwHAQIKdQKHvmD"
+	_ "E0oCAggAMAwGCCqGSIb3DQIJBQAwHQYJYIZIAWUDBAEqBBALi5ISgBbvHMsxEIX9"
+	_ "lYA4BIGQyu+NP0a+ldVsDWbjFrofKw6nzrhVmAY6JRWPob64hWcHKJCB+BlQ3pXo"
+	_ "W0n0mNMS+dC4ufEhtnnCo1T/E4SUBig+muYhBchoKjQFPlab2M1+SB2Sqm9RNQzz"
+	_ "enqlB47E1GyQAdXU+92q+X39fCf+lfBdEFZfWFr6fSqecmWAeg7SCwvGYoL8hi2t"
+	_ "nGAik7c4MWIwIwYJKoZIhvcNAQkVMRYEFDpdwunbdjj+2kMnfbmjRmLiWuTpMDsG"
+	_ "CSqGSIb3DQEJFDEuHiwAWgB1AHoAdQAgAFAAaABhAHMAZQAgADEAMQAgAEkAZAB"
+	_ "lAG4AdABpAHQAeTBBMDEwDQYJYIZIAWUDBAIBBQAEIG148te1anUHEm+laoAB21q"
+	_ "JB/duSY/t5bcLE8223NKJBAgv8THLzNnTCwICCAA=";
+
+is( Secure.has( "tls_identity", "pem" ), true, "PEM TLS identity is advertised" );
+is(
+	caps{tls_identity}.contains("pem"),
+	true,
+	"capabilities reports PEM TLS identity",
+);
+
+let identity := TlsIdentity.from_pem( cert_pem _ cert_pem, key_pem );
+is( typeof identity, "TlsIdentity", "from_pem returns a TlsIdentity" );
+let cert := identity.certificate();
+is( typeof cert, "Certificate", "certificate returns a Certificate" );
+like(
+	cert.subject(),
+	/Zuzu Phase 11 Identity/,
+	"identity certificate subject contains fixture CN",
+);
+is(
+	cert.serial_number(),
+	"11A2B3C4D5E6F7",
+	"identity certificate serial is normalized",
+);
+is( cert.not_before().epoch(), 1778062440, "identity not_before epoch" );
+is( cert.not_after().epoch(), 2093422440, "identity not_after epoch" );
+
+if ( caps{host} == "browser" ) {
+	is(
+		Secure.has( "tls_identity", "pkcs12" ),
+		false,
+		"browser does not advertise PKCS#12 TLS identity",
+	);
+	like(
+		exception( function () {
+			identity.private_key();
+		} ),
+		/not supported/,
+		"browser private_key is unsupported",
+	);
+	like(
+		exception( function () {
+			TlsIdentity.from_pkcs12( decode(pkcs12_b64), "zuzu-phase11" );
+		} ),
+		/not supported/,
+		"browser rejects PKCS#12 TLS identity",
+	);
+}
+else {
+	is(
+		Secure.has( "tls_identity", "pkcs12" ),
+		true,
+		"host advertises PKCS#12 TLS identity",
+	);
+	is(
+		caps{tls_identity}.contains("pkcs12"),
+		true,
+		"capabilities reports PKCS#12 TLS identity",
+	);
+	let private_key := identity.private_key();
+	is( typeof private_key, "SigningKey", "private_key returns SigningKey" );
+	let message := to_binary("phase 11 tls identity");
+	let signature := private_key.sign(message);
+	is(
+		cert.public_key().verify( message, signature ),
+		true,
+		"identity private key matches certificate public key",
+	);
+
+	let pkcs12_identity := TlsIdentity.from_pkcs12(
+		decode(pkcs12_b64),
+		"zuzu-phase11",
+	);
+	is(
+		typeof pkcs12_identity,
+		"TlsIdentity",
+		"from_pkcs12 returns a TlsIdentity",
+	);
+	is(
+		pkcs12_identity.certificate().serial_number(),
+		cert.serial_number(),
+		"PKCS#12 certificate matches PEM certificate",
+	);
+	let pkcs12_key := pkcs12_identity.private_key();
+	is(
+		pkcs12_identity.certificate().public_key().verify(
+			message,
+			pkcs12_key.sign(message),
+		),
+		true,
+		"PKCS#12 private key matches certificate public key",
+	);
+	like(
+		exception( function () {
+			TlsIdentity.from_pkcs12( decode(pkcs12_b64), "wrong" );
+		} ),
+		/PKCS#12/,
+		"wrong PKCS#12 password throws clearly",
+	);
+}
+
+done_testing();

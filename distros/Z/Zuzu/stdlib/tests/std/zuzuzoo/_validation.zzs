@@ -1,0 +1,128 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/data/json import JSON;
+from std/io import Path;
+from std/zuzuzoo import Zuzuzoo;
+
+function throws_like ( f, rx, name ) {
+	let got := "";
+	try {
+		f();
+	}
+	catch ( Exception e ) {
+		got := e.to_String();
+	}
+	like( got, rx, name );
+}
+
+function base_meta ( dir ) {
+	return {
+		name: "valid-dist",
+		version: "1.0.0",
+		author: "Example Author",
+		license: "MIT",
+		status: "stable",
+		installed: {
+			zdf: "ZDF-1",
+			lib_dir: "/tmp/zuzu-lib",
+			bin_dir: "/tmp/zuzu-bin",
+			meta_dir: dir.to_String(),
+			modules: [
+				{
+					source: "modules/valid/dist.zzm",
+					install_as: "valid/dist.zzm",
+					sha256: "aaa",
+				},
+			],
+			scripts: [],
+		},
+	};
+}
+
+function check_invalid ( label, mutate, rx ) {
+	let dir := Path.tempdir();
+	let meta := base_meta(dir);
+	mutate(meta);
+	( new JSON( pretty: true ) ).dump( dir.child( label _ ".json" ), meta );
+	let zoo := new Zuzuzoo( meta_dir: dir.to_String() );
+	throws_like(
+		function () {
+			zoo.list_installed();
+		},
+		rx,
+		label,
+	);
+}
+
+check_invalid(
+	"missing-name",
+	fn m -> m.remove("name"),
+	/missing name/,
+);
+check_invalid(
+	"bad-status",
+	fn m -> m{status} := "ancient",
+	/bad status/,
+);
+check_invalid(
+	"bad-dependencies",
+	fn m -> m{dependencies} := [],
+	/dependencies must be an object/,
+);
+check_invalid(
+	"missing-installed",
+	fn m -> m.remove("installed"),
+	/missing installed/,
+);
+check_invalid(
+	"bad-zdf",
+	fn m -> m{installed}{zdf} := "ZDF-0",
+	/bad installed\.zdf/,
+);
+check_invalid(
+	"missing-dirs",
+	fn m -> m{installed}.remove("lib_dir"),
+	/missing lib_dir/,
+);
+check_invalid(
+	"bad-modules-array",
+	fn m -> m{installed}{modules} := {},
+	/modules must be an array/,
+);
+check_invalid(
+	"empty-records",
+	function ( m ) {
+		m{installed}{modules} := [];
+		m{installed}{scripts} := [];
+	},
+	/no installed files/,
+);
+check_invalid(
+	"bad-module-entry",
+	fn m -> m{installed}{modules}[0].remove("sha256"),
+	/missing sha256/,
+);
+check_invalid(
+	"bad-script-wrapper",
+	function ( m ) {
+		m{installed}{modules} := [];
+		m{installed}{scripts} := [
+			{
+				source: "scripts/x.zzs",
+				install_as: "x.zzs",
+				sha256: "bbb",
+				wrappers: "x.cmd",
+			},
+		];
+	},
+	/bad script wrappers/,
+);
+check_invalid(
+	"top-level-modules",
+	fn m -> m{modules} := [ "valid/dist.zzm" ],
+	/top-level modules\/scripts are not allowed/,
+);
+
+done_testing();

@@ -1,0 +1,23 @@
+from std/marshal import
+	dump,
+	load,
+	safe_to_dump,
+	MarshallingException,
+	UnmarshallingException;
+from test/more import *;
+
+is( typeof dump, "Function", "dump is exported" );
+is( typeof load, "Function", "load is exported" );
+is( typeof safe_to_dump, "Function", "safe_to_dump is exported" );
+is(
+	typeof MarshallingException,
+	"Class",
+	"MarshallingException is exported",
+);
+is(
+	typeof UnmarshallingException,
+	"Class",
+	"UnmarshallingException is exported",
+);
+
+done_testing();

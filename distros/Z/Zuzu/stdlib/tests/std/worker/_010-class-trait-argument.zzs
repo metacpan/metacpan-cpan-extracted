@@ -1,0 +1,39 @@
+from test/more import *;
+from test/worker_contract import require_worker_phase;
+
+let Worker := require_worker_phase(3);
+
+trait WorkerPhase2Labelled {
+	method label () -> String {
+		return "trait:" _ self.get_name();
+	}
+}
+
+class WorkerPhase2Thing with WorkerPhase2Labelled {
+	let String name with get := "Ada";
+}
+
+async function main () {
+	let result := await {
+		Worker.spawn(
+			function ( klass ) {
+				let obj := new klass();
+				return [ typeof obj, obj.label() ];
+			},
+			[ WorkerPhase2Thing ],
+		);
+	};
+
+	is( result[0], "WorkerPhase2Thing", "worker reconstructs user class" );
+	is(
+		result[1],
+		"trait:Ada",
+		"worker reconstructs class trait dependency",
+	);
+}
+
+await {
+	main();
+};
+
+done_testing();

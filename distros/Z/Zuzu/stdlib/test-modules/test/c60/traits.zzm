@@ -1,0 +1,5 @@
+trait Labelled {
+	method label () {
+		return "worker:" _ self.get_name();
+	}
+}

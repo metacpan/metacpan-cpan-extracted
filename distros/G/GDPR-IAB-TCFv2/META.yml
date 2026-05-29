@@ -32,55 +32,55 @@ no_index:
 provides:
   GDPR::IAB::TCFv2:
     file: lib/GDPR/IAB/TCFv2.pm
-    version: '0.520'
+    version: '0.530'
   GDPR::IAB::TCFv2::BitField:
     file: lib/GDPR/IAB/TCFv2/BitField.pm
-    version: '0.520'
+    version: '0.530'
   GDPR::IAB::TCFv2::BitUtils:
     file: lib/GDPR/IAB/TCFv2/BitUtils.pm
-    version: '0.520'
+    version: '0.530'
   GDPR::IAB::TCFv2::CMPValidator:
     file: lib/GDPR/IAB/TCFv2/CMPValidator.pm
-    version: '0.520'
+    version: '0.530'
   GDPR::IAB::TCFv2::Constants::Purpose:
     file: lib/GDPR/IAB/TCFv2/Constants/Purpose.pm
-    version: '0.520'
+    version: '0.530'
   GDPR::IAB::TCFv2::Constants::RestrictionType:
     file: lib/GDPR/IAB/TCFv2/Constants/RestrictionType.pm
-    version: '0.520'
+    version: '0.530'
   GDPR::IAB::TCFv2::Constants::SpecialFeature:
     file: lib/GDPR/IAB/TCFv2/Constants/SpecialFeature.pm
-    version: '0.520'
+    version: '0.530'
   GDPR::IAB::TCFv2::Parser:
     file: lib/GDPR/IAB/TCFv2/Parser.pm
-    version: '0.520'
+    version: '0.530'
   GDPR::IAB::TCFv2::Publisher:
     file: lib/GDPR/IAB/TCFv2/Publisher.pm
-    version: '0.520'
+    version: '0.530'
   GDPR::IAB::TCFv2::PublisherRestrictions:
     file: lib/GDPR/IAB/TCFv2/PublisherRestrictions.pm
-    version: '0.520'
+    version: '0.530'
   GDPR::IAB::TCFv2::PublisherTC:
     file: lib/GDPR/IAB/TCFv2/PublisherTC.pm
-    version: '0.520'
+    version: '0.530'
   GDPR::IAB::TCFv2::RangeSection:
     file: lib/GDPR/IAB/TCFv2/RangeSection.pm
-    version: '0.520'
+    version: '0.530'
   GDPR::IAB::TCFv2::Validator:
     file: lib/GDPR/IAB/TCFv2/Validator.pm
-    version: '0.520'
+    version: '0.530'
   GDPR::IAB::TCFv2::Validator::Failure:
     file: lib/GDPR/IAB/TCFv2/Validator/Failure.pm
-    version: '0.520'
+    version: '0.530'
   GDPR::IAB::TCFv2::Validator::Reason:
     file: lib/GDPR/IAB/TCFv2/Validator/Reason.pm
-    version: '0.520'
+    version: '0.530'
   GDPR::IAB::TCFv2::Validator::Result:
     file: lib/GDPR/IAB/TCFv2/Validator/Result.pm
-    version: '0.520'
+    version: '0.530'
   iabtcfv2:
     file: lib/iabtcfv2.pm
-    version: '0.520'
+    version: '0.530'
 recommends:
   DateTimeX::TO_JSON: '0'
   HTTP::Tiny: '0'
@@ -96,6 +96,6 @@ resources:
   homepage: https://github.com/peczenyj/GDPR-IAB-TCFv2
   license: http://dev.perl.org/licenses/
   repository: https://github.com/peczenyj/GDPR-IAB-TCFv2.git
-version: '0.520'
+version: '0.530'
 x_authority: cpan:PACMAN
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,0 +1,136 @@
+from test/more import *;
+
+requires_capability("fs");
+
+from std/archive import Archive;
+from std/io import Path;
+
+let source := {
+	entries: [
+		{ path: "hello.txt", data: to_binary( "Hello\n" ) },
+		{ path: "nested/world.txt", data: to_binary( "World\n" ) },
+	],
+};
+
+let tgz := Archive.encode( source, "tar.gz" );
+let from_tgz := Archive.decode(tgz);
+is( from_tgz{format}, "tar.gz", "Archive.decode auto-detects tar.gz", );
+is( Archive.decode( tgz, "tgz" ){format}, "tar.gz", "tgz alias decodes as tar.gz", );
+is( Archive.decode( tgz, ".tgz" ){format}, "tar.gz", ".tgz alias decodes as tar.gz", );
+is( Archive.decode( tgz, "tar.gz" ){format}, "tar.gz", "tar.gz canonical format decodes", );
+is( from_tgz{entries}[0]{path}, "hello.txt", "tar.gz preserves first path", );
+is( to_string( from_tgz{entries}[0]{data} ), "Hello\n", "tar.gz preserves first payload", );
+is( from_tgz{entries}[1]{path}, "nested/world.txt", "tar.gz preserves nested path", );
+is( to_string( from_tgz{entries}[1]{data} ), "World\n", "tar.gz preserves nested payload", );
+is( from_tgz{entries}.count(), 2, "tar.gz only exposes the expected entries", );
+
+let zip := Archive.encode( { format: "zip", entries: source{entries} } );
+let from_zip := Archive.decode(zip);
+is( from_zip{format}, "zip", "Archive.encode can reuse archive.format", );
+is( from_zip{entries}[1]{path}, "nested/world.txt", "zip preserves nested path", );
+is( to_string( from_zip{entries}[1]{data} ), "World\n", "zip preserves nested payload", );
+is( from_zip{entries}.count(), 2, "zip only exposes the expected entries", );
+
+let gz := Archive.encode(
+	{
+		entries: [
+			{ path: "payload.txt", data: to_binary( "single-stream\n" ) },
+		],
+	},
+	"gz",
+);
+let from_gz := Archive.decode(gz);
+is( from_gz{format}, "gz", "Archive.decode auto-detects gz", );
+is( from_gz{entries}[0]{path}, "payload.txt", "gz preserves embedded name when available", );
+is( to_string( from_gz{entries}[0]{data} ), "single-stream\n", "gz preserves payload", );
+is( from_gz{entries}.count(), 1, "gz exposes a single entry", );
+
+let tbz2 := Archive.encode(
+	{
+		entries: [
+			{ path: "bzip.txt", data: to_binary( "bz2 ok\n" ) },
+		],
+	},
+	"tar.bz2",
+);
+let from_tbz2 := Archive.decode(tbz2);
+is( from_tbz2{format}, "tar.bz2", "Archive.decode auto-detects tar.bz2", );
+is( Archive.decode( tbz2, "tbz" ){format}, "tar.bz2", "tbz alias decodes as tar.bz2", );
+is( Archive.decode( tbz2, "tbz2" ){format}, "tar.bz2", "tbz2 alias decodes as tar.bz2", );
+is( Archive.decode( tbz2, ".tbz2" ){format}, "tar.bz2", ".tbz2 alias decodes as tar.bz2", );
+is( to_string( from_tbz2{entries}[0]{data} ), "bz2 ok\n", "tar.bz2 preserves payload", );
+
+let dir := Path.tempdir();
+let source_file := dir.child("from-file.txt");
+source_file.spew( to_binary( "from path\n" ) );
+
+let from_file_zip := Archive.encode(
+	{
+		entries: [
+			{ path: "copied.txt", data_from: source_file },
+		],
+	},
+	"zip",
+);
+let from_file_loaded := Archive.decode(from_file_zip);
+is( from_file_loaded{entries}[0]{path}, "copied.txt", "Archive.encode supports data_from Path", );
+is( to_string( from_file_loaded{entries}[0]{data} ), "from path\n", "data_from reads bytes from Path", );
+
+let zip_path := dir.child("sample.zip");
+Archive.dump( zip_path, source );
+let loaded_zip := Archive.load(zip_path);
+is( loaded_zip{format}, "zip", "Archive.load infers zip from file extension", );
+is( to_string( loaded_zip{entries}[0]{data} ), "Hello\n", "Archive.dump/Archive.load roundtrip zip payload", );
+is( loaded_zip{entries}.count(), 2, "Archive.load returns the expected zip entries", );
+
+let gz_path := dir.child("payload.txt.gz");
+Archive.dump(
+	gz_path,
+	{
+		entries: [
+			{ path: "payload.txt", data: to_binary( "disk gzip\n" ) },
+		],
+	},
+);
+let loaded_gz := Archive.load(gz_path);
+is( loaded_gz{format}, "gz", "Archive.load infers gz from file extension", );
+is( loaded_gz{entries}[0]{path}, "payload.txt", "Archive.load derives gzip entry name", );
+is( to_string( loaded_gz{entries}[0]{data} ), "disk gzip\n", "Archive.dump/Archive.load roundtrip gz payload", );
+
+let tgz_path := dir.child("sample.tgz");
+Archive.dump( tgz_path, source );
+is( Archive.load(tgz_path){format}, "tar.gz", "Archive.load infers .tgz alias", );
+
+let tbz_path := dir.child("sample.tbz");
+Archive.dump( tbz_path, source );
+is( Archive.load(tbz_path){format}, "tar.bz2", "Archive.load infers .tbz alias", );
+
+let tbz2_path := dir.child("sample.tbz2");
+Archive.dump( tbz2_path, source );
+is( Archive.load(tbz2_path){format}, "tar.bz2", "Archive.load infers .tbz2 alias", );
+
+like( exception( function() {
+	Archive.dump( "archive.zip", source );
+} ), /TypeException: Archive.dump expects Path as first argument/, "Archive.dump rejects non-Path target", );
+
+like( exception( function() {
+	Archive.encode( { entries: [ { path: "bad.txt", data: "oops" } ] }, "zip" );
+} ), /TypeException: Archive.encode archive.entries\[0\].data expects BinaryString, got String/, "Archive.encode requires BinaryString entry data", );
+
+like( exception( function() {
+	Archive.encode( { entries: [ { path: "bad.txt", data_from: "oops" } ] }, "zip" );
+} ), /TypeException: Archive.encode archive.entries\[0\].data_from expects Path as first argument/, "Archive.encode requires Path data_from", );
+
+like( exception( function() {
+	Archive.encode(
+		{
+			entries: [
+				{ path: "a.txt", data: to_binary( "a" ) },
+				{ path: "b.txt", data: to_binary( "b" ) },
+			],
+		},
+		"gz",
+	);
+} ), /expects exactly one entry/, "gz encoding rejects multiple entries", );
+
+done_testing();

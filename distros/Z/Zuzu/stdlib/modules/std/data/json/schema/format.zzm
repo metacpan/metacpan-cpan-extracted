@@ -1,0 +1,581 @@
+=encoding utf8
+
+=head1 NAME
+
+std/data/json/schema/format - JSON Schema format validators.
+
+=head1 SYNOPSIS
+
+  from std/data/json/schema/format import FormatRegistry;
+
+  let formats := new FormatRegistry();
+  formats.register( "slug", fn value -> value ~ /^[a-z0-9-]+$/ );
+
+  say( formats.check( "slug", "release-2026" ) );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This Pure Zuzu module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+I<std/data/json/schema/format> provides the C<format> registry used by the
+JSON Schema validator. A registry maps format names to callables. A callable
+receives the instance value and returns true when the value satisfies the
+format.
+
+The default registry includes validators for the standard JSON Schema
+formats: C<date-time>, C<date>, C<time>, C<duration>, C<email>,
+C<idn-email>, C<hostname>, C<idn-hostname>, C<ipv4>, C<ipv6>, C<uri>,
+C<uri-reference>, C<iri>, C<iri-reference>, C<uuid>, C<json-pointer>,
+C<relative-json-pointer>, and C<regex>.
+
+Format checking is controlled by the validator. By default C<format> is
+annotation-only; pass C<< format_assert: true >> to C<JSONSchema> to make it
+assertive.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<FormatRegistry>
+
+Registry of named format validators.
+
+=over
+
+=item C<< register( name, validator ) >>
+
+Registers C<validator> under C<name> and returns the registry. The validator
+may be any callable value.
+
+=item C<< has( name ) >>
+
+Returns true when a validator has been registered for C<name>.
+
+=item C<< check( name, value ) >>
+
+Returns the result of the named validator. Unknown names return C<false>;
+the higher-level validator decides whether an unknown format is ignored or
+reported as an error.
+
+=back
+
+=back
+
+=head1 PORTABILITY
+
+Some validators rely on the host runtime's regular expression engine. The
+validators are intentionally conservative and do not attempt full RFC-grade
+parsing for every format.
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/data/json/schema/format >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/internals import to_Regexp_with_flags;
+from std/path/jsonpointer import JSONPointer;
+from std/data/json/schema/relative_pointer import valid_relative_json_pointer;
+from std/string import index, ord, substr, split;
+
+function _fmt_ipv4_ok;
+function _fmt_ipv6_ok;
+function _fmt_uri_reference_ok;
+function _fmt_regex_hex;
+
+function _fmt_regex ( String pattern ) {
+	return fn value -> value instanceof String
+		and value ~ to_Regexp_with_flags(pattern, "u");
+}
+
+function _fmt_date_parts_ok ( String value ) {
+	let m := value ~ /^([0-9]{4})-([0-9]{2})-([0-9]{2})$/;
+	if ( not m ) { return false; }
+	let month := int(m[2]);
+	let day := int(m[3]);
+	if ( month < 1 or month > 12 ) { return false; }
+	let max := 31;
+	if ( month in [ 4, 6, 9, 11 ] ) {
+		max := 30;
+	}
+	else if ( month == 2 ) {
+		let year := int(m[1]);
+		let leap := ( year mod 400 == 0 )
+			or ( year mod 4 == 0 and year mod 100 != 0 );
+		max := leap ? 29 : 28;
+	}
+	return day >= 1 and day <= max;
+}
+
+function _fmt_time_ok ( String value ) {
+	let m := value ~ /^([0-9]{2}):([0-9]{2}):([0-9]{2})(?:\.[0-9]+)?(?:[Zz]|([+-])([0-9]{2}):([0-9]{2}))$/;
+	if ( not m ) { return false; }
+	let hour := int(m[1]);
+	let minute := int(m[2]);
+	let second := int(m[3]);
+	let has_offset := m[4] instanceof String and m[4] ne "";
+	if ( hour > 23 or minute > 59 ) { return false; }
+	if ( second > 60 ) { return false; }
+	if ( has_offset ) {
+		if ( int(m[5]) > 23 or int(m[6]) > 59 ) { return false; }
+	}
+	if ( second == 60 and minute != 59 ) { return false; }
+	if ( second == 60 and not has_offset and hour != 23 ) { return false; }
+	return true;
+}
+
+function _fmt_date_time_ok ( value ) {
+	if ( not( value instanceof String ) ) { return false; }
+	let m := value ~ /^([0-9]{4}-[0-9]{2}-[0-9]{2})[Tt]([0-9]{2}:[0-9]{2}:[0-9]{2}(?:\.[0-9]+)?(?:[Zz]|[+-][0-9]{2}:[0-9]{2}))$/;
+	return m and _fmt_date_parts_ok(m[1]) and _fmt_time_ok(m[2]);
+}
+
+function _fmt_date_ok ( value ) {
+	return value instanceof String and _fmt_date_parts_ok(value);
+}
+
+function _fmt_time_value_ok ( value ) {
+	return value instanceof String and _fmt_time_ok(value);
+}
+
+function _fmt_duration_ok ( value ) {
+	return value instanceof String
+		and length value > 1
+		and value ~ /^P[0-9YMWDTHS.,+-]+$/;
+}
+
+function _fmt_hostname_ok ( value ) {
+	if ( not( value instanceof String ) ) { return false; }
+	if ( length value > 253 ) { return false; }
+	if ( value eq "" ) { return false; }
+	for ( let label in split( value, "." ) ) {
+		if ( label eq "" or length label > 63 ) { return false; }
+		if ( not( label ~ /^[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?$/ ) ) {
+			return false;
+		}
+	}
+	return true;
+}
+
+function _fmt_email_ok ( value ) {
+	if ( not( value instanceof String ) ) { return false; }
+	let address;
+	try {
+		from std/mail import Address;
+		address := Address.parse(value);
+	}
+	catch {
+		return false;
+	}
+	if ( address.display_name() ≢ null ) { return false; }
+	let domain := address.domain();
+	if ( substr( domain, 0, 1 ) eq "[" ) {
+		let inner := substr( domain, 1, length domain - 2 );
+		if ( substr( inner, 0, 5 ) eq "IPv6:" ) {
+			return _fmt_ipv6_ok( substr( inner, 5 ) );
+		}
+		return _fmt_ipv4_ok(inner);
+	}
+	return _fmt_hostname_ok(domain);
+}
+
+function _fmt_idn_hostname_ok ( value ) {
+	if ( not( value instanceof String ) ) { return false; }
+	if ( length value > 253 ) { return false; }
+	if ( value eq "" or value ~ /\s/ ) { return false; }
+	for ( let label in split( value, "." ) ) {
+		if ( label eq "" or length label > 63 ) { return false; }
+		if ( substr( label, 0, 1 ) eq "-" ) { return false; }
+		if ( substr( label, length label - 1, 1 ) eq "-" ) { return false; }
+	}
+	return true;
+}
+
+function _fmt_idn_email_ok ( value ) {
+	if ( not( value instanceof String ) ) { return false; }
+	let m := value ~ /^([^@\s]+)@([^@\s]+)$/;
+	return m and _fmt_idn_hostname_ok(m[2]);
+}
+
+function _fmt_ipv4_ok ( value ) {
+	if ( not( value instanceof String ) ) { return false; }
+	if ( value ~ /[\r\n]/ ) { return false; }
+	if ( value eq "" or substr( value, 0, 1 ) eq "." ) { return false; }
+	if ( substr( value, length value - 1, 1 ) eq "." ) { return false; }
+	let parts := split( value, "." );
+	if ( parts.length() != 4 ) { return false; }
+	for ( let part in parts ) {
+		if ( not( part ~ /^(0|[1-9][0-9]*)$/ ) ) { return false; }
+		let n := int(part);
+		if ( n > 255 ) { return false; }
+	}
+	return true;
+}
+
+function _fmt_ipv6_ok ( value ) {
+	if ( not( value instanceof String ) ) { return false; }
+	if ( not( value ~ /^[0-9A-Fa-f:.]+$/ ) ) { return false; }
+	if ( value ~ /::/ ) { return true; }
+	return split( value, ":" ).length() == 8;
+}
+
+function _fmt_uri_ok ( value ) {
+	return value instanceof String
+		and value ~ /^[A-Za-z][A-Za-z0-9+.-]*:[^\s]*$/
+		and _fmt_uri_reference_ok(value);
+}
+
+function _fmt_uri_chars_ok ( String value, Boolean allow_non_ascii ) {
+	if ( value ~ /[\s\\]/ ) { return false; }
+	let i := 0;
+	while ( i < length value ) {
+		let ch := substr( value, i, 1 );
+		let cp := ord(ch);
+		if ( ch eq "%" ) {
+			if ( not _fmt_regex_hex( value, i + 1, 2 ) ) {
+				return false;
+			}
+			i += 3;
+			next;
+		}
+		if ( not allow_non_ascii and cp > 127 ) {
+			return false;
+		}
+		i++;
+	}
+	return true;
+}
+
+function _fmt_uri_reference_ok ( value ) {
+	return value instanceof String and _fmt_uri_chars_ok( value, false );
+}
+
+function _fmt_last_index ( String value, String needle ) {
+	let found := -1;
+	let i := 0;
+	while ( i < length value ) {
+		if ( substr( value, i, length needle ) eq needle ) {
+			found := i;
+		}
+		i++;
+	}
+	return found;
+}
+
+function _fmt_authority_from_iri ( String value ) {
+	let scheme := index( value, ":" );
+	if ( scheme < 0 or substr( value, scheme + 1, 2 ) ne "//" ) {
+		return null;
+	}
+	let start := scheme + 3;
+	let end := start;
+	while ( end < length value ) {
+		let ch := substr( value, end, 1 );
+		if ( ch eq "/" or ch eq "?" or ch eq "#" ) {
+			last;
+		}
+		end++;
+	}
+	return substr( value, start, end - start );
+}
+
+function _fmt_colon_count ( String value ) {
+	let count := 0;
+	let i := 0;
+	while ( i < length value ) {
+		if ( substr( value, i, 1 ) eq ":" ) {
+			count++;
+		}
+		i++;
+	}
+	return count;
+}
+
+function _fmt_iri_authority_ok ( String authority ) {
+	if ( authority eq "" or authority ~ /[\s\\]/ ) { return false; }
+	let hostport := authority;
+	let at := _fmt_last_index( authority, "@" );
+	if ( at >= 0 ) {
+		hostport := substr( authority, at + 1 );
+	}
+	if ( hostport eq "" ) { return false; }
+	if ( substr( hostport, 0, 1 ) eq "[" ) {
+		let close := index( hostport, "]" );
+		if ( close < 0 ) { return false; }
+		let literal := substr( hostport, 1, close - 1 );
+		let rest := substr( hostport, close + 1 );
+		if ( not _fmt_ipv6_ok(literal) ) { return false; }
+		return rest eq "" or rest ~ /^:[0-9]+$/;
+	}
+	return _fmt_colon_count(hostport) <= 1;
+}
+
+function _fmt_iri_ok ( value ) {
+	if ( not( value instanceof String ) ) { return false; }
+	if ( not _fmt_uri_chars_ok( value, true ) ) { return false; }
+	if ( not( value ~ /^[A-Za-z][A-Za-z0-9+.-]*:/ ) ) { return false; }
+	let authority := _fmt_authority_from_iri(value);
+	return authority ≡ null or _fmt_iri_authority_ok(authority);
+}
+
+function _fmt_iri_reference_ok ( value ) {
+	if ( not( value instanceof String ) ) { return false; }
+	if ( not _fmt_uri_chars_ok( value, true ) ) { return false; }
+	if ( value ~ /^[A-Za-z][A-Za-z0-9+.-]*:/ ) {
+		return _fmt_iri_ok(value);
+	}
+	if ( substr( value, 0, 2 ) eq "//" ) {
+		let authority := _fmt_authority_from_iri( "x:" _ value );
+		return authority ≢ null and _fmt_iri_authority_ok(authority);
+	}
+	return true;
+}
+
+function _fmt_regex_hex ( String value, Number start, Number count ) {
+	if ( start + count > length value ) {
+		return false;
+	}
+	let i := start;
+	while ( i < start + count ) {
+		if ( not( substr( value, i, 1 ) ~ /[0-9A-Fa-f]/ ) ) {
+			return false;
+		}
+		i++;
+	}
+	return true;
+}
+
+function _fmt_regex_escape_ok ( String value, Number slash, Boolean in_class ) {
+	if ( slash + 1 >= length value ) {
+		return {
+			ok: false,
+			next: slash + 1,
+		};
+	}
+
+	let esc := substr( value, slash + 1, 1 );
+	if ( esc ~ /[fnrtv0bBdDsSwW]/ ) {
+		return {
+			ok: true,
+			next: slash + 2,
+		};
+	}
+	if ( esc eq "c" ) {
+		return {
+			ok: slash + 2 < length value
+				and substr( value, slash + 2, 1 ) ~ /[A-Za-z]/,
+			next: slash + 3,
+		};
+	}
+	if ( esc eq "x" ) {
+		return {
+			ok: _fmt_regex_hex( value, slash + 2, 2 ),
+			next: slash + 4,
+		};
+	}
+	if ( esc eq "u" ) {
+		if ( slash + 2 < length value and substr( value, slash + 2, 1 ) eq "{" ) {
+			let i := slash + 3;
+			let digits := 0;
+			while ( i < length value and substr( value, i, 1 ) ne "}" ) {
+				if ( not( substr( value, i, 1 ) ~ /[0-9A-Fa-f]/ ) ) {
+					return {
+						ok: false,
+						next: i + 1,
+					};
+				}
+				digits++;
+				i++;
+			}
+			return {
+				ok: i < length value and digits > 0,
+				next: i + 1,
+			};
+		}
+		return {
+			ok: _fmt_regex_hex( value, slash + 2, 4 ),
+			next: slash + 6,
+		};
+	}
+	if ( esc eq "p" or esc eq "P" ) {
+		let open := slash + 2;
+		if ( open >= length value or substr( value, open, 1 ) ne "{" ) {
+			return {
+				ok: false,
+				next: open,
+			};
+		}
+		let close := open + 1;
+		while ( close < length value and substr( value, close, 1 ) ne "}" ) {
+			close++;
+		}
+		return {
+			ok: close < length value and close > open + 1,
+			next: close + 1,
+		};
+	}
+	if ( esc ~ /[A-Za-z]/ ) {
+		return {
+			ok: false,
+			next: slash + 2,
+		};
+	}
+
+	return {
+		ok: true,
+		next: slash + 2,
+	};
+}
+
+function _fmt_json_pointer_ok ( value ) {
+	if ( not( value instanceof String ) ) { return false; }
+	try {
+		new JSONPointer( path: value );
+		return true;
+	}
+	catch {
+		return false;
+	}
+}
+
+function _fmt_regex_ok ( value ) {
+	if ( not( value instanceof String ) ) { return false; }
+	let parens := 0;
+	let in_class := false;
+	let class_items := 0;
+	let i := 0;
+
+	while ( i < length value ) {
+		let ch := substr( value, i, 1 );
+		if ( ch eq "\\" ) {
+			let escaped := _fmt_regex_escape_ok( value, i, in_class );
+			if ( not escaped{ok} ) {
+				return false;
+			}
+			if ( in_class ) {
+				class_items++;
+			}
+			i := escaped{next};
+			next;
+		}
+		if ( in_class ) {
+			if ( ch eq "]" and class_items > 0 ) {
+				in_class := false;
+			}
+			else {
+				class_items++;
+			}
+			i++;
+			next;
+		}
+		if ( ch eq "[" ) {
+			in_class := true;
+			class_items := 0;
+		}
+		else if ( ch eq "]" ) {
+			return false;
+		}
+		else if ( ch eq "(" ) {
+			parens++;
+		}
+		else if ( ch eq ")" ) {
+			if ( parens == 0 ) {
+				return false;
+			}
+			parens--;
+		}
+		i++;
+	}
+
+	if ( in_class or parens != 0 ) {
+		return false;
+	}
+
+	try {
+		to_Regexp_with_flags(value, "u");
+		return true;
+	}
+	catch {
+		return false;
+	}
+}
+
+function _fmt_uri_template_ok ( value ) {
+	if ( not( value instanceof String ) ) { return false; }
+	let depth := 0;
+	let expr := "";
+	let i := 0;
+	while ( i < length value ) {
+		let ch := substr( value, i, 1 );
+		if ( ch eq "{" ) {
+			if ( depth != 0 ) { return false; }
+			depth := 1;
+			expr := "";
+		}
+		else if ( ch eq "}" ) {
+			if ( depth != 1 or expr eq "" ) { return false; }
+			if ( not( expr ~ /^[+#./;?&]?[A-Za-z0-9_][A-Za-z0-9_.%]*(?::[1-9][0-9]{0,3})?$/ ) ) {
+				return false;
+			}
+			depth := 0;
+		}
+		else if ( depth == 1 ) {
+			expr _= ch;
+		}
+		i++;
+	}
+	return depth == 0;
+}
+
+class FormatRegistry {
+	let _validators := {};
+
+	method __build__ () {
+		self.register( "date-time", _fmt_date_time_ok );
+		self.register( "date", _fmt_date_ok );
+		self.register( "time", _fmt_time_value_ok );
+		self.register( "duration", _fmt_duration_ok );
+		self.register( "email", _fmt_email_ok );
+		self.register( "idn-email", _fmt_idn_email_ok );
+		self.register( "hostname", _fmt_hostname_ok );
+		self.register( "idn-hostname", _fmt_idn_hostname_ok );
+		self.register( "ipv4", _fmt_ipv4_ok );
+		self.register( "ipv6", _fmt_ipv6_ok );
+		self.register( "uri", _fmt_uri_ok );
+		self.register( "uri-reference", _fmt_uri_reference_ok );
+		self.register( "iri", _fmt_iri_ok );
+		self.register( "iri-reference", _fmt_iri_reference_ok );
+		self.register( "uuid", _fmt_regex(
+			"^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$",
+		) );
+		self.register( "json-pointer", _fmt_json_pointer_ok );
+		self.register(
+			"relative-json-pointer",
+			fn v -> v instanceof String and valid_relative_json_pointer(v),
+		);
+		self.register( "regex", _fmt_regex_ok );
+		self.register( "uri-template", _fmt_uri_template_ok );
+	}
+
+	method register ( String name, validator ) {
+		_validators.set( name, validator );
+		return self;
+	}
+
+	method has ( String name ) {
+		return _validators.exists(name);
+	}
+
+	method check ( String name, value ) {
+		if ( not self.has(name) ) { return false; }
+		return _validators.get(name)(value);
+	}
+}

@@ -1,0 +1,46 @@
+from test/more import *;
+
+trait Named {
+
+	method tag () {
+		return "tag:" _ self.get_name();
+	}
+}
+
+trait Renamable {
+	method rename_to ( String value ) {
+		self.set_name( value );
+		return self.get_name();
+	}
+}
+
+class Animal {
+	let String name with get, set;
+}
+
+class Dog extends Animal with Named;
+class Fox extends Animal but Named;
+
+class LoudDog extends Animal with Named {
+	method tag () {
+		return super() _ "!";
+	}
+}
+
+class Cat extends Animal with Named, Renamable;
+
+let dog := new Dog( name: "Mochi" );
+let fox := new Fox( name: "Rin" );
+let loud := new LoudDog( name: "Bolt" );
+let cat := new Cat( name: "Nori" );
+
+is( dog.tag(), "tag:Mochi", "with composes trait methods" );
+is( fox.tag(), "tag:Rin", "but alias composes trait methods" );
+is( dog does Named, 1, "does recognizes composed traits" );
+is( loud.tag(), "tag:Bolt!", "super() can dispatch to trait method in overrides" );
+
+is( cat.tag(), "tag:Nori", "trait can call class get accessor shortcut" );
+is( cat.rename_to("Puff"), "Puff", "trait can call class set accessor shortcut" );
+is( cat.tag(), "tag:Puff", "set accessor in trait updates consumed class field" );
+
+done_testing();

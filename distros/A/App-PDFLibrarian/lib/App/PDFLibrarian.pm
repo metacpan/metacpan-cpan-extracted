@@ -20,7 +20,7 @@ use warnings;
 
 package App::PDFLibrarian;
 # ABSTRACT: Manage a library of academic papers in PDF format with embedded BibTeX metadata
-$App::PDFLibrarian::VERSION = '6.0.1';
+$App::PDFLibrarian::VERSION = '6.0.2';
 use parent 'Exporter';
 
 use Carp;

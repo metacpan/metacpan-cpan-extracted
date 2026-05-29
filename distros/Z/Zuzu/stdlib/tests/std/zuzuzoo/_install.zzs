@@ -1,0 +1,174 @@
+from test/more import *;
+
+requires_capability( "fs" );
+requires_capability( "proc" );
+
+from std/archive import Archive;
+from std/data/json import JSON;
+from std/io import Path;
+from std/proc import Env;
+from std/zuzuzoo import Zuzuzoo, format_install_plan, install;
+
+function ensure_dir ( path ) {
+	return true if path.exists();
+	let parent := path.parent();
+	ensure_dir(parent) if not parent.exists();
+	path.mkdir();
+	return true;
+}
+
+function root () {
+	let dir := Path.tempdir();
+	let lib := dir.child("lib");
+	let bin := dir.child("bin");
+	let meta := dir.child("meta");
+	ensure_dir(lib);
+	ensure_dir(bin);
+	ensure_dir(meta);
+	return {
+		dir_obj: dir,
+		lib_dir: lib.to_String(),
+		bin_dir: bin.to_String(),
+		meta_dir: meta.to_String(),
+		lib_obj: lib,
+		bin_obj: bin,
+		meta_obj: meta,
+	};
+}
+
+function archive_path () {
+	let path := Path.tempfile();
+	Archive.dump(
+		path,
+		{
+			entries: [
+				{
+					path: "install-basic-1.0.0/zuzu-distribution.json",
+					data: to_binary(
+						"{\"name\":\"install-basic\",\"version\":\"1.0.0\"," _
+						"\"author\":\"Example\",\"license\":\"MIT\"}\n",
+					),
+				},
+				{
+					path: "install-basic-1.0.0/modules/install/basic.zzm",
+					data: to_binary(
+						"function installed_value () {\n" _
+						"\treturn \"installed\";\n" _
+						"}\n",
+					),
+				},
+				{
+					path: "install-basic-1.0.0/scripts/basic-tool.zzs",
+					data: to_binary("say \"tool\";\n"),
+				},
+				{
+					path: "install-basic-1.0.0/scripts/zuzu-tool",
+					data: to_binary(
+						"#!/usr/bin/env zuzu\n" _
+						"say \"zuzu tool\";\n",
+					),
+				},
+				{
+					path: "install-basic-1.0.0/scripts/not-a-tool",
+					data: to_binary("say \"not installed\";\n"),
+				},
+				{
+					path: "install-basic-1.0.0/tests/basic.zzs",
+					data: to_binary(
+						"from test/more import *;\n" _
+						"from install/basic import installed_value;\n" _
+						"is( installed_value(), \"installed\", " _
+							"\"distribution module imported\" );\n" _
+						"pass(\"distribution test ran\");\n" _
+						"done_testing();\n",
+					),
+				},
+			],
+		},
+		"zip",
+	);
+	return path;
+}
+
+let target := root();
+let zuzu := ( new Path( path: Env.get( "ZUZU", "./bin/zuzu" ) ) ).to_String();
+let archive := archive_path();
+let zoo := new Zuzuzoo(
+	lib_dir: target{lib_dir},
+	bin_dir: target{bin_dir},
+	meta_dir: target{meta_dir},
+	home: Path.tempdir().to_String(),
+	zuzu_command: zuzu,
+);
+let result := zoo.install(archive.to_String());
+
+ok( result{ok}, "install returns ok" );
+is( result{tests}.length(), 1, "distribution tests are run" );
+ok( result{tests}[0]{ok}, "distribution test result is successful" );
+is(
+	target{lib_obj}.child("install").child("basic.zzm").slurp_utf8(),
+	"function installed_value () {\n" _
+		"\treturn \"installed\";\n" _
+		"}\n",
+	"module is copied to lib_dir",
+);
+is(
+	target{bin_obj}.child("basic-tool.zzs").slurp_utf8(),
+	"say \"tool\";\n",
+	"script is copied to bin_dir",
+);
+is(
+	target{bin_obj}.child("zuzu-tool").slurp_utf8(),
+	"#!/usr/bin/env zuzu\n" _
+		"say \"zuzu tool\";\n",
+	"extensionless Zuzu shebang script is copied to bin_dir",
+);
+ok(
+	not target{bin_obj}.child("not-a-tool").exists(),
+	"extensionless non-Zuzu script is not installed",
+);
+is(
+	target{bin_obj}.child("basic-tool.zzs").stat(){mode} & 511,
+	493,
+	"POSIX script is chmodded to 0755",
+);
+
+let installed := ( new JSON() ).load(
+	target{meta_obj}.child("install-basic-1.0.0.json"),
+);
+is(
+	installed{installed}{modules}[0]{install_as},
+	"install/basic.zzm",
+	"installed metadata records module destination",
+);
+is(
+	installed{installed}{scripts}.map( fn s -> s{install_as} ),
+	[ "basic-tool.zzs", "zuzu-tool" ],
+	"installed metadata records script destination",
+);
+is(
+	installed.exists("modules"),
+	false,
+	"installed metadata has no top-level modules",
+);
+like(
+	format_install_plan( result{plan} ),
+	/Install target:/,
+	"format_install_plan wrapper returns plan text",
+);
+
+let second := root();
+let top_result := install(
+	archive.to_String(),
+	{
+		lib_dir: second{lib_dir},
+		bin_dir: second{bin_dir},
+		meta_dir: second{meta_dir},
+		home: Path.tempdir().to_String(),
+		zuzu_command: zuzu,
+		no_test: true,
+	},
+);
+ok( top_result{ok}, "top-level install wrapper works" );
+
+done_testing();

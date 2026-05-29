@@ -1,0 +1,8 @@
+from test/c24/child import ChildDescribe;
+from test/more import *;
+
+let c := new ChildDescribe();
+
+is( c.describe(), "parent:trait", "trait method super() reaches imported parent method" );
+
+done_testing();

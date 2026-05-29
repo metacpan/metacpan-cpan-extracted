@@ -1,0 +1,130 @@
+from test/more import *;
+let ascii := to_binary("Hello");
+let bytes_a := to_binary("ABC");
+let bytes_b := to_binary("XYZ");
+let utf8_text := "é";
+let utf8_bytes := to_binary(utf8_text);
+is(
+	to_string( ascii _ to_binary("!") ),
+	"Hello!",
+	"BinaryString _ BinaryString stays binary",
+);
+is(
+	"<" _ ascii _ ">",
+	"<Hello>",
+	"String and ASCII BinaryString concatenate safely",
+);
+like(
+	exception( function() {
+		let bad := ~to_binary("A");
+		let tail_concat := bad _ "tail";
+	} ),
+	/Cannot implicitly concatenate non-ASCII BinaryString/,
+	"non-ASCII BinaryString concat with String is rejected",
+);
+like(
+	exception( function() {
+		let bad := utf8_bytes _ "tail";
+	} ),
+	/Cannot implicitly concatenate non-ASCII BinaryString/,
+	"valid UTF-8 but non-ASCII BinaryString concat with String is rejected",
+);
+is(
+	to_string(utf8_bytes),
+	utf8_text,
+	"explicit to_string decodes UTF-8 binary data",
+);
+let anded := bytes_a & bytes_b;
+let ored := bytes_a | bytes_b;
+let xored := bytes_a ^ bytes_b;
+let inverted := ~bytes_b;
+is(
+	typeof anded,
+	"BinaryString",
+	"bitwise and on binary returns BinaryString",
+);
+is( length anded, 3, "bitwise and is bytewise", );
+is( typeof ored, "BinaryString", "bitwise or is bytewise", );
+is( typeof xored, "BinaryString", "bitwise xor is bytewise", );
+is( length inverted, 3, "unary bitwise not keeps binary length", );
+like(
+	exception( function() {
+		let bad := to_binary("A") & to_binary("AB");
+	} ),
+	/equal.*length/i,
+	"unequal length binary bitwise operands throw",
+);
+is( 5 & 3, 1, "numeric bitwise and still works", );
+is( 5 | 2, 7, "numeric bitwise or still works", );
+is( 5 ^ 3, 6, "numeric bitwise xor still works", );
+ok(
+	( ~5 ) instanceof Number,
+	"numeric unary bitwise not still returns Number",
+);
+is( length utf8_text, 1, "length on text counts characters" );
+is( length utf8_bytes, 2, "length on BinaryString counts bytes" );
+like(
+	exception( function() {
+		let bad := uc ascii;
+	} ),
+	/TypeException|BinaryString|String/,
+	"uc rejects BinaryString",
+);
+like(
+	exception( function() {
+		let bad := lc ascii;
+	} ),
+	/TypeException|BinaryString|String/,
+	"lc rejects BinaryString",
+);
+like(
+	exception( function() {
+		let bad := ascii + 1;
+	} ),
+	/TypeException|Number|coerce/,
+	"numeric operators reject BinaryString",
+);
+function accepts_string ( String value ) {
+	return value;
+}
+function accepts_binary ( BinaryString value ) {
+	return value;
+}
+ok(
+	ascii instanceof BinaryString,
+	"BinaryString satisfies BinaryString instanceof",
+);
+ok(
+	! ( ascii instanceof String ),
+	"BinaryString does not satisfy String instanceof",
+);
+ok( "Hello" instanceof String, "String satisfies String instanceof" );
+ok(
+	! ( "Hello" instanceof BinaryString ),
+	"String does not satisfy BinaryString instanceof",
+);
+is(
+	accepts_string( to_string(ascii) ),
+	"Hello",
+	"explicit to_string allows String parameter",
+);
+is(
+	typeof accepts_binary(ascii),
+	"BinaryString",
+	"BinaryString parameter accepts BinaryString",
+);
+like(
+	exception( function() {
+		accepts_string(ascii);
+	} ),
+	/TypeException.*String.*BinaryString|BinaryString.*String/,
+	"String parameter rejects BinaryString",
+);
+like(
+	exception( function() {
+		accepts_binary("Hello");
+	} ),
+	/TypeException.*BinaryString.*String|String.*BinaryString/,
+	"BinaryString parameter rejects String",
+);
+done_testing();

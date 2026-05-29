@@ -1,0 +1,1914 @@
+=encoding utf8
+
+=head1 NAME
+
+std/gui - User-facing GUI constructor helpers.
+
+=head1 SYNOPSIS
+
+  from std/gui import *;
+
+  let w := Window(
+  	title: "Demo",
+  	VBox(
+  		Label( text: "Name:" ),
+  		Input( id: "name" ),
+  		Button( text: "OK", id: "submit" ),
+  	),
+  );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Electron.
+It is not supported by zuzu-js on Node. It is partially supported by
+zuzu-js in the browser: core GUI and widget lifecycle coverage passes,
+but filesystem-backed file and directory dialogue coverage is unsupported.
+
+=head1 DESCRIPTION
+
+This module provides thin constructor helpers over C<std/gui/objects>.
+Host runtimes expose the shared widget, object tree, event, and window
+lifecycle APIs when GUI support is available. It also re-exports
+backend-native file and directory dialogue hooks for C<std/gui/dialogue>.
+
+The module exports C<EM>, the standard UI font height in logical
+pixels, derived from C<std/gui/objects> metadata.
+
+=head1 EXPORTS
+
+=head2 Constants
+
+=over
+
+=item C<EM>
+
+Type: C<Number>. Standard UI font height in logical pixels.
+
+=item C<GUI_XML_NS>
+
+Type: C<String>. XML namespace URI used by GUI XML serialization and
+parsing.
+
+=back
+
+=head2 Functions
+
+=over
+
+=item C<< Window(... PairList p, Array c) >>, C<< VBox(... PairList p, Array c) >>, C<< HBox(... PairList p, Array c) >>, C<< Frame(... PairList p, Array c) >>
+
+Parameters: C<p> are widget properties and C<c> contains child widgets.
+Returns: widget object. Constructs window and layout widgets.
+
+=item C<< Label(... PairList p, Array c) >>, C<< Text(... PairList p, Array c) >>, C<< RichText(... PairList p, Array c) >>, C<< Image(... PairList p, Array c) >>
+
+Parameters: C<p> are widget properties and C<c> contains child widgets.
+Returns: widget object. Constructs content widgets.
+
+=item C<< Input(... PairList p, Array c) >>, C<< DatePicker(... PairList p, Array c) >>, C<< Checkbox(... PairList p, Array c) >>, C<< Radio(... PairList p, Array c) >>, C<< RadioGroup(... PairList p, Array c) >>, C<< Select(... PairList p, Array c) >>
+
+Parameters: C<p> are widget properties and C<c> contains child widgets.
+Returns: widget object. Constructs input widgets.
+
+=item C<< Menu(... PairList p, Array c) >>, C<< MenuItem(... PairList p, Array c) >>, C<< Button(... PairList p, Array c) >>, C<< Separator(... PairList p, Array c) >>, C<< Slider(... PairList p, Array c) >>, C<< Progress(... PairList p, Array c) >>
+
+Parameters: C<p> are widget properties and C<c> contains child widgets.
+Returns: widget object. Constructs command and control widgets.
+
+=item C<< Tabs(... PairList p, Array c) >>, C<< Tab(... PairList p, Array c) >>, C<< ListView(... PairList p, Array c) >>, C<< TreeView(... PairList p, Array c) >>
+
+Parameters: C<p> are widget properties and C<c> contains child widgets.
+Returns: widget object. Constructs tabular and collection widgets.
+
+=item C<< unbind(BindingToken token) >>
+
+Parameters: C<token> is a binding token. Returns: C<null>. Removes a GUI
+binding.
+
+=item C<< gui_from_xml(String xml) >>, C<< gui_from_xml_file(path) >>
+
+Parameters: C<xml> is GUI XML text and C<path> is a file path. Returns:
+widget object. Builds a GUI object tree from XML.
+
+=item C<< gui_to_xml(Widget root) >>
+
+Parameters: C<root> is a GUI widget. Returns: C<String>. Serializes a
+GUI object tree to XML.
+
+=back
+
+=head2 Classes
+
+=over
+
+=item C<BindingToken>
+
+Represents a model/widget binding.
+
+=over
+
+=item C<< token.is_active() >>
+
+Parameters: none. Returns: C<Boolean>. Returns true while the binding is
+active.
+
+=item C<< token.set_listener(token) >>
+
+Parameters: C<token> is a listener token. Returns: C<BindingToken>.
+Stores the listener token associated with the binding.
+
+=item C<< token.sync_model_to_widget() >>, C<< token.sync_widget_to_model() >>
+
+Parameters: none. Returns: C<null>. Synchronizes the bound values.
+
+=item C<< token.unbind() >>
+
+Parameters: none. Returns: C<null>. Removes the binding.
+
+=back
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/gui >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/gui/objects import
+	Window as _WindowClass,
+	VBox as _VBoxClass,
+	HBox as _HBoxClass,
+	Frame as _FrameClass,
+	Label as _LabelClass,
+	Text as _TextClass,
+	RichText as _RichTextClass,
+	Image as _ImageClass,
+	Input as _InputClass,
+	DatePicker as _DatePickerClass,
+	Checkbox as _CheckboxClass,
+	Radio as _RadioClass,
+	RadioGroup as _RadioGroupClass,
+	Select as _SelectClass,
+	Menu as _MenuClass,
+	MenuItem as _MenuItemClass,
+	Button as _ButtonClass,
+	Separator as _SeparatorClass,
+	Slider as _SliderClass,
+	Progress as _ProgressClass,
+	Tabs as _TabsClass,
+	Tab as _TabClass,
+	ListView as _ListViewClass,
+	TreeView as _TreeViewClass,
+	Widget,
+	Event,
+	ListenerToken,
+	native_file_open,
+	native_file_save,
+	native_directory_open,
+	native_directory_save,
+	native_colour_picker,
+	meta as _gui_meta;
+
+from std/gui/objects try import
+	native_alert,
+	native_confirm,
+	native_prompt;
+
+from std/data/xml import XML;
+from std/data/xml/escape import escape_xml;
+from std/internals import getupperprop;
+from std/path/zz import ZZPath;
+from std/string import join, split, substr, trim;
+
+
+const Number EM := _gui_meta{font_size_pixels};
+
+function _assert_known_props ( String ctor, PairList props, Array allowed ) {
+	let geometry := [
+		"width",
+		"height",
+		"minwidth",
+		"minheight",
+		"maxwidth",
+		"maxheight",
+	];
+	for ( let key in props.keys() ) {
+		if ( key ∉ allowed and key ∉ geometry ) {
+			die `GUI_PROP_UNKNOWN: ${ctor} does not accept property '${key}'`;
+		}
+	}
+}
+
+function _assert_prop_value ( String ctor, String prop, value, Array allowed ) {
+	if ( value ∉ allowed ) {
+		die `GUI_PROP_TYPE: ${ctor} property '${prop}' has invalid value`;
+	}
+}
+
+function _assert_prop_array ( String ctor, String prop, value ) {
+	if ( not( value instanceof Array ) ) {
+		die `GUI_PROP_TYPE: ${ctor} property '${prop}' expects Array`;
+	}
+}
+
+function _with_geometry_props ( Array allowed ) {
+	for ( let key in [
+		"width",
+		"height",
+		"minwidth",
+		"minheight",
+		"maxwidth",
+		"maxheight",
+	] ) {
+		allowed.push(key) unless key ∈ allowed;
+	}
+	return allowed;
+}
+
+function _apply_geometry ( Widget widget, PairList p ) {
+	for ( let key in [
+		"width",
+		"height",
+		"minwidth",
+		"minheight",
+		"maxwidth",
+		"maxheight",
+	] ) {
+		if ( p.has(key) ) {
+			widget.(key)( p.get(key) );
+		}
+	}
+	return widget;
+}
+
+function Window ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"Window",
+		p,
+		_with_geometry_props( [
+			"id",
+			"title",
+			"width",
+			"height",
+			"resizable",
+			"modal",
+			"visible",
+			"enabled",
+			"disabled",
+		] ),
+	);
+
+	return new _WindowClass(
+		id: p.get( "id", null ),
+		title: p.get( "title", "" ),
+		width: p.get( "width", 800 ),
+		height: p.get( "height", 600 ),
+		minwidth: p.get( "minwidth", null ),
+		minheight: p.get( "minheight", null ),
+		maxwidth: p.get( "maxwidth", null ),
+		maxheight: p.get( "maxheight", null ),
+		resizable: p.get( "resizable", true ),
+		modal: p.get( "modal", false ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	);
+}
+
+function VBox ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"VBox",
+		p,
+		[
+			"id",
+			"align",
+			"gap",
+			"padding",
+			"visible",
+			"enabled",
+			"disabled",
+		],
+	);
+
+	_assert_prop_value(
+		"VBox",
+		"align",
+		p.get( "align", "top" ),
+		[ "top", "centre", "bottom", "stretch" ],
+	);
+
+	return _apply_geometry( new _VBoxClass(
+		id: p.get( "id", null ),
+		align: p.get( "align", "top" ),
+		gap: p.get( "gap", 0 ),
+		padding: p.get( "padding", 0 ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	), p );
+}
+
+function HBox ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"HBox",
+		p,
+		_with_geometry_props( [
+			"id",
+			"align",
+			"gap",
+			"padding",
+			"visible",
+			"enabled",
+			"disabled",
+		] ),
+	);
+
+	_assert_prop_value(
+		"HBox",
+		"align",
+		p.get( "align", "left" ),
+		[ "left", "centre", "right", "stretch" ],
+	);
+
+	return new _HBoxClass(
+		id: p.get( "id", null ),
+		align: p.get( "align", "left" ),
+		gap: p.get( "gap", 0 ),
+		padding: p.get( "padding", 0 ),
+		width: p.get( "width", null ),
+		height: p.get( "height", null ),
+		minwidth: p.get( "minwidth", null ),
+		minheight: p.get( "minheight", null ),
+		maxwidth: p.get( "maxwidth", null ),
+		maxheight: p.get( "maxheight", null ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	);
+}
+
+function Frame ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"Frame",
+		p,
+		[
+			"id",
+			"label",
+			"collapsible",
+			"collapsed",
+			"visible",
+			"enabled",
+			"disabled",
+		],
+	);
+
+	return _apply_geometry( new _FrameClass(
+		id: p.get( "id", null ),
+		label: p.get( "label", "" ),
+		collapsible: p.get( "collapsible", false ),
+		collapsed: p.get( "collapsed", false ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	), p );
+}
+
+function Label ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"Label",
+		p,
+		[ "id", "text", "for", "visible", "enabled", "disabled" ],
+	);
+
+	let label := new _LabelClass(
+		id: p.get( "id", null ),
+		text: p.get( "text", "" ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	);
+	if ( p.has("for") ) {
+		label.set_for_id( p.get( "for", null ) );
+	}
+
+	return _apply_geometry( label, p );
+}
+
+function Text ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"Text",
+		p,
+		[
+			"id",
+			"value",
+			"multiline",
+			"readonly",
+			"wrap",
+			"visible",
+			"enabled",
+			"disabled",
+		],
+	);
+
+	return _apply_geometry( new _TextClass(
+		id: p.get( "id", null ),
+		value: p.get( "value", "" ),
+		multiline: p.get( "multiline", false ),
+		readonly: p.get( "readonly", false ),
+		wrap: p.get( "wrap", true ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	), p );
+}
+
+function RichText ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"RichText",
+		p,
+		[
+			"id",
+			"value",
+			"multiline",
+			"readonly",
+			"visible",
+			"enabled",
+			"disabled",
+		],
+	);
+
+	return _apply_geometry( new _RichTextClass(
+		id: p.get( "id", null ),
+		value: p.get( "value", "" ),
+		multiline: p.get( "multiline", true ),
+		readonly: p.get( "readonly", true ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	), p );
+}
+
+function Image ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"Image",
+		p,
+		[ "id", "src", "alt", "fit", "visible", "enabled", "disabled" ],
+	);
+
+	_assert_prop_value(
+		"Image",
+		"fit",
+		p.get( "fit", "none" ),
+		[ "none", "contain", "cover", "stretch" ],
+	);
+
+	return _apply_geometry( new _ImageClass(
+		id: p.get( "id", null ),
+		src: p.get( "src", "" ),
+		alt: p.get( "alt", "" ),
+		fit: p.get( "fit", "none" ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	), p );
+}
+
+function Input ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"Input",
+		p,
+		[
+			"id",
+			"value",
+			"placeholder",
+			"multiline",
+			"readonly",
+			"password",
+			"required",
+			"visible",
+			"enabled",
+			"disabled",
+		],
+	);
+
+	return _apply_geometry( new _InputClass(
+		id: p.get( "id", null ),
+		value: p.get( "value", "" ),
+		placeholder: p.get( "placeholder", "" ),
+		multiline: p.get( "multiline", false ),
+		readonly: p.get( "readonly", false ),
+		password: p.get( "password", false ),
+		required: p.get( "required", false ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	), p );
+}
+
+function DatePicker ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"DatePicker",
+		p,
+		[
+			"id",
+			"value",
+			"min",
+			"max",
+			"first_day_of_week",
+			"visible",
+			"enabled",
+			"disabled",
+		],
+	);
+
+	return _apply_geometry( new _DatePickerClass(
+		id: p.get( "id", null ),
+		value: p.get( "value", null ),
+		min: p.get( "min", null ),
+		max: p.get( "max", null ),
+		first_day_of_week: p.get( "first_day_of_week", 0 ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	), p );
+}
+
+function Checkbox ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"Checkbox",
+		p,
+		[
+			"id",
+			"label",
+			"checked",
+			"indeterminate",
+			"visible",
+			"enabled",
+			"disabled",
+		],
+	);
+
+	return _apply_geometry( new _CheckboxClass(
+		id: p.get( "id", null ),
+		label: p.get( "label", "" ),
+		checked: p.get( "checked", false ),
+		indeterminate: p.get( "indeterminate", false ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	), p );
+}
+
+function Radio ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"Radio",
+		p,
+		[
+			"id",
+			"label",
+			"value",
+			"group",
+			"checked",
+			"visible",
+			"enabled",
+			"disabled",
+		],
+	);
+
+	return _apply_geometry( new _RadioClass(
+		id: p.get( "id", null ),
+		label: p.get( "label", "" ),
+		value: p.get( "value", "" ),
+		group: p.get( "group", null ),
+		checked: p.get( "checked", false ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	), p );
+}
+
+function RadioGroup ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"RadioGroup",
+		p,
+		[
+			"id",
+			"name",
+			"value",
+			"visible",
+			"enabled",
+			"disabled",
+		],
+	);
+
+	return _apply_geometry( new _RadioGroupClass(
+		id: p.get( "id", null ),
+		name: p.get( "name", "" ),
+		value: p.get( "value", null ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	), p );
+}
+
+function Select ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"Select",
+		p,
+		[
+			"id",
+			"value",
+			"options",
+			"multiple",
+			"visible",
+			"enabled",
+			"disabled",
+		],
+	);
+
+	if ( p.has("options") ) {
+		_assert_prop_array( "Select", "options", p.get("options") );
+	}
+
+	return _apply_geometry( new _SelectClass(
+		id: p.get( "id", null ),
+		value: p.get( "value", null ),
+		options: p.get( "options", [] ),
+		multiple: p.get( "multiple", false ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	), p );
+}
+
+function Menu ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"Menu",
+		p,
+		[ "id", "text", "visible", "enabled", "disabled" ],
+	);
+
+	return _apply_geometry( new _MenuClass(
+		id: p.get( "id", null ),
+		text: p.get( "text", "" ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	), p );
+}
+
+function MenuItem ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"MenuItem",
+		p,
+		[ "id", "text", "disabled", "visible", "enabled" ],
+	);
+
+	return _apply_geometry( new _MenuItemClass(
+		id: p.get( "id", null ),
+		text: p.get( "text", "" ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	), p );
+}
+
+function Button ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"Button",
+		p,
+		_with_geometry_props( [
+			"id",
+			"text",
+			"variant",
+			"visible",
+			"enabled",
+			"disabled",
+		] ),
+	);
+
+	_assert_prop_value(
+		"Button",
+		"variant",
+		p.get( "variant", "default" ),
+		[ "default", "primary", "danger" ],
+	);
+
+	return new _ButtonClass(
+		id: p.get( "id", null ),
+		text: p.get( "text", "" ),
+		variant: p.get( "variant", "default" ),
+		width: p.get( "width", null ),
+		height: p.get( "height", null ),
+		minwidth: p.get( "minwidth", null ),
+		minheight: p.get( "minheight", null ),
+		maxwidth: p.get( "maxwidth", null ),
+		maxheight: p.get( "maxheight", null ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	);
+}
+
+function Separator ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"Separator",
+		p,
+		[ "id", "orientation", "visible", "enabled", "disabled" ],
+	);
+
+	_assert_prop_value(
+		"Separator",
+		"orientation",
+		p.get( "orientation", "horizontal" ),
+		[ "horizontal", "vertical" ],
+	);
+
+	return _apply_geometry( new _SeparatorClass(
+		id: p.get( "id", null ),
+		orientation: p.get( "orientation", "horizontal" ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	), p );
+}
+
+function Slider ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"Slider",
+		p,
+		[
+			"id",
+			"value",
+			"min",
+			"max",
+			"step",
+			"orientation",
+			"readonly",
+			"visible",
+			"enabled",
+			"disabled",
+		],
+	);
+
+	_assert_prop_value(
+		"Slider",
+		"orientation",
+		p.get( "orientation", "horizontal" ),
+		[ "horizontal", "vertical" ],
+	);
+
+	return _apply_geometry( new _SliderClass(
+		id: p.get( "id", null ),
+		value: p.get( "value", 0 ),
+		min: p.get( "min", 0 ),
+		max: p.get( "max", 100 ),
+		step: p.get( "step", 1 ),
+		orientation: p.get( "orientation", "horizontal" ),
+		readonly: p.get( "readonly", false ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	), p );
+}
+
+function Progress ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"Progress",
+		p,
+		[
+			"id",
+			"value",
+			"min",
+			"max",
+			"indeterminate",
+			"show_text",
+			"visible",
+			"enabled",
+			"disabled",
+		],
+	);
+
+	return _apply_geometry( new _ProgressClass(
+		id: p.get( "id", null ),
+		value: p.get( "value", 0 ),
+		min: p.get( "min", 0 ),
+		max: p.get( "max", 100 ),
+		indeterminate: p.get( "indeterminate", false ),
+		show_text: p.get( "show_text", false ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	), p );
+}
+
+function Tabs ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"Tabs",
+		p,
+		[
+			"id",
+			"selected",
+			"placement",
+			"visible",
+			"enabled",
+			"disabled",
+		],
+	);
+
+	_assert_prop_value(
+		"Tabs",
+		"placement",
+		p.get( "placement", "top" ),
+		[ "top", "bottom", "left", "right" ],
+	);
+
+	return _apply_geometry( new _TabsClass(
+		id: p.get( "id", null ),
+		selected: p.get( "selected", null ),
+		placement: p.get( "placement", "top" ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	), p );
+}
+
+function Tab ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"Tab",
+		p,
+		[
+			"id",
+			"title",
+			"value",
+			"selected",
+			"closable",
+			"icon",
+			"visible",
+			"enabled",
+			"disabled",
+		],
+	);
+
+	return _apply_geometry( new _TabClass(
+		id: p.get( "id", null ),
+		title: p.get( "title", "" ),
+		value: p.get( "value", "" ),
+		selected: p.get( "selected", false ),
+		closable: p.get( "closable", false ),
+		icon: p.get( "icon", null ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	), p );
+}
+
+function ListView ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"ListView",
+		p,
+		[
+			"id",
+			"items",
+			"selected_index",
+			"multiple",
+			"visible",
+			"enabled",
+			"disabled",
+		],
+	);
+
+	if ( p.has("items") ) {
+		_assert_prop_array( "ListView", "items", p.get("items") );
+	}
+
+	return _apply_geometry( new _ListViewClass(
+		id: p.get( "id", null ),
+		items: p.get( "items", [] ),
+		selected_index: p.get( "selected_index", null ),
+		multiple: p.get( "multiple", false ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	), p );
+}
+
+function TreeView ( ... PairList p, Array c ) {
+	_assert_known_props(
+		"TreeView",
+		p,
+		[
+			"id",
+			"items",
+			"selected_path",
+			"multiple",
+			"visible",
+			"enabled",
+			"disabled",
+		],
+	);
+
+	if ( p.has("items") ) {
+		_assert_prop_array( "TreeView", "items", p.get("items") );
+	}
+	if ( p.has("selected_path") ) {
+		_assert_prop_array( "TreeView", "selected_path", p.get("selected_path") );
+	}
+
+	return _apply_geometry( new _TreeViewClass(
+		id: p.get( "id", null ),
+		items: p.get( "items", [] ),
+		selected_path: p.get( "selected_path", [] ),
+		multiple: p.get( "multiple", false ),
+		visible: p.get( "visible", true ),
+		enabled: p.get( "enabled", true ),
+		disabled: p.get( "disabled", false ),
+		children: c,
+	), p );
+}
+
+function _binding_path_class ( path_class ) {
+	if ( path_class ≡ null ) {
+		return ZZPath;
+	}
+	if ( not( path_class instanceof Class ) ) {
+		die "GUI_BIND_PATH: paths special property must be Class or null";
+	}
+	return path_class;
+}
+
+function _binding_compile_path ( String path_text, path_class ) {
+	if ( path_class ≡ null ) {
+		try {
+			return new ZZPath( path: path_text );
+		}
+		catch ( Exception e ) {
+			die `GUI_BIND_PATH: ${e{message}}`;
+		}
+	}
+
+	let path_type := _binding_path_class(path_class);
+	try {
+		return new path_type( path: path_text );
+	}
+	catch ( Exception e ) {
+		die `GUI_BIND_PATH: ${e{message}}`;
+	}
+}
+
+function _binding_path ( pathish, path_class ) {
+	if ( pathish instanceof String ) {
+		return _binding_compile_path( pathish, path_class );
+	}
+	if (
+		pathish can first
+		and ( pathish can assign_first or pathish can ref_first )
+	) {
+		return pathish;
+	}
+
+	die "GUI_BIND_PATH: binding path must be String or path-like Object";
+}
+
+function _binding_get ( model, path ) {
+	return path.first( model, null );
+}
+
+function _binding_set ( model, path, value ) {
+	if ( path can assign_first ) {
+		return path.assign_first( model, value );
+	}
+
+	let ref := path.ref_first(model);
+	return ref(value);
+}
+
+class BindingToken {
+	let Widget widget but weak;
+	let String widget_prop;
+	let model;
+	let model_path;
+	let String event := "change";
+	let listener := null;
+	let Boolean _active := true;
+
+	method is_active () {
+		return _active;
+	}
+
+	method set_listener ( token ) {
+		listener := token;
+		return self;
+	}
+
+	method sync_model_to_widget () {
+		widget.(widget_prop)( _binding_get( model, model_path ) );
+		return self;
+	}
+
+	method sync_widget_to_model () {
+		_binding_set( model, model_path, widget.(widget_prop)() );
+		return self;
+	}
+
+	method unbind () {
+		if ( _active and listener ≢ null ) {
+			widget.off(listener);
+		}
+		_active := false;
+		return self;
+	}
+}
+
+function bind (
+	Widget widget,
+	String widget_prop,
+	model,
+	model_path,
+	... PairList p
+) {
+	let path := _binding_path( model_path, getupperprop( 1, "paths" ) );
+
+	let token := new BindingToken(
+		widget: widget,
+		widget_prop: widget_prop,
+		model: model,
+		model_path: path,
+		event: p.get( "event", "change" ),
+	);
+	let event_name := p.get( "event", "change" );
+
+	switch ( p.get( "initial", "model" ): eq ) {
+		case "model":
+			token.sync_model_to_widget();
+		case "widget":
+			token.sync_widget_to_model();
+		case "none":
+			// No initial sync.
+		default:
+			die "GUI_BIND_INITIAL: initial must be model, widget, or none";
+	}
+
+	token.set_listener(
+		widget.on( event_name, function () {
+			if ( token.is_active() ) {
+				token.sync_widget_to_model();
+			}
+		} ),
+	);
+	return token;
+}
+
+function unbind ( BindingToken token ) {
+	return token.unbind();
+}
+
+let GUI_XML_NS := "https://zuzulang.org/ns/std/gui";
+
+function _xml_error ( String code, String message ) {
+	die `${code}: ${message}`;
+}
+
+function _xml_tag_name ( node ) {
+	return node.localName() ?: node.nodeName();
+}
+
+function _xml_assert_namespace ( node ) {
+	let ns := node.namespaceURI();
+	if ( ns ≢ null and ns ≢ "" and ns ≢ GUI_XML_NS ) {
+		_xml_error(
+			"GUI_XML_STRUCTURE",
+			`unsupported GUI XML namespace '${ns}'`,
+		);
+	}
+}
+
+function _xml_common_allowed ( Array extra ) {
+	let out := [
+		"id",
+		"visible",
+		"enabled",
+		"disabled",
+		"width",
+		"height",
+		"minwidth",
+		"minheight",
+		"maxwidth",
+		"maxheight",
+	];
+	for ( let attr in extra ) {
+		out.push(attr);
+	}
+	return out;
+}
+
+function _xml_allowed_attrs ( String tag ) {
+	switch ( tag: eq ) {
+		case "Window":
+			return _xml_common_allowed(
+				[ "title", "width", "height", "resizable", "modal" ],
+			);
+		case "VBox", "HBox":
+			return _xml_common_allowed( [ "align", "gap", "padding" ] );
+		case "Frame":
+			return _xml_common_allowed( [ "label", "collapsible", "collapsed" ] );
+		case "Label":
+			return _xml_common_allowed( [ "text", "for" ] );
+		case "Text":
+			return _xml_common_allowed(
+				[ "value", "multiline", "readonly", "wrap" ],
+			);
+		case "RichText":
+			return _xml_common_allowed(
+				[ "value", "multiline", "readonly" ],
+			);
+		case "Image":
+			return _xml_common_allowed( [ "src", "alt", "fit" ] );
+		case "Input":
+			return _xml_common_allowed( [
+				"value",
+				"placeholder",
+				"multiline",
+				"readonly",
+				"password",
+				"required",
+			] );
+		case "DatePicker":
+			return _xml_common_allowed(
+				[ "value", "min", "max", "first_day_of_week" ],
+			);
+		case "Checkbox":
+			return _xml_common_allowed( [ "label", "checked", "indeterminate" ] );
+		case "Radio":
+			return _xml_common_allowed( [ "label", "value", "group", "checked" ] );
+		case "RadioGroup":
+			return _xml_common_allowed( [ "name", "value" ] );
+		case "Select":
+			return _xml_common_allowed( [ "value", "multiple" ] );
+		case "Menu":
+			return _xml_common_allowed( [ "text" ] );
+		case "MenuItem":
+			return _xml_common_allowed( [ "text" ] );
+		case "Button":
+			return _xml_common_allowed( [ "text", "variant" ] );
+		case "Separator":
+			return _xml_common_allowed( [ "orientation" ] );
+		case "Slider":
+			return _xml_common_allowed( [
+				"value",
+				"min",
+				"max",
+				"step",
+				"orientation",
+				"readonly",
+			] );
+		case "Progress":
+			return _xml_common_allowed( [
+				"value",
+				"min",
+				"max",
+				"indeterminate",
+				"show_text",
+			] );
+		case "Tabs":
+			return _xml_common_allowed( [ "selected", "placement" ] );
+		case "Tab":
+			return _xml_common_allowed(
+				[ "title", "value", "selected", "closable", "icon" ],
+			);
+		case "ListView":
+			return _xml_common_allowed( [ "selected_index", "multiple" ] );
+		case "TreeView":
+			return _xml_common_allowed( [ "selected_path", "multiple" ] );
+	}
+
+	_xml_error( "GUI_XML_STRUCTURE", `unsupported GUI XML element '${tag}'` );
+}
+
+function _xml_bool_attrs ( String tag ) {
+	return [
+		"visible",
+		"enabled",
+		"disabled",
+		"resizable",
+		"modal",
+		"collapsible",
+		"collapsed",
+		"multiline",
+		"readonly",
+		"wrap",
+		"password",
+		"required",
+		"checked",
+		"indeterminate",
+		"multiple",
+		"show_text",
+		"selected",
+		"closable",
+	];
+}
+
+function _xml_number_attrs ( String tag ) {
+	return [
+		"width",
+		"height",
+		"minwidth",
+		"minheight",
+		"maxwidth",
+		"maxheight",
+		"gap",
+		"padding",
+		"first_day_of_week",
+		"selected_index",
+		"value",
+		"min",
+		"max",
+		"step",
+	];
+}
+
+function _xml_bool ( String tag, String attr, String raw ) {
+	switch ( lc(raw): eq ) {
+		case "true", "1", "yes", "on": return true;
+		case "false", "0", "no", "off": return false;
+	}
+	_xml_error(
+		"GUI_XML_ATTR_TYPE",
+		`${tag}.${attr} expects a boolean XML attribute`,
+	);
+}
+
+function _xml_number ( String tag, String attr, String raw ) {
+	if ( not ( raw ~ /^-?[0-9]+(\.[0-9]+)?$/ ) ) {
+		_xml_error(
+			"GUI_XML_ATTR_TYPE",
+			`${tag}.${attr} expects a numeric XML attribute`,
+		);
+	}
+	return 0 + raw;
+}
+
+function _xml_int_list ( String tag, String attr, String raw ) {
+	let out := [];
+	return out if raw eq "";
+	for ( let part in split( raw, "," ) ) {
+		let item := trim(part);
+		if ( not ( item ~ /^-?[0-9]+$/ ) ) {
+			_xml_error(
+				"GUI_XML_ATTR_TYPE",
+				`${tag}.${attr} expects comma-separated integers`,
+			);
+		}
+		out.push( 0 + item );
+	}
+	return out;
+}
+
+function _xml_coerce_attr ( String tag, String attr, String raw ) {
+	if ( attr eq "selected" and tag eq "Tabs" ) {
+		return raw;
+	}
+	if ( attr eq "value" and tag ∉ [ "Slider", "Progress" ] ) {
+		return raw;
+	}
+	if ( attr eq "min" and tag eq "DatePicker" ) {
+		return raw;
+	}
+	if ( attr eq "max" and tag eq "DatePicker" ) {
+		return raw;
+	}
+	if ( attr eq "selected_path" ) {
+		return _xml_int_list( tag, attr, raw );
+	}
+	if ( attr ∈ _xml_bool_attrs(tag) ) {
+		return _xml_bool( tag, attr, raw );
+	}
+	if ( attr ∈ _xml_number_attrs(tag) ) {
+		return _xml_number( tag, attr, raw );
+	}
+	return raw;
+}
+
+function _xml_attrs ( node ) {
+	let tag := _xml_tag_name(node);
+	let props := {};
+	let meta := {};
+	let meta_keys := [];
+	let style := {};
+	let style_keys := [];
+	let allowed := _xml_allowed_attrs(tag);
+
+	for ( let attr in node.attributeNames() ) {
+		next if attr eq "xmlns";
+		next if substr( attr, 0, 6 ) eq "xmlns:";
+		let value := node.getAttribute(attr);
+		if ( substr( attr, 0, 5 ) eq "meta." ) {
+			let key := substr( attr, 5 );
+			_xml_error( "GUI_XML_ATTR_UNKNOWN", "empty meta attribute name" )
+				if key eq "";
+			meta{(key)} := value;
+			meta_keys.push(key);
+			next;
+		}
+		if ( substr( attr, 0, 6 ) eq "style." ) {
+			let key := substr( attr, 6 );
+			_xml_error( "GUI_XML_ATTR_UNKNOWN", "empty style attribute name" )
+				if key eq "";
+			style{(key)} := value;
+			style_keys.push(key);
+			next;
+		}
+		if ( attr ∉ allowed ) {
+			_xml_error(
+				"GUI_XML_ATTR_UNKNOWN",
+				`${tag} does not accept XML attribute '${attr}'`,
+			);
+		}
+		props{(attr)} := _xml_coerce_attr( tag, attr, value );
+	}
+
+	return {
+		props: props,
+		meta: meta,
+		meta_keys: meta_keys,
+		style: style,
+		style_keys: style_keys,
+	};
+}
+
+function _xml_apply_meta ( Widget widget, Dict meta, Array keys ) {
+	for ( let key in keys ) {
+		widget.meta( key, meta{(key)} );
+	}
+	if ( keys.length() > 0 ) {
+		widget.meta( "__xml_meta_keys", keys );
+	}
+	return widget;
+}
+
+function _xml_apply_style ( Widget widget, Dict style, Array keys ) {
+	for ( let key in keys ) {
+		widget.style( key, style{(key)} );
+	}
+	if ( keys.length() > 0 ) {
+		widget.meta( "__xml_style_keys", keys );
+	}
+	return widget;
+}
+
+function _xml_widget_from_node ( node ) {
+	_xml_assert_namespace(node);
+
+	let tag := _xml_tag_name(node);
+	let child_widgets := [];
+	for ( let child in node.children() ) {
+		child_widgets.push( _xml_widget_from_node(child) );
+	}
+	let parsed := _xml_attrs(node);
+	let p := parsed{props};
+	let widget;
+
+	switch ( tag: eq ) {
+		case "Window":
+			widget := new _WindowClass(
+				id: p.get( "id", null ),
+				title: p.get( "title", "" ),
+				width: p.get( "width", 800 ),
+				height: p.get( "height", 600 ),
+				resizable: p.get( "resizable", true ),
+				modal: p.get( "modal", false ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+				children: child_widgets,
+			);
+		case "VBox":
+			widget := new _VBoxClass(
+				id: p.get( "id", null ),
+				align: p.get( "align", "top" ),
+				gap: p.get( "gap", 0 ),
+				padding: p.get( "padding", 0 ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+				children: child_widgets,
+			);
+		case "HBox":
+			widget := new _HBoxClass(
+				id: p.get( "id", null ),
+				align: p.get( "align", "left" ),
+				gap: p.get( "gap", 0 ),
+				padding: p.get( "padding", 0 ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+				children: child_widgets,
+			);
+		case "Frame":
+			widget := new _FrameClass(
+				id: p.get( "id", null ),
+				label: p.get( "label", "" ),
+				collapsible: p.get( "collapsible", false ),
+				collapsed: p.get( "collapsed", false ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+				children: child_widgets,
+			);
+		case "Label":
+			widget := Label(
+				id: p.get( "id", null ),
+				text: p.get( "text", "" ),
+				("for"): p.get( "for", null ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+			);
+		case "Text":
+			widget := Text(
+				id: p.get( "id", null ),
+				value: p.get( "value", "" ),
+				multiline: p.get( "multiline", false ),
+				readonly: p.get( "readonly", false ),
+				wrap: p.get( "wrap", true ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+			);
+		case "RichText":
+			widget := RichText(
+				id: p.get( "id", null ),
+				value: p.get( "value", "" ),
+				multiline: p.get( "multiline", true ),
+				readonly: p.get( "readonly", true ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+			);
+		case "Image":
+			widget := Image(
+				id: p.get( "id", null ),
+				src: p.get( "src", "" ),
+				alt: p.get( "alt", "" ),
+				fit: p.get( "fit", "none" ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+			);
+		case "Input":
+			widget := Input(
+				id: p.get( "id", null ),
+				value: p.get( "value", "" ),
+				placeholder: p.get( "placeholder", "" ),
+				multiline: p.get( "multiline", false ),
+				readonly: p.get( "readonly", false ),
+				password: p.get( "password", false ),
+				required: p.get( "required", false ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+			);
+		case "DatePicker":
+			widget := DatePicker(
+				id: p.get( "id", null ),
+				value: p.get( "value", null ),
+				min: p.get( "min", null ),
+				max: p.get( "max", null ),
+				first_day_of_week: p.get( "first_day_of_week", 0 ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+			);
+		case "Checkbox":
+			widget := Checkbox(
+				id: p.get( "id", null ),
+				label: p.get( "label", "" ),
+				checked: p.get( "checked", false ),
+				indeterminate: p.get( "indeterminate", false ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+			);
+		case "Radio":
+			widget := Radio(
+				id: p.get( "id", null ),
+				label: p.get( "label", "" ),
+				value: p.get( "value", "" ),
+				group: p.get( "group", null ),
+				checked: p.get( "checked", false ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+			);
+		case "RadioGroup":
+			widget := new _RadioGroupClass(
+				id: p.get( "id", null ),
+				name: p.get( "name", "" ),
+				value: p.get( "value", null ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+				children: child_widgets,
+			);
+		case "Select":
+			widget := Select(
+				id: p.get( "id", null ),
+				value: p.get( "value", null ),
+				multiple: p.get( "multiple", false ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+			);
+		case "Menu":
+			widget := new _MenuClass(
+				id: p.get( "id", null ),
+				text: p.get( "text", "" ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+				children: child_widgets,
+			);
+		case "MenuItem":
+			widget := MenuItem(
+				id: p.get( "id", null ),
+				text: p.get( "text", "" ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+			);
+		case "Button":
+			widget := Button(
+				id: p.get( "id", null ),
+				text: p.get( "text", "" ),
+				variant: p.get( "variant", "default" ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+			);
+		case "Separator":
+			widget := Separator(
+				id: p.get( "id", null ),
+				orientation: p.get( "orientation", "horizontal" ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+			);
+		case "Slider":
+			widget := Slider(
+				id: p.get( "id", null ),
+				value: p.get( "value", 0 ),
+				min: p.get( "min", 0 ),
+				max: p.get( "max", 100 ),
+				step: p.get( "step", 1 ),
+				orientation: p.get( "orientation", "horizontal" ),
+				readonly: p.get( "readonly", false ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+			);
+		case "Progress":
+			widget := Progress(
+				id: p.get( "id", null ),
+				value: p.get( "value", 0 ),
+				min: p.get( "min", 0 ),
+				max: p.get( "max", 100 ),
+				indeterminate: p.get( "indeterminate", false ),
+				show_text: p.get( "show_text", false ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+			);
+		case "Tabs":
+			widget := new _TabsClass(
+				id: p.get( "id", null ),
+				selected: p.get( "selected", null ),
+				placement: p.get( "placement", "top" ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+				children: child_widgets,
+			);
+		case "Tab":
+			widget := new _TabClass(
+				id: p.get( "id", null ),
+				title: p.get( "title", "" ),
+				value: p.get( "value", "" ),
+				selected: p.get( "selected", false ),
+				closable: p.get( "closable", false ),
+				icon: p.get( "icon", null ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+				children: child_widgets,
+			);
+		case "ListView":
+			widget := ListView(
+				id: p.get( "id", null ),
+				selected_index: p.get( "selected_index", null ),
+				multiple: p.get( "multiple", false ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+			);
+		case "TreeView":
+			widget := TreeView(
+				id: p.get( "id", null ),
+				selected_path: p.get( "selected_path", [] ),
+				multiple: p.get( "multiple", false ),
+				visible: p.get( "visible", true ),
+				enabled: p.get( "enabled", true ),
+				disabled: p.get( "disabled", false ),
+			);
+		default:
+			_xml_error(
+				"GUI_XML_STRUCTURE",
+				`unsupported GUI XML element '${tag}'`,
+			);
+	}
+
+	_xml_apply_meta( widget, parsed{meta}, parsed{meta_keys} );
+	return _xml_apply_style( widget, parsed{style}, parsed{style_keys} );
+}
+
+function gui_from_xml ( String xml ) {
+	return _xml_widget_from_node( XML.parse(xml).documentElement() );
+}
+
+function gui_from_xml_file ( path ) {
+	die "XML.load is denied by runtime policy" if __system__{deny_fs};
+	from std/io import Path;
+	let file := path instanceof Path ? path : new Path(path);
+	return _xml_widget_from_node( XML.load(file).documentElement() );
+}
+
+function _xml_tag_for_widget ( Widget widget ) {
+	if ( widget instanceof _WindowClass ) { return "Window"; }
+	if ( widget instanceof _VBoxClass ) { return "VBox"; }
+	if ( widget instanceof _HBoxClass ) { return "HBox"; }
+	if ( widget instanceof _FrameClass ) { return "Frame"; }
+	if ( widget instanceof _LabelClass ) { return "Label"; }
+	if ( widget instanceof _TextClass ) { return "Text"; }
+	if ( widget instanceof _RichTextClass ) { return "RichText"; }
+	if ( widget instanceof _ImageClass ) { return "Image"; }
+	if ( widget instanceof _InputClass ) { return "Input"; }
+	if ( widget instanceof _DatePickerClass ) { return "DatePicker"; }
+	if ( widget instanceof _CheckboxClass ) { return "Checkbox"; }
+	if ( widget instanceof _RadioClass ) { return "Radio"; }
+	if ( widget instanceof _RadioGroupClass ) { return "RadioGroup"; }
+	if ( widget instanceof _SelectClass ) { return "Select"; }
+	if ( widget instanceof _MenuClass ) { return "Menu"; }
+	if ( widget instanceof _MenuItemClass ) { return "MenuItem"; }
+	if ( widget instanceof _ButtonClass ) { return "Button"; }
+	if ( widget instanceof _SeparatorClass ) { return "Separator"; }
+	if ( widget instanceof _SliderClass ) { return "Slider"; }
+	if ( widget instanceof _ProgressClass ) { return "Progress"; }
+	if ( widget instanceof _TabsClass ) { return "Tabs"; }
+	if ( widget instanceof _TabClass ) { return "Tab"; }
+	if ( widget instanceof _ListViewClass ) { return "ListView"; }
+	if ( widget instanceof _TreeViewClass ) { return "TreeView"; }
+	_xml_error( "GUI_XML_STRUCTURE", "unsupported widget for gui_to_xml" );
+}
+
+function _xml_attr ( String name, value ) {
+	return "" if value ≡ null;
+	return ` ${name}="${escape_xml(value)}"`;
+}
+
+function _xml_attr_if ( String name, value, fallback ) {
+	return "" if value ≡ fallback;
+	return _xml_attr( name, value );
+}
+
+function _xml_bool_attr_if ( String name, value, fallback ) {
+	let normalized := value ? true : false;
+	let normalized_fallback := fallback ? true : false;
+	return "" if normalized ≡ normalized_fallback;
+	return _xml_attr( name, normalized ? "true" : "false" );
+}
+
+function _xml_attr_nonempty ( String name, value ) {
+	return "" if value ≡ null or value eq "";
+	return _xml_attr( name, value );
+}
+
+function _xml_join_ints ( Array values ) {
+	let out := [];
+	for ( let value in values ) {
+		out.push( "" _ value );
+	}
+	return join( ",", out );
+}
+
+function _xml_meta_attrs ( Widget widget ) {
+	let keys := widget.meta( "__xml_meta_keys" ) ?: [];
+	let out := "";
+	for ( let key in keys ) {
+		out _= _xml_attr( "meta." _ key, widget.meta(key) );
+	}
+	return out;
+}
+
+function _xml_style_attrs ( Widget widget ) {
+	let keys := widget.meta( "__xml_style_keys" ) ?: [];
+	let out := "";
+	for ( let key in keys ) {
+		out _= _xml_attr( "style." _ key, widget.style(key) );
+	}
+	return out;
+}
+
+function _xml_common_attrs ( Widget widget ) {
+	let out := "";
+	out _= _xml_attr( "id", widget.id() ) if widget.id() ≢ null;
+	out _= _xml_bool_attr_if( "visible", widget.visible(), true );
+	out _= _xml_bool_attr_if( "disabled", not widget.enabled(), false );
+	out _= _xml_meta_attrs(widget);
+	out _= _xml_style_attrs(widget);
+	return out;
+}
+
+function _xml_widget_attrs ( Widget widget ) {
+	let out := _xml_common_attrs(widget);
+	if ( widget instanceof _WindowClass ) {
+		out _= _xml_attr_if( "title", widget.title(), "" );
+	}
+	else if ( widget instanceof _VBoxClass or widget instanceof _HBoxClass ) {
+		let default_align := widget instanceof _VBoxClass ? "top" : "left";
+		out _= _xml_attr_if( "align", widget.align(), default_align );
+		out _= _xml_attr_if( "gap", widget.gap(), 0 );
+		out _= _xml_attr_if( "padding", widget.padding(), 0 )
+			unless widget.padding() instanceof Array;
+	}
+	else if ( widget instanceof _FrameClass ) {
+		out _= _xml_attr_if( "label", widget.label(), "" );
+		out _= _xml_bool_attr_if( "collapsible", widget.collapsible(), false );
+		out _= _xml_bool_attr_if( "collapsed", widget.collapsed(), false );
+	}
+	else if ( widget instanceof _LabelClass ) {
+		out _= _xml_attr_if( "text", widget.text(), "" );
+		out _= _xml_attr_nonempty( "for", widget.for_id() );
+	}
+	else if ( widget instanceof _TextClass ) {
+		out _= _xml_attr_if( "value", widget.value(), "" );
+		out _= _xml_bool_attr_if( "multiline", widget.multiline(), false );
+		out _= _xml_bool_attr_if( "readonly", widget.readonly(), false );
+		out _= _xml_bool_attr_if( "wrap", widget.wrap(), true );
+	}
+	else if ( widget instanceof _RichTextClass ) {
+		out _= _xml_attr_if( "value", widget.value(), "" );
+		out _= _xml_bool_attr_if( "multiline", widget.multiline(), true );
+		out _= _xml_bool_attr_if( "readonly", widget.readonly(), true );
+	}
+	else if ( widget instanceof _ImageClass ) {
+		out _= _xml_attr_if( "src", widget.src(), "" );
+		out _= _xml_attr_if( "alt", widget.alt(), "" );
+		out _= _xml_attr_if( "fit", widget.fit(), "none" );
+	}
+	else if ( widget instanceof _InputClass ) {
+		out _= _xml_attr_if( "value", widget.value(), "" );
+		out _= _xml_attr_if( "placeholder", widget.placeholder(), "" );
+		out _= _xml_bool_attr_if( "multiline", widget.multiline(), false );
+		out _= _xml_bool_attr_if( "readonly", widget.readonly(), false );
+		out _= _xml_bool_attr_if( "password", widget.password(), false );
+		out _= _xml_bool_attr_if( "required", widget.required(), false );
+	}
+	else if ( widget instanceof _DatePickerClass ) {
+		out _= _xml_attr( "value", widget.value() );
+		out _= _xml_attr( "min", widget.min() ) if widget.min() ≢ null;
+		out _= _xml_attr( "max", widget.max() ) if widget.max() ≢ null;
+		out _= _xml_attr_if(
+			"first_day_of_week",
+			widget.first_day_of_week(),
+			0,
+		);
+	}
+	else if ( widget instanceof _CheckboxClass ) {
+		out _= _xml_attr_if( "label", widget.label(), "" );
+		out _= _xml_bool_attr_if( "checked", widget.checked(), false );
+		out _= _xml_bool_attr_if( "indeterminate", widget.indeterminate(), false );
+	}
+	else if ( widget instanceof _RadioClass ) {
+		out _= _xml_attr_if( "label", widget.label(), "" );
+		out _= _xml_attr_if( "value", widget.value(), "" );
+		out _= _xml_attr_nonempty( "group", widget.group() );
+		out _= _xml_bool_attr_if( "checked", widget.checked(), false );
+	}
+	else if ( widget instanceof _RadioGroupClass ) {
+		out _= _xml_attr_if( "name", widget.name(), "" );
+		out _= _xml_attr( "value", widget.value() ) if widget.value() ≢ null;
+	}
+	else if ( widget instanceof _SelectClass ) {
+		out _= _xml_attr( "value", widget.value() ) if widget.value() ≢ null;
+		out _= _xml_bool_attr_if( "multiple", widget.multiple(), false );
+	}
+	else if ( widget instanceof _MenuClass ) {
+		out _= _xml_attr_if( "text", widget.text(), "" );
+	}
+	else if ( widget instanceof _MenuItemClass ) {
+		out _= _xml_attr_if( "text", widget.text(), "" );
+	}
+	else if ( widget instanceof _ButtonClass ) {
+		out _= _xml_attr_if( "text", widget.text(), "" );
+		out _= _xml_attr_if( "variant", widget.variant(), "default" );
+	}
+	else if ( widget instanceof _SeparatorClass ) {
+		out _= _xml_attr_if( "orientation", widget.orientation(), "horizontal" );
+	}
+	else if ( widget instanceof _SliderClass ) {
+		out _= _xml_attr_if( "value", widget.value(), 0 );
+		out _= _xml_attr_if( "min", widget.min(), 0 );
+		out _= _xml_attr_if( "max", widget.max(), 100 );
+		out _= _xml_attr_if( "step", widget.step(), 1 );
+		out _= _xml_attr_if( "orientation", widget.orientation(), "horizontal" );
+		out _= _xml_bool_attr_if( "readonly", widget.readonly(), false );
+	}
+	else if ( widget instanceof _ProgressClass ) {
+		out _= _xml_attr_if( "value", widget.value(), 0 );
+		out _= _xml_attr_if( "min", widget.min(), 0 );
+		out _= _xml_attr_if( "max", widget.max(), 100 );
+		out _= _xml_bool_attr_if( "indeterminate", widget.indeterminate(), false );
+		out _= _xml_bool_attr_if( "show_text", widget.show_text(), false );
+	}
+	else if ( widget instanceof _TabsClass ) {
+		out _= _xml_attr( "selected", widget.selected() )
+			if widget.selected() ≢ null;
+		out _= _xml_attr_if( "placement", widget.placement(), "top" );
+	}
+	else if ( widget instanceof _TabClass ) {
+		out _= _xml_attr_if( "title", widget.title(), "" );
+		out _= _xml_attr_if( "value", widget.value(), "" );
+		out _= _xml_attr( "icon", widget.icon() ) if widget.icon() ≢ null;
+		out _= _xml_bool_attr_if( "selected", widget.selected(), false );
+		out _= _xml_bool_attr_if( "closable", widget.closable(), false );
+	}
+	else if ( widget instanceof _ListViewClass ) {
+		out _= _xml_attr( "selected_index", widget.selected_index() )
+			if widget.selected_index() ≢ null;
+		out _= _xml_bool_attr_if( "multiple", widget.multiple(), false );
+	}
+	else if ( widget instanceof _TreeViewClass ) {
+		let selected_path := widget.selected_path();
+		out _= _xml_attr( "selected_path", _xml_join_ints(selected_path) )
+			if selected_path.length() > 0;
+		out _= _xml_bool_attr_if( "multiple", widget.multiple(), false );
+	}
+	return out;
+}
+
+function _xml_serialize_widget ( Widget widget, Number depth ) {
+	let indent := "";
+	let i := 0;
+	while ( i < depth ) {
+		indent _= "\t";
+		i++;
+	}
+
+	let tag := _xml_tag_for_widget(widget);
+	let attrs := _xml_widget_attrs(widget);
+	attrs _= _xml_attr( "xmlns", GUI_XML_NS ) if depth = 0;
+	let children := widget.children();
+	if ( children.length() = 0 ) {
+		return indent _ "<" _ tag _ attrs _ " />";
+	}
+
+	let parts := [];
+	for ( let child in children ) {
+		parts.push( _xml_serialize_widget( child, depth + 1 ) );
+	}
+
+	return indent _ "<" _ tag _ attrs _ ">\n"
+		_ join( "\n", parts )
+		_ "\n" _ indent _ "</" _ tag _ ">";
+}
+
+function gui_to_xml ( Widget root ) {
+	return _xml_serialize_widget( root, 0 ) _ "\n";
+}

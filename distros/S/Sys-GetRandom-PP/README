@@ -20,10 +20,13 @@ SUPPORT AND DOCUMENTATION
 
     You can also look for information at:
 
-    *   RT, CPAN's request tracker:
-        <https://rt.cpan.org/Dist/Display.html?Name=Sys-GetRandom-PP>
-
     *   MetaCPAN: <https://metacpan.org/pod/Sys::GetRandom::PP>
+
+    *   The source repository on Codeberg:
+        <https://codeberg.org/mauke/Sys-GetRandom-PP>
+
+    *   The module's bug tracker:
+        <https://codeberg.org/mauke/Sys-GetRandom-PP/issues>
 
 COPYRIGHT & LICENSE
 

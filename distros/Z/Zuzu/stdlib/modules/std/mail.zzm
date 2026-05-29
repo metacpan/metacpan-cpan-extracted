@@ -1,0 +1,2726 @@
+=encoding utf8
+
+=head1 NAME
+
+std/mail - Pure ZuzuScript mail message object model.
+
+=head1 SYNOPSIS
+
+  from std/mail import Address, Head, Body, Message;
+  let message := new Message(
+    head: new Head(),
+    body: Body.bytes( to_binary("Hello\r\n") )
+  );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module provides the object model for RFC 5322-style message
+headers, address objects, MIME-ish bodies, date helpers, a conservative
+parser, and integration with compatible low-level mailers.
+
+The parser ignores multipart preamble and epilogue bytes in Phase 9.
+When either is present, C<Parser.warnings()> records the limitation.
+
+The serializer can generate missing multipart boundaries on request.
+C<Serializer.serialize()> writes matching C<Content-Type> output for the
+generated boundary. C<Serializer.serialize_body()> returns only body bytes,
+so callers using it with a generated boundary must provide the matching
+C<Content-Type> header separately.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item C<< parse_datetime(String text) >>
+
+Parameters: C<text> is a mail date string. Returns: C<Time>. Parses a
+mail header date into a C<std/time> object.
+
+=item C<< format_datetime(Time time) >>
+
+Parameters: C<time> is a C<std/time> object. Returns: C<String>. Formats
+a time for use in mail headers.
+
+=back
+
+=head2 Classes
+
+=over
+
+=item C<Address>
+
+Mail address object.
+
+=over
+
+=item C<< Address.parse(String text) >>, C<< Address.parse_list(String text) >>
+
+Parameters: C<text> is address header text. Returns: C<Address> or
+C<Array>. Parses one address or a comma-separated address list.
+
+=item C<< address.local() >>, C<< address.domain() >>, C<< address.display_name() >>, C<< address.address() >>
+
+Parameters: none. Returns: C<String> or C<null>. Returns address
+components.
+
+=item C<< address.to_header() >>, C<< address.to_String() >>
+
+Parameters: none. Returns: C<String>. Formats the address.
+
+=item C<< address.to_Dict() >>
+
+Parameters: none. Returns: C<Dict>. Converts the address to a
+dictionary.
+
+=back
+
+=item C<Head>
+
+Ordered mail header collection.
+
+=over
+
+=item C<< head.fields() >>, C<< head.to_PairList() >>, C<< head.to_Iterator() >>
+
+Parameters: none. Returns: C<PairList> or C<Function>. Returns header
+fields or an iterator.
+
+=item C<< head.raw(String name, fallback := null) >>, C<< head.raw_all(String name) >>, C<< head.decoded(String name, fallback := null) >>, C<< head.decoded_all(String name) >>, C<< head.get(String name, fallback := null) >>, C<< head.get_all(String name) >>
+
+Parameters: C<name> is a header name and C<fallback> is optional.
+Returns: C<String>, C<Array>, or fallback. Reads header values.
+
+=item C<< head.set(String name, String value) >>, C<< head.add(String name, String value) >>, C<< head.remove(String name) >>
+
+Parameters: C<name> is a header name and C<value> is header text.
+Returns: C<Head>. Mutates header fields.
+
+=item C<< head.has(String name) >>
+
+Parameters: C<name> is a header name. Returns: C<Boolean>. Tests whether
+a header exists.
+
+=item C<< head.content_type() >>, C<< head.content_transfer_encoding() >>, C<< head.charset() >>, C<< head.boundary() >>, C<< head.message_id() >>, C<< head.date() >>, C<< head.from() >>, C<< head.to() >>, C<< head.cc() >>, C<< head.bcc() >>, C<< head.subject() >>
+
+Parameters: none. Returns: header-specific value. Reads common headers.
+
+=back
+
+=item C<Body>
+
+Mail body value.
+
+=over
+
+=item C<< Body.bytes(BinaryString raw, ... PairList options) >>
+
+Parameters: C<raw> is body bytes and C<options> describe content type,
+encoding, and parts. Returns: C<Body>. Creates a leaf or multipart body.
+
+=item C<< Body.nested(message, ... PairList options) >>
+
+Parameters: C<message> is a C<Message>. Returns: C<Body>. Creates a
+nested message body.
+
+=item C<< body.is_multipart() >>, C<< body.is_nested() >>
+
+Parameters: none. Returns: C<Boolean>. Reports body shape.
+
+=item C<< body.bytes() >>, C<< body.decoded() >>, C<< body.encoded() >>
+
+Parameters: none. Returns: C<BinaryString>. Returns raw, decoded, or
+encoded body bytes.
+
+=item C<< body.parts() >>, C<< body.part(Number index) >>, C<< body.count() >>
+
+Parameters: C<index> selects a body part. Returns: C<Array>, C<Body>, or
+C<Number>. Reads multipart body parts.
+
+=item C<< body.nested() >>, C<< body.content_type() >>, C<< body.transfer_encoding() >>, C<< body.to_Dict() >>
+
+Parameters: none. Returns: value. Reads body metadata or converts the
+body to a dictionary.
+
+=back
+
+=item C<Message>
+
+Mail message object with C<head> and C<body>.
+
+=over
+
+=item C<< message.head() >>, C<< message.body() >>
+
+Parameters: none. Returns: C<Head> or C<Body>. Returns message parts.
+
+=item C<< message.header(String name, fallback := null) >>, C<< message.headers(String name) >>
+
+Parameters: C<name> is a header name and C<fallback> is optional.
+Returns: C<String>, C<Array>, or fallback. Reads message headers.
+
+=item C<< message.set_header(String name, String value) >>, C<< message.add_header(String name, String value) >>, C<< message.remove_header(String name) >>
+
+Parameters: C<name> is a header name and C<value> is header text.
+Returns: C<Message>. Mutates message headers.
+
+=item C<< message.subject() >>, C<< message.from() >>, C<< message.to() >>, C<< message.cc() >>, C<< message.bcc() >>, C<< message.date() >>, C<< message.message_id() >>
+
+Parameters: none. Returns: header-specific value. Reads common message
+headers.
+
+=item C<< message.is_part() >>, C<< message.container() >>, C<< message.toplevel() >>
+
+Parameters: none. Returns: C<Boolean> or C<Message>. Reads containment
+state.
+
+=item C<< message.send(mailer, ... PairList options) >>
+
+Parameters: C<mailer> is a compatible low-level mailer. Returns: value.
+Sends the message.
+
+=item C<< message.to_Dict() >>
+
+Parameters: none. Returns: C<Dict>. Converts the message to a
+dictionary.
+
+=back
+
+=item C<Parser>
+
+Conservative mail parser.
+
+=over
+
+=item C<< parser.warnings() >>
+
+Parameters: none. Returns: C<Array>. Returns non-fatal parse warnings.
+
+=item C<< parser.parse(BinaryString bytes) >>
+
+Parameters: C<bytes> is raw message bytes. Returns: C<Message>. Parses a
+mail message.
+
+=back
+
+=item C<Serializer>
+
+Mail serializer.
+
+=over
+
+=item C<< serializer.serialize_body(Message message, ... PairList options) >>
+
+Parameters: C<message> is a mail message and C<options> control output.
+Returns: C<BinaryString>. Serializes only the message body.
+
+=item C<< serializer.serialize(Message message, ... PairList options) >>
+
+Parameters: C<message> is a mail message and C<options> control output.
+Returns: C<BinaryString>. Serializes a complete message.
+
+=back
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/mail >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/string import chr, index, join, ord, substr, trim;
+
+from std/string/base64 import
+	encode as _base64_encode,
+	decode as _base64_decode;
+from std/string/quoted_printable import decode as _qp_decode;
+from std/time import Time, TimeZone;
+
+function _parse_one_address;
+function _parse_address_list;
+function _parse_address_header;
+function _mail_send_serialize_body;
+
+function _has_crlf ( String text ) {
+	return index( text, "\r" ) >= 0 or index( text, "\n" ) >= 0;
+}
+
+function _assert_no_crlf ( String text, String context ) {
+	if ( _has_crlf(text) ) {
+		die `mail.${context}: value must not contain CR or LF`;
+	}
+}
+
+function _is_ws ( String ch ) {
+	return ch eq " " or ch eq "\t";
+}
+
+function _skip_ws ( String text, Number i ) {
+	let pos := i;
+	let n := length text;
+	while ( pos < n and _is_ws( substr( text, pos, 1 ) ) ) {
+		pos++;
+	}
+	return pos;
+}
+
+function _div_floor ( Number n, Number d ) {
+	return floor( n / d );
+}
+
+function _hex_value ( String ch ) {
+	let v := index( "0123456789ABCDEF", uc(ch) );
+	return v;
+}
+
+function _bytes_to_binary ( Array bytes ) {
+	let alphabet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		_ "abcdefghijklmnopqrstuvwxyz0123456789+/";
+	let out := "";
+	let i := 0;
+	let n := bytes.length();
+
+	while ( i < n ) {
+		let b0 := bytes[i];
+		let b1 := null;
+		let b2 := null;
+		if ( i + 1 < n ) {
+			b1 := bytes[i + 1];
+		}
+		if ( i + 2 < n ) {
+			b2 := bytes[i + 2];
+		}
+
+		let c0 := _div_floor( b0, 4 );
+		let c1 := ( b0 mod 4 ) * 16;
+		let c2 := 64;
+		let c3 := 64;
+
+		if ( not( b1 == null ) ) {
+			c1 += _div_floor( b1, 16 );
+			c2 := ( b1 mod 16 ) * 4;
+			if ( not( b2 == null ) ) {
+				c2 += _div_floor( b2, 64 );
+				c3 := b2 mod 64;
+			}
+		}
+
+		out _= substr( alphabet, c0, 1 );
+		out _= substr( alphabet, c1, 1 );
+		out _= c2 == 64 ? "=" : substr( alphabet, c2, 1 );
+		out _= c3 == 64 ? "=" : substr( alphabet, c3, 1 );
+		i += 3;
+	}
+
+	return _base64_decode(out);
+}
+
+function _binary_to_bytes ( BinaryString raw ) {
+	let alphabet := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		_ "abcdefghijklmnopqrstuvwxyz0123456789+/";
+	let b64 := _base64_encode(raw);
+	let out := [];
+	let i := 0;
+	let n := length b64;
+
+	while ( i < n ) {
+		let c0 := index( alphabet, substr( b64, i, 1 ) );
+		let c1 := index( alphabet, substr( b64, i + 1, 1 ) );
+		let ch2 := substr( b64, i + 2, 1 );
+		let ch3 := substr( b64, i + 3, 1 );
+		let c2 := -1;
+		let c3 := -1;
+		if ( ch2 ne "=" ) {
+			c2 := index( alphabet, ch2 );
+		}
+		if ( ch3 ne "=" ) {
+			c3 := index( alphabet, ch3 );
+		}
+
+		out.push( c0 * 4 + _div_floor( c1, 16 ) );
+		if ( c2 >= 0 ) {
+			out.push( ( c1 mod 16 ) * 16 + _div_floor( c2, 4 ) );
+		}
+		if ( c3 >= 0 ) {
+			out.push( ( c2 mod 4 ) * 64 + c3 );
+		}
+
+		i += 4;
+	}
+
+	return out;
+}
+
+function _latin1_to_string ( BinaryString raw ) {
+	let out := "";
+	for ( let b in _binary_to_bytes(raw) ) {
+		out _= chr(b);
+	}
+	return out;
+}
+
+function _read_quoted_string ( String text, Number start ) {
+	let n := length text;
+	if ( substr( text, start, 1 ) ne "\"" ) {
+		die "mail.invalid_address: expected quoted string";
+	}
+
+	let out := "";
+	let i := start + 1;
+	while ( i < n ) {
+		let ch := substr( text, i, 1 );
+		if ( ch eq "\"" ) {
+			return { value: out, end: i + 1 };
+		}
+		if ( ch eq "\\" ) {
+			if ( i + 1 >= n ) {
+				die "mail.invalid_address: unterminated quoted string";
+			}
+			out _= substr( text, i + 1, 1 );
+			i += 2;
+			next;
+		}
+		if ( ch eq "\r" or ch eq "\n" ) {
+			die "mail.invalid_address: quoted string must not contain CR or LF";
+		}
+		out _= ch;
+		i++;
+	}
+
+	die "mail.invalid_address: unterminated quoted string";
+}
+
+function _quote_string ( String text ) {
+	let out := "\"";
+	let i := 0;
+	let n := length text;
+
+	while ( i < n ) {
+		let ch := substr( text, i, 1 );
+		if ( ch eq "\\" or ch eq "\"" ) {
+			out _= "\\";
+		}
+		out _= ch;
+		i++;
+	}
+
+	return out _ "\"";
+}
+
+function _is_alpha ( String ch ) {
+	let cp := ord(ch);
+	return ( cp >= 65 and cp <= 90 ) or ( cp >= 97 and cp <= 122 );
+}
+
+function _is_digit ( String ch ) {
+	let cp := ord(ch);
+	return cp >= 48 and cp <= 57;
+}
+
+function _is_atext ( String ch ) {
+	if ( _is_alpha(ch) or _is_digit(ch) ) {
+		return true;
+	}
+	return index( "!#$%&'*+-/=?^_`{|}~", ch ) >= 0;
+}
+
+function _is_dot_atom ( String text ) {
+	let n := length text;
+	return false if n == 0;
+	return false if substr( text, 0, 1 ) eq ".";
+	return false if substr( text, n - 1, 1 ) eq ".";
+
+	let prev_dot := false;
+	let i := 0;
+	while ( i < n ) {
+		let ch := substr( text, i, 1 );
+		if ( ch eq "." ) {
+			return false if prev_dot;
+			prev_dot := true;
+		}
+		else {
+			return false if not _is_atext(ch);
+			prev_dot := false;
+		}
+		i++;
+	}
+
+	return true;
+}
+
+function _is_domain_text ( String text ) {
+	let n := length text;
+	return false if n == 0;
+	return false if substr( text, 0, 1 ) eq ".";
+	return false if substr( text, n - 1, 1 ) eq ".";
+
+	let i := 0;
+	while ( i < n ) {
+		let ch := substr( text, i, 1 );
+		return false if not(
+			_is_alpha(ch)
+			or _is_digit(ch)
+			or ch eq "-"
+			or ch eq "."
+		);
+		i++;
+	}
+
+	return true;
+}
+
+function _is_phrase_text ( String text ) {
+	let n := length text;
+	return false if n == 0;
+	return false if text ne trim(text);
+
+	let i := 0;
+	while ( i < n ) {
+		let ch := substr( text, i, 1 );
+		if ( _is_ws(ch) ) {
+			i++;
+			next;
+		}
+		return false if not _is_atext(ch) and ch ne ".";
+		i++;
+	}
+
+	return true;
+}
+
+function _find_unquoted (
+	String text,
+	String target,
+	Number start := 0,
+	Boolean ignore_angle := false,
+) {
+	let i := start;
+	let n := length text;
+	let in_quote := false;
+	let escape := false;
+	let in_literal := false;
+	let angle_depth := 0;
+
+	while ( i < n ) {
+		let ch := substr( text, i, 1 );
+
+		if ( escape ) {
+			escape := false;
+			i++;
+			next;
+		}
+		if ( in_quote ) {
+			if ( ch eq "\\" ) {
+				escape := true;
+			}
+			else if ( ch eq "\"" ) {
+				in_quote := false;
+			}
+			i++;
+			next;
+		}
+		if ( in_literal ) {
+			if ( ch eq "]" ) {
+				in_literal := false;
+			}
+			i++;
+			next;
+		}
+
+		if ( ch eq target and ( not ignore_angle or angle_depth == 0 ) ) {
+			return i;
+		}
+		if ( ch eq "\"" ) {
+			in_quote := true;
+		}
+		else if ( ch eq "[" ) {
+			in_literal := true;
+		}
+		else if ( ch eq "<" ) {
+			angle_depth++;
+		}
+		else if ( ch eq ">" and angle_depth > 0 ) {
+			angle_depth--;
+		}
+
+		i++;
+	}
+
+	return -1;
+}
+
+function _find_top_level ( String text, String target, Number start := 0 ) {
+	return _find_unquoted( text, target, start, true );
+}
+
+function _parse_phrase ( String raw ) {
+	let text := trim(raw);
+	return null if text eq "";
+
+	if ( substr( text, 0, 1 ) eq "\"" ) {
+		let quoted := _read_quoted_string( text, 0 );
+		if ( trim( substr( text, quoted{end} ) ) ne "" ) {
+			die "mail.invalid_address: text follows quoted display name";
+		}
+		return quoted{value};
+	}
+
+	return text;
+}
+
+function _parse_addr_spec ( String raw ) {
+	let text := trim(raw);
+	_assert_no_crlf( text, "invalid_address" );
+
+	if ( substr( text, 0, 1 ) eq "@" ) {
+		die "mail.invalid_address: obsolete route syntax is not supported";
+	}
+
+	let at := _find_unquoted( text, "@", 0, false );
+	if ( at < 0 ) {
+		die "mail.invalid_address: mailbox address is missing @";
+	}
+
+	let route := _find_unquoted( text, ":", 0, false );
+	if ( route >= 0 and route < at ) {
+		die "mail.invalid_address: obsolete route syntax is not supported";
+	}
+
+	let local := trim( substr( text, 0, at ) );
+	let domain := trim( substr( text, at + 1 ) );
+	if ( local eq "" or domain eq "" ) {
+		die "mail.invalid_address: mailbox address is incomplete";
+	}
+
+	if ( substr( local, 0, 1 ) eq "\"" ) {
+		let quoted := _read_quoted_string( local, 0 );
+		if ( quoted{end} != length local ) {
+			die "mail.invalid_address: text follows quoted local part";
+		}
+		local := quoted{value};
+	}
+	else if ( not _is_dot_atom(local) ) {
+		die "mail.invalid_address: invalid local part";
+	}
+
+	if ( substr( domain, 0, 1 ) eq "[" ) {
+		if ( substr( domain, ( length domain ) - 1, 1 ) ne "]" ) {
+			die "mail.invalid_address: unterminated domain literal";
+		}
+		if ( _has_crlf(domain) ) {
+			die "mail.invalid_address: invalid domain literal";
+		}
+	}
+	else if ( not _is_domain_text(domain) ) {
+		die "mail.invalid_address: invalid domain";
+	}
+
+	return { local: local, domain: domain };
+}
+
+function _decode_q_encoded_word ( String text ) {
+	let bytes := [];
+	let i := 0;
+	let n := length text;
+
+	while ( i < n ) {
+		let ch := substr( text, i, 1 );
+		if ( ch eq "_" ) {
+			bytes.push(32);
+			i++;
+			next;
+		}
+		if ( ch eq "=" ) {
+			if ( i + 2 >= n ) {
+				return null;
+			}
+			let hi := _hex_value( substr( text, i + 1, 1 ) );
+			let lo := _hex_value( substr( text, i + 2, 1 ) );
+			if ( hi < 0 or lo < 0 ) {
+				return null;
+			}
+			bytes.push( hi * 16 + lo );
+			i += 3;
+			next;
+		}
+
+		let cp := ord(ch);
+		return null if cp > 127;
+		bytes.push(cp);
+		i++;
+	}
+
+	return _bytes_to_binary(bytes);
+}
+
+function _normal_charset ( String charset ) {
+	let cs := lc(charset);
+	if ( cs in [ "utf-8", "utf8" ] ) {
+		return "utf-8";
+	}
+	if ( cs in [ "us-ascii", "ascii" ] ) {
+		return "us-ascii";
+	}
+	if ( cs in [ "latin1", "latin-1", "iso-8859-1", "iso8859-1" ] ) {
+		return "latin1";
+	}
+	return null;
+}
+
+function _decode_charset_bytes ( BinaryString bytes, String charset ) {
+	let cs := _normal_charset(charset);
+	return null if cs == null;
+
+	if ( cs eq "latin1" ) {
+		return _latin1_to_string(bytes);
+	}
+
+	return try {
+		to_string(bytes);
+	}
+	catch {
+		null;
+	};
+}
+
+function _parse_encoded_word_at ( String text, Number start ) {
+	if ( substr( text, start, 2 ) ne "=?" ) {
+		return null;
+	}
+
+	let q1 := index( text, "?", start + 2 );
+	return null if q1 < 0;
+	let q2 := index( text, "?", q1 + 1 );
+	return null if q2 < 0;
+	let end := index( text, "?=", q2 + 1 );
+	return null if end < 0;
+
+	let charset := substr( text, start + 2, q1 - start - 2 );
+	let encoding := lc( substr( text, q1 + 1, q2 - q1 - 1 ) );
+	let payload := substr( text, q2 + 1, end - q2 - 1 );
+	let bytes := null;
+
+	if ( charset eq "" or payload eq "" ) {
+		return null;
+	}
+	if ( encoding eq "b" ) {
+		bytes := try {
+			_base64_decode(payload);
+		}
+		catch {
+			null;
+		};
+	}
+	else if ( encoding eq "q" ) {
+		bytes := _decode_q_encoded_word(payload);
+	}
+	else {
+		return null;
+	}
+
+	return null if bytes == null;
+	let decoded := _decode_charset_bytes( bytes, charset );
+	return null if decoded == null;
+
+	return { text: decoded, end: end + 2 };
+}
+
+function _decode_rfc2047 ( String raw ) {
+	let out := "";
+	let pending_ws := "";
+	let last_encoded := false;
+	let i := 0;
+	let n := length raw;
+
+	while ( i < n ) {
+		let ch := substr( raw, i, 1 );
+		if ( _is_ws(ch) ) {
+			let start := i;
+			while ( i < n and _is_ws( substr( raw, i, 1 ) ) ) {
+				i++;
+			}
+			pending_ws _= substr( raw, start, i - start );
+			next;
+		}
+
+		if ( substr( raw, i, 2 ) eq "=?" ) {
+			let parsed := _parse_encoded_word_at( raw, i );
+			if ( not( parsed == null ) ) {
+				out _= pending_ws unless last_encoded;
+				pending_ws := "";
+				out _= parsed{text};
+				last_encoded := true;
+				i := parsed{end};
+				next;
+			}
+		}
+
+		out _= pending_ws;
+		pending_ws := "";
+		out _= ch;
+		last_encoded := false;
+		i++;
+	}
+
+	return out _ pending_ws;
+}
+
+function _copy_pairlist ( fields ) {
+	let copy := new PairList();
+	if ( fields == null ) {
+		return copy;
+	}
+	if ( not( fields instanceof PairList ) ) {
+		die "mail.invalid_headers: Head fields expects PairList";
+	}
+	for ( let pair in fields.to_Array() ) {
+		copy.add( pair.key, pair.value );
+	}
+	return copy;
+}
+
+function _mail_send_recipients_option ( value ) {
+	if ( value instanceof String ) {
+		return [ value ];
+	}
+	if ( not( value instanceof Array ) ) {
+		die "mail.send: envelope_to expects String or Array";
+	}
+
+	let out := [];
+	for ( let item in value ) {
+		if ( not( item instanceof String ) ) {
+			die "mail.send: envelope_to expects String or Array of String";
+		}
+		out.push(item);
+	}
+	if ( out.length() == 0 ) {
+		die "mail.invalid_address: Message.send requires at least one "
+			_ "envelope recipient";
+	}
+	return out;
+}
+
+function _mail_send_options ( PairList options ) {
+	let out := {
+		envelope_from: null,
+		envelope_to: null,
+		send_options: new PairList(),
+	};
+
+	for ( let pair in options.to_Array() ) {
+		if ( pair.key eq "envelope_from" ) {
+			if ( not( pair.value instanceof String ) ) {
+				die "mail.send: envelope_from expects String";
+			}
+			out{envelope_from} := pair.value;
+		}
+		else if ( pair.key eq "envelope_to" ) {
+			out{envelope_to} := _mail_send_recipients_option(pair.value);
+		}
+		else if ( pair.key eq "send_options" ) {
+			if ( not( pair.value instanceof Dict )
+				and not( pair.value instanceof PairList ) ) {
+				die "mail.send: send_options expects Dict or PairList";
+			}
+			out{send_options} := pair.value;
+		}
+		else {
+			die "mail.send: unsupported option '" _ pair.key _ "'";
+		}
+	}
+
+	return out;
+}
+
+function _valid_header_name ( String name ) {
+	let n := length name;
+	return false if n == 0;
+	let i := 0;
+	while ( i < n ) {
+		let cp := ord( substr( name, i, 1 ) );
+		return false if cp < 33 or cp > 126 or cp == 58;
+		i++;
+	}
+	return true;
+}
+
+function _check_header_name ( String name ) {
+	if ( not _valid_header_name(name) ) {
+		die "mail.invalid_headers: invalid header name";
+	}
+}
+
+function _check_header_value ( value ) {
+	if ( not( value instanceof String ) ) {
+		die "mail.invalid_headers: header value expects String, got "
+			_ typeof value;
+	}
+	_assert_no_crlf( value, "invalid_headers" );
+}
+
+function _split_header_segments ( String text, String delimiter ) {
+	let out := [];
+	let start := 0;
+	let i := 0;
+	let n := length text;
+	let in_quote := false;
+	let escape := false;
+
+	while ( i < n ) {
+		let ch := substr( text, i, 1 );
+		if ( escape ) {
+			escape := false;
+		}
+		else if ( in_quote ) {
+			if ( ch eq "\\" ) {
+				escape := true;
+			}
+			else if ( ch eq "\"" ) {
+				in_quote := false;
+			}
+		}
+		else if ( ch eq "\"" ) {
+			in_quote := true;
+		}
+		else if ( ch eq delimiter ) {
+			out.push( substr( text, start, i - start ) );
+			start := i + 1;
+		}
+		i++;
+	}
+	out.push( substr( text, start ) );
+
+	return out;
+}
+
+function _unquote_header_param ( String text ) {
+	let value := trim(text);
+	if ( length value >= 2 and substr( value, 0, 1 ) eq "\"" ) {
+		let quoted := _read_quoted_string( value, 0 );
+		if ( trim( substr( value, quoted{end} ) ) eq "" ) {
+			return quoted{value};
+		}
+	}
+	return value;
+}
+
+function _header_main_value ( String value ) {
+	let parts := _split_header_segments( value, ";" );
+	return lc( trim( parts[0] ) );
+}
+
+function _header_parameter ( String value, String wanted ) {
+	let parts := _split_header_segments( value, ";" );
+	let i := 1;
+	while ( i < parts.length() ) {
+		let part := parts[i];
+		let equals_at := _find_unquoted( part, "=", 0, false );
+		if ( equals_at > 0 ) {
+			let name := lc( trim( substr( part, 0, equals_at ) ) );
+			if ( name eq lc(wanted) ) {
+				return _unquote_header_param( substr( part, equals_at + 1 ) );
+			}
+		}
+		i++;
+	}
+	return null;
+}
+
+function _body_options ( PairList options ) {
+	let opts := {
+		content_type: null,
+		transfer_encoding: null,
+		charset: null,
+		boundary: null,
+	};
+
+	for ( let option in options.to_Array() ) {
+		let key := option.key;
+		let value := option.value;
+		if ( key eq "content_type" ) {
+			opts{content_type} := value;
+		}
+		else if ( key eq "transfer_encoding"
+			or key eq "content_transfer_encoding" ) {
+			opts{transfer_encoding} := value;
+		}
+		else if ( key eq "charset" ) {
+			opts{charset} := value;
+		}
+		else if ( key eq "boundary" ) {
+			opts{boundary} := value;
+		}
+		else {
+			die `mail.body: unsupported Body option '${key}'`;
+		}
+	}
+
+	return opts;
+}
+
+function _copy_array ( Array items ) {
+	let out := [];
+	for ( let item in items ) {
+		out.push(item);
+	}
+	return out;
+}
+
+function _bytes_slice ( Array bytes, Number start, count := null ) {
+	let out := [];
+	let end := count == null ? bytes.length() : start + count;
+	end := bytes.length() if end > bytes.length();
+	let i := start;
+
+	while ( i < end ) {
+		out.push(bytes[i]);
+		i++;
+	}
+
+	return out;
+}
+
+function _bytes_to_latin1_string ( Array bytes ) {
+	return _latin1_to_string( _bytes_to_binary(bytes) );
+}
+
+function _split_message_bytes ( Array bytes ) {
+	let n := bytes.length();
+	let i := 0;
+	let line_start := 0;
+
+	while ( i < n ) {
+		if ( bytes[i] == 10 ) {
+			let content_end := i;
+			if ( content_end > line_start and bytes[content_end - 1] == 13 ) {
+				content_end--;
+			}
+			if ( content_end == line_start ) {
+				return {
+					header_bytes: _bytes_slice( bytes, 0, line_start ),
+					body_bytes: _bytes_slice( bytes, i + 1 ),
+					header_size: line_start,
+					found_separator: true,
+				};
+			}
+			i++;
+			line_start := i;
+			next;
+		}
+		i++;
+	}
+
+	return {
+		header_bytes: _bytes_slice( bytes, 0 ),
+		body_bytes: [],
+		header_size: n,
+		found_separator: false,
+	};
+}
+
+function _mail_header_lines ( Array bytes ) {
+	let lines := [];
+	let n := bytes.length();
+	let i := 0;
+	let line_start := 0;
+
+	while ( i < n ) {
+		if ( bytes[i] == 10 ) {
+			let content_end := i;
+			if ( content_end > line_start and bytes[content_end - 1] == 13 ) {
+				content_end--;
+			}
+			lines.push(
+				_bytes_to_latin1_string(
+					_bytes_slice( bytes, line_start, content_end - line_start ),
+				),
+			);
+			i++;
+			line_start := i;
+			next;
+		}
+		i++;
+	}
+
+	if ( line_start < n ) {
+		lines.push( _bytes_to_latin1_string( _bytes_slice( bytes, line_start ) ) );
+	}
+
+	return lines;
+}
+
+function _parse_mail_header_fields ( Array header_bytes ) {
+	let fields := new PairList();
+	let current_name := null;
+	let current_value := "";
+
+	for ( let line in _mail_header_lines(header_bytes) ) {
+		next if line eq "";
+
+		if ( _is_ws( substr( line, 0, 1 ) ) ) {
+			if ( current_name == null ) {
+				die "mail.parse: folded header without previous field";
+			}
+			current_value _= " " _ trim(line);
+			next;
+		}
+
+		if ( not( current_name == null ) ) {
+			fields.add( current_name, current_value );
+		}
+
+		let colon := index( line, ":" );
+		if ( colon <= 0 ) {
+			die "mail.parse: malformed header line";
+		}
+
+		current_name := substr( line, 0, colon );
+		if ( not _valid_header_name(current_name) ) {
+			die "mail.parse: invalid header name";
+		}
+		current_value := trim( substr( line, colon + 1 ) );
+	}
+
+	if ( not( current_name == null ) ) {
+		fields.add( current_name, current_value );
+	}
+
+	return fields;
+}
+
+function _only_sp_tab ( String text ) {
+	let i := 0;
+	let n := length text;
+
+	while ( i < n ) {
+		return false if not _is_ws( substr( text, i, 1 ) );
+		i++;
+	}
+
+	return true;
+}
+
+function _mail_boundary_line_kind ( Array line_bytes, String boundary ) {
+	let line := _bytes_to_latin1_string(line_bytes);
+	let delimiter := "--" _ boundary;
+	let dlen := length delimiter;
+
+	return null if length line < dlen;
+	return null if substr( line, 0, dlen ) ne delimiter;
+
+	let tail := substr( line, dlen );
+	return "open" if _only_sp_tab(tail);
+
+	if ( length tail >= 2 and substr( tail, 0, 2 ) eq "--" ) {
+		return "close" if _only_sp_tab( substr( tail, 2 ) );
+	}
+
+	return null;
+}
+
+function _mail_part_end_before_boundary (
+	Array bytes,
+	Number part_start,
+	Number line_start
+) {
+	let end := line_start;
+	if ( end > part_start and bytes[end - 1] == 10 ) {
+		end--;
+		if ( end > part_start and bytes[end - 1] == 13 ) {
+			end--;
+		}
+	}
+	return end;
+}
+
+function _scan_multipart_parts ( Array bytes, String boundary ) {
+	let parts := [];
+	let n := bytes.length();
+	let line_start := 0;
+	let opened := false;
+	let closed := false;
+	let part_start := 0;
+	let preamble_size := 0;
+	let epilogue_size := 0;
+
+	while ( line_start < n ) {
+		let line_end := line_start;
+		while ( line_end < n and bytes[line_end] != 10 ) {
+			line_end++;
+		}
+
+		let content_end := line_end;
+		if ( content_end > line_start and bytes[content_end - 1] == 13 ) {
+			content_end--;
+		}
+
+		let after_line := line_end < n ? line_end + 1 : n;
+		let kind := _mail_boundary_line_kind(
+			_bytes_slice( bytes, line_start, content_end - line_start ),
+			boundary,
+		);
+
+		if ( not( kind == null ) ) {
+			if ( not opened ) {
+				opened := true;
+				preamble_size := line_start;
+				part_start := after_line;
+				if ( kind eq "close" ) {
+					closed := true;
+					epilogue_size := n - after_line;
+					return {
+						opened: opened,
+						closed: closed,
+						parts: parts,
+						preamble_size: preamble_size,
+						epilogue_size: epilogue_size,
+					};
+				}
+			}
+			else {
+				let part_end := _mail_part_end_before_boundary(
+					bytes,
+					part_start,
+					line_start,
+				);
+				parts.push(
+					_bytes_slice( bytes, part_start, part_end - part_start ),
+				);
+				part_start := after_line;
+
+				if ( kind eq "close" ) {
+					closed := true;
+					epilogue_size := n - after_line;
+					return {
+						opened: opened,
+						closed: closed,
+						parts: parts,
+						preamble_size: preamble_size,
+						epilogue_size: epilogue_size,
+					};
+				}
+			}
+		}
+
+		line_start := after_line;
+	}
+
+	if ( opened and not closed ) {
+		parts.push( _bytes_slice( bytes, part_start ) );
+	}
+
+	return {
+		opened: opened,
+		closed: closed,
+		parts: parts,
+		preamble_size: preamble_size,
+		epilogue_size: epilogue_size,
+	};
+}
+
+function _is_identity_transfer_encoding ( encoding ) {
+	if ( encoding == null or encoding eq "" ) {
+		return true;
+	}
+	return encoding in [ "identity", "7bit", "8bit", "binary" ];
+}
+
+function _invalid_datetime ( String message ) {
+	die "mail.invalid_datetime: " _ message;
+}
+
+function _numeric_zone_seconds ( String zone ) {
+	return null if not( zone ~ /^[+-][0-9]{4}$/ );
+
+	let sign := substr( zone, 0, 1 ) eq "-" ? -1 : 1;
+	let hours := int( substr( zone, 1, 2 ) );
+	let minutes := int( substr( zone, 3, 2 ) );
+	return null if hours > 23 or minutes > 59;
+	return sign * ( hours * 3600 + minutes * 60 );
+}
+
+function _datetime_apply_option ( Dict opts, Dict seen, key, value ) {
+	if ( not( key instanceof String ) ) {
+		_invalid_datetime("format option names must be strings");
+	}
+	if ( seen.exists(key) ) {
+		_invalid_datetime( "conflicting format option '" _ key _ "'" );
+	}
+	seen.set( key, true );
+
+	if ( key eq "utc" ) {
+		if ( not( value instanceof Boolean ) ) {
+			_invalid_datetime("format option 'utc' expects Boolean");
+		}
+		opts{utc} := value;
+		opts{utc_seen} := true;
+		return;
+	}
+	if ( key eq "offset" ) {
+		if ( not( value instanceof String ) ) {
+			_invalid_datetime("format option 'offset' expects String");
+		}
+		let seconds := _numeric_zone_seconds(value);
+		if ( seconds == null ) {
+			_invalid_datetime("format option 'offset' expects +HHMM or -HHMM");
+		}
+		opts{offset} := value;
+		opts{offset_seconds} := seconds;
+		opts{offset_seen} := true;
+		return;
+	}
+	if ( key eq "include_weekday" ) {
+		if ( not( value instanceof Boolean ) ) {
+			_invalid_datetime("format option 'include_weekday' expects Boolean");
+		}
+		opts{include_weekday} := value;
+		return;
+	}
+
+	_invalid_datetime( "unknown format option '" _ key _ "'" );
+}
+
+function _datetime_options ( options, PairList named_options ) {
+	let opts := {
+		utc: true,
+		utc_seen: false,
+		offset: "+0000",
+		offset_seconds: 0,
+		offset_seen: false,
+		include_weekday: true,
+	};
+	let seen := {};
+
+	if ( options instanceof Dict ) {
+		for ( let key in options.keys() ) {
+			_datetime_apply_option( opts, seen, key, options.get(key) );
+		}
+	}
+	else if ( options instanceof PairList ) {
+		for ( let pair in options.to_Array() ) {
+			_datetime_apply_option( opts, seen, pair.key, pair.value );
+		}
+	}
+	else {
+		_invalid_datetime("format options expects Dict");
+	}
+
+	for ( let pair in named_options.to_Array() ) {
+		_datetime_apply_option( opts, seen, pair.key, pair.value );
+	}
+
+	if ( opts{offset_seen} and not opts{utc_seen} ) {
+		opts{utc} := false;
+	}
+	if ( opts{utc} and opts{offset_seconds} != 0 ) {
+		_invalid_datetime("format options 'utc' and 'offset' conflict");
+	}
+	return opts;
+}
+
+function _datetime_parse_error_message ( e ) {
+	let message := lc( "" _ e );
+	return "invalid time zone" if index( message, "invalid time zone" ) >= 0;
+	return "invalid time zone" if index( message, "timezone offset" ) >= 0;
+	return "invalid date" if index( message, "invalid date" ) >= 0;
+	return "invalid time" if index( message, "invalid time" ) >= 0;
+	return "invalid month" if index( message, "invalid month" ) >= 0;
+	return "invalid weekday" if index( message, "invalid weekday" ) >= 0;
+	return "invalid year" if index( message, "invalid year" ) >= 0;
+	return "expected RFC 5322 date-time";
+}
+
+function parse_datetime ( String text ) {
+	_assert_no_crlf( text, "invalid_datetime" );
+
+	try {
+		return Time.parse( trim(text) );
+	}
+	catch ( Exception e ) {
+		_invalid_datetime( _datetime_parse_error_message(e) );
+	}
+}
+
+function format_datetime (
+	time,
+	options := {},
+	... PairList named_options
+) {
+	if ( not( time instanceof Time ) ) {
+		_invalid_datetime("format_datetime expects Time");
+	}
+
+	let opts := _datetime_options( options, named_options );
+	let zoned := opts{utc}
+		? time.with_timezone( TimeZone.utc() )
+		: time.with_timezone( TimeZone.offset(opts{offset_seconds}) );
+	return zoned.to_rfc5322( include_weekday: opts{include_weekday} );
+}
+
+class Address {
+	let local := null;
+	let domain := null;
+	let display_name := null;
+
+	method __build__ () {
+		if ( not( local instanceof String ) or local eq "" ) {
+			die "mail.invalid_address: local part expects non-empty String";
+		}
+		if ( not( domain instanceof String ) or domain eq "" ) {
+			die "mail.invalid_address: domain expects non-empty String";
+		}
+		if ( not( display_name == null ) and not( display_name instanceof String ) ) {
+			die "mail.invalid_address: display_name expects String or null";
+		}
+
+		_assert_no_crlf( local, "invalid_address" );
+		_assert_no_crlf( domain, "invalid_address" );
+		if ( not( display_name == null ) ) {
+			_assert_no_crlf( display_name, "invalid_address" );
+		}
+	}
+
+	method local () {
+		return local;
+	}
+
+	method domain () {
+		return domain;
+	}
+
+	method display_name () {
+		return display_name;
+	}
+
+	method address () {
+		let lhs := _is_dot_atom(local) ? local : _quote_string(local);
+		return lhs _ "@" _ domain;
+	}
+
+	method to_header () {
+		if ( display_name == null or display_name eq "" ) {
+			return self.address();
+		}
+
+		let name := _is_phrase_text(display_name)
+			? display_name
+			: _quote_string(display_name);
+		return name _ " <" _ self.address() _ ">";
+	}
+
+	method to_String () {
+		return self.to_header();
+	}
+
+	method to_Dict () {
+		return {
+			local: local,
+			domain: domain,
+			display_name: display_name,
+			address: self.address(),
+			header: self.to_header(),
+		};
+	}
+
+	static method parse ( String text ) {
+		return _parse_one_address(text);
+	}
+
+	static method parse_list ( String text ) {
+		return _parse_address_list(text);
+	}
+}
+
+function _parse_one_address ( String raw ) {
+	let text := trim(raw);
+	_assert_no_crlf( text, "invalid_address" );
+
+	if ( text eq "" ) {
+		die "mail.invalid_address: empty address";
+	}
+	if ( _find_unquoted( text, "(", 0, false ) >= 0
+		or _find_unquoted( text, ")", 0, false ) >= 0 ) {
+		die "mail.invalid_address: obsolete comment syntax is not supported";
+	}
+
+	let angle_start := _find_unquoted( text, "<", 0, false );
+	if ( angle_start >= 0 ) {
+		let angle_end := _find_unquoted( text, ">", angle_start + 1, false );
+		if ( angle_end < 0 ) {
+			die "mail.invalid_address: unterminated angle address";
+		}
+		if ( trim( substr( text, angle_end + 1 ) ) ne "" ) {
+			die "mail.invalid_address: text follows angle address";
+		}
+
+		let spec := _parse_addr_spec(
+			substr( text, angle_start + 1, angle_end - angle_start - 1 ),
+		);
+		return new Address(
+			local: spec{local},
+			domain: spec{domain},
+			display_name: _parse_phrase( substr( text, 0, angle_start ) ),
+		);
+	}
+
+	let spec := _parse_addr_spec(text);
+	return new Address( local: spec{local}, domain: spec{domain} );
+}
+
+function _parse_address_list ( String text ) {
+	_assert_no_crlf( text, "invalid_address" );
+
+	let out := [];
+	let i := 0;
+	let n := length text;
+
+	while ( i < n ) {
+		i := _skip_ws( text, i );
+		if ( i < n and substr( text, i, 1 ) eq "," ) {
+			i++;
+			next;
+		}
+
+		let comma := _find_top_level( text, ",", i );
+		let semi := _find_top_level( text, ";", i );
+		let colon := _find_top_level( text, ":", i );
+		let group_end := semi;
+
+		if ( colon >= 0
+			and ( comma < 0 or colon < comma )
+			and ( semi < 0 or colon < semi ) ) {
+			if ( group_end < 0 ) {
+				die "mail.invalid_address: unterminated address group";
+			}
+			for ( let addr in _parse_address_list(
+				substr( text, colon + 1, group_end - colon - 1 ),
+			) ) {
+				out.push(addr);
+			}
+			i := group_end + 1;
+			next;
+		}
+
+		let end := comma < 0 ? n : comma;
+		if ( semi >= 0 and semi < end ) {
+			end := semi;
+		}
+		let token := trim( substr( text, i, end - i ) );
+		if ( token ne "" ) {
+			out.push( Address.parse(token) );
+		}
+		i := end + 1;
+	}
+
+	return out;
+}
+
+function _parse_address_header ( value ) {
+	if ( value == null ) {
+		return [];
+	}
+	return Address.parse_list(value);
+}
+
+function _mail_send_addresses_from_headers ( head, Array names ) {
+	let out := [];
+	for ( let name in names ) {
+		for ( let value in head.decoded_all(name) ) {
+			for ( let address in Address.parse_list(value) ) {
+				out.push(address);
+			}
+		}
+	}
+	return out;
+}
+
+function _mail_send_envelope_from ( head ) {
+	let senders := _mail_send_addresses_from_headers( head, [ "Sender" ] );
+	if ( senders.length() == 1 ) {
+		return senders[0].address();
+	}
+	if ( senders.length() > 1 ) {
+		die "mail.invalid_address: Message.send requires exactly one "
+			_ "Sender address";
+	}
+
+	let from_addrs := _mail_send_addresses_from_headers( head, [ "From" ] );
+	if ( from_addrs.length() == 1 ) {
+		return from_addrs[0].address();
+	}
+	if ( from_addrs.length() > 1 ) {
+		die "mail.invalid_address: Message.send requires exactly one "
+			_ "From address when Sender is absent";
+	}
+	die "mail.invalid_address: Message.send requires a Sender or From "
+		_ "address";
+}
+
+function _mail_send_envelope_to ( head ) {
+	let addresses := _mail_send_addresses_from_headers(
+		head,
+		[ "To", "Cc", "Bcc" ],
+	);
+	let seen := {};
+	let out := [];
+
+	for ( let address in addresses ) {
+		let value := address.address();
+		if ( not( value in seen ) ) {
+			seen{(value)} := true;
+			out.push(value);
+		}
+	}
+	if ( out.length() == 0 ) {
+		die "mail.invalid_address: Message.send requires at least one "
+			_ "envelope recipient";
+	}
+	return out;
+}
+
+function _mail_send_headers ( head ) {
+	let out := new PairList();
+	for ( let pair in head.to_PairList().to_Array() ) {
+		if ( lc(pair.key) ne "bcc" ) {
+			out.add( pair.key, pair.value );
+		}
+	}
+	return out;
+}
+
+class Head {
+	let fields := null;
+
+	method __build__ () {
+		fields := _copy_pairlist(fields);
+		for ( let pair in fields.to_Array() ) {
+			_check_header_name(pair.key);
+			_check_header_value(pair.value);
+		}
+	}
+
+	method fields () {
+		return fields.keys();
+	}
+
+	method raw ( String name, fallback := null ) {
+		_check_header_name(name);
+		let key := lc(name);
+		for ( let pair in fields.to_Array() ) {
+			if ( lc(pair.key) eq key ) {
+				return pair.value;
+			}
+		}
+		return fallback;
+	}
+
+	method raw_all ( String name ) {
+		_check_header_name(name);
+		let key := lc(name);
+		let out := [];
+		for ( let pair in fields.to_Array() ) {
+			if ( lc(pair.key) eq key ) {
+				out.push(pair.value);
+			}
+		}
+		return out;
+	}
+
+	method decoded ( String name, fallback := null ) {
+		let raw := self.raw( name, null );
+		return fallback if raw == null;
+		return _decode_rfc2047(raw);
+	}
+
+	method decoded_all ( String name ) {
+		let out := [];
+		for ( let value in self.raw_all(name) ) {
+			out.push( _decode_rfc2047(value) );
+		}
+		return out;
+	}
+
+	method get ( String name, fallback := null ) {
+		return self.decoded( name, fallback );
+	}
+
+	method get_all ( String name ) {
+		return self.decoded_all(name);
+	}
+
+	method set ( String name, String value ) {
+		self.remove(name);
+		return self.add( name, value );
+	}
+
+	method add ( String name, String value ) {
+		_check_header_name(name);
+		_check_header_value(value);
+		fields.add( name, value );
+		return self;
+	}
+
+	method remove ( String name ) {
+		_check_header_name(name);
+		let key := lc(name);
+		let kept := new PairList();
+		for ( let pair in fields.to_Array() ) {
+			if ( lc(pair.key) ne key ) {
+				kept.add( pair.key, pair.value );
+			}
+		}
+		fields := kept;
+		return self;
+	}
+
+	method has ( String name ) {
+		return not( self.raw( name, null ) == null );
+	}
+
+	method to_PairList () {
+		return _copy_pairlist(fields);
+	}
+
+	method to_Iterator () {
+		let items := fields.to_Array();
+		return items.to_Iterator();
+	}
+
+	method content_type () {
+		let value := self.decoded( "Content-Type", null );
+		return value == null ? null : _header_main_value(value);
+	}
+
+	method content_transfer_encoding () {
+		let value := self.decoded( "Content-Transfer-Encoding", null );
+		return value == null ? null : lc( trim(value) );
+	}
+
+	method charset () {
+		let value := self.decoded( "Content-Type", null );
+		let got := value == null ? null : _header_parameter( value, "charset" );
+		return got == null ? null : lc(got);
+	}
+
+	method boundary () {
+		let value := self.decoded( "Content-Type", null );
+		return value == null ? null : _header_parameter( value, "boundary" );
+	}
+
+	method message_id () {
+		return self.decoded( "Message-ID", null );
+	}
+
+	method date () {
+		return self.decoded( "Date", null );
+	}
+
+	method from () {
+		return _parse_address_header( self.decoded( "From", null ) );
+	}
+
+	method to () {
+		return _parse_address_header( self.decoded( "To", null ) );
+	}
+
+	method cc () {
+		return _parse_address_header( self.decoded( "Cc", null ) );
+	}
+
+	method bcc () {
+		return _parse_address_header( self.decoded( "Bcc", null ) );
+	}
+
+	method subject () {
+		return self.decoded( "Subject", null );
+	}
+}
+
+class _BodyBase {
+	let kind := "bytes";
+	let _bytes := null;
+	let _parts := null;
+	let _nested := null;
+	let content_type := null;
+	let transfer_encoding := null;
+	let charset := null;
+	let boundary := null;
+	let _owner_message but weak;
+
+	method __build__ () {
+		_bytes := to_binary("") if _bytes == null;
+		_parts := [] if _parts == null;
+		self._refresh_links();
+	}
+
+	method _refresh_links () {
+		if ( kind eq "multipart" ) {
+			for ( let part in _parts ) {
+				part._set_container(self);
+			}
+		}
+		else if ( kind eq "nested" and not( _nested == null ) ) {
+			_nested._set_container(self);
+		}
+		return self;
+	}
+
+	method _set_owner_message ( owner ) {
+		_owner_message := owner but weak;
+		return self;
+	}
+
+	method owner_message () {
+		return _owner_message;
+	}
+
+	method is_multipart () {
+		return kind eq "multipart";
+	}
+
+	method is_nested () {
+		return kind eq "nested";
+	}
+
+	method bytes () {
+		if ( kind ne "bytes" ) {
+			die "mail.body: only leaf bodies expose bytes";
+		}
+		return _bytes;
+	}
+
+	method parts () {
+		return _copy_array(_parts);
+	}
+
+	method part ( Number index ) {
+		if ( kind ne "multipart" ) {
+			die "mail.body: only multipart bodies expose parts";
+		}
+		return _parts[index];
+	}
+
+	method count () {
+		if ( kind eq "multipart" ) {
+			return _parts.length();
+		}
+		return kind eq "nested" ? 1 : 0;
+	}
+
+	method nested () {
+		return kind eq "nested" ? _nested : null;
+	}
+
+	method content_type () {
+		return content_type;
+	}
+
+	method transfer_encoding () {
+		return transfer_encoding == null ? "identity" : lc(transfer_encoding);
+	}
+
+	method decoded () {
+		if ( kind ne "bytes" ) {
+			die "mail.body: multipart/nested decoding is planned for Phase 10";
+		}
+
+		let enc := self.transfer_encoding();
+		if ( enc eq "base64" ) {
+			return _base64_decode( to_string(_bytes) );
+		}
+		if ( enc eq "quoted-printable" ) {
+			return _qp_decode( to_string(_bytes) );
+		}
+		if ( enc in [ "identity", "7bit", "8bit", "binary" ] ) {
+			return _bytes;
+		}
+
+		die `mail.body: unsupported transfer encoding '${enc}'`;
+	}
+
+	method encoded () {
+		if ( kind ne "bytes" ) {
+			die "mail.body: multipart/nested encoding is planned for Phase 10";
+		}
+		return _bytes;
+	}
+
+	method to_Dict () {
+		if ( kind eq "multipart" ) {
+			return {
+				kind: kind,
+				content_type: content_type,
+				transfer_encoding: transfer_encoding,
+				charset: charset,
+				boundary: boundary,
+				parts: _parts.map( fn part -> part.to_Dict() ),
+			};
+		}
+		if ( kind eq "nested" ) {
+			return {
+				kind: kind,
+				content_type: content_type,
+				transfer_encoding: transfer_encoding,
+				charset: charset,
+				message: _nested == null ? null : _nested.to_Dict(),
+			};
+		}
+		return {
+			kind: kind,
+			content_type: content_type,
+			transfer_encoding: transfer_encoding,
+			charset: charset,
+			bytes: _bytes,
+		};
+	}
+
+}
+
+class Body extends _BodyBase {
+	static method bytes ( BinaryString raw, ... PairList options ) {
+		let opts := _body_options(options);
+		return new Body(
+			kind: "bytes",
+			_bytes: raw,
+			content_type: opts{content_type},
+			transfer_encoding: opts{transfer_encoding},
+			charset: opts{charset},
+		);
+	}
+
+	static method multipart (
+		Array parts,
+		String boundary,
+		... PairList options
+	) {
+		_assert_no_crlf( boundary, "body" );
+		let opts := _body_options(options);
+		let ctype := opts{content_type} == null
+			? "multipart/mixed"
+			: opts{content_type};
+		let body := new Body(
+			kind: "multipart",
+			_parts: _copy_array(parts),
+			content_type: ctype,
+			transfer_encoding: opts{transfer_encoding},
+			charset: opts{charset},
+			boundary: boundary,
+		);
+		return body._refresh_links();
+	}
+
+	static method nested ( message, ... PairList options ) {
+		let opts := _body_options(options);
+		let ctype := opts{content_type} == null
+			? "message/rfc822"
+			: opts{content_type};
+		let body := new Body(
+			kind: "nested",
+			_nested: message,
+			content_type: ctype,
+			transfer_encoding: opts{transfer_encoding},
+			charset: opts{charset},
+		);
+		return body._refresh_links();
+	}
+}
+
+class Message {
+	let head := null;
+	let body := null;
+	let _container but weak;
+
+	method __build__ () {
+		head := new Head() if head == null;
+		body := Body.bytes( to_binary("") ) if body == null;
+		body._set_owner_message(self);
+	}
+
+	method _set_container ( container ) {
+		_container := container but weak;
+		return self;
+	}
+
+	method head () {
+		return head;
+	}
+
+	method body () {
+		return body;
+	}
+
+	method header ( String name, fallback := null ) {
+		return head.get( name, fallback );
+	}
+
+	method headers ( String name ) {
+		return head.get_all(name);
+	}
+
+	method set_header ( String name, String value ) {
+		head.set( name, value );
+		return self;
+	}
+
+	method add_header ( String name, String value ) {
+		head.add( name, value );
+		return self;
+	}
+
+	method remove_header ( String name ) {
+		head.remove(name);
+		return self;
+	}
+
+	method subject () {
+		return head.subject();
+	}
+
+	method from () {
+		return head.from();
+	}
+
+	method to () {
+		return head.to();
+	}
+
+	method cc () {
+		return head.cc();
+	}
+
+	method bcc () {
+		return head.bcc();
+	}
+
+	method date () {
+		return head.date();
+	}
+
+	method message_id () {
+		return head.message_id();
+	}
+
+	method is_part () {
+		return not( _container == null );
+	}
+
+	method container () {
+		return _container;
+	}
+
+	method toplevel () {
+		let current := self;
+		while ( not( current.container() == null ) ) {
+			let owner := current.container().owner_message();
+			return current if owner == null;
+			current := owner;
+		}
+		return current;
+	}
+
+	method send ( mailer, ... PairList options ) {
+		if ( mailer == null or not( mailer can "send" ) ) {
+			die "mail.unsupported: Message.send requires a compatible mailer";
+		}
+
+		let opts := _mail_send_options(options);
+		let envelope_from := opts{envelope_from} == null
+			? _mail_send_envelope_from(head)
+			: opts{envelope_from};
+		let envelope_to := opts{envelope_to} == null
+			? _mail_send_envelope_to(head)
+			: opts{envelope_to};
+		let headers := _mail_send_headers(head);
+		let send_body := _mail_send_serialize_body(self);
+
+		return mailer.send(
+			envelope_from,
+			envelope_to,
+			headers,
+			send_body,
+			opts{send_options},
+		);
+	}
+
+	method to_Dict () {
+		return {
+			head: head.to_PairList(),
+			body: body.to_Dict(),
+			is_part: self.is_part(),
+		};
+	}
+}
+
+class Parser {
+	let strict := false;
+	let max_header_bytes := 65536;
+	let max_depth := 32;
+	let decode_transfer := false;
+	let _warnings := [];
+
+	method __build__ () {
+		if ( not( strict instanceof Boolean ) ) {
+			die "mail.parse: strict expects Boolean";
+		}
+		if ( not( max_header_bytes instanceof Number ) or max_header_bytes < 0 ) {
+			die "mail.parse: max_header_bytes expects non-negative Number";
+		}
+		if ( not( max_depth instanceof Number ) or max_depth < 0 ) {
+			die "mail.parse: max_depth expects non-negative Number";
+		}
+		if ( not( decode_transfer instanceof Boolean ) ) {
+			die "mail.parse: decode_transfer expects Boolean";
+		}
+
+		_warnings := [];
+	}
+
+	method warnings () {
+		return _copy_array(_warnings);
+	}
+
+	method _warn ( String message ) {
+		_warnings.push( "mail.parse: " _ message );
+		return self;
+	}
+
+	method _fail ( String message ) {
+		die "mail.parse: " _ message;
+	}
+
+	method _enforce_depth ( Number depth ) {
+		if ( depth > max_depth ) {
+			self._fail("max_depth exceeded");
+		}
+	}
+
+	method _parse_head ( Array header_bytes ) {
+		let fields := _parse_mail_header_fields(header_bytes);
+		return new Head( fields: fields );
+	}
+
+	method _header_malformed_message ( BinaryString raw ) {
+		self._warn("malformed header section; preserving original bytes");
+		return new Message(
+			head: new Head(),
+			body: Body.bytes(raw),
+		);
+	}
+
+	method _safe_content_type ( Head head ) {
+		try {
+			return head.content_type();
+		}
+		catch {
+			if ( strict ) {
+				self._fail("malformed Content-Type header");
+			}
+			self._warn("malformed Content-Type header");
+			return null;
+		}
+	}
+
+	method _safe_charset ( Head head ) {
+		try {
+			return head.charset();
+		}
+		catch {
+			if ( strict ) {
+				self._fail("malformed Content-Type charset");
+			}
+			self._warn("malformed Content-Type charset");
+			return null;
+		}
+	}
+
+	method _safe_boundary ( Head head ) {
+		try {
+			return head.boundary();
+		}
+		catch {
+			if ( strict ) {
+				self._fail("malformed multipart boundary");
+			}
+			self._warn("malformed multipart boundary");
+			return null;
+		}
+	}
+
+	method _safe_transfer_encoding ( Head head ) {
+		try {
+			return head.content_transfer_encoding();
+		}
+		catch {
+			if ( strict ) {
+				self._fail("malformed Content-Transfer-Encoding header");
+			}
+			self._warn("malformed Content-Transfer-Encoding header");
+			return null;
+		}
+	}
+
+	method _leaf_body (
+		BinaryString raw,
+		content_type,
+		transfer_encoding,
+		charset
+	) {
+		return Body.bytes(
+			raw,
+			content_type: content_type,
+			transfer_encoding: transfer_encoding,
+			charset: charset,
+		);
+	}
+
+	method _multipart_body (
+		BinaryString raw,
+		Array body_bytes,
+		String content_type,
+		transfer_encoding,
+		charset,
+		boundary,
+		Number depth
+	) {
+		if ( boundary == null or boundary eq "" or _has_crlf(boundary) ) {
+			if ( strict ) {
+				self._fail("multipart body missing boundary");
+			}
+			self._warn("multipart body missing boundary; using leaf body");
+			return self._leaf_body( raw, content_type, transfer_encoding, charset );
+		}
+
+		let scanned := _scan_multipart_parts( body_bytes, boundary );
+		if ( not scanned{opened} ) {
+			if ( strict ) {
+				self._fail("multipart boundary open delimiter not found");
+			}
+			self._warn("multipart boundary open delimiter not found; using leaf body");
+			return self._leaf_body( raw, content_type, transfer_encoding, charset );
+		}
+
+		if ( scanned{preamble_size} > 0 ) {
+			self._warn("multipart preamble ignored");
+		}
+		if ( scanned{epilogue_size} > 0 ) {
+			self._warn("multipart epilogue ignored");
+		}
+		if ( not scanned{closed} ) {
+			if ( strict ) {
+				self._fail("multipart boundary close delimiter not found");
+			}
+			self._warn("multipart boundary close delimiter not found");
+		}
+
+		let messages := [];
+		for ( let part_bytes in scanned{parts} ) {
+			messages.push(
+				self._parse_message( _bytes_to_binary(part_bytes), depth + 1 ),
+			);
+		}
+
+		return Body.multipart(
+			messages,
+			boundary,
+			content_type: content_type,
+			transfer_encoding: transfer_encoding,
+			charset: charset,
+		);
+	}
+
+	method _nested_body (
+		BinaryString raw,
+		String content_type,
+		transfer_encoding,
+		charset,
+		Number depth
+	) {
+		if ( not _is_identity_transfer_encoding(transfer_encoding) ) {
+			if ( strict ) {
+				self._fail("encoded message/rfc822 bodies are not supported");
+			}
+			self._warn("encoded message/rfc822 body kept as leaf body");
+			return self._leaf_body( raw, content_type, transfer_encoding, charset );
+		}
+
+		return Body.nested(
+			self._parse_message( raw, depth + 1 ),
+			content_type: content_type,
+			transfer_encoding: transfer_encoding,
+			charset: charset,
+		);
+	}
+
+	method _parse_message ( BinaryString raw, Number depth ) {
+		self._enforce_depth(depth);
+
+		let bytes := _binary_to_bytes(raw);
+		let split := _split_message_bytes(bytes);
+		if ( split{header_size} > max_header_bytes ) {
+			self._fail("max_header_bytes exceeded");
+		}
+
+		let head;
+		if ( strict ) {
+			head := try {
+				self._parse_head( split{header_bytes} );
+			} catch {
+				self._fail("malformed header section");
+			};
+		}
+		else {
+			let fallback := null;
+			head := try {
+				self._parse_head( split{header_bytes} );
+			} catch {
+				fallback := self._header_malformed_message(raw);
+				null;
+			};
+			return fallback if not( fallback == null );
+		}
+
+		let raw_body := _bytes_to_binary( split{body_bytes} );
+		let content_type := self._safe_content_type(head);
+		let charset := self._safe_charset(head);
+		let boundary := self._safe_boundary(head);
+		let transfer_encoding := self._safe_transfer_encoding(head);
+		let body;
+
+		if ( not( content_type == null ) and index( content_type, "multipart/" ) == 0 ) {
+			body := self._multipart_body(
+				raw_body,
+				split{body_bytes},
+				content_type,
+				transfer_encoding,
+				charset,
+				boundary,
+				depth,
+			);
+		}
+		else if ( content_type eq "message/rfc822" ) {
+			body := self._nested_body(
+				raw_body,
+				content_type,
+				transfer_encoding,
+				charset,
+				depth,
+			);
+		}
+		else {
+			body := self._leaf_body(
+				raw_body,
+				content_type,
+				transfer_encoding,
+				charset,
+			);
+		}
+
+		return new Message( head: head, body: body );
+	}
+
+	method parse ( BinaryString bytes ) {
+		return self._parse_message( bytes, 0 );
+	}
+}
+
+function _mail_serialize_fail ( String message ) {
+	die "mail.serialize: " _ message;
+}
+
+function _mail_serialize_append_text (
+	Array out,
+	String text,
+	String context
+) {
+	let i := 0;
+	let n := length text;
+
+	while ( i < n ) {
+		let cp := ord( substr( text, i, 1 ) );
+		if ( cp > 255 ) {
+			_mail_serialize_fail(
+				context _ " contains a character outside byte range",
+			);
+		}
+		out.push(cp);
+		i++;
+	}
+
+	return out;
+}
+
+function _mail_serialize_append_binary ( Array out, BinaryString bytes ) {
+	for ( let b in _binary_to_bytes(bytes) ) {
+		out.push(b);
+	}
+	return out;
+}
+
+function _mail_serialize_header_words ( String value ) {
+	let words := [];
+	let i := 0;
+	let n := length value;
+
+	while ( i < n ) {
+		i := _skip_ws( value, i );
+		last if i >= n;
+
+		let start := i;
+		while ( i < n and not _is_ws( substr( value, i, 1 ) ) ) {
+			i++;
+		}
+		words.push( substr( value, start, i - start ) );
+	}
+
+	return words;
+}
+
+function _mail_serialize_folded_header_lines (
+	String name,
+	String value,
+	Number line_length
+) {
+	let unfolded := name _ ": " _ value;
+	return [ unfolded ] if length unfolded <= line_length;
+
+	let words := _mail_serialize_header_words(value);
+	return [ unfolded ] if words.length() <= 1;
+
+	let lines := [];
+	let first_prefix := name _ ": ";
+	let line := first_prefix;
+
+	for ( let word in words ) {
+		let separator := ( line eq first_prefix or line eq "\t" )
+			? ""
+			: " ";
+		let candidate := line _ separator _ word;
+
+		if ( length candidate <= line_length
+			or line eq first_prefix
+			or line eq "\t" ) {
+			line := candidate;
+			next;
+		}
+
+		lines.push(line);
+		line := "\t" _ word;
+	}
+
+	lines.push(line);
+	return lines;
+}
+
+function _mail_serialize_quote_boundary ( String boundary ) {
+	return _quote_string(boundary);
+}
+
+class Serializer {
+	let newline := "\r\n";
+	let fold_headers := true;
+	let line_length := 78;
+	let generate_boundary := false;
+	let _boundary_counter := 0;
+
+	method __build__ () {
+		if ( not( newline instanceof String ) ) {
+			self._fail("newline expects String");
+		}
+		if ( newline ne "\r\n" and newline ne "\n" ) {
+			self._fail("newline must be CRLF or LF");
+		}
+		if ( not( fold_headers instanceof Boolean ) ) {
+			self._fail("fold_headers expects Boolean");
+		}
+		if ( not( line_length instanceof Number ) ) {
+			self._fail("line_length expects Number");
+		}
+		if ( line_length < 1 ) {
+			self._fail("line_length must be positive");
+		}
+		if ( not( generate_boundary instanceof Boolean ) ) {
+			self._fail("generate_boundary expects Boolean");
+		}
+		if ( not( _boundary_counter instanceof Number ) or _boundary_counter < 0 ) {
+			self._fail("_boundary_counter expects non-negative Number");
+		}
+
+		line_length := int(line_length);
+		_boundary_counter := int(_boundary_counter);
+	}
+
+	method _fail ( String message ) {
+		_mail_serialize_fail(message);
+	}
+
+	method _reject_method_options ( PairList options ) {
+		let items := options.to_Array();
+		if ( items.length() > 0 ) {
+			self._fail(
+				"unsupported method option '" _ items[0].key
+					_ "'; use constructor named arguments",
+			);
+		}
+	}
+
+	method _validate_header_pair ( pair ) {
+		if ( not( pair.key instanceof String ) or not _valid_header_name(pair.key) ) {
+			self._fail("invalid header name");
+		}
+		if ( not( pair.value instanceof String ) ) {
+			self._fail("header value expects String, got " _ typeof pair.value);
+		}
+		if ( _has_crlf(pair.value) ) {
+			self._fail("header value must not contain CR or LF");
+		}
+	}
+
+	method _append_line ( Array out, String line ) {
+		_mail_serialize_append_text( out, line, "header line" );
+		_mail_serialize_append_text( out, newline, "newline" );
+	}
+
+	method _append_header ( Array out, String name, String value ) {
+		let lines := fold_headers
+			? _mail_serialize_folded_header_lines(
+				name,
+				value,
+				line_length,
+			)
+			: [ name _ ": " _ value ];
+
+		for ( let line in lines ) {
+			self._append_line( out, line );
+		}
+	}
+
+	method _generated_boundary () {
+		_boundary_counter++;
+		return `zuzu-boundary-${_boundary_counter}`;
+	}
+
+	method _validate_boundary ( String boundary ) {
+		if ( boundary eq "" ) {
+			self._fail("multipart body missing boundary");
+		}
+		if ( _has_crlf(boundary) ) {
+			self._fail("multipart boundary must not contain CR or LF");
+		}
+		return boundary;
+	}
+
+	method _header_boundary ( Head head ) {
+		let value := head.raw( "Content-Type", null );
+		return null if value == null;
+
+		let boundary := null;
+		try {
+			boundary := _header_parameter( value, "boundary" );
+		}
+		catch {
+			boundary := null;
+		}
+
+		return boundary;
+	}
+
+	method _body_content_type ( body ) {
+		let data := body.to_Dict();
+		let content_type := data{content_type};
+		return "multipart/mixed" if content_type == null;
+		if ( not( content_type instanceof String ) ) {
+			self._fail("multipart content_type expects String");
+		}
+		return content_type;
+	}
+
+	method _content_type_with_boundary (
+		body,
+		String value,
+		String boundary
+	) {
+		let existing := null;
+		let main := null;
+		try {
+			existing := _header_parameter( value, "boundary" );
+			main := _header_main_value(value);
+		}
+		catch {
+			existing := null;
+			main := null;
+		}
+
+		let quoted := _mail_serialize_quote_boundary(boundary);
+		if ( not( existing == null ) and existing eq "" ) {
+			return self._body_content_type(body) _ "; boundary=" _ quoted;
+		}
+		if ( existing == null ) {
+			if ( main == null or index( main, "multipart/" ) != 0 ) {
+				return self._body_content_type(body) _ "; boundary=" _ quoted;
+			}
+			return value _ "; boundary=" _ quoted;
+		}
+
+		return value;
+	}
+
+	method _generated_content_type ( body, String boundary ) {
+		return self._body_content_type(body)
+			_ "; boundary="
+			_ _mail_serialize_quote_boundary(boundary);
+	}
+
+	method _full_context ( Message message ) {
+		let body := message.body();
+		let data := body.to_Dict();
+		if ( data{kind} ne "multipart" ) {
+			return { multipart: false, boundary: null };
+		}
+
+		let boundary := data{boundary};
+		if ( not( boundary == null ) and not( boundary instanceof String ) ) {
+			self._fail("multipart boundary expects String");
+		}
+		if ( boundary == null or boundary eq "" ) {
+			boundary := self._header_boundary( message.head() );
+		}
+		if ( not( boundary == null ) and not( boundary instanceof String ) ) {
+			self._fail("multipart boundary expects String");
+		}
+		if ( boundary == null or boundary eq "" ) {
+			if ( generate_boundary ) {
+				boundary := self._generated_boundary();
+			}
+			else {
+				return { multipart: true, boundary: null };
+			}
+		}
+
+		return {
+			multipart: true,
+			boundary: self._validate_boundary(boundary),
+		};
+	}
+
+	method _multipart_boundary ( body, boundary_override := null ) {
+		if ( not( boundary_override == null ) ) {
+			return self._validate_boundary(boundary_override);
+		}
+
+		let data := body.to_Dict();
+		let boundary := data{boundary};
+
+		if ( boundary == null or boundary eq "" ) {
+			if ( generate_boundary ) {
+				return self._generated_boundary();
+			}
+			self._fail("multipart body missing boundary");
+		}
+		if ( not( boundary instanceof String ) ) {
+			self._fail("multipart boundary expects String");
+		}
+		return self._validate_boundary(boundary);
+	}
+
+	method _serialize_body ( body, boundary_override := null ) {
+		let data := body.to_Dict();
+		let kind := data{kind};
+
+		if ( kind eq "bytes" ) {
+			return body.encoded();
+		}
+		if ( kind eq "nested" ) {
+			let nested := body.nested();
+			if ( nested == null ) {
+				self._fail("message/rfc822 body missing nested message");
+			}
+			return self.serialize(nested);
+		}
+		if ( kind ne "multipart" ) {
+			self._fail("unsupported body kind '" _ kind _ "'");
+		}
+
+		let boundary := self._multipart_boundary( body, boundary_override );
+		let out := [];
+
+		for ( let part in body.parts() ) {
+			_mail_serialize_append_text( out, "--" _ boundary, "boundary" );
+			_mail_serialize_append_text( out, newline, "newline" );
+			_mail_serialize_append_binary( out, self.serialize(part) );
+			_mail_serialize_append_text( out, newline, "newline" );
+		}
+
+		_mail_serialize_append_text( out, "--" _ boundary _ "--", "boundary" );
+		_mail_serialize_append_text( out, newline, "newline" );
+
+		return _bytes_to_binary(out);
+	}
+
+	method serialize_body ( Message message, ... PairList options ) {
+		self._reject_method_options(options);
+		return self._serialize_body( message.body() );
+	}
+
+	method serialize ( Message message, ... PairList options ) {
+		self._reject_method_options(options);
+		let out := [];
+		let context := self._full_context(message);
+		let saw_content_type := false;
+
+		for ( let pair in message.head().to_PairList().to_Array() ) {
+			self._validate_header_pair(pair);
+			let value := pair.value;
+			if ( context{multipart}
+				and lc(pair.key) eq "content-type"
+				and not saw_content_type
+				and not( context{boundary} == null ) ) {
+				value := self._content_type_with_boundary(
+					message.body(),
+					value,
+					context{boundary},
+				);
+				saw_content_type := true;
+			}
+			else if ( lc(pair.key) eq "content-type" ) {
+				saw_content_type := true;
+			}
+			self._append_header( out, pair.key, value );
+		}
+
+		if ( context{multipart}
+			and not saw_content_type
+			and not( context{boundary} == null ) ) {
+			self._append_header(
+				out,
+				"Content-Type",
+				self._generated_content_type(
+					message.body(),
+					context{boundary},
+				),
+			);
+		}
+
+		_mail_serialize_append_text( out, newline, "newline" );
+		_mail_serialize_append_binary(
+			out,
+			self._serialize_body( message.body(), context{boundary} ),
+		);
+
+		return _bytes_to_binary(out);
+	}
+}
+
+function _mail_send_serialize_body ( message ) {
+	return ( new Serializer() ).serialize_body(message);
+}

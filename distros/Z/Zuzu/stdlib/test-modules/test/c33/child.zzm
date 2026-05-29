@@ -1,0 +1,16 @@
+from std/proc import sleep_async;
+from test/c33/parent import AsyncParent;
+from test/c33/traits import AsyncTag;
+
+class AsyncChild extends AsyncParent with AsyncTag {
+	method build_async_tagger () {
+		let label := self.tag();
+		async function runner () {
+			await {
+				sleep_async(0.01);
+			};
+			return label;
+		}
+		return runner;
+	}
+}

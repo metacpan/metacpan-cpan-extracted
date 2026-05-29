@@ -1,0 +1,100 @@
+from test/more import *;
+
+function capture ( ... PairList opts ) {
+	return opts;
+}
+
+class Box {
+	let opts with get;
+
+	method options () {
+		return opts;
+	}
+}
+
+let left := { a: 1, b: 2 };
+let merged := left default { b: 20, c: 30 };
+ok( merged instanceof Dict, "Dict-left default result is a Dict" );
+is( merged{"a"}, 1, "Dict-left default keeps existing keys" );
+is( merged{"b"}, 2, "Dict-left default does not overwrite existing keys" );
+is( merged{"c"}, 30, "Dict-left default fills missing keys" );
+is( left.has("c"), 0, "Dict-left default does not mutate left" );
+
+let dup_dict := { a: 1 } default {{ b: 2, b: 3 }};
+ok( dup_dict instanceof Dict, "Dict default with PairList right returns a Dict" );
+is( dup_dict{"b"}, 2, "Dict default adds first missing duplicate key" );
+is( dup_dict.keys().length(), 2, "Dict default adds only one missing Dict key" );
+
+let pair_left := {{ a: 1 }};
+let pair_merged := pair_left default {{ a: 10, b: 20, b: 30 }};
+ok( pair_merged instanceof PairList, "PairList-left default result is a PairList" );
+is( pair_merged.get_all("a"), [ 1 ], "PairList-left default keeps existing keys" );
+is(
+	pair_merged.get_all("b"),
+	[ 20, 30 ],
+	"PairList-left default preserves all right duplicates for missing keys",
+);
+
+let null_default := null default {{ a: 1, a: 2 }};
+ok( null_default instanceof PairList, "null default rhs returns a PairList" );
+is(
+	null_default.get_all("a"),
+	[ 1, 2 ],
+	"null default rhs preserves PairList duplicates",
+);
+
+ok(
+	exception( function () {
+		let got := {} default null default { a: 1 };
+	} ) instanceof Exception,
+	"default is left associative",
+);
+
+let x := { a: 1 };
+ok(
+	exception( function () {
+		let got := x default null;
+	} ) instanceof Exception,
+	"x default null throws",
+);
+ok(
+	exception( function () {
+		let got := 10 default { a: 1 };
+	} ) instanceof Exception,
+	"invalid left operand throws",
+);
+ok(
+	exception( function () {
+		let got := { a: 1 } default 10;
+	} ) instanceof Exception,
+	"invalid right operand throws",
+);
+
+let opts := { size: "small" };
+let defaults := { size: "large", colour: "blue" };
+let captured := capture(... opts default defaults);
+is(
+	captured{"size"},
+	"small",
+	"spread/default precedence keeps explicit option",
+);
+is(
+	captured{"colour"},
+	"blue",
+	"spread/default precedence fills default option",
+);
+
+let box := new Box( opts: { local: "yes" } );
+let postfix_result := box.options() default { local: "no", extra: "ok" };
+is(
+	postfix_result{"local"},
+	"yes",
+	"call postfix binds before default",
+);
+is(
+	postfix_result{"extra"},
+	"ok",
+	"member and call postfix bind before default",
+);
+
+done_testing();

@@ -1,0 +1,15 @@
+from test/more import *;
+
+requires_module( "perl" );
+requires_capability( "perl" );
+
+from perl import *;
+
+let r := Perl.eval("[ 7, 8, 9 ]");
+ok( r instanceof PerlResult, "Perl.eval returns PerlResult", );
+is( r.eval(" $_->[1] ").value(), 8, "PerlResult.eval with $_ in scalar context", );
+is( Perl.eval( "{ answer => 42 }" ).toJSON(), "{\"answer\":42}", "PerlResult.toJSON", );
+ok( not Perl.eval( "bless {}, 'X'" ).isSafe(), "blessed values are not safe", );
+ok( Perl.version() ≢ null, "Perl.version returns a value", );
+
+done_testing();

@@ -1,0 +1,230 @@
+from std/path/simple import SimplePath;
+from test/more import *;
+
+let probe := {
+	store: {
+		title: "Before",
+	},
+};
+
+is( probe @ "/store/title", "Before", "outer scope still uses ZPath before SimplePath.use" );
+
+{
+	SimplePath.use();
+
+	function fresh_report () {
+		return {
+			store: {
+				count: 4,
+				title: "Read 2026",
+				books: [
+					{
+						pages: 1,
+						author: "Ada",
+					},
+					{
+						pages: 2,
+						author: "Bob",
+					},
+				],
+			},
+		};
+	}
+
+	{
+		let sample := fresh_report();
+		is(
+			( sample @ "store.count" )++,
+			4,
+			"SimplePath @ postfix ++ returns old scalar",
+		);
+		is( sample{store}{count}, 5, "SimplePath @ postfix ++ mutates focused target" );
+	}
+
+	{
+		let sample := fresh_report();
+		is(
+			++( sample @ "store.count" ),
+			5,
+			"SimplePath @ prefix ++ returns new scalar",
+		);
+		is( sample{store}{count}, 5, "SimplePath @ prefix ++ mutates focused target" );
+	}
+
+	{
+		let sample := fresh_report();
+		is(
+			( sample @ "store.count" )--,
+			4,
+			"SimplePath @ postfix -- returns old scalar",
+		);
+		is( sample{store}{count}, 3, "SimplePath @ postfix -- mutates focused target" );
+	}
+
+	{
+		let sample := fresh_report();
+		is(
+			--( sample @ "store.count" ),
+			3,
+			"SimplePath @ prefix -- returns new scalar",
+		);
+		is( sample{store}{count}, 3, "SimplePath @ prefix -- mutates focused target" );
+	}
+
+	{
+		let sample := fresh_report();
+		is(
+			( sample @@ "store.books[*].pages" )++,
+			[ 1, 2 ],
+			"SimplePath @@ postfix ++ returns array of old values",
+		);
+		is( sample{store}{books}[0]{pages}, 2, "SimplePath @@ postfix ++ mutates first target" );
+		is( sample{store}{books}[1]{pages}, 3, "SimplePath @@ postfix ++ mutates later target" );
+	}
+
+	{
+		let sample := fresh_report();
+		is(
+			++( sample @@ "store.books[*].pages" ),
+			[ 2, 3 ],
+			"SimplePath @@ prefix ++ returns array of new values",
+		);
+		is( sample{store}{books}[0]{pages}, 2, "SimplePath @@ prefix ++ mutates first target" );
+		is( sample{store}{books}[1]{pages}, 3, "SimplePath @@ prefix ++ mutates later target" );
+	}
+
+	{
+		let sample := fresh_report();
+		is(
+			( sample @@ "store.books[*].pages" )--,
+			[ 1, 2 ],
+			"SimplePath @@ postfix -- returns array of old values",
+		);
+		is( sample{store}{books}[0]{pages}, 0, "SimplePath @@ postfix -- mutates first target" );
+		is( sample{store}{books}[1]{pages}, 1, "SimplePath @@ postfix -- mutates later target" );
+	}
+
+	{
+		let sample := fresh_report();
+		is(
+			--( sample @@ "store.books[*].pages" ),
+			[ 0, 1 ],
+			"SimplePath @@ prefix -- returns array of new values",
+		);
+		is( sample{store}{books}[0]{pages}, 0, "SimplePath @@ prefix -- mutates first target" );
+		is( sample{store}{books}[1]{pages}, 1, "SimplePath @@ prefix -- mutates later target" );
+	}
+
+	{
+		let sample := fresh_report();
+		ok(
+			( sample @? "store.count" )++,
+			"SimplePath @? postfix ++ returns true on match",
+		);
+		is( sample{store}{count}, 5, "SimplePath @? postfix ++ mutates matched target" );
+	}
+
+	{
+		let sample := fresh_report();
+		ok(
+			++( sample @? "store.count" ),
+			"SimplePath @? prefix ++ returns true on match",
+		);
+		is( sample{store}{count}, 5, "SimplePath @? prefix ++ mutates matched target" );
+	}
+
+	{
+		let sample := fresh_report();
+		ok(
+			( sample @? "store.count" )--,
+			"SimplePath @? postfix -- returns true on match",
+		);
+		is( sample{store}{count}, 3, "SimplePath @? postfix -- mutates matched target" );
+	}
+
+	{
+		let sample := fresh_report();
+		ok(
+			--( sample @? "store.count" ),
+			"SimplePath @? prefix -- returns true on match",
+		);
+		is( sample{store}{count}, 3, "SimplePath @? prefix -- mutates matched target" );
+	}
+
+	{
+		let sample := fresh_report();
+		let miss := exception( function () {
+			++( sample @ "store.missing" );
+		} );
+		isnt( miss, null, "SimplePath @ update throws on selector miss" );
+	}
+
+	{
+		let sample := fresh_report();
+		is(
+			++( sample @@ "store.books[*].missing" ),
+			[],
+			"SimplePath @@ prefix ++ returns empty array on selector miss",
+		);
+	}
+
+	{
+		let sample := fresh_report();
+		ok(
+			not ++( sample @? "store.missing" ),
+			"SimplePath @? prefix ++ returns false on selector miss",
+		);
+	}
+
+	{
+		let sample := fresh_report();
+		let title_ref := \( sample @ "store.title" );
+		is( title_ref(), "Read 2026", "SimplePath \\ @ returns one ref getter" );
+		is(
+			title_ref("Done"),
+			"Done",
+			"SimplePath \\ @ ref setter returns assigned value",
+		);
+		is( sample{store}{title}, "Done", "SimplePath \\ @ ref setter mutates target" );
+	}
+
+	{
+		let sample := fresh_report();
+		let page_refs := \( sample @@ "store.books[*].pages" );
+		is( page_refs.length(), 2, "SimplePath \\ @@ returns one ref per selected target" );
+		is( page_refs[0](), 1, "SimplePath \\ @@ refs follow traversal order" );
+		is( page_refs[1]( 9 ), 9, "SimplePath \\ @@ refs remain assignable" );
+		is( sample{store}{books}[1]{pages}, 9, "SimplePath \\ @@ ref setter mutates target" );
+	}
+
+	{
+		let sample := fresh_report();
+		let maybe_ref := \( sample @? "store.title" );
+		isnt( maybe_ref, null, "SimplePath \\ @? returns ref on match" );
+		is( maybe_ref(), "Read 2026", "SimplePath \\ @? returned ref is assignable" );
+	}
+
+	{
+		let sample := fresh_report();
+		let miss_refs := \( sample @@ "store.books[*].missing" );
+		is( miss_refs.length(), 0, "SimplePath \\ @@ returns [] on selector miss" );
+	}
+
+	{
+		let sample := fresh_report();
+		let maybe_ref := \( sample @? "store.missing" );
+		is( maybe_ref, null, "SimplePath \\ @? returns null on selector miss" );
+	}
+
+	{
+		let sample := fresh_report();
+		let miss := exception( function () {
+			\( sample @ "store.missing" );
+		} );
+		isnt( miss, null, "SimplePath \\ @ throws on selector miss" );
+	}
+}
+
+is( probe @ "/store/title", "Before", "outer scope falls back to ZPath after SimplePath block" );
+
+done_testing();

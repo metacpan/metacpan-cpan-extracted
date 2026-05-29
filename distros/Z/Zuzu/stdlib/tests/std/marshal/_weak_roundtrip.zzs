@@ -1,0 +1,32 @@
+from std/marshal import dump, load;
+from test/more import *;
+
+let d := {
+	strong: [ 1, 2, 3 ],
+};
+d{weak} := d{strong} but weak;
+d{weak}.push(4);
+
+let d2 := load( dump(d) );
+
+function check_loaded_shared_array ( d2 ) {
+	d2{weak}.push(5);
+
+	is(
+		d2{weak},
+		[ 1, 2, 3, 4, 5 ],
+		"loaded weak reference can mutate the shared array",
+	);
+	is(
+		d2{strong},
+		[ 1, 2, 3, 4, 5 ],
+		"loaded strong reference sees mutation through weak reference",
+	);
+}
+
+check_loaded_shared_array(d2);
+
+d2.remove("strong");
+is( d2{weak}, null, "loaded weak reference dies after strong edge removal" );
+
+done_testing();

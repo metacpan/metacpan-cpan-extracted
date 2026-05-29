@@ -1,0 +1,7 @@
+class AliasDevice {
+	let String name with get;
+
+	static method family () {
+		return "device-family";
+	}
+}

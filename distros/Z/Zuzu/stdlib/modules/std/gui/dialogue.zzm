@@ -1,0 +1,592 @@
+=encoding utf8
+
+=head1 NAME
+
+std/gui/dialogue - Dialogue helpers.
+
+=head1 SYNOPSIS
+
+  from std/gui/dialogue import *;
+
+  alert("Saved");
+  let ok := confirm("Continue?");
+  let name := prompt("Name:", value: "Ada");
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Electron
+and Browser. It is not supported by zuzu-js on Node.
+
+=head1 DESCRIPTION
+
+This module provides convenience dialogue helpers layered on top of the
+regular C<std/gui> widgets.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item C<< alert(String message, ... PairList p) >>, C<< alert_window(String message, ... PairList p) >>
+
+Parameters: C<message> is display text and C<p> contains options.
+Returns: C<null> for C<alert> or C<Window> for C<alert_window>. Shows or
+builds an alert dialogue.
+
+=item C<< confirm(String message, ... PairList p) >>, C<< confirm_window(String message, ... PairList p) >>
+
+Parameters: C<message> is display text and C<p> contains options.
+Returns: C<Boolean> for C<confirm> or C<Window> for
+C<confirm_window>. Shows or builds a confirmation dialogue.
+
+=item C<< prompt(String message, ... PairList p) >>, C<< prompt_window(String message, ... PairList p) >>
+
+Parameters: C<message> is prompt text and C<p> contains options such as
+C<value>. Returns: C<String> or C<null> for C<prompt>, or C<Window> for
+C<prompt_window>. Shows or builds a text prompt.
+
+=item C<< file_open(... PairList p) >>, C<< file_save(... PairList p) >>
+
+Parameters: C<p> contains dialogue options. Returns: path value or
+C<null>. Opens a file selection dialogue.
+
+=item C<< directory_open(... PairList p) >>, C<< directory_save(... PairList p) >>
+
+Parameters: C<p> contains dialogue options. Returns: path value or
+C<null>. Opens a directory selection dialogue.
+
+=item C<< colour_picker(... PairList p) >>
+
+Parameters: C<p> contains dialogue options. Returns: C<String> or
+C<null>. Opens a colour picker and returns a normalized colour string.
+
+=item C<< file_open_window(... PairList p) >>, C<< file_save_window(... PairList p) >>, C<< directory_open_window(... PairList p) >>, C<< directory_save_window(... PairList p) >>, C<< colour_picker_window(... PairList p) >>
+
+Parameters: C<p> contains dialogue options. Returns: C<Window>. Builds
+the corresponding GUI dialogue window.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/gui/dialogue >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/gui try import
+	EM,
+	Window,
+	VBox,
+	HBox,
+	Label,
+	Text,
+	Input,
+	Button,
+	Widget,
+	native_file_open,
+	native_file_save,
+	native_directory_open,
+	native_directory_save,
+	native_colour_picker;
+from std/gui/objects try import
+	meta as _objects_meta,
+	native_alert,
+	native_confirm,
+	native_prompt;
+from std/colour import parse_colour;
+from std/string import split;
+from std/tui import
+	colour_text,
+	directory_completions,
+	filename_completions,
+	readline;
+
+function _tui_string ( value ) {
+	return value ≡ null ? "" : "" _ value;
+}
+
+function _gui_backend () {
+	if ( _objects_meta ≢ null ) {
+		return _objects_meta{backend};
+	}
+	return "";
+}
+
+function _path_dialogue_unsupported () {
+	if ( __system__{deny_fs} ) {
+		die "GUI_DIALOGUE_FS_DENIED: file and directory dialogues require filesystem capability";
+	}
+	if ( _gui_backend() eq "browser-dom" ) {
+		die "GUI_DIALOGUE_UNSUPPORTED: file and directory dialogues are unsupported in JS/Browser";
+	}
+}
+
+function _tui_prompt ( String message, PairList p, String default_value ) {
+	return readline(
+		colour_text( message _ " ", "cyan" ),
+		default_value,
+		null,
+	);
+}
+
+function _tui_path_dialog (
+	String label,
+	String default_value,
+	completion,
+	PairList p
+) {
+	let answer := readline(
+		colour_text( p.get( "label", label ) _ " ", "cyan" ),
+		_tui_string( p.get( "value", default_value ) ),
+		completion,
+	);
+	if ( p.get( "multiple", false ) ) {
+		return split( answer, p.get( "separator", "\n" ) );
+	}
+	return answer;
+}
+
+function _parse_colour_or_null ( value ) {
+	return try {
+		parse_colour( _tui_string(value) );
+	}
+	catch {
+		null;
+	};
+}
+
+function _colour_initial_value ( PairList p ) {
+	let raw := _tui_string( p.get( "value", "#000000" ) );
+	let parsed := _parse_colour_or_null(raw);
+	return parsed ≢ null ? parsed : raw;
+}
+
+function _colour_default_value ( PairList p ) {
+	return _parse_colour_or_null( p.get( "value", "#000000" ) ) ?: "#000000";
+}
+
+function _tui_colour_dialog ( PairList p ) {
+	let default_value := _colour_default_value(p);
+	while ( true ) {
+		let answer := readline(
+			colour_text( p.get( "label", "Colour:" ) _ " ", "cyan" ),
+			default_value,
+			null,
+		);
+		let parsed := _parse_colour_or_null(answer);
+		if ( parsed ≢ null ) {
+			return parsed;
+		}
+		say( colour_text( "Invalid colour; try #336699 or red.", "yellow" ) );
+	}
+}
+
+function _dialogue_window (
+	String kind,
+	String title,
+	Widget body,
+	Array buttons,
+	PairList p
+) {
+	let button_row := HBox(
+		id: "buttons",
+		align: "right",
+		gap: 6,
+		height: p.get( "button_row_height", 2.125 × EM ),
+		maxheight: p.get( "button_row_height", 2.125 × EM ),
+	);
+	for ( let button in buttons ) {
+		button_row.add_child(button);
+	}
+	let w := Window(
+		title: title,
+		width: p.get( "width", 360 ),
+		height: p.get( "height", 180 ),
+		resizable: p.get( "resizable", false ),
+		modal: true,
+		VBox(
+			id: p.get( "id", null ),
+			gap: p.get( "gap", 8 ),
+			padding: p.get( "padding", 12 ),
+			body,
+			button_row,
+		),
+	);
+	w.meta( "dialogue.kind", kind );
+	return w;
+}
+
+function _message_body ( String message, PairList p ) {
+	return Text(
+		id: p.get( "message_id", "message" ),
+		value: message,
+		readonly: true,
+		wrap: true,
+	);
+}
+
+function _primary_button ( PairList p, String fallback ) {
+	return Button(
+		id: p.get( "ok_id", "ok" ),
+		text: p.get( "ok_text", fallback ),
+		variant: "primary",
+		width: p.get( "button_width", 5.5 × EM ),
+		height: p.get( "button_height", 1.75 × EM ),
+		maxheight: p.get( "button_height", 1.75 × EM ),
+	);
+}
+
+function _cancel_button ( PairList p ) {
+	return Button(
+		id: p.get( "cancel_id", "cancel" ),
+		text: p.get( "cancel_text", "Cancel" ),
+		width: p.get( "button_width", 5.5 × EM ),
+		height: p.get( "button_height", 1.75 × EM ),
+		maxheight: p.get( "button_height", 1.75 × EM ),
+	);
+}
+
+function _alert_window ( String message, PairList p ) {
+	let ok := _primary_button( p, "OK" );
+	let w := _dialogue_window(
+		"alert",
+		p.get( "title", "Alert" ),
+		_message_body( message, p ),
+		[ ok ],
+		p,
+	);
+	ok.click( function () {
+		w.close(null);
+	} );
+	return w;
+}
+
+function alert_window ( String message, ... PairList p ) {
+	return _alert_window( message, p );
+}
+
+function alert ( String message, ... PairList p ) {
+	if ( p.has("auto_result") ) {
+		return null;
+	}
+	if ( __system__{deny_gui} ) {
+		say( colour_text( message, "yellow" ) );
+		return null;
+	}
+	if ( native_alert ≢ null ) {
+		let native_result := native_alert( message, p );
+		if ( native_result ) {
+			return null;
+		}
+	}
+	return _alert_window( message, p ).call();
+}
+
+function _confirm_window ( String message, PairList p ) {
+	let ok := _primary_button( p, p.get( "ok_text", "OK" ) );
+	let cancel := _cancel_button(p);
+	let w := _dialogue_window(
+		"confirm",
+		p.get( "title", "Confirm" ),
+		_message_body( message, p ),
+		[ cancel, ok ],
+		p,
+	);
+	ok.click( function () {
+		w.close(true);
+	} );
+	cancel.click( function () {
+		w.close(false);
+	} );
+	return w;
+}
+
+function confirm_window ( String message, ... PairList p ) {
+	return _confirm_window( message, p );
+}
+
+function confirm ( String message, ... PairList p ) {
+	if ( p.has("auto_result") ) {
+		return p.get("auto_result") ? true : false;
+	}
+	if ( __system__{deny_gui} ) {
+		let yes_default := p.get( "value", p.get( "default", false ) );
+		let suffix := yes_default ? " [Y/n] " : " [y/N] ";
+		let answer := readline(
+			colour_text( message _ suffix, "cyan" ),
+			yes_default ? "y" : "n",
+			null,
+		);
+		return ( answer ~ /^(?:y|yes|1|true)$/i ) ? true : false;
+	}
+	if ( native_confirm ≢ null ) {
+		let native_result := native_confirm( message, p );
+		if ( native_result ≢ null ) {
+			return native_result ? true : false;
+		}
+	}
+	return _confirm_window( message, p ).call() ? true : false;
+}
+
+function _prompt_window ( String message, PairList p ) {
+	let input := Input(
+		id: p.get( "input_id", "value" ),
+		value: p.get( "value", "" ),
+		placeholder: p.get( "placeholder", "" ),
+	);
+	let ok := _primary_button( p, p.get( "ok_text", "OK" ) );
+	let cancel := _cancel_button(p);
+	let w := _dialogue_window(
+		"prompt",
+		p.get( "title", "Prompt" ),
+		VBox(
+			gap: 6,
+			_message_body( message, p ),
+			input,
+		),
+		[ cancel, ok ],
+		p,
+	);
+	ok.click( function () {
+		w.close( input.value() );
+	} );
+	cancel.click( function () {
+		w.close(null);
+	} );
+	return w;
+}
+
+function prompt_window ( String message, ... PairList p ) {
+	return _prompt_window( message, p );
+}
+
+function prompt ( String message, ... PairList p ) {
+	if ( p.has("auto_result") ) {
+		return p.get("auto_result");
+	}
+	if ( __system__{deny_gui} ) {
+		return _tui_prompt(
+			message,
+			p,
+			_tui_string( p.get( "value", "" ) ),
+		);
+	}
+	if ( native_prompt ≢ null ) {
+		let native_result := native_prompt( message, p );
+		if ( _gui_backend() eq "browser-dom" ) {
+			return native_result;
+		}
+		if ( native_result ≢ null ) {
+			return native_result;
+		}
+	}
+	return _prompt_window( message, p ).call();
+}
+
+function _path_dialog_window (
+	String kind,
+	String title,
+	String label,
+	String default_value,
+	PairList p
+) {
+	let input := Input(
+		id: p.get( "input_id", "path" ),
+		value: p.get( "value", default_value ),
+		placeholder: p.get( "placeholder", "" ),
+		multiline: p.get( "multiple", false ),
+	);
+	let ok := _primary_button( p, p.get( "ok_text", "OK" ) );
+	let cancel := _cancel_button(p);
+	let w := _dialogue_window(
+		kind,
+		p.get( "title", title ),
+		VBox(
+			gap: 6,
+			Label( text: p.get( "label", label ), ("for"): input.id() ),
+			input,
+		),
+		[ cancel, ok ],
+		p,
+	);
+	ok.click( function () {
+		if ( p.get( "multiple", false ) ) {
+			w.close( split( input.value(), p.get( "separator", "\n" ) ) );
+		}
+		else {
+			w.close( input.value() );
+		}
+	} );
+	cancel.click( function () {
+		w.close(null);
+	} );
+	return w;
+}
+
+function file_open_window ( ... PairList p ) {
+	return _path_dialog_window( "file_open", "Open File", "File:", "", p );
+}
+
+function file_save_window ( ... PairList p ) {
+	return _path_dialog_window( "file_save", "Save File", "File:", "", p );
+}
+
+function directory_open_window ( ... PairList p ) {
+	return _path_dialog_window(
+		"directory_open",
+		"Open Directory",
+		"Directory:",
+		"",
+		p,
+	);
+}
+
+function directory_save_window ( ... PairList p ) {
+	return _path_dialog_window(
+		"directory_save",
+		"Save Directory",
+		"Directory:",
+		"",
+		p,
+	);
+}
+
+function _colour_picker_window ( PairList p ) {
+	let input := Input(
+		id: p.get( "input_id", "path" ),
+		value: _colour_initial_value(p),
+		placeholder: p.get( "placeholder", "#336699" ),
+	);
+	let ok := _primary_button( p, p.get( "ok_text", "OK" ) );
+	let cancel := _cancel_button(p);
+	let default_value := _colour_default_value(p);
+	let sync_ok := function () {
+		ok.set_enabled( _parse_colour_or_null( input.value() ) ≢ null );
+	};
+	let w := _dialogue_window(
+		"colour_picker",
+		p.get( "title", "Choose Colour" ),
+		VBox(
+			gap: 6,
+			Label(
+				text: p.get( "label", "Colour:" ),
+				("for"): input.id(),
+			),
+			input,
+		),
+		[ cancel, ok ],
+		p,
+	);
+	sync_ok();
+	input.on( "change", sync_ok );
+	ok.click( function () {
+		let parsed := _parse_colour_or_null( input.value() );
+		if ( parsed ≢ null ) {
+			w.close(parsed);
+		}
+	} );
+	cancel.click( function () {
+		w.close(default_value);
+	} );
+	return w;
+}
+
+function colour_picker_window ( ... PairList p ) {
+	return _colour_picker_window(p);
+}
+
+function file_open ( ... PairList p ) {
+	_path_dialogue_unsupported();
+	if ( p.has("auto_result") ) {
+		return p.get("auto_result");
+	}
+	if ( __system__{deny_gui} ) {
+		return _tui_path_dialog( "File:", "", filename_completions, p );
+	}
+	return native_file_open(p);
+}
+
+function file_save ( ... PairList p ) {
+	_path_dialogue_unsupported();
+	if ( p.has("auto_result") ) {
+		return p.get("auto_result");
+	}
+	if ( __system__{deny_gui} ) {
+		return _tui_path_dialog( "File:", "", filename_completions, p );
+	}
+	return native_file_save(p);
+}
+
+function directory_open ( ... PairList p ) {
+	_path_dialogue_unsupported();
+	if ( p.has("auto_result") ) {
+		return p.get("auto_result");
+	}
+	if ( __system__{deny_gui} ) {
+		return _tui_path_dialog(
+			"Directory:",
+			"",
+			directory_completions,
+			p,
+		);
+	}
+	return native_directory_open(p);
+}
+
+function directory_save ( ... PairList p ) {
+	_path_dialogue_unsupported();
+	if ( p.has("auto_result") ) {
+		return p.get("auto_result");
+	}
+	if ( __system__{deny_gui} ) {
+		return _tui_path_dialog(
+			"Directory:",
+			"",
+			directory_completions,
+			p,
+		);
+	}
+	if ( native_directory_save ≢ null ) {
+		let native_result := native_directory_save(p);
+		if ( native_result ≢ null ) {
+			return native_result;
+		}
+		if ( _gui_backend() eq "electron-dom" ) {
+			return null;
+		}
+	}
+	return _path_dialog_window(
+		"directory_save",
+		"Save Directory",
+		"Directory:",
+		"",
+		p,
+	).call();
+}
+
+function colour_picker ( ... PairList p ) {
+	if ( p.has("auto_result") ) {
+		return parse_colour( _tui_string( p.get("auto_result") ) );
+	}
+	if ( __system__{deny_gui} ) {
+		return _tui_colour_dialog(p);
+	}
+	if ( native_colour_picker ≢ null ) {
+		let native_result := native_colour_picker(p);
+		if ( native_result ≢ null ) {
+			return parse_colour(native_result);
+		}
+		if ( _gui_backend() eq "browser-dom" ) {
+			return null;
+		}
+	}
+	if ( _gui_backend() eq "electron-dom" ) {
+		return _colour_picker_window(p).call();
+	}
+	return parse_colour( _colour_picker_window(p).call() );
+}

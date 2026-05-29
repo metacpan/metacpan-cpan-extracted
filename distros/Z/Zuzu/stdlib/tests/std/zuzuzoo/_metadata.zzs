@@ -1,0 +1,111 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/data/json import JSON;
+from std/io import Path;
+from std/zuzuzoo import Zuzuzoo;
+
+function write_meta ( dir, name, version, modules, scripts ) {
+	( new JSON( pretty: true ) ).dump(
+		dir.child( name _ "-" _ version _ ".json" ),
+		{
+			name: name,
+			version: version,
+			author: "Example Author",
+			license: "MIT",
+			status: "stable",
+			dependencies: {
+				"std/math": "1.0.0",
+			},
+			installed: {
+				zdf: "ZDF-1",
+				lib_dir: "/tmp/zuzu-lib",
+				bin_dir: "/tmp/zuzu-bin",
+				meta_dir: dir.to_String(),
+				modules: modules,
+				scripts: scripts,
+			},
+		},
+	);
+}
+
+let missing := Path.tempdir().child("missing-meta");
+let empty_zoo := new Zuzuzoo(
+	meta_dir: missing.to_String(),
+);
+is(
+	empty_zoo.list_installed(),
+	[],
+	"absent metadata directory returns empty list",
+);
+
+let dir := Path.tempdir();
+is(
+	( new Zuzuzoo( meta_dir: dir.to_String() ) ).list_installed(),
+	[],
+	"empty metadata directory returns empty list",
+);
+
+write_meta(
+	dir,
+	"acme-tools",
+	"1.0.0",
+	[
+		{
+			source: "modules/acme/tools.zzm",
+			install_as: "acme/tools.zzm",
+			sha256: "aaa",
+		},
+	],
+	[],
+);
+
+write_meta(
+	dir,
+	"acme-tools",
+	"1.2.0",
+	[
+		{
+			source: "modules/acme/tools.zzm",
+			install_as: "acme/tools.zzm",
+			sha256: "bbb",
+		},
+	],
+	[],
+);
+
+write_meta(
+	dir,
+	"script-pack",
+	"0.9.0",
+	[],
+	[
+		{
+			source: "scripts/zuzu-helper.zzs",
+			install_as: "zuzu-helper.zzs",
+			sha256: "ccc",
+			wrappers: [ "zuzu-helper.cmd" ],
+		},
+	],
+);
+
+let zoo := new Zuzuzoo( meta_dir: dir.to_String() );
+let installed := zoo.list_installed();
+is( installed.length(), 3, "metadata files are scanned" );
+is( installed[0]{name}, "acme-tools", "results sort by name" );
+is( installed[0]{version}, "1.2.0", "versions sort descending" );
+is( installed[1]{version}, "1.0.0", "older version follows newer version" );
+is( installed[2]{name}, "script-pack", "script-only distribution is listed" );
+like(
+	installed[0]{metadata_file},
+	/acme-tools-1\.2\.0\.json$/,
+	"metadata_file is included",
+);
+is(
+	installed[2]{installed}{scripts}[0]{wrappers}[0],
+	"zuzu-helper.cmd",
+	"script wrappers are preserved",
+);
+
+done_testing();

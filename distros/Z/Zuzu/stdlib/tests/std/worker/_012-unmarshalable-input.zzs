@@ -1,0 +1,26 @@
+from std/marshal import MarshallingException, dump;
+from test/more import *;
+from test/worker_contract import require_worker_phase;
+
+let Worker := require_worker_phase(3);
+
+let err := exception( function () {
+	Worker.spawn(
+		function ( value ) {
+			return value;
+		},
+		[ dump ],
+	);
+} );
+
+ok(
+	err instanceof MarshallingException,
+	"Worker.spawn rejects unmarshalable input synchronously",
+);
+like(
+	err.to_String(),
+	/(marshal|not marshalable)/i,
+	"unmarshalable input failure identifies marshalling",
+);
+
+done_testing();

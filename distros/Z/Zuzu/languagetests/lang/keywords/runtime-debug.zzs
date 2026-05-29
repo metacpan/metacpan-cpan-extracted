@@ -1,0 +1,9 @@
+from test/more import *;
+let x := 5;
+if (false) {
+	warn "this branch is intentionally unreachable";
+}
+debug 999, "this may be filtered";
+assert true;
+is( x, 5, "debug/assert/warn keywords parse and keep state stable" );
+done_testing();

@@ -43,7 +43,10 @@ subtest 'Validator::Failure: unset structured fields are undef' => sub {
 };
 
 subtest 'Validator::Result: passing result has no failures' => sub {
-  my $validator = GDPR::IAB::TCFv2::Validator->new(vendor_id => 32);
+
+  # Vendor 21 has a vendor-level consent bit in the fixture, so it clears the
+  # global vendor gate; with no purposes configured the result is a clean pass.
+  my $validator = GDPR::IAB::TCFv2::Validator->new(vendor_id => 21);
   my $result    = $validator->validate($tc_string);
 
   ok($result,           'result is truthy when validation passes');
@@ -63,10 +66,10 @@ subtest 'Validator::Result: passing result has no failures' => sub {
 
 subtest 'Validator::Result: failing result exposes failures + codes + reasons' => sub {
 
-  # Vendor 99999 is well above any vendor in the fixture, so
-  # consent for any required purpose will fail. Forces predictable
-  # ReasonVendorNotAllowedConsent failures.
-  my $validator = GDPR::IAB::TCFv2::Validator->new(vendor_id => 99999, consent_purpose_ids => [1, 3],);
+  # Vendor 21 has a vendor-level consent bit (clears the global gate), but
+  # purposes 2 and 6 lack purpose-level consent in this fixture, so each
+  # required purpose fails with ReasonVendorNotAllowedConsent.
+  my $validator = GDPR::IAB::TCFv2::Validator->new(vendor_id => 21, consent_purpose_ids => [2, 6],);
   my $result    = $validator->validate_all($tc_string);
 
   ok(!$result,           'result is falsy on failure');
@@ -86,13 +89,13 @@ subtest 'Validator::Result: failing result exposes failures + codes + reasons' =
   # the offending vendor + purpose ids.
   for my $f (@failures) {
     is($f->code,      ReasonVendorNotAllowedConsent, 'consent-path failures use ReasonVendorNotAllowedConsent');
-    is($f->vendor_id, 99999,                         'vendor_id is set on the failure');
+    is($f->vendor_id, 21,                            'vendor_id is set on the failure');
     ok(defined $f->purpose_id, 'purpose_id is set on the failure');
   }
 
   # Stringified result is the failure messages joined per the
   # output-record-separator overload (legacy contract).
-  like("$result", qr/vendor 99999 not allowed for purpose/, 'stringification includes failure messages');
+  like("$result", qr/vendor 21 not allowed for purpose/, 'stringification includes failure messages');
 };
 
 subtest 'Validator::Result: min_tcf_policy_version failure carries correct code' => sub {
@@ -168,39 +171,45 @@ subtest 'Validator::Result: P3 LI carve-out only fires on TCF v2.2+ (policy >= 4
 
 subtest 'Validator::Result: NotAllowed publisher restriction emits ReasonPublisherRestrictionNotAllowed' => sub {
 
-  # COxPe2T... fixture (policy 2) has a NotAllowed (type 0)
-  # publisher restriction for vendor 32 / purpose 1. Configured under
-  # consent_purpose_ids the validator must report this as the
-  # publisher-restriction code, not the generic vendor-not-allowed
-  # code, even though the consent flags also happen to be missing.
-  my $tc_with_pr
-    = 'COxPe2TOxPe2TALABAENAPCgAAAAAAAAAAAAAFAAAAoAAA4IACACAIABgACAFA4ADACAAIygAGADwAQBIAIAIB0AEAEBSACACAA';
+  # Under the global vendor gate, a NotAllowed restriction reason is only
+  # reachable for a vendor that also holds a vendor-level bit (a bit-less
+  # vendor is rejected by the gate first). No fixture in the corpus pairs a
+  # NotAllowed restriction with a bit-bearing vendor, so the restriction ->
+  # reason mapping is exercised directly against the helper, with a stub TC
+  # that reports a type-0 (NotAllowed) restriction. (RequireConsent and
+  # RequireLegitimateInterest are covered end-to-end below.)
+  {
 
-  my $validator = GDPR::IAB::TCFv2::Validator->new(vendor_id => 32, consent_purpose_ids => [1],);
-  my $result    = $validator->validate($tc_with_pr);
+    package PRStubNotAllowed;
+    sub new { return bless {}, shift }
 
-  ok(!$result, 'NotAllowed restriction rejects the consent purpose');
+    # NotAllowed == 0; report it for any (purpose, vendor) pair.
+    sub check_publisher_restriction { my (undef, undef, $type) = @_; return $type == 0 ? 1 : 0 }
+  }
 
-  my @failures = $result->failures;
-  is(scalar @failures,   1,                                    'fail-fast yields exactly one failure');
-  is($failures[0]->code, ReasonPublisherRestrictionNotAllowed, 'code is ReasonPublisherRestrictionNotAllowed');
-  is($failures[0]->restriction_type, 0,                        'restriction_type is 0 (NotAllowed)');
-  is($failures[0]->purpose_id,       1,                        'purpose_id is 1');
-  is($failures[0]->vendor_id,        32,                       'vendor_id is 32');
-  like($failures[0]->message, qr/purpose 1 not allowed/, 'message names the restriction');
+  my $validator = GDPR::IAB::TCFv2::Validator->new(vendor_id => 7);
+  my $failure   = $validator->_publisher_restriction_failure(PRStubNotAllowed->new, 7, 1, 0);
+
+  ok($failure, 'a publisher-restriction failure is returned');
+  is($failure->code,             ReasonPublisherRestrictionNotAllowed, 'code is ReasonPublisherRestrictionNotAllowed');
+  is($failure->restriction_type, 0,                                    'restriction_type is 0 (NotAllowed)');
+  is($failure->purpose_id,       1,                                    'purpose_id is 1');
+  is($failure->vendor_id,        7,                                    'vendor_id is 7');
+  like($failure->message, qr/purpose 1 not allowed/, 'message names the restriction');
 };
 
 subtest 'Validator::Result: RequireConsent restriction on LI basis emits ReasonPublisherRestrictionRequireConsent' =>
   sub {
 
-  # COwAdDh... (policy 2) has a RequireConsent restriction for
-  # vendor 32 / purpose 7. Configured under
-  # legitimate_interest_purpose_ids that's a contradiction the
-  # validator must surface as a restriction-driven reason rather
-  # than the generic LI-vendor reason.
-  my $tc_with_consent_pr = 'COwAdDhOwAdDhN4ABAENAPCgAAQAAv___wAAAFP_AAp_4AI6ACACAA';
+  # CQa0zs... (policy 5) has a RequireConsent restriction for vendor 2 /
+  # purpose 8. Vendor 2 holds a vendor-level consent bit (so it clears the
+  # global gate); configuring purpose 8 under legitimate_interest is a
+  # contradiction the validator must surface as the restriction-driven reason
+  # rather than the generic LI-vendor reason.
+  my $tc_with_consent_pr
+    = 'CQa0zsAQa0zsAAHABBENCEFsAP_AAELgAAAoLstR_G__bXlr8bb3aftkeYxf9_hr7sQhBgbJk24FzLvW7JwXx2E7JAzatqIKmRIAu3BBIQNlHIDURVCgKIgFryDMaEyUoTtKJ6BkiFMRA2NYCExvi4pjWQCY5vr99ld1mR-J7dr82dzyy6hHv3a5_2S1UJCdIYctBfvsZBKT-9AE9_x8v4v4_F5pE2-eS1n_pGvp6jd-YnM_dBmxt-bSffTKn93rl_e7XvuZ_n37u94VX77v___vf6-7_u92C7CAZho1U0ZZOmgUKDxBAiIUFcQIUCAMAAEwbICBMyaFOQMAt9hMgBACgAGCBkQAIMUAQEASQAYVARQIQiAESIQ6AAMACAYCAKgZAAxEWIgEABID4OLYEEAkWICVnVUbYE4BCQSdtlY8sAwIa8QrFngFECYmCgDARgAKAgAAeHyFJNwWsyCiLiO6QIAgAATyzAiRSl2EMKw3RaB8DTqMjTANXzhMlp0mwBsFZCabMJ_QmHmmqIUEuTuzSzV3AGIQAYAAgu8VAAwABBd4eABgACC7xMADAAEF3goAGAAILvFwAMAAQXeA';
 
-  my $validator = GDPR::IAB::TCFv2::Validator->new(vendor_id => 32, legitimate_interest_purpose_ids => [7],);
+  my $validator = GDPR::IAB::TCFv2::Validator->new(vendor_id => 2, legitimate_interest_purpose_ids => [8],);
   my $result    = $validator->validate($tc_with_consent_pr);
 
   ok(!$result, 'RequireConsent restriction rejects LI purpose');
@@ -209,8 +218,8 @@ subtest 'Validator::Result: RequireConsent restriction on LI basis emits ReasonP
   is(scalar @failures,   1,                                        'fail-fast yields exactly one failure');
   is($failures[0]->code, ReasonPublisherRestrictionRequireConsent, 'code is ReasonPublisherRestrictionRequireConsent');
   is($failures[0]->restriction_type, 1,                            'restriction_type is 1 (RequireConsent)');
-  is($failures[0]->purpose_id,       7,                            'purpose_id is 7');
-  is($failures[0]->vendor_id,        32,                           'vendor_id is 32');
+  is($failures[0]->purpose_id,       8,                            'purpose_id is 8');
+  is($failures[0]->vendor_id,        2,                            'vendor_id is 2');
   };
 
 subtest 'Validator::Result: RequireLegitimateInterest restriction on consent basis emits matching reason' => sub {
@@ -239,7 +248,19 @@ subtest 'Validator::Result: RequireLegitimateInterest restriction on consent bas
   is($failures[0]->vendor_id,        2, 'vendor_id is 2');
 };
 
-subtest 'Validator::Result: invalid CMP carries ReasonInvalidCMP' => sub {
+subtest 'global vendor gate short-circuits per-purpose checks' => sub {
+
+  # A vendor with neither consent nor LI at the vendor level must fail with
+  # ReasonVendorNotAllowed and stop before per-purpose checks.
+  my $v     = GDPR::IAB::TCFv2::Validator->new(vendor_id => 9999, consent_purpose_ids => [1, 3],);
+  my @codes = $v->validate_all($tc_string)->reason_codes;
+  my %seen  = map { $_ => 1 } @codes;
+
+  ok $seen{ReasonVendorNotAllowed()},         "absent vendor => ReasonVendorNotAllowed";
+  ok !$seen{ReasonVendorNotAllowedConsent()}, "per-purpose consent check is short-circuited";
+};
+
+subtest 'Validator::Result: unknown CMP carries ReasonCMPUnknown' => sub {
   require GDPR::IAB::TCFv2::CMPValidator;
 
   my $cmp_file = File::Spec->catfile($FindBin::Bin, 'corpus', 'cmp-list.json');
@@ -256,8 +277,21 @@ subtest 'Validator::Result: invalid CMP carries ReasonInvalidCMP' => sub {
   my @failures = $result->failures;
   is(scalar @failures, 1, 'fail-fast yields exactly one failure');
 
-  is($failures[0]->code,   ReasonInvalidCMP, 'code is ReasonInvalidCMP');
+  is($failures[0]->code,   ReasonCMPUnknown, 'code is ReasonCMPUnknown');
   is($failures[0]->cmp_id, 888,              'cmp_id is set to the CMP from the consent string');
+};
+
+subtest 'Validator::Result: deleted CMP carries ReasonCMPDeleted' => sub {
+  require GDPR::IAB::TCFv2::CMPValidator;
+
+  # Baseline string carries CMP 21; mark it deleted in an inline registry.
+  my $validator = GDPR::IAB::TCFv2::Validator->new(
+    vendor_id     => 32,
+    cmp_validator => {now => 1776254400, data => '{"cmps":{"21":{"id":21,"deletedDate":"2020-01-01T00:00:00Z"}}}',},
+  );
+  my @failures = $validator->validate_all($tc_string)->failures;
+
+  ok((grep { $_->code == ReasonCMPDeleted } @failures), 'deleted CMP => ReasonCMPDeleted');
 };
 
 done_testing;

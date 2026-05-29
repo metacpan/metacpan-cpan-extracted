@@ -1,0 +1,10 @@
+from test/c19/person import Person;
+from test/more import *;
+
+let p := new Person( name: "Nori" );
+
+is( p.tag(), "name:Nori", "trait from external module is composed into class" );
+is( p.rename_to( "Mika" ), "Mika", "external trait method mutates class field" );
+is( p.tag(), "name:Mika", "composed trait method sees updated field" );
+
+done_testing();

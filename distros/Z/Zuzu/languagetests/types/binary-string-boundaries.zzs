@@ -1,0 +1,29 @@
+from test/more import *;
+
+class TypeFence {
+
+	method as_text ( String text ) {
+		return text;
+	}
+
+	method as_binary ( BinaryString payload ) {
+		return payload;
+	}
+}
+
+let fence := new TypeFence();
+let ascii := to_binary("ABC");
+ok( ascii instanceof BinaryString, "to_binary values are BinaryString", );
+ok( not( ascii instanceof String ), "BinaryString does not satisfy String instanceof", );
+ok( not( "ABC" instanceof BinaryString ), "String does not satisfy BinaryString instanceof", );
+is( fence.as_text( to_string(ascii) ), "ABC", "explicit to_string allows String parameter", );
+ok( fence.as_binary(ascii) == ascii, "BinaryString parameter accepts BinaryString", );
+ok( exception( function() {
+	fence.as_text(ascii);
+}
+) ne null, "String parameter rejects BinaryString", );
+ok( exception( function() {
+	fence.as_binary("ABC");
+}
+) ne null, "BinaryString parameter rejects String", );
+done_testing();

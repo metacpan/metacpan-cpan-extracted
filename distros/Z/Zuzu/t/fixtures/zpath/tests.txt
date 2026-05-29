@@ -1,0 +1,301 @@
+---- BEGIN JSON
+{
+    "first": "John",
+    "last": "doe",
+    "age": 26,
+    "address": {
+        "street": "naist street",
+        "city": "Nara",
+        "postcode": "630-0192"
+    },
+    "numbers": [
+        {
+            "type": "iPhone",
+            "number": "0123-4567-8888",
+            "things": [ "foo", "bar" ]
+        },
+        {
+            "type": "home",
+            "number": "0123-4567-8910",
+            "things": [ "biff", "boff" ]
+        },
+        {
+            "type": "work",
+            "number": "0123-9999-8910"
+        }
+    ],
+    "typetest": {
+        "numvalue": 30,
+        "samenumvalue": 30,
+        "list": [30, 30, 30, 30, 30, 30],
+        "nullvalue": null,
+        "falsevalue": false,
+        "mediatype0": "application/pdf",
+        "mediatype1": "application/pdf;charset=utf-8"
+    }
+}
+---- END
+
+first									/first
+first									"John"
+age									26
+*									/first,/last,/age,/address,/numbers,/typetest
+address/city								"Nara"
+[age == 26]								/ 		# test on current item
+address[city == 'Nara']							/address
+*[city == 'Nara']							/address	# test an all children
+**[age == 26]								/		# test an self and all descendents (finds self)
+**[city == 'Nara']							/address	# test an self and all descendents (finds child)
+/[age == 26]								/		# test on root
+/numbers/*[type == 'iPhone']						/numbers/0
+/numbers/[type == 'iPhone']						/numbers/0
+/*[city == 'Nara']							/address     	# test on all children of root item
+/**[age == 26]								/		# test on root and all descendents (finds self)
+/**[city]								/address	# test on root and all descendents (finds child)
+/*/**[city == 'Nara']							/address	# test on all descendents of root
+address[city == 'Nara']							/address
+address[age != 26]							/address
+address[city == 'Nara' && age != 26]					/address
+address[city == "Nara" && postcode == '630-0192']			/address
+address[city == 'Nara' || foo]						/address
+address[foo || city == 'Nara']						/address
+address[foo && city == 'Nara']						NULL
+address[foo]								NULL
+address[city]								/address
+address[city && postcode]						/address
+address[city || foo]							/address
+address[city && 2 + 3 == 5]						/address
+numbers/#0								/numbers/0
+numbers/*[type == 'home']						/numbers/1
+numbers/*[type == 'home']/number					/numbers/1/number
+/**[type == 'home']							/numbers/1
+/**[type == 'home']/number						/numbers/1/number
+/address[!foo]								/address
+/address[!city]								NULL
+/address/*[key() != 'city']						/address/street,/address/postcode
+key(/address)								"address"
+/address/city/..							/address
+.									/
+./address								/address
+/address/.								/address
+/address/././city/..							/address
+index(numbers/*[type == 'home'])					1
+index(numbers/#1)							1
+/address/../..								NULL
+/..									NULL
+..									NULL
+../*									NULL
+/numbers/#0/number/..*							/numbers/0,/numbers,/
+..*									NULL
+index()									0
+index(..)								NULL
+count(numbers/*)							3
+first, first,last							/first,/first,/last
+union(first, first,last)						/first,/last
+intersection(first, *)							/first
+intersection(first, first, last)					NULL
+[/ == 1]								NULL
+**/typetest[* == 30]							/typetest
+**/typetest/falsevalue							false
+**/typetest/nullvalue 							null
+**/typetest[nullvalue]							/typetest
+**/typetest[!numvalue]	  					   NULL
+**/typetest[!!nullvalue]						NULL
+**/typetest[type(nullvalue) == "null"]					/typetest
+**/typetest[type(missingvalue) == "null"]				NULL
+**/typetest[type(missingvalue) == "undefined"]				/typetest
+**/numbers/*/count(*)							3,3,2
+**/numbers/*/union(..)/*						/numbers/0,/numbers/1,/numbers/2	# duplicates removed
+#BAD? count(**/union(/**)/union(/**)/union(/**)) < 50				true	# duplicates removed
+count(/**)								38
+count(**)								38
+#BAD? count(union(**))							31
+#BAD? count(union(/**))							31
+#BAD? count(union(/**/union(/**)))						31
+**/numbers/*[things/* == "foo"]/type					"iPhone"
+
+# Ambiguity between path and operators
+index(numbers/*[type == 'home']) == 1					true
+1 == 1									true
+2 + 3 == 5								true
+2 * 2									4
+2* 2									ERROR
+2 *2									ERROR
+2*2									ERROR
+2+2									ERROR
+4/2									ERROR
+4/ 2									ERROR
+4 /2									ERROR
+4 / 2									2
+age / 2									13
+age /2									ERROR
+2 - 2									0
+2 * 3 + 4								10
+4 + 2 * 3								10
+(4 + 2) * 3								18
+(((4 + 2) * 3))								18
+10 & 6									2
+10 | 6									14
+10 ^ 6									12
+255 & ~8								247
+min(age, 30)								26
+max(age, 30)								30
+sum(age, 30)								56
+floor(age / 3)								8
+ceil(age / 3)								9
+round(age / 3)								9
+age == 26 ? age + 2 : 'young'						28
+age != 26 ? 'old' : 'young'						"young"
+age == 26 ? (name == 'Jim' ? '26Jim' : '26NotJim') : 'Not26'		"26NotJim"
+age == 26 ? name == 'Jim' ? '26Jim' : '26NotJim' : 'Not26'		"26NotJim"
+numbers/*[index() % 2 == 0]						/numbers/0,/numbers/2
+numbers/*[index() % 2 != 0]						/numbers/1
+numbers/*[index() % 2.4 != 0]						/numbers/1,/numbers/2
+1.3 * 2.6 == 3.38							true
+union(first == 'John' ? first : 'foo', first, last)			/first,/last
+floor(2 * 3.3)								6
+**/numvalue == **/samenumvalue						true
+value(**/numvalue) == value(**/samenumvalue)				true
+/ == /									true
+**/numvalue == **/numvalue						true
+**/numbers == **/numbers/#0/..						true
+number("1231213123213123123124124124142") > number("1231213123213123123124124124141")	true		# BigInteger test
+number("1231213123213123123124124124142") > number("1231213123213123123124124124141.9")	true		# BigDecimal test
+number("1231213123213123123124124124142") > 9999			true
+index-of(**/street, "street")						6
+string-length(**/street)						12
+substring(**/street, index-of(**/street, "street"), string-length(**/street))		"street"
+**/street[matches("st[r]e")]						/address/street
+**/street/replace("(.*) street", "$1 road")				"naist road"
+replace("(.*) street", "$1 road", **/street)				"naist road"
+replace("road$", "", replace("(.*) street", "$1 road", **/street))	"naist "
+replace("(.*) street", "$1 road", **/street)				"naist road"
+replace("road$", "", replace("(.*) street", "$1 road", **/street))			"naist "
+replace("^[^/]*/", "", replace(";.*", "", **/mediatype0))		"pdf"
+replace("^[^/]*/", "", replace(";.*", "", **/mediatype1))		"pdf"
+upper-case(replace("^[^/]*/", "", replace(";.*", "", **/mediatype1)))	"PDF"
+lower-case("PDF")							"pdf"
+join("|", typetest/list/*)						"30|30|30|30|30|30"
+join("|", numbers/*[type == "iPhone"]/things/*)				"foo|bar"
+join("|", first)							"John"
+
+
+#---------------------------------------------------------------------------------------
+#  CBOR
+#---------------------------------------------------------------------------------------
+
+---- BEGIN CBOR
+{
+    "tagged": 123("John"),
+    1: 5
+}
+---- END
+
+tag(tagged)							123
+#1								5
+#type(key(#1))							"number"
+type(key(#1))							"string"
+
+#---------------------------------------------------------------------------------------
+#  XML
+#---------------------------------------------------------------------------------------
+
+---- BEGIN XML
+<html>
+ <body>
+  <table>
+   <tr id="tr1">
+    <td id="td1.1">TD1.1</td>
+    <td id="td1.2">TD1.2</td>
+   </tr>
+   <tr id="tr2" class="second">
+    <td id="td2.1">TD2.1</td>
+    <td id="td2.2">TD2.2</td>
+   </tr>
+   <tr id="tr3">
+    <td id="td3.1">TD3.1</td>
+    <td id="td3.2">TD3.2</td>
+   </tr>
+  </table>
+  <person>
+   <name>John</name>
+   <age>26</age>
+   <data>mixed <span>content</span> test</data>
+   <items>
+    <item><price>4.50</price><quantity>3</quantity></item><!--9-->
+    <item><price>2.25</price><quantity>4</quantity></item><!--9-->
+   </items>
+  </person>
+  <rdf:seq xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" rdf:about="aboutvalue">
+   <rdf:li>data</rdf:li>
+  </rdf:seq>
+ </body>
+</html>
+---- END
+
+body									/body
+*									/body
+body/table								/body/table
+body/table/*[@class == "second"]					/body/table/tr[1]
+**[@id == "tr1"]							/body/table/tr[0]
+**[@class == "second"]							/body/table/tr[1]
+**/table/#2								/body/table/tr[2]
+**/tr#2									/body/table/tr[2]
+body/table/..								/body
+count(**/tr)								3
+**/person[name == "John"]						/body/person
+**/person[string(name) == "John"]					/body/person
+**/person[data]								/body/person
+**/person[foo]								NULL
+**/tr[@id && index() == 1]						/body/table/tr[1]
+**/table[count(tr) == 3]						/body/table
+**/table[count(tr) == 3 && count(tr/td) == 6]				/body/table
+**/tr[!@class]/td[@id]							/body/table/tr[0]/td[0],/body/table/tr[0]/td[1],/body/table/tr[2]/td[0],/body/table/tr[2]/td[1]
+**[key(prev()) == "table"]						/body/person
+**[key(next()) == "person"]						/body/table
+**/td[@id == "td3.2" && string() == "TD3.2"]				/body/table/tr[2]/td[1]
+**/table/tr[index() == count() - 1]					/body/table/tr[2]
+**/table/tr[is-first()]							/body/table/tr[0]
+**/table/tr[is-last()]							/body/table/tr[2]
+**/rdf:seq/rdf:li							/body/rdf:seq/rdf:li
+**/rdf:seq/@rdf:about							"aboutvalue"
+**/td/@id								"td1.1","td1.2","td2.1","td2.2","td3.1","td3.2"
+**/data/*								/body/person/data/0, /body/person/data/1, /body/person/data/2
+**/data/*[type() == "text"]						/body/person/data/0, /body/person/data/2
+**/data/*[type() == "text"][index() == 1]				/body/person/data/2
+**[count(*) == 3]							/body,/body/table,/body/person/data
+union(**/table,**/table,**/person)					/body/table,/body/person
+**/tr/count(td)								2,2,2
+**[@id == "tr2"]/@*							"second","tr2"
+**/items/item/value(number(price) * number(quantity))			13.5,9			# sum of price*quantity for each item
+sum(**/items/item/value(number(price) * number(quantity)))		22.5			# sum of price*quantity for each item
+format("$%02.2f", sum(**/items/item/value(number(price) * number(quantity))))		"$22.50"		# sum of price*quantity for each item
+**/@*[url() == "http://www.w3.org/1999/02/22-rdf-syntax-ns#"]		"aboutvalue"
+**/@*									"tr1", "td1.1", "td1.2", "second", "tr2", "td2.1", "td2.2", "tr3", "td3.1", "td3.2", "aboutvalue", "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+
+#---------------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------------
+
+# TODO
+# * ensure we can select first or last item in a selection	 - yes, index()==0 or index()==count() - 1
+# * ensure we can handle non-string key types = *[key() == buffer("foo")]
+# * isnull() - no need, type(nnn) == "null" or type(nnn) == "undefined"
+# * ancestor - ..* ??
+# * difference() function
+
+
+# //hr[@class="edge" and position()=1]'                // every first hr of 'edge' class                                               /**/hr[@class == "edge" && index() == 1]
+# //table[count(tr)=1 and count(tr/td)=2]'             // all tables with 1 row and 2 cols                                             /**/table[count(tr) == 1 && count(tr/td) == 2]
+# //div/form/parent::*'                                // all divs that have form                                                      /**/div[form]
+# ./div/b'                                             // a relative path                                                              div/b
+# //table[parent::div[@class="pad"] and not(@id)]//a'  // any anchor in a table without id, contained in a div of "pad" class          /**/div[pad]/table[!id]
+# /html/body/div/*[preceding-sibling::h4]'             // give me whatever after h4                                                    /html/body/div/*[key(prev()) == "h4"]
+# //tr/td[font[@class="head" and text()="TRACK"]]'     // all td that has font of a "head" class and text "TRACK"                      /**/tr/td[font[class == "head" && string() == "TRACK"]]
+# ./table/tr[last()]'                                  // the last row of a table                                                      table/tr[last()]
+# //rdf:Seq/rdf:li/em:id'                              // using namespaces                                                             /**/rdf:Seq/rdf:li/em:id
+# //a/@href'                                           // hrefs of all anchors                                                         /**/a/@href
+# //*[count(*)=3]'                                     // all nodes with 3 children                                                    /**/*[count(*) == 3]
+# //var|//acronym'                                     // all vars and acronyms                                                        union(//var, //acronym)
+# child::*[self::chapter or self::appendix][position()=last()]  // last <chapter> or <appendix> child of the context node.	       union(chapter, appendix)[isfirst()]
+
+# vim: syntax=none tabstop=8 noexpandtab

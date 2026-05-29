@@ -1,0 +1,56 @@
+from test/more import *;
+from test/worker_contract import require_worker;
+
+let Worker := require_worker();
+
+if ( not( Worker can "spawn_handle" ) ) {
+	skip_all( "Worker.spawn_handle is unavailable" );
+}
+
+async function main () {
+	let handle := Worker.spawn_handle(
+		async function ( inbox, prefix ) {
+			let value := await {
+				inbox.recv();
+			};
+			await {
+				inbox.send( prefix _ ":" _ value );
+			};
+			inbox.close();
+			return "done";
+		},
+		[ "echo" ],
+	);
+
+	await {
+		handle.send("Ada");
+	};
+	is(
+		await { handle.recv(); },
+		"echo:Ada",
+		"parent sends and receives worker reply",
+	);
+	let close_error := null;
+	try {
+		await {
+			handle.recv();
+		};
+	}
+	catch ( Exception e ) {
+		close_error := e;
+	}
+	like(
+		close_error.to_String(),
+		/ChannelClosedException/,
+		"recv after worker close rejects",
+	);
+	is( await { handle.result(); }, "done", "handle result returns worker value" );
+	ok( handle.done(), "handle done delegates to result task" );
+	is( handle.status(), "fulfilled", "handle status delegates to result task" );
+}
+
+await {
+	main();
+};
+
+done_testing();

@@ -1,0 +1,347 @@
+=encoding utf8
+
+=head1 NAME
+
+std/lingua/en - English text helpers for ZuzuScript.
+
+=head1 SYNOPSIS
+
+  from std/lingua/en import *;
+
+  say( english_list(["tea", "cake", "jam"]) );
+  # tea, cake, and jam
+
+  say( english_number(251) );
+  # two hundred and fifty-one
+
+  say( english_ordinal(42) );
+  # forty-second
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module provides pure-Zuzu helpers for presenting English text,
+using British English conventions (including the serial comma and
+"and" in hundreds).
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item * C<< english_list(Collection c, String j := "and") >>
+
+Parameters: C<c> is an ordered collection and C<j> is the conjunction
+before the final item. Returns: C<String> or C<null>. Formats a list of
+values into English prose.
+
+=item * C<< english_number(Number n, Number cutoff?) >>
+
+Parameters: C<n> is the number to render and C<cutoff> is an optional
+numeric rendering limit. Returns: C<String>. Renders a number in English
+words, falling back to digits when C<abs(n)> exceeds C<cutoff>.
+
+=item * C<< english_ordinal(Number n, Number cutoff?) >>
+
+Parameters: C<n> is the number to render and C<cutoff> is an optional
+numeric rendering limit. Returns: C<String>. Renders an ordinal form such
+as C<first>, C<second>, or C<third>.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/lingua/en >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.
+
+=cut
+
+from std/string import substr, index, split, join;
+
+function english_list ( Collection c, String j := "and" ) {
+	let n := c.length();
+	if ( n = 0 ) {
+		return null;
+	}
+	if ( n = 1 ) {
+		return "" _ c[0];
+	}
+	if ( n = 2 ) {
+		return "" _ c[0] _ " " _ j _ " " _ c[1];
+	}
+	let out := "";
+	let i := 0;
+
+	while ( i < n ) {
+
+		if ( i > 0 ) {
+			if ( i = n - 1 ) {
+				out _= ", " _ j _ " ";
+			}
+			else {
+				out _= ", ";
+			}
+		}
+
+		out _= "" _ c[i];
+		i++;
+	}
+
+	return out;
+}
+
+function _digit_word ( String ch ) {
+	switch ( ch: eq ) {
+		case "0": return "nought";
+		case "1": return "one";
+		case "2": return "two";
+		case "3": return "three";
+		case "4": return "four";
+		case "5": return "five";
+		case "6": return "six";
+		case "7": return "seven";
+		case "8": return "eight";
+		case "9": return "nine";
+	}
+
+	return ch;
+}
+
+function _small_cardinal ( Number n ) {
+	switch ( n ) {
+		case 0: return "nought";
+		case 1: return "one";
+		case 2: return "two";
+		case 3: return "three";
+		case 4: return "four";
+		case 5: return "five";
+		case 6: return "six";
+		case 7: return "seven";
+		case 8: return "eight";
+		case 9: return "nine";
+		case 10: return "ten";
+		case 11: return "eleven";
+		case 12: return "twelve";
+		case 13: return "thirteen";
+		case 14: return "fourteen";
+		case 15: return "fifteen";
+		case 16: return "sixteen";
+		case 17: return "seventeen";
+		case 18: return "eighteen";
+		case 19: return "nineteen";
+	}
+	let tens := int( n / 10 ) * 10;
+	let ones := n mod 10;
+	let tword := "";
+	switch ( tens ) {
+		case 20: tword := "twenty";
+		case 30: tword := "thirty";
+		case 40: tword := "forty";
+		case 50: tword := "fifty";
+		case 60: tword := "sixty";
+		case 70: tword := "seventy";
+		case 80: tword := "eighty";
+		case 90: tword := "ninety";
+	}
+	if ( ones = 0 ) {
+		return tword;
+	}
+
+	return tword _ "-" _ _small_cardinal(ones);
+}
+
+function _integer_cardinal ( Number n ) {
+	if ( n < 100 ) {
+		return _small_cardinal(n);
+	}
+
+	if ( n < 1000 ) {
+		let hundreds := int( n / 100 );
+		let rem := n mod 100;
+		if ( rem = 0 ) {
+			return _small_cardinal(hundreds) _ " hundred";
+		}
+		return _small_cardinal(hundreds) _ " hundred and " _ _small_cardinal(rem);
+	}
+
+	if ( n < 1000000 ) {
+		let thousands := int( n / 1000 );
+		let rem := n mod 1000;
+		let head := _integer_cardinal(thousands) _ " thousand";
+		if ( rem = 0 ) {
+			return head;
+		}
+		if ( rem < 100 ) {
+			return head _ " and " _ _integer_cardinal(rem);
+		}
+		return head _ ", " _ _integer_cardinal(rem);
+	}
+
+	if ( n < 1000000000 ) {
+		let millions := int( n / 1000000 );
+		let rem := n mod 1000000;
+		let head := _integer_cardinal(millions) _ " million";
+		if ( rem = 0 ) {
+			return head;
+		}
+		if ( rem < 100 ) {
+			return head _ " and " _ _integer_cardinal(rem);
+		}
+		return head _ ", " _ _integer_cardinal(rem);
+	}
+
+	if ( n = 1000000000 ) {
+		return "one billion";
+	}
+	let billions := int( n / 1000000000 );
+	let rem := n mod 1000000000;
+	let head := _integer_cardinal(billions) _ " billion";
+	if ( rem = 0 ) {
+		return head;
+	}
+	if ( rem < 100 ) {
+		return head _ " and " _ _integer_cardinal(rem);
+	}
+
+	return head _ ", " _ _integer_cardinal(rem);
+}
+
+function _english_number_core ( Number n ) {
+	if ( n < 0 ) {
+		return "negative " _ _english_number_core( -n );
+	}
+	let text := "" _ n;
+	let dot := index( text,".");
+
+	if ( dot >= 0 ) {
+		let int_text := substr( text, 0, dot );
+		let frac_text := substr( text, dot + 1 );
+		let int_num := int_text + 0;
+		let frac_words := [];
+		let i := 0;
+		while ( i < length frac_text ) {
+			frac_words.push( _digit_word( substr( frac_text, i, 1 ) ) );
+			i++;
+		}
+		return _integer_cardinal(int_num) _ " point " _ join( " ", frac_words );
+	}
+
+	let whole := int n;
+
+	return _integer_cardinal(whole);
+}
+
+function english_number ( Number n, Number cutoff? ) {
+	if ( cutoff != null and abs(n) > cutoff ) {
+		return "" _ n;
+	}
+
+	return _english_number_core(n);
+}
+
+function _ends_with ( String text, String suffix ) {
+	if ( length suffix > length text ) {
+		return false;
+	}
+
+	return substr( text, length text - length suffix ) ≡ suffix;
+}
+
+function _ordinal_word ( String word ) {
+	switch ( word: eq ) {
+		case "one": return "first";
+		case "two": return "second";
+		case "three": return "third";
+		case "four": return "fourth";
+		case "five": return "fifth";
+		case "six": return "sixth";
+		case "seven": return "seventh";
+		case "eight": return "eighth";
+		case "nine": return "ninth";
+		case "ten": return "tenth";
+		case "eleven": return "eleventh";
+		case "twelve": return "twelfth";
+		case "thirteen": return "thirteenth";
+		case "fourteen": return "fourteenth";
+		case "fifteen": return "fifteenth";
+		case "sixteen": return "sixteenth";
+		case "seventeen": return "seventeenth";
+		case "eighteen": return "eighteenth";
+		case "nineteen": return "nineteenth";
+		case "twenty": return "twentieth";
+		case "thirty": return "thirtieth";
+		case "forty": return "fortieth";
+		case "fifty": return "fiftieth";
+		case "sixty": return "sixtieth";
+		case "seventy": return "seventieth";
+		case "eighty": return "eightieth";
+		case "ninety": return "ninetieth";
+		case "hundred": return "hundredth";
+		case "thousand": return "thousandth";
+		case "million": return "millionth";
+		case "billion": return "billionth";
+		case "nought": return "zeroth";
+	}
+	if ( _ends_with( word, "y" ) ) {
+		return substr( word, 0, length word - 1 ) _ "ieth";
+	}
+
+	return word _ "th";
+}
+
+function _ordinalize_phrase ( String phrase ) {
+	let words := split( phrase, " " );
+	let last_i := words.length() - 1;
+	let last_word := words[last_i];
+	let hy := index( last_word, "-" );
+
+	if ( hy >= 0 ) {
+		let first := substr( last_word, 0, hy + 1 );
+		let tail := substr( last_word, hy + 1 );
+		words[last_i] := first _ _ordinal_word(tail);
+	}
+
+	else {
+		words[last_i] := _ordinal_word(last_word);
+	}
+
+	return join( " ", words );
+}
+
+function _ordinal_suffix ( Number n ) {
+	let whole := abs( int n );
+	let last_two := whole mod 100;
+	switch ( last_two ) {
+		case 11, 12, 13: return "th";
+	}
+	let last_digit := whole mod 10;
+	switch ( last_digit ) {
+		case 1: return "st";
+		case 2: return "nd";
+		case 3: return "rd";
+	}
+
+	return "th";
+}
+
+function english_ordinal ( Number n, Number cutoff? ) {
+	if ( cutoff != null and abs(n) > cutoff ) {
+		return "" _ n _ _ordinal_suffix(n);
+	}
+	if ( n < 0 ) {
+		return "negative " _ english_ordinal( -n, cutoff );
+	}
+	let text := "" _ n;
+	if ( index( text,".") >= 0 ) {
+		return english_number( n, cutoff ) _ "th";
+	}
+
+	return _ordinalize_phrase( _english_number_core(n) );
+}

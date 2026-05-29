@@ -1,8 +1,10 @@
-# Pixel size has been depreciated.
+# Remember, the virtual screen size is 3840x2160.  Actual output will be scaled
+#  for the physical screen, if the resolution is different.
 
 # WHITE STRIPES
 FOREGROUND 255,255,255
 RBOX 0,0,3840,2150,1
+
 # RED STRIPES
 FOREGROUND 255,0,0
 RBOX 0,0,3840,166,1
@@ -12,9 +14,11 @@ RBOX 0,996,3840,166,1
 RBOX 0,1328,3840,166,1
 RBOX 0,1660,3840,166,1
 RBOX 0,1992,3840,166,1
+
 # BLUE FIELD
 FOREGROUND 0,0,200
 RBOX 0,0,1536,1162,1
+
 # STARS
 FOREGROUND 255,255,255
 STAR 160,110,40

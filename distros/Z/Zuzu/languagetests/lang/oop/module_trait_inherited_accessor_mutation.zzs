@@ -1,0 +1,9 @@
+from test/c27/child import NamedChild;
+from test/more import *;
+
+let c := new NamedChild( name: "Before" );
+
+is( c.rename_parent_field( "After" ), "After", "trait mutates inherited accessor-backed field" );
+is( c.get_name(), "After", "inherited accessor reflects trait mutation" );
+
+done_testing();

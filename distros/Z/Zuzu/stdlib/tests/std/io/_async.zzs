@@ -1,0 +1,65 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/io import Path;
+from std/task import all;
+
+async function main () {
+	let file := Path.tempfile();
+	let other := Path.tempfile();
+	let raw := ~to_binary("ABC");
+
+	await {
+		file.spew_utf8_async("one\ntwo\n");
+	};
+	is(
+		await {
+			file.slurp_utf8_async();
+		},
+		"one\ntwo\n",
+		"slurp_utf8_async reads text",
+	);
+
+	await {
+		file.append_utf8_async("three\n");
+	};
+	let lines := await {
+		file.lines_utf8_async();
+	};
+	is( lines.length(), 3, "lines_utf8_async returns text lines" );
+	is( lines[2], "three\n", "append_utf8_async writes text" );
+
+	await {
+		other.spew_async(raw);
+	};
+	let roundtrip := await {
+		other.slurp_async();
+	};
+	is( typeof roundtrip, "BinaryString", "slurp_async returns BinaryString" );
+	ok( roundtrip == raw, "spew_async writes binary data" );
+
+	await {
+		other.append_async( ~to_binary("D") );
+	};
+	let appended := await {
+		other.slurp_async();
+	};
+	is(
+		length appended,
+		4,
+		"append_async appends binary data",
+	);
+
+	let both := await {
+		all( [ file.slurp_utf8_async(), other.slurp_async() ] );
+	};
+	is( both[0], "one\ntwo\nthree\n", "async file tasks compose with all" );
+	is( typeof both[1], "BinaryString", "binary async result composes with all" );
+}
+
+await {
+	main();
+};
+
+done_testing();

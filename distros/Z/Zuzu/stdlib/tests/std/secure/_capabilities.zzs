@@ -1,0 +1,424 @@
+from std/secure import PasswordHash, Secure;
+from test/more import *;
+
+let caps := Secure.capabilities();
+
+is( Secure.has( "random", "bytes" ), true, "random bytes is available" );
+is( Secure.has( "random", "token" ), true, "random token is available" );
+is( Secure.has( "random", "int" ), true, "random int is available" );
+is(
+	Secure.has( "kdf", "hkdf-sha256" ),
+	true,
+	"hkdf-sha256 is available",
+);
+is(
+	Secure.has( "cipher", "aes-256-gcm" ),
+	true,
+	"aes-256-gcm is available",
+);
+if ( caps{host} == "perl" ) {
+	is(
+		Secure.has( "cipher", "aes-128-gcm" ),
+		true,
+		"Perl advertises aes-128-gcm",
+	);
+	is(
+		Secure.require( "cipher", "aes-128-gcm" ),
+		true,
+		"require returns true for aes-128-gcm",
+	);
+	is(
+		Secure.has( "cipher", "aes-192-gcm" ),
+		true,
+		"Perl advertises aes-192-gcm",
+	);
+	is(
+		Secure.require( "cipher", "aes-192-gcm" ),
+		true,
+		"require returns true for aes-192-gcm",
+	);
+}
+else {
+	is(
+		Secure.has( "cipher", "aes-128-gcm" ),
+		false,
+		"non-Perl hosts do not advertise aes-128-gcm",
+	);
+	is(
+		Secure.has( "cipher", "aes-192-gcm" ),
+		false,
+		"non-Perl hosts do not advertise aes-192-gcm",
+	);
+}
+if ( caps{host} == "browser" ) {
+	is(
+		Secure.has( "cipher", "chacha20-poly1305" ),
+		false,
+		"browser does not advertise chacha20-poly1305",
+	);
+}
+else if ( caps{host} == "electron" ) {
+	if ( Secure.has( "cipher", "chacha20-poly1305" ) ) {
+		is(
+			Secure.require( "cipher", "chacha20-poly1305" ),
+			true,
+			"require returns true for chacha20-poly1305",
+		);
+	}
+	else {
+		like(
+			exception( function () {
+				Secure.require( "cipher", "chacha20-poly1305" );
+			} ),
+			/cipher\/chacha20-poly1305/,
+			"require rejects unavailable chacha20-poly1305",
+		);
+	}
+}
+else {
+	is(
+		Secure.has( "cipher", "chacha20-poly1305" ),
+		true,
+		"chacha20-poly1305 is available",
+	);
+	is(
+		Secure.require( "cipher", "chacha20-poly1305" ),
+		true,
+		"require returns true for chacha20-poly1305",
+	);
+}
+is(
+	Secure.has( "key_agreement", "x25519" ),
+	true,
+	"x25519 key agreement is available",
+);
+is(
+	Secure.require( "key_agreement", "x25519" ),
+	true,
+	"require returns true for x25519",
+);
+if ( caps{host} == "browser" ) {
+	is(
+		Secure.has( "signing", "ed25519" ),
+		false,
+		"ed25519 signing is not advertised in browsers",
+	);
+}
+else {
+	is(
+		Secure.has( "signing", "ed25519" ),
+		true,
+		"ed25519 signing is available",
+	);
+	is(
+		Secure.require( "signing", "ed25519" ),
+		true,
+		"require returns true for ed25519 signing",
+	);
+}
+is(
+	Secure.has( "signing", "ecdsa-p256-sha256" ),
+	true,
+	"ecdsa-p256-sha256 signing is available",
+);
+is(
+	Secure.require( "signing", "ecdsa-p256-sha256" ),
+	true,
+	"require returns true for ecdsa-p256-sha256",
+);
+is(
+	Secure.has( "signing", "ecdsa-p384-sha384" ),
+	true,
+	"ecdsa-p384-sha384 signing is available",
+);
+is(
+	Secure.require( "signing", "ecdsa-p384-sha384" ),
+	true,
+	"require returns true for ecdsa-p384-sha384",
+);
+if ( caps{host} == "perl" ) {
+	is(
+		Secure.has( "signing", "ecdsa-p521-sha512" ),
+		true,
+		"Perl advertises ecdsa-p521-sha512 signing",
+	);
+	is(
+		Secure.require( "signing", "ecdsa-p521-sha512" ),
+		true,
+		"require returns true for ecdsa-p521-sha512",
+	);
+}
+else {
+	is(
+		Secure.has( "signing", "ecdsa-p521-sha512" ),
+		false,
+		"non-Perl hosts do not advertise ecdsa-p521-sha512",
+	);
+}
+is(
+	Secure.has( "password_hash", "pbkdf2-sha256" ),
+	true,
+	"pbkdf2-sha256 password hash is available",
+);
+is( Secure.has( "kdf", "unknown" ), false, "unknown kdf is unavailable" );
+is(
+	Secure.has( "password_hash", "unknown" ),
+	false,
+	"unknown password hash is unavailable",
+);
+is(
+	Secure.has( "cipher", "unknown" ),
+	false,
+	"unknown cipher is unavailable",
+);
+is( Secure.has( "unknown", "thing" ), false, "unknown area is unavailable" );
+is( Secure.has( "random", "unknown" ), false, "unknown name is unavailable" );
+is( Secure.has( null, "bytes" ), false, "null area is unavailable" );
+is( Secure.has( "random", null ), false, "null name is unavailable" );
+
+is(
+	Secure.require( "random", "bytes" ),
+	true,
+	"require returns true for available capability",
+);
+is(
+	Secure.require( "kdf", "hkdf-sha256" ),
+	true,
+	"require returns true for hkdf-sha256",
+);
+is(
+	Secure.require( "cipher", "aes-256-gcm" ),
+	true,
+	"require returns true for aes-256-gcm",
+);
+is(
+	Secure.has( "certificate", "parse-x509-der" ),
+	true,
+	"parse-x509-der certificate capability is available",
+);
+is(
+	Secure.has( "certificate", "fingerprint-sha256" ),
+	true,
+	"fingerprint-sha256 certificate capability is available",
+);
+if ( caps{host} == "perl" ) {
+	is(
+		Secure.has( "certificate", "fingerprint-sha384" ),
+		true,
+		"Perl advertises SHA-384 certificate fingerprinting",
+	);
+	is(
+		Secure.has( "certificate", "fingerprint-sha512" ),
+		true,
+		"Perl advertises SHA-512 certificate fingerprinting",
+	);
+}
+else {
+	is(
+		Secure.has( "certificate", "fingerprint-sha384" ),
+		false,
+		"non-Perl hosts do not advertise SHA-384 certificate fingerprinting",
+	);
+	is(
+		Secure.has( "certificate", "fingerprint-sha512" ),
+		false,
+		"non-Perl hosts do not advertise SHA-512 certificate fingerprinting",
+	);
+}
+if ( caps{host} == "browser" ) {
+	is(
+		Secure.has( "certificate", "verify-chain" ),
+		false,
+		"browser does not advertise certificate chain verification",
+	);
+}
+else {
+	is(
+		Secure.has( "certificate", "verify-chain" ),
+		true,
+		"certificate chain verification is available",
+	);
+}
+is(
+	Secure.has( "tls_identity", "pem" ),
+	true,
+	"PEM TLS identity capability is available",
+);
+if ( caps{host} == "browser" ) {
+	is(
+		Secure.has( "certificate", "parse-x509" ),
+		false,
+		"browser does not advertise PEM certificate parsing",
+	);
+	is(
+		Secure.has( "certificate", "public-key" ),
+		false,
+		"browser does not advertise certificate public-key extraction",
+	);
+	is(
+		Secure.has( "tls_identity", "pkcs12" ),
+		false,
+		"browser does not advertise PKCS#12 TLS identity",
+	);
+}
+else {
+	is(
+		Secure.has( "certificate", "parse-x509" ),
+		true,
+		"host advertises PEM certificate parsing",
+	);
+	is(
+		Secure.has( "certificate", "public-key" ),
+		true,
+		"host advertises certificate public-key extraction",
+	);
+	is(
+		Secure.has( "tls_identity", "pkcs12" ),
+		true,
+		"host advertises PKCS#12 TLS identity",
+	);
+}
+is(
+	Secure.require( "password_hash", "pbkdf2-sha256" ),
+	true,
+	"require returns true for pbkdf2-sha256",
+);
+
+is(
+	PasswordHash.default_algorithm(),
+	"pbkdf2-sha256",
+	"default password hash algorithm is portable",
+);
+
+if ( caps{host} == "perl" or caps{host} == "rust" ) {
+	is(
+		Secure.has( "password_hash", "argon2id" ),
+		true,
+		"argon2id is available on this host",
+	);
+	is(
+		Secure.require( "password_hash", "argon2id" ),
+		true,
+		"require returns true for host argon2id",
+	);
+}
+else {
+	is(
+		Secure.has( "password_hash", "argon2id" ),
+		false,
+		"argon2id is not advertised on this host",
+	);
+	like(
+		exception( function () {
+			Secure.require( "password_hash", "argon2id" );
+		} ),
+		/password_hash\/argon2id/,
+		"require rejects unavailable argon2id",
+	);
+}
+
+if (
+	caps{host} == "perl"
+	or caps{host} == "rust"
+	or caps{host} == "node"
+	or caps{host} == "electron"
+) {
+	is(
+		Secure.has( "password_hash", "scrypt" ),
+		true,
+		"scrypt is available on this host",
+	);
+	is(
+		Secure.require( "password_hash", "scrypt" ),
+		true,
+		"require returns true for host scrypt",
+	);
+}
+else {
+	is(
+		Secure.has( "password_hash", "scrypt" ),
+		false,
+		"scrypt is not advertised on this host",
+	);
+	like(
+		exception( function () {
+			Secure.require( "password_hash", "scrypt" );
+		} ),
+		/password_hash\/scrypt/,
+		"require rejects unavailable scrypt",
+	);
+}
+
+if ( caps{host} == "perl" ) {
+	is(
+		Secure.has( "password_hash", "crypt" ),
+		true,
+		"crypt is available on this host",
+	);
+	is(
+		Secure.require( "password_hash", "crypt" ),
+		true,
+		"require returns true for host crypt",
+	);
+}
+else {
+	is(
+		Secure.has( "password_hash", "crypt" ),
+		false,
+		"crypt is not advertised on this host",
+	);
+	like(
+		exception( function () {
+			Secure.require( "password_hash", "crypt" );
+		} ),
+		/password_hash\/crypt/,
+		"require rejects unavailable crypt",
+	);
+}
+
+let kdf_err := exception( function () {
+	Secure.require( "kdf", "unknown" );
+} );
+like(
+	kdf_err,
+	/kdf\/unknown/,
+	"require reports unsupported area and name",
+);
+
+let unknown_err := exception( function () {
+	Secure.require( "unknown", "thing" );
+} );
+like(
+	unknown_err,
+	/unknown\/thing/,
+	"require reports unknown area and name",
+);
+if ( caps{host} == "perl" ) {
+	like( unknown_err, /perl/, "require reports Perl host name" );
+}
+else if ( caps{host} == "rust" ) {
+	like( unknown_err, /rust/, "require reports Rust host name" );
+}
+else if ( caps{host} == "node" ) {
+	like( unknown_err, /node/, "require reports Node host name" );
+}
+else if ( caps{host} == "electron" ) {
+	like( unknown_err, /electron/, "require reports Electron host name" );
+}
+else if ( caps{host} == "browser" ) {
+	like( unknown_err, /browser/, "require reports browser host name" );
+}
+else {
+	fail( "require reports host name" );
+}
+
+let null_err := exception( function () {
+	Secure.require( null, "bytes" );
+} );
+like(
+	null_err,
+	/Secure capability '\/bytes'/,
+	"require treats null area as unsupported",
+);
+
+done_testing();

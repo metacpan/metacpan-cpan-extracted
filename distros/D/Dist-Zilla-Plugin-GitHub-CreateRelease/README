@@ -2,7 +2,7 @@ NAME
     Dist::Zilla::Plugin::GitHub::CreateRelease - Create a GitHub Release
 
 VERSION
-    version 0.0008
+    version 0.0009
 
 SYNOPSIS
     In your dist.ini:
@@ -169,7 +169,7 @@ METHODS
         release is complete.
 
 AUTHOR
-      Timothy Legge <timlegge@cpan.org>
+      Timothy Legge <timlegge@gmail.com>
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2023 by Timothy Legge.

@@ -1,0 +1,38 @@
+from test/more import *;
+
+requires_capability( "db" );
+
+from std/db import DB;
+
+let dbh := DB.temp();
+dbh.prepare( "create table nums (value integer)" ).execute();
+dbh.prepare( "insert into nums (value) values (1)" ).execute();
+dbh.prepare( "insert into nums (value) values (2)" ).execute();
+dbh.prepare( "insert into nums (value) values (3)" ).execute();
+
+let stmt := dbh.prepare( "select value from nums order by value" );
+stmt.execute();
+
+let seen := 0;
+let else_hit := 0;
+let msg := "";
+try {
+	for ( let row in stmt ) {
+		seen++;
+		if ( row{value} == 2 ) {
+			throw new Exception( message: "mid-stream" );
+		}
+	}
+	else {
+		else_hit := 1;
+	}
+}
+catch ( Exception e ) {
+	msg := e{message};
+}
+
+is( seen, 2, "statement iterator consumed rows until mid-stream failure" );
+like( msg, /mid-stream/, "mid-stream failure is surfaced" );
+is( else_hit, 0, "for-else block is skipped when statement iteration aborts with error" );
+
+done_testing();

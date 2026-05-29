@@ -1,0 +1,316 @@
+from std/secure import Cipher, Secure;
+from std/string/base64 import decode;
+from test/more import *;
+
+let caps := Secure.capabilities();
+let key := Cipher.generate_key();
+let plaintext := to_binary("classified payload");
+let aad := to_binary("context");
+
+function check_envelope ( envelope, name ) {
+	is( typeof envelope, "Dict", name _ " returns an envelope Dict" );
+	is( envelope{version}, 1, name _ " envelope version is stable" );
+	is( envelope{algorithm}, "aes-256-gcm", name _ " algorithm is stable" );
+	is( typeof envelope{nonce}, "BinaryString", name _ " nonce is binary" );
+	is( length envelope{nonce}, 12, name _ " nonce is 12 bytes" );
+	is(
+		typeof envelope{ciphertext},
+		"BinaryString",
+		name _ " ciphertext is binary",
+	);
+	is( typeof envelope{tag}, "BinaryString", name _ " tag is binary" );
+	is( length envelope{tag}, 16, name _ " tag is 16 bytes" );
+	isnt(
+		envelope{ciphertext},
+		plaintext,
+		name _ " ciphertext differs from non-empty plaintext",
+	);
+}
+
+async function async_exception_message ( Function f ) {
+	try {
+		await {
+			f();
+		};
+		return null;
+	}
+	catch ( Exception e ) {
+		return e{message};
+	}
+}
+
+is(
+	Secure.has( "cipher", "aes-256-gcm" ),
+	true,
+	"aes-256-gcm capability is available",
+);
+is(
+	Secure.require( "cipher", "aes-256-gcm" ),
+	true,
+	"require accepts aes-256-gcm",
+);
+is( typeof key, "BinaryString", "generate_key returns BinaryString" );
+is( length key, 32, "generate_key returns a 32-byte key" );
+
+let async_envelope := await {
+	Cipher.encrypt_async( plaintext, key, { aad: aad } );
+};
+check_envelope( async_envelope, "async encrypt" );
+let async_plaintext := await {
+	Cipher.decrypt_async( async_envelope, key, { aad: aad } );
+};
+is( async_plaintext, plaintext, "async encrypt/decrypt round-trips" );
+
+if ( caps{host} == "browser" ) {
+	is(
+		caps{async_required}{cipher},
+		true,
+		"browser reports async-required cipher support",
+	);
+	like(
+		exception( function () {
+			Cipher.encrypt( plaintext, key, { aad: aad } );
+		} ),
+		/not available synchronously|encrypt_async/,
+		"browser rejects synchronous encrypt",
+	);
+	like(
+		exception( function () {
+			Cipher.decrypt( async_envelope, key, { aad: aad } );
+		} ),
+		/not available synchronously|decrypt_async/,
+		"browser rejects synchronous decrypt",
+	);
+	like(
+		await {
+			async_exception_message( function () {
+				Cipher.decrypt_async(
+					async_envelope,
+					key,
+					{ aad: to_binary("wrong") },
+				);
+			} );
+		},
+		/authentication failed/,
+		"async decrypt rejects wrong AAD",
+	);
+	like(
+		await {
+			async_exception_message( function () {
+				Cipher.decrypt_async(
+					async_envelope,
+					Cipher.generate_key(),
+					{ aad: aad },
+				);
+			} );
+		},
+		/authentication failed/,
+		"async decrypt rejects wrong key",
+	);
+
+	let tampered := {
+		version: async_envelope{version},
+		algorithm: async_envelope{algorithm},
+		nonce: async_envelope{nonce},
+		ciphertext: async_envelope{ciphertext},
+		tag: decode("AAAAAAAAAAAAAAAAAAAAAA=="),
+	};
+	like(
+		await {
+			async_exception_message( function () {
+				Cipher.decrypt_async( tampered, key, { aad: aad } );
+			} );
+		},
+		/authentication failed/,
+		"async decrypt rejects tampered tag",
+	);
+	like(
+		await {
+			async_exception_message( function () {
+				Cipher.encrypt_async( plaintext, decode("AA==") );
+			} );
+		},
+		/32-byte key/,
+		"async encrypt rejects invalid key length",
+	);
+
+	let malformed := {
+		version: 1,
+		algorithm: "aes-256-gcm",
+		nonce: async_envelope{nonce},
+		ciphertext: async_envelope{ciphertext},
+	};
+	like(
+		await {
+			async_exception_message( function () {
+				Cipher.decrypt_async( malformed, key, { aad: aad } );
+			} );
+		},
+		/envelope.tag/,
+		"async decrypt rejects malformed envelopes",
+	);
+}
+else {
+	is(
+		caps{async_required}{cipher},
+		false,
+		"CLI runtimes report synchronous cipher support",
+	);
+
+	let envelope := Cipher.encrypt(
+		plaintext,
+		key,
+		{ aad: aad },
+	);
+	check_envelope( envelope, "encrypt" );
+	is(
+		Cipher.decrypt( envelope, key, { aad: aad } ),
+		plaintext,
+		"decrypt round-trips plaintext",
+	);
+
+	like(
+		exception( function () {
+			Cipher.decrypt( envelope, key, { aad: to_binary("wrong") } );
+		} ),
+		/authentication failed/,
+		"decrypt rejects wrong AAD",
+	);
+	like(
+		exception( function () {
+			Cipher.decrypt(
+				envelope,
+				Cipher.generate_key(),
+				{ aad: aad },
+			);
+		} ),
+		/authentication failed/,
+		"decrypt rejects wrong key",
+	);
+
+	let tampered := {
+		version: envelope{version},
+		algorithm: envelope{algorithm},
+		nonce: envelope{nonce},
+		ciphertext: envelope{ciphertext},
+		tag: decode("AAAAAAAAAAAAAAAAAAAAAA=="),
+	};
+	like(
+		exception( function () {
+			Cipher.decrypt( tampered, key, { aad: aad } );
+		} ),
+		/authentication failed/,
+		"decrypt rejects tampered tag",
+	);
+	like(
+		exception( function () {
+			Cipher.encrypt( plaintext, decode("AA==") );
+		} ),
+		/32-byte key/,
+		"encrypt rejects invalid key length",
+	);
+
+	let malformed := {
+		version: 1,
+		algorithm: "aes-256-gcm",
+		nonce: envelope{nonce},
+		ciphertext: envelope{ciphertext},
+	};
+	like(
+		exception( function () {
+			Cipher.decrypt( malformed, key, { aad: aad } );
+		} ),
+		/envelope.tag/,
+		"decrypt rejects malformed envelopes",
+	);
+}
+
+function exercise_perl_aes_gcm_variant ( algorithm, key_length ) {
+	if ( caps{host} == "perl" ) {
+		is(
+			Secure.has( "cipher", algorithm ),
+			true,
+			algorithm _ " capability is available on Perl",
+		);
+		let variant_key := Cipher.generate_key(algorithm);
+		is(
+			length variant_key,
+			key_length,
+			algorithm _ " generate_key returns expected key length",
+		);
+		let variant_envelope := Cipher.encrypt(
+			plaintext,
+			variant_key,
+			{ algorithm: algorithm, aad: aad },
+		);
+		is(
+			variant_envelope{algorithm},
+			algorithm,
+			algorithm _ " envelope records algorithm",
+		);
+		is(
+			length variant_envelope{nonce},
+			12,
+			algorithm _ " nonce is 12 bytes",
+		);
+		is(
+			length variant_envelope{tag},
+			16,
+			algorithm _ " tag is 16 bytes",
+		);
+		is(
+			Cipher.decrypt( variant_envelope, variant_key, { aad: aad } ),
+			plaintext,
+			algorithm _ " decrypt round-trips plaintext",
+		);
+		like(
+			exception( function () {
+				Cipher.decrypt(
+					variant_envelope,
+					variant_key,
+					{ aad: to_binary("wrong") },
+				);
+			} ),
+			/authentication failed/,
+			algorithm _ " rejects wrong AAD",
+		);
+		like(
+			exception( function () {
+				Cipher.decrypt(
+					variant_envelope,
+					variant_key,
+					{ algorithm: "aes-256-gcm", aad: aad },
+				);
+			} ),
+			/options.algorithm|algorithm/,
+			algorithm _ " rejects mismatched options.algorithm",
+		);
+	}
+	else {
+		is(
+			Secure.has( "cipher", algorithm ),
+			false,
+			algorithm _ " is not advertised on non-Perl hosts",
+		);
+		like(
+			exception( function () {
+				Cipher.generate_key(algorithm);
+			} ),
+			/not available|only supports/,
+			algorithm _ " key generation is rejected on non-Perl hosts",
+		);
+	}
+}
+
+exercise_perl_aes_gcm_variant( "aes-128-gcm", 16 );
+exercise_perl_aes_gcm_variant( "aes-192-gcm", 24 );
+
+like(
+	exception( function () {
+		Cipher.generate_key("aes-64-gcm");
+	} ),
+	/not available|only supports/,
+	"generate_key rejects unsupported algorithms",
+);
+
+done_testing();

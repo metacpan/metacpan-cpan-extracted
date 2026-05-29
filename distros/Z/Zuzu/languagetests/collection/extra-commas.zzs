@@ -1,0 +1,6 @@
+from test/more import *;
+
+let loose := [ 1 ,,,, 2 ,,,,,,, 3 ,, ];
+is( loose, [ 1, 2, 3 ], "array literals ignore duplicate commas" );
+
+done_testing();

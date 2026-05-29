@@ -1,0 +1,133 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/data/json import JSON;
+from std/io import Path;
+from std/zuzuzoo import *;
+
+let dir := Path.tempdir();
+let meta := {
+	name: "geo-utils",
+	version: "2.0.0",
+	author: "Example Author",
+	license: "MIT",
+	status: "stable",
+	installed: {
+		zdf: "ZDF-1",
+		lib_dir: "/tmp/zuzu-lib",
+		bin_dir: "/tmp/zuzu-bin",
+		meta_dir: dir.to_String(),
+		modules: [
+			{
+				source: "modules/geo/utils.zzm",
+				install_as: "geo/utils.zzm",
+				sha256: "111",
+			},
+			{
+				source: "modules/geo/math.zzm",
+				install_as: "geo/math.zzm",
+				sha256: "222",
+			},
+		],
+		scripts: [
+			{
+				source: "scripts/geo-report.zzs",
+				install_as: "geo-report.zzs",
+				sha256: "333",
+			},
+		],
+	},
+};
+( new JSON( pretty: true ) ).dump(
+	dir.child("geo-utils-2.0.0.json"),
+	meta,
+);
+
+let options := { meta_dir: dir.to_String() };
+let zoo := new Zuzuzoo( meta_dir: dir.to_String() );
+
+is(
+	zoo.find_installed_module("geo/utils"){name},
+	"geo-utils",
+	"module lookup accepts extensionless names",
+);
+is(
+	zoo.find_installed_module("geo/utils.zzm"){version},
+	"2.0.0",
+	"module lookup accepts .zzm names",
+);
+is(
+	zoo.find_installed_distribution("geo-utils"){name},
+	"geo-utils",
+	"distribution lookup works",
+);
+is(
+	zoo.query("geo/math"){version},
+	"2.0.0",
+	"query delegates to module lookup",
+);
+is(
+	zoo.query_distribution("geo-utils"){version},
+	"2.0.0",
+	"query_distribution delegates to distribution lookup",
+);
+is( zoo.query("missing/module"), null, "missing module query returns null" );
+is(
+	zoo.query_distribution("missing-dist"),
+	null,
+	"missing distribution query returns null",
+);
+is(
+	zoo.is_installed("geo/utils"),
+	true,
+	"is_installed finds installed module",
+);
+is(
+	zoo.is_installed( "geo/utils", "1.9.0" ),
+	true,
+	"is_installed accepts satisfied minimum version",
+);
+is(
+	zoo.is_installed( "geo/utils", "2.1.0" ),
+	false,
+	"is_installed rejects unsatisfied minimum version",
+);
+is(
+	zoo.installed_version("geo/utils"),
+	"2.0.0",
+	"installed_version returns version",
+);
+
+is(
+	query( "geo/utils", options ){name},
+	"geo-utils",
+	"top-level query wrapper works",
+);
+is(
+	query_distribution( "geo-utils", options ){version},
+	"2.0.0",
+	"top-level distribution wrapper works",
+);
+is(
+	is_installed( "geo/utils", "2.0.0", options ),
+	true,
+	"top-level is_installed wrapper works",
+);
+is(
+	installed_version( "geo/utils", options ),
+	"2.0.0",
+	"top-level installed_version wrapper works",
+);
+like(
+	zoo.pretty_json( zoo.query("geo/utils") ),
+	/"metadata_file"/,
+	"pretty_json encodes query results",
+);
+like(
+	pretty_json( query( "geo/utils", options ), options ),
+	/"metadata_file"/,
+	"top-level pretty_json wrapper works",
+);
+
+done_testing();

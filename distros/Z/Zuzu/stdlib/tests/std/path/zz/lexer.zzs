@@ -1,0 +1,120 @@
+from std/path/z/lexer import Lexer;
+from std/path/zz/operators import STANDARD_OPERATORS;
+from test/more import *;
+
+function token_kinds ( src ) {
+	let lx := new Lexer( src: src, allowed_operators: STANDARD_OPERATORS );
+	let out := [];
+	while ( true ) {
+		let t := lx.next_tok();
+		out.push( t{k} );
+		last if t{k} ≡ "EOF";
+	}
+	return out;
+}
+
+function operator_kind ( src ) {
+	let kinds := token_kinds(src);
+	return kinds[1];
+}
+
+is( operator_kind( "two ** three" ), "POW", "binary ** tokenizes" );
+is( operator_kind( "two × three" ), "TIMES_SIGN", "binary × tokenizes" );
+is( operator_kind( "two * three" ), "STAR", "binary * tokenizes" );
+is( operator_kind( "ten ÷ four" ), "DIVIDE_SIGN", "binary ÷ tokenizes" );
+is( operator_kind( "ten / four" ), "SLASH", "binary / tokenizes" );
+is( operator_kind( "five mod two" ), "MOD", "binary mod tokenizes" );
+is( operator_kind( "two + three" ), "UPLUS", "binary + tokenizes" );
+is( operator_kind( "ten - three" ), "UMINUS", "binary - tokenizes" );
+is( operator_kind( "five = string_five" ), "EQ", "binary = tokenizes" );
+is( operator_kind( "five ≠ six" ), "NE", "binary ≠ tokenizes" );
+is( operator_kind( "two < three" ), "LT", "binary < tokenizes" );
+is( operator_kind( "three > two" ), "GT", "binary > tokenizes" );
+is( operator_kind( "three ≤ three" ), "LE_SIGN", "binary ≤ tokenizes" );
+is( operator_kind( "three <= four" ), "LE", "binary <= tokenizes" );
+is( operator_kind( "four ≥ three" ), "GE_SIGN", "binary ≥ tokenizes" );
+is( operator_kind( "four >= four" ), "GE", "binary >= tokenizes" );
+is( operator_kind( "two ≶ three" ), "CMP_SIGN", "binary ≶ tokenizes" );
+is( operator_kind( "three <=> three" ), "CMP", "binary <=> tokenizes" );
+is( operator_kind( "four ≷ three" ), "CMP_REV_SIGN", "binary ≷ tokenizes" );
+is( operator_kind( "left _ right" ), "CONCAT", "binary _ tokenizes" );
+is( operator_kind( "left eq right" ), "STR_EQ", "binary eq tokenizes" );
+is( operator_kind( "left ne right" ), "STR_NE", "binary ne tokenizes" );
+is( operator_kind( "left gt right" ), "STR_GT", "binary gt tokenizes" );
+is( operator_kind( "left ge right" ), "STR_GE", "binary ge tokenizes" );
+is( operator_kind( "left lt right" ), "STR_LT", "binary lt tokenizes" );
+is( operator_kind( "left le right" ), "STR_LE", "binary le tokenizes" );
+is( operator_kind( "left cmp right" ), "STR_CMP", "binary cmp tokenizes" );
+is( operator_kind( "left eqi right" ), "STR_EQI", "binary eqi tokenizes" );
+is( operator_kind( "left nei right" ), "STR_NEI", "binary nei tokenizes" );
+is( operator_kind( "left gti right" ), "STR_GTI", "binary gti tokenizes" );
+is( operator_kind( "left gei right" ), "STR_GEI", "binary gei tokenizes" );
+is( operator_kind( "left lti right" ), "STR_LTI", "binary lti tokenizes" );
+is( operator_kind( "left lei right" ), "STR_LEI", "binary lei tokenizes" );
+is( operator_kind( "left cmpi right" ), "STR_CMPI", "binary cmpi tokenizes" );
+is( operator_kind( "left ~ right" ), "REGEXP_MATCH", "binary ~ tokenizes" );
+is( operator_kind( "one & two" ), "BAND", "binary & tokenizes" );
+is( operator_kind( "one ^ two" ), "BXOR", "binary ^ tokenizes" );
+is( operator_kind( "one | two" ), "BOR", "binary | tokenizes" );
+is( operator_kind( "one ⋀ two" ), "LAND_SIGN", "binary ⋀ tokenizes" );
+is( operator_kind( "one and two" ), "LAND", "binary and tokenizes" );
+is( operator_kind( "one ⊼ two" ), "LNAND_SIGN", "binary ⊼ tokenizes" );
+is( operator_kind( "one nand two" ), "LNAND", "binary nand tokenizes" );
+is( operator_kind( "one ⊻ two" ), "LXOR_SIGN", "binary ⊻ tokenizes" );
+is( operator_kind( "one xor two" ), "LXOR", "binary xor tokenizes" );
+is( operator_kind( "one ⋁ two" ), "LOR_SIGN", "binary ⋁ tokenizes" );
+is( operator_kind( "one or two" ), "LOR", "binary or tokenizes" );
+is( operator_kind( "one ⋃ two" ), "SET_UNION_SIGN", "binary ⋃ tokenizes" );
+is( operator_kind( "one union two" ), "SET_UNION", "binary union tokenizes" );
+is( operator_kind( "one ⋂ two" ), "SET_INTERSECTION_SIGN", "binary ⋂ tokenizes" );
+is(
+	operator_kind( "one intersection two" ),
+	"SET_INTERSECTION",
+	"binary intersection tokenizes",
+);
+is( operator_kind( "one ∖ two" ), "SET_DIFFERENCE_SIGN", "binary ∖ tokenizes" );
+is( operator_kind( "one \\ two" ), "SET_DIFFERENCE", "binary \\ tokenizes" );
+is( operator_kind( "one ∈ two" ), "MEMBER_SIGN", "binary ∈ tokenizes" );
+is( operator_kind( "one in two" ), "MEMBER", "binary in tokenizes" );
+is( operator_kind( "one ∉ two" ), "NOT_MEMBER_SIGN", "binary ∉ tokenizes" );
+is( operator_kind( "one ⊂ two" ), "SUBSETOF_SIGN", "binary ⊂ tokenizes" );
+is( operator_kind( "one subsetof two" ), "SUBSETOF", "binary subsetof tokenizes" );
+is( operator_kind( "one ⊃ two" ), "SUPERSETOF_SIGN", "binary ⊃ tokenizes" );
+is( operator_kind( "one supersetof two" ), "SUPERSETOF", "binary supersetof tokenizes" );
+is( operator_kind( "one ⊂⊃ two" ), "EQUIVALENTOF_SIGN", "binary ⊂⊃ tokenizes" );
+is(
+	operator_kind( "one equivalentof two" ),
+	"EQUIVALENTOF",
+	"binary equivalentof tokenizes",
+);
+is( operator_kind( "one ≡ two" ), "TYPE_EQ_SIGN", "binary ≡ tokenizes" );
+is( operator_kind( "one == two" ), "TYPE_EQ", "binary == tokenizes" );
+is( operator_kind( "one ≢ two" ), "TYPE_NE_SIGN", "binary ≢ tokenizes" );
+is( operator_kind( "one != two" ), "TYPE_NE", "binary != tokenizes" );
+is( operator_kind( "one can \"length\"" ), "CAN", "binary can tokenizes" );
+is( token_kinds( "zero ? one : two" )[1], "QMARK", "ternary ? tokenizes" );
+is( token_kinds( "zero ? one : two" )[3], "COLON", "ternary : tokenizes" );
+is( operator_kind( "zero ?: two" ), "ELVIS", "Elvis ?: tokenizes" );
+
+is( token_kinds( "**/value" )[0], "STARSTAR", "bare ** remains a path token" );
+is( token_kinds( "2*3" )[1], "STAR_PATH", "non-whitespace * stays path-like" );
+is( token_kinds( "left_eq_right" )[0], "NAME", "word operators respect name boundaries" );
+is( token_kinds( "leftandright" )[0], "NAME", "logical words respect name boundaries" );
+is( token_kinds( "leftunionright" )[0], "NAME", "set words respect name boundaries" );
+is( token_kinds( "leftcanright" )[0], "NAME", "can respects name boundaries" );
+like(
+	exception( function () {
+		token_kinds( "\\value" );
+	} ),
+	/requires whitespace/,
+	"prefix-like \\ is not tokenized as a supported operator",
+);
+like(
+	exception( function () {
+		token_kinds( "zero ?:two" );
+	} ),
+	/Elvis operator '\?:' requires whitespace/,
+	"Elvis ?: requires whitespace",
+);
+
+done_testing();

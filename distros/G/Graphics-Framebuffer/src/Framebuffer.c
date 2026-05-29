@@ -117,22 +117,22 @@ void c_fill(char *framebuffer,
 
 /* Helper to plot one antialiased pixel. */
 static void plot_aa_pixel(char *framebuffer,
-                          unsigned int color,
-                          unsigned int bcolor,
-                          unsigned char alpha,
-                          unsigned char bytes_per_pixel,
-                          unsigned char bits_per_pixel,
-                          unsigned int bytes_per_line,
-                          short x_clip,
-                          short y_clip,
-                          short xx_clip,
-                          short yy_clip,
-                          short xoffset,
-                          short yoffset,
-                          int steep,
-                          long xx,
-                          long yy,
-                          double intensity) {
+            unsigned int color,
+            unsigned int bcolor,
+            unsigned char alpha,
+            unsigned char bytes_per_pixel,
+            unsigned char bits_per_pixel,
+            unsigned int bytes_per_line,
+            short x_clip,
+            short y_clip,
+            short xx_clip,
+            short yy_clip,
+            short xoffset,
+            short yoffset,
+            int steep,
+            long xx,
+            long yy,
+            double intensity) {
     if (intensity <= 0.0) return;
     if (intensity > 1.0) intensity = 1.0;
     unsigned char ia = (unsigned char)(intensity * 255.0 + 0.5);
@@ -326,33 +326,46 @@ void c_fill(char *framebuffer,
         unsigned int index = rx * (unsigned int)bytes_per_pixel + ry * bytes_per_line;
         unsigned char *p = (unsigned char *)(framebuffer + index);
 
-        if (bits_per_pixel == 32) {
-            target32 = *((uint32_t *)p);
-        } else if (bits_per_pixel == 24) {
-            /* pack 3 bytes into 24-bit value (low 24 bits) */
-            target32 = (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16);
-        } else if (bits_per_pixel == 16) {
-            target16 = *((uint16_t *)p);
-        } else if (bits_per_pixel == 8) {
-            target8 = *p;
-        } else {
-            /* unsupported bpp for fill */
-            return;
-        }
+        switch (bits_per_pixel) {
+            case 32:
+                target32 = *((uint32_t *)p);
+                break;
+            case 24:
+                /* pack 3 bytes into 24-bit value (low 24 bits) */
+                target32 = (uint32_t)p[0] | ((uint32_t)p[1] << 8) | ((uint32_t)p[2] << 16);
+                break;
+            case 16:
+                target16 = *((uint16_t *)p);
+                break;
+            case 8:
+                target8 = *p;
+                break;
+            default:
+                /* unsupported bpp for fill */
+                return;
+         }
     }
 
     /* If drawing in NORMAL mode and the target pixel already equals the fill color,
        no work to do (compare in the same packed representation). */
     if (draw_mode == NORMAL_MODE) {
-        if (bits_per_pixel == 32) {
-            if (target32 == (uint32_t)color) return;
-        } else if (bits_per_pixel == 24) {
-            if (target32 == (uint32_t)(color & 0x00FFFFFF)) return;
-        } else if (bits_per_pixel == 16) {
-            if (target16 == (uint16_t)color) return;
-        } else if (bits_per_pixel == 8) {
-            if (target8 == (uint8_t)color) return;
-        }
+        switch (bits_per_pixel) {
+            case 32:
+                if (target32 == (uint32_t)color) return;
+                break;
+            case 24:
+                if (target32 == (uint32_t)(color & 0x00FFFFFF)) return;
+                break;
+            case 16:
+                if (target16 == (uint16_t)color) return;
+                break;
+            case 8:
+                if (target8 == (uint8_t)color) return;
+                break;
+            default:
+                // Handle unexpected bits_per_pixel values if necessary
+                break;
+         }
     }
 
     /* Define a small point struct and a dynamic stack for spans */
@@ -387,22 +400,32 @@ void c_fill(char *framebuffer,
             unsigned char *p = (unsigned char *)(framebuffer + index);
 
             bool equal = false;
-            if (bits_per_pixel == 32) {
-                uint32_t v = *((uint32_t *)p);
-                equal = (v == target32);
-            } else if (bits_per_pixel == 24) {
-                uint32_t v = (uint32_t)p[0] |
-                             ((uint32_t)p[1] << 8) |
-                             ((uint32_t)p[2] << 16);
-                equal = (v == (target32 & 0x00FFFFFF));
-            } else if (bits_per_pixel == 16) {
-                uint16_t v = *((uint16_t *)p);
-                equal = (v == target16);
-            } else if (bits_per_pixel == 8) {
-                uint8_t v = *p;
-                equal = (v == target8);
-            } else {
-                equal = false;
+            switch (bits_per_pixel) {
+                case 32: {
+                    uint32_t v = *((uint32_t *)p);
+                    equal = (v == target32);
+                    break;
+                }
+                case 24: {
+                    uint32_t v = (uint32_t)p[0] |
+                                 ((uint32_t)p[1] << 8) |
+                                 ((uint32_t)p[2] << 16);
+                    equal = (v == (target32 & 0x00FFFFFF));
+                    break;
+               }
+               case 16: {
+                    uint16_t v = *((uint16_t *)p);
+                    equal = (v == target16);
+                    break;
+               }
+               case 8: {
+                    uint8_t v = *p;
+                    equal = (v == target8);
+                    break;
+               }
+               default:
+                    equal = false;
+                    break;
             }
 
             if (!equal) {
@@ -427,22 +450,32 @@ void c_fill(char *framebuffer,
             unsigned char *pr = (unsigned char *)(framebuffer + indexr);
 
             bool equalr = false;
-            if (bits_per_pixel == 32) {
-                uint32_t v = *((uint32_t *)pr);
-                equalr = (v == target32);
-            } else if (bits_per_pixel == 24) {
-                uint32_t v = (uint32_t)pr[0] |
-                             ((uint32_t)pr[1] << 8) |
-                             ((uint32_t)pr[2] << 16);
-                equalr = (v == (target32 & 0x00FFFFFF));
-            } else if (bits_per_pixel == 16) {
-                uint16_t v = *((uint16_t *)pr);
-                equalr = (v == target16);
-            } else if (bits_per_pixel == 8) {
-                uint8_t v = *pr;
-                equalr = (v == target8);
-            } else {
-                equalr = false;
+            switch (bits_per_pixel) {
+                case 32: {
+                    uint32_t v = *((uint32_t *)pr);
+                    equalr = (v == target32);
+                    break;
+                }
+                case 24: {
+                    uint32_t v = (uint32_t)pr[0] |
+                                 ((uint32_t)pr[1] << 8) |
+                                 ((uint32_t)pr[2] << 16);
+                    equalr = (v == (target32 & 0x00FFFFFF));
+                    break;
+                }
+                case 16: {
+                    uint16_t v = *((uint16_t *)pr);
+                    equalr = (v == target16);
+                    break;
+                }
+                case 8: {
+                    uint8_t v = *pr;
+                    equalr = (v == target8);
+                    break;
+                }
+                default:
+                    equalr = false;
+                    break;
             }
 
             if (!equalr) {
@@ -489,20 +522,33 @@ void c_fill(char *framebuffer,
                     unsigned int idxs = rxs * (unsigned int)bytes_per_pixel + rys * bytes_per_line;
                     unsigned char *ps = (unsigned char *)(framebuffer + idxs);
                     bool equalu = false;
-                    if (bits_per_pixel == 32) {
-                        uint32_t v = *((uint32_t *)ps);
-                        equalu = (v == target32);
-                    } else if (bits_per_pixel == 24) {
-                        uint32_t v = (uint32_t)ps[0] |
-                                     ((uint32_t)ps[1] << 8) |
-                                     ((uint32_t)ps[2] << 16);
-                        equalu = (v == (target32 & 0x00FFFFFF));
-                    } else if (bits_per_pixel == 16) {
-                        uint16_t v = *((uint16_t *)ps);
-                        equalu = (v == target16);
-                    } else if (bits_per_pixel == 8) {
-                        uint8_t v = *ps;
-                        equalu = (v == target8);
+                    switch (bits_per_pixel) {
+                        case 32: {
+                            uint32_t v = *((uint32_t *)ps);
+                            equalu = (v == target32);
+                            break;
+                        }
+                        case 24: {
+                            uint32_t v = (uint32_t)ps[0] |
+                                         ((uint32_t)ps[1] << 8) |
+                                         ((uint32_t)ps[2] << 16);
+                            equalu = (v == (target32 & 0x00FFFFFF));
+                            break;
+                        }
+                        case 16: {
+                            uint16_t v = *((uint16_t *)ps);
+                            equalu = (v == target16);
+                            break;
+                        }
+                        case 8: {
+                            uint8_t v = *ps;
+                            equalu = (v == target8);
+                            break;
+                        }
+                        default:
+                            // Handle unexpected bits_per_pixel values if necessary
+                            equalu = false; // or some other default behavior
+                            break;
                     }
                     if (!equalu) {
                         scanx++;
@@ -518,20 +564,33 @@ void c_fill(char *framebuffer,
                         unsigned int idxs2 = rxs2 * (unsigned int)bytes_per_pixel + rys2 * bytes_per_line;
                         unsigned char *ps2 = (unsigned char *)(framebuffer + idxs2);
                         bool equald = false;
-                        if (bits_per_pixel == 32) {
-                            uint32_t v = *((uint32_t *)ps2);
-                            equald = (v == target32);
-                        } else if (bits_per_pixel == 24) {
-                            uint32_t v = (uint32_t)ps2[0] |
-                                         ((uint32_t)ps2[1] << 8) |
-                                         ((uint32_t)ps2[2] << 16);
-                            equald = (v == (target32 & 0x00FFFFFF));
-                        } else if (bits_per_pixel == 16) {
-                            uint16_t v = *((uint16_t *)ps2);
-                            equald = (v == target16);
-                        } else if (bits_per_pixel == 8) {
-                            uint8_t v = *ps2;
-                            equald = (v == target8);
+                        switch (bits_per_pixel) {
+                            case 32: {
+                                uint32_t v = *((uint32_t *)ps2);
+                                equald = (v == target32);
+                                break;
+                            }
+                            case 24: {
+                                uint32_t v = (uint32_t)ps2[0] |
+                                             ((uint32_t)ps2[1] << 8) |
+                                             ((uint32_t)ps2[2] << 16);
+                                equald = (v == (target32 & 0x00FFFFFF));
+                                break;
+                            }
+                            case 16: {
+                                uint16_t v = *((uint16_t *)ps2);
+                                equald = (v == target16);
+                                break;
+                            }
+                            case 8: {
+                                uint8_t v = *ps2;
+                                equald = (v == target8);
+                                break;
+                            }
+                            default:
+                                // Handle unexpected bits_per_pixel values if necessary
+                                equald = false; // or some other default behavior
+                                break;
                         }
                         if (!equald) break;
                         scanx++;
@@ -565,20 +624,33 @@ void c_fill(char *framebuffer,
                     unsigned int idxs = rxs * (unsigned int)bytes_per_pixel + rys * bytes_per_line;
                     unsigned char *ps = (unsigned char *)(framebuffer + idxs);
                     bool equalu = false;
-                    if (bits_per_pixel == 32) {
-                        uint32_t v = *((uint32_t *)ps);
-                        equalu = (v == target32);
-                    } else if (bits_per_pixel == 24) {
-                        uint32_t v = (uint32_t)ps[0] |
-                                     ((uint32_t)ps[1] << 8) |
-                                     ((uint32_t)ps[2] << 16);
-                        equalu = (v == (target32 & 0x00FFFFFF));
-                    } else if (bits_per_pixel == 16) {
-                        uint16_t v = *((uint16_t *)ps);
-                        equalu = (v == target16);
-                    } else if (bits_per_pixel == 8) {
-                        uint8_t v = *ps;
-                        equalu = (v == target8);
+                    switch (bits_per_pixel) {
+                        case 32: {
+                            uint32_t v = *((uint32_t *)ps);
+                            equalu = (v == target32);
+                            break;
+                        }
+                        case 24: {
+                            uint32_t v = (uint32_t)ps[0] |
+                                         ((uint32_t)ps[1] << 8) |
+                                         ((uint32_t)ps[2] << 16);
+                            equalu = (v == (target32 & 0x00FFFFFF));
+                            break;
+                        }
+                        case 16: {
+                            uint16_t v = *((uint16_t *)ps);
+                            equalu = (v == target16);
+                            break;
+                        }
+                        case 8: {
+                            uint8_t v = *ps;
+                            equalu = (v == target8);
+                            break;
+                        }
+                        default:
+                            // Handle unexpected bits_per_pixel values if necessary
+                            equalu = false;
+                            break;
                     }
                     if (!equalu) {
                         scanx++;
@@ -594,20 +666,32 @@ void c_fill(char *framebuffer,
                         unsigned int idxs2 = rxs2 * (unsigned int)bytes_per_pixel + rys2 * bytes_per_line;
                         unsigned char *ps2 = (unsigned char *)(framebuffer + idxs2);
                         bool equald = false;
-                        if (bits_per_pixel == 32) {
-                            uint32_t v = *((uint32_t *)ps2);
-                            equald = (v == target32);
-                        } else if (bits_per_pixel == 24) {
-                            uint32_t v = (uint32_t)ps2[0] |
-                                         ((uint32_t)ps2[1] << 8) |
-                                         ((uint32_t)ps2[2] << 16);
-                            equald = (v == (target32 & 0x00FFFFFF));
-                        } else if (bits_per_pixel == 16) {
-                            uint16_t v = *((uint16_t *)ps2);
-                            equald = (v == target16);
-                        } else if (bits_per_pixel == 8) {
-                            uint8_t v = *ps2;
-                            equald = (v == target8);
+                        switch (bits_per_pixel) {
+                            case 32: {
+                                uint32_t v = *((uint32_t *)ps2);
+                                equald = (v == target32);
+                                break;
+                            }
+                            case 24: {
+                                uint32_t v = (uint32_t)ps2[0] |
+                                             ((uint32_t)ps2[1] << 8) |
+                                             ((uint32_t)ps2[2] << 16);
+                                equald = (v == (target32 & 0x00FFFFFF));
+                                break;
+                            }
+                            case 16: {
+                                uint16_t v = *((uint16_t *)ps2);
+                                equald = (v == target16);
+                                break;
+                            }
+                            case 8: {
+                                uint8_t v = *ps2;
+                                equald = (v == target8);
+                                break;
+                            }
+                            default:
+                                // Handle unexpected bits_per_pixel value if necessary
+                                break;
                         }
                         if (!equald) break;
                         scanx++;
@@ -1933,10 +2017,10 @@ void c_convert_8_16(char *buf8,
 
 /* Convert any type RGB bitmap to a monochrome bitmap of the same type */
 void c_monochrome(char *pixels,
-                  unsigned int size,
-                  unsigned char color_order,
-                  unsigned char bytes_per_pixel,
-                  unsigned char bits_per_pixel) {
+    unsigned int size,
+    unsigned char color_order,
+    unsigned char bytes_per_pixel,
+    unsigned char bits_per_pixel) {
     unsigned int idx;
     unsigned char r;
     unsigned char g;
@@ -2090,3 +2174,4 @@ void c_monochrome(char *pixels,
 }
 
 /* END C Section */
+

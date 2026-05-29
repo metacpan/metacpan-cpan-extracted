@@ -1,0 +1,62 @@
+from test/more import *;
+from std/string import ord;
+
+let name := "Ada";
+
+function codepoints ( String text ) {
+	let out := [];
+	let i := 0;
+	while ( i < length text ) {
+		out.push( ord( text, i ) );
+		i++;
+	}
+
+	return out;
+}
+
+is(
+	codepoints( "A\n\r\t\\'\"`\/\$\x42\u00E9" ),
+	[ 65, 10, 13, 9, 92, 39, 34, 96, 47, 36, 66, 233 ],
+	"double-quoted strings decode canonical escapes",
+);
+is(
+	codepoints( `A\n\r\t\\'\"\`\/\$\x42\u00E9` ),
+	[ 65, 10, 13, 9, 92, 39, 34, 96, 47, 36, 66, 233 ],
+	"template strings decode canonical escapes",
+);
+is(
+	`\${name}`,
+	"${name}",
+	"escaped dollar prevents template interpolation",
+);
+is( `hello ${name}`, "hello Ada", "template interpolation still works" );
+
+let binary := 'A\n\r\t\\\'"`\/\$\x42';
+is( typeof binary, "BinaryString", "single-quoted literals are BinaryString" );
+is(
+	codepoints( to_string(binary) ),
+	[ 65, 10, 13, 9, 92, 39, 34, 96, 47, 36, 66 ],
+	"binary strings decode canonical byte escapes",
+);
+
+is( """\n\x41\u0042""", "\\n\\x41\\u0042", "triple double quote is raw" );
+is(
+	to_string('''\n\x41\u0042'''),
+	"\\n\\x41\\u0042",
+	"triple single quote is raw binary",
+);
+is( ```\n\x41```, "\\n\\x41", "triple backtick text is raw" );
+is(
+	```\${name}```,
+	"\\Ada",
+	"triple backtick has raw backslash and interpolation",
+);
+
+let digits := "[0-9]+";
+let match := "item-123" ~ /item-${digits}/;
+is( match[0], "item-123", "regexp literals interpolate pattern text" );
+ok( "x9" ~ /x\d/, "regexp interpolation keeps regex escapes intact" );
+ok( "a/b" ~ /a\/b/, "regexp literals support escaped slash" );
+ok( "${name}" ~ /\$\{name\}/, "escaped dollar in regexp is not interpolation" );
+
+done_testing();

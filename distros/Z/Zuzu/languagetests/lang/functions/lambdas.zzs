@@ -1,0 +1,37 @@
+from test/more import *;
+
+function make_adder (x) {
+	return fn y -> x + y;
+}
+
+function make_labeler ( String prefix ) {
+	return fn Number n -> prefix _":" _ n;
+}
+
+function makeThresholdLabeler () {
+	return fn( String x, Number y ) ->( y < 10 ) ?( uc x ):( lc x );
+}
+
+let plus_five := make_adder(5);
+let labeler := make_labeler("item");
+let thresholdLabeler := makeThresholdLabeler();
+let anon := function(x) {
+	return x + 1;
+}
+;
+let plus_two := -> ^^ + 2;
+let triple := → ^^ * 3;
+let fallback := -> ^^ ? ^^: 41;
+is( plus_five(10), 15, "fn lambdas close over lexical scope" );
+is( labeler(7), "item:7", "typed fn shorthand lambdas execute" );
+is( thresholdLabeler( "Hi", 3 ), "HI", "typed fn shorthand supports parenthesized multi-params", );
+is( thresholdLabeler( "Hi", 12 ), "hi", "typed fn shorthand parenthesized multi-params branch", );
+is( anon(8), 9, "anonymous function expressions are callable" );
+is( plus_two(5), 7, "leading ASCII arrow lambdas bind ^^" );
+is( triple(4), 12, "leading Unicode arrow lambdas bind ^^" );
+is( fallback(), 41, "leading arrow lambdas make ^^ optional" );
+like( exception( function() {
+	labeler("bad");
+}
+), /TypeException/, "typed fn shorthand enforces argument type", );
+done_testing();

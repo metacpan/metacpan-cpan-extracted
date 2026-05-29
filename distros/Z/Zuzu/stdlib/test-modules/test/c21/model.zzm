@@ -1,0 +1,7 @@
+from test/c21/traits import LeftName, RightName;
+
+class Diamondish with LeftName, RightName {
+	method conflict_name () {
+		return "override";
+	}
+}

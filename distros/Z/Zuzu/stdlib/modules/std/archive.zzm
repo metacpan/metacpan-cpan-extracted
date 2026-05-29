@@ -1,0 +1,132 @@
+=encoding utf8
+
+=head1 NAME
+
+std/archive - Small archive and compression helpers.
+
+=head1 SYNOPSIS
+
+  from std/archive import Archive;
+  from std/io import Path;
+
+  let archive := {
+    entries: [
+      { path: "hello.txt", data: to_binary( "Hello\n" ) },
+      { path: "nested/world.txt", data: to_binary( "World\n" ) },
+    ],
+  };
+
+  let bytes := Archive.encode( archive, "tar.gz" );
+  let roundtrip := Archive.decode(bytes);
+
+  let path := Path.tempdir().child("hello.zip");
+  Archive.dump( path, archive );
+  let loaded := Archive.load(path);
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Node and
+Electron. It is not supported by zuzu-js in the browser.
+
+=head1 DESCRIPTION
+
+This module provides a small, runtime-supported archive API centred on
+one exported class, C<Archive>.
+
+=head1 EXPORTS
+
+=head2 Classes
+
+=over
+
+=item C<Archive>
+
+Runtime-supported archive namespace class.
+
+=over
+
+=item C<< Archive.decode(BinaryString bytes, String format?) >>
+
+Parameters: C<bytes> is archive or compressed data and C<format> is an
+optional format name. Returns: C<Dict>. Decodes C<bytes> into an archive
+value.
+
+=item C<< Archive.encode(Dict archive, String format?) >>
+
+Parameters: C<archive> is an archive value and C<format> is an optional
+format name. Returns: C<BinaryString>. Encodes C<archive> into archive
+or compressed data.
+
+=item C<< Archive.load(Path path, String format?) >>
+
+Parameters: C<path> is a C<std/io> C<Path> and C<format> is an optional
+format name. Returns: C<Dict>. Reads and decodes an archive file.
+
+=item C<< Archive.dump(Path path, Dict archive, String format?) >>
+
+Parameters: C<path> is a C<std/io> C<Path>, C<archive> is an archive
+value, and C<format> is an optional format name. Returns: C<null>.
+Encodes and writes an archive file.
+
+=back
+
+=back
+
+Archive values use this shape:
+
+  {
+    format: "zip",
+    entries: [
+      { path: "hello.txt", data: BinaryString },
+      { path: "nested/world.txt", data: BinaryString },
+    ],
+  }
+
+Only regular file payloads are preserved in this API. Directory
+entries and extended archive metadata are ignored so the interface
+remains practical to port to other backends later.
+
+When constructing archives for C<encode> or C<dump>, each entry may
+provide either:
+
+=over
+
+=item * C<data> as a C<BinaryString>
+
+=item * C<data_from> as a C<std/io::Path>
+
+=back
+
+For single-stream compression formats such as C<gz> and C<bz2>,
+C<entries> contains exactly one file entry.
+
+=head1 SUPPORTED FORMATS
+
+Host runtimes may support:
+
+=over
+
+=item * C<zip>
+
+=item * C<tar>
+
+=item * C<tar.gz> and C<tgz>
+
+=item * C<tar.bz2> and C<tbz2>
+
+=item * C<gz>
+
+=item * C<bz2>
+
+=back
+
+This module is intended for host runtimes with archive and compression
+support. Browser runtimes should not be assumed to support it.
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/archive >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.

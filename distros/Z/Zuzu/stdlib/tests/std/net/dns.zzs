@@ -1,0 +1,55 @@
+from test/more import *;
+
+requires_capability("net");
+
+if ( __system__{runtime} eq "zuzu-js" and __system__{platform} eq "browser" ) {
+	skip_all( "std/net/dns is not supported in JS/Browser" );
+}
+
+from std/net/dns import
+	lookup,
+	lookup_async,
+	addresses,
+	addresses_async,
+	reverse,
+	reverse_async;
+
+let ipv4 := addresses( "localhost", "ipv4" );
+ok( ipv4.length() >= 1, "addresses() resolves localhost IPv4" );
+
+let any_addresses := addresses("localhost");
+ok( any_addresses.length() >= ipv4.length(), "addresses() supports any family" );
+
+let records := lookup( "localhost", "A" );
+ok( records.length() >= 0, "lookup() returns an Array" );
+if ( records.length() > 0 ) {
+	is( records[0]{type}, "A", "lookup() normalizes record type" );
+	ok( records[0]{address} ≢ null, "lookup() includes address field" );
+	ok( "ttl" in records[0], "lookup() includes ttl field" );
+}
+
+let names := reverse("127.0.0.1");
+ok( names.length() >= 0, "reverse() returns an Array" );
+
+async function main () {
+	let async_ipv4 := await {
+		addresses_async( "localhost", "ipv4" );
+	};
+	ok( async_ipv4.length() >= 1, "addresses_async() resolves localhost" );
+
+	let async_records := await {
+		lookup_async( "localhost", "A" );
+	};
+	ok( async_records.length() >= 0, "lookup_async() returns an Array" );
+
+	let async_reverse := await {
+		reverse_async("127.0.0.1");
+	};
+	ok( async_reverse.length() >= 0, "reverse_async() returns an Array" );
+}
+
+await {
+	main();
+};
+
+done_testing();

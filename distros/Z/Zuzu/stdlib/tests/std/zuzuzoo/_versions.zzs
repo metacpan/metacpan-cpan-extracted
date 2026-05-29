@@ -1,0 +1,164 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/archive import Archive;
+from std/data/json import JSON;
+from std/io import Path;
+from std/zuzuzoo import Zuzuzoo, compare_versions;
+
+function throws_like ( f, rx, name ) {
+	let got := "";
+	try {
+		f();
+	}
+	catch ( Exception e ) {
+		got := e.to_String();
+	}
+	like( got, rx, name );
+}
+
+function ensure_dir ( path ) {
+	return true if path.exists();
+	let parent := path.parent();
+	ensure_dir(parent) if not parent.exists();
+	path.mkdir();
+	return true;
+}
+
+function root () {
+	let dir := Path.tempdir();
+	let lib := dir.child("lib");
+	let bin := dir.child("bin");
+	let meta := dir.child("meta");
+	ensure_dir(lib);
+	ensure_dir(bin);
+	ensure_dir(meta);
+	return {
+		dir_obj: dir,
+		lib_obj: lib,
+		bin_obj: bin,
+		meta_obj: meta,
+		lib_dir: lib.to_String(),
+		bin_dir: bin.to_String(),
+		meta_dir: meta.to_String(),
+	};
+}
+
+function write_installed ( root, dist_name, version, module_name ) {
+	( new JSON( pretty: true ) ).dump(
+		( new Path( root{meta_dir} ) ).child(
+			dist_name _ "-" _ version _ ".json",
+		),
+		{
+			name: dist_name,
+			version: version,
+			author: "Example",
+			license: "MIT",
+			status: "stable",
+			dependencies: {},
+			installed: {
+				zdf: "ZDF-1",
+				lib_dir: root{lib_dir},
+				bin_dir: root{bin_dir},
+				meta_dir: root{meta_dir},
+				modules: [
+					{
+						source: "modules/" _ module_name _ ".zzm",
+						install_as: module_name _ ".zzm",
+						sha256: "abc",
+					},
+				],
+				scripts: [],
+			},
+		},
+	);
+}
+
+function archive_path ( dist_name, version, module_name ) {
+	let path := Path.tempfile();
+	Archive.dump(
+		path,
+		{
+			entries: [
+				{
+					path: dist_name _ "-" _ version _
+						"/zuzu-distribution.json",
+					data: to_binary(
+						"{\"name\":\"" _ dist_name _
+						"\",\"version\":\"" _ version _
+						"\",\"author\":\"Example\"," _
+						"\"license\":\"MIT\"," _
+						"\"status\":\"stable\"}\n",
+					),
+				},
+				{
+					path: dist_name _ "-" _ version _
+						"/modules/" _ module_name _ ".zzm",
+					data: to_binary("// module\n"),
+				},
+			],
+		},
+		"zip",
+	);
+	return path;
+}
+
+is( compare_versions( "1", "1.0.0" ), 0, "missing version parts are zero" );
+is( compare_versions( "1.2.3.4", "1.2.3" ), 1, "arbitrary dotted parts compare" );
+is( compare_versions( "1.2", "1.2.0" ), 0, "1.2 equals 1.2.0" );
+is( compare_versions( "1.2", "1.2-beta" ), 1, "no suffix is newer" );
+is( compare_versions( "1.2-alpha", "1.2-beta" ), -1, "suffixes compare lexically" );
+
+let target := root();
+let custom := root();
+write_installed( target, "old-any", "0.1.0", "any/mod" );
+write_installed( target, "too-old", "1.0.0", "min/mod" );
+write_installed( custom, "new-enough", "1.2.3", "min/mod" );
+
+let zoo := new Zuzuzoo(
+	lib_dir: target{lib_dir},
+	bin_dir: target{bin_dir},
+	meta_dir: target{meta_dir},
+	home: Path.tempdir().to_String(),
+	dependency_roots: [
+		{
+			name: "custom",
+			lib_dir: custom{lib_dir},
+			bin_dir: custom{bin_dir},
+			meta_dir: custom{meta_dir},
+		},
+	],
+);
+is( zoo.find_dependency( "any/mod", "0" ){distribution}, "old-any", "zero means any version" );
+is(
+	zoo.find_dependency( "min/mod", "1.2" ){distribution},
+	"new-enough",
+	"dependency versions are minimum versions",
+);
+
+let first := archive_path( "conflict-dist", "1.0.0", "conflict/one" );
+let second := archive_path( "conflict-dist", "2.0.0", "conflict/two" );
+throws_like(
+	function () {
+		zoo.plan_install( [ first.to_String(), second.to_String() ] );
+	},
+	/Conflicting planned versions/,
+	"conflicting planned versions are rejected",
+);
+throws_like(
+	function () {
+		zoo.plan_install( [ first.to_String(), second.to_String() ] );
+	},
+	/conflicting target/,
+	"conflicting planned versions include target context",
+);
+throws_like(
+	function () {
+		zoo.plan_install( [ first.to_String(), second.to_String() ] );
+	},
+	/^(?!.*Dependency conflict: requested dependency)/,
+	"direct version conflicts are not reported as dependency conflicts",
+);
+
+done_testing();

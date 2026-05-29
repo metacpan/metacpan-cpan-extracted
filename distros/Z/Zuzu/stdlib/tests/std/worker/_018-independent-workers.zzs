@@ -1,0 +1,37 @@
+from std/task import all;
+from test/more import *;
+from test/worker_contract import require_worker_phase;
+
+let Worker := require_worker_phase(4);
+
+async function main () {
+	let original := [ "parent" ];
+	let first := Worker.spawn(
+		function ( copy ) {
+			copy.push("first");
+			return copy;
+		},
+		[ original ],
+	);
+	let second := Worker.spawn(
+		function ( copy ) {
+			copy.push("second");
+			return copy;
+		},
+		[ original ],
+	);
+
+	let results := await {
+		all( [ first, second ] );
+	};
+
+	is( results[0], [ "parent", "first" ], "first worker has own copy" );
+	is( results[1], [ "parent", "second" ], "second worker has own copy" );
+	is( original, [ "parent" ], "parent data is not mutated by workers" );
+}
+
+await {
+	main();
+};
+
+done_testing();

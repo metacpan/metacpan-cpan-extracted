@@ -1,0 +1,95 @@
+from std/secure import KeyDerivation;
+from std/string/base64 import decode, encode;
+from test/more import *;
+
+let ikm1 := decode("CwsLCwsLCwsLCwsLCwsLCwsLCwsLCw==");
+let salt1 := decode("AAECAwQFBgcICQoLDA==");
+let info1 := decode("8PHy8/T19vf4+Q==");
+let okm1 := "PLJfJfqs1XqQQ09k0DYvKi0tCpDPGlpMXbAtVuzExb80AHII1biHGFhl";
+
+let ikm2 := decode(
+	"AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygp"
+	_ "KissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk8=",
+);
+let salt2 := decode(
+	"YGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJ"
+	_ "iouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq8=",
+);
+let info2 := decode(
+	"sLGys7S1tre4ubq7vL2+v8DBwsPExcbHyMnKy8zNzs/Q0dLT1NXW19jZ"
+	_ "2tvc3d7f4OHi4+Tl5ufo6err7O3u7/Dx8vP09fb3+Pn6+/z9/v8=",
+);
+let okm2 := "sR45jcgDJ6HI5/eMWWpJNE8BLtotTvrYoFDMTBmvqXxZBFqZyseC"
+	_ "cnHLQcZeWQ4J2jJ1YAwvCbg2d5OprKPbccwwxYF57D6HwUwB1cHzQ08dhw==";
+
+let okm3 := "jaTndaVjwY9xX4AqBjxaMbihH1xe4Yeew0VOXzxzjS2dIBOV+qS2GpbI";
+
+let derived1 := KeyDerivation.hkdf_sha256( ikm1, 42, salt1, info1 );
+is( typeof derived1, "BinaryString", "hkdf returns BinaryString" );
+is( length derived1, 42, "hkdf returns requested length" );
+is( encode(derived1), okm1, "RFC 5869 test case 1" );
+
+is(
+	encode( KeyDerivation.hkdf_sha256( ikm2, 82, salt2, info2 ) ),
+	okm2,
+	"RFC 5869 test case 2",
+);
+is(
+	encode( KeyDerivation.hkdf_sha256( ikm1, 42, null, null ) ),
+	okm3,
+	"RFC 5869 test case 3",
+);
+
+is(
+	KeyDerivation.hkdf_sha256( ikm1, 0, salt1, info1 ),
+	decode(""),
+	"zero-length hkdf returns empty BinaryString",
+);
+is(
+	KeyDerivation.hkdf_sha256( ikm1, 42, null, null ),
+	KeyDerivation.hkdf_sha256( ikm1, 42, decode(""), decode("") ),
+	"null salt and info match explicit empty values",
+);
+
+let async_derived := await {
+	KeyDerivation.hkdf_sha256_async( ikm1, 42, salt1, info1 );
+};
+is( encode(async_derived), okm1, "hkdf async result matches sync" );
+
+like(
+	exception( function () {
+		KeyDerivation.hkdf_sha256( "not binary", 32 );
+	} ),
+	/TypeException.*BinaryString/,
+	"hkdf rejects String input key material",
+);
+like(
+	exception( function () {
+		KeyDerivation.hkdf_sha256( ikm1, 1.5 );
+	} ),
+	/length between 0 and 8160/,
+	"hkdf rejects fractional length",
+);
+like(
+	exception( function () {
+		KeyDerivation.hkdf_sha256( ikm1, 8161 );
+	} ),
+	/length between 0 and 8160/,
+	"hkdf rejects too-long output",
+);
+like(
+	exception( function () {
+		KeyDerivation.hkdf_sha256( ikm1, 32, "salt" );
+	} ),
+	/BinaryString salt/,
+	"hkdf rejects String salt",
+);
+like(
+	exception( function () {
+		KeyDerivation.hkdf_sha256( ikm1, 32, null, "info" );
+	} ),
+	/BinaryString info/,
+	"hkdf rejects String info",
+);
+
+done_testing();

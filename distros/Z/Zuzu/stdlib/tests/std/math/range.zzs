@@ -1,0 +1,35 @@
+from std/math/range import abbreviate;
+from std/string import join;
+from test/more import *;
+
+is(
+	join( ",", abbreviate( [ 3, 4, 9, 10, 11, 12, 15 ] ) ),
+	"3,4,9-12,15",
+	"long runs collapse, two-item run stays split",
+);
+
+is(
+	join( ",", abbreviate( [ 1, 2, 3 ] ) ),
+	"1-3",
+	"three-item run becomes one range",
+);
+
+is(
+	join( ",", abbreviate( [ 1, 2 ] ) ),
+	"1,2",
+	"two-item run stays as individual numbers",
+);
+
+is(
+	join( ",", abbreviate( [ 8, 7, 7, 6, 3, 2, 1 ] ) ),
+	"1-3,6-8",
+	"input is sorted and de-duplicated",
+);
+
+is(
+	join( ",", abbreviate( [] ) ),
+	"",
+	"empty input yields empty output",
+);
+
+done_testing();

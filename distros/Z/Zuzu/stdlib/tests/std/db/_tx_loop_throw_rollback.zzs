@@ -1,0 +1,33 @@
+from test/more import *;
+
+requires_capability( "db" );
+
+from std/db import DB;
+
+let dbh := DB.temp( { auto_commit: true } );
+dbh.prepare( "create table thrown (value integer)" ).execute();
+let insert := dbh.prepare( "insert into thrown (value) values (?)" );
+
+let message := "";
+dbh.begin();
+try {
+	for ( let v in [ 1, 2, 3, 4 ] ) {
+		if ( v == 3 ) {
+			throw new Exception( message: "explode" );
+		}
+		insert.execute(v);
+	}
+	dbh.commit();
+}
+catch ( Exception e ) {
+	message := e{message};
+	dbh.rollback();
+}
+
+let q := dbh.prepare( "select count(*) from thrown" );
+q.execute();
+
+like( message, /explode/, "loop throw captured in catch" );
+is( q.next_array()[0], 0, "rollback clears writes from failed loop transaction" );
+
+done_testing();

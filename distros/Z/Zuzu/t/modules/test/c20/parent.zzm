@@ -1,0 +1,7 @@
+class ParentRecord {
+	let Number id with get, set;
+
+	method base_label () {
+		return "id=" _ self.get_id();
+	}
+}

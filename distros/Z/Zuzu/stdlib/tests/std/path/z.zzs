@@ -1,0 +1,878 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/path/z import ZPath;
+from std/data/cbor import TaggedValue;
+from std/data/kdl import KDL;
+from std/data/xml import XML;
+
+function compile  (    p    ) { return new ZPath(path: p) }
+function query    ( d, p    ) { return compile(p).query(d) }
+function first    ( d, p, f ) { return compile(p).first(d, f) }
+function exists   ( d, p    ) { return compile(p).exists(d) }
+function assign_first ( d, p, v ) { return compile(p).assign_first( d, v ) }
+function assign_all   ( d, p, v ) { return compile(p).assign_all( d, v ) }
+
+let data := {
+	users: [
+		{
+			name: "Ada",
+			age: 32,
+			email: "ada@example.test",
+		},
+		{
+			name: "Bob",
+			age: 27,
+			email: null,
+		},
+		{
+			name: "Cara",
+			age: 40,
+			email: "cara@example.test",
+		},
+	],
+	meta: {
+		title: "Example",
+		tags: [ "x", "y" ],
+	},
+	address: {
+		street: "naist street",
+		city: "Nara",
+		postcode: "630-0192",
+	},
+};
+
+let names := query( data, "/users/*/name" );
+is( names.length(), 3, "absolute path traverses arrays and dicts" );
+is( names[0], "Ada", "first name" );
+is( names[2], "Cara", "third name" );
+
+is(
+	new ZPath( path: "/users/*/name" ).evaluate( data, { level: 9 } ).length(),
+	3,
+	"evaluate accepts optional meta argument",
+);
+
+is( first( data, "/users/#1/name", "n/a" ), "Bob", "#index segment" );
+is( first( data, "/users/#9/name", "n/a" ), "n/a", "fallback for missing path" );
+ok( exists( data, "/users/#1/name" ), "exists helper sees present path" );
+ok( not exists( data, "/users/#9/name" ), "exists helper sees missing path" );
+
+let assign_blob := {
+	users: [
+		{ name: "Ada", age: 32 },
+		{ name: "Bob", age: 27 },
+		{ name: "Cara", age: 40 },
+	],
+	meta: {
+		title: "Before",
+	},
+};
+
+is(
+	assign_first( assign_blob, "/users/*/name", "ALPHA" ),
+	"ALPHA",
+	"assign_first helper returns assigned value",
+);
+is( assign_blob{users}[0]{name}, "ALPHA", "assign_first mutates first match only" );
+is( assign_blob{users}[1]{name}, "Bob", "assign_first leaves later matches untouched" );
+
+is(
+	assign_all( assign_blob, "/users/*/name", "OMEGA" ),
+	"OMEGA",
+	"assign_all helper returns assigned value",
+);
+is( assign_blob{users}[0]{name}, "OMEGA", "assign_all updates first matching node" );
+is( assign_blob{users}[1]{name}, "OMEGA", "assign_all updates second matching node" );
+is( assign_blob{users}[2]{name}, "OMEGA", "assign_all updates third matching node" );
+
+is(
+	new ZPath( path: "/meta/title" ).assign_first( assign_blob, "After" ),
+	"After",
+	"assign_first works directly on compiled object",
+);
+is( assign_blob{meta}{title}, "After", "compiled assign_first mutates dictionary value" );
+
+is(
+	new ZPath( path: "/users/#9/name" ).assign_all( assign_blob, "UNCHANGED" ),
+	"UNCHANGED",
+	"assign_all returns value even when no nodes match",
+);
+is( assign_blob{users}[0]{name}, "OMEGA", "assign_all with no matches keeps original data" );
+
+function _assign_first_throws ( blob, path, value ) {
+	try {
+		new ZPath( path: path ).assign_first( blob, value );
+		return false;
+	}
+	catch {
+		return true;
+	}
+}
+
+ok(
+	_assign_first_throws( assign_blob, "/users/#9/name", "X" ),
+	"assign_first throws when no nodes match",
+);
+
+let api_blob := {
+	users: [
+		{ name: "Ada", age: 32, title: "Reader" },
+		{ name: "Bob", age: 27, title: "Writer" },
+	],
+	meta: {
+		title: "Hello 2026",
+	},
+};
+
+let age_path := new ZPath( path: "/users/#0/age" );
+is(
+	age_path.assign_first( api_blob, 8, "+=" ),
+	40,
+	"assign_first accepts compound operator argument",
+);
+is( api_blob{users}[0]{age}, 40, "compound assign_first mutates selected node" );
+
+let title_path := new ZPath( path: "/users/*/title" );
+is(
+	title_path.assign_all( api_blob, "!", "_=" ),
+	"!",
+	"assign_all keeps ordinary RHS return contract with operator argument",
+);
+is( api_blob{users}[0]{title}, "Reader!", "compound assign_all mutates first match" );
+is( api_blob{users}[1]{title}, "Writer!", "compound assign_all mutates later match" );
+
+ok(
+	new ZPath( path: "/users/#1/age" ).assign_maybe( api_blob, 3, "+=" ),
+	"assign_maybe returns true on match",
+);
+is( api_blob{users}[1]{age}, 30, "assign_maybe updates maybe-selected node" );
+
+ok(
+	not new ZPath( path: "/users/#9/age" ).assign_maybe( api_blob, 1, "+=" ),
+	"assign_maybe returns false on no match",
+);
+
+let meta_title_path := new ZPath( path: "/meta/title" );
+is(
+	meta_title_path.assign_first(
+		api_blob,
+		[ /[0-9]+/, fn m -> "world" ],
+		"~=",
+	),
+	"Hello world",
+	"assign_first accepts structured ~= payload",
+);
+is( api_blob{meta}{title}, "Hello world", "structured ~= mutates through ZPath" );
+
+let meta_title_ref := meta_title_path.ref_first(api_blob);
+is( meta_title_ref(), "Hello world", "ref_first returns getter/setter closure" );
+is( meta_title_ref("Updated"), "Updated", "ref_first setter returns assigned value" );
+is( api_blob{meta}{title}, "Updated", "ref_first setter mutates target" );
+
+let title_refs := title_path.ref_all(api_blob);
+is( title_refs.length(), 2, "ref_all returns one ref per selected target" );
+is( title_refs[0](), "Reader!", "ref_all getter reads first target" );
+title_refs[0]( "Lead!" );
+is( api_blob{users}[0]{title}, "Lead!", "ref_all refs remain assignable" );
+
+is(
+	new ZPath( path: "/users/#9/name" ).ref_maybe(api_blob),
+	null,
+	"ref_maybe returns null on no match",
+);
+is(
+	new ZPath( path: "/users/#1/name" ).ref_maybe(api_blob)(),
+	"Bob",
+	"ref_maybe returns ref on match",
+);
+
+let zp := new ZPath( path: "/users/*[is-first()]/name" );
+let first_only := zp.get(data);
+is( first_only.length(), 1, "is-first filter" );
+is( first_only[0], "Ada", "is-first selected first entry" );
+
+let compiled := compile( "/users/*/name" );
+is( compiled.query(data).length(), 3, "compile still returns reusable zpath object" );
+ok( compiled.exists(data), "compiled object has exists method" );
+ok( not compile("/users/#9/name").exists(data), "compiled exists false on missing path" );
+
+let last_only := query( data, "/users/*[is-last()]/name" );
+is( last_only.length(), 1, "is-last filter" );
+is( last_only[0], "Cara", "is-last selected last entry" );
+
+let numbers := [ 10, 20, 30 ];
+let keyed_last := query( { numbers: numbers }, "/numbers/*[is-last()]" );
+is( keyed_last.length(), 1, "is-last works when sibling keys differ" );
+is( keyed_last[0], 30, "is-last picks final array entry" );
+
+let second := query( data, "/users/*[index() == 1]/name" );
+is( second.length(), 1, "index() filter" );
+is( second[0], "Bob", "index() == 1 selected second entry" );
+
+let with_email := query( data, "/users/*[email]/name" );
+is( with_email.length(), 3, "bare identifier filter checks field existence" );
+is( with_email[0], "Ada", "first user with email" );
+is( with_email[1], "Bob", "second user with email key" );
+is( with_email[2], "Cara", "third user with email key" );
+
+let no_email := query( data, "/users/*[!email]/name" );
+is( no_email.length(), 1, "negated bare identifier still uses value truthiness" );
+is( no_email[0], "Bob", "only Bob has a falsey email value" );
+
+let age_compare := query( data, "/users/*[age >= 32]/name" );
+is( age_compare.length(), 2, "comparison operators in filters" );
+is( age_compare[0], "Ada", "age >= 32 includes ada" );
+is( age_compare[1], "Cara", "age >= 32 includes cara" );
+
+let logic_and := query( data, "/users/*[age >= 27 && age < 40]/name" );
+is( logic_and.length(), 2, "logical and in filters" );
+is( logic_and[0], "Ada", "and filter includes ada" );
+is( logic_and[1], "Bob", "and filter includes bob" );
+
+let logic_or := query( data, "/users/*[age < 30 || name == 'Cara']/name" );
+is( logic_or.length(), 2, "logical or and == comparison in filters" );
+is( logic_or[0], "Bob", "or filter includes bob" );
+is( logic_or[1], "Cara", "or filter includes cara" );
+
+let arithmetic := query( data, "/users/*[(age / 2) + 1 > 16]/name" );
+is( arithmetic.length(), 2, "arithmetic operators in filters" );
+is( arithmetic[0], "Ada", "arithmetic filter includes ada" );
+is( arithmetic[1], "Cara", "arithmetic filter includes cara" );
+
+let ternary := query( data, "/users/*[(age >= 32 ? true() : false())]/name" );
+is( ternary.length(), 2, "ternary operator in filters" );
+is( ternary[0], "Ada", "ternary filter includes ada" );
+is( ternary[1], "Cara", "ternary filter includes cara" );
+
+let strings := {
+	text: "Main street",
+	media: "application/pdf;version=1",
+	list: [ "one", "two", 3 ],
+	street: "naist street",
+};
+let person_names := {
+	first: "John",
+	last: "Smith",
+};
+is( first( strings, "index-of(\"street\", text)", "x" ), 5, "index-of(needle, expr) works" );
+is( first( strings, "/text[index-of(\"street\") == 5]", "x" ), "Main street", "index-of(needle) uses current node" );
+is( first( strings, "last-index-of(\"a\", \"bananas\")", "x" ), 5, "last-index-of(needle, expr) works" );
+is( first( strings, "/text[string-length() == 11]", "x" ), "Main street", "string-length() uses current node" );
+is( first( strings, "string-length(/text)", "x" ), 11, "string-length(path) string-coerces first path item" );
+is( first( strings, "upper-case(text)", "x" ), "MAIN STREET", "upper-case(expr) works" );
+is( first( strings, "lower-case(\"PDF\")", "x" ), "pdf", "lower-case(expr) works" );
+is( first( strings, "substring(text, 5, 6)", "x" ), "street", "substring(expr, start, len) works" );
+is( first( strings, "/text[substring(5, 6) == \"street\"]", "x" ), "Main street", "substring(start, len) uses current node" );
+ok( first( strings, "match(\"street\", text)", false ), "match(pattern, expr) works" );
+is( first( strings, "replace(\" street\", \" road\", text)", "x" ), "Main road", "replace(pattern, replacement, expr) works" );
+is(
+	first( strings, "replace(\"(.*) street\", \"$1 road\", street)", "x" ),
+	"naist road",
+	"replace supports xpath-style $1 capture replacement",
+);
+is(
+	first( strings, "replace(\"road$\", \"\", replace(\"(.*) street\", \"$1 road\", street))", "x" ),
+	"naist ",
+	"replace supports anchored suffix pattern in nested calls",
+);
+is(
+	first( strings, "replace(\"^[^/]*/\", \"\", replace(\";.*\", \"\", media))", "x" ),
+	"pdf",
+	"replace supports leading-prefix cleanup for media types",
+);
+is( first( strings, "join(\"|\", list/*)", "x" ), "one|two|3", "join(joiner, expr) works" );
+is(
+	first( data, "join(\"|\", users/*[age >= 27]/name)", "x" ),
+	"Ada|Bob|Cara",
+	"top-level function expression accepts filtered path arguments",
+);
+is(
+	first( data, "join(\"|\", users/*[name == \"Ada\"]/name)", "x" ),
+	"Ada",
+	"top-level join path args allow string-filter tokens",
+);
+is(
+	first( strings, "escape(\"A&B <test> \\\"q\\\"\")", "x" ),
+	"A&amp;B &lt;test&gt; &quot;q&quot;",
+	"escape(expr) performs xml escaping",
+);
+is(
+	first( strings, "unescape(\"A&amp;B &lt;test&gt;\")", "x" ),
+	"A&B <test>",
+	"unescape(expr) decodes xml entities",
+);
+is( first( strings, "format(\"%s!\", text)", "x" ), "Main street!", "format(fmt, expr) works" );
+
+let ceil_math := query( data, "/users/*[ceil(age / 3) == 11]/name" );
+is( ceil_math.length(), 1, "ceil() in filters" );
+is( ceil_math[0], "Ada", "ceil() result matched ada" );
+
+let ceil_math_current := query( data, "/users/*/age[ceil() == 32]" );
+is( ceil_math_current.length(), 1, "ceil() without args uses current node" );
+is( ceil_math_current[0], 32, "ceil() without args matched numeric node" );
+
+let floor_math := query( data, "/users/*[floor(age / 3) == 13]/name" );
+is( floor_math.length(), 1, "floor() in filters" );
+is( floor_math[0], "Cara", "floor() result matched cara" );
+
+let floor_math_current := query( data, "/users/*/age[floor() == 27]" );
+is( floor_math_current.length(), 1, "floor() without args uses current node" );
+is( floor_math_current[0], 27, "floor() without args matched numeric node" );
+
+let round_math := query( data, "/users/*[round(age / 3) == 9]/name" );
+is( round_math.length(), 1, "round() in filters" );
+is( round_math[0], "Bob", "round() result matched bob" );
+
+let round_math_current := query( data, "/users/*/age[round() == 40]" );
+is( round_math_current.length(), 1, "round() without args uses current node" );
+is( round_math_current[0], 40, "round() without args matched numeric node" );
+
+let math_blob := {
+	values: [ 1, "2", 3.5 ],
+	mixed: [ 1, "oops", 2.5, null, "7" ],
+	solo: 1.2,
+};
+is( first( math_blob, "sum(values/*)", "x" ), 6.5, "sum(expr) works" );
+is( first( math_blob, "sum(values/*, 1.5)", "x" ), 8, "sum(expr, literal) works" );
+is( first( math_blob, "sum(1, 2, 3)", "x" ), 6, "sum(literal, literal, literal) works" );
+is( first( math_blob, "sum(values/*, mixed/*)", "x" ), 17, "sum(expr, expr) supports multiple expressions and ignores non-numeric nodes" );
+is( first( math_blob, "min(values/*)", "x" ), 1, "min(expr) handles numeric arrays" );
+is( first( math_blob, "min(values/*, 0.5)", "x" ), 0.5, "min(expr, literal) flattens all argument values" );
+is( first( math_blob, "min(values/*, mixed/*)", "x" ), 1, "min(expr, expr) supports multiple expressions and ignores non-numeric nodes" );
+is( first( math_blob, "max(values/*)", "x" ), 3.5, "max(expr) handles numeric arrays" );
+is( first( math_blob, "max(values/*, 9)", "x" ), 9, "max(expr, literal) flattens all argument values" );
+is( first( math_blob, "max(values/*, mixed/*)", "x" ), 7, "max(expr, expr) supports multiple expressions and ignores non-numeric nodes" );
+is( first( math_blob, "ceil(solo)", "x" ), 2, "ceil(expr) works" );
+is( first( math_blob, "floor(solo)", "x" ), 1, "floor(expr) works" );
+is( first( math_blob, "round(solo)", "x" ), 1, "round(expr) works" );
+is( first( math_blob, "floor(solo, 9.9)", "x" ), 1, "floor(expr, expr) supports multiple expressions by using first numeric value" );
+is( first( math_blob, "round(solo, 9.9)", "x" ), 1, "round(expr, expr) supports multiple expressions by using first numeric value" );
+
+let non_null_email := query( data, "/users/*[type(email) != 'null']/name" );
+is( non_null_email.length(), 2, "type() function in filters" );
+is( non_null_email[0], "Ada", "type() keeps non-null email for ada" );
+is( non_null_email[1], "Cara", "type() keeps non-null email for cara" );
+
+let value_compare := query( data, "/meta/tags/*[value() == 'x']" );
+is( value_compare.length(), 1, "value() function in filters" );
+is( value_compare[0], "x", "value() compares primitive tag value" );
+
+let under_40_by_count := query( data, "/users/*[count(split(name, 'a')) < 3]/name" );
+let count_contract_blob := {
+	nodes: [
+		{ arr: [ 1, 2 ] },
+		{ arr: [ 3 ] },
+		{ arr: null },
+	],
+};
+is( under_40_by_count.length(), 3, "count(expression) works on array expression values" );
+is( first( strings, "count(text, list/*)", "x" ), 4, "count(scalar, expr) accumulates sequence counts" );
+is( first( person_names, "count(first, last)", "x" ), 2, "count(path, path) counts path argument values" );
+is( first( data, "count(/users/*)", "x" ), 3, "count(path to sequence node) counts sequence members" );
+is( first( data, "count(1, 2, 3)", "x" ), 3, "count(literal, literal, literal) preserves sequence count policy" );
+is( first( count_contract_blob, "count(nodes/*/arr)", "x" ), 3, "count(path node-set) counts selected nodes without flattening nested array members" );
+is( first( count_contract_blob, "count(nodes/*[index() == 0]/arr/*)", "x" ), 2, "count(single sequence node path) counts sequence members" );
+is( first( count_contract_blob, "count(nodes/*/arr/*, 1)", "x" ), 4, "count(node-set, scalar) combines node and scalar sequence counts" );
+
+is( first( person_names, "count(union(first, first, last))", "x" ), 2, "union(path, path, path) preserves node-set uniqueness" );
+is( first( person_names, "count(intersection(first, first, last))", "x" ), 0, "intersection(path, path, path) preserves set contract" );
+
+is(
+	first( strings, "replace(list/*, \"x\", \"one\")", "x" ),
+	"x",
+	"replace(pattern, replacement, scalar) string-coerces sequence arguments",
+);
+is(
+	first( strings, "substring(list/*, 0, 3)", "x" ),
+	"one",
+	"substring(sequence, start, len) string-coerces first item in sequence",
+);
+is(
+	first( strings, "index-of(\"ne\", list/*)", "x" ),
+	1,
+	"index-of(sequence, needle) string-coerces first item in sequence",
+);
+is( first( strings, "replace(\"street\", \"road\", \"Main street\")", "x" ), "Main road", "replace(pattern, replacement, literal) string-coerces literal input" );
+
+let phase2_contract_blob := {
+	numbers: [ 1, 2, 3 ],
+	words: [ "alpha", "beta" ],
+};
+is( first( phase2_contract_blob, "sum(1, 2, 3)", "x" ), 6, "sum literal arguments flatten as numeric values" );
+is( first( phase2_contract_blob, "sum(numbers/*)", "x" ), 6, "sum path argument flattens sequence values" );
+is( first( phase2_contract_blob, "min(9, 4, 7)", "x" ), 4, "min literal arguments flatten as numeric values" );
+is( first( phase2_contract_blob, "min(numbers/*)", "x" ), 1, "min path argument flattens sequence values" );
+is( first( phase2_contract_blob, "max(9, 4, 7)", "x" ), 9, "max literal arguments flatten as numeric values" );
+is( first( phase2_contract_blob, "max(numbers/*)", "x" ), 3, "max path argument flattens sequence values" );
+is( first( phase2_contract_blob, "join(\"|\", words/*)", "x" ), "alpha|beta", "join(path) string-coerces sequence members" );
+is( first( phase2_contract_blob, "replace(\"alpha\", \"omega\", words/*)", "x" ), "omega", "replace(path) string-coerces first sequence member" );
+let segment_call_blob := {
+	numbers: [
+		{ values: [ 1, 2, 3 ] },
+		{ values: [ 8 ] },
+	],
+};
+let segment_count := query( segment_call_blob, "/numbers/*/count(values/*)" );
+is( segment_count.length(), 2, "function call segments keep per-node sequence context" );
+is( segment_count[0], 3, "count(path) works in function call segment for first node" );
+is( segment_count[1], 1, "count(path) works in function call segment for second node" );
+let segment_peer_count := query( segment_call_blob, "/numbers/*[index() == count() - 1]/values/#0" );
+is( segment_peer_count.length(), 1, "count() in filter uses peer-sequence size with no args" );
+is( segment_peer_count[0], 8, "count()-based last-item filter selects final peer" );
+
+let cart := {
+	items: [
+		{ price: 2.5, quantity: 2 },
+		{ price: 4, quantity: 1 },
+	],
+};
+is(
+	first( cart, "sum(/items/*/value(number(price) * number(quantity)))", "x" ),
+	9,
+	"nested expression in path argument preserves sequence for sum",
+);
+is(
+	first( cart, "/items/#0/value(number(price))", "x" ),
+	2.5,
+	"number(path) string/sequence-coerces first selected path item",
+);
+let faceless_like_cart := {
+	body: {
+		items: [
+			{
+				item: [
+					{ price: 4.5, quantity: 3 },
+					{ price: 3, quantity: 3 },
+				],
+			},
+		],
+	},
+};
+let faceless_like_line_totals := query(
+	faceless_like_cart,
+	"**/items/*/item/*/value(number(price) * number(quantity))",
+);
+is(
+	faceless_like_line_totals.length(),
+	2,
+	"nested value(number(path) * number(path)) path traverses named segments through arrays",
+);
+is( faceless_like_line_totals[0], 13.5, "first faceless-like line total evaluates correctly" );
+is( faceless_like_line_totals[1], 9, "second faceless-like line total evaluates correctly" );
+is(
+	first(
+		faceless_like_cart,
+		"sum(**/items/*/item/*/value(number(price) * number(quantity)))",
+		"x",
+	),
+	22.5,
+	"sum(path nested expression) keeps sequence context through array-name traversal",
+);
+is(
+	first(
+		faceless_like_cart,
+		"format(\"$%02.2f\", sum(**/items/*/item/*/value(number(price) * number(quantity))))",
+		"x",
+	),
+	"$22.50",
+	"format(sum(path nested expression)) handles faceless-like cart totals",
+);
+
+let faceless_like_table := {
+	body: {
+		table: {
+			tr: [
+				{ td: [ "TD1.1", "TD1.2" ] },
+				{ td: [ "TD2.1", "TD2.2" ] },
+				{ td: [ "TD3.1", "TD3.2" ] },
+			],
+		},
+	},
+};
+is(
+	first( faceless_like_table, "count(**/tr/*)", "x" ),
+	3,
+	"count(descendant path) preserves node-set array member count",
+);
+
+let with_named_meta := query( data, "/users/*[/meta/title]/name" );
+is( with_named_meta.length(), 3, "absolute subpath exists filter" );
+
+// key() should be null as this is an array
+let key_ne := query( data, "/meta/tags/*[key() != 1]" );
+is( key_ne.length(), 2, "key() inequality filter" );
+is( key_ne[0], "x", "key() != 1 selected first tag" );
+
+let map_key_ne := query( data, "/address/*[key() != 'city']" );
+is( map_key_ne.length(), 2, "key() inequality filter over map children" );
+ok(
+	( "naist street" in map_key_ne ) and ( "630-0192" in map_key_ne ),
+	"key() != 'city' keeps street and postcode map children",
+);
+
+let ancestors := query( data, "/users/#0/name/..*/key" );
+is( ancestors.length(), 0, "..* over primitive has no key child by default" );
+
+let all_scalars := query( data, "/**" );
+ok( all_scalars.length() > 8, "** returns many descendants including root" );
+
+let parent_roundtrip := query( data, "/users/#2/name/../name" );
+is( parent_roundtrip.length(), 1, "parent segment preserves metadata" );
+is( parent_roundtrip[0], "Cara", "parent traversal returns to owning node" );
+
+let parent_indexing := query( data, "/users/#1/../#0/name" );
+is( parent_indexing.length(), 1, "parent + #index segment keeps index metadata" );
+is( parent_indexing[0], "Ada", "parent + #index resolves first sibling" );
+
+let descendant_parent_roundtrip := query( data, "/**/name/../name" );
+ok( descendant_parent_roundtrip.length() >= 3, "** metadata supports parent traversal" );
+
+let ancestor_reanchor := query( data, "/users/#2/name/..*/users/#0/name" );
+is( ancestor_reanchor.length(), 1, "..* keeps ancestor parent chain" );
+is( ancestor_reanchor[0], "Ada", "..* can re-anchor from ancestors" );
+
+is( first( data, "/meta/title/../title", "x" ), "Example", "parent traversal with whitespace around segment" );
+
+let xml_doc := XML.parse( "<root xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'><item id='x'/><rdf:seq rdf:about='aboutvalue'/></root>" );
+
+let xml_attr := query( xml_doc, "rdf:seq/@rdf:about" );
+let xml_attr_nodes := compile( "rdf:seq/@rdf:about" ).evaluate(xml_doc);
+is( xml_attr.length(), 1, "xml attribute lookup by name" );
+is(
+	first( xml_doc, "string(rdf:seq/@rdf:about)", "x" ),
+	"aboutvalue",
+	"xml attribute lookup string-coerces attribute node value",
+);
+is(
+	first( xml_attr_nodes[0], "type()", "x" ),
+	"attr",
+	"xml attribute lookup returns attribute-node type",
+);
+
+let xml_attr_parent := query( xml_doc, "rdf:seq/@rdf:about/../@rdf:about" );
+is( xml_attr_parent.length(), 1, "attribute nodes keep parent metadata" );
+is(
+	first( xml_doc, "string(rdf:seq/@rdf:about/../@rdf:about)", "x" ),
+	"aboutvalue",
+	"attribute parent traversal round-trips with string coercion",
+);
+is(
+	query( xml_doc, "/@*" ).length(),
+	1,
+	"xml attribute wildcard returns attribute node entries",
+);
+is(
+	query(
+		xml_doc,
+		"rdf:seq/@*[url() == \"http://www.w3.org/1999/02/22-rdf-syntax-ns#\"]",
+	).length(),
+	1,
+	"xml attribute wildcard predicates can filter by namespace url()",
+);
+
+let xml_text_doc := XML.parse( "<root>alpha<b>mid</b>omega</root>" );
+let text_nodes := query( xml_text_doc, "/*[type() == 'text']" );
+is( text_nodes.length(), 2, "type() classifies XML text child nodes" );
+let xml_faceless_doc := XML.parse(
+	"<html><body><table><tr id='tr1'><td id='td1.1'>TD1.1</td><td id='td1.2'>TD1.2</td></tr><tr id='tr2'><td id='td2.1'>TD2.1</td><td id='td2.2'>TD2.2</td></tr><tr id='tr3'><td id='td3.1'>TD3.1</td><td id='td3.2'>TD3.2</td></tr></table><person><items><item><price>4.50</price><quantity>3</quantity></item><item><price>2.25</price><quantity>4</quantity></item></items><data>mixed <span>content</span> test</data></person><rdf:seq xmlns:rdf='http://www.w3.org/1999/02/22-rdf-syntax-ns#'><rdf:li>data</rdf:li></rdf:seq></body></html>",
+);
+let xml_last_tr := query( xml_faceless_doc, "**/table/tr[index() == count() - 1]" );
+let xml_last_tr_nodes := compile( "**/table/tr[index() == count() - 1]" ).evaluate(xml_faceless_doc);
+is( xml_last_tr.length(), 1, "index() == count() - 1 works for XML siblings with ignorable whitespace trimmed" );
+is(
+	first( xml_last_tr_nodes[0], "string(@id)", "x" ),
+	"tr3",
+	"count()-relative XML row filter selects last row",
+);
+let xml_count_three := query( xml_faceless_doc, "**[count(*) == 3]" );
+is( xml_count_three.length(), 3, "count(*) over XML descendants ignores whitespace-only text nodes" );
+is(
+	query( xml_faceless_doc, "**/person[data]" ).length(),
+	1,
+	"XML exists-filter accepts present data child nodes",
+);
+is(
+	query( xml_faceless_doc, "**/data/*" ).length(),
+	3,
+	"XML wildcard child traversal includes mixed-content text and element children",
+);
+is(
+	query( xml_faceless_doc, "**/data/*[type() == \"text\"]" ).length(),
+	2,
+	"XML type() filter selects text children under mixed-content data nodes",
+);
+is(
+	query( xml_faceless_doc, "**/data/*[type() == \"text\"][index() == 1]" ).length(),
+	1,
+	"XML text type() filter composes with index() filters on mixed-content children",
+);
+is(
+	first(
+		xml_faceless_doc,
+		"sum(**/items/item/value(number(price) * number(quantity)))",
+		"x",
+	),
+	22.5,
+	"sum over XML number(path) expressions coerces text-number nodes",
+);
+is(
+	first(
+		xml_faceless_doc,
+		"format(\"$%02.2f\", sum(**/items/item/value(number(price) * number(quantity))))",
+		"x",
+	),
+	"$22.50",
+	"format(sum(...)) over XML number(path) expressions returns expected currency text",
+);
+
+let cborish := {
+	tv: new TaggedValue(
+		tag: 32,
+		value: "http://www.ietf.org/rfc/rfc2396.txt",
+	),
+	nested: new TaggedValue(
+		tag: 24,
+		value: new TaggedValue( tag: 32, value: 42 ),
+	),
+	items: [
+		new TaggedValue( tag: 2, value: 1 ),
+		new TaggedValue( tag: 3, value: 2 ),
+	],
+};
+
+is(
+	new ZPath( path: "tv" ).first( cborish, "NOT FOUND" ),
+	"http://www.ietf.org/rfc/rfc2396.txt",
+	"named child unwraps TaggedValue payload",
+);
+is(
+	new ZPath( path: "type(tv)" ).first( cborish, "NOT FOUND" ),
+	"string",
+	"type(tv) uses wrapped value type",
+);
+is(
+	new ZPath( path: "tag(tv)" ).first( cborish, "NOT FOUND" ),
+	32,
+	"tag(tv) returns cbor tag number",
+);
+is(
+	new ZPath( path: "type(tag(tv))" ).first( cborish, "NOT FOUND" ),
+	"number",
+	"type(tag(tv)) is number",
+);
+is(
+	first( cborish, "/nested", "NOT FOUND" ),
+	42,
+	"nested TaggedValue wrappers unwrap recursively",
+);
+let cbor_item_types := query( cborish, "/items/*[type() == 'number']" );
+is( cbor_item_types.length(), 2, "type() in filters sees unwrapped cbor values" );
+let cbor_tag_filter := query( cborish, "/items/*[tag() == 3]" );
+is( cbor_tag_filter.length(), 1, "tag() in filters can inspect current node tag" );
+is( cbor_tag_filter[0], 2, "tag() filter still returns unwrapped value" );
+
+let kdl_doc := ( new KDL() ).decode( """(pkg)package "zuzu" (email)"dev@example.test" version="0.1.0" {
+	foo "first"
+	bar "middle"
+	foo "second"
+	foo "third"
+}
+""" );
+
+is(
+	first( kdl_doc, "/package/#0", "NOT FOUND" ),
+	"zuzu",
+	"KDLNode exposes args as indexed children",
+);
+is(
+	first( kdl_doc, "/package/foo#2/#0", "NOT FOUND" ),
+	"third",
+	"KDLNode supports named indexed child lookup",
+);
+is(
+	first( kdl_doc, "/package/@version", "NOT FOUND" ),
+	"0.1.0",
+	"KDLNode exposes props as attributes",
+);
+is(
+	first( kdl_doc, "tag(/package)", "NOT FOUND" ),
+	"pkg",
+	"KDLNode tag() returns type annotation",
+);
+is(
+	first( kdl_doc, "tag(/package/#1)", "NOT FOUND" ),
+	"email",
+	"KDLValue tag() returns type annotation",
+);
+is(
+	first( kdl_doc, "local-name(/package)", "NOT FOUND" ),
+	"package",
+	"local-name() returns KDLNode name",
+);
+is(
+	first( kdl_doc, "/package/foo#2/local-name()", "NOT FOUND" ),
+	"foo",
+	"local-name() works as a segment on KDLNode",
+);
+
+let phase3_compare_blob := {
+	age: 26,
+	vals: [ 1, 2 ],
+	ones: [ 1 ],
+	numbers: [
+		{ type: "iPhone", number: "0123-4567-8888" },
+		{ type: "home", number: "0123-4567-8910" },
+		{ type: "work", number: "0123-9999-8910" },
+	],
+	vals_holder: {
+		items: [ 1, 2 ],
+	},
+	miss_holder: {
+		present: null,
+	},
+};
+let phase3_filter_eq := query( phase3_compare_blob, "/vals/*[. == 1]" );
+is( phase3_filter_eq.length(), 1, "filter [. == 1] uses sequence existential equality" );
+is( phase3_filter_eq[0], 1, "filter [. == 1] keeps matching scalar" );
+is(
+	first( phase3_compare_blob, "/miss_holder/type(missing)", "x" ),
+	"undefined",
+	"type() reports undefined for absent values",
+);
+is(
+	first( phase3_compare_blob, "/miss_holder/type(present)", "x" ),
+	"null",
+	"type() reports null for explicit null values",
+);
+is(
+	query( phase3_compare_blob, "/miss_holder[missing]" ).length(),
+	0,
+	"missing values are false in filter truthiness",
+);
+is(
+	query( phase3_compare_blob, "/miss_holder[present]" ).length(),
+	1,
+	"bare-identifier filters check existence even when value is null",
+);
+is(
+	query( phase3_compare_blob, "[age == 26]" ).length(),
+	1,
+	"relative bare-filter equality can match current/root node",
+);
+is(
+	query( phase3_compare_blob, "/[age == 26]" ).length(),
+	1,
+	"absolute bare-filter equality can match root node",
+);
+is(
+	query( phase3_compare_blob, "**[age == 26]" ).length(),
+	1,
+	"descendants-or-self filter equality includes matching self node",
+);
+is(
+	query( phase3_compare_blob, "/**[age == 26]" ).length(),
+	1,
+	"absolute descendants-or-self filter equality includes matching root",
+);
+is(
+	query( phase3_compare_blob, "/numbers/[type == 'iPhone']" ).length(),
+	1,
+	"container filter segment targets array children for equality checks",
+);
+is(
+	query( phase3_compare_blob, "numbers/*[type == 'home']" ).length(),
+	1,
+	"array child filter matches only home entry",
+);
+is(
+	first( phase3_compare_blob, "numbers/*[type == 'home']/number", "x" ),
+	"0123-4567-8910",
+	"array child filter can project a matched scalar field",
+);
+is(
+	query( phase3_compare_blob, "/**[type == 'home']" ).length(),
+	1,
+	"descendant filter keeps matching container child",
+);
+is(
+	first( phase3_compare_blob, "/**[type == 'home']/number", "x" ),
+	"0123-4567-8910",
+	"descendant filter can project matched child fields",
+);
+is(
+	query(
+		{
+			typetest: {
+				nullvalue: null,
+			},
+		},
+		"**/typetest[nullvalue]",
+	).length(),
+	1,
+	"exists-style filters treat present null fields as existing",
+);
+
+let pairlist_query_blob := {{ tag: "perl", page: 1, tag: "zuzu" }};
+is(
+	first( pairlist_query_blob, "/#1/@key", "missing" ),
+	"page",
+	"pairlist global index exposes pair key",
+);
+is(
+	first( pairlist_query_blob, "/#1/@value", "missing" ),
+	1,
+	"pairlist global index exposes pair value",
+);
+
+let pairlist_tag_values := query( pairlist_query_blob, "/tag/@value" );
+is( pairlist_tag_values.length(), 2, "pairlist name query preserves duplicates" );
+is( pairlist_tag_values[0], "perl", "pairlist name query returns first duplicate" );
+is( pairlist_tag_values[1], "zuzu", "pairlist name query returns second duplicate" );
+is(
+	first( pairlist_query_blob, "/tag#1/@value", "missing" ),
+	"zuzu",
+	"pairlist name#index uses per-key occurrence index",
+);
+
+let pairlist_assign_blob := {{ tag: "perl", page: 1, tag: "zuzu" }};
+is(
+	assign_first( pairlist_assign_blob, "/tag#1", "ruby" ),
+	"ruby",
+	"pairlist pair assignment returns assigned value",
+);
+let pairlist_assigned_values := query( pairlist_assign_blob, "/tag/@value" );
+is(
+	pairlist_assigned_values[0],
+	"perl",
+	"pairlist pair assignment leaves first duplicate unchanged",
+);
+is(
+	pairlist_assigned_values[1],
+	"ruby",
+	"pairlist pair assignment updates selected duplicate",
+);
+is(
+	first( pairlist_assign_blob, "/#1/@key", "missing" ),
+	"page",
+	"pairlist pair assignment preserves pair order",
+);
+
+is(
+	assign_first( pairlist_assign_blob, "/tag#1/@value", "zuzu" ),
+	"zuzu",
+	"pairlist pair value assignment returns assigned value",
+);
+is(
+	first( pairlist_assign_blob, "/tag#1/@value", "missing" ),
+	"zuzu",
+	"pairlist pair value assignment updates selected duplicate",
+);
+is(
+	first( pairlist_assign_blob, "/#1/@value", "missing" ),
+	1,
+	"pairlist pair value assignment preserves unrelated pair",
+);
+
+done_testing();

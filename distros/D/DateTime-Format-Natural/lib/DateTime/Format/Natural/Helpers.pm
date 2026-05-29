@@ -10,7 +10,7 @@ use constant VIRT_FLAG => false;
 
 our ($VERSION, @EXPORT_OK, %flag);
 
-$VERSION = '0.07';
+$VERSION = '0.08';
 @EXPORT_OK = qw(%flag);
 
 my @flags = (
@@ -25,6 +25,7 @@ my @flags = (
     { noon_midnight     => VIRT_FLAG },
     { morn_aftern_even  => VIRT_FLAG },
     { before_after_from => VIRT_FLAG },
+    { eve_day           => VIRT_FLAG },
 );
 
 {

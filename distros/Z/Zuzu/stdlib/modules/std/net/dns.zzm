@@ -1,0 +1,93 @@
+=encoding utf8
+
+=head1 NAME
+
+std/net/dns - DNS lookup helpers.
+
+=head1 SYNOPSIS
+
+  from std/net/dns import lookup, addresses, reverse;
+
+  let ips := addresses("example.com");
+  let mx  := lookup("example.com", "MX");
+  let ptr := reverse("127.0.0.1");
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by zuzu.pl, zuzu-rust, and zuzu-js on Node and
+Electron. It is not supported by zuzu-js in the browser.
+
+=head1 DESCRIPTION
+
+This runtime-supported module provides small DNS helper functions for
+forward lookups, common DNS record queries, and reverse DNS.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item C<< lookup(name, type = "A") >>
+
+Parameters: C<name> is a DNS name and C<type> is the record type.
+Returns: C<Array>. Looks up records for C<name>.
+
+Returns an array of dictionaries. All records include C<type>, C<name>,
+C<value>, and C<ttl>. Backends return C<ttl: null> when TTLs are not
+available.
+
+Record-specific keys include:
+
+=over
+
+=item * C<address> for C<A> and C<AAAA>
+
+=item * C<target> for C<CNAME>, C<NS>, C<PTR>, and C<SRV>
+
+=item * C<exchange> and C<preference> for C<MX>
+
+=item * C<text> and C<strings> for C<TXT>
+
+=item * C<port>, C<priority>, and C<weight> for C<SRV>
+
+=back
+
+=item C<< lookup_async(name, type = "A") >>
+
+Parameters: same as C<lookup>. Returns: C<Task>. Asynchronous version of
+C<lookup>.
+
+=item C<< addresses(name, family = "any") >>
+
+Parameters: C<name> is a DNS name and C<family> is C<any>, C<ipv4>, or
+C<ipv6>. Returns: C<Array>. Returns address strings for C<name>.
+
+=item C<< addresses_async(name, family = "any") >>
+
+Parameters: same as C<addresses>. Returns: C<Task>. Asynchronous version
+of C<addresses>.
+
+=item C<< reverse(address) >>
+
+Parameters: C<address> is an IPv4 or IPv6 address. Returns: C<Array>.
+Returns PTR names for the address.
+
+=item C<< reverse_async(address) >>
+
+Parameters: same as C<reverse>. Returns: C<Task>. Asynchronous version
+of C<reverse>.
+
+=back
+
+No-data and NXDOMAIN responses return an empty array. Invalid input,
+internal resolver timeouts, and resolver failures throw runtime
+exceptions.
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/net/dns >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.

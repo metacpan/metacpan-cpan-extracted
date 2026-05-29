@@ -1,0 +1,30 @@
+from test/more import *;
+
+requires_capability( "proc" );
+
+from std/proc import Proc;
+
+let ok_run := Proc.run( "perl", [ "-e", "print qq<ok>" ] );
+ok( ok_run{ok}, "successful proc run reports ok" );
+
+let bad_run := Proc.run(
+	"perl",
+	[ "-e", "print STDERR qq<oops\\n>; exit 3;" ],
+	{ capture_stderr: true },
+);
+
+ok( not bad_run{ok}, "failed proc run reports not ok" );
+like( bad_run{stderr}, /oops/, "stderr is captured from failed proc run" );
+
+let mapped := exception( function () {
+	if ( not bad_run{ok} ) {
+		throw new Exception(
+			message: "proc failed: " _ Proc.status_text( bad_run ) _ " :: " _ bad_run{stderr},
+		);
+	}
+} );
+
+like( mapped, /proc failed:/, "failure is mapped to structured exception" );
+like( mapped, /oops/, "mapped exception keeps stderr details" );
+
+done_testing();

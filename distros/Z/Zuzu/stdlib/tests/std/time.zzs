@@ -1,0 +1,117 @@
+from std/time import *;
+from test/more import *;
+let base := new Time(2);
+is( base.epoch(), 2, "constructor accepts epoch timestamp", );
+is( base.add_seconds(5).epoch(), 7, "add_seconds", );
+is( base.add_minutes(2).epoch(), 122, "add_minutes", );
+is( base.add_hours(1).epoch(), 3602, "add_hours", );
+is( base.add_days(1).epoch(), 86402, "add_days", );
+is( base.add_weeks(1).epoch(), 604802, "add_weeks", );
+is( base.add_months(1).mon(), 2, "add_months", );
+is( base.add_years(1).year(), 1971, "add_years", );
+is( base.epoch(), 2, "time values are immutable", );
+let parser := new TimeParser( "%A %drd %b, %Y" );
+let parsed := parser.parse( "Sunday 3rd Nov, 1943" );
+is( parsed.day_of_month(), 3, "TimeParser.parse day", );
+is( parsed.mon(), 11, "TimeParser.parse month", );
+is( parsed.year(), 1943, "TimeParser.parse year", );
+let utc := TimeZone.utc();
+let london := TimeZone.named( "Europe/London" );
+let noon := new Time( 1778241600, timezone: utc );
+is( noon.with_timezone( london ).hour(), 13, "with_timezone display zone", );
+is( noon.hour(), 12, "with_timezone leaves original unchanged", );
+is( noon.add( Duration.minutes( 5 ) ).epoch(), 1778241900, "Duration add", );
+is( noon.subtract_seconds( 60 ).epoch(), 1778241540, "subtract_seconds", );
+is(
+	Time.parse( "2026-05-08T12:00:00Z" ).epoch(),
+	1778241600,
+	"Time.parse RFC3339",
+);
+is(
+	Time.parse( "Fri, 08 May 2026 12:00:00 +0000" ).epoch(),
+	1778241600,
+	"Time.parse RFC5322",
+);
+is(
+	Time.parse( "Fri, 08 May 26 12:00:00 +0000" ).epoch(),
+	1778241600,
+	"Time.parse RFC5322 two-digit year",
+);
+is(
+	Time.parse( "08 May 26 12:00 UT" ).epoch(),
+	1778241600,
+	"Time.parse RFC5322 without weekday or seconds",
+);
+is(
+	Time.parse( "Fri, 08 May 2026 07:00:00 EST" ).epoch(),
+	1778241600,
+	"Time.parse RFC5322 US legacy zone",
+);
+is(
+	Time.parse( "Fri, 08 May 2026 13:00:00 A" ).epoch(),
+	1778241600,
+	"Time.parse RFC5322 military A zone",
+);
+is(
+	Time.parse( "Fri, 08 May 2026 00:00:00 Y" ).epoch(),
+	1778241600,
+	"Time.parse RFC5322 military Y zone",
+);
+is(
+	Time.parse( "Tue, 08 Sept. 2026 12:00:00 Z" ).epoch(),
+	1788868800,
+	"Time.parse RFC5322 month spelling variant",
+);
+is(
+	TimeFormat.rfc5322().parse( "Fri, 08 May 2026 12:00:00 +0000" ).epoch(),
+	1778241600,
+	"TimeFormat.rfc5322 parses RFC5322",
+);
+is(
+	TimeFormat.rfc3339().format( noon ),
+	"2026-05-08T12:00:00+00:00",
+	"TimeFormat format",
+);
+is(
+	noon.with_timezone( TimeZone.offset(3600) ).to_rfc5322(),
+	"Fri, 08 May 2026 13:00:00 +0100",
+	"to_rfc5322 formats fixed offset",
+);
+is(
+	noon.with_timezone( TimeZone.offset(3600) ).to_rfc5322(
+		include_weekday: false,
+	),
+	"08 May 2026 13:00:00 +0100",
+	"to_rfc5322 can omit weekday",
+);
+let before_dst := Time.parse( "2026-03-28T12:00:00", timezone: london );
+is( before_dst.add_days( 1 ).hour(), 12, "add_days keeps wall time", );
+ok(
+	exception( function () { Time.parse( "2026-05-08T12:00:00" ); } ),
+	"Time.parse requires timezone for zone-less input",
+);
+ok(
+	exception( function () {
+		Time.parse( "Sat, 29 Feb 2025 12:00:00 +0000" );
+	} ),
+	"Time.parse RFC5322 rejects invalid date",
+);
+ok(
+	exception( function () {
+		Time.parse( "Fri, 08 May 2026 24:00:00 +0000" );
+	} ),
+	"Time.parse RFC5322 rejects invalid time",
+);
+ok(
+	exception( function () {
+		Time.parse( "Fri, 08 May 2026 12:00:00 J" );
+	} ),
+	"Time.parse RFC5322 rejects military J zone",
+);
+ok(
+	exception( function () {
+		Time.parse( "Fri, 08 May 2026 12:00:00 +2460" );
+	} ),
+	"Time.parse RFC5322 rejects invalid numeric zone",
+);
+done_testing();

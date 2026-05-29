@@ -1,0 +1,39 @@
+from test/more import *;
+
+requires_capability("fs");
+
+from std/string import trim;
+from std/io import Path;
+
+class Person {
+	let String name with get, set;
+	let Number age with get, set;
+}
+
+let file := Path.tempfile();
+file.spew_utf8(
+	"Ada:37\n"
+	_ "Bob:25\n"
+	_ "skip-this-line\n"
+	_ "Cia:41\n",
+);
+
+let people := [];
+file.each_line( function ( line ) {
+	let m := trim(line) ~ /^([A-Za-z]+):([0-9]+)$/;
+	if ( m ) {
+		people.push(
+			new Person(
+				name: m[1],
+				age: int( m[2] ),
+			),
+		);
+	}
+} );
+
+is( people.length(), 3, "regex captures in loop build typed class instances" );
+is( people[0].get_name(), "Ada", "first captured name mapped to class field" );
+is( people[1].get_age(), 25, "captured numeric text converted to typed Number field" );
+ok( people[2] instanceof Person, "constructed objects keep class type" );
+
+done_testing();

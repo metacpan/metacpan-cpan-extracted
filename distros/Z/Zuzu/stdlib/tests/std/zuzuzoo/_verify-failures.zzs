@@ -1,0 +1,131 @@
+from test/more import *;
+
+requires_capability( "fs" );
+
+from std/data/json import JSON;
+from std/digest/sha import sha256_hex;
+from std/io import Path;
+from std/string import split;
+from std/zuzuzoo import Zuzuzoo;
+
+function ensure_dir ( path ) {
+	return true if path.exists();
+	let parent := path.parent();
+	ensure_dir(parent) if not parent.exists();
+	path.mkdir();
+	return true;
+}
+
+function root () {
+	let dir := Path.tempdir();
+	let lib := dir.child("lib");
+	let bin := dir.child("bin");
+	let meta := dir.child("meta");
+	ensure_dir(lib);
+	ensure_dir(bin);
+	ensure_dir(meta);
+	return {
+		dir_obj: dir,
+		lib_obj: lib,
+		bin_obj: bin,
+		meta_obj: meta,
+		lib_dir: lib.to_String(),
+		bin_dir: bin.to_String(),
+		meta_dir: meta.to_String(),
+	};
+}
+
+function module_path ( root, install_as ) {
+	let path := root{lib_obj};
+	for ( let part in split( install_as, "/" ) ) {
+		path := path.child(part);
+	}
+	return path;
+}
+
+function write_module ( root, install_as, text ) {
+	let path := module_path( root, install_as );
+	ensure_dir( path.parent() );
+	path.spew_utf8(text);
+	return sha256_hex(path.slurp());
+}
+
+function module_entry ( root, install_as, text ) {
+	return {
+		source: "modules/" _ install_as,
+		install_as: install_as,
+		sha256: write_module( root, install_as, text ),
+	};
+}
+
+function write_installed ( root, name, version, modules, scripts := [] ) {
+	( new JSON( pretty: true ) ).dump(
+		root{meta_obj}.child( name _ "-" _ version _ ".json" ),
+		{
+			name: name,
+			version: version,
+			author: "Example",
+			license: "MIT",
+			status: "stable",
+			dependencies: {},
+			installed: {
+				zdf: "ZDF-1",
+				lib_dir: root{lib_dir},
+				bin_dir: root{bin_dir},
+				meta_dir: root{meta_dir},
+				modules: modules,
+				scripts: scripts,
+			},
+		},
+	);
+}
+
+let target := root();
+let mismatch := module_entry(
+	target,
+	"fail/mismatch.zzm",
+	"// original\n",
+);
+module_path( target, "fail/mismatch.zzm" ).spew_utf8("// changed\n");
+write_installed( target, "mismatch-app", "1.0.0", [ mismatch ] );
+
+let missing := module_entry( target, "fail/missing.zzm", "// present\n" );
+module_path( target, "fail/missing.zzm" ).remove();
+write_installed( target, "missing-app", "1.0.0", [ missing ] );
+
+write_installed(
+	target,
+	"ambiguous-a",
+	"1.0.0",
+	[ module_entry( target, "fail/ambiguous.zzm", "// a\n" ) ],
+);
+write_installed(
+	target,
+	"ambiguous-b",
+	"1.0.0",
+	[ module_entry( target, "fail/ambiguous.zzm", "// b\n" ) ],
+);
+
+let zoo := new Zuzuzoo(
+	lib_dir: target{lib_dir},
+	bin_dir: target{bin_dir},
+	meta_dir: target{meta_dir},
+	home: Path.tempdir().to_String(),
+);
+let result := zoo.verify(
+	[
+		"fail/mismatch",
+		"fail/missing",
+		"fail/ambiguous",
+		"fail/not-installed",
+	],
+);
+
+is( result{ok}, false, "verify fails with recorded problems" );
+is( result{hash_mismatches}.length(), 1, "hash mismatch is reported" );
+is( result{missing_files}.length(), 1, "missing file is reported" );
+is( result{errors}.length(), 2, "target errors are reported" );
+is( result{errors}[0]{code}, "ambiguous-target", "ambiguous module is an error" );
+is( result{errors}[1]{code}, "missing-target", "missing module is an error" );
+
+done_testing();

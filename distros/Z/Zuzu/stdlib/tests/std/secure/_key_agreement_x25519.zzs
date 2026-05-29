@@ -1,0 +1,360 @@
+from std/secure import Cipher, KeyAgreement, KeyDerivation, Secure, SigningKey;
+from std/string/base64 import decode, encode;
+from test/more import *;
+
+let algorithm := "x25519";
+let caps := Secure.capabilities();
+
+async function async_exception_message ( Function f ) {
+	try {
+		await {
+			f();
+		};
+		return null;
+	}
+	catch ( Exception e ) {
+		return e{message};
+	}
+}
+
+if ( Secure.has( "key_agreement", algorithm ) ) {
+	is(
+		Secure.require( "key_agreement", algorithm ),
+		true,
+		"require returns true for x25519",
+	);
+
+	if ( caps{host} == "browser" ) {
+		is(
+			caps{async_required}{key_agreement},
+			true,
+			"browser reports async-required key agreement support",
+		);
+		like(
+			exception( function () {
+				KeyAgreement.generate(algorithm);
+			} ),
+			/not available synchronously|generate_async/,
+			"browser rejects synchronous key agreement generation",
+		);
+
+		let alice := await {
+			KeyAgreement.generate_async(algorithm);
+		};
+		let bob := await {
+			KeyAgreement.generate_async(algorithm);
+		};
+		let alice_public := alice.public_key();
+		let bob_public := bob.public_key();
+
+		is( typeof alice, "KeyAgreement", "generate_async returns KeyAgreement" );
+		is( typeof alice_public, "PublicKey", "public_key returns PublicKey" );
+
+		let alice_private_raw := alice.export_private();
+		let alice_public_raw := alice_public.export();
+		let bob_private_raw := bob.export_private();
+		let bob_public_raw := bob_public.export();
+
+		is( length alice_private_raw, 32, "raw private key length" );
+		is( length alice_public_raw, 32, "raw public key length" );
+		is( length bob_private_raw, 32, "second raw private key length" );
+		is( length bob_public_raw, 32, "second raw public key length" );
+
+		let alice_imported := await {
+			KeyAgreement.import_private_async(
+				alice_private_raw,
+				{ algorithm: algorithm },
+			);
+		};
+		let alice_public_imported := await {
+			KeyAgreement.import_public_async(
+				alice_public_raw,
+				{ algorithm: algorithm },
+			);
+		};
+
+		is(
+			encode( alice_imported.export_private() ),
+			encode(alice_private_raw),
+			"raw private import round-trips",
+		);
+		is(
+			encode( alice_public_imported.export() ),
+			encode(alice_public_raw),
+			"raw public import round-trips",
+		);
+
+		like(
+			exception( function () {
+				alice.derive(bob_public);
+			} ),
+			/not available synchronously|derive_async/,
+			"browser rejects synchronous derive",
+		);
+		let alice_shared := await {
+			alice.derive_async(bob_public);
+		};
+		let bob_shared := await {
+			bob.derive_async(alice_public);
+		};
+		is(
+			typeof alice_shared,
+			"BinaryString",
+			"derive_async returns BinaryString",
+		);
+		is( length alice_shared, 32, "shared secret length" );
+		is(
+			encode(alice_shared),
+			encode(bob_shared),
+			"both sides derive the same shared secret",
+		);
+		is(
+			encode(
+				await {
+					alice_imported.derive_async(bob_public);
+				},
+			),
+			encode(alice_shared),
+			"imported private key derives the same secret",
+		);
+		is(
+			encode(
+				await {
+					bob.derive_async(alice_public_imported);
+				},
+			),
+			encode(alice_shared),
+			"imported public key derives the same secret",
+		);
+
+		let salt := decode("AAECAwQFBgcICQoLDA0ODw==");
+		let info := to_binary("zuzu phase 9 x25519 aes key");
+		let alice_key := await {
+			KeyDerivation.hkdf_sha256_async(
+				alice_shared,
+				32,
+				salt,
+				info,
+			);
+		};
+		let bob_key := await {
+			KeyDerivation.hkdf_sha256_async(
+				bob_shared,
+				32,
+				salt,
+				info,
+			);
+		};
+		let plaintext := to_binary("phase 9 shared secret payload");
+		let aad := to_binary("phase 9 aad");
+		let sealed := await {
+			Cipher.encrypt_async( plaintext, alice_key, { aad: aad } );
+		};
+		is(
+			encode(
+				await {
+					Cipher.decrypt_async( sealed, bob_key, { aad: aad } );
+				},
+			),
+			encode(plaintext),
+			"HKDF output from shared secret can decrypt AES-GCM envelope",
+		);
+
+		like(
+			await {
+				async_exception_message( function () {
+					KeyAgreement.import_private_async(
+						decode("AA=="),
+						{ algorithm: algorithm },
+					);
+				} );
+			},
+			/32-byte raw private key/,
+			"short private key is rejected",
+		);
+		like(
+			await {
+				async_exception_message( function () {
+					KeyAgreement.import_public_async(
+						decode("AA=="),
+						{ algorithm: algorithm },
+					);
+				} );
+			},
+			/32-byte raw public key/,
+			"short public key is rejected",
+		);
+		like(
+			await {
+				async_exception_message( function () {
+					KeyAgreement.generate_async("ecdh-p256");
+				} );
+			},
+			/only supports x25519|not available/,
+			"unsupported key agreement algorithm is rejected",
+		);
+	}
+	else {
+		is(
+			caps{async_required}{key_agreement},
+			false,
+			"CLI runtimes report synchronous key agreement support",
+		);
+
+		let alice := KeyAgreement.generate(algorithm);
+		let bob := KeyAgreement.generate();
+		let alice_public := alice.public_key();
+		let bob_public := bob.public_key();
+
+		is( typeof alice, "KeyAgreement", "generate returns KeyAgreement" );
+		is( typeof alice_public, "PublicKey", "public_key returns PublicKey" );
+
+		let alice_private_raw := alice.export_private();
+		let alice_public_raw := alice_public.export();
+		let bob_private_raw := bob.export_private();
+		let bob_public_raw := bob_public.export();
+
+		is( length alice_private_raw, 32, "raw private key length" );
+		is( length alice_public_raw, 32, "raw public key length" );
+		is( length bob_private_raw, 32, "second raw private key length" );
+		is( length bob_public_raw, 32, "second raw public key length" );
+
+		let alice_imported := KeyAgreement.import_private(
+			alice_private_raw,
+			{ algorithm: algorithm },
+		);
+		let alice_public_imported := KeyAgreement.import_public(
+			alice_public_raw,
+			{ algorithm: algorithm },
+		);
+
+		is(
+			encode( alice_imported.export_private() ),
+			encode(alice_private_raw),
+			"raw private import round-trips",
+		);
+		is(
+			encode( alice_public_imported.export() ),
+			encode(alice_public_raw),
+			"raw public import round-trips",
+		);
+
+		let alice_shared := alice.derive(bob_public);
+		let bob_shared := bob.derive(alice_public);
+		is( typeof alice_shared, "BinaryString", "derive returns BinaryString" );
+		is( length alice_shared, 32, "shared secret length" );
+		is(
+			encode(alice_shared),
+			encode(bob_shared),
+			"both sides derive the same shared secret",
+		);
+		is(
+			encode( alice_imported.derive(bob_public) ),
+			encode(alice_shared),
+			"imported private key derives the same secret",
+		);
+		is(
+			encode( bob.derive(alice_public_imported) ),
+			encode(alice_shared),
+			"imported public key derives the same secret",
+		);
+
+		let async_alice := await {
+			KeyAgreement.generate_async(algorithm);
+		};
+		let async_bob := await {
+			KeyAgreement.import_private_async(
+				bob_private_raw,
+				{ algorithm: algorithm },
+			);
+		};
+		let async_secret := await {
+			async_alice.derive_async( async_bob.public_key() );
+		};
+		let async_reverse := await {
+			async_bob.derive_async( async_alice.public_key() );
+		};
+		is(
+			encode(async_secret),
+			encode(async_reverse),
+			"async derive works in both directions",
+		);
+
+		let salt := decode("AAECAwQFBgcICQoLDA0ODw==");
+		let info := to_binary("zuzu phase 9 x25519 aes key");
+		let alice_key := KeyDerivation.hkdf_sha256(
+			alice_shared,
+			32,
+			salt,
+			info,
+		);
+		let bob_key := KeyDerivation.hkdf_sha256(
+			bob_shared,
+			32,
+			salt,
+			info,
+		);
+		let plaintext := to_binary("phase 9 shared secret payload");
+		let aad := to_binary("phase 9 aad");
+		let sealed := Cipher.encrypt( plaintext, alice_key, { aad: aad } );
+		is(
+			encode( Cipher.decrypt( sealed, bob_key, { aad: aad } ) ),
+			encode(plaintext),
+			"HKDF output from shared secret can decrypt AES-GCM envelope",
+		);
+
+		like(
+			exception( function () {
+				KeyAgreement.import_private(
+					decode("AA=="),
+					{ algorithm: algorithm },
+				);
+			} ),
+			/32-byte raw private key/,
+			"short private key is rejected",
+		);
+		like(
+			exception( function () {
+				KeyAgreement.import_public(
+					decode("AA=="),
+					{ algorithm: algorithm },
+				);
+			} ),
+			/32-byte raw public key/,
+			"short public key is rejected",
+		);
+		like(
+			exception( function () {
+				KeyAgreement.generate("ecdh-p256");
+			} ),
+			/only supports x25519/,
+			"unsupported key agreement algorithm is rejected",
+		);
+
+		if ( Secure.has( "signing", "ed25519" ) ) {
+			like(
+				exception( function () {
+					alice.derive( SigningKey.generate().public_key() );
+				} ),
+				/x25519 public key/,
+				"derive rejects signing public keys",
+			);
+			like(
+				exception( function () {
+					alice_public.verify( plaintext, decode("AA==") );
+				} ),
+				/signing public key/,
+				"x25519 public keys reject signing verification",
+			);
+		}
+	}
+}
+else {
+	is(
+		Secure.has( "key_agreement", algorithm ),
+		false,
+		"x25519 key agreement is not advertised",
+	);
+}
+
+done_testing();

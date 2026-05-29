@@ -1,0 +1,14 @@
+from test/more import *;
+
+class Counter {
+	static method ten () {
+		return 10;
+	}
+	static method add_two (x) {
+		return x + 2;
+	}
+}
+
+is( Counter.ten(), 10, "static method without args works" );
+is( Counter.add_two(3), 5, "static method with args works" );
+done_testing();

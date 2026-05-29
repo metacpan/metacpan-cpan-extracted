@@ -1,0 +1,60 @@
+from std/template/z import ZTemplate;
+from test/more import *;
+
+let template := new ZTemplate( string: """<!doctype html>
+<html>
+<head>
+ <title>{{ metadata/title }}</title>
+ {{# metadata/author }}
+  <meta name="author" content="{{.}}" />
+ {{/ metadata/author }}
+</head>
+<body>
+{{# /items/* }}
+ {{# is-first() }}
+  <table>
+ {{/ is-first() }}
+ <tr>
+  <td>
+   {{ name }}
+  </td>
+  <td>
+   {{ format("%1.2f", price * quantity) }}
+  </td>
+ </tr>
+ {{# is-last() }}
+  <tr class="total">
+   <th>
+    Number of items: {{ count() }}
+   </th>
+   <th>
+    {{ format("%1.2f", sum(../*/value(number(price) * number(quantity)))) }}
+   </th>
+  </tr>
+  </table>
+ {{/ is-last() }}
+{{/}}
+</body>
+</html>""" );
+
+let data := {
+	metadata: {
+		title: "Basket",
+		author: "Me",
+	},
+	items: [
+		{ name: "Foo", price: 1.99, quantity: 3 },
+		{ name: "Bar", price: 2.99, quantity: 2 },
+	],
+};
+
+let got := template.process( data );
+
+ok( got ~ /<title>Basket<\/title>/, "renders title tag" );
+ok( got ~ /<meta name=\"author\" content=\"Me\" \/>/, "renders author tag" );
+ok( got ~ /<table>/, "renders table tag" );
+ok( got ~ /<tr class=\"total\">/, "renders total row" );
+ok( got ~ /Number of items: 2/, "renders count in total row" );
+ok( got ~ /11\.95/, "renders computed total value" );
+
+done_testing();
