@@ -2,7 +2,7 @@ package Lemonldap::NG::Manager::Conf::Zero;
 
 use strict;
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.23.0';
 
 sub zeroConf {
     my ( $domain, $sessionDir, $persistentSessionDir, $notificationDir,
@@ -133,9 +133,7 @@ sub zeroConf {
             'Directory'     => $persistentSessionDir,
             'LockDirectory' => "$persistentSessionDir/lock"
         },
-        'reloadUrls' => {
-            "localhost" => "http://reload.$domain/reload"
-        },
+        'reloadUrls'            => {},
         'sessionDataToRemember' => {},
         'notification'          => 1,
         'groups'                => {},

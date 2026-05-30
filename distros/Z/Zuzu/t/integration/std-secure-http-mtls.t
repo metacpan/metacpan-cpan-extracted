@@ -21,7 +21,7 @@ eval {
 my $repo_root = File::Spec->rel2abs( File::Spec->curdir );
 my $fixture_dir = File::Spec->catdir(
 	$repo_root,
-	qw( t fixtures secure phase12-mtls ),
+	qw( stdlib test-fixtures secure phase12-mtls ),
 );
 my $ca_pem = _slurp( File::Spec->catfile( $fixture_dir, 'ca.pem' ) );
 my $client_pem = _slurp( File::Spec->catfile( $fixture_dir, 'client.pem' ) );

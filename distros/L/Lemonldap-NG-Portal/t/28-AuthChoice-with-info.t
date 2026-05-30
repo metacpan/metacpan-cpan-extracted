@@ -9,8 +9,7 @@ require 't/test-lib.pm';
 my $res;
 my $maintests = 5;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel       => 'error',
             useSafeJail    => 1,
@@ -27,8 +26,7 @@ my $client = LLNG::Manager::Test->new(
     }
 );
 
-my $postString = buildForm(
-    {
+my $postString = buildForm( {
         user     => 'dwho',
         password => 'dwho',
         test     => 'Demo',

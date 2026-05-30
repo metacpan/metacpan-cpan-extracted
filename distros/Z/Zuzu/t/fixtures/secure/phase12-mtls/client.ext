@@ -1,4 +1,0 @@
-basicConstraints = CA:FALSE
-keyUsage = digitalSignature
-extendedKeyUsage = clientAuth
-

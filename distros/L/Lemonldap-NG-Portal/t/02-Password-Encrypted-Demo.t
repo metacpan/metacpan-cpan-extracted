@@ -17,6 +17,7 @@ my $client = LLNG::Manager::Test->new( {
             restSessionServer      => 1,
             restExportSecretKeys   => 1,
             key                    => 'secret',
+            whatToTrace            => "uid",
             macros                 => { '_decrypted' => 'decrypt($_password)' }
         }
     }

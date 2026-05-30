@@ -1,0 +1,15 @@
+0.001     2026-05-30 01:01:52Z
+
+ - Initial release
+ - IO::Async / Net::Async::HTTP client wrapping WWW::Crawl4AI
+ - Future-returning low-level endpoints: crawl_once, md, job_submit, job_status, health
+ - Async, orchestrated strategy chain: markdown / crawl return Future<WWW::Crawl4AI::Result>
+ - crawl_job_and_wait flow helper: submit /crawl/job, poll to COMPLETED via delay_future
+ - Retry on transport + retryable API status via delay_future, sharing the
+   client's retry policy (max_attempts, retry_backoff, retry_statuses)
+ - Async callbacks: external_callback strategy may return a plain hashref or a Future
+ - deep_crawl: breadth-first crawl following each page's links, with each depth
+   level's frontier crawled concurrently (concurrency knob); shares the link
+   accessors and Result objects with WWW::Crawl4AI
+ - Future-returning single-URL action endpoints mirroring WWW::Crawl4AI:
+   screenshot / pdf (raw bytes), html, execute_js (page + js_result), llm, token

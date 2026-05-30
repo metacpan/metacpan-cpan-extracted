@@ -1,6 +1,6 @@
 package Lemonldap::NG::Manager::Api::Menu::Cat;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.23.0';
 
 package Lemonldap::NG::Manager::Api;
 
@@ -21,7 +21,7 @@ sub getMenuCatByConfKey {
         "[API] Menu Category $confKey configuration requested");
 
     # Get latest configuration
-    my $conf = $self->_confAcc->getConf;
+    my $conf = $self->_confAcc->getConf( { noCache => 1 } );
 
     my $menuCat = $self->_getMenuCatByConfKey( $conf, $confKey );
 
@@ -53,7 +53,7 @@ sub findMenuCatByConfKey {
         "[API] Find Menu Categories by confKey regexp $pattern requested");
 
     # Get latest configuration
-    my $conf = $self->_confAcc->getConf;
+    my $conf = $self->_confAcc->getConf( { noCache => 1 } );
 
     my @menuCats =
       map { $_ =~ $pattern ? $self->_getMenuCatByConfKey( $conf, $_ ) : () }
@@ -101,7 +101,7 @@ sub addMenuCat {
 
     my $res = $self->_pushMenuCat( $conf, $add->{confKey}, $add, 1 );
 
-    return $self->sendError( $req, $res->{msg}, $res->{code} || 400 )
+    return $self->sendError( $req, $res->{msg}, 400 )
       unless ( $res->{res} eq 'ok' );
 
     return $self->sendJSONresponse(
@@ -136,7 +136,7 @@ sub updateMenuCat {
 
     my $res = $self->_pushMenuCat( $conf, $confKey, $update, 0 );
 
-    return $self->sendError( $req, $res->{msg}, $res->{code} || 400 )
+    return $self->sendError( $req, $res->{msg}, 400 )
       unless ( $res->{res} eq 'ok' );
 
     return $self->sendJSONresponse( $req, undef, code => 204 );
@@ -182,7 +182,7 @@ sub replaceMenuCat {
       unless ( defined $self->_getMenuCatByConfKey( $conf, $confKey ) );
 
     my $res = $self->_pushMenuCat( $conf, $confKey, $replace, 1 );
-    return $self->sendError( $req, $res->{msg}, $res->{code} || 400 )
+    return $self->sendError( $req, $res->{msg}, 400 )
       unless ( $res->{res} eq 'ok' );
 
     return $self->sendJSONresponse( $req, undef, code => 204 );
@@ -209,13 +209,9 @@ sub deleteMenuCat {
     delete $conf->{applicationList}->{$confKey};
 
     # Save configuration
-    if ( $self->_saveApplyConf($conf) ) {
-        return $self->sendJSONresponse( $req, undef, code => 204 );
-    }
-    else {
-        return $self->sendError( $req,
-            "Failed to save configuration, please try again later", 503 );
-    }
+    $self->_saveApplyConf($conf);
+
+    return $self->sendJSONresponse( $req, undef, code => 204 );
 }
 
 sub _getMenuCatByConfKey {
@@ -251,30 +247,24 @@ sub _pushMenuCat {
 
     # Test new configuration
     my $parser = Lemonldap::NG::Manager::Conf::Parser->new( {
-            refConf => $self->_confAcc->getConf,
+            refConf => $self->_confAcc->getConf( { noCache => 1 } ),
             newConf => $conf,
             req     => {},
         }
     );
     unless ( $parser->testNewConf( $self->p ) ) {
         return {
-            res => 'ko',
-            msg => "Configuration error: "
+            res  => 'ko',
+            code => 400,
+            msg  => "Configuration error: "
               . join( ". ", map { $_->{message} } @{ $parser->errors } ),
         };
     }
 
     # Save configuration
-    if ( $self->_saveApplyConf($conf) ) {
-        return { res => 'ok' };
-    }
-    else {
-        return {
-            res  => 'ko',
-            msg  => "Failed to save configuration, please try again later",
-            code => 503,
-        };
-    }
+    $self->_saveApplyConf($conf);
+
+    return { res => 'ok' };
 }
 
 1;

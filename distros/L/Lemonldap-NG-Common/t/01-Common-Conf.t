@@ -291,4 +291,90 @@ subtest "local param behavior" => sub {
     );
 };
 
+subtest "Backend failure: lastCfg falls back to cached cfgNum" => sub {
+
+    Time::Fake->reset;
+    t::TestConfBackend::testReset();
+
+    $Lemonldap::NG::Common::Conf::msg = "";
+    ok(
+        my $c =
+          Lemonldap::NG::Common::Conf->new( confFile => 't/lemonldap-ng.ini' ),
+        "Valid configuration"
+    );
+    $c->{refLocalStorage}->Clear();
+
+    # Initial load populates the cache
+    getConfTest(
+        $c, { local => 1 },
+        msg   => qr/Get configuration 1/,
+        keys  => { cfgNum  => 1 },
+        stats => { lastCfg => 1, load => 1 }
+    );
+
+    # Backend goes down
+    t::TestConfBackend::fail_lastCfg();
+
+    # Force a remote check: lastCfg fails, but the fallback returns the
+    # cached cfgNum so getConf serves the cached conf without calling load()
+    getConfTest(
+        $c, { local => 0 },
+        msg   => qr/falling back to cached configuration/,
+        keys  => { cfgNum  => 1 },
+        stats => { lastCfg => 1, load => 0 }
+    );
+
+    # Backend recovers, new conf appears
+    t::TestConfBackend::recover();
+    push @t::TestConfBackend::conf, { cfgNum => 2, newvalue => "new" };
+
+    getConfTest(
+        $c, { local => 0 },
+        msg   => qr/Get configuration 2/,
+        keys  => { cfgNum  => 2, newvalue => "new" },
+        stats => { lastCfg => 1, load     => 1 }
+    );
+};
+
+subtest "noCache disables the fallback (Manager / write paths)" => sub {
+
+    Time::Fake->reset;
+    t::TestConfBackend::testReset();
+
+    $Lemonldap::NG::Common::Conf::msg = "";
+    ok(
+        my $c =
+          Lemonldap::NG::Common::Conf->new( confFile => 't/lemonldap-ng.ini' ),
+        "Valid configuration"
+    );
+    $c->{refLocalStorage}->Clear();
+
+    # Populate the cache
+    getConfTest(
+        $c, { local => 1 },
+        msg  => qr/Get configuration 1/,
+        keys => { cfgNum => 1 }
+    );
+
+    # Backend down: with noCache, no fallback, lastCfg must return 0
+    t::TestConfBackend::fail_lastCfg();
+    $Lemonldap::NG::Common::Conf::msg = "";
+    is( $c->lastCfg( { noCache => 1 } ),
+        0, "lastCfg with noCache returns 0 when backend is down" );
+    unlike(
+        $Lemonldap::NG::Common::Conf::msg,
+        qr/falling back to cached configuration/,
+        "No fallback message when noCache is set"
+    );
+
+    # Same path through getConf({ noCache => 1 }) — Manager-style call
+    $Lemonldap::NG::Common::Conf::msg = "";
+    my $conf = $c->getConf( { noCache => 1 } );
+    unlike(
+        $Lemonldap::NG::Common::Conf::msg,
+        qr/falling back to cached configuration/,
+        "getConf with noCache propagates the noCache flag to lastCfg"
+    );
+};
+
 done_testing;

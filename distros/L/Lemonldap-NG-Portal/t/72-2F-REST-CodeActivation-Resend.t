@@ -17,7 +17,9 @@ LWP::Protocol::PSGI->register(
         if ( $req->path_info eq '/init' ) {
             my $json = from_json( $req->content );
             is( $json->{user}, "dwho", ' Init req gives dwho' );
-            is( $json->{uid},  "dwho", ' Found uid attribute' );
+            is( $json->{uid},  "dwho", ' Found custom attribute' );
+            is( $json->{ucuid}, "DWHO",
+                ' Found custom attribute from perl expression' );
             my $code = $json->{code};
             ok( $code, "Received code from LLNG" );
             $receivedCode = $code;
@@ -122,15 +124,14 @@ sub init_login {
     return $res;
 }
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel             => 'error',
             rest2fActivation     => 1,
             rest2fCodeActivation => '\d{6}',
             rest2fResendInterval => 30,
             rest2fInitUrl        => 'http://auth.example.com/init',
-            rest2fInitArgs       => { uid => 'uid' },
+            rest2fInitArgs       => { uid => 'uid', ucuid => 'uc($uid)' },
             rest2fVerifyUrl      => 'http://auth.example.com/vrfy',
             loginHistoryEnabled  => 1,
             authentication       => 'Demo',

@@ -1,0 +1,2 @@
+# This scenario triggers a ban after only 3 failures (instead of global setting)
+3

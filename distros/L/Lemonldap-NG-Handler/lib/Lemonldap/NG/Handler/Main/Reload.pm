@@ -1,6 +1,6 @@
 package Lemonldap::NG::Handler::Main::Reload;
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.23.0';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -20,8 +20,14 @@ our @_onReload;
 
 sub onReload {
     my ( $class, $obj, $sub ) = @_;
-    weaken($obj);
-    push @_onReload, [ $obj, $sub ];
+    unless ( ref($obj) and $sub ) {
+        $class->logger->error(
+            'onReload called with invalid arguments, skipping');
+        return;
+    }
+    my $entry = [ $obj, $sub ];
+    weaken( $entry->[0] );
+    push @_onReload, $entry;
 }
 
 # CONFIGURATION UPDATE
@@ -78,6 +84,12 @@ sub checkConf {
         }
         $class->configReload($conf);
         foreach (@_onReload) {
+            unless ( ref($_) eq 'ARRAY' ) {
+                $class->logger->error(
+                    "Corrupted entry in _onReload: expected ARRAY ref, got "
+                      . ( defined $_ ? "'$_'" : 'undef' ) );
+                next;
+            }
             my ( $obj, $sub ) = @$_;
             if ($obj) {
                 $class->logger->debug(
@@ -261,7 +273,8 @@ sub defaultValuesInit {
             $class->tsv->{type}->{$vhost} =
               $conf->{vhostOptions}->{$vhost}->{vhostType};
             $class->tsv->{authnLevel}->{$vhost} =
-              $conf->{vhostOptions}->{$vhost}->{vhostAuthnLevel};
+                 $conf->{vhostOptions}->{$vhost}->{vhostAuthnLevel}
+              || $conf->{defaultAuthnLevel};
             $class->tsv->{serviceTokenTTL}->{$vhost} =
               $conf->{vhostOptions}->{$vhost}->{vhostServiceTokenTTL};
             $class->tsv->{accessToTrace}->{$vhost} =
@@ -673,7 +686,8 @@ sub substitute {
 sub buildSub {
     my ( $class, $val ) = @_;
     my $res =
-      $class->tsv->{jail}->jail_reval("sub{my (\$r,\$s)=\@_; local *_;return($val)}");
+      $class->tsv->{jail}
+      ->jail_reval("sub{my (\$r,\$s)=\@_; local *_;return($val)}");
     unless ($res) {
         $class->logger->error( $class->tsv->{jail}->error );
     }

@@ -11,7 +11,7 @@ use Lemonldap::NG::Common::UserAgent;
 use URI;
 use Crypt::URandom;
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.23.0';
 
 # PROPERTIES
 
@@ -82,7 +82,17 @@ sub loadApp {
 
     foreach ( keys %{ $self->conf->{casAppMetaDataOptions} } ) {
 
+        $self->logger->debug("Processing CAS application: $_");
+
         my $valid = 1;
+
+        # Check if CAS application is activated
+        unless ( $self->conf->{casAppMetaDataOptions}->{$_}
+            ->{casAppMetaDataOptionsActivation} // 1 )
+        {
+            $self->logger->debug("Processing $_: CAS application deactivated");
+            next;
+        }
 
         # Load access rule
         my $rule =
@@ -96,10 +106,13 @@ sub loadApp {
         }
 
         # Required authentication level rule
-        my $levelrule = $self->conf->{casAppMetaDataOptions}->{$_}
-          ->{casAppMetaDataOptionsAuthnLevel} || 0;
+        my $levelrule =
+          $self->conf->{casAppMetaDataOptions}->{$_}
+          ->{casAppMetaDataOptionsAuthnLevel}
+          || $self->conf->{defaultAuthnLevel}
+          || 0;
         $levelrule = $self->p->buildRule( $levelrule,
-            "required authentication level" . " rule for App $_" );
+            "Required authentication level rule for App $_" );
         unless ($levelrule) {
             $valid = 0;
         }
@@ -142,14 +155,8 @@ sub loadApp {
 sub sendSoapResponse {
     my ( $self, $req, $s ) = @_;
     $self->logger->debug("Send response: $s");
-    return [
-        200,
-        [
-            'Content-Length' => length($s),
-            'Content-Type'   => 'application/soap+xml',
-        ],
-        [$s]
-    ];
+    return $self->p->sendTextResponse( $req, $s,
+        type => 'application/soap+xml' );
 }
 
 # Try to recover the CAS session corresponding to id and return session data
@@ -181,7 +188,7 @@ sub getCasSession {
 
     if ( $casSession->error ) {
         if ($id) {
-            $self->userLogger->notice("CAS session $id isn't yet available");
+            $self->userLogger->notice("CAS session $id not found");
         }
         else {
             $self->logger->error("Unable to create new CAS session");
@@ -193,11 +200,34 @@ sub getCasSession {
     return $casSession;
 }
 
+# Try to recover the SSO-CAS session corresponding to the ticket and return session data
+# If id is set to undef, return a new session
+sub getSSOSessionIdByTicket {
+    my ( $self, $ticket ) = @_;
+
+    my $moduleOptions;
+    if ( $self->conf->{casStorage} ) {
+        $moduleOptions = $self->conf->{casStorageOptions} || {};
+        $moduleOptions->{backend} = $self->conf->{casStorage};
+    }
+    else {
+        $moduleOptions = $self->conf->{globalStorageOptions} || {};
+        $moduleOptions->{backend} = $self->conf->{globalStorage};
+    }
+    my $module = "Lemonldap::NG::Common::Apache::Session";
+
+    my $cas_sessions =
+        $module->searchOn( $moduleOptions, "auth_cas_ticket", $ticket );
+
+    my (undef, $cas_session) = %$cas_sessions;
+    return $cas_session && $cas_session->{_cas_id};   
+}
+
 # Return an error for CAS VALIDATE request
 sub returnCasValidateError {
     my ( $self, $req ) = @_;
 
-    return [ 200, [ 'Content-Length' => 4 ], ["no\n\n"] ];
+    return $self->p->sendBinaryResponse( $req, "no\n\n" );
 }
 
 # Return success for CAS VALIDATE request
@@ -327,7 +357,7 @@ sub updateCasSecondarySessions {
             # Get session
             $self->logger->debug("Retrieve CAS session $cas_session");
 
-            my $casSession = $self->getCasSession($cas_session, undef, 0);
+            my $casSession = $self->getCasSession( $cas_session, undef, 0 );
 
             # Delete session
             if ($casSession) {
@@ -371,7 +401,7 @@ sub deleteCasSecondarySessions {
             # Get session
             $self->logger->debug("Retrieve CAS session $cas_session");
 
-            my $casSession = $self->getCasSession($cas_session, undef, 0);
+            my $casSession = $self->getCasSession( $cas_session, undef, 0 );
 
             # Delete session
             $result = $self->deleteCasSession($casSession);
@@ -603,7 +633,7 @@ sub getCasApp {
     my $longestCandidate = "";
     my $hostnameConfKey;
 
-    for my $app ( keys %{ $self->casAppList } ) {
+    for my $app ( sort keys %{ $self->casAppList } ) {
 
         for my $appservice (
             split(
@@ -791,7 +821,7 @@ sub getAttributesFromServiceValidateResponse {
         {
 
             # There should be only on session
-            my $pgtIdSession = $self->getCasSession($id, undef, 0) or next;
+            my $pgtIdSession = $self->getCasSession( $id, undef, 0 ) or next;
             $pgtId = $pgtIdSession->data->{pgtId};
             $pgtIdSession->remove;
         }

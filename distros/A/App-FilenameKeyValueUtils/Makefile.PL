@@ -18,7 +18,9 @@ my %WriteMakefileArgs = (
     "script/normalize-keyvalue-filename",
     "script/parse-keyvalue-filename",
     "script/rename-add-keyvalue-filenames",
-    "script/rename-remove-keyvalue-filenames"
+    "script/rename-modify-keyvalue-filenames",
+    "script/rename-remove-keyvalue-filenames",
+    "script/rename-replace-keyvalue-filenames"
   ],
   "LICENSE" => "perl",
   "NAME" => "App::FilenameKeyValueUtils",
@@ -30,7 +32,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::str" => "0.914",
     "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
     "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
-    "Filename::KeyValue" => "0.004",
+    "Filename::KeyValue" => "0.007",
     "Perinci::CmdLine::Any" => "0.154",
     "Perinci::CmdLine::Lite" => "1.924",
     "Sah::Schema::filename" => 0,
@@ -43,7 +45,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -59,7 +61,7 @@ my %FallbackPrereqs = (
   "Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix" => 0,
   "Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix" => 0,
   "File::Spec" => 0,
-  "Filename::KeyValue" => "0.004",
+  "Filename::KeyValue" => "0.007",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Perinci::CmdLine::Any" => "0.154",

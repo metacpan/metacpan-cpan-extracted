@@ -3,7 +3,7 @@ use Lemonldap::NG::Common::JWT qw(getAccessTokenSessionId);
 
 use strict;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.23.0';
 
 sub retrieveSession {
     my ( $class, $req, $id ) = @_;
@@ -40,20 +40,18 @@ sub retrieveSession {
     );
 
     unless ( $session->error ) {
-
         my $data = { %{ $session->data }, $class->_getTokenAttributes($req) };
 
         $class->data($data);
-
         $class->logger->debug("Get session $offlineId from Handler::Main::Run");
 
         # Verify that session is valid
         $class->logger->error(
-"_utime is not defined. This should not happen. Check if it is well transmitted to handler"
+'_utime is not defined. This should not happen. Check if it is well transmitted to handler'
         ) unless $session->data->{_utime};
 
         my $ttl = $class->tsv->{timeout} - time + $session->data->{_utime};
-        $class->logger->debug( "Session TTL = " . $ttl );
+        $class->logger->debug("Session TTL = $ttl");
 
         if ( time - $session->data->{_utime} > $class->tsv->{timeout} ) {
             $class->logger->info("Session $id expired");
@@ -75,7 +73,6 @@ sub retrieveSession {
 
 sub fetchId {
     my ( $class, $req ) = @_;
-
     my $access_token;
     my $authorization = $req->{env}->{HTTP_AUTHORIZATION};
 
@@ -103,8 +100,10 @@ sub fetchId {
     # Store scope and rpid for future session attributes
     if ( $infos->{rp} ) {
         my $rp = $infos->{rp};
+        $req->data->{_accessToken}     = $access_token;
         $req->data->{_scope}           = $infos->{scope};
         $req->data->{_oidc_grant_type} = $infos->{grant_type};
+        $req->data->{_audiences}       = $infos->{aud};
         $req->data->{_clientConfKey}   = $rp;
         if (    $class->tsv->{oauth2Options}->{$rp}
             and $class->tsv->{oauth2Options}->{$rp}->{clientId} )
@@ -179,6 +178,14 @@ sub getOIDCInfos {
     return $infos;
 }
 
+# Hide AccesToken to the protected application
+sub hideCookie {
+    my ( $class, $req ) = @_;
+    $class->logger->debug('Removing Authorization header');
+    $class->unset_header_in( $req, 'Authorization' );
+    $class->Lemonldap::NG::Handler::Main::hideCookie($req);
+}
+
 ## The OAuth2 handler does not redirect, we simply return a 401 with relevant
 # information as described in https://tools.ietf.org/html/rfc6750#section-3
 sub goToPortal {
@@ -196,7 +203,10 @@ sub goToPortal {
 sub _getTokenAttributes {
     my ( $class, $req ) = @_;
     my %res;
-    for my $attr (qw/_scope _clientConfKey _clientId _oidc_grant_type/) {
+    for my $attr (
+        qw/_scope _clientConfKey _clientId _oidc_grant_type _accessToken _audiences/
+      )
+    {
         if ( $req->data->{$attr} ) {
             $res{$attr} = $req->data->{$attr};
         }

@@ -4,7 +4,7 @@ require 5.010;
 use strict;
 use feature 'say';
 package Stats::LikeR;
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 require XSLoader;
 use Devel::Confess 'color';
 use warnings FATAL => 'all';
@@ -12,32 +12,10 @@ use autodie ':default';
 use Exporter 'import';
 use Scalar::Util 'looks_like_number';
 XSLoader::load('Stats::LikeR', $VERSION);
-our @EXPORT_OK = qw(aov chisq_test cor cor_test cov fisher_test glm hist kruskal_test ks_test lm matrix mean median min max oneway_test p_adjust power_t_test quantile rbinom read_table rnorm runif sample scale sd seq shapiro_test sum summary t_test var var_test wilcox_test write_table);
+our @EXPORT_OK = qw(add_data aov chisq_test cor cor_test cov dnorm fisher_test glm group_by hist kruskal_test ks_test ljoin lm matrix max mean median min mode oneway_test p_adjust power_t_test quantile rbinom read_table rnorm runif sample scale sd seq shapiro_test sum summary t_test var var_test wilcox_test write_table);
 our @EXPORT = @EXPORT_OK;
 
 require XSLoader;
-
-# Wrapper to mimic R's structure
-sub chisq_test {
-	my ($data) = @_;
-
-	die 'Input must be an array reference' unless ref($data) eq 'ARRAY';
-
-	# The XS function handles the heavy lifting
-	my $result = _chisq_c($data);
-
-	# Format the output to look like R's htest object
-	return {
-	  'statistic' => { 'X-squared' => $result->{statistic} },
-	  'parameter' => { 'df' => $result->{df} },
-	  'p.value'   => $result->{p_value},
-	  'method'    => $result->{method},
-	  'data.name' => 'Perl ArrayRef',
-	  'observed'  => $data,
-	  'expected'  => $result->{expected}
-	};
-}
-
 
 sub summary {
 	my ($data, %args);
@@ -59,23 +37,18 @@ sub summary {
 	  my @list = @_;
 	  $data = \@list;
 	}
-
 	# Normalize nrow -> nrows, default to 10
 	$args{nrows} //= delete($args{nrow}) // 10;
-
 	my $ref_type = ref $data;
 	if (($ref_type ne 'ARRAY') && ($ref_type ne 'HASH')) {
 		die "$current_sub' data must either be a hash or an array, not \"$ref_type\"";
 	}
-	
 	my $single_arr = 0;
 	if (($ref_type eq 'ARRAY') && (ref $data->[0] eq '')) {
 		$single_arr = 1;
 	}
-	
 	my @header = ('# values', 'Min.', '1st Qu.', 'Median', 'Mean', '3rd Qu.', 'Max.');
 	my @out;
-	
 	if ($single_arr == 1) {
 		push @out, '-' x 75;
 		my $header = sprintf('%9s ' x scalar @header, @header);
@@ -127,12 +100,7 @@ sub summary {
 			}
 			my @numeric = grep {looks_like_number($_)} @{ $data->{$key} };
 			my $q = quantile(\@numeric, probs => [0.25, 0.75]);
-			my $print_key;
-			if ($key =~ m/^(.{0,9})/) { # take the first 9 characters of the key
-				$print_key = $1;
-			} else {
-				die "\"$key\" failed regex";
-			}
+			my $print_key = substr($key, 0, 9);
 			if ((length $print_key) < 9) { # make sure that short keys line up correctly
 				$print_key .= ' ' x (9 - length $print_key);
 			}
@@ -276,7 +244,7 @@ sub read_table {
 			my $row_name = $line_hash{$args{'row.names'}};
 			foreach my $col (@header) {
 				next if $col eq $args{'row.names'};
-				$data{$col}{$row_name} = $line_hash{$col};
+				$data{$row_name}{$col} = $line_hash{$col};
 			}
 		}
 	});
@@ -486,6 +454,51 @@ There B<are> other modules on CPAN that can do B<PARTS> of this, but this works 
 
 =head1 Functions/Subroutines
 
+=head2 add_data
+
+Add data to a hash
+
+ $data = { 'Jack Smith' => { age => 30 } };
+ $n = { 
+     'Jack Smith' => { dept => 'Engineering' },             # Update existing (Hash)
+     'Jane Doe'   => { age => 25, dept => 'Sales' },        # Add new (Hash)
+     'Bob Brown'  => [ 'age', 40, 'dept', 'IT' ],           # Add new (Array)
+     'Invalid'    => 'Not a reference'                      # Edge case safety
+ };
+ add_data($data, $n); # will add data to 'Jack Smith', as well as new keys for Jane and Bob.
+
+this is the equivalent of adding new rows, as well as C<ljoin>, which is described below.
+
+where the resulting hash-of-hash looks like:
+
+     {
+     1st   {
+         a   "A",
+         b   "B"
+     },
+     2nd   {
+         a   "C",
+         b   "D"
+     }
+ }
+
+=head3 no pivot key/row name
+
+with no pivot key, each array index becomes a hash key, which is less useful, but necessary for completeness.  The same C<@aoh> above becomes:
+
+ {
+     0   {
+         a   "A",
+         b   "B",
+         r   "1st" (dualvar: 1)
+     },
+     1   {
+         a   "C",
+         b   "D",
+         r   "2nd" (dualvar: 2)
+     }
+ }
+
 =head2 aov
 
 Warning: assumes normal distribution
@@ -633,6 +646,22 @@ or
 
  cov($array1, $array2, 'kendall')
 
+=head2 dnorm
+
+gives the density of the normal distribution, with the specified mean and standard deviation.
+
+In other words, the predicted height of the value C<x>, given a mean, standard deviation, and whether or not to use a log value.
+
+returns a single scalar/number if a single value is given, otherwise returns an array reference.
+
+Usage:
+
+ dnorm(4) # assumes a mean of 0 and standard deviation of 1
+
+but default mean, standard deviation, and log can be passed as parameters:
+
+ $x = dnorm(0, mean => 0, sd => 2, 'log' => 0);
+
 =head2 fisher_test
 
 =head3 array reference entry
@@ -701,6 +730,67 @@ In addition to the C<gaussian> default, it fully supports logistic regression us
 
  my $glm_bin = glm(formula => 'am ~ wt + hp', data => \%mtcars, family => 'binomial');
 
+=head2 group_by
+
+Take a hash of arrays, hash of hashes, or array of hashes, and group a column by another column.
+
+ my $aoh_data = [
+     { 'Gender' => 'Male',   'Testosterone, total (nmol/L)' => 20.5 },
+     { 'Gender' => 'Female', 'Testosterone, total (nmol/L)' => 1.8 },
+     { 'Gender' => 'Male',   'Testosterone, total (nmol/L)' => 18.2 },
+     { 'Gender' => 'Female' } # Intentional missing target value
+ ];
+
+as well as
+
+ $hoh_data = {
+     'Patient_A' => { 'Gender' => 'Male',   'Testosterone, total (nmol/L)' => 20.5 },
+     'Patient_B' => { 'Gender' => 'Female', 'Testosterone, total (nmol/L)' => 1.8 },
+     'Patient_C' => { 'Gender' => 'Male',   'Testosterone, total (nmol/L)' => 18.2 },
+     'Patient_D' => { 'Gender' => 'Female' }, # Intentional missing target value
+     'Patient_E' => { 'Gender' => 'Female', 'Testosterone, total (nmol/L)' => undef } # Explicit undef
+     };
+
+and
+
+ my $hoa_data = {
+     'Gender'                       => ['Male', 'Female', 'Male', 'Female'],
+     'Testosterone, total (nmol/L)' => [22.1,   2.5,      19.4,   undef   ]
+ };
+
+then run the function thus:
+
+ group_by( $hoa_data, 'Testosterone, total (nmol/L)', 'Gender');
+
+The output can be thought of like a hash, with the first string broken down by the second.
+
+all become the hash of arrays:
+
+ {
+     Female   [
+         [0] 1.8
+     ],
+     Male     [
+         [0] 18.2,
+         [1] 20.5
+     ]
+ }
+
+returns an empty array of hashes if neither target nor group keys are found.
+
+=head3 Filtering
+
+Data can be further broken down with filter/subs like in C<read_table>:
+
+ my $testosterone = group_by($d, # group testosterone by "Gender"
+     'Testosterone, total (nmol/L)',
+     'Gender',
+     { 'Race/Hispanic origin w/ NH Asian' => sub { $_ eq $n } },
+     { 'Testosterone, total (nmol/L)' => sub { $_ ne 'NA' } } # filter
+ );
+
+where each filter filters on the columns, e.g. second hash keys.
+
 =head2 hist
 
 Computes the histogram of the given data values, operating in single $O(N)$ pass performance. It returns the bin counts, computed breaks, midpoints, and density. 
@@ -761,6 +851,38 @@ Also, a single array can be tested against a normal distribution:
  $ks = ks_test($ksx, 'pnorm');
 
 The p-value precision is about 1e-8, which I want to improve, but am not sure how.
+
+=head2 ljoin
+
+Consider a hash: C<$h{$row}{$col}>, and another hash C<$i{$row}{$col}>.
+C<ljoin> will add information for C<$col> in C<%i> for each C<$row> to C<%h>, where C<$row> exists in both C<%h> and C<%i>
+
+For example,
+
+ {
+ "Jack Smith"   {
+     age   30
+ }
+ }
+
+and a second hash,
+    {
+        "Jack Smith"   {
+            dept   "Engineering"
+        },
+        "Jane Doe"     {
+            age   25
+        }
+    }
+
+in this case, running C<ljoin(\%h, \%i)> will modify \%h to result:
+
+ {
+ "Jack Smith"   {
+     age    30,
+     dept   "Engineering"
+ }
+ }
 
 =head2 lm
 
@@ -833,6 +955,14 @@ or
  min(@arr, 4, 5)
 
 as of version 0.02, min will die if any undefined values are provided
+
+=head2 mode
+
+Takes either an array or an array reference, and returns an array of the most common scalars (numbers or strings)
+
+ @arr = mode([1,3,3,3]); # returns (3)
+ 
+ @arr = mode('a','a','c','c','z'); # returns ('a', 'c')
 
 =head2 oneway_test
 
@@ -1188,7 +1318,6 @@ As described by R: Performs an F test to compare the variances of two samples fr
  
  my @x = (2.9, 3.0, 2.5, 2.6, 3.2);
  my @y = (3.8, 2.7, 4.0, 2.4);
- my @z = (2.8, 3.4, 3.7, 2.2, 2.0);
  
  my $t0 = Time::HiRes::time();
  my $vt = var_test(\@x, \@y);
@@ -1230,9 +1359,19 @@ as of version 0.07, C<write_table> determines comma and tab-separated delimiters
 
 =head1 changes
 
-=head2 0.07
+=head2 0.08
 
-Changes to dist.ini to prevent C<LikeR.c: loadable library and perl binaries are mismatched> errors on other operating systems
+Speed improvement in C<summary> of hashes.
+
+Addition of C<add_data>, C<dnorm>, C<group_by>, C<ljoin>, and C<mode> functions
+
+Chi-squared function no longer has Perl wrapper, and all code is in XS, which should result in a minor speed increase with 1 less function call.
+
+Compiler changes for GNU source and inclusion of C<strings.h>, to ensure more CPAN testing works better.
+
+C<read_table> now returns hash-of-hash in {row}{column}
+
+=head2 0.07
 
 Addition of C<summary> function.
 

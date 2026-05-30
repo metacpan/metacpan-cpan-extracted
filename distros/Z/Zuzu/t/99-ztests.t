@@ -1,4 +1,5 @@
 use Test2::V0;
+use Test2::Require::AuthorTesting;
 
 use File::Find qw( find );
 use File::Spec;
@@ -17,7 +18,6 @@ my @ztests_dirs = (
 	File::Spec->catdir( $repo_root, 'stdlib', 'tests' ),
 );
 my @runtime_lib = (
-	File::Spec->catdir( $repo_root, 't', 'modules' ),
 	File::Spec->catdir( $repo_root, 'stdlib', 'test-modules' ),
 	File::Spec->catdir( $repo_root, 'stdlib', 'modules' ),
 );

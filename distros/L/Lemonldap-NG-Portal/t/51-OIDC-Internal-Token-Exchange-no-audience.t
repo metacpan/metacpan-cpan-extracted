@@ -153,7 +153,7 @@ my $baseConfig = {
                 oidcRPMetaDataOptionsIDTokenForceClaims  => 1,
                 oidcRPMetaDataOptionsAdditionalAudiences =>
                   "http://my.extra.audience/test urn:extra2",
-                oidcRPMetaDataOptionsRedirectUris => 'http://test/',
+                oidcRPMetaDataOptionsRedirectUris       => 'http://test/',
                 oidcRPMetaDataOptionsTokenXAuthorizedRP => 'rp',
             },
         },

@@ -1,4 +1,0 @@
-// Phase-0 design fixture placeholder for path operators.
-// Case: special-props-missing-null
-plan(1);
-ok(1, "phase0 placeholder: special-props-missing-null");

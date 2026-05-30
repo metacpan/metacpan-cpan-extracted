@@ -2,7 +2,7 @@ package Zuzu::Value::Equality;
 
 use utf8;
 
-our $VERSION = '0.001000';
+our $VERSION = '0.001002';
 
 use Exporter qw(import);
 

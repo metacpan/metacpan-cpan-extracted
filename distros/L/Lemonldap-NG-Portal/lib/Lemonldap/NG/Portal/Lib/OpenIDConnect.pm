@@ -5,7 +5,9 @@
 # Common OpenID Connect functions
 package Lemonldap::NG::Portal::Lib::OpenIDConnect;
 
+use Mouse;
 use strict;
+use Crypt::URandom;
 use Crypt::OpenSSL::RSA;
 use Crypt::OpenSSL::X509;
 use Crypt::JWT  qw(encode_jwt decode_jwt);
@@ -20,16 +22,13 @@ use MIME::Base64
   qw/encode_base64 decode_base64 encode_base64url decode_base64url/;
 use Scalar::Util qw/looks_like_number/;
 use URI;
-use URI::QueryParam;
-use Mouse;
-use Crypt::URandom;
-use URI;
 use URI::Escape qw(uri_unescape);
+use URI::QueryParam;
 
 use Lemonldap::NG::Portal::Main::Constants
   qw(PE_OK PE_REDIRECT PE_ERROR portalConsts);
 
-our $VERSION = '2.22.2';
+our $VERSION = '2.23.0';
 
 use constant oidcErrorLevel => {
     server_error     => 'error',
@@ -79,6 +78,23 @@ has state_ott => (
         $ott->timeout( $_[0]->conf->{oidcRPStateTimeout}
               || $_[0]->conf->{timeout} );
         return $ott;
+    }
+);
+
+# Calculate conditional plugins to be loaded if required by a dynamic RP
+has _rpConditionalPlugins => (
+    is      => 'ro',
+    lazy    => 1,
+    default => sub {
+        my %map;
+        for ( my $i = 0 ; $i < @Lemonldap::NG::Portal::Main::pList ; $i += 2 ) {
+            if ( $Lemonldap::NG::Portal::Main::pList[$i] =~
+                m{^or::oidcRPMetaDataOptions/\*/(.+)$} )
+            {
+                $map{$1} = $Lemonldap::NG::Portal::Main::pList[ $i + 1 ];
+            }
+        }
+        return \%map;
     }
 );
 
@@ -151,6 +167,12 @@ sub load_rp {
     my ( $self, %config ) = @_;
     my $rp = $config{confKey};
 
+    # Check if RP is activated
+    unless ( $config{options}->{oidcRPMetaDataOptionsActivation} // 1 ) {
+        $self->logger->debug("Processing $rp: RP Deactivated");
+        return 0;
+    }
+
     my $valid = 1;
 
     # Handle scopes
@@ -179,9 +201,12 @@ sub load_rp {
     }
 
     # Required authentication level rule
-    my $levelrule = $config{options}->{oidcRPMetaDataOptionsAuthnLevel} || 0;
+    my $levelrule =
+         $config{options}->{oidcRPMetaDataOptionsAuthnLevel}
+      || $self->conf->{defaultAuthnLevel}
+      || 0;
     $levelrule = $self->p->buildRule( $levelrule,
-        "required authentication level rule for RP $rp" );
+        "Required authentication level rule for RP $rp" );
     unless ($levelrule) {
         $valid = 0;
     }
@@ -231,7 +256,7 @@ sub load_rp {
             or $config{options}->{oidcRPMetaDataOptionsJwks} )
       )
     {
-        $self->logger->debug("Processing JWKS options for RP $rp...");
+        $self->logger->debug("Processing JWKS options for RP $rp");
         my $jwks = $config{options}->{oidcRPMetaDataOptionsJwks};
         $jwks = $self->decodeJSON($jwks) if $jwks and not ref $jwks;
 
@@ -314,6 +339,10 @@ sub load_rp {
         $self->rpScopeRules->{$rp} = $compiled_scope_rules;
         $self->rpRules->{$rp}      = $rule;
         $self->rpLevelRules->{$rp} = $levelrule;
+
+        # Ensure plugins required by this RP's options are loaded (#3587)
+        $self->_loadConditionalPlugins( $config{options} );
+
         return 1;
     }
     else {
@@ -322,6 +351,23 @@ sub load_rp {
             "Relying Party $rp has errors and will be ignored");
     }
     return 0;
+}
+
+# Plugins that must be loaded when specific RP options are enabled (#3587)
+# Built from @Lemonldap::NG::Portal::Main::pList entries matching
+# or::oidcRPMetaDataOptions/*/...
+sub _loadConditionalPlugins {
+    my ( $self, $options ) = @_;
+
+    while ( my ( $opt, $plugin ) = each %{ $self->_rpConditionalPlugins } ) {
+        next unless $options->{$opt};
+        my $full =
+          ( $plugin =~ /^::/ ) ? "Lemonldap::NG::Portal$plugin" : $plugin;
+        next if $self->p->loadedModules->{$full};
+        $self->logger->info(
+            "Dynamically loading plugin $plugin for RP option $opt");
+        $self->p->loadPlugin($plugin);
+    }
 }
 
 # Refresh JWKS data if needed
@@ -407,7 +453,6 @@ sub getCallbackUri {
     my ( $self, $req ) = @_;
 
     my $callback_get_param = $self->conf->{oidcRPCallbackGetParam};
-
     my $callback_uri =
       $self->p->buildUrl( $req->portal, { $callback_get_param => 1 } );
 
@@ -454,6 +499,31 @@ sub buildAuthorizationCodeAuthnRequest {
         ( defined $nonce      ? ( nonce      => $nonce )      : () ),
         ( defined $login_hint ? ( login_hint => $login_hint ) : () ),
     };
+
+    my %custom_request_params;
+    while (
+        my ( $key, $value ) = each %{
+            $self->opOptions->{$op}
+              ->{oidcOPMetaDataOptionsAuthEndpointExtraParams} || {}
+        }
+      )
+    {
+
+        # If the value looks like JSON, decode it
+        if ( $value =~ /^[\[\{]/ ) {
+            my $try_json = eval { from_json($value) };
+            if ( defined($try_json) ) {
+                $value = $try_json;
+            }
+            else {
+                $self->logger->debug(
+                        "Unable to decode value for request parameter $key"
+                      . " as JSON: $@" );
+            }
+        }
+        $custom_request_params{$key} = $value;
+    }
+
     my $authorize_request_params = {
         %$authorize_request_oauth2_params,
         ( $display ? ( display => $display ) : () ),
@@ -469,7 +539,8 @@ sub buildAuthorizationCodeAuthnRequest {
         (
             defined($acr_values)
               && length($acr_values) ? ( acr_values => $acr_values ) : ()
-        )
+        ),
+        %custom_request_params,
     };
 
     # Call oidcGenerateAuthenticationRequest
@@ -490,7 +561,7 @@ sub buildAuthorizationCodeAuthnRequest {
                 iss => $client_id,
                 aud => $aud,
                 jti => $self->generateNonce,
-                exp => time + 30,
+                exp => time + $self->conf->{shortTokenTTL},
                 iat => time,
                 %$authorize_request_params,
             },
@@ -510,10 +581,32 @@ sub buildAuthorizationCodeAuthnRequest {
                 'Unable to generate JWT, continue with unauthenticated query');
         }
     }
+
+    # Make sure request params all contain string data, since hooks or extra
+    # claims may have inserted a complex object
+
+    my %flat_authorize_request_params;
+    while ( my ( $key, $value ) = each %$authorize_request_params ) {
+        if ( ref($value) ) {
+            my $try_value  = eval { to_json($value) };
+            my $eval_error = $@;
+            if ( defined($try_value) ) {
+                $value = $try_value;
+            }
+            else {
+                $value = undef;
+                $self->logger->warn(
+                    "Could not add $key to Authorization request: $eval_error");
+            }
+        }
+
+        $flat_authorize_request_params{$key} = $value if defined($value);
+    }
+
     my $authn_uri =
         $authorize_uri
       . ( $authorize_uri =~ /\?/ ? '&' : '?' )
-      . build_urlencoded(%$authorize_request_params);
+      . build_urlencoded(%flat_authorize_request_params);
 
     $self->logger->debug(
         "OpenIDConnect Authorization Code Flow Authn Request: $authn_uri");
@@ -541,6 +634,9 @@ sub isResponseModeAllowed {
 sub sendOidcResponse {
     my ( $self, $req, $flow, $response_mode, $redirect_uri, $response_params )
       = @_;
+
+    # RFC 9207: Add iss parameter to prevent mix-up attacks
+    $response_params->{iss} = $self->get_issuer($req);
 
     $response_mode //= $self->getDefaultResponseModeForFlow($flow);
 
@@ -798,7 +894,7 @@ sub getAccessTokenFromTokenEndpoint {
                     sub => $client_id,
                     aud => $access_token_uri,
                     jti => $self->generateNonce,
-                    exp => $time + 30,
+                    exp => $time + $self->conf->{shortTokenTTL},
                     iat => $time,
                 },
                 $alg, $op
@@ -1039,9 +1135,8 @@ sub refreshAccessToken {
     my ( $self, $req, $op, $session ) = @_;
 
     # Handle unauthenticated OIDC calls
-    my $data       = $session ? $session->data : $req->userData;
-    my $session_id = $session ? $session->id   : $req->id;
-
+    my $data          = $session ? $session->data : $req->userData;
+    my $session_id    = $session ? $session->id   : $req->id;
     my $refresh_token = $data->{_oidc_refresh_token};
 
     if ($refresh_token) {
@@ -1114,15 +1209,15 @@ sub getUserInfo {
     }
 
     $self->logger->debug(
-        "Request User Info on $userinfo_uri with access token $access_token");
+        "Request UserInfo on $userinfo_uri with access token $access_token");
 
     my $response = $self->ua->get( $userinfo_uri,
         "Authorization" => "Bearer $access_token" );
 
     if ( $response->is_error ) {
-        $self->logger->error( "Bad userinfo response: " . $response->message );
+        $self->logger->error( "Bad UserInfo response: " . $response->message );
         $self->logger->debug(
-            "Userinfo response received: " . $response->as_string );
+            "UserInfo response received: " . $response->as_string );
         return 0;
     }
 
@@ -1137,6 +1232,12 @@ sub getUserInfo {
     elsif ( $content_type =~ /jwt/ ) {
         my $jwt = $self->decryptJwt($userinfo_content);
         return $self->decodeJWT( $jwt, $op );
+    }
+    else {
+        $self->logger->error('Bad UserInfo Content-Type');
+        $self->logger->debug( "UserInfo response received with"
+              . " invalid Content-Type ($content_type)" );
+        return 0;
     }
 }
 
@@ -1157,10 +1258,6 @@ sub decodeJSON {
 }
 
 sub decodeTokenResponse {
-    return decodeJSON(@_);
-}
-
-sub decodeClientMetadata {
     return decodeJSON(@_);
 }
 
@@ -1205,19 +1302,16 @@ sub getAuthorizationCode {
 
 sub newAccessToken {
     my ( $self, $req, $rp, $scope, $sessionInfo, $info ) = @_;
-
     my $client_id = $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsClientID};
-
-    my $at_info = {
-
+    my $at_info   = {
         scope     => $scope,
         rp        => $rp,
         client_id => $client_id,
         iat       => time,
         nbf       => time,
+        aud       => $self->getAudiences($rp),
         %{$info},
     };
-
     my $ttl =
          $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsAccessTokenExpiration}
       || $self->conf->{oidcServiceAccessTokenExpiration};
@@ -1278,7 +1372,7 @@ sub makeJWT {
 
     my $access_token_payload = {
         iss => $self->get_issuer($req),     # Issuer Identifier
-        exp => $exp,                        # expiration
+        exp => $exp,                        # Expiration
         aud => $self->getAudiences($rp),    # Audience
         jti => $id,                         # Access Token session ID
         sid => $self->getSidFromSession( $rp, $sessionInfo ),    # Session id
@@ -1424,8 +1518,7 @@ sub updateToken {
     );
 
     if ( $oidcSession->error ) {
-        $self->userLogger->warn(
-            "OpenIDConnect session $id isn't yet available");
+        $self->userLogger->warn("OpenIDConnect session $id not found");
         return undef;
     }
 
@@ -1439,6 +1532,8 @@ sub getOpenIDConnectSession {
     my $self = shift;
     my $id   = shift;
     my $type = shift;
+
+    my $type_log = $type || "session";
 
     # Check old method signature ($id, $type, $ttl, $info)
     my %opts =
@@ -1477,11 +1572,11 @@ sub getOpenIDConnectSession {
 
     if ( $oidcSession->error ) {
         if ($id) {
-            $self->userLogger->warn(
-                "OpenIDConnect session $id isn't yet available");
+            $self->userLogger->warn("OpenIDConnect $type_log $id not found");
         }
         else {
-            $self->logger->error("Unable to create new OpenIDConnect session");
+            $self->logger->error(
+                "Unable to create new OpenIDConnect $type_log");
             $self->logger->error( $oidcSession->error );
         }
         return undef;
@@ -1504,7 +1599,7 @@ sub getOpenIDConnectSession {
         if (
             time > ( $oidcSession->{data}->{_utime} + $self->conf->{timeout} ) )
         {
-            $self->logger->notice("Session $id has expired");
+            $self->logger->notice("OpenIDConnect $type_log $id has expired");
             return undef;
         }
     }
@@ -1512,7 +1607,7 @@ sub getOpenIDConnectSession {
     # Make sure the token is still valid, we already compensated for
     # different TTLs when storing _utime
     if ( time > ( $oidcSession->{data}->{_utime} + $self->conf->{timeout} ) ) {
-        $self->logger->notice("Session $id has expired");
+        $self->logger->notice("OpenIDConnect $type_log $id has expired");
         return undef;
     }
 
@@ -1864,16 +1959,16 @@ sub sendOIDCError {
 # @param error_message Error message
 # @return GI response
 sub returnBearerError {
-    my ( $self, $error_code, $error_message ) = @_;
+    my ( $self, $req, $error_code, $error_message ) = @_;
 
-    my $res = [
-        401,
-        [
+    my $res = $self->p->sendBinaryResponse(
+        $req, '',
+        code    => 401,
+        headers => [
             'WWW-Authenticate' =>
               "error=$error_code,error_description=$error_message"
-        ],
-        []
-    ];
+        ]
+    );
 
     $self->p->setCorsHeaderFromConfig($res);
 
@@ -1982,7 +2077,7 @@ sub getEndPointAuthenticationCredentials {
 
         # Unescape clientId and clientSecret to be compliant with RFC 6749
         # https://datatracker.ietf.org/doc/html/rfc6749
-        $client_id = uri_unescape($client_id);
+        $client_id     = uri_unescape($client_id);
         $client_secret = uri_unescape($client_secret);
 
         # Using multiple methods is an error
@@ -2796,6 +2891,15 @@ sub validatePKCEChallenge {
     my ( $self, $code_verifier, $code_challenge, $code_challenge_method ) = @_;
 
     unless ($code_challenge) {
+
+       # RFC 9700 section 2.1.1: Mitigate PKCE downgrade attacks
+       # Reject code_verifier if no code_challenge was sent during authorization
+        if ($code_verifier) {
+            $self->userLogger->error(
+                    "PKCE downgrade attack: code_verifier provided "
+                  . "but no code_challenge was sent during authorization" );
+            return 0;
+        }
         $self->logger->debug("PKCE was not requested by the RP");
         return 1;
     }
@@ -2867,6 +2971,9 @@ sub getAudiences {
 # It can be a session attribute, or per-RP macro
 sub getUserIDForRP {
     my ( $self, $req, $rp, $data ) = @_;
+
+    # Use pre-computed sub if available (stored in online refresh tokens)
+    return $data->{_oidc_sub} if $data->{_oidc_sub};
 
     my $user_id_attribute =
          $self->rpOptions->{$rp}->{oidcRPMetaDataOptionsUserIDAttr}

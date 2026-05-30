@@ -11,8 +11,8 @@ package Spreadsheet::Edit::IO;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1001.003'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2026-05-05'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1001.004'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2026-05-30'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # This module is derived from the old never-released Text:CSV::Spreadsheet
 
@@ -1073,6 +1073,7 @@ sub _convert_using_ssconvert($$$) {
 # INTERNAL USE ONLY: In array  context, returns (filepath, SHEETNAME or undef)
 sub sheetname_from_spec($) {
   my $spec = shift;
+  return undef if $spec eq ""; #caller will hopefully diag bogus path
   local $_;
   my $p = path($spec);
   my $parent = $p->parent;
@@ -1132,6 +1133,7 @@ sub _process_args($;@) {
   } else {
     $opts{inpath} = $leading_inpath // croak "No inpath was specified";
   }
+  croak "Input path is \"\"\n" if $opts{inpath} eq "";
   $opts{verbose}=1 if $opts{debug};
 
   # inpath or outpath may have "!sheetname" appended (or alternate syntaxes),

@@ -21,6 +21,12 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Class::Load" : "0",
+            "Moose" : "0",
+            "Mouse" : "0",
+            "Test::Exception" : "0"
+         },
          "requires" : {
             "Carp" : "0",
             "SUPER" : "1.20",
@@ -30,10 +36,6 @@
       },
       "test" : {
          "requires" : {
-            "Class::Load" : "0",
-            "Moose" : "0",
-            "Mouse" : "0",
-            "Test::Exception" : "0",
             "Test::More" : "0.88",
             "Test::Warnings" : "0"
          }
@@ -42,7 +44,7 @@
    "provides" : {
       "Test::MockModule" : {
          "file" : "lib/Test/MockModule.pm",
-         "version" : "v0.185.1"
+         "version" : "v0.185.2"
       }
    },
    "release_status" : "stable",
@@ -58,6 +60,6 @@
          "url" : "git://github.com/geofffranks/test-mockmodule.git"
       }
    },
-   "version" : "v0.185.1",
+   "version" : "v0.185.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

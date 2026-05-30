@@ -108,8 +108,7 @@ SKIP: {
 }';
     $notif->newNotification($xml);
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel                   => $logLevel,
                 useSafeJail                => 1,

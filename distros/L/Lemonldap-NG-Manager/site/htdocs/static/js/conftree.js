@@ -39,6 +39,13 @@ function templates(tpl,key) {
    {
       "_nodes" : [
          {
+            "default" : 1,
+            "get" : tpl+"s/"+key+"/"+"casAppMetaDataOptionsActivation",
+            "id" : tpl+"s/"+key+"/"+"casAppMetaDataOptionsActivation",
+            "title" : "casAppMetaDataOptionsActivation",
+            "type" : "bool"
+         },
+         {
             "get" : tpl+"s/"+key+"/"+"casAppMetaDataOptionsService",
             "id" : tpl+"s/"+key+"/"+"casAppMetaDataOptionsService",
             "title" : "casAppMetaDataOptionsService"
@@ -307,6 +314,13 @@ function templates(tpl,key) {
                },
                {
                   "default" : 0,
+                  "get" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsRequireIss",
+                  "id" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsRequireIss",
+                  "title" : "oidcOPMetaDataOptionsRequireIss",
+                  "type" : "bool"
+               },
+               {
+                  "default" : 0,
                   "get" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsStoreIDToken",
                   "id" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsStoreIDToken",
                   "title" : "oidcOPMetaDataOptionsStoreIDToken",
@@ -403,6 +417,12 @@ function templates(tpl,key) {
                   "get" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsAcrValues",
                   "id" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsAcrValues",
                   "title" : "oidcOPMetaDataOptionsAcrValues"
+               },
+               {
+                  "cnodes" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsAuthEndpointExtraParams",
+                  "id" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsAuthEndpointExtraParams",
+                  "title" : "oidcOPMetaDataOptionsAuthEndpointExtraParams",
+                  "type" : "keyTextContainer"
                },
                {
                   "get" : tpl+"s/"+key+"/"+"oidcOPMetaDataOptionsAuthnEndpointAuthMethod",
@@ -843,8 +863,22 @@ function templates(tpl,key) {
                   "default" : 0,
                   "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRequirePKCE",
                   "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsRequirePKCE",
+                  "select" : [
+                     {
+                        "k" : "0",
+                        "v" : "disabled"
+                     },
+                     {
+                        "k" : "1",
+                        "v" : "required"
+                     },
+                     {
+                        "k" : "2",
+                        "v" : "pkceOrSecret"
+                     }
+                  ],
                   "title" : "oidcRPMetaDataOptionsRequirePKCE",
-                  "type" : "bool"
+                  "type" : "select"
                },
                {
                   "default" : 0,
@@ -1096,62 +1130,127 @@ function templates(tpl,key) {
                      },
                      {
                         "k" : "none",
-                        "v" : "JWT/None"
+                        "v" : "None"
                      },
                      {
                         "k" : "HS256",
-                        "v" : "JWT/HS256"
+                        "v" : "HS256"
                      },
                      {
                         "k" : "HS384",
-                        "v" : "JWT/HS384"
+                        "v" : "HS384"
                      },
                      {
                         "k" : "HS512",
-                        "v" : "JWT/HS512"
+                        "v" : "HS512"
                      },
                      {
                         "k" : "RS256",
-                        "v" : "JWT/RS256"
+                        "v" : "RS256"
                      },
                      {
                         "k" : "RS384",
-                        "v" : "JWT/RS384"
+                        "v" : "RS384"
                      },
                      {
                         "k" : "RS512",
-                        "v" : "JWT/RS512"
+                        "v" : "RS512"
                      },
                      {
                         "k" : "PS256",
-                        "v" : "JWT/PS256"
+                        "v" : "PS256"
                      },
                      {
                         "k" : "PS384",
-                        "v" : "JWT/PS384"
+                        "v" : "PS384"
                      },
                      {
                         "k" : "PS512",
-                        "v" : "JWT/PS512"
+                        "v" : "PS512"
                      },
                      {
                         "k" : "ES256",
-                        "v" : "JWT/ES256"
+                        "v" : "ES256"
                      },
                      {
                         "k" : "ES384",
-                        "v" : "JWT/ES384"
+                        "v" : "ES384"
                      },
                      {
                         "k" : "ES512",
-                        "v" : "JWT/ES512"
+                        "v" : "ES512"
                      },
                      {
                         "k" : "EdDSA",
-                        "v" : "JWT/EdDSA"
+                        "v" : "EdDSA"
                      }
                   ],
                   "title" : "oidcRPMetaDataOptionsUserInfoSignAlg",
+                  "type" : "select"
+               },
+               {
+                  "default" : "",
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsIntrospectionSignAlg",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsIntrospectionSignAlg",
+                  "select" : [
+                     {
+                        "k" : "",
+                        "v" : "JSON"
+                     },
+                     {
+                        "k" : "HS256",
+                        "v" : "HS256"
+                     },
+                     {
+                        "k" : "HS384",
+                        "v" : "HS384"
+                     },
+                     {
+                        "k" : "HS512",
+                        "v" : "HS512"
+                     },
+                     {
+                        "k" : "RS256",
+                        "v" : "RS256"
+                     },
+                     {
+                        "k" : "RS384",
+                        "v" : "RS384"
+                     },
+                     {
+                        "k" : "RS512",
+                        "v" : "RS512"
+                     },
+                     {
+                        "k" : "PS256",
+                        "v" : "PS256"
+                     },
+                     {
+                        "k" : "PS384",
+                        "v" : "PS384"
+                     },
+                     {
+                        "k" : "PS512",
+                        "v" : "PS512"
+                     },
+                     {
+                        "k" : "ES256",
+                        "v" : "ES256"
+                     },
+                     {
+                        "k" : "ES384",
+                        "v" : "ES384"
+                     },
+                     {
+                        "k" : "ES512",
+                        "v" : "ES512"
+                     },
+                     {
+                        "k" : "EdDSA",
+                        "v" : "EdDSA"
+                     }
+                  ],
+                  "title" : "oidcRPMetaDataOptionsIntrospectionSignAlg",
                   "type" : "select"
                },
                {
@@ -1374,6 +1473,79 @@ function templates(tpl,key) {
                   "type" : "select"
                },
                {
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsIntrospectionEncKeyMgtAlg",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsIntrospectionEncKeyMgtAlg",
+                  "select" : [
+                     {
+                        "k" : "",
+                        "v" : "None"
+                     },
+                     {
+                        "k" : "RSA-OAEP",
+                        "v" : "RSA-OAEP"
+                     },
+                     {
+                        "k" : "RSA-OAEP-256",
+                        "v" : "RSA-OAEP-256"
+                     },
+                     {
+                        "k" : "RSA1_5",
+                        "v" : "RSA1_5"
+                     },
+                     {
+                        "k" : "ECDH-ES",
+                        "v" : "ECDH-ES"
+                     },
+                     {
+                        "k" : "ECDH-ES+A128KW",
+                        "v" : "ECDH-ES+A128KW"
+                     },
+                     {
+                        "k" : "ECDH-ES+A192KW",
+                        "v" : "ECDH-ES+A192KW"
+                     },
+                     {
+                        "k" : "ECDH-ES+A256KW",
+                        "v" : "ECDH-ES+A256KW"
+                     }
+                  ],
+                  "title" : "oidcRPMetaDataOptionsIntrospectionEncKeyMgtAlg",
+                  "type" : "select"
+               },
+               {
+                  "default" : "A256GCM",
+                  "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsIntrospectionEncContentEncAlg",
+                  "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsIntrospectionEncContentEncAlg",
+                  "select" : [
+                     {
+                        "k" : "A256CBC-HS512",
+                        "v" : "A256CBC-HS512"
+                     },
+                     {
+                        "k" : "A256GCM",
+                        "v" : "A256GCM"
+                     },
+                     {
+                        "k" : "A192CBC-HS384",
+                        "v" : "A192CBC-HS384"
+                     },
+                     {
+                        "k" : "A192GCM",
+                        "v" : "A192GCM"
+                     },
+                     {
+                        "k" : "A128CBC-HS256",
+                        "v" : "A128CBC-HS256"
+                     },
+                     {
+                        "k" : "A128GCM",
+                        "v" : "A128GCM"
+                     }
+                  ],
+                  "title" : "oidcRPMetaDataOptionsIntrospectionEncContentEncAlg",
+                  "type" : "select"
+               },
+               {
                   "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsLogoutEncKeyMgtAlg",
                   "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsLogoutEncKeyMgtAlg",
                   "select" : [
@@ -1561,6 +1733,13 @@ function templates(tpl,key) {
             "id" : "logout",
             "title" : "logout",
             "type" : "simpleInputContainer"
+         },
+         {
+            "default" : 1,
+            "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsActivation",
+            "id" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsActivation",
+            "title" : "oidcRPMetaDataOptionsActivation",
+            "type" : "bool"
          },
          {
             "get" : tpl+"s/"+key+"/"+"oidcRPMetaDataOptionsComment",
@@ -2067,6 +2246,12 @@ function templates(tpl,key) {
                   "type" : "select"
                },
                {
+                  "get" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsForceNameIDFormat",
+                  "id" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsForceNameIDFormat",
+                  "title" : "samlSPMetaDataOptionsForceNameIDFormat",
+                  "type" : "bool"
+               },
+               {
                   "get" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsNameIDSessionKey",
                   "id" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsNameIDSessionKey",
                   "title" : "samlSPMetaDataOptionsNameIDSessionKey"
@@ -2268,6 +2453,13 @@ function templates(tpl,key) {
             "id" : "samlSPMetaDataOptionsFederation",
             "title" : "samlSPMetaDataOptionsFederation",
             "type" : "simpleInputContainer"
+         },
+         {
+            "default" : 1,
+            "get" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsActivation",
+            "id" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsActivation",
+            "title" : "samlSPMetaDataOptionsActivation",
+            "type" : "bool"
          },
          {
             "get" : tpl+"s/"+key+"/"+"samlSPMetaDataOptionsURL",

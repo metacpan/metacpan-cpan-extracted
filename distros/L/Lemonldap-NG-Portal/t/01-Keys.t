@@ -250,6 +250,39 @@ subtest "Explicit key only" => sub {
     );
 };
 
+subtest "Config placeholder with key" => sub {
+    my $client = LLNG::Manager::Test->new( {
+            ini => {
+                configStorage => {
+                    do {
+                        no warnings 'once';
+                        %{ $LLNG::Manager::Test::defaultIni->{configStorage} },;
+                    },
+                    configPlaceHolderModules => 'SECRET=t::Secrets',
+                },
+                keys => {
+                    "my-key" => {
+                        keyId      => "%SECRET:key.id%",
+                        keyPrivate => saml_key_idp_private_sig(),
+                        keyPublic  => saml_key_idp_public_sig(),
+                    }
+                },
+                customPlugins => "t::TestKeys"
+            }
+        }
+    );
+    my $instance = $client->p->loadedModules->{'t::TestKeys'};
+
+    is_deeply(
+        $instance->get_public_key("my-key"),
+        {
+            'external_id' => 'secret-key.id',
+            'public'      => saml_key_idp_public_sig(),
+        },
+        "Config placeholder is used"
+    );
+};
+
 clean_sessions();
 
 done_testing();

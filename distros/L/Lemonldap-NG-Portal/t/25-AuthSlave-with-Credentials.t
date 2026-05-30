@@ -2,7 +2,8 @@ use warnings;
 use Test::More;
 use strict;
 use JSON;
-use Lemonldap::NG::Portal::Main::Constants qw(PE_FORBIDDENIP PE_USERNOTFOUND PE_MALFORMEDUSER);
+use Lemonldap::NG::Portal::Main::Constants
+  qw(PE_FORBIDDENIP PE_USERNOTFOUND PE_MALFORMEDUSER);
 
 require 't/test-lib.pm';
 

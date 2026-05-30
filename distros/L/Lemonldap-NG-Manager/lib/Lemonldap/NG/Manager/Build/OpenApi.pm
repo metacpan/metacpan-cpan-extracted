@@ -2,7 +2,7 @@
 
 package Lemonldap::NG::Manager::Build::OpenApi;
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.23.0';
 
 use Lemonldap::NG::Manager::Attributes;
 use Lemonldap::NG::Manager::Api::Common;
@@ -225,9 +225,6 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
-                        },
-                        '503' => {
-                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 }
@@ -370,9 +367,6 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
-                        },
-                        '503' => {
-                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 },
@@ -380,7 +374,21 @@ sub openapi {
                     'tags'        => ['samlsp'],
                     'summary'     => 'Updates a SAML Service.',
                     'operationId' => 'updateSamlSp',
-                    'parameters'  => [ {
+                    'description' => <<'EOF'
+This method merges the supplied JSON object with existing configuration. You
+can delete a subkey from a top-level key by setting its value to `null`.  For
+example:
+```
+{
+  "macros": {
+    "addme": "newval",
+    "deleteme": null
+  }
+}
+```
+EOF
+                    ,
+                    'parameters' => [ {
                             'name'        => 'confKey',
                             'in'          => 'path',
                             'description' =>
@@ -413,9 +421,6 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
-                        },
-                        '503' => {
-                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 },
@@ -443,9 +448,6 @@ sub openapi {
                         },
                         '404' => {
                             '$ref' => '#/components/responses/NotFound'
-                        },
-                        '503' => {
-                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 }
@@ -475,9 +477,6 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
-                        },
-                        '503' => {
-                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 }
@@ -587,6 +586,20 @@ sub openapi {
                 'patch' => {
                     'tags'        => ['oidcrp'],
                     'summary'     => 'Updates an OpenID Connect Relying Party',
+                    'description' => <<'EOF'
+This method merges the supplied JSON object with existing configuration. You
+can delete a subkey from a top-level key by setting its value to `null`.  For
+example:
+```
+{
+  "macros": {
+    "addme": "newval",
+    "deleteme": null
+  }
+}
+```
+EOF
+                    ,
                     'operationId' => 'updateOidcRp',
                     'parameters'  => [ {
                             'name'        => 'confKey',
@@ -621,9 +634,6 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
-                        },
-                        '503' => {
-                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 },
@@ -664,9 +674,6 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
-                        },
-                        '503' => {
-                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 },
@@ -694,9 +701,6 @@ sub openapi {
                         },
                         '404' => {
                             '$ref' => '#/components/responses/NotFound'
-                        },
-                        '503' => {
-                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 }
@@ -726,9 +730,6 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
-                        },
-                        '503' => {
-                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 }
@@ -869,9 +870,6 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
-                        },
-                        '503' => {
-                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 },
@@ -879,7 +877,21 @@ sub openapi {
                     'tags'        => ['casapp'],
                     'summary'     => 'Updates a CAS Application.',
                     'operationId' => 'updateCasApp',
-                    'parameters'  => [ {
+                    'description' => <<'EOF'
+This method merges the supplied JSON object with existing configuration. You
+can delete a subkey from a top-level key by setting its value to `null`.  For
+example:
+```
+{
+  "macros": {
+    "addme": "newval",
+    "deleteme": null
+  }
+}
+```
+EOF
+                    ,
+                    'parameters' => [ {
                             'name'        => 'confKey',
                             'in'          => 'path',
                             'description' =>
@@ -912,9 +924,6 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
-                        },
-                        '503' => {
-                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 },
@@ -942,9 +951,6 @@ sub openapi {
                         },
                         '404' => {
                             '$ref' => '#/components/responses/NotFound'
-                        },
-                        '503' => {
-                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 }
@@ -1248,9 +1254,6 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
-                        },
-                        '503' => {
-                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 }
@@ -1361,11 +1364,7 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
-                        },
-                        '503' => {
-                            '$ref' => '#/components/responses/Unavailable'
                         }
-
                     }
                 },
                 'patch' => {
@@ -1405,9 +1404,6 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
-                        },
-                        '503' => {
-                            '$ref' => '#/components/responses/Unavailable'
                         }
                     }
                 },
@@ -1435,11 +1431,7 @@ sub openapi {
                         },
                         '404' => {
                             '$ref' => '#/components/responses/NotFound'
-                        },
-                        '503' => {
-                            '$ref' => '#/components/responses/Unavailable'
                         }
-
                     }
                 }
             },
@@ -1512,11 +1504,7 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
-                        },
-                        '503' => {
-                            '$ref' => '#/components/responses/Unavailable'
                         }
-
                     }
                 }
             },
@@ -1658,11 +1646,7 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
-                        },
-                        '503' => {
-                            '$ref' => '#/components/responses/Unavailable'
                         }
-
                     }
                 },
                 'patch' => {
@@ -1712,11 +1696,7 @@ sub openapi {
                         },
                         '409' => {
                             '$ref' => '#/components/responses/Conflict'
-                        },
-                        '503' => {
-                            '$ref' => '#/components/responses/Unavailable'
                         }
-
                     }
                 },
                 'delete' => {
@@ -1753,11 +1733,7 @@ sub openapi {
                         },
                         '404' => {
                             '$ref' => '#/components/responses/NotFound'
-                        },
-                        '503' => {
-                            '$ref' => '#/components/responses/Unavailable'
                         }
-
                     }
                 }
             }
@@ -2446,17 +2422,6 @@ sub openapi {
                 'NotFound' => {
                     'description' => 'The specified resource was not found',
                     'content'     => {
-                        'application/json' => {
-                            'schema' => {
-                                '$ref' => '#/components/schemas/Error'
-                            }
-                        }
-                    }
-                },
-                'Unavailable' => {
-                    'description' =>
-'The new configuration could not be saved, this is usually a lock-related temporary condition',
-                    'content' => {
                         'application/json' => {
                             'schema' => {
                                 '$ref' => '#/components/schemas/Error'

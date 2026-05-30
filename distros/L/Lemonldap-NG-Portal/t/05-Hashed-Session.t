@@ -13,8 +13,7 @@ BEGIN {
 foreach my $hashedSessionStore ( 0 .. 1 ) {
 
     subtest(
-        ( $hashedSessionStore ? 'Hashed session' : 'Unhashed session' ) =>
-          sub {
+        ( $hashedSessionStore ? 'Hashed session' : 'Unhashed session' ) => sub {
             my $res;
             my $client = LLNG::Manager::Test->new( {
                     ini => { hashedSessionStore => $hashedSessionStore },
@@ -76,7 +75,8 @@ foreach my $hashedSessionStore ( 0 .. 1 ) {
             ok( ( $as->data->{aa} == 1 && $as->data->{bb} == 2 ),
                 'Data is updated' );
 
-            ok( ($as->data->{_updateTime} - $now) > 500, '_updateTime updated');
+            ok( ( $as->data->{_updateTime} - $now ) > 500,
+                '_updateTime updated' );
 
             $as = undef;
 

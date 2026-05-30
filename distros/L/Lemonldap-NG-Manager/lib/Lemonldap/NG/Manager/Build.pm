@@ -104,7 +104,8 @@ sub run {
 ';
 
     my $reverseScanResult =
-      $self->reverseScan( Lemonldap::NG::Manager::Build::Tree::tree(), '', {} );
+      $self->reverseScan( Lemonldap::NG::Manager::Build::Tree::tree(),
+        '', {}, $mainTree );
 
     # To build confTree.js, each special node is scanned from
     # Lemonldap::NG::Manager::Build::CTrees
@@ -835,19 +836,27 @@ sub scanLeaf1 {
 }
 
 sub reverseScan {
-    my ( $self, $tree, $path, $res ) = @_;
+    my ( $self, $tree, $path, $res, $cTrees ) = @_;
     foreach my $elem (@$tree) {
         $elem =~ s/^\*//;
         if ( ref($elem) eq 'HASH' ) {
             foreach (qw(nodes nodes_cond group)) {
-                $self->reverseScan( $elem->{$_}, "$path$elem->{title}/", $res )
+                $self->reverseScan( $elem->{$_}, "$path$elem->{title}/", $res,
+                    $cTrees )
                   if ( $elem->{$_} );
             }
         }
         else {
-            my $tmp = $path;
-            $tmp =~ s#/$##;
-            $res->{$elem} = $tmp;
+            my ($singular) = $elem =~ /^(.*)s$/;
+            if ( $singular and $cTrees->{$singular} ) {
+                $self->reverseScan( $cTrees->{$singular},
+                    "${path}${elem}/__confKey__/", $res, $cTrees );
+            }
+            else {
+                my $tmp = $path;
+                $tmp =~ s#/$##;
+                $res->{$elem} = $tmp;
+            }
         }
     }
     return $res;

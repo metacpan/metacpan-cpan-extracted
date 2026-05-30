@@ -1,0 +1,120 @@
+#!/usr/bin/env perl
+# PODNAME: www-crawl4ai-test-url
+# ABSTRACT: run the full WWW::Crawl4AI strategy chain against one URL
+use strict;
+use warnings;
+use feature 'say';
+use Getopt::Long;
+use WWW::Crawl4AI;
+
+my %opt = ( show => 400 );
+GetOptions(
+  'base-url=s'         => \$opt{base_url},
+  'cloakbrowser-url=s' => \$opt{cloakbrowser_url},
+  'proxy-url=s'        => \$opt{proxy_url},
+  'min-markdown=i'     => \$opt{min_markdown},
+  'show=i'             => \$opt{show},
+  'json'               => \$opt{json},
+  'help'               => \$opt{help},
+) or die "bad options\n";
+
+my $url = shift @ARGV;
+
+if ( $opt{help} || !$url ) {
+  say "usage: www-crawl4ai-test-url [options] URL";
+  say "  --base-url URL --cloakbrowser-url URL --proxy-url URL";
+  say "  --min-markdown N   thin-content threshold (chars)";
+  say "  --show N           print first N chars of markdown (default 400)";
+  say "  --json             print the result (with attempts) as JSON";
+  exit( $opt{help} ? 0 : 1 );
+}
+
+my $crawler = WWW::Crawl4AI->new(
+  ( $opt{base_url}         ? ( base_url         => $opt{base_url} )         : () ),
+  ( $opt{cloakbrowser_url} ? ( cloakbrowser_url => $opt{cloakbrowser_url} ) : () ),
+  ( $opt{proxy_url}        ? ( proxy_url        => $opt{proxy_url} )        : () ),
+  ( defined $opt{min_markdown} ? ( min_markdown => $opt{min_markdown} ) : () ),
+);
+
+my $result = $crawler->markdown($url);
+
+if ( $opt{json} ) {
+  require JSON::MaybeXS;
+  say JSON::MaybeXS->new( canonical => 1, convert_blessed => 1, pretty => 1 )->encode($result);
+  exit( $result->ok ? 0 : 2 );
+}
+
+say "URL:        $url";
+say "ok:         " . ( $result->ok ? 'yes' : 'no' );
+say "backend:    " . ( $result->backend    // '-' );
+say "cost_class: " . ( $result->cost_class // '-' );
+say "final_url:  " . ( $result->final_url  // '-' );
+say "status:     " . ( $result->status     // '-' );
+say "why_failed: " . ( $result->why_failed // '-' ) unless $result->ok;
+say "";
+say "attempts:";
+for my $a ( @{ $result->attempts } ) {
+  my $h = $a->to_hash;
+  printf "  - %-22s %-8s ok=%s md=%-6d %s\n",
+    $h->{backend}, $h->{cost_class}, ( ${ $h->{ok} } ? 1 : 0 ),
+    $h->{markdown_len}, ( $h->{why_failed} // ( $h->{error} ? "error: $h->{error}" : '' ) );
+}
+
+if ( $result->ok && $opt{show} ) {
+  say "";
+  say "--- markdown (first $opt{show} chars) ---";
+  say substr( $result->markdown // '', 0, $opt{show} );
+}
+
+exit( $result->ok ? 0 : 2 );
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+www-crawl4ai-test-url - run the full WWW::Crawl4AI strategy chain against one URL
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+  www-crawl4ai-test-url https://example.com
+  www-crawl4ai-test-url --cloakbrowser-url http://localhost:9222 --json https://example.com
+
+=head1 DESCRIPTION
+
+Runs the full L<WWW::Crawl4AI> strategy chain against a single URL and prints
+the winning backend plus the complete attempt history, so you can see exactly
+where a site started cooperating (or why it never did). With C<--json> it dumps
+the L<WWW::Crawl4AI::Result> — attempts included — as JSON. Exit code: 0 on
+success, 2 if every strategy failed.
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-www-crawl4ai/issues>.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

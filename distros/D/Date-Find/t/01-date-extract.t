@@ -21,6 +21,10 @@ my @tests_find = (
                   },
       value    => '06.11.2022'
     },
+    { name => 'No date found',
+      expected => {},
+      value    => 'random.pdf'
+    },
 );
 
 my @tests_guess = (

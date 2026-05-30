@@ -7,13 +7,13 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SESSIONNOTGRANTED
 );
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 with 'Lemonldap::NG::Portal::Lib::CrowdSec';
 
 # Entrypoint
-use constant beforeAuth => 'checkIpStatus';
+use constant aroundSub => { controlUrl => 'checkCrowdsec' };
 
 has rule => ( is => 'rw', default => sub { 0 } );
 
@@ -32,17 +32,18 @@ sub init {
     return 1;
 }
 
-sub checkIpStatus {
-    my ( $self, $req ) = @_;
+sub checkCrowdsec {
+    my ( $self, $sub, $req ) = @_;
     if ( !$self->rule->( $req, $req->sessionInfo ) ) {
         $self->logger->debug('Crowdsec disabled for this env');
-        return PE_OK;
+        return $sub->($req);
     }
     my $ip = $req->address;
     my ( $ok, $err ) = $self->bouncer($ip);
 
     # bouncer() answer $ok=0 only when Crowdsec response rejects the given IP
-    return PE_OK if ( $ok and $err and $self->conf->{crowdsecIgnoreFailures} );
+    return $sub->($req)
+      if ( $ok and $err and $self->conf->{crowdsecIgnoreFailures} );
 
     # When $ok==0, $err contains the Crowdsec decision
     unless ($ok) {
@@ -63,10 +64,10 @@ sub checkIpStatus {
                 ip      => $ip,
             );
             $req->env->{CROWDSEC_REJECT} = 1;
-            return PE_OK;
+            return $sub->($req);
         }
     }
-    return $err ? $err : PE_OK;
+    return $err ? $err : $sub->($req);
 }
 
 1;

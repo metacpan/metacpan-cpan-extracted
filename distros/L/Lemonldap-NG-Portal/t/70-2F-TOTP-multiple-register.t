@@ -11,7 +11,6 @@ SKIP: {
     if ($@) {
         skip 'Convert::Base32 is missing';
     }
-    require Lemonldap::NG::Common::TOTP;
 
     sub registerTotp {
         my ( $client, $id ) = @_;
@@ -53,12 +52,8 @@ SKIP: {
         $key = Convert::Base32::decode_base32($key);
 
         # Post code
-        ok(
-            my $code =
-              Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
-            'Code'
-        );
-        ok( $code =~ /^\d{6}$/, 'Code contains 6 digits' );
+        ok( my $code = getTotp($key), 'Code' );
+        ok( $code =~ /^\d{6}$/,       'Code contains 6 digits' );
         my $s = "code=$code&token=$token&TOTPName=my-T OTP";
         ok(
             $res = $client->_post(

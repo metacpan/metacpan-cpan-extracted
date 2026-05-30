@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -23,6 +23,7 @@ sub setGroups {
             $req->sessionInfo->{hGroups}->{$group} = { name => $group };
         }
     }
+
     # Populate $groups from $hGroups
     elsif ( ( $hGroups and keys %$hGroups ) and not $groups ) {
         $req->sessionInfo->{groups} =

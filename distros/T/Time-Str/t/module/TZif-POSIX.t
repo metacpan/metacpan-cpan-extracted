@@ -38,6 +38,14 @@ throws_ok { Time::TZif::POSIX->new(tz_string => 'EST5EDT,M3.2.0,M11.1.0', overla
   qr/Invalid policy value for the parameter 'overlap_policy'/,
   'new: invalid overlap_policy';
 
+throws_ok { Time::TZif::POSIX->new(tz_string => 'EST5EDT,M3.2.0,M11.1.0', name => '123') }
+  qr/Invalid value for the parameter 'name'/,
+  'new: invalid name (starts with digit)';
+
+throws_ok { Time::TZif::POSIX->new(tz_string => 'EST5EDT,M3.2.0,M11.1.0', name => '') }
+  qr/Invalid value for the parameter 'name'/,
+  'new: invalid name (empty string)';
+
 ## Constructor defaults
 
 {
@@ -55,6 +63,109 @@ throws_ok { Time::TZif::POSIX->new(tz_string => 'EST5EDT,M3.2.0,M11.1.0', overla
   );
   is($tz->gap_policy,     'later', 'custom gap_policy preserved');
   is($tz->overlap_policy, 'std',   'custom overlap_policy preserved');
+}
+
+## name / has_name
+
+{
+  my $tz = Time::TZif::POSIX->new(tz_string => 'EST5EDT,M3.2.0,M11.1.0');
+  is($tz->name, undef, 'name is undef when not provided');
+  ok(!$tz->has_name, 'has_name is false when not provided');
+}
+
+{
+  my $tz = Time::TZif::POSIX->new(
+    tz_string => 'EST5EDT,M3.2.0,M11.1.0',
+    name      => 'America/New_York',
+  );
+  is($tz->name, 'America/New_York', 'name accessor returns provided name');
+  ok($tz->has_name, 'has_name is true when name provided');
+}
+
+## with_name
+
+throws_ok { Time::TZif::POSIX->new(tz_string => 'EST5EDT,M3.2.0,M11.1.0')->with_name() }
+  qr/^Usage: /,
+  'with_name: no arguments';
+
+throws_ok { Time::TZif::POSIX->new(tz_string => 'EST5EDT,M3.2.0,M11.1.0')->with_name('123') }
+  qr/Invalid name value/,
+  'with_name: invalid name';
+
+{
+  my $tz1 = Time::TZif::POSIX->new(
+    tz_string => 'EST5EDT,M3.2.0,M11.1.0',
+    name      => 'America/New_York',
+  );
+  my $tz2 = $tz1->with_name('US/Eastern');
+  isnt($tz2, $tz1, 'with_name: returns new object when name differs');
+  is($tz2->name, 'US/Eastern', 'with_name: new object has updated name');
+  is($tz2->tz_string, $tz1->tz_string, 'with_name: shares tz_string');
+  is($tz2->gap_policy, $tz1->gap_policy, 'with_name: shares gap_policy');
+}
+
+{
+  my $tz1 = Time::TZif::POSIX->new(
+    tz_string => 'EST5EDT,M3.2.0,M11.1.0',
+    name      => 'America/New_York',
+  );
+  my $tz2 = $tz1->with_name('America/New_York');
+  is($tz2, $tz1, 'with_name: returns same object when name unchanged');
+}
+
+{
+  my $tz1 = Time::TZif::POSIX->new(tz_string => 'EST5EDT,M3.2.0,M11.1.0');
+  my $tz2 = $tz1->with_name('America/New_York');
+  isnt($tz2, $tz1, 'with_name: returns new object when name was undef');
+  is($tz2->name, 'America/New_York', 'with_name: sets name from undef');
+}
+
+## with_gap_policy
+
+throws_ok { Time::TZif::POSIX->new(tz_string => 'EST5EDT,M3.2.0,M11.1.0')->with_gap_policy() }
+  qr/^Usage: /,
+  'with_gap_policy: no arguments';
+
+throws_ok { Time::TZif::POSIX->new(tz_string => 'EST5EDT,M3.2.0,M11.1.0')->with_gap_policy('invalid') }
+  qr/Invalid policy value/,
+  'with_gap_policy: invalid policy';
+
+{
+  my $tz1 = Time::TZif::POSIX->new(tz_string => 'EST5EDT,M3.2.0,M11.1.0');
+  my $tz2 = $tz1->with_gap_policy('later');
+  isnt($tz2, $tz1, 'with_gap_policy: returns new object when policy differs');
+  is($tz2->gap_policy, 'later', 'with_gap_policy: new object has updated policy');
+  is($tz2->overlap_policy, $tz1->overlap_policy, 'with_gap_policy: overlap_policy unchanged');
+}
+
+{
+  my $tz1 = Time::TZif::POSIX->new(tz_string => 'EST5EDT,M3.2.0,M11.1.0');
+  my $tz2 = $tz1->with_gap_policy('reject');
+  is($tz2, $tz1, 'with_gap_policy: returns same object when policy unchanged');
+}
+
+## with_overlap_policy
+
+throws_ok { Time::TZif::POSIX->new(tz_string => 'EST5EDT,M3.2.0,M11.1.0')->with_overlap_policy() }
+  qr/^Usage: /,
+  'with_overlap_policy: no arguments';
+
+throws_ok { Time::TZif::POSIX->new(tz_string => 'EST5EDT,M3.2.0,M11.1.0')->with_overlap_policy('invalid') }
+  qr/Invalid policy value/,
+  'with_overlap_policy: invalid policy';
+
+{
+  my $tz1 = Time::TZif::POSIX->new(tz_string => 'EST5EDT,M3.2.0,M11.1.0');
+  my $tz2 = $tz1->with_overlap_policy('earlier');
+  isnt($tz2, $tz1, 'with_overlap_policy: returns new object when policy differs');
+  is($tz2->overlap_policy, 'earlier', 'with_overlap_policy: new object has updated policy');
+  is($tz2->gap_policy, $tz1->gap_policy, 'with_overlap_policy: gap_policy unchanged');
+}
+
+{
+  my $tz1 = Time::TZif::POSIX->new(tz_string => 'EST5EDT,M3.2.0,M11.1.0');
+  my $tz2 = $tz1->with_overlap_policy('reject');
+  is($tz2, $tz1, 'with_overlap_policy: returns same object when policy unchanged');
 }
 
 ## Parsing: invalid TZ strings
@@ -476,7 +587,7 @@ SKIP: {
     unless defined $tzdir && -f "$tzdir/America/New_York";
 
   my $tzif = Time::TZif->new(
-    filename       => "$tzdir/America/New_York",
+    path           => "$tzdir/America/New_York",
     gap_policy     => 'later',
     overlap_policy => 'earlier',
   );

@@ -7,10 +7,16 @@ use strict;
 use Mouse;
 use Convert::Base32 qw(decode_base32 encode_base32);
 use Crypt::URandom;
-use Digest::HMAC_SHA1 'hmac_sha1_hex';
+use Digest::SHA;
 use Lemonldap::NG::Common::Crypto;
 
-our $VERSION = '2.19.0';
+my $hash_func = {
+    "sha1"   => \&Digest::SHA::hmac_sha1_hex,
+    "sha256" => \&Digest::SHA::hmac_sha256_hex,
+    "sha512" => \&Digest::SHA::hmac_sha512_hex,
+};
+
+our $VERSION = '2.23.0';
 
 has key => (
     is      => 'ro',
@@ -72,35 +78,90 @@ sub get_storable_secret {
     return $storable_secret;
 }
 
-# Verify that TOTP $code matches with $secret
+# DEPRECATED: legacy API
 sub verifyCode {
     my ( $self, $interval, $range, $digits, $stored_secret, $code ) = @_;
+    my $result = $self->verify_totp(
+        interval        => $interval,
+        range_tolerance => $range,
+        digits          => $digits,
+        stored_secret   => $stored_secret,
+        code            => $code,
+    );
+    if ( $result->{result} == 1 ) {
+        return ( wantarray() ? ( 1, $result->{offset} ) : 1 );
+    }
+    else {
+        $self->logger->error( $result->{error} );
+        return $result->{result};
+    }
+}
+
+# Verify that TOTP $code matches with $secret
+sub verify_totp {
+    my ( $self, %args ) = @_;
+
+    my $interval      = $args{interval} || 30;
+    my $digits        = $args{digits}   || 6;
+    my $range         = $args{range_tolerance} // 0;
+    my $stored_secret = $args{stored_secret};
+    my $code          = $args{code};
+    my $hash          = $args{hash} || "sha1";
+
+    if ( !$stored_secret ) {
+        return {
+            result => -1,
+            error  => "No secret provided",
+        };
+    }
+
+    if ( !$code ) {
+        return {
+            result => -1,
+            error  => "No code provided",
+        };
+    }
 
     my $secret = $self->get_cleartext_secret($stored_secret);
     if ( !$secret ) {
-        $self->logger->error('Unable to decrypt TOTP secret');
-        return -1;
+        return {
+            result => -1,
+            error  => "Unable to decrypt TOTP secret",
+        };
     }
 
     my $s = eval { decode_base32($secret) };
     if ($@) {
-        $self->logger->error('Bad characters in TOTP secret');
-        return -1;
+        return {
+            result => -1,
+            error  => "Bad characters in TOTP secret",
+        };
     }
     for ( -$range .. $range ) {
-        if ( $code eq $self->_code( $s, $_, $interval, $digits ) ) {
-            return (wantarray() ? (1, $_) : 1 );
+        if ( $code eq $self->_code( $s, $_, $interval, $digits, $hash ) ) {
+            return {
+                result => 1,
+                offset => $_,
+            };
         }
     }
-    return 0;
+    return {
+        result => 0,
+        error  => "Code did not match",
+    };
 }
 
 # Internal subroutine that calculates TOTP code using $secret and $interval
 sub _code {
-    my ( $self, $secret, $r, $interval, $digits ) = @_;
-    my $hmac = hmac_sha1_hex(
-        pack( 'H*',
-            sprintf( '%016x', int( ( time - $r * $interval ) / $interval ) ) ),
+    my ( $self, $secret, $offset, $interval, $digits, $hash, $time ) = @_;
+
+    $time ||= time();
+
+    my $hash_func = $hash_func->{$hash};
+    die "Unknown hash $hash" unless $hash_func;
+
+    my $hmac = $hash_func->(
+        pack( 'H*', sprintf( '%016x', int( $time / $interval ) - $offset ) ),
         $secret,
     );
 

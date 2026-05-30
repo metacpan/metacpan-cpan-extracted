@@ -188,11 +188,14 @@ ok( $res->{name} eq 'Frédéric Accents', 'UTF-8 values' )
 ok( $res->{sid}, "get sid in userinfo" ) or print Dumper($res);
 count(3);
 
-ok( getSession($spId)->data->{cn} eq 'Frédéric Accents', 'UTF-8 values' )
-  or explain( $res, 'cn => Frédéric Accents' );
+$res = getSession($spId)->data;
+is( $res->{cn}, 'Frédéric Accents', 'UTF-8 values' );
 count(1);
 
-$res = getSession($spId)->data;
+is( $res->{'_oidc_acr'} => 'customacr-1',    "ACR is exposed" );
+is( $res->{'_oidc_amr'} => 'myamr1; myamr2', "AMR is exposed" );
+count(2);
+
 my $access_token_eol = $res->{_oidc_access_token_eol};
 my $access_token_old = $res->{_oidc_access_token};
 ok( $access_token_eol, 'OIDC EOL time is stored' );
@@ -216,11 +219,12 @@ is_deeply(
     },
     "Correct hGroups"
 );
-count(6);
-
-is( $res->{userinfo_hook}, "op/french", "oidcGotUserInfo called" );
-is( $res->{id_token_hook}, "op/french", "oidcGotIDToken called" );
-count(2);
+is_deeply(
+    $res->{complex},
+    { a => [ 1, 2 ] },
+    "Complex JSON variable was imported as-is"
+);
+count(7);
 
 my $id_token_decoded = id_token_payload( $res->{_oidc_id_token} );
 is( $id_token_decoded->{acr}, 'customacr-1', "Correct custom ACR" );
@@ -391,12 +395,6 @@ ok(
 count(1);
 ( $url, $query ) =
   expectRedirection( $res, qr#^http://auth.op.com(/oauth2/authorize)\?(.*)$# );
-
-my $u = URI->new;
-$u->query($query);
-is( $u->query_param('my_param'),
-    "my value", "oidcGenerateAuthenticationRequest called" );
-count(1);
 
 # Test if consent was saved
 # -------------------------
@@ -582,12 +580,17 @@ sub op {
                         family_name => "cn",
                         name        => "cn",
                         groups      => "groups",
+                        complex     => "complex",
                     }
                 },
                 oidcServiceAllowHybridFlow            => 1,
                 oidcServiceAllowImplicitFlow          => 1,
                 oidcServiceAllowAuthorizationCodeFlow => 1,
-                oidcRPMetaDataOptions                 => {
+                oidcServiceMetaDataAmrRules           => {
+                    myamr1 => '1',
+                    myamr2 => '1',
+                },
+                oidcRPMetaDataOptions => {
                     rp => {
                         oidcRPMetaDataOptionsDisplayName       => "RP",
                         oidcRPMetaDataOptionsIDTokenExpiration => 3600,
@@ -626,12 +629,15 @@ sub rp {
     my ( $jwks, $metadata ) = @_;
     return LLNG::Manager::Test->new( {
             ini => {
-                logLevel                   => $debug,
+                logLevel => $debug,
 
                 # needed to to test #3445
                 issuerDBOpenIDConnectActivation => "1",
 
-                domain                     => 'rp.com',
+                domain => 'rp.com',
+                macros => {
+                    complex => ' { a => [ 1, 2 ] }'
+                },
                 portal                     => 'http://auth.rp.com/',
                 authentication             => 'OpenIDConnect',
                 userDB                     => 'Same',
@@ -639,11 +645,12 @@ sub rp {
                 restExportSecretKeys       => 1,
                 oidcOPMetaDataExportedVars => {
                     op => {
-                        cn     => "name",
-                        uid    => "sub",
-                        sn     => "family_name",
-                        mail   => "email",
-                        groups => "groups",
+                        cn      => "name",
+                        uid     => "sub",
+                        sn      => "family_name",
+                        mail    => "email",
+                        groups  => "groups",
+                        complex => "complex",
                     }
                 },
                 oidcOPMetaDataOptions => {
@@ -669,7 +676,6 @@ sub rp {
                 oidcOPMetaDataJSON => {
                     op => $metadata,
                 },
-                customPlugins => 't::OidcHookPlugin',
             }
         }
     );

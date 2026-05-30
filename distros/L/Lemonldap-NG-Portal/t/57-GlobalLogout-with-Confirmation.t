@@ -9,8 +9,7 @@ BEGIN {
 
 my $res;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel             => 'error',
             authentication       => 'Demo',
@@ -77,7 +76,7 @@ ok(
 eval { $res = JSON::from_json( $res->[2]->[0] ) };
 ok( not($@), 'Content is JSON' )
   or explain( $res->[2]->[0], 'JSON content' );
-ok( $res->{globalLogout} == 3, '3 active sessions found' );
+ok( $res->{globalLogout} == 3,         '3 active sessions found' );
 ok( $res->{confirmationRequired} == 1, 'Confirmation required' );
 count(4);
 

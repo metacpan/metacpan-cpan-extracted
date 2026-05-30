@@ -9,8 +9,10 @@ our %defaultConf = (
     cfgDate   => time,
     cfgAuthor => 'LLNG Team',
 );
-our @conf        = ( \%defaultConf );
-our $fail_prereq = 0;
+our @conf         = ( \%defaultConf );
+our $fail_prereq  = 0;
+our $fail_lastCfg = 0;
+our $fail_load    = 0;
 
 our $VERSION = '2.19.0';
 
@@ -32,6 +34,7 @@ sub available {
 
 sub lastCfg {
     $stats{'lastCfg'} += 1;
+    return undef if $fail_lastCfg;
     my $res = @conf[-1]->{cfgNum};
     return $res;
 }
@@ -55,6 +58,7 @@ sub store {
 sub load {
     my ( $self, $num ) = @_;
     $stats{'load'} += 1;
+    return undef if $fail_load;
     my @res = grep { $_->{cfgNum} == $num } @conf;
     return { %{ $res[0] } };
 }
@@ -67,13 +71,16 @@ sub delete {
 
 # Reset state, used by tests
 sub testReset {
-    @conf        = ( \%defaultConf );
-    %stats       = ();
-    $fail_prereq = 0;
+    @conf         = ( \%defaultConf );
+    %stats        = ();
+    $fail_prereq  = 0;
+    $fail_lastCfg = 0;
+    $fail_load    = 0;
 }
 
-sub fail_prereq {
-    $fail_prereq = 1;
-}
+sub fail_prereq  { $fail_prereq  = 1; }
+sub fail_lastCfg { $fail_lastCfg = 1; }
+sub fail_load    { $fail_load    = 1; }
+sub recover      { $fail_lastCfg = 0; $fail_load = 0; }
 
 1;

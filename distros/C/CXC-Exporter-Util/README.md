@@ -4,7 +4,7 @@ CXC::Exporter::Util - Tagged Based Exporting
 
 # VERSION
 
-version 0.12
+version 0.13
 
 # SYNOPSIS
 

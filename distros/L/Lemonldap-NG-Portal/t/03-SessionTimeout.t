@@ -8,8 +8,7 @@ require 't/test-lib.pm';
 
 my $res;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel             => 'error',
             useSafeJail          => 1,
@@ -25,7 +24,7 @@ my $client = LLNG::Manager::Test->new(
 
 # Try to authenticate with good password
 # --------------------------------------
-diag 'Waiting';
+note 'Waiting';
 ok(
     $res = $client->_post(
         '/',

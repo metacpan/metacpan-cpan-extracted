@@ -75,7 +75,13 @@ close $fh;
 my $stdout = '';
 my $stderr = '';
 my $ok = run(
-	[ $^X, File::Spec->catfile( $repo_root, 'bin', 'zuzu.pl' ), $script ],
+	[
+		$^X,
+		File::Spec->catfile( $repo_root, 'bin', 'zuzu.pl' ),
+		'-I' . File::Spec->catdir( $repo_root, 'stdlib', 'test-modules' ),
+		'-I' . File::Spec->catdir( $repo_root, 'stdlib', 'modules' ),
+		$script,
+	],
 	'>',
 	\$stdout,
 	'2>',

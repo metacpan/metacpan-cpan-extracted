@@ -2,7 +2,7 @@ package Lemonldap::NG::Common::MessageBroker::MQTT;
 
 use strict;
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.23.0';
 
 sub new {
     my ( $class, $conf, $logger ) = @_;
@@ -52,7 +52,7 @@ sub subscribe {
             $_[0] =~ s#llng/##;
             my $tmp = eval { JSON::from_json( $_[1] ) };
             if ($@) {
-                $self->{logger}->error("Bad message from MQTT server: $@")
+                $self->{logger}->error("Bad message from MQTT server: $@");
             }
             else {
                 push @{ $self->{messages}{ $_[0] } }, $tmp;

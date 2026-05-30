@@ -1,4 +1,4 @@
-CREATE UNLOGGED TABLE sessions (
+CREATE TABLE sessions (
     id varchar(64) not null primary key,
     a_session jsonb
 );
@@ -25,7 +25,7 @@ CREATE INDEX i_p__whatToTrace           ON psessions ((a_session ->> '_whatToTra
 CREATE INDEX i_p__webAuthnUserHandle    ON psessions ((a_session ->> '_webAuthnUserHandle'));
 
 
-CREATE UNLOGGED TABLE samlsessions (
+CREATE TABLE samlsessions (
     id varchar(64) not null primary key,
     a_session jsonb
 );
@@ -37,7 +37,7 @@ CREATE INDEX i_a__assert_id    ON samlsessions ((a_session ->> '_assert_id'));
 CREATE INDEX i_a__art_id       ON samlsessions ((a_session ->> '_art_id'));
 CREATE INDEX i_a__saml_id      ON samlsessions ((a_session ->> '_saml_id'));
 
-CREATE UNLOGGED TABLE oidcsessions (
+CREATE TABLE oidcsessions (
     id varchar(64) not null primary key,
     a_session jsonb
 );
@@ -47,11 +47,12 @@ CREATE INDEX i_o_user_session_id ON oidcsessions ((a_session ->> 'user_session_i
 CREATE INDEX i_o__oidc_sid       ON oidcsessions ((a_session ->> '_oidc_sid'));
 CREATE INDEX i_o__oidc_sub       ON oidcsessions ((a_session ->> '_oidc_sub'));
 
-CREATE UNLOGGED TABLE cassessions (
+CREATE TABLE cassessions (
     id varchar(64) not null primary key,
     a_session jsonb
 );
-CREATE INDEX i_c__session_kind ON cassessions ((a_session ->> '_session_kind'));
-CREATE INDEX i_c__utime        ON cassessions ((cast(a_session ->> '_utime' as bigint)));
-CREATE INDEX i_c__cas_id       ON cassessions ((a_session ->> '_cas_id'));
-CREATE INDEX i_c_pgtIou        ON cassessions ((a_session ->> 'pgtIou'));
+CREATE INDEX i_c__session_kind   ON cassessions ((a_session ->> '_session_kind'));
+CREATE INDEX i_c__utime          ON cassessions ((cast(a_session ->> '_utime' as bigint)));
+CREATE INDEX i_c__cas_id         ON cassessions ((a_session ->> '_cas_id'));
+CREATE INDEX i_c_pgtIou          ON cassessions ((a_session ->> 'pgtIou'));
+CREATE INDEX i_c_auth_cas_ticket ON cassessions ((a_session ->> 'auth_cas_ticket'));

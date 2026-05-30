@@ -1,0 +1,1374 @@
+#!/usr/bin/perl
+#
+# llng-build-manager-files - Regenerate LemonLDAP::NG Manager with plugin extensions
+#
+# This script allows plugins to extend the Manager configuration by adding
+# new attributes, tree nodes, and portal constants. Extensions can be in
+# Perl (.pm) or JSON (.json) format.
+#
+# Usage:
+#   llng-build-manager-files --plugins-dir=/etc/lemonldap-ng/manager-overrides.d --plugins-dir=/other/dir
+#
+# Paths are configured via placeholders replaced during installation.
+# All paths can be overridden via command line options.
+
+use strict;
+use warnings;
+use Getopt::Long;
+use File::Basename qw(dirname basename);
+use Cwd            qw(getcwd);
+use JSON;
+use Storable qw(dclone);
+
+# Pod::Usage is optional - provide fallback if not available
+my $has_pod_usage = eval { require Pod::Usage; 1 };
+
+sub show_help {
+    my ( $exitcode, $verbose ) = @_;
+    if ($has_pod_usage) {
+        Pod::Usage::pod2usage( -exitcode => $exitcode, -verbose => $verbose );
+    }
+    else {
+        print
+"Usage: llng-build-manager-files [--plugins-dir=<path> ...] [options]\n";
+        print "Use 'perldoc $0' for full documentation.\n";
+        exit $exitcode;
+    }
+}
+
+# Load the core Build modules to get their data
+require Lemonldap::NG::Manager::Build::Attributes;
+require Lemonldap::NG::Manager::Build::Tree;
+require Lemonldap::NG::Manager::Build::CTrees;
+require Lemonldap::NG::Manager::Build::PortalConstants;
+
+my $VERSION = '2.23.0';
+
+#############################################################################
+# Default paths - placeholders replaced during installation
+# These can all be overridden via command line options
+#############################################################################
+my $DEFAULT_MANAGERSTATICDIR = '__MANAGERSTATICDIR__';
+my $DEFAULT_PERLLIBDIR       = '__INSTALLSITELIB__';
+my $DEFAULT_DOCDIR           = '__DOCDIR__';
+my $DEFAULT_LANGDIR          = '__MANAGERSTATICDIR__/languages';
+
+# Command line options
+my @plugins_dirs;
+my (
+    $struct_file,            $conftree_file,
+    $manager_constants_file, $manager_attributes_file,
+    $default_values_file,    $conf_constants_file,
+    $first_lmconf_file,      $reverse_tree_file,
+    $portal_constants_file,  $handler_status_constants_file,
+    $doc_constants_file,     $lang_dir,
+    $help,                   $verbose,
+);
+
+GetOptions(
+    'plugins-dir=s'                   => \@plugins_dirs,
+    'struct-file=s'                   => \$struct_file,
+    'conftree-file=s'                 => \$conftree_file,
+    'manager-constants-file=s'        => \$manager_constants_file,
+    'manager-attributes-file=s'       => \$manager_attributes_file,
+    'default-values-file=s'           => \$default_values_file,
+    'conf-constants-file=s'           => \$conf_constants_file,
+    'first-lmconf-file=s'             => \$first_lmconf_file,
+    'reverse-tree-file=s'             => \$reverse_tree_file,
+    'portal-constants-file=s'         => \$portal_constants_file,
+    'handler-status-constants-file=s' => \$handler_status_constants_file,
+    'doc-constants-file=s'            => \$doc_constants_file,
+    'lang-dir=s'                      => \$lang_dir,
+    'help|h'                          => \$help,
+    'verbose|v'                       => \$verbose,
+) or show_help( 1, 0 );
+
+show_help( 0, 2 ) if $help;
+
+sub verbose {
+    print @_ if $verbose;
+}
+
+# plugins-dir is optional - if not specified or doesn't exist, run without extensions
+@plugins_dirs = grep {
+    if ( !-d $_ ) {
+        print STDERR
+"Note: Plugins directory not found: $_ (continuing without extensions)\n";
+        0;
+    }
+    else { 1 }
+} @plugins_dirs;
+
+# Set default paths from placeholders (can be overridden via options)
+$struct_file       //= "$DEFAULT_MANAGERSTATICDIR/struct.json";
+$conftree_file     //= "$DEFAULT_MANAGERSTATICDIR/js/conftree.js";
+$reverse_tree_file //= "$DEFAULT_MANAGERSTATICDIR/reverseTree.json";
+$manager_constants_file //=
+  "$DEFAULT_PERLLIBDIR/Lemonldap/NG/Common/Conf/ReConstants.pm";
+$manager_attributes_file //=
+  "$DEFAULT_PERLLIBDIR/Lemonldap/NG/Manager/Attributes.pm";
+$default_values_file //=
+  "$DEFAULT_PERLLIBDIR/Lemonldap/NG/Common/Conf/DefaultValues.pm";
+$conf_constants_file //=
+  "$DEFAULT_PERLLIBDIR/Lemonldap/NG/Common/Conf/Constants.pm";
+$portal_constants_file //=
+  "$DEFAULT_PERLLIBDIR/Lemonldap/NG/Portal/Main/Constants.pm";
+$handler_status_constants_file //=
+  "$DEFAULT_PERLLIBDIR/Lemonldap/NG/Handler/Lib/StatusConstants.pm";
+$first_lmconf_file  //= '/dev/null';
+$doc_constants_file //= '/dev/null';
+$lang_dir           //= $DEFAULT_LANGDIR;
+
+# Validate that placeholders were replaced (unless overridden)
+if ( $struct_file =~ /__(?:MANAGERSTATICDIR|INSTALLSITELIB)__/ ) {
+    die "Error: placeholders not replaced during installation.\n"
+      . "Please specify paths via command line options.\n";
+}
+
+verbose "Configuration:\n"
+  . "  plugins-dir:                   "
+  . ( @plugins_dirs ? join( ', ', @plugins_dirs ) : '(none)' ) . "\n"
+  . "  struct-file:                   $struct_file\n"
+  . "  conftree-file:                 $conftree_file\n"
+  . "  manager-constants-file:        $manager_constants_file\n"
+  . "  manager-attributes-file:       $manager_attributes_file\n"
+  . "  default-values-file:           $default_values_file\n"
+  . "  conf-constants-file:           $conf_constants_file\n"
+  . "  reverse-tree-file:             $reverse_tree_file\n"
+  . "  portal-constants-file:         $portal_constants_file\n"
+  . "  handler-status-constants-file: $handler_status_constants_file\n"
+  . "  lang-dir:                      $lang_dir\n" . "\n";
+
+# 1. Load core data from Build modules
+verbose "Loading core configuration data...\n";
+my $attributes = Lemonldap::NG::Manager::Build::Attributes::attributes();
+my $tree       = Lemonldap::NG::Manager::Build::Tree::tree();
+my $ctrees     = Lemonldap::NG::Manager::Build::CTrees::cTrees();
+my $constants =
+  Lemonldap::NG::Manager::Build::PortalConstants::portalConstants();
+
+# 2. Load and merge extensions from plugins directory
+my @ext_files;
+if (@plugins_dirs) {
+    for my $dir (@plugins_dirs) {
+        my @files = sort( glob("$dir/*.pm"), glob("$dir/*.json") );
+        verbose @files
+          ? "Found " . scalar(@files) . " extension file(s) in $dir\n"
+          : "No extension files found in $dir\n";
+        push @ext_files, @files;
+    }
+}
+else {
+    verbose "No plugins directory specified, running without extensions\n";
+}
+
+my @auth_plugins;
+for my $ext_file (@ext_files) {
+    verbose "Loading extension: $ext_file\n";
+    my $ext = load_extension($ext_file);
+    merge_extension( $attributes, $tree, $ctrees, $constants, $ext, $ext_file );
+    push @auth_plugins, collect_auth_plugins( $ext->{authPlugin}, $ext_file );
+}
+
+# Warn on conflicting authPlugin declarations (same k with a different v
+# or a different role set across extension files). Dedup below keeps only
+# the first-seen label, so flag the conflict to the maintainer.
+warn_auth_plugin_conflicts( \@auth_plugins );
+
+# Apply auth plugin declarations to the initial merged attributes so the
+# diff-based extraction below also picks up auth-plugin-driven additions.
+# This initial pass also populates nested authChoiceModules; auth plugins
+# are re-applied again at call time via @auth_plugins on fresh Build.pm
+# data so nested-select changes survive dclone().
+apply_auth_plugins( $attributes, \@auth_plugins );
+
+# 3. Store extension data for merging at call time
+# Build.pm modifies data in place, so we need fresh copies each time
+verbose "Patching Build modules with merged data...\n";
+
+# Store only the EXTENSION data (not the full merged data)
+my $ext_attributes = {};
+my $ext_tree       = {};
+my $ext_ctrees     = {};
+my $ext_constants  = {};
+my $ext_lang       = {};
+
+# Extract extensions by comparing with original
+my $orig_attrs     = Lemonldap::NG::Manager::Build::Attributes::attributes();
+my $orig_attr_keys = { map { $_ => 1 } keys %$orig_attrs };
+
+# Store select append operations separately (for existing attributes with
+# new select options added by extensions)
+my $ext_select_appends = {};
+
+for my $key ( keys %$attributes ) {
+    if ( $orig_attr_keys->{$key} ) {
+
+        # Check if select options were appended to an existing attribute
+        if (   ref $orig_attrs->{$key} eq 'HASH'
+            && ref $attributes->{$key} eq 'HASH'
+            && ref $orig_attrs->{$key}{select} eq 'ARRAY'
+            && ref $attributes->{$key}{select} eq 'ARRAY' )
+        {
+            my %orig_keys =
+              map  { $_->{k} => 1 }
+              grep { ref $_ eq 'HASH' && exists $_->{k} }
+              @{ $orig_attrs->{$key}{select} };
+            my @new_opts =
+              grep { ref $_ eq 'HASH' && $_->{k} && !$orig_keys{ $_->{k} } }
+              @{ $attributes->{$key}{select} };
+            $ext_select_appends->{$key} = \@new_opts if @new_opts;
+        }
+    }
+    else {
+        $ext_attributes->{$key} = $attributes->{$key};
+    }
+}
+
+# For tree: store extension modifications to replay on each fresh copy
+# We need to re-apply extensions to fresh tree data because Build.pm modifies the tree in place
+# (e.g., $leaf =~ s/^\*// removes * prefix on first scan)
+my @tree_extensions;
+for my $ext_file (@ext_files) {
+    my $ext = load_extension($ext_file);
+    if ( $ext->{tree} ) {
+        my @trees =
+          ref $ext->{tree} eq 'ARRAY' ? @{ $ext->{tree} } : ( $ext->{tree} );
+        for my $t (@trees) {
+            push @tree_extensions, { ext => $t, file => $ext_file }
+              if $t && %$t;
+        }
+    }
+    for my $ctree_name ( keys %{ $ext->{ctrees} || {} } ) {
+        my $spec  = $ext->{ctrees}{$ctree_name};
+        my @specs = ref $spec eq 'ARRAY' ? @$spec : ($spec);
+        for my $s (@specs) {
+            push @{ $ext_ctrees->{$ctree_name} },
+              { ext => $s, file => $ext_file };
+        }
+    }
+
+    # Collect translations
+    if ( $ext->{lang} && %{ $ext->{lang} } ) {
+        for my $key ( keys %{ $ext->{lang} } ) {
+            if ( exists $ext_lang->{$key} ) {
+                warn "Warning [$ext_file]: Overriding translation key '$key'\n";
+            }
+            $ext_lang->{$key} = $ext->{lang}{$key};
+            verbose "  Added translation: $key\n";
+        }
+    }
+}
+
+# Save original functions
+my $orig_attributes = \&Lemonldap::NG::Manager::Build::Attributes::attributes;
+my $orig_tree       = \&Lemonldap::NG::Manager::Build::Tree::tree;
+my $orig_ctrees     = \&Lemonldap::NG::Manager::Build::CTrees::cTrees;
+my $orig_constants =
+  \&Lemonldap::NG::Manager::Build::PortalConstants::portalConstants;
+
+{
+    no warnings 'redefine';
+
+    *Lemonldap::NG::Manager::Build::Attributes::attributes = sub {
+        my $fresh = $orig_attributes->();
+
+        # Merge extension attributes (new attributes)
+        for my $key ( keys %$ext_attributes ) {
+            $fresh->{$key} = $ext_attributes->{$key};
+        }
+
+        # Apply select appends (new options added to existing select attributes)
+        for my $key ( keys %$ext_select_appends ) {
+            if (   ref $fresh->{$key} eq 'HASH'
+                && ref $fresh->{$key}{select} eq 'ARRAY' )
+            {
+                my %existing =
+                  map  { $_->{k} => 1 }
+                  grep { ref $_ eq 'HASH' && exists $_->{k} }
+                  @{ $fresh->{$key}{select} };
+                for my $opt ( @{ $ext_select_appends->{$key} } ) {
+                    push @{ $fresh->{$key}{select} }, $opt
+                      unless $existing{ $opt->{k} };
+                }
+            }
+        }
+
+        # Apply authPlugin declarations (fills authentication / userDB /
+        # passwordDB / authChoiceModules / combModules selects based on
+        # declared roles). Safe to re-run: each append is deduplicated.
+        apply_auth_plugins( $fresh, \@auth_plugins );
+
+        return $fresh;
+    };
+
+    # For tree: return a fresh deep copy and re-apply extensions each time
+    # This is necessary because Build.pm modifies the tree in place
+    # (e.g., scanTree does $leaf =~ s/^\*// which removes * prefix)
+    *Lemonldap::NG::Manager::Build::Tree::tree = sub {
+        my $fresh = dclone( $orig_tree->() );
+        for my $ext_info (@tree_extensions) {
+            merge_tree( $fresh, $ext_info->{ext}, $ext_info->{file} );
+        }
+        return $fresh;
+    };
+
+# For ctrees: also return fresh deep copy since scanTree is called on each ctree node
+    *Lemonldap::NG::Manager::Build::CTrees::cTrees = sub {
+        my $fresh = dclone( $orig_ctrees->() );
+        for my $ctree_name ( keys %$ext_ctrees ) {
+            for my $ext_info ( @{ $ext_ctrees->{$ctree_name} } ) {
+                apply_ctree_extension( $fresh, $ctree_name, $ext_info->{ext},
+                    $ext_info->{file} );
+            }
+        }
+        return $fresh;
+    };
+
+    *Lemonldap::NG::Manager::Build::PortalConstants::portalConstants =
+      sub { $constants };
+}
+
+# 4. Load Build.pm (modules are already loaded, functions are patched)
+require Lemonldap::NG::Manager::Build;
+
+# 5a. Preserve DEFAULTCONFFILE and dirName from installed Constants.pm
+#     These values may have been customized by Makefile.PL (via LMNGCONFFILE
+#     and LMNGCONFDIR env vars). Build.pm regenerates Constants.pm with
+#     hardcoded defaults, so we read the current values and restore them after.
+my ( $saved_conffile, $saved_dirname );
+if ( $conf_constants_file ne '/dev/null' && -r $conf_constants_file ) {
+    open my $fh, '<', $conf_constants_file;
+    while (<$fh>) {
+        if (/^use constant DEFAULTCONFFILE\s*=>\s*"(.+)"\s*;/) {
+            $saved_conffile = $1;
+        }
+        elsif (/^\s*dirName\s*=>\s*'(.+)'\s*,/) {
+            $saved_dirname = $1;
+        }
+    }
+    close $fh;
+    verbose "  Preserved DEFAULTCONFFILE=$saved_conffile\n" if $saved_conffile;
+    verbose "  Preserved dirName=$saved_dirname\n"          if $saved_dirname;
+}
+
+# 5b. Redirect output files to /dev/null when their parent directory does not
+#     exist (component not installed locally, e.g. portal or handler absent)
+for my $ref (
+    \$struct_file,            \$conftree_file,
+    \$manager_constants_file, \$manager_attributes_file,
+    \$default_values_file,    \$conf_constants_file,
+    \$reverse_tree_file,      \$portal_constants_file,
+    \$handler_status_constants_file,
+  )
+{
+    if ( $$ref ne '/dev/null' && !-d dirname($$ref) ) {
+        verbose "  Skipping $$ref (parent directory does not exist)\n";
+        $$ref = '/dev/null';
+    }
+}
+
+# 6. Call Build.pm::run()
+verbose "Running Build.pm to generate files...\n";
+Lemonldap::NG::Manager::Build->run(
+    structFile                 => $struct_file,
+    confTreeFile               => $conftree_file,
+    managerConstantsFile       => $manager_constants_file,
+    managerAttributesFile      => $manager_attributes_file,
+    defaultValuesFile          => $default_values_file,
+    confConstantsFile          => $conf_constants_file,
+    firstLmConfFile            => $first_lmconf_file,
+    reverseTreeFile            => $reverse_tree_file,
+    portalConstantsFile        => $portal_constants_file,
+    handlerStatusConstantsFile => $handler_status_constants_file,
+    docConstantsFile           => $doc_constants_file,
+);
+
+# 6a. Restore preserved DEFAULTCONFFILE and dirName in Constants.pm
+if ( $conf_constants_file ne '/dev/null'
+    && ( $saved_conffile || $saved_dirname ) )
+{
+    open my $fh, '<', $conf_constants_file
+      or die "Cannot read $conf_constants_file: $!";
+    my $content = do { local $/; <$fh> };
+    close $fh;
+
+    my $modified = 0;
+    if (   $saved_conffile
+        && $content =~
+s{^(use constant DEFAULTCONFFILE\s*=>\s*").*("\s*;)}{$1$saved_conffile$2}m
+      )
+    {
+        $modified = 1;
+        verbose "  Restored DEFAULTCONFFILE=$saved_conffile\n";
+    }
+    if (   $saved_dirname
+        && $content =~ s{^(\s*dirName\s*=>\s*').*('\s*,)}{$1$saved_dirname$2}m )
+    {
+        $modified = 1;
+        verbose "  Restored dirName=$saved_dirname\n";
+    }
+
+    if ($modified) {
+        open my $out, '>', $conf_constants_file
+          or die "Cannot write $conf_constants_file: $!";
+        print $out $content;
+        close $out;
+    }
+}
+
+# 6b. Minify conftree.js
+if ( $conftree_file ne '/dev/null' ) {
+    minify_conftree($conftree_file);
+}
+else {
+    verbose "Skipping minification (conftree.js not generated)\n";
+}
+
+# 7. Update language files with translations from extensions
+if ( %$ext_lang && -d $lang_dir ) {
+    verbose "Updating language files in $lang_dir...\n";
+    update_language_files( $lang_dir, $ext_lang );
+}
+elsif (%$ext_lang) {
+    warn "Warning: Language directory not found: $lang_dir\n";
+    warn "         Translations from extensions will not be applied.\n";
+}
+
+verbose "Build completed successfully.\n";
+
+exit 0;
+
+#
+# Helper functions
+#
+
+sub load_extension {
+    my ($file) = @_;
+
+    if ( $file =~ /\.json$/i ) {
+        return load_json_extension($file);
+    }
+    elsif ( $file =~ /\.pm$/i ) {
+        return load_perl_extension($file);
+    }
+    else {
+        warn "Unknown extension file type: $file\n";
+        return {};
+    }
+}
+
+sub load_json_extension {
+    my ($file) = @_;
+
+    open my $fh, '<', $file or die "Cannot open $file: $!";
+    local $/;
+    my $content = <$fh>;
+    close $fh;
+
+    my $data = JSON->new->utf8->decode($content);
+    return {
+        attributes => $data->{attributes} || {},
+        tree       => $data->{tree}       || {},
+        ctrees     => $data->{ctrees}     || {},
+        constants  => $data->{constants}  || {},
+        lang       => $data->{lang}       || {},
+        authPlugin => $data->{authPlugin},
+    };
+}
+
+sub load_perl_extension {
+    my ($file) = @_;
+
+    # Read the file content to find the package name
+    my $content = do {
+        open my $fh, '<', $file or die "Cannot open $file: $!";
+        local $/;
+        <$fh>;
+    };
+
+    # Extract package name from the file
+    my ($pkg) = $content =~ /^\s*package\s+([\w:]+)\s*;/m;
+
+    unless ($pkg) {
+
+        # If no package declaration, create one with a unique name
+        $pkg = $file;
+        $pkg =~ s/[^a-zA-Z0-9]/_/g;
+        $pkg     = "LLNGExtension::$pkg";
+        $content = "package $pkg;\n$content";
+    }
+
+    # Eval the code
+    eval $content;
+    die "Error loading $file: $@" if $@;
+
+    # Extract data from the extension module
+    my $ext = {};
+
+    no strict 'refs';
+    $ext->{attributes} =
+      defined &{"${pkg}::attributes"} ? &{"${pkg}::attributes"}() : {};
+    $ext->{tree}   = defined &{"${pkg}::tree"}   ? &{"${pkg}::tree"}()   : {};
+    $ext->{ctrees} = defined &{"${pkg}::ctrees"} ? &{"${pkg}::ctrees"}() : {};
+    $ext->{constants} =
+      defined &{"${pkg}::constants"} ? &{"${pkg}::constants"}() : {};
+    $ext->{lang} = defined &{"${pkg}::lang"} ? &{"${pkg}::lang"}() : {};
+    $ext->{authPlugin} =
+      defined &{"${pkg}::authPlugin"} ? &{"${pkg}::authPlugin"}() : undef;
+    use strict 'refs';
+
+    return $ext;
+}
+
+# Normalize an extension's `authPlugin` entry into a list of
+# { k, v, roles, file } hashes. Accepts a single hash or an array of hashes.
+sub collect_auth_plugins {
+    my ( $raw, $ext_file ) = @_;
+    return () unless $raw;
+
+    my @entries = ref $raw eq 'ARRAY' ? @$raw : ($raw);
+    my @out;
+    for my $entry (@entries) {
+        unless ( ref $entry eq 'HASH' && $entry->{k} && $entry->{v} ) {
+            warn
+"Warning [$ext_file]: authPlugin entries must have 'k' and 'v' keys\n";
+            next;
+        }
+        my $roles =
+            ref $entry->{roles} eq 'ARRAY' ? $entry->{roles}
+          : $entry->{roles}                ? [ $entry->{roles} ]
+          :                                  [];
+        unless (@$roles) {
+            warn
+"Warning [$ext_file]: authPlugin '$entry->{k}' declares no roles\n";
+            next;
+        }
+        my %valid = map  { $_ => 1 } qw(authentication userDB passwordDB);
+        my @bad   = grep { !$valid{$_} } @$roles;
+        if (@bad) {
+            warn "Warning [$ext_file]: authPlugin '$entry->{k}' has "
+              . "unknown role(s): @bad (allowed: authentication, userDB, passwordDB)\n";
+        }
+        push @out,
+          {
+            k     => $entry->{k},
+            v     => $entry->{v},
+            roles => [ grep { $valid{$_} } @$roles ],
+            file  => $ext_file,
+          };
+    }
+    return @out;
+}
+
+# Mutate $attrs so the given auth plugins appear in the right select lists:
+#   authentication role  -> authentication.select,   authChoiceModules.select[0], combModules.select
+#   userDB         role  -> userDB.select,           authChoiceModules.select[1], combModules.select
+#   passwordDB     role  -> passwordDB.select,       authChoiceModules.select[2]
+# All appends dedupe on the `k` key so re-running is safe.
+sub apply_auth_plugins {
+    my ( $attrs, $plugins ) = @_;
+    return unless $attrs && $plugins && @$plugins;
+
+    my %role_to_flat = (
+        authentication => 'authentication',
+        userDB         => 'userDB',
+        passwordDB     => 'passwordDB',
+    );
+    my %role_to_choice_idx = (
+        authentication => 0,
+        userDB         => 1,
+        passwordDB     => 2,
+    );
+
+    for my $plugin (@$plugins) {
+        my $opt   = { k => $plugin->{k}, v => $plugin->{v} };
+        my %roles = map { $_ => 1 } @{ $plugin->{roles} };
+
+        for my $role ( keys %roles ) {
+            _append_flat_select( $attrs, $role_to_flat{$role}, $opt );
+            _append_nested_select( $attrs, 'authChoiceModules',
+                $role_to_choice_idx{$role}, $opt );
+        }
+
+        # combModules only covers authentication and userDB roles
+        if ( $roles{authentication} || $roles{userDB} ) {
+            _append_flat_select( $attrs, 'combModules', $opt );
+        }
+    }
+}
+
+sub warn_auth_plugin_conflicts {
+    my ($plugins) = @_;
+    my %seen;
+    for my $p (@$plugins) {
+        my $prev = $seen{ $p->{k} };
+        unless ($prev) {
+            $seen{ $p->{k} } = $p;
+            next;
+        }
+        if ( $prev->{v} ne $p->{v} ) {
+            warn "Warning [$p->{file}]: authPlugin '$p->{k}' label differs "
+              . "from earlier declaration in $prev->{file} "
+              . "('$p->{v}' vs '$prev->{v}'); keeping '$prev->{v}'\n";
+        }
+        my $prev_roles = join ',', sort @{ $prev->{roles} };
+        my $curr_roles = join ',', sort @{ $p->{roles} };
+        if ( $prev_roles ne $curr_roles ) {
+            warn "Warning [$p->{file}]: authPlugin '$p->{k}' roles differ "
+              . "from earlier declaration in $prev->{file} "
+              . "($curr_roles vs $prev_roles); union will be applied\n";
+        }
+    }
+}
+
+sub _append_flat_select {
+    my ( $attrs, $key, $opt ) = @_;
+    return unless ref $attrs->{$key} eq 'HASH';
+    return unless ref $attrs->{$key}{select} eq 'ARRAY';
+    for my $existing ( @{ $attrs->{$key}{select} } ) {
+        return
+             if ref $existing eq 'HASH'
+          && defined $existing->{k}
+          && $existing->{k} eq $opt->{k};
+    }
+    push @{ $attrs->{$key}{select} }, {%$opt};
+}
+
+sub _append_nested_select {
+    my ( $attrs, $key, $idx, $opt ) = @_;
+    return unless ref $attrs->{$key} eq 'HASH';
+    return unless ref $attrs->{$key}{select} eq 'ARRAY';
+    return unless ref $attrs->{$key}{select}[$idx] eq 'ARRAY';
+    for my $existing ( @{ $attrs->{$key}{select}[$idx] } ) {
+        return
+             if ref $existing eq 'HASH'
+          && defined $existing->{k}
+          && $existing->{k} eq $opt->{k};
+    }
+    push @{ $attrs->{$key}{select}[$idx] }, {%$opt};
+}
+
+sub merge_extension {
+    my ( $core_attrs, $core_tree, $core_ctrees, $core_constants, $ext,
+        $ext_file )
+      = @_;
+
+    # Merge attributes (simple hash merge)
+    merge_attributes( $core_attrs, $ext->{attributes}, $ext_file );
+
+    # Merge tree (insert nodes at specified path)
+    # Support both single hash and array of hashes
+    if ( $ext->{tree} ) {
+        my @trees =
+          ref $ext->{tree} eq 'ARRAY' ? @{ $ext->{tree} } : ( $ext->{tree} );
+        for my $t (@trees) {
+            merge_tree( $core_tree, $t, $ext_file ) if $t && %$t;
+        }
+    }
+
+    # Merge ctrees (insert into specific node templates)
+    merge_ctrees( $core_ctrees, $ext->{ctrees}, $ext_file )
+      if $ext->{ctrees} && %{ $ext->{ctrees} };
+
+    # Merge constants (with validation)
+    merge_constants( $core_constants, $ext->{constants}, $ext_file )
+      if $ext->{constants};
+}
+
+sub merge_attributes {
+    my ( $core, $ext, $ext_file ) = @_;
+
+    for my $key ( keys %$ext ) {
+        if ( exists $core->{$key} ) {
+
+            # If both core and extension have a 'select' array, append new
+            # options instead of replacing the entire attribute
+            if (   ref $core->{$key} eq 'HASH'
+                && ref $ext->{$key} eq 'HASH'
+                && ref $core->{$key}{select} eq 'ARRAY'
+                && ref $ext->{$key}{select} eq 'ARRAY' )
+            {
+                my %existing =
+                  map  { $_->{k} => 1 }
+                  grep { ref $_ eq 'HASH' && exists $_->{k} }
+                  @{ $core->{$key}{select} };
+                for my $opt ( @{ $ext->{$key}{select} } ) {
+                    next unless ref $opt eq 'HASH' && $opt->{k};
+                    unless ( $existing{ $opt->{k} } ) {
+                        push @{ $core->{$key}{select} }, $opt;
+                        verbose
+"  Appended select option '$opt->{k}' to attribute '$key'\n";
+                    }
+                }
+                next;
+            }
+
+            warn "Warning [$ext_file]: Overriding existing attribute '$key'\n";
+        }
+        $core->{$key} = $ext->{$key};
+        verbose "  Added attribute: $key\n";
+    }
+}
+
+sub merge_tree {
+    my ( $core_tree, $ext_tree, $ext_file ) = @_;
+
+    my $insert_into = $ext_tree->{insert_into};
+    my $nodes       = $ext_tree->{nodes};
+
+    unless ( $insert_into && $nodes ) {
+        warn
+"Warning [$ext_file]: tree extension requires 'insert_into' and 'nodes'\n";
+        return;
+    }
+
+    # Find the target node by path (e.g., "generalParameters/plugins")
+    my @path_parts = split '/', $insert_into;
+    my $target     = find_tree_node( $core_tree, \@path_parts );
+
+    unless ($target) {
+        warn "Warning [$ext_file]: Could not find tree path: $insert_into\n";
+        return;
+    }
+
+    # Insert the new nodes
+    my $insert_after  = $ext_tree->{insert_after};
+    my $insert_before = $ext_tree->{insert_before};
+
+    if ($insert_after) {
+        insert_nodes_after( $target->{nodes}, $insert_after, $nodes,
+            $ext_file );
+    }
+    elsif ($insert_before) {
+        insert_nodes_before( $target->{nodes}, $insert_before, $nodes,
+            $ext_file );
+    }
+    else {
+        # Default: append at end
+        push @{ $target->{nodes} }, @$nodes;
+    }
+
+    verbose "  Inserted tree nodes into: $insert_into\n";
+}
+
+sub find_tree_node {
+    my ( $tree, $path_parts ) = @_;
+
+    return undef unless @$path_parts;
+
+    my $current_name = shift @$path_parts;
+
+    for my $node (@$tree) {
+        next unless ref($node) eq 'HASH';
+        next unless ( $node->{title} // '' ) eq $current_name;
+
+        if ( @$path_parts == 0 ) {
+            return $node;
+        }
+        elsif ( $node->{nodes} ) {
+            return find_tree_node( $node->{nodes}, $path_parts );
+        }
+    }
+
+    return undef;
+}
+
+sub insert_nodes_after {
+    my ( $nodes_array, $after_title, $new_nodes, $ext_file ) = @_;
+
+    for my $i ( 0 .. $#$nodes_array ) {
+        my $node  = $nodes_array->[$i];
+        my $title = ref($node) eq 'HASH' ? $node->{title} : $node;
+        next unless defined $title;
+        if ( $title eq $after_title ) {
+            splice @$nodes_array, $i + 1, 0, @$new_nodes;
+            return;
+        }
+    }
+
+    # Reference not found in the target: append at end rather than failing.
+    warn "Warning"
+      . ( $ext_file ? " [$ext_file]" : "" )
+      . ": insert_after reference '$after_title' not found, appending at end\n";
+    push @$nodes_array, @$new_nodes;
+}
+
+sub insert_nodes_before {
+    my ( $nodes_array, $before_title, $new_nodes, $ext_file ) = @_;
+
+    for my $i ( 0 .. $#$nodes_array ) {
+        my $node  = $nodes_array->[$i];
+        my $title = ref($node) eq 'HASH' ? $node->{title} : $node;
+        next unless defined $title;
+        if ( $title eq $before_title ) {
+            splice @$nodes_array, $i, 0, @$new_nodes;
+            return;
+        }
+    }
+
+    # Reference not found in the target: append at end (consistent with
+    # insert_nodes_after). Prepending at position 0 would reorder
+    # unrelated, unrelated nodes and is almost never what the admin
+    # meant when the sibling is simply missing.
+    warn "Warning"
+      . ( $ext_file ? " [$ext_file]" : "" )
+      . ": insert_before reference '$before_title' not found, appending at end\n";
+    push @$nodes_array, @$new_nodes;
+}
+
+sub merge_ctrees {
+    my ( $core_ctrees, $ext_ctrees, $ext_file ) = @_;
+
+    for my $ctree_name ( keys %$ext_ctrees ) {
+        my $spec  = $ext_ctrees->{$ctree_name};
+        my @specs = ref $spec eq 'ARRAY' ? @$spec : ($spec);
+        for my $s (@specs) {
+            apply_ctree_extension( $core_ctrees, $ctree_name, $s, $ext_file );
+        }
+    }
+}
+
+# Apply a single ctree extension - used by both merge_ctrees and the redefined cTrees function
+sub apply_ctree_extension {
+    my ( $core_ctrees, $ctree_name, $ext_spec, $ext_file ) = @_;
+
+    unless ( exists $core_ctrees->{$ctree_name} ) {
+
+        # Create new ctree entry
+        $core_ctrees->{$ctree_name} = $ext_spec->{nodes} || [];
+        verbose "  Created new ctree: $ctree_name\n";
+        return;
+    }
+
+    my $nodes = $ext_spec->{nodes};
+    unless ($nodes) {
+        warn
+"Warning [$ext_file]: ctree '$ctree_name' extension requires 'nodes'\n";
+        return;
+    }
+
+    my $insert_into   = $ext_spec->{insert_into};
+    my $insert_after  = $ext_spec->{insert_after};
+    my $insert_before = $ext_spec->{insert_before};
+
+    # Determine target array for insertion
+    my $target_array;
+    if ($insert_into) {
+
+# Navigate to nested node using path (e.g., "oidcRPMetaDataOptions/oidcRPMetaDataOptionsAdvanced")
+        my @path_parts = split '/', $insert_into;
+        my $target =
+          find_tree_node( $core_ctrees->{$ctree_name}, \@path_parts );
+        unless ($target) {
+            warn
+"Warning [$ext_file]: Could not find ctree path: $ctree_name/$insert_into\n";
+            return;
+        }
+        $target_array = $target->{nodes};
+        unless ($target_array) {
+            warn
+"Warning [$ext_file]: Target node '$insert_into' has no 'nodes' array\n";
+            return;
+        }
+    }
+    else {
+        $target_array = $core_ctrees->{$ctree_name};
+    }
+
+    if ($insert_after) {
+        insert_nodes_after( $target_array, $insert_after, $nodes, $ext_file );
+    }
+    elsif ($insert_before) {
+        insert_nodes_before( $target_array, $insert_before, $nodes, $ext_file );
+    }
+    else {
+        push @$target_array, @$nodes;
+    }
+
+    verbose "  Extended ctree: $ctree_name\n";
+}
+
+sub merge_constants {
+    my ( $core, $ext, $ext_file ) = @_;
+
+    for my $key ( keys %$ext ) {
+        if ( exists $core->{$key} ) {
+            die
+"Error [$ext_file]: Portal constant '$key' already exists with value $core->{$key}\n";
+        }
+
+        my $value = $ext->{$key};
+        if ( $value >= 0 && $value < 200 ) {
+            warn
+"Warning [$ext_file]: Plugin constants should use values >= 200 (got $key => $value)\n";
+        }
+
+        $core->{$key} = $value;
+        verbose "  Added constant: $key => $value\n";
+    }
+}
+
+sub update_language_files {
+    my ( $dir, $translations ) = @_;
+
+    # List all language files
+    opendir my $dh, $dir or die "Cannot open language directory $dir: $!";
+    my @lang_files = grep { /\.json$/ } readdir $dh;
+    closedir $dh;
+
+    my $json =
+      JSON->new->utf8->pretty->canonical->space_before(0)->space_after(0);
+
+    for my $lang_file (@lang_files) {
+        my $lang_path = "$dir/$lang_file";
+
+        # Extract language code from filename (e.g., "fr.json" -> "fr")
+        my ($lang_code) = $lang_file =~ /^(.+)\.json$/;
+
+        # Load existing translations
+        my $content;
+        {
+            open my $fh, '<', $lang_path or die "Cannot read $lang_path: $!";
+            local $/;
+            $content = <$fh>;
+            close $fh;
+        }
+        my $lang_data = $json->decode($content);
+
+        # Add new translations
+        my $modified = 0;
+        for my $key ( keys %$translations ) {
+            my $trans = $translations->{$key};
+
+            # Determine the text to use:
+            # 1. Use the specific language if available
+            # 2. Fall back to English
+            # 3. Fall back to the first available language
+            my $text;
+            if ( ref($trans) eq 'HASH' ) {
+                $text = $trans->{$lang_code} // $trans->{en}
+                  // ( values %$trans )[0];
+            }
+            else {
+                # If trans is a scalar, use it directly (same for all languages)
+                $text = $trans;
+            }
+
+            if ( defined $text ) {
+                if ( exists $lang_data->{$key} ) {
+                    verbose "    [$lang_code] Overriding existing key '$key'\n";
+                }
+                $lang_data->{$key} = $text;
+                $modified = 1;
+            }
+        }
+
+        # Write back if modified
+        if ($modified) {
+            $content = $json->encode($lang_data);
+
+            # Compact format like addTrEntry
+            $content =~ s/\n\s+/\n/sg;
+            $content =~ s/\n*$//s;
+
+            open my $fh, '>', $lang_path or die "Cannot write $lang_path: $!";
+            print $fh $content;
+            close $fh;
+
+            verbose "  Updated $lang_file\n";
+        }
+    }
+}
+
+sub minify_conftree {
+    my ($conftree_file) = @_;
+
+    # Get directory and basename for proper source map paths
+    my $dir          = dirname($conftree_file);
+    my $basename     = basename($conftree_file);
+    my $min_basename = $basename;
+    $min_basename =~ s/\.js$/.min.js/;
+
+    # If source and min are the same (shouldn't happen), skip
+    if ( $min_basename eq $basename ) {
+        warn "Warning: Cannot determine minified filename for $conftree_file\n";
+        return;
+    }
+
+    verbose "Minifying $conftree_file -> $dir/$min_basename\n";
+
+    # Save current directory and change to target directory
+    my $orig_dir = getcwd();
+    chdir $dir or do {
+        warn "Warning: Cannot chdir to $dir: $!\n";
+        return;
+    };
+
+    my $success = 0;
+
+    # Prefer terser
+    my $terser_version = `terser --version 2>/dev/null`;
+    if ( $? == 0 && $terser_version ) {
+        verbose "  Using terser\n";
+        my @cmd = (
+            'terser',     $basename,  '--compress',   '--mangle',
+            '--comments', '/Copyr/i', '--source-map', '-o',
+            $min_basename,
+        );
+        $success = ( system(@cmd) == 0 );
+    }
+
+    # Fall back to uglifyjs
+    if ( !$success ) {
+        my $uglifyjs_version = `uglifyjs --version 2>/dev/null`;
+        if ( $? == 0 && $uglifyjs_version ) {
+            my ($major) = $uglifyjs_version =~ /^[^\d]*(\d)/;
+            $major //= 3;
+
+            my @cmd;
+            if ( $major == 2 ) {
+                @cmd = (
+                    'uglifyjs',     $basename,
+                    '--compress',   '--mangle',
+                    '--comments',   '/Copyr/i',
+                    '--source-map', "$min_basename.map",
+                    '-o',           $min_basename,
+                );
+            }
+            else {
+                @cmd = (
+                    'uglifyjs',   $basename,  '--compress',   '--mangle',
+                    '--comments', '/Copyr/i', '--source-map', '-o',
+                    $min_basename,
+                );
+            }
+
+            verbose "  Using uglifyjs (version $major)\n";
+            $success = ( system(@cmd) == 0 );
+        }
+    }
+
+    # No minifier available or all failed, just copy
+    if ( !$success ) {
+        verbose "  No minifier available, copying file\n";
+        copy_file( $basename, $min_basename );
+    }
+
+    # Restore original directory
+    chdir $orig_dir or warn "Warning: Cannot chdir back to $orig_dir: $!\n";
+}
+
+sub copy_file {
+    my ( $src, $dst ) = @_;
+    open my $in,  '<', $src or die "Cannot open $src: $!";
+    open my $out, '>', $dst or die "Cannot open $dst: $!";
+    while (<$in>) {
+        print $out $_;
+    }
+    close $in;
+    close $out;
+}
+
+__END__
+
+=head1 NAME
+
+llng-build-manager-files - Regenerate LemonLDAP::NG Manager with plugin extensions
+
+=head1 SYNOPSIS
+
+  llng-build-manager-files [--plugins-dir=<path> ...] [options]
+
+=head1 DESCRIPTION
+
+This script allows LemonLDAP::NG plugins to extend the Manager interface by
+adding new configuration attributes, tree nodes (for the configuration tree),
+and portal constants.
+
+Extensions can be provided in either Perl (.pm) or JSON (.json) format and are
+loaded from the specified plugins directory.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--plugins-dir>=I<path>
+
+Directory containing plugin extension files (.pm or .json).
+Can be specified multiple times to scan several directories.
+If not specified or a directory doesn't exist, it is skipped with a warning.
+
+=item B<--struct-file>=I<path>
+
+Output path for struct.json file.
+
+=item B<--conftree-file>=I<path>
+
+Output path for conftree.js file.
+
+=item B<--manager-constants-file>=I<path>
+
+Output path for ReConstants.pm file.
+
+=item B<--manager-attributes-file>=I<path>
+
+Output path for Attributes.pm file.
+
+=item B<--default-values-file>=I<path>
+
+Output path for DefaultValues.pm file.
+
+=item B<--conf-constants-file>=I<path>
+
+Output path for Constants.pm file.
+
+=item B<--reverse-tree-file>=I<path>
+
+Output path for reverseTree.json file.
+
+=item B<--portal-constants-file>=I<path>
+
+Output path for portal Constants.pm file.
+
+=item B<--handler-status-constants-file>=I<path>
+
+Output path for StatusConstants.pm file.
+
+=item B<--lang-dir>=I<path>
+
+Directory containing language JSON files (e.g., en.json, fr.json).
+Translations from extensions will be merged into these files.
+
+=item B<--verbose>, B<-v>
+
+Show detailed progress information.
+
+=item B<--help>, B<-h>
+
+Show help message.
+
+=back
+
+=head1 EXTENSION FILE FORMAT
+
+=head2 Perl Format (.pm)
+
+  package MyPlugin::Extension;
+
+  sub attributes {
+      return {
+          myPluginEnabled => {
+              type          => 'bool',
+              default       => 0,
+              documentation => 'Enable my plugin',
+              help          => 'myplugin.html',
+          },
+          myPluginOption => {
+              type    => 'text',
+              default => 'default_value',
+          },
+      };
+  }
+
+  sub tree {
+      return {
+          insert_into => 'generalParameters/plugins',
+          nodes => [
+              {
+                  title => 'myPluginNode',
+                  help  => 'myplugin.html',
+                  form  => 'simpleInputContainer',
+                  nodes => ['myPluginEnabled', 'myPluginOption'],
+              }
+          ],
+      };
+  }
+
+  sub ctrees {
+      return {
+          # Extend oidcRPMetaDataNode with additional options
+          oidcRPMetaDataNode => {
+              insert_after => 'oidcRPMetaDataMacros',
+              nodes => [
+                  {
+                      title => 'myPluginOidcOptions',
+                      form  => 'simpleInputContainer',
+                      nodes => ['myPluginOidcAttr'],
+                  }
+              ],
+          },
+      };
+  }
+
+  sub constants {
+      return {
+          PE_MYPLUGIN_ERROR => 200,
+      };
+  }
+
+  sub lang {
+      return {
+          myPluginEnabled => {
+              en => 'Enable my plugin',
+              fr => 'Activer mon plugin',
+          },
+          myPluginOption => {
+              en => 'My plugin option',
+              fr => 'Option de mon plugin',
+          },
+      };
+  }
+
+  1;
+
+=head2 JSON Format (.json)
+
+  {
+    "attributes": {
+      "myPluginEnabled": {
+        "type": "bool",
+        "default": 0,
+        "documentation": "Enable my plugin"
+      }
+    },
+    "tree": {
+      "insert_into": "generalParameters/plugins",
+      "nodes": [
+        {
+          "title": "myPluginNode",
+          "form": "simpleInputContainer",
+          "nodes": ["myPluginEnabled"]
+        }
+      ]
+    },
+    "ctrees": {},
+    "constants": {
+      "PE_MYPLUGIN_ERROR": 200
+    },
+    "lang": {
+      "myPluginEnabled": {
+        "en": "Enable my plugin",
+        "fr": "Activer mon plugin"
+      }
+    }
+  }
+
+=head1 AUTH PLUGIN DECLARATION
+
+Authentication plugins can declare themselves via the C<authPlugin> key
+(top level of an extension file, alongside C<attributes>, C<tree>, etc.)
+instead of manually appending to every select list:
+
+  "authPlugin": {
+    "k": "JsonFile",
+    "v": "JSON File (dev/test)",
+    "roles": ["authentication", "userDB"]
+  }
+
+Multiple plugins may be declared as an array. Allowed roles are
+C<authentication>, C<userDB>, and C<passwordDB>. The option is appended
+to the following core selects based on the declared roles:
+
+=over 4
+
+=item * C<authentication> role: C<authentication>, C<authChoiceModules>
+(auth slot), C<combModules>
+
+=item * C<userDB> role: C<userDB>, C<authChoiceModules> (userDB slot),
+C<combModules>
+
+=item * C<passwordDB> role: C<passwordDB>, C<authChoiceModules>
+(password slot)
+
+=back
+
+Appends are deduplicated on the C<k> key, so re-running the rebuilder
+or declaring the same plugin in multiple files is safe.
+
+=head1 TREE INSERTION
+
+The C<tree> and C<ctrees> extensions support the following insertion options:
+
+=over 4
+
+=item B<insert_into>
+
+Path to the target node, using "/" as separator (e.g., "generalParameters/plugins").
+
+=item B<insert_after>
+
+Insert new nodes after the node with this title.
+
+=item B<insert_before>
+
+Insert new nodes before the node with this title.
+
+=back
+
+If neither C<insert_after> nor C<insert_before> is specified, nodes are appended
+at the end.
+
+If C<insert_after> or C<insert_before> refers to a sibling that does not
+exist in the target tree, nodes are also appended at the end and a
+warning is printed on stderr pointing to the offending extension file.
+
+=head1 TRANSLATIONS
+
+Extensions can provide translations for their configuration keys using the
+C<lang> function (Perl) or C<lang> key (JSON). Translations are specified
+as a hash where keys are the translation identifiers and values are hashes
+mapping language codes to translated text.
+
+If a translation is not provided for a specific language, the script will:
+
+=over 4
+
+=item 1. Use the English (C<en>) translation if available
+
+=item 2. Fall back to the first available translation
+
+=back
+
+This ensures all language files get an entry even if translations are only
+provided for a subset of languages.
+
+=head1 PORTAL CONSTANTS
+
+Plugin constants should use values >= 200 to avoid conflicts with core constants.
+A warning is issued if a value below 200 is used.
+
+=head1 EXAMPLES
+
+  # Regenerate with plugins (uses default paths from installation)
+  llng-build-manager-files --plugins-dir=/etc/lemonldap-ng/manager-overrides.d
+
+  # Multiple plugin directories
+  llng-build-manager-files \
+    --plugins-dir=/etc/lemonldap-ng/manager-overrides.d \
+    --plugins-dir=/usr/share/lemonldap-ng/plugins.d
+
+  # Verbose mode
+  llng-build-manager-files --plugins-dir=/etc/lemonldap-ng/manager-overrides.d -v
+
+  # Override specific output paths (useful for testing)
+  llng-build-manager-files \
+    --plugins-dir=/etc/lemonldap-ng/manager-overrides.d \
+    --struct-file=/custom/path/struct.json
+
+=head1 SEE ALSO
+
+L<Lemonldap::NG::Manager::Build>, L<https://lemonldap-ng.org/>
+
+=head1 AUTHORS
+
+LemonLDAP::NG team L<http://lemonldap-ng.org/team>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2, or (at your option)
+any later version.
+
+=cut

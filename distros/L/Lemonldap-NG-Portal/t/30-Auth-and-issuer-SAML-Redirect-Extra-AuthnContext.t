@@ -18,14 +18,7 @@ my $debug     = 'error';
 my ( $issuer, $sp, $res );
 
 # Redefine LWP methods for tests
-LWP::Protocol::PSGI->register(
-    sub {
-        my $req = Plack::Request->new(@_);
-        fail('POST should not launch SOAP requests');
-        count(1);
-        return [ 500, [], [] ];
-    }
-);
+LWP::Protocol::PSGI->register( denyLwpRequests() );
 
 SKIP: {
     unless (
@@ -96,7 +89,7 @@ SKIP: {
         'SAMLResponse', 'RelayState' );
 
     my ($resp) = $query =~ qr/SAMLResponse=([^&]*)/;
-    my $message = decode_base64( URI::Escape::uri_unescape $resp);
+    my $message = decode_base64( URI::Escape::uri_unescape $resp );
     like(
         $message,
         qr@urn:federation:authentication:windows@,
@@ -120,7 +113,8 @@ SKIP: {
     expectAuthenticatedAs( $res, 'fa@badwolf.org@idp' );
 
     # Verify authn leevel
-    ok( getSession($spId)->data->{authenticationLevel} eq '1', 'Map authentication context' );
+    ok( getSession($spId)->data->{authenticationLevel} eq '1',
+        'Map authentication context' );
 }
 
 count($maintests);
@@ -169,9 +163,9 @@ sub issuer {
                           samlSPMetaDataXML( 'sp', 'HTTP-Redirect' )
                     },
                 },
-            adaptativeAuthenticationLevelRules => {
-                '$uid eq "french"'   => '=1',
-            },
+                adaptativeAuthenticationLevelRules => {
+                    '$uid eq "french"' => '=1',
+                },
                 samlAuthnContextMapExtra => {
                     'urn:federation:authentication:windows' => 1,
                 }
@@ -231,7 +225,7 @@ sub sp {
                 samlServicePublicKeyEnc     => saml_key_sp_public_enc,
                 samlServiceSignatureMethod  => "RSA_SHA1",
                 samlSPSSODescriptorAuthnRequestsSigned => 1,
-                samlAuthnContextMapExtra => {
+                samlAuthnContextMapExtra               => {
                     'urn:federation:authentication:windows' => 1,
                 }
             },

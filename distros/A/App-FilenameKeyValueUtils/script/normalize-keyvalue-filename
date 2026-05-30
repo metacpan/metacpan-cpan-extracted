@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-05-28'; # DATE
+our $DATE = '2026-05-29'; # DATE
 our $DIST = 'App-FilenameKeyValueUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Filename/KeyValue/normalize_keyvalue_filename",
@@ -38,7 +38,7 @@ normalize-keyvalue-filename - Normalize filename that has the key-values followi
 
 =head1 VERSION
 
-This document describes version 0.002 of normalize-keyvalue-filename (from Perl distribution App-FilenameKeyValueUtils), released on 2026-05-28.
+This document describes version 0.003 of normalize-keyvalue-filename (from Perl distribution App-FilenameKeyValueUtils), released on 2026-05-29.
 
 =head1 SYNOPSIS
 
@@ -200,7 +200,7 @@ For fish and zsh, install L<shcompgen> as described above.
 =head2 Sort keys
 
  % normalize-keyvalue-filename 'foo-bar-kw2=val2-kw1=val1.jpg'
- foo-bar--kw1=val1-kw2=val2.jpg
+ foo-bar-kw1=val1-kw2=val2.jpg
 
 =head1 HOMEPAGE
 

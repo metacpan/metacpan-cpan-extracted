@@ -49,8 +49,7 @@ sub iniCmb {
     my $expr = shift;
     count(1);
     if (
-        my $client = LLNG::Manager::Test->new(
-            {
+        my $client = LLNG::Manager::Test->new( {
                 ini => {
                     logLevel       => 'error',
                     useSafeJail    => 1,

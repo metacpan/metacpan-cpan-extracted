@@ -19,8 +19,9 @@ LWP::Protocol::PSGI->register(
         my $type = $1;
         count(1);
         my $res = from_json( $req->content );
+        is( $res->{ip}, '127.0.0.1', 'Found extra arg' );
         ok( $res->{user} eq 'dwho', ' User is dwho' );
-        count(1);
+        count(2);
 
         if ( $type eq 'auth' ) {
             ok( $res->{password} eq 'dwho', ' Password is dwho' )
@@ -65,18 +66,29 @@ LWP::Protocol::PSGI->register(
 
 my $res;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel          => 'error',
-            useSafeJail       => 1,
-            authentication    => 'REST',
-            userDB            => 'Same',
-            passwordDB        => 'REST',
-            restAuthUrl       => 'http://ws/auth',
-            restUserDBUrl     => 'http://ws/user',
-            restPwdConfirmUrl => 'http://ws/confirm',
+            logLevel       => 'error',
+            useSafeJail    => 1,
+            authentication => 'REST',
+            userDB         => 'Same',
+            passwordDB     => 'REST',
+            restAuthUrl    => 'http://ws/auth',
+            restAuthArgs   => {
+                "ip" => '$ENV{REMOTE_ADDR}',
+            },
+            restUserDBUrl  => 'http://ws/user',
+            restUserDBArgs => {
+                "ip" => '$ENV{REMOTE_ADDR}',
+            },
+            restPwdConfirmUrl  => 'http://ws/confirm',
+            restPwdConfirmArgs => {
+                "ip" => '$ENV{REMOTE_ADDR}',
+            },
             restPwdModifyUrl  => 'http://ws/modify',
+            restPwdModifyArgs => {
+                "ip" => '$ENV{REMOTE_ADDR}',
+            },
         }
     }
 );

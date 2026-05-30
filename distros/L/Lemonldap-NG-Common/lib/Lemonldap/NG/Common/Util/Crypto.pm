@@ -4,8 +4,8 @@ use warnings;
 
 require Exporter;
 
-our $VERSION = '2.22.0';
-our @ISA     = qw(Exporter);
+our $VERSION   = '2.23.0';
+our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(genRsaKey);
 
 use Crypt::OpenSSL::RSA;
@@ -16,14 +16,14 @@ use Net::SSLeay;
 sub genRsaKey {
     my ( $key_size, $password ) = @_;
 
-    my $rsa = Crypt::OpenSSL::RSA->generate_key( $key_size );
+    my $rsa = Crypt::OpenSSL::RSA->generate_key($key_size);
 
-    my $keys  = {
+    my $keys = {
         'private' => $rsa->get_private_key_string(),
         'public'  => $rsa->get_public_key_x509_string(),
         'hash'    => md5_base64( $rsa->get_public_key_string() ),
     };
-    if ( $password ) {
+    if ($password) {
         my $pem = Convert::PEM->new(
             Name => 'RSA PRIVATE KEY',
             ASN  => q(
@@ -155,17 +155,17 @@ sub genEcCertKey {
 }
 
 sub genEcKey {
-    my ( $curve ) = @_;
+    my ($curve) = @_;
     require Crypt::PK::ECC;
     my $ec_key = Crypt::PK::ECC->new();
     $ec_key->generate_key($curve);
 
-    my $pubKey = $ec_key->export_key_pem('public');
+    my $pubKey  = $ec_key->export_key_pem('public');
     my $privKey = $ec_key->export_key_pem('private');
     return {
         private => $privKey,
-        public => $pubKey,
-        hash => md5_base64($pubKey),
+        public  => $pubKey,
+        hash    => md5_base64($pubKey),
     };
 }
 

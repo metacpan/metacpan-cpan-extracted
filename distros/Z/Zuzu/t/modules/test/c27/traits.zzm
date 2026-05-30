@@ -1,6 +1,0 @@
-trait ParentRenamer {
-	method rename_parent_field ( String value ) {
-		self.set_name( value );
-		return self.get_name();
-	}
-}

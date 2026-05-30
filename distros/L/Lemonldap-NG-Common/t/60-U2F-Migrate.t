@@ -62,15 +62,12 @@ SKIP: {
         );
 
         #dwho
-        Lemonldap::NG::Common::Session->new(
-            {
+        Lemonldap::NG::Common::Session->new( {
                 @psessionsOpts,
                 id    => "5efe8af397fc3577e05b483aca964f1b",
                 force => 1,
                 info  => {
-                    "_2fDevices" => to_json(
-                        [
-                            {
+                    "_2fDevices" => to_json( [ {
                                 'type'     => 'UBK',
                                 'epoch'    => 1588691690,
                                 '_yubikey' => 'cccccceijfnf',
@@ -102,9 +99,7 @@ SKIP: {
                             }
                         ]
                     ),
-                    "_oidcConsents" => to_json(
-                        [
-                            {
+                    "_oidcConsents" => to_json( [ {
                                 'scope' => 'openid email',
                                 'rp'    => 'rp-example',
                                 'epoch' => 1589288341
@@ -122,16 +117,13 @@ SKIP: {
         );
 
         # rtyler
-        Lemonldap::NG::Common::Session->new(
-            {
+        Lemonldap::NG::Common::Session->new( {
                 @psessionsOpts,
                 id    => "8d3bc3b0e14ea2a155f275aa7c07ebee",
                 force => 1,
                 info  => {
                     "_session_uid" => "rtyler",
-                    "_2fDevices"   => to_json(
-                        [
-                            {
+                    "_2fDevices"   => to_json( [ {
                                 'type'     => 'UBK',
                                 'epoch'    => 1588691690,
                                 '_yubikey' => 'cccccceijfnf',

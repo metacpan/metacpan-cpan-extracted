@@ -36,7 +36,7 @@ my $client = LLNG::Manager::Test->new( {
 ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Portal', );
 ok( $res->[2]->[0] =~ /input type="checkbox" id="checkLogins1_demo"/,
     'token id found' )
-or explain( $res->[2]->[0], 'Token id' );
+  or explain( $res->[2]->[0], 'Token id' );
 ok(
     $res->[2]->[0] =~
 m%<input type="hidden" id="token1_demo" name="token" value="([\d_]+?)" />%,

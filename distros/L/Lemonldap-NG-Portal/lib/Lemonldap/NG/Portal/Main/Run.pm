@@ -9,7 +9,7 @@
 #
 package Lemonldap::NG::Portal::Main::Run;
 
-our $VERSION = '2.22.2';
+our $VERSION = '2.23.0';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -370,7 +370,6 @@ sub do {
         portalCode => $err,
     );
 
-    # Update history
     return $req->response if $err == PE_SENDRESPONSE;
 
     # Remove userData if authentication fails
@@ -457,11 +456,7 @@ sub doPE {
 
 sub getModule {
     my ( $self, $req, $type ) = @_;
-    if ( my $val =
-        $req->userData->{ { auth => '_auth', user => '_userDB' }->{$type} } )
-    {
-        return $val;
-    }
+
     if (
         my $mod = {
             auth     => '_authentication',
@@ -531,14 +526,9 @@ sub autoRedirect {
                 $req->data->{redirectFormMethod} = "get";
             }
             else {
-                return [
-                    302,
-                    [
-                        Location => URI->new( $req->{urldc} )->as_string,
-                        $req->spliceHdrs
-                    ],
-                    []
-                ];
+                return $self->sendRedirection( $req,
+                    URI->new( $req->{urldc} )->as_string,
+                );
             }
         }
     }
@@ -1213,13 +1203,7 @@ sub sendImage {
     my $u = URI->new_abs( $self->staticPrefix . "/common/$img", $req->portal )
       ->as_string;
 
-    return [
-        302,
-        [
-            'Location' => $u,
-        ],
-        [],
-    ];
+    return $self->sendRedirection( $req, $u );
 }
 
 sub sendCss {
@@ -1234,15 +1218,11 @@ sub sendCss {
           . '") no-repeat center fixed;'
           . 'background-size:cover;}';
     }
-    return [
-        200,
-        [
-            'Content-Type'   => 'text/css',
-            'Content-Length' => length($s),
-            'Cache-Control'  => 'public,max-age=3600',
-        ],
-        [$s]
-    ];
+    return $self->sendTextResponse(
+        $req, $s,
+        type    => 'text/css',
+        headers => [ 'Cache-Control' => 'public,max-age=3600' ]
+    );
 }
 
 sub lmError {
@@ -1353,6 +1333,9 @@ sub registerLogin {
       unless ( $self->conf->{loginHistoryEnabled}
         and defined $req->authResult );
 
+    # Do not store login blocked by BruteForceProtection (#3561)
+    return if $req->authResult == PE_WAIT;
+
     # Check old login history
     if ( $req->sessionInfo->{loginHistory} ) {
 
@@ -1462,7 +1445,7 @@ sub _sumUpSession {
 sub corsPreflight {
     my ( $self, $req ) = @_;
     my @headers;
-    my $res = [ 204, \@headers, [] ];
+    my $res = $self->sendBinaryResponse( $req, '', code => 204 );
 
     $self->setCorsHeaderFromConfig($res);
 
@@ -1590,6 +1573,50 @@ sub cspGetHost {
         return ( $scheme . ":" );
     }
     return;
+}
+
+# Method that triggers back-channel logout notifications to federated
+# applications for a session being removed remotely (e.g., by GlobalLogout or
+# SingleSession).
+#
+# @param $req The current request object
+# @param $sessionData Hashref of the session data being deleted
+# @return PE_OK on success, error code otherwise
+sub _triggerBackChannelLogout {
+    my ( $self, $req, $sessionData ) = @_;
+
+    return PE_OK unless $sessionData && ref($sessionData) eq 'HASH';
+
+    $self->logger->debug(
+        "Triggering back-channel logout for session $sessionData->{_session_id}"
+    );
+
+    # Save the original context
+    my $originalUserData    = $req->userData;
+    my $originalSessionInfo = $req->sessionInfo;
+    my $originalId          = $req->id;
+    my @steps               = @{ $req->steps || [] };
+    my $noFail              = $req->data->{nofail};
+    my $originalError       = $req->error;
+
+    # Inject the data of the session being deleted
+    $req->userData($sessionData);
+    $req->sessionInfo($sessionData);
+    $req->id( $sessionData->{_session_id} );
+    $req->steps( [ @{ $self->beforeLogout } ] );
+
+    # Iterate over beforeLogout entry points
+    my $result = $self->process( $req, nofail => 1 );
+
+    # Restore the original context
+    $req->userData($originalUserData);
+    $req->sessionInfo($originalSessionInfo);
+    $req->id($originalId);
+    $req->steps( \@steps );
+    $req->data->{nofail} = $noFail;
+    $req->error($originalError);
+
+    return $result;
 }
 
 sub relativeUrl {

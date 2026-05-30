@@ -6,7 +6,7 @@ use Lemonldap::NG::Portal::Main::Constants 'PE_OK';
 use Mouse;
 use JSON qw(from_json to_json);
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.23.0';
 
 extends qw(
   Lemonldap::NG::Portal::2F::Register::Base
@@ -35,6 +35,7 @@ has ott => (
 
 use constant supportedActions => {
     delete => "delete",
+    modify => "modify",
     verify => "verify",
     getkey => "getkey",
 };
@@ -68,19 +69,30 @@ sub verify {
       $self->checkNameSfa( $req, $self->type, $req->param('TOTPName') );
     return $self->failResponse( $req, 'badName', 200 ) unless $TOTPName;
 
-    my ( $r, $range ) = $self->verifyCode(
-        $self->conf->{totp2fInterval},
-        $self->conf->{totp2fRange},
-        $self->conf->{totp2fDigits},
-        $token->{_totp2fSecret}, $code
+    my $verify_result = $self->verify_totp(
+        interval        => $self->conf->{totp2fInterval},
+        digits          => $self->conf->{totp2fDigits},
+        hash            => $self->conf->{totp2fAlgorithm},
+        range_tolerance => $self->conf->{totp2fRange},
+        stored_secret   => $token->{_totp2fSecret},
+        code            => $code,
     );
-    return $self->failResponse( $req, 'serverError' ) if $r == -1;
+
+    my $r = $verify_result->{result};
+
+    if ( $r == -1 ) {
+        $self->logger->error(
+            "TOTP registration failed: " . $verify_result->{error} );
+        return $self->failResponse( $req, 'serverError' );
+    }
 
     # Invalid try is returned with a 200 code. Javascript will read error
     # and propose to retry
     if ( $r == 0 ) {
         return $self->failResponse( $req, 'badCode', 200 );
     }
+
+    my $range = $verify_result->{offset};
 
     $self->userLogger->info("Codes match at range $range");
     $self->logger->debug( $self->prefix . '2f: code verified' );
@@ -138,13 +150,14 @@ sub getkey {
     return $self->successResponse(
         $req,
         {
-            secret   => $secret,
-            token    => $token,
-            portal   => $issuer,
-            user     => $user,
-            newkey   => $nk,
-            digits   => $self->conf->{totp2fDigits},
-            interval => $self->conf->{totp2fInterval}
+            secret    => $secret,
+            token     => $token,
+            portal    => $issuer,
+            user      => $user,
+            newkey    => $nk,
+            digits    => $self->conf->{totp2fDigits},
+            interval  => $self->conf->{totp2fInterval},
+            algorithm => $self->conf->{totp2fAlgorithm}
         }
     );
 }

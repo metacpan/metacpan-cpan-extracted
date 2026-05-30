@@ -254,8 +254,7 @@ clean_sessions();
 done_testing( count() );
 
 sub proxy {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'proxy.com',
@@ -329,7 +328,7 @@ sub proxy {
                         'samlSPMetaDataOptionsSessionNotOnOrAfterTimeout' =>
                           72000,
                         'samlSPMetaDataOptionsSignSLOMessage'  => -1,
-                        'samlSPMetaDataOptionsSignSSOMessage'  => 1,
+                        'samlSPMetaDataOptionsSignSSOMessage'  =>  1,
                         'samlSPMetaDataOptionsSignatureMethod' => ''
                     }
                 },
@@ -356,8 +355,7 @@ sub proxy {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'sp.com',
@@ -420,8 +418,7 @@ sub sp {
 }
 
 sub idp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',
@@ -443,7 +440,7 @@ sub idp {
                         'samlSPMetaDataOptionsSessionNotOnOrAfterTimeout' =>
                           72000,
                         'samlSPMetaDataOptionsSignSLOMessage'  => -1,
-                        'samlSPMetaDataOptionsSignSSOMessage'  => 1,
+                        'samlSPMetaDataOptionsSignSSOMessage'  =>  1,
                         'samlSPMetaDataOptionsSignatureMethod' => ''
                     }
                 },

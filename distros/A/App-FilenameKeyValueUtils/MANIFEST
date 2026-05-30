@@ -12,7 +12,9 @@ script/modify-keyvalue-filename
 script/normalize-keyvalue-filename
 script/parse-keyvalue-filename
 script/rename-add-keyvalue-filenames
+script/rename-modify-keyvalue-filenames
 script/rename-remove-keyvalue-filenames
+script/rename-replace-keyvalue-filenames
 t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t

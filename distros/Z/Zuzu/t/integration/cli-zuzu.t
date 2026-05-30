@@ -182,7 +182,7 @@ my $version_cmd = "$^X $zuzu_bin -v 2>&1";
 my $version_output = qx{$version_cmd};
 my $version_exit = $? >> 8;
 is $version_exit, 0, '-v exits successfully';
-like $version_output, qr/\Azuzu version \S+/,
+like $version_output, qr/\Azuzu\.pl version \S+/,
 	'-v prints project version';
 
 my $version_verbose_cmd = "$^X $zuzu_bin -V -I$tmpdir/modules 2>&1";
@@ -229,12 +229,13 @@ isnt $deny_gui_exit, 0, '--deny=gui rejects std/gui/objects imports';
 like $deny_gui_output, qr/std\/gui\/objects is denied by runtime policy/,
 	'--deny=gui fails while loading std/gui/objects';
 
-my $deny_gui_dialogue_cmd = "$^X $zuzu_bin --deny=gui -e 'from std/gui/dialogue import alert, confirm, prompt, file_open; from std/tui import filename_completions; alert(\"Hi\"); say(confirm(\"Q\", auto_result: true)); say(prompt(\"Name:\", auto_result: \"Ada\")); say(file_open(auto_result: \"x.txt\")); say(filename_completions(\"modules/std/tu\").length() > 0);' 2>&1";
+my $stdlib_modules = File::Spec->catdir( $repo_root, 'stdlib', 'modules' );
+my $deny_gui_dialogue_cmd = "$^X $zuzu_bin --deny=gui -I$stdlib_modules -e 'from std/gui/dialogue import alert, confirm, prompt, file_open; from std/tui import filename_completions; alert(\"Hi\"); say(confirm(\"Q\", auto_result: true)); say(prompt(\"Name:\", auto_result: \"Ada\")); say(file_open(auto_result: \"x.txt\")); say(filename_completions(\"$stdlib_modules/std/tu\").length() > 0);' 2>&1";
 my $deny_gui_dialogue_output = qx{$deny_gui_dialogue_cmd};
 my $deny_gui_dialogue_exit = $? >> 8;
 is $deny_gui_dialogue_exit, 0,
 	'--deny=gui allows std/gui/dialogue terminal fallbacks';
-is $deny_gui_dialogue_output, "Hi\n1\nAda\nx.txt\n1\n",
+is $deny_gui_dialogue_output, "Hi\ntrue\nAda\nx.txt\ntrue\n",
 	'std/gui/dialogue terminal fallback output is plain on non-TTY stdout';
 
 my $deny_module_cmd = "$^X $zuzu_bin --denymodule=extras/value -I$tmpdir/modules $import_script 2>&1";
@@ -272,7 +273,7 @@ my $die_object_cmd = "$^X $zuzu_bin -e 'die \"hi\"' 2>&1";
 my $die_object_output = qx{$die_object_cmd};
 my $die_object_exit = $? >> 8;
 isnt $die_object_exit, 0, 'die on String exits with exception';
-like $die_object_output, qr/\Ahi at \(command line\), line 1\s*\z/,
+like $die_object_output, qr/\AException: hi at \(command line\), line 1\s*\z/,
 	'die stringifies Exception payload via to_String';
 
 my $default_object_string_cmd = "$^X $zuzu_bin -e 'class Foo; say new Foo()' 2>&1";

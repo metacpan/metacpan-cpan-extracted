@@ -31,8 +31,10 @@ my $client = LLNG::Manager::Test->new( {
 ok( $res = $client->_get( '/', accept => 'text/html' ), 'Get Menu' );
 ok( $res->[2]->[0] =~ /1_securenull/, '1_securenull displayed' );
 ok( $res->[2]->[0] =~ /2_null/,       '2_null displayed' );
-ok( $res->[2]->[0] =~ /input type="checkbox" id="checkLogins1_securenull"/, '1_securenull checkbox displayed' );
-ok( $res->[2]->[0] =~ /input type="checkbox" id="checkLogins2_null"/,       '2_null checkbox displayed' );
+ok( $res->[2]->[0] =~ /input type="checkbox" id="checkLogins1_securenull"/,
+    '1_securenull checkbox displayed' );
+ok( $res->[2]->[0] =~ /input type="checkbox" id="checkLogins2_null"/,
+    '2_null checkbox displayed' );
 
 # Authenticate on first choice
 my $postString = 'user=dwho&password=dwho&test=1_securenull';
@@ -46,10 +48,9 @@ ok(
     'Auth query'
 );
 expectOK($res);
-my $id = expectCookie($res);
+my $id      = expectCookie($res);
 my $session = getSession($id)->data;
-is( $session->{authenticationLevel},
-    3, "Overriden authentication level" );
+is( $session->{authenticationLevel}, 3, "Overriden authentication level" );
 is( $session->{_auth},
     "SecureNull", "Allow custom modules to override their name" );
 $client->logout($id);
@@ -68,18 +69,17 @@ ok(
     'Auth query'
 );
 expectOK($res);
-$id = expectCookie($res);
+$id      = expectCookie($res);
 $session = getSession($id)->data;
-is( $session->{authenticationLevel},
-    1, "Default authentication level" );
-is( $session->{_auth},
-    "Null", "Correct fallback when no name is defined" );
+is( $session->{authenticationLevel}, 1, "Default authentication level" );
+is( $session->{_auth}, "Null", "Correct fallback when no name is defined" );
 $client->logout($id);
 
 clean_sessions();
 done_testing();
 
 BEGIN {
+
     package t::SecureNull;
     use Mouse;
     extends 'Lemonldap::NG::Portal::Auth::Null';

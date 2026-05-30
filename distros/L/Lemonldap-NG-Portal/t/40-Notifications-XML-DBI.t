@@ -72,8 +72,7 @@ qq{INSERT INTO notifications VALUES ('rtyler','testref2','2050-05-30 00:00:00','
 </notification></root>',null,null)}
     );
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel                   => 'error',
                 useSafeJail                => 1,

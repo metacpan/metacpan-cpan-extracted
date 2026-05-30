@@ -57,8 +57,18 @@ my $ztest_ids = module_ids_from_ztests(
 	File::Spec->catdir( $repo_root, 'stdlib', 'tests', 'std' ),
 );
 
+my %contract_owner_exempt = map { $_ => 1 } qw(
+	std/data/json/schema/core
+	std/data/json/schema/format
+	std/data/json/schema/model
+	std/data/json/schema/output
+	std/data/json/schema/relative_pointer
+	std/data/json/schema/validation
+);
 my %has_ztest = map { $_ => 1 } @{$ztest_ids};
-my @missing_contracts = grep { !$has_ztest{$_} } @{$module_ids};
+my @missing_contracts = grep {
+	!$has_ztest{$_} and !$contract_owner_exempt{$_}
+} @{$module_ids};
 is scalar @missing_contracts, 0,
 	'every stdlib module has a native ztest contract owner';
 

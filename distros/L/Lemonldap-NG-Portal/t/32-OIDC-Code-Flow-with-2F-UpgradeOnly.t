@@ -308,8 +308,191 @@ count(1);
 expectOK($res);
 expectAuthenticatedAs( $res, 'french' );
 
+## THIRD TEST: login at low level, then register TOTP
+# Query RP for auth
+
+$query = "user=msmith&password=msmith";
+ok(
+    $res = $op->_post(
+        '/',
+        IO::String->new($query),
+        accept => 'text/html',
+        length => length($query),
+    ),
+    "Post authentication with no target auth level",
+);
+count(1);
+$idpId = expectCookie($res);
+
+# Query RP for auth
+ok( $res = $rp->_get( '/', accept => 'text/html' ), 'Unauth SP request' );
+count(1);
+( $url, $query ) =
+  expectRedirection( $res, qr#http://auth.op.com(/oauth2/authorize)\?(.*)$# );
+
+# Push request to OP
+ok(
+    $res = $op->_get(
+        $url,
+        query  => $query,
+        accept => 'text/html',
+        cookie => "lemonldap=$idpId",
+    ),
+    "Push request to OP,         endpoint $url"
+);
+count(1);
+expectOK($res);
+$pdata = expectCookie( $res, 'lemonldappdata' );
+
+# OP should offer to upgrade the session
+( $host, $url, $query ) =
+  expectForm( $res, undef, '/upgradesession', 'confirm', 'url' );
+
+ok(
+    $res = $op->_post(
+        '/upgradesession',
+        IO::String->new($query),
+        length => length($query),
+        accept => 'text/html',
+        cookie => "lemonldap=$idpId;lemonldappdata=$pdata",
+    ),
+    'Post code'
+);
+count(1);
+
+$pdata = expectCookie( $res, 'lemonldappdata' );
+
+expectRedirection( $res, 'http://auth.op.com/2fregisters' );
+ok(
+    $res = $op->_get(
+        '/2fregisters',
+        accept => 'text/html',
+        cookie => "lemonldap=$idpId; lemonldappdata=$pdata",
+    ),
+    'Move to 2FA list'
+);
+like( $res->[2]->[0],
+    qr/trspan="2fRegRequired"/, "Found registration required prompt" );
+like( $res->[2]->[0],
+    qr(href="/2fregisters/totp"), "Found link to TOTP registration" );
+
+ok(
+    $res = $op->_get(
+        '/2fregisters/totp',
+        accept => 'text/html',
+        cookie => "lemonldap=$idpId; lemonldappdata=$pdata",
+    ),
+    'On TOTP registration page'
+);
+
+ok( $res->[2]->[0] =~ /totpregistration\.(?:min\.)?js/, 'Found TOTP js' );
+
+# JS query
+ok(
+    $res = $op->_post(
+        '/2fregisters/totp/getkey',
+        IO::String->new(''),
+        cookie => "lemonldap=$idpId; lemonldappdata=$pdata",
+        length => 0,
+        custom => {
+            HTTP_X_CSRF_CHECK => 1,
+        },
+    ),
+    'Get new key'
+);
+eval { $res = JSON::from_json( $res->[2]->[0] ) };
+ok( not($@), 'Content is JSON' )
+  or explain( $res->[2]->[0], 'JSON content' );
+my ( $key, $token );
+ok( $key   = $res->{secret}, 'Found secret' ) or print STDERR Dumper($res);
+ok( $token = $res->{token},  'Found token' )  or print STDERR Dumper($res);
+is( $res->{user}, 'msmith', 'Found user' );
+$key = Convert::Base32::decode_base32($key);
+
+# Post code
+ok( my $code = getTotp($key), 'Code' );
+ok( $code =~ /^\d{6}$/,       'Code contains 6 digits' );
+ok(
+    $res = $op->_post(
+        '/2fregisters/totp/verify',
+        {
+            code     => $code,
+            token    => $token,
+            TOTPName => "mytotp",
+        },
+        cookie => "lemonldap=$idpId; lemonldappdata=$pdata",
+        custom => {
+            HTTP_X_CSRF_CHECK => 1,
+        },
+    ),
+    'Post code'
+);
+eval { $res = JSON::from_json( $res->[2]->[0] ) };
+ok( not($@), 'Content is JSON' )
+  or explain( $res->[2]->[0], 'JSON content' );
+ok( $res->{result} == 1, 'TOTP is registered' );
+
+# JS sends us to ?continue=1
+ok(
+    $res = $op->_get(
+        '/2fregisters',
+        query  => "continue=1",
+        accept => 'text/html',
+        cookie => "lemonldap=$idpId; lemonldappdata=$pdata",
+    ),
+    'Continue registration'
+);
+
+$idpId = expectCookie($res);
+
+$pdata = expectCookie( $res, 'lemonldappdata' );
+($url) = expectRedirection( $res, qr#http://auth.op.com(/?/oauth2.*)# );
+
+ok(
+    $res = $op->_get(
+        "$url",
+        accept => 'text/html',
+        cookie => "lemonldap=$idpId; lemonldappdata=$pdata",
+    ),
+    "Follow redirection to Oauth2 issuer"
+);
+count(1);
+
+$pdata = expectCookie( $res, 'lemonldappdata' );
+is( $pdata, '', "Pdata was cleared" );
+count(1);
+
+( $host, $url, $query ) =
+  expectForm( $res, undef, qr#/oauth2/authorize.*#, 'confirm' );
+
+ok(
+    $res = $op->_post(
+        '/oauth2/authorize',
+        IO::String->new($query),
+        accept => 'text/html',
+        cookie => "lemonldap=$idpId",
+        length => length($query),
+    ),
+    "Post confirmation,          endpoint $url"
+);
+count(1);
+
+($query) = expectRedirection( $res, qr#^http://auth.rp.com/?\?(.*)$# );
+
+# Push OP response to RP
+
+ok( $res = $rp->_get( '/', query => $query, accept => 'text/html' ),
+    'Call openidconnectcallback on RP' );
+count(1);
+$spId = expectCookie($res);
+
+ok( $res = $rp->_get( '/', cookie => "lemonldap=$spId" ), 'Get / on SP' );
+count(1);
+expectOK($res);
+expectAuthenticatedAs( $res, 'msmith' );
+
 clean_sessions();
-done_testing( count() );
+done_testing();
 
 sub op {
     return LLNG::Manager::Test->new( {
@@ -321,12 +504,16 @@ sub op {
                 userDB                          => 'Same',
                 issuerDBOpenIDConnectActivation => 1,
                 sfOnlyUpgrade                   => 1,
-                ext2fActivation                 => 1,
-                ext2fAuthnLevel                 => 5,
-                ext2fCodeActivation             => '123456',
-                ext2FSendCommand                => 't/sendOTP.pl -uid dwho',
-                ext2FValidateCommand => 't/vrfyOTP.pl -uid dwho -code $code',
-                restSessionServer    => 1,
+                totp2fActivation       => '$uid eq "msmith" and has2f("TOTP")',
+                totp2fSelfRegistration => 1,
+                totp2fAuthnLevel       => 5,
+                sfRequired             => 1,
+                ext2fActivation        => '$uid eq "french"',
+                ext2fAuthnLevel        => 5,
+                ext2fCodeActivation    => '123456',
+                ext2FSendCommand       => 't/sendOTP.pl -uid dwho',
+                ext2FValidateCommand   => 't/vrfyOTP.pl -uid dwho -code $code',
+                restSessionServer      => 1,
                 oidcRPMetaDataExportedVars => {
                     rp => {
                         email       => "mail",

@@ -6,7 +6,7 @@ use Lemonldap::NG::Common::UserAgent;
 
 # Add constants used by this module
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -35,7 +35,8 @@ sub init_captcha {
     my ( $self, $req ) = @_;
 
     $req->data->{customScript} .=
-      '<script src="https://www.google.com/recaptcha/enterprise.js"></script>';
+        '<script src="https://www.google.com/recaptcha/enterprise.js?onload=__llng_recaptchaLoad" async defer></script>'
+      . '<script src="/static/common/js/recaptchav2.js"></script>';
 
     # Read option from the manager configuration
     my $dataSiteKey = $self->conf->{captchaOptions}->{dataSiteKey};

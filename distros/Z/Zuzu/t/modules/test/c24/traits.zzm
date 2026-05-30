@@ -1,5 +1,0 @@
-trait DescribeSuffix {
-	method describe () {
-		return super() _ ":trait";
-	}
-}

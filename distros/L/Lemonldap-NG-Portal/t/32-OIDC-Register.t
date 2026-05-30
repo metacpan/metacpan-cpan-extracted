@@ -15,68 +15,214 @@ BEGIN {
 my $debug = 'error';
 my $res;
 
-# Initialization
-ok( my $op = op(), 'OP portal' );
+# Helper to post registration data
+sub post_register {
+    my ( $op, $data ) = @_;
+    my $json = JSON::to_json($data);
+    return $op->_post(
+        "/oauth2/register",
+        IO::String->new($json),
+        accept => 'application/json',
+        length => length($json),
+    );
+}
 
-my $register_data = {
-    "application_type" => "web",
-    "redirect_uris"    => [
-        "https://client.example.org/callback",
-        "https://client.example.org/callback2"
-    ],
-    "client_name"                => "My Example",
-    "logo_uri"                   => "https://client.example.org/logo.png",
-    "subject_type"               => "pairwise",
-    "token_endpoint_auth_method" => "client_secret_basic",
+# Helper to find the latest config file for a registered RP
+sub get_registered_rp_conf {
+    my ($conf_num) = @_;
+    $conf_num //= 2;
+
+    # Try requested number first, then fall back
+    my $confFile;
+    for my $n ( $conf_num, $conf_num - 1, $conf_num + 1 ) {
+        my $f = "$main::tmpDir/lmConf-$n.json";
+        if ( -f $f ) {
+            $confFile = $f;
+            last;
+        }
+    }
+    die "No config file found" unless $confFile;
+    my $conf = JSON::from_json(`cat $confFile`);
+    my $rpId =
+      ( grep { /^register-/ } keys %{ $conf->{oidcRPMetaDataOptions} } )[0];
+    return ( $conf, $rpId, $confFile );
+}
+
+subtest "Confidential only mode (value=1)" => sub {
+
+    ok( my $op = op(1), 'OP portal' );
+
+    subtest "client_secret_basic registration" => sub {
+        $res = post_register(
+            $op,
+            {
+                application_type         => "web",
+                redirect_uris            => [
+                    "https://client.example.org/callback",
+                    "https://client.example.org/callback2"
+                ],
+                client_name                => "My Example",
+                logo_uri                   => "https://client.example.org/logo.png",
+                subject_type               => "pairwise",
+                token_endpoint_auth_method => "client_secret_basic",
+            }
+        );
+        ok( $res->[0] == 201, "Return code is 201" );
+        my $answer = JSON::from_json( $res->[2]->[0] );
+
+        ok( defined $answer->{client_id},     "client_id in response" );
+        ok( defined $answer->{client_secret},  "client_secret in response" );
+        is( $answer->{token_endpoint_auth_method}, 'client_secret_basic',
+            "token_endpoint_auth_method in response" );
+
+        my ( $conf, $rpId, $confFile ) = get_registered_rp_conf(2);
+        is( $conf->{oidcRPMetaDataOptions}->{$rpId}
+              ->{oidcRPMetaDataOptionsClientID},
+            $answer->{client_id}, "Client ID saved in configuration" );
+        is( $conf->{oidcRPMetaDataOptionsExtraClaims}->{$rpId}
+              ->{"extra_claim"},
+            "extra_var", "Extra claim defined" );
+        is( $conf->{oidcRPMetaDataExportedVars}->{$rpId}->{"extra_var"},
+            "mail", "Extra variable defined" );
+        is( $conf->{oidcRPMetaDataOptions}->{$rpId}
+              ->{oidcRPMetaDataOptionsRequirePKCE},
+            2, "RequirePKCE set to 2 (pkceOrSecret)" );
+        unlink $confFile;
+    };
+
+    subtest "public client rejected" => sub {
+        $res = post_register(
+            $op,
+            {
+                redirect_uris            => ["https://client.example.org/callback"],
+                client_name                => "Public Client",
+                token_endpoint_auth_method => "none",
+            }
+        );
+        is( $res->[0], 400, "Public client rejected" );
+    };
+
+    subtest "private_key_jwt rejected" => sub {
+        $res = post_register(
+            $op,
+            {
+                redirect_uris            => ["https://client.example.org/callback"],
+                client_name                => "PKJ Client",
+                token_endpoint_auth_method => "private_key_jwt",
+                jwks_uri                   => "https://client.example.org/jwks",
+            }
+        );
+        is( $res->[0], 400, "private_key_jwt rejected" );
+    };
+
+    subtest "unsupported auth method rejected" => sub {
+        $res = post_register(
+            $op,
+            {
+                redirect_uris            => ["https://client.example.org/callback"],
+                client_name                => "Bad Method",
+                token_endpoint_auth_method => "tls_client_auth",
+            }
+        );
+        is( $res->[0], 400, "Unsupported method rejected" );
+    };
 };
 
-my $register_data_json = JSON::to_json($register_data);
+reset_tmpdir();
 
-ok(
-    $res = $op->_post(
-        "/oauth2/register",
-        IO::String->new($register_data_json),
-        accept => 'application/json',
-        length => length($register_data_json),
-    ),
-    "Post register data"
-);
+subtest "All clients mode (value=2)" => sub {
 
-ok( $res->[0] == 201, "Return code is 201" );
-my $register_answer = JSON::from_json( $res->[2]->[0] );
+    ok( my $op = op(2), 'OP portal' );
 
-ok( defined $register_answer->{client_id},
-    "Client ID found in answer: " . $register_answer->{client_id} );
+    subtest "public client accepted" => sub {
+        $res = post_register(
+            $op,
+            {
+                redirect_uris            => ["https://client.example.org/callback"],
+                client_name                => "Public Client",
+                token_endpoint_auth_method => "none",
+            }
+        );
+        is( $res->[0], 201, "Public client accepted" );
+        my $answer = JSON::from_json( $res->[2]->[0] );
 
-# New configuration registered
-my $confFile = "$main::tmpDir/lmConf-2.json";
-my $conf     = JSON::from_json(`cat $confFile`);
+        ok( !defined $answer->{client_secret}, "No client_secret" );
+        is( $answer->{token_endpoint_auth_method}, 'none',
+            "token_endpoint_auth_method=none" );
 
-# Check saved data
-my $rpId = ( keys %{ $conf->{oidcRPMetaDataOptions} } )[0];
+        my ( $conf, $rpId, $confFile ) = get_registered_rp_conf(2);
+        is( $conf->{oidcRPMetaDataOptions}->{$rpId}
+              ->{oidcRPMetaDataOptionsPublic},
+            1, "Public flag set" );
+        is( $conf->{oidcRPMetaDataOptions}->{$rpId}
+              ->{oidcRPMetaDataOptionsRequirePKCE},
+            2, "RequirePKCE set to 2" );
+        unlink $confFile;
+    };
 
-ok(
-    $conf->{oidcRPMetaDataOptions}->{$rpId}->{oidcRPMetaDataOptionsClientID} eq
-      $register_answer->{client_id},
-    "Client ID saved in configuration"
-);
+    subtest "private_key_jwt without jwks_uri rejected" => sub {
+        $res = post_register(
+            $op,
+            {
+                redirect_uris            => ["https://client.example.org/callback"],
+                client_name                => "PKJ No JWKS",
+                token_endpoint_auth_method => "private_key_jwt",
+            }
+        );
+        is( $res->[0], 400, "Rejected without jwks_uri" );
+    };
 
-# Check extra claims and extra attributes
-ok(
-    $conf->{oidcRPMetaDataOptionsExtraClaims}->{$rpId}->{"extra_claim"} eq
-      "extra_var",
-    "Extra claim defined"
-);
-ok( $conf->{oidcRPMetaDataExportedVars}->{$rpId}->{"extra_var"} eq "mail",
-    "Extra variable defined" );
+    subtest "private_key_jwt with jwks_uri accepted" => sub {
+        $res = post_register(
+            $op,
+            {
+                redirect_uris            => ["https://client.example.org/callback"],
+                client_name                => "PKJ Client",
+                token_endpoint_auth_method => "private_key_jwt",
+                jwks_uri                   => "https://client.example.org/jwks",
+            }
+        );
+        is( $res->[0], 201, "Accepted with jwks_uri" );
+        my $answer = JSON::from_json( $res->[2]->[0] );
 
-unlink $confFile;
+        ok( !defined $answer->{client_secret}, "No client_secret" );
+        is( $answer->{token_endpoint_auth_method}, 'private_key_jwt',
+            "token_endpoint_auth_method=private_key_jwt" );
+
+        my ( $conf, $rpId, $confFile ) = get_registered_rp_conf(3);
+        is( $conf->{oidcRPMetaDataOptions}->{$rpId}
+              ->{oidcRPMetaDataOptionsJwksUri},
+            'https://client.example.org/jwks', "jwks_uri saved" );
+        ok( !$conf->{oidcRPMetaDataOptions}->{$rpId}
+              ->{oidcRPMetaDataOptionsPublic},
+            "Not marked as public" );
+    };
+
+    subtest "client_secret_jwt generates a secret" => sub {
+        $res = post_register(
+            $op,
+            {
+                redirect_uris            => ["https://client.example.org/callback"],
+                client_name                => "CS JWT Client",
+                token_endpoint_auth_method => "client_secret_jwt",
+            }
+        );
+        is( $res->[0], 201, "Accepted" );
+        my $answer = JSON::from_json( $res->[2]->[0] );
+
+        ok( defined $answer->{client_secret}, "client_secret present" );
+        is( $answer->{token_endpoint_auth_method}, 'client_secret_jwt',
+            "token_endpoint_auth_method=client_secret_jwt" );
+    };
+};
+
 clean_sessions();
 done_testing();
 
 sub op {
-    return LLNG::Manager::Test->new(
-        {
+    my ($dynreg_level) = @_;
+    $dynreg_level //= 1;
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'idp.com',
@@ -98,7 +244,7 @@ sub op {
                   { "extra_claim" => "extra_var" },
                 oidcServiceAllowHybridFlow            => 1,
                 oidcServiceAllowImplicitFlow          => 1,
-                oidcServiceAllowDynamicRegistration   => 1,
+                oidcServiceAllowDynamicRegistration   => $dynreg_level,
                 oidcServiceAllowAuthorizationCodeFlow => 1,
                 oidcRPMetaDataMacros                  => {
                     rp => {
@@ -133,4 +279,3 @@ sub op {
         }
     );
 }
-

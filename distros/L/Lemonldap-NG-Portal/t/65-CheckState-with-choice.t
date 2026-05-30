@@ -14,12 +14,12 @@ SKIP: {
 
     my $client = LLNG::Manager::Test->new( {
             ini => {
-                logLevel         => 'error',
-                requireToken     => 1,
-                checkStateSecret => 'x',
-                checkState       => 1,
-                authentication   => 'Choice',
-                userDB           => 'Same',
+                logLevel          => 'error',
+                requireToken      => 1,
+                checkStateSecret  => 'x',
+                checkState        => 1,
+                authentication    => 'Choice',
+                userDB            => 'Same',
                 authChoiceModules => {
                     '1_demo' => 'Demo;Demo;Null',
                     '2_ssl'  => 'SSL;Demo;Null',

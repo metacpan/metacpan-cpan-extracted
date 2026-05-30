@@ -5,7 +5,7 @@ use strict;
 use Lemonldap::NG::Portal::Main::Constants qw/PE_OK PE_ERROR/;
 use Mouse;
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -134,7 +134,54 @@ sub delete {
     my $epoch = $req->param('epoch')
       or return $self->p->sendError( $req,
         $self->prefix . '2f: "epoch" parameter is missing', 400 );
+
+    my $registration_state = { module => $self };
+
+    my $h = $self->p->processHook( $req, 'sfDeleteDevice', $req->userData,
+        $self->type, $epoch, $registration_state );
+
+    if ( $h != PE_OK ) {
+
+        # Return custom error label if defined by sfDeleteDevice hook
+        my $errorLabel = $registration_state->{errorLabel}
+          // 'sfDeleteDeviceHookError';
+        $self->logger->error( $self->prefix
+              . "2f: error in sfDeleteDevice hook: "
+              . $errorLabel );
+        return $self->p->sendError( $req, $errorLabel, 400 );
+    }
+
     if ( $self->del2fDevice( $req, $req->userData, $self->type, $epoch ) ) {
+        return $self->p->sendJSONresponse( $req, { result => 1 } );
+    }
+    else {
+        $self->logger->error(
+            $self->prefix . "2f: unable to delete device: 2FDeviceNotFound" );
+        return $self->p->sendError( $req, '2FDeviceNotFound', 400 );
+    }
+}
+
+sub modify {
+    my ( $self, $req ) = @_;
+    my $user = $req->userData->{ $self->conf->{whatToTrace} };
+
+    $self->checkCsrf($req)
+      or return $self->p->sendError( $req, 'csrfError', 400 );
+
+    my $epoch = $req->param('epoch')
+      or return $self->p->sendError( $req,
+        $self->prefix . '2f: "epoch" parameter is missing', 400 );
+    my $label = $req->param('label')
+      or return $self->p->sendError( $req,
+        $self->prefix . '2f: "label" parameter is missing', 400 );
+    $self->logger->debug( "Modifying 2FA device with the label " . $label );
+    if (
+        $self->update2fDevice(
+            $req,   $req->userData, $self->type, "epoch",
+            $epoch, "name",         $label
+        )
+      )
+    {
         return $self->p->sendJSONresponse( $req, { result => 1 } );
     }
     $self->logger->error( $self->prefix . "2f: device not found" );
@@ -191,7 +238,10 @@ sub successResponse {
 sub registerDevice {
     my ( $self, $req, $info, $device ) = @_;
 
-    my $registration_state = { authenticationLevel => $self->authnLevel, };
+    my $registration_state = {
+        authenticationLevel => $self->authnLevel,
+        module              => $self
+    };
 
     my $h = $self->p->processHook( $req, 'sfRegisterDevice', $info, $device,
         $registration_state );

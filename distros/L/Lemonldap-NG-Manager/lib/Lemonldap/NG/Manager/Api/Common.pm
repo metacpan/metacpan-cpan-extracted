@@ -1,6 +1,6 @@
 package Lemonldap::NG::Manager::Api::Common;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.23.0';
 
 package Lemonldap::NG::Manager::Api;
 
@@ -118,8 +118,7 @@ sub _translateOptionConfToApi {
 sub _translateValueConfToApi {
     my ( $self, $optionName, $optionValue ) = @_;
 
-    if ( $self->_mustArrayizeOption($optionName))
-    {
+    if ( $self->_mustArrayizeOption($optionName) ) {
         return [ split( /\s+/, $optionValue, ) ];
     }
     else {
@@ -175,12 +174,22 @@ sub _getSSOMod {
 
 sub _saveApplyConf {
     my ( $self, $conf ) = @_;
-    my $res = $self->_confAcc->saveConf($conf);
-    if ( $res <= 0 ) {
-        return 0;
-    }
+    $self->_confAcc->saveConf($conf);
     $self->applyConf($conf);
-    return 1;
+}
+
+sub _merge_hash {
+    my ( $self, $conf, $option, $provider, $hash_to_merge ) = @_;
+
+    while ( my ( $key, $value ) = each %{$hash_to_merge} ) {
+        if ( defined $value ) {
+            $conf->{$option}->{$provider}->{$key} = $value;
+        }
+        else {
+            delete $conf->{$option}->{$provider}->{$key};
+        }
+    }
+    return;
 }
 
 1;

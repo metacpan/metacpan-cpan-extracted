@@ -19,7 +19,7 @@ my @notManagedAttributes = (
     # Complex nodes
     'samlSPMetaDataOptions', 'samlIDPMetaDataOptions', 'oidcRPMetaDataOptions',
     'oidcOPMetaDataOptions', 'casSrvMetaDataOptions',  'casAppMetaDataOptions',
-    'vhostOptions', 'keys',
+    'vhostOptions',          'keys',
 
     # Second factor engine, lists of 2F modules and other parameters
     'sfEngine', 'available2FSelfRegistration', 'available2F', 'max2FDevices',

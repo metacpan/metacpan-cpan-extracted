@@ -5,7 +5,7 @@ use Lemonldap::NG::Manager::Conf::Diff;
 use Test::More;
 use strict;
 use IO::String;
-use JSON qw(from_json);
+use JSON     qw(from_json);
 use Storable qw(dclone);
 
 require 't/test-lib.pm';

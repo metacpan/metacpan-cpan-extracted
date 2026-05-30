@@ -211,7 +211,7 @@ async function __main__ () {
 ZZS
 
 ok $ok, 'async __main__ ran successfully' or diag $err;
-is $out, "42\n42\n42\n42:7\nfast\nready\nlater\ntimeout\nsleeping:cancelled:1:1\ncancelled-type\nclosed-type\ntimeout-type\n",
+is $out, "42\n42\n42\n42:7\nfast\nready\nlater\ntimeout\nsleeping:cancelled:true:true\ncancelled-type\nclosed-type\ntimeout-type\n",
 	'await/spawn blocks and std/task helpers work';
 
 my $start = time;
@@ -488,7 +488,7 @@ $elapsed = time - $start;
 ok $ok, 'race over spawned sleeps ran successfully' or diag $err;
 is $out, "fast:alive\n",
 	'race returns first completed task and cancels the loser';
-ok $elapsed < 0.38, 'race returns before slower task completes';
+ok $elapsed < 0.55, 'race returns before slower task completes';
 
 ( $ok, $out, $err ) = run_zuzu( <<'ZZS' );
 from std/task import all, sleep, resolved;

@@ -208,7 +208,8 @@ qr%<input name="code" value="" type="text" class="form-control" id="extcode" trp
         ),
         'Authorization request to RP1'
     );
-    expectPortalError( $res, 82 );
+    expectPortalError( $res, 113 );
+    expectXpath( $res, '//span[@trspan="connectedAs"]' );
     $pdata = expectCookie( $res, 'lemonldappdata' );
     ok( !$pdata, "pdata was cleared" );
 

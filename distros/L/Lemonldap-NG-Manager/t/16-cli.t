@@ -117,7 +117,7 @@ combined_like(
 );
 
 # Test 'purge' command
-my $client = llclient;
+my $client        = llclient;
 my $clientConfAcc = llclient->mgr->_confAcc;
 
 # Generate 3 forged configs
@@ -125,27 +125,29 @@ my $clientConfAcc = llclient->mgr->_confAcc;
 @cmd = qw(-yes 1 purge --keep-last 2);
 combined_like(
     sub { $client->run(@cmd) },
-     # If there are 3 configs and we want to keep the last 2, one config is deleted
+
+  # If there are 3 configs and we want to keep the last 2, one config is deleted
     qr/Deleted 1 configs/,
     'Configuration purge --keep-last OK'
 );
-is($clientConfAcc->available(), 2, 'Correct number of configurations after purge last');
+is( $clientConfAcc->available(),
+    2, 'Correct number of configurations after purge last' );
 
 # Generate 3 forged configs
 &genConfFiles;
 $client = llclient;
-@cmd = qw(-yes 1 purge --keep-recent 5);
+@cmd    = qw(-yes 1 purge --keep-recent 5);
 combined_like(
     sub { $client->run(@cmd) },
     qr/Deleted 2 configs/,
     'Configuration purge --keep-recent OK'
 );
 
-is($clientConfAcc->available(), 1, 'Correct number of configurations after purge recent');
+is( $clientConfAcc->available(),
+    1, 'Correct number of configurations after purge recent' );
 
 count($tests);
 done_testing( count() );
-
 
 sub cleanConfFiles {
     foreach ( 2 .. $tests - 3 ) {
@@ -155,18 +157,19 @@ sub cleanConfFiles {
 
 # Sub to delete all existing configs and create forged ones
 sub genConfFiles {
-    for my $config ($clientConfAcc->available()) {
-        $clientConfAcc->delete( $config );
+    for my $config ( $clientConfAcc->available() ) {
+        $clientConfAcc->delete($config);
     }
     my $time = time();
+
     # FIXME: The locationRules is incorrect in the default configuration file,
     # we need to overwrite it
     my @configsToStore = (
-        { cfgNum => 1, cfgDate => $time, locationRules => {} },
+        { cfgNum => 1, cfgDate => $time,      locationRules => {} },
         { cfgNum => 2, cfgDate => $time - 10, locationRules => {} },
-        { cfgNum => 3, cfgDate => $time - 20, locationRules => {}},
+        { cfgNum => 3, cfgDate => $time - 20, locationRules => {} },
     );
     for my $config (@configsToStore) {
-        $clientConfAcc->store( $config );
+        $clientConfAcc->store($config);
     }
 }

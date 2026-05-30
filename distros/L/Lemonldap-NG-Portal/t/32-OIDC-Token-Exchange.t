@@ -15,8 +15,7 @@ BEGIN {
 my $debug = 'error';
 
 # Initialization
-my $portal = LLNG::Manager::Test->new(
-    {
+my $portal = LLNG::Manager::Test->new( {
         ini => {
             logLevel                        => $debug,
             domain                          => 'op.com',

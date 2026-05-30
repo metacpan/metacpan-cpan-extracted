@@ -2,7 +2,7 @@ package Zuzu::Parser;
 
 use utf8;
 
-our $VERSION = '0.001000';
+our $VERSION = '0.001002';
 
 use Zuzu::Error;
 use Zuzu::Lexer;
@@ -92,26 +92,41 @@ sub BUILD {
 sub parse {
 	my ($self, $src, $filename) = @_;
 
-	my $lx = Zuzu::Lexer->new(src => $src, filename => $filename);
-	my $p = Zuzu::Parser::_Impl->new(lexer => $lx, filename => $filename);
-
 	my $ast;
 	eval {
+		my $lx = Zuzu::Lexer->new(src => $src, filename => $filename);
+		my $p = Zuzu::Parser::_Impl->new(lexer => $lx, filename => $filename);
 		$ast = $p->parse_program;
 		$self->apply_visitors($ast);
 		1;
 	} or do {
 		my $err = $@;
 		die $err if ref($err) and eval { $err->isa('Zuzu::Error') };
-		die Zuzu::Error->new_compile(
-			code => 'E_COMPILE_INTERNAL',
-			message => "Internal parser failure: $err",
-			file => ( defined $filename ? $filename : '<input>' ),
-			line => 1,
-		);
+		die $self->_compile_error_from_parse_exception( $err, $filename );
 	};
 
 	return $ast;
+}
+
+sub _compile_error_from_parse_exception {
+	my ( $self, $err, $filename ) = @_;
+
+	my $message = "$err";
+	chomp $message;
+	$message =~ s/\s+at \S+ line \d+\.?\z//;
+
+	my $code = $message =~ /\A(?:Unterminated|Invalid)\b/
+		? 'E_COMPILE_SYNTAX'
+		: 'E_COMPILE_INTERNAL';
+	$message = "Internal parser failure: $message"
+		if $code eq 'E_COMPILE_INTERNAL';
+
+	return Zuzu::Error->new_compile(
+		code => $code,
+		message => $message,
+		file => ( defined $filename ? $filename : '<input>' ),
+		line => 1,
+	);
 }
 
 =pod

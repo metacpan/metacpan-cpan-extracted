@@ -116,7 +116,7 @@ ok( $res->[2]->[0] =~ /trmsg="90"/, 'Reject reason is 90' )
 count(1);
 
 # Initialization
-ok( $op = register('op', sub { op() }) , 'OP portal' );
+ok( $op = register( 'op', sub { op() } ), 'OP portal' );
 
 ok( $res = $op->_get('/oauth2/jwks'), 'Get JWKS,     endpoint /oauth2/jwks' );
 expectOK($res);
@@ -131,7 +131,7 @@ $metadata = $res->[2]->[0];
 count(3);
 
 &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
-ok( $rp = register('rp', sub { rp( $jwks, $metadata ) }), 'RP portal' );
+ok( $rp = register( 'rp', sub { rp( $jwks, $metadata ) } ), 'RP portal' );
 count(1);
 
 # Query RP for auth
@@ -214,8 +214,7 @@ clean_sessions();
 done_testing( count() );
 
 sub op {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'idp.com',
@@ -267,8 +266,7 @@ sub op {
 
 sub rp {
     my ( $jwks, $metadata ) = @_;
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'rp.com',

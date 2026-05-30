@@ -23,33 +23,41 @@ throws_ok { Time::TZif->new() }
   qr/Usage:/,
   'new: no arguments';
 
-throws_ok { Time::TZif->new(filename => '/nonexistent/path') }
+throws_ok { Time::TZif->new(path => '/nonexistent/path') }
   qr/Unable to parse TZif: could not open/,
   'new: nonexistent file';
 
-throws_ok { Time::TZif->new(filename => "$TZDIR/UTC", bogus => 1) }
+throws_ok { Time::TZif->new(path => "$TZDIR/UTC", bogus => 1) }
   qr/Unrecognised named parameter: 'bogus'/,
   'new: unknown parameter';
 
-throws_ok { Time::TZif->new(filename => "$TZDIR/UTC", gap_policy => 'invalid') }
+throws_ok { Time::TZif->new(path => "$TZDIR/UTC", gap_policy => 'invalid') }
   qr/Invalid policy value for the parameter 'gap_policy'/,
   'new: invalid gap_policy policy';
 
-throws_ok { Time::TZif->new(filename => "$TZDIR/UTC", overlap_policy => 'invalid') }
+throws_ok { Time::TZif->new(path => "$TZDIR/UTC", overlap_policy => 'invalid') }
   qr/Invalid policy value for the parameter 'overlap_policy'/,
   'new: invalid overlap_policy policy';
+
+throws_ok { Time::TZif->new(path => "$TZDIR/UTC", name => '123') }
+  qr/Invalid value for the parameter 'name'/,
+  'new: invalid name (starts with digit)';
+
+throws_ok { Time::TZif->new(path => "$TZDIR/UTC", name => '') }
+  qr/Invalid value for the parameter 'name'/,
+  'new: invalid name (empty string)';
 
 ## Constructor defaults
 
 {
-  my $tz = Time::TZif->new(filename => "$TZDIR/UTC");
+  my $tz = Time::TZif->new(path => "$TZDIR/UTC");
   is($tz->gap_policy,     'reject', 'default gap_policy is reject');
   is($tz->overlap_policy, 'reject', 'default overlap_policy is reject');
 }
 
 {
   my $tz = Time::TZif->new(
-    filename   => "$TZDIR/UTC",
+    path   => "$TZDIR/UTC",
     gap_policy     => 'later',
     overlap_policy => 'std',
   );
@@ -57,12 +65,103 @@ throws_ok { Time::TZif->new(filename => "$TZDIR/UTC", overlap_policy => 'invalid
   is($tz->overlap_policy, 'std',   'custom overlap_policy preserved');
 }
 
+{
+  my $tz = Time::TZif->new(path => "$TZDIR/UTC", name => 'UTC');
+  is($tz->name, 'UTC', 'name accessor returns provided name');
+  ok($tz->has_name, 'has_name is true when name provided');
+}
+
+## with_name
+
+throws_ok { Time::TZif->new(path => "$TZDIR/UTC")->with_name() }
+  qr/^Usage: /,
+  'with_name: no arguments';
+
+throws_ok { Time::TZif->new(path => "$TZDIR/UTC")->with_name('123') }
+  qr/Invalid name value/,
+  'with_name: invalid name';
+
+{
+  my $tz1 = Time::TZif->new(path => "$TZDIR/UTC", name => 'UTC');
+  my $tz2 = $tz1->with_name('Etc/UTC');
+  isnt($tz2, $tz1, 'with_name: returns new object when name differs');
+  is($tz2->name, 'Etc/UTC', 'with_name: new object has updated name');
+  is($tz2->path, $tz1->path, 'with_name: shares path');
+  is($tz2->gap_policy, $tz1->gap_policy, 'with_name: shares gap_policy');
+}
+
+{
+  my $tz1 = Time::TZif->new(path => "$TZDIR/UTC", name => 'UTC');
+  my $tz2 = $tz1->with_name('UTC');
+  is($tz2, $tz1, 'with_name: returns same object when name unchanged');
+}
+
+{
+  my $tz1 = Time::TZif->new(path => "$TZDIR/UTC");
+  my $tz2 = $tz1->with_name('UTC');
+  isnt($tz2, $tz1, 'with_name: returns new object when name was undef');
+  is($tz2->name, 'UTC', 'with_name: sets name from undef');
+}
+
+## with_gap_policy
+
+throws_ok { Time::TZif->new(path => "$TZDIR/UTC")->with_gap_policy() }
+  qr/^Usage: /,
+  'with_gap_policy: no arguments';
+
+throws_ok { Time::TZif->new(path => "$TZDIR/UTC")->with_gap_policy('invalid') }
+  qr/Invalid policy value/,
+  'with_gap_policy: invalid policy';
+
+{
+  my $tz1 = Time::TZif->new(path => "$TZDIR/UTC");
+  my $tz2 = $tz1->with_gap_policy('later');
+  isnt($tz2, $tz1, 'with_gap_policy: returns new object when policy differs');
+  is($tz2->gap_policy, 'later', 'with_gap_policy: new object has updated policy');
+  is($tz2->overlap_policy, $tz1->overlap_policy, 'with_gap_policy: overlap_policy unchanged');
+}
+
+{
+  my $tz1 = Time::TZif->new(path => "$TZDIR/UTC");
+  my $tz2 = $tz1->with_gap_policy('reject');
+  is($tz2, $tz1, 'with_gap_policy: returns same object when policy unchanged');
+}
+
+## with_overlap_policy
+
+throws_ok { Time::TZif->new(path => "$TZDIR/UTC")->with_overlap_policy() }
+  qr/^Usage: /,
+  'with_overlap_policy: no arguments';
+
+throws_ok { Time::TZif->new(path => "$TZDIR/UTC")->with_overlap_policy('invalid') }
+  qr/Invalid policy value/,
+  'with_overlap_policy: invalid policy';
+
+{
+  my $tz1 = Time::TZif->new(path => "$TZDIR/UTC");
+  my $tz2 = $tz1->with_overlap_policy('earlier');
+  isnt($tz2, $tz1, 'with_overlap_policy: returns new object when policy differs');
+  is($tz2->overlap_policy, 'earlier', 'with_overlap_policy: new object has updated policy');
+  is($tz2->gap_policy, $tz1->gap_policy, 'with_overlap_policy: gap_policy unchanged');
+}
+
+{
+  my $tz1 = Time::TZif->new(path => "$TZDIR/UTC");
+  my $tz2 = $tz1->with_overlap_policy('reject');
+  is($tz2, $tz1, 'with_overlap_policy: returns same object when policy unchanged');
+}
+
 ## UTC timezone (no DST transitions)
 
 {
-  my $utc = Time::TZif->new(filename => "$TZDIR/UTC");
+  my $utc = Time::TZif->new(path => "$TZDIR/UTC");
   isa_ok($utc, 'Time::TZif');
-  is($utc->filename, "$TZDIR/UTC", 'filename accessor');
+  is($utc->path, "$TZDIR/UTC", 'path accessor');
+  is($utc->name, undef, 'name is undef when not provided');
+  ok(!$utc->has_name, 'has_name is false when not provided');
+  ok(defined $utc->modified_time, 'modified_time is defined');
+  is($utc->modified_time, (stat "$TZDIR/UTC")[9],
+    'modified_time matches stat mtime');
   is($utc->offset_for_utc(0), 0, 'UTC: offset_for_utc at epoch 0');
   is($utc->offset_for_utc(1_000_000_000), 0, 'UTC: offset_for_utc at 1e9');
   is($utc->offset_for_local(0), 0, 'UTC: offset_for_local at epoch 0');
@@ -80,7 +179,7 @@ SKIP: {
   skip "America/New_York not available", 60
     unless -f "$TZDIR/America/New_York";
 
-  my $tz = Time::TZif->new(filename => "$TZDIR/America/New_York");
+  my $tz = Time::TZif->new(path => "$TZDIR/America/New_York");
   isa_ok($tz, 'Time::TZif');
 
   # Known constants
@@ -262,7 +361,7 @@ SKIP: {
 
   {
     my $tz_custom = Time::TZif->new(
-      filename   => "$TZDIR/America/New_York",
+      path   => "$TZDIR/America/New_York",
       gap_policy     => 'later',
       overlap_policy => 'earlier',
     );
@@ -289,7 +388,7 @@ SKIP: {
   skip "Europe/Stockholm not available", 10
     unless -f "$TZDIR/Europe/Stockholm";
 
-  my $tz = Time::TZif->new(filename => "$TZDIR/Europe/Stockholm");
+  my $tz = Time::TZif->new(path => "$TZDIR/Europe/Stockholm");
 
   my $CET  = 3600;   # UTC+1
   my $CEST = 7200;   # UTC+2
@@ -335,12 +434,82 @@ SKIP: {
   }
 }
 
+## POSIX TZ footer fallback (times beyond last stored transition)
+
+SKIP: {
+  skip "America/New_York not available", 14
+    unless -f "$TZDIR/America/New_York";
+
+  my $tz = Time::TZif->new(
+    path           => "$TZDIR/America/New_York",
+    gap_policy     => 'earlier',
+    overlap_policy => 'earlier',
+  );
+
+  my $EST = -18000;  # UTC-5
+  my $EDT = -14400;  # UTC-4
+
+  # 2040-01-15 12:00:00 UTC (winter, beyond last transition ~2037)
+  {
+    my $utc = timegm(0, 0, 12, 15, 0, 2040);
+    is($tz->offset_for_utc($utc), $EST,
+      'POSIX fallback: offset_for_utc winter 2040 = EST');
+
+    my @info = $tz->type_info_for_utc($utc);
+    is($info[0], $EST,   'POSIX fallback: type_info_for_utc winter offset');
+    is($info[1], 0,      'POSIX fallback: type_info_for_utc winter is_dst=0');
+    is($info[2], 'EST',  'POSIX fallback: type_info_for_utc winter abbreviation');
+  }
+
+  # 2040-07-15 12:00:00 UTC (summer, beyond last transition)
+  {
+    my $utc = timegm(0, 0, 12, 15, 6, 2040);
+    is($tz->offset_for_utc($utc), $EDT,
+      'POSIX fallback: offset_for_utc summer 2040 = EDT');
+
+    my @info = $tz->type_info_for_utc($utc);
+    is($info[0], $EDT,   'POSIX fallback: type_info_for_utc summer offset');
+    is($info[1], 1,      'POSIX fallback: type_info_for_utc summer is_dst=1');
+    is($info[2], 'EDT',  'POSIX fallback: type_info_for_utc summer abbreviation');
+  }
+
+  # offset_for_local in 2040
+  {
+    my $winter = timegm(0, 0, 12, 15, 0, 2040);
+    is($tz->offset_for_local($winter), $EST,
+      'POSIX fallback: offset_for_local winter 2040 = EST');
+
+    my $summer = timegm(0, 0, 12, 15, 6, 2040);
+    is($tz->offset_for_local($summer), $EDT,
+      'POSIX fallback: offset_for_local summer 2040 = EDT');
+  }
+
+  # type_info_for_local in 2040
+  {
+    my $winter = timegm(0, 0, 12, 15, 0, 2040);
+    my @info = $tz->type_info_for_local($winter);
+    is($info[0], $EST,   'POSIX fallback: type_info_for_local winter offset');
+    is($info[1], 0,      'POSIX fallback: type_info_for_local winter is_dst=0');
+
+    my $summer = timegm(0, 0, 12, 15, 6, 2040);
+    @info = $tz->type_info_for_local($summer);
+    is($info[0], $EDT,   'POSIX fallback: type_info_for_local summer offset');
+  }
+
+  # with_gap_policy clears cached POSIX object
+  {
+    my $tz2 = $tz->with_gap_policy('later');
+    is($tz2->offset_for_utc(timegm(0, 0, 12, 15, 0, 2040)), $EST,
+      'POSIX fallback: with_gap_policy preserves future lookups');
+  }
+}
+
 ## Parameter validation
 
 {
   SKIP: {
     skip "UTC not available", 3 unless -f "$TZDIR/UTC";
-    my $tz = Time::TZif->new(filename => "$TZDIR/UTC");
+    my $tz = Time::TZif->new(path => "$TZDIR/UTC");
 
     throws_ok { $tz->offset_for_local(0, overlap_policy => 'invalid') }
       qr/Invalid policy value for the parameter 'overlap_policy'/,

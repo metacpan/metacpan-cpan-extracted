@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_MALFORMEDUSER
 );
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.23.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Auth
@@ -27,7 +27,9 @@ sub init { 1 }
 sub extractFormInfo {
     my ( $self, $req ) = @_;
     return PE_FORBIDDENIP
-      unless ( $self->checkIP($req) and $self->checkHeader($req) );
+      unless ( $self->checkIP($req)
+        and $self->checkHeader($req)
+        and $self->checkCertificate($req) );
 
     unless ( $self->conf->{slaveUserHeader} ) {
         $self->logger->debug('slaveUserHeader is undefined');

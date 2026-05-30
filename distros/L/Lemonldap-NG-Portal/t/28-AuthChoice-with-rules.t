@@ -126,9 +126,14 @@ m%<form id="lformKerberos" action="#" method="post" class="login Kerberos">%,
       or explain( $res->[2]->[0],
         '<img src="/static/common/logos/logo_llng_old.png"' );
 
-    ok(getHtmlElement( $res,
-            '//div[@id="id_2_sql"]//input[@id="userfield"]/@autofocus' ), "User field has focus") ;
-    is (getHtmlElement($res, '//input/@autofocus')->size, 1, "Only one field has focus");
+    ok(
+        getHtmlElement(
+            $res, '//div[@id="id_2_sql"]//input[@id="userfield"]/@autofocus'
+        ),
+        "User field has focus"
+    );
+    is( getHtmlElement( $res, '//input/@autofocus' )->size,
+        1, "Only one field has focus" );
     count(2);
 
     # Fail password
@@ -153,9 +158,15 @@ m%<form id="lformKerberos" action="#" method="post" class="login Kerberos">%,
     is( $n->value, "", "login not autofilled in SQL form" );
     count(2);
 
-    ok(getHtmlElement( $res,
-            '//div[@id="id_3_demo"]//input[@id="passwordfield"]/@autofocus' ), "Password field has focus") ;
-    is (getHtmlElement($res, '//input/@autofocus')->size, 1, "Only one field has focus");
+    ok(
+        getHtmlElement(
+            $res,
+            '//div[@id="id_3_demo"]//input[@id="passwordfield"]/@autofocus'
+        ),
+        "Password field has focus"
+    );
+    is( getHtmlElement( $res, '//input/@autofocus' )->size,
+        1, "Only one field has focus" );
     count(2);
 
     # Authenticate

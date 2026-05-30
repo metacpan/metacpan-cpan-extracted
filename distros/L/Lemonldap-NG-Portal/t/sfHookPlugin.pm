@@ -11,6 +11,7 @@ use constant hook => {
     sfBeforeVerify   => 'ipHasChanged',
     sfBeforeRetry    => 'allowedToRetry',
     sfRegisterDevice => 'sfRegisterDevice',
+    sfDeleteDevice   => 'sfDeleteDevice',
     sfAfterVerify    => 'sfAfterVerify',
 };
 
@@ -48,6 +49,20 @@ sub sfRegisterDevice {
 
         # Set authnLevel
         $registration_state->{authenticationLevel} = 7;
+    }
+
+    return $hookResult;
+}
+
+sub sfDeleteDevice {
+    my ( $self, $req, $info, $type, $epoch, $registration_state ) = @_;
+
+    my $module = $registration_state->{module};
+
+    # Test custom condition for making hook fail
+    if ( defined( $req->userData->{hookStatus} ) ) {
+        $registration_state->{errorLabel} = $req->userData->{hookStatus};
+        return PE_ERROR;
     }
 
     return $hookResult;

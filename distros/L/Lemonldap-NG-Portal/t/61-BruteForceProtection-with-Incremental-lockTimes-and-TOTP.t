@@ -70,9 +70,8 @@ SKIP: {
 
     # Post code
     my $code;
-    ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
-        'Code' );
-    ok( $code =~ /^\d{6}$/, 'Code contains 6 digits' );
+    ok( $code = getTotp($key), 'Code' );
+    ok( $code =~ /^\d{6}$/,    'Code contains 6 digits' );
     my $s = "code=$code&token=$token";
     ok(
         $res = $client->_post(
@@ -122,7 +121,7 @@ SKIP: {
       or print STDERR Dumper( $res->[2]->[0] );
     ok( $res->[2]->[0] =~ m%(\d{2}) <span trspan="seconds">seconds</span>%,
         "LockTime = $1" );
-    ok( $1 <= 15 && $1 >= 13, 'LockTime in range' )
+    ok( $1 <= 31 && $1 >= 25, 'LockTime in range (~30s)' )
       or print STDERR Dumper( $res->[2]->[0] );
     count(4);
 
@@ -132,7 +131,7 @@ SKIP: {
     ok(
         $res = $client->_post(
             '/',
-            IO::String->new('user=dwho&password=dwho'),
+            IO::String->new('user=dwho&password=ohwd'),
             length => 23,
             accept => 'text/html',
         ),
@@ -143,13 +142,17 @@ SKIP: {
       or print STDERR Dumper( $res->[2]->[0] );
     ok( $res->[2]->[0] =~ m%(\d{2}) <span trspan="seconds">seconds</span>%,
         "LockTime = $1" );
-    ok( $1 < 30 && $1 >= 25, 'LockTime in range' )
+
+    # With fix #3561: blocked attempts not stored, countFailed stays 1
+    # lockTimes[1]=30, delta=3 → remaining ~27s
+    ok( $1 <= 28 && $1 >= 22, 'LockTime in range (~27s)' )
       or print STDERR Dumper( $res->[2]->[0] );
     count(4);
 
-    # Waiting
-    Time::Fake->offset("+6s");
-    ## Third failed connection
+    # Waiting - lock expired (30s from t=0, now t=35)
+    Time::Fake->offset("+35s");
+
+    ## Third failed connection - lock expired, bad credential stored (count→2)
     ok(
         $res = $client->_post(
             '/',
@@ -157,20 +160,38 @@ SKIP: {
             length => 23,
             accept => 'text/html',
         ),
-        '2nd Bad Auth query'
+        '3rd Bad Auth query (lock expired)'
+    );
+    ok(
+        $res->[2]->[0] =~ /<span trmsg="5"><\/span>/,
+        'Bad credential (lock expired, failure stored)'
+    ) or print STDERR Dumper( $res->[2]->[0] );
+    count(2);
+
+    ## Immediate retry → countFailed=2, lockTimes[2]=60 → PE_WAIT
+    ok(
+        $res = $client->_post(
+            '/',
+            IO::String->new('user=dwho&password=ohwd'),
+            length => 23,
+            accept => 'text/html',
+        ),
+        'Immediate retry triggers new lock'
     );
     ok( $res->[2]->[0] =~ /<span trmsg="86"><\/span>/,
         'Rejected -> Protection enabled' )
       or print STDERR Dumper( $res->[2]->[0] );
     ok( $res->[2]->[0] =~ m%(\d{2}) <span trspan="seconds">seconds</span>%,
         "LockTime = $1" );
-    ok( $1 < 60 && $1 >= 55, 'LockTime in range' )
+
+    # countFailed=2 → lockTimes[2]=60
+    ok( $1 <= 61 && $1 >= 55, 'LockTime in range (~60s)' )
       or print STDERR Dumper( $res->[2]->[0] );
     count(4);
 
-    # Waiting
-    Time::Fake->offset("+70s");
-    ## Try to connect
+    # Waiting - lock expired (60s from t=35, now t=100)
+    Time::Fake->offset("+100s");
+    ## Try to connect with good password
     ok(
         $res = $client->_post(
             '/',
@@ -186,8 +207,7 @@ SKIP: {
 
     my ( $host, $url, $query ) =
       expectForm( $res, undef, '/totp2fcheck', 'token' );
-    ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
-        'Code' );
+    ok( $code = getTotp($key), 'Code' );
     $query =~ s/code=/code=$code/;
     ok(
         $res = $client->_post(

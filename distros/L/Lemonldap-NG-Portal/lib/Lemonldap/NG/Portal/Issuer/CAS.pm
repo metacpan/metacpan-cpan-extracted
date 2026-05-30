@@ -18,9 +18,8 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADURL
   PE_CAS_SERVICE_NOT_ALLOWED
 );
-use URI;
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Portal::Main::Issuer',
   'Lemonldap::NG::Portal::Lib::CAS';
@@ -29,7 +28,6 @@ extends 'Lemonldap::NG::Portal::Main::Issuer',
 
 use constant beforeAuth  => 'storeEnvAndCheckGateway';
 use constant sessionKind => 'ICAS';
-
 use constant hook => { updateSessionId => 'updateCasSecondarySessions', };
 
 has rule => ( is => 'rw' );
@@ -108,7 +106,10 @@ sub storeEnvAndCheckGateway {
             $self->logger->debug(
                 "Gateway mode requested, redirect without authentication");
             $req->response(
-                [ 302, [ Location => URI->new($service)->as_string ], [] ] );
+                $self->p->sendRedirection(
+                    $req, URI->new($service)->as_string
+                )
+            );
             for my $s ( $self->ipath, $self->ipath . 'Path' ) {
                 $self->logger->debug("Removing $s from pdata")
                   if delete $req->pdata->{$s};
@@ -352,7 +353,7 @@ sub run {
             user    => $user,
             message => (
                 $app
-                ? ("User $user is authorized to access to $app")
+                ? ("User $user is authorized to access $app")
                 : ("User $user is redirected to $service")
             ),
         );
@@ -1129,7 +1130,7 @@ sub _failValidate1 {
         user         => $req->sessionInfo->{ $self->conf->{whatToTrace} },
     );
 
-    return $self->returnCasValidateError();
+    return $self->returnCasValidateError($req);
 }
 
 sub _failValidate2 {
@@ -1204,7 +1205,7 @@ sub _failLoginRule {
         $req,
         code => "ISSUER_CAS_LOGIN_FAILED",
         ( $app ? ( app => $app ) : () ),
-        message  => ("User $user is not authorized to access to $app"),
+        message  => ("User $user is not authorized to access $app"),
         reason   => "User is not authorized by access rule",
         user     => $user,
     );

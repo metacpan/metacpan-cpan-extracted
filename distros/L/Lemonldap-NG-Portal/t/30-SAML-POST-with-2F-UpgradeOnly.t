@@ -12,24 +12,16 @@ BEGIN {
     require 't/smtp.pm';
 }
 
-my $maintests = 20;
-my $debug     = 'error';
+my $debug = 'error';
 my ( $issuer, $sp, $res );
 
 # Redefine LWP methods for tests
-LWP::Protocol::PSGI->register(
-    sub {
-        my $req = Plack::Request->new(@_);
-        fail('POST should not launch SOAP requests');
-        count(1);
-        return [ 500, [], [] ];
-    }
-);
+LWP::Protocol::PSGI->register( denyLwpRequests() );
 
 SKIP: {
     eval "use Lasso";
     if ($@) {
-        skip 'Lasso not found', $maintests;
+        skip 'Lasso not found';
     }
 
     # Initialization
@@ -201,7 +193,6 @@ qr%<input name="code" value="" type="text" class="form-control" id="extcode" trp
         ),
         'Post code'
     );
-    count(1);
 
     $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
 
@@ -269,15 +260,195 @@ qr%<input name="code" value="" type="text" class="form-control" id="extcode" trp
     expectOK($res);
     expectAuthenticatedAs( $res, 'dwho@badwolf.org@idp' );
 
+    ## THIRD CASE##
+    # * Login to IDP without 2FA
+    # * Login to SP, 2FA has to be registered to upgrade session
+
+    # Login to IDP
+    $s = "user=msmith&password=msmith";
+    ok(
+        $res = $issuer->_post(
+            "/",
+            IO::String->new($s),
+            accept => 'text/html',
+            length => length($s),
+        ),
+        'Post authentication'
+    );
+
+    # No 2FA asked
+    $idpId = expectCookie($res);
+    is( getSession($idpId)->data->{authenticationLevel},
+        1, "Expected authnlevel" );
+
+    # Simple SP access
+    ok(
+        $res = $sp->_get(
+            '/', accept => 'text/html',
+        ),
+        'Unauth SP request'
+    );
+    expectOK($res);
+    ( $host, $url, $s ) =
+      expectAutoPost( $res, 'auth.idp.com', '/saml/singleSignOn',
+        'SAMLRequest' );
+
+    # Push SAML request to IdP
+    ok(
+        $res = $issuer->_post(
+            $url,
+            IO::String->new($s),
+            accept => 'text/html',
+            cookie => "lemonldap=$idpId",
+            length => length($s)
+        ),
+        'Post SAML request to IdP'
+    );
+    expectOK($res);
+    $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
+
+    # IDP should offer to upgrade the session
+    ( $host, $url, $s ) =
+      expectForm( $res, undef, '/upgradesession', 'confirm', 'url' );
+
+    ok(
+        $res = $issuer->_post(
+            '/upgradesession',
+            IO::String->new($s),
+            length => length($s),
+            accept => 'text/html',
+            cookie => "lemonldap=$idpId; $pdata",
+        ),
+        'Post code'
+    );
+
+    $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
+
+    expectRedirection( $res, 'http://auth.idp.com/2fregisters' );
+    ok(
+        $res = $issuer->_get(
+            '/2fregisters',
+            accept => 'text/html',
+            cookie => "lemonldap=$idpId; $pdata",
+        ),
+        'Move to 2FA list'
+    );
+    like( $res->[2]->[0],
+        qr/trspan="2fRegRequired"/, "Found registration required prompt" );
+    like( $res->[2]->[0],
+        qr(href="/2fregisters/totp"), "Found link to TOTP registration" );
+
+    ok(
+        $res = $issuer->_get(
+            '/2fregisters/totp',
+            accept => 'text/html',
+            cookie => "lemonldap=$idpId; $pdata",
+        ),
+        'On TOTP registration page'
+    );
+
+    ok( $res->[2]->[0] =~ /totpregistration\.(?:min\.)?js/, 'Found TOTP js' );
+
+    # JS query
+    ok(
+        $res = $issuer->_post(
+            '/2fregisters/totp/getkey',
+            IO::String->new(''),
+            cookie => "lemonldap=$idpId; $pdata",
+            length => 0,
+            custom => {
+                HTTP_X_CSRF_CHECK => 1,
+            },
+        ),
+        'Get new key'
+    );
+    eval { $res = JSON::from_json( $res->[2]->[0] ) };
+    ok( not($@), 'Content is JSON' )
+      or explain( $res->[2]->[0], 'JSON content' );
+    my ( $key, $token );
+    ok( $key   = $res->{secret}, 'Found secret' ) or print STDERR Dumper($res);
+    ok( $token = $res->{token},  'Found token' )  or print STDERR Dumper($res);
+    is( $res->{user}, 'msmith', 'Found user' );
+    $key = Convert::Base32::decode_base32($key);
+
+    # Post code
+    ok( $code = getTotp($key), 'Code' );
+    ok( $code =~ /^\d{6}$/,    'Code contains 6 digits' );
+    ok(
+        $res = $issuer->_post(
+            '/2fregisters/totp/verify',
+            {
+                code     => $code,
+                token    => $token,
+                TOTPName => "mytotp",
+            },
+            cookie => "lemonldap=$idpId; $pdata",
+            custom => {
+                HTTP_X_CSRF_CHECK => 1,
+            },
+        ),
+        'Post code'
+    );
+    eval { $res = JSON::from_json( $res->[2]->[0] ) };
+    ok( not($@), 'Content is JSON' )
+      or explain( $res->[2]->[0], 'JSON content' );
+    ok( $res->{result} == 1, 'TOTP is registered' );
+
+    # JS sends us to ?continue=1
+    ok(
+        $res = $issuer->_get(
+            '/2fregisters',
+            query  => "continue=1",
+            accept => 'text/html',
+            cookie => "lemonldap=$idpId; $pdata",
+        ),
+        'Continue registration'
+    );
+
+    $pdata = 'lemonldappdata=' . expectCookie( $res, 'lemonldappdata' );
+    expectRedirection( $res, 'http://auth.idp.com/saml/singleSignOn' );
+
+    ok(
+        $res = $issuer->_get(
+            '/saml',
+            cookie => "lemonldap=$idpId; $pdata",
+            accept => 'text/html',
+        ),
+        'Follow redirection'
+    );
+
+    # Expect pdata to be cleared
+    $pdata = expectCookie( $res, 'lemonldappdata' );
+    ok( $pdata !~ 'issuerRequestsaml', 'SAML request cleared from pdata' );
+
+    ( $host, $url, $s ) =
+      expectAutoPost( $res, 'auth.sp.com', '/saml/proxySingleSignOnPost',
+        'SAMLResponse' );
+
+    # Post SAML response to SP
+    ok(
+        $res = $sp->_post(
+            $url, IO::String->new($s),
+            accept => 'text/html',
+            length => length($s),
+        ),
+        'Post SAML response to SP'
+    );
+
+    # Verify authentication on SP
+    expectRedirection( $res, 'http://auth.sp.com/' );
+    $spId = expectCookie($res);
+
+    ok( $res = $sp->_get( '/', cookie => "lemonldap=$spId" ), 'Get / on SP' );
+    expectOK($res);
+    expectAuthenticatedAs( $res, 'msmith@badwolf.org@idp' );
 }
 
-count($maintests);
 clean_sessions();
-done_testing( count() );
+done_testing();
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',
@@ -286,7 +457,11 @@ sub issuer {
                 userDB                 => 'Same',
                 sfOnlyUpgrade          => 1,
                 issuerDBSAMLActivation => 1,
-                mail2fActivation       => 1,
+                totp2fActivation       => '$uid eq "msmith" and has2f("TOTP")',
+                totp2fSelfRegistration => 1,
+                totp2fAuthnLevel       => 5,
+                sfRequired             => 1,
+                mail2fActivation       => '$uid eq "dwho"',
                 mail2fCodeRegex        => '\d{4}',
                 mail2fAuthnLevel       => 5,
                 samlSPMetaDataOptions  => {
@@ -326,8 +501,7 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                          => $debug,
                 domain                            => 'sp.com',

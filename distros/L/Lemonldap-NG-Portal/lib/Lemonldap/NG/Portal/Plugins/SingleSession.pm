@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_TOKENEXPIRED
 );
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -118,6 +118,10 @@ sub run {
               )
             {
                 push @$deleted, $self->p->_sumUpSession( $session->data );
+
+                # Trigger back-channel logout before deletion
+                $self->p->_triggerBackChannelLogout( $req, $session->data );
+
                 $self->p->_deleteSession( $req, $session, 1 );
             }
             else {
@@ -149,6 +153,10 @@ sub run {
                 $session->data->{ $self->conf->{whatToTrace} } )
             {
                 push @$deleted, $self->p->_sumUpSession( $session->data );
+
+                # Trigger back-channel logout before deletion
+                $self->p->_triggerBackChannelLogout( $req, $session->data );
+
                 $self->p->_deleteSession( $req, $session, 1 );
             }
         }
@@ -193,10 +201,13 @@ sub removeOther {
                     next;
                 }
                 my $user = $token->{user};
-                if ( $req->{userData}->{ $self->{conf}->{whatToTrace} } eq
-                    $user )
+                if ( $req->userData->{ $self->{conf}->{whatToTrace} } eq $user )
                 {
                     $self->userLogger->info("Remove \"$user\" session: $_");
+
+                    # Trigger back-channel logout before deletion
+                    $self->p->_triggerBackChannelLogout( $req, $as->data );
+
                     $self->p->_deleteSession( $req, $as, 1 );
                     $count++;
                 }

@@ -96,8 +96,7 @@ SKIP: {
     ok( $res->[2]->[0] =~ /<span trspan="passwordPolicy">/,
         ' Found password policy' );
     ok(
-        $res->[2]->[0] =~
-        qr/<span trspan="passwordPolicyMinLower"><\/span> 1/,
+        $res->[2]->[0] =~ qr/<span trspan="passwordPolicyMinLower"><\/span> 1/,
         ' Found password policy min lower == 1'
     );
     ok( $res->[2]->[0] =~ /<span trspan="passwordPolicyMinUpper"><\/span> 1/,

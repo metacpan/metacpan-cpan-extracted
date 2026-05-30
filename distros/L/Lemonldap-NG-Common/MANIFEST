@@ -109,7 +109,7 @@ scripts/rotateOidcKeys.cron.d
 t/01-Common-Conf.t
 t/02-Common-Conf-File.t
 t/02-Common-Conf-Overlay.t
-t/02-Common-Conf-ServerEnv.t
+t/02-Common-Conf-Placeholders.t
 t/03-Common-Conf-CDBI.t
 t/03-Common-Conf-Patroni.t
 t/03-Common-Conf-RDBI.t
@@ -152,6 +152,7 @@ t/saml-schemas/saml-schema-metadata-2.0.xsd
 t/saml-schemas/xenc-schema.xsd
 t/saml-schemas/xml.xsd
 t/saml-schemas/xmldsig-core-schema.xsd
+t/Secrets.pm
 t/TestAuditLogger.pm
 t/TestConfBackend.pm
 t/TestLogger.pm

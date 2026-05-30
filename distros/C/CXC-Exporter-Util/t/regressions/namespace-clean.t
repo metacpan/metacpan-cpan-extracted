@@ -4,10 +4,10 @@ use v5.22;
 
 use Test2::V0;
 
-use constant HAVE_NAMESPACE_CLEAN => eval { no namespace::clean; 1 };
-
-skip_all( 'namespace::clean is not installed' )
-  unless HAVE_NAMESPACE_CLEAN;
+BEGIN {
+    skip_all( 'namespace::clean is not installed' )
+      unless eval q{ no namespace::clean; 1 };
+}
 
 package    #
   My::Test1 {

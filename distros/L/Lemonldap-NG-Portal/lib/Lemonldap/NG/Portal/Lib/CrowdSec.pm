@@ -13,7 +13,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SESSIONNOTGRANTED
 );
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 our $defaultBanValues = {
     events_count     => 1,
@@ -137,23 +137,104 @@ sub alert {
     my ($notBanned) = $self->bouncer($ip);
 
     $data ||= {};
-    my $max   = $self->conf->{crowdsecMaxFailures};
-    my $count = $self->getAlertsByIp($ip) || 0;
+
+    # Use per-scenario maxFailures if provided, otherwise use global config
+    my $max = $data->{maxFailures} // $self->conf->{crowdsecMaxFailures};
+
+    # Get both count and previous alerts for enrichment
+    my @prevAlerts =
+      $self->getAlertsByIp( $ip, $data->{scenario}, $data->{timeWindow} );
+
     $data->{remediation} =
-      ( $max and $count >= ( $max - 1 ) and $notBanned )
+      ( $max and @prevAlerts >= ( $max - 1 ) and $notBanned )
       ? JSON::true
       : JSON::false;
-    $self->logger->debug("Crowdsec alerts count is $count for $ip");
+    $self->logger->debug(
+        "Crowdsec alerts count is " . scalar(@prevAlerts) . " for $ip" );
     $data->{reason} ||= 'Reported by LLNG';
     $msg ||= 'Reported by LLNG';
+
+  # Pass previous alerts for enrichment when ban decision is made
+  # Only include alerts that contributed to the decision (max - 1), capped at 30
+    if ( $data->{remediation} and @prevAlerts ) {
+        my $limit = ( $max && $max > 1 ) ? $max - 1 : 30;
+        $limit = 30 if $limit > 30;
+        if ( @prevAlerts > $limit ) {
+
+            # Take most recent alerts (sorted by start_at desc)
+            my @sorted =
+              sort { ( $b->{start_at} || '' ) cmp( $a->{start_at} || '' ) }
+              @prevAlerts;
+            $data->{_prevAlerts} = [ @sorted[ 0 .. $limit - 1 ] ];
+        }
+        else {
+            $data->{_prevAlerts} = \@prevAlerts;
+        }
+    }
+
     return $self->ban( $ip, $msg, $data );
 }
 
+# Extract context from previous alerts for enrichment
+sub _extractAlertContext {
+    my ( $self, $prevAlerts ) = @_;
+    return unless $prevAlerts and @$prevAlerts;
+
+    my ( @logins, @uris, @timestamps );
+    my ( %seen_logins, %seen_uris );
+
+    foreach my $alert (@$prevAlerts) {
+
+        # Extract timestamp
+        push @timestamps, $alert->{start_at} if $alert->{start_at};
+
+        # Extract login and uri from events meta
+        if ( $alert->{events} and @{ $alert->{events} } ) {
+            foreach my $event ( @{ $alert->{events} } ) {
+                if ( $event->{meta} and @{ $event->{meta} } ) {
+                    foreach my $m ( @{ $event->{meta} } ) {
+                        if (    $m->{key} eq 'login'
+                            and $m->{value}
+                            and !$seen_logins{ $m->{value} }++ )
+                        {
+                            push @logins, $m->{value};
+                        }
+                        if (    $m->{key} eq 'uri'
+                            and $m->{value}
+                            and !$seen_uris{ $m->{value} }++ )
+                        {
+                            push @uris, $m->{value};
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    # Sort timestamps chronologically
+    @timestamps = sort @timestamps if @timestamps;
+
+    return {
+        logins      => \@logins,
+        uris        => \@uris,
+        first_alert => $timestamps[0],
+        last_alert  => $timestamps[-1],
+        count       => scalar @$prevAlerts,
+    };
+}
+
 sub getAlertsByIp {
-    my ( $self, $ip, $scenario ) = @_;
+    my ( $self, $ip, $scenario, $timeWindow ) = @_;
     $scenario ||= $defaultBanValues->{scenario};
     if ( my $token = $self->getToken ) {
-        my $url     = $self->crowdsecUrl . '/v1/alerts';
+
+        # Use API filters to avoid default 50 alerts limit
+        my $url =
+            $self->crowdsecUrl
+          . '/v1/alerts?scope=ip&value='
+          . $ip
+          . '&scenario='
+          . $scenario;
         my $request = HTTP::Request->new(
             GET => $url,
             [
@@ -166,32 +247,48 @@ sub getAlertsByIp {
                 join ' ',           'Unable to get alerts',
                 $resp->status_line, $resp->decoded_content
             );
-            return;
+            return ();
         }
-        my $alerts = eval { from_json( $resp->decoded_content ) };
-        if ( $@ or !$alerts ) {
+        my $content = $resp->decoded_content;
+
+        # CrowdSec returns "null" when there are no alerts
+        if ( !$content or $content eq 'null' ) {
+            $self->logger->debug("No alerts found for $ip");
+            return ();
+        }
+        my $alerts = eval { from_json($content) };
+        if ($@) {
             $self->logger->error( join ' ', 'Unable to read Crowdsec response:',
-                $@, $resp->decoded_content );
-            return;
+                $@, ", $content" );
+            return ();
         }
-        my $timeLimit = time - ( $self->conf->{crowdsecBlockDelay} || 180 );
+
+        # Use per-scenario timeWindow if provided, otherwise use global config
+        # Default: 900 seconds (15 minutes)
+        my $delay     = $timeWindow // $self->conf->{crowdsecBlockDelay} // 900;
+        my $timeLimit = time - $delay;
+
+        # API already filters by IP and scenario, just filter by time
         my @ipAlerts =
-          grep {
-                  $_->{source}->{value} eq $ip
-              and $_->{scenario} eq $scenario
-              and str2time( $_->{start_at} ) > $timeLimit
-          } @$alerts;
-        return ( scalar @ipAlerts );
+          grep { str2time( $_->{start_at} ) > $timeLimit } @$alerts;
+
+        # In list context, return both count and alerts for enrichment
+        return @ipAlerts;
     }
     else {
-        $self->logger->error('Unable to push Crowdsec decision');
-        return;
+        $self->logger->error('Unable to query Crowdsec');
+        return ();
     }
 }
 
 sub _banPayload {
     my ( $self, $ip, $msg, $data ) = @_;
-    $msg ||= 'Banned by LLNG Crowdsec plugin';
+    $msg  ||= 'Banned by LLNG Crowdsec plugin';
+    $data ||= {};
+
+    # Extract and remove internal data
+    my $prevAlerts = delete $data->{_prevAlerts};
+
     foreach my $k ( keys %$defaultBanValues ) {
         $data->{$k} //= $defaultBanValues->{$k};
     }
@@ -200,29 +297,116 @@ sub _banPayload {
     $data->{stop_at}  ||= $timestamp;
     $data->{source}   ||= { scope => 'ip', value => $ip };
     my $reason = delete( $data->{reason} ) || 'Banned by LLNG';
+    my $login  = delete( $data->{login} );
+    my $uri    = delete( $data->{uri} );
+
+    # Include login in message for CAPI transmission
+    # (events[].meta is NOT forwarded by LAPI to CAPI)
+    $msg .= " (login: $login)" if $login;
+
     $data->{scenario_hash} = sha256_hex( $data->{scenario} );
-    return to_json( [ {
-                %$data,
-                message => $msg,
-                events  => [ {
-                        timestamp => $data->{start_at},
-                        meta      => [
-                            { key => 'log_type', value => 'llng-auth' },
-                            { key => 'reason',   value => $reason }
-                        ],
-                        source => $data->{source},
-                    }
-                ],
-            }
-        ]
+    my @meta = (
+        { key => 'log_type', value => 'llng-auth' },
+        { key => 'reason',   value => $reason }
     );
+    push @meta, { key => 'login', value => $login } if $login;
+    push @meta, { key => 'uri',   value => $uri }   if $uri;
+
+    # Enrich with historical context when ban decision is made
+    if ( $data->{remediation} and $prevAlerts ) {
+        my $context = $self->_extractAlertContext($prevAlerts);
+        if ($context) {
+            my @msg_parts;
+
+            # Add historical metadata
+            if ( @{ $context->{logins} } ) {
+                my $all_logins = join ', ', @{ $context->{logins} };
+                push @meta, { key => 'previous_logins', value => $all_logins };
+
+                # Truncate for message display
+                my $login_summary =
+                  @{ $context->{logins} } <= 3
+                  ? $all_logins
+                  : join( ', ', @{ $context->{logins} }[ 0 .. 2 ] ) . '...';
+                push @msg_parts, "attempted logins: $login_summary";
+            }
+
+            if ( @{ $context->{uris} } ) {
+                my $all_uris = join ', ', @{ $context->{uris} };
+                push @meta, { key => 'previous_uris', value => $all_uris };
+
+                # Truncate for message display
+                my $uri_summary =
+                  @{ $context->{uris} } <= 3
+                  ? $all_uris
+                  : join( ', ', @{ $context->{uris} }[ 0 .. 2 ] ) . '...';
+                push @msg_parts, "scanned URIs: $uri_summary";
+            }
+
+            if ( $context->{count} ) {
+                push @meta,
+                  {
+                    key   => 'previous_alert_count',
+                    value => "" . $context->{count}
+                  };
+            }
+
+            if ( $context->{first_alert} ) {
+                push @meta,
+                  { key => 'first_alert', value => $context->{first_alert} };
+            }
+
+            if ( $context->{last_alert} ) {
+                push @meta,
+                  { key => 'last_alert', value => $context->{last_alert} };
+            }
+
+            # Enrich human-readable message
+            if ( $context->{count} ) {
+                $msg .= sprintf "; after %d previous alert(s)",
+                  $context->{count};
+            }
+            if (@msg_parts) {
+                $msg .= "; " . join( "; ", @msg_parts );
+            }
+        }
+    }
+
+    my $alert = {
+        %$data,
+        message => $msg,
+        events  => [ {
+                timestamp => $data->{start_at},
+                meta      => \@meta,
+                source    => $data->{source},
+            }
+        ],
+    };
+
+    # Add decisions array when remediation is requested
+    # This ensures the IP is immediately banned by CrowdSec
+    if ( $data->{remediation} ) {
+        my $duration =
+          $data->{banDuration} || $self->conf->{crowdsecBanDuration} || '4h';
+        $alert->{decisions} = [ {
+                duration => $duration,
+                type     => 'ban',
+                scope    => 'ip',
+                value    => $ip,
+                origin   => 'llng',
+                scenario => $data->{scenario},
+            }
+        ];
+    }
+
+    return to_json( [$alert] );
 }
 
 sub getToken {
     my ($self) = @_;
 
     # Use token if available
-    return $self->token if $self->token and $self->tokenExp < time - 10;
+    return $self->token if $self->token and $self->tokenExp > time + 10;
 
     # Get new token
     my ( $user, $pwd ) =

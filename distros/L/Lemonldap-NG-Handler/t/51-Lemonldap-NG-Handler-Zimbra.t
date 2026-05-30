@@ -30,15 +30,6 @@ open STDERR, '>/dev/null';
 
 #########################
 
-# Insert your test code below, the Test::More module is used here so read
-# its man page ( perldoc Test::More ) for help writing this test script.
-SKIP: {
-    eval { require Digest::HMAC_SHA1 };
-    skip
-"Digest::HMAC_SHA1 is not installed, so Lemonldap::NG::Handler::Lib::ZimbraPreAuth will not be useable",
-      1
-      if ($@);
-    use_ok('Lemonldap::NG::Handler::Lib::ZimbraPreAuth');
-}
+use_ok('Lemonldap::NG::Handler::Lib::ZimbraPreAuth');
 
 $LLNG_DEFAULTCONFFILE = undef;

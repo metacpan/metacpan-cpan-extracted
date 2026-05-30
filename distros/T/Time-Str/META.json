@@ -62,39 +62,39 @@
    "provides" : {
       "Time::Str" : {
          "file" : "lib/Time/Str.pm",
-         "version" : "0.87"
+         "version" : "0.88"
       },
       "Time::Str::Calendar" : {
          "file" : "lib/Time/Str/Calendar.pm",
-         "version" : "0.87"
+         "version" : "0.88"
       },
       "Time::Str::PP" : {
          "file" : "lib/Time/Str/PP.pm",
-         "version" : "0.87"
+         "version" : "0.88"
       },
       "Time::Str::Regexp" : {
          "file" : "lib/Time/Str/Regexp.pm",
-         "version" : "0.87"
+         "version" : "0.88"
       },
       "Time::Str::Time" : {
          "file" : "lib/Time/Str/Time.pm",
-         "version" : "0.87"
+         "version" : "0.88"
       },
       "Time::Str::Token" : {
          "file" : "lib/Time/Str/Token.pm",
-         "version" : "0.87"
+         "version" : "0.88"
       },
       "Time::Str::Util" : {
          "file" : "lib/Time/Str/Util.pm",
-         "version" : "0.87"
+         "version" : "0.88"
       },
       "Time::TZif" : {
          "file" : "lib/Time/TZif.pm",
-         "version" : "0.87"
+         "version" : "0.88"
       },
       "Time::TZif::POSIX" : {
          "file" : "lib/Time/TZif/POSIX.pm",
-         "version" : "0.87"
+         "version" : "0.88"
       }
    },
    "release_status" : "stable",
@@ -109,7 +109,7 @@
          "web" : "https://github.com/chansen/p5-time-str"
       }
    },
-   "version" : "0.87",
+   "version" : "0.88",
    "x_generated_by_perl" : "v5.42.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

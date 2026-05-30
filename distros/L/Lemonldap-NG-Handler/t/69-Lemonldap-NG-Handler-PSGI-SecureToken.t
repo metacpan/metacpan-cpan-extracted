@@ -23,7 +23,6 @@ SKIP: {
     init(
         'Lemonldap::NG::Handler::Server',
         {
-            logLevel          => 'error',
             secureTokenUrls   => [ '^/secured$', '/test$' ],
             secureTokenHeader => 'AuthToken',
             vhostOptions      => {

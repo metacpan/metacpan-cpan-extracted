@@ -10,7 +10,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.0.16';
+our $VERSION = '2.23.0';
 
 extends qw(
   Lemonldap::NG::Portal::Lib::Code2F
@@ -25,48 +25,27 @@ has prefix => ( is => 'rw', default => 'rest' );
 # Used to lookup config
 has conf_type => ( is => 'ro', default => 'rest' );
 
-has legend    => ( is => 'rw', default => 'enterRest2fCode' );
-has initAttrs => ( is => 'rw', default => sub { {} } );
-has vrfyAttrs => ( is => 'rw', default => sub { {} } );
+has legend => ( is => 'rw', default => 'enterRest2fCode' );
 
 sub init {
     my ($self) = @_;
 
+    my $init_result   = $self->initNamedCallFromConf( 'rest2fInit',   'init' );
+    my $verify_result = $self->initNamedCallFromConf( 'rest2fVerify', 'vrfy' );
+
     if ( $self->code_activation ) {
-        unless ( $self->conf->{rest2fInitUrl} ) {
+        unless ($init_result) {
             $self->logger->error(
                 $self->prefix . '2f: missing intialization URL' );
             return 0;
         }
     }
     else {
-        unless ( $self->conf->{rest2fVerifyUrl} ) {
+        unless ($verify_result) {
             $self->logger->error(
                 $self->prefix . '2f: missing verification URL' );
             return 0;
         }
-    }
-
-    foreach my $k ( keys %{ $self->conf->{rest2fInitArgs} } ) {
-        my $attr = $self->conf->{rest2fInitArgs}->{$k};
-        $attr =~ s/^$//;
-        unless ( $attr =~ /^\w+$/ ) {
-            $self->logger->error( $self->prefix
-                  . "2f: $k key must point to a single attribute or macro" );
-            return 0;
-        }
-        $self->initAttrs->{$k} = $attr;
-    }
-    foreach my $k ( keys %{ $self->conf->{rest2fVerifyArgs} } ) {
-        my $attr = $self->conf->{rest2fVerifyArgs}->{$k};
-        $attr =~ s/^$//;
-        unless ( $attr =~ /^\w+$/ ) {
-            $self->logger->error( $self->prefix
-                  . "2f: $k key must point to a single attribute or macro" );
-            return 0;
-        }
-        $self->logger->debug( $self->prefix . "2f: push verify attribute $k" );
-        $self->vrfyAttrs->{$k} = $attr;
     }
 
     return $self->SUPER::init();
@@ -82,14 +61,11 @@ sub sendCode {
             user => $sessionInfo->{ $self->conf->{whatToTrace} },
             ( $code ? ( code => $code ) : () ),
         };
-        foreach my $k ( keys %{ $self->{initAttrs} } ) {
-            $args->{$k} = $sessionInfo->{ $self->{initAttrs}->{$k} };
-        }
 
         # Launch REST request
         $self->logger->debug( $self->prefix . '2f: call init URL' );
         my $res =
-          eval { $self->restCall( $self->conf->{rest2fInitUrl}, $args ); };
+          eval { $self->restNamedCall( $req, 'init', $args, $sessionInfo ); };
         if ($@) {
             $self->logger->error( $self->prefix . "2f: error ($@)" );
             return PE_ERROR;
@@ -116,22 +92,15 @@ sub verify_external {
         code => $code
     };
 
-    foreach my $k ( keys %{ $self->{vrfyAttrs} } ) {
-
-        # in older versions, code was not automatically defined
-        # if admins defined it explicitly, do not treat it as a session
-        # attribute
-        $args->{$k} = (
-              $k eq 'code'
-            ? $code
-            : $session->{ $self->{vrfyAttrs}->{$k} }
-        );
-    }
+    # in older versions, code was not automatically defined
+    # if admins defined it explicitly, do not treat it as a session
+    # attribute
+    my $session_data = { %{ $session || {} }, code => $code };
 
     # Launch REST request
     $self->logger->debug( $self->prefix . '2f: call verify URL' );
     my $res =
-      eval { $self->restCall( $self->conf->{rest2fVerifyUrl}, $args ); };
+      eval { $self->restNamedCall( $req, 'vrfy', $args, $session_data ) };
     if ($@) {
         $self->logger->error( $self->prefix . "2f: error ($@)" );
         return PE_ERROR;

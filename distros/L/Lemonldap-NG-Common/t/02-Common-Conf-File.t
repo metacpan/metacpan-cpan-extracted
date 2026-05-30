@@ -21,8 +21,7 @@ use File::Temp;
 my $dir = File::Temp::tempdir( CLEANUP => 1 );
 
 ok(
-    $confAcc = new Lemonldap::NG::Common::Conf(
-        {
+    $confAcc = new Lemonldap::NG::Common::Conf( {
             type    => 'File',
             dirName => $dir,
         }

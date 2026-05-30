@@ -104,7 +104,7 @@ count(1);
 my $query = "user=french&password=french";
 ok(
     $res = $op->_post(
-        '/',,
+        '/',
         IO::String->new($query),
         accept => 'text/html',
         length => length($query),

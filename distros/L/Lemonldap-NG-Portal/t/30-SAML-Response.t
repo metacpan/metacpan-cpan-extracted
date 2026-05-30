@@ -17,14 +17,7 @@ BEGIN {
 my ( $issuer, $res );
 
 # Redefine LWP methods for tests
-LWP::Protocol::PSGI->register(
-    sub {
-        my $req = Plack::Request->new(@_);
-        fail('POST should not launch SOAP requests');
-        count(1);
-        return [ 500, [], [] ];
-    }
-);
+LWP::Protocol::PSGI->register( denyLwpRequests() );
 our $saml;
 
 SKIP: {

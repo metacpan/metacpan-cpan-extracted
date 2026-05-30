@@ -9,7 +9,7 @@ Time::TZif - TZif timezone file parser with configurable local time resolution
     use Time::TZif;
     
     my $tz = Time::TZif->new(
-      filename       => '/usr/share/zoneinfo/America/New_York',
+      path           => '/usr/share/zoneinfo/America/New_York',
       gap_policy     => 'later',      # default policy for gaps
       overlap_policy => 'earlier',    # default policy for overlaps
     );
@@ -29,14 +29,16 @@ Time::TZif - TZif timezone file parser with configurable local time resolution
 
 =head1 DESCRIPTION
 
-B<Note:> This module is experimental and may change without prior notice.
-
 C<Time::TZif> parses TZif binary timezone files (RFC 8536) and
 provides methods for resolving UTC and local times to UTC offsets.
 
 Supports TZif version 1 (32-bit timestamps), version 2, and version 3
 (64-bit timestamps). When a v2/v3 file is detected and the platform
 supports 64-bit integers, the 64-bit data block is used automatically.
+
+For v2/v3 files that contain a POSIX TZ string footer, times after the 
+last stored transition are resolved using the footer rules. This allows 
+correct handling of future dates beyond the precomputed transition table.
 
 The key challenge in timezone handling is converting I<local> times to
 UTC, because DST transitions create two problematic cases:
@@ -65,26 +67,31 @@ that can be set as defaults in the constructor or overridden per call.
 =head2 new
 
     my $tz = Time::TZif->new(
-      filename       => $filename,
-      gap_policy     => 'reject',    # optional, default: 'reject'
-      overlap_policy => 'reject',    # optional, default: 'reject'
+      path           => $path,
+      name           => 'America/New_York',  # optional
+      gap_policy     => 'reject',            # optional, default: 'reject'
+      overlap_policy => 'reject',            # optional, default: 'reject'
     );
 
 Creates a new C<Time::TZif> object by parsing the specified TZif file.
 
 =over 4
 
-=item C<filename> (required)
+=item C<path> (required)
 
 Path to a TZif binary timezone file (e.g., C</usr/share/zoneinfo/America/New_York>).
 
-=item C<gap_policy> (optional, default: C<'reject'>)
+=item C<name> (optional)
+
+IANA timezone name associated with this file (e.g., C<America/New_York>).
+
+=item C<gap_policy> (optional, default: C<reject>)
 
 Default policy for resolving non-existing local times (during
 spring-forward gaps). See L</POLICIES>. Can be overridden per call in
 C<offset_for_local> and C<type_info_for_local>.
 
-=item C<overlap_policy> (optional, default: C<'reject'>)
+=item C<overlap_policy> (optional, default: C<reject>)
 
 Default policy for resolving ambiguous local times (during fall-back
 overlaps). See L</POLICIES>. Can be overridden per call in
@@ -101,26 +108,18 @@ Croaks if the file cannot be opened or is not a valid TZif file.
     my $offset = $tz->offset_for_utc($time);
 
 Returns the UTC offset in seconds for the given UTC epoch time. This is
-always unambiguous.
+always unambiguous. For times after the last stored transition,
+delegates to the POSIX TZ string footer if available.
 
 =head2 offset_for_local
 
     my $offset = $tz->offset_for_local($time);
     my $offset = $tz->offset_for_local($time, %opts);
-    
-    use Time::Str::Time qw[timegm_modern];
-    
-    # Treat wall-clock 2024-03-10 02:30:00 as a UTC epoch
-    my $local  = timegm_modern(0, 30, 2, 10, 3, 2024);
-    my $offset = $tz->offset_for_local($local);
-    
-    # The actual UTC epoch is:
-    my $utc = $local - $offset;
 
 Returns the UTC offset in seconds for the given local epoch time (i.e.,
 the epoch value obtained by treating the wall-clock time as if it were UTC).
 
-=head3 Options
+B<Options>
 
 =over 4
 
@@ -134,11 +133,24 @@ Policy for ambiguous local times. See L</POLICIES>.
 
 =back
 
+B<Eaxmple>
+
+    use Time::Str::Time qw[timegm_modern];
+    
+    # Treat wall-clock 2024-03-10 02:30:00 as a UTC epoch
+    my $local  = timegm_modern(0, 30, 2, 10, 3, 2024);
+    my $offset = $tz->offset_for_local($local);
+    
+    # The actual UTC epoch is:
+    my $utc = $local - $offset;
+
 =head2 type_info_for_utc
 
     my ($offset, $is_dst, $abbreviation) = $tz->type_info_for_utc($time);
 
-Returns the full type information for the given UTC epoch time:
+Returns the full type information for the given UTC epoch time. For
+times after the last stored transition, delegates to the POSIX TZ
+string footer if available.
 
 =over 4
 
@@ -157,11 +169,32 @@ Returns the full type information for the given UTC epoch time:
 Returns the full type information for the given local epoch time. Accepts
 the same C<gap_policy> and C<overlap_policy> options as C<offset_for_local>.
 
-=head2 filename
+=head2 name
 
-    my $filename = $tz->filename;
+    my $name = $tz->name;
 
-Returns the filename used to construct the object.
+Returns the timezone name passed to the constructor, or C<undef> if
+none was provided.
+
+=head2 has_name
+
+    if ($tz->has_name) { ... }
+
+Returns true if a timezone name was provided to the constructor.
+
+=head2 path
+
+    my $path = $tz->path;
+
+Returns the path used to construct the object.
+
+=head2 modified_time
+
+    my $mtime = $tz->modified_time;
+
+Returns the last modification time of the TZif file at the time it was 
+parsed, as a Unix epoch value. This can be used to detect whether the 
+file has changed since parsing (e.g., after a tzdata package upgrade).
 
 =head2 gap_policy
 
@@ -174,6 +207,30 @@ Returns the default gap policy set in the constructor.
     my $policy = $tz->overlap_policy;
 
 Returns the default overlap policy set in the constructor.
+
+=head2 with_name
+
+    my $tz2 = $tz->with_name('Europe/Stockholm');
+
+Returns a new C<Time::TZif> object with the given timezone name, sharing
+the parsed TZif data with the original. Croaks if the name is not
+structurally valid. Returns the same object if the name is unchanged.
+
+=head2 with_gap_policy
+
+    my $tz2 = $tz->with_gap_policy('later');
+
+Returns a new C<Time::TZif> object with the given gap policy, sharing
+the parsed TZif data with the original. Croaks if the policy is not
+valid. Returns the same object if the policy is unchanged.
+
+=head2 with_overlap_policy
+
+    my $tz2 = $tz->with_overlap_policy('earlier');
+
+Returns a new C<Time::TZif> object with the given overlap policy, sharing
+the parsed TZif data with the original. Croaks if the policy is not
+valid. Returns the same object if the policy is unchanged.
 
 =head1 POLICIES
 
@@ -228,7 +285,7 @@ C<DateTime::TimeZone-E<gt>offset_for_local_datetime()> throws an exception
 on gaps and selects the later (post-transition) offset for overlaps:
 
     my $tz = Time::TZif->new(
-      filename       => $filename,
+      path           => $path,
       gap_policy     => 'reject',
       overlap_policy => 'later',
     );
@@ -240,7 +297,7 @@ period and likewise resolves overlaps to the earlier (pre-transition)
 offset:
 
     my $tz = Time::TZif->new(
-      filename       => $filename,
+      path           => $path,
       gap_policy     => 'earlier',
       overlap_policy => 'earlier',
     );
@@ -250,6 +307,31 @@ offset:
 The behaviour of C<POSIX::mktime()> with C<tm_isdst = -1> for
 non-existing (gap) and ambiguous (overlap) local times is unspecified
 by the C standard and varies across platforms.
+
+=head3 glibc (Linux)
+
+glibc resolves gaps to the pre-transition (earlier) offset and overlaps
+to the first occurrence (earlier), equivalent to:
+
+    my $tz = Time::TZif->new(
+      path           => $path,
+      gap_policy     => 'earlier',
+      overlap_policy => 'earlier',
+    );
+
+This produces zero mismatches against C<POSIX::mktime()> for all tested
+zones.
+
+=head3 BSD libc (macOS)
+
+BSD libc does not match any single policy combination consistently.
+No combination of gap and overlap policy produces zero mismatches
+across all transition points. The closest results use C<gap_policy>
+C<earlier> with C<overlap_policy> C<earlier>, but still produce 
+mismatches at some transitions.
+
+See F<author/check_mktime.pl> in the source repository for the
+brute-force comparison used to determine these results.
 
 =head1 DIAGNOSTICS
 
@@ -346,10 +428,15 @@ transition and the C<overlap_policy> policy is set to C<'reject'>.
 
 A method was called with an incorrect number of arguments.
 
-=item C<Parameter 'filename' is required>
+=item C<Parameter 'path' is required>
 
-The C<new> constructor was called without the required C<filename>
+The C<new> constructor was called without the required C<path>
 parameter.
+
+=item C<Invalid value for the parameter 'name'>
+
+The value given for C<name> is not structurally valid as an IANA Time 
+Zone Database timezone name.
 
 =item C<Invalid policy value for the parameter '%s'>
 

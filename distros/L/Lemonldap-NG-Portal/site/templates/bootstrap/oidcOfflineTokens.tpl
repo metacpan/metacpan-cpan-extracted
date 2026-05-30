@@ -1,4 +1,4 @@
-<script type="text/javascript" src="<TMPL_VAR NAME="js">""></script>
+<script type="text/javascript" src="<TMPL_VAR NAME="js">"></script>
 <script type="application/init">
 {"sessions":<TMPL_VAR NAME="sessions">}
 </script>

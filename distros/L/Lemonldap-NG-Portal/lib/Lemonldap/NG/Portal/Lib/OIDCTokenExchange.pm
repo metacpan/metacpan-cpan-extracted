@@ -7,23 +7,12 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 );
 use Mouse;
 
-extends 'Lemonldap::NG::Portal::Main::Plugin';
+extends 'Lemonldap::NG::Portal::Lib::OIDCPlugin';
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.23.0';
 
 # INTERFACE
 use constant hook => { oidcGotTokenExchange => 'tokenExchange' };
-
-has oidc => (
-    is      => 'ro',
-    lazy    => 1,
-    default => sub {
-        $_[0]
-          ->p->loadedModules->{'Lemonldap::NG::Portal::Issuer::OpenIDConnect'};
-    }
-);
-
-sub init { 1 }
 
 # MAIN METHOD
 #

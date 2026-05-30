@@ -5,7 +5,7 @@ use Mouse;
 use Lemonldap::NG::Common::PSGI;
 use Lemonldap::NG::Common::PSGI::Constants;
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Common::PSGI';
 
@@ -138,15 +138,14 @@ sub handler {
     if ( !@path and $self->defaultRoute ) {
         @path = ( $self->defaultRoute );
     }
-    my $head = 0;
+    my $head   = 0;
     my $method = $req->method;
     if ( $method eq 'HEAD' ) {
-        $head = 1;
+        $head   = 1;
         $method = 'GET';
     }
-    my $res =
-      $self->followPath( $req, $self->routes->{ $method }, \@path );
-    if ( $res and $head ) { $res->[2] = undef }
+    my $res = $self->followPath( $req, $self->routes->{$method}, \@path );
+    if ( $res and $head ) { $res->[2] = [] }
     return $res ? $res : $self->sendError( $req, 'Bad request', 400 );
 }
 

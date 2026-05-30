@@ -29,7 +29,7 @@ my $client = LLNG::Manager::Test->new( {
     }
 );
 
-diag "Waiting";
+note "Waiting";
 ok( !$client->{p}->init( $client->ini ) );
 ok( $client->app( $client->{p}->run ) );
 ok(

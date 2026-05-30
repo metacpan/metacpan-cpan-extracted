@@ -23,8 +23,7 @@ SKIP: {
         skip 'Missing dependencies', $maintests;
     }
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel             => 'error',
                 useSafeJail          => 1,
@@ -143,7 +142,7 @@ qr#<h3><span>Your account was signed in to from a new location\.</span></h3></br
     );
     like(
         mail(),
-        qr#<span>Date</span> <b>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} \(UTC[+-][0-9]{4}\)</b>#,
+qr#<span>Date</span> <b>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2} \(UTC[+-][0-9]{4}\)</b>#,
         ' Date found in mail body'
     );
     like(

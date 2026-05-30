@@ -3,17 +3,18 @@ package Lemonldap::NG::Common::OpenIDConnect::Constants;
 use strict;
 use Exporter 'import';
 
-our @EXPORT = (qw(
-  BACKCHANNEL_EVENTSKEY
-  PROFILE
-  EMAIL
-  ADDRESS
-  PHONE
-  DEFAULT_SCOPES
-  COMPLEX_CLAIM
-  ENC_ALG_SUPPORTED
-  ENC_SUPPORTED
-));
+our @EXPORT = ( qw(
+      BACKCHANNEL_EVENTSKEY
+      PROFILE
+      EMAIL
+      ADDRESS
+      PHONE
+      DEFAULT_SCOPES
+      COMPLEX_CLAIM
+      ENC_ALG_SUPPORTED
+      ENC_SUPPORTED
+    )
+);
 
 use constant BACKCHANNEL_EVENTSKEY =>
   'http://schemas.openid.net/event/backchannel-logout';

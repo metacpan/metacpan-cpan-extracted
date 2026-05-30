@@ -35,7 +35,78 @@ Date::Find - find year, month, day from (filename) strings
     # statement_20221201.pdf - 2022 - 12 - 00
     # statement_02.12.2022.pdf - 2022 - 12 - 00
 
-## `find_ymd`
+# FUNCTIONS
+
+## `find_ymd $date_regex, $source, $date_regex_order`
+
+    my $r = find_ymd( 'dmy', 'my-filename-01012025.pdf' );
+    # {
+    #    d => '01',
+    #    m => '01',
+    #    y => '2025'
+    # }
+
+Finds a date fitting the given regular expression and extracts it into
+a hashref with the found parts.
+
+## `find_all_ymd`
+
+    my %res = find_all_ymd('my-filename-20250101.pdf');
+    # y   => {...}
+    # ym  => {...}
+    # ymd => {...}
+    # dmy => {...}
+
+Finds all matches for dates in the filename and returns a hash
+keyed by the date type of each match.
+
+If no date can be found, returns an empty list.
+
+## `guess_date_format $sources, %options`
+
+    my $by_found_date = guess_date_format( \@files );
+    # {
+    #     'no_date' => [ ... ],
+    #     'ymd'     => [ ... ],
+    # }
+    for my $file ($by_found_date->{ no_date }) {
+        say "No date found in $file->{value}";
+    }
+
+Guesses the date formats for all items in the lists and puts them into
+the buckets for each matched date format.
+
+## `guess_ymd $sources, %options`
+
+    my @results = guess_ymd( \@files, { preference => ['dmy', 'ymd'] } );
+
+    for my $f (@results) {
+      say $f->{value}, $f->{y}, $f->{m}, $f->{d}
+    }
+
+Guesses the date format common to most files and returns that list. The other
+files are ignored.
+
+Options:
+
+- **mode**
+
+        mode => 'lax'
+
+    If you enable `strict` mode, an exception will be thrown for files for which no
+    date can be found.
+
+- **preference**
+
+        preference => ['dxy','ymd']
+
+    The order in which alternatives should be tried when looking for a date.
+
+- **components**
+
+        components => 'dmy',
+
+    The components you want in the date.
 
 # SEE ALSO
 

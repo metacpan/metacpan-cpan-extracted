@@ -55,6 +55,9 @@
         if (data.interval !== 30) {
           s += "&period=".concat(data.interval);
         }
+        if (data.algorithm !== "sha1") {
+          s += "&algorithm=".concat(data.algorithm.toUpperCase());
+        }
         // Generate QR code
         new QRious({
           element: document.getElementById('qr'),

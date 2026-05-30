@@ -33,7 +33,7 @@
   /*
   LemonLDAP::NG 2F registration script
   */
-  var delete2F, displayError, setMsg;
+  var delete2F, displayError, update2F, setMsg;
   setMsg = function setMsg(msg, level) {
     $('#msg').attr('trspan', msg);
     $('#msg').html(window.translate(msg));
@@ -118,10 +118,55 @@
     }, "error", displayError));
   };
 
+  // Update function (launched by "save" button)
+  update2F = function update2F(device, epoch, prefix, label, oldlabel) {
+    if (label == oldlabel) {
+      setMsg('yourKeyIsUnchanged', 'warning');
+    } else {
+      return $.ajax({
+        type: "POST",
+        url: "".concat(scriptname, "2fregisters/").concat(prefix, "/modify"),
+        data: {
+          epoch: epoch,
+          label: label
+        },
+        headers: {
+          "X-CSRF-Check": "1"
+        },
+        dataType: 'json',
+        error: displayError,
+        success: function success(data) {
+          var e;
+          if (data.error) {
+            if (data.error.match(/bad(Code|Name)/)) {
+              return setMsg(data.error, 'warning');
+            } else {
+              return setMsg(data.error, 'danger');
+            }
+          } else {
+            $("span.update2f[device=".concat(device, "][epoch=").concat(epoch, "]")).attr('oldlabel', label);
+            e = jQuery.Event("mfaUpdated");
+            $(document).trigger(e, [{
+              "type": device,
+              "epoch": epoch,
+              "label": label
+            }]);
+            if (!e.isDefaultPrevented()) {
+              setMsg('yourKeyIsUpdated', 'positive');
+            }
+          }
+        }
+      });
+    }
+  };
+
   // Register "click" events
   $(document).ready(function () {
     $('body').on('click', '.remove2f', function () {
       return delete2F($(this).attr('device'), $(this).attr('epoch'), $(this).attr('prefix'));
+    });
+    $('body').on('click', '.update2f', function () {
+      return update2F($(this).attr('device'), $(this).attr('epoch'), $(this).attr('prefix'), $("#input-".concat($(this).attr('epoch'))).val(), $(this).attr('oldlabel'));
     });
     $('#goback').attr('href', portal);
     return $(".data-epoch").each(function () {

@@ -56,6 +56,9 @@ getKey = function() {
       if (data.interval !== 30) {
         s += `&period=${data.interval}`;
       }
+      if (data.algorithm !== "sha1") {
+        s += `&algorithm=${data.algorithm.toUpperCase()}`;
+      }
       // Generate QR code
       new QRious({
         element: document.getElementById('qr'),

@@ -29,6 +29,17 @@ sub parse_case {
 sub runtime_for_case {
 	my ( $case ) = @_;
 	my %runtime = %{ $case->{runtime} // {} };
+	if ( exists $runtime{lib} ) {
+		$runtime{lib} = [
+			map {
+				$_ eq 'modules'
+					? File::Spec->catdir( 'stdlib', 'modules' )
+					: $_ eq 'test-modules'
+						? File::Spec->catdir( 'stdlib', 'test-modules' )
+						: $_
+			} @{ $runtime{lib} }
+		];
+	}
 	return Zuzu::Runtime->new(%runtime);
 }
 
@@ -50,7 +61,7 @@ sub assert_error {
 }
 
 my $fixture_path = File::Spec->catfile(
-	't', 'fixtures', 'semantics', 'conformance-suite.json',
+	'stdlib', 'test-fixtures', 'semantics', 'conformance-suite.json',
 );
 my $fixture_doc = decode_json( slurp_utf8($fixture_path) );
 my @cases = @{ $fixture_doc->{cases} // [] };

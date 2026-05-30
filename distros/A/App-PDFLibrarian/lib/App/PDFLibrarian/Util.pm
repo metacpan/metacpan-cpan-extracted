@@ -19,7 +19,7 @@ use strict;
 use warnings;
 
 package App::PDFLibrarian::Util;
-$App::PDFLibrarian::Util::VERSION = '6.0.2';
+$App::PDFLibrarian::Util::VERSION = '6.0.3';
 use parent 'Exporter';
 
 use Carp;

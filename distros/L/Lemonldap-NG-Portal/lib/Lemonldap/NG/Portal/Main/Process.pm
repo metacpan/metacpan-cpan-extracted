@@ -1,13 +1,13 @@
 package Lemonldap::NG::Portal::Main::Process;
 
-our $VERSION = '2.22.2';
+our $VERSION = '2.23.0';
 
 package Lemonldap::NG::Portal::Main;
 
 use strict;
 use MIME::Base64;
-use POSIX qw(strftime);
-use Lemonldap::NG::Common::Util qw(isHiddenAttr);
+use POSIX                                  qw(strftime);
+use Lemonldap::NG::Common::Util            qw(isHiddenAttr);
 use Lemonldap::NG::Portal::Main::Constants qw(portalConsts);
 use URI;
 
@@ -688,8 +688,7 @@ sub store {
     foreach my $k ( sort keys %{ $req->{sessionInfo} } ) {
         next unless defined $req->{sessionInfo}->{$k};
         my $displayValue = $req->{sessionInfo}->{$k};
-        $displayValue = '****'
-          if isHiddenAttr( $self->conf->{hiddenAttributes}, $k );
+        $displayValue = '****' if isHiddenAttr( $self->conf, $k );
         $self->logger->debug("Store $displayValue in session key $k");
         $self->_dump($displayValue) if ref($displayValue);
         $infos->{$k} = $req->{sessionInfo}->{$k};
@@ -755,18 +754,27 @@ sub buildCookie {
     my $ref = (
         %{ $req->{sessionInfo} }
         ? $req->{sessionInfo}
-        : $req->{userData}
+        : $req->userData
     );
     $req->data->{newAuth} = 1;
+
+    my $whatToTrace = $ref->{ $self->conf->{whatToTrace} };
+    if ( !$whatToTrace ) {
+        $self->logger->error( "Could not obtain main identifier ("
+              . $self->conf->{whatToTrace}
+              . ") of user. Aborting authentication" );
+        return PE_ERROR;
+
+    }
+
     $self->auditLog(
         $req,
         message => (
-                'User '
-              . $ref->{ $self->conf->{whatToTrace} }
+                "User $whatToTrace "
               . " successfully authenticated at level $ref->{authenticationLevel}"
         ),
         code  => "AUTHENTICATED",
-        user  => $ref->{ $self->conf->{whatToTrace} },
+        user  => $whatToTrace,
         level => $ref->{authenticationLevel},
     );
     return PE_OK;

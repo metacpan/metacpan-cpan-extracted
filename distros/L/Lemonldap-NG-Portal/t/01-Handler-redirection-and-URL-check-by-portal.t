@@ -11,8 +11,7 @@ require 't/test-lib.pm';
 
 my $res;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel       => 'error',
             useSafeJail    => 1,
@@ -32,8 +31,7 @@ ok( $app = Lemonldap::NG::Handler::Server->run( $client->ini ), 'App' );
 count(1);
 
 ok(
-    $res = $app->(
-        {
+    $res = $app->( {
             'HTTP_ACCEPT'          => 'text/html',
             'SCRIPT_NAME'          => '/',
             'SERVER_NAME'          => '127.0.0.1',
@@ -70,8 +68,7 @@ expectForm( $res, undef, undef, 'url' );
 count(1);
 
 ok(
-    $res = $app->(
-        {
+    $res = $app->( {
             'HTTP_ACCEPT'          => 'text/html',
             'SCRIPT_NAME'          => '/',
             'SERVER_NAME'          => '127.0.0.1',

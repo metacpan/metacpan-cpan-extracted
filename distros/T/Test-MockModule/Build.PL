@@ -45,6 +45,22 @@ my $builder = $class->new(
 	test_requires => {
 		'Test::More'          => 0.88,
 		'Test::Warnings'      => 0,
+	},
+	# Moose, Mouse, Class::Load and Test::Exception are exercised ONLY by the
+	# t/moose_*.t and t/mouse_*.t MOP-integration tests added for GH #55. Each
+	# of those files opens with `eval { require Moose } or plan skip_all`, so
+	# the suite passes cleanly without them. They are therefore OPTIONAL, not
+	# required: declaring them as `recommends` keeps a plain
+	# `cpanm Test::MockModule` from dragging in two full Perl OO systems (GH #90).
+	#
+	# NOTE: Module::Build 0.42xx cannot emit *test-phase* recommends -- a
+	# `prereqs` key in meta_merge/meta_add is silently dropped -- so the
+	# top-level `recommends` property is used, which lands these under
+	# runtime/recommends in META. That is cosmetic: no CPAN client installs
+	# recommends of any phase by default, and `cpanm --with-recommends` (used
+	# by .github/workflows/testsuite.yml) installs them regardless of phase.
+	# Do NOT move these back into test_requires.
+	recommends => {
 		'Test::Exception'     => 0,
 		'Class::Load'         => 0,
 		'Moose'               => 0,

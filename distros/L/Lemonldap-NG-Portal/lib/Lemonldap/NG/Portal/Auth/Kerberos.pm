@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -109,16 +109,7 @@ sub _request_credential {
 
         # Case 1.1: Ajax request
         if ( $req->wantJSON ) {
-            $req->response( [
-                    401,
-                    [
-                        'WWW-Authenticate' => 'Negotiate',
-                        'Content-Type'     => 'application/json',
-                        'Content-Length'   => 35
-                    ],
-                    ['{"error":"Authentication required"}']
-                ]
-            );
+            $req->response( $self->_request_ajax_credential($req) );
         }
 
         # Case 1.2: HTML request: display error and initiate Kerberos
@@ -197,15 +188,14 @@ sub _request_ajax_credential {
 
     $self->logger->debug('Initialize Kerberos dialog');
 
-    return [
-        401,
-        [
-            'WWW-Authenticate' => 'Negotiate',
-            'Content-Type'     => 'application/json',
-            'Content-Length'   => 35
-        ],
-        ['{"error":"Authentication required"}']
-    ];
+    # Use sendTextResponse instead of sendJSONresponse to avoid normal header
+    # processing
+    return $self->p->sendTextResponse(
+        $req, '{"error":"Authentication required"}',
+        type    => "application/json",
+        code    => 401,
+        headers => [ 'WWW-Authenticate' => 'Negotiate' ]
+    );
 }
 
 sub _handle_ajax_response {
@@ -217,7 +207,7 @@ sub _handle_ajax_response {
     }
     else {
         $req->wantErrorRender(1);
-        return $self->p->doPE($req, PE_BADCREDENTIALS);
+        return $self->p->doPE( $req, PE_BADCREDENTIALS );
     }
 }
 

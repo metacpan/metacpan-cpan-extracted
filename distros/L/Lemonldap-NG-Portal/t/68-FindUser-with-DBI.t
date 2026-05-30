@@ -38,8 +38,7 @@ SKIP: {
     $dbh->do(
 "INSERT INTO users VALUES ('dalek','dalek', 'The Daleks','mutant','bad','1')"
     );
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel                    => 'error',
                 authentication              => 'DBI',

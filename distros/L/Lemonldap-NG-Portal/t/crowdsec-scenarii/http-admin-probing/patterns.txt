@@ -1,0 +1,4 @@
+/admin
+/phpmyadmin
+/wp-admin
+/solr

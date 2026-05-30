@@ -2,7 +2,7 @@ package Lemonldap::NG::Portal::UserDB::REST;
 
 use strict;
 use Mouse;
-use JSON qw(from_json to_json);
+use JSON                                   qw(from_json to_json);
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_ERROR
@@ -15,7 +15,7 @@ extends qw(
   Lemonldap::NG::Portal::Lib::REST
 );
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.23.0';
 
 # INITIALIZATION
 
@@ -30,7 +30,7 @@ has findUserDBUrl => (
 sub init {
     my $self = shift;
 
-    unless ( $self->conf->{restUserDBUrl} ) {
+    unless ( $self->initNamedCallFromConf( 'restUserDB', 'user' ) ) {
         $self->logger->error('REST User data URL is not set');
         return 0;
     }
@@ -44,13 +44,14 @@ sub getUser {
     my ( $self, $req, %args ) = @_;
     my $res;
     $res = eval {
-        $self->restCall(
-            $self->conf->{restUserDBUrl},
+        $self->restNamedCall(
+            $req, 'user',
             {
                 ( $args{useMail} ? 'mail' : 'user' ) => $req->user,
                 'useMail' => ( $args{useMail} ? JSON::true : JSON::false ),
 
-            }
+            },
+            {}
         );
     };
     if ($@) {

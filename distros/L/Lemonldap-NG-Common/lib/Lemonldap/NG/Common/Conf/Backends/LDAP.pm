@@ -11,7 +11,7 @@ use Net::LDAP;
 use Lemonldap::NG::Common::Conf::Constants;    #inherits
 use Lemonldap::NG::Common::Conf::Serializer;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.23.0';
 
 BEGIN {
     *Lemonldap::NG::Common::Conf::getLdapConnection = \&getLdapConnection;
@@ -97,7 +97,7 @@ sub getLdapConnection {
         ( $self->{ldapCAFile} ? ( cafile => $self->{ldapCAFile} ) : () ),
         ( $self->{ldapCAPath} ? ( capath => $self->{ldapCAPath} ) : () ),
         ( $self->{ldapPort}   ? ( port   => $self->{ldapPort} )   : () ),
-        raw => => qr/(?i:^jpegPhoto|;binary)/
+        raw => qr/(?i:^jpegPhoto|;binary)/
     );
 
     unless ($ldap) {

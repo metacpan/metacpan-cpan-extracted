@@ -13,14 +13,15 @@ extends qw(
   Lemonldap::NG::Portal::Password::Base
 );
 
-our $VERSION = '2.0.16';
+our $VERSION = '2.23.0';
 
 sub init {
     my ($self) = @_;
-    unless ($self->conf->{restPwdConfirmUrl}
-        and $self->conf->{restPwdModifyUrl} )
+
+    unless ($self->initNamedCallFromConf( 'restPwdConfirm', 'confirm' )
+        and $self->initNamedCallFromConf( 'restPwdModify', 'modify' ) )
     {
-        $self->logger->error('Missing REST password URL');
+        $self->logger->error('Missing REST password URLs');
         return 0;
     }
     return $self->SUPER::init;
@@ -29,10 +30,9 @@ sub init {
 sub confirm {
     my ( $self, $req, $pwd ) = @_;
     my $res = eval {
-        $self->restCall(
-            $self->conf->{restPwdConfirmUrl},
-            { user => $req->user, password => $pwd }
-        );
+        $self->restNamedCall( $req, 'confirm',
+            { user => $req->user, password => $pwd },
+            $req->sessionInfo );
     };
     if ($@) {
         $self->logger("REST password confirm error: $@");
@@ -44,13 +44,14 @@ sub confirm {
 sub modifyPassword {
     my ( $self, $req, $pwd, %args ) = @_;
     my $res = eval {
-        $self->restCall(
-            $self->conf->{restPwdModifyUrl},
+        $self->restNamedCall(
+            $req, 'modify',
             {
                 ( $args{useMail} ? 'mail' : 'user' ) => $req->user,
                 useMail  => ( $args{useMail} ? JSON::true : JSON::false ),
                 password => $pwd
-            }
+            },
+            $req->sessionInfo
         );
     };
     if ($@) {

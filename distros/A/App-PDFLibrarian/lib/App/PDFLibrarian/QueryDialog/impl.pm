@@ -19,7 +19,7 @@ use strict;
 use warnings;
 
 package App::PDFLibrarian::QueryDialog::impl;
-$App::PDFLibrarian::QueryDialog::impl::VERSION = '6.0.2';
+$App::PDFLibrarian::QueryDialog::impl::VERSION = '6.0.3';
 use Wx qw(:dialog :statictext :combobox :textctrl :sizer :panel :window :id);
 use Wx::ArtProvider;
 use Wx::Event qw(EVT_BUTTON EVT_TEXT EVT_TEXT_ENTER);
@@ -28,9 +28,9 @@ use base qw(Wx::Dialog);
 
 use App::PDFLibrarian qw(%query_databases);
 
-our $query_db_name_combo;
-our $query_value_combo;
-our $buttonok;
+my $query_db_name_combo;
+my $query_value_combo;
+my $buttonok;
 
 1;
 

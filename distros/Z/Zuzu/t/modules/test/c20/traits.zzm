@@ -1,5 +1,0 @@
-trait NamedRecord {
-	method full_label () {
-		return self.base_label() _ ":" _ self.get_name();
-	}
-}

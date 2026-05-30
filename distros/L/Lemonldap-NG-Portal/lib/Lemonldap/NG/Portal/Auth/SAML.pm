@@ -25,7 +25,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Auth
@@ -272,7 +272,8 @@ sub extractFormInfo {
             my $responseAuthnContext;
             eval {
                 $responseAuthnContext =
-                  $assertion->AuthnStatement()->AuthnContext()
+                  $assertion->AuthnStatement()
+                  ->AuthnContext()
                   ->AuthnContextClassRef();
             };
             if ($@) {
@@ -800,14 +801,10 @@ sub extractFormInfo {
 
                 $self->logger->debug("SOAP response $slo_body");
 
-                $req->response( [
-                        200,
-                        [
-                            'Content-Type'   => 'text/xml',
-                            'Content-Length' => length($slo_body)
-                        ],
-                        [$slo_body]
-                    ]
+                $req->response(
+                    $self->p->sendBinaryResponse(
+                        $req, $slo_body, type => 'text/xml'
+                    )
                 );
                 $req->data->{_continueLogout} = 1;
                 $req->steps( [
@@ -865,14 +862,10 @@ sub extractFormInfo {
             return PE_SAML_ART_ERROR;
         }
 
-        $req->response( [
-                200,
-                [
-                    'Content-Type'   => 'text/xml',
-                    'Content-Length' => length($art_response)
-                ],
-                [$art_response]
-            ]
+        $req->response(
+            $self->p->sendBinaryResponse(
+                $req, $art_response, type => 'text/xml'
+            )
         );
         $req->user('SOAP client');
         return PE_SENDRESPONSE;

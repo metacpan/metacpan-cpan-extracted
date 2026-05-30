@@ -10,7 +10,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
 );
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -53,7 +53,7 @@ sub auth_route {
     }
     else {
         $req->wantErrorRender(1);
-        return $self->p->doPE($req, PE_CERTIFICATEREQUIRED);
+        return $self->p->doPE( $req, PE_CERTIFICATEREQUIRED );
     }
 }
 
@@ -93,13 +93,14 @@ sub extractFormInfo {
         $req->wantErrorRender(1);
     }
 
-    if ($self->conf->{sslByAjax}) {
+    if ( $self->conf->{sslByAjax} ) {
         my $token_id = $req->param('ajax_auth_token');
         if ($token_id) {
             my $token = $self->get_auth_token( $req, $token_id );
             if ( $token->{user} ) {
                 my $user = $token->{user};
-                $self->userLogger->notice( "Good SSL authentication for " . $user );
+                $self->userLogger->notice(
+                    "Good SSL authentication for " . $user );
                 $req->user($user);
                 $req->data->{_Issuer} = $token->{extraInfo}->{_Issuer};
                 return PE_OK;
@@ -113,7 +114,8 @@ sub extractFormInfo {
     my $ssl_user = $self->get_user_from_req($req);
 
     if ( $ssl_user and $req->user($ssl_user) ) {
-        $self->userLogger->notice( "Good SSL authentication for " . $req->user );
+        $self->userLogger->notice(
+            "Good SSL authentication for " . $req->user );
         $req->data->{_Issuer} = $req->env->{ $self->issuer_var };
         return PE_OK;
     }

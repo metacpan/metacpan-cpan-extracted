@@ -18,7 +18,7 @@ SKIP: {
     }
 
     my ( $res, $json );
- 
+
     my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel                    => 'error',
@@ -36,7 +36,7 @@ SKIP: {
                 checkHIBPRequired           => 0,
                 checkEntropy                => 1,
                 checkEntropyRequired        => 1,
-                checkEntropyRequiredLevel => 2
+                checkEntropyRequiredLevel   => 2
             }
         }
     );
@@ -61,8 +61,7 @@ SKIP: {
         $res = $client->_post(
             '/',
             IO::String->new(
-    'oldpassword=dwho&newpassword=secret1&confirmpassword=secret1'
-            ),
+                'oldpassword=dwho&newpassword=secret1&confirmpassword=secret1'),
             cookie => "lemonldap=$id",
             accept => 'application/json',
             length => 60
@@ -81,7 +80,8 @@ SKIP: {
         $res = $client->_post(
             '/',
             IO::String->new(
-    'oldpassword=dwho&newpassword=L3m0n1DaPl&confirmpassword=L3m0n1DaPl'),
+'oldpassword=dwho&newpassword=L3m0n1DaPl&confirmpassword=L3m0n1DaPl'
+            ),
             cookie => "lemonldap=$id",
             accept => 'application/json',
             length => 66
@@ -95,5 +95,5 @@ SKIP: {
 
 clean_sessions();
 
-done_testing( );
+done_testing();
 

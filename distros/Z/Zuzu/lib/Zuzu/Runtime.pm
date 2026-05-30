@@ -2,7 +2,7 @@ package Zuzu::Runtime;
 
 use utf8;
 
-our $VERSION = '0.001000';
+our $VERSION = '0.001002';
 our $DEBUG_LEVEL = 0;
 
 use Digest::MD5 qw( md5_hex );
@@ -285,45 +285,44 @@ sub parse_with_current_scope {
 	my ( $self, $source, $filename ) = @_;
 
 	$filename //= '<eval>';
-	my $lexer = Zuzu::Lexer->new( src => $source, filename => $filename );
-	my $parser = Zuzu::Parser::_Impl->new(
-		lexer => $lexer,
-		filename => $filename,
-	);
-
-	my %visible;
-	my $env = $self->_env;
-	while ( defined $env ) {
-		for my $name ( CORE::keys %{ $env->slots } ) {
-			next if $name eq '__wildcard_import__';
-			$visible{$name} = 1;
-		}
-		$env = $env->parent;
-	}
-
-	my $scope = $parser->scopes->[0];
-	for my $name ( CORE::keys %visible ) {
-		next if exists $scope->{$name};
-		$scope->{$name} = {
-			kind => 'eval-visible',
-			mutable => 1,
-		};
-	}
-	push @{ $parser->scopes }, {};
 
 	my $ast;
 	eval {
+		my $lexer = Zuzu::Lexer->new( src => $source, filename => $filename );
+		my $parser = Zuzu::Parser::_Impl->new(
+			lexer => $lexer,
+			filename => $filename,
+		);
+
+		my %visible;
+		my $env = $self->_env;
+		while ( defined $env ) {
+			for my $name ( CORE::keys %{ $env->slots } ) {
+				next if $name eq '__wildcard_import__';
+				$visible{$name} = 1;
+			}
+			$env = $env->parent;
+		}
+
+		my $scope = $parser->scopes->[0];
+		for my $name ( CORE::keys %visible ) {
+			next if exists $scope->{$name};
+			$scope->{$name} = {
+				kind => 'eval-visible',
+				mutable => 1,
+			};
+		}
+		push @{ $parser->scopes }, {};
+
 		$ast = $parser->parse_program;
 		$self->{_parser}->apply_visitors($ast);
 		1;
 	} or do {
 		my $error = $@;
 		die $error if ref($error) and eval { $error->isa('Zuzu::Error') };
-		die Zuzu::Error->new_compile(
-			code => 'E_COMPILE_INTERNAL',
-			message => "Internal parser failure: $error",
-			file => $filename,
-			line => 1,
+		die $self->{_parser}->_compile_error_from_parse_exception(
+			$error,
+			$filename,
 		);
 	};
 
@@ -6360,7 +6359,17 @@ sub _function_binding_plan {
 sub _module_search_paths {
 	my ( $self, $module, $from_file ) = @_;
 
-	my @paths = @{$self->lib // []};
+	my @paths;
+	if (
+		defined $from_file
+		and $from_file ne ''
+		and $from_file !~ /\A</
+		and $from_file ne '(command line)'
+	) {
+		my $local_lib = File::Spec->catdir( dirname($from_file), 'lib' );
+		push @paths, $local_lib if -d $local_lib;
+	}
+	push @paths, @{$self->lib // []};
 
 	my %seen;
 	@paths = grep { defined $_ and !$seen{$_}++ } @paths;
@@ -6442,7 +6451,8 @@ sub _file_value_for_path {
 	my $file_path = $force_absolute
 		? File::Spec->rel2abs( $path, $INITIAL_CWD )
 		: $path;
-	my $module_env = $self->_load_module( 'std/io', $file_path, 0 );
+	my $module_env = eval { $self->_load_module( 'std/io', $file_path, 0 ) };
+	return undef if !defined $module_env;
 	my $class_ref = $module_env->find_ref('Path');
 	return undef if !defined $class_ref;
 	my $path_class = ${ $class_ref };

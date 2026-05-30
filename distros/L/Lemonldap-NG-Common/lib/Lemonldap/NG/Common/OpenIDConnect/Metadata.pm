@@ -138,6 +138,11 @@ sub metadataDoc {
         userinfo_encryption_alg_values_supported => ENC_ALG_SUPPORTED,
         userinfo_encryption_enc_values_supported => ENC_SUPPORTED,
 
+        # Introspection response (RFC 9701)
+        introspection_signing_alg_values_supported    => \@supportedSigAlg,
+        introspection_encryption_alg_values_supported => ENC_ALG_SUPPORTED,
+        introspection_encryption_enc_values_supported => ENC_SUPPORTED,
+
         # PKCE
         code_challenge_methods_supported => [qw/plain S256/],
 

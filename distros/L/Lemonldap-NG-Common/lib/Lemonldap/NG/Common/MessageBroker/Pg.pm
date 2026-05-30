@@ -2,10 +2,10 @@ package Lemonldap::NG::Common::MessageBroker::Pg;
 
 use strict;
 use JSON;
-use POSIX qw(:signal_h);
+use POSIX                           qw(:signal_h);
 use Lemonldap::NG::Common::Lib::DBI qw(check_dbh);
 
-our $VERSION = '2.22.2';
+our $VERSION = '2.23.0';
 
 sub new {
     my ( $class, $conf, $logger ) = @_;
@@ -13,8 +13,7 @@ sub new {
     my $args = $conf->{messageBrokerOptions};
     unless ($args
         and $args->{dbiChain}
-        and $args->{dbiUser}
-        and $args->{dbiPassword} )
+        and $args->{dbiUser} )
     {
         $logger->error('MISSING OPTIONS FOR PG PUB/SUB');
         return undef;

@@ -2,7 +2,7 @@ package Zuzu::Parser::_Impl;
 
 use utf8;
 
-our $VERSION = '0.001000';
+our $VERSION = '0.001002';
 
 use Zuzu::AST::Block;
 use Zuzu::AST::Expr::Array;
@@ -1781,7 +1781,7 @@ sub parse_import {
 				$self->{tok},
 			);
 		}
-		my $seg = $self->_eat('IDENT');
+		my $seg = $self->_eat_import_path_segment;
 		$module .= '/' . $seg->value;
 	}
 
@@ -1850,6 +1850,17 @@ sub parse_import {
 		condition_expr => $condition_expr,
 		condition_positive => $condition_positive,
 	);
+}
+
+sub _eat_import_path_segment {
+	my ( $self ) = @_;
+
+	return $self->_eat('IDENT')
+		if $self->{tok}->is_IDENT;
+	return $self->_eat('KW')
+		if $self->{tok}->is_KW;
+
+	return $self->_eat('IDENT');
 }
 
 # Expression parsing (Pratt)

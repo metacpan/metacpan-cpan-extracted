@@ -3,10 +3,13 @@ use strict;
 use warnings;
 use v5.10;
 
-our $VERSION = '0.87';
+our $VERSION = '0.88';
 
-use Carp            qw[croak];
-use Time::Str::Util qw[range_bounds upper_bound];
+use Carp              qw[croak];
+use Time::Str::Util   qw[range_bounds
+                         upper_bound
+                         valid_tzdb_timezone];
+use Time::TZif::POSIX qw[];
 
 my %ValidPolicy = (
   earlier => 1, later => 1, std => 1, dst => 1, reject => 1
@@ -20,53 +23,134 @@ use constant TZIF_MAX_CHARS => 256;
 use constant HAS_QUAD => eval { my $x = pack('q>', 0); 1 };
 
 sub new {
-  (@_ & 1 && @_ >= 3) or croak q/Usage: Time::TZif->new(filename => $filename)/;
+  (@_ & 1 && @_ >= 3) or croak q/Usage: Time::TZif->new(path => $path)/;
   my ($class, %p) = @_;
 
-  my ($filename, $gap_policy, $overlap_policy);
+  my (%state, $path);
 
   while (my ($key, $v) = each %p) {
-    if ($key eq 'filename') {
-      $filename = $v;
+    if ($key eq 'path') {
+      $path = $v;
+    }
+    elsif ($key eq 'name') {
+      valid_tzdb_timezone($v)
+        or croak qq/Invalid value for the parameter 'name'/;
+      $state{name} = $v;
     }
     elsif ($key eq 'gap_policy') {
       (defined $v && exists $ValidPolicy{$v})
         or croak qq/Invalid policy value for the parameter 'gap_policy'/;
-      $gap_policy = $v;
+      $state{gap_policy} = $v;
     }
     elsif ($key eq 'overlap_policy') {
       (defined $v && exists $ValidPolicy{$v})
         or croak qq/Invalid policy value for the parameter 'overlap_policy'/;
-      $overlap_policy = $v;
+      $state{overlap_policy} = $v;
     }
     else {
       croak qq/Unrecognised named parameter: '$key'/;
     }
   }
 
-  (defined $filename)
-    or croak q/Parameter 'filename' is required/;
+  (defined $path)
+    or croak q/Parameter 'path' is required/;
 
-  $gap_policy     //= 'reject';
-  $overlap_policy //= 'reject';
+  open(my $fh, '<:raw', $path)
+    or croak qq/Unable to parse TZif: could not open '$path': '$!'/;
 
-  open(my $fh, '<:raw', $filename)
-    or croak qq/Unable to parse TZif: could not open '$filename': '$!'/;
+  $state{path}             = $path;
+  $state{modified_time}    = (stat $fh)[9];
+  $state{gap_policy}     //= 'reject';
+  $state{overlap_policy} //= 'reject';
 
-  my $self = bless {
-    filename       => $filename,
-    gap_policy     => $gap_policy,
-    overlap_policy => $overlap_policy,
-  }, $class;
-
+  my $self = bless \%state, $class;
   $self->_parse($fh);
   close($fh);
   return $self;
 }
 
-sub filename       { $_[0]->{filename}   }
-sub gap_policy     { $_[0]->{gap_policy}     }
-sub overlap_policy { $_[0]->{overlap_policy} }
+sub _with {
+  my ($object, %with) = @_;
+  return bless { %{$object}, %with }, ref $object;
+}
+
+sub name { 
+  @_ == 1 or croak q/Usage: $tz->name()/;
+  return $_[0]->{name};
+}
+
+sub path {
+  @_ == 1 or croak q/Usage: $tz->path()/;
+  return $_[0]->{path};
+}
+
+sub modified_time {
+  @_ == 1 or croak q/Usage: $tz->modified_time()/;
+  return $_[0]->{modified_time};
+}
+
+sub gap_policy {
+  @_ == 1 or croak q/Usage: $tz->gap_policy()/;
+  return $_[0]->{gap_policy};
+}
+
+sub overlap_policy {
+  @_ == 1 or croak q/Usage: $tz->overlap_policy()/;
+  return $_[0]->{overlap_policy};
+}
+
+sub has_name {
+  @_ == 1 or croak q/Usage: $tz->has_name()/;
+  return exists $_[0]->{name};
+}
+
+sub with_name {
+  @_ == 2 or croak q/Usage: $tz->with_name($name)/;
+  my ($self, $name) = @_;
+
+  valid_tzdb_timezone($name)
+    or croak qq/Invalid name value/;
+
+  if (!exists $self->{name} || $name ne $self->{name}) {
+    return _with($self, name => $name);
+  }
+  return $self;
+}
+
+sub with_gap_policy {
+  @_ == 2 or croak q/Usage: $tz->with_gap_policy($policy)/;
+  my ($self, $policy) = @_;
+
+  (defined $policy && exists $ValidPolicy{$policy})
+    or croak qq/Invalid policy value/;
+
+  if ($policy ne $self->{gap_policy}) {
+    return _with($self, gap_policy => $policy, _posix_tz => undef);
+  }
+  return $self;
+}
+
+sub with_overlap_policy {
+  @_ == 2 or croak q/Usage: $tz->with_overlap_policy($policy)/;
+  my ($self, $policy) = @_;
+
+  (defined $policy && exists $ValidPolicy{$policy})
+    or croak qq/Invalid policy value/;
+
+  if ($policy ne $self->{overlap_policy}) {
+    return _with($self, overlap_policy => $policy, _posix_tz => undef);
+  }
+  return $self;
+}
+
+sub _posix_tz {
+  my ($self) = @_;
+  return $self->{_posix_tz} //= Time::TZif::POSIX->new(
+    tz_string      => $self->{posix_tz},
+    gap_policy     => $self->{gap_policy},
+    overlap_policy => $self->{overlap_policy},
+  );
+}
 
 sub _readn {
   my ($fh, $len) = @_;
@@ -128,6 +212,16 @@ sub _parse {
   else {
     $self->_parse_data($fh, $timecnt, $typecnt, $charcnt,
                        $leapcnt, $isstdcnt, $isutcnt, 4);
+  }
+
+  my $times = $self->{times};
+  if ($self->{posix_tz} && @$times) {
+    $self->{max_time_utc}   = $times->[-1];
+    $self->{max_time_local} = $times->[-1] + 86400;
+  }
+  else {
+    $self->{max_time_utc}   = ~0;
+    $self->{max_time_local} = ~0;
   }
 }
 
@@ -214,8 +308,9 @@ sub _parse_data {
   $self->{types} = \@resolved;
 }
 
-sub transitions_times {
-  @_ == 1 or croak q/Usage: $tz->transitions_times()/;
+# Internal method - not part of the public API. May change or be removed without notice.
+sub _transition_times {
+  @_ == 1 or croak q/Usage: $tz->_transition_times()/;
   my ($self) = @_;
   return wantarray ? @{ $self->{times} } : [ @{ $self->{times} } ];
 }
@@ -223,30 +318,48 @@ sub transitions_times {
 sub offset_for_utc {
   @_ == 2 or croak q/Usage: $tz->offset_for_utc($time)/;
   my ($self, $time) = @_;
-  return $self->{types}[ upper_bound($self->{times}, $time) ][0];
+  if ($time <= $self->{max_time_utc}) {
+    return $self->{types}[ upper_bound($self->{times}, $time) ][0];
+  }
+  else {
+    return $self->_posix_tz->offset_for_utc($time);
+  }
 }
 
 sub type_info_for_utc {
   @_ == 2 or croak q/Usage: $tz->type_info_for_utc($time)/;
   my ($self, $time) = @_;
-  my $type = $self->{types}[ upper_bound($self->{times}, $time) ];
-  return @$type;
+  if ($time <= $self->{max_time_utc}) {
+    my $type = $self->{types}[ upper_bound($self->{times}, $time) ];
+    return @$type;
+  }
+  else {
+    return $self->_posix_tz->type_info_for_utc($time);
+  }
 }
 
 sub offset_for_local {
   @_ >= 2 or croak q/Usage: $tz->offset_for_local($time, %opts)/;
+  my ($self, $time) = @_;
+  if ($time > $self->{max_time_local}) {
+    return shift->_posix_tz->offset_for_local(@_);
+  }
   my $type = &_resolve_local;
   return $type->[0];
 }
 
 sub type_info_for_local {
   @_ >= 2 or croak q/Usage: $tz->type_info_for_local($time, %opts)/;
+  my ($self, $time) = @_;
+  if ($time > $self->{max_time_local}) {
+    return shift->_posix_tz->type_info_for_local(@_);
+  }
   my $type = &_resolve_local;
   return @$type;
 }
 
 sub _resolve_local {
-  ((@_ & 1) == 0 && @_ >= 2) or croak q/Usage: $tz->offset_for_local($time, %opts)/;
+  (@_ & 1) == 0 or croak q/Usage: $tz->offset_for_local($time, %opts)/;
   my ($self, $time, %p) = @_;
 
   my ($gap_policy, $overlap_policy);

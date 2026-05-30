@@ -18,7 +18,7 @@ sub _null_logger {
 }
 
 package main;
-use Test::More tests => 16;
+use Test::More tests => 17;
 
 BEGIN {
     use_ok('Lemonldap::NG::Common::TOTP');
@@ -41,6 +41,51 @@ my $cleartext_secret   = "ggtoch5x6naorymli6nh72ku4khwd4jr";
 my $key                = "azert";
 my $encrypted_secret =
 "{llngcrypt}TdEcd2vkmn4j0D8+str3v2D8zt0Dbm3sZ8TwlzdOKcang+qUmLraTQBztSrESRHDpAh+pQCKvDozuz9va7GxhHIkaKI3EZxOCWJ0rQCun/I=";
+
+#########################
+
+subtest "RFC6238 test vectors" => sub {
+
+    my $keys = {
+        "SHA1"   => "12345678901234567890",
+        "SHA256" => "12345678901234567890123456789012",
+        "SHA512" =>
+          "1234567890123456789012345678901234567890123456789012345678901234",
+    };
+
+    my @vectors = (
+        [ 59,          "94287082", "SHA1" ],
+        [ 59,          "46119246", "SHA256" ],
+        [ 59,          "90693936", "SHA512" ],
+        [ 1111111109,  "07081804", "SHA1" ],
+        [ 1111111109,  "68084774", "SHA256" ],
+        [ 1111111109,  "25091201", "SHA512" ],
+        [ 1111111111,  "14050471", "SHA1" ],
+        [ 1111111111,  "67062674", "SHA256" ],
+        [ 1111111111,  "99943326", "SHA512" ],
+        [ 1234567890,  "89005924", "SHA1" ],
+        [ 1234567890,  "91819424", "SHA256" ],
+        [ 1234567890,  "93441116", "SHA512" ],
+        [ 2000000000,  "69279037", "SHA1" ],
+        [ 2000000000,  "90698825", "SHA256" ],
+        [ 2000000000,  "38618901", "SHA512" ],
+        [ 20000000000, "65353130", "SHA1" ],
+        [ 20000000000, "77737706", "SHA256" ],
+        [ 20000000000, "47863826", "SHA512" ],
+    );
+    my $t = TestableTotp->new();
+    for my $vector (@vectors) {
+
+        my $alg           = $vector->[2];
+        my $expected_code = $vector->[1];
+        my $timestamp     = $vector->[0];
+        my $key           = $keys->{$alg};
+
+        is( $t->_code( $key, 0, 30, 8, lc($alg), $timestamp ),
+            $expected_code,
+            "$alg TOTP at timestamp $timestamp is $expected_code" );
+    }
+};
 
 #########################
 

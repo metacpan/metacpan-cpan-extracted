@@ -9,10 +9,15 @@ Time::Str::Util - Binary search and time zone database utilities
 =head1 SYNOPSIS
 
     use Time::Str::Util qw( find_tzdb_directory
+                            valid_tzdb_timezone valid_posix_timezone
                             lower_bound upper_bound range_bounds );
 
     # Locate system zoneinfo directory
     my $tzdir = find_tzdb_directory();  # /usr/share/zoneinfo or undef
+
+    # Validate timezone names
+    valid_tzdb_timezone('America/New_York');           # true
+    valid_posix_timezone('EST5EDT,M3.2.0,M11.1.0');   # true
 
     my @sorted = (10, 20, 30, 40, 50);
 
@@ -99,6 +104,50 @@ F</usr/share/lib/zoneinfo>, F</etc/zoneinfo>, F</usr/share/zoneinfo.default>.
 
 A candidate directory is accepted only if it exists and contains a
 F<UTC> file.
+
+=head2 Validation
+
+=head3 valid_tzdb_timezone
+
+    my $bool = valid_tzdb_timezone($string);
+
+Returns true if C<$string> is structurally valid as an IANA Time Zone
+Database timezone name (e.g., C<America/New_York>, C<Europe/Stockholm>,
+C<Etc/GMT+5>, C<UTC>).
+
+A valid name consists of one or more path components separated by C</>.
+Each component starts with a letter, followed by letters or digits,
+with optional C<_>, C<+>, or C<-> separators introducing additional
+alphanumeric segments.
+
+This is a structural check only; it does not verify that the timezone
+exists in the database.
+
+=head3 valid_posix_timezone
+
+    my $bool = valid_posix_timezone($string);
+
+Returns true if C<$string> is structurally valid as a POSIX TZ string
+(IEEE Std 1003.1).
+
+A POSIX TZ string has the form:
+
+    std offset [dst [offset] , start [/time] , end [/time]]
+
+Examples:
+
+    EST5EDT,M3.2.0,M11.1.0          # US Eastern
+    CET-1CEST,M3.5.0/2,M10.5.0/3   # Central European
+    UTC0                             # Fixed UTC
+
+Transition rules may use C<Mm.w.d> (month/week/weekday), C<Jn>
+(Julian day excluding Feb 29), or C<n> (zero-based Julian day
+including Feb 29) forms.
+
+This validates the syntactic structure of the string only, not the
+semantic validity of field values (e.g., month ranges, day ranges).
+Quoted timezone designations (C<< <+05> >>) as used in TZif extensions
+are not part of the POSIX standard and are not accepted.
 
 =head1 SEE ALSO
 

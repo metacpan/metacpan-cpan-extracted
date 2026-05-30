@@ -1,0 +1,34 @@
+# Minimal Crawl4AI + CloakBrowser stack for WWW::Crawl4AI.
+#
+# Ports are bound to 127.0.0.1 only — the CDP port (9222) gives full browser
+# control and must never be exposed to the public internet. Containers talk to
+# each other over the compose network via http://crawl4ai:11235 and
+# http://cloakbrowser:9222.
+services:
+  crawl4ai:
+    image: unclecode/crawl4ai:latest
+    container_name: crawl4ai
+    restart: unless-stopped
+    shm_size: "1g"
+    ports:
+      - "127.0.0.1:11235:11235"
+    environment:
+      - CRAWL4AI_LOG_LEVEL=INFO
+      # - CRAWL4AI_API_TOKEN=changeme   # uncomment to require a bearer token
+    depends_on:
+      cloakbrowser:
+        condition: service_healthy
+
+  cloakbrowser:
+    image: cloakhq/cloakbrowser:latest
+    container_name: cloakbrowser
+    command: cloakserve
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9222:9222"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9222/json/version"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

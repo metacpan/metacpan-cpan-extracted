@@ -64,6 +64,7 @@ sub _dbh {
         $self->{_dbh} =
           DBI->connect_cached( $self->{dbiChain}, $self->{dbiUser},
             $self->{dbiPassword}, { RaiseError => 1, AutoCommit => 1, } );
+        die unless $self->{_dbh}->ping;
     };
     if (    $@
         and $self->{type}->can('beforeRetry')

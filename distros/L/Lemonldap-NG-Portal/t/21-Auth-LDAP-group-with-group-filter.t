@@ -14,8 +14,7 @@ SKIP: {
     skip 'LLNGTESTLDAP is not set', $maintests unless ( $ENV{LLNGTESTLDAP} );
     require 't/test-ldap.pm';
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel                 => 'error',
                 useSafeJail              => 1,
@@ -27,11 +26,12 @@ SKIP: {
                 ldapServer               => $main::slapd_url,
                 ldapBase                 => 'ou=users,dc=example,dc=com',
                 ldapGroupBase            => 'ou=groups,dc=example,dc=com',
-                groupLDAPFilter          => '(|(objectClass=extensibleObject)(objectClass=groupOfNames))',
-                ldapGroupAttributeName   => 'member',
-                managerDn                => 'cn=admin,dc=example,dc=com',
-                managerPassword          => 'admin',
-                restSessionServer        => 1,
+                groupLDAPFilter          =>
+                  '(|(objectClass=extensibleObject)(objectClass=groupOfNames))',
+                ldapGroupAttributeName => 'member',
+                managerDn              => 'cn=admin,dc=example,dc=com',
+                managerPassword        => 'admin',
+                restSessionServer      => 1,
             }
         }
     );
@@ -41,7 +41,8 @@ SKIP: {
 
     ok(
         $res = $client->_post(
-            '/', IO::String->new('user=dwho&password=dwho'),
+            '/',
+            IO::String->new('user=dwho&password=dwho'),
             length => 23
         ),
         'Auth query'
@@ -53,8 +54,9 @@ SKIP: {
     expectOK($res);
     ok( $res = eval { JSON::from_json( $res->[2]->[0] ) }, ' GET JSON' )
       or print STDERR $@;
-    ok( defined $res->{hGroups}->{extgroup}, 'Group extgroup found in session');
-    ok( defined $res->{hGroups}->{mygroup}, 'Group mygroup found in session');
+    ok( defined $res->{hGroups}->{extgroup},
+        'Group extgroup found in session' );
+    ok( defined $res->{hGroups}->{mygroup}, 'Group mygroup found in session' );
 
 }
 

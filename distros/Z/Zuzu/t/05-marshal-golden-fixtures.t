@@ -2,7 +2,7 @@ use Test2::V0;
 
 use Zuzu::Runtime;
 
-my $fixture_dir = 't/fixtures/marshal/golden';
+my $fixture_dir = 'stdlib/test-fixtures/marshal/golden';
 
 my @fixtures = (
 	[
@@ -25,10 +25,10 @@ my @fixtures = (
 	[
 		'time-path',
 		q{
-			from std/time import Time;
+			from std/time import Time, TimeZone;
 			from std/io import Path;
 			let fixture_value := [
-				new Time(12345),
+				new Time(12345, timezone: TimeZone.utc()),
 				new Path("tmp/../file.txt"),
 			];
 		},

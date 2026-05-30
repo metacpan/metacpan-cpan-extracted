@@ -11,7 +11,6 @@ SKIP: {
     if ($@) {
         skip 'Convert::Base32 is missing', $maintests;
     }
-    require Lemonldap::NG::Common::TOTP;
 
     my $client = LLNG::Manager::Test->new( {
             ini => {
@@ -101,9 +100,8 @@ SKIP: {
 
     # Post code
     my $code;
-    ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
-        'Code' );
-    ok( $code =~ /^\d{6}$/, 'Code contains 6 digits' );
+    ok( $code = getTotp($key), 'Code' );
+    ok( $code =~ /^\d{6}$/,    'Code contains 6 digits' );
     my $s = "code=$code&token=$token";
     ok(
         $res = $client->_post(
@@ -141,8 +139,7 @@ SKIP: {
     # Test Login timeout
     Time::Fake->offset("+10m");
 
-    ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
-        'Code' );
+    ok( $code = getTotp($key), 'Code' );
     $query =~ s/code=/code=$code/;
 
     ok(

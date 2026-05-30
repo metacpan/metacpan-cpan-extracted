@@ -24,7 +24,7 @@ BEGIN {
 sub startRedis {
     note "Starting Redis server";
     mkdir 't/redis/run';
-    system( 'redis-server', 't/redis/redis.conf');
+    system( 'redis-server', 't/redis/redis.conf' );
     waitForRedis();
 }
 
@@ -48,8 +48,8 @@ sub waitForRedis {
     my $waitloop = 0;
     note "Waiting for Redis server to be available";
     while ( $waitloop < 100 ) {
-        my $r = $REDIS->new(server => REDISSERVER);
-        last if ( $r and $r->set('test','test') );
+        my $r = $REDIS->new( server => REDISSERVER );
+        last if ( $r and $r->set( 'test', 'test' ) );
         $waitloop++;
         usleep 100000;
     }

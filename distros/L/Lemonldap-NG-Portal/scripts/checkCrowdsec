@@ -1,0 +1,185 @@
+#!/usr/bin/perl
+
+use strict;
+use Getopt::Long;
+use JSON qw(from_json to_json);
+use Lemonldap::NG::Common::Conf;
+use Lemonldap::NG::Common::Conf::Constants;
+use Lemonldap::NG::Common::UserAgent;
+
+our $VERSION = '2.22.0';
+
+my %opts;
+my $exitCode = 0;
+
+sub usage {
+    print STDERR "Tool to check CrowdSec bouncer and watcher connections
+
+Usage:
+\$ $0 <options>
+
+Options:
+ -v, --version:  display version
+ -h, --help:     display this
+ -q, --quiet:    quiet mode, only show errors
+ -u, --url:      override crowdsecUrl
+ -k, --key:      override crowdsecKey (bouncer API key)
+ -m, --machine:  override crowdsecMachineId (watcher)
+ -p, --password: override crowdsecPassword (watcher)
+ --test-ip:      IP to test against bouncer (default: 127.0.0.1)
+";
+}
+
+sub error {
+    print STDERR join "\n", @_, "\n";
+    $exitCode = 1;
+}
+
+sub info {
+    return if $opts{q};
+    print join "\n", @_, "\n";
+}
+
+sub success {
+    return if $opts{q};
+    print "OK: ", join( "\n", @_ ), "\n";
+}
+
+unless (
+    GetOptions(
+        \%opts,      'h|help',       'v|version',
+        'q|quiet',   'u|url=s',      'k|key=s',
+        'm|machine=s', 'p|password=s', 'test-ip=s',
+    )
+  )
+{
+    usage;
+    exit 1;
+}
+
+# HELP
+if ( $opts{h} ) {
+    usage;
+    exit;
+}
+
+# VERSION
+if ( $opts{v} ) {
+    print "$VERSION\n";
+    exit;
+}
+
+# Load configuration
+my $lmConf = Lemonldap::NG::Common::Conf->new
+  or die $Lemonldap::NG::Common::Conf::msg;
+my $conf = $lmConf->getConf
+  or die "Unable to get configuration ($!)";
+my $localconf = $lmConf->getLocalConf(PORTALSECTION);
+if ($localconf) {
+    $conf->{$_} = $localconf->{$_} foreach ( keys %$localconf );
+}
+
+# Override configuration with command-line options
+$conf->{crowdsecUrl}       = $opts{u} if $opts{u};
+$conf->{crowdsecKey}       = $opts{k} if $opts{k};
+$conf->{crowdsecMachineId} = $opts{m} if $opts{m};
+$conf->{crowdsecPassword}  = $opts{p} if $opts{p};
+
+# Normalize crowdsecUrl
+my $crowdsecUrl = $conf->{crowdsecUrl} || 'http://localhost:8080';
+$crowdsecUrl =~ s#/+$##;
+
+# Create user agent
+my $ua = Lemonldap::NG::Common::UserAgent->new($conf);
+$ua->agent("LLNG-CrowdsecCheck/$VERSION");
+$ua->default_headers->header( 'Accept'       => 'application/json' );
+$ua->default_headers->header( 'Content-Type' => 'application/json' );
+
+my $bouncerConfigured = $conf->{crowdsecKey} ? 1 : 0;
+my $watcherConfigured =
+  ( $conf->{crowdsecMachineId} && $conf->{crowdsecPassword} ) ? 1 : 0;
+
+unless ( $bouncerConfigured || $watcherConfigured ) {
+    error 'No CrowdSec connection configured';
+    error '  - Set crowdsecKey for bouncer connection';
+    error '  - Set crowdsecMachineId and crowdsecPassword for watcher connection';
+    exit 1;
+}
+
+info "CrowdSec URL: $crowdsecUrl";
+info "";
+
+# Test bouncer connection
+if ($bouncerConfigured) {
+    info "Testing bouncer connection...";
+    my $testIp = $opts{'test-ip'} || '127.0.0.1';
+    my $resp   = $ua->get(
+        "$crowdsecUrl/v1/decisions?ip=$testIp",
+        'Accept'    => 'application/json',
+        'X-Api-Key' => $conf->{crowdsecKey},
+    );
+
+    if ( $resp->is_success ) {
+        my $content = $resp->decoded_content;
+        if ( !$content || $content eq 'null' ) {
+            success "Bouncer connection OK (no decision for $testIp)";
+        }
+        else {
+            my $json;
+            eval { $json = from_json( $content, { allow_nonref => 1 } ); };
+            if ($@) {
+                error "Bouncer: unable to decode response: $content";
+            }
+            else {
+                success "Bouncer connection OK (found decisions for $testIp)";
+            }
+        }
+    }
+    else {
+        error "Bouncer connection FAILED: " . $resp->status_line;
+        error "  " . $resp->decoded_content if $resp->decoded_content;
+    }
+}
+else {
+    info "Bouncer: not configured (crowdsecKey not set)";
+}
+
+info "";
+
+# Test watcher connection
+if ($watcherConfigured) {
+    info "Testing watcher connection...";
+    my $request = HTTP::Request->new(
+        POST => "$crowdsecUrl/v1/watchers/login",
+        [ 'Content-Type' => 'application/json' ],
+        to_json( {
+                machine_id => $conf->{crowdsecMachineId},
+                password   => $conf->{crowdsecPassword},
+            }
+        )
+    );
+    my $resp = $ua->request($request);
+
+    if ( $resp->is_success ) {
+        my $json;
+        eval { $json = from_json( $resp->decoded_content ); };
+        if ( $@ || !$json ) {
+            error "Watcher: unable to decode response: " . $resp->decoded_content;
+        }
+        elsif ( $json->{token} ) {
+            success "Watcher connection OK (token obtained, expires: $json->{expire})";
+        }
+        else {
+            error "Watcher: unexpected response (no token)";
+        }
+    }
+    else {
+        error "Watcher connection FAILED: " . $resp->status_line;
+        error "  " . $resp->decoded_content if $resp->decoded_content;
+    }
+}
+else {
+    info "Watcher: not configured (crowdsecMachineId or crowdsecPassword not set)";
+}
+
+exit $exitCode;

@@ -21,7 +21,7 @@ my @cases = (
 		args => [ '-d1', '-e', 'assert false; say "after";' ],
 		exit => 255,
 		stdout => '',
-		stderr_like => qr/\AAssertion failed\n\z/,
+		stderr_like => qr/\AAssertionException: Assertion failed\n\z/,
 	},
 	{
 		name => '-d3 prints debug at matching level',

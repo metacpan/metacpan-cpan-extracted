@@ -2,11 +2,11 @@
 
 use strict;
 use Getopt::Long;
-use Lemonldap::NG::Portal;
 use Regexp::Common qw(net);
 
-use constant CROWDSECPLUGIN => 'Lemonldap::NG::Portal::Plugins::CrowdSec';
-use constant VALIDIP        => qr/^(?:$RE{net}{IPv4}|$RE{net}{IPv6})$/;
+use constant VALIDIP => qr/^(?:$RE{net}{IPv4}|$RE{net}{IPv6})$/;
+
+our $VERSION = '2.22.0';
 
 sub usage {
     print STDERR "Tool to push a IP-ban decision to CrowdSec
@@ -20,7 +20,8 @@ Options:
  -d, --debug:    enable debug mode
  -u, --user:     override config to fix Crowdsec 'machine-id'
  -p, --password: override config to fix Crowdsec password
- --loglevel:    fix logLevel (default: error)
+ -m, --message:  ban message (default: 'Manual ban via LLNG')
+ --loglevel:     fix logLevel (default: error)
 ";
 }
 
@@ -35,8 +36,9 @@ my %opts;
 unless (
     GetOptions(
         \%opts,         'h|help',
-        'v|version',    'u|user=s',
-        'p|password=s', 'loglevel|log-level=s'
+        'v|version',    'd|debug',
+        'u|user=s',     'p|password=s',
+        'm|message=s',  'loglevel|log-level=s'
     )
   )
 {
@@ -52,7 +54,7 @@ if ( $opts{h} ) {
 
 # VERSION
 if ( $opts{v} ) {
-    print $Lemonldap::NG::Portal::VERSION. "\n";
+    print "$VERSION\n";
     exit;
 }
 
@@ -63,19 +65,14 @@ unless ( @ARGV >= 1 ) {
 my $exitCode = 0;
 $opts{loglevel} ||= 'error';
 
-my $p = Lemonldap::NG::Portal->new or error('Unable to create portal');
-$p->init( {
-        logLevel => $opts{d} ? 'debug' : $opts{loglevel},
-        ( $opts{u} ? ( crowdsecMachineId => $opts{u} ) : () ),
-        ( $opts{p} ? ( crowdsecPassword  => $opts{p} ) : () ),
-    }
-) or error('Unable to create portal');
+# Create CrowdSec client
+my $client = CrowdSecClient->new(
+    logLevel => $opts{d} ? 'debug' : $opts{loglevel},
+    ( $opts{u} ? ( crowdsecMachineId => $opts{u} ) : () ),
+    ( $opts{p} ? ( crowdsecPassword  => $opts{p} ) : () ),
+);
 
-unless ( $p->loadedModules->{&CROWDSECPLUGIN} ) {
-    $p->loadModule(CROWDSECPLUGIN)
-      or error( 'Unable to load ' . CROWDSECPLUGIN );
-}
-my $crowdSecPlugin = $p->loadedModules->{&CROWDSECPLUGIN};
+my $message = $opts{m} || 'Manual ban via LLNG';
 
 foreach my $ip (@ARGV) {
     unless ( $ip =~ VALIDIP ) {
@@ -84,9 +81,9 @@ foreach my $ip (@ARGV) {
         next;
     }
     unless (
-        $crowdSecPlugin->ban(
+        $client->ban(
             $ip,
-            ( $opts{m} || "Manual ban via LLNG" ),
+            $message,
             { scenario => 'Manual ban via LLNG' },
         )
       )
@@ -98,3 +95,77 @@ foreach my $ip (@ARGV) {
 }
 
 exit $exitCode;
+
+# Lightweight class that consumes CrowdSec role
+package CrowdSecClient;
+
+use strict;
+use Mouse;
+use Lemonldap::NG::Common::Conf;
+use Lemonldap::NG::Common::Conf::Constants;
+use Lemonldap::NG::Common::Logger::Std;
+
+with 'Lemonldap::NG::Portal::Lib::CrowdSec';
+
+has conf => (
+    is      => 'ro',
+    lazy    => 1,
+    builder => '_buildConf',
+);
+
+has overrides => (
+    is      => 'ro',
+    default => sub { {} },
+);
+
+has logger => (
+    is      => 'ro',
+    lazy    => 1,
+    builder => '_buildLogger',
+);
+
+has userLogger => (
+    is      => 'ro',
+    lazy    => 1,
+    builder => '_buildLogger',
+);
+
+sub _buildConf {
+    my ($self) = @_;
+    my $lmConf = Lemonldap::NG::Common::Conf->new
+      or die $Lemonldap::NG::Common::Conf::msg;
+    my $conf = $lmConf->getConf
+      or die "Unable to get configuration ($!)";
+    my $localconf = $lmConf->getLocalConf(PORTALSECTION);
+    if ($localconf) {
+        $conf->{$_} = $localconf->{$_} foreach ( keys %$localconf );
+    }
+    # Apply overrides
+    my $overrides = $self->overrides;
+    $conf->{$_} = $overrides->{$_} foreach ( keys %$overrides );
+    return $conf;
+}
+
+sub _buildLogger {
+    my ($self) = @_;
+    return Lemonldap::NG::Common::Logger::Std->new( $self->conf );
+}
+
+around BUILDARGS => sub {
+    my ( $orig, $class, %args ) = @_;
+    my %overrides;
+    for my $key (qw(crowdsecMachineId crowdsecPassword logLevel)) {
+        if ( exists $args{$key} ) {
+            $overrides{$key} = delete $args{$key};
+        }
+    }
+    $args{overrides} = \%overrides;
+    return $class->$orig(%args);
+};
+
+sub BUILD {
+    my ($self) = @_;
+    $self->_init or die "Unable to initialize CrowdSec client";
+}
+
+1;

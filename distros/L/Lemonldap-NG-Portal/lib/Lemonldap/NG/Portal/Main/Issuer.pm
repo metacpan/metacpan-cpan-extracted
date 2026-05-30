@@ -18,12 +18,12 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_RENEWSESSION
   PE_UPGRADESESSION
-  PE_TOKENEXPIRED
+  PE_ISSUERTIMEOUT
 );
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 # PROPERTIES
 
@@ -105,8 +105,8 @@ sub _redirect {
         $self->logger->debug(
             'Add ' . $self->ipath . ', ' . $self->ipath . 'Path in keepPdata' );
         push @{ $req->pdata->{keepPdata} }, $self->ipath, $self->ipath . 'Path';
-        $req->{urldc}           = $self->p->buildUrl( $req->portal, $self->path );
-        $req->pdata->{_url}     = encode_base64( $req->urldc, '' );
+        $req->{urldc}       = $self->p->buildUrl( $req->portal, $self->path );
+        $req->pdata->{_url} = encode_base64( $req->urldc, '' );
         $req->pdata->{issuerTs} = time;
     }
     else {
@@ -140,10 +140,18 @@ sub _redirect {
 sub resumeProcess {
     my ( $self, $req, $ir, @path ) = @_;
 
-    $self->p->clearHiddenFormValue($req, [ 'inProgress' ]);
-    $self->restoreRequest( $req, $ir );
+    $self->p->clearHiddenFormValue( $req, ['inProgress'] );
     $self->cleanPdata($req);
-    return $self->run( $req, @path );
+    if ($ir) {
+        $self->restoreRequest( $req, $ir );
+        return $self->run( $req, @path );
+    }
+    else {
+        $self->logger->error(
+            "Could not restore issuer context, redirecting to portal");
+        $req->menuError(PE_ISSUERTIMEOUT);
+        return PE_ISSUERTIMEOUT;
+    }
 }
 
 # Case 3: authentified user, launch
@@ -176,9 +184,10 @@ sub _forAuthUser {
     }
 
     if ( $restore_failed and !@path ) {
-        $self->logger->error("Unable to restore issuer context");
-        $req->mustRedirect(1);
-        return $self->p->doPE($req, PE_TOKENEXPIRED);
+        $self->logger->error(
+            "Could not restore issuer context, redirecting to portal");
+        $req->menuError(PE_ISSUERTIMEOUT);
+        return $self->p->doPE( $req, PE_ISSUERTIMEOUT );
     }
 
     # Clean pdata: keepPdata has been set, so pdata must be cleaned here

@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-05-28'; # DATE
+our $DATE = '2026-05-29'; # DATE
 our $DIST = 'App-FilenameKeyValueUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Filename/KeyValue/parse_keyvalue_filename",
@@ -38,7 +38,7 @@ parse-keyvalue-filename - Parse filename using the KeyValue naming scheme
 
 =head1 VERSION
 
-This document describes version 0.002 of parse-keyvalue-filename (from Perl distribution App-FilenameKeyValueUtils), released on 2026-05-28.
+This document describes version 0.003 of parse-keyvalue-filename (from Perl distribution App-FilenameKeyValueUtils), released on 2026-05-29.
 
 =head1 SYNOPSIS
 

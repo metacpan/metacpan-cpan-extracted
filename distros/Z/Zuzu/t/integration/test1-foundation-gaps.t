@@ -103,7 +103,7 @@ SRC
 	);
 	my $ast = parse_ok(
 		"from nowhere/missing import nope;\n",
-		'module-missing.zzs',
+		'<module-missing.zzs>',
 	);
 
 	my $e = dies {
@@ -122,7 +122,7 @@ SRC
 	);
 	my $ast = parse_ok(
 		"from broken import Foo;\n",
-		'builtin-load-failure.zzs',
+		'<builtin-load-failure.zzs>',
 	);
 
 	my $e = dies {
@@ -133,7 +133,9 @@ SRC
 	like( $e->message, qr/Failed loading builtin module 'broken'/, 'broken builtin reports package load failure' );
 }
 
-my $fixtures_file = File::Spec->catfile( 't', 'fixtures', 'semantics', 'language-core.json' );
+my $fixtures_file = File::Spec->catfile(
+	'stdlib', 'test-fixtures', 'semantics', 'language-core.json',
+);
 my $fixtures = decode_json( slurp_utf8($fixtures_file) );
 
 is( scalar @{$fixtures}, 4, 'deterministic language semantics fixture set contains expected high-value cases' );

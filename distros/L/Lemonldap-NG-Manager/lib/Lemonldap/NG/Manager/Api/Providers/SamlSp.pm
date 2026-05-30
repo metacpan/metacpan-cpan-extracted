@@ -1,6 +1,6 @@
 package Lemonldap::NG::Manager::Api::Providers::SamlSp;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.23.0';
 
 package Lemonldap::NG::Manager::Api;
 
@@ -19,7 +19,7 @@ sub getSamlSpByConfKey {
     $self->logger->debug("[API] SAML SP $confKey configuration requested");
 
     # Get latest configuration
-    my $conf   = $self->_confAcc->getConf;
+    my $conf   = $self->_confAcc->getConf( { noCache => 1 } );
     my $samlSp = $self->_getSamlSpByConfKey( $conf, $confKey );
 
     # Check if confKey is defined
@@ -50,7 +50,7 @@ sub findSamlSpByConfKey {
         "[API] Find SAML SPs by confKey regexp $pattern requested");
 
     # Get latest configuration
-    my $conf = $self->_confAcc->getConf;
+    my $conf = $self->_confAcc->getConf( { noCache => 1 } );
     my @samlSps =
       map { $_ =~ $pattern ? $self->_getSamlSpByConfKey( $conf, $_ ) : () }
       keys %{ $conf->{samlSPMetaDataXML} };
@@ -74,7 +74,7 @@ sub findSamlSpByEntityId {
     $self->logger->debug("[API] Find SAML SPs by entityId $entityId requested");
 
     # Get latest configuration
-    my $conf   = $self->_confAcc->getConf;
+    my $conf   = $self->_confAcc->getConf( { noCache => 1 } );
     my $samlSp = $self->_getSamlSpByEntityId( $conf, $entityId );
 
     return $self->sendError( $req,
@@ -127,7 +127,7 @@ sub addSamlSp {
 
     my $res = $self->_pushSamlSp( $conf, $add->{confKey}, $add, 1 );
 
-    return $self->sendError( $req, $res->{msg}, $res->{code} || 400 )
+    return $self->sendError( $req, $res->{msg}, 400 )
       unless ( $res->{res} eq 'ok' );
 
     return $self->sendJSONresponse(
@@ -171,7 +171,7 @@ sub replaceSamlSp {
 
     $res = $self->_pushSamlSp( $conf, $confKey, $replace, 1 );
 
-    return $self->sendError( $req, $res->{msg}, $res->{code} || 400 )
+    return $self->sendError( $req, $res->{msg}, 400 )
       unless ( $res->{res} eq 'ok' );
 
     return $self->sendJSONresponse( $req, undef, code => 204 );
@@ -211,7 +211,7 @@ sub updateSamlSp {
     }
 
     $res = $self->_pushSamlSp( $conf, $confKey, $update, 0 );
-    return $self->sendError( $req, $res->{msg}, $res->{code} || 400 )
+    return $self->sendError( $req, $res->{msg}, 400 )
       unless ( $res->{res} eq 'ok' );
 
     return $self->sendJSONresponse( $req, undef, code => 204 );
@@ -240,13 +240,9 @@ sub deleteSamlSp {
     delete $conf->{samlSPMetaDataMacros}->{$confKey};
 
     # Save configuration
-    if ( $self->_saveApplyConf($conf) ) {
-        return $self->sendJSONresponse( $req, undef, code => 204 );
-    }
-    else {
-        return $self->sendError( $req,
-            "Failed to save configuration, please try again later", 503 );
-    }
+    $self->_saveApplyConf($conf);
+
+    return $self->sendJSONresponse( $req, undef, code => 204 );
 }
 
 sub _getSamlSpByConfKey {
@@ -342,36 +338,41 @@ sub _readSamlSpExportedAttributes {
         "urn:oasis:names:tc:SAML:2.0:attrname-format:basic"
     ];
     foreach ( keys %{$attrs} ) {
-        return { res => "ko", msg => "Exported attribute $_ has no name" }
-          unless ( defined $attrs->{$_}->{name} );
-        my $mandatory    = 0;
-        my $name         = $attrs->{$_}->{name};
-        my $format       = '';
-        my $friendlyName = '';
+        if ( defined( $attrs->{$_} ) ) {
+            return { res => "ko", msg => "Exported attribute $_ has no name" }
+              unless ( defined $attrs->{$_}->{name} );
+            my $mandatory    = 0;
+            my $name         = $attrs->{$_}->{name};
+            my $format       = '';
+            my $friendlyName = '';
 
-        ( $mandatory, $name, $format, $friendlyName ) =
-          split( /;/, $mergeWith->{$_} )
-          if ( defined $mergeWith->{$_} );
+            ( $mandatory, $name, $format, $friendlyName ) =
+              split( /;/, $mergeWith->{$_} )
+              if ( defined $mergeWith->{$_} );
 
-        if ( defined $attrs->{$_}->{mandatory} ) {
-            $mandatory = (
-                     $attrs->{$_}->{mandatory} eq '1'
-                  or $attrs->{$_}->{mandatory} eq 'true'
-            ) ? 1 : 0;
+            if ( defined $attrs->{$_}->{mandatory} ) {
+                $mandatory = (
+                         $attrs->{$_}->{mandatory} eq '1'
+                      or $attrs->{$_}->{mandatory} eq 'true'
+                ) ? 1 : 0;
+            }
+
+            if ( defined $attrs->{$_}->{format} ) {
+                $format = $attrs->{$_}->{format};
+                return {
+                    res => "ko",
+                    msg => "Exported attribute $_ format does not exist."
+                  }
+                  unless ( length( grep { /^$format$/ } @{$allowedFormats} ) );
+            }
+
+            $friendlyName = $attrs->{$_}->{friendlyName}
+              if ( defined $attrs->{$_}->{friendlyName} );
+            $mergeWith->{$_} = "$mandatory;$name;$format;$friendlyName";
         }
-
-        if ( defined $attrs->{$_}->{format} ) {
-            $format = $attrs->{$_}->{format};
-            return {
-                res => "ko",
-                msg => "Exported attribute $_ format does not exist."
-              }
-              unless ( length( grep { /^$format$/ } @{$allowedFormats} ) );
+        else {
+            delete $mergeWith->{$_};
         }
-
-        $friendlyName = $attrs->{$_}->{friendlyName}
-          if ( defined $attrs->{$_}->{friendlyName} );
-        $mergeWith->{$_} = "$mandatory;$name;$format;$friendlyName";
     }
 
     return { res => "ok", exportedAttributes => $mergeWith };
@@ -406,19 +407,15 @@ sub _pushSamlSp {
         my $res = $self->_hasAllowedAttributes( $translatedOptions,
             'samlSPMetaDataNode' );
         return $res unless ( $res->{res} eq 'ok' );
-        foreach ( keys %{$translatedOptions} ) {
-            $conf->{samlSPMetaDataOptions}->{$confKey}->{$_} =
-              $translatedOptions->{$_};
-        }
+        $self->_merge_hash( $conf, 'samlSPMetaDataOptions', $confKey,
+            $translatedOptions );
 
     }
 
     if ( defined $push->{macros} ) {
         if ( $self->_isSimpleKeyValueHash( $push->{macros} ) ) {
-            foreach ( keys %{ $push->{macros} } ) {
-                $conf->{samlSPMetaDataMacros}->{$confKey}->{$_} =
-                  $push->{macros}->{$_};
-            }
+            $self->_merge_hash( $conf, 'samlSPMetaDataMacros', $confKey,
+                $push->{macros} );
         }
         else {
             return {
@@ -441,30 +438,24 @@ sub _pushSamlSp {
 
     # Test new configuration
     my $parser = Lemonldap::NG::Manager::Conf::Parser->new( {
-            refConf => $self->_confAcc->getConf,
+            refConf => $self->_confAcc->getConf( { noCache => 1 } ),
             newConf => $conf,
             req     => {},
         }
     );
     unless ( $parser->testNewConf( $self->p ) ) {
         return {
-            res => 'ko',
-            msg => "Configuration error: "
+            res  => 'ko',
+            code => 400,
+            msg  => "Configuration error: "
               . join( ". ", map { $_->{message} } @{ $parser->errors } ),
         };
     }
 
     # Save configuration
-    if ( $self->_saveApplyConf($conf) ) {
-        return { res => 'ok' };
-    }
-    else {
-        return {
-            res  => 'ko',
-            msg  => "Failed to save configuration, please try again later",
-            code => 503,
-        };
-    }
+    $self->_saveApplyConf($conf);
+
+    return { res => 'ok' };
 }
 
 sub _isNewSamlSpEntityIdUnique {

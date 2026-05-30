@@ -6,7 +6,7 @@ use Scalar::Util qw/reftype refaddr weaken/;
 use Carp;
 use SUPER;
 # This is now auto-updated at release time by the github action
-$VERSION = '0.185.1';
+$VERSION = '0.185.2';
 
 our $GLOBAL_STRICT_MODE;
 

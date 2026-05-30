@@ -3,9 +3,9 @@ package Lemonldap::NG::Handler::Lib::DevOps;
 use strict;
 use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Common::Util qw(isHiddenAttr);
-use JSON qw(from_json);
+use JSON                        qw(from_json);
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.23.0';
 our $_ua;
 
 sub ua {
@@ -99,8 +99,7 @@ q"I refuse to compile 'rules.json' when useSafeJail isn't activated! Yes I know,
     foreach ( keys %{ $json->{headers} } ) {
         my $header = $json->{headers}->{$_};
         $header =~ s/^\$//;
-        if ( isHiddenAttr( $class->localConfig->{hiddenAttributes}, $header ) )
-        {
+        if ( isHiddenAttr( $class->localConfig, $header ) ) {
             delete $json->{headers}->{$_};
             $class->auditLog(
                 $req,

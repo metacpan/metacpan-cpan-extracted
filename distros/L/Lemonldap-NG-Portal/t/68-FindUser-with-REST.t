@@ -74,8 +74,7 @@ LWP::Protocol::PSGI->register(
 my $res;
 my $json;
 my $request;
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel       => 'error',
             authentication => 'Null',

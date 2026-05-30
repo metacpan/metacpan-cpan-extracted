@@ -65,7 +65,7 @@ use MIME::Base64;
 use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Common::Session 'id2storage';
 use Lemonldap::NG::Common::Util qw/getPSessionID/;
-use Carp qw/shortmess/;
+use Carp                        qw/shortmess/;
 
 #use 5.10.0;
 
@@ -239,6 +239,20 @@ sub getSamlSession {
     return Lemonldap::NG::Common::Session->new( {
             @sessionsOpts, id => $id,
         }
+    );
+}
+
+sub getTotp {
+    require Lemonldap::NG::Common::TOTP;
+    my ( $key, %args ) = @_;
+
+    return Lemonldap::NG::Common::TOTP::_code(
+        undef, $key,
+        $args{offset}   // 0,
+        $args{interval} // 30,
+        $args{digits}   // 6,
+        $args{hash}     // "sha1",
+        $args{time}     // time
     );
 }
 
@@ -729,7 +743,8 @@ Return a temporary file named XXXX.db
 =cut
 
 sub tempdb {
-    return "$tmpDir/userdb.db";
+    my $filename = shift // "userdb.db";
+    return "$tmpDir/$filename";
 }
 
 my %handlerOR;
@@ -852,6 +867,14 @@ sub popHandler {
 sub switch {
     note shortmess( 'Manual switching is deprecated,'
           . ' you can remove it from your tests' );
+}
+
+sub denyLwpRequests {
+    return sub {
+        my $req = Plack::Request->new(@_);
+        fail( 'External requests are not allowed. Attempted: ' . $req->uri );
+        return [ 500, [], [] ];
+    }
 }
 
 =head4 encodeUrl( $url );

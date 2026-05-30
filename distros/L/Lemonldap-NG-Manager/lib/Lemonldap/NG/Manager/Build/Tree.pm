@@ -17,7 +17,7 @@
 
 package Lemonldap::NG::Manager::Build::Tree;
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 sub tree {
     return [ {
@@ -415,9 +415,28 @@ sub tree {
                             help  => 'authrest.html',
                             form  => 'simpleInputContainer',
                             nodes => [
-                                'restAuthnLevel', 'restAuthUrl',
-                                'restUserDBUrl',  'restPwdConfirmUrl',
-                                'restPwdModifyUrl'
+                                'restAuthnLevel',
+                                {
+                                    title => 'url',
+                                    form  => 'simpleInputContainer',
+                                    help  => 'authrest.html',
+                                    nodes => [
+                                        'restAuthUrl',
+                                        'restUserDBUrl',
+                                        'restPwdConfirmUrl',
+                                        'restPwdModifyUrl',
+                                    ]
+                                },
+                                {
+                                    title => 'args',
+                                    help  => 'authrest.html#rest-args',
+                                    nodes => [
+                                        'restAuthArgs',
+                                        'restUserDBArgs',
+                                        'restPwdConfirmArgs',
+                                        'restPwdModifyArgs',
+                                    ]
+                                },
                             ]
                         },
                         {
@@ -436,9 +455,21 @@ sub tree {
                             help  => 'authslave.html',
                             form  => 'simpleInputContainer',
                             nodes => [
-                                'slaveAuthnLevel',    'slaveUserHeader',
-                                'slaveMasterIP',      'slaveHeaderName',
-                                'slaveHeaderContent', 'slaveDisplayLogo',
+                                'slaveAuthnLevel',
+                                'slaveUserHeader',
+                                'slaveDisplayLogo',
+                                {
+                                    title => 'security',
+                                    help  => 'authslave.html#security',
+                                    form  => 'simpleInputContainer',
+                                    nodes => [
+                                        'slaveMasterIP',
+                                        'slaveCertificateField',
+                                        'slaveCertificateRegexp',
+                                        'slaveHeaderName',
+                                        'slaveHeaderContent',
+                                    ]
+                                },
                                 'slaveExportedVars',
                             ]
                         },
@@ -933,6 +964,7 @@ sub tree {
                                 'findUserWildcard',
                                 'findUserControl',
                                 'restFindUserDBUrl',
+                                'restFindUserDBArgs',
                                 'findUserSearchingAttributes',
                                 'findUserExcludingAttributes'
                             ]
@@ -964,6 +996,10 @@ sub tree {
                             ],
                         },
                         {
+                            title => 'adminLogoutServer',
+                            nodes => ['adminLogoutServerSecret']
+                        },
+                        {
                             title => 'customPluginsNode',
                             help  => 'plugincustom.html#plugin-options',
                             form  => 'simpleInputContainer',
@@ -971,10 +1007,6 @@ sub tree {
                                 'customPlugins', 'customPluginsParams',
                                 'disabledPlugins'
                             ]
-                        },
-                        {
-                            title => 'adminLogoutServer',
-                            nodes => ['adminLogoutServerSecret']
                         },
                         'oidcOfflineTokens',
                     ]
@@ -1017,8 +1049,9 @@ sub tree {
                                 'totp2fUserCanRemoveKey',
                                 'totp2fIssuer',
                                 'totp2fInterval',
-                                'totp2fRange',
                                 'totp2fDigits',
+                                'totp2fAlgorithm',
+                                'totp2fRange',
                                 'totp2fEncryptSecret',
                                 'totp2fAuthnLevel',
                                 'totp2fLabel',
@@ -1143,10 +1176,19 @@ sub tree {
                             nodes => [
                                 'rest2fActivation',
                                 'rest2fCodeActivation',
-                                'rest2fInitUrl',
-                                'rest2fInitArgs',
-                                'rest2fVerifyUrl',
-                                'rest2fVerifyArgs',
+                                {
+                                    title => 'url',
+                                    form  => 'simpleInputContainer',
+                                    help  => 'authrest.html',
+                                    nodes =>
+                                      [ 'rest2fInitUrl', 'rest2fVerifyUrl', ]
+                                },
+                                {
+                                    title => 'args',
+                                    help  => 'authrest.html#rest-args',
+                                    nodes =>
+                                      [ 'rest2fInitArgs', 'rest2fVerifyArgs', ]
+                                },
                                 'rest2fResendInterval',
                                 'rest2fAuthnLevel',
                                 'rest2fLabel',
@@ -1192,6 +1234,7 @@ sub tree {
                                 'userControl',
                                 'browsersDontStorePassword',
                                 'portalForceAuthn',
+                                'defaultAuthnLevel',
                                 'portalForceAuthnInterval',
                                 'key',
                                 'trustedDomains',
@@ -1203,6 +1246,7 @@ sub tree {
                                 'tokenUseGlobalStorage',
                                 'strictTransportSecurityMax_Age',
                                 'hashedSessionStore',
+                                'shortTokenTTL',
                                 {
                                     title => 'Crowdsec',
                                     help  => 'crowdsec.html',
@@ -1226,6 +1270,7 @@ sub tree {
                                                 'crowdsecPassword',
                                                 'crowdsecMaxFailures',
                                                 'crowdsecBlockDelay',
+                                                'crowdsecBanDuration',
                                                 'crowdsecFilters',
                                                 'crowdSecAgentResponseCode',
                                                 'crowdSecAgentResponseValue',
@@ -1328,6 +1373,7 @@ sub tree {
                             form  => 'simpleInputContainer',
                             nodes => [
                                 'jsRedirect',
+                                'externalMenu',
                                 'noAjaxHook',
                                 'skipRenewConfirmation',
                                 'skipUpgradeConfirmation',
@@ -1347,9 +1393,9 @@ sub tree {
                             title => 'eventsManagement',
                             help  => 'eventsmanagement.html',
                             nodes => [
-                                'messageBroker', 'messageBrokerOptions',
-                                'reloadTimeout', 'reloadUrls',
-                                'compactConf',   'eventQueueName',
+                                'reloadUrls',     'reloadTimeout',
+                                'compactConf',    'messageBroker',
+                                'eventQueueName', 'messageBrokerOptions',
                             ]
                         },
                     ]

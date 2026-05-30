@@ -17,6 +17,7 @@ my $client = LLNG::Manager::Test->new( {
             restSessionServer => 1,
             test2fSelfRegistration => 1,
             test2fActivation       => 'has2f("test")',
+            test2fUserCanRemoveKey => 1,
             sfRequired             => '$uid eq "dwho"',
             sfRetries              => 1,
             macros                 => {
@@ -283,6 +284,88 @@ subtest "Check custom display" => sub {
         1, "Found correct myzero_0 display param" );
     is( $lastParams->{params}->{SFDEVICES}->[0]->{_private_1},
         undef, "private subkey _private_1 is not exposed" );
+
+};
+
+subtest "Delete 2FA" => sub {
+
+    ok(
+        $res = $client->_post(
+            '/',
+            IO::String->new('user=dwho&password=dwho'),
+            length => 23,
+        ),
+        'Auth query'
+    );
+    expectOK($res);
+
+    my ( $host, $url, $query ) =
+      expectForm( $res, undef, '/test2fcheck', 'token' );
+    ok(
+        $res = $client->_post(
+            '/test2fcheck', IO::String->new($query),
+            length => length($query),
+            accept => 'text/html',
+        ),
+        'Post dummy form'
+    );
+
+    my $id = expectCookie($res);
+
+    ok(
+        $res = $client->_get(
+            '/2fregisters',
+            cookie => "lemonldap=$id",
+            accept => 'text/html',
+        ),
+        '2FA manager'
+    );
+
+    expectXpath( $res, '//span[@device="test"]' );
+
+    my ($epoch) = grep( /epoch=/, split( "\n", $res->[2]->[0] ) );
+    $epoch =~ s/^.*epoch='([0-9]+)'.*$/$1/;
+
+    # Testing hook returning an error + a custom error label
+    ok(
+        $res = $client->_post(
+            '/2fregisters/test/delete',
+            {
+                epoch      => "$epoch",
+                hookStatus => "deleteHookFail",
+            },
+            cookie => "lemonldap=$id",
+        ),
+        'Post delete 2FA with hook error'
+    );
+    expectReject( $res, 400, "deleteHookFail" );
+
+    # Testing delete fail because of missing epoch param
+    ok(
+        $res = $client->_post(
+            '/2fregisters/test/delete', {}, cookie => "lemonldap=$id",
+        ),
+        'Post delete 2FA with missing epoch param'
+    );
+    expectReject( $res, 400, 'test2f: "epoch" parameter is missing' );
+
+    # Testing sucessful delete of device
+    ok(
+        $res = $client->_post(
+            '/2fregisters/test/delete',
+            {
+                epoch => "$epoch",
+            },
+            cookie => "lemonldap=$id",
+        ),
+        'Post delete 2FA with hook success'
+    );
+    is( expectJSON($res)->{result},
+        1, "Correct response from sfDeleteDevice hook" );
+
+    # Testing that device list is empty
+    my $devices = from_json( getPSession("dwho")->data->{_2fDevices} );
+    ok( @$devices == 0, "Empty list of 2FA, device correctly deleted" );
 
 };
 

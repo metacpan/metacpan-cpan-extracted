@@ -1,17 +1,18 @@
 package Lemonldap::NG::Portal::Plugins::LocationDetect;
 
 use Mouse;
-use List::MoreUtils qw/uniq/;
-use Scalar::Util qw/blessed/;
+use List::MoreUtils                        qw/uniq/;
+use Scalar::Util                           qw/blessed/;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_ERROR);
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
   Lemonldap::NG::Portal::Lib::SMTP
 );
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.23.0';
 
 has reader   => ( is => 'rw' );
+has locales  => ( is => 'rw' );
 has ipDetail => ( is => 'rw' );
 has uaDetail => ( is => 'rw' );
 use constant betweenAuthAndData => 'storeEnvironment';
@@ -25,9 +26,9 @@ sub init {
         return 0;
     }
 
-    eval { use GeoIP2::Database::Reader; };
+    eval { use MaxMind::DB::Reader; };
     if ($@) {
-        $self->logger->error("Can't load use GeoIP2::Database::Reader: $@");
+        $self->logger->error("Can't load MaxMind::DB::Reader: $@");
         return 0;
     }
     $self->addSessionDataToRemember( {
@@ -41,20 +42,20 @@ sub init {
           || $self->conf->{languages} );
 
     $self->reader(
-        GeoIP2::Database::Reader->new(
-            file    => $self->conf->{locationDetectGeoIpDatabase},
-            locales => \@languages
+        MaxMind::DB::Reader->new(
+            file => $self->conf->{locationDetectGeoIpDatabase},
         )
     );
+    $self->locales( \@languages );
     $self->ipDetail( $self->conf->{locationDetectIpDetail} || "city" );
     $self->uaDetail( $self->conf->{locationDetectUaDetail} || "browser" );
     return 1;
 }
 
 sub _get_localized {
-    my ( $self, $req, $record ) = @_;
-    my $lang  = $self->p->getLanguage($req);
-    my $names = $record->names;
+    my ( $self, $req, $names ) = @_;
+    return unless $names;
+    my $lang = $self->p->getLanguage($req);
     if ( $names->{$lang} ) {
         return $names->{$lang};
     }
@@ -102,55 +103,37 @@ sub getIpInfo {
     my ( $self, $req ) = @_;
 
     # Try to detect type of GeoIP database
-    my $type = $self->reader->metadata->database_type;
-    if ( $type =~ /City/ ) {
-        $type = "city";
-    }
-    else {
-        $type = "country";
-    }
+    my $type    = $self->reader->metadata->{database_type};
+    my $hasCity = ( $type =~ /City/ );
 
-    my $city_display = "Unknown";
-    my $city_code    = "unknown";
-    if ( $type eq "city" ) {
-        my $city =
-          eval { $self->reader->$type( ip => $req->address )->city() };
-        if ($@) {
-            my $msg = $@;
-            if ( blessed($@) && $@->isa('Throwable::Error') ) {
-                $msg = $@->message;
-            }
+    my $city_display    = "Unknown";
+    my $city_code       = "unknown";
+    my $country_display = "Unknown";
+    my $country_code    = "unknown";
 
-            $self->logger->warn(
-                    "[LocationDetect] Could not resolve city for IP "
-                  . $req->address . ": "
-                  . $msg );
-        }
-        else {
-            $city_code    = $city->geoname_id                    || "unknown";
-            $city_display = $self->_get_localized( $req, $city ) || "Unknown";
-        }
-    }
-
-    my $country_display;
-    my $country_code;
-    my $country =
-      eval { $self->reader->$type( ip => $req->address )->country() };
+    my $record = eval { $self->reader->record_for_address( $req->address ) };
     if ($@) {
         my $msg = $@;
         if ( blessed($@) && $@->isa('Throwable::Error') ) {
             $msg = $@->message;
         }
-        $self->logger->warn(
-                "[LocationDetect] Could not resolve country for IP "
+        $self->logger->warn( "[LocationDetect] Could not resolve IP "
               . $req->address . ": "
               . $msg );
-        $country_code    = "unknown";
-        $country_display = "Unknown";
     }
     else {
-        $country_code    = $country->iso_code                      || "unknown";
-        $country_display = $self->_get_localized( $req, $country ) || "Unknown";
+        if ( $hasCity && $record->{city} ) {
+            $city_code = $record->{city}{geoname_id} || "unknown";
+            $city_display =
+              $self->_get_localized( $req, $record->{city}{names} )
+              || "Unknown";
+        }
+        if ( $record->{country} ) {
+            $country_code = $record->{country}{iso_code} || "unknown";
+            $country_display =
+              $self->_get_localized( $req, $record->{country}{names} )
+              || "Unknown";
+        }
     }
 
     my ( $ipraw, $ipdisplay );

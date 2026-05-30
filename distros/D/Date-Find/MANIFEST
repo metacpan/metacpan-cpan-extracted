@@ -13,6 +13,7 @@ README.mkdn
 scripts/move-year
 t/00-load.t
 t/01-date-extract.t
+t/02-strict-mode.t
 testrules.yml
 xt/99-changes.t
 xt/99-compile.t

@@ -16,8 +16,7 @@ SKIP: {
         skip 'Image::Magick not found', $maintests;
     }
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 useSafeJail               => 1,
                 browsersDontStorePassword => 1,
@@ -35,7 +34,7 @@ SKIP: {
             '/',
             IO::String->new('user=dwho&password=dwho'),
             length => 23,
-            ip => '10.2.3.4',
+            ip     => '10.2.3.4',
         ),
         'Auth query from non captcha network'
     );

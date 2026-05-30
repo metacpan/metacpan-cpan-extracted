@@ -8,7 +8,7 @@ std/clib - Dynamic C library loading and scalar FFI calls.
 
   from std/clib import CLib;
 
-  let lib := CLib.open("t/fixtures/example_clib/libgreet.so");
+  let lib := CLib.open("stdlib/test-fixtures/example_clib/libgreet.so");
   let greet := lib.func(
     "greet",
     [],

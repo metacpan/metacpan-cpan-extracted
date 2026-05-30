@@ -98,6 +98,25 @@ checkRequestParams( {
     }
 );
 
+# Extra params are added
+checkRequestParams( {
+        oidcOPMetaDataOptionsAuthEndpointExtraParams => {
+            claims  => '{"id_token":{"amr":{"essential":true}}}',
+            myparam => 42,
+        },
+    },
+    {
+        'client_id'     => 'rpid',
+        'redirect_uri'  => 'http://auth.example.com?openidconnectcallback=1',
+        'response_type' => 'code',
+        'claims'        => '{"id_token":{"amr":{"essential":true}}}',
+        'myparam'       => 42,
+        'state'         => '123',
+        'nonce'         => '456',
+        'scope'         => 'openid profile email',
+    }
+);
+
 clean_sessions();
 done_testing();
 

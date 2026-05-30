@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 6 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/FilenameKeyValueUtils.pm'
@@ -16,7 +16,9 @@ my @scripts = (
     'script/normalize-keyvalue-filename',
     'script/parse-keyvalue-filename',
     'script/rename-add-keyvalue-filenames',
-    'script/rename-remove-keyvalue-filenames'
+    'script/rename-modify-keyvalue-filenames',
+    'script/rename-remove-keyvalue-filenames',
+    'script/rename-replace-keyvalue-filenames'
 );
 
 # no fake home requested

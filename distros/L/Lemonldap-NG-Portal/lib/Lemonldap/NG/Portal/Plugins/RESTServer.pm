@@ -68,7 +68,7 @@ use Mouse;
 use JSON qw(from_json to_json);
 use MIME::Base64;
 use Lemonldap::NG::Common::Languages;
-use Lemonldap::NG::Common::Session qw(id2storage reHashedKinds);
+use Lemonldap::NG::Common::Session         qw(id2storage reHashedKinds);
 use Lemonldap::NG::Portal::Main::Constants qw(
   URIRE
   PE_OK
@@ -76,7 +76,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PASSWORD_OK
 );
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 

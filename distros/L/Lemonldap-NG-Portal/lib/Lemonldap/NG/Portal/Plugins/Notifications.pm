@@ -20,7 +20,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_NOTIFICATION
 );
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -141,8 +141,7 @@ sub checkNotifDuringAuth {
             and $req->env->{PATH_INFO} ne '/' )
         {
             $req->data->{_url} =
-              encode_base64( $req->portal . $req->env->{PATH_INFO},
-                '' );
+              encode_base64( $req->portal . $req->env->{PATH_INFO}, '' );
         }
 
         # Restore and cipher cookies
@@ -213,10 +212,10 @@ sub retrieveNotifs {
     } (
         map {
             /^notification_(.+)$/
-              ? { reference => $1, epoch => $req->{userData}->{$_} }
+              ? { reference => $1, epoch => $req->userData->{$_} }
               : ()
           }
-          keys %{ $req->{userData} }
+          keys %{ $req->userData }
     );
     splice @_notifications, $self->conf->{notificationsMaxRetrieve};
 

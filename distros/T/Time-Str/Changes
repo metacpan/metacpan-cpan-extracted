@@ -1,3 +1,27 @@
+0.88 2026-05-29
+  - Declare Time::TZif and Time::TZif::POSIX API stable; remove
+    experimental notice from documentation.
+  - Time::TZif now resolves times beyond the last stored transition
+    using the POSIX TZ string footer in v2/v3 TZif files. All four
+    lookup methods (offset_for_utc, offset_for_local,
+    type_info_for_utc, type_info_for_local) handle future dates
+    correctly.
+  - Add valid_tzdb_timezone and valid_posix_timezone structural
+    validators to Time::Str::Util.
+  - Rename 'filename' parameter to 'path' in Time::TZif.
+  - Add modified_time accessor to Time::TZif, capturing st_mtime
+    at parse time for stale-object detection.
+  - Add optional 'name' parameter to Time::TZif and Time::TZif::POSIX
+    constructors, validated via valid_tzdb_timezone. Includes name()
+    accessor and has_name() predicate.
+  - Add immutable with_name, with_gap_policy, and with_overlap_policy
+    methods to Time::TZif and Time::TZif::POSIX. Return shallow copies
+    sharing parsed data; return the same object when unchanged.
+  - Cache POSIX TZ transition windows for years 1990–2039 in
+    Time::TZif::POSIX.
+  - Document POSIX::mktime behaviour for glibc (Linux) and BSD libc
+    (macOS) in the Time::TZif COMPATIBILITY section.
+
 0.87 2026-05-26
   - Add Time::TZif::POSIX module for algorithmic POSIX TZ string
     parsing (IEEE Std 1003.1 / RFC 8536 §3.3.1). Same API as

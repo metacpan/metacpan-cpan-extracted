@@ -88,7 +88,8 @@ sub runTest {
     my $refresh_token = $json->{refresh_token};
 
     # Make sure refresh token session has no _lastSeen to avoid purge
-    ok( !getSamlSession($refresh_token)->{data}->{_lastSeen} , "session has no _lastSeen");
+    ok( !getSamlSession($refresh_token)->{data}->{_lastSeen},
+        "session has no _lastSeen" );
 
     count(1);
 
@@ -124,11 +125,13 @@ sub runTest {
         $returned_refresh_token = $1;
     }
 
-    ok( $returned_refresh_token, "refresh token $returned_refresh_token exists in html" );
+    ok( $returned_refresh_token,
+        "refresh token $returned_refresh_token exists in html" );
 
     ok(
         $res = $op->_delete(
-            "/myoffline/$returned_refresh_token", cookie => "lemonldap=$idd",
+            "/myoffline/$returned_refresh_token",
+            cookie => "lemonldap=$idd",
         ),
         "Delete token $returned_refresh_token"
     );

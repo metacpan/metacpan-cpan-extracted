@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
 );
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Common::Module';
 
@@ -122,7 +122,8 @@ sub addSessionDataToRemember {
 
 sub addEntryPoint {
     my ( $self, %entryPointDescription ) = @_;
-    return $self->p->_addPluginEntryPoint(%entryPointDescription, _pkg => ref($self));
+    return $self->p->_addPluginEntryPoint( %entryPointDescription,
+        _pkg => ref($self) );
 }
 
 1;
@@ -261,7 +262,7 @@ is called. Example:
 
   use constant afterSub => {
       getUser => 'mysub',
-  }
+  };
   sub mysub {
       my ( $self ,$req ) = @_;
       # Do something
@@ -291,7 +292,6 @@ LemonLDAP::NG code. Example:
   use constant hook => {
       oidcGenerateIDToken          => 'addClaimToIDToken'
   };
-
   sub addClaimToIDToken {
     my ( $self, $req, $payload, $rp ) = @_;
     $payload->{"id_token_hook"} = 1;

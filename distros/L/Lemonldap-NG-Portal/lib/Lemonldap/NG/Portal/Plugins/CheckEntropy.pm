@@ -11,7 +11,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_PP_INSUFFICIENT_PASSWORD_QUALITY
 );
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -93,8 +93,7 @@ sub init {
             customHtml =>
 qq'<script type="text/javascript" src="$self->{p}->{staticPrefix}/common/js/entropy.min.js?v=$cacheTag"></script>\n
 <link rel="stylesheet" type="text/css" href="$self->{p}->{staticPrefix}/common/css/entropy.min.css?v=$cacheTag">',
-            customHtmlAfter =>
-qq'<div id="entropybar" class="progress">\n
+            customHtmlAfter => qq'<div id="entropybar" class="progress">\n
     <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>\n
 </div>\n
 <div id="entropybar-msg" class="alert alert-warning entropyHidden"></div>',
@@ -134,7 +133,7 @@ sub checkEntropy {
 }
 
 # Check user password against zxcvbn library
-# Input : request, new user base64-encoded password 
+# Input : request, new user base64-encoded password
 # Output: JSON response: { "level" => int, "message" => "msg" }
 sub _checkEntropyJSON {
     my ( $self, $req, $pass ) = @_;
@@ -144,7 +143,7 @@ sub _checkEntropyJSON {
     # use password value submitted in form
     # this happens when frontend is testing a new password while user is typing
     my $password_base64 = $req->param('password');
-    $self->logger->debug( 'checkEntropy: password taken from submitted form');
+    $self->logger->debug('checkEntropy: password taken from submitted form');
 
     unless ($password_base64) {
         $response_params->{"level"}   = -1;
@@ -179,7 +178,7 @@ sub _checkEntropy {
 
     # Password already given, so take it directly
     # this happens at backend side, when really changing the password
-    $self->logger->debug( 'checkEntropy: password taken directly');
+    $self->logger->debug('checkEntropy: password taken directly');
 
     my $entropy = password_strength($pass);
 

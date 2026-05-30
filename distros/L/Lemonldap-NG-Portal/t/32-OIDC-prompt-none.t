@@ -49,7 +49,8 @@ my $op = LLNG::Manager::Test->new( {
 );
 my $res;
 
-my $query = "response_type=code&scope=openid%20profile%20email&client_id=rpid&state=af0ifjsldkj&redirect_uri=http%3A%2F%2Frp.com%2F&prompt=none";
+my $query =
+"response_type=code&scope=openid%20profile%20email&client_id=rpid&state=af0ifjsldkj&redirect_uri=http%3A%2F%2Frp.com%2F&prompt=none";
 ok(
     $res = $op->_get(
         "/oauth2/authorize",
@@ -86,8 +87,7 @@ ok(
     "Get authorization code"
 );
 
-($code) =
-  expectRedirection( $res, qr#http://rp\.com/\?.*code=([^\&]*)# );
+($code) = expectRedirection( $res, qr#http://rp\.com/\?.*code=([^\&]*)# );
 
 clean_sessions();
 done_testing();

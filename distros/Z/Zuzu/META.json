@@ -27,8 +27,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0",
-            "File::ShareDir::Install" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
@@ -79,10 +78,16 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/zuzuscript/zuzu-perl/issues"
+      },
+      "homepage" : "https://zuzulang.org/",
       "repository" : {
-         "url" : "https://example.invalid/zuzu"
+         "type" : "git",
+         "url" : "https://github.com/zuzuscript/zuzu-perl",
+         "web" : "https://github.com/zuzuscript/zuzu-perl"
       }
    },
-   "version" : "0.001000",
+   "version" : "0.001002",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

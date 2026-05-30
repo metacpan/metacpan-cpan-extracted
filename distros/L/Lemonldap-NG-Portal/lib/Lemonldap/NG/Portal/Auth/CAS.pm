@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.23.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Auth
@@ -24,6 +24,7 @@ extends qw(
 has srvNumber => ( is => 'rw', default => 0 );
 has srvList   => ( is => 'rw', default => sub { [] } );
 use constant sessionKind => 'CAS';
+use constant afterData   => 'authFinish';
 
 # INITIALIZATION
 
@@ -114,6 +115,21 @@ sub extractFormInfo {
         }
 
         # Exit
+        $req->response( $self->p->sendBinaryResponse( $req, "" ) );
+        return PE_SENDRESPONSE;
+    }
+
+    if ($req->param('logoutRequest')) {
+        my $xml = eval { $self->parser->parse_string( $req->param('logoutRequest') ) };
+        if ($@) {
+            $self->logger->error("Could not process logoutRequest: $@");
+        } else {
+            my $xpc = XML::LibXML::XPathContext->new($xml);
+            $xpc->registerNs( 'samlp', 'urn:oasis:names:tc:SAML:2.0:protocol' );
+            if (my $ticket = $xpc->findnodes('/samlp:LogoutRequest/samlp:SessionIndex')->string_value) {
+                $self->_handleBackChannelLogout($req, $ticket);
+            }
+        }
         $req->response( [ 200, [ 'Content-Length' => 0 ], [] ] );
         return PE_SENDRESPONSE;
     }
@@ -209,6 +225,9 @@ sub extractFormInfo {
 
     $self->logger->debug("CAS: Service Ticket received: $ticket");
 
+    # save it for authFinish
+    $req->data->{ticket} = $ticket;
+
     my $proxied =
       $self->conf->{casSrvMetaDataOptionsProxiedServices}->{$srv} || {};
 
@@ -261,6 +280,58 @@ sub extractFormInfo {
     return PE_OK;
 }
 
+sub _handleBackChannelLogout {
+    my ($self, $req, $ticket) = @_;
+
+    $self->logger->debug("CAS: Received BackChannel logoutRequest for ticket $ticket");
+
+    if (my $id = $self->getSSOSessionIdByTicket($ticket)) {
+        my $sessionData = $self->p->HANDLER->retrieveSession( $req, $id );
+        if ($sessionData) {
+          $self->logger->debug("Doing backchannel logout on session $id");
+          $req->userData( $req->sessionInfo($sessionData) );
+          $self->p->do( $req,
+            [ @{ $self->p->beforeLogout }, 'authLogout', 'deleteSession' ] );
+        }
+    }
+}
+
+# Saves the link between IDP-side Session ID/NameID and LLNG session
+sub authFinish {
+    my ( $self, $req ) = @_;
+
+    # Get saved ticket
+    my $ticket = $req->data->{ticket};
+
+    # Auth::CAS was not used for this session
+    return unless ($ticket);
+
+    # Real session was stored, get id and utime
+    my $id    = $req->{id};
+    my $utime = $req->{sessionInfo}->{_utime};
+
+    $self->logger->debug( "Store ticket "
+          . $ticket
+          . " for session $id" );
+
+    my $infos;
+    $infos->{type}            = 'casTicket';  # Session type
+    $infos->{_utime}          = $utime;       # Creation time
+    $infos->{_cas_id}         = $id;          # SSO session id
+    $infos->{auth_cas_ticket} = $ticket;      # CAS ticket
+
+    # Save CAS session
+    my $CASSessionInfo = $self->getCasSession( undef, $infos );
+
+    return PE_ERROR unless $CASSessionInfo;
+
+    my $session_id = $CASSessionInfo->id;
+
+    $self->logger->debug("Link session $id to CAS session $session_id");
+
+    return PE_OK;
+}
+
 sub authenticate {
     return PE_OK;
 }
@@ -275,6 +346,11 @@ sub setAuthSessionInfo {
 
 sub authLogout {
     my ( $self, $req ) = @_;
+
+    # Real session was previously deleted,
+    # remove corresponding CAS sessions
+    my $session_id = $req->sessionInfo->{_session_id};
+    $self->deleteCasSecondarySessions($session_id);
 
     # Build CAS logout URL
     my $logout_url = $self->getServerLogoutURL( $self->p->fullUrl($req),

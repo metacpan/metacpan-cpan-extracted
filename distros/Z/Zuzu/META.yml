@@ -9,7 +9,6 @@ build_requires:
   Test2::V0: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-  File::ShareDir::Install: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -57,6 +56,8 @@ requires:
   YAML::PP: '0'
   perl: '5.014'
 resources:
-  repository: https://example.invalid/zuzu
-version: '0.001000'
+  bugtracker: https://github.com/zuzuscript/zuzu-perl/issues
+  homepage: https://zuzulang.org/
+  repository: https://github.com/zuzuscript/zuzu-perl
+version: '0.001002'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

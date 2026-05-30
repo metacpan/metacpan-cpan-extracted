@@ -12,15 +12,14 @@ SKIP: {
     use_ok('Lemonldap::NG::Common::FormEncode');
     my $res;
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
-                sfOnlyUpgrade  => 1,
+                sfOnlyUpgrade    => 1,
                 totp2fActivation => 1,
-                totp2fAuthnLevel  => 5,
-                authentication => 'Demo',
-                userDB         => 'Same',
-                'vhostOptions' => {
+                totp2fAuthnLevel => 5,
+                authentication   => 'Demo',
+                userDB           => 'Same',
+                'vhostOptions'   => {
                     'test1.example.com' => {
                         'vhostAuthnLevel' => 3
                     },

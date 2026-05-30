@@ -2,7 +2,7 @@ package Zuzu::Module::DigestMD5;
 
 use utf8;
 
-our $VERSION = '0.001000';
+our $VERSION = '0.001002';
 
 use Digest::MD5 qw(
 	md5

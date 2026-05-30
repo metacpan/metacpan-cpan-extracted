@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use v5.10;
 
-our $VERSION = '0.87';
+our $VERSION = '0.88';
 
 use Carp                qw[croak];
 use Time::Str::Calendar qw[leap_year
@@ -14,7 +14,8 @@ use Time::Str::Calendar qw[leap_year
                            rdn_to_ymd];
 use Time::Str::Time     qw[ gmtime_year
                             timegm_modern ];
-use Time::Str::Util     qw[upper_bound];
+use Time::Str::Util     qw[upper_bound
+                           valid_tzdb_timezone];
 
 my %ValidPolicy = (
   earlier => 1, later => 1, std => 1, dst => 1, reject => 1
@@ -66,21 +67,26 @@ sub new {
   (@_ & 1 && @_ >= 3) or croak q/Usage: Time::TZif::POSIX->new(tz_string => $string)/;
   my ($class, %p) = @_;
 
-  my ($tz_string, $gap_policy, $overlap_policy);
+  my (%state, $tz_string);
 
   while (my ($key, $v) = each %p) {
     if ($key eq 'tz_string') {
       $tz_string = $v;
     }
+    elsif ($key eq 'name') {
+      valid_tzdb_timezone($v)
+        or croak qq/Invalid value for the parameter 'name'/;
+      $state{name} = $v;
+    }
     elsif ($key eq 'gap_policy') {
       (defined $v && exists $ValidPolicy{$v})
         or croak qq/Invalid policy value for the parameter 'gap_policy'/;
-      $gap_policy = $v;
+      $state{gap_policy} = $v;
     }
     elsif ($key eq 'overlap_policy') {
       (defined $v && exists $ValidPolicy{$v})
         or croak qq/Invalid policy value for the parameter 'overlap_policy'/;
-      $overlap_policy = $v;
+      $state{overlap_policy} = $v;
     }
     else {
       croak qq/Unrecognised named parameter: '$key'/;
@@ -90,22 +96,83 @@ sub new {
   (defined $tz_string)
     or croak q/Parameter 'tz_string' is required/;
 
-  $gap_policy     //= 'reject';
-  $overlap_policy //= 'reject';
+  $state{tz_string}        = $tz_string;
+  $state{gap_policy}     //= 'reject';
+  $state{overlap_policy} //= 'reject';
 
-  my $self = bless {
-    tz_string      => $tz_string,
-    gap_policy     => $gap_policy,
-    overlap_policy => $overlap_policy,
-  }, $class;
-
+  my $self = bless \%state, $class;
   $self->_parse($tz_string);
   return $self;
 }
 
-sub tz_string      { $_[0]->{tz_string}      }
-sub gap_policy     { $_[0]->{gap_policy}     }
-sub overlap_policy { $_[0]->{overlap_policy} }
+sub _with {
+  my ($object, %with) = @_;
+  return bless { %{$object}, %with }, ref $object;
+}
+
+sub name { 
+  @_ == 1 or croak q/Usage: $tz->name()/;
+  return $_[0]->{name};
+}
+
+sub tz_string {
+  @_ == 1 or croak q/Usage: $tz->tz_string()/;
+  return $_[0]->{tz_string};
+}
+
+sub gap_policy {
+  @_ == 1 or croak q/Usage: $tz->gap_policy()/;
+  return $_[0]->{gap_policy};
+}
+
+sub overlap_policy {
+  @_ == 1 or croak q/Usage: $tz->overlap_policy()/;
+  return $_[0]->{overlap_policy};
+}
+
+sub has_name {
+  @_ == 1 or croak q/Usage: $tz->has_name()/;
+  return exists $_[0]->{name};
+}
+
+sub with_name {
+  @_ == 2 or croak q/Usage: $tz->with_name($name)/;
+  my ($self, $name) = @_;
+
+  valid_tzdb_timezone($name)
+    or croak qq/Invalid name value/;
+
+  if (!exists $self->{name} || $name ne $self->{name}) {
+    return _with($self, name => $name);
+  }
+  return $self;
+}
+
+sub with_gap_policy {
+  @_ == 2 or croak q/Usage: $tz->with_gap_policy($policy)/;
+  my ($self, $policy) = @_;
+
+  (defined $policy && exists $ValidPolicy{$policy})
+    or croak qq/Invalid policy value/;
+
+  if ($policy ne $self->{gap_policy}) {
+    return _with($self, gap_policy => $policy);
+  }
+  return $self;
+}
+
+sub with_overlap_policy {
+  @_ == 2 or croak q/Usage: $tz->with_overlap_policy($policy)/;
+  my ($self, $policy) = @_;
+
+  (defined $policy && exists $ValidPolicy{$policy})
+    or croak qq/Invalid policy value/;
+
+  if ($policy ne $self->{overlap_policy}) {
+    return _with($self, overlap_policy => $policy);
+  }
+  return $self;
+}
 
 sub _parse_offset {
   my ($str) = @_;
@@ -292,11 +359,10 @@ sub _transitions_for_year {
   return ($t_start, $t_end);
 }
 
-# Returns (\@times, \@types) for the 3-year window around $time.
-sub _transitions_for_time {
-  my ($self, $time) = @_;
+# Returns \@times for the 3-year window around $time.
+sub _transitions_window_for_year {
+  my ($self, $year) = @_;
 
-  my $year = gmtime_year($time);
   my @times;
   for my $y ($self->{cross_year} ? ($year - 1, $year, $year + 1) : $year) {
     my ($t_start, $t_end) = $self->_transitions_for_year($y);
@@ -308,7 +374,25 @@ sub _transitions_for_time {
     }
   }
 
-  return (\@times, $self->{types_3y});
+  return \@times;
+}
+
+sub _transitions_for_time {
+  my ($self, $time) = @_;
+
+  my $year = gmtime_year($time);
+  my $year_index = $year - 1990;
+  my $cache = $self->{cache_years} //= [];
+  my $times;
+
+  if ($year_index >= 0 && $year_index < 50) {
+    $times = $cache->[$year_index] //= $self->_transitions_window_for_year($year);
+  }
+  else {
+    $times = $self->_transitions_window_for_year($year);
+  }
+
+  return ($times, $self->{types_3y});
 }
 
 sub _type_for_utc {

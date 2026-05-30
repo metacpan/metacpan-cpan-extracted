@@ -1,6 +1,6 @@
 package Lemonldap::NG::Manager::Api::Providers::CasApp;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.23.0';
 
 package Lemonldap::NG::Manager::Api;
 
@@ -20,7 +20,7 @@ sub getCasAppByConfKey {
     $self->logger->debug("[API] CAS App $confKey configuration requested");
 
     # Get latest configuration
-    my $conf = $self->_confAcc->getConf;
+    my $conf = $self->_confAcc->getConf( { noCache => 1 } );
 
     my $casApp = $self->_getCasAppByConfKey( $conf, $confKey );
 
@@ -52,7 +52,7 @@ sub findCasAppByConfKey {
         "[API] Find CAS Apps by confKey regexp $pattern requested");
 
     # Get latest configuration
-    my $conf = $self->_confAcc->getConf;
+    my $conf = $self->_confAcc->getConf( { noCache => 1 } );
 
     my @casApps =
       map { $_ =~ $pattern ? $self->_getCasAppByConfKey( $conf, $_ ) : () }
@@ -79,7 +79,7 @@ sub findCasAppsByServiceUrl {
         "[API] Find CAS Apps by service URL $serviceUrl requested");
 
     # Get latest configuration
-    my $conf = $self->_confAcc->getConf;
+    my $conf = $self->_confAcc->getConf( { noCache => 1 } );
 
     my $casApp = $self->_getCasAppByServiceUrl( $conf, $serviceUrl );
     return $self->sendError( $req,
@@ -138,7 +138,7 @@ sub addCasApp {
 
     my $res = $self->_pushCasApp( $conf, $add->{confKey}, $add, 1 );
 
-    return $self->sendError( $req, $res->{msg}, $res->{code} || 400 )
+    return $self->sendError( $req, $res->{msg}, 400 )
       unless ( $res->{res} eq 'ok' );
 
     return $self->sendJSONresponse(
@@ -179,7 +179,7 @@ sub updateCasApp {
 
     $res = $self->_pushCasApp( $conf, $confKey, $update, 0 );
 
-    return $self->sendError( $req, $res->{msg}, $res->{code} || 400 )
+    return $self->sendError( $req, $res->{msg}, 400 )
       unless ( $res->{res} eq 'ok' );
 
     return $self->sendJSONresponse( $req, undef, code => 204 );
@@ -212,7 +212,7 @@ sub replaceCasApp {
       unless ( $res->{res} eq 'ok' );
 
     $res = $self->_pushCasApp( $conf, $confKey, $replace, 1 );
-    return $self->sendError( $req, $res->{msg}, $res->{code} || 400 )
+    return $self->sendError( $req, $res->{msg}, 400 )
       unless ( $res->{res} eq 'ok' );
 
     return $self->sendJSONresponse( $req, undef, code => 204 );
@@ -241,13 +241,9 @@ sub deleteCasApp {
     delete $conf->{casAppMetaDataMacros}->{$confKey};
 
     # Save configuration
-    if ( $self->_saveApplyConf($conf) ) {
-        return $self->sendJSONresponse( $req, undef, code => 204 );
-    }
-    else {
-        return $self->sendError( $req,
-            "Failed to save configuration, please try again later", 503 );
-    }
+    $self->_saveApplyConf($conf);
+
+    return $self->sendJSONresponse( $req, undef, code => 204 );
 }
 
 sub _getCasAppByConfKey {
@@ -356,7 +352,8 @@ sub _pushCasApp {
         foreach ( keys %{ $push->{options} } ) {
             my $optionName = $self->_translateOptionApiToConf( $_, 'casApp' );
             my $optionValue =
-              $self->_translateValueApiToConf( $optionName, $push->{options}->{$_} );
+              $self->_translateValueApiToConf( $optionName,
+                $push->{options}->{$_} );
 
             $translatedOptions->{$optionName} = $optionValue;
         }
@@ -365,19 +362,16 @@ sub _pushCasApp {
             'casAppMetaDataNode' );
         return $res unless ( $res->{res} eq 'ok' );
 
-        foreach ( keys %{$translatedOptions} ) {
-            $conf->{casAppMetaDataOptions}->{$confKey}->{$_} =
-              $translatedOptions->{$_};
-        }
-
+        $self->_merge_hash( $conf, 'casAppMetaDataOptions', $confKey,
+            $translatedOptions );
     }
 
     if ( defined $push->{exportedVars} ) {
         if ( $self->_isSimpleKeyValueHash( $push->{exportedVars} ) ) {
-            foreach ( keys %{ $push->{exportedVars} } ) {
-                $conf->{casAppMetaDataExportedVars}->{$confKey}->{$_} =
-                  $push->{exportedVars}->{$_};
-            }
+            $self->_merge_hash(
+                $conf,    'casAppMetaDataExportedVars',
+                $confKey, $push->{exportedVars}
+            );
         }
         else {
             return {
@@ -390,10 +384,8 @@ sub _pushCasApp {
 
     if ( defined $push->{macros} ) {
         if ( $self->_isSimpleKeyValueHash( $push->{macros} ) ) {
-            foreach ( keys %{ $push->{macros} } ) {
-                $conf->{casAppMetaDataMacros}->{$confKey}->{$_} =
-                  $push->{macros}->{$_};
-            }
+            $self->_merge_hash( $conf, 'casAppMetaDataMacros', $confKey,
+                $push->{macros} );
         }
         else {
             return {
@@ -406,30 +398,24 @@ sub _pushCasApp {
 
     # Test new configuration
     my $parser = Lemonldap::NG::Manager::Conf::Parser->new( {
-            refConf => $self->_confAcc->getConf,
+            refConf => $self->_confAcc->getConf( { noCache => 1 } ),
             newConf => $conf,
             req     => {},
         }
     );
     unless ( $parser->testNewConf( $self->p ) ) {
         return {
-            res => 'ko',
-            msg => "Configuration error: "
+            res  => 'ko',
+            code => 400,
+            msg  => "Configuration error: "
               . join( ". ", map { $_->{message} } @{ $parser->errors } ),
         };
     }
 
     # Save configuration
-    if ( $self->_saveApplyConf($conf) ) {
-        return { res => 'ok' };
-    }
-    else {
-        return {
-            res  => 'ko',
-            msg  => "Failed to save configuration, please try again later",
-            code => 503,
-        };
-    }
+    $self->_saveApplyConf($conf);
+
+    return { res => 'ok' };
 }
 
 1;

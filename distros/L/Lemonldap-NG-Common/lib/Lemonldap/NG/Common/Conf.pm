@@ -27,11 +27,9 @@ use Config::IniFiles;
 #inherits Lemonldap::NG::Common::Conf::Backends::SOAP
 #inherits Lemonldap::NG::Common::Conf::Backends::LDAP
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 our $msg     = '';
 our $iniObj;
-
-our $PlaceHolderRe = '%SERVERENV:(.*?)%';
 
 BEGIN {
     eval {
@@ -74,9 +72,13 @@ sub new {
             # Use local conf to get configStorage and localStorage
             my $localConfAccessPrms =
               $self->getLocalConf( CONFSECTION, $self->{confFile}, 0 );
-            $self->replacePlaceholders($localConfAccessPrms)
-              if $localConfAccessPrms->{useServerEnv};
+
             if ( defined $localConfAccessPrms ) {
+                %$self = ( %$self, %$localConfAccessPrms );
+                $self->replacePlaceholders($localConfAccessPrms);
+
+                # localConfAccessPrms might have changed so we need to
+                # update $self
                 %$self = ( %$self, %$localConfAccessPrms );
             }
         }
@@ -123,7 +125,9 @@ sub new {
 sub saveConf {
     my ( $self, $conf, %args ) = @_;
 
-    my $last = $self->lastCfg;
+    # noCache => 1 disables the localStorage fallback in lastCfg, so a stale
+    # cached cfgNum cannot let us overwrite a newer central configuration.
+    my $last = $self->lastCfg( { noCache => 1 } );
 
     # If configuration was modified, return an error
     if ( not $args{force} ) {
@@ -218,7 +222,7 @@ sub getConf {
     # Check cfgNum in conf backend
     # Get conf in backend only if a newer configuration is available
     else {
-        $cfgNum ||= $self->lastCfg;
+        $cfgNum ||= $self->lastCfg( { noCache => $noCache } );
         unless ($cfgNum) {
             $msg .= "Error: No configuration available in backend.\n";
         }
@@ -277,7 +281,7 @@ sub getConf {
     # Create cipher object and replace variable placeholder
     unless ($raw) {
 
-        $self->replacePlaceholders($res) if $self->{useServerEnv};
+        $self->replacePlaceholders($res);
         eval {
             $res->{cipher} = Lemonldap::NG::Common::Crypto->new( $res->{key} );
         };
@@ -430,7 +434,7 @@ sub getLocalConf {
         }
     }
 
-    $self->replacePlaceholders($r) if $self->{useServerEnv};
+    $self->replacePlaceholders($r);
     return $r;
 }
 
@@ -502,11 +506,33 @@ sub available {
     return shift->_launch( 'available', @_ );
 }
 
-## @method int lastCfg()
+## @method int lastCfg(hashRef args)
 # Call lastCfg() from the $self->{type} package.
-# @return Number of the last configuration available
+#
+# When the backend call fails (returns undef/0) and a populated localStorage
+# is available, returns the cfgNum of the cached configuration except if
+# noCache is set.
+#
+# @param $args Optional hashRef, recognized keys: noCache
+# @return Number of the last configuration available, 0 on failure
 sub lastCfg {
-    return shift->_launch( 'lastCfg', @_ ) || 0;
+    my ( $self, $args ) = @_;
+    $args ||= {};
+    my $r = $self->_launch('lastCfg');
+    return $r if $r;
+
+    if ( !$args->{noCache} and ref( $self->{refLocalStorage} ) ) {
+        my $cached;
+        eval { $cached = $self->{refLocalStorage}->get('conf') };
+        $msg .= "Warn: $@\n" if $@;
+        if ( ref($cached) and $cached->{cfgNum} ) {
+            $msg .=
+                "lastCfg failed, falling back to cached configuration "
+              . "(cfgNum=$cached->{cfgNum}).\n";
+            return $cached->{cfgNum};
+        }
+    }
+    return 0;
 }
 
 ## @method boolean lock()
@@ -565,9 +591,13 @@ sub logError {
 }
 
 sub _substPlaceHolders {
-    return $_[0] unless $_[0];
-    $_[0] =~ s/$PlaceHolderRe/$ENV{$1}/ge;
-    return $_[0];
+    my ( $self, $string, $placeholder_config ) = @_;
+    return $string unless $string;
+
+    while ( my ( $key, $value ) = each %$placeholder_config ) {
+        $string =~ s/%\Q$key\E:(.*?)%/$value->($1)/ge;
+    }
+    return $string;
 }
 
 ## @method void replacePlaceholders(res: LLNG_Conf)
@@ -575,30 +605,54 @@ sub _substPlaceHolders {
 # Recursively replace %SERVERENV:VariableName% by $ENV{VariableName} value
 sub replacePlaceholders {
     my ( $self, $conf ) = @_;
+
+    my $placeholder_config = {};
+    if ( $self->{useServerEnv} ) {
+        $placeholder_config->{SERVERENV} = sub { $ENV{ $_[0] } };
+    }
+    if ( my $moduleList = $self->{configPlaceHolderModules} ) {
+        for my $moduledef ( split( /[,\s]+/, $moduleList ) ) {
+            if ( my ( $prefix, $module ) =
+                $moduledef =~ /(\w+)\s*=\s*([\w:]+)/ )
+            {
+                eval "require $module";
+                $placeholder_config->{$prefix} =
+                  sub { $module->replace( $self, $_[0] ) };
+            }
+        }
+    }
+
+    return $self->_replacePlaceholder_recurse( $conf, $placeholder_config );
+}
+
+sub _replacePlaceholder_recurse {
+    my ( $self, $conf, $placeholder_config ) = @_;
     if ( ref $conf eq 'HASH' ) {
-        foreach my $key ( keys %$conf ) {
-            if ( $key =~ /$PlaceHolderRe/ ) {
-                my $val = $conf->{$key};
-                delete $conf->{$key};
-                my $nk = _substPlaceHolders($key);
-                $conf->{$nk} = $val;
+        foreach my $oldkey ( keys %$conf ) {
+            my $key = $self->_substPlaceHolders( $oldkey, $placeholder_config );
+            if ( $key ne $oldkey ) {
+                $conf->{$key} = delete $conf->{$oldkey};
             }
             next unless ( $conf->{$key} );
             if ( ref $conf->{$key} ) {
-                $self->replacePlaceholders( $conf->{$key} );
+                $self->_replacePlaceholder_recurse( $conf->{$key},
+                    $placeholder_config );
             }
-            elsif ( $conf->{$key} =~ /$PlaceHolderRe/ ) {
-                $conf->{$key} = _substPlaceHolders( $conf->{$key} );
+            else {
+                $conf->{$key} = $self->_substPlaceHolders( $conf->{$key},
+                    $placeholder_config );
             }
         }
     }
     elsif ( ref $conf eq 'ARRAY' ) {
         for ( my $i = 0 ; $i < @$conf ; $i++ ) {
             if ( ref $conf->[$i] ) {
-                $self->replacePlaceholders( $conf->[$i] );
+                $self->_replacePlaceholder_recurse( $conf->[$i],
+                    $placeholder_config );
             }
-            elsif ( $conf->[$i] =~ /$PlaceHolderRe/ ) {
-                $conf->[$i] = _substPlaceHolders( $conf->[$i] );
+            else {
+                $conf->[$i] =
+                  $self->_substPlaceHolders( $conf->[$i], $placeholder_config );
             }
         }
     }

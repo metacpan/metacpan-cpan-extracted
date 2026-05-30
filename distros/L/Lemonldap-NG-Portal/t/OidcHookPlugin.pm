@@ -7,6 +7,10 @@ use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_SENDRESPONSE PE_DONE);
 use Data::Dumper;
 use Test::More;
 
+our $generateRefreshTokenCalled = '';
+our $lastTokenResponseGrantType = '';
+our $refreshSendResponse        = 0;
+
 has confEnabled => (
     is      => 'rw',
     default => 1,
@@ -36,15 +40,18 @@ use constant hook => {
     oidcGenerateAccessToken           => 'addClaimToAccessToken',
     oidcGenerateTokenResponse         => 'addCustomToken',
     oidcGotClientCredentialsGrant     => 'oidcGotClientCredentialsGrant',
-    oidcGenerateAuthenticationRequest => 'genAuthRequest',
-    oidcGenerateTokenRequest          => 'genTokenRequest',
-    oidcGotUserInfo                   => 'modifyUserInfo',
-    oidcGotIDToken                    => 'modifyIDToken',
     oidcGotOnlineRefresh              => 'refreshHook',
     oidcGotOfflineRefresh             => 'refreshHook',
     oidcGotTokenExchange              => 'tokenExchange',
     getOidcRpConfig                   => 'getRp',
     oidcValidateRedirectUri           => 'allowOnlyLocalhost',
+    oidcGenerateAuthorizationResponse => 'buildAuthzResponse',
+    oidcGenerateIntrospectionResponse => 'buildIntrospectionResponse',
+    oidcGotTokenRequest               => 'gotTokenRequest',
+    oidcGenerateRefreshToken          => 'generateRefreshToken',
+    oidcGotRegistrationRequest        => 'gotRegistrationRequest',
+    oidcRegisterClient                => 'registerClient',
+    oidcGenerateMetadata              => 'addCustomMetadata',
 };
 
 sub addClaimToIDToken {
@@ -98,8 +105,10 @@ sub addClaimToAccessToken {
 }
 
 sub addCustomToken {
-    my ( $self, $req, $rp, $response, $codeSession, $userSession ) = @_;
+    my ( $self, $req, $rp, $response, $codeSession, $userSession, $grant_type )
+      = @_;
     $response->{custom_token} = 'CustomToken';
+    $lastTokenResponseGrantType = $grant_type || '';
     return PE_OK;
 }
 
@@ -110,38 +119,16 @@ sub oidcGotClientCredentialsGrant {
     return PE_OK;
 }
 
-sub genTokenRequest {
-    my ( $self, $req, $op, $authorize_request_params ) = @_;
-
-    $authorize_request_params->{my_param} = "my value";
-    return PE_OK;
-}
-
-sub genAuthRequest {
-    my ( $self, $req, $op, $token_request_params ) = @_;
-
-    $token_request_params->{my_param} = "my value";
-    return PE_OK;
-}
-
-sub modifyIDToken {
-    my ( $self, $req, $op, $id_token_payload_hash ) = @_;
-
-    # do some post-processing on the `sub` claim
-    $req->sessionInfo->{id_token_hook} = "$op/" . $id_token_payload_hash->{sub};
-    return PE_OK;
-}
-
-sub modifyUserInfo {
-    my ( $self, $req, $op, $userinfo_content ) = @_;
-
-    # Custom attribute processing
-    $req->sessionInfo->{userinfo_hook} = "$op/" . $userinfo_content->{sub};
-    return PE_OK;
-}
-
 sub refreshHook {
     my ( $self, $req, $rp, $refreshInfo, $sessionInfo ) = @_;
+
+    # Test PE_SENDRESPONSE support
+    if ($refreshSendResponse) {
+        $req->response(
+            [ 200, [ 'Content-Type' => 'text/plain' ], ['Direct response'] ] );
+        return PE_SENDRESPONSE;
+    }
+
     my $uid = $refreshInfo->{uid} || ( "online_" . $sessionInfo->{uid} );
     $refreshInfo->{scope} = $refreshInfo->{scope} . " refreshed_" . $uid;
     return PE_OK;
@@ -163,7 +150,7 @@ sub getRp {
 
     $config->{ttl} = 600;
 
-    return unless $client_id eq "hookclient" and $self->confEnabled;
+    return PE_OK unless $client_id eq "hookclient" and $self->confEnabled;
 
     %$config = (
         confKey    => "hook.hookclient",
@@ -221,6 +208,89 @@ sub allowOnlyLocalhost {
     # LemonLDAP::NG's built-in logic, which is to only allow
     # explicitely declared URIs
 
+    return PE_OK;
+}
+
+sub buildAuthzResponse {
+    my ( $self, $req, $oidc_request, $rp, $response_params ) = @_;
+
+    # Add a custom parameter to the authorization response
+    $response_params->{authz_hook} = "hooked";
+
+    return PE_OK;
+}
+
+sub buildIntrospectionResponse {
+    my ( $self, $req, $response, $rp, $token_data ) = @_;
+
+    # Add custom claim to introspection response
+    $response->{introspection_hook} = "hooked";
+
+    return PE_OK;
+}
+
+sub gotTokenRequest {
+    my ( $self, $req, $rp, $grant_type ) = @_;
+
+    # Handle a custom grant type for testing
+    if ( $grant_type eq 'urn:test:custom_grant' ) {
+        $req->response(
+            $self->p->sendJSONresponse(
+                $req,
+                {
+                    custom_grant => 1,
+                    grant_type   => $grant_type,
+                    rp           => $rp,
+                }
+            )
+        );
+        return PE_SENDRESPONSE;
+    }
+
+    return PE_OK;
+}
+
+sub generateRefreshToken {
+    my ( $self, $req, $info, $rp, $offline ) = @_;
+
+    # Add custom data to refresh token
+    $info->{refresh_hook} = "hooked_$rp";
+
+    # Mark that this hook was called
+    $generateRefreshTokenCalled = 1;
+
+    return PE_OK;
+}
+
+sub gotRegistrationRequest {
+    my ( $self, $req, $client_metadata ) = @_;
+
+    # Deny registration for clients with a specific redirect_uri pattern
+    my $redirect_uris = $client_metadata->{redirect_uris} || [];
+    for my $uri (@$redirect_uris) {
+        if ( $uri =~ /^https:\/\/denied\.example\.com\// ) {
+            $req->response(
+                $self->p->sendError( $req, 'registration_not_allowed', 403 ) );
+            return PE_SENDRESPONSE;
+        }
+    }
+
+    return PE_OK;    # Defer to default behavior
+}
+
+sub registerClient {
+    my ( $self, $req, $newRp, $client_metadata ) = @_;
+
+    # Add a custom option to the new RP
+    $newRp->{options}->{oidcRPMetaDataOptionsBypassConsent} = 1;
+
+    return PE_OK;
+}
+
+sub addCustomMetadata {
+    my ( $self, $req, $metadata ) = @_;
+    $metadata->{custom_metadata_hook} = 'hooked';
+    push @{ $metadata->{grant_types_supported} }, 'urn:test:custom_grant';
     return PE_OK;
 }
 

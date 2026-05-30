@@ -251,8 +251,8 @@ sub runTest {
         );
     }
     my $nbCall = $adminLogout ? 3 : 1;
-    ok( $op2rpRequestCount == ($i + $nbCall), "$nbCall request sent ro RP" )
-      or explain( $op2rpRequestCount, ($i+$nbCall) );
+    ok( $op2rpRequestCount == ( $i + $nbCall ), "$nbCall request sent ro RP" )
+      or explain( $op2rpRequestCount, ( $i + $nbCall ) );
     is(
         $lastRpRequest,
         'http://auth.rp.com/oauth2/blogout',

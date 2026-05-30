@@ -17,7 +17,7 @@ extends qw(
   Lemonldap::NG::Common::Conf::AccessLib
 );
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -105,7 +105,8 @@ sub userLogout {
             if ( $sessions and %$sessions ) {
                 @keys = keys %$sessions;
                 foreach my $sid (@keys) {
-                    my $kind = $sessions->{$sid}->{_session_kind};
+                    my $kind            = $sessions->{$sid}->{_session_kind};
+                    my $deletedByPortal = 0;
                     if (
                         $self->{tokenRevokeSecret}
                         and (
@@ -123,8 +124,10 @@ sub userLogout {
                             token      => $sid,
                             raw        => 1,
                         );
+                        my $portal = $self->{portal};
+                        $portal =~ s#/+$##;
                         my $lreq = HTTP::Request->new(
-                            POST => "$self->{portal}/admintokenrevoke",
+                            POST => "$portal/admintokenrevoke",
                             [
                                 Authorization =>
                                   "Bearer $self->{tokenRevokeSecret}",
@@ -139,6 +142,8 @@ sub userLogout {
                         if ( $resp->is_success ) {
                             $self->logger->info(
                                 "Session $type/$sid deleted by portal");
+                            $deletedByPortal = 1;
+                            $count++;
                         }
                         else {
                             $self->logger->error(
@@ -146,6 +151,9 @@ sub userLogout {
                                   . $resp->status_line );
                         }
                     }
+
+                    # Skip manual removal if already deleted by portal
+                    next if $deletedByPortal;
 
                     my $session = Lemonldap::NG::Common::Session->new(
                         storageModule        => $storageModule,

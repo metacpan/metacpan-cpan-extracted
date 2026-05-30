@@ -140,6 +140,7 @@ ok(
 );
 
 expectOK($res);
+
 #diag $res->[2]->[0];
 ok( $res->[2]->[0] =~ /"exp":\d/, 'Number are well encoded' );
 $json = from_json( $res->[2]->[0] );

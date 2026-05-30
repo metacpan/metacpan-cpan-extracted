@@ -5,7 +5,7 @@ use Mouse;
 use Lemonldap::NG::Common::Util qw(isHiddenAttr);
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::Util qw/display2F getPSessionID/;
-use JSON qw(from_json to_json);
+use JSON                        qw(from_json to_json);
 
 our $VERSION = '2.21.0';
 
@@ -13,11 +13,6 @@ has sessionTypes => ( is => 'rw' );
 
 # Boolean value to tell if storage ID is hashed or not
 has hashedSessionStore => ( is => 'rw' );
-
-sub hiddenAttributes {
-    my ($self) = @_;
-    return $self->{hiddenAttributes} || $self->conf->{hiddenAttributes};
-}
 
 sub setTypes {
     my ( $self, $conf ) = @_;
@@ -330,8 +325,8 @@ qq{Use of an uninitialized attribute "$group" to group sessions},
                       or $a[2] <=> $b[2]
                       or $a[3] <=> $b[3] )
                   : $a->{value} cmp $b->{value}
-              }
-              map { { value => $_, count => $r->{$_} } } keys %$r
+            }
+            map { { value => $_, count => $r->{$_} } } keys %$r
         ];
     }
 
@@ -340,7 +335,7 @@ qq{Use of an uninitialized attribute "$group" to group sessions},
     else {
         $res = [
             sort { $a->{userId} cmp $b->{userId} }
-              map {
+            map {
                 {
                     session => $_,
                     userId  => $res->{$_}->{_session_uid},
@@ -472,8 +467,7 @@ sub _session {
     my %session = %{ $apacheSession->data };
     unless ($raw) {
         foreach ( keys %session ) {
-            $session{$_} = '******'
-              if isHiddenAttr( $self->hiddenAttributes, $_ );
+            $session{$_} = '******' if isHiddenAttr( $self->conf, $_ );
         }
     }
 

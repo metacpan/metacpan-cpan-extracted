@@ -342,7 +342,7 @@ llapp.controller('TreeCtrl', [
       return node.nodes.push({
         id: `${node.id}/n${idinc++}`,
         title: 'New rule',
-        re: 'Message',
+        re: '"Message"',
         comment: 'New rule',
         data: '1',
         type: "grant"
@@ -597,6 +597,20 @@ llapp.controller('TreeCtrl', [
         'samlPartnerName',
         'sp-example');
     };
+    $scope.duplicateSamlSp = function() {
+      $scope.message = {
+        title: 'samlPartnerName',
+        field: 'name'
+      };
+      return $scope.showModal('prompt.html',
+        'sp-copy').then(function() {
+        var n;
+        n = $scope.result;
+        return $scope.duplicateNode(n,
+          'samlSPMetaDataNode',
+          $scope.currentNode.title);
+      });
+    };
     $scope.addOidcOp = function() {
       return $scope.newTemplateNode('oidcOPMetaDataNode',
         'oidcOPName',
@@ -607,6 +621,20 @@ llapp.controller('TreeCtrl', [
         'oidcRPName',
         'rp-example');
     };
+    $scope.duplicateOidcRp = function() {
+      $scope.message = {
+        title: 'oidcRPName',
+        field: 'name'
+      };
+      return $scope.showModal('prompt.html',
+        'rp-copy').then(function() {
+        var n;
+        n = $scope.result;
+        return $scope.duplicateNode(n,
+          'oidcRPMetaDataNode',
+          $scope.currentNode.title);
+      });
+    };
     $scope.addCasSrv = function() {
       return $scope.newTemplateNode('casSrvMetaDataNode',
         'casPartnerName',
@@ -616,6 +644,20 @@ llapp.controller('TreeCtrl', [
       return $scope.newTemplateNode('casAppMetaDataNode',
         'casPartnerName',
         'app-example');
+    };
+    $scope.duplicateCasApp = function() {
+      $scope.message = {
+        title: 'casPartnerName',
+        field: 'name'
+      };
+      return $scope.showModal('prompt.html',
+        'app-copy').then(function() {
+        var n;
+        n = $scope.result;
+        return $scope.duplicateNode(n,
+          'casAppMetaDataNode',
+          $scope.currentNode.title);
+      });
     };
     $scope.addKey = function() {
       return $scope.newTemplateNode('keyNode',

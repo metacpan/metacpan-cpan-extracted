@@ -11,8 +11,8 @@ package Spreadsheet::Edit::Log;
 
 # Allow "use <thismodule> VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1001.003'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2026-05-05'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1001.004'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2026-05-30'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
 use Scalar::Util qw/reftype refaddr blessed weaken openhandle/;
@@ -24,7 +24,7 @@ use Exporter 5.57 ();
 our @EXPORT = qw/fmt_call log_call fmt_methcall log_methcall
                  nearest_call abbrev_call_fn_ln_subname/;
 
-our @EXPORT_OK = qw/btw btwN btwbt btwN_str oops set_logdest
+our @EXPORT_OK = qw/btw btwN btwbt btwN_str btwpad oops set_logdest
                     colorize ERROR_COLOR WARN_COLOR BOLD_COLOR SUCCESS_COLOR
                     _can_colorize/;
 
@@ -58,6 +58,9 @@ sub _getcode($) {
 }
 sub colorize($$) {
   my ($str, $colortype) = @_;
+  if (! exists $ENV{NO_COLOR}) {
+     $ENV{NO_COLOR} = ! -t &get_effective_logdest();
+  }
   return $str
     if $ENV{NO_COLOR};  # check every time
   my ($color_start, $color_end);
@@ -121,7 +124,7 @@ sub import {
         if keys(%btw_importing_pkgs) && !$btw_importing_pkgs{$pkg};
       $btw_importing_pkgs{$pkg}++;
       if (/^:btw$/) {
-        push @remaining_args, qw/btw btwN btwbt btwN_str/;
+        push @remaining_args, qw/btw btwN btwbt btwpad btwN_str/;
         next;
       }
     }
@@ -132,18 +135,29 @@ sub import {
   goto &Exporter::import
 }#import
 
+our $btw_prefix = "";
+sub btwpad {
+  my $prev = $btw_prefix;
+  if (defined (my $new = $_[0])) {
+    if ($new =~ /^([-+]?)\d+$/) {
+      $btw_prefix = " " x ($1 ? (length($btw_prefix) + $new) : $new);
+    } else {
+      $btw_prefix = $new; # literal string
+    }
+  }
+  return $prev;
+}
+
 sub _btwN_str_back1($@) { # does not show top call frame
   my ($N, @strings) = @_;
-  local $@;
-  local $_ = join("", @strings);
-  s/\n\z//s;
+  local ($@, $!, $^E, $., $,, $/, $\, $?, $^W);
   my (@frames, $pkg_obvious);
-  #my $sep = ">";
-  #my $sep = " → ";
-  #my $sep = " ⇢ ";
-  #my $sep = " » "; # « exists in both Unicode and latin1
-  #my $sep = " ⇒ ";
-  my $sep = "»";
+  #my $framesep = ">";
+  #my $framesep = " → ";
+  #my $framesep = " ⇢ ";
+  #my $framesep = " » "; # « exists in both Unicode and latin1
+  #my $framesep = " ⇒ ";
+  my $framesep = "»";
   my @levels;
   if (ref($N) eq "") {
     @levels = ($N);
@@ -153,7 +167,7 @@ sub _btwN_str_back1($@) { # does not show top call frame
   }
   elsif (ref($N) eq 'ARRAY' && @$N > 0 && all{defined} @$N) {
     @levels = sort { $a <=> $b } @$N;  # arbitrary list of levels
-    $sep = "," unless $#levels == ($levels[-1] - $levels[0]);
+    $framesep = "," unless $#levels == ($levels[-1] - $levels[0]);
   }
   else {
     carp "Invalid N arg to btwN: ${\vis($N)}\n";
@@ -215,7 +229,7 @@ sub _btwN_str_back1($@) { # does not show top call frame
       }
       $s = $s ? " ${pkg}:$lno" : "${pkg}:$lno"
     }
-    $pfx .= $sep if $pfx;
+    $pfx .= $framesep if $pfx;
     if (defined($prev_n)) {
       $pfx .= "«" x (($prev_n-$n)-1); # n.b. reverse order (n high to low)
     }
@@ -223,10 +237,13 @@ sub _btwN_str_back1($@) { # does not show top call frame
     $prev_pkg = $pkg;
     $prev_n = $n;
   }
-  $pfx .= "> ";
 
-  $_ = colorize($_, WARN_COLOR);
-  "${pfx}${_}";
+  my $s = join("", @strings);
+  $s =~ s/\R\z//s;
+  $s =~ s/(\R)(?=.)/$1 . btwpad() /esg;
+  $s = colorize($s, WARN_COLOR);
+
+  btwpad."${pfx}> ${s}";
 }#_btwN_str_back1
 
 sub btwN_str($@) { # Just the message string, sans final newline
@@ -655,7 +672,8 @@ B<btw> prints a message to STDERR
 preceeded by "package:linenum> "
 giving the location I<of the call to btw>.
 A newline is appended to the message unless the last STRING already
-ends with a newline.  The message is colorized unless $ENV{NO_COLOR} is true.
+ends with a newline.  The message is colorized if the output is
+a terminal (but see NO_COLOR).
 
 In effect, C<btw> does what Perl's C<warn> does when the message omits a final newline,
 but with a different presentation.
@@ -669,9 +687,30 @@ B<btwbt> displays an inline mini traceback before the message, like this:
 
 The package name is omitted if it is obvious.
 
+=head2 $prev_string = btwpad($num_spaces or "+$incr" or "-$incr" or $literal_string)
+
+=head2 $current_string = btwpad();
+
+Specify a string to be prefixed to every btw message.
+If an integer is given, the prefix will consist of that many spaces;
+with a + or - the previous width is incremented/decremented.
+Otherwise the argument string will be used literally as the prefix.
+For example, to indicate recursion level:
+
+  use Guard qw/scope_guard/;
+
+  sub recursive_func {
+    ...
+    my $inner_result = do{
+      btwpad("+1"); scope_guard{ btwpad("-1") };
+      __SUB__->( ... );
+    };
+    ...
+  }
+
 =head2 :btw import tag
 
-imports all three functions (btw, btwN and btwbt).
+imports btw, btwN, btwbt and btwpad.
 
 =head2 oops STRING,STRING,...
 
@@ -701,7 +740,9 @@ default foreground color.
 
 =over
 
-=item NO_COLOR (true to make C<btw> functions and C<colorize> not colorize).
+=item NO_COLOR
+
+If set, a true value disables colorization and false ("0" or "") unconditionally enables.  If not set, colorizes if the I<logdest> handle is a terminal.
 
 =back
 

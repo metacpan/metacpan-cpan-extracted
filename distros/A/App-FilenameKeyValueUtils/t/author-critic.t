@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/FilenameKeyValueUtils.pm','script/modify-keyvalue-filename','script/normalize-keyvalue-filename','script/parse-keyvalue-filename','script/rename-add-keyvalue-filenames','script/rename-remove-keyvalue-filenames'];
+my $filenames = ['lib/App/FilenameKeyValueUtils.pm','script/modify-keyvalue-filename','script/normalize-keyvalue-filename','script/parse-keyvalue-filename','script/rename-add-keyvalue-filenames','script/rename-modify-keyvalue-filenames','script/rename-remove-keyvalue-filenames','script/rename-replace-keyvalue-filenames'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

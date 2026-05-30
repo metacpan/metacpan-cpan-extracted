@@ -150,7 +150,7 @@ sub _test_purge {
     return $result;
 }
 
-use_ok( 'Lemonldap::NG::Common::Session::Purge', "Module successfully loaded" );
+use_ok('Lemonldap::NG::Common::Session::Purge');
 
 subtest "Purge psessions that are too old" => sub {
     _cleanSessions;

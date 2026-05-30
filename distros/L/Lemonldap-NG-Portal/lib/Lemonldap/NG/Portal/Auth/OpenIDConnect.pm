@@ -2,9 +2,9 @@ package Lemonldap::NG::Portal::Auth::OpenIDConnect;
 
 use strict;
 use Mouse;
-use MIME::Base64 qw/encode_base64 decode_base64/;
-use Scalar::Util qw/looks_like_number/;
-use Lemonldap::NG::Common::JWT qw(getJWTPayload);
+use MIME::Base64                           qw/encode_base64 decode_base64/;
+use Scalar::Util                           qw/looks_like_number/;
+use Lemonldap::NG::Common::JWT             qw(getJWTPayload);
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_IDPCHOICE
@@ -13,7 +13,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_REDIRECT
 );
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Auth
@@ -141,12 +141,35 @@ sub extractFormInfo {
         $self->logger->debug(
             'OpenIDConnect callback URI detected: ' . $req->uri );
 
-        # AuthN Response
-        my $state = $req->param('state');
+        # Initialize callback_params with all known OIDC callback parameters
+        my $callback_params = {
+            state             => scalar( $req->param('state') ),
+            code              => scalar( $req->param('code') ),
+            error             => scalar( $req->param('error') ),
+            error_description => scalar( $req->param('error_description') ),
+            error_uri         => scalar( $req->param('error_uri') ),
+            iss               => scalar( $req->param('iss') ),
+        };
+
+        # Call hook - plugins can modify callback_params
+        my $hook_res =
+          $self->p->processHook( $req, 'oidcGotAuthenticationResponse',
+            $callback_params );
+        return $hook_res if ( $hook_res != PE_OK and $hook_res > 0 );
 
         # Restore state
+        my $state = $callback_params->{state};
         if ($state) {
-            if ( $self->extractState( $req, $state ) ) {
+
+          # If state is a hashref, hook already extracted it - skip extractState
+          # If state is a scalar, call extractState
+            if ( ref($state) eq 'HASH' ) {
+                $self->logger->debug("State already extracted by hook");
+                $req->data->{_oidcOPCurrent} = $state->{_oidcOPCurrent};
+                $req->data->{_oidcNonce}     = $state->{_oidcNonce};
+                $req->data->{_url}           = $state->{urldc};
+            }
+            elsif ( $self->extractState( $req, $state ) ) {
                 $self->logger->debug("State $state extracted");
             }
             else {
@@ -165,11 +188,33 @@ sub extractFormInfo {
 
         $self->logger->debug("Using OpenIDConnect Provider $op");
 
+        # RFC 9207: Verify iss parameter if present or required
+        my $iss          = $callback_params->{iss};
+        my $expected_iss = $self->opMetadata->{$op}->{conf}->{issuer};
+
+        if ($iss) {
+            unless ( $iss eq $expected_iss ) {
+                $self->userLogger->error(
+                    "Issuer mismatch: received '$iss', expected '$expected_iss'"
+                );
+                return PE_OIDC_AUTH_ERROR;
+            }
+            $self->logger->debug("Issuer verification passed");
+        }
+        elsif ( $self->conf->{oidcOPMetaDataOptions}->{$op}
+            ->{oidcOPMetaDataOptionsRequireIss} )
+        {
+            $self->userLogger->error(
+"Missing iss parameter in authorization response (required by config)"
+            );
+            return PE_OIDC_AUTH_ERROR;
+        }
+
         # Check error
-        my $error = $req->param("error");
+        my $error = $callback_params->{error};
         if ($error) {
-            my $error_description = $req->param("error_description");
-            my $error_uri         = $req->param("error_uri");
+            my $error_description = $callback_params->{error_description};
+            my $error_uri         = $callback_params->{error_uri};
 
             $self->logger->error("Error returned by $op Provider: $error");
             $self->logger->error("Error description: $error_description")
@@ -180,7 +225,7 @@ sub extractFormInfo {
         }
 
         # Get access_token and id_token
-        my $code = $req->param("code");
+        my $code = $callback_params->{code};
 
         my $content =
           $self->getAuthorizationCodeAccessToken( $req, $op, $code );
@@ -200,6 +245,21 @@ sub extractFormInfo {
         }
         else {
             $self->logger->debug("Token response is valid");
+        }
+
+        # Check if returned scopes match requested scopes (#3585)
+        # Ignore offline_access (often stripped by OP) and ordering differences
+        my $reqs = $self->opOptions->{$op}->{oidcOPMetaDataOptionsScope};
+        if ( my $recs = $token_response->{scope} ) {
+            my %scopes;
+            $scopes{$_} += 1 for split( /\s+/, $reqs );
+            $scopes{$_} -= 1 for split( /\s+/, $recs );
+            delete $scopes{offline_access};
+            if ( grep { $_ } values %scopes ) {
+                $self->userLogger->warn( "OP $op returned different scopes"
+                      . " than requested: requested='$reqs',"
+                      . " received='$recs'" );
+            }
         }
 
         my $access_token  = $token_response->{access_token};
@@ -305,6 +365,12 @@ sub extractFormInfo {
         # Remember sid claim if given
         $req->data->{op_sid} = $id_token_payload_hash->{sid}
           if $id_token_payload_hash->{sid};
+
+        # Remember acr/amr claims
+        $req->data->{id_token_acr} = $id_token_payload_hash->{acr}
+          if $id_token_payload_hash->{acr};
+        $req->data->{id_token_amr} = $id_token_payload_hash->{amr}
+          if $id_token_payload_hash->{amr};
 
         # If access token TTL is given save expiration date
         # (with security margin)
@@ -423,6 +489,21 @@ sub setAuthSessionInfo {
         $req->{sessionInfo}->{_oidc_sub} = $req->data->{id_token_sub};
     }
 
+    if ( $req->data->{id_token_acr} ) {
+        $req->{sessionInfo}->{_oidc_acr} = $req->data->{id_token_acr};
+    }
+
+    if ( $req->data->{id_token_amr} ) {
+        if ( ref( $req->data->{id_token_amr} ) eq "ARRAY" ) {
+            $req->{sessionInfo}->{_oidc_amr} =
+              join $self->conf->{multiValuesSeparator},
+              sort @{ $req->data->{id_token_amr} };
+        }
+        else {
+            $req->{sessionInfo}->{_oidc_amr} = $req->data->{id_token_amr};
+        }
+    }
+
     # Keep ID Token in session
     my $store_IDToken =
       $self->opOptions->{$op}->{oidcOPMetaDataOptionsStoreIDToken};
@@ -522,16 +603,10 @@ sub frontLogout {
     my $badRequest = 0;
     my $logName    = 'OIDC FC Logout';
 
-    my $img      = $self->conf->{staticPrefix} . '/common/icons/ok.png';
-    my $frame    = qq'<html><body><img src="$img"></body></html>';
-    my $response = [
-        200,
-        [
-            'Content-Type'   => 'text/html',
-            'Content-Length' => length($frame)
-        ],
-        [$frame]
-    ];
+    my $img   = $self->conf->{staticPrefix} . '/common/icons/ok.png';
+    my $frame = qq'<html><body><img src="$img"></body></html>';
+    my $response =
+      $self->p->sendTextResponse( $req, $frame, type => 'text/html' );
 
     # LLNG requires sid and iss
     unless ( $iss and $sid ) {
@@ -622,7 +697,7 @@ sub backLogout {
     # TODO: validate "alg" header => prohibit "none" value
 
     # Required fields
-    foreach (qw(iss aud iat jti events)) {
+    foreach (qw(iss aud iat exp jti events)) {
         return $self->p->sendError( $req, "Missing $_", 400 )
           unless $payload->{$_};
     }
@@ -721,7 +796,7 @@ sub backLogout {
         $self->logger->warn("$logName: no session found for $uid");
     }
 
-    return [ 200, [], [] ];
+    return $self->p->sendBinaryResponse( $req, '' );
 }
 
 1;

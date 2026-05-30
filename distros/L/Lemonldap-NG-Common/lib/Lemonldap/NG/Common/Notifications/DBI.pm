@@ -12,7 +12,7 @@ use DBI;
 use Encode;
 use Lemonldap::NG::Common::Lib::DBI qw(check_dbh);
 
-our $VERSION = '2.22.2';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Common::Notifications';
 
@@ -291,7 +291,7 @@ sub getIdentifier {
 
 sub _dbh {
     my $self = shift;
-    my $dbh = check_dbh( $self->{_dbh} );
+    my $dbh  = check_dbh( $self->{_dbh} );
     return $dbh if $dbh;
     delete $self->{_dbh};
     $self->logger->debug("Notification DBI connection lost, getting a new one");

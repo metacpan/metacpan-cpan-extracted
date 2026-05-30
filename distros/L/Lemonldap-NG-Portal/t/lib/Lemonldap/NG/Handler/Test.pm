@@ -72,8 +72,7 @@ sub run {
         $res = $server->request($req);
         my @flatten = &flatten($res);
         print $out JSON::to_json(
-            [ $res->code, [@flatten], [ $res->content ] ] )
-          . "\n";
+            [ $res->code, [@flatten], [ $res->content ] ] ) . "\n";
     }
 }
 

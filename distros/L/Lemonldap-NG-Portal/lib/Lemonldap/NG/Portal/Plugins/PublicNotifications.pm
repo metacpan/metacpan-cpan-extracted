@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
 );
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
@@ -64,7 +64,7 @@ sub getPublicNotifs {
             }
         );
         $req->env->{DISPLAY_PUBLIC_NOTIFICATIONS} = 1 if $res;
-        $req->data->{customScript} .= <<EOF if $res;
+        $req->data->{customScript} .= <<EOF           if $res;
 <script type="application/init">
 {
   "publicNotifications": $res

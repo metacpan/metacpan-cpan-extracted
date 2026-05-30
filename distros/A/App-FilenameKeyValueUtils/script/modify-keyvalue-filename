@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-05-28'; # DATE
+our $DATE = '2026-05-29'; # DATE
 our $DIST = 'App-FilenameKeyValueUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Filename/KeyValue/modify_keyvalue_filename",
@@ -38,7 +38,7 @@ modify-keyvalue-filename - Add/remove/replace key-values in filename that follow
 
 =head1 VERSION
 
-This document describes version 0.002 of modify-keyvalue-filename (from Perl distribution App-FilenameKeyValueUtils), released on 2026-05-28.
+This document describes version 0.003 of modify-keyvalue-filename (from Perl distribution App-FilenameKeyValueUtils), released on 2026-05-29.
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ B<modify-keyvalue-filename> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, 
 
 B<modify-keyvalue-filename> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<modify-keyvalue-filename> [B<L<--add|/"--add=s">>=I<s>|B<L<--add-json|/"--add=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [(B<L<--remove|/"--remove=s@">>=I<str>)+|B<L<--remove-json|/"--remove=s@">>=I<json>] [B<L<--replace|/"--replace=s">>=I<s>|B<L<--replace-json|/"--replace=s">>=I<json>] -- E<lt>I<L<filename|/"--filename=s*">>E<gt>
+B<modify-keyvalue-filename> [B<L<--add|/"--add=s">>=I<s>|B<L<--add-json|/"--add=s">>=I<json>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--ignore|/"--ignore">>|B<L<--no-ignore|/"--ignore">>|B<L<--noignore|/"--ignore">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [(B<L<--remove|/"--remove=s@">>=I<str>)+|B<L<--remove-json|/"--remove=s@">>=I<json>] [B<L<--replace|/"--replace=s">>=I<s>|B<L<--replace-json|/"--replace=s">>=I<json>] -- E<lt>I<L<filename|/"--filename=s*">>E<gt>
 
 
 
@@ -92,6 +92,10 @@ List of key=>value pairs to add.
 
 
 Can also be specified as the 1st command-line argument.
+
+=item B<--ignore>
+
+If set, when filename already has the same key, do nothing.
 
 =item B<--remove-json>=I<s>
 
@@ -232,7 +236,7 @@ For fish and zsh, install L<shcompgen> as described above.
 =head2 Add a key
 
  % modify-keyvalue-filename 'foo-bar-kw1=val1.jpg' --add-json '{"kw2":"val2"}'
- foo-bar--kw1=val1-kw2=val2.jpg
+ foo-bar-kw1=val1-kw2=val2.jpg
 
 =head1 HOMEPAGE
 

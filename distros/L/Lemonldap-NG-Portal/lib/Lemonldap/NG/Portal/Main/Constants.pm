@@ -4,7 +4,7 @@ package Lemonldap::NG::Portal::Main::Constants;
 use strict;
 use Exporter 'import';
 
-our $VERSION = '2.22.2';
+our $VERSION = '2.23.0';
 
 use constant HANDLER => 'Lemonldap::NG::Handler::PSGI::Main';
 use constant URIRE =>
@@ -120,6 +120,7 @@ use constant {
     PE_RETRY_2FA                         => 110,
     PE_PP_PASSWORD_TOO_LONG              => 111,
     PE_PP_PASSWORD_EXPIRES_SOON          => 112,
+    PE_ISSUERTIMEOUT                     => 113,
 };
 
 sub portalConsts {
@@ -146,6 +147,7 @@ sub portalConsts {
         '110' => 'PE_RETRY_2FA',
         '111' => 'PE_PP_PASSWORD_TOO_LONG',
         '112' => 'PE_PP_PASSWORD_EXPIRES_SOON',
+        '113' => 'PE_ISSUERTIMEOUT',
         '2'   => 'PE_FORMEMPTY',
         '20'  => 'PE_NO_PASSWORD_BE',
         '21'  => 'PE_PP_ACCOUNT_LOCKED',
@@ -352,7 +354,8 @@ our @EXPORT_OK = (
     'PE_UNPROTECTEDURL',
     'PE_RETRY_2FA',
     'PE_PP_PASSWORD_TOO_LONG',
-    'PE_PP_PASSWORD_EXPIRES_SOON'
+    'PE_PP_PASSWORD_EXPIRES_SOON',
+    'PE_ISSUERTIMEOUT'
 );
 our %EXPORT_TAGS = ( 'all' => [ @EXPORT_OK, 'import' ], );
 

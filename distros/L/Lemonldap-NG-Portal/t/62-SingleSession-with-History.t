@@ -9,8 +9,7 @@ BEGIN {
 
 my $level = 'error';
 my $res;
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel            => $level,
             authentication      => 'Demo',

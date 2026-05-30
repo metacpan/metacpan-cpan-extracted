@@ -9,8 +9,7 @@ BEGIN {
 
 my $res;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel                       => 'error',
             authentication                 => 'Demo',
@@ -317,7 +316,8 @@ ok( $res->[2]->[0] =~ m%<td scope="row">rtyler/dwho</td>%, 'Found rtyler/dwo' )
 count(15);
 
 my %attributes = map /<td scope="row">(.+)?<\/td>/g, $res->[2]->[0];
-ok( keys %attributes == ( $ENV{LLNG_HASHED_SESSION_STORE} ? 35 : 34), 'Found 34 attributes' )
+ok( keys %attributes == ( $ENV{LLNG_HASHED_SESSION_STORE} ? 35 : 34 ),
+    'Found 34 attributes' )
   or print STDERR ( keys %attributes < 34 )
   ? "Missing attributes -> " . scalar keys(%attributes) . "\n"
   : "Too much attributes -> " . scalar keys(%attributes) . "\n";

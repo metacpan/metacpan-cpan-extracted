@@ -170,7 +170,8 @@ $query = 'oldpassword=dwho&newpassword=t3stUPPER\}&confirmpassword=t3stUPPER\}';
 ok(
     $res = $client->_post(
         '/',
-        IO::String->new($query
+        IO::String->new(
+            $query
         ),
         cookie => "lemonldap=$id",
         accept => 'application/json',

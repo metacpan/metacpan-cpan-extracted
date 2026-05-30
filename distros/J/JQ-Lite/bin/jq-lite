@@ -31,36 +31,32 @@ my %arg_vars;
 my @slurpfiles;
 my $slurpfile_probably_missing_file = 0;
 
+sub _exit_with_error {
+    my ($tag, $default_message, $exit_code, $message) = @_;
+    $message = defined($message) && $message ne '' ? $message : $default_message;
+    $message =~ s/\s+\z//;
+    warn "[$tag]$message\n";
+    exit $exit_code;
+}
+
 sub _usage_error {
     my ($message) = @_;
-    $message ||= 'invalid usage';
-    $message =~ s/\s+\z//;
-    warn "[USAGE]$message\n";
-    exit 5;
+    _exit_with_error('USAGE', 'invalid usage', 5, $message);
 }
 
 sub _input_error {
     my ($message) = @_;
-    $message ||= 'input error';
-    $message =~ s/\s+\z//;
-    warn "[INPUT]$message\n";
-    exit 4;
+    _exit_with_error('INPUT', 'input error', 4, $message);
 }
 
 sub _compile_error {
     my ($message) = @_;
-    $message ||= 'compile error';
-    $message =~ s/\s+\z//;
-    warn "[COMPILE]$message\n";
-    exit 2;
+    _exit_with_error('COMPILE', 'compile error', 2, $message);
 }
 
 sub _runtime_error {
     my ($message) = @_;
-    $message ||= 'runtime error';
-    $message =~ s/\s+\z//;
-    warn "[RUNTIME]$message\n";
-    exit 3;
+    _exit_with_error('RUNTIME', 'runtime error', 3, $message);
 }
 
 sub _validate_query_syntax {

@@ -39,11 +39,6 @@ LWP::Protocol::PSGI->register(
         }
         if ( $req->method =~ /^post$/i ) {
             my $s = $req->content;
-            if ( $req->uri eq '/token/oauth2' ) {
-                is( $req->param("my_param"),
-                    "my value", "oidcGenerateTokenRequest called" );
-                count(1);
-            }
             ok(
                 $res = $client->_post(
                     $url, IO::String->new($s),
@@ -256,7 +251,6 @@ sub rp {
                 oidcOPMetaDataJSON => {
                     op => $metadata,
                 },
-                customPlugins => 't::OidcHookPlugin',
             }
         }
     );

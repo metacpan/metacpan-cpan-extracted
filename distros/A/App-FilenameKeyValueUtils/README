@@ -2,24 +2,22 @@ NAME
     App::FilenameKeyValueUtils - CLIs for Filename::KeyValue
 
 VERSION
-    This document describes version 0.002 of App::FilenameKeyValueUtils
+    This document describes version 0.003 of App::FilenameKeyValueUtils
     (from Perl distribution App-FilenameKeyValueUtils), released on
-    2026-05-28.
+    2026-05-29.
 
 SYNOPSIS
 DESCRIPTION
     This distribution includes several utilities related to
     Filename::KeyValue:
 
-    *   modify-keyvalue-filename
-
-    *   normalize-keyvalue-filename
-
-    *   parse-keyvalue-filename
-
-    *   rename-add-keyvalue-filenames
-
-    *   rename-remove-keyvalue-filenames
+    1. modify-keyvalue-filename
+    2. normalize-keyvalue-filename
+    3. parse-keyvalue-filename
+    4. rename-add-keyvalue-filenames
+    5. rename-modify-keyvalue-filenames
+    6. rename-remove-keyvalue-filenames
+    7. rename-replace-keyvalue-filenames
 
 HOMEPAGE
     Please visit the project's homepage at

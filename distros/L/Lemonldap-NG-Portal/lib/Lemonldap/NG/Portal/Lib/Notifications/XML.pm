@@ -6,7 +6,7 @@ use XML::LibXML;
 use XML::LibXSLT;
 use POSIX qw(strftime);
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.23.0';
 
 # Lemonldap::NG::Portal::Main::Plugin provides addAuthRoute() and
 # addUnauthRoute() methods in addition of Lemonldap::NG::Common::Module.
@@ -193,8 +193,8 @@ sub viewNotification {
             $self->logger->debug("Get reference $reference");
 
             # Check it in session
-            unless (exists $req->{userData}->{"notification_$reference"}
-                and $req->{userData}->{"notification_$reference"} eq $epoch
+            unless ( exists $req->userData->{"notification_$reference"}
+                and $req->userData->{"notification_$reference"} eq $epoch
                 and $reference eq $ref )
             {
 

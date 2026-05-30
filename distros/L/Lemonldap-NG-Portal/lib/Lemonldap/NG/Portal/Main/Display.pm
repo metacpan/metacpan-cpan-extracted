@@ -2,7 +2,7 @@
 # Display functions for LemonLDAP::NG Portal
 package Lemonldap::NG::Portal::Main::Display;
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 package Lemonldap::NG::Portal::Main;
 use strict;
@@ -301,7 +301,7 @@ sub display {
     }
 
     # 2.2 Case : display menu (with error or not)
-    elsif ( $req->error == PE_OK ) {
+    elsif ( $req->error == PE_OK || $req->error == PE_ISSUERTIMEOUT ) {
         $skinfile = 'menu';
 
         #utf8::decode($auth_user);
@@ -311,8 +311,8 @@ sub display {
             LOGOUT_URL     => $self->buildUrl( $req->portal, { logout => 1 } ),
             APPSLIST_ORDER => $req->{sessionInfo}->{'_appsListOrder'},
             PING           => $self->conf->{portalPingInterval},
-            DONT_STORE_PASSWORD => $self->conf->{browsersDontStorePassword},
-            HIDE_OLDPASSWORD    => 0,
+            DONT_STORE_PASSWORD     => $self->conf->{browsersDontStorePassword},
+            HIDE_OLDPASSWORD        => 0,
             ENABLE_PASSWORD_DISPLAY =>
               $self->conf->{portalEnablePasswordDisplay},
             %{ $self->getPasswordPolicyTemplateVars },
@@ -427,11 +427,11 @@ sub display {
             ACTIVE_FORM           => 1,
             DONT_STORE_PASSWORD   => $self->conf->{browsersDontStorePassword},
             CHECK_LOGINS          => $self->conf->{portalCheckLogins},
-            ASK_LOGINS            => $req->param('checkLogins') || 0,
+            ASK_LOGINS            => $req->param('checkLogins')   || 0,
             ASK_STAYCONNECTED     => $req->param('stayconnected') || 0,
             DISPLAY_RESETPASSWORD => $self->conf->{portalDisplayResetPassword},
             DISPLAY_REGISTER      => $self->conf->{portalDisplayRegister},
-            DISPLAY_UPDATECERTIF =>
+            DISPLAY_UPDATECERTIF  =>
               $self->conf->{portalDisplayCertificateResetByMail},
             MAILCERTIF_URL => $self->certificateResetUrl,
             MAIL_URL       => $self->passwordResetUrl,
@@ -758,7 +758,7 @@ sub getSkin {
             }
             else {
                 $self->logger->warn(
-                    "User tries to access to nonexistent skin dir $skinParam");
+                    "User tries to access nonexistent skin dir $skinParam");
             }
         }
         else {
@@ -880,7 +880,8 @@ sub mkOidcConsent {
         'oidcConsents',
         params => {
             partners => [
-                map { {
+                map {
+                    {
                         name        => $_,
                         epoch       => $consents->{$_}->{epoch},
                         scope       => $consents->{$_}->{scope},
@@ -918,7 +919,7 @@ sub getPasswordPolicyTemplateVars {
         (
             $self->conf->{passwordPolicyMinSpeChar} && $self->speChars()
             ? (
-                PPOLICY_ALLOWEDSPECHAR => $self->speChars(),
+                PPOLICY_ALLOWEDSPECHAR      => $self->speChars(),
                 PPOLICY_ALLOWEDSPECHAR_JSON =>
                   to_json( $self->speChars(), { allow_nonref => 1 } ),
               )

@@ -11,8 +11,7 @@ use_ok('Lemonldap::NG::Common::FormEncode');
 count(1);
 my $res;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel             => 'error',
             upgradeSession       => 1,

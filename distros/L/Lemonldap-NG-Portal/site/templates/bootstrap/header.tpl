@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml"<TMPL_IF "LANGUAGE"> lang="<TMPL_VAR "LANGUAGE">"</TMPL_IF>>
 <head>
  <title trspan="authPortal">Authentication portal</title>
  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />

@@ -4,7 +4,6 @@ use strict;
 use IO::String;
 
 require 't/test-lib.pm';
-require Lemonldap::NG::Common::TOTP;
 
 my $client = LLNG::Manager::Test->new( {
         ini => {

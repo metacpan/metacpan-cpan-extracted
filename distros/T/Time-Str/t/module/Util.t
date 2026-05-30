@@ -10,7 +10,9 @@ use Util qw[throws_ok];
 BEGIN {
   use_ok('Time::Str::Util', qw[ lower_bound
                                 range_bounds
-                                upper_bound ]);
+                                upper_bound
+                                valid_tzdb_timezone
+                                valid_posix_timezone ]);
 }
 
 my @arr = (10, 20, 30, 40, 50);
@@ -239,5 +241,180 @@ throws_ok { range_bounds(\@arr, 30, 20) }
   is(lower_bound(\@neg, -20), 2,
     'lower_bound: between negatives');
 }
+
+## valid_tzdb_timezone
+
+throws_ok { valid_tzdb_timezone() }
+  qr/^Usage: valid_tzdb_timezone/,
+  'valid_tzdb_timezone: no arguments';
+
+throws_ok { valid_tzdb_timezone('a', 'b') }
+  qr/^Usage: valid_tzdb_timezone/,
+  'valid_tzdb_timezone: too many arguments';
+
+# valid names
+ok(valid_tzdb_timezone('UTC'),
+  'valid_tzdb_timezone: UTC');
+
+ok(valid_tzdb_timezone('EST'),
+  'valid_tzdb_timezone: EST');
+
+ok(valid_tzdb_timezone('America/New_York'),
+  'valid_tzdb_timezone: America/New_York');
+
+ok(valid_tzdb_timezone('Europe/Stockholm'),
+  'valid_tzdb_timezone: Europe/Stockholm');
+
+ok(valid_tzdb_timezone('America/Argentina/Buenos_Aires'),
+  'valid_tzdb_timezone: three-level path');
+
+ok(valid_tzdb_timezone('Etc/GMT+5'),
+  'valid_tzdb_timezone: Etc/GMT+5');
+
+ok(valid_tzdb_timezone('Etc/GMT-14'),
+  'valid_tzdb_timezone: Etc/GMT-14');
+
+ok(valid_tzdb_timezone('US/Eastern'),
+  'valid_tzdb_timezone: US/Eastern');
+
+ok(valid_tzdb_timezone('Pacific/Port_Moresby'),
+  'valid_tzdb_timezone: underscore in component');
+
+ok(valid_tzdb_timezone('America/North_Dakota/New_Salem'),
+  'valid_tzdb_timezone: three-level with underscores');
+
+ok(valid_tzdb_timezone('Asia/Ho_Chi_Minh'),
+  'valid_tzdb_timezone: multiple underscores');
+
+ok(valid_tzdb_timezone('Factory'),
+  'valid_tzdb_timezone: Factory');
+
+# invalid names
+ok(!valid_tzdb_timezone(undef),
+  'valid_tzdb_timezone: undef');
+
+ok(!valid_tzdb_timezone(''),
+  'valid_tzdb_timezone: empty string');
+
+ok(!valid_tzdb_timezone('123'),
+  'valid_tzdb_timezone: starts with digit');
+
+ok(!valid_tzdb_timezone('/America/New_York'),
+  'valid_tzdb_timezone: leading slash');
+
+ok(!valid_tzdb_timezone('America/New_York/'),
+  'valid_tzdb_timezone: trailing slash');
+
+ok(!valid_tzdb_timezone('America//New_York'),
+  'valid_tzdb_timezone: double slash');
+
+ok(!valid_tzdb_timezone('America/New York'),
+  'valid_tzdb_timezone: space in name');
+
+ok(!valid_tzdb_timezone('America/New_York '),
+  'valid_tzdb_timezone: trailing space');
+
+ok(!valid_tzdb_timezone('_America/New_York'),
+  'valid_tzdb_timezone: leading underscore');
+
+ok(!valid_tzdb_timezone('America/_New_York'),
+  'valid_tzdb_timezone: component starts with underscore');
+
+ok(!valid_tzdb_timezone('America/1York'),
+  'valid_tzdb_timezone: component starts with digit');
+
+## valid_posix_timezone
+
+throws_ok { valid_posix_timezone() }
+  qr/^Usage: valid_posix_timezone/,
+  'valid_posix_timezone: no arguments';
+
+throws_ok { valid_posix_timezone('a', 'b') }
+  qr/^Usage: valid_posix_timezone/,
+  'valid_posix_timezone: too many arguments';
+
+# valid strings — fixed offset (no DST)
+ok(valid_posix_timezone('UTC0'),
+  'valid_posix_timezone: UTC0');
+
+ok(valid_posix_timezone('EST5'),
+  'valid_posix_timezone: EST5');
+
+ok(valid_posix_timezone('CET-1'),
+  'valid_posix_timezone: CET-1');
+
+ok(valid_posix_timezone('IST-5:30'),
+  'valid_posix_timezone: offset with minutes');
+
+ok(valid_posix_timezone('NPT-5:45:00'),
+  'valid_posix_timezone: offset with seconds');
+
+# valid strings — with DST and M rules
+ok(valid_posix_timezone('EST5EDT,M3.2.0,M11.1.0'),
+  'valid_posix_timezone: US Eastern');
+
+ok(valid_posix_timezone('CET-1CEST,M3.5.0/2,M10.5.0/3'),
+  'valid_posix_timezone: Central European');
+
+ok(valid_posix_timezone('NZST-12NZDT,M9.5.0,M4.1.0/3'),
+  'valid_posix_timezone: New Zealand');
+
+ok(valid_posix_timezone('EST5EDT4,M3.2.0,M11.1.0'),
+  'valid_posix_timezone: explicit DST offset');
+
+ok(valid_posix_timezone('CST6CDT,M3.2.0/2:00,M11.1.0/2:00'),
+  'valid_posix_timezone: rule times with minutes');
+
+# valid strings — J and n rule forms
+ok(valid_posix_timezone('EST5EDT,J80,J310'),
+  'valid_posix_timezone: Julian day rules');
+
+ok(valid_posix_timezone('EST5EDT,60,305'),
+  'valid_posix_timezone: zero-based day rules');
+
+# valid strings — negative rule times
+ok(valid_posix_timezone('EST5EDT,M3.2.0/-1,M11.1.0'),
+  'valid_posix_timezone: negative rule time');
+
+# valid strings — positive offset sign
+ok(valid_posix_timezone('ABC+5'),
+  'valid_posix_timezone: positive offset sign');
+
+# invalid strings
+ok(!valid_posix_timezone(undef),
+  'valid_posix_timezone: undef');
+
+ok(!valid_posix_timezone(''),
+  'valid_posix_timezone: empty string');
+
+ok(!valid_posix_timezone('E5'),
+  'valid_posix_timezone: name too short (1 char)');
+
+ok(!valid_posix_timezone('ES5'),
+  'valid_posix_timezone: name too short (2 chars)');
+
+ok(!valid_posix_timezone('EST'),
+  'valid_posix_timezone: missing offset');
+
+ok(!valid_posix_timezone('123'),
+  'valid_posix_timezone: numeric only');
+
+ok(!valid_posix_timezone('EST5EDT'),
+  'valid_posix_timezone: DST name without rules');
+
+ok(!valid_posix_timezone('EST5EDT,M3.2.0'),
+  'valid_posix_timezone: only one rule');
+
+ok(!valid_posix_timezone('<+05>-5'),
+  'valid_posix_timezone: quoted name (not POSIX)');
+
+ok(!valid_posix_timezone('EST5EDT,M3.2.0,M11.1.0,M12.1.0'),
+  'valid_posix_timezone: too many rules');
+
+ok(!valid_posix_timezone(' EST5'),
+  'valid_posix_timezone: leading space');
+
+ok(!valid_posix_timezone('EST5 '),
+  'valid_posix_timezone: trailing space');
 
 done_testing;

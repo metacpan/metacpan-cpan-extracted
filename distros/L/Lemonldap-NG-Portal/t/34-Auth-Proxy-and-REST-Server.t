@@ -198,13 +198,15 @@ ok(
             PATH_INFO            => "/sessions/global/"
               . (
                 $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($newId) : $newId
-              ).'/zz',
+              )
+              . '/zz',
             REMOTE_ADDR    => '127.0.0.1',
             REQUEST_METHOD => 'PUT',
             REQUEST_URI    => "/sessions/global/"
               . (
                 $ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($newId) : $newId
-              ).'/zz',
+              )
+              . '/zz',
             SCRIPT_NAME            => '',
             SERVER_NAME            => 'auth.example.com',
             SERVER_PORT            => '80',

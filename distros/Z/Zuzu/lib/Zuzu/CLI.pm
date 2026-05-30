@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.001000';
+our $VERSION = '0.001002';
 
 use Scalar::Util qw( blessed );
 use Getopt::Long qw(
@@ -288,7 +288,7 @@ sub _print_version {
 		disabled_visitors => $options->{disabled_visitors} // [],
 	);
 
-	print "zuzu version $Zuzu::VERSION\n";
+	print "zuzu.pl version $Zuzu::VERSION\n";
 	if ( $options->{show_version_verbose} ) {
 		print "\n";
 		print "lib search paths:\n";
@@ -468,35 +468,10 @@ sub _repl_structural_depth {
 sub _repl_prelude_for_runtime {
 	my ( $runtime ) = @_;
 
-	my %reserved = map { $_ => 1 } qw(
-		Exception
-		AssertionException
-		TypeException
-		CancelledException
-		TimeoutException
-		ChannelClosedException
-		Array
-		Dict
-		PairList
-		Set
-		Bag
-		Pair
-		String
-		BinaryString
-		Task
-		say
-		print
-		warn
-		typeof
-		to_binary
-		to_string
-		__file__
-		__system__
-		__global__
-	);
 	my @decls;
 	for my $name ( sort keys %{ $runtime->{_global}{slots} // {} } ) {
-		next if $reserved{$name};
+		next if $runtime->{_builtin_global_names}{$name};
+		next if $name =~ /\A__/;
 		next if $name !~ /\A[_A-Za-z][_A-Za-z0-9]*\z/;
 		next if Zuzu::Util::is_keyword($name);
 		push @decls, "let $name := null;";

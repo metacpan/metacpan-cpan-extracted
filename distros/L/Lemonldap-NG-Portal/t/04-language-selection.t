@@ -72,6 +72,9 @@ sub getDetectedLangage {
     );
     my $language = getJsVars($res)->{language};
     ok( $language, "Language was found in response" );
+
+    # HTML tag is consistent
+    is( getHtmlElement( $res, '/html/@lang' )->pop->getValue(), $language );
     return $language;
 }
 subtest "test language resolution by portal" => sub {

@@ -20,11 +20,13 @@ sub LLNG::Manager::Test::getStatus {
 my $client = LLNG::Manager::Test->new;
 
 # "break" config file
-rename "$main::tmpdir/conf/lmConf-1.json", "$main::tmpdir/conf/lmConf-1.json.broken";
+rename "$main::tmpdir/conf/lmConf-1.json",
+  "$main::tmpdir/conf/lmConf-1.json.broken";
 my $brokenconfig = $client->getStatus( "Broken config backend", 503 );
 is( $brokenconfig->{status},        'ko', 'Got expected global status' );
 is( $brokenconfig->{status_config}, 'ko', 'Got expected config status' );
-rename "$main::tmpdir/conf/lmConf-1.json.broken", "$main::tmpdir/conf/lmConf-1.json";
+rename "$main::tmpdir/conf/lmConf-1.json.broken",
+  "$main::tmpdir/conf/lmConf-1.json";
 
 my $allfine = $client->getStatus("Back to normal");
 is( $allfine->{status},           'ok',      'Got expected global status' );

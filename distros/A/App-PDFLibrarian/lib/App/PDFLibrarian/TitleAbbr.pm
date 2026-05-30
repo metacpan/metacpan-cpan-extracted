@@ -19,7 +19,7 @@ use strict;
 use warnings;
 
 package App::PDFLibrarian::TitleAbbr;
-$App::PDFLibrarian::TitleAbbr::VERSION = '6.0.2';
+$App::PDFLibrarian::TitleAbbr::VERSION = '6.0.3';
 use parent 'Exporter';
 
 use Carp::Assert;
@@ -36,7 +36,7 @@ our @EXPORT_OK = qw(get_aas_macros abbr_iso4_title);
 my %aas_macros;
 
 my @iso4_word_abbr;
-my $iso4_title_abbr_cachefile;
+my $iso4_title_abbr_cachefile = undef;
 my %iso4_title_abbr_cache;
 my $iso4_title_abbr_cache_new = 0;
 

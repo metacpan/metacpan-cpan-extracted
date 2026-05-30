@@ -2,7 +2,7 @@ package Zuzu::Error::Compile;
 
 use utf8;
 
-our $VERSION = '0.001000';
+our $VERSION = '0.001002';
 
 use Moo;
 

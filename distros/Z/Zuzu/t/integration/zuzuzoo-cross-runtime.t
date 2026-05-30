@@ -1,5 +1,8 @@
 use Test2::V0;
 
+plan skip_all => 'set AUTHOR_TESTING=1 to run zuzuzoo cross-runtime tests'
+	if !$ENV{AUTHOR_TESTING};
+
 use Config;
 use File::Spec;
 use File::Temp qw( tempfile tempdir );
@@ -80,12 +83,12 @@ sub command_text {
 }
 
 my @zuzuzoo_tests = qw(
-	stdlib/tests/std/zuzuzoo/paths.zzs
-	stdlib/tests/std/zuzuzoo/install-windows.zzs
-	stdlib/tests/std/zuzuzoo/metadata.zzs
-	stdlib/tests/std/zuzuzoo/queries.zzs
-	stdlib/tests/std/zuzuzoo/verify.zzs
-	stdlib/tests/std/zuzuzoo/source.zzs
+	stdlib/tests/std/zuzuzoo/_paths.zzs
+	stdlib/tests/std/zuzuzoo/_install-windows.zzs
+	stdlib/tests/std/zuzuzoo/_metadata.zzs
+	stdlib/tests/std/zuzuzoo/_queries.zzs
+	stdlib/tests/std/zuzuzoo/_verify.zzs
+	stdlib/tests/std/zuzuzoo/_source.zzs
 );
 
 my ( $import_fh, $import_script ) = tempfile(

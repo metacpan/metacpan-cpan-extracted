@@ -3,7 +3,6 @@ use Test::More;
 use strict;
 use IO::String;
 use Data::Dumper;
-use Lemonldap::NG::Common::TOTP;
 
 require 't/test-lib.pm';
 require 't/smtp.pm';
@@ -12,9 +11,7 @@ use_ok('Lemonldap::NG::Common::FormEncode');
 
 sub totp {
     my ($key) = @_;
-    return Lemonldap::NG::Common::TOTP::_code( undef,
-        Convert::Base32::decode_base32($key),
-        0, 30, 6 );
+    return getTotp( Convert::Base32::decode_base32($key) );
 
 }
 

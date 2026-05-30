@@ -3,7 +3,7 @@ package Lemonldap::NG::Common::MessageBroker::Redis;
 use strict;
 use JSON;
 
-our $VERSION = '2.21.0';
+our $VERSION    = '2.23.0';
 our $REDISCLASS = 'Redis::Fast';
 
 sub new {

@@ -8,7 +8,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
 );
 
-our $VERSION = '2.18.0';
+our $VERSION = '2.23.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -43,7 +43,7 @@ sub check {
 
     # Run TrustedBrowser challenge
     if ( $trustedBrowser->mustChallenge($req) ) {
-        return $trustedBrowser->challenge( $req, '#');
+        return $trustedBrowser->challenge( $req, '#' );
     }
     elsif ( my $state = $trustedBrowser->getKnownBrowserState($req) ) {
         return $self->skipAuthentication( $req, $state );

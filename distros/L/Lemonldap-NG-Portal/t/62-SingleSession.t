@@ -10,8 +10,7 @@ BEGIN {
 
 my $level = 'error';
 my $res;
-my $client1 = LLNG::Manager::Test->new(
-    {
+my $client1 = LLNG::Manager::Test->new( {
         ini => {
             logLevel       => $level,
             authentication => 'Demo',
@@ -20,8 +19,7 @@ my $client1 = LLNG::Manager::Test->new(
         }
     }
 );
-my $client2 = LLNG::Manager::Test->new(
-    {
+my $client2 = LLNG::Manager::Test->new( {
         ini => {
             logLevel       => $level,
             authentication => 'Demo',
@@ -30,8 +28,7 @@ my $client2 = LLNG::Manager::Test->new(
         }
     }
 );
-my $client3 = LLNG::Manager::Test->new(
-    {
+my $client3 = LLNG::Manager::Test->new( {
         ini => {
             logLevel       => $level,
             authentication => 'Demo',
@@ -40,8 +37,7 @@ my $client3 = LLNG::Manager::Test->new(
         }
     }
 );
-my $client4 = LLNG::Manager::Test->new(
-    {
+my $client4 = LLNG::Manager::Test->new( {
         ini => {
             logLevel       => $level,
             authentication => 'Demo',
@@ -53,8 +49,7 @@ my $client4 = LLNG::Manager::Test->new(
     }
 );
 
-my $client5 = LLNG::Manager::Test->new(
-    {
+my $client5 = LLNG::Manager::Test->new( {
         ini => {
             logLevel       => $level,
             authentication => 'Demo',
@@ -189,7 +184,6 @@ $id2 = expectCookie($res);
 
 $res = loginUser( $client5, "dwho", "127.0.0.2" );
 $id3 = expectCookie($res);
-
 
 $res = loginUser( $client4, "dwho", "127.0.0.2",
     query => 'url=' . encode_base64( "http://test1.example.com/", '' ) );

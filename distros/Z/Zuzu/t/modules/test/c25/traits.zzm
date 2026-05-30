@@ -1,5 +1,0 @@
-trait NamedSpeak {
-	method speak () {
-		return "hi " _ self.get_name();
-	}
-}

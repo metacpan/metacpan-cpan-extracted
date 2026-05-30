@@ -1,7 +1,11 @@
 use Test2::V0;
 use Test2::Require::AuthorTesting;
 
+use File::Spec;
 use Zuzu qw( zuzu_eval );
+
+my $repo_root = File::Spec->rel2abs( File::Spec->catdir( File::Spec->curdir ) );
+my $stdlib_modules = File::Spec->catdir( $repo_root, 'stdlib', 'modules' );
 
 my $script = <<'ZZS';
 from std/io import Path;
@@ -165,17 +169,17 @@ like(
 
 is(
 	zuzu_eval(
-		<<'ZZS',
+		<<"ZZS",
 from std/gui/dialogue import confirm, prompt, file_open;
 from std/tui import filename_completions;
 ( confirm( "Q", auto_result: true ) ? "yes" : "no" )
 	_ ":" _ prompt( "Name:", auto_result: "Ada" )
 	_ ":" _ file_open( auto_result: "x.txt" )
-	_ ":" _ ( filename_completions( "modules/std/tu" ).length() > 0 );
+	_ ":" _ ( filename_completions( "$stdlib_modules/std/tu" ).length() > 0 );
 ZZS
-		{ deny => [ 'gui' ] },
+		{ deny => [ 'gui' ], lib => [ $stdlib_modules ] },
 	),
-	'yes:Ada:x.txt:1',
+	'yes:Ada:x.txt:true',
 	'std/gui/dialogue loads with deny gui and uses non-GUI results',
 );
 

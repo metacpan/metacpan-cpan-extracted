@@ -6,7 +6,7 @@ use Mouse;
 use Lemonldap::NG::Common::Conf::Constants;
 use Lemonldap::NG::Common::Conf::ReConstants;
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Common::Conf::AccessLib';
 
@@ -70,7 +70,7 @@ sub getConfKey {
 
 sub getConfByNum {
     my ( $self, $cfgNum, @args ) = @_;
-    unless ($self->currentConf
+    unless ( $self->currentConf
         and %{ $self->currentConf }
         and $cfgNum == $self->currentConf->{cfgNum} )
     {
@@ -398,8 +398,8 @@ sub _oidcMetaDataNodes {
     # Reject unknown partners
     return $self->sendError( $req,
         "Unknown OpenID-Connect partner ($partner)", 400 )
-      unless ( defined eval { $self->getConfKey( $req, $refKey )->{$partner}; }
-      );
+      unless (
+        defined eval { $self->getConfKey( $req, $refKey )->{$partner}; } );
 
     my ( $id, $resp ) = ( 1, [] );
 
@@ -521,8 +521,8 @@ sub _casMetaDataNodes {
 
     # Reject unknown partners
     return $self->sendError( $req, "Unknown CAS partner ($partner)", 400 )
-      unless ( defined eval { $self->getConfKey( $req, $refKey )->{$partner}; }
-      );
+      unless (
+        defined eval { $self->getConfKey( $req, $refKey )->{$partner}; } );
 
     my ( $id, $resp ) = ( 1, [] );
 
@@ -898,14 +898,8 @@ sub metadata {
                   $metadata->serviceToXML(
                     { %{ $self->currentConf }, portal => $self->p->portal },
                     'all' );
-                return [
-                    200,
-                    [
-                        'Content-Type'   => 'application/xml',
-                        'Content-Length' => length($s),
-                    ],
-                    [$s]
-                ];
+                return $self->p->sendTextResponse( $req, $s,
+                    type => "application/xml; charset=utf-8" );
             }
             return $self->p->sendError( $req, 'Unable to build Metadata', 500 );
         }
@@ -924,9 +918,25 @@ sub metadata {
         my @a     = $self->confAcc->available;
         my $id    = -1;
         my ($ind) = map { $id++; $_ == $res->{cfgNum} ? ($id) : () } @a;
-        if ($ind) { $res->{prev} = $a[ $ind - 1 ]; }
+        if ($ind) {
+            my $prevNum = $a[ $ind - 1 ];
+            my $prevConf =
+              $self->confAcc->getConf(
+                { cfgNum => $prevNum, raw => 1, noCache => 1 } );
+            $res->{prev} = {
+                cfgNum => $prevNum,
+                cfgLog => $prevConf->{cfgLog}
+            };
+        }
         if ( defined $ind and $ind < $#a ) {
-            $res->{next} = $a[ $ind + 1 ];
+            my $nextNum = $a[ $ind + 1 ];
+            my $nextConf =
+              $self->confAcc->getConf(
+                { cfgNum => $nextNum, raw => 1, noCache => 1 } );
+            $res->{next} = {
+                cfgNum => $nextNum,
+                cfgLog => $nextConf->{cfgLog}
+            };
         }
         if ( my $userid = $self->_userId($req) ) {
             $self->auditLog(

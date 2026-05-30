@@ -10,8 +10,7 @@ my $maintests = 14;
 
 my $res;
 my $json;
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel                    => 'error',
             authentication              => 'Choice',

@@ -8,7 +8,9 @@ use Lemonldap::NG::Handler::Main;
 use Lemonldap::NG::Common::Util qw(getSameSite);
 use URI;
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
+
+use constant validPartnerName => qr/^[\w-]+$/;
 
 ## @method hashref tests(hashref conf)
 # Return a hash ref where keys are the names of the tests and values
@@ -83,6 +85,60 @@ sub tests {
                     ? 'Virtual hosts '
                       . join( ', ', @pb )
                       . " are not in $conf->{domain} and cross-domain-authentication is not set"
+                    : undef
+                )
+            );
+        },
+
+      # Check if automatically displayed menu applications have VH configuration
+        menuAutoDisplayedVhostsHaveConf => sub {
+            my @pb;
+
+            # Known hosts: locationRules keys + every vhostAliases entry
+            my %known;
+            $known{ lc $_ } = 1 for keys %{ $conf->{locationRules} || {} };
+            foreach my $vh ( keys %{ $conf->{vhostOptions} || {} } ) {
+                my $aliases = $conf->{vhostOptions}->{$vh}->{vhostAliases};
+                next unless defined $aliases and length $aliases;
+                $known{ lc $_ } = 1 for split /\s+/, $aliases;
+            }
+
+            # Walk applicationList recursively (categories may be nested)
+            my %entries;
+            my $walk;
+            $walk = sub {
+                my $node = shift;
+                return unless ref $node eq 'HASH';
+                foreach my $key ( keys %$node ) {
+                    next if $key =~ /^(?:catname|type|options|order)$/;
+                    my $child = $node->{$key};
+                    next unless ref $child eq 'HASH';
+                    if ( ( $child->{type} // '' ) eq 'category' ) {
+                        $walk->($child);
+                    }
+                    elsif ( ( $child->{options}->{display} // '' ) eq 'auto' ) {
+                        my $uri = $child->{options}->{uri};
+                        next unless defined $uri and length $uri;
+                        my $u = URI->new($uri);
+                        next unless $u->can('host');
+                        my $h = $u->host;
+                        $entries{ lc $h } = 1 if defined $h and length $h;
+                    }
+                }
+            };
+            $walk->( $conf->{applicationList} );
+
+            foreach ( sort keys %entries ) {
+                push @pb, $_ unless $known{$_};
+            }
+
+            return (
+                1,
+                (
+                    @pb
+                    ? 'Menu applications '
+                      . join( ', ', @pb )
+                      . ' are automatically displayed but have no configuration'
                     : undef
                 )
             );
@@ -436,42 +492,16 @@ sub tests {
             {
                 return 1;
             }
-            elsif ( $conf->{keys}->{"default-saml-sig"} ) {
-                return 1;
+            else {
+                my ($key) = split( /\s*,\s*/,
+                    ( $conf->{samlServiceSignatureKey} || "" ) );
+                if ( $conf->{keys}->{$key} ) {
+                    return 1;
+                }
             }
 
             return ( 0,
                 'SAML service private and public keys signature must be set' );
-        },
-
-        samlSignatureOverrideNeedsCertificate => sub {
-            return 1
-              if $conf->{samlServicePublicKeySig}
-              && $conf->{samlServicePublicKeySig} =~ /CERTIFICATE/;
-
-            my @offenders;
-            for my $idp ( keys %{ $conf->{samlIDPMetaDataOptions} } ) {
-                if ( $conf->{samlIDPMetaDataOptions}->{$idp}
-                    ->{samlIDPMetaDataOptionsSignatureMethod} )
-                {
-                    push @offenders, $idp;
-                }
-            }
-            for my $sp ( keys %{ $conf->{samlSPMetaDataOptions} } ) {
-                if ( $conf->{samlSPMetaDataOptions}->{$sp}
-                    ->{samlSPMetaDataOptionsSignatureMethod} )
-                {
-                    push @offenders, $sp;
-                }
-            }
-            return @offenders
-              ? (
-                0,
-                "Cannot set non-default signature method on "
-                  . join( ", ", @offenders )
-                  . " unless SAML signature key is in certificate form"
-              )
-              : 1;
         },
 
         samlSignatureUnsupportedAlg => sub {
@@ -879,8 +909,12 @@ sub tests {
             {
                 return 1;
             }
-            elsif ( $conf->{keys}->{"default-oidc-sig"} ) {
-                return 1;
+            else {
+                my ($key) = split( /\s*,\s*/,
+                    ( $conf->{oidcServiceSignatureKey} || "" ) );
+                if ( $conf->{keys}->{$key} ) {
+                    return 1;
+                }
             }
 
             return ( 1,
@@ -911,7 +945,7 @@ sub tests {
             if (
                 @usingRSA
                 and not( $conf->{oidcServicePrivateKeySig}
-                    or $conf->{keys}->{"default-oidc-sig"} )
+                    or %{ $conf->{keys} || {} } )
               )
             {
                 my $msg =
@@ -1048,6 +1082,61 @@ sub tests {
             return 1;
         },
 
+        # Relying Party / Service Provider / CAS Application names must
+        # contain only word characters (letters, digits, underscore)
+        spNameNoWhitespace => sub {
+            my @msg;
+            foreach my $rpId ( keys %{ $conf->{oidcRPMetaDataOptions} || {} } )
+            {
+                if ( $rpId !~ validPartnerName ) {
+                    push @msg,
+"OIDC Relying Party name '$rpId' must contain only word characters (letters, digits, underscore)";
+                }
+            }
+            foreach my $spId ( keys %{ $conf->{samlSPMetaDataXML} || {} } ) {
+                if ( $spId !~ validPartnerName ) {
+                    push @msg,
+"SAML Service Provider name '$spId' must contain only word characters (letters, digits, underscore)";
+                }
+            }
+            foreach my $casId ( keys %{ $conf->{casAppMetaDataOptions} || {} } )
+            {
+                if ( $casId !~ validPartnerName ) {
+                    push @msg,
+"CAS Application name '$casId' must contain only word characters (letters, digits, underscore)";
+                }
+            }
+            return @msg ? ( 0, join( ', ', @msg ) ) : 1;
+        },
+
+        # Identity Provider / OpenID Provider / CAS Server names must
+        # contain only word characters (letters, digits, underscore)
+        idpNameNoWhitespace => sub {
+            my @msg;
+            foreach my $idpId ( keys %{ $conf->{samlIDPMetaDataXML} || {} } ) {
+                if ( $idpId !~ validPartnerName ) {
+                    push @msg,
+"SAML Identity Provider name '$idpId' must contain only word characters (letters, digits, underscore)";
+                }
+            }
+            foreach my $opId ( keys %{ $conf->{oidcOPMetaDataOptions} || {} } )
+            {
+                if ( $opId !~ validPartnerName ) {
+                    push @msg,
+"OIDC OpenID Provider name '$opId' must contain only word characters (letters, digits, underscore)";
+                }
+            }
+            foreach
+              my $casSrvId ( keys %{ $conf->{casSrvMetaDataOptions} || {} } )
+            {
+                if ( $casSrvId !~ validPartnerName ) {
+                    push @msg,
+"CAS Server name '$casSrvId' must contain only word characters (letters, digits, underscore)";
+                }
+            }
+            return @msg ? ( 0, join( ', ', @msg ) ) : 1;
+        },
+
         # Notification system required with removed SF notification
         sfRemovedNotification => sub {
             return 1 unless ( $conf->{sfRemovedMsgRule} );
@@ -1103,6 +1192,30 @@ sub tests {
                 return ( -1,
 'Password module is enabled without AuthChoice password backend'
                 ) unless $hasPwdBE;
+            }
+            return 1;
+        },
+
+        webAuthnRequiresToken => sub {
+            if (
+                grep { $_->[0] eq "WebAuthn" }
+                map  { [ split( /;\s*/, $_ ) ] }
+                values %{ $conf->{authChoiceModules} }
+              )
+            {
+                if ( $conf->{requireToken} == 0 ) {
+                    return ( 0,
+                        "WebAuthn authentication requires using a token" );
+                }
+                elsif ( $conf->{requireToken} == 1 ) {
+                    return 1;
+                }
+                else {
+                    return ( 1,
+                            "WebAuthn authentication requires a token"
+                          . " but a rule was defined for token use."
+                          . " WebAuthn might not work in some situations" );
+                }
             }
             return 1;
         },
@@ -1374,6 +1487,14 @@ sub tests {
               if $conf->{crowdsecMachineId} and $conf->{crowdsecPassword};
             return ( 0,
                 'Crowdsec Agent enabled without machine_id and password' );
+        },
+
+        # External menu URL must be a valid URL
+        externalMenuUrl => sub {
+            return 1 unless $conf->{externalMenu};
+            return ( 0, 'External menu URL looks invalid' )
+              unless $conf->{externalMenu} =~ m#^(\w+)://#;
+            return 1;
         },
     };
 }

@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-05-28'; # DATE
+our $DATE = '2026-05-29'; # DATE
 our $DIST = 'App-FilenameKeyValueUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 our %SPEC;
 
@@ -25,7 +25,7 @@ App::FilenameKeyValueUtils - CLIs for Filename::KeyValue
 
 =head1 VERSION
 
-This document describes version 0.002 of App::FilenameKeyValueUtils (from Perl distribution App-FilenameKeyValueUtils), released on 2026-05-28.
+This document describes version 0.003 of App::FilenameKeyValueUtils (from Perl distribution App-FilenameKeyValueUtils), released on 2026-05-29.
 
 =head1 SYNOPSIS
 
@@ -35,15 +35,19 @@ This distribution includes several utilities related to L<Filename::KeyValue>:
 
 =over
 
-=item * L<modify-keyvalue-filename>
+=item 1. L<modify-keyvalue-filename>
 
-=item * L<normalize-keyvalue-filename>
+=item 2. L<normalize-keyvalue-filename>
 
-=item * L<parse-keyvalue-filename>
+=item 3. L<parse-keyvalue-filename>
 
-=item * L<rename-add-keyvalue-filenames>
+=item 4. L<rename-add-keyvalue-filenames>
 
-=item * L<rename-remove-keyvalue-filenames>
+=item 5. L<rename-modify-keyvalue-filenames>
+
+=item 6. L<rename-remove-keyvalue-filenames>
+
+=item 7. L<rename-replace-keyvalue-filenames>
 
 =back
 

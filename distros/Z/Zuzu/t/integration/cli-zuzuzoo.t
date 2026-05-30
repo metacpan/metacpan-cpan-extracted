@@ -11,10 +11,21 @@ use JSON::PP;
 
 my $repo_root = File::Spec->rel2abs( File::Spec->catdir( File::Spec->curdir ) );
 my $zuzu_bin = File::Spec->catfile( $repo_root, 'bin', 'zuzu.pl' );
-my $zuzuzoo_bin = File::Spec->catfile( $repo_root, 'bin', 'zuzuzoo.pl' );
+my $zuzuzoo_bin = _zuzuzoo_script();
 
 ok -x $zuzu_bin, 'bin/zuzu.pl exists and is executable';
-ok -x $zuzuzoo_bin, 'bin/zuzuzoo.pl exists and is executable';
+ok -x $zuzuzoo_bin, 'zuzuzoo script exists and is executable';
+
+sub _zuzuzoo_script {
+	my @candidates = (
+		File::Spec->catfile( $repo_root, 'blib', 'script', 'zuzuzoo' ),
+		File::Spec->catfile( $repo_root, 'stdlib', 'scripts', 'zuzuzoo' ),
+	);
+	for my $candidate ( @candidates ) {
+		return $candidate if -x $candidate;
+	}
+	return $candidates[-1];
+}
 
 sub run_zuzuzoo {
 	my ( $home, $stdin, @args ) = @_;
@@ -25,7 +36,12 @@ sub run_zuzuzoo {
 
 	local $ENV{HOME} = $home;
 	local $ENV{PATH} = File::Spec->catdir( $repo_root, 'bin' )
+		. $Config::Config{path_sep}
+		. File::Spec->catdir( $repo_root, 'blib', 'script' )
 		. $Config::Config{path_sep} . $ENV{PATH};
+	local $ENV{ZUZULIB} = File::Spec->catdir( $repo_root, 'stdlib', 'modules' )
+		. $Config::Config{path_sep}
+		. File::Spec->catdir( $repo_root, 'stdlib', 'test-modules' );
 	local $ENV{ZUZU_COMMAND} = $zuzu_bin;
 	run \@cmd, '<', \$stdin, '>', \$stdout, '2>', \$stderr;
 

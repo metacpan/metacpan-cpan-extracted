@@ -75,7 +75,8 @@
     hmac = shaObj.getHMAC("HEX");
     offset = hex2dec(hmac.substring(hmac.length - 1));
     otp = (hex2dec(hmac.substr(offset * 2, 8)) & hex2dec("7fffffff")) + "";
-    return otp.substr(Math.max(otp.length - 6, 0), 6);
+    // take last 6 digits and add padding if needed
+    return leftpad(otp.substr(Math.max(otp.length - 6, 0), 6), 6, "0");
   };
   hex2dec = function hex2dec(s) {
     return parseInt(s, 16);

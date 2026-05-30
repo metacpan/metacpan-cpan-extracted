@@ -1,7 +1,7 @@
 package Plack::Middleware::Auth::LemonldapNG;
 
 our $AUTHORITY = 'cpan:GUIMARD';
-our $VERSION   = '2.21.0';
+our $VERSION   = '2.23.0';
 our $llclass   = 'Lemonldap::NG::Handler::Server';
 
 use strict;
@@ -31,7 +31,7 @@ sub call {
             return $res;
         }
     }
-    my $app  = $self->app;
+    my $app = $self->app;
     @_ = $env;
     goto $app;
 }

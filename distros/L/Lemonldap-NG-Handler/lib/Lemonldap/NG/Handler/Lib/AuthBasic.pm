@@ -5,13 +5,11 @@ use Exporter;
 use Digest::SHA qw(sha256_hex);
 use MIME::Base64;
 use HTTP::Headers;
-
-#use SOAP::Lite;    # link protected portalRequest
 use Lemonldap::NG::Common::UserAgent;
 use Lemonldap::NG::Common::FormEncode;
 use Lemonldap::NG::Common::Session;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.23.0';
 our @ISA     = ('Exporter');
 our @EXPORT  = qw(fetchId retrieveSession createSession hideCookie goToPortal);
 our @EXPORT_OK = @EXPORT;
@@ -49,7 +47,7 @@ sub fetchId {
 
 ## @rmethod protected boolean retrieveSession(id)
 # Tries to retrieve the session whose index is id,
-# and if needed, ask portal to create it through a SOAP request
+# and if needed, ask portal to create it through a REST request
 # @return true if the session was found, false else
 sub retrieveSession {
     my ( $class, $req, $id ) = @_;
@@ -82,19 +80,11 @@ sub createSession {
     $xheader .= ", " if ($xheader);
     $xheader .= $req->address;
 
-    #my $soapHeaders = HTTP::Headers->new( "X-Forwarded-For" => $xheader );
-    ## TODO: use adminSession or sessions
-    #my $soapClient = SOAP::Lite->proxy(
-    #    $class->tsv->{portal}->() . '/sessions',
-    #    default_headers => $soapHeaders
-    #)->uri('urn:Lemonldap/NG/Common/PSGI/SOAPService');
-
     my $creds = $req->env->{'HTTP_AUTHORIZATION'};
     $creds =~ s/^Basic\s+//;
     my ( $user, $pwd ) = ( decode_base64($creds) =~ /^(.*?):(.*)$/ );
     $class->logger->debug("AuthBasic authentication for user: $user");
 
-    #my $soapRequest = $soapClient->getCookies( $user, $pwd, $id );
     my $url = $class->tsv->{portal}->($req) . "/sessions/global/$id?auth";
     $url =~ s#//sessions/#/sessions/#g;
     my $get = HTTP::Request->new( POST => $url );
@@ -142,7 +132,7 @@ sub createSession {
 # Hide user credentials to the protected application
 sub hideCookie {
     my ( $class, $req ) = @_;
-    $class->logger->debug("removing Authorization header");
+    $class->logger->debug('Removing Authorization header');
     $class->unset_header_in( $req, 'Authorization' );
 }
 

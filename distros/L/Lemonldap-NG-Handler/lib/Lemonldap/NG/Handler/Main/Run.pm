@@ -1,7 +1,7 @@
 # Main running methods file
 package Lemonldap::NG::Handler::Main::Run;
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 package Lemonldap::NG::Handler::Main;
 
@@ -152,6 +152,7 @@ sub run {
         $class->logger->debug("Access control skipped");
         $class->updateStatus( $req, 'SKIP' );
         $class->hideCookie($req);
+        $class->data( {} );
         $class->cleanHeaders($req);
         return $class->OK;
     }

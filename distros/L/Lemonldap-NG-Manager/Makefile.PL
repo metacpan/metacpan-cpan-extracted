@@ -3,6 +3,21 @@ use ExtUtils::MakeMaker;
 
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
+
+# Autodiscover needed man1 files (scripts are installed by main Makefile)
+opendir D, 'scripts' or die $!;
+my $man1 = {};
+while ( my $file = readdir D ) {
+    next if $file =~ /^\./;
+    open my $fh, '<', "scripts/$file" or die $!;
+    while (<$fh>) {
+        if (/^=head1/) {
+            $man1->{"scripts/$file"} = "blib/man1/$file.1p";
+            last;
+        }
+    }
+}
+
 WriteMakefile(
     NAME           => 'Lemonldap::NG::Manager',
     VERSION_FROM   => 'lib/Lemonldap/NG/Manager.pm',    # finds $VERSION
@@ -38,8 +53,8 @@ WriteMakefile(
     PREREQ_PM => {
         'Convert::PEM'           => 0,
         'Crypt::OpenSSL::RSA'    => 0,
-        'Lemonldap::NG::Common'  => '2.22.3',
-        'Lemonldap::NG::Handler' => '2.22.3',
+        'Lemonldap::NG::Common'  => '2.23.0',
+        'Lemonldap::NG::Handler' => '2.23.0',
         'LWP::UserAgent'         => 0,
     },    # e.g., Module::Name => 1.1
     (
@@ -56,5 +71,6 @@ WriteMakefile(
     clean => {
         FILES => 't/conf/lmConf-2.json',
     },
+    MAN1PODS => $man1,
 );
 

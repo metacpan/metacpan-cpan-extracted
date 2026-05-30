@@ -16,8 +16,7 @@ SKIP: {
         skip 'Image::Magick not found', $maintests;
     }
 
-    my $client = LLNG::Manager::Test->new(
-        {
+    my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel                  => 'error',
                 useSafeJail               => 1,
@@ -140,8 +139,7 @@ SKIP: {
     ok( ( defined $json->{newtoken} and $json->{newtoken} =~ /^\w+$/ ),
         'New token has been received' )
       or explain( $json->{newtoken}, 'New token not received' );
-    ok(
-        (
+    ok( (
             defined $json->{newimage}
               and $json->{newimage} =~ m%^data:image/png;base64,.+%
         ),

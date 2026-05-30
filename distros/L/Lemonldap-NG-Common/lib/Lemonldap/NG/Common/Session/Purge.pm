@@ -331,7 +331,7 @@ sub purge {
         $log .= join( ', ', @logentries );
     }
 
-    $self->logger->info($log);
+    $self->logger->notice($log);
     $self->logger->warn(
 "$total_error sessions remaining, try to purge them with force (option -f)"
     ) if $total_error;
@@ -374,10 +374,10 @@ sub _purge_for_backend {
     }
 
     my $checkRtExpiration = sub {
-        my ($id, $session) = @_;
+        my ( $id, $session ) = @_;
         return unless $session->{_session_kind} eq 'OIDCI';
         return unless $session->{_type} eq 'refresh_token';
-        my $v = $session->{_oidcRtUpdate} or return;
+        my $v       = $session->{_oidcRtUpdate}              or return;
         my $timeout = $rpActivity->{ $session->{client_id} } or return;
         push @t, $id if $v + $timeout < time;
     };
@@ -674,7 +674,7 @@ sub persistentPurge {
         $log .= join( ', ', @logentries );
     }
 
-    $self->logger->info($log);
+    $self->logger->notice($log);
 
     return {
         success => 1,

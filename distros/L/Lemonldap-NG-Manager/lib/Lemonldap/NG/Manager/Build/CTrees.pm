@@ -14,7 +14,7 @@
 
 package Lemonldap::NG::Manager::Build::CTrees;
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 sub cTrees {
     return {
@@ -125,6 +125,7 @@ sub cTrees {
                         form  => 'simpleInputContainer',
                         nodes => [
                             'samlSPMetaDataOptionsNameIDFormat',
+                            'samlSPMetaDataOptionsForceNameIDFormat',
                             'samlSPMetaDataOptionsNameIDSessionKey',
                             'samlSPMetaDataOptionsOneTimeUse',
                             'samlSPMetaDataOptionsSessionNotOnOrAfterTimeout',
@@ -163,6 +164,7 @@ sub cTrees {
                             'samlSPMetaDataOptionsFederationRequiredAttributes',
                         ]
                     },
+                    'samlSPMetaDataOptionsActivation',
                     'samlSPMetaDataOptionsURL',
                     'samlSPMetaDataOptionsComment'
                 ]
@@ -181,6 +183,7 @@ sub cTrees {
                         form  => 'simpleInputContainer',
                         nodes => [
                             'oidcOPMetaDataOptionsRequirePkce',
+                            'oidcOPMetaDataOptionsRequireIss',
                             'oidcOPMetaDataOptionsStoreIDToken',
                             'oidcOPMetaDataOptionsConfigurationURI',
                             'oidcOPMetaDataOptionsJWKSTimeout',
@@ -199,6 +202,7 @@ sub cTrees {
                             'oidcOPMetaDataOptionsMaxAge',
                             'oidcOPMetaDataOptionsUiLocales',
                             'oidcOPMetaDataOptionsAcrValues',
+                            'oidcOPMetaDataOptionsAuthEndpointExtraParams',
                             'oidcOPMetaDataOptionsAuthnEndpointAuthMethod',
                             'oidcOPMetaDataOptionsAuthnEndpointAuthSigAlg',
                             'oidcOPMetaDataOptionsTokenEndpointAuthMethod',
@@ -291,12 +295,15 @@ sub cTrees {
                             'oidcRPMetaDataOptionsIDTokenSignAlg',
                             'oidcRPMetaDataOptionsAccessTokenSignAlg',
                             'oidcRPMetaDataOptionsUserInfoSignAlg',
+                            'oidcRPMetaDataOptionsIntrospectionSignAlg',
                             'oidcRPMetaDataOptionsAccessTokenEncKeyMgtAlg',
                             'oidcRPMetaDataOptionsAccessTokenEncContentEncAlg',
                             'oidcRPMetaDataOptionsIdTokenEncKeyMgtAlg',
                             'oidcRPMetaDataOptionsIdTokenEncContentEncAlg',
                             'oidcRPMetaDataOptionsUserInfoEncKeyMgtAlg',
                             'oidcRPMetaDataOptionsUserInfoEncContentEncAlg',
+                            'oidcRPMetaDataOptionsIntrospectionEncKeyMgtAlg',
+'oidcRPMetaDataOptionsIntrospectionEncContentEncAlg',
                             'oidcRPMetaDataOptionsLogoutEncKeyMgtAlg',
                             'oidcRPMetaDataOptionsLogoutEncContentEncAlg',
                         ],
@@ -331,6 +338,7 @@ sub cTrees {
                             'oidcRPMetaDataOptionsPostLogoutRedirectUris',
                         ]
                     },
+                    'oidcRPMetaDataOptionsActivation',
                     'oidcRPMetaDataOptionsComment',
                 ]
             },
@@ -377,6 +385,7 @@ sub cTrees {
                 title => 'casAppMetaDataOptions',
                 form  => 'simpleInputContainer',
                 nodes => [
+                    'casAppMetaDataOptionsActivation',
                     'casAppMetaDataOptionsService',
                     'casAppMetaDataOptionsUserAttribute',
                     'casAppMetaDataOptionsAllowProxy',

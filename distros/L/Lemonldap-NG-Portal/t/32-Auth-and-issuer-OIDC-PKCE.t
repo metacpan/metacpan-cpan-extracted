@@ -116,6 +116,138 @@ subtest "PKCE required/PKCE flow/invalid verifier fails" => sub {
     expectReject( $res, 400, "invalid_grant" );
 };
 
+# RFC 9700 section 2.1.1: PKCE downgrade attack protection
+subtest
+  "not required/no PKCE flow/code_verifier rejected (downgrade attack)" => sub {
+    my $code = codeAuthorize(
+        $op, $id,
+        {
+            %test_authorize_params,
+            client_id => "rp",
+
+            # No code_challenge sent
+        }
+    );
+
+    my $res = codeGrant( $op, "rp", $code, "http://rp.com/",
+        code_verifier => $code_verifier );
+    expectReject( $res, 400, "invalid_grant" );
+  };
+
+# For confidential clients, RequirePKCE=2 does not change behavior:
+# secret/jwt authentication is always required
+subtest "Confidential with RequirePKCE=2/with secret succeeds" => sub {
+    my $code = codeAuthorize(
+        $op, $id,
+        {
+            %test_authorize_params,
+            client_id             => "rp_pkce_or_secret",
+            code_challenge        => $code_challenge,
+            code_challenge_method => $code_challenge_method,
+        }
+    );
+
+    my $res = expectJSON(
+        codeGrant(
+            $op,   "rp_pkce_or_secret",
+            $code, "http://rp.com/",
+            code_verifier => $code_verifier
+        )
+    );
+    ok( $res->{access_token}, "Access token was provided with secret" );
+};
+
+subtest "Confidential with RequirePKCE=2/no secret fails" => sub {
+    my $code = codeAuthorize(
+        $op, $id,
+        {
+            %test_authorize_params,
+            client_id             => "rp_pkce_or_secret",
+            code_challenge        => $code_challenge,
+            code_challenge_method => $code_challenge_method,
+        }
+    );
+
+    # Even with PKCE, confidential client needs secret
+    my $res =
+      codeGrantNoSecret( $op, "rp_pkce_or_secret", $code, "http://rp.com/",
+        code_verifier => $code_verifier );
+    expectReject( $res, 400, "invalid_client" );
+};
+
+subtest "PKCE not required/no client_secret fails" => sub {
+    my $code = codeAuthorize(
+        $op, $id,
+        {
+            %test_authorize_params,
+            client_id             => "rp",
+            code_challenge        => $code_challenge,
+            code_challenge_method => $code_challenge_method,
+        }
+    );
+
+    # Without PKCE required, client_secret is still needed (not public)
+    my $res = codeGrantNoSecret( $op, "rp", $code, "http://rp.com/",
+        code_verifier => $code_verifier );
+    expectReject( $res, 400, "invalid_client" );
+};
+
+subtest "Public PKCE-or-secret mode/with PKCE succeeds" => sub {
+    my $code = codeAuthorize(
+        $op, $id,
+        {
+            %test_authorize_params,
+            client_id             => "rp_public_pkce_or_secret",
+            code_challenge        => $code_challenge,
+            code_challenge_method => $code_challenge_method,
+        }
+    );
+
+    my $res = expectJSON(
+        codeGrantNoSecret(
+            $op, "rp_public_pkce_or_secret", $code, "http://rp.com/",
+            code_verifier => $code_verifier
+        )
+    );
+    ok( $res->{access_token},
+        "Access token was provided for public client with PKCE" );
+};
+
+subtest "Public PKCE-or-secret mode/with secret (no PKCE) succeeds" => sub {
+    my $code = codeAuthorize(
+        $op, $id,
+        {
+            %test_authorize_params,
+            client_id => "rp_public_pkce_or_secret",
+
+            # No code_challenge
+        }
+    );
+
+    # Public client in mode 2 with valid secret should succeed
+    my $res = expectJSON(
+        codeGrant( $op, "rp_public_pkce_or_secret", $code, "http://rp.com/" ) );
+    ok( $res->{access_token},
+        "Access token was provided for public client with secret" );
+};
+
+subtest "Public PKCE-or-secret mode/without PKCE or secret fails" => sub {
+    my $code = codeAuthorize(
+        $op, $id,
+        {
+            %test_authorize_params,
+            client_id => "rp_public_pkce_or_secret",
+
+            # No code_challenge
+        }
+    );
+
+    # Public client in mode 2 without PKCE or secret should fail
+    my $res = codeGrantNoSecret( $op, "rp_public_pkce_or_secret", $code,
+        "http://rp.com/" );
+    expectReject( $res, 400, "invalid_client" );
+};
+
 clean_sessions();
 done_testing();
 
@@ -136,6 +268,16 @@ sub op {
                         groups => "groups",
                     },
                     rp_pkce => {
+                        email  => "mail",
+                        name   => "cn",
+                        groups => "groups",
+                    },
+                    rp_pkce_or_secret => {
+                        email  => "mail",
+                        name   => "cn",
+                        groups => "groups",
+                    },
+                    rp_public_pkce_or_secret => {
                         email  => "mail",
                         name   => "cn",
                         groups => "groups",
@@ -165,6 +307,32 @@ sub op {
                         oidcRPMetaDataOptionsBypassConsent         => 1,
                         oidcRPMetaDataOptionsRedirectUris => 'http://rp.com/',
                         oidcRPMetaDataOptionsRequirePKCE  => 1,
+                    },
+                    rp_pkce_or_secret => {
+                        oidcRPMetaDataOptionsDisplayName       => "RP",
+                        oidcRPMetaDataOptionsIDTokenExpiration => 3600,
+                        oidcRPMetaDataOptionsClientID => "rp_pkce_or_secret",
+                        oidcRPMetaDataOptionsIDTokenSignAlg => "RS256",
+                        oidcRPMetaDataOptionsBypassConsent  => 1,
+                        oidcRPMetaDataOptionsClientSecret   =>
+                          "rp_pkce_or_secret",
+                        oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
+                        oidcRPMetaDataOptionsRedirectUris => 'http://rp.com/',
+                        oidcRPMetaDataOptionsRequirePKCE  => 2, # PKCE or secret
+                    },
+                    rp_public_pkce_or_secret => {
+                        oidcRPMetaDataOptionsDisplayName       => "RP",
+                        oidcRPMetaDataOptionsIDTokenExpiration => 3600,
+                        oidcRPMetaDataOptionsClientID          =>
+                          "rp_public_pkce_or_secret",
+                        oidcRPMetaDataOptionsIDTokenSignAlg => "RS256",
+                        oidcRPMetaDataOptionsBypassConsent  => 1,
+                        oidcRPMetaDataOptionsClientSecret   =>
+                          "rp_public_pkce_or_secret",
+                        oidcRPMetaDataOptionsAccessTokenExpiration => 3600,
+                        oidcRPMetaDataOptionsRedirectUris => 'http://rp.com/',
+                        oidcRPMetaDataOptionsPublic       => 1,
+                        oidcRPMetaDataOptionsRequirePKCE  => 2, # PKCE or secret
                     }
                 },
                 oidcServicePrivateKeySig => oidc_key_op_private_sig,

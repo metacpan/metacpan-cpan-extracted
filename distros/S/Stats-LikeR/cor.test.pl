@@ -14,7 +14,9 @@ my $r = cor_test($x_na, $y_na);
 p $r;
 my $x1 = [ 1, 2, 3, 4 ];
 my $y1 = [ 2, 4, 6, 8 ];
-my $res_perfect = cor_test($x1, $y1, method => 'pearson');
-p $res_perfect;
+$r = cor_test($x1, $y1, method => 'pearson');
+
+$r = cor_test($x1, $x1);
+p $r;
 =my $res = cor_test([1,2,3], [1,3,2], method => 'pearson');
 p $res;

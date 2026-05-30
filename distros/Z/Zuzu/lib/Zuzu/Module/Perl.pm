@@ -2,7 +2,7 @@ package Zuzu::Module::Perl;
 
 use utf8;
 
-our $VERSION = '0.001000';
+our $VERSION = '0.001002';
 
 use JSON::PP ();
 use Scalar::Util qw( blessed );

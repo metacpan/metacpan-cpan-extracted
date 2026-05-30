@@ -2,7 +2,7 @@ package Lemonldap::NG::Common::Logger::_Duplicate;
 
 use strict;
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 sub new {
     my $self = bless {}, shift;
@@ -16,7 +16,7 @@ sub new {
 
 sub setRequestObj {
     my $self = shift;
-    if ($self->{logger}->can('setRequestObj')) {
+    if ( $self->{logger}->can('setRequestObj') ) {
         return $self->{logger}->setRequestObj(@_);
     }
     return;
@@ -24,7 +24,7 @@ sub setRequestObj {
 
 sub clearRequestObj {
     my $self = shift;
-    if ($self->{logger}->can('clearRequestObj')) {
+    if ( $self->{logger}->can('clearRequestObj') ) {
         return $self->{logger}->clearRequestObj(@_);
     }
     return;

@@ -10,13 +10,12 @@ require 't/test-lib.pm';
 
 my $res;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
-            logLevel        => 'error',
-            portal          => 'https://auth.example.com/',
-            skinTemplateDir => 't/templates',
-            tpl_iniParam    => 'Template parameter from lemonldap-ng.ini',
+            logLevel              => 'error',
+            portal                => 'https://auth.example.com/',
+            skinTemplateDir       => 't/templates',
+            tpl_iniParam          => 'Template parameter from lemonldap-ng.ini',
             portalCustomTplParams =>
               { confParam => 'Template parameter from configuration' },
         }

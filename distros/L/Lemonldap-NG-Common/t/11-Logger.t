@@ -51,24 +51,27 @@ subtest "Check request ID" => sub {
     my $psgi = new_ok( 't::TestPsgi' => [$args] );
     $psgi->init($args);
 
-    my $app = $psgi->run;
-    my $server = Plack::Test->create( $app );
+    my $app    = $psgi->run;
+    my $server = Plack::Test->create($app);
 
     # One request, no unique ID specified
     my $res = $server->request( GET "/" );
+
     # One request, no unique ID specified
     my $res = $server->request( GET "/" );
+
     # One request, with sepcified UNIQUE_ID
-    my $req_env = GET("/")->to_psgi(UNIQUE_ID=>"aaabbbccc123");
+    my $req_env = GET("/")->to_psgi( UNIQUE_ID => "aaabbbccc123" );
     $app->($req_env);
 
-    my $logs = $psgi->_auditLogger->logs;
-    my @request_ids = map {$_->{req}->{id}} @$logs;
+    my $logs        = $psgi->_auditLogger->logs;
+    my @request_ids = map { $_->{req}->{id} } @$logs;
     my %request_id_count;
     map { $request_id_count{$_}++ } @request_ids;
 
-    cmp_ok($request_id_count{"aaabbbccc123"}, ">=", 2, "Enforced UNIQUE_ID seen in 2 messages");
-    is(scalar keys %request_id_count, 3, "Seen three different request IDs");
+    cmp_ok( $request_id_count{"aaabbbccc123"},
+        ">=", 2, "Enforced UNIQUE_ID seen in 2 messages" );
+    is( scalar keys %request_id_count, 3, "Seen three different request IDs" );
 };
 
 done_testing();

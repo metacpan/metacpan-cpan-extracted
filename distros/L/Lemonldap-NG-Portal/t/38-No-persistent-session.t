@@ -11,17 +11,16 @@ SKIP: {
     if ($@) {
         skip 'Convert::Base32 is missing', $maintests;
     }
-    require Lemonldap::NG::Common::TOTP;
 
     my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel                 => 'error',
-                totp2fSelfRegistration   => 1,
-                totp2fActivation         => 1,
-                totp2fDigits             => 8,
+                totp2fSelfRegistration   =>  1,
+                totp2fActivation         =>  1,
+                totp2fDigits             =>  8,
                 totp2fTTL                => -1,
-                loginHistoryEnabled      => 1,
-                disablePersistentStorage => 1,
+                loginHistoryEnabled      =>  1,
+                disablePersistentStorage =>  1,
             }
         }
     );
@@ -114,9 +113,8 @@ SKIP: {
 
     # Post code
     my $code;
-    ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 8 ),
-        'Code' );
-    ok( $code =~ /^\d{8}$/, 'Code contains 8 digits' );
+    ok( $code = getTotp( $key, digits => 8 ), 'Code' );
+    ok( $code =~ /^\d{8}$/,                   'Code contains 8 digits' );
     my $s = "code=$code&token=$token";
     ok(
         $res = $client->_post(

@@ -1,3 +1,8 @@
+2.47  2026-05-29
+
+  - Centralize CLI error exit handling to reduce duplicated code.
+  - Bump module version to 2.47.
+
 2.46  2026-05-10
 
   - Avoid string eval when evaluating select() arithmetic comparisons.

@@ -10,9 +10,9 @@ package Lemonldap::NG::Handler::Lib::ZimbraPreAuth;
 
 use strict;
 use URI::Escape;
-use Digest::HMAC_SHA1 qw(hmac_sha1_hex);
+use Digest::SHA qw(hmac_sha1_hex);
 
-our $VERSION = '2.0.7';
+our $VERSION = '2.23.0';
 
 # Overload main run method
 sub run {

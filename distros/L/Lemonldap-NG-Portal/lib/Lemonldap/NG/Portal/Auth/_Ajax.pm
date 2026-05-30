@@ -12,7 +12,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_ERROR
 );
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 # addUnauthRoute/addAuthRoute are provided by deriving your plugin from
 # 'Lemonldap::NG::Portal::Main::Auth' or 'Lemonldap::NG::Portal::Main::Plugin'
@@ -73,7 +73,7 @@ sub _auth_route {
     my $res = $self->p->process($req);
     if ( $res && $res > 0 ) {
         $req->wantErrorRender(1);
-        return $self->p->doPE($req, $res);
+        return $self->p->doPE( $req, $res );
     }
 
     return $self->auth_route( $req, @path );
@@ -86,8 +86,9 @@ sub get_auth_token {
     my $token = $self->authott->getToken($token_id);
     if ($token) {
         if ( $token->{type} eq ( 'auth_token_' . $self->auth_id ) ) {
+
             # Fix #3180
-            utf8::downgrade($token->{user});
+            utf8::downgrade( $token->{user} );
             return $token;
         }
         else {
@@ -123,7 +124,7 @@ sub ajax_success {
     else {
         $self->logger->error("Could not create user token for $user");
         $req->wantErrorRender(1);
-        return $self->p->doPE($req, PE_ERROR);
+        return $self->p->doPE( $req, PE_ERROR );
     }
 }
 

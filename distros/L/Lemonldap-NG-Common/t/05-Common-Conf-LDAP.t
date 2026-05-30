@@ -20,8 +20,7 @@ SKIP: {
     use_ok('Lemonldap::NG::Common::Conf');
     my $h;
     ok(
-        $h = new Lemonldap::NG::Common::Conf(
-            {
+        $h = new Lemonldap::NG::Common::Conf( {
                 type             => 'LDAP',
                 ldapServer       => 'ldap://localhost',
                 ldapConfBase     => 'ou=conf,ou=websso,dc=example,dc=com',

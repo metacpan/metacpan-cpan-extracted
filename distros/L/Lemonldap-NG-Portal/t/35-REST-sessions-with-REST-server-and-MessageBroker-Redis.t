@@ -63,7 +63,7 @@ LWP::Protocol::PSGI->register(
 SKIP: {
     skip( "LLNGTESTREDIS isn't set", 1 ) unless $ENV{LLNGTESTREDIS};
     require 't/redis/redis.pm';
-    skip( 'Redis is missing',        1 ) if $main::noRedis;
+    skip( 'Redis is missing', 1 ) if $main::noRedis;
     &startRedis;
 
     $issuer = register( 'issuer', \&issuer );
@@ -134,19 +134,19 @@ done_testing();
 sub issuer {
     return LLNG::Manager::Test->new( {
             ini => {
-                domain            => 'idp.com',
-                portal            => 'http://auth.idp.com/',
-                authentication    => 'Demo',
-                userDB            => 'Same',
-                restSessionServer => 1,
+                domain               => 'idp.com',
+                portal               => 'http://auth.idp.com/',
+                authentication       => 'Demo',
+                userDB               => 'Same',
+                restSessionServer    => 1,
                 messageBroker        => '::Redis',
                 messageBrokerOptions => {
                     server => &REDISSERVER,
                 },
                 localSessionStorageOptions => {
-                    namespace   => 'lemonldap-ng-session',
-                    cache_root  => "$main::tmpDir/idp",
-                    cache_depth => 0,
+                    namespace            => 'lemonldap-ng-session',
+                    cache_root           => "$main::tmpDir/idp",
+                    cache_depth          => 0,
                     allow_cache_for_root => 1,
                 },
             }
@@ -175,9 +175,9 @@ sub sp {
                     server => &REDISSERVER,
                 },
                 localSessionStorageOptions => {
-                    namespace   => 'lemonldap-ng-session',
-                    cache_root  => "$main::tmpDir/sp",
-                    cache_depth => 0,
+                    namespace            => 'lemonldap-ng-session',
+                    cache_root           => "$main::tmpDir/sp",
+                    cache_depth          => 0,
                     allow_cache_for_root => 1,
                 },
             },

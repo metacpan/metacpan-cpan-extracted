@@ -5,21 +5,21 @@ package Lemonldap::NG::Portal::Lib::Net::LDAP;
 use strict;
 use Net::LDAP;    #inherits
 use Net::LDAP::Util qw(escape_filter_value);
-use base qw(Net::LDAP);
+use base            qw(Net::LDAP);
 use Lemonldap::NG::Portal::Main::Constants ':all';
 use Net::LDAP::Control::PasswordPolicy;
 use Encode;
 use Scalar::Util 'weaken';
 use IO::Socket::Timeout;
 use Net::LDAP qw(LDAP_PP_PASSWORD_EXPIRED LDAP_PP_ACCOUNT_LOCKED
-                 LDAP_PP_CHANGE_AFTER_RESET LDAP_PP_PASSWORD_MOD_NOT_ALLOWED
-                 LDAP_PP_MUST_SUPPLY_OLD_PASSWORD LDAP_PP_INSUFFICIENT_PASSWORD_QUALITY
-                 LDAP_PP_PASSWORD_TOO_SHORT LDAP_PP_PASSWORD_TOO_YOUNG
-                 LDAP_PP_PASSWORD_IN_HISTORY );
+  LDAP_PP_CHANGE_AFTER_RESET LDAP_PP_PASSWORD_MOD_NOT_ALLOWED
+  LDAP_PP_MUST_SUPPLY_OLD_PASSWORD LDAP_PP_INSUFFICIENT_PASSWORD_QUALITY
+  LDAP_PP_PASSWORD_TOO_SHORT LDAP_PP_PASSWORD_TOO_YOUNG
+  LDAP_PP_PASSWORD_IN_HISTORY );
 
 use utf8;
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 # INITIALIZATION
 
@@ -144,13 +144,14 @@ sub bind {
             my ($resp) = $mesg->control("1.3.6.1.4.1.42.2.27.8.5.1");
 
             # Check for ppolicy error
-            my ( $llng_code, $ppolicy_error_code, $ppolicy_error_msg ) = $self->check_ppolicy($resp);
+            my ( $llng_code, $ppolicy_error_code, $ppolicy_error_msg ) =
+              $self->check_ppolicy($resp);
             if ( $llng_code != 0 ) {
-                $self->{portal}
-                  ->logger->error( "Error when service account $dn binding to LDAP server: "
+                $self->{portal}->logger->error(
+                    "Error when service account $dn binding to LDAP server: "
                       . $mesg->error
                       . " | extended ppolicy control response error: $ppolicy_error_msg"
-                  );
+                );
             }
             else {
                 $self->{portal}->logger->error(
@@ -170,31 +171,41 @@ sub bind {
 sub check_ppolicy {
     my $self = shift;
     my $resp = shift;
-    return (PE_OK, undef, undef) unless(defined($resp));
+    return ( PE_OK, undef, undef ) unless ( defined($resp) );
 
     my $PPOLICY_ERRORS = {
-        LDAP_PP_PASSWORD_EXPIRED() => [ PE_PP_PASSWORD_EXPIRED, "password expired" ],
+        LDAP_PP_PASSWORD_EXPIRED() =>
+          [ PE_PP_PASSWORD_EXPIRED, "password expired" ],
         LDAP_PP_ACCOUNT_LOCKED() => [ PE_PP_ACCOUNT_LOCKED, "account locked" ],
-        LDAP_PP_CHANGE_AFTER_RESET() => [ PE_PP_CHANGE_AFTER_RESET, "change after reset" ],
-        LDAP_PP_PASSWORD_MOD_NOT_ALLOWED() => [ PE_PP_PASSWORD_MOD_NOT_ALLOWED, "password mod not allowed" ],
-        LDAP_PP_MUST_SUPPLY_OLD_PASSWORD() => [ PE_PP_MUST_SUPPLY_OLD_PASSWORD, "supply old password" ],
-        LDAP_PP_INSUFFICIENT_PASSWORD_QUALITY() => [ PE_PP_INSUFFICIENT_PASSWORD_QUALITY, "insufficient password quality" ],
-        LDAP_PP_PASSWORD_TOO_SHORT() => [ PE_PP_PASSWORD_TOO_SHORT, "password too short" ],
-        LDAP_PP_PASSWORD_TOO_YOUNG() => [ PE_PP_PASSWORD_TOO_YOUNG, "password too young" ],
-        LDAP_PP_PASSWORD_IN_HISTORY() => [ PE_PP_PASSWORD_IN_HISTORY, "password in history" ]
+        LDAP_PP_CHANGE_AFTER_RESET() =>
+          [ PE_PP_CHANGE_AFTER_RESET, "change after reset" ],
+        LDAP_PP_PASSWORD_MOD_NOT_ALLOWED() =>
+          [ PE_PP_PASSWORD_MOD_NOT_ALLOWED, "password mod not allowed" ],
+        LDAP_PP_MUST_SUPPLY_OLD_PASSWORD() =>
+          [ PE_PP_MUST_SUPPLY_OLD_PASSWORD, "supply old password" ],
+        LDAP_PP_INSUFFICIENT_PASSWORD_QUALITY() => [
+            PE_PP_INSUFFICIENT_PASSWORD_QUALITY,
+            "insufficient password quality"
+        ],
+        LDAP_PP_PASSWORD_TOO_SHORT() =>
+          [ PE_PP_PASSWORD_TOO_SHORT, "password too short" ],
+        LDAP_PP_PASSWORD_TOO_YOUNG() =>
+          [ PE_PP_PASSWORD_TOO_YOUNG, "password too young" ],
+        LDAP_PP_PASSWORD_IN_HISTORY() =>
+          [ PE_PP_PASSWORD_IN_HISTORY, "password in history" ]
     };
 
     my $ppolicy_error_code = $resp->pp_error;
 
-    if ( defined $ppolicy_error_code and $PPOLICY_ERRORS->{$ppolicy_error_code} ) {
+    if ( defined $ppolicy_error_code
+        and $PPOLICY_ERRORS->{$ppolicy_error_code} )
+    {
 
         # return: ( llng_code, ppolicy_error_code, ppolicy_error_msg )
         return ( $PPOLICY_ERRORS->{$ppolicy_error_code}->[0],
-                 $ppolicy_error_code,
-                 $PPOLICY_ERRORS->{$ppolicy_error_code}->[1]
-               );
+            $ppolicy_error_code, $PPOLICY_ERRORS->{$ppolicy_error_code}->[1] );
     }
-    return (PE_OK, undef, undef);
+    return ( PE_OK, undef, undef );
 }
 
 ## @method Net::LDAP::Message unbind()
@@ -251,10 +262,12 @@ sub userBind {
         }
 
         # Check for ppolicy error
-        my ( $llng_code, $ppolicy_error_code, $ppolicy_error_msg ) = $self->check_ppolicy($resp);
+        my ( $llng_code, $ppolicy_error_code, $ppolicy_error_msg ) =
+          $self->check_ppolicy($resp);
         if ( $llng_code != 0 ) {
             $self->{portal}->userLogger->error(
-                "Password policy error $ppolicy_error_code ($ppolicy_error_msg) for " . $req->user );
+"Password policy error $ppolicy_error_code ($ppolicy_error_msg) for "
+                  . $req->user );
             return $llng_code;
         }
         elsif ( $mesg->code == 0 ) {
@@ -662,9 +675,9 @@ sub searchGroups {
     my $groups = {};
 
     # Creating search filter
-    my $groupSearchFilter = $self->{conf}->{groupLDAPFilter} || "(objectClass=" . $self->{conf}->{ldapGroupObjectClass} . ")";
-    my $searchFilter =
-      "(&" . $groupSearchFilter . "(|";
+    my $groupSearchFilter = $self->{conf}->{groupLDAPFilter}
+      || "(objectClass=" . $self->{conf}->{ldapGroupObjectClass} . ")";
+    my $searchFilter = "(&" . $groupSearchFilter . "(|";
     foreach ( split( $self->{conf}->{multiValuesSeparator}, $value ) ) {
         $searchFilter .= "(" . $key . "=" . escape_filter_value($_) . ")";
     }

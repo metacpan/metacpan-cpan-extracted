@@ -10,13 +10,13 @@ use MIME::Base64;
 use strict;
 use Mouse;
 use Crypt::URandom;
-use MIME::Base64 qw/encode_base64url/;
+use MIME::Base64                           qw/encode_base64url/;
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK PE_DONE);
-use Lemonldap::NG::Common::Lib::DBI qw(check_dbh);
+use Lemonldap::NG::Common::Lib::DBI        qw(check_dbh);
 
 extends 'Lemonldap::NG::Common::Module';
 
-our $VERSION = '2.22.2';
+our $VERSION = '2.23.0';
 
 # PROPERTIES
 
@@ -330,7 +330,7 @@ sub get_dynamic_hash_password {
         $self->logger->debug(
             "Using unixcrypt$dbscheme to hash salted password");
 
-        $hash = crypt($password, $dbhash);
+        $hash = crypt( $password, $dbhash );
         return $hash;
     }
 
@@ -468,7 +468,7 @@ sub get_dynamic_hash_new_password {
         $dbsalt   = gen_salt_text();
         $dbsalt   = "\$$dbscheme\$$dbsalt\$";
 
-        $hash = crypt($password, $dbsalt);
+        $hash = crypt( $password, $dbsalt );
 
         return $hash;
 

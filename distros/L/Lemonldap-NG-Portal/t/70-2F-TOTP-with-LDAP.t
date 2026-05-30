@@ -17,8 +17,6 @@ SKIP: {
     skip 'LLNGTESTLDAP is not set', $maintests unless ( $ENV{LLNGTESTLDAP} );
     require 't/test-ldap.pm';
 
-    require Lemonldap::NG::Common::TOTP;
-
     my $client = LLNG::Manager::Test->new( {
             ini => {
                 logLevel               => 'error',
@@ -67,13 +65,7 @@ SKIP: {
     );
     my ( $host, $url, $query ) = expectForm( $res, undef, '/totp2fcheck' );
 
-    ok(
-        my $code = Lemonldap::NG::Common::TOTP::_code(
-            undef, Convert::Base32::decode_base32($key),
-            0,     30, 6
-        ),
-        'Code'
-    );
+    ok( my $code = getTotp( Convert::Base32::decode_base32($key) ), 'Code' );
     $query =~ s/code=/code=$code/;
     ok(
         $res = $client->_post(

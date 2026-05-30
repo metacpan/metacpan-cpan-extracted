@@ -19,7 +19,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   URIRE
 );
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.23.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -94,14 +94,7 @@ has wsdl => (
         $resp =~ s/\$cookieList/$cookieList/g;
         $resp =~ s/\$attrList/$attrList/g;
         $resp =~ s/\$portal/$self->p->buildUrl/ge;
-        return [
-            200,
-            [
-                'Content-Type'   => 'application/wsdl+xml',
-                'Content-Length' => length($resp)
-            ],
-            [$resp]
-        ];
+        return $resp;
     }
 );
 
@@ -198,7 +191,9 @@ sub dispatch_to {
 # This subroutine works only for portals working with user and password
 
 sub getWsdl {
-    return $_[0]->wsdl;
+    my ( $self, $req ) = @_;
+    return $self->p->sendTextResponse( $req, $self->wsdl,
+        type => 'application/wsdl+xml' );
 }
 
 sub error {

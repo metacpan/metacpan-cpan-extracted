@@ -37,8 +37,8 @@
               <li uib-dropdown>
                 <a id="navmenu" name="menu" uib-dropdown-toggle data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="glyphicon glyphicon-cog"></i> {{translate('browse')}} <span class="caret"></span></a>
                 <ul uib-dropdown-menu aria-labelled-by="navmenu">
-                  <li ng-class="{'disabled':!currentCfg.prev}"><a class="link" ng-click="currentCfg.prev && getCfg(currentCfg.prev)" title="Configuration {{currentCfg.prev}}"><i class="glyphicon glyphicon-arrow-left"></i> {{translate('previous')}}</a></li>
-                  <li ng-class="{'disabled':!currentCfg.next}"><a class="link" ng-click="currentCfg.next && getCfg(currentCfg.next)" title="Configuration {{currentCfg.next}}"><i class="glyphicon glyphicon-arrow-right"></i> {{translate('next')}}</a></a></li>
+                  <li ng-class="{'disabled':!currentCfg.prev}"><a class="link" ng-click="currentCfg.prev && getCfg(currentCfg.prev.cfgNum)" uib-tooltip="{{currentCfg.prev.cfgLog || currentCfg.prev.cfgNum}}"><i class="glyphicon glyphicon-arrow-left"></i> {{translate('previous')}}</a></li>
+                  <li ng-class="{'disabled':!currentCfg.next}"><a class="link" ng-click="currentCfg.next && getCfg(currentCfg.next.cfgNum)" uib-tooltip="{{currentCfg.next.cfgLog || currentCfg.next.cfgNum}}"><i class="glyphicon glyphicon-arrow-right"></i> {{translate('next')}}</a></a></li>
                   <li><a class="link" ng-click="getCfg('latest')" title="Latest configuration"><i class="glyphicon glyphicon-refresh"></i> {{translate('latest')}}</a></li>
                 </ul>
               </li>

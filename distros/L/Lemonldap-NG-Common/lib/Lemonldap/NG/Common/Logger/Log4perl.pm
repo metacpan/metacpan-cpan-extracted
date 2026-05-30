@@ -4,7 +4,7 @@ use strict;
 use Log::Log4perl;
 use Log::Log4perl::MDC;
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.23.0';
 
 our $init = 0;
 
@@ -73,8 +73,7 @@ sub new {
         if ($show) {
             my $name = $_;
             $name = 'info' if ( $_ eq 'notice' );
-            eval
-              qq'sub $_ {shift->{log}->$name(\@_)}';
+            eval qq'sub $_ {shift->{log}->$name(\@_)}';
             die $@ if ($@);
         }
         else {

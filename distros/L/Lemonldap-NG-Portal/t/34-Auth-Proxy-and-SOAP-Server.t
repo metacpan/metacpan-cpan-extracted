@@ -88,8 +88,7 @@ SKIP: {
     ok(
         $res =
           Lemonldap::NG::Common::Apache::Session::SOAP
-          ->get_key_from_all_sessions(
-            {
+          ->get_key_from_all_sessions( {
                 proxy => 'http://auth.idp.com/adminSessions',
                 ns    => 'urn:Lemonldap/NG/Common/PSGI/SOAPService'
             },
@@ -97,7 +96,12 @@ SKIP: {
           ),
         'Try get_key_from_all_sessions'
     );
-    ok( defined $res->{$ENV{LLNG_HASHED_SESSION_STORE} ? id2storage($spId) : $spId}, ' Found session' );
+    ok(
+        defined $res->{ $ENV{LLNG_HASHED_SESSION_STORE}
+            ? id2storage($spId)
+            : $spId },
+        ' Found session'
+    );
     count(3);
 
     # Logout
@@ -129,8 +133,7 @@ clean_sessions();
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel          => $debug,
                 domain            => 'idp.com',
@@ -144,8 +147,7 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel         => $debug,
                 domain           => 'sp.com',

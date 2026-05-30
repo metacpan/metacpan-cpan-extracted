@@ -4,11 +4,11 @@ package Lemonldap::NG::Portal::2F::Register::WebAuthn;
 use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants 'PE_OK';
-use JSON qw(from_json to_json);
+use JSON         qw(from_json to_json);
 use MIME::Base64 qw(encode_base64url decode_base64url);
 use Crypt::URandom;
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Portal::2F::Register::Base';
 with 'Lemonldap::NG::Portal::Lib::WebAuthn';
@@ -58,6 +58,7 @@ use constant supportedActions => {
     registration          => "_registration",
     verificationchallenge => "_verificationchallenge",
     verification          => "_verification",
+    modify                => "modify",
     delete                => "delete",
 };
 
@@ -137,7 +138,11 @@ sub _registrationchallenge {
         },
         challenge              => $challenge_base64,
         attestation            => $attestation,
-        pubKeyCredParams       => [],
+        pubKeyCredParams       => [
+            { type => 'public-key', alg => -7   },    # ES256
+            { type => 'public-key', alg => -257 },    # RS256
+            { type => 'public-key', alg => -37  },    # PS256
+        ],
         authenticatorSelection => { (
                 $userVerification ? ( userVerification => $userVerification )
                 : ()

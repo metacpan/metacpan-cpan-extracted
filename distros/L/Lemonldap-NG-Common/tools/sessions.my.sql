@@ -77,9 +77,11 @@ CREATE TABLE cassessions (
     _session_kind varchar(15),
     _utime bigint,
     _cas_id varchar(128),
-    pgtIou varchar(128)
+    pgtIou varchar(128),
+    auth_cas_ticket varchar(128)
 ) DEFAULT CHARSET utf8;
-CREATE INDEX i_c__session_kind ON cassessions (_session_kind);
-CREATE INDEX i_c__utime        ON cassessions (_utime);
-CREATE INDEX i_c__cas_id       ON cassessions (_cas_id);
-CREATE INDEX i_c_pgtIou        ON cassessions (pgtIou);
+CREATE INDEX i_c__session_kind   ON cassessions (_session_kind);
+CREATE INDEX i_c__utime          ON cassessions (_utime);
+CREATE INDEX i_c__cas_id         ON cassessions (_cas_id);
+CREATE INDEX i_c_pgtIou          ON cassessions (pgtIou);
+CREATE INDEX i_c_auth_cas_ticket ON cassessions (auth_cas_ticket);

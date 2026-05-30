@@ -2,11 +2,11 @@ package Lemonldap::NG::Portal::Plugins::NewLocationWarning;
 
 use strict;
 use Mouse;
-use POSIX qw(strftime);
+use POSIX                                  qw(strftime);
 use Lemonldap::NG::Portal::Main::Constants qw(PE_OK);
-use List::MoreUtils qw/uniq/;
+use List::MoreUtils                        qw/uniq/;
 
-our $VERSION = '2.17.0';
+our $VERSION = '2.23.0';
 
 has locationAttribute        => ( is => 'rw' );
 has locationDisplayAttribute => ( is => 'rw' );

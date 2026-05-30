@@ -3,14 +3,14 @@ package Lemonldap::NG::Portal::2F::Register::Yubikey;
 
 use strict;
 use Mouse;
-use JSON qw(from_json to_json);
+use JSON                                   qw(from_json to_json);
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_FORMEMPTY
   PE_ERROR
   PE_OK
 );
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Portal::2F::Register::Base';
 with 'Lemonldap::NG::Portal::Lib::2fDevices';
@@ -29,6 +29,7 @@ has welcome  => ( is => 'ro', default => 'clickOnYubikey' );
 
 use constant supportedActions => {
     register => "register",
+    modify   => "modify",
     delete   => "delete",
 };
 
@@ -66,15 +67,12 @@ sub register {
             }
         );
         if ( $res == PE_OK ) {
-            return [
-                302,
-                [
-                    Location => $self->p->buildUrl(
-                        $req->portal, "2fregisters", { continue => 1 }
-                    )
-                ],
-                []
-            ];
+            return $self->p->sendRedirection(
+                $req,
+                $self->p->buildUrl(
+                    $req->portal, "2fregisters", { continue => 1 }
+                )
+            );
         }
         else {
             $self->logger->debug( $self->prefix . "2f: unable to add device" );

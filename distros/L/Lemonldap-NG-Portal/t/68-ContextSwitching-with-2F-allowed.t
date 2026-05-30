@@ -10,7 +10,6 @@ BEGIN {
 my $maintests = 76;
 
 SKIP: {
-    require Lemonldap::NG::Common::TOTP;
     eval { require Convert::Base32 };
     if ($@) {
         skip 'Convert::Base32 is missing';
@@ -113,9 +112,8 @@ SKIP: {
     $key = Convert::Base32::decode_base32($key);
 
     # Post code
-    ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
-        'Code' );
-    ok( $code =~ /^\d{6}$/, 'Code contains 6 digits' );
+    ok( $code = getTotp($key), 'Code' );
+    ok( $code =~ /^\d{6}$/,    'Code contains 6 digits' );
     my $s = "code=$code&token=$token&TOTPName=myTOTP";
     ok(
         $res = $client->_post(
@@ -166,8 +164,7 @@ SKIP: {
     );
     ( $host, $url, $query ) =
       expectForm( $res, undef, '/totp2fcheck', 'token' );
-    ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
-        'Code' );
+    ok( $code = getTotp($key), 'Code' );
     $query =~ s/code=/code=$code/;
     ok(
         $res = $client->_post(
@@ -206,8 +203,7 @@ SKIP: {
     my $devices;
     ok(
         $devices =
-          $res->[2]->[0] =~
-          s%<span\s*device=\'(?:TOTP)\'\s*epoch=\'\d{10}\'%%mg,
+          $res->[2]->[0] =~ s%<td\s*class="data-epoch">\d{10}<\/td>%%mg,
         '2F device found'
     ) or print STDERR Dumper( $res->[2]->[0] );
     ok( $devices == 1, '2F devices found' )
@@ -298,9 +294,8 @@ SKIP: {
     $key = Convert::Base32::decode_base32($key);
 
     # Post code
-    ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
-        'Code' );
-    ok( $code =~ /^\d{6}$/, 'Code contains 6 digits' );
+    ok( $code = getTotp($key), 'Code' );
+    ok( $code =~ /^\d{6}$/,    'Code contains 6 digits' );
     $s = "code=$code&token=$token&TOTPName=myTOTP";
     my $epoch = time();
     ok(
@@ -334,7 +329,7 @@ SKIP: {
       or print STDERR Dumper( $res->[2]->[0] );
     ok(
         $devices =
-          $res->[2]->[0] =~ s%<span\s*device=\'TOTP\'\s*epoch=\'\d{10}\'%%mg,
+          $res->[2]->[0] =~ s%<td\s*class="data-epoch">\d{10}<\/td>%%mg,
         '2F device found'
     ) or print STDERR Dumper( $res->[2]->[0] );
     ok( $devices == 1, '2F device found' )
@@ -489,8 +484,7 @@ SKIP: {
     $epoch = $1;
     ok(
         $devices =
-          $res->[2]->[0] =~
-          s%<span\s*device=\'(?:TOTP)\'\s*epoch=\'(?:\d{10})\'%%mg,
+          $res->[2]->[0] =~ s%<td\s*class="data-epoch">\d{10}<\/td>%%mg,
         '2F devices found'
     ) or print STDERR Dumper( $res->[2]->[0] );
     ok( $devices == 1, '2F devices registered' )

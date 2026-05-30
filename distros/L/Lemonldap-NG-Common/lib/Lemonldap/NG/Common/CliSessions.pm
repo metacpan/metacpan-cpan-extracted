@@ -12,7 +12,7 @@ use Lemonldap::NG::Common::Util qw/getPSessionID genId2F/;
 use constant BACKENDS       => qw(global persistent oidc saml cas);
 use constant ISREFRESHTOKEN => '_type=refresh_token';
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 has opts => ( is => 'rw' );
 
@@ -88,12 +88,14 @@ sub _search {
                 $selectField, $value, @fields );
         }
         elsif ( $self->opts->{where} =~ /^(\w+)\s*<\s*(.*)/ ) {
-            $res = Lemonldap::NG::Common::Apache::Session->searchLt( $args,
-                $1, $2, @fields );
+            $res =
+              Lemonldap::NG::Common::Apache::Session->searchLt( $args, $1, $2,
+                @fields );
         }
         elsif ( $self->opts->{where} =~ /^(\w+)\s*>\s*(.*)/ ) {
-            $res = Lemonldap::NG::Common::Apache::Session->searchGt( $args,
-                $1, $2, @fields );
+            $res =
+              Lemonldap::NG::Common::Apache::Session->searchGt( $args, $1, $2,
+                @fields );
         }
         else {
             die "Invalid --where option : " . $self->opts->{where};
@@ -609,6 +611,94 @@ sub delKey {
     return 0;
 }
 
+sub _get_login_history {
+    my ( $self, $uid ) = @_;
+
+    my $psession_id = getPSessionID($uid);
+    my $as          = $self->_get_one_session( $psession_id, 'persistent' );
+    return undef unless $as;
+
+    my $data          = $as->data;
+    my $login_history = $data->{_loginHistory};
+    return $login_history
+      if $login_history && ref($login_history) eq 'HASH';
+    return undef;
+}
+
+sub _last_login_event {
+    my ( $self, $uid, $key, $label ) = @_;
+    die "User ID required" unless $uid;
+
+    my $o             = $self->stdout;
+    my $e             = $self->stderr;
+    my $login_history = $self->_get_login_history($uid);
+
+    unless ($login_history) {
+        print $e "No login history found for user $uid\n";
+        return 1;
+    }
+
+    my $events = $login_history->{$key};
+    unless ( $events && ref($events) eq 'ARRAY' && @$events ) {
+        print $e "No $label found for user $uid\n";
+        return 1;
+    }
+
+    my $last  = $events->[0];
+    my $utime = $last->{_utime};
+
+    unless ($utime) {
+        print $e "No timestamp found in last $label\n";
+        return 1;
+    }
+
+    my $msg = scalar( localtime($utime) );
+    $msg .= " ($last->{error})" if $last->{error};
+    print $o "$msg\n";
+    return 0;
+}
+
+sub history_lastsuccessdate {
+    my ( $self, $uid ) = @_;
+    return $self->_last_login_event( $uid, 'successLogin', 'successful login' );
+}
+
+sub history_lastfailuredate {
+    my ( $self, $uid ) = @_;
+    return $self->_last_login_event( $uid, 'failedLogin', 'failed login' );
+}
+
+sub history_get {
+    my ( $self, $uid ) = @_;
+    die "User ID required" unless $uid;
+
+    my $o             = $self->stdout;
+    my $e             = $self->stderr;
+    my $login_history = $self->_get_login_history($uid);
+
+    unless ($login_history) {
+        print $e "No login history found for user $uid\n";
+        return 1;
+    }
+
+    my $result = {};
+
+    for my $key (qw(successLogin failedLogin)) {
+        next unless my $events = $login_history->{$key};
+        $result->{$key} = [
+            map {
+                {
+                    %$_,
+                      date => scalar( localtime( $_->{_utime} ) ),
+                }
+            } @$events
+        ];
+    }
+
+    print $o $self->_to_json($result);
+    return 0;
+}
+
 sub run {
     my $self   = shift;
     my $action = shift;
@@ -628,7 +718,7 @@ sub run {
     }
 
     # Subcommands and target
-    elsif ( $action =~ /^(?:secondfactors|consents)$/ ) {
+    elsif ( $action =~ /^(?:secondfactors|consents|history)$/ ) {
         my $subcommand = shift;
         unless ($subcommand) {
             die "Missing subcommand $action";

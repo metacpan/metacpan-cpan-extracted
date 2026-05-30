@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-05-28'; # DATE
+our $DATE = '2026-05-29'; # DATE
 our $DIST = 'App-FilenameKeyValueUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Filename/KeyValue/rename_remove_keyvalue_filenames",
@@ -38,7 +38,7 @@ rename-remove-keyvalue-filenames - Rename file by removing keys
 
 =head1 VERSION
 
-This document describes version 0.002 of rename-remove-keyvalue-filenames (from Perl distribution App-FilenameKeyValueUtils), released on 2026-05-28.
+This document describes version 0.003 of rename-remove-keyvalue-filenames (from Perl distribution App-FilenameKeyValueUtils), released on 2026-05-29.
 
 =head1 SYNOPSIS
 
@@ -46,7 +46,7 @@ B<rename-remove-keyvalue-filenames> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"
 
 B<rename-remove-keyvalue-filenames> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<rename-remove-keyvalue-filenames> [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [(B<L<--remove|/"--remove=s@">>=I<str>)+|B<L<--remove-json|/"--remove=s@">>=I<json>] -- E<lt>I<L<filename|/"--filename=s@*">>E<gt> ...
+B<rename-remove-keyvalue-filenames> [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--ignore|/"--ignore">>|B<L<--no-ignore|/"--ignore">>|B<L<--noignore|/"--ignore">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [(B<L<--remove|/"--remove=s@">>=I<str>)+|B<L<--remove-json|/"--remove=s@">>=I<json>] -- E<lt>I<L<filename|/"--filename=s@*">>E<gt> ...
 
 =head1 DESCRIPTION
 
@@ -86,6 +86,10 @@ Can also be specified as the 1st command-line argument and onwards.
 Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
+
+=item B<--ignore>
+
+If set, when filename already has the same key, do nothing.
 
 =item B<--remove-json>=I<s>
 

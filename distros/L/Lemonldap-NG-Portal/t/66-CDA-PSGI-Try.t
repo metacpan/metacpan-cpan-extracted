@@ -9,12 +9,29 @@ extends 'Lemonldap::NG::Handler::PSGI::Try';
 sub init {
     my ($self) = @_;
     $self->SUPER::init( $_[1] ) or return 0;
+
+    # Register sub-routes that must not be overwritten
+    $self->addUnauthRoute(
+        myapp => { public => 'publicPage' },
+        ['GET']
+    );
+
+# addAuthRouteWithRedirect with sub-routes must preserve existing unauth sub-routes
+    $self->addAuthRouteWithRedirect(
+        myapp => { '*' => 'my' },
+        ['GET']
+    );
+
     $self->addAuthRouteWithRedirect( '*' => 'my' );
     return 1;
 }
 
 sub my {
     return [ 200, [], ['OK'] ];
+}
+
+sub publicPage {
+    return [ 200, [], ['PUBLIC'] ];
 }
 
 package main;
@@ -34,8 +51,7 @@ my $res;
 my $client = register(
     'portal',
     sub {
-        LLNG::Manager::Test->new(
-            {
+        LLNG::Manager::Test->new( {
                 ini => {
                     logLevel    => 'error',
                     useSafeJail => 1,
@@ -84,8 +100,7 @@ my ( $cli, $app );
 $app = register( 'app', sub { LocalApp->run( $client->ini ) } );
 
 ok(
-    $res = $app->(
-        {
+    $res = $app->( {
             'HTTP_ACCEPT'          => 'text/html',
             'SCRIPT_NAME'          => '/',
             'SERVER_NAME'          => '127.0.0.1',
@@ -112,8 +127,7 @@ expectRedirection( $res, 'http://test.example.org/' );
 my $cid = expectCookie($res);
 
 ok(
-    $res = $app->(
-        {
+    $res = $app->( {
             'HTTP_ACCEPT'          => 'text/html',
             'SCRIPT_NAME'          => '/',
             'SERVER_NAME'          => '127.0.0.1',
@@ -138,6 +152,62 @@ ok(
 count(1);
 expectOK($res);
 expectAuthenticatedAs( $res, 'dwho' );
+
+# Test that addAuthRouteWithRedirect does not overwrite existing unauth sub-routes
+# /myapp/public should be accessible without auth (registered before addAuthRouteWithRedirect)
+ok(
+    $res = $app->( {
+            'HTTP_ACCEPT'        => 'text/html',
+            'SCRIPT_NAME'        => '/',
+            'SERVER_NAME'        => '127.0.0.1',
+            'HTTP_CACHE_CONTROL' => 'max-age=0',
+            'PATH_INFO'          => '/myapp/public',
+            'REQUEST_METHOD'     => 'GET',
+            'REQUEST_URI'        => '/myapp/public',
+            'X_ORIGINAL_URI'     => '/myapp/public',
+            'SERVER_PORT'        => '80',
+            'SERVER_PROTOCOL'    => 'HTTP/1.1',
+            'HTTP_USER_AGENT'    =>
+              'Mozilla/5.0 (VAX-4000; rv:36.0) Gecko/20350101 Firefox',
+            'REMOTE_ADDR' => '127.0.0.1',
+            'HTTP_HOST'   => 'test.example.org',
+            'VHOSTTYPE'   => 'CDA',
+        }
+    ),
+    'Unauth request to /myapp/public'
+);
+count(1);
+ok( $res->[0] == 200, '/myapp/public returns 200 without auth' )
+  or explain( $res, '200 expected' );
+ok( $res->[2]->[0] eq 'PUBLIC', '/myapp/public returns PUBLIC content' );
+count(2);
+
+# /myapp/other should redirect to portal (unauthenticated, covered by wildcard redirect)
+ok(
+    $res = $app->( {
+            'HTTP_ACCEPT'        => 'text/html',
+            'SCRIPT_NAME'        => '/',
+            'SERVER_NAME'        => '127.0.0.1',
+            'HTTP_CACHE_CONTROL' => 'max-age=0',
+            'PATH_INFO'          => '/myapp/other',
+            'REQUEST_METHOD'     => 'GET',
+            'REQUEST_URI'        => '/myapp/other',
+            'X_ORIGINAL_URI'     => '/myapp/other',
+            'SERVER_PORT'        => '80',
+            'SERVER_PROTOCOL'    => 'HTTP/1.1',
+            'HTTP_USER_AGENT'    =>
+              'Mozilla/5.0 (VAX-4000; rv:36.0) Gecko/20350101 Firefox',
+            'REMOTE_ADDR' => '127.0.0.1',
+            'HTTP_HOST'   => 'test.example.org',
+            'VHOSTTYPE'   => 'CDA',
+        }
+    ),
+    'Unauth request to /myapp/other'
+);
+count(1);
+ok( $res->[0] == 302, '/myapp/other redirects to portal (302)' )
+  or explain( $res, '302 expected' );
+count(1);
 
 clean_sessions();
 

@@ -5,7 +5,7 @@ use strict;
 use utf8;
 use warnings;
 
-our $VERSION = '0.001000';
+our $VERSION = '0.001002';
 
 use Unicode::Normalize qw(NFC);
 use Zuzu::Value::Equality qw(equality_type);
@@ -26,7 +26,7 @@ sub is_word_ident {
 sub is_keyword {
 	my ($s) = @_;
 
-	state %kw = map { $_ => 1 } qw(
+	state $kw = { map { $_ => 1 } qw(
 		let const function method static class trait extends with but
 		if else unless while for in return next last switch case default continue
 		true false null
@@ -38,9 +38,9 @@ sub is_keyword {
 		try catch throw die do warn say print debug assert
 		new self super fn
 		async await spawn
-	);
+	) };
 
-	return $kw{$s} ? 1 : 0;
+	return $kw->{$s} ? 1 : 0;
 }
 
 sub boolify {

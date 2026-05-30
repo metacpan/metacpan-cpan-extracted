@@ -1,5 +1,8 @@
 use Test2::V0;
 
+plan skip_all => 'set AUTHOR_TESTING=1 to run zuzuzoo hardening tests'
+	if !$ENV{AUTHOR_TESTING};
+
 use Config;
 use File::Basename qw( dirname );
 use File::Path qw( make_path );
@@ -10,7 +13,18 @@ use JSON::PP;
 
 my $repo_root = File::Spec->rel2abs( File::Spec->curdir );
 my $zuzu_bin = File::Spec->catfile( $repo_root, 'bin', 'zuzu.pl' );
-my $zuzuzoo_bin = File::Spec->catfile( $repo_root, 'bin', 'zuzuzoo.pl' );
+my $zuzuzoo_bin = _zuzuzoo_script();
+
+sub _zuzuzoo_script {
+	my @candidates = (
+		File::Spec->catfile( $repo_root, 'blib', 'script', 'zuzuzoo' ),
+		File::Spec->catfile( $repo_root, 'stdlib', 'scripts', 'zuzuzoo' ),
+	);
+	for my $candidate ( @candidates ) {
+		return $candidate if -x $candidate;
+	}
+	return $candidates[-1];
+}
 
 sub run_zuzuzoo {
 	my ( $home, @args ) = @_;
@@ -20,7 +34,12 @@ sub run_zuzuzoo {
 
 	local $ENV{HOME} = $home;
 	local $ENV{PATH} = File::Spec->catdir( $repo_root, 'bin' )
+		. $Config::Config{path_sep}
+		. File::Spec->catdir( $repo_root, 'blib', 'script' )
 		. $Config::Config{path_sep} . $ENV{PATH};
+	local $ENV{ZUZULIB} = File::Spec->catdir( $repo_root, 'stdlib', 'modules' )
+		. $Config::Config{path_sep}
+		. File::Spec->catdir( $repo_root, 'stdlib', 'test-modules' );
 	local $ENV{ZUZU_COMMAND} = $zuzu_bin;
 	run \@cmd, '<', \undef, '>', \$stdout, '2>', \$stderr;
 

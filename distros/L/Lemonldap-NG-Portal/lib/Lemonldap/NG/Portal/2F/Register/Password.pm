@@ -7,7 +7,7 @@ use Mouse;
 use JSON qw(from_json to_json);
 use Lemonldap::NG::Common::Crypto;
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Portal::2F::Register::Base';
 with 'Lemonldap::NG::Portal::Lib::2fDevices';
@@ -50,6 +50,7 @@ has crypto => (
 
 use constant supportedActions => {
     verify => "verify",
+    modify => "modify",
     delete => "delete",
 };
 

@@ -2,7 +2,7 @@ package Lemonldap::NG::Handler::Lib::ServiceToken;
 
 use strict;
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.23.0';
 
 sub fetchId {
     my ( $class, $req ) = @_;
@@ -103,6 +103,14 @@ sub fetchId {
     }
 
     return $_session_id;
+}
+
+# Hide ServiceToken to the protected application
+sub hideCookie {
+    my ( $class, $req ) = @_;
+    $class->logger->debug('Removing X_LLNG_TOKEN header');
+    $class->unset_header_in( $req, 'X_LLNG_TOKEN' );
+    $class->Lemonldap::NG::Handler::Main::hideCookie($req);
 }
 
 1;

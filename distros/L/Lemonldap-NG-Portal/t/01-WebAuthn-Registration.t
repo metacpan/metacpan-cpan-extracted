@@ -325,12 +325,14 @@ ENDKEY
         is_deeply(
             $device1,
             {
-                '_credentialId'        => encode_base64url($credential_id_1),
+                '_credentialId'        => encode_base64url($credential_id_2),
                 '_credentialPublicKey' =>
 'pQECAyYgASFYIM_oQXEUzjPwEhM4gWmIbCuOXc4Ja8jPDKxbQaZckal7Ilgg_9a693_nkf7flk1S9AV2tjrtJPF6kg8TCGbFKoeD9Wc',
-                '_signCount' => 7,
-                'name'       => "MyFirstDevice",
-                'type'       => 'WebAuthn'
+                '_signCount' => 18,
+                '_transports', 'usb,nfc',
+                'name'   => "MySecondDevice",
+                'type'   => 'WebAuthn',
+                resident => 1,
             },
             "Registration contains expected data"
         );
@@ -348,11 +350,9 @@ ENDKEY
             ),
             'Show 2FA Manager'
         );
-
-        my $tr = getHtmlElement( $res,
-            "//td[text() = \"$name\"]/..//span[\@prefix=\"webauthn\"]" )->shift;
-        ok( $tr, "Found $name among registered devices" );
-        my $epoch = $tr->getAttribute('epoch');
+        my $epoch =
+          getHtmlElement( $res, "//td[\@class=\"data-epoch\"]/text()" )->shift;
+        ok( $epoch, "Found $name among registered devices" );
         ok( $epoch, "Found epoch for $name" );
 
         {

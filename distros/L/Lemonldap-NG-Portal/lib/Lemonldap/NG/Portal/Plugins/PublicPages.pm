@@ -5,7 +5,7 @@ use Mouse;
 
 extends 'Lemonldap::NG::Portal::Main::Plugin';
 
-our $VERSION = '2.0.10';
+our $VERSION = '2.23.0';
 
 sub init {
     my ($self) = @_;
@@ -55,8 +55,7 @@ system.
 
 =over
 
-=item Add "C<customPlugins = ::Plugins::PublicPages>" in your lemonldap-ng.ini
-file
+=item Add "C<::Plugins::PublicPages>" to custom plugins list
 
 =item Create a "public" subdir in your template directory
 

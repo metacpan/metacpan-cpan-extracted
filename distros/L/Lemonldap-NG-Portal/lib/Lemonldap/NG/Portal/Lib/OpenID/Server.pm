@@ -6,14 +6,14 @@
 package Lemonldap::NG::Portal::Lib::OpenID::Server;
 
 use strict;
-use base qw(Net::OpenID::Server);
+use base   qw(Net::OpenID::Server);
 use fields qw(_extensions);
 use Net::OpenID::Server;
 use Lemonldap::NG::Common::Regexp;
 
 use constant DEBUG => 0;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.23.0';
 
 use constant OPENID2_NS => 'http://specs.openid.net/auth/2.0';
 

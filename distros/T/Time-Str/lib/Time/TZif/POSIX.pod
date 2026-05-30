@@ -29,8 +29,6 @@ Time::TZif::POSIX - POSIX TZ string parser with configurable local time resoluti
 
 =head1 DESCRIPTION
 
-B<Note:> This module is experimental and may change without prior notice.
-
 C<Time::TZif::POSIX> parses POSIX TZ strings as defined in
 IEEE Std 1003.1 (POSIX.1) and RFC 8536 E<sect>3.3.1, and provides
 the same API as L<Time::TZif> for resolving UTC and local times to
@@ -115,8 +113,9 @@ Hours may range up to 167 (RFC 8536 E<sect>3.3.1 extension).
 
     my $tz = Time::TZif::POSIX->new(
       tz_string      => $string,
-      gap_policy     => 'reject',    # optional, default: 'reject'
-      overlap_policy => 'reject',    # optional, default: 'reject'
+      name           => 'America/New_York',  # optional
+      gap_policy     => 'reject',            # optional, default: 'reject'
+      overlap_policy => 'reject',            # optional, default: 'reject'
     );
 
 Creates a new C<Time::TZif::POSIX> object by parsing the given POSIX
@@ -127,6 +126,10 @@ TZ string.
 =item C<tz_string> (required)
 
 A POSIX TZ string (e.g., C<'EST5EDT,M3.2.0,M11.1.0'>).
+
+=item C<name> (optional)
+
+IANA timezone name associated with this TZ string (e.g., C<America/New_York>).
 
 =item C<gap_policy> (optional, default: C<'reject'>)
 
@@ -200,6 +203,19 @@ Returns the full type information for the given local epoch time.
 Accepts the same C<gap_policy> and C<overlap_policy> options as
 C<offset_for_local>.
 
+=head2 name
+
+    my $name = $tz->name;
+
+Returns the timezone name passed to the constructor, or C<undef> if
+none was provided.
+
+=head2 has_name
+
+    if ($tz->has_name) { ... }
+
+Returns true if a timezone name was provided to the constructor.
+
 =head2 tz_string
 
     my $string = $tz->tz_string;
@@ -217,6 +233,30 @@ Returns the default gap policy set in the constructor.
     my $policy = $tz->overlap_policy;
 
 Returns the default overlap policy set in the constructor.
+
+=head2 with_name
+
+    my $tz2 = $tz->with_name('Europe/Stockholm');
+
+Returns a new C<Time::TZif::POSIX> object with the given timezone name,
+sharing the parsed data with the original. Croaks if the name is not
+structurally valid. Returns the same object if the name is unchanged.
+
+=head2 with_gap_policy
+
+    my $tz2 = $tz->with_gap_policy('later');
+
+Returns a new C<Time::TZif::POSIX> object with the given gap policy,
+sharing the parsed data with the original. Croaks if the policy is not
+valid. Returns the same object if the policy is unchanged.
+
+=head2 with_overlap_policy
+
+    my $tz2 = $tz->with_overlap_policy('earlier');
+
+Returns a new C<Time::TZif::POSIX> object with the given overlap policy,
+sharing the parsed data with the original. Croaks if the policy is not
+valid. Returns the same object if the policy is unchanged.
 
 =head1 CROSS-YEAR TRANSITIONS
 
@@ -311,6 +351,11 @@ A method was called with an incorrect number of arguments.
 
 The C<new> constructor was called without the required C<tz_string>
 parameter.
+
+=item C<Invalid value for the parameter 'name'>
+
+The value given for C<name> is not structurally valid as an IANA Time 
+Zone Database timezone name.
 
 =item C<Invalid policy value for the parameter '%s'>
 

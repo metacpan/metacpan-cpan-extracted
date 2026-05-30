@@ -83,9 +83,8 @@ count(4);
 
 # Post code
 my $code;
-ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
-    'Code' );
-ok( $code =~ /^\d{6}$/, 'Code contains 6 digits' );
+ok( $code = getTotp($key), 'Code' );
+ok( $code =~ /^\d{6}$/,    'Code contains 6 digits' );
 my $s = "code=$code&token=$token";
 ok(
     $res = $client->_post(
@@ -170,9 +169,8 @@ $keyR = Convert::Base32::decode_base32($keyR);
 count(4);
 
 # Post code
-ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $keyR, 0, 30, 6 ),
-    'Code' );
-ok( $code =~ /^\d{6}$/, 'Code contains 6 digits' );
+ok( $code = getTotp($keyR), 'Code' );
+ok( $code =~ /^\d{6}$/,     'Code contains 6 digits' );
 $s = "code=$code&token=$token";
 ok(
     $res = $client->_post(
@@ -365,7 +363,6 @@ is(
 );
 count(3);
 
-
 ## Try to authenticate => TOTP prompted
 ok(
     $res = $client->_post(
@@ -381,8 +378,7 @@ ok( $res->[2]->[0] =~ m%<span trspan="enterTotpCode">%, 'TOTP code required' )
   or explain( $res->[2]->[0], 'trspan="enterTotpCode"' );
 count(2);
 ( $host, $url, $query ) = expectForm( $res, undef, '/totp2fcheck', 'token' );
-ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
-    'LLNG Code' );
+ok( $code = getTotp($key), 'LLNG Code' );
 $query =~ s/code=/code=$code/;
 ok(
     $res = $client->_post(

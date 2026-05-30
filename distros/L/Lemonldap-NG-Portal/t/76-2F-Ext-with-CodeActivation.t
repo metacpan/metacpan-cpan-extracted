@@ -9,8 +9,7 @@ require 't/test-lib.pm';
 use_ok('Lemonldap::NG::Common::FormEncode');
 count(1);
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel            => 'error',
             ext2fActivation     => 1,

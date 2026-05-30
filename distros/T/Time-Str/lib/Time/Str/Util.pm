@@ -7,7 +7,7 @@ use Carp     qw[croak];
 use Exporter qw[import];
 
 BEGIN {
-  our $VERSION     = '0.87';
+  our $VERSION     = '0.88';
   our @EXPORT_OK   = qw[ lower_bound
                          range_bounds
                          upper_bound ];
@@ -19,7 +19,9 @@ BEGIN {
     require Time::Str::PP; Time::Str::PP::Util->import(@EXPORT_OK);
   }
   
-  push @EXPORT_OK, qw[ find_tzdb_directory ];
+  push @EXPORT_OK, qw[ find_tzdb_directory 
+                       valid_tzdb_timezone
+                       valid_posix_timezone ];
 }
 
 {
@@ -47,6 +49,52 @@ BEGIN {
     return $macos if -d $macos && -f "$macos/UTC";
 
     return undef;
+  }
+}
+
+{
+  my $ValidName_Rx = qr{
+    (?(DEFINE)
+      (?<NameInitial> [A-Za-z])
+      (?<NameChar>    [A-Za-z0-9])
+      (?<NamePart>    (?&NameInitial) (?&NameChar)* (?: [_+-] (?&NameChar)+ )* )
+      (?<Name>        (?&NamePart) (?: [/] (?&NamePart) )* )
+    )
+    \A (?&Name) \z
+  }x;
+
+  sub valid_tzdb_timezone {
+    @_ == 1 or croak q/Usage: valid_tzdb_timezone(string)/;
+    my ($string) = @_;
+    return (defined $string && $string =~ $ValidName_Rx);
+  }
+}
+
+{
+  my $ValidPOSIX_Rx = qr{
+    (?(DEFINE)
+      (?<Name>   [A-Za-z]{3,} )
+      (?<Offset> [+-]? [0-9]{1,2} (?: [:][0-9]{2} (?: [:][0-9]{2} )? )? )
+      (?<Time>   [+-]? [0-9]{1,3} (?: [:][0-9]{2} (?: [:][0-9]{2} )? )? )
+      (?<Rule>   M [0-9]{1,2} [.] [0-9] [.] [0-9]
+               | J [0-9]{1,3}
+               |   [0-9]{1,3} )
+    )
+
+    \A
+          (?&Name)         (?&Offset)
+    (?:
+          (?&Name) (?:     (?&Offset) )?
+      [,] (?&Rule) (?: [/] (?&Time)   )?
+      [,] (?&Rule) (?: [/] (?&Time)   )?
+    )?
+    \z
+  }x;
+
+  sub valid_posix_timezone {
+    @_ == 1 or croak q/Usage: valid_posix_timezone(string)/;
+    my ($string) = @_;
+    return (defined $string && $string =~ $ValidPOSIX_Rx);
   }
 }
 

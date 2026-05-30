@@ -1,7 +1,0 @@
-from test/c31/b import CycleB;
-
-class CycleA {
-	method side () {
-		return "A";
-	}
-}

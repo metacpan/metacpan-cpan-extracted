@@ -5,6 +5,7 @@ use IO::String;
 use LWP::UserAgent;
 use LWP::Protocol::PSGI;
 use MIME::Base64;
+use Plack::Builder;
 
 BEGIN {
     require 't/test-lib.pm';
@@ -15,43 +16,23 @@ my ( $issuer, $sp, $res );
 
 # Redefine LWP methods for tests
 LWP::Protocol::PSGI->register(
-    sub {
-        my $req = Plack::Request->new(@_);
-        ok( $req->uri =~ m#http://auth.((?:id|s)p).com([^\?]*)(?:\?(.*))?$#,
-            'SOAP request' );
-        my $host  = $1;
-        my $url   = $2;
-        my $query = $3;
-        my $res;
-        my $client = ( $host eq 'idp' ? $issuer : $sp );
-        if ( $req->method eq 'POST' ) {
-            my $s = $req->content;
-            ok(
-                $res = $client->_post(
-                    $url, IO::String->new($s),
-                    length => length($s),
-                    query  => $query,
-                    type   => 'application/xml',
-                ),
-                "Execute POST request to $url"
-            );
-        }
-        else {
-            ok(
-                $res = $client->_get(
-                    $url,
-                    type  => 'application/xml',
-                    query => $query,
-                ),
-                "Execute request to $url"
-            );
-        }
-        expectOK($res);
-        ok( getHeader( $res, 'Content-Type' ) =~ m#xml#, 'Content is XML' )
-          or explain( $res->[1], 'Content-Type => application/xml' );
-        count(3);
-        return $res;
-    }
+    builder {
+        enable sub {
+            my $app = shift;
+            sub {
+                ok( my $res = $app->(@_) );
+                expectOK($res);
+                ok( getHeader( $res, 'Content-Type' ) =~ m#xml#,
+                    'Content is XML' )
+                  or explain( $res->[1], 'Content-Type => application/xml' );
+                count(2);
+                return $res;
+            };
+        };
+        mount "http://auth.idp.com/" => sub { goto $issuer->app };
+        mount "http://auth.sp.com/"  => sub { goto $sp->app };
+        mount "/"                    => denyLwpRequests;
+    },
 );
 
 $issuer = register( 'issuer', \&issuer );

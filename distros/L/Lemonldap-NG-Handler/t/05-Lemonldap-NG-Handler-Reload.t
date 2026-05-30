@@ -30,8 +30,7 @@ eval { Lemonldap::NG::Handler::Main->logLevelInit() };
 ok( !$@, 'logLevelInit' );
 
 ok(
-    Lemonldap::NG::Handler::Main->jailInit(
-        {
+    Lemonldap::NG::Handler::Main->jailInit( {
             https        => 0,
             port         => 0,
             maintenance  => 0,
@@ -51,8 +50,7 @@ ok(
 );
 
 ok(
-    Lemonldap::NG::Handler::Main->defaultValuesInit(
-        {
+    Lemonldap::NG::Handler::Main->defaultValuesInit( {
             https        => 0,
             port         => 0,
             maintenance  => 0,
@@ -72,8 +70,7 @@ ok(
 );
 
 ok(
-    Lemonldap::NG::Handler::Main->locationRulesInit(
-        {
+    Lemonldap::NG::Handler::Main->locationRulesInit( {
             'locationRules' => {
                 'www1' => {
                     'default' => 'accept',

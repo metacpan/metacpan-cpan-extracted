@@ -41,7 +41,7 @@ ok(
     "Post register data with bad redirect_uris"
 );
 
-ok( $res->[0] == 400, "Return code is 400" ) or explain($res->[0], 400);
+ok( $res->[0] == 400, "Return code is 400" ) or explain( $res->[0], 400 );
 
 clean_sessions();
 done_testing();

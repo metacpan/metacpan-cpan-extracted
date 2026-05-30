@@ -93,6 +93,40 @@ SKIP: {
         is( $mock->count, 4, "Hook was not called again" );
     };
 
+    subtest "dynamic RP loads conditional plugin" => sub {
+        Time::Fake->reset();
+        $client->p->HANDLER->checkConf(1);
+        my ( $i_saml, $i_oidc, $mock ) = getinstances($client);
+
+        # Verify NativeSso plugin is not loaded yet
+        ok(
+            !$client->p->loadedModules->{
+                'Lemonldap::NG::Portal::Plugins::OIDC::NativeSso'},
+            'OIDC::NativeSso not loaded initially'
+        );
+
+        # Configure mock to return an RP with AllowNativeSso
+        $mock->mock_info( {
+                confKey => 'dynamic_rp',
+                options => {
+                    oidcRPMetaDataOptionsClientID       => 'dynamic_client',
+                    oidcRPMetaDataOptionsAllowNativeSso => 1,
+                },
+            }
+        );
+
+        # Trigger dynamic RP loading
+        my $rp = $i_oidc->getRP('dynamic_client');
+        is( $rp, 'dynamic_rp', "Dynamic RP was loaded" );
+
+        # Verify NativeSso plugin was loaded dynamically
+        ok(
+            $client->p->loadedModules->{
+                'Lemonldap::NG::Portal::Plugins::OIDC::NativeSso'},
+            'OIDC::NativeSso loaded after dynamic RP'
+        );
+    };
+
     subtest "TTL, called again after TTL" => sub {
         Time::Fake->reset();
         $client->p->HANDLER->checkConf(1);

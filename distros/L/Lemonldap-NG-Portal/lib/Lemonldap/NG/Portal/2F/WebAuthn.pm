@@ -6,7 +6,7 @@ package Lemonldap::NG::Portal::2F::WebAuthn;
 
 use strict;
 use Mouse;
-use JSON qw(from_json to_json);
+use JSON         qw(from_json to_json);
 use MIME::Base64 qw(encode_base64url decode_base64url);
 use Crypt::URandom;
 
@@ -18,7 +18,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
 );
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Portal::Main::SecondFactor';
 with 'Lemonldap::NG::Portal::Lib::WebAuthn';

@@ -143,9 +143,8 @@ $key = Convert::Base32::decode_base32($key);
 
 # Post code
 my $code;
-ok( $code = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 ),
-    'Code' );
-ok( $code =~ /^\d{6}$/, 'Code contains 6 digits' );
+ok( $code = getTotp($key), 'Code' );
+ok( $code =~ /^\d{6}$/,    'Code contains 6 digits' );
 my $s = "code=$code&token=$token";
 ok(
     $res = $client->_post(
@@ -179,7 +178,7 @@ ok(
 my ( $host, $url, $query ) = expectForm( $res, undef, '/totp2fcheck', 'token' );
 
 # Generate TOTP with LLNG
-my $totp = Lemonldap::NG::Common::TOTP::_code( undef, $key, 0, 30, 6 );
+my $totp = getTotp($key);
 
 $query =~ s/code=/code=$code/;
 ok(

@@ -1,3 +1,11 @@
+## 0.185.2 — 2026-05-29
+
+## What's Changed
+* Fix/90 optional moose test deps by @geofffranks in https://github.com/geofffranks/test-mockmodule/pull/91
+
+
+**Full Changelog**: https://github.com/geofffranks/test-mockmodule/compare/0.185.1...0.185.2
+
 ## 0.185.1 — 2026-05-26
 
 ## What's Changed

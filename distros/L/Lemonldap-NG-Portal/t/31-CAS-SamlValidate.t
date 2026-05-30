@@ -223,7 +223,7 @@ sub expectCasSuccess {
                     "//samlp:Response/saml:Assertion/saml:AttributeStatement"
                       . "/saml:Attribute[\@AttributeName='$attr']"
                       . "/saml:AttributeValue/text()"
-                )->get_nodelist
+                  )->get_nodelist
             ],
             $attributes->{$attr},
             "Expected attributes"

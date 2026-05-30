@@ -10,8 +10,7 @@ require 't/smtp.pm';
 use_ok('Lemonldap::NG::Common::FormEncode');
 count(1);
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel         => 'error',
             mail2fActivation => 1,

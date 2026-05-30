@@ -62,7 +62,7 @@ sub backup {
             },
         },
         stdout => *F,
-    )->run("backup", {});
+    )->run( "backup", {} );
     close F;
 }
 
@@ -87,8 +87,7 @@ my @psessionsOpts = (
 );
 
 sub resetSessions {
-    Lemonldap::NG::Common::Session->new(
-        {
+    Lemonldap::NG::Common::Session->new( {
             @sessionsOpts,
             id   => "1b3231655cebb7a1f783eddf27d254ca",
             info => {
@@ -96,8 +95,7 @@ sub resetSessions {
             }
         }
     );
-    Lemonldap::NG::Common::Session->new(
-        {
+    Lemonldap::NG::Common::Session->new( {
             @sessionsOpts,
             id   => "9684dd2a6489bf2be2fbdd799a8028e3",
             info => {
@@ -105,8 +103,7 @@ sub resetSessions {
             }
         }
     );
-    Lemonldap::NG::Common::Session->new(
-        {
+    Lemonldap::NG::Common::Session->new( {
             @sessionsOpts,
             id   => "f90f597566f5cce47d9641377776c0c2",
             info => {
@@ -115,8 +112,7 @@ sub resetSessions {
             }
         }
     );
-    Lemonldap::NG::Common::Session->new(
-        {
+    Lemonldap::NG::Common::Session->new( {
             @sessionsOpts,
             id   => "1234",
             info => {
@@ -124,8 +120,7 @@ sub resetSessions {
             }
         }
     );
-    Lemonldap::NG::Common::Session->new(
-        {
+    Lemonldap::NG::Common::Session->new( {
             @sessionsOpts,
             id   => "1235",
             info => {
@@ -134,15 +129,12 @@ sub resetSessions {
         }
     );
 
-    Lemonldap::NG::Common::Session->new(
-        {
+    Lemonldap::NG::Common::Session->new( {
             @psessionsOpts,
             id    => "5efe8af397fc3577e05b483aca964f1b",
             force => 1,
             info  => {
-                "_2fDevices" => to_json(
-                    [
-                        {
+                "_2fDevices" => to_json( [ {
                             'type'     => 'UBK',
                             'epoch'    => 1588691690,
                             '_yubikey' => 'cccccceijfnf',
@@ -161,9 +153,7 @@ sub resetSessions {
                         }
                     ]
                 ),
-                "_oidcConsents" => to_json(
-                    [
-                        {
+                "_oidcConsents" => to_json( [ {
                             'scope' => 'openid email',
                             'rp'    => 'rp-example',
                             'epoch' => 1589288341
@@ -175,20 +165,34 @@ sub resetSessions {
                         }
                     ]
                 ),
+                "_loginHistory" => {
+                    'successLogin' => [ {
+                            '_utime' => 1710239445,
+                            'ipAddr' => '192.168.1.1',
+                        },
+                        {
+                            '_utime' => 1710153045,
+                            'ipAddr' => '10.0.0.5',
+                        },
+                    ],
+                    'failedLogin' => [ {
+                            '_utime' => 1710235522,
+                            'ipAddr' => '192.168.1.100',
+                            'error'  => 5,
+                        },
+                    ],
+                },
                 "_session_uid" => "dwho",
             }
         }
     );
-    Lemonldap::NG::Common::Session->new(
-        {
+    Lemonldap::NG::Common::Session->new( {
             @psessionsOpts,
             id    => "8d3bc3b0e14ea2a155f275aa7c07ebee",
             force => 1,
             info  => {
                 "_session_uid" => "rtyler",
-                "_2fDevices"   => to_json(
-                    [
-                        {
+                "_2fDevices"   => to_json( [ {
                             'type'     => 'UBK',
                             'epoch'    => 1588691690,
                             '_yubikey' => 'cccccceijfnf',
@@ -404,6 +408,43 @@ $res = getJson( "consents", {}, "get", "dwho" );
 is( ( keys %{$res} ),     1,     "Found one consent" );
 is( $res->{'rp-example'}, undef, "Consent for test-rp removed" );
 ok( $res->{'rp-example2'}, "Consent for test-rp2 still present" );
+
+# History tests
+resetSessions;
+subtest 'History commands' => sub {
+
+    # Test history lastsuccessdate
+    my ( $stdout, $stderr ) = Test::Output::output_from(
+        sub { $cli->run( "history", {}, "lastsuccessdate", "dwho" ); } );
+    like( $stdout, qr/Mar.*2024/, "lastsuccessdate shows date" );
+    is( $stderr, '', "No error on lastsuccessdate" );
+
+    # Test history lastfailuredate
+    ( $stdout, $stderr ) = Test::Output::output_from(
+        sub { $cli->run( "history", {}, "lastfailuredate", "dwho" ); } );
+    like( $stdout, qr/Mar.*2024.*\(5\)/,
+        "lastfailuredate shows date with error code" );
+    is( $stderr, '', "No error on lastfailuredate" );
+
+    # Test history get (JSON output)
+    $res = getJson( "history", {}, "get", "dwho" );
+    ok( $res->{successLogin}, "history get has successLogin" );
+    ok( $res->{failedLogin},  "history get has failedLogin" );
+    is( @{ $res->{successLogin} }, 2, "Found 2 successful logins" );
+    is( @{ $res->{failedLogin} },  1, "Found 1 failed login" );
+
+    # Check all fields are present
+    ok( $res->{successLogin}[0]{_utime}, "successLogin has _utime" );
+    ok( $res->{successLogin}[0]{ipAddr}, "successLogin has ipAddr" );
+    ok( $res->{successLogin}[0]{date}, "successLogin has human-readable date" );
+    is( $res->{failedLogin}[0]{error}, 5, "failedLogin has error code" );
+
+    # Test error case: user without history
+    ( $stdout, $stderr ) = Test::Output::output_from(
+        sub { $cli->run( "history", {}, "lastsuccessdate", "rtyler" ); } );
+    is( $stdout, '', "No stdout on missing history" );
+    like( $stderr, qr/No login history found/, "Error message on stderr" );
+};
 
 rmtree $dir;
 done_testing();

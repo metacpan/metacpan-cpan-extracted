@@ -8,11 +8,11 @@
 package Lemonldap::NG::Handler::ApacheMP2::Menu;
 
 use strict;
-use base qw(Lemonldap::NG::Handler::ApacheMP2::Main);
+use base            qw(Lemonldap::NG::Handler::ApacheMP2::Main);
 use Apache2::Filter ();
 use constant BUFF_LEN => 8192;
 
-our $VERSION = '2.0.0';
+our $VERSION = '2.23.0';
 
 sub handler {
     my $r = pop;

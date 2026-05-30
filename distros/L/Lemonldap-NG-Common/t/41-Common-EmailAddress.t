@@ -14,12 +14,7 @@ my $name = 'my name';
 my $mail = 'test@domain.com';
 my $format_email;
 
-ok(
-  $format_email = format_email($name, $mail),
-  "calling format_email function"
-);
+ok( $format_email = format_email( $name, $mail ),
+    "calling format_email function" );
 
-ok(
-  $format_email eq "\"$name\" <$mail>",
-  "testing formatted email value"
-);
+ok( $format_email eq "\"$name\" <$mail>", "testing formatted email value" );

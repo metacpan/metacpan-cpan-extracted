@@ -3,7 +3,7 @@ package Lemonldap::NG::Common::Conf::Backends::Local;
 use strict;
 use Lemonldap::NG::Common::Conf::Constants;
 
-our $VERSION = '2.0.14';
+our $VERSION = '2.23.0';
 
 sub prereq {
     return 1;
@@ -34,7 +34,7 @@ sub load {
     return {
         cfgNum    => 1,
         cfgDate   => time,
-        cfgAuthor => 'LLNG Team',
+        cfgAuthor => 'Noone',
         cfgLog    =>
 q"Do not edit this configuration, Null backend uses lemonldap-ng.ini values only",
     };

@@ -471,7 +471,7 @@ sub idp {
                         'samlSPMetaDataOptionsSessionNotOnOrAfterTimeout' =>
                           72000,
                         'samlSPMetaDataOptionsSignSLOMessage'  => -1,
-                        'samlSPMetaDataOptionsSignSSOMessage'  => 1,
+                        'samlSPMetaDataOptionsSignSSOMessage'  =>  1,
                         'samlSPMetaDataOptionsSignatureMethod' => ''
                     }
                 },

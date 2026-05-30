@@ -23,8 +23,7 @@ print F '[
 ]';
 close F;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel                       => 'error',
             useSafeJail                    => 1,
@@ -197,9 +196,11 @@ ok( $json->{notification} =~ m%<h2 class="notifText">Test title</h2>%,
 ok( $json->{notification} =~ m%<h3 class="notifText">Test subtitle</h3>%,
     ' <h3> tag found' )
   or explain( $json, "<h3> tag" );
-ok( $json->{notification} =~ m%<p class="notifText">This is a test text for dwho</p>%,
-    ' <p> tag found' )
-  or explain( $json, "<p> tag" );
+ok(
+    $json->{notification} =~
+      m%<p class="notifText">This is a test text for dwho</p>%,
+    ' <p> tag found'
+) or explain( $json, "<p> tag" );
 ok( $json->{notification} =~ m%checked disabled name="check1x1x1"%,
     ' Checkbox 1 found' )
   or explain( $json, "Checkbox 1" );

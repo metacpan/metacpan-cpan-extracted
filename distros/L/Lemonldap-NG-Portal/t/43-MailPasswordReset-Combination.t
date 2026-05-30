@@ -19,7 +19,23 @@ SKIP: {
         skip 'Missing dependencies', 0;
     }
 
-    $client = iniCmb();
+    my $client;
+    subtest "Combination as main backend" => sub {
+        myTest(0);
+    };
+    subtest "Combination inside Choice" => sub {
+        myTest(1);
+    };
+
+}
+
+clean_sessions();
+
+done_testing();
+
+sub myTest {
+    my $use_choice = shift;
+    $client = iniCmb($use_choice);
 
     # As dvador
     # Check first password
@@ -48,13 +64,7 @@ SKIP: {
 
     # Check that new password works
     expectCookie( try( 'jkirk', 'kobayashi' ) );
-
 }
-count(0);
-
-clean_sessions();
-
-done_testing( count() );
 
 sub updatePassword {
     my $query       = shift;
@@ -95,6 +105,7 @@ sub getMailQuery {
     ok(
         $res = $client->_post(
             '/resetpwd', IO::String->new($query),
+            query  => "test=cmb",
             length => length($query),
             accept => 'text/html',
             cookie => 'llnglanguage=fr',
@@ -109,8 +120,9 @@ sub getMailQuery {
 }
 
 sub iniCmb {
-    my $userdb = tempdb();
-    my $dbh    = DBI->connect("dbi:SQLite:dbname=$userdb");
+    my $use_choice = shift;
+    my $userdb     = tempdb("mydb$use_choice.sql");
+    my $dbh        = DBI->connect("dbi:SQLite:dbname=$userdb");
     $dbh->do(
         'CREATE TABLE wars (user text,password text,email text, name text)');
     $dbh->do(
@@ -122,16 +134,16 @@ sub iniCmb {
 "INSERT INTO trek VALUES ('jkirk','jkirk','jkirk\@trek.star', 'James Tiberius Kirk')"
     );
 
+    my $auth_backend = $use_choice ? "Choice" : "Combination";
     &Lemonldap::NG::Handler::Main::cfgNum( 0, 0 );
     if (
-        my $res = LLNG::Manager::Test->new(
-            {
+        my $res = LLNG::Manager::Test->new( {
                 ini => {
                     logLevel                   => 'error',
                     useSafeJail                => 1,
-                    authentication             => 'Combination',
+                    authentication             => $auth_backend,
+                    passwordDB                 => $auth_backend,
                     userDB                     => 'Same',
-                    passwordDB                 => 'Combination',
                     restSessionServer          => 1,
                     portalDisplayResetPassword => 1,
                     requireToken               => 0,
@@ -152,6 +164,11 @@ sub iniCmb {
                                 dbiAuthTable => 'trek',
                             }
                         },
+                    },
+
+                    authChoiceParam   => 'test',
+                    authChoiceModules => {
+                        cmb => 'Combination;Combination;Combination',
                     },
 
                     dbiAuthChain         => "dbi:SQLite:dbname=$userdb",
@@ -175,7 +192,7 @@ sub iniCmb {
 sub try {
     my $user     = shift;
     my $password = shift || $user;
-    my $s        = "user=$user&password=$password";
+    my $s        = "user=$user&password=$password&test=cmb";
     my $res;
     ok(
         $res = $client->_post(

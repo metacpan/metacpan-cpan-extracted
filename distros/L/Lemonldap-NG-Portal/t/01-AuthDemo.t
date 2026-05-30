@@ -10,8 +10,7 @@ require 't/test-lib.pm';
 
 my $res;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel                       => 'error',
             portal                         => 'https://auth.example.com/',

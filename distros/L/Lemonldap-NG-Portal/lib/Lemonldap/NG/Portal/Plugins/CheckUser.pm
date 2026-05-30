@@ -2,7 +2,7 @@ package Lemonldap::NG::Portal::Plugins::CheckUser;
 
 use strict;
 use Mouse;
-use Lemonldap::NG::Common::Util qw(isHiddenAttr);
+use Lemonldap::NG::Common::Util            qw(isHiddenAttr);
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_NOTOKEN
   PE_TOKENEXPIRED
@@ -10,7 +10,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_BADCREDENTIALS
 );
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.23.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -30,17 +30,9 @@ has ott => (
     }
 );
 
-has displayHistoryRule           => ( is => 'rw', default => sub { 0 } );
-has unrestrictedUsersRule        => ( is => 'rw', default => sub { 0 } );
-has displayEmptyValuesRule       => ( is => 'rw', default => sub { 0 } );
-has displayEmptyHeadersRule      => ( is => 'rw', default => sub { 0 } );
-has displayPersistentInfoRule    => ( is => 'rw', default => sub { 0 } );
-has displayComputedSessionRule   => ( is => 'rw', default => sub { 0 } );
-has displayHiddenAttributesRule  => ( is => 'rw', default => sub { 0 } );
-has displayNormalizedHeadersRule => ( is => 'rw', default => sub { 0 } );
-has idRule                       => ( is => 'rw', default => sub { 1 } );
-has sorted                       => ( is => 'rw', default => sub { 0 } );
-has merged                       => ( is => 'rw', default => '' );
+has rules  => ( is => 'rw', default => sub { {} } );
+has sorted => ( is => 'rw', default => sub { 0 } );
+has merged => ( is => 'rw', default => '' );
 
 # Prefix used for renaming session attributes during impersonation process
 has prefix => (
@@ -62,74 +54,17 @@ sub init {
     $self->addAuthRoute( checkuser => 'check', ['POST'] )
       ->addAuthRouteWithRedirect( checkuser => 'display', ['GET'] );
 
-    # Parse checkUser rules
-    $self->idRule(
-        $self->p->buildRule( $self->conf->{checkUserIdRule}, 'checkUserId' ) );
-    return 0 unless $self->idRule;
-
-    $self->displayEmptyValuesRule(
-        $self->p->buildRule(
-            $self->conf->{checkUserDisplayEmptyValues},
-            'checkUserDisplayEmptyValues'
-        )
-    );
-    return 0 unless $self->displayEmptyValuesRule;
-
-    $self->displayEmptyHeadersRule(
-        $self->p->buildRule(
-            $self->conf->{checkUserDisplayEmptyHeaders},
-            'checkUserDisplayEmptyHeaders'
-        )
-    );
-    return 0 unless $self->displayEmptyHeadersRule;
-
-    $self->displayPersistentInfoRule(
-        $self->p->buildRule(
-            $self->conf->{checkUserDisplayPersistentInfo},
-            'checkUserDisplayPersistentInfo'
-        )
-    );
-    return 0 unless $self->displayPersistentInfoRule;
-
-    $self->unrestrictedUsersRule(
-        $self->p->buildRule(
-            $self->conf->{checkUserUnrestrictedUsersRule},
-            'checkUserUnrestrictedUsersRule'
-        )
-    );
-    return 0 unless $self->unrestrictedUsersRule;
-
-    $self->displayComputedSessionRule(
-        $self->p->buildRule(
-            $self->conf->{checkUserDisplayComputedSession},
-            'checkUserdisplayComputedSession'
-        )
-    );
-    return 0 unless $self->displayComputedSessionRule;
-
-    $self->displayNormalizedHeadersRule(
-        $self->p->buildRule(
-            $self->conf->{checkUserDisplayNormalizedHeaders},
-            'checkUserDisplayNormalizedHeaders'
-        )
-    );
-    return 0 unless $self->displayNormalizedHeadersRule;
-
-    $self->displayHistoryRule(
-        $self->p->buildRule(
-            $self->conf->{checkUserDisplayHistory},
-            'checkUserDisplayHistory'
-        )
-    );
-    return 0 unless $self->displayHistoryRule;
-
-    $self->displayHiddenAttributesRule(
-        $self->p->buildRule(
-            $self->conf->{checkUserDisplayHiddenAttributes},
-            'checkUserDisplayHiddenAttributes'
-        )
-    );
-    return 0 unless $self->displayHistoryRule;
+    # Compile rules
+    foreach (
+        qw(DisplayEmptyValues DisplayEmptyHeaders DisplayPersistentInfo DisplayComputedSession DisplayNormalizedHeaders DisplayHistory DisplayHiddenAttributes IdRule UnrestrictedUsersRule)
+      )
+    {
+        $self->logger->debug("CheckUser: Build rule $_");
+        my $rule =
+          $self->p->buildRule( $self->conf->{"checkUser$_"}, "checkUser$_" );
+        return 0 unless $rule;
+        $self->rules->{$_} = $rule;
+    }
 
     # Init. other options
     $self->sorted( $self->conf->{impersonationRule}
@@ -151,13 +86,13 @@ sub display {
       if ( $self->conf->{impersonationRule} );
 
     $history = $self->_concatHistory( $attrs->{_loginHistory} )
-      if $self->displayHistoryRule->( $req, $req->userData )
+      if $self->rules->{DisplayHistory}->( $req, $req->userData )
       && $self->conf->{loginHistoryEnabled};
 
     $attrs =
       $self->_removeKeys( $attrs, $self->persistentAttrs,
         'Remove persistent session attributes...' )
-      unless $self->displayPersistentInfoRule->( $req, $req->userData );
+      unless $self->rules->{DisplayPersistentInfo}->( $req, $req->userData );
 
     # Create an array of hashes and dispatch attributes for template loop
     # ARRAY_REF = [ A_REF GROUPS, A_REF MACROS, A_REF OTHERS ]
@@ -168,7 +103,7 @@ sub display {
         FORM_ACTION => $self->p->relativeUrl( $req, 'checkuser' ),
         MSG         => 'checkUser' . $self->merged,
         ALERTE      => ( $self->merged ? 'alert-warning' : 'alert-info' ),
-        LOGIN       => $req->{userData}->{ $self->conf->{whatToTrace} },
+        LOGIN       => $req->userData->{ $self->conf->{whatToTrace} },
         HISTORY     => ( @{ $history->[0] } || @{ $history->[1] } ) ? 1 : 0,
         SUCCESS     => $history->[0],
         FAILED      => $history->[1],
@@ -197,7 +132,8 @@ sub check {
     my ( $attrs, $array_attrs, $array_hdrs ) = ( {}, [], [] );
     my $msg           = my $auth = my $computed = '';
     my $savedUserData = $req->userData;
-    my $unUser  = $self->unrestrictedUsersRule->( $req, $savedUserData ) || 0;
+    my $unUser =
+      $self->rules->{UnrestrictedUsersRule}->( $req, $savedUserData ) || 0;
     my $history = [ [], [] ];
 
     # Check token
@@ -313,7 +249,7 @@ sub check {
               . $savedUserData->{ $self->conf->{whatToTrace} }
               . '" is an unrestricted user!' )
           if $unUser;
-        unless ( $unUser || $self->idRule->( $req, $attrs ) ) {
+        unless ( $unUser || $self->rules->{IdRule}->( $req, $attrs ) ) {
             $self->userLogger->warn(
                 "checkUser requested for an invalid user ($user)");
             $req->{sessionInfo} = {};
@@ -331,16 +267,20 @@ sub check {
     else {
         $msg     = 'checkUser' . $self->merged;
         $history = $self->_concatHistory( $attrs->{_loginHistory} )
-          if $self->displayHistoryRule->( $req, $savedUserData )
+          if $self->rules->{DisplayHistory}->( $req, $savedUserData )
           && $self->conf->{loginHistoryEnabled};
 
         $attrs =
           $self->_removeKeys( $attrs, $self->persistentAttrs,
             'Remove persistent session attributes...' )
-          unless $self->displayPersistentInfoRule->( $req, $savedUserData );
+          unless $self->rules->{DisplayPersistentInfo}
+          ->( $req, $savedUserData );
 
         if ($computed) {
-            if ( $self->displayComputedSessionRule->( $req, $savedUserData ) ) {
+            if (
+                $self->rules->{DisplayComputedSession}->( $req, $savedUserData )
+              )
+            {
                 $msg = 'checkUserComputedSession';
                 if ( $self->conf->{impersonationRule} ) {
                     $self->logger->debug("Map real attributes...");
@@ -396,7 +336,7 @@ sub check {
             $auth = $auth ? "allowed" : "forbidden";
             $self->logger->debug(
                     "checkUser: $attrs->{ $self->{conf}->{whatToTrace} } is "
-                  . "$auth to access to $url" );
+                  . "$auth to access $url" );
 
             # Return VirtualHost headers
             $array_hdrs =
@@ -543,7 +483,7 @@ sub _headers {
     my $headers = $self->p->HANDLER->checkHeaders( $req, $attrs );
 
     # Remove hidden headers relative to VHost if required
-    unless ( $self->unrestrictedUsersRule->( $req, $savedUserData ) ) {
+    unless ( $self->rules->{UnrestrictedUsersRule}->( $req, $savedUserData ) ) {
         my $keysToRemove = '';
         $keysToRemove = '__ALL__'
           if exists $self->conf->{checkUserHiddenHeaders}->{$vhost};
@@ -574,13 +514,13 @@ sub _headers {
     }
 
     # Remove empty headers if required
-    unless ( $self->displayEmptyHeadersRule->( $req, $savedUserData ) ) {
+    unless ( $self->rules->{DisplayEmptyHeaders}->( $req, $savedUserData ) ) {
         $self->logger->debug("Remove empty headers...");
         @$headers = grep $_->{value} =~ /.+/, @$headers;
     }
 
     # Normalize headers name if required
-    if ( $self->displayNormalizedHeadersRule->( $req, $savedUserData ) ) {
+    if ( $self->rules->{DisplayNormalizedHeaders}->( $req, $savedUserData ) ) {
         $self->logger->debug("Normalize headers...");
         @$headers = map {
             ;    # Prevent compilation error with old Perl versions
@@ -606,11 +546,11 @@ sub _createArray {
         push @$array_attrs,
           { key => $_, value => $attrs->{$_} }
           unless ( (
-                isHiddenAttr( $self->conf->{hiddenAttributes}, $_, @hidden )
-                && !$self->displayHiddenAttributesRule->( $req, $userData )
+                isHiddenAttr( $self->conf, $_, @hidden )
+                && !$self->rules->{DisplayHiddenAttributes}->( $req, $userData )
             )
             || (   !$attrs->{$_}
-                && !$self->displayEmptyValuesRule->( $req, $userData ) )
+                && !$self->rules->{DisplayEmptyValues}->( $req, $userData ) )
           );
     }
 

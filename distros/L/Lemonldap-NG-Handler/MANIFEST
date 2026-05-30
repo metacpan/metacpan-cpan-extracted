@@ -69,6 +69,7 @@ t/65-Lemonldap-NG-Handler-Nginx-ServiceToken.t
 t/65-Lemonldap-NG-Handler-PSGI-ServiceToken-regexp_only.t
 t/65-Lemonldap-NG-Handler-PSGI-ServiceToken.t
 t/66-Lemonldap-NG-Handler-PSGI-wildcard.t
+t/67-Lemonldap-NG-Handler-PSGI-authnLevel.t
 t/67-Lemonldap-NG-Handler-PSGI-vhostOptions-with-reload.t
 t/67-Lemonldap-NG-Handler-PSGI-vhostOptions.t
 t/68-Lemonldap-NG-Handler-PSGI-Zimbra.t

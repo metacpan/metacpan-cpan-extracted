@@ -1,0 +1,100 @@
+#!/usr/bin/env perl
+# PODNAME: www-crawl4ai-doctor
+# ABSTRACT: probe Crawl4AI / CloakBrowser / proxy reachability and print the chain
+use strict;
+use warnings;
+use utf8;
+use feature 'say';
+use Getopt::Long;
+use WWW::Crawl4AI;
+
+binmode STDOUT, ':encoding(UTF-8)';
+
+my %opt;
+GetOptions(
+  'base-url=s'         => \$opt{base_url},
+  'cloakbrowser-url=s' => \$opt{cloakbrowser_url},
+  'proxy-url=s'        => \$opt{proxy_url},
+  'help'               => \$opt{help},
+) or die "bad options\n";
+
+if ( $opt{help} ) {
+  say "usage: www-crawl4ai-doctor [--base-url URL] [--cloakbrowser-url URL] [--proxy-url URL]";
+  say "Probes the configured services and prints which strategy backends are active.";
+  exit 0;
+}
+
+my $crawler = WWW::Crawl4AI->new(
+  ( $opt{base_url}         ? ( base_url         => $opt{base_url} )         : () ),
+  ( $opt{cloakbrowser_url} ? ( cloakbrowser_url => $opt{cloakbrowser_url} ) : () ),
+  ( $opt{proxy_url}        ? ( proxy_url        => $opt{proxy_url} )        : () ),
+);
+
+my $d = $crawler->detect;
+
+my $mark = sub { $_[0] ? "\x{2713} ok" : "\x{2717} unreachable" };
+my $cloak =
+    !$d->{cloakbrowser_url} ? '- not configured'
+  :                           $mark->( $d->{cloakbrowser} );
+
+say "WWW::Crawl4AI doctor";
+say "====================";
+printf "  crawl4ai      %-16s %s\n", $mark->( $d->{crawl4ai} ), $d->{crawl4ai_url} // '';
+printf "  cloakbrowser  %-16s %s\n", $cloak, $d->{cloakbrowser_url} // '';
+printf "  proxy         %-16s %s\n", ( $d->{proxy} ? 'configured' : '-' ), $d->{proxy_url} // '';
+printf "  callback      %s\n",       ( $d->{callback} ? 'configured' : '-' );
+say "";
+say "active chain: " . join( ' -> ', @{ $d->{backends} } );
+
+exit( $d->{crawl4ai} ? 0 : 1 );
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+www-crawl4ai-doctor - probe Crawl4AI / CloakBrowser / proxy reachability and print the chain
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+  www-crawl4ai-doctor
+  www-crawl4ai-doctor --base-url http://localhost:11235 --cloakbrowser-url http://localhost:9222
+
+=head1 DESCRIPTION
+
+Probes the Crawl4AI server (C<GET /health>), the CloakBrowser CDP endpoint
+(C<GET /json/version>) and reports whether a proxy and callback are configured,
+then prints the active strategy chain. Exits non-zero if Crawl4AI itself is
+unreachable. Reads C<CRAWL4AI_URL>, C<CLOAKBROWSER_CDP_URL> and
+C<CRAWL4AI_PROXY_URL> from the environment unless overridden by options.
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests on GitHub at
+L<https://github.com/Getty/p5-www-crawl4ai/issues>.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudssus.de> L<https://raudss.us/>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

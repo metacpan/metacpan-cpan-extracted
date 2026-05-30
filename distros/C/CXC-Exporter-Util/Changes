@@ -1,5 +1,12 @@
 Revision history for CXC-Exporter-Util
 
+0.13      2026-05-29 11:13:05 EDT
+
+  [TEST FIX]
+
+    * t/regressions/namespace-clean.t did not test for the presence of
+      namespace::clean correctly.
+
 0.12      2026-05-28 17:47:34 EDT
 
   [BUG FIX]

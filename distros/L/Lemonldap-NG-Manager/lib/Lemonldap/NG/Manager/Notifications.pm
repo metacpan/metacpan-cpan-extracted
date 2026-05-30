@@ -3,8 +3,8 @@ package Lemonldap::NG::Manager::Notifications;
 use strict;
 use utf8;
 use Mouse;
-use JSON qw(from_json to_json);
-use POSIX qw(strftime);
+use JSON         qw(from_json to_json);
+use POSIX        qw(strftime);
 use MIME::Base64 qw(decode_base64);
 
 use Lemonldap::NG::Common::Conf::Constants;
@@ -18,7 +18,7 @@ extends qw(
   Lemonldap::NG::Common::Conf::AccessLib
 );
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.23.0';
 
 has notifAccess => ( is => 'rw' );
 has notifFormat => ( is => 'rw' );

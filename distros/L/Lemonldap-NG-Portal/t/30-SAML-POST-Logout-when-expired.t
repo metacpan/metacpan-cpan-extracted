@@ -17,14 +17,7 @@ my $timeout   = 72000;
 my ( $issuer, $sp, $res );
 
 # Redefine LWP methods for tests
-LWP::Protocol::PSGI->register(
-    sub {
-        my $req = Plack::Request->new(@_);
-        fail('POST should not launch SOAP requests');
-        count(1);
-        return [ 500, [], [] ];
-    }
-);
+LWP::Protocol::PSGI->register( denyLwpRequests() );
 
 SKIP: {
     eval "use Lasso";
@@ -191,8 +184,7 @@ clean_sessions();
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 timeout                => $timeout,
                 logLevel               => $debug,
@@ -238,8 +230,7 @@ sub issuer {
 }
 
 sub sp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                          => $debug,
                 timeout                           => $timeout,

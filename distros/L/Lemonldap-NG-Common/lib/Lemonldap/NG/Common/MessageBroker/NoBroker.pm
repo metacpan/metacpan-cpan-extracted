@@ -1,17 +1,15 @@
 package Lemonldap::NG::Common::MessageBroker::NoBroker;
 
-# This pseudo message broker only dispatch messages into current node.
-# It also inserts periodically "newConf" into llng_events to permit- to
-# detect configuration changes usng the checkTime parameter.
+# This pseudo message broker dispatches messages into current node only.
+# It also inserts periodically "newConf" into llng_events to permit to
+# detect configuration changes using the checkTime parameter.
 
 use strict;
 use Lemonldap::NG::Common::Conf::Constants;
 
-our $VERSION = '2.20.0';
-
+our $VERSION   = '2.23.0';
 our $lastCheck = time;
-
-our $channels = {};
+our $channels  = {};
 
 sub new {
     my ( $class, $conf, $logger ) = @_;

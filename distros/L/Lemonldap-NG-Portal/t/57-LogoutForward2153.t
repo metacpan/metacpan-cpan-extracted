@@ -10,8 +10,7 @@ BEGIN {
 
 my $res;
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             logLevel             => 'error',
             authentication       => 'Demo',
@@ -100,8 +99,7 @@ $ep =~ s/https?:\/\/[^\/]+//;
 ##       - locationRules
 ##       - presence of resource in the server (404,...)
 ok(
-    $res = $app->(
-        {
+    $res = $app->( {
             'HTTP_ACCEPT'          => 'text/html',
             'SCRIPT_NAME'          => '/',
             'SERVER_NAME'          => '127.0.0.1',

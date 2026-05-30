@@ -7,7 +7,7 @@ use Carp     qw[];
 use Exporter qw[import];
 
 BEGIN {
-  our $VERSION     = '0.87';
+  our $VERSION     = '0.88';
   our @EXPORT_OK   = qw[ str2date
                          str2time
                          time2str ];

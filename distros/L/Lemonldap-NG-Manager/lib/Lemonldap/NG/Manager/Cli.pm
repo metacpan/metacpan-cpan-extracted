@@ -11,7 +11,7 @@ use Lemonldap::NG::Common::Conf::ReConstants;
 
 use constant booleanOptions => qr/^(?:json)$/;
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 $Data::Dumper::Useperl = 1;
 
 extends('Lemonldap::NG::Manager::Cli::Lib');
@@ -478,9 +478,8 @@ sub rollback {
       $self->mgr->confAcc->getConf( { cfgNum => $previousCfg, raw => 1 } )
       or die $Lemonldap::NG::Common::Conf::msg;
 
-    $conf->{cfgNum}    = $lastCfg;
-    $conf->{cfgAuthor} = scalar( getpwuid $< ) . '(command-line-interface)';
-    chomp $conf->{cfgAuthor};
+    $conf->{cfgNum}      = $lastCfg;
+    $conf->{cfgAuthor}   = &_user . ' (command-line-interface)';
     $conf->{cfgAuthorIP} = '127.0.0.1';
     $conf->{cfgDate}     = time;
     $conf->{cfgVersion}  = $Lemonldap::NG::Manager::VERSION;
@@ -636,8 +635,7 @@ sub _save {
         $saveParams->{cfgNum}      = $self->cfgNum;
         $saveParams->{cfgNumFixed} = 1;
     }
-    $new->{cfgAuthor} = scalar( getpwuid $< ) . '(command-line-interface)';
-    chomp $new->{cfgAuthor};
+    $new->{cfgAuthor}   = &_user . ' (command-line-interface)';
     $new->{cfgAuthorIP} = '127.0.0.1';
     $new->{cfgDate}     = time;
     $new->{cfgVersion}  = $Lemonldap::NG::Manager::VERSION;
@@ -723,6 +721,23 @@ sub run {
     }
 
     $self->$action(@_);
+}
+
+sub _user {
+    my $sysUser = scalar( getpwuid $< );
+    chomp $sysUser;
+    my $envUser;
+    foreach (qw(REMOTE_USER SUDO_USER USER)) {
+        ( $envUser = $ENV{$_} ) and last;
+    }
+    $envUser = undef unless $envUser =~ /\w/;
+    if ($sysUser) {
+        $sysUser .= " [$envUser] " if $envUser;
+    }
+    else {
+        $sysUser = $envUser || 'Unknown';
+    }
+    return $sysUser;
 }
 
 package Lemonldap::NG::Manager::Cli::Request;

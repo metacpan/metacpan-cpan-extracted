@@ -12,7 +12,6 @@ BEGIN {
     $ENV{LLNG_HASHED_SESSION_STORE} = 1;
 }
 
-
 our $debug = 'error';
 my ( $p, $res, $spId );
 $| = 1;
@@ -143,8 +142,7 @@ clean_sessions();
 done_testing( count() );
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel           => $debug,
                 domain             => 'idp.com',

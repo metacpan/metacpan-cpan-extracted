@@ -3,10 +3,10 @@ package Lemonldap::NG::Portal::Plugins::SamlFederation;
 use strict;
 use Mouse;
 use Lemonldap::NG::Portal::Main::Constants qw( PE_OK);
-use Carp qw(croak);
+use Carp                                   qw(croak);
 use XML::LibXML::Reader;
 
-our $VERSION = '2.0.16';
+our $VERSION = '2.23.0';
 
 use constant hook => { getSamlConfig => 'getSamlConfig' };
 
@@ -112,9 +112,8 @@ sub get_sp_config_from_placeholders {
         }
     }
 
-    # handle eduPersonTargetedID
-    if ( $attributes->{eduPersonTargetedID} ) {
-        delete $attributes->{eduPersonTargetedID};
+    # if SP wants a persistent NameID (eduPersonTargetedID)
+    if ( $attributes->{__persistent_name_id} ) {
         $options->{samlSPMetaDataOptionsNameIDFormat} = 'persistent';
     }
 
@@ -261,7 +260,13 @@ sub get_config_info_from_xml_federation {
                         $self->logger->debug( "Attribute $friendlyname ($name)"
                               . " requested by SP $entityID\n" );
 
-                        $requestedAttributes->{$friendlyname} =
+                        # handle eduPersonTargetedID
+                        my $session_attr_name = $friendlyname;
+                        if ( $name eq "urn:oid:1.3.6.1.4.1.5923.1.1.1.10" ) {
+                            $session_attr_name = "__persistent_name_id";
+                        }
+
+                        $requestedAttributes->{$session_attr_name} =
                           "$required;$name;$nameformat;$friendlyname";
                     }
                 }
@@ -330,8 +335,8 @@ sub get_federation {
     {
         $federation_name = $reader->getAttribute('Name');
         $cache_duration =
-        eval { parse_duration( $reader->getAttribute('cacheDuration') ) }
-        || $self->default_ttl;
+          eval { parse_duration( $reader->getAttribute('cacheDuration') ) }
+          || $self->default_ttl;
     }
     else {
         $self->logger->warn(

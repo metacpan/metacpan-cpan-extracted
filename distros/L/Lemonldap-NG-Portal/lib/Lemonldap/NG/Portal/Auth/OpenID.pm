@@ -15,7 +15,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_REDIRECT
 );
 
-our $VERSION = '2.19.0';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 
@@ -149,14 +149,15 @@ sub extractFormInfo {
         # Build the redirection
         $self->logger->debug("OpenID redirection to $url");
         my $req_url   = $req->data->{_url};
-        my $return_to = $self->p->buildUrl( $req->portal,
-                {
-                    openid => 1,
-                    ( $req_url ? ( url => $req_url ) : () )
-                }
-            );
+        my $return_to = $self->p->buildUrl(
+            $req->portal,
+            {
+                openid => 1,
+                ( $req_url ? ( url => $req_url ) : () )
+            }
+        );
         my $check_url = $claimed_identity->check_url(
-            return_to => $return_to,
+            return_to      => $return_to,
             trust_root     => $req->portal,
             delayed_return => 1,
         );

@@ -13,7 +13,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 );
 use Scalar::Util 'weaken';
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Portal::Main::Auth';
 with 'Lemonldap::NG::Portal::Lib::OverConf';
@@ -128,6 +128,7 @@ sub getDisplayType {
     return $self->conf->{combinationForms}
       if ( $self->conf->{combinationForms} );
 
+    eval { $self->getStack( $req, 'getDisplayType' ); };
     my ( $nb, $stack ) = (
         $req->data->{dataKeep}->{combinationTry},
         $req->data->{combinationStack}
@@ -327,6 +328,7 @@ sub warn {
 
 sub AUTOLOAD {
     no strict;
+    $AUTOLOAD =~ s/.*:://;
     return $_[0]->{logger}->$AUTOLOAD( $_[1] )
       if ( $AUTOLOAD =~ /^(?:notice|debug|error|info)$/ );
 }

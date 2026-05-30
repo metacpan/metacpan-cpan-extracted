@@ -1,5 +1,0 @@
-class CrossModuleFailure {
-	method explode () {
-		throw new Exception( message: "boom-from-c34" );
-	}
-}

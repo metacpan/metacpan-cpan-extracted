@@ -4,7 +4,7 @@ use strict;
 use Mouse;
 use JSON qw(from_json);
 use Lemonldap::NG::Common::UserAgent;
-use Lemonldap::NG::Common::Util qw(isHiddenAttr);
+use Lemonldap::NG::Common::Util            qw(isHiddenAttr);
 use Lemonldap::NG::Portal::Main::Constants qw(
   URIRE
   PE_OK
@@ -16,7 +16,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_REGISTERFORMEMPTY
 );
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.23.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -193,7 +193,7 @@ sub parse {
         foreach ( keys %{ $json->{headers} } ) {
             my $header = $json->{headers}->{$_};
             $header =~ s/^\$//;
-            if ( isHiddenAttr( $self->conf->{hiddenAttributes}, $header ) ) {
+            if ( isHiddenAttr( $self->conf, $header ) ) {
                 my $user = $req->userData->{ $self->conf->{whatToTrace} };
                 $self->userLogger->warn(
 "CheckDevOps: $user tried to retrieve a hidden attribute -> $header"

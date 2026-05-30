@@ -1,0 +1,3 @@
+# Time window in seconds for counting alerts
+# Short window for testing
+60

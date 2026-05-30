@@ -1,0 +1,26 @@
+0.001     2026-05-29 23:36:25Z
+
+ - Initial release
+ - WWW::Crawl4AI: Perl client and fallback orchestrator for Crawl4AI
+ - WWW::Crawl4AI::Client: UA-agnostic REST client (/crawl, /md, /crawl/job,
+   /crawl/job/{task_id}, /health) with request/parse/convenience flavours
+ - WWW::Crawl4AI::Request: BrowserConfig/CrawlerRunConfig payload builder
+ - Visible strategy chain: plain, browser, stealth, cloakbrowser (CDP), proxy,
+   callback — escalated in cost/complexity order
+ - CloakBrowser strategy: per-domain fingerprint seed is now a deterministic
+   32-bit FNV-1a hash of the host (CloakBrowser requires a numeric seed and
+   rejects raw host strings with HTTP 400)
+ - WWW::Crawl4AI::Result with attempt history, signals, backend and cost_class
+ - Result link accessors: urls (deduped, absolute, fragment-stripped),
+   internal_links, external_links, links — no reaching into raw
+ - deep_crawl: breadth-first crawl following each page's links through the full
+   strategy chain (max_pages / max_depth / same_host / url_filter / on_page)
+ - Single-URL action endpoints on the Client (and delegated from WWW::Crawl4AI):
+   screenshot / pdf (raw bytes), html (preprocessed), execute_js (page +
+   js_result), llm (LLM Q&A), token (JWT) — each with request/parse/convenience
+   flavours like the rest
+ - WWW::Crawl4AI::Detect: service detection + content-quality classification
+   (js_required / blocked / captcha / thin_html)
+ - WWW::Crawl4AI::Error structured error model (transport/api/job/content)
+ - bin/www-crawl4ai-doctor and bin/www-crawl4ai-test-url
+ - examples/docker-compose.yml (+ proxy escalation variant)

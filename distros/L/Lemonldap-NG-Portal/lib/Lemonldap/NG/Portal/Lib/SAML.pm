@@ -23,7 +23,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 
 with 'Lemonldap::NG::Portal::Lib::LazyLoadedConfiguration';
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 # PROPERTIES
 
@@ -441,6 +441,12 @@ sub load_sp_metadata {
 
     my $valid = 1;
 
+    # Check if SP is activated
+    unless ( $options->{samlSPMetaDataOptionsActivation} // 1 ) {
+        $self->logger->debug("SP $spConfKey deactivated");
+        return 0;
+    }
+
     # Access Rule
     my $rule = $options->{samlSPMetaDataOptionsRule};
     if ( length $rule ) {
@@ -451,9 +457,12 @@ sub load_sp_metadata {
     }
 
     # Required authentication level rule
-    my $levelrule = $options->{samlSPMetaDataOptionsAuthnLevel} || 0;
+    my $levelrule =
+         $options->{samlSPMetaDataOptionsAuthnLevel}
+      || $self->conf->{defaultAuthnLevel}
+      || 0;
     $levelrule = $self->p->buildRule( $levelrule,
-        "required authentication level rule for SP $spConfKey" );
+        "Required authentication level rule for SP $spConfKey" );
     unless ($levelrule) {
         $valid = 0;
     }
@@ -2697,7 +2706,7 @@ sub sendLogoutResponseToServiceProvider {
 
         # Redirect user to response URL
         my $slo_url = $logout->msg_url;
-        return [ 302, [ Location => URI->new($slo_url)->as_string ], [] ];
+        return $self->p->sendRedirection( $req, URI->new($slo_url)->as_string );
     }
 
     # HTTP-POST
@@ -3163,7 +3172,7 @@ sub getSamlSession {
 
     if ( $samlSession->error ) {
         if ($id) {
-            $self->userLogger->warn("SAML session $id isn't yet available");
+            $self->userLogger->warn("SAML session $id not found");
         }
         else {
             $self->logger->error("Unable to create new SAML session");
@@ -3207,9 +3216,9 @@ sub createAttribute {
     return $attribute;
 }
 
-## @method Lasso::Saml2AttributeValue createAttributeValue(string value, boolean force_utf8)
+## @method Lasso::Saml2AttributeValue createAttributeValue(value, force_utf8)
 # Create a new SAML attribute value
-# @param value Value to store
+# @param value Value to store (string or Lasso::Node)
 # @param force_utf8 set to 1 to decode UTF8 value
 # @return SAML attribute value
 sub createAttributeValue {
@@ -3220,11 +3229,6 @@ sub createAttributeValue {
     # Value is required
     return unless defined $value;
 
-    # Decode UTF-8
-    $self->logger->debug("Decode UTF8 value $value") if $force_utf8;
-    $value = decode( "utf8", $value )                if $force_utf8;
-    $self->logger->debug("Create attribute value $value");
-
     # SAML2 attribute value
     eval { $saml2value = Lasso::Saml2AttributeValue->new(); };
     if ($@) {
@@ -3232,22 +3236,26 @@ sub createAttributeValue {
         return;
     }
 
-    my @any;
+    my $content = $value;
 
-    # Text node
-    my $textNode;
-    eval { $textNode = Lasso::MiscTextNode->new(); };
-    if ($@) {
-        $self->checkLassoError($@);
-        return;
+    # If a string was provided, wrap it in a TextNode
+    if ( !ref($content) ) {
+
+        # Decode UTF-8
+        $self->logger->debug("Decode UTF8 value $value") if $force_utf8;
+        $value = decode( "utf8", $value )                if $force_utf8;
+        $self->logger->debug("Create attribute value $value");
+
+        eval { $content = Lasso::MiscTextNode->new(); };
+        if ($@) {
+            $self->checkLassoError($@);
+            return;
+        }
+        $content->text_child(1);
+        $content->content($value);
     }
 
-    $textNode->text_child(1);
-    $textNode->content($value);
-
-    push @any, $textNode;
-
-    $saml2value->any(@any);
+    $saml2value->any($content);
 
     return $saml2value;
 }
@@ -3399,14 +3407,7 @@ sub sendSLOSoapErrorResponse {
     }
     my $slo_body = $logout->msg_body;
     $self->logger->debug("SOAP response $slo_body");
-    return [
-        200,
-        [
-            'Content-Type'   => 'text/xml',
-            'Content-Length' => length($slo_body)
-        ],
-        [$slo_body]
-    ];
+    return $self->p->sendBinaryResponse( $req, $slo_body, type => 'text/xml' );
 }
 
 ## @method string getQueryString()
@@ -3513,14 +3514,8 @@ sub metadata {
     my $idp  = $req->param('idp');
     my $sp   = $req->param('sp');
     if ( my $metadata = $self->_get_metadata_xml( $req, $type, $sp, $idp ) ) {
-        return [
-            200,
-            [
-                'Content-Type'   => 'application/xml',
-                'Content-Length' => length($metadata),
-            ],
-            [$metadata]
-        ];
+        return $self->p->sendTextResponse( $req, $metadata,
+            type => 'application/xml' );
     }
     return $self->p->sendError( $req, 'Unable to build Metadata', 500 );
 }

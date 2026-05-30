@@ -20,7 +20,7 @@ extends qw(
   Lemonldap::NG::Common::Conf::RESTServer
 );
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 #############################
 # I. INITIALIZATION METHODS #
@@ -30,7 +30,7 @@ use constant defaultRoute => 'manager.html';
 use constant icon         => 'cog';
 
 has defaultNewKeySize => ( is => 'rw', default => 2048, );
-has defaultCurve => ( is => 'rw', default => 'prime256v1', );
+has defaultCurve      => ( is => 'rw', default => 'prime256v1', );
 
 sub init {
     my ( $self, $conf ) = @_;
@@ -64,13 +64,13 @@ sub init {
       # New key and conf save
       ->addRoute(
         confs => {
-            newRSAKey      => 'newRSAKey',
-            newCertificate => 'newCertificate',
+            newRSAKey        => 'newRSAKey',
+            newCertificate   => 'newCertificate',
             newEcCertificate => 'newEcCertificate',
-            newEcKeys      => 'newEcKeys',
-            sendTestMail   => 'sendTestMail',
-            raw            => 'newRawConf',
-            '*'            => 'newConf'
+            newEcKeys        => 'newEcKeys',
+            sendTestMail     => 'sendTestMail',
+            raw              => 'newRawConf',
+            '*'              => 'newConf'
         },
         ['POST']
       )
@@ -166,14 +166,15 @@ sub _generateX509 {
     my $portal_uri  = new URI::URL( $conf->{portal} || "http://localhost" );
     my $portal_host = $portal_uri->host;
 
-    if ($type eq "EC") {
-    my $curve    = $self->defaultCurve;
-    return Lemonldap::NG::Common::Util::Crypto::genEcCertKey( $curve,
-        $password, $portal_host );
-    } else {
-    my $key_size    = $self->defaultNewKeySize;
-    return Lemonldap::NG::Common::Util::Crypto::genCertKey( $key_size,
-        $password, $portal_host );
+    if ( $type eq "EC" ) {
+        my $curve = $self->defaultCurve;
+        return Lemonldap::NG::Common::Util::Crypto::genEcCertKey( $curve,
+            $password, $portal_host );
+    }
+    else {
+        my $key_size = $self->defaultNewKeySize;
+        return Lemonldap::NG::Common::Util::Crypto::genCertKey( $key_size,
+            $password, $portal_host );
     }
 }
 
@@ -243,8 +244,15 @@ sub prx {
 
     my $response = $self->ua->get( $query->{url} );
     unless ( $response->code == 200 ) {
-        return $self->sendError( $req,
-            $response->code . " (" . $response->message . ")", 400 );
+        return $self->sendError(
+            $req,
+            "Received unexpected HTTP status code "
+              . $response->code . " ("
+              . $response->message
+              . ") when trying to load content from "
+              . $query->{url},
+            400
+        );
     }
     unless ( $response->header('Content-Type') =~
         m#^(?:application/json|(?:application|text)/.*xml).*$# )
@@ -266,7 +274,7 @@ sub prx {
 
 sub getConfByNum {
     my ( $self, $cfgNum, @args ) = @_;
-    unless ($self->currentConf
+    unless ( $self->currentConf
         and %{ $self->currentConf }
         and $cfgNum == $self->currentConf->{cfgNum} )
     {

@@ -14,8 +14,7 @@ BEGIN {
 }
 
 # Initialization
-my $op = LLNG::Manager::Test->new(
-    {
+my $op = LLNG::Manager::Test->new( {
         ini => {
             domain                          => 'idp.com',
             portal                          => 'http://auth.op.com',
@@ -195,8 +194,7 @@ $res = $op->_post(
 );
 
 $json = expectJSON($res);
-ok(
-    (
+ok( (
               $json->{name} eq 'Frédéric Accents'
           and $json->{email} eq 'fa@badwolf.org'
     ),

@@ -2,7 +2,7 @@ package Zuzu::Error;
 
 use utf8;
 
-our $VERSION = '0.001000';
+our $VERSION = '0.001002';
 
 use overload '""' => sub { $_[0]->as_string }, fallback => 1;
 

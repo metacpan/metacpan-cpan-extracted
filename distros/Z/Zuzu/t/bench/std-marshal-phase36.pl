@@ -12,9 +12,9 @@ use Path::Tiny;
 use Time::HiRes qw( time );
 
 my %commands = (
-	perl => './bin/zuzu.pl -It/modules',
-	rust => './extras/zuzu-rust/target/release/zuzu-rust -It/modules',
-	'js-node' => './extras/zuzu-js/bin/zuzu-js -It/modules',
+	perl => './bin/zuzu.pl -Istdlib/test-modules -Istdlib/modules',
+	rust => './extras/zuzu-rust/target/release/zuzu-rust -Istdlib/test-modules -Istdlib/modules',
+	'js-node' => './extras/zuzu-js/bin/zuzu-js -Istdlib/test-modules -Istdlib/modules',
 	'js-electron' =>
 		'./extras/zuzu-js/node_modules/.bin/electron '
 		. 'extras/zuzu-js/bin/zuzu-js-electron',

@@ -21,7 +21,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_SENDRESPONSE
 );
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::Plugin
@@ -31,7 +31,7 @@ extends qw(
 
 # INTERFACE
 
-use constant beforeAuth => 'checkAlreadyTrusted';
+use constant beforeAuth   => 'checkAlreadyTrusted';
 use constant beforeLogout => 'logout';
 
 # INITIALIZATION

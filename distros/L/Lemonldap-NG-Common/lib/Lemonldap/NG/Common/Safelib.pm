@@ -14,7 +14,7 @@ use Net::CIDR;
 use Digest::SHA;
 use Date::Parse;
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.23.0';
 
 # Set here all the names of functions that must be available in Safe objects.
 # Note that only functions, not methods, can be written here
@@ -26,7 +26,7 @@ our $functions =
 ## @function boolean ipInSubnet(string ip, string network, ... )
 # Function to check if an IP is part of a network
 # @param $ip IP address to test
-# @param $network Network in CIDR notation.
+# @param $network Network in CIDR notation
 # You can call the function with multiple networks
 # @return 1 true, 0 else
 sub ipInSubnet {
@@ -36,10 +36,10 @@ sub ipInSubnet {
 
 ## @function boolean subjectid(string alg, string value, string scope, string salt)
 # Function to compute an opaque identifier from a value and optional salt
-# @param $ip IP address to test
-# @param $network Network in CIDR notation.
-# You can call the function with multiple networks
-# @return 1 true, 0 else
+# @param $value ID to encrypt
+# @param $scope Domain used for restricting scope
+# @param $salt Salt appended to generate hash
+# @return encrypted ID
 sub subjectid {
     my ( $value, $scope, $salt ) = @_;
     $salt //= "";
@@ -133,9 +133,9 @@ sub listMatch {
     my @a;
 
     if ( $values[-1] eq '1' || $values[-1] eq '0' ) {
-        $flags = pop @values ? 'i' : '';        
+        $flags = pop @values ? 'i' : '';
     }
-    
+
     if ( ref($list) eq "ARRAY" ) {
         @a = @{$list};
     }

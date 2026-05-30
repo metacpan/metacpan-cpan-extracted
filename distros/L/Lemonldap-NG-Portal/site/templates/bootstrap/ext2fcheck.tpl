@@ -31,7 +31,7 @@
   </div>
   <div class="buttons">
     <TMPL_IF "RESENDTARGET">
-    <button type="submit" class="btn btn-primary" formaction="<TMPL_VAR NAME="RESENDTARGET">">
+    <button type="submit" formnovalidate="formnovalidate" class="btn btn-primary" formaction="<TMPL_VAR NAME="RESENDTARGET">">
       <span class="fa fa-repeat"></span>
       <span trspan="resendCode">Re-send code</span>
     </button>

@@ -12,8 +12,7 @@ my $maintests = 11;
 
 no warnings 'once';
 
-my $client = LLNG::Manager::Test->new(
-    {
+my $client = LLNG::Manager::Test->new( {
         ini => {
             portal                        => 'http://auth.example.com/',
             mailUrl                       => 'http://auth.example.com/resetpwd',
@@ -28,12 +27,12 @@ my $client = LLNG::Manager::Test->new(
     }
 );
 
-
 # Try yo authenticate
 # -------------------
 ok(
     $res = $client->_post(
-        '/', IO::String->new('user=dwho&password=dwho'),
+        '/',
+        IO::String->new('user=dwho&password=dwho'),
         length => 23
     ),
     'Auth query'
@@ -46,7 +45,7 @@ ok(
     $res = $client->_post(
         '/initializepasswordreset',
         IO::String->new($request),
-        type => 'application/json',
+        type   => 'application/json',
         length => length($request)
     ),
     'Force reinitialization for rtyler@badwolf.org'
@@ -54,13 +53,11 @@ ok(
 expectOK($res);
 my $json = expectJSON($res);
 
-ok(
-    $json->{mail_token},
-    'mail_token found'
-);
+ok( $json->{mail_token}, 'mail_token found' );
 
 ok(
-    $json->{url} =~ /^http:\/\/auth\.example\.com\/resetpwd\?mail_token=[a-z0-9]+$/,
+    $json->{url} =~
+      /^http:\/\/auth\.example\.com\/resetpwd\?mail_token=[a-z0-9]+$/,
     'reset url found and have a correct format'
 );
 
@@ -69,7 +66,7 @@ ok(
     $res = $client->_post(
         '/initializepasswordreset',
         IO::String->new($request),
-        type => 'application/json',
+        type   => 'application/json',
         length => length($request)
     ),
     'Force reinitialization for rtyler@badwolf.org - bad secret'
@@ -77,17 +74,15 @@ ok(
 expectForbidden($res);
 eval { $json = JSON::from_json( $res->[2]->[0] ) };
 ok( not($@), 'Content is valid JSON' );
-ok(
-    $json->{msg} =~ /^InitializePasswordReset: authentication error$/,
-    'authentication error'
-);
+ok( $json->{msg} =~ /^InitializePasswordReset: authentication error$/,
+    'authentication error' );
 
 $request = '{"mail":"unknown@badwolf.org","secret":"UoIpS0aKXuSE7SQT"}';
 ok(
     $res = $client->_post(
         '/initializepasswordreset',
         IO::String->new($request),
-        type => 'application/json',
+        type   => 'application/json',
         length => length($request)
     ),
     'Force reinitialization for rtyler@badwolf.org - user not found'
@@ -96,7 +91,8 @@ ok( $res->[0] == 404, ' HTTP code is 404' ) or explain( $res, 404 );
 eval { $json = JSON::from_json( $res->[2]->[0] ) };
 ok( not($@), 'Content is valid JSON' );
 ok(
-    $json->{msg} =~ /^InitializePasswordReset: user unknown\@badwolf\.org not found$/,
+    $json->{msg} =~
+      /^InitializePasswordReset: user unknown\@badwolf\.org not found$/,
     'user not found'
 );
 

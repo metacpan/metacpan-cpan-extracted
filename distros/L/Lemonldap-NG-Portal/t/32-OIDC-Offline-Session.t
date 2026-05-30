@@ -130,6 +130,14 @@ sub runTest {
 
     # Make sure refresh token session has no _lastSeen to avoid purge
     ok( !getSamlSession($refresh_token)->{data}->{_lastSeen} );
+    {
+        my $session_data = getSamlSession($refresh_token)->{data};
+        is( $session_data->{_auth},   'Demo', '_auth was preserved' );
+        is( $session_data->{_userDB}, 'Demo', '_userDB was preserved' );
+        if ( $op->p->conf->{authentication} eq "Choice" ) {
+            is( $session_data->{_choice}, '1_Demo', '_choice was preserved' );
+        }
+    }
 
     $access_token = $json->{access_token};
     if ($jwt) {

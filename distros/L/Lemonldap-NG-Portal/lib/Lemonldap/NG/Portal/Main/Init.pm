@@ -8,7 +8,7 @@
 #                  of lemonldap-ng.ini) and underlying handler configuration
 package Lemonldap::NG::Portal::Main::Init;
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -330,7 +330,7 @@ sub reloadConf {
     # Set asset tag from version and optional salt
     my $cacheTagSalt = $self->conf->{cacheTagSalt} // "";
     my $key          = $self->conf->{key}          // "";
-    my $digest = substr(
+    my $digest       = substr(
         MIME::Base64::encode_base64url(
             Digest::SHA::hmac_sha256(
                 $Lemonldap::NG::Portal::VERSION . $cacheTagSalt, $key
@@ -490,6 +490,11 @@ sub loadPlugin {
 
     my $full_name =
       ( $plugin =~ /^::/ ) ? "Lemonldap::NG::Portal$plugin" : $plugin;
+
+    # Skip if already loaded (avoids double-loading when
+    # _loadConditionalPlugins and enabledPlugins both trigger the same plugin)
+    return 1 if $self->loadedModules->{$full_name};
+
     if (
         grep {
             my $item_full_name =
@@ -520,7 +525,7 @@ sub findEP {
     # Corresponding code paths must be removed
     my $is_only = 1;
     if ( $self->_loadedPlugins->{$module} ) {
-        $self->logger->debug( "Plugin $module has already been loaded once." );
+        $self->logger->debug("Plugin $module has already been loaded once.");
         $is_only = 0;
     }
     else {
@@ -695,13 +700,18 @@ sub loadModule {
         $self->logger->error("$module new() method returned undef");
         return 0;
     }
+
+    # Register before init so that plugins loaded during init (e.g. via
+    # _loadConditionalPlugins) can find this module in loadedModules
+    $self->loadedModules->{$module} = $obj;
+
     if ( $obj->can("init") and ( !$obj->init ) ) {
+        delete $self->loadedModules->{$module};
         $self->logger->error("$module init failed");
         $self->error("$module init failed");
         return 0;
     }
 
-    $self->loadedModules->{$module} = $obj;
     return $obj;
 }
 
@@ -738,7 +748,7 @@ sub buildRule {
     my $overLoadedRule = $compiledRule;
     if ( $self->conf->{logParams} ) {
         $overLoadedRule = sub {
-            $self->_dump($_[0]);
+            $self->_dump( $_[0] );
             return $compiledRule->(@_);
         };
     }

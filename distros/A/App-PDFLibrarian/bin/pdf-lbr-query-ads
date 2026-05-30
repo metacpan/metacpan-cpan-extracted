@@ -32,7 +32,7 @@ use URI;
 
 FindBin::again();
 
-use App::PDFLibrarian;
+use App::PDFLibrarian qw($cfgdir);
 use App::PDFLibrarian::TitleAbbr qw(get_aas_macros);
 
 =pod
@@ -122,7 +122,7 @@ croak "$Script: missing personal ADS API token" unless defined($api_token);
 
 # user agent for web queries
 my $useragent = LWP::UserAgent->new;
-$useragent->agent("pdflibrarian/$VERSION");
+$useragent->agent("App::PDFLibrarian v$App::PDFLibrarian::VERSION");
 
 # escape any colons and parentheses in query value
 $query =~ s{^([^:]*):(.*)$}{ my $k = $1; my $v = $2; $v =~ s|:|\\:|g; "$k:$v" }e;

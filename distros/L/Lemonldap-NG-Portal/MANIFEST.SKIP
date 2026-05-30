@@ -14,4 +14,5 @@ cpanfile
 ^\.prove
 ^\.proverc
 .bak$
+node_modules
 ^t/sessions/tmp

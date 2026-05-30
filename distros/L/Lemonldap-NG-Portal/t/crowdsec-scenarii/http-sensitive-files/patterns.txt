@@ -1,0 +1,7 @@
+.env
+.git/config
+.htaccess
+.htpasswd
+config.php
+wp-config.php
+composer.json

@@ -2,7 +2,7 @@
 # into "plugins" list in lemonldap-ng.ini, section "portal"
 package Lemonldap::NG::Portal::Main::Plugins;
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 package Lemonldap::NG::Portal::Main;
 
@@ -40,22 +40,29 @@ our @pList = (
     checkHIBP                           => '::Plugins::CheckHIBP',
     checkEntropy                        => '::Plugins::CheckEntropy',
     initializePasswordReset             => '::Plugins::InitializePasswordReset',
-    oidcOfflineTokens                   => '::Plugins::OidcOfflineTokens',
-    adaptativeAuthenticationLevelRules  =>
+    oidcOfflineTokens                   => '::Plugins::OIDC::OfflineTokens',
+    oidcServiceAllowDynamicRegistration =>
+      '::Plugins::OIDC::DynamicRegistration',
+    adaptativeAuthenticationLevelRules =>
       '::Plugins::AdaptativeAuthenticationLevel',
     refreshSessions         => '::Plugins::Refresh',
-    crowdsec                => '::Plugins::CrowdSec',
+    externalMenu            => '::Plugins::ExternalMenu',
     crowdsecAgent           => '::Plugins::CrowdSecAgent',
+    crowdsec                => '::Plugins::CrowdSec',
     locationDetect          => '::Plugins::LocationDetect',
     globalLogoutRule        => '::Plugins::GlobalLogout',
     samlFederationFiles     => '::Plugins::SamlFederation',
     adminLogoutServerSecret => '::Plugins::AdminLogout',
     'or::oidcRPMetaDataOptions/*/oidcRPMetaDataOptionsAllowNativeSso' =>
-      '::Plugins::OIDCNativeSso',
+      '::Plugins::OIDC::NativeSso',
     'or::oidcOPMetaDataOptions/*/oidcOPMetaDataOptionsRequirePkce' =>
-      '::Plugins::AuthOidcPkce',
+      '::Plugins::OIDC::AuthPkce',
     'or::oidcRPMetaDataOptions/*/oidcRPMetaDataOptionsTokenXAuthorizedRP' =>
-      '::Plugins::OIDCInternalTokenExchange',
+      '::Plugins::OIDC::InternalTokenExchange',
+    'or::oidcRPMetaDataOptions/*/oidcRPMetaDataOptionsAllowPasswordGrant' =>
+      '::Plugins::OIDC::PasswordGrant',
+'or::oidcRPMetaDataOptions/*/oidcRPMetaDataOptionsAllowClientCredentialsGrant'
+      => '::Plugins::OIDC::ClientCredentialsGrant',
 );
 
 ##@method list enabledPlugins

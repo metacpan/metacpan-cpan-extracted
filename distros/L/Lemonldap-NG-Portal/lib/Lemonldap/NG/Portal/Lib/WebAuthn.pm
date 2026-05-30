@@ -3,14 +3,14 @@ package Lemonldap::NG::Portal::Lib::WebAuthn;
 use strict;
 use Mouse::Role;
 use MIME::Base64 qw(encode_base64url decode_base64url);
-use JSON qw(decode_json from_json to_json);
-use Digest::SHA qw(sha256);
+use JSON         qw(decode_json from_json to_json);
+use Digest::SHA  qw(sha256);
 use URI;
 use Carp;
 with 'Lemonldap::NG::Portal::Lib::2fDevices';
 use Lemonldap::NG::Common::Util qw/display2F/;
 
-our $VERSION = '2.20.0';
+our $VERSION = '2.23.0';
 
 has trust_anchors => (
     is      => 'rw',
@@ -41,7 +41,7 @@ sub rp_id {
         return $self->conf->{webauthnRpId};
     }
     else {
-        my $portal_uri = URI->new( $portal );
+        my $portal_uri = URI->new($portal);
         if ( $portal_uri->can('host') ) {
             return $portal_uri->host;
         }
@@ -57,7 +57,7 @@ sub origin {
     # In case a plugin calls this method without arguments
     my $portal = $req ? $req->portal : $self->p->portal;
 
-    my $portal_uri = URI->new( $portal );
+    my $portal_uri = URI->new($portal);
     return ( $portal_uri->scheme . "://" . $portal_uri->authority );
 }
 

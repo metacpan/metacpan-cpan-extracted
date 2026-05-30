@@ -13,7 +13,7 @@ Readonly::Array our @EXPORT_OK => qw(set_params set_params_pub set_split_params
 	split_params);
 
 # Version.
-our $VERSION = 0.14;
+our $VERSION = 0.15;
 
 # Set parameters to user values.
 sub set_params {
@@ -107,6 +107,13 @@ Class::Utils - Class utilities.
  set_params_pub($self, @params);
  my @other_params = set_split_params($self, @params);
  my ($object_params_ar, $other_params_ar) = split_params($object_keys_ar, @params);
+
+=head1 DESCRIPTION
+
+Class::Utils provides helper subroutines for working with object or hash
+references and parameter lists. It can assign incoming key/value pairs to an
+object, filter out private parameters, and split arguments into object-owned
+and external parts.
 
 =head1 SUBROUTINES
 
@@ -323,12 +330,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2011-2022 Michal Josef Špaček
+© 2011-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.14
+0.15
 
 =cut

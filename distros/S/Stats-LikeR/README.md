@@ -9,6 +9,51 @@ There **are** other modules on CPAN that can do **PARTS** of this, but this work
 
 # Functions/Subroutines
 
+## add_data
+
+Add data to a hash
+
+    $data = { 'Jack Smith' => { age => 30 } };
+    $n = { 
+        'Jack Smith' => { dept => 'Engineering' },             # Update existing (Hash)
+        'Jane Doe'   => { age => 25, dept => 'Sales' },        # Add new (Hash)
+        'Bob Brown'  => [ 'age', 40, 'dept', 'IT' ],           # Add new (Array)
+        'Invalid'    => 'Not a reference'                      # Edge case safety
+    };
+    add_data($data, $n); # will add data to 'Jack Smith', as well as new keys for Jane and Bob.
+
+this is the equivalent of adding new rows, as well as `ljoin`, which is described below.
+
+where the resulting hash-of-hash looks like:
+
+        {
+        1st   {
+            a   "A",
+            b   "B"
+        },
+        2nd   {
+            a   "C",
+            b   "D"
+        }
+    }
+
+### no pivot key/row name
+
+with no pivot key, each array index becomes a hash key, which is less useful, but necessary for completeness.  The same `@aoh` above becomes:
+
+    {
+        0   {
+            a   "A",
+            b   "B",
+            r   "1st" (dualvar: 1)
+        },
+        1   {
+            a   "C",
+            b   "D",
+            r   "2nd" (dualvar: 2)
+        }
+    }
+
 ## aov
 
 Warning: assumes normal distribution
@@ -156,6 +201,22 @@ or
 
     cov($array1, $array2, 'kendall')
 
+## dnorm
+
+gives the density of the normal distribution, with the specified mean and standard deviation.
+
+In other words, the predicted height of the value `x`, given a mean, standard deviation, and whether or not to use a log value.
+
+returns a single scalar/number if a single value is given, otherwise returns an array reference.
+
+Usage:
+
+    dnorm(4) # assumes a mean of 0 and standard deviation of 1
+
+but default mean, standard deviation, and log can be passed as parameters:
+
+    $x = dnorm(0, mean => 0, sd => 2, 'log' => 0);
+
 ## fisher_test
 
 ### array reference entry
@@ -224,6 +285,67 @@ In addition to the `gaussian` default, it fully supports logistic regression usi
 
     my $glm_bin = glm(formula => 'am ~ wt + hp', data => \%mtcars, family => 'binomial');
 
+## group_by
+
+Take a hash of arrays, hash of hashes, or array of hashes, and group a column by another column.
+
+    my $aoh_data = [
+        { 'Gender' => 'Male',   'Testosterone, total (nmol/L)' => 20.5 },
+        { 'Gender' => 'Female', 'Testosterone, total (nmol/L)' => 1.8 },
+        { 'Gender' => 'Male',   'Testosterone, total (nmol/L)' => 18.2 },
+        { 'Gender' => 'Female' } # Intentional missing target value
+    ];
+
+as well as
+
+    $hoh_data = {
+        'Patient_A' => { 'Gender' => 'Male',   'Testosterone, total (nmol/L)' => 20.5 },
+        'Patient_B' => { 'Gender' => 'Female', 'Testosterone, total (nmol/L)' => 1.8 },
+        'Patient_C' => { 'Gender' => 'Male',   'Testosterone, total (nmol/L)' => 18.2 },
+        'Patient_D' => { 'Gender' => 'Female' }, # Intentional missing target value
+        'Patient_E' => { 'Gender' => 'Female', 'Testosterone, total (nmol/L)' => undef } # Explicit undef
+        };
+
+and
+
+    my $hoa_data = {
+        'Gender'                       => ['Male', 'Female', 'Male', 'Female'],
+        'Testosterone, total (nmol/L)' => [22.1,   2.5,      19.4,   undef   ]
+    };
+
+then run the function thus:
+
+    group_by( $hoa_data, 'Testosterone, total (nmol/L)', 'Gender');
+
+The output can be thought of like a hash, with the first string broken down by the second.
+
+all become the hash of arrays:
+
+    {
+        Female   [
+            [0] 1.8
+        ],
+        Male     [
+            [0] 18.2,
+            [1] 20.5
+        ]
+    }
+
+returns an empty array of hashes if neither target nor group keys are found.
+
+### Filtering
+
+Data can be further broken down with filter/subs like in `read_table`:
+
+    my $testosterone = group_by($d, # group testosterone by "Gender"
+        'Testosterone, total (nmol/L)',
+        'Gender',
+        { 'Race/Hispanic origin w/ NH Asian' => sub { $_ eq $n } },
+        { 'Testosterone, total (nmol/L)' => sub { $_ ne 'NA' } } # filter
+    );
+
+where each filter filters on the columns, e.g. second hash keys.
+
 ## hist
 
 Computes the histogram of the given data values, operating in single $O(N)$ pass performance. It returns the bin counts, computed breaks, midpoints, and density. 
@@ -285,6 +407,38 @@ Also, a single array can be tested against a normal distribution:
 
 The p-value precision is about 1e-8, which I want to improve, but am not sure how.
 
+## ljoin
+
+Consider a hash: `$h{$row}{$col}`, and another hash `$i{$row}{$col}`.
+`ljoin` will add information for `$col` in `%i` for each `$row` to `%h`, where `$row` exists in both `%h` and `%i`
+
+For example,
+
+    {
+    "Jack Smith"   {
+        age   30
+    }
+    }
+
+and a second hash,
+    {
+        "Jack Smith"   {
+            dept   "Engineering"
+        },
+        "Jane Doe"     {
+            age   25
+        }
+    }
+
+in this case, running `ljoin(\%h, \%i)` will modify \%h to result:
+
+    {
+    "Jack Smith"   {
+        age    30,
+        dept   "Engineering"
+    }
+    }
+
 ## lm
 
 This is the linear models function.
@@ -315,7 +469,7 @@ You can also pass `byrow => 1` if you want the matrix populated row-wise instead
 ## max
 
     max(1,2,3);
-    
+
 or
 
     my @arr = 1..8;
@@ -356,6 +510,14 @@ or
     min(@arr, 4, 5)
 
 as of version 0.02, min will die if any undefined values are provided
+
+## mode
+
+Takes either an array or an array reference, and returns an array of the most common scalars (numbers or strings)
+
+    @arr = mode([1,3,3,3]); # returns (3)
+
+    @arr = mode('a','a','c','c','z'); # returns ('a', 'c')
 
 ## oneway_test
 
@@ -712,7 +874,6 @@ As described by R: Performs an F test to compare the variances of two samples fr
 
     my @x = (2.9, 3.0, 2.5, 2.6, 3.2);
     my @y = (3.8, 2.7, 4.0, 2.4);
-    my @z = (2.8, 3.4, 3.7, 2.2, 2.0);
 
     my $t0 = Time::HiRes::time();
     my $vt = var_test(\@x, \@y);
@@ -754,9 +915,19 @@ as of version 0.07, `write_table` determines comma and tab-separated delimiters 
 
 # changes
 
-## 0.07
+## 0.08
 
-Changes to dist.ini to prevent `LikeR.c: loadable library and perl binaries are mismatched` errors on other operating systems
+Speed improvement in `summary` of hashes.
+
+Addition of `add_data`, `dnorm`, `group_by`, `ljoin`, and `mode` functions
+
+Chi-squared function no longer has Perl wrapper, and all code is in XS, which should result in a minor speed increase with 1 less function call.
+
+Compiler changes for GNU source and inclusion of `strings.h`, to ensure more CPAN testing works better.
+
+`read_table` now returns hash-of-hash in {row}{column}
+
+## 0.07
 
 Addition of `summary` function.
 

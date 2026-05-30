@@ -11,7 +11,7 @@ use MIME::Base64;
 use Lemonldap::NG::Common::FormEncode;
 use URI;
 
-our $VERSION = '2.16.3';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Common::PSGI';
 
@@ -164,11 +164,7 @@ sub handler {
         );
 
         # Redirect
-        return [
-            302, [ Location => URI->new($urldc)->as_string, $req->spliceHdrs ],
-            []
-        ];
-
+        return $self->sendRedirection( $req, URI->new($urldc)->as_string, );
     }
 
     if ($cdc_cookie) {
@@ -179,15 +175,7 @@ sub handler {
         $self->{cdc_values} = \@cdc_values;
     }
 
-    return [
-        200,
-        [
-            'Content-Type'   => 'text/plain',
-            'Content-Length' => 2,
-            $req->spliceHdrs,
-        ],
-        ['OK']
-    ];
+    return $self->sendTextResponse( $req, 'OK', type => 'text/plain' );
 }
 
 1;

@@ -112,6 +112,17 @@ ok(
 is( getJWTHeader($request)->{alg}, "HS256", "Alg can be changed in config" );
 count(2);
 
+my $payload = getJWTPayload($request);
+is_deeply(
+    $payload->{claims},
+    {
+        "id_token" => { "amr" => { "essential" => JSON::true } }
+    },
+    "Correct custom json extra parameter"
+);
+is_deeply( $payload->{myparam}, "42", "Correct string extra parameter" );
+count(2);
+
 # Push request to OP
 ok( $res = $op->_get( $url, query => $query, accept => 'text/html' ),
     "Push request to OP,         endpoint $url" );
@@ -286,6 +297,11 @@ sub rp {
                         oidcOPMetaDataOptionsAuthnEndpointAuthSigAlg => 'HS256',
                         oidcOPMetaDataOptionsTokenEndpointAuthMethod =>
                           'client_secret_jwt',
+                        oidcOPMetaDataOptionsAuthEndpointExtraParams => {
+                            myparam => '42',
+                            claims  =>
+'{ "id_token": { "amr": { "essential": true } } }',
+                        },
                     }
                 },
                 oidcServiceKeyIdSig => 'aabbcc',

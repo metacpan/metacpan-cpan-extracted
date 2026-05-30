@@ -91,8 +91,8 @@ count(1);
 # OIDC idp must be sorted
 my @idp = map /idploop py-3" val="(.+?)">/g, $res->[2]->[0];
 ok( $idp[0] eq 'op3', '1st = op3' ) or print STDERR Dumper( \@idp );
-ok( $idp[1] eq 'op', '2nd = op' ) or print STDERR Dumper( \@idp );
-ok( $idp[2] eq 'op2',  '3rd = op2' )  or print STDERR Dumper( \@idp );
+ok( $idp[1] eq 'op',  '2nd = op' )  or print STDERR Dumper( \@idp );
+ok( $idp[2] eq 'op2', '3rd = op2' ) or print STDERR Dumper( \@idp );
 count(3);
 
 # Found OIDC idp logo and display name
@@ -108,8 +108,7 @@ clean_sessions();
 done_testing( count() );
 
 sub op {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                        => $debug,
                 domain                          => 'idp.com',
@@ -158,8 +157,7 @@ sub op {
 
 sub rp {
     my ( $jwks, $metadata ) = @_;
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel                   => $debug,
                 domain                     => 'rp.com',

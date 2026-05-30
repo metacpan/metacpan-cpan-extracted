@@ -1,6 +1,6 @@
 use LWP::Protocol::PSGI;
 use MIME::Base64;
-use Digest::HMAC_SHA1 qw(hmac_sha1 hmac_sha1_hex);
+use Digest::SHA qw(hmac_sha1 hmac_sha1_hex);
 
 # Fake yubikeyserver will succed for any OTP whose unique partbegins with 1
 # and fail when it begins with 2

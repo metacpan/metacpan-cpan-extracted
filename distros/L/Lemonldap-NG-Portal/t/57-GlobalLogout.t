@@ -147,9 +147,9 @@ my @d = ( $res->[2]->[0] =~ m%<th scope="col">%gs );
 my @e = ( $res->[2]->[0] =~ m%class="data-epoch">(\d{10})</td>%gs );
 
 ## Three entries found
-ok( @c == 3, ' -> Three entries found' );
-ok( @d == 5, ' -> Five <th> found' );
-ok( @e == 3, ' -> Three epoch found' );
+ok( @c == 3,                                    ' -> Three entries found' );
+ok( @d == 5,                                    ' -> Five <th> found' );
+ok( @e == 3,                                    ' -> Three epoch found' );
 ok( time() - 5 <= $e[0] && $e[0] <= time() + 5, 'Right epoch found' )
   or print STDERR Dumper( $res->[2]->[0] ), time(), " / $1";
 ok( $res->[2]->[0] =~ /\bglobalLogout(?:min)?\.js\b/,

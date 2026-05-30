@@ -210,8 +210,7 @@ clean_sessions();
 done_testing( count() );
 
 sub sp {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 domain         => 'sp.com',
                 portal         => 'http://auth.sp.com/',
@@ -346,8 +345,7 @@ sub sp {
 }
 
 sub issuer {
-    return LLNG::Manager::Test->new(
-        {
+    return LLNG::Manager::Test->new( {
             ini => {
                 logLevel               => $debug,
                 domain                 => 'idp.com',

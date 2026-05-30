@@ -10,7 +10,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
 );
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.23.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::UserDB
@@ -113,10 +113,17 @@ sub setSessionInfo {
 
     while ( my ( $k, $v ) = each %vars ) {
         my $value = $req->data->{OpenIDConnect_user_info}->{$v};
-        if ( ref($value) and ref($value) eq "ARRAY" ) {
+
+        # Flatten arrays if all their values are scalars
+        if (    ref($value)
+            and ref($value) eq "ARRAY"
+            and not grep { ref($_) } @$value )
+        {
             $req->{sessionInfo}->{$k} =
               join( $self->conf->{multiValuesSeparator}, @$value );
         }
+
+        # Else, store the value as-is
         else {
             $req->{sessionInfo}->{$k} = $value;
         }

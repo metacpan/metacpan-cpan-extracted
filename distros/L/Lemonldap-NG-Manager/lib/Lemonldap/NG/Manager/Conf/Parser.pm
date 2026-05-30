@@ -26,7 +26,7 @@ use JSON 'to_json';
 use Lemonldap::NG::Common::Conf::ReConstants;
 use Lemonldap::NG::Manager::Attributes;
 
-our $VERSION = '2.22.0';
+our $VERSION = '2.23.0';
 
 extends 'Lemonldap::NG::Common::Conf::Compact';
 
@@ -146,10 +146,16 @@ sub scanTree {
     # Set cfgNum to ref cfgNum (will be changed when saving), set other
     # metadata and set a value to the key if empty
     $self->newConf->{cfgNum} = $self->req->params('cfgNum');
+    my $envUser;
+    foreach (qw(REMOTE_USER SUDO_USER USER)) {
+        ( $envUser = $self->req->env->{$_} || $ENV{$_} ) and last;
+    }
+    $envUser = '' unless $envUser =~ /\w/;
     $self->newConf->{cfgAuthor} =
       $self->req->userData->{ Lemonldap::NG::Handler::Main->tsv->{whatToTrace}
-          || '_whatToTrace' } // $self->req->env->{REMOTE_USER}
-      // $ENV{REMOTE_USER} // "anonymous";
+          || '_whatToTrace' }
+      || $envUser
+      || "anonymous";
     $self->newConf->{cfgAuthorIP} = $self->req->address;
     $self->newConf->{cfgAuthorIP} .=
       ' (maybe '
@@ -175,7 +181,7 @@ use feature 'state';
 sub _scanNodes {
     my ( $self, $tree, ) = @_;
     hdebug("# _scanNodes()");
-    state( $knownCat, %newNames );
+    state ( $knownCat, %newNames );
     unless ( ref($tree) eq 'ARRAY' ) {
         print STDERR 'Fatal: node is not an array';
         push @{ $self->errors }, { message => 'Fatal: node is not an array' };

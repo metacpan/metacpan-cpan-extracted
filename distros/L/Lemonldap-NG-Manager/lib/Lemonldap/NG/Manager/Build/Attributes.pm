@@ -6,7 +6,7 @@
 
 package Lemonldap::NG::Manager::Build::Attributes;
 
-our $VERSION = '2.22.2';
+our $VERSION = '2.23.0';
 use strict;
 use Regexp::Common qw/URI/;
 
@@ -279,7 +279,6 @@ use constant oidcEncAlgorithmAlg => [
     #{ k => 'PBES2-HS256+A128KW', v => 'PBES2-HS256+A128KW' },
     #{ k => 'PBES2-HS384+A192KW', v => 'PBES2-HS384+A192KW' },
     #{ k => 'PBES2-HS512+A256KW', v => 'PBES2-HS512+A256KW' },
-    { k => '',               v => 'None' },
     { k => 'RSA-OAEP',       v => 'RSA-OAEP' },
     { k => 'RSA-OAEP-256',   v => 'RSA-OAEP-256' },
     { k => 'RSA1_5',         v => 'RSA1_5' },
@@ -322,6 +321,7 @@ sub attributes {
             default       => 5,
             flags         => 'hp',
         },
+        defaultAuthnLevel => { type => 'intOrNull' },
         defaultNewKeySize => {
             type          => 'int',
             documentation => 'Default size for new RSA key helper',
@@ -425,6 +425,12 @@ sub attributes {
             type          => 'boolOrExpr',
             default       => 0,
             documentation => 'Use javascript for redirections',
+        },
+        externalMenu => {
+            type          => 'text',
+            default       => '',
+            documentation =>
+'URL to redirect authenticated users to instead of showing menu. Supports session variables like $uid, $mail, etc.',
         },
         logoutServices => {
             type          => 'keyTextContainer',
@@ -1115,7 +1121,7 @@ sub attributes {
         portalPingInterval => {
             type          => 'int',
             default       => 60000,
-            documentation => 'Interval in ms between portal Ajax pings ',
+            documentation => 'Interval in ms between portal Ajax pings',
         },
         portalSkin => {
             type          => 'portalskin',
@@ -1171,6 +1177,11 @@ sub attributes {
             default       => 120,
             type          => 'int',
             documentation => 'Token timeout for forms',
+        },
+        shortTokenTTL => {
+            default       => 30,
+            type          => 'int',
+            documentation => 'Short token timeout (for machines)',
         },
         issuersTimeout => {
             default       => 120,
@@ -1530,6 +1541,11 @@ sub attributes {
         crowdsecBlockDelay => {
             type          => 'int',
             documentation => 'Crowdsec-Agent check delay',
+        },
+        crowdsecBanDuration => {
+            type          => 'text',
+            default       => '4h',
+            documentation => 'Crowdsec-Agent ban duration (e.g. 4h, 1d)',
         },
         crowdsecFilters => {
             type          => 'text',
@@ -2387,7 +2403,7 @@ sub attributes {
         },
         password2fTTL => {
             type          => 'intOrNull',
-            documentation => 'Password2F device time to live ',
+            documentation => 'Password2F device time to live',
         },
 
         # TOTP second factor
@@ -2423,15 +2439,25 @@ sub attributes {
             default       => 30,
             documentation => 'TOTP interval',
         },
-        totp2fRange => {
-            type          => 'int',
-            default       => 1,
-            documentation => 'TOTP range (number of interval to test)',
-        },
         totp2fDigits => {
             type          => 'int',
             default       => 6,
             documentation => 'Number of digits for TOTP code',
+        },
+        totp2fAlgorithm => {
+            type   => 'select',
+            select => [
+                { k => 'sha1',   v => 'SHA-1' },
+                { k => 'sha256', v => 'SHA-256' },
+                { k => 'sha512', v => 'SHA-512' },
+            ],
+            default       => 'sha1',
+            documentation => 'Hashing algorithm to use for HMAC',
+        },
+        totp2fRange => {
+            type          => 'int',
+            default       => 1,
+            documentation => 'TOTP range (number of interval to test)',
         },
         totp2fUserCanRemoveKey => {
             type          => 'bool',
@@ -2440,7 +2466,7 @@ sub attributes {
         },
         totp2fTTL => {
             type          => 'intOrNull',
-            documentation => 'TOTP device time to live ',
+            documentation => 'TOTP device time to live',
         },
         totp2fEncryptSecret => {
             type          => 'bool',
@@ -2586,23 +2612,21 @@ sub attributes {
         },
         rest2fInitArgs => {
             type          => 'keyTextContainer',
-            keyTest       => qr/^\w+$/,
-            keyMsgFail    => '__badKeyName__',
-            test          => qr/^\w+$/,
+            test          => sub { return perlExpr(@_) },
             msgFail       => '__badValue__',
             documentation => 'Args for REST 2F init',
         },
         rest2fVerifyUrl => {
             type          => 'url',
+            documentation => 'REST 2F verify URL',
+        },
+        rest2fVerifyArgs => {
+            type          => 'keyTextContainer',
             keyTest       => qr/^\w+$/,
             keyMsgFail    => '__badKeyName__',
             test          => qr/^\w+$/,
             msgFail       => '__badValue__',
-            documentation => 'REST 2F init URL',
-        },
-        rest2fVerifyArgs => {
-            type          => 'keyTextContainer',
-            documentation => 'Args for REST 2F init',
+            documentation => 'Args for REST 2F verify',
         },
         rest2fResendInterval => {
             type          => 'text',
@@ -2719,9 +2743,9 @@ sub attributes {
         webauthn2fUserVerification => {
             type   => 'select',
             select => [
-                { k => 'discouraged', v => 'Discouraged' },
-                { k => 'preferred',   v => 'Preferred' },
-                { k => 'required',    v => 'Required' },
+                { k => 'discouraged', v => 'discouraged' },
+                { k => 'preferred',   v => 'preferred' },
+                { k => 'required',    v => 'required' },
             ],
             default       => 'preferred',
             documentation => 'Verify user during registration and login',
@@ -3194,6 +3218,11 @@ sub attributes {
         casAppMetaDataOptionsAllowProxy => {
             type          => 'bool',
             documentation => 'Allow CAS proxy',
+            default       => 1,
+        },
+        casAppMetaDataOptionsActivation => {
+            type          => 'bool',
+            documentation => 'Activate CAS application',
             default       => 1,
         },
         casAppMetaDataMacros => {
@@ -3702,7 +3731,11 @@ sub attributes {
             msgFail    => '__badValue__',
             default    => {},
         },
-        samlSPMetaDataXML        => { type => 'file', },
+        samlSPMetaDataXML               => { type => 'file', },
+        samlSPMetaDataOptionsActivation => {
+            type    => 'bool',
+            default => 1,
+        },
         samlSPMetaDataOptionsURL => {
             type => 'url',
         },
@@ -3776,7 +3809,7 @@ sub attributes {
             type    => 'samlAssertion',
             default => '1;0;urn:oasis:names:tc:SAML:2.0:bindings:SOAP;'
               . '#PORTAL#/saml/artifact',
-            documentation => 'SAML SP artifact resolution service ',
+            documentation => 'SAML SP artifact resolution service',
         },
         samlSPMetaDataOptionsComment => {
             type => 'longtext'
@@ -3797,6 +3830,7 @@ sub attributes {
             ],
             default => '',
         },
+        samlSPMetaDataOptionsForceNameIDFormat   => { type => 'bool' },
         samlSPMetaDataOptionsNameIDSessionKey    => { type => 'text' },
         samlSPMetaDataOptionsNotOnOrAfterTimeout => {
             type    => 'int',
@@ -4415,12 +4449,47 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         },
 
         # REST
-        restAuthUrl       => { type => 'url' },
-        restUserDBUrl     => { type => 'url' },
-        restFindUserDBUrl => { type => 'url' },
+        restAuthUrl  => { type => 'url' },
+        restAuthArgs => {
+            type          => 'keyTextContainer',
+            test          => sub { return perlExpr(@_) },
+            msgFail       => '__badValue__',
+            documentation => 'Extra args for REST Auth request',
+            help          => 'authrest.html#rest-args',
+        },
+        restUserDBUrl  => { type => 'url' },
+        restUserDBArgs => {
+            type          => 'keyTextContainer',
+            test          => sub { return perlExpr(@_) },
+            msgFail       => '__badValue__',
+            documentation => 'Extra args for REST UserDB request',
+            help          => 'authrest.html#rest-args',
+        },
+        restFindUserDBUrl  => { type => 'url' },
+        restFindUserDBArgs => {
+            type          => 'keyTextContainer',
+            test          => sub { return perlExpr(@_) },
+            msgFail       => '__badValue__',
+            documentation => 'Extra args for REST FindUser request',
+            help          => 'authrest.html#rest-args',
+        },
 
-        restPwdConfirmUrl => { type => 'url' },
+        restPwdConfirmUrl  => { type => 'url' },
+        restPwdConfirmArgs => {
+            type          => 'keyTextContainer',
+            test          => sub { return perlExpr(@_) },
+            msgFail       => '__badValue__',
+            documentation => 'Extra args for REST password confirm request',
+            help          => 'authrest.html#rest-args',
+        },
         restPwdModifyUrl  => { type => 'url' },
+        restPwdModifyArgs => {
+            type          => 'keyTextContainer',
+            test          => sub { return perlExpr(@_) },
+            msgFail       => '__badValue__',
+            documentation => 'Extra args for REST password modify request',
+            help          => 'authrest.html#rest-args',
+        },
 
         # Remote
         remoteCookieName => {
@@ -4651,7 +4720,13 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             default       => 2,
             documentation => 'Slave authentication level',
         },
-        slaveUserHeader   => { type => 'text', },
+        slaveUserHeader => { type => 'text', },
+        slaveCertificateField        => { type => 'text', },
+        slaveCertificateRegexp     => {
+            type          => 'pcre',
+            default       => '',
+            documentation => 'Regular expression to test Slave var',
+        },
         slaveExportedVars => {
             type          => 'keyTextContainer',
             keyTest       => qr/^!?[a-zA-Z][a-zA-Z0-9_-]*$/,
@@ -4727,6 +4802,7 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
                     { k => 'Twitter',       v => 'Twitter' },
                     { k => 'WebID',         v => 'WebID (deprecated)' },
                     { k => 'WebAuthn',      v => 'WebAuthn' },
+                    { k => 'Combination',   v => 'combineMods' },
                     { k => 'Custom',        v => 'customModule' },
                 ],
                 [
@@ -4748,16 +4824,18 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
                     { k => 'SAML',          v => 'SAML v2' },
                     { k => 'Slave',         v => 'Slave' },
                     { k => 'WebID',         v => 'WebID (deprecated)' },
+                    { k => 'Combination',   v => 'combineMods' },
                     { k => 'Custom',        v => 'customModule' },
                 ],
                 [
-                    { k => 'AD',     v => 'Active Directory' },
-                    { k => 'DBI',    v => 'Database (DBI)' },
-                    { k => 'Demo',   v => 'Demo' },
-                    { k => 'LDAP',   v => 'LDAP' },
-                    { k => 'REST',   v => 'REST' },
-                    { k => 'Null',   v => 'None' },
-                    { k => 'Custom', v => 'customModule' },
+                    { k => 'AD',          v => 'Active Directory' },
+                    { k => 'DBI',         v => 'Database (DBI)' },
+                    { k => 'Demo',        v => 'Demo' },
+                    { k => 'LDAP',        v => 'LDAP' },
+                    { k => 'REST',        v => 'REST' },
+                    { k => 'Null',        v => 'None' },
+                    { k => 'Combination', v => 'combineMods' },
+                    { k => 'Custom',      v => 'customModule' },
                 ]
             ],
             documentation => 'Hash list of Choice strings',
@@ -5013,40 +5091,14 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         },
 
         oidcServiceEncAlgorithmAlg => {
-            type   => 'select',
-            select => [
-
-                # Symetric encryption not supported
-                #{ k => 'A128KW',             v => 'A128KW' },
-                #{ k => 'A192KW',             v => 'A192KW' },
-                #{ k => 'A256KW',             v => 'A256KW' },
-                #{ k => 'A128GCMKW',          v => 'A128GCMKW' },
-                #{ k => 'A192GCMKW',          v => 'A192GCMKW' },
-                #{ k => 'A256GCMKW',          v => 'A256GCMKW' },
-                #{ k => 'PBES2-HS256+A128KW', v => 'PBES2-HS256+A128KW' },
-                #{ k => 'PBES2-HS384+A192KW', v => 'PBES2-HS384+A192KW' },
-                #{ k => 'PBES2-HS512+A256KW', v => 'PBES2-HS512+A256KW' },
-                { k => 'RSA-OAEP',       v => 'RSA-OAEP' },
-                { k => 'RSA-OAEP-256',   v => 'RSA-OAEP-256' },
-                { k => 'RSA1_5',         v => 'RSA1_5' },
-                { k => 'ECDH-ES',        v => 'ECDH-ES' },
-                { k => 'ECDH-ES+A128KW', v => 'ECDH-ES+A128KW' },
-                { k => 'ECDH-ES+A192KW', v => 'ECDH-ES+A192KW' },
-                { k => 'ECDH-ES+A256KW', v => 'ECDH-ES+A256KW' },
-            ],
+            type          => 'select',
+            select        => oidcEncAlgorithmAlg,
             default       => 'RSA-OAEP',
             documentation => 'JWT encryption algorithme',
         },
         oidcServiceEncAlgorithmEnc => {
-            type   => 'select',
-            select => [
-                { k => 'A256CBC-HS512', v => 'A256CBC-HS512' },
-                { k => 'A256GCM',       v => 'A256GCM' },
-                { k => 'A192CBC-HS384', v => 'A192CBC-HS384' },
-                { k => 'A192GCM',       v => 'A192GCM' },
-                { k => 'A128CBC-HS256', v => 'A128CBC-HS256' },
-                { k => 'A128GCM',       v => 'A128GCM' },
-            ],
+            type          => 'select',
+            select        => oidcEncAlgorithmEnc,
             default       => 'A256GCM',
             documentation => 'JWT encryption algorithme',
         },
@@ -5087,7 +5139,12 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         },
 
         oidcServiceAllowDynamicRegistration => {
-            type          => 'bool',
+            type   => 'select',
+            select => [
+                { k => '0', v => 'disabled' },
+                { k => '1', v => 'confidentialOnly' },
+                { k => '2', v => 'allClients' },
+            ],
             default       => 0,
             documentation => 'OpenID Connect allow dynamic client registration',
         },
@@ -5223,6 +5280,11 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         oidcOPMetaDataOptionsMaxAge    => { type => 'int', default => 0 },
         oidcOPMetaDataOptionsUiLocales => { type => 'text', },
         oidcOPMetaDataOptionsAcrValues => { type => 'text', },
+        oidcOPMetaDataOptionsAuthEndpointExtraParams => {
+            type          => 'keyTextContainer',
+            documentation =>
+              'Additional parameters for OpenID Connect Authorization endpoint',
+        },
         oidcOPMetaDataOptionsTokenEndpointAuthMethod => {
             type   => 'select',
             select => [
@@ -5272,6 +5334,12 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             default       => 0,
             documentation => 'Use PKCE with this OP',
         },
+        oidcOPMetaDataOptionsRequireIss => {
+            type          => 'bool',
+            default       => 0,
+            documentation =>
+              'Require iss parameter in authorization response (RFC 9207)',
+        },
         oidcOPMetaDataOptionsUserinfoSource => {
             type    => 'select',
             default => 'userinfo',
@@ -5299,6 +5367,10 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
                 'preferred_username' => 'uid',
                 'email'              => 'mail',
             }
+        },
+        oidcRPMetaDataOptionsActivation => {
+            type    => 'bool',
+            default => 1,
         },
         oidcRPMetaDataOptionsClientID     => { type => 'text', },
         oidcRPMetaDataOptionsClientSecret => { type => 'password', },
@@ -5340,23 +5412,31 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
         oidcRPMetaDataOptionsUserInfoSignAlg => {
             type   => 'select',
             select => [
-                { k => '',      v => 'JSON' },
-                { k => 'none',  v => 'JWT/None' },
-                { k => 'HS256', v => 'JWT/HS256' },
-                { k => 'HS384', v => 'JWT/HS384' },
-                { k => 'HS512', v => 'JWT/HS512' },
-                { k => 'RS256', v => 'JWT/RS256' },
-                { k => 'RS384', v => 'JWT/RS384' },
-                { k => 'RS512', v => 'JWT/RS512' },
-                { k => 'PS256', v => 'JWT/PS256' },
-                { k => 'PS384', v => 'JWT/PS384' },
-                { k => 'PS512', v => 'JWT/PS512' },
-                { k => 'ES256', v => 'JWT/ES256' },
-                { k => 'ES384', v => 'JWT/ES384' },
-                { k => 'ES512', v => 'JWT/ES512' },
-                { k => 'EdDSA', v => 'JWT/EdDSA' },
+                { k => '',     v => 'JSON' },
+                { k => 'none', v => 'None' },
+                @{&oidcSigAlgorithmAlg},
             ],
             default => '',
+        },
+        oidcRPMetaDataOptionsIntrospectionSignAlg => {
+            type    => 'select',
+            select  => [ { k => '', v => 'JSON' }, @{&oidcSigAlgorithmAlg}, ],
+            default => '',
+            documentation =>
+              'Introspection response signature algorithm (RFC 9701)',
+        },
+        oidcRPMetaDataOptionsIntrospectionEncKeyMgtAlg => {
+            type   => 'select',
+            select => [ { k => '', v => 'None' }, @{&oidcEncAlgorithmAlg} ],
+            documentation =>
+              '"alg" for introspection response encryption (RFC 9701)',
+        },
+        oidcRPMetaDataOptionsIntrospectionEncContentEncAlg => {
+            type          => 'select',
+            select        => oidcEncAlgorithmEnc,
+            default       => 'A256GCM',
+            documentation =>
+              '"enc" for introspection response encryption (RFC 9701)',
         },
         oidcRPMetaDataOptionsAccessTokenJWT => { type => 'bool', default => 0 },
         oidcRPMetaDataOptionsAccessTokenClaims =>
@@ -5410,7 +5490,12 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             documentation => 'Declare this RP as public client',
         },
         oidcRPMetaDataOptionsRequirePKCE => {
-            type          => 'bool',
+            type   => 'select',
+            select => [
+                { k => '0', v => 'disabled' },
+                { k => '1', v => 'required' },
+                { k => '2', v => 'pkceOrSecret' },
+            ],
             default       => 0,
             documentation => 'Require PKCE',
         },
@@ -5499,8 +5584,9 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
               'Relying party JWKS endpoint (to get encryption keys)',
         },
         oidcRPMetaDataOptionsAccessTokenEncKeyMgtAlg => {
-            type          => 'select',
-            select        => oidcEncAlgorithmAlg,
+            type   => 'select',
+            select =>
+              [ { k => '', 'v' => 'None' }, @{ &oidcEncAlgorithmAlg, } ],
             documentation => '"alg" algorithm for access_token encryption',
         },
         oidcRPMetaDataOptionsAccessTokenEncContentEncAlg => {
@@ -5510,8 +5596,9 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             documentation => '"enc" algorithm for access_token encryption',
         },
         oidcRPMetaDataOptionsIdTokenEncKeyMgtAlg => {
-            type          => 'select',
-            select        => oidcEncAlgorithmAlg,
+            type   => 'select',
+            select =>
+              [ { k => '', 'v' => 'None' }, @{ &oidcEncAlgorithmAlg, } ],
             documentation => '"alg" algorithm for id_token encryption',
         },
         oidcRPMetaDataOptionsIdTokenEncContentEncAlg => {
@@ -5521,8 +5608,8 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             documentation => '"enc" algorithm for id_token encryption',
         },
         oidcRPMetaDataOptionsUserInfoEncKeyMgtAlg => {
-            type          => 'select',
-            select        => oidcEncAlgorithmAlg,
+            type   => 'select',
+            select => [ { k => '', v => 'None' }, @{&oidcEncAlgorithmAlg} ],
             documentation => '"alg" algorithm for user_info encryption',
         },
         oidcRPMetaDataOptionsUserInfoEncContentEncAlg => {
@@ -5532,8 +5619,8 @@ m{^(?:ldapi://[^/]*/?|\w[\w\-\.]*(?::\d{1,5})?|ldap(?:s|\+tls)?://\w[\w\-\.]*(?:
             documentation => '"enc" algorithm for user_info encryption',
         },
         oidcRPMetaDataOptionsLogoutEncKeyMgtAlg => {
-            type          => 'select',
-            select        => oidcEncAlgorithmAlg,
+            type   => 'select',
+            select => [ { k => '', v => 'None' }, @{&oidcEncAlgorithmAlg} ],
             documentation => '"alg" algorithm for logout token encryption',
         },
         oidcRPMetaDataOptionsLogoutEncContentEncAlg => {

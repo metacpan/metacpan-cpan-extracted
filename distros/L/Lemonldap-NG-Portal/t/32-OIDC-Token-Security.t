@@ -27,6 +27,7 @@ my $op = LLNG::Manager::Test->new( {
             authentication                  => 'Demo',
             userDB                          => 'Same',
             issuerDBOpenIDConnectActivation => 1,
+            defaultAuthnLevel               => 3,
             oidcRPMetaDataExportedVars      => {
                 rp => {
                     email       => "mail",
@@ -494,6 +495,26 @@ subtest "Use expired access token" => sub {
 
 subtest "Check AuthenticationLevel requirement" => sub {
 
+    # Switch to authnLevel = 1
+
+    local *Lemonldap::NG::Portal::Auth::Demo::authnLevel = sub {
+        return 1;
+    };
+    my $idpId = $op->login("french");
+
+    # static required authnlevel
+    $res = authorize(
+        $op, $idpId,
+        {
+            response_type => "code",
+            scope         => "openid",
+            client_id     => "rpid",
+            redirect_uri  => "http://rp.com/",
+        }
+    );
+    expectForm( $res, undef, '/upgradesession' );
+    is( expectPdata($res)->{targetAuthnLevel}, 2, "Expected authnLevel" );
+
     # As french, required authenlevel is 9
     $res = authorize(
         $op, $idpId,
@@ -505,6 +526,7 @@ subtest "Check AuthenticationLevel requirement" => sub {
         }
     );
     expectForm( $res, undef, '/upgradesession' );
+    is( expectPdata($res)->{targetAuthnLevel}, 9, "Expected authnLevel" );
 
     # As dwho, access is allowed
     my $idpId2 = $op->login("dwho");
@@ -519,6 +541,19 @@ subtest "Check AuthenticationLevel requirement" => sub {
     );
     ok( expectRedirection( $res, qr#http://.*code=([^\&]*)# ),
         "Access was allowed" );
+
+    # default authnLevel
+    $res = authorize(
+        $op, $idpId2,
+        {
+            response_type => "code",
+            scope         => "openid",
+            client_id     => "rp2id",
+            redirect_uri  => "http://rp2.com/",
+        }
+    );
+    expectForm( $res, undef, '/upgradesession' );
+    is( expectPdata($res)->{targetAuthnLevel}, 3, "Expected authnLevel" );
 
 };
 

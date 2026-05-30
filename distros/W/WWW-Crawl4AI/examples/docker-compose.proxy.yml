@@ -1,0 +1,39 @@
+# Crawl4AI + CloakBrowser stack with a Squid proxy for the escalation tier.
+#
+# Point WWW::Crawl4AI at the proxy with CRAWL4AI_PROXY_URL=http://proxy:3128 so
+# the crawl4ai_proxy strategy joins the chain. Proxy is an OPTIONAL strategy —
+# it is never hard-wired into the request path.
+services:
+  crawl4ai:
+    image: unclecode/crawl4ai:latest
+    container_name: crawl4ai
+    restart: unless-stopped
+    shm_size: "1g"
+    ports:
+      - "127.0.0.1:11235:11235"
+    environment:
+      - CRAWL4AI_LOG_LEVEL=INFO
+      - CRAWL4AI_PROXY_URL=http://proxy:3128
+    depends_on:
+      cloakbrowser:
+        condition: service_healthy
+
+  cloakbrowser:
+    image: cloakhq/cloakbrowser:latest
+    container_name: cloakbrowser
+    command: cloakserve
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9222:9222"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9222/json/version"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  proxy:
+    image: ubuntu/squid:latest
+    container_name: crawl4ai-proxy
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3128:3128"

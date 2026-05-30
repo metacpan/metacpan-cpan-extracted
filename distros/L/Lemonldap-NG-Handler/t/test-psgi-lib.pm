@@ -1,7 +1,7 @@
 # Base library for tests
 
 use strict;
-use 5.10.0;
+use warnings;
 use POSIX 'strftime';
 use Data::Dumper;
 use Time::Fake;
@@ -15,7 +15,7 @@ no warnings 'redefine';
 
 my $module;
 our $sessionId =
-  'f5eec18ebb9bc96352595e2d8ce962e8ecf7af7c9a98cb9a43f9cd181cf4b545';
+  '71e4f2a03a64d468f0e0783fbcf3ba8d07a94ebfdc7605749c33547fa163cb55';
 our $file = "t/sessions/$sessionId";
 
 sub init {
@@ -73,7 +73,7 @@ sub init {
         },
         'ipAddr'              => '127.0.0.1',
         'mail'                => 'dwho@badwolf.org',
-        'authenticationLevel' => 1,
+        'authenticationLevel' => 2,
         '_utime'              => $now,
         '_passwordDB'         => 'Demo',
         '_auth'               => 'Demo',
@@ -154,6 +154,33 @@ sub _get {
             'HTTP_ACCEPT_LANGUAGE' => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
             'PATH_INFO'            => $path,
             'REQUEST_METHOD'       => 'GET',
+            'REQUEST_URI'          => '/lmauth',
+            'X_ORIGINAL_URI'       => $path . ( $query ? "?$query" : '' ),
+            'SERVER_PORT'          => '80',
+            'SERVER_PROTOCOL'      => 'HTTP/1.1',
+            'HTTP_USER_AGENT'      =>
+              'Mozilla/5.0 (VAX-4000; rv:36.0) Gecko/20350101 Firefox',
+            'REMOTE_ADDR' => '127.0.0.1',
+            'HTTP_HOST'   => $host,
+            ( $cookie ? ( HTTP_COOKIE => $cookie ) : ( HTTP_COOKIE => '' ) ),
+            %custom,
+        }
+    );
+}
+
+sub _head {
+    my ( $self, $path, $query, $host, $cookie, %custom ) = @_;
+    $query //= '';
+    $host ||= 'test1.example.com';
+    return $self->app->( {
+            'HTTP_ACCEPT'          => 'text/html',
+            'SCRIPT_NAME'          => 'lmAuth',
+            'SERVER_NAME'          => '127.0.0.1',
+            'QUERY_STRING'         => $query,
+            'HTTP_CACHE_CONTROL'   => 'max-age=0',
+            'HTTP_ACCEPT_LANGUAGE' => 'fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3',
+            'PATH_INFO'            => $path,
+            'REQUEST_METHOD'       => 'HEAD',
             'REQUEST_URI'          => '/lmauth',
             'X_ORIGINAL_URI'       => $path . ( $query ? "?$query" : '' ),
             'SERVER_PORT'          => '80',

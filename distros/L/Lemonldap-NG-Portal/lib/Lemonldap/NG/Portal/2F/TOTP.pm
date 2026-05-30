@@ -6,7 +6,7 @@ package Lemonldap::NG::Portal::2F::TOTP;
 
 use strict;
 use Mouse;
-use JSON qw(from_json to_json);
+use JSON                                   qw(from_json to_json);
 use Lemonldap::NG::Portal::Main::Constants qw(
   PE_OK
   PE_ERROR
@@ -16,7 +16,7 @@ use Lemonldap::NG::Portal::Main::Constants qw(
 );
 use Lemonldap::NG::Common::Util qw/display2F/;
 
-our $VERSION = '2.21.0';
+our $VERSION = '2.23.0';
 
 extends qw(
   Lemonldap::NG::Portal::Main::SecondFactor
@@ -79,15 +79,20 @@ sub verify {
         $self->logger->debug( "Trying TOTP device " . display2F($device) );
 
         if ( my $secret = $device->{_secret} ) {
-            my ( $r, $range ) = $self->verifyCode(
-                $self->conf->{totp2fInterval},
-                $self->conf->{totp2fRange},
-                $self->conf->{totp2fDigits},
-                $secret, $code
+
+            my $verify_result = $self->verify_totp(
+                interval        => $self->conf->{totp2fInterval},
+                digits          => $self->conf->{totp2fDigits},
+                hash            => $self->conf->{totp2fAlgorithm},
+                range_tolerance => $self->conf->{totp2fRange},
+                stored_secret   => $secret,
+                code            => $code,
             );
-            if ( $r == 1 ) {
-                $req->data->{_2fDevice}  = $device;
-                $req->data->{_2fLogInfo} = { range => $range };
+
+            if ( $verify_result->{result} == 1 ) {
+                $req->data->{_2fDevice} = $device;
+                $req->data->{_2fLogInfo} =
+                  { range => $verify_result->{offset} };
                 return PE_OK;
             }
         }

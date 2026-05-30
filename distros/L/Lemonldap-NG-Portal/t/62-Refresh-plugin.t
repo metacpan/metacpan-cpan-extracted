@@ -42,7 +42,7 @@ foreach ( 1 .. 6 ) {
 $Lemonldap::NG::Portal::UserDB::Demo::demoAccounts{dwho}->{uid} = 'Dr Who';
 
 $Lemonldap::NG::Portal::UserDB::Demo::demoGroups{timelords} = [];
-$Lemonldap::NG::Portal::UserDB::Demo::demoGroups{daleks} = ["dwho"]; #uh oh
+$Lemonldap::NG::Portal::UserDB::Demo::demoGroups{daleks}    = ["dwho"];   #uh oh
 
 ok(
     $res = $client->_post(

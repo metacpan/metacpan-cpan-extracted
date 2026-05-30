@@ -35,7 +35,7 @@ sub source_dies_like {
 ok evaluate_source(<<'SRC'), 'double close is harmless';
 from std/clib import CLib;
 
-let lib := CLib.open("t/fixtures/example_clib/libgreet.so");
+let lib := CLib.open("stdlib/test-fixtures/example_clib/libgreet.so");
 lib.close();
 lib.close();
 SRC
@@ -46,7 +46,7 @@ source_dies_like(
 	<<'SRC',
 from std/clib import CLib;
 
-let lib := CLib.open("t/fixtures/example_clib/libgreet.so");
+let lib := CLib.open("stdlib/test-fixtures/example_clib/libgreet.so");
 let greet := lib.func(
 	"greet",
 	[],
@@ -67,7 +67,7 @@ source_dies_like(
 	<<'SRC',
 from std/clib import CLib;
 
-let lib := CLib.open("t/fixtures/example_clib/libgreet.so");
+let lib := CLib.open("stdlib/test-fixtures/example_clib/libgreet.so");
 lib.close();
 lib.has_symbol("greet");
 SRC
@@ -79,7 +79,7 @@ source_dies_like(
 	<<'SRC',
 from std/clib import CLib;
 
-let lib := CLib.open("t/fixtures/example_clib/libgreet.so");
+let lib := CLib.open("stdlib/test-fixtures/example_clib/libgreet.so");
 lib.func("not_a_symbol", [], "null");
 SRC
 );
@@ -90,7 +90,7 @@ source_dies_like(
 	<<'SRC',
 from std/clib import CLib;
 
-let lib := CLib.open("t/fixtures/example_clib/libgreet.so");
+let lib := CLib.open("stdlib/test-fixtures/example_clib/libgreet.so");
 lib.func("greet_add_i64", [ { type: "int", bits: 32 } ], "null");
 SRC
 );
@@ -101,7 +101,7 @@ source_dies_like(
 	<<'SRC',
 from std/clib import CLib;
 
-let lib := CLib.open("t/fixtures/example_clib/libgreet.so");
+let lib := CLib.open("stdlib/test-fixtures/example_clib/libgreet.so");
 let greet := lib.func(
 	"greet",
 	[],
@@ -121,7 +121,7 @@ source_dies_like(
 	<<'SRC',
 from std/clib import CLib;
 
-let lib := CLib.open("t/fixtures/example_clib/libgreet.so");
+let lib := CLib.open("stdlib/test-fixtures/example_clib/libgreet.so");
 let bool_not := lib.func("greet_not", [ "bool" ], "bool");
 bool_not.call(1);
 SRC
