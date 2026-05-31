@@ -36,4 +36,4 @@ $ybl->read_from_files( $file );
 
 cmp_ok( $ycb->length( ), '==', scalar @urls, 'length_ycb' );
 cmp_ok( $ybl->length( ), '==', scalar @urls, 'length_ybl' );
-cmp_ok( $ycb->length( ), '==',  $ybl->length( ), 'length_diff' );
+cmp_ok( $ycb->length( ), '==', $ybl->length( ), 'length_diff' );

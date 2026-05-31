@@ -73,7 +73,7 @@ WWW::Crawl4AI::StrategyChain - ordered list of strategy objects, pluggable at co
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

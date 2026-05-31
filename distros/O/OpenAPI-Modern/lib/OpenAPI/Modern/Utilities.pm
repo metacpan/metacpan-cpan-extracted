@@ -3,7 +3,7 @@ package OpenAPI::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities and common definitions for OpenAPI::Modern
 
-our $VERSION = '0.137';
+our $VERSION = '0.138';
 
 use 5.020;
 use strictures 2;
@@ -246,8 +246,9 @@ sub is_cookie_value ($value) {
   !!(defined $value && $value =~ /^("?)[\x21\x23-\x2B\x2D-\x3A\x3C-\x5B\x5D-\x7E]*\1\z/);
 }
 
+# are any $items a member of $set?
 sub elem ($items, $set) {
-  croak 'set is not an array' if not ref $set eq 'ARRAY';
+  croak 'set is not an array' if ref $set ne 'ARRAY';
   $items = [ $items ] if ref $items ne 'ARRAY';
 
   any {
@@ -279,7 +280,7 @@ OpenAPI::Modern::Utilities - Internal utilities and common definitions for OpenA
 
 =head1 VERSION
 
-version 0.137
+version 0.138
 
 =head1 SYNOPSIS
 

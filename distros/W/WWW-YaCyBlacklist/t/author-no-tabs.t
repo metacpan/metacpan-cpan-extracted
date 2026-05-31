@@ -20,6 +20,7 @@ my @files = (
     't/01-constructor.t',
     't/02-read.t',
     't/03-testlist.t',
+    't/04-doubles.t',
     't/author-critic.t',
     't/author-distmeta.t',
     't/author-eol.t',

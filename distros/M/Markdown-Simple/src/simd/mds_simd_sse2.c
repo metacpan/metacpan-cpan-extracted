@@ -52,7 +52,8 @@ MDS_SSSE3_FN static void classify_structural_sse2(const char* in, size_t len,
     }
 }
 
-static const mds_simd_ops* s_scalar(void) { return mds_simd_ops_scalar(); }
+static const mds_simd_ops* s_scalar_sse2(void) { return mds_simd_ops_scalar(); }
+#define s_scalar s_scalar_sse2
 
 MDS_SSSE3_FN static int validate_utf8_sse2(const char* in, size_t len)
 {

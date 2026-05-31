@@ -5,6 +5,7 @@ data/cpan.metacurator.conf
 data/cpan.metacurator.constants.csv
 data/cpan.metacurator.sqlite
 data/cpan.metapackager.conf
+data/names.txt
 data/one.png
 data/tiddlers.json
 html/cpan.metacurator.tree.html
@@ -15,6 +16,7 @@ lib/CPAN/MetaCurator/Database.pm
 lib/CPAN/MetaCurator/Export.pm
 lib/CPAN/MetaCurator/HTML.pm
 lib/CPAN/MetaCurator/Import.pm
+lib/CPAN/MetaCurator/Search.pm
 LICENSE
 LICENSE-Artistic-2.0
 LICENSE-GPL-3
@@ -23,6 +25,7 @@ Makefile.PL
 MANIFEST			This list of files
 README
 scripts/build.db.sh
+scripts/check.module.names.pl
 scripts/create.tables.pl
 scripts/drop.tables.pl
 scripts/export.modules2csv.pl

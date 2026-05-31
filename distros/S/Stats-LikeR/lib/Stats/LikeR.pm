@@ -4,7 +4,7 @@ require 5.010;
 use strict;
 use feature 'say';
 package Stats::LikeR;
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 require XSLoader;
 use Devel::Confess 'color';
 use warnings FATAL => 'all';
@@ -1358,6 +1358,12 @@ undefined variables are printed as C<NA> by default, but can be set as you wish 
 as of version 0.07, C<write_table> determines comma and tab-separated delimiters from the filename, but will override if C<sep> or C<delim> are explicitly set.
 
 =head1 changes
+
+=head2 0.09
+
+context changes in XS C<dTHX>, C<pTHX_>, and C<aTHX_> to get better CPAN testing results
+
+C<restrict> keywords added to C<lm> to increase speed
 
 =head2 0.08
 

@@ -916,6 +916,12 @@ as of version 0.07, C<write_table> determines comma and tab-separated delimiters
 
 =head1 changes
 
+=head2 0.09
+
+context changes in XS C<dTHX>, C<pTHX_>, and C<aTHX_> to get better CPAN testing results
+
+C<restrict> keywords added to C<lm> to increase speed
+
 =head2 0.08
 
 Speed improvement in C<summary> of hashes.

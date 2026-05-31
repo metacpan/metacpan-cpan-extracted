@@ -7,8 +7,8 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 # Clean up any cached XS modules for clean testing
-system("rm -rf _hypersonic_* 2>/dev/null");
-system("rm -rf _test_cache_* 2>/dev/null");
+do { local $@; eval { require File::Path; File::Path::remove_tree($_, { safe => 1, error => \my $e }) for grep { -e $_ } glob(qq(_hypersonic_* )); }; };
+do { local $@; eval { require File::Path; File::Path::remove_tree($_, { safe => 1, error => \my $e }) for grep { -e $_ } glob(qq(_test_cache_* )); }; };
 
 BEGIN {
     use_ok('Hypersonic');
@@ -147,6 +147,6 @@ subtest 'C code generation' => sub {
 };
 
 # Cleanup
-system("rm -rf _test_cache_compress _test_cache_no_compress 2>/dev/null");
+do { local $@; eval { require File::Path; File::Path::remove_tree($_, { safe => 1, error => \my $e }) for grep { -e $_ } glob(qq(_test_cache_compress _test_cache_no_compress )); }; };
 
 done_testing();

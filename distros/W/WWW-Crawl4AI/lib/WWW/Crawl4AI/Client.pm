@@ -349,19 +349,27 @@ sub _normalize_page {
   return { raw => $page } unless ref $page eq 'HASH';
   my $meta = $page->{metadata} || {};
   return {
-    success      => $page->{success},
-    url          => $meta->{sourceURL} // $page->{url} // $meta->{url},
-    final_url    => $page->{redirected_url} // $page->{url} // $meta->{url},
-    status_code  => $page->{status_code} // $page->{status} // $meta->{statusCode},
-    markdown     => $self->_extract_markdown($page),
-    html         => $page->{cleaned_html} // $page->{html},
-    raw_html     => $page->{html},
-    title        => $meta->{title},
-    links        => $self->_extract_links($page),
-    metadata     => $meta,
-    error        => $page->{error_message} // $page->{error},
-    raw          => $page,
+    success          => $page->{success},
+    url              => $meta->{sourceURL} // $page->{url} // $meta->{url},
+    final_url        => $page->{redirected_url} // $page->{url} // $meta->{url},
+    status_code      => $page->{status_code} // $page->{status} // $meta->{statusCode},
+    markdown         => $self->_extract_markdown($page),
+    html             => $page->{cleaned_html} // $page->{html},
+    raw_html         => $page->{html},
+    title            => $meta->{title},
+    links            => $self->_extract_links($page),
+    metadata         => $meta,
+    error            => $page->{error_message} // $page->{error},
+    response_headers => $self->_lc_headers( $page->{response_headers} ),
+    raw              => $page,
   };
+}
+
+# Lowercase all header keys for deterministic, case-insensitive matching by callers.
+sub _lc_headers {
+  my ( $self, $h ) = @_;
+  return {} unless ref $h eq 'HASH';
+  return { map { lc($_) => $h->{$_} } keys %$h };
 }
 
 # Crawl4AI returns links as { internal => [...], external => [...] }, each entry
@@ -525,7 +533,7 @@ WWW::Crawl4AI::Client - UA-agnostic REST client for the Crawl4AI Docker API
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

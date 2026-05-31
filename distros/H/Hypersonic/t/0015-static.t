@@ -150,7 +150,8 @@ END {
     if ($pid) {
         kill(9, $pid);
         waitpid($pid, 0);
-        system("rm -rf $cache_dir");
+        $? = 0;  # clear waitpid status so Test::Builder doesn't flag exit 9
+        do { local $@; eval { require File::Path; File::Path::remove_tree($_, { safe => 1, error => \my $e }) for grep { -e $_ } glob(qq($cache_dir)); }; };
     }
 }
 

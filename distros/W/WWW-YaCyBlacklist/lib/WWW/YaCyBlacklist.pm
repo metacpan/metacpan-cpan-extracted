@@ -5,13 +5,13 @@ package WWW::YaCyBlacklist;
 # ABSTRACT: a Perl module to parse and execute YaCy blacklists
 
 our $AUTHORITY = 'cpan:IBRAUN';
-$WWW::YaCyBlacklist::VERSION = '0.9';
+$WWW::YaCyBlacklist::VERSION = '1.00';
 
 use Moose;
 use Moose::Util::TypeConstraints;
 use IO::All;
 use URI::URL;
-require 5.8.0;
+require 5.033006;
 
 
 # Needed if RegExps do not compile
@@ -78,11 +78,29 @@ sub read_from_array {
     my ($self, @lines) = @_;
 
     foreach my $line ( @lines ) {
-        if ( CORE::length $line > 0 && $line =~ /.+\/.+/ ) {
-            ${ $self->patterns }{ $line }{ 'origorder' } = $self->origorder( $self->origorder + 1 );
+
+        if ( exists( ${ $self->patterns }{ $line } ) ) {
+            print STDERR "\nNOTICE: ignoring double pattern '", $line, "'\n";
+            next;
+        }
+        elsif ( CORE::length $line > 2 && $line =~ /.+\/.+/ && $line !~ /.+?\/\*$/ ) {
+            $self->origorder( $self->origorder + 1 );
+            ${ $self->patterns }{ $line }{ 'origorder' } = $self->origorder;
             ( ${ $self->patterns }{ $line }{ 'host' }, ${ $self->patterns }{ $line }{ 'path' } ) = split /(?!\\)\/+?/, $line, 2;
-            ${ $self->patterns }{ $line }{ 'path' } = '/' . ${ $self->patterns }{ $line }{ 'path' };
+            ${ $self->patterns }{ $line }{ 'path_r' } = qr/^${ $self->patterns }{ $line }{ 'path' }$/;
             ${ $self->patterns }{ $line }{ 'host_regex' } = $self->_check_host_regex( ${ $self->patterns }{ $line }{ 'host' } );
+
+            if ( ${ $self->patterns }{ $line }{ 'host_regex' } ) {
+                ${ $self->patterns }{ $line }{ 'host_r' } = qr/${ $self->patterns }{ $line }{ host }/; }
+            else {
+                if ( index( ${ $self->patterns }{ $line }{ host }, '*') > -1 ) {
+                    my $host = ${ $self->patterns }{ $line }{ host };
+                    $host =~ s/\*/.*/g;
+                    ${ $self->patterns }{ $line }{ 'host_r' } = qr/^$host$/;
+                }
+                else {
+                    ${ $self->patterns }{ $line }{ 'host_r' } = qr/^([\w\-]+\.)*${ $self->patterns }{ $line }{ host }$/; }
+            }
         }
         else { print STDERR "\n\tWARNING: ignoring broken pattern '", $line, "'\n"; }
     }
@@ -106,7 +124,7 @@ sub read_from_files {
 sub length {
 
     my $self = shift;
-    return scalar keys %{ $self->patterns };
+    return scalar      %{ $self->patterns };
 }
 
 
@@ -118,27 +136,17 @@ sub check_url {
     $url .= '/' if $url =~ /\:\/\/[\w\-\.]+$/;
     $url = new URI $url;
     my $pq = ( defined $url->query ) ? $url->path.'?'.$url->query : $url->path;
+    $pq =~ s/^\///;
 
     foreach my $pattern ( keys %{ $self->patterns } ) {
 
-        my $path = '^' . ${ $self->patterns }{ $pattern }{ path } . '$';
-        next if $pq !~ /$path/;
-        my $host = ${ $self->patterns }{ $pattern }{ host };
+        next if $pq !~ ${ $self->patterns }{ $pattern }{ 'path_r' };
 
         if ( !${ $self->patterns }{ $pattern }{ host_regex } ) {
-
-            if ( index( ${ $self->patterns }{ $pattern }{ host }, '*') > -1 ) {
-
-                $host =~ s/\*/.*/g;
-                return 1 if $url->host =~ /^$host$/;
-            }
-            else {
-                return 1 if index( $url->host, ${ $self->patterns }{ $pattern }{ host } ) > -1 && $url->host =~ /^([\w\-]+\.)*$host$/;
-            }
-        }
+            return 1 if $url->host =~ ${ $self->patterns }{ $pattern }{ host_r }; }
         else {
-            return 1 if $self->use_regex && $url->host  =~ /^$host$/;
-        }
+            return 1 if $self->use_regex && $url->host =~ ${ $self->patterns }{ $pattern }{ host_r }; }
+
     }
     return 0;
 }
@@ -177,9 +185,9 @@ sub sort_list {
     my @sorted_list;
 
     @sorted_list = sort keys %{ $self->patterns } if $self->sorting eq 'alphabetical';
-    @sorted_list = sort { CORE::length $a <=> CORE::length $b } keys %{ $self->patterns } if $self->sorting eq 'length';
+    @sorted_list = sort { CORE::length $a <=> CORE::length $b } keys  %{ $self->patterns } if $self->sorting eq 'length';
     @sorted_list = sort { ${ $self->patterns }{ $a }{ origorder } <=> ${ $self->patterns }{ $b }{ origorder } } keys %{ $self->patterns } if $self->sorting eq 'origorder';
-    @sorted_list = sort { reverse( ${ $self->patterns }{ $a }{ host } ) cmp reverse( ${ $self->patterns }{ $b }{ host } ) } keys %{ $self->patterns }  if $self->sorting eq 'reverse_host';
+    @sorted_list = sort { reverse( ${ $self->patterns }{ $a }{ host } ) cmp reverse( ${ $self->patterns }{ $b }{ host } ) } keys %{ $self->patterns } if $self->sorting eq 'reverse_host';
 
    return @sorted_list if $self->sortorder;
    return reverse( @sorted_list );
@@ -189,7 +197,7 @@ sub sort_list {
 sub store_list {
 
     my $self = shift;
-    join( "\n", $self->sort_list( ) ) > io( $self->filename );
+    join( "\n", $self->sort_list( ) ) . "\n" > io( $self->filename );
 }
 
 1;
@@ -208,7 +216,7 @@ WWW::YaCyBlacklist - a Perl module to parse and execute YaCy blacklists
 
 =head1 VERSION
 
-version 0.9
+version 1.00
 
 =head1 SYNOPSIS
 
@@ -296,8 +304,6 @@ Returns a list of patterns configured by C<sorting> and C<sortorder>.
 Prints the current list to a file. Executes C<sort_list( )>.
 
 =head1 OPERATIONAL NOTES
-
-C<WWW::YaCyBlacklist> checks the path part including the leading separator C</>. This protects against regexp compiling errors with leading quantifiers. So do not something like C<host.tld/^path> although YaCy allows this.
 
 C<check_url( )> alway returns true if the protocol of the URL is not C<https?> or C<ftps?>.
 

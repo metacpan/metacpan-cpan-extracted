@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.638-6-g0ea6909b
+package JSON::Schema::Modern; # git description: v0.639-11-g6ce510f0
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.639';
+our $VERSION = '0.640';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -1293,7 +1293,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.639
+version 0.640
 
 =head1 SYNOPSIS
 
@@ -1489,16 +1489,17 @@ This allows you to write a schema like this (which validates a string representi
 Such keywords are only applied if the value looks like a number, and do not generate a failure
 otherwise. Values are determined to be numbers via L<perlapi/looks_like_number>.
 This option is only intended to be used for evaluating data from sources that can only be strings,
-such as the extracted value of an HTTP header or query parameter (but in the OpenAPI context, it is
-preferable to use an explicit C<type> keyword in the schema to indicate the value should be
-deserialized as a number).
+such as the extracted value of an HTTP header or query parameter, or a value from an XML document.
+In the OpenAPI context, it is preferable to use an explicit C<type> keyword in the schema to
+indicate the value should be deserialized as a number).
 
 Defaults to false.
 
 =head2 strict
 
 When true, unrecognized keywords are disallowed in schemas (they will cause an immediate abort
-in L</traverse> or L</evaluate>), with the exception of keywords starting with C<x->.
+in L</traverse> or L</evaluate>), with the exception of keywords starting with C<x->. Note that
+this option is expected to become the default behaviour in future versions of JSON Schema.
 
 Defaults to false.
 
@@ -2177,6 +2178,10 @@ L<https://json-schema.org>
 =item *
 
 L<RFC8259: The JavaScript Object Notation (JSON) Data Interchange Format|https://datatracker.ietf.org/doc/html/rfc8259>
+
+=item *
+
+L<RFC6901: JavaScript Object Notation (JSON) Pointer|https://datatracker.ietf.org/doc/html/rfc6901>
 
 =item *
 

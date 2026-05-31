@@ -694,7 +694,7 @@ YAML
           instanceLocation => '/request/uri/query/beta',
           keywordLocation => jsonp(qw(/paths /foo post parameters 2 schema const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 2 schema const)))->to_string,
-          error => 'value does not match',
+          error => 'value does not match (wrong type: number vs integer)',
         },
       ],
     },
@@ -754,38 +754,38 @@ YAML
       errors => [
         {
           instanceLocation => '/request/uri/query/null_query',
-          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 0)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 0)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 0 style)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 0 style)))->to_string,
           error => 'cannot deserialize to requested type (null)',
         },
         {
           instanceLocation => '/request/uri/query/boolean_query',
-          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 1)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 1)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 1 style)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 1 style)))->to_string,
           error => 'cannot deserialize to requested type (boolean)',
         },
         {
           instanceLocation => '/request/header/NullHeader',
-          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 2)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 2)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 2 style)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 2 style)))->to_string,
           error => 'cannot deserialize to requested type (null)',
         },
         {
           instanceLocation => '/request/header/BooleanHeader',
-          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 3)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 3)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 3 style)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} get parameters 3 style)))->to_string,
           error => 'cannot deserialize to requested type (boolean)',
         },
         {
           instanceLocation => '/request/uri/path/null_path',
-          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} parameters 0)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} parameters 0)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} parameters 0 style)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} parameters 0 style)))->to_string,
           error => 'cannot deserialize to requested type (null)',
         },
         {
           instanceLocation => '/request/uri/path/boolean_path',
-          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} parameters 1)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} parameters 1)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo/{null_path}/{boolean_path} parameters 1 style)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo/{null_path}/{boolean_path} parameters 1 style)))->to_string,
           error => 'cannot deserialize to requested type (boolean)',
         },
       ],
@@ -947,6 +947,7 @@ YAML
     'empty querystring still counts as being provided',
   );
 
+  # this test intentionally is only for mojo
   if ($::TYPE eq 'mojo') {
     my @warnings = warnings {
       my $request = request('GET', 'http://example.com/string?hi');
@@ -983,7 +984,7 @@ YAML
           instanceLocation => '/request/uri/query',
           keywordLocation => jsonp(qw(/paths /string get parameters 0 content text/plain;charset=utf-8 schema const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /string get parameters 0 content text/plain;charset=utf-8 schema const)))->to_string,
-          error => 'value does not match',
+          error => 'value does not match (strings not equal)',
         },
         {
           instanceLocation => '/request/uri/query',
@@ -1005,7 +1006,7 @@ YAML
           instanceLocation => '/request/uri/query',
           keywordLocation => jsonp(qw(/paths /string get parameters 0 content text/plain;charset=utf-8 schema const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /string get parameters 0 content text/plain;charset=utf-8 schema const)))->to_string,
-          error => 'value does not match',
+          error => 'value does not match (strings not equal)',
         },
       ],
     },
@@ -1013,7 +1014,7 @@ YAML
   );
 
   is_equal(
-    $openapi->validate_request($request = request('GET', 'http://example.com/string?%e0%b2%a0'))->TO_JSON,
+    $openapi->validate_request($request = request('GET', 'http://example.com/string?%E0%B2%A0'))->TO_JSON,
     { valid => true },
     'text/plain querystring is percent-decoded and then parsed as a string, respecting the charset',
   );
@@ -1070,7 +1071,7 @@ YAML
   );
 
   is_equal(
-    $openapi->validate_request($request = request('GET', 'http://example.com/application/x-www-form-urlencoded?key=%e0%b2%a0&bar=2'))->TO_JSON,
+    $openapi->validate_request($request = request('GET', 'http://example.com/application/x-www-form-urlencoded?key=%E0%B2%A0&bar=2'))->TO_JSON,
     { valid => true },
     'application/x-www-form-urlencoded querystring is url-decoded and properly decoded',
   );
@@ -2143,31 +2144,31 @@ YAML
           instanceLocation => '/request/uri/path/path',
           keywordLocation => jsonp(qw(/paths /foo/{path} post parameters 0 content application/json $ref schema const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/schema/const')->to_string,
-          error => 'value does not match',
+          error => 'value does not match (booleans not equal)',
         },
         {
           instanceLocation => '/request/uri/query/q',
           keywordLocation => jsonp(qw(/paths /foo/{path} post parameters 1 content application/json $ref schema const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/schema/const')->to_string,
-          error => 'value does not match',
+          error => 'value does not match (booleans not equal)',
         },
         {
           instanceLocation => '/request/header/header',
           keywordLocation => jsonp(qw(/paths /foo/{path} post parameters 2 content application/json $ref schema const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/schema/const')->to_string,
-          error => 'value does not match',
+          error => 'value does not match (booleans not equal)',
         },
         {
           instanceLocation => '/request/header/Cookie/cookie',
           keywordLocation => jsonp(qw(/paths /foo/{path} post parameters 3 content application/json $ref schema const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/schema/const')->to_string,
-          error => 'value does not match',
+          error => 'value does not match (booleans not equal)',
         },
         {
           instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo/{path} post requestBody content application/json $ref schema const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/schema/const')->to_string,
-          error => 'value does not match',
+          error => 'value does not match (booleans not equal)',
         },
       ],
     },
@@ -2217,7 +2218,7 @@ YAML
           instanceLocation => '/request/uri/query',
           keywordLocation => jsonp(qw(/paths /foo post parameters 0 content application/json $ref schema const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/schema/const')->to_string,
-          error => 'value does not match',
+          error => 'value does not match (booleans not equal)',
         },
       ],
     },
@@ -2314,7 +2315,7 @@ YAML
           instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content text/plain schema const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content text/plain schema const)))->to_string,
-          error => 'value does not match',
+          error => 'value does not match (strings not equal)',
         },
       ],
     },
@@ -2393,7 +2394,7 @@ YAML
           instanceLocation => '/request/body/content',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content text/plain schema const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content text/plain schema const)))->to_string,
-          error => 'value does not match',
+          error => 'value does not match (strings not equal)',
         },
       ],
     },
@@ -2609,7 +2610,7 @@ YAML
           instanceLocation => '/request/body/content/gamma',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json schema properties gamma const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json schema properties gamma const)))->to_string,
-          error => 'value does not match',
+          error => 'value does not match (strings not equal)',
         },
         {
           instanceLocation => '/request/body/content',
@@ -3471,8 +3472,8 @@ YAML
         },
         {
           instanceLocation => '/request/header/ArrayWithLocalTypeAndRef',
-          keywordLocation => jsonp(qw(/paths /foo get parameters 8)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 8)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo get parameters 8 style)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get parameters 8 style)))->to_string,
           error => 'cannot deserialize to any type',
         },
         {
@@ -5009,13 +5010,13 @@ YAML
           instanceLocation => '/request/uri/query/q/1',
           keywordLocation => jsonp(qw(/paths /foo post parameters 0 content application/json itemSchema const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post parameters 0 content application/json itemSchema const)))->to_string,
-          error => 'value does not match',
+          error => 'value does not match (strings not equal)',
         },
         {
           instanceLocation => '/request/body/content/1',
           keywordLocation => jsonp(qw(/paths /foo post requestBody content application/json itemSchema const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post requestBody content application/json itemSchema const)))->to_string,
-          error => 'value does not match',
+          error => 'value does not match (strings not equal)',
         },
       ],
     },
@@ -5134,31 +5135,31 @@ YAML
           instanceLocation => '/request/uri/path/path/0',
           keywordLocation => jsonp(qw(/paths /foo/{path} post parameters 0 content application/json $ref itemSchema const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/itemSchema/const')->to_string,
-          error => 'value does not match',
+          error => 'value does not match (booleans not equal)',
         },
         {
           instanceLocation => '/request/uri/query/q/0',
           keywordLocation => jsonp(qw(/paths /foo/{path} post parameters 1 content application/json $ref itemSchema const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/itemSchema/const')->to_string,
-          error => 'value does not match',
+          error => 'value does not match (booleans not equal)',
         },
         {
           instanceLocation => '/request/header/header/0',
           keywordLocation => jsonp(qw(/paths /foo/{path} post parameters 2 content application/json $ref itemSchema const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/itemSchema/const')->to_string,
-          error => 'value does not match',
+          error => 'value does not match (booleans not equal)',
         },
         {
           instanceLocation => '/request/header/Cookie/cookie/0',
           keywordLocation => jsonp(qw(/paths /foo/{path} post parameters 3 content application/json $ref itemSchema const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/itemSchema/const')->to_string,
-          error => 'value does not match',
+          error => 'value does not match (booleans not equal)',
         },
         {
           instanceLocation => '/request/body/content/0',
           keywordLocation => jsonp(qw(/paths /foo/{path} post requestBody content application/json $ref itemSchema const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/itemSchema/const')->to_string,
-          error => 'value does not match',
+          error => 'value does not match (booleans not equal)',
         },
       ],
     },
@@ -5207,7 +5208,7 @@ YAML
           instanceLocation => '/request/uri/query/0',
           keywordLocation => jsonp(qw(/paths /foo post parameters 0 content application/json $ref itemSchema const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment('/components/mediaTypes/json_object/itemSchema/const')->to_string,
-          error => 'value does not match',
+          error => 'value does not match (booleans not equal)',
         },
       ],
     },

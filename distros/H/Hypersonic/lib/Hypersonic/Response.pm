@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 # JIT-compiled Response object using array-based slots for maximum speed
 # Generates XS accessors at compile time via XS::JIT::Builder

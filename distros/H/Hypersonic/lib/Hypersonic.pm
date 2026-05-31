@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use Scalar::Util qw(blessed);
 use XS::JIT;
@@ -880,9 +880,12 @@ sub compile {
 
     # Emit a visible breadcrumb BEFORE the (potentially slow) gcc/cc
     # invocation so smoker logs never show "(child wrote no output)"
-    # when wait_for_port times out mid-compile.
+    # when wait_for_port times out mid-compile. Force a flush in case
+    # something upstream disabled autoflush on STDERR.
     if ($ENV{HYPERSONIC_COMPILE_DIAG} || $ENV{AUTOMATED_TESTING}) {
+        local $| = 1;
         print STDERR "# Hypersonic: compiling JIT module $module_name ...\n";
+        eval { STDERR->flush; };
     }
 
     # The JIT boot xsub installs Hypersonic::Stream::* xsubs into

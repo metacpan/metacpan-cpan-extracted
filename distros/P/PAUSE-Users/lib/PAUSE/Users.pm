@@ -1,5 +1,5 @@
 package PAUSE::Users;
-$PAUSE::Users::VERSION = '0.11';
+$PAUSE::Users::VERSION = '0.12';
 # ABSTRACT: interface to PAUSE's users file (00whois.xml)
 
 use strict;

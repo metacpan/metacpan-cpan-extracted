@@ -59,7 +59,11 @@ static void classify_structural_neon(const char* in, size_t len,
     }
 }
 
-static const mds_simd_ops* s_scalar(void) { return mds_simd_ops_scalar(); }
+#ifdef s_scalar
+#  undef s_scalar
+#endif
+static const mds_simd_ops* s_scalar_neon(void) { return mds_simd_ops_scalar(); }
+#define s_scalar s_scalar_neon
 
 /* ---- UTF-8 validation (ASCII fast-path + scalar tail per chunk) ------
  *

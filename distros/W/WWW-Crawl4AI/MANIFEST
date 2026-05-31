@@ -42,6 +42,7 @@ lib/WWW/Crawl4AI/Strategy/Proxy.pm
 lib/WWW/Crawl4AI/Strategy/Stealth.pm
 lib/WWW/Crawl4AI/StrategyChain.pm
 t/00-load.t
+t/010_result_response_headers.t
 t/10-requests.t
 t/20-detect.t
 t/30-result.t

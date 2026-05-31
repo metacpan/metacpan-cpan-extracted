@@ -26,10 +26,11 @@ isa_ok $tus, 'Protocol::Tus';
 
 {
    my $response = $tus->HTTP_request(
-      POST => {
+      method => 'POST',
+      headers => {
          'Tus-Resumable' => '1.0.0',
          'Upload-Length' => 10,
-      }, undef, '',
+      },
    );
    my $to = tus_response($response, 'first, create');
    $to->no_exception
@@ -38,10 +39,13 @@ isa_ok $tus, 'Protocol::Tus';
 
    my $id = $response->id;
    $response = $tus->HTTP_request(
-      PATCH => {
+      method => 'PATCH',
+      headers => {
          'Tus-Resumable' => '1.0.0',
          'Upload-Offset' => 0
-      }, $id, 'hello'
+      },
+      id => $id,
+      body => 'hello',
    );
    $to = tus_response($response, 'first, first chunk');
    $to->no_exception
@@ -51,16 +55,23 @@ isa_ok $tus, 'Protocol::Tus';
 
    # this request is "wrong" and we expect to receive an error back
    $response = $tus->HTTP_request(
-      PATCH => {
+      method => 'PATCH',
+      headers => {
          'Tus-Resumable' => '1.0.0',
          'Upload-Offset' => 3,
-      }, $id, 'world');
+      },
+      id => $id,
+      body => 'world'
+   );
    $to = tus_response($response, 'first, misaligned chunk upload');
    $to->status_is(409)
       ->exception_like(qr{(?mxs:\A offset \s+ mismatch \z)});
 
    $response = $tus->HTTP_request(
-      HEAD => { 'Tus-Resumable' => '1.0.0' }, $id, '');
+      method => 'HEAD',
+      headers => { 'Tus-Resumable' => '1.0.0' },
+      id => $id,
+   );
    $to = tus_response($response, 'first, HEAD request for info');
    $to->no_exception
       ->status_is(204)
@@ -70,10 +81,14 @@ isa_ok $tus, 'Protocol::Tus';
    ok !$model->is_complete($id), 'upload still not complete';
 
    $response = $tus->HTTP_request(
-      PATCH => {
+      method => 'PATCH',
+      headers => {
          'Tus-Resumable' => '1.0.0',
          'Upload-Offset' => 5,
-      }, $id, 'world');
+      },
+      id => $id,
+      body => \'world',
+   );
    $to = tus_response($response, 'first, second and final chunk');
    $to->no_exception
       ->status_is(204)
@@ -82,7 +97,10 @@ isa_ok $tus, 'Protocol::Tus';
    ok $model->is_complete($id), 'upload complete now';
 
    $response = $tus->HTTP_request(
-      HEAD => { 'Tus-Resumable' => '1.0.0' }, $id, '');
+      method => 'HEAD',
+      headers => { 'Tus-Resumable' => '1.0.0' },
+      id => $id,
+   );
    $to = tus_response($response, 'first, HEAD request for info');
    $to->no_exception
       ->status_is(204)
@@ -92,10 +110,13 @@ isa_ok $tus, 'Protocol::Tus';
    ok $model->is_complete($id), 'upload complete now';
 
    $response = $tus->HTTP_request(
-      PATCH => {
+      method => 'PATCH',
+      headers => {
          'Tus-Resumable' => '1.0.0',
          'Upload-Offset' => 10,
-      }, $id, '');
+      },
+      id => $id,
+   );
    $to = tus_response($response, 'first, no-chunk after completion');
    $to->no_exception
       ->status_is(204)
@@ -105,10 +126,14 @@ isa_ok $tus, 'Protocol::Tus';
 
    # try to push more data after completion
    $response = $tus->HTTP_request(
-      PATCH => {
+      method => 'PATCH',
+      headers => {
          'Tus-Resumable' => '1.0.0',
          'Upload-Offset' => 10,
-      }, $id, 'foo');
+      },
+      id => $id,
+      body => 'foo',
+   );
    $to = tus_response($response, 'first, chunk over limit');
    $to->status_is(400)
       ->exception_like(qr{(?mxs:\A file \s+ is \s+ complete)});
@@ -118,7 +143,10 @@ isa_ok $tus, 'Protocol::Tus';
    is $path->child('data')->slurp_raw, 'helloworld', 'file contents';
 
    $response = $tus->HTTP_request(
-      DELETE => { 'Tus-Resumable' => '1.0.0', }, $id, '');
+      method => 'DELETE',
+      headers => { 'Tus-Resumable' => '1.0.0', },
+      id => $id,
+   );
    $to = tus_response($response, 'first, deletion');
    $to->no_exception
       ->status_is(204)
@@ -127,7 +155,11 @@ isa_ok $tus, 'Protocol::Tus';
    
    # on second attempt to delete we get a 404 because there's no directory
    $response = $tus->HTTP_request(
-      DELETE => { 'Tus-Resumable' => '1.0.0', }, $id, '');
+      method => 'DELETE',
+      headers => { 'Tus-Resumable' => '1.0.0', },
+      id => $id,
+      body => \'',
+   );
    $to = tus_response($response, 'first, second deletion');
    $to->status_is(404);
 }

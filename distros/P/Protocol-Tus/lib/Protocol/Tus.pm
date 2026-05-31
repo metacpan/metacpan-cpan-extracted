@@ -1,5 +1,5 @@
 package Protocol::Tus;
-{ our $VERSION = '0.001' }
+{ our $VERSION = '0.003' }
 use Moo;
 use v5.24;
 use warnings;
@@ -27,24 +27,33 @@ sub augment_response ($response) {
 use namespace::clean;
 
 has model => (is => 'ro', required => 1, coerce => \&coerce_model);
-has id_to_location => (is => 'ro', default => undef);
+has on_complete => (is => 'ro', default => undef);
+has on_create   => (is => 'ro', default => undef);
+has generate_location => (is => 'ro', default => undef);
 
-sub HTTP_request ($self, $method, $headers, $id, $body) {
+sub HTTP_request ($self, %args) {
    my $response;
 
    try {
       # honor overriding the method as per Tus spec
-      $headers = lc_hash($headers);
-      $method = uc($headers->{'x-http-method-override'} // $method);
+      my $headers = lc_hash($args{headers});
+      my $method = uc($headers->{'x-http-method-override'}
+         // $args{method});
 
-      # hand over to the right sub-method
-      $response =
-           $method eq 'HEAD'    ? $self->HTTP_HEAD($headers, $id)
-         : $method eq 'OPTIONS' ? $self->HTTP_OPTIONS
-         : $method eq 'PATCH'   ? $self->HTTP_PATCH($headers, $id, $body)
-         : $method eq 'POST'    ? $self->HTTP_POST($headers, $body, $id)
-         : $method eq 'DELETE'  ? $self->HTTP_DELETE($headers, $id)
-         : ouch 405, 'Method Not Allowed';
+      my $id = $args{id} // undef;
+      if (defined($id)) {
+         $response =
+              $method eq 'HEAD'    ? $self->HTTP_HEAD($headers, $id)
+            : $method eq 'PATCH'   ? $self->HTTP_PATCH($headers, $id, $args{body})
+            : $method eq 'DELETE'  ? $self->HTTP_DELETE($headers, $id)
+            : ouch 405, 'Method Not Allowed';
+      }
+      else {
+         $response =
+              $method eq 'OPTIONS' ? $self->HTTP_OPTIONS
+            : $method eq 'POST'    ? $self->HTTP_POST($headers, $args{body})
+            : ouch 405, 'Method Not Allowed';
+      }
    }
    catch { $response = response_from_exception($_) };
 
@@ -53,7 +62,7 @@ sub HTTP_request ($self, $method, $headers, $id, $body) {
 
 # Core Protocol
 sub HTTP_HEAD ($self, $headers, $id) {
-   my $response;
+   my ($response, $upload);
 
    try {
       validate_id($id);
@@ -63,7 +72,8 @@ sub HTTP_HEAD ($self, $headers, $id) {
 
       # collect data
       my $model = $self->model;
-      my $info = $model->get_info($id) or ouch 404, 'Not Found';
+      $upload = $model->upload_for($id);
+      my $info = $upload->get_info or ouch 404, 'Not Found';
       my %headers = (
          'Cache-Control' => 'no-store',
          'Upload-Offset' => $info->{offset},
@@ -84,9 +94,10 @@ sub HTTP_HEAD ($self, $headers, $id) {
          status => 204,
          body   => '',
          headers => \%headers,
+         upload  => $upload,
       );
    }
-   catch { $response = response_from_exception($_) };
+   catch { $response = response_from_exception($_, upload => $upload) };
    
    return augment_response($response);
 }
@@ -114,7 +125,7 @@ sub HTTP_OPTIONS ($self) {
 }
 
 sub HTTP_PATCH ($self, $headers, $id, $data) {
-   my $response;
+   my ($response, $upload);
 
    try {
       validate_id($id);
@@ -123,7 +134,8 @@ sub HTTP_PATCH ($self, $headers, $id, $data) {
       validate_tus_resumable($headers, TUS_VERSION);
 
       my $model = $self->model;
-      my $info = $model->get_info($id) or ouch 404, 'Not Found';
+      $upload = $model->upload_for($id);
+      my $info = $upload->get_info or ouch 404, 'Not Found';
 
       my $args = lc_hash($headers);
 
@@ -174,7 +186,7 @@ sub HTTP_PATCH ($self, $headers, $id, $data) {
                   )
                if $full_length < $min_uploaded;
 
-            $self->set_length($id, $full_length)
+            $upload->set_length($full_length)
                unless defined($saved_length);
          }
 
@@ -182,64 +194,74 @@ sub HTTP_PATCH ($self, $headers, $id, $data) {
          validate_checksum($dref, $args->{'upload-checksum'});
 
          # we have no more excuses to refuse to write incoming data
-         $model->save_chunk($id, $current_offset, $dref);
+         $upload->save_chunk($current_offset, $dref);
       }
 
-      my $offset = $model->get_offset($id);
-      $model->finalize($id)
-         if defined($full_length) && $offset >= $full_length;
-
+      my $offset = $upload->get_offset;
       $response = response(
          status => 204,
          body   => '',
          headers => { 'Upload-Offset' => $offset },
+         upload  => $upload,
       );
+
+      if (defined($full_length) && $offset >= $full_length) {
+         $upload->finalize;
+         if (defined(my $cb = $self->on_complete)) {
+            $cb->(response => $response, tus => $self, upload => $upload);
+         }
+      }
    }
    catch {
       my $e = as_ouch($_);
       eval {
          my $data = $e->data;
-         $self->model->cleanup($id)
-            if ref($data) eq 'HASH' && $data->{cleanup}
+         if (ref($data) eq 'HASH' && $data->{cleanup}) {
+            $upload->cleanup;
+            $upload = undef;
+         }
       };
-      $response = response_from_exception($e);
+      $response = response_from_exception($e, upload => $upload);
    };
 
    return augment_response($response);
 }
 
 # Extensions
-sub HTTP_POST ($self, $headers, $data, $id = undef) {
-   my $response;
+sub HTTP_POST ($self, $headers, $data) {
+   my ($response, $upload);
 
    try {
-      ouch 405, 'Method Not Allowed' if length($id // '');
-
       my $args = lc_hash($headers);
       validate_tus_resumable($args, TUS_VERSION);
 
       # create resource allocating an identifier
       my $length = validate_length(undef, $args);
       my $metadata = $args->{'upload-metadata'};
-      $id = $self->model->create_upload($length, $metadata);
+      $upload = $self->model->create_upload($length, $metadata);
+      my $id = $upload->id;
 
       # save any data we might have received
       $args->{'upload-offset'} //= 0;
       $self->HTTP_PATCH($args, $id, $data);
 
       # ok, creation went fine so we have to give back the 201.
-      $response = response(status => 201, id => $id);
+      $response = response(
+         status => 201,
+         upload => $upload,
+      );
 
-      # if we got a callback to generate a Location header we do this,
-      # otherwise the caller will have to generate it by itself using
-      # $response->id
-      if (defined(my $cb = $self->id_to_location)) {
-         $response->headers->{Location} = $cb->($id);
+      if (defined(my $cb0 = $self->generate_location)) {
+         $response->headers->{Location} =
+            $cb0->(response => $response, tus => $self, upload => $upload);
+      }
+      if (defined(my $cb1 = $self->on_create)) {
+         $cb1->(response => $response, tus => $self, upload => $upload);
       }
    }
    catch {
       my $e = $_;
-      eval { $self->model->cleanup($id) if length($id // '') };
+      eval { $upload->cleanup if defined($upload) };
       $response = response_from_exception($e);
    };
    
@@ -256,8 +278,9 @@ sub HTTP_DELETE ($self, $headers, $id) {
       validate_tus_resumable($headers, TUS_VERSION);
 
       my $model = $self->model;
-      my $info = $model->get_info($id) or ouch 404, 'Not Found';
-      $model->cleanup($id);
+      my $upload = $model->upload_for($id);
+      my $info = $upload->get_info or ouch 404, 'Not Found';
+      $upload->cleanup;
       $response = response(
          status  => 204,
          body    => '',

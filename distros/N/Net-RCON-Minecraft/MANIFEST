@@ -23,6 +23,7 @@ t/lib/Local/Helpers.pm
 t/live/01-connect.t
 t/live/02-command.t
 t/live/03-timeout.t
+xt/kwalitee.t
 xt/todo.t
 xt/manifest.t
 xt/pod-coverage.t

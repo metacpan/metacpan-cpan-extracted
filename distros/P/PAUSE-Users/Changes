@@ -1,5 +1,8 @@
 Revision history for Perl module PAUSE::Users
 
+0.12 2026-05-30 NEILB
+    - Added `nologin`, `deleted`, and `type` slots to User.
+
 0.11 2022-10-06 NEILB
     - PAUSE::Users was `use`ing PAUSE::Users::User unnecessarily
     - Added `my` to SYNOPSIS so the code sample was strict clean

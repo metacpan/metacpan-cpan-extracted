@@ -1,5 +1,5 @@
 package Protocol::Tus::LocalDir;
-{ our $VERSION = '0.001' }
+{ our $VERSION = '0.003' }
 use Moo;
 use v5.24;
 use warnings;
@@ -44,7 +44,7 @@ sub create_upload ($self, $length, $metadata) {
          metadata => $metadata,
       }
    );
-   return $path->basename;
+   return $self->upload_for($path->basename);
 }
 
 sub extensions ($self) {

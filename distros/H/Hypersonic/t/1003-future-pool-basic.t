@@ -9,6 +9,7 @@ Hypersonic::Future->compile();
 
 # Now load Test::More
 use Test::More;
+plan skip_all => "Hypersonic::Future / ::Pool not supported on native Win32 (POSIX pthread + self-pipe)" if $^O eq "MSWin32";
 
 # Test OO interface - single pool
 {

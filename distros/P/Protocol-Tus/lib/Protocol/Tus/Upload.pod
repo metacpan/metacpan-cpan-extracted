@@ -1,0 +1,118 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Protocol::Tus::Upload
+
+
+=head1 SYNOPSIS
+
+   # most probable way to get such an object
+   my $model = ...; # something adhering to Protocol::Tus::AbstractModel
+   my $item = $model->upload_for($id);
+
+   # strictly speaking...
+   use Protocol::Tus::Upload;
+   my $upload = Protocol::Tus::Upload->new(model => $model, id => $id);
+
+
+=head1 DESCRIPTION
+
+Handler class wrapping methods of L<Protocol::Tus::AbstractModel> based
+on a specific upload.
+
+Instead of this:
+
+   my $info = $model->get_info($id);
+   $model->set_length($id, $some_length);
+   $model->save_chunk($id, $offset, $data_reference);
+   my $offset = $model->get_offset($id);
+
+you can use a more I<natural> interface like this:
+
+   my $upload = $model->upload_for($id);
+   my $info = $upload->get_info;
+   $upload->set_length($some_length);
+   $upload->save_chunk($offset, $data_reference);
+   my $offset = $upload->get_offset;
+
+
+=head1 INTERFACE
+
+All methods are wrappers around the corresponding method with the same
+name in the model class (whose interface must be compatible with
+L<Protocol::Tus::AbstractModel>).
+
+=head2 B<< cleanup >>
+
+   $upload->cleanup;
+
+See L<Protocol::Tus::AbstractModel/cleanup>.
+
+=head2 B<< finalize >>
+
+   $upload->finalize;
+
+See L<Protocol::Tus::AbstractModel/finalize>.
+
+=head2 B<< get_info >>
+
+   my $hash_ref = $upload->get_info;
+
+See L<Protocol::Tus::AbstractModel/get_info>.
+
+=head2 B<< get_offset >>
+
+   my $offset = $upload->get_offset;
+
+See L<Protocol::Tus::AbstractModel/get_offset>.
+
+=head2 B<< is_complete >>
+
+   my $bool = $upload->is_complete;
+
+See L<Protocol::Tus::AbstractModel/is_complete>.
+
+=head2 B<< id >>
+
+   my $id = $upload->id;
+
+Accessor to the I<identifier> of the upload.
+
+=head2 B<< new >>
+
+   my $upload = Protocol::Tus::Upload->new(model => $model, id => $id);
+
+Constructor. Accepts two I<mandatory> named parameters: the C<model>
+(compatible with L<Protocol::Tus::AbstractModel>) and the upload
+identifier (according to the model's restrictions).
+
+=head2 B<< model >>
+
+   my $model = $upload->model;
+
+Accessor to the I<model> that manages the upload.
+
+=head2 B<< save_chunk >>
+
+   $upload->save_chunk($offset, $data_ref);
+
+See L<Protocol::Tus::AbstractModel/save_chunk>.
+
+=head2 B<< set_length >>
+
+   $upload->set_length($length);
+
+See L<Protocol::Tus::AbstractModel/set_length>.
+
+=head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
+
+See documentation for L<Protocol::Tus>.
+
+
+=cut

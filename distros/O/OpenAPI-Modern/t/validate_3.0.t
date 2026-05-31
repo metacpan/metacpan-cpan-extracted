@@ -75,7 +75,7 @@ YAML
           instanceLocation => '/request/uri/query/q',
           keywordLocation => jsonp(qw(/paths /foo post parameters 0 schema $ref enum)),
           absoluteKeywordLocation => $doc_uri->clone->fragment('/components/schemas/basic_subschema/enum')->to_string,
-          error => 'value does not match',
+          error => 'value does not match (from enum 0: strings not equal)',
         },
         {
           instanceLocation => '/request/body/content/not_nullable',

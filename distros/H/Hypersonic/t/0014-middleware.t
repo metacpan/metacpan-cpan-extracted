@@ -185,10 +185,11 @@ END {
     if ($pid) {
         kill(9, $pid);
         waitpid($pid, 0);
+        $? = 0;  # clear waitpid status so Test::Builder doesn't flag exit 9
     }
     # Clean up cache directory
     if (-d $cache_dir) {
-        system("rm", "-rf", $cache_dir);
+        do { local $@; eval { require File::Path; File::Path::remove_tree($cache_dir, { safe => 1, error => \my $e }) if -e $cache_dir; }; };
     }
 }
 

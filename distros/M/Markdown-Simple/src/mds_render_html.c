@@ -49,7 +49,9 @@ typedef enum {
 } close_kind;
 
 typedef struct {
+#ifdef MULTIPLICITY
     tTHX        my_perl;     /* captured interpreter, used via dTHXa */
+#endif
     mds_buf*    buf;
     close_kind  closes[CLOSE_STACK_MAX];
     int         top;
@@ -1344,7 +1346,9 @@ void mds_render_html_install(mds_callbacks* cb, void** ud_out, mds_buf* buf,
                              unsigned flags) {
     dTHX;
     render_state* st = (render_state*)*ud_out;
+#ifdef MULTIPLICITY
     st->my_perl = aTHX;
+#endif
     st->buf     = buf;
     st->top     = 0;
     st->tight_depth = 0;

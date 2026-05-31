@@ -12,6 +12,7 @@ WriteMakefile(
     VERSION_FROM   => 'lib/Catalyst/Plugin/OpenIDConnect.pm',
     ABSTRACT_FROM  => 'lib/Catalyst/Plugin/OpenIDConnect.pm',
     AUTHOR         => 'Tim F. Rayner <tfrayner@cpan.org>',
+    PREREQ_PM      => $prereqs,
     LICENSE        => 'artistic_2',
     META_MERGE     => {
         'meta-spec' => { version => 2 },

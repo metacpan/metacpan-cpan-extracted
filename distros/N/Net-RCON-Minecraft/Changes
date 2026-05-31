@@ -1,5 +1,9 @@
 Net-RCON-Minecraft Changes
 
+0.05    2026-05-30
+        - Recent Test::MockModule test failures with ->make_immutable [Issue #1]
+        - Kwalitee improvements for better buildability
+
 0.04    2021-01-21
         - RT -> GitHub for issue tracker, as RT is being shut down
 

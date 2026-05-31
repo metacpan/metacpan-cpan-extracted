@@ -1,6 +1,6 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
-use 5.36.0;
+use feature 'say';
 use open qw(:std :utf8);
 use strict;
 use warnings;

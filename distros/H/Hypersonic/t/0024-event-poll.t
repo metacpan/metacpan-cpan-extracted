@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 
+plan skip_all => 'poll(2) backend not available on native Win32' if $^O eq 'MSWin32';
 
 # Test Hypersonic::Event::Poll backend
 use_ok('Hypersonic::Event::Poll');

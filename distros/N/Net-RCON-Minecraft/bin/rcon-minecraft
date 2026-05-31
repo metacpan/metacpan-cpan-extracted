@@ -11,6 +11,8 @@ no warnings 'uninitialized';
 
 exit main(@ARGV) unless caller;
 
+my $VER = Net::RCON::Minecraft->VERSION;
+
 sub main {
     my $ARGV = \@_;
 
@@ -18,7 +20,7 @@ sub main {
     GetOptionsFromArray($ARGV, \%o, qw< host=s port=i password=s timeout=f
         command|cmd=s@ color quiet echo help version > )           or return 2;
     if ($o{help})    { pod2usage -verbose => 1, -exitval => 'noexit'; return }
-    if ($o{version}) { print "rcon-minecraft version 0.04\n";         return }
+    if ($o{version}) { print "rcon-minecraft version $VER\n";         return }
 
     push @{$o{command}}, join(' ', @$ARGV) if @$ARGV;
 

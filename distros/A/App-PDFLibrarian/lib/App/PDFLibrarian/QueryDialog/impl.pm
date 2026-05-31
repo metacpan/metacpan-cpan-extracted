@@ -19,7 +19,7 @@ use strict;
 use warnings;
 
 package App::PDFLibrarian::QueryDialog::impl;
-$App::PDFLibrarian::QueryDialog::impl::VERSION = '6.0.3';
+$App::PDFLibrarian::QueryDialog::impl::VERSION = '6.2.0';
 use Wx qw(:dialog :statictext :combobox :textctrl :sizer :panel :window :id);
 use Wx::ArtProvider;
 use Wx::Event qw(EVT_BUTTON EVT_TEXT EVT_TEXT_ENTER);

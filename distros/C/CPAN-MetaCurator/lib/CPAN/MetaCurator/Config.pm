@@ -1,7 +1,7 @@
 package CPAN::MetaCurator::Config;
 
-use 5.36.0;
 use boolean;
+use feature 'say';
 use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
 use Config::Tiny;
@@ -28,7 +28,6 @@ has config_path =>
 	isa			=> Str,
 	required	=> 0,
 );
-
 
 has database_path =>
 (
@@ -112,14 +111,6 @@ has node_types =>
 	required	=> 0,
 );
 
-has separator =>
-(
-	default		=> '-' x 50,
-	is			=> 'ro',
-	isa			=> Str,
-	required	=> 0,
-);
-
 # Warning. Order is important because of foreign key constraints.
 # The tables are created in this order, and dropped in reverse order.
 # Lastly, we process the topics table to extract the module names.
@@ -141,7 +132,15 @@ has tiddlers_path =>
 	required	=> 0,
 );
 
-our $VERSION = '1.17';
+has visual_break =>
+(
+	default		=> sub{return '-' x 50},
+	is			=> 'rw',
+	isa			=> Str,
+	required	=> 0,
+);
+
+our $VERSION = '1.21';
 
 # -----------------------------------------------
 

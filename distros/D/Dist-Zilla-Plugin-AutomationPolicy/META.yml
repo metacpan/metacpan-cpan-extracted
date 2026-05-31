@@ -1,0 +1,62 @@
+---
+abstract: 'add an automation policy to a distribution'
+author:
+  - 'Robert Rothenberg <perl@rhizomnic.com>'
+build_requires:
+  ExtUtils::MakeMaker: '7.22'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  JSON: '0'
+  Module::Metadata: '1.000015'
+  Path::Tiny: '0'
+  Test::DZil: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - automation
+  - policy
+  - automated
+  - AI
+  - GenAI
+  - Generative
+  - AI
+  - LLM
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-AutomationPolicy
+provides:
+  Dist::Zilla::Plugin::AutomationPolicy:
+    file: lib/Dist/Zilla/Plugin/AutomationPolicy.pm
+    version: v0.1.0
+requires:
+  Dist::AutomationPolicy: '0'
+  Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Pragmas: '0'
+  Dist::Zilla::Role::FileGatherer: '0'
+  Dist::Zilla::Role::FilePruner: '0'
+  Dist::Zilla::Role::PrereqSource: '0'
+  Moose: '0'
+  MooseX::Types::Moose: '0'
+  MooseX::Types::Perl: '0'
+  experimental: '0'
+  namespace::autoclean: '0'
+  perl: v5.24.0
+resources:
+  bugtracker: https://github.com/robrwo/perl-Dist-Zilla-Plugin-AutomationPolicy/issues
+  repository: git://github.com/robrwo/perl-Dist-Zilla-Plugin-AutomationPolicy.git
+version: v0.1.0
+x_authority: cpan:RRWO
+x_contributors:
+  - 'Leon Timmermans <fawaka@gmail.com>'
+x_generated_by_perl: v5.42.1
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: Artistic-2.0

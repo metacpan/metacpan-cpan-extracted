@@ -128,6 +128,6 @@ like($resp, qr/HTTP\/1\.1 404/, 'Unknown route: returns 404');
 # Cleanup
 kill('TERM', $pid);
 waitpid($pid, 0);
-system("rm -rf $cache_dir");
+do { local $@; eval { require File::Path; File::Path::remove_tree($_, { safe => 1, error => \my $e }) for grep { -e $_ } glob(qq($cache_dir)); }; };
 
 done_testing();

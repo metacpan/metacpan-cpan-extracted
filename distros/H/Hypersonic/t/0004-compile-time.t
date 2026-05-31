@@ -49,6 +49,6 @@ my $resp2 = $server->dispatch(['GET', '/counter', '', 1, 0]);
 like($resp2, qr/"time":$compile_time_value/, 'Timestamp unchanged - response is baked');
 
 # Clean up
-system("rm -rf _test_cache_compile");
+do { local $@; eval { require File::Path; File::Path::remove_tree($_, { safe => 1, error => \my $e }) for grep { -e $_ } glob(qq(_test_cache_compile)); }; };
 
 done_testing();

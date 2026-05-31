@@ -1,7 +1,7 @@
-This is the Security Policy for the Perl Tree-DAG_Node distribution.
+This is the Security Policy for the Perl CPAN-MetaCurator distribution.
 
 The latest version of the Security Policy can be found in the
-[git repository for Tree-DAG_Node](https://github.com/ronsavage/Tree-DAG_Node).
+[git repository for CPAN-MetaCurator](https://github.com/ronsavage/CPAN-MetaCurator).
 
 This text is based on the CPAN Security Group's Guidelines for Adding
 a Security Policy to Perl Distributions (version 1.1.0)
@@ -55,7 +55,7 @@ They may also forward this issue to CPANSec.
 
 # Which Software This Policy Applies To
 
-Any security vulnerabilities in Tree-DAG_Node are covered by this policy.
+Any security vulnerabilities in CPAN-MetaCurator are covered by this policy.
 
 Security vulnerabilities are considered anything that allows users
 to execute unauthorised code, access unauthorised resources, or to
@@ -63,20 +63,20 @@ have an adverse impact on accessibility or performance of a system.
 
 Security vulnerabilities in upstream software (embedded libraries,
 prerequisite modules or system libraries, or in Perl), are not
-covered by this policy unless they affect Tree-DAG_Node, or Tree-DAG_Node can
+covered by this policy unless they affect CPAN-MetaCurator, or CPAN-MetaCurator can
 be used to exploit vulnerabilities in them.
 
 Security vulnerabilities in downstream software (any software that
-uses Tree-DAG_Node, or plugins to it that are not included with the
-Tree-DAG_Node distribution) are not covered by this policy.
+uses CPAN-MetaCurator, or plugins to it that are not included with the
+CPAN-MetaCurator distribution) are not covered by this policy.
 
-## Supported Versions of Tree-DAG_Node
+## Supported Versions of CPAN-MetaCurator
 
 The maintainer(s) will release security fixes for the latest version
-of Tree-DAG_Node.
+of CPAN-MetaCurator.
 
-Note that the Tree-DAG_Node project only supports major versions of Perl
-released in the past ten (10) years, even though Tree-DAG_Node will run on
+Note that the CPAN-MetaCurator project only supports major versions of Perl
+released in the past ten (10) years, even though CPAN-MetaCurator will run on
 older versions of Perl.  If a security fix requires the maintainers to
 increase the minimum version of Perl that is supported, then they may
 do so.
@@ -84,7 +84,7 @@ do so.
 # Installation and Usage Issues
 
 The distribution metadata specifies minimum versions of
-prerequisites that are required for Tree-DAG_Node to work.  However, some
+prerequisites that are required for CPAN-MetaCurator to work.  However, some
 of these prerequisites may have security vulnerabilities, and you
 should ensure that you are using up-to-date versions of these
 prerequisites.

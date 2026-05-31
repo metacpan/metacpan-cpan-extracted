@@ -59,7 +59,7 @@ sub stop_test_server {
         kill('TERM', $server_pid);
         waitpid($server_pid, 0);
     }
-    system("rm -rf _test_async_server_*");
+    do { local $@; eval { require File::Path; File::Path::remove_tree($_, { safe => 1, error => \my $e }) for grep { -e $_ } glob(qq(_test_async_server_*)); }; };
 }
 
 END { stop_test_server() }
@@ -132,6 +132,6 @@ subtest 'Slow endpoint' => sub {
 };
 
 # Cleanup
-system("rm -rf _test_async_client_*");
+do { local $@; eval { require File::Path; File::Path::remove_tree($_, { safe => 1, error => \my $e }) for grep { -e $_ } glob(qq(_test_async_client_*)); }; };
 
 done_testing();

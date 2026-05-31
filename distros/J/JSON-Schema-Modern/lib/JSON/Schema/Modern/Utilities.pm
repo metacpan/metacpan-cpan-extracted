@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.639';
+our $VERSION = '0.640';
 
 use 5.020;
 use strictures 2;
@@ -487,6 +487,7 @@ sub core_formats_type () {
       [ qw(text *) ],
       [ qw(application x-www-form-urlencoded) ],
       [ qw(application x-ndjson) ],
+      # multipart/form-data and multipart/* are special-cased in OpenAPI::Modern: do not add here
     )
   };
 
@@ -507,10 +508,13 @@ sub core_formats_type () {
     # backslash."
     my $params = {
       map +(m{^($TOKEN)=($TOKEN|$QUOTED_STRING)\z}
-        ? (fc($1) => fc(defined $3 ? ($3 =~ s/\x5C(.)/$1/gr) : $2))
+        ? (fc($1) => defined $3 ? ($3 =~ s/\x5C(.)/$1/gr) : $2)
         : ()),
       @params
     };
+
+    # some parameter values are case-insensitive; enumerate them here
+    $params->{$_} = fc($params->{$_}) foreach grep exists $params->{$_}, qw(charset);
 
     croak 'cannot parse more than 64 parameters' if keys $params->%* > 64;
     +{
@@ -533,7 +537,7 @@ sub core_formats_type () {
       encode => sub ($content_ref, @) {
         \ _JSON_BACKEND->new->allow_nonref(1)->utf8(1)->allow_blessed(1)->convert_blessed(1)->encode($content_ref->$*);
       },
-      caller_addr => 1,
+      owner_addr => 1,
     }
     if $media_type_string eq 'application/json';
 
@@ -541,7 +545,7 @@ sub core_formats_type () {
       type => 'application',
       subtype => 'octet-stream',
       (map +($_ => sub ($content_ref, @) { $content_ref }), qw(decode encode)),
-      caller_addr => 1,
+      owner_addr => 1,
     }
     if $media_type_string eq 'application/octet-stream';
 
@@ -559,7 +563,7 @@ sub core_formats_type () {
           \ Encode::encode($parameters->{charset}, $content_ref->$*, Encode::DIE_ON_ERR | Encode::LEAVE_SRC)
           : $content_ref;
       },
-      caller_addr => 1,
+      owner_addr => 1,
     }
     if $media_type_string eq 'text/*';
 
@@ -570,9 +574,10 @@ sub core_formats_type () {
         \ Mojo::Parameters->new->charset('UTF-8')->parse($content_ref->$*)->to_hash;
       },
       encode => sub ($content_ref, @) {
-        \ Mojo::Parameters->new->charset('UTF-8')->pairs([ $content_ref->$*->%* ])->to_string;
+        \ Mojo::Parameters->new->charset('UTF-8')
+          ->parse(map +($_ => $content_ref->$*->{$_}), sort keys $content_ref->$*->%*)->to_string;
       },
-      caller_addr => 1,
+      owner_addr => 1,
     }
     if $media_type_string eq 'application/x-www-form-urlencoded';
 
@@ -595,12 +600,12 @@ sub core_formats_type () {
         my $encoder = _JSON_BACKEND->new->allow_nonref(1)->utf8(1)->allow_blessed(1)->convert_blessed(1);
         \ join "\n", map $encoder->encode($_), $content_ref->$*->@*;
       },
-      caller_addr => 1,
+      owner_addr => 1,
     }
     if $media_type_string eq 'application/x-ndjson';
   }
 
-  # for internal use only by JSON::Schema::Modern! may be removed without notice!
+  # for internal use by JSON::Schema::Modern only! may be removed without notice!
   sub _get_media_type_decoder ($media_type_string) {
     my $matched_string = match_media_type($media_type_string);
     return undef if not defined $matched_string;
@@ -612,7 +617,7 @@ sub core_formats_type () {
     return $definition->{decode};
   }
 
-  sub add_media_type ($media_type_string, $decoder_sub = undef, $encoder_sub = undef, $caller_addr = 1) {
+  sub add_media_type ($media_type_string, $decoder_sub = undef, $encoder_sub = undef, $owner_addr = 1) {
     croak 'decoder is not a subref' if defined $decoder_sub and ref $decoder_sub ne 'CODE';
     croak 'encoder is not a subref' if defined $encoder_sub and ref $encoder_sub ne 'CODE';
 
@@ -623,10 +628,10 @@ sub core_formats_type () {
     _predefined_media_types($media_type_string) if not exists $MEDIA_TYPES->{$media_type_string};
 
     if (any { is_equal($type, { $_->%{qw(type subtype parameters)} }) } values %$MEDIA_TYPES) {
-      croak 'duplicate media-type found' if $caller_addr == 1;
+      croak 'duplicate media-type found' if $owner_addr == 1;
 
       # track evaluator object that used the deprecated add_media_type interface
-      push $MEDIA_TYPES->{$media_type_string}{caller_addr}->@*, $caller_addr;
+      push $MEDIA_TYPES->{$media_type_string}{owner_addr}->@*, $owner_addr;
       return;
     }
 
@@ -634,26 +639,28 @@ sub core_formats_type () {
       decode => $decoder_sub,
       encode => $encoder_sub,
       %$type,
-      caller_addr => [ $caller_addr ],    # refaddr of the evaluator object that added us
+      owner_addr => [ $owner_addr ],    # refaddr of the evaluator object that added us
     };
 
     return;
   }
 
-  sub delete_media_type ($media_type_string, $caller_addr = 1) {
+  sub delete_media_type ($media_type_string, $owner_addr = 1) {
     return if not exists $MEDIA_TYPES->{$media_type_string};
 
     delete $MEDIA_TYPES->{$media_type_string}
-      if $caller_addr == 1
-        or $MEDIA_TYPES->{$media_type_string}{caller_addr} = [
-          grep +($_ != 1 && $_ != $caller_addr), $MEDIA_TYPES->{$media_type_string}{caller_addr}->@*
+      if $owner_addr == 1
+        or $MEDIA_TYPES->{$media_type_string}{owner_addr} = [
+          grep +($_ != 1 && $_ != $owner_addr), $MEDIA_TYPES->{$media_type_string}{owner_addr}->@*
         ];
   }
 
   # wildcards, parameters supported
   # always returns a reference to the decoded data, or undef if no decoder is found
   sub decode_media_type ($media_type_string, $content_ref) {
-    croak 'decoder payload must be a reference to a string' if ref $content_ref ne 'SCALAR';
+    croak 'decoder payload must be a reference to a string (not ',
+        (length ref $content_ref ? ref $content_ref : 'a non-reference')
+      if ref $content_ref ne 'SCALAR';
 
     my $matched_string = match_media_type($media_type_string);
     return if not $matched_string;
@@ -953,7 +960,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.639
+version 0.640
 
 =head1 SYNOPSIS
 
@@ -1153,19 +1160,21 @@ future flexibility with this interface.
 
 These media types are already defined:
 
+=for stopwords WHATWG
+
 =over 4
 
 =item *
 
-C<application/json> - see L<RFC 4627|https://datatracker.ietf.org/doc/html/rfc4627>
+C<application/json> L<(RFC 4627)|https://datatracker.ietf.org/doc/html/rfc4627>
 
 =item *
 
-C<application/schema+json> - see L<proposed definition|https://json-schema.org/draft/2020-12/json-schema-core.html#name-application-schemajson>
+C<application/schema+json> L<(proposed definition)|https://json-schema.org/draft/2020-12/json-schema-core.html#name-application-schemajson>
 
 =item *
 
-C<application/schema-instance+json> - see L<proposed definition|https://json-schema.org/draft/2020-12/json-schema-core.html#name-application-schema-instance>
+C<application/schema-instance+json> L<(proposed definition)|https://json-schema.org/draft/2020-12/json-schema-core.html#name-application-schema-instance>
 
 =item *
 
@@ -1173,11 +1182,11 @@ C<application/octet-stream> - passes strings through unchanged
 
 =item *
 
-C<application/x-www-form-urlencoded>
+C<application/x-www-form-urlencoded> L<(WHATWG)|https://url.spec.whatwg.org/#application/x-www-form-urlencoded>
 
 =item *
 
-C<application/x-ndjson> - see L<https://github.com/ndjson/ndjson-spec>
+C<application/x-ndjson> L<(spec)|https://github.com/ndjson/ndjson-spec>
 
 =item *
 

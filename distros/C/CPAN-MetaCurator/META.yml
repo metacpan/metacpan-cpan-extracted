@@ -49,6 +49,7 @@ requires:
   Text::CSV::Encoded: '0.25'
   Types::Standard: '2.006'
   boolean: '0.46'
+  feature: '1.89'
   lib: '0.65'
   open: '1.13'
   parent: '0.242'
@@ -59,5 +60,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-MetaCurator
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ronsavage/CPAN-MetaCurator.git
-version: '1.17'
+version: '1.21'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

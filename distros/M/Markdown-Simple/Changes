@@ -1,22 +1,34 @@
 Revision history for Markdown-Simple
 
-0.01    Date/time
+0.13    2026-05-30
+        - Fix build failure on perls built without MULTIPLICITY /
+          PERL_IMPLICIT_CONTEXT 
+        - Fix "redefinition of 's_scalar'"
+
+0.12    2026-05-27
+        - SIMD acceleration: SSE2/SSSE3 on x86_64, AVX2 on capable hosts,
+          NEON on aarch64, with scalar fallback dispatched at runtime via
+          CPUID / hwcap. Refactored Makefile.PL to probe headers with
+          Devel::CheckLib before enabling each backend.
+
+0.11    2025-06-22
+        - Adds a strip_markdown function
+
+0.10    2025-06-21
+        - prompt engineer the fix to allow bold text to come the line after
+          lists while using '*'
+
+0.09    2025-06-21
+        - prompt engineer support for _ and __ for italic and bold.
+
+0.08    2025-06-21
+        - prompt engineer support for nested components in lists and tables.
+
+0.07    2025-06-20
+        - prompt engineer utf8 support - it's a bit of a hack!
+
+0.06    2025-06-19
+        - Adds preprocessing by default which replaces \r\n with \n
+
+0.01    2025-06-18
         First version, released on an unsuspecting world.
-
-0.06 	2025-06-19
-	- Adds preprocessing by default which replaces \r\n with \n
-
-0.07 	2025-06-20
-	- prompt engineer utf8 support - it's a bit of a hack!
-
-0.08 	2025-06-21
-	- prompt engineer support for nested components in lists and tables.
-
-0.09	2025-06-21
-	- prompt engineer support for _ and __ for italic and bold.
-
-0.10 	2025-06-21
-	- prompt engineer the fix to allow bold text to come the line after lists while using '*'
-
-0.11 	2025-06-22
-	- Adds a strip_markdown function

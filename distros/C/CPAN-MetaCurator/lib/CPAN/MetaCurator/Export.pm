@@ -1,7 +1,7 @@
 package CPAN::MetaCurator::Export;
 
-use 5.36.0;
 use boolean;
+use feature 'say';
 use open qw(:std :utf8);
 use parent 'CPAN::MetaCurator::HTML';
 use warnings qw(FATAL utf8); # Fatalize encoding glitches.
@@ -12,13 +12,13 @@ use DateTime::Tiny;
 use File::Slurper 'read_lines';
 use File::Spec;
 
-use Moo;
-
 use Syntax::Keyword::Match;
+
+use Types::Standard 'Enum';
 
 our %seen;
 
-our $VERSION = '1.17';
+our $VERSION = '1.21';
 
 # -----------------------------------------------
 
@@ -29,15 +29,19 @@ sub export_tree
 	$self -> init_config;
 	$self -> init_db;
 
+	say 'export_tree()';
+	say 'home_path:        ', $self -> home_path;
+	say 'include_packages: ', $self -> include_packages;
+	say 'log_level:        ', $self -> log_level;
+	say 'output_path:      ', $self -> output_path;
+
 	my($pad)					= $self -> build_pad;
 	my($header, $body, $footer)	= $self -> build_html($pad); # Returns templates.
+	my(@list)					= '<ul>';
+	my($root)					= shift @{$$pad{topics} }; # I.e.: {parent_id => 1, text => 'Root', title => 'MetaCurator'}.
+	my($id)						= $$pad{topic_html_ids}{$$root{title} };
 
-	# Populate the body.
-
-	my(@list)	= '<ul>';
-	my($root)	= shift @{$$pad{topics} }; # I.e.: {parent_id => 1, text => 'Root', title => 'MetaCurator'}.
-	my($id)		= $$pad{topic_html_ids}{$$root{title} };
-
+	$self -> logger -> info($self -> visual_break);
 	$self -> logger -> info("Topic: id: $id. title: $$root{title}");
 
 	push @list, qq|<li data-jstree='{"opened": true}' id = '$id'><a href = '#'>$$root{title}</a>|;
@@ -113,93 +117,6 @@ sub export_modules_table
 } # End of export_modules_table.
 
 # --------------------------------------------------
-# Note: Data is returned in:
-# 1: $button
-# 2: $index
-# 3: @$inside_pre
-
-sub handle_inside_pre
-{
-	my($self, $index, $line, $lines, $inside_pre, $special_case, $topic) = @_;
-
-	$$special_case{inside_pre}	= true;
-	@$inside_pre				= $line;
-
-	do
-	{
-		$index++;
-
-		if ($index <= $#$lines)
-		{
-			$line = $$lines[$index];
-
-			if ($line =~ /^o /)
-			{
-				$$special_case{inside_pre} = false;
-			}
-			else
-			{
-				push @$inside_pre, $line;
-			}
-		}
-		else
-		{
-			$$special_case{inside_pre} = false;
-		}
-	} until (! $$special_case{inside_pre});
-
-	my($button) = "<span>&nbsp;&nbsp;</span><button id='toggle-btn'>[pre.../pre]</button>";
-
-	$self -> logger -> debug("\t$_") for (@$inside_pre);
-
-	return ($button, $index);
-
-} # End of handle_inside_pre.
-
-# --------------------------------------------------
-# Note: Data is returned in:
-# 1: $button
-# 2: $index
-# 3: @$see_also
-
-sub handle_see_also
-{
-	my($self, $index, $line, $lines, $see_also, $special_case, $topic) = @_;
-
-	$$special_case{see_also}	= true;
-	@$see_also					= $line;
-
-	do
-	{
-		$index++;
-
-		if ($index <= $#$lines)
-		{
-			$line = $$lines[$index];
-
-			if ($line =~ /^o /)
-			{
-				$$special_case{see_also} = false;
-			}
-			else
-			{
-				push @$see_also, $line;
-			}
-
-		}
-		else
-		{
-			$$special_case{see_also} = false;
-		}
-	} until (! $$special_case{see_also});
-
-	$self -> logger -> debug("\t$_") for (@$see_also);
-
-	return $index;
-
-} # End of handle_see_also.
-
-# --------------------------------------------------
 # Some names might be acronyms & module names & topic names.
 # Example: RSS.
 
@@ -209,7 +126,7 @@ sub gather_statistics
 
 	$$node_type{acronym}	= $$topic{title} eq 'Acronyms'	? true : false;
 	$$node_type{topic}		= $$pad{topic_names}{$token}	? true : false;
-	$$node_type{known}		= $$pad{packages}{$token}		? true : false;
+	$$node_type{known}		= $$pad{module_names}{$token}	? true : false;
 	$$node_type{unknown}	= ! ($$node_type{acronym} || $$node_type{known} || $$node_type{topic});
 
 	$$pad{count}{acronym}++	if ($$node_type{acronym});
@@ -217,6 +134,8 @@ sub gather_statistics
 
 	if ($$node_type{unknown} && ($token ne 'See also') )
 	{
+		$$pad{count}{unknown}++;
+
 		$self -> logger -> debug("Unknown: $token");
 	}
 
@@ -230,136 +149,132 @@ sub parse_topic
 	my(@lines)							= split(/\n/, $$topic{text});
 	@lines								= grep{length} map{s/^\s+//; s/:\s*$//; $_} @lines;
 	my($line_id)						= $leaf_id;
-	my($index)							= 0;
+	my($index)							= -1;
 
-	my($button, %button);
+	my(%button);
+	my($context);
 	my($description);
-	my(@extras);
-	my($href, @hover);
-	my(@inside_pre, $item, @items);
+	my($href);
+	my($item, @items);
 	my($line);
 	my(%node_type);
-	my(%special_case, @see_also);
 	my($token);
 
-	$button{extras}				= '';
-	$button{inside_pre}			= '';
-	$button{see_also}			= '';
-	$special_case{inside_pre}	= false;
-	$special_case{see_also}		= false;
+	$button{extras}		= '';
+	$button{faq}		= '';
+	$button{pre_pre}	= "<span>&nbsp;&nbsp;</span><button id='toggle-btn'>[pre.../pre]</button>";
+	$button{see_also}	= "<button id='toggle-btn'>[See also]</button>";
+	my($context_enum)	= Enum['acronym', 'faq', 'module', 'pre_pre', 'see_also', 'text'];
 
-	while ($index <= $#lines)
+	while ($index < $#lines)
 	{
-		$line = $lines[$index];
-
-		# 1 of 2: Process non-modules.
-
-		if ($line =~ /<pre>/)
-		{
-			($button{inside_pre}, $index) = $self -> handle_inside_pre($index, $line, \@lines, \@inside_pre, \%special_case, $topic);
-		}
-		elsif ($line =~ /^o See also/)
-		{
-			$index				= $self -> handle_see_also($index, $line, \@lines, \@see_also, \%special_case, $topic);
-			$button{see_also}	= "<button id='toggle-btn'>[See also]</button>";
-		}
-
 		$index++;
 
-		last if ($index > $#lines);
-
-		# 2 of 2: Skip everything except modules (hopefully).
-
-		next if ($line !~ /^o (.+):?/);
-
-		$token	= $1 || '';
+		$line	= $lines[$index];
 		$item	= {href => '', id => ++$line_id, text => ''};
+		$token	= '';
 
-		$self -> gather_statistics(\%node_type, $pad, $token, $topic);
-
-		# Special cases, due to their formatting:
-		# 1: See also.
-		# 2: FAQ.
-
-		if ($token eq 'See also')
+		if ($$topic{title} eq 'Acronyms')
 		{
-			$$item{html}	= $button{see_also};
-			$$item{text}	= "";
+			$context = 'acronym';
 
-			push @items, $item;
-
+			$self -> gather_statistics(\%node_type, $pad, $token, $topic);
+			$self -> logger -> debug("Topic: $$topic{title}. Acronym: $line");
 		}
 		elsif ($$topic{title} eq 'FAQ')
 		{
-			$$item{html}	= '';
-			$$item{text}	= $line;
+			$context = 'faq';
+		}
+		elsif ($line =~ /^o See also:/)
+		{
+			$context = 'see_also';
+		}
+		elsif ( ($context eq 'see_also') && ($line =~ /^- /) )
+		{
+			# No change to context.
+		}
+		elsif ($line =~ /<pre>/)
+		{
+			$context = 'pre_pre';
+		}
+		elsif ($line =~ m|</pre>|)
+		{
+			$context = 'text';
+		}
+		elsif ($line =~ /^o (.+)$/)
+		{
+			$context	= 'module';
+			$token		= $1;
 
-			push @items, $item;
+			if ($$pad{module_names}{$token} && ! $seen{$token})
+			{
+				$seen{$token} = $self -> insert_hashref('modules', {name => $token});
+
+				$self -> gather_statistics(\%node_type, $pad, $token, $topic);
+				$self -> logger -> debug("Topic: $$topic{title}. Module: $token");
+			}
 		}
 		else
 		{
-			# Do we have a standard 3 line entry or 3+ lines? Examples are from Acronyms.
-			#
-			# 3 line entry:
-			# o DKIM:
-			# - DomainKeys Identified Mail <- $index
-			# - https://en.wikipedia.org/wiki/DomainKeys_Identified_Mail
-			#
-			# 3+ line entry:
-			# o DMARC:
-			# - Domain-based Message Authentication, Reporting, and Conformance <- $index
-			# - https://en.wikipedia.org/wiki/DMARC
-			# - An email authentication protocol that helps protect domain owners and recipients from email spoofing, phishing, and other email-based attacks
-			# - https://datatracker.ietf.org/doc/html/draft-crocker-dmarc-bcp-03
-			#
-			# If the latter then stockpile lines beyond 3 & stash them in a hidden field to be popped-up on a button click.
-
-			@extras = ();
-
-			while ( ($index <= $#lines) && ($lines[$index] !~ /^o/) )
-			{
-				push @extras, $lines[$index++];
-			}
-
-			if ($#extras < 2)
-			{
-				#$self -> logger -> debug("Token: $token. Expected: $_ >$extras[$_]<") for (0 .. $#extras);
-			}
-
-			$self -> logger -> error("Token: $token. Missing lines"), next if ($#extras < 1);
-			$self -> logger -> error("Token: $token. Missing -text"), next if ($extras[0] !~ /^-/);
-			$self -> logger -> error("Token: $token. Missing -link"), next if ( ($#extras < 1) || ($extras[1] !~ /^-/) );
-
-			$description	= shift @extras;
-			$href			= shift @extras;
-
-			$self -> logger -> error("Token: $token. Missing description"),	next if (! defined($description) );
-			$self -> logger -> error("Token: $token. Missing href"), 		next if (! defined($href) );
-
-			if ($#extras >= 0)
-			{
-				$button{extras} = "<span>&nbsp;&nbsp;</span><button id='toggle-btn'>[TBA]</button>";
-
-				$self -> logger -> debug("Token: $token. Extras:");
-				$self -> logger -> debug("\t$_") for (@extras);
-			}
-			else
-			{
-				$button{extras} = '';
-			}
-
-			$$item{html}	= "<span><a href = '$href' target = '_blank'>$token - $description</a></span><span>.</span>$button{extras}";
-			$$item{text}	= "";
-
-			push @items, $item;
+			$context = 'text';
 		}
 
-		if (! $seen{$token})
+		match($context : eq)
 		{
-			$self -> insert_hashref('modules', {name => $token});
+			case('acronym')
+			{
+				$token			= ($line =~ /^o (.+)$/) ? $1 : $line;
+				$description	= $lines[++$index]; substr($description, 0, 2) = '';	# Remove '^- '.
+				$href			= $lines[++$index]; substr($href, 0, 2) = '';			# "
+				$$item{html}	= "<span><a href = '$href' target = '_blank'>$token - $description</a></span><span>.</span>$button{extras}";
+				$$item{text}	= '';
 
-			$seen{$token} = true;
-		}
+				push @items, $item;
+			}
+			case('faq')
+			{
+				$$item{html}	= '';
+				$$item{text}	= $line;
+
+				push @items, $item;
+			}
+			case('module')
+			{
+				# Do we have a standard 3 line entry or 3+ lines? Examples are from Acronyms.
+				#
+				# 3 line entry:
+				# o DKIM:
+				# - DomainKeys Identified Mail <- $index
+				# - https://en.wikipedia.org/wiki/DomainKeys_Identified_Mail
+				#
+				# 3+ line entry:
+				# o DMARC:
+				# - Domain-based Message Authentication, Reporting, and Conformance <- $index
+				# - https://en.wikipedia.org/wiki/DMARC
+				# - An email authentication protocol that helps protect domain owners and recipients from email spoofing, phishing, and other email-based attacks
+				# - https://datatracker.ietf.org/doc/html/draft-crocker-dmarc-bcp-03
+
+				$description	= $lines[++$index]; substr($description, 0, 2) = '';	# Remove '^- '.
+				$href			= $lines[++$index]; substr($href, 0, 2) = '';			# "
+				$$item{html}	= "<span><a href = '$href' target = '_blank'>$token - $description</a></span><span>.</span>$button{extras}";
+				$$item{text}	= '';
+
+				$self -> logger -> debug("href: $href");
+
+				push @items, $item;
+
+				#while ($lines[$index + 1] != /^o /){$index++}; # Skip empty line (up to next 'o ...').
+			}
+			case('see_also')
+			{
+			}
+			case('pre_pre')
+			{
+			}
+			case('text')
+			{
+			}
+		} # End match.
 	}
 
 	return [@items];

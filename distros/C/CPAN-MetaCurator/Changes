@@ -1,23 +1,40 @@
 Revision history for perl module CPAN::MetaCurator
 
+1.21  2026-05-29
+	- Fix handling of See Also when it is the only entry in the Topic. Eg: TheLanguageGuide.
+	- Rewrite some of the JSTree generation code in preparation of the whole re-write.
+	- This involves simplifying the output for a while.
+
+1.20  2026-05-09
+	- Add CPAN::MetaCurator::Search & scripts/check.module.names.pl.
+	- The latter reads data/module.names.txt & determines if those names are in the db.
+	- Module names found are written to the log before the names of the modules which are not found.
+
+1.19  2026-05-04
+	- Fix Export.gather_statistics() where new code failed to count unknown modules.
+
+1.18  2026-05-03
+	- Add line to templates/header.html to we can display the Last-Updated data of 02packages.details.txt.
+	- Slightly re-order header lines within templates/header.html.
+
 1.17  2026-04-15
-	- Start work on stockpiling See also text at the start of each topic & <pre>...</pre>
+	- Start work on stockpiling See also text at the start of each topic & <pre>...</pre>.
 	- Update Makefile.pl $] test from erroneous non-numeric ($] ge '5.005') to ($] >= 5.005).
 	- In this file replace all (' ' x 4) by a tab.
 
 1.16  2026-04-06
-	- Start adding buttons on each line of the tree, to support popups
+	- Start adding buttons on each line of the tree, to support popups.
 
 1.15  2026-04-06
-	- Re-build db with newest data/tiddlers.json. Export as tree
+	- Re-build db with newest data/tiddlers.json. Export as tree.
 
 1.14  2026-03-20
-	- Add a NAME section to the POD in MetaCurator.pm
-	- Fix Export.pm to add each modules NAME to its entry in cpan.metacurator.tree.html
+	- Add a NAME section to the POD in MetaCurator.pm.
+	- Fix Export.pm to add each modules NAME to its entry in cpan.metacurator.tree.html.
 
 1.13  2026-03-11
 	- Clean up counting of nodes
-	- Write module names to the 'modules' table if they appear in Perl.Wiki
+	- Write module names to the 'modules' table if they appear in Perl.Wiki.
 
 1.12  2026-03-09
 	- Add code to optionally read cpan.metapackager.sqlite as shipped with CPAN::MetaPackager.

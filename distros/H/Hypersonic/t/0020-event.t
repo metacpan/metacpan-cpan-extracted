@@ -14,9 +14,13 @@ subtest 'Backend registry' => sub {
     # Check that common backends are in the list
     my %available = map { $_ => 1 } @backends;
 
-    # poll and select should always be available
-    ok($available{poll}, 'poll backend registered');
-    ok($available{select}, 'select backend registered');
+    # poll and select should always be available (poll absent on native Win32)
+    if ($^O eq 'MSWin32') {
+        ok($available{select}, 'select backend registered (Win32)');
+    } else {
+        ok($available{poll}, 'poll backend registered');
+        ok($available{select}, 'select backend registered');
+    }
 
     note("Available backends: @backends");
 };
@@ -38,6 +42,8 @@ subtest 'best_backend selection' => sub {
         like($best, qr/^(epoll|io_uring)$/, 'Linux uses epoll or io_uring');
     } elsif ($^O =~ /^(freebsd|openbsd|netbsd)$/) {
         is($best, 'kqueue', 'BSD uses kqueue as best backend');
+    } elsif ($^O eq 'MSWin32') {
+        like($best, qr/^(iocp|select)$/, 'Win32 uses iocp or select');
     }
 };
 
@@ -55,7 +61,8 @@ subtest 'backend() loading' => sub {
 
 # Test loading specific backends
 subtest 'Load specific backends' => sub {
-    for my $name (qw(poll select)) {
+    my @always = $^O eq 'MSWin32' ? ('select') : ('poll', 'select');
+    for my $name (@always) {
         my $class = Hypersonic::Event->backend($name);
         ok($class, "Loaded $name backend: $class");
         is($class->name, $name, "$name backend returns correct name");

@@ -12,7 +12,7 @@ Protocol::Tus - Tus protocol handling
 
 =head1 VERSION
 
-This document describes Protocol::Tus version 0.001.
+This document describes Protocol::Tus version 0.003.
 
 =begin html
 
@@ -51,18 +51,19 @@ This document describes Protocol::Tus version 0.001.
    my $request = get_some_input_request();
 
    my $response = $tus->HTTP_request(
-      $request->{method},   # POST, PATCH, ...
-      $request->{headers},  # hash reference
-      $request->{id},       # id of the upload or undef/''
-      $request->{body},     # or, better, passed as a ref to a scalar
+      method  => $request->{method},   # POST, PATCH, ...
+      headers => $request->{headers},  # hash reference
+      id      => $request->{id},       # id of the upload or undef/''
+      body    => $request->{body},     # better as a ref to a scalar
+      cb_data => $something_for_callback,  # anything more you need
    );
    # The $response is-a Protocol::Tus::Response
 
    # or you can decide to call the relevant methods directly. 
-   $response = $tus->HTTP_HEAD($request->{headers}, $request->{id});
-   $response = $tus->HTTP_OPTIONS($request->{headers});
+   $response = $tus->HTTP_HEAD($request->@{qw< headers id>});
+   $response = $tus->HTTP_OPTIONS;
    $response = $tus->HTTP_PATCH($request->@{qw< headers id body >});
-   $response = $tus->HTTP_POST($request->@{qw< headers id body >});
+   $response = $tus->HTTP_POST($request->@{qw< headers body >}, $cb_data);
    $response = $tus->HTTP_DELETE($request->{headers}, $request->{id});
    # Again, the $response is-a Protocol::Tus::Response
 
@@ -80,7 +81,10 @@ with a specification useful for creating an instance:
       model => {
          class => 'Protocol::Tus::LocalDir',
          args  => { root => '/path/to/somewhere' },
-      }
+      },
+      generate_location => sub (%args) { ... },  # optional
+      on_create => sub (%args) { ... },     # optional
+      on_complete => sub (%args) { ... },   # optional
    );
 
 The C<model> can be retrieved through the C<model> accessor. It SHOULD
@@ -118,11 +122,11 @@ uploads; one possible way is in the example below (note: untested):
    app->start;
 
    sub call_tus ($c) {
-      state $tus = Protocol::Tus->new(
+      my $tus = Protocol::Tus->new(
          model => {
             class => 'Protocol::Tus::LocalDir',
             args  => { root => '/path/to/storage' },
-         }
+         },
       );
 
       my $request = $c->req;
@@ -132,36 +136,30 @@ uploads; one possible way is in the example below (note: untested):
          $request->headers->to_hash,
          $c->param('id'), # possibly undefined, it's OK
          \$body,
+         cb_data => sub ($id) { $c->url_for("/tus-upload/$id") },
       );
 
       # log any exception. It's a Ouch object, so you might want to
       # take a look into $exception->data too.
       if (defined(my $exception = $tus_response->exception)) {
          $c->app->log->error(bleep($exception));
+         $c->app->log->error($exception->data)
+            if eval { $exception->isa('Ouch') };
       }
 
       # prepare the response to the client
       my $response = $c->res;
 
       # transfer headers from the $tus_response
-      my $response_headers = $response->headers;
-      my $thdrs = $tus_response->headers; # hash ref
-      $response_headers->header($_ => $thdrs->{$_}) for keys($thdrs->%*);
+      my $res_headers = $c->res->headers;
+      my $tus_headers = $tus_response->headers; # hash ref
+      $res_headers->header($_ => $tus_headers->{$_})
+         for keys($tus_headers->%*);
 
       # rendering depends on the status code
-      my $status = $tus_response->status;
-      if ($status == 201) {  # set the Location header to the upload URL
-         my $id = $tus_response->id;
-         $response_headers->header(Location => "/tus/$id");
-         $c->rendered(201);
-      }
-      elsif ($status == 204) {
-         $c->rendered(204);
-      }
-      else {
-         my $message = $tus_response->body // '';
-         $c->render(status => $status, text => $message);
-      );
+      my $code = $tus_response->code;
+      my $body = $tus_response->body;
+      $c->render(status => $code, text => $text);
 
       return;
    }
@@ -205,9 +203,10 @@ holds the data.
 
 =back
 
-Each method receives the arguments that it needs as a positional
-argument list, as detailed below. Method starting with C<HTTP_> return
-an instance of L<Protocol::Tus::Response> and never raise exceptions.
+Each method receives the arguments that it needs either as a key/value
+pairs list or as a positional argument list, as detailed below. Method
+starting with C<HTTP_> return an instance of L<Protocol::Tus::Response>
+and never raise exceptions.
 
 You are encouraged to determine the structure of the identifier and, in
 case, make sure that it is consistent with the I<model> adopted. As an
@@ -217,20 +216,39 @@ case, it will be up to the caller of the different methods to figure out
 how to represent these identifiers in the external API and how to
 extract them from the requests coming from clients.
 
+=head2 B<< generate_location >>
+
+   my $coderef = $tus->generate_location;
+
+Accessor to the optional callback to turn an upload identifier into a
+C<Location> header needed in the C<201> response when creating a new
+upload. If not set, the caller is supposed to generate the C<Location>
+header independently.
+
+See L</new>.
+
 =head2 B<< new >>
 
-   my $tus = Protocol::Tus->new(model => $spec_or_object);
-   my $tus = Protocol::Tus->new({model => $spec_or_object});
+   my $tus = Protocol::Tus->new(
+      model => $spec_or_object,
+      generate_location => $sub_reference_1,
+      on_create    => $sub_reference_2,
+      on_complete  => $sub_reference_3,
+   );
+   my $tus = Protocol::Tus->new(
+      {
+         model => $spec_or_object,
+         generate_location => $sub_reference_1,
+         on_create    => $sub_reference_2,
+         on_complete  => $sub_reference_3,
+      }
+   );
 
 Create a new instance of a Protocol::Tus.
 
 The following keys are supported:
 
 =over
-
-=item C<< id_to_location >>
-
-set the callback to turn an identifier into a C<Location> header.
 
 =item C<< model >>
 
@@ -241,16 +259,57 @@ If an object is passed, it's assumed to be already valid; otherwise, the
 C<$spec_of_object> is supposed to be a hash reference with keys C<class>
 and C<args> to create one.
 
+=item C<< on_complete >>
+
+set the callback to invoke when an upload is successfully completed.
+
+The return value is ignored.
+
+=item C<< on_create >>
+
+set the callback to invoke when a new upload is successfully created. If
+you need to just set the C<Location> header in the response (which you
+are required to do as per the protocol interface) you might want to look
+into L</generate_location>; this method allows you to do fancier things
+with a more readable interface.
+
+The return value is ignored.
+
+=item C<< generate_location >>
+
+set the callback to turn an identifier into a C<Location> header when
+creating a new upload. The signature of this callback is as follows:
+
+   my $location = $callback->(%args);
+
+The return value I<MUST> be a value suitable for a C<Location> header in
+the response.
+
 =back
 
-=head2 B<< id_to_location >>
+The three callbacks are invoked as follows:
 
-   my $coderef = $tus->id_to_location;
+   $callback->(%args);
 
-Accessor to the optional callback to turn an upload identifier into a
-C<Location> header needed in the C<201> response when creating a new
-upload. If not set, the caller is supposed to generate the C<Location>
-header independently.
+The C<%args> supports the following key/value pairs:
+
+=over
+
+=item C<response>
+
+the L<Protocol::Tus::Response> currently candidate as a return value
+from the invoked method;
+
+=item C<tus>
+
+the L<Protocol::Tus> object invoking the callback;
+
+=item C<upload>
+
+the L<Protocol::Tus::Upload> object triggering the event.
+
+=back
+
 
 =head2 B<< model >>
 
@@ -259,17 +318,32 @@ header independently.
 Accessor to the model object. Most probably it will be something derived
 from L<Protocol::Tus::AbstractModel>, like L<Protocol::Tus::LocalDir>.
 
+=head2 B<< on_complete >>
+
+   my $coderef = $tus->on_complete;
+
+Accessor to the optional callback invoked upon completion of an upload.
+
+See L</new>.
+
+=head2 B<< on_create >>
+
+   my $coderef = $tus->on_create;
+
+Accessor to the optional callback invoked upon creation of an upload.
+
+See L</new>.
+
 =head2 B<< HTTP_request >>
 
-   my $response = $tus->HTTP_request(
-      $method,   # POST, PATCH, ...
-      $headers,  # hash reference
-      $id,       # id of the upload or undef/''
-      $body,     # or, better, passed as a ref to a scalar
-   );
+   my $response = $tus->HTTP_request(%args);
 
 Handle an incoming request. Not all arguments will be used but they are
 required to provide a single entry point for the whole Tus interface.
+
+Supported arguments are C<method>, C<headers>, C<body>, C<id>, and
+C<cb_data>.
+
 
 =head3 B<< HTTP_HEAD >>
 
@@ -285,12 +359,11 @@ required to provide a single entry point for the whole Tus interface.
 
 =head2 B<< HTTP_POST >>
 
-   my $response = $tus->HTTP_POST($headers, $id, $body);
+   my $response = $tus->HTTP_POST($headers, $body, $cb_data);
 
 =head2 B<< HTTP_DELETE >>
 
    my $response = $tus->HTTP_DELETE($headers, $id);
-
 
 =head1 BUGS AND LIMITATIONS
 

@@ -120,7 +120,7 @@ YAML
           instanceLocation => '/response/body/content/status',
           keywordLocation => jsonp(qw(/paths /foo/{foo_id} post responses default content application/json schema properties status const)),
           absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp(qw(/paths /foo/{foo_id} post responses default content application/json schema properties status const)))->to_string,
-          error => 'value does not match',
+          error => 'value does not match (strings not equal)',
         },
         {
           instanceLocation => '/response/body/content',

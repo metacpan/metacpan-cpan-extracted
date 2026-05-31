@@ -1,6 +1,7 @@
 package CPAN::MetaCurator::HTML;
 
-use 5.36.0;
+use boolean;
+use feature 'say';
 use parent 'CPAN::MetaCurator::Database';
 use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
@@ -11,7 +12,7 @@ use File::Spec;
 
 use Moo;
 
-our $VERSION = '1.17';
+our $VERSION = '1.21';
 
 # ------------------------------------------------
 
@@ -29,6 +30,10 @@ sub build_html
 	{
 		$header =~ s/!$_!/$data{$_}/;
 	}
+
+	# Special case. See Database.pm's build_pad().
+
+	$header =~ s/!packages_id!/$$pad{packages_id}/;
 
 	return ($header, $body, $footer);
 

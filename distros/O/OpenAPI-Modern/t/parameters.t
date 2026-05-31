@@ -231,8 +231,8 @@ subtest 'path parameters' => sub {
       errors => [
         {
           instanceLocation => '/request/uri/path/color',
-          keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          keywordLocation => $keyword_path.'/style',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
           error => 'cannot deserialize to any type',
         },
       ],
@@ -244,8 +244,8 @@ subtest 'path parameters' => sub {
       errors => [
         {
           instanceLocation => '/request/uri/path/color',
-          keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          keywordLocation => $keyword_path.'/style',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
           error => 'cannot deserialize to requested type (number)',
         },
       ],
@@ -297,8 +297,8 @@ subtest 'path parameters' => sub {
       errors => [
         {
           instanceLocation => '/request/uri/path/color',
-          keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          keywordLocation => $keyword_path.'/style',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
           error => 'cannot deserialize to requested type (object)',
         },
       ],
@@ -460,8 +460,8 @@ subtest 'path parameters' => sub {
       errors => [
         {
           instanceLocation => '/request/uri/path/color',
-          keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          keywordLocation => $keyword_path.'/style',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
           error => 'cannot deserialize to any type',
         },
       ],
@@ -573,8 +573,8 @@ subtest 'path parameters' => sub {
       errors => [
         {
           instanceLocation => '/request/uri/path/color',
-          keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          keywordLocation => $keyword_path.'/style',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
           error => 'cannot deserialize to requested type (object)',
         },
       ],
@@ -723,8 +723,8 @@ subtest 'path parameters' => sub {
       errors => [
         {
           instanceLocation => '/request/uri/path/color',
-          keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          keywordLocation => $keyword_path.'/style',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
           error => 'cannot deserialize to any type',
         },
       ],
@@ -764,8 +764,8 @@ subtest 'path parameters' => sub {
       errors => [
         {
           instanceLocation => '/request/uri/path/color',
-          keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          keywordLocation => $keyword_path.'/style',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
           error => 'cannot deserialize to requested type (object)',
         },
       ],
@@ -1055,7 +1055,7 @@ subtest 'query parameters' => sub {
       [ 'form', false, { 'blue−black', 'yes!', 'blackish﹠green', '¿no?', '100𝑥brown', 'fl¡p' },
         'q=blue%E2%88%92black,yes!,blackish%EF%B9%A0green,%C2%BFno?,100%F0%9D%91%A5brown,fl%C2%A1p' ],
       [ 'form', true,  { 'blue−black', 'yes!', 'blackish﹠green', '¿no?', '100𝑥brown', 'fl¡p' },
-        'blue%E2%88%92black=yes!&blackish%EF%B9%A0green=%C2%Bfno?&100%f0%9D%91%A5brown=fl%C2%A1p' ],
+        'blue%E2%88%92black=yes!&blackish%EF%B9%A0green=%C2%Bfno?&100%F0%9D%91%A5brown=fl%C2%A1p' ],
     ],
     [
       [ qw(style explode name content queries) ],
@@ -1127,8 +1127,8 @@ subtest 'query parameters' => sub {
       errors => [
         {
           instanceLocation => '/request/uri/query/color',
-          keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          keywordLocation => $keyword_path.'/style',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
           error => 'cannot deserialize to any type',
         },
       ],
@@ -1140,8 +1140,8 @@ subtest 'query parameters' => sub {
       errors => [
         {
           instanceLocation => '/request/uri/query/q',
-          keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          keywordLocation => $keyword_path.'/style',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
           error => 'cannot deserialize to requested type (number)',
         },
       ],
@@ -1379,8 +1379,8 @@ subtest 'query parameters' => sub {
       errors => [
         {
           instanceLocation => '/request/uri/query/color',
-          keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          keywordLocation => $keyword_path.'/style',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
           error => 'cannot deserialize to requested type (object)',
         },
       ],
@@ -1551,8 +1551,8 @@ subtest 'query parameters' => sub {
       errors => [
         {
           instanceLocation => '/request/uri/query/color',
-          keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          keywordLocation => $keyword_path.'/style',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
           error => 'spaceDelimited style can only deserialize to arrays or objects',
         },
       ],
@@ -1564,8 +1564,8 @@ subtest 'query parameters' => sub {
       errors => [
         {
           instanceLocation => '/request/uri/query/color',
-          keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          keywordLocation => $keyword_path.'/style',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
           error => 'spaceDelimited style can only deserialize to arrays or objects',
         },
       ],
@@ -1634,8 +1634,8 @@ subtest 'query parameters' => sub {
       errors => [
         {
           instanceLocation => '/request/uri/query/q',
-          keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          keywordLocation => $keyword_path.'/style',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
           error => 'spaceDelimited style can only deserialize to arrays or objects',
         },
       ],
@@ -1680,8 +1680,8 @@ subtest 'query parameters' => sub {
       errors => [
         {
           instanceLocation => '/request/uri/query/color',
-          keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          keywordLocation => $keyword_path.'/style',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
           error => 'cannot deserialize to requested type (object)',
         },
       ],
@@ -1719,8 +1719,8 @@ subtest 'query parameters' => sub {
       errors => [
         {
           instanceLocation => '/request/uri/query/color',
-          keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          keywordLocation => $keyword_path.'/style',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
           error => 'cannot deserialize to requested type (object)',
         },
       ],
@@ -1779,8 +1779,8 @@ subtest 'query parameters' => sub {
       errors => [
         {
           instanceLocation => '/request/uri/query/color',
-          keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          keywordLocation => $keyword_path.'/style',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
           error => 'deepObject style can only deserialize to objects',
         },
       ],
@@ -1855,8 +1855,8 @@ subtest 'query parameters' => sub {
       errors => [
         {
           instanceLocation => '/request/uri/query/q',
-          keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          keywordLocation => $keyword_path.'/style',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
           error => 'deepObject style can only deserialize to objects',
         },
       ],
@@ -2120,8 +2120,8 @@ subtest 'header parameters' => sub {
       errors => [
         {
           instanceLocation => '/response/header/My-Header',
-          keywordLocation => $keyword_path,
-          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path,
+          keywordLocation => $keyword_path.'/style',
+          absoluteKeywordLocation => $openapi->openapi_uri.'#'.$keyword_path.'/style',
           error => 'cannot deserialize to requested type (object)',
         },
       ],

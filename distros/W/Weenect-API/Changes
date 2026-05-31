@@ -1,0 +1,9 @@
+xxx
+
+	(Tracker) Add super_live.
+	(User) Add get_animals.
+	(User) Add get_preferences / set_preferences.
+
+1.00	2026-05-29
+
+	Initial release.

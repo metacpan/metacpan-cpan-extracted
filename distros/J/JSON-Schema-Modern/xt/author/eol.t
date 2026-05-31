@@ -136,6 +136,7 @@ my @files = (
     't/lib/MyVocabulary/ReservedKeyword.pm',
     't/lib/MyVocabulary/StringComparison.pm',
     't/max_depth.t',
+    't/media-types.t',
     't/multipleOf.t',
     't/pattern.t',
     't/read_serialized_file',

@@ -70,6 +70,6 @@ use Hypersonic;
 }
 
 # Cleanup
-system("rm -rf _test_cache_err*");
+do { local $@; eval { require File::Path; File::Path::remove_tree($_, { safe => 1, error => \my $e }) for grep { -e $_ } glob(qq(_test_cache_err*)); }; };
 
 done_testing();

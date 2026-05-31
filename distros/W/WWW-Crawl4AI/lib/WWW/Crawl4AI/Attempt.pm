@@ -64,7 +64,7 @@ WWW::Crawl4AI::Attempt - one strategy attempt in a WWW::Crawl4AI fallback chain
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

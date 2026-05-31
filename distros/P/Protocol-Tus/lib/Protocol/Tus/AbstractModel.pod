@@ -48,16 +48,14 @@ resources related to it.
 
 Abstract method, must be implemented in a derived class.
 
-   my $id = $model->create_upload($length, $metadata);
+   my $upload = $model->create_upload($length, $metadata);
 
 Kickstart a new upload. Both C<$length> and C<$metadata> might be
 C<undef> and the model class has to deal with it, e.g. in case extension
 C<creation-defer-length> is I<not> supported.
 
-In case of success it's supposed to return the identifier of the upload
-in a way that's meaningful for the model, keeping in mind that this
-identifier will probably be used (directly or not) to shape the exposed
-API.
+In case of success, a L<Protocol::Tus::Upload> object I<SHOULD> be
+returned, or anything that adheres to its interface.
 
 =head2 B<< extensions >>
 
@@ -164,6 +162,13 @@ Check if an upload (identified by C<$id>) is complete or not.
 
 Check if C<$extension_name> is part of the list provided by
 L</extensions>.
+
+=head2 B<< upload_for >>
+
+   my $upload = $model->upload_for($identifier);
+
+Get a L<Protocol::Tus::Upload> object to ease interacting with a
+specific upload instance.
 
 
 =head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)

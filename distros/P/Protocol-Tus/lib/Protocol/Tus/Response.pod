@@ -62,12 +62,8 @@ the headers can be manipulated.
 
    my $id = $response->id;
 
-Accessor to the upload identifier. This is mostly useful when creating a
-new upload, because it's necessary to set the C<Location> header in the
-actual response sent back to the client and this header has to somehow
-allow referencing this C<id>. For this use case, anyway, see
-L<Protocol::Tus/id_to_location> to allow L<Protocol::Tus> do the right
-thing for you.
+Accessor to the upload identifier, returns C<undef> if L</upload> is not
+defined.
 
 =head2 B<< is_error >>
 
@@ -102,6 +98,11 @@ L</exception>.
 
 Accessor to the status code of the response.
 
+=head2 B<< upload >>
+
+   my $upload = $response->upload;
+
+Accessor to the upload sub-object, if any.
 
 =head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
 

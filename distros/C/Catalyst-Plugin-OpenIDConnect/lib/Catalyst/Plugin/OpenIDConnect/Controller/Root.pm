@@ -139,7 +139,40 @@ sub authorize : Local {
     $code_challenge        //= $stored_auth_request->{code_challenge};
     $code_challenge_method //= $stored_auth_request->{code_challenge_method};
 
-    # Validate request parameters
+    # --- Phase 1: validate client_id and redirect_uri BEFORE using either in a
+    # redirect-based error response (NEW-HIGH-1 / RFC 6749 §4.1.2.1).
+    # Any error raised here returns a direct HTTP 400; we must never redirect
+    # to a URI that has not yet been confirmed as registered for the client.
+
+    unless ($client_id) {
+        $c->log->warn('Missing client_id parameter');
+        return $self->_json_error( $c, 'invalid_request', 'client_id is required' );
+    }
+
+    unless ($redirect_uri) {
+        $c->log->warn('Missing redirect_uri parameter');
+        return $self->_json_error( $c, 'invalid_request', 'redirect_uri is required' );
+    }
+
+    # Resolve client — must succeed before redirect_uri can be validated.
+    my $client = $c->openidconnect->get_client($client_id);
+    unless ($client) {
+        $c->log->error("Unknown client: $client_id");
+        return $self->_json_error( $c, 'invalid_client', 'Unknown client' );
+    }
+
+    # Validate redirect_uri against the registered list.
+    # Only after this check is it safe to use $redirect_uri in _error_response.
+    my @allowed_uris = _normalize_uri_list( $client->{redirect_uris} );
+    unless ( grep { $_ eq $redirect_uri } @allowed_uris ) {
+        $c->log->error("Redirect URI mismatch for client $client_id: $redirect_uri");
+        return $self->_json_error( $c, 'invalid_request',
+            'Redirect URI not registered' );
+    }
+
+    # --- Phase 2: remaining parameter validation — redirect_uri is now
+    # confirmed registered so _error_response redirects are safe from here on.
+
     unless ( $response_type && $response_type eq 'code' ) {
         $c->log->warn("Invalid response_type: $response_type");
         return $self->_error_response(
@@ -148,40 +181,36 @@ sub authorize : Local {
         );
     }
 
-    unless ($client_id) {
-        $c->log->warn('Missing client_id parameter');
-        return $self->_error_response(
-            $c, undef, 'invalid_request',
-            'client_id is required'
-        );
-    }
-
-    unless ($redirect_uri) {
-        $c->log->warn('Missing redirect_uri parameter');
-        return $self->_error_response(
-            $c, undef, 'invalid_request',
-            'redirect_uri is required'
-        );
-    }
-
-    # Get client config
-    my $client = $c->openidconnect->get_client($client_id);
-    unless ($client) {
-        $c->log->error("Unknown client: $client_id");
-        return $self->_error_response(
-            $c, $redirect_uri, 'invalid_client',
-            'Unknown client', $state
-        );
-    }
-
-    # Validate redirect URI
-    my @allowed_uris = _normalize_uri_list( $client->{redirect_uris} );
-    unless ( grep { $_ eq $redirect_uri } @allowed_uris ) {
-        $c->log->error("Redirect URI mismatch for client $client_id: $redirect_uri");
-        return $self->_error_response(
-            $c, undef, 'invalid_request',
-            'Redirect URI not registered'
-        );
+    # Restrict scope to the intersection of what was requested and what this
+    # client is registered for (NEW-MED-2 / RFC 6749 §3.3).
+    # Accepting arbitrary scope strings allows clients to obtain tokens
+    # bearing scopes they were never granted (e.g. "admin").
+    {
+        my @registered = split /\s+/, ( $client->{scope} // 'openid' );
+        my @requested  = split /\s+/, $scope;
+        my %allowed    = map { $_ => 1 } @registered;
+        my @effective  = grep { $allowed{$_} } @requested;
+        unless (@effective) {
+            $c->log->warn(
+                "No permitted scopes in request for client $client_id: $scope"
+            );
+            return $self->_error_response(
+                $c, $redirect_uri, 'invalid_scope',
+                'None of the requested scopes are registered for this client',
+                $state
+            );
+        }
+        # OIDC Core §3.1.2.1 — openid scope is mandatory for OIDC requests.
+        unless ( grep { $_ eq 'openid' } @effective ) {
+            $c->log->warn("Missing openid scope for client $client_id");
+            return $self->_error_response(
+                $c, $redirect_uri, 'invalid_scope',
+                'openid scope is required', $state
+            );
+        }
+        $scope = join ' ', @effective;
+        $c->log->debug("Effective scope for client $client_id: $scope")
+            if $config->{debug};
     }
 
     # Check if user is authenticated
@@ -222,6 +251,18 @@ sub authorize : Local {
             return $self->_error_response(
                 $c, $redirect_uri, 'invalid_request',
                 'code_challenge_method must be S256', $state
+            );
+        }
+        # Validate the challenge value format (NEW-LOW-1 / RFC 7636 §4.2).
+        # An S256 challenge is BASE64URL(SHA256(verifier)) — exactly 43 chars
+        # from the BASE64URL alphabet with no padding.  Reject malformed values
+        # before they reach the store or any downstream comparison.
+        unless ( $code_challenge =~ /\A[A-Za-z0-9\-_]{43}\z/ ) {
+            $c->log->warn("Malformed code_challenge for client $client_id");
+            return $self->_error_response(
+                $c, $redirect_uri, 'invalid_request',
+                'code_challenge must be a 43-character BASE64URL-encoded string',
+                $state
             );
         }
     }
@@ -352,6 +393,13 @@ sub userinfo : Local {
         $c->log->warn("Token verification failed: $_");
         return $self->_json_error( $c, 'invalid_token', "Token verification failed: $_" );
     };
+
+    # Reject ID tokens and refresh tokens presented as access tokens (NEW-MED-1).
+    # Access tokens carry typ=at+JWT (RFC 9068); all other token types must be refused.
+    unless ( ( $payload->{typ} // '' ) eq 'at+JWT' ) {
+        $c->log->warn('Presented token is not an access token (typ=' . ($payload->{typ} // 'missing') . ')');
+        return $self->_json_error( $c, 'invalid_token', 'Presented token is not an access token' );
+    }
 
     # Get user and claims
     my $user_id = $payload->{sub};
@@ -627,6 +675,19 @@ sub _handle_authorization_code_grant {
     # Use client_id from authorization code if not provided in request (public client flow)
     $client_id ||= $code_data->{client_id};
 
+    # Enforce that the client presenting the token request is the same client
+    # the authorization code was issued to (RFC 6749 §4.1.3, NEW-HIGH-2).
+    # Without this check a confidential client that obtains another client's
+    # code could redeem it by authenticating with its own valid secret.
+    if ( $client_id ne $code_data->{client_id} ) {
+        $c->log->warn(
+            "client_id mismatch at token endpoint: "
+            . "request=$client_id stored=$code_data->{client_id}"
+        );
+        return $self->_json_error( $c, 'invalid_grant',
+            'client_id does not match the authorization code' );
+    }
+
     # Verify redirect URI matches
     unless ( $code_data->{redirect_uri} eq $redirect_uri ) {
         $c->log->error("Redirect URI mismatch for code: $code (expected: " . $code_data->{redirect_uri} . ", got: $redirect_uri)");
@@ -684,6 +745,7 @@ sub _handle_authorization_code_grant {
         sub => $user_claims->{sub},
         aud => $client_id,
         scp => $code_data->{scope},
+        typ => 'at+JWT',  # RFC 9068 — distinguishes access tokens from ID/refresh tokens (NEW-MED-1)
         exp => $now + 3600,
     );
 
@@ -777,6 +839,7 @@ sub _handle_refresh_token_grant {
     my %new_payload = (
         sub => $payload->{sub},
         aud => $client_id,
+        typ => 'at+JWT',  # RFC 9068 — distinguishes access tokens from ID/refresh tokens (NEW-MED-1)
         exp => $now + 3600,
     );
 

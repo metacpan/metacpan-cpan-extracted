@@ -6,7 +6,7 @@ use 5.010;
 
 use parent 'Hypersonic::Event::Role';
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 sub name { 'iocp' }
 
@@ -47,6 +47,18 @@ typedef struct {
 
 /* AcceptEx function pointer (loaded dynamically) */
 static LPFN_ACCEPTEX lpfnAcceptEx = NULL;
+
+/* Per-IO data for Hypersonic::UA::Async slot tracking.
+ * One ASYNC_SLOT_IO is allocated per pending readiness notification
+ * and freed in gen_get_slot once the completion is delivered.
+ * Slot is also passed as the IOCP completion key (ULONG_PTR), so
+ * gen_get_slot recovers it cheaply via lpCompletionKey, falling
+ * back to overlapped->slot when the kernel delivers a NULL key. */
+typedef struct {
+    OVERLAPPED overlapped;
+    int slot;
+    char peek_buf[1];
+} ASYNC_SLOT_IO;
 C
 }
 
@@ -54,6 +66,98 @@ sub event_struct { 'OVERLAPPED_ENTRY' }
 
 sub extra_cflags  { '' }
 sub extra_ldflags { '-lws2_32 -lmswsock' }
+
+# Create the IOCP completion port without an associated listen socket.
+# Used by Hypersonic::UA::Async tick path (no server listener required).
+sub gen_create_loop {
+    my ($class, $builder, $loop_var) = @_;
+
+    $builder->comment('IOCP loop create (no listen socket - UA::Async tick path)')
+      ->line('WSADATA wsa_data;')
+      ->if('WSAStartup(MAKEWORD(2,2), &wsa_data) != 0')
+        ->line('croak("WSAStartup failed");')
+      ->endif
+      ->line('HANDLE iocp_loop = CreateIoCompletionPort(INVALID_HANDLE_VALUE, NULL, 0, 0);')
+      ->if('iocp_loop == NULL')
+        ->line('WSACleanup();')
+        ->line('croak("CreateIoCompletionPort (loop) failed");')
+      ->endif
+      ->line("$loop_var = (int)(intptr_t)iocp_loop;");
+}
+
+# ============================================================
+# UA::Async slot integration (stub)
+# ------------------------------------------------------------
+# IOCP is completion-based, not readiness-based, so we fake
+# readiness by posting a 1-byte WSARecv with MSG_PEEK (read) or
+# synthesizing an immediate completion via PostQueuedCompletionStatus
+# (write). The slot is carried both as the IOCP completion key
+# (ULONG_PTR) and inside the per-IO ASYNC_SLOT_IO struct, so
+# gen_get_slot can recover it from either source.
+# This is enough to drive Hypersonic::UA::Async's tick loop on
+# native Win32; high-throughput async users should still prefer
+# the dedicated IOCP path in the future-server JIT.
+# ============================================================
+
+sub gen_add_with_slot {
+    my ($class, $builder, $loop_var, $fd_var, $slot_var, $events) = @_;
+
+    $builder->line('{')
+      ->line("    HANDLE _iocp = (HANDLE)(intptr_t)$loop_var;")
+      ->comment('    Associate fd with IOCP (slot as completion key); idempotent / errors ignored.')
+      ->line("    CreateIoCompletionPort((HANDLE)(intptr_t)$fd_var, _iocp, (ULONG_PTR)$slot_var, 0);")
+      ->line('    ASYNC_SLOT_IO *_io = (ASYNC_SLOT_IO *)calloc(1, sizeof(ASYNC_SLOT_IO));')
+      ->if('!_io')
+        ->line('croak("calloc(ASYNC_SLOT_IO) failed");')
+      ->endif
+      ->line("    _io->slot = $slot_var;");
+
+    if ($events eq 'write') {
+        $builder->comment('    Writability: synthesize an immediate completion.')
+          ->line("    PostQueuedCompletionStatus(_iocp, 0, (ULONG_PTR)$slot_var, &_io->overlapped);");
+    }
+    else {
+        $builder->comment('    Readability: post a 1-byte WSARecv with MSG_PEEK so we get notified')
+          ->comment('    when data arrives without consuming it from the socket buffer.')
+          ->line('    WSABUF _buf;')
+          ->line('    _buf.buf = _io->peek_buf;')
+          ->line('    _buf.len = 1;')
+          ->line('    DWORD _flags = MSG_PEEK;')
+          ->line('    DWORD _bytes = 0;')
+          ->line("    int _rc = WSARecv((SOCKET)$fd_var, &_buf, 1, &_bytes, &_flags, &_io->overlapped, NULL);")
+          ->line('    if (_rc == SOCKET_ERROR && WSAGetLastError() != WSA_IO_PENDING) {')
+          ->comment('        Failed (e.g. socket closed): synthesize completion so caller can advance state.')
+          ->line("        PostQueuedCompletionStatus(_iocp, 0, (ULONG_PTR)$slot_var, &_io->overlapped);")
+          ->line('    }');
+    }
+    $builder->line('}');
+}
+
+sub gen_wait_once {
+    my ($class, $builder, $loop_var, $events_var, $count_var, $timeout_ms) = @_;
+
+    $builder->line('{')
+      ->line("    HANDLE _iocp = (HANDLE)(intptr_t)$loop_var;")
+      ->line('    ULONG _removed = 0;')
+      ->line("    BOOL _ok = GetQueuedCompletionStatusEx(_iocp, $events_var, MAX_EVENTS, &_removed, (DWORD)($timeout_ms), FALSE);")
+      ->line("    $count_var = _ok ? (int)_removed : 0;")
+      ->line('}');
+}
+
+sub gen_get_slot {
+    my ($class, $builder, $events_var, $index_var, $slot_var) = @_;
+
+    $builder->line("int $slot_var = -1;")
+      ->line('{')
+      ->line("    OVERLAPPED_ENTRY *_entry = &${events_var}" . "[$index_var];")
+      ->line("    $slot_var = (int)(intptr_t)_entry->lpCompletionKey;")
+      ->line('    if (_entry->lpOverlapped) {')
+      ->line('        ASYNC_SLOT_IO *_io = CONTAINING_RECORD(_entry->lpOverlapped, ASYNC_SLOT_IO, overlapped);')
+      ->line("        if ($slot_var < 0) $slot_var = _io->slot;")
+      ->line('        free(_io);')
+      ->line('    }')
+      ->line('}');
+}
 
 # IOCP is completion-based, fundamentally different from readiness-based APIs
 sub gen_create {

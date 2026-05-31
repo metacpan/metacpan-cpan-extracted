@@ -7,6 +7,8 @@ use Test::Warnings qw/:all/;
 use Test::Output;
 require 'rcon-minecraft';
 
+use Net::RCON::Minecraft;
+
 my $VER = Net::RCON::Minecraft->VERSION;
 
 stdout_like { main('--version')     } qr/^rcon-minecraft version $VER/;

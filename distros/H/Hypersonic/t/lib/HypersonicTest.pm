@@ -50,18 +50,23 @@ sub spawn_server {
         open STDERR, '>&=', 2 or die "reopen stderr: $!";
         select STDERR; $| = 1;
         select STDOUT; $| = 1;
-        # Make sure any C-level stdio buffers get flushed if the
-        # child dies via croak/exit/SIGPIPE rather than reaching the
-        # explicit exit() below.
         # Force Hypersonic to print a breadcrumb before JIT compile so
         # the captured log is never empty if wait_for_port gives up.
         local $ENV{HYPERSONIC_COMPILE_DIAG} = 1;
+        # Emit an EARLY breadcrumb (before `require Hypersonic`)
+        # because on slow smoker hosts (e.g. ARMv6 Pi w/ DEBUGGING
+        # perl) just loading Hypersonic.pm can take many seconds, and
+        # if the parent's wait_for_port budget elapses during that
+        # load we want the log to at least say "child reached fork"
+        # rather than be empty.
+        print STDERR "# HypersonicTest: child pid $$ alive, loading...\n";
         eval { $child_code->(); };
         my $err = $@;
         STDOUT->flush;
         STDERR->flush;
         if ($err) {
             print STDERR "child died: $err\n";
+            STDERR->flush;
             POSIX::_exit(70);  # EX_SOFTWARE
         }
         POSIX::_exit(0);
@@ -85,6 +90,24 @@ sub wait_for_port {
     # in CPAN tester reports on the k93msid host for perl 5.12..5.42.
     my $max_tries = $opts->{tries} // 300;
     my $sleep     = $opts->{sleep} // 0.2;
+
+    # Enforce a MINIMUM total wait of 60 wallclock seconds regardless
+    # of what the caller asked for. Most test files in this dist pass
+    # `tries => 50` which (at 0.2s/try) is only 10s; that's nowhere
+    # near enough for the JIT compile on a slow/DEBUGGING smoker.
+    # Also scale by PERL_TEST_TIME_OUT_FACTOR (some smokers set this
+    # to 3 to indicate "I'm a slow box, give tests 3x the budget").
+    # CPAN tester reports for Hypersonic 0.16 from k93msid (perl
+    # 5.34.1 DEBUGGING) and a Raspberry Pi (armv6, perl 5.42.2) both
+    # bailed because individual tests had `tries => 50` / `tries => 100`
+    # hard-coded. Rather than rewrite every test, raise the floor here.
+    my $factor = $ENV{PERL_TEST_TIME_OUT_FACTOR};
+    $factor = 1 unless defined $factor && $factor =~ /^\d+(?:\.\d+)?$/ && $factor > 0;
+    my $min_seconds = 60 * $factor;
+    my $asked_seconds = $max_tries * $sleep;
+    if ($asked_seconds < $min_seconds) {
+        $max_tries = int($min_seconds / $sleep) + 1;
+    }
 
     for my $try (1 .. $max_tries) {
         my $sock = IO::Socket::INET->new(

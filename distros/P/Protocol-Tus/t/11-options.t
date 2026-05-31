@@ -33,7 +33,10 @@ for my $spec (
    my ($method, $headers, $msg) = $spec->@*;
    my $response;
    lives_ok {
-      $response = $tus->HTTP_request($method, $headers, undef, '');
+      $response = $tus->HTTP_request(
+         method => $method,
+         headers => $headers,
+      );
    } 'HTTP_request';
    check_response($response, $msg);
 }

@@ -1,6 +1,7 @@
 package CPAN::MetaCurator::Database;
 
-use 5.36.0;
+use boolean;
+use feature 'say';
 use parent 'CPAN::MetaCurator::Config';
 use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
@@ -96,19 +97,19 @@ has output_path =>
 	required	=> 1,
 );
 
+has packages_path =>
+(
+	default		=> sub{return '/tmp/02packages.details.txt'},
+	is			=> 'rw',
+	isa			=> Str,
+	required	=> 0,
+);
+
 has pad =>
 (
 	default		=> sub{return {} },
 	is			=> 'rw',
 	isa			=> HashRef,
-	required	=> 0,
-);
-
-has visual_break =>
-(
-	default		=> sub{return '-' x 50},
-	is			=> 'rw',
-	isa			=> Str,
 	required	=> 0,
 );
 
@@ -120,7 +121,7 @@ has time_option =>
 	required	=> 0,
 );
 
-our $VERSION = '1.17';
+our $VERSION = '1.21';
 
 # -----------------------------------------------
 
@@ -130,6 +131,11 @@ sub build_pad
 	my($pad)			= {};
 	$$pad{count}		= {};
 	$$pad{count}{$_}	= 0 for (@{$self -> node_types});
+
+	# Special case. See HTML.pm's build_html().
+
+	my($packages_path)	= $self -> packages_path;
+	$$pad{packages_id}	= `head -8 $packages_path | tail -1`;
 
 	# Read all tables into the pad.
 
@@ -237,7 +243,6 @@ sub init_db
 	$self -> engine($self -> creator -> db_vendor =~ /(?:Mysql)/i ? 'engine=innodb' : '');
 	$self -> time_option($self -> creator -> db_vendor =~ /(?:MySQL|Postgres)/i ? '(0) without time zone' : '');
 	$self -> logger -> info("Connected to $dsn[0]");
-	$self -> logger -> info($self -> separator);
 
 } # End of init_db.
 
@@ -279,7 +284,6 @@ sub init_metapackager_db
 	$self -> metapackager_dbh -> do('PRAGMA foreign_keys = ON') if ($$config{dsn} =~ /SQLite/i);
 	$self -> metapackager_db(DBIx::Simple -> new($self -> metapackager_dbh) );
 	$self -> logger -> info("Connected to $dsn[0]");
-	$self -> logger -> info($self -> separator);
 
 } # End of init_metapackager_db.
 

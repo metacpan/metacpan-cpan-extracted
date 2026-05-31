@@ -1,7 +1,7 @@
 package CPAN::MetaCurator::Import;
 
-use 5.36.0;
 use boolean;
+use feature 'say';
 use parent 'CPAN::MetaCurator::Database';
 use warnings qw(FATAL utf8); # Fatalize encoding glitches.
 
@@ -25,7 +25,7 @@ has constants_csv_path =>
 	required	=> 0,
 );
 
-our $VERSION = '1.17';
+our $VERSION = '1.21';
 
 # -----------------------------------------------
 

@@ -32,33 +32,70 @@
       "develop" : {
          "requires" : {
             "Dist::Milla" : "v1.0.22",
-            "Path::Tiny" : "0.084",
+            "Path::Tiny" : "0.148",
             "Template::Perlish" : "1.52",
-            "Test::Exception" : "0",
+            "Test::Exception" : "0.43",
             "Test::Pod" : "1.51",
             "Test::Pod::Coverage" : "1.04"
          }
       },
       "runtime" : {
          "requires" : {
-            "Module::Runtime" : "0",
-            "Moo" : "0",
-            "Ouch" : "0",
-            "Path::Tiny" : "0.084",
-            "Try::Catch" : "0",
-            "namespace::clean" : "0",
+            "Module::Runtime" : "0.018",
+            "Moo" : "2.005005",
+            "Ouch" : "0.0501",
+            "Path::Tiny" : "0.148",
+            "Try::Catch" : "v1.1.0",
+            "namespace::clean" : "0.27",
             "perl" : "5.024000"
          }
       },
       "test" : {
          "requires" : {
-            "Path::Tiny" : "0.084",
-            "Test::Exception" : "0"
+            "Path::Tiny" : "0.148",
+            "Test::Exception" : "0.43"
          }
       }
    },
+   "provides" : {
+      "Protocol::Tus" : {
+         "file" : "lib/Protocol/Tus.pm",
+         "version" : "0.003"
+      },
+      "Protocol::Tus::AbstractModel" : {
+         "file" : "lib/Protocol/Tus/AbstractModel.pm",
+         "version" : "0.003"
+      },
+      "Protocol::Tus::LocalDir" : {
+         "file" : "lib/Protocol/Tus/LocalDir.pm",
+         "version" : "0.003"
+      },
+      "Protocol::Tus::Response" : {
+         "file" : "lib/Protocol/Tus/Response.pm",
+         "version" : "0.003"
+      },
+      "Protocol::Tus::Upload" : {
+         "file" : "lib/Protocol/Tus/Upload.pm",
+         "version" : "0.003"
+      },
+      "Protocol::Tus::Util" : {
+         "file" : "lib/Protocol/Tus/Util.pm",
+         "version" : "0.003"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.001",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/polettix/Protocol-Tus/issues"
+      },
+      "homepage" : "https://codeberg.org/polettix/Protocol-Tus",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://codeberg.org/polettix/Protocol-Tus.git",
+         "web" : "https://codeberg.org/polettix/Protocol-Tus"
+      }
+   },
+   "version" : "0.003",
    "x_contributors" : [
       "Flavio Poletti <flavio@polettix.it>"
    ],

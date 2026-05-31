@@ -16,6 +16,8 @@ lib/Protocol/Tus/LocalDir.pm
 lib/Protocol/Tus/LocalDir.pod
 lib/Protocol/Tus/Response.pm
 lib/Protocol/Tus/Response.pod
+lib/Protocol/Tus/Upload.pm
+lib/Protocol/Tus/Upload.pod
 lib/Protocol/Tus/Util.pm
 lib/Protocol/Tus/Util.pod
 t/00-load.t

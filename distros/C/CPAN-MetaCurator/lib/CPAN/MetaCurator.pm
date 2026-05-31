@@ -1,8 +1,6 @@
 package CPAN::MetaCurator;
 
-use 5.36.0;
-
-our $VERSION = '1.17';
+our $VERSION = '1.21';
 
 #-------------------------------------------------
 
@@ -21,10 +19,10 @@ Note: My web host and I use case-sensitive file systems.
 =head2 Prepare wikis
 =over
 =item cd ~/savage.net.au/
-=item Edit Perl.Wiki, etc. Includes updating the release date. Save to ~/Downloads/
-=item cp ~/Downloads/*.Wiki.html to misc/
+=item Edit Perl.Wiki as desired. Includes updating the release date. Save to ~/Downloads/
+=item cp ~/Downloads/Perl.Wiki.html to misc/
 =item git commit -am"Update Perl.Wiki V 1.xx"
-=item mv misc/*.Wiki.html to $DH (/dev/shm/html on my machine) for eye-ball check via FF
+=item cp misc/Perl.Wiki.html to $DH/misc (/dev/shm/html/misc on my machine) for eye-ball check via FF
 =back
 
 =head2 Export Perl.Wiki.html
@@ -32,7 +30,7 @@ Note: My web host and I use case-sensitive file systems.
 =item In the 'Tools' tab click 'export all'
 =item In the export menu click 'JSON format'. This creates ~/Downloads/tiddlers.json
 =item cd ~/perl.modules/CPAN-MetaCurator
-=item mv ~/Downloads/tiddlers.json data/tiddlers.json
+=item mv ~/Downloads/tiddlers.json data/
 =back
 
 =head2 Rebuild Perl Wiki Tree
@@ -40,7 +38,8 @@ Note: My web host and I use case-sensitive file systems.
 Note: Optionally use sqlite database (15 Mb) from CPAN::MetaPackager
 
 =over
-=item Set env var INCLUDE_PACKAGES=1 if you have /tmp/cpan.metapackager.sqlite available & to 0 (default) otherwise
+=item Set env var with: INCLUDE_PACKAGES=1 if you have /tmp/cpan.metapackager.sqlite available & to 0 (default) otherwise
+=item Test with: echo $INCLUDE_PACKAGES
 =item Run scripts/build.db.sh to import tiddlers.json file into database data/cpan.metacurator.sqlite
 =item Run scripts/export.tree.sh to export CPAN::MetaCurator database to html/cpan.metacurator.tree.html
 =item git push
@@ -51,7 +50,6 @@ Note: Optionally use sqlite database (15 Mb) from CPAN::MetaPackager
 =item cd ~/perl.modules/Local-Website
 =item Edit Local::Website::Util::PatchIndex's sub parser() if necessary
 =item Run scripts/parse.index.sh to patch ~/savage.net.au/index.html
-=item cp index.html $DH
 =item Backup new files: bu5.sh savage.net.au
 =item Backup new files: bu5.sh perl.modules
 =back

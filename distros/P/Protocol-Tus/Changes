@@ -1,2 +1,11 @@
+0.003  2026-05-30 15:45:23 CEST
+   - Reshape interface a bit
+   - Support for callback data or using the callback data directly as a
+     callback
+   - Add convenience class Protocol::Tus::Upload
+   - Change interface of create_upload to return a Protocol::Tus::Upload
+     object instead of an identifier
+   - Fix dependencies to address errors up to perl 5.36.3
+
 0.001  2026-05-25 07:27:30 CEST
    - Initial release (iteration1)

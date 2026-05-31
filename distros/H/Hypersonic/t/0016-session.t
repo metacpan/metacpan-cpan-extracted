@@ -7,7 +7,7 @@ use FindBin;
 use lib "$FindBin::Bin/../lib";
 
 # Clean up any cached XS modules for clean testing
-system("rm -rf _hypersonic_* _test_cache_*");
+do { local $@; eval { require File::Path; File::Path::remove_tree($_, { safe => 1, error => \my $e }) for grep { -e $_ } glob(qq(_hypersonic_* _test_cache_*)); }; };
 
 BEGIN {
     use_ok('Hypersonic');
@@ -307,6 +307,6 @@ subtest 'Session regeneration' => sub {
 };
 
 # Cleanup
-system("rm -rf _test_cache_session");
+do { local $@; eval { require File::Path; File::Path::remove_tree($_, { safe => 1, error => \my $e }) for grep { -e $_ } glob(qq(_test_cache_session)); }; };
 
 done_testing();

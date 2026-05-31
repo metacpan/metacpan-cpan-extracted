@@ -110,6 +110,6 @@ kill('TERM', $pid);
 waitpid($pid, 0);
 
 # Clean up cache
-system("rm -rf $cache_dir");
+do { local $@; eval { require File::Path; File::Path::remove_tree($_, { safe => 1, error => \my $e }) for grep { -e $_ } glob(qq($cache_dir)); }; };
 
 done_testing();

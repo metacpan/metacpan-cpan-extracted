@@ -59,7 +59,7 @@ plan tests => 10;
 # Cleanup
 for my $i (1..3) {
     my $dir = "_test_cache_mp$i";
-    system("rm -rf $dir") if -d $dir;
+    do { local $@; eval { require File::Path; File::Path::remove_tree($_, { safe => 1, error => \my $e }) for grep { -e $_ } glob(qq($dir)); }; };
 }
 
 done_testing();

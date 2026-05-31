@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use XS::JIT;
 use XS::JIT::Builder;
@@ -147,8 +147,10 @@ C
         ->line('XSRETURN(1);')
       ->endif
       ->blank
-      ->line('int flags = fcntl(client_fd, F_GETFL, 0);')
-      ->line('fcntl(client_fd, F_SETFL, flags | O_NONBLOCK);')
+      ->comment('Portable non-blocking: hs_set_nonblocking expands to')
+      ->comment('ioctlsocket(FIONBIO) on Win32 and fcntl(F_SETFL|O_NONBLOCK)')
+      ->comment('on POSIX. Defined by Hypersonic::JIT::Util::add_standard_includes.')
+      ->line('hs_set_nonblocking(client_fd);')
       ->blank
       ->line('ST(0) = sv_2mortal(newSViv(client_fd));')
       ->xs_return('1')
@@ -254,13 +256,27 @@ C
       ->line('    "Connection: keep-alive\\r\\n\\r\\n",')
       ->line('    content_type, body_len);')
       ->blank
-      ->line('struct iovec iov[2];')
-      ->line('iov[0].iov_base = header;')
-      ->line('iov[0].iov_len = (size_t)hdr_len;')
-      ->line('iov[1].iov_base = (void*)body;')
-      ->line('iov[1].iov_len = body_len;')
-      ->blank
-      ->line('ssize_t sent = writev((int)fd, iov, 2);')
+      # writev() / struct iovec are POSIX-only (sys/uio.h). On Windows
+      # we'd have to use WSASend with WSABUF[]; for simplicity (and
+      # because Win32 perl smokers run mostly correctness, not perf,
+      # tests) just emit two send() calls. Header is always <512 bytes
+      # so the kernel-buffer copy is negligible.
+      ->raw(<<'C')
+#ifdef _WIN32
+    ssize_t sent = send((int)fd, header, (size_t)hdr_len, 0);
+    if (sent > 0 && body_len > 0) {
+        ssize_t sent2 = send((int)fd, body, (size_t)body_len, 0);
+        if (sent2 > 0) sent += sent2;
+    }
+#else
+    struct iovec iov[2];
+    iov[0].iov_base = header;
+    iov[0].iov_len  = (size_t)hdr_len;
+    iov[1].iov_base = (void*)body;
+    iov[1].iov_len  = body_len;
+    ssize_t sent = writev((int)fd, iov, 2);
+#endif
+C
       ->line('ST(0) = sv_2mortal(newSViv((IV)sent));')
       ->xs_return('1')
       ->xs_end;

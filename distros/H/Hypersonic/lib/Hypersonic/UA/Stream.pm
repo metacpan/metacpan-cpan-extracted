@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use constant {
     STATE_INIT      => 0,

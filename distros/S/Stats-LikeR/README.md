@@ -915,6 +915,12 @@ as of version 0.07, `write_table` determines comma and tab-separated delimiters 
 
 # changes
 
+## 0.09
+
+context changes in XS `dTHX`, `pTHX_`, and `aTHX_` to get better CPAN testing results
+
+`restrict` keywords added to `lm` to increase speed
+
 ## 0.08
 
 Speed improvement in `summary` of hashes.

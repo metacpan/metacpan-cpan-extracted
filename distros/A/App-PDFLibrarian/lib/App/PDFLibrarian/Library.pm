@@ -19,7 +19,7 @@ use strict;
 use warnings;
 
 package App::PDFLibrarian::Library;
-$App::PDFLibrarian::Library::VERSION = '6.0.3';
+$App::PDFLibrarian::Library::VERSION = '6.2.0';
 use parent 'Exporter';
 
 use Carp;
@@ -143,13 +143,13 @@ sub make_pdf_links {
       my $yearstr .= " " . $bibentry->get("year");
 
       # link name by author
-      $pdflinkby{Author} = "$authorstr $yearstr $titlestr";
+      $pdflinkby{author} = "$authorstr $yearstr $titlestr";
 
       # link name by title
-      $pdflinkby{Title} = "$titlestr $authorstr $yearstr";
+      $pdflinkby{title} = "$titlestr $authorstr $yearstr";
 
       # link name by year
-      $pdflinkby{Year} = "$yearstr $authorstr $titlestr";
+      $pdflinkby{year} = "$yearstr $authorstr $titlestr";
 
     }
 
@@ -171,14 +171,14 @@ sub make_pdf_links {
       my @collaborations = format_bib_authors("vl", undef, "", $bibentry->names("collaboration"));
 
       # make links
-      foreach my $by (qw(Year Title)) {
+      foreach my $by (qw(year title)) {
         foreach my $author (@collaborations, @authors) {
           next if $author eq "";
-          push @links, ["Authors", $author, "${by}s", "$pdflinkby{$by}"];
+          push @links, ["Authors", $author, "by_${by}s", "$pdflinkby{$by}"];
         }
         foreach my $editor (@editors) {
           next if $editor eq "";
-          push @links, ["Authors", "$editor ed", "${by}s", "$pdflinkby{$by}"];
+          push @links, ["Authors", "$editor ed", "by_${by}s", "$pdflinkby{$by}"];
         }
       }
 
@@ -187,14 +187,14 @@ sub make_pdf_links {
     # make links by first word of title
     my $firstword = ucfirst($title);
     $firstword =~ s/\s.*$//;
-    foreach my $by (qw(Author Year)) {
-      push @links, ["Titles", $firstword, "${by}s", "$pdflinkby{$by}"];
+    foreach my $by (qw(author year)) {
+      push @links, ["Titles", $firstword, "by_${by}s", "$pdflinkby{$by}"];
     }
 
     # make links by year
-    foreach my $by (qw(Author Title)) {
+    foreach my $by (qw(author title)) {
       my $year = $bibentry->get("year") // "!NO-YEAR!";
-      push @links, ["Years", $year, "${by}s", "$pdflinkby{$by}"];
+      push @links, ["Years", $year, "by_${by}s", "$pdflinkby{$by}"];
     }
 
     # make links by keyword(s)
@@ -208,9 +208,12 @@ sub make_pdf_links {
     }
     foreach my $keyword (keys %keywords) {
       my @subkeywords = split /:|(?: - )/, $keyword;
-      s/\b(\w)/\U$1\E/g for @subkeywords;
-      foreach my $by (qw(Author Title Year)) {
-        push @links, ["Keywords", @subkeywords, "${by}s", "$pdflinkby{$by}"];
+      foreach my $subkeyword (@subkeywords) {
+        $subkeyword =~ s/\b(\w)/\U$1\E/g;
+        $subkeyword = "kw_" . $subkeyword;
+      }
+      foreach my $by (qw(author title year)) {
+        push @links, ["Keywords", @subkeywords, "by_${by}s", "$pdflinkby{$by}"];
       }
     }
 
@@ -225,7 +228,7 @@ sub make_pdf_links {
         $eprintprefix =~ s/[^\d]//g;
         $eprintprefix = substr($eprintprefix, 0, 2);
       }
-      push @links, ["Pre Prints", "$archiveprefix", "$eprintprefix", "$eprint $pdflinkby{Author}"];
+      push @links, ["Pre Prints", "$archiveprefix", "$eprintprefix", "$eprint $pdflinkby{author}"];
     }
 
     if (grep { $bibentry->type eq $_ } qw(article)) {
@@ -250,7 +253,7 @@ sub make_pdf_links {
         $volume = $bibentry->get("volume") // "!NO-VOLUME!";
         $pages = $bibentry->get("pages") // "!NO-PAGES!";
       }
-      push @links, ["Journals", "$journal", "v$volume", "p$pages $pdflinkby{Author}"];
+      push @links, ["Journals", "$journal", "v$volume", "p$pages $pdflinkby{author}"];
 
     } elsif (grep { $bibentry->type eq $_ } qw(techreport)) {
 
@@ -264,12 +267,12 @@ sub make_pdf_links {
         $numberprefix =~ s/[^\d]//g;
         $numberprefix = substr($numberprefix, 0, 2);
       }
-      push @links, ["Tech Reports", "$institution", "$numberprefix", "$number $pdflinkby{Author}"];
+      push @links, ["Tech Reports", "$institution", "$numberprefix", "$number $pdflinkby{author}"];
 
     } elsif (grep { $bibentry->type eq $_ } qw(book inbook proceedings)) {
 
       # make links to books and (whole) proceedings
-      push @links, ["Books", "$pdflinkby{Author}"];
+      push @links, ["Books", "$pdflinkby{author}"];
 
     } elsif (grep { $bibentry->type eq $_ } qw(conference incollection inproceedings)) {
 
@@ -277,33 +280,33 @@ sub make_pdf_links {
       my $booktitle = remove_tex_markup_undef($bibentry->get("booktitle")) // "!NO-BOOKTITLE!";
       my $pages = $bibentry->get("pages") // "!NO-PAGES!";
       $booktitle = join(' ', map { ucfirst($_) } remove_short_words(split(/\s+/, $booktitle)));
-      push @links, ["In", $booktitle, "p$pages $pdflinkby{Author}"];
+      push @links, ["In", $booktitle, "p$pages $pdflinkby{author}"];
       if ($bibentry->exists("series")) {
         my $series = remove_tex_markup($bibentry->get("series"));
         my $volume = $bibentry->get("volume") // "!NO-VOLUME!";
-        push @links, ["In", "$series", "v$volume", "p$pages $pdflinkby{Author}"];
+        push @links, ["In", "$series", "v$volume", "p$pages $pdflinkby{author}"];
       }
 
     } elsif (grep { $bibentry->type eq $_ } qw(mastersthesis phdthesis)) {
 
       # make links to theses
-      push @links, ["Theses", "$pdflinkby{Author}"];
+      push @links, ["Theses", "$pdflinkby{author}"];
 
     } elsif ($bibentry->exists('howpublished')) {
 
       # make links by publication method
       my $howpublished = $bibentry->get("howpublished");
       $howpublished = join(' ', map { ucfirst($_) } remove_short_words(split(/\s+/, $howpublished)));
-      foreach my $by (qw(Author Title Year)) {
-        push @links, ["How Published", $howpublished, "${by}s", "$pdflinkby{$by}"];
+      foreach my $by (qw(author title year)) {
+        push @links, ["How Published", $howpublished, "by_${by}s", "$pdflinkby{$by}"];
       }
 
     } else {
 
       # make links to everything else
       my $type = ucfirst($bibentry->type);
-      foreach my $by (qw(Author Title Year)) {
-        push @links, ["Other", "${type}s", "${by}s", "$pdflinkby{$by}"];
+      foreach my $by (qw(author title year)) {
+        push @links, ["Other", "${type}s", "by_${by}s", "$pdflinkby{$by}"];
       }
 
     }

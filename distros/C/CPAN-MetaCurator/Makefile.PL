@@ -41,6 +41,7 @@ my(%params) =
 		'DateTime'					=> 1.65,
 		'DateTime::Tiny'			=> 1.07,
 		'ExtUtils::MakeMaker'		=> 7.70,
+		'feature'					=> 1.89,
 		'File::Slurper'				=> 0.014,
 		'File::Spec'				=> 3.90,
 		'Getopt::Long'				=> 2.57,

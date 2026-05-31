@@ -2,6 +2,61 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.11] - 2026-05-30 Fixed PREREQ_PM in Makefile.PL
+
+## [0.10] - 2026-05-30 (Security Fixes: NEW-HIGH-1, NEW-HIGH-2, NEW-MED-1, NEW-MED-2, NEW-LOW-1)
+
+### Security
+
+- **NEW-HIGH-1 fixed — Open redirect via unvalidated `redirect_uri` in
+  pre-validation error responses** (`Controller::Root`).  The `authorize`
+  action previously called `_error_response` (which issues an HTTP redirect)
+  with the client-supplied `redirect_uri` before that URI had been validated
+  against the client's registered list.  The action is now split into two
+  explicit phases: Phase 1 validates `client_id`, looks up the client, and
+  checks `redirect_uri` against the registered list, returning direct HTTP 400
+  responses (`_json_error`) for any failure.  Only after Phase 1 succeeds are
+  redirect-based error responses used.  This conforms with RFC 6749 §4.1.2.1.
+
+- **NEW-HIGH-2 fixed — Cross-client authorization code redemption at the token
+  endpoint** (`Controller::Root`).  After resolving `client_id` at the token
+  endpoint, the handler now immediately asserts that the resolved value equals
+  the `client_id` stored inside the authorization code.  A mismatch returns
+  `invalid_grant` before redirect URI verification or client authentication,
+  preventing a confidential client from redeeming a code that was issued to a
+  different client (RFC 6749 §4.1.3).
+
+- **NEW-MED-1 fixed — Token type confusion at the UserInfo endpoint**
+  (`Controller::Root`).  Access tokens now carry `typ: at+JWT` (RFC 9068) at
+  both issuance paths: the authorization code grant and the refresh token grant.
+  The `userinfo` action rejects any bearer token whose `typ` claim is absent or
+  not `at+JWT`, preventing ID tokens and refresh tokens from being accepted as
+  access tokens.
+
+- **NEW-MED-2 fixed — Requested scope not validated against registered client
+  scopes** (`Controller::Root`).  The `authorize` action now intersects the
+  requested scope with the client's registered scope list (RFC 6749 §3.3).  An
+  empty intersection returns `invalid_scope`.  A missing `openid` scope (OIDC
+  Core §3.1.2.1 mandatory) also returns `invalid_scope`.  The effective
+  (narrowed) scope overwrites `$scope` so all downstream code — the session,
+  `create_authorization_code`, and the `scp` claim in issued access tokens —
+  reflects only permitted scopes.
+
+- **NEW-LOW-1 fixed — PKCE `code_challenge` not validated for format**
+  (`Controller::Root`).  When a `code_challenge` is supplied, the `authorize`
+  action now validates that the value matches `\A[A-Za-z0-9\-_]{43}\z` —
+  exactly 43 BASE64URL characters with no padding, as required by RFC 7636
+  §4.2 for S256 challenges.  A malformed value returns `invalid_request`
+  before the code reaches the store.
+
+## [0.09] - 2026-05-27 POD review and initial CPAN release
+
+### POD documentation
+
+- All perldoc stanzas reviewed and reformatted as needed for clarity.
+- Standard perldoc tests now included.
+- Updated MANIFEST to include all required files.
+
 ## [0.08] - 2026-04-29 (Security Fix: MED-6)
 
 ### Security

@@ -66,7 +66,11 @@ for my $spec (
 
    my $response;
    lives_ok {
-      $response = $tus->HTTP_request($method, \%headers, undef, $body);
+      $response = $tus->HTTP_request(
+         method => $method,
+         headers => \%headers,
+         body => \$body,
+      );
    } 'HTTP_request';
    check_response($response, $msg);
 }

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use constant {
     STATE_INIT     => 0,
@@ -37,7 +37,13 @@ sub generate_c_code {
     $opts //= {};
     my $max = $opts->{max_streams} // MAX_STREAMS;
     
-    $builder->line('#include <sys/uio.h>')
+    # sys/uio.h is POSIX-only (writev + struct iovec live there).
+    # On Windows we fall back to multiple send() calls (see
+    # stream_write_chunk_http1 below). Winsock headers are pulled in
+    # by Hypersonic::JIT::Util / Hypersonic::Socket already.
+    $builder->line('#ifndef _WIN32')
+      ->line('#include <sys/uio.h>')
+      ->line('#endif')
       ->blank;
     
     $class->gen_stream_registry($builder, $max);
@@ -131,14 +137,25 @@ sub gen_stream_write_chunk_c {
       ->line('    if (len == 0) return;')
       ->line('    char size_line[32];')
       ->line('    int header_len = snprintf(size_line, sizeof(size_line), "%zx\\r\\n", len);')
-      ->line('    struct iovec iov[3];')
-      ->line('    iov[0].iov_base = size_line;')
-      ->line('    iov[0].iov_len = header_len;')
-      ->line('    iov[1].iov_base = (void*)data;')
-      ->line('    iov[1].iov_len = len;')
-      ->line('    iov[2].iov_base = "\\r\\n";')
-      ->line('    iov[2].iov_len = 2;')
-      ->line('    writev(fd, iov, 3);')
+      ->raw(<<'C')
+#ifdef _WIN32
+    /* No writev on Windows; three send() calls instead. The chunk
+     * size line is tiny and the trailing CRLF is 2 bytes so the
+     * extra syscalls are negligible. */
+    send(fd, size_line, header_len, 0);
+    send(fd, data, len, 0);
+    send(fd, "\r\n", 2, 0);
+#else
+    struct iovec iov[3];
+    iov[0].iov_base = size_line;
+    iov[0].iov_len = header_len;
+    iov[1].iov_base = (void*)data;
+    iov[1].iov_len = len;
+    iov[2].iov_base = "\r\n";
+    iov[2].iov_len = 2;
+    writev(fd, iov, 3);
+#endif
+C
       ->line('    stream_registry[fd].chunks_sent++;')
       ->line('}')
       ->blank;

@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.136-6-g94402c57
+package OpenAPI::Modern; # git description: v0.137-10-g8faa518a
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.0 v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.137';
+our $VERSION = '0.138';
 
 use 5.020;
 use utf8;
@@ -1369,7 +1369,7 @@ sub _deserialize_style ($self, $data, $state, %opt) {
         'explode=true is not supported for style=%s', $style)
       if $explode;
 
-    return E({ %$state, data_path => jsonp($state->{data_path}, $name) },
+    return E({ %$state, data_path => jsonp($state->{data_path}, $name), keyword => 'style' },
         '%s style can only deserialize to arrays or objects', $style)
       if not elem([qw(array object)], \@types);
 
@@ -1413,7 +1413,7 @@ sub _deserialize_style ($self, $data, $state, %opt) {
         '"explode" cannot be false with style=deepObject')
       if not $explode and $self->openapi_document->oas_version < '3.2';
 
-    return E({ %$state, data_path => jsonp($state->{data_path}, $name) },
+    return E({ %$state, data_path => jsonp($state->{data_path}, $name), keyword => 'style' },
         'deepObject style can only deserialize to objects')
       if not elem('object', \@types);
 
@@ -1477,7 +1477,7 @@ sub _deserialize_style ($self, $data, $state, %opt) {
     die 'unsupported style ', $style;
   }
 
-  return E({ %$state, data_path => jsonp($state->{data_path}, $name) },
+  return E({ %$state, data_path => jsonp($state->{data_path}, $name), keyword => 'style' },
     'cannot deserialize to %s type%s%s', !@types ? 'any' : 'requested', @types > 1 ? 's' : '',
     @types ? ' ('.join(', ', @types).')' : '');
 }
@@ -2039,7 +2039,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.0, 
 
 =head1 VERSION
 
-version 0.137
+version 0.138
 
 =head1 SYNOPSIS
 
@@ -2509,10 +2509,10 @@ reloading them (perhaps by using a timestamp or checksum to determine if a fresh
       );
       $openapi->evaluator->add_schema(decode_json(...));  # any other needed schemas
       my $frozen = Sereal::Encoder->new({ freeze_callbacks => 1 })->encode($openapi);
-      $serialized_file->spew_raw($frozen);
+      $serialized_file->spew($frozen);
     }
     else {
-      my $frozen = $serialized_file->slurp_raw;
+      my $frozen = $serialized_file->slurp;
       $openapi = Sereal::Decoder->new->decode($frozen);
     }
 
@@ -2548,14 +2548,17 @@ which treats the `format` keyword as an assertion, and also prevents any unknown
 used in JSON Schemas. This is useful to avoid
 spelling mistakes from going unnoticed and resulting in false positive results.
 
-The OpenAPI v3.0 schema document is also available, for use in validating v3.0.x OpenAPI
-descriptions, but parsing of the description (e.g. for use in request and response validation) is
-not supported. It can be used directly as a schema (e.g. by using its URI in a C<$schema> or C<$ref>
-keyword) after calling L<JSON::Schema::Modern::Utilities/load_cached_document>.
+The OpenAPI v3.0 schema document is also available; its JSON Schema dialect can be used directly as
+a schema (e.g. by using its URI in a C<$schema> or C<$ref> keyword) after calling
+L<JSON::Schema::Modern::Utilities/load_cached_document>, e.g.:
+
+  ...
+  "$schema": "https://spec.openapis.org/oas/3.0/schema/2024-10-18#/definitions/Schema",
+  ...
 
 =head1 ON THE USE OF JSON SCHEMAS
 
-Embedded JSON Schemas, through the use of the C<schema> keyword, are fully draft2020-12-compliant,
+Embedded JSON Schemas, through the use of the C<$schema> keyword, are fully draft2020-12-compliant,
 as per the spec, and implemented with L<JSON::Schema::Modern>. Unless overridden with the use of the
 L<jsonSchemaDialect|https://spec.openapis.org/oas/latest#specifying-schema-dialects> keyword, their
 metaschema is the "dialect" schema listed at L<https://spec.openapis.org/oas/#schema-iterations>, which allows for use of the
@@ -2737,6 +2740,26 @@ L<https://spec.openapis.org/oas/v3.2>
 =item *
 
 L<https://spec.openapis.org/oas>
+
+=item *
+
+L<RFC9110: HTTP Semantics|https://datatracker.ietf.org/doc/html/rfc9110>
+
+=item *
+
+L<RFC9112: HTTP/1.1|https://datatracker.ietf.org/doc/html/rfc9112>
+
+=item *
+
+L<RFC3986: Uniform Resource Identifier (URI): Generic Syntax|https://datatracker.ietf.org/doc/html/rfc3986>
+
+=item *
+
+L<RFC6265: HTTP State Management Mechanism|https://datatracker.ietf.org/doc/html/rfc6265>
+
+=item *
+
+L<RFC6570: URI Template|https://datatracker.ietf.org/doc/html/rfc6570>
 
 =back
 

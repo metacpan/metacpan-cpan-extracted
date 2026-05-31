@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Document::OpenAPI;
 # ABSTRACT: One OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: JSON Schema data validation request response OpenAPI
 
-our $VERSION = '0.137';
+our $VERSION = '0.138';
 
 use 5.020;
 use utf8;
@@ -756,15 +756,14 @@ JSON::Schema::Modern::Document::OpenAPI - One OpenAPI v3.0, v3.1 or v3.2 documen
 
 =head1 VERSION
 
-version 0.137
+version 0.138
 
 =head1 SYNOPSIS
 
-  use JSON::Schema::Modern::Document::OpenAPI;
-
   my $openapi_document = JSON::Schema::Modern::Document::OpenAPI->new(
     canonical_uri => 'https://example.com/v1/api',
-    schema => decode_json(<<JSON),
+    metaschema_uri => 'https://example.com/my_custom_metaschema',
+    schema => decode_json(<<'JSON'));
   {
     "openapi": "3.2.0",
     "$self": "openapi.json",
@@ -782,8 +781,6 @@ version 0.137
     }
   }
   JSON
-    metaschema_uri => 'https://example.com/my_custom_metaschema',
-  );
 
 =head1 DESCRIPTION
 

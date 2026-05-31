@@ -1,5 +1,5 @@
 package Protocol::Tus::Util;
-{ our $VERSION = '0.001' }
+{ our $VERSION = '0.003' }
 use v5.24;
 use warnings;
 use experimental qw< signatures >;
@@ -50,9 +50,9 @@ sub response (@args) {
    return Protocol::Tus::Response->new(@args);
 }
 
-sub response_from_exception ($exception) {
+sub response_from_exception ($exception, %args) {
    require Protocol::Tus::Response;
-   return Protocol::Tus::Response->new_from_exception($exception);
+   return Protocol::Tus::Response->new_from_exception($exception, %args);
 }
 
 sub validate_checksum ($dref, $chk) {

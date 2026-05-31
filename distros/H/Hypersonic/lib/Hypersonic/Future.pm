@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 # High-performance JIT-compiled Future for async operations
 # Serves as the foundation for all async in Hypersonic:
@@ -1290,6 +1290,15 @@ sub compile {
 
     return 1 if $COMPILED;
 
+    # Future compilation pulls in Pool, which emits pthread + self-pipe
+    # C that doesn't build on native Windows. See Pool::compile() for
+    # the full explanation. Bail with a clear message so callers
+    # (server JIT, t/1001..1009) can skip cleanly.
+    if ($^O eq 'MSWin32') {
+        die "Hypersonic::Future / ::Pool is not supported on Windows "
+          . "(uses POSIX pthread + self-pipe). Skip on \$^O eq 'MSWin32'.\n";
+    }
+
     require XS::JIT;
 
     my $cache_dir = $opts{cache_dir} // '_hypersonic_cache/future';
@@ -1303,11 +1312,19 @@ sub compile {
     # Collect functions from Future
     my %functions = %{ $class->get_xs_functions };
 
-    # Include Pool - Future compilation always includes Pool
-    require Hypersonic::Future::Pool;
-    Hypersonic::Future::Pool->generate_c_code($builder, \%opts);
-    %functions = (%functions, %{ Hypersonic::Future::Pool->get_xs_functions });
-    $Hypersonic::Future::Pool::COMPILED = 1;
+    # Include Pool - Future compilation always includes Pool.
+    # EXCEPT on Windows: Pool's worker model is pthread + pipe(2) +
+    # fcntl/O_NONBLOCK, none of which exist in MinGW/MSVC. Skipping
+    # Pool here keeps Future itself usable on Win32 (basic
+    # done/fail/wait); attempting to call Future::Pool->new on Win32
+    # will give "Undefined subroutine" which the t/1003..t/1009 tests
+    # skip_all around.
+    if ($^O ne 'MSWin32') {
+        require Hypersonic::Future::Pool;
+        Hypersonic::Future::Pool->generate_c_code($builder, \%opts);
+        %functions = (%functions, %{ Hypersonic::Future::Pool->get_xs_functions });
+        $Hypersonic::Future::Pool::COMPILED = 1;
+    }
 
     my $code = $builder->code;
 
@@ -1317,18 +1334,24 @@ sub compile {
     # they live in libpthread and the JIT-compiled .so fails dlopen
     # with "Undefined symbol 'pthread_create'". Add the flags
     # unconditionally - they're no-ops on platforms that don't need them.
+    # On Windows there's no Pool, so no pthread either.
+    my %extra;
+    if ($^O ne 'MSWin32') {
+        $extra{extra_cflags}  = '-pthread';
+        $extra{extra_ldflags} = '-lpthread';
+    }
     XS::JIT->compile(
         code         => $code,
         name         => $MODULE_NAME,
         cache_dir    => $cache_dir,
         functions    => \%functions,
-        extra_cflags => '-pthread',
-        extra_ldflags => '-lpthread',
+        %extra,
     );
 
     # Register custom ops to replace method calls at compile time
     $class->_register_ops();
-    Hypersonic::Future::Pool->_register_ops();
+    Hypersonic::Future::Pool->_register_ops()
+        if $^O ne 'MSWin32';
 
     # Install direct XS function aliases - eliminates Perl wrapper overhead
     no warnings 'redefine';

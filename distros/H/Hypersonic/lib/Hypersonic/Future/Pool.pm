@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use XS::JIT::Builder;
 use Hypersonic::Future qw(MAX_FUTURES);
@@ -840,6 +840,19 @@ sub compile {
     my ($class, %opts) = @_;
 
     return 1 if $COMPILED;
+
+    # Pool's JIT C uses pthread + a self-pipe (fcntl(O_NONBLOCK) +
+    # read/write on pipe fds). Neither exists on native Windows
+    # (Strawberry/Activestate). A real Win32 port would use
+    # CRITICAL_SECTION + CONDITION_VARIABLE + _beginthreadex and a
+    # pair of socketpair()-emulated sockets for the notify fd; that
+    # is well out of scope for the minimum-viable Windows release.
+    # Die with a clear message so the test files (1001..1009) can
+    # SKIP cleanly via eval { Pool->compile } / plan skip_all.
+    if ($^O eq 'MSWin32') {
+        die "Hypersonic::Future::Pool is not supported on Windows "
+          . "(uses POSIX pthread + self-pipe). Skip on \$^O eq 'MSWin32'.\n";
+    }
 
     # Pool is compiled together with Future - just call Future's compile
     Hypersonic::Future->compile(%opts);

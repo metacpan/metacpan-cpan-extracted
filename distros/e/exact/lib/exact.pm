@@ -8,9 +8,10 @@ use namespace::autoclean;
 use B::Deparse;
 use Import::Into;
 use Sub::Util 'set_subname';
+use Syntax::Keyword::Defer;
 use Syntax::Keyword::Try;
 
-our $VERSION = '1.29'; # VERSION
+our $VERSION = '1.31'; # VERSION
 
 use feature      ();
 use utf8         ();
@@ -30,7 +31,7 @@ my $features_available = ( %feature::feature_bundle and $feature::feature_bundle
 my $functions_available = [ qw(
     nostrict nowarnings
     nofeatures nobundle noskipexperimentalwarnings
-    noutf8 noc3 nocarp notry trytiny nomaybe noautoclean
+    noutf8 noc3 nocarp notry trytiny nodefer nomaybe noautoclean
 ) ];
 
 my $functions_deprecated = ['noexperiments'];
@@ -111,6 +112,11 @@ sub import {
         not grep { $_ eq 'trytiny' } @functions
     );
     Try::Tiny->import::into($caller) if ( grep { $_ eq 'trytiny' } @functions );
+
+    Syntax::Keyword::Defer->import_into($caller) if (
+        $perl_version < 36 and
+        not grep { $_ eq 'nodefer' } @functions
+    );
 
     monkey_patch( $self, $caller, ( map { $_ => \&{ 'PerlX::Maybe::' . $_ } } qw(
         maybe provided provided_deref provided_deref_with_maybe
@@ -285,7 +291,7 @@ exact - Perl pseudo pragma to enable strict, warnings, features, mro, filehandle
 
 =head1 VERSION
 
-version 1.29
+version 1.31
 
 =for markdown [![test](https://github.com/gryphonshafer/exact/workflows/test/badge.svg)](https://github.com/gryphonshafer/exact/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/exact/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/exact)
@@ -418,6 +424,10 @@ functionality of L<Syntax::Keyword::Try> otherwise.
 
 If you want to use L<Try::Tiny> instead of either native Perl's C<try> feature
 or L<Syntax::Keyword::Try>, this is how.
+
+=head2 C<nodefer>
+
+Skips setup of C<defer> block support.
 
 =head2 C<nomaybe>
 
@@ -645,6 +655,18 @@ L<CPANTS|http://cpants.cpanauthors.org/dist/exact>
 =item *
 
 L<CPAN Testers|http://www.cpantesters.org/distro/T/exact.html>
+
+=back
+
+=head1 GRATITUDE
+
+Special thanks to the following for contributing:
+
+=over 4
+
+=item *
+
+Alexander Ponomarev (shootnix)
 
 =back
 

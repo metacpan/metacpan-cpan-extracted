@@ -56,6 +56,7 @@ sub bin_mock {
     my $code = shift;
     my $mock_args = shift if 'HASH' eq ref $_[0];
 
+    Net::RCON::Minecraft->meta->make_mutable;
     my $mock = Test::MockModule->new('Net::RCON::Minecraft');
     my %mocks = (
         connect     => sub { defined $_[1] ? $_[1] : 1 },

@@ -8,6 +8,7 @@ use Hypersonic::Future::Pool;
 Hypersonic::Future->compile();
 
 use Test::More;
+plan skip_all => "Hypersonic::Future / ::Pool not supported on native Win32 (POSIX pthread + self-pipe)" if $^O eq "MSWin32";
 
 # Create and init pool (OO API)
 my $pool = Hypersonic::Future::Pool->new(workers => 4);

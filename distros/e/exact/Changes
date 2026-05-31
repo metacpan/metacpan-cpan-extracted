@@ -1,5 +1,11 @@
 Revision history for exact
 
+1.31      2026-05-30 09:35:22-07:00 America/Los_Angeles
+        - Patch nodefer error to match v14 and v16
+
+1.30      2026-05-30 09:28:48-07:00 America/Los_Angeles
+        - Add support for "defer" prior to Perl 5.36; thank you: Alexander Ponomarev (shootnix)
+
 1.29      2025-06-13 10:28:34-07:00 America/Los_Angeles
         - Add security policy as per CPANSec recommendation
 

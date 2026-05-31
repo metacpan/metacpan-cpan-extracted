@@ -1,0 +1,66 @@
+{
+   "abstract" : "API to Weenect tracker server",
+   "author" : [
+      "Johan Vromans <jv@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Weenect-API",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.54"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.54",
+            "Object::Pad" : "0.825",
+            "Test::More" : "0",
+            "perl" : "5.036000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Object::Pad" : "0.825",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "jv@cpan.org",
+         "web" : "https://github.com/sciurius/perl-Weenect-API/issues"
+      },
+      "homepage" : "https://github.com/sciurius/perl-Weenect-API",
+      "license" : [
+         "https://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/sciurius/perl-Weenect-API.git",
+         "web" : "https://github.com/sciurius/perl-Weenect-API"
+      }
+   },
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

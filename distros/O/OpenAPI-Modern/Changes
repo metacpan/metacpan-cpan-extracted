@@ -1,5 +1,8 @@
 Revision history for OpenAPI-Modern
 
+0.138     2026-05-30 17:52:03Z
+          - adjust tests for changes in JSON::Schema::Modern 0.640
+
 0.137     2026-05-12 18:09:22Z
           - switch to non-deprecated JSM config "max_depth"
 

@@ -672,7 +672,7 @@ YAML
           instanceLocation => '/response/body/content/gamma',
           keywordLocation => jsonp(qw(/paths /foo post responses default $ref content application/json schema properties gamma const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/components responses default content application/json schema properties gamma const)))->to_string,
-          error => 'value does not match',
+          error => 'value does not match (strings not equal)',
         },
         {
           instanceLocation => '/response/body/content',
@@ -845,7 +845,7 @@ YAML
           instanceLocation => '/response/header/Content-Length',
           keywordLocation => jsonp(qw(/paths /foo post responses 200 headers Content-Length schema const)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo post responses 200 headers Content-Length schema const)))->to_string,
-          error => 'value does not match',
+          error => 'value does not match (integers not equal)',
         },
         {
           instanceLocation => '/response/body/content',

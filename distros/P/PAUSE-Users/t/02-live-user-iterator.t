@@ -9,11 +9,8 @@ my $iterator;
 my %got;
 my %expected =
     (
-        CRI     => 'Sun Apr 30 20:15:55 2006',
-        HAVOC   => 'Wed Feb 27 04:52:57 2008',
         LETO    => 'Tue Jul 17 21:53:22 2001',
-        DOGGY   => 'Fri Jul 30 01:30:57 2010',
-        JWAR    => 'Sun Aug 29 12:32:22 2010',
+        NEILB     => 'Thu Jun 10 16:48:40 1999',
     );
 
 eval { $iterator = PAUSE::Users->new()->user_iterator() };

@@ -17,8 +17,29 @@ no_index:
   directory:
     - t
     - inc
+requires:
+  Bytes::Random::Secure: '0'
+  Catalyst: '0'
+  Catalyst::Runtime: '5.90100'
+  Config::General: '0'
+  Crypt::Misc: '0'
+  Crypt::OpenSSL::RSA: '0.35'
+  Crypt::PK::RSA: '0'
+  Data::UUID: '0'
+  DateTime: '0'
+  DateTime::Format::ISO8601: '0'
+  Digest::SHA: '0'
+  ExtUtils::MakeMaker: '6.52'
+  JSON::MaybeXS: '0'
+  MIME::Base64: '0'
+  Module::Runtime: '0'
+  Moose: '0'
+  Try::Tiny: '0'
+  URI: '0'
+  namespace::autoclean: '0'
+  perl: '5.020'
 resources:
   bugtracker: https://github.com/tfrayner/catalyst-plugin-openidconnect/issues
   repository: https://github.com/tfrayner/catalyst-plugin-openidconnect.git
-version: '0.09'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
