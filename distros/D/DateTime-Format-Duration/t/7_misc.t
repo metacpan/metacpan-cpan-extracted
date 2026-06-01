@@ -1,17 +1,18 @@
-
-use Test::More tests => 7;
-
+use strict;
 use warnings;
+
+use Test::More 0.88;
+
 use DateTime;
 use DateTime::Duration;
 use DateTime::Format::Duration;
 
 
-$strf = DateTime::Format::Duration->new(
+my $strf = DateTime::Format::Duration->new(
     base => DateTime->new(year=>2003),
     pattern => '%V weeks, %u days',
 );
-$duration = DateTime::Duration->new( days => 17 );
+my $duration = DateTime::Duration->new( days => 17 );
 is( $strf->format_duration( $duration ), '2 weeks, 3 days', '17 days = 2 weeks, 3 days' );
 
 
@@ -45,3 +46,4 @@ is( $strf->format_duration( $duration ), (22*24*60*60) + (36*60*60), '22 days, 3
 $strf->set_pattern('%u');
 is( $strf->format_duration( $duration ), '2', '22 days, 36 hours as days modulus 7' );
 
+done_testing;

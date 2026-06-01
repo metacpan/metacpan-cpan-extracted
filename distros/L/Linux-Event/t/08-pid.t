@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use Test2::V0;
+use Errno qw(ENOSYS EPERM EINVAL);
 use POSIX qw(WIFEXITED WEXITSTATUS);
 
 use Linux::Event;
@@ -11,7 +12,17 @@ BEGIN {
   eval { require Linux::FD::Pid; 1 } or plan skip_all => "Linux::FD::Pid not installed";
 }
 
-my $loop = Linux::Event->new( model => 'reactor' );
+my $pidfd_probe = eval { Linux::FD::Pid->new($$, 'non-blocking') };
+if (!$pidfd_probe) {
+  my $err = 0 + $!;
+  plan skip_all => "pidfd is not available in this environment: $!"
+    if $err == ENOSYS || $err == EPERM || $err == EINVAL;
+  die $@ if $@;
+  die "pidfd probe failed: $!";
+}
+undef $pidfd_probe;
+
+my $loop = Linux::Event->new;
 
 my $pid = fork();
 if (!defined $pid) {

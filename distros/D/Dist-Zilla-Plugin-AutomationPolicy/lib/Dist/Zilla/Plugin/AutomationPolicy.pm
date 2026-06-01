@@ -7,7 +7,7 @@ use v5.24;
 use Moose;
 with qw( Dist::Zilla::Role::FileGatherer Dist::Zilla::Role::PrereqSource Dist::Zilla::Role::FilePruner );
 
-use Dist::AutomationPolicy;
+use Dist::AutomationPolicy v0.2.0;
 use Dist::Zilla::File::InMemory;
 use Dist::Zilla::Pragmas;
 use MooseX::Types::Moose qw( HashRef );
@@ -17,7 +17,7 @@ use namespace::autoclean;
 
 use experimental qw( postderef signatures );
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.1.1';
 
 
 has version => (
@@ -109,7 +109,7 @@ Dist::Zilla::Plugin::AutomationPolicy - add an automation policy to a distributi
 
 =head1 VERSION
 
-version v0.1.0
+version v0.1.1
 
 =head1 SYNOPSIS
 
@@ -228,6 +228,10 @@ Model IDs should come from L<https://docs.aimlapi.com/api-references/model-datab
 =for Pod::Coverage register_prereqs
 
 =for Pod::Coverage prune_files
+
+=head1 SEE ALSO
+
+L<Metadata v3 Automation Policy|https://github.com/CPAN-Security/cpan-metadata-v3/blob/main/automation-policy.md>
 
 =head1 SOURCE
 

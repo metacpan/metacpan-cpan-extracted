@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use File::Find ();
+use IO::Select ();
 use IPC::Open3 ();
 use Symbol ();
 
@@ -301,16 +302,16 @@ sub run_build_checks {
   );
 
   for my $cmd (@commands) {
-    my ($ok, $out) = run_cmd(@$cmd);
     my $label = join(' ', @$cmd);
+    my $ok = system(@$cmd) == 0;
 
     if ($ok) {
       print "ok: $label\n";
     }
     else {
+      my $status = $? >> 8;
       push @failures, "command failed: $label";
-      print "FAIL: $label\n";
-      print indent($out, 2) if length $out;
+      print "FAIL: $label exited with status $status\n";
     }
   }
 }
@@ -442,13 +443,29 @@ sub run_cmd (@cmd) {
   my $pid = IPC::Open3::open3(my $in, my $out, $err, @cmd);
   close $in;
 
-  local $/;
-  my $stdout = <$out> // '';
-  my $stderr = <$err> // '';
+  my $sel = IO::Select->new($out, $err);
+  my $combined = '';
+
+  while (my @ready = $sel->can_read) {
+    for my $fh (@ready) {
+      my $bytes = sysread($fh, my $buf, 8192);
+      if (!defined $bytes) {
+        next if $!{EINTR};
+        $sel->remove($fh);
+        close $fh;
+        next;
+      }
+      if ($bytes == 0) {
+        $sel->remove($fh);
+        close $fh;
+        next;
+      }
+      $combined .= $buf;
+    }
+  }
 
   waitpid($pid, 0);
   my $exit = $? >> 8;
 
-  my $combined = $stdout . $stderr;
   return ($exit == 0 ? 1 : 0, $combined);
 }

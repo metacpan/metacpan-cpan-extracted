@@ -1,19 +1,32 @@
-# Examples
+# Linux::Event examples
 
-The examples in this directory are grouped by model.
+These examples demonstrate the current Linux::Event API. The low-numbered
+examples are ordered from basic loop features to more advanced composition
+patterns. The 90-series files are manual benchmarks and regression runners.
 
-Canonical examples:
+## Basic and feature examples
 
-- `01-reactor-after.pl`
-- `02-reactor-at.pl`
-- `03-reactor-watch-pipe.pl`
-- `04-reactor-signal.pl`
-- `05-reactor-waker-thread.pl`
-- `06-reactor-pid.pl`
-- `20-proactor-after.pl`
-- `21-proactor-read-pipe.pl`
-- `22-proactor-socketpair-send-recv.pl`
-- `23-proactor-accept-connect.pl`
+- `01-after.pl` - relative timer
+- `02-at.pl` - absolute monotonic timer deadline
+- `03-watch-pipe.pl` - readiness watch on a pipe
+- `04-watch-replace.pl` - replacing an existing watcher for the same file descriptor
+- `05-watch-oneshot.pl` - one-shot watcher behavior
+- `06-unwatch-safe.pl` - idempotent unwatch and watcher cancellation
+- `07-signal.pl` - signalfd signal delivery
+- `08-waker-thread.pl` - eventfd wakeup from another thread
+- `09-waker-fork-pipe.pl` - eventfd wakeup with a forked producer and separate payload pipe
+- `10-pid.pl` - pidfd child exit notification
 
-Higher-numbered examples are deeper benchmarking or regression scripts for the
-reactor backend.
+## Manual benchmarks and regression runners
+
+- `90-bench-oneshot.pl` - pipe readability throughput benchmark
+- `91-stress-oneshot-edge-safe.pl` - edge-triggered one-shot stress runner
+- `92-linux-epoll-oneshot-rearm.pl` - direct Linux::Epoll one-shot rearm check
+- `93-regress-stop-no-backend-wait.pl` - stop-before-backend-wait regression runner
+- `94-regress-epoll-oneshot-rearm.pl` - Linux::Event backend one-shot rearm regression runner
+
+Run all examples with:
+
+```sh
+perl examples/all.pl
+```

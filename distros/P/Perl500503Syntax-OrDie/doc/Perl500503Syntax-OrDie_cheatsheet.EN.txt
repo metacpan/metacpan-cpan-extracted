@@ -5,7 +5,7 @@ NAME
     Perl500503Syntax::OrDie - Validate Perl 5.005_03 source compatibility
 
 VERSION
-    0.01
+    0.03
 
 SYNOPSIS
     # Auto-check the calling file at use-time:
@@ -358,7 +358,7 @@ DEPENDENCIES
     No non-core dependencies.  Perl 5.005_03 or later.
 
 AUTHOR
-    INABA Hitoshi <ina@cpan.org>
+    INABA Hitoshi <ina.cpan@gmail.com>
 
 LICENSE
     This library is free software; you may redistribute it and/or

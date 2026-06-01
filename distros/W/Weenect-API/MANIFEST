@@ -1,6 +1,6 @@
 Changes
 MANIFEST
-Makefile
+Makefile.PL
 README.md
 do_fetch.sh
 lib/Weenect.pm

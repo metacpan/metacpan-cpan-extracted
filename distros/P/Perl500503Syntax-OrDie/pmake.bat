@@ -21,11 +21,11 @@ package pmake;
 #
 # pmake - make of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
-$VERSION = '0.31';
-$VERSION = $VERSION;
+$PMAKE_BAT_VERSION = '0.32';
+$PMAKE_BAT_VERSION = $PMAKE_BAT_VERSION;
 use strict;
 BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
 use FindBin;
@@ -158,7 +158,7 @@ for my $target (@ARGV) {
         }
 
         # your PAUSE ID here
-        my $author = q{ina <ina@cpan.org>};
+        my $author = q{ina <ina.cpan@gmail.com>};
 
         # get $name_as_filesystem
         open(FH_MANIFEST,'MANIFEST') || die "Can't open file: MANIFEST.\n";
@@ -229,7 +229,6 @@ for my $target (@ARGV) {
             IOas::SJIS2004       0.06
             Jacode4e::RoundTrip  2.13.81.8
             UTF8::R2             0.05
-            strict               1.01
         ));
         my %requires = (qw(
             perl                 5.005_03
@@ -269,6 +268,10 @@ for my $target (@ARGV) {
                 Sjis
             )};
         }
+        delete $requires{'strict'};
+        delete $requires{'warnings'};
+        delete $requires{'vars'};
+        $requires{'ExtUtils::MakeMaker'} = '5.4302';
 
         #                                                12345678
         my $requires_as_makefile_pl = join "\n", map {qq{        '$_' => '$requires{$_}',}} sort keys %requires;
@@ -313,7 +316,7 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
     $args{META_MERGE} = {
         'meta-spec' => { version => 2 },
         'resources' => {
-            'license'    => [ 'http://dev.perl.org/licenses/' ],
+            'license'    => [ 'https://dev.perl.org/licenses/' ],
             'bugtracker' => {
                 'web' => 'https://github.com/ina-cpan/%s/issues',
             },
@@ -352,7 +355,7 @@ END
         #
         #   meta-spec:
         #     version: 1.4
-        #     url: http://module-build.sourceforge.net/META-spec-v1.4.html
+        #     url: https://module-build.sourceforge.net/META-spec-v1.4.html
 
         #                                      12     1234
         my $provides_as_yml = join "\n", map {"  $_:\n    file: $provides{$_}\n    version: $version"} sort keys %provides;
@@ -361,27 +364,25 @@ END
 
         open(FH_METAYML,'>META.yml') || die "Can't open file: META.yml.\n";
         binmode FH_METAYML;
-        printf FH_METAYML (<<'END', $name_as_dist_on_url, $version, $abstract, $author, $requires_as_yml, $provides_as_yml, $name_as_dist_on_url, $name_as_dist_on_url);
+        printf FH_METAYML (<<'END', $name_as_dist_on_url, $version, $abstract, $author, $pmake::PMAKE_BAT_VERSION, $requires_as_yml, $provides_as_yml, $name_as_dist_on_url, $name_as_dist_on_url);
 --- #YAML:1.0
 meta-spec:
   version: 1.4
-  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  url: https://module-build.sourceforge.net/META-spec-v1.4.html
 name: %s
 version: %s
 abstract: %s
 author:
   - %s
 license: perl
-generated_by: pmake.bat
+generated_by: pmake.bat version %s
 requires:
 %s
-build_requires:
-  Test: 1.122
 minimum_perl_version: 5.00503
 provides:
 %s
 resources:
-  license: http://dev.perl.org/licenses/
+  license: https://dev.perl.org/licenses/
   bugtracker: https://github.com/ina-cpan/%s/issues
   repository: https://github.com/ina-cpan/%s
 END
@@ -403,7 +404,7 @@ END
         # How to escape from trap
         #
         #   "meta-spec" : {
-        #       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        #       "url" : "https://search.cpan.org/perldoc?CPAN::Meta::Spec",
         #       "version" : 2
         #   },
 
@@ -414,7 +415,7 @@ END
 
         open(FH_METAJSON,'>META.json') || die "Can't open file: META.json.\n";
         binmode FH_METAJSON;
-        printf FH_METAJSON (<<'END', $name_as_dist_on_url, $version, $abstract, $author, $name_as_dist_on_url, $name_as_dist_on_url, $name_as_dist_on_url, $requires_as_json, $requires_as_json, $requires_as_json, $requires_as_json, $provides_as_json);
+        printf FH_METAJSON (<<'END', $name_as_dist_on_url, $version, $abstract, $author, $pmake::PMAKE_BAT_VERSION, $name_as_dist_on_url, $name_as_dist_on_url, $name_as_dist_on_url, $requires_as_json, $requires_as_json, $requires_as_json, $requires_as_json, $provides_as_json);
 {
     "name" : "%s",
     "version" : "%s",
@@ -423,18 +424,18 @@ END
         "%s"
     ],
     "dynamic_config" : 1,
-    "generated_by" : "pmake.bat",
+    "generated_by" : "pmake.bat version %s",
     "license" : [
         "perl_5"
     ],
     "meta-spec" : {
-        "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        "url" : "https://search.cpan.org/perldoc?CPAN::Meta::Spec",
         "version" : 2
     },
     "release_status" : "stable",
     "resources" : {
         "license" : [
-            "http://dev.perl.org/licenses/"
+            "https://dev.perl.org/licenses/"
         ],
         "bugtracker" : {
             "web" : "https://github.com/ina-cpan/%s/issues"
@@ -916,7 +917,7 @@ TO_CONTRIBUTE
 ## Reporting a Vulnerability
 
 If you discover a security vulnerability in this distribution, please report
-it by e-mail to the author at ina@cpan.org.
+it by e-mail to the author at ina.cpan@gmail.com.
 
 Do NOT open a public GitHub issue for security vulnerabilities.  Please use
 private e-mail so that a fix can be prepared before public disclosure.
@@ -941,7 +942,7 @@ TO_SECURITY
         my $basename = basename($file[0], '.pm','.pl','.bat');
         my $tardir = "$dirname-$basename-$version";
         $tardir =~ s#^lib-##;
-        rmtree($tardir,0,0);
+        rmtree($tardir, 0, 0);
 
         if ($^O =~ /(?:solaris|linux)/i) {
             for my $file (@file) {
@@ -991,9 +992,9 @@ TO_SECURITY
 #-----------------------------------------------------------------------------
 # Sunday December 21, 2008 07:38 PM
 # Fixing world writable files in tarball before upload to CPAN [ #38127 ]
-# http://use.perl.org/~bart/journal/38127 (dead link)
+# https://use.perl.org/~bart/journal/38127 (dead link)
 # Fix CPAN uploads for world writable files
-# http://perlmonks.org/index.pl?node_id=731935
+# https://perlmonks.org/index.pl?node_id=731935
 #-----------------------------------------------------------------------------
 #                   $tar->add_files("$tardir/$file");
 #-----------------------------------------------------------------------------
@@ -1037,7 +1038,7 @@ TO_SECURITY
             syswrite FH_TAR, ($ZERO_BLOCK . $ZERO_BLOCK);
 
             close FH_TAR;
-            rmtree($tardir,0,0);
+            rmtree($tardir, 0, 0);
 
             # make *.tar.gz file
             my $gz = gzopen("$tardir.tar.gz", 'wb');
@@ -1077,7 +1078,7 @@ TO_SECURITY
 #
 # ptar - tar of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2011, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2011, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 use strict;
@@ -1123,7 +1124,7 @@ for my $gzfile (grep m/\.tar\.gz$/xmsi, @ARGV) {
         $gz->gzclose;
         close FH_TAR;
 
-        my $tar = Archive::Tar->new($tarfile,1);
+        my $tar = Archive::Tar->new($tarfile, 1);
         for my $file ($tar->list_files){
             if (-e $file) {
                 print STDERR "skip $file is already exists.\n";
@@ -1197,7 +1198,7 @@ END
                 $gz->gzclose;
                 close FH_TAR;
 
-                my $tar = Archive::Tar->new($tarfile,1);
+                my $tar = Archive::Tar->new($tarfile, 1);
                 for my $file ($tar->list_files){
                     if (-e $file) {
                         print STDERR "skip $file is already exists.\n";
@@ -1221,7 +1222,7 @@ END
 #
 # pwget - wget of Perl Poor Tools
 #
-# Copyright (c) 2011, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2011, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 use Socket;
@@ -1367,7 +1368,7 @@ sub _runtests {
     #   Preferred POSIX equivalent is: /cygdrive/c/cpan/Char-X.XX
     #   CYGWIN environment variable option "nodosfilewarning" turns off this warning.
     #   Consult the user's guide for more details about POSIX paths: #'
-    #     http://cygwin.com/cygwin-ug-net/using.html#using-pathnames
+    #     https://cygwin.com/cygwin-ug-net/using.html#using-pathnames
 
     if (exists $ENV{'CYGWIN'}) {
         if ($ENV{'CYGWIN'} !~ /\b nodosfilewarning \b/x) {
@@ -1508,10 +1509,66 @@ sub _sc_slurp_lines {
     return @lines;
 }
 
-# Strip __END__, POD, string literals, regexes, inline comments from code.
-# Returns cleaned text suitable for pattern matching.
+# Mask here-document bodies, blanking each body line while keeping the
+# introducer and terminator lines so that line numbers are preserved.
+#
+# Knowledge carried over from Perl500503Syntax::OrDie: a here-doc body is
+# data, not code, and may legitimately contain post-5.005_03 example text
+# (<<>>, $+[N], //=, signatures, ...). Left unmasked, such text leaks into
+# the P/C/E/K scans and is wrongly reported. Two or more here-docs may
+# share one introducer line (e.g. "$_ = <<'A'; $x = <<'B';"), so every
+# sentinel is queued at its '<<' operator and all queued bodies are
+# consumed, in order, before the next introducer line is processed.
+#
+# Only genuine here-doc forms are recognized -- <<'TAG', <<"TAG" (space
+# allowed before the quote) and the adjacent bareword <<TAG whose TAG
+# starts with a letter or underscore. This deliberately ignores the
+# left-shift operator ($x << 2, $x <<= 1, $x << $y), which never starts a
+# here-doc. The indented <<~ form is post-5.005_03 and is not produced by
+# ina@CPAN code, so terminators are matched at column zero.
+sub _sc_mask_heredocs {
+    my ($text) = @_;
+    my @in    = split /\n/, $text, -1;
+    my @out   = ();
+    my @queue = ();
+    my $line;
+    for $line (@in) {
+        if (@queue) {
+            my $tag = $queue[0];
+            if ($line =~ /^\Q$tag\E\r?\z/) {
+                shift @queue;
+                push @out, $line;
+            }
+            else {
+                push @out, '';
+            }
+            next;
+        }
+        # Detect here-doc introducers on this line, in order. A '#' comment
+        # tail is removed first so a commented-out '<<WORD' is not mistaken
+        # for an introducer; quotes are left intact because the TAG itself
+        # may be quoted.
+        my $probe = $line;
+        $probe =~ s/\#.*\z//;
+        while ($probe =~ /<<(?:\s*'(\w+)'|\s*"(\w+)"|(\w+))/g) {
+            my $tag = defined $1 ? $1 : defined $2 ? $2 : $3;
+            if (defined $3) {
+                next unless $3 =~ /^[A-Za-z_]/;
+            }
+            push @queue, $tag;
+        }
+        push @out, $line;
+    }
+    return join "\n", @out;
+}
+
+# Strip here-doc bodies, __END__, POD, string literals, regexes, inline
+# comments from code.  Returns cleaned text suitable for pattern matching.
+# Here-doc bodies are masked first so that body text such as "__END__" or
+# "=pod" cannot derail the __END__ / POD strippers that follow.
 sub _sc_clean_code {
     my ($text) = @_;
+    $text = _sc_mask_heredocs($text);
     $text =~ s/\n__END__\b.*\z//s;
     $text =~ s/^=[a-zA-Z].*?^=cut[ \t]*$//msg;
     return $text;
@@ -1528,7 +1585,12 @@ sub _sc_scan {
         my $clean = $line;
         $clean =~ s/'(?:[^'\\]|\\.)*'/''/g;
         $clean =~ s/"(?:[^"\\]|\\.)*"/""/g;
-        $clean =~ s{(?:s|m|qr)/[^/]*/[^/]*/[gimsex]*}{}g;
+        # s///, m//, qr// are quote-like operators only when not preceded by
+        # an identifier character, '*', '&', ':' or "'": e.g. "keys/2/",
+        # "&s/...", "*s{...}", "Foo::s" and the apostrophe package separator
+        # "jcode's" must NOT be stripped as quote-like. (Knowledge carried
+        # over from Perl500503Syntax::OrDie.)
+        $clean =~ s{(?<![\w*&:'])(?:s|m|qr)/[^/]*/[^/]*/[gimsex]*}{}g;
         $clean =~ s{/[^/]+/[gimsex]*}{}g;
         $clean =~ s/#.*$//;
         if ($clean =~ $pattern) {
@@ -1556,9 +1618,23 @@ sub _selfcheck_p1p12 {
         "$label P2: 3-arg open guarded or absent");
 
     # P3: open(my $fh...) guarded or absent
-    my $has_lex = ($code =~ /\bopen\s*[\(\s]\s*my\s+\$\w+/);
-    _sc_ok(!$has_lex || $guarded,
-        "$label P3: open(my \$fh...) guarded or absent");
+    do {
+        # Scan per line, skipping comment lines and stripping quoted
+        # strings, so the checker's own descriptive comments and message
+        # strings are not mistaken for executable open(my $fh...) calls.
+        # (Masking discipline carried over from Perl500503Syntax::OrDie.)
+        my $has_lex = 0;
+        for my $l (split /\n/, $code) {
+            next if $l =~ /^\s*#/;
+            my $s = $l;
+            $s =~ s/'(?:[^'\\]|\\.)*'/''/g;
+            $s =~ s/"(?:[^"\\]|\\.)*"/""/g;
+            $s =~ s/#.*$//;
+            if ($s =~ /\bopen\s*[\(\s]\s*my\s+\$\w+/) { $has_lex = 1; last }
+        }
+        _sc_ok(!$has_lex || $guarded,
+            "$label P3: open(my \$fh...) guarded or absent");
+    };
 
     # P4: use warnings guarded
     _sc_ok($code !~ /^\s*use\s+warnings\s*;/m
@@ -1578,16 +1654,39 @@ sub _selfcheck_p1p12 {
 
     # P8: no //= operator (Perl 5.10+)
     do {
-        my $p8_code = join "\n", grep { !/^\s*#/ } split /\n/, $code;
-        $p8_code =~ s/#[^\n]*//g;
-        _sc_ok($p8_code !~ m{//=},
+        # Scan per line with single/double-quoted strings and trailing
+        # comments removed so that "//=" appearing inside a string literal
+        # or a URL-like "://" is not mistaken for the 5.10 //= operator.
+        my $p8_fail = 0;
+        for my $p8_line (split /\n/, $code) {
+            next if $p8_line =~ /^\s*#/;
+            my $s = $p8_line;
+            $s =~ s/'(?:[^'\\]|\\.)*'/''/g;
+            $s =~ s/"(?:[^"\\]|\\.)*"/""/g;
+            $s =~ s/#.*$//;
+            next if $s =~ m{://};
+            # Built from single characters so this detector does not itself
+            # contain a literal defined-or-assignment token in its source.
+            if (index($s, '/' . '/' . '=') >= 0) { $p8_fail = 1; last }
+        }
+        _sc_ok(!$p8_fail,
             "$label P8: no //= operator (Perl 5.10+)");
     };
 
     # P9: opendir(my $dh...) guarded or absent
-    my $has_od_lex = ($code =~ /\bopendir\s*[\(\s]+my\s+\$/);
-    _sc_ok(!$has_od_lex || $guarded,
-        "$label P9: opendir(my \$dh...) guarded or absent");
+    do {
+        my $has_od_lex = 0;
+        for my $l (split /\n/, $code) {
+            next if $l =~ /^\s*#/;
+            my $s = $l;
+            $s =~ s/'(?:[^'\\]|\\.)*'/''/g;
+            $s =~ s/"(?:[^"\\]|\\.)*"/""/g;
+            $s =~ s/#.*$//;
+            if ($s =~ /\bopendir\s*[\(\s]+my\s+\$/) { $has_od_lex = 1; last }
+        }
+        _sc_ok(!$has_od_lex || $guarded,
+            "$label P9: opendir(my \$dh...) guarded or absent");
+    };
 
     # P10: no bare say (Perl 5.10+)
     _sc_ok($code !~ /^\s*say\s/m && $code !~ /[;{(]\s*say\s/m,
@@ -1604,12 +1703,16 @@ sub _selfcheck_p1p12 {
             next if $p12_line =~ /^\s*#/;
             $p12_line =~ s/#[^'"]*$//;
             next if $p12_line =~ /=~\s*[sm]?\//;
-            next if $p12_line =~ /\bsplit\s*\/\//;
+            # split/grep/map are regex-introducing list operators: an empty
+            # pattern (as the first argument) immediately after one of them
+            # is a pattern, never the 5.10 defined-or operator. (Knowledge
+            # carried over from Perl500503Syntax::OrDie.)
+            next if $p12_line =~ /\b(?:split|grep|map)\s*\/\//;
             next if $p12_line =~ m{://};
             if ($p12_line =~ m{\s//[^/=]}) { $p12_fail = 1; last }
         }
         _sc_ok(!$p12_fail || $guarded,
-            "$label P12: // defined-or guarded or absent");
+            "$label P12: defined-or operator guarded or absent");
     };
 }
 
@@ -1644,6 +1747,13 @@ sub _selfcheck_style {
         my $n = 0;
         for my $line (@lines) {
             $n++;
+            # A 0x20/0x09 byte at end of line may be the trailing byte of a
+            # double-byte (Shift_JIS/EUC-JP/...) character rather than real
+            # whitespace, so the byte pattern /[ \t]+$/ is unreliable on
+            # non-US-ASCII lines; skip them. (Knowledge carried over from
+            # Perl500503Syntax::OrDie; ina@CPAN sources are US-ASCII by the
+            # C1 house rule, so this only affects external multibyte files.)
+            next if $line =~ /[^\x00-\x7F]/;
             push @bad, $n if $line =~ /[ \t]+\r?$/;
         }
         _sc_ok(!@bad,
@@ -1676,7 +1786,7 @@ sub _selfcheck_style {
             # Also strip q{} and qq{} literals (content may contain commas)
             $s =~ s/\bqq\{[^}]*\}/""/g;
             $s =~ s/\bq\{[^}]*\}/''/g;
-            $s =~ s{(?:s|m|qr|split\s*/)[^/]*/[^/]*/[gimsex]*}{}g;
+            $s =~ s{(?<![\w*&:'])(?:s|m|qr|split\s*/)[^/]*/[^/]*/[gimsex]*}{}g;
             $s =~ s{/[^/]+/[gimsex]*}{}g;
             $s =~ s/#.*$//;
             # Allow comma immediately before $ (variable) or '' "" (empty string after strip)
@@ -1885,7 +1995,7 @@ This software requires perl5.00503 or later.
 
 =head1 AUTHOR
 
-INABA Hitoshi E<lt>ina@cpan.orgE<gt> in a CPAN
+INABA Hitoshi E<lt>ina.cpan@gmail.comE<gt> in a CPAN
 
 This project was originated by INABA Hitoshi.
 

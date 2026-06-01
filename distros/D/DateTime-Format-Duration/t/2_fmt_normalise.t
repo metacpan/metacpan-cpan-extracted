@@ -1,6 +1,4 @@
-# Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl 1.t'
-
+use strict;
 use warnings;
 use DateTime;
 use DateTime::Duration;
@@ -8,13 +6,13 @@ use DateTime::Format::Duration;
 
 #########################
 
-use Test::More tests=>52;
+use Test::More 0.88;
 
 
 my $x = 0; # Test Counter
 
 
-$strf = DateTime::Format::Duration->new(
+my $strf = DateTime::Format::Duration->new(
     base => DateTime->new( year=> 2004, time_zone=>"Australia/Melbourne" ),
     pattern => '%P%F %r',
 );
@@ -130,7 +128,7 @@ sub in_range {
 
     my $test = shift;
 
-    $argv = join(',', @ARGV);
+    my $argv = join(',', @ARGV);
     $argv=~s/,\.\.,/../g;
     $argv=~s/,,/,/g;
 
@@ -172,3 +170,4 @@ sub Dump {
  #------------------ 48 hours ------------------#
 # 1 hour
 
+done_testing;

@@ -8,7 +8,7 @@ use Test::Exception;
 use Protocol::Tus;
 
 use Path::Tiny;
-use lib path(__FILE__)->parent;
+use lib path(__FILE__)->parent->stringify;
 use Test::TusResponse;
 
 my $root = path(__FILE__)->parent->tempdir;

@@ -57,8 +57,10 @@ subtest 'clone() - has independent async_db' => sub {
     my $clone = $schema->clone;
 
     ok($clone->{_async_db}, 'Clone has async_db');
-    isnt($clone->{_async_db}, $schema->{_async_db},
-        'Clone has different async_db instance');
+    # Clones share the parent's worker pool for safe cleanup.
+    # An isolated pool can be obtained via a fresh Schema->connect().
+    is($clone->{_async_db}, $schema->{_async_db},
+        'Clone shares async_db with parent (shared worker pool)');
 };
 
 subtest 'clone() - has fresh sources cache' => sub {
@@ -166,8 +168,9 @@ subtest 'clone() - can create multiple clones' => sub {
     isnt($clone2, $clone3, 'Clone 2 and 3 are different');
     isnt($clone1, $clone3, 'Clone 1 and 3 are different');
 
-    isnt($clone1->{_async_db}, $clone2->{_async_db},
-        'Clones have different async_db instances');
+    # Clones share the parent's worker pool - _async_db is the same object.
+    is($clone1->{_async_db}, $clone2->{_async_db},
+        'Clones share async_db with parent (shared worker pool)');
 };
 
 subtest 'clone() - all clones work independently' => sub {

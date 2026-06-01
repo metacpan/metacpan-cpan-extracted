@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use Carp qw(croak);
 use Scalar::Util qw(weaken);
@@ -208,27 +208,25 @@ __END__
 
 =head1 NAME
 
-Linux::Event::Signal - signalfd adaptor for Linux::Event::Reactor
+Linux::Event::Signal - signalfd adaptor for Linux::Event::Loop
 
 =head1 SYNOPSIS
 
-<<<<<<< HEAD
-=======
   use v5.36;
   use Linux::Event;
 
-  my $loop = Linux::Event->new( model => 'reactor' );
+  my $loop = Linux::Event->new;
 
   # Subscribe via the loop convenience method:
->>>>>>> 1401c31 (prep for cpan and release, new tool added)
+
   my $sub = $loop->signal('INT', sub ($loop, $sig, $count, $data) {
     $loop->stop;
   });
 
 =head1 DESCRIPTION
 
-C<Linux::Event::Signal> adapts signalfd-style signal delivery into the reactor
-loop. Most users access it through C<< $loop->signal(...) >> rather than
+C<Linux::Event::Signal> adapts signalfd-style signal delivery into the loop.
+Most users access it through C<< $loop->signal(...) >> rather than
 constructing it directly.
 
 Signal subscriptions are loop primitives. They are not a general-purpose signal
@@ -248,7 +246,6 @@ The returned subscription object supports C<cancel>.
 
 =head1 SEE ALSO
 
-L<Linux::Event::Reactor>,
 L<Linux::Event::Loop>
 
 =cut

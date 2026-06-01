@@ -1,17 +1,116 @@
 Revision history for DBIx::Class::Async
 
+v1.0.4   2026-05-31
+         [BUG FIXES]
+         - Fixed a SEGV (signal 11) during Perl global destruction when
+           using two or more workers. The root cause was an incorrect
+           teardown order in DBIx::Class::Async::disconnect(): calling
+           $loop->remove() after $instance->stop() causes IO::Async to
+           set an internal {stopping} flag that silently prevents remove()
+           from deregistering the notifier. The orphaned Stream, Handle,
+           and Process child notifiers remained in the loop's internal
+           registry, and the loop's XS destructor accessed freed memory
+           during global destruction. Fixed by calling $loop->remove()
+           before $instance->stop(), then awaiting the returned Future so
+           workers complete their shutdown sequence before cleanup proceeds.
+           (Reported during Debian packaging; triggered by make -j32 test.)
+
+         - Fixed DBIx::Class::Async::Schema::disconnect() which was
+           performing its own broken worker cleanup instead of delegating
+           to DBIx::Class::Async::disconnect(). The original code called
+           stop() on the worker hashref ({ instance => .., healthy => .. })
+           rather than on the IO::Async::Function object it contained,
+           meaning workers were never actually stopped. It then wiped
+           %{$self->{_async_db}} = (), destroying all state including the
+           loop reference before any cleanup could happen.
+           Schema::disconnect() now delegates entirely to
+           DBIx::Class::Async::disconnect() for correct, ordered teardown.
+
+         - Fixed clone() creating a full independent worker pool (new forked
+           processes) for every call, including in contexts where no
+           isolation was needed. With many clones sharing the same
+           IO::Async::Loop, the concurrent teardown of dozens of
+           IO::Async::Function instances caused the loop's XS destructor to
+           SEGV during global destruction. clone() now shares the parent's
+           worker pool by default. An independent pool is only created when
+           workers => $count is explicitly passed.
+
+         - Fixed the async_loop option not being recognised in
+           create_async_db(). Schema::connect() passes the loop via
+           async_loop => but create_async_db() checked only for loop =>,
+           causing _owns_loop to be incorrectly set to true for all
+           user-supplied loops. create_async_db() now consistently uses
+           async_loop => as the canonical parameter name throughout.
+
+         - Added DESTROY() to DBIx::Class::Async::Schema. Schema objects
+           that go out of scope during the RUN phase now automatically call
+           disconnect() to stop their worker processes. DESTROY() is a no-op
+           during global destruction (${^GLOBAL_PHASE} eq 'DESTRUCT') where
+           IO::Async's XS internals may already be partially freed, and is
+           also a no-op for shared clones which don't own their worker pool.
+
+         [BEHAVIOUR CHANGE]
+         - clone() now shares the parent's worker pool by default instead of
+           spawning a new pool of processes. This is a safe change for the
+           common case (clones connect to the same database and don't require
+           process isolation), and eliminates a class of SEGV that occurred
+           when many clones were created and destroyed within the same event
+           loop.
+
+           To obtain an independent worker pool (the previous behaviour),
+           pass workers => $count explicitly:
+
+               # Before (always independent - now only when workers given):
+               my $clone = $schema->clone;
+
+               # After (shared pool, auto-cleanup, safe default):
+               my $clone = $schema->clone;
+
+               # Independent pool (e.g. dedicated reporting workers):
+               my $reporting = $schema->clone( workers => 8 );
+               # ... use $reporting ...
+               $reporting->disconnect;   # caller must disconnect
+
+           Independent clones (created with workers =>) own their worker
+           pool. Callers are responsible for calling disconnect() on them
+           before they go out of scope. Shared clones (no workers =>) are
+           cleaned up automatically.
+
+         [DOCUMENTATION]
+         - Updated POD for clone() in DBIx::Class::Async::Schema to document
+           the shared vs. independent pool distinction and the disconnect()
+           requirement for independent clones.
+
+         - Updated POD for create_async_db() in DBIx::Class::Async to
+           document all options in a structured list, including the
+           async_loop alias for loop and the ownership semantics (who stops
+           the loop on disconnect).
+
+         - Updated POD for disconnect() in DBIx::Class::Async to document
+           the required remove()-before-stop() ordering and the reason it
+           matters for XS safety during global destruction.
+
+         [TESTS]
+         - Updated t/001-schema.t and t/027-schema-class.t to reflect the
+           new clone() behaviour: clones now share _async_db with the parent
+           rather than holding an independent instance.
+
+         - t/103-clone.t continues to pass without modification: clone()
+           called with workers => $count still creates an independent pool
+           with the requested worker count and a distinct _async_db.
+
 v1.0.3   2026-05-06
          [IMPROVEMENTS]
-          - Fix non-deterministic failures in t/020-slice.t by forcing
-            'name' sort order, ensuring consistent results across
-            asynchronous worker insertions.
-          - Improve reliability of caching tests (t/148-caching.t and
-            t/149-scalar-ref-char-pk.t) by using high-precision fractional
-            seconds with SQLite's strftime.
-          - Explicitly disable Resultset caching in t/148-caching.t using
-            'cache_ttl => 0' to verify cache-bypass logic regardless of
-            execution speed.
-          - Fix incorrect HashRefInflator accessors in test suites.
+         - Fix non-deterministic failures in t/020-slice.t by forcing
+           'name' sort order, ensuring consistent results across
+           asynchronous worker insertions.
+         - Improve reliability of caching tests (t/148-caching.t and
+           t/149-scalar-ref-char-pk.t) by using high-precision fractional
+           seconds with SQLite's strftime.
+         - Explicitly disable Resultset caching in t/148-caching.t using
+           'cache_ttl => 0' to verify cache-bypass logic regardless of
+           execution speed.
+         - Fix incorrect HashRefInflator accessors in test suites.
 
 v1.0.2   2026-05-06
          [IMPROVEMENTS]

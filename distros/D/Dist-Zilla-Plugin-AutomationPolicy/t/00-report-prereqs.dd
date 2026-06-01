@@ -12,6 +12,7 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Dist::AutomationPolicy' => 'v0.2.0',
                                       'Dist::Zilla::Plugin::UsefulReadme' => 'v0.4.3',
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
@@ -51,7 +52,7 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
-                                      'Dist::AutomationPolicy' => '0',
+                                      'Dist::AutomationPolicy' => 'v0.2.0',
                                       'Dist::Zilla::File::InMemory' => '0',
                                       'Dist::Zilla::Pragmas' => '0',
                                       'Dist::Zilla::Role::FileGatherer' => '0',

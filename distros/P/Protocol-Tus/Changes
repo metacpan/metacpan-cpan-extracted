@@ -1,3 +1,10 @@
+0.004  2026-05-31 18:12:03 CEST
+   - Release after 83 PASSes in CPAN Testers (thanks!)
+
+0.003001  2026-05-31 12:14:05 CEST
+   - Hopefully fix bug about using Path::Tiny in use lib (spoiler: it needs
+     `->stringify` in perl previous than 5.38.0)
+
 0.003  2026-05-30 15:45:23 CEST
    - Reshape interface a bit
    - Support for callback data or using the callback data directly as a

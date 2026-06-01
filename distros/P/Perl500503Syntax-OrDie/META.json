@@ -1,23 +1,23 @@
 {
     "name" : "Perl500503Syntax-OrDie",
-    "version" : "0.02",
+    "version" : "0.03",
     "abstract" : "Validate Perl 5.005_03 source compatibility",
     "author" : [
-        "ina <ina@cpan.org>"
+        "ina <ina.cpan@gmail.com>"
     ],
     "dynamic_config" : 1,
-    "generated_by" : "pmake.bat",
+    "generated_by" : "pmake.bat version 0.32",
     "license" : [
         "perl_5"
     ],
     "meta-spec" : {
-        "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        "url" : "https://search.cpan.org/perldoc?CPAN::Meta::Spec",
         "version" : 2
     },
     "release_status" : "stable",
     "resources" : {
         "license" : [
-            "http://dev.perl.org/licenses/"
+            "https://dev.perl.org/licenses/"
         ],
         "bugtracker" : {
             "web" : "https://github.com/ina-cpan/Perl500503Syntax-OrDie/issues"
@@ -31,41 +31,33 @@
     "prereqs" : {
         "build" : {
             "requires" : {
-                "perl" : "5.005_03",
-                "strict" : "1.01",
-                "vars" : "0",
-                "warnings" : "0"
+                "ExtUtils::MakeMaker" : "5.4302",
+                "perl" : "5.00503"
             }
         },
         "configure" : {
             "requires" : {
-                "perl" : "5.005_03",
-                "strict" : "1.01",
-                "vars" : "0",
-                "warnings" : "0"
+                "ExtUtils::MakeMaker" : "5.4302",
+                "perl" : "5.00503"
             }
         },
         "runtime" : {
             "requires" : {
-                "perl" : "5.005_03",
-                "strict" : "1.01",
-                "vars" : "0",
-                "warnings" : "0"
+                "ExtUtils::MakeMaker" : "5.4302",
+                "perl" : "5.00503"
             }
         },
         "test" : {
             "requires" : {
-                "perl" : "5.005_03",
-                "strict" : "1.01",
-                "vars" : "0",
-                "warnings" : "0"
+                "ExtUtils::MakeMaker" : "5.4302",
+                "perl" : "5.00503"
             }
         }
     },
     "provides" : {
         "Perl500503Syntax::OrDie" : {
             "file" : "lib/Perl500503Syntax/OrDie.pm",
-            "version" : "0.02"
+            "version" : "0.03"
         }
     }
 }

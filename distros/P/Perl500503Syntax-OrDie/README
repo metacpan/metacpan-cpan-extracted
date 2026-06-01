@@ -3,7 +3,7 @@ NAME
     Perl 5.005_03
 
 VERSION
-    0.01
+    0.03
 
 SYNOPSIS
         # Place at the top of any script you wish to guard:
@@ -175,27 +175,27 @@ CHECKED CONSTRUCTS
 DOCUMENTATION
     Multilingual cheatsheets are provided in the doc/ directory:
 
+        doc/Perl500503Syntax-OrDie_cheatsheet.BM.txt  (Bahasa Melayu)
+        doc/Perl500503Syntax-OrDie_cheatsheet.BN.txt  (Bengali)
         doc/Perl500503Syntax-OrDie_cheatsheet.EN.txt  (English)
-        doc/Perl500503Syntax-OrDie_cheatsheet.JA.txt  (Japanese)
-        doc/Perl500503Syntax-OrDie_cheatsheet.ZH.txt  (Chinese)
-        doc/Perl500503Syntax-OrDie_cheatsheet.KO.txt  (Korean)
         doc/Perl500503Syntax-OrDie_cheatsheet.FR.txt  (French)
-        doc/Perl500503Syntax-OrDie_cheatsheet.DE.txt  (German)
-        doc/Perl500503Syntax-OrDie_cheatsheet.ES.txt  (Spanish)
-        doc/Perl500503Syntax-OrDie_cheatsheet.IT.txt  (Italian)
-        doc/Perl500503Syntax-OrDie_cheatsheet.PT.txt  (Portuguese)
-        doc/Perl500503Syntax-OrDie_cheatsheet.RU.txt  (Russian)
-        doc/Perl500503Syntax-OrDie_cheatsheet.AR.txt  (Arabic)
         doc/Perl500503Syntax-OrDie_cheatsheet.HI.txt  (Hindi)
-        doc/Perl500503Syntax-OrDie_cheatsheet.NL.txt  (Dutch)
-        doc/Perl500503Syntax-OrDie_cheatsheet.PL.txt  (Polish)
-        doc/Perl500503Syntax-OrDie_cheatsheet.SV.txt  (Swedish)
-        doc/Perl500503Syntax-OrDie_cheatsheet.TR.txt  (Turkish)
-        doc/Perl500503Syntax-OrDie_cheatsheet.VI.txt  (Vietnamese)
-        doc/Perl500503Syntax-OrDie_cheatsheet.ID.txt  (Indonesian)
+        doc/Perl500503Syntax-OrDie_cheatsheet.ID.txt  (Bahasa Indonesia)
+        doc/Perl500503Syntax-OrDie_cheatsheet.JA.txt  (Japanese)
+        doc/Perl500503Syntax-OrDie_cheatsheet.KM.txt  (Khmer)
+        doc/Perl500503Syntax-OrDie_cheatsheet.KO.txt  (Korean)
+        doc/Perl500503Syntax-OrDie_cheatsheet.MN.txt  (Mongolian)
+        doc/Perl500503Syntax-OrDie_cheatsheet.MY.txt  (Burmese)
+        doc/Perl500503Syntax-OrDie_cheatsheet.NE.txt  (Nepali)
+        doc/Perl500503Syntax-OrDie_cheatsheet.SI.txt  (Sinhala)
         doc/Perl500503Syntax-OrDie_cheatsheet.TH.txt  (Thai)
-        doc/Perl500503Syntax-OrDie_cheatsheet.UK.txt  (Ukrainian)
-        doc/Perl500503Syntax-OrDie_cheatsheet.CS.txt  (Czech)
+        doc/Perl500503Syntax-OrDie_cheatsheet.TL.txt  (Tagalog)
+        doc/Perl500503Syntax-OrDie_cheatsheet.TR.txt  (Turkish)
+        doc/Perl500503Syntax-OrDie_cheatsheet.TW.txt  (Traditional Chinese)
+        doc/Perl500503Syntax-OrDie_cheatsheet.UR.txt  (Urdu)
+        doc/Perl500503Syntax-OrDie_cheatsheet.UZ.txt  (Uzbek)
+        doc/Perl500503Syntax-OrDie_cheatsheet.VI.txt  (Vietnamese)
+        doc/Perl500503Syntax-OrDie_cheatsheet.ZH.txt  (Simplified Chinese)
         doc/perldelta_summary.txt  (perldelta feature summary with URLs)
 
 INSTALL
@@ -208,7 +208,7 @@ DEPENDENCIES
     No non-core dependencies.  Perl 5.005_03 or later.
 
 AUTHOR
-    INABA Hitoshi <ina@cpan.org>
+    INABA Hitoshi <ina.cpan@gmail.com>
 
 LICENSE
     This library is free software; you may redistribute it and/or

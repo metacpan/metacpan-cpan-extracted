@@ -1,5 +1,10 @@
 Revision history for Concierge-Users
 
+v0.8.4  2026-05-31
+    - Fix version consistency: bump Database, File, and YAML backend modules
+      to v0.8.4 (were not bumped during v0.8.3 release)
+    - Update Makefile.PL provides section to v0.8.4
+
 v0.8.3  2026-05-27
     - get_field_hints: add default, null, and validate_as to returned hashref;
       document required semantics (service-layer, not app-level conditional)

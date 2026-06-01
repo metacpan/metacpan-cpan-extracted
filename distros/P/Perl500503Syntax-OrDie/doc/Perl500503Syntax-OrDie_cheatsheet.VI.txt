@@ -1,13 +1,13 @@
-Perl500503Syntax::OrDie Cheatsheet (Tiáº¿ng Viá»t)
-EOF_UNDERLINE
+Perl500503Syntax::OrDie Tham khảo nhanh (Tiếng Việt)
+======================================================
 
-TÃN
+TÊN
     Perl500503Syntax::OrDie - (see EN cheatsheet for full description)
 
-PHIÃN Báº¢N
-    0.01
+PHIÊN BẢN
+    0.03
 
-TÃM Táº®T
+TÓM TẮT
     use Perl500503Syntax::OrDie;
 
     use Perl500503Syntax::OrDie ();
@@ -18,35 +18,42 @@ TÃM Táº®T
     perl lib/Perl500503Syntax/OrDie.pm script1.pl script2.pl ...
     perl lib/Perl500503Syntax/OrDie.pm -
 
-MÃ Táº¢
-    Khi cháº¡y nhÆ° lá»nh, má»i file ÄÆ°á»£c chá» Äá»nh sáº½ ÄÆ°á»£c kiá»m tra.
-KhÃ´ng cÃ³ tham sá» thÃ¬ hiá»n thá» cÃ¡ch dÃ¹ng.
+MÔ TẢ
+    Khi chạy như một lệnh, mỗi tập tin được chỉ định sẽ được kiểm tra.
+    Nếu không có đối số, cách dùng sẽ được hiển thị.
 
-Cáº¤U TRÃC KIá»M TRA (tÄ©nh, biÃªn dá»ch)
-    Perl 5.6  : our / 3-arg open / use utf8 / \x{} / \N{} / @+@- /
-                CHECK/INIT / v-string / $^V / :lvalue / \p{}\P{}
-    Perl 5.8  : use encoding / PerlIO layers
+CẤU TRÚC ĐƯỢC KIỂM TRA (tĩnh, lúc biên dịch)
+    Perl 5.6  : our / 3-arg open / use utf8 / use VERSION>=5.6 / \x{} /
+                \N{} / @+@- $+[N] $-[N] / CHECK/INIT / v-string / $^V /
+                :lvalue / *name{SLOT} / \p{}\P{}
+    Perl 5.8  : use encoding / use constant { HASH }
     Perl 5.10 : //= // say state given/when ~~ use feature
-                \K (?<name>) \k<name> (?|) (*VERB) \h\v\R
-                UNITCHECK possessive-quantifiers (?1)(?R) ${^MATCH} \g{N}
+                \K (?<name>) \k<name> (?|) (*VERB) \h\H\v\V\R
+                UNITCHECK possessive-quantifiers (?1)(?&name)(?R)
+                ${^MATCH} ${^PREMATCH} ${^POSTMATCH} \g{N}
     Perl 5.12 : package NAME VERSION / ...
     Perl 5.14 : s///r tr///r
     Perl 5.16 : __SUB__
-    Perl 5.20 : subroutine signatures / $ref->@*
-    Perl 5.22 : <<>> / /n
+    Perl 5.18 : my sub / state sub
+    Perl 5.20 : subroutine signatures / $ref->@* $ref->%* /
+                %hash{LIST} %array[LIST]
+    Perl 5.22 : <<>> / /n / &. |. ^. ~. / foreach \$x (@list)
     Perl 5.26 : <<~
+    Perl 5.30 : variable-length lookbehind (regex)
     Perl 5.32 : isa
     Perl 5.34 : try/catch
     Perl 5.36 : use builtin / for my ($a,$b)
     Perl 5.38 : class
+    Perl 5.40 : ^^ ^^= / __CLASS__
+    Perl 5.42 : any/all BLOCK LIST / my method / ->&name
 
-Cáº¤U TRÃC KIá»M TRA (thá»i gian cháº¡y)
+CẤU TRÚC ĐƯỢC KIỂM TRA (lúc chạy)
     open(FH, MODE, PATH)   3-argument open
     open(FH, \$ref)       reference-as-mode open
     mkdir(PATH)            mkdir without explicit mode
 
-Lá»CH Sá»¬ PHIÃN Báº¢N PERL
-    Tham kháº£o: https://perldoc.perl.org/perl56delta
+LỊCH SỬ PHIÊN BẢN PERL
+    Tham khảo: https://perldoc.perl.org/perl56delta
               https://perldoc.perl.org/perl58delta
               https://perldoc.perl.org/perl5100delta
               https://perldoc.perl.org/perl5120delta
@@ -66,7 +73,7 @@ Lá»CH Sá»¬ PHIÃN Báº¢N PERL
               https://perldoc.perl.org/perl5400delta
               https://perldoc.perl.org/perl5420delta
 
-  TÃ­nh nÄng theo phiÃªn báº£n Perl mÃ  mÃ´-Äun nÃ y kiá»m tra:
+  Tính năng của từng phiên bản Perl mà mô-đun này kiểm tra:
 
   perl56delta (Perl 5.6.0, 2000-03-22)
     our VARIABLE, 3-arg open(), use utf8, use VERSION>=5.6,
@@ -74,7 +81,8 @@ Lá»CH Sá»¬ PHIÃN Báº¢N PERL
     v-string, $^V, :lvalue, \p{}\P{}, mkdir without mode
 
   perl58delta (Perl 5.8.0, 2002-07-18)
-    use encoding, PerlIO layers (:utf8 :encoding :crlf)
+    use encoding; use constant { HASH } multi-constant form
+    (PerlIO layers such as :utf8 are runtime string values, NOT checked)
 
   perl5100delta (Perl 5.10.0, 2007-12-18)
     // //= say state given/when ~~ use feature \K
@@ -131,22 +139,22 @@ Lá»CH Sá»¬ PHIÃN Báº¢N PERL
     my method / ->& lexical method call (requires class feature)
       my method foo () { ... }  -- lexically scoped private method.
 
-THÃNH NGá»® AN TOÃN (Perl 5.005_03)
-    use vars qw($x @arr %hash);         "use vars" thay vÃ¬ "our"
-    open(FH, ">$path") or die $!;       dáº¡ng bareword 2 Äá»i sá»
-    mkdir("dir", 0755) or die $!;        cháº¿ Äá» rÃµ rÃ ng
-    $x = defined($y) ? $y : 'v';        thay vÃ¬ //=
-    print "...\n";                        thay vÃ¬ say
+THÀNH NGỮ AN TOÀN (Perl 5.005_03)
+    use vars qw($x @arr %hash);         "use vars" instead of "our"
+    open(FH, ">$path") or die $!;       2-argument bareword form
+    mkdir("dir", 0755) or die $!;        explicit mode
+    $x = defined($y) ? $y : 'v';        instead of //=
+    print "...\n";                        instead of say
 
-PHá»¤ THUá»C
-    KhÃ´ng cÃ³ phá»¥ thuá»c ngoÃ i lÃµi. Perl 5.005_03 trá» lÃªn.
+PHỤ THUỘC
+    Không phụ thuộc ngoài lõi. Perl 5.005_03 trở lên.
 
-TÃC GIáº¢
-    INABA Hitoshi <ina@cpan.org>
+TÁC GIẢ
+    INABA Hitoshi <ina.cpan@gmail.com>
 
-GIáº¤Y PHÃP
-    ThÆ° viá»n tá»± do; cÃ³ thá» phÃ¢n phá»i láº¡i theo cÃ¹ng Äiá»u khoáº£n vá»i Perl.
+GIẤY PHÉP
+    Phần mềm tự do; phân phối lại theo cùng điều khoản với Perl.
 
-XEM THÃM
+XEM THÊM
     perlpolicy, perlhist
     https://metacpan.org/dist/Perl500503Syntax-OrDie

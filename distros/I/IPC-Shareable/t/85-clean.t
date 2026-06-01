@@ -6,7 +6,6 @@ use Data::Dumper;
 use IPC::Shareable;
 IPC::Shareable->testing_set('IPC::Shareable');
 use IPC::Shareable::SharedMem;
-use Mock::Sub;
 use Test::More;
 use Test::SharedFork;
 
@@ -222,8 +221,13 @@ is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
     local $SIG{__WARN__} = sub { push @seen_warnings, @_ };
 
     {
-        my $mock = Mock::Sub->new;
-        my $sem_mock = $mock->mock('IPC::Semaphore::remove', return_value => undef);
+        # Override IPC::Semaphore::remove via local typeglob, not Mock::Sub:
+        # Mock::Sub 1.08 (on some CPAN testers) returns the call args for
+        # return_value => undef, so sem->remove looked like it succeeded and the
+        # warn path never fired. Bare `return` = failure in any context; no
+        # warnings 'redefine' is block-scoped so real redefines warn.
+        no warnings 'redefine';
+        local *IPC::Semaphore::remove = sub { return };
         $k->remove;
     }
 

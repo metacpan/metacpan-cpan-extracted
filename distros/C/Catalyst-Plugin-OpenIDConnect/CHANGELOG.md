@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.12] - 2026-05-31 Fixed CPAN test failures
+
+- Module::CPANfile added as dist.ini prerequisite
+
+- Required Crypt::OpenSSL::RSA version changed to >= 0.38
+
 ## [0.11] - 2026-05-30 Fixed PREREQ_PM in Makefile.PL
 
 ## [0.10] - 2026-05-30 (Security Fixes: NEW-HIGH-1, NEW-HIGH-2, NEW-MED-1, NEW-MED-2, NEW-LOW-1)

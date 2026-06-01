@@ -5,15 +5,13 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{Perl500503Syntax::OrDie},
-    'VERSION'   => q{0.02},
+    'VERSION'   => q{0.03},
     'ABSTRACT'  => q{Validate Perl 5.005_03 source compatibility},
     'PREREQ_PM' => {
-        'perl' => '5.005_03',
-        'strict' => '1.01',
-        'vars' => '0',
-        'warnings' => '0',
+        'ExtUtils::MakeMaker' => '5.4302',
+        'perl' => '5.00503',
     },
-    'AUTHOR'    => q{ina <ina@cpan.org>},
+    'AUTHOR'    => q{ina <ina.cpan@gmail.com>},
 );
 
 # LICENSE was introduced in ExtUtils::MakeMaker 6.31 (2006).
@@ -31,7 +29,7 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
     $args{META_MERGE} = {
         'meta-spec' => { version => 2 },
         'resources' => {
-            'license'    => [ 'http://dev.perl.org/licenses/' ],
+            'license'    => [ 'https://dev.perl.org/licenses/' ],
             'bugtracker' => {
                 'web' => 'https://github.com/ina-cpan/Perl500503Syntax-OrDie/issues',
             },
@@ -44,7 +42,7 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'Perl500503Syntax::OrDie' => {
                 'file'    => 'lib/Perl500503Syntax/OrDie.pm',
-                'version' => '0.02',
+                'version' => '0.03',
             }
         },
     };

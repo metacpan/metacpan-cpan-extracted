@@ -1,5 +1,165 @@
 Revision history for Perl500503Syntax::OrDie
 
+0.03  2026-05-31 JST (Japan Standard Time)
+
+  - Updated the README DOCUMENTATION section to list the actual 21
+    cheatsheet languages shipped in doc/ (it still named the eleven
+    removed languages and omitted the eleven new ones).
+  - Audited every cheatsheet against the module implementation and
+    corrected the abbreviated "CHECKED CONSTRUCTS (static)" block used by
+    the template-language cheatsheets, which was both wrong and stale:
+      * removed "PerlIO layers" from the checked list -- PerlIO layers
+        are runtime string values and are deliberately NOT checked (the
+        perl58delta note now says so explicitly);
+      * the Perl 5.8 entry now lists the "use constant { HASH }"
+        multi-constant form that the module actually detects;
+      * added the constructs that were missing entirely: *name{SLOT}
+        (5.6), my sub / state sub (5.18), key/value slices (5.20),
+        string bitwise operators and foreach reference aliasing (5.22),
+        variable-length lookbehind (5.30), ^^ / ^^= and __CLASS__ (5.40),
+        and any/all BLOCK LIST, my method, ->&name (5.42).
+    The English and Japanese full cheatsheets already matched the
+    implementation and were left as-is apart from the version bump.
+  - Regenerated the doc/ cheatsheets as the standard 21-language set
+    (BM BN EN FR HI ID JA KM KO MN MY NE SI TH TL TR TW UR UZ VI ZH).
+    Eleven non-standard languages (AR CS DE ES IT NL PL PT RU SV UK)
+    had been introduced by mistake and are removed; MANIFEST now matches.
+  - Fixed UTF-8 double-encoding (mojibake) in twelve cheatsheets and a
+    literal "EOF_UNDERLINE" placeholder left on the title-underline line
+    of fourteen cheatsheets. All cheatsheets are now well-formed UTF-8.
+  - Synchronised the version in README and in every cheatsheet to 0.03
+    (they previously read 0.01 while the rest of the distribution was
+    already 0.03).
+  - Fixed eg/check_compatibility.pl: it wrapped check_source() in
+    eval{}/if($@), but check_source() returns a violation list rather
+    than dying, so every example printed "(not detected)". The examples
+    now use the return-value API and report violations correctly.
+  - Canonicalised the module header: added the distribution URL and a
+    "use 5.00503;" minimum-version declaration.
+  - Fixed a false positive in t/9020-perl5compat.t (P5): the
+    "use VERSION >= 5.6" pattern stripped the leading zeros of 5.00503
+    and flagged the legitimate minimum-version line. P5 now mirrors the
+    module's own @BLACKLIST alternation.
+  - Closed test blind spots:
+      * t/9080-cheatsheets.t lists the standard 21 languages, adds a
+        per-language guard against UTF-8 double-encoding, and declares
+        its plan via plan_tests() so a failure also exits non-zero.
+      * t/9070-examples.t now runs the demonstration script and asserts
+        it reports violations (guarding the eval/$@ regression).
+      * t/9060-readme.t H9 genuinely gates on the module version. The
+        list-context idiom "ok($x =~ /.../, name)" used by the README
+        checks let a failed match shift the test name into the truth
+        slot and pass vacuously; the predicates are now scalar-forced.
+      * t/9030-distribution.t language list updated to the standard set.
+
+  - Fixed t/9050-pod.t failing on every Perl from 5.16 through 5.24.
+    The test called Pod::Checker->parse_file(), a method that exists only
+    in the Pod::Simple-based Pod::Checker (1.73+, shipped with Perl 5.26
+    and later). The Pod::Parser-based versions bundled with those Perls
+    (1.51 with 5.16; 1.60 with 5.18-5.24) provide only parse_from_file(),
+    so parse_file() threw, the eval trapped it, and subtest G12 (errors)
+    failed regardless of the actual POD content. The test now selects the
+    available API via ->can('parse_file'); the Pod::Parser path routes
+    messages to STDERR so the TAP stream is never corrupted.
+  - Fixed three "unescaped <>" POD warnings reported by Pod::Checker 1.60
+    (Perl 5.18-5.24), which would have failed subtest G13 once G12 ran:
+    escaped the bare '>' in "VERSION >= 5.6" / "VERSION >= v5.6" as
+    E<gt>=, and wrapped the match-position variables @-, $-[N] in C<>
+    so no bare '>' remains in the CHECKED CONSTRUCTS list.
+  - Fixed false positive: an empty pattern // used as the first argument
+    of split/grep/map, e.g. "for my $ch (split //, $str)", is no longer
+    reported as the Perl 5.10 defined-or operator. The source masker now
+    recognizes split/grep/map as regex-introducing list operators, so a
+    '/' immediately following one of these barewords is masked as the
+    start of a pattern (a division can never follow these operators).
+  - Added regression tests for the fix in t/0008-new-features.t.
+  - Fixed false positive: a subroutine definition "sub any { ... }" or
+    "sub all { ... }" is no longer reported as the Perl 5.42 "any BLOCK
+    LIST" / "all BLOCK LIST" keyword operator. Matches preceded by "sub"
+    or by an arrow operator are now skipped.
+  - Fixed false positive: a 2-argument open() whose second argument
+    contains a function call with a comma, e.g.
+    open(FH, '>' . File::Spec->catfile($dir, $file)), is no longer
+    mistaken for a 3-argument open(). Detection now counts only
+    top-level commas inside the open(...) parentheses (paren-aware).
+  - Added regression tests for both fixes in t/0008-new-features.t.
+  - Fixed false positive: here-document bodies are now masked correctly.
+    The source masker previously consumed only the sentinel-length of a
+    heredoc body and could not handle two or more heredocs sharing one
+    line (e.g. "$_ = <<'A'; $x eq <<'B';"). Heredoc bodies that contained
+    post-5.005_03 example text (<<>>, $+[N], tr///r, subroutine
+    signatures, //x, ...) leaked into the code scan and were wrongly
+    reported. The masker now queues each heredoc sentinel at its <<
+    operator and consumes all queued bodies, in order, at the end of the
+    line.
+  - Fixed false positive: a typeglob ("local (*s, $n) = @_;") or a
+    subroutine sigil ("&s") immediately before a quote-like word is no
+    longer mistaken for a quote-like operator (s///, m//, tr///, ...).
+    Likewise a package-qualified call such as "mb::tr($x, 'A', '1')" is
+    no longer read as the tr/// transliteration operator: the masker now
+    refuses to start a quote-like operator when the preceding character
+    is '*', '&', or ':'.
+  - Fixed false positive: the old-style apostrophe package separator
+    (e.g. "&jcode'tr(...)", equivalent to "&jcode::tr(...)") is now
+    recognized. A sigil-led identifier followed by "'" and a word
+    character is treated as a package separator, not the start of a
+    single-quoted string, so the remainder of the line no longer desyncs.
+  - Fixed false positive: an escaped backslash followed by a regex-escape
+    letter inside a regex literal, e.g. the two-character literal "\\h"
+    in "(?:(?![$bare_h])$x)" style replacement strings, is no longer
+    mistaken for the Perl 5.10 \h horizontal-whitespace escape. Backslash
+    pairs are neutralized before the regex-body scan.
+  - Fixed false positive: a postfix-increment operator on a
+    package-qualified or subscripted lvalue (e.g. "$mb::seq++") is no
+    longer reported as a Perl 5.10 possessive quantifier; "++" in masked
+    code is always the increment operator (a genuine possessive
+    quantifier can occur only inside a regex, which is scanned separately).
+  - Added regression tests for the above fixes in t/0008-new-features.t.
+  - Fixed false positive: the empty-import form "use feature ()" is no
+    longer reported as the Perl 5.10 "use feature" pragma. Used with the
+    "BEGIN { $INC{'feature.pm'} = '' if $] < 5.010 }" stub it imports and
+    loads nothing on Perl 5.005_03 (a no-op on every Perl version), so it
+    is the standard cross-version guard idiom. A non-empty import list
+    such as "use feature 'say'" or "use feature qw(...)" is still
+    reported. Regression tests added in t/0002-check-source.t.
+
+  - Added t/0009-clean-corpus.t: a clean-corpus regression test that
+    scans the shipped library modules (lib/*.pm) of eight known
+    5.005_03-compatible ina@CPAN distributions -- CSV-LINQ, LTSV-LINQ,
+    JSON-LINQ, mb-JSON, Modern-Open, Perl7-Handy, BATsh and UTF8-R2 --
+    and asserts zero violations for each. The sample sources live under
+    t/corpus/. This guards against future BLACKLIST/masker changes
+    introducing false positives against genuine clean code.
+
+  - Added t/0010-clean-corpus-stack.t: a second clean-corpus regression
+    test scanning the shipped library modules (lib/*.pm) of eight more
+    5.005_03-compatible ina@CPAN distributions -- the Handy runtime
+    stack (PSGI-Handy, HTTP-Handy, DB-Handy, HP-Handy) and the
+    character-encoding libraries (Jacode, mb, Jacode4e,
+    Jacode4e-RoundTrip) -- and asserting zero violations for each (12
+    module files). The sample sources live under t/corpus-stack/, a
+    sibling of t/corpus/ so the 0009 walker does not descend into it.
+    Three of the sources (mb.pm, Jacode4e.pm, Jacode4e/RoundTrip.pm) are
+    multibyte (MBCS); they are read with binmode and exercise the masker
+    against large, real-world non-ASCII code.
+  - t/9010-encoding.t: the t/corpus and t/corpus-stack trees are now
+    exempted from the encoding-hygiene checks, the same kind of exemption
+    already granted to doc/. External corpus sources are stored byte-exact
+    and are not held to OrDie's own US-ASCII house rule. This also avoids
+    a false positive in the C2 (trailing-whitespace) check: a legacy
+    multibyte source whose double-byte character ends in 0x20 or 0x09 just
+    before a newline would otherwise be flagged by the byte-pattern
+    /[ \t]+\n/ even though no real trailing whitespace exists. The corpus
+    trees are matched directly from the MANIFEST list with
+    !m{^t/corpus(?:-stack)?/}; their 5.005_03 compatibility is validated
+    by t/0009-clean-corpus.t and t/0010-clean-corpus-stack.t.
+  - t/9020-perl5compat.t: the corpus exemption regex was widened from
+    [/\\]corpus[/\\] to [/\\]corpus(?:-stack)?[/\\] so that the sibling
+    t/corpus-stack tree is excluded as well. Without this the external
+    samples (e.g. HTTP::Handy and mb, which use a scalar filehandle in
+    open()) were wrongly held to this distribution's bareword-filehandle
+    (P14) house rule.
+
 0.02  2026-05-29 JST (Japan Standard Time)
 
   - Fixed malformed POD interior sequences (C<<<>>>, C<<<~>) that Pod::Checker 1.51-1.73 flagged as errors on perl 5.16-5.24

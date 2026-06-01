@@ -38,7 +38,7 @@
             "Crypt::OpenSSL::PKCS12" : "0",
             "Crypt::OpenSSL::X509" : "0",
             "Crypt::URandom" : "0",
-            "CryptX" : "0",
+            "CryptX" : "0.088",
             "DBD::SQLite" : "0",
             "DBI" : "0",
             "DateTime::Lite" : "0",
@@ -88,6 +88,6 @@
          "web" : "https://github.com/zuzuscript/zuzu-perl"
       }
    },
-   "version" : "0.001002",
+   "version" : "0.001003",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

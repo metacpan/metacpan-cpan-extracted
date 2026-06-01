@@ -31,7 +31,9 @@ $tickit->tick( RUN_NOHANG );
 
    $tickit->watch_process( $pid, sub { $status = $_[0]->wstatus } );
 
-   $tickit->tick( 0 );
+   # Some platforms (e.g. FreeBSD) don't synchronously report this on the
+   # first tick. Give it up to 3 rounds to settle
+   defined $status or $tickit->tick( 0 ) for 1 .. 3;
 
    is( POSIX::WEXITSTATUS($status), 5, '$status after child terminated' );
 }

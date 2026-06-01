@@ -41,8 +41,8 @@ ok(defined $Perl500503Syntax::OrDie::VERSION,
 ok($Perl500503Syntax::OrDie::VERSION =~ /^\d+\.\d+/,
    'Perl500503Syntax::OrDie: $VERSION looks like a version number');
 
-ok($Perl500503Syntax::OrDie::VERSION eq '0.02',
-   'Perl500503Syntax::OrDie: $VERSION is 0.02');
+ok($Perl500503Syntax::OrDie::VERSION eq '0.03',
+   'Perl500503Syntax::OrDie: $VERSION is 0.03');
 
 # Public API subs
 ok(defined &Perl500503Syntax::OrDie::check_file,

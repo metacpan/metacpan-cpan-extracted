@@ -12,6 +12,7 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Dist::AutomationPolicy' => 'v0.2.0',
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',

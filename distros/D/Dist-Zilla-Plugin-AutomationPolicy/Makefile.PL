@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.024000",
   "NAME" => "Dist::Zilla::Plugin::AutomationPolicy",
   "PREREQ_PM" => {
-    "Dist::AutomationPolicy" => 0,
+    "Dist::AutomationPolicy" => "0.2.0",
     "Dist::Zilla::File::InMemory" => 0,
     "Dist::Zilla::Pragmas" => 0,
     "Dist::Zilla::Role::FileGatherer" => 0,
@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.1.0",
+  "VERSION" => "v0.1.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -54,7 +54,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Dist::AutomationPolicy" => 0,
+  "Dist::AutomationPolicy" => "0.2.0",
   "Dist::Zilla::File::InMemory" => 0,
   "Dist::Zilla::Pragmas" => 0,
   "Dist::Zilla::Role::FileGatherer" => 0,

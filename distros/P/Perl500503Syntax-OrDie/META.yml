@@ -1,27 +1,23 @@
 --- #YAML:1.0
 meta-spec:
   version: 1.4
-  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  url: https://module-build.sourceforge.net/META-spec-v1.4.html
 name: Perl500503Syntax-OrDie
-version: 0.02
+version: 0.03
 abstract: Validate Perl 5.005_03 source compatibility
 author:
-  - ina <ina@cpan.org>
+  - ina <ina.cpan@gmail.com>
 license: perl
-generated_by: pmake.bat
+generated_by: pmake.bat version 0.32
 requires:
-  perl: 5.005_03
-  strict: 1.01
-  vars: 0
-  warnings: 0
-build_requires:
-  Test: 1.122
+  ExtUtils::MakeMaker: 5.4302
+  perl: 5.00503
 minimum_perl_version: 5.00503
 provides:
   Perl500503Syntax::OrDie:
     file: lib/Perl500503Syntax/OrDie.pm
-    version: 0.02
+    version: 0.03
 resources:
-  license: http://dev.perl.org/licenses/
+  license: https://dev.perl.org/licenses/
   bugtracker: https://github.com/ina-cpan/Perl500503Syntax-OrDie/issues
   repository: https://github.com/ina-cpan/Perl500503Syntax-OrDie

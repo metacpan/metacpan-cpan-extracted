@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use Carp qw(croak);
 use Scalar::Util qw(weaken);
@@ -108,18 +108,18 @@ __END__
 
 =head1 NAME
 
-Linux::Event::Wakeup - eventfd-backed wakeup primitive for Linux::Event::Reactor
+Linux::Event::Wakeup - eventfd-backed wakeup primitive for Linux::Event::Loop
 
 =head1 SYNOPSIS
 
+  use v5.36;
+  use Linux::Event;
+
+  my $loop = Linux::Event->new;
   my $waker = $loop->waker;
 
-<<<<<<< HEAD
   # from another thread or cooperating producer
   $waker->signal;
-=======
-  my $loop = Linux::Event->new( model => 'reactor' );
->>>>>>> 1401c31 (prep for cpan and release, new tool added)
 
   # in the loop
   my $count = $waker->drain;
@@ -127,10 +127,10 @@ Linux::Event::Wakeup - eventfd-backed wakeup primitive for Linux::Event::Reactor
 =head1 DESCRIPTION
 
 C<Linux::Event::Wakeup> provides an eventfd-backed wakeup mechanism for the
-reactor. The usual pattern is to enqueue work elsewhere, then signal the waker
+loop. The usual pattern is to enqueue work elsewhere, then signal the waker
 so the loop can wake promptly and drain that work source.
 
-Most users obtain the waker through C<< $loop->waker >>. The reactor installs an
+Most users obtain the waker through C<< $loop->waker >>. The loop installs an
 internal read watcher for the eventfd so stop and explicit wakeups can break a
 blocking backend wait.
 
@@ -150,7 +150,6 @@ Drain pending wakeups and return the number observed.
 
 =head1 SEE ALSO
 
-L<Linux::Event::Reactor>,
 L<Linux::Event::Loop>
 
 =cut

@@ -1,11 +1,11 @@
 Perl500503Syntax::OrDie Cheatsheet (Bahasa Indonesia)
-EOF_UNDERLINE
+======================================================
 
 NAMA
     Perl500503Syntax::OrDie - (see EN cheatsheet for full description)
 
 VERSI
-    0.01
+    0.03
 
 RINGKASAN
     use Perl500503Syntax::OrDie;
@@ -19,26 +19,33 @@ RINGKASAN
     perl lib/Perl500503Syntax/OrDie.pm -
 
 DESKRIPSI
-    Saat dijalankan sebagai perintah, setiap file yang diberikan diperiksa.
-Tanpa argumen, menampilkan cara penggunaan.
+    Saat dijalankan sebagai perintah, setiap berkas yang diberikan diperiksa.
+    Tanpa argumen, cara penggunaan ditampilkan.
 
 KONSTRUKSI DIPERIKSA (statis, kompilasi)
-    Perl 5.6  : our / 3-arg open / use utf8 / \x{} / \N{} / @+@- /
-                CHECK/INIT / v-string / $^V / :lvalue / \p{}\P{}
-    Perl 5.8  : use encoding / PerlIO layers
+    Perl 5.6  : our / 3-arg open / use utf8 / use VERSION>=5.6 / \x{} /
+                \N{} / @+@- $+[N] $-[N] / CHECK/INIT / v-string / $^V /
+                :lvalue / *name{SLOT} / \p{}\P{}
+    Perl 5.8  : use encoding / use constant { HASH }
     Perl 5.10 : //= // say state given/when ~~ use feature
-                \K (?<name>) \k<name> (?|) (*VERB) \h\v\R
-                UNITCHECK possessive-quantifiers (?1)(?R) ${^MATCH} \g{N}
+                \K (?<name>) \k<name> (?|) (*VERB) \h\H\v\V\R
+                UNITCHECK possessive-quantifiers (?1)(?&name)(?R)
+                ${^MATCH} ${^PREMATCH} ${^POSTMATCH} \g{N}
     Perl 5.12 : package NAME VERSION / ...
     Perl 5.14 : s///r tr///r
     Perl 5.16 : __SUB__
-    Perl 5.20 : subroutine signatures / $ref->@*
-    Perl 5.22 : <<>> / /n
+    Perl 5.18 : my sub / state sub
+    Perl 5.20 : subroutine signatures / $ref->@* $ref->%* /
+                %hash{LIST} %array[LIST]
+    Perl 5.22 : <<>> / /n / &. |. ^. ~. / foreach \$x (@list)
     Perl 5.26 : <<~
+    Perl 5.30 : variable-length lookbehind (regex)
     Perl 5.32 : isa
     Perl 5.34 : try/catch
     Perl 5.36 : use builtin / for my ($a,$b)
     Perl 5.38 : class
+    Perl 5.40 : ^^ ^^= / __CLASS__
+    Perl 5.42 : any/all BLOCK LIST / my method / ->&name
 
 KONSTRUKSI DIPERIKSA (runtime)
     open(FH, MODE, PATH)   3-argument open
@@ -66,7 +73,7 @@ RIWAYAT VERSI PERL
               https://perldoc.perl.org/perl5400delta
               https://perldoc.perl.org/perl5420delta
 
-  Fitur per versi Perl yang diperiksa oleh modul ini:
+  Fitur tiap versi Perl yang diperiksa oleh modul ini:
 
   perl56delta (Perl 5.6.0, 2000-03-22)
     our VARIABLE, 3-arg open(), use utf8, use VERSION>=5.6,
@@ -74,7 +81,8 @@ RIWAYAT VERSI PERL
     v-string, $^V, :lvalue, \p{}\P{}, mkdir without mode
 
   perl58delta (Perl 5.8.0, 2002-07-18)
-    use encoding, PerlIO layers (:utf8 :encoding :crlf)
+    use encoding; use constant { HASH } multi-constant form
+    (PerlIO layers such as :utf8 are runtime string values, NOT checked)
 
   perl5100delta (Perl 5.10.0, 2007-12-18)
     // //= say state given/when ~~ use feature \K
@@ -132,20 +140,20 @@ RIWAYAT VERSI PERL
       my method foo () { ... }  -- lexically scoped private method.
 
 IDIOM AMAN (Perl 5.005_03)
-    use vars qw($x @arr %hash);         "use vars" daripada "our"
-    open(FH, ">$path") or die $!;       bentuk bareword 2 argumen
-    mkdir("dir", 0755) or die $!;        mode eksplisit
-    $x = defined($y) ? $y : 'v';        daripada //=
-    print "...\n";                        daripada say
+    use vars qw($x @arr %hash);         "use vars" instead of "our"
+    open(FH, ">$path") or die $!;       2-argument bareword form
+    mkdir("dir", 0755) or die $!;        explicit mode
+    $x = defined($y) ? $y : 'v';        instead of //=
+    print "...\n";                        instead of say
 
 DEPENDENSI
-    Tidak ada dependensi non-inti. Perl 5.005_03 atau lebih baru.
+    Tidak ada dependensi non-inti. Perl 5.005_03 atau yang lebih baru.
 
 PENULIS
-    INABA Hitoshi <ina@cpan.org>
+    INABA Hitoshi <ina.cpan@gmail.com>
 
 LISENSI
-    Pustaka bebas; dapat didistribusikan ulang dengan ketentuan yang sama seperti Perl.
+    Perangkat lunak bebas; dapat didistribusikan ulang dengan syarat yang sama seperti Perl.
 
 LIHAT JUGA
     perlpolicy, perlhist

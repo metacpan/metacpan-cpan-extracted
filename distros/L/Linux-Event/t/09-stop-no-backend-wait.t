@@ -52,8 +52,7 @@ use Linux::Event::Loop;
 
 my $backend = t::MockBackend->new;
 my $loop = Linux::Event::Loop->new(
-  model   => 'reactor',
-  backend => $backend,
+    backend => $backend,
   clock   => t::MockClock->new,
   timer   => t::MockTimer->new,
 );

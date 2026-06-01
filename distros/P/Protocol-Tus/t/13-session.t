@@ -9,7 +9,7 @@ use Protocol::Tus;
 use Protocol::Tus::LocalDir;
 
 use Path::Tiny;
-use lib path(__FILE__)->parent;
+use lib path(__FILE__)->parent->stringify;
 use Test::TusResponse;
 
 my $root = path(__FILE__)->parent->tempdir(CLEANUP => 1);

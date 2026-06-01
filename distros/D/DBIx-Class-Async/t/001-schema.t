@@ -62,7 +62,8 @@ subtest 'Storage compatibility' => sub {
 subtest 'Schema cloning' => sub {
     my $new_schema = $schema->clone;
     isa_ok($new_schema, 'DBIx::Class::Async::Schema', 'Cloned schema');
-    isnt($schema->{_async_db}, $new_schema->{_async_db}, 'Async DB instances are different');
+    is($schema->{_async_db}, $new_schema->{_async_db},
+        'Cloned schema shares async_db with parent (shared worker pool)');
     cmp_bag([$schema->sources], [$new_schema->sources], 'Cloned schema has same sources');
 };
 

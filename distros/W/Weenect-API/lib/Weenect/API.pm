@@ -20,7 +20,7 @@ Weenect::API - API interaction
     my $trackers = $api->get_trackers;
 
     # Process tracker data.
-    foreach my $tracker ( @$trackers ) {
+    foreach my $tracker ( $trackers->items->@* ) {
 	printf("Tracker %s [%d%s]\n", $tracker->name, $tracker->id,
 	      $tracker->active ? "" : ",inactive" );
     }
@@ -31,7 +31,7 @@ class Weenect::API;
 
 use Weenect::Connect;
 
-field $api;
+field $api :accessor;
 field $acct;
 field $debug :mutator;
 
@@ -54,7 +54,7 @@ method login( $user = "", $pass = "" ) {
     $api->debug = $debug;
     my $acct = $self->get_acct( $user, $pass );
     my $res = $api->request( "user/login",
-			     { Content => $acct->json } );
+			     Content => $acct->json );
     return unless $res;
     $api->auth = Weenect::Auth->create($res);
 }
@@ -87,8 +87,7 @@ method get_trackers {
     my $res = $api->request("mytracker");
     return unless $res;
 
-    my $trackers = Weenect::Trackers->create_with_api( $res, $api );
-    $trackers->items;
+    return Weenect::Trackers->create_with_api( $res, $api );
 }
 
 =head2 get_preferences
@@ -128,9 +127,7 @@ Weenect::Preferences object.
 
 method set_preferences( %prefs ) {
     require Weenect::Preferences;
-    my $res = $api->request( "myuser",
-			     { Content => \%prefs }
-			   );
+    my $res = $api->request( "myuser", Content => \%prefs );
     return unless $res;
 
     return Weenect::Preferences->create($res);
@@ -154,6 +151,28 @@ method get_animals( $imei ) {
     return $animals->items;
 }
 
+=head2 logout
+
+Disconnect.
+
+=cut
+
+method logout {
+    return $api->request("logout");
+}
+
+=head2 kindex
+
+Get the planetary magnetic field disturbance.
+
+Mostly returns nothing.
+
+=cut
+
+method kindex {
+    return $api->request("kindex");
+}
+
 ################ Classes ################
 
 class Weenect::Login :does(Class::JSON_Object) {
@@ -169,3 +188,8 @@ class Weenect::Auth :does(Class::JSON_Object) {
 }
 
 1;
+
+# user/$uid
+# subscriptionoffer
+# mysubscription/$subscriptionid
+# mytracker/$tid/activity

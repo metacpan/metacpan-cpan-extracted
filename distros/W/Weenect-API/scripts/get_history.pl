@@ -3,8 +3,8 @@
 # Author          : Johan Vromans
 # Created On      : Mon Apr 27 16:42:51 2026
 # Last Modified By: Johan Vromans
-# Last Modified On: Sat May 30 17:19:22 2026
-# Update Count    : 127
+# Last Modified On: Sun May 31 21:48:01 2026
+# Update Count    : 129
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -86,6 +86,8 @@ system( "gpxsee", $gpx ) if $view;
 
 ################ Subroutines ################
 
+use Weenect::Position;
+
 sub make_gpx( $hist ) {
     my $ds = substr($start,0,10);
     my $gpx = "$dir/$ds.gpx";
@@ -158,7 +160,7 @@ sub get_history {
     $api->login;
 
     my $trackers = $api->get_trackers;
-    my $tracker = $trackers->[0];
+    my $tracker = $trackers->items->[0];
 
     printf("Tracker %s [%d%s]\n", $tracker->name, $tracker->id,
 	  $tracker->active ? "" : ",inactive" );

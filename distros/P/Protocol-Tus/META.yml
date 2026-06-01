@@ -25,22 +25,22 @@ no_index:
 provides:
   Protocol::Tus:
     file: lib/Protocol/Tus.pm
-    version: '0.003'
+    version: '0.004'
   Protocol::Tus::AbstractModel:
     file: lib/Protocol/Tus/AbstractModel.pm
-    version: '0.003'
+    version: '0.004'
   Protocol::Tus::LocalDir:
     file: lib/Protocol/Tus/LocalDir.pm
-    version: '0.003'
+    version: '0.004'
   Protocol::Tus::Response:
     file: lib/Protocol/Tus/Response.pm
-    version: '0.003'
+    version: '0.004'
   Protocol::Tus::Upload:
     file: lib/Protocol/Tus/Upload.pm
-    version: '0.003'
+    version: '0.004'
   Protocol::Tus::Util:
     file: lib/Protocol/Tus/Util.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Module::Runtime: '0.018'
   Moo: '2.005005'
@@ -53,7 +53,7 @@ resources:
   bugtracker: https://codeberg.org/polettix/Protocol-Tus/issues
   homepage: https://codeberg.org/polettix/Protocol-Tus
   repository: https://codeberg.org/polettix/Protocol-Tus.git
-version: '0.003'
+version: '0.004'
 x_contributors:
   - 'Flavio Poletti <flavio@polettix.it>'
 x_generated_by_perl: v5.40.1

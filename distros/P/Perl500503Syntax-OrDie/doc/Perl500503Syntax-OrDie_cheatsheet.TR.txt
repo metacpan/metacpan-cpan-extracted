@@ -1,13 +1,13 @@
-Perl500503Syntax::OrDie Cheatsheet (TÃ¼rkÃ§e)
-EOF_UNDERLINE
+Perl500503Syntax::OrDie Hızlı Başvuru (Türkçe)
+======================================================
 
 AD
     Perl500503Syntax::OrDie - (see EN cheatsheet for full description)
 
-SÃRÃM
-    0.01
+SÜRÜM
+    0.03
 
-ÃZET
+ÖZET
     use Perl500503Syntax::OrDie;
 
     use Perl500503Syntax::OrDie ();
@@ -18,35 +18,42 @@ SÃRÃM
     perl lib/Perl500503Syntax/OrDie.pm script1.pl script2.pl ...
     perl lib/Perl500503Syntax/OrDie.pm -
 
-AÃIKLAMA
-    Komut olarak Ã§alÄ±ÅtÄ±rÄ±ldÄ±ÄÄ±nda her belirtilen dosya kontrol edilir.
-ArgÃ¼man olmadan kullanÄ±m kÄ±lavuzu gÃ¶rÃ¼ntÃ¼lenir.
+AÇIKLAMA
+    Komut olarak çalıştırıldığında, verilen her dosya denetlenir.
+    Argüman verilmezse kullanım biçimi gösterilir.
 
-KONTROL EDÄ°LEN YAPILAR (statik, derleme zamanÄ±)
-    Perl 5.6  : our / 3-arg open / use utf8 / \x{} / \N{} / @+@- /
-                CHECK/INIT / v-string / $^V / :lvalue / \p{}\P{}
-    Perl 5.8  : use encoding / PerlIO layers
+DENETLENEN YAPILAR (statik, derleme)
+    Perl 5.6  : our / 3-arg open / use utf8 / use VERSION>=5.6 / \x{} /
+                \N{} / @+@- $+[N] $-[N] / CHECK/INIT / v-string / $^V /
+                :lvalue / *name{SLOT} / \p{}\P{}
+    Perl 5.8  : use encoding / use constant { HASH }
     Perl 5.10 : //= // say state given/when ~~ use feature
-                \K (?<name>) \k<name> (?|) (*VERB) \h\v\R
-                UNITCHECK possessive-quantifiers (?1)(?R) ${^MATCH} \g{N}
+                \K (?<name>) \k<name> (?|) (*VERB) \h\H\v\V\R
+                UNITCHECK possessive-quantifiers (?1)(?&name)(?R)
+                ${^MATCH} ${^PREMATCH} ${^POSTMATCH} \g{N}
     Perl 5.12 : package NAME VERSION / ...
     Perl 5.14 : s///r tr///r
     Perl 5.16 : __SUB__
-    Perl 5.20 : subroutine signatures / $ref->@*
-    Perl 5.22 : <<>> / /n
+    Perl 5.18 : my sub / state sub
+    Perl 5.20 : subroutine signatures / $ref->@* $ref->%* /
+                %hash{LIST} %array[LIST]
+    Perl 5.22 : <<>> / /n / &. |. ^. ~. / foreach \$x (@list)
     Perl 5.26 : <<~
+    Perl 5.30 : variable-length lookbehind (regex)
     Perl 5.32 : isa
     Perl 5.34 : try/catch
     Perl 5.36 : use builtin / for my ($a,$b)
     Perl 5.38 : class
+    Perl 5.40 : ^^ ^^= / __CLASS__
+    Perl 5.42 : any/all BLOCK LIST / my method / ->&name
 
-KONTROL EDÄ°LEN YAPILAR (Ã§alÄ±Åma zamanÄ±)
+DENETLENEN YAPILAR (çalışma zamanı)
     open(FH, MODE, PATH)   3-argument open
     open(FH, \$ref)       reference-as-mode open
     mkdir(PATH)            mkdir without explicit mode
 
-PERL SÃRÃM GEÃMÄ°ÅÄ°
-    Referanslar: https://perldoc.perl.org/perl56delta
+PERL SÜRÜM GEÇMİŞİ
+    Kaynak: https://perldoc.perl.org/perl56delta
               https://perldoc.perl.org/perl58delta
               https://perldoc.perl.org/perl5100delta
               https://perldoc.perl.org/perl5120delta
@@ -66,7 +73,7 @@ PERL SÃRÃM GEÃMÄ°ÅÄ°
               https://perldoc.perl.org/perl5400delta
               https://perldoc.perl.org/perl5420delta
 
-  Bu modÃ¼lÃ¼n kontrol ettiÄi Perl sÃ¼rÃ¼mÃ¼ Ã¶zellikleri:
+  Bu modülün denetlediği her Perl sürümünün özellikleri:
 
   perl56delta (Perl 5.6.0, 2000-03-22)
     our VARIABLE, 3-arg open(), use utf8, use VERSION>=5.6,
@@ -74,7 +81,8 @@ PERL SÃRÃM GEÃMÄ°ÅÄ°
     v-string, $^V, :lvalue, \p{}\P{}, mkdir without mode
 
   perl58delta (Perl 5.8.0, 2002-07-18)
-    use encoding, PerlIO layers (:utf8 :encoding :crlf)
+    use encoding; use constant { HASH } multi-constant form
+    (PerlIO layers such as :utf8 are runtime string values, NOT checked)
 
   perl5100delta (Perl 5.10.0, 2007-12-18)
     // //= say state given/when ~~ use feature \K
@@ -131,22 +139,22 @@ PERL SÃRÃM GEÃMÄ°ÅÄ°
     my method / ->& lexical method call (requires class feature)
       my method foo () { ... }  -- lexically scoped private method.
 
-GÃVENLÄ° DEYÄ°MLER (Perl 5.005_03)
-    use vars qw($x @arr %hash);         "our" yerine "use vars"
-    open(FH, ">$path") or die $!;       2 baÄÄ±msÄ±z deÄiÅkenli bareword formu
-    mkdir("dir", 0755) or die $!;        aÃ§Ä±k mod
-    $x = defined($y) ? $y : 'v';        //= yerine
-    print "...\n";                        say yerine
+GÜVENLİ DEYİMLER (Perl 5.005_03)
+    use vars qw($x @arr %hash);         "use vars" instead of "our"
+    open(FH, ">$path") or die $!;       2-argument bareword form
+    mkdir("dir", 0755) or die $!;        explicit mode
+    $x = defined($y) ? $y : 'v';        instead of //=
+    print "...\n";                        instead of say
 
-BAÄIMLILIKLAR
-    Ãekirdek dÄ±ÅÄ± baÄÄ±mlÄ±lÄ±k yok. Perl 5.005_03 veya Ã¼stÃ¼.
+BAĞIMLILIKLAR
+    Çekirdek dışı bağımlılık yok. Perl 5.005_03 veya üstü.
 
 YAZAR
-    INABA Hitoshi <ina@cpan.org>
+    INABA Hitoshi <ina.cpan@gmail.com>
 
-LÄ°SANS
-    ÃzgÃ¼r kÃ¼tÃ¼phane; Perl ile aynÄ± koÅullar altÄ±nda yeniden daÄÄ±tÄ±labilir.
+LİSANS
+    Özgür yazılım; Perl ile aynı koşullarda yeniden dağıtılabilir.
 
-AYRICA BAKIN
+AYRICA BAKINIZ
     perlpolicy, perlhist
     https://metacpan.org/dist/Perl500503Syntax-OrDie

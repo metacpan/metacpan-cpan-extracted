@@ -36,14 +36,15 @@ This was written as a successor to [Pod::Readme](https://metacpan.org/pod/Pod%3A
 
 # RECENT CHANGES
 
-Changes for version v0.5.2 (2025-10-19)
+Changes for version v0.5.3 (2026-05-31)
 
-- Enhancements
-    - The STATUS and SECURITY CONSIDERATIONS sections are included by default.
 - Documentation
-    - Updated the SUPPORT section to clarify the minimum Perl version.
-- Tests
-    - Add more author tests.
+    - Updated copyright year.
+    - Added doap.xml metadata to the distribution.
+    - Updated author email address.
+- Toolchain
+    - Added automation-policy.json to the distribution.
+    - Stopped signing distributions with Module::Signature.
 
 See the `Changes` file for more details.
 
@@ -130,14 +131,14 @@ and may be cloned from [https://github.com/robrwo/perl-Dist-Zilla-Plugin-UsefulR
 
 # AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 Some of this code was adapted from similar code in [Dist::Zilla::Plugin::ReadmeAnyFromPod](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AReadmeAnyFromPod) and
 [Dist::Zilla::Plugin::Readme::Brief](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AReadme%3A%3ABrief).
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Robert Rothenberg.
+This software is copyright (c) 2025-2026 by Robert Rothenberg.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

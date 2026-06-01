@@ -50,8 +50,14 @@ _find_pm_t("$ROOT/t",   \@src_files);
 # 0002 and 0003 are functional tests that intentionally contain
 # the very constructs being tested (inside strings/eval); they are
 # exempt from the checks that would produce false positives on them.
+# t/corpus/ and t/corpus-stack/ hold external sample modules copied
+# verbatim from other ina@CPAN distributions; they follow their own
+# house conventions and their 5.005_03 compatibility is validated by
+# t/0009-clean-corpus.t and t/0010-clean-corpus-stack.t, so they are not
+# subject to this distribution's own header/style checks here.
 my @check_files = grep {
     $_ !~ m{lib[/\\]Perl500503Syntax[/\\]OrDie\.pm$}
+    && $_ !~ m{[/\\]corpus(?:-stack)?[/\\]}
 } @src_files;
 
 # 14 checks per file
@@ -89,9 +95,13 @@ for my $f (@check_files) {
     ok(!@bad_utf8, "P4: no 'use utf8': $rel");
 
     # P5: no use VERSION >= 5.6
+    # The version alternation mirrors @BLACKLIST in the module itself:
+    # it matches 5.6, 5.06, 5.006, 5.010, 5.012, 5.100 ... but NOT the
+    # minimum-version declaration "use 5.00503" (= 5.005_03).  The earlier
+    # clause 0*[1-9]\d{2,} was too greedy: it stripped the leading zeros of
+    # 00503 and matched "503", flagging the legitimate "use 5.00503;" line.
     my @bad_ver = grep {
-        $lines[$_] =~ /\buse\s+5\s*\.\s*0*[6-9]\b/
-     || $lines[$_] =~ /\buse\s+5\s*\.\s*0*[1-9]\d{2,}\b/
+        $lines[$_] =~ /\buse\s+5\s*\.\s*(?:0*[6-9]|0[1-9]\d+|[1-9]\d+)\b/
      || $lines[$_] =~ /\buse\s+v5\s*\.\s*[6-9]/
      || $lines[$_] =~ /\buse\s+v5\s*\.1/
     } 0..$#lines;

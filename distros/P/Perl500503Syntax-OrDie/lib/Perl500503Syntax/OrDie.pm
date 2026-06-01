@@ -4,10 +4,13 @@ package Perl500503Syntax::OrDie;
 #
 # Perl500503Syntax::OrDie - Validate Perl 5.005_03 source compatibility
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org>
+# https://metacpan.org/dist/Perl500503Syntax-OrDie
+#
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com>
 #
 ######################################################################
 
+use 5.00503;
 use strict;
 BEGIN { if ($] < 5.006 && !defined(&warnings::import)) {
         $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } }
@@ -15,7 +18,7 @@ use warnings; local $^W = 1;
 
 use vars qw($VERSION @BLACKLIST @REGEX_BLACKLIST @RAW_BLACKLIST $_OPEN_GUARDED $_MKDIR_GUARDED);
 
-$VERSION = '0.02';
+$VERSION = '0.03';
 
 # ======================================================================
 # BLACKLIST
@@ -32,10 +35,10 @@ $VERSION = '0.02';
     [ qr/\bour\s*[\$\@\%\*]/,
       "'our' declaration (introduced in Perl 5.6; use 'use vars' instead)" ],
 
-    # 3-argument open: after masking the mode string becomes "X", so we
-    # detect by counting commas inside open(...)
-    [ do { my $kw = 'op' . 'en'; qr/\b$kw\s*\(\s*[^,\)]+\s*,\s*[^,\)]+\s*,/ },
-      "3-argument open() (introduced in Perl 5.6; use 2-argument form)" ],
+    # 3-argument open() is detected in a dedicated paren-aware stage
+    # (see "Stage 1c" in _check_source); a flat comma-counting regex
+    # cannot tell a top-level argument comma from one nested inside an
+    # expression such as  open(FH, '>' . File::Spec->catfile($d, $f)).
 
     # use utf8
     [ qr/\buse\s+utf8\b/,
@@ -132,7 +135,13 @@ $VERSION = '0.02';
       "smart-match operator '~~' (introduced in Perl 5.10)" ],
 
     # use feature
-    [ qr/\buse\s+feature\b/,
+    # The empty-import form  use feature ()  imports nothing and, when paired
+    # with a  BEGIN { $INC{'feature.pm'} = '' if $] < 5.010 }  stub, loads
+    # nothing on Perl 5.005_03.  It is a no-op on every Perl version and is the
+    # standard cross-version guard idiom (parallel to the tolerated
+    # use warnings stub), so it is NOT a violation.  A non-empty import list
+    # such as  use feature 'say'  or  use feature qw(...)  still is.
+    [ qr/\buse\s+feature\b(?!\s*\(\s*\))/,
       "'use feature' (introduced in Perl 5.10)" ],
 
     # defined-or operator (two slashes, not part of s///, m//, =~, !~)
@@ -468,24 +477,77 @@ sub _check_source {
         }
     }
 
-    # Stage 1b: any/all BLOCK keyword -- conditional on import pre-scan
+    # Stage 1b: any/all BLOCK keyword -- conditional on import pre-scan.
+    # The List::Util keyword form is an expression  any { ... } LIST .
+    # A subroutine *definition*  sub any { ... }  (or a method call such
+    # as  $obj->all { ... } ) must NOT be flagged.  We therefore inspect
+    # the text immediately preceding each  any{ / all{  match and skip it
+    # when it is preceded by  sub  or by an arrow operator.
     {
-        my $any_pattern = $listutil_any_imported ? qr/(?!x)x/ : qr/\bany\s*\{/;
-        my $all_pattern = $listutil_all_imported ? qr/(?!x)x/ : qr/\ball\s*\{/;
+        my $check_any = $listutil_any_imported ? 0 : 1;
+        my $check_all = $listutil_all_imported ? 0 : 1;
         my $desc_any = "'any BLOCK LIST' keyword operator (introduced in Perl 5.42; use List::Util instead)";
         my $desc_all = "'all BLOCK LIST' keyword operator (introduced in Perl 5.42; use List::Util instead)";
         my $lineno = 0;
         for my $mline (@lines) {
             $lineno++;
-            if ($mline =~ $any_pattern) {
-                push @violations,
-                    "Perl500503Syntax::OrDie: VIOLATION at $file line $lineno:\n"
-                  . "  $desc_any\n";
+            while ($mline =~ /\b(any|all)(\s*)\{/g) {
+                my $word     = $1;
+                my $matchlen = length($1) + length($2) + 1;
+                my $start    = pos($mline) - $matchlen;
+                my $pre      = substr($mline, 0, $start);
+                next if $pre =~ /\bsub\s+$/;   # sub any { ... } definition
+                next if $pre =~ /->\s*$/;      # $obj->any { ... } method
+                if ($word eq 'any' && $check_any) {
+                    push @violations,
+                        "Perl500503Syntax::OrDie: VIOLATION at $file line $lineno:\n"
+                      . "  $desc_any\n";
+                }
+                elsif ($word eq 'all' && $check_all) {
+                    push @violations,
+                        "Perl500503Syntax::OrDie: VIOLATION at $file line $lineno:\n"
+                      . "  $desc_all\n";
+                }
             }
-            if ($mline =~ $all_pattern) {
-                push @violations,
-                    "Perl500503Syntax::OrDie: VIOLATION at $file line $lineno:\n"
-                  . "  $desc_all\n";
+        }
+    }
+
+    # Stage 1c: 3-argument open() -- paren-aware top-level comma count.
+    # open(FH, MODE, EXPR) has two commas at the top level of the call;
+    # open(FH, EXPR) has one.  Commas nested inside parentheses -- e.g. a
+    # function call used as the second argument, as in
+    #   open(FH, '>' . File::Spec->catfile($dir, $file))
+    # -- sit at depth >= 2 and are not counted, so the 2-argument form is
+    # no longer mistaken for the 3-argument form.
+    {
+        my $kw      = 'op' . 'en';
+        my $open_re = qr/\b$kw\s*\(/;
+        my $lineno  = 0;
+        for my $mline (@lines) {
+            $lineno++;
+            while ($mline =~ /$open_re/g) {
+                my $i      = pos($mline);   # index just after the '('
+                my $len    = length($mline);
+                my $depth  = 1;
+                my $commas = 0;
+                while ($i < $len && $depth > 0) {
+                    my $c = substr($mline, $i, 1);
+                    if ($c eq '(') {
+                        $depth++;
+                    }
+                    elsif ($c eq ')') {
+                        $depth--;
+                    }
+                    elsif ($c eq ',' && $depth == 1) {
+                        $commas++;
+                    }
+                    $i++;
+                }
+                if ($commas >= 2) {
+                    push @violations,
+                        "Perl500503Syntax::OrDie: VIOLATION at $file line $lineno:\n"
+                      . "  3-argument $kw() (introduced in Perl 5.6; use 2-argument form)\n";
+                }
             }
         }
     }
@@ -496,7 +558,13 @@ sub _check_source {
         for my $mline (@lines) {
             $lineno2++;
             while ($mline =~ /(?<=[a-zA-Z0-9_.)\]])((?:[+*?]|\{\d+(?:,\d*)?\})\+)/g) {
-                my $qpos   = pos($mline) - length($1) - 1;
+                my $quant  = $1;
+                # In masked code a "++" is always the postfix-increment
+                # operator (e.g. $pkg::var++, $a[0]++); a genuine possessive
+                # quantifier can only occur inside a regex, which is masked,
+                # and is caught by REGEX_BLACKLIST instead.
+                next if $quant eq '++';
+                my $qpos   = pos($mline) - length($quant) - 1;
                 my $before = substr($mline, 0, $qpos + 1);
                 next if $before =~ /\$\w+$/;
                 next if $before =~ /\@\w+$/;
@@ -525,9 +593,21 @@ sub _check_source {
 
     # Stage 3: REGEX_BLACKLIST -- content of regex literals only
     # Each element of @$regex_bodies_ref is [$body_text, $line_number].
+    # Escaped backslashes are first neutralised so that, for example, the
+    # two-character literal sequence "\\h" (an escaped backslash followed
+    # by the letter h, valid in every Perl) is not mistaken for the \h
+    # horizontal-whitespace escape introduced in Perl 5.10.  Backslash
+    # pairs are consumed left to right, leaving a genuine escape introducer
+    # intact (so "\\\h" still exposes a real \h).
+    my @scan_bodies;
+    for my $rbody (@{$regex_bodies_ref}) {
+        my ($body_text, $body_line) = @{$rbody};
+        (my $scan = $body_text) =~ s/\\\\/\0\0/g;
+        push @scan_bodies, [$scan, $body_line];
+    }
     for my $entry (@REGEX_BLACKLIST) {
         my ($pattern, $desc) = @{$entry};
-        for my $rbody (@{$regex_bodies_ref}) {
+        for my $rbody (@scan_bodies) {
             my ($body_text, $body_line) = @{$rbody};
             if ($body_text =~ $pattern) {
                 push @violations,
@@ -588,9 +668,39 @@ sub _mask_source {
     my $len          = length($src);
     my @regex_bodies;
     my $in_pod       = 0;
+    my @pending_heredocs;
 
     while ($pos < $len) {
         my $ch = substr($src, $pos, 1);
+
+        # -- flush pending heredoc bodies at the end of their line ------
+        # Heredoc bodies follow, in order, the line on which their <<
+        # operators appear.  When that line's newline is reached, consume
+        # every queued body so that two or more heredocs sharing one line
+        # (e.g.  $_ = <<'A'; $x eq <<'B';) are all masked correctly.
+        if ($ch eq "\n" && @pending_heredocs) {
+            $out .= "\n";
+            $pos++;
+            while (@pending_heredocs) {
+                my $sentinel = shift @pending_heredocs;
+                my $remain   = substr($src, $pos);
+                my $bodylen;
+                if ($remain =~ /^\Q$sentinel\E[\t ]*\r?\n/m) {
+                    $bodylen = length($`) + length($&);
+                }
+                elsif ($remain =~ /^\Q$sentinel\E[\t ]*\r?\z/m) {
+                    $bodylen = length($`) + length($&);
+                }
+                else {
+                    $bodylen = length($remain);
+                }
+                my $raw = substr($src, $pos, $bodylen);
+                (my $masked_body = $raw) =~ s/[^\n]/X/g;
+                $out .= $masked_body;
+                $pos += $bodylen;
+            }
+            next;
+        }
 
         # -- __END__ / __DATA__ : mask everything after this line ------
         if ($ch eq '_' && ($pos == 0 || substr($src, $pos - 1, 1) eq "\n")) {
@@ -644,6 +754,24 @@ sub _mask_source {
 
         # -- single-quoted string  '...' --------------------------------
         if ($ch eq "'") {
+            # Old-style package separator:  &jcode'tr  is  &jcode::tr .
+            # When a sigil-led identifier ($pkg'var, &pkg'sub, *pkg'glob,
+            # ...) abuts the apostrophe and a word character follows, the
+            # apostrophe separates package components and is NOT a string
+            # delimiter.  Emit it verbatim so the following name is not read
+            # as the start of a new string.
+            my $nextc = ($pos + 1 < $len) ? substr($src, $pos + 1, 1) : '';
+            if ($out =~ /[\$\@\%\&\*]\w*\z/ && $nextc =~ /[A-Za-z_]/) {
+                # Emit the apostrophe together with the whole following
+                # identifier, so that a quote-like name such as the tr in
+                # &jcode'tr is not subsequently read as the tr/// operator
+                # (the operator detector keys off the preceding character).
+                my $rest = substr($src, $pos);
+                $rest =~ /\A('(\w+))/;
+                $out .= $1;
+                $pos += length($1);
+                next;
+            }
             my ($rep, $len2) = _mask_squote($src, $pos);
             $out .= $rep;
             $pos += $len2;
@@ -680,28 +808,31 @@ sub _mask_source {
             }
         }
 
-        # -- heredoc  <<WORD  <<"WORD"  <<'WORD' ------------------------
+        # -- heredoc start  <<WORD  <<"WORD"  <<'WORD' ------------------
+        # Only the operator token (<< plus the sentinel) is masked here;
+        # the body is consumed when the current line's newline is reached
+        # (see the flush handler at the top of the loop).  This lets two or
+        # more heredocs that share a single line all be masked in order.
         if ($ch eq '<' && $pos + 1 < $len && substr($src, $pos + 1, 1) eq '<') {
             my $rest = substr($src, $pos);
-            if ($rest =~ /^(<<\s*([\"']?)(\w+)\2[^\r\n]*\r?\n)/) {
-                my ($header, $quote, $sentinel) = ($1, $2, $3);
-                my $hlen  = length($header);
-                my $body  = substr($src, $pos + $hlen);
-                my $re    = qr/^\Q$sentinel\E\r?\n/m;
-                if ($body =~ $re) {
-                    my $used  = length($&);
-                    my $total = $hlen + $used;
-                    my $raw   = substr($src, $pos, $total);
-                    (my $mraw = $raw) =~ s/[^\n]/X/g;
-                    $out .= $mraw;
-                    $pos += $total;
-                    next;
-                }
+            if ($rest =~ /\A(<<\s*([\"']?)(\w+)\2)/) {
+                my $token    = $1;
+                my $sentinel = $3;
+                push @pending_heredocs, $sentinel;
+                $out .= 'X' x length($token);
+                $pos += length($token);
+                next;
             }
         }
 
         # -- Regex/subst/transliteration operators ----------------------
-        if ($out !~ /[\w\$\@\%]\z/) {
+        # A quote-like operator (q/qq/qw/qx/qr/m/s/tr/y) is not recognised
+        # when the immediately preceding character is a typeglob sigil '*',
+        # a subroutine sigil '&', or a package-separator colon ':'; there
+        # the following word is a symbol name, not an operator -- e.g. the
+        # typeglob *s in  local(*s, $n) = @_;  or the function name tr in a
+        # package-qualified call such as  mb::tr($_, 'A', '1').
+        if ($out !~ /[\w\$\@\%*&:]\z/) {
             my $rest = substr($src, $pos);
             if ($rest =~ /\A(qr|m(?!y(?:\b|\s*=>))|s(?!ub(?:\b|\s*\{))|tr|y)\s*([^\w\s#])/s) {
                 my $op    = $1;
@@ -766,8 +897,14 @@ sub _mask_source {
         }
 
         # -- bare /regex/ -- only in regex context ----------------------
+        # The keyword alternation also lists the regex-first-argument list
+        # operators split/grep/map: a '/' immediately following one of these
+        # barewords can only begin a pattern (e.g. split //, $str), never a
+        # division, so it is treated as a regex.  This keeps the empty
+        # pattern // in  split //, ...  from being misread as the Perl 5.10
+        # defined-or operator.
         if ($ch eq '/' &&
-            $out =~ /(?:=~|!~|[=(,\{\[!&|;]|\b(?:if|while|unless|until|not|and|or|return))\s*\z/s)
+            $out =~ /(?:=~|!~|[=(,\{\[!&|;]|\b(?:if|while|unless|until|not|and|or|return|split|grep|map))\s*\z/s)
         {
             my $cur_line = 1 + _count_newlines($src, 0, $pos);
             $pos++;
@@ -1063,7 +1200,7 @@ Perl500503Syntax::OrDie - Validate that source code is compatible with Perl 5.00
 
 =head1 VERSION
 
-0.02
+0.03
 
 =head1 SYNOPSIS
 
@@ -1166,15 +1303,15 @@ list if any violations are found; returns normally otherwise.
 
 =item * C<use utf8> -- Perl 5.6
 
-=item * C<use VERSION> where VERSION >= 5.6
+=item * C<use VERSION> where VERSION E<gt>= 5.6
 
-=item * C<use vVERSION> where VERSION >= v5.6
+=item * C<use vVERSION> where VERSION E<gt>= v5.6
 
 =item * C<\x{HHHH}> Unicode escape -- Perl 5.6
 
 =item * C<\N{name}> named character escape -- Perl 5.6
 
-=item * Match-position arrays C<@+>/@- and C<$+[N]>/$-[N]> -- Perl 5.6
+=item * Match-position arrays C<@+>/C<@-> and C<$+[N]>/C<$-[N]> -- Perl 5.6
 
 =item * C<CHECK>/C<INIT> phase blocks -- Perl 5.6
 
@@ -1201,6 +1338,8 @@ list if any violations are found; returns normally otherwise.
 =item * Smart-match C<~~> -- Perl 5.10
 
 =item * C<use feature> -- Perl 5.10
+(the empty-import form C<use feature ()> is a no-op on every Perl version
+and is treated as compatible)
 
 =item * Defined-or operator C<//> (standalone) -- Perl 5.10
 
@@ -1368,7 +1507,7 @@ L<perlpolicy>, L<perlhist>
 
 =head1 AUTHOR
 
-INABA Hitoshi E<lt>ina@cpan.orgE<gt>
+INABA Hitoshi E<lt>ina.cpan@gmail.comE<gt>
 
 =head1 LICENSE
 

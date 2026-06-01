@@ -33,8 +33,19 @@ my @all  = _manifest_files($ROOT);
 # Files subject to all three checks (C1 US-ASCII, C2 trailing ws, C3 newline)
 # doc/ cheatsheet files are excluded from @check (non-ASCII expected);
 # they are handled separately in @doc_txt below.
+#
+# t/corpus/ and t/corpus-stack/ hold verbatim sample modules copied from
+# other ina@CPAN distributions. Some are legacy multi-byte sources
+# (Shift-JIS / EUC-JP / KEIS / JEF / ...), whose trailing byte may
+# legitimately be 0x20 or 0x09 just before a newline; the naive byte-pattern
+# C1/C2 checks would misfire on such MBCS trail bytes. These are this
+# distribution's external corpus, not its own authored files, and their
+# Perl 5.005_03 compatibility is validated by t/0009-clean-corpus.t and
+# t/0010-clean-corpus-stack.t, so they are exempt from the hygiene checks here.
 my @check = grep {
-    /\.(?:pm|pl|t|PL|bat|txt|md|yml|json)$/i && !/^doc\//
+    /\.(?:pm|pl|t|PL|bat|txt|md|yml|json)$/i
+    && !/^doc\//
+    && !m{^t/corpus(?:-stack)?/}
 } @all;
 
 # doc/ cheatsheet files: skip C1 (non-ASCII expected), check C2+C3 only

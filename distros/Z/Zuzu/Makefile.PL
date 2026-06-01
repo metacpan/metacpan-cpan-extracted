@@ -30,7 +30,7 @@ WriteMakefile(
 		'Crypt::OpenSSL::PKCS12' => 0,
 		'Crypt::OpenSSL::X509' => 0,
 		'Crypt::URandom' => 0,
-		'CryptX' => 0,
+		'CryptX' => '0.088',
 		'DateTime::Lite' => 0,
 		'DateTime::Lite::TimeZone' => 0,
 		'DBD::SQLite' => 0,

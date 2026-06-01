@@ -60,7 +60,7 @@ WriteMakefile(
     },
     BUILD_REQUIRES => {
         'IPC::Semaphore' => 0,
-        'Mock::Sub'      => 0,
+        'Mock::Sub'      => 1.09,
         'Test::More'       => 0.98,
         'Test::SharedFork' => 0.35,
     },

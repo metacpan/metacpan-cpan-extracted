@@ -1,5 +1,9 @@
 Revision history for Perl extension Google-ISBNNumbers
 
+1.01 2026-06-01T06:04:23Z
+
+    - Fixes to docs, remove unneeded object and code clean
+
 1.00 2021-02-25T16:19:16Z
 
     - original version

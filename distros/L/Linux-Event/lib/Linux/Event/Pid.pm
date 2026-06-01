@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use Carp qw(croak);
 use Scalar::Util qw(weaken);
@@ -166,28 +166,26 @@ __END__
 
 =head1 NAME
 
-Linux::Event::Pid - pidfd-backed process-exit subscriptions for Linux::Event::Reactor
+Linux::Event::Pid - pidfd-backed process-exit subscriptions for Linux::Event::Loop
 
 =head1 SYNOPSIS
 
-<<<<<<< HEAD
-=======
+
   use v5.36;
   use Linux::Event;
 
-  my $loop = Linux::Event->new( model => 'reactor' );
+  my $loop = Linux::Event->new;
 
   my $pid = fork() // die "fork: $!";
   if ($pid == 0) { exit 42 }
 
->>>>>>> 1401c31 (prep for cpan and release, new tool added)
   my $sub = $loop->pid($pid, sub ($loop, $pid, $status, $data) {
     ...
   });
 
 =head1 DESCRIPTION
 
-C<Linux::Event::Pid> adapts Linux pidfds into the reactor loop. It opens a
+C<Linux::Event::Pid> adapts Linux pidfds into the readiness loop. It opens a
 pidfd using L<Linux::FD::Pid>, watches it like any other readable filehandle,
 and invokes the callback when the target process exits.
 
@@ -220,7 +218,6 @@ The returned subscription object supports C<cancel>.
 
 =head1 SEE ALSO
 
-L<Linux::Event::Reactor>,
 L<Linux::Event::Loop>,
 L<Linux::FD::Pid>
 

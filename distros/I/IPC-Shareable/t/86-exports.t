@@ -30,7 +30,7 @@ subtest 'structural integrity' => sub {
     {
         my %seen;
         my @dupes = grep { $seen{$_}++ } @IPC::Shareable::EXPORT_OK;
-        ok(!@dupes, '@EXPORT_OK has no duplicate symbols')
+        ok(! @dupes, '@EXPORT_OK has no duplicate symbols')
             or diag "Duplicates: @dupes";
 
         is_deeply(
@@ -43,8 +43,8 @@ subtest 'structural integrity' => sub {
     # Every symbol in @EXPORT_OK is covered by at least one tag
     {
         my %tag_items = map { $_ => 1 } map { @$_ } values %IPC::Shareable::EXPORT_TAGS;
-        my @uncovered = sort grep { !$tag_items{$_} } keys %{ { map { $_ => 1 } @IPC::Shareable::EXPORT_OK } };
-        ok(!@uncovered, 'Every symbol in @EXPORT_OK is covered by at least one tag')
+        my @uncovered = sort grep { ! $tag_items{$_} } keys %{ { map { $_ => 1 } @IPC::Shareable::EXPORT_OK } };
+        ok(! @uncovered, 'Every symbol in @EXPORT_OK is covered by at least one tag')
             or diag "Uncovered: @uncovered";
     }
 
@@ -52,8 +52,8 @@ subtest 'structural integrity' => sub {
     {
         my %ok = map { $_ => 1 } @IPC::Shareable::EXPORT_OK;
         for my $tag (sort keys %{ $IPC::Shareable::EXPORT_TAGS }) {
-            my @extra = grep { !$ok{$_} } @{ $IPC::Shareable::EXPORT_TAGS{$tag} };
-            ok(!@extra, ":$tag contains only symbols from \@EXPORT_OK")
+            my @extra = grep { ! $ok{$_} } @{ $IPC::Shareable::EXPORT_TAGS{$tag} };
+            ok(! @extra, ":$tag contains only symbols from \@EXPORT_OK")
                 or diag "Extra in :$tag: @extra";
         }
     }

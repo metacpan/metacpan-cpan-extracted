@@ -25,5 +25,6 @@ t/Mo-utils-Hash/01-use.t
 t/Mo-utils-Hash/02-version.t
 t/Mo-utils-Hash/03-check_hash.t
 t/Mo-utils-Hash/03-check_hash_keys.t
+t/Mo-utils-Hash/04-check_hash_optional_keys.t
 xt/Mo-utils-Hash/01-pod_coverage.t
 xt/Mo-utils-Hash/02-pod.t

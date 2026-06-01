@@ -162,6 +162,15 @@ use vars qw(@tests);
     ['use feature: in comment - ignored',
         sub { !violates("# use feature\n") }],
 
+    ['use feature (): empty-import no-op - ignored',
+        sub { !violates("use feature ();\n") }],
+
+    ['use feature ( ): empty-import with space - ignored',
+        sub { !violates("use feature (  );\n") }],
+
+    ['use feature with import still detected',
+        sub { violates("use feature ':5.10';\n") }],
+
     # ==============================================================
     # use utf8  (Perl 5.6)
     # ==============================================================

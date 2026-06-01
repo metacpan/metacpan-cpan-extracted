@@ -98,8 +98,9 @@ diag("  bad name: $_") for @bad_names;
 # L: doc/ cheatsheet files exist (21 languages + perldelta_summary)
 ######################################################################
 my @LANGS = qw(
-    EN JA ZH KO FR DE ES IT PT RU
-    AR HI NL PL SV TR VI ID TH UK CS
+    BM BN EN FR HI ID JA KM KO MN
+    MY NE SI TH TL TR TW UR UZ VI
+    ZH
 );
 for my $lang (@LANGS) {
     my $f = "$ROOT/doc/Perl500503Syntax-OrDie_cheatsheet.$lang.txt";

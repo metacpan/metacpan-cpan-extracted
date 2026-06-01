@@ -18,18 +18,19 @@ my @files = (
     't/6_parse.t',
     't/7_misc.t',
     't/8_negatives.t',
+    't/9_subclasses.t',
     'xt/author/00-compile.t',
+    'xt/author/distmeta.t',
     'xt/author/eol.t',
     'xt/author/kwalitee.t',
+    'xt/author/minimum-version.t',
     'xt/author/mojibake.t',
     'xt/author/no-tabs.t',
     'xt/author/pod-spell.t',
+    'xt/author/pod-syntax.t',
+    'xt/author/portability.t',
     'xt/release/changes_has_content.t',
-    'xt/release/cpan-changes.t',
-    'xt/release/distmeta.t',
-    'xt/release/minimum-version.t',
-    'xt/release/pod-syntax.t',
-    'xt/release/portability.t'
+    'xt/release/cpan-changes.t'
 );
 
 notabs_ok($_) foreach @files;

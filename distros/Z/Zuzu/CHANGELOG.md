@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project roughly adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
 but using Perlish version numbers like `x.yyyzzz` instead of `x.y.z`.
 
+## 0.001003 - 2026-05-31
+
+### Changed
+
+- Bumped required version of CryptX.
+
 ## 0.001002 - 2026-05-29
 
 ### Changed

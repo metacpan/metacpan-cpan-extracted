@@ -1,4 +1,4 @@
-package Concierge::Users::File v0.8.2;
+package Concierge::Users::File v0.8.4;
 use v5.36;
 use Carp qw/ croak /;
 use Text::CSV;

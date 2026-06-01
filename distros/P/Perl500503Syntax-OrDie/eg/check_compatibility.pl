@@ -55,12 +55,15 @@ mkdir("newdir", 0755) or die $!;
 CODE
 
 print "Example 1: valid Perl 5.005_03 code\n";
-eval { Perl500503Syntax::OrDie::check_source($clean, 'example1') };
-if ($@) {
-    print "UNEXPECTED violation: $@\n";
-}
-else {
-    print "  -> No violations. OK\n";
+{
+    my @v = Perl500503Syntax::OrDie::check_source($clean, 'example1');
+    if (@v) {
+        print "  -> UNEXPECTED violation:\n";
+        print "     $_\n" for @v;
+    }
+    else {
+        print "  -> No violations. OK\n";
+    }
 }
 print "\n";
 
@@ -70,12 +73,14 @@ my $bad_our = 'ou' . 'r $config = {};' . "\n"
             . 'ou' . 'r @items  = (1, 2, 3);' . "\n";
 
 print "Example 2: 'our' declaration (Perl 5.6+)\n";
-eval { Perl500503Syntax::OrDie::check_source($bad_our, 'example2') };
-if ($@) {
-    print "  -> $@";
-}
-else {
-    print "  -> (not detected)\n";
+{
+    my @v = Perl500503Syntax::OrDie::check_source($bad_our, 'example2');
+    if (@v) {
+        print "  -> $_" for map { (my $m=$_)=~s/\s+\z//; "$m\n" } @v;
+    }
+    else {
+        print "  -> (not detected)\n";
+    }
 }
 print "\n";
 
@@ -85,12 +90,14 @@ my $bad_defor = 'my $value = undef;' . "\n"
               . '$value ' . join('', '/', '/') . "= 'default';\n";
 
 print "Example 3: defined-or-assign (Perl 5.10+)\n";
-eval { Perl500503Syntax::OrDie::check_source($bad_defor, 'example3') };
-if ($@) {
-    print "  -> $@";
-}
-else {
-    print "  -> (not detected)\n";
+{
+    my @v = Perl500503Syntax::OrDie::check_source($bad_defor, 'example3');
+    if (@v) {
+        print "  -> $_" for map { (my $m=$_)=~s/\s+\z//; "$m\n" } @v;
+    }
+    else {
+        print "  -> (not detected)\n";
+    }
 }
 print "\n";
 
@@ -100,12 +107,14 @@ my $bad_say = 'use feature ' . "'" . 'say' . "'" . ';' . "\n"
             . 'sa' . 'y "Hello, world!";' . "\n";
 
 print "Example 4: 'say' and 'use feature' (Perl 5.10+)\n";
-eval { Perl500503Syntax::OrDie::check_source($bad_say, 'example4') };
-if ($@) {
-    print "  -> $@";
-}
-else {
-    print "  -> (not detected)\n";
+{
+    my @v = Perl500503Syntax::OrDie::check_source($bad_say, 'example4');
+    if (@v) {
+        print "  -> $_" for map { (my $m=$_)=~s/\s+\z//; "$m\n" } @v;
+    }
+    else {
+        print "  -> (not detected)\n";
+    }
 }
 print "\n";
 

@@ -1,10 +1,10 @@
 {
-   "abstract" : "Front door for the Linux::Event reactor and proactor ecosystem",
+   "abstract" : "Linux-native readiness event loop for Perl",
    "author" : [
       "Joshua S. Day"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150012",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -33,19 +33,23 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "IO::Uring" : "0",
             "Linux::Epoll" : "0",
             "Linux::Event::Clock" : "0.011",
             "Linux::Event::Timer" : "0.01",
+            "Linux::FD::Event" : "0",
+            "Linux::FD::Pid" : "0",
             "Linux::FD::Signal" : "0",
-            "Test2::V0" : "0",
-            "Time::Spec" : "0",
             "perl" : "5.036000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {},
-   "version" : "0.010",
+   "version" : "0.011",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

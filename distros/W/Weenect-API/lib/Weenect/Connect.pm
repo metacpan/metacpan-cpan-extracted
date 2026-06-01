@@ -60,8 +60,9 @@ If %keys contains C<Content>, then a POST is made, otherwise it will GET.
 
 =cut
 
-method request( $path, $keys = {} ) {
+method request( $path, %keys ) {
     my $u = $self->get_endpoint($path);
+    $u = "https://my.weenect.com/en/$path" if $path eq "logout";
 
     my $req;
     my @common =
@@ -75,24 +76,34 @@ method request( $path, $keys = {} ) {
       );
     push( @common, Authorization => "JWT ".$auth->access_token ) if $auth;
 
-    if ( $keys->{Content} ) {
-	my $content = delete $keys->{Content};
+    my $op = delete $keys{OP} || 'GET';
+
+    if ( $op eq 'POST' || defined $keys{Content} ) {
+	my $content = delete $keys{Content} // {};
 	$content = $json->encode($content) if ref($content);
 	$req = HTTP::Request::Common::POST
 	  ( $u,
 	    @common,
 	    Content_Type => "application/json",
 	    Content => $content,
-	    %$keys
+	    %keys
 	  );
     }
-    else {
+    elsif ( $op eq 'GET' ) {
 	$req = HTTP::Request::Common::GET
 	  ( $u,
 	    @common,
-	    %$keys
+	    %keys
 	  );
     }
+    elsif ( $op eq 'DELETE' ) {
+	$req = HTTP::Request::Common::DELETE
+	  ( $u,
+	    @common,
+	    %keys
+	  );
+    }
+
     p($req) if $debug;
     my $res = $ua->request($req); # res1.json.raw
     unless ( $res->is_success ) {
@@ -100,7 +111,8 @@ method request( $path, $keys = {} ) {
 	return;
     }
 
-    return $json->decode( $res->decoded_content );
+    return 1 if $path eq "logout"; # res is HTML login page
+    return $json->decode( $res->decoded_content || "{}" );
 }
 
 1;

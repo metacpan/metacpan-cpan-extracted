@@ -4,19 +4,20 @@ Google::ISBNNumbers - Retrieve book info by ISBN number
 
 # SYNOPSIS
 
-    use Google::ISBNNumbers;
-    
-    $books = Google::ISBNNumbers->new($your_google_api_key);
-
-    $isbn_number = 9781680500882; # may include dashes and spaces
-    $book_info = $books->lookup_isbn( $isbn_number );
-
+        use Google::ISBNNumbers;
+        
+        $books = Google::ISBNNumbers->new($your_google_api_key);
+        
+        $isbn_number = 9781680500882; # may include dashes and spaces
+        $book_info = $books->lookup_isbn( $isbn_number );
+        
         # or, if you prefer
         $book_info = Google::ISBNNumbers->new($your_google_api_key)->lookup_isbn($isbn_number); 
-    
-    # $book_info now has keys for 'title', 'author_name',
-    # 'description','publication_date', and 'cover_link'
-    say $$book_info{title}; # says 'Modern Perl'
+        
+        $book_info now has keys for 'title', 'author_name',
+        'description', 'publication_date', and 'cover_link'
+
+        say $book_info->{title}; # says 'Modern Perl'
 
 # DESCRIPTION
 
@@ -53,7 +54,7 @@ Please send me a note with any bugs or suggestions.
 
 MIT License
 
-Copyright (c) 2021 Eric Chernoff
+Copyright (c) 2026 Eric Chernoff
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

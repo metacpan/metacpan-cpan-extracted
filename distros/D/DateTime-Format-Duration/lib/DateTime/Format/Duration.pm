@@ -1,4 +1,4 @@
-package DateTime::Format::Duration; # git description: v1.03a-16-g3f2a121
+package DateTime::Format::Duration; # git description: v1.04-8-gf9e2852
 # ABSTRACT: Format and parse DateTime::Durations
 
 use Params::Validate qw( validate SCALAR OBJECT ARRAYREF HASHREF UNDEF );
@@ -8,13 +8,15 @@ use DateTime::Duration;
 
 use constant MAX_NANOSECONDS => 1000000000;  # 1E9 = almost 32 bits
 use strict;
+use warnings;
 
-require Exporter;
-our @ISA = qw/Exporter/;
+use Scalar::Util 'blessed';
+use Exporter 'import';
+
 our @EXPORT_OK = qw/strpduration strfduration/;
 our %EXPORT_TAGS = (ALL => [qw/strpduration strfduration/]);
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 #---------------------------------------------------------------------------
 # CONSTRUCTORS
@@ -53,7 +55,7 @@ sub base { croak("No arguments should be passed to base. Use set_base() instead.
 sub set_base {
     my $self = shift;
     my $newbase = shift;
-    croak("Argument to set_base() must be a DateTime object.") unless ref($newbase) eq 'DateTime';
+    croak("Argument to set_base() must be a DateTime object.") unless blessed($newbase) && $newbase->isa('DateTime');
     $self->{base} = $newbase;
     return $self;
 }
@@ -208,7 +210,7 @@ sub parse_duration_as_deltas {
     my ( $centuries,$years,   $months,
          $weeks,    $days,    $hours,
          $minutes,  $seconds, $nanoseconds
-       );
+       ) = (0)x9;
 
     # Variables for DateTime
     my ( $Years, $Months,  $Days,
@@ -249,7 +251,7 @@ sub normalise {
             or not $self->base
         );
 
-    my %delta = (ref($_[0]) =~/^DateTime::Duration/)
+    my %delta = (blessed($_[0]) && $_[0]->isa('DateTime::Duration'))
         ? $_[0]->deltas
         : @_;
 
@@ -346,7 +348,7 @@ sub normalise {
 
 sub normalise_no_base {
     my $self = shift;
-    my %delta = (ref($_[0]) =~/^DateTime::Duration/) ? $_[0]->deltas : @_;
+    my %delta = (blessed($_[0]) && $_[0]->isa('DateTime::Duration')) ? $_[0]->deltas : @_;
 
     if (delete $delta{negative}) {
         foreach (keys %delta) { $delta{$_} *= -1 }
@@ -685,7 +687,7 @@ DateTime::Format::Duration - Format and parse DateTime::Durations
 
 =head1 VERSION
 
-version 1.04
+version 1.05
 
 =head1 SYNOPSIS
 
@@ -1127,6 +1129,14 @@ datetime@perl.org mailing list
 
 http://datetime.perl.org/
 
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/DateTime-Format-Duration>
+and a star in L<GitHub|https://github.com/karenetheridge/DateTime-Format-Duration>.
+
 =head1 SUPPORT
 
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Format-Duration>
@@ -1135,17 +1145,27 @@ Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Di
 There is also a mailing list available for users of this distribution, at
 L<http://lists.perl.org/list/datetime.html>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHOR
 
 Rick Measham <rickm@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge
+=for stopwords Karen Etheridge Matthias Bethke
+
+=over 4
+
+=item *
 
 Karen Etheridge <ether@cpan.org>
+
+=item *
+
+Matthias Bethke <mbe@financial.com>
+
+=back
 
 =head1 COPYRIGHT AND LICENCE
 

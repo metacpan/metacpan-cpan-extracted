@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2012-2016 -- leonerd@leonerd.org.uk
 
-package Tickit::StringPos 0.75;
+package Tickit::StringPos 0.76;
 
 use v5.14;
 use warnings;

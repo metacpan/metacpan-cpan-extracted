@@ -23,11 +23,24 @@ This plugin will create a machine-readable `CPAN-META/automation-policy.json` fi
 It allows authors to specify the use of automation in generating their modules, and what automated contributions they
 will accept.
 
+# RECENT CHANGES
+
+Changes for version v0.1.1 (2026-05-31)
+
+- Bug Fixes
+    - Specified the minimum version of Dist::AutomationPolicy.
+- Documentation
+    - Link to the Metadata v3 Automation Policy Specification.
+- Toolchain
+    - Included automation-policy.json in the distribution.
+
+See the `Changes` file for more details.
+
 # REQUIREMENTS
 
 This module lists the following modules as runtime dependencies:
 
-- [Dist::AutomationPolicy](https://metacpan.org/pod/Dist%3A%3AAutomationPolicy)
+- [Dist::AutomationPolicy](https://metacpan.org/pod/Dist%3A%3AAutomationPolicy) version v0.2.0 or later
 - [Dist::Zilla::File::InMemory](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3AFile%3A%3AInMemory)
 - [Dist::Zilla::Pragmas](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APragmas)
 - [Dist::Zilla::Role::FileGatherer](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3ARole%3A%3AFileGatherer)
@@ -115,3 +128,7 @@ This is free software, licensed under:
 ```
 The Artistic License 2.0 (GPL Compatible)
 ```
+
+# SEE ALSO
+
+[Metadata v3 Automation Policy](https://github.com/CPAN-Security/cpan-metadata-v3/blob/main/automation-policy.md)

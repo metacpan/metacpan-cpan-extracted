@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.3');
+our $VERSION   = qv('v1.0.4');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =encoding utf8
@@ -15,7 +15,7 @@ DBIx::Class::Async::Schema - Non-blocking, worker-pool based Proxy for DBIx::Cla
 
 =head1 VERSION
 
-Version v1.0.3
+Version v1.0.4
 
 =head1 SYNOPSIS
 
@@ -239,35 +239,45 @@ sub class {
 sub clone {
     my ($self, %args) = @_;
 
-    # 1. Determine worker count
     my $orig_db = $self->{_async_db};
-    my $worker_count = $args{workers}
-        || ($orig_db
-            && $orig_db->{_workers_config}
-            && $orig_db->{_workers_config}{_count})
-        || 2;
 
-    # 2. Re-create the async engine
+    # Decide whether to share the parent's worker pool or create a new one.
+    #
+    # DEFAULT (no arguments): share the pool.
+    # Clones that connect to the same database have no need for independent
+    # worker processes. Sharing avoids spawning/tearing down extra
+    # IO::Async::Function instances, which is the root cause of the SEGV
+    # in global destruction when many clones are created in tests.
+    #
+    # EXPLICIT workers => N: create an independent pool.
+    # This supports the legitimate use case of a "heavy reporting" clone
+    # with more workers than the parent, or a "read-only" clone with fewer.
+    # The caller is responsible for calling disconnect() on these clones.
+    my $independent = exists $args{workers};
     my $new_async_db;
-    if ($orig_db) {
+
+    if ($independent && $orig_db) {
         $new_async_db = DBIx::Class::Async->create_async_db(
             schema_class   => $orig_db->{_schema_class},
             connect_info   => $orig_db->{_connect_info},
-            workers        => $worker_count,
-            loop           => $orig_db->{_loop},
+            workers        => $args{workers},
+            async_loop     => $orig_db->{_loop},
             enable_metrics => $orig_db->{_enable_metrics},
             enable_retry   => $orig_db->{_enable_retry},
         );
     }
+    else {
+        $new_async_db = $orig_db;   # shared - not a new pool
+    }
 
-    # 3. Build the new schema object (strictly internal keys)
     my $new_self = bless {
         %$self,
         _async_db      => $new_async_db,
         _sources_cache => {},
+        _is_clone      => !$independent, # shared clones must not disconnect workers
     }, ref $self;
 
-    # 4. Re-attach storage
+    # Re-attach storage
     if ($new_async_db) {
         $new_self->{_storage} = DBIx::Class::Async::Storage::DBI->new(
             schema   => $new_self,
@@ -297,27 +307,39 @@ sub deploy {
 sub disconnect {
     my $self = shift;
 
+    # Delegate all worker/loop cleanup to the functional library, which
+    # handles the correct remove()-before-stop() ordering and cleans up
+    # IO::Async global state (ONE_TRUE_LOOP, SIGCHLD handler).
     if (ref $self->{_async_db} eq 'HASH') {
-        # 1. Properly stop every worker in the array
-        if (my $workers = $self->{_async_db}->{_workers}) {
-            for my $worker (@$workers) {
-                if (blessed($worker) && $worker->can('stop')) {
-                    eval { $worker->stop };
-                }
-            }
-        }
-
-        # 2. Clear the internal hash contents to break any circular refs
-        %{$self->{_async_db}} = ();
+        DBIx::Class::Async::disconnect($self->{_async_db});
     }
 
-    # 3. Remove the manager entirely
+    # Remove the manager reference and flush metadata cache.
     delete $self->{_async_db};
-
-    # 4. Flush the metadata cache
     $self->{_sources_cache} = {};
 
     return $self;
+}
+
+sub DESTROY {
+    my $self = shift;
+
+    # Skip cleanup during global destruction: by the time Perl runs END
+    # and tears down globals, IO::Async's XS internals may already be
+    # partially freed. Calling disconnect() at that point risks a SEGV.
+    # Workers are stopped earlier (during RUN phase) when the schema
+    # object normally goes out of scope.
+    return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
+
+    # Clones share the parent's worker pool (_is_clone flag set in clone()).
+    # Only the original schema object owns the workers and should shut them
+    # down. Clones just drop their reference to the shared _async_db.
+    if ($self->{_is_clone}) {
+        delete $self->{_async_db};
+        return;
+    }
+
+    $self->disconnect if $self->{_async_db};
 }
 
 sub health_check {

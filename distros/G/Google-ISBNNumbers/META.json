@@ -4,7 +4,7 @@
       "Eric Chernoff <eric@weaverstreet.net<gt>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.11",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "mit"
    ],
@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "Cpanel::JSON::XS" : "4.08",
-            "HTTP::Tiny" : "0.076",
+            "HTTP::Tiny" : "0.094",
             "IO::Socket::SSL" : "1.56",
             "Net::SSLeay" : "1.49",
             "perl" : "5.022001"
@@ -58,7 +58,7 @@
    "provides" : {
       "Google::ISBNNumbers" : {
          "file" : "lib/Google/ISBNNumbers.pm",
-         "version" : "1.00"
+         "version" : "1.01"
       }
    },
    "release_status" : "stable",
@@ -68,16 +68,18 @@
       },
       "homepage" : "https://github.com/ericschernoff/Google-ISBNNumbers",
       "repository" : {
-         "url" : "git://github.com/ericschernoff/Google-ISBNNumbers.git",
+         "type" : "git",
+         "url" : "https://github.com/ericschernoff/Google-ISBNNumbers.git",
          "web" : "https://github.com/ericschernoff/Google-ISBNNumbers"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_authority" : "cpan:ECHERNOF",
    "x_contributors" : [
       "Eric Chernoff <eric@pepper.weaverstreet.net>",
+      "Eric Chernoff <eric@weaverstreet.net>",
       "Eric Chernoff <ericschernoff@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

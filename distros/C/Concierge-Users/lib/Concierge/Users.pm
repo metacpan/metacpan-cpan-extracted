@@ -1,4 +1,4 @@
-package Concierge::Users v0.8.3;
+package Concierge::Users v0.8.4;
 use v5.36;
 
 use Carp		qw/ croak carp /;

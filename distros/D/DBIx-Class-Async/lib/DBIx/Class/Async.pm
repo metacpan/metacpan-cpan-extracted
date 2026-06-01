@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.3');
+our $VERSION   = qv('v1.0.4');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =encoding utf8
@@ -15,7 +15,7 @@ DBIx::Class::Async - Non-blocking, multi-worker asynchronous wrapper for DBIx::C
 
 =head1 VERSION
 
-Version v1.0.3
+Version v1.0.4
 
 =head1 DISCLAIMER
 
@@ -303,15 +303,28 @@ Initialises the async environment and spawns workers.
         enable_retry  => 1,
     );
 
-Set the default Time-To-Live for cached queries in seconds. Defaults to
-B<0> (caching is B<disabled> by default).
+B<Options:>
 
-To enable caching globally, set a positive integer. To enable it for a
-specific query, use the B<cache> attribute in the search method.
+=over 4
 
-B<Warning:> Be cautious enabling caching. Cached data can become stale, and
-queries containing non-deterministic SQL functions (like B<NOW()>, B<RAND()>)
-may produce incorrect results if cached.
+=item * C<schema_class> (required) - Your L<DBIx::Class::Schema> class name.
+
+=item * C<connect_info> (required) - Arrayref of DBI connect arguments.
+
+=item * C<workers> - Number of background worker processes (default: 4).
+
+=item * C<loop> or C<async_loop> - An existing L<IO::Async::Loop> instance.
+Both names are accepted as aliases. If omitted, a new loop is created
+internally and owned by the async_db (it will be stopped on disconnect).
+
+=item * C<cache_ttl> - Default Time-To-Live for cached queries in seconds.
+Defaults to B<0> (caching B<disabled>). Set a positive integer to enable.
+B<Warning:> Cached data can become stale; avoid caching queries that use
+non-deterministic SQL functions like C<NOW()> or C<RAND()>.
+
+=item * C<enable_retry> - Automatically retry on transient errors (default: 0).
+
+=back
 
 =cut
 
@@ -348,12 +361,18 @@ sub create_async_db {
         }
     }
 
+    # Save SIGCHLD state before IO::Async installs its handler
+    my $old_sigchld        = $SIG{CHLD};
+    my $user_supplied_loop = exists $args{async_loop};
+
     # 2. Build the async_db state hashref
     my $async_db = {
         _schema_class      => $schema_class,
         _connect_info      => $connect_info,
         _custom_inflators  => $custom_inflators,
-        _loop              => $args{loop} || IO::Async::Loop->new,
+        _loop              => $args{async_loop} || IO::Async::Loop->new,
+        _owns_loop         => !$user_supplied_loop,
+        _old_sigchld       => $old_sigchld,
         _workers           => [],
         _workers_config    => {
             _count         => $workers,
@@ -395,9 +414,16 @@ sub create_async_db {
 
 =head2 disconnect
 
-Gracefully shuts down all background workers and clears timers. Always call this before your application exits.
+Gracefully shuts down all background workers and clears timers. Always call
+this before your application exits to prevent zombie processes.
 
     DBIx::Class::Async->disconnect($db);
+
+Internally this performs cleanup in the correct order required by
+L<IO::Async::Function>: each worker is first removed from the event loop
+(C<< $loop->remove >>) and then stopped (C<< $function->stop >>). Reversing
+this order causes C<remove()> to silently fail, leaving orphaned notifiers
+in the loop's registry that trigger a C<SEGV> during Perl global destruction.
 
 =cut
 
@@ -405,24 +431,66 @@ sub disconnect {
     my ($db) = @_;
 
     return unless $db && ref $db eq 'HASH';
+    return unless $db->{_loop};
 
     # 1. Clear the health check timer
+    # remove() BEFORE stop() - same ordering rule as workers below.
     if ($db->{_health_check_timer}) {
-        $db->{_loop}->remove($db->{_health_check_timer});
+        eval { $db->{_loop}->remove($db->{_health_check_timer}) };
+        eval { $db->{_health_check_timer}->stop };
         delete $db->{_health_check_timer};
     }
 
-    # 2. Shutdown workers
+    # 2. Remove and stop each worker.
+    #
+    # CRITICAL ORDER: remove() MUST be called BEFORE stop().
+    #
+    # IO::Async::Function::stop() sets an internal {stopping} flag and
+    # begins tearing down IPC channels. Once that flag is set, remove()
+    # silently fails - the notifier stays in the loop's internal registry,
+    # keeping the loop (and its SIGCHLD handler) alive past the point where
+    # we expect them to be freed. During Perl global destruction the loop's
+    # XS destructor then accesses already-freed memory -> SEGV.
+    #
+    # Calling remove() first detaches the Function and all its child
+    # notifiers (Streams, Handles, Processes) cleanly, then stop() signals
+    # the worker processes to exit and returns a Future we can await.
     if ($db->{_workers}) {
+        my @stop_futures;
         foreach my $worker_info (@{ $db->{_workers} }) {
-            if (my $instance = $worker_info->{instance}) {
-                $db->{_loop}->remove($instance);
-            }
+            my $instance = $worker_info->{instance} or next;
+            eval { $db->{_loop}->remove($instance) };
+            my $f = eval { $instance->stop };
+            push @stop_futures, $f if $f && ref $f;
         }
         $db->{_workers} = [];
+
+        # Await the stop Futures so worker processes begin their shutdown
+        # sequence before we proceed. stop() returns a Future that resolves
+        # when the IPC channels are closed (not when the OS process exits,
+        # but close enough to prevent the SEGV in the common case).
+        if (@stop_futures) {
+            eval { $db->{_loop}->await(Future->needs_all(@stop_futures)) };
+        }
     }
 
-    # 3. Final state update
+    # 3. Clean up global IO::Async state that outlives the loop object.
+    #
+    # IO::Async::Loop maintains a $ONE_TRUE_LOOP singleton and installs a
+    # SIGCHLD handler when workers are forked. Both hold strong references
+    # to the loop object, preventing garbage collection even after all our
+    # Perl-level references are dropped. In global destruction this causes
+    # a SEGV because the loop's XS destructor runs after other XS objects
+    # it depends on have already been freed.
+    #
+    # We only do this when we own the loop (i.e. we created it internally).
+    # For user-supplied loops the caller is responsible for lifecycle.
+    if ($db->{_owns_loop}) {
+        undef $IO::Async::Loop::ONE_TRUE_LOOP;
+        $SIG{CHLD} = $db->{_old_sigchld};
+    }
+
+    # 4. Final state update
     $db->{_is_connected} = 0;
 
     return 1;

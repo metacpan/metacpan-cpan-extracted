@@ -774,6 +774,7 @@ static XS(invoke_watch);
 static XS(invoke_watch)
 {
   dXSARGS;
+  PERL_UNUSED_VAR(items);
   TickitWatch *watch = XSANY.any_ptr;
 
   tickit_evloop_invoke_watch(watch, TICKIT_EV_FIRE);
@@ -793,6 +794,7 @@ static XS(invoke_iowatch);
 static XS(invoke_iowatch)
 {
   dXSARGS;
+  PERL_UNUSED_VAR(items);
   TickitWatch *watch = XSANY.any_ptr;
 
   TickitIOCondition cond = POPi;
@@ -814,6 +816,7 @@ static XS(invoke_processwatch);
 static XS(invoke_processwatch)
 {
   dXSARGS;
+  PERL_UNUSED_VAR(items);
   TickitWatch *watch = XSANY.any_ptr;
 
   int wstatus = POPi;
@@ -1234,6 +1237,8 @@ static int invoke_callback(Tickit *t, TickitEventFlags flags, void *info, void *
     SvREFCNT_dec((SV*)data->code);
     Safefree(data);
   }
+
+  return 0;
 }
 
 static int invoke_iocallback(Tickit *t, TickitEventFlags flags, void *_info, void *user)
@@ -1269,6 +1274,8 @@ static int invoke_iocallback(Tickit *t, TickitEventFlags flags, void *_info, voi
     SvREFCNT_dec((SV*)data->code);
     Safefree(data);
   }
+
+  return 0;
 }
 
 static int invoke_processcallback(Tickit *t, TickitEventFlags flags, void *_info, void *user)
@@ -1435,19 +1442,14 @@ _enabled()
     RETVAL
 
 void
-_log(flag, message)
-  char *flag
-  char *message
+_log(char *flag, char *message)
   CODE:
     tickit_debug_logf(flag, "%s", message);
 
 MODULE = Tickit             PACKAGE = Tickit::Event::Expose
 
 SV *
-_new(package,rb,rect)
-  char                 *package
-  Tickit::RenderBuffer  rb
-  Tickit::Rect          rect
+_new(char *package, Tickit::RenderBuffer rb, Tickit::Rect rect)
   INIT:
     TickitExposeEventInfo *info;
   CODE:
@@ -1461,8 +1463,7 @@ _new(package,rb,rect)
     RETVAL
 
 void
-DESTROY(self)
-  SV *self
+DESTROY(SV *self)
   INIT:
     TickitExposeEventInfo *info = INT2PTR(TickitExposeEventInfo *, SvIV((SV*)SvRV(self)));
   CODE:
@@ -1470,8 +1471,7 @@ DESTROY(self)
     Safefree(info);
 
 SV *
-rb(self)
-  SV *self
+rb(SV *self)
   ALIAS:
     rb   = 0
     rect = 1
@@ -1489,10 +1489,7 @@ rb(self)
 MODULE = Tickit             PACKAGE = Tickit::Event::Focus
 
 SV *
-_new(package,type,win)
-  char *package
-  SV   *type
-  SV   *win
+_new(char *package, SV *type, SV *win)
   INIT:
     TickitFocusEventInfo *info;
   CODE:
@@ -1518,8 +1515,7 @@ _new(package,type,win)
     RETVAL
 
 void
-DESTROY(self)
-  SV *self
+DESTROY(SV *self)
   INIT:
     TickitFocusEventInfo *info = INT2PTR(TickitFocusEventInfo *, SvIV((SV*)SvRV(self)));
   CODE:
@@ -1528,15 +1524,14 @@ DESTROY(self)
     Safefree(info);
 
 SV *
-type(self,newapi=&PL_sv_undef)
-  SV *self
-  SV *newapi
+type(SV *self, SV *newapi = &PL_sv_undef)
   ALIAS:
     type = 0
     win  = 1
   INIT:
     TickitFocusEventInfo *info = INT2PTR(TickitFocusEventInfo *, SvIV((SV*)SvRV(self)));
   CODE:
+    PERL_UNUSED_VAR(newapi);
     switch(ix) {
       case 0: RETVAL = tickit_focusevtype2sv(info->type); break;
       case 1: RETVAL = newSVwin(tickit_window_ref(info->win)); break;
@@ -1548,16 +1543,14 @@ type(self,newapi=&PL_sv_undef)
 MODULE = Tickit             PACKAGE = Tickit::Event::IOWatch
 
 void
-DESTROY(self)
-  SV *self
+DESTROY(SV *self)
   INIT:
     TickitIOWatchInfo *info = INT2PTR(TickitIOWatchInfo *, SvIV((SV*)SvRV(self)));
   CODE:
     Safefree(info);
 
 SV *
-fd(self)
-  SV *self
+fd(SV *self)
   ALIAS:
     fd   = 0
     cond = 1
@@ -1575,16 +1568,14 @@ fd(self)
 MODULE = Tickit             PACKAGE = Tickit::Event::ProcessWatch
 
 void
-DESTROY(self)
-  SV *self
+DESTROY(SV *self)
   INIT:
     TickitProcessWatchInfo *info = INT2PTR(TickitProcessWatchInfo *, SvIV((SV*)SvRV(self)));
   CODE:
     Safefree(info);
 
 SV *
-pid(self)
-  SV *self
+pid(SV *self)
   ALIAS:
     pid     = 0
     wstatus = 1
@@ -1603,11 +1594,7 @@ pid(self)
 MODULE = Tickit             PACKAGE = Tickit::Event::Key
 
 SV *
-_new(package,type,str,mod=0)
-  char *package
-  char *type
-  char *str
-  int   mod
+_new(char *package, char *type, char *str, int mod = 0)
   INIT:
     TickitKeyEventInfo *info;
   CODE:
@@ -1626,8 +1613,7 @@ _new(package,type,str,mod=0)
     RETVAL
 
 void
-DESTROY(self)
-  SV *self
+DESTROY(SV *self)
   INIT:
     TickitKeyEventInfo *info = INT2PTR(TickitKeyEventInfo *, SvIV((SV*)SvRV(self)));
   CODE:
@@ -1635,8 +1621,7 @@ DESTROY(self)
     Safefree(info);
 
 SV *
-type(self)
-  SV *self
+type(SV *self)
   ALIAS:
     type = 0
     str  = 1
@@ -1656,13 +1641,7 @@ type(self)
 MODULE = Tickit             PACKAGE = Tickit::Event::Mouse
 
 SV *
-_new(package,type,button,line,col,mod=0)
-  char *package
-  char *type
-  SV   *button
-  int   line
-  int   col
-  int   mod
+_new(char *package, char *type, SV *button, int line, int col, int mod = 0)
   INIT:
     TickitMouseEventInfo *info;
   CODE:
@@ -1689,14 +1668,12 @@ _new(package,type,button,line,col,mod=0)
     RETVAL
 
 void
-DESTROY(self)
-  SV *self
+DESTROY(SV *self)
   CODE:
     Safefree(INT2PTR(void *, SvIV((SV*)SvRV(self))));
 
 SV *
-type(self)
-  SV *self
+type(SV *self)
   ALIAS:
     type   = 0
     button = 1
@@ -1720,8 +1697,7 @@ type(self)
 MODULE = Tickit             PACKAGE = Tickit::Event::Resize
 
 void
-DESTROY(self)
-  SV *self
+DESTROY(SV *self)
   CODE:
     Safefree(INT2PTR(void *, SvIV((SV*)SvRV(self))));
 
@@ -1745,9 +1721,7 @@ lines(self)
 MODULE = Tickit             PACKAGE = Tickit::Pen
 
 SV *
-_new(package, attrs)
-  char *package
-  HV   *attrs
+_new(char *package, HV *attrs)
   INIT:
     TickitPen   *pen;
   CODE:
@@ -1762,15 +1736,12 @@ _new(package, attrs)
     RETVAL
 
 void
-DESTROY(self)
-  Tickit::Pen self
+DESTROY(Tickit::Pen self)
   CODE:
     tickit_pen_unref(self);
 
 bool
-hasattr(self,attr)
-  Tickit::Pen  self
-  char        *attr
+hasattr(Tickit::Pen self, char *attr)
   INIT:
     int a;
   CODE:
@@ -1787,9 +1758,7 @@ hasattr(self,attr)
     RETVAL
 
 SV *
-getattr(self,attr)
-  Tickit::Pen  self
-  char        *attr
+getattr(Tickit::Pen self, char *attr)
   INIT:
     int a;
   CODE:
@@ -1811,8 +1780,7 @@ getattr(self,attr)
     RETVAL
 
 void
-getattrs(self)
-  Tickit::Pen self
+getattrs(Tickit::Pen self)
   INIT:
     TickitPenAttr a;
     int           count = 0;
@@ -1840,10 +1808,7 @@ getattrs(self)
     XSRETURN(count);
 
 bool
-equiv_attr(self,other,attr)
-  Tickit::Pen  self
-  Tickit::Pen  other
-  char        *attr
+equiv_attr(Tickit::Pen self, Tickit::Pen other, char *attr)
   INIT:
     TickitPenAttr a;
   CODE:
@@ -1854,9 +1819,7 @@ equiv_attr(self,other,attr)
     RETVAL
 
 bool
-equiv(self,other)
-  Tickit::Pen  self
-  Tickit::Pen  other
+equiv(Tickit::Pen self, Tickit::Pen other)
   CODE:
     RETVAL = tickit_pen_equiv(self, other);
   OUTPUT:
@@ -1865,10 +1828,7 @@ equiv(self,other)
 MODULE = Tickit             PACKAGE = Tickit::Pen::Mutable
 
 void
-chattr(self,attr,value)
-  Tickit::Pen  self
-  char        *attr
-  SV          *value
+chattr(Tickit::Pen self, char *attr, SV *value)
   INIT:
     int a;
   CODE:
@@ -1888,16 +1848,12 @@ chattr(self,attr,value)
     pen_set_attr(self, a, value);
 
 void
-chattrs(self,attrs)
-  Tickit::Pen  self
-  HV          *attrs
+chattrs(Tickit::Pen self, HV *attrs)
   CODE:
     pen_set_attrs(self, attrs);
 
 void
-delattr(self,attr)
-  Tickit::Pen  self
-  char        *attr
+delattr(Tickit::Pen self, char *attr)
   INIT:
     TickitPenAttr a;
   CODE:
@@ -1906,38 +1862,28 @@ delattr(self,attr)
     tickit_pen_clear_attr(self, a);
 
 void
-copy(self,other,overwrite)
-  Tickit::Pen self
-  Tickit::Pen other
-  int         overwrite
+copy(Tickit::Pen self, Tickit::Pen other, int overwrite)
   CODE:
     tickit_pen_copy(self, other, overwrite);
 
 MODULE = Tickit             PACKAGE = Tickit::Rect
 
 Tickit::Rect
-_new(package,top,left,lines,cols)
-  char *package
-  int top
-  int left
-  int lines
-  int cols
+_new(char *package, int top, int left, int lines, int cols)
   CODE:
+    PERL_UNUSED_VAR(package);
     Newx(RETVAL, 1, TickitRect);
     tickit_rect_init_sized(RETVAL, top, left, lines, cols);
   OUTPUT:
     RETVAL
 
 void
-DESTROY(self)
-  Tickit::Rect self
+DESTROY(Tickit::Rect self)
   CODE:
     Safefree(self);
 
 Tickit::Rect
-intersect(self,other)
-  Tickit::Rect self
-  Tickit::Rect other
+intersect(Tickit::Rect self, Tickit::Rect other)
   INIT:
     TickitRect ret;
   CODE:
@@ -1950,10 +1896,7 @@ intersect(self,other)
     RETVAL
 
 Tickit::Rect
-translate(self,downward,rightward)
-  Tickit::Rect self
-  int          downward
-  int          rightward
+translate(Tickit::Rect self, int downward, int rightward)
   CODE:
     Newx(RETVAL, 1, TickitRect);
     tickit_rect_init_sized(RETVAL, self->top + downward, self->left + rightward,
@@ -1962,59 +1905,51 @@ translate(self,downward,rightward)
     RETVAL
 
 int
-top(self)
-  Tickit::Rect self
+top(Tickit::Rect self)
   CODE:
     RETVAL = self->top;
   OUTPUT:
     RETVAL
 
 int
-left(self)
-  Tickit::Rect self
+left(Tickit::Rect self)
   CODE:
     RETVAL = self->left;
   OUTPUT:
     RETVAL
 
 int
-lines(self)
-  Tickit::Rect self
+lines(Tickit::Rect self)
   CODE:
     RETVAL = self->lines;
   OUTPUT:
     RETVAL
 
 int
-cols(self)
-  Tickit::Rect self
+cols(Tickit::Rect self)
   CODE:
     RETVAL = self->cols;
   OUTPUT:
     RETVAL
 
 int
-bottom(self)
-  Tickit::Rect self
+bottom(Tickit::Rect self)
   CODE:
     RETVAL = tickit_rect_bottom(self);
   OUTPUT:
     RETVAL
 
 int
-right(self)
-  Tickit::Rect self
+right(Tickit::Rect self)
   CODE:
     RETVAL = tickit_rect_right(self);
   OUTPUT:
     RETVAL
 
 bool
-equals(self,other,swap=0)
-  Tickit::Rect self
-  Tickit::Rect other
-  int          swap
+equals(Tickit::Rect self, Tickit::Rect other, int swap = 0)
   CODE:
+    PERL_UNUSED_VAR(swap);
     RETVAL = (self->top   == other->top) &&
              (self->lines == other->lines) &&
              (self->left  == other->left) &&
@@ -2023,27 +1958,21 @@ equals(self,other,swap=0)
     RETVAL
 
 bool
-intersects(self,other)
-  Tickit::Rect self
-  Tickit::Rect other
+intersects(Tickit::Rect self, Tickit::Rect other)
   CODE:
     RETVAL = tickit_rect_intersects(self, other);
   OUTPUT:
     RETVAL
 
 bool
-contains(large,small)
-  Tickit::Rect large
-  Tickit::Rect small
+contains(Tickit::Rect large, Tickit::Rect small)
   CODE:
     RETVAL = tickit_rect_contains(large, small);
   OUTPUT:
     RETVAL
 
 void
-add(x,y)
-  Tickit::Rect x
-  Tickit::Rect y
+add(Tickit::Rect x, Tickit::Rect y)
   INIT:
     int n_rects, i;
     TickitRect rects[3];
@@ -2056,9 +1985,7 @@ add(x,y)
     XSRETURN(n_rects);
 
 void
-subtract(self,hole)
-  Tickit::Rect self
-  Tickit::Rect hole
+subtract(Tickit::Rect self, Tickit::Rect hole)
   INIT:
     int n_rects, i;
     TickitRect rects[4];
@@ -2074,28 +2001,25 @@ subtract(self,hole)
 MODULE = Tickit             PACKAGE = Tickit::RectSet
 
 Tickit::RectSet
-new(package)
-  char *package
+new(char *package)
   CODE:
+    PERL_UNUSED_VAR(package);
     RETVAL = tickit_rectset_new();
   OUTPUT:
     RETVAL
 
 void
-DESTROY(self)
-  Tickit::RectSet self
+DESTROY(Tickit::RectSet self)
   CODE:
     tickit_rectset_destroy(self);
 
 void
-clear(self)
-  Tickit::RectSet self
+clear(Tickit::RectSet self)
   CODE:
     tickit_rectset_clear(self);
 
 void
-rects(self)
-  Tickit::RectSet self
+rects(Tickit::RectSet self)
   INIT:
     int n;
     int i;
@@ -2117,32 +2041,24 @@ rects(self)
     XSRETURN(n);
 
 void
-add(self,rect)
-  Tickit::RectSet self
-  Tickit::Rect rect
+add(Tickit::RectSet self, Tickit::Rect rect)
   CODE:
     tickit_rectset_add(self, rect);
 
 void
-subtract(self,rect)
-  Tickit::RectSet self
-  Tickit::Rect rect
+subtract(Tickit::RectSet self, Tickit::Rect rect)
   CODE:
     tickit_rectset_subtract(self, rect);
 
 bool
-intersects(self,r)
-  Tickit::RectSet self
-  Tickit::Rect r
+intersects(Tickit::RectSet self, Tickit::Rect r)
   CODE:
     RETVAL = tickit_rectset_intersects(self, r);
   OUTPUT:
     RETVAL
 
 bool
-contains(self,r)
-  Tickit::RectSet self
-  Tickit::Rect r
+contains(Tickit::RectSet self, Tickit::Rect r)
   CODE:
     RETVAL = tickit_rectset_contains(self, r);
   OUTPUT:
@@ -2151,40 +2067,34 @@ contains(self,r)
 MODULE = Tickit             PACKAGE = Tickit::RenderBuffer
 
 SV *
-_xs_new(class,lines,cols)
-  char *class
-  int lines
-  int cols
+_xs_new(char *package, int lines, int cols)
   CODE:
+    PERL_UNUSED_VAR(package);
     RETVAL = newSVrb_noinc(tickit_renderbuffer_new(lines, cols));
   OUTPUT:
     RETVAL
 
 void
-DESTROY(self)
-  Tickit::RenderBuffer self
+DESTROY(Tickit::RenderBuffer self)
   CODE:
     tickit_renderbuffer_unref(self);
 
 int
-lines(self)
-  Tickit::RenderBuffer self
+lines(Tickit::RenderBuffer self)
   CODE:
     tickit_renderbuffer_get_size(self, &RETVAL, NULL);
   OUTPUT:
     RETVAL
 
 int
-cols(self)
-  Tickit::RenderBuffer self
+cols(Tickit::RenderBuffer self)
   CODE:
     tickit_renderbuffer_get_size(self, NULL, &RETVAL);
   OUTPUT:
     RETVAL
 
 SV *
-line(self)
-  Tickit::RenderBuffer self
+line(Tickit::RenderBuffer self)
   INIT:
     TickitRenderBuffer *rb;
   CODE:
@@ -2200,8 +2110,7 @@ line(self)
     RETVAL
 
 SV *
-col(self)
-  Tickit::RenderBuffer self
+col(Tickit::RenderBuffer self)
   INIT:
     TickitRenderBuffer *rb;
   CODE:
@@ -2217,32 +2126,22 @@ col(self)
     RETVAL
 
 void
-translate(self,downward,rightward)
-  Tickit::RenderBuffer self
-  int downward
-  int rightward
+translate(Tickit::RenderBuffer self, int downward, int rightward)
   PPCODE:
     tickit_renderbuffer_translate(self, downward, rightward);
 
 void
-clip(self,rect)
-  Tickit::RenderBuffer self
-  Tickit::Rect rect
+clip(Tickit::RenderBuffer self, Tickit::Rect rect)
   CODE:
     tickit_renderbuffer_clip(self, rect);
 
 void
-mask(self,rect)
-  Tickit::RenderBuffer self
-  Tickit::Rect rect
+mask(Tickit::RenderBuffer self, Tickit::Rect rect)
   CODE:
     tickit_renderbuffer_mask(self, rect);
 
 void
-goto(self,line,col)
-  Tickit::RenderBuffer self
-  SV *line
-  SV *col
+goto(Tickit::RenderBuffer self, SV *line, SV *col)
   CODE:
     if(SvIsNumeric(line) && SvIsNumeric(col))
       tickit_renderbuffer_goto(self, SvIV(line), SvIV(col));
@@ -2250,22 +2149,17 @@ goto(self,line,col)
       tickit_renderbuffer_ungoto(self);
 
 void
-setpen(self,pen)
-  Tickit::RenderBuffer self
-  Tickit::Pen pen
+setpen(Tickit::RenderBuffer self, Tickit::Pen pen)
   CODE:
     tickit_renderbuffer_setpen(self, pen);
 
 void
-reset(self)
-  Tickit::RenderBuffer self
+reset(Tickit::RenderBuffer self)
   CODE:
     tickit_renderbuffer_reset(self);
 
 void
-clear(self,pen=NULL)
-  Tickit::RenderBuffer self
-  Tickit::Pen pen
+clear(Tickit::RenderBuffer self, Tickit::Pen pen=NULL)
   CODE:
     if(pen) {
       tickit_renderbuffer_savepen(self);
@@ -2276,28 +2170,22 @@ clear(self,pen=NULL)
       tickit_renderbuffer_restore(self);
 
 void
-save(self)
-  Tickit::RenderBuffer self
+save(Tickit::RenderBuffer self)
   CODE:
     tickit_renderbuffer_save(self);
 
 void
-savepen(self)
-  Tickit::RenderBuffer self
+savepen(Tickit::RenderBuffer self)
   CODE:
     tickit_renderbuffer_savepen(self);
 
 void
-restore(self)
-  Tickit::RenderBuffer self
+restore(Tickit::RenderBuffer self)
   CODE:
     tickit_renderbuffer_restore(self);
 
 void
-_xs_get_cell(self,line,col)
-  Tickit::RenderBuffer self
-  int line
-  int col
+_xs_get_cell(Tickit::RenderBuffer self, int line, int col)
   INIT:
     TickitRenderBuffer *rb;
     STRLEN len;
@@ -2332,18 +2220,12 @@ _xs_get_cell(self,line,col)
     XSRETURN(6);
 
 void
-skip_at(self,line,col,len)
-  Tickit::RenderBuffer self
-  int line
-  int col
-  int len
+skip_at(Tickit::RenderBuffer self, int line, int col, int len)
   CODE:
     tickit_renderbuffer_skip_at(self, line, col, len);
 
 void
-skip(self,len)
-  Tickit::RenderBuffer self
-  int len
+skip(Tickit::RenderBuffer self, int len)
   CODE:
     if(!tickit_renderbuffer_has_cursorpos(self))
       croak("Cannot ->skip without a virtual cursor position");
@@ -2351,9 +2233,7 @@ skip(self,len)
     tickit_renderbuffer_skip(self, len);
 
 void
-skip_to(self,col)
-  Tickit::RenderBuffer self
-  int col
+skip_to(Tickit::RenderBuffer self, int col)
   CODE:
     if(!tickit_renderbuffer_has_cursorpos(self))
       croak("Cannot ->skip_to without a virtual cursor position");
@@ -2361,19 +2241,12 @@ skip_to(self,col)
     tickit_renderbuffer_skip_to(self, col);
 
 void
-skiprect(self,rect)
-  Tickit::RenderBuffer self
-  Tickit::Rect rect
+skiprect(Tickit::RenderBuffer self, Tickit::Rect rect)
   CODE:
     tickit_renderbuffer_skiprect(self, rect);
 
 int
-text_at(self,line,col,text,pen=NULL)
-  Tickit::RenderBuffer self
-  int line
-  int col
-  SV *text
-  Tickit::Pen pen
+text_at(Tickit::RenderBuffer self, int line, int col, SV *text, Tickit::Pen pen = NULL)
   INIT:
     char *bytes;
     STRLEN len;
@@ -2390,10 +2263,7 @@ text_at(self,line,col,text,pen=NULL)
     RETVAL
 
 int
-text(self,text,pen=NULL)
-  Tickit::RenderBuffer self
-  SV *text
-  Tickit::Pen pen
+text(Tickit::RenderBuffer self, SV *text, Tickit::Pen pen = NULL)
   INIT:
     char *bytes;
     STRLEN len;
@@ -2413,12 +2283,7 @@ text(self,text,pen=NULL)
     RETVAL
 
 void
-erase_at(self,line,col,len,pen=NULL)
-  Tickit::RenderBuffer self
-  int line
-  int col
-  int len
-  Tickit::Pen pen
+erase_at(Tickit::RenderBuffer self, int line, int col, int len, Tickit::Pen pen = NULL)
   CODE:
     if(pen) {
       tickit_renderbuffer_savepen(self);
@@ -2429,10 +2294,7 @@ erase_at(self,line,col,len,pen=NULL)
       tickit_renderbuffer_restore(self);
 
 void
-erase(self,len,pen=NULL)
-  Tickit::RenderBuffer self
-  int len
-  Tickit::Pen pen
+erase(Tickit::RenderBuffer self, int len, Tickit::Pen pen = NULL)
   CODE:
     if(!tickit_renderbuffer_has_cursorpos(self))
       croak("Cannot ->erase without a virtual cursor position");
@@ -2446,10 +2308,7 @@ erase(self,len,pen=NULL)
       tickit_renderbuffer_restore(self);
 
 void
-erase_to(self,col,pen=NULL)
-  Tickit::RenderBuffer self
-  int col
-  Tickit::Pen pen
+erase_to(Tickit::RenderBuffer self, int col, Tickit::Pen pen = NULL)
   CODE:
     if(!tickit_renderbuffer_has_cursorpos(self))
       croak("Cannot ->erase_to without a virtual cursor position");
@@ -2463,10 +2322,7 @@ erase_to(self,col,pen=NULL)
       tickit_renderbuffer_restore(self);
 
 void
-eraserect(self,rect,pen=NULL)
-  Tickit::RenderBuffer self
-  Tickit::Rect rect
-  Tickit::Pen pen
+eraserect(Tickit::RenderBuffer self, Tickit::Rect rect, Tickit::Pen pen = NULL)
   CODE:
     if(pen) {
       tickit_renderbuffer_savepen(self);
@@ -2477,12 +2333,7 @@ eraserect(self,rect,pen=NULL)
       tickit_renderbuffer_restore(self);
 
 void
-char_at(self,line,col,codepoint,pen=NULL)
-  Tickit::RenderBuffer self
-  int line
-  int col
-  int codepoint
-  Tickit::Pen pen
+char_at(Tickit::RenderBuffer self, int line, int col, int codepoint, Tickit::Pen pen = NULL)
   CODE:
     if(pen) {
       tickit_renderbuffer_savepen(self);
@@ -2493,10 +2344,7 @@ char_at(self,line,col,codepoint,pen=NULL)
       tickit_renderbuffer_restore(self);
 
 void
-char(self,codepoint,pen=NULL)
-  Tickit::RenderBuffer self
-  int codepoint
-  Tickit::Pen pen
+char(Tickit::RenderBuffer self, int codepoint, Tickit::Pen pen = NULL)
   CODE:
     if(pen) {
       tickit_renderbuffer_savepen(self);
@@ -2507,14 +2355,8 @@ char(self,codepoint,pen=NULL)
       tickit_renderbuffer_restore(self);
 
 void
-hline_at(self,line,startcol,endcol,style,pen=NULL,caps=0)
-  Tickit::RenderBuffer self
-  int line
-  int startcol
-  int endcol
-  int style
-  Tickit::Pen pen
-  int caps
+hline_at(Tickit::RenderBuffer self, int line, int startcol, int endcol, \
+    int style, Tickit::Pen pen = NULL, int caps = 0)
   CODE:
     if(pen) {
       tickit_renderbuffer_savepen(self);
@@ -2525,14 +2367,8 @@ hline_at(self,line,startcol,endcol,style,pen=NULL,caps=0)
       tickit_renderbuffer_restore(self);
 
 void
-vline_at(self,startline,endline,col,style,pen=NULL,caps=0)
-  Tickit::RenderBuffer self
-  int startline
-  int endline
-  int col
-  int style
-  Tickit::Pen pen
-  int caps
+vline_at(Tickit::RenderBuffer self, int startline, int endline, int col, \
+    int style, Tickit::Pen pen = NULL, int caps = 0)
   CODE:
     if(pen) {
       tickit_renderbuffer_savepen(self);
@@ -2543,17 +2379,12 @@ vline_at(self,startline,endline,col,style,pen=NULL,caps=0)
       tickit_renderbuffer_restore(self);
 
 void
-flush_to_term(self,term)
-  Tickit::RenderBuffer self
-  Tickit::Term term
+flush_to_term(Tickit::RenderBuffer self, Tickit::Term term)
   CODE:
     tickit_renderbuffer_flush_to_term(self, term);
 
 void
-copyrect(self,dest,src)
-  Tickit::RenderBuffer self
-  Tickit::Rect dest
-  Tickit::Rect src
+copyrect(Tickit::RenderBuffer self, Tickit::Rect dest, Tickit::Rect src)
   ALIAS:
     copyrect = 0
     moverect = 1
@@ -2566,97 +2397,88 @@ copyrect(self,dest,src)
 MODULE = Tickit             PACKAGE = Tickit::StringPos
 
 SV *
-zero(package)
-  char *package;
+zero(char *package)
   INIT:
     TickitStringPos *pos;
   CODE:
+    PERL_UNUSED_VAR(package);
     pos = new_stringpos(&RETVAL);
     tickit_stringpos_zero(pos);
   OUTPUT:
     RETVAL
 
 SV *
-limit_bytes(package,bytes)
-  char *package;
-  size_t bytes;
+limit_bytes(char *package, size_t bytes)
   INIT:
     TickitStringPos *pos;
   CODE:
+    PERL_UNUSED_VAR(package);
     pos = new_stringpos(&RETVAL);
     tickit_stringpos_limit_bytes(pos, bytes);
   OUTPUT:
     RETVAL
 
 SV *
-limit_codepoints(package,codepoints)
-  char *package;
-  int codepoints;
+limit_codepoints(char *package, int codepoints)
   INIT:
     TickitStringPos *pos;
   CODE:
+    PERL_UNUSED_VAR(package);
     pos = new_stringpos(&RETVAL);
     tickit_stringpos_limit_codepoints(pos, codepoints);
   OUTPUT:
     RETVAL
 
 SV *
-limit_graphemes(package,graphemes)
-  char *package;
-  int graphemes;
+limit_graphemes(char *package, int graphemes)
   INIT:
     TickitStringPos *pos;
   CODE:
+    PERL_UNUSED_VAR(package);
     pos = new_stringpos(&RETVAL);
     tickit_stringpos_limit_graphemes(pos, graphemes);
   OUTPUT:
     RETVAL
 
 SV *
-limit_columns(package,columns)
-  char *package;
-  int columns;
+limit_columns(char *package, int columns)
   INIT:
     TickitStringPos *pos;
   CODE:
+    PERL_UNUSED_VAR(package);
     pos = new_stringpos(&RETVAL);
     tickit_stringpos_limit_columns(pos, columns);
   OUTPUT:
     RETVAL
 
 void
-DESTROY(self)
-  Tickit::StringPos self
+DESTROY(Tickit::StringPos self)
   CODE:
     Safefree(self);
 
 size_t
-bytes(self)
-  Tickit::StringPos self;
+bytes(Tickit::StringPos self)
   CODE:
     RETVAL = self->bytes;
   OUTPUT:
     RETVAL
 
 int
-codepoints(self)
-  Tickit::StringPos self;
+codepoints(Tickit::StringPos self)
   CODE:
     RETVAL = self->codepoints;
   OUTPUT:
     RETVAL
 
 int
-graphemes(self)
-  Tickit::StringPos self;
+graphemes(Tickit::StringPos self)
   CODE:
     RETVAL = self->graphemes;
   OUTPUT:
     RETVAL
 
 int
-columns(self)
-  Tickit::StringPos self;
+columns(Tickit::StringPos self)
   CODE:
     RETVAL = self->columns;
   OUTPUT:
@@ -2665,13 +2487,8 @@ columns(self)
 MODULE = Tickit             PACKAGE = Tickit::Term
 
 SV *
-_new(package,termtype,input_handle,output_handle,writer,utf8)
-  char *package;
-  char *termtype;
-  SV   *input_handle
-  SV   *output_handle
-  SV   *writer
-  SV   *utf8
+_new(char *package, char *termtype, SV *input_handle, SV *output_handle, \
+    SV *writer, SV *utf8)
   INIT:
     struct TickitTermBuilder builder = { 0 };
     TickitTerm   *tt;
@@ -2702,8 +2519,7 @@ _new(package,termtype,input_handle,output_handle,writer,utf8)
     RETVAL
 
 SV *
-open_stdio(package)
-  char *package
+open_stdio(char *package)
   INIT:
     TickitTerm   *tt;
   CODE:
@@ -2716,8 +2532,7 @@ open_stdio(package)
     RETVAL
 
 void
-DESTROY(self)
-  Tickit::Term  self
+DESTROY(Tickit::Term self)
   CODE:
     /*
      * destroy TickitTerm first in case it's still using output_handle/func
@@ -2725,70 +2540,58 @@ DESTROY(self)
     tickit_term_unref(self);
 
 UV
-_xs_addr(self, ...)
-  Tickit::Term  self
+_xs_addr(Tickit::Term self, ...)
   CODE:
     RETVAL = (UV)self;
   OUTPUT:
     RETVAL
 
 int
-get_input_fd(self)
-  Tickit::Term  self
+get_input_fd(Tickit::Term self)
   CODE:
     RETVAL = tickit_term_get_input_fd(self);
   OUTPUT:
     RETVAL
 
 int
-get_output_fd(self)
-  Tickit::Term  self
+get_output_fd(Tickit::Term self)
   CODE:
     RETVAL = tickit_term_get_output_fd(self);
   OUTPUT:
     RETVAL
 
 void
-await_started(self,timeout)
-  Tickit::Term  self
-  double        timeout
+await_started(Tickit::Term self, double timeout)
   CODE:
     tickit_term_await_started_msec(self, timeout * 1000);
 
 void
-pause(self)
-  Tickit::Term  self
+pause(Tickit::Term self)
   CODE:
     tickit_term_pause(self);
 
 void
-resume(self)
-  Tickit::Term  self
+resume(Tickit::Term self)
   CODE:
     tickit_term_resume(self);
 
 void
-teardown(self)
-  Tickit::Term  self
+teardown(Tickit::Term self)
   CODE:
     tickit_term_teardown(self);
 
 void
-flush(self)
-  Tickit::Term  self
+flush(Tickit::Term self)
   CODE:
     tickit_term_flush(self);
 
 void
-set_output_buffer(self,len)
-  Tickit::Term  self
-  size_t        len
+set_output_buffer(Tickit::Term self, size_t len)
   CODE:
     tickit_term_set_output_buffer(self, len);
 
 void
-get_size(self)
-  Tickit::Term  self
+get_size(Tickit::Term self)
   INIT:
     int lines, cols;
   PPCODE:
@@ -2799,26 +2602,17 @@ get_size(self)
     XSRETURN(2);
 
 void
-set_size(self,lines,cols)
-  Tickit::Term  self
-  int           lines
-  int           cols
+set_size(Tickit::Term self, int lines, int cols)
   CODE:
     tickit_term_set_size(self, lines, cols);
 
 void
-refresh_size(self)
-  Tickit::Term  self
+refresh_size(Tickit::Term self)
   CODE:
     tickit_term_refresh_size(self);
 
 int
-_bind_event(self,ev,flags,code,data = &PL_sv_undef)
-  Tickit::Term  self
-  char         *ev
-  int           flags
-  CV           *code
-  SV           *data
+_bind_event(Tickit::Term self, char *ev, int flags, CV *code, SV *data = &PL_sv_undef)
   INIT:
     TickitTermEvent _ev = -1;
     struct GenericEventData *user;
@@ -2847,16 +2641,12 @@ _bind_event(self,ev,flags,code,data = &PL_sv_undef)
     RETVAL
 
 void
-unbind_event_id(self,id)
-  Tickit::Term  self
-  int           id
+unbind_event_id(Tickit::Term self, int id)
   CODE:
     tickit_term_unbind_event_id(self, id);
 
 void
-input_push_bytes(self,bytes)
-  Tickit::Term  self
-  SV           *bytes
+input_push_bytes(Tickit::Term self, SV *bytes)
   INIT:
     char   *str;
     STRLEN  len;
@@ -2865,15 +2655,12 @@ input_push_bytes(self,bytes)
     tickit_term_input_push_bytes(self, str, len);
 
 void
-input_readable(self)
-  Tickit::Term  self
+input_readable(Tickit::Term self)
   CODE:
     tickit_term_input_readable(self);
 
 void
-input_wait(self,timeout=&PL_sv_undef)
-  Tickit::Term  self
-  SV           *timeout
+input_wait(Tickit::Term self, SV *timeout = &PL_sv_undef)
   CODE:
     if(SvIsNumeric(timeout))
       tickit_term_input_wait_msec(self, SvNV(timeout) * 1000);
@@ -2882,8 +2669,7 @@ input_wait(self,timeout=&PL_sv_undef)
 
 
 SV *
-check_timeout(self)
-  Tickit::Term  self
+check_timeout(Tickit::Term self)
   INIT:
     int msec;
   CODE:
@@ -2895,32 +2681,19 @@ check_timeout(self)
     RETVAL
 
 bool
-goto(self,line,col)
-  Tickit::Term  self
-  SV           *line
-  SV           *col
+goto(Tickit::Term self, SV *line, SV *col)
   CODE:
     RETVAL = tickit_term_goto(self, SvOK(line) ? SvIV(line) : -1, SvOK(col) ? SvIV(col) : -1);
   OUTPUT:
     RETVAL
 
 void
-move(self,downward,rightward)
-  Tickit::Term  self
-  SV           *downward
-  SV           *rightward
+move(Tickit::Term self, SV *downward, SV *rightward)
   CODE:
     tickit_term_move(self, SvOK(downward) ? SvIV(downward) : 0, SvOK(rightward) ? SvIV(rightward) : 0);
 
 int
-scrollrect(self,top,left,lines,cols,downward,rightward)
-  Tickit::Term  self
-  int           top
-  int           left
-  int           lines
-  int           cols
-  int           downward
-  int           rightward
+scrollrect(Tickit::Term self, int top, int left, int lines, int cols, int downward, int rightward)
   INIT:
     TickitRect rect;
   CODE:
@@ -2933,8 +2706,7 @@ scrollrect(self,top,left,lines,cols,downward,rightward)
     RETVAL
 
 void
-chpen(self,...)
-  Tickit::Term  self
+chpen(Tickit::Term self, ...)
   INIT:
     TickitPen *pen;
     int        pen_temp = 0;
@@ -2953,8 +2725,7 @@ chpen(self,...)
       tickit_pen_unref(pen);
 
 void
-setpen(self,...)
-  Tickit::Term  self
+setpen(Tickit::Term self, ...)
   INIT:
     TickitPen *pen;
     int        pen_temp = 0;
@@ -2973,10 +2744,7 @@ setpen(self,...)
       tickit_pen_unref(pen);
 
 void
-print(self,text,pen=NULL)
-  Tickit::Term  self
-  SV           *text
-  Tickit::Pen   pen
+print(Tickit::Term self, SV *text, Tickit::Pen pen = NULL)
   INIT:
     char  *utf8;
     STRLEN len;
@@ -2987,29 +2755,21 @@ print(self,text,pen=NULL)
     tickit_term_printn(self, utf8, len);
 
 void
-clear(self,pen=NULL)
-  Tickit::Term  self
-  Tickit::Pen   pen
+clear(Tickit::Term self, Tickit::Pen pen=NULL)
   CODE:
     if(pen)
       tickit_term_setpen(self, pen);
     tickit_term_clear(self);
 
 void
-erasech(self,count,moveend,pen=NULL)
-  Tickit::Term  self
-  int           count
-  SV           *moveend
-  Tickit::Pen   pen
+erasech(Tickit::Term self, int count, SV *moveend, Tickit::Pen pen=NULL)
   CODE:
     if(pen)
       tickit_term_setpen(self, pen);
     tickit_term_erasech(self, count, SvOK(moveend) ? SvIV(moveend) : -1);
 
 int
-getctl_int(self,ctl)
-  Tickit::Term self
-  SV          *ctl
+getctl_int(Tickit::Term self, SV *ctl)
   INIT:
     TickitTermCtl ctl_e;
   CODE:
@@ -3029,10 +2789,7 @@ getctl_int(self,ctl)
     RETVAL
 
 void
-setctl_int(self,ctl,value)
-  Tickit::Term self
-  SV          *ctl
-  int          value
+setctl_int(Tickit::Term self, SV *ctl, int value)
   INIT:
     TickitTermCtl ctl_e;
   PPCODE:
@@ -3052,10 +2809,7 @@ setctl_int(self,ctl,value)
       XSRETURN_NO;
 
 int
-setctl_str(self,ctl,value)
-  Tickit::Term self
-  SV          *ctl
-  char        *value
+setctl_str(Tickit::Term self, SV *ctl, char *value)
   INIT:
     TickitTermCtl ctl_e;
   CODE:
@@ -3073,9 +2827,7 @@ setctl_str(self,ctl,value)
     RETVAL
 
 SV *
-getctl(self,ctl)
-  Tickit::Term  self
-  SV           *ctl
+getctl(Tickit::Term self, SV *ctl)
   INIT:
     TickitTermCtl ctl_e;
   CODE:
@@ -3089,6 +2841,7 @@ getctl(self,ctl)
     else
       croak("Expected 'ctl' to be an integer or string");
 
+    RETVAL = &PL_sv_undef;
     switch(tickit_termctl_type(ctl_e)) {
       case TICKIT_TYPE_BOOL: {
         int value;
@@ -3106,18 +2859,15 @@ getctl(self,ctl)
       }
 
       case TICKIT_TYPE_STR:
+      case TICKIT_TYPE_COLOUR:
       case TICKIT_TYPE_NONE:
-        RETVAL = &PL_sv_undef;
         break;
     }
   OUTPUT:
     RETVAL
 
 int
-setctl(self,ctl,value)
-  Tickit::Term  self
-  SV           *ctl
-  SV           *value
+setctl(Tickit::Term self, SV *ctl, SV *value)
   INIT:
     TickitTermCtl ctl_e;
   CODE:
@@ -3140,6 +2890,7 @@ setctl(self,ctl,value)
       case TICKIT_TYPE_STR:
         RETVAL = tickit_term_setctl_str(self, ctl_e, SvPV_nolen(value));
         break;
+      case TICKIT_TYPE_COLOUR:
       case TICKIT_TYPE_NONE:
         break;
     }
@@ -3147,29 +2898,23 @@ setctl(self,ctl,value)
     RETVAL
 
 void
-_emit_key(self,info)
-  Tickit::Term       self
-  Tickit::Event::Key info
+_emit_key(Tickit::Term self, Tickit::Event::Key info)
   CODE:
     tickit_term_emit_key(self, info);
 
 void
-_emit_mouse(self,info)
-  Tickit::Term         self
-  Tickit::Event::Mouse info
+_emit_mouse(Tickit::Term self, Tickit::Event::Mouse info)
   CODE:
     tickit_term_emit_mouse(self, info);
 
 MODULE = Tickit::Test::MockTerm    PACKAGE = Tickit::Test::MockTerm
 
 SV *
-_new_mocking(package,lines,cols)
-  char *package
-  int   lines
-  int   cols
+_new_mocking(char *package, int lines, int cols)
   INIT:
     TickitMockTerm *mt;
   CODE:
+    PERL_UNUSED_VAR(package);
     mt = tickit_mockterm_new(lines, cols);
     if(!mt)
       XSRETURN_UNDEF;
@@ -3179,8 +2924,7 @@ _new_mocking(package,lines,cols)
     RETVAL
 
 void
-get_methodlog(self)
-  Tickit::Term self
+get_methodlog(Tickit::Term self)
   INIT:
     TickitMockTerm *mt;
     int loglen;
@@ -3257,11 +3001,7 @@ get_methodlog(self)
     XSRETURN(i);
 
 SV *
-get_display_text(self,line,col,width)
-  Tickit::Term self
-  int line
-  int col
-  int width
+get_display_text(Tickit::Term self, int line, int col, int width)
   INIT:
     STRLEN len;
   CODE:
@@ -3278,10 +3018,7 @@ get_display_text(self,line,col,width)
     RETVAL
 
 SV *
-get_display_pen(self,line,col)
-  Tickit::Term self
-  int line
-  int col
+get_display_pen(Tickit::Term self, int line, int col)
   INIT:
     TickitPen *pen;
     HV *penattrs;
@@ -3304,16 +3041,12 @@ get_display_pen(self,line,col)
     RETVAL
 
 void
-resize(self,newlines,newcols)
-  Tickit::Term self
-  int newlines
-  int newcols
+resize(Tickit::Term self, int newlines, int newcols)
   CODE:
     tickit_mockterm_resize((TickitMockTerm *)self, newlines, newcols);
 
 int
-line(self)
-  Tickit::Term self
+line(Tickit::Term self)
   ALIAS:
     line        = 0
     col         = 1
@@ -3335,10 +3068,7 @@ line(self)
 MODULE = Tickit             PACKAGE = Tickit::Utils
 
 size_t
-string_count(str,pos,limit=NULL)
-    SV *str
-    Tickit::StringPos pos
-    Tickit::StringPos limit
+string_count(SV *str, Tickit::StringPos pos, Tickit::StringPos limit = NULL)
   INIT:
     char *s;
     STRLEN len;
@@ -3356,10 +3086,7 @@ string_count(str,pos,limit=NULL)
     RETVAL
 
 size_t
-string_countmore(str,pos,limit=NULL)
-    SV *str
-    Tickit::StringPos pos
-    Tickit::StringPos limit
+string_countmore(SV *str, Tickit::StringPos pos, Tickit::StringPos limit = NULL)
   INIT:
     char *s;
     STRLEN len;
@@ -3376,8 +3103,7 @@ string_countmore(str,pos,limit=NULL)
   OUTPUT:
     RETVAL
 
-int textwidth(str)
-    SV *str
+int textwidth(SV *str)
   INIT:
     STRLEN len;
     const char *s;
@@ -3400,8 +3126,7 @@ int textwidth(str)
   OUTPUT:
     RETVAL
 
-void chars2cols(str,...)
-    SV *str;
+void chars2cols(SV *str, ...)
   INIT:
     STRLEN len;
     const char *s;
@@ -3440,8 +3165,7 @@ void chars2cols(str,...)
 
     XSRETURN(items - 1);
 
-void cols2chars(str,...)
-    SV *str;
+void cols2chars(SV *str, ...)
   INIT:
     STRLEN len;
     const char *s;
@@ -3483,14 +3207,12 @@ void cols2chars(str,...)
 MODULE = Tickit  PACKAGE = Tickit::Window
 
 SV *
-_new_root(package,tt,tickit)
-  char         *package
-  Tickit::Term  tt
-  SV           *tickit
+_new_root(char *package, Tickit::Term tt, SV *tickit)
   INIT:
     Tickit__Window  self;
     TickitWindow   *win;
   CODE:
+    PERL_UNUSED_VAR(package);
     win = tickit_window_new_root(tt);
     if(!win)
       XSRETURN_UNDEF;
@@ -3504,13 +3226,7 @@ _new_root(package,tt,tickit)
     RETVAL
 
 SV *
-_make_sub(win,top,left,lines,cols,flags)
-  Tickit::Window win;
-  int            top;
-  int            left;
-  int            lines;
-  int            cols;
-  int            flags;
+_make_sub(Tickit::Window win, int top, int left, int lines, int cols, int flags)
   INIT:
     TickitRect rect;
     TickitWindow *subwin;
@@ -3529,69 +3245,60 @@ _make_sub(win,top,left,lines,cols,flags)
     RETVAL
 
 void
-DESTROY(self)
-  Tickit::Window self
+DESTROY(Tickit::Window self)
   CODE:
     tickit_window_unref(self->win);
     self->win = NULL;
 
 void
-close(self)
-  Tickit::Window self
+close(Tickit::Window self)
   CODE:
     tickit_window_close(self->win);
 
 int
-top(self)
-  Tickit::Window self
+top(Tickit::Window self)
   CODE:
     RETVAL = tickit_window_top(self->win);
   OUTPUT:
     RETVAL
 
 int
-left(self)
-  Tickit::Window self
+left(Tickit::Window self)
   CODE:
     RETVAL = tickit_window_left(self->win);
   OUTPUT:
     RETVAL
 
 int
-lines(self)
-  Tickit::Window self
+lines(Tickit::Window self)
   CODE:
     RETVAL = tickit_window_lines(self->win);
   OUTPUT:
     RETVAL
 
 int
-cols(self)
-  Tickit::Window self
+cols(Tickit::Window self)
   CODE:
     RETVAL = tickit_window_cols(self->win);
   OUTPUT:
     RETVAL
 
 int
-abs_top(self)
-  Tickit::Window self
+abs_top(Tickit::Window self)
   CODE:
     RETVAL = tickit_window_get_abs_geometry(self->win).top;
   OUTPUT:
     RETVAL
 
 int
-abs_left(self)
-  Tickit::Window self
+abs_left(Tickit::Window self)
   CODE:
     RETVAL = tickit_window_get_abs_geometry(self->win).left;
   OUTPUT:
     RETVAL
 
 SV *
-root(self)
-  Tickit::Window self
+root(Tickit::Window self)
   ALIAS:
     root   = 0
     parent = 1
@@ -3616,8 +3323,7 @@ root(self)
     RETVAL
 
 void
-subwindows(self)
-  Tickit::Window self
+subwindows(Tickit::Window self)
   INIT:
     size_t n;
     TickitWindow **children;
@@ -3643,12 +3349,7 @@ subwindows(self)
     XSRETURN(n);
 
 int
-_bind_event(self,ev,flags,code,data = &PL_sv_undef)
-  Tickit::Window  self
-  char           *ev
-  int             flags
-  CV             *code
-  SV             *data
+_bind_event(Tickit::Window self, char *ev, int flags, CV *code, SV *data = &PL_sv_undef)
   INIT:
     TickitWindowEvent _ev = -1;
     struct GenericEventData *user;
@@ -3688,60 +3389,42 @@ _bind_event(self,ev,flags,code,data = &PL_sv_undef)
     RETVAL
 
 void
-unbind_event_id(self,id)
-  Tickit::Window self
-  int            id
+unbind_event_id(Tickit::Window self, int id)
   CODE:
     tickit_window_unbind_event_id(self->win, id);
 
 void
-flush(self)
-  Tickit::Window  self
+flush(Tickit::Window self)
   CODE:
     tickit_window_flush(self->win);
 
 void
-expose(self,rect = NULL)
-  Tickit::Window     self
-  Tickit::Rect_MAYBE rect
+expose(Tickit::Window self, Tickit::Rect_MAYBE rect = NULL)
   CODE:
     tickit_window_expose(self->win, rect);
 
 void
-hide(self)
-  Tickit::Window  self
+hide(Tickit::Window self)
   CODE:
     tickit_window_hide(self->win);
 
 void
-show(self)
-  Tickit::Window  self
+show(Tickit::Window self)
   CODE:
     tickit_window_show(self->win);
 
 void
-resize(self,lines,cols)
-  Tickit::Window self
-  int            lines
-  int            cols
+resize(Tickit::Window self, int lines, int cols)
   CODE:
     tickit_window_resize(self->win, lines, cols);
 
 void
-reposition(self,top,left)
-  Tickit::Window self
-  int            top
-  int            left
+reposition(Tickit::Window self, int top, int left)
   CODE:
     tickit_window_reposition(self->win, top, left);
 
 void
-change_geometry(self,top,left,lines,cols)
-  Tickit::Window  self
-  int             top
-  int             left
-  int             lines
-  int             cols
+change_geometry(Tickit::Window self, int top, int left, int lines, int cols)
   INIT:
     TickitRect rect;
   CODE:
@@ -3752,31 +3435,26 @@ change_geometry(self,top,left,lines,cols)
     tickit_window_set_geometry(self->win, rect);
 
 bool
-is_visible(self)
-  Tickit::Window  self
+is_visible(Tickit::Window self)
   CODE:
     RETVAL = tickit_window_is_visible(self->win);
   OUTPUT:
     RETVAL
 
 SV *
-pen(self)
-  Tickit::Window  self
+pen(Tickit::Window self)
   CODE:
     RETVAL = newSVpen(tickit_window_get_pen(self->win), "Tickit::Pen::Mutable");
   OUTPUT:
     RETVAL
 
 void
-set_pen(self,pen)
-  Tickit::Window  self
-  Tickit::Pen     pen
+set_pen(Tickit::Window self, Tickit::Pen pen)
   CODE:
     tickit_window_set_pen(self->win, pen);
 
 void
-raise(self)
-  Tickit::Window self
+raise(Tickit::Window self)
   ALIAS:
     raise = 0
     lower = 1
@@ -3791,53 +3469,38 @@ raise(self)
     }
 
 bool
-_scrollrect(self,rect,downward,rightward,pen)
-  Tickit::Window self
-  Tickit::Rect   rect
-  int            downward
-  int            rightward
-  Tickit::Pen    pen
+_scrollrect(Tickit::Window self, Tickit::Rect rect, int downward, int rightward, Tickit::Pen pen)
   CODE:
     RETVAL = tickit_window_scrollrect(self->win, rect, downward, rightward, pen);
   OUTPUT:
     RETVAL
 
 bool
-_scroll_with_children(self,downward,rightward)
-  Tickit::Window self
-  int            downward
-  int            rightward
+_scroll_with_children(Tickit::Window self, int downward, int rightward)
   CODE:
     RETVAL = tickit_window_scroll_with_children(self->win, downward, rightward);
   OUTPUT:
     RETVAL
 
 bool
-is_focused(self)
-  Tickit::Window  self
+is_focused(Tickit::Window self)
   CODE:
     RETVAL = tickit_window_is_focused(self->win);
   OUTPUT:
     RETVAL
 
 void
-take_focus(self)
-  Tickit::Window  self
+take_focus(Tickit::Window self)
   CODE:
     tickit_window_take_focus(self->win);
 
 void
-set_cursor_position(self,line,col)
-  Tickit::Window  self
-  int             line
-  int             col
+set_cursor_position(Tickit::Window self, int line, int col)
   CODE:
     tickit_window_set_cursor_position(self->win, line, col);
 
 SV *
-getctl(self,ctl)
-  Tickit::Window  self
-  SV             *ctl
+getctl(Tickit::Window self, SV *ctl)
   INIT:
     TickitWindowCtl ctl_e;
   CODE:
@@ -3851,6 +3514,7 @@ getctl(self,ctl)
     else
       croak("Expected 'ctl' to be an integer or string");
 
+    RETVAL = &PL_sv_undef;
     switch(tickit_windowctl_type(ctl_e)) {
       case TICKIT_TYPE_BOOL: {
         int value;
@@ -3868,19 +3532,15 @@ getctl(self,ctl)
       }
 
       case TICKIT_TYPE_STR:
+      case TICKIT_TYPE_COLOUR:
       case TICKIT_TYPE_NONE:
-        RETVAL = &PL_sv_undef;
         break;
     }
   OUTPUT:
     RETVAL
 
-
 int
-setctl(self,ctl,value)
-  Tickit::Window  self
-  SV             *ctl
-  SV             *value
+setctl(Tickit::Window self, SV *ctl, SV *value)
   INIT:
     TickitWindowCtl ctl_e;
   CODE:
@@ -3901,6 +3561,7 @@ setctl(self,ctl,value)
         RETVAL = tickit_window_setctl_int(self->win, ctl_e, SvIV(value));
         break;
       case TICKIT_TYPE_STR:
+      case TICKIT_TYPE_COLOUR:
         // TODO: currently there aren't any
         break;
       case TICKIT_TYPE_NONE:
@@ -3912,9 +3573,7 @@ setctl(self,ctl,value)
 MODULE = Tickit  PACKAGE = Tickit::_Tickit
 
 SV *
-new(package,term)
-  char               *package
-  Tickit::Term_MAYBE  term
+new(char *package, Tickit::Term term)
   INIT:
     struct TickitBuilder builder = { 0 };
     Tickit *t;
@@ -3933,9 +3592,7 @@ new(package,term)
     RETVAL
 
 SV *
-_new_with_evloop(package, term, ...)
-  char *package
-  SV   *term
+_new_with_evloop(char *package, SV *term, ...)
   INIT:
     TickitTerm *tt = NULL;
     struct TickitBuilder builder = { 0 };
@@ -4047,15 +3704,12 @@ _new_with_evloop(package, term, ...)
     RETVAL
 
 void
-DESTROY(self)
-  Tickit::_Tickit self
+DESTROY(Tickit::_Tickit self)
   CODE:
     tickit_unref(self);
 
 SV *
-rootwin(self,tickit)
-  Tickit::_Tickit  self
-  SV              *tickit
+rootwin(Tickit::_Tickit self, SV *tickit)
   INIT:
     Tickit__Window win;
   CODE:
@@ -4069,18 +3723,14 @@ rootwin(self,tickit)
     RETVAL
 
 SV *
-term(self)
-  Tickit::_Tickit self
+term(Tickit::_Tickit self)
   CODE:
     RETVAL = newSVterm(tickit_get_term(self), "Tickit::Term");
   OUTPUT:
     RETVAL
 
 bool
-setctl(self, ctl, value)
-  Tickit::_Tickit  self
-  SV              *ctl
-  SV              *value
+setctl(Tickit::_Tickit self, SV *ctl, SV *value)
   INIT:
     TickitCtl ctl_e;
   CODE:
@@ -4101,6 +3751,7 @@ setctl(self, ctl, value)
         RETVAL = tickit_setctl_int(self, ctl_e, SvIV(value));
         break;
       case TICKIT_TYPE_STR:
+      case TICKIT_TYPE_COLOUR:
       case TICKIT_TYPE_NONE:
         break;
     }
@@ -4108,11 +3759,7 @@ setctl(self, ctl, value)
     RETVAL
 
 UV
-watch_io(self, fd, cond, code)
-  Tickit::_Tickit  self
-  UV               fd
-  UV               cond
-  CV              *code
+watch_io(Tickit::_Tickit self, UV fd, UV cond, CV *code)
   CODE:
     RETVAL = PTR2UV(tickit_watch_io(self, fd, cond, TICKIT_BIND_UNBIND, invoke_iocallback,
       new_eventdata_codeonly(code)));
@@ -4120,10 +3767,7 @@ watch_io(self, fd, cond, code)
     RETVAL
 
 UV
-watch_timer_after(self, delay, code)
-  Tickit::_Tickit  self
-  NV               delay
-  CV              *code
+watch_timer_after(Tickit::_Tickit self, NV delay, CV *code)
   INIT:
     struct timeval after;
   CODE:
@@ -4139,10 +3783,7 @@ watch_timer_after(self, delay, code)
     RETVAL
 
 UV
-watch_timer_at(self, epoch, code)
-  Tickit::_Tickit  self
-  NV               epoch
-  CV              *code
+watch_timer_at(Tickit::_Tickit self, NV epoch, CV *code)
   INIT:
     struct timeval at;
   CODE:
@@ -4158,10 +3799,7 @@ watch_timer_at(self, epoch, code)
     RETVAL
 
 UV
-watch_signal(self, signum, code)
-  Tickit::_Tickit  self
-  int              signum
-  CV              *code
+watch_signal(Tickit::_Tickit self, int signum, CV *code)
   CODE:
     RETVAL = PTR2UV(tickit_watch_signal(self, signum, TICKIT_BIND_UNBIND, invoke_callback,
       new_eventdata_codeonly(code)));
@@ -4169,10 +3807,7 @@ watch_signal(self, signum, code)
     RETVAL
 
 UV
-watch_process(self, pid, code)
-  Tickit::_Tickit  self
-  IV               pid
-  CV              *code
+watch_process(Tickit::_Tickit self, IV pid, CV *code)
   CODE:
     RETVAL = PTR2UV(tickit_watch_process(self, pid, TICKIT_BIND_UNBIND, invoke_processcallback,
       new_eventdata_codeonly(code)));
@@ -4180,16 +3815,12 @@ watch_process(self, pid, code)
     RETVAL
 
 void
-watch_cancel(self, id)
-  Tickit::_Tickit  self
-  UV               id
+watch_cancel(Tickit::_Tickit self, UV id)
   CODE:
     tickit_watch_cancel(self, INT2PTR(void *,id));
 
 UV
-watch_later(self, code)
-  Tickit::_Tickit  self
-  CV              *code
+watch_later(Tickit::_Tickit self, CV *code)
   CODE:
     RETVAL = PTR2UV(tickit_watch_later(self, TICKIT_BIND_UNBIND, invoke_callback,
       new_eventdata_codeonly(code)));
@@ -4197,21 +3828,17 @@ watch_later(self, code)
     RETVAL
 
 void
-run(self)
-  Tickit::_Tickit  self
+run(Tickit::_Tickit self)
   CODE:
     tickit_run(self);
 
 void
-stop(self)
-  Tickit::_Tickit  self
+stop(Tickit::_Tickit self)
   CODE:
     tickit_stop(self);
 
 void
-tick(self, flags=0)
-  Tickit::_Tickit  self
-  int              flags
+tick(Tickit::_Tickit self, int flags = 0)
   CODE:
     tickit_tick(self, flags);
 
@@ -4224,6 +3851,7 @@ version_major()
     version_minor = 1
     version_patch = 2
   CODE:
+    RETVAL = 0;
     switch(ix) {
       case 0: RETVAL = tickit_version_major(); break;
       case 1: RETVAL = tickit_version_minor(); break;

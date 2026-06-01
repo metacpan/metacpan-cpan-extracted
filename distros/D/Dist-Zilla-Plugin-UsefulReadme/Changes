@@ -1,5 +1,18 @@
 Release history for Dist-Zilla-Plugin-UsefulReadme:
 
+v0.5.3    2026-05-31 12:43:44+01:00 Europe/London
+  [Documentation]
+  - Updated copyright year.
+
+  - Added doap.xml metadata to the distribution.
+
+  - Updated author email address.
+
+  [Toolchain]
+  - Added automation-policy.json to the distribution.
+
+  - Stopped signing distributions with Module::Signature.
+
 v0.5.2    2025-10-19 12:48:46+01:00 Europe/London
   [Enhancements]
   - The STATUS and SECURITY CONSIDERATIONS sections are included by default.

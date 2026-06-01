@@ -24,7 +24,7 @@ requires 'Tie::Hash::MultiValueOrdered';
 requires 'Plack';
 requires 'Regexp::Util';
 requires 'Coro';
-requires 'CryptX';
+requires 'CryptX', '0.088';
 requires 'Crypt::OpenSSL::PKCS12';
 requires 'Crypt::OpenSSL::X509';
 requires 'Crypt::URandom';

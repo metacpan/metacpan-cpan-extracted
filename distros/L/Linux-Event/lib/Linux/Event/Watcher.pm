@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use Carp qw(croak);
 use Scalar::Util qw(weaken);
@@ -203,28 +203,23 @@ __END__
 
 =head1 NAME
 
-Linux::Event::Watcher - Mutable readiness watcher handle for Linux::Event::Reactor
+Linux::Event::Watcher - Mutable readiness watcher handle for Linux::Event::Loop
 
 =head1 SYNOPSIS
 
-<<<<<<< HEAD
-  my $watcher = $loop->watch(
-    $fh,
-    read => sub ($loop, $fh, $watcher) {
-      ...
-=======
   use v5.36;
   use Linux::Event;
 
-  my $loop = Linux::Event->new( model => 'reactor' );
+  my $loop = Linux::Event->new;
 
-  my $w = $loop->watch($fh,
-    read => sub ($loop, $fh, $w) {
-      my $buf;
+  my $watcher = $loop->watch(
+    $fh,
+    read => sub ($loop, $fh, $watcher) {
+      my $buf = '';
       my $n = sysread($fh, $buf, 8192);
 
       if (!defined $n || $n == 0) {
-        $w->cancel;
+        $watcher->cancel;
         close $fh;
         return;
       }
@@ -232,16 +227,15 @@ Linux::Event::Watcher - Mutable readiness watcher handle for Linux::Event::React
       # ... handle $buf ...
     },
 
-    write => sub ($loop, $fh, $w) {
+    write => sub ($loop, $fh, $watcher) {
       # fd became writable
-      $w->disable_write; # typical: only enable when you actually have pending output
+      $watcher->disable_write;
     },
 
-    error => sub ($loop, $fh, $w) {
-      # error readiness reported (see DISPATCH SEMANTICS)
-      $w->cancel;
+    error => sub ($loop, $fh, $watcher) {
+      # error readiness reported
+      $watcher->cancel;
       close $fh;
->>>>>>> 1401c31 (prep for cpan and release, new tool added)
     },
   );
 
@@ -252,7 +246,7 @@ Linux::Event::Watcher - Mutable readiness watcher handle for Linux::Event::React
 =head1 DESCRIPTION
 
 C<Linux::Event::Watcher> is the lightweight handle returned by
-L<Linux::Event::Reactor/watch>. It stores the current callbacks, enablement
+L<Linux::Event::Loop/watch>. It stores the current callbacks, enablement
 flags, filehandle metadata, and a user data slot.
 
 The watcher does not own backend policy. Methods that change interest state
@@ -282,19 +276,31 @@ Get or set one-shot mode.
 
 =head2 on_read([$cb])
 
+Get or replace the read callback.
+
 =head2 on_write([$cb])
+
+Get or replace the write callback.
 
 =head2 on_error([$cb])
 
-Install or replace callbacks.
+Get or replace the error callback.
 
 =head2 enable_read, disable_read
 
+Enable or disable read readiness dispatch for this watcher.
+
 =head2 enable_write, disable_write
+
+Enable or disable write readiness dispatch for this watcher.
 
 =head2 enable_error, disable_error
 
-Toggle callback enablement.
+Enable or disable error readiness dispatch for this watcher.
+
+=head2 read_enabled, write_enabled, error_enabled
+
+Return true when the corresponding readiness callback is enabled.
 
 =head2 cancel
 
@@ -304,9 +310,8 @@ Remove the watcher from the loop.
 
 Watcher callbacks receive:
 
-<<<<<<< HEAD
   $cb->($loop, $fh, $watcher)
-=======
+
 =head2 Error readiness ordering
 
 If an epoll event indicates an error condition (for example C<EPOLLERR>), the loop
@@ -325,12 +330,10 @@ delivered so user code can observe EOF via C<read(2)> returning 0.
 
 =head1 VERSION
 
-This document describes Linux::Event::Watcher version 0.009.
->>>>>>> 1401c31 (prep for cpan and release, new tool added)
+This document describes Linux::Event::Watcher version 0.011.
 
 =head1 SEE ALSO
 
-L<Linux::Event::Reactor>,
 L<Linux::Event::Loop>
 
 =cut

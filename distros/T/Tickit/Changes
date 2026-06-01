@@ -1,5 +1,17 @@
 Revision history for Changes
 
+0.76    2026-05-31
+        [CHANGES]
+         * Style fixes in Tickit.xs:
+            + Use ANSI-style argument type declarations
+            + Fix compiler warnings about unused variables, unhandled enum
+              constants in `switch` statements, and possibly-uninitialised
+              `RETVAL` variables
+
+        [BUGFIXES]
+         * Fix t/35tickit-process.t waiting for SIGCHLD on platforms where it
+           may not be delivered synchronously
+
 0.75    2026-02-27
         [CHANGES]
          * Use libtickit 0.4.6:

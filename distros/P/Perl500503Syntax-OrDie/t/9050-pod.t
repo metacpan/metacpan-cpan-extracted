@@ -62,7 +62,21 @@ my ($errors, $warnings) = (0, 0);
 if ($pod_checker_ver && $pod_checker_ver >= 1.51) {
     my $checker = Pod::Checker->new(-warnings => 2);
     eval {
-        $checker->parse_file($pm);
+        # Two incompatible Pod::Checker families ship across Perls:
+        #   * Pod::Simple-based (>= 1.73, Perl 5.26+) provides parse_file().
+        #   * Pod::Parser-based (1.45 .. 1.71, Perl <= 5.24) provides only
+        #     parse_from_file(), and writes its messages to STDOUT by
+        #     default -- which would corrupt the TAP stream -- so the
+        #     second argument explicitly redirects them to STDERR.
+        # Calling parse_file() on the Pod::Parser-based versions throws
+        # "Can't locate object method parse_file", which previously made
+        # this test fail on every Perl from 5.16 through 5.24.
+        if ($checker->can('parse_file')) {
+            $checker->parse_file($pm);
+        }
+        else {
+            $checker->parse_from_file($pm, \*STDERR);
+        }
         $errors   = $checker->num_errors();
         $warnings = $checker->num_warnings();
     };

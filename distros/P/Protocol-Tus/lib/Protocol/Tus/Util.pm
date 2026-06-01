@@ -1,5 +1,5 @@
 package Protocol::Tus::Util;
-{ our $VERSION = '0.003' }
+{ our $VERSION = '0.004' }
 use v5.24;
 use warnings;
 use experimental qw< signatures >;

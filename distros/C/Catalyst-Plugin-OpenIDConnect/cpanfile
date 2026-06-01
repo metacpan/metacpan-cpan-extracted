@@ -1,5 +1,6 @@
 requires 'perl', '5.020';
-requires 'ExtUtils::MakeMaker' => '6.52';
+configure_requires 'ExtUtils::MakeMaker', '6.52';
+configure_requires 'Module::CPANfile', '1.1';
 
 requires 'Catalyst';
 requires 'Catalyst::Runtime', '>= 5.90100';
@@ -7,7 +8,7 @@ requires 'Catalyst::Runtime', '>= 5.90100';
 requires 'Moose';
 requires 'namespace::autoclean';
 requires 'JSON::MaybeXS';
-requires 'Crypt::OpenSSL::RSA', '0.35'; # for RSA signing/verification with JWT (openssl 3 support)
+requires 'Crypt::OpenSSL::RSA', '>=0.38'; # for RSA signing/verification with JWT (openssl 3 support)
 requires 'Crypt::PK::RSA'; # for JWK key parameter extraction in JWKS endpoint
 requires 'Digest::SHA';
 requires 'MIME::Base64';
@@ -33,5 +34,5 @@ on 'test' => sub {
     requires 'Test::Exception';
     requires 'Test::MockObject';
     requires 'Test::Deep';
-    requires 'Test::Pod::Coverage', '>= 1.04';
+    recommends 'Test::Pod::Coverage', '>= 1.04';
 };

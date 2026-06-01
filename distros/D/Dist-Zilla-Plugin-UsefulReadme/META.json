@@ -1,10 +1,10 @@
 {
    "abstract" : "generate a README file with the useful bits",
    "author" : [
-      "Robert Rothenberg <rrwo@cpan.org>"
+      "Robert Rothenberg <perl@rhizomnic.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "unicode",
       "security",
@@ -19,7 +19,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Dist-Zilla-Plugin-UsefulReadme",
    "prereqs" : {
@@ -36,6 +36,7 @@
       },
       "develop" : {
          "requires" : {
+            "Dist::AutomationPolicy" : "v0.2.0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
@@ -127,19 +128,19 @@
    "provides" : {
       "Dist::Zilla::Plugin::UsefulReadme" : {
          "file" : "lib/Dist/Zilla/Plugin/UsefulReadme.pm",
-         "version" : "v0.5.2"
+         "version" : "v0.5.3"
       },
       "Pod::Weaver::Section::InstallationInstructions" : {
          "file" : "lib/Pod/Weaver/Section/InstallationInstructions.pm",
-         "version" : "v0.5.2"
+         "version" : "v0.5.3"
       },
       "Pod::Weaver::Section::RecentChanges" : {
          "file" : "lib/Pod/Weaver/Section/RecentChanges.pm",
-         "version" : "v0.5.2"
+         "version" : "v0.5.3"
       },
       "Pod::Weaver::Section::Requirements" : {
          "file" : "lib/Pod/Weaver/Section/Requirements.pm",
-         "version" : "v0.5.2"
+         "version" : "v0.5.3"
       }
    },
    "release_status" : "stable",
@@ -153,10 +154,10 @@
          "web" : "https://github.com/robrwo/perl-Dist-Zilla-Plugin-UsefulReadme"
       }
    },
-   "version" : "v0.5.2",
+   "version" : "v0.5.3",
    "x_authority" : "cpan:RRWO",
-   "x_generated_by_perl" : "v5.34.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
+   "x_generated_by_perl" : "v5.42.1",
+   "x_serialization_backend" : "JSON::XS version 4.04",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

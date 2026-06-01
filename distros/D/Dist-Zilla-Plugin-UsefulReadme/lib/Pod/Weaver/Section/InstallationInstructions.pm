@@ -21,7 +21,7 @@ use experimental qw( lexical_subs postderef signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.5.2';
+our $VERSION = 'v0.5.3';
 
 
 has header => (
@@ -203,7 +203,7 @@ Pod::Weaver::Section::InstallationInstructions - generate POD with installation 
 
 =head1 VERSION
 
-version v0.5.2
+version v0.5.3
 
 =head1 SYNOPSIS
 
@@ -320,11 +320,11 @@ and may be cloned from L<https://github.com/robrwo/perl-Dist-Zilla-Plugin-Useful
 
 =head1 AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Robert Rothenberg.
+This software is copyright (c) 2025-2026 by Robert Rothenberg.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

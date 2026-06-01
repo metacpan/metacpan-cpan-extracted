@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.3');
+our $VERSION   = qv('v1.0.4');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,7 +13,7 @@ DBIx::Class::Async::SelectNormaliser - Normalise C<-ident> clauses in ResultSet 
 
 =head1 VERSION
 
-Version v1.0.3
+Version v1.0.4
 
 =head1 SYNOPSIS
 

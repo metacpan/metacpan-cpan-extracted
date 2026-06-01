@@ -213,6 +213,110 @@ use vars qw(@tests);
             scalar(@v) >= 2;
         }],
 
+    # ==============================================================
+    # any/all: subroutine definition is NOT the keyword operator
+    # (false-positive fix)
+    # ==============================================================
+    ['sub any {}: definition - not detected',
+        sub { !violates("sub any {\n    return 1;\n}\n") }],
+
+    ['sub all {}: definition - not detected',
+        sub { !violates("sub all {\n    return 1;\n}\n") }],
+
+    ['sub any {}: extra spaces - not detected',
+        sub { !violates("sub   any   {\n    return 1;\n}\n") }],
+
+    ['method ->any {}: not detected',
+        sub { !violates("\$obj->any {\n    return 1;\n};\n") }],
+
+    ['any { } operator still detected after sub on same line',
+        sub { violates("sub f { return any { \$_ } \@x }\n") }],
+
+    # ==============================================================
+    # 3-argument open(): paren-aware top-level comma count
+    # (false-positive fix for a nested function-call comma)
+    # ==============================================================
+    ['open 2-arg with nested catfile comma: not detected',
+        sub { !violates(
+            "open(FH, '>' . File::Spec->catfile(\$dir, \$file));\n") }],
+
+    ['open 2-arg with nested join comma: not detected',
+        sub { !violates("open(FH, join(',', \@parts));\n") }],
+
+    ['open 3-arg still detected (literal mode)',
+        sub { violates("open(FH, \">\", \$file);\n") }],
+
+    ['open 3-arg still detected (variable mode)',
+        sub { violates("open(FH, \$mode, \$file);\n") }],
+
+    # ==============================================================
+    # Here-document body masking (false-positive fix)
+    # Bodies are data, not code; example text inside them must not be
+    # flagged.  Two heredocs may also share a single line.
+    # ==============================================================
+    ['heredoc body: our-decl inside body not detected',
+        sub { !violates("\$x = <<'E';\nour \$z = 1;\nE\n") }],
+
+    ['heredoc body: signature inside body not detected',
+        sub { !violates("\$x = <<'E';\nsub max (\$m, \$n) {}\nE\n") }],
+
+    ['heredoc body: <<>> inside body not detected',
+        sub { !violates("\$x = <<'E';\n<<>>\nE\n") }],
+
+    ['heredoc: real say keyword after heredoc on same line - detected',
+        sub { violates("\$x = <<\"E\"; " . "sa" . "y \$y;\nbody\nE\n") }],
+
+    ['heredoc: two heredocs sharing a line, real defined-or after - detected',
+        sub { violates(
+            "\$a = <<\"A\"; \$b = <<\"B\"; my \$z = \$p "
+          . join('', '/', '/') . " \$q;\nAAA\nA\nBBB\nB\n") }],
+
+    ['heredoc: two heredocs sharing a line, bodies are data',
+        sub { !violates(
+            "\$a = <<'A'; \$b = <<'B';\nour \$x;\nA\nstate \$y;\nB\n") }],
+
+    # ==============================================================
+    # Typeglob / sub-sigil / package-separator before quote-like word
+    # (false-positive fix)
+    # ==============================================================
+    ['typeglob *s not read as s/// operator',
+        sub { !violates("local (*s, \$n) = \@_;\n") }],
+
+    ['package-qualified mb::tr not read as tr/// operator',
+        sub { !violates("my \$r = mb::tr(\$x, 'A', '1');\n") }],
+
+    ['real s/// after assignment still detected via flag',
+        sub { violates("my \$r = \$s =~ s/a/b/r;\n") }],
+
+    # ==============================================================
+    # Old-style apostrophe package separator (false-positive fix)
+    # &jcode'tr(...) is &jcode::tr(...); the line must not desync.
+    # ==============================================================
+    ['apostrophe package separator: trailing our still detected (no desync)',
+        sub { violates("&jcode'tr(*val, 'A', '1');\nour \$leak = 1;\n") }],
+
+    ['apostrophe package separator: clean call not flagged',
+        sub { !violates("&jcode'tr(*val, 'A', '1');\n") }],
+
+    # ==============================================================
+    # Escaped backslash + regex-escape letter (false-positive fix)
+    # The literal two characters \\h are not the \h escape.
+    # ==============================================================
+    ['escaped backslash + h in regex not detected',
+        sub { !violates("\$x =~ /a\\\\hb/;\n") }],
+
+    ['real \\h escape in regex still detected',
+        sub { violates("\$x =~ /a\\h/;\n") }],
+
+    # ==============================================================
+    # Postfix increment vs possessive quantifier (false-positive fix)
+    # ==============================================================
+    ['package-qualified postfix increment not detected',
+        sub { !violates("\$mb::seq++;\n") }],
+
+    ['real possessive quantifier in regex still detected',
+        sub { violates("\$x =~ /a++/;\n") }],
+
 );
 
 print "1.." . scalar(@tests) . "\n";

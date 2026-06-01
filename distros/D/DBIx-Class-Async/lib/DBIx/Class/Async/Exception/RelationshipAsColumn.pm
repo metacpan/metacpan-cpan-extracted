@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.0.3');
+our $VERSION   = qv('v1.0.4');
 our $AUTHORITY = 'cpan:MANWAR';
 
 use parent 'DBIx::Class::Async::Exception';
@@ -16,7 +16,7 @@ name passed where a column was expected
 
 =head1 VERSION
 
-Version v1.0.3
+Version v1.0.4
 
 =head1 SYNOPSIS
 

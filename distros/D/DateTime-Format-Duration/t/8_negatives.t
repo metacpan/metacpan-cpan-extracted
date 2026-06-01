@@ -1,4 +1,4 @@
-
+use strict;
 use warnings;
 
 use DateTime;
@@ -7,14 +7,14 @@ use DateTime::Format::Duration;
 
 #########################
 
-use Test::More tests=>5;
+use Test::More 0.88;
 
-$strf = DateTime::Format::Duration->new(
+my $strf = DateTime::Format::Duration->new(
     base => DateTime->new( year=> 2003 ),
     pattern => '%F %r',
 );
 
-@tests = (
+my @tests = (
     { # 1 & 2
         pattern     =>  '%P%F %r',
         duration => {
@@ -104,4 +104,4 @@ sub Dump {
     return Data::Dumper::Dumper(@_)
 }
 
-
+done_testing;

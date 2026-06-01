@@ -468,8 +468,12 @@ IPC::Shareable::_end;  # flush cleanup to stay under OpenBSD semmni=10
     is $k->{_was_changed}, 1, "unlock _encode fail: _was_changed is set while locked";
 
     {
-        my $mock = Mock::Sub->new;
-        my $encode_mock = $mock->mock('IPC::Shareable::_encode', return_value => undef);
+        # Override _encode via local typeglob, not Mock::Sub: Mock::Sub 1.08
+        # (on some CPAN testers) returns the call args for return_value => undef,
+        # so the croak-on-undef path never fired. Bare `return` = failure in any
+        # context; no warnings 'redefine' is block-scoped so real redefines warn.
+        no warnings 'redefine';
+        local *IPC::Shareable::_encode = sub { return };
 
         is eval { $k->unlock; 1 }, undef,
             "unlock() croaks when _encode returns undef with _was_changed set";

@@ -1,0 +1,160 @@
+Perl500503Syntax::OrDie Mabilisang Sanggunian (Tagalog)
+======================================================
+
+PANGALAN
+    Perl500503Syntax::OrDie - (see EN cheatsheet for full description)
+
+BERSYON
+    0.03
+
+SINOPSIS
+    use Perl500503Syntax::OrDie;
+
+    use Perl500503Syntax::OrDie ();
+    Perl500503Syntax::OrDie::check_file('/path/to/script.pl');
+    my @violations = Perl500503Syntax::OrDie::check_source($source_text, 'label.pl');
+
+    perl lib/Perl500503Syntax/OrDie.pm script.pl
+    perl lib/Perl500503Syntax/OrDie.pm script1.pl script2.pl ...
+    perl lib/Perl500503Syntax/OrDie.pm -
+
+PAGLALARAWAN
+    Kapag pinatakbo bilang utos, sinusuri ang bawat ibinigay na file.
+    Kung walang argumento, ipinapakita ang paraan ng paggamit.
+
+SINUSURING MGA KONSTRUK (statiko, sa pag-compile)
+    Perl 5.6  : our / 3-arg open / use utf8 / use VERSION>=5.6 / \x{} /
+                \N{} / @+@- $+[N] $-[N] / CHECK/INIT / v-string / $^V /
+                :lvalue / *name{SLOT} / \p{}\P{}
+    Perl 5.8  : use encoding / use constant { HASH }
+    Perl 5.10 : //= // say state given/when ~~ use feature
+                \K (?<name>) \k<name> (?|) (*VERB) \h\H\v\V\R
+                UNITCHECK possessive-quantifiers (?1)(?&name)(?R)
+                ${^MATCH} ${^PREMATCH} ${^POSTMATCH} \g{N}
+    Perl 5.12 : package NAME VERSION / ...
+    Perl 5.14 : s///r tr///r
+    Perl 5.16 : __SUB__
+    Perl 5.18 : my sub / state sub
+    Perl 5.20 : subroutine signatures / $ref->@* $ref->%* /
+                %hash{LIST} %array[LIST]
+    Perl 5.22 : <<>> / /n / &. |. ^. ~. / foreach \$x (@list)
+    Perl 5.26 : <<~
+    Perl 5.30 : variable-length lookbehind (regex)
+    Perl 5.32 : isa
+    Perl 5.34 : try/catch
+    Perl 5.36 : use builtin / for my ($a,$b)
+    Perl 5.38 : class
+    Perl 5.40 : ^^ ^^= / __CLASS__
+    Perl 5.42 : any/all BLOCK LIST / my method / ->&name
+
+SINUSURING MGA KONSTRUK (sa runtime)
+    open(FH, MODE, PATH)   3-argument open
+    open(FH, \$ref)       reference-as-mode open
+    mkdir(PATH)            mkdir without explicit mode
+
+KASAYSAYAN NG BERSYON NG PERL
+    Sanggunian: https://perldoc.perl.org/perl56delta
+              https://perldoc.perl.org/perl58delta
+              https://perldoc.perl.org/perl5100delta
+              https://perldoc.perl.org/perl5120delta
+              https://perldoc.perl.org/perl5140delta
+              https://perldoc.perl.org/perl5160delta
+              https://perldoc.perl.org/perl5180delta
+              https://perldoc.perl.org/perl5200delta
+              https://perldoc.perl.org/perl5220delta
+              https://perldoc.perl.org/perl5240delta
+              https://perldoc.perl.org/perl5260delta
+              https://perldoc.perl.org/perl5280delta
+              https://perldoc.perl.org/perl5300delta
+              https://perldoc.perl.org/perl5320delta
+              https://perldoc.perl.org/perl5340delta
+              https://perldoc.perl.org/perl5360delta
+              https://perldoc.perl.org/perl5380delta
+              https://perldoc.perl.org/perl5400delta
+              https://perldoc.perl.org/perl5420delta
+
+  Mga tampok ng bawat bersyon ng Perl na sinusuri ng modyul na ito:
+
+  perl56delta (Perl 5.6.0, 2000-03-22)
+    our VARIABLE, 3-arg open(), use utf8, use VERSION>=5.6,
+    \x{HHHH}, \N{name}, @+/@-/$+[N]/$-[N], CHECK/INIT blocks,
+    v-string, $^V, :lvalue, \p{}\P{}, mkdir without mode
+
+  perl58delta (Perl 5.8.0, 2002-07-18)
+    use encoding; use constant { HASH } multi-constant form
+    (PerlIO layers such as :utf8 are runtime string values, NOT checked)
+
+  perl5100delta (Perl 5.10.0, 2007-12-18)
+    // //= say state given/when ~~ use feature \K
+    (?<name>...) \k<name> (?|...) (*VERB) \h\H\v\V\R
+    UNITCHECK a++ a*+ a?+ (?1) (?&name) (?R)
+    ${^MATCH} ${^PREMATCH} ${^POSTMATCH} \g{N}
+
+  perl5120delta (Perl 5.12.0, 2010-04-12)
+    package NAME VERSION, ... (yada-yada)
+
+  perl5140delta (Perl 5.14.0, 2011-05-14)
+    s///r tr///r (non-destructive flag)
+
+  perl5160delta (Perl 5.16.0, 2012-05-20)
+    __SUB__
+
+  perl5180delta (5.18): my sub / state sub -- lexical subroutines
+
+  perl5200delta (Perl 5.20.0, 2014-05-27)
+    subroutine signatures, postfix dereference $ref->@*
+    %hash{LIST} / %array[LIST] -- key/value slices
+
+  perl5220delta (Perl 5.22.0, 2015-06-01)
+    <<>> (double-diamond), /n (non-capturing flag)
+    &. |. ^. ~. -- string bitwise operators (experimental; stable 5.28)
+
+  perl5260delta (Perl 5.26.0, 2017-05-30)
+    <<~ (indented heredoc)
+
+  perl5300delta (Perl 5.30.0, 2019-05-22)
+    variable-length lookbehind in regex (experimental; stable from Perl 5.38)
+
+  perl5320delta (Perl 5.32.0, 2020-06-20)
+    isa (infix operator)
+
+  perl5340delta (Perl 5.34.0, 2021-05-20)
+    try / catch
+
+  perl5360delta (Perl 5.36.0, 2022-05-28)
+    use builtin, for my ($a, $b) (@list)
+
+  perl5380delta (Perl 5.38.0, 2023-07-02)
+    class keyword (experimental OOP)
+
+  perl5400delta (Perl 5.40.0, 2024-06-09)
+    ^^ / ^^= high-precedence logical XOR operator
+      $x ^^ $y  -- completes the &&/|| set; use "xor" for 5.005_03.
+    __CLASS__ keyword (inside class blocks)
+      Runtime class name inside method/ADJUST/field (requires class feature).
+
+  perl5420delta (Perl 5.42.0, 2025-07-02)
+    any BLOCK LIST / all BLOCK LIST (experimental keywords)
+      any { EXPR } @list  -- use List::Util::any for 5.005_03.
+    my method / ->& lexical method call (requires class feature)
+      my method foo () { ... }  -- lexically scoped private method.
+
+LIGTAS NA MGA IDYOMA (Perl 5.005_03)
+    use vars qw($x @arr %hash);         "use vars" instead of "our"
+    open(FH, ">$path") or die $!;       2-argument bareword form
+    mkdir("dir", 0755) or die $!;        explicit mode
+    $x = defined($y) ? $y : 'v';        instead of //=
+    print "...\n";                        instead of say
+
+MGA DEPENDENSIYA
+    Walang dependensiyang hindi-core. Perl 5.005_03 o mas bago.
+
+MAY-AKDA
+    INABA Hitoshi <ina.cpan@gmail.com>
+
+LISENSYA
+    Malayang software; maipamamahagi muli sa parehong mga tuntunin gaya ng Perl.
+
+TINGNAN DIN
+    perlpolicy, perlhist
+    https://metacpan.org/dist/Perl500503Syntax-OrDie

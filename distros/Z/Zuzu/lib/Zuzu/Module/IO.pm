@@ -2,7 +2,7 @@ package Zuzu::Module::IO;
 
 use utf8;
 
-our $VERSION = '0.001002';
+our $VERSION = '0.001003';
 
 use Encode qw( decode_utf8 );
 use Errno qw( EEXIST );

@@ -80,8 +80,16 @@ sub plan_skip {
 }
 
 END {
+    # Signal failure to the harness by setting the exit status, NOT by
+    # calling exit() here.  Calling exit() from inside an END block makes
+    # Perl 5.6 and earlier abort with
+    #   Callback called exit.
+    #   END failed--cleanup aborted.
+    # which is printed ahead of (and masks) the real "not ok" line.
+    # Assigning to $? sets the process exit status portably, all the way
+    # back to Perl 5.005_03.
     if ($T_PLAN && $T_FAIL) {
-        exit 1;
+        $? = 1;
     }
 }
 

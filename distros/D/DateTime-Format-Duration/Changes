@@ -1,5 +1,9 @@
 Revision history for DateTime-Format-Duration
 
+1.05    2026-05-31 18:27:42Z
+    - fix handling of DateTime::* subclasses (thanks, Matthias Bethke!)
+    - use strict, warnings everywhere
+
 1.04    2015-09-20 06:17:20Z
     - converted tooling to Dist::Zilla (fixes RT#48187, RT#82055, RT#53462)
     - added missing prereq declarations (Params::Validate)

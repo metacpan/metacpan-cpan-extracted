@@ -1,0 +1,7 @@
+{
+   "automated_actions" : "issue",
+   "automated_contributions" : "issue",
+   "code_generation" : "toolchain",
+   "distribution" : "Dist-Zilla-Plugin-AutomationPolicy-v0.1.1",
+   "version" : 1
+}

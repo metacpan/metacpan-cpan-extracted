@@ -20,6 +20,7 @@ readme_from 'Hash.pm';
 recursive_author_tests('xt');
 requires 'Error::Pure' => 0.15;
 requires 'Exporter' => 0;
+requires 'List::Util' => 1.33;
 requires 'Readonly' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Mo-utils-Hash/issues',
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Mo-utils-Hash';
@@ -29,7 +30,7 @@ test_requires 'Error::Pure::Utils' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.02';
+version '0.03';
 
 # Run.
 WriteAll();

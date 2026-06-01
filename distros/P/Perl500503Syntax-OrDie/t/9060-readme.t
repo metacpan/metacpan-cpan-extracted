@@ -43,13 +43,22 @@ my $ver    = '(unknown)';
     }
 }
 
-ok($readme ne '',                       'H7: README is not empty');
-ok($readme =~ /\bNAME\b/,              'H1: README has NAME section');
-ok($readme =~ /\bSYNOPSIS\b/,          'H2: README has SYNOPSIS section');
-ok($readme =~ /\bDESCRIPTION\b/,       'H3: README has DESCRIPTION section');
-ok($readme =~ /install/i,              'H4: README mentions INSTALL');
-ok($readme =~ /\bAUTHOR\b/,            'H5: README has AUTHOR section');
-ok($readme =~ /\bLICENSE\b/i,          'H6: README mentions LICENSE');
-ok($readme =~ /Perl500503Syntax::OrDie/,     'H8: README mentions Perl500503Syntax::OrDie');
-ok($readme =~ /\Q$ver\E/,             "H9: README mentions version $ver");
+# NOTE: each predicate below is wrapped in scalar() on purpose.  A bare
+# "$readme =~ /.../" is evaluated in the list context of ok()'s argument
+# list; on a FAILED match it yields an empty list, which shifts the test
+# name into the first argument and makes ok() pass vacuously (a false
+# green).  Forcing scalar context makes a failed match return '' so the
+# check actually fails when the section/version is missing.
+ok(scalar($readme ne ''),                'H7: README is not empty');
+ok(scalar($readme =~ /\bNAME\b/),        'H1: README has NAME section');
+ok(scalar($readme =~ /\bSYNOPSIS\b/),    'H2: README has SYNOPSIS section');
+ok(scalar($readme =~ /\bDESCRIPTION\b/), 'H3: README has DESCRIPTION section');
+ok(scalar($readme =~ /install/i),        'H4: README mentions INSTALL');
+ok(scalar($readme =~ /\bAUTHOR\b/),      'H5: README has AUTHOR section');
+ok(scalar($readme =~ /\bLICENSE\b/i),    'H6: README mentions LICENSE');
+ok(scalar($readme =~ /Perl500503Syntax::OrDie/), 'H8: README mentions Perl500503Syntax::OrDie');
+# H9 genuinely gates: it fails if the module $VERSION could not be
+# determined, and fails if the README does not state that version.
+my $h9_ok = ($ver ne '(unknown)') && (index($readme, $ver) >= 0);
+ok($h9_ok ? 1 : 0, "H9: README states module version ($ver)");
 

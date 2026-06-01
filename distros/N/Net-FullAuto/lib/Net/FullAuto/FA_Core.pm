@@ -3,7 +3,7 @@ package Net::FullAuto::FA_Core;
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Distributed Workload Automation Software
-#    Copyright © 2000-2025  Brian M. Kelly
+#    Copyright © 2000-2026  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or
 #    modify it under the terms of the GNU Affero General Public License
@@ -2698,6 +2698,8 @@ sub cmd_raw
       -1<index $Net::FullAuto::FA_Core::LOG,'*';
    my $self=$_[0];
    my $cmd=$_[1];
+   my $time_out=$Net::FullAuto::FA_Core::timeout;
+   $time_out=$_[2] if (defined $_[2] and $_[2]=~/^\d+$/);
    my $delay=0;
    my $display=0;
    foreach my $item (@_) {
@@ -2720,11 +2722,15 @@ sub cmd_raw
    }
    my $alloutput='';
    my $save='';
+   my $_time=time;
    while (1) {
       my $output='';
       ($output,$save)=fetch($self,$save);
       $alloutput.=$output;
       last if $output=~/$prompt/;
+      if ($time_out<time-$_time) {
+         last;         
+      }
    }
    return $alloutput;
 
@@ -2740,7 +2746,7 @@ my $version=<<VERSION;
 This is Net::FullAuto©, v$Net::FullAuto::VERSION
 (See  fullauto -V  or  fa -V  for more detail)
 
-Copyright © 2000-2025, Brian M. Kelly  Brian.Kelly\@FullAuto.com
+Copyright © 2000-2026, Brian M. Kelly  Brian.Kelly\@FullAuto.com
 
 FullAuto© may be copied only under the terms of the GNU Affero General Public
 License, which may be found in the FullAuto source distribution.
@@ -7792,7 +7798,7 @@ sub pty_do_cmd
       } else { last }
    }
    return $pty,$child if $child; # Save Pound Sign
-   POSIX::setsid or &handle_error("setsid failed: ".($!)); # Save Pound Sign
+   #POSIX::setsid or &handle_error("setsid failed: ".($!)); # Save Pound Sign
    my $tty = $pty->slave; # Save Pound Sign
    $pty->make_slave_controlling_terminal
       if ($^O eq 'cygwin') || ($doslave eq '_slave_'); # Save Pound Sign
@@ -9753,7 +9759,11 @@ sub send_email
          $body=$email_defaults{Msg};
       }
       $body=join '',@{$body} if ref $body eq 'ARRAY';
-      $ent->attach(Data => $body);
+      if (exists $mail_info->{Html}) {
+         $ent->attach(Data => $body,Type => 'text/html');
+      } else {
+         $ent->attach(Data => $body);
+      }
       my $stdout_capture='';my $stderr_capture='';
       while (1) {
          my $eval_error='';
@@ -9819,7 +9829,7 @@ my $affero=<<END;
 ### OPEN SOURCE LICENSE - GNU AFFERO PUBLIC LICENSE Version 3.0 #######
 #
 #    Net::FullAuto - Powerful Network Process Automation Software
-#    Copyright © 2000-2025  Brian M. Kelly
+#    Copyright © 2000-2026  Brian M. Kelly
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU Affero General Public License as
@@ -11593,7 +11603,7 @@ our $fa_welcome=<<'END';
 
 
 
-   Copyright © 2000-2025  Brian M. Kelly  Brian.Kelly@FullAuto.com
+   Copyright © 2000-2026  Brian M. Kelly  Brian.Kelly@FullAuto.com
 
 
 
@@ -31212,7 +31222,10 @@ print "cmd() STDERRBOTTOM=$stderr<== and STDOUTBOTTOM=$stdout and LASTLINE=$last
          my $num_of_err_lines=0;
          ($num_of_err_lines=$eval_error)=~tr/\n//;
          $num_of_err_lines=0 if $num_of_err_lines!~/^\d+$/;
-         if ((-1<index $eval_error,'logout') ||
+         $eval_error=~tr/\0-\11\13-\37\177-\377//d;
+         chomp($eval_error);
+         if (((-1<index $eval_error,'logout') &&
+               (-1==index $eval_error,'logout.')) ||
                (-1<index $eval_error,'Connection closed') ||
                ((-1<index $eval_error,'read timed-out') &&
                (40<$num_of_err_lines))

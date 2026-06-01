@@ -2,7 +2,7 @@ package Zuzu::Value::Boolean;
 
 use utf8;
 
-our $VERSION = '0.001002';
+our $VERSION = '0.001003';
 
 use Moo;
 

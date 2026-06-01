@@ -27,6 +27,7 @@ no_index:
 requires:
   Error::Pure: 0.15
   Exporter: 0
+  List::Util: 1.33
   Readonly: 0
   perl: 5.6.2
 resources:
@@ -34,4 +35,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Mo-utils-Hash
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Mo-utils-Hash
-version: '0.02'
+version: '0.03'

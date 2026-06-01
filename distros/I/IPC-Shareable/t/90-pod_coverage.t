@@ -21,7 +21,7 @@ my $pc = Pod::Coverage->new(
 
 is $pc->coverage, 1, "IPC::Shareable pod coverage ok";
 
-if ($pc->uncovered){
+if ($pc->uncovered) {
     warn "IPC::Shareable uncovered:\n\t", join( ", ", $pc->uncovered ), "\n";
 }
 
@@ -33,7 +33,7 @@ my $pc_shm = Pod::Coverage->new(
 
 is $pc_shm->coverage, 1, "IPC::Shareable::SharedMem pod coverage ok";
 
-if ($pc_shm->uncovered){
+if ($pc_shm->uncovered) {
     warn "IPC::Shareable::SharedMem uncovered:\n\t", join( ", ", $pc_shm->uncovered ), "\n";
 }
 

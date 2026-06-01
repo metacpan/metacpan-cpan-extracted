@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.010';
+our $VERSION = '0.011';
 
 use v5.36;
 use strict;
@@ -200,11 +200,11 @@ __END__
 
 =head1 NAME
 
-Linux::Event::Scheduler - Internal monotonic timer queue for Linux::Event::Reactor
+Linux::Event::Scheduler - Internal monotonic timer queue for Linux::Event::Loop
 
 =head1 DESCRIPTION
 
-C<Linux::Event::Scheduler> is the internal deadline queue used by the reactor.
+C<Linux::Event::Scheduler> is the internal deadline queue used by the loop.
 It stores callbacks keyed by monotonic nanosecond deadlines and returns expired
 items in deadline order.
 
@@ -240,7 +240,7 @@ Return all expired entries as C<[ $id, $cb, $deadline_ns ]> tuples.
 
 =head1 SEE ALSO
 
-L<Linux::Event::Reactor>,
+L<Linux::Event::Loop>,
 L<Linux::Event::Clock>,
 L<Linux::Event::Timer>
 

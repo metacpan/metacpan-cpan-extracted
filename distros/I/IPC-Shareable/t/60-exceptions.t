@@ -57,7 +57,9 @@ is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
     $h{a} = 1;  # write something so the segment has the IPC::Shareable tag
 
     # Use local typeglob override instead of Mock::Sub to avoid prototype mismatch
-    # warnings (decode_json carries a ($) prototype).
+    # warnings (decode_json carries a ($) prototype). no warnings 'redefine' is
+    # block-scoped so a genuine accidental redefine elsewhere still warns.
+    no warnings 'redefine';
     local *IPC::Shareable::decode_json = sub { return undef };
 
     is eval { my $x = $h{a}; 1 }, undef,
@@ -78,8 +80,12 @@ is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
 
 # _tie: fallthrough croak when SharedMem->new returns undef (create => 1, not exclusive)
 {
-    my $mock = Mock::Sub->new;
-    my $shm_mock = $mock->mock('IPC::Shareable::SharedMem::new', return_value => undef);
+    # Override SharedMem::new via local typeglob, not Mock::Sub: Mock::Sub 1.08
+    # (on some CPAN testers) returns the call args for return_value => undef, so
+    # the croak-on-undef path never fired. Bare `return` = failure in any
+    # context; no warnings 'redefine' is block-scoped so real redefines warn.
+    no warnings 'redefine';
+    local *IPC::Shareable::SharedMem::new = sub { return };
 
     is
         eval { tie my %h, 'IPC::Shareable', { create => 1, destroy => 1 , serializer => 'storable' }; 1 },
@@ -95,8 +101,13 @@ is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
     my $key_int = hex($key);
 
     {
-        my $mock = Mock::Sub->new;
-        my $sem_mock = $mock->mock('IPC::Semaphore::new', return_value => undef);
+        # Override IPC::Semaphore::new via local typeglob, not Mock::Sub:
+        # Mock::Sub 1.08 (on some CPAN testers) returns the call args for
+        # return_value => undef, so the croak-on-undef path never fired. Bare
+        # `return` = failure in any context; no warnings 'redefine' is
+        # block-scoped so real redefines warn.
+        no warnings 'redefine';
+        local *IPC::Semaphore::new = sub { return };
 
         is
             eval { tie my %h, 'IPC::Shareable', { key => $key, create => 1, destroy => 0 , serializer => 'storable' }; 1 },
@@ -118,8 +129,12 @@ is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
     $sv = 'hello';   # write so the segment carries the IPC::Shareable tag
 
     {
-        my $mock      = Mock::Sub->new;
-        my $thaw_mock = $mock->mock('IPC::Shareable::thaw', return_value => undef);
+        # Override thaw via local typeglob, not Mock::Sub: Mock::Sub 1.08 (on
+        # some CPAN testers) returns the call args for return_value => undef, so
+        # the croak-on-undef path never fired. Bare `return` = failure in any
+        # context; no warnings 'redefine' is block-scoped so real redefines warn.
+        no warnings 'redefine';
+        local *IPC::Shareable::thaw = sub { return };
 
         is eval { my $x = $sv; 1 }, undef,
             "_thaw: croaks when Storable::thaw returns undef";
@@ -130,6 +145,9 @@ is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
 
 # _tie: croaks with OOM message when SharedMem->new fails with ENOMEM
 {
+    # no warnings 'redefine' is block-scoped so a genuine accidental redefine
+    # elsewhere still warns.
+    no warnings 'redefine';
     local *IPC::Shareable::SharedMem::new = sub {
         $! = 12;   # ENOMEM
         return undef;
@@ -144,6 +162,9 @@ is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
 # _tie: croaks when create+exclusive set but SharedMem->new returns undef
 # (SharedMem::new normally croaks itself for File exists; this tests the _tie fallthrough)
 {
+    # no warnings 'redefine' is block-scoped so a genuine accidental redefine
+    # elsewhere still warns.
+    no warnings 'redefine';
     local *IPC::Shareable::SharedMem::new = sub {
         $! = 17;   # EEXIST
         return undef;

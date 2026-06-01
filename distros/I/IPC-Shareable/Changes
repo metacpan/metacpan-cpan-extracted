@@ -1,5 +1,21 @@
 Revision history for Perl extension IPC::Shareable.
 
+1.17    2026-05-31
+    - POD enhancements regarding testing_set() and clean_up_testing()
+    - Test VM enhancements (now allows Async::Event::Interval to piggy back
+      them)
+    - sysv_info() now reports semaphore limits (semmni, semmns, semmsl, semopm)
+      alongside the shm* keys on FreeBSD, Linux, macOS, and OpenBSD; lets
+      tests size themselves to the platform's kern.ipc.semmni budget
+    - FreeBSD CI: pre-test IPC cleanup widened to non-system users and root;
+      optional IPC_DEBUG_DELTAS=1 enables per-file leak detection
+    - Fix CPAN test failures on Mock::Sub 1.08 (t/20, t/60, t/68; t/85 had the
+      same latent issue): those tests mocked subs with 'return_value => undef',
+      but Mock::Sub 1.08 returns the sub's call args (not undef) in that case,
+      so the croak/warn-on-undef paths under test never fired. Replaced those
+      mocks with block-scoped local typeglob overrides that return undef
+      directly, and raised the Mock::Sub build prereq to 1.09
+
 1.16    2026-05-27
     - POD: Promoted the signal handling note into its own section under
       DESTRUCTION

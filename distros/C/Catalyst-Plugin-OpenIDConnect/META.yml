@@ -3,9 +3,13 @@ abstract: 'OpenID Connect provider plugin for Catalyst'
 author:
   - 'Tim F. Rayner <tfrayner@cpan.org>'
 build_requires:
-  ExtUtils::MakeMaker: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::MockObject: '0'
+  Test::More: '0.88'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '6.52'
+  Module::CPANfile: '1.1'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
@@ -23,13 +27,12 @@ requires:
   Catalyst::Runtime: '5.90100'
   Config::General: '0'
   Crypt::Misc: '0'
-  Crypt::OpenSSL::RSA: '0.35'
+  Crypt::OpenSSL::RSA: '0.38'
   Crypt::PK::RSA: '0'
   Data::UUID: '0'
   DateTime: '0'
   DateTime::Format::ISO8601: '0'
   Digest::SHA: '0'
-  ExtUtils::MakeMaker: '6.52'
   JSON::MaybeXS: '0'
   MIME::Base64: '0'
   Module::Runtime: '0'
@@ -41,5 +44,5 @@ requires:
 resources:
   bugtracker: https://github.com/tfrayner/catalyst-plugin-openidconnect/issues
   repository: https://github.com/tfrayner/catalyst-plugin-openidconnect.git
-version: '0.11'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

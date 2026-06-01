@@ -1,3 +1,9 @@
+0.03 2026-05-31T12:04:57+02:00
+ - Add check_hash_optional_keys() check.
+ - Fix SYNOPSIS section in doc.
+ - Rewrite to use of =head1 EXAMPLES section.
+ - Update copyright years.
+
 0.02 2025-07-15T11:54:52+02:00
  - Add check_hash_keys() check.
  - Fix output of example in doc.

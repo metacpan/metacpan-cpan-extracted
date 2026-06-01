@@ -22,12 +22,16 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0.88"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.52",
+            "Module::CPANfile" : "1.1"
          }
       },
       "runtime" : {
@@ -37,13 +41,12 @@
             "Catalyst::Runtime" : "5.90100",
             "Config::General" : "0",
             "Crypt::Misc" : "0",
-            "Crypt::OpenSSL::RSA" : "0.35",
+            "Crypt::OpenSSL::RSA" : "0.38",
             "Crypt::PK::RSA" : "0",
             "Data::UUID" : "0",
             "DateTime" : "0",
             "DateTime::Format::ISO8601" : "0",
             "Digest::SHA" : "0",
-            "ExtUtils::MakeMaker" : "6.52",
             "JSON::MaybeXS" : "0",
             "MIME::Base64" : "0",
             "Module::Runtime" : "0",
@@ -66,6 +69,6 @@
          "web" : "https://github.com/tfrayner/catalyst-plugin-openidconnect"
       }
    },
-   "version" : "0.11",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -11,7 +11,7 @@ isa_ok( $books, 'Google::ISBNNumbers' );
 
 # make sure we can find a good good
 my $book_info = $books->lookup_isbn(9781680500882);
-ok($$book_info{title} =~ /Modern Perl/, 'Able to look up 9781680500882');
+ok($book_info->{title} =~ /Modern Perl/, 'Able to look up 9781680500882');
 
 done_testing;
 

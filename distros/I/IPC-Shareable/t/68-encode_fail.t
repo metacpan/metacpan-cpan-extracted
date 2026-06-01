@@ -2,7 +2,6 @@ use warnings;
 use strict;
 
 use Test::More;
-use Mock::Sub;
 
 use IPC::Shareable;
 IPC::Shareable->testing_set('IPC::Shareable');
@@ -16,18 +15,24 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 
     tie my $sv => 'IPC::Shareable', { create => 1, destroy => 1 , serializer => 'storable' };
 
-    my $mock = Mock::Sub->new;
-    my $encode_mock = $mock->mock('IPC::Shareable::_encode', return_value => undef);
+    {
+        # Override _encode via local typeglob, not Mock::Sub: Mock::Sub 1.08
+        # (on some CPAN testers) returns the call args for return_value => undef,
+        # so the croak-on-undef path never fired. Bare `return` = failure in any
+        # context; no warnings 'redefine' is block-scoped so real redefines warn.
+        no warnings 'redefine';
+        local *IPC::Shareable::_encode = sub { return };
 
-    is
-        eval { $sv = 'foo'; 1 },
-        undef,
-        "STORE croaks when _encode() returns undef";
+        is
+            eval { $sv = 'foo'; 1 },
+            undef,
+            "STORE croaks when _encode() returns undef";
 
-    like
-        $@,
-        qr/Could not write to shared memory/,
-        "...and the error message is correct";
+        like
+            $@,
+            qr/Could not write to shared memory/,
+            "...and the error message is correct";
+    }
 }
 
 {
@@ -36,18 +41,24 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
     my $s = tie my %hv => 'IPC::Shareable', { create => 1, destroy => 1 , serializer => 'storable' };
     $hv{a} = 1;
 
-    my $mock = Mock::Sub->new;
-    my $encode_mock = $mock->mock('IPC::Shareable::_encode', return_value => undef);
+    {
+        # Override _encode via local typeglob, not Mock::Sub: Mock::Sub 1.08
+        # (on some CPAN testers) returns the call args for return_value => undef,
+        # so the croak-on-undef path never fired. Bare `return` = failure in any
+        # context; no warnings 'redefine' is block-scoped so real redefines warn.
+        no warnings 'redefine';
+        local *IPC::Shareable::_encode = sub { return };
 
-    is
-        eval { %hv = (); 1 },
-        undef,
-        "CLEAR croaks when _encode() returns undef";
+        is
+            eval { %hv = (); 1 },
+            undef,
+            "CLEAR croaks when _encode() returns undef";
 
-    like
-        $@,
-        qr/Could not write to shared memory/,
-        "...and the CLEAR error message is correct";
+        like
+            $@,
+            qr/Could not write to shared memory/,
+            "...and the CLEAR error message is correct";
+    }
 }
 
 {
@@ -56,18 +67,24 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
     tie my %hv => 'IPC::Shareable', { create => 1, destroy => 1 , serializer => 'storable' };
     $hv{a} = 1;
 
-    my $mock = Mock::Sub->new;
-    my $encode_mock = $mock->mock('IPC::Shareable::_encode', return_value => undef);
+    {
+        # Override _encode via local typeglob, not Mock::Sub: Mock::Sub 1.08
+        # (on some CPAN testers) returns the call args for return_value => undef,
+        # so the croak-on-undef path never fired. Bare `return` = failure in any
+        # context; no warnings 'redefine' is block-scoped so real redefines warn.
+        no warnings 'redefine';
+        local *IPC::Shareable::_encode = sub { return };
 
-    is
-        eval { delete $hv{a}; 1 },
-        undef,
-        "DELETE croaks when _encode() returns undef";
+        is
+            eval { delete $hv{a}; 1 },
+            undef,
+            "DELETE croaks when _encode() returns undef";
 
-    like
-        $@,
-        qr/Could not write to shared memory/,
-        "...and the DELETE error message is correct";
+        like
+            $@,
+            qr/Could not write to shared memory/,
+            "...and the DELETE error message is correct";
+    }
 }
 
 for my $op (
@@ -83,18 +100,24 @@ for my $op (
     tie my @av => 'IPC::Shareable', { create => 1, destroy => 1 , serializer => 'storable' };
     @av = (1, 2, 3);
 
-    my $mock = Mock::Sub->new;
-    my $encode_mock = $mock->mock('IPC::Shareable::_encode', return_value => undef);
+    {
+        # Override _encode via local typeglob, not Mock::Sub: Mock::Sub 1.08
+        # (on some CPAN testers) returns the call args for return_value => undef,
+        # so the croak-on-undef path never fired. Bare `return` = failure in any
+        # context; no warnings 'redefine' is block-scoped so real redefines warn.
+        no warnings 'redefine';
+        local *IPC::Shareable::_encode = sub { return };
 
-    is
-        eval { $code->(\@av); 1 },
-        undef,
-        "$name croaks when _encode() returns undef";
+        is
+            eval { $code->(\@av); 1 },
+            undef,
+            "$name croaks when _encode() returns undef";
 
-    like
-        $@,
-        qr/Could not write to shared memory/,
-        "...$name error message is correct";
+        like
+            $@,
+            qr/Could not write to shared memory/,
+            "...$name error message is correct";
+    }
 }
 
 IPC::Shareable::_end;

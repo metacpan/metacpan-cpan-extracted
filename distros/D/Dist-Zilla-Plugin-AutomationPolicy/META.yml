@@ -36,9 +36,9 @@ name: Dist-Zilla-Plugin-AutomationPolicy
 provides:
   Dist::Zilla::Plugin::AutomationPolicy:
     file: lib/Dist/Zilla/Plugin/AutomationPolicy.pm
-    version: v0.1.0
+    version: v0.1.1
 requires:
-  Dist::AutomationPolicy: '0'
+  Dist::AutomationPolicy: v0.2.0
   Dist::Zilla::File::InMemory: '0'
   Dist::Zilla::Pragmas: '0'
   Dist::Zilla::Role::FileGatherer: '0'
@@ -53,7 +53,7 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/perl-Dist-Zilla-Plugin-AutomationPolicy/issues
   repository: git://github.com/robrwo/perl-Dist-Zilla-Plugin-AutomationPolicy.git
-version: v0.1.0
+version: v0.1.1
 x_authority: cpan:RRWO
 x_contributors:
   - 'Leon Timmermans <fawaka@gmail.com>'

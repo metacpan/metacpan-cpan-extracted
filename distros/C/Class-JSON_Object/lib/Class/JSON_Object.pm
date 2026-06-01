@@ -5,6 +5,11 @@ use warnings; # see https://metacpan.org/pod/Object::Pad#Implied-Pragmata
 use Object::Pad qw( :experimental(mop) :experimental(custom_field_attr) );
 use utf8;
 
+# For stupid VERSION scanners...
+package Class::JSON_Object
+
+our $VERSION = "0.04";
+
 =head1 NAME
 
 Class::JSON_Object - Role for Class::JSON_Object
@@ -74,7 +79,6 @@ role Class::JSON_Object;
 
 use Object::Pad::MetaFunctions qw( deconstruct_object ref_field );
 
-our $VERSION = "0.02";
 use Carp;
 
 field $_json;			# JSON en/decoder
@@ -210,11 +214,11 @@ method _load_data( $data, $sparse ) {
 	    if ( $class ) {	# Object
 		# Check for array of objects.
 		if ( ref($v->{ref}) eq 'ARRAY' && ref($val) eq 'ARRAY' ) {
-		    @{$v->{ref}} = map { $class->new->load($_) } @$val;
+		    @{$v->{ref}} = map { $class->new->_load_data($_,$sparse) } @$val;
 		}
 		else {
 		    # Single object.
-		    ${$v->{ref}} = $class->new->load($val);
+		    ${$v->{ref}} = $class->new->_load_data($val,$sparse);
 		}
 	    }
 

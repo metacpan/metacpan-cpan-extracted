@@ -232,6 +232,100 @@ sub mask { (Perl500503Syntax::OrDie::_mask_source($_[0]))[0] }
             scalar(split /\n/, $src, -1) == scalar(split /\n/, $m, -1);
         }],
 
+    # ----------------------------------------------------------------
+    # Multiple / shared-line here-documents (jcode-style test fixtures)
+    # ----------------------------------------------------------------
+    ['heredoc: two heredocs sharing one line, both bodies masked',
+        sub {
+            # $_ = <<'A'; $x eq <<'B';  followed by body A then body B.
+            my $src = "\$_ = <<'A'; \$x eq <<'B';\nour \$p\nA\nstate \$q\nB\n";
+            my $m   = mask($src);
+            # Both bodies are data; their declarations must be masked away,
+            # and the line count must be preserved.
+            $m !~ /our/ && $m !~ /state/
+                && scalar(split /\n/, $src, -1) == scalar(split /\n/, $m, -1);
+        }],
+
+    ['heredoc: code following two shared-line heredocs stays visible',
+        sub {
+            # A real construct on the operator line must survive masking.
+            my $src = "\$a = <<'A'; \$b = <<'B'; my \$z = 1;\nAAA\nA\nBBB\nB\n";
+            my $m   = mask($src);
+            my @ml  = split /\n/, $m, -1;
+            # First line still carries the visible assignment 'my $z = 1;'
+            $ml[0] =~ /my \$z = 1;/;
+        }],
+
+    ['heredoc: body line count stable with two heredocs',
+        sub {
+            my $src = "x\n\$p = <<'A'; \$q = <<'B';\n1\n2\nA\n3\nB\ny\n";
+            my $m   = mask($src);
+            scalar(split /\n/, $src, -1) == scalar(split /\n/, $m, -1);
+        }],
+
+    # ----------------------------------------------------------------
+    # Old-style apostrophe package separator  &pkg'sub  ==  &pkg::sub
+    # (jcode idiom:  &jcode'tr(*val, FROM, TO))
+    # ----------------------------------------------------------------
+    ['apostrophe pkgsep: not treated as string start',
+        sub {
+            my $src = "&jcode'tr(*val, 'A', '1');\n";
+            my $m   = mask($src);
+            # The package separator and the following name remain visible;
+            # only the genuine string arguments are masked.
+            $m =~ /&jcode'tr\(\*val, 'X', 'X'\);/;
+        }],
+
+    ['apostrophe pkgsep: trailing code on next line stays visible',
+        sub {
+            my $src = "&jcode'tr(*val, 'A', '1');\nour \$leak = 1;\n";
+            my $m   = mask($src);
+            # If the apostrophe were mistaken for a string opener the rest
+            # would be masked; the real 'our' must remain visible.
+            $m =~ /our \$leak = 1;/;
+        }],
+
+    ['apostrophe pkgsep: scalar form $pkg\'var preserved',
+        sub {
+            my $src = "\$main'foo = 1;\n";
+            my $m   = mask($src);
+            $m =~ /\$main'foo = 1;/;
+        }],
+
+    # ----------------------------------------------------------------
+    # Typeglob / package-qualified name before a quote-like word
+    # ----------------------------------------------------------------
+    ['typeglob *s not consumed as s/// operator',
+        sub {
+            my $src = "local (*s, \$n) = \@_;\n";
+            my $m   = mask($src);
+            # The line has no strings or comments, so a correct masker
+            # leaves it byte-for-byte identical; if *s were taken as the
+            # s/// operator the argument list would be masked away.
+            $m eq $src;
+        }],
+
+    ['package-qualified ::tr not consumed as tr/// operator',
+        sub {
+            my $src = "my \$r = mb::tr(\$x, 'A', '1');\n";
+            my $m   = mask($src);
+            $m =~ /mb::tr\(\$x, 'X', 'X'\);/;
+        }],
+
+    # ----------------------------------------------------------------
+    # Escaped backslash inside a regex literal
+    # ----------------------------------------------------------------
+    ['regex body: escaped backslash kept distinct from escape letter',
+        sub {
+            # /a\\hb/ contains the two literal characters \\ then h, which
+            # is NOT the \h escape.  The masker records the regex body; the
+            # de-escaping happens in _check_source, so here we only verify
+            # the operator line keeps a stable line count.
+            my $src = "\$x =~ /a\\\\hb/;\n";
+            my $m   = mask($src);
+            scalar(split /\n/, $src, -1) == scalar(split /\n/, $m, -1);
+        }],
+
 );
 
 print "1.." . scalar(@tests) . "\n";

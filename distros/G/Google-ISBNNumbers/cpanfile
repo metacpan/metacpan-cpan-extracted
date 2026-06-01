@@ -8,6 +8,6 @@ on 'runtime' => sub {
 	requires 'Cpanel::JSON::XS', '>= 4.08';
 	requires 'IO::Socket::SSL', '>= 1.56';
 	requires 'Net::SSLeay', '>= 1.49';
-	requires 'HTTP::Tiny', '>= 0.076';
+	requires 'HTTP::Tiny', '>= 0.094';
 };
 

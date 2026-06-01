@@ -5,11 +5,13 @@ use strict;
 use warnings;
 
 use Error::Pure qw(err);
+use List::Util 1.33 qw(none);
 use Readonly;
 
-Readonly::Array our @EXPORT_OK => qw(check_hash check_hash_keys);
+Readonly::Array our @EXPORT_OK => qw(check_hash check_hash_keys
+	check_hash_optional_keys);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 sub check_hash {
 	my ($self, $key) = @_;
@@ -56,6 +58,26 @@ sub check_hash_keys {
 	return;
 }
 
+sub check_hash_optional_keys {
+	my ($self, $key, @optional_root_keys) = @_;
+
+	if (! exists $self->{$key}) {
+		return;
+	}
+
+	check_hash($self, $key);
+
+	foreach my $hash_key (keys %{$self->{$key}}) {
+		if (none { $hash_key eq $_ } @optional_root_keys) {
+			err "Parameter '$key' contain bad hash key.",
+				'Bad key' => $hash_key,
+			;
+		}
+	}
+
+	return;
+}
+
 1;
 
 __END__
@@ -70,10 +92,11 @@ Mo::utils::Hash - Mo hash utilities.
 
 =head1 SYNOPSIS
 
- use Mo::utils::Hash qw(check_hash);
+ use Mo::utils::Hash qw(check_hash check_hash_keys check_hash_optional_keys);
 
  check_hash($self, $key);
  check_hash_keys($self, $key, @keys);
+ check_hash_optional_keys($self, $key, @optional_root_keys);
 
 =head1 DESCRIPTION
 
@@ -105,6 +128,19 @@ Put error if check isn't ok.
 
 Returns undef.
 
+=head2 C<check_hash_optional_keys>
+
+ check_hash_optional_keys($self, $key, @optional_root_keys);
+
+I<Since version 0.03.>
+
+Check parameter defined by C<$key> which contain different key than
+C<@optional_root_keys>.
+
+Put error if check isn't ok.
+
+Return undef.
+
 =head1 ERRORS
 
  check_hash():
@@ -116,8 +152,15 @@ Returns undef.
          Parameter '%s' doesn't contain expected keys.
                  Keys: %s
 
+ check_hash_optional_keys():
+         Parameter '%s' isn't hash reference.
+                 Reference: %s
+         Parameter '%s' contain bad hash key.",
+                 Bad key: %s
 
-=head1 EXAMPLE1
+=head1 EXAMPLES
+
+=head2 EXAMPLE1
 
 =for comment filename=check_hash_ok.pl
 
@@ -137,7 +180,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE2
+=head2 EXAMPLE2
 
 =for comment filename=check_hash_fail.pl
 
@@ -160,7 +203,7 @@ Returns undef.
  # Output like:
  # #Error [..Hash.pm:?] Parameter 'key' isn't hash reference.
 
-=head1 EXAMPLE3
+=head2 EXAMPLE3
 
 =for comment filename=check_hash_keys_ok.pl
 
@@ -184,7 +227,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE4
+=head2 EXAMPLE4
 
 =for comment filename=check_hash_keys_fail.pl
 
@@ -215,6 +258,7 @@ Returns undef.
 
 L<Exporter>,
 L<Error::Pure>,
+L<List::Util>,
 L<Readonly>.
 
 =head1 SEE ALSO
@@ -239,12 +283,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2025 Michal Josef Špaček
+© 2025-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

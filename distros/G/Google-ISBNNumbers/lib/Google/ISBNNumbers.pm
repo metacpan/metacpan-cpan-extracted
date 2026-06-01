@@ -6,7 +6,7 @@ use Carp;
 use strict;
 use warnings;
 
-our $VERSION = "1.00";
+our $VERSION = "1.01";
 
 sub new {
 	my ($class, $google_api_key) = @_;
@@ -18,7 +18,6 @@ sub new {
 	# become self, with an HTTP::Tiny and Cpanel::JSON objects
 	my $self = bless {
 		'api_key' => $google_api_key,
-		'http' => HTTP::Tiny->new,
 		'json_coder' => Cpanel::JSON::XS->new->utf8->allow_nonref->allow_blessed,
 	}, $class;
 		
@@ -34,10 +33,13 @@ sub lookup_isbn {
 	croak "Valid ISBN number required for lookup_book()" unless $isbn_number =~ /^97/ && $isbn_number !~ /\D/;
 	
 	# do the lookup!
-	my $response = HTTP::Tiny->new->get( 'https://www.googleapis.com/books/v1/volumes?q=isbn:'.$isbn_number.'&key='.$self->{api_key} );
+	my $response = HTTP::Tiny->new->get(
+		'https://www.googleapis.com/books/v1/volumes?q=isbn:'
+		. $isbn_number . '&key=' . $self->{api_key} 
+	);
 	
 	# alert if failure
-	croak "Lookup failed: ".$response->{reason} unless $response->{success};
+	croak "Lookup failed: " . $response->{reason} unless $response->{success};
 	
 	# translate JSON to data struct
 	my $results = $self->{json_coder}->decode( $response->{content} );
@@ -46,15 +48,14 @@ sub lookup_isbn {
 	croak "Invalid results returned.  Check your API key." unless ref($$results{items}) eq 'ARRAY';
 
 	# we have a book: simplify and return
-	my $book_info = $$results{items}[0]{volumeInfo};
+	my $book_info = $results->{items}->[0]->{volumeInfo};
 	return {
-		'title' => $$book_info{title},
-		'author_name' => $$book_info{authors}[0],
-		'publication_date' => $$book_info{publishedDate},
-		'description' => $$book_info{description},
-		'cover_link' => $$book_info{imageLinks}{smallThumbnail},
+		'title' => $book_info->{title},
+		'author_name' => $book_info->{authors}->[0],
+		'publication_date' => $book_info->{publishedDate},
+		'description' => $book_info->{description},
+		'cover_link' => $book_info->{imageLinks}->{smallThumbnail},
 	};
-
 }
 
 1;
@@ -68,19 +69,20 @@ Google::ISBNNumbers - Retrieve book info by ISBN number
 
 =head1 SYNOPSIS
 
-    use Google::ISBNNumbers;
-    
-    $books = Google::ISBNNumbers->new($your_google_api_key);
-
-    $isbn_number = 9781680500882; # may include dashes and spaces
-    $book_info = $books->lookup_isbn( $isbn_number );
-
+	use Google::ISBNNumbers;
+	
+	$books = Google::ISBNNumbers->new($your_google_api_key);
+	
+	$isbn_number = 9781680500882; # may include dashes and spaces
+	$book_info = $books->lookup_isbn( $isbn_number );
+	
 	# or, if you prefer
 	$book_info = Google::ISBNNumbers->new($your_google_api_key)->lookup_isbn($isbn_number); 
-    
-    # $book_info now has keys for 'title', 'author_name',
-    # 'description','publication_date', and 'cover_link'
-    say $$book_info{title}; # says 'Modern Perl'
+	
+	$book_info now has keys for 'title', 'author_name',
+	'description', 'publication_date', and 'cover_link'
+
+	say $book_info->{title}; # says 'Modern Perl'
 
 =head1 DESCRIPTION
 
@@ -117,7 +119,7 @@ Please send me a note with any bugs or suggestions.
 
 MIT License
 
-Copyright (c) 2021 Eric Chernoff
+Copyright (c) 2026 Eric Chernoff
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

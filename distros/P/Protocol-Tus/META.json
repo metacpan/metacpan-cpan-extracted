@@ -60,27 +60,27 @@
    "provides" : {
       "Protocol::Tus" : {
          "file" : "lib/Protocol/Tus.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Protocol::Tus::AbstractModel" : {
          "file" : "lib/Protocol/Tus/AbstractModel.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Protocol::Tus::LocalDir" : {
          "file" : "lib/Protocol/Tus/LocalDir.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Protocol::Tus::Response" : {
          "file" : "lib/Protocol/Tus/Response.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Protocol::Tus::Upload" : {
          "file" : "lib/Protocol/Tus/Upload.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       },
       "Protocol::Tus::Util" : {
          "file" : "lib/Protocol/Tus/Util.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -95,7 +95,7 @@
          "web" : "https://codeberg.org/polettix/Protocol-Tus"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_contributors" : [
       "Flavio Poletti <flavio@polettix.it>"
    ],
