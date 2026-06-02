@@ -1,7 +1,7 @@
-package Concierge v0.8.2;
+package Concierge v0.8.3;
 use v5.36;
 
-our $VERSION = 'v0.8.2';
+our $VERSION = 'v0.8.3';
 
 # ABSTRACT: Service layer orchestrator for authentication, sessions, and user data
 
@@ -786,7 +786,7 @@ Concierge - Service layer orchestrator for authentication, sessions, and user da
 
 =head1 VERSION
 
-v0.8.1
+v0.8.3
 
 =head1 SYNOPSIS
 

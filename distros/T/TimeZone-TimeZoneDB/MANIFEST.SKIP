@@ -68,3 +68,6 @@
 \.lwpcookies
 TimeZone-.*
 t/online.enabled
+.claude/settings.local.json
+CLAUDE.md
+mutation.json

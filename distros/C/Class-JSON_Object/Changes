@@ -1,5 +1,13 @@
 Revision history for Class-JSON_Object
 
+0.05	2026-06-01
+
+	More help for stupid VERSION scanners.
+
+0.04	2026-06-01
+
+	Help stupid VERSION scanners to find the version.
+
 0.03	2026-06-01
 
 	Make sparse loading recursive.

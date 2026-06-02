@@ -1,5 +1,9 @@
 Revision history for EV::Kafka
 
+0.03  2026-06-01
+    - Reject malformed lengths in broker responses (record header-key varint,
+      metadata array counts)
+
 0.02  2026-05-02
     - zstd / snappy compression
     - Producer and consumer-group correctness fixes

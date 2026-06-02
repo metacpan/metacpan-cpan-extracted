@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Compiler::MSVC;
-$ExtUtils::Builder::Compiler::MSVC::VERSION = '0.036';
+$ExtUtils::Builder::Compiler::MSVC::VERSION = '0.037';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ sub language {
 sub compile_flags {
 	my ($self, $from, $to) = @_;
 	my @ret;
-	push @ret, $self->new_argument(ranking => 5,  value => ['/NOLOGO']);
+	push @ret, $self->new_argument(ranking => 5,  value => ['/nologo']);
 	push @ret, $self->new_argument(ranking => 10, value => [qw{/TP /EHsc}]) if $self->language eq 'C++';
 	push @ret, $self->new_argument(ranking => 15, value => [ "/std:$self->{standard}"]) if $self->{standard};
 	push @ret, $self->new_argument(ranking => 75, value => [ "/Fo$to", '/c', $from ]);
@@ -50,7 +50,7 @@ ExtUtils::Builder::Compiler::MSVC - Class for compiling with Microsoft Visual C
 
 =head1 VERSION
 
-version 0.036
+version 0.037
 
 =head1 AUTHOR
 

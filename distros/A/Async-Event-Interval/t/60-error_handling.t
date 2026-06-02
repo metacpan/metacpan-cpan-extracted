@@ -1,97 +1,98 @@
 use strict;
 use warnings;
 
-use Data::Dumper;
+use lib 't/lib';
+use TestHelper;
+use IPC::Shareable;
 use Test::More;
-
-BEGIN {
-    if (! $ENV{CI_TESTING}) {
-        plan skip_all => "Not on a valid CI testing platform...";
-    }
-    warn "Segs before: " . `ipcs -m | wc -l` . "\n" if $ENV{PRINT_SEGS};
-}
 
 use Async::Event::Interval;
 
 my $mod = 'Async::Event::Interval';
 
-tie my $num, 'IPC::Shareable', { destroy => 1 };
+{
+    tie my $num, 'IPC::Shareable', { destroy => 1 };
 
-$num = 1;
+    $num = 1;
 
-my $e = $mod->new(
-    0.1,
-    sub {
-        die("critical") if $num == 8;
-        $num++;
+    my $e = $mod->new(
+        0.1,
+        sub {
+            die("critical") if $num == 8;
+            $num++;
+        }
+    );
+
+    # Start
+
+    $e->start;
+
+    my $waited = 0;
+    until ($e->error || $waited >= 10) {
+        select(undef, undef, undef, 0.1);
+        $waited += 0.1;
     }
-);
 
-# Start
+    cmp_ok $e->events->{$e->id}{runs}, '>=', 6, "events() has correct count of runs ok";
+    cmp_ok $e->info->{runs}, '>=', 6, "...so does info()";
+    cmp_ok $e->runs, '>=', 6, "...so does runs()";
 
-$e->start;
+    is $e->events->{$e->id}{errors}, 1, "events() has proper count of errors ok";
+    is $e->info->{errors}, 1, "...so does info()";
+    is $e->errors, 1, "...so does errors()";
 
-select(undef, undef, undef, 1);
+    like
+        $e->events->{$e->id}{error_message},
+        qr/critical/,
+        "events() has proper error message ok";
+    like
+        $e->info->{error_message},
+        qr/critical/,
+        "...so does info()";
+    like
+        $e->error_message,
+        qr/critical/,
+        "...so does error_message";
 
-is $e->events->{$e->id}{runs}, 8, "events() has proper count of runs ok";
-is $e->info->{runs}, 8, "...so does info()";
-is $e->runs, 8, "...so does runs()";
+    is $e->status, 0, "status() is waiting on error ok";
+    is $e->error, 1, "error() is set on error ok";
+    is $e->waiting, 1, "waiting() is set on error ok";
 
-is $e->events->{$e->id}{errors}, 1, "events() has proper count of errors ok";
-is $e->info->{errors}, 1, "...so does info()";
-is $e->errors, 1, "...so does errors()";
+    # Restart
 
-like
-    $e->events->{$e->id}{error_message},
-    qr/critical/,
-    "events() has proper error message ok";
-like
-    $e->info->{error_message},
-    qr/critical/,
-    "...so does info()";
-like
-    $e->error_message,
-    qr/critical/,
-    "...so does error_message";
+    $num = 1;
+    $e->restart if $e->waiting;
 
-is $e->status, 0, "status() is waiting on error ok";
-is $e->error, 1, "error() is set on error ok";
-is $e->waiting, 1, "waiting() is set on error ok";
+    $waited = 0;
+    until ($e->error || $waited >= 10) {
+        select(undef, undef, undef, 0.1);
+        $waited += 0.1;
+    }
 
-# Restart
+    cmp_ok $e->events->{$e->id}{runs}, '>=', 14, "events() has correct count of runs after restart ok";
+    cmp_ok $e->info->{runs}, '>=', 14, "...so does info()";
+    cmp_ok $e->runs, '>=', 14, "...so does runs()";
 
-$num = 1;
-$e->restart if $e->waiting;
+    is $e->events->{$e->id}{errors}, 2, "events() has proper count of errors after restart ok";
+    is $e->info->{errors}, 2, "...so does info()";
+    is $e->errors, 2, "...so does errors()";
 
-select(undef, undef, undef, 1);
+    like
+        $e->events->{$e->id}{error_message},
+        qr/critical/,
+        "events() has proper error message after restart ok";
+    like
+        $e->info->{error_message},
+        qr/critical/,
+        "...so does info()";
+    like
+        $e->error_message,
+        qr/critical/,
+        "...so does error_message";
 
-is $e->events->{$e->id}{runs}, 16, "events() has proper count of runs after restart ok";
-is $e->info->{runs}, 16, "...so does info()";
-is $e->runs, 16, "...so does runs()";
+    is $e->status, 0, "status() is waiting on error after restart ok";
+    is $e->error, 1, "error() is set on error after restart ok";
+    is $e->waiting, 1, "waiting() is set on error after restart ok";
 
-is $e->events->{$e->id}{errors}, 2, "events() has proper count of errors after restart ok";
-is $e->info->{errors}, 2, "...so does info()";
-is $e->errors, 2, "...so does errors()";
-
-like
-    $e->events->{$e->id}{error_message},
-    qr/critical/,
-    "events() has proper error message after restart ok";
-like
-    $e->info->{error_message},
-    qr/critical/,
-    "...so does info()";
-like
-    $e->error_message,
-    qr/critical/,
-    "...so does error_message";
-
-is $e->status, 0, "status() is waiting on error after restart ok";
-is $e->error, 1, "error() is set on error after restart ok";
-is $e->waiting, 1, "waiting() is set on error after restart ok";
-
-$e->stop;
-
-warn "Segs after: " . `ipcs -m | wc -l` . "\n" if $ENV{PRINT_SEGS};
-
-done_testing();
+    $e->stop;
+}

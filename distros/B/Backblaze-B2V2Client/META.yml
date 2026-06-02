@@ -1,5 +1,5 @@
 ---
-abstract: 'Client library for the Backblaze B2 Cloud Storage Service V2 API.'
+abstract: 'Replaced by Backblaze::B2V4 | Deprecated client library for the Backblaze B2 Cloud Storage Service V2 API.'
 author:
   - '/ BUGS'
 build_requires:
@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150010'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Backblaze::B2V2Client:
     file: lib/Backblaze/B2V2Client.pm
-    version: '1.6'
+    version: '1.7'
 requires:
   Cpanel::JSON::XS: '4.11'
   Digest::SHA: '6.02'
@@ -39,8 +39,8 @@ requires:
 resources:
   bugtracker: https://github.com/ericschernoff/Backblaze-B2V2Client/issues
   homepage: https://github.com/ericschernoff/Backblaze-B2V2Client
-  repository: git://github.com/ericschernoff/Backblaze-B2V2Client.git
-version: '1.6'
+  repository: https://github.com/ericschernoff/Backblaze-B2V2Client.git
+version: '1.7'
 x_contributors:
   - 'Eric Chernoff <eric@laravel.weaverstreet.net>'
   - 'Eric Chernoff <eric@mail.weaverqueue.com>'

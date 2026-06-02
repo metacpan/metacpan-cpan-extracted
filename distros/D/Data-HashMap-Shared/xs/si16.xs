@@ -5,7 +5,7 @@ SV*
 new(char* class, SV* path_sv, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0)
     CODE:
         char errbuf[SHM_ERR_BUFLEN]; const char* path = SvOK(path_sv) ? SvPV_nolen(path_sv) : NULL; ShmHandle* map = shm_si16_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, errbuf);
-        if (!map) croak("HashMap::Shared::SI16: %s", errbuf[0] ? errbuf : "unknown error");
+        if (!map) croak("Data::HashMap::Shared::SI16: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
     OUTPUT:
         RETVAL
@@ -14,7 +14,7 @@ SV*
 new_sharded(char* class, char* path_prefix, UV num_shards, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0)
     CODE:
         char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_si16_create_sharded(path_prefix, (uint32_t)num_shards, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, errbuf);
-        if (!map) croak("HashMap::Shared::SI16: %s", errbuf[0] ? errbuf : "unknown error");
+        if (!map) croak("Data::HashMap::Shared::SI16: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
     OUTPUT:
         RETVAL
@@ -84,20 +84,17 @@ set_multi(SV* self_sv, ...)
             for (int i = 1; i < items; i += 2) {
                 STRLEN _klen; const char *_kstr = SvPV(ST(i), _klen);
                 bool _kutf8 = SvUTF8(ST(i)) ? 1 : 0;
+                if (_klen > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
                 count += shm_si16_put(h, _kstr, (uint32_t)_klen, _kutf8, (int16_t)SvIV(ST(i + 1)));
             }
         } else {
-            ShmHeader *hdr = h->hdr;
-            shm_rwlock_wrlock(h);
-            shm_seqlock_write_begin(&hdr->seq);
+            WRSEQ_GUARD(h);
             for (int i = 1; i < items; i += 2) {
                 STRLEN _klen; const char *_kstr = SvPV(ST(i), _klen);
                 bool _kutf8 = SvUTF8(ST(i)) ? 1 : 0;
-                if (_klen > SHM_MAX_STR_LEN) { shm_seqlock_write_end(&hdr->seq); shm_rwlock_wrunlock(h); croak("key too long"); }
+                if (_klen > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
                 count += shm_si16_put_inner(h, _kstr, (uint32_t)_klen, _kutf8, (int16_t)SvIV(ST(i + 1)), SHM_TTL_USE_DEFAULT);
             }
-            shm_seqlock_write_end(&hdr->seq);
-            shm_rwlock_wrunlock(h);
         }
         RETVAL = count;
     OUTPUT:
@@ -112,22 +109,18 @@ remove_multi(SV* self_sv, ...)
             for (int i = 1; i < items; i++) {
                 STRLEN _kl; const char *_ks = SvPV(ST(i), _kl);
                 bool _ku = SvUTF8(ST(i)) ? 1 : 0;
-                if (_kl > SHM_MAX_STR_LEN) croak("key too long (max 2GB)");
+                if (_kl > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
                 count += shm_si16_remove(h, _ks, (uint32_t)_kl, _ku);
             }
         } else {
-            ShmHeader *hdr = h->hdr;
-            shm_rwlock_wrlock(h);
-            shm_seqlock_write_begin(&hdr->seq);
+            WRSEQ_GUARD(h);
             for (int i = 1; i < items; i++) {
                 STRLEN _kl; const char *_ks = SvPV(ST(i), _kl);
                 bool _ku = SvUTF8(ST(i)) ? 1 : 0;
-                if (_kl > SHM_MAX_STR_LEN) { shm_seqlock_write_end(&hdr->seq); shm_rwlock_wrunlock(h); croak("key too long (max 2GB)"); }
+                if (_kl > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
                 count += shm_si16_remove_inner(h, _ks, (uint32_t)_kl, _ku);
             }
             if (count) shm_si16_maybe_shrink(h);
-            shm_seqlock_write_end(&hdr->seq);
-            shm_rwlock_wrunlock(h);
         }
         RETVAL = count;
     OUTPUT:
@@ -322,7 +315,7 @@ incr(SV* self_sv, SV* key_sv)
         EXTRACT_STR_KEY(key_sv);
         int ok;
         int16_t val = shm_si16_incr_by(h, _kstr, (uint32_t)_klen, _kutf8, 1, &ok);
-        if (!ok) croak("HashMap::Shared::SI16: increment failed");
+        if (!ok) croak("Data::HashMap::Shared::SI16: increment failed");
         RETVAL = newSViv(val);
     OUTPUT:
         RETVAL
@@ -334,7 +327,7 @@ decr(SV* self_sv, SV* key_sv)
         EXTRACT_STR_KEY(key_sv);
         int ok;
         int16_t val = shm_si16_incr_by(h, _kstr, (uint32_t)_klen, _kutf8, -1, &ok);
-        if (!ok) croak("HashMap::Shared::SI16: decrement failed");
+        if (!ok) croak("Data::HashMap::Shared::SI16: decrement failed");
         RETVAL = newSViv(val);
     OUTPUT:
         RETVAL
@@ -346,7 +339,7 @@ incr_by(SV* self_sv, SV* key_sv, int16_t delta)
         EXTRACT_STR_KEY(key_sv);
         int ok;
         int16_t val = shm_si16_incr_by(h, _kstr, (uint32_t)_klen, _kutf8, delta, &ok);
-        if (!ok) croak("HashMap::Shared::SI16: incr_by failed");
+        if (!ok) croak("Data::HashMap::Shared::SI16: incr_by failed");
         RETVAL = newSViv(val);
     OUTPUT:
         RETVAL
@@ -431,7 +424,7 @@ items(SV* self_sv)
                 }
             }
         }
-        
+
 
 void
 each(SV* self_sv)
@@ -486,7 +479,7 @@ to_hash(SV* self_sv)
                 }
             }
         }
-        
+
         RETVAL = newRV_noinc((SV*)hv);
     OUTPUT:
         RETVAL
@@ -547,11 +540,11 @@ drain(SV* self_sv, UV limit)
         if (limit == 0) XSRETURN_EMPTY;
         shm_si16_drain_entry *entries;
         Newxz(entries, limit, shm_si16_drain_entry);
-        
+
         SAVEFREEPV(entries);
         char *buf = NULL; uint32_t buf_cap = 0;
         uint32_t n = shm_si16_drain(h, (uint32_t)limit, entries, &buf, &buf_cap);
-        
+
         EXTEND(SP, n * 2);
         for (uint32_t i = 0; i < n; i++) {
             SV *ksv = newSVpvn(buf + entries[i].key_off, entries[i].key_len);
@@ -560,7 +553,7 @@ drain(SV* self_sv, UV limit)
             mPUSHi(entries[i].value);
         }
         if (buf) free(buf);
-        
+
 
 UV
 flush_expired(SV* self_sv)

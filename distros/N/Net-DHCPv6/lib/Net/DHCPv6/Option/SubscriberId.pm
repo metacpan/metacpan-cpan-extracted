@@ -1,29 +1,31 @@
-#!/usr/bin/false
-# ABSTRACT: Subscriber ID option (code 38) — opaque subscriber identification
+#!/bin/false
+# ABSTRACT: Subscriber ID option (code 38) -- opaque subscriber identification
 # PODNAME: Net::DHCPv6::Option::SubscriberId
-package Net::DHCPv6::Option::SubscriberId;
-$Net::DHCPv6::Option::SubscriberId::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Option::SubscriberId;
+$Net::DHCPv6::Option::SubscriberId::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
 use Net::DHCPv6::Constants;
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
+my $EMPTY = q();
 
 sub new {
     my ( $class, %args ) = @_;
-    my $subscriber_id = $args{subscriber_id} // '';
+    my $subscriber_id = $args{subscriber_id} // $EMPTY;
     $args{code} = $OPTION_SUBSCRIBER_ID;
     $args{data} = $subscriber_id;
     my $self = $class->SUPER::new( %args );
     $self->{subscriber_id} = $subscriber_id;
-    bless $self, $class;
+    return bless $self, $class;
 }
 
-sub subscriber_id { shift->{subscriber_id} }
+sub subscriber_id { return shift->{subscriber_id} }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
-    return $class->new( subscriber_id => $data );
+    my ( $class, $code, $payload ) = @_;
+    return $class->new( subscriber_id => $payload );
 }
 
 $Net::DHCPv6::OptionList::OPTION_CLASS{$OPTION_SUBSCRIBER_ID} = __PACKAGE__;
@@ -33,15 +35,15 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::SubscriberId - Subscriber ID option (code 38) — opaque subscriber identification
+Net::DHCPv6::Option::SubscriberId - Subscriber ID option (code 38) -- opaque subscriber identification
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

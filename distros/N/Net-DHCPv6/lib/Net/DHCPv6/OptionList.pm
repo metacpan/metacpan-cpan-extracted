@@ -1,12 +1,17 @@
-#!/usr/bin/false
+#!/bin/false
 # ABSTRACT: Shared container for a collection of DHCPv6 options
 # PODNAME: Net::DHCPv6::OptionList
-package Net::DHCPv6::OptionList;
-$Net::DHCPv6::OptionList::VERSION = '0.001';
 use strictures 2;
-use Carp      qw(croak);
-use Ref::Util qw(is_ref);
+
+package Net::DHCPv6::OptionList;
+$Net::DHCPv6::OptionList::VERSION = '0.002';
+use Net::DHCPv6::Option::Generic;
+use Carp      qw( croak );
+use Ref::Util qw( is_ref );
 use namespace::clean;
+
+my $EMPTY        = q();
+my $OPT_HDR_SIZE = 4;     ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 
 our %OPTION_CLASS;
 
@@ -24,20 +29,20 @@ sub add_option {
     push @{ $self->{options_order} }, $code
         unless exists $self->{options_by_code}{$code};
     $self->{options_by_code}{$code} //= [];
-    push @{ $self->{options_by_code}{$code} }, $option;
+    return push @{ $self->{options_by_code}{$code} }, $option;
 }
 
 sub get_option {
     my ( $self, $code ) = @_;
     my $list = $self->{options_by_code}{$code};
-    return unless $list && @$list;
+    return unless $list && @{$list};
     return $list->[0];
 }
 
 sub remove_option {
     my ( $self, $code ) = @_;
     delete $self->{options_by_code}{$code};
-    @{ $self->{options_order} } = grep { $_ != $code } @{ $self->{options_order} };
+    return @{ $self->{options_order} } = grep { $_ != $code } @{ $self->{options_order} };
 }
 
 sub options {
@@ -46,15 +51,15 @@ sub options {
     my @opts;
     for my $code ( @{ $self->{options_order} } ) {
         my $list = $self->{options_by_code}{$code};
-        push @opts, @$list if $list;
+        push @opts, @{$list} if $list;
     }
     return \@opts;
 }
 
 sub as_bytes {
-    my $self = shift;
-    my $opts = $self->options or return '';
-    return join( '', map { $_->as_bytes } @$opts );
+    my $self     = shift;
+    my $opt_list = $self->options or return $EMPTY;
+    return join( $EMPTY, map { $_->as_bytes } @{$opt_list} );
 }
 
 sub try_from_bytes {
@@ -66,29 +71,28 @@ sub try_from_bytes {
     my $len    = CORE::length( $bytes );
     my $error;
 
-    while ( $offset + 4 <= $len ) {
+    while ( $offset + $OPT_HDR_SIZE <= $len ) {
         my $code   = unpack( 'n', substr( $bytes, $offset,     2 ) );
         my $optlen = unpack( 'n', substr( $bytes, $offset + 2, 2 ) );
-        $offset += 4;
+        $offset += $OPT_HDR_SIZE;
         if ( $offset + $optlen > $len ) {
             $error = "Truncated option $code: need $optlen bytes, have " . ( $len - $offset );
             last;
         }
-        my $data = substr( $bytes, $offset, $optlen );
+        my $payload = substr( $bytes, $offset, $optlen );
         $offset += $optlen;
 
         my $class_name = $OPTION_CLASS{$code} || 'Net::DHCPv6::Option::Generic';
         my $option;
-        eval { $option = $class_name->from_bytes_inner( $code, $data ); };
+        eval { $option = $class_name->from_bytes_inner( $code, $payload ); };
         if ( my $err = $@ ) {
-            is_ref( $err ) && $err->isa( 'Net::DHCPv6::X' )
-                ? do {
-                $option = Net::DHCPv6::Option::Generic->new( code => $code, data => $data );
-                }
-                : do {
+            if ( is_ref( $err ) && $err->isa( 'Net::DHCPv6::X' ) ) {
+                $option = Net::DHCPv6::Option::Generic->new( code => $code, data => $payload );
+            }
+            else {
                 $error = "Option $code parse error: $err";
                 last;
-                };
+            }
         }
         $list->add_option( $option );
     }
@@ -113,7 +117,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -121,7 +125,7 @@ Net::DHCPv6::OptionList - Shared container for a collection of DHCPv6 options
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

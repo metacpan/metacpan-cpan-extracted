@@ -1,10 +1,12 @@
-#!/usr/bin/false
-# ABSTRACT: Reconfigure Message option (code 19) — 1-byte msg-type
+#!/bin/false
+# ABSTRACT: Reconfigure Message option (code 19) -- 1-byte msg-type
 # PODNAME: Net::DHCPv6::Option::ReconfMsg
-package Net::DHCPv6::Option::ReconfMsg;
-$Net::DHCPv6::Option::ReconfMsg::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Option::ReconfMsg;
+$Net::DHCPv6::Option::ReconfMsg::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
+use Carp qw( croak );
 use Net::DHCPv6::Constants;
 use Net::DHCPv6::X::Truncated;
 use parent 'Net::DHCPv6::Option';
@@ -17,16 +19,16 @@ sub new {
     $args{data} = pack( 'C', $args{msg_type} );
     my $self = $class->SUPER::new( %args );
     $self->{msg_type} = $args{msg_type};
-    bless $self, $class;
+    return bless $self, $class;
 }
 
-sub msg_type { shift->{msg_type} }
+sub msg_type { return shift->{msg_type} }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
+    my ( $class, $code, $payload ) = @_;
     Net::DHCPv6::X::Truncated->throw( message => 'Truncated ReconfMsg option' )
-        if CORE::length( $data ) < 1;
-    my $type = unpack( 'C', $data );
+        if CORE::length( $payload ) < 1;
+    my $type = unpack( 'C', $payload );
     return $class->new( msg_type => $type );
 }
 
@@ -37,24 +39,28 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::ReconfMsg - Reconfigure Message option (code 19) — 1-byte msg-type
+Net::DHCPv6::Option::ReconfMsg - Reconfigure Message option (code 19) -- 1-byte msg-type
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
   use Net::DHCPv6::Option::ReconfMsg;
-  my $opt = Net::DHCPv6::Option::ReconfMsg->new(msg_type => 1);
+  use Net::DHCPv6::Constants qw($RENEW);
+
+  my $opt = Net::DHCPv6::Option::ReconfMsg->new(
+      msg_type => $RENEW,
+  );
 
 =head1 DESCRIPTION
 
-Carries the message type of a Reconfigure message.  See RFC 8415 §21.21.
+Carries the message type of a Reconfigure message.  See RFC 8415 E<167>21.21.
 
 =head1 ALPHA STATUS
 

@@ -4,21 +4,20 @@ use strict;
 use warnings;
 
 use HTTP::Response;
-use Test::MockModule;
+use Test::Mockingbird;
 use Test::Most;
 
 BEGIN { use_ok('Weather::Meteo') }
 
 # Mock the LWP::UserAgent to avoid actual API calls
-my $mock_ua = Test::MockModule->new('LWP::UserAgent');
-$mock_ua->mock(get => sub {
+mock 'LWP::UserAgent::get' => sub {
 	my ($self, $url) = @_;
 
 	# Simulated API response
 	my $response = HTTP::Response->new(200);
 	$response->content('{"hourly":{"temperature_2m":[5,6,7]}}');
 	return $response;
-});
+};
 
 # Test object creation
 my $meteo = new_ok('Weather::Meteo');
@@ -37,11 +36,11 @@ my $invalid_weather = $meteo->weather({ latitude => 51.34, longitude => 1.42, da
 ok(!defined($invalid_weather), 'Invalid date (before 1940) returns undef');
 
 # Test JSON parsing failure
-$mock_ua->mock(get => sub {
+mock 'LWP::UserAgent::get' => sub {
 	my $response = HTTP::Response->new(200);
 	$response->content('invalid json');
 	return $response;
-});
+};
 
 # Clear the cache to force using the invalid response
 cmp_ok(ref($meteo->{'cache'}->get('weather:51.34:1.42:2022-12-25:Europe/London')), 'eq', 'HASH');

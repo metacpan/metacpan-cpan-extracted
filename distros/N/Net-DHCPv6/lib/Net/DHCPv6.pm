@@ -1,13 +1,14 @@
-#!/usr/bin/false
+#!/bin/false
 # ABSTRACT: DHCPv6 packet decoder/encoder
 # PODNAME: Net::DHCPv6
-package Net::DHCPv6;
-$Net::DHCPv6::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6;
+$Net::DHCPv6::VERSION = '0.002';
+use Carp qw( croak );
 use Net::DHCPv6::DUID;
 
-# Option classes — loaded so they register in the dispatch tables
+# Option classes - loaded so they register in the dispatch tables
 use Net::DHCPv6::Option::AftrName;
 use Net::DHCPv6::Option::Auth;
 use Net::DHCPv6::Option::BootfileParam;
@@ -38,6 +39,7 @@ use Net::DHCPv6::Option::NispServers;
 use Net::DHCPv6::Option::NtpServer;
 use Net::DHCPv6::Option::ORO;
 use Net::DHCPv6::Option::PdExclude;
+use Net::DHCPv6::Option::SntpServers;
 use Net::DHCPv6::Option::Preference;
 use Net::DHCPv6::Option::RapidCommit;
 use Net::DHCPv6::Option::ReconfAccept;
@@ -76,16 +78,18 @@ use Net::DHCPv6::OptionList;
 use Net::DHCPv6::Packet;
 use namespace::clean;
 
+my $MIN_LEN = 4;    ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
+
 # Packet-level decoders
 sub decode_or_croak {
     my ( $class, $bytes ) = @_;
-    croak 'No data provided' unless defined $bytes && CORE::length( $bytes ) >= 4;
+    croak 'No data provided' if !defined $bytes || CORE::length( $bytes ) < $MIN_LEN;
     return Net::DHCPv6::Packet->from_bytes( $bytes );
 }
 
 sub decode_or_null {
     my ( $class, $bytes ) = @_;
-    return unless defined $bytes && CORE::length( $bytes ) >= 4;
+    return if !defined $bytes || CORE::length( $bytes ) < $MIN_LEN;
     my $packet;
     eval { $packet = Net::DHCPv6::Packet->from_bytes( $bytes ); };
     return $packet;
@@ -95,12 +99,12 @@ sub decode_with_error {
     my ( $class, $bytes ) = @_;
     my $packet;
     my $error;
-    if ( !defined $bytes || CORE::length( $bytes ) < 4 ) {
+    if ( !defined $bytes || CORE::length( $bytes ) < $MIN_LEN ) {
         $error = 'No data provided';
     }
     else {
         eval { $packet = Net::DHCPv6::Packet->from_bytes( $bytes ); 1 }
-            or do { $error = $@; };
+            or $error = $@;
     }
     return ( $packet, $error );
 }
@@ -149,7 +153,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -157,7 +161,7 @@ Net::DHCPv6 - DHCPv6 packet decoder/encoder
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -242,7 +246,7 @@ Returns a L<Net::DHCPv6::DUID> on success, croaks on any truncation.
 =head1 OPTION-LIST STREAMING HELPERS
 
 These methods parse raw option TLV chains without requiring a packet
-wrapper — useful for relay messages or extracting options from
+wrapper -- useful for relay messages or extracting options from
 sub-option payloads.
 
 =over

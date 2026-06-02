@@ -178,6 +178,19 @@ if( !$ENV{NO_MOD_PERL} )
     }
 }
 
+# NOTE: threads::shared minimum version
+# When perl is built with useithreads, require a recent threads::shared.
+# The 1.40 release bundled with perl 5.16.0 has a defect that causes SIGSEGV
+# during the END phase when modules touch :shared structures from their END
+# blocks. The 1.48 release (June 2015) introduced fixes to shared object
+# destruction that resolve the failure. Non-threaded perls do not load
+# threads::shared at all and need no constraint, so the prereq is only added
+# when $Config{useithreads} is set.
+if( $Config{useithreads} )
+{
+    $WriteMakefileArgs{PREREQ_PM}->{ 'threads::shared' } = '1.48';
+}
+
 if( !$@ && !$ENV{NO_MOD_PERL} && $has_modperl )
 {
     print( STDERR "Generating Makefile including modperl\n" ) if( $MY_DEBUG );

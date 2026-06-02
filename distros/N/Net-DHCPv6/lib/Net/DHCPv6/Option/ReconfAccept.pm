@@ -1,9 +1,11 @@
-#!/usr/bin/false
-# ABSTRACT: Reconfigure Accept option (code 20) — zero-length data
+#!/bin/false
+# ABSTRACT: Reconfigure Accept option (code 20) -- zero-length data
 # PODNAME: Net::DHCPv6::Option::ReconfAccept
-package Net::DHCPv6::Option::ReconfAccept;
-$Net::DHCPv6::Option::ReconfAccept::VERSION = '0.001';
 use strictures 2;
+
+package Net::DHCPv6::Option::ReconfAccept;
+$Net::DHCPv6::Option::ReconfAccept::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
 use Net::DHCPv6::Constants;
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
@@ -15,7 +17,7 @@ sub new {
 }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
+    my ( $class, $code, $payload ) = @_;
     return $class->new;
 }
 
@@ -26,15 +28,15 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::ReconfAccept - Reconfigure Accept option (code 20) — zero-length data
+Net::DHCPv6::Option::ReconfAccept - Reconfigure Accept option (code 20) -- zero-length data
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -44,7 +46,7 @@ version 0.001
 =head1 DESCRIPTION
 
 Zero-length option used by a server to indicate that the client should
-accept reconfiguration.  See RFC 8415 §21.22.
+accept reconfiguration.  See RFC 8415 E<167>21.22.
 
 =head1 ALPHA STATUS
 

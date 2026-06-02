@@ -504,6 +504,7 @@ pop_front(self)
   CODE:
     uint8_t *buf;
     Newx(buf, h->elem_size, uint8_t);
+    SAVEFREEPV(buf);
     if (deq_try_pop_front(h, buf)) {
         uint32_t len;
         memcpy(&len, buf, sizeof(uint32_t));
@@ -513,7 +514,6 @@ pop_front(self)
     } else {
         RETVAL = &PL_sv_undef;
     }
-    Safefree(buf);
   OUTPUT:
     RETVAL
 
@@ -525,6 +525,7 @@ pop_back(self)
   CODE:
     uint8_t *buf;
     Newx(buf, h->elem_size, uint8_t);
+    SAVEFREEPV(buf);
     if (deq_try_pop_back(h, buf)) {
         uint32_t len;
         memcpy(&len, buf, sizeof(uint32_t));
@@ -534,7 +535,6 @@ pop_back(self)
     } else {
         RETVAL = &PL_sv_undef;
     }
-    Safefree(buf);
   OUTPUT:
     RETVAL
 
@@ -548,6 +548,7 @@ pop_front_wait(self, ...)
     if (items > 1) timeout = SvNV(ST(1));
     uint8_t *buf;
     Newx(buf, h->elem_size, uint8_t);
+    SAVEFREEPV(buf);
     if (deq_pop_wait(h, buf, 0, timeout)) {
         uint32_t len;
         memcpy(&len, buf, sizeof(uint32_t));
@@ -557,7 +558,6 @@ pop_front_wait(self, ...)
     } else {
         RETVAL = &PL_sv_undef;
     }
-    Safefree(buf);
   OUTPUT:
     RETVAL
 
@@ -571,6 +571,7 @@ pop_back_wait(self, ...)
     if (items > 1) timeout = SvNV(ST(1));
     uint8_t *buf;
     Newx(buf, h->elem_size, uint8_t);
+    SAVEFREEPV(buf);
     if (deq_pop_wait(h, buf, 1, timeout)) {
         uint32_t len;
         memcpy(&len, buf, sizeof(uint32_t));
@@ -580,6 +581,5 @@ pop_back_wait(self, ...)
     } else {
         RETVAL = &PL_sv_undef;
     }
-    Safefree(buf);
   OUTPUT:
     RETVAL

@@ -44,5 +44,18 @@ WriteMakefile(
     XS                => { 'Shared.xs' => 'Shared.c' },
     OBJECT            => 'Shared$(OBJ_EXT)',
     TYPEMAPS         => ['typemap'],
+    META_MERGE        => {
+        'meta-spec' => { version => 2 },
+        resources   => {
+            repository => {
+                type => 'git',
+                url  => 'https://github.com/vividsnow/perl5-data-hashmap-shared.git',
+                web  => 'https://github.com/vividsnow/perl5-data-hashmap-shared',
+            },
+            bugtracker => {
+                web => 'https://github.com/vividsnow/perl5-data-hashmap-shared/issues',
+            },
+        },
+    },
     clean            => { FILES => "*.bs *.o ppport.h Shared.c" },
 );

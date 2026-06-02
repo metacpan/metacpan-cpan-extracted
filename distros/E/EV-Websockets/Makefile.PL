@@ -50,6 +50,18 @@ WriteMakefile(Alien::Base::Wrapper->new('Alien::libwebsockets')->mm_args2(ev_arg
 
     META_MERGE => {
         'meta-spec' => { version => 2 },
+        prereqs => {
+            develop => {
+                requires => {
+                    'Test::Pod'           => '1.41',
+                    'Test::Pod::Coverage' => '1.08',
+                    'Pod::Coverage'       => '0.18',
+                    'Test::Kwalitee'      => '1.21',
+                    'Test::Spelling'      => '0.12',
+                    'Test::LeakTrace'     => '0.14',
+                },
+            },
+        },
         provides => {
             'EV::Websockets' => {
                 file    => 'lib/EV/Websockets.pm',

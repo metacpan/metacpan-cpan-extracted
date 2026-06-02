@@ -1,6 +1,6 @@
 # NAME
 
-Backblaze::B2V2Client - Client library for the Backblaze B2 Cloud Storage Service V2 API.
+Backblaze::B2V2Client - Replaced by Backblaze::B2V4 | Deprecated client library for the Backblaze B2 Cloud Storage Service V2 API.
 
 # SYNOPSIS
 
@@ -58,6 +58,13 @@ Backblaze::B2V2Client - Client library for the Backblaze B2 Cloud Storage Servic
         }
 
 # DESCRIPTION / SET UP
+
+**This module is obsolete -- use Backblaze::B2V4 instead**
+
+This module will no longer be updated, as Backblaze::B2V4 supports
+the V4 Backblaze API and is better in every way. 
+
+\---
 
 This module should help you create buckets and store/retrieve files in the
 Backblaze B2 cloud storage service using V2 of their API.

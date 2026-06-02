@@ -1,10 +1,12 @@
-#!/usr/bin/false
-# ABSTRACT: DHCP Captive-Portal option (code 103) — captive portal API URI
+#!/bin/false
+# ABSTRACT: DHCP Captive-Portal option (code 103) -- captive portal API URI
 # PODNAME: Net::DHCPv6::Option::CaptivePortal
-package Net::DHCPv6::Option::CaptivePortal;
-$Net::DHCPv6::Option::CaptivePortal::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Option::CaptivePortal;
+$Net::DHCPv6::Option::CaptivePortal::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
+use Carp qw( croak );
 use Net::DHCPv6::Constants;
 use Net::DHCPv6::X::Truncated;
 use parent 'Net::DHCPv6::Option';
@@ -17,16 +19,16 @@ sub new {
     $args{data} = $args{uri};
     my $self = $class->SUPER::new( %args );
     $self->{uri} = $args{uri};
-    bless $self, $class;
+    return bless $self, $class;
 }
 
-sub uri { shift->{uri} }
+sub uri { return shift->{uri} }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
+    my ( $class, $code, $payload ) = @_;
     Net::DHCPv6::X::Truncated->throw( message => 'Truncated CaptivePortal option' )
-        if CORE::length( $data ) == 0;
-    return $class->new( uri => $data );
+        if CORE::length( $payload ) == 0;
+    return $class->new( uri => $payload );
 }
 
 $Net::DHCPv6::OptionList::OPTION_CLASS{$OPTION_CAPTIVE_PORTAL} = __PACKAGE__;
@@ -36,15 +38,15 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::CaptivePortal - DHCP Captive-Portal option (code 103) — captive portal API URI
+Net::DHCPv6::Option::CaptivePortal - DHCP Captive-Portal option (code 103) -- captive portal API URI
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

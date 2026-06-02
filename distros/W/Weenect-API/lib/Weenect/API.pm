@@ -84,7 +84,7 @@ of Weenect::Tracker objects
 method get_trackers {
     require Weenect::Tracker;
 
-    my $res = $api->request("mytracker");
+    my $res = $api->request("mytracker"); # same as "mytracker-userspace"?
     return unless $res;
 
     return Weenect::Trackers->create_with_api( $res, $api );
@@ -173,6 +173,66 @@ method kindex {
     return $api->request("kindex");
 }
 
+=head2 wifi-zone( $zid )
+
+Returns a WiFiZone object for the requested wifi zone.
+
+=cut
+
+method wifi_zone( $zid ) {
+    return $api->request( sprintf("wifi-zone/%d", $zid ) );
+}
+
+=head2 wifi_zone_active( $zid, $active )
+
+Enables/disables a WiFi zone.
+
+=cut
+
+method wifi_zone_active( $zid, $active = 1 ) {
+
+    my $z = $api->wifi_zone($zid);
+    require Weenect::WiFiZone;
+    my $zone = Weenect::WiFiZone->create($z)->hash;
+    $zone->{is_active} = $active;
+    return $api->request( sprintf("wifi-zone/%d", $zid ),
+			  Content => $zone,
+			  OP => 'PUT' );
+}
+
+=head2 remove_wifi_zone( $zid )
+
+Returns a WiFiZone object for the requested wifi zone.
+
+=cut
+
+method remove_wifi_zone( $zid ) {
+    $zid = $zid->id if $zid isa Weenect::WiFiZone;
+    return $api->request( sprintf("wifi-zone/%d", $zid), OP => 'DELETE' );
+}
+
+=head2 add_wifi_zone( %atts )
+
+Adds a new WiFi zone and returns the WiFiZone object for the hew zone.
+
+%atts may contain _zone => WiFiZone object.
+
+=cut
+
+#   name                 : "Oh Denneboom"
+#   mac_address          : "cc:ce:1e:1c:7c:46"
+#   latitude             : 52.8849946
+#   longitude            : 6.85922149999999
+#   radius               : 15
+#   is_active            : true
+#   enable_notifications : true
+
+
+method add_wifi_zone( %atts ) {
+    %atts = ( delete($atts{_zone})->hash->%*, %atts ) if $atts{_zone};
+    return $api->request( "wifi-zone", Content => \%atts );
+}
+
 ################ Classes ################
 
 class Weenect::Login :does(Class::JSON_Object) {
@@ -189,7 +249,20 @@ class Weenect::Auth :does(Class::JSON_Object) {
 
 1;
 
-# user/$uid
-# subscriptionoffer
+# android
+# android/token device_uuid site
+# auth/external-id
+# mailtoken
+# myaccountoptions
 # mysubscription/$subscriptionid
 # mytracker/$tid/activity
+# mytracker/register
+# mytracker/$tid/buttons
+# mytracker/$tid/imei
+# mytracker/$tid/wifi-zones/suggest
+# oauth/token
+# subscriptionoffer
+# user/$uid
+# user/forgotpassword mail
+# user/register
+

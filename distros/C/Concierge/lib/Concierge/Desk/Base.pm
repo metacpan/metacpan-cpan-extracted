@@ -1,7 +1,7 @@
-package Concierge::Desk::Base v0.8.2;
+package Concierge::Desk::Base v0.8.3;
 use v5.36;
 
-our $VERSION = 'v0.8.2';
+our $VERSION = 'v0.8.3';
 
 # ABSTRACT: Records-store base class for Concierge component modules
 
@@ -51,7 +51,7 @@ Concierge::Desk::Base - Records-store base class for Concierge component modules
 
 =head1 VERSION
 
-v0.8.1
+v0.8.3
 
 =head1 SYNOPSIS
 

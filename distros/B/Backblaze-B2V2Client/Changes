@@ -1,5 +1,13 @@
 Revision history for Perl extension Backblaze-B2V2Client
 
+1.7 2026-06-01T10:39:03Z
+
+    - FIx version number for PAUSE indexer
+
+1.6.1 2026-06-01T07:04:56Z
+
+    - Notice of obsolescence and replacement by Backblaze::B2V4
+
 1.6 2021-06-23T04:16:17Z
 
     - Enhance b2_list_file_names() to use options provided by the B2V2 API (thanks ESTRABD).

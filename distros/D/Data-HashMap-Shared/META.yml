@@ -23,5 +23,8 @@ no_index:
 requires:
   XS::Parse::Keyword: '0.40'
   perl: '5.022'
-version: '0.09'
+resources:
+  bugtracker: https://github.com/vividsnow/perl5-data-hashmap-shared/issues
+  repository: https://github.com/vividsnow/perl5-data-hashmap-shared.git
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

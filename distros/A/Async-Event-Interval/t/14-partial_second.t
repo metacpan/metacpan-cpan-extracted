@@ -1,17 +1,21 @@
 use strict;
 use warnings;
 
+use IPC::Shareable;
 use Test::More;
 use Time::HiRes qw(time);
 
+my ($segs_before, $sems_before);
 BEGIN {
-    if (! $ENV{CI_TESTING}) {
-        plan skip_all => "Not on a valid CI testing platform...";
-    }
-    warn "Segs before: " . `ipcs -m | wc -l` . "\n" if $ENV{PRINT_SEGS};
+    IPC::Shareable->testing_set('Async::Event::Interval');
+    $segs_before = IPC::Shareable::seg_count();
+    $sems_before = IPC::Shareable::sem_count();
 }
 
 use Async::Event::Interval;
+
+warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
+warn "Sems Before: $sems_before\n" if $ENV{PRINT_SEGS};
 
 my $mod = 'Async::Event::Interval';
 
@@ -24,8 +28,6 @@ $$t = time;
 $e->start;
 sleep 2;
 $e->stop;
-
-warn "Segs after: " . `ipcs -m | wc -l` . "\n" if $ENV{PRINT_SEGS};
 
 sub perform {
     my $time = time;

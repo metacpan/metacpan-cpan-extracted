@@ -1,5 +1,5 @@
 {
-   "abstract" : "Scheduled and one-off asynchronous events",
+   "abstract" : "Scheduled and one-off restartable asynchronous events",
    "author" : [
       "Steve Bertrand <steveb@cpan.org>"
    ],
@@ -22,6 +22,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
+            "File::Temp" : "0",
             "Mock::Sub" : "0",
             "Test::More" : "0",
             "Test::SharedFork" : "0"
@@ -34,8 +35,9 @@
       },
       "runtime" : {
          "requires" : {
-            "IPC::Shareable" : "1.13",
+            "IPC::Shareable" : "1.17",
             "Parallel::ForkManager" : "0",
+            "Time::HiRes" : "0",
             "perl" : "5.006"
          }
       }
@@ -51,6 +53,6 @@
          "web" : "https://github.com/stevieb9/async-event-interval"
       }
    },
-   "version" : "1.13",
+   "version" : "1.14",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

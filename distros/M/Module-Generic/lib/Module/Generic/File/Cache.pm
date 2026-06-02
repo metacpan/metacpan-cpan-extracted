@@ -938,7 +938,7 @@ END
     }
     else
     {
-        warn( "Error instantiating a new Module::Generic::Global object for 'cache': ", Module::Generic::Global->error );
+        warn( "Error instantiating a new Module::Generic::Global object for 'cache': ", ( Module::Generic::Global->error // '' ) );
         return;
     }
     my $file2obj_repo = Module::Generic::Global->new( 'file2object_repo' => __PACKAGE__, key => __PACKAGE__ );

@@ -1,7 +1,9 @@
 #!/usr/bin/env perl
+## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 # ABSTRACT: Validate every constant against IANA/RFC values and verify option class coverage
 use strictures 2;
-use Test2::V1 -ipP;
+use Test2::V1 -ipP, qw(is ok subtest pass note done_testing);    ## no critic (Subroutines::ProhibitCallsToUndeclaredSubs)
+
 use lib 't/lib';
 use lib 'lib';
 
@@ -13,11 +15,7 @@ use Net::DHCPv6::OptionList;
 # Helper: check that $OPTION_XXX constant exists, matches expected
 # value, is registered in REV_OPTION_CODE, and has an option class.
 # -------------------------------------------------------------------
-my %OPTION_CLASS_CODES;
-{
-    no strict 'refs';
-    %OPTION_CLASS_CODES = %Net::DHCPv6::OptionList::OPTION_CLASS;
-}
+my %OPTION_CLASS_CODES = %Net::DHCPv6::OptionList::OPTION_CLASS;
 
 sub check_option_constant {
     my ( $name, $expected, $desc ) = @_;
@@ -26,10 +24,11 @@ sub check_option_constant {
     exists $OPTION_CLASS_CODES{$expected}
         ? pass( "$desc: option class registered for code $expected" )
         : note( "$desc: no dedicated option class for code $expected (Generic OK)" );
+    return;
 }
 
 # -------------------------------------------------------------------
-# Message types (RFC 8415 §14)
+# Message types (RFC 8415 Section 14)
 # -------------------------------------------------------------------
 subtest 'Message types' => sub {
     is( $SOLICIT,             1,  'SOLICIT' );
@@ -49,15 +48,14 @@ subtest 'Message types' => sub {
     is( Net::DHCPv6::Constants::message_type_name( 1 ),  'SOLICIT',     'REV_MESSAGE_TYPE 1' );
     is( Net::DHCPv6::Constants::message_type_name( 13 ), 'RELAY_REPLY', 'REV_MESSAGE_TYPE 13' );
     ok( !defined Net::DHCPv6::Constants::message_type_name( 99 ), 'REV_MESSAGE_TYPE 99 is undef' );
-
-    ok( Net::DHCPv6::Constants::is_valid_message_type( 1 ),   'is_valid 1' );
-    ok( Net::DHCPv6::Constants::is_valid_message_type( 13 ),  'is_valid 13' );
-    ok( !Net::DHCPv6::Constants::is_valid_message_type( 0 ),  'is_valid 0 false' );
-    ok( !Net::DHCPv6::Constants::is_valid_message_type( 99 ), 'is_valid 99 false' );
+    ok( Net::DHCPv6::Constants::is_valid_message_type( 1 ),       'is_valid 1' );
+    ok( Net::DHCPv6::Constants::is_valid_message_type( 13 ),      'is_valid 13' );
+    ok( !Net::DHCPv6::Constants::is_valid_message_type( 0 ),      'is_valid 0 false' );
+    ok( !Net::DHCPv6::Constants::is_valid_message_type( 99 ),     'is_valid 99 false' );
 };
 
 # -------------------------------------------------------------------
-# Option codes (RFC 8415 §21)
+# Option codes (RFC 8415 Section 21)
 # -------------------------------------------------------------------
 subtest 'Option codes' => sub {
     is( $OPTION_CLIENTID,                 1,   'OPTION_CLIENTID' );
@@ -160,7 +158,7 @@ subtest 'Option codes' => sub {
 };
 
 # -------------------------------------------------------------------
-# Status codes (RFC 8415 §18.3)
+# Status codes (RFC 8415 Section 18.3)
 # -------------------------------------------------------------------
 subtest 'Status codes' => sub {
     is( $STATUS_SUCCESS,         0, 'STATUS_SUCCESS' );
@@ -177,7 +175,7 @@ subtest 'Status codes' => sub {
 };
 
 # -------------------------------------------------------------------
-# DUID types (RFC 8415 §11)
+# DUID types (RFC 8415 Section 11)
 # -------------------------------------------------------------------
 subtest 'DUID types' => sub {
     is( $DUID_LLT,  1, 'DUID_LLT' );
@@ -187,7 +185,122 @@ subtest 'DUID types' => sub {
 };
 
 # -------------------------------------------------------------------
-# Option class registration coverage — every code in REV_OPTION_CODE
+# Client architecture types (IANA Processor Architecture Types, RFC 5970)
+# -------------------------------------------------------------------
+subtest 'Client architecture types' => sub {
+    is( $CLIENT_ARCH_X86_BIOS,               0,  'CLIENT_ARCH_X86_BIOS' );
+    is( $CLIENT_ARCH_NEC_PC98,               1,  'CLIENT_ARCH_NEC_PC98' );
+    is( $CLIENT_ARCH_ITANIUM,                2,  'CLIENT_ARCH_ITANIUM' );
+    is( $CLIENT_ARCH_DEC_ALPHA,              3,  'CLIENT_ARCH_DEC_ALPHA' );
+    is( $CLIENT_ARCH_ARC_X86,                4,  'CLIENT_ARCH_ARC_X86' );
+    is( $CLIENT_ARCH_INTEL_LEAN_CLIENT,      5,  'CLIENT_ARCH_INTEL_LEAN_CLIENT' );
+    is( $CLIENT_ARCH_X86_UEFI,               6,  'CLIENT_ARCH_X86_UEFI' );
+    is( $CLIENT_ARCH_X64_UEFI,               7,  'CLIENT_ARCH_X64_UEFI' );
+    is( $CLIENT_ARCH_EFI_XSCALE,             8,  'CLIENT_ARCH_EFI_XSCALE' );
+    is( $CLIENT_ARCH_EBC,                    9,  'CLIENT_ARCH_EBC' );
+    is( $CLIENT_ARCH_ARM_32_UEFI,            10, 'CLIENT_ARCH_ARM_32_UEFI' );
+    is( $CLIENT_ARCH_ARM_64_UEFI,            11, 'CLIENT_ARCH_ARM_64_UEFI' );
+    is( $CLIENT_ARCH_PPC_OPEN_FIRMWARE,      12, 'CLIENT_ARCH_PPC_OPEN_FIRMWARE' );
+    is( $CLIENT_ARCH_PPC_EPAPR,              13, 'CLIENT_ARCH_PPC_EPAPR' );
+    is( $CLIENT_ARCH_POWER_OPAL_V3,          14, 'CLIENT_ARCH_POWER_OPAL_V3' );
+    is( $CLIENT_ARCH_X86_UEFI_HTTP,          15, 'CLIENT_ARCH_X86_UEFI_HTTP' );
+    is( $CLIENT_ARCH_X64_UEFI_HTTP,          16, 'CLIENT_ARCH_X64_UEFI_HTTP' );
+    is( $CLIENT_ARCH_EBC_HTTP,               17, 'CLIENT_ARCH_EBC_HTTP' );
+    is( $CLIENT_ARCH_ARM_32_UEFI_HTTP,       18, 'CLIENT_ARCH_ARM_32_UEFI_HTTP' );
+    is( $CLIENT_ARCH_ARM_64_UEFI_HTTP,       19, 'CLIENT_ARCH_ARM_64_UEFI_HTTP' );
+    is( $CLIENT_ARCH_PC_AT_BIOS_HTTP,        20, 'CLIENT_ARCH_PC_AT_BIOS_HTTP' );
+    is( $CLIENT_ARCH_ARM_32_UBOOT,           21, 'CLIENT_ARCH_ARM_32_UBOOT' );
+    is( $CLIENT_ARCH_ARM_64_UBOOT,           22, 'CLIENT_ARCH_ARM_64_UBOOT' );
+    is( $CLIENT_ARCH_ARM_UBOOT_32_HTTP,      23, 'CLIENT_ARCH_ARM_UBOOT_32_HTTP' );
+    is( $CLIENT_ARCH_ARM_UBOOT_64_HTTP,      24, 'CLIENT_ARCH_ARM_UBOOT_64_HTTP' );
+    is( $CLIENT_ARCH_RISCV_32_UEFI,          25, 'CLIENT_ARCH_RISCV_32_UEFI' );
+    is( $CLIENT_ARCH_RISCV_32_UEFI_HTTP,     26, 'CLIENT_ARCH_RISCV_32_UEFI_HTTP' );
+    is( $CLIENT_ARCH_RISCV_64_UEFI,          27, 'CLIENT_ARCH_RISCV_64_UEFI' );
+    is( $CLIENT_ARCH_RISCV_64_UEFI_HTTP,     28, 'CLIENT_ARCH_RISCV_64_UEFI_HTTP' );
+    is( $CLIENT_ARCH_RISCV_128_UEFI,         29, 'CLIENT_ARCH_RISCV_128_UEFI' );
+    is( $CLIENT_ARCH_RISCV_128_UEFI_HTTP,    30, 'CLIENT_ARCH_RISCV_128_UEFI_HTTP' );
+    is( $CLIENT_ARCH_S390_BASIC,             31, 'CLIENT_ARCH_S390_BASIC' );
+    is( $CLIENT_ARCH_S390_EXTENDED,          32, 'CLIENT_ARCH_S390_EXTENDED' );
+    is( $CLIENT_ARCH_MIPS_32_UEFI,           33, 'CLIENT_ARCH_MIPS_32_UEFI' );
+    is( $CLIENT_ARCH_MIPS_64_UEFI,           34, 'CLIENT_ARCH_MIPS_64_UEFI' );
+    is( $CLIENT_ARCH_SUNWAY_32_UEFI,         35, 'CLIENT_ARCH_SUNWAY_32_UEFI' );
+    is( $CLIENT_ARCH_SUNWAY_64_UEFI,         36, 'CLIENT_ARCH_SUNWAY_64_UEFI' );
+    is( $CLIENT_ARCH_LOONGARCH_32_UEFI,      37, 'CLIENT_ARCH_LOONGARCH_32_UEFI' );
+    is( $CLIENT_ARCH_LOONGARCH_32_UEFI_HTTP, 38, 'CLIENT_ARCH_LOONGARCH_32_UEFI_HTTP' );
+    is( $CLIENT_ARCH_LOONGARCH_64_UEFI,      39, 'CLIENT_ARCH_LOONGARCH_64_UEFI' );
+    is( $CLIENT_ARCH_LOONGARCH_64_UEFI_HTTP, 40, 'CLIENT_ARCH_LOONGARCH_64_UEFI_HTTP' );
+    is( $CLIENT_ARCH_ARM_RPIBOOT,            41, 'CLIENT_ARCH_ARM_RPIBOOT' );
+
+    is( Net::DHCPv6::Constants::arch_name( 0 ),  'X86_BIOS',    'REV_CLIENT_ARCH 0' );
+    is( Net::DHCPv6::Constants::arch_name( 41 ), 'ARM_RPIBOOT', 'REV_CLIENT_ARCH 41' );
+    ok( !defined Net::DHCPv6::Constants::arch_name( 99 ), 'REV_CLIENT_ARCH 99 undef' );
+};
+
+# -------------------------------------------------------------------
+# Client FQDN flags (RFC 4704 Section 4)
+# -------------------------------------------------------------------
+subtest 'Client FQDN flags' => sub {
+    is( $CLIENT_FQDN_S, 0x01, 'CLIENT_FQDN_S' );
+    is( $CLIENT_FQDN_O, 0x02, 'CLIENT_FQDN_O' );
+    is( $CLIENT_FQDN_N, 0x04, 'CLIENT_FQDN_N' );
+};
+
+# -------------------------------------------------------------------
+# Link-layer types (IANA ARP Hardware Type registry)
+# -------------------------------------------------------------------
+subtest 'Link-layer types' => sub {
+    is( $LINK_TYPE_RESERVED,        0,      'LINK_TYPE_RESERVED' );
+    is( $LINK_TYPE_ETHERNET,        1,      'LINK_TYPE_ETHERNET' );
+    is( $LINK_TYPE_EXP_ETHERNET,    2,      'LINK_TYPE_EXP_ETHERNET' );
+    is( $LINK_TYPE_AX25,            3,      'LINK_TYPE_AX25' );
+    is( $LINK_TYPE_PRONET,          4,      'LINK_TYPE_PRONET' );
+    is( $LINK_TYPE_CHAOS,           5,      'LINK_TYPE_CHAOS' );
+    is( $LINK_TYPE_IEEE802,         6,      'LINK_TYPE_IEEE802' );
+    is( $LINK_TYPE_ARCNET,          7,      'LINK_TYPE_ARCNET' );
+    is( $LINK_TYPE_HYPERCHANNEL,    8,      'LINK_TYPE_HYPERCHANNEL' );
+    is( $LINK_TYPE_LANSTAR,         9,      'LINK_TYPE_LANSTAR' );
+    is( $LINK_TYPE_AUTONET,         10,     'LINK_TYPE_AUTONET' );
+    is( $LINK_TYPE_LOCALTALK,       11,     'LINK_TYPE_LOCALTALK' );
+    is( $LINK_TYPE_LOCALNET,        12,     'LINK_TYPE_LOCALNET' );
+    is( $LINK_TYPE_ULTRA,           13,     'LINK_TYPE_ULTRA' );
+    is( $LINK_TYPE_SMDS,            14,     'LINK_TYPE_SMDS' );
+    is( $LINK_TYPE_FRAME_RELAY,     15,     'LINK_TYPE_FRAME_RELAY' );
+    is( $LINK_TYPE_ATM,             16,     'LINK_TYPE_ATM' );
+    is( $LINK_TYPE_HDLC,            17,     'LINK_TYPE_HDLC' );
+    is( $LINK_TYPE_FIBRE_CHANNEL,   18,     'LINK_TYPE_FIBRE_CHANNEL' );
+    is( $LINK_TYPE_ATM_RFC2225,     19,     'LINK_TYPE_ATM_RFC2225' );
+    is( $LINK_TYPE_SERIAL,          20,     'LINK_TYPE_SERIAL' );
+    is( $LINK_TYPE_ATM_ALT,         21,     'LINK_TYPE_ATM_ALT' );
+    is( $LINK_TYPE_MIL_STD_188_220, 22,     'LINK_TYPE_MIL_STD_188_220' );
+    is( $LINK_TYPE_METRICOM,        23,     'LINK_TYPE_METRICOM' );
+    is( $LINK_TYPE_IEEE1394,        24,     'LINK_TYPE_IEEE1394' );
+    is( $LINK_TYPE_MAPOS,           25,     'LINK_TYPE_MAPOS' );
+    is( $LINK_TYPE_TWINAXIAL,       26,     'LINK_TYPE_TWINAXIAL' );
+    is( $LINK_TYPE_EUI64,           27,     'LINK_TYPE_EUI64' );
+    is( $LINK_TYPE_HIPARP,          28,     'LINK_TYPE_HIPARP' );
+    is( $LINK_TYPE_ISO7816,         29,     'LINK_TYPE_ISO7816' );
+    is( $LINK_TYPE_ARP_SEC,         30,     'LINK_TYPE_ARP_SEC' );
+    is( $LINK_TYPE_IPSEC_TUNNEL,    31,     'LINK_TYPE_IPSEC_TUNNEL' );
+    is( $LINK_TYPE_INFINIBAND,      32,     'LINK_TYPE_INFINIBAND' );
+    is( $LINK_TYPE_TIA_102,         33,     'LINK_TYPE_TIA_102' );
+    is( $LINK_TYPE_WIEGAND,         34,     'LINK_TYPE_WIEGAND' );
+    is( $LINK_TYPE_PURE_IP,         35,     'LINK_TYPE_PURE_IP' );
+    is( $LINK_TYPE_HW_EXP1,         36,     'LINK_TYPE_HW_EXP1' );
+    is( $LINK_TYPE_HFI,             37,     'LINK_TYPE_HFI' );
+    is( $LINK_TYPE_UNIFIED_BUS,     38,     'LINK_TYPE_UNIFIED_BUS' );
+    is( $LINK_TYPE_HW_EXP2,         256,    'LINK_TYPE_HW_EXP2' );
+    is( $LINK_TYPE_AETHERNET,       257,    'LINK_TYPE_AETHERNET' );
+    is( $LINK_TYPE_RESERVED_HIGH,   65_535, 'LINK_TYPE_RESERVED_HIGH' );
+
+    is( Net::DHCPv6::Constants::link_type_name( 1 ),      'ETHERNET',      'REV_LINK_TYPE 1' );
+    is( Net::DHCPv6::Constants::link_type_name( 38 ),     'UNIFIED_BUS',   'REV_LINK_TYPE 38' );
+    is( Net::DHCPv6::Constants::link_type_name( 256 ),    'HW_EXP2',       'REV_LINK_TYPE 256' );
+    is( Net::DHCPv6::Constants::link_type_name( 65_535 ), 'RESERVED_HIGH', 'REV_LINK_TYPE 65535' );
+    ok( !defined Net::DHCPv6::Constants::link_type_name( 99 ), 'REV_LINK_TYPE 99 undef' );
+};
+
+# -------------------------------------------------------------------
+# Option class registration coverage -- every code in REV_OPTION_CODE
 # should have either a dedicated class or be noted as Generic-fallback
 # -------------------------------------------------------------------
 subtest 'Option class registration' => sub {
@@ -202,4 +315,5 @@ subtest 'Option class registration' => sub {
     }
 };
 
+## use critic (ValuesAndExpressions::ProhibitMagicNumbers)
 done_testing;

@@ -1,5 +1,9 @@
 Revision history for Data::Graph::Shared
 
+0.03  2026-06-01
+    - new/new_memfd: reject max_nodes/max_edges > 2^32 instead of silently
+      truncating the uint32 cast to a tiny graph
+
 0.02  2026-04-26
     - atomic RMW + lifecycle parity
     - REQUIRE NODE macro; notify() returns bool

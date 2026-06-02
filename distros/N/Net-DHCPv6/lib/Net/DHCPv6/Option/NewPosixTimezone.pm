@@ -1,10 +1,12 @@
-#!/usr/bin/false
-# ABSTRACT: NEW_POSIX_TIMEZONE option (code 41) — POSIX timezone string
+#!/bin/false
+# ABSTRACT: NEW_POSIX_TIMEZONE option (code 41) -- POSIX timezone string
 # PODNAME: Net::DHCPv6::Option::NewPosixTimezone
-package Net::DHCPv6::Option::NewPosixTimezone;
-$Net::DHCPv6::Option::NewPosixTimezone::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Option::NewPosixTimezone;
+$Net::DHCPv6::Option::NewPosixTimezone::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
+use Carp qw( croak );
 use Net::DHCPv6::Constants;
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
@@ -16,14 +18,14 @@ sub new {
     $args{data} = $args{tz_string};
     my $self = $class->SUPER::new( %args );
     $self->{tz_string} = $args{tz_string};
-    bless $self, $class;
+    return bless $self, $class;
 }
 
-sub tz_string { shift->{tz_string} }
+sub tz_string { return shift->{tz_string} }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
-    return $class->new( tz_string => $data );
+    my ( $class, $code, $payload ) = @_;
+    return $class->new( tz_string => $payload );
 }
 
 $Net::DHCPv6::OptionList::OPTION_CLASS{$OPTION_NEW_POSIX_TIMEZONE} = __PACKAGE__;
@@ -33,15 +35,15 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::NewPosixTimezone - NEW_POSIX_TIMEZONE option (code 41) — POSIX timezone string
+Net::DHCPv6::Option::NewPosixTimezone - NEW_POSIX_TIMEZONE option (code 41) -- POSIX timezone string
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

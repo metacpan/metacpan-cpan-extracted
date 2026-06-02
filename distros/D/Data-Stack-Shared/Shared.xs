@@ -425,6 +425,7 @@ pop(self)
   CODE:
     uint8_t *buf;
     Newx(buf, h->elem_size, uint8_t);
+    SAVEFREEPV(buf);
     if (stk_try_pop(h, buf)) {
         uint32_t len;
         memcpy(&len, buf, sizeof(uint32_t));
@@ -434,7 +435,6 @@ pop(self)
     } else {
         RETVAL = &PL_sv_undef;
     }
-    Safefree(buf);
   OUTPUT:
     RETVAL
 
@@ -448,6 +448,7 @@ pop_wait(self, ...)
     if (items > 1) timeout = SvNV(ST(1));
     uint8_t *buf;
     Newx(buf, h->elem_size, uint8_t);
+    SAVEFREEPV(buf);
     if (stk_pop(h, buf, timeout)) {
         uint32_t len;
         memcpy(&len, buf, sizeof(uint32_t));
@@ -457,7 +458,6 @@ pop_wait(self, ...)
     } else {
         RETVAL = &PL_sv_undef;
     }
-    Safefree(buf);
   OUTPUT:
     RETVAL
 
@@ -469,6 +469,7 @@ peek(self)
   CODE:
     uint8_t *buf;
     Newx(buf, h->elem_size, uint8_t);
+    SAVEFREEPV(buf);
     if (stk_peek(h, buf)) {
         uint32_t len;
         memcpy(&len, buf, sizeof(uint32_t));
@@ -478,6 +479,5 @@ peek(self)
     } else {
         RETVAL = &PL_sv_undef;
     }
-    Safefree(buf);
   OUTPUT:
     RETVAL

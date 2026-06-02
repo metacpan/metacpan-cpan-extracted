@@ -2,30 +2,34 @@ use 5.006;
 use strict;
 use warnings;
 
+use IPC::Shareable;
 use Test::More;
 
-BEGIN {
-    warn "Segs before: " . `ipcs -m | wc -l` . "\n" if $ENV{PRINT_SEGS};
-    use_ok( 'Async::Event::Interval' ) || print "Bail out!\n";
+my $tmpfile = '/tmp/async_event_interval_seg_count';
+
+END {
+    unlink $tmpfile if defined $tmpfile && -e $tmpfile;
 }
 
-use IPC::Shareable;
+warn "Segs Before: " . IPC::Shareable::seg_count() . "\n" if $ENV{PRINT_SEGS};
+warn "Sems Before: " . IPC::Shareable::sem_count() . "\n" if $ENV{PRINT_SEGS};
 
-if (! $ENV{CI_TESTING}) {
-    done_testing();
-    exit;
-}
+open my $fh, '<', $tmpfile or die "Can't open $tmpfile for read: $!";
+chomp(my $start_segs = <$fh>);
+chomp(my $start_sems = <$fh>);
+close $fh;
 
-tie my %store, 'IPC::Shareable', { key => 'async_tests', destroy => 1 };
+my $removed = IPC::Shareable::clean_up_testing('Async::Event::Interval');
+diag "Suite-final clean_up_testing removed $removed leaked segments"
+    if $removed;
 
-my $start_segs = $store{segs};
+my $segs = IPC::Shareable::seg_count();
+my $sems = IPC::Shareable::sem_count();
 
-IPC::Shareable::clean_up_all;
+warn "Segs After: $segs\n" if $ENV{PRINT_SEGS};
+warn "Sems After: $sems\n" if $ENV{PRINT_SEGS};
 
-open my $fh, '>', '/tmp/ipc_shareable_ipc_count' or die "Can't open tmp file: $!";
-
-print $fh $start_segs;
-
-warn "Segs after: " . `ipcs -m | wc -l` . "\n" if $ENV{PRINT_SEGS};
+is $segs, $start_segs, "Started and ended test suite with $start_segs segs ok";
+is $sems, $start_sems, "Started and ended test suite with $start_sems sems ok";
 
 done_testing();

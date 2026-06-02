@@ -22,7 +22,7 @@ use Time::HiRes;
 @ISA = qw(Exporter);
 @EXPORT = qw(pingecho);
 @EXPORT_OK = qw(wakeonlan);
-$VERSION = "2.76";
+$VERSION = "2.77";
 
 # Globals
 

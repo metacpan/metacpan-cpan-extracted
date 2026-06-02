@@ -69,7 +69,6 @@ struct ev_ws_ctx_s {
     ev_ws_fd_t** fd_table;
     int fd_table_size;
     ev_timer timer;
-    ev_idle idle;
 };
 
 /* Connection structure */
@@ -81,7 +80,8 @@ struct ev_ws_conn_s {
     ev_ws_conn_t* prev;
 
     int refcnt;
-    SV* perl_self; /* Weak-ish reference to the Perl object */
+    SV* perl_self; /* non-owning ptr to the blessed RV's target; its existence
+                      holds one refcnt (added in get_conn_sv, dropped in DESTROY) */
 
     /* Callbacks */
     SV* on_connect;
@@ -147,11 +147,10 @@ static int ev_ws_debug = 0;
 /* Bridges userdata into ws_callback() before lws_adopt returns. */
 static ev_ws_conn_t* pending_adoption = NULL;
 static HV* handshake_headers_map = NULL; /* wsi-ptr → per-conn response headers HV */
-static int ev_ws_ssl_inited = 0;
+static struct lws_context* ssl_keepalive_ctx = NULL; /* see ensure_ssl_keepalive() */
 
-/* Capture a header value into an HV, dynamically allocating if needed */
-static void capture_header(struct lws *wsi, HV *hv, enum lws_token_indexes tok,
-                           const char *name, STRLEN nlen) {
+/* Copy an lws header token into a fresh SV, or return NULL if absent/empty */
+static SV* hdr_to_sv(struct lws *wsi, enum lws_token_indexes tok) {
     int total = lws_hdr_total_length(wsi, tok);
     if (total > 0) {
         char *buf;
@@ -160,11 +159,20 @@ static void capture_header(struct lws *wsi, HV *hv, enum lws_token_indexes tok,
         n = lws_hdr_copy(wsi, buf, total + 1, tok);
         if (n > 0) {
             SV *val = newSVpvn(buf, n);
-            if (!hv_store(hv, name, nlen, val, 0))
-                SvREFCNT_dec(val);
+            Safefree(buf);
+            return val;
         }
         Safefree(buf);
     }
+    return NULL;
+}
+
+/* Capture a header value into an HV under the given key */
+static void capture_header(struct lws *wsi, HV *hv, enum lws_token_indexes tok,
+                           const char *name, STRLEN nlen) {
+    SV *val = hdr_to_sv(wsi, tok);
+    if (val && !hv_store(hv, name, nlen, val, 0))
+        SvREFCNT_dec(val);
 }
 
 typedef struct { enum lws_token_indexes tok; const char *name; STRLEN nlen; } header_def_t;
@@ -188,26 +196,37 @@ static void capture_request_headers(struct lws *wsi, HV *hv) {
                        request_hdrs[i].name, request_hdrs[i].nlen);
 }
 
-/* Inject all key/value pairs from an HV as HTTP headers via lws */
-static void inject_headers(struct lws *wsi, HV *hv,
-                           unsigned char **p, unsigned char *end) {
+/* Inject all key/value pairs from an HV as HTTP headers via lws.
+   Returns -1 if lws rejected a header (client path aborts the handshake);
+   server callers ignore the result and simply stop adding. */
+static int inject_headers(struct lws *wsi, HV *hv,
+                          unsigned char **p, unsigned char *end) {
     HE *entry;
     char kbuf[256];
     hv_iterinit(hv);
     while ((entry = hv_iternext(hv))) {
         I32 klen;
         const char *key = hv_iterkey(entry, &klen);
-        SV *val_sv = hv_iterval(hv, entry);
+        SV *val_sv;
         STRLEN vlen;
-        const char *val = SvPV(val_sv, vlen);
+        const char *val;
         if (klen >= 254) continue;
+        val_sv = hv_iterval(hv, entry);
+        val = SvPV(val_sv, vlen);
         memcpy(kbuf, key, klen);
         kbuf[klen] = ':';
         kbuf[klen + 1] = '\0';
         if (lws_add_http_header_by_name(wsi, (unsigned char *)kbuf,
                 (unsigned char *)val, vlen, p, end))
-            break;
+            return -1;
     }
+    return 0;
+}
+
+/* Format a wsi pointer as the lookup key for handshake_headers_map.
+   Callers must pass a buffer of at least 32 bytes; returns the key length. */
+static int wsi_key(char *buf, struct lws *wsi) {
+    return snprintf(buf, 32, "%p", (void*)wsi);
 }
 
 #define DEBUG_LOG(fmt, ...) do { if (ev_ws_debug) fprintf(stderr, "[EV::WS] " fmt "\n", ##__VA_ARGS__); } while(0)
@@ -222,20 +241,23 @@ static void ctx_unref(ev_ws_ctx_t* ctx) {
     }
 }
 
-/* Helper to schedule next timeout */
+/* Schedule the next lws housekeeping wake-up.
+
+   lws_service_adjust_timeout returns the ms until lws next needs servicing; 0
+   means "service as soon as possible". This timer only paces lws's time-based
+   work (connection/handshake timeouts, TLS cert aging, draining buffered rx) --
+   socket readability/writability is driven by the per-fd io watcher, not here.
+   We deliberately floor the delay at 1ms rather than arming an ev_idle watcher
+   on 0: do_lws_service is now non-blocking, so an always-ready idle watcher
+   would busy-spin at 100% CPU whenever lws keeps asking for immediate service.
+   A 1ms floor lets the loop block briefly so every other EV watcher still
+   fires, at negligible latency for this coarse, time-based work. */
 static void schedule_timeout(ev_ws_ctx_t* ctx) {
-    /* lws_service_adjust_timeout returns ms; 0 means work pending */
     int delay_ms = lws_service_adjust_timeout(ctx->lws_ctx, 1000, 0);
+    double delay_s;
 
-    if (delay_ms <= 0) {
-        ev_idle_start(ctx->loop, &ctx->idle);
-        ev_timer_stop(ctx->loop, &ctx->timer);
-        return;
-    }
-
-    ev_idle_stop(ctx->loop, &ctx->idle);
-
-    double delay_s = (double)delay_ms / 1000.0;
+    if (delay_ms < 1) delay_ms = 1;
+    delay_s = (double)delay_ms / 1000.0;
 
     ev_timer_stop(ctx->loop, &ctx->timer);
     ev_timer_set(&ctx->timer, delay_s, 0.);
@@ -248,7 +270,17 @@ static void do_lws_service(ev_ws_ctx_t* ctx) {
         int* prev_flag = ctx->alive_flag;
         ctx->alive_flag = &alive;
         ctx_ref(ctx);
-        lws_service(ctx->lws_ctx, 0);
+        /* "Forced service": drive connections that need servicing with no
+           pending socket event -- rx already read into lws's buflist, plus any
+           due lws_sul timeouts. Counterintuitively a timeout_ms of 0 is NOT
+           non-blocking here: lws maps it to its maximum internal poll wait, so
+           the old lws_service(ctx, 0) blocked for seconds on an idle connection
+           and starved every other EV watcher. A negative timeout_ms clamps the
+           wait to 0, servicing only ready + forced-service work and returning at
+           once (see the lws_service_adjust_timeout docs). lws_service_fd(ctx,
+           NULL) is invalid since lws 3.2 and never drains buflists. Per-fd I/O
+           is driven by io_cb via lws_service_fd(&pollfd). */
+        lws_service_tsi(ctx->lws_ctx, -1, 0);
         if (alive) {
             ctx->alive_flag = prev_flag;
             schedule_timeout(ctx);
@@ -257,11 +289,6 @@ static void do_lws_service(ev_ws_ctx_t* ctx) {
         }
         ctx_unref(ctx);
     }
-}
-
-static void idle_cb(EV_P_ ev_idle* w, int revents) {
-    (void)loop; (void)revents;
-    do_lws_service((ev_ws_ctx_t*)w->data);
 }
 
 static void timer_cb(EV_P_ ev_timer* w, int revents) {
@@ -293,138 +320,128 @@ static SV* get_conn_sv(ev_ws_conn_t* conn) {
     return rv;
 }
 
-static void emit_error(ev_ws_conn_t* conn, const char* error) {
-    if (conn == NULL || conn->on_error == NULL) return;
+/* All emit_* callbacks share this skeleton: guard on a registered handler,
+   ref the conn across the call (a callback may close/destroy it), push $conn
+   plus handler-specific args, invoke under G_EVAL, and warn — without
+   recursing — on a die.  EMIT_BEGIN opens a block that EMIT_END closes;
+   handler-specific args are XPUSHs'd in between. */
+#define EMIT_BEGIN(conn, cb_field)                          \
+    if ((conn) == NULL || (conn)->cb_field == NULL) return; \
+    {                                                       \
+        SV* _emit_cb = (conn)->cb_field;                    \
+        dSP;                                                \
+        ENTER;                                              \
+        SAVETMPS;                                           \
+        PUSHMARK(SP);                                       \
+        conn_ref(conn);                                     \
+        XPUSHs(sv_2mortal(get_conn_sv(conn)));
 
-    dSP;
-    ENTER;
-    SAVETMPS;
-    PUSHMARK(SP);
-    conn_ref(conn);
-    XPUSHs(sv_2mortal(get_conn_sv(conn)));
-    XPUSHs(sv_2mortal(newSVpv(error, 0)));
-    PUTBACK;
-    sv_setsv(ERRSV, &PL_sv_undef);
-    call_sv(conn->on_error, G_DISCARD | G_EVAL);
-    if (SvTRUE(ERRSV)) {
-        warn("EV::Websockets: exception in error handler: %s", SvPV_nolen(ERRSV));
+#define EMIT_END(conn, label)                               \
+        PUTBACK;                                            \
+        sv_setsv(ERRSV, &PL_sv_undef);                      \
+        call_sv(_emit_cb, G_DISCARD | G_EVAL);              \
+        if (SvTRUE(ERRSV))                                  \
+            warn("EV::Websockets: exception in " label ": %s", SvPV_nolen(ERRSV)); \
+        FREETMPS;                                           \
+        LEAVE;                                              \
+        conn_unref(conn);                                   \
     }
-    FREETMPS;
-    LEAVE;
-    conn_unref(conn);
+
+/* Guard shared by the send_* methods: croak if the connection has been
+   destroyed or is not currently open for writing. */
+#define CHECK_CONN_OPEN(self) STMT_START {                          \
+        if ((self)->magic != EV_WS_CONN_MAGIC)                      \
+            croak("Connection has been destroyed");                 \
+        if (!(self)->wsi || !(self)->connected || (self)->closing)  \
+            croak("Connection is not open");                        \
+    } STMT_END
+
+/* Guard for send/send_binary: a whole-message write must not interleave with
+   an in-progress fragmented message. */
+#define CHECK_NOT_FRAGMENTING(self) STMT_START {                    \
+        if ((self)->in_fragmented_send)                             \
+            croak("Cannot send while a fragmented message is in progress; " \
+                  "finish the fragment with send_fragment(..., is_final => 1) first"); \
+    } STMT_END
+
+static void emit_error(ev_ws_conn_t* conn, const char* error) {
+    EMIT_BEGIN(conn, on_error);
+    XPUSHs(sv_2mortal(newSVpv(error, 0)));
+    EMIT_END(conn, "error handler");
 }
 
 static void emit_connect(ev_ws_conn_t* conn) {
-    if (conn == NULL || conn->on_connect == NULL) return;
-
-    dSP;
-    ENTER;
-    SAVETMPS;
-    PUSHMARK(SP);
-    conn_ref(conn);
-    XPUSHs(sv_2mortal(get_conn_sv(conn)));
-
-    if (conn->response_headers) {
+    EMIT_BEGIN(conn, on_connect);
+    if (conn->response_headers)
         XPUSHs(sv_2mortal(newRV_inc((SV*)conn->response_headers)));
-    } else {
+    else
         XPUSHs(&PL_sv_undef);
-    }
-
-    PUTBACK;
-    sv_setsv(ERRSV, &PL_sv_undef);
-    call_sv(conn->on_connect, G_DISCARD | G_EVAL);
-    if (SvTRUE(ERRSV)) {
-        warn("EV::Websockets: exception in connect handler: %s", SvPV_nolen(ERRSV));
-    }
-    FREETMPS;
-    LEAVE;
-    conn_unref(conn);
+    EMIT_END(conn, "connect handler");
 }
 
 static void emit_message(ev_ws_conn_t* conn, const char* data, size_t len, int is_binary, int is_final) {
-    if (conn == NULL || conn->on_message == NULL) return;
-
-    dSP;
-    ENTER;
-    SAVETMPS;
-    PUSHMARK(SP);
-    conn_ref(conn);
-    XPUSHs(sv_2mortal(get_conn_sv(conn)));
+    EMIT_BEGIN(conn, on_message);
     XPUSHs(sv_2mortal(newSVpvn(data, len)));
     XPUSHs(sv_2mortal(newSViv(is_binary)));
     XPUSHs(sv_2mortal(newSViv(is_final)));
-    PUTBACK;
-    sv_setsv(ERRSV, &PL_sv_undef);
-    call_sv(conn->on_message, G_DISCARD | G_EVAL);
-    if (SvTRUE(ERRSV)) {
-        warn("EV::Websockets: exception in message handler: %s", SvPV_nolen(ERRSV));
-    }
-    FREETMPS;
-    LEAVE;
-    conn_unref(conn);
+    EMIT_END(conn, "message handler");
 }
 
 static void emit_close(ev_ws_conn_t* conn, int code, const char* reason) {
-    if (conn == NULL || conn->on_close == NULL) return;
-
-    dSP;
-    ENTER;
-    SAVETMPS;
-    PUSHMARK(SP);
-    conn_ref(conn);
-    XPUSHs(sv_2mortal(get_conn_sv(conn)));
+    EMIT_BEGIN(conn, on_close);
     XPUSHs(sv_2mortal(newSViv(code)));
     XPUSHs(reason ? sv_2mortal(newSVpv(reason, 0)) : &PL_sv_undef);
-    PUTBACK;
-    sv_setsv(ERRSV, &PL_sv_undef);
-    call_sv(conn->on_close, G_DISCARD | G_EVAL);
-    if (SvTRUE(ERRSV)) {
-        warn("EV::Websockets: exception in close handler: %s", SvPV_nolen(ERRSV));
-    }
-    FREETMPS;
-    LEAVE;
-    conn_unref(conn);
+    EMIT_END(conn, "close handler");
 }
 
 static void emit_pong(ev_ws_conn_t* conn, const char* data, size_t len) {
-    if (conn == NULL || conn->on_pong == NULL) return;
-
-    dSP;
-    ENTER;
-    SAVETMPS;
-    PUSHMARK(SP);
-    conn_ref(conn);
-    XPUSHs(sv_2mortal(get_conn_sv(conn)));
+    EMIT_BEGIN(conn, on_pong);
     XPUSHs(sv_2mortal(newSVpvn(data ? data : "", len)));
-    PUTBACK;
-    sv_setsv(ERRSV, &PL_sv_undef);
-    call_sv(conn->on_pong, G_DISCARD | G_EVAL);
-    if (SvTRUE(ERRSV)) {
-        warn("EV::Websockets: exception in pong handler: %s", SvPV_nolen(ERRSV));
-    }
-    FREETMPS;
-    LEAVE;
-    conn_unref(conn);
+    EMIT_END(conn, "pong handler");
 }
 
 static void emit_drain(ev_ws_conn_t* conn) {
-    if (conn == NULL || conn->on_drain == NULL) return;
+    EMIT_BEGIN(conn, on_drain);
+    EMIT_END(conn, "drain handler");
+}
 
-    dSP;
-    ENTER;
-    SAVETMPS;
-    PUSHMARK(SP);
-    conn_ref(conn);
-    XPUSHs(sv_2mortal(get_conn_sv(conn)));
-    PUTBACK;
-    sv_setsv(ERRSV, &PL_sv_undef);
-    call_sv(conn->on_drain, G_DISCARD | G_EVAL);
-    if (SvTRUE(ERRSV)) {
-        warn("EV::Websockets: exception in drain handler: %s", SvPV_nolen(ERRSV));
+/* Stop the connect-timeout watcher if it is running */
+static void stop_connect_timer(ev_ws_conn_t* conn) {
+    if (conn->connect_timer_active && conn->loop) {
+        ev_timer_stop(conn->loop, &conn->connect_timer);
+        conn->connect_timer_active = 0;
     }
-    FREETMPS;
-    LEAVE;
-    conn_unref(conn);
+}
+
+/* Drop references to the (up to seven) callback SVs collected while parsing
+   options, on an error path that croaks before they are owned elsewhere.
+   Pass NULL for absent slots; SvREFCNT_dec of NULL is guarded out. */
+static void free_cb_svs(SV* on_connect, SV* on_message, SV* on_close,
+                        SV* on_error, SV* on_pong, SV* on_drain,
+                        SV* on_handshake) {
+    if (on_connect)   SvREFCNT_dec(on_connect);
+    if (on_message)   SvREFCNT_dec(on_message);
+    if (on_close)     SvREFCNT_dec(on_close);
+    if (on_error)     SvREFCNT_dec(on_error);
+    if (on_pong)      SvREFCNT_dec(on_pong);
+    if (on_drain)     SvREFCNT_dec(on_drain);
+    if (on_handshake) SvREFCNT_dec(on_handshake);
+}
+
+/* Drop the server's callback/header SV references (not protocol_name, which the
+   live vhost still points at, nor the struct itself). Idempotent via NULL-out. */
+static void free_server_svs(ev_ws_server_t* srv) {
+    if (srv->on_connect)   { SvREFCNT_dec(srv->on_connect);   srv->on_connect = NULL; }
+    if (srv->on_message)   { SvREFCNT_dec(srv->on_message);   srv->on_message = NULL; }
+    if (srv->on_close)     { SvREFCNT_dec(srv->on_close);     srv->on_close = NULL; }
+    if (srv->on_error)     { SvREFCNT_dec(srv->on_error);     srv->on_error = NULL; }
+    if (srv->on_pong)      { SvREFCNT_dec(srv->on_pong);      srv->on_pong = NULL; }
+    if (srv->on_drain)     { SvREFCNT_dec(srv->on_drain);     srv->on_drain = NULL; }
+    if (srv->on_handshake) { SvREFCNT_dec(srv->on_handshake); srv->on_handshake = NULL; }
+    if (srv->response_headers) {
+        SvREFCNT_dec((SV*)srv->response_headers);
+        srv->response_headers = NULL;
+    }
 }
 
 /* Free a connection's resources (not the struct itself) */
@@ -434,10 +451,7 @@ static void free_conn_resources(ev_ws_conn_t* conn) {
 
     DEBUG_LOG("Freeing connection resources: conn=%p", conn);
 
-    if (conn->connect_timer_active && conn->loop) {
-        ev_timer_stop(conn->loop, &conn->connect_timer);
-        conn->connect_timer_active = 0;
-    }
+    stop_connect_timer(conn);
 
     if (conn->on_connect) { SvREFCNT_dec(conn->on_connect); conn->on_connect = NULL; }
     if (conn->on_message) { SvREFCNT_dec(conn->on_message); conn->on_message = NULL; }
@@ -733,36 +747,15 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
             if (conn && conn->custom_headers) {
                 unsigned char **p = (unsigned char **)in;
                 unsigned char *end = (*p) + len;
-                HV* hv = conn->custom_headers;
-                HE* entry;
-                char kbuf[256];
-
-                hv_iterinit(hv);
-                while ((entry = hv_iternext(hv))) {
-                    I32 klen = 0;
-                    char *key = hv_iterkey(entry, &klen);
-                    SV *val_sv = hv_iterval(hv, entry);
-                    STRLEN vlen = 0;
-                    const char *val;
-
-                    if (klen >= 254) continue;
-                    val = SvPV(val_sv, vlen);
-
-                    memcpy(kbuf, key, klen);
-                    kbuf[klen] = ':';
-                    kbuf[klen+1] = '\0';
-
-                    if (lws_add_http_header_by_name(wsi, (unsigned char*)kbuf, (unsigned char*)val, vlen, p, end)) {
-                        return -1;
-                    }
-                }
+                if (inject_headers(wsi, conn->custom_headers, p, end))
+                    return -1;
             }
             break;
         }
         
         case LWS_CALLBACK_CLIENT_FILTER_PRE_ESTABLISH: {
             if (conn && conn->magic == EV_WS_CONN_MAGIC) {
-                static const struct { enum lws_token_indexes tok; const char *name; STRLEN nlen; } resp_hdrs[] = {
+                static const header_def_t resp_hdrs[] = {
                     { WSI_TOKEN_HTTP_SET_COOKIE, "Set-Cookie", 10 },
                     { WSI_TOKEN_HTTP_CONTENT_TYPE, "Content-Type", 12 },
                     { WSI_TOKEN_HTTP_SERVER, "Server", 6 },
@@ -819,7 +812,7 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
                 }
                 if (SvROK(result) && SvTYPE(SvRV(result)) == SVt_PVHV) {
                     char key[32];
-                    int klen = snprintf(key, sizeof(key), "%p", (void*)wsi);
+                    int klen = wsi_key(key, wsi);
                     SV *val = newRV_inc(SvRV(result));
                     if (!handshake_headers_map)
                         handshake_headers_map = newHV();
@@ -865,10 +858,7 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
         case LWS_CALLBACK_CLIENT_ESTABLISHED:
             if (conn && conn->magic == EV_WS_CONN_MAGIC) {
                 DEBUG_LOG("Connected (reason %d): conn=%p", (int)reason, conn);
-                if (conn->connect_timer_active) {
-                    ev_timer_stop(conn->loop, &conn->connect_timer);
-                    conn->connect_timer_active = 0;
-                }
+                stop_connect_timer(conn);
                 conn->connected = 1;
                 emit_connect(conn);
             }
@@ -884,7 +874,7 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
                                (unsigned char **)&args->p, p_end);
             if (handshake_headers_map) {
                 char key[32];
-                int klen = snprintf(key, sizeof(key), "%p", (void*)wsi);
+                int klen = wsi_key(key, wsi);
                 SV *val = hv_delete(handshake_headers_map, key, klen, 0);
                 if (val && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVHV)
                     inject_headers(wsi, (HV*)SvRV(val), (unsigned char **)&args->p, p_end);
@@ -934,7 +924,8 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
                     Renew(conn->recv_buf, new_alloc, char);
                     conn->recv_alloc = new_alloc;
                 }
-                memcpy(conn->recv_buf + conn->recv_len, in, len);
+                if (len) /* guard: recv_buf may still be NULL for an empty frame */
+                    memcpy(conn->recv_buf + conn->recv_len, in, len);
                 conn->recv_len += len;
 
                 if (is_final) {
@@ -986,8 +977,8 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
                     DEBUG_LOG("Closing connection via writeable callback");
                     return -1;
                 }
-                if (conn->send_head == NULL && conn->on_drain) {
-                    emit_drain(conn);
+                if (conn->send_head == NULL) {
+                    emit_drain(conn); /* self-guards on a registered on_drain */
                 }
             }
             break;
@@ -996,10 +987,7 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
             DEBUG_LOG("CLIENT_CONNECTION_ERROR: conn=%p", conn);
             if (conn && conn->magic == EV_WS_CONN_MAGIC) {
                 const char* err = in ? (const char*)in : "connection error";
-                if (conn->connect_timer_active) {
-                    ev_timer_stop(conn->loop, &conn->connect_timer);
-                    conn->connect_timer_active = 0;
-                }
+                stop_connect_timer(conn);
                 /* Clear wsi user pointer so WSI_DESTROY (which follows) sees NULL
                    and skips — we handle cleanup here to avoid double conn_unref
                    if Context::DESTROY fires from within the callback. */
@@ -1019,10 +1007,7 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
             DEBUG_LOG("CLOSED: conn=%p", conn);
             if (conn && conn->magic == EV_WS_CONN_MAGIC) {
                 int close_code = 1000;
-                if (conn->connect_timer_active) {
-                    ev_timer_stop(conn->loop, &conn->connect_timer);
-                    conn->connect_timer_active = 0;
-                }
+                stop_connect_timer(conn);
                 const char* close_reason = NULL;
                 char reason_buf[126];
 
@@ -1054,17 +1039,12 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
             if (vh) {
                 ev_ws_server_t *srv = (ev_ws_server_t *)lws_get_vhost_user(vh);
                 if (srv && (srv->magic == EV_WS_SRV_MAGIC || srv->magic == EV_WS_SRV_FREED)) {
-                    if (srv->magic == EV_WS_SRV_MAGIC) {
-                        if (srv->on_connect) SvREFCNT_dec(srv->on_connect);
-                        if (srv->on_message) SvREFCNT_dec(srv->on_message);
-                        if (srv->on_close)   SvREFCNT_dec(srv->on_close);
-                        if (srv->on_error)   SvREFCNT_dec(srv->on_error);
-                        if (srv->on_pong)    SvREFCNT_dec(srv->on_pong);
-                        if (srv->on_drain)   SvREFCNT_dec(srv->on_drain);
-                        if (srv->on_handshake) SvREFCNT_dec(srv->on_handshake);
-                        if (srv->response_headers) SvREFCNT_dec((SV*)srv->response_headers);
-                        if (srv->protocol_name) Safefree(srv->protocol_name);
-                    }
+                    /* SRV_FREED means a failed listen() already dropped the SV
+                       refs but deliberately left protocol_name alive (the vhost
+                       still pointed at it); free it here, once, at teardown. */
+                    if (srv->magic == EV_WS_SRV_MAGIC)
+                        free_server_svs(srv);
+                    if (srv->protocol_name) Safefree(srv->protocol_name);
                     Safefree(srv);
                 }
             }
@@ -1074,7 +1054,7 @@ static int ws_callback(struct lws* wsi, enum lws_callback_reasons reason,
         case LWS_CALLBACK_WSI_DESTROY:
             if (handshake_headers_map) {
                 char key[32];
-                int klen = snprintf(key, sizeof(key), "%p", (void*)wsi);
+                int klen = wsi_key(key, wsi);
                 hv_delete(handshake_headers_map, key, klen, G_DISCARD);
             }
             if (conn && conn->magic == EV_WS_CONN_MAGIC) {
@@ -1105,6 +1085,37 @@ static const struct lws_protocols protocols[] = {
     },
     { NULL, NULL, 0, 0, 0, NULL, 0 }
 };
+
+/* Pin libwebsockets' global TLS init for the whole process.
+
+   lws refcounts the global OpenSSL init across contexts created with
+   LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT. When that refcount falls to zero (the
+   last such context is destroyed) lws runs OPENSSL_cleanup(), which OpenSSL
+   1.1+/3.x cannot undo: creating another TLS context then fails, and lws's own
+   error reporting dereferences torn-down state and crashes. So a program that
+   destroys its TLS context and makes a new one (reconnect-with-fresh-ctx,
+   worker recycling, test suites) would break.
+
+   A TLS-using context still needs its own GLOBAL_INIT flag for its TLS to work
+   (the flag is per-context: "initialize the SSL library at all"); we keep that.
+   This keepalive is a single extra flagged context, created on first TLS use
+   and never destroyed or serviced, that holds the refcount floor at >= 1 so no
+   user context's teardown can trigger the cleanup. Returns 1 if held.
+
+   Idempotent; single-threaded use only (like the rest of this module). */
+static int ensure_ssl_keepalive(void) {
+    struct lws_context_creation_info info;
+    if (ssl_keepalive_ctx)
+        return 1;
+    memset(&info, 0, sizeof(info));
+    info.port = CONTEXT_PORT_NO_LISTEN;
+    info.protocols = protocols;
+    info.gid = -1;
+    info.uid = -1;
+    info.options = LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
+    ssl_keepalive_ctx = lws_create_context(&info);
+    return ssl_keepalive_ctx != NULL;
+}
 
 MODULE = EV::Websockets  PACKAGE = EV::Websockets
 
@@ -1151,9 +1162,16 @@ CODE:
 #endif
     info.gid = -1;
     info.uid = -1;
-    if (ssl_init == -1)
-        ssl_init = ev_ws_ssl_inited ? 0 : 1;
-    info.options = ssl_init ? LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT : 0;
+    /* ssl_init: -1 = manage OpenSSL init (default); 1 = force; 0 = coexist
+       (leave it to another TLS library). When we manage it, flag this context
+       so its own TLS works, and also pin the global init in a process-lifetime
+       keepalive so destroying this context can't drop lws's TLS refcount to
+       zero (which would run OPENSSL_cleanup() and break later TLS use). */
+    info.options = 0;
+    if (ssl_init != 0) {
+        info.options = LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
+        ensure_ssl_keepalive();
+    }
     info.user = RETVAL;
     info.foreign_loops = foreign_loops;
     info.vhost_name = "default";
@@ -1178,13 +1196,8 @@ CODE:
         Safefree(RETVAL);
         croak("Failed to create libwebsockets context");
     }
-    if (ssl_init)
-        ev_ws_ssl_inited = 1;
     ev_timer_init(&RETVAL->timer, timer_cb, 0.00001, 0.);
     RETVAL->timer.data = (void*)RETVAL;
-
-    ev_idle_init(&RETVAL->idle, idle_cb);
-    RETVAL->idle.data = (void*)RETVAL;
 
     schedule_timeout(RETVAL);
 
@@ -1205,7 +1218,6 @@ CODE:
     self->magic = EV_WS_CTX_FREED;
 
     ev_timer_stop(self->loop, &self->timer);
-    ev_idle_stop(self->loop, &self->idle);
 
     free_all_fd_watchers(self);
 
@@ -1297,12 +1309,7 @@ CODE:
     }
 
     if (url == NULL) {
-        if (on_connect) SvREFCNT_dec(on_connect);
-        if (on_message) SvREFCNT_dec(on_message);
-        if (on_close) SvREFCNT_dec(on_close);
-        if (on_error) SvREFCNT_dec(on_error);
-        if (on_pong) SvREFCNT_dec(on_pong);
-        if (on_drain) SvREFCNT_dec(on_drain);
+        free_cb_svs(on_connect, on_message, on_close, on_error, on_pong, on_drain, NULL);
         croak("url parameter is required");
     }
 
@@ -1322,12 +1329,7 @@ CODE:
         host = url_copy + 5;
     } else {
         Safefree(url_copy);
-        if (on_connect) SvREFCNT_dec(on_connect);
-        if (on_message) SvREFCNT_dec(on_message);
-        if (on_close) SvREFCNT_dec(on_close);
-        if (on_error) SvREFCNT_dec(on_error);
-        if (on_pong) SvREFCNT_dec(on_pong);
-        if (on_drain) SvREFCNT_dec(on_drain);
+        free_cb_svs(on_connect, on_message, on_close, on_error, on_pong, on_drain, NULL);
         croak("URL must start with ws:// or wss://");
     }
 
@@ -1403,7 +1405,7 @@ CODE:
     RETVAL->wsi = lws_client_connect_via_info(&ccinfo);
 
     Safefree(path);
-    if (host_header) Safefree(host_header);
+    Safefree(host_header);
     Safefree(url_copy);
 
     if (RETVAL->wsi == NULL) {
@@ -1496,13 +1498,7 @@ CODE:
     }
 
     if (strcmp(name, "default") == 0) {
-        if (on_connect) SvREFCNT_dec(on_connect);
-        if (on_message) SvREFCNT_dec(on_message);
-        if (on_close) SvREFCNT_dec(on_close);
-        if (on_error) SvREFCNT_dec(on_error);
-        if (on_pong) SvREFCNT_dec(on_pong);
-        if (on_drain) SvREFCNT_dec(on_drain);
-        if (on_handshake) SvREFCNT_dec(on_handshake);
+        free_cb_svs(on_connect, on_message, on_close, on_error, on_pong, on_drain, on_handshake);
         croak("listen: vhost name 'default' is reserved");
     }
 
@@ -1541,18 +1537,12 @@ CODE:
         if (ssl_ca)
             info.ssl_ca_filepath = ssl_ca;
         info.options |= LWS_SERVER_OPTION_DO_SSL_GLOBAL_INIT;
+        ensure_ssl_keepalive(); /* pin global init so vhost/context teardown won't OPENSSL_cleanup */
     }
 
     vh = lws_create_vhost(self->lws_ctx, &info);
     if (vh == NULL) {
-        if (on_connect) SvREFCNT_dec(on_connect);
-        if (on_message) SvREFCNT_dec(on_message);
-        if (on_close) SvREFCNT_dec(on_close);
-        if (on_error) SvREFCNT_dec(on_error);
-        if (on_pong) SvREFCNT_dec(on_pong);
-        if (on_drain) SvREFCNT_dec(on_drain);
-        if (on_handshake) SvREFCNT_dec(on_handshake);
-        if (srv->response_headers) SvREFCNT_dec((SV*)srv->response_headers);
+        free_server_svs(srv);
         if (srv->protocol_name) Safefree(srv->protocol_name);
         Safefree(srv);
         croak("Failed to create vhost for listening");
@@ -1560,21 +1550,13 @@ CODE:
     
     RETVAL = lws_get_vhost_listen_port(vh);
     if (RETVAL <= 0) {
-        /* Vhost created but port bind failed. Release SV refs now.
-           Do NOT Safefree(srv) — the vhost retains the pointer.
-           PROTOCOL_DESTROY will Safefree(srv) on context teardown;
-           SRV_FREED sentinel tells it to skip SvREFCNT_dec. */
-        if (srv->on_connect) { SvREFCNT_dec(srv->on_connect); srv->on_connect = NULL; }
-        if (srv->on_message) { SvREFCNT_dec(srv->on_message); srv->on_message = NULL; }
-        if (srv->on_close)   { SvREFCNT_dec(srv->on_close);   srv->on_close = NULL; }
-        if (srv->on_error)   { SvREFCNT_dec(srv->on_error);   srv->on_error = NULL; }
-        if (srv->on_pong)    { SvREFCNT_dec(srv->on_pong);    srv->on_pong = NULL; }
-        if (srv->on_drain)   { SvREFCNT_dec(srv->on_drain);   srv->on_drain = NULL; }
-        if (srv->on_handshake) { SvREFCNT_dec(srv->on_handshake); srv->on_handshake = NULL; }
-        if (srv->response_headers) { SvREFCNT_dec((SV*)srv->response_headers); srv->response_headers = NULL; }
-        if (srv->protocol_name) {
-            Safefree(srv->protocol_name); srv->protocol_name = NULL;
-        }
+        /* Vhost created but port bind failed. Release the SV refs now, but
+           leave protocol_name alive — the live vhost still points at it via
+           vhost_protocols[0].name, so freeing it here would dangle. Do NOT
+           Safefree(srv): the vhost retains the pointer. PROTOCOL_DESTROY frees
+           protocol_name and srv at context teardown; the SRV_FREED sentinel
+           tells it to skip the (already-released) SV refs. */
+        free_server_svs(srv);
         srv->magic = EV_WS_SRV_FREED;
         croak("listen: failed to bind port");
     }
@@ -1630,24 +1612,14 @@ CODE:
     }
 
     if (fh_sv == NULL) {
-        if (on_connect) SvREFCNT_dec(on_connect);
-        if (on_message) SvREFCNT_dec(on_message);
-        if (on_close) SvREFCNT_dec(on_close);
-        if (on_error) SvREFCNT_dec(on_error);
-        if (on_pong) SvREFCNT_dec(on_pong);
-        if (on_drain) SvREFCNT_dec(on_drain);
+        free_cb_svs(on_connect, on_message, on_close, on_error, on_pong, on_drain, NULL);
         croak("fh parameter is required");
     }
 
     IO* io = sv_2io(fh_sv);
     PerlIO *ifp = io ? IoIFP(io) : NULL;
     if (!ifp || (fd = PerlIO_fileno(ifp)) < 0) {
-        if (on_connect) SvREFCNT_dec(on_connect);
-        if (on_message) SvREFCNT_dec(on_message);
-        if (on_close) SvREFCNT_dec(on_close);
-        if (on_error) SvREFCNT_dec(on_error);
-        if (on_pong) SvREFCNT_dec(on_pong);
-        if (on_drain) SvREFCNT_dec(on_drain);
+        free_cb_svs(on_connect, on_message, on_close, on_error, on_pong, on_drain, NULL);
         croak("Invalid filehandle");
     }
 
@@ -1714,8 +1686,12 @@ CODE:
     }
     conn_unref(RETVAL); /* drop sentinel */
 
-    /* Kick lws to process readbuf data (needed for lws 4.5+).
-     * Guard with extra refs: lws_service may synchronously fire
+    /* Kick lws to process the adopted socket's readbuf (needed for lws 4.5+).
+     * Use the same non-blocking forced-service call as do_lws_service: the
+     * readbuf is pending work, so lws_service_tsi(ctx, -1, 0) drains it without
+     * blocking. A plain lws_service(ctx, 0) would block the EV loop here when a
+     * socket is adopted with no immediately-pending data.
+     * Guard with extra refs: the service call may synchronously fire
      * error/destroy callbacks that would free RETVAL or ctx. */
     {
         int rejected, alive = 1;
@@ -1723,7 +1699,7 @@ CODE:
         conn_ref(RETVAL);
         ctx_ref(self);
         self->alive_flag = &alive;
-        lws_service(self->lws_ctx, 0);
+        lws_service_tsi(self->lws_ctx, -1, 0);
         if (alive) {
             self->alive_flag = prev_flag;
             schedule_timeout(self);
@@ -1749,6 +1725,9 @@ PPCODE:
     ev_ws_conn_t* conn;
     if (self->magic != EV_WS_CTX_MAGIC) XSRETURN_EMPTY;
     for (conn = self->connections; conn != NULL; conn = conn->next) {
+        /* "connected" stays set during the "closing" drain (close() never
+           clears it), and is cleared together with wsi on teardown — so this
+           single predicate covers both the "connected" and "closing" states. */
         if (conn->magic == EV_WS_CONN_MAGIC && conn->connected) {
             XPUSHs(sv_2mortal(get_conn_sv(conn)));
         }
@@ -1778,16 +1757,8 @@ CODE:
     STRLEN len;
     const char* buf;
 
-    if (self->magic != EV_WS_CONN_MAGIC) {
-        croak("Connection has been destroyed");
-    }
-    if (!self->wsi || !self->connected || self->closing) {
-        croak("Connection is not open");
-    }
-    if (self->in_fragmented_send) {
-        croak("Cannot send while a fragmented message is in progress; "
-              "finish the fragment with send_fragment(..., is_final => 1) first");
-    }
+    CHECK_CONN_OPEN(self);
+    CHECK_NOT_FRAGMENTING(self);
 
     buf = SvPV(data, len);
     queue_send(self, buf, len, LWS_WRITE_TEXT);
@@ -1800,16 +1771,8 @@ CODE:
     STRLEN len;
     const char* buf;
 
-    if (self->magic != EV_WS_CONN_MAGIC) {
-        croak("Connection has been destroyed");
-    }
-    if (!self->wsi || !self->connected || self->closing) {
-        croak("Connection is not open");
-    }
-    if (self->in_fragmented_send) {
-        croak("Cannot send while a fragmented message is in progress; "
-              "finish the fragment with send_fragment(..., is_final => 1) first");
-    }
+    CHECK_CONN_OPEN(self);
+    CHECK_NOT_FRAGMENTING(self);
 
     buf = SvPV(data, len);
     queue_send(self, buf, len, LWS_WRITE_BINARY);
@@ -1822,12 +1785,7 @@ CODE:
     STRLEN len = 0;
     const char* buf = NULL;
     
-    if (self->magic != EV_WS_CONN_MAGIC) {
-        croak("Connection has been destroyed");
-    }
-    if (!self->wsi || !self->connected || self->closing) {
-        croak("Connection is not open");
-    }
+    CHECK_CONN_OPEN(self);
     
     if (data && SvOK(data)) {
         buf = SvPV(data, len);
@@ -1841,19 +1799,10 @@ SV*
 get_protocol(EV::Websockets::Connection self);
 CODE:
 {
-    RETVAL = newSV(0);
-    if (self->magic == EV_WS_CONN_MAGIC && self->wsi) {
-        int total = lws_hdr_total_length(self->wsi, WSI_TOKEN_PROTOCOL);
-        if (total > 0) {
-            char *buf;
-            int n;
-            Newx(buf, total + 1, char);
-            n = lws_hdr_copy(self->wsi, buf, total + 1, WSI_TOKEN_PROTOCOL);
-            if (n > 0)
-                sv_setpvn(RETVAL, buf, n);
-            Safefree(buf);
-        }
-    }
+    SV* val = NULL;
+    if (self->magic == EV_WS_CONN_MAGIC && self->wsi)
+        val = hdr_to_sv(self->wsi, WSI_TOKEN_PROTOCOL);
+    RETVAL = val ? val : newSV(0);
 }
 OUTPUT:
     RETVAL
@@ -1881,12 +1830,7 @@ CODE:
     STRLEN len = 0;
     const char* buf = NULL;
 
-    if (self->magic != EV_WS_CONN_MAGIC) {
-        croak("Connection has been destroyed");
-    }
-    if (!self->wsi || !self->connected || self->closing) {
-        croak("Connection is not open");
-    }
+    CHECK_CONN_OPEN(self);
 
     if (data && SvOK(data)) {
         buf = SvPV(data, len);
@@ -1983,10 +1927,7 @@ CODE:
     const char* buf;
     enum lws_write_protocol mode;
 
-    if (self->magic != EV_WS_CONN_MAGIC)
-        croak("Connection has been destroyed");
-    if (!self->wsi || !self->connected || self->closing)
-        croak("Connection is not open");
+    CHECK_CONN_OPEN(self);
 
     buf = SvPV(data, len);
 

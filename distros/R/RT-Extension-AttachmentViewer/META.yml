@@ -24,8 +24,8 @@ requires:
   perl: 5.10.1
 resources:
   license: http://opensource.org/licenses/gpl-license.php
-  repository: https://github.com/gibus/RT-Extension-ModifyUsersPrefs
-version: '0.04'
+  repository: https://github.com/gibus/RT-Extension-AttachmentViewer
+version: '0.05'
 x_module_install_rtx_version: '0.44'
 x_requires_rt: 5.0.0
 x_rt_too_new: 6.1.0

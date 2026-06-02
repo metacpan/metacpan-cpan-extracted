@@ -21,8 +21,8 @@ Weenect::Tracker - Tracker data
 
     # Process tracker data.
     foreach my $tracker ( $trackers->items->@* ) {
-	printf("Tracker %s [%d%s]\n", $tracker->name, $tracker->id,
-	      $tracker->active ? "" : ",inactive" );
+        printf("Tracker %s [%d%s]\n", $tracker->name, $tracker->id,
+               $tracker->active ? "" : ",inactive" );
     }
 
 =cut
@@ -151,34 +151,8 @@ method get_wifizone( $zid ) {
     return Weenect::WiFiZone->create($res);
 }
 
-#### "mytracker/%d/wifi-zones" only allows HEAD GET OPTIONS.
+#### "mytracker/%d/wifi-zones" only allows HEAD GET OPTIONS. Use "wifi-zone" in API.
 #
-# =head2 remove_wifizone( $zid )
-#
-# Removes a WiFi zone (powersave area).
-#
-# =cut
-#
-# method remove_wifizone( $zid ) {
-#     my $res = $api->request( sprintf( "mytracker/%d/wifi-zones/%s", $id, $zid ),
-# 			     OP => 'DELETE' );
-#     return $res;
-# }
-#
-# #   name                 : "Oh Denneboom"
-# #   mac_address          : "cc:ce:1e:1c:7c:46"
-# #   latitude             : 52.8849946
-# #   longitude            : 6.85922149999999
-# #   radius               : 15
-# #   is_active            : true
-# #   enable_notifications : true
-#
-# method add_wifizone( %args ) {
-#     my $res = $api->request( sprintf( "mytracker/%d/wifi-zones", $id ),
-# 			     Content => \%args );
-#     return $res;
-# }
-
 =head2 get_history( $start, $end )
 
 Returns a list of positions as tracked between $start and $end.
@@ -255,6 +229,26 @@ method flash( $on = 1 ) {
     	                  Content => \%content );
 }
 
+=head2 flash_stop
+
+    {
+      data          = {
+          intermittent_duration_off = 1,
+          intermittent_duration_on  = 1
+      },
+      duration      = 60,
+      end_at        = undef,
+      sent_start_at = '2026-06-01T09:47:26.822271' (dualvar: 2026),
+      sent_stop_at  = undef,
+      started_at    = undef
+    }
+
+=cut
+
+method flash_stop {
+    return $api->request( sprintf( "mytracker/%d/flash/stop", $id ) );
+}
+
 =head2 ring
 
 Initiates the ringer of the tracker.
@@ -268,6 +262,16 @@ method ring {
     return $res;
 }
 
+=head2 ring_stop
+
+Stops the ringer.
+
+=cut
+
+method ring_stop {
+    return $api->request( sprintf( "mytracker/%d/ring/stop", $id ) );
+}
+
 =head2 vibrate
 
 Initiates the buzzer of the tracker.
@@ -279,6 +283,16 @@ method vibrate {
 			     OP => 'POST' );
     # return unless $res;
     return $res;
+}
+
+=head2 vibrate_stop
+
+Stops the buzzer.
+
+=cut
+
+method vibrate_stop {
+    return $api->request( sprintf( "mytracker/%d/vibrate/stop", $id ) );
 }
 
 =head2 position_refresh
@@ -310,6 +324,51 @@ method super_live {
     return $res;		# {"interval":10}
 }
 
+=head2 get_super_live
+
+Gets the current super_live status.
+
+    {
+      active    = 0,
+      duration  = undef,
+      freq_mode = undef,
+      interval  = undef,
+      ttl       = -2
+    }
+
+=cut
+
+method get_super_live {
+    my $res = $api->request( sprintf( "mytracker/%d/superlive", $id ) );
+    # return unless $res;
+    return $res;		# {}
+}
+
+=head2 stop_super_live {
+
+Stops super_live tracking.
+
+    {
+      data          = undef,
+      duration      = undef,
+      end_at        = undef,
+      sent_start_at = undef,
+      sent_stop_at  = undef,
+      started_at    = undef
+    }
+
+=cut
+
+method stop_super_live {
+    my $res = $api->request( sprintf( "mytracker/%d/superlive/stop", $id ) );
+    # return unless $res;
+    return $res;		# {}
+}
+
+# "mytracker/%d/sos"
+# "mytracker/%d/full-sos"
+# "mytracker/%d/full-sos/ack"
+
 method sos_call {
     my $res = $api->request( sprintf( "mytracker/%d/sos", $id ),
 			     Content => { phone_number => $sos_phone } );
@@ -332,4 +391,69 @@ method set_mode( $mode ) {
     return $res;		# {}
 }
 
+=head2 detect_hotspots
+
+Initiate WiFi hotspot detecting.
+
+=cut
+
+method detect_hotspots {
+    my $res = $api->request( sprintf( "mytracker/%d/detect-hotspots", $id ), OP => 'POST' );
+    return $res;		# {}
+}
+
+=head2 list_hotspots
+
+List detected hotspots.
+
+    {
+      completed = 0 (JSON::PP::Boolean),
+      items     = [],
+      total     = 0
+    }
+
+=cut
+
+method list_hotspots {
+    my $res = $api->request( sprintf( "mytracker/%d/list-hotspots", $id ) );
+    return $res;		# {}
+}
+
+=head2 deep-sleep-wifi
+
+=cut
+
+method deep_sleep_wifi {
+    my $res = $api->request( sprintf( "mytracker/%d/deep-sleep-wifi", $id ) );
+    return $res;		# {"enable_deep_sleep_wifi":false}
+}
+
+=head2 wifizones_suggest
+
+    {
+      size        = 0,
+      zone_status = 'new',
+      zone_wifi   = []
+    }
+
+=cut
+
+method wifizones_suggest {
+    my $res = $api->request( sprintf( "mytracker/%d/wifi-zones/suggest", $id ) );
+    return $res;		# {}
+}
+
+=head2 remove_picture
+
+Removes the tracker picture, if any.
+
+=cut
+
+method remove_picture {
+    my $res = $api->request( sprintf( "mytracker/%d/picture", $id ), OP => 'DELETE' );
+    return $res;		# {}
+}
+
 1;
+
+# "mytracker/{trackerId}/activity/v2" start end metric_system

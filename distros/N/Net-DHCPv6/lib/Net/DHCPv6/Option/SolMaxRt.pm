@@ -1,10 +1,12 @@
-#!/usr/bin/false
-# ABSTRACT: SOL_MAX_RT option (code 10) — maximum solicit retransmission duration (32-bit)
+#!/bin/false
+# ABSTRACT: SOL_MAX_RT option (code 10) -- maximum solicit retransmission duration (32-bit)
 # PODNAME: Net::DHCPv6::Option::SolMaxRt
-package Net::DHCPv6::Option::SolMaxRt;
-$Net::DHCPv6::Option::SolMaxRt::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Option::SolMaxRt;
+$Net::DHCPv6::Option::SolMaxRt::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
+use Carp qw( croak );
 use Net::DHCPv6::Constants;
 use Net::DHCPv6::X::BadOption;
 use parent 'Net::DHCPv6::Option';
@@ -17,23 +19,17 @@ sub new {
     $args{data} = pack( 'N', $args{value} );
     my $self = $class->SUPER::new( %args );
     $self->{value} = $args{value};
-    bless $self, $class;
+    return bless $self, $class;
 }
 
-sub value { shift->{value} }
+sub value { return shift->{value} }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
+    my ( $class, $code, $payload ) = @_;
     Net::DHCPv6::X::BadOption->throw( message => 'SolMaxRt must be exactly 4 bytes' )
-        if CORE::length( $data ) != 4;
-    my $value = unpack( 'N', $data );
+        if CORE::length( $payload ) != 4;    ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
+    my $value = unpack( 'N', $payload );
     return $class->new( value => $value );
-}
-
-sub as_bytes {
-    my $self = shift;
-    my $data = pack( 'N', $self->{value} );
-    return pack( 'nn', $self->{code}, CORE::length( $data ) ) . $data;
 }
 
 $Net::DHCPv6::OptionList::OPTION_CLASS{$OPTION_SOL_MAX_RT} = __PACKAGE__;
@@ -43,25 +39,25 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::SolMaxRt - SOL_MAX_RT option (code 10) — maximum solicit retransmission duration (32-bit)
+Net::DHCPv6::Option::SolMaxRt - SOL_MAX_RT option (code 10) -- maximum solicit retransmission duration (32-bit)
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
   use Net::DHCPv6::Option::SolMaxRt;
-  my $opt = Net::DHCPv6::Option::SolMaxRt->new(value => 3600);
+   my $opt = Net::DHCPv6::Option::SolMaxRt->new(value => 3_600);
 
 =head1 DESCRIPTION
 
 Carries the maximum retransmission duration (in seconds) for Solicit
-messages.  See RFC 8415 §21.10.
+messages.  See RFC 8415 E<167>21.10.
 
 =head1 ALPHA STATUS
 

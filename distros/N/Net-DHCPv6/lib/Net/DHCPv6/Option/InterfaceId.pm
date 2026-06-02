@@ -1,25 +1,28 @@
-#!/usr/bin/false
-# ABSTRACT: Interface-ID option (code 18) — opaque interface identifier
+#!/bin/false
+# ABSTRACT: Interface-ID option (code 18) -- opaque interface identifier
 # PODNAME: Net::DHCPv6::Option::InterfaceId
-package Net::DHCPv6::Option::InterfaceId;
-$Net::DHCPv6::Option::InterfaceId::VERSION = '0.001';
 use strictures 2;
+
+package Net::DHCPv6::Option::InterfaceId;
+$Net::DHCPv6::Option::InterfaceId::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
 use Net::DHCPv6::Constants;
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
+my $EMPTY = q();
 
 sub new {
     my ( $class, %args ) = @_;
     $args{code} = $OPTION_INTERFACE_ID;
-    $args{data} = $args{data} // ( $args{interface_id} // '' );
+    $args{data} = $args{data} // ( $args{interface_id} // $EMPTY );
     return $class->SUPER::new( %args );
 }
 
-sub interface_id { shift->{data} }
+sub interface_id { return shift->{data} }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
-    return $class->new( interface_id => $data );
+    my ( $class, $code, $payload ) = @_;
+    return $class->new( interface_id => $payload );
 }
 
 $Net::DHCPv6::OptionList::OPTION_CLASS{$OPTION_INTERFACE_ID} = __PACKAGE__;
@@ -29,15 +32,15 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::InterfaceId - Interface-ID option (code 18) — opaque interface identifier
+Net::DHCPv6::Option::InterfaceId - Interface-ID option (code 18) -- opaque interface identifier
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -47,7 +50,7 @@ version 0.001
 =head1 DESCRIPTION
 
 Opaque identifier used by relay agents to identify the interface on
-which the client message was received.  See RFC 8415 §21.18.
+which the client message was received.  See RFC 8415 E<167>21.18.
 
 =head1 ALPHA STATUS
 

@@ -640,13 +640,24 @@ push_multi(self, ...)
   CODE:
     uint32_t count = items - 1;
     uint32_t pushed = 0;
+    /* Extract SV data BEFORE locking: SvPV can run magic (tied/overloaded
+     * stringification) that longjmps; doing it under the process-shared
+     * mutex would abandon the lock and deadlock peers. Newx+SAVEFREEPV so a
+     * die during extraction (or the too-long croak) cannot leak args. */
+    struct qsm_arg { const char *str; STRLEN len; bool utf8; };
+    struct qsm_arg *args = NULL;
+    if (count > 0) {
+        Newx(args, count, struct qsm_arg);
+        SAVEFREEPV(args);
+        for (uint32_t i = 0; i < count; i++) {
+            SV *sv = ST(i + 1);
+            args[i].str = SvPV(sv, args[i].len);
+            args[i].utf8 = SvUTF8(sv) ? true : false;
+        }
+    }
     queue_mutex_lock(h->hdr);
     for (uint32_t i = 0; i < count; i++) {
-        SV *sv = ST(i + 1);
-        STRLEN slen;
-        const char *str = SvPV(sv, slen);
-        bool utf8 = SvUTF8(sv) ? true : false;
-        int r = queue_str_push_locked(h, str, (uint32_t)slen, utf8);
+        int r = queue_str_push_locked(h, args[i].str, (uint32_t)args[i].len, args[i].utf8);
         if (r == -2) { queue_mutex_unlock(h->hdr); croak("Data::Queue::Shared::Str: string too long (max 2GB)"); }
         if (r != 1) break;
         pushed++;

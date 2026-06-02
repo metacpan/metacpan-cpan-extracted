@@ -5,7 +5,7 @@ SV*
 new(char* class, SV* path_sv, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0)
     CODE:
         char errbuf[SHM_ERR_BUFLEN]; const char* path = SvOK(path_sv) ? SvPV_nolen(path_sv) : NULL; ShmHandle* map = shm_ss_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, errbuf);
-        if (!map) croak("HashMap::Shared::SS: %s", errbuf[0] ? errbuf : "unknown error");
+        if (!map) croak("Data::HashMap::Shared::SS: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
     OUTPUT:
         RETVAL
@@ -14,7 +14,7 @@ SV*
 new_sharded(char* class, char* path_prefix, UV num_shards, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0)
     CODE:
         char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_ss_create_sharded(path_prefix, (uint32_t)num_shards, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, errbuf);
-        if (!map) croak("HashMap::Shared::SS: %s", errbuf[0] ? errbuf : "unknown error");
+        if (!map) croak("Data::HashMap::Shared::SS: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
     OUTPUT:
         RETVAL
@@ -87,23 +87,21 @@ set_multi(SV* self_sv, ...)
                 bool _ku = SvUTF8(ST(i)) ? 1 : 0;
                 STRLEN _vl; const char *_vs = SvPV(ST(i+1), _vl);
                 bool _vu = SvUTF8(ST(i+1)) ? 1 : 0;
+                if (_kl > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
+                if (_vl > SHM_MAX_STR_LEN) croak("value too long (max 1GB)");
                 count += shm_ss_put(h, _ks, (uint32_t)_kl, _ku, _vs, (uint32_t)_vl, _vu);
             }
         } else {
-            ShmHeader *hdr = h->hdr;
-            shm_rwlock_wrlock(h);
-            shm_seqlock_write_begin(&hdr->seq);
+            WRSEQ_GUARD(h);
             for (int i = 1; i < items; i += 2) {
                 STRLEN _kl; const char *_ks = SvPV(ST(i), _kl);
                 bool _ku = SvUTF8(ST(i)) ? 1 : 0;
-                if (_kl > SHM_MAX_STR_LEN) { shm_seqlock_write_end(&hdr->seq); shm_rwlock_wrunlock(h); croak("key too long"); }
+                if (_kl > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
                 STRLEN _vl; const char *_vs = SvPV(ST(i+1), _vl);
                 bool _vu = SvUTF8(ST(i+1)) ? 1 : 0;
-                if (_vl > SHM_MAX_STR_LEN) { shm_seqlock_write_end(&hdr->seq); shm_rwlock_wrunlock(h); croak("value too long"); }
+                if (_vl > SHM_MAX_STR_LEN) croak("value too long (max 1GB)");
                 count += shm_ss_put_inner(h, _ks, (uint32_t)_kl, _ku, _vs, (uint32_t)_vl, _vu, SHM_TTL_USE_DEFAULT);
             }
-            shm_seqlock_write_end(&hdr->seq);
-            shm_rwlock_wrunlock(h);
         }
         RETVAL = count;
     OUTPUT:
@@ -118,22 +116,18 @@ remove_multi(SV* self_sv, ...)
             for (int i = 1; i < items; i++) {
                 STRLEN _kl; const char *_ks = SvPV(ST(i), _kl);
                 bool _ku = SvUTF8(ST(i)) ? 1 : 0;
-                if (_kl > SHM_MAX_STR_LEN) croak("key too long (max 2GB)");
+                if (_kl > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
                 count += shm_ss_remove(h, _ks, (uint32_t)_kl, _ku);
             }
         } else {
-            ShmHeader *hdr = h->hdr;
-            shm_rwlock_wrlock(h);
-            shm_seqlock_write_begin(&hdr->seq);
+            WRSEQ_GUARD(h);
             for (int i = 1; i < items; i++) {
                 STRLEN _kl; const char *_ks = SvPV(ST(i), _kl);
                 bool _ku = SvUTF8(ST(i)) ? 1 : 0;
-                if (_kl > SHM_MAX_STR_LEN) { shm_seqlock_write_end(&hdr->seq); shm_rwlock_wrunlock(h); croak("key too long (max 2GB)"); }
+                if (_kl > SHM_MAX_STR_LEN) croak("key too long (max 1GB)");
                 count += shm_ss_remove_inner(h, _ks, (uint32_t)_kl, _ku);
             }
             if (count) shm_ss_maybe_shrink(h);
-            shm_seqlock_write_end(&hdr->seq);
-            shm_rwlock_wrunlock(h);
         }
         RETVAL = count;
     OUTPUT:
@@ -400,7 +394,7 @@ items(SV* self_sv)
                 }
             }
         }
-        
+
 
 void
 each(SV* self_sv)
@@ -565,11 +559,11 @@ drain(SV* self_sv, UV limit)
         if (limit == 0) XSRETURN_EMPTY;
         shm_ss_drain_entry *entries;
         Newxz(entries, limit, shm_ss_drain_entry);
-        
+
         SAVEFREEPV(entries);
         char *buf = NULL; uint32_t buf_cap = 0;
         uint32_t n = shm_ss_drain(h, (uint32_t)limit, entries, &buf, &buf_cap);
-        
+
         EXTEND(SP, n * 2);
         for (uint32_t i = 0; i < n; i++) {
             SV *ksv = newSVpvn(buf + entries[i].key_off, entries[i].key_len);
@@ -580,7 +574,7 @@ drain(SV* self_sv, UV limit)
             mPUSHs(vsv);
         }
         if (buf) free(buf);
-        
+
 
 UV
 flush_expired(SV* self_sv)

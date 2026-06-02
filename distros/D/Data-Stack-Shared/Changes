@@ -1,5 +1,11 @@
 Revision history for Data::Stack::Shared
 
+0.05  2026-06-01
+    - create: reject capacity > 2^31-1 (matches validate_header), so it can
+      no longer silently truncate the uint32 capacity / fail on reopen
+    - Str pop/pop_wait/peek: free temp buffer via SAVEFREEPV (leak if
+      newSVpvn croaked on OOM)
+
 0.04  2026-05-26
     - drain: bounded recovery (~2s) for slots stuck WRITING after a crashed pusher
     - slot publish is now CAS-only — prevents a stalled-but-live pusher from

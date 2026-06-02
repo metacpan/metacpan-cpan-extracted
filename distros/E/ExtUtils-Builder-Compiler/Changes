@@ -1,5 +1,8 @@
 Revision history for ExtUtils-Builder-Compiler
 
+0.037     2026-06-01 12:05:26+02:00 Europe/Brussels
+          - Lowercase nologo argument to MSVC
+
 0.036     2026-03-15 23:27:43+01:00 Europe/Brussels
           - Mark ParseXS helper functions deprecated
           - Fix C++ compiler code to load modules in correct order

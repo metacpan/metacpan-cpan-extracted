@@ -7,7 +7,7 @@ use Perl::Critic::Violation;
 
 use App::CriticDB::DB::Index;
 
-our $VERSION='0.0.4';
+our $VERSION='0.0.5';
 
 my %engines=(
 	storable=>'App::CriticDB::DB::Stor',
@@ -56,6 +56,7 @@ sub _filemtime {
 
 sub _fileNewer {
 	my ($self,$fn,$ts)=@_;
+	if(!$ts) { return }
 	my $tm=_filemtime($fn);
 	if(!$tm) { return }
 	return ($tm>$ts);
@@ -160,7 +161,7 @@ App::CriticDB::DB - Datastores for Perl::Critic violations
 
 =head1 VERSION
 
-Version 0.0.4
+Version 0.0.5
 
 =head1 SYNOPSIS
 

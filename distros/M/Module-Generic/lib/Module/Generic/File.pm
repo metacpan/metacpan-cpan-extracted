@@ -803,7 +803,7 @@ sub chmod
             }
             else
             {
-                warnings::warn( "Relative mode definition \"$def\" is malformed.\n" ) if( warnings::enabled() );
+                warn( "Relative mode definition \"$def\" is malformed." ) if( warnings::enabled( 'Module::Generic' ) );
             }
         }
     }
@@ -1606,7 +1606,7 @@ sub flags
     };
     if( $@ )
     {
-        warnings::warn( "An error occurred while trying to get flags for opened file \"${file}\": $@\n" ) if( warnings::enabled() );
+        warn( "An error occurred while trying to get flags for opened file \"${file}\": $@" ) if( warnings::enabled( 'Module::Generic' ) );
         return(0);
     }
     return( $flags );
@@ -3143,12 +3143,12 @@ sub mmap
     }
     elsif( $mode eq '>' || $mode eq '+>' || $mode eq '>>' || $mode eq '+>>' )
     {
-        warnings::warn( "Do not use mode '", ( $_[2] || $mode ), "', this will not work as you would expect. Alway prefer < for read-only or +< for read-write\n" ) if( warnings::enabled() );
+        warn( "Do not use mode '", ( $_[2] || $mode ), "', this will not work as you would expect. Alway prefer < for read-only or +< for read-write" ) if( warnings::enabled( 'Module::Generic' ) );
     }
     elsif( !HAS_PERLIO_MMAP && $mode =~ /^([\<\>\+]+)[[:blank:]\h]*\:encoding\([[:blank:]\h]*utf\-?8[[:blank:]\h]*\)$/i )
     {
         $mode = "${1}:utf8";
-        warnings::warn( "Use of utf8 encoding is supported by File::Map, but result is unknown\n" ) if( warnings::enabled() );
+        warn( "Use of utf8 encoding is supported by File::Map, but result is unknown" ) if( warnings::enabled( 'Module::Generic' ) );
     }
     elsif( !HAS_PERLIO_MMAP && $mode =~ /\:(\w+)\([^\)]+\)/ )
     {
@@ -3224,7 +3224,7 @@ sub mmap
         my $fsize = $self->length;
         if( $size > $fsize )
         {
-            warnings::warn( "Required size is $size but file size is smaller with $fsize bytes, and I do not have permission to write to it to fill the gap necessary for File::Map to work.\n" ) if( warnings::enabled() );
+            warn( "Required size is $size but file size is smaller with $fsize bytes, and I do not have permission to write to it to fill the gap necessary for File::Map to work.\n" ) if( warnings::enabled( 'Module::Generic' ) );
         }
     }
     # If it was not initially opened, close it now
@@ -3873,7 +3873,7 @@ sub rmtree
             if( $@ )
             {
                 $error_files->push( $f );
-                warnings::warn( "An error occurred while trying to remove file \"$f\": $@\n" ) if( warnings::enabled() );
+                warn( "An error occurred while trying to remove file \"$f\": $@" ) if( warnings::enabled( 'Module::Generic' ) );
             }
         }
         return(1);
@@ -3906,7 +3906,7 @@ sub rmtree
             };
             if( $@ )
             {
-                warnings::warn( "Unable to chdir to ", ( defined( $where ) ? "\"${where}\"" : 'default system location (if any)' ), ": $@\n" ) if( warnings::enabled() );
+                warn( "Unable to chdir to ", ( defined( $where ) ? "\"${where}\"" : 'default system location (if any)' ), ": $@" ) if( warnings::enabled( 'Module::Generic' ) );
             }
         };
 
@@ -3947,7 +3947,7 @@ sub rmtree
             if( $@ )
             {
                 $error_files->push( $d );
-                warnings::warn( "An error occurred while trying to remove directory \"$d\": $@\n" ) if( warnings::enabled() );
+                warn( "An error occurred while trying to remove directory \"$d\": $@" ) if( warnings::enabled( 'Module::Generic' ) );
             }
         }
         # Return true
@@ -3957,7 +3957,7 @@ sub rmtree
     {
         CORE::rmdir( $dir ) || do
         {
-            warnings::warn( "Unable to remove the directory \"$dir\": $!\n" ) if( warnings::enabled() );
+            warn( "Unable to remove the directory \"$dir\": $!\n" ) if( warnings::enabled( 'Module::Generic' ) );
         };
     }
     $error_files->foreach(sub
@@ -4172,7 +4172,7 @@ sub tempfile
     {
         if( $opts->{suffix} !~ /[A-Za-z0-9_]/ )
         {
-            warnings::warn( "Warning only: suffix provided looks unusual: \"$opts->{suffix}\"\n" ) if( warnings::enabled() );
+            warn( "Warning only: suffix provided looks unusual: \"$opts->{suffix}\"\n" ) if( warnings::enabled( 'Module::Generic' ) );
         }
         substr( $opts->{suffix}, 0, 0, '.' ) if( substr( $opts->{suffix}, 0, 1 ) ne '.' );
         $fname .= $opts->{suffix};
@@ -4193,7 +4193,7 @@ sub tempfile
         }
         elsif( !-w( $opts->{dir} ) )
         {
-            warnings::warn( "Warning only: directory provided is not writable for uid $>\n" ) if( warnings::enabled() );
+            warn( "Warning only: directory provided is not writable for uid $>\n" ) if( warnings::enabled( 'Module::Generic' ) );
         }
         $dir = $opts->{dir};
         $base_vol = [$self->_spec_splitpath( $dir )]->[0];
@@ -4251,7 +4251,7 @@ sub tmpdir
         }
         elsif( !-w( $opts->{dir} ) )
         {
-            warnings::warn( "Warning only: directory provided is not writable for uid $>\n" ) if( warnings::enabled() );
+            warn( "Warning only: directory provided is not writable for uid $>\n" ) if( warnings::enabled( 'Module::Generic' ) );
         }
         $parent = $opts->{dir};
     }

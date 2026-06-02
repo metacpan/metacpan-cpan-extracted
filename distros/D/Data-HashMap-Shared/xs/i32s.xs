@@ -5,7 +5,7 @@ SV*
 new(char* class, SV* path_sv, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0)
     CODE:
         char errbuf[SHM_ERR_BUFLEN]; const char* path = SvOK(path_sv) ? SvPV_nolen(path_sv) : NULL; ShmHandle* map = shm_i32s_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, errbuf);
-        if (!map) croak("HashMap::Shared::I32S: %s", errbuf[0] ? errbuf : "unknown error");
+        if (!map) croak("Data::HashMap::Shared::I32S: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
     OUTPUT:
         RETVAL
@@ -14,7 +14,7 @@ SV*
 new_sharded(char* class, char* path_prefix, UV num_shards, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0)
     CODE:
         char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_i32s_create_sharded(path_prefix, (uint32_t)num_shards, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, errbuf);
-        if (!map) croak("HashMap::Shared::I32S: %s", errbuf[0] ? errbuf : "unknown error");
+        if (!map) croak("Data::HashMap::Shared::I32S: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
     OUTPUT:
         RETVAL
@@ -84,20 +84,17 @@ set_multi(SV* self_sv, ...)
             for (int i = 1; i < items; i += 2) {
                 STRLEN _vl; const char *_vs = SvPV(ST(i+1), _vl);
                 bool _vu = SvUTF8(ST(i+1)) ? 1 : 0;
+                if (_vl > SHM_MAX_STR_LEN) croak("value too long (max 1GB)");
                 count += shm_i32s_put(h, (int32_t)SvIV(ST(i)), _vs, (uint32_t)_vl, _vu);
             }
         } else {
-            ShmHeader *hdr = h->hdr;
-            shm_rwlock_wrlock(h);
-            shm_seqlock_write_begin(&hdr->seq);
+            WRSEQ_GUARD(h);
             for (int i = 1; i < items; i += 2) {
                 STRLEN _vl; const char *_vs = SvPV(ST(i+1), _vl);
                 bool _vu = SvUTF8(ST(i+1)) ? 1 : 0;
-                if (_vl > SHM_MAX_STR_LEN) { shm_seqlock_write_end(&hdr->seq); shm_rwlock_wrunlock(h); croak("value too long"); }
+                if (_vl > SHM_MAX_STR_LEN) croak("value too long (max 1GB)");
                 count += shm_i32s_put_inner(h, (int32_t)SvIV(ST(i)), _vs, (uint32_t)_vl, _vu, SHM_TTL_USE_DEFAULT);
             }
-            shm_seqlock_write_end(&hdr->seq);
-            shm_rwlock_wrunlock(h);
         }
         RETVAL = count;
     OUTPUT:
@@ -112,14 +109,10 @@ remove_multi(SV* self_sv, ...)
             for (int i = 1; i < items; i++)
                 count += shm_i32s_remove(h, (int32_t)SvIV(ST(i)));
         } else {
-            ShmHeader *hdr = h->hdr;
-            shm_rwlock_wrlock(h);
-            shm_seqlock_write_begin(&hdr->seq);
+            WRSEQ_GUARD(h);
             for (int i = 1; i < items; i++)
                 count += shm_i32s_remove_inner(h, (int32_t)SvIV(ST(i)));
             if (count) shm_i32s_maybe_shrink(h);
-            shm_seqlock_write_end(&hdr->seq);
-            shm_rwlock_wrunlock(h);
         }
         RETVAL = count;
     OUTPUT:
@@ -377,7 +370,7 @@ items(SV* self_sv)
                 }
             }
         }
-        
+
 
 void
 each(SV* self_sv)
@@ -433,7 +426,7 @@ to_hash(SV* self_sv)
                 }
             }
         }
-        
+
         RETVAL = newRV_noinc((SV*)hv);
     OUTPUT:
         RETVAL
@@ -531,11 +524,11 @@ drain(SV* self_sv, UV limit)
         if (limit == 0) XSRETURN_EMPTY;
         shm_i32s_drain_entry *entries;
         Newxz(entries, limit, shm_i32s_drain_entry);
-        
+
         SAVEFREEPV(entries);
         char *buf = NULL; uint32_t buf_cap = 0;
         uint32_t n = shm_i32s_drain(h, (uint32_t)limit, entries, &buf, &buf_cap);
-        
+
         EXTEND(SP, n * 2);
         for (uint32_t i = 0; i < n; i++) {
             mPUSHi(entries[i].key);
@@ -544,7 +537,7 @@ drain(SV* self_sv, UV limit)
             mPUSHs(vsv);
         }
         if (buf) free(buf);
-        
+
 
 UV
 flush_expired(SV* self_sv)

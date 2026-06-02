@@ -1,7 +1,7 @@
 package Data::Deque::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 require XSLoader;
 XSLoader::load('Data::Deque::Shared', $VERSION);
 @Data::Deque::Shared::Int::ISA = ('Data::Deque::Shared');

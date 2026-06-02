@@ -1,61 +1,70 @@
-#!/usr/bin/false
-# ABSTRACT: AFTR Name option (code 88) — RFC 6334 domain name
+#!/bin/false
+# ABSTRACT: AFTR Name option (code 88) -- RFC 6334 domain name
 # PODNAME: Net::DHCPv6::Option::AftrName
-package Net::DHCPv6::Option::AftrName;
-$Net::DHCPv6::Option::AftrName::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Option::AftrName;
+$Net::DHCPv6::Option::AftrName::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
+use Net::DHCPv6::Option;
+use Carp qw( croak );
 use Net::DHCPv6::Constants;
 use Net::DHCPv6::X::Truncated;
 use Net::DHCPv6::X::BadOption;
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
+my $EMPTY         = q();
+my $MAX_PTR_DEPTH = 255;    ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 
 sub _encode_domain {
     my ( $domain ) = @_;
-    return "\x00" unless defined $domain && CORE::length( $domain );
-    my @labels = split m/\./, $domain;
-    join( '', map { pack( 'C', CORE::length ) . $_ } @labels ) . "\x00";
+    return chr( 0 ) unless defined $domain && CORE::length( $domain );
+    my @labels = split m/[.]/, $domain;
+    return join( $EMPTY, map { pack( 'C', CORE::length ) . $_ } @labels ) . chr( 0 );
 }
 
 sub _read_labels_at {
-    my ( $data, $offset_ref, $len ) = @_;
+    my ( $payload, $offset_ref, $len, $depth ) = @_;
+    $depth //= 0;
     my @labels;
-    while ( $$offset_ref < $len ) {
-        my $llen = unpack( 'C', substr( $data, $$offset_ref, 1 ) );
+    while ( ${$offset_ref} < $len ) {
+        my $llen = unpack( 'C', substr( $payload, ${$offset_ref}, 1 ) );
         if ( $llen == 0 ) {
-            ++$$offset_ref;
+            ++${$offset_ref};
             last;
         }
-        if ( ( $llen & 0xC0 ) == 0xC0 ) {
+        if ( ( $llen & $DN_COMPRESS_MASK ) == $DN_COMPRESS_MASK ) {    ## no critic (Bangs::ProhibitBitwiseOperators ValuesAndExpressions::ProhibitMagicNumbers)
             if ( $Net::DHCPv6::Option::FOLLOW_COMPRESSION ) {
                 Net::DHCPv6::X::Truncated->throw( message => 'Truncated compression pointer' )
-                    if $$offset_ref + 2 > $len;
-                my $ptr = ( ( $llen & 0x3F ) << 8 ) | unpack( 'C', substr( $data, $$offset_ref + 1, 1 ) );
+                    if ${$offset_ref} + 2 > $len;
+                my $ptr =
+                    ( ( $llen & $DN_LABEL_MASK ) << 8 ) | unpack( 'C', substr( $payload, ${$offset_ref} + 1, 1 ) );    ## no critic (Bangs::ProhibitBitwiseOperators ValuesAndExpressions::ProhibitMagicNumbers)
                 Net::DHCPv6::X::BadOption->throw( message => 'Compression pointer out of range' )
                     if $ptr >= $len;
-                $$offset_ref += 2;
+                Net::DHCPv6::X::BadOption->throw( message => 'Compression pointer depth exceeded' )
+                    if $depth > $MAX_PTR_DEPTH;
+                ${$offset_ref} += 2;
                 my $ptr_ref = \$ptr;
-                push @labels, _read_labels_at( $data, $ptr_ref, $len );
+                push @labels, _read_labels_at( $payload, $ptr_ref, $len, $depth + 1 );
                 last;
             }
             Net::DHCPv6::X::BadOption->throw( message => 'Compression pointer in domain name' );
         }
-        Net::DHCPv6::X::BadOption->throw( message => 'Invalid domain label length' ) if $llen > 63;
-        ++$$offset_ref;
+        Net::DHCPv6::X::BadOption->throw( message => 'Invalid domain label length' ) if $llen > $DN_LABEL_MASK;
+        ++${$offset_ref};
         Net::DHCPv6::X::Truncated->throw( message => 'Truncated domain label' )
-            if $$offset_ref + $llen > $len;
-        push @labels, substr( $data, $$offset_ref, $llen );
-        $$offset_ref += $llen;
+            if ${$offset_ref} + $llen > $len;
+        push @labels, substr( $payload, ${$offset_ref}, $llen );
+        ${$offset_ref} += $llen;
     }
     return @labels;
 }
 
 sub _decode_domain {
-    my ( $data ) = @_;
-    return '' unless CORE::length( $data );
+    my ( $payload ) = @_;
+    return $EMPTY unless CORE::length( $payload );
     my $offset = 0;
-    my @labels = _read_labels_at( $data, \$offset, CORE::length( $data ) );
+    my @labels = _read_labels_at( $payload, \$offset, CORE::length( $payload ) );
     return join( '.', @labels );
 }
 
@@ -66,14 +75,14 @@ sub new {
     $args{data} = _encode_domain( $args{domain_name} );
     my $self = $class->SUPER::new( %args );
     $self->{domain_name} = $args{domain_name};
-    bless $self, $class;
+    return bless $self, $class;
 }
 
-sub domain_name { shift->{domain_name} }
+sub domain_name { return shift->{domain_name} }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
-    my $name = _decode_domain( $data );
+    my ( $class, $code, $payload ) = @_;
+    my $name = _decode_domain( $payload );
     return $class->new( domain_name => $name );
 }
 
@@ -84,15 +93,15 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::AftrName - AFTR Name option (code 88) — RFC 6334 domain name
+Net::DHCPv6::Option::AftrName - AFTR Name option (code 88) -- RFC 6334 domain name
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

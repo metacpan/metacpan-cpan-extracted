@@ -415,7 +415,18 @@ static void process_http_response(ev_clickhouse_t *self) {
         body_len = decoded_len;
         consumed = cp - self->recv_buf;
     } else {
-        /* Content-Length based */
+        /* Content-Length based — bound content_length before any pointer
+         * arithmetic so a malicious huge value cannot overflow
+         * hdr_end + content_length and slip past the need-more check. */
+        size_t cl_cap = CH_MAX_DECOMPRESS_SIZE;
+        if (self->max_recv_buffer > 0 && self->max_recv_buffer < cl_cap)
+            cl_cap = self->max_recv_buffer;
+        if (content_length > cl_cap) {
+            self->send_count--;
+            teardown_after_deliver(self,
+                "Content-Length exceeds limit", "connection closed");
+            return;
+        }
         if (self->recv_len < hdr_end + content_length) return; /* need more data */
         body = self->recv_buf + hdr_end;
         body_len = content_length;

@@ -11018,6 +11018,7 @@ langext:
       dsl: Danish Sign Language
       dsz: Mardin Sign Language
       dup: Duano
+      dyl: Bhutanese Sign Language
       ecs: Ecuadorian Sign Language
       ehs: Miyakubo Sign Language
       esl: Egypt Sign Language
@@ -11193,6 +11194,7 @@ langext:
       ysl: Yugoslavian Sign Language
       ysm: Myanmar Sign Language
       yue: Yue Chinese
+      zhk: Kurdish Sign Language
       zib: Zimbabwe Sign Language
       zlm: Malay (individual language)
       zmi: Negeri Sembilan Malay
@@ -11271,6 +11273,9 @@ langext:
       berau malay: 
         - bve
         - Berau Malay
+      bhutanese sign language: 
+        - dyl
+        - Bhutanese Sign Language
       bolivian sign language: 
         - bvl
         - Bolivian Sign Language
@@ -11544,6 +11549,9 @@ langext:
       kufr qassem sign language (kqsl): 
         - sqx
         - Kufr Qassem Sign Language (KQSL)
+      kurdish sign language: 
+        - zhk
+        - Kurdish Sign Language
       langue des signes de belgique francophone: 
         - sfb
         - Langue des signes de Belgique Francophone
@@ -12019,7 +12027,7 @@ language:
       hu: Hungarian
       hy: Armenian
       hz: Herero
-      ia: Interlingua (International Auxiliary Language Association)
+      ia: Interlingua (IALA)
       id: Indonesian
       ie: Interlingue
       ig: Igbo
@@ -12075,12 +12083,12 @@ language:
       "no": Norwegian
       nr: South Ndebele
       nv: Navajo
-      ny: Nyanja
+      ny: Chichewa
       oc: Occitan (post 1500)
       oj: Ojibwa
       om: Oromo
       or: Oriya (macrolanguage)
-      os: Ossetian
+      os: Iron Ossetic
       pa: Panjabi
       pi: Pali
       pl: Polish
@@ -12225,6 +12233,9 @@ language:
       chechen: 
         - ce
         - Chechen
+      chichewa: 
+        - ny
+        - Chichewa
       chinese: 
         - zh
         - Chinese
@@ -12339,9 +12350,9 @@ language:
       indonesian: 
         - id
         - Indonesian
-      interlingua (international auxiliary language association): 
+      interlingua (iala): 
         - ia
-        - Interlingua (International Auxiliary Language Association)
+        - Interlingua (IALA)
       interlingue: 
         - ie
         - Interlingue
@@ -12354,6 +12365,9 @@ language:
       irish: 
         - ga
         - Irish
+      iron ossetic: 
+        - os
+        - Iron Ossetic
       italian: 
         - it
         - Italian
@@ -12489,9 +12503,6 @@ language:
       norwegian nynorsk: 
         - nn
         - Norwegian Nynorsk
-      nyanja: 
-        - ny
-        - Nyanja
       occitan (post 1500): 
         - oc
         - Occitan (post 1500)
@@ -12504,9 +12515,6 @@ language:
       oromo: 
         - om
         - Oromo
-      ossetian: 
-        - os
-        - Ossetian
       pali: 
         - pi
         - Pali
@@ -13570,7 +13578,7 @@ language:
       bnz: Beezen
       boa: Bora
       bob: Aweer
-      boe: Mundabli
+      boe: Mundabli-Mufu
       bof: Bolon
       bog: Bamako Sign Language
       boh: Boma
@@ -14270,7 +14278,7 @@ language:
       dei: Demisa
       del: Delaware
       dem: Dem
-      den: Slave (Athapascan)
+      den: Slavey
       dep: Pidgin Delaware
       deq: Dendi (Central African Republic)
       der: Deori
@@ -14491,6 +14499,7 @@ language:
       dyd: Dyugun
       dyg: Villa Viciosa Agta
       dyi: Djimini Senoufo
+      dyl: Bhutanese Sign Language
       dym: Yanda Dom Dogon
       dyn: Dyangadi
       dyo: Jola-Fonyi
@@ -15419,7 +15428,7 @@ language:
       iso: Isoko
       isr: Israeli Sign Language
       ist: Istriot
-      isu: Isu (Menchum Division)
+      isu: Isu
       isv: Interslavic
       ita: Italian
       itb: Binongan Itneg
@@ -15831,7 +15840,7 @@ language:
       kjl: Western Parbate Kham
       kjm: Khang
       kjn: Kunjen
-      kjo: Harijan Kinnauri
+      kjo: Kinnauri Pahari
       kjp: Pwo Eastern Karen
       kjq: Western Keres
       kjr: Kurudu
@@ -16111,7 +16120,7 @@ language:
       kuq: Karipuna
       kur: Kurdish
       kus: Kusaal
-      kut: Kutenai
+      kut: Ktunaxa
       kuu: Upper Kuskokwim
       kuv: Kur
       kuw: Kpagua
@@ -16336,6 +16345,7 @@ language:
       ley: Lemolang
       lez: Lezghian
       lfa: Lefa
+      lfb: Buu (Cameroon)
       lfn: Lingua Franca Nova
       lga: Lungga
       lgb: Laghu
@@ -16547,7 +16557,7 @@ language:
       luf: Laua
       lug: Ganda
       luh: Leizhou Chinese
-      lui: Luiseno
+      lui: LuiseÃ±o
       luj: Luna
       luk: Lunanakha
       lul: Olu'bo
@@ -16668,7 +16678,7 @@ language:
       mcz: Mawan
       mda: Mada (Nigeria)
       mdb: Morigi
-      mdc: Male (Papua New Guinea)
+      mdc: Soq
       mdd: Mbum
       mde: Maba (Chad)
       mdf: Moksha
@@ -16689,7 +16699,7 @@ language:
       mdv: Santa Lucia Monteverde Mixtec
       mdw: Mbosi
       mdx: Dizin
-      mdy: Male (Ethiopia)
+      mdy: Male
       mdz: Surui Do Para
       mea: Menka
       meb: Ikobi
@@ -17789,6 +17799,7 @@ language:
       okx: Okpe (Northwestern Edo)
       okz: Old Khmer
       ola: Walungge
+      olb: Oli-Bodiman
       old: Mochi
       ole: Olekha
       olk: Olkol
@@ -17862,6 +17873,7 @@ language:
       orz: Ormu
       osa: Osage
       osc: Oscan
+      osd: Digor Ossetic
       osi: Osing
       osn: Old Sundanese
       oso: Ososo
@@ -18546,6 +18558,7 @@ language:
       scv: Sheni
       scw: Sha
       scx: Sicel
+      scz: Shaetlan
       sda: Toraja-Sa'dan
       sdb: Shabak
       sdc: Sassarese Sardinian
@@ -18856,7 +18869,7 @@ language:
       srp: Serbian
       srq: Siriono
       srr: Serer
-      srs: Sarsi
+      srs: Tsuut'ina
       srt: Sauri
       sru: Surui
       srv: Southern Sorsoganon
@@ -19001,7 +19014,7 @@ language:
       szn: Sula
       szp: Suabo
       szs: Solomon Islands Sign Language
-      szv: Isu (Fako Division)
+      szv: Isubu
       szw: Sawai
       szy: Sakizaya
       taa: Lower Tanana
@@ -19457,6 +19470,7 @@ language:
       tva: Vaghua
       tvd: Tsuvadi
       tve: Te'un
+      tvg: Tugunese
       tvi: Tulai
       tvk: Southeast Ambrym
       tvl: Tuvalu
@@ -19763,7 +19777,7 @@ language:
       vut: Vute
       vwa: Awa (China)
       waa: Walla Walla
-      wab: Wab
+      wab: Yote
       wac: Wasco-Wishram
       wad: Wamesa
       wae: Walser
@@ -20411,7 +20425,7 @@ language:
       ykl: Khlula
       ykm: Kap
       ykn: Kua-nsi
-      yko: Yasa
+      yko: Iyasa
       ykr: Yekora
       ykt: Kathu
       yku: Kuamasi
@@ -20462,7 +20476,6 @@ language:
       yog: Yogad
       yoi: Yonaguni
       yok: Yokuts
-      yol: Yola
       yom: Yombe
       yon: Yongkom
       yor: Yoruba
@@ -20600,6 +20613,7 @@ language:
       zhb: Zhaba
       zhd: Dai Zhuang
       zhi: Zhire
+      zhk: Kurdish Sign Language
       zhn: Nong Zhuang
       zhw: Zhoa
       zhx: Chinese (family)
@@ -23225,6 +23239,9 @@ language:
       bhunjia: 
         - bhu
         - Bhunjia
+      bhutanese sign language: 
+        - dyl
+        - Bhutanese Sign Language
       biafada: 
         - bif
         - Biafada
@@ -24092,6 +24109,9 @@ language:
       butuanon: 
         - btw
         - Butuanon
+      buu (cameroon): 
+        - lfb
+        - Buu (Cameroon)
       buwal: 
         - bhs
         - Buwal
@@ -25589,6 +25609,9 @@ language:
       digo: 
         - dig
         - Digo
+      digor ossetic: 
+        - osd
+        - Digor Ossetic
       dii: 
         - dur
         - Dii
@@ -27836,9 +27859,6 @@ language:
       harari: 
         - har
         - Harari
-      harijan kinnauri: 
-        - kjo
-        - Harijan Kinnauri
       haroi: 
         - hro
         - Haroi
@@ -28119,7 +28139,7 @@ language:
         - ero
         - Horpa
       hote: 
-        - hot
+        - mdy
         - Hote
       hoti: 
         - hti
@@ -28739,12 +28759,12 @@ language:
       istro romanian: 
         - ruo
         - Istro Romanian
-      isu (fako division): 
-        - szv
-        - Isu (Fako Division)
-      isu (menchum division): 
+      isu: 
         - isu
-        - Isu (Menchum Division)
+        - Isu
+      isubu: 
+        - szv
+        - Isubu
       italian: 
         - ita
         - Italian
@@ -28820,6 +28840,9 @@ language:
       ixtenco otomi: 
         - otz
         - Ixtenco Otomi
+      iyasa: 
+        - yko
+        - Iyasa
       iyayu: 
         - iya
         - Iyayu
@@ -30404,6 +30427,9 @@ language:
       kinnauri: 
         - kfk
         - Kinnauri
+      kinnauri pahari: 
+        - kjo
+        - Kinnauri Pahari
       kintaq: 
         - knq
         - Kintaq
@@ -31025,6 +31051,9 @@ language:
       kryts: 
         - kry
         - Kryts
+      ktunaxa: 
+        - kut
+        - Ktunaxa
       kua: 
         - tyu
         - Kua
@@ -31295,6 +31324,9 @@ language:
       kurdish: 
         - kur
         - Kurdish
+      kurdish sign language: 
+        - zhk
+        - Kurdish Sign Language
       kuri: 
         - nbn
         - Kuri
@@ -31343,9 +31375,6 @@ language:
       kusunda: 
         - kgg
         - Kusunda
-      kutenai: 
-        - kut
-        - Kutenai
       kutep: 
         - kub
         - Kutep
@@ -32528,9 +32557,9 @@ language:
       luimbi: 
         - lum
         - Luimbi
-      luiseno: 
-        - lui
-        - Luiseno
+      luiseã±o: 
+        - ~
+        - LuiseÃ±o
       lukpa: 
         - dop
         - Lukpa
@@ -33026,12 +33055,9 @@ language:
       malba birifor: 
         - bfo
         - Malba Birifor
-      male (ethiopia): 
+      male: 
         - mdy
-        - Male (Ethiopia)
-      male (papua new guinea): 
-        - mdc
-        - Male (Papua New Guinea)
+        - Male
       malecite-passamaquoddy: 
         - pqm
         - Malecite-Passamaquoddy
@@ -34826,9 +34852,9 @@ language:
       munda languages: 
         - mun
         - Munda languages
-      mundabli: 
+      mundabli-mufu: 
         - boe
-        - Mundabli
+        - Mundabli-Mufu
       mundang: 
         - mua
         - Mundang
@@ -36875,6 +36901,9 @@ language:
       olekha: 
         - ole
         - Olekha
+      oli-bodiman: 
+        - olb
+        - Oli-Bodiman
       olkol: 
         - olk
         - Olkol
@@ -39155,9 +39184,6 @@ language:
       sarli: 
         - sdf
         - Sarli
-      sarsi: 
-        - srs
-        - Sarsi
       sartang: 
         - onp
         - Sartang
@@ -39503,6 +39529,9 @@ language:
       shabak: 
         - sdb
         - Shabak
+      shaetlan: 
+        - scz
+        - Shaetlan
       shahmirzadi: 
         - srz
         - Shahmirzadi
@@ -39935,9 +39964,9 @@ language:
       skou: 
         - skv
         - Skou
-      slave (athapascan): 
+      slavey: 
         - den
-        - Slave (Athapascan)
+        - Slavey
       slavic languages: 
         - sla
         - Slavic languages
@@ -40064,6 +40093,9 @@ language:
       sop: 
         - urw
         - Sop
+      soq: 
+        - mdc
+        - Soq
       soqotri: 
         - sqt
         - Soqotri
@@ -42155,6 +42187,9 @@ language:
       tsum: 
         - ttz
         - Tsum
+      tsuut'ina: 
+        - srs
+        - Tsuut'ina
       tsuvadi: 
         - tvd
         - Tsuvadi
@@ -42191,6 +42226,9 @@ language:
       tugun: 
         - tzn
         - Tugun
+      tugunese: 
+        - tvg
+        - Tugunese
       tugutil: 
         - tuj
         - Tugutil
@@ -43040,9 +43078,6 @@ language:
       waata: 
         - ssn
         - Waata
-      wab: 
-        - wab
-        - Wab
       wabo: 
         - wbb
         - Wabo
@@ -44282,9 +44317,6 @@ language:
       yarsun: 
         - yrs
         - Yarsun
-      yasa: 
-        - yko
-        - Yasa
       yassic: 
         - ysc
         - Yassic
@@ -44495,9 +44527,6 @@ language:
       yokuts: 
         - yok
         - Yokuts
-      yola: 
-        - yol
-        - Yola
       yolnu sign language: 
         - ygs
         - Yolnu Sign Language
@@ -44543,6 +44572,9 @@ language:
       yosondua mixtec: 
         - mpm
         - Yosondua Mixtec
+      yote: 
+        - wab
+        - Yote
       yotti: 
         - yot
         - Yotti
@@ -46869,6 +46901,7 @@ langvar:
       mdctrans: Ancient Egyptian transliteration encoded in Manuel de Codage
       mesokem: Mesokemic alias Oxyrhynchite dialect of Coptic
       metelko: Slovene in Metelko alphabet
+      moderat: The moderate (conservative, i.e. Danish-like) spelling variant of BokmÃ¥l
       monoton: Monotonic Greek
       ndyuka: Ndyuka dialect
       nedis: Natisone dialect
@@ -46889,6 +46922,7 @@ langvar:
       polyton: Polytonic Greek
       provenc: Provencal
       puter: Puter idiom of Romansh
+      radikalt: Radical (i.e. Nynorsk-like) spelling variant of BokmÃ¥l
       rigik: Volapuk rigik
       rozaj: Resian
       rumgr: Rumantsch Grischun
@@ -46897,13 +46931,16 @@ langvar:
       scotland: Scottish Standard English
       scouse: Scouse
       simple: Simplified form
+      slepe: Sorbian dialect of Schleife
       solba: The Stolvizza dialect of Resian
       sotav: The Sotavento dialect group of Kabuverdianu
       spanglis: Spanglish
+      stadi: The "Stadin slangi" dialect of Finnish
       surmiran: Surmiran idiom of Romansh
       sursilv: Sursilvan idiom of Romansh
       sutsilv: Sutsilvan idiom of Romansh
       synnejyl: Synnejysk
+      taglish: Tagalog-English code-switching
       tailo: Taiwanese Hokkien Romanization System for Hokkien languages
       tarask: Belarusian in Taraskievica orthography
       tongyong: Tongyong Pinyin romanization
@@ -47149,6 +47186,9 @@ langvar:
       puter idiom of romansh: 
         - puter
         - Puter idiom of Romansh
+      radical (i.e. nynorsk-like) spelling variant of bokmã¥l: 
+        - ~
+        - Radical (i.e. Nynorsk-like) spelling variant of BokmÃ¥l
       resian: 
         - rozaj
         - Resian
@@ -47182,6 +47222,9 @@ langvar:
       slovene in metelko alphabet: 
         - metelko
         - Slovene in Metelko alphabet
+      sorbian dialect of schleife: 
+        - slepe
+        - Sorbian dialect of Schleife
       spanglish: 
         - spanglis
         - Spanglish
@@ -47209,9 +47252,15 @@ langvar:
       synnejysk: 
         - synnejyl
         - Synnejysk
+      tagalog-english code-switching: 
+        - taglish
+        - Tagalog-English code-switching
       taiwanese hokkien romanization system for hokkien languages: 
         - tailo
         - Taiwanese Hokkien Romanization System for Hokkien languages
+      the "stadin slangi" dialect of finnish: 
+        - stadi
+        - The "Stadin slangi" dialect of Finnish
       the balanka dialect of anii: 
         - balanka
         - The Balanka dialect of Anii
@@ -47239,6 +47288,9 @@ langvar:
       the lipovaz dialect of resian: 
         - lipaw
         - The Lipovaz dialect of Resian
+      the moderate (conservative, i.e. danish-like) spelling variant of bokmã¥l: 
+        - ~
+        - The moderate (conservative, i.e. Danish-like) spelling variant of BokmÃ¥l
       the oseacco dialect of resian: 
         - osojs
         - The Oseacco dialect of Resian

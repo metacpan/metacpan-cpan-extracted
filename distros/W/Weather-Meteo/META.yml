@@ -3,6 +3,7 @@ abstract: 'Interface to L<https://open-meteo.com> for historical weather data'
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
+  DateTime: '0'
   ExtUtils::MakeMaker: '0'
   File::Glob: '0'
   File::Slurp: '0'
@@ -14,10 +15,15 @@ build_requires:
   Test::Carp: '0'
   Test::Compile: '0'
   Test::DescribeMe: '0'
-  Test::MockModule: '0'
+  Test::LWP::UserAgent: '0'
+  Test::Memory::Cycle: '0'
+  Test::Mockingbird: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::NoWarnings: '0'
+  Test::Returns: '0'
+  Test::Which: '0'
+  TimeZone::TimeZoneDB: '0'
   WWW::RT::CPAN: '0'
   autodie: '0'
 configure_requires:
@@ -52,5 +58,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/Weather-Meteo/issues
   repository: git://github.com/nigelhorne/Weather-Meteo.git
-version: '0.13'
+version: '0.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

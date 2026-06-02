@@ -74,11 +74,12 @@ requires:
   parent: '0'
   perl: '5.016000'
   strict: '0'
+  threads::shared: '1.48'
   utf8: '0'
   version: '0'
   warnings: '0'
 resources:
   bugtracker: https://gitlab.com/deguest/Module-Generic/issues
   repository: https://gitlab.com/deguest/Module-Generic
-version: v1.5.1
+version: v1.5.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

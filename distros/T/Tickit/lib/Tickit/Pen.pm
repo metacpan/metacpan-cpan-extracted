@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2011-2023 -- leonerd@leonerd.org.uk
 
-package Tickit::Pen 0.76;
+package Tickit::Pen 0.77;
 
 use v5.14;
 use warnings;
@@ -362,13 +362,13 @@ use overload
 use Scalar::Util qw( refaddr );
 use overload '==' => sub { refaddr($_[0]) == refaddr($_[1]) };
 
-package Tickit::Pen::Immutable 0.76;
+package Tickit::Pen::Immutable 0.77;
 use base qw( Tickit::Pen );
 use constant mutable => 0;
 
 sub as_immutable { return $_[0] }
 
-package Tickit::Pen::Mutable 0.76;
+package Tickit::Pen::Mutable 0.77;
 use base qw( Tickit::Pen );
 use constant mutable => 1;
 

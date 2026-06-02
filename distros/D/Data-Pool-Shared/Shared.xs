@@ -383,6 +383,7 @@ alloc_n(self, count, ...)
     } else {
         uint64_t *buf;
         Newx(buf, count, uint64_t);
+        SAVEFREEPV(buf);  /* freed on scope exit, incl. a croak from newSViv/av_push */
         if (pool_alloc_n(h, buf, (uint32_t)count, timeout)) {
             AV *av = newAV();
             av_extend(av, count - 1);
@@ -392,7 +393,6 @@ alloc_n(self, count, ...)
         } else {
             RETVAL = &PL_sv_undef;
         }
-        Safefree(buf);
     }
   OUTPUT:
     RETVAL
@@ -413,16 +413,14 @@ free_n(self, slots_av)
     } else {
         uint64_t *buf;
         Newx(buf, len, uint64_t);
+        SAVEFREEPV(buf);  /* freed on scope exit, incl. a croak from SvUV magic */
         for (SSize_t i = 0; i < len; i++) {
             SV **svp = av_fetch(av, i, 0);
-            if (!svp || !SvOK(*svp)) {
-                Safefree(buf);
+            if (!svp || !SvOK(*svp))
                 croak("free_n: undef slot at index %ld", (long)i);
-            }
             buf[i] = (uint64_t)SvUV(*svp);
         }
         RETVAL = pool_free_n(h, buf, (uint32_t)len);
-        Safefree(buf);
     }
   OUTPUT:
     RETVAL

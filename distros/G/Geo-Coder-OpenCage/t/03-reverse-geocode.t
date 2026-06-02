@@ -11,77 +11,103 @@ binmode Test::More->builder->todo_output,    ":encoding(utf8)";
 use lib './lib'; # actually use the module, not other versions installed
 use Geo::Coder::OpenCage;
 
-my $api_key;
-if ($ENV{GEO_CODER_OPENCAGE_API_KEY}) {
-    $api_key = $ENV{GEO_CODER_OPENCAGE_API_KEY};
-} else {
-    plan skip_all => "Set GEO_CODER_OPENCAGE_API_KEY environment variable to run this test";
+# Offline: No api key needed here.
+{
+    my $geocoder = Geo::Coder::OpenCage->new(api_key => 'dummy');
+
+    {
+        my $result;
+        warning_like { $result = $geocoder->reverse_geocode() }
+            qr/lat is a required parameter/,
+            "reverse_geocode() with no args warns about missing lat";
+        is($result, undef, "... and returns undef");
+    }
+
+    {
+        my $result;
+        warning_like { $result = $geocoder->reverse_geocode(lat => 52.5) }
+            qr/lng is a required parameter/,
+            "reverse_geocode() with only lat warns about missing lng";
+        is($result, undef, "... and returns undef");
+    }
+
+    {
+        my $result;
+        warning_like { $result = $geocoder->reverse_geocode(lng => 13.4) }
+            qr/lat is a required parameter/,
+            "reverse_geocode() with only lng warns about missing lat";
+        is($result, undef, "... and returns undef");
+    }
 }
 
-my $geocoder = Geo::Coder::OpenCage->new(api_key => $api_key,);
+# Live tests against the API need a key
+SKIP: {
+    skip 'Set GEO_CODER_OPENCAGE_API_KEY environment variable to run live tests', 1
+        unless $ENV{GEO_CODER_OPENCAGE_API_KEY};
 
-my @tests = (
-    # Basics
-    {   input => {
-            lat => -32.5980702,
-            lng => 149.5886383
+    my $geocoder = Geo::Coder::OpenCage->new(api_key => $ENV{GEO_CODER_OPENCAGE_API_KEY});
+
+    my @tests = (
+        # Basics
+        {   input => {
+                lat => -32.5980702,
+                lng => 149.5886383
+            },
+            output => "Mudgee",
         },
-        output => "Mudgee",
-    },
 
-    # Encoding
-    {   input => {
-            lat => 51.9625101,
-            lng => 7.6251879,
+        # Encoding
+        {   input => {
+                lat => 51.9625101,
+                lng => 7.6251879,
+            },
+            output => "Münster",
         },
-        output => "Münster",
-    },
 
-    # language
-    {   input => {
-            lat      => 35.6823815,
-            lng      => 139.7530053,
-            language => "jp",
+        # language
+        {   input => {
+                lat      => 35.6823815,
+                lng      => 139.7530053,
+                language => "jp",
+            },
+            output => "皇居",
         },
-        output => "皇居",
-    },
-);
+    );
 
-for my $test (@tests) {
-    my $location = join(", ", $test->{input}{lat}, $test->{input}{lng});
-    ok $location, "Trying to geocode '$location'";
+    for my $test (@tests) {
+        my $location = join(", ", $test->{input}{lat}, $test->{input}{lng});
+        ok $location, "Trying to geocode '$location'";
 
-    my $result = $geocoder->reverse_geocode(%{$test->{input}});
+        my $result = $geocoder->reverse_geocode(%{$test->{input}});
 
-    ok $result, '... got a sane response';
+        ok $result, '... got a sane response';
 
-    my @results     = @{$result->{results} || []};
-    my $num_results = @results;
+        my @results     = @{$result->{results} || []};
+        my $num_results = @results;
 
-    ok @results > 0, "... got at least one ($num_results) results";
+        ok @results > 0, "... got at least one ($num_results) results";
 
-    my $good_results = 0;
-RESULT:
-    for my $individual_result (@results) {
-    COMPONENT:
-        for my $component (values %{$individual_result->{components}}) {
-            if ($component =~ /^$test->{output}\b/) {
-                $good_results++;
-                last COMPONENT;
+        my $good_results = 0;
+        RESULT:
+        for my $individual_result (@results) {
+            COMPONENT:
+            for my $component (values %{$individual_result->{components}}) {
+                if ($component =~ /^$test->{output}\b/) {
+                    $good_results++;
+                    last COMPONENT;
+                }
             }
         }
+        ok $good_results, "... got at least one ($good_results) results with the name we expect ($test->{output})";
     }
-    ok $good_results, "... got at least one ($good_results) results with the name we expect ($test->{output})";
-}
 
-{
+    {
+        my $result;
+        warning_like { $result = $geocoder->reverse_geocode('lat' => 1000, 'lng' => 1000); }
+        [qr/400, invalid coordinates/], " got invalid coordinates warning ";
 
-    my $result;
-    warning_like { $result = $geocoder->reverse_geocode('lat' => 1000, 'lng' => 1000); }
-    [qr/400, invalid coordinates/], " got invalid coordinates warning ";
-
-    is($result, undef, 'correctly returned undef for bad coords');
-
+        is($result, undef, 'correctly returned undef for bad coords');
+    }
 }
 
 done_testing();

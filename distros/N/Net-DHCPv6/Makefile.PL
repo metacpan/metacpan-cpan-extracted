@@ -28,14 +28,15 @@ my %WriteMakefileArgs = (
     "strictures" => 2
   },
   "TEST_REQUIRES" => {
+    "File::Slurper" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test2::Mock" => 0,
-    "Test2::V1" => 0,
+    "Test2::V1" => "1.302217",
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,13 +46,14 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Const::Fast::Exporter" => 0,
+  "File::Slurper" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Module::Build" => "0.28",
   "Ref::Util" => 0,
   "Test2::Mock" => 0,
-  "Test2::V1" => 0,
+  "Test2::V1" => "1.302217",
   "Test::More" => 0,
   "namespace::clean" => 0,
   "strictures" => 2

@@ -1,10 +1,12 @@
-#!/usr/bin/false
-# ABSTRACT: Preference option (code 7) — 8-bit server preference value
+#!/bin/false
+# ABSTRACT: Preference option (code 7) -- 8-bit server preference value
 # PODNAME: Net::DHCPv6::Option::Preference
-package Net::DHCPv6::Option::Preference;
-$Net::DHCPv6::Option::Preference::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Option::Preference;
+$Net::DHCPv6::Option::Preference::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
+use Carp qw( croak );
 use Net::DHCPv6::Constants;
 use Net::DHCPv6::X::BadOption;
 use parent 'Net::DHCPv6::Option';
@@ -17,23 +19,17 @@ sub new {
     $args{data} = pack( 'C', $args{value} );
     my $self = $class->SUPER::new( %args );
     $self->{value} = $args{value};
-    bless $self, $class;
+    return bless $self, $class;
 }
 
-sub value { shift->{value} }
+sub value { return shift->{value} }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
+    my ( $class, $code, $payload ) = @_;
     Net::DHCPv6::X::BadOption->throw( message => 'Preference option must be exactly 1 byte' )
-        if CORE::length( $data ) != 1;
-    my $value = unpack( 'C', $data );
+        if CORE::length( $payload ) != 1;
+    my $value = unpack( 'C', $payload );
     return $class->new( value => $value );
-}
-
-sub as_bytes {
-    my $self = shift;
-    my $data = pack( 'C', $self->{value} );
-    return pack( 'nn', $self->{code}, CORE::length( $data ) ) . $data;
 }
 
 $Net::DHCPv6::OptionList::OPTION_CLASS{$OPTION_PREFERENCE} = __PACKAGE__;
@@ -44,24 +40,25 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::Preference - Preference option (code 7) — 8-bit server preference value
+Net::DHCPv6::Option::Preference - Preference option (code 7) -- 8-bit server preference value
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
-  my $pref = Net::DHCPv6::Option::Preference->new(value => 255);
+  my $pref = Net::DHCPv6::Option::Preference->new(value => 255);  # 0-255, higher = more preferred
 
 =head1 DESCRIPTION
 
 Implements the Preference option (OPTION_PREFERENCE, code 7) per
-RFC 8415 §21.8. An 8-bit unsigned integer indicating server preference.
+RFC 8415 E<167>21.8. An 8-bit unsigned integer (0-255) where a higher
+value indicates the server is more preferred by the client.
 
 =head1 ALPHA STATUS
 

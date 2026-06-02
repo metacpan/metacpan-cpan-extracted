@@ -75,6 +75,7 @@
             "parent" : "0",
             "perl" : "5.016000",
             "strict" : "0",
+            "threads::shared" : "1.48",
             "utf8" : "0",
             "version" : "0",
             "warnings" : "0"
@@ -108,6 +109,6 @@
          "web" : "https://gitlab.com/deguest/Module-Generic"
       }
    },
-   "version" : "v1.5.1",
+   "version" : "v1.5.3",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

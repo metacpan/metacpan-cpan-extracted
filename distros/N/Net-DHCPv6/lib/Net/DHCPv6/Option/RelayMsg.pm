@@ -1,27 +1,30 @@
-#!/usr/bin/false
-# ABSTRACT: Relay Message option (code 9) — encapsulated relay message
+#!/bin/false
+# ABSTRACT: Relay Message option (code 9) -- encapsulated relay message
 # PODNAME: Net::DHCPv6::Option::RelayMsg
-package Net::DHCPv6::Option::RelayMsg;
-$Net::DHCPv6::Option::RelayMsg::VERSION = '0.001';
 use strictures 2;
+
+package Net::DHCPv6::Option::RelayMsg;
+$Net::DHCPv6::Option::RelayMsg::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
 use Net::DHCPv6::Constants;
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
+my $EMPTY = q();
 
 sub new {
     my ( $class, %args ) = @_;
     $args{code} = $OPTION_RELAY_MSG;
-    $args{data} = $args{data} // ( $args{message} // '' );
+    $args{data} = $args{data} // ( $args{message} // $EMPTY );
     my $self = $class->SUPER::new( %args );
     $self->{message} = $args{data};
-    bless $self, $class;
+    return bless $self, $class;
 }
 
-sub message { shift->{message} }
+sub message { return shift->{message} }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
-    return $class->new( message => $data );
+    my ( $class, $code, $payload ) = @_;
+    return $class->new( message => $payload );
 }
 
 $Net::DHCPv6::OptionList::OPTION_CLASS{$OPTION_RELAY_MSG} = __PACKAGE__;
@@ -31,15 +34,15 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::RelayMsg - Relay Message option (code 9) — encapsulated relay message
+Net::DHCPv6::Option::RelayMsg - Relay Message option (code 9) -- encapsulated relay message
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -49,7 +52,7 @@ version 0.001
 =head1 DESCRIPTION
 
 Carries an encapsulated DHCPv6 message between relay agents and
-servers.  See RFC 8415 §21.9.
+servers.  See RFC 8415 E<167>21.9.
 
 =head1 ALPHA STATUS
 

@@ -6,11 +6,27 @@ use EV;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.06';
+    our $VERSION = '0.08';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
 package EV::Websockets::Context;
+
+# Parse a proxy value (typically from *_proxy env vars) into ($host, $port).
+# Accepts an optional scheme prefix and userinfo, plain host:port, and IPv6
+# bracket notation. Returns an empty list if no host can be extracted; the
+# port defaults to 1080 when the value carries a host but no explicit port.
+sub _parse_proxy {
+    my ($url) = @_;
+    return unless defined $url && length $url;
+    return unless $url =~ m{^(?:\w+://)?(?:[^@]+\@)?(\[[\w:]+\]|[^:/]+)(?::(\d+))?};
+    # Capture before the substitution below: a successful s/// resets $2.
+    my ($host, $port) = ($1, $2);
+    # Strip IPv6 brackets: lws wants a bare proxy host (the port is passed
+    # separately), matching how connect() unwraps bracketed URL hosts.
+    $host =~ s/^\[(.*)\]\z/$1/;
+    return ($host, defined $port ? $port : 1080);
+}
 
 sub new {
     my ($class, %args) = @_;
@@ -21,9 +37,10 @@ sub new {
 
     if (!defined $proxy) {
         my $env_proxy = $ENV{https_proxy} // $ENV{http_proxy} // $ENV{all_proxy};
-        if ($env_proxy && $env_proxy =~ m{^(?:\w+://)?(?:[^@]+\@)?(\[[\w:]+\]|[^:/]+)(?::(\d+))?}) {
-            $proxy      = $1;
-            $proxy_port = $2 // 1080;
+        my ($host, $port) = _parse_proxy($env_proxy);
+        if (defined $host) {
+            $proxy      = $host;
+            $proxy_port = $port;
         }
     }
 
@@ -83,12 +100,9 @@ libwebsockets C library integrated with the EV event loop.
 
 This module uses libwebsockets' foreign loop integration to run within an
 existing EV event loop, making it suitable for applications already using EV.
-
-B<Important:> a context with no active listeners or connections may spin an
-internal idle watcher, preventing other EV watchers (timers, I/O) from
-firing. Always create a listener (C<< $ctx->listen(...) >>) or connection
-(C<< $ctx->connect(...) >>) before entering C<EV::run>, or destroy the
-context when not in use.
+The context services libwebsockets without blocking, so idle connections (or a
+context with no connections at all) never stall other EV watchers such as your
+own timers and I/O.
 
 =head1 CLASSES
 
@@ -114,10 +128,12 @@ If C<proxy> is not specified, the module reads C<https_proxy>, C<http_proxy>,
 or C<all_proxy> from the environment. Pass C<< proxy => "" >> to suppress
 auto-detection.
 
-C<ssl_init> controls whether libwebsockets initializes OpenSSL globals.
-By default, initialization happens once on the first context.  Pass
-C<< ssl_init => 0 >> when coexisting with another TLS library (e.g.
-Feersum/picotls) to avoid reinitializing shared OpenSSL state.
+C<ssl_init> controls whether this module initializes libwebsockets' global
+OpenSSL state. By default it is initialized once and then pinned for the
+lifetime of the process, so contexts may be created and destroyed (and new
+ones created) freely without tearing OpenSSL down. Pass C<< ssl_init => 0 >>
+when coexisting with another TLS library (e.g. Feersum/picotls) that owns the
+OpenSSL global state, so this module leaves it untouched.
 
 =head3 connect(%options)
 
@@ -230,6 +246,10 @@ The module holds a reference to the Perl handle until the connection is
 destroyed, preventing premature fd closure. C<$headers> in C<on_connect>
 is always C<undef> for adopted connections.
 
+Adopted connections cannot select a WebSocket subprotocol: lws uses the first
+protocol registered on the auto-created C<server> vhost. There is no
+C<protocol> option (unlike C<connect> and C<listen>).
+
 If you already read data from the socket (e.g., the HTTP upgrade request),
 pass it via C<initial_data> so lws can process the handshake.
 
@@ -267,6 +287,10 @@ continuation frames. Set C<$is_final> true on the last fragment.
     $conn->send_fragment("part2", 0, 0);   # continuation, not final
     $conn->send_fragment("part3", 0, 1);   # continuation, final
 
+C<$is_binary> is honoured only on the first fragment, which fixes the message
+type; it is ignored on continuation frames (they are always sent as
+continuations), per RFC 6455 §5.4.
+
 Use this only if you need to interleave outbound writes with other I/O while
 streaming a single message. For ordinary sends, prefer C<send>/C<send_binary>.
 
@@ -274,7 +298,8 @@ streaming a single message. For ordinary sends, prefer C<send>/C<send_binary>.
 
 Returns the number of payload bytes currently queued for sending (excludes
 WebSocket framing overhead). Useful for backpressure monitoring; pair with
-C<on_drain> to gate further sends.
+C<on_drain> to gate further sends. Returns C<0> on a closed connection (it
+does not croak), so it is safe to poll from cleanup paths.
 
 =head3 stash
 
@@ -445,8 +470,10 @@ from cleanup paths without guarding.
 User-supplied callbacks (C<on_connect>, C<on_message>, C<on_close>,
 C<on_error>, C<on_pong>, C<on_drain>, C<on_handshake>) are invoked under
 C<G_EVAL>: a die inside a callback is caught, warned, and the connection
-continues. C<on_error> is itself wrapped, so a die inside C<on_error> will
-not recurse.
+continues. The exception is C<on_handshake>, which gates the upgrade: a die
+there rejects the connection (the client receives a 403), exactly as if the
+callback had returned a false value. C<on_error> is itself wrapped, so a die
+inside C<on_error> will not recurse.
 
 =head1 SEE ALSO
 

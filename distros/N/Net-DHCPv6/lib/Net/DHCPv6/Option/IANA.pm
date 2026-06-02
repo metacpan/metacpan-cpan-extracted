@@ -1,15 +1,18 @@
-#!/usr/bin/false
+#!/bin/false
 # ABSTRACT: Identity Association for Non-temporary Addresses option (code 3)
 # PODNAME: Net::DHCPv6::Option::IANA
-package Net::DHCPv6::Option::IANA;
-$Net::DHCPv6::Option::IANA::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Option::IANA;
+$Net::DHCPv6::Option::IANA::VERSION = '0.002';
+use Carp qw( croak );
 use Net::DHCPv6::Constants;
 use Net::DHCPv6::OptionList;
 use Net::DHCPv6::X::Truncated;
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
+
+my $IA_HDR_SIZE = 12;    ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 
 sub new {
     my ( $class, %args ) = @_;
@@ -18,24 +21,24 @@ sub new {
     $args{t1}      = $args{t1}      // 0;
     $args{t2}      = $args{t2}      // 0;
     $args{options} = $args{options} // Net::DHCPv6::OptionList->new;
-    my $data = pack( 'N N N', $args{iaid}, $args{t1}, $args{t2} ) . $args{options}->as_bytes;
-    $args{data} = $data;
+    my $payload = pack( 'N N N', $args{iaid}, $args{t1}, $args{t2} ) . $args{options}->as_bytes;
+    $args{data} = $payload;
     my $self = $class->SUPER::new( %args );
     $self->{iaid}    = $args{iaid};
     $self->{t1}      = $args{t1};
     $self->{t2}      = $args{t2};
     $self->{options} = $args{options};
-    bless $self, $class;
+    return bless $self, $class;
 }
 
-sub iaid    { shift->{iaid} }
-sub t1      { shift->{t1} }
-sub t2      { shift->{t2} }
-sub options { shift->{options} }
+sub iaid    { return shift->{iaid} }
+sub t1      { return shift->{t1} }
+sub t2      { return shift->{t2} }
+sub options { return shift->{options} }
 
 sub add_option {
     my ( $self, $option ) = @_;
-    $self->{options}->add_option( $option );
+    return $self->{options}->add_option( $option );
 }
 
 sub get_option {
@@ -44,19 +47,19 @@ sub get_option {
 }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
+    my ( $class, $code, $payload ) = @_;
     Net::DHCPv6::X::Truncated->throw( message => 'Truncated IANA option' )
-        if CORE::length( $data ) < 12;
-    my ( $iaid, $t1, $t2 ) = unpack( 'N N N', substr( $data, 0, 12 ) );
-    my $opt_data = substr( $data, 12 );
+        if CORE::length( $payload ) < $IA_HDR_SIZE;
+    my ( $iaid, $t1, $t2 ) = unpack( 'N N N', substr( $payload, 0, $IA_HDR_SIZE ) );
+    my $opt_data = substr( $payload, $IA_HDR_SIZE );
     my $opts     = Net::DHCPv6::OptionList->from_bytes( $opt_data );
     return $class->new( iaid => $iaid, t1 => $t1, t2 => $t2, options => $opts );
 }
 
 sub as_bytes {
-    my $self = shift;
-    my $data = pack( 'N N N', $self->{iaid}, $self->{t1}, $self->{t2} ) . $self->{options}->as_bytes;
-    return pack( 'nn', $self->{code}, CORE::length( $data ) ) . $data;
+    my $self    = shift;
+    my $payload = pack( 'N N N', $self->{iaid}, $self->{t1}, $self->{t2} ) . $self->{options}->as_bytes;
+    return pack( 'nn', $self->{code}, CORE::length( $payload ) ) . $payload;
 }
 
 $Net::DHCPv6::OptionList::OPTION_CLASS{$OPTION_IA_NA} = __PACKAGE__;
@@ -67,7 +70,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -75,11 +78,15 @@ Net::DHCPv6::Option::IANA - Identity Association for Non-temporary Addresses opt
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
-  my $iana = Net::DHCPv6::Option::IANA->new(iaid => 42, t1 => 3600, t2 => 5400);
+  my $iana = Net::DHCPv6::Option::IANA->new(
+      iaid => 42,
+      t1   => 3_600,
+      t2   => 5_400,
+  );
   $iana->add_option($iaaddr);
 
   print $iana->iaid;
@@ -87,7 +94,7 @@ version 0.001
 
 =head1 DESCRIPTION
 
-Implements the IA_NA option (OPTION_IA_NA, code 3) per RFC 8415 §21.4.
+Implements the IA_NA option (OPTION_IA_NA, code 3) per RFC 8415 E<167>21.4.
 Contains an IAID, T1, T2, and sub-options (typically IAAddr options).
 
 =head1 ALPHA STATUS

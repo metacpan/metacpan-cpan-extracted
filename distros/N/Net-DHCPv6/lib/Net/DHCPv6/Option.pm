@@ -1,26 +1,28 @@
-#!/usr/bin/false
+#!/bin/false
 # ABSTRACT: DHCPv6 option base class
 # PODNAME: Net::DHCPv6::Option
-package Net::DHCPv6::Option;
-$Net::DHCPv6::Option::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
-use Net::DHCPv6::Constants;
-use Net::DHCPv6::OptionList;
-use Net::DHCPv6::X::Truncated;
-use namespace::clean;
 
+package Net::DHCPv6::Option;
+$Net::DHCPv6::Option::VERSION = '0.002';
+use Carp qw( croak );
+use Net::DHCPv6::Constants;
+use Net::DHCPv6::X::Truncated;
+use parent 'Net::DHCPv6::Helpers';
+use namespace::clean;
+my $EMPTY        = q();
+my $OPT_HDR_SIZE = 4;     ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 our $FOLLOW_COMPRESSION = 0;
 
 sub new {
     my ( $class, %args ) = @_;
     croak 'Option->new: code is required' unless defined $args{code};
-    my $self = { code => $args{code}, data => $args{data} // '' };
-    bless $self, $class;
+    my $self = { code => $args{code}, data => $args{data} // $EMPTY };
+    return bless $self, $class;
 }
 
-sub code { shift->{code} }
-sub data { shift->{data} }
+sub code { return shift->{code} }
+sub data { return shift->{data} }    ## no critic (Bangs::ProhibitVagueNames)
 
 sub type {
     my $self = shift;
@@ -28,25 +30,26 @@ sub type {
 }
 
 sub as_bytes {
-    my $self = shift;
-    my $data = $self->{data} // '';
-    return pack( 'nn', $self->{code}, CORE::length( $data ) ) . $data;
+    my $self    = shift;
+    my $payload = $self->{data} // $EMPTY;
+    return pack( 'nn', $self->{code}, CORE::length( $payload ) ) . $payload;
 }
 
 sub from_bytes {
     my ( $class, $bytes ) = @_;
     Net::DHCPv6::X::Truncated->throw( message => 'Option->from_bytes: need at least 4 bytes for TLV header' )
-        unless defined $bytes && CORE::length( $bytes ) >= 4;
+        if !defined $bytes || CORE::length( $bytes ) < $OPT_HDR_SIZE;
     my $code   = unpack( 'n', substr( $bytes, 0, 2 ) );
     my $optlen = unpack( 'n', substr( $bytes, 2, 2 ) );
     Net::DHCPv6::X::Truncated->throw( message => 'Truncated option TLV payload' )
-        if 4 + $optlen > CORE::length( $bytes );
-    my $data   = substr( $bytes, 4, $optlen );
-    my $remain = substr( $bytes, 4 + $optlen );
+        if $OPT_HDR_SIZE + $optlen > CORE::length( $bytes );
+    my $payload = substr( $bytes, $OPT_HDR_SIZE, $optlen );
+    my $remain  = substr( $bytes, $OPT_HDR_SIZE + $optlen );
 
+    require Net::DHCPv6::OptionList;
     my $class_name = $Net::DHCPv6::OptionList::OPTION_CLASS{$code}
         || 'Net::DHCPv6::Option::Generic';
-    my $option = $class_name->from_bytes_inner( $code, $data );
+    my $option = $class_name->from_bytes_inner( $code, $payload );
     return ( $option, $remain );
 }
 
@@ -56,7 +59,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -64,11 +67,15 @@ Net::DHCPv6::Option - DHCPv6 option base class
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
-  my $opt = Net::DHCPv6::Option->new(code => 99, data => "\x01\x02");
+  my $opt = Net::DHCPv6::Option->new(
+      code => 99,
+      data => "\x01\x02",
+  );
+
   print $opt->code;       # 99
   print $opt->data;       # raw bytes
   print $opt->as_bytes;   # TLV-encoded wire bytes
@@ -130,7 +137,7 @@ Concrete option classes should:
 
 =item Override C<as_bytes> if the wire format differs from standard TLV
 
-=item Implement C<from_bytes_inner($code, $data)> for parse-from-wire
+=item Implement C<from_bytes_inner($code, $payload)> for parse-from-wire
 
 =item Register with C<$Net::DHCPv6::OptionList::OPTION_CLASS{$code} = __PACKAGE__>
 

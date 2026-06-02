@@ -1,5 +1,12 @@
 -----
 
+12.4.0    2026-06-01
+   [Added]
+       * Domain events PROC_DOMAIN_EVENT_CALLBACK_CHANNEL_LIFECYCLE
+         and PROC_DOMAIN_EVENT_VCPU_REMOVED
+   [Changed]
+       * Updated to libvirt tag v12.4.0
+
 12.3.0    2026-05-02
    [Changed]
        * Updated to libvirt tag v12.3.0

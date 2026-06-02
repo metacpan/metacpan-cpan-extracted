@@ -122,22 +122,22 @@ sub callback
     my( $what, $code ) = @_;
     if( !defined( $what ) )
     {
-        warnings::warn( "No callback type was provided.\n" ) if( warnings::enabled( 'Module::Generic' ) );
+        warn( "No callback type was provided.\n" ) if( warnings::enabled( 'Module::Generic' ) );
         CORE::return;
     }
     elsif( $what ne 'add' && $what ne 'remove' )
     {
-        warnings::warn( "Callback type provided ($what) is unsupported. Use 'add' or 'remove'.\n" ) if( warnings::enabled( 'Module::Generic' ) );
+        warn( "Callback type provided ($what) is unsupported. Use 'add' or 'remove'.\n" ) if( warnings::enabled( 'Module::Generic' ) );
         CORE::return;
     }
     elsif( CORE::scalar( @_ ) == 1 )
     {
-        warnings::warn( "No callback code was provided. Provide an anonymous subroutine, or reference to existing subroutine.\n" ) if( warnings::enabled( 'Module::Generic' ) );
+        warn( "No callback code was provided. Provide an anonymous subroutine, or reference to existing subroutine.\n" ) if( warnings::enabled( 'Module::Generic' ) );
         CORE::return;
     }
     elsif( defined( $code ) && ref( $code ) ne 'CODE' )
     {
-        warnings::warn( "Callback provided is not a code reference. Provide an anonymous subroutine, or reference to existing subroutine." ) if( warnings::enabled( 'Module::Generic' ) );
+        warn( "Callback provided is not a code reference. Provide an anonymous subroutine, or reference to existing subroutine." ) if( warnings::enabled( 'Module::Generic' ) );
         CORE::return;
     }
 
@@ -794,7 +794,7 @@ sub pass_error
         my $error = $repo->get;
         if( !CORE::defined( $error ) )
         {
-            warnings::warnif( "No error object provided and no previous error set either! It seems the previous method call returned a simple undef\n" );
+            warn( "No error object provided and no previous error set either! It seems the previous method call returned a simple undef" ) if( warnings::enabled( 'Module::Generic' ) );
         }
         else
         {
@@ -1371,12 +1371,12 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         $opts->{debug} //= 0;
         if( CORE::length( $opts->{add} ) && ref( $opts->{add} ) ne 'CODE' )
         {
-            warnings::warn( "Code provided for the array add callback is not a code reference.\n" ) if( warnings::enabled( 'Module::Generic' ) || $opts->{debug} );
+            warn( "Code provided for the array add callback is not a code reference.\n" ) if( warnings::enabled( 'Module::Generic' ) || $opts->{debug} );
             CORE::return;
         }
         if( CORE::length( $opts->{remove} ) && ref( $opts->{remove} ) ne 'CODE' )
         {
-            warnings::warn( "Code provided for the array remove callback is not a code reference.\n" ) if( warnings::enabled( 'Module::Generic' ) || $opts->{debug} );
+            warn( "Code provided for the array remove callback is not a code reference.\n" ) if( warnings::enabled( 'Module::Generic' ) || $opts->{debug} );
             CORE::return;
         }
 
@@ -1400,7 +1400,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         my $rv;
         if( !$cb )
         {
-            warnings::warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
+            warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
             $rv = 1;
         }
         else
@@ -1425,7 +1425,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         my $rv;
         if( !$cb )
         {
-            warnings::warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
+            warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
             $rv = 1;
         }
         else
@@ -1476,7 +1476,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         my $rv;
         if( !$cb )
         {
-            warnings::warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
+            warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
             $rv = 1;
         }
         else
@@ -1500,7 +1500,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         my $rv;
         if( !$cb )
         {
-            warnings::warn( "No callback add found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
+            warn( "No callback add found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
             $rv = 1;
         }
         else
@@ -1524,7 +1524,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         my $rv;
         if( !$cb )
         {
-            warnings::warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
+            warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
             $rv = 1;
         }
         else
@@ -1554,7 +1554,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
             my $cb = $self->{callback_add} || $dummy_callback;
             if( !$cb )
             {
-                warnings::warn( "No callback add found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
+                warn( "No callback add found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
                 $rv = 1;
             }
             else
@@ -1572,7 +1572,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
             my $cb = $self->{callback_remove} || $dummy_callback;
             if( !$cb )
             {
-                warnings::warn( "No callback remove found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
+                warn( "No callback remove found. This should not happen." ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
                 $rv = 1;
             }
             else
@@ -1596,7 +1596,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         my $rv;
         if( !$cb )
         {
-            warnings::warn( "No callback add found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
+            warn( "No callback add found. This should not happen." ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
             $rv = 1;
         }
         else
@@ -1635,7 +1635,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         my $rv;
         if( !$cb )
         {
-            warnings::warn( "No callback add found. This should not happen.\n" ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
+            warn( "No callback add found. This should not happen." ) if( warnings::enabled( 'Module::Generic' ) || $self->{debug} );
             $rv = 1;
         }
         else

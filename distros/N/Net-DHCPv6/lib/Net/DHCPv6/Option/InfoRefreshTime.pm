@@ -1,10 +1,12 @@
-#!/usr/bin/false
-# ABSTRACT: Information Refresh Time option (code 32) — 32-bit refresh duration
+#!/bin/false
+# ABSTRACT: Information Refresh Time option (code 32) -- 32-bit refresh duration
 # PODNAME: Net::DHCPv6::Option::InfoRefreshTime
-package Net::DHCPv6::Option::InfoRefreshTime;
-$Net::DHCPv6::Option::InfoRefreshTime::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Option::InfoRefreshTime;
+$Net::DHCPv6::Option::InfoRefreshTime::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
+use Carp qw( croak );
 use Net::DHCPv6::Constants;
 use Net::DHCPv6::X::BadOption;
 use parent 'Net::DHCPv6::Option';
@@ -17,23 +19,17 @@ sub new {
     $args{data} = pack( 'N', $args{value} );
     my $self = $class->SUPER::new( %args );
     $self->{value} = $args{value};
-    bless $self, $class;
+    return bless $self, $class;
 }
 
-sub value { shift->{value} }
+sub value { return shift->{value} }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
+    my ( $class, $code, $payload ) = @_;
     Net::DHCPv6::X::BadOption->throw( message => 'InfoRefreshTime must be exactly 4 bytes' )
-        if CORE::length( $data ) != 4;
-    my $value = unpack( 'N', $data );
+        if CORE::length( $payload ) != 4;    ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
+    my $value = unpack( 'N', $payload );
     return $class->new( value => $value );
-}
-
-sub as_bytes {
-    my $self = shift;
-    my $data = pack( 'N', $self->{value} );
-    return pack( 'nn', $self->{code}, CORE::length( $data ) ) . $data;
 }
 
 $Net::DHCPv6::OptionList::OPTION_CLASS{$OPTION_INFORMATION_REFRESH_TIME} = __PACKAGE__;
@@ -43,26 +39,26 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::InfoRefreshTime - Information Refresh Time option (code 32) — 32-bit refresh duration
+Net::DHCPv6::Option::InfoRefreshTime - Information Refresh Time option (code 32) -- 32-bit refresh duration
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
   use Net::DHCPv6::Option::InfoRefreshTime;
-  my $opt = Net::DHCPv6::Option::InfoRefreshTime->new(value => 86400);
+   my $opt = Net::DHCPv6::Option::InfoRefreshTime->new(value => 86_400);
 
 =head1 DESCRIPTION
 
 Carries the minimum time (in seconds) that a client should wait before
 refreshing information received from the server.  Required for
-Information-Request messages.  See RFC 8415 §21.24.
+Information-Request messages.  See RFC 8415 E<167>21.24.
 
 =head1 ALPHA STATUS
 

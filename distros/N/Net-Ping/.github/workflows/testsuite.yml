@@ -19,10 +19,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - run: perl -V
       - name: install cpan deps
-        uses: perl-actions/install-with-cpm@v1.3
+        uses: perl-actions/install-with-cpm@8b1a9840b26cc3885ae2889749a48629be2501b0 # v1.9
         with:
           install: |
             Socket
@@ -77,19 +77,15 @@ jobs:
           ]
 
     steps:
-      - uses: actions/checkout@v1
-      - uses: shogo82148/actions-setup-perl@v1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: shogo82148/actions-setup-perl@b6cfc127f1b0a63ac98797800f641494d80f42f8 # v1.37.1
         with:
           perl-version: ${{ matrix.perl-version }}
       - run: perl -V
+      - name: install cpanm
+        run: curl -sL https://cpanmin.us | perl - App::cpanminus
       - name: install cpan deps
-        uses: perl-actions/install-with-cpm@v1.3
-        with:
-          sudo: false
-          install: |
-            Socket
-            Test::More
-            Time::HiRes
+        run: cpanm --notest Socket Test::More Time::HiRes
       - run: perl Makefile.PL
       - run: make test
 
@@ -109,7 +105,7 @@ jobs:
         perl-version: [latest]
 
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - run: perl -V
       - run: perl Makefile.PL
       - run: make test
@@ -131,7 +127,7 @@ jobs:
         perl-version: [latest]
 
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - run: perl -V
       - run: perl Makefile.PL
       #- run: prove -vb t/*.t

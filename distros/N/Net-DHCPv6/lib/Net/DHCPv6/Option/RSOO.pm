@@ -1,25 +1,28 @@
-#!/usr/bin/false
-# ABSTRACT: Relay-Supplied Options option (code 66) — opaque
+#!/bin/false
+# ABSTRACT: Relay-Supplied Options option (code 66) -- opaque
 # PODNAME: Net::DHCPv6::Option::RSOO
-package Net::DHCPv6::Option::RSOO;
-$Net::DHCPv6::Option::RSOO::VERSION = '0.001';
 use strictures 2;
+
+package Net::DHCPv6::Option::RSOO;
+$Net::DHCPv6::Option::RSOO::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
 use Net::DHCPv6::Constants;
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
+my $EMPTY = q();
 
 sub new {
     my ( $class, %args ) = @_;
     $args{code} = $OPTION_RSOO;
-    $args{data} = $args{data} // ( $args{option_data} // '' );
+    $args{data} = $args{data} // ( $args{option_data} // $EMPTY );
     return $class->SUPER::new( %args );
 }
 
-sub option_data { shift->{data} }
+sub option_data { return shift->{data} }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
-    return $class->new( option_data => $data );
+    my ( $class, $code, $payload ) = @_;
+    return $class->new( option_data => $payload );
 }
 
 $Net::DHCPv6::OptionList::OPTION_CLASS{$OPTION_RSOO} = __PACKAGE__;
@@ -29,15 +32,15 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::RSOO - Relay-Supplied Options option (code 66) — opaque
+Net::DHCPv6::Option::RSOO - Relay-Supplied Options option (code 66) -- opaque
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -47,7 +50,7 @@ version 0.001
 =head1 DESCRIPTION
 
 Opaque container for options supplied by a relay agent and
-returned in server responses.  See RFC 8415 §21.24.
+returned in server responses.  See RFC 8415 E<167>21.24.
 
 =head1 ALPHA STATUS
 

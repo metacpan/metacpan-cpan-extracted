@@ -1,5 +1,11 @@
 Revision history for Concierge
 
+v0.8.3  2026-06-01
+    - Fix MANIFEST: remove .perl-version (file does not exist in repo,
+      causing CPAN Testers MANIFEST mismatch error)
+    - Add .perl-version to MANIFEST.SKIP to prevent recurrence
+    - Fix POD VERSION sections in all four modules (were stale at v0.8.1)
+
 v0.8.2  2026-05-31
     - Fix version consistency: update Makefile.PL provides section to v0.8.2
       (was not updated when modules were bumped from v0.8.0 to v0.8.1)

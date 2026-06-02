@@ -244,6 +244,12 @@ static char* ch_lz4_decompress_chain(const char *buf, size_t len, size_t *pos,
             *err = extra_err;
             return NULL;
         }
+        if (extra_len > CH_MAX_DECOMPRESS_SIZE - *out_len) {
+            Safefree(extra);
+            Safefree(out);
+            *err = "LZ4 chain decompressed size exceeds limit";
+            return NULL;
+        }
         Renew(out, *out_len + extra_len, char);
         Copy(extra, out + *out_len, extra_len, char);
         *out_len += extra_len;

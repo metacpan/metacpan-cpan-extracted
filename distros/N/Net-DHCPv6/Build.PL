@@ -19,7 +19,7 @@ my %module_build_args = (
     "Dean Hamstead <dean\@fragfest.com.au>"
   ],
   "dist_name" => "Net-DHCPv6",
-  "dist_version" => "0.001",
+  "dist_version" => "0.002",
   "license" => "mit",
   "module_name" => "Net::DHCPv6",
   "recursive_test_files" => 1,
@@ -32,23 +32,25 @@ my %module_build_args = (
     "strictures" => 2
   },
   "test_requires" => {
+    "File::Slurper" => 0,
     "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Test2::Mock" => 0,
-    "Test2::V1" => 0,
+    "Test2::V1" => "1.302217",
     "Test::More" => 0
   }
 );
 
 
 my %fallback_build_requires = (
+  "File::Slurper" => 0,
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Module::Build" => "0.28",
   "Test2::Mock" => 0,
-  "Test2::V1" => 0,
+  "Test2::V1" => "1.302217",
   "Test::More" => 0
 );
 

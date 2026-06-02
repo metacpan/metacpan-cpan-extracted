@@ -1,5 +1,11 @@
 Revision history for Changes
 
+0.77    2026-06-01
+        [BUGFIXES]
+         * Fix incorrectly converted ANSI argument type declaration for `term`
+           to `Tickit::_Tickit`, which should have been a _MAYBE type but
+           wasn't (RT178289)
+
 0.76    2026-05-31
         [CHANGES]
          * Style fixes in Tickit.xs:

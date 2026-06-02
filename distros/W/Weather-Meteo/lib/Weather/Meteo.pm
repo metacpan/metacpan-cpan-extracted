@@ -25,11 +25,11 @@ Weather::Meteo - Interface to L<https://open-meteo.com> for historical weather d
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =head1 SYNOPSIS
 
@@ -119,6 +119,52 @@ setting C<$ENV{'WEATHER__METEO__carp_on_warn'}> causes warnings to use L<Carp>.
 For more information about runtime configuration,
 see L<Object::Configure>.
 
+=head3 API specification
+
+=head4 Input
+
+All parameters are optional.
+They may be supplied as a hashref or a flat key/value list.
+When C<$class> is an existing C<Weather::Meteo> object the call clones it,
+merging any supplied parameters.
+
+    {
+        ua           => { type => 'object', can => 'get', optional => 1 },
+        cache        => { type => 'object',               optional => 1 },
+        host         => { type => 'scalar',               optional => 1 },
+        min_interval => { type => 'scalar',               optional => 1 },
+    }
+
+=head4 Output
+
+    { type => 'object', isa => 'Weather::Meteo' }
+
+=head3 FORMAL SPECIFICATION
+
+    ___ NEW ___________________________________________________
+    | class?        : PACKAGE | Weather::Meteo               |
+    | params?       : NAME |--> VALUE                         |
+    |___________________________________________________________|
+    | result!       : Weather::Meteo                          |
+    |                                                          |
+    | blessed(result!) = 'Weather::Meteo'                     |
+    |                                                          |
+    | params?.ua?    => result!.ua    = params?.ua             |
+    | ~params?.ua    => result!.ua    : LWP::UserAgent         |
+    | params?.cache? => result!.cache = params?.cache          |
+    | ~params?.cache => result!.cache : CHI(Memory, global)    |
+    | params?.host?  => result!.host  = params?.host           |
+    | ~params?.host  => result!.host  = 'archive-api.open-meteo.com' |
+    | params?.min_interval? => result!.min_interval = params?.min_interval |
+    | ~params?.min_interval => result!.min_interval = 0        |
+    | result!.last_request  = 0                                |
+    |___________________________________________________________|
+    |                                                          |
+    | PRE:  class? is PACKAGE name or blessed Weather::Meteo  |
+    | POST: blessed(result!) = 'Weather::Meteo'               |
+    |       forall k in params? . result!.k = params?.k       |
+    |___________________________________________________________|
+
 =cut
 
 sub new {
@@ -185,6 +231,84 @@ If not given, the module tries to work it out from the given location,
 for that to work set TIMEZONEDB_KEY to be your API key from L<https://timezonedb.com>.
 If all else fails, the module falls back to Europe/London.
 
+Dates before 1940 return C<undef> silently.
+Invalid date strings cause a C<carp> and return C<undef>.
+Missing required arguments or non-numeric coordinates cause a C<croak>.
+
+On success returns a hashref containing at minimum the key C<hourly>.
+Returns C<undef> if the API returns an error, if the JSON cannot be
+parsed, or if the response contains no C<hourly> key.
+
+=head3 API specification
+
+=head4 Input
+
+Three call forms are accepted.
+
+    # Form 1 and 2 -- hashref or flat list
+    {
+        latitude  => { type => 'scalar' },
+        longitude => { type => 'scalar' },
+        date      => { type => 'scalar | object' },
+        tz        => { type => 'scalar', optional => 1 },
+        location  => { type => 'object', can => 'latitude', optional => 1 },
+    }
+
+    # Form 3 -- positional: ($location_obj, $date)
+    # $location_obj must respond to latitude() and longitude()
+
+=head4 Output
+
+    { type => 'hashref', min => 1 }   # success -- contains 'hourly' key
+    undef                              # pre-1940 date, bad input, or API error
+
+=head3 FORMAL SPECIFICATION
+
+    ___ WEATHER _______________________________________________
+    | self?      : Weather::Meteo                            |
+    | latitude?  : REAL                                       |
+    | longitude? : REAL                                       |
+    | date?      : DATE_STRING | strftime_OBJECT              |
+    | tz?        : STRING  (optional, default 'Europe/London')|
+    |____________________________________________________________|
+    | result!    : HASHREF | undef                            |
+    |____________________________________________________________|
+    |                                                          |
+    | PRE (~latitude? v ~longitude? v ~date?)                 |
+    |   => croak /Usage: weather\(latitude/                   |
+    |                                                          |
+    | PRE lat? or lon? not matching /^-?\d+(\.\d+)?$/         |
+    |   (after leading-decimal normalisation)                  |
+    |   => croak /Invalid latitude\/longitude format/          |
+    |                                                          |
+    | PRE date? blessed ^ date?.can('strftime')               |
+    |   => date? := date?.strftime('%F')                       |
+    |   PRE date? !~ /^\d{4}-\d{2}-\d{2}$/                   |
+    |     => croak /Invalid date format. Expected YYYY-MM-DD/ |
+    |                                                          |
+    | PRE year(date?) < 1940                                   |
+    |   => result! = undef                                     |
+    |                                                          |
+    | POST cache hit for (lat, lon, date, tz)                 |
+    |   => result! = cached_value                              |
+    |                                                          |
+    | POST HTTP error response                                 |
+    |   => carp msg ^ result! = undef                          |
+    |                                                          |
+    | POST JSON parse failure                                  |
+    |   => carp /Failed to parse JSON response/ ^ result! = undef |
+    |                                                          |
+    | POST response.error = true                               |
+    |   => result! = undef                                     |
+    |                                                          |
+    | POST ~response.hourly                                    |
+    |   => result! = undef                                     |
+    |                                                          |
+    | POST otherwise                                           |
+    |   => result! = { hourly => HOURLY, daily => DAILY }     |
+    |      cache.set(key, result!)                             |
+    |____________________________________________________________|
+
 =cut
 
 sub weather
@@ -240,7 +364,7 @@ sub weather
 
 	if(($latitude !~ /^-?\d+(\.\d+)?$/) || ($longitude !~ /^-?\d+(\.\d+)?$/)) {
 		if(my $logger = $self->{'logger'}) {
-			$self->error(__PACKAGE__ . ": Invalid latitude/longitude format ($latitude, $longitude)");
+			$logger->error(__PACKAGE__ . ": Invalid latitude/longitude format ($latitude, $longitude)");
 		}
 		Carp::croak(__PACKAGE__, ": Invalid latitude/longitude format ($latitude, $longitude)");
 	}
@@ -256,7 +380,7 @@ sub weather
 
 	unless($date =~ /^\d{4}-\d{2}-\d{2}$/) {
 		if(my $logger = $self->{'logger'}) {
-			$self->error('Invalid date format. Expected YYYY-MM-DD');
+			$logger->error('Invalid date format. Expected YYYY-MM-DD');
 		}
 		croak('Invalid date format. Expected YYYY-MM-DD');
 	}
@@ -298,6 +422,11 @@ sub weather
 	# Update last_request timestamp
 	$self->{last_request} = time();
 
+	unless(defined($res) && ref($res) && $res->can('is_error')) {
+		Carp::carp(ref($self) . ': UA->get did not return a valid HTTP response');
+		return;
+	}
+
 	if($res->is_error()) {
 		Carp::carp(ref($self), ": $url API returned error: ", $res->status_line());
 		return;
@@ -311,7 +440,7 @@ sub weather
 		return;
 	}
 
-	if($rc) {
+	if($rc && (ref($rc) eq 'HASH')) {
 		if($rc->{'error'}) {
 			# TODO: print error code
 			return;
@@ -324,8 +453,7 @@ sub weather
 		}
 	}
 
-	# my @results = @{ $data || [] };
-	# wantarray ? @results : $results[0];
+	return;
 }
 
 =head2 ua
@@ -344,6 +472,38 @@ You can also set your own User-Agent object:
     $ua->throttle('open-meteo.com' => 1);
     $meteo->ua($ua);
 
+=head3 API specification
+
+=head4 Input
+
+When called with no arguments acts as a getter; the input schema is empty.
+When called with an argument the argument must be an object that responds to C<get>:
+
+    { ua => { type => 'object', can => 'get' } }
+
+=head4 Output
+
+    { type => 'object', can => 'get' }
+
+=head3 FORMAL SPECIFICATION
+
+    ___ UA ____________________________________________________
+    | self?   : Weather::Meteo                               |
+    | ua?     : OBJECT [can 'get']   (optional)              |
+    |____________________________________________________________|
+    | result! : OBJECT [can 'get']                            |
+    |____________________________________________________________|
+    |                                                          |
+    | PRE ua? defined ^ ~ua?.can('get')                       |
+    |   => croak /must be an object that understands the get method/ |
+    |                                                          |
+    | POST ua? defined                                         |
+    |   => self?.ua = ua? ^ result! = ua?                     |
+    |                                                          |
+    | POST ~ua?                                                |
+    |   => result! = self?.ua  (no state change)              |
+    |____________________________________________________________|
+
 =cut
 
 sub ua {
@@ -351,7 +511,7 @@ sub ua {
 
 	if (@_) {
 		my $params = Params::Validate::Strict::validate_strict({
-			args => Params::Get::get_params('ua', @_),
+			args => Params::Get::get_params('ua', \@_),
 			schema => {
 				ua => {
 					type => 'object',
@@ -359,6 +519,13 @@ sub ua {
 				}
 			}
 		});
+		# Reject undef explicitly before it silently corrupts $self->{ua}
+		if(!$params->{ua}) {
+			if(my $logger = $self->{'logger'}) {
+				$logger->error('ua() requires a defined value')
+			}
+			Carp::croak('ua() requires a defined value')
+		}
 		$self->{ua} = $params->{ua};
 	}
 	return $self->{ua};
@@ -431,7 +598,9 @@ L<http://deps.cpantesters.org/?module=Weather-Meteo>
 
 Copyright 2023-2026 Nigel Horne.
 
-This program is released under the following licence: GPL2
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
 
 =cut
 

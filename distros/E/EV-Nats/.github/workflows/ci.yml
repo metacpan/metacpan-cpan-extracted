@@ -63,21 +63,9 @@ jobs:
       - name: Test
         run: TEST_NATS_HOST=127.0.0.1 TEST_NATS_PORT=14222 make test
 
-  freebsd:
-    runs-on: ubuntu-latest
-    name: FreeBSD / Perl (system)
-    steps:
-      - uses: actions/checkout@v4
-      - uses: vmactions/freebsd-vm@v1
-        with:
-          usesh: true
-          prepare: |
-            pkg install -y perl5 p5-EV nats-server gmake socat
-          run: |
-            nats-server -p 14222 -a 127.0.0.1 --pid /tmp/nats.pid &
-            sleep 1
-            perl Makefile.PL && gmake
-            TEST_NATS_HOST=127.0.0.1 TEST_NATS_PORT=14222 gmake test
+  # FreeBSD coverage is provided by CPANTesters once the dist is on CPAN.
+  # We previously had a vmactions/freebsd-vm job here but it consistently
+  # hung in the action's cleanup phase even after tests passed.
 
   tls:
     runs-on: ubuntu-latest
@@ -92,6 +80,10 @@ jobs:
           curl -fsSL https://github.com/nats-io/nats-server/releases/download/v2.10.24/nats-server-v2.10.24-linux-amd64.tar.gz | tar xz
           sudo mv nats-server-v2.10.24-linux-amd64/nats-server /usr/local/bin/
       - name: Generate self-signed cert
+        env:
+          # setup-perl exports OPENSSL_CONF pointing at a Perl-bundled
+          # path that the system openssl binary can't read; clear it.
+          OPENSSL_CONF: /dev/null
         run: |
           openssl req -x509 -newkey rsa:2048 -nodes -days 1 \
             -subj "/CN=localhost" \

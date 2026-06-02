@@ -30,12 +30,12 @@ no_index:
 provides:
   EV::Websockets:
     file: lib/EV/Websockets.pm
-    version: '0.06'
+    version: '0.08'
 requires:
   EV: '4'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/vividsnow/perl5-ev-websockets/issues
   repository: https://github.com/vividsnow/perl5-ev-websockets.git
-version: '0.06'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

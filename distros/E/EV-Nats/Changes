@@ -1,5 +1,9 @@
 Revision history for EV::Nats
 
+0.03  2026-06-01
+    - Fix an HMSG header out-of-bounds read and a stack-pointer drift when
+      cancelling pending requests
+
 0.02  2026-04-29
     - Hardened TLS (hostname verification) and NKey auth (CRC + prefix
       fixes; both were latently broken in 0.01).

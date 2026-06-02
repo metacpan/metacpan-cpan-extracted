@@ -4,7 +4,7 @@ use utf8;
 
 RTx     'RT-Extension-AttachmentViewer';
 license 'gpl_3';
-repository 'https://github.com/gibus/RT-Extension-ModifyUsersPrefs';
+repository 'https://github.com/gibus/RT-Extension-AttachmentViewer';
 all_from 'lib/RT/Extension/AttachmentViewer.pm';
 
 requires_rt('5.0.0');

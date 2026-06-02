@@ -1,17 +1,17 @@
 #! /usr/bin/env perl
 use strictures 2;
-use FindBin;
+use FindBin ();
 use lib "$FindBin::Bin/../lib";    # locate the module from the repo
 
 use Net::DHCPv6;                   # top-level decode/encode API
+use File::Slurper qw( read_binary );
 
 # ── Input ──────────────────────────────────────────────────────────
 # Read hex strings from command-line args, or from STDIN if none given
 
 my @hexes = @ARGV;
 if ( !@hexes ) {
-    local $/;    # slurp mode
-    @hexes = split /\s+/, <STDIN>;
+    @hexes = split /\s+/, read_binary( '/dev/stdin' );
 }
 
 # ── Decode ─────────────────────────────────────────────────────────

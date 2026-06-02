@@ -5,17 +5,22 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
-scripts/generate_index.pl
 t/00-load.t
 t/10-compile.t
 t/30-basics.t
 t/carp.t
 t/comment-spelling.t
+t/edge_cases.t
 t/eof.t
 t/eol.t
+t/extended_tests.t
+t/function.t
+t/fuzz.t
 t/get_time_zone.t
+t/integration.t
 t/limiting.t
 t/links.t
+t/mutant_killers.t
 t/no404s.t
 t/noopentickets.t
 t/noplan.t
@@ -26,6 +31,7 @@ t/pod-spelling.t
 t/pod-synopsis.t
 t/pod.t
 t/port.t
+t/unit.t
 t/vars.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

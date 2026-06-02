@@ -1,5 +1,9 @@
 Revision history for Data-PubSub-Shared
 
+0.06  2026-06-01
+    - Str publish_multi: hoist SvPV out of the mutex so a tied/overloaded
+      argument that dies mid-batch can't abandon the lock and deadlock peers
+
 0.05  2026-05-27
     - poll_wait: fix missed-wakeup race; increment sub_waiters before
       polling and use SEQ_CST ordering with publisher fence

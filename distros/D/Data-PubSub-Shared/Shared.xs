@@ -681,20 +681,26 @@ publish_multi(self, ...)
     RETVAL = 0;
     uint32_t count = items - 1;
     if (count > 0) {
-        pubsub_mutex_lock(h->hdr);
+        /* Extract SV data BEFORE locking: SvPV(utf8) can run magic
+         * (tied/overloaded stringification) that longjmps; doing it under
+         * the process-shared mutex would abandon the lock and deadlock peers.
+         * Newx+SAVEFREEPV so a die during extraction cannot leak args. */
+        struct psm_arg { const char *str; STRLEN len; bool utf8; };
+        struct psm_arg *args;
+        Newx(args, count, struct psm_arg);
+        SAVEFREEPV(args);
         for (uint32_t i = 0; i < count; i++) {
             SV *val = ST(i + 1);
-            STRLEN len;
-            bool utf8 = SvUTF8(val) ? true : false;
-            const char *str;
-            if (utf8)
-                str = SvPVutf8(val, len);
-            else
-                str = SvPV(val, len);
-            int r = pubsub_str_publish_locked(h, str, (uint32_t)len, utf8);
+            args[i].utf8 = SvUTF8(val) ? true : false;
+            args[i].str = args[i].utf8 ? SvPVutf8(val, args[i].len)
+                                       : SvPV(val, args[i].len);
+        }
+        pubsub_mutex_lock(h->hdr);
+        for (uint32_t i = 0; i < count; i++) {
+            int r = pubsub_str_publish_locked(h, args[i].str, (uint32_t)args[i].len, args[i].utf8);
             if (r == -1) {
                 pubsub_mutex_unlock(h->hdr);
-                croak("publish_multi: message too long (%u > %u)", (unsigned)len, h->msg_size);
+                croak("publish_multi: message too long (%u > %u)", (unsigned)args[i].len, h->msg_size);
             }
             RETVAL++;
         }

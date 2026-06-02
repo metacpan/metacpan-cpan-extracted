@@ -44,13 +44,13 @@
             "Future::Selector" : "0",
             "Log::Any" : "0",
             "Object::Pad" : "0.821",
-            "Protocol::Sys::Virt" : "v12.3.0",
-            "Protocol::Sys::Virt::KeepAlive" : "v12.3.0",
-            "Protocol::Sys::Virt::Remote" : "v12.3.0",
-            "Protocol::Sys::Virt::Remote::XDR" : "v12.3.0",
-            "Protocol::Sys::Virt::TypedParams" : "v12.3.0",
-            "Protocol::Sys::Virt::UNIXSocket" : "v12.3.0",
-            "Protocol::Sys::Virt::URI" : "v12.3.0",
+            "Protocol::Sys::Virt" : "v12.4.0",
+            "Protocol::Sys::Virt::KeepAlive" : "v12.4.0",
+            "Protocol::Sys::Virt::Remote" : "v12.4.0",
+            "Protocol::Sys::Virt::Remote::XDR" : "v12.4.0",
+            "Protocol::Sys::Virt::TypedParams" : "v12.4.0",
+            "Protocol::Sys::Virt::UNIXSocket" : "v12.4.0",
+            "Protocol::Sys::Virt::URI" : "v12.4.0",
             "Sublike::Extended" : "0.29",
             "perl" : "v5.26.0"
          }
@@ -72,6 +72,6 @@
          "web" : "https://github.com/ehuelsmann/perl-sys-async-virt"
       }
    },
-   "version" : "v0.6.3",
+   "version" : "v0.6.4",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

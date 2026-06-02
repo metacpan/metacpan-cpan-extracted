@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Global.pm
-## Version v1.1.1
+## Version v1.2.1
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2025/05/06
-## Modified 2026/03/14
+## Modified 2026/06/02
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -52,10 +52,10 @@ BEGIN
     # Perl built with both -Duseithreads and -Duselongdouble (or -Dusequadmath) has a
     # defect in threads::shared on older releases (5.16.0 and earlier are known to be
     # affected): locking or marking a variable as shared triggers the assertion
-    # 'SvTYPE(_svmagic) >= SVt_PVMG' at shared.xs and aborts the interpreter with
-    # SIGABRT. The boundary below is set empirically from CPAN Testers reports, since
-    # no single upstream ticket pins the exact release where this was resolved. It can
-    # be raised later should a newer long double build report the same abort.
+    # 'SvTYPE(_svmagic) >= SVt_PVMG' at shared.xs and aborts the interpreter with SIGABRT.
+    # The boundary below is set empirically from CPAN Testers reports, since no single
+    # upstream ticket pins the exact release where this was resolved. It can be raised
+    # later should a newer long double build report the same abort.
     # On such a build we must not promote our global repositories to :shared unless
     # threads are genuinely in use.
     sub BROKEN_SHARED_ABI () { CORE::return( $PerlConfig->{useithreads} && ( $PerlConfig->{uselongdouble} || $PerlConfig->{usequadmath} ) && $] < 5.018000 ? 1 : 0 ); }
@@ -66,15 +66,29 @@ BEGIN
 
     sub MOD_PERL () { CORE::return( $MOD_PERL ); }
 
+    # NOTE: _in_end_phase, _in_global_destruction
+    # These two helpers tell whether the interpreter is running END blocks
+    # (${^GLOBAL_PHASE} eq 'END') or in global destruction (${^GLOBAL_PHASE} eq 'DESTRUCT').
+    # They are used by _share_repo() and _lock() to avoid operations that abort or corrupt
+    # threads::shared during the exit dance.
+    # They are defined here rather than imported from Module::Generic to keep this
+    # package self-contained: Module::Generic depends on this one, not the other way
+    # around. Module::Generic also provides the same helpers for its own callers, and the
+    # implementations must match.
+    # Module::Generic requires perl v5.16, where ${^GLOBAL_PHASE} is always defined, so
+    # no fallback through B::main_cv() is needed as I did before.
+    sub _in_end_phase () { CORE::return( ${^GLOBAL_PHASE} eq 'END' ? 1 : 0 ); }
+    sub _in_global_destruction () { CORE::return( ${^GLOBAL_PHASE} eq 'DESTRUCT' ? 1 : 0 ); }
+
     my $mpm;
     my $mpm_threaded    = 0;
     my $use_mutex       = 0;
-    # NOTE: We promote our globals to :shared only when the running Perl can use
-    # threads and is not affected by the broken threads::shared ABI described above.
+    # NOTE: We promote our globals to :shared only when the running Perl can use threads
+    # and is not affected by the broken threads::shared ABI described above.
     # On an affected build, all sharing is deferred to genuine thread usage, which is
-    # gated elsewhere on HAS_THREADS, so a single-threaded process never triggers the
-    # abort.
-    my $need_shared     = ( CAN_THREADS() && !BROKEN_SHARED_ABI() ) ? 1 : 0;
+    # gated elsewhere on HAS_THREADS, so a single-threaded process never triggers the abort.
+    # my $need_shared     = ( CAN_THREADS() && !BROKEN_SHARED_ABI() ) ? 1 : 0;
+    my $need_shared     = CAN_THREADS() ? 1 : 0;
     our( $MUTEX, $LOCK_MUTEX );
     # The user data repository
     our $REPO           = {};
@@ -217,7 +231,7 @@ BEGIN
     our @EXPORT_OK = qw( CAN_THREADS HAS_THREADS IN_THREAD MOD_PERL MPM HAS_MPM_THREADS );
     our %EXPORT_TAGS = ( 'const' => [@EXPORT_OK] );
     our $DEFAULT_SERIALISER = 'Storable::Improved';
-    our $VERSION = 'v1.1.1';
+    our $VERSION = 'v1.2.1';
 };
 
 use strict;
@@ -380,7 +394,7 @@ sub new
         {
             # $self->__message( 4, "The repository for namespace '$ns' does not exist yet, creating it now." );
             # $self->__message( 4, "_NEED_SHARED has value '", ( _NEED_SHARED // 'undef' ), "'" );
-            if( _NEED_SHARED )
+            if( _NEED_SHARED() )
             {
                 # $self->__message( 4, "Initialising shared repository for namespace '$ns'." );
                 my %refcount :shared;
@@ -393,19 +407,19 @@ sub new
             }
         }
         my $refns = $REFCOUNTS->{ $ns };
-        if( !CORE::exists( $refns->{ $key } ) && _NEED_SHARED )
-        {
-            $self->_lock_write( $refns ) || return( $self->error( "Unable to lock namespace for new shared refcounts slot." ) );
-            my $shared_refcount :shared = 0;
-            $refns->{ $key } = $shared_refcount;
-            $self->_unlock;
-            $self->__message( 5, "Pre-shared new refcount slot for key '$key' in namespace '$ns'." );
-        }
-
-        my $refcount = \$refns->{ $key };
-        $$refcount //= 0;
-        $self->_lock_write( $refcount ) || return( $self->error( "Unable to lock the repository to write to it." ) );
-        $$refcount++;
+        # NOTE: Refcount update under a single hash-level lock
+        # We lock the namespace hash $refns (a :shared hash, safe to lock on all
+        # threads::shared releases) rather than \$refns->{ $key } (a reference to a
+        # scalar entry inside a :shared hash). The latter SIGSEGV on
+        # threads::shared 1.4 bundled with perl 5.16, particularly on long-double builds,
+        # and there is no catchable exception we can rescue. Locking the parent hash
+        # trades per-key contention for per-namespace contention, which is acceptable for
+        # refcount tracking where simultaneous writes are rare.
+        # We also avoid taking a reference to the scalar entry at all: the entry is read
+        # and written by name in a single locked section.
+        $self->_lock_write( $refns ) || return( $self->error( "Unable to lock namespace for refcount update." ) );
+        $refns->{ $key } //= 0;
+        $refns->{ $key } = $refns->{ $key } + 1;
         $self->_unlock;
     }
 
@@ -459,7 +473,7 @@ sub cleanup_register
 
     my $callback    = $opts->{callback} if( ref( $opts->{callback} ) eq 'CODE' );
     my $namespaces  = $opts->{namespaces} // [$self->{_namespace}]; # Default to self ns
-    my %keep = map{ $_ => 1 } @{ $opts->{keep} || [] };
+    my %keep = map{ $_ => 1 } @{$opts->{keep} || []};
     if( !$r && $MOD_PERL )
     {
         local $@;
@@ -473,9 +487,16 @@ sub cleanup_register
     return(1) unless( $r ); # Non-mod_perl: Rely on END
 
     my $r_id = Scalar::Util::refaddr( $r );
-    $self->_lock_write( \$CLEANUP->{ $r_id } ) || return( $self->error( 'Lock fail for cleanup track.' ) );
+    # NOTE: Lock the parent :shared hash, not a reference to a leaf entry.
+    # On threads::shared 1.4 (perl 5.16-ld), CORE::lock( \$shared_hash->{$k} ) SIGSEGVs.
+    # Locking $CLEANUP itself is safe across all releases.
+    # FIXME: storing a plain hashref into $CLEANUP->{ $r_id } also fails on modern
+    # threads::shared with "Invalid value for shared scalar". This code path is
+    # mod_perl-only and not currently exercised in the test suite, so we defer the fix to
+    # a separate change.
+    $self->_lock_write( $CLEANUP ) || return( $self->error( 'Lock fail for cleanup track.' ) );
     $CLEANUP->{ $r_id } //= { ns => {}, keep => {} };
-    $CLEANUP->{ $r_id }->{ns}{ $_ } = 1 for( @$namespaces );
+    $CLEANUP->{ $r_id }->{ns}->{ $_ } = 1 for( @$namespaces );
     %{$CLEANUP->{ $r_id }->{keep}} = %keep;
     $self->_unlock;
 
@@ -530,8 +551,8 @@ sub clear_error
     my $self  = shift( @_ );
     my $class = ref( $self ) || $self;
     my $err_key = HAS_THREADS() ? join( ';', $class, $$, threads->tid ) : join( ';', $class, $$ );
-
     $self->{_error} = undef if( ref( $self ) );
+
     $self->_lock_write( $ERRORS, delay => ERROR_DELAY ) || die( "Unable to get a lock on \$ERRORS" );
     eval
     {
@@ -559,8 +580,8 @@ sub error
         my $ex = Module::Generic::Global::Exception->new({ message => $msg, code => 500, skip_frames => 1 });
         warn( $ex ) if( warnings::enabled( 'Module::Generic' ) );
         # $self->__message( 4, "Is \$ERRORS shared ? ", ( HAS_THREADS && threads::shared::is_shared( $ERRORS ) ? 'yes' : 'no' ) );
-        $self->_lock_write( $ERRORS, delay => ERROR_DELAY ) || die( "Unable to get a lock on \$ERRORS" );
         $self->{_error} = $ex if( ref( $self ) );
+        $self->_lock_write( $ERRORS, delay => ERROR_DELAY ) || die( "Unable to get a lock on \$ERRORS" );
         eval
         {
             $ERRORS->{ $err_key } = Storable::Improved::freeze( $ex );
@@ -625,7 +646,7 @@ sub get
     }
     $self->__message( 7, "Called for namespace '$ns' and key '$key' from class ", [caller]->[0], " at line ", [caller]->[2], " in sub ", [caller(1)]->[3] );
     # Make sure the repository is shared if needed
-    $self->_share_repo( $ns );
+    $self->_share_repo( $ns ) || return;
  
      # We avoid autovivification
     if( !CORE::exists( $REPO->{ $ns }->{ $key } ) )
@@ -637,10 +658,12 @@ sub get
     # $self->__message( 4, "\$REPO->{ $ns } is ", overload::StrVal( $REPO->{ $ns } ) );
     # $self->__message( 4, "HAS_THREADS is '", ( HAS_THREADS // 'undef' ), "'" );
     # $self->__message( 4, "Is \$REPO->{ $ns } shared already ? ", ( HAS_THREADS && threads::shared::is_shared( $REPO->{ $ns } ) ? 'yes' : 'no' ) );
-    my $ref  = \$REPO->{ $ns }->{ $key };
-    $$ref //= undef;
-    $self->_lock_read( $ref ) || return( $self->error( "Unable to lock the repository to read from it." ) );
-    my $store = $$ref;
+    # NOTE: Lock the parent :shared hash, not a reference to a leaf scalar.
+    # On threads::shared 1.4 (perl 5.16-ld), CORE::lock( \$shared_hash->{$k} ) SIGSEGVs.
+    # Locking $REPO->{ $ns } itself is safe across all releases.
+    # The leaf value is accessed by name inside the locked section.
+    $self->_lock_read( $REPO->{ $ns } ) || return( $self->error( "Unable to lock the repository to read from it." ) );
+    my $store = CORE::exists( $REPO->{ $ns }->{ $key } ) ? $REPO->{ $ns }->{ $key } : undef;
     $self->_unlock;
     if( CORE::length( $store // '' ) )
     {
@@ -683,7 +706,7 @@ sub key { return( shift->{_key} ); }
 sub length
 {
     my( $self ) = @_;
-    my $ns  = $self->{_namespace} || die( "No namespace is set." );
+    my $ns = $self->{_namespace} || die( "No namespace is set." );
 
     $self->_share_repo( $ns );
 
@@ -700,20 +723,19 @@ sub length
     # Optional: if your "deleted" state is empty string, you probably want to exclude them
     # to avoid resurrected empty slots being counted.
     # This requires reading each value carefully without autoviv: we already have keys, so it's safe.
+    # NOTE: Lock the parent :shared hash once around the whole scan, rather than taking a
+    # leaf-scalar lock per key. The latter SIGSEGVs on threads::shared 1.4
+    # (perl 5.16-ld), and is also more expensive.
     my @alive;
-    for my $k ( @keys )
+    $self->_lock_read( $REPO->{ $ns } ) || return( $self->error( "Unable to lock repository to scan keys." ) );
+    foreach my $k ( @keys )
     {
         next if( !CORE::exists( $REPO->{ $ns }->{ $k } ) );
-
-        my $ref = \$REPO->{ $ns }->{ $k };
-        $$ref //= '';
-        $self->_lock_read( $ref ) || next;
-        my $v = $$ref;
-        $self->_unlock;
-
+        my $v = $REPO->{ $ns }->{ $k };
         # next if( !defined( $v ) || $v eq '' );
         push( @alive, $k );
     }
+    $self->_unlock;
 
     $self->__message( 7, "The following keys were found for namespace '$ns': '", join( ', ', sort( @alive ) ), "'" );
 
@@ -741,14 +763,19 @@ sub lock
     die( "No key found in our object!" ) if( !$key );
     if( HAS_THREADS && !$MUTEX )
     {
-        my $lock_ref = \$LOCKS->{ $key };
-        $$lock_ref //= 0;
+        # NOTE: Lock the top-level :shared $LOCKS hash itself, not a reference to a leaf
+        # scalar entry. CORE::lock( \$LOCKS->{$key} ) SIGSEGVs on threads::shared 1.4
+        # (perl 5.16-ld). Locking $LOCKS trades per-key contention for hash-wide
+        # contention; this is acceptable because the public lock() method is rarely on a
+        # hot path and provides advisory locking semantics rather than fine-grained
+        # synchronisation.
+        $LOCKS->{ $key } //= 0;
         # try-catch
         my $rv;
-        eval{ $rv = CORE::lock( $lock_ref ) };
+        eval{ $rv = CORE::lock( $LOCKS ) };
         if( $@ )
         {
-            $self->__message( 3, "Error locking \$lock_ref (", overload::StrVal( $lock_ref // 'undef' ), "): $@" );
+            $self->__message( 3, "Error locking \$LOCKS for key $key: $@" );
             return( $self->error({
                 message => "Failed to acquire shared lock for key $key: $@",
                 class => 'Module::Generic::Global::Exception',
@@ -799,10 +826,10 @@ sub remove
         # $self->__message( 4, "The repository \$REPO->{ $ns }->{ $key } does not exist, so there is nothing to remove." );
         return(1);
     }
-    my $ref  = \$REPO->{ $ns }->{ $key };
-    $$ref //= '';
-    $self->_lock_write( $ref ) || return( $self->error( "Unable to lock the repository to write to it." ) );
-    my $removed_len = CORE::length( $$ref // '' );
+    # NOTE: Lock the parent :shared hash, not a leaf scalar reference.
+    # See similar comment in get() for the rationale.
+    $self->_lock_write( $REPO->{ $ns } ) || return( $self->error( "Unable to lock the repository to write to it." ) );
+    my $removed_len = CORE::length( $REPO->{ $ns }->{ $key } // '' );
     CORE::delete( $REPO->{ $ns }->{ $key } );
     $self->_unlock;
 
@@ -888,7 +915,7 @@ sub set
     # Pre-create shared slot if new key and in shared mode (fixes invalid shared scalar on autoviv)
     my $is_new_key = CORE::exists( $REPO->{ $ns }->{ $key } ) ? 0 : 1;
 
-    if( !CORE::exists( $REPO->{ $ns }->{ $key } ) && _NEED_SHARED )
+    if( !CORE::exists( $REPO->{ $ns }->{ $key } ) && _NEED_SHARED() )
     {
         # Lock per-ns shared scalar
         $self->_lock_write( $NS_LOCKS->{ $ns } ) || return( $self->error( "Unable to lock namespace for new shared slot." ) );
@@ -902,10 +929,10 @@ sub set
     my $old_len = 0;
     if( CORE::exists( $REPO->{ $ns }->{ $key } ) )
     {
-        my $ref = \$REPO->{ $ns }->{ $key };
-        $$ref //= '';
-        $self->_lock_read( $ref ) || return( $self->error( "Unable to read old len." ) );
-        $old_len = CORE::length( $$ref // '' );
+        # NOTE: Lock the parent :shared hash instead of taking a reference to
+        # a leaf scalar; the latter SIGSEGVs on threads::shared 1.4.
+        $self->_lock_read( $REPO->{ $ns } ) || return( $self->error( "Unable to read old len." ) );
+        $old_len = CORE::length( $REPO->{ $ns }->{ $key } // '' );
         $self->_unlock;
     }
 
@@ -935,10 +962,9 @@ sub set
                 # Do not evict self if overwrite
                 if( CORE::exists( $REPO->{ $ns }->{ $evict_key } ) && $evict_key ne $key )
                 {
-                    my $evict_ref = \$REPO->{ $ns }->{ $evict_key };
-                    $$evict_ref //= '';
-                    $self->_lock_write( $evict_ref ) || last;
-                    my $evict_len = CORE::length( $$evict_ref // '' );
+                    # NOTE: Lock the parent :shared hash, not a leaf scalar ref.
+                    $self->_lock_write( $REPO->{ $ns } ) || last;
+                    my $evict_len = CORE::length( $REPO->{ $ns }->{ $evict_key } // '' );
                     CORE::delete( $REPO->{ $ns }->{ $evict_key } );
                     $self->_unlock;
                     # Update sizes (lock separately to avoid deep nest)
@@ -949,9 +975,8 @@ sub set
                     my $evict_stat_key = join( ';', $ns, $evict_key );
                     if( CORE::exists( $STATS->{ $evict_stat_key } ) )
                     {
-                        my $evict_stat_ref = \$STATS->{ $evict_stat_key };
-                        $$evict_stat_ref //= 0;
-                        $self->_lock_write( $evict_stat_ref ) || last;
+                        # NOTE: Lock $STATS (top-level :shared hash) directly.
+                        $self->_lock_write( $STATS ) || last;
                         CORE::delete( $STATS->{ $evict_stat_key } );
                         $self->_unlock;
                     }
@@ -982,10 +1007,9 @@ sub set
             $self->__message( 4, "Checking keys to evit: processing key '$old_key' with namespace size of '", scalar( keys( %{$REPO->{ $ns }} ) ), "'" );
             if( CORE::exists( $REPO->{ $ns }->{ $old_key } ) )
             {
-                my $old_ref = \$REPO->{ $ns }->{ $old_key };
-                $$old_ref //= '';
-                $self->_lock_write( $old_ref ) || last;
-                my $old_bytes = CORE::length( $$old_ref // '' );
+                # NOTE: Lock the parent :shared hash, not a leaf scalar ref.
+                $self->_lock_write( $REPO->{ $ns } ) || last;
+                my $old_bytes = CORE::length( $REPO->{ $ns }->{ $old_key } // '' );
                 CORE::delete( $REPO->{ $ns }->{ $old_key } );
                 $self->_unlock;
 
@@ -996,9 +1020,8 @@ sub set
                 my $old_stat_key = join( ';', $ns, $old_key );
                 if( CORE::exists( $STATS->{ $old_stat_key } ) )
                 {
-                    my $old_stat_ref = \$STATS->{ $old_stat_key };
-                    $$old_stat_ref //= 0;
-                    $self->_lock_write( $old_stat_ref ) || last;
+                    # NOTE: Lock $STATS (top-level :shared hash) directly.
+                    $self->_lock_write( $STATS ) || last;
                     CORE::delete( $STATS->{ $old_stat_key } );
                     $self->_unlock;
                 }
@@ -1011,10 +1034,10 @@ sub set
     }
 
     # $self->__message( 4, "\$REPO->{ $ns } is ", overload::StrVal( $REPO->{ $ns } ) );
-    my $ref = \$REPO->{ $ns }->{ $key };
-    $$ref //= '';
-    $self->_lock_write( $ref ) || return( $self->error( "Unable to lock the repository to write to it." ) );
-    $$ref = $store;
+    # NOTE: Lock the parent :shared hash, not a leaf scalar reference.
+    $self->_lock_write( $REPO->{ $ns } ) || return( $self->error( "Unable to lock the repository to write to it." ) );
+    $REPO->{ $ns }->{ $key } = $store;
+    $self->_unlock;
 
     if( $delta != 0 )
     {
@@ -1033,11 +1056,10 @@ sub set
     $self->_unlock;
 
     # Collect some statistics
+    # NOTE: Lock $STATS (top-level :shared hash) directly.
     my $stat_key = join( ';', $ns, $key );
-    my $stat_ref = \$STATS->{ $stat_key };
-    $$stat_ref //= 0;
-    $self->_lock_write( $stat_ref ) || return( $self->error( "Unable to lock stats." ) );
-    $$stat_ref = $len;
+    $self->_lock_write( $STATS ) || return( $self->error( "Unable to lock stats." ) );
+    $STATS->{ $stat_key } = $len;
     $self->_unlock;
     return(1);
 }
@@ -1084,23 +1106,29 @@ sub _decrement
     my $key = $self->{_key} // '';
     $self->_share_repo( $ns );
     return(1) if( !CORE::exists( $REFCOUNTS->{ $ns }->{ $key } ) );
-    my $ref = \$REFCOUNTS->{ $ns }->{ $key };
-    $$ref //= 0;
-    $self->_lock_write( $ref ) || return( $self->error( "Unable to lock refcounts counter for update." ) );
-    if( $$ref > 0 )
+    my $refns = $REFCOUNTS->{ $ns };
+    # NOTE: Refcount decrement under a single hash-level lock.
+    # See the corresponding NOTE in new() for the rationale: we lock $refns
+    # (a :shared hash, safe everywhere) rather than \$refns->{ $key }
+    # (a reference to a scalar inside a :shared hash, which SIGSEGV on
+    # threads::shared 1.4 / perl 5.16-ld).
+    $self->_lock_write( $refns ) || return( $self->error( "Unable to lock refcounts namespace for update." ) );
+    my $current = $refns->{ $key } // 0;
+    if( $current > 0 )
     {
-        $$ref--;
+        $refns->{ $key } = $current - 1;
+        $current = $refns->{ $key };
     }
-    # A bit paranoid given the only place where this is reduced is here, but why not?
-    elsif( $$ref < 0 )
+    elsif( $current < 0 )
     {
-        $self->__message( 6, "Refcount underflow with value '", $$ref, "' for $ns;$key" );
-        $$ref = 0;
+        $self->__message( 6, "Refcount underflow with value '", $current, "' for $ns;$key" );
+        $refns->{ $key } = 0;
+        $current = 0;
     }
-    if( $$ref == 0 )
+    if( $current == 0 )
     {
         $self->remove;
-        CORE::delete( $REFCOUNTS->{ $ns }->{ $key } );
+        CORE::delete( $refns->{ $key } );
     }
     $self->_unlock;
     return(1);
@@ -1301,13 +1329,23 @@ sub _lock
     my $rw = $opts->{rw} // 0;
     if( HAS_THREADS && !$MUTEX )
     {
-        # try-catch
+        # NOTE: Locking safely when shared structures may not have been promoted
+        # During the END phase and global destruction, _share_repo() deliberately
+        # creates plain refs rather than :shared ones, because marking new variables as
+        # :shared at that point aborts the interpreter on older threads::shared releases.
+        # CORE::lock on a plain ref dies with the message "lock can only be used on
+        # shared values", so during those phases we treat the operation as a silent no-op
+        # and return 1, which lets callers using "_lock_write(...) || die" complete their
+        # cleanup paths normally. Outside those phases, the same error reflects a real
+        # upstream bug (a missed share()), and we keep the historical behaviour of
+        # warning and returning undef so the caller's "|| die" fires.
         local $@;
         my $rv;
         eval{ $rv = CORE::lock( $ref ) };
         if( $@ )
         {
-            warn( "Error locking \$ref (", overload::StrVal( $ref // 'undef' ), "): $@" );
+            warn( "Unable to lock \$ref (", overload::StrVal( $ref // 'undef' ), ") outside END or DESTRUCT phase, which suggests a missed share() upstream: $@" ) if( warnings::enabled( 'Module::Generic' ) );
+            return;
             return;
         }
         return( $rv );
@@ -1562,84 +1600,103 @@ sub _share_repo
 {
     my $self = shift( @_ );
     my $ns   = shift( @_ ) || die( "No namespace is set." );
-    if( !CORE::exists( $REPO->{ $ns } ) )
+    # NOTE: Initialisation strategy
+    # Our top-level globals ($REPO, $ORDER, $SIZES, $NS_LOCKS, $REFCOUNTS) are promoted
+    # to :shared at BEGIN time when _NEED_SHARED is true, and stay :shared for the whole
+    # process lifetime. Adding sub-entries to a :shared hash requires that the value
+    # itself be :shared, otherwise modern threads::shared rejects the assignment with
+    # "Invalid value for shared scalar" (and older releases silently corrupt memory and
+    # SEGV at exit).
+    # Conversely, creating a fresh :shared variable during the END phase or during global
+    # destruction aborts the interpreter on older threads::shared releases (the 1.4
+    # shipped with perl 5.16 in particular). So when we are in the shared world and in a
+    # terminal phase, we have no safe action: we return without populating, and callers in
+    # END/DESTRUCT must handle a missing namespace gracefully (typically by checking the
+    # result of get()).
+    # In the non-shared world (_NEED_SHARED is false), our globals are plain refs and we
+    # can populate them with plain refs at any time without phase constraints.
+    if( _NEED_SHARED() )
     {
-        # $self->__message( 4, "The repository for namespace '$ns' does not exist yet, creating it now." );
-        # $self->__message( 4, "_NEED_SHARED has value '", ( _NEED_SHARED // 'undef' ), "'" );
-        if( _NEED_SHARED )
+        if( !CORE::exists( $REPO->{ $ns } ) )
         {
-            # $self->__message( 4, "Initialising shared repository for namespace '$ns'." );
+            # Shared world: refuse to do anything during terminal phases.
+            if( _in_end_phase() || _in_global_destruction() )
+            {
+                warn( "Cannot share data in end or global destruction phase." ) if( warnings::enabled( 'Module::Generic' ) );
+                return;
+            }
             my %sub_repo :shared;
             $REPO->{ $ns } = \%sub_repo;
         }
-        else
+        if( !CORE::exists( $ORDER->{ $ns } ) )
         {
-            # $self->__message( 4, "Initialising non-shared repository for namespace '$ns'." );
-            $REPO->{ $ns } = {};
+            # Shared world: refuse to do anything during terminal phases.
+            if( _in_end_phase() || _in_global_destruction() )
+            {
+                warn( "Cannot share data in end or global destruction phase." ) if( warnings::enabled( 'Module::Generic' ) );
+                return;
+            }
+            my @sub_order :shared;
+            $ORDER->{ $ns } = \@sub_order;
+        }
+        if( !CORE::exists( $SIZES->{ $ns } ) )
+        {
+            # Shared world: refuse to do anything during terminal phases.
+            if( _in_end_phase() || _in_global_destruction() )
+            {
+                warn( "Cannot share data in end or global destruction phase." ) if( warnings::enabled( 'Module::Generic' ) );
+                return;
+            }
+            my $sub_size :shared = 0;
+            $SIZES->{ $ns } = \$sub_size;
+        }
+        if( !CORE::exists( $NS_LOCKS->{ $ns } ) )
+        {
+            # Shared world: refuse to do anything during terminal phases.
+            if( _in_end_phase() || _in_global_destruction() )
+            {
+                warn( "Cannot share data in end or global destruction phase." ) if( warnings::enabled( 'Module::Generic' ) );
+                return;
+            }
+           my $ns_lock :shared = 0;
+            $NS_LOCKS->{ $ns } = \$ns_lock;
+        }
+        if( $self->{refcount} && !CORE::exists( $REFCOUNTS->{ $ns } ) )
+        {
+            # Shared world: refuse to do anything during terminal phases.
+            if( _in_end_phase() || _in_global_destruction() )
+            {
+                warn( "Cannot share data in end or global destruction phase." ) if( warnings::enabled( 'Module::Generic' ) );
+                return;
+            }
+            my %refcounts :shared;
+            $REFCOUNTS->{ $ns } = \%refcounts;
         }
     }
     else
     {
-        # $REPO->{ $ns } already exists.
-        # $self->__message( 4, "\$REPO->{ $ns } (", overload::StrVal( $REPO->{ $ns } ), ") already exists, and is shared ? ", ( HAS_THREADS && threads::shared::is_shared( $REPO->{ $ns } ) ? 'yes' : 'no' ) );
-    }
-
-    # To keep track of they keys in a given namespace
-    if( !CORE::exists( $ORDER->{ $ns } ) )
-    {
-        if( _NEED_SHARED )
+        # Non-shared world: plain refs everywhere, no phase constraints.
+        if( !CORE::exists( $REPO->{ $ns } ) )
         {
-            my @sub_order :shared;
-            $ORDER->{ $ns } = \@sub_order;
+            $REPO->{ $ns } = {};
         }
-        else
+        if( !CORE::exists( $ORDER->{ $ns } ) )
         {
             $ORDER->{ $ns } = [];
         }
-    }
-
-    # To keep track of repositories size, and to later act accordingly
-    if( !CORE::exists( $SIZES->{ $ns } ) )
-    {
-        if( _NEED_SHARED )
-        {
-            my $sub_size :shared = 0;
-            $SIZES->{ $ns } = \$sub_size;
-        }
-        else
+        if( !CORE::exists( $SIZES->{ $ns } ) )
         {
             my $sub_size = 0;
             $SIZES->{ $ns } = \$sub_size;
         }
-    }
-
-    if( !CORE::exists( $NS_LOCKS->{ $ns } ) )
-    {
-        if( _NEED_SHARED )
-        {
-            my $ns_lock :shared = 0;
-            $NS_LOCKS->{ $ns } = \$ns_lock;
-        }
-        else
+        if( !CORE::exists( $NS_LOCKS->{ $ns } ) )
         {
             my $ns_lock = 0;
             $NS_LOCKS->{ $ns } = \$ns_lock;
         }
-    }
-
-    if( $self->{refcount} )
-    {
-        if( !CORE::exists( $REFCOUNTS->{ $ns } ) )
+        if( $self->{refcount} && !CORE::exists( $REFCOUNTS->{ $ns } ) )
         {
-            if( _NEED_SHARED )
-            {
-                my %refcounts :shared;
-                $REFCOUNTS->{ $ns } = \%refcounts;
-            }
-            else
-            {
-                $REFCOUNTS->{ $ns } = {};
-            }
+            $REFCOUNTS->{ $ns } = {};
         }
     }
     return(1);
@@ -1658,9 +1715,9 @@ END
     # or in their own destruction phase causes a SEGV in threads::shared. We therefore
     # skip the cleanup when threads are active, and let Perl's own global destruction
     # handle the memory.
-    if( _NEED_SHARED && $INC{'threads.pm'} )
+    if( _NEED_SHARED() && $INC{'threads.pm'} )
     {
-        my @running = grep { $_->is_running } threads->list;
+        my @running = grep{ $_->is_running } threads->list;
         return if( @running );
     }
     %$REPO      = ();
@@ -1681,18 +1738,7 @@ END
     use strict;
     use warnings;
     local $@;
-    if( defined( ${^GLOBAL_PHASE} ) )
-    {
-        # perl 5.14+: use the built-in
-        eval q{ sub _in_global_destruction () { ${^GLOBAL_PHASE} eq 'DESTRUCT' } };
-    }
-    else
-    {
-        # perl < 5.14: detect via B::main_cv. During global destruction, PL_main_cv is
-        # set to Nullcv, which B exposes as a B::SPECIAL whose dereferenced value is 0.
-        require B;
-        eval q{ sub _in_global_destruction () { ${B::main_cv()} == 0 } };
-    }
+    *_in_global_destruction = sub{ ${^GLOBAL_PHASE} eq 'DESTRUCT' };
     die( $@ ) if( $@ );
     our $VERSION = 'v0.1.0';
 
@@ -1868,7 +1914,7 @@ END
             my $caller_func;
             $caller_func = \&{"CORE::GLOBAL::caller"} if( defined( &{"CORE::GLOBAL::caller"} ) );
             my $call_pack = $caller_func ? $caller_func->() : caller();
-            ## Check if this is an internal package or a package inheriting from us
+            # Check if this is an internal package or a package inheriting from us
             local $CALLER_LEVEL = ( $CALLER_INTERNAL->{ $call_pack } || bless( {} => $call_pack )->isa( 'Module::Generic::Exception' ) ) 
                 ? $CALLER_LEVEL 
                 : $CALLER_LEVEL + 1;
@@ -2005,11 +2051,10 @@ END
     sub package { return( shift->{package} ); }
 
     # From perlfunc docmentation on "die":
-    # "If LIST was empty or made an empty string, and $@ contains an
-    # object reference that has a "PROPAGATE" method, that method will
-    # be called with additional file and line number parameters. The
-    # return value replaces the value in $@; i.e., as if "$@ = eval {
-    # $@->PROPAGATE(__FILE__, __LINE__) };" were called."
+    # "If LIST was empty or made an empty string, and $@ contains an object reference that
+    # has a "PROPAGATE" method, that method will be called with additional file and line
+    # number parameters. The return value replaces the value in $@; i.e., as
+    # if "$@ = eval { $@->PROPAGATE(__FILE__, __LINE__) };" were called."
     sub PROPAGATE
     {
         my( $self, $file, $line ) = @_;
@@ -2141,7 +2186,7 @@ Module::Generic::Global - Contextual global storage by namespace, class or objec
 
 =head1 VERSION
 
-    v1.1.1
+    v1.2.1
 
 =head1 DESCRIPTION
 

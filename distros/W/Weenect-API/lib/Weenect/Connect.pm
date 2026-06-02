@@ -76,9 +76,20 @@ method request( $path, %keys ) {
       );
     push( @common, Authorization => "JWT ".$auth->access_token ) if $auth;
 
-    my $op = delete $keys{OP} || 'GET';
+    my $op = delete $keys{OP} || (defined($keys{Content}) ? 'POST' : 'GET');
 
-    if ( $op eq 'POST' || defined $keys{Content} ) {
+    if ( $op eq 'PUT' ) {
+	my $content = delete $keys{Content} // {};
+	$content = $json->encode($content) if ref($content);
+	$req = HTTP::Request::Common::PUT
+	  ( $u,
+	    @common,
+	    Content_Type => "application/json",
+	    Content => $content,
+	    %keys
+	  );
+    }
+    elsif ( $op eq 'POST' ) {
 	my $content = delete $keys{Content} // {};
 	$content = $json->encode($content) if ref($content);
 	$req = HTTP::Request::Common::POST

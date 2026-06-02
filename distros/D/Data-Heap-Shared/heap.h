@@ -157,12 +157,12 @@ static inline void heap_sift_up(HeapEntry *data, uint32_t idx) {
 static inline void heap_sift_down(HeapEntry *data, uint32_t size, uint32_t idx) {
     while (1) {
         uint32_t smallest = idx;
-        uint32_t left = 2 * idx + 1;
-        uint32_t right = 2 * idx + 2;
+        uint64_t left = (uint64_t)idx * 2 + 1;   /* uint64: 2*idx overflows uint32 near 2^31 */
+        uint64_t right = (uint64_t)idx * 2 + 2;
         if (left < size && data[left].priority < data[smallest].priority)
-            smallest = left;
+            smallest = (uint32_t)left;
         if (right < size && data[right].priority < data[smallest].priority)
-            smallest = right;
+            smallest = (uint32_t)right;
         if (smallest == idx) break;
         heap_swap(&data[idx], &data[smallest]);
         idx = smallest;
@@ -192,7 +192,7 @@ static inline int heap_remaining(const struct timespec *dl, struct timespec *rem
 static inline int heap_push(HeapHandle *h, int64_t priority, int64_t value) {
     HeapHeader *hdr = h->hdr;
     heap_mutex_lock(hdr);
-    if (hdr->size >= (uint32_t)hdr->capacity) {
+    if (hdr->size >= hdr->capacity) {
         heap_mutex_unlock(hdr);
         return 0;
     }

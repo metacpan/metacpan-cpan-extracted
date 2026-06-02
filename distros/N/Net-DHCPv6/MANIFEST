@@ -14,6 +14,7 @@ eg/dhcpv6-lease-sim
 lib/Net/DHCPv6.pm
 lib/Net/DHCPv6/Constants.pm
 lib/Net/DHCPv6/DUID.pm
+lib/Net/DHCPv6/Helpers.pm
 lib/Net/DHCPv6/Message/Advertise.pm
 lib/Net/DHCPv6/Message/Confirm.pm
 lib/Net/DHCPv6/Message/Decline.pm
@@ -69,6 +70,7 @@ lib/Net/DHCPv6/Option/RemoteId.pm
 lib/Net/DHCPv6/Option/ServerId.pm
 lib/Net/DHCPv6/Option/SipServerA.pm
 lib/Net/DHCPv6/Option/SipServerD.pm
+lib/Net/DHCPv6/Option/SntpServers.pm
 lib/Net/DHCPv6/Option/SolMaxRt.pm
 lib/Net/DHCPv6/Option/StatusCode.pm
 lib/Net/DHCPv6/Option/SubscriberId.pm
@@ -94,6 +96,8 @@ t/005-decoder.t
 t/006-streaming.t
 t/007-new-options.t
 t/008-warnings.t
+t/009-helpers.t
+t/010-from_bytes.t
 t/030-constants-coverage.t
 t/100-pcap-wireshark.t
 t/101-pcap-ztp.t
@@ -104,6 +108,7 @@ t/105-pcap-ia-ta.t
 t/106-pcap-mud.t
 t/107-pcap-sip-server-d.t
 t/author-clean-namespaces.t
+t/author-critic.t
 t/author-distmeta.t
 t/author-eof.t
 t/author-eol.t

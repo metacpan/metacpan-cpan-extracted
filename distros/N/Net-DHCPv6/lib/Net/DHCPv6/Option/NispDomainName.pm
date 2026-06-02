@@ -1,10 +1,12 @@
-#!/usr/bin/false
-# ABSTRACT: NIS+ Domain Name option (code 30) — NIS+ domain name string
+#!/bin/false
+# ABSTRACT: NIS+ Domain Name option (code 30) -- NIS+ domain name string
 # PODNAME: Net::DHCPv6::Option::NispDomainName
-package Net::DHCPv6::Option::NispDomainName;
-$Net::DHCPv6::Option::NispDomainName::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Option::NispDomainName;
+$Net::DHCPv6::Option::NispDomainName::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
+use Carp qw( croak );
 use Net::DHCPv6::Constants;
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
@@ -16,14 +18,14 @@ sub new {
     $args{data} = $args{domain_name};
     my $self = $class->SUPER::new( %args );
     $self->{domain_name} = $args{domain_name};
-    bless $self, $class;
+    return bless $self, $class;
 }
 
-sub domain_name { shift->{domain_name} }
+sub domain_name { return shift->{domain_name} }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
-    return $class->new( domain_name => $data );
+    my ( $class, $code, $payload ) = @_;
+    return $class->new( domain_name => $payload );
 }
 
 $Net::DHCPv6::OptionList::OPTION_CLASS{$OPTION_NISP_DOMAIN_NAME} = __PACKAGE__;
@@ -33,15 +35,15 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::NispDomainName - NIS+ Domain Name option (code 30) — NIS+ domain name string
+Net::DHCPv6::Option::NispDomainName - NIS+ Domain Name option (code 30) -- NIS+ domain name string
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

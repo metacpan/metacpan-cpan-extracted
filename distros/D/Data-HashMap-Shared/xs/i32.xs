@@ -5,7 +5,7 @@ SV*
 new(char* class, SV* path_sv, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0)
     CODE:
         char errbuf[SHM_ERR_BUFLEN]; const char* path = SvOK(path_sv) ? SvPV_nolen(path_sv) : NULL; ShmHandle* map = shm_i32_create(path, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, errbuf);
-        if (!map) croak("HashMap::Shared::I32: %s", errbuf[0] ? errbuf : "unknown error");
+        if (!map) croak("Data::HashMap::Shared::I32: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
     OUTPUT:
         RETVAL
@@ -14,7 +14,7 @@ SV*
 new_sharded(char* class, char* path_prefix, UV num_shards, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0)
     CODE:
         char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_i32_create_sharded(path_prefix, (uint32_t)num_shards, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, errbuf);
-        if (!map) croak("HashMap::Shared::I32: %s", errbuf[0] ? errbuf : "unknown error");
+        if (!map) croak("Data::HashMap::Shared::I32: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
     OUTPUT:
         RETVAL
@@ -83,13 +83,9 @@ set_multi(SV* self_sv, ...)
             for (int i = 1; i < items; i += 2)
                 count += shm_i32_put(h, (int32_t)SvIV(ST(i)), (int32_t)SvIV(ST(i + 1)));
         } else {
-            ShmHeader *hdr = h->hdr;
-            shm_rwlock_wrlock(h);
-            shm_seqlock_write_begin(&hdr->seq);
+            WRSEQ_GUARD(h);
             for (int i = 1; i < items; i += 2)
                 count += shm_i32_put_inner(h, (int32_t)SvIV(ST(i)), (int32_t)SvIV(ST(i + 1)), SHM_TTL_USE_DEFAULT);
-            shm_seqlock_write_end(&hdr->seq);
-            shm_rwlock_wrunlock(h);
         }
         RETVAL = count;
     OUTPUT:
@@ -104,14 +100,10 @@ remove_multi(SV* self_sv, ...)
             for (int i = 1; i < items; i++)
                 count += shm_i32_remove(h, (int32_t)SvIV(ST(i)));
         } else {
-            ShmHeader *hdr = h->hdr;
-            shm_rwlock_wrlock(h);
-            shm_seqlock_write_begin(&hdr->seq);
+            WRSEQ_GUARD(h);
             for (int i = 1; i < items; i++)
                 count += shm_i32_remove_inner(h, (int32_t)SvIV(ST(i)));
             if (count) shm_i32_maybe_shrink(h);
-            shm_seqlock_write_end(&hdr->seq);
-            shm_rwlock_wrunlock(h);
         }
         RETVAL = count;
     OUTPUT:
@@ -279,7 +271,7 @@ incr(SV* self_sv, int32_t key)
         EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
         int ok;
         int32_t val = shm_i32_incr_by(h, key, 1, &ok);
-        if (!ok) croak("HashMap::Shared::I32: increment failed");
+        if (!ok) croak("Data::HashMap::Shared::I32: increment failed");
         RETVAL = newSViv(val);
     OUTPUT:
         RETVAL
@@ -290,7 +282,7 @@ decr(SV* self_sv, int32_t key)
         EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
         int ok;
         int32_t val = shm_i32_incr_by(h, key, -1, &ok);
-        if (!ok) croak("HashMap::Shared::I32: decrement failed");
+        if (!ok) croak("Data::HashMap::Shared::I32: decrement failed");
         RETVAL = newSViv(val);
     OUTPUT:
         RETVAL
@@ -301,7 +293,7 @@ incr_by(SV* self_sv, int32_t key, int32_t delta)
         EXTRACT_MAP("Data::HashMap::Shared::I32", self_sv);
         int ok;
         int32_t val = shm_i32_incr_by(h, key, delta, &ok);
-        if (!ok) croak("HashMap::Shared::I32: incr_by failed");
+        if (!ok) croak("Data::HashMap::Shared::I32: incr_by failed");
         RETVAL = newSViv(val);
     OUTPUT:
         RETVAL
@@ -377,7 +369,7 @@ items(SV* self_sv)
                 }
             }
         }
-        
+
 
 void
 each(SV* self_sv)
@@ -427,7 +419,7 @@ to_hash(SV* self_sv)
                 }
             }
         }
-        
+
         RETVAL = newRV_noinc((SV*)hv);
     OUTPUT:
         RETVAL
@@ -507,18 +499,18 @@ drain(SV* self_sv, UV limit)
         if (limit == 0) XSRETURN_EMPTY;
         shm_i32_drain_entry *entries;
         Newxz(entries, limit, shm_i32_drain_entry);
-        
+
         SAVEFREEPV(entries);
         char *buf = NULL; uint32_t buf_cap = 0;
         uint32_t n = shm_i32_drain(h, (uint32_t)limit, entries, &buf, &buf_cap);
-        
+
         EXTEND(SP, n * 2);
         for (uint32_t i = 0; i < n; i++) {
             mPUSHi(entries[i].key);
             mPUSHi(entries[i].value);
         }
         if (buf) free(buf);
-        
+
 
 UV
 flush_expired(SV* self_sv)

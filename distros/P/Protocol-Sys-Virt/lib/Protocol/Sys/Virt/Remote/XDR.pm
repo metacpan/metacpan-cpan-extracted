@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1,
-#        XDR::Gen version 1.1.2 and LibVirt version v12.3.0
+#        XDR::Gen version 1.1.2 and LibVirt version v12.4.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -9,7 +9,7 @@
 #
 ####################################################################
 
-package Protocol::Sys::Virt::Remote::XDR v12.3.0;
+package Protocol::Sys::Virt::Remote::XDR v12.4.0;
 
 use constant {
     VIR_TYPED_PARAM_INT     => 1,
@@ -33995,6 +33995,69 @@ sub serialize_domain_event_memory_device_size_change_msg {
     $_[2] += 8;
 }
 # @_: ($class, $value, $index, $input) = @_;
+sub deserialize_domain_event_vcpu_removed_msg {
+    my $input_length = length $_[3];
+    $_[1] = {};
+    # Deserializing field: 'callbackID'
+    # my ($class, $value, $index, $input) = @_;
+    die "Input buffer too short"
+        if ($input_length - $_[2]) < 4;
+    $_[1]->{callbackID} = unpack("l>", substr( $_[3], $_[2] ));
+    $_[2] += 4;
+    die "Out of bounds 'int': $_[1]->{callbackID}"
+        unless (-2147483648 <= $_[1]->{callbackID} and $_[1]->{callbackID} < 2147483648);
+
+    # Deserializing field: 'dom'
+    # my ($class, $value, $index, $input) = @_;
+    $_[0]->deserialize_nonnull_domain( $_[1]->{dom}, $_[2], $_[3] );
+
+    # Deserializing field: 'vcpuid'
+    # my ($class, $value, $index, $input) = @_;
+    die "Input buffer too short"
+        if ($input_length - $_[2]) < 4;
+    $_[1]->{vcpuid} = unpack("L>", substr( $_[3], $_[2] ));
+    $_[2] += 4;
+    die "Out of bounds 'unsigned int': $_[1]->{vcpuid}"
+        unless (0 <= $_[1]->{vcpuid} and $_[1]->{vcpuid} <= 4294967295);
+}
+# @_: ($class, $value, $index, $output) = @_;
+sub serialize_domain_event_vcpu_removed_msg {
+    croak "Missing required input 'struct' value"
+        unless defined $_[1];
+
+    # Serializing field: 'callbackID'
+    croak "Missing required input value 'callbackID'"
+        unless exists $_[1]->{callbackID};
+    # my ($class, $value, $index, $output) = @_;
+    croak "Missing required input 'int' value"
+        unless defined $_[1]->{callbackID};
+    die "Out of bounds 'int': $_[1]->{callbackID}"
+        unless (-2147483648 <= $_[1]->{callbackID} and $_[1]->{callbackID} < 2147483648);
+    die "Non-integer 'int' value given: $_[1]->{callbackID}"
+        unless int($_[1]->{callbackID}) == $_[1]->{callbackID};
+    substr( $_[3], $_[2] ) = pack("l>", $_[1]->{callbackID});
+    $_[2] += 4;
+
+    # Serializing field: 'dom'
+    croak "Missing required input value 'dom'"
+        unless exists $_[1]->{dom};
+    # my ($class, $value, $index, $output) = @_;
+    $_[0]->serialize_nonnull_domain( $_[1]->{dom}, $_[2], $_[3] );
+
+    # Serializing field: 'vcpuid'
+    croak "Missing required input value 'vcpuid'"
+        unless exists $_[1]->{vcpuid};
+    # my ($class, $value, $index, $output) = @_;
+    croak "Missing required input 'unsigned int' value"
+        unless defined $_[1]->{vcpuid};
+    die "Out of bounds 'unsigned int': $_[1]->{vcpuid}"
+        unless (0 <= $_[1]->{vcpuid} and $_[1]->{vcpuid} <= 4294967295);
+    die "Non-integer 'int' value given: $_[1]->{vcpuid}"
+        unless int($_[1]->{vcpuid}) == $_[1]->{vcpuid};
+    substr( $_[3], $_[2] ) = pack("L>", $_[1]->{vcpuid});
+    $_[2] += 4;
+}
+# @_: ($class, $value, $index, $input) = @_;
 sub deserialize_domain_fd_associate_args {
     my $input_length = length $_[3];
     $_[1] = {};
@@ -34206,6 +34269,101 @@ sub serialize_domain_event_nic_mac_change_msg {
         unless exists $_[1]->{newMAC};
     # my ($class, $value, $index, $output) = @_;
     $_[0]->serialize_nonnull_string( $_[1]->{newMAC}, $_[2], $_[3] );
+}
+# @_: ($class, $value, $index, $input) = @_;
+sub deserialize_domain_event_callback_channel_lifecycle_msg {
+    my $input_length = length $_[3];
+    $_[1] = {};
+    # Deserializing field: 'callbackID'
+    # my ($class, $value, $index, $input) = @_;
+    die "Input buffer too short"
+        if ($input_length - $_[2]) < 4;
+    $_[1]->{callbackID} = unpack("l>", substr( $_[3], $_[2] ));
+    $_[2] += 4;
+    die "Out of bounds 'int': $_[1]->{callbackID}"
+        unless (-2147483648 <= $_[1]->{callbackID} and $_[1]->{callbackID} < 2147483648);
+
+    # Deserializing field: 'dom'
+    # my ($class, $value, $index, $input) = @_;
+    $_[0]->deserialize_nonnull_domain( $_[1]->{dom}, $_[2], $_[3] );
+
+    # Deserializing field: 'channelName'
+    # my ($class, $value, $index, $input) = @_;
+    $_[0]->deserialize_nonnull_string( $_[1]->{channelName}, $_[2], $_[3] );
+
+    # Deserializing field: 'state'
+    # my ($class, $value, $index, $input) = @_;
+    die "Input buffer too short"
+        if ($input_length - $_[2]) < 4;
+    $_[1]->{state} = unpack("l>", substr( $_[3], $_[2] ));
+    $_[2] += 4;
+    die "Out of bounds 'int': $_[1]->{state}"
+        unless (-2147483648 <= $_[1]->{state} and $_[1]->{state} < 2147483648);
+
+    # Deserializing field: 'reason'
+    # my ($class, $value, $index, $input) = @_;
+    die "Input buffer too short"
+        if ($input_length - $_[2]) < 4;
+    $_[1]->{reason} = unpack("l>", substr( $_[3], $_[2] ));
+    $_[2] += 4;
+    die "Out of bounds 'int': $_[1]->{reason}"
+        unless (-2147483648 <= $_[1]->{reason} and $_[1]->{reason} < 2147483648);
+}
+# @_: ($class, $value, $index, $output) = @_;
+sub serialize_domain_event_callback_channel_lifecycle_msg {
+    croak "Missing required input 'struct' value"
+        unless defined $_[1];
+
+    # Serializing field: 'callbackID'
+    croak "Missing required input value 'callbackID'"
+        unless exists $_[1]->{callbackID};
+    # my ($class, $value, $index, $output) = @_;
+    croak "Missing required input 'int' value"
+        unless defined $_[1]->{callbackID};
+    die "Out of bounds 'int': $_[1]->{callbackID}"
+        unless (-2147483648 <= $_[1]->{callbackID} and $_[1]->{callbackID} < 2147483648);
+    die "Non-integer 'int' value given: $_[1]->{callbackID}"
+        unless int($_[1]->{callbackID}) == $_[1]->{callbackID};
+    substr( $_[3], $_[2] ) = pack("l>", $_[1]->{callbackID});
+    $_[2] += 4;
+
+    # Serializing field: 'dom'
+    croak "Missing required input value 'dom'"
+        unless exists $_[1]->{dom};
+    # my ($class, $value, $index, $output) = @_;
+    $_[0]->serialize_nonnull_domain( $_[1]->{dom}, $_[2], $_[3] );
+
+    # Serializing field: 'channelName'
+    croak "Missing required input value 'channelName'"
+        unless exists $_[1]->{channelName};
+    # my ($class, $value, $index, $output) = @_;
+    $_[0]->serialize_nonnull_string( $_[1]->{channelName}, $_[2], $_[3] );
+
+    # Serializing field: 'state'
+    croak "Missing required input value 'state'"
+        unless exists $_[1]->{state};
+    # my ($class, $value, $index, $output) = @_;
+    croak "Missing required input 'int' value"
+        unless defined $_[1]->{state};
+    die "Out of bounds 'int': $_[1]->{state}"
+        unless (-2147483648 <= $_[1]->{state} and $_[1]->{state} < 2147483648);
+    die "Non-integer 'int' value given: $_[1]->{state}"
+        unless int($_[1]->{state}) == $_[1]->{state};
+    substr( $_[3], $_[2] ) = pack("l>", $_[1]->{state});
+    $_[2] += 4;
+
+    # Serializing field: 'reason'
+    croak "Missing required input value 'reason'"
+        unless exists $_[1]->{reason};
+    # my ($class, $value, $index, $output) = @_;
+    croak "Missing required input 'int' value"
+        unless defined $_[1]->{reason};
+    die "Out of bounds 'int': $_[1]->{reason}"
+        unless (-2147483648 <= $_[1]->{reason} and $_[1]->{reason} < 2147483648);
+    die "Non-integer 'int' value given: $_[1]->{reason}"
+        unless int($_[1]->{reason}) == $_[1]->{reason};
+    substr( $_[3], $_[2] ) = pack("l>", $_[1]->{reason});
+    $_[2] += 4;
 }
 use constant PROGRAM => 536903814; # 0x20008086
 use constant PROTOCOL_VERSION => 1; # 1
@@ -34664,6 +34822,8 @@ use constant {
     PROC_DOMAIN_SET_THROTTLE_GROUP                    => 451,
     PROC_DOMAIN_DEL_THROTTLE_GROUP                    => 452,
     PROC_DOMAIN_EVENT_NIC_MAC_CHANGE                  => 453,
+    PROC_DOMAIN_EVENT_VCPU_REMOVED                    => 454,
+    PROC_DOMAIN_EVENT_CALLBACK_CHANNEL_LIFECYCLE      => 455,
 };
 # @_: ($class, $value, $index, $input) = @_;
 sub deserialize_procedure {
@@ -34673,7 +34833,7 @@ sub deserialize_procedure {
         if ($input_length - $_[2]) < 4;
     $_[1] = unpack("l>", substr( $_[3], $_[2] ) );
     die "Out of range enum value supplied: $_[1]"
-        unless vec(state $m = pack('H*', 'feffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff3f'),
+        unless vec(state $m = pack('H*', 'feffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'),
                    $_[1], 1);
     $_[2] += 4;
 }
@@ -34683,7 +34843,7 @@ sub serialize_procedure {
     croak "Missing required input 'enum' value"
         unless defined $_[1];
     die "Out of range enum value: $_[1]"
-        unless vec(state $m = pack('H*', 'feffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff3f'),
+        unless vec(state $m = pack('H*', 'feffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'),
                    $_[1], 1);
     substr( $_[3], $_[2] ) = pack("l>", $_[1]);
     $_[2] += 4;
@@ -34700,9 +34860,9 @@ Protocol::Sys::Virt::Remote::XDR - Constants and (de)serializers for remote serv
 
 =head1 VERSION
 
-v12.3.0
+v12.4.0
 
-Based on LibVirt tag v12.3.0
+Based on LibVirt tag v12.4.0
 
 =head1 SYNOPSYS
 
@@ -35810,6 +35970,10 @@ brevity.  These prefixes have been stripped:
 =item * PROC_DOMAIN_DEL_THROTTLE_GROUP
 
 =item * PROC_DOMAIN_EVENT_NIC_MAC_CHANGE
+
+=item * PROC_DOMAIN_EVENT_VCPU_REMOVED
+
+=item * PROC_DOMAIN_EVENT_CALLBACK_CHANNEL_LIFECYCLE
 
 =back
 
@@ -37250,6 +37414,8 @@ position C<$idx> into their corresponding Perl representation.
 
 =item * domain_event_memory_device_size_change_msg
 
+=item * domain_event_vcpu_removed_msg
+
 =item * domain_fd_associate_args
 
 =item * domain_get_autostart_once_args
@@ -37259,6 +37425,8 @@ position C<$idx> into their corresponding Perl representation.
 =item * domain_set_autostart_once_args
 
 =item * domain_event_nic_mac_change_msg
+
+=item * domain_event_callback_channel_lifecycle_msg
 
 =item * procedure
 

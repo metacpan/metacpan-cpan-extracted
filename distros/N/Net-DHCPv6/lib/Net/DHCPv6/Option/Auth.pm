@@ -1,14 +1,19 @@
-#!/usr/bin/false
-# ABSTRACT: Authentication option (code 11) — protocol/algorithm/rdm/replay/auth-info
+#!/bin/false
+# ABSTRACT: Authentication option (code 11) -- protocol/algorithm/rdm/replay/auth-info
 # PODNAME: Net::DHCPv6::Option::Auth
-package Net::DHCPv6::Option::Auth;
-$Net::DHCPv6::Option::Auth::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Option::Auth;
+$Net::DHCPv6::Option::Auth::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
+use Carp qw( croak );
 use Net::DHCPv6::Constants;
 use Net::DHCPv6::X::Truncated;
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
+my $EMPTY           = q();
+my $REPLAY_WIRE_LEN = 8;     ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
+my $MIN_PAYLOAD     = 11;    ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 
 sub new {
     my ( $class, %args ) = @_;
@@ -16,36 +21,36 @@ sub new {
         croak "Auth requires $field" unless defined $args{$field};
     }
     croak 'Auth replay must be exactly 8 bytes'
-        if CORE::length( $args{replay} ) != 8;
+        if CORE::length( $args{replay} ) != $REPLAY_WIRE_LEN;
     $args{code} = $OPTION_AUTH;
     $args{data} =
-        pack( 'C C C a8 a*', $args{protocol}, $args{algorithm}, $args{rdm}, $args{replay}, $args{auth_info} // '' );
+        pack( 'C C C a8 a*', $args{protocol}, $args{algorithm}, $args{rdm}, $args{replay}, $args{auth_info} // $EMPTY );
     my $self = $class->SUPER::new( %args );
     $self->{protocol}  = $args{protocol};
     $self->{algorithm} = $args{algorithm};
     $self->{rdm}       = $args{rdm};
     $self->{replay}    = $args{replay};
-    $self->{auth_info} = $args{auth_info} // '';
-    bless $self, $class;
+    $self->{auth_info} = $args{auth_info} // $EMPTY;
+    return bless $self, $class;
 }
 
-sub protocol  { shift->{protocol} }
-sub algorithm { shift->{algorithm} }
-sub rdm       { shift->{rdm} }
-sub replay    { shift->{replay} }
-sub auth_info { shift->{auth_info} }
+sub protocol  { return shift->{protocol} }
+sub algorithm { return shift->{algorithm} }
+sub rdm       { return shift->{rdm} }
+sub replay    { return shift->{replay} }
+sub auth_info { return shift->{auth_info} }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
+    my ( $class, $code, $payload ) = @_;
     Net::DHCPv6::X::Truncated->throw( message => 'Truncated Auth option' )
-        if CORE::length( $data ) < 11;
-    my ( $proto, $alg, $rdm, $replay, $info ) = unpack( 'C C C a8 a*', $data );
+        if CORE::length( $payload ) < $MIN_PAYLOAD;
+    my ( $proto, $alg, $rdm, $replay, $auth_info ) = unpack( 'C C C a8 a*', $payload );
     return $class->new(
         protocol  => $proto,
         algorithm => $alg,
         rdm       => $rdm,
         replay    => $replay,
-        auth_info => $info,
+        auth_info => $auth_info,
     );
 }
 
@@ -56,15 +61,15 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::Auth - Authentication option (code 11) — protocol/algorithm/rdm/replay/auth-info
+Net::DHCPv6::Option::Auth - Authentication option (code 11) -- protocol/algorithm/rdm/replay/auth-info
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -81,7 +86,7 @@ version 0.001
 
 Carries authentication information for DHCPv6 messages, including
 protocol, algorithm, replay detection method, replay counter, and
-authentication data.  See RFC 8415 §21.11.
+authentication data.  See RFC 8415 E<167>21.11.
 
 =head1 ALPHA STATUS
 

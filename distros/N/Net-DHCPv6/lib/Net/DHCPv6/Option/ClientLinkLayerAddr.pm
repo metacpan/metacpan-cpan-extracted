@@ -1,10 +1,12 @@
-#!/usr/bin/false
-# ABSTRACT: Client Link-Layer Address option (code 79) — link-layer type + address
+#!/bin/false
+# ABSTRACT: Client Link-Layer Address option (code 79) -- link-layer type + address
 # PODNAME: Net::DHCPv6::Option::ClientLinkLayerAddr
-package Net::DHCPv6::Option::ClientLinkLayerAddr;
-$Net::DHCPv6::Option::ClientLinkLayerAddr::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Option::ClientLinkLayerAddr;
+$Net::DHCPv6::Option::ClientLinkLayerAddr::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
+use Carp qw( croak );
 use Net::DHCPv6::Constants;
 use Net::DHCPv6::X::Truncated;
 use parent 'Net::DHCPv6::Option';
@@ -19,18 +21,18 @@ sub new {
     my $self = $class->SUPER::new( %args );
     $self->{link_layer_type} = $args{link_layer_type};
     $self->{link_layer_addr} = $args{link_layer_addr};
-    bless $self, $class;
+    return bless $self, $class;
 }
 
-sub link_layer_type { shift->{link_layer_type} }
-sub link_layer_addr { shift->{link_layer_addr} }
+sub link_layer_type { return shift->{link_layer_type} }
+sub link_layer_addr { return shift->{link_layer_addr} }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
+    my ( $class, $code, $payload ) = @_;
     Net::DHCPv6::X::Truncated->throw( message => 'Truncated ClientLinkLayerAddr option' )
-        if CORE::length( $data ) < 3;
-    my $type = unpack( 'n', substr( $data, 0, 2 ) );
-    my $addr = substr( $data, 2 );
+        if CORE::length( $payload ) < 3;    ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
+    my $type = unpack( 'n', substr( $payload, 0, 2 ) );
+    my $addr = substr( $payload, 2 );
     return $class->new( link_layer_type => $type, link_layer_addr => $addr );
 }
 
@@ -41,21 +43,21 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::ClientLinkLayerAddr - Client Link-Layer Address option (code 79) — link-layer type + address
+Net::DHCPv6::Option::ClientLinkLayerAddr - Client Link-Layer Address option (code 79) -- link-layer type + address
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
   use Net::DHCPv6::Option::ClientLinkLayerAddr;
   my $opt = Net::DHCPv6::Option::ClientLinkLayerAddr->new(
-      link_layer_type => 1,
+      link_layer_type => $LINK_TYPE_ETHERNET,
       link_layer_addr => "\x00\x11\x22\x33\x44\x55",
   );
 
@@ -78,7 +80,7 @@ Constructor.  Requires C<link_layer_type> and C<link_layer_addr>.
 
 =head2 link_layer_type
 
-Returns the 16-bit link-layer type (e.g. 1 for Ethernet).
+Returns the 16-bit link-layer type (e.g. C<$LINK_TYPE_ETHERNET> for Ethernet).
 
 =head2 link_layer_addr
 

@@ -3,8 +3,9 @@
 use strict;
 use warnings;
 use App::CriticDB::DB::Stor;
+use Fcntl qw/:flock/;
 use File::Temp qw/tempfile/;
-use Test::More tests=>2;
+use Test::More tests=>3;
 
 subtest 'end to end'=>sub{
 	plan tests=>8;
@@ -40,4 +41,22 @@ subtest 'mtime guard'=>sub{
 	$$db{mtime}=0;
 	$db->read();
 	is($$db{store}{version},1001,'newer mtime:  re-read');
+};
+
+subtest 'update guards'=>sub {
+	plan tests=>2;
+	my ($fh,$fn)=tempfile(UNLINK=>1); close($fh); unlink($fn);
+	my $db=App::CriticDB::DB->new(mode=>'file',file=>$fn,type=>'storable');
+	sleep(1); # ensure mtime tick
+	open(my $dupfh,'>',$fn);
+	print $dupfh "\n";
+	close($dupfh);
+	eval {$db->write()};
+	like($@,qr/changed underneath/,'Refuse write if file changed');
+	#
+	unlink($fn);
+	$db->write();
+	chmod(oct('0400'),$fn);
+	eval {$db->write()};
+	like($@,qr/Failed to open/,'No write permissions');
 };

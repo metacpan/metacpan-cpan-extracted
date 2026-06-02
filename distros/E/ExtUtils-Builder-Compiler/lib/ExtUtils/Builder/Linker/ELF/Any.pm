@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::ELF::Any;
-$ExtUtils::Builder::Linker::ELF::Any::VERSION = '0.036';
+$ExtUtils::Builder::Linker::ELF::Any::VERSION = '0.037';
 use strict;
 use warnings;
 

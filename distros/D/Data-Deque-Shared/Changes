@@ -1,5 +1,8 @@
 Revision history for Data::Deque::Shared
 
+0.05  2026-06-01
+    - Str pop paths: free temp buffer via SAVEFREEPV (leak on OOM-croak)
+
 0.04  2026-05-26
     - drain: bounded recovery (~2s) for slots stuck after a crashed pusher
       (covers both WRITING and pre-claim_write EMPTY@gen windows)

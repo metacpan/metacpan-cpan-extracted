@@ -1,5 +1,17 @@
 Revision history for Weather::Meteo
 
+0.14	Mon Jun  1 08:55:15 EDT 2026
+	Use Test::Mockingbird instead of Test::MockModule in t/30-basics.t
+	Fix $self->error() calls that should be $logger->error() in weather()
+	Fix weather() to guard against UA returning a non-response object
+	Fix weather() to guard against JSON decoding to a non-hashref
+	Fix ua(undef) silently corrupting the stored user-agent
+	Add explicit return at end of weather() when no hourly key is present
+	Add formal API specification POD (with Z calculus) to new(), weather(), ua()
+	Added t/function.t, t/unit.t, t/integration.t, t/edge_cases.t
+	Added t/extended_tests.t targeting coverage gaps
+	Added t/mutant_killers.t targeting surviving mutants
+
 0.13	Thu Apr  9 07:48:29 EDT 2026
 	Use Object::Configure to allow runtime configuration
 	Remove magic numbers

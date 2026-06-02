@@ -1,14 +1,17 @@
-#!/usr/bin/false
-# ABSTRACT: Remote ID option (code 37) — enterprise-number + opaque data
+#!/bin/false
+# ABSTRACT: Remote ID option (code 37) -- enterprise-number + opaque data
 # PODNAME: Net::DHCPv6::Option::RemoteId
-package Net::DHCPv6::Option::RemoteId;
-$Net::DHCPv6::Option::RemoteId::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Option::RemoteId;
+$Net::DHCPv6::Option::RemoteId::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
+use Carp qw( croak );
 use Net::DHCPv6::Constants;
 use Net::DHCPv6::X::Truncated;
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
+my $ENT_NUM_LEN = 4;    ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 
 sub new {
     my ( $class, %args ) = @_;
@@ -19,18 +22,18 @@ sub new {
     my $self = $class->SUPER::new( %args );
     $self->{enterprise_number} = $args{enterprise_number};
     $self->{remote_data}       = $args{remote_data};
-    bless $self, $class;
+    return bless $self, $class;
 }
 
-sub enterprise_number { shift->{enterprise_number} }
-sub remote_data       { shift->{remote_data} }
+sub enterprise_number { return shift->{enterprise_number} }
+sub remote_data       { return shift->{remote_data} }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
+    my ( $class, $code, $payload ) = @_;
     Net::DHCPv6::X::Truncated->throw( message => 'Truncated RemoteId option' )
-        if CORE::length( $data ) < 4;
-    my $en   = unpack( 'N', substr( $data, 0, 4 ) );
-    my $rest = substr( $data, 4 );
+        if CORE::length( $payload ) < $ENT_NUM_LEN;
+    my $en   = unpack( 'N', substr( $payload, 0, $ENT_NUM_LEN ) );
+    my $rest = substr( $payload, $ENT_NUM_LEN );
     return $class->new( enterprise_number => $en, remote_data => $rest );
 }
 
@@ -41,28 +44,30 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::RemoteId - Remote ID option (code 37) — enterprise-number + opaque data
+Net::DHCPv6::Option::RemoteId - Remote ID option (code 37) -- enterprise-number + opaque data
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
   use Net::DHCPv6::Option::RemoteId;
   my $opt = Net::DHCPv6::Option::RemoteId->new(
-      enterprise_number => 9,
+      enterprise_number => 9,        # Cisco (IANA PEN)
       remote_data       => "\x00\x01\x02\x03",
   );
 
 =head1 DESCRIPTION
 
 Carries a relay agent's remote identification, consisting of an IANA
-enterprise number and opaque data.  See RFC 4649.
+Private Enterprise Number (PEN, see
+L<https://www.iana.org/assignments/enterprise-numbers>)
+and opaque data.  See RFC 4649.
 
 =head1 ALPHA STATUS
 

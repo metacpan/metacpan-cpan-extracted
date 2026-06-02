@@ -1,10 +1,12 @@
-#!/usr/bin/false
-# ABSTRACT: NEW_TZDB_TIMEZONE option (code 42) — IANA timezone DB name
+#!/bin/false
+# ABSTRACT: NEW_TZDB_TIMEZONE option (code 42) -- IANA timezone DB name
 # PODNAME: Net::DHCPv6::Option::NewTzdbTimezone
-package Net::DHCPv6::Option::NewTzdbTimezone;
-$Net::DHCPv6::Option::NewTzdbTimezone::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Option::NewTzdbTimezone;
+$Net::DHCPv6::Option::NewTzdbTimezone::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
+use Carp qw( croak );
 use Net::DHCPv6::Constants;
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
@@ -16,14 +18,14 @@ sub new {
     $args{data} = $args{tz_name};
     my $self = $class->SUPER::new( %args );
     $self->{tz_name} = $args{tz_name};
-    bless $self, $class;
+    return bless $self, $class;
 }
 
-sub tz_name { shift->{tz_name} }
+sub tz_name { return shift->{tz_name} }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
-    return $class->new( tz_name => $data );
+    my ( $class, $code, $payload ) = @_;
+    return $class->new( tz_name => $payload );
 }
 
 $Net::DHCPv6::OptionList::OPTION_CLASS{$OPTION_NEW_TZDB_TIMEZONE} = __PACKAGE__;
@@ -33,15 +35,15 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::NewTzdbTimezone - NEW_TZDB_TIMEZONE option (code 42) — IANA timezone DB name
+Net::DHCPv6::Option::NewTzdbTimezone - NEW_TZDB_TIMEZONE option (code 42) -- IANA timezone DB name
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

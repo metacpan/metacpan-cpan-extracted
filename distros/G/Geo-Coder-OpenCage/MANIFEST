@@ -18,4 +18,10 @@ t/03-reverse-geocode.t
 t/04-402-response.t
 t/05-403-response.t
 t/06-429-response.t
+t/07-invalid-response.t
+t/08-check-params.t
 t/10-user-agent.t
+t/11-http-response-subclass.t
+t/12-pod.t
+t/13-perlcritic.t
+t/lib/TestConnectivity.pm

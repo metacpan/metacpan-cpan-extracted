@@ -1,21 +1,26 @@
 #!/usr/bin/env perl
+## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 use strictures 2;
-use Test2::V1 -ipP;
+use Test2::Tools::Exception qw( dies );
+use Net::DHCPv6::Packet;
+use Test2::V1 -ipP, qw(is ok done_testing);    ## no critic (Subroutines::ProhibitCallsToUndeclaredSubs)
+
 use lib 't/lib';
 use lib 'lib';
 
 use Net::DHCPv6;
-use Test::Net::DHCPv6;
+use Test::Net::DHCPv6 qw(hex2bytes solicit_hex advertise_hex request_hex reply_hex);
+my $EMPTY = q();
 
 # decode_or_croak - Solicit
 my $bytes  = hex2bytes( solicit_hex() );
 my $packet = Net::DHCPv6->decode_or_croak( $bytes );
 ok( $packet->isa( 'Net::DHCPv6::Message::Solicit' ), 'decode_or_croak Solicit' );
-is( $packet->transaction_id, 123456, 'Solicit tid from fixture' );
+is( $packet->transaction_id, 123_456, 'Solicit tid from fixture' );
 
 my $cid = $packet->get_option( 1 );
 ok( $cid->isa( 'Net::DHCPv6::Option::ClientId' ), 'Solicit has ClientId' );
-is( $cid->duid->time,       123456,                       'ClientId DUID time' );
+is( $cid->duid->time,       123_456,                      'ClientId DUID time' );
 is( $cid->duid->identifier, pack( 'H*', '001122334455' ), 'ClientId DUID mac' );
 
 # decode_or_croak - Advertise
@@ -48,9 +53,10 @@ is( $iana->t2,   5400, 'IANA t2' );
 
 my $iaaddr = $iana->get_option( 5 );
 ok( $iaaddr->isa( 'Net::DHCPv6::Option::IAAddr' ), 'IANA has IAAddr' );
-is( $iaaddr->address,            pack( 'H*', '20010db8000000000000000000000001' ), 'IAAddr address' );
+is( $iaaddr->address,            '2001:db8::1',                                    'IAAddr address' );
+is( $iaaddr->address_raw,        pack( 'H*', '20010db8000000000000000000000001' ), 'IAAddr address_raw' );
 is( $iaaddr->preferred_lifetime, 7200,                                             'IAAddr preferred' );
-is( $iaaddr->valid_lifetime,     86400,                                            'IAAddr valid' );
+is( $iaaddr->valid_lifetime,     86_400,                                           'IAAddr valid' );
 
 # decode_or_null - valid
 $bytes  = hex2bytes( solicit_hex() );
@@ -59,11 +65,11 @@ ok( defined $packet,                                 'decode_or_null returns pac
 ok( $packet->isa( 'Net::DHCPv6::Message::Solicit' ), 'decode_or_null returns correct class' );
 
 # decode_or_null - invalid (empty)
-$packet = Net::DHCPv6->decode_or_null( '' );
+$packet = Net::DHCPv6->decode_or_null( $EMPTY );
 ok( !defined $packet, 'decode_or_null returns undef for empty data' );
 
 # decode_or_null - truncated
-$packet = Net::DHCPv6->decode_or_null( "\x01\x02" );
+$packet = Net::DHCPv6->decode_or_null( pack( 'H*', '0102' ) );
 ok( !defined $packet, 'decode_or_null returns undef for truncated data' );
 
 # decode_with_error - valid
@@ -73,7 +79,7 @@ ok( defined $pkt,  'decode_with_error returns packet for valid data' );
 ok( !defined $err, 'decode_with_error no error for valid data' );
 
 # decode_with_error - invalid
-( $pkt, $err ) = Net::DHCPv6->decode_with_error( "\x01\x02" );
+( $pkt, $err ) = Net::DHCPv6->decode_with_error( pack( 'H*', '0102' ) );
 ok( !defined $pkt, 'decode_with_error returns undef for truncated' );
 ok( defined $err,  'decode_with_error returns error for truncated' );
 
@@ -83,7 +89,8 @@ $packet = Net::DHCPv6::Packet->new( $bytes );
 ok( $packet->isa( 'Net::DHCPv6::Message::Solicit' ), 'Packet->new($bytes) delegates' );
 
 # decode_or_croak on empty data
-ok( dies { Net::DHCPv6->decode_or_croak( '' ) },    'decode_or_croak with empty dies' );
-ok( dies { Net::DHCPv6->decode_or_croak( undef ) }, 'decode_or_croak with undef dies' );
+ok( dies { Net::DHCPv6->decode_or_croak( $EMPTY ) }, 'decode_or_croak with empty dies' );
+ok( dies { Net::DHCPv6->decode_or_croak( undef ) },  'decode_or_croak with undef dies' );
 
+## use critic (ValuesAndExpressions::ProhibitMagicNumbers)
 done_testing;

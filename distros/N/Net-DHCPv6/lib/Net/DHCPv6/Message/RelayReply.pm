@@ -1,9 +1,11 @@
-#!/usr/bin/false
+#!/bin/false
 # ABSTRACT: Relay-Reply message (type 13)
 # PODNAME: Net::DHCPv6::Message::RelayReply
-package Net::DHCPv6::Message::RelayReply;
-$Net::DHCPv6::Message::RelayReply::VERSION = '0.001';
 use strictures 2;
+
+package Net::DHCPv6::Message::RelayReply;
+$Net::DHCPv6::Message::RelayReply::VERSION = '0.002';
+use Net::DHCPv6::Packet;
 use Net::DHCPv6::Constants;
 use parent 'Net::DHCPv6::Packet::Relay';
 use namespace::clean;
@@ -11,7 +13,7 @@ use namespace::clean;
 sub new {
     my ( $class, %args ) = @_;
     $args{msg_type} = $RELAY_REPLY;
-    $class->SUPER::new( %args );
+    return $class->SUPER::new( %args );
 }
 
 $Net::DHCPv6::Packet::MESSAGE_CLASS{$RELAY_REPLY} = __PACKAGE__;
@@ -22,7 +24,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -30,7 +32,7 @@ Net::DHCPv6::Message::RelayReply - Relay-Reply message (type 13)
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -56,7 +58,7 @@ experimental and subject to change without notice.
 =head1 SEE ALSO
 
 L<Net::DHCPv6::Packet::Relay>, L<Net::DHCPv6::Message::RelayForw>,
-RFC 8415 §14, §20
+RFC 8415 E<167>14, E<167>20
 
 =head1 AUTHOR
 

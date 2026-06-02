@@ -1,5 +1,9 @@
 Revision history for Data::Heap::Shared
 
+0.05  2026-06-01
+    - sift_down: compute child indices in 64-bit to avoid a uint32 overflow
+      (2*idx+1) that corrupted the heap past ~2^31 entries
+
 0.04  2026-05-27
     - Cap capacity at UINT32_MAX; (uint32_t) cast in capacity check
       no longer silently truncates oversized files

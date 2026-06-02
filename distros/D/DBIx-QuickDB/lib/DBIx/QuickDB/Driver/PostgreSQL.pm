@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000043';
+our $VERSION = '0.000044';
 
 use IPC::Cmd qw/can_run/;
 use DBIx::QuickDB::Util qw/strip_hash_defaults/;

@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Compiler::Unixy;
-$ExtUtils::Builder::Compiler::Unixy::VERSION = '0.036';
+$ExtUtils::Builder::Compiler::Unixy::VERSION = '0.037';
 use strict;
 use warnings;
 
@@ -45,7 +45,7 @@ ExtUtils::Builder::Compiler::Unixy - Class for compiling with a unix compiler
 
 =head1 VERSION
 
-version 0.036
+version 0.037
 
 =head1 AUTHOR
 

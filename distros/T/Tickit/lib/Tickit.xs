@@ -1869,9 +1869,8 @@ copy(Tickit::Pen self, Tickit::Pen other, int overwrite)
 MODULE = Tickit             PACKAGE = Tickit::Rect
 
 Tickit::Rect
-_new(char *package, int top, int left, int lines, int cols)
+_new(package, int top, int left, int lines, int cols)
   CODE:
-    PERL_UNUSED_VAR(package);
     Newx(RETVAL, 1, TickitRect);
     tickit_rect_init_sized(RETVAL, top, left, lines, cols);
   OUTPUT:
@@ -2001,9 +2000,8 @@ subtract(Tickit::Rect self, Tickit::Rect hole)
 MODULE = Tickit             PACKAGE = Tickit::RectSet
 
 Tickit::RectSet
-new(char *package)
+new(package)
   CODE:
-    PERL_UNUSED_VAR(package);
     RETVAL = tickit_rectset_new();
   OUTPUT:
     RETVAL
@@ -2067,9 +2065,8 @@ contains(Tickit::RectSet self, Tickit::Rect r)
 MODULE = Tickit             PACKAGE = Tickit::RenderBuffer
 
 SV *
-_xs_new(char *package, int lines, int cols)
+_xs_new(package, int lines, int cols)
   CODE:
-    PERL_UNUSED_VAR(package);
     RETVAL = newSVrb_noinc(tickit_renderbuffer_new(lines, cols));
   OUTPUT:
     RETVAL
@@ -2397,55 +2394,50 @@ copyrect(Tickit::RenderBuffer self, Tickit::Rect dest, Tickit::Rect src)
 MODULE = Tickit             PACKAGE = Tickit::StringPos
 
 SV *
-zero(char *package)
+zero(package)
   INIT:
     TickitStringPos *pos;
   CODE:
-    PERL_UNUSED_VAR(package);
     pos = new_stringpos(&RETVAL);
     tickit_stringpos_zero(pos);
   OUTPUT:
     RETVAL
 
 SV *
-limit_bytes(char *package, size_t bytes)
+limit_bytes(package, size_t bytes)
   INIT:
     TickitStringPos *pos;
   CODE:
-    PERL_UNUSED_VAR(package);
     pos = new_stringpos(&RETVAL);
     tickit_stringpos_limit_bytes(pos, bytes);
   OUTPUT:
     RETVAL
 
 SV *
-limit_codepoints(char *package, int codepoints)
+limit_codepoints(package, int codepoints)
   INIT:
     TickitStringPos *pos;
   CODE:
-    PERL_UNUSED_VAR(package);
     pos = new_stringpos(&RETVAL);
     tickit_stringpos_limit_codepoints(pos, codepoints);
   OUTPUT:
     RETVAL
 
 SV *
-limit_graphemes(char *package, int graphemes)
+limit_graphemes(package, int graphemes)
   INIT:
     TickitStringPos *pos;
   CODE:
-    PERL_UNUSED_VAR(package);
     pos = new_stringpos(&RETVAL);
     tickit_stringpos_limit_graphemes(pos, graphemes);
   OUTPUT:
     RETVAL
 
 SV *
-limit_columns(char *package, int columns)
+limit_columns(package, int columns)
   INIT:
     TickitStringPos *pos;
   CODE:
-    PERL_UNUSED_VAR(package);
     pos = new_stringpos(&RETVAL);
     tickit_stringpos_limit_columns(pos, columns);
   OUTPUT:
@@ -2910,11 +2902,10 @@ _emit_mouse(Tickit::Term self, Tickit::Event::Mouse info)
 MODULE = Tickit::Test::MockTerm    PACKAGE = Tickit::Test::MockTerm
 
 SV *
-_new_mocking(char *package, int lines, int cols)
+_new_mocking(package, int lines, int cols)
   INIT:
     TickitMockTerm *mt;
   CODE:
-    PERL_UNUSED_VAR(package);
     mt = tickit_mockterm_new(lines, cols);
     if(!mt)
       XSRETURN_UNDEF;
@@ -3207,12 +3198,11 @@ void cols2chars(SV *str, ...)
 MODULE = Tickit  PACKAGE = Tickit::Window
 
 SV *
-_new_root(char *package, Tickit::Term tt, SV *tickit)
+_new_root(package, Tickit::Term tt, SV *tickit)
   INIT:
     Tickit__Window  self;
     TickitWindow   *win;
   CODE:
-    PERL_UNUSED_VAR(package);
     win = tickit_window_new_root(tt);
     if(!win)
       XSRETURN_UNDEF;
@@ -3573,7 +3563,7 @@ setctl(Tickit::Window self, SV *ctl, SV *value)
 MODULE = Tickit  PACKAGE = Tickit::_Tickit
 
 SV *
-new(char *package, Tickit::Term term)
+new(char *package, Tickit::Term_MAYBE term)
   INIT:
     struct TickitBuilder builder = { 0 };
     Tickit *t;

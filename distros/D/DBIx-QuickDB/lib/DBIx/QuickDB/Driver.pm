@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver;
 use strict;
 use warnings;
 
-our $VERSION = '0.000043';
+our $VERSION = '0.000044';
 
 use Carp qw/croak confess/;
 use File::Path qw/remove_tree/;
@@ -347,22 +347,27 @@ sub stop {
         }
     );
 
+    my $server_pid = $watcher->server_pid;
     $watcher->stop();
 
-    my $start = time;
     unless ($params{no_wait}) {
         $watcher->wait();
 
-        while (-S $self->socket) {
-            my $waited = time - $start;
-
-            if ($waited > 10) {
-                confess "Timed out waiting for server to stop";
-                last;
-            }
-
+        # The watcher reaps the server process before it exits, so once wait()
+        # has returned the server is gone. Confirm via the pid rather than the
+        # unix socket file: a server killed with SIGKILL (e.g. a slow shutdown
+        # that blew the watcher's grace period) never gets to remove its socket,
+        # so waiting for the socket to disappear would hang and then time out.
+        my $start = time;
+        while ($server_pid && kill(0, $server_pid)) {
+            confess "Timed out waiting for server to stop" if time - $start > 10;
             sleep 0.01;
         }
+
+        # Remove a stale unix socket left behind by a hard kill so it does not
+        # confuse callers or a later run that reuses the same directory.
+        my $socket = $self->socket;
+        unlink($socket) if $socket && -S $socket;
     }
 
     return;

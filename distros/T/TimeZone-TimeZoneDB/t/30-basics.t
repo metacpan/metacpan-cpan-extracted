@@ -5,22 +5,22 @@
 use strict;
 use warnings;
 
+use lib "$ENV{HOME}/src/njh/Test-Mockingbird/lib";
+
+use HTTP::Response;
 use Test::Most tests => 5;
-use Test::MockModule;
+use Test::Mockingbird;
 use LWP::UserAgent;
 
 BEGIN { use_ok('TimeZone::TimeZoneDB') }
 
-# Mock the LWP::UserAgent to avoid actual API calls
-my $mock_ua = Test::MockModule->new('LWP::UserAgent');
-$mock_ua->mock(get => sub {
-	my ($self, $url) = @_;
-
-	# Simulated API response
-	my $response = HTTP::Response->new(200);
+# Mock LWP::UserAgent::get for the whole file to avoid real HTTP calls.
+# The mock returns a canned 200 OK response with a known JSON body.
+mock 'LWP::UserAgent::get' => sub {
+	my $response = HTTP::Response->new(200, 'OK');
 	$response->content('{"status":"OK","zoneName":"America/New_York"}');
 	return $response;
-});
+};
 
 # Test object creation
 subtest 'Object Creation' => sub {
@@ -36,7 +36,7 @@ subtest 'Missing API Key' => sub {
 
 # Test get_time_zone method with valid input
 subtest 'Get Time Zone' => sub {
-	my $tzdb = TimeZone::TimeZoneDB->new(key => 'dummy_key', ua => LWP::UserAgent->new());
+	my $tzdb   = TimeZone::TimeZoneDB->new(key => 'dummy_key', ua => LWP::UserAgent->new());
 	my $result = $tzdb->get_time_zone({ latitude => 40.7128, longitude => -74.0060 });
 
 	ok($result, 'Valid API response received');
@@ -50,3 +50,6 @@ subtest 'Get Time Zone - Missing Parameters' => sub {
 		$tzdb->get_time_zone();
 	} qr/Required parameter/, 'Dies when missing parameters';
 };
+
+# Restore the LWP::UserAgent::get mock installed at the top of the file
+restore_all();

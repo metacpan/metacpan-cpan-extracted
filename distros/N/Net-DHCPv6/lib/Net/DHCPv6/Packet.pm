@@ -1,43 +1,48 @@
-#!/usr/bin/false
+#!/bin/false
 # ABSTRACT: DHCPv6 packet base class
 # PODNAME: Net::DHCPv6::Packet
-package Net::DHCPv6::Packet;
-$Net::DHCPv6::Packet::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Packet;
+$Net::DHCPv6::Packet::VERSION = '0.002';
+use Carp qw( croak );
 use Net::DHCPv6::Constants;
 use Net::DHCPv6::OptionList;
 use Net::DHCPv6::Packet::Relay;
 use Net::DHCPv6::X::BadMessage;
 use namespace::clean;
 
+my $TX_ID_MAX   = 0xFFFFFF;    ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
+my $TX_ID_BYTES = 3;           ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
+my $HDR_SIZE    = 4;           ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
+
 sub new {
-    my ( $class, @args ) = @_;
-    if ( @args == 1 ) {
-        return $class->from_bytes( $args[0] );
+    my ( $class, @argv ) = @_;
+    if ( @argv == 1 ) {
+        return $class->from_bytes( $argv[0] );
     }
-    croak 'Packet->new: no arguments' unless @args;
-    my %args = @args;
+    croak 'Packet->new: no arguments' unless @argv;
+    my %args = @argv;
     croak 'Packet->new: msg_type is required'       unless defined $args{msg_type};
     croak 'Packet->new: transaction_id is required' unless defined $args{transaction_id};
     croak 'transaction_id must fit in 24 bits'
-        if $args{transaction_id} < 0 || $args{transaction_id} > 0xFFFFFF;
+        if $args{transaction_id} < 0 || $args{transaction_id} > $TX_ID_MAX;
     $args{options} = $args{options} // Net::DHCPv6::OptionList->new;
     my $self = {
         msg_type       => $args{msg_type},
         transaction_id => $args{transaction_id},
         options        => $args{options},
     };
-    bless $self, $class;
+    return bless $self, $class;
 }
 
-sub msg_type       { shift->{msg_type} }
-sub transaction_id { shift->{transaction_id} }
-sub options        { shift->{options} }
+sub msg_type       { return shift->{msg_type} }
+sub transaction_id { return shift->{transaction_id} }
+sub options        { return shift->{options} }
 
 sub add_option {
     my ( $self, $option ) = @_;
-    $self->{options}->add_option( $option );
+    return $self->{options}->add_option( $option );
 }
 
 sub get_option {
@@ -47,7 +52,7 @@ sub get_option {
 
 sub as_bytes {
     my $self = shift;
-    my $tid  = substr( pack( 'N', $self->{transaction_id} ), 1, 3 );
+    my $tid  = substr( pack( 'N', $self->{transaction_id} ), 1, $TX_ID_BYTES );
     my $opts = $self->{options}->as_bytes;
     return pack( 'C', $self->{msg_type} ) . $tid . $opts;
 }
@@ -55,15 +60,15 @@ sub as_bytes {
 sub from_bytes {
     my ( $class, $bytes ) = @_;
     Net::DHCPv6::X::BadMessage->throw( message => 'Empty packet data' )
-        unless defined $bytes && CORE::length( $bytes ) >= 4;
+        if !defined $bytes || CORE::length( $bytes ) < $HDR_SIZE;
     my $msg_type = unpack( 'C', substr( $bytes, 0, 1 ) );
 
     if ( $msg_type == $RELAY_FORW || $msg_type == $RELAY_REPLY ) {
         return Net::DHCPv6::Packet::Relay->from_bytes( $bytes );
     }
 
-    my $tid        = unpack( 'N', "\x00" . substr( $bytes, 1, 3 ) );
-    my $opts_bytes = substr( $bytes, 4 );
+    my $tid        = unpack( 'N', chr( 0 ) . substr( $bytes, 1, $TX_ID_BYTES ) );
+    my $opts_bytes = substr( $bytes, $HDR_SIZE );
 
     my $subclass = $Net::DHCPv6::Packet::MESSAGE_CLASS{$msg_type} || $class;
     my $opts     = Net::DHCPv6::OptionList->from_bytes( $opts_bytes );
@@ -80,7 +85,7 @@ sub type {
     return $Net::DHCPv6::Constants::REV_MESSAGE_TYPE{ $self->{msg_type} };
 }
 
-sub msg_type_name { shift->type }
+sub msg_type_name { return shift->type }
 
 our %MESSAGE_CLASS;
 
@@ -90,7 +95,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -98,7 +103,7 @@ Net::DHCPv6::Packet - DHCPv6 packet base class
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

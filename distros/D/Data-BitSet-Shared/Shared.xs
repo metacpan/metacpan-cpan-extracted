@@ -274,6 +274,7 @@ to_string(self, ...)
     uint32_t nw = h->hdr->num_words;
     char *buf;
     Newx(buf, cap + 1, char);
+    SAVEFREEPV(buf);  /* freed on scope exit, incl. a croak from newSVpvn (OOM) */
     uint64_t idx = 0;
     for (uint32_t w = 0; w < nw && idx < cap; w++) {
         uint64_t word = __atomic_load_n(&h->data[w], __ATOMIC_RELAXED);
@@ -282,6 +283,5 @@ to_string(self, ...)
     }
     buf[cap] = '\0';
     RETVAL = newSVpvn(buf, cap);
-    Safefree(buf);
   OUTPUT:
     RETVAL

@@ -64,10 +64,13 @@ CLASSES
     "http_proxy", or "all_proxy" from the environment. Pass "proxy => """ to
     suppress auto-detection.
 
-    "ssl_init" controls whether libwebsockets initializes OpenSSL globals.
-    By default, initialization happens once on the first context. Pass
-    "ssl_init => 0" when coexisting with another TLS library (e.g.
-    Feersum/picotls) to avoid reinitializing shared OpenSSL state.
+    "ssl_init" controls whether this module initializes libwebsockets'
+    global OpenSSL state. By default it is initialized once and then pinned
+    for the lifetime of the process, so contexts may be created and
+    destroyed (and new ones created) freely without tearing OpenSSL down.
+    Pass "ssl_init => 0" when coexisting with another TLS library (e.g.
+    Feersum/picotls) that owns the OpenSSL global state, so this module
+    leaves it untouched.
 
    connect(%options)
     Create a new WebSocket connection.
@@ -176,6 +179,10 @@ CLASSES
     destroyed, preventing premature fd closure. $headers in "on_connect" is
     always "undef" for adopted connections.
 
+    Adopted connections cannot select a WebSocket subprotocol: lws uses the
+    first protocol registered on the auto-created "server" vhost. There is
+    no "protocol" option (unlike "connect" and "listen").
+
     If you already read data from the socket (e.g., the HTTP upgrade
     request), pass it via "initial_data" so lws can process the handshake.
 
@@ -207,6 +214,10 @@ CLASSES
         $conn->send_fragment("part2", 0, 0);   # continuation, not final
         $conn->send_fragment("part3", 0, 1);   # continuation, final
 
+    $is_binary is honoured only on the first fragment, which fixes the
+    message type; it is ignored on continuation frames (they are always sent
+    as continuations), per RFC 6455 §5.4.
+
     Use this only if you need to interleave outbound writes with other I/O
     while streaming a single message. For ordinary sends, prefer
     "send"/"send_binary".
@@ -214,7 +225,9 @@ CLASSES
    send_queue_size
     Returns the number of payload bytes currently queued for sending
     (excludes WebSocket framing overhead). Useful for backpressure
-    monitoring; pair with "on_drain" to gate further sends.
+    monitoring; pair with "on_drain" to gate further sends. Returns 0 on a
+    closed connection (it does not croak), so it is safe to poll from
+    cleanup paths.
 
    stash
     Returns a hashref for storing arbitrary per-connection metadata. The
@@ -362,8 +375,10 @@ ERRORS AND EXCEPTIONS
     User-supplied callbacks ("on_connect", "on_message", "on_close",
     "on_error", "on_pong", "on_drain", "on_handshake") are invoked under
     "G_EVAL": a die inside a callback is caught, warned, and the connection
-    continues. "on_error" is itself wrapped, so a die inside "on_error" will
-    not recurse.
+    continues. The exception is "on_handshake", which gates the upgrade: a
+    die there rejects the connection (the client receives a 403), exactly as
+    if the callback had returned a false value. "on_error" is itself
+    wrapped, so a die inside "on_error" will not recurse.
 
 SEE ALSO
     EV, Alien::libwebsockets, libwebsockets <https://libwebsockets.org/>,

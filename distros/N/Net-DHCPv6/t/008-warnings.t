@@ -1,12 +1,22 @@
 #!/usr/bin/env perl
 use strictures 2;
-use Test2::V1 -ipP;
+use Test2::V1 -ipP, qw(is ok like subtest done_testing);    ## no critic (Subroutines::ProhibitCallsToUndeclaredSubs)
+
 use lib 't/lib';
 use lib 'lib';
 
 use Net::DHCPv6;
 use Net::DHCPv6::Constants;
 use Net::DHCPv6::Option::SipServerD;
+use Net::DHCPv6::Option::ORO;
+use Net::DHCPv6::Option::Preference;
+use Net::DHCPv6::Option::ElapsedTime;
+use Net::DHCPv6::Option::StatusCode;
+use Net::DHCPv6::Option::RapidCommit;
+use Net::DHCPv6::Option::DomainList;
+use Net::DHCPv6::Option::ClientId;
+use Net::DHCPv6::Option::SntpServers;
+use Net::DHCPv6::DUID;
 
 # Warning-testing pattern for use with strictures 2.
 #
@@ -52,6 +62,71 @@ subtest 'clean code produces no warnings' => sub {
         },
         'no warnings during SipServerD default construction'
     );
+
+    ok(
+        _no_warnings {
+            my $o = Net::DHCPv6::Option::ORO->new( requested_options => [ 23, 24 ] );
+            is( $o->code, 6, 'ORO construction clean' );
+        },
+        'no warnings during ORO construction'
+    );
+
+    ok(
+        _no_warnings {
+            my $o = Net::DHCPv6::Option::Preference->new( value => 255 );
+            is( $o->code, 7, 'Preference construction clean' );
+        },
+        'no warnings during Preference construction'
+    );
+
+    ok(
+        _no_warnings {
+            my $o = Net::DHCPv6::Option::ElapsedTime->new( centiseconds => 1000 );
+            is( $o->code, 8, 'ElapsedTime construction clean' );
+        },
+        'no warnings during ElapsedTime construction'
+    );
+
+    ok(
+        _no_warnings {
+            my $o = Net::DHCPv6::Option::StatusCode->new( status_code => 0, message => 'OK' );
+            is( $o->code, 13, 'StatusCode construction clean' );
+        },
+        'no warnings during StatusCode construction'
+    );
+
+    ok(
+        _no_warnings {
+            my $o = Net::DHCPv6::Option::RapidCommit->new;
+            is( $o->code, 14, 'RapidCommit construction clean' );
+        },
+        'no warnings during RapidCommit construction'
+    );
+
+    ok(
+        _no_warnings {
+            my $o = Net::DHCPv6::Option::DomainList->new( domains => [] );
+            is( $o->code, 24, 'DomainList construction clean' );
+        },
+        'no warnings during DomainList construction'
+    );
+
+    ok(
+        _no_warnings {
+            my $duid = Net::DHCPv6::DUID->new_llt( $LINK_TYPE_ETHERNET, 123_456, pack( 'H*', '001122334455' ) );
+            my $o    = Net::DHCPv6::Option::ClientId->new( duid => $duid );
+            is( $o->code, 1, 'ClientId construction clean' );
+        },
+        'no warnings during ClientId construction'
+    );
+
+    ok(
+        _no_warnings {
+            my $o = Net::DHCPv6::Option::SntpServers->new( servers => ['2001:db8::1'] );
+            is( $o->code, 31, 'SntpServers construction clean' );
+        },
+        'no warnings during SntpServers construction'
+    );
 };
 
 subtest '_warns counts carp warnings' => sub {
@@ -61,7 +136,7 @@ subtest '_warns counts carp warnings' => sub {
 
 subtest '_warnings returns warning strings' => sub {
     my $w = _warnings { require Carp; Carp::carp( 'test warning' ) };
-    ok( @$w, 'returned at least one warning' );
+    ok( @{$w}, 'returned at least one warning' );
     like( $w->[0], qr/test warning/, 'warning matches expected string' );
 };
 

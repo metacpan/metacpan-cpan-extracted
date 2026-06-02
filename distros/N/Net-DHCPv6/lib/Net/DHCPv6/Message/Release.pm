@@ -1,9 +1,11 @@
-#!/usr/bin/false
+#!/bin/false
 # ABSTRACT: Release message (type 8)
 # PODNAME: Net::DHCPv6::Message::Release
-package Net::DHCPv6::Message::Release;
-$Net::DHCPv6::Message::Release::VERSION = '0.001';
 use strictures 2;
+
+package Net::DHCPv6::Message::Release;
+$Net::DHCPv6::Message::Release::VERSION = '0.002';
+use Net::DHCPv6::Packet;
 use Net::DHCPv6::Constants;
 use parent 'Net::DHCPv6::Packet';
 use namespace::clean;
@@ -11,7 +13,7 @@ use namespace::clean;
 sub new {
     my ( $class, %args ) = @_;
     $args{msg_type} = $RELEASE;
-    $class->SUPER::new( %args );
+    return $class->SUPER::new( %args );
 }
 
 $Net::DHCPv6::Packet::MESSAGE_CLASS{$RELEASE} = __PACKAGE__;
@@ -22,7 +24,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -30,7 +32,7 @@ Net::DHCPv6::Message::Release - Release message (type 8)
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

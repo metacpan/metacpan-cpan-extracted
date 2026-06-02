@@ -1,5 +1,24 @@
 Revision history for TimeZone::TimeZoneDB
 
+0.05	Mon Jun  1 19:55:51 EDT 2026
+	[ Bug Fixes ]
+	- Clone path now validates ua argument: a defined, non-object ua croaks
+	  with a clear message rather than silently storing an unusable value
+	- get_time_zone() now explicitly croaks when latitude or longitude is undef,
+	  working around Params::Validate::Strict silently skipping type checks for
+	  undef values
+	[ Documentation ]
+	- Added Z-notation formal specifications for new(), get_time_zone(), and ua()
+	- Consolidated formal specifications into the POD
+	[ Tests ]
+	- Upgraded t/30-basics.t from Test::MockModule to Test::Mockingbird
+	- Added t/function.t: white-box function-level tests (49 subtests)
+	- Added t/unit.t: black-box unit tests against POD specification (41 subtests)
+	- Added t/integration.t: end-to-end integration tests (28 subtests)
+	- Added t/edge_cases.t: destructive, boundary-condition and security tests (52 subtests)
+	- Added t/extended_tests.t: coverage-targeted tests for uncovered paths (24 subtests)
+	- Added t/mutant_killers.t: tests that kill surviving mutation-testing mutants
+
 0.04	Wed Sep  3 07:42:27 EDT 2025
 	Use Object::Configure
 	More use of Params::Get

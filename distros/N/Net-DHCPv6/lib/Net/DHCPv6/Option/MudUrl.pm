@@ -1,10 +1,12 @@
-#!/usr/bin/false
-# ABSTRACT: MUD URL option (code 112) — Manufacturer Usage Description URL
+#!/bin/false
+# ABSTRACT: MUD URL option (code 112) -- Manufacturer Usage Description URL
 # PODNAME: Net::DHCPv6::Option::MudUrl
-package Net::DHCPv6::Option::MudUrl;
-$Net::DHCPv6::Option::MudUrl::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Option::MudUrl;
+$Net::DHCPv6::Option::MudUrl::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
+use Carp qw( croak );
 use Net::DHCPv6::Constants;
 use Net::DHCPv6::X::Truncated;
 use parent 'Net::DHCPv6::Option';
@@ -17,16 +19,16 @@ sub new {
     $args{data} = $args{url};
     my $self = $class->SUPER::new( %args );
     $self->{url} = $args{url};
-    bless $self, $class;
+    return bless $self, $class;
 }
 
-sub url { shift->{url} }
+sub url { return shift->{url} }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
+    my ( $class, $code, $payload ) = @_;
     Net::DHCPv6::X::Truncated->throw( message => 'Truncated MudUrl option' )
-        if CORE::length( $data ) == 0;
-    return $class->new( url => $data );
+        if CORE::length( $payload ) == 0;
+    return $class->new( url => $payload );
 }
 
 $Net::DHCPv6::OptionList::OPTION_CLASS{$OPTION_MUD_URL} = __PACKAGE__;
@@ -36,15 +38,15 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::MudUrl - MUD URL option (code 112) — Manufacturer Usage Description URL
+Net::DHCPv6::Option::MudUrl - MUD URL option (code 112) -- Manufacturer Usage Description URL
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

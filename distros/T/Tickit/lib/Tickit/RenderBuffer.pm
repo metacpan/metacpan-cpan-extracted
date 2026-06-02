@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2013-2017 -- leonerd@leonerd.org.uk
 
-package Tickit::RenderBuffer 0.76;
+package Tickit::RenderBuffer 0.77;
 
 use v5.14;
 use warnings;

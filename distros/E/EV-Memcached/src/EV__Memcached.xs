@@ -1386,8 +1386,13 @@ static void handle_response_packet(pTHX_ ev_mc_t *self) {
 
     case CB_CMD_ARITH:
         if (cbt->cb) {
-            uint64_t new_val = mc_read_u64(value_ptr);
-            invoke_cb(aTHX_ self, cbt->cb, newSVuv((UV)new_val), NULL);
+            if (value_len >= 8) {
+                uint64_t new_val = mc_read_u64(value_ptr);
+                invoke_cb(aTHX_ self, cbt->cb, newSVuv((UV)new_val), NULL);
+            } else {
+                invoke_cb(aTHX_ self, cbt->cb, NULL,
+                    newSVpv("malformed ARITH response", 0));
+            }
         }
         break;
 
@@ -1620,7 +1625,7 @@ static void start_connect(pTHX_ ev_mc_t *self) {
         if (fd < 0) {
             char errbuf[128];
             snprintf(errbuf, sizeof(errbuf), "socket: %s", strerror(errno));
-            emit_error(aTHX_ self, errbuf);
+            report_connect_error(aTHX_ self, errbuf);
             return;
         }
 
@@ -1629,7 +1634,7 @@ static void start_connect(pTHX_ ev_mc_t *self) {
             int fl = fcntl(fd, F_GETFL);
             if (fl < 0 || fcntl(fd, F_SETFL, fl | O_NONBLOCK) < 0) {
                 close(fd);
-                emit_error(aTHX_ self, "fcntl O_NONBLOCK failed");
+                report_connect_error(aTHX_ self, "fcntl O_NONBLOCK failed");
                 return;
             }
         }
@@ -1669,7 +1674,7 @@ static void start_connect(pTHX_ ev_mc_t *self) {
             if (fl < 0 || fcntl(fd, F_SETFL, fl | O_NONBLOCK) < 0) {
                 freeaddrinfo(res);
                 close(fd);
-                emit_error(aTHX_ self, "fcntl O_NONBLOCK failed");
+                report_connect_error(aTHX_ self, "fcntl O_NONBLOCK failed");
                 return;
             }
         }

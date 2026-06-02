@@ -384,6 +384,7 @@ static StkHandle *stk_create(const char *path, uint64_t capacity,
                               char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
     if (capacity == 0) { STK_ERR("capacity must be > 0"); return NULL; }
+    if (capacity > 0x7FFFFFFFu) { STK_ERR("capacity too large (max 2147483647)"); return NULL; }
     if (elem_size == 0) { STK_ERR("elem_size must be > 0"); return NULL; }
     if (capacity > (UINT64_MAX - sizeof(StkHeader) - 16) / (elem_size + sizeof(uint64_t))) {
         STK_ERR("capacity * elem_size overflow"); return NULL;
@@ -445,6 +446,7 @@ static StkHandle *stk_create_memfd(const char *name, uint64_t capacity,
                                     char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
     if (capacity == 0) { STK_ERR("capacity must be > 0"); return NULL; }
+    if (capacity > 0x7FFFFFFFu) { STK_ERR("capacity too large (max 2147483647)"); return NULL; }
     if (elem_size == 0) { STK_ERR("elem_size must be > 0"); return NULL; }
     if (capacity > (UINT64_MAX - sizeof(StkHeader) - 16) / (elem_size + sizeof(uint64_t))) {
         STK_ERR("capacity * elem_size overflow"); return NULL;

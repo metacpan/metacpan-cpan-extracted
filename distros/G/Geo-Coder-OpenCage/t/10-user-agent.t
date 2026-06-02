@@ -1,29 +1,48 @@
 use strict;
 use warnings;
 use utf8;
-use Net::Ping;
 use Test::More;
 use Test::Warn;
 use LWP::UserAgent;
-$ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
 
 binmode Test::More->builder->output,         ":encoding(utf8)";
 binmode Test::More->builder->failure_output, ":encoding(utf8)";
 binmode Test::More->builder->todo_output,    ":encoding(utf8)";
 
-use lib './lib'; # actually use the module, not other versions installed
+use lib './lib';   # actually use the module, not other versions installed
+use lib './t/lib'; # shared test helpers
 use Geo::Coder::OpenCage;
+use TestConnectivity;
 
-# TODO should move this into module to share with other tests
-my $api_ip_num      = '95.216.176.62';
-my $p               = Net::Ping->new;
-my $have_connection = 0;
-if ($p->ping($api_ip_num, 1)) {
-    $have_connection = 1;
+# Verify the UA string format documented in the pod: "Geo::Coder::OpenCage/$VERSION"
+{
+    my $geocoder = Geo::Coder::OpenCage->new(api_key => 'dummy');
+    like(
+        $geocoder->ua->agent,
+        qr{^Geo::Coder::OpenCage/\S+$},
+        'default HTTP::Tiny UA has agent "Geo::Coder::OpenCage/<version>"',
+    );
+
+    my $lwp = LWP::UserAgent->new;
+    $geocoder->ua($lwp);
+    like(
+        $lwp->agent,
+        qr{^Geo::Coder::OpenCage/\S+$},
+        'caller-supplied UA gets agent "Geo::Coder::OpenCage/<version>" via ua() setter',
+    );
+
+    my $lwp_via_new = LWP::UserAgent->new;
+    my $geocoder2 = Geo::Coder::OpenCage->new(api_key => 'dummy', ua => $lwp_via_new);
+    like(
+        $lwp_via_new->agent,
+        qr{^Geo::Coder::OpenCage/\S+$},
+        'caller-supplied UA gets agent "Geo::Coder::OpenCage/<version>" when passed via new()',
+    );
 }
 
 SKIP: {
-    skip 'skipping test that requires connectivity', 2 unless ($have_connection);
+    skip 'skipping test that requires connectivity', 2
+        unless TestConnectivity::have_connection();
 
     my $user_agent = LWP::UserAgent->new();
 

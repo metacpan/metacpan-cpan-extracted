@@ -5,10 +5,10 @@ use warnings; # see https://metacpan.org/pod/Object::Pad#Implied-Pragmata
 use Object::Pad qw( :experimental(mop) :experimental(custom_field_attr) );
 use utf8;
 
-# For stupid VERSION scanners...
-package Class::JSON_Object
+# For stupis VERSION scanners...
+package Class::JSON_Object;
 
-our $VERSION = "0.04";
+our $VERSION = 0.05;
 
 =head1 NAME
 

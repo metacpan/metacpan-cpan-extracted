@@ -7,7 +7,7 @@ use EV::Websockets;
 # Test pause_recv / resume_recv: pause, send, resume, verify delivery
 
 my $ctx = EV::Websockets::Context->new();
-my (%keep, @received);
+my (%keep, @received, $received_during_pause);
 
 my $port = $ctx->listen(
     port => 0,
@@ -31,6 +31,9 @@ my $start = EV::timer(0.1, 0, sub {
             # Resume after delay
             my $t; $t = EV::timer(0.5, 0, sub {
                 undef $t;
+                # By now the server's echo is sitting in the socket buffer,
+                # held back by flow control; nothing should be delivered yet.
+                $received_during_pause = scalar @received;
                 $c->resume_recv;
             });
         },
@@ -50,6 +53,7 @@ my $start = EV::timer(0.1, 0, sub {
 my $to = EV::timer(15, 0, sub { diag "Timeout"; EV::break });
 EV::run;
 
+is($received_during_pause, 0, "nothing delivered while paused (flow control held it)");
 is(scalar @received, 1, "received message after resume");
 is($received[0], "echo:paused_msg", "message content correct after pause/resume cycle");
 

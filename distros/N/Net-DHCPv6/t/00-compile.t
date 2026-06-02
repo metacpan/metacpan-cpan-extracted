@@ -5,12 +5,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 74 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 76 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Net/DHCPv6.pm',
     'Net/DHCPv6/Constants.pm',
     'Net/DHCPv6/DUID.pm',
+    'Net/DHCPv6/Helpers.pm',
     'Net/DHCPv6/Message/Advertise.pm',
     'Net/DHCPv6/Message/Confirm.pm',
     'Net/DHCPv6/Message/Decline.pm',
@@ -66,6 +67,7 @@ my @module_files = (
     'Net/DHCPv6/Option/ServerId.pm',
     'Net/DHCPv6/Option/SipServerA.pm',
     'Net/DHCPv6/Option/SipServerD.pm',
+    'Net/DHCPv6/Option/SntpServers.pm',
     'Net/DHCPv6/Option/SolMaxRt.pm',
     'Net/DHCPv6/Option/StatusCode.pm',
     'Net/DHCPv6/Option/SubscriberId.pm',

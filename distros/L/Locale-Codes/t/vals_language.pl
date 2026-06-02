@@ -122,11 +122,7 @@ rename zu NewName alpha-2 => 1
 
 2name nv => Navajo
 
-2name ny => Nyanja
-
 2name oc => 'Occitan (post 1500)'
-
-2name os => Ossetian
 
 2name pi => Pali
 

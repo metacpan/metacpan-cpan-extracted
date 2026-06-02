@@ -1,5 +1,8 @@
 Revision history for Data::Pool::Shared
 
+0.05  2026-06-01
+    - alloc_n/free_n: free temp buffer via SAVEFREEPV (leak on OOM-croak)
+
 0.04  2026-05-26
     - recover_stale: owner re-check around bitmap CAS + saturating-sub on used
       (fixes ABA race where a freshly allocated slot was incorrectly freed)

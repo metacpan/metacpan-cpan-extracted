@@ -1,10 +1,11 @@
-#!/usr/bin/false
-# ABSTRACT: Rapid Commit option (code 14) — zero-length data
+#!/bin/false
+# ABSTRACT: Rapid Commit option (code 14) -- zero-length data
 # PODNAME: Net::DHCPv6::Option::RapidCommit
-package Net::DHCPv6::Option::RapidCommit;
-$Net::DHCPv6::Option::RapidCommit::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Option::RapidCommit;
+$Net::DHCPv6::Option::RapidCommit::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
 use Net::DHCPv6::Constants;
 use Net::DHCPv6::X::BadOption;
 use parent 'Net::DHCPv6::Option';
@@ -14,13 +15,13 @@ sub new {
     my ( $class, %args ) = @_;
     $args{code} = $OPTION_RAPID_COMMIT;
     my $self = $class->SUPER::new( code => $args{code} );
-    bless $self, $class;
+    return bless $self, $class;
 }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
+    my ( $class, $code, $payload ) = @_;
     Net::DHCPv6::X::BadOption->throw( message => 'RapidCommit option must be empty' )
-        if CORE::length( $data ) > 0;
+        if CORE::length( $payload ) > 0;
     return $class->new;
 }
 
@@ -32,15 +33,15 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::RapidCommit - Rapid Commit option (code 14) — zero-length data
+Net::DHCPv6::Option::RapidCommit - Rapid Commit option (code 14) -- zero-length data
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -49,7 +50,7 @@ version 0.001
 =head1 DESCRIPTION
 
 Implements the Rapid Commit option (OPTION_RAPID_COMMIT, code 14) per
-RFC 8415 §21.14. A zero-length option that signals the server should
+RFC 8415 E<167>21.14. A zero-length option that signals the server should
 commit the assignment immediately (solicit-advertise-request-reply
 short circuit).
 

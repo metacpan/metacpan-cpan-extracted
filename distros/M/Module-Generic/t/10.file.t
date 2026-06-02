@@ -780,7 +780,7 @@ subtest 'Thread-safe file operations' => sub
     {
         if( !$Config{useithreads} )
         {
-            skip( 'Threads not available', 4 );
+            skip( 'Threads not available', 5 );
         }
 
         require threads;

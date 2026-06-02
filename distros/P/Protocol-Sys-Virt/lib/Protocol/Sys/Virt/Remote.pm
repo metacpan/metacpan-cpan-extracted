@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1,
-#        XDR::Gen version 1.1.2 and LibVirt version v12.3.0
+#        XDR::Gen version 1.1.2 and LibVirt version v12.4.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -13,13 +13,13 @@
 use v5.14;
 use warnings;
 
-package Protocol::Sys::Virt::Remote v12.3.0;
+package Protocol::Sys::Virt::Remote v12.4.0;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::Remote::XDR v12.3.0;
-use Protocol::Sys::Virt::Transport::XDR v12.3.0;
+use Protocol::Sys::Virt::Remote::XDR v12.4.0;
+use Protocol::Sys::Virt::Transport::XDR v12.4.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 my $transport = 'Protocol::Sys::Virt::Transport::XDR';
 
@@ -2328,7 +2328,9 @@ my @msg_encoders = (
     invalid_proc(450),
     invalid_proc(451),
     invalid_proc(452),
-    sub { my $idx = 0; my $rv = ''; $remote->serialize_domain_event_nic_mac_change_msg($_[0], $idx, $rv); return $rv; }
+    sub { my $idx = 0; my $rv = ''; $remote->serialize_domain_event_nic_mac_change_msg($_[0], $idx, $rv); return $rv; },
+    sub { my $idx = 0; my $rv = ''; $remote->serialize_domain_event_vcpu_removed_msg($_[0], $idx, $rv); return $rv; },
+    sub { my $idx = 0; my $rv = ''; $remote->serialize_domain_event_callback_channel_lifecycle_msg($_[0], $idx, $rv); return $rv; }
     );
 
 my @msg_decoders = (
@@ -2785,7 +2787,9 @@ my @msg_decoders = (
     invalid_proc(450),
     invalid_proc(451),
     invalid_proc(452),
-    sub { my $idx = 0; my $rv = ''; $remote->deserialize_domain_event_nic_mac_change_msg($rv, $idx, $_[0]); return $rv; }
+    sub { my $idx = 0; my $rv = ''; $remote->deserialize_domain_event_nic_mac_change_msg($rv, $idx, $_[0]); return $rv; },
+    sub { my $idx = 0; my $rv = ''; $remote->deserialize_domain_event_vcpu_removed_msg($rv, $idx, $_[0]); return $rv; },
+    sub { my $idx = 0; my $rv = ''; $remote->deserialize_domain_event_callback_channel_lifecycle_msg($rv, $idx, $_[0]); return $rv; }
     );
 
 
@@ -3052,9 +3056,9 @@ Protocol::Sys::Virt::Remote - Connect to remote libvirt daemon
 
 =head1 VERSION
 
-v12.3.0
+v12.4.0
 
-Based on LibVirt tag v12.3.0
+Based on LibVirt tag v12.4.0
 
 =head1 SYNOPSIS
 

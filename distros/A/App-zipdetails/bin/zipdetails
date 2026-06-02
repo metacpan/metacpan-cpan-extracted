@@ -29,7 +29,7 @@ use Encode;
 use Getopt::Long;
 use List::Util qw(min max);
 
-my $VERSION = '4.006' ;
+my $VERSION = '4.007' ;
 
 sub fatal_tryWalk;
 sub fatal_truncated ;
@@ -2419,7 +2419,7 @@ sub redactFilename
     $filename =~ s(.)(X)g
         if $opt_Redact;
 
-    return $filename;
+    return wantarray ? ($filename, $filename, 0)  : $filename;
 }
 
 sub validateDirectory

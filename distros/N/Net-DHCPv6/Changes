@@ -1,8 +1,17 @@
 Revision history for Net-DHCPv6
 
-0.001    2026-05-26
-    - Initial release: DHCPv6 packet codec
-    - Encode/decode message types (Solicit, Advertise, Request, etc.)
-    - Encode/decode options (ClientId, ServerId, IANA, IAAddr, etc.)
-    - DUID parsing and construction (LLT, EN, LL, UUID)
-    - Three-tier error handling: decode_or_croak, decode_or_null, decode_with_error
+0.002    2026-06-01
+    - [CHANGE] Option 31 renamed from NtpServer to SntpServers
+    - [CHANGE] `use strictures 2` moved before `package` in all modules
+    - [ADD] Option 56 NTP Server module (Net::DHCPv6::Option::NtpServer)
+    - [ADD] Recursion depth guard for compression-pointer label decoding
+    - [ADD] GitHub Actions CI workflow (Perl 5.36, 5.42)
+    - [ADD] Test coverage for DUID::length, type(), msg_type_name(), relay truncation, streaming DUID types
+    - [FIX] PdExclude prefix-length=0 edge case per RFC 6603
+    - [FIX] _resolve_ipv6 false positive on wire-format addresses
+    - [FIX] Circular compile-time dependency Option -> OptionList -> Generic -> Option
+    - [FIX] Test success assertions in PCAP decode tests (failures no longer silently skipped)
+    - [FIX] Remove redundant as_bytes() overrides from immutable Option modules
+    - [INFRA] Pin Test2::V1 to 1.302217
+    - [INFRA] Enable Test::Perl::Critic in dist.ini
+    - [INFRA] Perl::Critic compliance sweep: zero violations across lib/

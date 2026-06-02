@@ -1,10 +1,11 @@
-#!/usr/bin/false
+#!/bin/false
 # ABSTRACT: Exception base class for Net::DHCPv6
 # PODNAME: Net::DHCPv6::X
-package Net::DHCPv6::X;
-$Net::DHCPv6::X::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::X;
+$Net::DHCPv6::X::VERSION = '0.002';
+use Carp qw( croak );
 use namespace::clean;
 
 sub throw {
@@ -13,7 +14,7 @@ sub throw {
     croak $self;
 }
 
-sub message { shift->{message} }
+sub message { return shift->{message} }
 
 1;
 
@@ -21,7 +22,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -29,7 +30,7 @@ Net::DHCPv6::X - Exception base class for Net::DHCPv6
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

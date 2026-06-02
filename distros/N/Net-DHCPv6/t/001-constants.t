@@ -1,10 +1,13 @@
 #!/usr/bin/env perl
+## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 use strictures 2;
-use Test2::V1 -ipP;
+use Test2::V1 -ipP, qw(is done_testing);    ## no critic (Subroutines::ProhibitCallsToUndeclaredSubs)
+
 use lib 't/lib';
 use lib 'lib';
 
 use Net::DHCPv6::Constants;
+my $EMPTY = q();
 
 is( $SOLICIT,             1,  'SOLICIT' );
 is( $ADVERTISE,           2,  'ADVERTISE' );
@@ -52,6 +55,6 @@ is( Net::DHCPv6::Constants::option_name( 1 ),            'CLIENTID',    'REV_OPT
 is( Net::DHCPv6::Constants::option_name( 23 ),           'DNS_SERVERS', 'REV_OPTION_CODE 23' );
 is( Net::DHCPv6::Constants::status_name( 0 ),            'SUCCESS',     'REV_STATUS_CODE 0' );
 is( Net::DHCPv6::Constants::is_valid_message_type( 1 ),  1,             'is_valid_message_type 1' );
-is( Net::DHCPv6::Constants::is_valid_message_type( 99 ), '',            'is_valid_message_type 99' );
-
+is( Net::DHCPv6::Constants::is_valid_message_type( 99 ), $EMPTY,        'is_valid_message_type 99' );
+## use critic (ValuesAndExpressions::ProhibitMagicNumbers)
 done_testing;

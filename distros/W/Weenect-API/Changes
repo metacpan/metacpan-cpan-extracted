@@ -1,3 +1,9 @@
+1.02	2026-06-01
+
+	(API) Add wifi-zone, wifi_zone_active, remove_wifi_zone.
+	Update dependencies in Makefile.PL.
+	Fix some doc typos.
+
 1.01	2026-05-31
 
 	(API) Add logout, kindex.

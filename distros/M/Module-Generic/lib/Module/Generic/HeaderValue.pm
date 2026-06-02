@@ -214,7 +214,7 @@ sub new_from_header
                 }
                 else
                 {
-                    warnings::warn( "Value for property \"$attribute\" contained some illegal characters or exceeded the maximum size of '$value_max_len'.\n" ) if( warnings::enabled( 'Module::Generic' ) );
+                    warn( "Value for property \"$attribute\" contained some illegal characters or exceeded the maximum size of '$value_max_len'.\n" ) if( warnings::enabled( 'Module::Generic' ) );
                 }
             }
             else
@@ -224,7 +224,7 @@ sub new_from_header
         }
         else
         {
-            warnings::warn( "Token \"$attribute\" contains illegal characters or exceeds the maximum size of '$token_max_len'.\n" ) if( warnings::enabled( 'Module::Generic' ) );
+            warn( "Token \"$attribute\" contains illegal characters or exceeds the maximum size of '$token_max_len'.\n" ) if( warnings::enabled( 'Module::Generic' ) );
         }
     }
     return( $obj );

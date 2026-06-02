@@ -1,9 +1,11 @@
-#!/usr/bin/false
+#!/bin/false
 # ABSTRACT: Solicit message (type 1)
 # PODNAME: Net::DHCPv6::Message::Solicit
-package Net::DHCPv6::Message::Solicit;
-$Net::DHCPv6::Message::Solicit::VERSION = '0.001';
 use strictures 2;
+
+package Net::DHCPv6::Message::Solicit;
+$Net::DHCPv6::Message::Solicit::VERSION = '0.002';
+use Net::DHCPv6::Packet;
 use Net::DHCPv6::Constants;
 use parent 'Net::DHCPv6::Packet';
 use namespace::clean;
@@ -11,7 +13,7 @@ use namespace::clean;
 sub new {
     my ( $class, %args ) = @_;
     $args{msg_type} = $SOLICIT;
-    $class->SUPER::new( %args );
+    return $class->SUPER::new( %args );
 }
 
 $Net::DHCPv6::Packet::MESSAGE_CLASS{$SOLICIT} = __PACKAGE__;
@@ -22,7 +24,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -30,7 +32,7 @@ Net::DHCPv6::Message::Solicit - Solicit message (type 1)
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

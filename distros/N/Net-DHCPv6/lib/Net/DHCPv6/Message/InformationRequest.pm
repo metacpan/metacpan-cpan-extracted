@@ -1,9 +1,11 @@
-#!/usr/bin/false
+#!/bin/false
 # ABSTRACT: Information-Request message (type 11)
 # PODNAME: Net::DHCPv6::Message::InformationRequest
-package Net::DHCPv6::Message::InformationRequest;
-$Net::DHCPv6::Message::InformationRequest::VERSION = '0.001';
 use strictures 2;
+
+package Net::DHCPv6::Message::InformationRequest;
+$Net::DHCPv6::Message::InformationRequest::VERSION = '0.002';
+use Net::DHCPv6::Packet;
 use Net::DHCPv6::Constants;
 use parent 'Net::DHCPv6::Packet';
 use namespace::clean;
@@ -11,7 +13,7 @@ use namespace::clean;
 sub new {
     my ( $class, %args ) = @_;
     $args{msg_type} = $INFORMATION_REQUEST;
-    $class->SUPER::new( %args );
+    return $class->SUPER::new( %args );
 }
 
 $Net::DHCPv6::Packet::MESSAGE_CLASS{$INFORMATION_REQUEST} = __PACKAGE__;
@@ -22,7 +24,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -30,7 +32,7 @@ Net::DHCPv6::Message::InformationRequest - Information-Request message (type 11)
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -53,7 +55,7 @@ experimental and subject to change without notice.
 
 =head1 SEE ALSO
 
-L<Net::DHCPv6::Packet>, RFC 8415 §18.10
+L<Net::DHCPv6::Packet>, RFC 8415 E<167>18.10
 
 =head1 AUTHOR
 

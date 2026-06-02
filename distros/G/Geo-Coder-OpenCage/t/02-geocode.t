@@ -9,15 +9,18 @@ binmode Test::More->builder->output,         ":encoding(utf8)";
 binmode Test::More->builder->failure_output, ":encoding(utf8)";
 binmode Test::More->builder->todo_output,    ":encoding(utf8)";
 
-use lib './lib'; # actually use the module, not other versions installed
+use lib './lib';   # actually use the module, not other versions installed
+use lib './t/lib'; # shared test helpers
 use Geo::Coder::OpenCage;
+use TestConnectivity;
 
-my $api_key;
-if ($ENV{GEO_CODER_OPENCAGE_API_KEY}) {
-    $api_key = $ENV{GEO_CODER_OPENCAGE_API_KEY};
-} else {
-    plan skip_all => "Set GEO_CODER_OPENCAGE_API_KEY environment variable to run this test";
-}
+plan skip_all => "Set GEO_CODER_OPENCAGE_API_KEY environment variable to run this test"
+    unless $ENV{GEO_CODER_OPENCAGE_API_KEY};
+
+plan skip_all => "no connectivity to api.opencagedata.com"
+    unless TestConnectivity::have_connection();
+
+my $api_key = $ENV{GEO_CODER_OPENCAGE_API_KEY};
 
 my $geocoder = Geo::Coder::OpenCage->new(api_key => $api_key,);
 

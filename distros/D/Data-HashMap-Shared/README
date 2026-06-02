@@ -78,6 +78,17 @@ DESCRIPTION
     Data::HashMap::Shared::SI - string to int64
     Data::HashMap::Shared::SS - string to string
 
+  Integer Range and Wrapping
+    Integer keys and values are stored as fixed-width two's-complement
+    integers: "I16"/"SI16"/"I16S" use a signed 16-bit range (-32768 ..
+    32767), "I32"/"SI32"/"I32S" a signed 32-bit range, and "II"/"IS"/"SI" a
+    signed 64-bit range. A key or value outside the variant's range is
+    silently truncated to the low bits (two's complement), with no warning:
+    on an "I16" map, "$map->put(70000, ...)" stores under key 4464 ("70000 &
+    0xFFFF"), so get(70000) and get(4464) address the same entry.
+    "incr"/"decr" wrap the same way ("32767 + 1" becomes -32768). Pick a
+    variant wide enough for your data.
+
   Constructor
         my $map = Data::HashMap::Shared::II->new($path, $max_entries);
         my $map = Data::HashMap::Shared::II->new(undef, $max_entries);    # anonymous
@@ -175,7 +186,7 @@ DESCRIPTION
         my $ok = shm_xx_put $map, $key, $value;   # insert or overwrite
         my $ok = shm_xx_add $map, $key, $value;   # insert only if key absent
         my $ok = shm_xx_update $map, $key, $value; # overwrite only if key exists
-        my $old = shm_xx_swap $map, $key, $value; # put + return old value (undef if new)
+        my $old = shm_xx_swap $map, $key, $value; # put + return old value (undef if new); on TTL maps, refreshes TTL for keys that already had one and assigns default_ttl on insert (permanent entries stay permanent)
         my $ok = shm_xx_cas $map, $key, $expected, $desired; # compare-and-swap
         my $v  = shm_xx_cas_take $map, $key, $expected; # compare-and-remove; returns value on match, undef otherwise
         my $n  = $map->set_multi($k, $v, ...);   # batch put under single lock, returns count
@@ -202,11 +213,24 @@ DESCRIPTION
     variants) the arena is full. See "String Keys/Values and UTF-8" for the
     byte-only comparison rule.
 
+    "swap" returns the previous value, or "undef" when the key did not exist
+    (a fresh insert). "undef" is also returned when the new value cannot be
+    stored — the map is already at "max_entries" capacity, or (string-value
+    variants) the arena is full — in which case an existing key keeps its
+    old value. "swap" by itself therefore cannot distinguish a fresh insert
+    from a full-map failure; check "exists" or "size" first if that matters.
+
     Integer-value variants also have:
 
         my $n = shm_xx_incr $map, $key;           # returns new value
         my $n = shm_xx_decr $map, $key;           # returns new value
         my $n = shm_xx_incr_by $map, $key, $delta;
+
+    A missing key is created starting from zero (Redis-style): the first
+    "incr" returns 1, "decr" returns -1, and "incr_by" returns $delta. These
+    die only when the key is new and the map is already at "max_entries" (no
+    room to insert). The result wraps at the variant's integer width (see
+    "Integer Range and Wrapping").
 
     LRU/TTL operations ("put_ttl", "add_ttl", and "update_ttl" require a
     TTL-enabled map):
@@ -265,12 +289,19 @@ DESCRIPTION
         #   arena_used, arena_cap, evictions, expired, recoveries, max_size, ttl
 
     "set_multi", "get_multi", "remove_multi", "get_with_ttl", "stats",
-    "path", and "unlink" are method-only (no keyword form).
+    "path", "sync", and "unlink" are method-only (no keyword form).
 
     File management:
 
+        $map->sync;                               # flush the mmap to the backing file (msync MS_SYNC)
         $map->unlink;                             # remove backing file (mmap stays valid)
         Data::HashMap::Shared::II->unlink($path); # class method form
+
+    "sync" issues a synchronous msync(2) over the whole mapping (every
+    shard, for sharded maps) and dies on error. Use it to force durability
+    of a file-backed map; it is a no-op for anonymous mappings, which have
+    no backing file. Changes are visible to other processes sharing the
+    mapping without "sync" — it only affects on-disk persistence.
 
   Crash Safety
     If a process dies (e.g., SIGKILL, OOM kill) while holding the write
@@ -283,10 +314,13 @@ DESCRIPTION
     Reader-side recovery uses a 1024-slot table in the shared mmap (one slot
     per process, claimed lazily on first lock; fork()'d children claim a
     fresh slot via "pthread_atfork"). On a writer-lock timeout the recovery
-    scan drains every dead PID's reader and waiter counts, so a worker
-    killed mid-"incr_by" no longer pins the rwlock indefinitely. Beyond 1024
-    simultaneous handles per map, new handles skip slot tracking and fall
-    back to the slow per-timeout drain.
+    scan CAS-claims each dead PID's slot, drains the waiter counts, and
+    force-resets the reader counter once no live reader holds it — so a
+    worker killed mid-"incr_by" no longer pins the rwlock indefinitely. If a
+    live reader is concurrently present, the dead slot is left intact for
+    the next recovery cycle (preserves the only record of the stuck
+    counter). Beyond 1024 simultaneous handles per map, new handles skip
+    slot tracking and fall back to the slow per-timeout drain.
 
     The same path validates and rebuilds the LRU doubly-linked list if a
     dead writer left it inconsistent. "stat_recoveries" in "stats" counts

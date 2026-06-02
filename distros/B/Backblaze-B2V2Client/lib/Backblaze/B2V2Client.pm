@@ -2,7 +2,7 @@ package Backblaze::B2V2Client;
 # API client library for V2 of the API to Backblaze B2 object storage
 # Allows for creating/deleting buckets, listing files in buckets, and uploading/downloading files
 
-$Backblaze::B2V2Client::VERSION = '1.6';
+$Backblaze::B2V2Client::VERSION = '1.7';
 
 # our dependencies:
 use Cpanel::JSON::XS;
@@ -801,7 +801,7 @@ __END__
 
 =head1 NAME
 
-Backblaze::B2V2Client - Client library for the Backblaze B2 Cloud Storage Service V2 API.
+Backblaze::B2V2Client - Replaced by Backblaze::B2V4 | Deprecated client library for the Backblaze B2 Cloud Storage Service V2 API.
 
 =head1 SYNOPSIS
 
@@ -859,6 +859,13 @@ Backblaze::B2V2Client - Client library for the Backblaze B2 Cloud Storage Servic
 	}
 
 =head1 DESCRIPTION / SET UP
+
+B<This module is obsolete -- use Backblaze::B2V4 instead>
+
+This module will no longer be updated, as Backblaze::B2V4 supports
+the V4 Backblaze API and is better in every way. 
+
+---
 
 This module should help you create buckets and store/retrieve files in the
 Backblaze B2 cloud storage service using V2 of their API.

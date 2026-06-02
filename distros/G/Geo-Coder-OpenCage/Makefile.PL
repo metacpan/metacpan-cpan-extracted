@@ -16,25 +16,24 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Geo::Coder::OpenCage",
   "PREREQ_PM" => {
-    "Carp" => 0,
-    "Cpanel::JSON::XS" => "4.21",
-    "HTTP::Tiny" => 0,
+    "Carp" => "1.54",
+    "Cpanel::JSON::XS" => "4.40",
+    "HTTP::Tiny" => "0.083",
     "IO::Socket::SSL" => "2.068",
     "JSON::MaybeXS" => "1.004003",
-    "Pod::Perldoc" => "3.21",
-    "URI" => 0
+    "Scalar::Util" => "1.63",
+    "URI" => "5.19"
   },
   "TEST_REQUIRES" => {
     "LWP::Protocol::https" => "6.10",
     "LWP::UserAgent" => "6.55",
+    "Mozilla::CA" => 20240313,
     "Net::Ping" => "2.73",
-    "Scalar::Util" => 0,
     "Test::Exception" => "0.32",
     "Test::More" => "0.92",
-    "Test::Pod" => "1.51",
-    "Test::Warn" => 0
+    "Test::Warn" => "0.37"
   },
-  "VERSION" => "0.39",
+  "VERSION" => "0.42",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,21 +41,20 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => 0,
-  "Cpanel::JSON::XS" => "4.21",
-  "HTTP::Tiny" => 0,
+  "Carp" => "1.54",
+  "Cpanel::JSON::XS" => "4.40",
+  "HTTP::Tiny" => "0.083",
   "IO::Socket::SSL" => "2.068",
   "JSON::MaybeXS" => "1.004003",
   "LWP::Protocol::https" => "6.10",
   "LWP::UserAgent" => "6.55",
+  "Mozilla::CA" => 20240313,
   "Net::Ping" => "2.73",
-  "Pod::Perldoc" => "3.21",
-  "Scalar::Util" => 0,
+  "Scalar::Util" => "1.63",
   "Test::Exception" => "0.32",
   "Test::More" => "0.92",
-  "Test::Pod" => "1.51",
-  "Test::Warn" => 0,
-  "URI" => 0
+  "Test::Warn" => "0.37",
+  "URI" => "5.19"
 );
 
 

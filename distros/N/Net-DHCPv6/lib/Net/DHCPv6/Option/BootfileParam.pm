@@ -1,40 +1,42 @@
-#!/usr/bin/false
-# ABSTRACT: Boot File Parameters option (code 60) — list of boot parameters
+#!/bin/false
+# ABSTRACT: Boot File Parameters option (code 60) -- list of boot parameters
 # PODNAME: Net::DHCPv6::Option::BootfileParam
-package Net::DHCPv6::Option::BootfileParam;
-$Net::DHCPv6::Option::BootfileParam::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Option::BootfileParam;
+$Net::DHCPv6::Option::BootfileParam::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
 use Net::DHCPv6::Constants;
 use Net::DHCPv6::X::Truncated;
 use parent 'Net::DHCPv6::Option';
-use Ref::Util qw(is_plain_arrayref);
+use Ref::Util qw( is_plain_arrayref );
 use namespace::clean;
+my $EMPTY = q();
 
 sub new {
     my ( $class, %args ) = @_;
     $args{code} = $OPTION_BOOTFILE_PARAM;
     my $data_list = $args{parameters} // [];
     $data_list = [$data_list] unless is_plain_arrayref( $data_list );
-    $args{data} = join( '', map { pack( 'n', CORE::length ) . $_ } @$data_list );
+    $args{data} = join( $EMPTY, map { pack( 'n', CORE::length ) . $_ } @{$data_list} );
     my $self = $class->SUPER::new( %args );
     $self->{parameters} = $data_list;
-    bless $self, $class;
+    return bless $self, $class;
 }
 
-sub parameters { shift->{parameters} }
+sub parameters { return shift->{parameters} }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
+    my ( $class, $code, $payload ) = @_;
     my @items;
     my $offset = 0;
-    my $len    = CORE::length( $data );
+    my $len    = CORE::length( $payload );
     while ( $offset + 2 <= $len ) {
-        my $ilen = unpack( 'n', substr( $data, $offset, 2 ) );
+        my $ilen = unpack( 'n', substr( $payload, $offset, 2 ) );
         $offset += 2;
         Net::DHCPv6::X::Truncated->throw( message => 'Truncated BootfileParam item' )
             if $offset + $ilen > $len;
-        push @items, substr( $data, $offset, $ilen );
+        push @items, substr( $payload, $offset, $ilen );
         $offset += $ilen;
     }
     return $class->new( parameters => \@items );
@@ -47,15 +49,15 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::BootfileParam - Boot File Parameters option (code 60) — list of boot parameters
+Net::DHCPv6::Option::BootfileParam - Boot File Parameters option (code 60) -- list of boot parameters
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

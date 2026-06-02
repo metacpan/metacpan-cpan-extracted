@@ -1227,7 +1227,12 @@ static ShmHandle *shm_create_map(const char *path, uint32_t max_entries,
                                   uint32_t default_ttl, uint32_t lru_skip,
                                   char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
-    uint32_t max_tcap = shm_next_pow2((uint32_t)((uint64_t)max_entries * 4 / 3 + 1));
+    /* Cap at 2^31 (largest power-of-2 table the design supports) before
+     * next_pow2: a huge max_entries would otherwise overflow the uint32
+     * cast or make next_pow2 return 0, silently yielding a tiny table. */
+    uint64_t max_tcap_want = (uint64_t)max_entries * 4 / 3 + 1;
+    uint32_t max_tcap = (max_tcap_want > 0x80000000ULL)
+        ? 0x80000000U : shm_next_pow2((uint32_t)max_tcap_want);
     if (max_tcap < SHM_INITIAL_CAP) max_tcap = SHM_INITIAL_CAP;
 
     int has_lru = (max_size > 0);
@@ -1315,7 +1320,12 @@ static ShmHandle *shm_create_memfd(const char *name, uint32_t max_entries,
                                     char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
 
-    uint32_t max_tcap = shm_next_pow2((uint32_t)((uint64_t)max_entries * 4 / 3 + 1));
+    /* Cap at 2^31 (largest power-of-2 table the design supports) before
+     * next_pow2: a huge max_entries would otherwise overflow the uint32
+     * cast or make next_pow2 return 0, silently yielding a tiny table. */
+    uint64_t max_tcap_want = (uint64_t)max_entries * 4 / 3 + 1;
+    uint32_t max_tcap = (max_tcap_want > 0x80000000ULL)
+        ? 0x80000000U : shm_next_pow2((uint32_t)max_tcap_want);
     if (max_tcap < SHM_INITIAL_CAP) max_tcap = SHM_INITIAL_CAP;
     int has_lru = (max_size > 0);
     int has_ttl = (default_ttl > 0);
@@ -1465,6 +1475,12 @@ static ShmHandle *shm_create_sharded(const char *path_prefix, uint32_t num_shard
     h->num_shards = num_shards;
     h->shard_mask = num_shards - 1;
     h->path = strdup(path_prefix);
+    if (!h->path) {
+        if (errbuf) snprintf(errbuf, SHM_ERR_BUFLEN, "strdup: out of memory");
+        free(h->shard_handles);
+        free(h);
+        return NULL;
+    }
 
     for (uint32_t i = 0; i < num_shards; i++) {
         char shard_path[4096];
@@ -1686,7 +1702,9 @@ static uint32_t SHM_FN(rehash_insert_raw)(ShmHandle *h, SHM_NODE_TYPE *node) {
 
 static void SHM_FN(tombstone_at)(ShmHandle *h, uint32_t idx) {
     ShmHeader *hdr = h->hdr;
+#if !defined(SHM_KEY_IS_INT) || defined(SHM_VAL_IS_STR)
     SHM_NODE_TYPE *nodes = (SHM_NODE_TYPE *)h->nodes;
+#endif
 #ifndef SHM_KEY_IS_INT
     shm_str_free(hdr, h->arena, nodes[idx].key_off, nodes[idx].key_len);
 #endif
@@ -1874,9 +1892,10 @@ static inline void SHM_FN(maybe_grow)(ShmHandle *h) {
     uint32_t size = hdr->size, tomb = hdr->tombstones, cap = hdr->table_cap;
     if (__builtin_expect((uint64_t)(size + tomb) * 4 > (uint64_t)cap * 3, 0)) {
         if (h->iterating > 0) { h->deferred = 1; return; }
-        uint32_t new_cap = cap * 2;
-        if (new_cap <= hdr->max_table_cap)
-            SHM_FN(resize)(h, new_cap);
+        if (cap < hdr->max_table_cap)  /* cap is pow2; cap*2 can't overflow here */
+            SHM_FN(resize)(h, cap * 2);
+        else if (tomb > size || tomb > cap / 4)
+            SHM_FN(resize)(h, cap);  /* at max capacity: compact tombstones in place */
     } else if (__builtin_expect(tomb > size || tomb > cap / 4, 0)) {
         if (h->iterating > 0) { h->deferred = 1; return; }
         SHM_FN(resize)(h, cap);
@@ -1902,9 +1921,10 @@ static inline void SHM_FN(flush_deferred)(ShmHandle *h) {
     shm_seqlock_write_begin(&hdr->seq);
     uint32_t size = hdr->size, tomb = hdr->tombstones, cap = hdr->table_cap;
     if ((uint64_t)(size + tomb) * 4 > (uint64_t)cap * 3) {
-        uint32_t new_cap = cap * 2;
-        if (new_cap <= hdr->max_table_cap)
-            SHM_FN(resize)(h, new_cap);
+        if (cap < hdr->max_table_cap)  /* cap is pow2; cap*2 can't overflow here */
+            SHM_FN(resize)(h, cap * 2);
+        else if (tomb > size || tomb > cap / 4)
+            SHM_FN(resize)(h, cap);  /* at max capacity: compact tombstones in place */
     } else if (cap > SHM_INITIAL_CAP && (uint64_t)size * 4 < cap) {
         uint32_t new_cap = cap / 2;
         if (new_cap < SHM_INITIAL_CAP) new_cap = SHM_INITIAL_CAP;
@@ -2222,7 +2242,9 @@ static int SHM_FN(get)(ShmHandle *h,
                     found = 1;
                     goto simd_done;
                 }
-            simd_next:
+#ifndef SHM_KEY_IS_INT
+            simd_next:  /* goto target only exists on the string-key compare path */
+#endif
                 relevant &= relevant - 1;
             }
             if (emask) goto simd_done;  /* hit empty — key absent */
@@ -3440,6 +3462,7 @@ static uint32_t SHM_FN(drain_inner)(ShmHandle *h, uint32_t limit,
     uint32_t now = h->expires_at ? shm_now() : 0;
     uint32_t count = 0;
     uint32_t buf_used = *buf_used_p;
+    (void)buf; (void)buf_cap;  /* used only by the string key/value copy paths below */
 
     if (limit == 0) return 0;
 
@@ -3478,14 +3501,8 @@ static uint32_t SHM_FN(drain_inner)(ShmHandle *h, uint32_t limit,
 #else
         {
             uint32_t kl = SHM_STR_LEN(nodes[idx].key_len);
-            uint32_t need = buf_used + kl;
-            if (need > *buf_cap) {
-                uint32_t ns = *buf_cap ? *buf_cap * 2 : 4096;
-                while (ns < need) ns *= 2;
-                char *nb = (char *)realloc(*buf, ns);
-                if (!nb) break;
-                *buf = nb; *buf_cap = ns;
-            }
+            if ((uint64_t)buf_used + kl > UINT32_MAX) break;  /* drain buffer would exceed 4GB */
+            if (!shm_grow_buf(buf, buf_cap, buf_used + kl)) break;
             shm_str_copy(*buf + buf_used, nodes[idx].key_off, nodes[idx].key_len, h->arena, kl);
             out[count].key_off = buf_used;
             out[count].key_len = kl;
@@ -3497,14 +3514,8 @@ static uint32_t SHM_FN(drain_inner)(ShmHandle *h, uint32_t limit,
 #ifdef SHM_VAL_IS_STR
         {
             uint32_t vl = SHM_STR_LEN(nodes[idx].val_len);
-            uint32_t need = buf_used + vl;
-            if (need > *buf_cap) {
-                uint32_t ns = *buf_cap ? *buf_cap * 2 : 4096;
-                while (ns < need) ns *= 2;
-                char *nb = (char *)realloc(*buf, ns);
-                if (!nb) break;
-                *buf = nb; *buf_cap = ns;
-            }
+            if ((uint64_t)buf_used + vl > UINT32_MAX) break;  /* drain buffer would exceed 4GB */
+            if (!shm_grow_buf(buf, buf_cap, buf_used + vl)) break;
             shm_str_copy(*buf + buf_used, nodes[idx].val_off, nodes[idx].val_len, h->arena, vl);
             out[count].val_off = buf_used;
             out[count].val_len = vl;

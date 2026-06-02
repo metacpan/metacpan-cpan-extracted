@@ -3,7 +3,13 @@ abstract: 'API to Weenect tracker server'
 author:
   - 'Johan Vromans <jv@cpan.org>'
 build_requires:
+  Class::JSON_Object: '0.05'
+  Data::Printer: '0'
   ExtUtils::MakeMaker: '0'
+  HTTP::Request::Common: '0'
+  JSON::PP: '0'
+  LWP::UserAgent: '0'
+  List::Util: '0'
   Object::Pad: '0.825'
   Test::More: '0'
 configure_requires:
@@ -20,7 +26,13 @@ no_index:
     - t
     - inc
 requires:
+  Class::JSON_Object: '0.05'
+  Data::Printer: '0'
   ExtUtils::MakeMaker: '7.54'
+  HTTP::Request::Common: '0'
+  JSON::PP: '0'
+  LWP::UserAgent: '0'
+  List::Util: '0'
   Object::Pad: '0.825'
   Test::More: '0'
   perl: '5.036000'
@@ -29,5 +41,5 @@ resources:
   homepage: https://github.com/sciurius/perl-Weenect-API
   license: https://dev.perl.org/licenses/
   repository: git://github.com/sciurius/perl-Weenect-API.git
-version: '1.01'
+version: '1.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

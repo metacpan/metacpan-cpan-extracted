@@ -850,7 +850,6 @@ static void nats_stop_timers(nats_t *self)
 
 static void nats_cancel_all_requests(nats_t *self, const char *err)
 {
-    dSP;
     while (!ngx_queue_empty(&self->req_queue)) {
         ngx_queue_t *q = ngx_queue_head(&self->req_queue);
         nats_req_t *req = ngx_queue_data(q, nats_req_t, queue);
@@ -862,6 +861,7 @@ static void nats_cancel_all_requests(nats_t *self, const char *err)
         }
 
         if (req->cb) {
+            dSP;
             ENTER; SAVETMPS;
             PUSHMARK(SP);
             EXTEND(SP, 2);
@@ -1240,7 +1240,7 @@ static void nats_process_msg(nats_t *self, char *payload, size_t len)
             PUSHs(&PL_sv_undef);
         }
 
-        if (self->msg_type == MSG_TYPE_HMSG && self->msg_hdr_len > 0) {
+        if (self->msg_type == MSG_TYPE_HMSG && self->msg_hdr_len > 0 && self->msg_hdr_len <= len) {
             PUSHs(sv_2mortal(newSVpvn(payload, self->msg_hdr_len)));
         }
 

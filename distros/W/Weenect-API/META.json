@@ -32,7 +32,13 @@
       },
       "runtime" : {
          "requires" : {
+            "Class::JSON_Object" : "0.05",
+            "Data::Printer" : "0",
             "ExtUtils::MakeMaker" : "7.54",
+            "HTTP::Request::Common" : "0",
+            "JSON::PP" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Util" : "0",
             "Object::Pad" : "0.825",
             "Test::More" : "0",
             "perl" : "5.036000"
@@ -40,6 +46,12 @@
       },
       "test" : {
          "requires" : {
+            "Class::JSON_Object" : "0.05",
+            "Data::Printer" : "0",
+            "HTTP::Request::Common" : "0",
+            "JSON::PP" : "0",
+            "LWP::UserAgent" : "0",
+            "List::Util" : "0",
             "Object::Pad" : "0.825",
             "Test::More" : "0"
          }
@@ -61,6 +73,6 @@
          "web" : "https://github.com/sciurius/perl-Weenect-API"
       }
    },
-   "version" : "1.01",
+   "version" : "1.02",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

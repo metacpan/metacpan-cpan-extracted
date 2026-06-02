@@ -1,35 +1,38 @@
-#!/usr/bin/false
+#!/bin/false
 # ABSTRACT: Identity Association for Temporary Addresses option (code 4)
 # PODNAME: Net::DHCPv6::Option::IATA
-package Net::DHCPv6::Option::IATA;
-$Net::DHCPv6::Option::IATA::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Option::IATA;
+$Net::DHCPv6::Option::IATA::VERSION = '0.002';
+use Carp qw( croak );
 use Net::DHCPv6::Constants;
 use Net::DHCPv6::OptionList;
 use Net::DHCPv6::X::Truncated;
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
 
+my $IA_HDR_SIZE = 4;    ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
+
 sub new {
     my ( $class, %args ) = @_;
     croak 'IATA requires iaid' unless defined $args{iaid};
     $args{code}    = $OPTION_IA_TA;
     $args{options} = $args{options} // Net::DHCPv6::OptionList->new;
-    my $data = pack( 'N', $args{iaid} ) . $args{options}->as_bytes;
-    $args{data} = $data;
+    my $payload = pack( 'N', $args{iaid} ) . $args{options}->as_bytes;
+    $args{data} = $payload;
     my $self = $class->SUPER::new( %args );
     $self->{iaid}    = $args{iaid};
     $self->{options} = $args{options};
-    bless $self, $class;
+    return bless $self, $class;
 }
 
-sub iaid    { shift->{iaid} }
-sub options { shift->{options} }
+sub iaid    { return shift->{iaid} }
+sub options { return shift->{options} }
 
 sub add_option {
     my ( $self, $option ) = @_;
-    $self->{options}->add_option( $option );
+    return $self->{options}->add_option( $option );
 }
 
 sub get_option {
@@ -38,19 +41,19 @@ sub get_option {
 }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
+    my ( $class, $code, $payload ) = @_;
     Net::DHCPv6::X::Truncated->throw( message => 'Truncated IATA option' )
-        if CORE::length( $data ) < 4;
-    my $iaid     = unpack( 'N', substr( $data, 0, 4 ) );
-    my $opt_data = substr( $data, 4 );
+        if CORE::length( $payload ) < $IA_HDR_SIZE;
+    my $iaid     = unpack( 'N', substr( $payload, 0, $IA_HDR_SIZE ) );
+    my $opt_data = substr( $payload, $IA_HDR_SIZE );
     my $opts     = Net::DHCPv6::OptionList->from_bytes( $opt_data );
     return $class->new( iaid => $iaid, options => $opts );
 }
 
 sub as_bytes {
-    my $self = shift;
-    my $data = pack( 'N', $self->{iaid} ) . $self->{options}->as_bytes;
-    return pack( 'nn', $self->{code}, CORE::length( $data ) ) . $data;
+    my $self    = shift;
+    my $payload = pack( 'N', $self->{iaid} ) . $self->{options}->as_bytes;
+    return pack( 'nn', $self->{code}, CORE::length( $payload ) ) . $payload;
 }
 
 $Net::DHCPv6::OptionList::OPTION_CLASS{$OPTION_IA_TA} = __PACKAGE__;
@@ -61,7 +64,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -69,7 +72,7 @@ Net::DHCPv6::Option::IATA - Identity Association for Temporary Addresses option 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -78,7 +81,7 @@ version 0.001
 
 =head1 DESCRIPTION
 
-Implements the IA_TA option (OPTION_IA_TA, code 4) per RFC 8415 §21.5.
+Implements the IA_TA option (OPTION_IA_TA, code 4) per RFC 8415 E<167>21.5.
 Contains an IAID and sub-options. Unlike IA_NA, there are no T1/T2
 timers for temporary addresses.
 

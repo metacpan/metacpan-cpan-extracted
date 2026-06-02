@@ -1,10 +1,13 @@
-#!/usr/bin/false
+#!/bin/false
 # ABSTRACT: Server Identifier option (code 2)
 # PODNAME: Net::DHCPv6::Option::ServerId
-package Net::DHCPv6::Option::ServerId;
-$Net::DHCPv6::Option::ServerId::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Option::ServerId;
+$Net::DHCPv6::Option::ServerId::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
+use Net::DHCPv6::DUID;
+use Carp qw( croak );
 use Net::DHCPv6::Constants;
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
@@ -16,21 +19,15 @@ sub new {
     $args{data} = $args{duid}->as_bytes;
     my $self = $class->SUPER::new( %args );
     $self->{duid} = $args{duid};
-    bless $self, $class;
+    return bless $self, $class;
 }
 
-sub duid { shift->{duid} }
+sub duid { return shift->{duid} }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
-    my $duid = Net::DHCPv6::DUID->from_bytes( $data );
+    my ( $class, $code, $payload ) = @_;
+    my $duid = Net::DHCPv6::DUID->from_bytes( $payload );
     return $class->new( duid => $duid );
-}
-
-sub as_bytes {
-    my $self = shift;
-    my $data = $self->{duid}->as_bytes;
-    return pack( 'nn', $self->{code}, CORE::length( $data ) ) . $data;
 }
 
 $Net::DHCPv6::OptionList::OPTION_CLASS{$OPTION_SERVERID} = __PACKAGE__;
@@ -41,7 +38,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -49,7 +46,7 @@ Net::DHCPv6::Option::ServerId - Server Identifier option (code 2)
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -59,7 +56,7 @@ version 0.001
 =head1 DESCRIPTION
 
 Implements the Server Identifier option (OPTION_SERVERID, code 2)
-per RFC 8415 §21.2. The option data contains a single DUID.
+per RFC 8415 E<167>21.2. The option data contains a single DUID.
 
 =head1 ALPHA STATUS
 

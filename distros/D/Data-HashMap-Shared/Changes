@@ -1,5 +1,9 @@
 Revision history for Data-HashMap-Shared
 
+0.10  2026-05-29
+    - Exception-safe batch ops; integer-overflow and edge-case fixes
+    - Documentation fixes; -Wall -Wextra clean
+
 0.09  2026-05-26
     - Dead-reader rwlock recovery: SIGKILL'd worker holding rdlock no longer
       pins the counter; 1024-slot per-process mirror enables wrlock ETIMEDOUT

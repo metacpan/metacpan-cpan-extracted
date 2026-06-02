@@ -1,7 +1,7 @@
 ####################################################################
 #
 #     This file was generated using XDR::Parse version v1.0.1
-#                   and LibVirt version v12.3.0
+#                   and LibVirt version v12.4.0
 #
 #      Don't edit this file, use the source template instead
 #
@@ -18,14 +18,14 @@ use Future::AsyncAwait;
 use Object::Pad 0.821;
 use Sublike::Extended 0.29 'method', 'sub'; # From XS-Parse-Sublike, used by Future::AsyncAwait
 
-class Sys::Async::Virt::Domain v0.6.3;
+class Sys::Async::Virt::Domain v0.6.4;
 
 use Carp qw(croak);
 use Log::Any qw($log);
 
-use Protocol::Sys::Virt::TypedParams v12.3.0;
-use Protocol::Sys::Virt::URI v12.3.0;
-use Protocol::Sys::Virt::Remote::XDR v12.3.0;
+use Protocol::Sys::Virt::TypedParams v12.4.0;
+use Protocol::Sys::Virt::URI v12.4.0;
+use Protocol::Sys::Virt::Remote::XDR v12.4.0;
 my $remote = 'Protocol::Sys::Virt::Remote::XDR';
 
 use constant {
@@ -105,6 +105,10 @@ use constant {
     AFFECT_CURRENT                                                    => 0,
     AFFECT_LIVE                                                       => 1 << 0,
     AFFECT_CONFIG                                                     => 1 << 1,
+    SETVCPU_AFFECT_CURRENT                                            => 0,
+    SETVCPU_AFFECT_LIVE                                               => 1 << 0,
+    SETVCPU_AFFECT_CONFIG                                             => 1 << 1,
+    SETVCPU_ASYNC_UNPLUG                                              => 1 << 2,
     NONE                                                              => 0,
     START_PAUSED                                                      => 1 << 0,
     START_AUTODESTROY                                                 => 1 << 1,
@@ -298,6 +302,7 @@ use constant {
     VCPU_MAXIMUM                                                      => (1 << 2),
     VCPU_GUEST                                                        => (1 << 3),
     VCPU_HOTPLUGGABLE                                                 => (1 << 4),
+    VCPU_ASYNC_UNPLUG                                                 => (1 << 5),
     IOTHREAD_POLL_MAX_NS                                              => "poll_max_ns",
     IOTHREAD_POLL_GROW                                                => "poll_grow",
     IOTHREAD_POLL_SHRINK                                              => "poll_shrink",
@@ -450,6 +455,13 @@ use constant {
     STATS_MEMORY_BANDWIDTH_MONITOR_SUFFIX_NODE_SUFFIX_ID              => ".id",
     STATS_MEMORY_BANDWIDTH_MONITOR_SUFFIX_NODE_SUFFIX_BYTES_LOCAL     => ".bytes.local",
     STATS_MEMORY_BANDWIDTH_MONITOR_SUFFIX_NODE_SUFFIX_BYTES_TOTAL     => ".bytes.total",
+    STATS_CPU_ENERGY_MONITOR_COUNT                                    => "cpu.energy.monitor.count",
+    STATS_CPU_ENERGY_MONITOR_PREFIX                                   => "cpu.energy.monitor.",
+    STATS_CPU_ENERGY_MONITOR_SUFFIX_NAME                              => ".name",
+    STATS_CPU_ENERGY_MONITOR_SUFFIX_VCPUS                             => ".vcpus",
+    STATS_CPU_ENERGY_MONITOR_SUFFIX_PKG_COUNT                         => ".pkg.count",
+    STATS_CPU_ENERGY_MONITOR_SUFFIX_PKG_PREFIX                        => ".pkg.",
+    STATS_CPU_ENERGY_MONITOR_SUFFIX_PKG_SUFFIX_ID                     => ".id",
     STATS_DIRTYRATE_CALC_STATUS                                       => "dirtyrate.calc_status",
     STATS_DIRTYRATE_CALC_START_TIME                                   => "dirtyrate.calc_start_time",
     STATS_DIRTYRATE_CALC_PERIOD                                       => "dirtyrate.calc_period",
@@ -2361,7 +2373,7 @@ Sys::Async::Virt::Domain - Client side proxy to remote LibVirt domain
 
 =head1 VERSION
 
-v0.6.3
+v0.6.4
 
 =head1 SYNOPSIS
 
@@ -3844,6 +3856,14 @@ See documentation of L<virDomainUpdateDeviceFlags|https://libvirt.org/html/libvi
 
 =item AFFECT_CONFIG
 
+=item SETVCPU_AFFECT_CURRENT
+
+=item SETVCPU_AFFECT_LIVE
+
+=item SETVCPU_AFFECT_CONFIG
+
+=item SETVCPU_ASYNC_UNPLUG
+
 =item NONE
 
 =item START_PAUSED
@@ -4230,6 +4250,8 @@ See documentation of L<virDomainUpdateDeviceFlags|https://libvirt.org/html/libvi
 
 =item VCPU_HOTPLUGGABLE
 
+=item VCPU_ASYNC_UNPLUG
+
 =item IOTHREAD_POLL_MAX_NS
 
 =item IOTHREAD_POLL_GROW
@@ -4533,6 +4555,20 @@ See documentation of L<virDomainUpdateDeviceFlags|https://libvirt.org/html/libvi
 =item STATS_MEMORY_BANDWIDTH_MONITOR_SUFFIX_NODE_SUFFIX_BYTES_LOCAL
 
 =item STATS_MEMORY_BANDWIDTH_MONITOR_SUFFIX_NODE_SUFFIX_BYTES_TOTAL
+
+=item STATS_CPU_ENERGY_MONITOR_COUNT
+
+=item STATS_CPU_ENERGY_MONITOR_PREFIX
+
+=item STATS_CPU_ENERGY_MONITOR_SUFFIX_NAME
+
+=item STATS_CPU_ENERGY_MONITOR_SUFFIX_VCPUS
+
+=item STATS_CPU_ENERGY_MONITOR_SUFFIX_PKG_COUNT
+
+=item STATS_CPU_ENERGY_MONITOR_SUFFIX_PKG_PREFIX
+
+=item STATS_CPU_ENERGY_MONITOR_SUFFIX_PKG_SUFFIX_ID
 
 =item STATS_DIRTYRATE_CALC_STATUS
 

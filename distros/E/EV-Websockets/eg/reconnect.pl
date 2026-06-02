@@ -51,7 +51,10 @@ sub connect_ws {
 
 sub schedule_reconnect {
     return if $reconnect_timer;
-    $reconnect_timer = EV::timer($delay, 0, sub {
+    # Exponential backoff with jitter: wait 50-100% of the current window so a
+    # fleet of clients does not reconnect in lockstep (thundering herd).
+    my $wait = $delay * (0.5 + rand 0.5);
+    $reconnect_timer = EV::timer($wait, 0, sub {
         $reconnect_timer = undef;
         $delay *= 2 if $delay < 30;
         connect_ws();

@@ -213,6 +213,10 @@ static int parse_and_emit_log_block(ev_clickhouse_t *self,
     char     **names = NULL;
     SV      ***data  = NULL;     /* data[col][row] */
     if (nc > 0) {
+        /* A column occupies at least one wire byte (its name-length varint),
+         * so more columns than remaining bytes is malformed — reject before
+         * the allocation rather than letting Newxz attempt a huge size. */
+        if (nc > (uint64_t)(blen - bpos)) _BAIL_LOG(-1);
         Newxz(names, nc, char *);
         Newxz(data,  nc, SV **);
     }
@@ -487,6 +491,13 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
                 int meta_hard = 0;             /* 1 = hard error, 0 = need more */
                 const char *meta_err = NULL;   /* non-NULL → goto meta_cleanup */
 
+                /* Bound the column count to the remaining wire bytes before
+                 * allocating, same as the other block-decode sites. */
+                if (num_cols > (uint64_t)(dlen - dpos)) {
+                    if (decompressed) Safefree(decompressed);
+                    *errmsg = safe_strdup("too many columns");
+                    return -1;
+                }
                 Newxz(cnames, num_cols, const char *);
                 Newxz(cname_lens, num_cols, size_t);
                 Newxz(ctypes_str, num_cols, const char *);
@@ -669,6 +680,13 @@ static int parse_native_packet(ev_clickhouse_t *self, char **errmsg) {
             uint64_t c, r;
             int named = (self->decode_flags & DECODE_NAMED_ROWS) ? 1 : 0;
 
+            /* More columns than remaining wire bytes is malformed; reject
+             * before allocating so a bogus count can't drive a huge Newxz. */
+            if (num_cols > (uint64_t)(dlen - dpos)) {
+                if (decompressed) Safefree(decompressed);
+                *errmsg = safe_strdup("too many columns");
+                return -1;
+            }
             Newxz(columns, num_cols, SV**);
             Newxz(col_types, num_cols, col_type_t*);
             if (named) {

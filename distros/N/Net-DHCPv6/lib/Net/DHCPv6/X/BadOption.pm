@@ -1,9 +1,10 @@
-#!/usr/bin/false
+#!/bin/false
 # ABSTRACT: Thrown when option data violates expected format
 # PODNAME: Net::DHCPv6::X::BadOption
-package Net::DHCPv6::X::BadOption;
-$Net::DHCPv6::X::BadOption::VERSION = '0.001';
 use strictures 2;
+
+package Net::DHCPv6::X::BadOption;
+$Net::DHCPv6::X::BadOption::VERSION = '0.002';
 use parent 'Net::DHCPv6::X';
 use namespace::clean;
 
@@ -13,7 +14,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -21,7 +22,7 @@ Net::DHCPv6::X::BadOption - Thrown when option data violates expected format
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 

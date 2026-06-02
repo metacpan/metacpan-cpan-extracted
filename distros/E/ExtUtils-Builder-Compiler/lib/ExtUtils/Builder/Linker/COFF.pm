@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker::COFF;
-$ExtUtils::Builder::Linker::COFF::VERSION = '0.036';
+$ExtUtils::Builder::Linker::COFF::VERSION = '0.037';
 use strict;
 use warnings;
 

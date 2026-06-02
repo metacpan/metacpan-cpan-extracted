@@ -1916,8 +1916,9 @@ static SV* conn_parse_metadata_response(pTHX_ ev_kafka_conn_t *self,
                     if (n < 0) goto done;
                     p += n;
                     rcount = (int32_t)(raw - 1);
-                    if (end - p < (ptrdiff_t)(rcount * 4)) goto done;
-                    p += rcount * 4;
+                    if (rcount < 0 || rcount > 65536) goto done;
+                    if (end - p < (ptrdiff_t)((int64_t)rcount * 4)) goto done;
+                    p += (int64_t)rcount * 4;
                 }
 
                 /* tagged fields */
@@ -2063,8 +2064,9 @@ static SV* conn_parse_metadata_response(pTHX_ ev_kafka_conn_t *self,
                 if (version >= 5) {
                     if (end - p < 4) goto done;
                     rcount = kf_read_i32(p); p += 4;
-                    if (end - p < (ptrdiff_t)(rcount * 4)) goto done;
-                    p += rcount * 4;
+                    if (rcount < 0 || rcount > 65536) goto done;
+                    if (end - p < (ptrdiff_t)((int64_t)rcount * 4)) goto done;
+                    p += (int64_t)rcount * 4;
                 }
 
                 av_push(parts_av, newRV_noinc((SV*)ph));
@@ -2370,7 +2372,7 @@ static int kf_decode_record_batch(pTHX_ const char *data, size_t len,
                 if (n < 0) { SvREFCNT_dec((SV*)hdr_hv); if (decompressed) Safefree(decompressed); return -1; }
                 rp += n;
                 const char *hk_data = rp;
-                if (this_rec_end - rp < hk_len) { SvREFCNT_dec((SV*)hdr_hv); if (decompressed) Safefree(decompressed); return -1; }
+                if (hk_len < 0 || this_rec_end - rp < hk_len) { SvREFCNT_dec((SV*)hdr_hv); if (decompressed) Safefree(decompressed); return -1; }
                 rp += hk_len;
 
                 int64_t hv_len;

@@ -28,6 +28,24 @@ static void shm_rdunlock_cleanup(pTHX_ void *ptr) {
     shm_rwlock_rdlock(handle); \
     SAVEDESTRUCTOR_X(shm_rdunlock_cleanup, (void*)(handle))
 
+/* ---- Exception-safe guard for a wrlock + seqlock write section ----
+ * Mirrors RDLOCK_GUARD for batch write ops (set_multi/remove_multi) that
+ * call SvIV/SvPV on caller SVs while the lock is held: a die() from a tied
+ * or overloaded argument must not abandon the write lock with the seqlock
+ * left odd (which would self-deadlock this process and stall others until
+ * stale-lock recovery). The cleanup runs on XSUB scope exit, whether normal
+ * or via croak unwind. */
+static void shm_wrseq_unlock_cleanup(pTHX_ void *ptr) {
+    ShmHandle *h = (ShmHandle *)ptr;
+    shm_seqlock_write_end(&h->hdr->seq);
+    shm_rwlock_wrunlock(h);
+}
+
+#define WRSEQ_GUARD(handle) \
+    shm_rwlock_wrlock(handle); \
+    shm_seqlock_write_begin(&(handle)->hdr->seq); \
+    SAVEDESTRUCTOR_X(shm_wrseq_unlock_cleanup, (void*)(handle))
+
 /* ---- Helper macros ---- */
 
 #define EXTRACT_MAP(classname, sv) \
@@ -39,25 +57,25 @@ static void shm_rdunlock_cleanup(pTHX_ void *ptr) {
 #define EXTRACT_STR_KEY(sv) \
     STRLEN _klen; \
     const char* _kstr = SvPV(sv, _klen); \
-    if (_klen > SHM_MAX_STR_LEN) croak("key too long (max 2GB)"); \
+    if (_klen > SHM_MAX_STR_LEN) croak("key too long (max 1GB)"); \
     bool _kutf8 = SvUTF8(sv) ? true : false
 
 #define EXTRACT_STR_VAL(sv) \
     STRLEN _vlen; \
     const char* _vstr = SvPV(sv, _vlen); \
-    if (_vlen > SHM_MAX_STR_LEN) croak("value too long (max 2GB)"); \
+    if (_vlen > SHM_MAX_STR_LEN) croak("value too long (max 1GB)"); \
     bool _vutf8 = SvUTF8(sv) ? true : false
 
 #define EXTRACT_STR_EXPECTED(esv) \
     STRLEN _elen; \
     const char* _estr = SvPV(esv, _elen); \
-    if (_elen > SHM_MAX_STR_LEN) croak("expected value too long (max 2GB)")
+    if (_elen > SHM_MAX_STR_LEN) croak("expected value too long (max 1GB)")
 
 #define EXTRACT_STR_EXPECTED_DESIRED(esv, dsv) \
     EXTRACT_STR_EXPECTED(esv); \
     STRLEN _dlen; \
     const char* _dstr = SvPV(dsv, _dlen); \
-    if (_dlen > SHM_MAX_STR_LEN) croak("desired value too long (max 2GB)"); \
+    if (_dlen > SHM_MAX_STR_LEN) croak("desired value too long (max 1GB)"); \
     bool _dutf8 = SvUTF8(dsv) ? true : false
 
 #define REQUIRE_TTL(h) \
@@ -726,7 +744,7 @@ BOOT:
     REGISTER_KW(i16, reserve,         "Data::HashMap::Shared::I16::reserve");
     REGISTER_KW(i16, stat_evictions,  "Data::HashMap::Shared::I16::stat_evictions");
     REGISTER_KW(i16, stat_expired,    "Data::HashMap::Shared::I16::stat_expired");
-    REGISTER_KW(i16, stat_recoveries, "Data::HashMap::Shared::I16::stat_recoveries");    
+    REGISTER_KW(i16, stat_recoveries, "Data::HashMap::Shared::I16::stat_recoveries");
     REGISTER_KW(i16, arena_used,       "Data::HashMap::Shared::I16::arena_used");
     REGISTER_KW(i16, arena_cap,        "Data::HashMap::Shared::I16::arena_cap");
     REGISTER_KW(i16, add,              "Data::HashMap::Shared::I16::add");
@@ -776,7 +794,7 @@ BOOT:
     REGISTER_KW(i32, reserve,         "Data::HashMap::Shared::I32::reserve");
     REGISTER_KW(i32, stat_evictions,  "Data::HashMap::Shared::I32::stat_evictions");
     REGISTER_KW(i32, stat_expired,    "Data::HashMap::Shared::I32::stat_expired");
-    REGISTER_KW(i32, stat_recoveries, "Data::HashMap::Shared::I32::stat_recoveries");    
+    REGISTER_KW(i32, stat_recoveries, "Data::HashMap::Shared::I32::stat_recoveries");
     REGISTER_KW(i32, arena_used,       "Data::HashMap::Shared::I32::arena_used");
     REGISTER_KW(i32, arena_cap,        "Data::HashMap::Shared::I32::arena_cap");
     REGISTER_KW(i32, add,              "Data::HashMap::Shared::I32::add");
@@ -826,7 +844,7 @@ BOOT:
     REGISTER_KW(ii, reserve,         "Data::HashMap::Shared::II::reserve");
     REGISTER_KW(ii, stat_evictions,  "Data::HashMap::Shared::II::stat_evictions");
     REGISTER_KW(ii, stat_expired,    "Data::HashMap::Shared::II::stat_expired");
-    REGISTER_KW(ii, stat_recoveries, "Data::HashMap::Shared::II::stat_recoveries");    
+    REGISTER_KW(ii, stat_recoveries, "Data::HashMap::Shared::II::stat_recoveries");
     REGISTER_KW(ii, arena_used,       "Data::HashMap::Shared::II::arena_used");
     REGISTER_KW(ii, arena_cap,        "Data::HashMap::Shared::II::arena_cap");
     REGISTER_KW(ii, add,              "Data::HashMap::Shared::II::add");
@@ -873,7 +891,7 @@ BOOT:
     REGISTER_KW(i16s, reserve,         "Data::HashMap::Shared::I16S::reserve");
     REGISTER_KW(i16s, stat_evictions,  "Data::HashMap::Shared::I16S::stat_evictions");
     REGISTER_KW(i16s, stat_expired,    "Data::HashMap::Shared::I16S::stat_expired");
-    REGISTER_KW(i16s, stat_recoveries, "Data::HashMap::Shared::I16S::stat_recoveries");    
+    REGISTER_KW(i16s, stat_recoveries, "Data::HashMap::Shared::I16S::stat_recoveries");
     REGISTER_KW(i16s, arena_used,       "Data::HashMap::Shared::I16S::arena_used");
     REGISTER_KW(i16s, arena_cap,        "Data::HashMap::Shared::I16S::arena_cap");
     REGISTER_KW(i16s, add,              "Data::HashMap::Shared::I16S::add");
@@ -920,7 +938,7 @@ BOOT:
     REGISTER_KW(i32s, reserve,         "Data::HashMap::Shared::I32S::reserve");
     REGISTER_KW(i32s, stat_evictions,  "Data::HashMap::Shared::I32S::stat_evictions");
     REGISTER_KW(i32s, stat_expired,    "Data::HashMap::Shared::I32S::stat_expired");
-    REGISTER_KW(i32s, stat_recoveries, "Data::HashMap::Shared::I32S::stat_recoveries");    
+    REGISTER_KW(i32s, stat_recoveries, "Data::HashMap::Shared::I32S::stat_recoveries");
     REGISTER_KW(i32s, arena_used,       "Data::HashMap::Shared::I32S::arena_used");
     REGISTER_KW(i32s, arena_cap,        "Data::HashMap::Shared::I32S::arena_cap");
     REGISTER_KW(i32s, add,              "Data::HashMap::Shared::I32S::add");
@@ -967,7 +985,7 @@ BOOT:
     REGISTER_KW(is, reserve,         "Data::HashMap::Shared::IS::reserve");
     REGISTER_KW(is, stat_evictions,  "Data::HashMap::Shared::IS::stat_evictions");
     REGISTER_KW(is, stat_expired,    "Data::HashMap::Shared::IS::stat_expired");
-    REGISTER_KW(is, stat_recoveries, "Data::HashMap::Shared::IS::stat_recoveries");    
+    REGISTER_KW(is, stat_recoveries, "Data::HashMap::Shared::IS::stat_recoveries");
     REGISTER_KW(is, arena_used,       "Data::HashMap::Shared::IS::arena_used");
     REGISTER_KW(is, arena_cap,        "Data::HashMap::Shared::IS::arena_cap");
     REGISTER_KW(is, add,              "Data::HashMap::Shared::IS::add");
@@ -1017,7 +1035,7 @@ BOOT:
     REGISTER_KW(si16, reserve,         "Data::HashMap::Shared::SI16::reserve");
     REGISTER_KW(si16, stat_evictions,  "Data::HashMap::Shared::SI16::stat_evictions");
     REGISTER_KW(si16, stat_expired,    "Data::HashMap::Shared::SI16::stat_expired");
-    REGISTER_KW(si16, stat_recoveries, "Data::HashMap::Shared::SI16::stat_recoveries");    
+    REGISTER_KW(si16, stat_recoveries, "Data::HashMap::Shared::SI16::stat_recoveries");
     REGISTER_KW(si16, arena_used,       "Data::HashMap::Shared::SI16::arena_used");
     REGISTER_KW(si16, arena_cap,        "Data::HashMap::Shared::SI16::arena_cap");
     REGISTER_KW(si16, add,              "Data::HashMap::Shared::SI16::add");
@@ -1067,7 +1085,7 @@ BOOT:
     REGISTER_KW(si32, reserve,         "Data::HashMap::Shared::SI32::reserve");
     REGISTER_KW(si32, stat_evictions,  "Data::HashMap::Shared::SI32::stat_evictions");
     REGISTER_KW(si32, stat_expired,    "Data::HashMap::Shared::SI32::stat_expired");
-    REGISTER_KW(si32, stat_recoveries, "Data::HashMap::Shared::SI32::stat_recoveries");    
+    REGISTER_KW(si32, stat_recoveries, "Data::HashMap::Shared::SI32::stat_recoveries");
     REGISTER_KW(si32, arena_used,       "Data::HashMap::Shared::SI32::arena_used");
     REGISTER_KW(si32, arena_cap,        "Data::HashMap::Shared::SI32::arena_cap");
     REGISTER_KW(si32, add,              "Data::HashMap::Shared::SI32::add");
@@ -1117,7 +1135,7 @@ BOOT:
     REGISTER_KW(si, reserve,         "Data::HashMap::Shared::SI::reserve");
     REGISTER_KW(si, stat_evictions,  "Data::HashMap::Shared::SI::stat_evictions");
     REGISTER_KW(si, stat_expired,    "Data::HashMap::Shared::SI::stat_expired");
-    REGISTER_KW(si, stat_recoveries, "Data::HashMap::Shared::SI::stat_recoveries");    
+    REGISTER_KW(si, stat_recoveries, "Data::HashMap::Shared::SI::stat_recoveries");
     REGISTER_KW(si, arena_used,       "Data::HashMap::Shared::SI::arena_used");
     REGISTER_KW(si, arena_cap,        "Data::HashMap::Shared::SI::arena_cap");
     REGISTER_KW(si, add,              "Data::HashMap::Shared::SI::add");

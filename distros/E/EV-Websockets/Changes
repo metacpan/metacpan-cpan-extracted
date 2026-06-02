@@ -1,5 +1,10 @@
 Revision history for EV::Websockets
 
+0.08    2026-06-01
+        - Fixed idle connections stalling the EV loop
+        - Fixed crash when recycling TLS contexts
+        - Bug fixes, more tests and examples
+
 0.06    2026-05-02
         - Fixed recursive Context::DESTROY use-after-free
         - Proxy env var: accept any scheme prefix (was http/https only)

@@ -1,43 +1,40 @@
-#!/usr/bin/false
+#!/bin/false
 # ABSTRACT: Status Code option (code 13)
 # PODNAME: Net::DHCPv6::Option::StatusCode
-package Net::DHCPv6::Option::StatusCode;
-$Net::DHCPv6::Option::StatusCode::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Option::StatusCode;
+$Net::DHCPv6::Option::StatusCode::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
+use Carp qw( croak );
 use Net::DHCPv6::Constants;
 use Net::DHCPv6::X::Truncated;
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
+my $EMPTY = q();
 
 sub new {
     my ( $class, %args ) = @_;
     croak 'StatusCode requires status_code' unless defined $args{status_code};
     $args{code}    = $OPTION_STATUS_CODE;
-    $args{message} = $args{message} // '';
+    $args{message} = $args{message} // $EMPTY;
     $args{data}    = pack( 'n', $args{status_code} ) . $args{message};
     my $self = $class->SUPER::new( %args );
     $self->{status_code} = $args{status_code};
     $self->{message}     = $args{message};
-    bless $self, $class;
+    return bless $self, $class;
 }
 
-sub status_code { shift->{status_code} }
-sub message     { shift->{message} }
+sub status_code { return shift->{status_code} }
+sub message     { return shift->{message} }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
+    my ( $class, $code, $payload ) = @_;
     Net::DHCPv6::X::Truncated->throw( message => 'Truncated StatusCode option' )
-        if CORE::length( $data ) < 2;
-    my $sc  = unpack( 'n', substr( $data, 0, 2 ) );
-    my $msg = substr( $data, 2 );
+        if CORE::length( $payload ) < 2;
+    my $sc  = unpack( 'n', substr( $payload, 0, 2 ) );
+    my $msg = substr( $payload, 2 );
     return $class->new( status_code => $sc, message => $msg );
-}
-
-sub as_bytes {
-    my $self = shift;
-    my $data = pack( 'n', $self->{status_code} ) . $self->{message};
-    return pack( 'nn', $self->{code}, CORE::length( $data ) ) . $data;
 }
 
 $Net::DHCPv6::OptionList::OPTION_CLASS{$OPTION_STATUS_CODE} = __PACKAGE__;
@@ -48,7 +45,7 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
@@ -56,7 +53,7 @@ Net::DHCPv6::Option::StatusCode - Status Code option (code 13)
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -68,7 +65,7 @@ version 0.001
 =head1 DESCRIPTION
 
 Implements the Status Code option (OPTION_STATUS_CODE, code 13) per
-RFC 8415 §21.13. Contains a 16-bit status code and an optional
+RFC 8415 E<167>21.13. Contains a 16-bit status code and an optional
 human-readable message string.
 
 =head1 ALPHA STATUS

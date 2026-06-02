@@ -1,5 +1,9 @@
 Revision history for Data-Queue-Shared
 
+0.05  2026-06-01
+    - Str push_multi: hoist SvPV out of the mutex so a tied/overloaded
+      argument that dies mid-batch can't abandon the lock and deadlock peers
+
 0.04  2026-05-27
     - *_wait: fix missed-wakeup race (announce waiter before sampling seq)
     - batch ops (push_multi/pop_multi/drain) wake N waiters, not 1

@@ -30,12 +30,20 @@ WriteMakefile(
     BUILD_REQUIRES => {
         'Mock::Sub'        => 0,
         'Test::More'       => 0,
+        'File::Temp'       => 0,
         'Test::SharedFork' => 0,
     },
     PREREQ_PM => {
-        'IPC::Shareable'        => 1.13,
-        'Parallel::ForkManager' => 0,
+        'IPC::Shareable'        => '1.17',
+        'Parallel::ForkManager' => ($] < 5.014 ? '== 2.02' : 0),
+        'Time::HiRes'           => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Async-Event-Interval-*' },
 );
+
+# Strip macOS extended attributes and AppleDouble metadata from dist
+# tarballs (LIBARCHIVE.xattr.* headers cause warnings on Linux tar).
+sub MY::postamble {
+    return $^O eq 'darwin' ? "TARFLAGS = --no-mac-metadata -cvf\n" : '';
+}

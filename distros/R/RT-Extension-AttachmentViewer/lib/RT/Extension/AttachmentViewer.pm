@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =encoding utf8
 
@@ -14,7 +14,7 @@ RT::Extension::AttachmentViewer - View full size attachments from the dropzone
 
 =head1 DESCRIPTION
 
-By default, when attachments are to be uploaded in RT, the dropzone where they are added shows a thubmbnail. This extension enhances the attachment dropzone in RT by allowing users to click on a file preview to display it in a modal viewer. It supports images, PDFs, audio, HTML, and text files. Other file types are opened using the browser's default behavior.
+By default, when attachments are to be uploaded in RT, the dropzone where they are added shows a thumbnail. This extension enhances the attachment dropzone in RT by allowing users to click on a file preview to display it in a modal viewer. It supports images, PDFs, audio, HTML, and text files. Other file types are opened using the browser's default behavior.
 
 
 =head1 RT VERSION

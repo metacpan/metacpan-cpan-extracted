@@ -1,6 +1,6 @@
 package Geo::Coder::OpenCage;
 # ABSTRACT: Geocode coordinates and addresses with the OpenCage Geocoding API
-$Geo::Coder::OpenCage::VERSION = '0.39';
+$Geo::Coder::OpenCage::VERSION = '0.42';
 use strict;
 use warnings;
 
@@ -11,22 +11,21 @@ use Scalar::Util 'blessed';
 use URI;
 
 my $version = our $VERSION || 'dev';
-my $ua_string;
+my $ua_string = "Geo::Coder::OpenCage/$version";
 
 sub new {
-    my $class  = shift;
-    my %params = @_;
+    my ($class, %params) = @_;
 
     if (!$params{api_key}) {
         croak "api_key is a required parameter for new()";
     }
 
-    $ua_string = $class . ' ' . $version;
-    my $ua   = $params{ua} || HTTP::Tiny->new(agent => $ua_string);
+    my $ua = $params{ua} || HTTP::Tiny->new(timeout => 10);
+    $ua->agent($ua_string);
     my $api_url = 'https://api.opencagedata.com/geocode/v1/json';
     
-    if (defined($params{http} && $params{http} == 1 )){
-        $api_url =~ s|^https|http|;
+    if (defined($params{http}) && $params{http} eq '1') {
+        $api_url =~ s|^https://|http://|;
     }
     my $self = {
         version => $version,
@@ -58,6 +57,7 @@ my %valid_params = (
     countrycode    => 1,
     format         => 0,
     jsonp          => 0,
+    key            => 0,
     language       => 1,
     limit          => 1,
     min_confidence => 1,
@@ -71,23 +71,21 @@ my %valid_params = (
 );
 
 sub geocode {
-    my $self   = shift;
-    my %params = @_;
+    my ($self, %params) = @_;
 
     if (defined($params{location})) {
         $params{q} = delete $params{location};
     } else {
-        warn "location is a required parameter for geocode()";
-        return undef;
+        carp "location is a required parameter for geocode()";
+        return;
     }
 
-    for my $k (keys %params) {
-        if (!defined($params{$k})) {
-            warn "Unknown geocode parameter: $k";
+    foreach my $k (keys %params) {
+        if (!exists($valid_params{$k})) {
+            carp "Unknown geocode parameter: $k";
             delete $params{$k};
-        }
-        if (!$params{$k}) { # is a real parameter but we dont support it
-            warn "Unsupported geocode parameter: $k";
+        } elsif ($valid_params{$k} == 0) { # is a real parameter but we dont support it
+            carp "Unsupported geocode parameter: $k";
             delete $params{$k};
         }
     }
@@ -102,35 +100,47 @@ sub geocode {
     }
     my $URL = $self->{url}->clone();    
     $URL->query_form(\@final_params);
-    # print STDERR 'url: ' . $URL->as_string . "\n";
     my $response = $self->{ua}->get($URL);
 
-    # Support HTTP::Tiny and LWP:: CPAN packages
-    my $content = ( blessed $response and $response->isa('HTTP::Response') )
-        ? $response->decoded_content()
-        : $response->{content};
+    # Support HTTP::Tiny and LWP:: CPAN packages (and subclasses of either).
+    my $is_lwp = blessed $response && $response->isa('HTTP::Response');
+    my $content    = $is_lwp ? $response->decoded_content() : $response->{content};
+    my $is_success = $is_lwp ? $response->is_success()      : $response->{success};
 
-    my $is_success = (ref($response) eq 'HTTP::Response')
-        ? $response->is_success()
-        : $response->{success};
-
-    my $rh_content = $self->{json}->decode($content);
+    my $rh_content;
+    my $ok = eval { $rh_content = $self->{json}->decode($content); 1 };
+    if (!$ok) {
+        my $err = $@ || 'unknown error';
+        carp "failed to decode response from '" . $self->_sanitized_url($URL) . "': $err";
+        return;
+    }
 
     if (!$is_success) {
-        warn "response when requesting '$URL': " . $rh_content->{status}{code} . ', ' . $rh_content->{status}{message};
-        return undef;
+        my $status = $rh_content->{status} || {};
+        # Cleanup server-supplied strings, e.g. new-lines
+        my $code = ($status->{code}    // '?')             =~ s/[[:cntrl:]]//gr;
+        my $msg  = ($status->{message} // 'unknown error') =~ s/[[:cntrl:]]//gr;
+        carp "response when requesting '" . $self->_sanitized_url($URL) . "': $code, $msg";
+        return;
     }
     return $rh_content;
 }
 
+# mask the API key in a URL before logging, so it doesn't leak into stderr
+sub _sanitized_url {
+    my ($self, $url) = @_;
+    my $masked = substr($self->{api_key}, 0, 6) . '...';
+    (my $str = "$url") =~ s/\Q$self->{api_key}\E/$masked/g;
+    return $str;
+}
+
 sub reverse_geocode {
-    my $self   = shift;
-    my %params = @_;
+    my ($self, %params) = @_;
 
     foreach my $k (qw(lat lng)) {
         if (!defined($params{$k})) {
-            warn "$k is a required parameter";
-            return undef;
+            carp "$k is a required parameter";
+            return;
         }
     }
 
@@ -152,7 +162,7 @@ Geo::Coder::OpenCage - Geocode coordinates and addresses with the OpenCage Geoco
 
 =head1 VERSION
 
-version 0.39
+version 0.42
 
 =head1 SYNOPSIS
 
@@ -194,7 +204,27 @@ which includes a reference file for developing in Perl using this module.
 
 Get your API key from L<https://opencagedata.com>.
 
-Optionally "http => 1" can also be specified in which case API requests will NOT be made via https.
+=head3 Optional parameters
+
+=over
+
+=item C<< http => 1 >>
+
+Make API requests over plain HTTP instead of HTTPS.
+
+B<Warning:> this is strongly discouraged. Your API key and all queries (which
+may include user-supplied addresses or coordinates) will be transmitted in
+cleartext and visible to any network observer. Only use this if you have a
+specific reason to disable TLS (e.g. debugging via a local proxy).
+
+=item C<< ua => $user_agent >>
+
+Supply your own UserAgent object instead of the default L<HTTP::Tiny> (which
+is constructed with a 10 second timeout). Useful for things like rate limiting
+(L<LWP::UserAgent::Throttled>) or testing with a mock UA. See L</ua> for
+details on the User-Agent header.
+
+=back
 
 =head2 ua
 
@@ -205,7 +235,7 @@ Accessor for the UserAgent object. By default HTTP::Tiny is used. Useful if for
 example you want to specify that something like LWP::UserAgent::Throttled for 
 rate limiting.
 
-Regardless of which UserAgent object is used, the User-Agent HTTP header will always be set to Geo::Coder::OpenCage/$version.
+Regardless of which UserAgent object is used, the User-Agent HTTP header will always be set to C<Geo::Coder::OpenCage/I<VERSION>>, where I<VERSION> is the installed module version.
 
 =head2 geocode
 
@@ -234,15 +264,15 @@ L<OpenCage geocoding API response codes|https://opencagedata.com/api#codes>
       warn "API error: " . $response->{status}{message};
   }
 
-=over
-
-=item Supported Parameters
+=head3 Supported Parameters
 
 The OpenCage Geocoder has a few optional parameters.
 
 Please see L<the OpenCage geocoder documentation|https://opencagedata.com/api>. Most of L<the various optional parameters|https://opencagedata.com/api#forward-opt> are supported.
 
 The most commonly useful parameters are:
+
+=over
 
 =item language
 
@@ -261,6 +291,8 @@ the supplied country.
 
 The countrycode is a comma separated list of 2 character code as defined by the ISO 3166-1 Alpha 2 standard.
 
+=back
+
 As a full example:
 
     my $response = $Geocoder->geocode(
@@ -269,16 +301,18 @@ As a full example:
         countrycode => "ru",
     );
 
-=item Not Supported
+=head3 Not Supported
+
+=over
 
 =item jsonp
 
 This module always parses the response as a Perl data structure, so the jsonp
 option is never used.
 
-All other API parameters are passed through directly
-
 =back
+
+All other API parameters are passed through directly.
 
 =head2 reverse_geocode
 

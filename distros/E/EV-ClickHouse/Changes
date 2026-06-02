@@ -1,3 +1,7 @@
+0.04  2026-06-01
+    - Bound Content-Length, LZ4 chain size, and native column count from
+      untrusted server input
+
 0.03  2026-05-21
     - Multi-host failover and connection Pool (circuit breaker, hedged
       queries, fan-out, sessions); async DNS; TLS mutual auth.

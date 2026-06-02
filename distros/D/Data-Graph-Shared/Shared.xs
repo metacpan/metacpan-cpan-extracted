@@ -38,6 +38,8 @@ new(class, path, max_nodes, max_edges)
     char errbuf[GRAPH_ERR_BUFLEN];
   CODE:
     const char *p = SvOK(path) ? SvPV_nolen(path) : NULL;
+    if (max_nodes > UINT32_MAX || max_edges > UINT32_MAX)
+        croak("Data::Graph::Shared->new: max_nodes/max_edges exceed 2^32");
     GraphHandle *h = graph_create(p, (uint32_t)max_nodes, (uint32_t)max_edges, errbuf);
     if (!h) croak("Data::Graph::Shared->new: %s", errbuf);
     MAKE_OBJ(class, h);
@@ -53,6 +55,8 @@ new_memfd(class, name, max_nodes, max_edges)
   PREINIT:
     char errbuf[GRAPH_ERR_BUFLEN];
   CODE:
+    if (max_nodes > UINT32_MAX || max_edges > UINT32_MAX)
+        croak("Data::Graph::Shared->new_memfd: max_nodes/max_edges exceed 2^32");
     GraphHandle *h = graph_create_memfd(name, (uint32_t)max_nodes, (uint32_t)max_edges, errbuf);
     if (!h) croak("Data::Graph::Shared->new_memfd: %s", errbuf);
     MAKE_OBJ(class, h);

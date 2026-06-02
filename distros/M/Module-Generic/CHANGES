@@ -1,5 +1,48 @@
 Revision history for Perl module Module::Generic
 
+v1.5.3 2026-06-02T09:10:08+0900
+    - Fixed END phase failures reported by CPAN Testers on perl 5.40+ and FreeBSD smokers.
+      The phase guards added in v1.5.2 made Module::Generic::Global->new() return undef
+      during END/DESTRUCT phases, causing callers like Module::Generic::_is_class_loaded()
+      to crash with "Can't call method 'exists' on an undefined value" or
+      "Died at Module/Generic.pm line 455" when a module triggered class loading from an
+      END block.
+    - Removed phase guards from public methods of Module::Generic::Global.
+      The refactor of leaf-scalar locks to parent-hash locks in v1.5.2 eliminated the
+      underlying SIGSEGV cause; the additional phase protection was redundant and
+      prevented normal operation during END.
+    - Phase guards retained in _share_repo() to avoid initialising new :shared structures
+      during interpreter shutdown, and in Module::Generic::Global::Guard::DESTROY.
+    - Module::Generic::Global bumped to v1.2.1.
+
+v1.5.2 2026-06-01T15:02:08+0900
+    - Fixed SIGSEGV at exit on Perl 5.16 to 5.22 with useithreads, caused by CORE::lock
+      on a reference to a scalar leaf inside a :shared hash.
+      Affected approximately 23 of 38 test files in 'make test' on CPAN Testers smokers
+      running these configurations.
+    - Refactored Module::Generic::Global to lock parent :shared hashes rather than leaf
+      scalar entries: twelve places updated across new(), get(), set(), remove(),
+      length(), lock(), cleanup_register(), _decrement().
+      Lock granularity changes from per-key to per-namespace or per-top-level-hash;
+      functional behaviour is unchanged.
+    - Added END/DESTRUCT phase guards at the top of every public method in
+      Module::Generic::Global. Methods called during terminal phases now return a
+      sentinel value (undef for getters, 1 for no-op operations) rather than touching
+      :shared structures, which would SIGSEGV on older threads::shared releases.
+    - Adapted error() to skip Module::Generic::Global::Exception object construction and
+      the global $ERRORS write during terminal phases.
+      A warn() is still emitted so diagnostic output reaches the user;
+      the per-object _error slot is still populated with the bare message.
+    - Internalised _in_end_phase() and _in_global_destruction() into
+      Module::Generic::Global to avoid cross-package calls into Module::Generic, which
+      would silently fail when Global is loaded before Module::Generic.
+    - Hardened _share_repo() to refuse all work during END/DESTRUCT phases, and to
+      populate plain (non-shared) refs into the global hashes when _NEED_SHARED is false,
+      with a separate branch for the shared case.
+    - Added _in_end_phase() helper to Module::Generic (companion to the pre-existing
+      _in_global_destruction()), returning true during the Perl END phase. Useful for
+      cleanup logic in user DESTROY methods.
+
 v1.5.1 2026-05-27T10:04:51+0900
     - Changed clone() in Module::Generic to allow it to take optional argument of
       reference to clone, instead of the the instance itself.

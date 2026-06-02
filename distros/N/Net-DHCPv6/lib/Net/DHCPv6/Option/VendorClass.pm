@@ -1,15 +1,19 @@
-#!/usr/bin/false
-# ABSTRACT: Vendor Class option (code 16) — enterprise-number + opaque data
+#!/bin/false
+# ABSTRACT: Vendor Class option (code 16) -- enterprise-number + opaque data
 # PODNAME: Net::DHCPv6::Option::VendorClass
-package Net::DHCPv6::Option::VendorClass;
-$Net::DHCPv6::Option::VendorClass::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Option::VendorClass;
+$Net::DHCPv6::Option::VendorClass::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
+use Carp qw( croak );
 use Net::DHCPv6::Constants;
 use Net::DHCPv6::X::Truncated;
 use parent 'Net::DHCPv6::Option';
-use Ref::Util qw(is_plain_arrayref);
+use Ref::Util qw( is_plain_arrayref );
 use namespace::clean;
+my $EMPTY       = q();
+my $ENT_NUM_LEN = 4;     ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 
 sub new {
     my ( $class, %args ) = @_;
@@ -18,23 +22,23 @@ sub new {
     my $data_list = $args{vendor_data} // $args{data} // [];
     $data_list = [$data_list] unless is_plain_arrayref( $data_list );
     my $encoded =
-        pack( 'N', $args{enterprise_number} ) . join( '', map { pack( 'n', CORE::length ) . $_ } @$data_list );
+        pack( 'N', $args{enterprise_number} ) . join( $EMPTY, map { pack( 'n', CORE::length ) . $_ } @{$data_list} );
     $args{data} = $encoded;
     my $self = $class->SUPER::new( %args );
     $self->{enterprise_number} = $args{enterprise_number};
     $self->{vendor_data}       = $data_list;
-    bless $self, $class;
+    return bless $self, $class;
 }
 
-sub enterprise_number { shift->{enterprise_number} }
-sub vendor_data       { shift->{vendor_data} }
+sub enterprise_number { return shift->{enterprise_number} }
+sub vendor_data       { return shift->{vendor_data} }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
+    my ( $class, $code, $payload ) = @_;
     Net::DHCPv6::X::Truncated->throw( message => 'Truncated VendorClass option' )
-        if CORE::length( $data ) < 4;
-    my $en   = unpack( 'N', substr( $data, 0, 4 ) );
-    my $rest = substr( $data, 4 );
+        if CORE::length( $payload ) < $ENT_NUM_LEN;
+    my $en   = unpack( 'N', substr( $payload, 0, $ENT_NUM_LEN ) );
+    my $rest = substr( $payload, $ENT_NUM_LEN );
     my @items;
     my $offset = 0;
     my $len    = CORE::length( $rest );
@@ -56,28 +60,29 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::VendorClass - Vendor Class option (code 16) — enterprise-number + opaque data
+Net::DHCPv6::Option::VendorClass - Vendor Class option (code 16) -- enterprise-number + opaque data
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
   use Net::DHCPv6::Option::VendorClass;
   my $opt = Net::DHCPv6::Option::VendorClass->new(
-      enterprise_number => 9,
+      enterprise_number => 9,        # Cisco (IANA PEN)
       vendor_data       => [ 'foo', 'bar' ],
   );
 
 =head1 DESCRIPTION
 
-Conveys vendor-class information consisting of an IANA enterprise
-number and one or more opaque data items.  See RFC 8415 §21.16.
+Conveys vendor-class information consisting of an IANA Private
+Enterprise Number (PEN, see L<https://www.iana.org/assignments/enterprise-numbers>)
+and one or more opaque data items.  See RFC 8415 E<167>21.16.
 
 =head1 ALPHA STATUS
 

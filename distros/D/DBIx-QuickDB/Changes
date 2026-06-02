@@ -1,3 +1,7 @@
+0.000044  2026-06-01 14:23:16-07:00 America/Los_Angeles
+
+    - Driver stop() now confirms the server is gone by its pid instead of waiting for the unix socket file to disappear, and removes a stale socket left behind by a SIGKILLed server. Fixes FreeBSD smoke failures where a slow shutdown was SIGKILLed and stop() then timed out waiting for the leaked socket
+
 0.000043  2026-05-29 13:09:21-07:00 America/Los_Angeles
 
     - Stop PostgreSQL with SIGINT (fast shutdown) instead of SIGTERM (smart shutdown) to avoid hangs/SIGKILL and leaked sockets on slow hosts

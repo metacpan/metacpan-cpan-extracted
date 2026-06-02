@@ -1,5 +1,5 @@
 package ExtUtils::Builder::Linker;
-$ExtUtils::Builder::Linker::VERSION = '0.036';
+$ExtUtils::Builder::Linker::VERSION = '0.037';
 use strict;
 use warnings;
 
@@ -143,7 +143,7 @@ ExtUtils::Builder::Linker - An interface around different linkers.
 
 =head1 VERSION
 
-version 0.036
+version 0.037
 
 =head1 METHODS
 

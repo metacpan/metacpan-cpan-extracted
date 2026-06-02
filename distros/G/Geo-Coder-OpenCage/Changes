@@ -1,5 +1,48 @@
 Revision history for Geo-Coder-OpenCage
 
+0.42    2026-06-02
+        - only run Perl::Critic tests locally, not as part of perltesters
+
+0.41    2026-05-27
+        dependencies:
+        - bump HTTP::Tiny to 0.83 (shipped with Perl 5.38), pin previously unpinned versions
+        - move Scalar::Util to RuntimeRequires (was misclassified as test-only)
+        - drop Pod::Perldoc from RuntimeRequires (not actually used)
+        code fixes:
+        - default HTTP::Tiny UA now uses a 10 second timeout
+        - valid_params list wasn't actually used
+        - valid_params warned if a parameter value was 0 (e.g. 'no_dedupe' can be set to 0)
+        - 'key' can only be set in new(), not overwritten in geocoding calls
+        - fix defined() parenthesization in http=>1 handling
+        - JSON decode now warns and returns undef on parse error instead of dying
+        - avoid printing API key in error messages
+        - accept HTTP::Response subclasses (content/is_success branches stayed in sync)
+        documentation:
+        - document http=>1 and ua=>$ua parameters of new()
+        - restructure geocode() Supported/Not Supported sections into proper =head3/=over blocks
+        - We documented user-agent string as "Geo::Coder::OpenCage/$VERSION" but in code it
+           used space as delimiter. It's also set when another UA is supplied in new() as
+           documented.
+        tests:
+        - no longer test against Perl < 5.38
+        - connectivity check uses TCP/443 (requires no root)
+        - we pinged a stale hardcoded IP so some tests where always skipped
+        - new tests for parameter validation (typo, key, format, jsonp)
+        - new tests for JSON decoding and API-key masking
+        - new test for HTTP::Response subclasses
+        - new tests for reverse geocoding calling without required parameters (lat,lng)
+        - test the Perl documentation (POD) syntax
+        - we use hardcoded test API keys. Added links to the documentation
+        - factored duplicated Net::Ping connectivity check into t/lib/TestConnectivity.pm
+        - new Perl::Critic test
+        release tooling:
+        - abort (die) instead of warn on untracked files
+        - .gitignore: drop dead entries, ignore dotted dirs except .github
+
+0.40    2026-04-01
+        - documenation: use "Agent Skill" terminology and link to the opencage-skills
+          repo root instead of a deep file path
+
 0.39    2026-04-01
         - better Agent Skill link in pod, no code changes
 

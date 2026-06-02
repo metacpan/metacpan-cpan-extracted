@@ -62,4 +62,5 @@ t/schema/mysqlcom.sql
 t/schema/percona.sql
 t/schema/postgresql.sql
 t/schema/sqlite.sql
+t/stop_socket_cleanup.t
 xt/author/pod-syntax.t

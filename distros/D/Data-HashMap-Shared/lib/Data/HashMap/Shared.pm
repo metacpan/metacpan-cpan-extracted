@@ -1,7 +1,7 @@
 package Data::HashMap::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 require XSLoader;
 XSLoader::load('Data::HashMap::Shared', $VERSION);
@@ -110,6 +110,18 @@ B<Linux-only>. Requires 64-bit Perl.
 =item L<Data::HashMap::Shared::SS> - string to string
 
 =back
+
+=head2 Integer Range and Wrapping
+
+Integer keys and values are stored as fixed-width two's-complement
+integers: C<I16>/C<SI16>/C<I16S> use a signed 16-bit range
+(-32768 .. 32767), C<I32>/C<SI32>/C<I32S> a signed 32-bit range, and
+C<II>/C<IS>/C<SI> a signed 64-bit range. A key or value outside the
+variant's range is B<silently truncated> to the low bits (two's
+complement), with no warning: on an C<I16> map, C<< $map->put(70000, ...) >>
+stores under key C<4464> (C<70000 & 0xFFFF>), so C<get(70000)> and
+C<get(4464)> address the same entry. C<incr>/C<decr> wrap the same way
+(C<32767 + 1> becomes C<-32768>). Pick a variant wide enough for your data.
 
 =head2 Constructor
 
@@ -244,11 +256,24 @@ if the key is missing or expired, the value did not match, or (string-value
 variants) the arena is full. See L</"String Keys/Values and UTF-8"> for
 the byte-only comparison rule.
 
+C<swap> returns the previous value, or C<undef> when the key did not exist
+(a fresh insert). C<undef> is B<also> returned when the new value cannot be
+stored — the map is already at C<max_entries> capacity, or (string-value
+variants) the arena is full — in which case an existing key keeps its old
+value. C<swap> by itself therefore cannot distinguish a fresh insert from a
+full-map failure; check C<exists> or C<size> first if that matters.
+
 Integer-value variants also have:
 
     my $n = shm_xx_incr $map, $key;           # returns new value
     my $n = shm_xx_decr $map, $key;           # returns new value
     my $n = shm_xx_incr_by $map, $key, $delta;
+
+A missing key is created starting from zero (Redis-style): the first
+C<incr> returns 1, C<decr> returns -1, and C<incr_by> returns C<$delta>.
+These die only when the key is new and the map is already at
+C<max_entries> (no room to insert). The result wraps at the variant's
+integer width (see L</"Integer Range and Wrapping">).
 
 LRU/TTL operations (C<put_ttl>, C<add_ttl>, and C<update_ttl> require a TTL-enabled map):
 
@@ -305,12 +330,19 @@ Diagnostics:
     #   arena_used, arena_cap, evictions, expired, recoveries, max_size, ttl
 
 C<set_multi>, C<get_multi>, C<remove_multi>, C<get_with_ttl>, C<stats>,
-C<path>, and C<unlink> are method-only (no keyword form).
+C<path>, C<sync>, and C<unlink> are method-only (no keyword form).
 
 File management:
 
+    $map->sync;                               # flush the mmap to the backing file (msync MS_SYNC)
     $map->unlink;                             # remove backing file (mmap stays valid)
     Data::HashMap::Shared::II->unlink($path); # class method form
+
+C<sync> issues a synchronous C<msync(2)> over the whole mapping (every
+shard, for sharded maps) and dies on error. Use it to force durability of
+a file-backed map; it is a no-op for anonymous mappings, which have no
+backing file. Changes are visible to other processes sharing the mapping
+without C<sync> — it only affects on-disk persistence.
 
 =head2 Crash Safety
 

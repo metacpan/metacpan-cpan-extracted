@@ -1,10 +1,13 @@
 #!perl
+## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 use strictures 2;
 use lib 'lib';
+use File::Slurper qw( read_binary );
 use Net::DHCPv6;
+my $EMPTY = q();
 
-my $in = do { local $/; <> }
-    or die "No input";
+my $in = read_binary( '/dev/stdin' );
+die "No input\n" unless $in;
 
 my @packets;
 my $current;
@@ -18,9 +21,9 @@ for my $line ( split /\n/, $in ) {
                 advertise => 2,
                 request   => 3,
                 reply     => 7,
-                release   => 8
+                release   => 8,
             }->{$1},
-            hex => ''
+            hex => $EMPTY,
         };
     }
     elsif ( $current && $line =~ m/^\s+0x[0-9a-f]+:\s+(.*?)\s*$/ ) {
@@ -43,7 +46,7 @@ for my $pkt ( @packets ) {
         my $tid = $decoded->transaction_id;
         printf "%2d. %-10s tid=0x%06X\n", $count, uc( $pkt->{type} ), $tid;
         my $opts = $decoded->options;
-        for my $opt ( @$opts ) {
+        for my $opt ( @{$opts} ) {
             my $name = $opt->type // 'UNKNOWN';
             printf "      Option %-3d %-20s\n", $opt->code, $name;
             if ( $opt->code == 6 && $opt->can( 'requested_options' ) ) {
@@ -53,7 +56,7 @@ for my $pkt ( @packets ) {
                 printf "        IAPD iaid=%d t1=%d t2=%d\n", $opt->iaid, $opt->t1, $opt->t2;
             }
             if ( $opt->code == 26 && $opt->can( 'prefix_length' ) ) {
-                printf "        prefix=%d addr=%s\n", $opt->prefix_length, unpack( 'H*', $opt->address );
+                printf "        prefix=%d addr=%s\n", $opt->prefix_length, unpack( 'H*', $opt->address_raw );
             }
             if ( $opt->code == 13 && $opt->can( 'status_code' ) ) {
                 printf "        status=%d msg=%s\n", $opt->status_code, $opt->message;
@@ -64,3 +67,4 @@ for my $pkt ( @packets ) {
         printf "%2d. %-10s ERROR: %s\n", $count, uc( $pkt->{type} ), $error // 'decode failed';
     }
 }
+## use critic (ValuesAndExpressions::ProhibitMagicNumbers)

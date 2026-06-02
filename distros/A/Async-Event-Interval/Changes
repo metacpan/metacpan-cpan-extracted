@@ -1,5 +1,114 @@
 Revision history for Async-Event-Interval
 
+1.14    2026-06-01
+    - Add $count++ in callback exec params example in POD
+    - s/contains any/doesn't contain/ in Changes entry 1.12
+    - Remove all reliance on CI_TESTING env var in unit tests. They all run on
+      all systems by default
+    - Bump IPC::Shareable prereq to 1.14
+    - Add t/lib/TestHelper.pm; automatically does the seg/sem tests in all test
+      files that "use" it to ensure there are no leaks
+    - Test updates to conform with updates to IPC::Shareable
+    - Make shared_scalar() a property of the event that created it. Clarify its
+      cleanup in POD
+    - Fixes #16; _rand_shm_lock() now returns 1 + ($$ % 32767) so the value
+      fits in IPC::Shareable 1.14+'s SEM_PROTECTED semaphore slot
+    - shared_scalar() segments are now tied with protected => _shm_lock() to
+      close the IPC::Shareable->clean_up_all foot-gun that could wipe them
+      out from under a running event; the owning event's DESTROY still
+      removes them via IPC::Shareable->remove
+    - %events bootstrap loop is now capped at SHM_CREATE_RETRIES (100)
+      attempts and croaks with the last underlying error instead of
+      spinning forever when shmget fails persistently
+    - All reads/writes to %events now go through _events_read (LOCK_SH) /
+      _events_write (LOCK_EX) to synchronize access across processes
+    - events() now returns a read-locked deep copy snapshot; mutations to
+      the returned hashref do not affect the live %events
+    - info() now returns a shallow copy snapshot, consistent with events()
+    - _rand_shm_key() now generates hex strings within the 32-bit SHM key
+      range (0x0–0x7FFFFFFF), replacing the 12 random letters which also
+      removes the srand()-in-a-loop pattern
+    - shared_scalar() no longer stores tied refs inside %events;
+      %events now holds an arrayref of hex key strings instead,
+      eliminating a same-process FETCH deadlock in IPC::Shareable
+    - $SIG{__WARN__} moved to local inside _event() so it no longer
+      silently replaces the caller's handler at module load; $SIG{CHLD}
+      remains at file scope (children outlive _event(), need auto-reap)
+    - Add write-path tests and automated source audit to t/09-locking.t
+    - Extract _run_callback() from _event() to deduplicate the eval +
+      error-capture + store pattern and isolate $@ preservation
+    - Add _end() clean_up_protected coverage test; fix _end() mock-counter
+      test that was silently destroying the semaphore set, causing 11
+      subsequent tests to be skipped; fix events() deep-copy still treating
+      shared_scalars as a hashref instead of the new arrayref
+    - Fix fork failure silently falling through to child path and running
+      the callback in the parent process; now croaks with "fork() failed"
+    - Wrap _run_callback in eval inside _event() and always call
+      _pm->finish($@ ? 1 : 0) so ForkManager isn't left with a stale
+      child record when the callback dies
+    - Guard _end() with a local SIGALRM (END_LOCK_TIMEOUT, default 2s)
+      so process exit doesn't block forever on _events_read' LOCK_SH if
+      a peer still holds LOCK_EX on the events knot
+    - stop() now polls kill(0) at STOP_KILL_POLL_INTERVAL (0.05s) for up
+      to STOP_KILL_TIMEOUT (1s) instead of always sleeping a fixed 1s;
+      returns as soon as the target process is gone (full test suite
+      wallclock roughly halved)
+    - Refactor error()/status() to remove their mutual-recursion
+      side-effect chain. Crash detection now lives in a private
+      _detect_crash helper that both methods call independently
+    - Retire the undocumented -99 PID sentinel that marked crashes
+    - stop() now sends SIGTERM first (STOP_TERM_TIMEOUT 0.5s) and escalates
+      to SIGKILL only if the child is still alive; _signal_and_wait() helper
+      encapsulates the signal-and-poll logic
+    - Replace mutable module-level $is_child_process flag with
+      $$ != $creator_pid check in DESTROY; a forked child inherently has
+      a different PID than the process that loaded the module, so no
+      mutable state that mock-fork tests can corrupt is needed
+    - Replace lexical $id counter with shared _id_counter in %events to
+      prevent duplicate IDs across forked processes
+    - Closes #15; Add _stop_requested cooperative flag in shared %events so the
+      child's interval loop can break cleanly and call finish() instead of being
+      killed by SIGTERM; stop() sets it, start() clears it, the loop checks it
+      on each iteration
+    - Closes #14; Add timeout() accessor so a callback that exceeds the
+      specified number of whole seconds self-terminates with an error.
+      Accepts a non-negative integer or undef; fractional seconds are
+      not supported
+    - Closes #9; Add immediate() method. Set a flag to have the event fire
+      immediately on start rather than waiting for the first interval to be
+      reached
+    - Adopt IPC::Shareable's testing_set/clean_up_testing API to brand all
+      test-suite segments and purge orphans from prior crashed runs; bump
+      IPC::Shareable prereq to 1.17
+    - Fixes and enhancements to the local VM test infrastructure
+    - Pin Parallel::ForkManager to < 2.00 on Perl < 5.14 to avoid Moo XS
+      compile failures on macOS
+    - Guard DESTROY's _events_write in eval and clear stale _lock on
+      failure to prevent EAGAIN from IPC::Shareable's unlock() leaking
+      IPC segments on Linux
+    - Ensure counters are properly cleaned up in _end() cleanup
+    - Use Time::HiRes wall-clock time in _signal_and_wait so stop() timeout
+      is accurate on busy/VM systems where select() jitter accumulates
+    - Relax t/15-interval.t exact-count timing checks to >= so slow macOS VMs
+      don't fail before the first callback fires
+    - _detect_crash no longer marks cleanly-exited one-shot events as
+      crashed; child writes _clean_exit flag to shared %events before
+      finish(0) so the parent can distinguish normal completion from a crash
+    - Fix flaky t/90 on macOS CI by replacing nested-hash shared memory
+      writes with flat keys, eliminating child-segment race between forks
+    - Fix shared memory leak on SIGINT/SIGTERM: install signal handlers
+      that run _end() cleanup before re-raising; _end() now unconditionally
+      stops children and removes protected segments instead of skipping
+      when _event_count > 0
+    - Fix _end() SIGALRM deadlock: clear SA_RESTART via POSIX::sigaction so
+      the alarm actually interrupts blocked semop(); split the single 2s alarm
+      into per-phase evals so each cleanup step runs even when an earlier one
+      times out; add @all_pids fallback so children are killed even when the
+      %events read-lock is stuck
+    - Add 'error' and 'waiting' fields to events() and info() snapshots
+    - Add wait() method that polls until the event is dormant (optional
+      poll interval, default 0.01s)
+
 1.13    2024-03-04
     - Added ability to send in per-callback call parameters via the start()
       method (closes #10)
@@ -8,7 +117,7 @@ Revision history for Async-Event-Interval
 
 1.12    2022-03-31
     - Only remove the Async::Event::Interval protected shared %events hash
-      if it contains any keys (ie. event objects). When running in things
+      if it doesn't contain keys (ie. event objects). When running in things
       like 'plackup', END{} was being called on each browser session close,
       but there were still objects, so we were trashing the %events
       infrastructure prematurely

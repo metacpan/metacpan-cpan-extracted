@@ -1,40 +1,42 @@
-#!/usr/bin/false
-# ABSTRACT: User Class option (code 15) — list of opaque user class data
+#!/bin/false
+# ABSTRACT: User Class option (code 15) -- list of opaque user class data
 # PODNAME: Net::DHCPv6::Option::UserClass
-package Net::DHCPv6::Option::UserClass;
-$Net::DHCPv6::Option::UserClass::VERSION = '0.001';
 use strictures 2;
-use Carp qw(croak);
+
+package Net::DHCPv6::Option::UserClass;
+$Net::DHCPv6::Option::UserClass::VERSION = '0.002';
+use Net::DHCPv6::OptionList;
 use Net::DHCPv6::Constants;
 use Net::DHCPv6::X::Truncated;
 use parent 'Net::DHCPv6::Option';
-use Ref::Util qw(is_plain_arrayref);
+use Ref::Util qw( is_plain_arrayref );
 use namespace::clean;
+my $EMPTY = q();
 
 sub new {
     my ( $class, %args ) = @_;
     $args{code} = $OPTION_USER_CLASS;
     my $data_list = $args{user_class_data} // [];
     $data_list = [$data_list] unless is_plain_arrayref( $data_list );
-    $args{data} = join( '', map { pack( 'n', CORE::length ) . $_ } @$data_list );
+    $args{data} = join( $EMPTY, map { pack( 'n', CORE::length ) . $_ } @{$data_list} );
     my $self = $class->SUPER::new( %args );
     $self->{user_class_data} = $data_list;
-    bless $self, $class;
+    return bless $self, $class;
 }
 
-sub user_class_data { shift->{user_class_data} }
+sub user_class_data { return shift->{user_class_data} }
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
+    my ( $class, $code, $payload ) = @_;
     my @items;
     my $offset = 0;
-    my $len    = CORE::length( $data );
+    my $len    = CORE::length( $payload );
     while ( $offset + 2 <= $len ) {
-        my $ilen = unpack( 'n', substr( $data, $offset, 2 ) );
+        my $ilen = unpack( 'n', substr( $payload, $offset, 2 ) );
         $offset += 2;
         Net::DHCPv6::X::Truncated->throw( message => 'Truncated UserClass data item' )
             if $offset + $ilen > $len;
-        push @items, substr( $data, $offset, $ilen );
+        push @items, substr( $payload, $offset, $ilen );
         $offset += $ilen;
     }
     return $class->new( user_class_data => \@items );
@@ -47,15 +49,15 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::UserClass - User Class option (code 15) — list of opaque user class data
+Net::DHCPv6::Option::UserClass - User Class option (code 15) -- list of opaque user class data
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -67,7 +69,7 @@ version 0.001
 =head1 DESCRIPTION
 
 Carries a list of opaque user class data items.  Each item is
-preceded by a 16-bit length field.  See RFC 8415 §21.15.
+preceded by a 16-bit length field.  See RFC 8415 E<167>21.15.
 
 =head1 ALPHA STATUS
 

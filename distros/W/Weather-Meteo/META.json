@@ -51,6 +51,7 @@
       },
       "test" : {
          "requires" : {
+            "DateTime" : "0",
             "File::Glob" : "0",
             "File::Slurp" : "0",
             "File::stat" : "0",
@@ -61,10 +62,15 @@
             "Test::Carp" : "0",
             "Test::Compile" : "0",
             "Test::DescribeMe" : "0",
-            "Test::MockModule" : "0",
+            "Test::LWP::UserAgent" : "0",
+            "Test::Memory::Cycle" : "0",
+            "Test::Mockingbird" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
+            "Test::Returns" : "0",
+            "Test::Which" : "0",
+            "TimeZone::TimeZoneDB" : "0",
             "WWW::RT::CPAN" : "0",
             "autodie" : "0"
          }
@@ -84,6 +90,6 @@
          "x_repository" : "https://github.com/nigelhorne/Weather-Meteo"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

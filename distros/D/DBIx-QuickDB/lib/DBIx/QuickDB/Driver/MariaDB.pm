@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::MariaDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000043';
+our $VERSION = '0.000044';
 
 use IPC::Cmd qw/can_run/;
 use Capture::Tiny qw/capture/;

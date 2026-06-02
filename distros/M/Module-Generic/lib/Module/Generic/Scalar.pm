@@ -635,7 +635,7 @@ sub pass_error
         my $error = $repo->get;
         if( !CORE::defined( $error ) )
         {
-            warnings::warnif( "No error object provided and no previous error set either! It seems the previous method call returned a simple undef\n" );
+            warn( "No error object provided and no previous error set either! It seems the previous method call returned a simple undef" ) if( warnings::enabled( 'Module::Generic' ) );
         }
         else
         {

@@ -1,10 +1,10 @@
 {
-   "abstract" : "Client library for the Backblaze B2 Cloud Storage Service V2 API.",
+   "abstract" : "Replaced by Backblaze::B2V4 | Deprecated client library for the Backblaze B2 Cloud Storage Service V2 API.",
    "author" : [
       "/ BUGS"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.12",
+   "generated_by" : "Minilla/v3.1.29",
    "license" : [
       "mit"
    ],
@@ -61,7 +61,7 @@
    "provides" : {
       "Backblaze::B2V2Client" : {
          "file" : "lib/Backblaze/B2V2Client.pm",
-         "version" : "1.6"
+         "version" : "1.7"
       }
    },
    "release_status" : "stable",
@@ -71,11 +71,12 @@
       },
       "homepage" : "https://github.com/ericschernoff/Backblaze-B2V2Client",
       "repository" : {
-         "url" : "git://github.com/ericschernoff/Backblaze-B2V2Client.git",
+         "type" : "git",
+         "url" : "https://github.com/ericschernoff/Backblaze-B2V2Client.git",
          "web" : "https://github.com/ericschernoff/Backblaze-B2V2Client"
       }
    },
-   "version" : "1.6",
+   "version" : "1.7",
    "x_contributors" : [
       "Eric Chernoff <eric@laravel.weaverstreet.net>",
       "Eric Chernoff <eric@mail.weaverqueue.com>",
@@ -84,6 +85,6 @@
       "estrabd <estrabd@gmail.com>",
       "root <root@majestica-dev.weaverstreet.net>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

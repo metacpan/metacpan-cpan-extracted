@@ -14,8 +14,14 @@ my %makemaker =
   ( 'ExtUtils::MakeMaker' => 7.54 );
 
 my %prereq =
-  ( 'Test::More'          => 0,
-    'Object::Pad'         => 0.825,
+  ( 'Test::More'            => 0,
+    'Object::Pad'           => 0.825,
+    'Class::JSON_Object'    => 0.05,
+    'LWP::UserAgent'        => 0,
+    'HTTP::Request::Common' => 0,
+    'JSON::PP'              => 0,
+    'Data::Printer'         => 0,
+    'List::Util'            => 0,
   );
 
 my %w =

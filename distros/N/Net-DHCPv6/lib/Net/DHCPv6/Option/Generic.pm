@@ -1,15 +1,16 @@
-#!/usr/bin/false
-# ABSTRACT: Fallback option for unknown codes — stores raw code+data
+#!/bin/false
+# ABSTRACT: Fallback option for unknown codes -- stores raw code+data
 # PODNAME: Net::DHCPv6::Option::Generic
-package Net::DHCPv6::Option::Generic;
-$Net::DHCPv6::Option::Generic::VERSION = '0.001';
 use strictures 2;
+
+package Net::DHCPv6::Option::Generic;
+$Net::DHCPv6::Option::Generic::VERSION = '0.002';
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
 
 sub from_bytes_inner {
-    my ( $class, $code, $data ) = @_;
-    return $class->new( code => $code, data => $data );
+    my ( $class, $code, $payload ) = @_;
+    return $class->new( code => $code, data => $payload );
 }
 
 1;
@@ -18,15 +19,15 @@ __END__
 
 =pod
 
-=encoding utf-8
+=encoding UTF-8
 
 =head1 NAME
 
-Net::DHCPv6::Option::Generic - Fallback option for unknown codes — stores raw code+data
+Net::DHCPv6::Option::Generic - Fallback option for unknown codes -- stores raw code+data
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -34,7 +35,7 @@ version 0.001
 
     my ($msg, $err) = Net::DHCPv6->decode_with_error($bytes);
     my $opt = $msg->options->get_option(999);  # unknown code
-    my $data = $opt->data if $opt;
+    my $payload = $opt->data if $opt;
 
     # Or construct directly
     use Net::DHCPv6::Option::Generic;
