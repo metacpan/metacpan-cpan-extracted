@@ -19,10 +19,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - run: perl -V
       - name: install cpan deps
-        uses: perl-actions/install-with-cpm@stable
+        uses: perl-actions/install-with-cpanm@0f3cc9bc0b055cc20750d218061ebbdebd101bb3 # stable
         with:
           install: |
             Cpanel::JSON::XS
@@ -86,15 +86,14 @@ jobs:
           ]
 
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-      - uses: shogo82148/actions-setup-perl@5796a908661aa68fc0a5b8f55c6791af2376d72e # v1.35.0
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: shogo82148/actions-setup-perl@a198315ec4e9244f206879ea7b63078003aec8a6 # v1.41.1
         with:
           perl-version: ${{ matrix.perl-version }}
       - run: perl -V
       - name: install cpan deps
-        uses: perl-actions/install-with-cpm@stable
+        uses: perl-actions/install-with-cpanm@0f3cc9bc0b055cc20750d218061ebbdebd101bb3 # stable
         with:
-          sudo: false
           install: |
             constant
             File::Path
@@ -120,11 +119,12 @@ jobs:
         perl-version: [latest]
 
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - run: perl -V
       - name: install cpan deps
-        uses: perl-actions/install-with-cpm@stable
+        uses: perl-actions/install-with-cpanm@0f3cc9bc0b055cc20750d218061ebbdebd101bb3 # stable
         with:
+          sudo: false
           install: |
             constant
             File::Path
@@ -151,10 +151,10 @@ jobs:
         perl-version: [latest]
 
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - run: perl -V
       - name: install cpan deps
-        uses: perl-actions/install-with-cpm@stable
+        uses: perl-actions/install-with-cpanm@0f3cc9bc0b055cc20750d218061ebbdebd101bb3 # stable
         with:
           sudo: false
           install: |
@@ -166,7 +166,7 @@ jobs:
       - run: perl Makefile.PL
       - run: make test TEST_VERBOSE=1 2>&1 | tee make.log
       - name: Upload make.log
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         if: failure()
         with:
           name: artifacts

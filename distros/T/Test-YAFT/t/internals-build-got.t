@@ -3,52 +3,52 @@
 use v5.14;
 use  warnings;
 
-use require::relative "test-helper.pl";
+use require::relative q (test-helper.pl);
 
-it "should build result from non-coderef"
-	=> got    => Test::YAFT::_build_got ({ got => "foo" })
+it q (should build result from non-coderef)
+	=> got    => Test::YAFT::_build_got ({ got => q (foo) })
 	=> expect => +{
 		error    => undef,
 		lives_ok => expect_true,
-		value    => "foo",
+		value    => q (foo),
 	};
 
-it "should execute coderef"
-	=> got    => Test::YAFT::_build_got ({ got => sub { 'foo' } })
+it q (should execute coderef)
+	=> got    => Test::YAFT::_build_got ({ got => sub { q (foo) } })
 	=> expect => +{
-		error    => '',
+		error    => q (),
 		lives_ok => expect_true,
-		value    => "foo",
+		value    => q (foo),
 	};
 
-it "should execute coderef in scalar context"
+it q (should execute coderef in scalar context)
 	=> got    => Test::YAFT::_build_got ({ got => sub { qw[ foo bar ] } })
 	=> expect => +{
-		error    => '',
+		error    => q (),
 		lives_ok => expect_true,
-		value    => "bar",
+		value    => q (bar),
 	};
 
-it "should catch exception thrown by coderef"
-	=> got    => Test::YAFT::_build_got ({ got => sub { die bless {}, 'Foo::Bar' } })
+it q (should catch exception thrown by coderef)
+	=> got    => Test::YAFT::_build_got ({ got => sub { die bless {}, q (Foo::Bar) } })
 	=> expect => +{
-		error    => expect_isa ('Foo::Bar'),
+		error    => expect_isa (q (Foo::Bar)),
 		lives_ok => expect_false,
 		value    => undef,
 	};
 
-it "should execute got { } block"
-	=> got    => Test::YAFT::_build_got ({ got => got { 'foo' } })
+it q (should execute got { } block)
+	=> got    => Test::YAFT::_build_got ({ got => got { q (foo) } })
 	=> expect => +{
-		error    => '',
+		error    => q (),
 		lives_ok => expect_true,
-		value    => "foo",
+		value    => q (foo),
 	};
 
-it "should catch exception thrown by got { } block"
-	=> got    => Test::YAFT::_build_got ({ got => got { die bless {}, 'Foo::Bar' } })
+it q (should catch exception thrown by got { } block)
+	=> got    => Test::YAFT::_build_got ({ got => got { die bless {}, q (Foo::Bar) } })
 	=> expect => +{
-		error    => expect_isa ('Foo::Bar'),
+		error    => expect_isa (q (Foo::Bar)),
 		lives_ok => expect_false,
 		value    => undef,
 	};

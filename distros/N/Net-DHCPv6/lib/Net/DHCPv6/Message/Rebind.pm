@@ -4,9 +4,11 @@
 use strictures 2;
 
 package Net::DHCPv6::Message::Rebind;
-$Net::DHCPv6::Message::Rebind::VERSION = '0.002';
-use Net::DHCPv6::Packet;
-use Net::DHCPv6::Constants;
+$Net::DHCPv6::Message::Rebind::VERSION = '0.003';
+use Net::DHCPv6::Packet    ();
+use Net::DHCPv6::Constants qw(
+    $REBIND
+);
 use parent 'Net::DHCPv6::Packet';
 use namespace::clean;
 
@@ -32,7 +34,7 @@ Net::DHCPv6::Message::Rebind - Rebind message (type 6)
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

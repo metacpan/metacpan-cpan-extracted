@@ -3,7 +3,7 @@
 use strictures 2;
 use lib 'lib';
 use File::Slurper qw( read_binary );
-use Net::DHCPv6;
+use Net::DHCPv6   ();
 my $EMPTY = q();
 
 my $in = read_binary( '/dev/stdin' );

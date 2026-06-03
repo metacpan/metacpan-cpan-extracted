@@ -1653,6 +1653,19 @@ not subject to C<@CARP_NOT>.
 (F) C<str2time> successfully parsed the input string but cannot convert
 it to a Unix timestamp without a UTC designator or numeric offset.
 
+=item Unable to convert: a leap second must occur at 23:59:60 UTC
+
+(F) C<str2time> parsed a time with a leap second (C<60>), but after
+applying the UTC offset the instant is not 23:59:60 UTC. A leap second
+only ever occurs at 23:59:60 UTC; this is raised when C<60> appears at
+another time of day, or when an offset shifts it off that boundary.
+
+=item Unable to convert: no leap second on this UTC date
+
+(F) C<str2time> parsed a leap second at 23:59:60 UTC, but the UTC date
+does not carry one. Leap seconds are inserted only at the end of June
+or December, from 1972 onward.
+
 =back
 
 =head1 LIMITATIONS
@@ -1910,7 +1923,7 @@ to resolve them, leaving interpretation to the caller.
 
 =head1 SEE ALSO
 
-L<Time::Str::Regexp>, L<Time::Str::Token>, L<Time::Str::Calendar>,
+L<Time::Str::Regexp>, L<Time::Str::Token>, L<Time::Str::Calendar>, L<Time::Str::Time>, L<Time::Str::Util>,
 L<Time::Moment>, L<DateTime>, L<Time::Piece>
 
 =head1 AUTHOR

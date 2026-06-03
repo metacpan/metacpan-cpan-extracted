@@ -18,6 +18,8 @@ Format
 Karen
 Matthias
 Measham
+Petr
+Písař
 Rick
 Sep
 durations
@@ -26,6 +28,7 @@ irc
 lib
 linebreak
 mbe
+ppisar
 rickm
 strf
 timelines

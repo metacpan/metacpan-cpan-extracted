@@ -27,7 +27,7 @@ no_index:
 provides:
   DateTime::Format::Duration:
     file: lib/DateTime/Format/Duration.pm
-    version: '1.05'
+    version: '1.06'
 requires:
   Carp: '0'
   Data::Dumper: '0'
@@ -44,7 +44,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Format-Duration
   homepage: https://github.com/karenetheridge/DateTime-Format-Duration
   repository: https://github.com/karenetheridge/DateTime-Format-Duration.git
-version: '1.05'
+version: '1.06'
 x_Dist_Zilla:
   perl:
     version: '5.043010'
@@ -679,7 +679,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.05
+          tag: v1.06
           tag_format: v%V
           tag_message: v%v%t
         Dist::Zilla::Role::Git::Repo:
@@ -848,6 +848,7 @@ x_authority: cpan:ETHER
 x_contributors:
   - 'Karen Etheridge <ether@cpan.org>'
   - 'Matthias Bethke <mbe@financial.com>'
+  - 'Petr Písař <ppisar@redhat.com>'
 x_generated_by_perl: v5.43.10
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

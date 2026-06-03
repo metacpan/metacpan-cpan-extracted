@@ -2971,6 +2971,7 @@ sub _posix_rule_to_unix
 sub _posix_tz_lookup
 {
     my( $self, $unix_secs, $tz_string ) = @_;
+    no warnings 'once';
     unless( $DateTime::Lite::IsPurePerl )
     {
         return( DateTime::Lite::posix_tz_lookup( $self, $unix_secs, $tz_string ) );

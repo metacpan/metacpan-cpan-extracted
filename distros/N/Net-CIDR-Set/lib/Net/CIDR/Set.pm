@@ -13,7 +13,7 @@ use overload '""' => 'as_string';
 
 use namespace::autoclean;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 
 {
@@ -436,7 +436,7 @@ Net::CIDR::Set - Manipulate sets of IP addresses
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =head1 SYNOPSIS
 
@@ -774,8 +774,6 @@ value is C<0> which provides the most general formatting.
 
 The development version is on github at L<https://github.com/robrwo/perl-Net-CIDR-Set>
 and may be cloned from L<https://github.com/robrwo/perl-Net-CIDR-Set.git>
-
-See F<CONTRIBUTING.md> for more information.
 
 =head1 SUPPORT
 

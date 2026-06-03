@@ -4,9 +4,10 @@
  * Copyright(c) 2026 DEGUEST Pte. Ltd.
  * Author: Jacques Deguest <jack@deguest.jp>
  * Created  2026/03/07
- * Modified 2026/03/27
+ * Modified 2026/06/02
  *
  * XS implementations of the most frequently called type-inspection helpers.
+ * + integration of a class loading check with _is_class_loaded
  * Moving them here eliminates Perl dispatch overhead and the temporary
  * allocations created by the Perl call stack on every invocation.
  *
@@ -32,6 +33,15 @@
  * matching the Generic.so produced by EUMM with NAME = "Module::Generic".
  * PACKAGE = Module::Generic::File::Magic installs all XS functions in the
  * correct namespace. This pattern is also used by Time::HiRes and POSIX.
+ *---------------------------------------------------------------------------*/
+/*
+ * Portions of the class-loading detection logic are derived from
+ * Class::Load::XS by Matt S. Trout and contributors.
+ *
+ * Copyright (c) the Class::Load::XS authors.
+ * Distributed under the same terms as Perl itself.
+ *
+ * Adapted for Module::Generic by Jacques Deguest.
  *---------------------------------------------------------------------------*/
 #include "EXTERN.h"
 #include "perl.h"
@@ -131,6 +141,294 @@ mg_get_sv_arg( I32 n, I32 count, SV** sp )
     if( SvGMAGICAL( sv ) )
         sv = sv_mortalcopy( sv );
     return( sv );
+}
+
+/*
+ * mg_is_valid_class_name( $class )
+ *
+ * Validates that the supplied class name is syntactically valid without autovivifying
+ * any stash.
+ *
+ * Accepted format:
+ *
+ *     Foo
+ *     Foo::Bar
+ *     Foo::Bar::Baz
+ *
+ * Rejected:
+ *
+ *     ""
+ *     ::Foo
+ *     Foo:
+ *     Foo:::Bar
+ *     Foo-Bar
+ *     Foo Bar
+ *
+ * On success, returns TRUE and provides direct access to the underlying
+ * class name string and length.
+ *
+ * This performs only syntactic validation; it does not check whether the
+ * package actually exists.
+ */
+static bool
+mg_is_valid_class_name( pTHX_ SV* klass, const char** namep, STRLEN* lenp )
+{
+    const char* s;
+    STRLEN len;
+    STRLEN i;
+    int need_ident = 1;
+
+    if( !klass )
+    {
+        return( FALSE );
+    }
+
+    SvGETMAGIC( klass );
+
+    if( !SvOK( klass ) || SvROK( klass ) )
+    {
+        return( FALSE );
+    }
+
+    s = SvPV( klass, len );
+
+    if( len == 0 )
+    {
+        return( FALSE );
+    }
+
+    for( i = 0; i < len; i++ )
+    {
+        unsigned char c = (unsigned char)s[i];
+
+        if( need_ident )
+        {
+            if( !( ( c >= 'A' && c <= 'Z' ) ||
+                   ( c >= 'a' && c <= 'z' ) ||
+                   c == '_' ) )
+            {
+                return( FALSE );
+            }
+
+            need_ident = 0;
+        }
+        else if( c == ':' )
+        {
+            if( i + 1 >= len || s[i + 1] != ':' )
+            {
+                return( FALSE );
+            }
+
+            i++;
+            need_ident = 1;
+        }
+        else if( !( ( c >= 'A' && c <= 'Z' ) ||
+                    ( c >= 'a' && c <= 'z' ) ||
+                    ( c >= '0' && c <= '9' ) ||
+                    c == '_' ) )
+        {
+            return( FALSE );
+        }
+    }
+
+    if( need_ident )
+    {
+        return( FALSE );
+    }
+
+    *namep = s;
+    *lenp  = len;
+
+    return( TRUE );
+}
+
+/*
+ * mg_inc_has_class( $class )
+ *
+ * Checks whether a class appears in %INC.
+ *
+ * The class name is converted to its corresponding .pm path:
+ *
+ *     Foo::Bar -> Foo/Bar.pm
+ *
+ * and looked up directly in Perl's global %INC hash.
+ *
+ * This is the most reliable indication that a module file has been loaded through
+ * require/use.
+ *
+ * Returns TRUE if the module path exists in %INC, FALSE otherwise.
+ */
+static bool
+mg_inc_has_class( pTHX_ const char* name, STRLEN len )
+{
+    HV* inc;
+    char* pm;
+    STRLEN i;
+    STRLEN j = 0;
+    bool found;
+
+    inc = GvHV( PL_incgv );
+
+    if( !inc )
+    {
+        return( FALSE );
+    }
+
+    Newx( pm, len + 4, char );
+
+    for( i = 0; i < len; i++ )
+    {
+        if( name[i] == ':' && i + 1 < len && name[i + 1] == ':' )
+        {
+            pm[j++] = '/';
+            i++;
+        }
+        else
+        {
+            pm[j++] = name[i];
+        }
+    }
+
+    pm[j++] = '.';
+    pm[j++] = 'p';
+    pm[j++] = 'm';
+    pm[j]   = '\0';
+
+    found = hv_exists( inc, pm, (I32)j ) ? TRUE : FALSE;
+
+    Safefree( pm );
+
+    return( found );
+}
+
+/*
+ * mg_stash_has_sub( $stash )
+ *
+ * Iterates through a package stash and looks for at least one CODE entry.
+ *
+ * This mirrors part of the detection strategy used by Class::Load::XS.
+ *
+ * IMPORTANT:
+ *
+ * The presence of a CODE entry does not necessarily mean that a module file has been
+ * loaded. Perl may create stubs, forward declarations, or partially populated package
+ * symbols during compilation.
+ *
+ * Consequently, this helper should be considered heuristic only and must not be treated
+ * as equivalent to a positive %INC lookup.
+ *
+ * Returns TRUE if at least one CV is found in the stash.
+ */
+static bool
+mg_stash_has_sub( pTHX_ HV* stash )
+{
+    HE* he;
+
+    hv_iterinit( stash );
+
+    while( ( he = hv_iternext( stash ) ) )
+    {
+        GV* gv = (GV*)HeVAL( he );
+        STRLEN keylen;
+        const char* key = HePV( he, keylen );
+        SV* cv = NULL;
+
+        if( isGV( gv ) )
+        {
+            cv = (SV*)GvCVu( gv );
+        }
+        else
+        {
+            gv_init( gv, stash, key, keylen, GV_ADDMULTI );
+            cv = (SV*)GvCV( gv );
+        }
+
+        if( cv )
+        {
+            return( TRUE );
+        }
+    }
+
+    return( FALSE );
+}
+
+/*
+ * mg_stash_has_loaded_markers( $stash )
+ *
+ * Checks whether a package stash contains strong indicators that the package has
+ * been initialised.
+ *
+ * Current markers:
+ *
+ *     $VERSION
+ *     @ISA
+ *
+ * These are commonly populated by fully loaded Perl modules and provide a safer
+ * fallback than simply detecting the existence of a package stash.
+ *
+ * Unlike %INC, this remains heuristic because a package may manually populate these
+ * symbols without having been loaded from a .pm file.
+ *
+ * Returns TRUE if any recognised marker is found.
+ */
+/*
+ * NOTE:
+ *
+ * We intentionally do NOT treat the mere presence of CODE symbols as proof that a
+ * module has been loaded. Perl may create stubs and package entries during
+ * compilation long before a corresponding require() succeeds.
+ *
+ * This avoids false positives such as:
+ *
+ *     MIME::Base64::encode_base64(...)
+ *
+ * where the symbol may exist but MIME::Base64 has not yet been loaded.
+ */
+static bool
+mg_stash_has_loaded_markers( pTHX_ HV* stash )
+{
+    SV** svp;
+    GV* gv;
+    SV* sv;
+    AV* av;
+
+    svp = hv_fetchs( stash, "VERSION", 0 );
+
+    if( svp && *svp && isGV( *svp ) )
+    {
+        gv = (GV*)*svp;
+        sv = GvSV( gv );
+
+        if( sv )
+        {
+            if( SvROK( sv ) )
+            {
+                if( sv_isobject( sv ) || SvOK( SvRV( sv ) ) )
+                {
+                    return( TRUE );
+                }
+            }
+            else if( SvOK( sv ) )
+            {
+                return( TRUE );
+            }
+        }
+    }
+
+    svp = hv_fetchs( stash, "ISA", 0 );
+
+    if( svp && *svp && isGV( *svp ) )
+    {
+        gv = (GV*)*svp;
+        av = GvAV( gv );
+
+        if( av && av_len( av ) != -1 )
+        {
+            return( TRUE );
+        }
+    }
+
+    return( FALSE );
 }
 
 /*
@@ -494,6 +792,72 @@ _is_array( self, ... )
     {
         SV* val = mg_get_sv_arg( 1, items, &ST(0) );
         RETVAL = ( SvROK( val ) && SvTYPE( SvRV( val ) ) == SVt_PVAV ) ? 1 : 0;
+    }
+  OUTPUT:
+    RETVAL
+
+# ---------------------------------------------------------------------------
+# _is_class_loaded_xs( $self, $class )
+#
+# XS implementation of Module::Generic::_is_class_loaded.
+#
+# Detection order:
+#
+#   1. Validate class name syntax.
+#   2. Check %INC for the corresponding .pm file.
+#   3. Check the package stash for loading markers.
+#
+# Unlike gv_stashpv(..., GV_ADD), this implementation never autovivifies
+# namespaces and therefore cannot accidentally create packages while
+# testing for their existence.
+#
+# Returns:
+#
+#     1  Class appears loaded.
+#     0  Class does not appear loaded.
+#
+# This function is intended as a fast XS replacement for the Perl-level
+# implementation and follows the same semantics as closely as possible.
+# ---------------------------------------------------------------------------
+
+int
+_is_class_loaded_xs( self, ... )
+    SV* self
+  PREINIT:
+    SV* klass;
+    const char* name;
+    STRLEN len;
+    HV* stash;
+  CODE:
+    if( items < 2 )
+    {
+        RETVAL = 0;
+    }
+    else
+    {
+        klass = mg_get_sv_arg( 1, items, &ST(0) );
+
+        if( !mg_is_valid_class_name( aTHX_ klass, &name, &len ) )
+        {
+            RETVAL = 0;
+        }
+        else if( mg_inc_has_class( aTHX_ name, len ) )
+        {
+            RETVAL = 1;
+        }
+        else
+        {
+            stash = gv_stashpvn( name, (U32)len, 0 );
+
+            if( stash && mg_stash_has_loaded_markers( aTHX_ stash ) )
+            {
+                RETVAL = 1;
+            }
+            else
+            {
+                RETVAL = 0;
+            }
+        }
     }
   OUTPUT:
     RETVAL

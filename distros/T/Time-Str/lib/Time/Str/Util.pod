@@ -10,16 +10,20 @@ Time::Str::Util - Binary search and time zone database utilities
 
     use Time::Str::Util qw( find_tzdb_directory
                             valid_tzdb_timezone valid_posix_timezone
-                            lower_bound upper_bound range_bounds );
+                            binary_search lower_bound upper_bound range_bounds );
 
     # Locate system zoneinfo directory
     my $tzdir = find_tzdb_directory();  # /usr/share/zoneinfo or undef
 
     # Validate timezone names
-    valid_tzdb_timezone('America/New_York');           # true
+    valid_tzdb_timezone('America/New_York');          # true
     valid_posix_timezone('EST5EDT,M3.2.0,M11.1.0');   # true
 
     my @sorted = (10, 20, 30, 40, 50);
+
+    # Membership test
+    my $found = binary_search(\@sorted, 30);  # true
+    my $miss  = binary_search(\@sorted, 25);  # false
 
     my $i = lower_bound(\@sorted, 25);  # 2 (first element >= 25)
     my $j = upper_bound(\@sorted, 30);  # 3 (first element >  30)
@@ -41,6 +45,18 @@ everything.
 
 =head2 Binary Search
 
+=head3 binary_search
+
+    my $bool = binary_search($arrayref, $value);
+    my $bool = binary_search($arrayref, $value, $lo, $hi);
+
+Returns true if C<$value> is present in the sorted array, false
+otherwise.
+
+Optional C<$lo> and C<$hi> parameters restrict the search to the
+half-open range C<[$lo, $hi)>. Defaults to C<[0, length)>.
+
+
 =head3 lower_bound
 
     my $index = lower_bound($arrayref, $value);
@@ -49,6 +65,18 @@ everything.
 Returns the index of the first element in the sorted array that is
 greater than or equal to C<$value>. If all elements are less than
 C<$value>, returns the length of the array (one past the last index).
+
+Optional C<$lo> and C<$hi> parameters restrict the search to the
+half-open range C<[$lo, $hi)>. Defaults to C<[0, length)>.
+
+=head3 upper_bound
+
+    my $index = upper_bound($arrayref, $value);
+    my $index = upper_bound($arrayref, $value, $lo, $hi);
+
+Returns the index of the first element in the sorted array that is
+strictly greater than C<$value>. If all elements are less than or
+equal to C<$value>, returns the length of the array.
 
 Optional C<$lo> and C<$hi> parameters restrict the search to the
 half-open range C<[$lo, $hi)>. Defaults to C<[0, length)>.
@@ -67,18 +95,6 @@ This is optimized for cases where few elements fall within the range,
 as the linear scan avoids a second binary search.
 
 Croaks if C<$min_value> E<gt> C<$max_value>.
-
-=head3 upper_bound
-
-    my $index = upper_bound($arrayref, $value);
-    my $index = upper_bound($arrayref, $value, $lo, $hi);
-
-Returns the index of the first element in the sorted array that is
-strictly greater than C<$value>. If all elements are less than or
-equal to C<$value>, returns the length of the array.
-
-Optional C<$lo> and C<$hi> parameters restrict the search to the
-half-open range C<[$lo, $hi)>. Defaults to C<[0, length)>.
 
 =head2 Time Zone Database
 
@@ -137,8 +153,8 @@ A POSIX TZ string has the form:
 Examples:
 
     EST5EDT,M3.2.0,M11.1.0          # US Eastern
-    CET-1CEST,M3.5.0/2,M10.5.0/3   # Central European
-    UTC0                             # Fixed UTC
+    CET-1CEST,M3.5.0/2,M10.5.0/3    # Central European
+    UTC0                            # Fixed UTC
 
 Transition rules may use C<Mm.w.d> (month/week/weekday), C<Jn>
 (Julian day excluding Feb 29), or C<n> (zero-based Julian day

@@ -4,7 +4,7 @@ AtteanX::Serializer::SPARQLJSON - SPARQL Results JSON Serializer
 
 =head1 VERSION
 
-This document describes AtteanX::Serializer::SPARQLJSON version 0.038
+This document describes AtteanX::Serializer::SPARQLJSON version 0.039
 
 =head1 SYNOPSIS
 
@@ -35,7 +35,7 @@ This document describes AtteanX::Serializer::SPARQLJSON version 0.038
 use v5.14;
 use warnings;
 
-package AtteanX::Serializer::SPARQLJSON 0.038 {
+package AtteanX::Serializer::SPARQLJSON 0.039 {
 	use Moo;
 	use Types::Standard qw(Str);
 	use Encode qw(encode);
@@ -76,32 +76,35 @@ L<IO::Handle> object C<< $fh >>.
 		my $fh		= shift;
 		my $iter	= shift;
 
-		my @vars	= sort @{ $iter->variables };
-
-		my $data	= {
-						head	=> { vars => \@vars },
-						results	=> { bindings => [] },
-						};
-
-		while (my $t = $iter->next()) {
-			my %binding;
-			foreach my $name ($t->variables) {
-				my $term = $t->value($name);
-				if (blessed($term)) {
-					my $type;
-					if ($term->does('Attean::API::IRI')) {
-						$type = 'uri';
-					} elsif ($term->does('Attean::API::Literal')) {
-						$type = 'literal';
-					} elsif ($term->does('Attean::API::Blank')) {
-						$type = 'bnode';
-					} else {
-						die 'Term object has an unrecognized type: ' . ref($term);
+		my $data	= {};
+		if ($iter->does('Attean::API::TermIterator')) {
+			my $v	= $iter->next;
+			my $b	= $v->canonicalized_term->value;
+			$data->{boolean}	= ($b eq 'true') ? $JSON::true : $JSON::false;
+		} else {
+			my @vars	= sort @{ $iter->variables };
+			$data->{head}{vars}	= \@vars;
+			$data->{results}	= { bindings => [] };
+			while (my $t = $iter->next()) {
+				my %binding;
+				foreach my $name ($t->variables) {
+					my $term = $t->value($name);
+					if (blessed($term)) {
+						my $type;
+						if ($term->does('Attean::API::IRI')) {
+							$type = 'uri';
+						} elsif ($term->does('Attean::API::Literal')) {
+							$type = 'literal';
+						} elsif ($term->does('Attean::API::Blank')) {
+							$type = 'bnode';
+						} else {
+							die 'Term object has an unrecognized type: ' . ref($term);
+						}
+					$binding{$name} = { type => $type, value => $term->value };
 					}
-				$binding{$name} = { type => $type, value => $term->value };
 				}
+				push(@{ $data->{results}{bindings} }, { %binding });
 			}
-			push(@{ $data->{results}{bindings} }, { %binding });
 		}
 
 		print {$fh} JSON->new->canonical(1)->encode($data);

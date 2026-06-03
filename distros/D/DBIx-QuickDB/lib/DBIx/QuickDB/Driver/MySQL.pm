@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::MySQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000044';
+our $VERSION = '0.000045';
 
 use Capture::Tiny qw/capture/;
 use Carp qw/confess croak/;

@@ -57,6 +57,7 @@ subtest 'update guards'=>sub {
 	unlink($fn);
 	$db->write();
 	chmod(oct('0400'),$fn);
-	eval {$db->write()};
-	like($@,qr/Failed to open/,'No write permissions');
+	# Skip this check on non-posix or if running as root
+	if(!defined($>)||($>==0)) { pass('No write permissions (skipped)') }
+	else { eval {$db->write()}; like($@,qr/Failed to open/,'No write permissions') }
 };

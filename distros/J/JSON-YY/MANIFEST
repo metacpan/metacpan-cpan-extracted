@@ -31,6 +31,10 @@ t/12_pod.t
 t/13_file_io.t
 t/14_unicode.t
 t/15_minor_gaps.t
+t/16_ro_ref_lifetime.t
+t/17_to_json_croak_leak.t
+t/18_borrowed_write.t
+t/19_jfind_bigint.t
 xt/leak.t
 YY.xs
 yyjson.c

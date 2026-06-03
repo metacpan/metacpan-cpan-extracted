@@ -2,7 +2,7 @@ package XML::PugiXML;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('XML::PugiXML', $VERSION);
@@ -137,7 +137,8 @@ Indent output.
 
 =item FORMAT_NO_DECLARATION()
 
-Omit XML declaration.
+Suppress the auto-added XML declaration. A declaration node already present in
+the tree (e.g. parsed with C<PARSE_DECLARATION>) is still written.
 
 =item FORMAT_RAW()
 
@@ -175,7 +176,9 @@ Default parsing options.
 
 =item PARSE_MINIMAL()
 
-Minimal parsing (fastest, no comments/PI/DOCTYPE).
+Minimal parsing (fastest): only elements and PCDATA are added to the tree, with
+no text conversions. CDATA sections, entity/character references, comments, PIs,
+DOCTYPE and the XML declaration are all disabled.
 
 =item PARSE_PI()
 
@@ -216,7 +219,9 @@ Parse DOCTYPE.
 
 =item PARSE_FULL()
 
-Full parsing (all features enabled).
+Full parsing: PARSE_DEFAULT plus PIs, comments, the XML declaration and DOCTYPE
+nodes. (Whitespace-only PCDATA is still not preserved -- add PARSE_WS_PCDATA for
+that.)
 
 =back
 
@@ -249,7 +254,10 @@ Return the source offset of this node (for debugging).
 
 =item valid()
 
-Return true if this is a valid node handle.
+Return true if this is a valid node handle. This detects a null handle and a
+handle left stale by a document C<reset>/reload, but B<not> a node that was
+removed from the tree: an orphaned node still reports as valid until the
+document is destroyed.
 
 =item root()
 
@@ -397,7 +405,8 @@ Get value as floating-point number.
 
 =item as_bool()
 
-Get value as boolean (recognizes "true", "1", "yes", "on").
+Get value as boolean: true when the first character is in the set C<1tTyY>
+(so "1", "true", "yes" are true; "on", "0", "off", "no", "" are false).
 
 =item element()
 
@@ -413,7 +422,9 @@ Set attribute name. Returns true on success.
 
 =item valid()
 
-Return true if this is a valid attribute handle.
+Return true if this is a valid attribute handle. This detects a null handle and
+a handle left stale by a document C<reset>/reload, but B<not> an attribute that
+was removed from its node.
 
 =back
 
@@ -489,7 +500,10 @@ See F<bench/benchmark.pl> for details.
 =head1 SECURITY
 
 pugixml does not process external entities (XXE) and is therefore
-safe against XXE attacks by default.
+safe against XXE attacks by default. It also does not expand user-defined
+internal entities declared in a DOCTYPE, so it is not vulnerable to
+entity-expansion ("billion laughs") attacks; such entity references are left
+unexpanded in the parsed text rather than being recursively expanded.
 
 =head1 THREAD SAFETY
 

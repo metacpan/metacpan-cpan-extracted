@@ -6,7 +6,7 @@ use Carp 'croak';
 use EV;
 
 BEGIN {
-    our $VERSION = '0.06';
+    our $VERSION = '0.07';
     use XSLoader;
     XSLoader::load __PACKAGE__, $VERSION;
 }
@@ -213,7 +213,7 @@ Called on connection-level errors (handshake failure, lost connection,
 unexpected protocol state). Default: C<sub { die @_ }>.
 
 Exceptions thrown inside either handler are caught and re-emitted as
-warnings — they cannot escape into the event loop.
+warnings -- they cannot escape into the event loop.
 
 =back
 
@@ -248,7 +248,7 @@ you need to know if a row existed regardless of whether it was modified.
 
 Character set name (e.g., C<utf8mb4>). Controls both result encoding
 and how string parameters are interpreted by the server. To round-trip
-Perl Unicode strings, set this to C<utf8> or C<utf8mb4> — see L</UNICODE>.
+Perl Unicode strings, set this to C<utf8> or C<utf8mb4> -- see L</UNICODE>.
 
 =item init_command => $sql
 
@@ -300,7 +300,7 @@ Methods divide into two scheduling classes:
 
 =item B<Queueable>
 
-C<query> can be called at any time the object is alive — before connect
+C<query> can be called at any time the object is alive -- before connect
 completes, while a utility op is running, or while other queries are
 already in flight. Calls are pipelined and their callbacks fire in
 FIFO order.
@@ -364,7 +364,7 @@ On error: C<(undef, $error_message)>.
 Queries are pipelined (see L</PIPELINING>): consecutive C<query> calls
 are dispatched as a batch and their callbacks fire in FIFO order. Safe
 to call before C<connect> completes or while an exclusive op
-(C<ping>, C<select_db>, ...) is in flight — the query is buffered
+(C<ping>, C<select_db>, ...) is in flight -- the query is buffered
 until the connection is idle. Dies with C<"not connected"> if no
 connection exists (never connected, or already closed via C<finish>).
 
@@ -443,7 +443,7 @@ C<undef> for C<$db> to keep the current database. The new credentials
 are cached for C<reset>; the cache is rolled back if the change fails.
 
 B<Note:> The server discards all prepared statements as part of this
-operation — see L</reset_connection> for details.
+operation -- see L</reset_connection> for details.
 
 =head2 reset_connection
 
@@ -508,7 +508,7 @@ C<mysql_use_result>/C<mysql_fetch_row>. The callback is invoked:
 
 =back
 
-Unlike C<query>, rows are not buffered — suitable for very large
+Unlike C<query>, rows are not buffered -- suitable for very large
 result sets. No other queries can be queued while streaming is active.
 
 =head2 close_async
@@ -585,9 +585,11 @@ C<"connection is closing"> while C<close_async> is in flight.
 Cancels every pending, queued, and in-flight operation, invoking their
 callbacks with C<(undef, "skipped")>. If sent queries are still
 awaiting results (or an exclusive op is in flight), the underlying
-connection is also closed — call C<reset> afterwards to reconnect.
+connection is also closed -- call C<reset> afterwards to reconnect.
 Queries that were merely queued are cancelled without disturbing the
-connection.
+connection. When called from within a callback (for example a
+C<query_stream> row callback), that same callback is not re-invoked with
+the C<"skipped"> error -- you are already inside it.
 
 =head2 on_connect
 
@@ -718,7 +720,7 @@ Client library version string.
 When multiple queries are submitted before the event loop processes
 I/O, EV::MariaDB pipelines them: queries are dispatched to the server
 in a single batch, then results are read back in order. This
-eliminates per-query round-trip latency and can yield 2–3× higher
+eliminates per-query round-trip latency and can yield 2-3x higher
 throughput than sequential execution.
 
     # all 100 queries are pipelined
@@ -759,7 +761,7 @@ Binary and non-UTF-8 columns are returned as raw bytes. Column names
 in C<$fields> are UTF-8-flagged whenever the connection charset is
 C<utf8> or C<utf8mb4>, regardless of this option.
 
-Without C<< utf8 => 1 >>, all values are byte strings — decode with
+Without C<< utf8 => 1 >>, all values are byte strings -- decode with
 L<Encode/decode_utf8>.
 
 =head2 Writing

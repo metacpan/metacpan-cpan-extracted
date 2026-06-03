@@ -161,7 +161,7 @@ sub http_req {
     my $status = shift @lines;
     my %h;
     for (@lines) { $h{lc $1} = $2 if /^([^:]+):\s*(.*)$/ }
-    return ($status, \%h, defined $body ? $body : '');
+    return ($status, { %h }, defined $body ? $body : '');
 }
 
 # --- GET /hello (ok 2-6) ------------------------------------------------

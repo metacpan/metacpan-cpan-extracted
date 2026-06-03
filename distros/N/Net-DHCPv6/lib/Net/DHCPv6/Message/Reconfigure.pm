@@ -4,9 +4,11 @@
 use strictures 2;
 
 package Net::DHCPv6::Message::Reconfigure;
-$Net::DHCPv6::Message::Reconfigure::VERSION = '0.002';
-use Net::DHCPv6::Packet;
-use Net::DHCPv6::Constants;
+$Net::DHCPv6::Message::Reconfigure::VERSION = '0.003';
+use Net::DHCPv6::Packet    ();
+use Net::DHCPv6::Constants qw(
+    $RECONFIGURE
+);
 use parent 'Net::DHCPv6::Packet';
 use namespace::clean;
 
@@ -32,7 +34,7 @@ Net::DHCPv6::Message::Reconfigure - Reconfigure message (type 10)
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

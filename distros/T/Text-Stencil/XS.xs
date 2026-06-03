@@ -514,6 +514,16 @@ parse_chain:;
         op->chain[op->chain_len++] = parse_xform(p, (int)(pipe - p));
         p = pipe + 1;
     }
+
+    /* count/coalesce operate on the raw field value (array/hash size, or the
+       first truthy field), so they are only meaningful as the first transform.
+       Mid-chain they would silently emit "0"/nothing; reject at compile time. */
+    for (int i = 1; i < op->chain_len; i++) {
+        if (op->chain[i].type == XF_COUNT)
+            croak("Text::Stencil: 'count' must be the first transform in a chain");
+        if (op->chain[i].type == XF_COALESCE)
+            croak("Text::Stencil: 'coalesce' must be the first transform in a chain");
+    }
 }
 
 static tpl_compiled *tpl_compile(pTHX_ const char *header, STRLEN hlen,
@@ -589,6 +599,14 @@ static tpl_compiled *tpl_compile(pTHX_ const char *header, STRLEN hlen,
         if (!buf) croak("realloc"); \
         t->render_buf = buf; t->render_buf_alloc = alloc; \
     } \
+    /* Detach the reusable buffer for the render's duration. The live buffer \
+       lives only in the local `buf`; a BUF_ENSURE/render_field realloc can \
+       move it, and a render path can croak (e.g. a row callback dies). \
+       Leaving t->render_buf NULL until RBUF_FINISH guarantees DESTROY and the \
+       next render never free/realloc a stale pointer. A croak mid-render \
+       loses the in-flight buffer -- a bounded, error-path-only leak traded \
+       for memory safety. */ \
+    t->render_buf = NULL; t->render_buf_alloc = 0; \
     pos = 0; \
 } while(0)
 #define RBUF_FINISH(t) do { t->render_buf = buf; t->render_buf_alloc = alloc; } while(0)
@@ -781,6 +799,9 @@ static void apply_xform(tpl_xform *xf, const char *src, STRLEN slen,
         break;
     }
     case XF_COUNT: {
+        /* unreachable: count must be the first transform (compile-time croak
+           otherwise) and is handled in render_field before apply_xform; kept
+           for -Wswitch completeness */
         OUT_ENSURE(12);
         int w = itoa_fast(OUT_PTR, xf->param_int);
         if (to_output) pos += w; else tmp_len = w;
@@ -907,8 +928,10 @@ static void apply_xform(tpl_xform *xf, const char *src, STRLEN slen,
     }
     case XF_PLURAL: {
         long v = 0;
-        for (STRLEN i = 0; i < slen; i++)
+        STRLEN pi = (slen > 0 && src[0] == '-') ? 1 : 0;
+        for (STRLEN i = pi; i < slen; i++)
             if (src[i] >= '0' && src[i] <= '9') v = v * 10 + (src[i] - '0');
+        if (pi) v = -v;   /* preserve sign: -1 is plural, and itoa keeps the '-' */
         const char *form; STRLEN flen;
         if (v == 1) {
             form = xf->param_str ? xf->param_str : ""; flen = xf->param_str_len;
@@ -1141,7 +1164,6 @@ static void render_field(pTHX_ tpl_op *op, SV *row_sv, enum row_mode mode,
                 const char *next = memchr(p, ':', pe - p);
                 STRLEN seg_len = next ? (STRLEN)(next - p) : (STRLEN)(pe - p);
                 if (!next && p == last_param) break; /* this is the literal default */
-                if (next && next + 1 >= pe) { /* second-to-last could be last_param if no more colons */ }
                 /* check if this is not the last param */
                 if (p != last_param || next) {
                     /* try to fetch this field from the row */
@@ -1204,7 +1226,7 @@ static void render_field(pTHX_ tpl_op *op, SV *row_sv, enum row_mode mode,
         (op->chain[0].type == XF_COUNT || op->chain[0].type == XF_COALESCE))) {
         /* for int/float types as first transform, use numeric conversion */
         if (op->chain_len > 0 && (op->chain[0].type == XF_INT || op->chain[0].type == XF_INT_COMMA)) {
-            char ibuf[20];
+            char ibuf[28];   /* itoa_comma needs up to 26 ("-9,223,372,036,854,775,808"); itoa_fast 20 */
             int ilen = (op->chain[0].type == XF_INT) ? itoa_fast(ibuf, SvIV_nomg(sv)) : itoa_comma(ibuf, SvIV_nomg(sv));
             if (op->chain_len == 1) {
                 char *buf = *bufp; STRLEN pos = *posp; STRLEN alloc = *allocp;
@@ -1392,6 +1414,10 @@ static int sort_cmp_desc(const void *a, const void *b) {
     return sort_cmp_multi((const sort_entry *)b, (const sort_entry *)a);
 }
 
+/* libc free() as a SAVEDESTRUCTOR_X callback. The sort scratch is malloc'd,
+   not Newx'd, so SAVEFREEPV/Safefree would mismatch on DEBUGGING perls. */
+static void ts_free(pTHX_ void *p) { free(p); }
+
 static SV *tpl_render_sorted(pTHX_ tpl_compiled *t, AV *rows,
                               int *sort_cols, const char **sort_keys, STRLEN *sort_key_lens,
                               int nsort, int descending, int numeric) {
@@ -1402,6 +1428,16 @@ static SV *tpl_render_sorted(pTHX_ tpl_compiled *t, AV *rows,
     if (nrows > 0 && !entries) croak("malloc");
     const char **all_keys = nrows > 0 ? (const char **)calloc(nrows * nsort, sizeof(char *)) : NULL;
     STRLEN *all_lens = nrows > 0 ? (STRLEN *)calloc(nrows * nsort, sizeof(STRLEN)) : NULL;
+    /* Free the sort scratch on scope exit, so a croak mid-render (e.g. an OOM
+       realloc in BUF_ENSURE) frees it on the unwind instead of leaking it;
+       LEAVE frees it on the normal path. */
+    ENTER;
+    if (entries)  SAVEDESTRUCTOR_X(ts_free, entries);
+    if (all_keys) SAVEDESTRUCTOR_X(ts_free, all_keys);
+    if (all_lens) SAVEDESTRUCTOR_X(ts_free, all_lens);
+    /* checked after the SAVEDESTRUCTORs so the unwind frees entries; an
+       unchecked NULL here would segfault at entries[i].keys below */
+    if (nrows > 0 && (!all_keys || !all_lens)) croak("calloc");
     for (SSize_t i = 0; i < nrows; i++) {
         SV **rowref = av_fetch(rows, i, 0);
         entries[i].sv = rowref ? *rowref : &PL_sv_undef;
@@ -1450,11 +1486,10 @@ static SV *tpl_render_sorted(pTHX_ tpl_compiled *t, AV *rows,
         }
     }
     BUF_WRITE(t->footer, t->footer_len);
-    if (all_keys) free(all_keys);
-    if (all_lens) free(all_lens);
-    free(entries);
     RBUF_FINISH(t);
-    return newSVpvn_utf8(buf, pos, 1);
+    SV *result = newSVpvn_utf8(buf, pos, 1);
+    LEAVE;   /* runs the SAVEDESTRUCTOR_X frees for entries/all_keys/all_lens */
+    return result;
 }
 
 static SV *tpl_render_one(pTHX_ tpl_compiled *t, SV *row_sv) {
@@ -1525,8 +1560,17 @@ static SV *tpl_render_cb(pTHX_ tpl_compiled *t, SV *cb, PerlIO *fh) {
         ENTER; SAVETMPS;
         PUSHMARK(SP);
         PUTBACK;
-        int count = call_sv(cb, G_SCALAR);
+        int count = call_sv(cb, G_SCALAR | G_EVAL);
         SPAGAIN;
+        if (SvTRUE(ERRSV)) {
+            /* The row callback died: free our render buffer (the fh path's
+               own malloc, or the detached render_buf) before propagating, so
+               a dying callback can't leak it. */
+            SV *err = newSVsv(ERRSV);
+            PUTBACK; FREETMPS; LEAVE;
+            free(buf);
+            croak_sv(sv_2mortal(err));
+        }
         SV *row_sv = NULL;
         if (count > 0) row_sv = POPs;
         if (!row_sv || !SvOK(row_sv) || !SvROK(row_sv)) {

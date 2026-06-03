@@ -4,19 +4,33 @@
 use strictures 2;
 
 package Net::DHCPv6::Option::NtpServer;
-$Net::DHCPv6::Option::NtpServer::VERSION = '0.002';
-use Net::DHCPv6::OptionList;
-use Carp qw( croak );
-use Net::DHCPv6::Constants;
-use Net::DHCPv6::X::Truncated;
+$Net::DHCPv6::Option::NtpServer::VERSION = '0.003';
+use Net::DHCPv6::OptionList ();
+use Net::DHCPv6::Constants  qw(
+    $OPTION_NTP_SERVER
+);
+use Net::DHCPv6::X::Truncated ();
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
-my $EMPTY = q();
+my $EMPTY              = q();
+my $NTP_SUBOPT_ADDR    = 1;
+my $NTP_SUBOPT_DOMAIN  = 3;     ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
+my $NTP_SUBOPT_FQDN    = 2;
+my $NTP_SUBOPT_HDR_LEN = 4;     ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 
 my %SUBOPT_DECODE = (
-    1 => sub { my ( $v ) = @_; return { subopt => 1, type => 'address', value => $v } },
-    2 => sub { my ( $v ) = @_; return { subopt => 2, type => 'fqdn',    value => $v } },
-    3 => sub { my ( $v ) = @_; return { subopt => 3, type => 'domain',  value => $v } },
+    $NTP_SUBOPT_ADDR => sub {
+        my ( $v ) = @_;
+        return { subopt => $NTP_SUBOPT_ADDR, type => 'address', value => $v };
+    },
+    $NTP_SUBOPT_FQDN => sub {
+        my ( $v ) = @_;
+        return { subopt => $NTP_SUBOPT_FQDN, type => 'fqdn', value => $v };
+    },
+    $NTP_SUBOPT_DOMAIN => sub {
+        my ( $v ) = @_;
+        return { subopt => $NTP_SUBOPT_DOMAIN, type => 'domain', value => $v };
+    },
 );
 
 sub new {
@@ -34,28 +48,28 @@ sub entries { return shift->{entries} }
 
 sub from_bytes_inner {
     my ( $class, $code, $payload ) = @_;
-    my @entries;
+    my @decoded;
     my $len = CORE::length( $payload );
     my $off = 0;
-    while ( $off + 4 <= $len ) {
+    while ( $off + $NTP_SUBOPT_HDR_LEN <= $len ) {
         my $sc   = unpack( 'n', substr( $payload, $off,     2 ) );
         my $slen = unpack( 'n', substr( $payload, $off + 2, 2 ) );
-        $off += 4;
+        $off += $NTP_SUBOPT_HDR_LEN;
         Net::DHCPv6::X::Truncated->throw( message => 'Truncated NtpServer sub-option' )
             if $off + $slen > $len;
         my $sv = substr( $payload, $off, $slen );
         $off += $slen;
         my $decoder = $SUBOPT_DECODE{$sc};
         if ( $decoder ) {
-            push @entries, $decoder->( $sv );
+            push @decoded, $decoder->( $sv );
         }
         else {
-            push @entries, { subopt => $sc, value => $sv };
+            push @decoded, { subopt => $sc, value => $sv };
         }
     }
     Net::DHCPv6::X::Truncated->throw( message => 'Truncated NtpServer sub-option header' )
         if $off != $len;
-    return $class->new( entries => \@entries );
+    return $class->new( entries => \@decoded );
 }
 
 $Net::DHCPv6::OptionList::OPTION_CLASS{$OPTION_NTP_SERVER} = __PACKAGE__;
@@ -73,7 +87,7 @@ Net::DHCPv6::Option::NtpServer - NTP Server option (code 56) -- sub-options for 
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

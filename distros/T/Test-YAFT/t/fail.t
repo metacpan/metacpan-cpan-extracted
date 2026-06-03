@@ -3,40 +3,35 @@
 use v5.14;
 use warnings;
 
-use require::relative "test-helper.pl";
+use require::relative q (test-helper.pl);
 
-subtest "when just fails" => sub {
-	Test::Tester::check_test
-		sub {
-			fail "when just fails";
-		},
-		{
-			ok          => 0,
-			actual_ok   => 0,
-			name        => "when just fails",
-			diag        => "",
-		},
-		"when just fails"
+assume_test_yaft_exports fail
+	=> by_default => 1
+	=> on_demand  => 1
+	=> by_tag     => [qw [all default assumptions asserts]]
 	;
-};
 
-subtest "when failing with custom diag" => sub {
-	Test::Tester::check_test
-		sub {
-			fail "when failing with custom diag"
-				=> diag   => 'custom diag'
-				;
-		},
-		{
-			ok          => 0,
-			actual_ok   => 0,
-			name        => 'when failing with custom diag',
-			diag        => 'custom diag',
-		},
-		"when failing with custom diag"
+check_test q (when just fails)
+	=> assumption {
+		fail q (when just fails);
+	}
+	=> ok          => 0
+	=> actual_ok   => 0
+	=> name        => q (when just fails)
+	=> diag        => undef
 	;
-};
+
+check_test q (when failing with custom diag)
+	=> assumption {
+		fail q (when failing with custom diag)
+			=> diag   => q (custom diag)
+			;
+	}
+	=> ok          => 0
+	=> actual_ok   => 0
+	=> name        => q (when failing with custom diag)
+	=> diag        => q (custom diag)
+	;
 
 had_no_warnings;
-
-Test::More::done_testing;
+done_testing;

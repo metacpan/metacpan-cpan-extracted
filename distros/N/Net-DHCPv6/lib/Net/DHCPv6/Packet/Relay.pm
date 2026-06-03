@@ -4,12 +4,12 @@
 use strictures 2;
 
 package Net::DHCPv6::Packet::Relay;
-$Net::DHCPv6::Packet::Relay::VERSION = '0.002';
-use Net::DHCPv6::Constants qw( $IPV6_ADDR_LEN );
-use Net::DHCPv6::Packet;
-use Carp qw( croak );
-use Net::DHCPv6::OptionList;
-use Net::DHCPv6::X::BadMessage;
+$Net::DHCPv6::Packet::Relay::VERSION = '0.003';
+use Net::DHCPv6::Constants     qw( $IPV6_ADDR_LEN );
+use Net::DHCPv6::Packet        ();
+use Carp                       qw( croak );
+use Net::DHCPv6::OptionList    ();
+use Net::DHCPv6::X::BadMessage ();
 use parent 'Net::DHCPv6::Helpers', 'Net::DHCPv6::Packet';
 use namespace::clean;
 
@@ -94,7 +94,7 @@ Net::DHCPv6::Packet::Relay - Base class for DHCPv6 relay messages (RelayForw/Rel
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

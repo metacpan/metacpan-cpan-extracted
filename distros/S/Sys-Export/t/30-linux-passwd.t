@@ -52,7 +52,7 @@ is( \%passwd,
          field uid => 0;
          field gid => 0;
          field mode => (S_IFREG | 0644);
-         field data => <<~END;
+         field data => \<<~END;
          u1:x:1001:100:::
          u3:*:1003:1002:::
          END
@@ -62,7 +62,7 @@ is( \%passwd,
          field uid => 0;
          field gid => 0;
          field mode => (S_IFREG | 0644);
-         field data => <<~END;
+         field data => \<<~END;
          users:*:100:
          g2:*:1002:
          g3:*:1003:u3
@@ -73,7 +73,7 @@ is( \%passwd,
          field uid => 0;
          field gid => 0;
          field mode => (S_IFREG | 0600);
-         field data => <<~END;
+         field data => \<<~END;
          u1:${pass_hash}:::::::
          END
          etc;

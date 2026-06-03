@@ -1,5 +1,76 @@
 Revision history for Schema::Validator - Tools for validating and loading Schema.org vocabulary definitions
 
+0.03	Tue Jun  2 18:45:25 EDT 2026
+	[ Bug Fixes ]
+	- Handle address not being in parts
+	- Fix mkdir operator-precedence bug that silently ignored directory creation failures
+	- Fix cache read: open failure now warns gracefully instead of dereferencing undef filehandle
+	- Fix cache write: open failure now warns instead of crashing on undef filehandle print
+	- Fix TOCTOU race between file existence check and open by opening directly
+	- Add stale-cache fallback when network fetch of Schema.org vocabulary fails
+	- Fix exit code being overwritten by each validation error; first error now wins
+	- Fix enum validation false-positives for array/hash-valued JSON-LD properties
+	- Fix addressCountry static enum to use ISO 3166-1 alpha-2 codes (was mixed underscore strings)
+	- Fix Boolean property validation to accept JSON::PP::Boolean objects (decoded true/false)
+	- Fix country code validation to accept ISO 3166-1 alpha-3 codes (e.g. USA) as well as alpha-2
+	- Fix startDate property_validations key casing (was lowercase 'startdate', never matched JSON-LD)
+	- Fix SARIF uri field being undef when reading from STDIN; now defaults to '-'
+	- Fix Integer validation incorrectly accepting decimal numbers (was sharing Number regex)
+	- Fix die list-form in bin/extract-event losing the URL from the error message
+	- Fix bin/extract-event2 die list-form losing the URL from the error message
+	- Fix %config declared as lexical (my); changed to our so callers can override
+	  ua_timeout, cache_file, cache_duration, vocab_url at runtime
+	- Fix default cache_file location: was CWD-relative; now uses $ENV{CACHEDIR}
+	  if set, otherwise File::Spec->tmpdir() (e.g. /tmp), never the process CWD
+	- Fix crash when Schema.org vocabulary JSON is a non-object (e.g. a bare array);
+	  load_dynamic_vocabulary now carps and returns {} instead of dying "Not a HASH reference"
+	- Fix POD for is_valid_datetime: PURPOSE section incorrectly stated timezone offsets
+	  and calendar sanity were not validated; both are enforced via DateTime::Format::ISO8601
+	- Fix POD for load_dynamic_vocabulary: ARGUMENTS spec had optional=>1 for the required
+	  string parameter; corrected to optional=>0
+	- Fix POD NOTES for load_dynamic_vocabulary: stale note claimed bin/validate-schema had
+	  its own independent copy; it now imports from the module
+
+	[ Enhancements ]
+	- Replace is_valid_datetime regex with DateTime::Format::ISO8601; now rejects invalid
+	  calendar values (e.g. month 99) and accepts timezone designators (Z, +HH:MM)
+	- Replace email validation regex in validate_property_format with Email::Valid
+	- Replace DateTime type-branch regex in validate_property_format with is_valid_iso8601,
+	  consistent with the adjacent Date branch
+	- Replace Number validation regex with Scalar::Util::looks_like_number (was imported
+	  but unused); Integer now validated separately with a strict /^\d+$/ pattern
+	- Replace JSON-LD extraction regex in bin/extract-event with Mojo::DOM CSS selector,
+	  handling CDATA sections and unusual attribute ordering
+	- Replace HTML::TreeBuilder and JSON-LD extraction regex in bin/extract-event2 with
+	  Mojo::DOM throughout; removes the HTML::TreeBuilder dependency
+	- Hoist validate-schema exit-code map to file-level Readonly::Hash; was rebuilt on
+	  every push_validation call
+	- Add property-name Readonly constants to validate-schema; removes magic strings
+	  from the static schema rules table
+	- Import is_valid_datetime and load_dynamic_vocabulary from Schema::Validator module
+	  into bin/validate-schema; removes ~160 lines of duplicated code
+	- Add _organizer_field helper to bin/extract-event; removes duplicated organizer
+	  array/object extraction logic
+	- Switch bin/extract-event and bin/extract-event2 from JSON to JSON::MaybeXS
+	- Add Email::Valid, Mojolicious, and Readonly to cpanfile prerequisites
+	- Added a test dashboard
+
+	[ Tests ]
+	- Add t/function.t: white-box subtests for every function including internal helpers
+	  (_slurp_file, _spit_file, _fetch_url, _extract_label, _parse_graph) using
+	  Test::Mockingbird; 41 subtests
+	- Add t/unit.t: black-box unit tests per POD API documentation; 33 subtests
+	- Add t/integration.t: end-to-end tests across both public functions with
+	  Test::Mockingbird::Spy verifying external call arguments; 29 subtests
+	- Add t/edge_cases.t: destructive, pathological, boundary, and security subtests
+	  including typeglob inputs, circular references, and upstream failure mocks; 49 subtests
+	- Add t/extended_tests.t: coverage-gap targeted tests achieving >=97% statement coverage;
+	  documents two genuinely unreachable paths; 27 subtests
+	- Add t/mutant_killers.t: mutant-killing tests for all 21 stubs in the generated
+	  xt/mutant_*.t stub; kills BOOL_NEGATE, RETURN_UNDEF, COND_INV, NUM_BOUNDARY mutations
+	  across lines 297-711 using utime-based cache-freshness boundary tests; 27 subtests
+	- Total test suite: 228 subtests across 10 files, all passing under prove -lt
+
 0.02	Fri Dec 12 11:01:38 EST 2025
 	Install the bin
 	LWP::Protocol::https declared as prerequisite

@@ -28,10 +28,10 @@ note "exporter src: '".$exporter->src."'";
 
 for (
    [ 'usr/local/bin'      => 'usr/bin' ],
+   [ 'usr/local/./bin'    => 'usr/bin' ],
    [ 'usr/local/sbin'     => 'usr/bin' ],
+   [ 'usr/local/../../bin'=> 'usr/bin' ],
    [ 'usr/local/datafile' => 'usr/local/datafile' ],
-   [ 'usr/local/bin'      => 'usr/bin' ],
-   [ 'usr/local/sbin'     => 'usr/bin' ],
 ) {
    is( $exporter->_src_abs_path( $_->[0] ), $_->[1], $_->[0] );
 }
@@ -39,7 +39,7 @@ for (
 $exporter= Sys::Export::Unix->new(src => '/', dst => File::Temp->newdir);
 note "exporter src: '".$exporter->src."'";
 for (
-   [ "$tmp_abs/self"               => substr($tmp,1) ],
+   [ "$tmp_abs/self"               => substr($tmp_abs,1) ],
    # hide these from systems where /bin is a symlink or doesn't exist
    (-d '/bin' && !-l '/bin'? (
       [ "$tmp_abs/usr/local/bin"      => 'bin' ],

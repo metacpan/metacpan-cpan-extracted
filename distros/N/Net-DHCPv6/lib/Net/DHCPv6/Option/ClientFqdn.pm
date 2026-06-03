@@ -4,13 +4,15 @@
 use strictures 2;
 
 package Net::DHCPv6::Option::ClientFqdn;
-$Net::DHCPv6::Option::ClientFqdn::VERSION = '0.002';
-use Net::DHCPv6::OptionList;
-use Net::DHCPv6::Option;
-use Carp qw( croak );
-use Net::DHCPv6::Constants;
-use Net::DHCPv6::X::Truncated;
-use Net::DHCPv6::X::BadOption;
+$Net::DHCPv6::Option::ClientFqdn::VERSION = '0.003';
+use Net::DHCPv6::OptionList ();
+use Net::DHCPv6::Option     ();
+use Carp                    qw( croak );
+use Net::DHCPv6::Constants  qw(
+    $DN_COMPRESS_MASK $DN_LABEL_MASK $OPTION_CLIENT_FQDN
+);
+use Net::DHCPv6::X::Truncated ();
+use Net::DHCPv6::X::BadOption ();
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
 my $EMPTY         = q();
@@ -66,7 +68,7 @@ sub _decode_domain {
     return $EMPTY unless CORE::length( $payload );
     my $offset = 0;
     my @labels = _read_labels_at( $payload, \$offset, CORE::length( $payload ) );
-    return join( '.', @labels );
+    return join( q{.}, @labels );
 }
 
 sub new {
@@ -110,7 +112,7 @@ Net::DHCPv6::Option::ClientFqdn - Client FQDN option (code 39) -- flags + domain
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

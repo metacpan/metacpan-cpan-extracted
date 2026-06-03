@@ -2,13 +2,13 @@
 ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 use strictures 2;
 use Test2::Tools::Exception qw( dies );
-use Net::DHCPv6::Packet;
-use Test2::V1 -ipP, qw(is ok done_testing);    ## no critic (Subroutines::ProhibitCallsToUndeclaredSubs)
+use Net::DHCPv6::Packet     ();
+use Test2::V1 -ipP,         qw(is ok done_testing);    ## no critic (Subroutines::ProhibitCallsToUndeclaredSubs)
 
 use lib 't/lib';
 use lib 'lib';
 
-use Net::DHCPv6;
+use Net::DHCPv6       ();
 use Test::Net::DHCPv6 qw(hex2bytes solicit_hex advertise_hex request_hex reply_hex);
 my $EMPTY = q();
 
@@ -86,7 +86,7 @@ ok( defined $err,  'decode_with_error returns error for truncated' );
 # Packet->new($bytes) sugar
 $bytes  = hex2bytes( solicit_hex() );
 $packet = Net::DHCPv6::Packet->new( $bytes );
-ok( $packet->isa( 'Net::DHCPv6::Message::Solicit' ), 'Packet->new($bytes) delegates' );
+ok( $packet->isa( 'Net::DHCPv6::Message::Solicit' ), q{Packet->new($bytes) delegates} );    ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
 
 # decode_or_croak on empty data
 ok( dies { Net::DHCPv6->decode_or_croak( $EMPTY ) }, 'decode_or_croak with empty dies' );

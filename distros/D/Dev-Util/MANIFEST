@@ -47,6 +47,7 @@ t/perltidy.t
 VERSION
 xt/00-report-prereqs.t
 xt/boilerplate.t
+xt/cpan-meta.t
 xt/critic.t
 xt/eol.t
 xt/kwalitee.t

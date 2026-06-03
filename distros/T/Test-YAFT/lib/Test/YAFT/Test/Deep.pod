@@ -73,7 +73,7 @@ Replaced with C<it> (which btw internally uses it)
 
 =item cmp_details
 
-Reexportable (tag plumbing)
+Reexportable (tag C<foundations>)
 
 =item cmp_methods
 
@@ -89,11 +89,11 @@ Reexported as C<expect_code>
 
 =item deep_diag
 
-Reexportable (tag plumbing)
+Reexportable (tag C<foundations>)
 
 =item eq_deeply
 
-Reexportable (tag plumbing)
+Reexportable (tag C<foundations>)
 
 =item hash
 

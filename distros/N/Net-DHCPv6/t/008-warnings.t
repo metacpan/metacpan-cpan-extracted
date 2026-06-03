@@ -5,18 +5,23 @@ use Test2::V1 -ipP, qw(is ok like subtest done_testing);    ## no critic (Subrou
 use lib 't/lib';
 use lib 'lib';
 
-use Net::DHCPv6;
-use Net::DHCPv6::Constants;
-use Net::DHCPv6::Option::SipServerD;
-use Net::DHCPv6::Option::ORO;
-use Net::DHCPv6::Option::Preference;
-use Net::DHCPv6::Option::ElapsedTime;
-use Net::DHCPv6::Option::StatusCode;
-use Net::DHCPv6::Option::RapidCommit;
-use Net::DHCPv6::Option::DomainList;
-use Net::DHCPv6::Option::ClientId;
-use Net::DHCPv6::Option::SntpServers;
-use Net::DHCPv6::DUID;
+use Net::DHCPv6            ();
+use Net::DHCPv6::Constants qw(
+    $LINK_TYPE_ETHERNET
+    $OPTION_DNS_SERVERS $OPTION_DOMAIN_LIST $OPTION_ELAPSED_TIME
+    $OPTION_ORO $OPTION_PREFERENCE $OPTION_RAPID_COMMIT
+    $OPTION_SNTP_SERVERS $OPTION_STATUS_CODE
+);
+use Net::DHCPv6::Option::SipServerD  ();
+use Net::DHCPv6::Option::ORO         ();
+use Net::DHCPv6::Option::Preference  ();
+use Net::DHCPv6::Option::ElapsedTime ();
+use Net::DHCPv6::Option::StatusCode  ();
+use Net::DHCPv6::Option::RapidCommit ();
+use Net::DHCPv6::Option::DomainList  ();
+use Net::DHCPv6::Option::ClientId    ();
+use Net::DHCPv6::Option::SntpServers ();
+use Net::DHCPv6::DUID                ();
 
 # Warning-testing pattern for use with strictures 2.
 #
@@ -32,7 +37,7 @@ sub _warns (&) {
     my $code  = shift;
     my $count = 0;
     local $SIG{__WARN__} = sub { $count++ };
-    eval { $code->() };
+    eval { $code->() };    ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
     return $count;
 }
 
@@ -40,7 +45,7 @@ sub _warnings (&) {
     my $code = shift;
     my @warnings;
     local $SIG{__WARN__} = sub { push @warnings, @_ };
-    eval { $code->() };
+    eval { $code->() };    ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
     return \@warnings;
 }
 
@@ -48,7 +53,7 @@ sub _no_warnings (&) {
     my $code  = shift;
     my $count = 0;
     local $SIG{__WARN__} = sub { $count++ };
-    eval { $code->() };
+    eval { $code->() };    ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
     return $count == 0;
 }
 
@@ -65,8 +70,8 @@ subtest 'clean code produces no warnings' => sub {
 
     ok(
         _no_warnings {
-            my $o = Net::DHCPv6::Option::ORO->new( requested_options => [ 23, 24 ] );
-            is( $o->code, 6, 'ORO construction clean' );
+            my $o = Net::DHCPv6::Option::ORO->new( requested_options => [ $OPTION_DNS_SERVERS, $OPTION_DOMAIN_LIST ] );
+            is( $o->code, $OPTION_ORO, 'ORO construction clean' );
         },
         'no warnings during ORO construction'
     );
@@ -74,7 +79,7 @@ subtest 'clean code produces no warnings' => sub {
     ok(
         _no_warnings {
             my $o = Net::DHCPv6::Option::Preference->new( value => 255 );
-            is( $o->code, 7, 'Preference construction clean' );
+            is( $o->code, $OPTION_PREFERENCE, 'Preference construction clean' );
         },
         'no warnings during Preference construction'
     );
@@ -82,7 +87,7 @@ subtest 'clean code produces no warnings' => sub {
     ok(
         _no_warnings {
             my $o = Net::DHCPv6::Option::ElapsedTime->new( centiseconds => 1000 );
-            is( $o->code, 8, 'ElapsedTime construction clean' );
+            is( $o->code, $OPTION_ELAPSED_TIME, 'ElapsedTime construction clean' );
         },
         'no warnings during ElapsedTime construction'
     );
@@ -90,7 +95,7 @@ subtest 'clean code produces no warnings' => sub {
     ok(
         _no_warnings {
             my $o = Net::DHCPv6::Option::StatusCode->new( status_code => 0, message => 'OK' );
-            is( $o->code, 13, 'StatusCode construction clean' );
+            is( $o->code, $OPTION_STATUS_CODE, 'StatusCode construction clean' );
         },
         'no warnings during StatusCode construction'
     );
@@ -98,7 +103,7 @@ subtest 'clean code produces no warnings' => sub {
     ok(
         _no_warnings {
             my $o = Net::DHCPv6::Option::RapidCommit->new;
-            is( $o->code, 14, 'RapidCommit construction clean' );
+            is( $o->code, $OPTION_RAPID_COMMIT, 'RapidCommit construction clean' );
         },
         'no warnings during RapidCommit construction'
     );
@@ -106,14 +111,14 @@ subtest 'clean code produces no warnings' => sub {
     ok(
         _no_warnings {
             my $o = Net::DHCPv6::Option::DomainList->new( domains => [] );
-            is( $o->code, 24, 'DomainList construction clean' );
+            is( $o->code, $OPTION_DOMAIN_LIST, 'DomainList construction clean' );
         },
         'no warnings during DomainList construction'
     );
 
     ok(
         _no_warnings {
-            my $duid = Net::DHCPv6::DUID->new_llt( $LINK_TYPE_ETHERNET, 123_456, pack( 'H*', '001122334455' ) );
+            my $duid = Net::DHCPv6::DUID->new_llt( $LINK_TYPE_ETHERNET, 123_456, pack( 'H*', '001122334455' ) );    ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
             my $o    = Net::DHCPv6::Option::ClientId->new( duid => $duid );
             is( $o->code, 1, 'ClientId construction clean' );
         },
@@ -123,7 +128,7 @@ subtest 'clean code produces no warnings' => sub {
     ok(
         _no_warnings {
             my $o = Net::DHCPv6::Option::SntpServers->new( servers => ['2001:db8::1'] );
-            is( $o->code, 31, 'SntpServers construction clean' );
+            is( $o->code, $OPTION_SNTP_SERVERS, 'SntpServers construction clean' );
         },
         'no warnings during SntpServers construction'
     );

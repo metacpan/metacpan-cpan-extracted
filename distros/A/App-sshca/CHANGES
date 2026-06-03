@@ -1,4 +1,11 @@
 
+0.0.7   2026-06-03
+   [Fixed]
+     - Resolution of 'basedir' argument to 'init' subcommand
+     - Incorrect precedence in configuration option lookup
+     - Provide debug output for 'init' command with '--debug' option
+     - Processing continues even when invalid option provided
+
 0.0.6   2026-03-20
    [Added]
      - Add '--issued' option to 'list' command to exclude

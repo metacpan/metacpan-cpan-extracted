@@ -4,10 +4,12 @@
 use strictures 2;
 
 package Net::DHCPv6::Option::UserClass;
-$Net::DHCPv6::Option::UserClass::VERSION = '0.002';
-use Net::DHCPv6::OptionList;
-use Net::DHCPv6::Constants;
-use Net::DHCPv6::X::Truncated;
+$Net::DHCPv6::Option::UserClass::VERSION = '0.003';
+use Net::DHCPv6::OptionList ();
+use Net::DHCPv6::Constants  qw(
+    $OPTION_USER_CLASS
+);
+use Net::DHCPv6::X::Truncated ();
 use parent 'Net::DHCPv6::Option';
 use Ref::Util qw( is_plain_arrayref );
 use namespace::clean;
@@ -57,7 +59,7 @@ Net::DHCPv6::Option::UserClass - User Class option (code 15) -- list of opaque u
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

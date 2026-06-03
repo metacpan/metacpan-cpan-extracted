@@ -20,6 +20,29 @@ static inline bool tstr_time_valid_hms60(int h, int m, int s) {
       && (s >= 0 && s <= 60);
 }
 
+// Validates that a folded leap-second epoch (the 23:59:59 that a
+// 23:59:60 leap second folds onto) lands on a real leap-second slot:
+// exactly 23:59:60 UTC on June 30 or December 31, year >= 1972. The
+// check is table-free: every such date is accepted, whether or not a
+// leap second was actually inserted. Returns 0 on success, 1 if the
+// instant is not 23:59:60 UTC, or 2 if the UTC date is not valid.
+static inline int tstr_time_leap_check(int64_t epoch) {
+  int64_t days = epoch / 86400;
+  int64_t sod  = epoch - days * 86400;
+  if (sod < 0) {
+    sod += 86400;
+    days--;
+  }
+  if (sod != 86399)
+    return 1;
+  int y, m, d;
+  tstr_calendar_rdn_to_ymd((uint32_t)(days + TSTR_CALENDAR_RDN_UNIX_EPOCH),
+                           &y, &m, &d);
+  if (!(y >= 1972 && ((m == 6 && d == 30) || (m == 12 && d == 31))))
+    return 2;
+  return 0;
+}
+
 static inline int64_t tstr_time_timegm(int y,
                                        int m,
                                        int d,

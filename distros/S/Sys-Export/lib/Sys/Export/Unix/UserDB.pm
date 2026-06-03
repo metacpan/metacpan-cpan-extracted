@@ -1,7 +1,7 @@
 package Sys::Export::Unix::UserDB;
 
 # ABSTRACT: Abstractions for Unix passwd/group/shadow files
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use v5.26;
 use warnings;
@@ -11,7 +11,7 @@ use File::Spec::Functions qw( catfile );
 use Storable qw( dclone );
 use Scalar::Util ();
 use User::pwent qw( getpwnam pw_has );
-use Sys::Export qw( :isa );
+use Sys::Export qw( isa_userdb isa_user isa_group );
 
 # making lexical subs allows these to be seen by inner packages as well
 # and removes need for namespace::clean
@@ -663,13 +663,7 @@ package Sys::Export::Unix::UserDB::Group {
 }
 
 # Avoiding dependency on namespace::clean
-{  no strict 'refs';
-   delete @{"Sys::Export::Unix::"}{qw(
-      croak carp catfile dclone getpwnam pw_has
-      isa_export_dst isa_exporter isa_group isa_user isa_userdb
-   )};
-}
-
+delete @{Sys::Export::Unix::UserDB::}{qw( dclone isa_userdb isa_user isa_group getpwnam pw_has )};
 1;
 
 __END__
@@ -1015,7 +1009,7 @@ Group password, which should never be used anyway.  Leave this C<undef> or C<'*'
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 
@@ -1023,7 +1017,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Michael Conrad.
+This software is copyright (c) 2026 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

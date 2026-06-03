@@ -435,8 +435,12 @@ SKIP: {
 }
 
 ## POSIX TZ footer fallback (times beyond last stored transition)
+## The footer is only read from the v2/v3 data block, which requires
+## 64-bit integer support.
 
 SKIP: {
+  skip "64-bit integers not available", 14
+    unless eval { my $x = pack('q>', 0); 1 };
   skip "America/New_York not available", 14
     unless -f "$TZDIR/America/New_York";
 

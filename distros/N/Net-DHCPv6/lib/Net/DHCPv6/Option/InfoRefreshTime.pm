@@ -4,11 +4,13 @@
 use strictures 2;
 
 package Net::DHCPv6::Option::InfoRefreshTime;
-$Net::DHCPv6::Option::InfoRefreshTime::VERSION = '0.002';
-use Net::DHCPv6::OptionList;
-use Carp qw( croak );
-use Net::DHCPv6::Constants;
-use Net::DHCPv6::X::BadOption;
+$Net::DHCPv6::Option::InfoRefreshTime::VERSION = '0.003';
+use Net::DHCPv6::OptionList ();
+use Carp                    qw( croak );
+use Net::DHCPv6::Constants  qw(
+    $OPTION_INFORMATION_REFRESH_TIME
+);
+use Net::DHCPv6::X::BadOption ();
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
 
@@ -47,7 +49,7 @@ Net::DHCPv6::Option::InfoRefreshTime - Information Refresh Time option (code 32)
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

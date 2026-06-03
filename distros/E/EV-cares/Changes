@@ -1,5 +1,11 @@
 Revision history for EV::cares.
 
+0.03  2026-06-02
+    - fix use-after-free when the resolver is destroyed from within a callback
+      (defer channel teardown until the ares_* call unwinds; surfaced as a
+      crash on musl/Alpine)
+    - test robustness on sandboxed networks; clarify callback ordering comment
+
 0.02  2026-05-12
     - bulk helpers, DNSSEC/SVCB record parsing, custom EV::Loop
     - introspection (active_queries, is_destroyed, next_timeout, loop)

@@ -1,13 +1,14 @@
 package Sys::Export::CPIO;
 
 # ABSTRACT: Write CPIO archives needed for Linux initrd
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 use v5.26;
 use warnings;
 use experimental qw( signatures );
 use Fcntl qw( S_IFDIR S_IFMT );
 use Scalar::Util 'blessed';
+use Encode ();
 use Carp;
 our @CARP_NOT= qw( Sys::Export Sys::Export::Unix );
 require Sys::Export::Unix; # for _dev_major_minor 
@@ -53,8 +54,9 @@ sub virtual_inodes {
 
 
 sub add($self, $fileinfo) {
-   my ($dev, $dev_major, $dev_minor, $ino, $mode, $nlink, $uid, $gid, $rdev, $rdev_major, $rdev_minor, $mtime, $name)
-      = @{$fileinfo}{qw( dev dev_major dev_minor ino mode nlink uid gid rdev rdev_major rdev_minor mtime name )};
+   my ($dev, $dev_major, $dev_minor, $ino, $mode, $nlink, $uid, $gid, $rdev, $rdev_major, $rdev_minor, $mtime)
+      = @{$fileinfo}{qw( dev dev_major dev_minor ino mode nlink uid gid rdev rdev_major rdev_minor mtime )};
+   my $name= _fileinfo_get_name_bytes($fileinfo);
    # best-effort to extract major/minor from dev and rdev, unless user specified them
    ($dev_major, $dev_minor)= Sys::Export::Unix::_dev_major_minor($dev)
       if defined $dev and !defined $dev_major || !defined $dev_minor;
@@ -63,7 +65,14 @@ sub add($self, $fileinfo) {
    defined $mode or croak "require 'mode'";
    defined $name or croak "require 'name'";
 
-   my $size= length($fileinfo->{data}) // 0;
+   # Die on encoding mistakes
+   my ($size, $data_ref)= (0);
+   if (defined $fileinfo->{data}) {
+      $data_ref= ref $fileinfo->{data}? $fileinfo->{data} : \$fileinfo->{data};
+      croak "->{data} must be 8-bit, but encountered wide character at $name"
+         if utf8::is_utf8($$data_ref) && !utf8::downgrade($$data_ref, 1);
+      $size= length $$data_ref;
+   }
    # Handle hard links
    if ($nlink && $nlink > 1 && ($mode & S_IFMT) != S_IFDIR) {
       my $hardlink_key= "$dev_major:$dev_minor:$ino";
@@ -93,13 +102,26 @@ sub add($self, $fileinfo) {
    die "BUG" if length $header & 3;
 
    $self->{fh}->print($header) || die "write: $!";
-   # This is written in multiple parts like this because $fileinfo->{data} might be a File::Map,
-   #  and optimal to pass that directly back to fprint without a perl-side concatenation.
-   $self->{fh}->print($fileinfo->{data}) || die "write: $!"
+   # This is written in multiple parts like this because $fileinfo->{data} might be a memory-
+   #  mapped file, and optimal to pass that directly back to fprint without a perl-side
+   #  concatenation.
+   $self->{fh}->print($$data_ref) || die "write: $!"
       if $size;
    $self->{fh}->print("\0"x(4-($size & 3))) || die "write: $!"
       if $size & 3; # pad to multiple of 4
    $self;
+}
+
+sub _fileinfo_get_name_bytes($f) {
+   if (defined (my $name= $f->{name})) {
+      !utf8::is_utf8($name) or utf8::downgrade($name, 1)
+         or croak "->{name} must be encoded as bytes, but encountered wide character at $name";
+      return $name;
+   } elsif (defined $f->{uname}) {
+      return Encode::encode('UTF-8', $f->{uname}, Encode::FB_CROAK|Encode::LEAVE_SRC);
+   } else {
+      croak "Must specify either 'name' or 'uname'";
+   }
 }
 
 
@@ -111,12 +133,7 @@ sub finish($self) {
 }
 
 # Avoiding dependency on namespace::clean
-{  no strict 'refs';
-   delete @{"Sys::Export::CPIO::"}{qw(
-      S_IFDIR S_IFMT blessed carp croak
-   )}
-}
-
+delete @{Sys::Export::CPIO::}{qw( S_IFDIR S_IFMT blessed carp croak confess )};
 1;
 
 __END__
@@ -213,7 +230,7 @@ a linear sequence for a virtual inode on each file.
     mtime => #
     rdev  => # or, ( rdev_major =>, rdev_minor => )
     name  => # full path name, no leading '/'
-    data  => # full content of file or symlink
+    data  => # scalar ref of file data, or scalar symlink target
   });
 
 This simply packs the file metadata into a CPIO header, then writes the header, filename, and
@@ -225,7 +242,7 @@ Writes end-of-file signature, and closes the handle if L</autoclose> is true.
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 
@@ -233,7 +250,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Michael Conrad.
+This software is copyright (c) 2026 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,7 +4,7 @@
 use strictures 2;
 
 package Net::DHCPv6::Option::Generic;
-$Net::DHCPv6::Option::Generic::VERSION = '0.002';
+$Net::DHCPv6::Option::Generic::VERSION = '0.003';
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
 
@@ -27,7 +27,7 @@ Net::DHCPv6::Option::Generic - Fallback option for unknown codes -- stores raw c
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

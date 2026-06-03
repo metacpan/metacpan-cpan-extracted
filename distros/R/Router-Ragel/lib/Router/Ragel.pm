@@ -1,6 +1,6 @@
 package Router::Ragel;
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 use strict;
 use warnings;
@@ -82,7 +82,14 @@ sub compile {
     my $instance_id = $self->[1];
     my @ragel_routes;
     my @num_placeholders;
-    my $max_captures = 0;
+    my @capture_base;
+    # Capture slots are allocated globally across all routes (not reset per
+    # route), so every placeholder gets a unique slot and a unique
+    # start/end_capture action. Overlapping routes share DFA transitions and
+    # fire each other's capture actions; with per-route slots a losing route
+    # would clobber a shared index. Disjoint slots + a per-route base offset
+    # keep the winning route's captures intact.
+    my $capture_index = 0;
     for my $i (0 .. $#$routes) {
         my $pattern = $routes->[$i][0];
         croak "Router::Ragel: undefined or empty pattern" if !defined $pattern || $pattern eq '';
@@ -91,7 +98,8 @@ sub compile {
         my @segments = split '/', $pattern, -1; # -1 preserves trailing empty (so '/foo/' is distinct from '/foo')
         shift @segments; # leading '' from the mandatory leading slash
         my $ragel_pattern = '';
-        my $capture_index = 0;
+        my $route_base = $capture_index;
+        push @capture_base, $route_base;
         for my $j (0 .. $#segments) {
             my $seg = $segments[$j];
             $ragel_pattern .= " '/' ";
@@ -104,28 +112,37 @@ sub compile {
         }
         $ragel_pattern .= ' %route'.$i;
         push @ragel_routes, "route$i = $ragel_pattern;";
-        push @num_placeholders, $capture_index;
-        $max_captures = $capture_index if $capture_index > $max_captures;
+        push @num_placeholders, $capture_index - $route_base;
     }
+    my $max_captures = $capture_index;   # total capture slots across all routes
     my $routes_str = join "\n", @ragel_routes;
     my $route_list_str = join " | ", map "route$_", 0 .. $#$routes;
     my $num_placeholders_str = 'static const int num_placeholders[] = {'. (join ', ', @num_placeholders).'};';
+    my $capture_base_str = 'static const int capture_base[] = {'. (join ', ', @capture_base).'};';
     my $capture_actions =
         join "\n",
         map "action start_capture$_ { capture_start[$_] = p - data; }\naction end_capture$_ { capture_end[$_] = p - data; }",
         0 .. $max_captures - 1;
+    # Precedence on overlap: when several routes accept the same input their
+    # %route finish actions all fire in the combined accept state in ascending
+    # (add) order, so the LAST-added matching route's assignment is the one
+    # that sticks. This is the documented behaviour (README "Route precedence").
     my $route_actions = join "\n", map "action route$_ { route_index = $_; }", 0 .. $#$routes;
-    # Capture arrays left uninitialized: when route_index is set, every capture
-    # action of the matched route has fired. Ragel concatenation guarantees the
-    # route's %route action fires only after the inner [^/]+ submachines reach
-    # their finishing transitions (which carry the %end_capture actions).
+    # Capture arrays are left uninitialized: when route_index is set, every
+    # capture action of the matched route has fired (Ragel concatenation fires
+    # the route's %route action only after its inner [^/]+ submachines reach the
+    # finishing transitions that carry the %end_capture actions). Each route owns
+    # a disjoint slot range [capture_base[r] .. +num_placeholders[r]); other
+    # routes' slots may hold stale values from shared transitions but the
+    # readback only reads the winning route's own range.
     my $capture_decls = $max_captures
         ? "int capture_start[$max_captures];\n    int capture_end[$max_captures];"
         : '';
     my $capture_loop = $max_captures ? <<'C' : '';
+        int base = capture_base[route_index];
         int n = num_placeholders[route_index];
         for (int i = 0; i < n; i++) {
-            SV *sv = newSVpvn(data + capture_start[i], capture_end[i] - capture_start[i]);
+            SV *sv = newSVpvn(data + capture_start[base + i], capture_end[base + i] - capture_start[base + i]);
             Inline_Stack_Push(sv_2mortal(sv));
         }
 C
@@ -146,6 +163,7 @@ void match_${instance_id}(SV *self, SV *path_sv) {
     const char *eof = pe;
     int route_index = -1;
     $num_placeholders_str
+    $capture_base_str
     $capture_decls
     %% write data;
     %% write init;

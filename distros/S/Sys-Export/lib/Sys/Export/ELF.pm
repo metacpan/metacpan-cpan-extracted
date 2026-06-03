@@ -1,7 +1,7 @@
 package Sys::Export::ELF;
 
 # ABSTRACT: Unpack various data structures of an ELF binary
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 
 use v5.26;
@@ -95,20 +95,21 @@ our @relocation_addend_packstr= (
 );
 
 sub _strz_from_offset {
-   return undef unless 0 <= $_[1] < length $_[0];
+   return undef unless 0 <= $_[1] && $_[1] < length $_[0];
    pos $_[0] = $_[1];
    $_[0] =~ /\G([^\0]*)/? $1 : undef;
 }
 
 
 sub unpack {
+   # This doesn't copy $_[0] into a variable because it might be a memory-map
    my %elf;
 
    # Start with the encoding-independent fields
    @elf{@elf_common_header_fields}= unpack($elf_common_header_packstr, $_[0]);
    $elf{magic} eq "\x7FELF" or return undef;
-   die "Unsupported 'class'" unless 1 <= $elf{class} <= 2;
-   die "Unsupported 'data'" unless 1 <= $elf{data} <= 2;
+   die "Unsupported 'class'" unless 1 <= $elf{class} && $elf{class} <= 2;
+   die "Unsupported 'data'" unless 1 <= $elf{data} && $elf{data} <= 2;
    my $encoding_idx= ($elf{class}-1)*2 + ($elf{data}-1);
 
    # Now decode the endian and bit-length-varying fields
@@ -186,7 +187,7 @@ sub unpack {
             }
          }
          if (defined $elf{string_table_offset}) {
-            # now that string table is known, decode the libraary_needed
+            # now that string table is known, decode the needed_libraries
             my @needed;
             for (@dynamic_entries) {
                if ($_->{tag} eq 'NEEDED') {
@@ -216,6 +217,8 @@ sub unpack {
    \%elf;
 }
 
+# Avoiding dependency on namespace::clean
+delete @{Sys::Export::ELF::}{qw( croak carp confess dualvar )};
 1;
 
 __END__
@@ -253,7 +256,7 @@ file (via L<File::Map>) and actually avoid mapping the whole file.
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 
@@ -261,7 +264,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Michael Conrad.
+This software is copyright (c) 2026 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

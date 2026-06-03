@@ -416,7 +416,7 @@ indent (YAML *self, IV iv)
           self->indent = iv;
         }
         else if (ix == 2) {
-          if (iv < 1 || iv >= 0xffff)
+          if (iv < 1 || iv > 0xffff)
             croak("Invalid YAML::Safe->wrapwidth value %"  IVdf " (only 1-0xffff)", iv);
           self->wrapwidth = iv;
         }

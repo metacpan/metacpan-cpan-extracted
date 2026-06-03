@@ -4,9 +4,11 @@
 use strictures 2;
 
 package Net::DHCPv6::Message::InformationRequest;
-$Net::DHCPv6::Message::InformationRequest::VERSION = '0.002';
-use Net::DHCPv6::Packet;
-use Net::DHCPv6::Constants;
+$Net::DHCPv6::Message::InformationRequest::VERSION = '0.003';
+use Net::DHCPv6::Packet    ();
+use Net::DHCPv6::Constants qw(
+    $INFORMATION_REQUEST
+);
 use parent 'Net::DHCPv6::Packet';
 use namespace::clean;
 
@@ -32,7 +34,7 @@ Net::DHCPv6::Message::InformationRequest - Information-Request message (type 11)
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

@@ -34,6 +34,14 @@
 #define BUF_INIT_SIZE  16384
 #define MAX_CONTROL_LINE 4096
 
+/* snprintf returns the length it WOULD have written; if the control line was
+ * truncated (n >= bufsz) the buffer holds only bufsz-1 bytes + NUL. Clamp the
+ * length used for the subsequent send so an over-long subject/reply/queue
+ * cannot cause a stack over-read. (A truncated control line is malformed and
+ * the server will reject it -- but we never read past the buffer.) */
+#define NATS_CLAMP_LEN(n, bufsz) \
+    do { if ((n) < 0) (n) = 0; else if ((n) >= (int)(bufsz)) (n) = (int)(bufsz) - 1; } while (0)
+
 #define DEFAULT_MAX_PAYLOAD (1024 * 1024)
 
 #define PARSE_OP       0
@@ -44,6 +52,13 @@
 
 #define CLEAR_HANDLER(field) \
     do { if (NULL != (field)) { SvREFCNT_dec(field); (field) = NULL; } } while(0)
+
+/* call_sv a stored handler SV, pinned across the call so the callback may
+ * clear its own handler (e.g. $nats->on_error(undef)) without freeing the CV
+ * mid-call. Args must already be pushed. */
+#define PINNED_CALL_SV(handler, flags) \
+    STMT_START { SV *_pin = (handler); SvREFCNT_inc_simple_void_NN(_pin); \
+                 call_sv(_pin, (flags)); SvREFCNT_dec(_pin); } STMT_END
 
 #define NATS_CROAK_UNLESS_CONNECTED(self) \
     do { \
@@ -231,7 +246,6 @@ typedef struct nats_req_s {
     SV *cb;
     ev_timer timer;
     int timer_active;
-    nats_t *self;
     ngx_queue_t queue;
 } nats_req_t;
 
@@ -799,6 +813,7 @@ static void nats_resub_all(nats_t *self)
             n = snprintf(buf, sizeof(buf), "SUB %.*s %" UVuf "\r\n",
                          (int)slen, subj, (UV)sub->sid);
         }
+        NATS_CLAMP_LEN(n, sizeof(buf));
         wbuf_append(self, buf, n);
 
         /* Restore auto-unsub if partially consumed */
@@ -946,7 +961,7 @@ static void nats_cleanup(nats_t *self)
         EXTEND(SP, 1);
         PUSHs(sv_2mortal(newSVpvn("disconnected", 12)));
         PUTBACK;
-        call_sv(self->drain_cb, G_DISCARD);
+        PINNED_CALL_SV(self->drain_cb, G_DISCARD);
         FREETMPS; LEAVE;
         CLEAR_HANDLER(self->drain_cb);
         self->draining = 0;
@@ -957,7 +972,7 @@ static void nats_cleanup(nats_t *self)
         ENTER; SAVETMPS;
         PUSHMARK(SP);
         PUTBACK;
-        call_sv(self->on_disconnect, G_DISCARD);
+        PINNED_CALL_SV(self->on_disconnect, G_DISCARD);
         FREETMPS; LEAVE;
     }
 
@@ -973,7 +988,7 @@ static void nats_emit_error(nats_t *self, const char *err)
         EXTEND(SP, 1);
         PUSHs(sv_2mortal(newSVpv(err, 0)));
         PUTBACK;
-        call_sv(self->on_error, G_DISCARD);
+        PINNED_CALL_SV(self->on_error, G_DISCARD);
         FREETMPS; LEAVE;
     } else {
         croak("EV::Nats: %s", err);
@@ -1009,7 +1024,7 @@ static void nats_send_connect(nats_t *self)
     if (self->no_responders)
         CONNECT_APPEND(",\"no_responders\":true");
     CONNECT_APPEND(",\"headers\":true");
-    CONNECT_APPEND(",\"lang\":\"perl-xs\",\"version\":\"0.02\"");
+    CONNECT_APPEND(",\"lang\":\"perl-xs\",\"version\":\"0.03\""); /* keep in sync with $VERSION */
 
     if (self->user) {
         int elen = json_escape_string(escaped, sizeof(escaped), self->user);
@@ -1245,7 +1260,9 @@ static void nats_process_msg(nats_t *self, char *payload, size_t len)
         }
 
         PUTBACK;
-        call_sv(sub->cb, G_DISCARD);
+        /* pin sub->cb: a callback that unsubscribes its own sid clears
+           sub->cb (and frees the sub) mid-call; the pin keeps the CV alive */
+        PINNED_CALL_SV(sub->cb, G_DISCARD);
         FREETMPS; LEAVE;
     }
 
@@ -1370,7 +1387,7 @@ static void nats_process_line(nats_t *self, char *line, size_t len)
                             ENTER; SAVETMPS;
                             PUSHMARK(SP);
                             PUTBACK;
-                            call_sv(self->on_ldm, G_DISCARD);
+                            PINNED_CALL_SV(self->on_ldm, G_DISCARD);
                             FREETMPS; LEAVE;
                         }
                     }
@@ -1461,7 +1478,7 @@ static void nats_process_line(nats_t *self, char *line, size_t len)
                 ENTER; SAVETMPS;
                 PUSHMARK(SP);
                 PUTBACK;
-                call_sv(self->on_connect, G_DISCARD);
+                PINNED_CALL_SV(self->on_connect, G_DISCARD);
                 FREETMPS; LEAVE;
             }
 
@@ -1493,7 +1510,7 @@ static void nats_process_line(nats_t *self, char *line, size_t len)
                     EXTEND(SP, 1);
                     PUSHs(&PL_sv_undef);  /* success: no error */
                     PUTBACK;
-                    call_sv(self->drain_cb, G_DISCARD);
+                    PINNED_CALL_SV(self->drain_cb, G_DISCARD);
                     FREETMPS; LEAVE;
                     CLEAR_HANDLER(self->drain_cb);
                 }
@@ -1791,7 +1808,7 @@ static void nats_schedule_write(nats_t *self)
             EXTEND(SP, 1);
             PUSHs(sv_2mortal(newSVuv(self->wbuf_len - self->wbuf_off)));
             PUTBACK;
-            call_sv(self->on_slow_consumer, G_DISCARD);
+            PINNED_CALL_SV(self->on_slow_consumer, G_DISCARD);
             FREETMPS; LEAVE;
         }
     }
@@ -1978,6 +1995,38 @@ static void nats_next_server(nats_t *self)
     ngx_queue_insert_tail(&self->server_pool, q);
 }
 
+/* Shared post-connect(2) socket setup for the TCP and Unix connect paths.
+ * rv is the connect() return: nonzero means the connection is still in
+ * progress (EINPROGRESS) and we must also wait for EV_WRITE. */
+static void nats_after_connect(nats_t *self, int fd, int rv)
+{
+    self->fd = fd;
+    self->connecting = 1;
+    self->connected = 0;
+
+    ev_io_init(&self->rio, nats_on_read, fd, EV_READ);
+    ev_io_init(&self->wio, nats_on_write, fd, EV_WRITE);
+
+    if (self->priority) {
+        ev_set_priority(&self->rio, self->priority);
+        ev_set_priority(&self->wio, self->priority);
+    }
+
+    ev_io_start(self->loop, &self->rio);
+    self->reading = 1;
+
+    if (rv != 0) {
+        ev_io_start(self->loop, &self->wio);
+        self->writing = 1;
+    }
+
+    if (self->connect_timeout_ms > 0) {
+        ev_timer_set(&self->connect_timer, self->connect_timeout_ms / 1000.0, 0.0);
+        ev_timer_start(self->loop, &self->connect_timer);
+        self->connect_timer_active = 1;
+    }
+}
+
 static void nats_connect_tcp(nats_t *self)
 {
     struct addrinfo hints, *res, *rp;
@@ -2028,31 +2077,7 @@ static void nats_connect_tcp(nats_t *self)
         return;
     }
 
-    self->fd = fd;
-    self->connecting = 1;
-    self->connected = 0;
-
-    ev_io_init(&self->rio, nats_on_read, fd, EV_READ);
-    ev_io_init(&self->wio, nats_on_write, fd, EV_WRITE);
-
-    if (self->priority) {
-        ev_set_priority(&self->rio, self->priority);
-        ev_set_priority(&self->wio, self->priority);
-    }
-
-    ev_io_start(self->loop, &self->rio);
-    self->reading = 1;
-
-    if (rv != 0) {
-        ev_io_start(self->loop, &self->wio);
-        self->writing = 1;
-    }
-
-    if (self->connect_timeout_ms > 0) {
-        ev_timer_set(&self->connect_timer, self->connect_timeout_ms / 1000.0, 0.0);
-        ev_timer_start(self->loop, &self->connect_timer);
-        self->connect_timer_active = 1;
-    }
+    nats_after_connect(self, fd, rv);
 }
 
 static void nats_connect_unix(nats_t *self)
@@ -2087,31 +2112,7 @@ static void nats_connect_unix(nats_t *self)
         return;
     }
 
-    self->fd = fd;
-    self->connecting = 1;
-    self->connected = 0;
-
-    ev_io_init(&self->rio, nats_on_read, fd, EV_READ);
-    ev_io_init(&self->wio, nats_on_write, fd, EV_WRITE);
-
-    if (self->priority) {
-        ev_set_priority(&self->rio, self->priority);
-        ev_set_priority(&self->wio, self->priority);
-    }
-
-    ev_io_start(self->loop, &self->rio);
-    self->reading = 1;
-
-    if (rv != 0) {
-        ev_io_start(self->loop, &self->wio);
-        self->writing = 1;
-    }
-
-    if (self->connect_timeout_ms > 0) {
-        ev_timer_set(&self->connect_timer, self->connect_timeout_ms / 1000.0, 0.0);
-        ev_timer_start(self->loop, &self->connect_timer);
-        self->connect_timer_active = 1;
-    }
+    nats_after_connect(self, fd, rv);
 }
 
 /* Helper: connect via path or host */
@@ -2352,6 +2353,7 @@ publish(self, subject, payload = &PL_sv_undef, reply = NULL)
         hdr_len = snprintf(hdr, sizeof(hdr), "PUB %.*s %lu\r\n",
                            (int)subj_len, subj_pv, (unsigned long)pay_len);
     }
+    NATS_CLAMP_LEN(hdr_len, sizeof(hdr));
 
     self->msgs_out++;
     self->bytes_out += pay_len;
@@ -2414,6 +2416,7 @@ hpublish(self, subject, headers, payload = &PL_sv_undef, reply = NULL)
                            (int)subj_len, subj_pv,
                            (unsigned long)hdr_data_len, (unsigned long)total_size);
     }
+    NATS_CLAMP_LEN(cmd_len, sizeof(hdr));
 
     if (self->connected) {
         wbuf_append(self, hdr, cmd_len);
@@ -2465,6 +2468,7 @@ subscribe(self, subject, cb, queue_group = NULL)
         n = snprintf(buf, sizeof(buf), "SUB %.*s %" UVuf "\r\n",
                      (int)subj_len, subj_pv, (UV)sub->sid);
     }
+    NATS_CLAMP_LEN(n, sizeof(buf));
 
     if (self->connected || self->connecting)
         nats_queue_write(self, buf, n);
@@ -2557,7 +2561,6 @@ request(self, subject, payload, cb, timeout_ms = 5000)
     Newxz(req, 1, nats_req_t);
     req->req_id = req_id;
     req->cb = newSVsv(cb);
-    req->self = self;
     ngx_queue_insert_tail(&self->req_queue, &req->queue);
 
     if (timeout_ms > 0) {
@@ -2568,6 +2571,7 @@ request(self, subject, payload, cb, timeout_ms = 5000)
 
     int hdr_len = snprintf(hdr, sizeof(hdr), "PUB %.*s %s %lu\r\n",
                            (int)subj_len, subj_pv, reply_subj, (unsigned long)pay_len);
+    NATS_CLAMP_LEN(hdr_len, sizeof(hdr));
 
     size_t total = hdr_len + pay_len + 2;
     char *buf;
@@ -2831,7 +2835,7 @@ batch(self, code)
             EXTEND(SP, 1);
             PUSHs(sv_2mortal(newSVuv(self->wbuf_len - self->wbuf_off)));
             PUTBACK;
-            call_sv(self->on_slow_consumer, G_DISCARD);
+            PINNED_CALL_SV(self->on_slow_consumer, G_DISCARD);
             FREETMPS; LEAVE;
         }
     }

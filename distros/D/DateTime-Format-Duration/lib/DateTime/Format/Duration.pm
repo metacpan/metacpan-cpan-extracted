@@ -1,4 +1,4 @@
-package DateTime::Format::Duration; # git description: v1.04-8-gf9e2852
+package DateTime::Format::Duration; # git description: v1.05-4-gd99eb6b
 # ABSTRACT: Format and parse DateTime::Durations
 
 use Params::Validate qw( validate SCALAR OBJECT ARRAYREF HASHREF UNDEF );
@@ -16,7 +16,7 @@ use Exporter 'import';
 our @EXPORT_OK = qw/strpduration strfduration/;
 our %EXPORT_TAGS = (ALL => [qw/strpduration strfduration/]);
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 #---------------------------------------------------------------------------
 # CONSTRUCTORS
@@ -204,7 +204,7 @@ sub parse_duration {
 sub parse_duration_as_deltas {
     my ( $self, $time_string ) = @_;
 
-    local $^W = undef;
+    local $^W = 0;
 
     # Variables from the parser
     my ( $centuries,$years,   $months,
@@ -687,7 +687,7 @@ DateTime::Format::Duration - Format and parse DateTime::Durations
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 SYNOPSIS
 
@@ -1153,7 +1153,7 @@ Rick Measham <rickm@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Karen Etheridge Matthias Bethke
+=for stopwords Karen Etheridge Matthias Bethke Petr Písař
 
 =over 4
 
@@ -1164,6 +1164,10 @@ Karen Etheridge <ether@cpan.org>
 =item *
 
 Matthias Bethke <mbe@financial.com>
+
+=item *
+
+Petr Písař <ppisar@redhat.com>
 
 =back
 

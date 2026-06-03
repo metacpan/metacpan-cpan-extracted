@@ -1,6 +1,6 @@
 package Sys::Export;
 
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 # ABSTRACT: Export a subset of an OS file tree, for chroot/initrd
 
 use v5.26;
@@ -8,6 +8,7 @@ use warnings;
 use experimental qw( signatures );
 use Carp;
 use Scalar::Util qw( blessed looks_like_number );
+use Sys::Export::LogAny '$log';
 use Exporter ();
 BEGIN {
    # Fcntl happily exports macros that don't exist, then fails at runtime.
@@ -19,13 +20,15 @@ BEGIN {
 }
 our @EXPORT_OK= qw(
    isa_exporter isa_export_dst isa_userdb isa_user isa_group exporter isa_hash isa_array isa_int
-   add skip find finish rewrite_path rewrite_user rewrite_group expand_stat_shorthand
+   isa_handle isa_pow2 isa_data_ref round_up_to_pow2 round_up_to_multiple map_or_load_file filedata
+   add skip find which finish rewrite_path rewrite_user rewrite_group expand_stat_shorthand
+   write_file_extent
    S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK S_ISWHT
    S_IFREG S_IFDIR S_IFLNK S_IFBLK S_IFCHR S_IFIFO  S_IFSOCK S_IFWHT S_IFMT
 );
 our %EXPORT_TAGS= (
-   basic_methods => [qw( exporter add skip find finish rewrite_path rewrite_user rewrite_group )],
-   isa => [qw( isa_exporter isa_export_dst isa_userdb isa_user isa_group isa_hash isa_array isa_int )],
+   basic_methods => [qw( exporter add skip find which finish rewrite_path rewrite_user rewrite_group filedata )],
+   isa => [qw( isa_exporter isa_export_dst isa_userdb isa_user isa_group isa_hash isa_array isa_handle isa_int isa_pow2 isa_data_ref )],
    stat_modes => [qw( S_IFREG S_IFDIR S_IFLNK S_IFBLK S_IFCHR S_IFIFO  S_IFSOCK S_IFWHT S_IFMT )],
    stat_tests => [qw( S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK S_ISWHT )],
 );
@@ -88,6 +91,7 @@ sub init_global_exporter(%config) {
 sub add           { $exporter->add(@_) }
 sub skip          { $exporter->skip(@_) }
 sub find          { $exporter->src_find(@_) }
+sub which :prototype($) { $exporter->src_which(@_) }
 sub finish        { $exporter->finish(@_) }
 sub rewrite_path  { $exporter->rewrite_path(@_) }
 sub rewrite_user  { $exporter->rewrite_user(@_) }
@@ -96,12 +100,15 @@ sub rewrite_group { $exporter->rewrite_group(@_) }
 
 sub isa_hash       :prototype($) { ref $_[0] eq 'HASH' }
 sub isa_array      :prototype($) { ref $_[0] eq 'ARRAY' }
+sub isa_handle     :prototype($) { ref $_[0] eq 'GLOB' || (ref $_[0] && (ref $_[0])->isa('IO::Handle')) }
 sub isa_int        :prototype($) { looks_like_number($_[0]) && int($_[0]) == $_[0] }
 sub isa_exporter   :prototype($) { blessed($_[0]) && $_[0]->isa('Sys::Export::Exporter') }
 sub isa_export_dst :prototype($) { blessed($_[0]) && $_[0]->can('add') && $_[0]->can('finish') }
 sub isa_userdb     :prototype($) { blessed($_[0]) && $_[0]->can('user') && $_[0]->can('group') }
 sub isa_user       :prototype($) { blessed($_[0]) && $_[0]->isa('Sys::Export::Unix::UserDB::User') }
 sub isa_group      :prototype($) { blessed($_[0]) && $_[0]->isa('Sys::Export::Unix::UserDB::Group') }
+sub isa_pow2       :prototype($) { !($_[0] & ($_[0]-1)) }
+sub isa_data_ref   :prototype($) { ref $_[0] eq 'SCALAR' || blessed($_[0]) && $_[0]->can('as_scalarref') }
 
 
 sub _parse_major_minor_data($attrs, $data) {
@@ -149,6 +156,103 @@ sub expand_stat_shorthand {
    return %attrs;
 }
 
+
+sub round_up_to_pow2($n) {
+   croak "Not defined for negative numbers" unless $n > 0;
+   return 1 if $n <= 1;
+   --$n;
+   $n |= $n >> 1;
+   $n |= $n >> 2;
+   $n |= $n >> 4;
+   $n |= $n >> 8;
+   $n |= $n >> 16;
+   $n |= $n >> 32;
+   return $n+1;
+}
+
+sub round_up_to_multiple($n, $pow2) {
+   croak "Not defined for negative numbers" unless $n > 0;
+   my $mask= $pow2-1;
+   return ($n + $mask) & ~$mask;
+}
+
+
+if (eval { require File::Map; }) {
+   eval q{
+      sub map_or_load_file($filename, $offset=0, $length=undef) {
+         my $buf;
+         defined $length? File::Map::map_file($buf, $filename, "<", $offset, $length)
+            : File::Map::map_file($buf, $filename, "<", $offset, $length);
+         return \$buf;
+      }
+      1;
+   } or die "$@";
+} else {
+   *map_or_load_file= *_load_file;
+}
+
+sub _load_file($filename, $offset= 0, $length= undef) {
+   open my $fh, "<:raw", $filename
+      or die "open($filename): $!";
+   my $size= -s $fh;
+   croak "Offset beyond end of file ($filename, $offset > $size)" if $offset > $size;
+   $length //= $size - $offset;
+   my $buf= '';
+   if ($length) {
+      if ($offset > 0) {
+         sysseek($fh, $offset, 0) == $offset
+            or croak "sysseek($filename, $offset): $!";
+      }
+      sysread($fh, $buf, $length) == $size
+         or die "sysread($filename, $size): $!";
+   }
+   \$buf;
+}
+
+
+sub filedata {
+   state $loaded= require Sys::Export::LazyFileData;
+   Sys::Export::LazyFileData->new(@_);
+}
+
+
+sub write_file_extent($fh, $addr, $size, $data_ref, $ofs=0, $descrip=undef) {
+   $log->tracef("write %s at 0x%X-0x%X from buf size 0x%X%s",
+      $descrip//'blocks', $addr, $addr+$size, length($$data_ref), $ofs? sprintf(" ofs 0x%X", $ofs) : ''
+      ) if $log->is_trace;
+   return unless $size > 0;
+   if (defined $addr) {
+      my $reached= sysseek($fh, $addr, 0) // croak "sysseek($addr): $!";
+      $reached == $addr or croak "sysseek($addr) arrived at $reached instead of $addr";
+   }
+   $ofs //= 0;
+   my $avail= $data_ref? (length($$data_ref) - $ofs) : 0;
+   my $second;
+   # always write full size, padding with zeroes
+   if ($avail < $size) {
+      # If the scalar is particularly large, do two writes instead of reallocating the buffer.
+      if ($avail > 0x100000) {
+         my $first_write= $avail - ($avail & 0xFFF);
+         $second= pack 'a'.($size-$first_write), substr($$data_ref, $first_write);
+         $size= $first_write;
+      } else {
+         my $data= pack 'a'.$size, ($avail > 0? substr($$data_ref, $ofs) : '');
+         $data_ref= \$data;
+         $ofs= 0;
+      }
+   }
+   my $wrote= syswrite($fh, $$data_ref, $size, $ofs);
+   croak "syswrite: $!" if !defined $wrote;
+   croak "Unexpected short write ($wrote != $size)" if $wrote != $size;
+   if (length $second) {
+      $wrote= syswrite($fh, $second);
+      croak "syswrite: $!" if !defined $wrote;
+      croak "Unexpected short write ($wrote != $size)" if $wrote != length($second);
+   }
+   return 1;
+}
+
+
 1;
 
 __END__
@@ -178,6 +282,15 @@ Sys::Export - Export a subset of an OS file tree, for chroot/initrd
   
   # recurse and filter directories with 'find'
   add find 'usr/share/zoneinfo', sub { ! /(leapseconds|\.tab|\.list)$/ };
+  
+  # Inject dynamically generated files
+  add [ file400 => "/etc/some-service.conf", <<~END ];
+      # Some config file
+      secret = $secret
+      END
+  
+  # Inject files that come from a different name, or outside the 'src' tree
+  add [ file644 => "/opt/some-app/data", filedata("/path/to/some/data") ];
   
   # For Linux, generate minimal /etc/passwd /etc/group /etc/shadow according
   # to UID/GID which were exported so far.
@@ -295,6 +408,8 @@ the global exporter object get exported as functions:
 
 =item L<find|Sys::Export::Unix/src_find>
 
+=item L<which|Sys::Export::Unix/src_which>
+
 =item L<finish|Sys::Export::Unix/finish>
 
 =item L<rewrite_path|Sys::Export::Unix/rewrite_path>
@@ -341,9 +456,21 @@ Is it a hashref?
 
 Is it an arrayref?
 
+=item isa_data_ref
+
+Is it a scalar ref or an object with method C<as_scalarref>?
+
+=item isa_handle
+
+Is it a GLOB ref or IO::Handle?
+
 =item isa_int
 
 Is it an integer?
+
+=item isa_pow2
+
+Is it a power of 2?
 
 =back
 
@@ -390,9 +517,61 @@ For example:
 The default permissions are C<< 0777 & ~umask >> for a directory, C<0777> for symlinks, and
 C<< 0666 & ~umask >> for others.
 
+=head2 round_up_to_pow2
+
+  $pow2= round_up_to_pow2($number);
+
+Return a number rounded up to the next power of 2, or itself if it was already a power of 2.
+Dies if the number is less than 0.  Returns 1 when C<$number> is 0.
+
+=head2 round_up_to_multiple
+
+  $aligned= round_up_to_multiple($n, $pow2);
+
+Return a number rounded up to the next multiple of a power of 2.
+Dies if the number is less than 0.
+
+=head2 map_or_load_file
+
+  $scalar_ref= map_or_load_file($path);
+  $scalar_ref= map_or_load_file($path, $offset);
+  $scalar_ref= map_or_load_file($path, $offset, $length);
+
+If L<File::Map> is available, this creates a read-only memory map of the file (from the
+specified offset) and rreturns a scalar ref to it.  If not, it simply loads the file into
+a scalar and returns a ref to that.  You should assume the data in the scalar is read-only.
+
+=head2 filedata
+
+  $filedata= filedata($path);
+  $filedata= filedata($path, $offset);
+  $filedata= filedata(\$scalar_ref, $offset, $length);
+
+This is a shortcut for creating L<Sys::Export::LazyFileData> objects.  These objects delay the
+memory-mapping of a file (or substr operation on a large scalar) until it is needed.  This is
+a convenient way to pass file data to various methods such as L</add>.
+
+=head2 write_file_extent
+
+  write_file_extent($fh, $file_addr, $size, $data_ref, $data_ofs, $description=undef);
+
+This utility method writes a full extent of a file, padding the supplied data with NUL bytes
+if needed.  It first seeks to C<$file_addr>, then writes a full C<$size> bytes from
+C<$$data_ref> from offset C<$data_ofs> if possible.
+If the length of the scalar in C<$$data_ref> is too short, this pads the write with NUL bytes.
+If C<$$data_ref> is especially large (>1MiB) it first performs a syswrite of as many whole pages
+of the data as possible, then pads the final page with NUL bytes on a second syswrite.
+
+You can skip the seek operation with an undefined C<$file_addr>, in which case it just syswrites
+from the current position of the file.
+
+C<$description> is for debug-logging purposes and can be C<undef>.
+
+If any syscall fails, or can't write the full size, this croaks.
+
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 AUTHOR
 
@@ -400,7 +579,7 @@ Michael Conrad <mike@nrdvana.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Michael Conrad.
+This software is copyright (c) 2026 by Michael Conrad.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

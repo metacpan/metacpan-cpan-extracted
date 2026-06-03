@@ -1,5 +1,9 @@
 Revision history for Router-Ragel
 
+0.03    2026-06-01
+    - Fix captures for overlapping routes
+    - Document precedence (last added wins)
+
 0.02    2026-05-03
     - Typed and inline placeholders.
     - Stricter pattern validation at compile time.

@@ -33,6 +33,34 @@ sub alter_cloned {
     1;
 }
 
+# Compare result rows by their test_val column (in order) without asserting the
+# absolute test_id values. A PostgreSQL crash recovery -- e.g. after a slow host
+# blew the watcher's shutdown grace period and the server was SIGKILLed --
+# advances a SERIAL sequence by up to SEQ_LOG_VALS (32), so test_id is not
+# deterministic across runs. We still require the ids to be present, positive,
+# and strictly increasing in the requested order.
+sub check_rows {
+    my ($got, $expect_vals, $name) = @_;
+
+    my @vals = map { $_->{test_val} } @$got;
+    my $vals_ok = is(\@vals, $expect_vals, $name);
+
+    my $ids_ok = 1;
+    my $prev;
+    for my $row (@$got) {
+        my $id = $row->{test_id};
+        unless (defined($id) && $id =~ /^\d+$/ && $id > 0 && (!defined($prev) || $id > $prev)) {
+            $ids_ok = 0;
+            last;
+        }
+        $prev = $id;
+    }
+    ok($ids_ok, "$name (test_ids present, positive, strictly increasing)")
+        or diag("test_ids: " . join(', ', map { defined $_->{test_id} ? $_->{test_id} : 'undef' } @$got));
+
+    return $vals_ok && $ids_ok;
+}
+
 ok($driver, "Got a driver ($driver)") or die "Cannot continue without a driver";
 
 use DBIx::QuickDB::Pool cache_dir => tempdir(CLEANUP => 1), verbose => 0;
@@ -62,11 +90,7 @@ driver $driver => (
         my $sth = $dbh->prepare('SELECT * FROM quick_test WHERE test_val = ?');
         $sth->execute('base');
         my $all = $sth->fetchall_arrayref({});
-        is(
-            $all,
-            [{test_val => 'base', test_id => 1}],
-            "Got the inserted row"
-        );
+        check_rows($all, ['base'], "Got the inserted row");
     },
 );
 
@@ -115,14 +139,7 @@ build foo => (
         my $sth = $dbh->prepare('SELECT * FROM quick_test ORDER BY test_id');
         $sth->execute();
         my $all = $sth->fetchall_arrayref({});
-        is(
-            $all,
-            [
-                {test_val => 'base', test_id => 1},
-                {test_val => 'foo',  test_id => 2},
-            ],
-            "Got the inserted row"
-        );
+        check_rows($all, ['base', 'foo'], "Got the inserted row");
 
         $called++;
     },
@@ -155,25 +172,17 @@ ok($fooh2->do("INSERT INTO quick_test(test_val) VALUES('foo 2')"), "Insert succe
 
 my $sth_f1 = $fooh1->prepare('SELECT * FROM quick_test ORDER BY test_id');
 $sth_f1->execute();
-is(
+check_rows(
     $sth_f1->fetchall_arrayref({}),
-    [
-        {test_val => 'base',  test_id => 1},
-        {test_val => 'foo',   test_id => 2},
-        {test_val => 'foo 1', test_id => 3},
-    ],
+    ['base', 'foo', 'foo 1'],
     "Got only the row for foo 1"
 );
 
 my $sth_f2 = $fooh2->prepare('SELECT * FROM quick_test ORDER BY test_id');
 $sth_f2->execute();
-is(
+check_rows(
     $sth_f2->fetchall_arrayref({}),
-    [
-        {test_val => 'base',  test_id => 1},
-        {test_val => 'foo',   test_id => 2},
-        {test_val => 'foo 2', test_id => 3},
-    ],
+    ['base', 'foo', 'foo 2'],
     "Got only the row for foo 2"
 );
 
@@ -192,15 +201,7 @@ build bar => (
         my $sth = $dbh->prepare('SELECT * FROM quick_test ORDER BY test_id');
         $sth->execute();
         my $all = $sth->fetchall_arrayref({});
-        is(
-            $all,
-            [
-                {test_val => 'base', test_id => 1},
-                {test_val => 'foo',  test_id => 2},
-                {test_val => 'bar',  test_id => 3},
-            ],
-            "Got the inserted row"
-        );
+        check_rows($all, ['base', 'foo', 'bar'], "Got the inserted row");
     },
 );
 
@@ -219,16 +220,7 @@ subtest resync => sub {
     my $sth = $dbh->prepare('SELECT * FROM quick_test ORDER BY test_id');
     $sth->execute();
     my $all = $sth->fetchall_arrayref({});
-    is(
-        $all,
-        [
-            {test_val => 'base', test_id => 1},
-            {test_val => 'foo',  test_id => 2},
-            {test_val => 'bar',  test_id => 3},
-            {test_val => 'XXX',  test_id => 4},
-        ],
-        "Got the inserted row"
-    );
+    check_rows($all, ['base', 'foo', 'bar', 'XXX'], "Got the inserted row");
 
     $dbh->disconnect;
 
@@ -238,15 +230,7 @@ subtest resync => sub {
     $sth = $dbh->prepare('SELECT * FROM quick_test ORDER BY test_id');
     $sth->execute();
     $all = $sth->fetchall_arrayref({});
-    is(
-        $all,
-        [
-            {test_val => 'base', test_id => 1},
-            {test_val => 'foo',  test_id => 2},
-            {test_val => 'bar',  test_id => 3},
-        ],
-        "Inserted row is gone"
-    );
+    check_rows($all, ['base', 'foo', 'bar'], "Inserted row is gone");
 };
 
 subtest checksum_change_update => sub {
@@ -448,11 +432,7 @@ subtest instance_dir => sub {
                 my $sth = $dbh->prepare('SELECT * FROM quick_test WHERE test_val = ?');
                 $sth->execute('base');
                 my $all = $sth->fetchall_arrayref({});
-                is(
-                    $all,
-                    [{test_val => 'base', test_id => 1}],
-                    "Got the inserted row"
-                );
+                check_rows($all, ['base'], "Got the inserted row");
             },
         )
     );

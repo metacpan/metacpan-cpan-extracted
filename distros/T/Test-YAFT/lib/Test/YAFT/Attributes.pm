@@ -2,66 +2,189 @@
 use v5.14;
 use warnings;
 
-use Syntax::Construct qw[ package-block ];
+use Syntax::Construct qw (package-block package-version);
 
-package Test::YAFT::Attributes {
+package Test::YAFT::Attributes v1.0.3 {
 	use Attribute::Handlers;
 
-	my %where = (
-		Exported => 'EXPORT',
-		Exportable => 'EXPORT_OK',
+	require Ref::Util;
+	require Sub::Util;
+
+	my %attributes = (
+		Assumption  => { EXPORT    => [qw [all assumptions  asserts  ]] },
+		Expectation => { EXPORT    => [qw [all expectations          ]] },
+		Foundation  => { EXPORT_OK => [qw [all foundations  plumbings]] },
+		Util        => { EXPORT    => [qw [all utils        helpers  ]] },
 	);
 
 	sub import {
 		my $caller = scalar caller;
 		my $target = __PACKAGE__;
 
-		for my $attribute (qw[ Exported Exportable From Cmp_Builder ]) {
-			eval "sub ${caller}::${attribute} : ATTR(CODE,BEGIN) { goto &${target}::${attribute} }";
-			die "cannot install $target attribute $attribute in $caller: $@" if $@;
+		for my $attribute (keys %attributes) {
+			eval qq (
+				sub ${caller}::${attribute} : ATTR(CODE,BEGIN) {
+					goto &${target}::${attribute}
+				}
+			);
+
+			die qq (cannot install ${target} attribute ${attribute} into ${caller}: $@)
+				if $@
+				;
 		}
+	}
+
+	sub _push_unique_string (\@;@);
+
+	sub _build_coderef {
+		my ($package, $symbol, $referent, $attr, $data, $phase, $filename, $linenum) = @_;
+
+		return
+			unless $data
+			;
+
+		my ($builder, @arguments) = @$data;
+
+		if (Ref::Util::is_coderef ($builder)) {
+			return sub { $builder->(@arguments, @_) }
+				if @arguments
+				|| _is_distinct_prototype ($referent, $builder)
+				;
+
+			return $builder;
+		}
+
+		my $file = qq ($builder.pm);
+		$file =~ s (::) (/)g;
+
+		return sub {
+			local ($@, $!, $^E);
+			require $file;
+
+			$builder->new (@arguments, @_);
+		};
+
+	}
+
+	sub _register_expectation {
+		my ($package, $symbol, $referent, $attr, $data, $phase, $filename, $linenum) = @_;
+
+		my $name    = &_symbol_name;
+		my $coderef = &_symbol_code;
+		my $wrapper = sub {
+			my $expectation = $coderef->(@_);
+
+			Test::YAFT::Dumper->register_ref_builder ($expectation, $name, @_);
+
+			return $expectation;
+		};
+
+		no warnings q (redefine);
+		*{$symbol} = _sync_prototype ($coderef => $wrapper);
 	}
 
 	sub _exported {
 		my ($package, $symbol, $referent, $attr, $data, $phase, $filename, $linenum) = @_;
 
-		my $where = $where{$attr};
+		my $name = &_symbol_name;
+		my $config = $attributes{$attr};
 
-		no strict 'refs';
-		push @{"${package}::$where"}, *{$symbol}{NAME};
-		if ($data) {
-			push @{ ${"${package}::EXPORT_TAGS"}{$_} //= [] }, *{$symbol}{NAME} for eval { @$data };
+		my ($where, $tags) = %$config;
+
+		no strict q (refs);
+		_push_unique_string @{qq (${package}::${where})}, $name;
+		_push_unique_string @{qq (${package}::EXPORT_OK)}, $name;
+
+		_push_unique_string @{ ${qq (${package}::EXPORT_TAGS)}{$_} //= [] }, $name
+			for @{ $tags // [] }
+			;
+	}
+
+	sub _install_coderef {
+		my ($package, $symbol, $referent, $attr, $data, $phase, $filename, $linenum) = @_;
+
+		return
+			unless my $coderef = &_build_coderef
+			;
+
+		*{$symbol} = _sync_prototype ($referent => $coderef);
+	}
+
+	sub _is_distinct_prototype {
+		my ($target, $source) = @_;
+
+		my $lhs = Sub::Util::prototype ($target);
+		my $rhs = Sub::Util::prototype ($source);
+
+		return 0
+			|| (defined $lhs xor defined $rhs)
+			|| (defined $lhs && $lhs ne $rhs)
+			;
+	}
+
+	sub _push_unique_string (\@;@) {
+		my $push_into = shift;
+
+		my %exists;
+		@exists{@$push_into} = ();
+
+		push @$push_into, grep { ! exists $exists{$_} } @_;
+	}
+
+	sub _symbol_code {
+		my ($package, $symbol, $referent, $attr, $data, $phase, $filename, $linenum) = @_;
+
+		*{$symbol}{CODE};
+	}
+
+	sub _symbol_name {
+		my ($package, $symbol, $referent, $attr, $data, $phase, $filename, $linenum) = @_;
+
+		*{$symbol}{NAME};
+	}
+
+	sub _sync_prototype {
+		my ($referent, $coderef) = @_;
+
+		if (defined (my $prototype = Sub::Util::prototype ($referent))) {
+			Sub::Util::set_prototype $prototype => $coderef;
 		}
+
+		return $coderef;
 	}
 
-	sub Exported {
-		goto &_exported;
+	sub Assumption {
+		&_exported;
+		&_install_coderef;
 	}
 
-	sub Exportable {
-		goto &_exported;
+	sub Expectation {
+		&_exported;
+		&_install_coderef;
+		&_register_expectation;
+	}
+
+	sub Foundation {
+		&_exported;
+		&_install_coderef;
+	}
+
+	sub Util {
+		&_exported;
+		&_install_coderef;
 	}
 
 	sub From {
 		my ($package, $symbol, $referent, $attr, $data, $phase, $filename, $linenum) = @_;
 
-		if (ref $data->[0] eq 'CODE') {
-			my $function = shift @$data;
-			*{$symbol} = $function;
-		}
+		&_install_coderef;
 	}
 
 	sub Cmp_Builder {
 		my ($package, $symbol, $referent, $attr, $data, $phase, $filename, $linenum) = @_;
 
-		my $class = ref ($data)
-			? $data->[0]
-			: $data
-			;
-
-		*{$symbol} = eval "sub { $class->new (\@_) }";
+		&_install_coderef;
 	}
 
 	1;
 }
-$Test::YAFT::Attributes::VERSION = '1.0.2';

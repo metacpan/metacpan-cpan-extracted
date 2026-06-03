@@ -1,5 +1,10 @@
 Revision history for EV::Nats
 
+0.04  2026-06-02
+    - Fix use-after-free when a callback clears its own handler
+    - Clamp control-line length to prevent a stack over-read
+    - Fix stale CONNECT version; handle JetStream status frames
+
 0.03  2026-06-01
     - Fix an HMSG header out-of-bounds read and a stack-pointer drift when
       cancelling pending requests

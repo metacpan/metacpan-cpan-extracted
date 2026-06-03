@@ -4,7 +4,7 @@
 use strictures 2;
 
 package Net::DHCPv6::Constants;
-$Net::DHCPv6::Constants::VERSION = '0.002';
+$Net::DHCPv6::Constants::VERSION = '0.003';
 use Const::Fast::Exporter qw( const );
 
 # Message types (RFC 8415 Section 14)
@@ -419,7 +419,7 @@ Net::DHCPv6::Constants - DHCPv6 numeric constants (message types, option codes, 
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

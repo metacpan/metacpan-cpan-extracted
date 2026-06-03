@@ -6,6 +6,15 @@ Home page:    <https://metacpan.org/release/Attean/>
 Bug tracker:  <https://github.com/kasei/attean/issues>
 Maintainer:   Gregory Todd Williams <mailto:gwilliams@cpan.org>
 
+0.039  2026-06-02
+
+ - (Addition) Attean::DatasetModel.
+ - (Update) Fix SPARQLHTML serializer to use consistent variable ordering.
+ - (Update) Improve default priorities of media types in
+   Attean::negotiate_serializer.
+ - (Update) Improvements to support conformance testing of
+   AtteanX::Endpoint.
+
 0.038  2026-05-19
 
  - (Update) Update negotiate_serializer to accept a 'role' argument.

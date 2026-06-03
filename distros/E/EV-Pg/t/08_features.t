@@ -8,7 +8,7 @@ use TestHelper;
 
 require_pg;
 use File::Temp 'tmpnam';
-plan tests => 125;
+plan tests => 130;
 
 # notice handler
 with_pg(
@@ -428,6 +428,31 @@ with_pg(cb => sub {
         $pg->on_connect(sub {
             ok(!defined $pg->result_meta, 'result_meta: cleared on reset');
             EV::break;
+        });
+    });
+});
+
+# result_meta must NOT be refreshed by an error result (POD contract).
+# When an error is the very first result, result_meta stays undef rather
+# than returning a hash built from the error PGresult.
+with_pg(cb => sub {
+    my ($pg) = @_;
+    $pg->query("select * from no_such_table_rm_xyz", sub {
+        my ($data, $err) = @_;
+        ok($err, 'result_meta error-first: query errored');
+        ok(!defined $pg->result_meta,
+            'result_meta: undef when first result is an error (not refreshed)');
+        # a successful query refreshes it...
+        $pg->query("select 1 as a, 2 as b", sub {
+            is($pg->result_meta->{nfields}, 2, 'result_meta: refreshed by success');
+            # ...and a following error leaves the previous meta in place
+            $pg->query("select * from no_such_table_rm_xyz", sub {
+                my (undef, $err2) = @_;
+                ok($err2, 'result_meta error-after-success: query errored');
+                is($pg->result_meta->{nfields}, 2,
+                    'result_meta: error keeps last successful meta');
+                EV::break;
+            });
         });
     });
 });

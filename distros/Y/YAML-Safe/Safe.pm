@@ -1,16 +1,18 @@
 use strict; use warnings;
 
 package YAML::Safe;
-our $VERSION = '0.83';
+our $VERSION = '0.84';
 our $XS_VERSION = $VERSION;
 $VERSION = eval $VERSION;
 
 use base 'Exporter';
 @YAML::Safe::EXPORT = qw(Load Dump);
-@YAML::Safe::EXPORT_OK = qw(LoadFile DumpFile);
+@YAML::Safe::EXPORT_OK = qw(LoadFile DumpFile NO_WRAP);
 %YAML::Safe::EXPORT_TAGS = (
     all => [qw(Dump Load LoadFile DumpFile)],
 );
+
+use constant NO_WRAP => 0xFFFF;
 
 use XSLoader;
 

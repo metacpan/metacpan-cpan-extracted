@@ -1,7 +1,7 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.5.3
+## Version v1.5.4
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
@@ -118,7 +118,7 @@ BEGIN
     # shared state on the way out.
     *_in_end_phase = sub{ ${^GLOBAL_PHASE} eq 'END' };
 
-    our $VERSION   = 'v1.5.3';
+    our $VERSION   = 'v1.5.4';
 };
 
 # Load the XS shared library (Generic.so) which provides faster implementations of
@@ -3070,7 +3070,7 @@ sub _is_class_loadable
 sub _is_class_loaded
 {
     my $self = shift( @_ );
-    my $class = shift( @_ );
+    my $class = shift( @_ ) || return(0);
     my $key = HAS_THREADS ? join( ';', $class, threads->tid() ) : $class;
     my $repo = Module::Generic::Global->new( 'loaded_classes' => ( ref( $self ) || $self ), key => $key );
     $self->__message( 106, "Are we running under threads, switching to shared data ? ", ( HAS_THREADS ? 'yes' : 'no' ) );
@@ -3086,28 +3086,20 @@ sub _is_class_loaded
         $self->__message( 112, "Class $class is already loaded under threads -> ", ( $repo->get // 'undef' ) );
         return(1);
     }
-    else
+
+    $self->__message( 112, "Checking if class $class is loaded using \%INC." );
+    # NOTE: Strict check via %INC first
+    ( my $pm = $class ) =~ s{::}{/}gs;
+    $pm .= '.pm';
+    if( CORE::exists( $INC{ $pm } ) )
     {
-        $self->__message( 112, "Checking if class $class is loaded using \%INC." );
-        ( my $pm = $class ) =~ s{::}{/}gs;
-        $pm .= '.pm';
-        if( CORE::exists( $INC{ $pm } ) )
-        {
-            $self->__message( 112, "Found class $class already loaded using \%INC." );
-            $repo->set(1);
-            return(1);
-        }
+        $self->__message( 112, "Found class $class already loaded using \%INC." );
+        $repo->set(1);
+        return(1);
     }
-    no strict 'refs';
-    my $ns = \%{ $class . '::' };
-    $self->__message( 112, "Checking if class $class is loaded using class namespace." );
-    if( exists( $ns->{ISA} ) || 
-        exists( $ns->{BEGIN} ) || 
-        (
-            exists( $ns->{VERSION} ) &&
-            Scalar::Util::reftype( \$ns->{VERSION} ) eq 'GLOB' &&
-            defined( ${*{\$ns->{VERSION}}{SCALAR}} )
-        ) )
+
+    $self->__message( 112, "Checking if class $class is loaded using XS function __is_class_loaded." );
+    if( $self->_is_class_loaded_xs( $class ) )
     {
         $self->__message( 112, "Found class $class already loaded using class namespace." );
         $repo->set(1);
@@ -9965,6 +9957,13 @@ sub _parse_timestamp
         {
             return( $self->error( "An error occurred while trying to use DateTime::Format::JP: $@" ) );
         }
+        if( $dt && Scalar::Util::blessed( $dt ) && !$dt->isa( 'DateTime::Lite' ) )
+        {
+            $self->_load_class( 'DateTime::Lite', { version => 'v0.7.3', no_warning => 1 } ) ||
+                return( $self->pass_error );
+            $dt = DateTime::Lite->from_object( object => $dt ) ||
+                return( $self->pass_error( DateTime::Lite->error ) );
+        }
         return( $dt );
     }
     # <https://en.wikipedia.org/wiki/Date_format_by_country>
@@ -13342,7 +13341,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.5.3
+    v1.5.4
 
 =head1 DESCRIPTION
 

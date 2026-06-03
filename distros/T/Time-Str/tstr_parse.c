@@ -11,14 +11,9 @@
 #include "tstr_cparse.h"
 #include "tstr_parse_result.h"
 #include "tstr_carp.h"
+#include "tstr_time.h"
 
 #define DEFAULT_PIVOT_YEAR 1950
-
-static inline bool valid_hms(int h, int m, int s) {
-  return h >= 0 && h <= 23
-      && m >= 0 && m <= 59
-      && s >= 0 && (s <= 59 || (s == 60 && h == 23 && m == 59));
-}
 
 static tstr_parse_result_t validate_parsed(const tstr_parsed_t *p) {
   int m = (p->flags & TSTR_PARSED_HAS_MONTH) ? p->month : 1;
@@ -40,7 +35,7 @@ static tstr_parse_result_t validate_parsed(const tstr_parsed_t *p) {
     int h = p->hour;
     if (p->flags & TSTR_PARSED_HAS_MERIDIEM)
       h = p->hour % 12 + p->meridiem;
-    if (!valid_hms(h, p->minute, p->second))
+    if (!tstr_time_valid_hms60(h, p->minute, p->second))
       return TSTR_PARSE_ERR_TIME_RANGE;
   }
 

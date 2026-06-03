@@ -7,7 +7,7 @@ use Perl::Critic::Violation;
 
 use App::CriticDB::DB::Index;
 
-our $VERSION='0.0.5';
+our $VERSION='0.0.6';
 
 my %engines=(
 	storable=>'App::CriticDB::DB::Stor',
@@ -161,7 +161,7 @@ App::CriticDB::DB - Datastores for Perl::Critic violations
 
 =head1 VERSION
 
-Version 0.0.5
+Version 0.0.6
 
 =head1 SYNOPSIS
 

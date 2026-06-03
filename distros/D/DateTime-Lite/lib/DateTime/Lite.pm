@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Lightweight DateTime Alternative - ~/lib/DateTime/Lite.pm
-## Version v0.7.2
+## Version v0.7.3
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2026/04/03
-## Modified 2026/05/21
+## Modified 2026/06/03
 ## All rights reserved
 ## 
 ## 
@@ -40,7 +40,7 @@ BEGIN
         'ne'     => '_string_not_equals_overload',
     );
 
-    our $VERSION = 'v0.7.2';
+    our $VERSION = 'v0.7.3';
 
     @MonthLengths = ( 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 );
     @LeapYearMonthLengths = @MonthLengths;
@@ -492,6 +492,7 @@ sub add_duration
 # shallow-cloned one level deep and re-blessed.
 if( $IsPurePerl )
 {
+    no warnings 'once';
     *clone = sub
     {
         my $self  = shift( @_ );
@@ -1033,15 +1034,51 @@ sub from_object
     my $resolved_tz = $class->_resolve_time_zone( $p{locale}, $target_tz );
     if( defined( $resolved_tz ) )
     {
-        $new->set_time_zone( $resolved_tz );
+        $new->set_time_zone( $resolved_tz ) ||
+            return( $this->pass_error );
     }
     elsif( $object->can( 'time_zone' ) )
     {
-        $new->set_time_zone( $object->time_zone );
+        my $tz = $object->time_zone;
+        if( $tz )
+        {
+            if( Scalar::Util::blessed( $tz ) && $tz->isa( 'DateTime::Lite::TimeZone' ) )
+            {
+                $new->set_time_zone( $object->time_zone ) ||
+                    return( $this->pass_error( $new->error ) );
+            }
+            elsif( Scalar::Util::blessed( $tz ) && $tz->can( 'name' ) )
+            {
+                $new->set_time_zone( $tz->name ) ||
+                    return( $this->pass_error( $new->error ) );
+            }
+            elsif( Scalar::Util::blessed( $tz ) && overload::Method( $tz => '""' ) )
+            {
+                $new->set_time_zone( "$tz" ) ||
+                    return( $this->pass_error( $new->error ) );
+            }
+            elsif( ref( $tz ) )
+            {
+                return( $this->error( "Unsupported value for time_zone: $tz" ) );
+            }
+            else
+            {
+                $new->set_time_zone( "$tz" ) ||
+                    return( $this->pass_error( $new->error ) );
+            }
+        }
     }
     else
     {
-        $new->set_time_zone( $class->_default_time_zone );
+        $new->set_time_zone( $class->_default_time_zone ) ||
+            return( $this->pass_error( $new->error ) );
+    }
+
+    if( $object->can( 'formatter' ) )
+    {
+        my $formatter = $object->formatter;
+        $new->set_formatter( $formatter ) ||
+            return( $this->pass_error( $new->error ) );
     }
 
     return( $new );
@@ -1326,7 +1363,20 @@ sub set_day        { return( shift->set( day        => @_ ) ); }
 sub set_formatter
 {
     my $self = shift( @_ );
-    $self->{formatter} = shift( @_ );
+    my $formatter = shift( @_ );
+    # 
+    if( defined( $formatter ) )
+    {
+        if( !Scalar::Util::blessed( $formatter ) )
+        {
+            return( $self->error( "Formatter must be a blessed object." ) );
+        }
+        elsif( !$formatter->can( 'format_datetime' ) )
+        {
+            return( $self->error( "Formatter provided (", ( ref( $formatter ) || $formatter ), ") does not support the format_datetime() method." ) )
+        }
+    }
+    $self->{formatter} = $formatter;
     return( $self );
 }
 
@@ -3497,7 +3547,7 @@ DateTime::Lite - Lightweight, low-dependency drop-in replacement for DateTime
 
 =head1 VERSION
 
-    v0.7.2
+    v0.7.3
 
 =head1 DESCRIPTION
 

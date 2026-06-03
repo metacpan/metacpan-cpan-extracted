@@ -191,22 +191,22 @@ ok(!defined $empty->getline, 'Input->getline: undef from empty'); # ok 60
 
 # ok 61: returns false when HX-Request is absent
 my %plain_env = ();
-ok(!HTTP::Handy->is_htmx(\%plain_env), 'is_htmx: false when header absent'); # ok 61
+ok(!HTTP::Handy->is_htmx({ %plain_env }), 'is_htmx: false when header absent'); # ok 61
 
 # ok 62: returns true when HX-Request is "true"
 my %htmx_env = ('HTTP_HX_REQUEST' => 'true');
-ok(HTTP::Handy->is_htmx(\%htmx_env),  'is_htmx: true when HX-Request: true'); # ok 62
+ok(HTTP::Handy->is_htmx({ %htmx_env }),  'is_htmx: true when HX-Request: true'); # ok 62
 
 # ok 63: returns false when HX-Request has an unexpected value
 my %bad_env = ('HTTP_HX_REQUEST' => 'yes');
-ok(!HTTP::Handy->is_htmx(\%bad_env),  'is_htmx: false when value != "true"'); # ok 63
+ok(!HTTP::Handy->is_htmx({ %bad_env }),  'is_htmx: false when value != "true"'); # ok 63
 
 # ok 64: returns 1 (not just truthy) for true case
-my $val = HTTP::Handy->is_htmx(\%htmx_env);
+my $val = HTTP::Handy->is_htmx({ %htmx_env });
 ok($val == 1, 'is_htmx: returns exactly 1'); # ok 64
 
 # ok 65: returns 0 (not just falsy) for false case
-$val = HTTP::Handy->is_htmx(\%plain_env);
+$val = HTTP::Handy->is_htmx({ %plain_env });
 ok($val == 0, 'is_htmx: returns exactly 0'); # ok 65
 
 # --- _iso_time (ok 66-70) -----------------------------------------------

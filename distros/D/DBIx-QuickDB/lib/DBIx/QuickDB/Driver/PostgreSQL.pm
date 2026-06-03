@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000044';
+our $VERSION = '0.000045';
 
 use IPC::Cmd qw/can_run/;
 use DBIx::QuickDB::Util qw/strip_hash_defaults/;
@@ -69,14 +69,15 @@ sub list_env_vars {
 
 sub error_log { "$_[0]->{+DIR}/error.log" }
 
-# Stop the postmaster with SIGINT ("Fast Shutdown") rather than the default
-# SIGTERM ("Smart Shutdown"). Smart Shutdown waits for every client to
-# disconnect before exiting, so a single lingering connection makes the server
-# hang until the watcher escalates to SIGKILL -- and a SIGKILLed postmaster
-# leaves its unix socket file behind, so stop() then times out waiting for the
-# socket to disappear. Fast Shutdown aborts open transactions, disconnects
-# clients, and shuts down cleanly (removing the socket).
-sub stop_sig { 'INT' }
+# Stop the postmaster with SIGTERM ("Smart Shutdown"): it lets in-progress
+# transactions finish and shuts down cleanly. Smart Shutdown waits for every
+# client to disconnect first, which previously risked hanging until the watcher
+# escalated to SIGKILL. That risk is now handled elsewhere: stop() disconnects
+# our own lingering handles (via DBI->visit_handles) before signalling the
+# server, forces a CHECKPOINT so a hard kill cannot corrupt a later clone, and
+# the watcher's grace period before SIGKILL is generous and tunable. A proper
+# shutdown is preferred whenever it is possible.
+sub stop_sig { 'TERM' }
 
 sub _default_paths {
     return (
@@ -244,6 +245,27 @@ sub connect {
     });
 
     return $dbh;
+}
+
+# Force a CHECKPOINT so the on-disk state is durable before shutdown. Without
+# this, a shutdown that gets SIGKILLed (slow host blowing the watcher's grace
+# period) leaves the cluster needing crash recovery; cloning that data dir and
+# starting it replays WAL, which advances SERIAL sequences by SEQ_LOG_VALS (32)
+# -- e.g. the next inserted row gets id 34 instead of 2. Best effort: any
+# failure here must not prevent the server from stopping.
+sub checkpoint {
+    my $self = shift;
+
+    return unless $self->started;
+
+    eval {
+        my $dbh = $self->connect('postgres', AutoCommit => 1, RaiseError => 1, PrintError => 0);
+        $dbh->do('CHECKPOINT');
+        $dbh->disconnect;
+        1;
+    };
+
+    return;
 }
 
 sub connect_string {

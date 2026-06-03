@@ -4,7 +4,7 @@ Dev::Util::File - General utility functions for files and directories.
 
 # VERSION
 
-Version v2.19.35
+Version v2.19.42
 
 # SYNOPSIS
 
@@ -313,7 +313,7 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-This software is Copyright © 2019-2025 by Matt Martini.
+This software is Copyright © 2019-2026 by Matt Martini.
 
 This is free software, licensed under:
 

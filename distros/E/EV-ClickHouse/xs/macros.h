@@ -15,6 +15,13 @@
 /* Drop a refcounted SV and reset the slot to NULL. */
 #define CLEAR_SV(p)  do { if (p) { SvREFCNT_dec((SV*)(p)); (p) = NULL; } } while (0)
 
+/* call_sv a stored handler SV, pinned across the call so the callback may
+ * clear its own handler (e.g. $ch->on_error(undef)) without freeing the CV
+ * mid-call. Args must already be pushed. */
+#define PINNED_CALL_SV(handler, flags) \
+    STMT_START { SV *_pin = (handler); SvREFCNT_inc_simple_void_NN(_pin); \
+                 call_sv(_pin, (flags)); SvREFCNT_dec(_pin); } STMT_END
+
 /* Discard the pending two-phase INSERT payload (text or AV form). Does
  * not touch insert_err — caller decides whether to clear it. */
 #define CLEAR_INSERT(s) do { \

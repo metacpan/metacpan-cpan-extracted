@@ -153,7 +153,11 @@ static int is_unsub_reply(redisReply* reply) {
 }
 
 static void emit_error(EV__Redis self, SV* error) {
-    if (NULL == self->error_handler) return;
+    SV* handler = self->error_handler;
+    if (NULL == handler) return;
+    /* pin: the callback may clear its own handler ($r->on_error(undef)),
+       which would otherwise free the CV while call_sv is still running it */
+    SvREFCNT_inc_simple_void_NN(handler);
 
     dSP;
 
@@ -164,13 +168,14 @@ static void emit_error(EV__Redis self, SV* error) {
     XPUSHs(error);
     PUTBACK;
 
-    call_sv(self->error_handler, G_DISCARD | G_EVAL);
+    call_sv(handler, G_DISCARD | G_EVAL);
     if (SvTRUE(ERRSV)) {
         warn("EV::Redis: exception in error handler: %s", SvPV_nolen(ERRSV));
     }
 
     FREETMPS;
     LEAVE;
+    SvREFCNT_dec(handler);
 }
 
 static void emit_error_str(EV__Redis self, const char* error) {
@@ -265,10 +270,7 @@ static SV* timeout_accessor(struct timeval** tv_ptr, SV* timeout_ms, const char*
  * Returns the current handler (with refcount incremented) or undef. */
 static SV* handler_accessor(SV** handler_ptr, SV* handler, int has_handler_arg) {
     /* Clear existing handler first - both no-arg calls and set calls clear first */
-    if (NULL != *handler_ptr) {
-        SvREFCNT_dec(*handler_ptr);
-        *handler_ptr = NULL;
-    }
+    CLEAR_HANDLER(*handler_ptr);
 
     /* If a handler argument was provided and it's a valid CODE ref, set it */
     if (has_handler_arg && NULL != handler && SvOK(handler) && SvROK(handler) &&
@@ -279,6 +281,27 @@ static SV* handler_accessor(SV** handler_ptr, SV* handler, int has_handler_arg) 
     return (NULL != *handler_ptr)
         ? SvREFCNT_inc(*handler_ptr)
         : &PL_sv_undef;
+}
+
+/* Invoke a no-argument void handler (connect/disconnect), trapping and
+ * warning on any exception.  No-op when the handler is unset.  The handler SV
+ * is pinned across the call: the callback may clear its own handler (e.g.
+ * $r->on_connect(undef) for one-shot use), which would otherwise drop the last
+ * ref and free the CV while call_sv is still running it. */
+static void call_void_handler(SV* handler, const char* what) {
+    dSP;
+    if (NULL == handler) return;
+    SvREFCNT_inc_simple_void_NN(handler);
+    ENTER;
+    SAVETMPS;
+    PUSHMARK(SP);
+    PUTBACK;
+    call_sv(handler, G_DISCARD | G_EVAL);
+    if (SvTRUE(ERRSV))
+        warn("EV::Redis: exception in %s: %s", what, SvPV_nolen(ERRSV));
+    FREETMPS;
+    LEAVE;
+    SvREFCNT_dec(handler);
 }
 
 /* Uses in_cb_cleanup flag to prevent re-entrant queue modification from
@@ -571,23 +594,7 @@ static void EV__redis_connect_cb(redisAsyncContext* c, int status) {
     else {
         self->reconnect_attempts = 0;
 
-        if (NULL != self->connect_handler) {
-            dSP;
-
-            ENTER;
-            SAVETMPS;
-
-            PUSHMARK(SP);
-            PUTBACK;
-
-            call_sv(self->connect_handler, G_DISCARD | G_EVAL);
-            if (SvTRUE(ERRSV)) {
-                warn("EV::Redis: exception in connect handler: %s", SvPV_nolen(ERRSV));
-            }
-
-            FREETMPS;
-            LEAVE;
-        }
+        call_void_handler(self->connect_handler, "connect handler");
 
         send_next_waiting(self);
     }
@@ -635,21 +642,7 @@ static void EV__redis_disconnect_cb(const redisAsyncContext* c, int status) {
     }
 
     if (NULL != self->disconnect_handler) {
-        dSP;
-
-        ENTER;
-        SAVETMPS;
-
-        PUSHMARK(SP);
-        PUTBACK;
-
-        call_sv(self->disconnect_handler, G_DISCARD | G_EVAL);
-        if (SvTRUE(ERRSV)) {
-            warn("EV::Redis: exception in disconnect handler: %s", SvPV_nolen(ERRSV));
-        }
-
-        FREETMPS;
-        LEAVE;
+        call_void_handler(self->disconnect_handler, "disconnect handler");
 
         /* Re-check: user's handler might have called connect() or reconnect()
          * establishing a new ac. If so, skip clearing cb_queue to avoid
@@ -688,7 +681,10 @@ static void EV__redis_push_cb(redisAsyncContext* ac, void* reply_ptr) {
     redisReply* reply = (redisReply*)reply_ptr;
 
     if (NULL == self || self->magic != EV_REDIS_MAGIC) return;
-    if (NULL == self->push_handler || NULL == reply) return;
+    SV* handler = self->push_handler;
+    if (NULL == handler || NULL == reply) return;
+    /* pin: the callback may clear its own handler ($r->on_push(undef)) */
+    SvREFCNT_inc_simple_void_NN(handler);
 
     self->callback_depth++;
 
@@ -702,7 +698,7 @@ static void EV__redis_push_cb(redisAsyncContext* ac, void* reply_ptr) {
         XPUSHs(sv_2mortal(EV__redis_decode_reply(reply)));
         PUTBACK;
 
-        call_sv(self->push_handler, G_DISCARD | G_EVAL);
+        call_sv(handler, G_DISCARD | G_EVAL);
         if (SvTRUE(ERRSV)) {
             warn("EV::Redis: exception in push handler: %s", SvPV_nolen(ERRSV));
         }
@@ -711,6 +707,7 @@ static void EV__redis_push_cb(redisAsyncContext* ac, void* reply_ptr) {
         LEAVE;
     }
 
+    SvREFCNT_dec(handler);
     self->callback_depth--;
     check_destroyed(self);
 }
@@ -1113,7 +1110,7 @@ static int submit_to_redis(EV__Redis self, ev_redis_cb_t* cbt,
         }
         Safefree(cbt);
     } else if (fn == NULL) {
-        /* Successfully sent an unsubscribe command. Since hiredis won't 
+        /* Successfully sent an unsubscribe command. Since hiredis won't
          * call us back, we must clean up our tracking 'cbt' now. */
         ngx_queue_remove(&cbt->queue);
         if (NULL != cbt->cb) SvREFCNT_dec(cbt->cb);

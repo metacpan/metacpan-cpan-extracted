@@ -5,7 +5,7 @@ package HTTP::Handy;
 #
 # https://metacpan.org/dist/HTTP-Handy
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com>
 ######################################################################
 #
 # Compatible : Perl 5.005_03 and later
@@ -25,7 +25,7 @@ BEGIN { pop @INC if $INC[-1] eq '.' }
 use IO::Socket;
 use Carp qw(croak);
 use vars qw($VERSION $ACCESS_LOG_FH $CURRENT_LOG_FILE $_fh_seq);
-$VERSION = '1.05';
+$VERSION = '1.06';
 $VERSION = $VERSION;
 $_fh_seq = 0;
 # $VERSION self-assignment suppresses "used only once" warning under strict.
@@ -632,7 +632,11 @@ sub read {
     return 0 if $length <= 0;
     my $chunk = substr($self->{data}, $self->{pos}, $length);
     $self->{pos} += $length;
-    # Write into $_[1] at $offset (like POSIX read)
+    # Write into $_[1] at $offset (like POSIX read). The built-in read
+    # populates the buffer regardless of its prior contents and does not
+    # warn when the caller passes an undefined buffer; match that contract
+    # by treating an undefined buffer as empty before the in-place substr.
+    $_[1] = '' unless defined $_[1];
     substr($_[1], $offset) = $chunk;
     return $length;
 }
@@ -821,7 +825,7 @@ HTTP::Handy - A tiny HTTP/1.0 server for Perl 5.5.3 and later
 
 =head1 VERSION
 
-Version 1.05
+Version 1.06
 
 =head1 SYNOPSIS
 
@@ -1503,7 +1507,7 @@ file. Access log entries are still written to STDERR.
 =head1 BUGS AND LIMITATIONS
 
 Please report any bugs or feature requests by e-mail to
-E<lt>ina@cpan.orgE<gt>.
+E<lt>ina.cpan@gmail.comE<gt>.
 
 When reporting a bug, please include:
 
@@ -1620,7 +1624,7 @@ LTSV::LINQ.
 
 =head1 AUTHOR
 
-INABA Hitoshi E<lt>ina@cpan.orgE<gt>
+INABA Hitoshi E<lt>ina.cpan@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 

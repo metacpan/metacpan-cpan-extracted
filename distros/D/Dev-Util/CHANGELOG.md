@@ -2,6 +2,62 @@
 
 All notable changes to this project will be documented in this file.
 
+## [version/v2.19.42] - 2026-06-02
+
+### 🚀 Features
+
+- *(yath)* Set terminal color before running
+- *(syntax)* Add builtin/boolean to use list
+
+### 🐛 Bug Fixes
+
+- *(yath)* Fix syntax
+
+### ⚙️ Miscellaneous Tasks
+
+- *(version)* Bump version patch level
+
+### 🧪 Testing
+
+- *(syntax)* Add tests to ensure each module is loaded
+- *(syntax)* Fix test for false
+
+### 📚 Documentation
+
+- *(changelog)* Update changelog
+
+### Other
+
+- *(other)* Merge branch 'truefalse'
+
+* truefalse:
+  test(syntax): Add tests to ensure each module is loaded
+  feat(syntax): Add builtin/boolean to use list
+
+## [version/v2.19.37] - 2026-05-13
+
+### ⚙️ Miscellaneous Tasks
+
+- *(version)* Bump version patch level
+
+### 🧪 Testing
+
+- *(xt)* Insure Meta.yml meets specification
+
+### 📚 Documentation
+
+- *(copyright)* Update the copywrite year
+
+### 🚧 Build
+
+- *(make)* Require boolean for future inclusion in Dev::Util::Syntax
+
+## [release/2026/01/02/2045] - 2026-01-03
+
+### 📚 Documentation
+
+- *(changelog)* Update changelog
+
 ## [version/v2.19.35] - 2026-01-03
 
 ### ⚙️ Miscellaneous Tasks

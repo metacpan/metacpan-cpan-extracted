@@ -12,9 +12,10 @@ my $fdpath;
 
 sub new {
     my $class = shift;
+    my %opt = @_;
     my $fh = new_tmpfile IO::File or die "new_tmpfile: $!\n";
     $fh->fcntl(F_SETFD, 0) or die "fcntl F_SETFD: $!\n";
-    binmode $fh, ':encoding(utf8)';
+    binmode $fh, $opt{raw} ? ':raw' : ':encoding(utf8)';
     # Determine usable fd-path on first instantiation, using the fd we
     # just allocated.  Checking only "$path/0" is insufficient on
     # FreeBSD where /dev/fd/0,1,2 always exist as device nodes but
@@ -112,9 +113,28 @@ require file arguments rather than stdin.
 
 =over 4
 
-=item B<new>()
+=item B<new>([raw => I<bool>])
 
 Create a new temporary file object.
+
+By default the underlying file handle is opened with the
+C<:encoding(utf8)> layer, so character strings are encoded to UTF-8 on
+write and decoded on read.
+
+When C<raw> is true, the C<:raw> layer is used instead, making the file
+a transparent byte container: whatever bytes are written are stored and
+read back unchanged.  Use this when you write data that is already a
+byte stream (for example the output of an external command captured with
+C<qx//>, or the result of C<encode 'utf8', ...>), to avoid double
+encoding.
+
+    my $tmp = Command::Run::Tmpfile->new(raw => 1);
+    $tmp->write($bytes)->rewind;
+    system("cat", $tmp->path);  # bytes pass through unchanged
+
+Note that C<raw> means C<:raw> (no conversion at all), which is distinct
+from the C<:utf8> layer used by C<Command::Run>'s C<nofork>+C<raw>
+execution mode.
 
 =item B<write>(I<@data>)
 

@@ -3,39 +3,39 @@
 use v5.14;
 use warnings;
 
-use require::relative "test-helper.pl";
+use require::relative q (test-helper.pl);
 
-subtest "resource /countries/:continent provides alphabetical sorted list countries on the continent" => sub {
-	act { GET "/countries/$_[0]" } 'continent';
+subtest q (resource /countries/:continent provides alphabetical sorted list countries on the continent) => sub {
+	act { GET qq (/countries/$_[0]) } q (continent);
 
-	it "should list North America continental countries"
-		=> with_continent => 'north-america'
+	it q (should list North America continental countries)
+		=> with_continent => q (north-america)
 		=> expect         =>
 			& expect_http_success
 			& expect_json_content_type
 			& expect_json_content {
 				countries => [
-					'Canada',
-					'Mexico',
-					'USA',
+					q (Canada),
+					q (Mexico),
+					q (USA),
 				]
 			}
 		;
 
-	it "should list Australia continental countries"
-		=> with_continent => 'australia'
+	it q (should list Australia continental countries)
+		=> with_continent => q (australia)
 		=> expect         =>
 			& expect_http_success
 			& expect_json_content_type
 			& expect_json_content {
 				countries => [
-					'Australia',
+					q (Australia),
 				]
 			}
 		;
 
-	it "should list no country in Antarctica"
-		=> with_continent => 'antarctica'
+	it q (should list no country in Antarctica)
+		=> with_continent => q (antarctica)
 		=> expect         =>
 			& expect_http_success
 			& expect_json_content_type

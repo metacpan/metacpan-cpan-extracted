@@ -7,7 +7,8 @@ build_requires:
   ExtUtils::MakeMaker: '7.22'
   File::Spec: '0'
   Module::Metadata: '1.000015'
-  Test::More: '0'
+  Test::Exception: '0'
+  Test::More: '0.96'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
@@ -27,13 +28,13 @@ name: Net-CIDR-Set
 provides:
   Net::CIDR::Set:
     file: lib/Net/CIDR/Set.pm
-    version: '0.20'
+    version: '0.21'
   Net::CIDR::Set::IPv4:
     file: lib/Net/CIDR/Set/IPv4.pm
-    version: '0.20'
+    version: '0.21'
   Net::CIDR::Set::IPv6:
     file: lib/Net/CIDR/Set/IPv6.pm
-    version: '0.20'
+    version: '0.21'
 requires:
   Carp: '0'
   namespace::autoclean: '0'
@@ -45,7 +46,7 @@ resources:
   Authority: cpan:RRWO
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-CIDR-Set
   repository: git://github.com/robrwo/perl-Net-CIDR-Set.git
-version: '0.20'
+version: '0.21'
 x_contributors:
   - 'Thomas Eckardt <Thomas.Eckardt@thockar.com>'
   - 'Brian Gottreu <gottreu@cpan.org>'

@@ -1,17 +1,17 @@
 #!/usr/bin/env perl
 ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 use strictures 2;
-use Test2::Tools::Exception qw( dies );
-use Net::DHCPv6::Option::ServerId;
-use Net::DHCPv6::Option::ClientId;
-use Net::DHCPv6::DUID;
-use Test2::V1 -ipP, qw(is ok like done_testing);    ## no critic (Subroutines::ProhibitCallsToUndeclaredSubs)
+use Test2::Tools::Exception       qw( dies );
+use Net::DHCPv6::Option::ServerId ();
+use Net::DHCPv6::Option::ClientId ();
+use Net::DHCPv6::DUID             ();
+use Test2::V1 -ipP,               qw(is ok like done_testing);    ## no critic (Subroutines::ProhibitCallsToUndeclaredSubs)
 
 use lib 't/lib';
 use lib 'lib';
 
-use Net::DHCPv6;
-use Net::DHCPv6::Constants;
+use Net::DHCPv6            ();
+use Net::DHCPv6::Constants qw( $DUID_EN $DUID_LLT $DUID_UUID $LINK_TYPE_ETHERNET );
 my $EMPTY = q();
 
 my $mac = pack( 'H*', '001122334455' );

@@ -9,14 +9,20 @@ use autodie qw(:all);
 
 use DateTime::Format::ISO8601;
 use Mojo::DOM;
-use JSON::MaybeXS qw(decode_json encode_json);
+use JSON::MaybeXS qw(decode_json encode_json is_bool);
 use Encode qw(decode);
 use File::Spec;
 use Getopt::Long;
 use LWP::UserAgent;
+use Email::Valid;
 use Locale::Country;
+use Readonly;
 use Scalar::Util 'looks_like_number';
 use URI;
+
+# Import shared utilities from the module; removes duplicated implementations.
+use lib do { use File::Basename qw(dirname); dirname(__FILE__) . '/../lib' };
+use Schema::Validator qw(is_valid_datetime load_dynamic_vocabulary);
 
 # Command-line options
 my $file;
@@ -42,7 +48,7 @@ if(!defined($cache_dir)) {
 }
 
 if(!-d $cache_dir) {
-	mkdir $cache_dir, 02755 || die "$cache_dir: $@";
+	mkdir($cache_dir, 02755) or die "$cache_dir: $!";
 }
 my $exit_code = 0;
 
@@ -53,34 +59,40 @@ my @sarif_results;
 my %dynamic_schema;	# Global variable to store class definitions
 my %dynamic_properties;	# Global variable to store property definitions
 
+# ---------------------------------------------------------------------------
+# Property-name constants -- eliminates magic strings in the schema rules.
+# Using these as keys also fixes the startdate/startDate casing bug: the
+# old code used lowercase 'startdate' as the property_validations key, which
+# never matched real JSON-LD (which uses camelCase 'startDate').
+# ---------------------------------------------------------------------------
+Readonly::Scalar my $PROP_NAME           => 'name';
+Readonly::Scalar my $PROP_START_DATE     => 'startDate';
+Readonly::Scalar my $PROP_LOCATION       => 'location';
+Readonly::Scalar my $PROP_ADDR_COUNTRY   => 'addressCountry';
+Readonly::Scalar my $PROP_ADDR_LOCALITY  => 'addressLocality';
+
 #-----------------------------------------------------------------
-# Expanded built‑in schema definition.
+# Expanded built-in schema definition.
 # Each type defines:
 #  - required: property names that must exist.
 #  - nested: properties that are nested objects (validated using another type).
-#  - property_validations: custom validations (e.g., checking that 'startDate' is a valid date).
-#  - enum: for properties that must match one of a given set.
+#  - property_validations: custom validators keyed by property name.
+#  - enum: properties that must match one of a given set of values.
 my %schema = (
 	MusicEvent => {
-		required => [qw(name startDate location)],
-		nested => { location => 'PostalAddress' },
-		property_validations => {
-			startdate => \&is_valid_datetime,
-		},
+		required             => [$PROP_NAME, $PROP_START_DATE, $PROP_LOCATION],
+		nested               => { $PROP_LOCATION => 'PostalAddress' },
+		property_validations => { $PROP_START_DATE => \&is_valid_datetime },
 	},
 	PostalAddress => {
-		required => [qw(addressCountry addressLocality)],
-		enum => {
-			# Allowed country values for demonstration. (Note: these are sample strings.)
-			addressCountry => [qw(United_States US Canada United_Kingdom)],
+		required => [$PROP_ADDR_COUNTRY, $PROP_ADDR_LOCALITY],
+		enum     => {
+			# ISO 3166-1 alpha-2 country codes
+			$PROP_ADDR_COUNTRY => [qw(AU CA DE FR GB JP US)],
 		},
 	},
-	PerformingGroup => {
-		required => [qw(name)],
-	},
-	Person => {
-		required => [qw(name)],
-	},
+	PerformingGroup => { required => [$PROP_NAME] },
+	Person          => { required => [$PROP_NAME] },
 );
 
 #-----------------------------------------------------------------
@@ -113,9 +125,18 @@ if(!defined($file)) {
 my $dom = Mojo::DOM->new($html);
 my $scripts = $dom->find('script[type="application/ld+json"]');
 
-if($dynamic_mode && $scripts->each()) {
-	%dynamic_schema = load_dynamic_vocabulary();
-	unless (%dynamic_schema) {
+if ($dynamic_mode && $scripts->size) {
+	# Keep the vocabulary cache in the same location the old local function used.
+	my $vocab_cache_dir  = File::Spec->catfile($cache_dir, 'schema_validator');
+	mkdir($vocab_cache_dir, 02755) unless -d $vocab_cache_dir;
+	my $vocab_cache_file = File::Spec->catfile($vocab_cache_dir, 'schemaorg_dynamic_vocabulary.jsonld');
+
+	# Delegate to the module; pass the cache path so it matches our directory.
+	my $vocab = load_dynamic_vocabulary(cache_file => $vocab_cache_file);
+	if ($vocab && %{$vocab}) {
+		%dynamic_schema     = %{$vocab};
+		%dynamic_properties = %Schema::Validator::dynamic_properties;
+	} else {
 		warn 'Dynamic vocabulary could not be loaded';
 	}
 }
@@ -177,6 +198,24 @@ if ($github_mode) {
 
 exit $exit_code;
 
+# ---------------------------------------------------------------------------
+# Each SARIF rule ID maps to a distinct non-zero exit code.  Defined once
+# here so push_validation does not re-allocate the hash on every call.
+# ---------------------------------------------------------------------------
+Readonly::Hash my %EXIT_MAP => (
+	SCHEMA000     => 2,     # missing/invalid @type
+	SCHEMA001     => 3,     # missing required property
+	SCHEMA002     => 4,     # unknown type
+	SCHEMA003     => 5,     # invalid property format
+	SCHEMA004     => 6,     # unexpected enum value
+	SCHEMA005     => 7,     # invalid performer type
+	SCHEMA_DYN0   => 10,    # no dynamic definition for type
+	SCHEMA_DYN1   => 11,    # nested object missing @type
+	SCHEMA_DYN2   => 12,    # nested object unrecognized type
+	SCHEMA_DYNFMT => 13,    # property format mismatch (dynamic)
+	SCHEMA_CTRY   => 20,    # invalid country code
+);
+
 #-----------------------------------------------------------------
 # Helper: push_validation
 # Centralizes error/warning message production.
@@ -185,41 +224,19 @@ sub push_validation {
 	if ($github_mode) {
 		push @sarif_results, {
 			ruleId => $rule,
-			level => 'error',
-			message => { text => $message },
+			level  => 'error',
+			message   => { text => $message },
 			locations => [{
 				physicalLocation => {
-					artifactLocation => { uri => $file }
+					artifactLocation => { uri => $file // '-' }
 				}
 			}],
 		};
 	} else {
-		print "✗ [$rule] $message at $location\n";
+		print "x [$rule] $message at $location\n";
 	}
-	# map individual rule names to numeric exit codes
-	my %exit_map = (
-		'SCHEMA000' => 2,	# missing/invalid @type
-		'SCHEMA001' => 3,	# missing required property
-		'SCHEMA002' => 4,	# unknown type
-		'SCHEMA003' => 5,	# enum or format violation
-		'SCHEMA004' => 6,	# nested‐property type mismatch
-		'SCHEMA005' => 7,	# cross‐field validation failure
-		'SCHEMA_DYN0' => 10,	# no dynamic definition
-		'SCHEMA_DYN1' => 11,	# nested‐object missing @type
-		'SCHEMA_DYN2' => 12,	# nested‐object unrecognized type
-		'SCHEMA_DYNFMT' => 13,	# property format mismatch
-		'SCHEMA_CTRY' => 20,	# invalid country code
-		# …add your other rule→code mappings here…
-	);
-	$exit_code = $exit_map{$rule} // 99;
-}
-
-#-----------------------------------------------------------------
-# Helper: is_valid_datetime
-# Validates that the given value matches YYYY-MM-DD or YYYY-MM-DDTHH:MM(:SS)?
-sub is_valid_datetime {
-	my $val = shift;
-	return $val =~ /^\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(?::\d{2})?)?$/;
+	# Keep the lowest-numbered (first-encountered) non-zero exit code.
+	$exit_code ||= $EXIT_MAP{$rule} // 99;
 }
 
 #-----------------------------------------------------------------
@@ -275,7 +292,7 @@ sub validate_entity {
 		# Check enumerated values.
 		if ($rules->{enum}) {
 			for my $prop (keys %{ $rules->{enum} }) {
-				if (exists $entity->{$prop}) {
+				if (exists $entity->{$prop} && !ref($entity->{$prop})) {
 					my @allowed = @{ $rules->{enum}->{$prop} };
 					unless (grep { $_ eq $entity->{$prop} } @allowed) {
 						push_validation("SCHEMA004", "Unexpected value '$entity->{$prop}' for property '$prop'", ($currentPath || 'root'));
@@ -371,35 +388,36 @@ sub validate_property_format
 				$valid = 1; last;
 			}
 		} elsif ($type eq 'Email') {
-			# simple regex; swap in Email::Valid->address($value) if you like
-			if ($value =~ /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/) {
-				$valid = 1; last;
-			}
+			$valid = 1 if Email::Valid->address($value);
+			last if $valid;
 		} elsif(($type eq 'Date') || ($type eq 'schema:Date')) {
-			# if($value =~ /^\d{4}-\d{2}-\d{2}$/) {
-			if($value && is_valid_iso8601($value)) {
-				$valid = 1; last;
-			}
+			$valid = 1 if $value && is_valid_iso8601($value);
+			last if $valid;
 		} elsif ($type eq 'DateTime') {
-			if ($value =~ /^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(?::\d{2})?$/) {
-				$valid = 1; last;
-			}
+			# is_valid_iso8601 uses DateTime::Format::ISO8601 -- same module,
+			# same semantic validation as the Date branch above.
+			$valid = 1 if $value && is_valid_iso8601($value);
+			last if $valid;
 		} elsif ($type eq 'Time') {
 			if ($value =~ /^\d{2}:\d{2}(?::\d{2})?$/) {
 				$valid = 1; last;
 			}
-		} elsif ($type eq 'Number' || $type eq 'Integer') {
-			if (defined $value && $value =~ /^\d+(\.\d+)?$/) {
+		} elsif ($type eq 'Number') {
+			# looks_like_number accepts integers, floats, and scientific notation.
+			$valid = 1 if looks_like_number($value);
+			last if $valid;
+		} elsif ($type eq 'Integer') {
+			# Strict non-negative integer only -- no decimals, no scientific notation.
+			if (defined $value && $value =~ /^\d+$/) {
 				$valid = 1; last;
 			}
 		} elsif ($type eq 'Boolean') {
-			if ($value =~ /^(?:true|false)$/i) {
+			if (is_bool($value) || $value =~ /^(?:true|false)$/i) {
 				$valid = 1; last;
 			}
 		} elsif(($type eq 'Country') || ($type eq 'schema:Country')) {
-			# If this property is addressCountry, require 2-letter ISO code
 			my $code = uc($value);
-			if(Locale::Country::code2country($code)) {
+			if(Locale::Country::code2country($code, 'alpha-2') || Locale::Country::code2country($code, 'alpha-3')) {
 				$valid = 1; last;
 			}
 		} elsif(($type eq 'Gender') || ($type eq 'schema:GenderType')) {
@@ -518,141 +536,6 @@ sub dynamic_validate_entity
 	}
 }
 
-# Loads the dynamic Schema.org vocabulary.
-# It now handles both compact and expanded keys.
-sub load_dynamic_vocabulary
-{
-	my $cache_file = File::Spec->catfile($cache_dir, 'schema_validator');
-	my $cache_duration = 86400;	# Cache expires in 1 day (86400 seconds)
-	my $content;
-	my $use_cache = 0;
-
-	if(!-d $cache_file) {
-		mkdir $cache_file, 02755 || die "$cache_file: $@";
-	}
-	$cache_file = File::Spec->catfile($cache_file, 'schemaorg_dynamic_vocabulary.jsonld');
-	if (-e $cache_file) {
-		my $mtime = (stat($cache_file))[9];
-		if(time - $mtime < $cache_duration) {
-			$use_cache = 1;
-		}
-	}
-
-	if($use_cache) {
-		# Read from the cache file
-		open my $cfh, '<', $cache_file or warn "Could not open cache file $cache_file: $!";
-		{
-			local $/;	# Slurp mode
-			$content = <$cfh>;
-		}
-		close $cfh;
-	} else {
-		# Download the vocabulary from Schema.org
-		if(eval { require HTTP::Cache::Transparent; }) {
-			HTTP::Cache::Transparent->import();
-			my $dir = File::Spec->catfile($cache_dir, 'http-cache-transparent');
-			HTTP::Cache::Transparent::init({
-				BasePath => $dir,
-				# Verbose => $opts{'v'} ? 1 : 0,
-				Verbose => 0,
-				NoUpdate => 60 * 60 * 24,
-				MaxAge => 30 * 24
-			}) || die "$0: $cache_dir: $!";
-		} else {
-			print "Consider installing HTTP::Cache::Transparent to reduce downloads\n";
-		}
-
-		my $url = 'https://schema.org/version/latest/schemaorg-current-https.jsonld';
-		my $ua = LWP::UserAgent->new(timeout => 30);
-		my $res = $ua->get($url);
-
-		unless($res->is_success()) {
-			warn "Failed to fetch dynamic vocabulary from $url: ", $res->status_line();
-			return ();
-		}
-		$content = $res->decoded_content;
-		# Write the downloaded content to the cache file.
-		open my $cfh, '>', $cache_file or warn "Could not write to cache file $cache_file: $!";
-		print $cfh $content;
-		close $cfh;
-	}
-
-	my $data = eval { decode_json($content) };
-	if ($@) {
-		warn "Failed to parse dynamic vocabulary JSON: $@";
-		return ();
-	}
-
-	my %class_vocab;
-	my %prop_vocab;
-
-	if (exists $data->{'@graph'} && ref($data->{'@graph'}) eq 'ARRAY') {
-		for my $item (@{ $data->{'@graph'} }) {
-			next unless exists $item->{'@type'};
-			my $item_type = $item->{'@type'};
-
-			# ──────────────── CLASS DEFINITIONS ─────────────────
-			my $is_class = 0;
-			if (ref $item_type eq 'ARRAY') {
-				$is_class = grep { $_ eq 'rdfs:Class' } @{$item_type};
-			} else {
-				$is_class = ($item_type eq 'rdfs:Class');
-			}
-			if ($is_class) {
-				# 1) Human-readable label
-				my $label = $item->{'rdfs:label'}
-						 // $item->{'http://www.w3.org/2000/01/rdf-schema#label'};
-				next unless $label;
-				$label = ref($label) eq 'ARRAY' ? $label->[0] : $label;
-				$class_vocab{$label} = $item;
-
-				# 2) Short type name from @id (e.g. "MusicGroup")
-				if (my $full_id = $item->{'@id'}) {
-					if ($full_id =~ m{([^/:]+)$}) {
-						my $type_name = $1;
-						$class_vocab{$type_name} = $item;
-					}
-				}
-			}
-
-			# ───────────── PROPERTY DEFINITIONS ────────────────
-			my $is_prop = 0;
-			if (ref $item_type eq 'ARRAY') {
-				$is_prop = grep { $_ eq 'rdf:Property' } @{$item_type};
-			}
-			else {
-				$is_prop = ($item_type eq 'rdf:Property');
-			}
-			if ($is_prop) {
-				# 1) Human-readable label
-				my $label = $item->{'rdfs:label'}
-						 // $item->{'http://www.w3.org/2000/01/rdf-schema#label'};
-				next unless $label;
-				$label = ref($label) eq 'ARRAY' ? $label->[0] : $label;
-				$prop_vocab{$label} = $item;
-
-				# 2) Short property name from @id (e.g. "startDate")
-				if (my $full_id = $item->{'@id'}) {
-					if ($full_id =~ m{([^/:]+)$}) {
-						my $prop_name = $1;
-						$prop_vocab{$prop_name} = $item;
-					}
-				}
-			}
-		}
-	} else {
-		warn "No '\@graph' key found in the vocabulary JSON.";
-	}
-
-	# Assign the populated hashes to the global variables.
-	%dynamic_schema = %class_vocab;
-	%dynamic_properties = %prop_vocab;
-
-	warn 'Dynamic vocabulary loaded: ', scalar(keys %dynamic_schema),
-		' classes and ', scalar(keys %dynamic_properties), ' properties found.';
-
-	return %dynamic_schema;
-}
 
 sub is_valid_iso8601
 {

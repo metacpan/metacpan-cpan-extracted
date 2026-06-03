@@ -4,10 +4,12 @@
 use strictures 2;
 
 package Net::DHCPv6::Option::NewPosixTimezone;
-$Net::DHCPv6::Option::NewPosixTimezone::VERSION = '0.002';
-use Net::DHCPv6::OptionList;
-use Carp qw( croak );
-use Net::DHCPv6::Constants;
+$Net::DHCPv6::Option::NewPosixTimezone::VERSION = '0.003';
+use Net::DHCPv6::OptionList ();
+use Carp                    qw( croak );
+use Net::DHCPv6::Constants  qw(
+    $OPTION_NEW_POSIX_TIMEZONE
+);
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
 
@@ -43,7 +45,7 @@ Net::DHCPv6::Option::NewPosixTimezone - NEW_POSIX_TIMEZONE option (code 41) -- P
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

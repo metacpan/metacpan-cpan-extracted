@@ -2,51 +2,64 @@
 ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 use strictures 2;
 use Test2::Tools::Exception qw( dies );
-use Net::DHCPv6::OptionList;
-use Test2::V1 -ipP, qw(is ok done_testing);    ## no critic (Subroutines::ProhibitCallsToUndeclaredSubs)
+use Net::DHCPv6::OptionList ();
+use Test2::V1 -ipP,         qw(is ok done_testing);    ## no critic (Subroutines::ProhibitCallsToUndeclaredSubs)
 
 use lib 't/lib';
 use lib 'lib';
 
-use Net::DHCPv6::Option;
-use Net::DHCPv6::Option::AftrName;
-use Net::DHCPv6::Option::Auth;
-use Net::DHCPv6::Option::BootfileParam;
-use Net::DHCPv6::Option::BootfileUrl;
-use Net::DHCPv6::Option::CaptivePortal;
-use Net::DHCPv6::Option::ClientArchType;
-use Net::DHCPv6::Option::ClientFqdn;
-use Net::DHCPv6::Option::ClientId;
-use Net::DHCPv6::Option::ClientLinkLayerAddr;
-use Net::DHCPv6::Option::DnsServers;
-use Net::DHCPv6::Option::DomainList;
-use Net::DHCPv6::Option::InfMaxRt;
-use Net::DHCPv6::Option::InfoRefreshTime;
-use Net::DHCPv6::Option::InterfaceId;
-use Net::DHCPv6::Option::NewPosixTimezone;
-use Net::DHCPv6::Option::NewTzdbTimezone;
-use Net::DHCPv6::Option::NisDomainName;
-use Net::DHCPv6::Option::NisServers;
-use Net::DHCPv6::Option::NispDomainName;
-use Net::DHCPv6::Option::NispServers;
-use Net::DHCPv6::Option::SntpServers;
-use Net::DHCPv6::Option::NtpServer;
-use Net::DHCPv6::Option::PdExclude;
-use Net::DHCPv6::Option::ReconfAccept;
-use Net::DHCPv6::Option::ReconfMsg;
-use Net::DHCPv6::Option::RelayMsg;
-use Net::DHCPv6::Option::RemoteId;
-use Net::DHCPv6::Option::RSOO;
-use Net::DHCPv6::Option::SipServerA;
-use Net::DHCPv6::Option::SipServerD;
-use Net::DHCPv6::Option::MudUrl;
-use Net::DHCPv6::Option::SolMaxRt;
-use Net::DHCPv6::Option::SubscriberId;
-use Net::DHCPv6::Option::Unicast;
-use Net::DHCPv6::Option::UserClass;
-use Net::DHCPv6::Option::VendorClass;
-use Net::DHCPv6::Option::VendorOpts;
-use Net::DHCPv6::Constants;
+use Net::DHCPv6::Option                      ();
+use Net::DHCPv6::Option::AftrName            ();
+use Net::DHCPv6::Option::Auth                ();
+use Net::DHCPv6::Option::BootfileParam       ();
+use Net::DHCPv6::Option::BootfileUrl         ();
+use Net::DHCPv6::Option::CaptivePortal       ();
+use Net::DHCPv6::Option::ClientArchType      ();
+use Net::DHCPv6::Option::ClientFqdn          ();
+use Net::DHCPv6::Option::ClientId            ();
+use Net::DHCPv6::Option::ClientLinkLayerAddr ();
+use Net::DHCPv6::Option::DnsServers          ();
+use Net::DHCPv6::Option::DomainList          ();
+use Net::DHCPv6::Option::InfMaxRt            ();
+use Net::DHCPv6::Option::InfoRefreshTime     ();
+use Net::DHCPv6::Option::InterfaceId         ();
+use Net::DHCPv6::Option::NewPosixTimezone    ();
+use Net::DHCPv6::Option::NewTzdbTimezone     ();
+use Net::DHCPv6::Option::NisDomainName       ();
+use Net::DHCPv6::Option::NisServers          ();
+use Net::DHCPv6::Option::NispDomainName      ();
+use Net::DHCPv6::Option::NispServers         ();
+use Net::DHCPv6::Option::SntpServers         ();
+use Net::DHCPv6::Option::NtpServer           ();
+use Net::DHCPv6::Option::PdExclude           ();
+use Net::DHCPv6::Option::ReconfAccept        ();
+use Net::DHCPv6::Option::ReconfMsg           ();
+use Net::DHCPv6::Option::RelayMsg            ();
+use Net::DHCPv6::Option::RemoteId            ();
+use Net::DHCPv6::Option::RSOO                ();
+use Net::DHCPv6::Option::SipServerA          ();
+use Net::DHCPv6::Option::SipServerD          ();
+use Net::DHCPv6::Option::MudUrl              ();
+use Net::DHCPv6::Option::SolMaxRt            ();
+use Net::DHCPv6::Option::SubscriberId        ();
+use Net::DHCPv6::Option::Unicast             ();
+use Net::DHCPv6::Option::UserClass           ();
+use Net::DHCPv6::Option::VendorClass         ();
+use Net::DHCPv6::Option::VendorOpts          ();
+use Net::DHCPv6::Constants                   qw(
+    $CLIENT_ARCH_X86_UEFI $CLIENT_FQDN_S $LINK_TYPE_ETHERNET
+    $OPTION_AFTR_NAME $OPTION_AUTH $OPTION_BOOTFILE_PARAM $OPTION_BOOTFILE_URL
+    $OPTION_CAPTIVE_PORTAL $OPTION_CLIENT_ARCH_TYPE $OPTION_CLIENT_FQDN
+    $OPTION_CLIENT_LINKLAYER_ADDR $OPTION_DNS_SERVERS $OPTION_DOMAIN_LIST
+    $OPTION_INF_MAX_RT $OPTION_INFORMATION_REFRESH_TIME $OPTION_INTERFACE_ID
+    $OPTION_MUD_URL $OPTION_NEW_POSIX_TIMEZONE $OPTION_NEW_TZDB_TIMEZONE
+    $OPTION_NIS_DOMAIN_NAME $OPTION_NISP_DOMAIN_NAME $OPTION_NISP_SERVERS
+    $OPTION_NIS_SERVERS $OPTION_PD_EXCLUDE $OPTION_RECONF_ACCEPT
+    $OPTION_RECONF_MSG $OPTION_RELAY_MSG $OPTION_REMOTE_ID $OPTION_RSOO
+    $OPTION_SIP_SERVER_A $OPTION_SIP_SERVER_D $OPTION_SNTP_SERVERS
+    $OPTION_SOL_MAX_RT $OPTION_SUBSCRIBER_ID $OPTION_UNICAST
+    $OPTION_USER_CLASS $OPTION_VENDOR_CLASS $OPTION_VENDOR_OPTS
+);
 use Test::Net::DHCPv6 qw(bytes2hex);
 my $EMPTY = q();
 
@@ -877,7 +890,7 @@ my $EMPTY = q();
 
 # PdExclude prefix-length=0 edge cases (RFC 6603)
 {
-    my $EMPTY = q();
+    $EMPTY = q();
 
     # Build with prefix_length=0, address_raw => '' (valid: 0 bytes of prefix)
     {
@@ -895,7 +908,7 @@ my $EMPTY = q();
     {
         my $pe = Net::DHCPv6::Option::PdExclude->new(
             prefix_length => 0,
-            address       => '::',
+            address       => q{::},
         );
         is( $pe->prefix_length, 0,      'PdExclude plen=0 text address prefix_length' );
         is( $pe->address,       $EMPTY, 'PdExclude plen=0 text address (empty after truncation)' );
@@ -909,7 +922,7 @@ my $EMPTY = q();
         is( $parsed->address_raw,   $EMPTY, 'PdExclude plen=0 parsed address (empty)' );
     }
 
-    # Round-trip: build → as_bytes → parse → match
+    # Round-trip: build -> as_bytes -> parse -> match
     {
         my $pe = Net::DHCPv6::Option::PdExclude->new(
             prefix_length => 0,

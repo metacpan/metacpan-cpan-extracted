@@ -17,7 +17,8 @@ on 'test' => sub {
   requires "Data::Dumper" => "0";
   requires "File::Spec" => "0";
   requires "Module::Metadata" => "1.000015";
-  requires "Test::More" => "0";
+  requires "Test::Exception" => "0";
+  requires "Test::More" => "0.96";
 };
 
 on 'test' => sub {
@@ -29,6 +30,7 @@ on 'configure' => sub {
 };
 
 on 'develop' => sub {
+  requires "Dist::AutomationPolicy" => "v0.2.0";
   requires "Dist::Zilla::Plugin::UsefulReadme" => "v0.4.3";
   requires "Pod::Coverage::TrustPod" => "0";
   requires "Pod::Markdown::Github" => "0";

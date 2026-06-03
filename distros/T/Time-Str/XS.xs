@@ -16,6 +16,22 @@
 #include "tstr_sv.h"
 #include "tstr_carp.h"
 
+#if IVSIZE >= 8
+typedef IV I64V;
+# define SvI64V(sv)         (I64V)SvIV(sv)
+# define newSVi64v(i64)     newSViv((IV)i64)
+# define XSRETURN_I64V(i64) XSRETURN_IV((IV)i64)
+#else
+typedef NV I64V;
+# define SvI64V(sv)         (I64V)SvNV(sv)
+# define newSVi64v(i64)     newSVnv((NV)i64)
+# define XSRETURN_I64V(i64) XSRETURN_NV((NV)i64)
+#endif
+
+#ifndef XSRETURN_BOOL
+#define XSRETURN_BOOL(v) STMT_START { ST(0) = boolSV(v); XSRETURN(1); } STMT_END
+#endif
+
 #if NVSIZE > 8
 # define DEFAULT_PRECISION 9
 #else
@@ -101,6 +117,38 @@ static void load_regexps(pTHX_ my_cxt_t *cxt) {
   LEAVE;
 }
 
+/* Calls $timezone->offset_for_local($local) and returns the UTC offset
+ * in seconds. The argument is a local time expressed as a pseudo-epoch
+ * (seconds since the Unix epoch with no offset applied). */
+static int64_t tstr_offset_for_local(pTHX_ SV *obj, int64_t local) {
+  dSP;
+  int count;
+  int64_t offset;
+  SV *ret;
+
+  ENTER;
+  SAVETMPS;
+
+  PUSHMARK(SP);
+  EXTEND(SP, 2);
+  PUSHs(obj);
+  mPUSHs(newSVi64v(local));
+  PUTBACK;
+
+  count = call_method("offset_for_local", G_SCALAR);
+
+  SPAGAIN;
+  if (count != 1)
+    croak("panic: offset_for_local returned %d values", count);
+  ret = POPs;
+  offset = SvIV(ret);
+  PUTBACK;
+
+  FREETMPS;
+  LEAVE;
+
+  return offset;
+}
 
 MODULE = Time::Str  PACKAGE = Time::Str
 
@@ -224,6 +272,7 @@ str2time(...)
     tstr_format_t fmt = TSTR_FORMAT_RFC3339;
     int pivot_year = -1;
     int precision = -1;
+    SV *timezone = NULL;
     tstr_parsed_t parsed;
     int i;
   PPCODE:
@@ -248,6 +297,12 @@ str2time(...)
         case TSTR_PARAM_PRECISION:
           precision = tstr_sv_precision(aTHX_ val);
           break;
+        case TSTR_PARAM_TIMEZONE:
+          if (!sv_isobject(val) ||
+              !gv_fetchmethod_autoload(SvSTASH(SvRV(val)), "offset_for_local", FALSE))
+            croak("Parameter 'timezone' is not an object with an 'offset_for_local' method");
+          timezone = val;
+          break;
         default:
           croak("Unrecognised named parameter: '%"SVf"'", ST(i));
       }
@@ -256,19 +311,52 @@ str2time(...)
     tstr_parse(aTHX_ ST(0), fmt, pivot_year,
                MY_CXT.regexps, &MY_CXT.keys, &parsed);
 
-    if (!(parsed.flags & TSTR_PARSED_HAS_OFFSET))
+    if (!(parsed.flags & TSTR_PARSED_HAS_OFFSET) && !timezone)
       tstr_croak("Unable to convert: timestamp string without a UTC designator or numeric offset");
+
+    /* A timezone object resolves an offset-less local time, but it cannot
+     * interpret a zone abbreviation in the string (which may name a
+     * different zone than the object). Reject rather than guess. */
+    if (timezone && (parsed.flags & TSTR_PARSED_HAS_TZ_ABBREV))
+      tstr_croak("Unable to convert: cannot resolve abbreviated timezone");
 
     {
       int hour = parsed.hour;
+      int leap_second;
+      int second;
 
       if (parsed.flags & TSTR_PARSED_HAS_MERIDIEM)
         hour = hour % 12 + parsed.meridiem;
 
+      /* A leap second (23:59:60 UTC) cannot be represented as a POSIX
+       * time, so fold it onto the preceding 23:59:59 and validate that
+       * it lands on a real leap-second slot. The error messages are
+       * worded to hold equally if a Time::LeapSecond table lookup is
+       * used instead. */
+      leap_second = (parsed.second == 60);
+      second      = parsed.second - leap_second;
+
       uint32_t rdn = tstr_calendar_ymd_to_rdn(parsed.year, parsed.month, parsed.day);
-      int64_t sod  = ((int64_t)hour * 60 + parsed.minute) * 60 + parsed.second;
-      int64_t epoch = ((int64_t)rdn - TSTR_CALENDAR_RDN_UNIX_EPOCH) * 86400
-                    + sod - (int64_t)parsed.offset * 60;
+      int64_t sod  = ((int64_t)hour * 60 + parsed.minute) * 60 + second;
+      int64_t epoch = ((int64_t)rdn - TSTR_CALENDAR_RDN_UNIX_EPOCH) * 86400 + sod;
+
+      /* A string offset is in minutes; a timezone object resolves the
+       * local time and returns its UTC offset in seconds. */
+      if (parsed.flags & TSTR_PARSED_HAS_OFFSET)
+        epoch -= (int64_t)parsed.offset * 60;
+      else
+        epoch -= tstr_offset_for_local(aTHX_ timezone, epoch);
+
+      if (leap_second) {
+        switch (tstr_time_leap_check(epoch)) {
+          case 1:
+            tstr_croak("Unable to convert: a leap second must occur at 23:59:60 UTC");
+            break;
+          case 2:
+            tstr_croak("Unable to convert: no leap second on this UTC date");
+            break;
+        }
+      }
 
       if (parsed.flags & TSTR_PARSED_HAS_NANOSECOND) {
         int scale_exp = (precision >= 0) ? precision : DEFAULT_PRECISION;
@@ -681,17 +769,60 @@ MODULE = Time::Str  PACKAGE = Time::Str::Util
 PROTOTYPES: DISABLE
 
 void
+binary_search(...)
+  PREINIT:
+    AV *av;
+    IV len, lo, hi, mid, hi_orig;
+    I64V value;
+    bool found = false;
+  PPCODE:
+    if (items < 2 || items > 4)
+      croak("Usage: binary_search(array, value [, lo [, hi]])");
+    if (!SvROK(ST(0)) || SvTYPE(SvRV(ST(0))) != SVt_PVAV)
+      croak("Parameter 'array' must be an array reference");
+    av = (AV *)SvRV(ST(0));
+    value = SvI64V(ST(1));
+    len = av_len(av) + 1;
+    {
+      lo  = (items >= 3) ? SvIV(ST(2)) : 0;
+      hi  = (items >= 4) ? SvIV(ST(3)) : len;
+      if (lo < 0 || lo > len)
+        croak("Parameter 'lo' is out of range [0, %" IVdf "]", len);
+      if (hi < 0 || hi > len)
+        croak("Parameter 'hi' is out of range [0, %" IVdf "]", len);
+      if (lo > hi)
+        croak("Parameter 'lo' must not exceed 'hi'");
+    }
+    hi_orig = hi;
+    while (lo < hi) {
+      mid = (lo + hi) >> 1;
+      {
+        SV **elem = av_fetch(av, mid, 0);
+        if (elem && SvI64V(*elem) < value)
+          lo = mid + 1;
+        else
+          hi = mid;
+      }
+    }
+    if (lo != hi_orig) {
+      SV **elem = av_fetch(av, lo, 0);
+      found = elem && !(value < SvI64V(*elem));
+    }
+    XSRETURN_BOOL(found);
+
+void
 lower_bound(...)
   PREINIT:
     AV *av;
-    IV value, lo, hi, mid;
+    IV lo, hi, mid;
+    I64V value;
   PPCODE:
     if (items < 2 || items > 4)
       croak("Usage: lower_bound(array, value [, lo [, hi]])");
     if (!SvROK(ST(0)) || SvTYPE(SvRV(ST(0))) != SVt_PVAV)
       croak("Parameter 'array' must be an array reference");
     av = (AV *)SvRV(ST(0));
-    value = SvIV(ST(1));
+    value = SvI64V(ST(1));
     {
       IV len = av_len(av) + 1;
       lo = (items >= 3) ? SvIV(ST(2)) : 0;
@@ -707,7 +838,7 @@ lower_bound(...)
       mid = (lo + hi) >> 1;
       {
         SV **elem = av_fetch(av, mid, 0);
-        if (elem && SvIV(*elem) < value)
+        if (elem && SvI64V(*elem) < value)
           lo = mid + 1;
         else
           hi = mid;
@@ -719,15 +850,16 @@ void
 range_bounds(...)
   PREINIT:
     AV *av;
-    IV min_value, max_value, lo, hi, mid, len;
+    IV lo, hi, mid, len;
+    I64V min_value, max_value;
   PPCODE:
     if (items != 3)
       croak("Usage: range_bounds(array, min_value, max_value)");
     if (!SvROK(ST(0)) || SvTYPE(SvRV(ST(0))) != SVt_PVAV)
       croak("Parameter 'array' must be an array reference");
     av = (AV *)SvRV(ST(0));
-    min_value = SvIV(ST(1));
-    max_value = SvIV(ST(2));
+    min_value = SvI64V(ST(1));
+    max_value = SvI64V(ST(2));
     if (min_value > max_value)
       croak("Parameter 'min_value' must not exceed 'max_value'");
     len = av_len(av) + 1;
@@ -738,7 +870,7 @@ range_bounds(...)
       mid = (lo + hi) >> 1;
       {
         SV **elem = av_fetch(av, mid, 0);
-        if (elem && SvIV(*elem) < min_value)
+        if (elem && SvI64V(*elem) < min_value)
           lo = mid + 1;
         else
           hi = mid;
@@ -748,7 +880,7 @@ range_bounds(...)
     hi = lo;
     while (hi < len) {
       SV **elem = av_fetch(av, hi, 0);
-      if (elem && SvIV(*elem) <= max_value)
+      if (elem && SvI64V(*elem) <= max_value)
         hi++;
       else
         break;
@@ -761,14 +893,15 @@ void
 upper_bound(...)
   PREINIT:
     AV *av;
-    IV value, lo, hi, mid;
+    IV lo, hi, mid;
+    I64V value;
   PPCODE:
     if (items < 2 || items > 4)
       croak("Usage: upper_bound(array, value [, lo [, hi ]])");
     if (!SvROK(ST(0)) || SvTYPE(SvRV(ST(0))) != SVt_PVAV)
       croak("Parameter 'array' must be an array reference");
     av = (AV *)SvRV(ST(0));
-    value = SvIV(ST(1));
+    value = SvI64V(ST(1));
     {
       IV len = av_len(av) + 1;
       lo = (items >= 3) ? SvIV(ST(2)) : 0;
@@ -784,10 +917,10 @@ upper_bound(...)
       mid = (lo + hi) >> 1;
       {
         SV **elem = av_fetch(av, mid, 0);
-        if (elem && SvIV(*elem) <= value)
-          lo = mid + 1;
-        else
+        if (elem && value < SvI64V(*elem))
           hi = mid;
+        else
+          lo = mid + 1;
       }
     }
     mPUSHi(lo);

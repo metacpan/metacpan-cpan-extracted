@@ -1,3 +1,7 @@
+0.07  2026-06-02
+    - POD: ASCII punctuation; document skip_pending in stream callbacks
+    - Add query-during-stream and skip_pending regression tests
+
 0.06  2026-04-27
     - Bug fixes, input guards, POD overhaul
 

@@ -7,7 +7,7 @@ Attean::ListIterator - Iterator implementation backed by a list/array of values
 
 =head1 VERSION
 
-This document describes Attean::ListIterator version 0.038
+This document describes Attean::ListIterator version 0.039
 
 =head1 SYNOPSIS
 
@@ -49,11 +49,12 @@ iterator.
 
 =cut
 
-package Attean::ListIterator 0.038 {
+package Attean::ListIterator 0.039 {
 	use Moo;
 	use Scalar::Util qw(blessed);
 	use Type::Tiny::Role;
 	use Types::Standard qw(ArrayRef Int);
+	use Attean::API::Iterator;
 	use namespace::clean;
 	
 	has values => (is => 'ro', isa => ArrayRef, required => 1);

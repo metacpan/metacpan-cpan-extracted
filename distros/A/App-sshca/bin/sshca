@@ -24,7 +24,7 @@ my $json = JSON::PP->new->utf8->canonical;
 my $digest = Digest->new('SHA-256');
 
 my @config_locations = (
-    $ENV{SSHCA_CONF},
+    $ENV{SSHCA_CONF} ? ($ENV{SSHCA_CONF},) : (),
     '/etc/sshca/sshca.conf',
     '/usr/local/etc/sshca/sshca.conf',
     '/opt/sshca/etc/sshca.conf',
@@ -37,8 +37,8 @@ my %conf_envvars = (
 my %conf_handlers = (
     basedir           => sub($value) {
         $value
-        // $ENV{HOME} ? File::Spec->catdir( $ENV{HOME}, 'sshca' )
-            : File::Spec->catdir( '.', 'sshca' )
+        // ($ENV{HOME} ? File::Spec->catdir( $ENV{HOME}, 'sshca' )
+            : File::Spec->catdir( '.', 'sshca' ))
     },
     cadir             => sub($value) { $value // File::Spec->catdir( opt( 'basedir' ), 'ca' ) },
     caserial          => sub($) { File::Spec->catfile( opt( 'cadir' ), 'serial' ) },
@@ -63,11 +63,17 @@ my %options = ();
 my %config = ();
 
 sub opt($opt, $value = undef) {
+    my $default = defined $value ? $value : '<undef>';
+    say "Resolving option '$opt' with default value '$default'"
+        if $DEBUG;
     $options{$opt} = $value if defined $value;
-    my $val = $options{$opt} // $ENV{$conf_envvars{$opt}} // $config{$opt};
+    my $val = $options{$opt} // ($conf_envvars{$opt} ? $ENV{$conf_envvars{$opt}} : undef) // $config{$opt};
     if (my $h = $conf_handlers{$opt}) {
-        return $h->($val);
+        $val = $h->($val);
     }
+    my $str_val = defined $val ? $val : '<undef>';
+    say "Option '$opt' resolved to: '$str_val'"
+        if $DEBUG;
     return $val;
 }
 
@@ -348,8 +354,10 @@ sub _init_ca_key( %args ) {
 }
 
 sub cmd_init(@args) {
-    my $serial = $options{serial} // 1;
+    say 'Initialization started with arguments: ' . join(', ', map { "'$_'" } @args)
+        if $DEBUG;
 
+    my $serial = $options{serial} //= 1;
     my $basedir = opt( 'basedir', (shift @args) );
     die "Unable to create CA base directory '$basedir': Path exists\n"
         if -e $basedir;
@@ -447,8 +455,8 @@ sub cmd_renew(@args) {
     my $serial = shift @args;
     my $cert = cert_load( $serial );
 
-    my $serial  = conf_next_serial;
-    my $renewed = cert_renew( $cert, $serial );
+    my $new_serial  = conf_next_serial;
+    my $renewed     = cert_renew( $cert, $new_serial );
     cert_validity( $renewed, _validity_for_cert( $renewed ) );
     ssh_cert_issue( $renewed );
     cert_save( $renewed );
@@ -614,12 +622,14 @@ my %cmd_opts = (
     );
 
 Getopt::Long::Configure( 'require_order' );
-GetOptionsFromArray(\@ARGV, %common_opts);
+GetOptionsFromArray(\@ARGV, %common_opts)
+    or exit 1;
 my $command = shift @ARGV;
 if ($cmd{$command}) {
     configure();
     Getopt::Long::Configure( 'permute' );
-    GetOptionsFromArray(\@ARGV, $cmd_opts{$command}->%*);
+    GetOptionsFromArray(\@ARGV, $cmd_opts{$command}->%*)
+        or exit 1;
     exit $cmd{$command}->(@ARGV);
 }
 else {
@@ -637,7 +647,7 @@ sshca - Minimalistic SSH Certificate Authority
 
 =head1 VERSION
 
-version 0.0.6
+version 0.0.7
 
 =head1 SYNOPSIS
 

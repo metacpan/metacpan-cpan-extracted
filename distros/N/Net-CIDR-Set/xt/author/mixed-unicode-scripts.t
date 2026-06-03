@@ -22,7 +22,8 @@ my @files = (
     't/misc.t',
     't/octal.t',
     't/operations.t',
-    't/private.t'
+    't/private.t',
+    't/validation.t'
 );
 
 file_scripts_ok($_, { scripts => \@scxs } ) for @files;

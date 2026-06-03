@@ -4,16 +4,17 @@
 use strictures 2;
 
 package Net::DHCPv6::Helpers;
-$Net::DHCPv6::Helpers::VERSION = '0.002';
-use Carp      qw( croak );
-use Ref::Util qw( is_plain_arrayref );
-use Socket    qw( AF_INET6 inet_ntop inet_pton );
+$Net::DHCPv6::Helpers::VERSION = '0.003';
+use Carp                   qw( croak );
+use Net::DHCPv6::Constants qw( $IPV6_ADDR_LEN );
+use Ref::Util              qw( is_plain_arrayref );
+use Socket                 qw( AF_INET6 inet_ntop inet_pton );
 use namespace::clean;
 
 sub _resolve_ipv6 {
     my ( $class, $arg ) = @_;
     return unless defined $arg;
-    if ( CORE::length( $arg ) == 16 ) {
+    if ( CORE::length( $arg ) == $IPV6_ADDR_LEN ) {
 
         # If it looks like IPv6 text (hex digits + colons), parse it
         if ( $arg =~ m/^[0-9a-fA-F:]+$/ && $arg =~ m/:/ ) {
@@ -68,7 +69,7 @@ Net::DHCPv6::Helpers - Internal helper methods for IPv6 address resolution
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 

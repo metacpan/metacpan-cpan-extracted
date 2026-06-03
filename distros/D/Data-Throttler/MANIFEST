@@ -8,6 +8,7 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README
+releaserc
 t/001Basic.t
 t/002File.t
 t/003Bug.t

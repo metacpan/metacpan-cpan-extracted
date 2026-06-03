@@ -53,6 +53,32 @@ my %Map     = (
 
 use_ok( $Class );
 
+{
+    my $tar = $Class->new;
+    $tar->add_data( '.github/README.md', '',
+        { type => 2, linkname => '../README' } );
+
+    local $Archive::Tar::INSECURE_EXTRACT_MODE = 0;
+    ok( $tar->extract_file( '.github/README.md' ),
+        "Extracted symlink target that stays under cwd" );
+
+    unlink File::Spec->catfile( qw[.github README.md] );
+    rmtree( '.github' );
+}
+
+{
+    my $tar = $Class->new;
+    $tar->add_data( 'safe/link', '',
+        { type => 2, linkname => '../../outside' } );
+
+    local $Archive::Tar::INSECURE_EXTRACT_MODE = 0;
+    local $Archive::Tar::WARN = 0;
+    ok( !$tar->extract_file( 'safe/link' ),
+        "Refused symlink target escaping cwd" );
+
+    rmtree( 'safe' );
+}
+
 {   while( my($file, $aref) = each %Map ) {
 
         for my $mode ( 0, 1 ) {

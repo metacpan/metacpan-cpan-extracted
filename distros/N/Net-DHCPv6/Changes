@@ -1,5 +1,19 @@
 Revision history for Net-DHCPv6
 
+0.003    2026-06-02
+    - [INFRA] Zero perlcritic violations across lib/ and t/ (extended from lib/-only)
+    - [INFRA] Add ProhibitImplicitImport, ProhibitEmptyAlternatives, ProhibitHighPrecedentLogicalOperatorErrorHandling to .perlcriticrc
+    - [INFRA] Run perltidy across all lib/ and t/ files
+    - [FIX] Add explicit import lists to all use statements (ProhibitImplicitImport)
+    - [FIX] Remove unused imports (ProhibitUnusedImport)
+    - [FIX] Replace magic number option codes with named constants (ProhibitMagicNumbers)
+    - [FIX] Replace noisy quote strings with q{} (ProhibitNoisyQuotes)
+    - [FIX] Fix eval return value checks (RequireCheckingReturnValueOfEval)
+    - [FIX] Fix inline do-blocks in PCAP test files (ProhibitInlineDo)
+    - [FIX] Replace die with croak, add explicit imports (RequireCarping, ProhibitCallsToUndeclaredSubs)
+    - [FIX] Replace non-ASCII characters in comments (RequireASCII)
+    - [FIX] Variable reuse, name reuse, and sub name homonyms
+
 0.002    2026-06-01
     - [CHANGE] Option 31 renamed from NtpServer to SntpServers
     - [CHANGE] `use strictures 2` moved before `package` in all modules

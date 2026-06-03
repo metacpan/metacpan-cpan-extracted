@@ -9,7 +9,7 @@ use Fcntl qw/:flock/;
 use File::Temp qw//;
 use Storable qw/nstore_fd fd_retrieve/;
 
-our $VERSION='0.0.5';
+our $VERSION='0.0.6';
 
 sub storfileUnchanged {
 	my ($self)=@_;
@@ -41,7 +41,7 @@ sub write {
 		if($message) { confess("Failed to $message") }
 		confess($raw);
 	};
-	$fh=File::Temp->new(TEMPLATE=>"$$self{file}-XXXXXXXX",UNLINK=>0,SUFFIX=>'.tmp');
+	$fh=File::Temp->new(TEMPLATE=>"$$self{file}-XXXXXXXX",UNLINK=>0,SUFFIX=>'.tmp',PERMS=>(0666&(~umask())));
 	$tmpname=$fh->filename();
 	nstore_fd($$self{store},$fh)    or &$failed("write to $tmpname");
 	close($fh)                      or &$failed("fully write to $tmpname");
@@ -67,7 +67,7 @@ App::CriticDB::DB::Stor - Storable database for App::CriticDB
 
 =head1 VERSION
 
-Version 0.0.5
+Version 0.0.6
 
 =head1 SYNOPSIS
 

@@ -1,0 +1,831 @@
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Test::YAFT - Yet another testing framework
+
+=head1 SYNOPSIS
+
+	use Test::YAFT;
+
+	it q (should pass this test)
+		=> got    => scalar do { ... }
+		=> expect => $expected_value
+		;
+
+=head1 DISCLAIMER
+
+Please accept the fact that I'm not English native speaker so this documentation
+may contain improper grammar or wording making it harder to understand.
+
+If you encounter such place, please visit project's issue tracking.
+
+=head1 DESCRIPTION
+
+L<Test::YAFT> combines features of multiple test libraries, providing
+a BDD-inspired, AAA-based, Context oriented testing approach.
+
+=head2 Test Message First
+
+The test message is always the first argument to every assumption function.
+This is a core design principle that ensures tests are self-documenting
+and readable.
+
+	it q (should increment counter)
+		=> got    => $counter
+		=> expect => 42
+		;
+
+All other arguments use a named parameter approach, making tests
+explicit and easy to understand.
+
+=head2 AAA Pattern
+
+L<Test::YAFT> provides the Arrange-Act-Assert pattern:
+
+=over
+
+=item B<Arrange> - Set up test context using C<arrange { }>
+
+=item B<Act> - Execute code under test using C<got { }> or C<act { }>
+
+=item B<Assert> - Verify results using C<expect> or C<throws>
+
+=back
+
+=head2 BDD Inspired
+
+The naming conventions (C<it>, C<assume>, C<there>) are inspired by
+Behaviour-Driven Development, allowing tests to read as specifications:
+
+	it q (should return user's full name)
+		=> got	  => $user->full_name
+		=> expect => q (John Doe)
+		;
+
+	assume q (the user's full name is correctly constructed)
+		=> got	  => $user->full_name
+		=> expect => q (John Doe)
+		;
+
+=head2 Test::Deep Integration
+
+L<Test::YAFT> uses L<Test::Deep> under the hood, enabling powerful nested
+structure matching and custom comparators.
+
+Additionally, L<Test::Differences> is used to report differences when tests fail.
+
+
+=head2 Common Assumption Arguments
+
+=over
+
+=item C<got> - The value under test
+
+	=> got => $value_under_test
+	=> got { return $value_under_test }
+
+=item C<expect> - The expected value (L<Test::Deep::Cmp> or plain value)
+
+	=> expect => expect_foo (...)
+
+=item C<throws> - Expected exception (when testing for errors)
+
+	=> throws => expect_foo (...)
+
+=item C<with_*> - Context setup
+
+	=> with_name => $name
+	=> arrange { name => $name }
+
+=item C<diag> - Custom diagnostic message
+
+	=> diag => q (Custom diagnostic message)
+	=> diag => sub { q (Computed custom diagnostic message) }
+
+=back
+
+=head2 Computed C<got> Value
+
+The C<got { }> block computes the value under test within an C<eval>,
+automatically checking for unexpected exceptions:
+
+	it q (should calculate total)
+		=> got    { $cart->calculate_total }
+		=> expect => 99.99
+		;
+
+When C<throws> is specified, the test expects the code to die:
+
+	it q (should reject negative quantity)
+		=> got    { $cart->add_item (quantity => -1) }
+		=> throws => expect_obj_isa (My::X::Positive_Quantity::)
+		;
+
+To specify such block across multiple assumptions, use the L<act { }|/act { }> block.
+
+=head2 Context
+
+L<Test::YAFT> uses a hierarchical context system to manage test state.
+
+Each context enforces the following constraints:
+
+=over
+
+=item Only one L<act {}|/act {}> block can be defined
+
+=item Each property name can only be arranged once
+
+=back
+
+There is one root context shared by all test files within the same process.
+Each L<subtest|/subtest> and each L<assumption|/ASSUMPTIONS> creates a new sub-context.
+
+Sub-contexts inherit values from their parent context and allow you to override them (once).
+Changes in a sub-context do not affect the parent or sibling contexts.
+Once a value has been read from a parent, it becomes immutable and can no longer be overridden.
+
+See also:
+L<test_frame|/test_frame>
+
+=head1 GETTING STARTED
+
+For a tutorial-like introduction, see L<Test::YAFT::Introduction>.
+
+If you are migrating from another testing library, these guides may help:
+
+=over
+
+=item L<Test::YAFT for Test::Deep users|Test::YAFT::Test::Deep>
+
+=item L<Test::YAFT for Test::Exceptions users|Test::YAFT::Test::Exception>
+
+=item L<Test::YAFT for Test::More users|Test::YAFT::Test::More>
+
+=item L<Test::YAFT for Test::Spec users|Test::YAFT::Test::Spec>
+
+=item L<Test::YAFT for Test::Warnings users|Test::YAFT::Test::Warnings>
+
+=back
+
+=head1 EXPORTING
+
+L<Test::YAFT> exports symbols using L<Exporter::Tiny>.
+
+=head2 Export Tags
+
+=over
+
+=item C<:all>
+
+All exported functions.
+
+=item C<:assumptions>
+
+Assumption functions (exported by default).
+
+=item C<:default>
+
+All functions exported by default.
+
+=item C<:expectations>
+
+Expectation functions (exported by default).
+
+=item C<:foundations>
+
+Foundation functions (B<not> exported by default).
+
+=item C<:utils>
+
+Utility functions (exported by default).
+
+=back
+
+=head2 Selective Import
+
+    # Import specific functions
+    use Test::YAFT qw (it expect_true);
+
+    # Import only foundation functions
+    use Test::YAFT qw (:foundations);
+
+    # Exclude specific functions
+    use Test::YAFT qw (!fail);
+
+See L<Exporter::Tiny> for more import options.
+
+=head1 OVERLOADED OPERATORS
+
+L<Test::YAFT> overloads operators for L<Test::Deep> expectations,
+enabling tabular-style expectation definitions for improved readability.
+
+=over
+
+=item C<!>, C<~>, Unary C<->
+
+	assume q (...)
+		=> expect => ! expectation
+		;
+
+	assume q (...)
+		=> expect => ~ expectation
+		;
+
+	assume q (...)
+		=> expect => - expectation
+		;
+
+Creates a complementary expectation (negation).
+
+=item Binary C<+>
+
+	assume q (user should have valid properties)
+		=> expect =>
+			+ expectation # must pass
+			+ expectation # must pass as well
+			+ expectation # must pass as well
+		;
+
+Combines multiple expectations where all must pass. Same behaviour as
+L<Test::Deep>'s C<&> operator, but enables better vertical alignment for
+improved readability.
+
+=item Binary C<->
+
+	assume q (...)
+		=> expect =>
+			+ expectation # must pass
+			+ expectation # must pass as well
+			- expectation # must not pass
+		;
+
+Combines expectations where C<-> negates the expectation.
+Equivalent to C<+ !>.
+
+=back
+
+=head1 ASSUMPTIONS
+
+	use Test::YAFT qw (:assumptions);
+
+Assumption functions perform actual value comparison and report test results.
+They are exported by default.
+
+Every assumption accepts the test message as the first positional parameter,
+with remaining parameters using the named approach.
+
+When an assumption performs multiple internal expectations, it reports
+as a single test using the provided message, failing early.
+
+=head2 assume
+
+	assume q (meaningful sentence)
+		=> got    => ...
+		=> expect => ...
+		;
+
+The primary test primitive. It creates its own sub-context so already arranged
+values can be redefined per assumption when needed.
+
+Accepted parameters:
+
+=over
+
+=item arrange
+
+	assume q (...)
+		=> arrange { foo => q (bar) }
+		=> arrange { bar => q (baz) }
+		...
+		;
+
+L<<C<arrange { }>|/arrange { }>> blocks are evaluated in the context of the
+assumption's sub-context before resolving the value under test.
+
+Multiple L<<C<arrange { }>|/arrange { }>> blocks are evaluated in order.
+
+=item diag
+
+Custom diagnostic message, printed on failure. When specified, no other
+diagnostic message is printed.
+
+Can be a string, arrayref of strings, or coderef. Coderef receives
+the L<Test::Deep> stack and value under test as parameters.
+
+=item expect
+
+Expected value. When specified along with computed C<got> value, an additional
+check verifies the code did not die before comparison.
+
+=item got
+
+Value under test. When L<<C<got { }>|/got { }>> is used, the block is evaluated
+and its error status is checked before comparison.
+
+=item throws
+
+Expected exception. When specified along with computed C<got> value, an additional
+check verifies the code did die before comparison.
+
+When both C<expect> and C<throws> are specified, C<throws> takes precedence.
+
+See also L<Test::YAFT::Test::Exception>.
+
+=back
+
+=head2 fail
+
+	return fail q (what failed);
+
+	return fail q (what failed)
+		=> diag => q (diagnostic message)
+		;
+
+	return fail q (what failed)
+		=> diag => sub { q (diagnostic message) }
+		;
+
+Always fails the test. Accepts an optional C<diag> parameter for
+diagnostic messages.
+
+When C<diag> is a coderef, it is executed and its result is passed
+to C<diag>.
+
+=head2 had_no_warnings
+
+    had_no_warnings;
+    had_no_warnings q (title);
+
+Verifies that no warnings were emitted.
+
+See also L<Test::Warnings::had_no_warnings|Test::Warnings/had_no_warnings>.
+
+=head2 it
+
+	it q (should be ...)
+		=> got    => ...
+		=> expect => ...
+		;
+
+Alias for L</assume>. Use when forming sentences that read naturally with "it".
+
+=head2 nok
+
+	nok q (shouldn't be ...)
+		=> got    => ...
+		;
+
+Shortcut expecting a boolean false value.
+
+=head2 ok
+
+	ok q (should be ...)
+		=> got    => ...
+		;
+
+Shortcut expecting a boolean true value.
+
+=head2 pass
+
+	pass q (what passed);
+
+Always passes the test.
+
+=head2 there
+
+	there q (should be ...)
+		=> got    => ...
+		=> expect => ...
+		;
+
+Alias for L<it|/it>. Provides a convenient word for forming meaningful
+English sentences.
+
+=head1 EXPECTATIONS
+
+	use Test::YAFT qw (:expectations);
+
+Expectation functions return L<Test::Deep::Cmp> objects describing
+expected values. They are exported by default.
+
+=head2 expect_all
+
+Re-exported from L<Test::Deep/all>.
+
+=head2 expect_any
+
+Re-exported from L<Test::Deep/any>.
+
+=head2 expect_array
+
+Re-exported from L<Test::Deep/array>.
+
+=head2 expect_array_each
+
+Re-exported from L<Test::Deep/array_each>.
+
+=head2 expect_array_elements_only
+
+Re-exported from L<Test::Deep/arrayelementsonly>.
+
+=head2 expect_array_length
+
+Re-exported from L<Test::Deep/arraylength>.
+
+=head2 expect_array_length_only
+
+Re-exported from L<Test::Deep/arraylengthonly>.
+
+=head2 expect_bag
+
+Re-exported from L<Test::Deep/bag>.
+
+=head2 expect_blessed
+
+Re-exported from L<Test::Deep/blessed>.
+
+=head2 expect_bool
+
+Re-exported from L<Test::Deep/bool>.
+
+=head2 expect_code
+
+Re-exported from L<Test::Deep/code>.
+
+=head2 expect_compare
+
+	expect_compare (q (<=), $max)
+
+Similar to L<Test::More/cmp_ok> but provided as an expectation, allowing
+combination with other L<Test::YAFT> expectations.
+
+=head2 expect_complement_to
+
+	expect_complement_to (42)
+
+Negative expectation. Usually it is easier to use the overloaded
+complement operators C<!> or C<~>.
+
+=head2 expect_false
+
+Boolean expectation for false values.
+
+=head2 expect_hash
+
+Re-exported from L<Test::Deep/hash>.
+
+=head2 expect_hash_each
+
+Re-exported from L<Test::Deep/hash_each>.
+
+=head2 expect_hash_keys
+
+Re-exported from L<Test::Deep/hashkeys>.
+
+=head2 expect_hash_keys_only
+
+Re-exported from L<Test::Deep/hashkeysonly>.
+
+=head2 expect_isa
+
+Re-exported from L<Test::Deep/Isa>. Instance or inheritance expectation.
+
+=head2 expect_listmethods
+
+Re-exported from L<Test::Deep/listmethods>.
+
+=head2 expect_methods
+
+Re-exported from L<Test::Deep/methods>.
+
+=head2 expect_no_class
+
+Re-exported from L<Test::Deep/noclass>.
+
+=head2 expect_none
+
+Re-exported from L<Test::Deep/none>.
+
+=head2 expect_none_of
+
+Re-exported from L<Test::Deep/noneof>.
+
+=head2 expect_num
+
+Re-exported from L<Test::Deep/num>.
+
+=head2 expect_obj_isa
+
+Re-exported from L<Test::Deep/obj_isa>.
+
+=head2 expect_re
+
+Re-exported from L<Test::Deep/re>.
+
+=head2 expect_ref_type
+
+Re-exported from L<Test::Deep/reftype>.
+
+=head2 expect_regexp_matches
+
+Re-exported from L<Test::Deep/regexpmatches>.
+
+=head2 expect_regexp_only
+
+Re-exported from L<Test::Deep/regexponly>.
+
+=head2 expect_regexpref
+
+Re-exported from L<Test::Deep/regexpref>.
+
+=head2 expect_regexpref_only
+
+Re-exported from L<Test::Deep/regexprefonly>.
+
+=head2 expect_scalarref
+
+Re-exported from L<Test::Deep/scalarref>.
+
+=head2 expect_scalarref_only
+
+Re-exported from L<Test::Deep/scalarrefonly>.
+
+=head2 expect_set
+
+Re-exported from L<Test::Deep/set>.
+
+=head2 expect_shallow
+
+Re-exported from L<Test::Deep/shallow>.
+
+=head2 expect_str
+
+Re-exported from L<Test::Deep/str>.
+
+=head2 expect_subbag
+
+Re-exported from L<Test::Deep/subbagof>.
+
+=head2 expect_subbag_of
+
+Re-exported from L<Test::Deep/subbagof>.
+
+=head2 expect_subhash
+
+Re-exported from L<Test::Deep/subhashof>.
+
+=head2 expect_subhash_of
+
+Re-exported from L<Test::Deep/subhashof>.
+
+=head2 expect_subset
+
+Re-exported from L<Test::Deep/subsetof>.
+
+=head2 expect_subset_of
+
+Re-exported from L<Test::Deep/subsetof>.
+
+=head2 expect_superbag
+
+Re-exported from L<Test::Deep/superbagof>.
+
+=head2 expect_superbag_of
+
+Re-exported from L<Test::Deep/superbagof>.
+
+=head2 expect_superhash
+
+Re-exported from L<Test::Deep/superhashof>.
+
+=head2 expect_superhash_of
+
+Re-exported from L<Test::Deep/superhashof>.
+
+=head2 expect_superset
+
+Re-exported from L<Test::Deep/supersetof>.
+
+=head2 expect_superset_of
+
+Re-exported from L<Test::Deep/supersetof>.
+
+=head2 expect_true
+
+Boolean expectation for true values.
+
+=head2 expect_use_class
+
+Re-exported from L<Test::Deep/useclass>.
+
+=head2 expect_value
+
+    => expect => expect_value (42)
+
+Wraps any value as an expectation.
+
+=head2 ignore
+
+Re-exported from L<Test::Deep/ignore>.
+
+=head1 UTILITIES
+
+	use Test::YAFT qw (:utils);
+
+Utility functions help organise tests. They are exported by default.
+
+=head2 act { }
+
+	act { GET qq (/countries/$_[0]) }
+		q (continent)
+		;
+
+	it q (should list countries)
+		=> with_continent => q (europe)
+		=> expect         => ...
+		;
+
+Defines a shared computation for C<got> across multiple assumptions.
+The block receives dependency values as arguments.
+
+Dependencies are specified after the block and are provided via
+L<arrange { }|/arrange { }> block or via C<with_NAME> parameters
+in assumptions.
+
+=head2 arrange { }
+
+	arrange { foo => q (bar) };
+
+	it q (should ...)
+		=> arrange { foo => q (bar2) }
+		=> got     { $foo->method (deduce q (foo)) }
+		=> expect  => ...
+		;
+
+Sets up test context by providing values to L<Context::Singleton>.
+
+When called in void context, values are proclaimed immediately.
+When used as a parameter, values are proclaimed in the test-local frame.
+
+Returns a guard object evaluated in the frame valid at the time
+of evaluation.
+
+=head2 BAIL_OUT
+
+Reexported L<Test::More/BAIL_OUT>
+
+=head2 diag
+
+Re-exported from L<Test::More/diag>.
+
+=head2 done_testing
+
+Re-exported from L<Test::More/done_testing>.
+
+=head2 explain
+
+Re-exported from L<Test::More/explain>.
+
+=head2 got { }
+
+    it q (should die)
+        => got { $foo->do_something }
+        => throws => expect_obj_isa (...)
+        ;
+
+Specifies code to compute the test value. The block is evaluated
+in an C<eval>, and C<it> checks the error status before comparison.
+
+Use with C<throws> to test that code should die.
+
+=head2 note
+
+Re-exported from L<Test::More/note>.
+
+=head2 plan
+
+Re-exported from L<Test::More/plan>.
+
+=head2 skip
+
+Re-exported from L<Test::More/skip>.
+
+=head2 subtest
+
+    subtest q (title) => sub {
+        ...;
+    };
+
+Similar to L<Test::More/subtest> but also creates a new
+L<Context::Singleton> frame for each subtest.
+
+=head2 todo_skip
+
+Re-exported from L<Test::More/todo_skip>.
+
+=head1 FOUNDATIONS
+
+	use Test::YAFT qw (:foundations);
+
+Foundation functions help build custom assumptions, expectations,
+and tools. They are B<not> exported by default.
+
+=head2 cmp_details
+
+	use Test::YAFT qw (cmp_details);
+	my ($ok, $stack) = cmp_details ($got, $expected);
+
+Re-exported from L<Test::Deep/cmp_details>.
+
+=head2 deep_diag
+
+	use Test::YAFT qw (deep_diag);
+	deep_diag ($stack);
+
+Re-exported from L<Test::Deep/deep_diag>.
+
+=head2 eq_deeply
+
+	use Test::YAFT qw (eq_deeply);
+	if (eq_deeply ($got, $expected)) {
+		...
+	}
+
+Re-exported from L<Test::Deep/eq_deeply>.
+
+=head2 test_deep_cmp
+
+Creates an anonymous L<Test::YAFT> comparator class. Returns the
+created class name.
+
+	sub expect_foo {
+		state $class = test_deep_cmp (
+			isa       => ...,
+			descend   => ...,
+			renderGot => ...,
+		);
+
+		$class->new (@_);
+	}
+
+Accepted parameters:
+
+=over
+
+=item isa => E<lt>PACKAGEE<gt>
+
+Parent class, default: L<Test::YAFT::Cmp>.
+
+=item E<lt>METHODE<gt> => E<lt>CODEREF<gt>
+
+Every other parameter is treated as a method to install.
+
+=back
+
+=head2 test_frame (&)
+
+	use Test::YAFT qw (test_frame);
+	sub my_assumption {
+		test_frame {
+			...
+		};
+	}
+
+Utility for building custom assumptions. Handles:
+
+=over
+
+=item Adjusting L<Test::Builder/level>
+
+=item Creating L<Context::Singleton/frame>
+
+=back
+
+=head1 CONTRIBUTING
+
+Contributions are welcome!
+
+=over
+
+=item Repository: L<https://github.com/happy-barney/perl-Test-YAFT>
+
+=item Report issues: L<https://github.com/happy-barney/perl-Test-YAFT/issues>
+
+=item Questions and ideas: L<https://github.com/happy-barney/perl-Test-YAFT/discussions>
+
+=back
+
+=head1 AUTHOR
+
+Branislav Zahradník <barney@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+L<Test::YAFT> distribution is distributed under the Artistic License 2.0.
+
+=cut
+

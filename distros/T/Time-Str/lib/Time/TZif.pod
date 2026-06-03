@@ -178,7 +178,7 @@ none was provided.
 
 =head2 has_name
 
-    if ($tz->has_name) { ... }
+    my $bool = $tz->has_name;
 
 Returns true if a timezone name was provided to the constructor.
 
@@ -213,24 +213,24 @@ Returns the default overlap policy set in the constructor.
     my $tz2 = $tz->with_name('Europe/Stockholm');
 
 Returns a new C<Time::TZif> object with the given timezone name, sharing
-the parsed TZif data with the original. Croaks if the name is not
-structurally valid. Returns the same object if the name is unchanged.
+the parsed TZif data with the original. Returns the same object if the
+name is unchanged.
 
 =head2 with_gap_policy
 
     my $tz2 = $tz->with_gap_policy('later');
 
 Returns a new C<Time::TZif> object with the given gap policy, sharing
-the parsed TZif data with the original. Croaks if the policy is not
-valid. Returns the same object if the policy is unchanged.
+the parsed TZif data with the original. Returns the same object if
+the policy is unchanged.
 
 =head2 with_overlap_policy
 
     my $tz2 = $tz->with_overlap_policy('earlier');
 
 Returns a new C<Time::TZif> object with the given overlap policy, sharing
-the parsed TZif data with the original. Croaks if the policy is not
-valid. Returns the same object if the policy is unchanged.
+the parsed TZif data with the original. Returns the same object if the
+policy is unchanged.
 
 =head1 POLICIES
 
@@ -411,12 +411,12 @@ A type record references an abbreviation index that is out of range.
 =item C<Unable to resolve local time: non-existing time (gap)>
 
 The given local time falls within a gap created by a spring-forward
-transition and the C<gap_policy> policy is set to C<'reject'>.
+transition and the C<gap_policy> policy is set to C<reject>.
 
 =item C<Unable to resolve local time: ambiguous time (overlap)>
 
 The given local time falls within an overlap created by a fall-back
-transition and the C<overlap_policy> policy is set to C<'reject'>.
+transition and the C<overlap_policy> policy is set to C<reject>.
 
 =back
 
@@ -433,10 +433,14 @@ A method was called with an incorrect number of arguments.
 The C<new> constructor was called without the required C<path>
 parameter.
 
+=item C<Invalid name value>
+
 =item C<Invalid value for the parameter 'name'>
 
 The value given for C<name> is not structurally valid as an IANA Time 
 Zone Database timezone name.
+
+=item C<Invalid policy value>
 
 =item C<Invalid policy value for the parameter '%s'>
 

@@ -6,7 +6,7 @@ use warnings;
 use version;
 use Carp qw(carp);
 
-our $VERSION = version->declare("v2.19.35");
+our $VERSION = version->declare("v2.19.42");
 
 use Exporter   qw( );
 use List::Util qw( uniq );
@@ -55,7 +55,7 @@ Dev::Util - Utilities useful in the development of perl programs
 
 =head1 VERSION
 
-Version v2.19.35
+Version v2.19.42
 
 =head1 SYNOPSIS
 
@@ -291,7 +291,7 @@ This module was originally developed under the name C<MERM::Base>.
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright © 2024-2025 by Matt Martini.
+This software is Copyright © 2024-2026 by Matt Martini.
 
 This is free software, licensed under:
 

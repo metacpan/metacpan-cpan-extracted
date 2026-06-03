@@ -37,7 +37,7 @@ requires:
   Data::Dump: '1.23'
   Data::UUID: '1.226'
   DateTime::Format::Lite: v0.1.2
-  DateTime::Lite: v0.7.0
+  DateTime::Lite: v0.7.3
   Devel::StackTrace: '0'
   Encode: '0'
   Errno: '0'
@@ -81,5 +81,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/deguest/Module-Generic/issues
   repository: https://gitlab.com/deguest/Module-Generic
-version: v1.5.3
+version: v1.5.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

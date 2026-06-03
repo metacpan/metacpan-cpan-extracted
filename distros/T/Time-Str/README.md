@@ -133,6 +133,11 @@ tried first; otherwise parsing falls back to the precompiled regexps from
 - [Time::Str::Regexp](https://metacpan.org/pod/Time::Str::Regexp) - Precompiled regexps with named captures for all formats
 - [Time::Str::Token](https://metacpan.org/pod/Time::Str::Token) - Token parsers (month names, day names, timezone offsets)
 - [Time::Str::Calendar](https://metacpan.org/pod/Time::Str::Calendar) - Gregorian calendar utilities (leap year, day-of-week, RDN conversion)
+- [Time::Str::Time](https://metacpan.org/pod/Time::Str::Time) - Time validation and epoch conversion
+- [Time::Str::Util](https://metacpan.org/pod/Time::Str::Util) - Binary search and time zone database utilities
+- [Time::LeapSecond](https://metacpan.org/pod/Time::LeapSecond) - Leap second table with TAI/UTC conversions
+- [Time::TZif](https://metacpan.org/pod/Time::TZif) - TZif timezone file parser with configurable local time resolution
+- [Time::TZif::POSIX](https://metacpan.org/pod/Time::TZif::POSIX) - POSIX TZ string parser with configurable local time resolution
 
 ## Documentation
 

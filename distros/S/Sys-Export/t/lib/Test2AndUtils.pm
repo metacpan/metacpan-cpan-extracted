@@ -7,10 +7,11 @@ use experimental qw( signatures );
 use parent 'Test2::V0';
 use File::Temp;
 use IO::Handle;
+use Log::Any::Adapter 'TAP';
 
 our @EXPORT= (
    @Test2::V0::EXPORT,
-   qw( explain unindent mkfile slurp escape_nonprintable )
+   qw( explain unindent mkfile slurp escape_nonprintable hexdump )
 );
 
 # Test2 runs async by default, which messes up the relation between warnings and the test
@@ -67,6 +68,15 @@ sub slurp($name) {
    my $ret= scalar <$fh>;
    close $fh or die "close($name): $!";
    $ret;
+}
+
+# Equivalent of unix command 'hexdump -C'
+# https://www.perlmonks.org/?node_id=11166492
+sub hexdump($data) {
+   $data =~ s/\G(.{1,16})(\1+)?/
+      sprintf "%08x  %-50s|%s|\n%s", $-[0], "@{[unpack q{(H2)8a0(H2)8},$1]}",
+         $1 =~ y{ -~}{.}cr, "*\n"x!!$+[2]
+   /segr . sprintf "%08x", $+[0]
 }
 
 1;

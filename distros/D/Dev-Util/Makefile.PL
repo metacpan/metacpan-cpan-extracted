@@ -34,6 +34,7 @@ WriteMakefile(
                        'Readonly'        => 2.05,
                        'Term::ANSIColor' => 5.01,
                        'Term::ReadKey'   => 2.38,
+                       'boolean'         => 0.46,
                        'autodie'         => 0,
                        'strict'          => 0,
                        'utf8'            => 0,

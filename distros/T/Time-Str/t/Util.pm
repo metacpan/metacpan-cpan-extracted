@@ -2,10 +2,11 @@ package Util;
 use strict;
 use warnings;
 
+use IO::File    qw[SEEK_SET];
 use Test::Fatal qw[exception];
 
 BEGIN {
-  our @EXPORT_OK  = qw[ throws_ok warns_ok ];
+  our @EXPORT_OK  = qw[ throws_ok warns_ok tmpfile rewind ];
   our %EXPORT_TAGS = (
       all => [ @EXPORT_OK ],
   );
@@ -68,6 +69,29 @@ sub warns_ok (&$;$) {
       $Tester->diag("found: " . $warnings[0]);
     }
   }
+}
+
+sub rewind(*) {
+  seek($_[0], 0, SEEK_SET)
+    or die qq/Couldn't rewind file handle: '$!'/;
+}
+
+sub tmpfile {
+  my $fh = IO::File->new_tmpfile
+    or die qq/Couldn't create a new temporary file: '$!'/;
+
+  binmode($fh)
+    or die qq/Couldn't binmode temporary file handle: '$!'/;
+
+  if (@_) {
+    print({$fh} @_)
+      or die qq/Couldn't write to temporary file handle: '$!'/;
+
+    seek($fh, 0, SEEK_SET)
+      or die qq/Couldn't rewind temporary file handle: '$!'/;
+  }
+
+  return $fh;
 }
 
 1;

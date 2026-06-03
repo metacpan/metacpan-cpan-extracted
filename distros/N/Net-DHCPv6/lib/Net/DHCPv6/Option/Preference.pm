@@ -4,11 +4,13 @@
 use strictures 2;
 
 package Net::DHCPv6::Option::Preference;
-$Net::DHCPv6::Option::Preference::VERSION = '0.002';
-use Net::DHCPv6::OptionList;
-use Carp qw( croak );
-use Net::DHCPv6::Constants;
-use Net::DHCPv6::X::BadOption;
+$Net::DHCPv6::Option::Preference::VERSION = '0.003';
+use Net::DHCPv6::OptionList ();
+use Carp                    qw( croak );
+use Net::DHCPv6::Constants  qw(
+    $OPTION_PREFERENCE
+);
+use Net::DHCPv6::X::BadOption ();
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
 
@@ -48,7 +50,7 @@ Net::DHCPv6::Option::Preference - Preference option (code 7) -- 8-bit server pre
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

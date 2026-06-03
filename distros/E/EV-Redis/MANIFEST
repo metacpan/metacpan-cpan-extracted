@@ -68,11 +68,13 @@ src/EV__Redis.xs
 src/libev_adapter.h
 src/ngx-queue.h
 src/ppport.h
+t/auth.t
 t/autoload.t
 t/command.t
 t/connect.t
 t/connect_unix.t
 t/flow_control.t
+t/handler_selfclear.t
 t/leak.t
 t/lib/RedisTestHelper.pm
 t/options.t

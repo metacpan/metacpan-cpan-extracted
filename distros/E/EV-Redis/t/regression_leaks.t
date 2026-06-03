@@ -19,23 +19,38 @@ my %connect_info = $redis_server->connect_info;
     my $r = EV::Redis->new;
     $r->max_pending(1);
     $r->on_error(sub { }); # silence error
-    
-    # connect to closed TCP port which fails asynchronously
+
+    # Connect to a closed TCP port. On most platforms a refused loopback
+    # connection fails asynchronously, so the two commands queue (pending +
+    # wait) and are flushed with an error when the failure is delivered. On
+    # platforms where the refusal is synchronous (e.g. FreeBSD returns
+    # ECONNREFUSED immediately) command() croaks "connection required" as
+    # documented (see Test Case 4). Either way the queues must end empty.
     $r->connect("127.0.0.1", 65534);
 
     my $called = 0;
-    $r->command('ping', sub { $called++; }); # pending
-    $r->command('ping', sub { $called++; }); # wait_queue
+    my $queued = eval {
+        $r->command('ping', sub { $called++; }); # pending
+        $r->command('ping', sub { $called++; }); # wait_queue
+        1;
+    };
 
-    is $r->waiting_count, 1, 'cmd queued in wait queue during connect';
-    is $r->pending_count, 1, 'cmd in pending during connect';
+    if ($queued) {
+        is $r->waiting_count, 1, 'cmd queued in wait queue during connect';
+        is $r->pending_count, 1, 'cmd in pending during connect';
 
-    my $timer = EV::timer 0.5, 0, sub { EV::break };
-    EV::run;
+        my $timer = EV::timer 0.5, 0, sub { EV::break };
+        EV::run;
 
-    is $r->waiting_count, 0, 'wait queue cleared on connect failure';
-    is $r->pending_count, 0, 'pending queue cleared on connect failure';
-    is $called, 2, 'both callbacks invoked with error on connect failure';
+        is $called, 2, 'both callbacks invoked with error on connect failure';
+    }
+    else {
+        like $@, qr/connection required/,
+            'synchronous connect refusal croaks as documented';
+    }
+
+    is $r->waiting_count, 0, 'wait queue cleared after connect failure';
+    is $r->pending_count, 0, 'pending queue cleared after connect failure';
 }
 
 # Test Case 2: Memory leak for skipped persistent commands upon unsubscription.

@@ -1,6 +1,13 @@
 Revision history for Test::YAFT
 
-v1.0.2     2025-05-11 23:16 UTC
+v1.0.3     2026-06-03 07:01 UTC
+
+	New assumption `assume`
+	Additional export attributes: assumptions, utils, foundations
+
+v1.0.2     2025-05-12
+
+	Fix usage of Test::Warnings and its export of done_testing
 
 v1.0.1     2022-07-06 10:37 UTC
 

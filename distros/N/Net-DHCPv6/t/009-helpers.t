@@ -1,14 +1,14 @@
 #!/usr/bin/env perl
 use strictures 2;
-use Test2::Tools::Exception qw( dies lives );
+use Test2::Tools::Exception qw( dies );
 use Test2::V1 -ipP, qw(is ok done_testing);            ## no critic (Subroutines::ProhibitCallsToUndeclaredSubs)
 
 use lib 't/lib';
 use lib 'lib';
 
-use Socket qw( AF_INET6 inet_pton inet_ntop );
+use Socket qw( AF_INET6 inet_pton );
 
-use Net::DHCPv6::Helpers;
+use Net::DHCPv6::Helpers ();
 
 my $class  = 'Net::DHCPv6::Helpers';
 my $loop   = inet_pton( AF_INET6, '::1' );
@@ -23,7 +23,7 @@ ok( dies { $class->_resolve_ipv6( q() ) }, '_resolve_ipv6: empty string dies' );
 
 is( $class->_resolve_ipv6( $loop ), $loop, '_resolve_ipv6: 16-byte wire format pass-through' );
 
-my $wire_with_colon_byte = pack( 'C*', ( 0x3A, ( 0x00 ) x 15 ) );
+my $wire_with_colon_byte = pack( 'C*', ( 0x3A, ( 0x00 ) x 15 ) );    ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 is( $class->_resolve_ipv6( $wire_with_colon_byte ),
     $wire_with_colon_byte, '_resolve_ipv6: 16-byte wire with 0x3A byte pass-through' );
 
@@ -38,7 +38,7 @@ ok( dies { $class->_resolve_ipv6( 'short' ) }, '_resolve_ipv6: non-16-byte witho
 
 ok( dies { $class->_resolve_ipv6( 'not:an:ip' ) }, '_resolve_ipv6: invalid text with colons dies' );
 
-# 16-char IPv6 text address — looks like text, should be parsed
+# 16-char IPv6 text address -- looks like text, should be parsed
 my $sixteen_char_text = 'aa:b:c:d:e:f:1:2';
 my $sixteen_char_wire = inet_pton( AF_INET6, $sixteen_char_text );
 is( $class->_resolve_ipv6( $sixteen_char_text ),

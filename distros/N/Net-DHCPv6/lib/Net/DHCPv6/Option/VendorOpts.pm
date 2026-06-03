@@ -4,11 +4,13 @@
 use strictures 2;
 
 package Net::DHCPv6::Option::VendorOpts;
-$Net::DHCPv6::Option::VendorOpts::VERSION = '0.002';
-use Net::DHCPv6::OptionList;
-use Carp qw( croak );
-use Net::DHCPv6::Constants;
-use Net::DHCPv6::X::Truncated;
+$Net::DHCPv6::Option::VendorOpts::VERSION = '0.003';
+use Net::DHCPv6::OptionList ();
+use Carp                    qw( croak );
+use Net::DHCPv6::Constants  qw(
+    $OPTION_VENDOR_OPTS
+);
+use Net::DHCPv6::X::Truncated ();
 use parent 'Net::DHCPv6::Option';
 use Ref::Util qw( is_plain_arrayref );
 use namespace::clean;
@@ -52,7 +54,7 @@ Net::DHCPv6::Option::VendorOpts - Vendor-specific Information option (code 17) -
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

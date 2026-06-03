@@ -1,0 +1,4 @@
+TYPEMAP
+
+EV::Gearman          T_PTROBJ
+EV::Loop             T_PTROBJ

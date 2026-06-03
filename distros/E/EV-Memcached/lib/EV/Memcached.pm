@@ -5,7 +5,7 @@ use EV;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.03';
+    our $VERSION = '0.04';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -295,12 +295,14 @@ C<NOT_FOUND> if the key disappeared.
 =head2 append($key, $data, [$cb])
 
 Append bytes to an existing value. Errors with C<NOT_STORED> if the
-key does not exist. Without C<$cb>, errors are silently dropped.
+key does not exist. Without C<$cb> the result is discarded, but the
+server still sends a response (the non-quiet opcode is used); this is
+not fire-and-forget like C<set>.
 
 =head2 prepend($key, $data, [$cb])
 
-Prepend bytes to an existing value. Same error and fire-and-forget
-semantics as C<append>.
+Prepend bytes to an existing value. Same error and discard semantics
+as C<append>.
 
 =head2 delete($key, [$cb])
 
@@ -502,9 +504,10 @@ only on hit, and the NOOP reply terminates the batch. Fire-and-forget
 C<set>/C<flush> use the quiet SETQ / FLUSHQ opcodes so the server
 sends no response at all.
 
-Commands that can legitimately fail (C<add>, C<replace>, C<delete>,
-C<incr>, ...) always use the non-quiet opcode so error responses are
-consumed by the client even when the user passed no callback. Keys are
+Commands that can legitimately fail (C<add>, C<replace>, C<append>,
+C<prepend>, C<delete>, C<incr>, ...) always use the non-quiet opcode so
+error responses are consumed by the client even when the user passed no
+callback. Keys are
 validated against the 250-byte protocol limit before any bytes go on
 the wire.
 

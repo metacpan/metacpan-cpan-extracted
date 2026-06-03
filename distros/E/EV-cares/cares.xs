@@ -146,9 +146,10 @@ struct ev_cares_s {
     ev_cares_io_t ios[MAX_IO];
     int active_queries;
     int destroyed;
-    int in_callback;   /* prevent Safefree while callbacks run */
-    int free_pending;  /* deferred Safefree after last callback */
-    int last_timeouts; /* timeouts count from the most recent callback */
+    int in_callback;    /* prevent Safefree while callbacks run */
+    int free_pending;   /* deferred Safefree after last callback */
+    int cleanup_pending; /* deferred channel teardown after last callback */
+    int last_timeouts;  /* timeouts count from the most recent callback */
 };
 
 typedef struct {
@@ -161,16 +162,24 @@ typedef struct {
 
 /* forward declarations */
 static void update_timer(ev_cares_t *self);
+static void cleanup_now(ev_cares_t *self);
 
-/* Bracket an ares_* call that may fire callbacks synchronously.
- * Prevents UAF if user DESTROY's the resolver inside a callback. */
+/* Bracket an ares_* call that may fire callbacks synchronously.  Guards
+ * against the user destroying the resolver from inside such a callback: both
+ * the Safefree of self AND the ares_destroy of the channel are deferred until
+ * the outermost ares_* call has fully unwound, because the channel is still
+ * referenced further up the C stack until then (destroying it inline is a
+ * use-after-free that musl turns into a hard crash; glibc only tolerates it). */
 #define ARES_CALL_BEGIN(self)  (self)->in_callback++
 #define ARES_CALL_END(self)   \
     STMT_START { \
-        if (--(self)->in_callback == 0 && (self)->free_pending) \
-            Safefree(self); \
-        else \
+        if (--(self)->in_callback == 0) { \
+            if ((self)->cleanup_pending) cleanup_now(self); \
+            if ((self)->free_pending) Safefree(self); \
+            else update_timer(self); \
+        } else { \
             update_timer(self); \
+        } \
     } STMT_END
 static void io_cb(EV_P_ ev_io *w, int revents);
 static void timer_cb(EV_P_ ev_timer *w, int revents);
@@ -329,12 +338,13 @@ update_timer(ev_cares_t *self) {
     }
 }
 
+/* Actual teardown: stop watchers, destroy the channel, release the loop.
+   Only safe when not inside an ares_* call (see cleanup()). */
 static void
-cleanup(ev_cares_t *self) {
+cleanup_now(ev_cares_t *self) {
     int i;
 
-    if (self->destroyed) return;
-    self->destroyed = 1;
+    self->cleanup_pending = 0;
 
     ev_timer_stop(self->loop, &self->timer);
     for (i = 0; i < MAX_IO; i++) {
@@ -354,6 +364,24 @@ cleanup(ev_cares_t *self) {
         SvREFCNT_dec(self->loop_sv);
         self->loop_sv = NULL;
     }
+}
+
+static void
+cleanup(ev_cares_t *self) {
+    if (self->destroyed) return;
+    self->destroyed = 1;
+
+    /* If a callback dispatched synchronously from inside an ares_* call asked
+       us to destroy (e.g. $resolver->destroy from a resolve callback that
+       ares_getaddrinfo fired inline), the channel is still referenced further
+       up the C stack.  Tearing it down now is a use-after-free; defer it to
+       the ARES_CALL_END / CB_EPILOGUE that unwinds in_callback to zero. */
+    if (self->in_callback) {
+        self->cleanup_pending = 1;
+        return;
+    }
+
+    cleanup_now(self);
 }
 
 /* ---- callback prologue/epilogue (prevents UAF if resolver freed mid-callback) ---- */
@@ -384,11 +412,15 @@ cleanup(ev_cares_t *self) {
     } \
     FREETMPS; LEAVE; \
     free_req(aTHX_ req); \
-    /* update_timer is a no-op once destroyed=1, so the order with the */ \
-    /* free_pending check below is intentionally tolerant of either */ \
-    update_timer(self); \
-    if (--self->in_callback == 0 && self->free_pending) \
-        Safefree(self)
+    if (--self->in_callback == 0) { \
+        /* Outermost callback frame unwound: run any teardown the callback */ \
+        /* deferred (channel destroy), then free self if it asked to. */ \
+        if (self->cleanup_pending) cleanup_now(self); \
+        if (self->free_pending) Safefree(self); \
+        else update_timer(self); \
+    } else { \
+        update_timer(self); \
+    }
 
 /* ---- query callbacks ---- */
 

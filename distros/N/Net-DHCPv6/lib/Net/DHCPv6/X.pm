@@ -4,7 +4,7 @@
 use strictures 2;
 
 package Net::DHCPv6::X;
-$Net::DHCPv6::X::VERSION = '0.002';
+$Net::DHCPv6::X::VERSION = '0.003';
 use Carp qw( croak );
 use namespace::clean;
 
@@ -30,7 +30,7 @@ Net::DHCPv6::X - Exception base class for Net::DHCPv6
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

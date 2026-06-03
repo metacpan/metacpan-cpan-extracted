@@ -6,9 +6,9 @@ use Test2::V1 -ipP, qw(is ok subtest like diag done_testing);    ## no critic (S
 use lib 't/lib';
 use lib 'lib';
 
-use Net::DHCPv6;
-use Net::DHCPv6::Constants;
-use Net::DHCPv6::OptionList;
+use Net::DHCPv6             ();
+use Net::DHCPv6::Constants  qw( $LINK_TYPE_ETHERNET );
+use Net::DHCPv6::OptionList ();
 
 # Hex fixtures extracted from t/data/ztp-pcap-dhcpv6.pcap
 # Origin: https://github.com/ios-xr/ztp-pcap/blob/master/6225/pcap/dhcpv6.pcap

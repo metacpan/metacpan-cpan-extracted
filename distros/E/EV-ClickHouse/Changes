@@ -1,3 +1,7 @@
+0.05  2026-06-02
+    - Fix use-after-free when a callback clears its own handler
+    - Bound untrusted row and JSON path counts before allocation
+
 0.04  2026-06-01
     - Bound Content-Length, LZ4 chain size, and native column count from
       untrusted server input

@@ -7,7 +7,7 @@ Attean::API::Binding - Name to term bindings
 
 =head1 VERSION
 
-This document describes Attean::API::Binding version 0.038
+This document describes Attean::API::Binding version 0.039
 
 =head1 DESCRIPTION
 
@@ -71,7 +71,7 @@ otherwise.
 
 use Type::Tiny::Role;
 
-package Attean::API::Binding 0.038 {
+package Attean::API::Binding 0.039 {
 	use Scalar::Util qw(blessed);
 	use List::Util qw(mesh);
 
@@ -285,7 +285,7 @@ C<< $binding >>.
 	}
 }
 
-package Attean::API::TripleOrQuadPattern 0.038 {
+package Attean::API::TripleOrQuadPattern 0.039 {
 	use Encode qw(encode);
 	use List::Util qw(mesh);
 	use Scalar::Util qw(blessed);
@@ -465,7 +465,7 @@ parsed from C<< $string >> in SPARQL syntax.
 	}
 }
 
-package Attean::API::TripleOrQuad 0.038 {
+package Attean::API::TripleOrQuad 0.039 {
 	use List::Util qw(any);
 	use Carp;
 
@@ -481,7 +481,7 @@ package Attean::API::TripleOrQuad 0.038 {
 	}
 }
 
-package Attean::API::TriplePattern 0.038 {
+package Attean::API::TriplePattern 0.039 {
 	use List::Util qw(mesh);
 	use Scalar::Util qw(blessed);
 
@@ -540,7 +540,7 @@ package Attean::API::TriplePattern 0.038 {
 	with 'Attean::API::TripleOrQuadPattern', 'Attean::API::Binding', 'Attean::API::TermOrVariableOrTriplePattern';
 }
 
-package Attean::API::Triple 0.038 {
+package Attean::API::Triple 0.039 {
 	use Scalar::Util qw(blessed);
 	use Moo::Role;
 	
@@ -631,7 +631,7 @@ package Attean::API::Triple 0.038 {
 	with 'Attean::API::TermOrTriple';
 }
 
-package Attean::API::QuadPattern 0.038 {
+package Attean::API::QuadPattern 0.039 {
 	use Scalar::Util qw(blessed);
 	use List::Util qw(mesh);
 
@@ -641,7 +641,7 @@ package Attean::API::QuadPattern 0.038 {
 	sub value {
 		my $self	= shift;
 		my $key		= shift;
-		return $self->$key() if ($key =~ /^(subject|predicate|object|graph)$/);
+		return $self->$key() if (defined($key) and $key =~ /^(subject|predicate|object|graph)$/);
 		die "Unrecognized binding name '$key'";
 	}
 	
@@ -688,7 +688,7 @@ package Attean::API::QuadPattern 0.038 {
 	with 'Attean::API::TripleOrQuadPattern', 'Attean::API::Binding';
 }
 
-package Attean::API::Quad 0.038 {
+package Attean::API::Quad 0.039 {
 	use Moo::Role;
 	
 	if ($ENV{ATTEAN_TYPECHECK}) {
@@ -715,7 +715,7 @@ package Attean::API::Quad 0.038 {
 }
 
 
-package Attean::API::Result 0.038 {
+package Attean::API::Result 0.039 {
 	use Scalar::Util qw(refaddr);
 	use Types::Standard qw(HashRef);
 

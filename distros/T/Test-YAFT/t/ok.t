@@ -3,41 +3,36 @@
 use v5.14;
 use warnings;
 
-use require::relative "test-helper.pl";
+use require::relative q (test-helper.pl);
 
-subtest "when getting true" => sub {
-	Test::Tester::check_test
-		sub {
-			ok "should just pass"
-				=> got    => 1
-				;
-		},
-		{
-			ok          => 1,
-			actual_ok   => 1,
-			name        => 'should just pass',
-			diag        => '',
-		}
+assume_test_yaft_exports ok
+	=> by_default => 1
+	=> on_demand  => 1
+	=> by_tag     => [qw [all default assumptions asserts]]
 	;
-};
 
-subtest "when getting false" => sub {
-	Test::Tester::check_test
-		sub {
-			ok "should just fail"
-				=> got    => 0
-				;
-		},
-		{
-			ok          => 0,
-			actual_ok   => 0,
-			name        => 'should just fail',
-			diag        => '',
-		}
+check_test q (when getting true)
+	=> assumption {
+		ok q (should just pass)
+			=> got    => 1
+			;
+	}
+	=> ok          => 1
+	=> actual_ok   => 1
+	=> name        => q (should just pass)
 	;
-};
+
+check_test q (when getting false)
+	=> assumption {
+		ok q (should just fail)
+			=> got    => 0
+			;
+	}
+	=> ok          => 0
+	=> actual_ok   => 0
+	=> name        => q (should just fail)
+;
 
 had_no_warnings;
-
 done_testing;
 

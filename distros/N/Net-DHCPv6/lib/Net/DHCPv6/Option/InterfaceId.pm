@@ -4,9 +4,11 @@
 use strictures 2;
 
 package Net::DHCPv6::Option::InterfaceId;
-$Net::DHCPv6::Option::InterfaceId::VERSION = '0.002';
-use Net::DHCPv6::OptionList;
-use Net::DHCPv6::Constants;
+$Net::DHCPv6::Option::InterfaceId::VERSION = '0.003';
+use Net::DHCPv6::OptionList ();
+use Net::DHCPv6::Constants  qw(
+    $OPTION_INTERFACE_ID
+);
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
 my $EMPTY = q();
@@ -40,7 +42,7 @@ Net::DHCPv6::Option::InterfaceId - Interface-ID option (code 18) -- opaque inter
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

@@ -23,7 +23,7 @@ my %WriteMakefileArgs = (
     "Syntax::Operator::In" => 0,
     "YAML::PP" => 0
   },
-  "VERSION" => "0.0.6",
+  "VERSION" => "0.0.7",
   "test" => {
     "TESTS" => "t/*.t"
   }

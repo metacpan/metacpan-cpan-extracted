@@ -4,10 +4,12 @@
 use strictures 2;
 
 package Net::DHCPv6::DUID;
-$Net::DHCPv6::DUID::VERSION = '0.002';
-use Carp qw( croak );
-use Net::DHCPv6::Constants;
-use Net::DHCPv6::X::BadDUID;
+$Net::DHCPv6::DUID::VERSION = '0.003';
+use Carp                   qw( croak );
+use Net::DHCPv6::Constants qw(
+    $DUID_EN $DUID_LL $DUID_LLT $DUID_UUID $IPV6_ADDR_LEN
+);
+use Net::DHCPv6::X::BadDUID ();
 use namespace::clean;
 my $EMPTY        = q();
 my $N_LEN        = 4;     ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
@@ -68,7 +70,7 @@ sub _new_uuid {
 
 sub duid_type         { return shift->{duid_type} }
 sub link_layer_type   { return shift->{link_layer_type} }
-sub time              { return shift->{time} }
+sub time              { return shift->{time} }                ## no critic (Subroutines::ProhibitBuiltinHomonyms)
 sub enterprise_number { return shift->{enterprise_number} }
 sub identifier        { return shift->{identifier} }
 
@@ -79,7 +81,7 @@ my %DUID_LENGTH_BASE = (
     $DUID_UUID => 2,
 );
 
-sub length {
+sub length {    ## no critic (Subroutines::ProhibitBuiltinHomonyms)
     my $self = shift;
     my $type = $self->{duid_type};
     my $id   = $self->{identifier} // $EMPTY;
@@ -270,7 +272,7 @@ Net::DHCPv6::DUID - DUID parse/emit and helper constructors
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

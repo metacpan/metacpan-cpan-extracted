@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use EV ();
 require XSLoader;
@@ -364,8 +364,9 @@ optionally C<prev_kv> when the C<prev_kv> option is set).
 
 =item watch_id
 
-Server-assigned watch identifier. Stable for the lifetime of the watch
-(including across auto-reconnect).
+Server-assigned watch identifier. Note that etcd assigns a fresh id for
+each Watch stream, so this value can change if the watch transparently
+reconnects.
 
 =item created
 
@@ -1893,7 +1894,7 @@ Create a new client in the child process if needed.
 
 =head1 AUTHOR
 
-Yegor Korablev (egor@cpan.org)
+vividsnow
 
 =head1 LICENSE
 

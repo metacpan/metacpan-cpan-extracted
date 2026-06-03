@@ -105,6 +105,13 @@
 #define CLEAR_HANDLER(field) \
     do { if (NULL != (field)) { SvREFCNT_dec(field); (field) = NULL; } } while(0)
 
+/* call_sv a stored handler SV, pinned across the call so the callback may
+ * clear its own handler (e.g. $obj->on_error(undef)) without freeing the CV
+ * mid-call. Args must already be pushed. */
+#define PINNED_CALL_SV(handler, flags) \
+    STMT_START { SV *_pin = (handler); SvREFCNT_inc_simple_void_NN(_pin); \
+                 call_sv(_pin, (flags)); SvREFCNT_dec(_pin); } STMT_END
+
 /* ================================================================
  * Type declarations
  * ================================================================ */
@@ -463,8 +470,12 @@ struct ev_kafka_conn_s {
     int reconnect_timing;
     int intentional_disconnect;
 
-    /* Safety */
+    /* Safety: callback_depth is bumped by the outermost event-loop watcher
+     * frames; DESTROY defers Safefree while depth>0 (free_pending) so a
+     * callback that drops the last ref to the conn cannot free it out from
+     * under the still-running C frames. */
     int callback_depth;
+    int free_pending;
 };
 
 /* ================================================================
@@ -474,6 +485,10 @@ struct ev_kafka_conn_s {
 static void conn_io_cb(EV_P_ ev_io *w, int revents);
 static void conn_timer_cb(EV_P_ ev_timer *w, int revents);
 static void conn_reconnect_timer_cb(EV_P_ ev_timer *w, int revents);
+static void conn_io_cb_inner(EV_P_ ev_io *w, int revents);
+static void conn_timer_cb_inner(EV_P_ ev_timer *w, int revents);
+static void conn_reconnect_timer_cb_inner(EV_P_ ev_timer *w, int revents);
+static void conn_do_free(pTHX_ ev_kafka_conn_t *self);
 static void conn_start_reading(ev_kafka_conn_t *self);
 static void conn_stop_reading(ev_kafka_conn_t *self);
 static void conn_start_writing(ev_kafka_conn_t *self);
@@ -665,7 +680,7 @@ static void conn_emit_error(pTHX_ ev_kafka_conn_t *self, const char *msg) {
         PUSHMARK(SP);
         XPUSHs(sv_2mortal(newSVpv(msg, 0)));
         PUTBACK;
-        call_sv(self->on_error, G_DISCARD | G_EVAL);
+        PINNED_CALL_SV(self->on_error, G_DISCARD | G_EVAL);
         if (SvTRUE(ERRSV)) {
             warn("EV::Kafka::Conn: on_error callback error: %s", SvPV_nolen(ERRSV));
             sv_setsv(ERRSV, &PL_sv_undef);
@@ -686,7 +701,7 @@ static void conn_emit_connect(pTHX_ ev_kafka_conn_t *self) {
         SAVETMPS;
         PUSHMARK(SP);
         PUTBACK;
-        call_sv(self->on_connect, G_DISCARD | G_EVAL);
+        PINNED_CALL_SV(self->on_connect, G_DISCARD | G_EVAL);
         if (SvTRUE(ERRSV)) {
             warn("EV::Kafka::Conn: on_connect callback error: %s", SvPV_nolen(ERRSV));
             sv_setsv(ERRSV, &PL_sv_undef);
@@ -707,7 +722,7 @@ static void conn_emit_disconnect(pTHX_ ev_kafka_conn_t *self) {
         SAVETMPS;
         PUSHMARK(SP);
         PUTBACK;
-        call_sv(self->on_disconnect, G_DISCARD | G_EVAL);
+        PINNED_CALL_SV(self->on_disconnect, G_DISCARD | G_EVAL);
         if (SvTRUE(ERRSV)) {
             warn("EV::Kafka::Conn: on_disconnect callback error: %s", SvPV_nolen(ERRSV));
             sv_setsv(ERRSV, &PL_sv_undef);
@@ -744,7 +759,45 @@ static void conn_invoke_cb(pTHX_ ev_kafka_conn_t *self, SV *cb, SV *result, SV *
 }
 
 static int conn_check_destroyed(ev_kafka_conn_t *self) {
-    return self->magic != KF_MAGIC_ALIVE;
+    /* free_pending: DESTROY ran inside a callback and deferred the actual
+     * Safefree to the outermost watcher frame; treat the conn as gone so
+     * callers stop touching it, but the memory is still valid until then. */
+    return self->magic != KF_MAGIC_ALIVE || self->free_pending;
+}
+
+/* The actual teardown: stop the reconnect timer, drop handlers, free all
+ * buffers/strings and the struct.  Called by DESTROY when not inside a
+ * callback, or by the outermost event-loop watcher frame once it unwinds to
+ * callback_depth 0 with free_pending set.  conn_cleanup() must have run first. */
+static void conn_do_free(pTHX_ ev_kafka_conn_t *self) {
+    if (self->reconnect_timing) {
+        ev_timer_stop(self->loop, &self->reconnect_timer);
+        self->reconnect_timing = 0;
+    }
+
+    CLEAR_HANDLER(self->on_error);
+    CLEAR_HANDLER(self->on_connect);
+    CLEAR_HANDLER(self->on_disconnect);
+
+    if (self->host) Safefree(self->host);
+    if (self->client_id) Safefree(self->client_id);
+    if (self->sasl_mechanism) Safefree(self->sasl_mechanism);
+    if (self->sasl_username) Safefree(self->sasl_username);
+    if (self->sasl_password) Safefree(self->sasl_password);
+    if (self->scram_nonce) Safefree(self->scram_nonce);
+    if (self->scram_client_first) Safefree(self->scram_client_first);
+#ifdef HAVE_OPENSSL
+    OPENSSL_cleanse(self->scram_server_key, sizeof(self->scram_server_key));
+    if (self->scram_auth_message) {
+        OPENSSL_cleanse(self->scram_auth_message, self->scram_auth_message_len);
+        Safefree(self->scram_auth_message);
+    }
+#endif
+    if (self->tls_ca_file) Safefree(self->tls_ca_file);
+    if (self->rbuf) Safefree(self->rbuf);
+    if (self->wbuf) Safefree(self->wbuf);
+
+    Safefree(self);
 }
 
 /* ================================================================
@@ -818,7 +871,20 @@ static void conn_handle_disconnect(pTHX_ ev_kafka_conn_t *self, const char *reas
  * Reconnection
  * ================================================================ */
 
+/* Outermost watcher frame: owns callback_depth so a callback that drops the
+ * last ref to the conn defers the free to here (after all C frames unwind). */
 static void conn_reconnect_timer_cb(EV_P_ ev_timer *w, int revents) {
+    ev_kafka_conn_t *self = (ev_kafka_conn_t *)((char *)w - offsetof(ev_kafka_conn_t, reconnect_timer));
+    dTHX;
+    (void)loop;
+    if (self->magic != KF_MAGIC_ALIVE) return;
+    self->callback_depth++;
+    conn_reconnect_timer_cb_inner(loop, w, revents);
+    if (--self->callback_depth == 0 && self->free_pending)
+        conn_do_free(aTHX_ self);
+}
+
+static void conn_reconnect_timer_cb_inner(EV_P_ ev_timer *w, int revents) {
     ev_kafka_conn_t *self = (ev_kafka_conn_t *)((char *)w - offsetof(ev_kafka_conn_t, reconnect_timer));
     dTHX;
     (void)loop;
@@ -1665,8 +1731,10 @@ static void kf_encode_record_batch_multi(pTHX_ kf_buf_t *out,
             kf_buf_append_i32(&inner, (int32_t)count);
             kf_buf_append(&inner, compressed, clen);
         } else {
-            uint16_t zero = 0;
-            memcpy(inner.data, &zero, 2);
+            /* compression failed: fall back to uncompressed. Clear only the
+             * compression bits (0-2) in the big-endian attrs (low byte, at
+             * offset 1), preserving isTransactional (bit 4) and other flags. */
+            inner.data[1] &= (char)~0x07;
             kf_buf_append_i32(&inner, (int32_t)count);
             kf_buf_append(&inner, records.data, records.len);
         }
@@ -1695,8 +1763,10 @@ static void kf_encode_record_batch_multi(pTHX_ kf_buf_t *out,
             kf_buf_append_i32(&inner, (int32_t)count);
             kf_buf_append(&inner, compressed, zs.total_out);
         } else {
-            uint16_t zero = 0;
-            memcpy(inner.data, &zero, 2);
+            /* compression failed: fall back to uncompressed. Clear only the
+             * compression bits (0-2) in the big-endian attrs (low byte, at
+             * offset 1), preserving isTransactional (bit 4) and other flags. */
+            inner.data[1] &= (char)~0x07;
             kf_buf_append_i32(&inner, (int32_t)count);
             kf_buf_append(&inner, records.data, records.len);
         }
@@ -1714,8 +1784,10 @@ static void kf_encode_record_batch_multi(pTHX_ kf_buf_t *out,
             kf_buf_append_i32(&inner, (int32_t)count);
             kf_buf_append(&inner, compressed, clen);
         } else {
-            uint16_t zero = 0;
-            memcpy(inner.data, &zero, 2);
+            /* compression failed: fall back to uncompressed. Clear only the
+             * compression bits (0-2) in the big-endian attrs (low byte, at
+             * offset 1), preserving isTransactional (bit 4) and other flags. */
+            inner.data[1] &= (char)~0x07;
             kf_buf_append_i32(&inner, (int32_t)count);
             kf_buf_append(&inner, records.data, records.len);
         }
@@ -1733,8 +1805,10 @@ static void kf_encode_record_batch_multi(pTHX_ kf_buf_t *out,
             kf_buf_append_i32(&inner, (int32_t)count);
             kf_buf_append(&inner, compressed, clen);
         } else {
-            uint16_t zero = 0;
-            memcpy(inner.data, &zero, 2);
+            /* compression failed: fall back to uncompressed. Clear only the
+             * compression bits (0-2) in the big-endian attrs (low byte, at
+             * offset 1), preserving isTransactional (bit 4) and other flags. */
+            inner.data[1] &= (char)~0x07;
             kf_buf_append_i32(&inner, (int32_t)count);
             kf_buf_append(&inner, records.data, records.len);
         }
@@ -2260,7 +2334,11 @@ static int kf_decode_record_batch(pTHX_ const char *data, size_t len,
                 decompressed = NULL;
                 decomp_cap *= 2;
             }
-            if (dlen > 0) {
+            if (dlen >= 0) {
+                /* dlen==0 is a validly-empty batch: point rec_data at the
+                 * (empty) decompressed buffer so the record loop sees zero
+                 * records, instead of falling through to parse the still-
+                 * compressed bytes.  decompressed is freed after the loop. */
                 rec_data = decompressed;
                 rec_end = decompressed + dlen;
             } else if (decompressed) {
@@ -3220,6 +3298,17 @@ static void conn_io_cb(EV_P_ ev_io *w, int revents) {
     ev_kafka_conn_t *self = (ev_kafka_conn_t *)w->data;
     dTHX;
     (void)loop;
+    if (!self || self->magic != KF_MAGIC_ALIVE) return;
+    self->callback_depth++;
+    conn_io_cb_inner(loop, w, revents);
+    if (--self->callback_depth == 0 && self->free_pending)
+        conn_do_free(aTHX_ self);
+}
+
+static void conn_io_cb_inner(EV_P_ ev_io *w, int revents) {
+    ev_kafka_conn_t *self = (ev_kafka_conn_t *)w->data;
+    dTHX;
+    (void)loop;
 
     if (!self || self->magic != KF_MAGIC_ALIVE) return;
 
@@ -3341,6 +3430,18 @@ static void conn_io_cb(EV_P_ ev_io *w, int revents) {
  * ================================================================ */
 
 static void conn_timer_cb(EV_P_ ev_timer *w, int revents) {
+    ev_kafka_conn_t *self = (ev_kafka_conn_t *)w->data;
+    dTHX;
+    (void)loop;
+    self->timing = 0;
+    if (self->magic != KF_MAGIC_ALIVE) return;
+    self->callback_depth++;
+    conn_timer_cb_inner(loop, w, revents);
+    if (--self->callback_depth == 0 && self->free_pending)
+        conn_do_free(aTHX_ self);
+}
+
+static void conn_timer_cb_inner(EV_P_ ev_timer *w, int revents) {
     ev_kafka_conn_t *self = (ev_kafka_conn_t *)w->data;
     dTHX;
     (void)loop;
@@ -3611,41 +3712,25 @@ DESTROY(EV::Kafka::Conn self)
     CODE:
     {
         if (self->magic != KF_MAGIC_ALIVE) return;
+        if (self->free_pending) return;   /* already scheduled for deferred free */
 
         self->intentional_disconnect = 1;
         conn_cleanup(aTHX_ self);
+
+        /* Mark dead BEFORE firing any callback (conn_cancel_pending fires the
+         * pending command callbacks): a re-entrant DESTROY then hits the
+         * free_pending guard, and conn_check_destroyed reports the conn gone. */
+        self->magic = KF_MAGIC_FREED;
+        self->free_pending = 1;
+
         conn_cancel_pending(aTHX_ self, "destroyed");
 
-        self->magic = KF_MAGIC_FREED;
-
-        if (self->reconnect_timing) {
-            ev_timer_stop(self->loop, &self->reconnect_timer);
-            self->reconnect_timing = 0;
-        }
-
-        CLEAR_HANDLER(self->on_error);
-        CLEAR_HANDLER(self->on_connect);
-        CLEAR_HANDLER(self->on_disconnect);
-
-        if (self->host) Safefree(self->host);
-        if (self->client_id) Safefree(self->client_id);
-        if (self->sasl_mechanism) Safefree(self->sasl_mechanism);
-        if (self->sasl_username) Safefree(self->sasl_username);
-        if (self->sasl_password) Safefree(self->sasl_password);
-        if (self->scram_nonce) Safefree(self->scram_nonce);
-        if (self->scram_client_first) Safefree(self->scram_client_first);
-#ifdef HAVE_OPENSSL
-        OPENSSL_cleanse(self->scram_server_key, sizeof(self->scram_server_key));
-        if (self->scram_auth_message) {
-            OPENSSL_cleanse(self->scram_auth_message, self->scram_auth_message_len);
-            Safefree(self->scram_auth_message);
-        }
-#endif
-        if (self->tls_ca_file) Safefree(self->tls_ca_file);
-        if (self->rbuf) Safefree(self->rbuf);
-        if (self->wbuf) Safefree(self->wbuf);
-
-        Safefree(self);
+        /* If we are inside an event-loop watcher callback (callback_depth>0),
+         * that outermost frame runs conn_do_free when it unwinds to depth 0.
+         * Otherwise free now. conn_cancel_pending only fires callbacks and a
+         * nested DESTROY is blocked above, so self is still valid here. */
+        if (self->callback_depth == 0)
+            conn_do_free(aTHX_ self);
     }
 
 void

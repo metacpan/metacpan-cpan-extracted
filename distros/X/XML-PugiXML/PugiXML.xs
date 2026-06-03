@@ -12,7 +12,26 @@
 
 using namespace pugi;
 
-/* Forward declaration for compiled XPath wrapper */
+/* A const char* whose typemap rejects an embedded NUL byte. Plain const char*
+   args use SvPV_nolen and would silently truncate a name/value at the first
+   NUL (storing a different string than was passed); NUL is invalid in XML 1.0
+   anyway. Used for the string arguments of the tree-mutation methods. */
+typedef const char* nul_safe_pv;
+
+/* SvPV with an embedded-NUL guard, used by the nul_safe_pv typemap. Keep it a
+   function (not inline typemap code): an inline INPUT block with a quoted
+   croak() breaks ExtUtils::ParseXS template interpolation on some versions
+   (the '"' ends the interpolated string), which mis-emits the argument and
+   then crashes pugixml on a NULL. The typemap INPUT just calls this. */
+static const char* ng_check_nul(pTHX_ SV* sv) {
+    STRLEN len;
+    const char* p = SvPV(sv, len);
+    if (strlen(p) != len)
+        croak("XML::PugiXML: string argument contains an embedded NUL byte (invalid in XML)");
+    return p;
+}
+
+/* Compiled XPath wrapper */
 struct PugiXPath {
     xpath_query* query;
 };
@@ -52,6 +71,25 @@ typedef PugiXPath* XML__PugiXML__XPath;
 #define CHECK_ATTR_ALIVE(self) \
     if (self->gen_snap != *self->gen_ptr) \
         croak("Stale attribute handle: document has been reset or reloaded")
+
+/* Two node handles share a document iff their gen_ptr (which points at that
+   document's generation counter) is identical. insert_child_* / remove_child
+   require the ref/child argument to live in the same document as self;
+   pugixml otherwise silently returns a null node. */
+#define CHECK_SAME_DOC(a, b) \
+    if ((a)->gen_ptr != (b)->gen_ptr) \
+        croak("Node belongs to a different document")
+
+/* croak() longjmps out of a catch block, skipping __cxa_end_catch and leaking
+   the caught C++ exception object (kept reachable on the EH chain, ~150 bytes
+   each) on every caught exception. So stash the message in the catch and croak
+   only AFTER it has unwound. XPATH_GUARDED opens the guarded block;
+   END_XPATH_GUARDED closes it with the standard XPath-error handlers. */
+#define XPATH_GUARDED char xpath_err[256]; xpath_err[0] = '\0'; try
+#define END_XPATH_GUARDED \
+    catch (const xpath_exception& e) { snprintf(xpath_err, sizeof(xpath_err), "XPath error: %s", e.what()); } \
+    catch (const std::exception& e)  { snprintf(xpath_err, sizeof(xpath_err), "Internal XPath error: %s", e.what()); } \
+    if (xpath_err[0]) croak("%s", xpath_err)
 
 /* Helper functions */
 
@@ -171,9 +209,17 @@ OUTPUT:
     RETVAL
 
 bool
-load_string(XML::PugiXML self, const char* xml, unsigned int parse_options = parse_default)
+load_string(XML::PugiXML self, SV* xml_sv, unsigned int parse_options = parse_default)
 CODE:
 {
+    STRLEN xml_len;
+    const char* xml = SvPV(xml_sv, xml_len);
+    /* load_string takes a C string, so an embedded NUL would silently
+       truncate the document and parse a different (shorter) one than was
+       passed. NUL is invalid in XML 1.0 anyway -- reject it with a clear
+       error rather than succeed on the truncated prefix. */
+    if (strlen(xml) != xml_len)
+        croak("load_string: XML contains an embedded NUL byte (invalid XML)");
     self->generation++;
     xml_parse_result result = self->doc->load_string(xml, parse_options);
     set_parse_result(aTHX_ result);
@@ -191,12 +237,16 @@ CODE:
 }
 
 bool
-save_file(XML::PugiXML self, const char* path, const char* indent = "\t", unsigned int flags = format_default)
+save_file(XML::PugiXML self, const char* path, const char* indent = NULL, unsigned int flags = format_default)
 CODE:
 {
+    if (!indent) indent = "\t";   /* default: avoid ParseXS mangling "\t" in the signature */
     RETVAL = self->doc->save_file(path, indent, flags);
     if (!RETVAL) {
-        sv_setpvf(get_sv("@", GV_ADD), "Failed to save XML file: %s", strerror(errno));
+        /* capture errno before get_sv(), whose evaluation order relative to
+           strerror(errno) is otherwise unspecified and could clobber it */
+        int saved_errno = errno;
+        sv_setpvf(get_sv("@", GV_ADD), "Failed to save XML file: %s", strerror(saved_errno));
     } else {
         sv_setpvs(get_sv("@", GV_ADD), "");
     }
@@ -205,13 +255,20 @@ OUTPUT:
     RETVAL
 
 SV*
-to_string(XML::PugiXML self, const char* indent = "\t", unsigned int flags = format_default)
+to_string(XML::PugiXML self, const char* indent = NULL, unsigned int flags = format_default)
 CODE:
 {
-    std::ostringstream oss;
-    self->doc->save(oss, indent, flags);
-    std::string str = oss.str();
-    RETVAL = new_utf8_svpvn(aTHX_ str.c_str(), str.length());
+    if (!indent) indent = "\t";   /* default: avoid ParseXS mangling "\t" in the signature */
+    RETVAL = 0;
+    XPATH_GUARDED {
+        std::ostringstream oss;
+        self->doc->save(oss, indent, flags);
+        std::string str = oss.str();
+        RETVAL = new_utf8_svpvn(aTHX_ str.c_str(), str.length());
+    } catch (const std::exception& e) {
+        snprintf(xpath_err, sizeof(xpath_err), "to_string error: %s", e.what());
+    }
+    if (xpath_err[0]) croak("%s", xpath_err);
 }
 OUTPUT:
     RETVAL
@@ -240,14 +297,11 @@ SV*
 select_node(XML::PugiXML self, const char* xpath)
 CODE:
 {
-    try {
+    RETVAL = 0;
+    XPATH_GUARDED {
         xpath_node result = self->doc->select_node(xpath);
         RETVAL = wrap_xpath_result(aTHX_ result, ST(0));
-    } catch (const xpath_exception& e) {
-        croak("XPath error: %s", e.what());
-    } catch (const std::exception& e) {
-        croak("Internal XPath error: %s", e.what());
-    }
+    } END_XPATH_GUARDED;
 }
 OUTPUT:
     RETVAL
@@ -256,18 +310,14 @@ void
 select_nodes(XML::PugiXML self, const char* xpath)
 PPCODE:
 {
-    try {
+    XPATH_GUARDED {
         xpath_node_set nodes = self->doc->select_nodes(xpath);
         EXTEND(SP, (SSize_t)nodes.size());
         for (xpath_node_set::const_iterator it = nodes.begin(); it != nodes.end(); ++it) {
             SV* sv = wrap_xpath_result(aTHX_ *it, ST(0));
             PUSHs(sv_2mortal(sv));
         }
-    } catch (const xpath_exception& e) {
-        croak("XPath error: %s", e.what());
-    } catch (const std::exception& e) {
-        croak("Internal XPath error: %s", e.what());
-    }
+    } END_XPATH_GUARDED;
 }
 
 SV*
@@ -275,7 +325,8 @@ compile_xpath(XML::PugiXML self, const char* xpath)
 CODE:
 {
     PERL_UNUSED_VAR(self);
-    try {
+    RETVAL = 0;
+    XPATH_GUARDED {
         xpath_query* query = new (std::nothrow) xpath_query(xpath);
         if (!query) {
             croak("Out of memory allocating xpath_query");
@@ -291,10 +342,11 @@ CODE:
         sv_setref_pv(sv, "XML::PugiXML::XPath", (void*)wrapper);
         RETVAL = sv;
     } catch (const xpath_exception& e) {
-        croak("XPath compilation error: %s", e.what());
+        snprintf(xpath_err, sizeof(xpath_err), "XPath compilation error: %s", e.what());
     } catch (const std::exception& e) {
-        croak("Internal XPath compilation error: %s", e.what());
+        snprintf(xpath_err, sizeof(xpath_err), "Internal XPath compilation error: %s", e.what());
     }
+    if (xpath_err[0]) croak("%s", xpath_err);
 }
 OUTPUT:
     RETVAL
@@ -477,7 +529,7 @@ OUTPUT:
     RETVAL
 
 SV*
-append_child(XML::PugiXML::Node self, const char* name)
+append_child(XML::PugiXML::Node self, nul_safe_pv name)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -488,7 +540,7 @@ OUTPUT:
     RETVAL
 
 SV*
-prepend_child(XML::PugiXML::Node self, const char* name)
+prepend_child(XML::PugiXML::Node self, nul_safe_pv name)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -499,11 +551,12 @@ OUTPUT:
     RETVAL
 
 SV*
-insert_child_before(XML::PugiXML::Node self, const char* name, XML::PugiXML::Node ref_node)
+insert_child_before(XML::PugiXML::Node self, nul_safe_pv name, XML::PugiXML::Node ref_node)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
     CHECK_NODE_ALIVE(ref_node);
+    CHECK_SAME_DOC(self, ref_node);
     xml_node child = self->node.insert_child_before(name, ref_node->node);
     RETVAL = wrap_node(aTHX_ child, self->doc_sv);
 }
@@ -511,11 +564,12 @@ OUTPUT:
     RETVAL
 
 SV*
-insert_child_after(XML::PugiXML::Node self, const char* name, XML::PugiXML::Node ref_node)
+insert_child_after(XML::PugiXML::Node self, nul_safe_pv name, XML::PugiXML::Node ref_node)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
     CHECK_NODE_ALIVE(ref_node);
+    CHECK_SAME_DOC(self, ref_node);
     xml_node child = self->node.insert_child_after(name, ref_node->node);
     RETVAL = wrap_node(aTHX_ child, self->doc_sv);
 }
@@ -523,7 +577,7 @@ OUTPUT:
     RETVAL
 
 SV*
-append_cdata(XML::PugiXML::Node self, const char* content)
+append_cdata(XML::PugiXML::Node self, nul_safe_pv content)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -537,7 +591,7 @@ OUTPUT:
     RETVAL
 
 SV*
-append_comment(XML::PugiXML::Node self, const char* content)
+append_comment(XML::PugiXML::Node self, nul_safe_pv content)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -565,8 +619,14 @@ path(XML::PugiXML::Node self, char delimiter = '/')
 CODE:
 {
     CHECK_NODE_ALIVE(self);
-    std::string p = self->node.path(delimiter);
-    RETVAL = new_utf8_svpvn(aTHX_ p.c_str(), p.length());
+    RETVAL = 0;
+    XPATH_GUARDED {
+        std::string p = self->node.path(delimiter);
+        RETVAL = new_utf8_svpvn(aTHX_ p.c_str(), p.length());
+    } catch (const std::exception& e) {
+        snprintf(xpath_err, sizeof(xpath_err), "path error: %s", e.what());
+    }
+    if (xpath_err[0]) croak("%s", xpath_err);
 }
 OUTPUT:
     RETVAL
@@ -595,7 +655,7 @@ OUTPUT:
     RETVAL
 
 bool
-set_name(XML::PugiXML::Node self, const char* name)
+set_name(XML::PugiXML::Node self, nul_safe_pv name)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -605,7 +665,7 @@ OUTPUT:
     RETVAL
 
 bool
-set_value(XML::PugiXML::Node self, const char* value)
+set_value(XML::PugiXML::Node self, nul_safe_pv value)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -615,7 +675,7 @@ OUTPUT:
     RETVAL
 
 bool
-set_text(XML::PugiXML::Node self, const char* text)
+set_text(XML::PugiXML::Node self, nul_safe_pv text)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -629,14 +689,11 @@ select_node(XML::PugiXML::Node self, const char* xpath)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
-    try {
+    RETVAL = 0;
+    XPATH_GUARDED {
         xpath_node result = self->node.select_node(xpath);
         RETVAL = wrap_xpath_result(aTHX_ result, self->doc_sv);
-    } catch (const xpath_exception& e) {
-        croak("XPath error: %s", e.what());
-    } catch (const std::exception& e) {
-        croak("Internal XPath error: %s", e.what());
-    }
+    } END_XPATH_GUARDED;
 }
 OUTPUT:
     RETVAL
@@ -646,32 +703,28 @@ select_nodes(XML::PugiXML::Node self, const char* xpath)
 PPCODE:
 {
     CHECK_NODE_ALIVE(self);
-    try {
+    XPATH_GUARDED {
         xpath_node_set nodes = self->node.select_nodes(xpath);
         EXTEND(SP, (SSize_t)nodes.size());
         for (xpath_node_set::const_iterator it = nodes.begin(); it != nodes.end(); ++it) {
             SV* sv = wrap_xpath_result(aTHX_ *it, self->doc_sv);
             PUSHs(sv_2mortal(sv));
         }
-    } catch (const xpath_exception& e) {
-        croak("XPath error: %s", e.what());
-    } catch (const std::exception& e) {
-        croak("Internal XPath error: %s", e.what());
-    }
+    } END_XPATH_GUARDED;
 }
 
 bool
 valid(XML::PugiXML::Node self)
 CODE:
 {
-    /* valid() deliberately skips CHECK_NODE_ALIVE — returns false for stale handles */
+    /* valid() deliberately skips CHECK_NODE_ALIVE -- returns false for stale handles */
     RETVAL = (self->gen_snap == *self->gen_ptr) && (bool)self->node;
 }
 OUTPUT:
     RETVAL
 
 SV*
-append_attr(XML::PugiXML::Node self, const char* name)
+append_attr(XML::PugiXML::Node self, nul_safe_pv name)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -682,7 +735,7 @@ OUTPUT:
     RETVAL
 
 SV*
-prepend_attr(XML::PugiXML::Node self, const char* name)
+prepend_attr(XML::PugiXML::Node self, nul_safe_pv name)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -698,6 +751,7 @@ CODE:
 {
     CHECK_NODE_ALIVE(self);
     CHECK_NODE_ALIVE(child);
+    CHECK_SAME_DOC(self, child);
     RETVAL = self->node.remove_child(child->node);
 }
 OUTPUT:
@@ -744,6 +798,7 @@ CODE:
     CHECK_NODE_ALIVE(self);
     CHECK_NODE_ALIVE(source);
     CHECK_NODE_ALIVE(ref_node);
+    CHECK_SAME_DOC(self, ref_node);
     xml_node copy = self->node.insert_copy_before(source->node, ref_node->node);
     RETVAL = wrap_node(aTHX_ copy, self->doc_sv);
 }
@@ -757,6 +812,7 @@ CODE:
     CHECK_NODE_ALIVE(self);
     CHECK_NODE_ALIVE(source);
     CHECK_NODE_ALIVE(ref_node);
+    CHECK_SAME_DOC(self, ref_node);
     xml_node copy = self->node.insert_copy_after(source->node, ref_node->node);
     RETVAL = wrap_node(aTHX_ copy, self->doc_sv);
 }
@@ -764,7 +820,7 @@ OUTPUT:
     RETVAL
 
 SV*
-set_attr(XML::PugiXML::Node self, const char* name, const char* value)
+set_attr(XML::PugiXML::Node self, nul_safe_pv name, nul_safe_pv value)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -781,7 +837,7 @@ OUTPUT:
     RETVAL
 
 SV*
-append_pi(XML::PugiXML::Node self, const char* target, const char* data = NULL)
+append_pi(XML::PugiXML::Node self, nul_safe_pv target, nul_safe_pv data = NULL)
 CODE:
 {
     CHECK_NODE_ALIVE(self);
@@ -923,7 +979,7 @@ OUTPUT:
     RETVAL
 
 bool
-set_value(XML::PugiXML::Attr self, const char* value)
+set_value(XML::PugiXML::Attr self, nul_safe_pv value)
 CODE:
 {
     CHECK_ATTR_ALIVE(self);
@@ -933,7 +989,7 @@ OUTPUT:
     RETVAL
 
 bool
-set_name(XML::PugiXML::Attr self, const char* name)
+set_name(XML::PugiXML::Attr self, nul_safe_pv name)
 CODE:
 {
     CHECK_ATTR_ALIVE(self);
@@ -978,14 +1034,11 @@ evaluate_node(XML::PugiXML::XPath self, XML::PugiXML::Node node)
 CODE:
 {
     CHECK_NODE_ALIVE(node);
-    try {
+    RETVAL = 0;
+    XPATH_GUARDED {
         xpath_node result = self->query->evaluate_node(node->node);
         RETVAL = wrap_xpath_result(aTHX_ result, node->doc_sv);
-    } catch (const xpath_exception& e) {
-        croak("XPath error: %s", e.what());
-    } catch (const std::exception& e) {
-        croak("Internal XPath error: %s", e.what());
-    }
+    } END_XPATH_GUARDED;
 }
 OUTPUT:
     RETVAL
@@ -995,18 +1048,14 @@ evaluate_nodes(XML::PugiXML::XPath self, XML::PugiXML::Node node)
 PPCODE:
 {
     CHECK_NODE_ALIVE(node);
-    try {
+    XPATH_GUARDED {
         xpath_node_set nodes = self->query->evaluate_node_set(node->node);
         EXTEND(SP, (SSize_t)nodes.size());
         for (xpath_node_set::const_iterator it = nodes.begin(); it != nodes.end(); ++it) {
             SV* sv = wrap_xpath_result(aTHX_ *it, node->doc_sv);
             PUSHs(sv_2mortal(sv));
         }
-    } catch (const xpath_exception& e) {
-        croak("XPath error: %s", e.what());
-    } catch (const std::exception& e) {
-        croak("Internal XPath error: %s", e.what());
-    }
+    } END_XPATH_GUARDED;
 }
 
 SV*
@@ -1014,14 +1063,11 @@ evaluate_string(XML::PugiXML::XPath self, XML::PugiXML::Node node)
 CODE:
 {
     CHECK_NODE_ALIVE(node);
-    try {
+    RETVAL = 0;
+    XPATH_GUARDED {
         std::string result = self->query->evaluate_string(node->node);
         RETVAL = new_utf8_svpvn(aTHX_ result.c_str(), result.length());
-    } catch (const xpath_exception& e) {
-        croak("XPath error: %s", e.what());
-    } catch (const std::exception& e) {
-        croak("Internal XPath error: %s", e.what());
-    }
+    } END_XPATH_GUARDED;
 }
 OUTPUT:
     RETVAL
@@ -1031,13 +1077,10 @@ evaluate_number(XML::PugiXML::XPath self, XML::PugiXML::Node node)
 CODE:
 {
     CHECK_NODE_ALIVE(node);
-    try {
+    RETVAL = 0;
+    XPATH_GUARDED {
         RETVAL = self->query->evaluate_number(node->node);
-    } catch (const xpath_exception& e) {
-        croak("XPath error: %s", e.what());
-    } catch (const std::exception& e) {
-        croak("Internal XPath error: %s", e.what());
-    }
+    } END_XPATH_GUARDED;
 }
 OUTPUT:
     RETVAL
@@ -1047,13 +1090,10 @@ evaluate_boolean(XML::PugiXML::XPath self, XML::PugiXML::Node node)
 CODE:
 {
     CHECK_NODE_ALIVE(node);
-    try {
+    RETVAL = 0;
+    XPATH_GUARDED {
         RETVAL = self->query->evaluate_boolean(node->node);
-    } catch (const xpath_exception& e) {
-        croak("XPath error: %s", e.what());
-    } catch (const std::exception& e) {
-        croak("Internal XPath error: %s", e.what());
-    }
+    } END_XPATH_GUARDED;
 }
 OUTPUT:
     RETVAL

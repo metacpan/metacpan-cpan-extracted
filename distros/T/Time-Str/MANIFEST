@@ -11,6 +11,8 @@ dist.ini
 eg/datetime.pl
 eg/time-hires.pl
 eg/time-moment.pl
+lib/Time/LeapSecond.pm
+lib/Time/LeapSecond.pod
 lib/Time/Str.pm
 lib/Time/Str.pod
 lib/Time/Str/Calendar.pm
@@ -54,13 +56,16 @@ t/format/RubyDate.t
 t/format/UnixDate.t
 t/format/UnixStamp.t
 t/format/W3CDTF.t
+t/leapsecond.t
 t/module/Calendar.t
+t/module/LeapSecond.t
 t/module/Regexp.t
 t/module/TZif-POSIX.t
 t/module/TZif.t
 t/module/Time.t
 t/module/Token.t
 t/module/Util.t
+t/timezone.t
 tstr_calendar.h
 tstr_carp.h
 tstr_cparse.h

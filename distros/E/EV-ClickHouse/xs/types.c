@@ -678,23 +678,14 @@ static SV* days_to_date_sv(int32_t days) {
 }
 
 /* Convert epoch seconds to "YYYY-MM-DD HH:MM:SS" in UTC. */
-static SV* epoch_to_datetime_sv(uint32_t epoch) {
+/* Format a UNIX epoch as "YYYY-MM-DD HH:MM:SS".  use_local=1 formats in the
+ * caller's currently-active TZ (set via set_tz); otherwise UTC. */
+static SV* epoch_to_datetime_sv_ex(uint32_t epoch, int use_local) {
     time_t t = (time_t)epoch;
     struct tm tm;
     char buf[20];
-    if (!gmtime_r(&t, &tm)) return newSVpvn("0000-00-00 00:00:00", 19);
-    snprintf(buf, sizeof(buf), "%04d-%02d-%02d %02d:%02d:%02d",
-             tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
-             tm.tm_hour, tm.tm_min, tm.tm_sec);
-    return newSVpvn(buf, 19);
-}
-
-/* Format epoch in the caller's currently-active TZ (set via set_tz). */
-static SV* epoch_to_datetime_sv_local(uint32_t epoch) {
-    time_t t = (time_t)epoch;
-    struct tm tm;
-    char buf[20];
-    if (!localtime_r(&t, &tm)) return newSVpvn("0000-00-00 00:00:00", 19);
+    struct tm *r = use_local ? localtime_r(&t, &tm) : gmtime_r(&t, &tm);
+    if (!r) return newSVpvn("0000-00-00 00:00:00", 19);
     snprintf(buf, sizeof(buf), "%04d-%02d-%02d %02d:%02d:%02d",
              tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
              tm.tm_hour, tm.tm_min, tm.tm_sec);
@@ -933,6 +924,28 @@ static SV** decode_column_ex(const char *buf, size_t len, size_t *pos,
     uint64_t i;
     size_t fsz;
 
+    /* Bound nrows against the remaining buffer before allocating out[].
+     * Every wire column consumes at least one byte per row (a value, an
+     * offset, a null-map byte or an index), so a row count larger than the
+     * bytes left cannot be satisfied yet.  Return NULL WITHOUT setting
+     * decode_err -- exactly the per-type need-more convention -- so the caller
+     * treats it as "need more data" on the incremental (uncompressed) path and
+     * as a hard error on the compressed path (where the whole block is already
+     * present).  This caps the out[] allocation to the available data and
+     * stops a hostile server forcing a huge alloc from a tiny message, while
+     * also covering recursive Array/Map/Tuple/LowCardinality element counts.
+     * The nrows>remaining bound applies only to types that consume at least
+     * one byte per row: FixedString(0) and an empty Tuple() consume 0 bytes
+     * per row, so they may legitimately have more rows than bytes left -- let
+     * them fall through to their own handlers. (Neither is producible by a
+     * real ClickHouse server, but both are handled defensively.) */
+    if (*pos > len) return NULL;
+    if (nrows > (uint64_t)(len - *pos)
+        && !(ct->code == CT_FIXEDSTRING && ct->param == 0)
+        && !(ct->code == CT_TUPLE && ct->num_inners == 0)) {
+        return NULL;
+    }
+
     Newxz(out, nrows ? nrows : 1, SV*);
 
     if (ct->code == CT_NOTHING) {
@@ -1161,7 +1174,7 @@ static SV** decode_column_ex(const char *buf, size_t len, size_t *pos,
 
         for (i = 0; i < nrows; i++) {
             AV *av = newAV();
-            av_extend(av, ct->num_inners - 1);
+            if (ct->num_inners > 0) av_extend(av, ct->num_inners - 1);
             for (j = 0; j < ct->num_inners; j++)
                 av_push(av, cols[j][i]);
             out[i] = newRV_noinc((SV*)av);
@@ -1195,6 +1208,9 @@ static SV** decode_column_ex(const char *buf, size_t len, size_t *pos,
         }
         if (read_varuint(buf, len, pos, &num_paths64) <= 0) goto json_fail;
         if (num_paths64 > (uint64_t)INT_MAX) goto json_fail;
+        /* each path serializes to >=1 wire byte, so a count larger than the
+         * bytes left is malformed -- bound before the (jpe/path_kind) allocs */
+        if (num_paths64 > (uint64_t)(len - *pos)) goto json_fail;
         int num_paths = (int)num_paths64;
 
         if (num_paths > 0) {
@@ -1616,8 +1632,7 @@ static SV** decode_column_ex(const char *buf, size_t len, size_t *pos,
                 case CT_DATETIME: {
                     uint32_t v; memcpy(&v, p, 4);
                     if (decode_flags & DECODE_DT_STR)
-                        out[i] = tz_set ? epoch_to_datetime_sv_local(v)
-                                        : epoch_to_datetime_sv(v);
+                        out[i] = epoch_to_datetime_sv_ex(v, tz_set);
                     else
                         out[i] = newSVuv(v);
                     break;

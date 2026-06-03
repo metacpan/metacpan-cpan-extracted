@@ -1,5 +1,10 @@
 Revision history for EV::Kafka
 
+0.04  2026-06-02
+    - Fix use-after-free when a callback frees the connection
+    - Fix use-after-free when a callback clears its own handler
+    - Fix produce callback leak on unavailable topic; handle empty LZ4 batch
+
 0.03  2026-06-01
     - Reject malformed lengths in broker responses (record header-key varint,
       metadata array counts)

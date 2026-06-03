@@ -4,12 +4,14 @@
 use strictures 2;
 
 package Net::DHCPv6::Packet;
-$Net::DHCPv6::Packet::VERSION = '0.002';
-use Carp qw( croak );
-use Net::DHCPv6::Constants;
-use Net::DHCPv6::OptionList;
-use Net::DHCPv6::Packet::Relay;
-use Net::DHCPv6::X::BadMessage;
+$Net::DHCPv6::Packet::VERSION = '0.003';
+use Carp                   qw( croak );
+use Net::DHCPv6::Constants qw(
+    $RELAY_FORW $RELAY_REPLY
+);
+use Net::DHCPv6::OptionList    ();
+use Net::DHCPv6::Packet::Relay ();
+use Net::DHCPv6::X::BadMessage ();
 use namespace::clean;
 
 my $TX_ID_MAX   = 0xFFFFFF;    ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
@@ -103,7 +105,7 @@ Net::DHCPv6::Packet - DHCPv6 packet base class
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

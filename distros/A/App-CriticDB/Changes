@@ -1,5 +1,9 @@
 Revision history for App::CriticDB
 
+0.0.6 - 2026-06-02
+	- Storable tempfile permissions use umask
+	- Storable tests should pass as the root user
+
 0.0.5 - 2026-06-01
 	- Storable uses tempfile+rename
 

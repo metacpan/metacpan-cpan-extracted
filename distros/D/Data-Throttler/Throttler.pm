@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Log::Log4perl qw(:easy);
 
-our $VERSION    = "0.08";
+our $VERSION    = "0.09";
 our $DB_VERSION = "1.1";
 
 ###########################################
@@ -657,7 +657,31 @@ sub load {
     my($self) = @_;
 
     DEBUG "Loading YAML file $self->{db_file}";
-    return YAML::LoadFile( $self->{db_file} );
+    my $data = YAML::LoadFile( $self->{db_file} );
+    $self->native_classes_restore( $data );
+    return $data;
+}
+
+###########################################
+sub native_classes_restore {
+###########################################
+    my($self, $data) = @_;
+
+    return if ref($data) ne 'HASH';
+    return if !defined $data->{chain};
+
+    if(ref($data->{chain}) eq 'HASH') {
+        bless $data->{chain}, 'Data::Throttler::BucketChain';
+    }
+
+    return if !defined $data->{chain}->{buckets};
+    return if ref($data->{chain}->{buckets}) ne 'ARRAY';
+
+    for my $bucket (@{ $data->{chain}->{buckets} }) {
+        next if ref($bucket) ne 'HASH';
+        next if ref($bucket->{time}) ne 'HASH';
+        bless $bucket->{time}, 'Data::Throttler::Range';
+    }
 }
 
 ###########################################

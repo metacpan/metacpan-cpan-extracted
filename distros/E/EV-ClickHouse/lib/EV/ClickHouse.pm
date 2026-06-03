@@ -11,7 +11,7 @@ my $RE_IDENT = qr/\A[A-Za-z_][A-Za-z0-9_]*\z/;
 my $RE_TABLE = qr/\A[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)?\z/;
 
 BEGIN {
-    our $VERSION = '0.04';
+    our $VERSION = '0.05';
     use XSLoader;
     XSLoader::load __PACKAGE__, $VERSION;
 }

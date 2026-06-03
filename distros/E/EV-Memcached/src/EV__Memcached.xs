@@ -449,6 +449,9 @@ static void invoke_cb(pTHX_ ev_mc_t *self, SV *cb, SV *result, SV *error) {
    so a die in user code can't unwind through libev. */
 static void invoke_handler(pTHX_ ev_mc_t *self, SV *cb, SV *arg, const char *label) {
     if (NULL == cb) { if (arg) SvREFCNT_dec(arg); return; }
+    /* pin: the callback may clear its own handler ($mc->on_error(undef)),
+       which would otherwise free the CV while call_sv is still running it */
+    SvREFCNT_inc_simple_void_NN(cb);
 
     self->callback_depth++;
 
@@ -467,6 +470,7 @@ static void invoke_handler(pTHX_ ev_mc_t *self, SV *cb, SV *arg, const char *lab
     LEAVE;
 
     self->callback_depth--;
+    SvREFCNT_dec(cb);
 }
 
 static void emit_error(pTHX_ ev_mc_t *self, const char *msg) {
@@ -560,6 +564,25 @@ static void cleanup_wait(pTHX_ ev_mc_wait_t *wt) {
         wt->mget_results = NULL;
     }
     Safefree(wt);
+}
+
+/* Free every queued cb/wait entry WITHOUT invoking Perl callbacks.
+ * Used by the DESTROY teardown paths (deferred and global destruction). */
+static void free_all_queues(pTHX_ ev_mc_t *self) {
+    while (!ngx_queue_empty(&self->cb_queue)) {
+        ngx_queue_t *q = ngx_queue_head(&self->cb_queue);
+        ev_mc_cb_t *cbt = ngx_queue_data(q, ev_mc_cb_t, queue);
+        ngx_queue_remove(q);
+        cleanup_cbt(aTHX_ cbt);
+    }
+    while (!ngx_queue_empty(&self->wait_queue)) {
+        ngx_queue_t *q = ngx_queue_head(&self->wait_queue);
+        ev_mc_wait_t *wt = ngx_queue_data(q, ev_mc_wait_t, queue);
+        ngx_queue_remove(q);
+        cleanup_wait(aTHX_ wt);
+    }
+    self->pending_count = 0;
+    self->waiting_count = 0;
 }
 
 /* ================================================================
@@ -1871,20 +1894,7 @@ CODE:
         if (self->fd >= 0) { close(self->fd); self->fd = -1; }
 
         /* Clean up queues without invoking Perl callbacks */
-        while (!ngx_queue_empty(&self->cb_queue)) {
-            ngx_queue_t *q = ngx_queue_head(&self->cb_queue);
-            ev_mc_cb_t *cbt = ngx_queue_data(q, ev_mc_cb_t, queue);
-            ngx_queue_remove(q);
-            cleanup_cbt(aTHX_ cbt);
-        }
-        while (!ngx_queue_empty(&self->wait_queue)) {
-            ngx_queue_t *q = ngx_queue_head(&self->wait_queue);
-            ev_mc_wait_t *wt = ngx_queue_data(q, ev_mc_wait_t, queue);
-            ngx_queue_remove(q);
-            cleanup_wait(aTHX_ wt);
-        }
-        self->pending_count = 0;
-        self->waiting_count = 0;
+        free_all_queues(aTHX_ self);
 
         CLEAR_HANDLER(self->on_error);
         CLEAR_HANDLER(self->on_connect);
@@ -1919,18 +1929,7 @@ CODE:
         self->callback_depth--;
     } else {
         /* Global destruction: free entries without calling Perl */
-        while (!ngx_queue_empty(&self->cb_queue)) {
-            ngx_queue_t *q = ngx_queue_head(&self->cb_queue);
-            ev_mc_cb_t *cbt = ngx_queue_data(q, ev_mc_cb_t, queue);
-            ngx_queue_remove(q);
-            cleanup_cbt(aTHX_ cbt);
-        }
-        while (!ngx_queue_empty(&self->wait_queue)) {
-            ngx_queue_t *q = ngx_queue_head(&self->wait_queue);
-            ev_mc_wait_t *wt = ngx_queue_data(q, ev_mc_wait_t, queue);
-            ngx_queue_remove(q);
-            cleanup_wait(aTHX_ wt);
-        }
+        free_all_queues(aTHX_ self);
     }
 
     self->magic = MC_MAGIC_FREED;
@@ -2219,6 +2218,9 @@ CODE:
     mc_write_u32(extras, (uint32_t)expiry);
 
     static const int cmds[]    = { CB_CMD_TOUCH, CB_CMD_GAT, CB_CMD_GATS };
+    /* gats deliberately reuses the GAT opcode: there is no distinct GATS
+     * opcode in the binary protocol.  gat/gats differ only in response
+     * decoding (CB_CMD_GATS additionally returns the CAS). */
     static const uint8_t ops[] = { MC_OP_TOUCH, MC_OP_GAT, MC_OP_GAT };
 
     mc_enqueue_cmd(aTHX_ self, ops[ix], key, key_len, NULL, 0,

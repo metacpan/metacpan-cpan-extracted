@@ -19,7 +19,8 @@ my @files = (
     't/misc.t',
     't/octal.t',
     't/operations.t',
-    't/private.t'
+    't/private.t',
+    't/validation.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

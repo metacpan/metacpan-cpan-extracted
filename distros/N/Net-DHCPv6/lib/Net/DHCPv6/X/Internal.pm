@@ -4,7 +4,7 @@
 use strictures 2;
 
 package Net::DHCPv6::X::Internal;
-$Net::DHCPv6::X::Internal::VERSION = '0.002';
+$Net::DHCPv6::X::Internal::VERSION = '0.003';
 use parent 'Net::DHCPv6::X';
 use namespace::clean;
 
@@ -22,7 +22,7 @@ Net::DHCPv6::X::Internal - Thrown on internal logic errors in the library
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

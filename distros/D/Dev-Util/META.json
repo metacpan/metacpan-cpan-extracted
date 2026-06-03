@@ -4,7 +4,7 @@
       "Matt Martini <matt@imaginarywave.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "gpl_3"
    ],
@@ -53,6 +53,7 @@
             "Term::ANSIColor" : "5.01",
             "Term::ReadKey" : "2.38",
             "autodie" : "0",
+            "boolean" : "0.46",
             "perl" : "5.018",
             "strict" : "0",
             "utf8" : "0",
@@ -86,6 +87,6 @@
          "web" : "https://github.com/mattmartini/Dev-Util"
       }
    },
-   "version" : "v2.19.35",
+   "version" : "v2.19.42",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

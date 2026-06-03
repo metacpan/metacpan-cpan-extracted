@@ -7,24 +7,25 @@ use warnings;
 use feature 'say';
 
 use LWP::UserAgent;
-use JSON qw(decode_json);
+use JSON::MaybeXS qw(decode_json);
+use Mojo::DOM;
 
 my $url = shift or die "Usage: $0 <event-url>";
 
 my $ua = LWP::UserAgent->new(timeout => 10);
 my $res = $ua->get($url);
-die 'Fetch failed: ', $res->status_line unless $res->is_success();
+die "Failed to fetch '$url': " . $res->status_line unless $res->is_success();
 
 my $html = $res->decoded_content;
 
 # ---------------------------------------------
-# Extract all JSON-LD blocks
+# Extract all JSON-LD blocks via Mojo::DOM
+# (handles CDATA sections, unusual whitespace,
+#  and extra attributes that trip up bare regex)
 # ---------------------------------------------
-my @blocks = ($html =~ m{
-	<script[^>]+type=["']application/ld\+json["'][^>]*>
-	(.+?)
-	</script>
-}sigx);
+my $dom    = Mojo::DOM->new($html);
+my @blocks = $dom->find('script[type="application/ld+json"]')
+                 ->map('all_text')->each;
 
 die 'No JSON-LD blocks found' unless @blocks;
 
@@ -34,11 +35,6 @@ die 'No JSON-LD blocks found' unless @blocks;
 my $event;
 
 for my $raw (@blocks) {
-
-	# Clean HTML entities, trailing spaces, etc.
-	$raw =~ s/&quot;/"/g;
-	$raw =~ s/^\s+|\s+$//g;
-
 	my $json;
 	eval { $json = decode_json($raw); 1 } or next;
 
@@ -64,31 +60,16 @@ die 'No schema.org Event entry found' unless $event;
 # ---------------------------------------------
 # Extract Fields
 # ---------------------------------------------
-my $title = $event->{name} // '';
-my $event_url = $event->{url} // $url;
+my $title     = $event->{name}  // '';
+my $event_url = $event->{url}   // $url;
 
-# Organizer can be object or array
-my $group = '';
-if ($event->{organizer}) {
-	if (ref $event->{organizer} eq 'ARRAY') {
-		$group = $event->{organizer}[0]{name} // '';
-	} else {
-		$group = $event->{organizer}{name} // '';
-	}
-}
+# Organizer fields are extracted via a helper that handles both
+# the scalar-object and array-of-objects forms Schema.org allows.
+my $group = _organizer_field($event->{organizer}, 'name');
+my $email = _organizer_field($event->{organizer}, 'email');
 
 my $venue = $event->{location}{name} // '';
-
-my $start = $event->{startDate} // '';
-
-my $email = '';
-if ($event->{organizer}) {
-	if (ref $event->{organizer} eq 'ARRAY') {
-		$email = $event->{organizer}[0]{email} // '';
-	} else {
-		$email = $event->{organizer}{email} // '';
-	}
-}
+my $start = $event->{startDate}      // '';
 
 my ($date, $time) = ('','');
 if ($start =~ /^(\d{4}-\d{2}-\d{2})[T ](\d{2}:\d{2}(:\d{2})?)/) {
@@ -106,3 +87,18 @@ say "Date:		$date";
 say "Time:		$time";
 say "Email:		$email";
 say "Event URL:\t$event_url";
+
+# ---------------------------------------------
+# Helpers
+# ---------------------------------------------
+
+# _organizer_field($organizer, $field)
+# Extract a named field from an organizer value that may be either a
+# hashref or an arrayref-of-hashrefs.  Returns '' if not found.
+sub _organizer_field {
+	my ($organizer, $field) = @_;
+	return '' unless $organizer;
+	my $org = ref($organizer) eq 'ARRAY' ? $organizer->[0] : $organizer;
+	return '' unless ref($org) eq 'HASH';
+	return $org->{$field} // '';
+}

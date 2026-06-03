@@ -504,7 +504,7 @@ foreach my $type ( sort( keys( %$tests ) ) )
         diag( "Skipping tests for \"${type}\", because module DateTime::Format::JP is not installed." );
         next;
     }
-    
+
     # $o->debug( $DEBUG ) if( $type eq 'non_standard' );
     for( my $i = 0; $i < scalar( @{$tests->{ $type }} ); $i += 2 )
     {

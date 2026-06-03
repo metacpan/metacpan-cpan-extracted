@@ -27,232 +27,232 @@ no_index:
 provides:
   Net::DHCPv6:
     file: lib/Net/DHCPv6.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Constants:
     file: lib/Net/DHCPv6/Constants.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::DUID:
     file: lib/Net/DHCPv6/DUID.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Helpers:
     file: lib/Net/DHCPv6/Helpers.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Message::Advertise:
     file: lib/Net/DHCPv6/Message/Advertise.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Message::Confirm:
     file: lib/Net/DHCPv6/Message/Confirm.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Message::Decline:
     file: lib/Net/DHCPv6/Message/Decline.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Message::InformationRequest:
     file: lib/Net/DHCPv6/Message/InformationRequest.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Message::Rebind:
     file: lib/Net/DHCPv6/Message/Rebind.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Message::Reconfigure:
     file: lib/Net/DHCPv6/Message/Reconfigure.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Message::RelayForw:
     file: lib/Net/DHCPv6/Message/RelayForw.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Message::RelayReply:
     file: lib/Net/DHCPv6/Message/RelayReply.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Message::Release:
     file: lib/Net/DHCPv6/Message/Release.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Message::Renew:
     file: lib/Net/DHCPv6/Message/Renew.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Message::Reply:
     file: lib/Net/DHCPv6/Message/Reply.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Message::Request:
     file: lib/Net/DHCPv6/Message/Request.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Message::Solicit:
     file: lib/Net/DHCPv6/Message/Solicit.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option:
     file: lib/Net/DHCPv6/Option.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::AftrName:
     file: lib/Net/DHCPv6/Option/AftrName.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::Auth:
     file: lib/Net/DHCPv6/Option/Auth.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::BootfileParam:
     file: lib/Net/DHCPv6/Option/BootfileParam.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::BootfileUrl:
     file: lib/Net/DHCPv6/Option/BootfileUrl.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::CaptivePortal:
     file: lib/Net/DHCPv6/Option/CaptivePortal.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::ClientArchType:
     file: lib/Net/DHCPv6/Option/ClientArchType.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::ClientFqdn:
     file: lib/Net/DHCPv6/Option/ClientFqdn.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::ClientId:
     file: lib/Net/DHCPv6/Option/ClientId.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::ClientLinkLayerAddr:
     file: lib/Net/DHCPv6/Option/ClientLinkLayerAddr.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::DnsServers:
     file: lib/Net/DHCPv6/Option/DnsServers.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::DomainList:
     file: lib/Net/DHCPv6/Option/DomainList.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::ElapsedTime:
     file: lib/Net/DHCPv6/Option/ElapsedTime.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::Generic:
     file: lib/Net/DHCPv6/Option/Generic.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::IAAddr:
     file: lib/Net/DHCPv6/Option/IAAddr.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::IANA:
     file: lib/Net/DHCPv6/Option/IANA.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::IAPD:
     file: lib/Net/DHCPv6/Option/IAPD.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::IAPrefix:
     file: lib/Net/DHCPv6/Option/IAPrefix.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::IATA:
     file: lib/Net/DHCPv6/Option/IATA.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::InfMaxRt:
     file: lib/Net/DHCPv6/Option/InfMaxRt.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::InfoRefreshTime:
     file: lib/Net/DHCPv6/Option/InfoRefreshTime.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::InterfaceId:
     file: lib/Net/DHCPv6/Option/InterfaceId.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::MudUrl:
     file: lib/Net/DHCPv6/Option/MudUrl.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::NewPosixTimezone:
     file: lib/Net/DHCPv6/Option/NewPosixTimezone.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::NewTzdbTimezone:
     file: lib/Net/DHCPv6/Option/NewTzdbTimezone.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::NisDomainName:
     file: lib/Net/DHCPv6/Option/NisDomainName.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::NisServers:
     file: lib/Net/DHCPv6/Option/NisServers.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::NispDomainName:
     file: lib/Net/DHCPv6/Option/NispDomainName.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::NispServers:
     file: lib/Net/DHCPv6/Option/NispServers.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::NtpServer:
     file: lib/Net/DHCPv6/Option/NtpServer.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::ORO:
     file: lib/Net/DHCPv6/Option/ORO.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::PdExclude:
     file: lib/Net/DHCPv6/Option/PdExclude.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::Preference:
     file: lib/Net/DHCPv6/Option/Preference.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::RSOO:
     file: lib/Net/DHCPv6/Option/RSOO.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::RapidCommit:
     file: lib/Net/DHCPv6/Option/RapidCommit.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::ReconfAccept:
     file: lib/Net/DHCPv6/Option/ReconfAccept.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::ReconfMsg:
     file: lib/Net/DHCPv6/Option/ReconfMsg.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::RelayMsg:
     file: lib/Net/DHCPv6/Option/RelayMsg.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::RemoteId:
     file: lib/Net/DHCPv6/Option/RemoteId.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::ServerId:
     file: lib/Net/DHCPv6/Option/ServerId.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::SipServerA:
     file: lib/Net/DHCPv6/Option/SipServerA.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::SipServerD:
     file: lib/Net/DHCPv6/Option/SipServerD.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::SntpServers:
     file: lib/Net/DHCPv6/Option/SntpServers.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::SolMaxRt:
     file: lib/Net/DHCPv6/Option/SolMaxRt.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::StatusCode:
     file: lib/Net/DHCPv6/Option/StatusCode.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::SubscriberId:
     file: lib/Net/DHCPv6/Option/SubscriberId.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::Unicast:
     file: lib/Net/DHCPv6/Option/Unicast.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::UserClass:
     file: lib/Net/DHCPv6/Option/UserClass.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::VendorClass:
     file: lib/Net/DHCPv6/Option/VendorClass.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Option::VendorOpts:
     file: lib/Net/DHCPv6/Option/VendorOpts.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::OptionList:
     file: lib/Net/DHCPv6/OptionList.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Packet:
     file: lib/Net/DHCPv6/Packet.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::Packet::Relay:
     file: lib/Net/DHCPv6/Packet/Relay.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::X:
     file: lib/Net/DHCPv6/X.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::X::BadDUID:
     file: lib/Net/DHCPv6/X/BadDUID.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::X::BadMessage:
     file: lib/Net/DHCPv6/X/BadMessage.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::X::BadOption:
     file: lib/Net/DHCPv6/X/BadOption.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::X::Internal:
     file: lib/Net/DHCPv6/X/Internal.pm
-    version: '0.002'
+    version: '0.003'
   Net::DHCPv6::X::Truncated:
     file: lib/Net/DHCPv6/X/Truncated.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   Carp: '0'
   Const::Fast::Exporter: '0'
@@ -264,7 +264,7 @@ resources:
   bugtracker: https://github.com/djzort/perl-Net-DHCPv6/issues
   homepage: https://github.com/djzort/perl-Net-DHCPv6
   repository: https://github.com/djzort/perl-Net-DHCPv6.git
-version: '0.002'
+version: '0.003'
 x_author_pledge:
   version: 1
 x_generated_by_perl: v5.40.3

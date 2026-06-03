@@ -6,7 +6,7 @@ use warnings;
 use version;
 use Test::More;
 
-plan tests => 40;
+plan tests => 41;
 
 BEGIN {
     my @modules = qw(
@@ -49,6 +49,7 @@ BEGIN {
         Readonly
         Term::ANSIColor
         Term::ReadKey
+        boolean
     );
 
     foreach my $module (@needed_modules) {

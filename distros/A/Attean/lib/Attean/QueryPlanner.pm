@@ -7,7 +7,7 @@ Attean::QueryPlanner - Query planner
 
 =head1 VERSION
 
-This document describes Attean::QueryPlanner version 0.038
+This document describes Attean::QueryPlanner version 0.039
 
 =head1 SYNOPSIS
 
@@ -41,7 +41,7 @@ use Attean::Algebra;
 use Attean::Plan;
 use Attean::Expression;
 
-package Attean::QueryPlanner 0.038 {
+package Attean::QueryPlanner 0.039 {
 	use Moo;
 	use Encode qw(encode);
 	use Attean::RDF;
@@ -598,17 +598,18 @@ the supplied C<< $active_graph >>.
 			}
 			
 			my @children	= $self->plans_for_algebra($child, $model, \@active_graphs, \@default_graphs, %args);
+			$algebra->materialize;
 			my $i	= $algebra->insert;
 			my $d	= $algebra->delete;
 			my %patterns;
 			my @order;
-			if (scalar(@$d)) {
+			if ($d->size) {
 				push(@order, 'remove_quad');
-				$patterns{ 'remove_quad' }	= $d;
+				$patterns{ 'remove_quad' }	= [$d->elements];
 			}
-			if (scalar(@$i)) {
+			if ($i->size) {
 				push(@order, 'add_quad');
-				$patterns{ 'add_quad' }	= $i;
+				$patterns{ 'add_quad' }	= [$i->elements];
 			}
 			return map {
 				Attean::Plan::TripleTemplateToModelQuadMethod->new(

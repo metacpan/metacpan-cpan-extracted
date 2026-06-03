@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project
+  xmlns="http://usefulinc.com/ns/doap#"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  >
+  <name>Net-CIDR-Set</name>
+  <shortdesc>Manipulate sets of IP addresses</shortdesc>
+  <category rdfs:label="CIDR" />
+  <category rdfs:label="INET" />
+  <category rdfs:label="LPM" />
+  <category rdfs:label="Longest" />
+  <category rdfs:label="Prefix" />
+  <category rdfs:label="Match" />
+  <developer>
+    <foaf:Person>
+      <foaf:name>Andy Armstrong</foaf:name>
+      <foaf:mbox rdf:resource="mailto:andy@hexten.net" />
+    </foaf:Person>
+  </developer>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Thomas Eckardt</foaf:name>
+      <foaf:mbox rdf:resource="mailto:Thomas.Eckardt@thockar.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Brian Gottreu</foaf:name>
+      <foaf:mbox rdf:resource="mailto:gottreu@cpan.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Robert Rothenberg</foaf:name>
+      <foaf:mbox rdf:resource="mailto:perl@rhizomnic.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Stig Palmquist</foaf:name>
+      <foaf:mbox rdf:resource="mailto:stigtsp@cpan.org" />
+    </foaf:Person>
+  </helper>
+  <license rdf:resource="http://dev.perl.org/licenses/" />
+  <bug-database rdf:resource="https://rt.cpan.org/Public/Dist/Display.html?Name=Net-CIDR-Set" />
+  <repository>
+    <GitRepository>
+      <browse rdf:resource="https://github.com/robrwo/perl-Net-CIDR-Set" />
+      <location rdf:resource="git://github.com/robrwo/perl-Net-CIDR-Set.git" />
+    </GitRepository>
+  </repository>
+  <programming-language>Perl</programming-language>
+</Project>

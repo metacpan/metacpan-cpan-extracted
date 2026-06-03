@@ -8,15 +8,18 @@ use namespace::autoclean;
 
 # ABSTRACT: Encode / decode IPv4 addresses
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 sub new { bless \my $x, shift }
+
+my $DEC = "(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})";
+my $IP  = "(?:${DEC}\.){3}${DEC}";
 
 sub _pack {
   my @nums = split /[.]/, shift, -1;
   return unless @nums == 4;
   for ( @nums ) {
-    return unless /^\d{1,3}$/ and !/^0\d{1,2}$/ and $_ < 256;
+    return unless /\A${DEC}\z/ and !/\A0[1-9]+/;
   }
   return pack "CC*", 0, @nums;
 }
@@ -33,7 +36,7 @@ sub _ip2bits {
   my $ip = shift or return;
   vec( $ip, 0, 8 ) = 255;
   my $bits = unpack 'B*', $ip;
-  return unless $bits =~ /^1*0*$/;    # Valid mask?
+  return unless $bits =~ /\A1*0*\z/;    # Valid mask?
   return $ip;
 }
 
@@ -42,29 +45,32 @@ sub _is_cidr {
   my $mask = ~( $lo ^ $hi );
   my $bits = unpack 'B*', $mask;
   return unless $hi eq ($lo | $hi);
-  return unless $bits =~ /^(1*)0*$/;
+  return unless $bits =~ /\A(1*)0*\z/;
   return length( $1 ) - 8;
 }
 
 sub _encode {
   my ( $self, $ip ) = @_;
-  if ( $ip =~ m{^(.+?)/(.+)$} ) {
+  if ( $ip =~ m{\A(${IP})/((?:3[0-2]|[12]?[0-9])|${IP})\z} ) {
     my $mask = $2;
     return unless my $addr = _pack( $1 );
     return
      unless my $bits
-       = ( $mask =~ /^\d+$/ )
+       = ( $mask =~ /\A[0-9]+\z/ )
       ? _width2bits( $mask, 32 )
       : _ip2bits( _pack( $mask ) );
     return ( $addr & $bits, Net::CIDR::Set::_inc( $addr | ~$bits ) );
   }
-  elsif ( $ip =~ m{^(.+?)-(.+)$} ) {
+  elsif ( $ip =~ m{\A(${IP})-(${IP})\z} ) {
     return unless my $lo = _pack( $1 );
     return unless my $hi = _pack( $2 );
     return ( $lo, Net::CIDR::Set::_inc( $hi ) );
   }
-  else {
+  elsif ( $ip =~ m{\A${IP}\z} ) {
     return $self->_encode( "$ip/32" );
+  }
+  else {
+    return;
   }
 }
 
@@ -110,7 +116,7 @@ Net::CIDR::Set::IPv4 - Encode / decode IPv4 addresses
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =for Pod::Coverage new
 

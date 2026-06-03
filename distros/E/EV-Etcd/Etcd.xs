@@ -696,21 +696,18 @@ static SV* response_op_to_hashref(pTHX_ Etcdserverpb__ResponseOp *op) {
 }
 
 /* Helper to parse Perl array of RequestOps into C structures */
-static void parse_request_ops(pTHX_ SV *src_av, Etcdserverpb__RequestOp ***dst_ops, size_t *dst_n) {
-    *dst_n = 0;
-    *dst_ops = NULL;
-
-    if (!SvROK(src_av) || SvTYPE(SvRV(src_av)) != SVt_PVAV) {
-        return;
-    }
-
+/* Validate all key/value sizes in a request-ops array. Must run (and croak)
+ * BEFORE any allocation in the caller, otherwise a longjmp from
+ * VALIDATE_*_SIZE leaks whatever was allocated first. txn() calls this for
+ * its success/failure arrays up front, before allocating the compare array;
+ * parse_request_ops also calls it so non-txn callers stay validated.
+ * Uses SvPV() (not SvCUR) so non-POK SVs get stringified to a real length. */
+static void validate_request_ops(pTHX_ SV *src_av) {
+    if (!SvROK(src_av) || SvTYPE(SvRV(src_av)) != SVt_PVAV) return;
     AV *av = (AV *)SvRV(src_av);
     size_t n = av_len(av) + 1;
     if (n == 0) return;
 
-    /* Pre-validate sizes up front — must croak before any allocation, otherwise
-     * a longjmp from VALIDATE_*_SIZE leaks the partially-built ops array.
-     * Use SvPV() (not SvCUR) so non-POK SVs get stringified to a real length. */
     #define VALIDATE_HV_KEY(hv_in, name, len_check) do { \
         SV **_f = hv_fetch((hv_in), name, sizeof(name) - 1, 0); \
         if (_f && SvOK(*_f)) { STRLEN _l; (void)SvPV(*_f, _l); len_check(_l); } \
@@ -747,6 +744,22 @@ static void parse_request_ops(pTHX_ SV *src_av, Etcdserverpb__RequestOp ***dst_o
         }
     }
     #undef VALIDATE_HV_KEY
+}
+
+static void parse_request_ops(pTHX_ SV *src_av, Etcdserverpb__RequestOp ***dst_ops, size_t *dst_n) {
+    *dst_n = 0;
+    *dst_ops = NULL;
+
+    if (!SvROK(src_av) || SvTYPE(SvRV(src_av)) != SVt_PVAV) {
+        return;
+    }
+
+    AV *av = (AV *)SvRV(src_av);
+    size_t n = av_len(av) + 1;
+    if (n == 0) return;
+
+    /* Pre-validate sizes up front (croaks before any allocation). */
+    validate_request_ops(aTHX_ src_av);
 
     Newxz(*dst_ops, n, Etcdserverpb__RequestOp *);
     *dst_n = n;
@@ -2737,6 +2750,11 @@ CODE:
             }
         }
     }
+
+    /* Pre-validate success/failure op sizes too, before any allocation, so a
+     * croak from an oversized key/value can't leak the compare array below. */
+    validate_request_ops(aTHX_ success_av);
+    validate_request_ops(aTHX_ failure_av);
 
     /* Create pending call structure */
     pending_call_t *pc;
@@ -4843,7 +4861,7 @@ CODE:
         croak("Failed to create gRPC call for election_observe");
     }
 
-    grpc_op ops[4] = {0};
+    grpc_op ops[5] = {0};
     grpc_metadata auth_md;
 
     ops[0].op = GRPC_OP_SEND_INITIAL_METADATA;
@@ -4855,10 +4873,17 @@ CODE:
     ops[2].op = GRPC_OP_SEND_MESSAGE;
     ops[2].data.send_message.send_message = send_buffer;
 
-    ops[3].op = GRPC_OP_RECV_MESSAGE;
-    ops[3].data.recv_message.recv_message = &oc->recv_buffer;
+    /* Observe is server-streaming: the client sends one LeaderRequest and the
+     * server streams LeaderResponses. Half-close the client side so etcd's
+     * handler receives the completed request and begins streaming; without it
+     * the stream is established but never delivers an event. (Watch/keepalive
+     * are bidi and deliberately stay open, so they must NOT half-close.) */
+    ops[3].op = GRPC_OP_SEND_CLOSE_FROM_CLIENT;
 
-    grpc_call_error err = grpc_call_start_batch(oc->call, ops, 4, &oc->base, NULL);
+    ops[4].op = GRPC_OP_RECV_MESSAGE;
+    ops[4].data.recv_message.recv_message = &oc->recv_buffer;
+
+    grpc_call_error err = grpc_call_start_batch(oc->call, ops, 5, &oc->base, NULL);
     cleanup_auth_metadata(client, &auth_md);
     grpc_byte_buffer_destroy(send_buffer);
 

@@ -3,29 +3,25 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: HTTP-Handy
-version: 1.05
+version: 1.06
 abstract: A tiny HTTP/1.0 server for Perl 5.5.3+
 author:
-  - ina <ina@cpan.org>
+  - ina <ina.cpan@gmail.com>
 license: perl
-generated_by: pmake.bat
+generated_by: pmake.bat version 0.33
 requires:
   Carp: 0
+  ExtUtils::MakeMaker: 5.4302
   IO::Socket: 0
   perl: 5.00503
-  strict: 1.01
-  vars: 0
-  warnings: 0
-build_requires:
-  Test: 1.122
 minimum_perl_version: 5.00503
 provides:
   HTTP::Handy:
     file: lib/HTTP/Handy.pm
-    version: 1.05
+    version: 1.06
   HTTP::Handy::Input:
     file: lib/HTTP/Handy.pm
-    version: 1.05
+    version: 1.06
 resources:
   license: http://dev.perl.org/licenses/
   bugtracker: https://github.com/ina-cpan/HTTP-Handy/issues

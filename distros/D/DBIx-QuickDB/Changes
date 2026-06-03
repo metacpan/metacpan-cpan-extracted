@@ -1,3 +1,11 @@
+0.000045  2026-06-02 11:34:03-07:00 America/Los_Angeles
+
+    - Switched PostgreSQL shutdown back to SIGTERM (smart shutdown) for a proper, clean shutdown when possible. The earlier hang risk is now covered: stop() disconnects our own lingering handles first, forces a CHECKPOINT, and the watcher's SIGKILL grace period is generous and tunable
+    - Driver stop() now forces a CHECKPOINT (PostgreSQL) before shutting the server down. If the shutdown is slow enough to be SIGKILLed, the data dir is already consistent, so cloning it no longer triggers crash recovery that jumps SERIAL sequences forward by SEQ_LOG_VALS (32) -- the FreeBSD smoke failure where a cloned row got id 34 instead of 2
+    - Increased the watcher's graceful-shutdown window before escalating to SIGKILL (4s -> 15s) and made it configurable via the QDB_STOP_GRACE environment variable, so slow hosts can finish a clean shutdown
+    - Made the Pool tests tolerant of non-deterministic SERIAL ids (verify row values and that ids are strictly increasing, rather than exact id values)
+    - Fixed t/stop_socket_cleanup.t failing on platforms without DBI/IO::Socket::UNIX (e.g. Windows, smoke hosts lacking DBI): it now skips cleanly instead of dying
+
 0.000044  2026-06-01 14:23:16-07:00 America/Los_Angeles
 
     - Driver stop() now confirms the server is gone by its pid instead of waiting for the unix socket file to disappear, and removes a stale socket left behind by a SIGKILLed server. Fixes FreeBSD smoke failures where a slow shutdown was SIGKILLed and stop() then timed out waiting for the leaked socket

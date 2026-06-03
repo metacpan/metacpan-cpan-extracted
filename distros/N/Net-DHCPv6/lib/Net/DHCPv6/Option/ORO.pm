@@ -4,11 +4,13 @@
 use strictures 2;
 
 package Net::DHCPv6::Option::ORO;
-$Net::DHCPv6::Option::ORO::VERSION = '0.002';
-use Net::DHCPv6::OptionList;
-use Carp qw( croak );
-use Net::DHCPv6::Constants;
-use Net::DHCPv6::X::BadOption;
+$Net::DHCPv6::Option::ORO::VERSION = '0.003';
+use Net::DHCPv6::OptionList ();
+use Carp                    qw( croak );
+use Net::DHCPv6::Constants  qw(
+    $OPTION_ORO
+);
+use Net::DHCPv6::X::BadOption ();
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
 
@@ -48,7 +50,7 @@ Net::DHCPv6::Option::ORO - Option Request option (code 6)
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

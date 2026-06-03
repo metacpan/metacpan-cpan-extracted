@@ -4,11 +4,13 @@
 use strictures 2;
 
 package Net::DHCPv6::Option::IANA;
-$Net::DHCPv6::Option::IANA::VERSION = '0.002';
-use Carp qw( croak );
-use Net::DHCPv6::Constants;
-use Net::DHCPv6::OptionList;
-use Net::DHCPv6::X::Truncated;
+$Net::DHCPv6::Option::IANA::VERSION = '0.003';
+use Carp                   qw( croak );
+use Net::DHCPv6::Constants qw(
+    $OPTION_IA_NA
+);
+use Net::DHCPv6::OptionList   ();
+use Net::DHCPv6::X::Truncated ();
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
 
@@ -78,7 +80,7 @@ Net::DHCPv6::Option::IANA - Identity Association for Non-temporary Addresses opt
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

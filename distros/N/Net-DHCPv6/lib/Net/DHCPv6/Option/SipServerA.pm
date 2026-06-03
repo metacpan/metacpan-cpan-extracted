@@ -4,10 +4,12 @@
 use strictures 2;
 
 package Net::DHCPv6::Option::SipServerA;
-$Net::DHCPv6::Option::SipServerA::VERSION = '0.002';
-use Net::DHCPv6::OptionList;
-use Net::DHCPv6::Constants;
-use Net::DHCPv6::X::Truncated;
+$Net::DHCPv6::Option::SipServerA::VERSION = '0.003';
+use Net::DHCPv6::OptionList ();
+use Net::DHCPv6::Constants  qw(
+    $IPV6_ADDR_LEN $OPTION_SIP_SERVER_A
+);
+use Net::DHCPv6::X::Truncated ();
 use parent 'Net::DHCPv6::Option';
 use Ref::Util qw( is_plain_arrayref );
 use namespace::clean;
@@ -61,7 +63,7 @@ Net::DHCPv6::Option::SipServerA - SIP Server A option (code 22) -- list of IPv6 
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

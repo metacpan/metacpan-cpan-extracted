@@ -5,7 +5,7 @@ use EV;
 
 BEGIN {
     use XSLoader;
-    our $VERSION = '0.03';
+    our $VERSION = '0.04';
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
@@ -357,7 +357,7 @@ sub _init_idempotent {
 
         my $on_coord = sub {
             my ($res, $err) = @_;
-            if ($err || ($res->{error_code} && $res->{error_code} != 0)) {
+            if ($err || $res->{error_code}) {
                 $do_init->($conn);
                 return;
             }
@@ -478,9 +478,15 @@ sub produce {
 
     my $leader_id = $self->_get_leader($topic, $partition);
     unless (defined $leader_id) {
-        # topic/partition unknown — request metadata for this topic to trigger auto-creation
+        # topic/partition unknown — request metadata for this topic to trigger
+        # auto-creation. Tag with topic+cb so that if the topic stays
+        # unavailable past the retry bound, _refresh_metadata_for_topic can
+        # drop this op and report the error to the user's callback rather than
+        # leaking it in pending_ops forever.
         push @{$cfg->{pending_ops}}, {
-            run => sub { $self->produce($topic, $key, $value, @rest) },
+            topic => $topic,
+            cb    => $cb,
+            run   => sub { $self->produce($topic, $key, $value, @rest) },
         };
         $self->_refresh_metadata_for_topic($topic) unless $cfg->{meta_pending};
         return;
@@ -488,8 +494,13 @@ sub produce {
 
     my $conn = $self->_get_or_create_conn($leader_id);
     unless ($conn && $conn->connected) {
+        # Tag with topic+cb as well so a permanently-unreachable leader can be
+        # reported to the user's callback via the metadata-retry cleanup,
+        # rather than stranding the op (and its callback) in pending_ops.
         push @{$cfg->{pending_ops}}, {
             node_id => $leader_id,
+            topic   => $topic,
+            cb      => $cb,
             run => sub { $self->produce($topic, $key, $value, @rest) },
         };
         return;

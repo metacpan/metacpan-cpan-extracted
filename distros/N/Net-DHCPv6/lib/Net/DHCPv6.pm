@@ -4,78 +4,78 @@
 use strictures 2;
 
 package Net::DHCPv6;
-$Net::DHCPv6::VERSION = '0.002';
-use Carp qw( croak );
-use Net::DHCPv6::DUID;
+$Net::DHCPv6::VERSION = '0.003';
+use Carp              qw( croak );
+use Net::DHCPv6::DUID ();
 
 # Option classes - loaded so they register in the dispatch tables
-use Net::DHCPv6::Option::AftrName;
-use Net::DHCPv6::Option::Auth;
-use Net::DHCPv6::Option::BootfileParam;
-use Net::DHCPv6::Option::BootfileUrl;
-use Net::DHCPv6::Option::CaptivePortal;
-use Net::DHCPv6::Option::ClientArchType;
-use Net::DHCPv6::Option::ClientFqdn;
-use Net::DHCPv6::Option::ClientId;
-use Net::DHCPv6::Option::ClientLinkLayerAddr;
-use Net::DHCPv6::Option::DnsServers;
-use Net::DHCPv6::Option::DomainList;
-use Net::DHCPv6::Option::ElapsedTime;
-use Net::DHCPv6::Option::Generic;
-use Net::DHCPv6::Option::IAAddr;
-use Net::DHCPv6::Option::IANA;
-use Net::DHCPv6::Option::IAPD;
-use Net::DHCPv6::Option::IAPrefix;
-use Net::DHCPv6::Option::IATA;
-use Net::DHCPv6::Option::InfMaxRt;
-use Net::DHCPv6::Option::InfoRefreshTime;
-use Net::DHCPv6::Option::InterfaceId;
-use Net::DHCPv6::Option::NewPosixTimezone;
-use Net::DHCPv6::Option::NewTzdbTimezone;
-use Net::DHCPv6::Option::NisDomainName;
-use Net::DHCPv6::Option::NisServers;
-use Net::DHCPv6::Option::NispDomainName;
-use Net::DHCPv6::Option::NispServers;
-use Net::DHCPv6::Option::NtpServer;
-use Net::DHCPv6::Option::ORO;
-use Net::DHCPv6::Option::PdExclude;
-use Net::DHCPv6::Option::SntpServers;
-use Net::DHCPv6::Option::Preference;
-use Net::DHCPv6::Option::RapidCommit;
-use Net::DHCPv6::Option::ReconfAccept;
-use Net::DHCPv6::Option::ReconfMsg;
-use Net::DHCPv6::Option::RelayMsg;
-use Net::DHCPv6::Option::RemoteId;
-use Net::DHCPv6::Option::RSOO;
-use Net::DHCPv6::Option::ServerId;
-use Net::DHCPv6::Option::SipServerA;
-use Net::DHCPv6::Option::SipServerD;
-use Net::DHCPv6::Option::MudUrl;
-use Net::DHCPv6::Option::SolMaxRt;
-use Net::DHCPv6::Option::StatusCode;
-use Net::DHCPv6::Option::SubscriberId;
-use Net::DHCPv6::Option::Unicast;
-use Net::DHCPv6::Option::UserClass;
-use Net::DHCPv6::Option::VendorClass;
-use Net::DHCPv6::Option::VendorOpts;
+use Net::DHCPv6::Option::AftrName            ();
+use Net::DHCPv6::Option::Auth                ();
+use Net::DHCPv6::Option::BootfileParam       ();
+use Net::DHCPv6::Option::BootfileUrl         ();
+use Net::DHCPv6::Option::CaptivePortal       ();
+use Net::DHCPv6::Option::ClientArchType      ();
+use Net::DHCPv6::Option::ClientFqdn          ();
+use Net::DHCPv6::Option::ClientId            ();
+use Net::DHCPv6::Option::ClientLinkLayerAddr ();
+use Net::DHCPv6::Option::DnsServers          ();
+use Net::DHCPv6::Option::DomainList          ();
+use Net::DHCPv6::Option::ElapsedTime         ();
+use Net::DHCPv6::Option::Generic             ();
+use Net::DHCPv6::Option::IAAddr              ();
+use Net::DHCPv6::Option::IANA                ();
+use Net::DHCPv6::Option::IAPD                ();
+use Net::DHCPv6::Option::IAPrefix            ();
+use Net::DHCPv6::Option::IATA                ();
+use Net::DHCPv6::Option::InfMaxRt            ();
+use Net::DHCPv6::Option::InfoRefreshTime     ();
+use Net::DHCPv6::Option::InterfaceId         ();
+use Net::DHCPv6::Option::NewPosixTimezone    ();
+use Net::DHCPv6::Option::NewTzdbTimezone     ();
+use Net::DHCPv6::Option::NisDomainName       ();
+use Net::DHCPv6::Option::NisServers          ();
+use Net::DHCPv6::Option::NispDomainName      ();
+use Net::DHCPv6::Option::NispServers         ();
+use Net::DHCPv6::Option::NtpServer           ();
+use Net::DHCPv6::Option::ORO                 ();
+use Net::DHCPv6::Option::PdExclude           ();
+use Net::DHCPv6::Option::SntpServers         ();
+use Net::DHCPv6::Option::Preference          ();
+use Net::DHCPv6::Option::RapidCommit         ();
+use Net::DHCPv6::Option::ReconfAccept        ();
+use Net::DHCPv6::Option::ReconfMsg           ();
+use Net::DHCPv6::Option::RelayMsg            ();
+use Net::DHCPv6::Option::RemoteId            ();
+use Net::DHCPv6::Option::RSOO                ();
+use Net::DHCPv6::Option::ServerId            ();
+use Net::DHCPv6::Option::SipServerA          ();
+use Net::DHCPv6::Option::SipServerD          ();
+use Net::DHCPv6::Option::MudUrl              ();
+use Net::DHCPv6::Option::SolMaxRt            ();
+use Net::DHCPv6::Option::StatusCode          ();
+use Net::DHCPv6::Option::SubscriberId        ();
+use Net::DHCPv6::Option::Unicast             ();
+use Net::DHCPv6::Option::UserClass           ();
+use Net::DHCPv6::Option::VendorClass         ();
+use Net::DHCPv6::Option::VendorOpts          ();
 
 # Message classes
-use Net::DHCPv6::Message::Solicit;
-use Net::DHCPv6::Message::Advertise;
-use Net::DHCPv6::Message::Request;
-use Net::DHCPv6::Message::Confirm;
-use Net::DHCPv6::Message::Renew;
-use Net::DHCPv6::Message::Rebind;
-use Net::DHCPv6::Message::Reply;
-use Net::DHCPv6::Message::Release;
-use Net::DHCPv6::Message::Decline;
-use Net::DHCPv6::Message::Reconfigure;
-use Net::DHCPv6::Message::InformationRequest;
-use Net::DHCPv6::Message::RelayForw;
-use Net::DHCPv6::Message::RelayReply;
+use Net::DHCPv6::Message::Solicit            ();
+use Net::DHCPv6::Message::Advertise          ();
+use Net::DHCPv6::Message::Request            ();
+use Net::DHCPv6::Message::Confirm            ();
+use Net::DHCPv6::Message::Renew              ();
+use Net::DHCPv6::Message::Rebind             ();
+use Net::DHCPv6::Message::Reply              ();
+use Net::DHCPv6::Message::Release            ();
+use Net::DHCPv6::Message::Decline            ();
+use Net::DHCPv6::Message::Reconfigure        ();
+use Net::DHCPv6::Message::InformationRequest ();
+use Net::DHCPv6::Message::RelayForw          ();
+use Net::DHCPv6::Message::RelayReply         ();
 
-use Net::DHCPv6::OptionList;
-use Net::DHCPv6::Packet;
+use Net::DHCPv6::OptionList ();
+use Net::DHCPv6::Packet     ();
 use namespace::clean;
 
 my $MIN_LEN = 4;    ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
@@ -91,7 +91,7 @@ sub decode_or_null {
     my ( $class, $bytes ) = @_;
     return if !defined $bytes || CORE::length( $bytes ) < $MIN_LEN;
     my $packet;
-    eval { $packet = Net::DHCPv6::Packet->from_bytes( $bytes ); };
+    eval { $packet = Net::DHCPv6::Packet->from_bytes( $bytes ); 1 } or return;
     return $packet;
 }
 
@@ -161,7 +161,7 @@ Net::DHCPv6 - DHCPv6 packet decoder/encoder
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

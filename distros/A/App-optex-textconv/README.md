@@ -1,11 +1,11 @@
-[![Actions Status](https://github.com/kaz-utashiro/optex-textconv/workflows/test/badge.svg)](https://github.com/kaz-utashiro/optex-textconv/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-optex-textconv.svg)](https://metacpan.org/release/App-optex-textconv)
+[![Actions Status](https://github.com/kaz-utashiro/optex-textconv/actions/workflows/test.yml/badge.svg?branch=master)](https://github.com/kaz-utashiro/optex-textconv/actions?workflow=test) [![MetaCPAN Release](https://badge.fury.io/pl/App-optex-textconv.svg)](https://metacpan.org/release/App-optex-textconv)
 # NAME
 
 textconv - optex module to replace document file by its text contents
 
 # VERSION
 
-Version 1.07
+Version 1.08
 
 # SYNOPSIS
 
@@ -68,7 +68,7 @@ Next command simply produces the same result.
 
 - jpeg
 
-    JPEG files is converted to their exif information (.jpeg, .jpg).
+    JPEG file is converted to its exif information (.jpeg, .jpg).
 
 - http
 
@@ -99,8 +99,8 @@ converted to plain text by original code implemented in
 [App::optex::textconv::ooxml::regex](https://metacpan.org/pod/App%3A%3Aoptex%3A%3Atextconv%3A%3Aooxml%3A%3Aregex) module.  Algorithm used in this
 module is extremely simple, and consequently runs fast.
 
-Two module are included in this distribution to use other external
-converter program, **pandoc** and **tika**, those implement much more
+Two modules are included in this distribution to use other external
+converter program, **pandoc** and **tika**, which implement much more
 serious algorithm.  They can be invoked by calling **load** function
 with module declaration like:
 
@@ -145,6 +145,8 @@ About other GIT related setting, see
 
 [https://qiita.com/kaz-utashiro/items/23fd825bd325240592c2](https://qiita.com/kaz-utashiro/items/23fd825bd325240592c2)
 
+[https://qiita.com/kaz-utashiro/items/7c11337468c63fdfdccb](https://qiita.com/kaz-utashiro/items/7c11337468c63fdfdccb)
+
 [https://github.com/kaz-utashiro/sdif-tools](https://github.com/kaz-utashiro/sdif-tools)
 
 # AUTHOR
@@ -153,7 +155,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2019-2023 Kazumasa Utashiro.
+Copyright 2019-2024 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

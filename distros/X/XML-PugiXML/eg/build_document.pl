@@ -6,13 +6,10 @@ use XML::PugiXML;
 
 my $doc = XML::PugiXML->new;
 
-# Build structure
-my $root = $doc->child('root');  # empty doc has no root yet
-$root = $doc->root;              # still undef for empty doc
-
-# For an empty doc, use load_string with a root or append via document child
+# An empty document has no root element, and the document class has no
+# append_child; create the root element by parsing a minimal skeleton.
 $doc->load_string('<catalog/>') or die $@;
-$root = $doc->root;
+my $root = $doc->root;
 
 # Add products
 for my $item (

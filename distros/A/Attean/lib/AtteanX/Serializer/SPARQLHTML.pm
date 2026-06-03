@@ -4,7 +4,7 @@ AtteanX::Serializer::SPARQLHTML - SPARQL Results HTML Serializer
 
 =head1 VERSION
 
-This document describes AtteanX::Serializer::SPARQLHTML version 0.038
+This document describes AtteanX::Serializer::SPARQLHTML version 0.039
 
 =head1 SYNOPSIS
 
@@ -35,7 +35,7 @@ This document describes AtteanX::Serializer::SPARQLHTML version 0.038
 use v5.14;
 use warnings;
 
-package AtteanX::Serializer::SPARQLHTML 0.038 {
+package AtteanX::Serializer::SPARQLHTML 0.039 {
 	use Moo;
 	use Types::Standard qw(Str Bool ArrayRef);
 	use Encode qw(encode);
@@ -84,20 +84,16 @@ L<IO::Handle> object C<< $fh >>.
 <h2>Results</h2>
 END
 		}
-		my @names;
+		my @names	= @{ $iter->variables };
 		my $count	= 0;
 		my $first	= 1;
+		$io->print("<table class='sparqlresults'>\n<thead><tr>\n");
+		foreach my $name (@names) {
+			$io->print("\t<th>" . $name . "</th>\n");
+		}
+		$io->print("</tr></thead>\n");
 		while (my $t = $iter->next()) {
 			$count++;
-			if ($first) {
-				$io->print("<table class='sparqlresults'>\n<thead><tr>\n");
-				@names	= $t->variables;
-				foreach my $name (@names) {
-					$io->print("\t<th>" . $name . "</th>\n");
-				}
-				$io->print("</tr></thead>\n");
-				$first	= 0;
-			}
 			
 			$io->print("<tr>\n");
 			foreach my $k (@names) {
@@ -107,10 +103,8 @@ END
 			}
 			$io->print("</tr>\n");
 		}
-		unless ($first) {
-			my $columns	= scalar(@names);
-			$io->print("<tfoot><tr><th colspan=\"$columns\">Total: $count</th></tr></tfoot>\n</table>\n");
-		}
+		my $columns	= scalar(@names);
+		$io->print("<tfoot><tr><th colspan=\"$columns\">Total: $count</th></tr></tfoot>\n</table>\n");
 		if ($self->full_document) {
 			$io->print("</div>\n</body></html>\n");
 		}

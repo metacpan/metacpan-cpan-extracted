@@ -4,10 +4,12 @@
 use strictures 2;
 
 package Net::DHCPv6::Option::BootfileParam;
-$Net::DHCPv6::Option::BootfileParam::VERSION = '0.002';
-use Net::DHCPv6::OptionList;
-use Net::DHCPv6::Constants;
-use Net::DHCPv6::X::Truncated;
+$Net::DHCPv6::Option::BootfileParam::VERSION = '0.003';
+use Net::DHCPv6::OptionList ();
+use Net::DHCPv6::Constants  qw(
+    $OPTION_BOOTFILE_PARAM
+);
+use Net::DHCPv6::X::Truncated ();
 use parent 'Net::DHCPv6::Option';
 use Ref::Util qw( is_plain_arrayref );
 use namespace::clean;
@@ -57,7 +59,7 @@ Net::DHCPv6::Option::BootfileParam - Boot File Parameters option (code 60) -- li
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

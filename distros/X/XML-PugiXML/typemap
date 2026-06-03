@@ -3,3 +3,8 @@ XML::PugiXML         T_PTROBJ
 XML::PugiXML::Node   T_PTROBJ
 XML::PugiXML::Attr   T_PTROBJ
 XML::PugiXML::XPath  T_PTROBJ
+nul_safe_pv          T_NUL_SAFE_PV
+
+INPUT
+T_NUL_SAFE_PV
+	$var = ($type)ng_check_nul(aTHX_ $arg);

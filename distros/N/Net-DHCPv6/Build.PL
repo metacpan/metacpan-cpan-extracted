@@ -19,7 +19,7 @@ my %module_build_args = (
     "Dean Hamstead <dean\@fragfest.com.au>"
   ],
   "dist_name" => "Net-DHCPv6",
-  "dist_version" => "0.002",
+  "dist_version" => "0.003",
   "license" => "mit",
   "module_name" => "Net::DHCPv6",
   "recursive_test_files" => 1,

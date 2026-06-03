@@ -1,5 +1,12 @@
 Revision history for Text::Stencil
 
+0.02  2026-06-01
+    - Fix render-buffer use-after-free on croak
+    - Free buffers when a callback dies or render aborts
+    - Fix int_comma buffer overflow (values >= 1e15)
+    - Reject count/coalesce as non-first transform
+    - Fix plural sign for negatives
+
 0.01  2026-04-03
     - Initial release
     - 35 transform types: html, html_br, url, json, hex, base64, base64url,

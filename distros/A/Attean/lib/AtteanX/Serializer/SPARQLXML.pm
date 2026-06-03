@@ -4,7 +4,7 @@ AtteanX::Serializer::SPARQLXML - SPARQL Results XML Serializer
 
 =head1 VERSION
 
-This document describes AtteanX::Serializer::SPARQLXML version 0.038
+This document describes AtteanX::Serializer::SPARQLXML version 0.039
 
 =head1 SYNOPSIS
 
@@ -35,7 +35,7 @@ This document describes AtteanX::Serializer::SPARQLXML version 0.038
 use v5.14;
 use warnings;
 
-package AtteanX::Serializer::SPARQLXML 0.038 {
+package AtteanX::Serializer::SPARQLXML 0.039 {
 	use Moo;
 	use Types::Standard qw(Str ArrayRef);
 	use Encode qw(encode encode_utf8);
@@ -80,59 +80,63 @@ L<IO::Handle> object C<< $fh >>.
 <sparql xmlns="http://www.w3.org/2005/sparql-results#">
 <head>
 END
-		my @vars	= @{ $iter->variables };
+		my @vars;
 		if ($iter->does('Attean::API::ResultIterator')) {
+			@vars	= @{ $iter->variables };
 			foreach my $v (@vars) {
 				print $fh qq(\t<variable name="$v"/>\n);
 			}
 		}
 
-		print {$fh} <<"END";
-</head>
-<results>
-END
-		
-		while (my $t = $iter->next()) {
-			print $fh "\t\t<result>\n";
-			foreach my $name (@vars) {
-				my $term	= $t->value($name);
-				if (blessed($term)) {
-					if ($term->does('Attean::API::IRI')) {
-						my $label	= $term->value;
-						$label	=~ s/&/&amp;/g;
-						$label	=~ s/</&lt;/g;
-						$label	=~ s/"/&quot;/g;
-						$label	= encode_utf8($label);
-						print $fh qq(\t\t\t<binding name="${name}"><uri>${label}</uri></binding>\n);
-					} elsif ($term->does('Attean::API::Literal')) {
-						my $label	= $term->value;
-						$label	=~ s/&/&amp;/g;
-						$label	=~ s/</&lt;/g;
-						$label	=~ s/"/&quot;/g;
-						$label	= encode_utf8($label);
-						if (my $lang = $term->language) {
-							$label	= qq(<literal xml:lang="${lang}">${label}</literal>);
-						} elsif (my $dt = $term->datatype) {
-							$label	= qq(<literal datatype=") . $dt->value . qq(">${label}</literal>);
+		print {$fh} qq[</head>\n];
+		if ($iter->does('Attean::API::TermIterator')) {
+			my $v	= $iter->next;
+			my $b	= $v->canonicalized_term->value;
+			print $fh qq[<boolean>$b</boolean>\n];
+		} else {
+			print $fh qq[<results>\n];
+			while (my $t = $iter->next()) {
+				print $fh "\t\t<result>\n";
+				foreach my $name (@vars) {
+					my $term	= $t->value($name);
+					if (blessed($term)) {
+						if ($term->does('Attean::API::IRI')) {
+							my $label	= $term->value;
+							$label	=~ s/&/&amp;/g;
+							$label	=~ s/</&lt;/g;
+							$label	=~ s/"/&quot;/g;
+							$label	= encode_utf8($label);
+							print $fh qq(\t\t\t<binding name="${name}"><uri>${label}</uri></binding>\n);
+						} elsif ($term->does('Attean::API::Literal')) {
+							my $label	= $term->value;
+							$label	=~ s/&/&amp;/g;
+							$label	=~ s/</&lt;/g;
+							$label	=~ s/"/&quot;/g;
+							$label	= encode_utf8($label);
+							if (my $lang = $term->language) {
+								$label	= qq(<literal xml:lang="${lang}">${label}</literal>);
+							} elsif (my $dt = $term->datatype) {
+								$label	= qq(<literal datatype=") . $dt->value . qq(">${label}</literal>);
+							} else {
+								$label	= qq(<literal>${label}</literal>);
+							}
+							print $fh qq(\t\t\t<binding name="${name}">${label}</binding>\n);
+						} elsif ($term->does('Attean::API::Blank')) {
+							my $label	= $term->value;
+							$label	=~ s/&/&amp;/g;
+							$label	=~ s/</&lt;/g;
+							$label	=~ s/"/&quot;/g;
+							$label	= encode_utf8($label);
+							print $fh qq(\t\t\t<binding name="${name}"><bnode>${label}</bnode></binding>\n);
 						} else {
-							$label	= qq(<literal>${label}</literal>);
+							die "Term object has an unrecognized type: " . ref($term);
 						}
-						print $fh qq(\t\t\t<binding name="${name}">${label}</binding>\n);
-					} elsif ($term->does('Attean::API::Blank')) {
-						my $label	= $term->value;
-						$label	=~ s/&/&amp;/g;
-						$label	=~ s/</&lt;/g;
-						$label	=~ s/"/&quot;/g;
-						$label	= encode_utf8($label);
-						print $fh qq(\t\t\t<binding name="${name}"><bnode>${label}</bnode></binding>\n);
-					} else {
-						die "Term object has an unrecognized type: " . ref($term);
 					}
 				}
+				print $fh "\t\t</result>\n";
 			}
-			print $fh "\t\t</result>\n";
+			print {$fh} "</results>\n";
 		}
-		print {$fh} "</results>\n";
 		print {$fh} "</sparql>\n";
 		return;
 	}

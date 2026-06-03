@@ -7,8 +7,8 @@ use Test2::V1 -ipP, qw(is ok done_testing);            ## no critic (Subroutines
 use lib 't/lib';
 use lib 'lib';
 
-use Net::DHCPv6::DUID;
-use Net::DHCPv6::Constants;
+use Net::DHCPv6::DUID      ();
+use Net::DHCPv6::Constants qw( $DUID_LLT $DUID_UUID $LINK_TYPE_ETHERNET $LINK_TYPE_IEEE802 );
 
 ok( dies { Net::DHCPv6::DUID->new },                           'new() without args dies' );
 ok( dies { Net::DHCPv6::DUID->new( duid_type => $DUID_LLT ) }, 'DUID-LLT without hwtype dies' );

@@ -489,15 +489,29 @@ use Exporter qw[import];
   package
   Time::Str::PP::Util; # hide from PAUSE/indexers
 
-  our @EXPORT_OK = qw[ lower_bound
+  our @EXPORT_OK = qw[ binary_search
+                       lower_bound
                        range_bounds
                        upper_bound ];
 
   use Carp     qw[croak];
   use Exporter qw[import];
 
+  sub binary_search {
+    (@_ >= 2 && @_ <= 4) or croak q/Usage: binary_search(array, value [, lo [, hi]])/;
+    my ($array, $value, $lo, $hi) = @_;
+
+    ref $array eq 'ARRAY'
+      or croak q/Parameter 'array' must be an array reference/;
+
+    $lo //= 0;
+    $hi //= @$array;
+    $lo = lower_bound($array, $value, $lo, $hi);
+    return ($lo != $hi && !($value < $array->[$lo]));
+  }
+
   sub lower_bound {
-    (@_ >= 2 && @_ <= 4) or croak q/Usage: lower_bound(array, value [, lo [, h i]])/;
+    (@_ >= 2 && @_ <= 4) or croak q/Usage: lower_bound(array, value [, lo [, hi]])/;
     my ($array, $value, $lo, $hi) = @_;
 
     ref $array eq 'ARRAY'
@@ -552,8 +566,13 @@ use Exporter qw[import];
   my @import = qw [ valid_ymd
                     resolve_century
                     ymd_to_dow
-                    ymd_to_rdn ];
+                    ymd_to_rdn
+                    rdn_to_ymd ];
   Time::Str::PP::Calendar->import(@import);
+}
+{
+  my @import = qw[ valid_hms60 ];
+  Time::Str::PP::Time->import(@import);
 }
 {
   my @import = qw[ parse_day
@@ -630,13 +649,6 @@ BEGIN {
   }
 }
 
-sub valid_hms {
-    my ($h, $m, $s) = @_;
-    return ($h >= 0 && $h <= 23
-         && $m >= 0 && $m <= 59
-         && $s >= 0 && ($s <= 59 || ($s == 60 && $h == 23 && $m == 59)));
-}
-
 sub str2date {
   @_ & 1 or croak q/Usage: str2date(string [, format => 'RFC3339' ])/;
   my ($string, %p) = @_;
@@ -697,7 +709,7 @@ sub str2date {
       $r{hour} = ($hour % 12) + parse_meridiem(delete $r{meridiem});
     }
 
-    valid_hms($r{hour}, $r{minute} // 0, $r{second} // 0)
+    valid_hms60($r{hour}, $r{minute} // 0, $r{second} // 0)
       or croak q/Unable to parse: time of day is out of range/;
 
     if (exists $r{fraction}) {
@@ -755,30 +767,85 @@ sub str2date {
   return wantarray ? %r : \%r;
 }
 
+BEGIN {
+  if ($^V ge v5.40) {
+    builtin->import(qw(blessed));
+  }
+  else {
+    require Scalar::Util; Scalar::Util->import(qw(blessed));
+  }
+}
+
 sub str2time {
   @_ & 1 or croak q/Usage: str2time(string [, format => 'RFC3339' ])/;
   my ($string, %p) = @_;
 
-  my $precision;
+  my ($precision, $timezone);
 
   if (exists $p{precision}) {
     $precision = delete $p{precision};
     ($precision >= 0 && $precision <= 9)
       or croak q/Parameter 'precision' is out of range [0, 9]/;
   }
+  if (exists $p{timezone}) {
+    $timezone = delete $p{timezone};
+    (blessed($timezone) && $timezone->can('offset_for_local'))
+      or croak q/Parameter 'timezone' is not an object with an 'offset_for_local' method/;
+  }
 
   my $r = str2date($string, %p);
 
-  (exists $r->{tz_offset})
+  (defined $timezone || exists $r->{tz_offset})
     or croak q/Unable to convert: timestamp string without a UTC designator or numeric offset/;
+
+  # A timezone object resolves an offset-less local time, but it cannot
+  # interpret a zone abbreviation in the string (which may name a
+  # different zone than the object). Reject rather than guess.
+  (!defined $timezone || !exists $r->{tz_abbrev})
+    or croak q/Unable to convert: cannot resolve abbreviated timezone/;
 
   my ($Y, $M, $D, $h, $m, $s) = @$r{qw(year month day hour minute second)};
   $m //= 0;
   $s //= 0;
 
+  # A leap second (23:59:60 UTC) cannot be represented as a POSIX time,
+  # so fold it onto the preceding 23:59:59 and validate that it lands on
+  # a real leap-second slot. The check is table-free: every June 30 and
+  # December 31 since 1972 is accepted, whether or not a leap second was
+  # actually inserted that day. The error messages are worded to hold
+  # equally if a Time::LeapSecond table lookup is used instead.
+  my $leap_second = ($s == 60);
+  $s -= $leap_second;
+
   my $rdn  = ymd_to_rdn($Y, $M, $D);
   my $sod  = ($h * 60 + $m) * 60 + $s;
-  my $time = ($rdn - 719163) * 86400 + $sod - $r->{tz_offset} * 60;
+  my $time = ($rdn - 719163) * 86400 + $sod;
+
+  # A string offset is in minutes; a timezone object resolves the local
+  # time and returns its UTC offset in seconds.
+  if (exists $r->{tz_offset}) {
+    $time -= $r->{tz_offset} * 60;
+  }
+  else {
+    $time -= $timezone->offset_for_local($time);
+  }
+
+  if ($leap_second) {
+    my $days = int($time / 86400);
+    my $usod = $time - $days * 86400;
+    if ($usod < 0) {
+      $usod += 86400;
+      $days--;
+    }
+
+    ($usod == 86399)
+      or croak q/Unable to convert: a leap second must occur at 23:59:60 UTC/;
+
+    my ($uy, $um, $ud) = rdn_to_ymd($days + 719163);
+    ($uy >= 1972 && (($um == 6 && $ud == 30) || ($um == 12 && $ud == 31)))
+      or croak q/Unable to convert: no leap second on this UTC date/;
+  }
+
   if (exists $r->{nanosecond}) {
     my $scale    = 10 ** ($precision // DEFAULT_PRECISION);
     my $fraction = int($r->{nanosecond} * $scale / NANOS_PER_SECOND);

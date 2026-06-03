@@ -3,54 +3,60 @@
 use v5.14;
 use warnings;
 
-use require::relative "test-helper.pl";
+use require::relative q (test-helper.pl);
 
-subtest "successful compare with > operator" => sub {
-	Test::Tester::check_test
-		sub {
-			it "should just pass"
-				=> got    => 43
-				=> expect => expect_compare ('>', 42)
-				;
-		},
-		{
-			ok          => 1,
-			actual_ok   => 1,
-			name        => 'should just pass',
-			diag        => '',
-		}
+assume_test_yaft_exports expect_compare
+	=> by_default => 1
+	=> on_demand  => 1
+	=> by_tag     => [qw [all default expectations]]
 	;
-};
 
-subtest "failed compare with > operator" => sub {
-	Test::Tester::check_test
-		sub {
-			it "should just fail"
-				=> got    => 42
-				=> expect => expect_compare ('>', 42)
-				;
-		},
-		{
-			ok          => 0,
-			actual_ok   => 0,
-			name        => 'should just fail',
-			diag        => <<'DIAG',
-+----+-----+----+---------------------------------+
-| Elt|Got  | Elt|Expected                         |
-+----+-----+----+---------------------------------+
-*   0|42   *   0|bless( {                         *
-|    |     *   1|  operator => '>',               *
-|    |     *   2|  val => 42                      *
-|    |     *   3|}, 'Test::YAFT::Cmp::Compare' )  *
-+----+-----+----+---------------------------------+
+assume_yaft_dump q (Dumper should produce expect_compare (q (>), 42))
+	=> got { expect_compare (q (>), 42) }
+	=> expect => <<'END_OF_EXPECTED'
+expect_compare (
+  '>',
+  42,
+)
+END_OF_EXPECTED
+	;
+
+check_test q (successful compare with '>' operator)
+	=> assumption {
+		it q (should just pass)
+			=> got    => 43
+			=> expect => expect_compare (q (>), 42)
+			;
+	}
+	=> ok          => 1
+	=> actual_ok   => 1
+	=> name        => q (should just pass)
+	;
+
+check_test q (failed compare with '>' operator)
+	=> assumption {
+		it q (should just fail)
+			=> got    => 42
+			=> expect => expect_compare (q (>), 42)
+			;
+	}
+	=> ok          => 0
+	=> actual_ok   => 0
+	=> name        => q (should just fail)
+	=> diag        => <<'EXPECTED_DIAG'
++----+-----+----+------------------+
+| Elt|Got  | Elt|Expected          |
++----+-----+----+------------------+
+*   0|42   *   0|expect_compare (  *
+|    |     *   1|  '>',            *
+|    |     *   2|  42,             *
+|    |     *   3|)                 *
++----+-----+----+------------------+
 Compared $data
    got : '42'
 expect : > '42'
-DIAG
-		}
+EXPECTED_DIAG
 	;
-};
 
 had_no_warnings;
-
 done_testing;

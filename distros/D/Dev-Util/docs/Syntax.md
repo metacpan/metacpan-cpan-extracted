@@ -4,7 +4,7 @@ Dev::Util::Syntax - Provide consistent feature setup.
 
 # VERSION
 
-Version v2.19.35
+Version v2.19.42
 
 # SYNOPSIS
 
@@ -33,6 +33,8 @@ This is equivalent to:
     use Readonly;
     use Carp;
     use English qw( -no_match_vars );
+    use if $] >= 5.036, builtin => qw(true false);
+    use if $] < 5.036,  boolean => qw(true false);
 
     # Rest of Code...
 
@@ -76,7 +78,7 @@ You can also look for information at:
 
 # LICENSE AND COPYRIGHT
 
-This software is Copyright © 2024-2025 by Matt Martini.
+This software is Copyright © 2024-2026 by Matt Martini.
 
 This is free software, licensed under:
 

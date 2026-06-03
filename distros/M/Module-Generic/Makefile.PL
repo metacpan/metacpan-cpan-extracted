@@ -37,7 +37,8 @@ my %WriteMakefileArgs = (
         'Config'                => 0,
         'Data::Dump'            => '1.23',
         'Data::UUID'            => '1.226',
-        'DateTime::Lite'        => 'v0.7.0',
+        # version v0.7.3 needed for _parse_timestamp
+        'DateTime::Lite'        => 'v0.7.3',
         'DateTime::Format::Lite'=> 'v0.1.2',
         # 'DateTime::TimeZone::Catalog::Extend' => 'v0.3.0',
         'Devel::StackTrace'     => 0,

@@ -8,3 +8,6 @@ docs
 MANIFEST.bak
 adm/release
 MYMETA
+\.swp$
+^Data-Throttler-[0-9._]+\.tar$
+^Data-Throttler-[0-9._]+\.tar\.gz$

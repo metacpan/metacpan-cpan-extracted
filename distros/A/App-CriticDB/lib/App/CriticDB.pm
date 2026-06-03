@@ -8,7 +8,7 @@ use App::CriticDB::Collector;
 use App::CriticDB::DB;
 use App::CriticDB::Report;
 
-our $VERSION='0.0.5';
+our $VERSION='0.0.6';
 
 sub new {
 	my ($ref,%opt)=@_;
@@ -62,7 +62,7 @@ App::CriticDB - Manage a database of Perl::Critic violations
 
 =head1 VERSION
 
-Version 0.0.5
+Version 0.0.6
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,13 @@
 Revision history for JSON-YY
 
+0.05  2026-06-01
+    - Fix decode_json_ro use-after-free
+    - Fix encode croak/OOM leaks
+    - Fix jset/jdel/jraw on borrowed Docs (subtree-relative)
+    - jfind: 64-bit integer matching; match null
+    - Fix quadmath float buffer; guard jwrite OOM
+    - Document boolean handling
+
 0.04  2026-04-09
     - Migrate to XS::Parse::Keyword (lexically scoped keywords)
 

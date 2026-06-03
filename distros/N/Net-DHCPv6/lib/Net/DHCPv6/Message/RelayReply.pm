@@ -4,9 +4,11 @@
 use strictures 2;
 
 package Net::DHCPv6::Message::RelayReply;
-$Net::DHCPv6::Message::RelayReply::VERSION = '0.002';
-use Net::DHCPv6::Packet;
-use Net::DHCPv6::Constants;
+$Net::DHCPv6::Message::RelayReply::VERSION = '0.003';
+use Net::DHCPv6::Packet    ();
+use Net::DHCPv6::Constants qw(
+    $RELAY_REPLY
+);
 use parent 'Net::DHCPv6::Packet::Relay';
 use namespace::clean;
 
@@ -32,7 +34,7 @@ Net::DHCPv6::Message::RelayReply - Relay-Reply message (type 13)
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

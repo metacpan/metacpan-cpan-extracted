@@ -57,13 +57,17 @@ use EV::cares qw(:all);
     $r->set_servers('192.0.2.1');
     my $done;
     $r->resolve('unlikely-name.invalid', sub { $done = 1 });
+    my $t0 = EV::time;
+    my $drained = $r->wait_idle(1);
+    my $elapsed = EV::time - $t0;
     SKIP: {
-        skip 'query against TEST-NET resolved too fast on this platform', 2
-            if $done || !$r->is_busy;
-        my $t0 = EV::time;
-        my $drained = $r->wait_idle(1);
+        # If the query drained within the 1s window, the OS rejected the
+        # TEST-NET packet immediately (no route / hardened firewall) rather
+        # than black-holing it, so the timeout path can't be exercised.
+        # This must be detected AFTER wait_idle: a synchronous is_busy check
+        # before the loop runs still shows the query as in-flight.
+        skip 'TEST-NET query did not block on this platform', 2 if $drained;
         ok(!$drained, 'wait_idle returns false when timeout elapses');
-        my $elapsed = EV::time - $t0;
         cmp_ok($elapsed, '>=', 0.9, "elapsed >=~1s (actual: ${elapsed}s)");
     }
     # clean up — query may still be in flight

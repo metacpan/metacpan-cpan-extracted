@@ -2,28 +2,28 @@
 ## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
 use strictures 2;
 use Test2::Tools::Exception qw( dies );
-use Test2::V1 -ipP, qw(is ok done_testing);            ## no critic (Subroutines::ProhibitCallsToUndeclaredSubs)
+use Test2::V1 -ipP, qw(is ok like done_testing);            ## no critic (Subroutines::ProhibitCallsToUndeclaredSubs)
 
 use lib 't/lib';
 use lib 'lib';
 
-use Net::DHCPv6::Option;
-use Net::DHCPv6::Option::Generic;
-use Net::DHCPv6::Option::ClientId;
-use Net::DHCPv6::Option::ServerId;
-use Net::DHCPv6::DUID;
-use Net::DHCPv6::Option::ORO;
-use Net::DHCPv6::Option::Preference;
-use Net::DHCPv6::Option::ElapsedTime;
-use Net::DHCPv6::Option::StatusCode;
-use Net::DHCPv6::Option::RapidCommit;
-use Net::DHCPv6::Option::IANA;
-use Net::DHCPv6::Option::IATA;
-use Net::DHCPv6::Option::IAAddr;
-use Net::DHCPv6::Option::IAPD;
-use Net::DHCPv6::Option::IAPrefix;
-use Net::DHCPv6::OptionList;
-use Net::DHCPv6::Constants;
+use Net::DHCPv6::Option              ();
+use Net::DHCPv6::Option::Generic     ();
+use Net::DHCPv6::Option::ClientId    ();
+use Net::DHCPv6::Option::ServerId    ();
+use Net::DHCPv6::DUID                ();
+use Net::DHCPv6::Option::ORO         ();
+use Net::DHCPv6::Option::Preference  ();
+use Net::DHCPv6::Option::ElapsedTime ();
+use Net::DHCPv6::Option::StatusCode  ();
+use Net::DHCPv6::Option::RapidCommit ();
+use Net::DHCPv6::Option::IANA        ();
+use Net::DHCPv6::Option::IATA        ();
+use Net::DHCPv6::Option::IAAddr      ();
+use Net::DHCPv6::Option::IAPD        ();
+use Net::DHCPv6::Option::IAPrefix    ();
+use Net::DHCPv6::OptionList          ();
+use Net::DHCPv6::Constants           qw( $DUID_LLT $LINK_TYPE_ETHERNET $OPTION_IA_NA $OPTION_IA_TA );
 my $EMPTY = q();
 
 # Generic option
@@ -323,7 +323,8 @@ like( $parse_err, qr/Trailing garbage/, 'error mentions trailing garbage' );
 
     package Net::DHCPv6::Option::BadTest;
     use strictures 2;
-    sub from_bytes_inner { die 'kaboom' }
+    use Carp qw( croak );
+    sub from_bytes_inner { croak 'kaboom' }
 }
 my $saved_class = $Net::DHCPv6::OptionList::OPTION_CLASS{99};
 $Net::DHCPv6::OptionList::OPTION_CLASS{99} = 'Net::DHCPv6::Option::BadTest';

@@ -1,5 +1,22 @@
 Revision history for Net-CIDR-Set
 
+0.21      2026-06-02 17:45:44+01:00 Europe/London
+  [Security]
+  - Improved strictness of IP address (CVE-2026-49940) and netmask parsing (CVE-2026-49942).
+
+  - Removed potential infinite loops when attempting to parse IP addresses (CVE-2026-49941).
+
+  [Documentation]
+  - Removed CONTRIBUTING.md until policies about AI are updated.
+
+  [Tests]
+  - Changed tests to use Test::Exception.
+
+  [Toolchain]
+  - Added doap.xml to the distibution.
+
+  - Added automation-policy.json to the distribution.
+
 0.20      2026-04-27 19:02:28+01:00 Europe/London
   [Documentation]
   - Mentioned CONTRIBUTING.md in SOURCE.

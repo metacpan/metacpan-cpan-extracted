@@ -31,9 +31,10 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "File::Spec" => 0,
     "Module::Metadata" => "1.000015",
-    "Test::More" => 0
+    "Test::Exception" => 0,
+    "Test::More" => "0.96"
   },
-  "VERSION" => "0.20",
+  "VERSION" => "0.21",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,7 +47,8 @@ my %FallbackPrereqs = (
   "ExtUtils::MakeMaker" => "7.22",
   "File::Spec" => 0,
   "Module::Metadata" => "1.000015",
-  "Test::More" => 0,
+  "Test::Exception" => 0,
+  "Test::More" => "0.96",
   "namespace::autoclean" => 0,
   "overload" => 0,
   "strict" => 0,

@@ -3,12 +3,25 @@ use warnings;
 
 use Test2::V0;
 
-use DBI;
 use POSIX ();
-use IO::Socket::UNIX;
 use File::Temp qw/tempdir/;
 
 use DBIx::QuickDB::Driver;
+
+# This test fabricates a unix-domain socket left behind by a dead server, which
+# needs IO::Socket::UNIX and a fork-able platform. Skip where AF_UNIX is not
+# supported (e.g. Windows) rather than failing.
+skip_all "Unix domain sockets are not supported on $^O"
+    if $^O eq 'MSWin32';
+
+eval { require IO::Socket::UNIX; 1 }
+    or skip_all "IO::Socket::UNIX is not available: $@";
+
+# stop() calls DBI->visit_handles to disconnect lingering handles, so DBI must
+# be loaded. DBI is a runtime dependency, but some smoke environments test
+# without it installed -- skip rather than die there.
+eval { require DBI; 1 }
+    or skip_all "DBI is not available: $@";
 
 # A server that was SIGKILLed (because a slow shutdown blew the watcher's grace
 # period) never removes its unix socket. stop() must not hang/confess waiting
@@ -46,7 +59,7 @@ waitpid($dead_pid, 0);
 # the socket file persists until stop() unlinks it.
 my $socket_path = "$dir/.s.PGSQL.5432";
 my $srv = IO::Socket::UNIX->new(Local => $socket_path, Listen => 1)
-    or die "Could not create test socket: $!";
+    or skip_all "Could not create test unix socket: $!";
 ok(-S $socket_path, "test socket exists before stop");
 
 my $db = bless {

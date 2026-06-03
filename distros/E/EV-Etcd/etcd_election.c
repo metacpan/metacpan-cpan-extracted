@@ -255,12 +255,20 @@ static void observe_reconnect_cb(struct ev_loop *loop, ev_timer *w, int revents)
         return;
     }
 
-    grpc_op ops[4] = {0};
+    grpc_op ops[5] = {0};
     grpc_metadata auth_md;
     STREAMING_CALL_SETUP_OPS(client, ops, auth_md, send_buffer, oc);
 
+    /* Observe is server-streaming: the shared macro lays out bidi ops (no
+     * half-close, RECV_MESSAGE at ops[3]). Replace ops[3] with the client
+     * half-close and move RECV_MESSAGE to ops[4], matching the initial setup,
+     * so the reconnected stream actually delivers events. */
+    ops[3].op = GRPC_OP_SEND_CLOSE_FROM_CLIENT;
+    ops[4].op = GRPC_OP_RECV_MESSAGE;
+    ops[4].data.recv_message.recv_message = &oc->recv_buffer;
+
     init_call_base(&oc->base, CALL_TYPE_ELECTION_OBSERVE);
-    grpc_call_error err = grpc_call_start_batch(oc->call, ops, 4, &oc->base, NULL);
+    grpc_call_error err = grpc_call_start_batch(oc->call, ops, 5, &oc->base, NULL);
     cleanup_auth_metadata(client, &auth_md);
     grpc_byte_buffer_destroy(send_buffer);
 

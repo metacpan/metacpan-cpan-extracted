@@ -4,7 +4,7 @@ use Test::More;
 use EV;
 use EV::Kafka;
 
-plan tests => 6;
+plan tests => 7;
 
 # test that on_error fires on connection refused
 {
@@ -48,4 +48,18 @@ plan tests => 6;
     # produce before connect - should queue, not crash
     eval { $kafka->produce('test', 'k', 'v') };
     ok !$@, 'produce before connect does not crash';
+}
+
+# Regression: a callback that drops the last reference to the conn (triggering
+# DESTROY mid-callback) must not use-after-free. The conn's only ref lives in
+# @holder; on_error clears it while conn_emit_error is still on the C stack.
+# DESTROY now defers the free to the outermost watcher frame. Verified clean
+# under AddressSanitizer (xt/asan.t).
+{
+    my @holder = (EV::Kafka::Conn::_new('EV::Kafka::Conn', undef));
+    $holder[0]->on_error(sub { @holder = (); });
+    $holder[0]->connect('127.0.0.1', 19999, 1.0);  # nothing listening
+    my $t = EV::timer 3, 0, sub { EV::break };
+    EV::run;
+    pass 'conn freed inside its own callback: no use-after-free';
 }

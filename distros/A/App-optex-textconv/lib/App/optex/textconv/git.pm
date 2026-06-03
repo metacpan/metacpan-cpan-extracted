@@ -1,6 +1,6 @@
 package App::optex::textconv::git;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 =encoding utf-8
 
@@ -10,7 +10,7 @@ textconv::git - optex::textconv submodule to handle git arguments
 
 =head1 VERSION
 
-Version 1.07
+Version 1.08
 
 =head1 SYNOPSIS
 

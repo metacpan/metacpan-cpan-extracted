@@ -16,5 +16,7 @@ t/00-basic.t
 t/01-extended.t
 t/02-memory.t
 t/03-edge-cases.t
+t/04-precedence.t
+t/05-overlap-captures.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

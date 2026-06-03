@@ -11,7 +11,7 @@ use autodie;
 
 my $tmp= File::Temp->newdir;
 
-my $exporter= Sys::Export::Unix->new(src => $tmp, dst => File::Temp->newdir, log => 'trace');
+my $exporter= Sys::Export::Unix->new(src => $tmp, dst => File::Temp->newdir);
 note "exporter src: '".$exporter->src."' dst: '".$exporter->dst."'";
 
 umask 022;

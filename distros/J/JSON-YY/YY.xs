@@ -63,7 +63,7 @@ docholder_magic_free(pTHX_ SV *sv, MAGIC *mg) {
     return 0;
 }
 
-/* also used as a guard for yyjson_mut_doc* via mg_ptr cast */
+/* magic free for a yyjson_mut_doc holder: frees the doc when its SV dies */
 static int
 mut_docholder_magic_free(pTHX_ SV *sv, MAGIC *mg) {
     PERL_UNUSED_ARG(sv);
@@ -84,6 +84,12 @@ static MGVTBL mut_docholder_vtbl = {
     mut_docholder_magic_free,
     NULL, NULL, NULL
 };
+
+/* free() a yyjson-allocated (libc malloc) buffer at scope exit, so the buffer
+   is released even if the newSVpvn that copies it croaks on OOM. Used via
+   ENTER/SAVEDESTRUCTOR_X(...)/LEAVE around the copy. */
+static void yyjson_free_buf(pTHX_ void *p) { free(p); }
+
 static SV * yyjson_val_to_sv(pTHX_ yyjson_val *val);
 static SV * yyjson_val_to_sv_ro(pTHX_ yyjson_val *val, SV *doc_sv);
 static yyjson_mut_val * sv_to_yyjson_val(pTHX_ yyjson_mut_doc *doc, SV *sv,
@@ -256,14 +262,18 @@ static OP * pp_jset_impl(pTHX) {
         d->root = new_val;
     } else {
         yyjson_ptr_err perr;
+        /* Resolve from d->root, not the document root: on a borrowed subtree
+           Doc (from jget) this keeps jset subtree-relative, matching jget/
+           jgetp reads. For a non-borrowed Doc d->root IS the doc root, so this
+           is identical to the doc-based call. */
         /* try set first; if path ends with /- (array append), use add instead */
-        bool ok = yyjson_mut_doc_ptr_setx(d->doc, path, path_len, new_val,
-                                           true, NULL, &perr);
+        bool ok = yyjson_mut_ptr_setx(d->root, path, path_len, new_val,
+                                       d->doc, true, NULL, &perr);
         if (!ok) {
             /* retry with add (handles /- array append) */
             perr = (yyjson_ptr_err){0};
-            ok = yyjson_mut_doc_ptr_addx(d->doc, path, path_len, new_val,
-                                          true, NULL, &perr);
+            ok = yyjson_mut_ptr_addx(d->root, path, path_len, new_val,
+                                      d->doc, true, NULL, &perr);
         }
         if (!ok)
             croak("jset: failed to set path %.*s: %s",
@@ -286,19 +296,30 @@ static OP * pp_jdel_impl(pTHX) {
     if (path_len == 0)
         croak("jdel: cannot delete root");
 
-    yyjson_ptr_ctx ctx = {0};
-    yyjson_ptr_err perr;
-    yyjson_mut_val *removed = yyjson_mut_doc_ptr_removex(d->doc, path, path_len,
-                                                          &ctx, &perr);
-    if (!removed) {
+    /* Resolve from d->root (subtree-relative on a borrowed Doc, matching
+       jget/jgetp reads). Copy BEFORE removing, so an OOM while building the
+       returned Doc leaves the parent unmodified -- jdel stays transactional. */
+    yyjson_mut_val *target = yyjson_mut_ptr_getn(d->root, path, path_len);
+    if (!target) {
         XPUSHs(&PL_sv_undef);
         RETURN;
     }
 
-    /* deep copy removed val into independent doc (safe from parent mutations) */
+    /* deep copy into an independent doc (safe from later parent mutations) */
     yyjson_mut_doc *new_doc = yyjson_mut_doc_new(NULL);
-    yyjson_mut_val *copy = yyjson_mut_val_mut_copy(new_doc, removed);
+    if (!new_doc)
+        croak("jdel: out of memory");
+    yyjson_mut_val *copy = yyjson_mut_val_mut_copy(new_doc, target);
+    if (!copy) {
+        yyjson_mut_doc_free(new_doc);
+        croak("jdel: out of memory copying removed value");
+    }
     yyjson_mut_doc_set_root(new_doc, copy);
+
+    /* copy secured; now remove from the parent */
+    yyjson_ptr_ctx ctx = {0};
+    yyjson_ptr_err perr;
+    yyjson_mut_ptr_removex(d->root, path, path_len, &ctx, &perr);
     SV *result = new_doc_sv(aTHX_ new_doc, copy, NULL);
     XPUSHs(sv_2mortal(result));
     RETURN;
@@ -374,8 +395,10 @@ static OP * pp_jencode_impl(pTHX) {
     if (!json)
         croak("jencode: write error: %s", werr.msg);
 
+    ENTER;
+    SAVEDESTRUCTOR_X(yyjson_free_buf, json);
     SV *result = newSVpvn(json, json_len);
-    free(json);
+    LEAVE;
     XPUSHs(sv_2mortal(result));
     RETURN;
 }
@@ -791,8 +814,10 @@ static OP * pp_jpp_impl(pTHX) {
                                             &json_len, &werr);
     if (!json)
         croak("jpp: write error: %s", werr.msg);
+    ENTER;
+    SAVEDESTRUCTOR_X(yyjson_free_buf, json);
     SV *result = newSVpvn(json, json_len);
-    free(json);
+    LEAVE;
     XPUSHs(sv_2mortal(result));
     RETURN;
 }
@@ -829,12 +854,13 @@ static OP * pp_jraw_impl(pTHX) {
         d->root = new_val;
     } else {
         yyjson_ptr_err perr;
-        bool ok = yyjson_mut_doc_ptr_setx(d->doc, path, path_len, new_val,
-                                           true, NULL, &perr);
+        /* resolve from d->root (subtree-relative on a borrowed Doc) */
+        bool ok = yyjson_mut_ptr_setx(d->root, path, path_len, new_val,
+                                       d->doc, true, NULL, &perr);
         if (!ok) {
             perr = (yyjson_ptr_err){0};
-            ok = yyjson_mut_doc_ptr_addx(d->doc, path, path_len, new_val,
-                                          true, NULL, &perr);
+            ok = yyjson_mut_ptr_addx(d->root, path, path_len, new_val,
+                                      d->doc, true, NULL, &perr);
         }
         if (!ok)
             croak("jraw: failed to set path %.*s: %s",
@@ -909,6 +935,8 @@ static OP * pp_jwrite_impl(pTHX) {
     yyjson_write_err werr;
     /* write the subtree root, not necessarily the full doc */
     yyjson_mut_doc *tmp_doc = yyjson_mut_doc_new(NULL);
+    if (!tmp_doc)
+        croak("jwrite: out of memory");
     yyjson_mut_val *copy = yyjson_mut_val_mut_copy(tmp_doc, d->root);
     yyjson_mut_doc_set_root(tmp_doc, copy);
 
@@ -1045,11 +1073,28 @@ static OP * pp_jfind_impl(pTHX) {
                 RETURN;
             }
         }
-        /* compare: number match (convert match string to number) */
+        /* compare: number. For integer fields compare as 64-bit integers so
+           values above 2^53 (e.g. Snowflake IDs) don't collide through double
+           rounding; fall back to double for real fields or non-integer matches. */
         else if (yyjson_mut_is_num(field)) {
-            NV match_nv = SvNV(match_sv);
-            NV field_nv = yyjson_mut_get_num(field);
-            if (match_nv == field_nv) {
+            yyjson_subtype st = yyjson_mut_get_subtype(field);
+            int eq;
+            if (st == YYJSON_SUBTYPE_REAL || !SvIOK(match_sv)) {
+                eq = (SvNV(match_sv) == yyjson_mut_get_num(field));
+            } else if (SvIsUV(match_sv)) {
+                UV mv = SvUV(match_sv);
+                eq = (st == YYJSON_SUBTYPE_UINT)
+                     ? (yyjson_mut_get_uint(field) == (uint64_t)mv)
+                     : (yyjson_mut_get_sint(field) >= 0 &&
+                        (uint64_t)yyjson_mut_get_sint(field) == (uint64_t)mv);
+            } else {
+                IV mv = SvIV(match_sv);
+                eq = (st == YYJSON_SUBTYPE_SINT)
+                     ? (yyjson_mut_get_sint(field) == (int64_t)mv)
+                     : (mv >= 0 &&
+                        yyjson_mut_get_uint(field) == (uint64_t)mv);
+            }
+            if (eq) {
                 SV *result = new_doc_sv(aTHX_ d->doc, item, doc_sv);
                 XPUSHs(sv_2mortal(result));
                 RETURN;
@@ -1060,6 +1105,14 @@ static OP * pp_jfind_impl(pTHX) {
             bool bval = yyjson_mut_get_bool(field);
             if ((bval && match_len == 4 && memcmp(match, "true", 4) == 0) ||
                 (!bval && match_len == 5 && memcmp(match, "false", 5) == 0)) {
+                SV *result = new_doc_sv(aTHX_ d->doc, item, doc_sv);
+                XPUSHs(sv_2mortal(result));
+                RETURN;
+            }
+        }
+        /* compare: null -- match against the string "null" */
+        else if (yyjson_mut_is_null(field)) {
+            if (match_len == 4 && memcmp(match, "null", 4) == 0) {
                 SV *result = new_doc_sv(aTHX_ d->doc, item, doc_sv);
                 XPUSHs(sv_2mortal(result));
                 RETURN;
@@ -1091,13 +1144,15 @@ is_ascii(const char *s, size_t len) {
     return 1;
 }
 
-/* ---- zero-copy string SV (no per-SV magic, minimal overhead) ---- */
-/* SvLEN=0 tells Perl it doesn't own the buffer.
-   Perl will allocate+copy if someone does sv_setsv from this SV,
-   so extracted values are always safe.
-   The yyjson_doc lifetime is managed by magic on the ROOT container only. */
+/* ---- zero-copy string SV ---- */
+/* SvLEN=0 tells Perl it doesn't own the buffer; the bytes live inside the
+   yyjson_doc. Each borrowing SV carries magic holding a (refcounted) ref to
+   the doc holder, so the doc outlives every value that points into it --
+   including a reference taken to a nested value (e.g. \$data->[0]) that
+   outlives the root container. sv_setsv still copies, so values extracted by
+   assignment remain independent. */
 static inline SV *
-new_sv_zerocopy(pTHX_ const char *str, size_t len) {
+new_sv_zerocopy(pTHX_ const char *str, size_t len, SV *doc_sv) {
     SV *sv = newSV_type(SVt_PV);
     SvPV_set(sv, (char *)str);
     SvCUR_set(sv, len);
@@ -1105,6 +1160,7 @@ new_sv_zerocopy(pTHX_ const char *str, size_t len) {
     SvPOK_on(sv);
     if (!is_ascii(str, len))
         SvUTF8_on(sv);
+    sv_magicext(sv, doc_sv, PERL_MAGIC_ext, &empty_vtbl, NULL, 0);
     SvREADONLY_on(sv);
     return sv;
 }
@@ -1282,7 +1338,7 @@ yyjson_val_to_sv_ro(pTHX_ yyjson_val *val, SV *doc_sv) {
         case YYJSON_TYPE_STR:
             /* zero-copy: SV borrows string memory from yyjson_doc */
             return new_sv_zerocopy(aTHX_
-                yyjson_get_str(val), yyjson_get_len(val));
+                yyjson_get_str(val), yyjson_get_len(val), doc_sv);
 
         case YYJSON_TYPE_ARR: {
             size_t count = yyjson_arr_size(val);
@@ -1395,7 +1451,6 @@ needs_escape(const char *s, size_t len) {
     const unsigned char *p = (const unsigned char *)s;
     size_t i = 0;
     for (; i + 7 < len; i += 8) {
-        /* any byte < 0x20? */
         uint64_t chunk;
         memcpy(&chunk, p + i, 8);
         /* any byte < 0x20? subtract 0x20 from each byte; underflow sets high bit */
@@ -1509,7 +1564,9 @@ buf_cat_iv(pTHX_ SV *buf, IV val) {
 
 static void
 buf_cat_nv(pTHX_ SV *buf, NV val) {
-    buf_ensure(aTHX_ buf, 40);
+    /* worst-case Gconvert: sign + NV_DIG digits + '.' + 'e' + exp-sign + exp;
+       NV_DIG+32 is ample even for quadmath (NV_DIG=33), where 40 was too small */
+    buf_ensure(aTHX_ buf, NV_DIG + 32);
     char *p = SvPVX(buf) + SvCUR(buf);
     Gconvert(val, NV_DIG, 0, p);
     int len = strlen(p);
@@ -1548,8 +1605,11 @@ direct_encode_sv(pTHX_ SV *buf, SV *sv, U32 depth, json_yy_t *self) {
                 SV *result = count > 0 ? POPs : &PL_sv_undef;
                 SvREFCNT_inc(result);
                 PUTBACK; FREETMPS; LEAVE;
+                /* mortalize rather than an explicit dec: if the recursive
+                   encode croaks on an unencodable TO_JSON result, the mortal
+                   is still freed on unwind (an explicit dec would be skipped). */
+                sv_2mortal(result);
                 direct_encode_sv(aTHX_ buf, result, depth, self);
-                SvREFCNT_dec(result);
                 return;
             }
             if (self->flags & F_ALLOW_BLESSED) {
@@ -1667,9 +1727,11 @@ sv_to_yyjson_val(pTHX_ yyjson_mut_doc *doc, SV *sv, json_yy_t *self, U32 depth) 
                 SV *result = count > 0 ? POPs : &PL_sv_undef;
                 SvREFCNT_inc(result);
                 PUTBACK; FREETMPS; LEAVE;
-                yyjson_mut_val *ret = sv_to_yyjson_val(aTHX_ doc, result, self, depth);
-                SvREFCNT_dec(result);
-                return ret;
+                /* mortalize rather than an explicit dec: if the recursive
+                   encode croaks on an unencodable TO_JSON result, the mortal
+                   is still freed on unwind (an explicit dec would be skipped). */
+                sv_2mortal(result);
+                return sv_to_yyjson_val(aTHX_ doc, result, self, depth);
             }
             /* allow_blessed: encode as null */
             if (self->flags & F_ALLOW_BLESSED)
@@ -1721,7 +1783,6 @@ sv_to_yyjson_val(pTHX_ yyjson_mut_doc *doc, SV *sv, json_yy_t *self, U32 depth) 
         }
     }
 
-    /* check for boolean (JSON::PP::Boolean, Types::Serialiser::Boolean, etc.) */
     /* SvIOK first for speed */
     if (SvIOK(sv)) {
         if (SvIsUV(sv))
@@ -1782,10 +1843,14 @@ pp_encode_json_impl(pTHX) {
     SV *result = newSV(64);
     SvPOK_on(result);
     SvCUR_set(result, 0);
+    /* mortalize before encoding: direct_encode_sv can croak (max depth,
+       NaN/Inf, unencodable ref) and an unguarded result would leak.
+       The OO encoders use SAVEFREESV for the same reason. */
+    sv_2mortal(result);
     direct_encode_sv(aTHX_ result, data, 0, &default_self);
     *(SvPVX(result) + SvCUR(result)) = '\0';
 
-    XPUSHs(sv_2mortal(result));
+    XPUSHs(result);
     RETURN;
 }
 
@@ -1868,7 +1933,7 @@ make_custom_4op(pTHX_ Perl_ppaddr_t ppfunc, OP *a, OP *b, OP *c, OP *d) {
 #define XPK_KW0(name, ppfunc) \
 static int build_kw_##name(pTHX_ OP **out, XSParseKeywordPiece *args[], \
                            size_t nargs, void *hookdata) { \
-    PERL_UNUSED_ARG(args); PERL_UNUSED_ARG(nargs); PERL_UNUSED_ARG(hookdata); \
+    (void)args; PERL_UNUSED_ARG(nargs); PERL_UNUSED_ARG(hookdata); \
     OP *o = newOP(OP_NULL, 0); o->op_type = OP_CUSTOM; o->op_ppaddr = ppfunc; \
     *out = o; return KEYWORD_PLUGIN_EXPR; \
 } \
@@ -2253,12 +2318,14 @@ CODE:
         if (!json)
             croak("JSON encode error: %s", werr.msg);
 
+        ENTER;
+        SAVEDESTRUCTOR_X(yyjson_free_buf, json);
         if (self->flags & F_UTF8) {
             RETVAL = newSVpvn(json, json_len);
         } else {
             RETVAL = newSVpvn_utf8(json, json_len, 1);
         }
-        free(json);
+        LEAVE;
     }
 }
 OUTPUT:
@@ -2353,8 +2420,10 @@ CODE:
     char *json = yyjson_mut_val_write_opts(d->root, YYJSON_WRITE_NOFLAG, NULL, &json_len, &werr);
     if (!json)
         croak("JSON::YY::Doc: stringify error: %s", werr.msg);
+    ENTER;
+    SAVEDESTRUCTOR_X(yyjson_free_buf, json);
     RETVAL = newSVpvn(json, json_len);
-    free(json);
+    LEAVE;
 }
 OUTPUT:
     RETVAL

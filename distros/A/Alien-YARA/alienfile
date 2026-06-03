@@ -1,0 +1,17 @@
+use alienfile;
+
+plugin 'PkgConfig' => 'libyara';
+
+probe sub {
+  require FFI::CheckLib;
+  return FFI::CheckLib::check_lib( lib => 'yara' ) ? 'system' : 'share';
+};
+
+share {
+  start_url 'https://github.com/VirusTotal/yara/archive/refs/tags/v4.5.0.tar.gz';
+  plugin 'Download' => (
+    filter => qr/^v?([\d\.]+)\.tar\.gz$/,
+  );
+  plugin 'Extract' => 'tar.gz';
+  plugin 'Build::Autoconf';
+};

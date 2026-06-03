@@ -448,7 +448,7 @@ static void failover_advance(ev_clickhouse_t *self, const char *msg) {
         mXPUSHu(self->port);
         XPUSHs(sv_2mortal(newSVpv(msg ? msg : "", 0)));
         PUTBACK;
-        call_sv(self->on_failover, G_DISCARD | G_EVAL);
+        PINNED_CALL_SV(self->on_failover, G_DISCARD | G_EVAL);
         WARN_AND_CLEAR_ERRSV("on_failover");
         FREETMPS; LEAVE;
     }
@@ -471,7 +471,7 @@ static void emit_error(ev_clickhouse_t *self, const char *msg) {
         XPUSHs(sv_2mortal(newSVpv(msg, 0)));
         PUTBACK;
 
-        call_sv(self->on_error, G_DISCARD | G_EVAL);
+        PINNED_CALL_SV(self->on_error, G_DISCARD | G_EVAL);
         WARN_AND_CLEAR_ERRSV("error handler");
 
         FREETMPS;
@@ -518,7 +518,7 @@ static int fire_zero_arg_cb(ev_clickhouse_t *self, SV *cb, const char *what) {
         SAVETMPS;
         PUSHMARK(SP);
         PUTBACK;
-        call_sv(cb, G_DISCARD | G_EVAL);
+        PINNED_CALL_SV(cb, G_DISCARD | G_EVAL);
         if (SvTRUE(ERRSV)) {
             warn("EV::ClickHouse: exception in %s handler: %s",
                  what, SvPV_nolen(ERRSV));
@@ -550,7 +550,7 @@ static void emit_trace(ev_clickhouse_t *self, const char *fmt, ...) {
         PUSHMARK(SP);
         XPUSHs(sv_2mortal(newSVpv(buf, 0)));
         PUTBACK;
-        call_sv(self->on_trace, G_DISCARD | G_EVAL);
+        PINNED_CALL_SV(self->on_trace, G_DISCARD | G_EVAL);
         WARN_AND_CLEAR_ERRSV("trace handler");
         FREETMPS;
         LEAVE;
@@ -652,7 +652,7 @@ static void fire_on_query_complete_ex(ev_clickhouse_t *self, const char *errmsg,
         PUSHs(sv_2mortal(newSVnv(dur)));
         PUSHs(errmsg ? sv_2mortal(newSVpv(errmsg, 0)) : &PL_sv_undef);
         PUTBACK;
-        call_sv(target, G_DISCARD | G_EVAL);
+        PINNED_CALL_SV(target, G_DISCARD | G_EVAL);
         WARN_AND_CLEAR_ERRSV("on_query_complete");
         FREETMPS; LEAVE;
     }
@@ -2660,7 +2660,7 @@ CODE:
             mXPUSHi(buf_n);
             mXPUSHi(inflight);
             PUTBACK;
-            call_sv(*cb_p, G_DISCARD | G_EVAL);
+            PINNED_CALL_SV(*cb_p, G_DISCARD | G_EVAL);
             WARN_AND_CLEAR_ERRSV("on_high_water");
             FREETMPS; LEAVE;
         }

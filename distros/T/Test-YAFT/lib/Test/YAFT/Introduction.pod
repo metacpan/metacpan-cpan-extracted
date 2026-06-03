@@ -22,7 +22,7 @@ L<Test::More>. Main differences are:
 
 =item mandatory test message
 
-Test message is mandatory and is always a first argument of every assert
+Test message is mandatory and is always a first argument of every assumption
 function.
 
 Every other argument is provided using named argument approach.
@@ -35,15 +35,15 @@ Every comparison uses L<Test::Deep>
 
 =head1 HOW TO USE IT
 
-=head2 C<it> assert
+=head2 C<assume> assumption
 
-Basic assert L<Test::YAFT> provides is an C<it>. Naming expects that
+Basic assumption L<Test::YAFT> provides is an C<assume>. Naming expects that
 you have either subtests describing your testing intention or one
 behaviour per test file, so C<it> can be bounded with something from
 your domain.
 
 	subtest "Person" => sub {
-		it "should have method foo()"
+		assume "should have method foo()"
 			=> got    => defined &{ Person->can ('foo') }
 			=> expect => expect_true
 			;
@@ -87,7 +87,7 @@ first.
 =head2 Shared C<got> computation (with arguments)
 
 Often there are test scenarios when you share computation of C<got> value
-but with different arguments for each assert.
+but with different arguments for each assumption.
 
 L<Test::YAFT> provides simple tool for that - C<act { }> block
 

@@ -6,9 +6,9 @@ use Test2::V1 -ipP, qw(is ok subtest diag done_testing);    ## no critic (Subrou
 use lib 't/lib';
 use lib 'lib';
 
-use Net::DHCPv6;
-use Net::DHCPv6::Constants;
-use Net::DHCPv6::OptionList;
+use Net::DHCPv6             ();
+use Net::DHCPv6::Constants  qw( $LINK_TYPE_ETHERNET );
+use Net::DHCPv6::OptionList ();
 
 # Hex fixtures extracted from t/data/wireshark-sample-DHCPv6.pcap
 # Origin: https://wiki.wireshark.org/samplecaptures

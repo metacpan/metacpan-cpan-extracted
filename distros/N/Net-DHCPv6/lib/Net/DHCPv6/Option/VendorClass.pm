@@ -4,11 +4,13 @@
 use strictures 2;
 
 package Net::DHCPv6::Option::VendorClass;
-$Net::DHCPv6::Option::VendorClass::VERSION = '0.002';
-use Net::DHCPv6::OptionList;
-use Carp qw( croak );
-use Net::DHCPv6::Constants;
-use Net::DHCPv6::X::Truncated;
+$Net::DHCPv6::Option::VendorClass::VERSION = '0.003';
+use Net::DHCPv6::OptionList ();
+use Carp                    qw( croak );
+use Net::DHCPv6::Constants  qw(
+    $OPTION_VENDOR_CLASS
+);
+use Net::DHCPv6::X::Truncated ();
 use parent 'Net::DHCPv6::Option';
 use Ref::Util qw( is_plain_arrayref );
 use namespace::clean;
@@ -68,7 +70,7 @@ Net::DHCPv6::Option::VendorClass - Vendor Class option (code 16) -- enterprise-n
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

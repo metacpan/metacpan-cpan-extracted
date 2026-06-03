@@ -4,10 +4,10 @@
 use strictures 2;
 
 package Net::DHCPv6::OptionList;
-$Net::DHCPv6::OptionList::VERSION = '0.002';
-use Net::DHCPv6::Option::Generic;
-use Carp      qw( croak );
-use Ref::Util qw( is_ref );
+$Net::DHCPv6::OptionList::VERSION = '0.003';
+use Net::DHCPv6::Option::Generic ();
+use Carp                         qw( croak );
+use Ref::Util                    qw( is_ref );
 use namespace::clean;
 
 my $EMPTY        = q();
@@ -84,13 +84,12 @@ sub try_from_bytes {
 
         my $class_name = $OPTION_CLASS{$code} || 'Net::DHCPv6::Option::Generic';
         my $option;
-        eval { $option = $class_name->from_bytes_inner( $code, $payload ); };
-        if ( my $err = $@ ) {
-            if ( is_ref( $err ) && $err->isa( 'Net::DHCPv6::X' ) ) {
+        if ( !eval { $option = $class_name->from_bytes_inner( $code, $payload ); 1 } ) {
+            if ( is_ref( $@ ) && $@->isa( 'Net::DHCPv6::X' ) ) {
                 $option = Net::DHCPv6::Option::Generic->new( code => $code, data => $payload );
             }
             else {
-                $error = "Option $code parse error: $err";
+                $error = "Option $code parse error: $@";
                 last;
             }
         }
@@ -125,7 +124,7 @@ Net::DHCPv6::OptionList - Shared container for a collection of DHCPv6 options
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

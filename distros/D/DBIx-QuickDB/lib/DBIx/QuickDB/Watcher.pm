@@ -2,7 +2,7 @@ package DBIx::QuickDB::Watcher;
 use strict;
 use warnings;
 
-our $VERSION = '0.000044';
+our $VERSION = '0.000045';
 
 use Carp qw/croak/;
 use POSIX qw/:sys_wait_h/;
@@ -203,13 +203,24 @@ sub _watcher_kill {
 
     kill($sig, $pid) or die "Could not send kill signal";
 
+    # How long to wait for a graceful shutdown before escalating to SIGKILL,
+    # and how much longer before giving up entirely. Keep this generous: a slow
+    # or loaded host (e.g. a CPAN smoke box) can need well over a few seconds to
+    # finish PostgreSQL's shutdown checkpoint. A premature SIGKILL leaves the
+    # data dir in a crash-recovery state, and a clone of that dir then replays
+    # WAL on first start, jumping SERIAL sequences forward by SEQ_LOG_VALS (32)
+    # -- silently corrupting cloned databases. Tunable via QDB_STOP_GRACE.
+    my $kill_after = $ENV{QDB_STOP_GRACE};
+    $kill_after = 15 unless defined($kill_after) && $kill_after =~ /^\d+$/;
+    my $give_up = $kill_after * 2;
+
     my ($check, $exit, $killed);
     my $start = time;
     until ($check) {
         local $?;
         my $delta = time - $start;
 
-        if ($delta >= 4) {
+        if ($delta >= $kill_after) {
             if ($killed) {
                 my $delta2 = time - $killed;
                 next unless $delta2 >= 1;
@@ -219,7 +230,7 @@ sub _watcher_kill {
             $killed = time;
             kill('KILL', $pid);
 
-            last if $delta > 8;
+            last if $delta > $give_up;
         }
 
         $check = waitpid($pid, WNOHANG);

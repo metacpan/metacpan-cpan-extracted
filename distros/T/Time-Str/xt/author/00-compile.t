@@ -5,9 +5,10 @@ use warnings;
 
 use Test::More;
 
-plan tests => 10;
+plan tests => 11;
 
 my @module_files = (
+    'Time/LeapSecond.pm',
     'Time/Str.pm',
     'Time/Str/Calendar.pm',
     'Time/Str/PP.pm',

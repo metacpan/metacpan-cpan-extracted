@@ -4,9 +4,11 @@
 use strictures 2;
 
 package Net::DHCPv6::Option::RelayMsg;
-$Net::DHCPv6::Option::RelayMsg::VERSION = '0.002';
-use Net::DHCPv6::OptionList;
-use Net::DHCPv6::Constants;
+$Net::DHCPv6::Option::RelayMsg::VERSION = '0.003';
+use Net::DHCPv6::OptionList ();
+use Net::DHCPv6::Constants  qw(
+    $OPTION_RELAY_MSG
+);
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
 my $EMPTY = q();
@@ -42,7 +44,7 @@ Net::DHCPv6::Option::RelayMsg - Relay Message option (code 9) -- encapsulated re
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

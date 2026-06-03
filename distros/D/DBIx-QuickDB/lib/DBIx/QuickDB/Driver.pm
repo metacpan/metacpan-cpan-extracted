@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver;
 use strict;
 use warnings;
 
-our $VERSION = '0.000044';
+our $VERSION = '0.000045';
 
 use Carp qw/croak confess/;
 use File::Path qw/remove_tree/;
@@ -266,6 +266,11 @@ sub run_command {
 
 sub should_cleanup { shift->{+_CLEANUP} }
 
+# Flush server state durably to disk so a hard kill mid-shutdown cannot leave
+# the data dir needing crash recovery. Drivers that benefit (e.g. PostgreSQL)
+# override this; the default is a no-op.
+sub checkpoint { }
+
 sub cleanup {
     my $self = shift;
 
@@ -334,6 +339,13 @@ sub stop {
     my %params = @_;
 
     my $watcher = delete $self->{+WATCHER} or return;
+
+    # Flush a durable checkpoint while the server is still running. If shutdown
+    # is slow enough to be SIGKILLed, this ensures the on-disk state is already
+    # consistent so a later clone does not crash-recover and jump SERIAL
+    # sequences forward (PostgreSQL SEQ_LOG_VALS=32), corrupting the clone.
+    # No-op for drivers that do not need it.
+    $self->checkpoint;
 
     DBI->visit_handles(
         sub {

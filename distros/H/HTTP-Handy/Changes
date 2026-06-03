@@ -1,5 +1,17 @@
 Revision history for HTTP-Handy
 
+1.06  2026-06-03 JST (Japan Standard Time)
+
+    Fixes:
+      - lib/HTTP/Handy.pm: HTTP::Handy::Input::read() no longer emits
+        "Use of uninitialized value $_[1] in substr" when the caller
+        passes an undefined buffer (the common "my $buf; $input->read(
+        $buf, $len)" idiom, as used by PSGI request body readers). The
+        in-place 4-argument substr now treats an undefined buffer as
+        empty first, matching the built-in read() contract. The result
+        was already correct; this only silences the warning under
+        use warnings / $^W.
+
 1.05  2026-05-17 JST (Japan Standard Time)
 
     Fixes:
@@ -131,7 +143,7 @@ Revision history for HTTP-Handy
     - POD: added DIAGNOSTICS, BUGS AND LIMITATIONS, DESIGN PHILOSOPHY,
       and TABLE OF CONTENTS sections.
     - LICENSE -> COPYRIGHT AND LICENSE (aligned with DB-Handy).
-    - AUTHOR: corrected to "INABA Hitoshi E<lt>ina@cpan.orgE<gt>".
+    - AUTHOR: corrected to "INABA Hitoshi E<lt>ina.cpan@gmail.comE<gt>".
     - README: rewritten to DB-Handy structure with COMPATIBILITY (Perl
       5.005_03 philosophy), TARGET USE CASES, and COPYRIGHT AND LICENSE.
 

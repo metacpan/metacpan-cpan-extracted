@@ -1,5 +1,8 @@
 Revision history for DateTime-Format-Duration
 
+1.06    2026-06-02 17:59:12Z
+    - fix warning in tests due to a misuse of $^W (thanks, Petr Písař!)
+
 1.05    2026-05-31 18:27:42Z
     - fix handling of DateTime::* subclasses (thanks, Matthias Bethke!)
     - use strict, warnings everywhere

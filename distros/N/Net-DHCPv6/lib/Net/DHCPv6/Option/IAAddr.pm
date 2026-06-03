@@ -4,11 +4,13 @@
 use strictures 2;
 
 package Net::DHCPv6::Option::IAAddr;
-$Net::DHCPv6::Option::IAAddr::VERSION = '0.002';
-use Carp qw( croak );
-use Net::DHCPv6::Constants;
-use Net::DHCPv6::OptionList;
-use Net::DHCPv6::X::Truncated;
+$Net::DHCPv6::Option::IAAddr::VERSION = '0.003';
+use Carp                   qw( croak );
+use Net::DHCPv6::Constants qw(
+    $IPV6_ADDR_LEN $OPTION_IAADDR
+);
+use Net::DHCPv6::OptionList   ();
+use Net::DHCPv6::X::Truncated ();
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
 
@@ -95,7 +97,7 @@ Net::DHCPv6::Option::IAAddr - IA Address option (code 5) -- address + lifetimes 
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

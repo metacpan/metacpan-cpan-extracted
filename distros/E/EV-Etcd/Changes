@@ -1,5 +1,9 @@
 Revision history for EV-Etcd
 
+0.08  2026-06-02
+    - Fix election observe never delivering events (missing client half-close)
+    - Validate txn ops before allocation; doc and test fixes
+
 0.07  2026-04-29
     - Fix use-after-free on cancelled streaming handles past client cleanup
     - Fix memory leak in txn op size validation

@@ -8,7 +8,8 @@ use lib 't';
 use Util qw[throws_ok];
 
 BEGIN {
-  use_ok('Time::Str::Util', qw[ lower_bound
+  use_ok('Time::Str::Util', qw[ binary_search
+                                lower_bound
                                 range_bounds
                                 upper_bound
                                 valid_tzdb_timezone
@@ -16,6 +17,90 @@ BEGIN {
 }
 
 my @arr = (10, 20, 30, 40, 50);
+
+## binary_search
+
+throws_ok { binary_search() }
+  qr/^Usage: binary_search/,
+  'binary_search: no arguments';
+
+throws_ok { binary_search(\@arr) }
+  qr/^Usage: binary_search/,
+  'binary_search: too few arguments';
+
+throws_ok { binary_search(\@arr, 30, 0, 5, 99) }
+  qr/^Usage: binary_search/,
+  'binary_search: too many arguments';
+
+throws_ok { binary_search("not_a_ref", 10) }
+  qr/must be an array reference/,
+  'binary_search: non-ref argument';
+
+ok(binary_search(\@arr, 10),
+  'binary_search: matches first element');
+
+ok(binary_search(\@arr, 30),
+  'binary_search: matches middle element');
+
+ok(binary_search(\@arr, 50),
+  'binary_search: matches last element');
+
+ok(!binary_search(\@arr, 5),
+  'binary_search: value below all is not found');
+
+ok(!binary_search(\@arr, 15),
+  'binary_search: value between elements is not found');
+
+ok(!binary_search(\@arr, 55),
+  'binary_search: value above all is not found');
+
+ok(!binary_search([], 10),
+  'binary_search: empty array is not found');
+
+ok(binary_search([42], 42),
+  'binary_search: single element, value equal');
+
+ok(!binary_search([42], 41),
+  'binary_search: single element, value below');
+
+ok(!binary_search([42], 43),
+  'binary_search: single element, value above');
+
+# duplicates
+{
+  my @dup = (10, 20, 20, 20, 30);
+  ok(binary_search(\@dup, 20),
+    'binary_search: duplicates, value present');
+  ok(!binary_search(\@dup, 25),
+    'binary_search: duplicates, value absent');
+}
+
+# lo/hi bounds restrict the searched range
+is(binary_search(\@arr, 30, 1, 4), 1,
+  'binary_search: value within search range');
+
+is(binary_search(\@arr, 10, 2, 5), !!0,
+  'binary_search: value outside search range (below lo)');
+
+is(binary_search(\@arr, 50, 0, 4), !!0,
+  'binary_search: value outside search range (at/after hi)');
+
+# negative values
+{
+  my @neg = (-30, -20, -10, 0, 10);
+  ok(binary_search(\@neg, -20),
+    'binary_search: negative value present');
+  ok(!binary_search(\@neg, -25),
+    'binary_search: negative value absent');
+}
+
+# consistency with lower_bound/upper_bound
+for my $v (5, 10, 15, 30, 50, 55) {
+  my $present = (upper_bound(\@arr, $v) > lower_bound(\@arr, $v)) ? 1 : 0;
+  is(binary_search(\@arr, $v) ? 1 : 0, $present,
+    "binary_search agrees with lower/upper bound for $v");
+}
+
 
 ## lower_bound
 

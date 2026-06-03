@@ -1,3 +1,7 @@
+0.07  2026-06-02
+    - return undef result_meta for non-data results (first COPY/error/sync)
+    - fix connect_params undef handling and dedup conninfo building
+
 0.06  2026-04-27
     - fix UAF in cleanup_connection when cancel callback drops last $pg ref
 

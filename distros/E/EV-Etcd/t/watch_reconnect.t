@@ -101,7 +101,7 @@ my $prefix = "/test-watch-reconnect-$$-" . time();
     my $ev = $events[0];
     ok($ev->{kv}, 'event has kv field');
     is($ev->{kv}{key}, $key, 'event key matches watched key');
-    ok($ev->{type} eq 'PUT' || $ev->{type} == 0, 'event type is PUT');
+    is($ev->{type}, 'PUT', 'event type is PUT');
 
     my $cancel_done = 0;
     $watch->cancel(sub { $cancel_done = 1; EV::break });

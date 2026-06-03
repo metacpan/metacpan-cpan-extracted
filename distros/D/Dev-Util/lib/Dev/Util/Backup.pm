@@ -10,7 +10,7 @@ use File::Find;
 use IO::File;
 use Archive::Tar;
 
-our $VERSION = version->declare("v2.19.35");
+our $VERSION = version->declare("v2.19.42");
 
 our @EXPORT_OK = qw(
     backup
@@ -220,7 +220,7 @@ Dev::Util::Backup - Simple backup functions for files and dirs
 
 =head1 VERSION
 
-Version v2.19.35
+Version v2.19.42
 
 =head1 SYNOPSIS
 
@@ -299,7 +299,7 @@ L<https://metacpan.org/release/Dev-Util>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright © 2001-2025 by Matt Martini.
+This software is Copyright © 2001-2026 by Matt Martini.
 
 This is free software, licensed under:
 

@@ -31,7 +31,7 @@ sub expect_json_content ($) {
 			my ($self, $got) = @_;
 			delete @$self{qw{ -object -json -lives_json -error_json -compare }};
 
-			$self->{-object} = expect_obj_isa ('HTTP::Response');
+			$self->{-object} = expect_obj_isa (q (HTTP::Response));
 			return unless $self->{-object}->descend ($got);
 
 			$self->_decode ($got);
@@ -48,7 +48,7 @@ sub expect_json_content ($) {
 			return $self->{-object}->renderGot ($got)
 				unless $self->{-object}->descend;
 
-			return "Decoding json failed: $self->{-error_json}:\n${\ $got->decoded_json }"
+			return qq (Decoding json failed: $self->{-error_json}:\n${\ $got->decoded_json })
 				unless $self->{-lives_json};
 
 			return $got->decoded_json;
@@ -59,25 +59,25 @@ sub expect_json_content ($) {
 }
 
 my %data = (
-	'north-america' => [ qw [ Canada Mexico USA ] ],
-	'australia'     => [ qw [ Australia         ] ],
-	'antarctica'    => [                          ],
+	q (north-america) => [ qw [ Canada Mexico USA ] ],
+	q (australia)     => [ qw [ Australia         ] ],
+	q (antarctica)    => [                          ],
 );
 
 sub GET {
 	my ($uri) = @_;
 
-	die "Unrecognized URI: $uri"
+	die qq (Unrecognized URI: $uri)
 		unless $uri =~ m: ^ /countries/ (?<continent> [^/\s]+ ) $:x;
 
 	my $continent = $+{continent};
 
 	my $response = HTTP::Response::->new (HTTP::Status::HTTP_OK);
-	$response->content_type ('application/json');
+	$response->content_type (q (application/json));
 
 	unless (exists $data{$continent}) {
 		$response->code (HTTP::Status::HTTP_BAD_REQUEST);
-		$response->content (JSON::encode_json ({ error => "Continent not found" }));
+		$response->content (JSON::encode_json ({ error => q (Continent not found) }));
 
 		return $response;
 	}

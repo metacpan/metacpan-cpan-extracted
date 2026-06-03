@@ -14,6 +14,8 @@ MANIFEST.SKIP
 README.md
 t/fortune.t
 t/generic.t
+t/render_cb_croak.t
+t/edge_coverage.t
 XS.xs
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

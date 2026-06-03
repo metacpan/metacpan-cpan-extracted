@@ -38,7 +38,7 @@
             "Data::Dump" : "1.23",
             "Data::UUID" : "1.226",
             "DateTime::Format::Lite" : "v0.1.2",
-            "DateTime::Lite" : "v0.7.0",
+            "DateTime::Lite" : "v0.7.3",
             "Devel::StackTrace" : "0",
             "Encode" : "0",
             "Errno" : "0",
@@ -109,6 +109,6 @@
          "web" : "https://gitlab.com/deguest/Module-Generic"
       }
    },
-   "version" : "v1.5.3",
+   "version" : "v1.5.4",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

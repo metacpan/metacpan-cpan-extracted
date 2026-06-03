@@ -4,11 +4,13 @@
 use strictures 2;
 
 package Net::DHCPv6::Option::ReconfMsg;
-$Net::DHCPv6::Option::ReconfMsg::VERSION = '0.002';
-use Net::DHCPv6::OptionList;
-use Carp qw( croak );
-use Net::DHCPv6::Constants;
-use Net::DHCPv6::X::Truncated;
+$Net::DHCPv6::Option::ReconfMsg::VERSION = '0.003';
+use Net::DHCPv6::OptionList ();
+use Carp                    qw( croak );
+use Net::DHCPv6::Constants  qw(
+    $OPTION_RECONF_MSG
+);
+use Net::DHCPv6::X::Truncated ();
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
 
@@ -47,7 +49,7 @@ Net::DHCPv6::Option::ReconfMsg - Reconfigure Message option (code 19) -- 1-byte 
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

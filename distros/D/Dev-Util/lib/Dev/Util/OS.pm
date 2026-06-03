@@ -5,7 +5,7 @@ use Exporter qw(import);
 
 use IPC::Cmd qw[can_run run];
 
-our $VERSION = version->declare("v2.19.35");
+our $VERSION = version->declare("v2.19.42");
 
 our @EXPORT_OK = qw(
     get_os
@@ -270,7 +270,7 @@ Dev::Util::OS - OS discovery and functions
 
 =head1 VERSION
 
-Version v2.19.35
+Version v2.19.42
 
 =head1 SYNOPSIS
 
@@ -403,7 +403,7 @@ L<https://metacpan.org/release/Dev-Util>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright © 2019-2025 by Matt Martini.
+This software is Copyright © 2019-2026 by Matt Martini.
 
 This is free software, licensed under:
 

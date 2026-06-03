@@ -1,5 +1,9 @@
 Revision history for Perl extension EV::Redis
 
+0.12 2026-06-02
+     - Fix use-after-free when a callback clears its own handler
+     - Add AUTH test
+
 0.11 2026-04-27
      - Fix wait queue clearing on manual reconnect inside on_disconnect
      - Cap reply decode recursion at 512 levels (hostile-server defence)

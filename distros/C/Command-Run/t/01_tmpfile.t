@@ -31,4 +31,25 @@ $tmp->write("new data")->flush->rewind;
 $data = do { local $/; <$fh> };
 is $data, "new data", 'reset clears content';
 
+# raw mode: byte transparency (no double encoding)
+{
+    my $bytes = "\343\201\202\343\201\204"; # "あい" as raw UTF-8 bytes
+    ok !utf8::is_utf8($bytes), 'fixture is a byte string';
+
+    # default mode double-encodes raw UTF-8 bytes
+    my $enc = Command::Run::Tmpfile->new;
+    $enc->write($bytes)->flush->rewind;
+    my $efh = $enc->fh; binmode $efh;
+    my $eout = do { local $/; <$efh> };
+    isnt $eout, $bytes, 'default mode re-encodes byte string';
+
+    # raw mode stores bytes unchanged
+    my $raw = Command::Run::Tmpfile->new(raw => 1);
+    $raw->write($bytes)->flush->rewind;
+    my $rfh = $raw->fh; binmode $rfh;
+    my $rout = do { local $/; <$rfh> };
+    is $rout, $bytes, 'raw mode is byte-transparent';
+    is length($rout), 6, 'raw mode stores 6 bytes';
+}
+
 done_testing;

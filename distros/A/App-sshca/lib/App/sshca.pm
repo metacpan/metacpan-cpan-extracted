@@ -1,4 +1,4 @@
-package App::sshca v0.0.6;
+package App::sshca v0.0.7;
 
 use strict;
 use warnings;
@@ -13,7 +13,7 @@ sshca - A minimal SSH Certificate Authority
 
 =head1 VERSION
 
-version 0.0.6
+version 0.0.7
 
 =head1 SYNOPSIS
 

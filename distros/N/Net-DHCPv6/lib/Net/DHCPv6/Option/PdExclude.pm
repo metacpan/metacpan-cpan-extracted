@@ -4,12 +4,14 @@
 use strictures 2;
 
 package Net::DHCPv6::Option::PdExclude;
-$Net::DHCPv6::Option::PdExclude::VERSION = '0.002';
-use Net::DHCPv6::OptionList;
-use Carp qw( croak );
-use Net::DHCPv6::Constants;
-use Net::DHCPv6::X::Truncated;
-use Net::DHCPv6::X::BadOption;
+$Net::DHCPv6::Option::PdExclude::VERSION = '0.003';
+use Net::DHCPv6::OptionList ();
+use Carp                    qw( croak );
+use Net::DHCPv6::Constants  qw(
+    $OPTION_PD_EXCLUDE
+);
+use Net::DHCPv6::X::Truncated ();
+use Net::DHCPv6::X::BadOption ();
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
 
@@ -68,7 +70,7 @@ Net::DHCPv6::Option::PdExclude - PD Exclude option (code 67) -- prefix to exclud
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

@@ -4,9 +4,11 @@
 use strictures 2;
 
 package Net::DHCPv6::Option::ReconfAccept;
-$Net::DHCPv6::Option::ReconfAccept::VERSION = '0.002';
-use Net::DHCPv6::OptionList;
-use Net::DHCPv6::Constants;
+$Net::DHCPv6::Option::ReconfAccept::VERSION = '0.003';
+use Net::DHCPv6::OptionList ();
+use Net::DHCPv6::Constants  qw(
+    $OPTION_RECONF_ACCEPT
+);
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
 
@@ -36,7 +38,7 @@ Net::DHCPv6::Option::ReconfAccept - Reconfigure Accept option (code 20) -- zero-
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

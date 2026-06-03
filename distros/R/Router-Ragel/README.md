@@ -80,6 +80,20 @@ Perl's method dispatch:
 
 Both forms run the same compiled state machine.
 
+## Route precedence
+
+When more than one route matches the same path, the route added **last**
+wins. Overlapping a specific route with a later, more general one shadows the
+earlier route:
+
+    my $router = Router::Ragel->new
+        ->add('/files/index', 'index')
+        ->add('/files/:name', 'show')   # added last
+        ->compile;
+    my ($h) = $router->match('/files/index');   # 'show', not 'index'
+
+Add the route you want to win **last**, or avoid overlapping patterns.
+
 # ROUTE PATTERNS
 
 A pattern is a string starting with `/`. Each segment between slashes is
@@ -213,6 +227,8 @@ Normalize input ahead of `match` to fold repeated or trailing slashes.
 shared library; the previous one stays loaded for the lifetime of the
 process. See ["DEPLOYMENT"](#deployment) for the implications under pre-forking servers.
 - Calling `match` before `compile` `croak`s.
+- When several routes match the same path, the **most recently added** route
+wins; see ["Route precedence"](#route-precedence).
 
 # SEE ALSO
 

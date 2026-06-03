@@ -31,7 +31,7 @@ eval {
 
 plan skip_all => 'etcd not available on 127.0.0.1:2379' unless $etcd_available;
 
-plan tests => 20;
+plan tests => 22;
 
 my $client = EV::Etcd->new(
     endpoints => ['127.0.0.1:2379'],
@@ -203,6 +203,25 @@ $client->get("$prefix/to-delete", sub {
 });
 my $t13 = EV::timer(5, 0, sub { fail('timeout'); EV::break });
 EV::run;
+
+# Oversized key/value in a success/failure op is rejected up front (and the
+# rejection must happen before the compare array is allocated, so it cannot
+# leak it -- see validate_request_ops in Etcd.xs).
+{
+    my $big = 'x' x (2 * 1024 * 1024);   # over ETCD_MAX_KEY_SIZE
+    my $ok = eval {
+        $client->txn([ { key => 'k', target => 'VERSION', result => 'EQUAL', version => 0 } ],
+                     [ { put => { key => $big, value => 'v' } } ], [], sub { });
+        1;
+    };
+    ok(!$ok && $@, 'txn croaks on oversized key in a success op');
+
+    $ok = eval {
+        $client->txn([], [], [ { put => { key => 'k', value => $big } } ], sub { });
+        1;
+    };
+    ok(!$ok && $@, 'txn croaks on oversized value in a failure op');
+}
 
 # Cleanup
 $client->delete($prefix, { prefix => 1 }, sub {

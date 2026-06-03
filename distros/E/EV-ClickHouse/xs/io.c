@@ -674,7 +674,7 @@ static int pipeline_advance(ev_clickhouse_t *self) {
             PUTBACK;
             int gen_before = self->connect_gen;
             self->callback_depth++;
-            call_sv(self->on_query_start, G_EVAL | G_VOID | G_DISCARD);
+            PINNED_CALL_SV(self->on_query_start, G_EVAL | G_VOID | G_DISCARD);
             self->callback_depth--;
             WARN_AND_CLEAR_ERRSV("on_query_start");
             FREETMPS; LEAVE;

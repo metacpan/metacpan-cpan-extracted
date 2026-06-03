@@ -7,7 +7,7 @@ use IO::Interactive qw(is_interactive);
 use IO::Prompt      qw();                 # don't import prompt
 use Term::ReadKey;
 
-our $VERSION = version->declare("v2.19.35");
+our $VERSION = version->declare("v2.19.42");
 
 our %EXPORT_TAGS = (
                      misc => [ qw(
@@ -146,7 +146,7 @@ Dev::Util::Query - Functions to prompt user for input, y/n, or menus.
 
 =head1 VERSION
 
-Version v2.19.35
+Version v2.19.42
 
 =head1 SYNOPSIS
 
@@ -317,7 +317,7 @@ L<https://metacpan.org/release/Dev-Util>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright © 2019-2025 by Matt Martini.
+This software is Copyright © 2019-2026 by Matt Martini.
 
 This is free software, licensed under:
 

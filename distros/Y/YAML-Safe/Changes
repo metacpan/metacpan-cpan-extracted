@@ -1,4 +1,13 @@
 ---
+version: 0.84
+date:    Tue Jun  2 2025
+changes:
+- Fix wrapwidth upper bound off-by-one: allow 0xFFFF
+- Add NO_WRAP constant (0xFFFF) for disabling line wrapping
+- Activate t/long_plain_wrap.t: test wrapping at default width,
+  roundtrip of wrapped scalars, and no-wrap at NO_WRAP
+- Fix the perl test matrix in GH actions
+---
 version: 0.83
 date:    Mon Sep  8 09:13:25 AM CEST 2025
 changes:

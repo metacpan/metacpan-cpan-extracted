@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File/Cache.pm
-## Version v0.3.0
+## Version v0.3.1
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/16
-## Modified 2025/07/25
+## Modified 2026/06/02
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -30,7 +30,7 @@ BEGIN
     # use Storable 3.25 ();
     use Storable::Improved v0.1.3;
     $DEBUG = 0;
-    our $VERSION = 'v0.3.0';
+    our $VERSION = 'v0.3.1';
 };
 
 use strict;
@@ -930,6 +930,11 @@ sub THAW
 END
 {
     my $repo = Module::Generic::Global->new( 'cache' => __PACKAGE__, key => __PACKAGE__ );
+    if( Module::Generic::_in_end_phase() || Module::Generic::_in_global_destruction() )
+    {
+        return;
+    }
+
     my $repo_data;
     if( $repo )
     {
@@ -1047,7 +1052,7 @@ Module::Generic::File::Cache - File-based Cache
 
 =head1 VERSION
 
-    v0.3.0
+    v0.3.1
 
 =head1 DESCRIPTION
 

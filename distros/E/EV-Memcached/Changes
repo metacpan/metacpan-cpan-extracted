@@ -1,5 +1,8 @@
 Revision history for EV::Memcached
 
+0.04  2026-06-02
+    - Fix use-after-free when a callback clears its own handler
+
 0.03  2026-06-01
     - Schedule a reconnect on transient connect-setup failures (Unix socket / fcntl)
     - Reject a short binary ARITH response instead of reading past the value

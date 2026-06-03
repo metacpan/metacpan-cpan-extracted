@@ -10,9 +10,9 @@ use lib 'lib';
 # Intentionally do NOT load Net::DHCPv6::OptionList here to ensure
 # the circular dependency (Option -> OptionList -> Generic -> Option)
 # is broken by the require inside Option::from_bytes.
-use Net::DHCPv6::Option;
-use Net::DHCPv6::Option::ClientId;
-use Net::DHCPv6::Constants;
+use Net::DHCPv6::Option           ();
+use Net::DHCPv6::Option::ClientId ();
+use Net::DHCPv6::Constants        qw( $OPTION_CLIENTID );
 
 my $EMPTY = q();
 

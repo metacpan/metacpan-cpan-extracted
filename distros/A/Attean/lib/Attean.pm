@@ -4,7 +4,7 @@ Attean - A Semantic Web Framework
 
 =head1 VERSION
 
-This document describes Attean version 0.038
+This document describes Attean version 0.039
 
 =head1 SYNOPSIS
 
@@ -51,7 +51,7 @@ Semantic Web (RDF and SPARQL) data.
 package Attean {
 	use v5.14;
 	use warnings;
-	our $VERSION	= '0.038';
+	our $VERSION	= '0.039';
 	use Attean::API;
 	
 	use Attean::Blank;
@@ -351,9 +351,12 @@ The subsequent code will have to find out how to return a representation.
 					$qv	= 0.2;
 				} else {
 					$qv	= 0.99;
-					$qv		-= 0.01 if ($type =~ m#/html#);				# prefer data formats to HTML
-					$qv		-= 0.01 if ($type =~ m#/x-#);				# prefer non experimental media types
-					$qv		-= 0.01 if ($type =~ m#^application/(?!rdf[+]xml)#);	# prefer standard rdf/xml to other application/* formats
+					$qv		-= 0.02 if ($type =~ m#/html#);				# prefer data formats to HTML
+					$qv		-= 0.05 if ($type =~ m#/x-#);				# prefer non experimental media types
+					$qv		-= 0.01 if ($type =~ m#^application/(?!rdf[+]xml|sparql)#);	# prefer standard rdf/xml to other application/* formats
+					$qv		-= 0.04 if ($type =~ m#^text/(?!turtle)#);
+					$qv		+= 0.01 if ($type =~ m#^text/turtle#);
+					$qv		+= 0.01 if ($type =~ m#^application/sparql-results[+]json#);
 				}
 				push(@default_variants, [$type, $qv, $type]);
 			}

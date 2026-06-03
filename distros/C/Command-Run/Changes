@@ -1,5 +1,12 @@
 Revision history for Perl extension Command-Run
 
+1.01 2026-06-03T08:12:11Z
+
+    - Tmpfile: add raw mode (new(raw => 1)) for byte-transparent
+      temporary files, opening the handle with :raw instead of
+      :encoding(utf8) so byte streams (qx// output, pre-encoded UTF-8)
+      are stored and read back unchanged without double encoding
+
 1.00 2026-04-27T01:50:48Z
 
     - Tmpfile: probe fd-path with the actual allocated fd to detect

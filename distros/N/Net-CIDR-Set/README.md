@@ -37,18 +37,18 @@ the first data that is added to it.
 
 # RECENT CHANGES
 
-Changes for version 0.20 (2026-04-27)
+Changes for version 0.21 (2026-06-02)
 
+- Security
+    - Improved strictness of IP address (CVE-2026-49940) and netmask parsing (CVE-2026-49942).
+    - Removed potential infinite loops when attempting to parse IP addresses (CVE-2026-49941).
 - Documentation
-    - Mentioned CONTRIBUTING.md in SOURCE.
-    - Updated copyright year.
-    - Updated the current maintainer email.
+    - Removed CONTRIBUTING.md until policies about AI are updated.
 - Tests
-    - Added and improved author tests.
-    - Moved author tests into xt.
+    - Changed tests to use Test::Exception.
 - Toolchain
-    - Set up GitHub workflow for testing.
-    - Stopped using Module::Signature for signing modules.
+    - Added doap.xml to the distibution.
+    - Added automation-policy.json to the distribution.
 
 See the `Changes` file for more details.
 
@@ -121,8 +121,6 @@ then see `SECURITY.md` for instructions how to report security vulnerabilities.
 
 The development version is on github at [https://github.com/robrwo/perl-Net-CIDR-Set](https://github.com/robrwo/perl-Net-CIDR-Set)
 and may be cloned from [https://github.com/robrwo/perl-Net-CIDR-Set.git](https://github.com/robrwo/perl-Net-CIDR-Set.git)
-
-See `CONTRIBUTING.md` for more information.
 
 # AUTHOR
 

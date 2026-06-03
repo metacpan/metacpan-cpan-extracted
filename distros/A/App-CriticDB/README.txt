@@ -1,4 +1,4 @@
-"App::CriticDB" Version 0.0.5
+"App::CriticDB" Version 0.0.6
 
 Abstract:
 ---------

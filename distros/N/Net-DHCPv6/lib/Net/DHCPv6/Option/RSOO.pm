@@ -4,9 +4,11 @@
 use strictures 2;
 
 package Net::DHCPv6::Option::RSOO;
-$Net::DHCPv6::Option::RSOO::VERSION = '0.002';
-use Net::DHCPv6::OptionList;
-use Net::DHCPv6::Constants;
+$Net::DHCPv6::Option::RSOO::VERSION = '0.003';
+use Net::DHCPv6::OptionList ();
+use Net::DHCPv6::Constants  qw(
+    $OPTION_RSOO
+);
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
 my $EMPTY = q();
@@ -40,7 +42,7 @@ Net::DHCPv6::Option::RSOO - Relay-Supplied Options option (code 66) -- opaque
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 require XSLoader;
 XSLoader::load('JSON::YY', $VERSION);
@@ -564,6 +564,12 @@ for surgical operations on medium/large documents.
 has no sorted-key writer).
 
 =item * NaN and Infinity values cannot be encoded (croaks).
+
+=item * JSON C<true>/C<false> decode to the Perl scalars C<1>/C<0> (correct in
+boolean context), not to overloaded boolean objects. To B<encode> a JSON
+boolean, pass a scalar ref (C<\1> for true, C<\0> for false) or use C<jbool> in
+the Doc API. Consequently C<encode_json(decode_json('[true,false]'))> yields
+C<[1,0]>, not C<[true,false]>.
 
 =back
 

@@ -19,7 +19,8 @@ my @files = (
     't/misc.t',
     't/octal.t',
     't/operations.t',
-    't/private.t'
+    't/private.t',
+    't/validation.t'
 );
 
 notabs_ok($_) foreach @files;

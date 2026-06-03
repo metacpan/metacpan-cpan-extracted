@@ -5,17 +5,15 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{HTTP::Handy},
-    'VERSION'   => q{1.05},
+    'VERSION'   => q{1.06},
     'ABSTRACT'  => q{A tiny HTTP/1.0 server for Perl 5.5.3+},
     'PREREQ_PM' => {
         'Carp' => '0',
+        'ExtUtils::MakeMaker' => '5.4302',
         'IO::Socket' => '0',
         'perl' => '5.00503',
-        'strict' => '1.01',
-        'vars' => '0',
-        'warnings' => '0',
     },
-    'AUTHOR'    => q{ina <ina@cpan.org>},
+    'AUTHOR'    => q{ina <ina.cpan@gmail.com>},
 );
 
 # LICENSE was introduced in ExtUtils::MakeMaker 6.31 (2006).
@@ -46,11 +44,11 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'HTTP::Handy' => {
                 'file'    => 'lib/HTTP/Handy.pm',
-                'version' => '1.05',
+                'version' => '1.06',
             },
             'HTTP::Handy::Input' => {
                 'file'    => 'lib/HTTP/Handy.pm',
-                'version' => '1.05',
+                'version' => '1.06',
             }
         },
     };

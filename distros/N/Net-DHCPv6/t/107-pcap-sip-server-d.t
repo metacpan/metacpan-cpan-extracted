@@ -6,9 +6,8 @@ use Test2::V1 -ipP, qw(is ok subtest diag done_testing);    ## no critic (Subrou
 use lib 't/lib';
 use lib 'lib';
 
-use Net::DHCPv6;
-use Net::DHCPv6::Constants;
-use Net::DHCPv6::OptionList;
+use Net::DHCPv6             ();
+use Net::DHCPv6::OptionList ();
 
 # Hex fixture extracted from t/data/dhcpv6-sip-server-d.pcap
 # Origin: https://git.codelinaro.org/clo/la/platform/external/tcpdump/-/tree/aosp-new/aosp-new/master/tests
@@ -17,7 +16,12 @@ my $hex =
 my $bytes = pack( 'H*', $hex );
 
 my ( $msg, $err ) = Net::DHCPv6->decode_with_error( $bytes );
-ok( !$err, 'decode succeeds' ) or do { diag "err: $err"; done_testing; exit };
+if ( $err ) {
+    diag "err: $err";
+    done_testing;
+    exit;
+}
+ok( 1, 'decode succeeds' );
 
 subtest 'reply' => sub {
     is( $msg->msg_type,       7,        'Checking msg_type is 7 (REPLY)' );

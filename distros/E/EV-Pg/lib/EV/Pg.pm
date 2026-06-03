@@ -6,7 +6,7 @@ use Carp;
 use EV;
 
 BEGIN {
-    our $VERSION = '0.06';
+    our $VERSION = '0.07';
     use XSLoader;
     XSLoader::load __PACKAGE__, $VERSION;
 }

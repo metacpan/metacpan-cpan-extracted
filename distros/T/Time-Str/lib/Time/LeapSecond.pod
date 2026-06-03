@@ -1,0 +1,251 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Time::LeapSecond - Leap second table with TAI/UTC conversions
+
+=head1 SYNOPSIS
+
+    use Time::LeapSecond qw( posix_tai_offset
+                             posix_to_tai tai_to_posix
+                             rdn_leap_correction
+                             load_leapseconds_tzdb
+                             load_leapseconds_iers
+                             parse_leapseconds_tzdb
+                             parse_leapseconds_iers );
+    
+    use Time::Str::Calendar qw( ymd_to_rdn );
+    
+    # TAI-UTC offset (in seconds) at a POSIX time
+    my $offset = posix_tai_offset(1700000000);  # 37
+    
+    # Convert between POSIX and TAI epochs
+    my $tai   = posix_to_tai(1700000000);
+    my $posix = tai_to_posix($tai);
+    
+    # Does a calendar day carry a leap second? (keyed by Rata Die day number)
+    my $rdn  = ymd_to_rdn(2016, 12, 31);
+    my $corr = rdn_leap_correction($rdn);   # +1, -1, or 0
+    
+    # Refresh the table from a system leap seconds file
+    my $count = load_leapseconds_tzdb();    # IANA TZDB "leapseconds"
+    #   or
+    my $count = load_leapseconds_iers();    # IERS/NIST "leap-seconds.list"
+
+=head1 DESCRIPTION
+
+C<Time::LeapSecond> provides the history of leap seconds and functions
+for computing the TAI-UTC offset, for converting between POSIX and TAI
+epochs, and for asking whether a given calendar day carries a leap
+second. The non-TAI side is a POSIX C<time_t> (a UTC-based count that
+omits leap seconds and so cannot represent C<23:59:60>), which is why
+these names say C<posix> rather than C<utc>.
+
+The module ships with a built-in table of known leap seconds that is
+used as a fallback. At load time it makes a best-effort attempt to
+refresh the table from the system's IANA Time Zone Database
+F<leapseconds> file; if that file is absent, unreadable, or malformed
+the built-in table remains in effect. The table can also be refreshed
+explicitly from either the TZDB or the IERS/NIST file format.
+
+The table stores the cumulative TAI-UTC offset at each transition, so
+it represents both positive (inserted) and negative (removed) leap
+seconds. No negative leap second has ever been scheduled, but the data
+structure and the parsers support them.
+
+All functions are exportable on request. Use C<:all> to import
+everything.
+
+=head1 FUNCTIONS
+
+=head2 posix_tai_offset
+
+    my $offset = posix_tai_offset($time);
+
+Returns the TAI-UTC offset, in seconds, in effect at the POSIX time
+C<$time>. The offset is C<10> before the first leap second and changes
+by one second (up or down) at each subsequent leap second.
+
+=head2 posix_to_tai
+
+    my $tai = posix_to_tai($posix);
+
+Converts a POSIX epoch to the corresponding TAI epoch by adding the
+TAI-UTC offset in effect at C<$posix>.
+
+=head2 tai_to_posix
+
+    my $posix = tai_to_posix($tai);
+
+Converts a TAI epoch to the corresponding POSIX epoch by subtracting the
+TAI-UTC offset in effect at C<$tai>.
+
+This is the inverse of C<posix_to_tai> for representable instants. A TAI
+epoch that falls within an inserted (positive) leap second folds onto
+the preceding C<23:59:59> (the same POSIX value as that second, which it
+effectively repeats), because POSIX time cannot represent C<23:59:60>.
+This matches the convention used by the IANA C<tz> code and its TZif
+C<right/> zones. A removed (negative) leap second leaves a gap instead:
+the POSIX value of the deleted C<23:59:59> never occurs.
+
+=head2 rdn_leap_correction
+
+    my $corr = rdn_leap_correction($rdn);
+
+Given the Rata Die day number C<$rdn> of a UTC calendar day, returns
+the leap second correction applied at the end of that day: C<+1> if a
+positive leap second is inserted, C<-1> if a negative leap second is
+removed, or C<0> if the day carries no leap second.
+
+A leap second is a property of a calendar day rather than of an instant
+(POSIX time cannot represent the C<23:59:60> second), so this query is
+keyed by day number. Use C<Time::Str::Calendar::ymd_to_rdn> to obtain a
+day number from a year, month, and day.
+
+=head2 parse_leapseconds_tzdb
+
+    my ($days, $corrections) = parse_leapseconds_tzdb($path);
+
+Parses an IANA Time Zone Database F<leapseconds> file and returns two
+array references describing each leap second as a property of the
+calendar day it falls on: C<$days> holds the Rata Die day number of
+each leap day, and C<$corrections> the matching change in the TAI-UTC
+offset (C<+1> for a positive leap second, C<-1> for a negative one).
+Both are in ascending order of day. Comments and blank lines are
+ignored.
+
+Croaks if the file cannot be opened, if a C<Leap> line is malformed, if
+a C<Leap> line's time does not match its sign (a positive leap second
+must be C<23:59:60>, a negative one C<23:59:59>), or if the entries are
+not in ascending order of day. An out-of-order file is treated as
+malformed rather than silently reordered.
+
+This function has no side effects; it does not modify the tables used by
+the other functions.
+
+=head2 parse_leapseconds_iers
+
+    my ($days, $corrections) = parse_leapseconds_iers($path);
+
+Parses an IERS/NIST F<leap-seconds.list> file and returns the same
+C<($days, $corrections)> pair as C<parse_leapseconds_tzdb>. This file is
+keyed on NTP time (seconds since 1900-01-01) and lists the I<absolute>
+TAI-UTC offset at each transition; epochs are converted to Rata Die day 
+number and each change is turned into a C<+1>/C<-1> correction on the
+preceding day. The leading base row anchors the table and is dropped.
+
+Croaks if the file cannot be opened, if a data line is malformed, if an
+epoch is not a UTC midnight, if the first (base) row does not state the
+base offset of C<10> seconds (which would indicate a truncated file),
+if the offset changes by more than one second between consecutive
+transitions, or if the entries are not in ascending order of time.
+
+This function has no side effects.
+
+=head2 load_leapseconds_tzdb
+
+    my $count = load_leapseconds_tzdb();
+    my $count = load_leapseconds_tzdb($path);
+
+Parses an IANA Time Zone Database F<leapseconds> file with
+C<parse_leapseconds_tzdb> and installs the result into the package
+tables. Returns the number of entries loaded.
+
+When called without arguments the file is located via
+C<Time::Str::Util::find_tzdb_directory>. In this automatic mode a
+missing system file is not an error: the function returns C<undef> and
+leaves the current table intact so the built-in fallback remains in
+effect. An explicit path that cannot be opened, or any file that is
+malformed or contains no leap seconds, raises an exception rather than
+being silently discarded.
+
+=head2 load_leapseconds_iers
+
+    my $count = load_leapseconds_iers();
+    my $count = load_leapseconds_iers($path);
+
+As C<load_leapseconds_tzdb>, but parses an IERS/NIST
+F<leap-seconds.list> file with C<parse_leapseconds_iers>. In automatic
+mode the file is located as F<leap-seconds.list> within the TZDB
+directory.
+
+=head1 INITIALISATION
+
+At load time the module builds its tables exactly once: it first tries
+the system TZDB F<leapseconds> file (only that format is tried
+automatically) and, only if that file is absent, unreadable, or
+malformed, falls back to the built-in table. The fallback is installed
+through the same code path as a parsed file. A failure at this stage
+leaves the fallback in place rather than breaking C<use
+Time::LeapSecond>; call C<load_leapseconds_tzdb> or
+C<load_leapseconds_iers> explicitly if you need to observe load errors.
+
+=head1 THE LEAP SECOND TABLE
+
+The leap second history is held in these package globals:
+
+=over 4
+
+=item C<@Time::LeapSecond::TIMES>
+
+The POSIX epoch at which each leap second takes effect: the midnight
+immediately following the inserted C<23:59:60> second (or, for a
+negative leap second, the removed C<23:59:59> second). Sorted in
+ascending order.
+
+=item C<@Time::LeapSecond::OFFSETS>
+
+The cumulative TAI-UTC offset, in seconds. This array has one more entry
+than C<@TIMES>: C<$OFFSETS[0]> is the base offset (C<10>) in effect
+before the first leap second, and C<$OFFSETS[$k]> is the offset in
+effect after C<$k> leap seconds. It changes by C<+1> (positive leap
+second) or C<-1> (negative leap second) from one entry to the next.
+
+=item C<@Time::LeapSecond::CORRECTIONS>
+
+The per-leap-second C<+1>/C<-1> change, aligned with C<@OFFSETS>:
+C<$CORRECTIONS[0]> is C<0> (the no-correction base) and
+C<$CORRECTIONS[$k]> is the change applied by the C<$k>-th leap second.
+
+=back
+
+=head1 DATA FILES
+
+=head2 IERS/NIST format (F<leap-seconds.list>)
+
+=over 4
+
+=item IERS: L<https://hpiers.obspm.fr/iers/bul/bulc/ntp/leap-seconds.list>
+
+=item IANA TZDB: L<https://data.iana.org/time-zones/tzdb/leap-seconds.list>
+
+=item GitHub (eggert/tz): L<https://raw.githubusercontent.com/eggert/tz/main/leap-seconds.list>
+
+=back
+
+=head2 TZDB format (F<leapseconds>)
+
+=over 4
+
+=item IANA TZDB: L<https://data.iana.org/time-zones/tzdb/leapseconds>
+
+=back
+
+=head1 SEE ALSO
+
+L<Time::Str>, L<Time::Str::Util>, L<Time::Str::Calendar>
+
+=head1 AUTHOR
+
+Christian Hansen
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2026 by Christian Hansen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

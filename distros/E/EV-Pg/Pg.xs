@@ -1295,6 +1295,21 @@ static HV* build_result_meta(PGresult *res) {
     return hv;
 }
 
+/* Turn a PQconninfo/PQconninfoParse option list into a keyword=>value
+ * hashref (skipping unset values) and free the list.  Shared by the
+ * conninfo and conninfo_parse XSUBs. */
+static SV* conninfo_opts_to_hv(PQconninfoOption *opts) {
+    HV *hv = newHV();
+    PQconninfoOption *o;
+    for (o = opts; o->keyword; o++) {
+        if (o->val)
+            (void)hv_store(hv, o->keyword, strlen(o->keyword),
+                           newSVpv(o->val, 0), 0);
+    }
+    PQconninfoFree(opts);
+    return newRV_noinc((SV*)hv);
+}
+
 static void setup_new_conn(ev_pg_t *self, const char *what) {
     if (NULL == self->conn) {
         croak("cannot allocate PGconn");
@@ -1514,8 +1529,11 @@ CODE:
 
     i = 0;
     while ((entry = hv_iternext(params)) != NULL) {
+        SV *v = HeVAL(entry);
         keywords[i] = HePV(entry, PL_na);
-        values[i] = SvPV_nolen(HeVAL(entry));
+        /* undef value -> NULL so libpq uses the default/env for that
+         * keyword, rather than forcing it to an empty string */
+        values[i] = SvOK(v) ? SvPV_nolen(v) : NULL;
         i++;
     }
     keywords[i] = NULL;
@@ -2162,9 +2180,8 @@ SV*
 conninfo_parse(char *class, const char *conninfo)
 CODE:
 {
-    PQconninfoOption *opts, *o;
+    PQconninfoOption *opts;
     char *errmsg = NULL;
-    HV *hv;
 
     PERL_UNUSED_VAR(class);
     opts = PQconninfoParse(conninfo, &errmsg);
@@ -2178,14 +2195,7 @@ CODE:
         croak("PQconninfoParse failed");
     }
 
-    hv = newHV();
-    for (o = opts; o->keyword; o++) {
-        if (o->val)
-            (void)hv_store(hv, o->keyword, strlen(o->keyword),
-                           newSVpv(o->val, 0), 0);
-    }
-    PQconninfoFree(opts);
-    RETVAL = newRV_noinc((SV*)hv);
+    RETVAL = conninfo_opts_to_hv(opts);
 }
 OUTPUT:
     RETVAL
@@ -2343,8 +2353,20 @@ SV*
 result_meta(EV::Pg self)
 CODE:
 {
+    /* meta_res holds the most recent result purely for deferred PQclear,
+     * so it may be a COPY/error/pipeline-sync result.  Only build metadata
+     * from data/command results — COPY, errors and pipeline sync must not
+     * refresh result_meta (see POD), and when one of those is the very
+     * first result (last_result_meta still NULL) we must return undef. */
     if (self->meta_res && !self->last_result_meta) {
-        STORE_LAST_HV(self->last_result_meta, build_result_meta(self->meta_res));
+        ExecStatusType mst = PQresultStatus(self->meta_res);
+        if (mst == PGRES_TUPLES_OK || mst == PGRES_SINGLE_TUPLE
+            || mst == PGRES_COMMAND_OK
+ #ifdef LIBPQ_HAS_CHUNK_MODE
+            || mst == PGRES_TUPLES_CHUNK
+ #endif
+           )
+            STORE_LAST_HV(self->last_result_meta, build_result_meta(self->meta_res));
     }
     if (self->last_result_meta)
         RETVAL = newRV_inc((SV*)self->last_result_meta);
@@ -2429,22 +2451,14 @@ SV*
 conninfo(EV::Pg self)
 CODE:
 {
-    PQconninfoOption *opts, *o;
-    HV *hv;
+    PQconninfoOption *opts;
 
     REQUIRE_CONN(self);
     opts = PQconninfo(self->conn);
     if (!opts)
         croak("PQconninfo failed");
 
-    hv = newHV();
-    for (o = opts; o->keyword; o++) {
-        if (o->val)
-            (void)hv_store(hv, o->keyword, strlen(o->keyword),
-                           newSVpv(o->val, 0), 0);
-    }
-    PQconninfoFree(opts);
-    RETVAL = newRV_noinc((SV*)hv);
+    RETVAL = conninfo_opts_to_hv(opts);
 }
 OUTPUT:
     RETVAL

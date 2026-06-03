@@ -4,9 +4,11 @@
 use strictures 2;
 
 package Net::DHCPv6::Option::SubscriberId;
-$Net::DHCPv6::Option::SubscriberId::VERSION = '0.002';
-use Net::DHCPv6::OptionList;
-use Net::DHCPv6::Constants;
+$Net::DHCPv6::Option::SubscriberId::VERSION = '0.003';
+use Net::DHCPv6::OptionList ();
+use Net::DHCPv6::Constants  qw(
+    $OPTION_SUBSCRIBER_ID
+);
 use parent 'Net::DHCPv6::Option';
 use namespace::clean;
 my $EMPTY = q();
@@ -43,7 +45,7 @@ Net::DHCPv6::Option::SubscriberId - Subscriber ID option (code 38) -- opaque sub
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

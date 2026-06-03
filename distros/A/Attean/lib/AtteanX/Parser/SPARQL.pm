@@ -7,7 +7,7 @@ AtteanX::Parser::SPARQL - SPARQL 1.1 Parser.
 
 =head1 VERSION
 
-This document describes AtteanX::Parser::SPARQL version 0.038
+This document describes AtteanX::Parser::SPARQL version 0.039
 
 =head1 SYNOPSIS
 
@@ -74,7 +74,7 @@ L<Attean::API::AbbreviatingParser>.
 
 =cut
 
-package AtteanX::Parser::SPARQL 0.038;
+package AtteanX::Parser::SPARQL 0.039;
 
 use strict;
 use warnings;
@@ -475,7 +475,7 @@ sub _InsertDataUpdate {
 	my @triples	= $self->_ModifyTemplate();
 	$self->_expected_token(RBRACE);
 
-	my $insert	= Attean::Algebra::Modify->new(insert => \@triples);
+	my $insert	= Attean::Algebra::Modify->new(insert => \@triples, specifies_dataset => $self->{build}{custom_update_dataset});
 	$self->_add_patterns( $insert );
 	$self->{build}{method}		= 'UPDATE';
 }
@@ -488,7 +488,7 @@ sub _DeleteDataUpdate {
 	my @triples	= $self->_ModifyTemplate();
 	$self->_expected_token(RBRACE);
 	
-	my $delete	= Attean::Algebra::Modify->new(delete => \@triples);
+	my $delete	= Attean::Algebra::Modify->new(delete => \@triples, specifies_dataset => $self->{build}{custom_update_dataset});
 	$self->_add_patterns( $delete );
 	$self->{build}{method}		= 'UPDATE';
 }
@@ -533,7 +533,7 @@ sub _InsertUpdate {
 	my $ggp	= $self->_remove_pattern;
 
 	my @triples_with_fresh_bnodes	= $self->_statements_with_fresh_bnodes(@triples);
-	my $insert	= Attean::Algebra::Modify->new( children => [$ggp], insert => \@triples_with_fresh_bnodes, dataset => \%dataset );
+	my $insert	= Attean::Algebra::Modify->new( children => [$ggp], insert => \@triples_with_fresh_bnodes, dataset => \%dataset, specifies_dataset => $self->{build}{custom_update_dataset} );
 	$self->_add_patterns( $insert );
 	$self->{build}{method}		= 'UPDATE';
 }
@@ -603,7 +603,7 @@ sub _DeleteUpdate {
 		}
 		push(@patterns, Attean::Algebra::BGP->new( triples => \@triples ));
 		my $ggp	= Attean::Algebra::Join->new( children => \@patterns );
-		my $update	= Attean::Algebra::Modify->new( children => [$ggp], delete => [@st]);
+		my $update	= Attean::Algebra::Modify->new( children => [$ggp], delete => [@st], specifies_dataset => $self->{build}{custom_update_dataset});
 		$self->_add_patterns( $update );
 		$self->{build}{method}		= 'UPDATE';
 		return;
@@ -670,7 +670,7 @@ sub _DeleteUpdate {
 				croak "Cannot use blank nodes in a DELETE pattern";
 			}
 		}
-		my $update	= Attean::Algebra::Modify->new( %args );
+		my $update	= Attean::Algebra::Modify->new( %args, specifies_dataset => $self->{build}{custom_update_dataset} );
 		$self->_add_patterns( $update );
 		$self->{build}{method}		= 'UPDATE';
 	}
@@ -1568,6 +1568,7 @@ sub _GroupGraphPatternSub {
 		}
 
 		my $t	= $self->_peek_token;
+		no warnings 'uninitialized';
 		last if (refaddr($t) == refaddr($cur));
 	}
 	my ($cont, $hints)		= $self->_pop_pattern_container;
@@ -3943,7 +3944,7 @@ sub _token_error {
 	croak $message;
 }
 
-package AtteanX::Parser::SPARQL::ObjectWrapper 0.038;
+package AtteanX::Parser::SPARQL::ObjectWrapper 0.039;
 
 use strict;
 use warnings;

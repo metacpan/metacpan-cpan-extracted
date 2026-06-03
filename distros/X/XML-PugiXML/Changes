@@ -1,5 +1,12 @@
 Revision history for XML-PugiXML
 
+0.06  2026-06-01
+    - Catch C++ exceptions at the XS boundary
+    - Reject cross-doc node args and embedded NULs
+    - Don't leak caught C++ exception objects
+    - Capture errno before formatting save error
+    - Fix default indent (was " t", now tab)
+
 0.05  2026-04-27
     - Don't double-encode raw UTF-8 byte input
     - Stale-handle checks on secondary node arguments

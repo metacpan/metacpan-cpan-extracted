@@ -8,15 +8,17 @@ use namespace::autoclean;
 
 # ABSTRACT: Encode / decode IPv6 addresses
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 sub new { bless \my $x, shift }
+
+my $DEC = "(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})";
 
 sub _pack_ipv4 {
   my @nums = split /[.]/, shift, -1;
   return unless @nums == 4;
   for ( @nums ) {
-    return unless /^\d{1,3}$/ and !/^0\d{1,2}$/ and $_ < 256;
+    return unless /\A${DEC}\z/ and !/\A0[1-9]+/;
   }
   return pack "CC*", 0, @nums;
 }
@@ -30,14 +32,14 @@ sub _426 {
 sub _pack {
   my $ip = shift;
   return pack( 'H*', '0' x 33 ) if $ip eq '::';
-  return if $ip =~ /^:/ and $ip !~ s/^::/:/;
-  return if $ip =~ /:$/ and $ip !~ s/::$/:/;
+  return if $ip =~ /\A:/ and $ip !~ s/\A::/:/;
+  return if $ip =~ /:\z/ and $ip !~ s/::\z/:/;
   my @nums = split /:/, $ip, -1;
   return unless @nums <= 8;
   my ( $empty, $ipv4, $str ) = ( 0, '', '' );
   for ( @nums ) {
     return if $ipv4;
-    $str .= "0" x ( 4 - length ) . $_, next if /^[a-fA-F\d]{1,4}$/;
+    $str .= "0" x ( 4 - length ) . $_, next if /\A[A-Fa-f0-9]{1,4}\z/;
     do { return if $empty++ }, $str .= "X", next if $_ eq '';
     next if $ipv4 = _pack_ipv4( $_ );
     return;
@@ -55,7 +57,7 @@ sub _unpack {
 # Replace longest run of null blocks with a double colon
 sub _compress_ipv6 {
   my $ip = shift;
-  if ( my @runs = $ip =~ /((?:(?:^|:)(?:0000))+:?)/g ) {
+  if ( my @runs = $ip =~ /((?:(?:\A|:)(?:0000))+:?)/g ) {
     my $max = $runs[0];
     for ( @runs[ 1 .. $#runs ] ) {
       $max = $_ if length( $max ) < length;
@@ -77,26 +79,29 @@ sub _is_cidr {
   my $mask = ~( $lo ^ $hi );
   my $bits = unpack 'B*', $mask;
   return unless $hi eq ($lo | $hi);
-  return unless $bits =~ /^(1*)0*$/;
+  return unless $bits =~ /\A(1*)0*\z/;
   return length( $1 ) - 8;
 }
 
 sub _encode {
   my ( $self, $ip ) = @_;
-  if ( $ip =~ m{^(.+?)/(.+)$} ) {
+  if ( $ip =~ m{\A([0-9A-Fa-f:]+)/(0|[1-9][0-9]*)\z} ) {
     my $mask = $2;
     return unless my $addr = _pack( $1 );
     return unless my $bits = _width2bits( $mask, 128 );
     return ( $addr & $bits, Net::CIDR::Set::_inc( $addr | ~$bits ) );
   }
-  elsif ( $ip =~ m{^(.+?)-(.+)$} ) {
+  elsif ( $ip =~ m{\A([0-9A-Fa-f:]+)-([0-9A-Fa-f:]+)\z} ) {
     my ( $from, $to ) = ( $1, $2 );
     return unless my $lo = _pack( $from );
     return unless my $hi = _pack( $to );
     return ( $lo, Net::CIDR::Set::_inc( $hi ) );
   }
-  else {
+  elsif ( $ip =~ m{\A[0-9A-Fa-f:]+\z} ) {
     return $self->_encode( "$ip/128" );
+  }
+  else {
+    return;
   }
 }
 
@@ -142,7 +147,7 @@ Net::CIDR::Set::IPv6 - Encode / decode IPv6 addresses
 
 =head1 VERSION
 
-version 0.20
+version 0.21
 
 =for Pod::Coverage new
 

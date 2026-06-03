@@ -1,7 +1,7 @@
 package Text::Stencil;
 use v5.20;
 use warnings;
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 require XSLoader;
 XSLoader::load(__PACKAGE__, $VERSION);
 
@@ -92,6 +92,10 @@ truthy (non-empty, not C<"0">, not undef) are skipped.
 is B<not> truthy are skipped.
 
 =back
+
+As a shorthand, C<new> may be called with a single string argument, which is
+used as the C<row> template: C<< Text::Stencil->new($template) >> is equivalent
+to C<< Text::Stencil->new(row => $template) >>.
 
 =head2 from_file
 
@@ -214,13 +218,17 @@ C<map:K1=V1:K2=V2:*=DEFAULT>, C<wrap:PREFIX:SUFFIX>
 
 C<count>, C<date:FMT>, C<plural:SINGULAR:PLURAL>,
 C<number_si>, C<bytes_si>, C<elapsed>, C<ago>,
-C<coalesce:FIELD1:FIELD2:DEFAULT> - use the primary field if truthy,
-otherwise try each fallback field in order; the last parameter is a
-literal default string
+C<coalesce:FIELD1:FIELD2:DEFAULT> - use the primary field if non-empty
+(unlike C<bool>/C<if>, the string C<"0"> counts as present), otherwise try
+each fallback field in order; the last parameter is a literal default string
 
 =head2 Chaining
 
     {0:trim|trunc:80|html}     # pipe transforms left to right
+
+C<count> and C<coalesce> act on the raw field value (a container's size, or
+the first truthy field), so each must be the first transform in its chain.
+Using either later in a chain is a compile-time error.
 
 =head1 UNICODE
 
@@ -231,7 +239,9 @@ Output is flagged UTF-8. C<uc>/C<lc> are ASCII-only.
 
 The object is B<not> safe for concurrent renders from multiple threads
 due to shared render buffer and C<last_row_count> state. Create
-separate objects per thread, or serialize access.
+separate objects per thread, or serialize access. C<render_sorted>
+additionally uses process-global sort state, so it must not be called
+concurrently even on separate objects; serialize calls to it.
 
 =head1 PERFORMANCE
 

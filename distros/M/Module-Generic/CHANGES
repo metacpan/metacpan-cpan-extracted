@@ -1,5 +1,20 @@
 Revision history for Perl module Module::Generic
 
+v1.5.4 2026-06-02T15:11:46+0900
+    - Fixed Module::Generic::File::Cache END block calling Module::Generic::Global when
+      it should not.
+    - Reimplemented Module::Generic::_is_class_loaded as an XS function,
+      _is_class_loaded_xs, with stricter detection semantics than the previous
+      pure-Perl heuristic.
+    - gv_stashpvn is called without GV_ADD so that the check never
+      autovivifies a namespace while testing for its existence.
+    - Hardened _parse_timestamp's Japanese date branch: if an older DateTime::Format::JP
+      is installed (< v0.1.7, which used to return a DateTime object), the result is now
+      converted to DateTime::Lite via from_object(), ensuring the returned value's type
+      stays consistent regardless of the installed DateTime::Format::JP version.
+      The test t/22.parse_timestamp.t now also requires DateTime::Format::JP >= v0.1.7
+      in its guard, skipping the japan block otherwise.
+
 v1.5.3 2026-06-02T09:10:08+0900
     - Fixed END phase failures reported by CPAN Testers on perl 5.40+ and FreeBSD smokers.
       The phase guards added in v1.5.2 made Module::Generic::Global->new() return undef

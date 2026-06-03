@@ -3,7 +3,7 @@ package Dev::Util::Const;
 use Dev::Util::Syntax;
 use Exporter qw(import);
 
-our $VERSION = version->declare("v2.19.35");
+our $VERSION = version->declare("v2.19.42");
 
 our %EXPORT_TAGS = (
                      named_constants => [ qw(
@@ -47,7 +47,7 @@ Dev::Util::Const - Defines named constants as Readonly.
 
 =head1 VERSION
 
-Version v2.19.35
+Version v2.19.42
 
 =head1 SYNOPSIS
 
@@ -151,7 +151,7 @@ L<https://metacpan.org/release/Dev-Util>
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright © 2024-2025 by Matt Martini.
+This software is Copyright © 2024-2026 by Matt Martini.
 
 This is free software, licensed under:
 

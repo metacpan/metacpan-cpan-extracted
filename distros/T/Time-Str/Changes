@@ -1,3 +1,17 @@
+0.89 2026-06-02
+  - str2time now folds a leap second (23:59:60) onto 23:59:59
+    instead of rolling it over to the next day's 00:00:00, and
+    validates that it lands on a leap-second slot: 23:59:60 UTC on
+    June 30 or December 31, from 1972 onward. The check is table-
+    free. str2date accepts any HH:MM:60, since a leap second's
+    local time of day depends on the UTC offset.
+  - Add Time::LeapSecond module: leap second history with TAI/UTC
+    conversions (posix_tai_offset, posix_to_tai, tai_to_posix) and
+    rdn_leap_correction for testing whether a calendar day carries a
+    leap second. The table can be refreshed from a system file via
+    load_leapseconds_tzdb (IANA TZDB) or load_leapseconds_iers
+    (IERS/NIST).
+
 0.88 2026-05-29
   - Declare Time::TZif and Time::TZif::POSIX API stable; remove
     experimental notice from documentation.

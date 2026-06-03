@@ -12,6 +12,7 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Dist::AutomationPolicy' => 'v0.2.0',
                                       'Dist::Zilla::Plugin::UsefulReadme' => 'v0.4.3',
                                       'Pod::Coverage::TrustPod' => '0',
                                       'Pod::Markdown::Github' => '0',
@@ -58,7 +59,8 @@ do { my $x = {
                                    'Data::Dumper' => '0',
                                    'File::Spec' => '0',
                                    'Module::Metadata' => '1.000015',
-                                   'Test::More' => '0'
+                                   'Test::Exception' => '0',
+                                   'Test::More' => '0.96'
                                  }
                  }
      };

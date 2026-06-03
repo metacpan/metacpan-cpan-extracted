@@ -4,7 +4,7 @@ Dev::Util - Utilities useful in the development of perl programs
 
 # VERSION
 
-Version v2.19.35
+Version v2.19.42
 
 # SYNOPSIS
 
@@ -221,7 +221,7 @@ This module was originally developed under the name `MERM::Base`.
 
 # LICENSE AND COPYRIGHT
 
-This software is Copyright © 2024-2025 by Matt Martini.
+This software is Copyright © 2024-2026 by Matt Martini.
 
 This is free software, licensed under:
 

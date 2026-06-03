@@ -4,10 +4,10 @@
 use strictures 2;
 
 package Net::DHCPv6::Option;
-$Net::DHCPv6::Option::VERSION = '0.002';
-use Carp qw( croak );
-use Net::DHCPv6::Constants;
-use Net::DHCPv6::X::Truncated;
+$Net::DHCPv6::Option::VERSION = '0.003';
+use Carp                      qw( croak );
+use Net::DHCPv6::Constants    ();
+use Net::DHCPv6::X::Truncated ();
 use parent 'Net::DHCPv6::Helpers';
 use namespace::clean;
 my $EMPTY        = q();
@@ -67,7 +67,7 @@ Net::DHCPv6::Option - DHCPv6 option base class
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

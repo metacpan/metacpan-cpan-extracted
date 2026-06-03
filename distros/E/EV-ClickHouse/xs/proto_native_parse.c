@@ -249,7 +249,6 @@ static int parse_and_emit_log_block(ev_clickhouse_t *self,
         }
     }
 
-    int destroyed_during_cb = 0;
     if (err_seen == 1) {
         /* Pin cb across the loop: an on_log handler that calls
          * $ch->on_log(undef) would otherwise free the CV mid-iteration. */
@@ -270,7 +269,8 @@ static int parse_and_emit_log_block(ev_clickhouse_t *self,
             call_sv(cb, G_EVAL | G_VOID | G_DISCARD);
             WARN_AND_CLEAR_ERRSV("on_log");
             FREETMPS; LEAVE;
-            if (self->magic == EV_CH_FREED) { destroyed_during_cb = 1; break; }
+            /* freed state is authoritatively handled by check_destroyed below */
+            if (self->magic == EV_CH_FREED) break;
         }
         /* Drop the cb pin BEFORE callback_depth-- : dropping the last ref
          * to the on_log CV (a handler may have reassigned on_log) can free
@@ -280,8 +280,6 @@ static int parse_and_emit_log_block(ev_clickhouse_t *self,
         SvREFCNT_dec(cb);
         self->callback_depth--;
     }
-    (void)destroyed_during_cb;   /* loop-break flag only; freed state is
-                                  * authoritatively reported by check_destroyed */
 
     /* Free locally-collected SVs + names regardless of self's state. */
     for (uint64_t c = 0; c < nc; c++) {
@@ -333,7 +331,7 @@ static int fire_progress_cb(ev_clickhouse_t *self, const uint64_t pp[5]) {
     EXTEND(SP, 5);
     for (i = 0; i < 5; i++) PUSHs(sv_2mortal(newSVuv(pp[i])));
     PUTBACK;
-    call_sv(self->on_progress, G_DISCARD | G_EVAL);
+    PINNED_CALL_SV(self->on_progress, G_DISCARD | G_EVAL);
     WARN_AND_CLEAR_ERRSV("progress handler");
     FREETMPS; LEAVE;
     self->callback_depth--;

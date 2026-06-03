@@ -1,5 +1,16 @@
 Revision history for Perl distribution DateTime-Lite
 
+v0.7.3 2026-06-03T11:14:29+0900
+    [Improvement]
+    - Method from_object() now preserves the source object's time zone and formatter when
+      constructing the new DateTime::Lite instance. Previously, these attributes were
+      lost during conversion, which forced callers to re-apply them manually.
+      This makes from_object() safe to use as a drop-in converter from DateTime to
+      DateTime::Lite.
+    - Method set_formatter() now validates that the provided argument is a
+      formatter object implementing the format_datetime() method, returning an
+      error otherwise. Passing undef remains supported and clears the formatter.
+
 v0.7.2 2026-05-28T13:25:43+0900
     [Improvement]
     - Improved POD documentation for DateTime::Lite::TimeZone::extended_aliases with

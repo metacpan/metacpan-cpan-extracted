@@ -184,10 +184,13 @@ sub fetch {
         my ($subject, $payload, $reply, $headers) = @_;
         if ($headers && $headers =~ m{^NATS/1\.0\s+(\d+)}) {
             my $code = $1;
-            # 404 = no messages, 408 = expires elapsed, 503 = no responders
-            if ($code == 404 || $code == 408 || $code == 503) {
-                return $finish->();
-            }
+            # A NATS/1.0 status frame is a control message, never data, so it
+            # must not be pushed as a result. 100 = idle heartbeat / flow
+            # control: ignore and keep waiting. Everything else (404 no
+            # messages, 408 expires elapsed, 409 consumer issue, 503 no
+            # responders, 400 bad request, ...) terminates the batch.
+            return if $code == 100;
+            return $finish->();
         }
         push @messages, {
             subject => $subject,

@@ -6,7 +6,7 @@
 ##  Authors: Matt Martini                                                     ##
 ##           Eugene Miretskiy                                                 ##
 ##                                                                            ##
-##  Copyright © 2000-2025  Matt Martini <matt.martini@imaginarywave.com>      ##
+##  Copyright © 2000-2026  Matt Martini <matt.martini@imaginarywave.com>      ##
 ##                                                                            ##
 ################################################################################
 
@@ -19,7 +19,7 @@ use Dev::Util qw(::Backup);
 use File::Basename;
 use Term::ANSIColor;
 
-Readonly my $VERSION => version->declare("v2.19.35");
+Readonly my $VERSION => version->declare("v2.19.42");
 
 $Term::ANSIColor::AUTORESET = 1;
 
