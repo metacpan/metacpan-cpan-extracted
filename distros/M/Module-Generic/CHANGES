@@ -1,5 +1,18 @@
 Revision history for Perl module Module::Generic
 
+v1.5.5 2026-06-04T05:56:00+0900
+    - Fixed grouping detection in Module::Generic::Number to correctly interpret
+      POSIX::localeconv()'s grouping and mon_grouping byte strings. Empty values, a
+      leading zero byte, and CHAR_MAX byte (>= 127, meaning "no further grouping") are
+      now all normalised to 0 consistently. Previously, a CHAR_MAX byte could be stored
+      as 127 and used as a group size in format(), which would produce incorrect output
+      on very large numbers.
+    - Updated t/02.num.t to mirror this normalisation and to construct its expected
+      formatted output dynamically based on the resolved grouping size, rather than
+      mechanically assuming a 3-digit group.
+      This fixes spurious FAIL reports on smokers where the system locale does not
+      provide a grouping value (observed on FreeBSD 10.3 with de_DE.ISO8859-1).
+
 v1.5.4 2026-06-02T15:11:46+0900
     - Fixed Module::Generic::File::Cache END block calling Module::Generic::Global when
       it should not.

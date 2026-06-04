@@ -9,18 +9,9 @@ my %WriteMakefileArgs = (
   VERSION_FROM   => 'lib/Mojo/Redis.pm',
   EXE_FILES      => [qw()],
   OBJECT         => '',
-  BUILD_REQUIRES => {}
-,
-  TEST_REQUIRES  => {
-  'Test::More' => '0.88'
-}
-,
-  PREREQ_PM      => {
-  'Mojolicious' => '8.50',
-  'Protocol::Redis::Faster' => '0.002',
-  'perl' => '5.016'
-}
-,
+  BUILD_REQUIRES => {},
+  TEST_REQUIRES  => {'Test::More'  => '0.88'},
+  PREREQ_PM      => {'Mojolicious' => '8.50', 'Protocol::Redis::Faster' => '0.002', 'perl' => '5.016'},
   META_MERGE     => {
     'dynamic_config' => 0,
     'meta-spec'      => {version => 2},
@@ -33,11 +24,7 @@ my %WriteMakefileArgs = (
         web  => 'https://github.com/jhthorsen/mojo-redis',
       },
     },
-    'x_contributors' => [
-  'Jan Henning Thorsen <jhthorsen@cpan.org>',
-  'Dan Book <grinnz@grinnz.com>'
-]
-,
+    'x_contributors' => ['Jan Henning Thorsen <jhthorsen@cpan.org>', 'Dan Book <grinnz@grinnz.com>'],
   },
   test => {TESTS => (-e 'META.yml' ? 't/*.t' : 't/*.t xt/*.t')},
 );

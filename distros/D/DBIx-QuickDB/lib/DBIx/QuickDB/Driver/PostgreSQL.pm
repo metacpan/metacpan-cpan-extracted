@@ -2,10 +2,10 @@ package DBIx::QuickDB::Driver::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000045';
+our $VERSION = '0.000046';
 
 use IPC::Cmd qw/can_run/;
-use DBIx::QuickDB::Util qw/strip_hash_defaults/;
+use DBIx::QuickDB::Util qw/strip_hash_defaults env_timeout/;
 use Time::HiRes qw/sleep/;
 use Scalar::Util qw/reftype/;
 
@@ -312,10 +312,12 @@ sub catch_startup {
     my $self = shift;
     my ($code) = @_;
 
+    my $timeout = env_timeout(QDB_START_TIMEOUT => 10);
+
     my $start = time;
     while (1) {
         my $waited = time - $start;
-        die "Timeout waiting for server" if $waited > 10;
+        die "Timeout waiting for server" if $waited > $timeout;
 
         my ($ok, $err, $out);
         {

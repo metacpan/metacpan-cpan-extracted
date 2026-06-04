@@ -31,7 +31,7 @@ requires:
   Alien::Build: '0.25'
 resources:
   repository: https://github.com/manwar/Alien-YARA.git
-version: v0.0.1
+version: v0.0.6
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.84'
   requires:

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Dynamic.pm
-## Version v1.3.1
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Version v1.3.2
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2026/01/22
+## Modified 2026/06/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -22,7 +22,7 @@ BEGIN
     use Module::Generic::Global ':const';
     use Scalar::Util ();
     our $DEBUG = 0;
-    our $VERSION = 'v1.3.1';
+    our $VERSION = 'v1.3.2';
 };
 
 use strict;
@@ -348,7 +348,7 @@ sub AUTOLOAD
     {
         if( threads->tid != 0 )
         {
-            CORE::warn( "Module::Generic::Dynamic::AUTOLOAD is not thread-safe and should not be called from a thread." ) if( warnings::enabled() );
+            CORE::warn( "Module::Generic::Dynamic::AUTOLOAD is not thread-safe and should not be called from a thread." ) if( warnings::enabled( 'Module::Generic' ) );
             # return( $self->error( "Module::Generic::Dynamic::AUTOLOAD is not thread-safe and should not be called from a thread." ) );
         }
     }

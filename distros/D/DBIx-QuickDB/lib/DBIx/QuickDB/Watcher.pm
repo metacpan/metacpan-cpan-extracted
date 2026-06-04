@@ -2,7 +2,7 @@ package DBIx::QuickDB::Watcher;
 use strict;
 use warnings;
 
-our $VERSION = '0.000045';
+our $VERSION = '0.000046';
 
 use Carp qw/croak/;
 use POSIX qw/:sys_wait_h/;
@@ -211,7 +211,7 @@ sub _watcher_kill {
     # WAL on first start, jumping SERIAL sequences forward by SEQ_LOG_VALS (32)
     # -- silently corrupting cloned databases. Tunable via QDB_STOP_GRACE.
     my $kill_after = $ENV{QDB_STOP_GRACE};
-    $kill_after = 15 unless defined($kill_after) && $kill_after =~ /^\d+$/;
+    $kill_after = 4 unless defined($kill_after) && $kill_after =~ /^\d+$/ && $kill_after > 0;
     my $give_up = $kill_after * 2;
 
     my ($check, $exit, $killed);
@@ -271,10 +271,19 @@ sub wait {
     my $self = shift;
     my $pid = $self->{+WATCHER_PID} or return;
 
+    # Give the watcher long enough to finish a graceful shutdown before we
+    # SIGKILL it. The watcher escalates to SIGKILL on the server after
+    # QDB_STOP_GRACE and gives up at twice that, so this must outlast the
+    # watcher's give-up or we would kill it mid-shutdown and orphan a
+    # half-stopped server. Defaults to 10s (grace 4 -> give-up 8 -> 10).
+    my $grace = $ENV{QDB_STOP_GRACE};
+    $grace = 4 unless defined($grace) && $grace =~ /^\d+$/ && $grace > 0;
+    my $timeout = $grace * 2 + 2;
+
     my $start = time;
     while(kill(0, $pid)) {
         my $waited = time - $start;
-        if ($waited > 10) {
+        if ($waited > $timeout) {
             kill('KILL', $pid);
             $start = time;
         }

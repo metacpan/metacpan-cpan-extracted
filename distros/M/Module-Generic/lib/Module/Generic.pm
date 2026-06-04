@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.5.4
+## Version v1.5.5
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2026/06/02
+## Modified 2026/06/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -118,7 +118,7 @@ BEGIN
     # shared state on the way out.
     *_in_end_phase = sub{ ${^GLOBAL_PHASE} eq 'END' };
 
-    our $VERSION   = 'v1.5.4';
+    our $VERSION   = 'v1.5.5';
 };
 
 # Load the XS shared library (Generic.so) which provides faster implementations of
@@ -11198,7 +11198,7 @@ sub colour_format
     {
         my( $num ) = @_;
         my $res;
-        if( $n >= 0 )
+        if( $num >= 0 )
         {
             $res = CORE::int( $num + 0.5 );
         }
@@ -13341,7 +13341,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.5.4
+    v1.5.5
 
 =head1 DESCRIPTION
 

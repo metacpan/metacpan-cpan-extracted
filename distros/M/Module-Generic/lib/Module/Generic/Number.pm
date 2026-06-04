@@ -668,10 +668,8 @@ sub init
             POSIX::setlocale( &POSIX::LC_ALL, $curr_locale );
             if( $lconv && scalar( keys( %$lconv ) ) )
             {
-                my @grouping = CORE::length( $lconv->{grouping} // '' ) ? unpack( "C*", $lconv->{grouping} ) : ();
-                $lconv->{grouping} = $grouping[0];
-                @grouping = CORE::length( $lconv->{mon_grouping} // '' ) ? unpack( "C*", $lconv->{mon_grouping} ) : ();
-                $lconv->{mon_grouping} = $grouping[0];
+                $lconv->{grouping}     = $self->_normalise_lconv_grouping( $lconv->{grouping} );
+                $lconv->{mon_grouping} = $self->_normalise_lconv_grouping( $lconv->{mon_grouping} );
                 $default = $lconv;
                 if( my $decoded = $self->decode_lconv( $default ) )
                 {
@@ -1925,6 +1923,29 @@ sub _get_multipliers
             giga => $base ** 3
         });
     }
+}
+
+# NOTE: POSIX::localeconv()->{grouping} and {mon_grouping} are not simple scalar
+# integers. Per POSIX, they are byte strings where each byte indicates the size of one
+# digit group, applied from the lowest order to the highest.
+# Two byte values have special meaning:
+#   0        repeat the previous element for the rest of the digits.
+#   CHAR_MAX no further grouping is to be performed.
+# CHAR_MAX is platform-dependent: on systems where char is signed it is 127 (SCHAR_MAX),
+# on systems where char is unsigned it is 255 (UCHAR_MAX). We treat any value >= 127 as
+# "stop grouping", which covers both cases since a legitimate group size never exceeds
+# a handful of units.
+# An empty string, undef, or a leading 0 byte all mean "no grouping".
+sub _normalise_lconv_grouping
+{
+    my $self = shift( @_ );
+    my $value = shift( @_ );
+    return(0) if( !defined( $value ) || !CORE::length( $value ) );
+    my @grouping = unpack( 'C*', $value );
+    return(0) if( !scalar( @grouping ) );
+    my $first = $grouping[0];
+    return(0) if( !defined( $first ) || $first == 0 || $first >= 127 );
+    return( $first );
 }
 
 sub _round

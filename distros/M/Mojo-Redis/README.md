@@ -135,6 +135,10 @@ Returns an instance of [Mojo::Redis::Cursor](https://metacpan.org/pod/Mojo%3A%3A
     $redis = Mojo::Redis->new(\%attrs);
     $redis = Mojo::Redis->new(%attrs);
 
+    # TLS options
+    $redis = Mojo::Redis->new("redis://localhost:6379/1?tls=1");
+    $redis = Mojo::Redis->new("redis://localhost:6379/1?ca=ca.pem&cert=cert.pem&key=key.pem&SSL_alpn_protocols=foo");
+
 Object constructor. Can coerce a string into a [Mojo::URL](https://metacpan.org/pod/Mojo%3A%3AURL) and set ["url"](#url)
 if present.
 

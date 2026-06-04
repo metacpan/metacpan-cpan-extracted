@@ -5,9 +5,13 @@ ospf2dot - convert OSPF LSDB YAML to Graphviz dot
 =head1 SYNOPSIS
 
 ospf2dot
-[-46bBceEhlpPsSwWv]
+[-46bBceEhlpPsSvwW]
 [F<ospf.yaml>]
 [F<ospf.dot>]
+
+ospf2dot
+-l
+[F<legend.yaml>]
 
 =head1 DESCRIPTION
 
@@ -97,6 +101,10 @@ Display IP network summary LSAs.
 Display IP network summary LSAs aggregated.
 A single node contains all networks advertised from the same router.
 
+=item -v
+
+Be verbose and print all warnings to stderr.
+
 =item -w
 
 Show the most serious warning in the dot graph.
@@ -108,10 +116,6 @@ Note that this message is always shown as tool tip in SVG graphs.
 =item -W
 
 Show the all areas and warnings in the dot graph.
-
-=item -v
-
-Be verbose and print all warnings to stderr.
 
 =back
 

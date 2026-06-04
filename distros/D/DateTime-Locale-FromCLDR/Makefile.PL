@@ -64,12 +64,12 @@ my %WriteMakefileArgs = (
         resources => {
         #    homepage    => undef,
             repository  => {
-                url         => 'git@gitlab.com:jackdeguest/DateTime-Locale-FromCLDR.git',
-                web         => 'https://gitlab.com/jackdeguest/DateTime-Locale-FromCLDR',
+                url         => 'git@gitlab.com:deguest/DateTime-Locale-FromCLDR.git',
+                web         => 'https://gitlab.com/deguest/DateTime-Locale-FromCLDR',
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://gitlab.com/jackdeguest/DateTime-Locale-FromCLDR/issues',
+                web         => 'https://gitlab.com/deguest/DateTime-Locale-FromCLDR/issues',
             },
         },
     }) : ()),

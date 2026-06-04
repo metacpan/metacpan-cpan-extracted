@@ -1,3 +1,7 @@
+0.22 2026-06-03
+
+- Fix tests when Types::Serialiser is absent (GH#46) (Olaf Alders, Claude)
+
 0.21 2026-05-10
 
 - removed TOML::Parser from required prerequisites (GH#44) (Karen Etheridge)

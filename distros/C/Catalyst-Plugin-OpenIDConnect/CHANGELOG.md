@@ -2,13 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
-## [0.12] - 2026-05-31 Fixed CPAN test failures
+## [0.14] - 2026-06-03 Fix JWT signature verification and CSRF behaviour
 
-- Module::CPANfile added as dist.ini prerequisite
+- **Fixed JWT signature verification failures with external clients** (JWT.pm):
+  Explicit `use_pkcs1_padding()` call added to RSA signing and verification
+  operations. Required for OpenSSL 3.x compatibility with Crypt::OpenSSL::RSA
+  >= 0.38. Fixes BadSignatureError when external JWT libraries (authlib,
+  cryptography) verify tokens issued by the provider.
+
+- **Disabled unnecessary CSRF check on /token endpoint**
+  This caused login issues when using Catalist::Plugin::CSRF configured with
+  auto_check => 1
+
+## [0.13] - 2026-06-02 Fixed CPAN test failures
+
+- Module::CPANfile added as required for configure phase
 
 - Required Crypt::OpenSSL::RSA version changed to >= 0.38
-
-## [0.11] - 2026-05-30 Fixed PREREQ_PM in Makefile.PL
 
 ## [0.10] - 2026-05-30 (Security Fixes: NEW-HIGH-1, NEW-HIGH-2, NEW-MED-1, NEW-MED-2, NEW-LOW-1)
 

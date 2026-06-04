@@ -1,5 +1,11 @@
 Revision history for Test-Mojo-Role-OpenAPI-Modern
 
+0.012     2026-06-03 19:07:35Z
+          - update tests for changes in JSON::Schema::Modern 0.638
+            (application/x-www-form-urlencoded is now supported) and
+            OpenAPI::Modern 0.133 (change of instanceLocation for message body
+            errors)
+
 0.011     2026-02-09 23:31:18Z
           - update tests for new $ref validation in OpenAPI::Modern 0.120
           - update tests for changed parameter deserialization in

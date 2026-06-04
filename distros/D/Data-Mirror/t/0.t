@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 use LWP::Online qw(online);
 use Test::More;
 use LWP::Protocol::https; # ensure this is installed otherwise tests will fail.

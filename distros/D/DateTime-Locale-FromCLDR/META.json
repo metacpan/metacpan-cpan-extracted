@@ -59,13 +59,13 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://gitlab.com/jackdeguest/DateTime-Locale-FromCLDR/issues"
+         "web" : "https://gitlab.com/deguest/DateTime-Locale-FromCLDR/issues"
       },
       "repository" : {
          "type" : "git",
-         "web" : "https://gitlab.com/jackdeguest/DateTime-Locale-FromCLDR"
+         "web" : "https://gitlab.com/deguest/DateTime-Locale-FromCLDR"
       }
    },
-   "version" : "v0.8.5",
+   "version" : "v0.8.6",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

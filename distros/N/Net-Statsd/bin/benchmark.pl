@@ -40,7 +40,7 @@ benchmark.pl - Report max send rate for Net::Statsd client
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 DESCRIPTION
 
@@ -48,11 +48,11 @@ A basic test of the time is takes to send stats through Net::Statsd.
 
 =head1 AUTHOR
 
-Cosimo Streppone <cosimo@cpan.org>
+Cosimo Streppone <cosimo@streppone.it>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Cosimo Streppone.
+This software is copyright (c) 2026 by Cosimo Streppone.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,14 +1,12 @@
 package Net::Statsd;
-{
-  $Net::Statsd::VERSION = '0.12';
-}
-
+$Net::Statsd::VERSION = '0.13';
 # ABSTRACT: Perl client for Etsy's statsd daemon
 
 use strict;
 use warnings;
 use Carp ();
 use IO::Socket ();
+use Time::HiRes ();
 
 our $HOST = 'localhost';
 our $PORT = 8125;
@@ -25,11 +23,26 @@ sub timing {
         $sample_rate = 1;
     }
 
+    _validate_metric_value($time);
+
     my $stats = {
         $name => sprintf "%d|ms", $time
     };
 
     return Net::Statsd::send($stats, $sample_rate);
+}
+
+
+sub get_timer {
+    my ( $name, $sample_rate ) = @_;
+    my $start = [Time::HiRes::gettimeofday];
+    return sub {
+        Net::Statsd::timing(
+            $name,
+            Time::HiRes::tv_interval($start) * 1000,
+            $sample_rate,
+        );
+    };
 }
 
 
@@ -69,6 +82,8 @@ sub update_stats {
         Carp::croak("Usage: update_stats(\$str, ...) or update_stats(\\\@list, ...)");
     }
 
+    _validate_metric_value($delta);
+
     my %data = map { $_ => sprintf "%s|c", $delta } @{ $stats };
 
     return Net::Statsd::send(\%data, $sample_rate)
@@ -80,6 +95,7 @@ sub gauge {
 
     while (my($name, $value) = splice(@_, 0, 2)) {
         $value = 0 unless defined $value;
+        _validate_metric_value($value);
         # Didn't use '%d' because values might be floats
         push @{ $stats->{$name} }, sprintf("%s|g", $value);
     }
@@ -90,6 +106,13 @@ sub gauge {
 
 sub send {
     my ($data, $sample_rate) = @_;
+
+    # Validate metric names here: every metric, regardless of which
+    # public function was used to record it, funnels through send(),
+    # so this single check also guards direct Net::Statsd::send() calls.
+    if ($data && ref $data eq 'HASH') {
+        _validate_metric_name($_) for keys %{ $data };
+    }
 
     my $sampled_data = _sample_data($data, $sample_rate);
 
@@ -198,6 +221,21 @@ sub _sample_data {
     return $sampled_data;
 }
 
+
+sub _validate_metric_name {
+    my ($name) = @_;
+    Carp::croak("Net::Statsd: malformed metric name")
+        if !defined $name || $name =~ /[\x00-\x1f:|]/;
+    return $name;
+}
+
+sub _validate_metric_value {
+    my ($value) = @_;
+    Carp::croak("Net::Statsd: malformed metric value")
+        if defined $value && $value =~ /[\x00-\x1f:|]/;
+    return $value;
+}
+
 1;
 
 __END__
@@ -212,7 +250,7 @@ Net::Statsd - Perl client for Etsy's statsd daemon
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 SYNOPSIS
 
@@ -287,6 +325,20 @@ sample_rate value. (e.g. a sample rate of 0.5 would indicate that
 approximately only half of the metrics given to this module would
 actually be sent to statsd).
 
+=head1 SECURITY
+
+To prevent B<metric injection> (CVE-2026-46739), metric names and values are
+validated before being sent. The statsd wire format is C<name:value|type>, and
+several metrics can be packed into one UDP datagram separated by newlines, so a
+name or value containing a newline (or any control character below ASCII 32), a
+colon (C<:>) or a pipe (C<|>) could be used to forge extra metric lines.
+
+Any such name or value causes the offending call (C<timing>, C<increment>,
+C<decrement>, C<update_stats>, C<gauge> or C<send>) to throw via
+C<Carp::croak>. Note that values passed to C<send()> already contain a
+formatted C<|type> suffix, so C<send()> only re-validates the metric I<names>;
+raw values are validated by the higher level functions before formatting.
+
 =head1 FUNCTIONS
 
 =head2 C<timing($name, $time, $sample_rate = 1)>
@@ -295,6 +347,15 @@ Log timing information.
 B<Time is assumed to be in milliseconds (ms)>.
 
     Net::Statsd::timing('some.timer', 500);
+
+=head2 C<get_timer($name, $sample_rate = 1)>
+
+Start timer for the metric. Function returns timer object. When you call this
+object, it sends timing data to statsd.
+
+    my $timer = Net::Statsd::get_timer('my.func.time');
+    ...; # here comes your code
+    $timer->(); # send timing to server
 
 =head2 C<increment($counter, $sample_rate=1)>
 
@@ -396,13 +457,30 @@ with the given sample rate, so the Statsd server will automatically
 scale it. For example, with a sample rate of 0.2, the metric values
 will be multiplied by 5.
 
+=head2 C<_validate_metric_name($name)>
+
+=head2 C<_validate_metric_value($value)>
+
+B<These methods are used internally, they're not part of the public interface.>
+
+Guard against B<metric injection> (CVE-2026-46739). The statsd wire format is
+C<name:value|type>, and multiple metrics are packed in a single UDP datagram
+separated by newlines. A metric name or value that contains a newline (or any
+other control character below ASCII 32), a colon (C<:>) or a pipe (C<|>) could
+therefore forge additional, attacker-controlled metric lines.
+
+Both functions C<Carp::croak> when the input contains any of those characters.
+Names are validated centrally in C<send()>; raw values are validated at each
+recording entry point (C<timing>, C<update_stats>, C<gauge>) before the
+C<|type> suffix is appended.
+
 =head1 AUTHOR
 
-Cosimo Streppone <cosimo@cpan.org>
+Cosimo Streppone <cosimo@streppone.it>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Cosimo Streppone.
+This software is copyright (c) 2026 by Cosimo Streppone.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

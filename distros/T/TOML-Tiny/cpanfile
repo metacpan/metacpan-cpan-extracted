@@ -12,6 +12,7 @@ recommends 'Types::Serialiser' => 0;
 on test => sub{
   requires 'Data::Dumper'              => '0';
   requires 'Test2::V0'                 => '0';
+  requires 'Test::Needs'               => '0';
 
   recommends 'Unicode::GCString'       => '0';
 };

@@ -4,7 +4,7 @@
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -34,8 +34,11 @@
       },
       "runtime" : {
          "requires" : {
+            "Data::Validate::Domain" : "0.11",
+            "Data::Validate::IP" : "0.27",
             "List::Util" : "1.45",
-            "Mojolicious" : "7.28",
+            "Mojolicious" : "9.34",
+            "Net::IDN::Encode" : "2.500",
             "YAML::XS" : "0.67",
             "perl" : "5.016"
          }
@@ -66,7 +69,7 @@
          "web" : "https://web.libera.chat/#perl-openapi"
       }
    },
-   "version" : "5.15",
+   "version" : "5.16",
    "x_contributors" : [
       "Aleksandr Orlenko <zxteam@gmail.com>",
       "Alexander Hartmaier <alexander.hartmaier@t-systems.at>",

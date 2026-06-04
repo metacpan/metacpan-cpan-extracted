@@ -1,3 +1,9 @@
+1.19 2026-06-03
+    - ospf2dot -l can write legend to output file.
+    - Improve usage.
+    - Adapt code to please perlcritic.
+    - Tests pass with YAML-Syck 1.46 output format.
+
 1.18 2022-05-05
     - Fix t/strict.t on Windows for CPAN testers.
     - Add diagnostic code to t/syntax-lib.t.

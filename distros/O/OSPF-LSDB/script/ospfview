@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 ##########################################################################
-# Copyright (c) 2012-2022 Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2012-2024 Alexander Bluhm <alexander.bluhm@gmx.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -29,12 +29,12 @@ use OSPF::LSDB::View;
 use OSPF::LSDB::View6;
 use OSPF::LSDB::YAML;
 
-sub usage(@) {
+sub usage {
     print STDERR "Error: @_\n" if @_;
     print STDERR <<EOF;
 Periodically poll OSPF database from routing daemon and display it on X11.
 
-Usage: $0 [-46bBcdDeEhlpPsSwWv] [-H user\@host] [-I interval]
+Usage: $0 [-46bBcdDeEhlpPsSvwW] [-H user\@host] [-I interval]
     -4           disable IPv6
     -6           enable IPv6
     -b           generate other area AS boundary router summary
@@ -52,9 +52,9 @@ Usage: $0 [-46bBcdDeEhlpPsSwWv] [-H user\@host] [-I interval]
     -P           generate intra-area-prefix
     -s           generate other area network summary
     -S           aggregate other area network summary
+    -v           be verbose, print warnings to stdout
     -w           show most serious warning in dot graph
     -W           show all warnings and areas in dot graph
-    -v           be verbose, print warnings to stdout
 EOF
     exit(2);
 }

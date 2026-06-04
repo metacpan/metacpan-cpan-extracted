@@ -332,7 +332,11 @@ Returns:
 
 =cut
 
-sub token : Local {
+# Disable CSRF for compatibility with apps using Catalyst::Plugin::CSRF and auto_check => 1,
+# which would otherwise reject POST requests to this endpoint without a valid CSRF token.
+# The token endpoint is protected by client authentication and does not use cookies or sessions,
+# so CSRF protection is not applicable.
+sub token : Local DisableCSRF {
     my ( $self, $c ) = @_;
 
     my $config = $c->openidconnect->config;
@@ -770,6 +774,12 @@ sub _handle_authorization_code_grant {
     $c->log->debug('Refresh token created and JTI registered') if $config->{debug};
 
     $c->log->info("Tokens issued for client: $client_id, user: " . $user_claims->{sub});
+    
+    # Log token lengths for debugging signature issues
+    $c->log->debug("ID token length: " . length($id_token) . " bytes") if $config->{debug};
+    $c->log->debug("Access token length: " . length($access_token) . " bytes") if $config->{debug};
+    $c->log->debug("Refresh token length: " . length($refresh_token) . " bytes") if $config->{debug};
+    $c->log->debug("ID token (first 80 chars): " . substr($id_token, 0, 80) . "...") if $config->{debug};
 
     # Return tokens
     $self->_json_response( $c, {

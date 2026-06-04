@@ -635,25 +635,61 @@ is( ref($scaled_mat), 'ARRAY', 'scale on matrix returns an array reference' );
 #-----------------------
 #			MATRIX
 #-----------------------
-my $matrix_correct = '[[1,3,5],[2,4,6]]';
 my $mat1 = matrix(
-	data => [1..6],
-	nrow => 2
+	data => [1..6], nrow => 2
 );
-if ('[[1,3,5],[2,4,6]]' eq $matrix_correct) {
-	pass('simple "matrix" works');
+if (scalar @{ $mat1 } == 2) {
+	pass('matrix: makes correct # of rows');
 } else {
-	fail('simple "matrix" fails');
+	fail('matrix: does NOT make correct # of rows');
 }
-
+@ans = (
+	[1,3,5],
+	[2,4,6]
+);
+foreach my $i (0,1) {
+	foreach my $j (0..2) {
+		is_approx($mat1->[$i][$j], $ans[$i][$j], "matrix: check on [$i][$j]", 1e-13);
+	}
+}
 no_leaks_ok {
 	eval {
-		matrix(
-			data => [1..6],
-			nrow => 2
-		);
+		matrix( data => [1..6], nrow => 2 );
 	}
 } 'matrix: no memory leaks' unless $INC{'Devel/Cover.pm'};
+# check without keys
+
+$mat1 = matrix(
+	[1..6], # data
+	2       # nrow
+);
+if (scalar @{ $mat1 } == 2) {
+	pass('matrix: makes correct # of rows');
+} else {
+	fail('matrix: does NOT make correct # of rows');
+}
+foreach my $i (0,1) {
+	foreach my $j (0..2) {
+		is_approx($mat1->[$i][$j], $ans[$i][$j], "matrix: check on [$i][$j] without keys", 1e-13);
+	}
+}
+no_leaks_ok {
+	eval {
+		matrix( [1..6], 2	);
+	}
+} 'matrix: no memory leaks when using positional args' unless $INC{'Devel/Cover.pm'};
+$mat1 = matrix(
+	data => [1..6], nrow => 2, byrow => 1
+);
+@ans = (
+	[1,2,3],
+	[4,5,6]
+);
+foreach my $i (0,1) {
+	foreach my $j (0..2) {
+		is_approx($mat1->[$i][$j], $ans[$i][$j], "matrix: check on [$i][$j]", 1e-13);
+	}
+}
 # matrix exceptions
 eval { matrix(data => "string", nrow => 2) };
 like( $@, qr/must be an array reference/, 'matrix: dies on non-arrayref data' );

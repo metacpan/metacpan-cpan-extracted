@@ -36,7 +36,7 @@ requires:
   warnings: '0'
   warnings::register: '0'
 resources:
-  bugtracker: https://gitlab.com/jackdeguest/DateTime-Locale-FromCLDR/issues
-  repository: https://gitlab.com/jackdeguest/DateTime-Locale-FromCLDR
-version: v0.8.5
+  bugtracker: https://gitlab.com/deguest/DateTime-Locale-FromCLDR/issues
+  repository: https://gitlab.com/deguest/DateTime-Locale-FromCLDR
+version: v0.8.6
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

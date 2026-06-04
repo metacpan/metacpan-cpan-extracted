@@ -65,6 +65,22 @@ $lconv = $Module::Generic::Number::DEFAULT if( !$curr_locale );
 #         @$lconv{ @$fail } = ( -1 ) x scalar( @$fail );
 # POSIX::setlocale( &POSIX::LC_ALL, $prev_locale );
 my( $sep_space, $tho_sep, $dec_sep, $grouping, $n );
+
+# NOTE: Mirror the normalisation done in Module::Generic::Number for
+# POSIX::localeconv()->{grouping}. The first byte is the size of the first digit group;
+# an empty value, a leading 0 byte, or a CHAR_MAX byte (>= 127) all mean "no grouping".
+# See _normalise_lconv_grouping in Module::Generic::Number for the full rationale.
+sub normalise_lconv_grouping
+{
+    my $value = shift( @_ );
+    return(0) if( !defined( $value ) || !CORE::length( $value ) );
+    my @bytes = unpack( 'C*', $value );
+    return(0) if( !scalar( @bytes ) );
+    my $first = $bytes[0];
+    return(0) if( !defined( $first ) || $first == 0 || $first >= 127 );
+    return( $first );
+}
+
 if( !scalar( keys( %$lconv ) ) || [split(/\./, $curr_locale)]->[0] eq 'C' )
 {
     diag( "No locale could be found for language \"", ( $ENV{LANG} // '' ), "\"" );
@@ -81,13 +97,26 @@ else
     $dec_sep = CORE::length( $lconv->{decimal_point} // '' )
         ? $lconv->{decimal_point}
         : $lconv->{mon_decimal_point};
-    $grouping = CORE::length( $lconv->{grouping} // '' )
-        ? [unpack( "C*", $lconv->{grouping} )]->[0]
-        : [unpack( "C*", $lconv->{mon_grouping} )]->[0];
-    $grouping //= 0;
+    $grouping = normalise_lconv_grouping( $lconv->{grouping} );
+    $grouping = normalise_lconv_grouping( $lconv->{mon_grouping} ) if( !$grouping );
     $n = Module::Generic::Number->new( 10, precision => 2, debug => $DEBUG );
 }
 $sep_space = int( $lconv->{p_sep_by_space} // 0 ) > 0 ? qr/[[:blank:]\h]+/ : '';
+
+# NOTE: Diagnostic for CPAN Testers smokers. Only emitted when AUTOMATED_TESTING or
+# AUTHOR_TESTING is set, so this does not pollute output for regular users.
+# Helps us see what POSIX::localeconv() returns on smokers where the number formatting
+# tests would otherwise just say "got X, expected Y" without context.
+if( $ENV{AUTOMATED_TESTING} || $ENV{AUTHOR_TESTING} )
+{
+    diag( "Locale resolved to: '", ( $curr_locale // 'undef' ), "'" );
+    diag( "LC_ALL env: '", ( $ENV{LC_ALL} // 'unset' ), "', LANG env: '", ( $ENV{LANG} // 'unset' ), "'" );
+    diag( "Detected thousand separator: '", ( $tho_sep // 'undef' ), "'" );
+    diag( "Detected decimal separator: '", ( $dec_sep // 'undef' ), "'" );
+    diag( "Detected grouping size: '", ( $grouping // 'undef' ), "'" );
+    diag( "Raw lconv->{grouping}: '", ( defined( $lconv->{grouping} ) ? join( ',', unpack( 'C*', $lconv->{grouping} ) ) : 'undef' ), "'" );
+    diag( "Raw lconv->{mon_grouping}: '", ( defined( $lconv->{mon_grouping} ) ? join( ',', unpack( 'C*', $lconv->{mon_grouping} ) ) : 'undef' ), "'" );
+}
 
 if( !defined( $n ) )
 {
@@ -267,23 +296,38 @@ is( $n3, 1281284, 'Unformat resulting value' );
 is( $n3->precision, 2, 'New object precision' );
 $dec_sep = '' if( !defined( $dec_sep ) );
 $tho_sep = '' if( !defined( $tho_sep ) );
+# NOTE: Build the expected formatted string honestly based on what the system locale
+# really supports. If grouping is 0 (or thousand separator is empty),
+# the formatted output will not contain any group separator, and the test must reflect
+# that rather than mechanically assuming 3-digit groups.
+my $grouped_int = '1281284';
+if( $grouping && $grouping > 0 && CORE::length( $tho_sep ) )
+{
+    # Group from right to left by $grouping digits, joined with $tho_sep
+    $grouped_int = reverse( join( $tho_sep, unpack( "(A${grouping})*", reverse( '1281284' ) ) ) );
+}
+my $expected_number = "${grouped_int}${dec_sep}00";
+if( $ENV{AUTOMATED_TESTING} || $ENV{AUTHOR_TESTING} )
+{
+    diag( "Expected formatted number: '${expected_number}' (grouping=${grouping}, tho_sep='${tho_sep}', dec_sep='${dec_sep}')" );
+}
 # diag( "Thousand separator is: '", $n3->thousand, "'" );
 # diag( "Number::Format object is: ", Dumper( $n3->{_fmt} ) );
-is( $n3->format, "1${tho_sep}281${tho_sep}284${dec_sep}00", "Formatting number using format() -> 1${tho_sep}281${tho_sep}284${dec_sep}00" );
+is( $n3->format, $expected_number, "Formatting number using format() -> ${expected_number}" );
 is( $n3->currency, '€', "Currency symbol -> '€'" );
 my $n_money = $n3->format_money;
 if( $n3->precede )
 {
-    like( "$n_money", qr/€${sep_space}1${tho_sep}281${tho_sep}284${dec_sep}00/, 'Formatting money using format_money()' );
+    like( "$n_money", qr/€${sep_space}\Q${expected_number}\E/, 'Formatting money using format_money()' );
 }
 else
 {
-    like( "$n_money", qr/1${tho_sep}281${tho_sep}284${dec_sep}00${sep_space}€/, 'Formatting money using format_money()' );
+    like( "$n_money", qr/\Q${expected_number}\E${sep_space}€/, 'Formatting money using format_money()' );
 }
 isa_ok( $n_money, 'Module::Generic::Scalar', 'Returns string object upon formatting' );
 $n3 *= -1;
 is( $n3, -1281284, 'Negative number' );
-like( $n3->format_negative( '(x)' ), qr/\(1${tho_sep}281${tho_sep}284${dec_sep}00\)/, "Formatting negative number => (1${tho_sep}281${tho_sep}284${dec_sep}00)" );
+like( $n3->format_negative( '(x)' ), qr/\(\Q${expected_number}\E\)/, "Formatting negative number => (${expected_number})" );
 my $n4 = $n3->abs;
 is( $n4, 1281284, 'abs' );
 # 1.5707955463278

@@ -14,7 +14,7 @@ use v5.16; # or newer
 use strict;
 use warnings;
 
-our $VERSION = "1.14";
+our $VERSION = "1.18";
 
 use JSON::PP;
 use Tie::IxHash;
@@ -301,10 +301,7 @@ sub _addSecretsToConfigHash{
     my ($self, $config, $dirFileName) = @_;
 
     my @dirFileNameArr = split('/', $dirFileName); # test, prod etc.
-
     my $secretText = read_file($dirFileName);
-    $secretText =~ s/\n//g;
-    $secretText =~ s/\r//g;
     $config->{secrets}->{$dirFileNameArr[-1]} = $secretText;
   
     my $secretTextBase64 = encode_base64($secretText);
@@ -515,6 +512,7 @@ sub _generateConfig{
     $config->{instance_capitalized_first} = ucfirst $config->{instance};
     $config->{url_prefix}                 = $self->{urlPrefix} if defined $self->{urlPrefix};
     $config->{cluster_base_address}       = $self->{clusterBaseAddress} if defined $self->{clusterBaseAddress}; 
+    $config->{cluster_base_address}       = $config->{oc_config}->{project}->{cluster_base_address} if not defined $config->{cluster_base_address};
     
     my $componentConfigNodes  = $self->_getComponentConfigNodes($config);
     foreach my $componentConfNode (@$componentConfigNodes){
@@ -645,64 +643,72 @@ sub _getSecrets{
 
     my $secretJsonFileName = $self->{secretsJson};
     # secrets files for all instances and all clusters e.g.: secrets/my-secret.txt
-    for my $dirFileName (File::Find::Rule->file()->name("*")->in($self->{secretsDir})) {
+    for my $dirFileName (File::Find::Rule->file()->name("*")->maxdepth(1)->in($self->{secretsDir})) {
         my @dirFileNameArr = split('/', $dirFileName);
         next if $dirFileNameArr[-1] eq $secretJsonFileName;
-        $self->_addSecretsToConfigHash($config, $dirFileName) if scalar @dirFileNameArr == 2;
+        $self->_addSecretsToConfigHash($config, $dirFileName);
     }
 
     # instance specific secrets files and for all clusters e.g.: secrets/instance/test/my-secret.txt
-    for my $dirFileName (File::Find::Rule->file()->name("*")->in("$self->{secretsDir}/instance/$self->{instance}")) {
+    for my $dirFileName (File::Find::Rule->file()->name("*")->maxdepth(1)->in("$self->{secretsDir}/instance/$self->{instance}")) {
         my @dirFileNameArr = split('/', $dirFileName);
         next if $dirFileNameArr[-1] eq $secretJsonFileName;
-        $self->_addSecretsToConfigHash($config, $dirFileName) if scalar @dirFileNameArr == 4;
+        $self->_addSecretsToConfigHash($config, $dirFileName);
     }
     
     my $clusterSpecificSecretsDirExist = 0;
     foreach my $dirPath (glob "$self->{secretsDir}/*") {
         next if not -d $dirPath;
         my @dirPathArr = split('/', $dirPath);
-        my $dirName = $dirPathArr[1];
+        my $dirName = $dirPathArr[-1];
         next if $dirName eq "instance";
         $clusterSpecificSecretsDirExist = 1 if $dirName eq $self->{cluster};
     }
-
+    
     # secrets files for all instances and for specific cluster e.g.: secrets/clusterIntern/my_secret.txt
     if($clusterSpecificSecretsDirExist){
-        for my $dirFileName (File::Find::Rule->file()->name("*")->in("$self->{secretsDir}/$self->{cluster}")) {
+        for my $dirFileName (File::Find::Rule->file()->name("*")->maxdepth(1)->in("$self->{secretsDir}/$self->{cluster}")) {
             my @dirFileNameArr = split('/', $dirFileName);
             next if $dirFileNameArr[-1] eq $secretJsonFileName;
-            $self->_addSecretsToConfigHash($config, $dirFileName) if scalar @dirFileNameArr == 3;
+            $self->_addSecretsToConfigHash($config, $dirFileName);
         }
         # secret files for specific instance and specific cluster e.g.: secrets/clusterIntern/instance/prod/my_secret.txt
-        for my $dirFileName (File::Find::Rule->file()->name("*")->in("$self->{secretsDir}/$self->{cluster}/instance/$self->{instance}")) {
+        for my $dirFileName (File::Find::Rule->file()->name("*")->maxdepth(1)->in("$self->{secretsDir}/$self->{cluster}/instance/$self->{instance}")) {
             my @dirFileNameArr = split('/', $dirFileName);
             next if $dirFileNameArr[-1] eq $secretJsonFileName;
-            $self->_addSecretsToConfigHash($config, $dirFileName) if scalar @dirFileNameArr == 5;
+            $self->_addSecretsToConfigHash($config, $dirFileName);
         }
     }
-
     # secrets json for all instances and all clusters
-    my $secretJson = read_file("$self->{secretsDir}/$secretJsonFileName");
-    $config->{secrets_json} = $self->{json}->utf8->decode($secretJson);
+    $config->{secrets_json} = {};
+    eval {
+        my $secretJson = read_file("$self->{secretsDir}/$secretJsonFileName");
+        my $secretJsonAllInstancesAllClustersHash = $self->{json}->utf8->decode($secretJson);
+        $self->_mergeSecretsJson($config->{secrets_json}, $secretJsonAllInstancesAllClustersHash);
+    };
     if($clusterSpecificSecretsDirExist){
         # secrets json for all instances and specific cluster
         my $path = "$self->{secretsDir}/$self->{cluster}/$secretJsonFileName";
-        my $secretJsonClusterSpecific = read_file($path);
-        my $secretJsonClusterSpecificHash = $self->{json}->utf8->decode($secretJsonClusterSpecific);
-        $self->_mergeSecretsJson($config->{secrets_json}, $secretJsonClusterSpecificHash);
-        
+        eval {
+            my $secretJsonClusterSpecific = read_file($path);
+            my $secretJsonClusterSpecificHash = $self->{json}->utf8->decode($secretJsonClusterSpecific);
+            $self->_mergeSecretsJson($config->{secrets_json}, $secretJsonClusterSpecificHash);
+        };
         # secrets json for specific instance and specific cluster
         $path = "$self->{secretsDir}/$self->{cluster}/instance/$self->{instance}/$secretJsonFileName"; 
-        my $secretJsonClusterSpecificInstanceSpecific = read_file($path);
-        my $secretJsonClusterSpecificInstanceSpecificHash = $self->{json}->utf8->decode($secretJsonClusterSpecificInstanceSpecific);
-        $self->_mergeSecretsJson($config->{secrets_json}, $secretJsonClusterSpecificInstanceSpecificHash);
+        eval {
+            my $secretJsonClusterSpecificInstanceSpecific = read_file($path);
+            my $secretJsonClusterSpecificInstanceSpecificHash = $self->{json}->utf8->decode($secretJsonClusterSpecificInstanceSpecific);
+            $self->_mergeSecretsJson($config->{secrets_json}, $secretJsonClusterSpecificInstanceSpecificHash);
+        };
     }else{        
         # secrets json for specific instance and all clusters
         my $path = "$self->{secretsDir}/instance/$self->{instance}/$secretJsonFileName"; 
-        my $secretJsonInstanceSpecific = read_file($path);
-        my $secretJsonInstanceSpecificHash = $self->{json}->utf8->decode($secretJsonInstanceSpecific);
-        $self->_mergeSecretsJson($config->{secrets_json}, $secretJsonInstanceSpecificHash);
+        eval {
+            my $secretJsonInstanceSpecific = read_file($path);
+            my $secretJsonInstanceSpecificHash = $self->{json}->utf8->decode($secretJsonInstanceSpecific);
+            $self->_mergeSecretsJson($config->{secrets_json}, $secretJsonInstanceSpecificHash);
+        };
     }
 
     return;
@@ -887,7 +893,7 @@ __END__
 
 =head1 NAME
 
-OcToolkit - Open Cloud Toolkit -  A Helm-like Perl module for managing Openshift and Kubernetes projects
+OcToolkit - Open Cloud Toolkit -  Module for managing Openshift and Kubernetes projects
 
 =head1 SYNOPSIS
 
@@ -920,9 +926,8 @@ OcToolkit - Open Cloud Toolkit -  A Helm-like Perl module for managing Openshift
 
 =head1 DESCRIPTION
 
-Helm-like tool for Openshift and Kubernetes with multi cluster support.
-See https://gitlab.com/code7143615/octoolkit/-/blob/master/README.md how to use this library in ocToolkit.pl script
-and use it as 'Helm-like' command line tool.
+Library for Openshift and Kubernetes with multi cluster support. Wrapper for 'oc/kubectl' command line tool powered by 'Template Toolkit' templating engine.
+See https://gitlab.com/code7143615/octoolkit/-/blob/master/README.md for 'ocToolkit' command line tool.
 Feedback Page: https://gitlab.com/code7143615/octoolkit/-/issues/1
 
 =head1 LICENSE
@@ -934,7 +939,7 @@ it under the same terms as Perl itself.
 
 =head1 OVERVIEW
 
-OcToolkit (short for Open Cloud Toolkit) is a Perl module designed as a Helm-like toolkit for managing Openshift (and Kubernetes) projects, with added support for multi-cluster workflows.
+OcToolkit (short for Open Cloud Toolkit) is a Perl module designed for managing Openshift (and Kubernetes) projects, with added support for multi-cluster workflows. It includes Buids/BuildConfigs so you can use one tool for uploading your whole project to the Cloud. 
 
 =head1 KEY FEATURES AND FUNCTIONALITY
 
@@ -1079,9 +1084,9 @@ If you are intrested in 'ocToolkit' command line tool only as an end user, see l
 
 =head1 CONCLUSION
 
-OcToolkit is a robust and flexible Perl-based alternative to Helm, offering templated deployment workflows with validation, backups, and multi-cluster capabilities.
-
-If you're familiar with Helm but prefer a Perl-centric, highly customizable tool, this could be a great fit.
+This library powers 'ocToolkit' command line tool(see description). 
+'ocToolkit' aims to simplify CI/CD and reduce related overhead. Could be usefull for small teams and start-ups.
+Edit this library if you like to extend 'ocToolkit' features or use it for your own Perl based CI/CD pipeline. 
 
 =cut
 

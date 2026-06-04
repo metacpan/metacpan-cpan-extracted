@@ -18,15 +18,10 @@ my $string = <<EOF;
 ---
 database:
   boundarys: []
-
   externals: []
-
   intranetworks: []
-
   intrarouters: []
-
   links: []
-
   networks:
     -
       address: 0.0.1.1
@@ -56,38 +51,29 @@ database:
     -
       area: 1.0.0.0
       bits:
-        B: 1
-        E: 1
-        V: 0
+        B: '1'
+        E: '1'
+        V: '0'
       pointtopoints: []
-
       router: 0.1.0.0
       routerid: 0.1.0.0
       stubs: []
-
       transits: []
-
       virtuals: []
-
     -
       area: 2.0.0.0
       bits:
-        B: 1
-        E: 1
-        V: 0
+        B: '1'
+        E: '1'
+        V: '0'
       pointtopoints: []
-
       router: 0.1.0.0
       routerid: 0.1.0.0
       stubs: []
-
       transits: []
-
       virtuals: []
-
   summarys: []
-
-ipv6: 0
+ipv6: '0'
 self:
   areas:
     - 1.0.0.0

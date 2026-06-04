@@ -9,7 +9,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,8 +22,11 @@ no_index:
     - examples
     - t
 requires:
+  Data::Validate::Domain: '0.11'
+  Data::Validate::IP: '0.27'
   List::Util: '1.45'
-  Mojolicious: '7.28'
+  Mojolicious: '9.34'
+  Net::IDN::Encode: '2.500'
   YAML::XS: '0.67'
   perl: '5.016'
 resources:
@@ -34,7 +37,7 @@ resources:
   homepage: https://github.com/jhthorsen/json-validator
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/jhthorsen/json-validator.git
-version: '5.15'
+version: '5.16'
 x_contributors:
   - 'Aleksandr Orlenko <zxteam@gmail.com>'
   - 'Alexander Hartmaier <alexander.hartmaier@t-systems.at>'
@@ -70,4 +73,4 @@ x_contributors:
   - 'Stephan Hradek <github@hradek.net>'
   - 'Tim Stallard <tim@mythic-beasts.com>'
   - 'Zoffix Znet <cpan@zoffix.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

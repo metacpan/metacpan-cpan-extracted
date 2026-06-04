@@ -2,7 +2,7 @@ package DBIx::QuickDB::Pool;
 use strict;
 use warnings;
 
-our $VERSION = '0.000045';
+our $VERSION = '0.000046';
 
 use Carp qw/croak/;
 use Fcntl qw/:flock/;

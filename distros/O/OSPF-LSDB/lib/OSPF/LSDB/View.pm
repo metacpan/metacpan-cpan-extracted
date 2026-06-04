@@ -1,5 +1,5 @@
 ##########################################################################
-# Copyright (c) 2010-2021 Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2010-2024 Alexander Bluhm <alexander.bluhm@gmx.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -129,13 +129,13 @@ sub new {
 }
 
 # convert decimal dotted IPv4 address to packed format
-sub _ip2pack($) { pack("CCCC", split(/\./, $_[0])) }
+sub _ip2pack { pack("CCCC", split(/\./, $_[0])) }
 
 # convert packed IPv4 address to decimal dotted format
-sub _pack2ip($) { join('.', unpack("CCCC", $_[0])) }
+sub _pack2ip { join('.', unpack("CCCC", $_[0])) }
 
 # mask decimal dotted IPv4 network with decimal dotted IPv4 netmask
-sub _maskip($$) { _pack2ip(_ip2pack($_[0]) & _ip2pack($_[1])) }
+sub _maskip { _pack2ip(_ip2pack($_[0]) & _ip2pack($_[1])) }
 
 # compare function for sorting decimal dotted IPv4 address
 sub _cmp_ip { unpack("N",_ip2pack($a)) <=> unpack("N",_ip2pack($b)) }

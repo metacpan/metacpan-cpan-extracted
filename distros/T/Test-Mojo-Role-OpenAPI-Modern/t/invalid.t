@@ -23,13 +23,13 @@ subtest 'request or response not valid' => sub {
     ->openapi($::openapi)
     ->test_openapi_verbose(1);
 
-  $t->post_ok('/foo/123', form => { salutation => 'hi' })
+  $t->post_ok('/foo/123', {'Content-Type' => 'application/furble'} => '!!!')
     ->status_is(400)
     ->content_is('kaboom')
     ->request_not_valid
     ->response_not_valid
     ->request_not_valid('Unsupported Media Type')
-    ->request_not_valid(q{'/request/body': incorrect Content-Type "application/x-www-form-urlencoded"})
+    ->request_not_valid(q{'/request/body/content': incorrect Content-Type "application/furble"})
     ->response_not_valid(q{'/response/code': no response object found for code 400}, 'test2');
 
   cmp_deeply(
@@ -46,7 +46,7 @@ subtest 'request or response not valid' => sub {
 
   is(
     Mojo::JSON::Pointer->new($t->request_validation_result->TO_JSON)->get('/errors/1/error'),
-    'incorrect Content-Type "application/x-www-form-urlencoded"',
+    'incorrect Content-Type "application/furble"',
     'request validation second error',
   );
 
@@ -68,9 +68,9 @@ subtest 'request or response not valid' => sub {
 
   $t->post_ok('/foo/123', json => { kaboom => 'oh noes' })
     ->status_is(200)
-    ->request_not_valid(q{'/request/body/kaboom': EXCEPTION: unable to find resource "https://nowhere.example.com#/$defs/i_do_not_exist"})
+    ->request_not_valid(q{'/request/body/content/kaboom': EXCEPTION: unable to find resource "https://nowhere.example.com#/$defs/i_do_not_exist"})
     ->request_not_valid('Internal Server Error')
-    ->response_not_valid(q{'/response/body/kaboom': EXCEPTION: unable to find resource "https://nowhere.example.com#/$defs/i_do_not_exist"});
+    ->response_not_valid(q{'/response/body/content/kaboom': EXCEPTION: unable to find resource "https://nowhere.example.com#/$defs/i_do_not_exist"});
 
   cmp_deeply(
     $t->request_validation_result->recommended_response,

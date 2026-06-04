@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Test::Mojo::Role::OpenAPI::Modern; # git description: v0.010-3-ge7925fd
+package Test::Mojo::Role::OpenAPI::Modern; # git description: v0.011-2-g593a6ff
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Test::Mojo role providing access to an OpenAPI document and parser
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
 use 5.020;  # for fc, unicode_strings features
 use strictures 2;
@@ -16,8 +16,8 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 no if "$]" >= 5.041009, feature => 'smartmatch';
 no feature 'switch';
-use JSON::Schema::Modern 0.577;
-use OpenAPI::Modern 0.054;
+use JSON::Schema::Modern 0.638;
+use OpenAPI::Modern 0.133;
 use List::Util 'any';
 use namespace::clean;
 
@@ -171,7 +171,7 @@ Test::Mojo::Role::OpenAPI::Modern - Test::Mojo role providing access to an OpenA
 
 =head1 VERSION
 
-version 0.011
+version 0.012
 
 =head1 SYNOPSIS
 

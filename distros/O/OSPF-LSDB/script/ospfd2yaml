@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 ##########################################################################
-# Copyright (c) 2010-2012 Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2010-2024 Alexander Bluhm <alexander.bluhm@gmx.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -23,7 +23,7 @@ use OSPF::LSDB::ospfd;
 use OSPF::LSDB::ospf6d;
 use OSPF::LSDB::YAML;
 
-sub usage(@) {
+sub usage {
     print STDERR "Error: @_\n" if @_;
     print STDERR <<EOF;
 Convert OpenBSD ospfd or ospf6d link state database to YAML file.

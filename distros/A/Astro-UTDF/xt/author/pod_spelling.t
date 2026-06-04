@@ -22,7 +22,9 @@ all_pod_files_spelling_ok ();
 __DATA__
 agc
 Doppler
+Haisam
 hexified
+Ido
 Kongsberg
 merchantability
 padid

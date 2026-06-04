@@ -1,5 +1,13 @@
 Revision history for perl distribution Mojo-Redis
 
+3.31 2026-06-04T10:49:00
+ - Allow TLS-related query params in Redis URL #80 #84
+   Contributor: Alexander Karelas, hazemkmammu
+
+3.30 2026-06-04T10:37:00
+ - Fix connecting through sentinels #78
+   Contributor: Jan "Yenya" Kasprzak
+
 3.29 2022-02-23T14:56:18+0900
  - Fix use of "defined" in unit test
 

@@ -1,4 +1,4 @@
-package CPAN::Perl::Releases::MetaCPAN v1.0.0;
+package CPAN::Perl::Releases::MetaCPAN v1.0.1;
 use v5.24;
 use warnings;
 use experimental qw(lexical_subs signatures);
@@ -43,6 +43,7 @@ sub get ($self) {
             from => $from,
             sort => [ { date => 'desc' } ],
             fields => [qw( name date author version status maturity download_url checksum_sha256 )],
+            _source => JSON::PP::false,
         };
         my $res = $self->{http}->post($uri, {
             content => $self->{json}->encode($query),

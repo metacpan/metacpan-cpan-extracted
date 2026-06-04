@@ -13,6 +13,7 @@ has encoding => sub { Carp::confess('encoding is required in constructor') };
 has ioloop   => sub { Carp::confess('ioloop is required in constructor') };
 has protocol => sub { Carp::confess('protocol is required in constructor') };
 has url      => sub { Carp::confess('url is required in constructor') };
+has [qw/ tls tls_ca tls_cert tls_key tls_options /];
 
 sub DESTROY {
   my $self = shift;
@@ -58,7 +59,14 @@ sub _connect {
   delete $self->{master_url};     # Make sure we forget master_url so we can reconnect
   $self->protocol->on_message($self->_parse_message_cb);
   $self->{id} = $self->ioloop->client(
-    $self->_connect_args($url, {port => 6379, timeout => CONNECT_TIMEOUT}),
+    $self->_connect_args(
+      $url,
+      {
+        port    => 6379,
+        timeout => CONNECT_TIMEOUT,
+        map { ($_ => $self->$_) } grep defined $self->{$_}, qw/ tls tls_ca tls_cert tls_key tls_options /
+      }
+    ),
     sub {
       return unless $self;
       my ($loop, $err, $stream) = @_;
@@ -95,6 +103,8 @@ sub _connect_args {
   }
 
   $args{timeout} = $defaults->{timeout} || CONNECT_TIMEOUT;
+
+  $args{$_} = $defaults->{$_} foreach grep /^tls/, keys %$defaults;
   return \%args;
 }
 
@@ -120,7 +130,7 @@ sub _discover_master {
       $stream->on(read  => $self->_on_read_cb);
 
       $self->{stream} = $stream;
-      my $p = Mojo::Promise->new;
+      my $p = Mojo::Promise->new->ioloop($self->ioloop);
       unshift @{$self->{write}}, undef;    # prevent _write() from writing commands
       unshift @{$self->{write}}, [$self->_encode(SENTINEL => 'get-master-addr-by-name', $self->url->host), $p];
       unshift @{$self->{write}}, [$self->_encode(AUTH     => $url->password)] if length $url->password;
@@ -329,6 +339,41 @@ Holds an instance of L<Mojo::IOLoop>.
 
 Holds a protocol object, such as L<Protocol::Redis::Faster> that is used to
 generate and parse Redis messages.
+
+=head2 tls
+
+  my $tls = $conn->tls;
+  $conn   = $conn->tls(1);
+
+See L<Mojo::IOLoop::Client/tls>
+
+=head2 tls_ca
+
+  my $tls_ca = $conn->tls_ca;
+  $conn      = $conn->tls_ca('/etc/tls/ca.crt');
+
+See L<Mojo::IOLoop::Client/tls_ca>
+
+=head2 tls_cert
+
+  my $tls_cert = $conn->tls_cert;
+  $conn        = $conn->tls_cert('/etc/tls/client.crt');
+
+See L<Mojo::IOLoop::Client/tls_cert>
+
+=head2 tls_key
+
+  my $tls_key = $conn->tls_key;
+  $conn       = $conn->tls_key('/etc/tls/client.key');
+
+See L<Mojo::IOLoop::Client/tls_key>
+
+=head2 tls_options
+
+  my $tls_options = $conn->tls_options;
+  $conn           = $conn->tls_options({SSL_alpn_protocols => ['foo', 'bar'], SSL_verify_mode => 0x00});
+
+See L<Mojo::IOLoop::Client/tls_options>
 
 =head2 url
 

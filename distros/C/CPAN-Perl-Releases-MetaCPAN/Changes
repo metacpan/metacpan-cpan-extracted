@@ -1,5 +1,8 @@
 Revision history for CPAN-Perl-Releases-MetaCPAN
 
+v1.0.1  2026-06-04 00:03:44 JST
+  - Set _source to false in metacpan queries
+
 v1.0.0  2026-05-23
   - Raise minimum Perl to v5.24
 

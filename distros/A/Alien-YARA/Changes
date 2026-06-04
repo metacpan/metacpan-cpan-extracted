@@ -1,4 +1,22 @@
 Revision history for Alien::YARA
 
-0.0.1  2026-06-03
+v0.0.6  2026-06-04
+        - Fixed alienfile.
+
+v0.0.5  2026-06-04
+        - Updated alienfile.
+
+v0.0.4  2026-06-04
+        - Added build [] to alienfile.
+
+v0.0.3  2026-06-03
+        - Updated alienfile w.r.t Yara v4.5.0 tarball
+
+v0.0.2  2026-06-03
+        - Switch download URL from raw repository archive to official release
+          tarball asset. This ensures pre-generated './configure' scripts
+          are present and removes downstream dependencies on autotools
+          (autoconf/automake).
+
+v0.0.1  2026-06-03
         - module created.

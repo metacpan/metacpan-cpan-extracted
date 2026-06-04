@@ -1,7 +1,7 @@
 
 # NAME
 
-OcToolkit - Open Cloud Toolkit -  A Helm-like Perl module for managing Openshift and Kubernetes projects
+OcToolkit - Open Cloud Toolkit -  Module for managing Openshift and Kubernetes projects
 
 # SYNOPSIS
 
@@ -34,9 +34,8 @@ OcToolkit - Open Cloud Toolkit -  A Helm-like Perl module for managing Openshift
 
 # DESCRIPTION
 
-Helm-like tool for Openshift and Kubernetes with multi cluster support.
-See https://gitlab.com/code7143615/octoolkit/-/blob/master/README.md how to use this library in ocToolkit.pl script
-and use it as 'Helm-like' command line tool.
+Library for Openshift and Kubernetes with multi cluster support. Wrapper for 'oc/kubectl' command line tool powered by 'Template Toolkit' templating engine.
+See https://gitlab.com/code7143615/octoolkit/-/blob/master/README.md for 'ocToolkit' command line tool.
 Feedback Page: https://gitlab.com/code7143615/octoolkit/-/issues/1
 
 # LICENSE
@@ -48,7 +47,7 @@ it under the same terms as Perl itself.
 
 # OVERVIEW
 
-OcToolkit (short for Open Cloud Toolkit) is a Perl module designed as a Helm-like toolkit for managing Openshift (and Kubernetes) projects, with added support for multi-cluster workflows.
+OcToolkit (short for Open Cloud Toolkit) is a Perl module designed for managing Openshift (and Kubernetes) projects, with added support for multi-cluster workflows. It incudes Buids/BuildConfigs so you can use one tool for uploading your project to the Cloud.  
 
 # KEY FEATURES AND FUNCTIONALITY
 
@@ -157,9 +156,9 @@ If you are intrested in 'ocToolkit' command line tool only as an end user, see l
 
 # CONCLUSION
 
-OcToolkit is a robust and flexible Perl-based alternative to Helm, offering templated deployment workflows with validation, backups, and multi-cluster capabilities.
-
-If you're familiar with Helm but prefer a Perl-centric, highly customizable tool, this could be a great fit.
+This library powers 'ocToolkit' command line tool(see description). 
+'ocToolkit' aims to simplify CI/CD and reduce related overhead. Could be usefull for small teams and start-ups.
+Edit this library if you like to extend 'ocToolkit' features or use it for your own Perl based CI/CD pipeline. 
 
 # AUTHOR(S)
 

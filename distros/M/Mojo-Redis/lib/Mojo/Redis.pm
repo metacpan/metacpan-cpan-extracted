@@ -9,7 +9,7 @@ use Mojo::Redis::Database;
 use Mojo::Redis::PubSub;
 use Scalar::Util 'blessed';
 
-our $VERSION = '3.29';
+our $VERSION = '3.31';
 
 $ENV{MOJO_REDIS_URL} ||= 'redis://localhost:6379';
 
@@ -49,11 +49,21 @@ sub _connection {
   my ($self, %args) = @_;
 
   $args{ioloop} ||= Mojo::IOLoop->singleton;
+  my %tls_args;
+  if (my %url_args = %{$self->url->query->to_hash}) {
+    @tls_args{qw/ tls tls_ca tls_cert tls_key /} = @url_args{qw/ tls ca cert key /};
+    delete @tls_args{grep !defined $tls_args{$_}, keys %tls_args};
+    my %tls_options = map { ($_, $url_args{$_}) } grep /^SSL_/, keys %url_args;
+    $tls_options{$_} = [split /,/, $tls_options{$_}]
+      foreach grep /^SSL_(psk|(npn|alpn)_protocols)\z/, keys %tls_options;
+    $tls_args{tls_options} = \%tls_options if %tls_options;
+    $tls_args{tls} //= 1                   if %tls_args;
+  }
   my $conn = Mojo::Redis::Connection->new(
     encoding => $self->encoding,
     protocol => $self->protocol_class->new(api => 1),
     url      => $self->url->clone,
-    %args
+    %args, %tls_args
   );
 
   Scalar::Util::weaken($self);
@@ -235,6 +245,10 @@ L<Mojo::Redis::Cursor/new>. for possible commands.
   $redis = Mojo::Redis->new(Mojo::URL->new->host("/tmp/redis.sock"));
   $redis = Mojo::Redis->new(\%attrs);
   $redis = Mojo::Redis->new(%attrs);
+
+  # TLS options
+  $redis = Mojo::Redis->new("redis://localhost:6379/1?tls=1");
+  $redis = Mojo::Redis->new("redis://localhost:6379/1?ca=ca.pem&cert=cert.pem&key=key.pem&SSL_alpn_protocols=foo");
 
 Object constructor. Can coerce a string into a L<Mojo::URL> and set L</url>
 if present.

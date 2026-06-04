@@ -138,12 +138,21 @@ sub sign_token {
     # Create signature (explicitly use SHA256 for RS256)
     my $signing_input = "$header_b64.$payload_b64";
     my $priv_key = $self->private_key;
+    # Ensure consistent RSA configuration for signing (RFC 3447 PKCS1v15)
+    $priv_key->use_pkcs1_padding();
     $priv_key->use_sha256_hash();
     my $signature = $priv_key->sign($signing_input);
     my $signature_b64 = _urlsafe_b64_encode($signature);
 
     my $token = "$signing_input.$signature_b64";
-    $self->logger->debug('JWT token signed successfully') if $self->logger;
+    
+    if ( $self->logger ) {
+        $self->logger->debug( sprintf(
+            'JWT signed: header_b64_len=%d, payload_b64_len=%d, sig_b64_len=%d, total_len=%d',
+            length($header_b64), length($payload_b64), length($signature_b64), length($token),
+        ));
+        $self->logger->debug("JWT token (first 80 chars): " . substr($token, 0, 80) . "...");
+    }
     
     return $token;
 }
@@ -182,6 +191,8 @@ sub verify_token {
         my $signature = _urlsafe_b64_decode($signature_b64);
 
         my $pub_key = $self->public_key;
+        # Ensure consistent RSA configuration for verification (RFC 3447 PKCS1v15)
+        $pub_key->use_pkcs1_padding();
         $pub_key->use_sha256_hash();
         die 'Invalid signature' unless $pub_key->verify(
             $signing_input,
@@ -228,10 +239,21 @@ sub verify_token {
 
 Creates a signed ID token with the specified claims.
 
+The following claims are automatically set if not provided:
+- exp: Expiration time (1 hour from now, required by OIDC/JWT spec)
+- iat: Issued at time (current time)
+- iss: Issuer URL
+
 =cut
 
 sub create_id_token {
     my ( $self, %claims ) = @_;
+
+    # Ensure exp is set - this is MANDATORY per RFC 7519 and OIDC spec
+    # If not provided, default to 1 hour from now
+    unless ( defined $claims{exp} ) {
+        $claims{exp} = time() + 3600;
+    }
 
     my %payload = (
         typ => 'JWT',
@@ -245,10 +267,18 @@ sub create_id_token {
 
 Creates a signed access token with the specified claims.
 
+The exp (expiration) claim is mandatory and will be set to 1 hour from now
+if not explicitly provided.
+
 =cut
 
 sub create_access_token {
     my ( $self, %claims ) = @_;
+
+    # Ensure exp is set - this is MANDATORY per RFC 7519
+    unless ( defined $claims{exp} ) {
+        $claims{exp} = time() + 3600;
+    }
 
     return $self->sign_token(%claims);
 }
@@ -257,10 +287,19 @@ sub create_access_token {
 
 Creates a signed refresh token with the specified claims.
 
+The exp (expiration) claim is mandatory and will be set to 30 days from now
+if not explicitly provided.
+
 =cut
 
 sub create_refresh_token {
     my ( $self, %claims ) = @_;
+
+    # Ensure exp is set - this is MANDATORY per RFC 7519
+    # Refresh tokens have a longer lifetime (30 days)
+    unless ( defined $claims{exp} ) {
+        $claims{exp} = time() + (30 * 24 * 3600);
+    }
 
     return $self->sign_token(%claims);
 }
@@ -292,6 +331,8 @@ sub decode_id_token_hint {
         my $signing_input = "$header_b64.$payload_b64";
         my $signature     = _urlsafe_b64_decode($signature_b64);
         my $pub_key       = $self->public_key;
+        # Ensure consistent RSA configuration for verification (RFC 3447 PKCS1v15)
+        $pub_key->use_pkcs1_padding();
         $pub_key->use_sha256_hash();
         return undef unless $pub_key->verify( $signing_input, $signature );
 

@@ -1,5 +1,8 @@
 Revision history for MIDI-RtController
 
+0.0804 2026-06-03 17:31:05
+    - Add the eg/simple.pl example program.
+
 0.0803 2026-02-25 11:34:25
     - Update for RtMidi FFI.
 

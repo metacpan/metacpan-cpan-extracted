@@ -130,4 +130,45 @@ isnt $db->connection(1)->ioloop, Mojo::IOLoop->singleton, 'blocking connection';
 isnt $db->connection(1)->ioloop, $db->connection(0)->ioloop,
   'blocking connection does not share non-blocking connection ioloop';
 
+note 'Without TLS options';
+$db = $redis->db;
+$conn = $db->connection;
+is $conn->tls, undef, 'tls disabled';
+is $conn->tls_ca, undef, 'no custom tls ca certificate';
+is $conn->tls_cert, undef, 'no custom client tls certificate';
+is $conn->tls_key, undef, 'no custom client tls key';
+is $conn->tls_options, undef, 'no custom tls options';
+
+note 'TLS options passed on to connection';
+$redis = Mojo::Redis->new(
+    'redis://redis.localhost?ca=/var/mojo/app/ca.crt&cert=/var/mojo/app/client.crt&key=/var/mojo/app/client.key&SSL_alpn_protocols=foo',
+);
+$db = $redis->db;
+$conn = $db->connection;
+is $conn->tls, 1, 'tls enabled';
+is $conn->tls_ca, '/var/mojo/app/ca.crt', 'custom tls ca certificate';
+is $conn->tls_cert, '/var/mojo/app/client.crt', 'custom client tls certificate';
+is $conn->tls_key, '/var/mojo/app/client.key', 'custom client tls key';
+is $conn->tls_options->{SSL_alpn_protocols}[0], 'foo', 'custom tls options';
+
+note 'TLS Options passed on to Mojo::IOLoop::Client';
+my $original_ioloop_client_connect_ref = \&Mojo::IOLoop::Client::connect;
+my $ioloop_client_connect_args;
+Mojo::Util::monkey_patch('Mojo::IOLoop::Client', 'connect' => sub { $ioloop_client_connect_args = $_[1] });
+
+$conn->_connect;
+is_deeply $ioloop_client_connect_args, {
+    address     => 'redis.localhost',
+    port        => 6379,
+    timeout     => 10,
+    tls         => 1,
+    tls_ca      => '/var/mojo/app/ca.crt',
+    tls_cert    => '/var/mojo/app/client.crt',
+    tls_key     => '/var/mojo/app/client.key',
+    tls_options => {
+        SSL_alpn_protocols => ['foo']
+    }
+}, 'connect args';
+Mojo::Util::monkey_patch('Mojo::IOLoop::Client', 'connect' => $original_ioloop_client_connect_ref);
+
 done_testing;

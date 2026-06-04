@@ -1,0 +1,18 @@
+lib/FalkorDB.pm
+lib/FalkorDB/Edge.pm
+lib/FalkorDB/Graph.pm
+lib/FalkorDB/Node.pm
+lib/FalkorDB/Path.pm
+lib/FalkorDB/QueryResult.pm
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/01-connection.t
+t/02-query.t
+t/03-parameters.t
+t/04-types.t
+t/05-coverage.t
+t/lib/FalkorDBTests.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

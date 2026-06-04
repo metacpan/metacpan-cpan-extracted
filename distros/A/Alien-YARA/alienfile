@@ -9,9 +9,19 @@ probe sub {
 
 share {
   start_url 'https://github.com/VirusTotal/yara/archive/refs/tags/v4.5.0.tar.gz';
+
   plugin 'Download' => (
-    filter => qr/^v?([\d\.]+)\.tar\.gz$/,
+    filter => qr/^yara-?([\d\.]+)\.tar\.gz$/,
   );
   plugin 'Extract' => 'tar.gz';
-  plugin 'Build::Autoconf';
+
+  # This plugin provides standard helpers including %{alien_prefix} and %{make}
+  plugin 'Core::Setup';
+
+  build [
+    'sh bootstrap.sh',
+    './configure --prefix=%{alien_prefix} --with-pic --disable-shared',
+    '%{make}',
+    '%{make} install',
+  ];
 };

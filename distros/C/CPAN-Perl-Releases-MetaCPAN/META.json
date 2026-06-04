@@ -31,7 +31,7 @@
    "provides" : {
       "CPAN::Perl::Releases::MetaCPAN" : {
          "file" : "lib/CPAN/Perl/Releases/MetaCPAN.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.0.1"
       }
    },
    "release_status" : "stable",
@@ -46,7 +46,7 @@
          "web" : "https://github.com/skaji/CPAN-Perl-Releases-MetaCPAN"
       }
    },
-   "version" : "v1.0.0",
+   "version" : "v1.0.1",
    "x_contributors" : [
       "Chris 'BinGOs' Williams <chris@bingosnet.co.uk>",
       "Grinnz <grinnz@gmail.com>",

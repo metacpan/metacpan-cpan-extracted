@@ -1,0 +1,55 @@
+{
+   "abstract" : "Perl client module for FalkorDB",
+   "author" : [
+      "Gabor Szabo"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "FalkorDB",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON::PP" : "0",
+            "Redis::Fast" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/szabgab/FalkorDB-Perl/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/szabgab/FalkorDB-Perl.git",
+         "web" : "https://github.com/szabgab/FalkorDB-Perl"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

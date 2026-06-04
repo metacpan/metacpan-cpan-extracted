@@ -68,4 +68,22 @@ foreach my $def ( @$tests )
 
 done_testing();
 
+# NOTE: OpenBSD global destruction workaround
+# On OpenBSD, a double free deep in the SQLite-backed dependency stack corrupts the heap during
+# perl's global destruction. The OpenBSD allocator is strict and aborts the process on exit, which
+# the harness then misreads as a failure even though every assertion above has already passed.
+# Once done_testing() has emitted the TAP stream, we flush the standard handles and hard-exit,
+# bypassing global destruction entirely. This is restricted to OpenBSD so that normal teardown,
+# and the diagnostics it can surface, are preserved on every other platform.
+if( $^O eq 'openbsd' )
+{
+    my $builder = Test::More->builder;
+    my $passing = $builder->can( 'is_passing' ) ? $builder->is_passing : 1;
+    require IO::Handle;
+    STDOUT->flush;
+    STDERR->flush;
+    require POSIX;
+    POSIX::_exit( $passing ? 0 : 1 );
+}
+
 __END__

@@ -165,10 +165,11 @@ subtest 'from_file() - error handling' => sub
 $magic->flags( $MAGIC_MIME_TYPE );
 
 my @buffer_tests = (
-    # [ label,          bytes,                                       expected_mime      ]
-    [ 'gzip',           "\x1f\x8b\x08\x00"  . ( "\x00" x 100 ),     'application/gzip'  ],
-    [ 'pdf',            "%PDF-1.4"          . ( "\x00" x 100 ),     'application/pdf'   ],
-    [ 'plain text',     "The quick brown fox jumps\n" x 30,         'text/plain'        ],
+    # [ label,          bytes,                                      expected_mime      ]
+    # Issue on freebsd-10.3-release-p11 revealed by smoker
+    [ 'gzip',           "\x1f\x8b\x08\x00"  . ( "\x00" x 100 ),     qr{^application/(x-)?gzip$}  ],
+    [ 'pdf',            "%PDF-1.4"          . ( "\x00" x 100 ),     'application/pdf'            ],
+    [ 'plain text',     "The quick brown fox jumps\n" x 30,         'text/plain'                 ],
 );
 
 foreach my $t ( @buffer_tests )
@@ -176,7 +177,14 @@ foreach my $t ( @buffer_tests )
     my( $label, $buf, $expected ) = @$t;
     my $r = $magic->from_buffer( $buf );
     ok( defined( $r ), "from_buffer($label) returns a value" );
-    is( $r, $expected, "from_buffer($label): " . ( $r // '(undef)' ) );
+    if( ref( $expected ) eq 'Regexp' )
+    {
+        like( $r, $expected, "from_buffer($label): " . ( $r // '(undef)' ) );
+    }
+    else
+    {
+        is( $r, $expected, "from_buffer($label): " . ( $r // '(undef)' ) );
+    }
 }
 
 # NOTE: from_file() - ZIP and PNG via temp files

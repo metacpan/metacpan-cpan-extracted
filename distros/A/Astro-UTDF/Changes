@@ -1,3 +1,13 @@
+0.013		2026-06-03	T. R. Wyant
+    Add Haisam Ido's Python version to "SEE ALSO".
+
+    Update metadata for loss of the cpan.org mail forwarding, and
+    consequently of the RT bug tracking system.
+
+    Repackage licenses so GitHub can find them.
+
+    Add CONTRIBUTING, SECURITY.
+
 0.012		2021-08-09	T. R. Wyant
     Correct generation of 'provides' metadata.  Thanks to Favio Poletti
     for blogging

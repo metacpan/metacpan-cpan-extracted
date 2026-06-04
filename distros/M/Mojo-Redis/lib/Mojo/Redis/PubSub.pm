@@ -250,8 +250,8 @@ negative value.
 
 =head2 redis
 
-  $conn   = $pubsub->connection;
-  $pubsub = $pubsub->connection(Mojo::Redis->new);
+  $conn   = $pubsub->redis;
+  $pubsub = $pubsub->redis(Mojo::Redis->new);
 
 Holds a L<Mojo::Redis> object used to create the connections to talk with Redis.
 

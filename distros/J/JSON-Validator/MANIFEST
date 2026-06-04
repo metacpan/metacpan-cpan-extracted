@@ -1,6 +1,7 @@
 Changes
 CONTRIBUTING.md
-JSON-Validator-5.14.tar.gz
+JSON-Validator-5.15/META.json
+JSON-Validator-5.15/META.yml
 lib/JSON/Validator.pm
 lib/JSON/Validator/cache/089e74a6d17f64af17a9efd6d0fa0de6
 lib/JSON/Validator/cache/10a5eeb37fcd5d829449028f7ceb0774
@@ -102,6 +103,7 @@ t/openapiv2-readonly.t
 t/openapiv2-routes.t
 t/openapiv3-basic.t
 t/openapiv3-coerce-array.t
+t/openapiv3-content-types.t
 t/openapiv3-default-values.t
 t/openapiv3-discriminator.t
 t/openapiv3-nullable.t

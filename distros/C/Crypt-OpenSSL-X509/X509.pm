@@ -8,7 +8,7 @@ use base qw(Exporter);
 
 use Convert::ASN1;
 
-use version; our $VERSION = version->declare('2.0.1');
+use version; our $VERSION = version->declare('2.1.1');
 
 our @EXPORT_OK = qw(
   FORMAT_UNDEF FORMAT_ASN1 FORMAT_TEXT FORMAT_PEM
@@ -255,6 +255,26 @@ Crypt::OpenSSL::X509 - Perl extension to OpenSSL's X509 API.
   certificates where there is a X509v3 Extension of the form
   "X509v3 Subject Alternative Name: email=user@domain".
 
+=head2 SUPPORTED OPENSSL VERSIONS
+
+This module supports multiple versions of OpenSSL and maintains backward compatibility:
+
+=over 4
+
+=item OpenSSL 1.0.x - Legacy support (1.0.2 and later)
+
+=item OpenSSL 1.1.x - Full support
+
+=item OpenSSL 3.x - Full support (current stable)
+
+=item OpenSSL 4.x - Full support (with ASN1 opaque structure compatibility)
+
+=item LibreSSL 2.x/3.x - Compatible
+
+=back
+
+OpenSSL 4.0.0 introduced opaque ASN1 string types, requiring the use of accessor functions instead of direct structure member access. This module uses conditional compilation to maintain compatibility across all versions while supporting the new OpenSSL 4.x API requirements.
+
 =head2 EXPORT
 
 None by default.
@@ -413,7 +433,31 @@ Return true if the certificate has the extension specified by C<OID>.
 =item subjectaltname ( )
 
 Uses Convert::ASN1 to extract the Subject Alternative Names from the X509 object.
-subjectaltname ( ) returns an array of "rfc822Name"s
+subjectaltname ( ) returns an array of objects, each object representing a SAN.
+
+These could be of the following types (as defined in the embedded ASN.1 schema):
+
+=over 4
+
+=item * rfc822Name — email address (IA5String)
+
+=item * dNSName — DNS hostname (IA5String)
+
+=item * x400Address — X.400 address (ANY)
+
+=item * directoryName — Distinguished Name (RDNSequence)
+
+=item * ediPartyName — EDI party name (EDIPartyName)
+
+=item * uniformResourceIdentifier — URI (IA5String)
+
+=item * iPAddress — IP address (OCTET STRING; 4 bytes IPv4, 16 bytes IPv6)
+
+=item * registeredID — OID (OBJECT IDENTIFIER)
+
+=back
+
+Note: C<otherName> (tag [0] in RFC 5280) is not implemented and will never appear in the output.
 
     [
         {
@@ -642,7 +686,7 @@ In alphabetical order.
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2004-2022 by Dan Sully
+Copyright 2004 by Dan Sully
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

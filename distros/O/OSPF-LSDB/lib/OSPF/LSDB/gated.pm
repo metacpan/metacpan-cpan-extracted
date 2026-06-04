@@ -1,5 +1,5 @@
 ##########################################################################
-# Copyright (c) 2010-2021 Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2010-2024 Alexander Bluhm <alexander.bluhm@gmx.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -82,20 +82,20 @@ my $OO   = qr/(On|Off)/;
 my $TAG  = qr/(?:$DEC|Invalid tag: $HEX)/;
 
 # convert short IP to long IP
-sub _s2lIP($) {
+sub _s2lIP {
     my $ip = $_[0].".0.0.0";
     $ip =~ /^$RE{net}{IPv4}{-keep}/;
     return $1;
 }
 
 # convert time to seconds
-sub _time2sec($) {
+sub _time2sec {
     my @a = split(/:/, "0:0:".$_[0]);
     return 60*(60*$a[-3] + $a[-2]) + $a[-1];
 }
 
 # convert On/Off to boolean 0/1
-sub _oo2bool($) { $_[0] eq "On" ? 1 : $_[0] eq "Off" ? 0 : undef }
+sub _oo2bool { $_[0] eq "On" ? 1 : $_[0] eq "Off" ? 0 : undef }
 
 sub get_dump {
     my OSPF::LSDB::gated $self = shift;
@@ -470,8 +470,8 @@ sub parse {
     } else {
 	@{$self->{dump}} = read_file($todo{file});
     }
-    my $skip = $todo{skip} + 1 if $todo{skip};
-    my($task, @ospf_lines);
+    my($skip, $task, @ospf_lines);
+    $skip = $todo{skip} + 1 if $todo{skip};
     my $n = 0;
     foreach (@{$self->{dump}}) {
 	$n++;

@@ -1,5 +1,19 @@
 Revision history for Perl module DateTime::Locale::FromCLDR
 
+v0.8.6 2026-06-03T19:18:57+0900
+    - t/01.locale.t: compare fractional CLDR values (territory_info -> literacy_percent)
+      numerically within a small tolerance instead of as strings, so the test no longer
+      fails on perls built with -Duselongdouble or -Dusequadmath, where the NV stringifies
+      with extra precision digits (such as '97.7000000000000028' instead of '97.7'). All
+      other values keep an exact string comparison.
+    - t/01.locale.t: added the OpenBSD v5.12.0 to v5.12.5 skip guard that was already
+      present in t/02, t/03 and t/05. On those old OpenBSD perls the heavy locale test
+      was killed during teardown, whereas the lighter test files pass and are therefore
+      left running.
+    - Worked around an OpenBSD double free in the SQLite-backed dependency stack during
+      global destruction by flushing and hard-exiting after done_testing() on OpenBSD, so a
+      teardown crash no longer makes the harness report a failure when every assertion passed.
+
 v0.8.5 2026-05-20T06:21:05+0900
     - Correcting circular dependency on DateTime::Lite
 
@@ -32,8 +46,10 @@ v0.5.0 2024-10-10T12:36:14+0900
     - Added method number_system_digits()
 
 v0.4.3 2024-09-28T15:15:10+0900
-    - Improving the algorithm of the method interval_greatest_diff with the introduction of the option 'day_period_first'
-    - Updated methods format_gmt, format_timezone_location, format_timezone_non_location, has_dst, interval_format, timezone_city, _am_pm, _date_time_format
+    - Improving the algorithm of the method interval_greatest_diff with the introduction
+      of the option 'day_period_first'
+    - Updated methods format_gmt, format_timezone_location, format_timezone_non_location,
+      has_dst, interval_format, timezone_city, _am_pm, _date_time_format
     - Added method number_symbols
 
 v0.4.2 2024-09-24T18:57:03+0900
@@ -65,9 +81,11 @@ v0.2.1 2024-09-10T13:50:59+0900
 
 v0.2.0 2024-09-09T18:49:35+0900
     - Added more am_pm methods for several formats width and associated documentation
-    - Improved the day_period methods to allow fallback to AM/PM if day period is midnight or noon and there is no data, as per the LDML specifications
+    - Improved the day_period methods to allow fallback to AM/PM if day period is
+      midnight or noon and there is no data, as per the LDML specifications
     - Modified method error() to return an array reference when caller is expecting one
-    - Added complex timezone formatting methods 'format_timezone_non_location' and 'format_timezone_location'
+    - Added complex timezone formatting methods 'format_timezone_non_location' and
+      'format_timezone_location'
 
 v0.1.1 2024-08-02T08:37:29+0900
     - Documentation update

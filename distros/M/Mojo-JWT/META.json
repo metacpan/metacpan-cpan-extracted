@@ -4,7 +4,7 @@
       "Joel Berger, <joel.a.berger@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "App::ModuleBuildTiny version 0.042",
+   "generated_by" : "App::ModuleBuildTiny version 0.051",
    "license" : [
       "perl_5"
    ],
@@ -36,7 +36,7 @@
    "provides" : {
       "Mojo::JWT" : {
          "file" : "lib/Mojo/JWT.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       }
    },
    "release_status" : "stable",
@@ -51,7 +51,8 @@
          "url" : "http://github.com/jberger/Mojo-JWT"
       }
    },
-   "version" : "1.01",
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "version" : "1.02",
+   "x_generated_by_perl" : "v5.38.5",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

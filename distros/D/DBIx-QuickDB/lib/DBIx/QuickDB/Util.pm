@@ -2,7 +2,7 @@ package DBIx::QuickDB::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.000045';
+our $VERSION = '0.000046';
 
 use File::Path qw/remove_tree/;
 use IPC::Cmd qw/can_run/;
@@ -10,7 +10,18 @@ use Carp qw/confess/;
 
 use Importer Importer => 'import';
 
-our @EXPORT_OK = qw/clone_dir strip_hash_defaults/;
+our @EXPORT_OK = qw/clone_dir strip_hash_defaults env_timeout/;
+
+# Read a positive-integer timeout (in seconds) from an environment variable,
+# falling back to $default when it is unset or not a positive integer. Used to
+# make the server start/stop timeouts generous-but-tunable so slow hosts (e.g.
+# CPAN smoke boxes) do not spuriously time out.
+sub env_timeout {
+    my ($name, $default) = @_;
+    my $val = $ENV{$name};
+    return $val if defined($val) && $val =~ /^\d+$/ && $val > 0;
+    return $default;
+}
 
 my ($RSYNC, $CP);
 

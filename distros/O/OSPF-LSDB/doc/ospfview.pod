@@ -5,7 +5,7 @@ ospfview - periodically display OSPF LSDB as Graphviz dot xlib
 =head1 SYNOPSIS
 
 ospfview
-[-46bBcdDeEhlpPsSwWv]
+[-46bBcdDeEhlpPsSvwW]
 [-H user@host]
 [-I interval]
 
@@ -116,6 +116,10 @@ Display IP network summary LSAs.
 Display IP network summary LSAs aggregated.
 A single node contains all networks advertised from the same router.
 
+=item -v
+
+Be verbose and print all warnings to stderr.
+
 =item -w
 
 Show the most serious warning as in the dot graph.
@@ -125,10 +129,6 @@ If there is no warning, the area is displayed.
 =item -W
 
 Show the all areas and warnings in the dot graph.
-
-=item -v
-
-Be verbose and print all warnings to stderr.
 
 =back
 

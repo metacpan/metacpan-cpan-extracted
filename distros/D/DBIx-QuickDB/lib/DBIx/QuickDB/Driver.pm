@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver;
 use strict;
 use warnings;
 
-our $VERSION = '0.000045';
+our $VERSION = '0.000046';
 
 use Carp qw/croak confess/;
 use File::Path qw/remove_tree/;
@@ -11,7 +11,7 @@ use POSIX ":sys_wait_h";
 use Scalar::Util qw/blessed/;
 use Time::HiRes qw/sleep time/;
 
-use DBIx::QuickDB::Util qw/clone_dir/;
+use DBIx::QuickDB::Util qw/clone_dir env_timeout/;
 
 use DBIx::QuickDB::Watcher;
 
@@ -317,11 +317,15 @@ sub start {
 
     my $watcher = $self->{+WATCHER} = DBIx::QuickDB::Watcher->new(db => $self, args => \@args);
 
+    # Defaults to 10s; tunable via QDB_START_TIMEOUT for slow hosts that need
+    # longer to bring a server up (e.g. a clone doing crash recovery).
+    my $timeout = env_timeout(QDB_START_TIMEOUT => 10);
+
     my $start = time;
     until (-S $socket) {
         my $waited = time - $start;
 
-        if ($waited > 10) {
+        if ($waited > $timeout) {
             my $error_log = $self->read_error_log;
             $watcher->eliminate();
             confess "Timed out waiting for server to start\n$error_log";
@@ -370,9 +374,13 @@ sub stop {
         # unix socket file: a server killed with SIGKILL (e.g. a slow shutdown
         # that blew the watcher's grace period) never gets to remove its socket,
         # so waiting for the socket to disappear would hang and then time out.
+        # The watcher escalates to SIGKILL after QDB_STOP_GRACE and gives up at
+        # twice that; outlast the watcher's give-up so we never confess before
+        # it has finished reaping the server. Defaults to 10s (grace 4).
+        my $stop_timeout = env_timeout(QDB_STOP_GRACE => 4) * 2 + 2;
         my $start = time;
         while ($server_pid && kill(0, $server_pid)) {
-            confess "Timed out waiting for server to stop" if time - $start > 10;
+            confess "Timed out waiting for server to stop" if time - $start > $stop_timeout;
             sleep 0.01;
         }
 

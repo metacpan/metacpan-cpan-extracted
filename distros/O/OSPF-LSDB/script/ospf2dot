@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 ##########################################################################
-# Copyright (c) 2010-2012 Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2010-2024 Alexander Bluhm <alexander.bluhm@gmx.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -24,12 +24,12 @@ use OSPF::LSDB::View;
 use OSPF::LSDB::View6;
 use OSPF::LSDB::YAML;
 
-sub usage(@) {
+sub usage {
     print STDERR "Error: @_\n" if @_;
     print STDERR <<EOF;
 Convert OSPF LSDB in YAML format to dot file used by Graphviz.
 
-Usage: $0 [-46bBceEhlpPsSwWv] [ospf.yaml] [ospf.dot]
+Usage: $0 [-46bBceEhlpPsSvwW] [ospf.yaml] [ospf.dot]
     -4          disable IPv6
     -6          enable IPv6
     -b          generate other area AS boundary router summary
@@ -43,9 +43,9 @@ Usage: $0 [-46bBceEhlpPsSwWv] [ospf.yaml] [ospf.dot]
     -P          generate intra-area-prefix
     -s          generate other area network summary
     -S          aggregate other area network summary
+    -v          be verbose, print warnings to stderr
     -w          show most serious warning in dot graph
     -W          show all warnings and areas in dot graph
-    -v          be verbose, print warnings to stderr
     ospf.yaml   input file, default stdin
     ospf.dot    output file, default stdout
 EOF
@@ -89,8 +89,17 @@ sub main() {
     }
 
     if ($legend) {
+	usage("Only one argument allowed") if @ARGV > 1;
 	my $class = $ipv6 ? 'OSPF::LSDB::View6' : 'OSPF::LSDB::View';
-	print $class->legend();
+	if (@ARGV > 0) {
+	    open(my $fh, '>', $ARGV[0])
+		or die "Open file '$ARGV[0]' for writing failed: $!";
+	    print $fh $class->legend();
+	    close($fh)
+		or die "Close file '$ARGV[0]' after writing failed: $!";
+	} else {
+	    print $class->legend();
+	}
 	exit 0;
     }
 

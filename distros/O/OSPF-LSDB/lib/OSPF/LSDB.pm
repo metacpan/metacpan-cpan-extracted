@@ -1,5 +1,5 @@
 #########################################################################
-# Copyright (c) 2010-2021 Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2010-2024 Alexander Bluhm <alexander.bluhm@gmx.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -62,7 +62,7 @@ upgrade the file.
 
 =cut
 
-our $VERSION = '1.18';
+our $VERSION = '1.19';
 
 =pod
 
@@ -78,7 +78,7 @@ instances and use their specific features.
 
 sub new {
     my OSPF::LSDB $self = shift;
-    my $other = shift if UNIVERSAL::isa($_[0], "OSPF::LSDB");
+    my $other = UNIVERSAL::isa($_[0], "OSPF::LSDB") ? shift : undef;
     my %args = @_;
     $self = fields::new($self) unless (ref $self);
     $self->{ospf}{version} = $VERSION;

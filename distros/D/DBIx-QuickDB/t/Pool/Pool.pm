@@ -1,6 +1,26 @@
 package Test::Pool;
 BEGIN { $INC{'Test/Pool.pm'} = __FILE__ }
 
+# These pool tests build, clone, start, and stop many servers in sequence. On a
+# slow or loaded host (e.g. a CPAN smoke box) the library's default start/stop
+# timeouts are too tight and the test spuriously fails. Ask for generous
+# timeouts here -- this only affects the test, not normal consumers of the
+# library, which keep the default timeouts. Respect any value already set.
+#
+# Keep the stop grace small. stop() forces a CHECKPOINT first, so a SIGKILL
+# cannot corrupt a clone. Some servers (notably PostgreSQL 9.3, which the
+# FreeBSD smokers run) intermittently wedge during shutdown under this test's
+# rapid start/stop churn -- the postmaster acknowledges the shutdown signal but
+# never completes it (no clients connected), so it can only be reaped by the
+# eventual SIGKILL. Those stops never finish no matter how long we wait, so a
+# large grace just stalls each one for the whole window. A small grace reaps
+# them quickly; the start timeout stays generous since startup genuinely needs
+# time on a slow host.
+BEGIN {
+    $ENV{QDB_START_TIMEOUT} = 120 unless defined $ENV{QDB_START_TIMEOUT};
+    $ENV{QDB_STOP_GRACE}    = 5   unless defined $ENV{QDB_STOP_GRACE};
+}
+
 use Test2::V0 -target => 'DBIx::QuickDB::Pool';
 use File::Spec;
 use File::Temp qw/tempdir/;

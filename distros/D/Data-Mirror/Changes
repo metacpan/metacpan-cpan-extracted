@@ -1,3 +1,6 @@
+0.08 - 2026-06-04:
+  - use File::XDG and cache files in the user's .cache directory instead of /tmp.
+
 0.07 - 2024-10-18:
   - correctly set $VERSION in Mirror.pm so the user agent string is valid.
   - canonicalise URL when generating filename.

@@ -3,15 +3,16 @@ package Data::Mirror;
 use Carp;
 use Digest::SHA qw(sha256_hex);
 use Encode;
-use File::Basename qw(basename);
+use File::Basename qw(dirname basename);
+use File::Path qw(make_path);
 use File::Slurp;
 use File::Spec;
 use File::stat;
+use File::XDG;
 use HTTP::Date;
 use JSON::XS;
 use List::Util qw(any max);
 use LWP::UserAgent;
-use POSIX qw(getlogin);
 use Text::CSV_XS qw(csv);
 use XML::LibXML;
 use YAML::XS;
@@ -20,9 +21,9 @@ use base qw(Exporter);
 use open qw(:std :utf8);
 use strict;
 use utf8;
-use vars qw($VERSION %EXPORT_TAGS $TTL_SECONDS $UA $JSON $CSV);
+use vars qw($VERSION %EXPORT_TAGS $TTL_SECONDS $UA $JSON $CSV $XDG);
 
-$VERSION = '0.07';
+$VERSION = '0.08';
 
 $EXPORT_TAGS{'all'} = [qw(
     mirror_str
@@ -60,6 +61,10 @@ $CSV = Text::CSV_XS->new ({
 });
 
 
+
+$XDG = File::XDG->new(path_class => 'File::Spec', name => __PACKAGE__);
+
+
 sub mirror_file {
     my ($url, $ttl) = @_;
 
@@ -68,6 +73,9 @@ sub mirror_file {
     my $file = filename($url);
 
     return $file unless (stale($url));
+
+    my $dir = dirname($file);
+    croak(sprintf("Unable to create '%s'", $dir)) if (!-d $dir && !make_path($dir, { mode => 0700 }));
 
     #
     # update the local file
@@ -79,19 +87,22 @@ sub mirror_file {
         # if the response had the Expires: header, use that, otherwise use
         # the later of the current mtime or now
         #
-        my $expires = str2time($result->header('expires')) || max(stat($file)->mtime, time());
+        my $expires;
+
+        if ($result->header('expires')) {
+            $expires = str2time($result->header('expires'));
+
+        } else {
+            $expires = max(stat($file)->mtime, time());
+
+        }
 
         utime($expires, $expires, $file) if (-e $file);
     }
 
     carp($result->status_line) if ($result->code >= 400);
 
-    if (-e $file) {
-        chmod(0600, $file);
-        return $file;
-    }
-
-    return undef;
+    return $file;
 }
 
 
@@ -177,20 +188,11 @@ sub filename {
     my $url = shift;
 
     #
-    # the local filename is based on the hash of the URL, salted by the user's
-    # login
+    # the local filename is based on the hash of the URL
     #
     return File::Spec->catfile(
-        File::Spec->tmpdir,
-        join('.', (
-            __PACKAGE__,
-            sha256_hex(
-                getlogin(),
-                ':',
-                ($url->isa('URI') ? $url->canonical->as_string : $url),
-            ),
-            'dat'
-        ))
+        $XDG->cache_home,
+        sha256_hex($url->isa('URI') ? $url->canonical->as_string : $url).q{.dat},
     );
 }
 
@@ -225,14 +227,14 @@ Data::Mirror - a simple way to efficiently retrieve data from the World Wide Web
 
 =head1 VERSION
 
-version 0.07
+version 0.08
 
 =head1 SYNOPSIS
 
     use Data::Mirror qw(:all);
 
     # set the global time-to-live of all cached resources
-    $Data::Mirror::TTL = 30;
+    $Data::Mirror::TTL_SECONDS = 30;
 
     # get some data
     $file   = mirror_file($url);
@@ -324,6 +326,10 @@ variable to change how it processes JSON data.
 This is a L<Text::CSV_XS> object used for CSV parsing. You may wish to use this
 variable to change how it processes CSV data.
 
+=head2 $XDG
+
+This is a L<File::XDG> object used to obtain the user's cache directory.
+
 =head1 FUNCTIONS
 
 =head2 mirror_file()
@@ -333,12 +339,11 @@ resource. All the other functions listed in this section use C<mirror_file()>
 under the hood.
 
 C<Data::Mirror> will write local copies of files to the appropriate temporary
-directory (determined using C<L<File::Spec>-E<gt>tmpdir>) and tries to reduce
-the risk of collision by hashing the URL and the current username. This means
-that different programs, run by the same user, that use C<Data::Mirror> to
-retrieve the same URL, will effectively share a cache for that URL, but other
-users on the system will not. File permissions are set to C<0600> so other
-users cannot read the files.
+directory, determined using the C<$XDG-E<gt>cache_home()> (prior to v0.08, the
+value of C<File::Spec-E<gt>tmpdir()> was used). This means that different
+programs, run by the same user, that use L<Data::Mirror> to retrieve the same
+URL, will effectively share a cache for that URL, but other users on the system
+will not.
 
 =head2 mirror_str($url)
 

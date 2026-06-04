@@ -7,7 +7,7 @@ do { my $x = {
                       },
        'develop' => {
                       'recommends' => {
-                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.171',
+                                        'Dist::Zilla::PluginBundle::Author::ETHER' => '0.172',
                                         'Dist::Zilla::PluginBundle::Git::VersionManager' => '0.007'
                                       },
                       'requires' => {
@@ -37,11 +37,11 @@ do { my $x = {
                                         'Mojolicious::Plugin::OpenAPI::Modern' => '0.007'
                                       },
                       'requires' => {
-                                      'JSON::Schema::Modern' => '0.577',
+                                      'JSON::Schema::Modern' => '0.638',
                                       'List::Util' => '0',
                                       'Mojo::Base' => '0',
                                       'Mojolicious' => '9.0',
-                                      'OpenAPI::Modern' => '0.079',
+                                      'OpenAPI::Modern' => '0.133',
                                       'Role::Tiny' => '2.000001',
                                       'feature' => '0',
                                       'if' => '0',

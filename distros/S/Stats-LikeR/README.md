@@ -26,7 +26,7 @@ this is the equivalent of adding new rows, as well as `ljoin`, which is describe
 
 where the resulting hash-of-hash looks like:
 
-        {
+    {
         1st   {
             a   "A",
             b   "B"
@@ -87,6 +87,23 @@ You can also perform Two-Way ANOVA with categorical interactions using the `*` o
     my $res_2way = aov($data_2way, 'len ~ supp * dose');
 
 It is robust against rank deficiency; collinear terms will gracefully receive 0 degrees of freedom and 0 sum of squares, matching R's behavior.
+
+### Input Parameters
+
+| Parameter | Type | Default | Description | Example |
+| --- | --- | --- | --- | --- |
+| `data_sv` | `HashRef` | `ArrayRef` | *(Required)* | The dataset to analyze. Accepts a Hash of Arrays (HoA) or Array of Hashes (AoH). If no formula is provided, it must be an HoA to allow automatic stacking (mimicking R's `stack()` on a named list). |
+| `formula_sv` | `String` | `undef` | A symbolic description of the model to be fitted. If omitted, the formula automatically defaults to `'Value ~ Group'` and the input data is stacked. | `'yield ~ N * P'` |
+
+### Output Variables
+
+The function returns a single `HashRef` containing the evaluated statistical results. Because the keys map dynamically to the terms parsed from your formula, the structure will vary based on your inputs.
+
+| Parameter | Type | Default | Description | Example |
+| --- | --- | --- | --- | --- |
+| *(Term Name)* | `HashRef` | `undef` | A nested hash for each independent term in the formula (e.g., `'Group'`, `'N:P'`), containing its ANOVA table statistics. | `{'Df' => 1, 'Sum Sq' => 14.2, 'Mean Sq' => 14.2, 'F value' => 25.81, 'Pr(>F)' => 0.0004}` |
+| `Residuals` | `HashRef` | `undef` | A nested hash containing the residual (error) statistics for the fitted model. | `{'Df' => 10, 'Sum Sq' => 5.5, 'Mean Sq' => 0.55}` |
+| `group_stats` | `HashRef` | `undef` | A nested hash containing descriptive statistics (`mean` and `size` / count) for every column evaluated in the original unstacked data structure. | `{'mean' => {'A' => 2.1, 'B' => 5.4}, 'size' => {'A' => 10, 'B' => 10}}` |
 
 ### omitting formula
 
@@ -279,11 +296,37 @@ takes a hash of an array as input
     	family  => 'gaussian'
     );
 
-I'm not completely confident that this is working perfectly, though I've gotten this subroutine to work for simple cases.
-
 In addition to the `gaussian` default, it fully supports logistic regression using the `binomial` family parameter via Iteratively Reweighted Least Squares (IRLS):
 
     my $glm_bin = glm(formula => 'am ~ wt + hp', data => \%mtcars, family => 'binomial');
+
+### Input Parameters
+
+| Parameter | Type | Default | Description | Example |
+| --- | --- | --- | --- | --- |
+| `formula` | `String` | *None (Required)* | A symbolic description of the model to be fitted. Supports operators like `+`, `:`, `*`, `^`, and `-1` (to remove the intercept). | `'am ~ wt + hp'`, `'y ~ x - 1'` |
+| `data` | `HashRef` or `ArrayRef` | *None (Required)* | The dataset containing the variables used in the formula. Accepts either a Hash of Arrays (HoA) or an Array of Hashes (AoH). | `\%mtcars`, `[{x => 1, y => 2}, ...]` |
+| `family` | `String` | `'gaussian'` | A description of the error distribution and link function to be used in the model. Currently supports `'gaussian'` (identity link) and `'binomial'` (logit link). | `'binomial'` |
+
+### Output variables
+
+| Variable | Type | Description | Example |
+| --- | --- | --- | --- |
+| `aic` | `Double` | Akaike's Information Criterion for the fitted model. | `123.45` |
+| `boundary` | `Integer (Boolean)` | `1` if the fitted values computationally reached the `0` or `1` boundary (specific to the binomial family), `0` otherwise. | `0` |
+| `coefficients` | `HashRef` | A hash mapping the expanded model term names to their estimated coefficient values. | `{'Intercept' => 1.5, 'wt' => -0.5}` |
+| `converged` | `Integer (Boolean)` | `1` if the Iteratively Reweighted Least Squares (IRLS) algorithm converged within the maximum iterations, `0` otherwise. | `1` |
+| `deviance` | `Double` | The residual deviance of the fitted model. | `15.2` |
+| `deviance.resid` | `HashRef` | A hash mapping data row names to their computed deviance residuals. | `{'Mazda RX4' => 0.12}` |
+| `df.null` | `Integer` | The residual degrees of freedom for the null model. | `31` |
+| `df.residual` | `Integer` | The residual degrees of freedom for the fitted model. | `30` |
+| `family` | `String` | The statistical family used to fit the model. | `"gaussian"` |
+| `fitted.values` | `HashRef` | A hash mapping data row names to the fitted mean values (the model's predictions on the scale of the response). | `{'Mazda RX4' => 0.85}` |
+| `iter` | `Integer` | The number of IRLS iterations performed before convergence or hitting the iteration limit. | `4` |
+| `null.deviance` | `Double` | The deviance for the null model (a baseline model containing only an intercept, or an offset of 0 if the intercept is removed). | `43.5` |
+| `rank` | `Integer` | The numeric rank of the fitted linear model (the number of estimated, non-aliased parameters). | `2` |
+| `summary` | `HashRef` | A nested hash mapping each term to its detailed summary statistics, including `Estimate`, `Std. Error`, `t value` / `z value`, and `Pr(>|t|)` / `Pr(>|z|)`. Aliased parameters return `"NaN"`. | `{'wt' => {'Estimate' => -0.5, 'Std. Error' => 0.1, ...}}` |
+| `terms` | `ArrayRef` | An ordered list of the expanded term names included in the model matrix. | `['Intercept', 'wt', 'hp']` |
 
 ## group_by
 
@@ -466,6 +509,12 @@ the dot operator also works:
 
 You can also pass `byrow => 1` if you want the matrix populated row-wise instead of column-wise.
 
+As of version 0.10, parameters do not need to be named, so that `matrix` works more like R:
+
+    my $d = matrix(rnorm(32000), 1000, 32);
+
+works as `data`, `nrow`, and `ncol`
+
 ## max
 
     max(1,2,3);
@@ -606,6 +655,100 @@ Returns array of false-discovery-rate-corrected p-values, where methods availabl
     );
 
 It also allows configuring the test type (`type => 'one.sample'`, `'two.sample'`, `'paired'`) and alternative hypothesis (`alternative => 'one.sided'`). You can also pass `strict => 1` to strictly evaluate both tails of the distribution.
+
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `n` | Float | `undef` | Number of observations (per group for two-sample, pairs for paired). |
+| `delta` | Float | `undef` | True difference in means. |
+| `sd` | Float | 1.0 | Standard deviation. |
+| `sig_level` | Float | 0.05 | Significance level (Type I error probability). Also accepts `sig.level`. |
+| `power` | Float | `undef` | Power of test (1 minus Type II error probability). |
+| `type` | String | `"two.sample"` | Type of t-test: `"two.sample"`, `"one.sample"`, or `"paired"`. |
+| `alternative` | String | `"two.sided"` | One- or two-sided test: `"two.sided"`, `"one.sided"`, `"greater"`, or `"less"`. |
+| `strict` | Boolean | `FALSE` | Use strict interpretation of two-sided power calculations. |
+| `tol` | Float | ~`1.22e-4` | Numerical tolerance used for the internal root-finding algorithm. |
+
+## prcomp
+
+Principal Component Analysis
+
+### Options
+
+| Option | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `center` | Boolean | `1` (True) | If true, the variables are shifted to be zero-centered before the analysis takes place. |
+| `scale` | Boolean | `0` (False) | If true, the variables are scaled to have unit variance before the analysis takes place. *Note: If a column has zero variance, the function will `croak` to prevent division by zero.* |
+| `retx` | Boolean | `1` (True) | If true, the rotated data (the original data multiplied by the rotation matrix) is returned under the key `x`. |
+| `tol` | Number | `undef` | A value indicating the magnitude below which components should be omitted. Components are omitted if their standard deviation is less than or equal to `tol` times the standard deviation of the first component. |
+| `rank` | Integer | `undef` | Optionally specify a strict limit on the number of principal components to return. The function will return `min(rank, rows, columns)` components. |
+
+### Results
+
+### Returned Data Structure
+
+The `prcomp` function returns a HashRef containing the following keys representing the results of the Principal Component Analysis:
+
+| Key | Type | Description |
+| :--- | :--- | :--- |
+| `sdev` | ArrayRef[Number] | The standard deviations of the principal components. Mathematically, these are the square roots of the eigenvalues of the covariance matrix. |
+| `rotation` | ArrayRef[ArrayRef] | A 2D array representing the matrix of variable loadings (the eigenvectors). Each inner array represents a row, and the columns correspond to the principal components. |
+| `x` | ArrayRef[ArrayRef] | A 2D array containing the rotated data (often referred to as PCA scores). This is the original data projected onto the principal components. *Note: Only present if the `retx` option is true.* |
+| `center` | ArrayRef[Number] or `0` | The centering values used (typically the column means). Returns false (`0`) if centering was disabled. |
+| `scale` | ArrayRef[Number] or `0` | The scaling values used (typically the column standard deviations). Returns false (`0`) if scaling was disabled. |
+| `varnames` | ArrayRef[String] | The sorted names of the original variables. *Note: Only present if the input data was a Hash of Arrays (HoA) or a Hash of Hashes (HoH).* |
+
+### Using array of arrays
+
+    my $aoa = [ 
+        [2, 4], 
+        [4, 2], 
+        [6, 6] 
+    ];
+    
+    my $pca = prcomp($aoa);
+
+which returns
+
+    {
+        center     [
+            [0] 4,
+            [1] 4
+        ],
+        rotation   [
+            [0] [
+                    [0] 0.707106781186547,
+                    [1] 0.707106781186548
+                ],
+            [1] [
+                    [0] 0.707106781186548,
+                    [1] -0.707106781186547
+                ]
+        ],
+        scale      false,
+        sdev       [
+            [0] 2.44948974278318,
+            [1] 1.4142135623731
+        ],
+        x          [
+            [0] [
+                    [0] -1.41421356237309,
+                    [1] -1.4142135623731
+                ],
+            [1] [
+                    [0] -1.4142135623731,
+                    [1] 1.41421356237309
+                ],
+            [2] [
+                    [0] 2.82842712474619,
+                    [1] 2.22044604925031e-16
+                ]
+        ]
+    }
+
+### Hash of Arrays
+
+    my $hoa = { B => [4, 2, 6], A => [2, 4, 6] };
+    my $pca = prcomp($hoa);
 
 ## quantile
 
@@ -822,16 +965,15 @@ and then `summary(\@arr)`, or `summary(@arr)`
 
 ## t_test
 
-There are 1-sample and 2-sample t-tests:
+There are 1-sample and 2-sample t-tests, from one or two arrays:
 
-    my $t_test = t_test( $test_data[$i][$j], mu => mean( $test_data[$i][$j] ));
+    my $t_test = t_test( $array1, mu => mean( 0.2334 ));
 
 or 2-sample:
 
     $t_test = t_test(
-    	$test_data[3][0],
-    	$test_data[3][1],
-	    paired => true
+    	$array1,	$array2,
+	    paired => 1
     );
 
 returns a hash reference, which looks like:
@@ -847,10 +989,88 @@ returns a hash reference, which looks like:
 the two groups compared can be specified, though not necessarily, as `x` and `y`, just like in R:
 
     $t_test = t_test(
-    	'x' => test_data[3][0],
-    	'y' => $test_data[3][1],
-	    paired => true
+    	'x' => $array1, 'y' => $array2,
+	    paired => 1
     );
+
+### Parameters
+
+| Parameter | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `x` | Array Reference | Required | The first vector of data. Must contain at least 2 elements. |
+| `y` | Array Reference | `undef` | The second vector of data. Required for two-sample or paired tests. |
+| `mu` | Float | 0.0 | The true value of the mean (or difference in means) for the null hypothesis. |
+| `paired` | Boolean | `FALSE` | If true, performs a paired t-test. `x` and `y` must be the same length. |
+| `var_equal` | Boolean | `FALSE` | If true, assumes equal variances (standard two-sample). If false, performs Welch's t-test with unequal variances. |
+| `conf_level` | Float | 0.95 | Confidence level for the returned confidence interval. Must be between 0 and 1. |
+| `alternative` | String | `"two.sided"` | Direction of the alternative hypothesis: `"two.sided"`, `"less"`, or `"greater"`. |
+
+### Return Hash
+
+| Key | Description |
+| :--- | :--- |
+| `statistic` | The computed t-statistic. |
+| `df` | Degrees of freedom for the test. |
+| `p_value` | The calculated p-value based on the test directionality. |
+| `conf_int` | An Array Reference containing two elements: `[lower_bound, upper_bound]`. |
+| `estimate` | The estimated mean of `x` (one-sample) OR the mean of the differences (paired). |
+| `estimate_x` | The estimated mean of the `x` vector (only returned in two-sample tests). |
+| `estimate_y` | The estimated mean of the `y` vector (only returned in two-sample tests). |
+
+## value_counts
+
+Count the values in a given data set, return a hash reference showing how many times each particular value is present.
+
+### Scalar
+
+    $hash = value_counts('c');
+
+returns `{ c => 1 }`
+
+### Array reference
+
+    value_counts(['a','b','b']);
+
+returns `{ a => 1, b => 2}`
+
+### Array
+
+    my $value_counts = value_counts('a','b','b');
+
+like an array reference above, returns `{ a => 1, b => 2}`
+
+### Hash
+
+    my $value_counts = value_counts( { A => 'a', B => 'a', C => 'b' } );
+
+returns `{ a => 2, b => 1}`
+
+### Hash of array
+
+    my $value_counts = value_counts({ 'a' => ['j', 't', 't'], 'b' => ['j', 't', 'v']});
+
+without a key (like above), the occurences of `j`, `t`, and `v` are counted.
+
+With a key, like `a` for above, only values within that hash key are counted:
+
+    my $vc = value_counts({ 'a' => ['j', 't', 't'], 'b' => ['j', 't', 'v']}, 'a');
+
+### Hash of hash (table)
+
+    $hash = value_counts( {
+        A => {
+            a => 'x',
+            b => 'z'
+        },
+        B => {
+            a => 'x'
+        },
+        C => {
+	        a => 'y'
+        }
+    }, 'a');
+
+the column, or second hash key, that you wish to count, is specified at the command line
 
 ## var
 
@@ -870,19 +1090,15 @@ like `min`, `max`, etc., `var` can accept array references, to make code simpler
 As described by R: Performs an F test to compare the variances of two samples from normal populations
 
     use Stats::LikeR;
-    use Time::HiRes;
 
     my @x = (2.9, 3.0, 2.5, 2.6, 3.2);
     my @y = (3.8, 2.7, 4.0, 2.4);
 
-    my $t0 = Time::HiRes::time();
     my $vt = var_test(\@x, \@y);
-    my $t1 = Time::HiRes::time();
-    printf("var_tests in %g seconds.\n", $t1-$t0);
 
 also, conf_level can be set:
 
-    $vt = var_test(\@xk, \@yk, conf_level => 0.99);
+    $vt = var_test(\@x, \@y, conf_level => 0.99);
 
 as well as a ratio (from R: the hypothesized ratio of the population variances of `x` and `y`:
 
@@ -914,6 +1130,26 @@ undefined variables are printed as `NA` by default, but can be set as you wish u
 as of version 0.07, `write_table` determines comma and tab-separated delimiters from the filename, but will override if `sep` or `delim` are explicitly set.
 
 # changes
+
+## 0.11
+
+better POD formatting for tables
+
+addition of MANIFEST.skip to get better testing results on CPAN
+
+`glm`: bugfix for when there is no intercept in the formula, new test cases in t/glm.t
+
+`write_table` now accepts simple hashes as input, in addition to hash of arrays, hash of hashes, and arrays of hashes
+
+Better documentation for t-test
+
+## 0.10
+
+changes to compilation for CPAN, trying to get this work on Windows
+
+Addition of `prcomp` and `value_counts`
+
+`matrix` will work without key names, just like in R.  Testing for `matrix` has improved.
 
 ## 0.09
 

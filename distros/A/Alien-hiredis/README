@@ -1,34 +1,34 @@
-NAME
+Alien::hiredis
 
-    Alien::hiredis - Alien wrapper for hiredis
+This module provides the hiredis <https://github.com/redis/hiredis>
+minimalistic C client library for the Redis <https://redis.io> database.
+See Alien::Build::Manual::AlienUser for usage.
 
-DESCRIPTION
+INSTALLATION
 
-    This module provides the hiredis <https://github.com/redis/hiredis>
-    minimalistic C client library for the Redis <https://redis.io>
-    database. See Alien::Build::Manual::AlienUser for usage.
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-BUGS
+  cpanm .
+  cpan  .
+  cpanp -i .
 
-    Report any issues on the public bugtracker.
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
-AUTHOR
-
-    Dan Book <dbook@cpan.org>
+  perl Makefile.PL
+  make
+  make test
+  make install
 
 COPYRIGHT AND LICENSE
 
-    This software is Copyright (c) 2019 by Dan Book.
+This software is Copyright (c) 2019 by Dan Book.
 
-    This is free software, licensed under:
+This is free software, licensed under:
 
-      The Artistic License 2.0 (GPL Compatible)
+  The Artistic License 2.0 (GPL Compatible)
 
-    Bundled hiredis <https://github.com/redis/hiredis> library for share
-    installs is licensed under the (three-clause) BSD License. See its
-    COPYING file for details.
-
-SEE ALSO
-
-    Redis::hiredis, Protocol::Redis::XS
-
+Bundled hiredis <https://github.com/redis/hiredis> library for share
+installs is licensed under the (three-clause) BSD License. See its
+COPYING file for details.

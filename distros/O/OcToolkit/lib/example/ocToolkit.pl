@@ -181,9 +181,9 @@ $flag = $generateConfigTemplate  if defined $generateConfigTemplate;
 die("Flags -i -d -b -v -u -g can't be left empty.") if (defined $flag) && (length($flag) eq 2) && ($flag =~ /\-/ ); 
 
 my $clusterText = `oc config current-context`;
+$clusterText =~ s/\n//g;
 if((defined $cluster) && (lc($clusterText) !~ lc($cluster))){
-    print "Cluster you entered in -c flag '$cluster' doesn't correspondent to cluster that you are currently logged in.
-Press enter if you still want to continue or press ctrl+c to abort.";
+    print "Cluster you entered in -c flag '$cluster' doesn't correspondent to the cluster\n$clusterText\nthat you are currently logged in.\nPress enter if you still want to continue or press ctrl+c to abort.";
     my $continue = <>;
 }
 
@@ -195,7 +195,7 @@ if(defined $deleteInstances){
         @componentsDirArray    = (grep {$_ !~ /init/} @componentsDirArray);
         $myComponentDirs       = join( ';', @componentsDirArray);
     }
-    $myComponentDirs = "all" if not defined $myComponentDirs;
+    $myComponentDirs = "" if not defined $myComponentDirs;
     $cluster = "unknown" if not defined $cluster;
     print qx/oc project/;
     print "Deleting $myComponentDirs component(s) in '$deleteInstances' instance in '$cluster' cluster.

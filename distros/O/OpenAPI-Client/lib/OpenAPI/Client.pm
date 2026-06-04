@@ -9,7 +9,7 @@ use Scalar::Util qw(blessed);
 
 use constant DEBUG => $ENV{OPENAPI_CLIENT_DEBUG} || 0;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 has base_url => sub {
   my $self      = shift;
@@ -75,10 +75,18 @@ HERE
   return unless $schema->can('routes');    # In case it is not an OpenAPI spec
 
   for my $route ($schema->routes->each) {
-    next unless $route->{operation_id};
-    warn "[$class] Add method $route->{operation_id}() for $route->{method} $route->{path}\n" if DEBUG;
-    $class->_generate_method_bnb($route->{operation_id} => $route);
-    $class->_generate_method_p("$route->{operation_id}_p" => $route);
+    my $operation_id = $route->{operation_id};
+
+    unless ( $route->{operation_id} ) {
+      $operation_id = join '_', $route->{method}, $route->{path};
+      $operation_id =~ s|\{[^}]+\}|_|g;
+      $operation_id =~ s|[/-]|_|g;
+      $operation_id =~ s|__+|_|g;
+    }
+
+    warn "[$class] Add method $operation_id() for $route->{method} $route->{path}\n" if DEBUG;
+    $class->_generate_method_bnb($operation_id => $route);
+    $class->_generate_method_p("${operation_id}_p" => $route);
   }
 }
 
@@ -225,11 +233,11 @@ OpenAPI::Client - A client for talking to an Open API powered server
 
 =head1 DESCRIPTION
 
-L<OpenAPI::Client> can generating classes that can talk to an Open API server.
-This is done by generating a custom class, based on a Open API specification,
-with methods that transform parameters into a HTTP request.
-
-The generated class will perform input validation, so invalid data won't be
+L<OpenAPI::Client> generates objects that can talk to Open API servers.
+For each fresh OpenAPI contract given to the L</new> method, a custom subclass
+is created from the Open API specification, with methods corresponding
+to the operationIds. Parameters received by these methods are transformed
+into HTTP requests. Input validation is performed, so invalid data won't be
 sent to the server.
 
 Note that this implementation is currently EXPERIMENTAL, but unlikely to change!
@@ -237,10 +245,17 @@ Feedback is appreciated.
 
 =head1 SYNOPSIS
 
+=head2 Creating a client
+
+  use OpenAPI::Client;
+  $client = OpenAPI::Client->new("file:///path/to/api.json");
+
+The specification given to L</new> must point to a valid OpenAPI document.
+Several syntax variants are admitted -- see the L</new> method.
+
 =head2 Open API specification
 
-The specification given to L</new> need to point to a valid OpenAPI document.
-This document can be OpenAPI v2.x or v3.x, and it can be in either JSON or YAML
+The OpenAPI document can be in OpenAPI version v2.x or v3.x, and it can be in either JSON or YAML
 format. Example:
 
   openapi: 3.0.1
@@ -255,18 +270,15 @@ format. Example:
         operationId: listPets
         ...
 
-C<host>, C<basePath> and the first item in C<schemes> will be used to construct
-L</base_url>. This can be altered at any time, if you need to send data to a
-custom endpoint.
+
+The url specified in the OpenAPI document can be altered at any time, if you need to send data to another
+custom endpoint -- see the L</base_url> method.
+
 
 =head2 Client
 
 The OpenAPI API specification will be used to generate a sub-class of
-L<OpenAPI::Client> where the "operationId", inside of each path definition, is
-used to generate methods:
-
-  use OpenAPI::Client;
-  $client = OpenAPI::Client->new("file:///path/to/api.json");
+L<OpenAPI::Client> with additional methods corresponding to "operationId" inside of each path definition :
 
   # Blocking
   $tx = $client->listPets;
@@ -281,7 +293,7 @@ used to generate methods:
   $tx = $client->listPets({limit => 10});
 
 See L<Mojo::Transaction> for more information about what you can do with the
-C<$tx> object, but you often just want something like this:
+C<$tx> object. Often you just want something like this:
 
   # Check for errors
   die $tx->error->{message} if $tx->error;
@@ -296,7 +308,7 @@ L<Mojo::Transaction/res> for some of the most used methods in that class.
 
 =head2 Custom server URL
 
-If you want to request a different server than what is specified in the Open
+If you want to request another server than the one specified in the Open
 API document, you can change the L</base_url>:
 
   # Pass on a Mojo::URL object to the constructor
@@ -312,7 +324,7 @@ API document, you can change the L</base_url>:
 
 =head2 Custom content
 
-You can send XML or any format you like, but this require you to add a new
+You can send XML or any format you like, but this requires you to add a new
 "generator":
 
   use Your::XML::Library "to_xml";
@@ -334,7 +346,7 @@ See L<Mojo::UserAgent::Transactor> for more details.
 
 This event is emitted after a L<Mojo::UserAgent::Transactor> object has been
 built, just before it is passed on to the L</ua>. Note that all validation has
-already been run, so alternating the C<$tx> too much, might cause an invalid
+already been run, so altering the C<$tx> too much might cause an invalid
 request on the server side.
 
 A special L<Mojo::Message::Request/env> variable will be set, to reference the
@@ -360,17 +372,46 @@ or from C<servers> in the OpenAPI v3 specification.
 
 Returns a L<Mojo::UserAgent> object which is used to execute requests.
 
-=head1 METHODS
+=head1 CLASS METHODS
+
+=head2 new
+
+  $client = OpenAPI::Client->new($specification, \%attributes);
+  $client = OpenAPI::Client->new($specification, %attributes);
+
+Returns an object of a dynamic subclass of C<OpenAPI::Client>, 
+with methods generated from the OpenAPI specification located at C<$specification>. 
+Such subclasses are cached, so several invocations of C<new()> with the same
+C<$specification> URL will result in several instances of the same subclass.
+
+The C<$specification> argument can accept various syntaxes -- see L<JSON::Validator/schema>.
+
+Extra C<%attributes> can be:
+
+=over 2
+
+=item app
+
+Can be used to run against a local L<Mojolicious> instance instead of issuing real
+HTTP calls to a remote server.
+
+=item coerce
+
+See L<JSON::Validator/coerce>. Default to "booleans,numbers,strings".
+
+=back
+
+
+=head1 INSTANCE METHODS
 
 =head2 call
 
   $tx = $client->call($operationId => \%params, %content);
   $client = $client->call($operationId => \%params, %content, sub { my ($client, $tx) = @_; });
 
-Used to either call an C<$operationId> that has an "invalid name", such as
-"list pets" instead of "listPets" or to call an C<$operationId> that you are
-unsure is supported yet. If it is not, an exception will be thrown,
-matching text "No such operationId".
+Used to call an C<$operationId> that is not a proper Perl method name, such as
+"list pets" instead of "listPets", or to check if an C<$operationId> is supported.
+Unsupported operationIds throw an exception matching text "No such operationId".
 
 C<$operationId> is the name of the resource defined in the
 L<OpenAPI specification|https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#operation-object>.
@@ -378,13 +419,16 @@ L<OpenAPI specification|https://github.com/OAI/OpenAPI-Specification/blob/master
 C<$params> is optional, but must be a hash ref, where the keys should match a
 named parameter in the L<OpenAPI specification|https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#parameter-object>.
 
-C<%content> is used for the body of the request, where the key need to be
+C<%content> is used for the body of the request, where the key needs to be
 either "body" or a matching L<Mojo::UserAgent::Transactor/generators>. Example:
 
   $client->addHero({}, body => "Some data");
   $client->addHero({}, json => {name => "Supergirl"});
 
-C<$tx> is a L<Mojo::Transaction> object.
+Like in L<Mojo::UserAgent>, an additional coderef argument can be supplied in last position.
+In that case the call is asynchronous, and the coderef will be called as a continuation
+callback, with two arguments C<$client> (the current openAPI client) and C<$tx>
+(a L<Mojo::Transaction> object). See L<Mojolicious::Guides::Cookbook/Non-blocking> for details.
 
 =head2 call_p
 
@@ -393,41 +437,16 @@ C<$tx> is a L<Mojo::Transaction> object.
 
 As L</call> above, but returns a L<Mojo::Promise> object.
 
-=head2 new
-
-  $client = OpenAPI::Client->new($specification, \%attributes);
-  $client = OpenAPI::Client->new($specification, %attributes);
-
-Returns an object of a generated class, with methods generated from the Open
-API specification located at C<$specification>. See L<JSON::Validator/schema>
-for valid versions of C<$specification>.
-
-Note that the class is cached by perl, so loading a new specification from the
-same URL will not generate a new class.
-
-Extra C<%attributes>:
-
-=over 2
-
-=item * app
-
-Specifying an C<app> is useful when running against a local L<Mojolicious>
-instance.
-
-=item * coerce
-
-See L<JSON::Validator/coerce>. Default to "booleans,numbers,strings".
-
-=back
-
 =head2 validator
 
   $validator = $client->validator;
   $validator = $class->validator;
 
-Returns a L<JSON::Validator::Schema::OpenAPIv2> object for a generated class.
-Note that this is a global variable, so changing the object will affect all
-instances returned by L</new>.
+Returns the L<JSON::Validator::Schema> object associated with the current generated class.
+Depending on the openAPI specification, this object will belong to the
+L<OpenAPIv2|JSON::Validator::Schema::OpenAPIv2> or
+L<OpenAPIv3|JSON::Validator::Schema::OpenAPIv3> subclass.
+This object global to the class, so changing it will affect all instances returned by L</new>.
 
 =head1 COPYRIGHT AND LICENSE
 
@@ -462,6 +481,8 @@ Jan Henning Thorsen - C<jhthorsen@cpan.org>
 =item * Roy Storey <kiwiroy@users.noreply.github.com>
 
 =item * Veesh Goldman <rabbiveesh@gmail.com>
+
+=item * Laurent Dami <dami@cpan.org>
 
 =back
 

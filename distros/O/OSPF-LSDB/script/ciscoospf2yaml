@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 ##########################################################################
-# Copyright (c) 2010-2012 Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2010-2024 Alexander Bluhm <alexander.bluhm@gmx.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -22,7 +22,7 @@ use Getopt::Long qw(:config posix_default bundling);
 use OSPF::LSDB::Cisco;
 use OSPF::LSDB::YAML;
 
-sub usage(@) {
+sub usage {
     print STDERR "Error: @_\n" if @_;
     print STDERR <<EOF;
 Convert Cisco OSPF link state database to YAML file.  If the show

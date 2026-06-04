@@ -1,5 +1,5 @@
 ##########################################################################
-# Copyright (c) 2010-2021 Alexander Bluhm <alexander.bluhm@gmx.net>
+# Copyright (c) 2010-2024 Alexander Bluhm <alexander.bluhm@gmx.net>
 #
 # Permission to use, copy, modify, and distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -68,10 +68,10 @@ use fields qw(
 my $IP = qr/$RE{net}{IPv4}{-keep}/;
 
 # convert prefix length to packed IPv4 address
-sub _prefix2pack($) { pack("B32", "1"x$_[0]."0"x(32-$_[0])) }
+sub _prefix2pack { pack("B32", "1"x$_[0]."0"x(32-$_[0])) }
 
 # convert packed IPv4 address to decimal dotted format
-sub _pack2ip($) { join('.', unpack("CCCC", $_[0])) }
+sub _pack2ip { join('.', unpack("CCCC", $_[0])) }
 
 sub ssh_show {
     my OSPF::LSDB::Cisco $self = shift;

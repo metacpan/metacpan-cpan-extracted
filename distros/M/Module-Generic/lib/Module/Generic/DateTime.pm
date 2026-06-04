@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/DateTime.pm
-## Version v0.6.4
+## Version v0.6.5
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2026/03/09
+## Modified 2026/06/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -60,7 +60,7 @@ BEGIN
     /x;
     $NUMBER_REAL_RE = qr/(?:(?i)(?:[-+]?)(?:(?=[.]?[0123456789])(?:[0123456789]*)(?:(?:[.])(?:[0123456789]{0,}))?)(?:(?:[E])(?:(?:[-+]?)(?:[0123456789]+))|))/;
     $NUMBER_INT_RE = qr/(?:(?:[-+]?)(?:[0123456789]+))/;
-    our $VERSION = 'v0.6.4';
+    our $VERSION = 'v0.6.5';
 };
 
 # use strict;
@@ -597,11 +597,11 @@ sub THAW
     if( $@ )
     {
         require Module::Generic;
-        warn( "Error thawing the DateTime::Lite object: $@\nParameters used were: ", Module::Generic->dump( $opts ) ) if( warnings::enabled() );
+        warn( "Error thawing the DateTime::Lite object: $@\nParameters used were: ", Module::Generic->dump( $opts ) ) if( warnings::enabled( 'Module::Generic' ) );
     }
     elsif( !defined( $dt ) )
     {
-        warn( "Error thawing the DateTime::Lite object: ", DateTime::Lite->error, "\nParameters used were: ", Module::Generic->dump( $opts ) ) if( warnings::enabled() );
+        warn( "Error thawing the DateTime::Lite object: ", DateTime::Lite->error, "\nParameters used were: ", Module::Generic->dump( $opts ) ) if( warnings::enabled( 'Module::Generic' ) );
     }
 
     my $new;
@@ -1084,7 +1084,7 @@ Module::Generic::DateTime - A DateTime wrapper for enhanced features
 
 =head1 VERSION
 
-    v0.6.4
+    v0.6.5
 
 =head1 DESCRIPTION
 
