@@ -1,7 +1,7 @@
 # ABSTRACT: Role providing sync lifecycle with retry and guard insurance
 
 package App::karr::Role::SyncLifecycle;
-our $VERSION = '0.300';
+our $VERSION = '0.301';
 use Moo::Role;
 use Carp qw( croak );
 
@@ -20,7 +20,7 @@ sub sync_before {
             print STDERR "Pull successful.\n" if $attempt > 1;
             last;
         }
-        $err = "git pull failed (exit code $?)";
+        $err = "git pull failed: " . ( $git->last_error // 'unknown error' );
         print STDERR "  $err\n";
         sleep 1 if $attempt < 3;
     }
@@ -44,7 +44,7 @@ sub sync_after {
             print STDERR "Push successful.\n" if $attempt > 1;
             last;
         }
-        $err = "git push failed (exit code $?)";
+        $err = "git push failed: " . ( $git->last_error // 'unknown error' );
         print STDERR "  $err\n";
         sleep 1 if $attempt < 3;
     }
@@ -66,7 +66,7 @@ App::karr::Role::SyncLifecycle - Role providing sync lifecycle with retry and gu
 
 =head1 VERSION
 
-version 0.300
+version 0.301
 
 =head1 DESCRIPTION
 

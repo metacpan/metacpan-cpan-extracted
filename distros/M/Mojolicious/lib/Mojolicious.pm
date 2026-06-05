@@ -57,7 +57,7 @@ has ua        => sub { Mojo::UserAgent->new };
 has validator => sub { Mojolicious::Validator->new };
 
 our $CODENAME = 'Waffle';
-our $VERSION  = '9.45';
+our $VERSION  = '9.46';
 
 sub BUILD_DYNAMIC {
   my ($class, $method, $dyn_methods) = @_;
@@ -1041,6 +1041,8 @@ Lars Balker Rasmussen
 Lee Johnson
 
 Leon Brocard
+
+Leon Timmermans
 
 Lukas Mai
 

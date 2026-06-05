@@ -62,18 +62,36 @@ static const mds_entity MDS_ENTITIES[] = {
 
 #include "mds_entities_full.h"
 
+/* Portable thread-local storage qualifier. Falls back to plain static
+ * if the compiler offers nothing — single-threaded callers are unaffected;
+ * multi-threaded callers building under such a compiler must serialise
+ * mds_entity_lookup themselves. */
+#if defined(__cplusplus) && __cplusplus >= 201103L
+#  define MDS_TLS thread_local
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L && !defined(__STDC_NO_THREADS__)
+#  define MDS_TLS _Thread_local
+#elif defined(__GNUC__) || defined(__clang__) || defined(__SUNPRO_C) || defined(__IBMC__)
+#  define MDS_TLS __thread
+#elif defined(_MSC_VER)
+#  define MDS_TLS __declspec(thread)
+#else
+#  define MDS_TLS /* no TLS available; falls back to plain static */
+#endif
+
 static inline const mds_entity* mds_entity_lookup(const char* name, size_t n) {
+    const mds_entity_full* f;
+    static MDS_TLS mds_entity scratch;
+    size_t i;
     /* Fast path: small high-frequency table (linear scan). */
-    for (size_t i = 0; i < MDS_ENTITY_COUNT; i++) {
+    for (i = 0; i < MDS_ENTITY_COUNT; i++) {
         if (MDS_ENTITIES[i].nlen == n &&
             memcmp(MDS_ENTITIES[i].name, name, n) == 0)
             return &MDS_ENTITIES[i];
     }
     /* Slow path: full HTML5 table (binary search). Return value reuses the
      * mds_entity layout so callers don't have to care which table hit. */
-    const mds_entity_full* f = mds_entity_full_lookup(name, n);
+    f = mds_entity_full_lookup(name, n);
     if (!f) return NULL;
-    static _Thread_local mds_entity scratch;
     scratch.name = f->name;
     scratch.nlen = f->nlen;
     scratch.utf8 = f->utf8;

@@ -11,7 +11,7 @@ role App::cpan2arch::CheckPackages;
 
 use List::Util qw< any uniq >;
 
-our $VERSION = 'v1.1.1';
+our $VERSION = 'v1.1.2';
 
 field $_mua_arch;
 field %_arch_prereqs :reader :writer;
@@ -97,6 +97,14 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
     my %prereqs;
     my %seen_pkgs;
 
+    # Regexes to validate Perl pkgs in Official/AUR repos.
+    my %RE = (
+        words   => qr{\b(?> Perl | CPAN )\b}ix,
+        url     => qr{\Ahttps?://(?> search\.m? | meta)cpan\.org/}x,
+        license => qr{(?> Perl | Artistic )}x,
+        name    => qr{(?> \Aperl- | \Aperl\z )}x,
+    );
+
     my sub build_pkgnames ($p)
     {
         # Some packages do not prepend the perl prefix or exclude 'app-' (e.g. ack,
@@ -121,11 +129,11 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
         );
 
         return
-            $res->{pkgdesc} =~ /\b(?> Perl | CPAN)\b/ix                      ? true
-          : $res->{url} =~ m{ \Ahttps?://(?> search\.m? | meta)cpan\.org/ }x ? true
-          : ( any { /(?> \Aperl- | \Aperl\z )/x } @vars )                    ? true
-          : ( any { /(?> Perl | Artistic)/x } $res->{licenses}->@* )         ? true
-          :                                                                    false;
+            $res->{pkgdesc} =~ $RE{words}                       ? true
+          : $res->{url} =~ $RE{url}                             ? true
+          : ( any { $_ =~ $RE{name} } @vars )                   ? true
+          : ( any { $_ =~ $RE{license} } $res->{licenses}->@* ) ? true
+          :                                                       false;
     }
 
     my sub is_aur_pkg ($res)
@@ -153,12 +161,12 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
         push @kwords,  $res->{Keywords}->@* if defined $res->{Keywords};
 
         return
-            ( any { /\b(?> Perl | CPAN)\b/ix } @kwords )              ? true
-          : $desc =~ /\b(?> Perl | CPAN)\b/ix                         ? true
-          : $url =~ m{ \Ahttps?://(?> search\.m? | meta)cpan\.org/ }x ? true
-          : ( any { /(?> \Aperl- | \Aperl\z )/x } @vars )             ? true
-          : ( any { /(?> Perl | Artistic)/x } @license )              ? true
-          :                                                             false;
+            ( any { $_ =~ $RE{words} } @kwords )    ? true
+          : $desc =~ $RE{words}                     ? true
+          : $url =~ $RE{url}                        ? true
+          : ( any { $_ =~ $RE{name} } @vars )       ? true
+          : ( any { $_ =~ $RE{license} } @license ) ? true
+          :                                           false;
     }
 
     # NOTE:
@@ -168,9 +176,7 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
         next unless defined $deps;
 
         foreach my ( $module, $info ) ( $deps->%* ) {
-            my $dist    = $info->{dist};
-            my $version = $info->{version};
-            my $failed  = $info->{failed};
+            my ( $dist, $version, $failed ) = $info->@{ qw< dist version failed > };
 
             $self->_pdump( '$var',    \$var,    '' );
             $self->_pdump( '$module', \$module, '' );
@@ -395,7 +401,7 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
                         @bulk_pkgs = reverse sort { length $a <=> length $b } @bulk_pkgs;
 
                         my $pat = join '|', map { "\Q$_\E" } @bulk_pkgs;
-                        $pkg_rx = qr{ \A(?'pkg' $pat)\z }x;
+                        $pkg_rx = qr{\A(?'pkg' $pat)\z}x;
                     }
 
                     $self->_pdump( '@pkgs',       \@pkgs,       '' );
@@ -511,7 +517,7 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
                             $found = is_aur_pkg($res) if $pkg !~ /\Aperl-/;
 
                             if ($found) {
-                                $version =~ s{\Av}{} if $version =~ /\Av/ && $res->{Version} !~ /\Av/;
+                                $version =~ s{\Av}{} if $version =~ /\Av/ && $res->{Version} !~ /\A(?> [0-9]+:)?v/x;
                                 my $date = _fmt_date( $res->{OutOfDate}, 'aur' );
 
                                 $prereqs{$var}{$pkg} = {
@@ -555,7 +561,7 @@ method _preproc_prereqs ( $core_modules, $perl, %pkgs )
                         $found = is_aur_pkg($res) if $pkg !~ /\Aperl-/;
 
                         if ($found) {
-                            $version =~ s{\Av}{} if $version =~ /\Av/ && $res->{Version} !~ /\Av/;
+                            $version =~ s{\Av}{} if $version =~ /\Av/ && $res->{Version} !~ /\A(?> [0-9]+:)?v/x;
                             my $date = _fmt_date( $res->{OutOfDate}, 'aur' );
 
                             $prereqs{$var}{$pkg} = {
@@ -611,11 +617,8 @@ method _postproc_prereqs (%prereqs)
 
     foreach my ( $var, $deps ) (%prereqs) {
         foreach my ( $pkg, $info ) ( $deps->%* ) {
-            my $flag_date = $info->{flag_date};
-            my $failed    = $info->{failed};
-            my $missing   = $info->{missing};
-            my $version   = $info->{version};
-            my $vertype   = reftype $version // '';
+            my ( $flag_date, $failed, $missing, $version ) = $info->@{ qw< flag_date failed missing version > };
+            my $vertype = reftype $version // '';
 
             # Do not require a version in Test::Simple because several dists have
             # been merged into it, e.g. Test::More, Test2::*. A Test2 dependency
@@ -768,7 +771,6 @@ method _get_corelist ($ver)
     my $perl_pkg_ver = do {
         try {
             version->parse($ver)->numify;
-
         }
         catch ($e) {
             warn $e;
@@ -785,8 +787,11 @@ method _get_corelist ($ver)
     }
 
     my $core_modules = Module::CoreList->find_version($perl_pkg_ver);
-    $core_modules = Module::CoreList->find_version($perl_cur_ver)  # Fallback
+
+    # Fallback
+    $core_modules = Module::CoreList->find_version($perl_cur_ver)
       unless defined $core_modules;
+
     #$self->_pdump('$core_modules', $core_modules, "\n");
 
     if ( !defined $core_modules ) {

@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::RuntimeControl;
 use strict;
 use warnings;
 
-our $VERSION = '3.90';
+our $VERSION = '4.03';
 
 use Getopt::Long qw(GetOptionsFromArray);
 
@@ -34,10 +34,11 @@ sub run_runtime_command {
     ) if $command eq 'log' || $command eq 'logs';
 
     return _run_lifecycle_command(
-        command => $command,
-        args    => $argv,
-        runtime => $runtime,
-        config  => $config,
+        command    => $command,
+        args       => $argv,
+        runtime    => $runtime,
+        config     => $config,
+        collectors => $collectors,
     ) if $command eq 'restart' || $command eq 'stop';
 
     die "Unsupported runtime control command '$command'\n";
@@ -54,6 +55,7 @@ sub _run_lifecycle_command {
     my @argv = @{ $args{args} };
     my $runtime = $args{runtime};
     my $config  = $args{config};
+    my $collectors = $args{collectors} || die "Missing collector store\n";
 
     my $scope = 'all';
     $scope = shift @argv if @argv && $argv[0] !~ /^-/ && $argv[0] =~ /\A(?:web|collector)\z/;
@@ -81,6 +83,9 @@ sub _run_lifecycle_command {
     die _lifecycle_usage($command) if $output ne 'json' && $output ne 'table';
     die _lifecycle_usage($command) if @argv;
     die "Collector name is required after '$command collector'\n" if $scope eq 'collector' && defined $target && $target eq '';
+    die "Unknown collector '$target'\n"
+      if $scope eq 'collector' && defined $target && $target ne ''
+      && !_collector_known( $collectors, $config, $target );
 
     my $progress = _lifecycle_progress(
         title => "dashboard $command progress",

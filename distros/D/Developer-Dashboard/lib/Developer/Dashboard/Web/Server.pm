@@ -3,7 +3,7 @@ package Developer::Dashboard::Web::Server;
 use strict;
 use warnings;
 
-our $VERSION = '3.90';
+our $VERSION = '4.03';
 
 use Capture::Tiny qw(capture);
 use Errno qw(EINTR);
@@ -219,11 +219,7 @@ sub _serve_ssl_frontend {
     local $SSL_SHUTDOWN_REQUESTED = 0;
     my %reaped_children;
     local $SIG{CHLD} = sub {
-        while (1) {
-            my $reaped = _waitpid( -1, 1 );
-            last if $reaped <= 0;
-            $reaped_children{$reaped} = 1;
-        }
+        _reap_ssl_children( \%reaped_children );
         return;
     };
 
@@ -471,6 +467,34 @@ sub _wait_for_managed_child {
 sub _waitpid {
     my ( $pid, $flags ) = @_;
     return waitpid( $pid, $flags );
+}
+
+# _track_reaped_child($reaped_children, $pid)
+# Records one locally reaped child pid so later shutdown waits can skip
+# already-collected children.
+# Input: hash reference used as the local reap set and one positive process id.
+# Output: true value.
+sub _track_reaped_child {
+    my ( $reaped_children, $pid ) = @_;
+    return 1 if ref($reaped_children) ne 'HASH';
+    return 1 if !defined $pid || $pid <= 0;
+    $reaped_children->{$pid} = 1;
+    return 1;
+}
+
+# _reap_ssl_children($reaped_children)
+# Reaps any exited SSL frontend/backend children and records them in the local
+# reap set used by shutdown helpers.
+# Input: hash reference used as the local reap set.
+# Output: true value.
+sub _reap_ssl_children {
+    my ($reaped_children) = @_;
+    while (1) {
+        my $reaped = _waitpid( -1, 1 );
+        last if $reaped <= 0;
+        _track_reaped_child( $reaped_children, $reaped );
+    }
+    return 1;
 }
 
 # _ssl_term_handler()

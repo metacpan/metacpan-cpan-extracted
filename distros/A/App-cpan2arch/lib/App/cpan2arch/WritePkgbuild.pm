@@ -22,7 +22,7 @@ use List::Util     qw<
 
 $|++;  # Disable STDOUT buffering.
 
-our $VERSION = 'v1.1.1';
+our $VERSION = 'v1.1.2';
 
 field $_install_license;
 field %_generated_meta;
@@ -52,7 +52,7 @@ method generate_pkgbuild ()
         # (Prefer M::B or M::B::T and use EU::MM as fallback)
 
         if ( !$meta{has_module_install} ) {
-            @has_mb = grep { /\Aperl-module-build(?> -tiny)? (?> [<>=] | \z)/x } $arch_prereqs{makedepends}->@*;
+            @has_mb = grep { /\Aperl-module-build(?> -tiny)? (?> [<>=] | \z )/x } $arch_prereqs{makedepends}->@*;
             $mb     = true if scalar @has_mb;
         }
 
@@ -164,12 +164,12 @@ method generate_pkgbuild ()
             END
 
         if ( $_pkgbuild{dist} =~ /\AAlien-/ ) {
-            $pkgbuild =~ s{ ^(?= _dist=) }{$NOTE_ALIEN}mx;
+            $pkgbuild =~ s{^(?= _dist= )}{$NOTE_ALIEN}mx;
         }
     }
 
     # Strip empty deps arrays.
-    $pkgbuild =~ s{ ^(?> make | check | opt )depends=\n }{}gmx;
+    $pkgbuild =~ s{^(?> make | check | opt )depends=\n}{}gmx;
 
     $_pkgbuild{output} = $pkgbuild;
 
@@ -213,7 +213,7 @@ method _get_pkgbuild_vars ()
             \K
             [A-Z] / [A-Z]{2} / [A-Z]{3,9} / \Q$meta{name}\E
         }
-        {\${_author::1}/\${_author::2}/\$_author/\$_dist-\$pkgver}xr,
+        {\${_author::1}/\${_author::2}/\$_author/\$_dist-\$pkgver}rx,
 
         sha256sums => $meta{checksum},
     );
@@ -486,7 +486,7 @@ method _build_license_array ()
 
     if ( defined $opts{update} ) {
         foreach my $license (@licenses) {
-            push $_generated_meta{license}->@*, $license->{name} =~ s{\A' | '\z}{}gxr;
+            push $_generated_meta{license}->@*, $license->{name} =~ s{\A' | '\z}{}grx;
         }
     }
 
@@ -499,16 +499,12 @@ method _build_license_array ()
           length reduce { length $a > length $b ? $a : $b } map { $_->{name} } @licenses;
 
         foreach my $info (@licenses) {
-            my $name = $info->{name};
-            my $desc = $info->{desc};
-            my $note = $info->{note};
+            my ( $name, $desc, $note ) = $info->@{ qw< name desc note > };
             my $pad1 = $SPACE x 2;
             my $pad2 = $pad1;
 
-            my $len_indent = length $indent;
-            my $len_name   = length $name;
-            my $len_pad1   = length $pad1;
-            my $len_pad2   = length $pad2;
+            my ( $len_indent, $len_name, $len_pad1, $len_pad2 ) =
+              map { length } ( $indent, $name, $pad1, $pad2 );
 
             if ( $len_name < $max_str ) {
                 $pad1 = $SPACE x ( $max_str - $len_name + $len_pad1 );
@@ -589,10 +585,8 @@ method _build_deps_array ($var)
             my $pad = $SPACE x 2;
 
             foreach my ( $pkg, $status ) ( $dep->%* ) {
-                my $failed  = $status->{failed};
+                my ( $failed, $missing, $date ) = $status->@{ qw< failed missing flag_date > };
                 my $version = $status->{version} ? " (version: $status->{version})" : '';
-                my $missing = $status->{missing};
-                my $date    = $status->{flag_date};
 
                 my $comment =
                     defined $failed  ? "Failed to fetch $pkg module$version.$nl"
@@ -753,6 +747,7 @@ method write_pkgbuild ()
         # References:
         #   https://wiki.archlinux.org/title/PKGBUILD#epoch
         #   https://man.archlinux.org/man/core/pacman/PKGBUILD.5.en#:~:text=epoch
+        #   https://man.archlinux.org/man/alpm-epoch.7
         #   https://man.archlinux.org/man/vercmp.8
         #   https://gitlab.archlinux.org/pacman/pacman/-/blob/master/lib/libalpm/version.c
         my $has_epoch = false;
@@ -795,7 +790,7 @@ method write_pkgbuild ()
                             $self->_pdbg("bump epoch to $epoch\n");
                         }
 
-                        if ( $gen_output =~ s{^pkgrel=[0-9]+\n\K}{epoch=$epoch\n}m ) {
+                        if ( $gen_output =~ s{^pkgrel=[^\n]+\n\K}{epoch=$epoch\n}m ) {
                             $has_epoch = true;
                             $self->_pdbg("add epoch\n");
                         }
@@ -1019,7 +1014,7 @@ method write_pkgbuild ()
         {
             @file_contents = path( $FILES{outfile} )->lines_utf8( { chomp => 1 } );
             @contributors =
-              grep { /\A \# \s*(?> (?> Co-)?Mai?ntainer | Contributor)\s*:\s* [^\n]+ \z/xi } @file_contents;
+              grep { /\A \# \s* (?> (?> Co-)?Mai?ntainer | Contributor )\s*:\s*[^\n]+\z/ix } @file_contents;
 
             $self->_pdump( '@file_contents', \@file_contents, "\n" );
             $self->_pdump( '@contributors',  \@contributors,  "\n" );
@@ -1048,17 +1043,17 @@ method write_pkgbuild ()
                 my @preserved;
 
                 foreach my $contrib (@contributors) {
-                    if ( $contrib =~ s{\A \# \s* (?> Co-)?Mai?ntainer \s*: \s*}{# Maintainer: }ix ) {
+                    if ( $contrib =~ s{\A \# \s* (?> Co-)?Mai?ntainer\s*:\s*}{# Maintainer: }ix ) {
                         push @preserved, $contrib;
                         next;
                     }
-                    push @preserved, $contrib =~ s{\A [^:]+: \s*}{# Contributor: }xr;
+                    push @preserved, $contrib =~ s{\A[^:]+:\s*}{# Contributor: }r;
                 }
 
                 @contributors = @preserved;
             }
             else {
-                @contributors = map { s{ \A [^:]+: \s* }{# Contributor: }xr } @contributors;
+                @contributors = map { s{\A[^:]+:\s*}{# Contributor: }r } @contributors;
             }
 
             my $attributions = join "\n", $maintainer, @contributors;
@@ -1072,7 +1067,7 @@ method write_pkgbuild ()
 
             if ( defined $ret && $ret == 0 ) {
                 my $pkgrel = ++$srcinfo_meta{pkgrel};
-                $gen_output =~ s{ ^pkgrel=\K [^\n]+$ }{$pkgrel}mx;
+                $gen_output =~ s{^pkgrel=\K[^\n]+$}{$pkgrel}m;
 
                 $self->_pdbg("bump pkgrel to $pkgrel\n\n");
 
@@ -1086,10 +1081,8 @@ method write_pkgbuild ()
         }
 
         # Preserve epoch
-        {
-            if ( exists $srcinfo_meta{epoch} && !$has_epoch ) {
-                $gen_output =~ s{^pkgrel=[0-9]+\n\K}{epoch=$srcinfo_meta{epoch}\n}m;
-            }
+        if ( exists $srcinfo_meta{epoch} && !$has_epoch ) {
+            $gen_output =~ s{^pkgrel=[^\n]+\n\K}{epoch=$srcinfo_meta{epoch}\n}m;
         }
 
         # Update

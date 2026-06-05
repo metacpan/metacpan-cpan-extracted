@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use XSLoader;
 
-our $VERSION = '0.500000';
+our $VERSION = '1.000001';
 
 eval {
     require HTTP::Headers::Fast;
@@ -305,7 +305,7 @@ HTTP::Headers::Fast.
 
 =head1 VERSION
 
-Version 0.500000
+Version 1.000001
 
 =head1 SYNOPSIS
 
@@ -573,9 +573,9 @@ attributes are.
 
 =over 4
 
-=item * Gonzalo Diethelm C<< gonzus AT cpan DOT org >>
+=item * Gonzalo Diethelm C<< gonzalo.diethelm AT gmail DOT com >>
 
-=item * Sawyer X C<< xsawyerx AT cpan DOT org >>
+=item * Sawyer X C<< xsawyerx AT gmail DOT com >>
 
 =back
 

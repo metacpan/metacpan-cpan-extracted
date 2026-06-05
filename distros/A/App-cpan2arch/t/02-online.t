@@ -132,11 +132,15 @@ subtest 'Unit test' => sub {
 
                     # Error
                     if ( $t =~ /\Abogus_/ ) {
+                        my %endpoints = $c2a->endpoints;
+
                         if ( $t eq 'bogus_mod_end' ) {
-                            $c2a->set_mod_endpoint($BOGUS_END);
+                            $endpoints{module} = $BOGUS_END;
+                            $c2a->set_endpoints(%endpoints);
                         }
                         elsif ( $t eq 'bogus_rel_end' ) {
-                            $c2a->set_rel_endpoint($BOGUS_END);
+                            $endpoints{release} = $BOGUS_END;
+                            $c2a->set_endpoints(%endpoints);
                         }
 
                         my ( $stderr, @ret ) = capture_stderr {
@@ -288,7 +292,9 @@ subtest 'Unit test' => sub {
                 $c2a->set_meta( $expected->{$DIST}{meta}->%* );
 
                 if ( $t eq 'bogus_url' ) {
-                    $c2a->set_dl_endpoint($name);
+                    my %endpoints = $c2a->endpoints;
+                    $endpoints{download} = $name;
+                    $c2a->set_endpoints(%endpoints);
 
                     my ( $stderr, @ret ) = capture_stderr {
                         return $c2a->merge_prereqs;

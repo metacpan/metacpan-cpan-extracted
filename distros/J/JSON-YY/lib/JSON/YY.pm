@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('JSON::YY', $VERSION);
@@ -197,8 +197,14 @@ closures instead (not compiled as keywords).
 
 =item new(%options)
 
-Create a new encoder/decoder. Options: C<utf8>, C<pretty>, C<allow_nonref>,
-C<allow_unknown>, C<allow_blessed>, C<convert_blessed>, C<max_depth>.
+Create a new encoder/decoder. Options: C<utf8>, C<pretty>, C<canonical>,
+C<allow_nonref>, C<allow_unknown>, C<allow_blessed>, C<convert_blessed>,
+C<max_depth>. (C<canonical> is accepted for L<JSON::XS> compatibility but is
+currently a no-op; see L</LIMITATIONS>.)
+
+By default C<allow_nonref> is on and every other flag is off, so a fresh coder
+produces character-mode output; pass C<< utf8 =E<gt> 1 >> for UTF-8 byte
+strings (as the C<encode_json> function always does).
 
 =item encode($perl_value)
 
@@ -213,7 +219,7 @@ Decode from JSON string.
 Decode to a C<JSON::YY::Doc> handle (mutable document, no Perl
 materialization). Can then use Doc API keywords on the result.
 
-=item utf8, pretty, allow_nonref, allow_unknown, allow_blessed, convert_blessed
+=item utf8, pretty, canonical, allow_nonref, allow_unknown, allow_blessed, convert_blessed
 
 Boolean setters, return C<$self> for chaining.
 
@@ -230,6 +236,11 @@ Set maximum nesting depth (default 512).
 The Doc API operates on yyjson's internal mutable document tree, using
 JSON Pointer (RFC 6901) paths for addressing. All keywords compile to
 custom ops for maximum performance.
+
+Unless documented otherwise, path keywords B<croak> when the path is missing
+or the value has the wrong type for the operation. The exceptions return a
+soft value instead: C<jgetp>, C<jtype>, C<jdel>, and C<jfind> return C<undef>;
+C<jhas> and the C<jis_*> predicates return false.
 
 =head2 Document creation
 
@@ -291,7 +302,8 @@ Set value at path. C<$value> can be a scalar (auto-typed), Perl ref
 =item jdel $doc, $path
 
 Delete value at path. Returns the removed subtree as an independent Doc,
-or C<undef> if path not found.
+or C<undef> if path not found. Croaks on an empty path (the root cannot
+be deleted).
 
 =item jhas $doc, $path
 
@@ -398,10 +410,16 @@ per RFC 6901.
 =item jfind $doc, $array_path, $key_path, $match_value
 
 Find the first element in an array where the value at C<$key_path>
-equals C<$match_value>. Returns the matching element as a Doc,
-or C<undef> if not found.
+equals C<$match_value>. Returns the matching element as a Doc, or C<undef>
+if no element matches (also if C<$array_path> is missing or does not point
+to an array).
 
     my $bob = jfind $doc, "/users", "/name", "Bob";
+
+Integer fields are compared as 64-bit integers and real fields as doubles
+(so values above 2^53 do not collide). To match a JSON C<true>, C<false>,
+or C<null> field, pass the corresponding string C<"true">, C<"false">, or
+C<"null"> as C<$match_value>.
 
 =back
 
@@ -412,11 +430,13 @@ or C<undef> if not found.
 =item jpatch $doc, $patch_doc
 
 Apply RFC 6902 JSON Patch. C<$patch_doc> must be a Doc containing
-a patch array. Modifies C<$doc> in-place.
+a patch array. Modifies C<$doc> in-place. C<$doc> must be an owned
+document; croaks on a borrowed subtree (from C<jget>) -- C<jclone> it first.
 
 =item jmerge $doc, $patch_doc
 
-Apply RFC 7386 JSON Merge Patch. Modifies C<$doc> in-place.
+Apply RFC 7386 JSON Merge Patch. Modifies C<$doc> in-place. As with
+C<jpatch>, C<$doc> must be an owned document, not a borrowed subtree.
 
 =back
 
@@ -468,7 +488,8 @@ C<JSON::YY::Doc> objects support:
     use JSON::YY -utf8, -pretty;
 
 Imports C<encode_json>/C<decode_json> with the specified flags
-pre-configured.
+pre-configured. (C<decode_json_ro> is only available via the C<qw()>
+import, not the flag form.)
 
 =head1 JSON POINTER (RFC 6901)
 
@@ -565,6 +586,10 @@ has no sorted-key writer).
 
 =item * NaN and Infinity values cannot be encoded (croaks).
 
+=item * Decoding or enumerating extremely deeply nested JSON (thousands of
+levels) recurses on the C stack and can crash on pathological input; bound the
+size of untrusted JSON before decoding. Encoding is bounded by C<max_depth>.
+
 =item * JSON C<true>/C<false> decode to the Perl scalars C<1>/C<0> (correct in
 boolean context), not to overloaded boolean objects. To B<encode> a JSON
 boolean, pass a scalar ref (C<\1> for true, C<\0> for false) or use C<jbool> in
@@ -651,6 +676,7 @@ C<[1,0]>, not C<[true,false]>.
     # --- Read ---
     jget $doc, $path           # -> Doc subtree ref (shared)
     jgetp $doc, $path          # -> Perl value (materialized)
+    jdecode $doc, $path        # alias for jgetp
     jhas $doc, $path           # -> bool
     jfind $doc, $arr, $k, $v   # -> Doc (first match) or undef
 

@@ -27,6 +27,7 @@ use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::Prompt;
 use Developer::Dashboard::Runtime::Result ();
+use Developer::Dashboard::RuntimeManager ();
 use Developer::Dashboard::SeedSync ();
 use Developer::Dashboard::SkillDispatcher;
 use Developer::Dashboard::SkillManager;
@@ -579,6 +580,13 @@ for my $helper ( Developer::Dashboard::InternalCLI::helper_names() ) {
             "helper_content renders the shipped $helper file helper body",
         );
     }
+    elsif ( $helper eq 'api' ) {
+        like(
+            $content,
+            qr/\Qdashboard api ...\E/,
+            'helper_content renders the shipped api wrapper body',
+        );
+    }
     else {
         like(
             $content,
@@ -587,7 +595,7 @@ for my $helper ( Developer::Dashboard::InternalCLI::helper_names() ) {
         );
     }
 }
-for my $wrapper_helper (qw(encode decode indicator collector config auth init cpan page action docker serve stop restart log shell doctor housekeeper skills)) {
+for my $wrapper_helper (qw(encode decode indicator collector config auth api init cpan page action docker serve stop restart log shell doctor housekeeper skills)) {
     my $managed_content = Developer::Dashboard::InternalCLI::_managed_helper_content($wrapper_helper);
     like(
         $managed_content,
@@ -636,6 +644,47 @@ ok(
     'SeedSync file_matches_content_md5 confirms the staged helper content matches the shipped helper body',
 );
 {
+    my $single_home = tempdir( CLEANUP => 1 );
+    my $single_paths = Developer::Dashboard::PathRegistry->new( home => $single_home );
+    my $single_written = Developer::Dashboard::InternalCLI::ensure_helper(
+        paths => $single_paths,
+        name  => 'ps1',
+    );
+    is_deeply(
+        $single_written,
+        [ File::Spec->catfile( $single_home, '.developer-dashboard', 'cli', 'dd', 'ps1' ) ],
+        'ensure_helper stages only the requested standalone helper when the helper has no shared core runtime dependency',
+    );
+    ok(
+        !-e File::Spec->catfile( $single_home, '.developer-dashboard', 'cli', 'dd', '_dashboard-core' ),
+        'ensure_helper does not eagerly stage _dashboard-core for standalone helpers',
+    );
+    is_deeply(
+        Developer::Dashboard::InternalCLI::ensure_helper(
+            paths => $single_paths,
+            name  => 'ps1',
+        ),
+        [],
+        'ensure_helper skips rewriting a staged helper when the version marker already matches the current dashboard build',
+    );
+}
+{
+    my $wrapper_home = tempdir( CLEANUP => 1 );
+    my $wrapper_paths = Developer::Dashboard::PathRegistry->new( home => $wrapper_home );
+    my $wrapper_written = Developer::Dashboard::InternalCLI::ensure_helper(
+        paths => $wrapper_paths,
+        name  => 'shell',
+    );
+    is_deeply(
+        $wrapper_written,
+        [
+            File::Spec->catfile( $wrapper_home, '.developer-dashboard', 'cli', 'dd', '_dashboard-core' ),
+            File::Spec->catfile( $wrapper_home, '.developer-dashboard', 'cli', 'dd', 'shell' ),
+        ],
+        'ensure_helper stages the shared core runtime and the requested wrapper helper when the helper delegates through _dashboard-core',
+    );
+}
+{
     my $legacy_flat_core = File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'cli', '_dashboard-core' );
     my $legacy_flat_shell = File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'cli', 'shell' );
     open my $legacy_core_fh, '>:raw', $legacy_flat_core or die "Unable to write $legacy_flat_core: $!";
@@ -660,7 +709,26 @@ ok(
     is( $stderr, '', 'the staged shell helper writes no stderr for shell bash output' );
     like( $stdout, qr/_dd_tmux_status_active/, 'the staged shell helper bootstrap includes the ticket tmux-status detection helper' );
     like( $stdout, qr/status-format\[0\].*tmux-status-top --width #\{client_width\}/s, 'the staged shell helper bootstrap includes the tmux ticket status format wiring' );
+    like( $stdout, qr/status-interval 15/, 'the staged shell helper bootstrap slows the tmux status refresh cadence to avoid hot-looping' );
     like( $stdout, qr/ps1 --jobs \\j --mode compact --no-indicators/, 'the staged shell helper bootstrap suppresses prompt indicators when tmux owns the status line' );
+}
+{
+    my $legacy_flat_core = File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'cli', '_dashboard-core' );
+    my $legacy_flat_shell = File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'cli', 'shell' );
+    open my $legacy_core_fh, '>:raw', $legacy_flat_core or die "Unable to write $legacy_flat_core: $!";
+    print {$legacy_core_fh} Developer::Dashboard::InternalCLI::_managed_helper_content('_dashboard-core');
+    close $legacy_core_fh or die "Unable to close $legacy_flat_core: $!";
+    open my $legacy_shell_fh, '>:raw', $legacy_flat_shell or die "Unable to write $legacy_flat_shell: $!";
+    print {$legacy_shell_fh} Developer::Dashboard::InternalCLI::_managed_helper_content('shell');
+    close $legacy_shell_fh or die "Unable to close $legacy_flat_shell: $!";
+
+    my $focused_cleanup = Developer::Dashboard::InternalCLI::ensure_helper(
+        paths => $paths,
+        name  => 'shell',
+    );
+    ok( ref($focused_cleanup) eq 'ARRAY', 'ensure_helper returns an array reference while cleaning legacy flat helpers on the focused path' );
+    ok( !-e $legacy_flat_core, 'ensure_helper also removes dashboard-managed legacy flat _dashboard-core files from the cli root' );
+    ok( !-e $legacy_flat_shell, 'ensure_helper also removes dashboard-managed legacy flat helper wrappers from the cli root' );
 }
 {
     my $preserve_home = tempdir( CLEANUP => 1 );
@@ -1056,6 +1124,17 @@ is(
     'helper_path always stages built-in helpers under the home runtime dd helper root',
 );
 
+{
+    no warnings 'redefine';
+    require File::ShareDir;
+    local *File::ShareDir::dist_dir = sub { return '/tmp/internal-cli-dist-root' };
+    is(
+        Developer::Dashboard::InternalCLI::dist_dir('Developer-Dashboard'),
+        '/tmp/internal-cli-dist-root',
+        'InternalCLI dist_dir lazily proxies File::ShareDir::dist_dir',
+    );
+}
+
 my $paths_output = capture {
     Developer::Dashboard::CLI::Paths::run_paths_command( command => 'paths', args => [] );
 };
@@ -1449,8 +1528,9 @@ like(
     qr/Ticket args must be an array reference/,
     'resolve_ticket_request rejects non-array argv containers',
 );
+my $isolated_ticket_env_cwd = tempdir( CLEANUP => 1 );
 is_deeply(
-    Developer::Dashboard::CLI::Ticket::ticket_environment('DD-123'),
+    Developer::Dashboard::CLI::Ticket::ticket_environment( 'DD-123', cwd => $isolated_ticket_env_cwd ),
     {
         TICKET_REF                      => 'DD-123',
         B                               => 'DD-123',
@@ -4798,9 +4878,20 @@ sub _dies {
 {
     my $default_fail_skill = _create_skill_repo( $test_repos, 'make-default-fail', with_cpanfile => 0 );
     _write_file( File::Spec->catfile( $default_fail_skill, 'Makefile' ), "install:\n\t\@true\n" );
-    local $ENV{DD_TEST_MAKE_FAIL} = 'default';
-
-    my $default_make_failure = $manager->_install_skill_makefile($default_fail_skill);
+    my $default_make_failure;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::SkillManager::_run_streaming_command = sub {
+            my ( undef, %args ) = @_;
+            my $target = @{ $args{command} } > 1 ? join( ' ', @{ $args{command} }[ 1 .. $#{ $args{command} } ] ) : 'default';
+            return {
+                stdout => '',
+                stderr => "synthetic make failure for $target\n",
+                exit   => 1,
+            };
+        };
+        $default_make_failure = $manager->_install_skill_makefile($default_fail_skill);
+    }
     ok( $default_make_failure->{error}, '_install_skill_makefile returns an explicit error when the default make target fails' );
     like(
         $default_make_failure->{error},
@@ -4809,8 +4900,20 @@ sub _dies {
     );
 }
 {
-    local $ENV{DD_TEST_MAKE_FAIL} = 'install';
-    my $install_target_make_failure = $manager->_install_skill_makefile($dep_skill_root);
+    my $install_target_make_failure;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::SkillManager::_run_streaming_command = sub {
+            my ( undef, %args ) = @_;
+            my $target = @{ $args{command} } > 1 ? join( ' ', @{ $args{command} }[ 1 .. $#{ $args{command} } ] ) : 'default';
+            return {
+                stdout => '',
+                stderr => $target eq 'install' ? "synthetic make failure for $target\n" : '',
+                exit   => $target eq 'install' ? 1 : 0,
+            };
+        };
+        $install_target_make_failure = $manager->_install_skill_makefile($dep_skill_root);
+    }
     ok( $install_target_make_failure->{error}, '_install_skill_makefile returns an explicit error when a named target fails' );
     like(
         $install_target_make_failure->{error},

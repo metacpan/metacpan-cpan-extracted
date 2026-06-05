@@ -2,7 +2,7 @@
  *
  * $Id$
  *
- * Copyright (c) 2024-2025  DBI Team
+ * Copyright (c) 2024-2026  DBI Team
  * Copyright (c) 1994-2024  Tim Bunce  Ireland
  *
  * See COPYRIGHT section in DBI.pm for usage and distribution rights.
@@ -11,6 +11,9 @@
 /* DBI Interface Definitions for DBD Modules */
 
 #ifndef DBIXS_VERSION                           /* prevent multiple inclusion */
+
+/* define DBIXS_VERSION & DBIXS_REVISION */
+#include "dbixs_rev.h"
 
 #ifndef DBIS
 #define DBIS    dbis    /* default name for dbistate_t variable */
@@ -32,9 +35,6 @@
 #undef std
 #endif
 
-/* define DBIXS_REVISION */
-#include "dbixs_rev.h"
-
 /* Perl backwards compatibility definitions */
 #define NEED_sv_2pv_flags
 #define NEED_croak_xs_usage
@@ -43,9 +43,6 @@
 /* DBI SQL_* type definitions */
 #include "dbi_sql.h"
 
-
-#define DBIXS_VERSION 93 /* superseded by DBIXS_REVISION */
-
 #ifdef NEED_DBIXS_VERSION
 #if NEED_DBIXS_VERSION > DBIXS_VERSION
 error You_need_to_upgrade_your_DBI_module_before_building_this_driver
@@ -53,7 +50,6 @@ error You_need_to_upgrade_your_DBI_module_before_building_this_driver
 #else
 #define NEED_DBIXS_VERSION DBIXS_VERSION
 #endif
-
 
 #define DBI_LOCK
 #define DBI_UNLOCK
@@ -244,8 +240,10 @@ typedef struct {                /* -- FIELD DESCRIPTOR --               */
         (  (flags && (DBIc_TRACE_FLAGS(imp) & flags) && (DBIc_TRACE_LEVEL(imp) >= flaglevel)) \
         || (level && DBIc_TRACE_LEVEL(imp) >= level) )
 
+/* Deprecated, but cannot be removed, becaused used in e.g. DBD::Oracle :( */
 #define DBIc_DEBUG(imp)         (_imp2com(imp, attr.TraceLevel)) /* deprecated */
 #define DBIc_DEBUGIV(imp)       SvIV(DBIc_DEBUG(imp))            /* deprecated */
+
 #define DBIc_STATE(imp)         SvRV(_imp2com(imp, attr.State))
 #define DBIc_ERR(imp)           SvRV(_imp2com(imp, attr.Err))
 #define DBIc_ERRSTR(imp)        SvRV(_imp2com(imp, attr.Errstr))
@@ -497,7 +495,7 @@ typedef dbistate_t** (*_dbi_state_lval_t)(pTHX);
             CV *cv = get_cv("DBI::_dbi_state_lval", 0);                     \
             if (!cv)                                                        \
                 croak("Unable to get DBI state function. DBI not loaded."); \
-            dbi_state_lval_p = (_dbi_state_lval_t)CvXSUB(cv);               \
+            dbi_state_lval_p = (_dbi_state_lval_t)(void *)CvXSUB(cv);       \
         }                                                                   \
         return dbi_state_lval_p(aTHX);                                      \
     }                                                                       \

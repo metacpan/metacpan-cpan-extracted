@@ -81,8 +81,8 @@ subtest 'append_log writes NDJSON to ref' => sub {
     $board->append_log($git, action => 'create', task_id => 1, ts => '2026-01-01T00:00:00Z');
     $board->append_log($git, action => 'move', task_id => 1, ts => '2026-01-02T00:00:00Z');
 
-    my $log_content = $git->read_ref('refs/karr/log/test_test.com');
-    ok($log_content, 'log ref exists');
+    my $log_content = $git->read_ref('refs/karr/log/user/test_test.com');
+    ok($log_content, 'log ref exists at role-qualified path');
 
     require JSON::MaybeXS;
     my @lines = split /\n/, $log_content;

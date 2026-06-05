@@ -7,8 +7,8 @@
 #include "header.h"
 #include "util.h"
 
-/* Append string str at pos in buf. */
-static int string_append(char* buf, int pos, const char* str);
+/* Append string str at pos in buf; stops at max to prevent overrun. */
+static int string_append(char* buf, int pos, int max, const char* str);
 
 /* Cleanup string str (as used in as_string), leaving cleaned up result in */
 /* buf, with maximum length len; use newl as new line terminator. */
@@ -213,7 +213,12 @@ char* format_all(pTHX_ HList* h, int sort, const char* endl, int* size) {
       PNode* pn = &pl->data[k];
       const char* value = SvPV_nolen( (SV*) pn->ptr );
       int lv = strlen(value);
-      *size += lh + 2 + lv + lv * le;
+      /* string_cleanup always emits a trailing newl ("le" bytes) for
+       * values that don't already end in "\n"; the original formula
+       * did not account for that, producing a heap-buffer-overflow
+       * when many empty (lv == 0) values were serialised. The +le
+       * term below closes that gap. */
+      *size += lh + 2 + lv + lv * le + le;
     }
   }
 
@@ -247,9 +252,9 @@ char* format_all(pTHX_ HList* h, int sort, const char* endl, int* size) {
   }
 }
 
-static int string_append(char* buf, int pos, const char* str) {
+static int string_append(char* buf, int pos, int max, const char* str) {
   int k;
-  for (k = 0; str[k] != '\0'; ++k) {
+  for (k = 0; str[k] != '\0' && pos < max; ++k) {
     buf[pos++] = str[k];
   }
   return pos;
@@ -281,7 +286,7 @@ static int string_cleanup(const char* str, char* buf, int len, const char* newl)
           if (emit_cr && pos < len) {
             buf[pos++] = '\r';
           }
-          pos = string_append(buf, pos, newl);
+          pos = string_append(buf, pos, len, newl);
           saw_newline = 1;
           last_nonblank = pos-1;
         } else {
@@ -299,10 +304,12 @@ static int string_cleanup(const char* str, char* buf, int len, const char* newl)
   }
 
   if (! saw_newline) {
-    pos = string_append(buf, last_nonblank+1, newl);
+    pos = string_append(buf, last_nonblank+1, len, newl);
     last_nonblank = pos-1;
   }
-  buf[++last_nonblank] = '\0';
+  if (last_nonblank + 1 < len) {
+    buf[++last_nonblank] = '\0';
+  }
   return last_nonblank;
 
   /*

@@ -23,14 +23,16 @@ if($ENV{AUTHOR_TESTING}) {
 my $test_requires = {
 	'Test::Deep' => 0,
 	'Test::DescribeMe' => 0,
+	'Test::Memory::Cycle' => 0,
 	'Test::Mockingbird' => 0,
-	'Test::MockModule' => 0,
 	'Test::MockObject' => 0,
 	'Test::Most' => 0,
 	'Test::Needs' => 0,
 	'Test::NoWarnings' => 0,
 	'Test::Number::Delta' => 0,	# Always needed since used in free.t
 	'Test::RequiresInternet' => 0,
+	'Test::Returns' => 0,
+	'Test::Which' => 0,
 	'Test::Without::Module' => 0,
 };
 
@@ -76,9 +78,11 @@ WriteMakefile(
     PREREQ_PM => {
 	'Carp' => 0,
 	'HTML::Entities' => 0,
+	'IPC::System::Simple' => 0,
 	'LWP::Protocol::https' => 0,
 	'Object::Configure' => 0.13,
 	'Params::Get' => 0.04,
+	'Readonly' => 0,
 	'Scalar::Util' => 0,
 	'Time::HiRes' => 0
     }, dist => $dist,

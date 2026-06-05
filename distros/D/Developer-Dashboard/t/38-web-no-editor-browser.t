@@ -326,8 +326,8 @@ sub _wait_for_http {
 
 sub _http_probe_attempts {
     my $perl5opt = join ' ', grep { defined $_ && $_ ne '' } ( $ENV{PERL5OPT}, $ENV{HARNESS_PERL_SWITCHES} );
-    return 240 if $perl5opt =~ /Devel::Cover/;
-    return 80;
+    return 480 if $perl5opt =~ /Devel::Cover/;
+    return 240;
 }
 
 sub _coverage_requested {

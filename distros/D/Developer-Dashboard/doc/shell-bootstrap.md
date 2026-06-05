@@ -40,6 +40,27 @@ Shell-specific behavior
   forwards into the dashboard command, and `Register-ArgumentCompleter`
   handlers for `dashboard`, `d2`, `cdr`, `dd_cdr`, and `which_dir`.
 
+Prompt hot path
+---------------
+
+`dashboard ps1` is expected to be safe to call on every prompt render, even on
+slower shells and hosts such as iSH.
+
+The switchboard keeps that path lighter by:
+
+- reusing one `PathRegistry` object for the whole public-command invocation
+- refreshing only the requested built-in helper instead of restaging the whole
+  helper tree on every prompt render
+- skipping the unknown-command suggestion stack on the normal prompt path
+- loading installed skill config fragments directly from the layered config
+  files instead of constructing the full skill dispatcher during prompt startup
+- loading helper-staging-only modules such as `File::ShareDir` and
+  `SeedSync` only when a helper actually needs to be repaired or refreshed
+
+That means a steady-state prompt render can stay focused on env loading,
+collector state, and prompt rendering instead of paying for the full helper
+staging and suggestion runtime every time.
+
 Examples
 --------
 

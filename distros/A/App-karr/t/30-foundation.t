@@ -57,6 +57,9 @@ subtest 'module loads' => sub {
 # ---------------------------------------------------------------------------
 
 subtest 'missing config warns and returns empty' => sub {
+  # Isolate HOME so the default ~/.config/karr-foundation/config.yml path
+  # cannot resolve to a real file on the machine running the tests.
+  local $ENV{HOME} = tempdir( CLEANUP => 1 );
   my $f = new_foundation();
   my $cfg = $f->_config_data;
   is ref $cfg, 'HASH', 'returns hashref';

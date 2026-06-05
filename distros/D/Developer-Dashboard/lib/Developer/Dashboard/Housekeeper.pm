@@ -3,7 +3,7 @@ package Developer::Dashboard::Housekeeper;
 use strict;
 use warnings;
 
-our $VERSION = '3.90';
+our $VERSION = '4.03';
 
 use File::Path qw(remove_tree);
 use File::Spec;
@@ -116,13 +116,10 @@ sub _cleanup_state_roots {
 # Output: list of removed item hash references.
 sub _cleanup_temp_files {
     my ( $self, %args ) = @_;
-    my $tmpdir = File::Spec->tmpdir;
-    opendir my $dh, $tmpdir or die "Unable to read $tmpdir: $!";
     my @removed;
-    while ( my $entry = readdir $dh ) {
-        next if $entry eq '.' || $entry eq '..';
-        my $path = File::Spec->catfile( $tmpdir, $entry );
+    for my $path ( $self->_temp_file_candidates ) {
         next if !-f $path;
+        my ( undef, undef, $entry ) = File::Spec->splitpath($path);
         my ( $kind, $scan_key ) = $self->_temp_file_kind($entry);
         next if !$kind;
         $args{scanned}{$scan_key}++;
@@ -137,8 +134,29 @@ sub _cleanup_temp_files {
             path => $path,
         };
     }
-    closedir $dh;
     return @removed;
+}
+
+# _temp_file_candidates()
+# Returns the dashboard-owned temp file paths that housekeeper may remove.
+# Input: none.
+# Output: ordered list of candidate temp file path strings.
+sub _temp_file_candidates {
+    my ($self) = @_;
+    my $tmpdir = File::Spec->tmpdir;
+    my %seen;
+    my @paths;
+    for my $pattern (
+        File::Spec->catfile( $tmpdir, 'developer-dashboard-ajax-*' ),
+        File::Spec->catfile( $tmpdir, 'dashboard-result-*' ),
+      )
+    {
+        for my $path (glob $pattern) {
+            next if !defined $path || $path eq '' || $seen{$path}++;
+            push @paths, $path;
+        }
+    }
+    return @paths;
 }
 
 # _temp_file_kind($entry)

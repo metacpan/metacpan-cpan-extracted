@@ -1,3 +1,8 @@
+0.006   2026-06-05  Released-By: PERLANCAR; Urgency: high
+
+        - Update to using File::FindUniq instead of the old App::UniqFiles.
+
+
 0.005   2022-08-19  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

@@ -277,7 +277,7 @@ my $background_result = $actions->run_command_action(
 ok( $background_result->{pid} > 0, 'background command action returns a child pid' );
 ok( $actions->_pid_is_running( $background_result->{pid} ), 'background action child is running initially' );
 kill 'TERM', $background_result->{pid};
-my $background_wait_loops = $INC{'Devel/Cover.pm'} ? 100 : 20;
+my $background_wait_loops = $INC{'Devel/Cover.pm'} ? 400 : 20;
 for ( 1 .. $background_wait_loops ) {
     last if !$actions->_pid_is_running( $background_result->{pid} );
     sleep 0.1;

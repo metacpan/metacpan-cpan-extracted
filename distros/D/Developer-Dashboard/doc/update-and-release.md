@@ -46,6 +46,59 @@ release for that tag. That workflow must also install `Devel::Cover` before
 it runs the numeric `cover` gate, or the release path will die before the
 tarball, checksum, and signature assets are published.
 
+## OWASP Gate
+
+The repository also treats OWASP as a hard release gate.
+
+This is not limited to a baseline ASVS spot check anymore. Before build,
+release, or security-sensitive closeout, complete the full OWASP ASVS 5.0.0
+applicability review across:
+
+- V1 Architecture, Design and Threat Modeling
+- V2 Authentication
+- V3 Session Management
+- V4 Access Control
+- V5 Validation, Sanitization and Encoding
+- V6 Stored Cryptography
+- V7 Error Handling and Logging
+- V8 Data Protection
+- V9 Communication
+- V10 Malicious Code
+- V11 Business Logic
+- V12 Files and Resources
+- V13 API and Web Service
+- V14 Configuration
+
+Treat ASVS Level 2 rigor as the default floor for this repository, and require
+Level 3 review when the change touches higher-trust boundaries such as auth,
+sessions, cryptographic handling, release signing, or externally callable API
+routes.
+
+Also map the change against the OWASP Top 10 2021 categories, with explicit
+attention to:
+
+- `A01` Broken Access Control
+- `A02` Cryptographic Failures
+- `A03` Injection
+- `A04` Insecure Design
+- `A05` Security Misconfiguration
+- `A06` Vulnerable and Outdated Components
+- `A07` Identification and Authentication Failures
+- `A08` Software and Data Integrity Failures
+- `A09` Security Logging and Monitoring Failures
+- `A10` Server-Side Request Forgery
+
+Use the commands in `SECURITY_CHECKS.md` as the local repo-side evidence set.
+Do not claim the security review is complete merely because the code “looks
+fine”; the grep-based audit, focused tests, and release/integration gates are
+part of the proof.
+
+The shipped OWASP compliance SOW is also part of that proof. Keep the
+chapter-by-chapter evidence record current and do not upgrade the public
+wording from `OWASP-aligned` / `OWASP-gated` to blanket `OWASP compliant`
+until the SOW closure criteria and the remaining governance gates are
+actually closed.
+
 ## Local Update
 
 Run:

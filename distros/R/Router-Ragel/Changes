@@ -1,5 +1,9 @@
 Revision history for Router-Ragel
 
+0.04    2026-06-05
+    - Croak instead of crashing on match() without a router object
+    - Documentation and test coverage improvements
+
 0.03    2026-06-01
     - Fix captures for overlapping routes
     - Document precedence (last added wins)

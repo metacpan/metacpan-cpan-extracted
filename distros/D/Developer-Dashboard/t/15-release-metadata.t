@@ -16,6 +16,9 @@ my $readme = _slurp_optional( _repo_path('README.md') );
 my $plain_readme = _slurp_optional( _repo_path('README') );
 my $skill_guide = _slurp_optional( _repo_path('SKILL.md') );
 my $release_doc = _slurp_optional( _repo_path( 'doc', 'update-and-release.md' ) );
+my $security_checks_doc = _slurp_optional( _repo_path('SECURITY_CHECKS.md') );
+my $security_doc = _slurp_optional( _repo_path( 'doc', 'security.md' ) );
+my $owasp_sow_doc = _slurp_optional( _repo_path( 'doc', 'owasp-compliance-sow.md' ) );
 my $housekeeper_rotation_doc = _slurp_optional( _repo_path( 'doc', 'housekeeper-rotation.md' ) );
 my $install_bootstrap_doc = _slurp_optional( _repo_path( 'doc', 'install-bootstrap.md' ) );
 my $layered_env_doc = _slurp_optional( _repo_path( 'doc', 'layered-env-loading.md' ) );
@@ -45,6 +48,7 @@ my @doc_paths = grep { -e $_ } (
     _repo_path( 'doc', 'housekeeper-rotation.md' ),
     _repo_path( 'doc', 'install-bootstrap.md' ),
     _repo_path( 'doc', 'layered-env-loading.md' ),
+    _repo_path( 'doc', 'owasp-compliance-sow.md' ),
     _repo_path( 'doc', 'path-inventory-api.md' ),
     _repo_path( 'doc', 'shell-bootstrap.md' ),
     _repo_path( 'doc', 'integration-test-plan.md' ),
@@ -72,7 +76,7 @@ my $skills_pod = _extract_pod($skills_pm);
 
 like( $pm, qr/our \$VERSION = '([^']+)'/, 'main module declares a version' );
 my ($version) = $pm =~ /our \$VERSION = '([^']+)'/;
-is( $version, '3.90', 'repo version bumped for the path-registry cwd reuse and nested skill env hardening fix set' );
+is( $version, '4.03', 'repo version bumped for layered API CLI management delivery and gate refresh' );
 like( $pm, qr/^\Q$version\E$/m, 'main POD version matches the module version' );
 unlike( $readme, qr/\A=(?:pod|head\d|over|item|back|cut)\b/m, 'README.md is Markdown instead of raw POD' ) if $readme ne '';
 like( $readme, qr/\A(?:<!--.*?-->\n\n)?#\s+/s, 'README.md begins with Markdown headings' ) if $readme ne '';
@@ -197,7 +201,7 @@ for my $module (
     like( $cpanfile, qr/requires ['"]\Q$module\E['"];/, "cpanfile declares runtime prerequisite $module" );
     like( $dist, qr/^\Q$module\E = 0$/m, "dist.ini declares runtime prerequisite $module" ) if $dist ne '';
 }
-for my $helper (qw(_dashboard-core jq yq tomq propq iniq csvq xmlq of open-file ticket workspace path paths ps1 encode decode indicator collector config auth init cpan page action docker serve stop restart shell doctor housekeeper skills which)) {
+for my $helper (qw(_dashboard-core jq yq tomq propq iniq csvq xmlq of open-file ticket workspace path paths ps1 encode decode indicator collector config auth api init cpan page action docker serve stop restart shell doctor housekeeper skills which)) {
     ok( -f _repo_path( 'share', 'private-cli', $helper ), "share/private-cli/$helper is shipped as a private helper asset" );
 }
 ok( -f _repo_path( 'share', 'public', 'js', 'jquery-4.0.0.min.js' ), 'share/public/js/jquery-4.0.0.min.js is shipped as a bundled public asset' );
@@ -262,6 +266,10 @@ for my $doc ( grep { defined && $_ ne '' } ( $readme, $pm ) ) {
     like( $doc, qr/below\s+the\s+response\s+`pre`|below\s+the\s+response\s+C<pre>/s, 'docs describe the response tabs below the response pre box' );
     like( $doc, qr/dashboard cpan(?: <Module\.\.\.>| E<lt>Module\.\.\.E<gt>)?|C<dashboard cpan E<lt>Module\.\.\.E<gt>>/, 'docs describe the runtime-local dashboard cpan command' );
     like( $doc, qr/ssl_subject_alt_names/, 'docs describe configured extra SSL SAN aliases and IPs' );
+    like( $doc, qr/config\/api\.json|F<config\/api\.json>/, 'docs describe layered config/api.json machine auth for saved ajax routes' );
+    like( $doc, qr/dashboard api(?: add| rm| ls)?/, 'docs describe the dashboard api management command for layered machine auth' );
+    like( $doc, qr/X-DD-API-Key|x-dd-api-key/i, 'docs describe the API key header for saved ajax machine auth' );
+    like( $doc, qr/X-DD-API-Secret|x-dd-api-secret/i, 'docs describe the API secret header for saved ajax machine auth' );
     like( $doc, qr/bin\/dashboard|dashboard entrypoint|C<dashboard> entrypoint/, 'docs describe the dashboard cpan implementation as entrypoint-local' );
     like( $doc, qr/config\/config\.json.*intact|preserves an existing .*config\/config\.json/s, 'docs describe non-destructive dashboard init reruns' );
     like( $doc, qr/cli\/dd/, 'docs describe the dedicated dd helper namespace under the home runtime CLI root' );
@@ -406,6 +414,8 @@ for my $doc ( grep { defined && $_ ne '' } ($readme) ) {
     like( $doc, qr/do not treat the work as done until .*100%\s+statement\s+and\s+100%\s+subroutine|100%\s+statement\s+and\s+100%\s+subroutine.*do not treat the work as done/is, 'README documents numeric 100 percent library coverage as a completion gate' );
 }
 like( $release_doc, qr/dzil build/, 'release doc still documents the dzil build step' ) if $release_doc ne '';
+like( $release_doc, qr/OWASP ASVS 5\.0|ASVS 5\.0/, 'release doc references the current OWASP ASVS gate version' ) if $release_doc ne '';
+like( $release_doc, qr/OWASP Top 10/i, 'release doc references OWASP Top 10 coverage as part of the security gate' ) if $release_doc ne '';
 like( $release_doc, qr/exactly one unpacked\s+`Developer-Dashboard-X\.XX\/`\s+build directory and exactly one matching\s+`Developer-Dashboard-X\.XX\.tar\.gz`\s+tarball/s, 'release doc describes the enforced single-build-dir and single-tarball invariant' ) if $release_doc ne '';
 like(
     $release_doc,
@@ -422,6 +432,17 @@ like( $install_bootstrap_doc, qr/aptfile.*apkfile.*brewfile|aptfile.*brewfile.*a
 like( $testing_doc, qr/after the\s+normal\s+`prove -lr t`\s+test gate/is, 'testing doc documents the explicit post-test numeric coverage QA gate ordering' ) if $testing_doc ne '';
 like( $testing_doc, qr/every change, not only releases|not only releases.*every change|every change.*not only releases/is, 'testing doc documents the per-change numeric coverage QA gate scope' ) if $testing_doc ne '';
 like( $testing_doc, qr/do not treat the work as done until .*100%\s+statement\s+and\s+100%\s+subroutine|100%\s+statement\s+and\s+100%\s+subroutine.*do not treat the work as done/is, 'testing doc documents numeric 100 percent library coverage as a completion gate' ) if $testing_doc ne '';
+like( $security_checks_doc, qr/ASVS 5\.0|OWASP ASVS 5\.0/, 'security checks doc references the current OWASP ASVS gate version explicitly' ) if $security_checks_doc ne '';
+like( $security_checks_doc, qr/V1 .*Architecture|V14 .*Configuration/s, 'security checks doc covers the full OWASP ASVS chapter span instead of only a narrow baseline subset' ) if $security_checks_doc ne '';
+like( $security_checks_doc, qr/OWASP Top 10/i, 'security checks doc cross-maps the repo gate to the OWASP Top 10' ) if $security_checks_doc ne '';
+like( $security_doc, qr/ASVS 5\.0|OWASP ASVS 5\.0/, 'security guidance doc references the current OWASP ASVS gate version explicitly' ) if $security_doc ne '';
+like( $security_doc, qr/V1 .*Architecture|V14 .*Configuration/s, 'security guidance doc covers the full OWASP ASVS chapter span' ) if $security_doc ne '';
+like( $security_doc, qr/OWASP Top 10/i, 'security guidance doc references OWASP Top 10 coverage' ) if $security_doc ne '';
+like( $owasp_sow_doc, qr/OWASP ASVS 5\.0|ASVS 5\.0/, 'OWASP SOW doc names the current ASVS generation explicitly' ) if $owasp_sow_doc ne '';
+like( $owasp_sow_doc, qr/V1 .*Architecture|V14 .*Configuration/s, 'OWASP SOW doc covers the full ASVS chapter span' ) if $owasp_sow_doc ne '';
+like( $owasp_sow_doc, qr/OWASP Top 10/i, 'OWASP SOW doc cross-maps the work to OWASP Top 10' ) if $owasp_sow_doc ne '';
+like( $owasp_sow_doc, qr/OWASP-aligned|OWASP-gated/i, 'OWASP SOW doc states the currently safe public claim wording' ) if $owasp_sow_doc ne '';
+like( $owasp_sow_doc, qr/Do not claim .*OWASP compliant|blanket .*OWASP compliant/i, 'OWASP SOW doc forbids an unqualified compliance claim until the closure criteria are met' ) if $owasp_sow_doc ne '';
 like( $agents_override, qr/DD-OOP-LAYERS/, 'AGENTS.override.md documents the layered runtime contract' ) if $agents_override ne '';
 like( $agents_override, qr/FULL-POD-DOC/, 'AGENTS.override.md documents the FULL-POD-DOC rule' ) if $agents_override ne '';
 unlike( $readme, qr/FULL-POD-DOC/, 'README no longer embeds the contributor-only FULL-POD-DOC contract in the product manual' ) if $readme ne '';

@@ -21,10 +21,13 @@ static inline size_t mds_bm_words(size_t n_bits) {
 static inline size_t mds_bm_next_set(const uint64_t* bm, size_t n_bits,
                                      size_t from)
 {
+    size_t w;
+    size_t off;
+    uint64_t v;
     if (from >= n_bits) return (size_t)-1;
-    size_t w = from >> 6;
-    size_t off = from & 63u;
-    uint64_t v = bm[w] & (~(uint64_t)0 << off);
+    w = from >> 6;
+    off = from & 63u;
+    v = bm[w] & (~(uint64_t)0 << off);
     while (1) {
         if (v) {
 #if defined(__GNUC__) || defined(__clang__)
@@ -46,14 +49,19 @@ static inline size_t mds_bm_next_set(const uint64_t* bm, size_t n_bits,
 static inline size_t mds_bm_popcount(const uint64_t* bm, size_t n_bits,
                                      size_t from, size_t to)
 {
+    size_t w0;
+    size_t w1;
+    uint64_t lo_mask;
+    uint64_t hi_mask;
+    size_t pc = 0;
+    size_t w;
     if (to > n_bits) to = n_bits;
     if (from >= to)  return 0;
-    size_t w0 = from >> 6;
-    size_t w1 = (to - 1) >> 6;
-    uint64_t lo_mask = ~(uint64_t)0 << (from & 63u);
-    uint64_t hi_mask = (to & 63u) ? (((uint64_t)1 << (to & 63u)) - 1)
-                                  : ~(uint64_t)0;
-    size_t pc = 0;
+    w0 = from >> 6;
+    w1 = (to - 1) >> 6;
+    lo_mask = ~(uint64_t)0 << (from & 63u);
+    hi_mask = (to & 63u) ? (((uint64_t)1 << (to & 63u)) - 1)
+                         : ~(uint64_t)0;
     if (w0 == w1) {
 #if defined(__GNUC__) || defined(__clang__)
         return (size_t)__builtin_popcountll(bm[w0] & lo_mask & hi_mask);
@@ -65,14 +73,14 @@ static inline size_t mds_bm_popcount(const uint64_t* bm, size_t n_bits,
     }
 #if defined(__GNUC__) || defined(__clang__)
     pc += (size_t)__builtin_popcountll(bm[w0] & lo_mask);
-    for (size_t w = w0 + 1; w < w1; w++)
+    for (w = w0 + 1; w < w1; w++)
         pc += (size_t)__builtin_popcountll(bm[w]);
     pc += (size_t)__builtin_popcountll(bm[w1] & hi_mask);
 #else
     {
         uint64_t v;
         v = bm[w0] & lo_mask; while (v) { pc += (size_t)(v & 1); v >>= 1; }
-        for (size_t w = w0 + 1; w < w1; w++) {
+        for (w = w0 + 1; w < w1; w++) {
             v = bm[w]; while (v) { pc += (size_t)(v & 1); v >>= 1; }
         }
         v = bm[w1] & hi_mask; while (v) { pc += (size_t)(v & 1); v >>= 1; }

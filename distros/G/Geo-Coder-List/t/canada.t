@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use LWP;
-use Test::Most tests => 17;
+use Test::Most tests => 18;
 
 eval 'use autodie qw(:all)';	# Test for open/close failures
 
@@ -15,7 +15,7 @@ BEGIN {
 
 CANADA: {
 	SKIP: {
-		skip('Test requires Internet access', 16) unless(-e 't/online.enabled');
+		skip('Test requires Internet access', 17) unless(-e 't/online.enabled');
 
 		if(!require_ok('Geo::Coder::CA')) {
 			diag('Geo::Coder::CA not installed - skipping tests');
@@ -35,7 +35,12 @@ CANADA: {
 		my $ua = LWP::UserAgent->new();
 		$ua->env_proxy(1);
 		$geocoderlist->ua($ua);
-		ok($ca->ua() eq $ua);
+		# ua() now creates a per-geocoder clone (to preserve each geocoder's own
+		# agent string), so the object reference is different from $ua.
+		# Verify that a UA was propagated by checking it is defined and has the
+		# correct class.
+		ok(defined($ca->ua()), 'UA was propagated to the CA geocoder');
+		isa_ok($ca->ua(), 'LWP::UserAgent', 'Propagated UA has correct class');
 
 		my $location = $geocoderlist->geocode(location => '9235 Main St, Richibucto, New Brunswick, Canada');
 		ok(defined($location));

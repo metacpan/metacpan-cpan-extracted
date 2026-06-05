@@ -12,8 +12,8 @@ use Router::Ragel;
 
 {
     my $r = Router::Ragel->new
-        ->add('/a/b',  'static')
-        ->add('/a/:x', 'dynamic')   # added last -> wins on /a/b
+        ->add('/a/b', 'static')
+        ->add('/a/:x', 'dynamic') # added last -> wins on /a/b
         ->compile;
 
     my ($d, @cap) = $r->match('/a/b');
@@ -28,7 +28,7 @@ use Router::Ragel;
 {
     my $r = Router::Ragel->new
         ->add('/a/:x', 'dynamic')
-        ->add('/a/b',  'static')    # added last -> wins on /a/b
+        ->add('/a/b', 'static') # added last -> wins on /a/b
         ->compile;
 
     my ($d, @cap) = $r->match('/a/b');

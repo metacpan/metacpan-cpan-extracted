@@ -3,7 +3,7 @@ package Developer::Dashboard::SkillManager;
 use strict;
 use warnings;
 
-our $VERSION = '3.90';
+our $VERSION = '4.03';
 
 use Cwd qw(realpath);
 use File::Copy qw(copy);
@@ -1986,6 +1986,7 @@ sub _install_skill_makefile {
     my ( $self, $skill_path ) = @_;
     my $makefile = File::Spec->catfile( $skill_path, 'Makefile' );
     return { success => 1, skipped => 1 } if !-f $makefile;
+    my $make = command_in_path('make') || 'make';
 
     my %targets = map { $_ => 1 } $self->_makefile_targets($makefile);
     my @commands = (
@@ -2006,7 +2007,7 @@ sub _install_skill_makefile {
         for my $args (@commands) {
             my $target_name = @{$args} ? join( ' ', @{$args} ) : 'default';
             my $run = $self->_run_streaming_command(
-                command => [ 'make', @{$args} ],
+                command => [ $make, @{$args} ],
                 cwd     => $skill_path,
                 banner  => "Running make $target_name for " . basename($skill_path) . " from $makefile",
             );

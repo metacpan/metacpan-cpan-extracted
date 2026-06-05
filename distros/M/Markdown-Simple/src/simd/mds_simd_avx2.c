@@ -42,8 +42,11 @@ MDS_AVX2_FN static void classify_structural_avx2(const char* in, size_t len,
         __m256i la  = _mm256_shuffle_epi8(lo_tbl, lo);
         __m256i ha  = _mm256_shuffle_epi8(hi_tbl, hi);
         __m256i m   = _mm256_and_si256(la, ha);
-        __m256i nz  = _mm256_cmpgt_epi8(m, zero);     /* 0xFF where m>0 */
-        uint32_t bits = (uint32_t)_mm256_movemask_epi8(nz);
+        /* Use cmpeq(m,0) then invert: cmpgt_epi8 is SIGNED, which would
+         * misclassify bytes whose LUT product is 0x80 (e.g. '|' = 0x7C,
+         * '~' = 0x7E) — they hit hi_tbl[7]=0x80 and would read as -128. */
+        __m256i is_zero = _mm256_cmpeq_epi8(m, zero); /* 0xFF where m==0 */
+        uint32_t bits = (uint32_t)(~_mm256_movemask_epi8(is_zero));
 
         size_t word = i >> 6;
         size_t off  = i & 63u;

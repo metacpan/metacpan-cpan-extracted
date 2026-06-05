@@ -1,9 +1,9 @@
 # ABSTRACT: Activity log writer for karr board operations
 
 package App::karr::ActivityLog;
-our $VERSION = '0.300';
+our $VERSION = '0.301';
 use Moo;
-use JSON::MaybeXS qw( encode_json );
+use JSON::MaybeXS qw( encode_json decode_json );
 use POSIX qw( strftime );
 
 
@@ -13,22 +13,74 @@ has git => (
 );
 
 
+has role => (
+    is      => 'ro',
+    default => sub { $ENV{KARR_ROLE} || 'user' },
+);
+
+sub _sanitize {
+    my ($self, $s) = @_;
+    $s //= '';
+    $s =~ s/[^a-zA-Z0-9._-]/_/g;
+    return $s;
+}
+
+sub _email {
+    my ($self) = @_;
+    return $self->git->git_user_email || 'unknown';
+}
+
+
+sub identity {
+    my ($self) = @_;
+    return $self->_sanitize($self->role) . '/' . $self->_sanitize($self->_email);
+}
+
+sub _ref {
+    my ($self) = @_;
+    return 'refs/karr/log/' . $self->identity;
+}
+
+# Pre-role logs were keyed by bare sanitized email. Read them back for the
+# default 'user' role so existing history is not orphaned.
+sub _legacy_ref {
+    my ($self) = @_;
+    return 'refs/karr/log/' . $self->_sanitize($self->_email);
+}
+
+
 sub log_entry {
     my ($self, %entry) = @_;
     $entry{ts} //= strftime('%Y-%m-%dT%H:%M:%SZ', gmtime());
-    my $identity = $self->_identity;
-    my $ref = "refs/karr/log/$identity";
+    my $ref = $self->_ref;
     my $existing = $self->git->read_ref($ref);
     my $line = encode_json(\%entry);
     my $new = $existing ? "$existing\n$line" : $line;
     return $self->git->write_ref($ref, $new);
 }
 
-sub _identity {
+
+sub entries {
     my ($self) = @_;
-    my $email = $self->git->git_user_email || 'unknown';
-    $email =~ s/[^a-zA-Z0-9._-]/_/g;
-    return $email;
+    my $content = $self->git->read_ref($self->_ref);
+    if ((!defined $content || !length $content) && $self->role eq 'user') {
+        $content = $self->git->read_ref($self->_legacy_ref);
+    }
+    return () unless defined $content && length $content;
+    my @entries;
+    for my $line (split /\n/, $content) {
+        next unless length $line;
+        my $decoded = eval { decode_json($line) };
+        push @entries, $decoded if $decoded;
+    }
+    return @entries;
+}
+
+
+sub last_entry {
+    my ($self) = @_;
+    my @entries = $self->entries;
+    return @entries ? $entries[-1] : undef;
 }
 
 1;
@@ -45,7 +97,7 @@ App::karr::ActivityLog - Activity log writer for karr board operations
 
 =head1 VERSION
 
-version 0.300
+version 0.301
 
 =head1 SYNOPSIS
 
@@ -53,7 +105,7 @@ version 0.300
     use App::karr::Git;
 
     my $git = App::karr::Git->new(dir => '.');
-    my $log = App::karr::ActivityLog->new(git => $git);
+    my $log = App::karr::ActivityLog->new(git => $git, role => 'agent');
 
     $log->log_entry(
         agent   => 'agent-fox',
@@ -67,10 +119,23 @@ version 0.300
 Writes append-style JSON log entries to C<refs/karr/log/E<lt>identityE<gt>>
 refs. Each entry receives an automatic timestamp if not provided.
 
-The identity is derived from the Git user email, sanitized for use in ref
-names.
+The identity is C<E<lt>roleE<gt>/E<lt>emailE<gt>>: the Git user email
+(sanitized for ref names) qualified by a B<role> (C<user> or C<agent>). The
+role disambiguates a human and an AI agent that share one Git config. It
+defaults to the C<KARR_ROLE> environment variable, or C<user>.
 
 =head1 METHODS
+
+=head2 role
+
+The actor role, C<user> (default) or C<agent>. Read from C<KARR_ROLE> when not
+given explicitly.
+
+=head2 identity
+
+    my $id = $log->identity;   # e.g. "agent/getty_conflict.industries"
+
+The sanitized C<E<lt>roleE<gt>/E<lt>emailE<gt>> string keying this actor's log.
 
 =head2 log_entry
 
@@ -83,9 +148,23 @@ names.
     );
 
 Writes a JSON log line to the per-identity ref. The ref path is
-C<refs/karr/log/E<lt>sanitized_emailE<gt>>.
+C<refs/karr/log/E<lt>roleE<gt>/E<lt>sanitized_emailE<gt>>.
 
 Returns the result of L<Git/write_ref>.
+
+=head2 entries
+
+    my @entries = $log->entries;
+
+Returns the decoded log entries for this identity, oldest first. For the
+C<user> role, falls back to the legacy bare-email ref when the role-qualified
+ref does not yet exist.
+
+=head2 last_entry
+
+    my $entry = $log->last_entry;
+
+The most recent decoded log entry for this identity, or C<undef> if none.
 
 =head1 SUPPORT
 

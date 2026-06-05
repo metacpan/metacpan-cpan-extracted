@@ -1,0 +1,246 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>--header</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:ASSI@cygwin.nonet" />
+</head>
+
+<body id="_podtop_">
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#OPTIONS-CLI">OPTIONS (CLI)</a>
+    <ul>
+      <li><a href="#h---help">-h --help</a></li>
+      <li><a href="#v---verbose">-v --verbose</a></li>
+      <li><a href="#d---diag">-d --diag</a></li>
+      <li><a href="#a---assert">-a --assert</a></li>
+      <li><a href="#"></a></li>
+    </ul>
+  </li>
+  <li><a href="#Perl-Module-SYNOPSIS">Perl Module SYNOPSIS</a></li>
+  <li><a href="#API">API</a>
+    <ul>
+      <li><a href="#tstregex_init_desc-raw_re">tstregex_init_desc($raw_re)</a></li>
+      <li><a href="#tstregex-ctx-string">tstregex($ctx, $string)</a></li>
+      <li><a href="#tstregex_is_full_match">tstregex_is_full_match</a></li>
+      <li><a href="#tstregex_get_match_portion">tstregex_get_match_portion</a></li>
+      <li><a href="#tstregex_get_match_len">tstregex_get_match_len</a></li>
+      <li><a href="#tstregex_get_fail_token">tstregex_get_fail_token</a></li>
+      <li><a href="#tstregex_get_re_clean">tstregex_get_re_clean</a></li>
+      <li><a href="#tstregex_get_re_raw">tstregex_get_re_raw</a></li>
+      <li><a href="#tstregex_get_prefix_offset">tstregex_get_prefix_offset</a></li>
+    </ul>
+  </li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+  <li><a href="#EXAMPLE">EXAMPLE</a>
+    <ul>
+      <li><a href="#The-Nibbling-Engine">The &quot;Nibbling&quot; Engine</a></li>
+    </ul>
+  </li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#LICENSE">LICENSE</a></li>
+  <li><a href="#POD-ERRORS">POD ERRORS</a></li>
+</ul>
+
+<a href="#_podtop_"><h1 id="NAME">NAME</h1></a>
+
+<dl>
+
+<dt id="Tstregex---A-Hybrid-Regex-Diagnostic-Tool-single-file-Library-module-and-command-tool">Tstregex - A Hybrid Regex Diagnostic Tool (single file Library module and command tool)</dt>
+<dd>
+
+</dd>
+<dt id="shows-the-longest-Regular-Expression-match-highlight-the-rejected-part">shows the longest Regular Expression match / highlight the rejected part&gt;</dt>
+<dd>
+
+</dd>
+<dt id="pod">.</dt>
+<dd>
+
+</dd>
+<dt id="Example">Example:</dt>
+<dd>
+
+</dd>
+<dt id="pod1">.</dt>
+<dd>
+
+</dd>
+<dt id="perl-lib-Tstregex.pm-a-z-d-3-abc123-abc12a">$ perl lib/Tstregex.pm &#39;/^[a-z]*\d{3}$/&#39; &#39;abc123&#39; &#39;abc12a&#39;</dt>
+<dd>
+
+</dd>
+<dt id="abc123">abc123</dt>
+<dd>
+
+</dd>
+<dt id="abc12a-a-z-d-3">abc<b>12a</b> (^[a-z]*<b>\d{3}$</b>)</dt>
+<dd>
+
+</dd>
+<dt id="pod2">.</dt>
+<dd>
+
+</dd>
+<dt id="Above-the-normal-parts-are-the-longuest-matching-substring-when-bold-parts-highlights-the-rejected-substring"># Above, the normal parts are the longuest matching substring when bold parts highlights the rejected substring</dt>
+<dd>
+
+</dd>
+<dt id="idem-with-regexp-lexical-groups-between-parenthesis"># (idem with regexp lexical groups between parenthesis)</dt>
+<dd>
+
+</dd>
+</dl>
+
+<a href="#_podtop_"><h1 id="SYNOPSIS">SYNOPSIS</h1></a>
+
+<p><code>$tstregex &#39;regex&#39; string1 string2 ... stringN</code></p>
+
+<a href="#_podtop_"><h1 id="OPTIONS-CLI">OPTIONS (CLI)</h1></a>
+
+<h2 id="h---help">-h --help</h2>
+
+<p>show that help..</p>
+
+<h2 id="v---verbose">-v --verbose</h2>
+
+<p>shows key info on (un)matching..</p>
+
+<h2 id="d---diag">-d --diag</h2>
+
+<p>Triggers the Enriched Diagnostic View. It displays: - The string with the failing part highlighted. - The exact token in the regex that caused the break. - A visual pointer (<code>^--- HERE</code>) aligned with the regex syntax. - Execution time (useful for spotting ReDoS/Exponential backtracking).</p>
+
+<h2 id="a---assert">-a --assert</h2>
+
+<p>Misc: performs a huge test suite various a large collection of regexp tests with Tstregex..</p>
+
+<h2 id=""></h2>
+
+<a href="#_podtop_"><h1 id="Perl-Module-SYNOPSIS">Perl Module SYNOPSIS</h1></a>
+
+<pre><code>  use Tstregex;
+  my $ctx = tstregex_init_desc(&#39;/^\d{3}/&#39;);
+  tstregex($ctx, &#39;12a&#39;);
+  if (!tstregex_is_full_match($res))
+      {
+      my $token = tstregex_get_fail_token($res);
+      my $pos   = tstregex_get_match_len($res);
+      print &quot;Failure on token &#39;$token&#39; at column $pos\n&quot;;
+      }</code></pre>
+
+<a href="#_podtop_"><h1 id="API">API</h1></a>
+
+<h2 id="tstregex_init_desc-raw_re">tstregex_init_desc($raw_re)</h2>
+
+<p>Pre-parses the regex, handles delimiters (m!!, //, etc.), extracts modifiers (i, s, m, x), and prepares the nibbling steps. Returns a context hash.</p>
+
+<h2 id="tstregex-ctx-string">tstregex($ctx, $string)</h2>
+
+<p>Executes the diagnostic. Updates the context.</p>
+
+<h2 id="tstregex_is_full_match">tstregex_is_full_match</h2>
+
+<p>Returns match status of input string (BOOL 0 OR 1)</p>
+
+<h2 id="tstregex_get_match_portion">tstregex_get_match_portion</h2>
+
+<p>Returns the matching portion in case of full match (might be smaller than input string, depending on anchors..)</p>
+
+<h2 id="tstregex_get_match_len">tstregex_get_match_len</h2>
+
+<p>Returns the matching substring length</p>
+
+<h2 id="tstregex_get_fail_token">tstregex_get_fail_token</h2>
+
+<p>Returns the failing token in the regexp</p>
+
+<h2 id="tstregex_get_re_clean">tstregex_get_re_clean</h2>
+
+<p>Returns the matching regexp subpart</p>
+
+<h2 id="tstregex_get_re_raw">tstregex_get_re_raw</h2>
+
+<p>Returns the internal representation of the regexp</p>
+
+<h2 id="tstregex_get_prefix_offset">tstregex_get_prefix_offset</h2>
+
+<p>Returns the offset of the original regexp in the raw regexp</p>
+
+<a href="#_podtop_"><h1 id="DESCRIPTION">DESCRIPTION</h1></a>
+
+<p><code>tstregex</code> is designed to solve the &quot;Black Box&quot; problem of Regular Expressions. When a complex regex fails, Perl usually just says &quot;No Match&quot;. This tool identifies exactly <b>where</b> and <b>why</b> it failed by finding the longest possible partial match.</p>
+
+<a href="#_podtop_"><h1 id="EXAMPLE">EXAMPLE</h1></a>
+
+<pre><code>  $ perl lib/Tstregex.pm &#39;/^[a-z]*\d{3}$/&#39; &#39;abc123&#39; &#39;abc12a&#39;
+  abc123
+  abcB&lt;12a&gt; (B&lt;^[a-z]*&gt;\d{3}$)</code></pre>
+
+<p><i>The tool highlights the part of the string where the match failed.</i></p>
+
+<h2 id="The-Nibbling-Engine">The &quot;Nibbling&quot; Engine</h2>
+
+<p>The diagnostic logic uses a &quot;Nibbling&quot; (grignotage) strategy:</p>
+
+<dl>
+
+<dt id="Decomposition">1. Decomposition</dt>
+<dd>
+
+<p>The engine breaks down your regex into a hierarchy of valid sub-patterns (lexical groups, atoms, and quantifiers) from longest to shortest.</p>
+
+</dd>
+<dt id="Longest-Match-Search">2. Longest Match Search</dt>
+<dd>
+
+<p>It iteratively tests these sub-patterns against the input string. It&#39;s not just checking if the start matches, but what is the <i>maximum</i> sequence of instructions the engine could follow before hitting a wall.</p>
+
+</dd>
+<dt id="Failure-Point-Identification">3. Failure Point Identification</dt>
+<dd>
+
+<p>Once the longest matching sub-pattern is found, the tool identifies the very next token in your regex syntax. This is your &quot;Point of Failure&quot;.</p>
+
+</dd>
+</dl>
+
+<a href="#_podtop_"><h1 id="AUTHOR">AUTHOR</h1></a>
+
+<p>Olivier Delouya - 2026</p>
+
+<a href="#_podtop_"><h1 id="LICENSE">LICENSE</h1></a>
+
+<p>Artistic Version 2</p>
+
+<a href="#_podtop_"><h1 id="POD-ERRORS">POD ERRORS</h1></a>
+
+<p>Hey! <b>The above document had some coding errors, which are explained below:</b></p>
+
+<dl>
+
+<dt id="Around-line-15">Around line 15:</dt>
+<dd>
+
+<p>&#39;=item&#39; outside of any &#39;=over&#39;</p>
+
+</dd>
+<dt id="Around-line-38">Around line 38:</dt>
+<dd>
+
+<p>You forgot a &#39;=back&#39; before &#39;=head1&#39;</p>
+
+</dd>
+</dl>
+
+
+</body>
+
+</html>
+
+

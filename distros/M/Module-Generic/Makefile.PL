@@ -39,7 +39,7 @@ my %WriteMakefileArgs = (
         'Data::UUID'            => '1.226',
         # version v0.7.3 needed for _parse_timestamp
         'DateTime::Lite'        => 'v0.7.3',
-        'DateTime::Format::Lite'=> 'v0.1.2',
+        'DateTime::Format::Lite'=> 'v0.1.3',
         # 'DateTime::TimeZone::Catalog::Extend' => 'v0.3.0',
         'Devel::StackTrace'     => 0,
         'Errno'                 => 0,
@@ -82,6 +82,7 @@ my %WriteMakefileArgs = (
         'utf8'          => 0,
         'Bytes::Random::Secure' => '0.29',
         'Cwd'           => '3.72',
+        'DateTime::Format::JP' => 'v0.1.7',
         'Encode'        => '3.08',
         'File::Find'    => 0,
         'File::Which'   => '1.23',

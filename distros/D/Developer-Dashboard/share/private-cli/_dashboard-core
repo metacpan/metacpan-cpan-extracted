@@ -9,12 +9,20 @@ use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
 use FindBin qw($Bin);
 use lib grep { defined && -d } ( $ENV{DEVELOPER_DASHBOARD_REPO_LIB}, "$Bin/../lib" );
+use Developer::Dashboard::PerlEnv ();
 use File::Spec;
 use Getopt::Long qw(GetOptionsFromArray);
 use Getopt::Long ();
 
 binmode STDOUT, ':encoding(UTF-8)';
 binmode STDERR, ':encoding(UTF-8)';
+
+BEGIN {
+    my $dashboard_lib = File::Spec->catdir( $Bin, '..', 'lib' );
+    Developer::Dashboard::PerlEnv->bootstrap_perl5lib(
+        dashboard_lib => $dashboard_lib,
+    );
+}
 
 use Developer::Dashboard::Platform qw(
   native_shell_name
@@ -26,16 +34,21 @@ use Developer::Dashboard::InternalCLI ();
 use Developer::Dashboard::SeedSync ();
 
 my $dashboard_lib = File::Spec->catdir( $Bin, '..', 'lib' );
-if ( -d $dashboard_lib ) {
-    my $path_sep = $Config::Config{path_sep} || ':';
-    my @existing = grep { defined && $_ ne '' } split /\Q$path_sep\E/, ( $ENV{PERL5LIB} || '' );
-    if ( !grep { $_ eq $dashboard_lib } @existing ) {
-        $ENV{PERL5LIB} = join $path_sep, $dashboard_lib, @existing;
-    }
-}
 
 my $cmd = shift @ARGV || die "Missing built-in dashboard command\n";
 $0 = join q{ }, 'developer-dashboard', $cmd, @ARGV;
+
+if ( $cmd eq 'complete' ) {
+    require Developer::Dashboard::CLI::Complete;
+    my $index = shift @ARGV;
+    die "Usage: dashboard complete <index> <word0> <word1> ...\n" if !defined $index || $index !~ /\A\d+\z/;
+    my @candidates = Developer::Dashboard::CLI::Complete::complete(
+        index => $index,
+        words => \@ARGV,
+    );
+    print join( "\n", @candidates ), "\n" if @candidates;
+    exit 0;
+}
 
 require Developer::Dashboard::Auth;
 require Developer::Dashboard::ActionRunner;
@@ -291,8 +304,6 @@ sub _runtime_local_lib {
 # Output: hash containing the merged PERL5LIB value.
 sub _runtime_perl5lib_env {
     my (%args) = @_;
-    my $path_sep = $Config::Config{path_sep} || ':';
-    my @perl5lib = grep { defined $_ && $_ ne '' } split /\Q$path_sep\E/, ( $ENV{PERL5LIB} || '' );
     my @local_libs;
     if ( my $paths = $args{paths} ) {
         if ( $paths->can('runtime_local_lib_roots') ) {
@@ -305,14 +316,14 @@ sub _runtime_perl5lib_env {
     else {
         @local_libs = ( _runtime_local_lib(%args) );
     }
-    for my $local_lib ( reverse @local_libs ) {
-        next if !defined $local_lib || $local_lib eq '';
-        next if !-d $local_lib;
-        next if grep { $_ eq $local_lib } @perl5lib;
-        unshift @perl5lib, $local_lib;
+    for my $local_lib (@local_libs) {
+        next if !defined $local_lib || $local_lib eq '' || !-d $local_lib;
     }
     return (
-        PERL5LIB => join( $path_sep, @perl5lib ),
+        PERL5LIB => Developer::Dashboard::PerlEnv->perl5lib_env(
+            dashboard_lib => $dashboard_lib,
+            extra         => \@local_libs,
+        ),
     );
 }
 
@@ -615,6 +626,13 @@ elsif ( $cmd eq 'auth' ) {
         print json_encode( { removed => $username } );
         exit 0;
     }
+}
+elsif ( $cmd eq 'api' ) {
+    require Developer::Dashboard::CLI::API;
+    my $exit_code = Developer::Dashboard::CLI::API::run_api_command(
+        args => \@ARGV,
+    );
+    exit $exit_code;
 }
 elsif ( $cmd eq 'init' ) {
     _migrate_saved_pages();
@@ -1060,15 +1078,7 @@ elsif ( $cmd eq 'skills' ) {
     exit $exit_code;
 }
 elsif ( $cmd eq 'complete' ) {
-    require Developer::Dashboard::CLI::Complete;
-    my $index = shift @ARGV;
-    die "Usage: dashboard complete <index> <word0> <word1> ...\n" if !defined $index || $index !~ /\A\d+\z/;
-    my @candidates = Developer::Dashboard::CLI::Complete::complete(
-        index => $index,
-        words => \@ARGV,
-    );
-    print join( "\n", @candidates ), "\n" if @candidates;
-    exit 0;
+    die "dashboard complete should have exited before runtime bootstrap\n";
 }
 else {
     die "Unsupported built-in dashboard command '$cmd'\n";
@@ -1490,7 +1500,7 @@ _dd_apply_tmux_ticket_status() {
   fi
   tmux set-option -q status-position bottom >/dev/null 2>&1
   tmux set-option -q status 2 >/dev/null 2>&1
-  tmux set-option -q status-interval 2 >/dev/null 2>&1
+  tmux set-option -q status-interval 15 >/dev/null 2>&1
   tmux set-option -q status-format[0] "#(__DASHBOARD_TMUX_STATUS_CMD__ ps1 --mode tmux-status-top --width #{client_width})" >/dev/null 2>&1
   if [ -n "$_dd_default_status" ]; then
     tmux set-option -q status-format[1] "$_dd_default_status" >/dev/null 2>&1
@@ -1536,7 +1546,7 @@ _dd_apply_tmux_ticket_status() {
   fi
   tmux set-option -q status-position bottom >/dev/null 2>&1
   tmux set-option -q status 2 >/dev/null 2>&1
-  tmux set-option -q status-interval 2 >/dev/null 2>&1
+  tmux set-option -q status-interval 15 >/dev/null 2>&1
   tmux set-option -q status-format[0] "#(__DASHBOARD_TMUX_STATUS_CMD__ ps1 --mode tmux-status-top --width #{client_width})" >/dev/null 2>&1
   if [[ -n "$default_status" ]]; then
     tmux set-option -q status-format[1] "$default_status" >/dev/null 2>&1
@@ -1569,7 +1579,7 @@ _dd_apply_tmux_ticket_status() {
   fi
   tmux set-option -q status-position bottom >/dev/null 2>&1
   tmux set-option -q status 2 >/dev/null 2>&1
-  tmux set-option -q status-interval 2 >/dev/null 2>&1
+  tmux set-option -q status-interval 15 >/dev/null 2>&1
   tmux set-option -q status-format[0] "#(__DASHBOARD_TMUX_STATUS_CMD__ ps1 --mode tmux-status-top --width #{client_width})" >/dev/null 2>&1
   if [ -n "$_dd_default_status" ]; then
     tmux set-option -q status-format[1] "$_dd_default_status" >/dev/null 2>&1
@@ -1607,7 +1617,7 @@ function Set-DashboardTmuxTicketStatus {
   }
   & tmux set-option -q status-position bottom | Out-Null
   & tmux set-option -q status 2 | Out-Null
-  & tmux set-option -q status-interval 2 | Out-Null
+  & tmux set-option -q status-interval 15 | Out-Null
   & tmux set-option -q status-format[0] "#(__DASHBOARD_TMUX_STATUS_CMD__ ps1 --mode tmux-status-top --width #{client_width})" | Out-Null
   if (-not [string]::IsNullOrWhiteSpace($ddDefaultStatus)) {
     & tmux set-option -q status-format[1] $ddDefaultStatus | Out-Null

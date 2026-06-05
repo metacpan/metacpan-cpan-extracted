@@ -4,8 +4,9 @@ use strict;
 use warnings;
 
 use Test::DescribeMe qw(author);
-use Test::Most;
+use Test::More;
 use Test::Needs { 'Test::Pod' => '1.22' };
+use Test::Warnings ':no_end_test';
 
 Test::Pod->import();
 

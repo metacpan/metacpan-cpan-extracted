@@ -21,7 +21,6 @@ my %WriteMakefileArgs = (
     "Data::Dumper" => 0,
     "JSON" => 0,
     "LWP::UserAgent" => 0,
-    "List::Util" => 0,
     "URI::Escape" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -29,7 +28,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +40,6 @@ my %FallbackPrereqs = (
   "Data::Dumper" => 0,
   "JSON" => 0,
   "LWP::UserAgent" => 0,
-  "List::Util" => 0,
   "Test::More" => 0,
   "URI::Escape" => 0,
   "strict" => 0,

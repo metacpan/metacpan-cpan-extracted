@@ -4,6 +4,7 @@ use warnings;
 use Test::More;
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
+use Encode qw(encode_utf8);
 
 require_ok('Router::Ragel');
 
@@ -37,7 +38,7 @@ subtest 'all-static routes (max_captures == 0)' => sub {
 subtest 'backslash in pattern is correctly escaped' => sub {
     my $router = Router::Ragel->new;
     $router->add('/path/with\\backslash', 'bs_data');
-    $router->add('/path/:id/end',         'cap_data');
+    $router->add('/path/:id/end', 'cap_data');
     ok($router->compile, 'compile accepts backslash in literal segment');
 
     my @r = $router->match('/path/with\\backslash');
@@ -68,9 +69,9 @@ subtest 'slashes match exactly (no collapsing)' => sub {
     $router->compile;
 
     is(($router->match('/users/42'))[0], 'user', 'single slash matches');
-    is_deeply([$router->match('//users/42')],   [], 'leading double slash does not match');
-    is_deeply([$router->match('/users//42')],   [], 'middle double slash does not match');
-    is_deeply([$router->match('/users/42/')],   [], 'trailing slash does not match');
+    is_deeply([$router->match('//users/42')], [], 'leading double slash does not match');
+    is_deeply([$router->match('/users//42')], [], 'middle double slash does not match');
+    is_deeply([$router->match('/users/42/')], [], 'trailing slash does not match');
 };
 
 subtest 'malformed patterns croak at compile time' => sub {
@@ -254,6 +255,79 @@ subtest 'trailing slash is a distinct route' => sub {
     my $only_trailing = Router::Ragel->new->add('/y/', 'y_slash')->compile;
     is_deeply([$only_trailing->match('/y')], [], '/y does not match /y/');
     is(($only_trailing->match('/y/'))[0], 'y_slash', '/y/ matches /y/');
+};
+
+subtest 'literal suffix after <type> within a segment' => sub {
+    # The POD's motivating case for the greedy-name-then-type design:
+    # ':name<type>suffix' is the placeholder followed by a literal.
+    my $r = Router::Ragel->new
+        ->add('/:name<string>_extra', 'suf')
+        ->add('/:x<int>px', 'int_suf')
+        ->compile;
+
+    is_deeply([$r->match('/hello_extra')], ['suf', 'hello'],
+        ':name<string>_extra captures the name and matches the literal suffix');
+    is_deeply([$r->match('/hello_wrong')], [], 'wrong suffix does not match');
+    is_deeply([$r->match('/_extra')], [],
+        'string placeholder needs at least one char before the suffix');
+    is_deeply([$r->match('/42px')], ['int_suf', '42'],
+        ':x<int>px captures digits and matches the literal suffix');
+    is_deeply([$r->match('/42')], [], 'missing literal suffix fails to match');
+};
+
+subtest 'utf8-flagged (wide) path matched as UTF-8 bytes' => sub {
+    my $r = Router::Ragel->new
+        ->add(encode_utf8("/caf\x{e9}"), 'cafe')
+        ->add(encode_utf8('/x/:p'), 'cap')
+        ->compile;
+
+    my $wide = "/caf\x{e9}";
+    utf8::upgrade($wide); # force the utf8 flag on
+    is_deeply([$r->match($wide)], ['cafe'],
+        'wide path matches the byte pattern via its UTF-8 representation');
+
+    my $wcap = "/x/caf\x{e9}";
+    utf8::upgrade($wcap);
+    my @c = $r->match($wcap);
+    is($c[0], 'cap', 'wide path with a capture matches');
+    is($c[1], encode_utf8("caf\x{e9}"), 'capture returns the raw UTF-8 bytes');
+    ok(!utf8::is_utf8($c[1]), 'captured value is a byte string (utf8 flag off)');
+};
+
+subtest 'match() without a router object croaks instead of crashing' => sub {
+    eval { Router::Ragel::match('not a router', '/x') };
+    like($@, qr/requires a router object/, 'non-reference self croaks');
+
+    eval { Router::Ragel->match('/x') };
+    like($@, qr/requires a router object/, 'class-method call (forgot ->new) croaks');
+
+    my $r = Router::Ragel->new->add('/x', 'd')->compile;
+    eval { Router::Ragel::match('/x', $r) };
+    like($@, qr/requires a router object/, 'swapped arguments (path first) croaks');
+};
+
+subtest 'Ragel metacharacters in literal segments match literally' => sub {
+    # Only ' and \ are escaped for Ragel string literals (covered in t/01 and
+    # the backslash subtest above). Every other metacharacter -- including
+    # '#', Ragel's comment introducer -- must pass through and match itself
+    # rather than act as grammar.
+    my $lit = 'a#b%c{d}e<f>g|h*i+j(k)l[m]n.o&p=q@r~s^t$u';
+    my $r = Router::Ragel->new->add("/lit/$lit/end", 'special')->compile;
+    is(($r->match("/lit/$lit/end"))[0], 'special',
+        'segment full of metacharacters matches itself');
+    is_deeply([$r->match('/lit/aXb/end')], [],
+        'a different literal in that segment does not match');
+};
+
+subtest 'zero-width capture from a *-quantified custom type' => sub {
+    # The capture arrays are left uninitialized; the read-back is safe because
+    # every capture action of the matched route has fired. A type matching zero
+    # bytes still fires both start and end, yielding '' rather than a stale read.
+    my $r = Router::Ragel->new->add('/z/:p<[a-z]*>', 'zw')->compile;
+    my @e = $r->match('/z/');
+    is($e[0], 'zw', 'route with an empty capture still matches');
+    is($e[1], '', '...and returns an empty string, not a stale value');
+    is_deeply([$r->match('/z/abc')], ['zw', 'abc'], 'non-empty capture works too');
 };
 
 done_testing;

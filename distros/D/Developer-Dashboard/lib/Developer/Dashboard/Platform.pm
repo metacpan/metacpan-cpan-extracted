@@ -3,7 +3,7 @@ package Developer::Dashboard::Platform;
 use strict;
 use warnings;
 
-our $VERSION = '3.90';
+our $VERSION = '4.03';
 
 use Exporter 'import';
 use File::Basename qw(basename dirname);
@@ -74,14 +74,15 @@ sub normalize_shell_name {
 
 # shell_command_argv($command, %args)
 # Builds the argv list used to execute one shell command string on the current platform.
-# Input: command string and optional shell selector override.
+# Input: command string plus optional shell selector override and login boolean.
 # Output: command argv list suitable for system/open3.
 sub shell_command_argv {
     my ( $command, %args ) = @_;
     die "Missing shell command\n" if !defined $command;
 
     my $shell = normalize_shell_name( $args{shell} || native_shell_name() );
-    return ( $shell, '-lc', $command ) if $shell eq 'bash' || $shell eq 'zsh' || $shell eq 'sh';
+    my $login = $args{login} ? 1 : 0;
+    return ( $shell, $login ? '-lc' : '-c', $command ) if $shell eq 'bash' || $shell eq 'zsh' || $shell eq 'sh';
     return ( $shell, '-NoLogo', '-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-Command', $command )
       if $shell eq 'powershell' || $shell eq 'pwsh';
     die "Unsupported shell '$shell'\n";

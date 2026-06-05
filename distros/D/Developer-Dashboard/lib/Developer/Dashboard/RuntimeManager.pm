@@ -3,15 +3,16 @@ package Developer::Dashboard::RuntimeManager;
 use strict;
 use warnings;
 
-our $VERSION = '3.90';
+our $VERSION = '4.03';
 
 use Capture::Tiny qw(capture);
 use File::Spec;
 use IO::Socket::INET;
-use POSIX qw(setsid strftime);
+use POSIX qw(close setsid strftime);
 use Time::HiRes qw(sleep time);
 
 use Developer::Dashboard::Collector;
+use Developer::Dashboard::CollectorRunner ();
 use Developer::Dashboard::InternalCLI ();
 use Developer::Dashboard::JSON qw(json_encode json_decode);
 use Developer::Dashboard::Platform qw(command_in_path is_windows);
@@ -64,6 +65,7 @@ sub start_web {
     my $foreground = $args{foreground} ? 1 : 0;
 
     if ($foreground) {
+        $self->_close_inherited_fds( preserve_harness => 1 );
         my $server = $self->{app_builder}->( host => $host, port => $port, workers => $workers, ssl => $ssl );
         return $server->run;
     }
@@ -88,7 +90,7 @@ sub start_web {
     $self->_cleanup_web_files;
 
     pipe my $reader, my $writer or die "Unable to create startup pipe: $!";
-    my $pid = fork();
+    my $pid = $self->_fork_process();
     die "Unable to fork dashboard web service: $!" if !defined $pid;
 
     if ($pid) {
@@ -118,7 +120,7 @@ sub start_web {
     }
 
     close $reader;
-    exit $self->_run_web_child( $writer, $host, $port, workers => $workers, ssl => $ssl );
+    POSIX::_exit( $self->_run_web_child( $writer, $host, $port, workers => $workers, ssl => $ssl ) );
 }
 
 # _start_web_windows_background(%args)
@@ -195,7 +197,7 @@ sub running_web {
     if ( my $pid = $self->{files}->read('web_pid') ) {
         chomp $pid;
         $pid = $self->_normalized_process_id($pid);
-        if ( $pid && kill( 0, $pid ) && $self->_same_pid_namespace($pid) ) {
+        if ( $pid && $self->_pid_is_running($pid) && $self->_same_pid_namespace($pid) ) {
             if ( $self->_is_managed_web($pid) || ( $state->{status} || '' ) eq 'running' ) {
                 return {
                     %$state,
@@ -258,9 +260,11 @@ sub stop_web {
             label   => 'Stop dashboard web service',
         }
     );
+    my $saved_state = $self->web_state || {};
     my $running = $self->running_web;
-    my $state = $running || $self->web_state || {};
-    my $pid = $running ? $running->{pid} : undef;
+    my $state = $running ? { %{$saved_state}, %{$running} } : $saved_state;
+    my $pid = $saved_state->{pid};
+    $pid = $running->{pid} if !defined $pid && $running;
     my $port = $state->{port};
     my @listener_pids = $self->_listener_pids_from_state($state);
     if ( !$pid && @listener_pids == 1 ) {
@@ -297,28 +301,34 @@ sub stop_web {
     $self->_send_signal( 'TERM', $pid ) if $pid;
     $self->_send_signal( 'TERM', @listener_pids );
     $self->_pkill_perl('^dashboard web:');
-    $self->_pkill_perl('^dashboard ajax:');
-    for my $proc ( $self->_find_legacy_web_processes ) {
-        $self->_send_signal( 'TERM', $proc->{pid} );
-    }
-    for ( 1 .. 30 ) {
-        last if !$self->running_web && !scalar $self->_find_processes_by_prefix('dashboard ajax:');
-        sleep 0.1;
+    my @ajax_workers = $self->_managed_ajax_processes;
+    my @ajax_worker_pids = map { $_->{pid} } @ajax_workers;
+    $self->_send_signal( 'TERM', @ajax_worker_pids );
+    my @legacy_web_pids = map { $_->{pid} } $self->_find_legacy_web_processes;
+    $self->_send_signal( 'TERM', @legacy_web_pids );
+    my $watch_ajax_workers = @ajax_worker_pids ? 1 : 0;
+    for ( 1 .. 5 ) {
+        if ($watch_ajax_workers) {
+            @ajax_workers = $self->_managed_ajax_processes;
+            @ajax_worker_pids = map { $_->{pid} } @ajax_workers;
+        }
+        last if !$self->_wait_for_unix_web_shutdown(
+            pid           => $pid,
+            listener_pids => \@listener_pids,
+            ajax_pids     => \@ajax_worker_pids,
+            legacy_pids   => \@legacy_web_pids,
+        );
+        sleep $self->_runtime_poll_interval;
     }
 
-    my $still_running = $self->running_web;
-    if ($still_running) {
-        $self->_send_signal( 'KILL', $still_running->{pid} );
-        sleep 0.1;
+    if ( $pid && $self->_pid_is_running($pid) ) {
+        $self->_send_signal( 'KILL', $pid );
     }
-    for my $proc ( $self->_find_processes_by_prefix('dashboard ajax:') ) {
-        $self->_send_signal( 'KILL', $proc->{pid} );
-    }
+    $self->_send_signal( 'KILL', @ajax_worker_pids );
     my @still_listening = grep { kill 0, $_ } @listener_pids;
     $self->_send_signal( 'KILL', @still_listening );
-    for my $proc ( $self->_find_legacy_web_processes ) {
-        $self->_send_signal( 'KILL', $proc->{pid} );
-    }
+    $self->_send_signal( 'KILL', grep { $self->_pid_is_running($_) } @legacy_web_pids );
+    sleep $self->_runtime_poll_interval;
     my $released = $self->_wait_for_port_release($port);
     if ( !$released && $port ) {
         my @late_listeners = grep { kill 0, $_ } $self->_listener_pids_for_port($port);
@@ -326,7 +336,7 @@ sub stop_web {
         $self->_reap_child_processes(@late_listeners);
         $self->_wait_for_port_release($port);
     }
-    $self->_reap_child_processes( $pid, @listener_pids );
+    $self->_reap_child_processes( $pid, @listener_pids, @legacy_web_pids, @ajax_worker_pids );
 
     $self->_cleanup_web_files;
     $self->_progress_emit(
@@ -338,6 +348,46 @@ sub stop_web {
         }
     );
     return _numeric_pid($pid);
+}
+
+# _wait_for_unix_web_shutdown(%args)
+# Checks whether Unix web shutdown still has managed web, ajax worker, legacy
+# serve, or listener processes alive before escalation to KILL.
+# Input: optional pid integer plus array references for listener_pids,
+# ajax_pids, and legacy_pids.
+# Output: boolean true when shutdown work is still pending.
+sub _wait_for_unix_web_shutdown {
+    my ( $self, %args ) = @_;
+    my $pid = $args{pid};
+    my @listener_pids = @{ $args{listener_pids} || [] };
+    my @ajax_pids     = @{ $args{ajax_pids}     || [] };
+    my @legacy_pids   = @{ $args{legacy_pids}   || [] };
+
+    return 1 if defined $pid && $pid =~ /^\d+$/ && $pid > 0 && $self->_pid_is_running($pid);
+    return 1 if grep { defined $_ && $self->_pid_is_running($_) } @ajax_pids;
+    return 1 if grep { defined $_ && $self->_pid_is_running($_) } @legacy_pids;
+    return 1 if grep { defined $_ && /^\d+$/ && kill 0, $_ } @listener_pids;
+    return 0;
+}
+
+# _managed_ajax_processes()
+# Returns dashboard Ajax singleton workers that belong to the current runtime so
+# web stop and restart actions do not interfere with unrelated dashboard Ajax
+# processes owned by the same user.
+# Input: none.
+# Output: list of ajax process hash references for the active runtime root.
+sub _managed_ajax_processes {
+    my ($self) = @_;
+    my $runtime_root = $self->{paths} ? $self->{paths}->state_root : '';
+    my @matches;
+    for my $proc ( $self->_find_processes_by_prefix('dashboard ajax:') ) {
+        my $marker = $self->_read_process_env_marker( $proc->{pid}, 'DEVELOPER_DASHBOARD_RUNTIME_ROOT' );
+        next if defined $marker && $marker ne '' && $marker ne $runtime_root;
+        next if defined $marker && $marker eq '' && $runtime_root ne '';
+        next if !defined $marker && $self->_procfs_available && $runtime_root ne '';
+        push @matches, $proc;
+    }
+    return @matches;
 }
 
 # _numeric_pid($pid)
@@ -390,6 +440,34 @@ sub _reap_child_processes {
     return $count;
 }
 
+# _wait_for_any_child_process($flags)
+# Wraps waitpid for any direct child so the watchdog supervisor can reap exited
+# adopted children without depending on implicit process cleanup.
+# Input: waitpid flag integer such as WNOHANG.
+# Output: reaped pid integer, zero when nothing is ready, or -1 when no child
+# remains.
+sub _wait_for_any_child_process {
+    my ( $self, $flags ) = @_;
+    return waitpid( -1, $flags );
+}
+
+# _reap_any_child_processes()
+# Reaps every direct child that has already exited so long-lived runtime helper
+# processes such as the collector watchdog do not accumulate zombies when they
+# become the parent of dashboard-managed subprocesses.
+# Input: none.
+# Output: number of child processes reaped.
+sub _reap_any_child_processes {
+    my ($self) = @_;
+    my $count = 0;
+    while (1) {
+        my $reaped = $self->_wait_for_any_child_process(1);
+        last if !defined $reaped || $reaped <= 0;
+        $count++;
+    }
+    return $count;
+}
+
 # _wait_for_windows_web_shutdown($pid, $port, $listener_pids)
 # Checks whether the Windows-managed web process and its listener port have
 # both gone away after shutdown signals were sent.
@@ -413,8 +491,10 @@ sub start_collectors {
     my ( $self, %args ) = @_;
     my $progress = $args{progress};
     my %wanted = map { $_ => 1 } @{ $args{names} || [] };
+    my @jobs = @{ $self->{config}->collectors };
+    $self->_stop_disabled_collectors( jobs => \@jobs, progress => $progress, wanted => \%wanted );
     my @started;
-    for my $job ( @{ $self->{config}->collectors } ) {
+    for my $job (@jobs) {
         next if ref($job) ne 'HASH';
         my $schedule = $job->{schedule} || ( $job->{cron} ? 'cron' : $job->{interval} ? 'interval' : 'manual' );
         my $name = $job->{name} || '(unnamed)';
@@ -424,6 +504,7 @@ sub start_collectors {
         else {
             next if $schedule eq 'manual';
         }
+        next if $self->_collector_disabled($job);
         $self->_progress_emit(
             $progress,
             {
@@ -486,6 +567,13 @@ sub start_named_collector {
     my ( $self, %args ) = @_;
     my $name = $args{name} || die "Missing collector name\n";
     my $job = $self->_collector_job_by_name($name);
+    if ( $self->_collector_disabled($job) ) {
+        $self->stop_collectors(
+            names    => [$name],
+            progress => $args{progress},
+        );
+        die "Collector '$name' is disabled\n";
+    }
     my $loop_job = $self->_loop_job_for_named_start($job);
     my $progress = $args{progress};
     $self->_progress_emit(
@@ -637,6 +725,7 @@ sub stop_collectors {
             );
             die "Failed to stop collector '$name': $error\n";
         }
+        $self->_ensure_collector_pid_stopped( $name, $loop->{pid} );
         $self->_progress_emit(
             $progress,
             {
@@ -651,16 +740,52 @@ sub stop_collectors {
             status => 'stopped',
         };
     }
-    $self->_pkill_perl('^dashboard collector:');
-    for ( 1 .. 30 ) {
-        last if !scalar $self->_find_processes_by_prefix('dashboard collector:');
-        sleep 0.1;
-    }
-    for my $proc ( $self->_find_processes_by_prefix('dashboard collector:') ) {
-        $self->_send_signal( 'KILL', $proc->{pid} );
-    }
     return @stopped if $args{structured};
     return @names;
+}
+
+# _ensure_collector_pid_stopped($name, $pid)
+# Forces one targeted collector pid fully down after the runner has performed its
+# own stop work so restart flows cannot get stuck behind a loop that survived
+# state cleanup.
+# Input: collector name string and optional collector pid integer.
+# Output: true when no live collector pid remains for that target.
+sub _ensure_collector_pid_stopped {
+    my ( $self, $name, $pid ) = @_;
+    return 1 if !defined $pid || $pid !~ /^\d+$/ || $pid < 1;
+    return 1 if !$self->_same_pid_namespace($pid);
+    return 1 if !$self->_pid_is_running($pid);
+
+    $self->_send_signal( 'TERM', $pid );
+    for ( 1 .. 20 ) {
+        last if !$self->_pid_is_running($pid);
+        sleep 0.1;
+    }
+
+    if ( $self->_pid_is_running($pid) ) {
+        $self->_send_signal( 'KILL', $pid );
+        for ( 1 .. 20 ) {
+            last if !$self->_pid_is_running($pid);
+            sleep 0.1;
+        }
+    }
+
+    $self->_reap_child_process($pid);
+    die "Collector '$name' did not stop after TERM and KILL\n" if $self->_pid_is_running($pid);
+    return 1;
+}
+
+# _collector_supervisor_targets_without($names)
+# Returns the current watchdog target set after removing one explicit list of
+# collector names so targeted lifecycle commands can pause supervision without
+# losing the remaining watched fleet.
+# Input: array reference of collector names to remove.
+# Output: ordered list of remaining watched collector names.
+sub _collector_supervisor_targets_without {
+    my ( $self, $names ) = @_;
+    my %remove = map { $_ => 1 } $self->_normalized_collector_watch_names($names);
+    my $state = $self->_collector_supervisor_state || {};
+    return grep { !$remove{$_} } @{ $state->{watched_names} || [] };
 }
 
 # _collector_stop_targets($wanted)
@@ -689,7 +814,7 @@ sub _collector_stop_targets {
         if ( -f $pidfile ) {
             open my $fh, '<', $pidfile or die "Unable to read $pidfile: $!";
             my $pid_text = <$fh>;
-            close $fh or die "Unable to close $pidfile: $!";
+            close $fh;
             chomp $pid_text if defined $pid_text;
             $pid = $pid_text if defined $pid_text && $pid_text =~ /^\d+$/;
             push @targets, {
@@ -964,6 +1089,44 @@ sub _collector_job_by_name {
     die "Unknown collector '$name'\n";
 }
 
+# _collector_disabled($job)
+# Returns whether one collector job is explicitly disabled in config.
+# Input: collector job hash reference.
+# Output: boolean true when the collector should not be started.
+sub _collector_disabled {
+    my ( $self, $job ) = @_;
+    return 0 if ref($job) ne 'HASH';
+    return $job->{disable} ? 1 : 0;
+}
+
+# _stop_disabled_collectors(%args)
+# Stops running collectors that are explicitly disabled in config before the
+# startup loop continues with enabled jobs.
+# Input: collector jobs array reference, optional progress callback, and
+# optional wanted-name hash reference for scoped starts.
+# Output: ordered list of disabled collector names that were targeted for stop.
+sub _stop_disabled_collectors {
+    my ( $self, %args ) = @_;
+    my $jobs = $args{jobs};
+    return () if ref($jobs) ne 'ARRAY';
+    my $wanted = ref( $args{wanted} ) eq 'HASH' ? $args{wanted} : {};
+    my %disabled;
+    for my $job ( @{$jobs} ) {
+        next if !$self->_collector_disabled($job);
+        my $name = ref($job) eq 'HASH' ? ( $job->{name} || '' ) : '';
+        next if $name eq '';
+        next if %{$wanted} && !$wanted->{$name};
+        $disabled{$name} = 1;
+    }
+    my @names = sort keys %disabled;
+    return () if !@names;
+    $self->stop_collectors(
+        names    => \@names,
+        progress => $args{progress},
+    );
+    return @names;
+}
+
 # _loop_job_for_named_start($job)
 # Normalizes one collector job into a loopable schedule for explicit named starts.
 # Input: collector job hash reference.
@@ -1153,9 +1316,10 @@ sub _collector_watchdog_last_progress_epoch {
 sub _collector_watchdog_stale_seconds {
     my ( $self, $job ) = @_;
     $job ||= {};
-    my $interval = defined $job->{interval} && $job->{interval} =~ /^(?:\d+|\d*\.\d+)$/ && $job->{interval} > 0
-      ? $job->{interval}
-      : 30;
+    my $interval = Developer::Dashboard::CollectorRunner::_effective_interval_seconds(
+        bless( {}, 'Developer::Dashboard::CollectorRunner' ),
+        $job,
+    );
     my $timeout = defined $job->{timeout_ms} && $job->{timeout_ms} =~ /^\d+$/ && $job->{timeout_ms} > 0
       ? ( $job->{timeout_ms} / 1000 )
       : defined $job->{timeout} && $job->{timeout} =~ /^(?:\d+|\d*\.\d+)$/ && $job->{timeout} > 0
@@ -1357,17 +1521,24 @@ sub _run_collector_supervisor_child {
         open STDIN, '<', File::Spec->devnull() or die $!;
         open STDOUT, '>>', $self->{files}->collector_log or die $!;
         open STDERR, '>>', $self->{files}->collector_log or die $!;
+        $self->_close_inherited_fds( close_ipc => 1 );
     }
 
     $ENV{DEVELOPER_DASHBOARD_COLLECTOR_SUPERVISOR} = 1;
     local $0 = $self->_collector_supervisor_process_title;
     local $COLLECTOR_SUPERVISOR_MANAGER = $self;
     my $shutdown = sub { $self->_shutdown_collector_supervisor('stopped') };
+    local $SIG{CHLD} = sub {
+        return if !$COLLECTOR_SUPERVISOR_MANAGER;
+        $COLLECTOR_SUPERVISOR_MANAGER->_reap_any_child_processes;
+        return;
+    };
     local $SIG{TERM} = $shutdown;
     local $SIG{INT}  = $shutdown;
     local $SIG{HUP}  = $shutdown;
 
     while (1) {
+        $self->_reap_any_child_processes;
         my $state = $self->_collector_supervisor_state || {};
         my @targets = $self->_normalized_collector_watch_names( $state->{watched_names} );
         if ( !@targets ) {
@@ -1408,6 +1579,7 @@ sub _run_collector_supervisor_child {
 # Output: never returns.
 sub _shutdown_collector_supervisor {
     my ( $self, $status ) = @_;
+    $self->_reap_any_child_processes;
     my $state = $self->_collector_supervisor_state || {};
     $self->_write_collector_supervisor_state(
         {
@@ -1420,7 +1592,7 @@ sub _shutdown_collector_supervisor {
         }
     );
     $self->_cleanup_collector_supervisor_files;
-    exit 0;
+    POSIX::_exit(0);
 }
 
 # _stop_collector_supervisor()
@@ -1458,7 +1630,6 @@ sub _collector_supervisor_running {
     return if !-f $pidfile;
     open my $fh, '<', $pidfile or die "Unable to read $pidfile: $!";
     my $pid = <$fh>;
-    close $fh or die "Unable to close $pidfile: $!";
     chomp $pid if defined $pid;
     if ( $pid && $pid =~ /^\d+$/ && kill( 0, $pid ) && $self->_same_pid_namespace($pid) && $self->_is_collector_supervisor($pid) ) {
         return $pid + 0;
@@ -1730,7 +1901,7 @@ sub _shutdown_web {
             updated_at => _now_iso8601(),
         }
     );
-    exit 0;
+    POSIX::_exit(0);
 }
 
 # _run_web_child($writer, $host, $port, %args)
@@ -1745,7 +1916,7 @@ sub _run_web_child {
     my $ssl      = exists $args{ssl}      ? $args{ssl}      : 0;
     if ($detach) {
         $self->_detach_web_process_session;
-        my $pid = fork();
+        my $pid = $self->_fork_process();
         die "Unable to complete dashboard web daemonize: $!" if !defined $pid;
         return 0 if $pid;
     }
@@ -1754,7 +1925,6 @@ sub _run_web_child {
         open STDOUT, '>>', $self->{files}->dashboard_log or die $!;
         open STDERR, '>>', $self->{files}->dashboard_log or die $!;
     }
-
     $ENV{DEVELOPER_DASHBOARD_WEB_SERVICE} = 1;
     $ENV{DEVELOPER_DASHBOARD_WEB_HOST}    = $host;
     $ENV{DEVELOPER_DASHBOARD_WEB_PORT}    = $port;
@@ -1769,23 +1939,21 @@ sub _run_web_child {
 
     my $server = eval { $self->{app_builder}->( host => $host, port => $port, workers => $workers, ssl => $ssl ) };
     if ($@) {
-        print {$writer} "err: $@";
-        close $writer;
+        $self->_write_startup_pipe_message( $writer, "err: $@" );
         return 1;
     }
 
     my $daemon = eval { $server->start_daemon };
     if ($@) {
-        print {$writer} "err: $@";
-        close $writer;
+        $self->_write_startup_pipe_message( $writer, "err: $@" );
         return 1;
     }
 
     my $bound_host = $daemon->sockhost;
     my $bound_port = $daemon->sockport;
     my $child_pid = $self->_normalized_process_id($$);
-    print {$writer} join( '|', 'ok', $child_pid, $bound_host, $bound_port ), "\n";
-    close $writer;
+    $self->_write_startup_pipe_message( $writer, join( '|', 'ok', $child_pid, $bound_host, $bound_port ) . "\n" );
+    $self->_close_inherited_fds( close_ipc => 1 ) if $detach || $redirect;
 
     $self->_write_web_state(
         {
@@ -1834,6 +2002,42 @@ sub _run_web_child {
     return 0;
 }
 
+# _write_startup_pipe_message($writer, $message)
+# Writes one startup status payload to the parent startup pipe without relying
+# on buffered stdio semantics in detached children.
+# Input: writable startup pipe handle and message string.
+# Output: true value after the whole message is written and the handle closed.
+sub _write_startup_pipe_message {
+    my ( $self, $writer, $message ) = @_;
+    $message = '' if !defined $message;
+    my $fd = fileno($writer);
+    if ( !defined $fd || $fd < 0 ) {
+        print {$writer} $message or die "Unable to write startup pipe: $!";
+    }
+    else {
+        my $offset = 0;
+        while ( $offset < length $message ) {
+            my $written = syswrite( $writer, $message, length($message) - $offset, $offset );
+            die "Unable to write startup pipe: $!" if !defined $written;
+            $offset += $written;
+        }
+    }
+    if ( !$self->_close_startup_pipe_writer($writer) ) {
+        die "Unable to close startup pipe: $!" if $! !~ /Bad file descriptor/;
+    }
+    return 1;
+}
+
+# _close_startup_pipe_writer($writer)
+# Closes one startup pipe writer handle for web-service child startup reporting.
+# Input: writable startup pipe handle.
+# Output: true value when the close succeeds and false when the caller should
+# inspect $! for an expected close failure such as Bad file descriptor.
+sub _close_startup_pipe_writer {
+    my ( $self, $writer ) = @_;
+    return close $writer;
+}
+
 # _detach_web_process_session()
 # Detaches the current web-service child from the parent session when the
 # active platform supports POSIX setsid.
@@ -1845,6 +2049,14 @@ sub _detach_web_process_session {
     return 1 if is_windows();
     setsid() or die "Unable to detach dashboard web service: $!";
     return 1;
+}
+
+# _fork_process()
+# Wraps Perl fork so tests can drive parent and child runtime paths directly.
+# Input: none.
+# Output: child pid in the parent, zero in the child, or undef on failure.
+sub _fork_process {
+    return fork();
 }
 
 # web_log(%args)
@@ -1925,9 +2137,9 @@ sub _follow_log_file {
     else {
         seek $fh, 0, 2 or die "Unable to seek $file: $!";
     }
-    local $SIG{TERM} = sub { exit 0 };
-    local $SIG{INT}  = sub { exit 0 };
-    local $SIG{HUP}  = sub { exit 0 };
+    local $SIG{TERM} = sub { POSIX::_exit(0) };
+    local $SIG{INT}  = sub { POSIX::_exit(0) };
+    local $SIG{HUP}  = sub { POSIX::_exit(0) };
     while (1) {
         my $chunk = '';
         my $read = sysread( $fh, $chunk, 8192 );
@@ -1969,6 +2181,66 @@ sub _cleanup_web_files {
     $self->{files}->remove('web_pid');
     $self->{files}->remove('web_state');
     return 1;
+}
+
+# _close_inherited_fds(%args)
+# Closes inherited non-stdio descriptors in runtime children so background
+# web/watchdog processes do not keep caller-side capture handles open after
+# lifecycle commands exit.
+# Input: optional keep array reference of descriptor integers, optional
+# close_ipc boolean for socketpair/anon_inode cleanup, and optional
+# preserve_harness boolean for in-process TAP harness execution.
+# Output: true value.
+sub _close_inherited_fds {
+    my ( $self, %args ) = @_;
+    return 1 if $args{preserve_harness} && $ENV{HARNESS_ACTIVE};
+    my %keep = map { $_ => 1 } grep { defined $_ && $_ =~ /^\d+$/ } @{ $args{keep} || [] };
+    $keep{0} = 1;
+    $keep{1} = 1;
+    $keep{2} = 1;
+    for my $fd ( $self->_open_file_descriptors ) {
+        next if $keep{$fd};
+        next if !$self->_descriptor_is_inherited_pipe( $fd, %args );
+        POSIX::close($fd);
+    }
+    return 1;
+}
+
+# _open_file_descriptors()
+# Lists the current process file-descriptor numbers from procfs or /dev/fd so
+# detached runtime children can close inherited caller pipes safely.
+# Input: none.
+# Output: sorted list of descriptor integers.
+sub _open_file_descriptors {
+    my ($self) = @_;
+    my %seen;
+    my @fds;
+    for my $path ( glob('/proc/self/fd/*'), glob('/dev/fd/*') ) {
+        next if $path !~ m{(?:/proc/self/fd|/dev/fd)/(\d+)\z};
+        my $fd = $1 + 0;
+        next if $seen{$fd}++;
+        push @fds, $fd;
+    }
+    return sort { $a <=> $b } @fds;
+}
+
+# _descriptor_is_inherited_pipe($fd)
+# Returns whether one descriptor currently points at an inherited capture or
+# IPC endpoint that a detached runtime child should close after stdio has been
+# redirected.
+# Input: descriptor integer.
+# Output: boolean true when the descriptor target is an inherited pipe,
+# socketpair, or anonymous kernel handle.
+sub _descriptor_is_inherited_pipe {
+    my ( $self, $fd, %args ) = @_;
+    return 0 if !defined $fd || $fd !~ /^\d+$/;
+    my $proc_target = readlink("/proc/self/fd/$fd");
+    my $dev_target  = readlink("/dev/fd/$fd");
+    my $target = defined $proc_target ? $proc_target : $dev_target;
+    return 0 if !defined $target || $target eq '';
+    return 1 if $target =~ /^pipe:/;
+    return 0 if !$args{close_ipc};
+    return $target =~ /^(?:socket:|anon_inode:)/ ? 1 : 0;
 }
 
 # _web_process_title($host, $port)
@@ -2136,8 +2408,9 @@ sub _helper_file_supports_internal_command {
     open my $fh, '<:raw', $path or return 0;
     local $/;
     my $content = <$fh>;
-    close $fh or return 0;
-    return $content =~ /\Q$command\E/ ? 1 : 0;
+    CORE::close($fh) or return 0;
+    my $matched = $content =~ /\Q$command\E/ ? 1 : 0;
+    return $matched;
 }
 
 # _spawn_windows_background_command(@command)
@@ -2218,10 +2491,21 @@ sub _pkill_perl {
 # Output: list of process hash references.
 sub _find_processes_by_prefix {
     my ( $self, $prefix ) = @_;
-    return grep {
-        $self->_proc_owned_by_current_user($_)
-          && $_->{args} =~ /^\Q$prefix\E/
-    } $self->_ps_processes;
+    my @matches;
+    for my $proc ( $self->_ps_processes ) {
+        next if !$self->_proc_owned_by_current_user($proc);
+        if ( defined $proc->{args} && $proc->{args} =~ /^\Q$prefix\E/ ) {
+            push @matches, $proc;
+            next;
+        }
+        my $title = $self->_read_process_title( $proc->{pid} );
+        next if !defined $title || $title !~ /^\Q$prefix\E/;
+        push @matches, {
+            %{$proc},
+            args => $title,
+        };
+    }
+    return @matches;
 }
 
 # _find_web_processes()
@@ -2371,6 +2655,11 @@ sub _listener_pids_for_port {
         }
         return $self->_listener_pids_for_port_via_netstat($port);
     }
+    if ( !command_in_path('ss') ) {
+        my @pids = $self->_listener_pids_for_port_via_lsof($port);
+        return @pids if @pids;
+        return $self->_listener_pids_for_port_via_proc($port);
+    }
     my ( $stdout, $stderr, $exit_code ) = capture {
         system 'ss', '-ltnp', "( sport = :$port )";
         return $? >> 8;
@@ -2383,15 +2672,40 @@ sub _listener_pids_for_port {
     }
     else {
         my $ss_missing = 0;
-        if ( $exit_code == 127 ) {
+        if ( $exit_code == 127 || $exit_code == 255 ) {
             $ss_missing = 1;
         }
-        elsif ( defined $stderr && $stderr =~ /not found/i ) {
+        elsif ( defined $stderr && $stderr =~ /(?:not found|No such file or directory|Can't exec)/i ) {
             $ss_missing = 1;
         }
         if ($ss_missing) {
-            @pids = $self->_listener_pids_for_port_via_proc($port);
+            @pids = $self->_listener_pids_for_port_via_lsof($port);
+            @pids = $self->_listener_pids_for_port_via_proc($port) if !@pids;
         }
+    }
+    return @pids;
+}
+
+# _listener_pids_for_port_via_lsof($port)
+# Resolves TCP listener process ids from lsof output on hosts that do not ship
+# the Linux ss utility, such as macOS.
+# Input: TCP port integer.
+# Output: list of process ids.
+sub _listener_pids_for_port_via_lsof {
+    my ( $self, $port ) = @_;
+    return () if !$port;
+    my ( $stdout, $stderr, $exit_code ) = capture {
+        system 'lsof', '-nP', "-iTCP:$port", '-sTCP:LISTEN', '-Fp';
+        return $? >> 8;
+    };
+    return () if $exit_code != 0 || !defined $stdout || $stdout eq '';
+    my %seen;
+    my @pids;
+    for my $line ( split /\n/, $stdout ) {
+        next if $line !~ /^p(\d+)$/;
+        my $pid = $1 + 0;
+        next if $seen{$pid}++;
+        push @pids, $pid;
     }
     return @pids;
 }
@@ -2627,18 +2941,33 @@ sub _web_runtime_ready {
         my $running = $self->running_web;
         my $listening = 0;
         my $matches_runtime = 0;
+        my $listener_pid;
         if ($running) {
             $matches_runtime = $self->_web_runtime_matches_pid( $running, $pid, $port ) ? 1 : 0;
         }
-        if ($matches_runtime) {
-            my $listener_port = 0;
-            $listener_port = $port if $port;
-            $listener_port = $running->{port} if !$listener_port && $running->{port};
-            if ($listener_port) {
-                my @listener_pids = $self->_listener_pids_for_port($listener_port);
-                $listening = @listener_pids ? 1 : 0;
-                $listening = 1 if !$listening && $self->_port_accepting_connections($listener_port);
+        my $listener_port = 0;
+        $listener_port = $port if $port;
+        $listener_port = $running->{port} if !$listener_port && $running && $running->{port};
+        if ($listener_port) {
+            my @listener_pids = grep { $self->_same_pid_namespace($_) } $self->_listener_pids_for_port($listener_port);
+            if (@listener_pids) {
+                $listening = 1;
+                $listener_pid = $listener_pids[0];
+                if ( !$matches_runtime && !$self->_same_pid_namespace($pid) ) {
+                    $matches_runtime = 0;
+                }
+                elsif ( !$matches_runtime && $running ) {
+                    $matches_runtime = 1;
+                }
+                if ( $matches_runtime && defined $listener_pid && $listener_pid =~ /^\d+$/ ) {
+                    $self->_adopt_web_listener_pid(
+                        listener_pid => $listener_pid,
+                        state        => $running,
+                    );
+                    $running->{pid} = $listener_pid if $running;
+                }
             }
+            $listening = 1 if !$listening && $matches_runtime && $self->_port_accepting_connections($listener_port);
         }
         if ($listening) {
             $ready_polls++;
@@ -2650,6 +2979,32 @@ sub _web_runtime_ready {
         sleep $self->_runtime_poll_interval;
     }
     return 0;
+}
+
+# _adopt_web_listener_pid(%args)
+# Replaces the transient startup wrapper pid in persisted web state with the
+# real listener pid once the PSGI server has rebound under Starman.
+# Input: listener_pid integer and optional current runtime-state hash reference.
+# Output: adopted listener pid integer or undef when nothing was updated.
+sub _adopt_web_listener_pid {
+    my ( $self, %args ) = @_;
+    my $listener_pid = $self->_normalized_process_id( $args{listener_pid} );
+    return if !defined $listener_pid || $listener_pid !~ /^\d+$/ || $listener_pid < 1;
+    return if !$self->_same_pid_namespace($listener_pid);
+
+    my $state = ref( $args{state} ) eq 'HASH'
+      ? { %{ $args{state} } }
+      : { %{ $self->web_state || {} } };
+    return if ( $state->{pid} || 0 ) == $listener_pid;
+
+    $state->{pid} = $listener_pid + 0;
+    $state->{status} = 'running';
+    $state->{updated_at} = _now_iso8601();
+    my $title = $self->_read_process_title($listener_pid);
+    $state->{process_name} = $title if defined $title && $title ne '';
+    $self->{files}->write( 'web_pid', "$listener_pid\n" );
+    $self->_write_web_state($state);
+    return $listener_pid;
 }
 
 # _normalized_process_id($pid)
@@ -2833,15 +3188,15 @@ sub _pid_namespace_id {
 sub _read_process_title {
     my ( $self, $pid ) = @_;
     my $proc = "/proc/$pid/cmdline";
-    if ( -r $proc ) {
-        open my $fh, '<', $proc or return;
-        local $/;
-        my $cmdline = scalar <$fh>;
+    if ( $self->_procfs_available ) {
+        my $cmdline = $self->_slurp_proc_file($proc);
+        return if !defined $cmdline;
         if ( defined $cmdline && $cmdline ne '' ) {
             $cmdline =~ s/\0/ /g;
             $cmdline =~ s/\s+$//;
             return $cmdline;
         }
+        return;
     }
 
     my ( $stdout, undef, $exit_code ) = capture {
@@ -2861,13 +3216,13 @@ sub _read_process_title {
 sub _read_process_state {
     my ( $self, $pid ) = @_;
     my $proc = "/proc/$pid/stat";
-    if ( -r $proc ) {
-        open my $fh, '<', $proc or return;
-        local $/;
-        my $stat = scalar <$fh>;
+    if ( $self->_procfs_available ) {
+        my $stat = $self->_slurp_proc_file($proc);
+        return if !defined $stat;
         if ( defined $stat && $stat ne '' && $stat =~ /^\d+\s+\(.*\)\s+(\S)/s ) {
             return $1;
         }
+        return;
     }
 
     my ( $stdout, undef, $exit_code ) = capture {
@@ -2887,6 +3242,27 @@ sub _read_process_state {
 sub _process_exists {
     my ( $self, $pid ) = @_;
     return kill( 0, $pid ) ? 1 : 0;
+}
+
+# _procfs_available()
+# Reports whether procfs-backed process inspection is available on the current host.
+# Input: none.
+# Output: boolean true when /proc exists and process readers should prefer it.
+sub _procfs_available {
+    return -d '/proc' ? 1 : 0;
+}
+
+# _slurp_proc_file($path)
+# Reads one procfs-backed text payload when it is available on disk.
+# Input: absolute procfs file path string.
+# Output: file content string or undef when the proc entry is unreadable.
+sub _slurp_proc_file {
+    my ( $self, $path ) = @_;
+    return if !defined $path || $path eq '';
+    return if !-r $path;
+    open my $fh, '<', $path or return;
+    local $/;
+    return scalar <$fh>;
 }
 
 # _now_iso8601()

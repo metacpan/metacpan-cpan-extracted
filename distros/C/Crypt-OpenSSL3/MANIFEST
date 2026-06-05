@@ -13,6 +13,7 @@ examples/first.pl
 examples/rsa.pl
 lib/Crypt/OpenSSL3.pm
 lib/Crypt/OpenSSL3.xs
+lib/Crypt/OpenSSL3/ASN1.pm
 lib/Crypt/OpenSSL3/ASN1/Enumerated.pm
 lib/Crypt/OpenSSL3/ASN1/Integer.pm
 lib/Crypt/OpenSSL3/ASN1/Object.pm
@@ -28,6 +29,8 @@ lib/Crypt/OpenSSL3/BigNum/Context.pm
 lib/Crypt/OpenSSL3/Cipher.pm
 lib/Crypt/OpenSSL3/Cipher/Context.pm
 lib/Crypt/OpenSSL3/Error.pm
+lib/Crypt/OpenSSL3/HPKE.pm
+lib/Crypt/OpenSSL3/HPKE/Context.pm
 lib/Crypt/OpenSSL3/KDF.pm
 lib/Crypt/OpenSSL3/KDF/Context.pm
 lib/Crypt/OpenSSL3/MAC.pm
@@ -46,9 +49,11 @@ lib/Crypt/OpenSSL3/SSL/Session.pm
 lib/Crypt/OpenSSL3/Signature.pm
 lib/Crypt/OpenSSL3/X509.pm
 lib/Crypt/OpenSSL3/X509/Algorithm.pm
+lib/Crypt/OpenSSL3/X509/Attribute.pm
 lib/Crypt/OpenSSL3/X509/Extension.pm
 lib/Crypt/OpenSSL3/X509/Name.pm
 lib/Crypt/OpenSSL3/X509/Name/Entry.pm
+lib/Crypt/OpenSSL3/X509/Request.pm
 lib/Crypt/OpenSSL3/X509/Store.pm
 lib/Crypt/OpenSSL3/X509/VerifyParam.pm
 lib/Crypt/OpenSSL3/X509/VerifyResult.pm
@@ -60,6 +65,7 @@ t/20-rsa.t
 t/21-md.t
 t/22-kdf.t
 t/22-mac.t
+t/40-hpke.t
 t/50-ssl.t
 t/server.crt
 t/server.key

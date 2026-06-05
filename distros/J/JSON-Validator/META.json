@@ -69,7 +69,7 @@
          "web" : "https://web.libera.chat/#perl-openapi"
       }
    },
-   "version" : "5.16",
+   "version" : "5.17",
    "x_contributors" : [
       "Aleksandr Orlenko <zxteam@gmail.com>",
       "Alexander Hartmaier <alexander.hartmaier@t-systems.at>",

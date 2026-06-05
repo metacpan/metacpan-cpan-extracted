@@ -16,15 +16,15 @@ class App::cpan2arch
 use File::Basename qw< basename >;
 use version;
 
-our $VERSION = 'v1.1.1';
+our $VERSION = 'v1.1.2';
 
-field $_prog :reader = basename($0);
-field %_env  :reader :writer = (
+field %_env :reader :writer = (
     user_agent       => "App::cpan2arch/$VERSION",
     cache_mcpan_path => '/tmp/mcpan_cache',
     cache_arch_path  => '/tmp/arch_cache',
     cache_expiration => '1d',
 );
+field $_prog :reader = basename($0);
 field %_opts :reader;
 field %_args :reader;
 

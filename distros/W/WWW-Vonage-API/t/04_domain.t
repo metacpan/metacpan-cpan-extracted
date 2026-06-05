@@ -28,17 +28,17 @@ my %tests = (
     },
     '03' => {
         method      => "GET",
-        path        => "applications/1001",
+        path        => "applications/BS1001",
         payload_out => undef,
         params      => { },
-        url         => 'https://api.nexmo.com/v2/applications/1001'
+        url         => 'https://api.nexmo.com/v2/applications/BS1001'
     },
     '04' => {
         method      => "DELETE",
-        path        => "applications/1001",
+        path        => "applications/BS1001",
         payload_out => undef,
         params      => {  },
-        url         => 'https://api.nexmo.com/v2/applications/1001'
+        url         => 'https://api.nexmo.com/v2/applications/BS1001'
     },
     '05' => {
         method      => "GET",
@@ -90,17 +90,17 @@ my %tests = (
     },
     11 => {
         method      => "DELETE",
-        path        => "reports/12033",
+        path        => "reports/BB12033",
         payload_out => undef,
         params      => { API_Version => 'v2', },
-        url         => 'https://api.nexmo.com/v2/reports/12033'
+        url         => 'https://api.nexmo.com/v2/reports/BB12033'
     },
     12 => {
         method      => "GET",
-        path        => "media/12033",
+        path        => "media/bbB12033",
         payload_out => undef,
         params      => { API_Version => 'v3', },
-        url         => 'https://api.nexmo.com/v3/media/12033'
+        url         => 'https://api.nexmo.com/v3/media/bbB12033'
     },
     13 => {
         method      => "POST",
@@ -112,29 +112,29 @@ my %tests = (
     },
     14 => {
         method      => "POST",
-        path        => 'verify/4321',
+        path        => 'verify/BS4321',
         payload_in  => { country => 'GB', page => '2' },
         payload_out => '{"country":"GB","page":"2"}',
         params => { API_Version => 'v2',API_Region => 'api'  },
-        url    => 'https://api.nexmo.com/v2/verify/4321',
+        url    => 'https://api.nexmo.com/v2/verify/BS4321',
     },
     15 => {
         method      => "POST",
-        path        => 'verify/4321/next_workflow',
+        path        => 'verify/BS4321/next_workflow',
         payload_out => undef,
         params      => { API_Version => 'v2', },
-        url         => 'https://api.nexmo.com/v2/verify/4321/next_workflow',
+        url         => 'https://api.nexmo.com/v2/verify/BS4321/next_workflow',
     },
     16 => {
         method      => "GET",
-        path        => 'verify/4321/silent-auth/redirect',
+        path        => 'verify/BS4321/silent-auth/redirect',
         payload_out => undef,
         params      => { API_Version => 'v2', },
-        url => 'https://api.nexmo.com/v2/verify/4321/silent-auth/redirect',
+        url => 'https://api.nexmo.com/v2/verify/BS4321/silent-auth/redirect',
     },
     17 => {
         method      => "GET",
-        path        => 'project/999902/archive',
+        path        => 'project/BS999902/archive',
         payload_in  => { count => 10, offset => 15, sessionId => '10101' },
         payload_out => undef,
         params      => {
@@ -144,34 +144,34 @@ my %tests = (
             API_Version => 'v2'
         },
         url =>
-'https://video.api.vonage.com/v2/project/999902/archive?count=10&offset=15&sessionId=10101',
+'https://video.api.vonage.com/v2/project/BS999902/archive?count=10&offset=15&sessionId=10101',
     },
     18 => {
         method      => "PATCH",
-        path        => 'project/999902/archive/19900/streams',
+        path        => 'project/BS999902/archive/BS19900/streams',
         payload_in  => { removeStream => '65587' },
         payload_out => '{"removeStream":"65587"}',
         params      => {},
         url =>
-'https://video.api.vonage.com/v2/project/999902/archive/19900/streams',
+'https://video.api.vonage.com/v2/project/BS999902/archive/BS19900/streams',
     },
     19 => {
         method      => "POST",
-        path        => 'project/999902/archive/19900/stop',
-        payload_in  => { removeStream => '65587' },
-        payload_out => '{"removeStream":"65587"}',
+        path        => 'project/bs999902/archive/BS19900/stop',
+        payload_in  => { removeStream => 'BS65587' },
+        payload_out => '{"removeStream":"BS65587"}',
         params      => { },
         url =>
-          'https://video.api.vonage.com/v2/project/999902/archive/19900/stop',
+          'https://video.api.vonage.com/v2/project/bs999902/archive/BS19900/stop',
     },
     20 => {
         method      => "PUT",
-        path        => 'project/999902/archive/19900/layout',
+        path        => 'project/bs999902/archive/BS19900/layout',
         payload_in  => { type => 'something', stylesheet => 'something else' },
         payload_out => '{"stylesheet":"something else","type":"something"}',
         params      => { },
         url =>
-          'https://video.api.vonage.com/v2/project/999902/archive/19900/layout',
+          'https://video.api.vonage.com/v2/project/bs999902/archive/BS19900/layout',
     },
 );
 

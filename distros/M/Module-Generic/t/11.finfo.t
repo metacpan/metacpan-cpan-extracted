@@ -213,11 +213,12 @@ subtest 'Thread-safe datetime access' => sub
             });
         } 1..5;
 
-        my $success = 1;
-        for my $thr ( @threads )
-        {
-            $success &&= $thr->join();
-        }
+        # NOTE: Always join every thread, even after a failure. Using
+        # $success &&= $thr->join() would short-circuit as soon as one thread returned
+        # a false value, leaving subsequent threads unjoined and triggering
+        # "Perl exited with active threads".
+        my @results = map{ $_->join() } @threads;
+        my $success = !scalar( grep( !$_, @results ) );
 
         ok( $success, 'All threads accessed datetime successfully' );
         isa_ok( $finfo->atime, 'Module::Generic::DateTime', 'atime type' );

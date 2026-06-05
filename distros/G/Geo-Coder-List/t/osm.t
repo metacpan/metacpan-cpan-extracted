@@ -65,7 +65,9 @@ OSM: {
 		ok($location->{address}{country_code} eq 'us');
 		like($location->{address}{country}, qr/^United States/, 'check USA');
 
-		like($geocoderlist->reverse_geocode('39.00,-77.10'), qr/National Institutes of Health/i, 'test reverse geocode');
+		# OSM data around 39.00,-77.10 (NIH campus area, Bethesda MD) changes
+		# over time; check for the stable area name rather than a specific building.
+		like($geocoderlist->reverse_geocode('39.00,-77.10'), qr/Bethesda/i, 'test reverse geocode');
 
 		my @locations = $geocoderlist->geocode('Vessels, Misc Ships at Sea or Abroad, England');
 		my $count = scalar(@locations);

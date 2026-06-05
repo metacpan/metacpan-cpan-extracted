@@ -12,9 +12,8 @@ role App::cpan2arch::MergePrereqs;
 use Scalar::Util qw< looks_like_number >;
 use List::Util   qw< any >;
 
-our $VERSION = 'v1.1.1';
+our $VERSION = 'v1.1.2';
 
-field $_dl_endpoint  :reader :writer = 'https://fastapi.metacpan.org/v1/download_url/';
 field %_cpan_prereqs :reader :writer;
 field @_fetch_errors :reader;
 field @_prereq_dists;
@@ -52,12 +51,8 @@ method merge_prereqs ()
     $self->_pdump( '$prereqs', $prereqs, "\n" );
 
     foreach my $dep ( $prereqs->@* ) {
-        my $module       = $dep->{module};
-        my $dist         = $dep->{dist};
-        my $phase        = $dep->{phase};
-        my $relationship = $dep->{relationship};
-        my $version      = $dep->{version};
-        my $failed       = $dep->{failed};
+        my ( $module, $dist, $phase, $relationship, $version, $failed ) =
+          $dep->@{ qw< module dist phase relationship version failed > };
 
         my $variable =
             $relationship eq 'recommends' || $relationship eq 'suggests' ? 'optdepends'
@@ -237,8 +232,9 @@ method _fetch (@prereqs)
 
     require Mojo::Promise;
 
-    my $prog       = $self->prog;
+    my $prog      = $self->prog;
     my $mua_mcpan = $self->mua_mcpan;
+    my %endpoints = $self->endpoints;
 
     my %env = $self->env;
     local $ENV{MUAC_NOCACHE} = true if $env{cache_ignore};
@@ -254,7 +250,7 @@ method _fetch (@prereqs)
         sub ($prereq) {
             my $module  = $prereq->{module};
             my $version = $prereq->{version};
-            my $url     = $_dl_endpoint . $module;
+            my $url     = $endpoints{download} . $module;
             my $query;
 
             $query  = 'version=' . $version if $version;       # Ignore 0 versions.

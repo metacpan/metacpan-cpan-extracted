@@ -1,12 +1,14 @@
 package Router::Ragel;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use strict;
 use warnings;
 use Carp 'croak';
 use Inline C => <<\code;
 void match(SV *self, SV *path_sv) {
+    if (!SvROK(self))
+        croak("Router::Ragel: match() requires a router object");
     SV** elem_ptr = av_fetch((AV*)SvRV(self), 2, 0);
     if (!elem_ptr || !SvOK(*elem_ptr))
         croak("Router::Ragel: compile() not called");
@@ -117,8 +119,14 @@ sub compile {
     my $max_captures = $capture_index;   # total capture slots across all routes
     my $routes_str = join "\n", @ragel_routes;
     my $route_list_str = join " | ", map "route$_", 0 .. $#$routes;
-    my $num_placeholders_str = 'static const int num_placeholders[] = {'. (join ', ', @num_placeholders).'};';
-    my $capture_base_str = 'static const int capture_base[] = {'. (join ', ', @capture_base).'};';
+    # Only the capture loop reads these tables, so skip emitting them (like the
+    # capture decls/loop below) when there are no captures to read.
+    my $num_placeholders_str = $max_captures
+        ? 'static const int num_placeholders[] = {'. (join ', ', @num_placeholders).'};'
+        : '';
+    my $capture_base_str = $max_captures
+        ? 'static const int capture_base[] = {'. (join ', ', @capture_base).'};'
+        : '';
     my $capture_actions =
         join "\n",
         map "action start_capture$_ { capture_start[$_] = p - data; }\naction end_capture$_ { capture_end[$_] = p - data; }",

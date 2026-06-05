@@ -9,9 +9,9 @@ use Benchmark qw(:all);
 use Router::Ragel;
 
 my %have;
-$have{XS}   = eval { require Router::XS; Router::XS->import(':all'); 1 };
-$have{R3}   = eval { require Router::R3; 1 };
-$have{UR}   = eval { require URI::Router; 1 };
+$have{XS} = eval { require Router::XS; Router::XS->import(':all'); 1 };
+$have{R3} = eval { require Router::R3; 1 };
+$have{UR} = eval { require URI::Router; 1 };
 $have{Mojo} = eval {
     require Mojolicious::Routes;
     require Mojolicious::Routes::Match;

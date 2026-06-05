@@ -69,9 +69,10 @@ C<match> will C<croak> until C<compile> is called again.
 
     $router->compile;
 
-Builds and binds the Ragel state machine. Must be called before C<match>.
-Returns the router. May be called more than once to incorporate routes added
-between calls; see L</LIMITATIONS> for the cost of recompiling.
+Builds and binds the Ragel state machine. Must be called before C<match>;
+C<croak>s if no routes have been added. Returns the router. May be called
+more than once to incorporate routes added between calls; see L</LIMITATIONS>
+for the cost of recompiling.
 
 =head2 match
 
@@ -87,6 +88,24 @@ Perl's method dispatch:
     my ($data, @captures) = Router::Ragel::match($router, $path);
 
 Both forms run the same compiled state machine.
+
+Call C<match> in list context. In scalar context it yields only the last
+value pushed (the last capture, or the route data when the route has none),
+which is rarely what you want.
+
+=head2 Route precedence
+
+When more than one route matches the same path, the route added B<last>
+wins. Overlapping a specific route with a later, more general one shadows the
+earlier route:
+
+    my $router = Router::Ragel->new
+        ->add('/files/index', 'index')
+        ->add('/files/:name', 'show')   # added last
+        ->compile;
+    my ($h) = $router->match('/files/index');   # 'show', not 'index'
+
+Add the route you want to win B<last>, or avoid overlapping patterns.
 
 =head1 ROUTE PATTERNS
 
@@ -224,8 +243,9 @@ are matched against their UTF-8 byte representation.
 =item *
 
 Patterns must start with C</> and must not be empty, contain a NUL byte,
-contain consecutive slashes, use a bare C<:> placeholder name, or contain an
-empty or unterminated C<< <type> >>. C<compile> C<croak>s on any of these.
+contain consecutive slashes, use a bare C<:> placeholder name, or contain a
+C<< <type> >> that is empty, unterminated, or itself contains a C<< < >>.
+C<compile> C<croak>s on any of these.
 
 =item *
 
@@ -243,6 +263,11 @@ process. See L</DEPLOYMENT> for the implications under pre-forking servers.
 =item *
 
 Calling C<match> before C<compile> C<croak>s.
+
+=item *
+
+When several routes match the same path, the B<most recently added> route
+wins; see L</Route precedence>.
 
 =back
 

@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::BIO::PollDescriptor;
-$Crypt::OpenSSL3::BIO::PollDescriptor::VERSION = '0.005';
+$Crypt::OpenSSL3::BIO::PollDescriptor::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::BIO::PollDescriptor - A polldescriptor of a BIO
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 METHODS
 

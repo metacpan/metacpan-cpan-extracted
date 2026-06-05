@@ -5,6 +5,7 @@ use utf8;
 use Archive::Zip qw(:ERROR_CODES :CONSTANTS);
 use Capture::Tiny qw(capture);
 use Cwd qw(abs_path getcwd);
+use Digest::SHA qw(sha256_hex);
 use Developer::Dashboard::Collector;
 use Developer::Dashboard::CLI::SeededPages ();
 use Developer::Dashboard::EnvAudit;
@@ -75,12 +76,13 @@ my $runtime_workspace = File::Spec->catfile( $runtime_dd_cli_root, 'workspace' )
 my $runtime_path = File::Spec->catfile( $runtime_dd_cli_root, 'path' );
 my $runtime_paths = File::Spec->catfile( $runtime_dd_cli_root, 'paths' );
 my $runtime_ps1 = File::Spec->catfile( $runtime_dd_cli_root, 'ps1' );
+my $runtime_api = File::Spec->catfile( $runtime_dd_cli_root, 'api' );
 my $runtime_doctor = File::Spec->catfile( $runtime_dd_cli_root, 'doctor' );
 my $runtime_dashboard_core = File::Spec->catfile( $runtime_dd_cli_root, '_dashboard-core' );
 
 my $init = _run("$perl -I'$lib' '$dashboard' init");
 like($init, qr/runtime_root/, 'dashboard init works');
-for my $helper ( $runtime_jq, $runtime_yq, $runtime_tomq, $runtime_propq, $runtime_iniq, $runtime_csvq, $runtime_xmlq, $runtime_of, $runtime_open_file, $runtime_workspace, $runtime_path, $runtime_paths, $runtime_ps1 ) {
+for my $helper ( $runtime_jq, $runtime_yq, $runtime_tomq, $runtime_propq, $runtime_iniq, $runtime_csvq, $runtime_xmlq, $runtime_of, $runtime_open_file, $runtime_workspace, $runtime_path, $runtime_paths, $runtime_ps1, $runtime_api ) {
     ok( -f $helper, "dashboard init seeds private helper $helper" );
     ok( -x $helper, "dashboard init marks private helper $helper executable" );
 }
@@ -160,7 +162,7 @@ is_deeply(
     print {$user_cli_note_fh} "keep me\n";
     close $user_cli_note_fh;
 
-    my $preserve_user_cli = _run("$perl -I'$lib' '$dashboard' init");
+    my $preserve_user_cli = _run_in_home( $preserve_home, "$perl -I'$lib' '$dashboard' init" );
     like( $preserve_user_cli, qr/config_file/, 'dashboard init can be re-run when user-owned files already exist in the home runtime CLI root' );
     open my $preserved_user_jq_fh, '<', $user_owned_jq or die "Unable to read $user_owned_jq: $!";
     my $preserved_user_jq = do { local $/; <$preserved_user_jq_fh> };
@@ -177,7 +179,7 @@ is_deeply(
     local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
     local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
 
-    my $config_init_file = _run("$perl -I'$lib' '$dashboard' config init");
+    my $config_init_file = _run_in_home( $config_home, "$perl -I'$lib' '$dashboard' config init" );
     chomp $config_init_file;
     is( $config_init_file, File::Spec->catfile( $config_home, '.developer-dashboard', 'config', 'config.json' ), 'dashboard config init reports the writable home config path' );
     open my $config_init_fh, '<:raw', $config_init_file or die "Unable to read $config_init_file: $!";
@@ -187,7 +189,7 @@ is_deeply(
     my $config_mtime_before = ( stat $config_init_file )[9];
 
     sleep 1.1;
-    my $config_reinit_file = _run("$perl -I'$lib' '$dashboard' config init");
+    my $config_reinit_file = _run_in_home( $config_home, "$perl -I'$lib' '$dashboard' config init" );
     chomp $config_reinit_file;
     is( $config_reinit_file, $config_init_file, 'dashboard config init reports the same config path on rerun' );
     is( ( stat $config_init_file )[9], $config_mtime_before, 'dashboard config init leaves an existing config.json untouched on rerun' );
@@ -236,6 +238,53 @@ like($auth_add, qr/"username"\s*:\s*"helper"/, 'auth add-user works');
 
 my $auth_list = _run("$perl -I'$lib' '$dashboard' auth list-users");
 like($auth_list, qr/"username"\s*:\s*"helper"/, 'auth list-users works');
+
+my $api_list_table = _run("$perl -I'$lib' '$dashboard' api");
+like( $api_list_table, qr/^Key\s+Secret\s+Route/m, 'dashboard api defaults to a table listing' );
+
+my $api_add_secret = json_decode( _run("$perl -I'$lib' '$dashboard' api add --key helper-bot --secret helper-secret --route /ajax/health --route /ajax/status -o json") );
+is( $api_add_secret->{file}, File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'config', 'api.json' ), 'dashboard api add writes to the home runtime when no deeper layer participates' );
+is( $api_add_secret->{api}{'helper-bot'}{secret}, sha256_hex('helper-secret'), 'dashboard api add hashes raw secrets before saving them' );
+is_deeply( $api_add_secret->{api}{'helper-bot'}{ajax}, [ '/ajax/health', '/ajax/status' ], 'dashboard api add can create an API key and multiple routes in one command' );
+
+my $api_add_route = json_decode( _run("$perl -I'$lib' '$dashboard' api add --key helper-bot --route /ajax/health -o json") );
+is_deeply( $api_add_route->{api}{'helper-bot'}{ajax}, [ '/ajax/health', '/ajax/status' ], 'dashboard api add keeps the existing route set unchanged when a repeated route is requested' );
+
+my $api_duplicate_route = json_decode( _run("$perl -I'$lib' '$dashboard' api add --key helper-bot --route /ajax/health -o json") );
+ok( !$api_duplicate_route->{changed}, 'dashboard api add reports no change when a route already exists' );
+
+my $api_update_secret = json_decode( _run("$perl -I'$lib' '$dashboard' api add --key helper-bot --secret rotated-secret -o json") );
+is( $api_update_secret->{api}{'helper-bot'}{secret}, sha256_hex('rotated-secret'), 'dashboard api add updates an existing key secret' );
+
+my $api_maybe_secret = json_decode( _run("$perl -I'$lib' '$dashboard' api add --key helper-bot --maybe-secret maybe-secret --route /ajax/extra -o json") );
+is( $api_maybe_secret->{api}{'helper-bot'}{secret}, sha256_hex('maybe-secret'), 'dashboard api add updates an existing key secret through --maybe-secret' );
+is_deeply( $api_maybe_secret->{api}{'helper-bot'}{ajax}, [ '/ajax/health', '/ajax/status', '/ajax/extra' ], 'dashboard api add can append routes while using --maybe-secret' );
+
+my $api_filtered = json_decode( _run("$perl -I'$lib' '$dashboard' api ls --key helper-bot -o json") );
+is_deeply(
+    $api_filtered->{api}{'helper-bot'},
+    {
+        secret => sha256_hex('maybe-secret'),
+        ajax   => [ '/ajax/health', '/ajax/status', '/ajax/extra' ],
+    },
+    'dashboard api ls --key returns the targeted API group as JSON',
+);
+
+my $api_remove_route = json_decode( _run("$perl -I'$lib' '$dashboard' api rm --key helper-bot --route /ajax/status -o json") );
+is_deeply( $api_remove_route->{api}{'helper-bot'}{ajax}, [ '/ajax/health', '/ajax/extra' ], 'dashboard api rm removes one route while keeping the remaining routes and key' );
+
+my $api_project = File::Spec->catdir( $ENV{HOME}, 'projects', 'api-cli-layer' );
+make_path( File::Spec->catdir( $api_project, '.git' ), File::Spec->catdir( $api_project, '.developer-dashboard', 'config' ) );
+my $api_home_seed = json_decode( _run("$perl -I'$lib' '$dashboard' api add --key inherited-bot --secret inherited-secret --route /ajax/inherited -o json") );
+is( $api_home_seed->{file}, File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'config', 'api.json' ), 'dashboard api seed for inherited smoke coverage stays in the home runtime' );
+
+my $api_project_add = json_decode( _run_in_dir( $api_project, "$perl -I'$lib' '$dashboard' api add --key project-bot --secret project-secret -o json" ) );
+is( $api_project_add->{file}, File::Spec->catfile( $api_project, '.developer-dashboard', 'config', 'api.json' ), 'dashboard api add writes to the deepest project layer under DD-OOP-LAYERS' );
+
+my $api_project_remove = json_decode( _run_in_dir( $api_project, "$perl -I'$lib' '$dashboard' api rm --key inherited-bot -o json" ) );
+ok( $api_project_remove->{changed}, 'dashboard api rm can mask an inherited key from a project layer' );
+my $api_project_hidden = json_decode( _run_in_dir( $api_project, "$perl -I'$lib' '$dashboard' api ls --key inherited-bot -o json" ) );
+ok( !exists $api_project_hidden->{api}{'inherited-bot'}, 'dashboard api ls hides inherited keys after a project-layer tombstone is written' );
 
 my $legacy_bookmarks_root = File::Spec->catdir( $ENV{HOME}, 'bookmarks' );
 make_path($legacy_bookmarks_root);
@@ -369,10 +418,12 @@ like($indicator_refresh, qr/docker|project|git/, 'indicator refresh-core works')
 my $fake_tmux_dir = File::Spec->catdir( $ENV{HOME}, 'fake-bin' );
 make_path($fake_tmux_dir);
 my $fake_tmux = File::Spec->catfile( $fake_tmux_dir, 'tmux' );
+my $fake_tmux_log = File::Spec->catfile( $ENV{HOME}, 'fake-tmux.log' );
 open my $fake_tmux_fh, '>', $fake_tmux or die "Unable to write $fake_tmux: $!";
-print {$fake_tmux_fh} <<'SH';
+print {$fake_tmux_fh} <<"SH";
 #!/bin/sh
-if [ "$1" = "show-environment" ] && [ "$2" = "TICKET_REF" ]; then
+printf '%s\n' "\$*" >> '$fake_tmux_log'
+if [ "\$1" = "show-environment" ] && [ "\$2" = "TICKET_REF" ]; then
   printf 'TICKET_REF=DD-123\n'
   exit 0
 fi
@@ -389,9 +440,42 @@ my $ps1 = _run("$perl -I'$lib' '$dashboard' ps1 --jobs 1");
 like($ps1, qr/\(1 jobs\)|developer-dashboard:master| D /, 'ps1 command works');
 like($ps1, qr/🚨🔑/, 'ps1 seeds configured collector indicators before their first run');
 like($ps1, qr/🚨🐳/, 'ps1 shows all configured collector indicators, not just previously-run collectors');
-like($ps1, qr/🎫:DD-123/, 'ps1 loads the ticket from the tmux session environment when TICKET_REF is not already exported');
+unlike($ps1, qr/🎫:DD-123/, 'ps1 does not probe tmux for ticket context when TMUX is unset');
+ok( !-e $fake_tmux_log || _run("cat '$fake_tmux_log'") eq '', 'ps1 skips tmux show-environment entirely when TMUX is unset' );
+local $ENV{TMUX} = 'tmux-session';
+my $tmux_ps1 = _run("$perl -I'$lib' '$dashboard' ps1 --jobs 1");
+like($tmux_ps1, qr/🎫:DD-123/, 'ps1 loads the ticket from the tmux session environment when TMUX is active and TICKET_REF is not already exported');
 my $ps1_extended = _run("$perl -I'$lib' '$dashboard' ps1 --jobs 1 --mode extended --color");
 like($ps1_extended, qr/\e\[|\(1 jobs\)/, 'ps1 supports extended/color modes');
+{
+    my $fake_git_repo = File::Spec->catdir( $ENV{HOME}, 'prompt-head-repo' );
+    my $fake_git_meta = File::Spec->catdir( $fake_git_repo, '.git', 'refs', 'heads' );
+    my $fake_git_bin_dir = File::Spec->catdir( $ENV{HOME}, 'fake-git-bin' );
+    my $fake_git_log = File::Spec->catfile( $ENV{HOME}, 'fake-git.log' );
+    make_path( $fake_git_meta, $fake_git_bin_dir );
+    open my $fake_head_fh, '>', File::Spec->catfile( $fake_git_repo, '.git', 'HEAD' ) or die $!;
+    print {$fake_head_fh} "ref: refs/heads/main\n";
+    close $fake_head_fh;
+    open my $fake_branch_fh, '>', File::Spec->catfile( $fake_git_meta, 'main' ) or die $!;
+    print {$fake_branch_fh} "0123456789abcdef0123456789abcdef01234567\n";
+    close $fake_branch_fh;
+    my $fake_git = File::Spec->catfile( $fake_git_bin_dir, 'git' );
+    open my $fake_git_fh, '>', $fake_git or die "Unable to write $fake_git: $!";
+    print {$fake_git_fh} <<"SH";
+#!/bin/sh
+printf '%s\n' "\$*" >> '$fake_git_log'
+exit 98
+SH
+    close $fake_git_fh;
+    chmod 0755, $fake_git or die "Unable to chmod $fake_git: $!";
+
+    local $ENV{PATH} = join ':', $fake_git_bin_dir, $fake_tmux_dir, grep { defined && $_ ne '' } split /:/, ( $ENV{PATH} || '' );
+    local $ENV{TMUX} = '';
+    unlink $fake_git_log if -e $fake_git_log;
+    my $head_only_ps1 = _run("$perl -I'$lib' '$dashboard' ps1 --jobs 0 --cwd '$fake_git_repo'");
+    like( $head_only_ps1, qr/\Q🌿main\E/, 'ps1 reads the git branch from .git metadata without needing the git command' );
+    ok( !-e $fake_git_log || _run("cat '$fake_git_log'") eq '', 'ps1 does not invoke git subprocesses when branch metadata is available on disk' );
+}
 
 my $collector_inspect = _run("$perl -I'$lib' '$dashboard' collector inspect docker.collector");
 like($collector_inspect, qr/"job"|"status"/, 'collector inspect works');
@@ -520,7 +604,7 @@ if ( !$UNDER_COVER ) {
     local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
     local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
     local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
-    my $serve_init = _run("$perl -I'$lib' '$dashboard' init");
+    my $serve_init = _run_in_home( $serve_home, "$perl -I'$lib' '$dashboard' init" );
     like( $serve_init, qr/runtime_root/, 'isolated lifecycle smoke home initializes a runtime for serve/restart collector checks' );
     my $serve_config_file = File::Spec->catfile( $serve_home, '.developer-dashboard', 'config', 'config.json' );
     open my $serve_config_fh, '>:raw', $serve_config_file or die "Unable to write $serve_config_file: $!";
@@ -540,19 +624,19 @@ if ( !$UNDER_COVER ) {
     print {$serve_config_fh} $serve_config_json;
     close $serve_config_fh;
     my $serve_port = _find_free_port();
-    my $serve_json = json_decode( _run("$perl -I'$lib' '$dashboard' serve --host 127.0.0.1 --port $serve_port") );
+    my $serve_json = json_decode( _run_in_home( $serve_home, "$perl -I'$lib' '$dashboard' serve --host 127.0.0.1 --port $serve_port" ) );
     ok( $serve_json->{pid}, 'dashboard serve returns a managed web pid for the collector lifecycle smoke test' );
     my $first_stdout = '';
     for ( 1 .. 160 ) {
-        my $output = json_decode( _run("$perl -I'$lib' '$dashboard' collector output tick.collector") );
+        my $output = json_decode( _run_in_home( $serve_home, "$perl -I'$lib' '$dashboard' collector output tick.collector" ) );
         $first_stdout = $output->{stdout} || '';
         last if $first_stdout =~ /^\d+\.\d+\n$/;
-        my $status = json_decode( _run("$perl -I'$lib' '$dashboard' collector status tick.collector") );
+        my $status = json_decode( _run_in_home( $serve_home, "$perl -I'$lib' '$dashboard' collector status tick.collector" ) );
         last if ( $status->{last_success} || 0 ) && $first_stdout =~ /^\d+\.\d+\n$/;
         sleep 0.25;
     }
     like( $first_stdout, qr/^\d+\.\d+\n$/, 'dashboard serve starts configured interval collectors so collector output begins changing without a separate restart' );
-    my $restart_json = json_decode( _run("$perl -I'$lib' '$dashboard' restart -o json --host 127.0.0.1 --port $serve_port") );
+    my $restart_json = json_decode( _run_in_home( $serve_home, "$perl -I'$lib' '$dashboard' restart -o json --host 127.0.0.1 --port $serve_port" ) );
     ok( $restart_json->{web_pid}, 'dashboard restart still returns a managed web pid in the collector lifecycle smoke test' );
     ok( kill( 0, $restart_json->{web_pid} ), 'dashboard restart reports a live managed web pid in the collector lifecycle smoke test' );
     my $serve_ua = LWP::UserAgent->new( timeout => 5 );
@@ -565,13 +649,13 @@ if ( !$UNDER_COVER ) {
     ok( $serve_health_response && $serve_health_response->code, 'dashboard restart leaves the collector lifecycle web listener reachable on the restarted port' );
     my $second_stdout = '';
     for ( 1 .. 160 ) {
-        my $output = json_decode( _run("$perl -I'$lib' '$dashboard' collector output tick.collector") );
+        my $output = json_decode( _run_in_home( $serve_home, "$perl -I'$lib' '$dashboard' collector output tick.collector" ) );
         $second_stdout = $output->{stdout} || '';
         last if $second_stdout =~ /^\d+\.\d+\n$/ && $second_stdout ne $first_stdout;
         sleep 0.25;
     }
     unlike( $second_stdout, qr/^\Q$first_stdout\E$/, 'dashboard restart restarts collector loops and refreshes collector output after the serve-started run' );
-    my $serve_stop = json_decode( _run("$perl -I'$lib' '$dashboard' stop -o json") );
+    my $serve_stop = json_decode( _run_in_home( $serve_home, "$perl -I'$lib' '$dashboard' stop -o json" ) );
     ok( ref( $serve_stop->{collectors} ) eq 'ARRAY', 'dashboard stop still returns the collector stop list after serve/restart lifecycle control' );
     my $serve_stop_response = $serve_ua->get("http://127.0.0.1:$serve_port/");
     ok( !$serve_stop_response->is_success, 'dashboard stop actually tears down the restarted collector lifecycle web listener' );
@@ -582,16 +666,16 @@ if ( !$UNDER_COVER ) {
     local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
     local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
     local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
-    my $readonly_init = _run("$perl -I'$lib' '$dashboard' init");
+    my $readonly_init = _run_in_home( $readonly_home, "$perl -I'$lib' '$dashboard' init" );
     like( $readonly_init, qr/runtime_root/, 'isolated no-editor smoke home initializes a runtime' );
-    my $readonly_source = _run("$perl -I'$lib' '$dashboard' page new readonly 'Read Only'");
+    my $readonly_source = _run_in_home( $readonly_home, "$perl -I'$lib' '$dashboard' page new readonly 'Read Only'" );
     my $readonly_source_file = File::Spec->catfile( $readonly_home, 'readonly.page' );
     open my $readonly_source_fh, '>:raw', $readonly_source_file or die "Unable to write $readonly_source_file: $!";
     print {$readonly_source_fh} $readonly_source;
     close $readonly_source_fh;
-    _run("$perl -I'$lib' '$dashboard' page save readonly < '$readonly_source_file'");
+    _run_in_home( $readonly_home, "$perl -I'$lib' '$dashboard' page save readonly < '$readonly_source_file'" );
     my $readonly_port = _find_free_port();
-    my $readonly_serve = json_decode( _run("$perl -I'$lib' '$dashboard' serve --host 127.0.0.1 --port $readonly_port --no-endit") );
+    my $readonly_serve = json_decode( _run_in_home( $readonly_home, "$perl -I'$lib' '$dashboard' serve --host 127.0.0.1 --port $readonly_port --no-endit" ) );
     ok( $readonly_serve->{pid}, 'dashboard serve --no-endit starts the managed web service' );
     my $readonly_ua = LWP::UserAgent->new( timeout => 5 );
     my $readonly_ready_response;
@@ -634,7 +718,7 @@ if ( !$UNDER_COVER ) {
     my $readonly_config = do { local $/; <$readonly_config_fh> };
     close $readonly_config_fh;
     like( $readonly_config, qr/"web"\s*:\s*\{[\s\S]*"no_editor"\s*:\s*1/s, 'dashboard serve --no-endit persists no_editor in config' );
-    my $readonly_restart = json_decode( _run("$perl -I'$lib' '$dashboard' restart -o json --host 127.0.0.1 --port $readonly_port") );
+    my $readonly_restart = json_decode( _run_in_home( $readonly_home, "$perl -I'$lib' '$dashboard' restart -o json --host 127.0.0.1 --port $readonly_port" ) );
     ok( $readonly_restart->{web_pid}, 'dashboard restart keeps managing the no-editor web service' );
     for ( 1 .. _startup_probe_attempts() ) {
         my $ready_response = $readonly_ua->get("http://127.0.0.1:$readonly_port/app/readonly");
@@ -643,7 +727,7 @@ if ( !$UNDER_COVER ) {
     }
     my $source_response = $readonly_ua->get("http://127.0.0.1:$readonly_port/app/readonly/source");
     is( $source_response->code, 403, 'dashboard restart preserves the saved no-editor source block' );
-    my $readonly_stop = json_decode( _run("$perl -I'$lib' '$dashboard' stop -o json") );
+    my $readonly_stop = json_decode( _run_in_home( $readonly_home, "$perl -I'$lib' '$dashboard' stop -o json" ) );
     ok( ref( $readonly_stop->{collectors} ) eq 'ARRAY', 'dashboard stop still works after a no-editor lifecycle run' );
 }
 if ( !$UNDER_COVER ) {
@@ -652,16 +736,16 @@ if ( !$UNDER_COVER ) {
     local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
     local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
     local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
-    my $noind_init = _run("$perl -I'$lib' '$dashboard' init");
+    my $noind_init = _run_in_home( $noind_home, "$perl -I'$lib' '$dashboard' init" );
     like( $noind_init, qr/runtime_root/, 'isolated no-indicators smoke home initializes a runtime' );
-    my $noind_source = _run("$perl -I'$lib' '$dashboard' page new noind 'No Indicators'");
+    my $noind_source = _run_in_home( $noind_home, "$perl -I'$lib' '$dashboard' page new noind 'No Indicators'" );
     my $noind_source_file = File::Spec->catfile( $noind_home, 'noind.page' );
     open my $noind_source_fh, '>:raw', $noind_source_file or die "Unable to write $noind_source_file: $!";
     print {$noind_source_fh} $noind_source;
     close $noind_source_fh;
-    _run("$perl -I'$lib' '$dashboard' page save noind < '$noind_source_file'");
+    _run_in_home( $noind_home, "$perl -I'$lib' '$dashboard' page save noind < '$noind_source_file'" );
     my $noind_port = _find_free_port();
-    my $noind_serve = json_decode( _run("$perl -I'$lib' '$dashboard' serve --host 127.0.0.1 --port $noind_port --no-indicator") );
+    my $noind_serve = json_decode( _run_in_home( $noind_home, "$perl -I'$lib' '$dashboard' serve --host 127.0.0.1 --port $noind_port --no-indicator" ) );
     ok( $noind_serve->{pid}, 'dashboard serve --no-indicator starts the managed web service' );
     my $noind_ua = LWP::UserAgent->new( timeout => 5 );
     my $noind_ready_response;
@@ -691,14 +775,14 @@ if ( !$UNDER_COVER ) {
     }
     is( $noind_status_response->code, 200, 'no-indicators live server keeps the status endpoint available' );
     like( decode( 'UTF-8', $noind_status_response->decoded_content ), qr/"array"\s*:/, 'no-indicators live server still exposes status payload data' );
-    my $noind_ps1 = _run("$perl -I'$lib' '$dashboard' ps1 --jobs 0");
+    my $noind_ps1 = _run_in_home( $noind_home, "$perl -I'$lib' '$dashboard' ps1 --jobs 0" );
     like( $noind_ps1, qr/\S/, 'no-indicators mode does not blank the terminal prompt output' );
     my $noind_config_file = File::Spec->catfile( $noind_home, '.developer-dashboard', 'config', 'config.json' );
     open my $noind_config_fh, '<', $noind_config_file or die "Unable to read $noind_config_file: $!";
     my $noind_config = do { local $/; <$noind_config_fh> };
     close $noind_config_fh;
     like( $noind_config, qr/"web"\s*:\s*\{[\s\S]*"no_indicators"\s*:\s*1/s, 'dashboard serve --no-indicator persists no_indicators in config' );
-    my $noind_restart = json_decode( _run("$perl -I'$lib' '$dashboard' restart -o json --host 127.0.0.1 --port $noind_port") );
+    my $noind_restart = json_decode( _run_in_home( $noind_home, "$perl -I'$lib' '$dashboard' restart -o json --host 127.0.0.1 --port $noind_port" ) );
     ok( $noind_restart->{web_pid}, 'dashboard restart keeps managing the no-indicators web service' );
     my $post_restart_render;
     for ( 1 .. 240 ) {
@@ -709,7 +793,7 @@ if ( !$UNDER_COVER ) {
     ok( $post_restart_render && $post_restart_render->is_success, 'no-indicators live server remains reachable after restart' );
     my $post_restart_body = decode( 'UTF-8', $post_restart_render->decoded_content );
     unlike( $post_restart_body, qr/id="status-on-top"/, 'dashboard restart preserves the no-indicators top-right strip removal' );
-    my $noind_stop = json_decode( _run("$perl -I'$lib' '$dashboard' stop -o json") );
+    my $noind_stop = json_decode( _run_in_home( $noind_home, "$perl -I'$lib' '$dashboard' stop -o json" ) );
     ok( ref( $noind_stop->{collectors} ) eq 'ARRAY', 'dashboard stop still works after a no-indicators lifecycle run' );
 }
 {
@@ -718,7 +802,7 @@ if ( !$UNDER_COVER ) {
     local $ENV{DEVELOPER_DASHBOARD_BOOKMARKS};
     local $ENV{DEVELOPER_DASHBOARD_CONFIGS};
     local $ENV{DEVELOPER_DASHBOARD_CHECKERS};
-    my $collector_init = _run("$perl -I'$lib' '$dashboard' init");
+    my $collector_init = _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' init" );
     like( $collector_init, qr/runtime_root/, 'isolated collector-log smoke home initializes a runtime' );
     my $collector_config_file = File::Spec->catfile( $collector_log_home, '.developer-dashboard', 'config', 'config.json' );
     open my $collector_config_fh, '>:raw', $collector_config_file or die "Unable to write $collector_config_file: $!";
@@ -767,43 +851,43 @@ if ( !$UNDER_COVER ) {
     print {$collector_config_fh} $collector_config_json;
     close $collector_config_fh;
 
-    my $collector_run = json_decode( _run("$perl -I'$lib' '$dashboard' collector run cli.collector") );
+    my $collector_run = json_decode( _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' collector run cli.collector" ) );
     is( $collector_run->{name}, 'cli.collector', 'dashboard collector run returns the requested collector payload before log inspection' );
 
-    my $named_log = _run("$perl -I'$lib' '$dashboard' collector log cli.collector");
+    my $named_log = _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' collector log cli.collector" );
     like( $named_log, qr/cli\.collector/, 'dashboard collector log <name> resolves the named collector log stream' );
     like( $named_log, qr/cli stdout/, 'dashboard collector log <name> includes collector stdout' );
     like( $named_log, qr/cli stderr/, 'dashboard collector log <name> includes collector stderr' );
 
-    my $all_logs = _run("$perl -I'$lib' '$dashboard' collector log");
+    my $all_logs = _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' collector log" );
     like( $all_logs, qr/cli\.collector/, 'dashboard collector log without a name aggregates collector log output' );
     like( $all_logs, qr/cli stdout/, 'dashboard collector log aggregate includes collector stdout' );
 
-    my $pending_log = _run("$perl -I'$lib' '$dashboard' collector log pending.collector");
+    my $pending_log = _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' collector log pending.collector" );
     like( $pending_log, qr/No log entries are available yet for collector 'pending\.collector'/, 'dashboard collector log <name> is explicit when a configured collector has not run yet' );
 
     my $collector_log_files = Developer::Dashboard::FileRegistry->new(
         paths => Developer::Dashboard::PathRegistry->new( home => $collector_log_home )
     );
     $collector_log_files->write( 'dashboard_log', "web one\nweb two\n" );
-    my $top_level_web_log = _run("$perl -I'$lib' '$dashboard' log web");
+    my $top_level_web_log = _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' log web" );
     is( $top_level_web_log, "web one\nweb two\n", 'dashboard log web prints only the dashboard web log' );
 
-    my $top_level_collector_logs = _run("$perl -I'$lib' '$dashboard' log collector");
+    my $top_level_collector_logs = _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' log collector" );
     like( $top_level_collector_logs, qr/cli\.collector/, 'dashboard log collector prints collector logs without needing the nested collector command' );
     like( $top_level_collector_logs, qr/cli stdout/, 'dashboard log collector includes collector stdout content' );
 
-    my $named_top_level_collector_log = _run("$perl -I'$lib' '$dashboard' log collector cli.collector");
+    my $named_top_level_collector_log = _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' log collector cli.collector" );
     like( $named_top_level_collector_log, qr/cli\.collector/, 'dashboard log collector <name> resolves one named collector log stream' );
     unlike( $named_top_level_collector_log, qr/pending\.collector/, 'dashboard log collector <name> limits output to the requested collector' );
 
-    my $everything_log = _run("$perl -I'$lib' '$dashboard' logs");
+    my $everything_log = _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' logs" );
     like( $everything_log, qr/web one/, 'dashboard logs includes the dashboard web log in the all-logs view' );
     like( $everything_log, qr/cli\.collector/, 'dashboard logs includes collector logs in the all-logs view' );
 
-    my $templated_run = json_decode( _run("$perl -I'$lib' '$dashboard' collector run templated.collector") );
+    my $templated_run = json_decode( _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' collector run templated.collector" ) );
     is( $templated_run->{exit_code}, 0, 'dashboard collector run keeps TT-icon collectors successful when stdout contains valid JSON' );
-    my $templated_indicators = json_decode( _run("$perl -I'$lib' '$dashboard' indicator list") );
+    my $templated_indicators = json_decode( _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' indicator list" ) );
     my ($templated_indicator) = grep { $_->{name} eq 'templated.indicator' } @{$templated_indicators};
     ok( $templated_indicator, 'dashboard indicator list exposes the TT-backed collector indicator after a collector run' );
     is( $templated_indicator->{icon}, '123', 'dashboard indicator list preserves the rendered TT-backed collector icon instead of reverting to raw template syntax' ) if $templated_indicator;
@@ -815,7 +899,7 @@ if ( !$UNDER_COVER ) {
     print {$rotating_log_fh} "line-1\nline-2\nline-3\nline-4\nline-5\nline-6\n";
     close $rotating_log_fh or die "Unable to close $rotating_log: $!";
 
-    my $housekeeper_run = json_decode( _run("$perl -I'$lib' '$dashboard' housekeeper") );
+    my $housekeeper_run = json_decode( _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' housekeeper" ) );
     is( $housekeeper_run->{ok}, 1, 'dashboard housekeeper reports a successful cleanup scan' );
     ok( exists $housekeeper_run->{scanned}, 'dashboard housekeeper reports scan counts' );
     ok( $housekeeper_run->{scanned}{collector_logs} >= 1, 'dashboard housekeeper reports configured collector log scans when rotation is enabled' );
@@ -824,7 +908,7 @@ if ( !$UNDER_COVER ) {
     close $rotated_log_fh or die "Unable to close $rotating_log: $!";
     is( $rotated_log, "line-3\nline-4\nline-5\nline-6\n", 'dashboard housekeeper rotates configured collector logs from the CLI command path' );
 
-    my $collector_housekeeper_run = json_decode( _run("$perl -I'$lib' '$dashboard' collector run housekeeper") );
+    my $collector_housekeeper_run = json_decode( _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' collector run housekeeper" ) );
     is( $collector_housekeeper_run->{name}, 'housekeeper', 'dashboard collector run housekeeper executes the built-in housekeeper collector' );
     is( $collector_housekeeper_run->{exit_code}, 0, 'dashboard collector run housekeeper succeeds' );
 
@@ -839,28 +923,50 @@ if ( !$UNDER_COVER ) {
         'dashboard collector log reports unknown collector names explicitly',
     );
 
-    my $collector_start_pid = _run("$perl -I'$lib' '$dashboard' collector start cli.collector");
+    my ( $missing_restart_stdout, $missing_restart_stderr, $missing_restart_exit ) = capture {
+        system 'sh', '-c', "$perl -I'$lib' '$dashboard' restart collector missing.collector";
+        return $? >> 8;
+    };
+    ok( $missing_restart_exit != 0, 'dashboard restart collector exits non-zero for an unknown collector name' );
+    like(
+        decode( 'UTF-8', $missing_restart_stdout . $missing_restart_stderr ),
+        qr/Unknown collector 'missing\.collector'/,
+        'dashboard restart collector reports unknown collector names explicitly',
+    );
+
+    my ( $missing_stop_stdout, $missing_stop_stderr, $missing_stop_exit ) = capture {
+        system 'sh', '-c', "$perl -I'$lib' '$dashboard' stop collector missing.collector";
+        return $? >> 8;
+    };
+    ok( $missing_stop_exit != 0, 'dashboard stop collector exits non-zero for an unknown collector name' );
+    like(
+        decode( 'UTF-8', $missing_stop_stdout . $missing_stop_stderr ),
+        qr/Unknown collector 'missing\.collector'/,
+        'dashboard stop collector reports unknown collector names explicitly',
+    );
+
+    my $collector_start_pid = _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' collector start cli.collector" );
     like( $collector_start_pid, qr/\A\d+\n\z/, 'dashboard collector start still starts one named collector loop directly' );
 
-    my $top_level_stop_named_collector = _run("$perl -I'$lib' '$dashboard' stop collector cli.collector");
+    my $top_level_stop_named_collector = _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' stop collector cli.collector" );
     like( $top_level_stop_named_collector, qr/Component\s+Target\s+Status/, 'dashboard stop collector <name> prints a table summary by default' );
     like( $top_level_stop_named_collector, qr/collector\s+cli\.collector\s+stopped/, 'dashboard stop collector <name> reports the named collector row' );
 
-    my $top_level_restart_named_collector = json_decode( _run("$perl -I'$lib' '$dashboard' restart collector cli.collector -o json") );
+    my $top_level_restart_named_collector = json_decode( _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' restart collector cli.collector -o json" ) );
     is( $top_level_restart_named_collector->{scope}, 'collector', 'dashboard restart collector <name> reports the collector scope in JSON mode' );
     is( $top_level_restart_named_collector->{target}, 'cli.collector', 'dashboard restart collector <name> reports the requested collector target in JSON mode' );
 
-    my $top_level_stop_all_collectors = _run("$perl -I'$lib' '$dashboard' stop collector");
+    my $top_level_stop_all_collectors = _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' stop collector" );
     like( $top_level_stop_all_collectors, qr/Component\s+Target\s+Status/, 'dashboard stop collector without a name prints a table summary by default' );
     like( $top_level_stop_all_collectors, qr/collector/, 'dashboard stop collector without a name reports collector rows' );
 
     my $restart_web_port = _find_free_port();
     my $top_level_restart_web = json_decode(
-        _run("$perl -I'$lib' '$dashboard' restart web -o json --host 127.0.0.1 --port $restart_web_port")
+        _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' restart web -o json --host 127.0.0.1 --port $restart_web_port" )
     );
     is( $top_level_restart_web->{scope}, 'web', 'dashboard restart web reports the web scope in JSON mode' );
     ok( $top_level_restart_web->{web_pid}, 'dashboard restart web returns the managed web pid in JSON mode' );
-    my $top_level_stop_web = _run("$perl -I'$lib' '$dashboard' stop web");
+    my $top_level_stop_web = _run_in_home( $collector_log_home, "$perl -I'$lib' '$dashboard' stop web" );
     like( $top_level_stop_web, qr/Component\s+Target\s+Status/, 'dashboard stop web prints a table summary by default' );
     like( $top_level_stop_web, qr/web\s+dashboard\s+stopped/, 'dashboard stop web reports the web row in the summary table' );
 }
@@ -1189,7 +1295,7 @@ like( $shell_bootstrap, qr/_dd_tmux_status_active/, 'dashboard shell bash bootst
 like( $shell_bootstrap, qr/TICKET_REF/, 'dashboard shell bash bootstrap also recognizes ticket-managed tmux sessions through the ticket reference environment' );
 like( $shell_bootstrap, qr/tmux set-option -q status-position bottom/, 'dashboard shell bash bootstrap keeps the normal tmux status bar at the bottom in ticket sessions' );
 like( $shell_bootstrap, qr/tmux set-option -q status 2/, 'dashboard shell bash bootstrap enables a two-line tmux status block for ticket sessions' );
-like( $shell_bootstrap, qr/tmux set-option -q status-interval 2/, 'dashboard shell bash bootstrap refreshes the tmux status block automatically for ticket sessions' );
+like( $shell_bootstrap, qr/tmux set-option -q status-interval 15/, 'dashboard shell bash bootstrap refreshes the tmux status block automatically for ticket sessions without hot-looping' );
 like( $shell_bootstrap, qr/tmux set-option -q status-format\[0\].*tmux-status-top --width #\{client_width\}/s, 'dashboard shell bash bootstrap renders the indicator strip into the first tmux status row' );
 like( $shell_bootstrap, qr/status-format\[0\] "#\('\Q$dashboard\E' ps1 --mode tmux-status-top --width #\{client_width\}\)"/, 'dashboard shell bash bootstrap renders the tmux ticket indicator row through the explicit dashboard entrypoint path' );
 unlike( $shell_bootstrap, qr/status-format\[0\] "#\(dashboard ps1 --mode tmux-status-top --width #\{client_width\}\)"/, 'dashboard shell bash bootstrap does not depend on a bare dashboard PATH lookup for tmux ticket status rendering' );
@@ -1205,7 +1311,7 @@ like( $zsh_bootstrap, qr/_dd_tmux_status_active/, 'dashboard shell zsh bootstrap
 like( $zsh_bootstrap, qr/TICKET_REF/, 'dashboard shell zsh bootstrap also recognizes ticket-managed tmux sessions through the ticket reference environment' );
 like( $zsh_bootstrap, qr/tmux set-option -q status-position bottom/, 'dashboard shell zsh bootstrap keeps the normal tmux status bar at the bottom in ticket sessions' );
 like( $zsh_bootstrap, qr/tmux set-option -q status 2/, 'dashboard shell zsh bootstrap enables a two-line tmux status block for ticket sessions' );
-like( $zsh_bootstrap, qr/tmux set-option -q status-interval 2/, 'dashboard shell zsh bootstrap refreshes the tmux status block automatically for ticket sessions' );
+like( $zsh_bootstrap, qr/tmux set-option -q status-interval 15/, 'dashboard shell zsh bootstrap refreshes the tmux status block automatically for ticket sessions without hot-looping' );
 like( $zsh_bootstrap, qr/tmux set-option -q status-format\[0\].*tmux-status-top --width #\{client_width\}/s, 'dashboard shell zsh bootstrap renders the indicator strip into the first tmux status row' );
 like( $zsh_bootstrap, qr/tmux set-option -q status-format\[1\] "\$default_status"/, 'dashboard shell zsh bootstrap restores the normal tmux status row beneath the indicators' );
 like( $zsh_bootstrap, qr/ps1 --jobs \$\{#jobstates\} --mode compact --no-indicators/, 'dashboard shell zsh bootstrap suppresses prompt indicators when tmux owns the status line' );
@@ -1226,7 +1332,7 @@ like( $sh_bootstrap, qr/_dd_tmux_status_active/, 'dashboard shell sh bootstrap c
 like( $sh_bootstrap, qr/TICKET_REF/, 'dashboard shell sh bootstrap also recognizes ticket-managed tmux sessions through the ticket reference environment' );
 like( $sh_bootstrap, qr/tmux set-option -q status-position bottom/, 'dashboard shell sh bootstrap keeps the normal tmux status bar at the bottom in ticket sessions' );
 like( $sh_bootstrap, qr/tmux set-option -q status 2/, 'dashboard shell sh bootstrap enables a two-line tmux status block for ticket sessions' );
-like( $sh_bootstrap, qr/tmux set-option -q status-interval 2/, 'dashboard shell sh bootstrap refreshes the tmux status block automatically for ticket sessions' );
+like( $sh_bootstrap, qr/tmux set-option -q status-interval 15/, 'dashboard shell sh bootstrap refreshes the tmux status block automatically for ticket sessions without hot-looping' );
 like( $sh_bootstrap, qr/tmux set-option -q status-format\[0\].*tmux-status-top --width #\{client_width\}/s, 'dashboard shell sh bootstrap renders the indicator strip into the first tmux status row' );
 like( $sh_bootstrap, qr/tmux set-option -q status-format\[1\] "\$_dd_default_status"/, 'dashboard shell sh bootstrap restores the normal tmux status row beneath the indicators' );
 like( $sh_bootstrap, qr/ps1 --mode compact --no-indicators/, 'dashboard shell sh bootstrap suppresses prompt indicators when tmux owns the status line' );
@@ -1257,7 +1363,7 @@ like( $ps_bootstrap, qr/DEVELOPER_DASHBOARD_TMUX_STATUS -eq '1'/, 'dashboard she
 like( $ps_bootstrap, qr/TICKET_REF/, 'dashboard shell ps bootstrap also recognizes ticket-managed tmux sessions through the ticket reference environment' );
 like( $ps_bootstrap, qr/tmux set-option -q status-position bottom/, 'dashboard shell ps bootstrap keeps the normal tmux status bar at the bottom in ticket sessions' );
 like( $ps_bootstrap, qr/tmux set-option -q status 2/, 'dashboard shell ps bootstrap enables a two-line tmux status block for ticket sessions' );
-like( $ps_bootstrap, qr/tmux set-option -q status-interval 2/, 'dashboard shell ps bootstrap refreshes the tmux status block automatically for ticket sessions' );
+like( $ps_bootstrap, qr/tmux set-option -q status-interval 15/, 'dashboard shell ps bootstrap refreshes the tmux status block automatically for ticket sessions without hot-looping' );
 like( $ps_bootstrap, qr/tmux set-option -q status-format\[0\].*tmux-status-top --width #\{client_width\}/s, 'dashboard shell ps bootstrap renders the indicator strip into the first tmux status row' );
 like( $ps_bootstrap, qr/tmux set-option -q status-format\[1\] \$ddDefaultStatus/, 'dashboard shell ps bootstrap restores the normal tmux status row beneath the indicators' );
 like( $ps_bootstrap, qr/\bps1 --mode compact --no-indicators/, 'dashboard shell ps bootstrap suppresses prompt indicators when tmux owns the status line' );
@@ -2063,7 +2169,7 @@ like( $fake_ticket_log_text, qr/^show-options -gqv \@dd_ticket_status_default$/m
 like( $fake_ticket_log_text, qr/^show-options -gqv status-format\[0\]$/m, 'dashboard workspace snapshots the current global tmux bottom-row status before replacing it with the indicator row' );
 like( $fake_ticket_log_text, qr/^set-option -gq status-position bottom$/m, 'dashboard workspace keeps the tmux status block anchored at the bottom' );
 like( $fake_ticket_log_text, qr/^set-option -gq status 2$/m, 'dashboard workspace enables a two-line tmux status block for dashboard-managed workspace sessions' );
-like( $fake_ticket_log_text, qr/^set-option -gq status-interval 2$/m, 'dashboard workspace refreshes the tmux status block automatically for dashboard-managed workspace sessions' );
+like( $fake_ticket_log_text, qr/^set-option -gq status-interval 15$/m, 'dashboard workspace refreshes the tmux status block automatically for dashboard-managed workspace sessions without hot-looping' );
 like( $fake_ticket_log_text, qr/^set-option -gq status-format\[0\] #\('.*dashboard' ps1 --mode tmux-status-top --width #\{client_width\}\)$/m, 'dashboard workspace configures the first tmux status row to render dashboard indicators through the explicit dashboard entrypoint path' );
 like( $fake_ticket_log_text, qr/^set-option -gq status-format\[1\] /m, 'dashboard workspace restores the normal tmux bottom-row status beneath the indicator strip' );
 like( $fake_ticket_log_text, qr/^set-option -guq status-format\[2\]$/m, 'dashboard workspace clears any stale third tmux status row after configuring the workspace status block' );
@@ -3028,6 +3134,19 @@ sub _run {
     };
     is( $exit_code, 0, "command succeeded: $cmd" );
     return decode( 'UTF-8', $stdout . $stderr );
+}
+
+sub _run_in_dir {
+    my ( $dir, $cmd ) = @_;
+    die "run directory is required\n" if !defined $dir || $dir eq '';
+    die "command is required\n" if !defined $cmd || $cmd eq '';
+    return _run("cd '$dir' && $cmd");
+}
+
+sub _run_in_home {
+    my ( $home, $cmd ) = @_;
+    die "home directory is required\n" if !defined $home || $home eq '';
+    return _run_in_dir( $home, $cmd );
 }
 
 sub _run_interactive_command {

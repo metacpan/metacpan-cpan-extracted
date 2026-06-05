@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.16.1
+## Version v0.16.2
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2026/05/16
+## Modified 2026/06/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -143,7 +143,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.16.1';
+    our $VERSION = 'v0.16.2';
 };
 
 use strict;
@@ -4224,6 +4224,20 @@ sub tempfile
     my $new = $self->new( $self->_spec_catpath( $base_vol, $dir, $fname ), %$opts ) || return( $self->pass_error );
     if( $open )
     {
+        # Given, we clobber existing file with '+>', which is inherently dangerous we check first if the file exists, and try up to 3 time to generate a new file name, and return an error if we fail.
+        # This is paranoid code to ensure it is safe.
+        my $attempts = 0;
+        while( $new->exists && ++$attempts < 4 )
+        {
+            # Get a new one
+            $fname = $uuid->create_str;
+            $fname .= '.' . $new->extension;
+            $new = $self->new( $self->_spec_catpath( $base_vol, $dir, $fname ), %$opts ) || return( $self->pass_error );
+        }
+        if( $new->exists )
+        {
+            return( $self->error( "Unable to create a unique temporary file after 4 attempts." ) );
+        }
         $opts->{mode} //= '+>';
         my $mode = CORE::delete( $opts->{mode} );
         $new->open( $mode, $opts ) || return( $self->pass_error );
@@ -5865,7 +5879,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.16.1
+    v0.16.2
 
 =head1 DESCRIPTION
 
@@ -8278,9 +8292,25 @@ This parameter takes precedence over C<tmpdir>
 
 This is the mode used to open this temporary file. It is used as arguement to L</open>
 
+By default, the mode used is C<< +> >>
+
 =item * C<open>
 
 If true, the temporary file will be opened. It defaults to false.
+
+Any additional options will be passed directly to L</open>
+
+For example:
+
+    my $f = $self->new_tempfile(
+        autoflush => 1,       # passed directly to 'open'
+        cleanup   => 1,
+        binmode   => 'utf8',  # passed directly to 'open'
+        dir       => $Config->{var_dir},
+        open      => 1,
+        suffix    => '.zip', # or extension => 'zip',
+    ) || return( $self->pass_error );
+    my $fh = $f->handle;
 
 =item * C<suffix> or C<extension>
 

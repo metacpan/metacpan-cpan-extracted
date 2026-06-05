@@ -1,3 +1,106 @@
+4.03  2026-06-05
+    - ship an explicit OWASP compliance SOW and evidence matrix, wire it into
+      the OWASP and release-metadata tests, and tighten the manuals so the
+      safe public wording stays `OWASP-aligned` / `OWASP-gated` until the
+      remaining governance blockers are truly closed
+4.02  2026-06-04
+    - fix `_helper_file_supports_internal_command` substring detection so
+      runtime helper refresh probes return true for matching staged helpers
+      and stay stable under the plain and covered harnesses
+    - harden `t/47-zombie-coverage-closure.t` with a persistent helper
+      fixture and direct runtime-object assertions so the final gate loop
+      stays deterministic
+4.01  2026-06-02
+    - add the built-in `dashboard api` management command for layered
+      `config/api.json` machine auth, including merged registry listing,
+      per-key inspection, SHA-256 hashing of raw secrets before persistence,
+      optional `--maybe-secret` route-oriented secret input, exact saved
+      `/ajax/...` route add/remove controls, duplicate-route no-op handling,
+      and child-layer tombstones that hide inherited API groups without
+      rewriting parent config
+4.00  2026-06-02
+    - add layered `config/api.json` machine auth for selected saved
+      `/ajax/...` routes, including installed skill `config/api.json`
+      fragments, exact route allowlists, and `X-DD-API-Key` plus
+      `X-DD-API-Secret` header verification against stored SHA-256 digests
+    - keep helper-session auth working on those same API-registered ajax
+      routes while failing unauthenticated or wrong-secret machine callers
+      closed with `403 {"status":"forbidden"}`
+    - pass saved ajax API auth headers through the PSGI/Dancer adapter so
+      browser-facing and direct HTTP entrypoints enforce the same machine-auth
+      contract
+3.99  2026-05-26
+    - keep the active shell directory in dashboard-managed child `PATH`
+      repairs alongside the current Perl interpreter bin so collector shell
+      commands still execute cleanly during blank-environment tarball installs
+      and any runtime that inherits a stripped `PATH`
+3.98  2026-05-20
+    - treat collector `disable` as a hard stop-and-skip flag so disabled
+      collectors are not started, explicit named starts reject them, and any
+      already-running managed loop is stopped during the next lifecycle action
+    - remove managed collector indicators for disabled collectors instead of
+      leaving stale active indicator state behind
+    - normalize dashboard-owned `PERL5LIB` ordering so core/site/vendor Perl
+      dirs stay ahead of inherited user-local shadow copies, preventing stale
+      dual-life XS modules such as `Encode` from breaking helper startup,
+      collector child commands, saved Ajax subprocesses, and skill hooks on
+      hosts with older local-lib artefacts
+    - keep the current Perl interpreter directory at the front of `PATH` for
+      dashboard-managed child commands so collector loops, saved Ajax
+      subprocesses, and skill hooks do not fall back to a mismatched system
+      `perl` when they execute `dashboard` through `/usr/bin/env perl`
+    - run collector shell commands through a non-login shell so macOS shell
+      session restore output and other shell-init chatter do not get prefixed
+      onto JSON collector output
+    - slow tmux ticket/workspace status refresh from a 2-second hot loop to a
+      15-second cadence so dashboard-managed tmux sessions do not burn CPU just
+      to repaint status fragments
+    - apply a 30-second default safety floor to shell collectors that recurse
+      back into `dashboard` or `d2`, with explicit opt-outs and an environment
+      override for intentionally fast dashboard polling
+    - pause the collector watchdog supervisor during explicit named collector
+      stop and restart actions, then restore supervision for the remaining
+      watched fleet afterwards so watchdog restarts do not race manual
+      lifecycle commands
+    - preserve the saved managed web pid during stop flows even when shutdown
+      has to fall back to persisted-state listener pids, and still escalate the
+      saved pid to KILL when process discovery lags after TERM
+    - scope web stop ajax cleanup to the current dashboard runtime root instead
+      of sweeping every `dashboard ajax:` process owned by the user
+    - make collector loop shutdown kill active worker process groups so
+      long-running singleton commands stop with the collector loop instead of
+      surviving as orphaned subprocesses
+    - reap exited collector workers and watchdog-adopted dashboard children
+      immediately on `SIGCHLD` instead of waiting for the next scheduler or
+      watchdog tick, so long-interval collectors and orphaned supervisors do
+      not leave visible `<defunct>` dashboard processes behind for minutes or
+      days
+    - persist active worker pids in collector loop state and lock in a live
+      singleton regression where a long-running due run must be skipped instead
+      of overlapped
+
+3.92  2026-05-20
+    - keep `dashboard ps1` on a lighter switchboard path by lazy-loading the
+      unknown-command suggestion runtime and helper-staging-only modules
+      instead of paying for them on every prompt render
+    - stage only the requested built-in helper on the hot path and reuse one
+      `PathRegistry` object across the switchboard invocation, instead of
+      rescanning and restaging the entire helper tree for every prompt
+    - load installed skill config fragments directly from layered
+      `config/config.json` files in `Config` so prompt-time config reads do not
+      pull in the full skill dispatch runtime
+
+3.91  2026-05-20
+    - make `dashboard ps1` skip `tmux show-environment` when `TMUX` is unset,
+      stop constructing an unused collector object, and refresh only
+      prompt-visible core indicators on the prompt path
+    - read the prompt branch directly from `.git/HEAD` and worktree `gitdir:`
+      metadata instead of spawning `git branch`, keeping branch rendering fast
+      on slower hosts such as iSH
+    - add a collector-sync fast path so repeated prompt renders avoid the full
+      collector indicator rewrite path when the stored config-backed indicator
+      state already matches
+
 3.90  2026-05-20
     - make `PathRegistry` actually reuse a precomputed invocation cwd and
       memoize repeated DD-OOP-LAYERS path derivation so thin helper commands

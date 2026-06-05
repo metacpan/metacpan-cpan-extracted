@@ -3,7 +3,7 @@ package Developer::Dashboard::Collector;
 use strict;
 use warnings;
 
-our $VERSION = '3.90';
+our $VERSION = '4.03';
 
 use Fcntl qw(:flock);
 use File::Spec;
@@ -86,6 +86,9 @@ sub read_job {
 sub write_result {
     my ( $self, $name, %result ) = @_;
     my $paths = $self->collector_paths($name);
+    my $status_callback = delete $result{status_callback};
+    die 'Collector status callback must be a code reference'
+      if defined $status_callback && ref($status_callback) ne 'CODE';
 
     $self->_atomic_write_text( $paths->{stdout}, defined $result{stdout} ? $result{stdout} : '' );
     $self->_atomic_write_text( $paths->{stderr}, defined $result{stderr} ? $result{stderr} : '' );
@@ -98,11 +101,13 @@ sub write_result {
         $name,
         sub {
             my ($previous) = @_;
+            my %extra = defined $status_callback ? %{ $status_callback->($previous) || {} } : ();
             return {
                 %{$previous},
+                %extra,
                 enabled          => exists $result{enabled} ? $result{enabled} : 1,
-                running          => exists $result{running} ? $result{running} : 0,
-                active_runs      => exists $result{active_runs} ? $result{active_runs} : ( $previous->{active_runs} || 0 ),
+                running          => exists $result{running} ? $result{running} : ( exists $extra{running} ? $extra{running} : 0 ),
+                active_runs      => exists $result{active_runs} ? $result{active_runs} : ( exists $extra{active_runs} ? $extra{active_runs} : ( $previous->{active_runs} || 0 ) ),
                 last_run         => $timestamp,
                 last_completed_at=> $timestamp,
                 last_exit_code   => $result{exit_code},
@@ -199,14 +204,18 @@ sub mark_run_started {
 # Output: written status file path.
 sub mark_run_finished {
     my ( $self, $name, %result ) = @_;
-    my $status = $self->read_status($name) || {};
-    my $active_runs = $status->{active_runs} || 0;
-    $active_runs-- if $active_runs > 0;
     return $self->write_result(
         $name,
         %result,
-        active_runs => $active_runs,
-        running     => $active_runs > 0 ? 1 : 0,
+        status_callback => sub {
+            my ($previous) = @_;
+            my $active_runs = $previous->{active_runs} || 0;
+            $active_runs-- if $active_runs > 0;
+            return {
+                active_runs => $active_runs,
+                running     => $active_runs > 0 ? 1 : 0,
+            };
+        },
     );
 }
 

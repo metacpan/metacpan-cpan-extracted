@@ -177,11 +177,12 @@ MDS_HOT static void html_escape(pTHX_ mds_buf* b, const char* s, size_t n) {
      * because we never dereference past `end`. */
     while ((size_t)(end - p) >= 8) {
         uint64_t w;
+        int k;
         memcpy(&w, p, 8);
         if (MDS_LIKELY(!mds_escape_hot64(w))) { p += 8; continue; }
         /* Word has at least one hot byte: emit any of the 8 that match
          * via the standard table, then continue. */
-        for (int k = 0; k < 8; k++) {
+        for (k = 0; k < 8; k++) {
             const mds_esc_entry e = mds_escape_text[(unsigned char)p[k]];
             if (!e.rlen) continue;
             if (p + k > run) mds_buf_write(aTHX_ b, run, (size_t)((p + k) - run));
@@ -208,15 +209,23 @@ static void html_escape_unesc(pTHX_ mds_buf* b, const char* s, size_t n) {
     /* expand_entity_at writes through `out` which is just `b` for titles. */
     extern size_t mds_expand_entity_at(const char* s, size_t i, size_t n,
                                        char* out, size_t* outlen);
-    size_t i = 0;
+    size_t i;
+    mds_esc_entry e;
+    unsigned char nx;
+    char ebuf[8];
+    size_t elen;
+    size_t k;
+    size_t z;
+
+    i = 0;
     while (i < n) {
         if (s[i] == '\\' && i + 1 < n) {
-            unsigned char nx = (unsigned char)s[i+1];
+            nx = (unsigned char)s[i+1];
             if ((nx >= 0x21 && nx <= 0x2F) ||
                 (nx >= 0x3A && nx <= 0x40) ||
                 (nx >= 0x5B && nx <= 0x60) ||
                 (nx >= 0x7B && nx <= 0x7E)) {
-                const mds_esc_entry e = mds_escape_text[nx];
+                e = mds_escape_text[nx];
                 if (e.rlen) mds_buf_write(aTHX_ b, e.rep, e.rlen);
                 else        mds_buf_write(aTHX_ b, (const char*)&nx, 1);
                 i += 2;
@@ -224,13 +233,12 @@ static void html_escape_unesc(pTHX_ mds_buf* b, const char* s, size_t n) {
             }
         }
         if (s[i] == '&') {
-            char ebuf[8]; size_t elen;
-            size_t k = mds_expand_entity_at(s, i, n, ebuf, &elen);
+            k = mds_expand_entity_at(s, i, n, ebuf, &elen);
             if (k) {
                 /* Re-emit decoded bytes through html_escape_text so chars
                  * like '<' '&' '"' get re-escaped. */
-                for (size_t z = 0; z < elen; z++) {
-                    const mds_esc_entry e = mds_escape_text[(unsigned char)ebuf[z]];
+                for (z = 0; z < elen; z++) {
+                    e = mds_escape_text[(unsigned char)ebuf[z]];
                     if (e.rlen) mds_buf_write(aTHX_ b, e.rep, e.rlen);
                     else        mds_buf_write(aTHX_ b, ebuf + z, 1);
                 }
@@ -238,7 +246,7 @@ static void html_escape_unesc(pTHX_ mds_buf* b, const char* s, size_t n) {
                 continue;
             }
         }
-        const mds_esc_entry e = mds_escape_text[(unsigned char)s[i]];
+        e = mds_escape_text[(unsigned char)s[i]];
         if (e.rlen) mds_buf_write(aTHX_ b, e.rep, e.rlen);
         else        mds_buf_write(aTHX_ b, s + i, 1);
         i++;
@@ -251,16 +259,24 @@ static void html_escape_unesc(pTHX_ mds_buf* b, const char* s, size_t n) {
  * consumed (0 = not an entity), and stores the UTF-8 length in *outlen. */
 size_t mds_expand_entity_at(const char* s, size_t i, size_t n,
                             char* out, size_t* outlen) {
+    size_t q;
+    unsigned long cp;
+    size_t digits;
+    char c;
+    size_t blen;
+    size_t name_start;
+    const mds_entity* e;
+
     if (i >= n || s[i] != '&') return 0;
-    size_t q = i + 1;
+    q = i + 1;
     if (q < n && s[q] == '#') {
         q++;
-        unsigned long cp = 0;
-        size_t digits = 0;
+        cp = 0;
+        digits = 0;
         if (q < n && (s[q] == 'x' || s[q] == 'X')) {
             q++;
             while (q < n && digits < 6 && isxdigit((unsigned char)s[q])) {
-                char c = s[q];
+                c = s[q];
                 cp = cp * 16 + (c <= '9' ? c - '0' :
                                 (c <= 'F' ? c - 'A' + 10 : c - 'a' + 10));
                 q++; digits++;
@@ -275,7 +291,6 @@ size_t mds_expand_entity_at(const char* s, size_t i, size_t n,
         q++;
         if (cp == 0 || cp > 0x10FFFF || (cp >= 0xD800 && cp <= 0xDFFF))
             cp = 0xFFFD;
-        size_t blen;
         if (cp < 0x80) {
             out[0] = (char)cp; blen = 1;
         } else if (cp < 0x800) {
@@ -294,10 +309,10 @@ size_t mds_expand_entity_at(const char* s, size_t i, size_t n,
         *outlen = blen;
         return q - i;
     }
-    size_t name_start = q;
+    name_start = q;
     while (q < n && isalnum((unsigned char)s[q])) q++;
     if (q == name_start || q >= n || s[q] != ';') return 0;
-    const mds_entity* e = mds_entity_lookup(s + name_start, q - name_start);
+    e = mds_entity_lookup(s + name_start, q - name_start);
     if (!e) return 0;
     if (e->ulen > 8) return 0;
     memcpy(out, e->utf8, e->ulen);
@@ -308,19 +323,26 @@ size_t mds_expand_entity_at(const char* s, size_t i, size_t n,
 /* Returns 1 if URL starts with a scheme we refuse to emit (xss vectors)
  * unless MDS_FLAG_UNSAFE is set. `for_image` permits data: image MIME. */
 static int url_is_dangerous(const char* s, size_t n, int for_image) {
+    size_t i;
+    size_t j;
+    char c;
+    size_t sl;
+    const char* p;
+    size_t rem;
+
     /* Skip leading whitespace (already trimmed upstream but be defensive). */
-    size_t i = 0;
+    i = 0;
     while (i < n && (unsigned char)s[i] <= 0x20) i++;
     /* Find optional scheme ending at ':'. */
-    size_t j = i;
+    j = i;
     while (j < n) {
-        char c = s[j];
+        c = s[j];
         if (c == ':') break;
         if (!isalnum((unsigned char)c) && c != '+' && c != '-' && c != '.') return 0;
         j++;
     }
     if (j >= n || j == i) return 0;
-    size_t sl = j - i;
+    sl = j - i;
     /* Case-insensitive scheme compare. */
     #define SCHEME_EQ(lit) (sl == (sizeof(lit) - 1) && strncasecmp(s + i, (lit), sl) == 0)
     if (SCHEME_EQ("javascript") || SCHEME_EQ("vbscript") || SCHEME_EQ("file"))
@@ -328,8 +350,8 @@ static int url_is_dangerous(const char* s, size_t n, int for_image) {
     if (SCHEME_EQ("data")) {
         if (!for_image) return 1;
         /* Allow only data:image/{gif,png,jpeg,webp}[;...]. */
-        const char* p = s + j + 1;
-        size_t rem = n - (j + 1);
+        p = s + j + 1;
+        rem = n - (j + 1);
         if (rem < 6 || strncasecmp(p, "image/", 6) != 0) return 1;
         p += 6; rem -= 6;
         if ((rem >= 3 && strncasecmp(p, "gif", 3) == 0) ||
@@ -364,10 +386,11 @@ static void cb_enter_block(void* ud, mds_block_type t, const mds_block_detail* d
      * of a list item; need_nl_next fires after a suppressed tight paragraph
      * when any further block follows in the same item. */
     if (st->li_first_block) {
+        int tight_para;
         st->li_first_block = 0;
-        int tight_para = (t == MDS_BLK_PARAGRAPH &&
-                          st->tight_top > 0 &&
-                          st->tight_stack[st->tight_top - 1]);
+        tight_para = (t == MDS_BLK_PARAGRAPH &&
+                      st->tight_top > 0 &&
+                      st->tight_stack[st->tight_top - 1]);
         if (!tight_para) MDS_BUF_LIT(b, "\n");
     } else if (st->need_nl_next) {
         st->need_nl_next = 0;
@@ -390,9 +413,15 @@ static void cb_enter_block(void* ud, mds_block_type t, const mds_block_detail* d
         break;
     }
     case MDS_BLK_HEADING: {
-        int lvl = d->u.heading.level;
+        int lvl;
+        char open[5];
+        lvl = d->u.heading.level;
         if (lvl < 1) lvl = 1; else if (lvl > 6) lvl = 6;
-        char open[5] = { '<', 'h', (char)('0' + lvl), '>', 0 };
+        open[0] = '<';
+        open[1] = 'h';
+        open[2] = (char)('0' + lvl);
+        open[3] = '>';
+        open[4] = 0;
         mds_buf_write(aTHX_ b, open, 4);
         push_close(st, (close_kind)(CLOSE_H1 + (lvl - 1)));
         break;
@@ -536,11 +565,12 @@ static void cb_leave_block(void* ud, mds_block_type t) {
     render_state* st = (render_state*)ud;
     dTHXa(st->my_perl);
     mds_buf* b = st->buf;
+    close_kind k;
     (void)t;
     /* Mirror cb_enter_block: in fn_skip mode, nested events were given
      * CLOSE_NOOP on the stack so pop here and return without flushing. */
     if (st->fn_skip) {
-        close_kind k = pop_close(st);
+        k = pop_close(st);
         if (k == CLOSE_FN_DEF_SKIP) {
             st->fn_skip = 0;
         }
@@ -551,7 +581,7 @@ static void cb_leave_block(void* ud, mds_block_type t) {
         MDS_BUF_LIT(b, "[");
     }
     st->li_check_pending = 0;
-    close_kind k = pop_close(st);
+    k = pop_close(st);
     switch (k) {
     case CLOSE_NONE:
     case CLOSE_NOOP:
@@ -593,14 +623,23 @@ static void cb_leave_block(void* ud, mds_block_type t) {
          * code block / quote / etc. and the backref goes after as a
          * bare <a>. One backref per ref-instance; first is plain `↩`,
          * subsequent are `↩<sup>N</sup>`. */
-        unsigned idx  = st->fn_in_def;
-        unsigned uses = (idx >= 1 && idx <= st->fn_count) ? st->fn_uses[idx - 1] : 1;
-        int inject_in_p = 0;
+        unsigned idx;
+        unsigned uses;
+        int inject_in_p;
+        unsigned u;
+        char nbuf[16];
+        int nn;
+        char ibuf[32];
+        int in;
+
+        idx  = st->fn_in_def;
+        uses = (idx >= 1 && idx <= st->fn_count) ? st->fn_uses[idx - 1] : 1;
+        inject_in_p = 0;
         if (b->cur - b->base >= 5 && memcmp(b->cur - 5, "</p>\n", 5) == 0) {
             b->cur -= 5;
             inject_in_p = 1;
         }
-        for (unsigned u = 1; u <= uses; u++) {
+        for (u = 1; u <= uses; u++) {
             /* Inside <p>: separate anchors from preceding content with
              * a space. As a bare trailing anchor (after </pre>/<blockquote>
              * etc.) no leading space — the newline from the prior block
@@ -610,13 +649,10 @@ static void cb_leave_block(void* ud, mds_block_type t) {
             MDS_BUF_LIT(b, "<a href=\"#fnref-");
             write_fn_label_attr(aTHX_ b, st->fn_in_def_label, st->fn_in_def_label_len);
             if (u > 1) {
-                char nbuf[16];
-                int nn = snprintf(nbuf, sizeof nbuf, "-%u", u);
+                nn = snprintf(nbuf, sizeof nbuf, "-%u", u);
                 if (nn > 0) mds_buf_write(aTHX_ b, nbuf, (size_t)nn);
             }
             MDS_BUF_LIT(b, "\" class=\"footnote-backref\" data-footnote-backref data-footnote-backref-idx=\"");
-            char ibuf[32];
-            int in;
             if (u == 1) in = snprintf(ibuf, sizeof ibuf, "%u", idx);
             else        in = snprintf(ibuf, sizeof ibuf, "%u-%u", idx, u);
             if (in > 0) mds_buf_write(aTHX_ b, ibuf, (size_t)in);
@@ -625,8 +661,7 @@ static void cb_leave_block(void* ud, mds_block_type t) {
             MDS_BUF_LIT(b, "\">\xe2\x86\xa9");
             if (u > 1) {
                 MDS_BUF_LIT(b, "<sup class=\"footnote-ref\">");
-                char nbuf[16];
-                int nn = snprintf(nbuf, sizeof nbuf, "%u", u);
+                nn = snprintf(nbuf, sizeof nbuf, "%u", u);
                 if (nn > 0) mds_buf_write(aTHX_ b, nbuf, (size_t)nn);
                 MDS_BUF_LIT(b, "</sup>");
             }
@@ -659,7 +694,8 @@ static void write_url_attr(pTHX_ mds_buf* b, const char* s, size_t n);
  * UTF-8 sequences are encoded byte-by-byte. */
 static void write_fn_label_attr(pTHX_ mds_buf* b, const char* s, size_t n) {
     static const char hex[] = "0123456789ABCDEF";
-    for (size_t i = 0; i < n; i++) {
+    size_t i;
+    for (i = 0; i < n; i++) {
         unsigned char c = (unsigned char)s[i];
         int safe = (c >= '0' && c <= '9') ||
                    (c >= 'A' && c <= 'Z') ||
@@ -679,7 +715,8 @@ static void write_fn_label_attr(pTHX_ mds_buf* b, const char* s, size_t n) {
 /* Look up label in render_state's used set. Returns 1-based ordinal
  * if found, 0 if not. Linear scan; footnote counts are tiny. */
 static unsigned fn_lookup(render_state* st, const char* s, size_t n) {
-    for (size_t i = 0; i < st->fn_count; i++) {
+    size_t i;
+    for (i = 0; i < st->fn_count; i++) {
         if (st->fn_label_lens[i] == n &&
             memcmp(st->fn_labels[i], s, n) == 0) {
             return (unsigned)(i + 1);
@@ -718,10 +755,21 @@ static int gfm_word_byte(unsigned char c) {
  * length on success (>=1 dot, valid segments, no underscores in last
  * two segments), else 0. */
 static size_t gfm_scan_domain_ex(const char* p, const char* end, int need_dot) {
-    const char* q = p;
-    int dots = 0;
-    const char* last_dot = NULL;
-    const char* prev_dot = NULL;
+    const char* q;
+    int dots;
+    const char* last_dot;
+    const char* prev_dot;
+    const char* check_end;
+    const char* r;
+    const char* l_s;
+    const char* l_e;
+    const char* m_s;
+    const char* m_e;
+
+    q = p;
+    dots = 0;
+    last_dot = NULL;
+    prev_dot = NULL;
     while (q < end) {
         unsigned char c = (unsigned char)*q;
         if (c == '.') {
@@ -736,27 +784,27 @@ static size_t gfm_scan_domain_ex(const char* p, const char* end, int need_dot) {
     if (need_dot && dots == 0) return 0;
     /* Permit trailing dot in domain; strip-trail handles it. Roll q back
      * just past the dot for the underscore check. */
-    const char* check_end = q;
+    check_end = q;
     if (check_end > p && check_end[-1] == '.') {
         check_end--;
         /* recompute last_dot/prev_dot if the trailing dot was the last one */
         if (last_dot == check_end) {
             last_dot = prev_dot;
             prev_dot = NULL;
-            for (const char* r = p; r < last_dot; r++) if (*r == '.') prev_dot = r;
+            for (r = p; r < last_dot; r++) if (*r == '.') prev_dot = r;
         }
     }
     if (last_dot) {
         /* No underscores in last two segments. */
-        const char* l_s = last_dot + 1;
-        const char* l_e = check_end;
-        for (const char* r = l_s; r < l_e; r++) if (*r == '_') return 0;
-        const char* m_s = prev_dot ? prev_dot + 1 : p;
-        const char* m_e = last_dot;
-        for (const char* r = m_s; r < m_e; r++) if (*r == '_') return 0;
+        l_s = last_dot + 1;
+        l_e = check_end;
+        for (r = l_s; r < l_e; r++) if (*r == '_') return 0;
+        m_s = prev_dot ? prev_dot + 1 : p;
+        m_e = last_dot;
+        for (r = m_s; r < m_e; r++) if (*r == '_') return 0;
     } else {
         /* No dot at all (only allowed when need_dot==0): also disallow `_`. */
-        for (const char* r = p; r < check_end; r++) if (*r == '_') return 0;
+        for (r = p; r < check_end; r++) if (*r == '_') return 0;
     }
     return (size_t)(q - p);
 }
@@ -776,7 +824,8 @@ static const char* gfm_strip_trail(const char* p, const char* q) {
         }
         if (c == ')') {
             int opens = 0, closes = 0;
-            for (const char* r = p; r < q; r++) {
+            const char* r;
+            for (r = p; r < q; r++) {
                 if (*r == '(') opens++;
                 else if (*r == ')') closes++;
             }
@@ -797,9 +846,11 @@ static const char* gfm_strip_trail(const char* p, const char* q) {
  * www. prefix. Returns length consumed past start of domain, 0 if no
  * valid URL. */
 static size_t gfm_scan_url_body(const char* p, const char* end) {
-    size_t dl = gfm_scan_domain_ex(p, end, 0);
+    size_t dl;
+    const char* q;
+    dl = gfm_scan_domain_ex(p, end, 0);
     if (!dl) return 0;
-    const char* q = p + dl;
+    q = p + dl;
     /* Optional path: byte run until whitespace, '<', or end. */
     while (q < end) {
         unsigned char c = (unsigned char)*q;
@@ -816,8 +867,13 @@ static size_t gfm_scan_url_body(const char* p, const char* end) {
  * domain length after @. Returns 1 on success. */
 static int gfm_scan_email_at(const char* base, const char* at, const char* end,
                               size_t* l_out, size_t* d_out) {
+    const char* L;
+    const char* D;
+    size_t dl;
+    const char* de;
+
     /* local part: [a-zA-Z0-9._+-] walking back */
-    const char* L = at;
+    L = at;
     while (L > base) {
         unsigned char c = (unsigned char)L[-1];
         if (isalnum(c) || c == '.' || c == '_' || c == '+' || c == '-') L--;
@@ -826,11 +882,11 @@ static int gfm_scan_email_at(const char* base, const char* at, const char* end,
     if (L == at) return 0;
     if (*L == '.') return 0;  /* can't start with dot */
     /* domain: alphanum, _, -, ., must have a dot, no _ in last two segs */
-    const char* D = at + 1;
-    size_t dl = gfm_scan_domain(D, end);
+    D = at + 1;
+    dl = gfm_scan_domain(D, end);
     if (!dl) return 0;
     /* Trailing punct stripping on domain. */
-    const char* de = gfm_strip_trail(D, D + dl);
+    de = gfm_strip_trail(D, D + dl);
     dl = (size_t)(de - D);
     if (!dl) return 0;
     *l_out = (size_t)(at - L);
@@ -849,8 +905,9 @@ static void gfm_emit_autolinked(pTHX_ render_state* st,
  * Called by every non-text event so the AUTOLINK scanner sees the whole
  * contiguous text run (the inline tokenizer splits at intra-word `_`/`*`). */
 static void flush_pending_text(pTHX_ render_state* st) {
+    size_t n;
     if (st->pending_len == 0) return;
-    size_t n = st->pending_len;
+    n = st->pending_len;
     st->pending_len = 0;  /* clear first so re-entry is safe */
     gfm_emit_autolinked(aTHX_ st, st->pending_text, n);
 }
@@ -862,12 +919,20 @@ static void gfm_emit_autolinked(pTHX_ render_state* st,
     const char* run = s;
     const char* p = s;
     while (p < end) {
-        unsigned char c = (unsigned char)*p;
-        int boundary = (p == s) ? 1 : !gfm_word_byte((unsigned char)p[-1]);
+        unsigned char c;
+        int boundary;
+        size_t url_len;
+        size_t scheme_len;
+        int is_email;
+        const char* scheme_prefix;
+        size_t dl;
+
+        c = (unsigned char)*p;
+        boundary = (p == s) ? 1 : !gfm_word_byte((unsigned char)p[-1]);
         if (!boundary) { p++; continue; }
         /* http://, https://, ftp:// */
-        size_t url_len = 0; size_t scheme_len = 0; int is_email = 0;
-        const char* scheme_prefix = NULL;
+        url_len = 0; scheme_len = 0; is_email = 0;
+        scheme_prefix = NULL;
         if (c == 'h' && (size_t)(end - p) >= 7 &&
             memcmp(p, "http://", 7) == 0) {
             scheme_len = 7;
@@ -884,7 +949,7 @@ static void gfm_emit_autolinked(pTHX_ render_state* st,
                    memcmp(p, "www.", 4) == 0) {
             scheme_len = 0;
             /* www. variant: require at least one further dot in domain. */
-            size_t dl = gfm_scan_domain(p, end);
+            dl = gfm_scan_domain(p, end);
             if (dl) {
                 /* Optional path. */
                 const char* qq = p + dl;
@@ -1047,9 +1112,11 @@ static void cb_text(void* ud, const char* s, size_t n) {
         /* Accumulate; flushed by any non-text callback. */
         size_t need = st->pending_len + n;
         if (need > st->pending_cap) {
-            size_t nc = st->pending_cap ? st->pending_cap : 64;
+            size_t nc;
+            char* np;
+            nc = st->pending_cap ? st->pending_cap : 64;
             while (nc < need) nc *= 2;
-            char* np = (char*)realloc(st->pending_text, nc);
+            np = (char*)realloc(st->pending_text, nc);
             if (!np) { /* OOM: bypass coalescing for this chunk */
                 flush_pending_text(aTHX_ st);
                 gfm_emit_autolinked(aTHX_ st, s, n);
@@ -1083,17 +1150,24 @@ static void cb_raw(void* ud, const char* s, size_t n) {
         };
         const char* run = s;
         const char* end = s + n;
-        for (const char* p = s; p < end; p++) {
+        const char* p;
+        const char* q;
+        const char* name;
+        size_t nlen;
+        int hit;
+        int i;
+        size_t bl;
+        for (p = s; p < end; p++) {
             if (*p != '<') continue;
-            const char* q = p + 1;
+            q = p + 1;
             if (q < end && *q == '/') q++;
-            const char* name = q;
+            name = q;
             while (q < end && isalnum((unsigned char)*q)) q++;
-            size_t nlen = (size_t)(q - name);
+            nlen = (size_t)(q - name);
             if (nlen == 0) continue;
-            int hit = 0;
-            for (int i = 0; banned[i]; i++) {
-                size_t bl = strlen(banned[i]);
+            hit = 0;
+            for (i = 0; banned[i]; i++) {
+                bl = strlen(banned[i]);
                 if (nlen == bl && strncasecmp(name, banned[i], bl) == 0) {
                     hit = 1; break;
                 }
@@ -1118,7 +1192,8 @@ static void write_url_attr_impl(pTHX_ mds_buf* b, const char* s, size_t n, int u
      * titles, but NOT in autolinks). Entities (named + numeric) are expanded
      * before percent-encoding so the resulting UTF-8 bytes are escaped. */
     static const char hex[] = "0123456789ABCDEF";
-    for (size_t i = 0; i < n; ) {
+    size_t i;
+    for (i = 0; i < n; ) {
         unsigned char c = (unsigned char)s[i];
         if (unesc && c == '\\' && i + 1 < n) {
             unsigned char nx = (unsigned char)s[i+1];
@@ -1140,7 +1215,8 @@ static void write_url_attr_impl(pTHX_ mds_buf* b, const char* s, size_t n, int u
                  * &amp; (CommonMark expects e.g. &amp; → %26? No, spec
                  * says ENT decoded to '&' renders as &amp; in href, and
                  * &auml; → ä → %C3%A4). */
-                for (size_t z = 0; z < elen; z++) {
+                size_t z;
+                for (z = 0; z < elen; z++) {
                     unsigned char ec = (unsigned char)ebuf[z];
                     if (ec == '&') { mds_buf_write(aTHX_ b, "&amp;", 5); continue; }
                     if (ec <= 0x20 || ec == 0x7f ||
@@ -1256,22 +1332,29 @@ static void cb_enter_inline(void* ud, mds_inline_type t, const mds_inline_detail
         /* opens nothing; children come via cb_raw */
         break;
     case MDS_INL_FOOTNOTE_REF: {
-        const char* lab = d->u.footnote_ref.label;
-        size_t       ll = d->u.footnote_ref.label_len;
-        unsigned     idx = fn_register(st, lab, ll);
-        unsigned     uses = st->fn_uses[idx - 1];
+        const char* lab;
+        size_t       ll;
+        unsigned     idx;
+        unsigned     uses;
+        char ibuf[16];
+        int in;
+        char nbuf[16];
+        int nn;
+
+        lab = d->u.footnote_ref.label;
+        ll = d->u.footnote_ref.label_len;
+        idx = fn_register(st, lab, ll);
+        uses = st->fn_uses[idx - 1];
         MDS_BUF_LIT(b, "<sup class=\"footnote-ref\"><a href=\"#fn-");
         write_fn_label_attr(aTHX_ b, lab, ll);
         MDS_BUF_LIT(b, "\" id=\"fnref-");
         write_fn_label_attr(aTHX_ b, lab, ll);
         if (uses > 1) {
-            char nbuf[16];
-            int nn = snprintf(nbuf, sizeof nbuf, "-%u", uses);
+            nn = snprintf(nbuf, sizeof nbuf, "-%u", uses);
             if (nn > 0) mds_buf_write(aTHX_ b, nbuf, (size_t)nn);
         }
         MDS_BUF_LIT(b, "\" data-footnote-ref>");
-        char ibuf[16];
-        int in = snprintf(ibuf, sizeof ibuf, "%u", idx);
+        in = snprintf(ibuf, sizeof ibuf, "%u", idx);
         if (in > 0) mds_buf_write(aTHX_ b, ibuf, (size_t)in);
         MDS_BUF_LIT(b, "</a></sup>");
         break;

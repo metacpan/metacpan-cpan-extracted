@@ -1,7 +1,7 @@
 # $Id$
 # vim: ts=8:sw=4:et
 #
-# Copyright (c) 2024-2025  DBI Team
+# Copyright (c) 2024-2026  DBI Team
 # Copyright (c) 1994-2024  Tim Bunce  Ireland
 #
 # See COPYRIGHT section in pod text below for usage and distribution rights.
@@ -16,7 +16,7 @@ use warnings;
 
 our ($XS_VERSION, $VERSION);
 BEGIN {
-$VERSION = "1.647"; # ==> ALSO update the version in the pod text below!
+$VERSION = "1.648"; # ==> ALSO update the version in the pod text below!
 $XS_VERSION = $VERSION;
 $VERSION =~ tr/_//d;
 }
@@ -148,7 +148,7 @@ sure that your issue isn't related to the driver you're using.
 
 =head2 NOTES
 
-This is the DBI specification that corresponds to DBI version 1.647
+This is the DBI specification that corresponds to DBI version 1.648
 (see L<DBI::Changes> for details).
 
 The DBI is evolving at a steady pace, so it's good to check that
@@ -1487,7 +1487,7 @@ sub _new_sth {	# called by DBD::<drivername>::db::prepare)
 	    join "!\001", $dsn, $user, $auth, DBI::_concat_hash_sorted($attr, "=\001", ",\001", 0, 0)
 	};
 	my $dbh = $cache->{$key};
-        $drh->trace_msg(sprintf("    connect_cached: key '$key', cached dbh $dbh\n", DBI::neat($key), DBI::neat($dbh)))
+        $drh->trace_msg(sprintf("    connect_cached: key '%s', cached dbh %s\n", DBI::neat($key), DBI::neat($dbh)))
             if (($DBI::dbi_debug & 0xF) >= 4);
 
         my $cb = $attr->{Callbacks}; # take care not to autovivify
@@ -4358,7 +4358,7 @@ rather defeat the purpose.
 A more common application for callbacks is setting connection state only when
 a new connection is made (by connect() or connect_cached()). Adding a callback
 to the connected method (when using C<connect>) or via
-C<connect_cached.connected> (when useing connect_cached()>) makes this easy.
+C<connect_cached.connected> (when using connect_cached()>) makes this easy.
 The connected() method is a no-op by default (unless you subclass the DBI and
 change it). The DBI calls it to indicate that a new connection has been made
 and the connection attributes have all been set. You can give it a bit of
@@ -6899,9 +6899,9 @@ a hash (thanks to H.Merijn Brand):
       print "$row{region}: $row{sales}\n";
   }
 
-but has a small drawback: If data already fetched call to L</bind_columns>
-will flush current values.  If you want to bind_columns after you have fetched
-you can use:
+but has a small drawback: If the data has already been fetched, the call to
+L</bind_columns> will flush current values.  If you want to bind_columns after
+you have fetched, you can use:
 
   use feature "refaliasing";
   no warnings "experimental::refaliasing";
@@ -6914,7 +6914,7 @@ or, with older perl versions:
   use Data::Alias;
   alias @$data{ $sth->{NAME_lc}->@* } =  @$row;
 
-This is useful in situations when you have many left joins, but wanna to join
+This is useful in situations when you have many left joins, but want to join
 your %$data hash to only subset of fetched values.
 
 =head3 C<dump_results>
@@ -7485,7 +7485,7 @@ can cause problems. You have been warned.
 
 Using DBI with perl threads is not yet recommended for production
 environments. For more information see
-L<http://www.perlmonks.org/index.pl?node_id=288022>
+L<https://www.perlmonks.org/index.pl?node_id=288022>
 
 Note: There is a bug in perl 5.8.2 when configured with threads and
 debugging enabled (bug #24463) which would cause some DBI tests to fail.
@@ -7776,10 +7776,10 @@ COMMON TO ALL HANDLES> for info and important caveats.
 When tracking down memory leaks using tools like L<Devel::Leak>
 you'll find that some DBI internals are reported as 'leaking' memory.
 This is very unlikely to be a real leak.  The DBI has various caches to improve
-performance and the apparrent leaks are simply the normal operation of these
+performance and the apparent leaks are simply the normal operation of these
 caches.
 
-The most frequent sources of the apparrent leaks are L</ChildHandles>,
+The most frequent sources of the apparent leaks are L</ChildHandles>,
 L</prepare_cached> and L</connect_cached>.
 
 For example http://stackoverflow.com/questions/13338308/perl-dbi-memory-leak
@@ -8367,7 +8367,7 @@ to thank Paul for his generosity and vision in supporting this work for many yea
 
 A couple of specific DBI features have been sponsored by enlightened companies:
 
-The development of the swap_inner_handle() method was sponsored by BizRate.com (L<http://BizRate.com>)
+The development of the swap_inner_handle() method was sponsored by BizRate.com
 
 The development of DBD::Gofer and related modules was sponsored by Shopzilla.com (L<https::connexity.com>).
 

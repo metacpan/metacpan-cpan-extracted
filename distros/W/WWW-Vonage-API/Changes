@@ -3,3 +3,15 @@ Revision history for Perl extension WWW::Vonage::API.
 release: 0.001
 
 - initial import of WWW::Vonage::API
+
+release: 0.002
+
+- Clean up the POD a little
+
+release: 0.003
+
+- Added a DEBUG to the new params
+- Removed some unsued modules 
+- Clean up the POD a little more
+- got rid of lc on path as some resouces and most ids are case sensitive.
+- updated pod for above

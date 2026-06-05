@@ -3,7 +3,7 @@ package Developer::Dashboard::SkillDispatcher;
 use strict;
 use warnings;
 
-our $VERSION = '3.90';
+our $VERSION = '4.03';
 
 use Config ();
 use IPC::Open3 qw(open3);
@@ -15,6 +15,7 @@ use File::Basename qw(dirname basename);
 use Symbol qw(gensym);
 use Developer::Dashboard::CLI::Suggest;
 use Developer::Dashboard::EnvLoader;
+use Developer::Dashboard::PerlEnv ();
 use Developer::Dashboard::Runtime::Result;
 use Developer::Dashboard::SkillManager;
 use Developer::Dashboard::Platform qw(command_argv_for_path is_runnable_file resolve_runnable_file);
@@ -719,20 +720,19 @@ sub _skill_env {
     my $skill_path = $args{skill_path} || die 'Missing skill path';
     my $local_root = File::Spec->catdir( $skill_path, 'perl5' );
     my $shared_root = File::Spec->catdir( $self->{manager}{paths}->home, 'perl5' );
-    my $path_sep   = $^O eq 'MSWin32' ? ';' : ':';
-    my @perl5lib   = grep { defined && $_ ne '' } split /\Q$path_sep\E/, ( $ENV{PERL5LIB} || '' );
+    my @perl5lib_extra;
     for my $shared_lib (
         File::Spec->catdir( $shared_root, 'lib', 'perl5' ),
         File::Spec->catdir( $shared_root, 'lib', 'perl5', $Config::Config{archname} || '' ),
     ) {
-        unshift @perl5lib, $shared_lib if defined $shared_lib && $shared_lib ne '' && -d $shared_lib;
+        push @perl5lib_extra, $shared_lib if defined $shared_lib && $shared_lib ne '' && -d $shared_lib;
     }
     for my $layer_path ( reverse @{ $args{skill_layers} || [] } ) {
         for my $local_lib (
             File::Spec->catdir( $layer_path, 'perl5', 'lib', 'perl5' ),
             File::Spec->catdir( $layer_path, 'perl5', 'lib', 'perl5', $Config::Config{archname} || '' ),
         ) {
-            unshift @perl5lib, $local_lib if defined $local_lib && $local_lib ne '' && -d $local_lib;
+            push @perl5lib_extra, $local_lib if defined $local_lib && $local_lib ne '' && -d $local_lib;
         }
     }
 
@@ -746,7 +746,9 @@ sub _skill_env {
         DEVELOPER_DASHBOARD_SKILL_STATE_ROOT  => File::Spec->catdir( $skill_path, 'state' ),
         DEVELOPER_DASHBOARD_SKILL_LOGS_ROOT   => File::Spec->catdir( $skill_path, 'logs' ),
         DEVELOPER_DASHBOARD_SKILL_LOCAL_ROOT  => $local_root,
-        PERL5LIB                              => join( $path_sep, @perl5lib ),
+        %{ Developer::Dashboard::PerlEnv->dashboard_child_env(
+            extra => \@perl5lib_extra,
+        ) },
     );
 }
 

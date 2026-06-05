@@ -45,8 +45,9 @@ static unsigned char g_byteclass[256];
 static int g_byteclass_inited = 0;
 
 static void byteclass_init(void) {
+    int c;
     if (g_byteclass_inited) return;
-    for (int c = 0; c < 256; c++) {
+    for (c = 0; c < 256; c++) {
         unsigned f = 0;
         if (c == ' ' || c == '\t' || c == '\n' || c == '\v' ||
             c == '\f' || c == '\r')
@@ -104,15 +105,14 @@ static unsigned mds_utf8_decode(const char* s, size_t n, size_t i, int* adv) {
  * sets *cp_start to start offset. */
 static unsigned mds_utf8_decode_prev(const char* s, size_t n, size_t pos,
                                      size_t* cp_start) {
-    /* Walk back to UTF-8 start byte. */
     size_t i = pos - 1;
     int back = 0;
+    int adv;
     while (i > 0 && back < 3 &&
            ((unsigned char)s[i] & 0xC0) == 0x80) {
         i--; back++;
     }
     *cp_start = i;
-    int adv;
     return mds_utf8_decode(s, n, i, &adv);
 }
 
@@ -246,13 +246,14 @@ static void append_to(inode* parent, inode* x) {
 /* Append literal text bytes; coalesces with previous TEXT node if possible
  * (only if contiguous in source). */
 static void append_text(scn* z, const char* p, size_t k) {
+    inode* x;
     if (k == 0) return;
     if (z->tail && z->tail->type == N_TEXT &&
         z->tail->s + z->tail->n == p) {
         z->tail->n += k;
         return;
     }
-    inode* x = node_new(z, N_TEXT);
+    x = node_new(z, N_TEXT);
     x->s = p; x->n = k;
     append(z, x);
 }
@@ -260,10 +261,12 @@ static void append_text(scn* z, const char* p, size_t k) {
 /* Allocate a fresh text node referring to arena-stored bytes (e.g. an
  * entity expansion). */
 static void append_text_dup(scn* z, const char* p, size_t k) {
+    char* d;
+    inode* x;
     if (k == 0) return;
-    char* d = (char*)mds_arena_alloc(&z->ctx->arena, k);
+    d = (char*)mds_arena_alloc(&z->ctx->arena, k);
     memcpy(d, p, k);
-    inode* x = node_new(z, N_TEXT);
+    x = node_new(z, N_TEXT);
     x->s = d; x->n = k;
     append(z, x);
 }
@@ -286,11 +289,16 @@ static void append_text_dup(scn* z, const char* p, size_t k) {
 static int classify_run(const char* s, size_t n, size_t pos, size_t runlen,
                         int* can_open_out, int* can_close_out,
                         unsigned char ch) {
+    unsigned cp_before, cp_after;
+    size_t after_pos;
+    int before_ws, after_ws, before_punct, after_punct;
+    int left, right;
+    int can_open, can_close;
+
     /* Decode the codepoint immediately before pos and the one starting
      * at pos+runlen. Treat document edges as line feeds (whitespace).
      * Decoding multi-byte codepoints is essential for non-ASCII spec
      * cases (NBSP as WS, currency / arrows / etc. as Unicode punct). */
-    unsigned cp_before, cp_after;
     if (pos == 0) {
         cp_before = '\n';
     } else {
@@ -302,7 +310,7 @@ static int classify_run(const char* s, size_t n, size_t pos, size_t runlen,
             cp_before = mds_utf8_decode_prev(s, n, pos, &st);
         }
     }
-    size_t after_pos = pos + runlen;
+    after_pos = pos + runlen;
     if (after_pos >= n) {
         cp_after = '\n';
     } else {
@@ -315,15 +323,14 @@ static int classify_run(const char* s, size_t n, size_t pos, size_t runlen,
         }
     }
 
-    int before_ws    = cp_is_ws(cp_before);
-    int after_ws     = cp_is_ws(cp_after);
-    int before_punct = cp_is_punct(cp_before);
-    int after_punct  = cp_is_punct(cp_after);
+    before_ws    = cp_is_ws(cp_before);
+    after_ws     = cp_is_ws(cp_after);
+    before_punct = cp_is_punct(cp_before);
+    after_punct  = cp_is_punct(cp_after);
 
-    int left  = !after_ws  && (!after_punct  || before_ws || before_punct);
-    int right = !before_ws && (!before_punct || after_ws  || after_punct);
+    left  = !after_ws  && (!after_punct  || before_ws || before_punct);
+    right = !before_ws && (!before_punct || after_ws  || after_punct);
 
-    int can_open, can_close;
     if (ch == '_') {
         /* §6.4: _ delimiters with intra-word restrictions */
         can_open  = left  && (!right || before_punct);
@@ -344,26 +351,36 @@ static int classify_run(const char* s, size_t n, size_t pos, size_t runlen,
  * On success returns new pos past the closing fence; emits one node.
  * On failure returns 0 (caller consumes one backtick as text). */
 static size_t try_code_span(scn* z, size_t pos) {
-    const char* s = z->s; size_t n = z->n;
+    const char* s = z->s;
+    size_t n = z->n;
     size_t open_start = pos;
+    size_t open_len;
+    size_t content_start;
+    size_t scan;
     while (pos < n && s[pos] == '`') pos++;
-    size_t open_len = pos - open_start;
-    size_t content_start = pos;
-    size_t scan = pos;
+    open_len = pos - open_start;
+    content_start = pos;
+    scan = pos;
     while (scan < n) {
         /* find next run of backticks */
         const char* p = (const char*)memchr(s + scan, '`', n - scan);
+        size_t bs;
+        size_t be;
         if (!p) return 0;
-        size_t bs = (size_t)(p - s);
-        size_t be = bs;
+        bs = (size_t)(p - s);
+        be = bs;
         while (be < n && s[be] == '`') be++;
         if (be - bs == open_len) {
             /* matched */
-            size_t cs = content_start, ce = bs;
+            size_t cs = content_start;
+            size_t ce = bs;
+            int has_nonspace = 0;
+            int needs_replace = 0;
+            inode* x;
+            size_t i;
             /* normalisation: if first and last are space, and content is
              * not all spaces, strip one leading and trailing space. */
-            int has_nonspace = 0;
-            for (size_t i = cs; i < ce; i++) {
+            for (i = cs; i < ce; i++) {
                 if (s[i] != ' ' && s[i] != '\n') { has_nonspace = 1; break; }
             }
             if (has_nonspace && ce - cs >= 2 &&
@@ -372,14 +389,13 @@ static size_t try_code_span(scn* z, size_t pos) {
                 cs++; ce--;
             }
             /* replace newlines with spaces */
-            int needs_replace = 0;
-            for (size_t i = cs; i < ce; i++) {
+            for (i = cs; i < ce; i++) {
                 if (s[i] == '\n') { needs_replace = 1; break; }
             }
-            inode* x = node_new(z, N_CODE);
+            x = node_new(z, N_CODE);
             if (needs_replace) {
                 char* d = (char*)mds_arena_alloc(&z->ctx->arena, ce - cs);
-                for (size_t i = cs; i < ce; i++)
+                for (i = cs; i < ce; i++)
                     d[i - cs] = (s[i] == '\n') ? ' ' : s[i];
                 x->s = d; x->n = ce - cs;
             } else {
@@ -399,12 +415,17 @@ static size_t try_code_span(scn* z, size_t pos) {
  * Returns chars consumed (including & and ;) on success, 0 otherwise. */
 static size_t try_entity(scn* z, size_t pos) {
     const char* s = z->s; size_t n = z->n;
+    size_t q;
+    size_t name_start;
+    const mds_entity* e;
     if (pos + 1 >= n) return 0;
-    size_t q = pos + 1;
+    q = pos + 1;
     if (s[q] == '#') {
-        q++;
         unsigned long cp = 0;
         size_t digits = 0;
+        char buf[5];
+        size_t blen;
+        q++;
         if (q < n && (s[q] == 'x' || s[q] == 'X')) {
             q++;
             while (q < n && digits < 6 && isxdigit((unsigned char)s[q])) {
@@ -424,7 +445,6 @@ static size_t try_entity(scn* z, size_t pos) {
         /* Encode codepoint as UTF-8. NUL → U+FFFD. */
         if (cp == 0 || cp > 0x10FFFF || (cp >= 0xD800 && cp <= 0xDFFF))
             cp = 0xFFFD;
-        char buf[5]; size_t blen;
         if (cp < 0x80) {
             buf[0] = (char)cp; blen = 1;
         } else if (cp < 0x800) {
@@ -444,10 +464,10 @@ static size_t try_entity(scn* z, size_t pos) {
         return q - pos;
     }
     /* named entity */
-    size_t name_start = q;
+    name_start = q;
     while (q < n && isalnum((unsigned char)s[q])) q++;
     if (q == name_start || q >= n || s[q] != ';') return 0;
-    const mds_entity* e = mds_entity_lookup(s + name_start, q - name_start);
+    e = mds_entity_lookup(s + name_start, q - name_start);
     if (!e) return 0;
     q++;
     append_text_dup(z, e->utf8, e->ulen);
@@ -459,27 +479,36 @@ static size_t try_entity(scn* z, size_t pos) {
 /* Returns total chars (including <>) on success, 0 otherwise. */
 static size_t try_autolink(scn* z, size_t pos) {
     const char* s = z->s; size_t n = z->n;
+    size_t q;
+    size_t scheme_start;
+    size_t scheme_len;
+    size_t body_start;
+    size_t r;
+    size_t e_start;
+    int dot_ok = 0;
+    int label_len = 0;
+    inode* x;
     if (pos >= n || s[pos] != '<') return 0;
-    size_t q = pos + 1;
+    q = pos + 1;
     /* URI autolink: scheme = [A-Za-z][A-Za-z0-9+.-]{1,31}: */
-    size_t scheme_start = q;
+    scheme_start = q;
     if (q >= n || !isalpha((unsigned char)s[q])) goto try_email;
     q++;
     while (q < n && (isalnum((unsigned char)s[q]) || s[q] == '+' ||
                      s[q] == '.' || s[q] == '-'))
         q++;
-    size_t scheme_len = q - scheme_start;
+    scheme_len = q - scheme_start;
     if (scheme_len < 2 || scheme_len > 32) goto try_email;
     if (q >= n || s[q] != ':') goto try_email;
     /* body: any non-WS, non-< non-> */
-    size_t body_start = q + 1;
-    size_t r = body_start;
+    body_start = q + 1;
+    r = body_start;
     while (r < n && s[r] != '>' && s[r] != '<' &&
            !is_unicode_ws((unsigned char)s[r]) &&
            (unsigned char)s[r] >= 0x20)
         r++;
     if (r < n && s[r] == '>') {
-        inode* x = node_new(z, N_AUTOLINK);
+        x = node_new(z, N_AUTOLINK);
         x->s = s + pos + 1; x->n = r - (pos + 1);
         x->is_email = 0;
         append(z, x);
@@ -488,14 +517,12 @@ static size_t try_autolink(scn* z, size_t pos) {
 try_email:
     /* email autolink: simple validation */
     q = pos + 1;
-    size_t e_start = q;
+    e_start = q;
     while (q < n && (isalnum((unsigned char)s[q]) ||
                      strchr(".!#$%&'*+/=?^_`{|}~-", s[q])))
         q++;
     if (q == e_start || q >= n || s[q] != '@') return 0;
     q++;
-    int dot_ok = 0;
-    int label_len = 0;
     while (q < n && s[q] != '>') {
         char c = s[q];
         if (isalnum((unsigned char)c)) { label_len++; q++; }
@@ -506,7 +533,7 @@ try_email:
     }
     (void)dot_ok;
     if (q >= n || s[q] != '>' || label_len == 0) return 0;
-    inode* x = node_new(z, N_AUTOLINK);
+    x = node_new(z, N_AUTOLINK);
     x->s = s + pos + 1; x->n = q - (pos + 1);
     x->is_email = 1;
     append(z, x);
@@ -522,9 +549,12 @@ static int html_attr_name_char(char c, int first) {
 
 static size_t try_html_inline(scn* z, size_t pos) {
     const char* s = z->s; size_t n = z->n;
+    size_t q;
+    inode* x;
+    int closing;
     if (pos >= n || s[pos] != '<') return 0;
     if (pos + 1 >= n) return 0;
-    size_t q = pos + 1;
+    q = pos + 1;
     /* comment (CommonMark 0.30+):
      *   <!-->  | <!--->  | <!--  ...not containing -->...  --> */
     if (q + 2 < n && s[q] == '!' && s[q+1] == '-' && s[q+2] == '-') {
@@ -532,14 +562,14 @@ static size_t try_html_inline(scn* z, size_t pos) {
         /* short forms */
         if (r < n && s[r] == '>') {
             r += 1;
-            inode* x = node_new(z, N_HTMLINLINE);
+            x = node_new(z, N_HTMLINLINE);
             x->s = s + pos; x->n = r - pos;
             append(z, x);
             return r - pos;
         }
         if (r + 1 < n && s[r] == '-' && s[r+1] == '>') {
             r += 2;
-            inode* x = node_new(z, N_HTMLINLINE);
+            x = node_new(z, N_HTMLINLINE);
             x->s = s + pos; x->n = r - pos;
             append(z, x);
             return r - pos;
@@ -548,7 +578,7 @@ static size_t try_html_inline(scn* z, size_t pos) {
         while (r + 2 < n) {
             if (s[r] == '-' && s[r+1] == '-' && s[r+2] == '>') {
                 r += 3;
-                inode* x = node_new(z, N_HTMLINLINE);
+                x = node_new(z, N_HTMLINLINE);
                 x->s = s + pos; x->n = r - pos;
                 append(z, x);
                 return r - pos;
@@ -563,7 +593,7 @@ static size_t try_html_inline(scn* z, size_t pos) {
         while (q + 1 < n) {
             if (s[q] == '?' && s[q+1] == '>') {
                 q += 2;
-                inode* x = node_new(z, N_HTMLINLINE);
+                x = node_new(z, N_HTMLINLINE);
                 x->s = s + pos; x->n = q - pos;
                 append(z, x);
                 return q - pos;
@@ -578,7 +608,7 @@ static size_t try_html_inline(scn* z, size_t pos) {
         while (q + 2 < n) {
             if (s[q] == ']' && s[q+1] == ']' && s[q+2] == '>') {
                 q += 3;
-                inode* x = node_new(z, N_HTMLINLINE);
+                x = node_new(z, N_HTMLINLINE);
                 x->s = s + pos; x->n = q - pos;
                 append(z, x);
                 return q - pos;
@@ -593,13 +623,13 @@ static size_t try_html_inline(scn* z, size_t pos) {
         while (q < n && s[q] != '>') q++;
         if (q >= n) return 0;
         q++;
-        inode* x = node_new(z, N_HTMLINLINE);
+        x = node_new(z, N_HTMLINLINE);
         x->s = s + pos; x->n = q - pos;
         append(z, x);
         return q - pos;
     }
     /* closing tag */
-    int closing = 0;
+    closing = 0;
     if (q < n && s[q] == '/') { closing = 1; q++; }
     /* tag name */
     if (q >= n || !isalpha((unsigned char)s[q])) return 0;
@@ -609,7 +639,7 @@ static size_t try_html_inline(scn* z, size_t pos) {
         while (q < n && (s[q] == ' ' || s[q] == '\t' || s[q] == '\n')) q++;
         if (q >= n || s[q] != '>') return 0;
         q++;
-        inode* x = node_new(z, N_HTMLINLINE);
+        x = node_new(z, N_HTMLINLINE);
         x->s = s + pos; x->n = q - pos;
         append(z, x);
         return q - pos;
@@ -618,6 +648,7 @@ static size_t try_html_inline(scn* z, size_t pos) {
     while (q < n) {
         size_t pre_attr = q;
         int saw_ws = 0;
+        size_t save;
         while (q < n && (s[q] == ' ' || s[q] == '\t' || s[q] == '\n')) {
             saw_ws = 1; q++;
         }
@@ -628,7 +659,7 @@ static size_t try_html_inline(scn* z, size_t pos) {
         q++;
         while (q < n && html_attr_name_char(s[q], 0)) q++;
         /* optional value */
-        size_t save = q;
+        save = q;
         while (q < n && (s[q] == ' ' || s[q] == '\t' || s[q] == '\n')) q++;
         if (q < n && s[q] == '=') {
             q++;
@@ -654,7 +685,7 @@ static size_t try_html_inline(scn* z, size_t pos) {
     if (q < n && s[q] == '/') q++;
     if (q >= n || s[q] != '>') return 0;
     q++;
-    inode* x = node_new(z, N_HTMLINLINE);
+    x = node_new(z, N_HTMLINLINE);
     x->s = s + pos; x->n = q - pos;
     append(z, x);
     return q - pos;
@@ -668,10 +699,12 @@ static size_t try_html_inline(scn* z, size_t pos) {
 static int parse_link_destination(const char* s, size_t* pp, size_t n,
                                   const char** out_s, size_t* out_n) {
     size_t p = *pp;
+    size_t ds;
+    int paren;
     if (p >= n) return 0;
     if (s[p] == '<') {
         p++;
-        size_t ds = p;
+        ds = p;
         while (p < n && s[p] != '>' && s[p] != '<' && s[p] != '\n') {
             if (s[p] == '\\' && p + 1 < n) p++;
             p++;
@@ -682,8 +715,8 @@ static int parse_link_destination(const char* s, size_t* pp, size_t n,
         *pp = p + 1;
         return 1;
     }
-    int paren = 0;
-    size_t ds = p;
+    paren = 0;
+    ds = p;
     while (p < n) {
         unsigned char c = (unsigned char)s[p];
         if (c < 0x20 || c == 0x7f) break;
@@ -703,14 +736,17 @@ static int parse_link_destination(const char* s, size_t* pp, size_t n,
 static int parse_link_title(const char* s, size_t* pp, size_t n,
                             const char** out_s, size_t* out_n) {
     size_t p = *pp;
+    char open, close;
+    size_t ts;
+    int prev_blank_line;
     if (p >= n) return 0;
-    char open = s[p], close;
+    open = s[p];
     if (open == '"' || open == '\'') close = open;
     else if (open == '(') close = ')';
     else return 0;
     p++;
-    size_t ts = p;
-    int prev_blank_line = 0;
+    ts = p;
+    prev_blank_line = 0;
     while (p < n && s[p] != close) {
         if (s[p] == '\\' && p + 1 < n && is_ascii_punct((unsigned char)s[p+1])) { p += 2; continue; }
         if (open == '(' && s[p] == '(') return 0;
@@ -779,12 +815,26 @@ static inode* wrap_after(scn* z, inode* open, ntype t) {
 static void process_emphasis(scn* z, inode* stack_bottom) {
     /* openers_bottom[delim_idx][closer_count_mod3][can_open(0|1)] */
     inode* openers_bottom[3][3][2];
-    for (int a = 0; a < 3; a++)
-        for (int b = 0; b < 3; b++)
-            for (int c = 0; c < 2; c++)
+    inode* closer;
+    int a, b, c;
+    int use2;
+    ntype tt;
+    unsigned _ifl;
+    inode* container;
+    inode* first;
+    inode* last;
+    inode* before;
+    inode* after;
+    inode* new_open;
+    inode* new_close;
+    inode* prev_link;
+    inode* start;
+    for (a = 0; a < 3; a++)
+        for (b = 0; b < 3; b++)
+            for (c = 0; c < 2; c++)
                 openers_bottom[a][b][c] = stack_bottom;
 
-    inode* closer = stack_bottom ? stack_bottom->next : z->head;
+    closer = stack_bottom ? stack_bottom->next : z->head;
     /* find first potential closer */
     while (closer) {
         if (closer->type == N_DELIM && closer->can_close &&
@@ -830,7 +880,7 @@ static void process_emphasis(scn* z, inode* stack_bottom) {
             continue;
         }
 
-        int use2 = (ch == '~')
+        use2 = (ch == '~')
             ? opener->count   /* matched count for tildes */
             : ((opener->count >= 2 && closer->count >= 2) ? 2 : 1);
 
@@ -850,8 +900,8 @@ static void process_emphasis(scn* z, inode* stack_bottom) {
             continue;
         }
 
-        ntype tt = (ch == '~') ? N_STRIKE : (use2 == 2 ? N_STRONG : N_EMPH);
-        unsigned _ifl = z->ctx->flags;
+        tt = (ch == '~') ? N_STRIKE : (use2 == 2 ? N_STRONG : N_EMPH);
+        _ifl = z->ctx->flags;
         if ((tt == N_EMPH   && (_ifl & MDS_FLAG_NO_EMPH)) ||
             (tt == N_STRONG && (_ifl & MDS_FLAG_NO_STRONG))) {
             /* Skip: leave delim run as-is, advance closer (becomes text) */
@@ -867,10 +917,10 @@ static void process_emphasis(scn* z, inode* stack_bottom) {
             }
             continue;
         }
-        inode* container = node_new(z, tt);
+        container = node_new(z, tt);
         /* children = (opener->next .. closer->prev) */
-        inode* first = opener->next;
-        inode* last  = closer->prev;
+        first = opener->next;
+        last  = closer->prev;
         if (first != closer) {
             container->children = first;
             container->children_tail = last;
@@ -882,11 +932,11 @@ static void process_emphasis(scn* z, inode* stack_bottom) {
         closer->count -= use2;
 
         /* relink: replace [opener? closer?] block with container */
-        inode* before = opener->prev;
-        inode* after  = closer->next;
+        before = opener->prev;
+        after  = closer->next;
 
-        inode* new_open  = (opener->count > 0) ? opener : NULL;
-        inode* new_close = (closer->count > 0) ? closer : NULL;
+        new_open  = (opener->count > 0) ? opener : NULL;
+        new_close = (closer->count > 0) ? closer : NULL;
 
         /* shrink opener s/n bytes for proper future text emission? Not
          * needed — opener bytes are never emitted directly; only the count
@@ -902,7 +952,7 @@ static void process_emphasis(scn* z, inode* stack_bottom) {
         }
 
         /* build list: before, new_open?, container, new_close?, after */
-        inode* prev_link = before;
+        prev_link = before;
         if (new_open) {
             if (prev_link) prev_link->next = new_open;
             else           z->head = new_open;
@@ -938,7 +988,7 @@ static void process_emphasis(scn* z, inode* stack_bottom) {
         }
     }
     /* clear remaining DELIMs to TEXT */
-    inode* start = stack_bottom ? stack_bottom->next : z->head;
+    start = stack_bottom ? stack_bottom->next : z->head;
     for (inode* p = start; p; p = p->next) {
         if (p->type == N_DELIM) {
             p->type = N_TEXT;
@@ -952,7 +1002,16 @@ static int try_close_bracket(scn* z, size_t* pos_io) {
     const char* s = z->s; size_t n = z->n;
     size_t pos = *pos_io;
     int is_image = 0;
-    inode* opener = find_open_bracket(z, &is_image);
+    inode* opener;
+    size_t p;
+    int matched = 0;
+    const char *href_s = NULL, *title_s = NULL;
+    size_t hlen = 0, tlen = 0;
+    int is_ref = 0;
+    const mds_linkref* refent = NULL;
+    ntype t;
+    inode* container;
+    opener = find_open_bracket(z, &is_image);
     if (!opener) {
         return 0; /* no opener — caller emits literal ']' */
     }
@@ -967,12 +1026,7 @@ static int try_close_bracket(scn* z, size_t* pos_io) {
         opener->active = 0;
         return 0;
     }
-    size_t p = pos + 1;
-    int matched = 0;
-    const char *href_s = NULL, *title_s = NULL;
-    size_t hlen = 0, tlen = 0;
-    int is_ref = 0;
-    const mds_linkref* refent = NULL;
+    p = pos + 1;
 
     /* GFM footnote reference [^label] — checked first so it wins over
      * inline link/ref interpretations. Requires the bracket content to
@@ -996,13 +1050,14 @@ static int try_close_bracket(scn* z, size_t* pos_io) {
                 opener->next = NULL;
                 z->tail = opener;
                 if (opener->type == N_OPEN_BANG) {
+                    inode* fnref;
                     /* Salvage the literal `!` byte that the bang opener
                      * absorbed — emit it as a sibling TEXT node BEFORE
                      * the footnote ref. Without this, inputs like
                      * `text![^1]` lose the `!`. */
                     opener->type = N_TEXT;
                     opener->n    = 1;       /* s already points at '!' */
-                    inode* fnref = node_new(z, N_FOOTNOTE_REF);
+                    fnref = node_new(z, N_FOOTNOTE_REF);
                     fnref->href   = fn->label;
                     fnref->hlen   = fn->llen;
                     fnref->active = 0;
@@ -1057,9 +1112,10 @@ static int try_close_bracket(scn* z, size_t* pos_io) {
         /* simpler: text content range is open_text..pos */
         size_t txt_s = (size_t)((opener->s + opener->n) - s);
         size_t txt_e = pos;
+        int tried_full = 0;
+        (void)lbl_start_off;
 
         /* full ref: [text][label] */
-        int tried_full = 0;
         if (p < n && s[p] == '[') {
             size_t q = p + 1;
             size_t lbl_s = q;
@@ -1101,8 +1157,8 @@ static int try_close_bracket(scn* z, size_t* pos_io) {
     process_emphasis(z, opener);
 
     /* wrap into LINK or IMAGE container */
-    ntype t = is_image ? N_IMAGE : N_LINK;
-    inode* container = wrap_after(z, opener, t);
+    t = is_image ? N_IMAGE : N_LINK;
+    container = wrap_after(z, opener, t);
     container->href = href_s; container->hlen = hlen;
     container->title = title_s; container->tlen = tlen;
 
@@ -1153,12 +1209,16 @@ static inline size_t mds_inline_skip16(const char* p) {
     uint8x16_t any  = vorrq_u8(vorrq_u8(vorrq_u8(bs, bt), vorrq_u8(lt, amp)),
                                vorrq_u8(vorrq_u8(vorrq_u8(st, us), vorrq_u8(ti, lb)),
                                         vorrq_u8(vorrq_u8(bg, rb), nl)));
+    uint8x8_t lo, hi;
+    uint8x8_t packed_lo;
+    uint64_t  m;
     if (vmaxvq_u8(any) == 0) return 16;
     /* Reduce to 64-bit then ctz to find first match. */
-    uint8x8_t lo = vget_low_u8(any), hi = vget_high_u8(any);
+    lo = vget_low_u8(any);
+    hi = vget_high_u8(any);
     /* Pack each byte's high bit into a 16-bit mask via shrn trick. */
-    uint8x8_t packed_lo = vshrn_n_u16(vreinterpretq_u16_u8(any), 4);
-    uint64_t  m = vget_lane_u64(vreinterpret_u64_u8(packed_lo), 0);
+    packed_lo = vshrn_n_u16(vreinterpretq_u16_u8(any), 4);
+    m = vget_lane_u64(vreinterpret_u64_u8(packed_lo), 0);
     (void)lo; (void)hi;
     return (size_t)(__builtin_ctzll(m) >> 2);
 }
@@ -1167,20 +1227,21 @@ static inline size_t mds_inline_skip16(const char* p) {
 static inline size_t mds_inline_skip8(const char* p) {
     /* Portable SWAR fallback: 8-byte stride. */
     uint64_t w;
+    uint64_t m;
     memcpy(&w, p, 8);
     #define MDS_HASZ(x) (((x) - 0x0101010101010101ULL) & ~(x) & 0x8080808080808080ULL)
     #define MDS_BC(b)   ((uint64_t)(b) * 0x0101010101010101ULL)
-    uint64_t m = MDS_HASZ(w ^ MDS_BC('\\'))
-               | MDS_HASZ(w ^ MDS_BC('`'))
-               | MDS_HASZ(w ^ MDS_BC('<'))
-               | MDS_HASZ(w ^ MDS_BC('&'))
-               | MDS_HASZ(w ^ MDS_BC('*'))
-               | MDS_HASZ(w ^ MDS_BC('_'))
-               | MDS_HASZ(w ^ MDS_BC('~'))
-               | MDS_HASZ(w ^ MDS_BC('['))
-               | MDS_HASZ(w ^ MDS_BC('!'))
-               | MDS_HASZ(w ^ MDS_BC(']'))
-               | MDS_HASZ(w ^ MDS_BC('\n'));
+    m = MDS_HASZ(w ^ MDS_BC('\\'))
+      | MDS_HASZ(w ^ MDS_BC('`'))
+      | MDS_HASZ(w ^ MDS_BC('<'))
+      | MDS_HASZ(w ^ MDS_BC('&'))
+      | MDS_HASZ(w ^ MDS_BC('*'))
+      | MDS_HASZ(w ^ MDS_BC('_'))
+      | MDS_HASZ(w ^ MDS_BC('~'))
+      | MDS_HASZ(w ^ MDS_BC('['))
+      | MDS_HASZ(w ^ MDS_BC('!'))
+      | MDS_HASZ(w ^ MDS_BC(']'))
+      | MDS_HASZ(w ^ MDS_BC('\n'));
     #undef MDS_HASZ
     #undef MDS_BC
     if (!m) return 8;
@@ -1203,10 +1264,11 @@ static void scan_forward(scn* z) {
         unsigned char c = (unsigned char)s[pos];
         switch (c) {
         case '\\': {
+            inode* x;
             if (pos + 1 < n && s[pos+1] == '\n') {
                 /* hard break */
                 FLUSH_TEXT();
-                inode* x = node_new(z, N_LINEBREAK);
+                x = node_new(z, N_LINEBREAK);
                 append(z, x);
                 pos += 2;
                 /* skip leading spaces on next line */
@@ -1222,9 +1284,11 @@ static void scan_forward(scn* z) {
                 continue;
             }
             pos++;
+            (void)x;
             continue;
         }
         case '`': {
+            size_t end;
             if (z->ctx->flags & MDS_FLAG_NO_CODE) {
                 /* emit literal backtick(s) as text */
                 size_t r = pos;
@@ -1233,7 +1297,7 @@ static void scan_forward(scn* z) {
                 append_text(z, s + pos, r - pos);
                 pos = r; text_start = pos; continue;
             }
-            size_t end = try_code_span(z, pos);
+            end = try_code_span(z, pos);
             if (end) {
                 /* flush bytes before pos */
                 if (pos > text_start) {
@@ -1249,6 +1313,8 @@ static void scan_forward(scn* z) {
             /* re-attempt with flush */
             {
                 size_t saved_pos = pos;
+                size_t end2;
+                size_t r;
                 /* remove the CODE node just appended (we did it above) */
                 if (end && z->tail && z->tail->type == N_CODE) {
                     inode* dead = z->tail;
@@ -1261,20 +1327,21 @@ static void scan_forward(scn* z) {
                     append_text(z, s + text_start, saved_pos - text_start);
                 text_start = saved_pos;
                 /* re-attempt cleanly */
-                size_t end2 = try_code_span(z, saved_pos);
+                end2 = try_code_span(z, saved_pos);
                 if (end2) {
                     pos = end2; text_start = pos; continue;
                 }
                 /* failed: emit literal backticks */
-                size_t r = pos;
+                r = pos;
                 while (r < n && s[r] == '`') r++;
                 append_text(z, s + pos, r - pos);
                 pos = r; text_start = pos; continue;
             }
         }
         case '<': {
+            size_t end;
             FLUSH_TEXT();
-            size_t end = try_autolink(z, pos);
+            end = try_autolink(z, pos);
             if (end) { pos += end; text_start = pos; continue; }
             if (!(z->ctx->flags & MDS_FLAG_NO_HTML)) {
                 end = try_html_inline(z, pos);
@@ -1313,19 +1380,22 @@ static void scan_forward(scn* z) {
         case '*':
         case '_':
         case '~': {
+            size_t start;
+            size_t runlen;
+            int co, cc;
+            inode* x;
             FLUSH_TEXT();
-            size_t start = pos;
+            start = pos;
             while (pos < n && (unsigned char)s[pos] == c) pos++;
-            size_t runlen = pos - start;
+            runlen = pos - start;
             if (c == '~' && ((runlen != 1 && runlen != 2) || !(z->ctx->flags & MDS_FLAG_STRIKE))) {
                 /* not strike candidate (or strikethrough disabled); emit as text */
                 append_text(z, s + start, runlen);
                 text_start = pos;
                 continue;
             }
-            int co, cc;
             classify_run(s, n, start, runlen, &co, &cc, c);
-            inode* x = node_new(z, N_DELIM);
+            x = node_new(z, N_DELIM);
             x->delim_char = c;
             x->count = (int)runlen;
             x->can_open  = co;
@@ -1336,13 +1406,14 @@ static void scan_forward(scn* z) {
             continue;
         }
         case '[': {
+            inode* x;
             if (z->ctx->flags & MDS_FLAG_NO_LINKS) {
                 FLUSH_TEXT();
                 append_text(z, s + pos, 1);
                 pos++; text_start = pos; continue;
             }
             FLUSH_TEXT();
-            inode* x = node_new(z, N_OPEN_BRACKET);
+            x = node_new(z, N_OPEN_BRACKET);
             x->s = s + pos; x->n = 1;
             x->active = 1;
             append(z, x);
@@ -1352,8 +1423,9 @@ static void scan_forward(scn* z) {
         case '!': {
             if (pos + 1 < n && s[pos+1] == '[' &&
                 !(z->ctx->flags & MDS_FLAG_NO_IMAGES)) {
+                inode* x;
                 FLUSH_TEXT();
-                inode* x = node_new(z, N_OPEN_BANG);
+                x = node_new(z, N_OPEN_BANG);
                 x->s = s + pos; x->n = 2;
                 x->active = 1;
                 append(z, x);
@@ -1363,8 +1435,9 @@ static void scan_forward(scn* z) {
             pos++; continue;
         }
         case ']': {
+            size_t p2;
             FLUSH_TEXT();
-            size_t p2 = pos;
+            p2 = pos;
             if (try_close_bracket(z, &p2)) {
                 pos = p2; text_start = pos;
                 continue;
@@ -1375,9 +1448,11 @@ static void scan_forward(scn* z) {
             continue;
         }
         case '\n': {
+            int hard;
+            inode* br;
             FLUSH_TEXT();
             /* hard break iff prev TEXT ended with two-or-more spaces */
-            int hard = 0;
+            hard = 0;
             if (z->tail && z->tail->type == N_TEXT) {
                 inode* t = z->tail;
                 if (t->n >= 2 && t->s[t->n - 1] == ' ' && t->s[t->n - 2] == ' ') {
@@ -1400,7 +1475,7 @@ static void scan_forward(scn* z) {
                     }
                 }
             }
-            inode* br = node_new(z, hard ? N_LINEBREAK : N_SOFTBREAK);
+            br = node_new(z, hard ? N_LINEBREAK : N_SOFTBREAK);
             append(z, br);
             pos++;
             /* skip leading spaces on next line */
@@ -1540,6 +1615,7 @@ static void emit_children(scn* z, inode* head) {
 /* ---------------- public entry ---------------- */
 
 MDS_HOT void mds_inline_scan(mds_ctx* ctx, const char* s, size_t n) {
+    scn z;
     if (n == 0) return;
 
     /* Fast path for table cells and trivial paragraphs: if no byte in
@@ -1579,7 +1655,6 @@ MDS_HOT void mds_inline_scan(mds_ctx* ctx, const char* s, size_t n) {
     }
 
     byteclass_init();
-    scn z;
     memset(&z, 0, sizeof z);
     z.ctx = ctx;
     z.s   = s;

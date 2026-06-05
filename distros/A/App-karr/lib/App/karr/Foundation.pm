@@ -1,7 +1,7 @@
 # ABSTRACT: Single-shot foundation daemon — periodic agent execution across karr boards
 
 package App::karr::Foundation;
-our $VERSION = '0.300';
+our $VERSION = '0.301';
 use Moo;
 use MooX::Options (
   usage_string => 'USAGE: karr-foundation [options]',
@@ -11,16 +11,29 @@ use Path::Tiny;
 use YAML::XS ();
 use JSON::MaybeXS qw( encode_json decode_json );
 use Time::Piece;
-use POSIX qw( WNOHANG );
+use IO::Select;
 use Digest::MD5 qw( md5_hex );
 use Try::Tiny;
 use App::karr::Git;
 use App::karr::BoardStore;
 
+# Instruction handed to a synthesized agent command via the $PROMPT variable
+# when neither the .karr file nor the config overrides it.
+our $DEFAULT_PROMPT =
+    'Use the karr-coordinator skill: pick the next actionable task on this '
+  . 'board, complete it, and move it forward. If you cannot proceed, block '
+  . 'the task with a reason.';
+
 option config => (
   is     => 'ro',
   format => 's',
   doc    => 'Path to config file (default: ~/.config/karr-foundation/config.yml)',
+);
+
+option command => (
+  is     => 'ro',
+  format => 's',
+  doc    => 'Global agent command; overrides .karr file per-repo',
 );
 
 option force => (
@@ -36,6 +49,16 @@ option dry_run => (
 option verbose => (
   is  => 'ro',
   doc => 'Extra output',
+);
+
+option status => (
+  is  => 'ro',
+  doc => 'Print a read-only overview of every board and exit (no agent runs)',
+);
+
+has _stream_to_terminal => (
+  is      => 'lazy',
+  builder => sub { -t STDOUT || $_[0]->verbose },
 );
 
 has _config_data => (
@@ -75,6 +98,26 @@ sub run {
     warn "karr-foundation: no repos found — check config\n";
     return 1;
   }
+
+  # --status forces the read-only overview regardless of agent config.
+  if ( $self->status ) {
+    $self->_print_overview( \@repos );
+    return 0;
+  }
+
+  # foundation is a multi-board coordinator: agent execution is opt-in. When no
+  # board has an agent configured, the default action is the overview — a human
+  # can use foundation purely to see what is happening across boards.
+  my $any_agent = grep {
+    defined $self->_agent_command( $_, $self->_load_karr($_) )
+  } @repos;
+  unless ( $any_agent ) {
+    print "No agent configured on any board. Showing overview "
+        . "(set 'claude: true' or 'command:' in a .karr file to enable agents).\n\n";
+    $self->_print_overview( \@repos );
+    return 0;
+  }
+
   for my $repo ( @repos ) {
     try {
       $self->_process_repo( $repo );
@@ -104,6 +147,7 @@ sub _discover_repos {
   }
 
   # Scanned parent directories — check direct children for .karr file
+  # OR refs/karr/config (karr-init'd repo without .karr file)
   for my $scan_dir ( @{ $self->_config_data->{scan} // [] } ) {
     my $p = path( $scan_dir );
     unless ( $p->is_dir ) {
@@ -111,8 +155,13 @@ sub _discover_repos {
       next;
     }
     for my $child ( $p->children ) {
-      push @repos, $child
-        if $child->is_dir && $child->child('.karr')->exists;
+      next unless $child->is_dir;
+      # .karr file takes precedence; also detect karr-init'd repos
+      if ( $child->child('.karr')->exists ) {
+        push @repos, $child;
+      } elsif ( $child->child('.git/refs/karr/config')->exists ) {
+        push @repos, $child;
+      }
     }
   }
 
@@ -125,15 +174,23 @@ sub _discover_repos {
 
 sub _process_repo {
   my ( $self, $repo ) = @_;
-  my $dot_karr = $repo->child('.karr');
-  unless ( $dot_karr->exists ) {
-    $self->_say_verbose("skip $repo — no .karr file");
+
+  # Check if repo has karr board (either .karr file or karr refs)
+  my $has_karr = $repo->child('.karr')->exists
+              || $repo->child('.git/refs/karr/config')->exists;
+  unless ( $has_karr ) {
+    $self->_say_verbose("skip $repo — no karr board");
     return;
   }
 
   my $karr = $self->_load_karr( $repo );
-  unless ( defined $karr->{command} ) {
-    warn "karr-foundation: $repo/.karr has no 'command' key — skipping\n";
+
+  # Resolve the agent command (CLI > default_command > .karr command >
+  # claude: true synthesis). Agent execution is opt-in: a board with no agent
+  # is shown in the overview, not run.
+  my $cmd = $self->_agent_command( $repo, $karr );
+  unless ( defined $cmd ) {
+    $self->_say_verbose("skip $repo — no agent configured (see --status)");
     return;
   }
 
@@ -172,7 +229,7 @@ sub _process_repo {
   # Acquire lock, drain, release
   $self->_acquire_lock( $repo );
   my $result = try {
-    $self->_drain_repo( $repo, $karr );
+    $self->_drain_repo( $repo, $karr, $cmd );
   } catch {
     warn "karr-foundation: drain error in $repo: $_\n";
     { outcome => 'error', exit => 1 };
@@ -290,12 +347,15 @@ sub _stuck_tasks {
 # auto-blocking tasks the agent keeps failing on. Returns
 # { outcome => progress|idle|common-error|error, exit => N }.
 sub _drain_repo {
-  my ( $self, $repo, $karr ) = @_;
+  my ( $self, $repo, $karr, $cmd ) = @_;
   my $max_runtime  = $karr->{max_runtime}    // 1800;
   my $max_attempts = $karr->{max_attempts}   // 2;
   my $max_iter     = $karr->{max_iterations} // 50;
   my $drain        = exists $karr->{drain} ? $karr->{drain} : 1;
   my $patterns     = $self->_error_patterns( $karr );
+
+  # Use the resolved command, not $karr->{command}
+  $cmd //= $karr->{command};
 
   my $loop_start = time;
   my $last_exit  = 0;
@@ -314,7 +374,7 @@ sub _drain_repo {
     last if $iter >= $max_iter;
 
     my $hash_before = $self->_ref_hash( $repo ) // '';
-    my ( $exit, $output ) = $self->_run_command( $repo, $karr );
+    my ( $exit, $output ) = $self->_run_command( $repo, $karr, $cmd );
     $last_exit = $exit;
     $first     = 0;
     $iter++;
@@ -466,9 +526,17 @@ sub _clear_cooldown {
 # ---------------------------------------------------------------------------
 
 sub _run_command {
-  my ( $self, $repo, $karr ) = @_;
-  my $command     = $karr->{command};
-  my $max_runtime = $karr->{max_runtime} // 1800;
+  my ( $self, $repo, $karr, $cmd ) = @_;
+  my $command      = $cmd // $karr->{command};
+  my $max_runtime  = $karr->{max_runtime} // 1800;
+  my $stream_terms = $self->_stream_to_terminal;
+
+  # Environment for the child (and all karr calls it spawns). Set before the
+  # substitution so a command template — including the synthesized claude
+  # command — can reference $PROMPT, $KARR_REPO, etc.
+  local $ENV{KARR_REPO} = "$repo";
+  local $ENV{KARR_ROLE} = 'agent';
+  local $ENV{PROMPT}    = $self->_prompt_for($karr);
 
   # Env-var substitution in command string
   $command =~ s/\$\{(\w+)\}/$ENV{$1} \/\/ ''/ge;
@@ -483,51 +551,75 @@ sub _run_command {
   }
 
   my $log_file = $repo->child('.karr.log');
-  # Remember where this run's output begins so we can scan it afterwards.
-  my $offset = $log_file->exists ? -s "$log_file" : 0;
-  local $ENV{KARR_REPO} = "$repo";
+
+  # Native pipe: the child writes stdout+stderr, the parent reads. The parent
+  # is the tee — it fans each chunk to the persistent log, the terminal (when
+  # streaming), and an in-memory buffer for error scanning. No external tee
+  # process to race, and the run's output is captured directly (no re-slurping
+  # the log via byte offsets).
+  pipe( my $reader, my $writer ) or croak "pipe failed: $!";
 
   my $pid = fork;
   croak "fork failed: $!" unless defined $pid;
 
   if ( $pid == 0 ) {
     # child
+    close $reader;
     chdir "$repo" or die "chdir $repo: $!";
-    open( STDOUT, '>>', "$log_file" ) or die "open log: $!";
-    open( STDERR, '>&STDOUT' )       or die "dup stderr: $!";
+    open( STDOUT, '>&', $writer ) or die "dup stdout: $!";
+    open( STDERR, '>&STDOUT' )    or die "dup stderr: $!";
     exec( '/bin/sh', '-c', $command ) or die "exec: $!";
   }
 
-  # parent — wait with hard timeout
+  # parent
+  close $writer;
+  open( my $log_fh, '>>', "$log_file" ) or croak "open log: $!";
+  $log_fh->autoflush(1);
+
   my $started   = time;
-  my $exit_code = 0;
-  eval {
-    local $SIG{ALRM} = sub { die "timeout\n" };
-    alarm( $max_runtime );
-    waitpid( $pid, 0 );
-    alarm( 0 );
-    $exit_code = $? >> 8;
-  };
-  if ( $@ ) {
-    if ( $@ eq "timeout\n" ) {
-      my $elapsed = time - $started;
-      $self->_append_log( $repo, "TIMEOUT after ${elapsed}s — sending SIGTERM to $pid" );
-      kill 'TERM', $pid;
-      sleep 2;
-      kill 'KILL', $pid;
-      waitpid( $pid, WNOHANG );
-      $exit_code = -1;
-    } else {
-      die $@;
+  my $output    = '';
+  my $timed_out = 0;
+  my $sel       = IO::Select->new($reader);
+
+  while (1) {
+    my $wait;
+    if ( $max_runtime > 0 ) {
+      $wait = $max_runtime - ( time - $started );
+      if ( $wait <= 0 ) { $timed_out = 1; last }
     }
+    # undef $wait => block indefinitely (max_runtime: 0 disables the timeout).
+    my @ready = $sel->can_read($wait);
+    unless (@ready) {
+      # Spurious wakeup (signal) or deadline. Only the deadline ends the loop.
+      next unless $max_runtime > 0;
+      if ( time - $started >= $max_runtime ) { $timed_out = 1; last }
+      next;
+    }
+    my $chunk;
+    my $n = sysread( $reader, $chunk, 65536 );
+    last if !defined $n;   # read error
+    last if $n == 0;       # EOF — the command closed its output
+    print {$log_fh} $chunk;
+    print $chunk if $stream_terms;
+    $output .= $chunk;
   }
 
-  # Capture just this run's output (between $offset and now) for error scanning.
-  my $output = '';
-  if ( $log_file->exists ) {
-    my $all = $log_file->slurp_utf8;
-    $output = length($all) > $offset ? substr( $all, $offset ) : '';
+  my $exit_code;
+  if ($timed_out) {
+    my $elapsed = time - $started;
+    $self->_append_log( $repo, "TIMEOUT after ${elapsed}s — sending SIGTERM to $pid" );
+    kill 'TERM', $pid;
+    sleep 2;
+    kill 'KILL', $pid;
+    waitpid( $pid, 0 );
+    $exit_code = -1;
+  } else {
+    waitpid( $pid, 0 );
+    $exit_code = $? >> 8;
   }
+
+  close $reader;
+  close $log_fh;
 
   my $elapsed = time - $started;
   $self->_append_log( $repo, "END elapsed=${elapsed}s exit=$exit_code" );
@@ -625,6 +717,91 @@ sub _load_karr {
   return ref $data eq 'HASH' ? $data : {};
 }
 
+# ---------------------------------------------------------------------------
+# Agent command resolution
+# ---------------------------------------------------------------------------
+
+# The resolved agent command string, or undef when no agent is configured.
+# Priority: CLI --command > config default_command > .karr command >
+# 'claude: true' shorthand (per-repo, then global).
+sub _agent_command {
+  my ( $self, $repo, $karr ) = @_;
+  my $cfg = $self->_config_data;
+
+  for my $candidate ( $self->command, $cfg->{default_command}, $karr->{command} ) {
+    return $candidate if defined $candidate && length $candidate;
+  }
+
+  my $claude = exists $karr->{claude} ? $karr->{claude} : $cfg->{claude};
+  return $self->_claude_command($karr) if $claude;
+
+  return undef;
+}
+
+# Synthesize the canonical claude invocation behind 'claude: true'. The $PROMPT
+# variable is substituted from $ENV{PROMPT} at run time (see _run_command), so
+# users never retype the long flag set. claude_bin / claude_max_turns /
+# claude_permission_mode override the defaults (per-repo, then global).
+sub _claude_command {
+  my ( $self, $karr ) = @_;
+  my $cfg = $self->_config_data;
+  my $bin   = $karr->{claude_bin}             // $cfg->{claude_bin}             // 'claude';
+  my $turns = $karr->{claude_max_turns}       // $cfg->{claude_max_turns}       // 30;
+  my $perm  = $karr->{claude_permission_mode} // $cfg->{claude_permission_mode} // 'bypassPermissions';
+  return qq{$bin -p "\$PROMPT" --permission-mode $perm --max-turns $turns};
+}
+
+# The agent instruction exposed as $PROMPT. .karr 'prompt' > config
+# 'default_prompt' > the built-in default.
+sub _prompt_for {
+  my ( $self, $karr ) = @_;
+  return $karr->{prompt}
+      // $self->_config_data->{default_prompt}
+      // $DEFAULT_PROMPT;
+}
+
+# ---------------------------------------------------------------------------
+# Overview (read-only dashboard)
+# ---------------------------------------------------------------------------
+
+sub _print_overview {
+  my ( $self, $repos ) = @_;
+  for my $repo (@$repos) {
+    my $karr   = $self->_load_karr($repo);
+    my %states = $self->_task_states($repo);
+
+    my %count;
+    my ( @in_progress, @blocked );
+    for my $id ( sort { $a <=> $b } keys %states ) {
+      my $st = $states{$id};
+      $count{ $st->{status} // 'unknown' }++;
+      push @in_progress, $id if ( $st->{status} // '' ) eq 'in-progress';
+      push @blocked,     $id if $st->{blocked};
+    }
+
+    my @flags;
+    push @flags, 'agent-running' if $self->_lock_held($repo);
+    if ( $self->_cooldown_active($repo) ) {
+      my $until = $self->_state_get( $repo, 'cooldown_until' ) // 0;
+      push @flags, 'cooldown ' . ( $until - time ) . 's';
+    }
+    push @flags, 'agent' if defined $self->_agent_command( $repo, $karr );
+
+    my $total = keys %states;
+    printf "%s\n", $repo->basename;
+    printf "  %d tasks", $total;
+    print '  [' . join( ', ', @flags ) . ']' if @flags;
+    print "\n";
+    if (%count) {
+      printf "  %s\n", join( '  ', map { "$_:$count{$_}" } sort keys %count );
+    }
+    printf "  in-progress: %s\n", join( ', ', map { "#$_" } @in_progress ) if @in_progress;
+    printf "  blocked:     %s\n", join( ', ', map { "#$_" } @blocked )     if @blocked;
+    print "\n";
+  }
+  return;
+}
+
 1;
 
 __END__
@@ -639,7 +816,7 @@ App::karr::Foundation - Single-shot foundation daemon — periodic agent executi
 
 =head1 VERSION
 
-version 0.300
+version 0.301
 
 =head1 SYNOPSIS
 
@@ -651,6 +828,9 @@ version 0.300
 
     # Preview what would run
     karr-foundation --dry-run --verbose
+
+    # Read-only overview of every board (no agent runs)
+    karr-foundation --status
 
 =head1 DESCRIPTION
 
@@ -670,9 +850,15 @@ B<Config file:> C<~/.config/karr-foundation/config.yml> (or C<--config>).
 
 B<Per-repo .karr file:>
 
-  command: claude -p "Use karr-coordinator agent, pick next task"
+  claude: true              # synthesize the canonical claude command (opt-in)
+  claude_bin: claude        # binary for claude: true (default: claude)
+  claude_max_turns: 30      # --max-turns for claude: true (default: 30)
+  claude_permission_mode: bypassPermissions   # (default: bypassPermissions)
+  prompt: >-                # agent instruction, exposed as $PROMPT
+    Use the karr-coordinator skill: pick the next actionable task and move it.
+  command: claude -p "$PROMPT"   # explicit command; wins over claude: true
   on_idle: skip             # 'skip' (default) | 'always-run'
-  max_runtime: 1800         # seconds: per-command SIGKILL + total drain budget
+  max_runtime: 1800         # seconds: per-command SIGKILL (0 = no limit)
   drain: true               # loop until drained (default) | false for single run
   max_attempts: 2           # stalls on one task before auto-block (default: 2)
   max_iterations: 50        # hard cap on drain iterations (default: 50)
@@ -680,6 +866,31 @@ B<Per-repo .karr file:>
   cooldown_max: 64          # cooldown ceiling in minutes (default: 64)
   error_patterns:           # extra case-insensitive substrings → common-error
     - my custom api error
+
+C<claude>, C<claude_bin>, C<claude_max_turns>, C<claude_permission_mode>,
+C<command> and C<prompt>/C<default_prompt> may also be set globally in the
+config file; the per-repo F<.karr> value wins.
+
+B<Coordinator and overview.> Agent execution is opt-in — a board runs an agent
+only via C<command> or C<< claude: true >>. When B<no> board has an agent
+configured, the default action is a read-only B<overview> of every board
+(status counts, in-progress/blocked tasks, lock and cooldown state); a human
+can use foundation purely to coordinate their own work. C<--status> forces the
+overview regardless of configuration.
+
+B<Live output.> When run interactively (TTY) or with C<--verbose>, the agent's
+output is streamed to the terminal in real time as foundation reads it; it is
+always appended to F<.karr.log> regardless of TTY. To shape what is shown, the
+command may emit stream-json and filter it, e.g.:
+
+  command: >-
+    claude -p "$PROMPT"
+      --output-format stream-json --verbose --include-partial-messages
+      --permission-mode bypassPermissions --max-turns 10
+    2>&1 | jq -r 'select(.type == "stream_event") | .event.delta.text // empty'
+
+Set C<max_runtime: 0> in F<.karr> to disable the per-run timeout entirely
+(agent runs until completion with no SIGKILL).
 
 B<Drain semantics.> Each iteration runs C<command> once, then classifies the
 result from what foundation can observe — exit code, board ref movement, and

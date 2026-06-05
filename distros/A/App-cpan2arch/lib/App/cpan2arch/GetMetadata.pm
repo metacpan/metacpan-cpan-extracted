@@ -12,13 +12,16 @@ role App::cpan2arch::GetMetadata;
 use File::Spec::Functions qw< catdir splitdir >;
 use Scalar::Util          qw< looks_like_number >;
 
-our $VERSION = 'v1.1.1';
+our $VERSION = 'v1.1.2';
 
-field $_mua_mcpan    :reader;
-field $_mod_endpoint :reader :writer = 'https://fastapi.metacpan.org/v1/module/';
-field $_rel_endpoint :reader :writer = 'https://fastapi.metacpan.org/v1/release/';
-field %_optionals    :reader;
-field %_meta         :reader :writer;
+field %_endpoints :reader :writer = (
+    module   => 'https://fastapi.metacpan.org/v1/module/',
+    release  => 'https://fastapi.metacpan.org/v1/release/',
+    download => 'https://fastapi.metacpan.org/v1/download_url/',
+);
+field $_mua_mcpan :reader;
+field %_optionals :reader;
+field %_meta      :reader :writer;
 
 # Get CPAN metadata from MetaCPAN's API.
 #
@@ -162,7 +165,6 @@ method _get_mua ($type)
             ? ()
             : ( logger => $logger ),
         );
-        $mua->transactor->name( $env{user_agent} );
 
         # Use CHI as the cache backend.
         {
@@ -191,8 +193,9 @@ method _get_mua ($type)
     }
     else {
         $mua = Mojo::UserAgent->new;
-        $mua->transactor->name( $env{user_agent} );
     }
+
+    $mua->transactor->name( $env{user_agent} ) if defined $mua;
 
     return $mua;
 }
@@ -202,7 +205,7 @@ method _get_module ($module)
     $self->_psub;
 
     my $prog = $self->prog;
-    my $url  = $_mod_endpoint . "$module?fields=distribution";
+    my $url  = $_endpoints{module} . "$module?fields=distribution";
     my $json;
 
     my $res = do {
@@ -249,7 +252,7 @@ method _get_release ($dist)
       ? "version:$version"
       : 'status:latest';
 
-    my $url = $_rel_endpoint . "_search?q=$query";
+    my $url = $_endpoints{release} . "_search?q=$query";
 
     my $res = do {
         try {
@@ -400,7 +403,7 @@ method _find_files ( $dist, $download_url )
 
                 if ( scalar @dirs ) {
                     # Ignore irrelevant dirs.
-                    next if $dirs[1] && $dirs[1] =~ /\A(?> inc | bin | script | eg | examples | share | x?t)\z/x;
+                    next if $dirs[1] && $dirs[1] =~ /\A(?> inc | bin | script | eg | examples | share | x?t )\z/x;
 
                     my $fname = $dirs[-1];
 

@@ -367,12 +367,18 @@ ok(
 
 {
     my @events;
+    my $reap_calls = 0;
     no warnings 'redefine';
     local *Developer::Dashboard::RuntimeManager::_collector_supervisor_state = sub {
         return { watched_names => ['alpha'] };
     };
     local *Developer::Dashboard::RuntimeManager::_supervise_collectors_once = sub {
+        $SIG{CHLD}->() if ref( $SIG{CHLD} ) eq 'CODE';
         die "watchdog boom\n";
+    };
+    local *Developer::Dashboard::RuntimeManager::_reap_any_child_processes = sub {
+        $reap_calls++;
+        return 0;
     };
     local *Developer::Dashboard::RuntimeManager::_write_collector_supervisor_state = sub {
         my ( undef, $state ) = @_;
@@ -389,6 +395,7 @@ ok(
         ( scalar grep { ( $_->{status} || '' ) eq 'error' && ( $_->{error} || '' ) =~ /watchdog boom/ } @events ),
         'collector supervisor child records watchdog errors in supervisor state',
     );
+    ok( $reap_calls >= 2, 'collector supervisor child reaps exited children during the loop and from the CHLD handler' );
 }
 
 {
@@ -495,6 +502,22 @@ ok(
     is( $manager->_stop_collector_supervisor, $child, 'collector supervisor stop returns the managed child pid' );
     is( waitpid( $child, 1 ), -1, 'collector supervisor stop reaps the managed child instead of leaving a zombie behind' );
     ok( !-f $manager->_collector_supervisor_pidfile, 'collector supervisor stop removes the pidfile after shutdown' );
+}
+
+{
+    my $child = fork();
+    die "fork failed: $!" if !defined $child;
+    if ( !$child ) {
+        POSIX::_exit(0);
+    }
+    my $reaped = 0;
+    for ( 1 .. 20 ) {
+        $reaped = $manager->_reap_any_child_processes;
+        last if $reaped;
+        select undef, undef, undef, 0.05;
+    }
+    is( $reaped, 1, 'collector supervisor reap helper reaps one exited direct child' );
+    is( waitpid( $child, 1 ), -1, 'collector supervisor reap helper leaves no zombie behind after reaping the child' );
 }
 
 END {

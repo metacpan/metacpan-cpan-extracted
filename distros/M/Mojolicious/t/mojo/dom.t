@@ -341,6 +341,14 @@ subtest 'Script tag with HTML comment containing nested script tags' => sub {
   is $dom->at('script')->text, ' console.log("<!-- <script> </script> -->"); ', 'right script content';
 };
 
+subtest 'Script tag with HTML comment containing stray characters' => sub {
+  my $dom = Mojo::DOM->new(q{<script>/* <!-- <foo --> */</script>});
+  is $dom->at('script')->text, '/* <!-- <foo --> */', 'right script content';
+
+  $dom = Mojo::DOM->new(q{<script>/* <!-- a-b --> */</script>});
+  is $dom->at('script')->text, '/* <!-- a-b --> */', 'right script content';
+};
+
 subtest 'HTML5 (unquoted values)' => sub {
   my $dom = Mojo::DOM->new('<div id = test foo ="bar" class=tset bar=/baz/ value baz=//>works</div>');
   is $dom->at('#test')->text,                'works', 'right text';
@@ -586,14 +594,14 @@ EOF
   is $dom->find('rss')->[0]->attr('version'), '2.0', 'right version';
   is_deeply [$dom->at('title')->ancestors->map('tag')->each], [qw(channel rss)], 'right results';
   is $dom->at('extension')->attr('foo:id'), 'works', 'right id';
-  like $dom->at('#works')->text,       qr/\[awesome\]\]/, 'right text';
-  like $dom->at('[id="works"]')->text, qr/\[awesome\]\]/, 'right text';
+  like $dom->at('[foo\:id]')->text,         qr/\[awesome\]\]/, 'right text';
+  like $dom->at('[foo\:id="works"]')->text, qr/\[awesome\]\]/, 'right text';
   is $dom->find('description')->[1]->text, "\n        <p>trololololo>\n      ", 'right text';
   is $dom->at('pubDate')->text,            'Mon, 12 Jul 2010 20:42:00',         'right text';
-  like $dom->at('[id*="ork"]')->text,  qr/\[awesome\]\]/, 'right text';
-  like $dom->at('[id*="orks"]')->text, qr/\[awesome\]\]/, 'right text';
-  like $dom->at('[id*="work"]')->text, qr/\[awesome\]\]/, 'right text';
-  like $dom->at('[id*="or"]')->text,   qr/\[awesome\]\]/, 'right text';
+  like $dom->at('[foo\:id*="ork"]')->text,  qr/\[awesome\]\]/, 'right text';
+  like $dom->at('[foo\:id*="orks"]')->text, qr/\[awesome\]\]/, 'right text';
+  like $dom->at('[foo\:id*="work"]')->text, qr/\[awesome\]\]/, 'right text';
+  like $dom->at('[foo\:id*="or"]')->text,   qr/\[awesome\]\]/, 'right text';
   ok $dom->at('rss')->xml,                     'XML mode active';
   ok $dom->at('extension')->parent->xml,       'XML mode active';
   ok $dom->at('extension')->root->xml,         'XML mode active';
@@ -632,11 +640,6 @@ EOF
   is $dom->at('k\:book'),                                   undef,            'no result';
   is $dom->at('ook'),                                       undef,            'no result';
   is $dom->at('[xmlns\:bk]')->{'xmlns:bk'},                 'uri:book-ns',    'right attribute';
-  is $dom->at('[bk]')->{'xmlns:bk'},                        'uri:book-ns',    'right attribute';
-  is $dom->at('[bk]')->attr('xmlns:bk'),                    'uri:book-ns',    'right attribute';
-  is $dom->at('[bk]')->attr('s:bk'),                        undef,            'no attribute';
-  is $dom->at('[bk]')->attr('bk'),                          undef,            'no attribute';
-  is $dom->at('[bk]')->attr('k'),                           undef,            'no attribute';
   is $dom->at('[s\:bk]'),                                   undef,            'no result';
   is $dom->at('[k]'),                                       undef,            'no result';
   is $dom->at('number')->ancestors('meta')->first->{xmlns}, 'uri:meta-ns',    'right attribute';
@@ -1286,6 +1289,13 @@ EOF
   is $dom->at('#♥ ~ #☃ ~ *:nth-last-child(1)')->text, 'G',   'right text';
   is $dom->at('#♥ + *:nth-last-child(2)')->text,      'F',   'right text';
   is $dom->at('#♥ ~ *:nth-last-child(2)')->text,      'F',   'right text';
+  ok $dom->at('#♥')->matches('h1 + p'),   'match';
+  ok !$dom->at('#☃')->matches('h1 + p'),  'no match';
+  ok !$dom->at('h1')->matches('h1 + p'),  'no match';
+  ok $dom->at('#☃')->matches('h1 ~ p'),   'match';
+  ok $dom->at('#♥')->matches('h1 ~ p'),   'match';
+  ok !$dom->at('div')->matches('h1 ~ p'), 'no match';
+  ok !$dom->matches('h1 + p'),            'no match';
 };
 
 subtest 'Whitespace as descendant combinator' => sub {

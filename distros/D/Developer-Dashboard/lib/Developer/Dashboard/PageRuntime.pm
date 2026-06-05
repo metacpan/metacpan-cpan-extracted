@@ -3,7 +3,7 @@ package Developer::Dashboard::PageRuntime;
 use strict;
 use warnings;
 
-our $VERSION = '3.90';
+our $VERSION = '4.03';
 
 use Capture::Tiny qw(capture);
 use Developer::Dashboard::DataHelper qw(j je);
@@ -14,6 +14,7 @@ use IPC::Open3 qw(open3);
 use Symbol qw(gensym);
 use Developer::Dashboard::PageRuntime::StreamHandle;
 use Developer::Dashboard::JSON qw(json_encode);
+use Developer::Dashboard::PerlEnv ();
 use Developer::Dashboard::Platform qw(command_argv_for_path command_in_path);
 use Developer::Dashboard::RuntimeManager ();
 use Developer::Dashboard::Folder ();
@@ -602,6 +603,7 @@ sub _saved_ajax_env {
         DEVELOPER_DASHBOARD_AJAX_SINGLETON => $self->_normalize_saved_ajax_singleton( $args{singleton} ),
         DEVELOPER_DASHBOARD_AJAX_TYPE      => $args{type} || '',
         DEVELOPER_DASHBOARD_AJAX_PARAMS    => $params_json,
+        DEVELOPER_DASHBOARD_RUNTIME_ROOT   => $self->{paths} ? $self->{paths}->state_root : '',
         DEVELOPER_DASHBOARD_RUNTIME_LAYERS => $self->{paths} ? join( "\n", $self->{paths}->runtime_layers ) : '',
         QUERY_STRING                       => $query_string,
         REQUEST_METHOD                     => 'GET',
@@ -636,16 +638,9 @@ sub _saved_ajax_env {
 sub _runtime_local_perl_env {
     my ($self) = @_;
     my $paths = $self->{paths} || return ();
-    my $path_sep = $^O eq 'MSWin32' ? ';' : ':';
-    my @perl5lib = grep { defined $_ && $_ ne '' } split /\Q$path_sep\E/, ( $ENV{PERL5LIB} || '' );
-    for my $local_lib ( reverse $paths->runtime_local_lib_roots ) {
-        next if !-d $local_lib;
-        next if grep { $_ eq $local_lib } @perl5lib;
-        unshift @perl5lib, $local_lib;
-    }
-    return (
-        PERL5LIB => join( $path_sep, @perl5lib ),
-    );
+    return %{ Developer::Dashboard::PerlEnv->dashboard_child_env(
+            extra => [ grep { -d $_ } $paths->runtime_local_lib_roots ],
+        ) };
 }
 
 # _saved_ajax_inline_env_limit()

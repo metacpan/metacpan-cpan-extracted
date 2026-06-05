@@ -337,7 +337,7 @@ my $background_result = $actions->run_command_action(
     timeout_ms => 1000,
 );
 ok( $background_result->{pid} > 0, 'background action forks a child process' );
-my $background_wait_loops = $INC{'Devel/Cover.pm'} ? 100 : 20;
+my $background_wait_loops = $INC{'Devel/Cover.pm'} ? 500 : 20;
 for ( 1 .. $background_wait_loops ) {
     last if !$actions->_pid_is_running( $background_result->{pid} );
     sleep 0.1;

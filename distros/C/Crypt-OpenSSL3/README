@@ -27,20 +27,11 @@ DESCRIPTION
 
 RECENT CHANGES
 
-    Changes for version 0.005 (2026-04-25)
+    Changes for version 0.006 (2026-06-04)
 
-      * Adapt to OpenSSL 4.0
+      * Add HPKE support
 
-      * Make set_alpn_protos take a list of protocols
-
-      * Remove copy_session_id
-
-      * Add get_{min,max}_proto_version to ssl object
-
-      * Remove various get/set methods on PKey::Context in favor of
-      get_param/set_param
-
-      * Duplicate distinguishing id before transfering ownership
+      * Add certificate request support
 
     See the Changes file for more details.
 

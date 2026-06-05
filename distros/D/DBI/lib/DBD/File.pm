@@ -10,7 +10,7 @@
 #
 #  The original author is Jochen Wiedmann.
 #
-#  Copyright (C) 2009-2020 by H.Merijn Brand & Jens Rehsack
+#  Copyright (C) 2009-2026 by H.Merijn Brand & Jens Rehsack
 #  Copyright (C) 2004 by Jeff Zucker
 #  Copyright (C) 1998 by Jochen Wiedmann
 #
@@ -35,7 +35,7 @@ use warnings;
 use base qw( DBI::DBD::SqlEngine );
 use Carp;
 
-our $VERSION = "0.44";
+our $VERSION = "0.45";
 
 our $drh = undef;		# holds driver handle(s) once initialized
 
@@ -565,6 +565,7 @@ use warnings;
 our @ISA = "DBD::File::DataSource::Stream";
 
 use Carp;
+require List::Util;
 
 my $fn_any_ext_regex = qr/\.[^.]*/;
 
@@ -623,6 +624,17 @@ sub complete_table_name {
 	}
     -d $searchdir or
 	croak "-d $searchdir: $!";
+
+    # If the file location is outside the current folder,
+    # its absolute path should be in ($f_dir, @f_dir_search)
+    # Note this triggers only when *used*, not at definition time
+    #   $dbh->{csv_tables}{foo}{file} = "/out/side/scope/foo.csv"; # OK
+    #   $dbh->do ("create table foo (c char)"); # FAIL
+    {   my @sd = map { Cwd::abs_path ($_) } $meta->{f_dir}, @{$meta->{f_dir_search} || []};
+	unless (List::Util::first { $_ eq $searchdir } @sd) {
+	    croak "Using data files in $searchdir is unsafe and not allowed.\nUse f_dir or f_dir_search.\n";
+	    }
+	}
 
     $searchdir eq $meta->{f_dir} and
 	$dir = "";
@@ -1286,8 +1298,7 @@ by replacing the C<f_> in the method name with the driver prefix.
 
 Signature:
 
-  sub f_versions (;$)
-  {
+  sub f_versions (;$) {
     my ($table_name) = @_;
     $table_name ||= ".";
     ...
@@ -1411,14 +1422,14 @@ tables, but they will not covered by C<table_info>.
 
 This module is currently maintained by
 
-H.Merijn Brand < h.m.brand at xs4all.nl > and
+H.Merijn Brand < hmbrand at cpan.org > and
 Jens Rehsack < rehsack at googlemail.com >
 
 The original author is Jochen Wiedmann.
 
 =head1 COPYRIGHT AND LICENSE
 
- Copyright (C) 2009-2020 by H.Merijn Brand & Jens Rehsack
+ Copyright (C) 2009-2026 by H.Merijn Brand & Jens Rehsack
  Copyright (C) 2004-2009 by Jeff Zucker
  Copyright (C) 1998-2004 by Jochen Wiedmann
 

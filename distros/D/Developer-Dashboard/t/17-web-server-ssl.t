@@ -736,6 +736,45 @@ OPENSSL_CONFIG
         );
     }
 
+    {
+        my %reaped_children;
+        ok(
+            Developer::Dashboard::Web::Server::_track_reaped_child( \%reaped_children, 4321 ),
+            'track-reaped-child helper returns success for positive child pids',
+        );
+        ok(
+            $reaped_children{4321},
+            'track-reaped-child helper records positive child pids for later shutdown waits',
+        );
+        ok(
+            Developer::Dashboard::Web::Server::_track_reaped_child( \%reaped_children, 0 ),
+            'track-reaped-child helper is a no-op for non-positive child ids',
+        );
+        is_deeply(
+            \%reaped_children,
+            { 4321 => 1 },
+            'track-reaped-child helper leaves the reap set unchanged for invalid child ids',
+        );
+    }
+
+    {
+        my %reaped_children;
+        my @waitpid_results = ( 4321, 0 );
+        no warnings 'redefine';
+        local *Developer::Dashboard::Web::Server::_waitpid = sub {
+            return shift(@waitpid_results) // 0;
+        };
+        ok(
+            Developer::Dashboard::Web::Server::_reap_ssl_children( \%reaped_children ),
+            'reap-ssl-children helper returns success after reaping available child pids',
+        );
+        is_deeply(
+            \%reaped_children,
+            { 4321 => 1 },
+            'reap-ssl-children helper records each positive waitpid result in the local reap set',
+        );
+    }
+
     my $default_signal_pid = fork();
     die "Unable to fork default signal test child: $!" if !defined $default_signal_pid;
     if ( !$default_signal_pid ) {

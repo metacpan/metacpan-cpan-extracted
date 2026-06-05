@@ -293,6 +293,17 @@ use Developer::Dashboard::SkillManager ();
         return $USAGE{$name} if exists $USAGE{$name};
         return $USAGE{json_ok};
     }
+
+    sub get_skill_path {
+        my ( $self, $name, %args ) = @_;
+        return undef if !$name || $name eq 'missing';
+        return '/tmp/demo';
+    }
+
+    sub is_enabled {
+        my ( $self, $name ) = @_;
+        return $name && $name ne 'disabled' ? 1 : 0;
+    }
 }
 
 {
@@ -851,6 +862,8 @@ subtest 'Developer::Dashboard::File and FileRegistry cover direct file helpers' 
 
 subtest 'CLI::Skills covers helper branches and table rendering' => sub {
     no warnings 'redefine';
+
+    require Developer::Dashboard::SkillDispatcher;
 
     local *Developer::Dashboard::CLI::Skills::_build_paths = sub { return bless {}, 'TestCLIPathRegistry' };
     local *Developer::Dashboard::SkillManager::new = sub { return TestSkillsManager->new(@_) };

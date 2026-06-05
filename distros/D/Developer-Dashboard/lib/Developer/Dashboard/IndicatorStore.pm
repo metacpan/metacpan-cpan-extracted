@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '3.90';
+our $VERSION = '4.03';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -158,96 +158,16 @@ sub sync_collectors {
         next if ref($job) ne 'HASH';
         next if ref( $job->{indicator} ) ne 'HASH';
         next if !defined $job->{name} || $job->{name} eq '';
+        next if $job->{disable};
 
         $active_collectors{ $job->{name} } = 1;
-        my $indicator_name = $job->{indicator}{name} || $job->{name};
-        my $existing = eval { $self->get_indicator($indicator_name) } || {};
-        my $local_existing = $self->_local_indicator($indicator_name) || {};
-        my $effective_existing = $existing;
-        my $healed_from_inherited = 0;
-        if (
-            ref($local_existing) eq 'HASH'
-            && %{ $local_existing }
-            && $self->_is_placeholder_missing_indicator($local_existing)
-        ) {
-            my $inherited = $self->_nearest_inherited_indicator($indicator_name);
-            if (
-                ref($inherited) eq 'HASH'
-                && %{ $inherited }
-                && ( $inherited->{managed_by_collector} || 0 )
-                && ( $inherited->{collector_name} || '' ) eq $job->{name}
-                && !$self->_is_placeholder_missing_indicator($inherited)
-            ) {
-                $effective_existing = $inherited;
-                $healed_from_inherited = 1;
-            }
-        }
-        my $candidate = $self->collector_indicator_candidate(
-            $job,
-            collector_order => $collector_order,
-            existing => $effective_existing,
-            status   => defined $effective_existing->{status} && $effective_existing->{status} ne '' ? $effective_existing->{status} : 'missing',
-        );
-        my $comparison_existing = ref($local_existing) eq 'HASH' && %{ $local_existing }
-          ? $local_existing
-          : $existing;
-        my @preserve_existing = $healed_from_inherited ? () : qw(status updated_at stale);
-        if (
-            ( $effective_existing->{managed_by_collector} || 0 )
-            && ( $effective_existing->{collector_name} || '' ) eq $job->{name}
-            && !$self->_is_placeholder_missing_indicator($effective_existing)
-        ) {
-            if (
-                exists $effective_existing->{configured_label}
-                && ( defined $effective_existing->{configured_label} ? $effective_existing->{configured_label} : '' )
-                    eq $candidate->{configured_label}
-                && ( defined $effective_existing->{label} ? $effective_existing->{label} : '' ) ne $candidate->{configured_label}
-            ) {
-                push @preserve_existing, 'label';
-            }
-            if (
-                exists $effective_existing->{configured_alias}
-                && ( defined $effective_existing->{configured_alias} ? $effective_existing->{configured_alias} : '' )
-                    eq $candidate->{configured_alias}
-                && ( defined $effective_existing->{alias} ? $effective_existing->{alias} : '' ) ne $candidate->{configured_alias}
-            ) {
-                push @preserve_existing, 'alias';
-            }
-            if (
-                exists $effective_existing->{configured_page_status_icon}
-                && ( defined $effective_existing->{configured_page_status_icon} ? $effective_existing->{configured_page_status_icon} : '' )
-                    eq $candidate->{configured_page_status_icon}
-                && ( defined $effective_existing->{page_status_icon} ? $effective_existing->{page_status_icon} : '' ) ne $candidate->{configured_page_status_icon}
-            ) {
-                push @preserve_existing, 'page_status_icon';
-            }
-            if (
-                exists $effective_existing->{configured_icon}
-                && ( defined $effective_existing->{configured_icon} ? $effective_existing->{configured_icon} : '' )
-                    eq $candidate->{configured_icon}
-                && ( defined $effective_existing->{icon} ? $effective_existing->{icon} : '' ) ne $candidate->{configured_icon}
-            ) {
-                push @preserve_existing, 'icon';
-            }
-        }
-        if (
-            defined $candidate->{icon_template}
-            && $candidate->{icon_template} ne ''
-            && defined $effective_existing->{icon_template}
-            && $effective_existing->{icon_template} eq $candidate->{icon_template}
-        ) {
-            push @preserve_existing, qw(icon icon_template);
-        }
-        my %comparison_candidate = %{$candidate};
-        for my $field (@preserve_existing) {
-            next if !exists $comparison_existing->{$field};
-            $comparison_candidate{$field} = $comparison_existing->{$field};
-        }
-        if ( !$self->_indicator_matches( $comparison_existing, \%comparison_candidate ) ) {
+        my $plan = $self->_collector_sync_plan( $job, collector_order => $collector_order );
+        if ( $plan->{needs_write} ) {
+            my $candidate = $plan->{candidate};
             push @written, $self->set_indicator(
                 $candidate->{name},
                 %{$candidate},
-                _preserve_existing_fields => \@preserve_existing,
+                _preserve_existing_fields => $plan->{preserve_existing},
             );
         }
         $collector_order++;
@@ -264,6 +184,40 @@ sub sync_collectors {
     }
 
     return \@written;
+}
+
+# collectors_need_sync($jobs)
+# Checks whether collector-declared indicators differ from persisted state so
+# prompt helpers can skip the full sync path when nothing changed.
+# Input: array reference of collector job hash references.
+# Output: boolean true when sync_collectors would write or delete anything.
+sub collectors_need_sync {
+    my ( $self, $jobs ) = @_;
+    $jobs = [] if ref($jobs) ne 'ARRAY';
+
+    my %active_collectors;
+    my $collector_order = 0;
+    for my $job ( @{$jobs} ) {
+        next if ref($job) ne 'HASH';
+        next if ref( $job->{indicator} ) ne 'HASH';
+        next if !defined $job->{name} || $job->{name} eq '';
+        next if $job->{disable};
+
+        $active_collectors{ $job->{name} } = 1;
+        my $plan = $self->_collector_sync_plan( $job, collector_order => $collector_order );
+        return 1 if $plan->{needs_write};
+        $collector_order++;
+    }
+
+    for my $indicator ( $self->list_indicators ) {
+        next if ref($indicator) ne 'HASH';
+        next if !$indicator->{managed_by_collector};
+        my $collector_name = $indicator->{collector_name} || '';
+        next if $collector_name eq '';
+        return 1 if !$active_collectors{$collector_name};
+    }
+
+    return 0;
 }
 
 # collector_indicator_candidate($job, %opts)
@@ -402,11 +356,12 @@ sub is_stale {
 # Output: array reference of updated indicator records.
 sub refresh_core_indicators {
     my ( $self, %args ) = @_;
+    my $prompt_only = $args{prompt_only} ? 1 : 0;
     my $cwd   = $args{cwd} || $self->{paths}->current_project_root || $self->{paths}->home;
     my $items = [];
 
     my $docker_ok = command_in_path('docker') ? 1 : 0;
-    push @$items, $self->set_indicator(
+    push @$items, $self->_set_indicator_if_changed(
         'docker',
         alias          => '🐳',
         label          => 'Docker',
@@ -416,9 +371,10 @@ sub refresh_core_indicators {
         priority       => 20,
         prompt_visible => 1,
     );
+    return $items if $prompt_only;
 
     my $project = $self->{paths}->project_root_for($cwd);
-    push @$items, $self->set_indicator(
+    push @$items, $self->_set_indicator_if_changed(
         'project',
         label          => $project || '(no-project)',
         icon           => 'P',
@@ -445,7 +401,7 @@ sub refresh_core_indicators {
         }
         chdir $old or die "Unable to restore cwd to $old: $!";
     }
-    push @$items, $self->set_indicator(
+    push @$items, $self->_set_indicator_if_changed(
         'git',
         label          => $git_status eq 'dirty' ? 'Git*' : 'Git',
         icon           => 'G',
@@ -455,6 +411,18 @@ sub refresh_core_indicators {
     );
 
     return $items;
+}
+
+# _set_indicator_if_changed($name, %data)
+# Writes one indicator only when the persisted state differs from the incoming
+# payload so prompt refreshes do not rewrite stable status files.
+# Input: indicator name plus indicator data fields.
+# Output: saved indicator hash reference or the unchanged existing indicator.
+sub _set_indicator_if_changed {
+    my ( $self, $name, %data ) = @_;
+    my $existing = $self->get_indicator($name);
+    return $existing if ref($existing) eq 'HASH' && $self->_indicator_matches( $existing, { %data, name => $name } );
+    return $self->set_indicator( $name, %data );
 }
 
 # page_header_items()
@@ -534,6 +502,106 @@ sub _indicator_matches {
         return 0 if $left ne $right;
     }
     return 1;
+}
+
+# _collector_sync_plan($job, %opts)
+# Builds the normalized collector indicator comparison payload used by sync and
+# prompt fast-path checks.
+# Input: collector job hash reference plus collector_order.
+# Output: hash reference with needs_write, candidate, and comparison fields.
+sub _collector_sync_plan {
+    my ( $self, $job, %opts ) = @_;
+    my $indicator_name = $job->{indicator}{name} || $job->{name};
+    my $existing = eval { $self->get_indicator($indicator_name) } || {};
+    my $local_existing = $self->_local_indicator($indicator_name) || {};
+    my $effective_existing = $existing;
+    my $healed_from_inherited = 0;
+    if (
+        ref($local_existing) eq 'HASH'
+        && %{ $local_existing }
+        && $self->_is_placeholder_missing_indicator($local_existing)
+    ) {
+        my $inherited = $self->_nearest_inherited_indicator($indicator_name);
+        if (
+            ref($inherited) eq 'HASH'
+            && %{ $inherited }
+            && ( $inherited->{managed_by_collector} || 0 )
+            && ( $inherited->{collector_name} || '' ) eq $job->{name}
+            && !$self->_is_placeholder_missing_indicator($inherited)
+        ) {
+            $effective_existing = $inherited;
+            $healed_from_inherited = 1;
+        }
+    }
+    my $candidate = $self->collector_indicator_candidate(
+        $job,
+        collector_order => $opts{collector_order},
+        existing => $effective_existing,
+        status   => defined $effective_existing->{status} && $effective_existing->{status} ne '' ? $effective_existing->{status} : 'missing',
+    );
+    my $comparison_existing = ref($local_existing) eq 'HASH' && %{ $local_existing }
+      ? $local_existing
+      : $existing;
+    my @preserve_existing = $healed_from_inherited ? () : qw(status updated_at stale);
+    if (
+        ( $effective_existing->{managed_by_collector} || 0 )
+        && ( $effective_existing->{collector_name} || '' ) eq $job->{name}
+        && !$self->_is_placeholder_missing_indicator($effective_existing)
+    ) {
+        if (
+            exists $effective_existing->{configured_label}
+            && ( defined $effective_existing->{configured_label} ? $effective_existing->{configured_label} : '' )
+                eq $candidate->{configured_label}
+            && ( defined $effective_existing->{label} ? $effective_existing->{label} : '' ) ne $candidate->{configured_label}
+        ) {
+            push @preserve_existing, 'label';
+        }
+        if (
+            exists $effective_existing->{configured_alias}
+            && ( defined $effective_existing->{configured_alias} ? $effective_existing->{configured_alias} : '' )
+                eq $candidate->{configured_alias}
+            && ( defined $effective_existing->{alias} ? $effective_existing->{alias} : '' ) ne $candidate->{configured_alias}
+        ) {
+            push @preserve_existing, 'alias';
+        }
+        if (
+            exists $effective_existing->{configured_page_status_icon}
+            && ( defined $effective_existing->{configured_page_status_icon} ? $effective_existing->{configured_page_status_icon} : '' )
+                eq $candidate->{configured_page_status_icon}
+            && ( defined $effective_existing->{page_status_icon} ? $effective_existing->{page_status_icon} : '' ) ne $candidate->{configured_page_status_icon}
+        ) {
+            push @preserve_existing, 'page_status_icon';
+        }
+        if (
+            exists $effective_existing->{configured_icon}
+            && ( defined $effective_existing->{configured_icon} ? $effective_existing->{configured_icon} : '' )
+                eq $candidate->{configured_icon}
+            && ( defined $effective_existing->{icon} ? $effective_existing->{icon} : '' ) ne $candidate->{configured_icon}
+        ) {
+            push @preserve_existing, 'icon';
+        }
+    }
+    if (
+        defined $candidate->{icon_template}
+        && $candidate->{icon_template} ne ''
+        && defined $effective_existing->{icon_template}
+        && $effective_existing->{icon_template} eq $candidate->{icon_template}
+    ) {
+        push @preserve_existing, qw(icon icon_template);
+    }
+    my %comparison_candidate = %{$candidate};
+    for my $field (@preserve_existing) {
+        next if !exists $comparison_existing->{$field};
+        $comparison_candidate{$field} = $comparison_existing->{$field};
+    }
+
+    return {
+        candidate           => $candidate,
+        comparison_existing => $comparison_existing,
+        comparison_candidate => \%comparison_candidate,
+        preserve_existing   => \@preserve_existing,
+        needs_write         => $self->_indicator_matches( $comparison_existing, \%comparison_candidate ) ? 0 : 1,
+    };
 }
 
 # _indicator_sort_cmp($left, $right)

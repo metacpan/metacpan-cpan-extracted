@@ -5,7 +5,8 @@ use utf8;
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
-use POSIX qw(:sys_wait_h);
+use POSIX qw(:sys_wait_h setsid);
+use Socket qw(AF_UNIX PF_UNSPEC SOCK_STREAM);
 use Test::More;
 use URI::Escape qw(uri_escape);
 
@@ -166,6 +167,41 @@ PAGE
     my $cron_name = 'coverage.cron';
     ok( !$runner->_job_is_due( { schedule => 'manual' }, $cron_name ), '_job_is_due rejects manual collectors' );
     ok( $runner->_job_is_due( { interval => 10 }, $cron_name ), '_job_is_due accepts interval collectors' );
+    is(
+        $runner->_effective_interval_seconds( { name => 'system-temp', command => 'dashboard system-temp cpu', interval => 5 } ),
+        30,
+        '_effective_interval_seconds throttles fast dashboard subcommand collectors to the default floor',
+    );
+    is(
+        $runner->_effective_interval_seconds( { name => 'system-temp', command => 'dashboard system-temp cpu', interval => 5, allow_fast_poll => 1 } ),
+        5,
+        '_effective_interval_seconds keeps the configured interval when fast dashboard polling is explicitly allowed',
+    );
+    is(
+        $runner->_effective_interval_seconds( { name => 'system-temp', command => 'dashboard system-temp cpu', interval => 5, allow_fast_dashboard_poll => 1 } ),
+        5,
+        '_effective_interval_seconds also honours the dedicated allow_fast_dashboard_poll opt-out',
+    );
+    local $ENV{DEVELOPER_DASHBOARD_MIN_DASHBOARD_COMMAND_INTERVAL_SECONDS} = 12;
+    is(
+        $runner->_effective_interval_seconds( { name => 'system-temp', command => 'dashboard system-temp cpu', interval => 5 } ),
+        12,
+        '_effective_interval_seconds honours the dashboard collector interval floor environment override',
+    );
+    local $ENV{DEVELOPER_DASHBOARD_MIN_DASHBOARD_COMMAND_INTERVAL_SECONDS} = 0;
+    is(
+        $runner->_effective_interval_seconds( { name => 'system-temp', command => q{/usr/local/bin/dashboard system-temp cpu}, interval => 5 } ),
+        5,
+        '_effective_interval_seconds leaves quoted or absolute dashboard commands alone when the floor is disabled',
+    );
+    {
+        local $ENV{DEVELOPER_DASHBOARD_MIN_DASHBOARD_COMMAND_INTERVAL_SECONDS} = 30;
+        is(
+            $runner->_effective_interval_seconds( { name => 'system-temp', command => 'dashboard system-temp cpu', interval => 45 } ),
+            45,
+            '_effective_interval_seconds keeps dashboard subcommand collectors above the minimum interval unchanged',
+        );
+    }
     ok( $runner->_cron_due( undef, $cron_name ), '_cron_due treats an empty cron expression as always due' );
     ok( !$runner->_cron_due( '* * * *', $cron_name ), '_cron_due rejects malformed cron expressions' );
     my @now = localtime();
@@ -516,6 +552,83 @@ PAGE
     };
     is( $runner->_reap_finished_loop_workers( \%active ), 1, '_reap_finished_loop_workers reaps exited worker children' );
     is_deeply( \%active, {}, '_reap_finished_loop_workers removes reaped worker children from the active set' );
+}
+
+{
+    my $child = fork();
+    die "fork failed: $!" if !defined $child;
+    if ( !$child ) {
+        setsid() or die "setsid failed: $!";
+        $SIG{TERM} = 'IGNORE';
+        sleep 30;
+        exit 0;
+    }
+    my %active = ( $child => 1 );
+    ok( $runner->_terminate_loop_workers( \%active ), '_terminate_loop_workers escalates to KILL when a worker ignores TERM' );
+    is_deeply( \%active, {}, '_terminate_loop_workers clears stubborn workers after KILL escalation' );
+    my $reaped = waitpid( $child, WNOHANG );
+    for ( 1 .. 20 ) {
+        last if $reaped == -1;
+        select undef, undef, undef, 0.1;
+        $reaped = waitpid( $child, WNOHANG );
+    }
+    is( $reaped, -1, '_terminate_loop_workers reaps a stubborn worker after KILL escalation' );
+}
+
+{
+    my %active = ( 424242 => 1 );
+    no warnings 'redefine';
+    local *Developer::Dashboard::CollectorRunner::_pid_is_running = sub { return 1 };
+    local *Developer::Dashboard::CollectorRunner::_reap_child_process = sub { return 1 };
+    ok( $runner->_terminate_loop_workers( \%active ), '_terminate_loop_workers still returns true when the forced-kill branch runs for an already-missing pid' );
+    is_deeply( \%active, {}, '_terminate_loop_workers clears the active set after forcing the kill branch for coverage' );
+}
+
+{
+    no warnings 'redefine';
+    local *Developer::Dashboard::CollectorRunner::_open_file_descriptors = sub { return () };
+    ok(
+        $runner->_close_inherited_fds( keep => [ undef, 'not-a-fd', 1 ] ),
+        '_close_inherited_fds ignores undefined and non-numeric keep descriptors while still accepting numeric keep fds before scanning inherited handles',
+    );
+}
+
+{
+    pipe my $result_reader, my $result_writer or die "Unable to create result pipe: $!";
+    my $pid = fork();
+    die "fork failed: $!" if !defined $pid;
+    if ( !$pid ) {
+        close $result_reader;
+        socketpair( my $keep_left, my $keep_right, AF_UNIX, SOCK_STREAM, PF_UNSPEC )
+          or die "Unable to create keep socketpair: $!";
+        socketpair( my $drop_left, my $drop_right, AF_UNIX, SOCK_STREAM, PF_UNSPEC )
+          or die "Unable to create drop socketpair: $!";
+        local $SIG{PIPE} = 'IGNORE';
+        local $SIG{__WARN__} = sub {
+            my ($warning) = @_;
+            return if defined $warning && $warning =~ /Broken pipe|Bad file descriptor/;
+            warn $warning;
+        };
+        $runner->_close_inherited_fds(
+            keep => [
+                fileno($result_writer),
+                fileno($keep_left),
+                fileno($keep_right),
+            ],
+            close_ipc => 1,
+        );
+        my $keep_ok = defined syswrite( $keep_right, "kept\n" ) ? 1 : 0;
+        my $drop_ok = defined syswrite( $drop_right, "dropped\n" ) ? 1 : 0;
+        print {$result_writer} "$keep_ok:$drop_ok\n";
+        close $result_writer;
+        POSIX::_exit(0);
+    }
+    close $result_writer;
+    my $payload = <$result_reader>;
+    close $result_reader;
+    waitpid( $pid, 0 );
+    chomp $payload if defined $payload;
+    is( $payload, '1:0', '_close_inherited_fds also closes inherited socketpair descriptors while preserving explicit keep handles' );
 }
 
 {

@@ -3,9 +3,10 @@ package Developer::Dashboard::Web::App;
 use strict;
 use warnings;
 
-our $VERSION = '3.90';
+our $VERSION = '4.03';
 
 use Capture::Tiny qw(capture);
+use Digest::SHA qw(sha256_hex);
 use File::Basename qw(dirname);
 use File::ShareDir qw(dist_dir);
 use POSIX qw(strftime);
@@ -146,28 +147,39 @@ sub authorize_request {
         ),
     );
     my $session;
+    my $api_context;
 
     if ( $tier ne 'admin' ) {
-        return $self->_helper_access_disabled_response
-          if !$self->{auth}->helper_users_enabled;
-        $session = $self->{sessions}->from_cookie( $headers->{cookie}, remote_addr => $args{remote_addr} );
-        if ( !$session ) {
-            return [
-                401,
-                'text/html; charset=utf-8',
-                $self->{auth}->login_page(
-                    redirect_to => $self->_login_redirect_target(%args),
-                ),
-            ];
+        if ( $self->_api_route_registered( $args{path} ) ) {
+            $session = $self->{sessions}->from_cookie( $headers->{cookie}, remote_addr => $args{remote_addr} );
+            if ( !$session ) {
+                $api_context = $self->_authorize_api_request(%args);
+                return $self->_api_forbidden_response if !$api_context;
+            }
+        }
+        else {
+            return $self->_helper_access_disabled_response
+              if !$self->{auth}->helper_users_enabled;
+            $session = $self->{sessions}->from_cookie( $headers->{cookie}, remote_addr => $args{remote_addr} );
+            if ( !$session ) {
+                return [
+                    401,
+                    'text/html; charset=utf-8',
+                    $self->{auth}->login_page(
+                        redirect_to => $self->_login_redirect_target(%args),
+                    ),
+                ];
+            }
         }
     }
 
     $self->{_current_request_context} = {
-        tier        => $tier,
+        tier        => $api_context ? 'api' : $tier,
         remote_addr => $args{remote_addr} || '',
         host        => $headers->{host} || '',
         username    => ref($session) eq 'HASH' ? ( $session->{username} || '' ) : '',
-        role        => ref($session) eq 'HASH' ? ( $session->{role} || '' ) : '',
+        role        => $api_context ? 'api' : ( ref($session) eq 'HASH' ? ( $session->{role} || '' ) : '' ),
+        api_key     => $api_context ? ( $api_context->{api_key} || '' ) : '',
     };
     return;
 }
@@ -232,6 +244,68 @@ sub _helper_access_disabled_response {
         'text/plain; charset=utf-8',
         '',
     ];
+}
+
+# _api_forbidden_response()
+# Builds the machine-auth denial used for registered API ajax routes.
+# Input: none.
+# Output: response array reference with a 403 JSON forbidden payload.
+sub _api_forbidden_response {
+    return [
+        403,
+        'application/json; charset=utf-8',
+        json_encode( { status => 'forbidden' } ),
+    ];
+}
+
+# _api_route_registered($path)
+# Reports whether one request path is covered by any layered config/api.json allowlist.
+# Input: request path string.
+# Output: boolean true when one API client entry explicitly allows the path.
+sub _api_route_registered {
+    my ( $self, $path ) = @_;
+    return 0 if !defined $path || $path !~ m{\A/ajax(?:/|\z)};
+    my $api_keys = $self->_api_keys;
+    for my $entry ( values %{$api_keys} ) {
+        next if ref($entry) ne 'HASH';
+        next if ref( $entry->{ajax} ) ne 'ARRAY';
+        return 1 if scalar grep { $_ eq $path } @{ $entry->{ajax} };
+    }
+    return 0;
+}
+
+# _authorize_api_request(%args)
+# Validates x-dd-api-key and x-dd-api-secret headers for one registered ajax route.
+# Input: normalized request path and headers.
+# Output: hash reference with api_key when authorized, otherwise undef.
+sub _authorize_api_request {
+    my ( $self, %args ) = @_;
+    my $headers = $args{headers} || {};
+    my $api_key = defined $headers->{'x-dd-api-key'} && !ref( $headers->{'x-dd-api-key'} )
+      ? $headers->{'x-dd-api-key'}
+      : '';
+    my $api_secret = defined $headers->{'x-dd-api-secret'} && !ref( $headers->{'x-dd-api-secret'} )
+      ? $headers->{'x-dd-api-secret'}
+      : '';
+    return undef if $api_key eq '' || $api_secret eq '';
+    my $api_keys = $self->_api_keys;
+    my $entry = $api_keys->{$api_key};
+    return undef if ref($entry) ne 'HASH';
+    return undef if ref( $entry->{ajax} ) ne 'ARRAY';
+    return undef if !( scalar grep { $_ eq ( $args{path} || '' ) } @{ $entry->{ajax} } );
+    return undef if sha256_hex($api_secret) ne ( $entry->{secret} || '' );
+    return { api_key => $api_key };
+}
+
+# _api_keys()
+# Returns the layered API auth config when a config service is available.
+# Input: none.
+# Output: hash reference keyed by API client name.
+sub _api_keys {
+    my ($self) = @_;
+    return {} if !blessed( $self->{config} ) || !$self->{config}->can('api_keys');
+    my $api_keys = $self->{config}->api_keys;
+    return ref($api_keys) eq 'HASH' ? $api_keys : {};
 }
 
 # _handle_login(%args)
@@ -2711,11 +2785,11 @@ Supports: JS, CSS, JSON, XML, HTML, SVG, PNG, JPEG, GIF, WebP, ICO, and others.
 
 =head1 PURPOSE
 
-This module is the main route backend for the browser application. It handles login and logout, saved and transient page render/source/edit routes, status endpoints, saved Ajax endpoints, and the auth checks that decide whether a request is local admin, helper user, or unauthorized outsider.
+This module is the main route backend for the browser application. It handles login and logout, saved and transient page render/source/edit routes, status endpoints, saved Ajax endpoints, and the auth checks that decide whether a request is local admin, helper user, API-authorized machine caller, or unauthorized outsider.
 
 =head1 WHY IT EXISTS
 
-It exists because the dashboard browser surface is large and security-sensitive. Centralizing route behavior, auth gating, saved-page handling, Ajax endpoints, and response shaping keeps the product behavior coherent and testable.
+It exists because the dashboard browser surface is large and security-sensitive. Centralizing route behavior, auth gating, saved-page handling, Ajax endpoints, layered C<config/api.json> machine auth, and response shaping keeps the product behavior coherent and testable.
 
 =head1 WHEN TO USE
 
@@ -2723,7 +2797,7 @@ Use this file when changing browser routes, helper login behavior, page render/s
 
 =head1 HOW TO USE
 
-Construct it with the action runner, auth service, page store, prompt, page resolver, page runtime, and session store, then hand it to the Dancer adapter or PSGI bootstrap. Route-specific behavior belongs here rather than in the transport wrapper.
+Construct it with the action runner, auth service, config service, page store, prompt, page resolver, page runtime, and session store, then hand it to the Dancer adapter or PSGI bootstrap. Route-specific behavior belongs here rather than in the transport wrapper.
 
 =head1 WHAT USES IT
 

@@ -1,9 +1,12 @@
 Revision history for App::cpan2arch
 
+v1.1.2    2026-06-04T11:28:21Z
+          - Fix 'v' prefix not being applied in versioned packages with epoch (AUR)
+          - Minor style refactor
+
 v1.1.1    2026-05-23T12:37:17Z
           - Preserve co-maintainers if PACKAGER is the current maintainer (--update)
-          - Fix --update tests
-          - Add Pinto to the test lib to address test coverage gaps
+          - Fix --update tests + improve test coverage
 
 v1.1.0    2026-05-21T09:14:02Z
           - Be more lightweight, so make caching as optional and move M::UA::C +
@@ -28,7 +31,6 @@ v1.0.2    2026-05-16T01:21:00Z
           - Improve _get_corelist() error handling and fallback to the current
             perl version instead of exiting (Module::CoreList)
           - Use default TTY width in normal_comp test (01-offline.t)
-          - Update READMEs
 
 v1.0.1    2026-05-14T00:40:43Z
           - Query all perl-* pages from Arch's Official API rather than only the

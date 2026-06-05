@@ -96,13 +96,14 @@ static int cf_fold(unsigned cp, char* out) {
  * must provide an output buffer of size >= n*4 + 4. Returns output
  * length. */
 static size_t cf_normalise(const char* s, size_t n, char* out) {
-    /* Trim ends */
     size_t a = 0, b = n;
+    size_t j = 0;
+    size_t i;
+    int in_ws = 0;
+    /* Trim ends */
     while (a < b && (s[a] == ' ' || s[a] == '\t' || s[a] == '\n')) a++;
     while (b > a && (s[b-1] == ' ' || s[b-1] == '\t' || s[b-1] == '\n')) b--;
-    size_t j = 0;
-    int in_ws = 0;
-    size_t i = a;
+    i = a;
     while (i < b) {
         unsigned char c = (unsigned char)s[i];
         if (c == ' ' || c == '\t' || c == '\n') {
@@ -120,15 +121,18 @@ static size_t cf_normalise(const char* s, size_t n, char* out) {
 }
 
 static char* normalise_label(mds_arena* a, const char* s, size_t n, size_t* nlen) {
-    char* out = (char*)mds_arena_alloc(a, n * 4 + 4);
-    size_t j = cf_normalise(s, n, out);
+    char* out;
+    size_t j;
+    out = (char*)mds_arena_alloc(a, n * 4 + 4);
+    j = cf_normalise(s, n, out);
     out[j] = '\0';
     *nlen = j;
     return out;
 }
 
 static char* arena_dup(mds_arena* a, const char* s, size_t n) {
-    char* d = (char*)mds_arena_alloc(a, n + 1);
+    char* d;
+    d = (char*)mds_arena_alloc(a, n + 1);
     if (n) memcpy(d, s, n);
     d[n] = '\0';
     return d;
@@ -147,9 +151,11 @@ const mds_linkref* mds_linkref_get(const struct mds_linkref_tab* t,
      * input expanding to 4-byte fold). Cap at 4 KiB; pathologically long
      * labels can't match a stored entry anyway. */
     char buf[4096];
+    size_t nlen;
+    size_t i;
     if (llen > sizeof buf / 4 - 4) return NULL;
-    size_t nlen = cf_normalise(label, llen, buf);
-    for (size_t i = 0; i < t->len; i++) {
+    nlen = cf_normalise(label, llen, buf);
+    for (i = 0; i < t->len; i++) {
         if (t->entries[i].klen == nlen &&
             (nlen == 0 || memcmp(t->entries[i].key, buf, nlen) == 0))
             return &t->entries[i];
@@ -162,9 +168,12 @@ int mds_linkref_add(struct mds_linkref_tab* t,
                     const char* url,   size_t ulen,
                     const char* title, size_t tlen) {
     size_t nlen;
-    char* key = normalise_label(t->arena, label, llen, &nlen);
+    char* key;
+    size_t i;
+    mds_linkref* e;
+    key = normalise_label(t->arena, label, llen, &nlen);
     /* dup check */
-    for (size_t i = 0; i < t->len; i++) {
+    for (i = 0; i < t->len; i++) {
         if (t->entries[i].klen == nlen &&
             (nlen == 0 || memcmp(t->entries[i].key, key, nlen) == 0))
             return 0;
@@ -174,7 +183,7 @@ int mds_linkref_add(struct mds_linkref_tab* t,
         t->entries = (mds_linkref*)realloc(t->entries, nc * sizeof(mds_linkref));
         t->cap = nc;
     }
-    mds_linkref* e = &t->entries[t->len++];
+    e = &t->entries[t->len++];
     e->key   = key;     e->klen = nlen;
     e->url   = arena_dup(t->arena, url, ulen);   e->ulen = ulen;
     e->title = tlen ? arena_dup(t->arena, title, tlen) : NULL;

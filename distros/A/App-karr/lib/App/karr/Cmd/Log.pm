@@ -1,7 +1,7 @@
 # ABSTRACT: Show activity log
 
 package App::karr::Cmd::Log;
-our $VERSION = '0.300';
+our $VERSION = '0.301';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -104,7 +104,7 @@ App::karr::Cmd::Log - Show activity log
 
 =head1 VERSION
 
-version 0.300
+version 0.301
 
 =head1 SYNOPSIS
 

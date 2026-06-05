@@ -10,6 +10,8 @@ use File::Temp qw(tempdir);
 use lib 'lib';
 
 use Developer::Dashboard::Collector;
+use Developer::Dashboard::Config;
+use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::IndicatorStore;
 use Developer::Dashboard::PathRegistry;
 use Developer::Dashboard::Prompt;
@@ -140,6 +142,52 @@ is_deeply(
     ],
     'page header payload keeps indicator priority order while rendering status-plus-alias entries',
 );
+{
+    my $config_home = tempdir(CLEANUP => 1);
+    my $config_paths = Developer::Dashboard::PathRegistry->new(
+        home            => $config_home,
+        cwd             => $config_home,
+        workspace_roots => [],
+        project_roots   => [],
+    );
+    my $config_files = Developer::Dashboard::FileRegistry->new( paths => $config_paths );
+    my $config = Developer::Dashboard::Config->new( files => $config_files, paths => $config_paths );
+    my $collector_indicators = Developer::Dashboard::IndicatorStore->new(paths => $config_paths);
+    $config->save_global(
+        {
+            collectors => [
+                {
+                    name      => 'enabled.collector',
+                    command   => 'true',
+                    interval  => 30,
+                    disable   => 0,
+                    indicator => { label => 'Enabled Collector' },
+                },
+                {
+                    name      => 'disabled.collector',
+                    command   => 'true',
+                    interval  => 30,
+                    disable   => 1,
+                    indicator => { label => 'Disabled Collector' },
+                },
+            ],
+        }
+    );
+    $collector_indicators->set_indicator(
+        'disabled.collector',
+        label                => 'Disabled Collector',
+        configured_label     => 'Disabled Collector',
+        collector_name       => 'disabled.collector',
+        managed_by_collector => 1,
+        status               => 'running',
+        prompt_visible       => 1,
+    );
+    ok( $collector_indicators->collectors_need_sync( $config->collectors ), 'collector indicator sync notices disabled collectors as removals' );
+    $collector_indicators->sync_collectors( $config->collectors );
+    ok( !$collector_indicators->get_indicator('disabled.collector'), 'collector indicator sync removes disabled collector indicators' );
+    ok( $collector_indicators->get_indicator('enabled.collector'), 'collector indicator sync still seeds enabled collector indicators' );
+}
+
 {
     my $repo = "$ENV{HOME}/repo";
     mkdir $repo or die $!;

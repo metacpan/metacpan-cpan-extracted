@@ -14,11 +14,12 @@
 
 static size_t fn_normalise(const char* s, size_t n, char* out) {
     size_t a = 0, b = n;
+    size_t j = 0;
+    size_t i;
+    int in_ws = 0;
     while (a < b && (s[a] == ' ' || s[a] == '\t' || s[a] == '\n')) a++;
     while (b > a && (s[b-1] == ' ' || s[b-1] == '\t' || s[b-1] == '\n')) b--;
-    size_t j = 0;
-    int in_ws = 0;
-    for (size_t i = a; i < b; i++) {
+    for (i = a; i < b; i++) {
         unsigned char c = (unsigned char)s[i];
         if (c == ' ' || c == '\t' || c == '\n') {
             if (!in_ws) { out[j++] = ' '; in_ws = 1; }
@@ -32,7 +33,8 @@ static size_t fn_normalise(const char* s, size_t n, char* out) {
 }
 
 static char* fn_arena_dup(mds_arena* a, const char* s, size_t n) {
-    char* d = (char*)mds_arena_alloc(a, n + 1);
+    char* d;
+    d = (char*)mds_arena_alloc(a, n + 1);
     if (n) memcpy(d, s, n);
     d[n] = '\0';
     return d;
@@ -47,11 +49,13 @@ void mds_footnote_init(struct mds_footnote_tab* t, mds_arena* a) {
 
 const mds_footnote* mds_footnote_get(const struct mds_footnote_tab* t,
                                      const char* label, size_t llen) {
-    if (!t || !t->len) return NULL;
     char buf[4096];
+    size_t nlen;
+    size_t i;
+    if (!t || !t->len) return NULL;
     if (llen > sizeof buf) return NULL;
-    size_t nlen = fn_normalise(label, llen, buf);
-    for (size_t i = 0; i < t->len; i++) {
+    nlen = fn_normalise(label, llen, buf);
+    for (i = 0; i < t->len; i++) {
         if (t->entries[i].klen == nlen &&
             (nlen == 0 || memcmp(t->entries[i].key, buf, nlen) == 0))
             return &t->entries[i];
@@ -63,10 +67,13 @@ int mds_footnote_add(struct mds_footnote_tab* t,
                      const char* label, size_t llen,
                      const char* body,  size_t blen) {
     char nbuf[4096];
+    size_t nlen;
+    size_t i;
+    mds_footnote* e;
     if (llen > sizeof nbuf) return 0;
-    size_t nlen = fn_normalise(label, llen, nbuf);
+    nlen = fn_normalise(label, llen, nbuf);
     /* duplicate label: first-wins (spec §6.13). */
-    for (size_t i = 0; i < t->len; i++) {
+    for (i = 0; i < t->len; i++) {
         if (t->entries[i].klen == nlen &&
             (nlen == 0 || memcmp(t->entries[i].key, nbuf, nlen) == 0))
             return 0;
@@ -76,7 +83,7 @@ int mds_footnote_add(struct mds_footnote_tab* t,
         t->entries = (mds_footnote*)realloc(t->entries, nc * sizeof(mds_footnote));
         t->cap = nc;
     }
-    mds_footnote* e = &t->entries[t->len++];
+    e = &t->entries[t->len++];
     e->label = fn_arena_dup(t->arena, label, llen);   e->llen = llen;
     e->key   = fn_arena_dup(t->arena, nbuf, nlen);    e->klen = nlen;
     e->body  = fn_arena_dup(t->arena, body, blen);    e->blen = blen;

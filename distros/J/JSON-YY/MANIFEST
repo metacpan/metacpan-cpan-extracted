@@ -35,6 +35,8 @@ t/16_ro_ref_lifetime.t
 t/17_to_json_croak_leak.t
 t/18_borrowed_write.t
 t/19_jfind_bigint.t
+t/20_int_width.t
+t/21_consistency.t
 xt/leak.t
 YY.xs
 yyjson.c

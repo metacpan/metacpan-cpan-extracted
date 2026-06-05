@@ -12,6 +12,48 @@ DBI::Changes - List of significant changes to the DBI
 
 =encoding UTF-8
 
+=head2 Changes in DBI 1.648 - 04 Jun 2026
+
+=over 2
+
+=item *
+
+Correct sprintf usage for trace_msg (issue#132)
+
+=item *
+
+Add DBIXS_VERSION & DBIXS_RELEASE to dbixs_rev.h
+
+=item *
+
+Remove -Wbad-function-cast
+
+=item *
+
+Fix possible stack overflow (old issue already noted by Tim) (CVE-2026-9698)
+
+=item *
+
+Do not allow table source locations outside explicit given folders
+
+=item *
+
+DBD::Sponge PRECISION handling (pr#12, pilcrow)
+
+=item *
+
+Fix possible buffer overflow in preparse
+
+=item *
+
+Skip mismatching .so's (Greg, PR#81)
+
+=item *
+
+Fix cast warning in dbi_get_state (Greg, PR#182)
+
+=back
+
 =head2 Changes in DBI 1.647 - 20 Jan 2025
 
 =over 2

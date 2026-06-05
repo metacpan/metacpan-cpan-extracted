@@ -2,9 +2,7 @@
 CONTRIBUTING.md
 CONTRIBUTING.pod
 Changes
-DASHBOARD_IMPROVEMENT_PLAN.html
 DASHBOARD_IMPROVEMENT_PLAN.md
-DASHBOARD_IMPROVEMENT_PLAN.pdf
 LICENSE
 MANIFEST
 MANIFEST.SKIP
@@ -32,7 +30,9 @@ doc/housekeeper-rotation.md
 doc/housekeeper-temp-cleanup.md
 doc/install-bootstrap.md
 doc/integration-test-plan.md
+doc/internal-operating-checklist.md
 doc/layered-env-loading.md
+doc/owasp-compliance-sow.md
 doc/path-inventory-api.md
 doc/security.md
 doc/shell-bootstrap.md
@@ -56,6 +56,7 @@ integration/windows/run-strawberry-smoke.ps1
 lib/Developer/Dashboard.pm
 lib/Developer/Dashboard/ActionRunner.pm
 lib/Developer/Dashboard/Auth.pm
+lib/Developer/Dashboard/CLI/API.pm
 lib/Developer/Dashboard/CLI/Complete.pm
 lib/Developer/Dashboard/CLI/Files.pm
 lib/Developer/Dashboard/CLI/OpenFile.pm
@@ -90,6 +91,7 @@ lib/Developer/Dashboard/PageRuntime.pm
 lib/Developer/Dashboard/PageRuntime/StreamHandle.pm
 lib/Developer/Dashboard/PageStore.pm
 lib/Developer/Dashboard/PathRegistry.pm
+lib/Developer/Dashboard/PerlEnv.pm
 lib/Developer/Dashboard/Platform.pm
 lib/Developer/Dashboard/Prompt.pm
 lib/Developer/Dashboard/Runtime/Result.pm
@@ -108,6 +110,7 @@ lib/Developer/Dashboard/Zipper.pm
 script/sync-readme-from-pod
 share/private-cli/_dashboard-core
 share/private-cli/action
+share/private-cli/api
 share/private-cli/auth
 share/private-cli/collector
 share/private-cli/complete
@@ -185,6 +188,8 @@ t/43-explicit-coverage-qa.t
 t/44-smart-router-two-stage.t
 t/45-skills-progress-platform.t
 t/46-runtime-manager-supervisor.t
+t/47-owasp-gate.t
+t/47-zombie-coverage-closure.t
 t/fuzz/scorecard-fast-check.mjs
 t/lib/Local/PSGITest.pm
 t/web_app_static_files.t

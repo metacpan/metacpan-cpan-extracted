@@ -23,5 +23,5 @@ requires:
   perl: '5.014'
 resources:
   repository: https://github.com/vividsnow/perl5-json-yy.git
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

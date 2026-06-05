@@ -118,8 +118,9 @@ typedef struct {
 /* ---------- heap buffer helpers ---------- */
 
 static void buf_grow(char** buf, size_t* cap, size_t need) {
+    size_t nc;
     if (need <= *cap) return;
-    size_t nc = *cap ? *cap : 256;
+    nc = *cap ? *cap : 256;
     while (nc < need) nc = nc + (nc >> 1) + 64;
     *buf = (char*)realloc(*buf, nc);
     *cap = nc;
@@ -135,8 +136,9 @@ static void buf_append(char** buf, size_t* len, size_t* cap,
 /* ---------- SAX dispatch (buffered while inside a list) ---------- */
 
 static size_t pool_intern(bscanner* b, const char* s, size_t n) {
+    size_t off;
     buf_grow(&b->bytepool, &b->bp_cap, b->bp_len + n + 1);
-    size_t off = b->bp_len;
+    off = b->bp_len;
     if (n) memcpy(b->bytepool + off, s, n);
     b->bp_len += n;
     return off;
@@ -245,8 +247,9 @@ static void sax_flush(bscanner* b) {
 static ctn* top(bscanner* b) { return &b->stack[b->depth - 1]; }
 
 static int push(bscanner* b, ct_kind k) {
+    ctn* c;
     if (b->depth >= MAX_DEPTH) return 0;
-    ctn* c = &b->stack[b->depth++];
+    c = &b->stack[b->depth++];
     memset(c, 0, sizeof *c);
     c->kind   = k;
     c->tight  = 1;
@@ -279,21 +282,38 @@ static int parse_linkref(const char* p, const char* end, const char** p_out,
                          const char** lbl_s, const char** lbl_e,
                          const char** url_s, const char** url_e,
                          const char** tit_s, const char** tit_e) {
-    const char* q = p;
-    int lead = 0;
+    const char* q;
+    int lead;
+    const char* ls;
+    int label_nl;
+    const char* r;
+    const char* le;
+    int has_nonws;
+    int nl;
+    const char *us, *ue;
+    const char *ts, *te;
+    const char* save_after_url;
+    int saw_nl;
+    int saw_ws;
+    char open, close;
+    int blank_found;
+    const char* check;
+
+    q = p;
+    lead = 0;
     while (q < end && *q == ' ' && lead < 3) { q++; lead++; }
     if (q >= end || *q != '[') return 0;
     q++;
-    const char* ls = q;
+    ls = q;
     /* Label may span multiple lines (no blank line). Allow \] inside. */
-    int label_nl = 0;
+    label_nl = 0;
     while (q < end && *q != ']') {
         if (*q == '\\' && q + 1 < end) { q += 2; continue; }
         if (*q == '[') return 0;
         if (*q == '\n') {
             if (++label_nl > 0) {
                 /* check for blank line */
-                const char* r = q + 1;
+                r = q + 1;
                 while (r < end && (*r == ' ' || *r == '\t')) r++;
                 if (r >= end || *r == '\n') return 0;
             }
@@ -301,28 +321,25 @@ static int parse_linkref(const char* p, const char* end, const char** p_out,
         q++;
     }
     if (q >= end || *q != ']') return 0;
-    const char* le = q;
+    le = q;
     if (le == ls) return 0;          /* empty label invalid */
     /* Label must contain at least one non-whitespace char. */
-    {
-        int has_nonws = 0;
-        for (const char* r = ls; r < le; r++) {
-            if (*r != ' ' && *r != '\t' && *r != '\n') { has_nonws = 1; break; }
-        }
-        if (!has_nonws) return 0;
+    has_nonws = 0;
+    for (r = ls; r < le; r++) {
+        if (*r != ' ' && *r != '\t' && *r != '\n') { has_nonws = 1; break; }
     }
+    if (!has_nonws) return 0;
     q++;
     if (q >= end || *q != ':') return 0;
     q++;
     /* whitespace, may include up to one newline */
-    int nl = 0;
+    nl = 0;
     while (q < end && (*q == ' ' || *q == '\t' || *q == '\n')) {
         if (*q == '\n') { if (++nl > 1) return 0; }
         q++;
     }
     if (q >= end) return 0;
     /* url */
-    const char *us, *ue;
     if (*q == '<') {
         q++;
         us = q;
@@ -342,30 +359,30 @@ static int parse_linkref(const char* p, const char* end, const char** p_out,
     }
     /* optional title — must be separated from URL by at least one ws char
      * (per CM §4.7). Without separator, '<bar>(baz)' is not a valid def. */
-    const char *ts = NULL, *te = NULL;
-    const char* save_after_url = q;
-    int saw_nl = 0;
-    int saw_ws = 0;
+    ts = NULL; te = NULL;
+    save_after_url = q;
+    saw_nl = 0;
+    saw_ws = 0;
     while (q < end && (*q == ' ' || *q == '\t' || *q == '\n')) {
         if (*q == '\n') saw_nl++;
         saw_ws = 1;
         q++;
     }
     if (q < end && (*q == '"' || *q == '\'' || *q == '(') && saw_nl <= 1 && saw_ws) {
-        char open = *q;
-        char close = (open == '(') ? ')' : open;
+        open = *q;
+        close = (open == '(') ? ')' : open;
         q++;
         ts = q;
         /* Title may span multiple lines but cannot contain a blank line.
            Detect blank line as: \n followed by (spaces|tabs)* \n . */
-        int blank_found = 0;
+        blank_found = 0;
         while (q < end && *q != close) {
             if (open != '(' && *q == '\\' && q + 1 < end) { q += 2; continue; }
             if (open == '(' && *q == '(') { /* unescaped '(' invalid in paren title */
                 blank_found = 1; break;
             }
             if (*q == '\n') {
-                const char* r = q + 1;
+                r = q + 1;
                 while (r < end && (*r == ' ' || *r == '\t')) r++;
                 if (r >= end || *r == '\n') { blank_found = 1; break; }
             }
@@ -376,7 +393,7 @@ static int parse_linkref(const char* p, const char* end, const char** p_out,
             te = q;
             q++;
             /* nothing but ws/newline allowed on remainder of title-line */
-            const char* check = q;
+            check = q;
             while (check < end && check < end && *check != '\n') {
                 if (*check != ' ' && *check != '\t') { ts = NULL; te = NULL; q = save_after_url; goto end_title; }
                 check++;
@@ -441,37 +458,63 @@ static void ensure_footnote_tab(mds_ctx* ctx) {
  * items or blockquotes are still handled by finalize_paragraph's leading-
  * defs strip. */
 static void preprocess_footnotes(mds_ctx* ctx) {
-    const char* in  = ctx->input;
-    size_t      ilen = ctx->len;
+    const char* in;
+    size_t      ilen;
+    char*  out;
+    size_t olen;
+    const char* p;
+    const char* end;
+    int in_fence;
+    char fence_ch;
+    int fence_len;
+    const char* le;
+    const char* nxt;
+    size_t lsz;
+    const char* q;
+    int ind;
+    int run;
+    const char* tail;
+    char fc;
+    int fl;
+    const char *lbs, *lbe, *bs;
+    char* body;
+    size_t blen;
+    const char *le2, *nxt2;
+    int blank;
+    const char* r;
+    int sp;
+
+    in   = ctx->input;
+    ilen = ctx->len;
     if (!ilen) return;
 
     /* Worst-case: same size as input. */
-    char*  out = (char*)mds_arena_alloc(&ctx->arena, ilen + 1);
-    size_t olen = 0;
+    out = (char*)mds_arena_alloc(&ctx->arena, ilen + 1);
+    olen = 0;
 
-    const char* p   = in;
-    const char* end = in + ilen;
-    int in_fence = 0;
-    char fence_ch = 0;
-    int fence_len = 0;
+    p   = in;
+    end = in + ilen;
+    in_fence = 0;
+    fence_ch = 0;
+    fence_len = 0;
 
     while (p < end) {
-        const char* le = (const char*)memchr(p, '\n', (size_t)(end - p));
+        le = (const char*)memchr(p, '\n', (size_t)(end - p));
         if (!le) le = end;
-        const char* nxt = (le < end) ? le + 1 : end;
-        size_t lsz = (size_t)(nxt - p);
+        nxt = (le < end) ? le + 1 : end;
+        lsz = (size_t)(nxt - p);
 
         /* Walk up to 3 leading spaces. */
-        const char* q = p;
-        int ind = 0;
+        q = p;
+        ind = 0;
         while (q < le && *q == ' ' && ind < 3) { q++; ind++; }
 
         if (in_fence) {
             /* Close-fence detection: run of fence_ch ≥ fence_len, then ws. */
-            int run = 0;
+            run = 0;
             while (q + run < le && q[run] == fence_ch) run++;
             if (run >= fence_len) {
-                const char* tail = q + run;
+                tail = q + run;
                 while (tail < le && (*tail == ' ' || *tail == '\t')) tail++;
                 if (tail == le) in_fence = 0;
             }
@@ -482,8 +525,8 @@ static void preprocess_footnotes(mds_ctx* ctx) {
 
         /* Open-fence detection. */
         if (le - q >= 3 && (q[0] == '`' || q[0] == '~') && q[1] == q[0] && q[2] == q[0]) {
-            char fc = q[0];
-            int fl = 3;
+            fc = q[0];
+            fl = 3;
             while (q + fl < le && q[fl] == fc) fl++;
             /* Tilde fences can have any info; backtick fences must not
              * contain backticks in info — but for our purposes (we only
@@ -499,19 +542,19 @@ static void preprocess_footnotes(mds_ctx* ctx) {
 
         /* Footnote def? `[^label]:` */
         if (le - q >= 4 && q[0] == '[' && q[1] == '^') {
-            const char* lbs = q + 2;
-            const char* lbe = lbs;
+            lbs = q + 2;
+            lbe = lbs;
             while (lbe < le && *lbe != ']' && *lbe != '[' && *lbe != '\n') lbe++;
             if (lbe < le && *lbe == ']' && lbe > lbs &&
                 lbe + 1 < le && lbe[1] == ':') {
                 /* Match. Capture body. */
-                const char* bs = lbe + 2;
+                bs = lbe + 2;
                 while (bs < le && (*bs == ' ' || *bs == '\t')) bs++;
 
                 /* Body buffer (arena). Worst case the rest of the input. */
-                char*  body = (char*)mds_arena_alloc(&ctx->arena,
-                                                     (size_t)(end - bs) + 1);
-                size_t blen = 0;
+                body = (char*)mds_arena_alloc(&ctx->arena,
+                                              (size_t)(end - bs) + 1);
+                blen = 0;
                 if (bs < le) {
                     memcpy(body + blen, bs, (size_t)(le - bs));
                     blen += (size_t)(le - bs);
@@ -520,13 +563,13 @@ static void preprocess_footnotes(mds_ctx* ctx) {
                 p = nxt;
                 /* Continuation lines: blank OR ≥4 spaces (or 1 tab) leading. */
                 while (p < end) {
-                    const char* le2 = (const char*)memchr(p, '\n', (size_t)(end - p));
+                    le2 = (const char*)memchr(p, '\n', (size_t)(end - p));
                     if (!le2) le2 = end;
-                    const char* nxt2 = (le2 < end) ? le2 + 1 : end;
+                    nxt2 = (le2 < end) ? le2 + 1 : end;
 
                     /* Blank? (only ws up to newline) */
-                    int blank = 1;
-                    for (const char* r = p; r < le2; r++) {
+                    blank = 1;
+                    for (r = p; r < le2; r++) {
                         if (*r != ' ' && *r != '\t') { blank = 0; break; }
                     }
                     if (blank) {
@@ -536,8 +579,8 @@ static void preprocess_footnotes(mds_ctx* ctx) {
                     }
 
                     /* Check ≥4 leading spaces (or one tab counts as 4). */
-                    int sp = 0;
-                    const char* r = p;
+                    sp = 0;
+                    r = p;
                     while (r < le2 && sp < 4) {
                         if (*r == ' ') { sp++; r++; }
                         else if (*r == '\t') { sp = 4; r++; break; }
@@ -586,16 +629,27 @@ static int parse_footnote_def(const char* p, const char* end,
                               const char** p_out,
                               const char** lbl_s, const char** lbl_e,
                               const char** body_s, const char** body_e) {
-    const char* q = p;
-    int lead = 0;
+    const char* q;
+    int lead;
+    const char* ls;
+    const char* le;
+    const char* bs;
+    const char* be;
+    const char* nxt;
+    const char* r;
+    int rlead;
+    const char* rr;
+
+    q = p;
+    lead = 0;
     while (q < end && *q == ' ' && lead < 3) { q++; lead++; }
     if (end - q < 4) return 0;
     if (q[0] != '[' || q[1] != '^') return 0;
     q += 2;
-    const char* ls = q;
+    ls = q;
     while (q < end && *q != ']' && *q != '\n' && *q != '[') q++;
     if (q >= end || *q != ']' || q == ls) return 0;
-    const char* le = q;
+    le = q;
     q++;
     if (q >= end || *q != ':') return 0;
     q++;
@@ -604,17 +658,17 @@ static int parse_footnote_def(const char* p, const char* end,
     /* Body runs until the next bare-line `[^...]:` or end of buffer.
      * In this MVP we accept body across newlines but NOT across blank
      * lines (the para buffer would already have been split). */
-    const char* bs = q;
-    const char* be = q;
+    bs = q;
+    be = q;
     while (q < end) {
         if (*q == '\n') {
-            const char* nxt = q + 1;
+            nxt = q + 1;
             /* Peek next line: another `[^...]:` ? -> stop here. */
-            const char* r = nxt;
-            int rlead = 0;
+            r = nxt;
+            rlead = 0;
             while (r < end && *r == ' ' && rlead < 3) { r++; rlead++; }
             if (end - r >= 4 && r[0] == '[' && r[1] == '^') {
-                const char* rr = r + 2;
+                rr = r + 2;
                 while (rr < end && *rr != ']' && *rr != '\n' && *rr != '[') rr++;
                 if (rr < end && *rr == ']' && rr + 1 < end && rr[1] == ':') {
                     be = q;        /* don't include the \n */
@@ -652,11 +706,14 @@ static const char* next_line(const char* p, const char* end,
  * run of preceding backslashes — odd count means escaped. */
 MDS_HOT
 static const char* tbl_find_pipe(const char* p, const char* end) {
+    const char* q;
+    const char* bs;
+
     while (p < end) {
-        const char* q = (const char*)memchr(p, '|', (size_t)(end - p));
+        q = (const char*)memchr(p, '|', (size_t)(end - p));
         if (!q) return NULL;
         /* Count preceding backslashes. */
-        const char* bs = q;
+        bs = q;
         while (bs > p && bs[-1] == '\\') bs--;
         if (((q - bs) & 1u) == 0u) return q;   /* even ⇒ unescaped */
         p = q + 1;
@@ -676,8 +733,18 @@ MDS_ALWAYS_INLINE static int tbl_cell_needs_unescape(const char* s, size_t n) {
 static unsigned tbl_split_cells(const char* line, size_t len,
                                 const char** out_s, size_t* out_n,
                                 unsigned max_cells) {
-    const char* p = line;
-    const char* end = line + len;
+    const char* p;
+    const char* end;
+    int esc;
+    const char* q;
+    unsigned count;
+    const char* pipe;
+    const char* cell_end;
+    const char* cs;
+    const char* ce;
+
+    p = line;
+    end = line + len;
     /* Trim outer whitespace. */
     while (p < end && (*p == ' ' || *p == '\t')) p++;
     while (end > p && (end[-1] == ' ' || end[-1] == '\t')) end--;
@@ -685,17 +752,17 @@ static unsigned tbl_split_cells(const char* line, size_t len,
     if (p < end && *p == '|') p++;
     /* Strip a single trailing unescaped pipe (must not be escaped). */
     if (end > p && end[-1] == '|') {
-        int esc = 0;
-        const char* q = end - 1;
+        esc = 0;
+        q = end - 1;
         while (q > p && q[-1] == '\\') { esc = !esc; q--; }
         if (!esc) end--;
     }
-    unsigned count = 0;
+    count = 0;
     while (p <= end) {
-        const char* pipe = tbl_find_pipe(p, end);
-        const char* cell_end = pipe ? pipe : end;
-        const char* cs = p;
-        const char* ce = cell_end;
+        pipe = tbl_find_pipe(p, end);
+        cell_end = pipe ? pipe : end;
+        cs = p;
+        ce = cell_end;
         while (cs < ce && (*cs == ' ' || *cs == '\t')) cs++;
         while (ce > cs && (ce[-1] == ' ' || ce[-1] == '\t')) ce--;
         if (count < max_cells) {
@@ -714,29 +781,37 @@ static unsigned tbl_split_cells(const char* line, size_t len,
  * fills aligns[]. Returns 0 if not a valid separator. */
 static unsigned tbl_parse_separator(const char* line, size_t len,
                                     mds_align* aligns, unsigned max_cells) {
-    const char* p = line;
-    const char* end = line + len;
+    const char* p;
+    const char* end;
+    unsigned count;
+    const char* cs;
+    const char* ce;
+    int left, right;
+    const char* q;
+
+    p = line;
+    end = line + len;
     while (p < end && (*p == ' ' || *p == '\t')) p++;
     while (end > p && (end[-1] == ' ' || end[-1] == '\t')) end--;
     if (p >= end) return 0;
     if (*p == '|') p++;
     /* Strip trailing |. */
     if (end > p && end[-1] == '|') end--;
-    unsigned count = 0;
+    count = 0;
     while (p <= end) {
-        const char* cs = p;
+        cs = p;
         while (p < end && *p != '|') p++;
-        const char* ce = p;
+        ce = p;
         /* Trim spaces around the cell. */
         while (cs < ce && (*cs == ' ' || *cs == '\t')) cs++;
         while (ce > cs && (ce[-1] == ' ' || ce[-1] == '\t')) ce--;
         if (cs >= ce) return 0;
-        int left = (*cs == ':');
+        left = (*cs == ':');
         if (left) cs++;
-        int right = (ce > cs && ce[-1] == ':');
+        right = (ce > cs && ce[-1] == ':');
         if (right) ce--;
         if (cs >= ce) return 0;
-        for (const char* q = cs; q < ce; q++)
+        for (q = cs; q < ce; q++)
             if (*q != '-') return 0;
         if (count < max_cells) {
             aligns[count] = left && right ? MDS_ALIGN_CENTER :
@@ -788,15 +863,24 @@ static void tbl_emit_row_pre(bscanner* b,
                              unsigned count,
                              const mds_align* aligns, unsigned nhead) {
     mds_block_detail d;
+    unsigned i;
+    mds_block_detail cd;
+    const char* s;
+    size_t      n;
+    size_t off;
+    char* dst;
+    size_t bl;
+    size_t j;
+    ev_rec* e;
+
     d.u.table_cell.align = MDS_ALIGN_NONE;     /* placeholder, row has no align */
     sax_enter(b, MDS_BLK_TABLE_ROW, &d);
-    for (unsigned i = 0; i < nhead; i++) {
-        mds_block_detail cd;
+    for (i = 0; i < nhead; i++) {
         cd.u.table_cell.align = aligns[i];
         sax_enter(b, MDS_BLK_TABLE_CELL, &cd);
         if (i < count && cn[i]) {
-            const char* s = cs[i];
-            size_t      n = cn[i];
+            s = cs[i];
+            n = cn[i];
             if (MDS_LIKELY(!tbl_cell_needs_unescape(s, n))) {
                 /* Fast path: no '\\' anywhere in the cell. If the cell
                  * is also free of inline triggers (the common single-
@@ -813,10 +897,10 @@ static void tbl_emit_row_pre(bscanner* b,
                 /* Slow path: copy-and-unescape '\\|' → '|' in one pass
                  * directly into the bytepool, then record the event. */
                 buf_grow(&b->bytepool, &b->bp_cap, b->bp_len + n + 1);
-                size_t off = b->bp_len;
-                char* dst = b->bytepool + off;
-                size_t bl = 0;
-                for (size_t j = 0; j < n; j++) {
+                off = b->bp_len;
+                dst = b->bytepool + off;
+                bl = 0;
+                for (j = 0; j < n; j++) {
                     if (s[j] == '\\' && j + 1 < n && s[j+1] == '|') {
                         dst[bl++] = '|'; j++;
                     } else {
@@ -824,7 +908,7 @@ static void tbl_emit_row_pre(bscanner* b,
                     }
                 }
                 b->bp_len += bl;
-                ev_rec* e = ev_alloc(b);
+                e = ev_alloc(b);
                 e->type = EV_INLINE;
                 e->u.bytes.off = off;
                 e->u.bytes.len = bl;
@@ -841,7 +925,9 @@ static void tbl_emit_row(bscanner* b, const char* line, size_t len,
                          const mds_align* aligns, unsigned nhead) {
     const char* cs[MDS_TBL_MAX_COLS];
     size_t      cn[MDS_TBL_MAX_COLS];
-    unsigned count = tbl_split_cells(line, len, cs, cn, MDS_TBL_MAX_COLS);
+    unsigned count;
+
+    count = tbl_split_cells(line, len, cs, cn, MDS_TBL_MAX_COLS);
     tbl_emit_row_pre(b, cs, cn, count, aligns, nhead);
 }
 
@@ -849,17 +935,22 @@ static void tbl_emit_row(bscanner* b, const char* line, size_t len,
  * valid GFM table header + separator (matching column count). Emits nothing. */
 static int tbl_peek_header(const char* p, const char* end) {
     const char* le1;
-    const char* p2 = tbl_next_line(p, end, &le1);
-    if (p2 >= end) return 0;
-    if (!tbl_find_pipe(p, le1)) return 0;
+    const char* p2;
     const char* hs[MDS_TBL_MAX_COLS];
     size_t      hn[MDS_TBL_MAX_COLS];
-    unsigned nhead = tbl_split_cells(p, (size_t)(le1 - p), hs, hn, MDS_TBL_MAX_COLS);
-    if (nhead < 1 || nhead > MDS_TBL_MAX_COLS) return 0;
+    unsigned nhead;
     const char* le2;
+    mds_align aligns[MDS_TBL_MAX_COLS];
+    unsigned nsep;
+
+    memset(aligns, 0, sizeof aligns);
+    p2 = tbl_next_line(p, end, &le1);
+    if (p2 >= end) return 0;
+    if (!tbl_find_pipe(p, le1)) return 0;
+    nhead = tbl_split_cells(p, (size_t)(le1 - p), hs, hn, MDS_TBL_MAX_COLS);
+    if (nhead < 1 || nhead > MDS_TBL_MAX_COLS) return 0;
     (void)tbl_next_line(p2, end, &le2);
-    mds_align aligns[MDS_TBL_MAX_COLS] = {0};
-    unsigned nsep = tbl_parse_separator(p2, (size_t)(le2 - p2), aligns, MDS_TBL_MAX_COLS);
+    nsep = tbl_parse_separator(p2, (size_t)(le2 - p2), aligns, MDS_TBL_MAX_COLS);
     return (nsep == nhead);
 }
 
@@ -868,46 +959,58 @@ static int tbl_peek_header(const char* p, const char* end) {
 static size_t try_emit_table(bscanner* b, const char* p, const char* end) {
     /* Read first line. */
     const char* le1;
-    const char* p2 = tbl_next_line(p, end, &le1);
+    const char* p2;
+    const char* hs[MDS_TBL_MAX_COLS];
+    size_t      hn[MDS_TBL_MAX_COLS];
+    unsigned nhead;
+    const char* le2;
+    const char* p3;
+    mds_align aligns[MDS_TBL_MAX_COLS];
+    unsigned nsep;
+    mds_block_detail d;
+    mds_align* alstore;
+    mds_block_detail hd;
+    const char* row;
+    int body_open;
+    const char* le;
+    const char* nx;
+    mds_block_detail bd;
+
+    memset(aligns, 0, sizeof aligns);
+    p2 = tbl_next_line(p, end, &le1);
     if (p2 >= end) return 0;  /* need a second line */
     /* Header must contain at least one unescaped pipe. */
     if (!tbl_find_pipe(p, le1)) return 0;
     /* Count header cells. */
-    const char* hs[MDS_TBL_MAX_COLS];
-    size_t      hn[MDS_TBL_MAX_COLS];
-    unsigned nhead = tbl_split_cells(p, (size_t)(le1 - p), hs, hn, MDS_TBL_MAX_COLS);
+    nhead = tbl_split_cells(p, (size_t)(le1 - p), hs, hn, MDS_TBL_MAX_COLS);
     if (nhead < 1 || nhead > MDS_TBL_MAX_COLS) return 0;
     /* Read separator line. */
-    const char* le2;
-    const char* p3 = tbl_next_line(p2, end, &le2);
-    mds_align aligns[MDS_TBL_MAX_COLS] = {0};
-    unsigned nsep = tbl_parse_separator(p2, (size_t)(le2 - p2), aligns, MDS_TBL_MAX_COLS);
+    p3 = tbl_next_line(p2, end, &le2);
+    nsep = tbl_parse_separator(p2, (size_t)(le2 - p2), aligns, MDS_TBL_MAX_COLS);
     if (nsep != nhead) return 0;
     /* Emit table. */
-    mds_block_detail d;
     memset(&d, 0, sizeof d);
     d.u.table.ncols = nhead;
     /* Persist aligns in arena so the renderer can see them. */
-    mds_align* alstore = (mds_align*)mds_arena_alloc(&b->ctx->arena,
-                                                     sizeof(mds_align) * nhead);
+    alstore = (mds_align*)mds_arena_alloc(&b->ctx->arena,
+                                          sizeof(mds_align) * nhead);
     memcpy(alstore, aligns, sizeof(mds_align) * nhead);
     d.u.table.aligns = alstore;
     sax_enter(b, MDS_BLK_TABLE, &d);
     /* Head. Reuse the already-split header instead of splitting again. */
-    mds_block_detail hd; memset(&hd, 0, sizeof hd);
+    memset(&hd, 0, sizeof hd);
     sax_enter(b, MDS_BLK_TABLE_HEAD, &hd);
     tbl_emit_row_pre(b, hs, hn, nhead, aligns, nhead);
     sax_leave(b, MDS_BLK_TABLE_HEAD);
     /* Body: keep consuming lines that contain at least one unescaped pipe. */
-    const char* row = p3;
-    int body_open = 0;
+    row = p3;
+    body_open = 0;
     while (row < end) {
-        const char* le;
-        const char* nx = tbl_next_line(row, end, &le);
+        nx = tbl_next_line(row, end, &le);
         if (le == row) { row = nx; break; }   /* blank */
         if (!tbl_find_pipe(row, le)) break;
         if (!body_open) {
-            mds_block_detail bd; memset(&bd, 0, sizeof bd);
+            memset(&bd, 0, sizeof bd);
             sax_enter(b, MDS_BLK_TABLE_BODY, &bd);
             body_open = 1;
         }
@@ -923,19 +1026,36 @@ static size_t try_emit_table(bscanner* b, const char* p, const char* end) {
 
 static void finalize_paragraph(bscanner* b) {
     /* Consume any leading link-reference and footnote definitions. */
-    char* p = b->para;
-    char* end = b->para + b->para_len;
-    unsigned _bf = b->ctx->flags;
+    char* p;
+    char* end;
+    unsigned _bf;
+    const char* np;
+    const char *ls, *le_, *us, *ue, *ts, *te;
+    const char *fls, *fle, *bs, *be;
+    size_t blen;
+    size_t rem;
+    char c;
+    size_t lead;
+    int sx;
+    mds_block_detail d;
+    const char* tp;
+    const char* tend;
+    const char* run;
+    const char* le;
+    const char* nx;
+    const char* re;
+    size_t consumed;
+
+    p = b->para;
+    end = b->para + b->para_len;
+    _bf = b->ctx->flags;
     while (p < end) {
-        const char* np;
-        const char *ls, *le, *us, *ue, *ts, *te;
         /* Footnote def MUST be checked before linkref, since a label
          * beginning with `^` would otherwise be eaten as a linkref. */
         if ((_bf & MDS_FLAG_FOOTNOTES)) {
-            const char *fls, *fle, *bs, *be;
             if (parse_footnote_def(p, end, &np, &fls, &fle, &bs, &be)) {
                 ensure_footnote_tab(b->ctx);
-                size_t blen = (size_t)(be - bs);
+                blen = (size_t)(be - bs);
                 while (blen > 0 && (bs[blen - 1] == '\n' || bs[blen - 1] == ' ' ||
                                      bs[blen - 1] == '\t')) blen--;
                 mds_footnote_add(b->ctx->footnotes,
@@ -946,10 +1066,10 @@ static void finalize_paragraph(bscanner* b) {
             }
         }
         if (!(_bf & MDS_FLAG_NO_REFERENCES) &&
-            parse_linkref(p, end, &np, &ls, &le, &us, &ue, &ts, &te)) {
+            parse_linkref(p, end, &np, &ls, &le_, &us, &ue, &ts, &te)) {
             ensure_linkref_tab(b->ctx);
             mds_linkref_add(b->ctx->refs,
-                            ls, (size_t)(le - ls),
+                            ls, (size_t)(le_ - ls),
                             us, (size_t)(ue - us),
                             ts ? ts : "", ts ? (size_t)(te - ts) : 0);
             p = (char*)np;
@@ -959,18 +1079,18 @@ static void finalize_paragraph(bscanner* b) {
     }
     /* Shift remaining content to the start of the buffer. */
     if (p > b->para) {
-        size_t rem = (size_t)(end - p);
+        rem = (size_t)(end - p);
         if (rem) memmove(b->para, p, rem);
         b->para_len = rem;
     }
     /* Trim trailing whitespace. */
     while (b->para_len > 0) {
-        char c = b->para[b->para_len - 1];
+        c = b->para[b->para_len - 1];
         if (c == ' ' || c == '\t' || c == '\n' || c == '\r') b->para_len--;
         else break;
     }
     /* Trim leading whitespace. */
-    size_t lead = 0;
+    lead = 0;
     while (lead < b->para_len &&
            (b->para[lead] == ' ' || b->para[lead] == '\t' || b->para[lead] == '\n'))
         lead++;
@@ -979,9 +1099,8 @@ static void finalize_paragraph(bscanner* b) {
         b->setext_level = 0;
         return;
     }
-    int sx = b->setext_level;
+    sx = b->setext_level;
     b->setext_level = 0;
-    mds_block_detail d;
     memset(&d, 0, sizeof d);
     if (sx) {
         d.u.heading.level = sx;
@@ -992,17 +1111,16 @@ static void finalize_paragraph(bscanner* b) {
                b->para_len >= 3) {
         /* Try GFM table detection: header line | separator. May appear
          * embedded — split paragraph into pre-text, table(s), post-text. */
-        const char* p   = b->para;
-        const char* end = b->para + b->para_len;
-        const char* run = p;
-        while (p < end) {
+        tp   = b->para;
+        tend = b->para + b->para_len;
+        run = tp;
+        while (tp < tend) {
             /* find current line bounds */
-            const char* le;
-            const char* nx = next_line(p, end, &le);
-            if (tbl_peek_header(p, end)) {
+            nx = next_line(tp, tend, &le);
+            if (tbl_peek_header(tp, tend)) {
                 /* flush any prior text as paragraph BEFORE emitting table */
-                if (p > run) {
-                    const char* re = p;
+                if (tp > run) {
+                    re = tp;
                     while (re > run && (re[-1] == '\n' || re[-1] == '\r' ||
                                         re[-1] == ' '  || re[-1] == '\t')) re--;
                     if (re > run) {
@@ -1011,16 +1129,16 @@ static void finalize_paragraph(bscanner* b) {
                         sax_leave(b, MDS_BLK_PARAGRAPH);
                     }
                 }
-                size_t consumed = try_emit_table(b, p, end);
-                p   = p + consumed;
-                run = p;
+                consumed = try_emit_table(b, tp, tend);
+                tp  = tp + consumed;
+                run = tp;
                 continue;
             }
             (void)le;
-            p = nx;
+            tp = nx;
         }
-        if (run < end) {
-            const char* re = end;
+        if (run < tend) {
+            re = tend;
             while (re > run && (re[-1] == '\n' || re[-1] == '\r' ||
                                 re[-1] == ' '  || re[-1] == '\t')) re--;
             if (re > run) {
@@ -1038,21 +1156,25 @@ static void finalize_paragraph(bscanner* b) {
 }
 
 static void finalize_code_indented(bscanner* b) {
+    size_t i;
+    size_t ls;
+    size_t j;
+    int blank;
+    mds_block_detail d;
     /* Strip trailing blank lines. */
     while (b->code_len > 0) {
-        size_t i = b->code_len;
+        i = b->code_len;
         /* find start of last line */
-        size_t ls = i;
+        ls = i;
         if (ls > 0) ls--;        /* skip its '\n' */
         while (ls > 0 && b->code_body[ls - 1] != '\n') ls--;
-        int blank = 1;
-        for (size_t j = ls; j + 1 < i; j++) {
+        blank = 1;
+        for (j = ls; j + 1 < i; j++) {
             if (b->code_body[j] != ' ' && b->code_body[j] != '\t') { blank = 0; break; }
         }
         if (!blank) break;
         b->code_len = ls;
     }
-    mds_block_detail d;
     memset(&d, 0, sizeof d);
     sax_enter(b, MDS_BLK_CODE_INDENTED, &d);
     if (b->code_len) sax_text(b, b->code_body, b->code_len);
@@ -1075,20 +1197,24 @@ static void finalize_code_fenced(bscanner* b) {
 }
 
 static void finalize_html(bscanner* b) {
+    size_t i;
+    size_t ls;
+    size_t j;
+    int blank;
+    mds_block_detail d;
     /* trim trailing blank lines */
     while (b->html_len > 0) {
-        size_t i = b->html_len;
-        size_t ls = i;
+        i = b->html_len;
+        ls = i;
         if (ls > 0) ls--;
         while (ls > 0 && b->html_body[ls - 1] != '\n') ls--;
-        int blank = 1;
-        for (size_t j = ls; j + 1 < i; j++) {
+        blank = 1;
+        for (j = ls; j + 1 < i; j++) {
             if (b->html_body[j] != ' ' && b->html_body[j] != '\t') { blank = 0; break; }
         }
         if (!blank) break;
         b->html_len = ls;
     }
-    mds_block_detail d;
     memset(&d, 0, sizeof d);
     sax_enter(b, MDS_BLK_HTML, &d);
     if (b->html_len) sax_raw(b, b->html_body, b->html_len);
@@ -1112,9 +1238,9 @@ static void finalize_leaf(bscanner* b) {
 
 static void emit_open(bscanner* b, int idx) {
     ctn* c = &b->stack[idx];
+    mds_block_detail d;
     if (c->opened) return;
     c->opened = 1;
-    mds_block_detail d;
     memset(&d, 0, sizeof d);
     if (c->kind == CT_QUOTE) {
         sax_enter(b, MDS_BLK_QUOTE, &d);
@@ -1150,9 +1276,10 @@ static void emit_close(bscanner* b, ctn* c) {
 }
 
 static void close_containers_to(bscanner* b, int target_depth) {
+    ctn* c;
     while (b->depth > target_depth) {
         finalize_leaf(b);
-        ctn* c = &b->stack[b->depth - 1];
+        c = &b->stack[b->depth - 1];
         emit_close(b, c);
         b->depth--;
     }
@@ -1162,9 +1289,11 @@ static void close_containers_to(bscanner* b, int target_depth) {
 
 static const char* next_line(const char* p, const char* end,
                              const char** line_end_out) {
-    const char* nl = (const char*)memchr(p, '\n', (size_t)(end - p));
+    const char* nl;
+    const char* le;
+    nl = (const char*)memchr(p, '\n', (size_t)(end - p));
     if (!nl) { *line_end_out = end; return end; }
-    const char* le = nl;
+    le = nl;
     if (le > p && *(le - 1) == '\r') le--;
     *line_end_out = le;
     return nl + 1;
@@ -1207,8 +1336,10 @@ static int is_blank(const char* p, const char* end) {
 /* ---------- HTML block recognition (CommonMark §4.6) ---------- */
 
 static int ascii_ieq(const char* a, const char* b, size_t n) {
-    for (size_t i = 0; i < n; i++) {
-        char x = a[i], y = b[i];
+    size_t i;
+    char x, y;
+    for (i = 0; i < n; i++) {
+        x = a[i]; y = b[i];
         if (x >= 'A' && x <= 'Z') x = (char)(x + 32);
         if (y >= 'A' && y <= 'Z') y = (char)(y + 32);
         if (x != y) return 0;
@@ -1247,22 +1378,31 @@ static int is_alnum(char c) {
  * Returns 1 if `[p, end)` (after the initial '<') is a complete tag
  * followed only by whitespace. */
 static int is_type7_open_tag(const char* p, const char* end) {
+    const char* name;
+    size_t nlen;
+    int i;
+    const char* aws;
+    const char* vs;
+    char q;
+    const char* uv;
     /* tag name: ASCII letter, then [A-Za-z0-9-]* */
     if (p >= end || !is_alpha(*p)) return 0;
-    const char* name = p;
+    name = p;
     p++;
     while (p < end && (is_alnum(*p) || *p == '-')) p++;
-    size_t nlen = (size_t)(p - name);
+    nlen = (size_t)(p - name);
     /* disallowed tag names for type 7 */
-    static const char* const banned[] = {"script","pre","style","textarea",NULL};
-    for (int i = 0; banned[i]; i++) {
-        size_t bl = strlen(banned[i]);
-        if (bl == nlen && ascii_ieq(name, banned[i], nlen)) return 0;
+    {
+        static const char* const banned[] = {"script","pre","style","textarea",NULL};
+        for (i = 0; banned[i]; i++) {
+            size_t bl = strlen(banned[i]);
+            if (bl == nlen && ascii_ieq(name, banned[i], nlen)) return 0;
+        }
     }
     /* attributes */
     while (p < end) {
         /* whitespace then attr-name */
-        const char* aws = p;
+        aws = p;
         while (p < end && (*p == ' ' || *p == '\t')) p++;
         if (p == aws) break;            /* must have ws before attr */
         if (p >= end || *p == '/' || *p == '>') break;
@@ -1270,19 +1410,19 @@ static int is_type7_open_tag(const char* p, const char* end) {
         p++;
         while (p < end && (is_alnum(*p) || *p == '_' || *p == ':' || *p == '.' || *p == '-')) p++;
         /* optional value */
-        const char* vs = p;
+        vs = p;
         while (p < end && (*p == ' ' || *p == '\t')) p++;
         if (p < end && *p == '=') {
             p++;
             while (p < end && (*p == ' ' || *p == '\t')) p++;
             if (p >= end) return 0;
             if (*p == '"' || *p == '\'') {
-                char q = *p++;
+                q = *p++;
                 while (p < end && *p != q) p++;
                 if (p >= end) return 0;
                 p++;
             } else {
-                const char* uv = p;
+                uv = p;
                 while (p < end && *p != ' ' && *p != '\t' && *p != '\"'
                        && *p != '\'' && *p != '=' && *p != '<' && *p != '>'
                        && *p != '`') p++;
@@ -1301,16 +1441,21 @@ static int is_type7_open_tag(const char* p, const char* end) {
 }
 
 static int is_type7_close_tag(const char* p, const char* end) {
+    const char* name;
+    size_t nlen;
+    int i;
     /* already past '</' */
     if (p >= end || !is_alpha(*p)) return 0;
-    const char* name = p;
+    name = p;
     p++;
     while (p < end && (is_alnum(*p) || *p == '-')) p++;
-    size_t nlen = (size_t)(p - name);
-    static const char* const banned[] = {"script","pre","style","textarea",NULL};
-    for (int i = 0; banned[i]; i++) {
-        size_t bl = strlen(banned[i]);
-        if (bl == nlen && ascii_ieq(name, banned[i], nlen)) return 0;
+    nlen = (size_t)(p - name);
+    {
+        static const char* const banned[] = {"script","pre","style","textarea",NULL};
+        for (i = 0; banned[i]; i++) {
+            size_t bl = strlen(banned[i]);
+            if (bl == nlen && ascii_ieq(name, banned[i], nlen)) return 0;
+        }
     }
     while (p < end && (*p == ' ' || *p == '\t')) p++;
     if (p >= end || *p != '>') return 0;
@@ -1326,9 +1471,10 @@ static int is_type7_close_tag(const char* p, const char* end) {
  * cannot interrupt). */
 static int detect_html_block_start(const char* p, const char* end, int allow_type7) {
     int lead = 0;
+    const char* q;
     while (p < end && *p == ' ' && lead < 3) { p++; lead++; }
     if (p >= end || *p != '<') return 0;
-    const char* q = p + 1;
+    q = p + 1;
     /* Type 2: <!-- */
     if (q + 2 < end && q[0] == '!' && q[1] == '-' && q[2] == '-') return 2;
     /* Type 3: <? */
@@ -1341,7 +1487,8 @@ static int detect_html_block_start(const char* p, const char* end, int allow_typ
      * followed by ws, '>' or EOL */
     {
         static const char* const t1[] = {"script","pre","style","textarea",NULL};
-        for (int i = 0; t1[i]; i++) {
+        int i;
+        for (i = 0; t1[i]; i++) {
             size_t tl = strlen(t1[i]);
             if ((size_t)(end - q) >= tl && ascii_ieq(q, t1[i], tl)) {
                 const char* a = q + tl;
@@ -1353,10 +1500,12 @@ static int detect_html_block_start(const char* p, const char* end, int allow_typ
     {
         const char* r = q;
         int closing = 0;
+        const char* name;
+        size_t nlen;
         if (r < end && *r == '/') { closing = 1; r++; }
-        const char* name = r;
+        name = r;
         while (r < end && is_alnum(*r)) r++;
-        size_t nlen = (size_t)(r - name);
+        nlen = (size_t)(r - name);
         if (nlen > 0 && is_html6_tag(name, nlen)) {
             if (r == end || *r == ' ' || *r == '\t' || *r == '>'
                 || (!closing && r + 1 <= end && *r == '/' && r + 1 < end && r[1] == '>'))
@@ -1378,38 +1527,42 @@ static int detect_html_block_start(const char* p, const char* end, int allow_typ
 
 /* Detect HTML block end for the given type, examining the whole line p..end. */
 static int detect_html_block_end(int type, const char* p, const char* end, int blank) {
+    const char* q;
     if (blank) {
         return (type == 6 || type == 7);
     }
     switch (type) {
     case 1: {
         /* line contains </script>, </pre>, </style>, or </textarea> (ci) */
-        for (const char* q = p; q < end; q++) {
+        for (q = p; q < end; q++) {
             if (*q != '<') continue;
             if (q + 1 >= end || q[1] != '/') continue;
-            const char* r = q + 2;
-            static const char* const t1[] = {"script","pre","style","textarea",NULL};
-            for (int i = 0; t1[i]; i++) {
-                size_t tl = strlen(t1[i]);
-                if ((size_t)(end - r) >= tl + 1
-                    && ascii_ieq(r, t1[i], tl) && r[tl] == '>') return 1;
+            {
+                const char* r = q + 2;
+                static const char* const t1[] = {"script","pre","style","textarea",NULL};
+                int i;
+                for (i = 0; t1[i]; i++) {
+                    size_t tl = strlen(t1[i]);
+                    if ((size_t)(end - r) >= tl + 1
+                        && ascii_ieq(r, t1[i], tl) && r[tl] == '>') return 1;
+                }
             }
         }
         return 0;
     }
     case 2:
-        for (const char* q = p; q + 2 < end; q++)
+        for (q = p; q + 2 < end; q++)
             if (q[0] == '-' && q[1] == '-' && q[2] == '>') return 1;
         return 0;
     case 3:
-        for (const char* q = p; q + 1 < end; q++)
+        for (q = p; q + 1 < end; q++)
             if (q[0] == '?' && q[1] == '>') return 1;
         return 0;
     case 4:
-        for (const char* q = p; q < end; q++) if (*q == '>') return 1;
+        for (q = p; q < end; q++) if (*q == '>') return 1;
         return 0;
     case 5:
-        for (const char* q = p; q + 2 < end; q++)
+        for (q = p; q + 2 < end; q++)
             if (q[0] == ']' && q[1] == ']' && q[2] == '>') return 1;
         return 0;
     case 6:
@@ -1423,11 +1576,12 @@ static int detect_html_block_end(int type, const char* p, const char* end, int b
 
 static int try_thematic_break(const char* p, const char* end) {
     int lead = 0;
+    char c;
+    int count = 0;
     while (p < end && *p == ' ' && lead < 3) { p++; lead++; }
     if (p >= end) return 0;
-    char c = *p;
+    c = *p;
     if (c != '-' && c != '_' && c != '*') return 0;
-    int count = 0;
     while (p < end) {
         if (*p == c) count++;
         else if (*p != ' ' && *p != '\t') return 0;
@@ -1440,17 +1594,20 @@ static int try_atx_heading(const char* p, const char* end,
                            int* level_out,
                            const char** body_start, const char** body_end) {
     int lead = 0;
-    while (p < end && *p == ' ' && lead < 3) { p++; lead++; }
     int n = 0;
+    const char* bs;
+    const char* be;
+    const char* trim;
+    while (p < end && *p == ' ' && lead < 3) { p++; lead++; }
     while (p < end && *p == '#' && n < 7) { p++; n++; }
     if (n == 0 || n > 6) return 0;
     if (p < end && *p != ' ' && *p != '\t') return 0;
     while (p < end && (*p == ' ' || *p == '\t')) p++;
-    const char* bs = p;
-    const char* be = end;
+    bs = p;
+    be = end;
     while (be > bs && (be[-1] == ' ' || be[-1] == '\t')) be--;
     /* optional trailing #s */
-    const char* trim = be;
+    trim = be;
     while (trim > bs && trim[-1] == '#') trim--;
     if (trim < be && (trim == bs || trim[-1] == ' ' || trim[-1] == '\t')) {
         be = trim;
@@ -1466,19 +1623,23 @@ static int try_fence_open(const char* p, const char* end,
                           int* indent_out, char* ch_out, int* len_out,
                           const char** info_start, const char** info_end) {
     int lead = 0;
+    char ch;
+    int n = 0;
+    const char* is;
+    const char* ie;
+    const char* q;
     while (p < end && *p == ' ' && lead < 3) { p++; lead++; }
     if (p >= end) return 0;
-    char ch = *p;
+    ch = *p;
     if (ch != '`' && ch != '~') return 0;
-    int n = 0;
     while (p < end && *p == ch) { p++; n++; }
     if (n < 3) return 0;
     while (p < end && (*p == ' ' || *p == '\t')) p++;
-    const char* is = p;
-    const char* ie = end;
+    is = p;
+    ie = end;
     while (ie > is && (ie[-1] == ' ' || ie[-1] == '\t')) ie--;
     if (ch == '`') {
-        for (const char* q = is; q < ie; q++) if (*q == '`') return 0;
+        for (q = is; q < ie; q++) if (*q == '`') return 0;
     }
     *indent_out = lead;
     *ch_out     = ch;
@@ -1490,8 +1651,8 @@ static int try_fence_open(const char* p, const char* end,
 
 static int is_fence_close(const char* p, const char* end, char ch, int min_len) {
     int lead = 0;
-    while (p < end && *p == ' ' && lead < 3) { p++; lead++; }
     int n = 0;
+    while (p < end && *p == ' ' && lead < 3) { p++; lead++; }
     while (p < end && *p == ch) { p++; n++; }
     if (n < min_len) return 0;
     while (p < end) {
@@ -1517,11 +1678,15 @@ static int try_open_list_item(const char** p_inout, const char* end,
                               int* content_col, int* is_empty) {
     const char* p = *p_inout;
     int col = 0, lead = 0;
+    int mc;
+    char m;
+    int ord = 0, st = 1, marker_len = 0;
+    int spaces_after = 0;
+    int empty;
     while (p < end && *p == ' ' && lead < 3) { p++; col++; lead++; }
     if (p >= end) return 0;
-    int mc = col;
-    char m = *p;
-    int ord = 0, st = 1, marker_len = 0;
+    mc = col;
+    m = *p;
     if (m == '-' || m == '+' || m == '*') {
         marker_len = 1;
         p++; col++;
@@ -1543,8 +1708,7 @@ static int try_open_list_item(const char** p_inout, const char* end,
     } else {
         return 0;
     }
-    int spaces_after = 0;
-    int empty = (p >= end);
+    empty = (p >= end);
     if (!empty) {
         if (*p == ' ') {
             while (p < end && spaces_after < 5 && *p == ' ') { p++; spaces_after++; col++; }
@@ -1580,11 +1744,12 @@ static int try_open_list_item(const char** p_inout, const char* end,
  * '-' (level 2), optional trailing spaces, end of line. Returns 1 or 2. */
 static int try_setext_underline(const char* p, const char* end) {
     int lead = 0;
+    char c;
+    int n = 0;
     while (p < end && *p == ' ' && lead < 3) { p++; lead++; }
     if (p >= end) return 0;
-    char c = *p;
+    c = *p;
     if (c != '=' && c != '-') return 0;
-    int n = 0;
     while (p < end && *p == c) { p++; n++; }
     while (p < end && (*p == ' ' || *p == '\t')) p++;
     if (p != end || n < 1) return 0;
@@ -1597,6 +1762,9 @@ static void scan_line(bscanner* b, const char* line, const char* line_end);
 
 MDS_HOT void mds_block_scan(mds_ctx* ctx) {
     bscanner b;
+    mds_block_scratch* sc;
+    const char* p;
+    const char* end;
     memset(&b, 0, sizeof b);
     b.ctx = ctx;
 
@@ -1604,7 +1772,7 @@ MDS_HOT void mds_block_scan(mds_ctx* ctx) {
      * we skip the per-parse malloc/free for para/code/html/ev/bytepool.
      * Lengths are reset to zero; capacities and pointers are taken
      * verbatim and written back at end-of-scan. */
-    mds_block_scratch* sc = (mds_block_scratch*)ctx->scratch;
+    sc = (mds_block_scratch*)ctx->scratch;
     if (sc) {
         b.para      = sc->para;       b.para_cap = sc->para_cap;
         b.code_body = sc->code_body;  b.code_cap = sc->code_cap;
@@ -1625,8 +1793,8 @@ MDS_HOT void mds_block_scan(mds_ctx* ctx) {
         preprocess_footnotes(ctx);
     }
 
-    const char* p   = ctx->input;
-    const char* end = ctx->input + ctx->len;
+    p   = ctx->input;
+    end = ctx->input + ctx->len;
     while (p < end) {
         const char* le;
         const char* nxt = next_line(p, end, &le);
@@ -1677,10 +1845,13 @@ MDS_HOT void mds_block_scan(mds_ctx* ctx) {
                 break;
             }
             if (saw_tab) {
-                size_t need = (size_t)(ws_end - p) * 4 + (size_t)(le - ws_end) + 8;
+                size_t need;
+                char* dst;
+                int col;
+                need = (size_t)(ws_end - p) * 4 + (size_t)(le - ws_end) + 8;
                 buf_grow(&b.line_scratch, &b.line_scratch_cap, need);
-                char* dst = b.line_scratch;
-                int col = 0;
+                dst = b.line_scratch;
+                col = 0;
                 for (const char* s = p; s < ws_end; s++) {
                     if (*s == '\t') {
                         int adv = 4 - (col & 3);
@@ -1730,10 +1901,11 @@ MDS_HOT void mds_block_scan(mds_ctx* ctx) {
                 memset(&d, 0, sizeof d);
                 cb.enter_block(ud, MDS_BLK_FOOTNOTES_SECTION, &d);
                 for (size_t k = 0; k < emit_n; k++) {
-                    mds_render_html_used_footnote(ud, k, &lbl, &llen);
-                    const mds_footnote* fn = mds_footnote_get(ctx->footnotes, lbl, llen);
-                    if (!fn) continue;
+                    const mds_footnote* fn;
                     mds_block_detail fd;
+                    mds_render_html_used_footnote(ud, k, &lbl, &llen);
+                    fn = mds_footnote_get(ctx->footnotes, lbl, llen);
+                    if (!fn) continue;
                     memset(&fd, 0, sizeof fd);
                     fd.u.footnote_def.label     = fn->label;
                     fd.u.footnote_def.label_len = fn->llen;
@@ -1787,11 +1959,27 @@ void mds_block_scratch_free(mds_block_scratch* s) {
 MDS_HOT static void scan_line(bscanner* b, const char* line, const char* line_end) {
     const char* p = line;
     int blank = is_blank(p, line_end);
+    int matched;
+    int i;
+    int lazy;
+    int level;
+    const char* bs;
+    const char* be;
+    int findent;
+    char fch;
+    int flen;
+    const char* ifs;
+    const char* ife;
+    const char* tp;
+    int lead;
 
     /* If inside fenced code, only check for close OR continue accumulating. */
     if (b->leaf == LF_CODE_FENCED) {
+        const char* cp;
+        int strip;
+        size_t add;
         /* still need to walk containers to count matched (for nested fenced code) */
-        for (int i = 1; i < b->depth; i++) {
+        for (i = 1; i < b->depth; i++) {
             ctn* c = &b->stack[i];
             if (c->kind == CT_QUOTE) {
                 if (!try_open_quote(&p, line_end)) {
@@ -1814,10 +2002,10 @@ MDS_HOT static void scan_line(bscanner* b, const char* line, const char* line_en
             finalize_leaf(b);
             return;
         }
-        const char* cp = p;
-        int strip = b->fence_indent;
+        cp = p;
+        strip = b->fence_indent;
         while (cp < line_end && strip > 0 && *cp == ' ') { cp++; strip--; }
-        size_t add = (size_t)(line_end - cp);
+        add = (size_t)(line_end - cp);
         buf_grow(&b->code_body, &b->code_cap, b->code_len + add + 2);
         if (add) memcpy(b->code_body + b->code_len, cp, add);
         b->code_len += add;
@@ -1828,7 +2016,8 @@ MDS_HOT static void scan_line(bscanner* b, const char* line, const char* line_en
     /* If inside an HTML block, walk containers then either close (on end
      * condition) or append the raw line. */
     if (b->leaf == LF_HTML) {
-        for (int i = 1; i < b->depth; i++) {
+        size_t add;
+        for (i = 1; i < b->depth; i++) {
             ctn* c = &b->stack[i];
             if (c->kind == CT_QUOTE) {
                 if (!try_open_quote(&p, line_end)) {
@@ -1850,7 +2039,7 @@ MDS_HOT static void scan_line(bscanner* b, const char* line, const char* line_en
             finalize_leaf(b);
             return;
         }
-        size_t add = (size_t)(line_end - p);
+        add = (size_t)(line_end - p);
         buf_grow(&b->html_body, &b->html_cap, b->html_len + add + 2);
         if (add) memcpy(b->html_body + b->html_len, p, add);
         b->html_len += add;
@@ -1864,8 +2053,8 @@ regular:
     ;  /* empty statement so the following declaration is legal C89/C99 */
 
     /* ---- 1. WALK ---- */
-    int matched = 1;
-    for (int i = 1; i < b->depth; i++) {
+    matched = 1;
+    for (i = 1; i < b->depth; i++) {
         ctn* c = &b->stack[i];
         if (c->kind == CT_QUOTE) {
             if (try_open_quote(&p, line_end)) { matched = i + 1; }
@@ -1907,13 +2096,14 @@ regular:
         if (b->leaf == LF_CODE_INDENTED) {
             int col = count_indent(p, line_end);
             if (col >= 4) {
+                size_t add;
                 while (b->pending_blanks > 0) {
                     buf_grow(&b->code_body, &b->code_cap, b->code_len + 2);
                     b->code_body[b->code_len++] = '\n';
                     b->pending_blanks--;
                 }
                 consume_indent(&p, line_end, 4);
-                size_t add = (size_t)(line_end - p);
+                add = (size_t)(line_end - p);
                 buf_grow(&b->code_body, &b->code_cap, b->code_len + add + 2);
                 if (add) memcpy(b->code_body + b->code_len, p, add);
                 b->code_len += add;
@@ -1984,7 +2174,7 @@ regular:
     }
 
     /* ---- lazy continuation check ---- */
-    int lazy = 0;
+    lazy = 0;
     if (matched < b->depth && b->leaf == LF_PARAGRAPH) {
         /* If line doesn't open something new on its own AND existing leaf is
          * paragraph, treat as continuation in original container. */
@@ -2000,8 +2190,9 @@ regular:
         else if (!(_f & MDS_FLAG_NO_FENCED_CODE) && try_fence_open(p, line_end, &fi, &fc, &fl, &ifs, &ife)) ;
         else if (!(_f & MDS_FLAG_NO_HTML) && detect_html_block_start(p, line_end, 0)) ;
         else if (!(_f & MDS_FLAG_NO_QUOTES) && try_open_quote(&tp, line_end)) ;
-        else { tp = p;
-               int _both_lists = (_f & MDS_FLAG_NO_ORDERED_LISTS) && (_f & MDS_FLAG_NO_UNORDERED_LISTS);
+        else { int _both_lists;
+               tp = p;
+               _both_lists = (_f & MDS_FLAG_NO_ORDERED_LISTS) && (_f & MDS_FLAG_NO_UNORDERED_LISTS);
                if (!_both_lists && try_open_list_item(&tp, line_end, &ord, &st, &mk, &cc, &em)) {
                    if ((ord && (_f & MDS_FLAG_NO_ORDERED_LISTS)) ||
                        (!ord && (_f & MDS_FLAG_NO_UNORDERED_LISTS))) lazy = 1;
@@ -2048,7 +2239,7 @@ regular:
      * still alive after the walk + post-list-close above. Lists that just
      * closed lose their pending blank silently (a trailing blank doesn't
      * make a closed list loose). */
-    for (int i = 0; i < b->depth; i++) {
+    for (i = 0; i < b->depth; i++) {
         if (b->stack[i].kind == CT_LIST && b->stack[i].pending_blank) {
             b->stack[i].had_blank_inside = 1;
             b->stack[i].pending_blank = 0;
@@ -2062,6 +2253,7 @@ regular:
         int col = count_indent(p, line_end);
         if (col >= 4 && b->leaf != LF_PARAGRAPH &&
             !(b->ctx->flags & MDS_FLAG_NO_INDENTED_CODE)) {
+            size_t add;
             /* This is an indented-code line. */
             consume_indent(&p, line_end, 4);
             if (b->leaf != LF_CODE_INDENTED) {
@@ -2077,7 +2269,7 @@ regular:
                     b->pending_blanks--;
                 }
             }
-            size_t add = (size_t)(line_end - p);
+            add = (size_t)(line_end - p);
             buf_grow(&b->code_body, &b->code_cap, b->code_len + add + 2);
             if (add) memcpy(b->code_body + b->code_len, p, add);
             b->code_len += add;
@@ -2129,17 +2321,26 @@ regular:
 
     /* ---- 2. OPEN ---- */
     for (;;) {
-        const char* before = p;
-        unsigned _of = b->ctx->flags;
+        const char* before;
+        unsigned _of;
+        int ord, st, cc, em; char mk;
+        const char* save;
+        int _both_lists2;
+        ctn* t;
+        int nested_inside_item;
+        int same_list;
+        ctn* lc;
+        ctn* it;
+        before = p;
+        _of = b->ctx->flags;
         if (!(_of & MDS_FLAG_NO_QUOTES) && try_open_quote(&p, line_end)) {
             finalize_leaf(b);
             if (!push(b, CT_QUOTE)) { p = before; break; }
             emit_open(b, b->depth - 1);
             continue;
         }
-        int ord, st, cc, em; char mk;
-        const char* save = p;
-        int _both_lists2 = (_of & MDS_FLAG_NO_ORDERED_LISTS) && (_of & MDS_FLAG_NO_UNORDERED_LISTS);
+        save = p;
+        _both_lists2 = (_of & MDS_FLAG_NO_ORDERED_LISTS) && (_of & MDS_FLAG_NO_UNORDERED_LISTS);
         /* CommonMark §4.1: thematic break wins over a list-item interpretation. */
         if (!(_of & MDS_FLAG_NO_THEMATIC_BREAK) &&
             try_thematic_break(p, line_end)) {
@@ -2156,14 +2357,14 @@ regular:
                 break;
             }
             finalize_leaf(b);
-            ctn* t = (b->depth > 0) ? top(b) : NULL;
-            int nested_inside_item = (t && t->kind == CT_LIST_ITEM);
-            int same_list = (t && t->kind == CT_LIST
+            t = (b->depth > 0) ? top(b) : NULL;
+            nested_inside_item = (t && t->kind == CT_LIST_ITEM);
+            same_list = (t && t->kind == CT_LIST
                              && t->ordered == ord && t->marker == mk);
             if (nested_inside_item) {
                 /* Start a fresh nested list inside the current item. */
                 if (!push(b, CT_LIST)) { p = save; break; }
-                ctn* lc = top(b);
+                lc = top(b);
                 lc->ordered = ord;
                 lc->start   = st;
                 lc->marker  = mk;
@@ -2183,7 +2384,7 @@ regular:
                     b->depth--;
                 }
                 if (!push(b, CT_LIST)) { p = save; break; }
-                ctn* lc = top(b);
+                lc = top(b);
                 lc->ordered = ord;
                 lc->start   = st;
                 lc->marker  = mk;
@@ -2191,7 +2392,7 @@ regular:
                 emit_open(b, b->depth - 1);
             }
             if (!push(b, CT_LIST_ITEM)) break;
-            ctn* it = top(b);
+            it = top(b);
             it->content_col = cc;
             it->is_empty    = em;
             it->blank_after_empty = 0;
@@ -2211,12 +2412,13 @@ regular:
         !(b->ctx->flags & MDS_FLAG_NO_INDENTED_CODE)) {
         int col2 = count_indent(p, line_end);
         if (col2 >= 4) {
+            size_t add;
             consume_indent(&p, line_end, 4);
             finalize_leaf(b);
             b->leaf = LF_CODE_INDENTED;
             b->leaf_in_container = b->depth - 1;
             b->pending_blanks = 0;
-            size_t add = (size_t)(line_end - p);
+            add = (size_t)(line_end - p);
             buf_grow(&b->code_body, &b->code_cap, b->code_len + add + 2);
             if (add) memcpy(b->code_body + b->code_len, p, add);
             b->code_len += add;
@@ -2224,21 +2426,18 @@ regular:
             return;
         }
     }
-    int level;
-    const char* bs; const char* be;
-    int findent; char fch; int flen;
-    const char* ifs; const char* ife;
     /* HTML block start — types 1..6 can interrupt a paragraph; type 7 cannot. */
     if (!(b->ctx->flags & MDS_FLAG_NO_HTML)) {
         int allow7 = (b->leaf != LF_PARAGRAPH);
         int htype  = detect_html_block_start(p, line_end, allow7);
         if (htype) {
+            size_t add;
             finalize_leaf(b);
             b->leaf = LF_HTML;
             b->leaf_in_container = b->depth - 1;
             b->html_type = htype;
             b->html_len = 0;
-            size_t add = (size_t)(line_end - p);
+            add = (size_t)(line_end - p);
             buf_grow(&b->html_body, &b->html_cap, b->html_len + add + 2);
             if (add) memcpy(b->html_body + b->html_len, p, add);
             b->html_len += add;
@@ -2251,8 +2450,8 @@ regular:
     }
     if (!(b->ctx->flags & MDS_FLAG_NO_HEADINGS) &&
         try_atx_heading(p, line_end, &level, &bs, &be)) {
-        finalize_leaf(b);
         mds_block_detail d;
+        finalize_leaf(b);
         memset(&d, 0, sizeof d);
         d.u.heading.level = level;
         sax_enter(b, MDS_BLK_HEADING, &d);
@@ -2262,6 +2461,7 @@ regular:
     }
     if (!(b->ctx->flags & MDS_FLAG_NO_THEMATIC_BREAK) &&
         try_thematic_break(p, line_end)) {
+        mds_block_detail d;
         finalize_leaf(b);
         /* CommonMark §4.1: a thematic break closes any enclosing list
          * whose item context has already been closed (top-of-stack is
@@ -2272,7 +2472,6 @@ regular:
             emit_close(b, top(b));
             b->depth--;
         }
-        mds_block_detail d;
         memset(&d, 0, sizeof d);
         sax_enter(b, MDS_BLK_THEMATIC_BREAK, &d);
         sax_leave(b, MDS_BLK_THEMATIC_BREAK);
@@ -2280,17 +2479,19 @@ regular:
     }
     if (!(b->ctx->flags & MDS_FLAG_NO_FENCED_CODE) &&
         try_fence_open(p, line_end, &findent, &fch, &flen, &ifs, &ife)) {
+        size_t iln;
         finalize_leaf(b);
         b->leaf = LF_CODE_FENCED;
         b->leaf_in_container = b->depth - 1;
         b->fence_char   = fch;
         b->fence_len    = flen;
         b->fence_indent = findent;
-        size_t iln = (size_t)(ife - ifs);
+        iln = (size_t)(ife - ifs);
         if (iln) {
+            size_t w;
             /* CommonMark: backslash-escape ASCII punctuation in info string. */
             b->fence_info = (char*)mds_arena_alloc(&b->ctx->arena, iln + 1);
-            size_t w = 0;
+            w = 0;
             for (size_t r = 0; r < iln; r++) {
                 unsigned char ch = (unsigned char)ifs[r];
                 if (ch == '\\' && r + 1 < iln) {
@@ -2320,8 +2521,8 @@ regular:
         b->leaf = LF_PARAGRAPH;
         b->leaf_in_container = b->depth - 1;
     }
-    const char* tp = p;
-    int lead = 0;
+    tp = p;
+    lead = 0;
     while (tp < line_end && *tp == ' ' && lead < 3) { tp++; lead++; }
     if (b->para_len > 0) {
         buf_grow(&b->para, &b->para_cap, b->para_len + 2);

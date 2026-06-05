@@ -29,6 +29,26 @@ sub rand_bytes {
                    _esc($set[$i]), $i));
     }
 }
+
+# Regression: the active backend (AVX2/SSE2/NEON) must classify EVERY
+# structural byte the scalar reference does — including those whose
+# LUT product is 0x80. _mm_cmpgt_epi8 / _mm256_cmpgt_epi8 perform a
+# SIGNED comparison, so a naive cmpgt(m, 0) misses bytes whose LUT
+# product is 0x80 (notably '|' = 0x7C and '~' = 0x7E, which both map
+# to hi_tbl[7] = 0x80). Spell those bytes out so this can't regress.
+{
+    my @set = ("\t","\n","\r"," ","!","\"","#","&","(",")",
+               "*","+","-",".",":","<","=",">","[","\\",
+               "]","_","`","|","~");
+    my $s = join '', @set;
+    my $bm = Markdown::Simple::_classify_structural($s);
+    for my $i (0 .. $#set) {
+        my $byte = ord substr $bm, $i >> 3, 1;
+        ok($byte & (1 << ($i & 7)),
+           sprintf("active backend: structural byte %s (idx %d) classified",
+                   _esc($set[$i]), $i));
+    }
+}
 {
     my $s = "abcdefghijklmnopqrstuvwxyz0123456789";
     my $bm = Markdown::Simple::_classify_structural_scalar($s);

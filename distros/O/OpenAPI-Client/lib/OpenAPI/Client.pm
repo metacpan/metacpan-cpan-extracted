@@ -9,7 +9,7 @@ use Scalar::Util qw(blessed);
 
 use constant DEBUG => $ENV{OPENAPI_CLIENT_DEBUG} || 0;
 
-our $VERSION = '1.08';
+our $VERSION = '1.09';
 
 has base_url => sub {
   my $self      = shift;
@@ -170,6 +170,22 @@ sub _build_tx {
       },
       query => sub {
         my ($name, $param) = @_;
+
+        # An undefined name means JSON::Validator wants the whole parameter
+        # hash so it can reassemble an exploded object parameter (style
+        # "deepObject", or "form" with explode). The matching keys are passed
+        # through to the query string as-is, while the complete hash is handed
+        # back for validation. See
+        # JSON::Validator::Schema::OpenAPIv3::_get_parameter_value.
+        unless (defined $name) {
+          my @keys
+            = +($param->{style} // '') eq 'deepObject'
+            ? grep {/^\Q$param->{name}\E\[/} keys %$params
+            : grep { exists $params->{$_} } keys %{$param->{schema}{properties} || {}};
+          $url->query->param($_ => $params->{$_}) for sort @keys;
+          return {exists => @keys ? 1 : 0, value => {%$params}};
+        }
+
         my $value = _param_as_array($name => $params);
         $url->query->param($name => _coerce_collection_format($value, $param));
         return {exists => !!@$value, value => $value};

@@ -1,36 +1,45 @@
 use strict; use warnings;
 use Test::More;
+use Config;
 use JSON::YY ':doc';
 
 # Regression: jfind compares integer fields as 64-bit integers, not doubles,
 # so values above 2^53 don't collide via floating-point rounding.
 # NB: the Doc keywords are list operators — call them without parentheses.
 
-# 2^53 vs 2^53+1 (indistinguishable as doubles)
-{
-    my $doc = jdoc '[{"id":9007199254740992,"n":"lo"},{"id":9007199254740993,"n":"hi"}]';
-    my $lo = jfind $doc, "", "/id", 9007199254740992;
-    my $hi = jfind $doc, "", "/id", 9007199254740993;
-    my $lon = jgetp $lo, "/n";
-    my $hin = jgetp $hi, "/n";
-    is $lon, "lo", 'jfind matches exact 2^53';
-    is $hin, "hi", 'jfind matches exact 2^53+1 (no double collision)';
-}
+# The next three blocks rely on 64-bit-integer match values. On perls built
+# with a 32-bit IV (ivsize < 8) these literals can't survive as integers --
+# Perl downgrades them to NVs, so the very collisions this guards against are
+# unavoidable. Skip there; the precision guarantee is a 64-bit-IV contract.
+SKIP: {
+    skip "64-bit integer matching requires ivsize >= 8", 5 if $Config{ivsize} < 8;
 
-# unsigned 64-bit beyond 2^63
-{
-    my $doc = jdoc '[{"id":18446744073709551610},{"id":18446744073709551615}]';
-    my $hit  = jfind $doc, "", "/id", 18446744073709551615;
-    my $miss = jfind $doc, "", "/id", 18446744073709551611;
-    ok  defined $hit,  'jfind matches UINT64_MAX';
-    ok !defined $miss, 'jfind does not match a near-miss uint64 (would collide as double)';
-}
+    # 2^53 vs 2^53+1 (indistinguishable as doubles)
+    {
+        my $doc = jdoc '[{"id":9007199254740992,"n":"lo"},{"id":9007199254740993,"n":"hi"}]';
+        my $lo = jfind $doc, "", "/id", 9007199254740992;
+        my $hi = jfind $doc, "", "/id", 9007199254740993;
+        my $lon = jgetp $lo, "/n";
+        my $hin = jgetp $hi, "/n";
+        is $lon, "lo", 'jfind matches exact 2^53';
+        is $hin, "hi", 'jfind matches exact 2^53+1 (no double collision)';
+    }
 
-# negative sint beyond -2^53
-{
-    my $doc = jdoc '[{"v":-5},{"v":-9007199254740993}]';
-    my $hit = jfind $doc, "", "/v", -9007199254740993;
-    ok defined $hit, 'jfind matches large negative integer';
+    # unsigned 64-bit beyond 2^63
+    {
+        my $doc = jdoc '[{"id":18446744073709551610},{"id":18446744073709551615}]';
+        my $hit  = jfind $doc, "", "/id", 18446744073709551615;
+        my $miss = jfind $doc, "", "/id", 18446744073709551611;
+        ok  defined $hit,  'jfind matches UINT64_MAX';
+        ok !defined $miss, 'jfind does not match a near-miss uint64 (would collide as double)';
+    }
+
+    # negative sint beyond -2^53
+    {
+        my $doc = jdoc '[{"v":-5},{"v":-9007199254740993}]';
+        my $hit = jfind $doc, "", "/v", -9007199254740993;
+        ok defined $hit, 'jfind matches large negative integer';
+    }
 }
 
 # real-valued fields still compared as doubles

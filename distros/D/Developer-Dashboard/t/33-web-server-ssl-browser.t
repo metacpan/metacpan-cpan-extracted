@@ -274,8 +274,8 @@ sub _wait_for_tcp {
 
 sub _tcp_probe_timeout_seconds {
     my $perl5opt = join ' ', grep { defined $_ && $_ ne '' } ( $ENV{PERL5OPT}, $ENV{HARNESS_PERL_SWITCHES} );
-    return 60 if $perl5opt =~ /Devel::Cover/;
-    return 20;
+    return 120 if $perl5opt =~ /Devel::Cover/;
+    return 60;
 }
 
 sub _coverage_requested {

@@ -1,7 +1,7 @@
 # ABSTRACT: Show board summary
 
 package App::karr::Cmd::Board;
-our $VERSION = '0.300';
+our $VERSION = '0.301';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
@@ -17,19 +17,19 @@ with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output';
 
 
 my %STATUS_STYLE = (
-  backlog       => 'bold black on_white',
-  todo          => 'bold black on_cyan',
-  'in-progress' => 'bold black on_yellow',
-  review        => 'bold black on_white',
-  done          => 'bold black on_green',
-  archived      => 'bold white on_black',
+  backlog       => 'black on_bright_white',
+  todo          => 'black on_cyan',
+  'in-progress' => 'black on_yellow',
+  review        => 'black on_bright_white',
+  done          => 'black on_green',
+  archived      => 'white on_black',
 );
 
 my %PRIORITY_COLOR = (
   critical => 'bold red',
   high     => 'red',
   medium   => 'yellow',
-  low      => 'bright_black',
+  low      => 'black',
 );
 
 sub execute {
@@ -75,7 +75,7 @@ sub execute {
   }
 
   my $board_name = $ec->{board}{name} // 'Kanban Board';
-  my $title = colored(" $board_name ", 'bold white on_black');
+  my $title = colored(" $board_name ", 'bold cyan on_black');
   print "\n $title\n\n";
 
   # Skip empty archived unless it has tasks
@@ -87,7 +87,7 @@ sub execute {
   for my $status (@display_statuses) {
     my $tasks = $by_status{$status} // [];
     my $count = scalar @$tasks;
-    my $style = $STATUS_STYLE{$status} // 'bold white on_black';
+    my $style = $STATUS_STYLE{$status} // 'white on_black';
 
     my $header = uc($status);
     printf " %s %s\n", colored(" $header ", $style), "[$count]";
@@ -102,7 +102,7 @@ sub execute {
         my $title = $t->title;
 
         my @badges;
-        if ($t->has_claimed_by) {
+        if ($t->has_claimed_by && $t->status ne 'done' && $t->status ne 'archived') {
           push @badges, colored('@' . $t->claimed_by, 'cyan');
         }
         if ($t->has_blocked) {
@@ -122,7 +122,7 @@ sub execute {
 
   # Summary line
   my $blocked = grep { $_->has_blocked } @tasks;
-  my $claimed = grep { $_->has_claimed_by } @tasks;
+  my $claimed = grep { $_->has_claimed_by && $_->status ne 'done' && $_->status ne 'archived' } @tasks;
   my @summary;
   push @summary, colored(scalar(@tasks) . ' tasks', 'bold');
   push @summary, colored("$claimed claimed", 'cyan') if $claimed;
@@ -144,7 +144,7 @@ App::karr::Cmd::Board - Show board summary
 
 =head1 VERSION
 
-version 0.300
+version 0.301
 
 =head1 SYNOPSIS
 

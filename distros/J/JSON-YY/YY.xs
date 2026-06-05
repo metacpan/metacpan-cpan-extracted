@@ -3,6 +3,19 @@
 #include "perl.h"
 #include "XSUB.h"
 
+/* Under PERL_IMPLICIT_SYS (Windows/Strawberry Perl) perl.h remaps the libc
+   allocator names to function-like PerlMem_* macros. yyjson's allocator
+   struct has members literally named malloc/realloc/free, and yyjson.h's
+   inline code calls them as `alc.free(ctx, ptr)` -- the macro then sees two
+   args and the build dies ("PerlMem_free passed 2 arguments"). Restore the
+   real libc names before including yyjson; the bundled yyjson uses the libc
+   allocator and yyjson_free_buf() below releases its buffers with libc free(),
+   so the names must agree. */
+#undef malloc
+#undef realloc
+#undef calloc
+#undef free
+
 #include "yyjson.h"
 #include "XSParseKeyword.h"
 
@@ -89,6 +102,37 @@ static MGVTBL mut_docholder_vtbl = {
    is released even if the newSVpvn that copies it croaks on OOM. Used via
    ENTER/SAVEDESTRUCTOR_X(...)/LEAVE around the copy. */
 static void yyjson_free_buf(pTHX_ void *p) { free(p); }
+
+/* yyjson parses integers as 64-bit. On 32-bit-IV perls a straight cast to
+   IV/UV truncates, so fall back to an NV when the value doesn't fit. The #if
+   compiles this out on 64-bit-IV builds (the common case). */
+static inline SV * sv_from_u64(pTHX_ uint64_t u) {
+#if UVSIZE < 8
+    if (u > (uint64_t)UV_MAX) return newSVnv((NV)u);
+#endif
+    return newSVuv((UV)u);
+}
+static inline SV * sv_from_i64(pTHX_ int64_t i) {
+#if IVSIZE < 8
+    if (i < (int64_t)IV_MIN || i > (int64_t)IV_MAX) return newSVnv((NV)i);
+#endif
+    return newSViv((IV)i);
+}
+
+/* Decode a yyjson number (UINT/SINT/REAL) to a fresh SV via the width-safe int
+   helpers above. Two variants for immutable and mutable yyjson values. */
+static inline SV * yyjson_num_to_sv(pTHX_ yyjson_val *val) {
+    yyjson_subtype st = yyjson_get_subtype(val);
+    if (st == YYJSON_SUBTYPE_UINT) return sv_from_u64(aTHX_ yyjson_get_uint(val));
+    if (st == YYJSON_SUBTYPE_SINT) return sv_from_i64(aTHX_ yyjson_get_sint(val));
+    return newSVnv(yyjson_get_real(val));
+}
+static inline SV * yyjson_mut_num_to_sv(pTHX_ yyjson_mut_val *val) {
+    yyjson_subtype st = yyjson_mut_get_subtype(val);
+    if (st == YYJSON_SUBTYPE_UINT) return sv_from_u64(aTHX_ yyjson_mut_get_uint(val));
+    if (st == YYJSON_SUBTYPE_SINT) return sv_from_i64(aTHX_ yyjson_mut_get_sint(val));
+    return newSVnv(yyjson_mut_get_real(val));
+}
 
 static SV * yyjson_val_to_sv(pTHX_ yyjson_val *val);
 static SV * yyjson_val_to_sv_ro(pTHX_ yyjson_val *val, SV *doc_sv);
@@ -229,6 +273,34 @@ static OP * pp_jgetp_impl(pTHX) {
     RETURN;
 }
 
+/* Place new_val at path within Doc d. The path is resolved from d->root, so on
+   a borrowed subtree Doc (from jget) it stays subtree-relative; for a
+   non-borrowed Doc d->root is the doc root. An empty path replaces the root
+   (forbidden on a borrowed Doc). Tries set first, then add (for "/-" array
+   append). Croaks "<op>: ..." on failure. Shared by jset and jraw. */
+static void
+doc_set_at_path(pTHX_ json_yy_doc_t *d, const char *path, STRLEN path_len,
+                yyjson_mut_val *new_val, const char *op) {
+    if (path_len == 0) {
+        if (d->owner)
+            croak("%s: cannot replace root of a borrowed Doc; jclone it first", op);
+        yyjson_mut_doc_set_root(d->doc, new_val);
+        d->root = new_val;
+        return;
+    }
+    yyjson_ptr_err perr;
+    bool ok = yyjson_mut_ptr_setx(d->root, path, path_len, new_val,
+                                   d->doc, true, NULL, &perr);
+    if (!ok) {
+        perr = (yyjson_ptr_err){0};
+        ok = yyjson_mut_ptr_addx(d->root, path, path_len, new_val,
+                                  d->doc, true, NULL, &perr);
+    }
+    if (!ok)
+        croak("%s: failed to set path %.*s: %s", op,
+              (int)path_len, path, perr.msg ? perr.msg : "unknown error");
+}
+
 /* pp_jset: set value at path */
 static OP * pp_jset_impl(pTHX) {
     dSP;
@@ -255,30 +327,7 @@ static OP * pp_jset_impl(pTHX) {
         new_val = sv_to_yyjson_val(aTHX_ d->doc, value_sv, &self_stack, 0);
     }
 
-    if (path_len == 0) {
-        if (d->owner)
-            croak("jset: cannot replace root of a borrowed Doc; jclone it first");
-        yyjson_mut_doc_set_root(d->doc, new_val);
-        d->root = new_val;
-    } else {
-        yyjson_ptr_err perr;
-        /* Resolve from d->root, not the document root: on a borrowed subtree
-           Doc (from jget) this keeps jset subtree-relative, matching jget/
-           jgetp reads. For a non-borrowed Doc d->root IS the doc root, so this
-           is identical to the doc-based call. */
-        /* try set first; if path ends with /- (array append), use add instead */
-        bool ok = yyjson_mut_ptr_setx(d->root, path, path_len, new_val,
-                                       d->doc, true, NULL, &perr);
-        if (!ok) {
-            /* retry with add (handles /- array append) */
-            perr = (yyjson_ptr_err){0};
-            ok = yyjson_mut_ptr_addx(d->root, path, path_len, new_val,
-                                      d->doc, true, NULL, &perr);
-        }
-        if (!ok)
-            croak("jset: failed to set path %.*s: %s",
-                  (int)path_len, path, perr.msg ? perr.msg : "unknown error");
-    }
+    doc_set_at_path(aTHX_ d, path, path_len, new_val, "jset");
 
     XPUSHs(doc_sv);
     RETURN;
@@ -847,25 +896,7 @@ static OP * pp_jraw_impl(pTHX) {
     if (!new_val)
         croak("jraw: failed to copy value");
 
-    if (path_len == 0) {
-        if (d->owner)
-            croak("jraw: cannot replace root of a borrowed Doc; jclone it first");
-        yyjson_mut_doc_set_root(d->doc, new_val);
-        d->root = new_val;
-    } else {
-        yyjson_ptr_err perr;
-        /* resolve from d->root (subtree-relative on a borrowed Doc) */
-        bool ok = yyjson_mut_ptr_setx(d->root, path, path_len, new_val,
-                                       d->doc, true, NULL, &perr);
-        if (!ok) {
-            perr = (yyjson_ptr_err){0};
-            ok = yyjson_mut_ptr_addx(d->root, path, path_len, new_val,
-                                      d->doc, true, NULL, &perr);
-        }
-        if (!ok)
-            croak("jraw: failed to set path %.*s: %s",
-                  (int)path_len, path, perr.msg ? perr.msg : "unknown error");
-    }
+    doc_set_at_path(aTHX_ d, path, path_len, new_val, "jraw");
 
     XPUSHs(doc_sv);
     RETURN;
@@ -938,6 +969,10 @@ static OP * pp_jwrite_impl(pTHX) {
     if (!tmp_doc)
         croak("jwrite: out of memory");
     yyjson_mut_val *copy = yyjson_mut_val_mut_copy(tmp_doc, d->root);
+    if (!copy) {
+        yyjson_mut_doc_free(tmp_doc);
+        croak("jwrite: out of memory");
+    }
     yyjson_mut_doc_set_root(tmp_doc, copy);
 
     bool ok = yyjson_mut_write_file(path, tmp_doc, YYJSON_WRITE_PRETTY, NULL, &werr);
@@ -1080,7 +1115,11 @@ static OP * pp_jfind_impl(pTHX) {
             yyjson_subtype st = yyjson_mut_get_subtype(field);
             int eq;
             if (st == YYJSON_SUBTYPE_REAL || !SvIOK(match_sv)) {
-                eq = (SvNV(match_sv) == yyjson_mut_get_num(field));
+                /* yyjson stores reals as C double; narrow the match to double
+                   so the compare works on long double / quadmath perls, where
+                   SvNV(2.71) carries extra precision the JSON value never had
+                   and a bare == would never be equal. */
+                eq = ((double)SvNV(match_sv) == yyjson_mut_get_num(field));
             } else if (SvIsUV(match_sv)) {
                 UV mv = SvUV(match_sv);
                 eq = (st == YYJSON_SUBTYPE_UINT)
@@ -1100,7 +1139,7 @@ static OP * pp_jfind_impl(pTHX) {
                 RETURN;
             }
         }
-        /* compare: bool/null -- match against string "true"/"false"/"null" */
+        /* compare: bool -- match against string "true"/"false" */
         else if (yyjson_mut_is_bool(field)) {
             bool bval = yyjson_mut_get_bool(field);
             if ((bval && match_len == 4 && memcmp(match, "true", 4) == 0) ||
@@ -1178,15 +1217,8 @@ yyjson_val_to_sv(pTHX_ yyjson_val *val) {
                 ? SvREFCNT_inc_simple_NN(&PL_sv_yes)
                 : SvREFCNT_inc_simple_NN(&PL_sv_no);
 
-        case YYJSON_TYPE_NUM: {
-            yyjson_subtype st = yyjson_get_subtype(val);
-            if (st == YYJSON_SUBTYPE_UINT)
-                return newSVuv((UV)yyjson_get_uint(val));
-            else if (st == YYJSON_SUBTYPE_SINT)
-                return newSViv((IV)yyjson_get_sint(val));
-            else
-                return newSVnv(yyjson_get_real(val));
-        }
+        case YYJSON_TYPE_NUM:
+            return yyjson_num_to_sv(aTHX_ val);
 
         case YYJSON_TYPE_STR: {
             const char *str = yyjson_get_str(val);
@@ -1250,15 +1282,8 @@ yyjson_mut_val_to_sv(pTHX_ yyjson_mut_val *val) {
                 ? SvREFCNT_inc_simple_NN(&PL_sv_yes)
                 : SvREFCNT_inc_simple_NN(&PL_sv_no);
 
-        case YYJSON_TYPE_NUM: {
-            yyjson_subtype st = yyjson_mut_get_subtype(val);
-            if (st == YYJSON_SUBTYPE_UINT)
-                return newSVuv((UV)yyjson_mut_get_uint(val));
-            else if (st == YYJSON_SUBTYPE_SINT)
-                return newSViv((IV)yyjson_mut_get_sint(val));
-            else
-                return newSVnv(yyjson_mut_get_real(val));
-        }
+        case YYJSON_TYPE_NUM:
+            return yyjson_mut_num_to_sv(aTHX_ val);
 
         case YYJSON_TYPE_STR: {
             const char *str = yyjson_mut_get_str(val);
@@ -1323,14 +1348,7 @@ yyjson_val_to_sv_ro(pTHX_ yyjson_val *val, SV *doc_sv) {
                 : SvREFCNT_inc_simple_NN(&PL_sv_no);
 
         case YYJSON_TYPE_NUM: {
-            SV *nsv;
-            yyjson_subtype st = yyjson_get_subtype(val);
-            if (st == YYJSON_SUBTYPE_UINT)
-                nsv = newSVuv((UV)yyjson_get_uint(val));
-            else if (st == YYJSON_SUBTYPE_SINT)
-                nsv = newSViv((IV)yyjson_get_sint(val));
-            else
-                nsv = newSVnv(yyjson_get_real(val));
+            SV *nsv = yyjson_num_to_sv(aTHX_ val);
             SvREADONLY_on(nsv);
             return nsv;
         }
@@ -1564,13 +1582,15 @@ buf_cat_iv(pTHX_ SV *buf, IV val) {
 
 static void
 buf_cat_nv(pTHX_ SV *buf, NV val) {
-    /* worst-case Gconvert: sign + NV_DIG digits + '.' + 'e' + exp-sign + exp;
-       NV_DIG+32 is ample even for quadmath (NV_DIG=33), where 40 was too small */
-    buf_ensure(aTHX_ buf, NV_DIG + 32);
-    char *p = SvPVX(buf) + SvCUR(buf);
-    Gconvert(val, NV_DIG, 0, p);
-    int len = strlen(p);
-    SvCUR_set(buf, SvCUR(buf) + len);
+    /* Stringify via Perl's NV->PV: sv_2pv does the correct per-nvtype thing
+       (Gconvert for double/long double, quadmath_snprintf for __float128) and
+       forces a C-locale '.' radix -- avoiding both the quadmath Gconvert
+       garbage (2.5 -> "0") and the LC_NUMERIC "2,5" bug. NaN/Inf are rejected
+       by the caller. */
+    STRLEN len;
+    SV *tmp = sv_2mortal(newSVnv(val));
+    const char *s = SvPV_const(tmp, len);
+    buf_cat_mem(aTHX_ buf, s, len);
 }
 
 static json_yy_t default_self = { F_UTF8 | F_ALLOW_NONREF, MAX_DEPTH_DEFAULT };
@@ -2268,6 +2288,13 @@ CODE:
         croak("decode_doc: failed to create mutable document");
 
     yyjson_mut_val *root = yyjson_mut_doc_get_root(mdoc);
+    if (!(self->flags & F_ALLOW_NONREF)) {
+        yyjson_type t = yyjson_mut_get_type(root);
+        if (t != YYJSON_TYPE_ARR && t != YYJSON_TYPE_OBJ) {
+            yyjson_mut_doc_free(mdoc);
+            croak("JSON text must be an object or array (but found number, string, true, false or null)");
+        }
+    }
     RETVAL = new_doc_sv(aTHX_ mdoc, root, NULL);
 }
 OUTPUT:
@@ -2285,10 +2312,9 @@ CODE:
             croak("hash- or arrayref expected (not a simple scalar)");
     }
 
-    /* hybrid: use direct encoder when no yyjson-specific features needed.
-       note: F_CANONICAL is accepted but not yet implemented (yyjson has no sort-keys).
-       canonical mode falls through to yyjson path which also doesn't sort,
-       so at least the output is consistent. */
+    /* hybrid: use the direct encoder unless a yyjson-only feature (pretty) is
+       requested. F_CANONICAL is accepted for JSON::XS compatibility but ignored
+       by both paths -- yyjson has no sorted-key writer. */
     if (!(self->flags & F_PRETTY)) {
         RETVAL = newSV(64);
         SvPOK_on(RETVAL);

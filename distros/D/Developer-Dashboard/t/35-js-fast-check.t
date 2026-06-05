@@ -35,6 +35,7 @@ if ( !-d $node_modules ) {
 my ( $stdout, $stderr, $exit ) = capture {
     local %ENV = %ENV;
     _configure_npm_test_env();
+    $ENV{DD_FAST_CHECK_RUNS} = _fast_check_run_count();
     system( $npm_bin, 'run', 'fuzz:scorecard' );
 };
 
@@ -59,6 +60,13 @@ sub _configure_npm_test_env {
     $ENV{npm_config_update_notifier} = 'false';
     $ENV{NO_UPDATE_NOTIFIER}         = '1';
     return;
+}
+
+sub _fast_check_run_count {
+    my $perl5opt = $ENV{PERL5OPT} // q{};
+    my $harness  = $ENV{HARNESS_PERL_SWITCHES} // q{};
+    return 5 if $perl5opt =~ /Devel::Cover/ || $harness =~ /Devel::Cover/;
+    return 50;
 }
 
 __END__

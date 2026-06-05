@@ -1,5 +1,11 @@
 Revision history for JSON-YY
 
+0.06  2026-06-05
+    - Fix build on Windows/Strawberry Perl (yyjson allocator macro clash)
+    - encode: fix reals on quadmath; emit C-locale radix
+    - jfind: match reals in double precision (long-double/quadmath)
+    - decode: large ints fall back to NV on 32-bit-IV perls
+
 0.05  2026-06-01
     - Fix decode_json_ro use-after-free
     - Fix encode croak/OOM leaks

@@ -14,8 +14,8 @@ use Router::Ragel;
 # Two routes that BOTH match /x/y, with 1 vs 2 captures.
 {
     my $r = Router::Ragel->new
-        ->add('/:b/:c', 'two')      # 2 captures
-        ->add('/x/:a',  'one')      # 1 capture, added last -> wins on /x/y
+        ->add('/:b/:c', 'two') # 2 captures
+        ->add('/x/:a', 'one') # 1 capture, added last -> wins on /x/y
         ->compile;
 
     my ($d, @cap) = $r->match('/x/y');
@@ -30,8 +30,8 @@ use Router::Ragel;
 # Reverse add-order: the 2-capture route now wins the overlap.
 {
     my $r = Router::Ragel->new
-        ->add('/x/:a',  'one')
-        ->add('/:b/:c', 'two')      # added last -> wins on /x/y
+        ->add('/x/:a', 'one')
+        ->add('/:b/:c', 'two') # added last -> wins on /x/y
         ->compile;
 
     my ($d, @cap) = $r->match('/x/y');
@@ -42,8 +42,8 @@ use Router::Ragel;
 # Shared prefix, different capture depths (no single path matches both).
 {
     my $r = Router::Ragel->new
-        ->add('/a/:x/:y', 'deep')     # 2 captures
-        ->add('/a/:z',    'shallow')  # 1 capture
+        ->add('/a/:x/:y', 'deep') # 2 captures
+        ->add('/a/:z', 'shallow') # 1 capture
         ->compile;
 
     my ($d, @c) = $r->match('/a/m/n');

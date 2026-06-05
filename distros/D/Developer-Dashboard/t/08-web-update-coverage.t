@@ -4,6 +4,7 @@ use utf8;
 
 use Capture::Tiny qw(capture);
 use Cwd qw(getcwd);
+use Digest::SHA qw(sha256_hex);
 use Encode qw(decode encode FB_CROAK);
 use File::Path qw(make_path);
 use File::Spec;
@@ -22,6 +23,7 @@ use Developer::Dashboard::Collector;
 use Developer::Dashboard::CollectorRunner;
 use Developer::Dashboard::Config;
 use Developer::Dashboard::FileRegistry;
+use Developer::Dashboard::JSON qw(json_decode);
 use Developer::Dashboard::PageDocument;
 use Developer::Dashboard::PageRuntime;
 use Developer::Dashboard::PageStore;
@@ -73,6 +75,7 @@ chdir $home or die "Unable to chdir to $home: $!";
 my $test_repos = tempdir( CLEANUP => 1 );
 my $paths = Developer::Dashboard::PathRegistry->new( home => $home );
 my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
+my $config = Developer::Dashboard::Config->new( files => $files, paths => $paths );
 my $store = Developer::Dashboard::PageStore->new( paths => $paths );
 my $runtime = Developer::Dashboard::PageRuntime->new( paths => $paths );
 my $auth = Developer::Dashboard::Auth->new( files => $files, paths => $paths );
@@ -101,6 +104,7 @@ close $runtime_routes or die "Unable to close runtime routes.json: $!";
 
 my $app = Developer::Dashboard::Web::App->new(
     auth     => $auth,
+    config   => $config,
     pages    => $store,
     runtime  => $runtime,
     sessions => $sessions,
@@ -694,6 +698,97 @@ PAGE
     like( $ajax_shebang_output, qr/shell-err/, 'legacy ajax saved-file route streams direct executable stderr' );
 }
 
+{
+    my $runtime_api_file = File::Spec->catfile( $paths->config_root, 'api.json' );
+    open my $runtime_api, '>:raw', $runtime_api_file
+      or die "Unable to write runtime api.json: $!";
+    print {$runtime_api} qq|{"runtime-client":{"secret":"@{[ sha256_hex('stream-secret') ]}","ajax":["/ajax/stream.txt"]}}|;
+    close $runtime_api or die "Unable to close runtime api.json: $!";
+
+    my $skill_api_dir = File::Spec->catdir( $dancer_skill_install->{path}, 'config' );
+    make_path($skill_api_dir);
+    open my $skill_api, '>:raw', File::Spec->catfile( $skill_api_dir, 'api.json' )
+      or die "Unable to write skill api.json: $!";
+    print {$skill_api} qq|{"skill-client":{"secret":"@{[ sha256_hex('skill-secret') ]}","ajax":["/ajax/dancer-route-skill/bar"]}}|;
+    close $skill_api or die "Unable to close skill api.json: $!";
+
+    my $api_host = 'dashboard-helper.example:7890';
+    my ( $registered_no_api_code, $registered_no_api_type, $registered_no_api_body ) = @{ $app->handle(
+        path        => '/ajax/stream.txt',
+        query       => 'type=text',
+        remote_addr => '127.0.0.1',
+        headers     => { host => $api_host },
+    ) };
+    is( $registered_no_api_code, 403, 'registered remote ajax route rejects requests that omit API credentials' );
+    like( $registered_no_api_type, qr/application\/json/, 'registered remote ajax route returns JSON when API credentials are missing' );
+    is_deeply( json_decode( decode_body_text($registered_no_api_body) ), { status => 'forbidden' }, 'registered remote ajax route returns the explicit forbidden JSON payload when API credentials are missing' );
+
+    my ( $registered_bad_api_code, undef, $registered_bad_api_body ) = @{ $app->handle(
+        path        => '/ajax/stream.txt',
+        query       => 'type=text',
+        remote_addr => '127.0.0.1',
+        headers     => {
+            host            => $api_host,
+            'x-dd-api-key'    => 'runtime-client',
+            'x-dd-api-secret' => 'wrong-secret',
+        },
+    ) };
+    is( $registered_bad_api_code, 403, 'registered remote ajax route rejects invalid API secrets' );
+    is_deeply( json_decode( decode_body_text($registered_bad_api_body) ), { status => 'forbidden' }, 'registered remote ajax route keeps the forbidden JSON payload for invalid API secrets' );
+
+    my ( $unregistered_remote_code, undef, $unregistered_remote_body ) = @{ $app->handle(
+        path        => '/ajax/process-endpoint.json',
+        query       => 'type=text',
+        remote_addr => '127.0.0.1',
+        headers     => { host => $api_host },
+    ) };
+    is( $unregistered_remote_code, 401, 'unregistered remote ajax routes still follow the existing helper-auth flow' );
+    is( $unregistered_remote_body, '', 'unregistered remote ajax routes stay silent before helper users exist' );
+
+    my ( $runtime_api_code, $runtime_api_type, $runtime_api_body ) = @{ $app->handle(
+        path        => '/ajax/stream.txt',
+        query       => 'type=text',
+        remote_addr => '127.0.0.1',
+        headers     => {
+            host              => $api_host,
+            'x-dd-api-key'    => 'runtime-client',
+            'x-dd-api-secret' => 'stream-secret',
+        },
+    ) };
+    is( $runtime_api_code, 200, 'registered runtime ajax route accepts a matching API key and secret' );
+    like( $runtime_api_type, qr/text\/plain/, 'registered runtime ajax route keeps the saved ajax content type under API auth' );
+    is( drain_stream_body($runtime_api_body), "first\nsecond\n", 'registered runtime ajax route executes through API auth without requiring a helper session' );
+
+    my ( $skill_api_code, $skill_api_type, $skill_api_body ) = @{ $app->handle(
+        path        => '/ajax/dancer-route-skill/bar',
+        query       => '',
+        remote_addr => '127.0.0.1',
+        headers     => {
+            host              => $api_host,
+            'x-dd-api-key'    => 'skill-client',
+            'x-dd-api-secret' => 'skill-secret',
+        },
+    ) };
+    is( $skill_api_code, 200, 'installed skill config/api.json can authorize its ajax routes through API credentials' );
+    like( $skill_api_type, qr/application\/json/, 'skill API auth keeps the skill ajax response content type' );
+    is( decode_body_text( drain_stream_body($skill_api_body) ), qq|{"route":"dancer-top"}\n|, 'installed skill API auth streams the skill ajax response body' );
+
+    my $psgi_app = Developer::Dashboard::Web::DancerApp->build_psgi_app( app => $app );
+    Local::PSGITest::test_psgi $psgi_app, sub {
+        my ($cb) = @_;
+        my $res = $cb->(
+            GET(
+                'http://127.0.0.1/ajax/stream.txt?type=text',
+                Host              => $api_host,
+                'X-DD-API-Key'    => 'runtime-client',
+                'X-DD-API-Secret' => 'stream-secret',
+            )
+        );
+        is( $res->code, 200, 'PSGI adapter forwards API auth headers to the backend ajax gate' );
+        is( decode_body_text( $res->content ), "first\nsecond\n", 'PSGI adapter keeps API-auth ajax output intact' );
+    };
+}
+
 is( $auth->trust_tier( remote_addr => '127.0.0.1', host => '127.0.0.1:7890' ), 'admin', 'exact loopback with numeric host is admin' );
 is( $auth->trust_tier( remote_addr => '127.0.0.1', host => 'localhost:7890' ), 'admin', 'localhost is trusted as admin when it resolves only to loopback' );
 is( $auth->trust_tier( remote_addr => '10.0.0.8', host => '127.0.0.1:7890' ), 'helper', 'non-loopback client is helper' );
@@ -802,6 +897,32 @@ my ( $helper_code, undef, $helper_body ) = @{ $app->handle(
 ) };
 is( $helper_code, 200, 'logged-in helper can view home route' );
 like( $helper_body, qr/Developer Dashboard/, 'logged-in helper receives app content' );
+
+my ( $helper_ajax_code, undef, $helper_ajax_body ) = @{ $app->handle(
+    path        => '/ajax/stream.txt',
+    query       => 'type=text',
+    remote_addr => '127.0.0.1',
+    headers     => {
+        host   => $helper_host,
+        cookie => $login_headers->{'Set-Cookie'},
+    },
+) };
+is( $helper_ajax_code, 200, 'logged-in helper can still access an API-registered ajax route without API headers' );
+is( drain_stream_body($helper_ajax_body), "first\nsecond\n", 'logged-in helper session keeps normal ajax access on API-registered routes' );
+
+my ( $helper_ajax_with_bad_api_code, undef, $helper_ajax_with_bad_api_body ) = @{ $app->handle(
+    path        => '/ajax/stream.txt',
+    query       => 'type=text',
+    remote_addr => '127.0.0.1',
+    headers     => {
+        host              => $helper_host,
+        cookie            => $login_headers->{'Set-Cookie'},
+        'x-dd-api-key'    => 'runtime-client',
+        'x-dd-api-secret' => 'wrong-secret',
+    },
+) };
+is( $helper_ajax_with_bad_api_code, 200, 'logged-in helper session still wins over bad API headers on an API-registered ajax route' );
+is( drain_stream_body($helper_ajax_with_bad_api_body), "first\nsecond\n", 'logged-in helper session keeps the normal ajax output even when bad API headers are also present' );
 
 my ( $logout_code, undef, undef, $logout_headers ) = @{ $app->handle(
     path        => '/logout',
@@ -1112,7 +1233,7 @@ my $missing_route_server = Developer::Dashboard::Web::Server->new( app => $missi
     is( $served->sockport, 5999, 'run passes the daemon descriptor through to serve_daemon' );
 }
 
-my $config = Developer::Dashboard::Config->new( files => $files, paths => $paths );
+my $update_config = Developer::Dashboard::Config->new( files => $files, paths => $paths );
 my $collector = Developer::Dashboard::Collector->new( paths => $paths );
 my $runner = Developer::Dashboard::CollectorRunner->new(
     collectors => $collector,
@@ -1120,7 +1241,7 @@ my $runner = Developer::Dashboard::CollectorRunner->new(
     paths      => $paths,
 );
 my $updater = Developer::Dashboard::UpdateManager->new(
-    config => $config,
+    config => $update_config,
     files  => $files,
     paths  => $paths,
     runner => $runner,

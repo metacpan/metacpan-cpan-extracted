@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Global.pm
-## Version v1.2.1
+## Version v1.2.2
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2025/05/06
-## Modified 2026/06/02
+## Modified 2026/06/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -231,7 +231,7 @@ BEGIN
     our @EXPORT_OK = qw( CAN_THREADS HAS_THREADS IN_THREAD MOD_PERL MPM HAS_MPM_THREADS );
     our %EXPORT_TAGS = ( 'const' => [@EXPORT_OK] );
     our $DEFAULT_SERIALISER = 'Storable::Improved';
-    our $VERSION = 'v1.2.1';
+    our $VERSION = 'v1.2.2';
 };
 
 use strict;
@@ -621,7 +621,8 @@ sub exists
     my $ns   = $self->{_namespace} || die( "No namespace is set." );
     my $key  = $self->{_key} || die( "No key is set." );
     # Make sure the repository is shared if needed
-    $self->_share_repo( $ns );
+    # If _share_repo returns false, we do too, because something went wrong.
+    $self->_share_repo( $ns ) || return(0);
     return(0) if( !CORE::exists( $REPO->{ $ns } ) );
     return( CORE::exists( $REPO->{ $ns }->{ $key } ) ? 1 : 0 );
 }
@@ -648,7 +649,7 @@ sub get
     # Make sure the repository is shared if needed
     $self->_share_repo( $ns ) || return;
  
-     # We avoid autovivification
+    # We avoid autovivification
     if( !CORE::exists( $REPO->{ $ns }->{ $key } ) )
     {
         $self->__message( 7, "No data to deserialise yet." );
@@ -708,7 +709,7 @@ sub length
     my( $self ) = @_;
     my $ns = $self->{_namespace} || die( "No namespace is set." );
 
-    $self->_share_repo( $ns );
+    $self->_share_repo( $ns ) || return(0);
 
     if( !CORE::exists( $REPO->{ $ns } ) )
     {
@@ -820,7 +821,8 @@ sub remove
     my $ns   = $self->{_namespace} || die( "No namespace is set." );
     my $key  = $self->{_key} || die( "No key is set." );
     # Make sure the repository is shared if needed
-    $self->_share_repo( $ns );
+    $self->_share_repo( $ns ) || return(1);
+
     if( !CORE::exists( $REPO->{ $ns }->{ $key } ) )
     {
         # $self->__message( 4, "The repository \$REPO->{ $ns }->{ $key } does not exist, so there is nothing to remove." );
@@ -910,7 +912,7 @@ sub set
     }
 
     # Make sure the repository is shared if needed (moved up for early init)
-    $self->_share_repo( $ns );
+    $self->_share_repo( $ns ) || return;
 
     # Pre-create shared slot if new key and in shared mode (fixes invalid shared scalar on autoviv)
     my $is_new_key = CORE::exists( $REPO->{ $ns }->{ $key } ) ? 0 : 1;
@@ -1104,7 +1106,7 @@ sub _decrement
     return(1) unless( $self->{refcount} );
     my $ns  = $self->{_namespace};
     my $key = $self->{_key} // '';
-    $self->_share_repo( $ns );
+    $self->_share_repo( $ns ) || return;
     return(1) if( !CORE::exists( $REFCOUNTS->{ $ns }->{ $key } ) );
     my $refns = $REFCOUNTS->{ $ns };
     # NOTE: Refcount decrement under a single hash-level lock.
@@ -1622,7 +1624,6 @@ sub _share_repo
             # Shared world: refuse to do anything during terminal phases.
             if( _in_end_phase() || _in_global_destruction() )
             {
-                warn( "Cannot share data in end or global destruction phase." ) if( warnings::enabled( 'Module::Generic' ) );
                 return;
             }
             my %sub_repo :shared;
@@ -1633,7 +1634,6 @@ sub _share_repo
             # Shared world: refuse to do anything during terminal phases.
             if( _in_end_phase() || _in_global_destruction() )
             {
-                warn( "Cannot share data in end or global destruction phase." ) if( warnings::enabled( 'Module::Generic' ) );
                 return;
             }
             my @sub_order :shared;
@@ -1644,7 +1644,6 @@ sub _share_repo
             # Shared world: refuse to do anything during terminal phases.
             if( _in_end_phase() || _in_global_destruction() )
             {
-                warn( "Cannot share data in end or global destruction phase." ) if( warnings::enabled( 'Module::Generic' ) );
                 return;
             }
             my $sub_size :shared = 0;
@@ -1655,10 +1654,9 @@ sub _share_repo
             # Shared world: refuse to do anything during terminal phases.
             if( _in_end_phase() || _in_global_destruction() )
             {
-                warn( "Cannot share data in end or global destruction phase." ) if( warnings::enabled( 'Module::Generic' ) );
                 return;
             }
-           my $ns_lock :shared = 0;
+            my $ns_lock :shared = 0;
             $NS_LOCKS->{ $ns } = \$ns_lock;
         }
         if( $self->{refcount} && !CORE::exists( $REFCOUNTS->{ $ns } ) )
@@ -1666,7 +1664,6 @@ sub _share_repo
             # Shared world: refuse to do anything during terminal phases.
             if( _in_end_phase() || _in_global_destruction() )
             {
-                warn( "Cannot share data in end or global destruction phase." ) if( warnings::enabled( 'Module::Generic' ) );
                 return;
             }
             my %refcounts :shared;
@@ -2186,7 +2183,7 @@ Module::Generic::Global - Contextual global storage by namespace, class or objec
 
 =head1 VERSION
 
-    v1.2.1
+    v1.2.2
 
 =head1 DESCRIPTION
 

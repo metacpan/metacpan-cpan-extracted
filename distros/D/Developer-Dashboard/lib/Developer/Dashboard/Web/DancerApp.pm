@@ -3,7 +3,7 @@ package Developer::Dashboard::Web::DancerApp;
 use strict;
 use warnings;
 
-our $VERSION = '3.90';
+our $VERSION = '4.03';
 
 use Dancer2 appname => 'DeveloperDashboard';
 
@@ -38,8 +38,10 @@ sub _current_backend {
 # Output: hash reference with host and cookie values.
 sub _request_headers {
     return {
-        host   => scalar( request->header('Host') // '' ),
-        cookie => scalar( request->header('Cookie') // '' ),
+        host              => scalar( request->header('Host') // '' ),
+        cookie            => scalar( request->header('Cookie') // '' ),
+        'x-dd-api-key'    => scalar( request->header('X-DD-API-Key') // '' ),
+        'x-dd-api-secret' => scalar( request->header('X-DD-API-Secret') // '' ),
     };
 }
 

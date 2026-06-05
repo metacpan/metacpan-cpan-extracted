@@ -1,3 +1,40 @@
+0.301     2026-06-04 22:35:33Z
+
+    - karr-foundation: stream agent output to the terminal when interactive
+      (TTY detected) or --verbose is set. The parent process now reads the
+      child's output through a native pipe and fans it to the log, the
+      terminal, and an in-memory buffer — no external `tee` and no re-reading
+      the log by byte offset. The per-run timeout is `select`-based (robust
+      against Perl's deferred signals) and only fires when max_runtime > 0
+      (max_runtime: 0 disables it entirely). Output is always appended to
+      .karr.log regardless of TTY.
+    - karr-foundation is now a multi-board coordinator, not just an agent
+      runner. Agent execution is opt-in: with no agent configured on any
+      board, the default action is a read-only overview of every board
+      (status counts, in-progress/blocked, lock/cooldown state). `--status`
+      forces that overview regardless of configuration.
+    - karr-foundation: `claude: true` synthesizes the canonical claude
+      invocation so you needn't retype it; `claude_bin`, `claude_max_turns`
+      and `claude_permission_mode` override the parts. The agent instruction
+      is exposed as the `$PROMPT` substitution variable (settable via `prompt`
+      in .karr or `default_prompt` in config), usable in any command template.
+    - Activity log entries are now keyed by a role-qualified identity
+      (`refs/karr/log/<role>/<email>`, role `user` or `agent`) so a human and
+      an AI sharing one Git config are told apart. The role propagates to
+      nested karr calls via the KARR_ROLE env var (foundation sets `agent`);
+      pre-existing bare-email logs are still read for the `user` role.
+    - karr show: with no ID shows the single most recently updated task;
+      `--last N` widens that, `--me` shows the task(s) the current identity
+      most recently acted on (via the activity log), and `--agent NAME` shows
+      the task(s) most recently claimed by that agent name.
+    - karr board: hide the `@claimed_by` badge and claimed-count for tasks in
+      a terminal status (done/archived) — a claim is an active lease, and the
+      history remains in the activity log.
+    - sync: surface the real libgit2 error on a failed pull/push instead of a
+      meaningless "(exit code $?)" (native libgit2 operations have no shell
+      exit code). New Git `last_error` accessor records the last remote-op
+      exception.
+
 0.300     2026-05-27 20:43:23Z
 
     - Docker: bundle libgit2 (Alien::Libgit2 share build) so the runtime

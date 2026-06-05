@@ -108,12 +108,14 @@ static SV* strip_markdown_except_lists_tables(const char* input) {
 				// Fenced block: drop the opening fence line entirely
 				// (but preserve one newline so surrounding text stays
 				// on its own line).
+				const char* fence;
+				const char* body_end;
 				p += 3;
 				while (*p && *p != '\n') p++;
 				// keep the '\n' that terminated the fence line in output
 				if (*p == '\n') { sv_catpvn(out, "\n", 1); p++; }
-				const char* fence = strstr(p, "```");
-				const char* body_end = fence ? fence : p + strlen(p);
+				fence = strstr(p, "```");
+				body_end = fence ? fence : p + strlen(p);
 				if (body_end > p)
 					sv_catpvn(out, p, (STRLEN)(body_end - p));
 				if (fence) {
@@ -124,8 +126,9 @@ static SV* strip_markdown_except_lists_tables(const char* input) {
 					p = body_end;
 				}
 			} else {
+				const char* code_start;
 				p++;
-				const char* code_start = p;
+				code_start = p;
 				while (*p && *p != '`') p++;
 				if (p > code_start)
 					sv_catpvn(out, code_start, (STRLEN)(p - code_start));
@@ -147,10 +150,12 @@ static SV* strip_markdown_except_lists_tables(const char* input) {
 		}
 		// Remove links [text](url), keep text
 		if (*p == '[') {
+			const char* text_start;
+			int text_len;
 			p++;
-			const char* text_start = p;
+			text_start = p;
 			while (*p && *p != ']') p++;
-			int text_len = (int)(p - text_start);
+			text_len = (int)(p - text_start);
 			if (text_len > 0)
 				sv_catpvn(out, text_start, text_len);
 			if (*p == ']') p++;
@@ -243,8 +248,9 @@ typedef struct mds_session {
  * and global destruction without a Perl-level DESTROY method).
  */
 static int mds_session_mg_free(pTHX_ SV* sv, MAGIC* mg) {
+	mds_session* s;
 	PERL_UNUSED_ARG(sv);
-	mds_session* s = (mds_session*)mg->mg_ptr;
+	s = (mds_session*)mg->mg_ptr;
 	if (s) {
 		mds_arena_free(&s->arena);
 		mds_block_scratch_free(&s->scratch);
@@ -428,13 +434,18 @@ _classify_structural(input)
 	SV* input;
 CODE:
 {
-	STRLEN n; const char* s = SvPV(input, n);
-	size_t words = (n + 63) >> 6;
+	STRLEN n;
+	const char* s;
+	size_t words;
+	uint64_t* bm;
+	size_t out_bytes;
+	s = SvPV(input, n);
+	words = (n + 63) >> 6;
 	if (!words) words = 1;
-	uint64_t* bm = (uint64_t*)calloc(words, sizeof(uint64_t));
+	bm = (uint64_t*)calloc(words, sizeof(uint64_t));
 	if (!bm) croak("oom");
 	mds_simd_get()->classify_structural(s, n, bm);
-	size_t out_bytes = (n + 7) >> 3;
+	out_bytes = (n + 7) >> 3;
 	RETVAL = newSVpvn((const char*)bm, out_bytes);
 	free(bm);
 }
@@ -446,13 +457,18 @@ _classify_structural_scalar(input)
 	SV* input;
 CODE:
 {
-	STRLEN n; const char* s = SvPV(input, n);
-	size_t words = (n + 63) >> 6;
+	STRLEN n;
+	const char* s;
+	size_t words;
+	uint64_t* bm;
+	size_t out_bytes;
+	s = SvPV(input, n);
+	words = (n + 63) >> 6;
 	if (!words) words = 1;
-	uint64_t* bm = (uint64_t*)calloc(words, sizeof(uint64_t));
+	bm = (uint64_t*)calloc(words, sizeof(uint64_t));
 	if (!bm) croak("oom");
 	mds_simd_ops_scalar()->classify_structural(s, n, bm);
-	size_t out_bytes = (n + 7) >> 3;
+	out_bytes = (n + 7) >> 3;
 	RETVAL = newSVpvn((const char*)bm, out_bytes);
 	free(bm);
 }
@@ -466,7 +482,9 @@ _validate_utf8(input)
 	SV* input;
 CODE:
 {
-	STRLEN n; const char* s = SvPV(input, n);
+	STRLEN n;
+	const char* s;
+	s = SvPV(input, n);
 	RETVAL = mds_simd_get()->validate_utf8(s, n);
 }
 OUTPUT:
@@ -477,7 +495,9 @@ _validate_utf8_scalar(input)
 	SV* input;
 CODE:
 {
-	STRLEN n; const char* s = SvPV(input, n);
+	STRLEN n;
+	const char* s;
+	s = SvPV(input, n);
 	RETVAL = mds_simd_ops_scalar()->validate_utf8(s, n);
 }
 OUTPUT:
@@ -491,11 +511,16 @@ _find_newlines(input)
 	SV* input;
 CODE:
 {
-	STRLEN n; const char* s = SvPV(input, n);
-	size_t cap = n ? n : 1;
-	uint32_t* offs = (uint32_t*)malloc(cap * sizeof(uint32_t));
+	STRLEN n;
+	const char* s;
+	size_t cap;
+	uint32_t* offs;
+	size_t k;
+	s = SvPV(input, n);
+	cap = n ? n : 1;
+	offs = (uint32_t*)malloc(cap * sizeof(uint32_t));
 	if (!offs) croak("oom");
-	size_t k = mds_simd_get()->find_newlines(s, n, offs, cap);
+	k = mds_simd_get()->find_newlines(s, n, offs, cap);
 	if (k == (size_t)-1) { free(offs); XSRETURN_UNDEF; }
 	RETVAL = newSVpvn((const char*)offs, k * sizeof(uint32_t));
 	free(offs);
@@ -508,11 +533,16 @@ _find_newlines_scalar(input)
 	SV* input;
 CODE:
 {
-	STRLEN n; const char* s = SvPV(input, n);
-	size_t cap = n ? n : 1;
-	uint32_t* offs = (uint32_t*)malloc(cap * sizeof(uint32_t));
+	STRLEN n;
+	const char* s;
+	size_t cap;
+	uint32_t* offs;
+	size_t k;
+	s = SvPV(input, n);
+	cap = n ? n : 1;
+	offs = (uint32_t*)malloc(cap * sizeof(uint32_t));
 	if (!offs) croak("oom");
-	size_t k = mds_simd_ops_scalar()->find_newlines(s, n, offs, cap);
+	k = mds_simd_ops_scalar()->find_newlines(s, n, offs, cap);
 	if (k == (size_t)-1) { free(offs); XSRETURN_UNDEF; }
 	RETVAL = newSVpvn((const char*)offs, k * sizeof(uint32_t));
 	free(offs);
@@ -569,35 +599,42 @@ CODE:
 {
 	/* Exercise alignment, page chaining, and the big-alloc path. */
 	mds_arena a;
+	int aligned_ok = 1;
+	int chained_ok;
+	void* big;
+	int big_ok;
+	int reset_ok;
+	HV* h_a;
+	int i_a;
+	size_t si_a;
 	mds_arena_init(&a);
 
 	/* 1. Alignment: every returned pointer is MDS_ARENA_ALIGN-aligned. */
-	int aligned_ok = 1;
-	for (int i = 0; i < 64; i++) {
-		void* p = mds_arena_alloc(&a, 1 + (i * 7));
-		if (((uintptr_t)p) & (MDS_ARENA_ALIGN - 1)) { aligned_ok = 0; break; }
+	for (i_a = 0; i_a < 64; i_a++) {
+		{ void* p = mds_arena_alloc(&a, 1 + (i_a * 7));
+		if (((uintptr_t)p) & (MDS_ARENA_ALIGN - 1)) { aligned_ok = 0; break; } }
 	}
 
 	/* 2. Page chaining: allocate enough to force a second page. */
-	for (size_t i = 0; i < 200; i++) mds_arena_alloc(&a, 1024);
-	int chained_ok = (a.head && a.head->next != NULL);
+	for (si_a = 0; si_a < 200; si_a++) mds_arena_alloc(&a, 1024);
+	chained_ok = (a.head && a.head->next != NULL);
 
 	/* 3. Big-alloc: > MDS_ARENA_BIG goes to dedicated page. */
-	void* big = mds_arena_alloc(&a, MDS_ARENA_BIG * 2);
-	int big_ok = (big != NULL && a.big != NULL);
+	big = mds_arena_alloc(&a, MDS_ARENA_BIG * 2);
+	big_ok = (big != NULL && a.big != NULL);
 
 	/* 4. Reset: walks back to single warm page, no big pages. */
 	mds_arena_reset(&a);
-	int reset_ok = (a.head && a.head->next == NULL && a.big == NULL);
+	reset_ok = (a.head && a.head->next == NULL && a.big == NULL);
 
 	mds_arena_free(&a);
 
-	HV* h = newHV();
-	hv_stores(h, "aligned",  newSViv(aligned_ok));
-	hv_stores(h, "chained",  newSViv(chained_ok));
-	hv_stores(h, "big",      newSViv(big_ok));
-	hv_stores(h, "reset",    newSViv(reset_ok));
-	RETVAL = newRV_noinc((SV*)h);
+	h_a = newHV();
+	hv_stores(h_a, "aligned",  newSViv(aligned_ok));
+	hv_stores(h_a, "chained",  newSViv(chained_ok));
+	hv_stores(h_a, "big",      newSViv(big_ok));
+	hv_stores(h_a, "reset",    newSViv(reset_ok));
+	RETVAL = newRV_noinc((SV*)h_a);
 }
 OUTPUT:
 	RETVAL
@@ -607,22 +644,28 @@ _buf_test()
 CODE:
 {
 	/* Exercise mds_buf: grows, preserves contents, finalises SvCUR. */
-	SV* out = newSVpv("", 0);
+	SV* out;
 	mds_buf b;
+	int i_b;
+	int len_ok;
+	const char* p_b;
+	int data_ok;
+	HV* h_b;
+	out = newSVpv("", 0);
 	mds_buf_init(aTHX_ &b, out, 8);   /* tiny hint to force growth */
-	for (int i = 0; i < 1000; i++) mds_buf_write(aTHX_ &b, "abcdef", 6);
+	for (i_b = 0; i_b < 1000; i_b++) mds_buf_write(aTHX_ &b, "abcdef", 6);
 	mds_buf_finalize(aTHX_ &b);
 
-	int len_ok = (SvCUR(out) == 6000);
-	const char* p = SvPVX(out);
-	int data_ok = (memcmp(p, "abcdef", 6) == 0 &&
-	               memcmp(p + 5994, "abcdef", 6) == 0);
+	len_ok = (SvCUR(out) == 6000);
+	p_b = SvPVX(out);
+	data_ok = (memcmp(p_b, "abcdef", 6) == 0 &&
+	               memcmp(p_b + 5994, "abcdef", 6) == 0);
 
-	HV* h = newHV();
-	hv_stores(h, "len",  newSViv(len_ok));
-	hv_stores(h, "data", newSViv(data_ok));
+	h_b = newHV();
+	hv_stores(h_b, "len",  newSViv(len_ok));
+	hv_stores(h_b, "data", newSViv(data_ok));
 	SvREFCNT_dec(out);
-	RETVAL = newRV_noinc((SV*)h);
+	RETVAL = newRV_noinc((SV*)h_b);
 }
 OUTPUT:
 	RETVAL

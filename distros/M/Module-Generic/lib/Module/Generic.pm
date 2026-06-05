@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.5.5
+## Version v1.5.8
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2026/06/04
+## Modified 2026/06/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -118,7 +118,7 @@ BEGIN
     # shared state on the way out.
     *_in_end_phase = sub{ ${^GLOBAL_PHASE} eq 'END' };
 
-    our $VERSION   = 'v1.5.5';
+    our $VERSION   = 'v1.5.8';
 };
 
 # Load the XS shared library (Generic.so) which provides faster implementations of
@@ -9959,6 +9959,17 @@ sub _parse_timestamp
         }
         if( $dt && Scalar::Util::blessed( $dt ) && !$dt->isa( 'DateTime::Lite' ) )
         {
+            # NOTE: This branch is defensive. Since DateTime::Format::JP v0.1.7 we expect
+            # parse_datetime() to return a DateTime::Lite directly. If we land here, it
+            # means an older DateTime::Format::JP is installed (returning a DateTime
+            # object), or some other unexpected blessed object was returned. We convert
+            # to DateTime::Lite via from_object() so the caller always gets a consistent
+            # return type, and emit a diagnostic on CPAN Testers smokers so we can investigate.
+            if( $ENV{AUTOMATED_TESTING} || $ENV{AUTHOR_TESTING} )
+            {
+                my $jp_version = DateTime::Format::JP->VERSION // 'undef';
+                warn( "DateTime::Format::JP ${jp_version} returned a ", ref( $dt ), " instead of a DateTime::Lite for input '${str}'.\n" );
+            }
             $self->_load_class( 'DateTime::Lite', { version => 'v0.7.3', no_warning => 1 } ) ||
                 return( $self->pass_error );
             $dt = DateTime::Lite->from_object( object => $dt ) ||
@@ -11556,7 +11567,7 @@ sub colour_parse
         {
             my( $num ) = @_;
             my $res;
-            if( $n >= 0 )
+            if( $num >= 0 )
             {
                 $res = CORE::int( $num + 0.5 );
             }
@@ -13341,7 +13352,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.5.5
+    v1.5.8
 
 =head1 DESCRIPTION
 

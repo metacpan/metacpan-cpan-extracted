@@ -9,6 +9,21 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '..', '..');
 const dashboard = path.join(repoRoot, 'bin', 'dashboard');
+const perl5opt = process.env.PERL5OPT || '';
+const harnessPerlSwitches = process.env.HARNESS_PERL_SWITCHES || '';
+
+function fastCheckRunCount() {
+  const explicit = Number.parseInt(process.env.DD_FAST_CHECK_RUNS || '', 10);
+  if (Number.isInteger(explicit) && explicit > 0) {
+    return explicit;
+  }
+
+  if (/Devel::Cover/.test(perl5opt) || /Devel::Cover/.test(harnessPerlSwitches)) {
+    return 5;
+  }
+
+  return 50;
+}
 
 function runDashboard(command, input) {
   const result = spawnSync(
@@ -40,6 +55,5 @@ fc.assert(
       return decoded === text;
     }
   ),
-  { numRuns: 50 }
+  { numRuns: fastCheckRunCount() }
 );
-

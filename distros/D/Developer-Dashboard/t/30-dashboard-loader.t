@@ -8,6 +8,9 @@ use File::Spec;
 use File::Temp qw(tempdir);
 use Test::More;
 
+use lib 'lib';
+use Developer::Dashboard::PerlEnv;
+
 my $repo_root = getcwd();
 my $dashboard = File::Spec->catfile( $repo_root, 'bin', 'dashboard' );
 my $source = _slurp($dashboard);
@@ -25,6 +28,10 @@ like( $source, qr/_custom_command_path/, 'dashboard entrypoint resolves layered 
 like( $source, qr/_builtin_helper_path/, 'dashboard entrypoint resolves staged private built-in helpers' );
 like( $source, qr/_builtin_helper_path\('skills'\)/, 'dashboard dotted skill dispatch reuses the staged skills helper' );
 like( $source, qr/_exec_switchboard_command\( \$helper_path, '_exec', \$skill_name, \$skill_command, \@ARGV \)/, 'dashboard dotted skill dispatch hands skill commands through the internal skills exec route' );
+like( $source, qr/Developer::Dashboard::PerlEnv->bootstrap_perl5lib/, 'dashboard entrypoint bootstraps a safe Perl library order before helper dispatch' );
+
+my $private_core = _slurp( File::Spec->catfile( $repo_root, 'share', 'private-cli', '_dashboard-core' ) );
+like( $private_core, qr/Developer::Dashboard::PerlEnv->bootstrap_perl5lib/, 'private helper core bootstraps a safe Perl library order before loading command modules' );
 
 my $share_seeded_root = File::Spec->catdir( $repo_root, 'share', 'seeded-pages' );
 ok(
@@ -67,6 +74,208 @@ my $version_exit = $? >> 8;
 is( $version_exit, 0, 'dashboard version also stays on the lightweight path without loading heavy web modules' )
   or diag $version_output;
 like( $version_output, qr/^\d+\.\d+\s*\z/, 'dashboard version still prints the package version' );
+
+my $lazy_home = tempdir( CLEANUP => 1 );
+{
+    local $ENV{HOME} = $lazy_home;
+    my $init_output = qx{$^X -I$lib $dashboard init 2>&1};
+    my $init_exit = $? >> 8;
+    is( $init_exit, 0, 'dashboard init stages private helpers before the prompt lazy-load check' )
+      or diag $init_output;
+}
+my $lazy_lib = tempdir( CLEANUP => 1 );
+my $lazy_cli_dir = File::Spec->catdir( $lazy_lib, 'Developer', 'Dashboard', 'CLI' );
+my $lazy_skill_dir = File::Spec->catdir( $lazy_lib, 'Developer', 'Dashboard' );
+my $lazy_file_dir = File::Spec->catdir( $lazy_lib, 'File' );
+make_path( $lazy_cli_dir, $lazy_skill_dir, $lazy_file_dir );
+_write_perl_module(
+    File::Spec->catfile( $lazy_cli_dir, 'Suggest.pm' ),
+    "package Developer::Dashboard::CLI::Suggest;\ndie qq(lazy-loader-regression: suggestion runtime loaded during dashboard ps1\\n);\n",
+);
+_write_perl_module(
+    File::Spec->catfile( $lazy_skill_dir, 'SkillManager.pm' ),
+    "package Developer::Dashboard::SkillManager;\ndie qq(lazy-loader-regression: skill manager loaded during dashboard ps1\\n);\n",
+);
+_write_perl_module(
+    File::Spec->catfile( $lazy_skill_dir, 'SeedSync.pm' ),
+    "package Developer::Dashboard::SeedSync;\ndie qq(lazy-loader-regression: seed sync loaded during dashboard ps1\\n);\n",
+);
+_write_perl_module(
+    File::Spec->catfile( $lazy_file_dir, 'ShareDir.pm' ),
+    "package File::ShareDir;\ndie qq(lazy-loader-regression: File::ShareDir loaded during dashboard ps1\\n);\n",
+);
+
+{
+    local $ENV{HOME} = $lazy_home;
+    local $ENV{PERL5OPT} = '-I' . $lazy_lib;
+    my $ps1_output = qx{$^X -I$lib $dashboard ps1 --cwd "$lazy_home" --mode compact --no-indicators 2>&1};
+    my $ps1_exit = $? >> 8;
+    is( $ps1_exit, 0, 'dashboard ps1 stays on the lightweight helper path once helpers are already staged' )
+      or diag $ps1_output;
+    unlike( $ps1_output, qr/lazy-loader-regression:/, 'dashboard ps1 does not load suggestion, skill, or helper-staging-only modules on the hot path' );
+}
+
+{
+    my $compat_home = tempdir( CLEANUP => 1 );
+    {
+        local $ENV{HOME} = $compat_home;
+        my $init_output = qx{$^X -I$lib $dashboard init 2>&1};
+        my $init_exit = $? >> 8;
+        is( $init_exit, 0, 'dashboard init stages private helpers before the ps1 compatibility check' )
+          or diag $init_output;
+    }
+
+    my $compat_lib = tempdir( CLEANUP => 1 );
+    my $compat_dd_dir = File::Spec->catdir( $compat_lib, 'Developer', 'Dashboard' );
+    make_path($compat_dd_dir);
+    _write_perl_module(
+        File::Spec->catfile( $compat_dd_dir, 'Config.pm' ),
+        <<'PERL',
+package Developer::Dashboard::Config;
+sub new { bless {}, shift }
+sub collectors { return [] }
+1;
+PERL
+    );
+    _write_perl_module(
+        File::Spec->catfile( $compat_dd_dir, 'FileRegistry.pm' ),
+        <<'PERL',
+package Developer::Dashboard::FileRegistry;
+sub new { bless {}, shift }
+1;
+PERL
+    );
+    _write_perl_module(
+        File::Spec->catfile( $compat_dd_dir, 'IndicatorStore.pm' ),
+        <<'PERL',
+package Developer::Dashboard::IndicatorStore;
+sub new { bless { synced => 0, refreshed => 0 }, shift }
+sub sync_collectors { $_[0]{synced}++; return [] }
+sub refresh_core_indicators { $_[0]{refreshed}++; return 1 }
+1;
+PERL
+    );
+    _write_perl_module(
+        File::Spec->catfile( $compat_dd_dir, 'PathRegistry.pm' ),
+        <<'PERL',
+package Developer::Dashboard::PathRegistry;
+sub new { bless {}, shift }
+1;
+PERL
+    );
+    _write_perl_module(
+        File::Spec->catfile( $compat_dd_dir, 'Prompt.pm' ),
+        <<'PERL',
+package Developer::Dashboard::Prompt;
+sub new { bless {}, shift }
+sub render { return "compat-ps1\n" }
+sub render_tmux_status { return "compat-tmux\n" }
+1;
+PERL
+    );
+
+    my $compat_ps1 = File::Spec->catfile( $compat_home, '.developer-dashboard', 'cli', 'dd', 'ps1' );
+    my $compat_output = qx{$^X -I$compat_lib -I$lib $compat_ps1 --cwd "$compat_home" --mode compact --no-indicators 2>&1};
+    my $compat_exit = $? >> 8;
+    is( $compat_exit, 0, 'staged ps1 remains compatible when the installed IndicatorStore predates collectors_need_sync' )
+      or diag $compat_output;
+    is( $compat_output, "compat-ps1\n", 'staged ps1 falls back cleanly to an unconditional collector sync when collectors_need_sync is unavailable' );
+}
+
+{
+    my $dashboard_lib = tempdir( CLEANUP => 1 );
+    my $local_shadow  = tempdir( CLEANUP => 1 );
+    my $extra_runtime = tempdir( CLEANUP => 1 );
+    my $core_arch     = tempdir( CLEANUP => 1 );
+    my $core_lib      = tempdir( CLEANUP => 1 );
+    no warnings 'redefine';
+    local *Developer::Dashboard::PerlEnv::core_inc_paths = sub { return ( $core_arch, $core_lib, $core_lib ) };
+    local $ENV{PERL5LIB} = join( Developer::Dashboard::PerlEnv::path_separator(), $local_shadow, '/missing-shadow' );
+
+    my @perl5lib = Developer::Dashboard::PerlEnv->perl5lib_list(
+        dashboard_lib => $dashboard_lib,
+        extra         => [ $extra_runtime, $extra_runtime, '/missing-extra' ],
+    );
+    is_deeply(
+        \@perl5lib,
+        [ $dashboard_lib, $extra_runtime, $core_arch, $core_lib, $local_shadow ],
+        'PerlEnv keeps dashboard and runtime libs ahead of core dirs and inherited shadowing local libs while removing duplicates',
+    );
+
+    my @explicit_existing = Developer::Dashboard::PerlEnv->perl5lib_list(
+        dashboard_lib => $dashboard_lib,
+        extra         => [$extra_runtime],
+        existing      => [ $local_shadow, $extra_runtime, '/missing-shadow' ],
+    );
+    is_deeply(
+        \@explicit_existing,
+        [ $dashboard_lib, $extra_runtime, $core_arch, $core_lib, $local_shadow ],
+        'PerlEnv accepts an explicit existing path list without reparsing PERL5LIB from the environment',
+    );
+
+    is(
+        Developer::Dashboard::PerlEnv->perl5lib_env(
+            dashboard_lib => $dashboard_lib,
+            extra         => [$extra_runtime],
+        ),
+        join( Developer::Dashboard::PerlEnv::path_separator(), $dashboard_lib, $extra_runtime, $core_arch, $core_lib, $local_shadow ),
+        'PerlEnv joins the normalized path list back into one PERL5LIB string',
+    );
+
+    local %ENV = ( PERL5LIB => $local_shadow );
+    my $bootstrapped = Developer::Dashboard::PerlEnv->bootstrap_perl5lib(
+        dashboard_lib => $dashboard_lib,
+        extra         => [$extra_runtime],
+    );
+    is( $ENV{PERL5LIB}, $bootstrapped, 'PerlEnv bootstrap writes the normalized PERL5LIB back into the environment' );
+
+    local %ENV = ( PATH => join( Developer::Dashboard::PerlEnv::path_separator(), '/bin', '/usr/bin' ) );
+    my $path = Developer::Dashboard::PerlEnv->path_with_current_perl;
+    like(
+        $path,
+        qr/^\Q@{[ Developer::Dashboard::PerlEnv->current_perl_bin_dir ]}\E(?:\Q@{[ Developer::Dashboard::PerlEnv::path_separator() ]}\E|$)/,
+        'PerlEnv keeps the current Perl interpreter directory at the front of PATH for child processes',
+    );
+    like(
+        $path,
+        qr/(?:^|\Q@{[ Developer::Dashboard::PerlEnv::path_separator() ]}\E)\Q@{[ Developer::Dashboard::PerlEnv->current_shell_bin_dir ]}\E(?:\Q@{[ Developer::Dashboard::PerlEnv::path_separator() ]}\E|$)/,
+        'PerlEnv also keeps the active shell directory in PATH for shell-based child commands',
+    );
+    my $child_env = Developer::Dashboard::PerlEnv->dashboard_child_env(
+        dashboard_lib => $dashboard_lib,
+        extra         => [$extra_runtime],
+    );
+    is( $child_env->{PATH}, $path, 'PerlEnv child env reuses the PATH override that keeps the current Perl first' );
+    like( $child_env->{PERL5LIB}, qr/\Q$dashboard_lib\E/, 'PerlEnv child env also carries the normalized PERL5LIB override' );
+}
+
+{
+    my $dashboard_install_root = tempdir( CLEANUP => 1 );
+    my $dashboard_perl5_root = File::Spec->catdir( $dashboard_install_root, 'perl5' );
+    my $dashboard_arch_root = File::Spec->catdir( $dashboard_perl5_root, $Config::Config{archname} );
+    make_path( $dashboard_perl5_root, $dashboard_arch_root );
+
+    is_deeply(
+        [ Developer::Dashboard::PerlEnv->dashboard_lib_roots($dashboard_install_root) ],
+        [ $dashboard_install_root, $dashboard_perl5_root, $dashboard_arch_root ],
+        'PerlEnv expands local::lib style dashboard installs into root, perl5, and arch library prefixes',
+    );
+
+    my @installed_perl5lib = Developer::Dashboard::PerlEnv->perl5lib_list(
+        dashboard_lib => $dashboard_install_root,
+        existing      => [],
+    );
+    is_deeply(
+        [ @installed_perl5lib[ 0 .. 2 ] ],
+        [ $dashboard_install_root, $dashboard_perl5_root, $dashboard_arch_root ],
+        'PerlEnv keeps local::lib style dashboard install library roots at the front of PERL5LIB bootstrap ordering',
+    );
+}
+
+{
+    my @core_inc = Developer::Dashboard::PerlEnv->core_inc_paths;
+    ok( @core_inc > 0, 'PerlEnv reports at least one existing core Perl library path for the active interpreter' );
+}
 
 my @perl_scripts = (
     File::Spec->catfile( $repo_root, 'bin', 'dashboard' ),
@@ -141,6 +350,14 @@ sub _slurp {
     my $content = do { local $/; <$fh> };
     close $fh;
     return $content;
+}
+
+sub _write_perl_module {
+    my ( $path, $content ) = @_;
+    open my $fh, '>', $path or die "Unable to write $path: $!";
+    print {$fh} $content;
+    close $fh;
+    return 1;
 }
 
 __END__

@@ -83,6 +83,9 @@ static int validate_utf8_neon(const char* in, size_t len)
         uint8x16_t v0 = vld1q_u8(p);
         uint8x16_t v1 = vld1q_u8(p + 16);
         uint8x16_t hi = vorrq_u8(v0, v1);
+        const uint8_t* chunk_end;
+        const uint8_t* tail;
+        int extend;
         /* vmaxvq_u8 is AArch64; gives the largest byte in the vector.
          * If <0x80, every byte is pure ASCII. */
         if (vmaxvq_u8(hi) < 0x80) { p += 32; continue; }
@@ -90,12 +93,12 @@ static int validate_utf8_neon(const char* in, size_t len)
         /* Non-ASCII present: rewind to the start of any in-flight
          * multi-byte sequence (continuation bytes are 10xxxxxx) so the
          * scalar DFA sees a coherent run. */
-        const uint8_t* chunk_end = p + 32;
+        chunk_end = p + 32;
         if (chunk_end > end) chunk_end = end;
-        const uint8_t* tail = chunk_end;
+        tail = chunk_end;
         /* Extend tail forward while next byte is a continuation, up to
          * a small bounded window (max UTF-8 sequence = 4 bytes). */
-        int extend = 3;
+        extend = 3;
         while (extend-- > 0 && tail < end && (*tail & 0xC0) == 0x80) tail++;
 
         if (!s_scalar()->validate_utf8((const char*)p, (size_t)(tail - p)))

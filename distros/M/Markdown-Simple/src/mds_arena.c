@@ -23,15 +23,18 @@ void mds_arena_init(mds_arena* a) {
 void* mds_arena_alloc(mds_arena* a, size_t n) {
     /* round up to alignment */
     size_t aligned = (n + (MDS_ARENA_ALIGN - 1)) & ~(size_t)(MDS_ARENA_ALIGN - 1);
+    void* out;
     a->total_alloc += aligned;
 
     if (aligned > MDS_ARENA_BIG) {
         /* oversize: dedicated page, prepended to `big` list */
         mds_arena_page* p = page_new(aligned + MDS_ARENA_ALIGN);
+        uintptr_t base;
+        size_t pad;
         if (!p) return NULL;
         /* align the start of `data` */
-        uintptr_t base = (uintptr_t)p->data;
-        size_t pad = (MDS_ARENA_ALIGN - (base & (MDS_ARENA_ALIGN - 1))) & (MDS_ARENA_ALIGN - 1);
+        base = (uintptr_t)p->data;
+        pad = (MDS_ARENA_ALIGN - (base & (MDS_ARENA_ALIGN - 1))) & (MDS_ARENA_ALIGN - 1);
         p->used = pad + aligned;
         p->next = a->big;
         a->big  = p;
@@ -42,32 +45,37 @@ void* mds_arena_alloc(mds_arena* a, size_t n) {
 
     if (!a->head || a->head->used + aligned > a->head->cap) {
         mds_arena_page* p = page_new(MDS_ARENA_PAGE);
+        uintptr_t base;
+        size_t pad;
         if (!p) return NULL;
         /* prime `used` so the first returned pointer is aligned */
-        uintptr_t base = (uintptr_t)p->data;
-        size_t pad = (MDS_ARENA_ALIGN - (base & (MDS_ARENA_ALIGN - 1))) & (MDS_ARENA_ALIGN - 1);
+        base = (uintptr_t)p->data;
+        pad = (MDS_ARENA_ALIGN - (base & (MDS_ARENA_ALIGN - 1))) & (MDS_ARENA_ALIGN - 1);
         p->used = pad;
         p->next = a->head;
         a->head = p;
         a->page_count++;
     }
-    void* out = a->head->data + a->head->used;
+    out = a->head->data + a->head->used;
     a->head->used += aligned;
     return out;
 }
 
 void mds_arena_reset(mds_arena* a) {
+    mds_arena_page* b;
     /* free everything except the head page (kept warm); reset head usage */
     if (a->head) {
         mds_arena_page* p = a->head->next;
+        uintptr_t base;
+        size_t pad;
         while (p) { mds_arena_page* n = p->next; free(p); p = n; }
         a->head->next = NULL;
         /* re-prime to alignment padding so next alloc returns aligned ptr */
-        uintptr_t base = (uintptr_t)a->head->data;
-        size_t pad = (MDS_ARENA_ALIGN - (base & (MDS_ARENA_ALIGN - 1))) & (MDS_ARENA_ALIGN - 1);
+        base = (uintptr_t)a->head->data;
+        pad = (MDS_ARENA_ALIGN - (base & (MDS_ARENA_ALIGN - 1))) & (MDS_ARENA_ALIGN - 1);
         a->head->used = pad;
     }
-    mds_arena_page* b = a->big;
+    b = a->big;
     while (b) { mds_arena_page* n = b->next; free(b); b = n; }
     a->big = NULL;
     a->total_alloc = 0;

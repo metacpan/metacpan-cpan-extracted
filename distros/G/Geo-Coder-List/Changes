@@ -1,5 +1,44 @@
 Revision history for Geo-Coder-List
 
+0.37	Thu Jun  4 19:02:53 EDT 2026
+	[ Enhancements ]
+	Add Readonly constants and %config hash for configurable cache TTLs
+	Add logging to reverse_geocode()
+	Add full POD API specifications and Z-notation formal specs to all public methods
+	ua() now clones the incoming UA per geocoder and restores the geocoder's own
+	  User-Agent string (e.g. Geo::Coder::OSM/0.03); APIs such as OSM Nominatim
+	  reject requests that use the generic libwww-perl default
+
+	[ Testing ]
+	Latest testing dashboard
+	Added fuzz testing
+	Use Test::Mockingbird in t/cache.t
+	Added t/edge_cases.t: destructive, pathological, boundary and security tests
+	Added t/extended_tests.t: coverage-raising tests for untested execution paths
+	Documented four unreachable code paths in comments with analysis
+
+	[ Bug fixes ]
+	Extract _build_ca_address() helper; fix $state/.= bug in CA address builder
+	Fix 'gecoder' typo in log entries (now correctly 'geocoder')
+	Fix flush() to reset log to [] and return $self for chaining
+	Fix _cache() write-path detection to correctly handle undef not-found values
+	Fix $Data::Dumper::Maxdepth global side-effect (now uses local)
+	Fix return CORE::push bug in reverse_geocode list context (returned count not address)
+	Fix geocode() to return $good_result not blindly $rc[0] after last POSSIBLE_LOCATION
+	Replace warn with Carp::carp throughout
+	Add use autodie qw(:all), use Data::Dumper, use Readonly
+	Fix geocode() normalisation: lat=0 (equator) was silently discarded because
+	  five branches used truthy checks ($l->{lat}) instead of defined($l->{lat})
+	Fix geocode() crash when a geocoder returns a bare scalar (e.g. 0 or ""):
+	  added "next unless ref($l)" guard before hash dereference
+	Fix geocode() L1 cache hit mutating caller-held references in place:
+	  HASH results are now shallow-copied before stamping geocoder => 'cache',
+	  so external variables and the cached entry are not silently modified
+	Fix reverse_geocode() to retry without the 'latlng' key when a backing
+	  geocoder rejects it as an unknown parameter (strict validation, e.g.
+	  Geo::Coder::GeoApify); geocoders that require 'latlng' (e.g.
+	  Geo::Coder::CA) still receive it on the first attempt
+
 0.36	Tue Jan 13 08:17:40 EST 2026
 	Invalid option now throws error rather than returning undef
 	Added t/mock.t

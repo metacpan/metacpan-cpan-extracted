@@ -13,27 +13,33 @@
  * density (table corpora) gets 2.25\u00d7, everything else gets 1.50\u00d7.
  * The 64-byte slack remains so tiny inputs never start at zero. */
 static size_t mds_buf_predict_cap(const char* s, size_t hint) {
-    if (hint == 0) return 64;
-    size_t scan = hint < 4096 ? hint : 4096;
+    size_t scan;
     size_t pipes = 0, newlines = 0;
+    int table_heavy;
+    size_t cap;
+    size_t i;
+
+    if (hint == 0) return 64;
+    scan = hint < 4096 ? hint : 4096;
     if (s) {
-        for (size_t i = 0; i < scan; i++) {
+        for (i = 0; i < scan; i++) {
             unsigned char c = (unsigned char)s[i];
             pipes    += (c == '|');
             newlines += (c == '\n');
         }
     }
     /* Table heuristic: average >= 1 pipe per line in the sampled head. */
-    int table_heavy = (newlines && pipes >= newlines);
-    size_t cap = table_heavy
+    table_heavy = (newlines && pipes >= newlines);
+    cap = table_heavy
         ? hint + (hint >> 1) + (hint >> 2) + 64    /* ~2.25\u00d7 */
         : hint + (hint >> 1) + 64;                  /* ~1.50\u00d7 */
     return cap;
 }
 
 void mds_buf_init(pTHX_ mds_buf* b, SV* sv, size_t hint) {
+    size_t cap;
     b->sv = sv;
-    size_t cap = mds_buf_predict_cap(SvPVX(sv), hint);
+    cap = mds_buf_predict_cap(SvPVX(sv), hint);
     /* Note: at this point sv has no PV yet; the predictor falls into the
      * `s == NULL` branch and returns the prose-default 1.5\u00d7. Callers
      * that want table-density sizing should call mds_buf_init_for_input
@@ -50,8 +56,9 @@ void mds_buf_init(pTHX_ mds_buf* b, SV* sv, size_t hint) {
 
 void mds_buf_init_for_input(pTHX_ mds_buf* b, SV* sv,
                             const char* input, size_t hint) {
+    size_t cap;
     b->sv = sv;
-    size_t cap = mds_buf_predict_cap(input, hint);
+    cap = mds_buf_predict_cap(input, hint);
     SvUPGRADE(sv, SVt_PV);
     SvGROW(sv, cap);
     SvCUR_set(sv, 0);
@@ -66,12 +73,13 @@ MDS_COLD void mds_buf_reserve(pTHX_ mds_buf* b, size_t need) {
     size_t used = (size_t)(b->cur - b->base);
     size_t cap  = SvLEN(b->sv);
     size_t want = used + need + 1;
+    size_t newcap;
     if (want <= cap) {
         /* SvGROW may have been a no-op; just refresh end */
         b->end = b->base + cap - 1;
         return;
     }
-    size_t newcap = cap ? cap : 64;
+    newcap = cap ? cap : 64;
     while (newcap < want) newcap = newcap + (newcap >> 1) + 64;  /* 1.5x */
     /* materialise current cursor into SvCUR so SvGROW preserves it */
     SvCUR_set(b->sv, used);

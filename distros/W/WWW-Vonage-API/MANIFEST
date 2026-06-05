@@ -14,5 +14,6 @@ t/01_new.t
 t/02_url.t
 t/03_new_domain.t
 t/04_domain.t
+t/META.json
 t/author-critic.t
 t/author-pod-coverage.t

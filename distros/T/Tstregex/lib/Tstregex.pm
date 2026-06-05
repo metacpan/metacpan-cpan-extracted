@@ -12,18 +12,32 @@ use warnings;
 
 =head1 NAME
 
-Tstregex - A Hybrid Regex Diagnostic Tool (single file Library module and command tool)
-shows the longest Regular Expression match / highlight the rejected part
-Example:
-$ perl lib/Tstregex.pm '/^[a-z]*\d{3}$/' 'abc123' 'abc12a'
-abc123
-abcB<12a> (B<^[a-z]*>\d{3}$)
+=item Tstregex - A Hybrid Regex Diagnostic Tool (single file Library module and command tool)
 
-# Above, the normal parts are the longuest matching substring when bold parts highlights the rejected substring (idem with regexp lexical groups between parenthesis)
+=item shows the longest Regular Expression match / highlight the rejected part>
+
+=item .
+
+=item Example:
+
+=item .
+
+=item $ perl lib/Tstregex.pm '/^[a-z]*\d{3}$/' 'abc123' 'abc12a'
+
+=item abc123
+
+=item abcB<12a> (^[a-z]*B<\d{3}$>)
+
+=item .
+
+=item # Above, the normal parts are the longuest matching substring when bold parts highlights the rejected substring
+
+=item # (idem with regexp lexical groups between parenthesis)
+
 
 =head1 SYNOPSIS
 
-C<$ tstregex 'regex' string1 string2 ...   stringN
+C<$tstregex 'regex' string1 string2 ...   stringN>
 
 =head1 OPTIONS (CLI)
 
@@ -380,7 +394,7 @@ package main;
 
 package Tstregex;
     {
-    our $VERSION = '1.03';
+    our $VERSION = '1.08';
     use Exporter qw(import);
 
     our @EXPORT  = qw(

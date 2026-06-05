@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::X509::Algorithm;
-$Crypt::OpenSSL3::X509::Algorithm::VERSION = '0.005';
+$Crypt::OpenSSL3::X509::Algorithm::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -21,7 +21,7 @@ Crypt::OpenSSL3::X509::Algorithm - A X509 algorithm identifier
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 METHODS
 

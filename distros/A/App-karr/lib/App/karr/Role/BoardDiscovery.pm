@@ -1,7 +1,7 @@
 # ABSTRACT: Role providing minimal board discovery and config access
 
 package App::karr::Role::BoardDiscovery;
-our $VERSION = '0.300';
+our $VERSION = '0.301';
 use Moo::Role;
 use Path::Tiny;
 use Carp qw( croak );
@@ -24,6 +24,19 @@ has git => (
 
 has config => (
     is => 'lazy',
+);
+
+has board_dir => (
+    is      => 'lazy',
+    builder => sub { $_[0]->git_root },
+);
+
+# Actor role for the activity log identity: 'user' (default) or 'agent'.
+# Carried to nested karr calls via the KARR_ROLE env var (foundation sets
+# 'agent'); a --role option on a command overrides this attribute.
+has role => (
+    is      => 'lazy',
+    builder => sub { $ENV{KARR_ROLE} || 'user' },
 );
 
 sub _build_git_root {
@@ -78,7 +91,7 @@ App::karr::Role::BoardDiscovery - Role providing minimal board discovery and con
 
 =head1 VERSION
 
-version 0.300
+version 0.301
 
 =head1 DESCRIPTION
 

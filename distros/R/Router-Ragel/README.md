@@ -61,9 +61,9 @@ Adding a route after `compile` invalidates the compiled state; the next
 
     $router->compile;
 
-Builds and binds the Ragel state machine. Must be called before `match`.
-Returns the router. May be called more than once to incorporate routes added
-between calls; see ["LIMITATIONS"](#limitations) for the cost of recompiling.
+Builds and binds the Ragel state machine. Must be called before `match`;
+`croak`s if no routes have been added. Returns the router. May be called
+more than once to incorporate routes added between calls; see ["LIMITATIONS"](#limitations) for the cost of recompiling.
 
 ## match
 
@@ -79,6 +79,10 @@ Perl's method dispatch:
     my ($data, @captures) = Router::Ragel::match($router, $path);
 
 Both forms run the same compiled state machine.
+
+Call `match` in list context. In scalar context it yields only the last
+value pushed (the last capture, or the route data when the route has none),
+which is rarely what you want.
 
 ## Route precedence
 
@@ -217,8 +221,9 @@ skipped.
 - Patterns and paths are byte strings. Wide-character (utf8-flagged) strings
 are matched against their UTF-8 byte representation.
 - Patterns must start with `/` and must not be empty, contain a NUL byte,
-contain consecutive slashes, use a bare `:` placeholder name, or contain an
-empty or unterminated `<type>`. `compile` `croak`s on any of these.
+contain consecutive slashes, use a bare `:` placeholder name, or contain a
+`<type>` that is empty, unterminated, or itself contains a `<`.
+`compile` `croak`s on any of these.
 - Matching is exact: `/users` matches only `/users`, not `//users`,
 `/users/`, or `/users//`. `/users` and `/users/` are distinct routes.
 Normalize input ahead of `match` to fold repeated or trailing slashes.

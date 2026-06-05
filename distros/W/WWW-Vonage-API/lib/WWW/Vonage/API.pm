@@ -4,14 +4,14 @@ use 5.010001;
 use strict;
 use warnings;
 
-our $VERSION = '0.001';
+our $VERSION = '0.003';
 our $Debug   = 0;
 our $Test    = 0;
 use LWP::UserAgent ();
 use URI::Escape qw(uri_escape uri_escape_utf8);
 use JSON;
 use Carp 'croak';
-use List::Util '1.29', 'pairs';
+#use List::Util '1.29', 'pairs';
 use Data::Dumper;
 sub API_Domain  { 'nexmo.com' }
 sub API_Version { 'v1' }
@@ -35,7 +35,9 @@ sub new {
         exists $args{$argument}
           or croak $class . "->new requires $argument argument";
     }
-
+    $Debug = 1
+      if ($args{DEBUG});
+      
     $account_sid{$self} = $args{API_Key}    || '';
     $auth_token{$self}  = $args{API_Secret} || '';
     $api_version{$self} =
@@ -53,15 +55,32 @@ sub new {
 }
 
 sub GET {
-    _do_request( shift, METHOD => 'GET', Path => shift, PAYLOAD => shift, @_ );
+    _do_request( 
+        shift, 
+        METHOD  => 'GET', 
+        Path    => shift, 
+        PAYLOAD => shift, 
+        @_ 
+    );
 }
 
 sub POST {
-    _do_request( shift, METHOD => 'POST', Path => shift, PAYLOAD => shift, @_ );
+    _do_request( 
+        shift, 
+        METHOD  => 'POST', 
+        Path    => shift, 
+        PAYLOAD => shift, 
+        @_ 
+    );
 }
 
 sub PUT {
-    _do_request( shift, METHOD => 'PUT', Path => shift, PAYLOAD => shift, @_ );
+    _do_request( 
+        shift, 
+        METHOD  => 'PUT', 
+        Path    => shift, 
+        PAYLOAD => shift, 
+        @_ );
 }
 
 sub PATCH {
@@ -84,14 +103,12 @@ sub DELETE {
     );
 }
 
-## METHOD => GET|POST|PUT|DELETE|PATCH
-## API    => Messages
-##           Recordings|Notifications|etc.
 sub _do_request {
     my $self = shift;
 
     my %args = @_;
-
+    $Debug = 1
+      if ($args{DEBUG});
     my $lwp = LWP::UserAgent->new;
     $lwp_callback{$self}->($lwp)
       if ref( $lwp_callback{$self} ) eq 'CODE';
@@ -100,7 +117,7 @@ sub _do_request {
 
     my $method  = delete $args{METHOD};
     my $payload = delete $args{PAYLOAD};
-    my $path    = lc( delete( $args{Path} ) );
+    my $path    = delete( $args{Path});
 
     print STDERR "Raw payload: " . Dumper($payload) . "\n"
       if $Debug;
@@ -255,7 +272,7 @@ WWW::Vonage::API
 
 =head1 VERSION
 
-version 0.001
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -275,7 +292,7 @@ version 0.001
       text         => 'There is a storm coming!',
   };
 
-  my $response = $vonage->POST( 'Messages', $payload );
+  my $response = $vonage->POST( 'messages', $payload );
 
   print $response->{content};
 
@@ -293,8 +310,8 @@ WWW::Vonage::API - Accessing Vonage's REST API with Perl
 The Vonage API documentation is found here: L<https://developer.vonage.com/en/home>
 
 The Vonage Communications API is a cloud-based platform that allows developers 
-to embed programmable communication channels—like SMS, voice, video, and social 
-messaging—directly into their applications, websites, and business systems.
+to embed programmable communication channels like SMS, voice, video, and social 
+messaging directly into their applications, websites, and business systems.
 
 =head2 Core API Offerings
 
@@ -347,19 +364,17 @@ In true large corporation fashion, not all Vonage APIs share the same domain or 
   | Voice API          | api.nexmo.com        | v1      |
   +--------------------+----------------------+---------+
 
-As well some of the domains that start with 'api' are also available with a 
-region specific domain and within some of the APIs you can have more than one 
-version of an API call and version may vary by API call. Finally some APIs 
+Additionally, some of the domains that start with 'api' are also available with a 
+region-specific domain. Within some of the APIs, you can have more than one 
+version of an API call, and the version may vary by API call. Finally, some APIs 
 do not use or have a version number.
 
 =head3 Using WWW::Vonage::API
 
 In theory, all features should work with this module. However, some features require 
-JSON Web Tokens (JWT). At this time, only **Basic Authentication** (API Key and Secret) is implemented.
+JSON Web Tokens (JWT). At this time, only B<Basic Authentication> (API Key and Secret) is implemented.
 
-=over 4
-
-=item 1. Basic Call
+=head3 Basic Call
 
     my $payload = {
             to           => '+6725550002',
@@ -369,57 +384,51 @@ JSON Web Tokens (JWT). At this time, only **Basic Authentication** (API Key and 
             text         => 'There is a storm coming!',
         };
 
-    my $response = $vonage->POST( 'Messages',$payload );
+    my $response = $vonage->POST( 'messages',$payload );
 
-=back
+In the above example, the "Messages" API is being invoked following the
+Vonage API documentation (L<https://developer.vonage.com/en/api/messages?source=messages>).
+For context, a snippet of the documentation follows:
 
-In the above example the "Messages" API is being invoked following the
-Vonage API documentation (L<https://developer.vonage.com/en/api/messages?source=messages>)
-For context a snippet of the documentation follows;
+=head3 B<Messages API>
 
-=over 4
-
-=item B<Messages API>
-
-=head3 Available Operations:
+B<Available Operations:>
 
 B<Post>
-  Send a message to the given channel
+      Send a message to the given channel
 
-=head3 Send an SMS message
+B<Send an SMS message>
 
-  POST https://{api-region}.nexmo.com/v1/messages
+      POST https://{api-region}.nexmo.com/v1/messages
 
-=head3 Server Variables
+B<Server Variables>
 
-  Api-region:  
-    one of  api, api-eu, api-us, api-ac
-  Authentication :
-    JWT or Basic
-  Body:
-    Required key value pairs in request body for SMS 
+      Api-region:  
+        one of  api, api-eu, api-us, api-ac
+      Authentication:
+        JWT or Basic
+      Body:
+        Required key-value pairs in request body for SMS 
 
-    +--------------+-----------------------+
-    |     Key      |         value         |     
-    +--------------+-----------------------+
-    | channel      | sms                   |
-    | message_type | text                  | 
-    | from         | the sender phone #    |
-    | to           | the recipient phone # |
-    | text         | up to 1000 characters |
-    +--------------+-----------------------+
+        +--------------+-----------------------+
+        |     Key      |         value         |     
+        +--------------+-----------------------+
+        | channel      | sms                   |
+        | message_type | text                  | 
+        | from         | the sender phone #    |
+        | to           | the recipient phone # |
+        | text         | up to 1000 characters |
+        +--------------+-----------------------+
 
-=head3 Responses:
+B<Responses:>
 
-  202 Accepted
-  401 Authentication failure
-  402 Payment Required
-  404 Not Found
-  422 Unprocessable Entity
-  429 Too Many Requests
-  500 Internal error
-
-=back
+      202 Accepted
+      401 Authentication failure
+      402 Payment Required
+      404 Not Found
+      422 Unprocessable Entity
+      429 Too Many Requests
+      500 Internal error
 
 =head1 METHODS
 
@@ -432,7 +441,7 @@ Creates a new Vonage object.
       API_Secret => 'YOUR_SECRET',
   );
 
-=head3 Available parameters:
+=head3 Available Parameters:
 
 =over 4
 
@@ -446,36 +455,36 @@ Your Vonage API Secret.
 
 =item B<API_Domain>
 
-Defaults to 'nexmo.com'. There is one production api that uses a different domain 
-as well as a number of 'beta' APIS. Simply use this parameter with the 
+Defaults to 'nexmo.com'. There is one production API that uses a different domain 
+as well as a number of 'beta' APIs. Simply use this parameter with the 
 value of the domain you wish to access.
 
 =item B<API_Version>
 
-Defaults to 'v1'. This value will change by API and even within an API, see 
-Vonage documentation for details. For example the 'Reports' API uses 'v2' and some 
+Defaults to 'v1'. This value will change by API and even within an API; see 
+Vonage documentation for details. For example, the 'Reports' API uses 'v2', and some 
 calls in that API use 'v3'. Use 'none' for APIs that do not utilize a version string in the URL.
 
 =item B<API_Region>
 
-Defaults to 'api'. Use this parameter when the api documentation calls for something
-other than 'api'. The documented ones are 'api-eu', 'api-us', 'api-ac', 'rest' and
+Defaults to 'api'. Use this parameter when the API documentation calls for something
+other than 'api'. The documented ones are 'api-eu', 'api-us', 'api-ac', 'rest', and
 'video.api'.  
+
+=item B<DEBUG>
+
+Sets an internal flag and will dump debug information to STDERR.
 
 =back
 
 =head2 Option Examples:
-
-=over 4
 
   my $vonage = new WWW::Vonage::API(
       API_Key => 'AC...',
       API_Secret  => '...',
      );
 
-would create the following url;
-
-    https://api.nexmo.com/v1/
+would create the following url: B<https://api.nexmo.com/v1/>
 
   my $vonage = new WWW::Vonage::API(
       API_Key => 'AC...',
@@ -483,9 +492,7 @@ would create the following url;
       API_Version => 'v2'
      );
 
-would create the following url;
-
-    https://api.nexmo.com/v2
+would create the following url: B<https://api.nexmo.com/v2/>
 
   my $vonage = new WWW::Vonage::API(
       API_Key => 'AC...',
@@ -494,9 +501,7 @@ would create the following url;
       API_Region => 'rest'
      );
 
-would create the following url;
-
-    https://rest.nexmo.com/
+would create the following url: B<https://rest.nexmo.com/>
 
   my $vonage = new WWW::Vonage::API(
       API_Key => 'AC...',
@@ -506,49 +511,45 @@ would create the following url;
       API_Region => 'video.api'
      );
 
-would create the following url;
-
-    https://video.api.vonage.com/v2/
-
-=back
+would create the following url: B<https://video.api.vonage.com/v2/>
 
 =head2 Vonage API calls
 
-As Vonage is supposed to be a RESTful API, there is an expectation 
-of a certain resource/entity path pattern for a given HTTP verb. For the most part
+As Vonage is designed to be a RESTful API, there is an expectation 
+of a certain resource/entity path pattern for a given HTTP verb. For the most part,
 Vonage follows the standard REST path pattern of:
 
 =over 4
 
-'resource' 
+    'resource' 
 
 =back
 
-for the POST verb and some GET and PATCH verbs and
+for the POST and some GET verbs 
 
 =over 4
 
-'resource/:entity_id'
+    'resource/:entity_id'
 
 =back
 
-for the DELETE, PATCH, PUT verbs and some GET verbs.
+for the DELETE, PATCH, and PUT verbs and some GET verbs.
 
-There are also a few APIs where there are parent-child calls as well in this
+There are also a few APIs that include parent-child calls in this
 pattern:
 
 =over 4
 
-'resource/:entity_id/:child_entity'
+    'resource/:entity_id/:child_entity'
 
 =back
 
-for the POST verb and some GET and PATCH verbs and for the DELETE, PATCH, PUT
-verbs and some GET verbs the child_id is also included:
+for the POST verb and some GET and PATCH verbs. For the DELETE, PATCH, and PUT
+verbs and some GET verbs, the child_id is also included:
 
 =over 4
 
-'resource/:entity_id/:child_entity/:child_entity_id'
+    'resource/:entity_id/:child_entity/:child_entity_id'
 
 =back
 
@@ -556,11 +557,13 @@ There are a few that also include an extra resource in the path:
 
 =over 4
 
-'resource_1/:entity_id/:child_entity/:child_entity_id/resource_2'
+    'resource_1/:entity_id/:child_entity/:child_entity_id/resource_2'
 
 =back
 
-Consult the individual Vonage API documents for details on how each works.
+As a final note, API resource names can be either case-sensitive or case-insensitive, 
+whereas API entity IDs are strictly case-sensitive. Please consult the individual 
+Vonage API documentation for specific details on how each works.
 
 =head2 All API calls are of the form:
 
@@ -572,76 +575,80 @@ Consult the individual Vonage API documents for details on how each works.
 
 =head3 METHOD 
 
-Method is one of following HTTP verbs B<GET>, B<POST>, B<PATCH>, B<DELETE> and 
+The method is one of the following HTTP verbs: B<GET>, B<POST>, B<PATCH>, B<DELETE>, and 
 B<PUT>.  
 
-=head4 GET
+=over 4
 
-Requests a representation of a specific entity and in a Vonage API. It is used to 
-retrieve data without modifying it. If the request has a 'PAYLOAD' it is encoded on
- the query string of the url. 
+=item B<GET>
 
-=head4 POST
+Requests a representation of a specific entity within a Vonage API. It is used to 
+retrieve data without modifying it. If the request has a 'PAYLOAD', it is encoded on
+ the query string of the URL. 
 
-Sends data to a server to create a new entity and in some Vonage APIs it is used
-to initiate a specialized process. If the request has a 'PAYLOAD' it is encoded
+=item B<POST>
+
+Sends data to a server to create a new entity, and in some Vonage APIs, it is used
+to initiate a specialized process. If the request has a 'PAYLOAD', it is encoded
  in JSON in the body of the request.
 
-=head4 PATCH
+=item B<PATCH>
 
 Applies partial modifications to an existing entity rather than replacing it. If
- the request has a 'PAYLOAD' it is encoded in JSON in the body of the request.
+ the request has a 'PAYLOAD', it is encoded in JSON in the body of the request.
 
-=head4 DELETE
+=item B<DELETE>
 
-Removes the specified entity from the server. Normally there is no 'PAYLOAD' and 
-the enitity_id is included in the request 'PATH'.
+Removes the specified entity from the server. Normally there is no 'PAYLOAD', and 
+the entity_id is included in the request 'PATH'.
 
-=head4 PUT
+=item B<PUT>
 
-Replaces the current the target entity with the payload. In some Vonage APIs it 
-will create the enitity if it doesn't exist.  If the request has a 'PAYLOAD' 
+Replaces the current target entity with the payload. In some Vonage APIs, it 
+will create the entity if it doesn't exist. If the request has a 'PAYLOAD', 
 it is encoded in JSON in the body of the request.
+
+=back
 
 =head3 PATH
 
 This is the Vonage API resource that is being invoked. Normally it is just a single
 resource, but that varies from API to API. This software expects that the full 
-resource/entity path is included. For example a call with the PATCH verb of the
+resource/entity path is included. For example, a call with the PATCH verb of the
 'project' resource requires this path pattern:
 
 =over 4
 
-'resource_1/:entity_id/:child_entity/:child_id/resource_2'  
+    'resource_1/:entity_id/:child_entity/:child_id/resource_2'  
 
 =back
 
 and so the PATCH call to an entity would look like this:
 
-  $vonage->PATCH('project/999902/archive/19900/streams',$payload,...)
+    $vonage->PATCH('project/999902/archive/19900/streams',$payload,...)
 
 where 'project' is the resource, '999902' the entity id, 'archive' the child entity,
-'19900' the child_id and 'streams' the secondary resource. 
+'19900' the child_id, and 'streams' the secondary resource. 
 
 =head3 PAYLOAD
 
 A hash-ref of key-value pairs. 
-For B<POST>, B<PATCH>, and B<PUT>, verbs it is encoded as JSON in the request body.
+For the B<POST>, B<PATCH>, and B<PUT> verbs, it is encoded as JSON in the request body.
 For B<GET>, it is encoded on the query string.
 
 =head3 OPTIONS
 
-You can override C<API_Version>, C<API_Domain>, or C<API_Region> on a per-call basis
-without creating a new instance. Note that these option values are sticky and will
-remain with a VONAGE instance until overwritten. 
+You can override B<API_Version>, B<API_Domain>, B<API_Region>, or B<DEBUG> options 
+on a per-call basis without creating a new instance. Note that these option values 
+are sticky and will remain with a VONAGE instance until overwritten. 
 
 =head3 API Response
 
-Each of B<GET>, B<POST>, B<PATCH>, B<PUT> and B<DELETE> return a hashref with
+Each of B<GET>, B<POST>, B<PATCH>, B<PUT>, and B<DELETE> returns a hashref with
 the call results, the most important of which is the I<content>
 element. This is the untouched, raw response of the Vonage API server,
-suitable for you to do whatever you want with it. Normally it is a JSON object as
-in this example below;
+suitable for you to do whatever you want with it. Normally it is a JSON object, as
+in the example below:
 
     my $payload = {
             date_start => '2026-04-18',
@@ -651,8 +658,9 @@ in this example below;
         };
 
     $response = $Vonage->GET('reports/records',$payload,API_Version=>'v2');
-...
-and B<$response> hash-ref will look like this;
+    ...
+
+and the B<$response> hash-ref will look like this:
 
     {
       content =>'{"message_uuid": "aaaaaaaa-bbbb-4ccc-8ddd-0123456789ab",
@@ -678,50 +686,46 @@ success code for the API you are invoking.
 =item B<message>
 
 A brief HTTP status message, corresponding to the status code. For 200
-codes, the message will be "OK". For 202 codes the message will be "Accepted".
-For "400" codes, the message will be "Bad Request" and so forth. Again check the
-Vonage API documentation to see what the correct message and code is for the API
+codes, the message will be "OK". For 202 codes, the message will be "Accepted".
+For "400" codes, the message will be "Bad Request", and so forth. Again, check the
+Vonage API documentation to see what the correct message and code are for the API
  you are invoking.
 
 =back
 
-=head4 Example:
+=head3 Example:
 
 =over 4
 
-  $response = $vonage->POST( 'Messages',$payload );
+    $response = $vonage->POST( 'messages',$payload );
 
 =back
 
 B<$response> is a hashref that looks like this:
 
-   {
-    content =>'{"message_uuid": "aaaaaaaa-bbbb-4ccc-8ddd-0123456789ab",
+    {
+      content =>'{"message_uuid": "aaaaaaaa-bbbb-4ccc-8ddd-0123456789ab",
                 "workflow_id": "3TcNjguHxr2vcCZ9Ddsnq6tw8yQUpZ9rMHv9QXSxLan5ibMxqSzLdx9"}',
-    code    =>'202',
-    message =>'Accepted',
-   }
+      code    =>'202',
+      message =>'Accepted',
+    }
 
 =head2 API Examples
 
-Vonage is a rather large API so here are some basic examples that will cover most 
+Vonage is a rather large API, so here are some examples that will cover most 
 of the basics.
 
-=over 4
-
-=item B<Get API calls>
-
-=back
+=head3 B<Get API calls>
 
 =head3 Reports API
 
-In this example a report on 'SMS' outbound messages for a date range is required.
+In this example, a report on 'SMS' outbound messages for a date range is required.
 The 'Reports API' is going to be invoked to fulfill this requirement. The 
-resource that will be invoked is 'reports' and the entity is 'records'. According
-to the API documentation, these four parameters; start date, end date, product and 
-direction, are required to be encoded on the URL Query String.
+resource that will be invoked is 'reports', and the entity is 'records'. According
+to the API documentation, these four parameters start date, end date, product, and 
+direction are required to be encoded on the URL Query String.
 
-First the payload is created;
+First, the payload is created:
 
 =over 4 
 
@@ -734,7 +738,7 @@ First the payload is created;
 
 =back
 
-Next a Vonage API instance is required;
+Next, a Vonage API instance is required:
 
 =over 4 
 
@@ -743,7 +747,7 @@ Next a Vonage API instance is required;
 
 =back
 
-then the API is invoked with this line:
+Then, the API is invoked with this line:
 
 =over 4 
 
@@ -772,25 +776,25 @@ The response is a hashref that would look like this:
 
 =head4 Notes:
 
-As the 'API_Version' parameter was not included in when creating the Vonage instance
-'v1' is used as the default. According to the API document 'v2' is required so 
-to invoke the correct version the 'API_Version' param is used.  
+As the B<API_Version> parameter was not included when creating the Vonage instance,
+'v1' is used as the default. According to the API documentation, 'v2' is required, so 
+to invoke the correct version, the B<API_Version> param is used.  
 
 =head3 Account API 
 
-In this example the current balance of the account is required. To get this value
-the 'Accounts API' must be used. So the 'account' resource is used in conjunction with
+In this example, the current balance of the account is required. To get this value,
+the B<Accounts API> must be used. So the 'account' resource is used in conjunction with
 the 'get-balance' entity.
 
-In this case there is no payload, only a call to the API;
+In this case, there is no payload, only a call to the API.
 
-Starting with a new vonage instance:
+Starting with a new Vonage instance:
 
-  my $Vonage = WWW::Vonage::API->new(API_Key      => 'ABC12345...',
-                                     API_Secret   => '1234567...',
-                                     API_Region   => 'rest');
+    my $Vonage = WWW::Vonage::API->new(API_Key      => 'ABC12345...',
+                                       API_Secret   => '1234567...',
+                                       API_Region   => 'rest');
 
-then the 'GET' call to the resource:
+Then, the B<GET> call to the resource:
 
 =over 4
 
@@ -811,25 +815,21 @@ The response is a hashref that would look like this:
 
 =head4 Notes:
 
-The API_Region param is used to set the first part of the URL to 'rest' when 
-invoking the Vonage instance.  The 'PAYLOAD' is set to 'undef' as there is no 
-payload and finally the 'API_Version' param is use with a  value of 'none' to 
+The B<API_Region> param is used to set the first part of the URL to 'rest' when 
+invoking the Vonage instance. The 'PAYLOAD' is set to 'undef' as there is no 
+payload, and finally, the B<API_Version> param is used with a value of 'none' to 
 drop the version number from the URL.
 
-=over 4
+=head3 B<POST API call>
 
-=item B<POST API calls>
+=head4 Account API 
 
-=back
-
-=head3 Account API 
-
-In this example a transaction notice needs to be sent to Vonage to update the 
+In this example, a transaction notice needs to be sent to Vonage to update the 
 balance of an account. The 'Accounts API' is again used to set this value using
-the 'POST' verb and the 'top-up' entity. The 'trx' param is required and it
-is encoded in the body of the post;
+the 'POST' verb and the 'top-up' entity. The 'trx' param is required, and it
+is encoded in the body of the POST:
 
-  my $response = $Vonage->GET('account/top-up',{trx=>'8ef2...'});
+  my $response = $Vonage->POST('account/top-up',{trx=>'8ef2...'});
 
 The response in this case would be a hashref:
 
@@ -844,9 +844,9 @@ The response in this case would be a hashref:
 
 =head4 Notes:
 
-In the above example it was assumed the Vonage object is being reused from the 
-previous example so it will maintain the values of API_Region and API_Version for 
-its call.
+In the above example, it is assumed the Vonage object is being reused from the 
+previous example, so it will maintain the option values of B<API_Region> and 
+B<API_Version> for its call.
 
 More examples of using the params to set the path of an API call can be found in
 the .t files.
@@ -865,6 +865,8 @@ Copyright (C) 2026 by John Scoles
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
+
+=cut
 
 =head1 AUTHOR
 

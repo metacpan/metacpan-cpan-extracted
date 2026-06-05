@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/DuplicateFilesUtils/show_duplicate_files
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-19'; # DATE
+our $DATE = '2026-06-05'; # DATE
 our $DIST = 'App-DuplicateFilesUtils'; # DIST
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/DuplicateFilesUtils/show_duplicate_files",
@@ -38,17 +38,21 @@ show-duplicate-files - Show duplicate files
 
 =head1 VERSION
 
-This document describes version 0.005 of show-duplicate-files (from Perl distribution App-DuplicateFilesUtils), released on 2022-08-19.
+This document describes version 0.006 of show-duplicate-files (from Perl distribution App-DuplicateFilesUtils), released on 2026-06-05.
 
 =head1 SYNOPSIS
 
-B<show-duplicate-files> [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]]
+B<show-duplicate-files> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<show-duplicate-files> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<show-duplicate-files> [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]]
 
 =head1 DESCRIPTION
 
 This is actually a shortcut for:
 
- % uniq-files -a --show-count --show-size --group-by-digest -R .
+ % uniq-files -a --show-count --show-size --report-duplicate=3 --group-by-digest -R .
 
 Sample output:
 
@@ -56,50 +60,38 @@ Sample output:
  +------------------------------+---------+-------+
  | file                         | size    | count |
  +------------------------------+---------+-------+
- | ./tmp/P_20161001_112707.jpg  | 1430261 | 2     |
  | ./tmp2/P_20161001_112707.jpg | 1430261 | 2     |
  |                              |         |       |
- | ./20160420/IMG_3430-(95).JPG | 1633463 | 2     |
  | ./tmp/IMG_3430-(95).JPG      | 1633463 | 2     |
  |                              |         |       |
- | ./tmp/P_20161009_081735.jpg  | 1722586 | 2     |
  | ./tmp2/P_20161009_081735.jpg | 1722586 | 2     |
  |                              |         |       |
- | ./20160420/IMG_3430-(98).JPG | 1847543 | 3     |
  | ./tmp/IMG_3430-(98).JPG      | 1847543 | 3     |
  | ./tmp2/IMG_3430-(98).JPG     | 1847543 | 3     |
  |                              |         |       |
- | ./20160420/IMG_3430-(97).JPG | 1878472 | 2     |
  | ./tmp/IMG_3430-(97).JPG      | 1878472 | 2     |
  |                              |         |       |
- | ./20160420/IMG_3430-(99).JPG | 1960652 | 3     |
  | ./tmp/IMG_3430-(99).JPG      | 1960652 | 3     |
  | ./tmp2/IMG_3430-(99).JPG     | 1960652 | 3     |
  |                              |         |       |
- | ./20160420/IMG_3430-(96).JPG | 2042952 | 2     |
  | ./tmp/IMG_3430-(96).JPG      | 2042952 | 2     |
  |                              |         |       |
- | ./20160420/IMG_3430-(92).JPG | 2049127 | 2     |
  | ./tmp/IMG_3430-(92).JPG      | 2049127 | 2     |
  |                              |         |       |
- | ./20160420/IMG_3430-(94).JPG | 2109852 | 2     |
  | ./tmp/IMG_3430-(94).JPG      | 2109852 | 2     |
  |                              |         |       |
- | ./20160420/IMG_3430-(91).JPG | 2138724 | 2     |
  | ./tmp/IMG_3430-(91).JPG      | 2138724 | 2     |
  |                              |         |       |
- | ./20160420/IMG_3430-(93).JPG | 2190379 | 2     |
  | ./tmp/IMG_3430-(93).JPG      | 2190379 | 2     |
  +------------------------------+---------+-------+
 
-You can then delete or move the duplicates manually, if you want. But there's
-also L<move-duplicate-files-to> to automatically move all the duplicates
-(but one, for each set) to a directory of your choice.
+You can then delete, move the duplicates, or replace them with symlinks
+manually, if you want. But there's also L<delete-duplicate-files>,
+L<move-duplicate-files-to>, L<replace-duplicate-files-with-symlinks>,
+L<replace-duplicate-files-with-hardlinks>.
 
-To perform other actions on the duplicate copies, for example delete them, you
-can use L<uniq-files> directly e.g. (in bash):
-
- % uniq-files -R -D * | while read f; do rm "$p"; done
+If you want more flexibility/customization, use L<uniq-files> or
+LL<dupe-files> directly.
 
 =head1 OPTIONS
 
@@ -247,7 +239,7 @@ that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2022, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

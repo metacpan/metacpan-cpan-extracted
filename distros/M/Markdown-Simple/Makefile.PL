@@ -2,6 +2,7 @@ use 5.006;
 use strict;
 use warnings;
 use Config;
+use File::Temp ();
 use ExtUtils::MakeMaker;
 use Devel::CheckLib;
 
@@ -17,17 +18,72 @@ sub _probe {
     return $ok ? 1 : 0;
 }
 
+# Free-form compile probe: writes $src to a temp .c, runs $Config{cc}
+# with $cflags, returns true iff the object compiled cleanly.
+# Used for the SIMD probes because they need to declare a top-level
+# static function with __attribute__((target(...))), which check_lib's
+# "body wedged into main" template can't express.
+sub _probe_compile {
+    my ($label, $cflags, $src) = @_;
+    my ($fh, $cfile) = File::Temp::tempfile(SUFFIX => '.c', UNLINK => 1);
+    print $fh $src;
+    close $fh;
+    my $ofile = "${cfile}.o";
+    my $cc    = $Config{cc} || 'cc';
+    my $ccfl  = $Config{ccflags} || '';
+    my $cmd   = "$cc $ccfl $cflags -c $cfile -o $ofile";
+    # Silence both streams; we only care about the exit code.
+    my $redir = ($^O eq 'MSWin32') ? '>NUL 2>&1' : '>/dev/null 2>&1';
+    my $rc    = system("$cmd $redir");
+    unlink $ofile if -e $ofile;
+    my $ok = ($rc == 0);
+    print "probe: $label ... ", ($ok ? "yes\n" : "no\n");
+    return $ok ? 1 : 0;
+}
+
 my @SIMD_DEFINES;
 my $arch = "$Config{archname} $Config{myarchname} $Config{archname64}";
 
+# IMPORTANT: the SIMD probes must compile under the *exact* flags the
+# unity build will use — i.e. WITHOUT -msse2/-mavx2 baseline — because
+# src/simd/mds_simd_{sse2,avx2}.c rely on per-function
+# __attribute__((target("..."))) for ISA escalation. If a probe with
+# -mavx2 succeeds but the compiler does not honour the target attribute
+# (old GCC, MSVC, etc.), the build will still fail. Probing through the
+# attribute matches the build's actual code path and degrades cleanly
+# to scalar on hosts where the attribute is unavailable.
 if ($arch =~ /(?:x86_64|amd64|i[3-6]86)/i) {
-    # SSE2 baseline on x86_64; probe AVX2 with target attribute.
-    push @SIMD_DEFINES, '-DMDS_HAVE_SSE2'
-        if _probe('SSE2', '-msse2', 'emmintrin.h',
-                  '__m128i v=_mm_setzero_si128();(void)v;return 0;');
-    push @SIMD_DEFINES, '-DMDS_HAVE_AVX2'
-        if _probe('AVX2', '-mavx2', 'immintrin.h',
-                  '__m256i v=_mm256_setzero_si256();(void)v;return 0;');
+    push @SIMD_DEFINES, '-DMDS_HAVE_SSE2' if _probe_compile(
+        'SSE2/SSSE3 (per-function target attribute)', '',
+        <<'C_SSE2');
+#include <tmmintrin.h>
+#include <emmintrin.h>
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__((target("ssse3")))
+#endif
+static int probe_ssse3(void) {
+    __m128i z = _mm_setzero_si128();
+    __m128i v = _mm_shuffle_epi8(z, z);
+    (void)v;
+    return 0;
+}
+int main(void) { return probe_ssse3(); }
+C_SSE2
+
+    push @SIMD_DEFINES, '-DMDS_HAVE_AVX2' if _probe_compile(
+        'AVX2 (per-function target attribute)', '',
+        <<'C_AVX2');
+#include <immintrin.h>
+#if defined(__GNUC__) || defined(__clang__)
+__attribute__((target("avx2,bmi2")))
+#endif
+static int probe_avx2(void) {
+    __m256i v = _mm256_setzero_si256();
+    (void)v;
+    return 0;
+}
+int main(void) { return probe_avx2(); }
+C_AVX2
 }
 elsif ($arch =~ /(?:aarch64|arm64)/i) {
     push @SIMD_DEFINES, '-DMDS_HAVE_NEON'

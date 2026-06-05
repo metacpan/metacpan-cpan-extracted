@@ -4,11 +4,11 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = '3.90';
+our $VERSION = '4.03';
 
-use Capture::Tiny qw(capture);
-use Cwd qw(cwd);
+use Cwd qw(abs_path cwd);
 use File::Basename qw(basename);
+use File::Spec;
 use POSIX qw(strftime);
 
 # new(%args)
@@ -187,28 +187,58 @@ sub _strip_ansi {
 }
 
 # _git_branch($project_root)
-# Reads the current git branch for a project root if available using the older
-# `git branch` parsing style so the prompt matches the classic shell helper.
+# Reads the current git branch for a project root directly from git metadata
+# without shelling out, so prompt rendering stays cheap on slower systems.
 # Input: project root directory path.
-# Output: branch name string or undef when unavailable.
+# Output: branch name string, detached HEAD short SHA, or undef when unavailable.
 sub _git_branch {
     my ( $self, $project_root ) = @_;
     return if !$project_root || !-d $project_root;
 
-    my $old = cwd();
-    chdir $project_root or return;
-    my ( $stdout, undef, $exit_code ) = capture {
-        system 'git', 'branch';
-        return $? >> 8;
-    };
-    chdir $old or die "Unable to restore cwd to $old: $!";
-    return if $exit_code != 0;
-    return if !defined $stdout || $stdout eq '';
-    for my $line ( split /\n/, $stdout ) {
-        next if !defined $line;
-        return $1 if $line =~ /^\*\s+(.+)$/;
+    my $git_dir = $self->_git_metadata_dir($project_root) || return;
+    my $head_file = File::Spec->catfile( $git_dir, 'HEAD' );
+    return if !-f $head_file;
+
+    open my $head_fh, '<', $head_file or return;
+    my $head = <$head_fh>;
+    close $head_fh;
+    return if !defined $head;
+    $head =~ s/\s+\z//;
+
+    if ( $head =~ /^ref:\s+(.+)$/ ) {
+        return basename($1);
     }
+
+    return substr( $head, 0, 7 ) if $head =~ /\A[0-9a-f]{7,40}\z/i;
     return;
+}
+
+# _git_metadata_dir($project_root)
+# Resolves the concrete git metadata directory for normal repos and worktrees.
+# Input: project root directory path.
+# Output: absolute git metadata directory path or undef when unavailable.
+sub _git_metadata_dir {
+    my ( $self, $project_root ) = @_;
+    return if !defined $project_root || $project_root eq '';
+
+    my $git_path = File::Spec->catfile( $project_root, '.git' );
+    return $git_path if -d $git_path;
+    return if !-f $git_path;
+
+    open my $git_fh, '<', $git_path or return;
+    my $line = <$git_fh>;
+    close $git_fh;
+    return if !defined $line;
+    $line =~ s/\s+\z//;
+    return if $line !~ /^gitdir:\s*(.+)$/;
+
+    my $git_dir = $1;
+    $git_dir = File::Spec->catdir( $project_root, $git_dir )
+      if !File::Spec->file_name_is_absolute($git_dir);
+    my $resolved = abs_path($git_dir);
+    return $resolved if defined $resolved && -d $resolved;
+    return if !-d $git_dir;
+    return $git_dir;
 }
 
 1;

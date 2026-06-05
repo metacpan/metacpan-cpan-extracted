@@ -32,19 +32,23 @@ int mds_render_html_to_sv_ex(pTHX_
                              mds_arena*         borrowed_arena,
                              mds_block_scratch* borrowed_scratch) {
     mds_buf buf;
+    struct mds_render_state_blob blob;
+    void* ud;
+    mds_callbacks cb;
+    mds_ctx ctx;
+    mds_arena local_arena;
+    mds_arena* arena;
+
     /* Pass raw `len` so mds_buf_init_for_input owns the output-size
      * multiplier; avoids double-inflation. */
     mds_buf_init_for_input(aTHX_ &buf, output_sv, input, len);
 
-    struct mds_render_state_blob blob;
     memset(&blob, 0, sizeof blob);
-    void* ud = &blob;
+    ud = &blob;
 
-    mds_callbacks cb;
     memset(&cb, 0, sizeof cb);
     mds_render_html_install(&cb, &ud, &buf, flags);
 
-    mds_ctx ctx;
     memset(&ctx, 0, sizeof ctx);
     ctx.input   = input;
     ctx.len     = len;
@@ -56,8 +60,6 @@ int mds_render_html_to_sv_ex(pTHX_
     /* If a persistent (borrowed) arena was provided, use
      * it by value and reset (not free) at the end so the warm head page
      * survives between parses. Otherwise allocate a per-call arena. */
-    mds_arena local_arena;
-    mds_arena* arena;
     if (borrowed_arena) {
         arena = borrowed_arena;
     } else {

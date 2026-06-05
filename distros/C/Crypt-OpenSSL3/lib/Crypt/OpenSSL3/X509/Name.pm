@@ -1,5 +1,5 @@
 package Crypt::OpenSSL3::X509::Name;
-$Crypt::OpenSSL3::X509::Name::VERSION = '0.005';
+$Crypt::OpenSSL3::X509::Name::VERSION = '0.006';
 use strict;
 use warnings;
 
@@ -21,11 +21,21 @@ Crypt::OpenSSL3::X509::Name - A name in a X509 certificate
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 METHODS
 
+=head2 add_entry
+
+=head2 add_entry_by_NID
+
+=head2 add_entry_by_OBJ
+
+=head2 add_entry_by_txt
+
 =head2 cmp
+
+=head2 delete_entry
 
 =head2 digest
 
@@ -39,7 +49,11 @@ version 0.005
 
 =head2 get_index_by_OBJ
 
+=head2 hash
+
 =head2 oneline
+
+=head2 print
 
 =head1 AUTHOR
 

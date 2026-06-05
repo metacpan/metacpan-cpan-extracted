@@ -3,7 +3,7 @@ package Developer::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '3.90';
+our $VERSION = '4.03';
 
 1;
 
@@ -18,7 +18,7 @@ __END__
 Developer::Dashboard - a local home for development work
 
 =head1 VERSION
-3.90
+4.03
 
 =head1 INTRODUCTION
 
@@ -69,7 +69,29 @@ C<dashboard> without polluting the global PATH. That keeps dashboard-owned
 built-ins separate from user commands and hooks under
 F<~/.developer-dashboard/cli/>. Compatibility aliases C<pjq>, C<pyq>,
 C<ptomq>, C<pjp>, and C<ticket> still normalize to the current commands when
-they are invoked through C<dashboard>.
+they are invoked through C<dashboard>. The public switchboard now keeps the
+prompt path lighter as well: once the managed helper files are already staged,
+C<dashboard ps1> refreshes only the requested helper, reuses one path registry
+for the whole invocation, and avoids loading the suggestion and skill dispatch
+stack on the ordinary prompt fast path.
+
+Dashboard also normalizes C<PERL5LIB> for its own processes before the staged
+helper runtime loads. Dashboard-owned libraries stay visible, but the active
+Perl core, site, and vendor directories are forced ahead of inherited
+user-local shadow copies. That keeps stale dual-life XS modules such as
+C<Encode> from breaking helper startup, collector child commands, saved Ajax
+subprocesses, or skill hooks on hosts with older local-lib artefacts.
+Dashboard-managed child commands also keep the current interpreter's bin
+directory plus the active shell directory at the front of C<PATH>, and
+collector shell commands now run through a non-login shell so macOS
+shell-session restore banners and similar startup chatter do not get prefixed
+onto JSON collector output.
+
+Explicit named collector stop and restart actions also pause the watchdog
+supervisor for the targeted collector set while the lifecycle command is in
+flight, then restore supervision for the remaining watched fleet afterwards.
+That prevents the watchdog from racing a manual collector restart and spawning
+another replacement loop underneath the CLI.
 
 It provides a small ecosystem for:
 
@@ -138,7 +160,11 @@ Managed runtime children are expected to clean up after themselves. Detached
 web startup helpers, collector loops, the collector watchdog supervisor, the
 SSL frontend connection workers, and background page actions now reap the
 direct children they own instead of leaving zombie processes behind on hosts
-such as macOS and WSL. Managed collectors are also watched after startup: an
+such as macOS and WSL. Collector loops and the collector watchdog supervisor
+also reap those children immediately on C<SIGCHLD>, so long-interval
+collectors and orphaned watchdogs do not leave visible C<E<lt>defunctE<gt>>
+dashboard processes behind until some later housekeeping pass. Managed
+collectors are also watched after startup: an
 unexpected exit triggers an automatic restart, while repeated crash loops are
 raised as explicit C<attention_required> collector state instead of silently
 stopping or spinning forever.
@@ -786,6 +812,26 @@ That keeps bookmark Ajax workflows usable even while transient token URLs stay
 disabled by default, and it means bookmark Ajax code can rely on normal
 C<print>, C<warn>, C<die>, C<system>, and C<exec> process behaviour instead of
 a buffered JSON wrapper.
+The same layered runtime config chain and installed-skill config trees can now
+ship C<config/api.json> files that authorize selected C</ajax/...> routes for
+machine-to-machine callers without forcing a helper login form. The schema is a
+JSON object keyed by API client name. Each entry must provide a stored SHA-256
+hex digest under C<secret> plus an C<ajax> array of exact saved Ajax route
+paths such as C</ajax/stream.txt> or
+C</ajax/example-skill/status.json>. When a non-admin remote request targets one
+of those registered C</ajax/...> paths, the caller can send
+C<X-DD-API-Key: NAME> and C<X-DD-API-Secret: RAW-SECRET>. Developer Dashboard
+hashes the raw secret with SHA-256, compares it to the stored digest, and
+executes the saved Ajax handler when they match. Missing or wrong credentials
+for a registered API route return C<403> with the JSON body
+C<{"status":"forbidden"}>. Existing helper-session auth still works on the
+same saved Ajax routes, so browser workflows and machine callers can coexist on
+one handler without adding a second copy of the route. Like the rest of
+C<DD-OOP-LAYERS>, runtime C<config/api.json> files merge from home to the
+deepest active child layer, and installed skills contribute their own layered
+C<config/api.json> fragments for skill-local saved Ajax routes. The built-in
+C<dashboard api> command is the supported way to inspect or update the writable
+runtime layer for that registry.
 Saved bookmark Ajax handlers also default to C<text/plain> when no explicit
 C<type =E<gt> ...> argument is supplied, and the generated Perl wrapper now
 enables autoflush on both C<STDOUT> and C<STDERR> so long-running handlers
@@ -1312,7 +1358,9 @@ prompt suppresses indicator fragments with C<dashboard ps1 --no-indicators>.
 Ordinary tmux sessions keep the normal inline prompt. Developer Dashboard
 does not edit the user's tmux config file to provide that behavior, and it
 uses session-local tmux options
-instead of changing the whole tmux server.
+instead of changing the whole tmux server. Those dashboard-managed tmux
+sessions also refresh the status block at a 15-second cadence instead of a
+hot 2-second loop.
 When helper staging reruns during upgrades, the managed home runtime also
 removes dashboard-owned older flat helper files from
 F<~/.developer-dashboard/cli/> so the public command and shell bootstrap
@@ -1675,6 +1723,51 @@ the helper session and that helper account. Helper page views also show the
 helper username in the top-right chrome instead of the local system account.
 Exact-loopback admin requests do not show a Logout link.
 
+=head2 Managing API Keys For Saved Ajax Routes
+
+List the effective machine-auth API registry:
+
+  dashboard api
+  dashboard api ls
+  dashboard api ls --key helper-bot
+  dashboard api ls --key helper-bot -o json
+
+Create or update one API group from a raw secret:
+
+  dashboard api add --key helper-bot --secret raw-secret
+  dashboard api add --key helper-bot --secret rotated-secret
+  dashboard api add --key helper-bot --secret raw-secret --route /ajax/health --route /ajax/healthz
+  dashboard api add --key helper-bot --maybe-secret raw-secret --route /ajax/health --route /ajax/healthz
+
+Add one exact saved Ajax route to an existing API group:
+
+  dashboard api add --key helper-bot --route /ajax/health
+  dashboard api add --key helper-bot --route /ajax/healthz
+
+Remove one route or remove the whole API group:
+
+  dashboard api rm --key helper-bot --route /ajax/healthz
+  dashboard api rm --key helper-bot
+
+The C<dashboard api> command manages the deepest writable runtime
+C<config/api.json> layer under C<DD-OOP-LAYERS>. Listing shows the effective
+merged registry from home through the active child layer together with any
+installed-skill API fragments that contribute saved Ajax machine auth. Updates
+never rewrite installed skill files; they only change the writable runtime
+layer for the current working context.
+
+When you pass C<--secret>, the raw secret is hashed to a SHA-256 hex digest
+before it is stored. C<--maybe-secret> is the route-friendly alias for the
+same raw secret input: if the key is missing it creates the group, and if the
+key already exists it overwrites the stored secret while the command updates
+the requested routes. The saved JSON keeps the digest under C<secret> plus the
+exact allowed saved Ajax routes under C<ajax>. C<dashboard api add> accepts
+one or more repeated C<--route> flags, so one command can create the key,
+hash the secret, and register multiple exact routes at once. Adding the same
+route twice is a no-op. Removing an inherited API group from a deeper child
+layer writes a child-layer tombstone so the parent definition is hidden
+without editing the parent file.
+
 =head2 Working With Pages
 
 Create a starter page document:
@@ -1898,6 +1991,30 @@ active, but only until C<multiple> active runs are already in flight.
 When C<mode> is C<multiple> and C<multiple> is omitted, the runtime uses
 C<2>.
 
+=item *
+
+Collectors whose C<command> re-enters C<dashboard> or C<d2> through a shell
+path now have a safety floor of C<30> seconds even if config asks for a
+smaller interval, because those recursive dashboard collectors are materially
+heavier than direct shell probes. Set C<allow_fast_poll> or
+C<allow_fast_dashboard_poll> on that collector, or set
+C<DEVELOPER_DASHBOARD_MIN_DASHBOARD_COMMAND_INTERVAL_SECONDS>, when the faster
+cadence is intentional and understood.
+
+=item *
+
+When a collector sets C<disable =E<gt> 1> or C<"disable": true>, dashboard
+will not start that collector, explicit named starts reject it, and any
+already-running managed loop for that collector is stopped during the next
+collector lifecycle action. Managed indicator state for that collector is
+also removed instead of lingering as if it were still active.
+
+=item *
+
+Stopping a singleton collector loop also terminates the long-running command
+currently owned by that loop, so C<dashboard stop collector foo> does not leave
+the old worker command alive behind the stopped dispatcher.
+
 =back
 
 Collector indicators follow the collector exit code automatically: C<0>
@@ -2006,10 +2123,13 @@ Render prompt text directly:
 C<dashboard ps1> now follows the original F<~/bin/ps1> shape more closely: a
 C<(YYYY-MM-DD HH:MM:SS)> timestamp prefix, dashboard status and workspace info, a
 bracketed working directory, an optional jobs suffix, and a trailing
-C<🌿branch> marker when git metadata is available. If the workspace workflow
-seeded C<WORKSPACE_REF> or the older C<TICKET_REF> into the current tmux
-session, C<dashboard ps1> also reads that context from tmux when the shell
-environment does not already export it.
+C<🌿branch> marker when git metadata is available. The prompt helper reads the
+branch directly from on-disk git metadata instead of shelling out to
+C<git branch>, so repeated prompt renders stay lightweight on slower hosts such
+as iSH. If the workspace workflow seeded C<WORKSPACE_REF> or the older
+C<TICKET_REF> into the current tmux session, C<dashboard ps1> also reads that
+context from tmux when the shell environment does not already export it, but it
+skips that tmux probe entirely when the shell is not inside tmux.
 
 Generate shell bootstrap:
 
@@ -2430,6 +2550,44 @@ The JavaScript fast-check wrapper is a source-tree fuzz gate: it runs when
 C<node>, C<npm>, C<package.json>, and C<package-lock.json> are all present, and
 it skips in packaged install-test trees that do not ship those checkout-only
 JavaScript manifests.
+
+Security review is also a hard verification gate. This repository now treats
+OWASP as a full gate rather than a baseline-only spot check: every
+security-sensitive change must complete an OWASP ASVS 5.0.0 applicability
+review across V1 through V14, use ASVS Level 2 rigor as the default floor,
+and escalate to Level 3 review when the change touches higher-trust surfaces
+such as authentication, session handling, cryptographic handling, release
+signing, or externally callable API routes. The same review must also map the
+change against the OWASP Top 10 2021 categories, with explicit attention to
+C<A01 Broken Access Control>, C<A02 Cryptographic Failures>,
+C<A03 Injection>, C<A04 Insecure Design>,
+C<A05 Security Misconfiguration>, C<A06 Vulnerable and Outdated Components>,
+C<A07 Identification and Authentication Failures>,
+C<A08 Software and Data Integrity Failures>,
+C<A09 Security Logging and Monitoring Failures>, and
+C<A10 Server-Side Request Forgery>.
+
+The shipped security review now also keeps a dedicated OWASP compliance SOW
+and evidence matrix. That record exists so the project can distinguish
+between the currently safe public wording, which is OWASP-aligned or
+OWASP-gated, and the stronger blanket phrase C<OWASP compliant>. Do not use
+the stronger phrase until the chapter-by-chapter evidence record, repo-side
+audit set, and remaining governance gates are all closed together.
+
+For the local repo-side evidence, run the grep-based auth/session, redirect,
+traversal, command-execution, header, and raw-SQL checks from the shipped
+security verification guidance, then keep the focused web and SSL regressions
+green:
+
+  rg -n "LWP::Simple|HTTP::Tiny|JSON::PP|capture_merged" bin lib t
+  rg -n "companies house|ewf|xmlgw|chips|tuxedo|chs|grover|cidev|pbs|password=|dsn=" bin lib README doc t
+  rg -n "X-Content-Type-Options|nosniff|Content-Security-Policy|X-Frame-Options|Referrer-Policy|SameSite=Strict|HttpOnly" lib doc SECURITY
+  rg -n "Transient token URLs are disabled|_transient_url_tokens_allowed|verify_user|login_response|_session_cookie" lib/Developer/Dashboard/Web lib/Developer/Dashboard/Auth.pm
+  rg -n "DBI->connect|\\$dbh->prepare\\(\\$sql\\)|table_info|column_info" bin/dashboard lib t
+  rg -n "_sanitize_redirect_target|Location|redirect" lib/Developer/Dashboard/Web lib t
+  rg -n "\\.\\./|rel2abs|dashboards/public|dashboards/ajax|skills/.+/dashboards" lib/Developer/Dashboard/Web lib t
+  rg -n "system\\(|exec\\(|open STDOUT|open STDERR|timeout_ms|alarm\\(" lib/Developer/Dashboard/ActionRunner.pm lib/Developer/Dashboard/CollectorRunner.pm lib/Developer/Dashboard/Web/Server.pm t
+  prove -lv t/08-web-update-coverage.t t/web_app_static_files.t t/17-web-server-ssl.t
 
 From a source checkout, for fast saved-bookmark browser regressions, run the
 dedicated smoke script:
@@ -2854,6 +3012,14 @@ Skill-local JSON config, merged into runtime config under
 C<_E<lt>repo-nameE<gt>>. Any declared C<collectors> join the managed fleet
 under repo-qualified names such as C<example-skill.status>
 
+=item B<config/api.json>
+
+Skill-local machine auth config for selected C</ajax/...> routes. Entries merge
+through the same skill-layer contract, keep SHA-256 secret digests plus exact
+saved Ajax route lists, and allow remote callers to send C<X-DD-API-Key> plus
+C<X-DD-API-Secret> instead of a helper session for those registered saved Ajax
+handlers.
+
 =item B<config/docker/>
 
 Skill-local Docker Compose roots that participate in layered docker service lookup
@@ -3229,7 +3395,7 @@ re-enabled
 =head3 Skill Authoring
 
 To build a new skill, start with a Git repository that contains C<cli/>,
-C<config/config.json>, and optional C<dashboards/>, C<dashboards/nav/>,
+C<config/config.json>, optional C<config/api.json>, and optional C<dashboards/>, C<dashboards/nav/>,
 C<state/>, C<logs/>, C<ddfile>, C<ddfile.local>, C<aptfile>, C<apkfile>,
 C<dnfile>,
 C<brewfile>, C<Makefile>, C<package.json>, C<requirements.txt>, C<cpanfile>, and C<cpanfile.local> files under the skill
@@ -3243,7 +3409,9 @@ resolves direct bookmark renders. If C<config/config.json> declares
 collectors, those collectors join the normal managed fleet under
 repo-qualified names such as C<example-skill.status>, which means
 C<dashboard serve>, C<dashboard restart>, and C<dashboard stop> treat them the
-same way they treat system-owned collectors.
+same way they treat system-owned collectors. If C<config/api.json> declares API
+clients, those entries join the layered machine-auth allowlist for exact
+saved C</ajax/...> route paths owned by that skill.
 
 The repository also ships a dedicated skill authoring guide, and the installed
 reference is available through the POD module

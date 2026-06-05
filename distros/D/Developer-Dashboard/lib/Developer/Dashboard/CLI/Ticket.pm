@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Ticket;
 use strict;
 use warnings;
 
-our $VERSION = '3.90';
+our $VERSION = '4.03';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -248,6 +248,15 @@ sub apply_workspace_status {
     return apply_ticket_status(@_);
 }
 
+# _tmux_status_interval_seconds()
+# Returns the tmux status refresh cadence used by dashboard-managed ticket and
+# workspace sessions.
+# Input: none.
+# Output: positive integer number of seconds.
+sub _tmux_status_interval_seconds {
+    return 15;
+}
+
 sub apply_ticket_status {
     my (%args) = @_;
     my $session = $args{session} || die 'Missing session name';
@@ -280,7 +289,7 @@ sub apply_ticket_status {
     my @commands = (
         [ 'set-option', '-gq', 'status-position', 'bottom' ],
         [ 'set-option', '-gq', 'status',          '2' ],
-        [ 'set-option', '-gq', 'status-interval', '2' ],
+        [ 'set-option', '-gq', 'status-interval', _tmux_status_interval_seconds() ],
         [ 'set-option', '-gq', 'status-format[0]', $indicator_status ],
         ( defined $default_status && $default_status ne ''
             ? ( [ 'set-option', '-gq', 'status-format[1]', $default_status ] )

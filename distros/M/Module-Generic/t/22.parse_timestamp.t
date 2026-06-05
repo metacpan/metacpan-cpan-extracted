@@ -504,6 +504,12 @@ foreach my $type ( sort( keys( %$tests ) ) )
         diag( "Skipping tests for \"${type}\", because module DateTime::Format::JP is not installed." );
         next;
     }
+    # NOTE: Report the installed version of DateTime::Format::JP on smokers,
+    # since version-specific behaviour has been the source of past test failures.
+    if( $type eq 'japan' && ( $ENV{AUTOMATED_TESTING} || $ENV{AUTHOR_TESTING} ) )
+    {
+        diag( "Using DateTime::Format::JP version: ", ( DateTime::Format::JP->VERSION // 'undef' ) );
+    }
 
     # $o->debug( $DEBUG ) if( $type eq 'non_standard' );
     for( my $i = 0; $i < scalar( @{$tests->{ $type }} ); $i += 2 )

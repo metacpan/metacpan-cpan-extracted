@@ -9,6 +9,7 @@ use Test::More;
 use lib 'lib';
 
 use Developer::Dashboard::PageRuntime;
+use Developer::Dashboard::PerlEnv;
 
 {
     package Local::FakePaths;
@@ -22,6 +23,11 @@ use Developer::Dashboard::PageRuntime;
     }
 
     sub runtime_root {
+        my ($self) = @_;
+        return $self->{root};
+    }
+
+    sub state_root {
         my ($self) = @_;
         return $self->{root};
     }
@@ -63,7 +69,16 @@ my $parent_lib_dir = File::Spec->catdir( $parent_root, 'local', 'lib', 'perl5' )
         type   => 'json',
         params => { one => 1 },
     );
-    is( $env{PERL5LIB}, 'alpha:beta', 'saved ajax env leaves PERL5LIB unchanged when the runtime local lib does not exist' );
+    is(
+        $env{PERL5LIB},
+        Developer::Dashboard::PerlEnv->perl5lib_env(),
+        'saved ajax env normalizes inherited PERL5LIB with the safe core-first ordering when no runtime local lib exists',
+    );
+    like(
+        $env{PATH},
+        qr/^\Q@{[ Developer::Dashboard::PerlEnv->current_perl_bin_dir ]}\E(?:\Q@{[ Developer::Dashboard::PerlEnv::path_separator() ]}\E|$)/,
+        'saved ajax env keeps the current Perl interpreter directory at the front of PATH',
+    );
 }
 
 make_path($lib_dir);
@@ -77,8 +92,8 @@ make_path($lib_dir);
     );
     is(
         $env{PERL5LIB},
-        join( ':', $lib_dir, 'alpha', 'beta' ),
-        'saved ajax env prepends the runtime local lib when it exists',
+        Developer::Dashboard::PerlEnv->perl5lib_env( extra => [$lib_dir] ),
+        'saved ajax env prepends the runtime local lib while keeping the safe core-first ordering',
     );
 }
 
@@ -93,8 +108,8 @@ make_path($parent_lib_dir);
     );
     is(
         $env{PERL5LIB},
-        join( ':', $lib_dir, $parent_lib_dir, 'alpha', 'beta' ),
-        'saved ajax env prepends every layered runtime local lib in lookup order',
+        Developer::Dashboard::PerlEnv->perl5lib_env( extra => [ $lib_dir, $parent_lib_dir ] ),
+        'saved ajax env prepends every layered runtime local lib in lookup order while preserving the safe core-first ordering',
     );
     is(
         $env{DEVELOPER_DASHBOARD_RUNTIME_LAYERS},
@@ -113,8 +128,8 @@ make_path($parent_lib_dir);
     );
     is(
         $env{PERL5LIB},
-        join( ':', $lib_dir, $parent_lib_dir, 'alpha' ),
-        'saved ajax env does not duplicate layered runtime local libs in PERL5LIB',
+        Developer::Dashboard::PerlEnv->perl5lib_env( extra => [ $lib_dir, $parent_lib_dir ] ),
+        'saved ajax env does not duplicate layered runtime local libs while preserving the safe core-first ordering',
     );
 }
 

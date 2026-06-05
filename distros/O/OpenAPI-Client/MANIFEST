@@ -17,5 +17,6 @@ t/spec.json
 t/spec/dummy.json
 t/spec/with-external-ref.json
 t/spec/with-ref.json
+t/style-explode.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Number.pm
-## Version v2.3.5
+## Version v2.3.6
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2026/03/22
+## Modified 2026/06/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -164,7 +164,7 @@ BEGIN
         threads::shared->import();
         our $LOCALE_LOCK :shared;
     }
-    our( $VERSION ) = 'v2.3.5';
+    our( $VERSION ) = 'v2.3.6';
 };
 
 # use strict;
@@ -702,10 +702,8 @@ sub init
         $self->encoding( $encoding );
         if( scalar( keys( %$lconv ) ) )
         {
-            my @grouping = CORE::length( $lconv->{grouping} // '' ) ? unpack( "C*", $lconv->{grouping} ) : ();
-            $lconv->{grouping} = $grouping[0];
-            @grouping = CORE::length( $lconv->{mon_grouping} // '' ) ? unpack( "C*", $lconv->{mon_grouping} ) : ();
-            $lconv->{mon_grouping} = $grouping[0];
+            $lconv->{grouping}     = $self->_normalise_lconv_grouping( $lconv->{grouping} );
+            $lconv->{mon_grouping} = $self->_normalise_lconv_grouping( $lconv->{mon_grouping} );
             $default = $lconv;
             if( my $decoded = $self->decode_lconv( $default ) )
             {

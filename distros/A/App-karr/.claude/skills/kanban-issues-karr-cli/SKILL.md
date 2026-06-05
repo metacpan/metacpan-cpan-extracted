@@ -45,6 +45,10 @@ karr list --json                             # JSON output
 
 ```bash
 karr show ID
+karr show                  # most recently updated task
+karr show --last 5         # the 5 most recent
+karr show --me             # the task you most recently acted on (re-orient)
+karr show --agent NAME     # the task most recently claimed by NAME
 ```
 
 ### Move task

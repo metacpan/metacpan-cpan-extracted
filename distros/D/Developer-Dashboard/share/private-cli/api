@@ -1,0 +1,93 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Basename qw(basename);
+use File::Spec;
+use FindBin qw($Bin);
+
+my $command = basename($0);
+my $core = File::Spec->catfile( $Bin, '_dashboard-core' );
+exec { $^X } $^X, $core, $command, @ARGV;
+die "Unable to exec $core for $command: $!";
+
+__END__
+
+=pod
+
+=head1 NAME
+
+api - private built-in command wrapper for Developer Dashboard
+
+=head1 SYNOPSIS
+
+  dashboard api ...
+
+=head1 DESCRIPTION
+
+This private helper is staged under F<~/.developer-dashboard/cli/dd/> so the
+public C<dashboard> entrypoint can stay a thin switchboard.
+
+=for comment FULL-POD-DOC START
+
+=head1 PURPOSE
+
+This staged helper exposes C<dashboard api> management commands for layered
+F<config/api.json> files, including API-key secret hashing and saved Ajax
+route allowlists.
+
+=head1 WHY IT EXISTS
+
+It exists because machine-auth API configuration is part of the built-in CLI
+surface, but the public switchboard should only dispatch to a staged helper
+instead of embedding config-mutation logic directly in C<bin/dashboard>.
+
+=head1 WHEN TO USE
+
+Use this file when changing the C<dashboard api> command surface or when
+fixing how API-key administration is routed into the private runtime.
+
+=head1 HOW TO USE
+
+Users run C<dashboard api>, C<dashboard api add>, or C<dashboard api rm>. The
+staged helper forwards the raw argv list into the private built-in runtime,
+which loads the API CLI module and updates the deepest writable OOP config
+layer.
+
+=head1 WHAT USES IT
+
+It is used by operators managing machine-auth API groups, by CLI smoke tests,
+and by staged-helper coverage tests.
+
+=head1 EXAMPLES
+
+Example 1:
+
+  dashboard api
+
+List the effective API registry through the public built-in command path.
+
+Example 2:
+
+  dashboard api add --key bot --secret raw-secret --route /ajax/health
+
+Create or update one API group from the staged helper path.
+
+Example 3:
+
+  prove -lv t/05-cli-smoke.t t/30-dashboard-loader.t
+
+Rerun the focused staged-helper and thin-loader tests after changing helper
+dispatch behavior.
+
+Example 4:
+
+  prove -lr t
+
+Verify that the helper still behaves correctly inside the complete repository
+suite.
+
+=for comment FULL-POD-DOC END
+
+=cut

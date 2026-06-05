@@ -1,5 +1,11 @@
 Revision history for perl distribution OpenAPI-Client
 
+1.09 2026-06-04T22:34:00
+ - Fix "Use of uninitialized value $name" warning and dropped query parameters
+   for object parameters with style "deepObject", or "form" with explode
+   jhthorsen/json-validator#282
+   Contributor: Veesh
+
 1.08 2026-06-04T11:09:00
  - Reformulations in the POD documentation (#45)
    Contributor: Laurent Dami

@@ -183,6 +183,8 @@ t/mojo/certs/client.crt
 t/mojo/certs/client.key
 t/mojo/certs/domain.crt
 t/mojo/certs/domain.key
+t/mojo/certs/mojo_server.crt
+t/mojo/certs/mojo_server.key
 t/mojo/certs/server.crt
 t/mojo/certs/server.key
 t/mojo/cgi.t

@@ -3,16 +3,17 @@ package Developer::Dashboard::CollectorRunner;
 use strict;
 use warnings;
 
-our $VERSION = '3.90';
+our $VERSION = '4.03';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
 use File::Spec;
-use POSIX qw(setsid strftime);
+use POSIX qw(close setsid strftime);
 use Template;
 use Time::HiRes qw(sleep time);
 
 use Developer::Dashboard::JSON qw(json_encode json_decode);
+use Developer::Dashboard::PerlEnv ();
 use Developer::Dashboard::Platform qw(is_windows shell_command_argv);
 
 our $SIGNAL_RUNNER;
@@ -260,7 +261,8 @@ sub _run_job {
 # Output: existing or newly forked collector pid integer.
 sub start_loop {
     my ( $self, $job ) = @_;
-    my $interval = $job->{interval} || 30;
+    my $interval = $self->_effective_interval_seconds($job);
+    my $configured_interval = defined $job->{interval} ? $job->{interval} : 30;
     my $name = $job->{name} || die 'Collector job missing name';
     my $schedule_mode = $job->{schedule} || ( $job->{cron} ? 'cron' : $job->{interval} ? 'interval' : 'manual' );
     die "Collector '$name' uses manual schedule and should be run on demand" if $schedule_mode eq 'manual';
@@ -305,6 +307,7 @@ sub start_loop {
                 command      => $job->{command},
                 cwd          => $job->{cwd},
                 interval     => $interval,
+                ( $interval != $configured_interval ? ( configured_interval => $configured_interval ) : () ),
                 schedule     => $schedule_mode,
                 status       => 'starting',
                 started_at   => _now_iso8601(),
@@ -352,6 +355,7 @@ sub _run_loop_child {
         open STDIN, '<', File::Spec->devnull() or die $!;
         open STDOUT, '>>', $self->{files}->collector_log or die $!;
         open STDERR, '>>', $self->{files}->collector_log or die $!;
+        $self->_close_inherited_fds( close_ipc => 1 );
     }
 
     $ENV{DEVELOPER_DASHBOARD_LOOP_NAME}   = $name;
@@ -361,6 +365,11 @@ sub _run_loop_child {
     local $SIGNAL_LOOP_NAME = $name;
     my %active_workers;
     local $SIGNAL_LOOP_WORKERS = \%active_workers;
+    local $SIG{CHLD} = sub {
+        return if !$SIGNAL_RUNNER || ref($SIGNAL_LOOP_WORKERS) ne 'HASH';
+        $SIGNAL_RUNNER->_reap_finished_loop_workers($SIGNAL_LOOP_WORKERS);
+        return;
+    };
     local $SIG{TERM} = \&_signal_stop;
     local $SIG{INT}  = \&_signal_stop;
     local $SIG{HUP}  = \&_signal_stop;
@@ -377,11 +386,13 @@ sub _run_loop_child {
                 command      => $job->{command},
                 cwd          => $job->{cwd},
                 interval     => $interval,
+                ( $interval != ( defined $job->{interval} ? $job->{interval} : 30 ) ? ( configured_interval => ( defined $job->{interval} ? $job->{interval} : 30 ) ) : () ),
                 schedule     => $schedule_mode,
                 status       => 'running',
                 mode         => $execution_mode,
                 multiple     => $max_parallel,
                 active_runs  => scalar keys %active_workers,
+                active_worker_pids => [ $self->_active_worker_pids( \%active_workers ) ],
                 heartbeat_at => _now_iso8601(),
             }
         );
@@ -407,11 +418,13 @@ sub _run_loop_child {
                         command      => $job->{command},
                         cwd          => $job->{cwd},
                         interval     => $interval,
+                        ( $interval != ( defined $job->{interval} ? $job->{interval} : 30 ) ? ( configured_interval => ( defined $job->{interval} ? $job->{interval} : 30 ) ) : () ),
                         schedule     => $schedule_mode,
                         status       => 'error',
                         mode         => $execution_mode,
                         multiple     => $max_parallel,
                         active_runs  => scalar keys %active_workers,
+                        active_worker_pids => [ $self->_active_worker_pids( \%active_workers ) ],
                         heartbeat_at => _now_iso8601(),
                         error        => $error,
                     }
@@ -421,7 +434,10 @@ sub _run_loop_child {
                 $active_workers{$worker_pid} = 1;
             }
         }
-        sleep( $schedule_mode eq 'cron' ? 1 : $interval );
+        $self->_sleep_until_next_tick(
+            interval       => $schedule_mode eq 'cron' ? 1 : $interval,
+            active_workers => \%active_workers,
+        );
         if ($single_tick) {
             $self->_settle_single_tick_workers( \%active_workers );
             return 1;
@@ -446,6 +462,55 @@ sub _collector_execution_policy {
     return ( 'multiple', $max_parallel + 0 );
 }
 
+# _effective_interval_seconds($job)
+# Normalizes one collector loop interval and applies a safety floor for
+# dashboard-recursive shell collectors unless fast polling is explicitly
+# allowed.
+# Input: collector job hash reference.
+# Output: positive numeric interval in seconds.
+sub _effective_interval_seconds {
+    my ( $self, $job ) = @_;
+    $job ||= {};
+    my $interval = defined $job->{interval} && $job->{interval} =~ /^(?:\d+|\d*\.\d+)$/ && $job->{interval} > 0
+      ? $job->{interval} + 0
+      : 30;
+    return $interval if $job->{allow_fast_poll} || $job->{allow_fast_dashboard_poll};
+
+    my $minimum = $self->_minimum_dashboard_command_interval_seconds;
+    return $interval if $minimum < 1;
+    return $interval if !$self->_is_dashboard_subcommand_collector($job);
+    return $minimum if $interval < $minimum;
+    return $interval;
+}
+
+# _minimum_dashboard_command_interval_seconds()
+# Returns the safety floor for dashboard-recursive collector commands.
+# Input: none.
+# Output: non-negative numeric interval floor in seconds.
+sub _minimum_dashboard_command_interval_seconds {
+    my ($self) = @_;
+    my $value = $ENV{DEVELOPER_DASHBOARD_MIN_DASHBOARD_COMMAND_INTERVAL_SECONDS};
+    return 30 if !defined $value || $value eq '';
+    return 30 if $value !~ /^(?:\d+|\d*\.\d+)$/;
+    return $value + 0;
+}
+
+# _is_dashboard_subcommand_collector($job)
+# Detects shell-command collectors that re-enter dashboard itself, which are
+# significantly heavier than direct shell probes and should not hot-loop by
+# default.
+# Input: collector job hash reference.
+# Output: boolean true when the collector command dispatches dashboard.
+sub _is_dashboard_subcommand_collector {
+    my ( $self, $job ) = @_;
+    return 0 if ref($job) ne 'HASH';
+    my $command = $job->{command};
+    return 0 if !defined $command || $command eq '';
+    return 1 if $command =~ /\A\s*(?:dashboard|d2)(?:\s|$)/;
+    return 1 if $command =~ /\A\s*(?:"[^"]*\/dashboard"|'[^']*\/dashboard'|[^\s]+\/dashboard)(?:\s|$)/;
+    return 0;
+}
+
 # _start_loop_worker($job, $name)
 # Starts one collector execution worker from the scheduling loop so long
 # collector runs do not block future interval ticks.
@@ -467,6 +532,7 @@ sub _start_loop_worker {
 sub _run_loop_worker {
     my ( $self, $job, $name, $title, $loop_pid ) = @_;
     $0 = "dashboard collector worker: $name";
+    setsid() if !is_windows();
     local $SIG{TERM} = 'DEFAULT';
     local $SIG{INT}  = 'DEFAULT';
     local $SIG{HUP}  = 'DEFAULT';
@@ -538,6 +604,7 @@ sub _terminate_loop_workers {
     $active_workers ||= {};
     for my $pid ( keys %{$active_workers} ) {
         next if !$self->_pid_is_running($pid);
+        kill 15, -$pid if !is_windows();
         kill 15, $pid;
     }
     for my $pid ( keys %{$active_workers} ) {
@@ -545,11 +612,32 @@ sub _terminate_loop_workers {
             last if !$self->_pid_is_running($pid);
             sleep 0.1;
         }
-        kill 9, $pid if $self->_pid_is_running($pid);
+        if ( $self->_pid_is_running($pid) ) {
+            kill 9, -$pid if !is_windows();
+            kill 9, $pid;
+        }
         $self->_reap_child_process($pid);
         delete $active_workers->{$pid};
     }
     return 1;
+}
+
+# _active_worker_pids($active_workers)
+# Normalizes one active-worker tracking hash into a stable numeric pid list for
+# persisted loop state and lifecycle diagnostics.
+# Input: hash reference keyed by worker pid.
+# Output: sorted list of numeric worker pids.
+sub _active_worker_pids {
+    my ( $self, $active_workers ) = @_;
+    $active_workers ||= {};
+    my @pids;
+    for my $pid ( keys %{$active_workers} ) {
+        next if !defined $pid;
+        next if $pid !~ /^\d+$/;
+        next if $pid <= 0;
+        push @pids, $pid;
+    }
+    return sort { $a <=> $b } @pids;
 }
 
 # _settle_single_tick_workers($active_workers)
@@ -569,6 +657,28 @@ sub _settle_single_tick_workers {
     return 1;
 }
 
+# _sleep_until_next_tick(%args)
+# Sleeps until the next collector loop tick while periodically reaping any
+# finished worker children so zombies do not sit around for an entire interval
+# when a CHLD wakeup is missed.
+# Input: interval seconds and active_workers hash reference.
+# Output: true value after the bounded sleep window completes.
+sub _sleep_until_next_tick {
+    my ( $self, %args ) = @_;
+    my $remaining = defined $args{interval} ? $args{interval} : 0;
+    $remaining = 0 if $remaining < 0;
+    my $active_workers = $args{active_workers} || {};
+    my $slice = $remaining > 0.1 ? 0.1 : $remaining;
+    while ( $remaining > 0 ) {
+        $slice = $remaining if $remaining < $slice || $slice <= 0;
+        sleep $slice;
+        $remaining -= $slice;
+        $remaining = 0 if $remaining < 0;
+        $self->_reap_finished_loop_workers($active_workers);
+    }
+    return 1;
+}
+
 # stop_loop($name)
 # Stops a managed collector loop by collector name.
 # Input: collector name string.
@@ -579,6 +689,8 @@ sub stop_loop {
     return if !-f $pidfile;
     my $pid = _slurp($pidfile);
     chomp $pid;
+    my @state_worker_pids = $self->_state_active_worker_pids($name);
+    $self->_terminate_loop_workers( { map { $_ => 1 } @state_worker_pids } ) if @state_worker_pids;
     my $already_reaped = $pid ? $self->_reap_child_process($pid) : 0;
     my $same_namespace = $pid ? $self->_same_pid_namespace($pid) : 0;
     if (
@@ -598,6 +710,7 @@ sub stop_loop {
             last if !$self->_pid_is_running($pid);
             sleep 0.1;
         }
+        $self->_terminate_loop_workers( { map { $_ => 1 } $self->_state_active_worker_pids($name) } );
         $self->_reap_child_process($pid);
         die "Collector '$name' did not stop after TERM and KILL\n" if $self->_pid_is_running($pid);
     }
@@ -626,6 +739,10 @@ sub running_loops {
         my $pid  = eval { _slurp( File::Spec->catfile( $root, $entry ) ) };
         next if !$pid;
         chomp $pid;
+        if ( $pid && $self->_reap_child_process($pid) ) {
+            $self->_cleanup_loop_files($name);
+            next;
+        }
         my $same_namespace = $pid ? $self->_same_pid_namespace($pid) : 0;
         if ( $pid && $same_namespace && ( $self->_is_managed_loop( $pid, $name ) || $self->_state_confirms_managed_loop( $name, $pid ) ) ) {
             push @running, { name => $name, pid => $pid, state => scalar $self->loop_state($name) };
@@ -639,6 +756,22 @@ sub running_loops {
     my @sorted = @running;
     @sorted = sort _sort_loop_names @sorted;
     return @sorted;
+}
+
+# _state_active_worker_pids($name)
+# Reads the persisted loop metadata for one collector and extracts any active
+# worker pid list recorded by the loop process itself.
+# Input: collector name string.
+# Output: sorted list of numeric active worker pids.
+sub _state_active_worker_pids {
+    my ( $self, $name ) = @_;
+    return () if !defined $name || $name eq '';
+    my $state = eval { $self->loop_state($name) };
+    return () if ref($state) ne 'HASH';
+    my $active = $state->{active_worker_pids};
+    return () if ref($active) ne 'ARRAY';
+    my %seen;
+    return sort { $a <=> $b } grep { defined && /^\d+$/ && $_ > 0 && !$seen{$_}++ } @{$active};
 }
 
 # _sort_loop_names()
@@ -657,9 +790,23 @@ sub loop_state {
     my ( $self, $name ) = @_;
     my $file = $self->_statefile($name);
     return if !-f $file;
-    open my $fh, '<', $file or die "Unable to read $file: $!";
-    local $/;
-    return json_decode( scalar <$fh> );
+    my $last_error = '';
+    for ( 1 .. 3 ) {
+        open my $fh, '<', $file or die "Unable to read $file: $!";
+        local $/;
+        my $payload = scalar <$fh>;
+        close $fh;
+        if ( defined $payload && $payload ne '' ) {
+            my $decoded = eval { json_decode($payload) };
+            return $decoded if $decoded;
+            $last_error = $@ || 'Unable to decode loop state JSON';
+        }
+        else {
+            $last_error = "Loop state file $file was empty";
+        }
+        sleep 0.01 if $_ < 3;
+    }
+    die $last_error;
 }
 
 # _pidfile($name)
@@ -859,6 +1006,69 @@ sub _cleanup_loop_files {
     return 1;
 }
 
+# _close_inherited_fds(%args)
+# Closes inherited non-stdio descriptors in detached collector children so
+# background loops do not keep caller-side capture handles open after the
+# lifecycle command exits.
+# Input: optional keep array reference of descriptor integers and optional
+# close_ipc boolean for socketpair/anon_inode cleanup.
+# Output: true value.
+sub _close_inherited_fds {
+    my ( $self, %args ) = @_;
+    my %keep;
+    for my $fd ( @{ $args{keep} || [] } ) {
+        next if !defined $fd;
+        next if $fd !~ /^\d+$/;
+        $keep{$fd} = 1;
+    }
+    $keep{0} = 1;
+    $keep{1} = 1;
+    $keep{2} = 1;
+    for my $fd ( $self->_open_file_descriptors ) {
+        next if $keep{$fd};
+        next if !$self->_descriptor_is_inherited_pipe( $fd, %args );
+        POSIX::close($fd);
+    }
+    return 1;
+}
+
+# _open_file_descriptors()
+# Lists the current process file-descriptor numbers from procfs or /dev/fd so
+# detached children can close inherited caller pipes safely.
+# Input: none.
+# Output: sorted list of descriptor integers.
+sub _open_file_descriptors {
+    my ($self) = @_;
+    my %seen;
+    my @fds;
+    for my $path ( glob('/proc/self/fd/*'), glob('/dev/fd/*') ) {
+        next if $path !~ m{(?:/proc/self/fd|/dev/fd)/(\d+)\z};
+        my $fd = $1 + 0;
+        next if $seen{$fd}++;
+        push @fds, $fd;
+    }
+    return sort { $a <=> $b } @fds;
+}
+
+# _descriptor_is_inherited_pipe($fd)
+# Returns whether one descriptor currently points at an inherited capture or
+# IPC endpoint that a detached collector child should close after stdio has
+# been redirected.
+# Input: descriptor integer.
+# Output: boolean true when the descriptor target is an inherited pipe,
+# socketpair, or anonymous kernel handle.
+sub _descriptor_is_inherited_pipe {
+    my ( $self, $fd, %args ) = @_;
+    return 0 if !defined $fd || $fd !~ /^\d+$/;
+    my $proc_target = readlink("/proc/self/fd/$fd");
+    my $dev_target  = readlink("/dev/fd/$fd");
+    my $target = defined $proc_target ? $proc_target : $dev_target;
+    return 0 if !defined $target || $target eq '';
+    return 1 if $target =~ /^pipe:/;
+    return 0 if !$args{close_ipc};
+    return $target =~ /^(?:socket:|anon_inode:)/ ? 1 : 0;
+}
+
 # _reap_child_process($pid)
 # Reaps one managed collector child owned by the current process when it has
 # already exited.
@@ -1000,12 +1210,14 @@ sub _run_command {
     my $old = cwd();
     chdir $cwd or die "Unable to chdir to $cwd: $!";
     local @ENV{ keys %$env } = values %$env if %$env;
+    my %dashboard_env = %{ Developer::Dashboard::PerlEnv->dashboard_child_env() };
+    local @ENV{ keys %dashboard_env } = values %dashboard_env;
     my $timed_out = 0;
     my ( $stdout, $stderr, $exit_code ) = capture {
         local $SIG{ALRM} = sub { die "__COLLECTOR_TIMEOUT__\n" };
         alarm( int( ( $timeout_ms + 999 ) / 1000 ) );
         my $ok = eval {
-            system shell_command_argv($cmd);
+            system shell_command_argv( $cmd, login => 0 );
             return $? >> 8;
         };
         if ($@) {

@@ -1,5 +1,8 @@
 Revision history for Markdown-Simple
 
+0.14    2026-06-05
+        - Fix C89 issues
+
 0.13    2026-05-30
         - Fix build failure on perls built without MULTIPLICITY /
           PERL_IMPLICIT_CONTEXT 

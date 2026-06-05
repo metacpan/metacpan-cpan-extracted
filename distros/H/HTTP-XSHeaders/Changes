@@ -1,3 +1,11 @@
+1.000001    2026-06-24
+            * Doc fixes.
+
+1.000000    2026-06-04
+            * Fix heap-buffer-overflow in format_all.
+            * GH #15: for() loop initial declarations unhappiness.
+            * GH #13: Mark as 1.0.0 stable, it's about time, right?
+
 0.400005    2022-06-23
             * RT #131685: Indicate dependency on HTTP::Date.
             * GH #11, RT #142201: Add content_is_text() method.

@@ -10,7 +10,6 @@ use FindBin qw($Bin);
 use Getopt::Long qw(GetOptionsFromArray);
 use lib "$Bin/../lib";
 
-use Developer::Dashboard::Collector;
 use Developer::Dashboard::Config;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::IndicatorStore;
@@ -34,6 +33,7 @@ sub _default_roots {
 # Input: none.
 # Output: ticket string or undef when tmux does not expose one.
 sub _tmux_ticket_ref {
+    return if !defined $ENV{TMUX} || $ENV{TMUX} eq '';
     my ( $stdout, undef, $exit_code ) = capture {
         system 'tmux', 'show-environment', 'TICKET_REF';
         return $? >> 8;
@@ -56,6 +56,17 @@ sub _prime_ticket_ref_env {
     my $ticket = _tmux_ticket_ref();
     $ENV{TICKET_REF} = $ticket if defined $ticket && $ticket ne '';
     return 1;
+}
+
+# _collectors_need_sync($indicator_store, $collector_jobs)
+# Determines whether collector-managed prompt indicators need a sync write.
+# Input: indicator store object and collector job array reference.
+# Output: boolean true when the helper should run sync_collectors.
+sub _collectors_need_sync {
+    my ( $indicator_store, $collector_jobs ) = @_;
+    return 1 if !$indicator_store;
+    return 1 if !$indicator_store->can('collectors_need_sync');
+    return $indicator_store->collectors_need_sync($collector_jobs) ? 1 : 0;
 }
 
 # main(@ARGV)
@@ -90,14 +101,15 @@ my $paths = Developer::Dashboard::PathRegistry->new(
 my $files = Developer::Dashboard::FileRegistry->new( paths => $paths );
 my $config = Developer::Dashboard::Config->new( files => $files, paths => $paths );
 my $indicators = Developer::Dashboard::IndicatorStore->new( paths => $paths );
-my $collectors = Developer::Dashboard::Collector->new( paths => $paths );
 my $prompt = Developer::Dashboard::Prompt->new(
     indicators => $indicators,
     paths      => $paths,
 );
 
-$indicators->sync_collectors( $config->collectors );
-$indicators->refresh_core_indicators( cwd => $cwd );
+my $collector_jobs = $config->collectors;
+$indicators->sync_collectors($collector_jobs)
+  if _collectors_need_sync( $indicators, $collector_jobs );
+$indicators->refresh_core_indicators( cwd => $cwd, prompt_only => 1 );
 _prime_ticket_ref_env();
 
 if ( $mode eq 'tmux-status' || $mode eq 'tmux-status-top' || $mode eq 'tmux-status-bottom' ) {

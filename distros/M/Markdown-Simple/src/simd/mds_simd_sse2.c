@@ -37,8 +37,11 @@ MDS_SSSE3_FN static void classify_structural_sse2(const char* in, size_t len,
         __m128i la  = _mm_shuffle_epi8(lo_tbl, lo);
         __m128i ha  = _mm_shuffle_epi8(hi_tbl, hi);
         __m128i m   = _mm_and_si128(la, ha);
-        __m128i nz  = _mm_cmpgt_epi8(m, zero);
-        uint32_t bits = (uint32_t)(uint16_t)_mm_movemask_epi8(nz);
+        /* See mds_simd_avx2.c: cmpgt_epi8 is signed and would misclassify
+         * bytes whose LUT product is 0x80 ('|' 0x7C, '~' 0x7E). Invert
+         * cmpeq(m,0) — and mask to 16 bits AFTER inversion. */
+        __m128i is_zero = _mm_cmpeq_epi8(m, zero);
+        uint32_t bits = (uint32_t)((unsigned)(~_mm_movemask_epi8(is_zero)) & 0xFFFFu);
 
         size_t word = i >> 6;
         size_t off  = i & 63u;

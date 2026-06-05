@@ -1,5 +1,5 @@
 ---
-abstract: "A Hybrid Regex Diagnostic Tool (single file Library module and command tool) shows the longest Regular Expression match / highlight the rejected part Example: $ perl lib/Tstregex.pm '/^[a-z]*\\d{3}$/' 'abc123' 'abc12a' abc123 abcB<12a> (B<^[a-z]*>\\d{3}$)"
+abstract: unknown
 author:
   - 'Olivier Delouya <olivier_delouya@hotmail.com>'
 build_requires:
@@ -23,5 +23,5 @@ requires:
   perl: '5.010'
 resources:
   repository: https://github.com/odjectif/tstregex.git
-version: '1.03'
+version: '1.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

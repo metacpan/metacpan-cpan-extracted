@@ -8,6 +8,7 @@ use Config ();
 use Cwd qw(abs_path cwd);
 use FindBin qw($Bin);
 use lib "$Bin/../lib";
+use Developer::Dashboard::PerlEnv ();
 use File::Spec;
 use IO::Handle ();
 use IO::Select ();
@@ -18,27 +19,23 @@ use Symbol qw(gensym);
 binmode STDOUT, ':encoding(UTF-8)';
 binmode STDERR, ':encoding(UTF-8)';
 
+BEGIN {
+    my $dashboard_lib = File::Spec->catdir( $Bin, '..', 'lib' );
+    Developer::Dashboard::PerlEnv->bootstrap_perl5lib(
+        dashboard_lib => $dashboard_lib,
+    );
+}
+
 use Developer::Dashboard::Platform qw(
   command_argv_for_path
   is_windows
   is_runnable_file
   resolve_runnable_file
 );
-use Developer::Dashboard::EnvAudit ();
-use Developer::Dashboard::EnvLoader ();
-use Developer::Dashboard::CLI::Suggest ();
-use Developer::Dashboard::InternalCLI ();
-use Developer::Dashboard::Runtime::Result ();
 
 my $dashboard_lib = File::Spec->catdir( $Bin, '..', 'lib' );
 my $switchboard_cwd = eval { cwd() };
-if ( -d $dashboard_lib ) {
-    my $path_sep = $Config::Config{path_sep} || ':';
-    my @existing = grep { defined && $_ ne '' } split /\Q$path_sep\E/, ( $ENV{PERL5LIB} || '' );
-    if ( !grep { $_ eq $dashboard_lib } @existing ) {
-        $ENV{PERL5LIB} = join $path_sep, $dashboard_lib, @existing;
-    }
-}
+my $switchboard_paths;
 
 my $cmd = shift @ARGV || '';
 _load_runtime_env();
@@ -78,6 +75,7 @@ if ( my ( $skill_name, $skill_command ) = _skill_dotted_command_parts($cmd) ) {
 }
 
 if ( $cmd ne '' ) {
+    require Developer::Dashboard::CLI::Suggest;
     print STDERR Developer::Dashboard::CLI::Suggest->new()->unknown_command_message($cmd);
 }
 
@@ -95,6 +93,7 @@ pod2usage(
 # Output: true value after hook execution completes.
 sub _prime_command_result_env {
     my ( $cmd, @argv ) = @_;
+    require Developer::Dashboard::Runtime::Result;
     Developer::Dashboard::Runtime::Result::clear_current();
     Developer::Dashboard::Runtime::Result::clear_last_result();
     $ENV{DEVELOPER_DASHBOARD_COMMAND} = $cmd if defined $cmd && $cmd ne '';
@@ -150,16 +149,29 @@ sub _prime_command_result_env {
 # Input: none.
 # Output: true value.
 sub _load_runtime_env {
-    require Developer::Dashboard::PathRegistry;
+    require Developer::Dashboard::EnvAudit;
+    require Developer::Dashboard::EnvLoader;
     Developer::Dashboard::EnvAudit->clear();
-    my $paths = Developer::Dashboard::PathRegistry->new(
+    my $paths = _switchboard_paths();
+    Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $paths );
+    return 1;
+}
+
+# _switchboard_paths()
+# Lazily constructs and memoizes the runtime path registry shared by the public
+# switchboard helpers during one command invocation.
+# Input: none.
+# Output: Developer::Dashboard::PathRegistry object.
+sub _switchboard_paths {
+    return $switchboard_paths if defined $switchboard_paths;
+    require Developer::Dashboard::PathRegistry;
+    $switchboard_paths = Developer::Dashboard::PathRegistry->new(
         cwd             => $switchboard_cwd,
         home            => $ENV{HOME},
         workspace_roots => [],
         project_roots   => [],
     );
-    Developer::Dashboard::EnvLoader->load_runtime_layers( paths => $paths );
-    return 1;
+    return $switchboard_paths;
 }
 
 # _run_command_hook_streaming($path, %args)
@@ -264,16 +276,14 @@ sub _custom_command_path {
 # Output: helper file path string or empty string when unsupported.
 sub _builtin_helper_path {
     my ($cmd) = @_;
+    require Developer::Dashboard::InternalCLI;
     my $helper = Developer::Dashboard::InternalCLI::canonical_helper_name($cmd);
     return '' if $helper eq '';
-    require Developer::Dashboard::PathRegistry;
-    my $paths = Developer::Dashboard::PathRegistry->new(
-        cwd             => $switchboard_cwd,
-        home            => $ENV{HOME},
-        workspace_roots => [],
-        project_roots   => [],
+    my $paths = _switchboard_paths();
+    Developer::Dashboard::InternalCLI::ensure_helper(
+        paths => $paths,
+        name  => $helper,
     );
-    Developer::Dashboard::InternalCLI::ensure_helpers( paths => $paths );
     return Developer::Dashboard::InternalCLI::helper_path( paths => $paths, name => $helper );
 }
 
@@ -287,14 +297,8 @@ sub _skill_dotted_command_parts {
     my ( $skill_name, $skill_command ) = split /\./, $cmd, 2;
     return if !defined $skill_name || $skill_name eq '';
     return if !defined $skill_command || $skill_command eq '';
-    require Developer::Dashboard::PathRegistry;
     require Developer::Dashboard::SkillManager;
-    my $paths = Developer::Dashboard::PathRegistry->new(
-        cwd             => $switchboard_cwd,
-        home            => $ENV{HOME},
-        workspace_roots => [],
-        project_roots   => [],
-    );
+    my $paths = _switchboard_paths();
     my $manager = Developer::Dashboard::SkillManager->new( paths => $paths );
     return if !$manager->get_skill_path( $skill_name, include_disabled => 1 );
     return ( $skill_name, $skill_command );
@@ -359,13 +363,7 @@ sub _command_hook_result_key {
 # Input: none.
 # Output: ordered list of CLI root directory paths.
 sub _cli_runtime_layers {
-    require Developer::Dashboard::PathRegistry;
-    my $paths = Developer::Dashboard::PathRegistry->new(
-        cwd             => $switchboard_cwd,
-        home            => $ENV{HOME},
-        workspace_roots => [],
-        project_roots   => [],
-    );
+    my $paths = _switchboard_paths();
     return $paths->cli_layers;
 }
 
@@ -457,6 +455,9 @@ dashboard - thin command switchboard for Developer Dashboard
   dashboard which [--edit] <cmd>|<skill>.<cmd>|<skill1>.<skill2>...<cmd>
   dashboard config init
   dashboard config show
+  dashboard api [ls] [--key <name>] [-o json|table]
+  dashboard api add --key <name> [--secret <raw>|--maybe-secret <raw>] [--route /ajax/...]...
+  dashboard api rm --key <name> [--route /ajax/...]
   dashboard auth add-user <username> <password>
   dashboard auth list-users
   dashboard auth remove-user <username>

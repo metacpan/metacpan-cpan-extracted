@@ -6,7 +6,7 @@
 #           Jul 23 2007: Fix bug in regex stripping (M.Thorland)
 
 package App::s2p;
-$App::s2p::VERSION = '1.003';
+$App::s2p::VERSION = '1.004';
 use 5.006;
 use strict;
 use warnings;
@@ -1007,9 +1007,9 @@ sub bre2p($$$){
             } elsif( $useEXTBRE && ( $nc =~ /[$useEXTBRE]/ ) ){
 		## extensions - at most <>wWyB - not in POSIX
                 if(      $nc eq '<' ){ ## \< => \b(?=\w), be precise
-                    $res .= '\\b(?<=\\W)';
-                } elsif( $nc eq '>' ){ ## \> => \b(?=\W), be precise
-                    $res .= '\\b(?=\\W)';
+                    $res .= '\\b(?=\\w)';
+                } elsif( $nc eq '>' ){ ## \> => \b(?<=\w), be precise
+                    $res .= '\\b(?<=\\w)';
                 } elsif( $nc eq 'y' ){ ## \y => \b
                     $res .= '\\b';
                 } else {               ## \B, \w, \W remain the same

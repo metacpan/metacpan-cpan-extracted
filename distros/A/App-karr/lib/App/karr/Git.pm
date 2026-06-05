@@ -1,7 +1,7 @@
 # ABSTRACT: Git operations for karr sync (all-native via Git::Native + libgit2)
 
 package App::karr::Git;
-our $VERSION = '0.300';
+our $VERSION = '0.301';
 use strict;
 use warnings;
 use Path::Tiny qw( path );
@@ -22,6 +22,14 @@ sub new {
 sub dir {
     my ($self) = @_;
     return path( $self->{dir} );
+}
+
+# The libgit2 exception text from the most recent remote operation that failed
+# (fetch/push/pull). Native operations have no shell exit code, so callers
+# report this instead of $?.
+sub last_error {
+    my ($self) = @_;
+    return $self->{_last_error};
 }
 
 # ----- Native repository handle (lazy) -----
@@ -57,7 +65,7 @@ sub is_repo {
         # open_ext walks up to find a .git; throws on miss.
         Git::Native->open_ext( $self->dir->stringify );
         1;
-    } catch { 0 };
+    } catch { $self->{_last_error} = "$_"; 0 };
     return $ok;
 }
 
@@ -243,7 +251,7 @@ sub fetch {
             credentials => _default_credentials_cb(),
         );
         1;
-    } catch { 0 };
+    } catch { $self->{_last_error} = "$_"; 0 };
 }
 
 sub push {
@@ -260,7 +268,7 @@ sub push {
             prune       => 1,
         );
         1;
-    } catch { 0 };
+    } catch { $self->{_last_error} = "$_"; 0 };
 }
 
 sub pull {
@@ -275,7 +283,7 @@ sub pull {
             credentials => _default_credentials_cb(),
         );
         1;
-    } catch { 0 };
+    } catch { $self->{_last_error} = "$_"; 0 };
 }
 
 sub push_ref {
@@ -291,7 +299,7 @@ sub push_ref {
             credentials => _default_credentials_cb(),
         );
         1;
-    } catch { 0 };
+    } catch { $self->{_last_error} = "$_"; 0 };
 }
 
 sub pull_ref {
@@ -307,7 +315,7 @@ sub pull_ref {
             credentials => _default_credentials_cb(),
         );
         1;
-    } catch { 0 };
+    } catch { $self->{_last_error} = "$_"; 0 };
 }
 
 # ----- Task / config refs (sit on top of write_ref/read_ref) -----
@@ -407,7 +415,7 @@ App::karr::Git - Git operations for karr sync (all-native via Git::Native + libg
 
 =head1 VERSION
 
-version 0.300
+version 0.301
 
 =head1 SYNOPSIS
 

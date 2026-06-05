@@ -1,11 +1,11 @@
 # ABSTRACT: Show full details of a task
 
 package App::karr::Cmd::Show;
-our $VERSION = '0.300';
+our $VERSION = '0.301';
 use Moo;
 use MooX::Cmd;
 use MooX::Options (
-  usage_string => 'USAGE: karr show ID [--json]',
+  usage_string => 'USAGE: karr show [ID] [--me] [--agent NAME] [--last N] [--json]',
 );
 use App::karr::Role::BoardAccess;
 use App::karr::Role::Output;
@@ -14,12 +14,26 @@ use App::karr::Task;
 with 'App::karr::Role::BoardAccess', 'App::karr::Role::Output';
 
 
-sub execute {
-  my ($self, $args_ref, $chain_ref) = @_;
-  my $id = $args_ref->[0] or die "Usage: karr show ID\n";
+option last => (
+  is      => 'ro',
+  format  => 'i',
+  default => sub { 1 },
+  doc     => 'Number of recent tasks to show (default: 1)',
+);
 
-  my $task = $self->find_task($id);
-  die "Task $id not found\n" unless $task;
+option me => (
+  is  => 'ro',
+  doc => 'Show the task(s) my identity most recently acted on',
+);
+
+option agent => (
+  is     => 'ro',
+  format => 's',
+  doc    => 'Show the task(s) most recently claimed by this agent name',
+);
+
+sub _show_task {
+  my ($self, $task) = @_;
 
   if ($self->json) {
     my $data = $task->to_frontmatter;
@@ -45,6 +59,82 @@ sub execute {
   }
 }
 
+# Tasks sorted most-recently-updated first.
+sub _by_updated {
+  my ($self, @tasks) = @_;
+  return sort { ($b->updated // '') cmp ($a->updated // '') } @tasks;
+}
+
+# Task ids the current identity most recently acted on, newest first, deduped.
+sub _my_recent_ids {
+  my ($self, $limit) = @_;
+  my @ids;
+  my %seen;
+  for my $entry (reverse $self->activity_log->entries) {
+    my $tid = $entry->{task_id};
+    next unless defined $tid;
+    next if $seen{$tid}++;
+    push @ids, $tid;
+    last if @ids >= $limit;
+  }
+  return @ids;
+}
+
+sub _select_tasks {
+  my ($self, $id) = @_;
+
+  # Explicit id always wins.
+  if (defined $id) {
+    my $task = $self->find_task($id);
+    die "Task $id not found\n" unless $task;
+    return ($task);
+  }
+
+  my $limit = $self->last > 0 ? $self->last : 1;
+
+  if ($self->me) {
+    my @tasks = grep { defined } map { $self->find_task($_) } $self->_my_recent_ids($limit);
+    return @tasks;
+  }
+
+  if (defined $self->agent) {
+    my @claimed = grep { $_->has_claimed_by && $_->claimed_by eq $self->agent } $self->load_tasks;
+    my @sorted  = $self->_by_updated(@claimed);
+    return splice(@sorted, 0, $limit);
+  }
+
+  my @sorted = $self->_by_updated($self->load_tasks);
+  return splice(@sorted, 0, $limit);
+}
+
+sub execute {
+  my ($self, $args_ref, $chain_ref) = @_;
+
+  my @tasks = $self->_select_tasks($args_ref->[0]);
+
+  unless (@tasks) {
+    print "No tasks found.\n" unless $self->json;
+    $self->print_json([]) if $self->json;
+    return;
+  }
+
+  if ($self->json) {
+    my @data = map {
+      my $d = $_->to_frontmatter;
+      $d->{body} = $_->body if $_->body;
+      $d;
+    } @tasks;
+    # A single explicit lookup stays a bare object for backward compatibility.
+    $self->print_json(@data == 1 ? $data[0] : \@data);
+    return;
+  }
+
+  for my $i (0 .. $#tasks) {
+    $self->_show_task($tasks[$i]);
+    print "\n" . ('=' x 60) . "\n\n" if $i < $#tasks;
+  }
+}
+
 1;
 
 __END__
@@ -59,23 +149,33 @@ App::karr::Cmd::Show - Show full details of a task
 
 =head1 VERSION
 
-version 0.300
+version 0.301
 
 =head1 SYNOPSIS
 
-    karr show 12
+    karr show 12              # a specific task
+    karr show                 # the most recently updated task
+    karr show --last 5        # the 5 most recently updated tasks
+    karr show --me            # the last task my identity acted on
+    karr show --agent fox-owl # the last task claimed by that agent
     karr show 12 --json
 
 =head1 DESCRIPTION
 
-Shows the full details of a single task, including optional metadata such as
-tags, due date, estimate, claim state, and the Markdown body. This is the most
-complete human-readable view of an individual card.
+Shows the full details of a task, including optional metadata such as tags, due
+date, estimate, claim state, and the Markdown body. This is the most complete
+human-readable view of an individual card.
+
+With no C<ID>, shows the most recently updated task. C<--last N> widens that to
+the C<N> most recently updated. C<--me> instead resolves the task(s) the
+current identity most recently acted on (via the activity log). C<--agent NAME>
+shows the task(s) most recently claimed by that agent name. C<ID> always wins
+over the selector options.
 
 =head1 SEE ALSO
 
 L<karr>, L<App::karr>, L<App::karr::Cmd::List>, L<App::karr::Cmd::Edit>,
-L<App::karr::Cmd::Move>, L<App::karr::Cmd::Archive>
+L<App::karr::Cmd::Move>, L<App::karr::Cmd::Archive>, L<App::karr::Cmd::Log>
 
 =head1 SUPPORT
 
