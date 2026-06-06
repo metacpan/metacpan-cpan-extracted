@@ -1,6 +1,6 @@
-# -*- cperl -*-
 use ExtUtils::testlib;
 use Test::More;
+use Test::Differences;
 use Config::Model 2.138;
 use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
 use Data::Dumper ;
@@ -19,15 +19,6 @@ my ($meta_model, $trace) = init_test();
 
 my $wr_test = setup_test_dir ;
 
-my $inst = $meta_model->instance (
-    root_class_name   => 'Itself::Model',
-    instance_name     => 'itself_instance',
-    root_dir          => $wr_test,
-);
-ok($inst,"Read Itself::Model and created instance") ;
-
-my $root = $inst -> config_root ;
-
 # copy itself model
 # avoid patching this file for Debian autopkgtest
 my $orig_cm_dir = path($INC{'Config/Model/Itself.pm'})->parent;
@@ -40,17 +31,6 @@ note("Copying models from $orig_model_dir");
 # See https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=809294
 dircopy($orig_cm_dir->stringify, $target_cm_dir->stringify);
 
-my $rw_obj    = Config::Model::Itself->new(
-    cm_lib_dir  => $target_cm_dir->stringify,
-    model_object => $root
-);
-
-# filter out applications not related to "Itself" model.  when using
-# "system" libraries
-my $map = $rw_obj->read_all( root_model => 'Itself', application => 'itself' );
-
-ok(1,"Read all models from $target_model_dir") ;
-
 my @expected_classes =
     qw/
           Itself::Application Itself::CargoElement
@@ -62,62 +42,127 @@ my @expected_classes =
           Itself::ConfigAccept Itself::ConfigReadWrite
           Itself::ConfigReadWrite::DefaultLayer Itself::Element
           Itself::MigratedValue Itself::Model Itself::NonWarpableElement
-          Itself::WarpOnlyElement Itself::WarpValue Itself::WarpableCargoElement
+          Itself::WarpApply Itself::WarpOnlyElement Itself::WarpValue
           Itself::WarpableElement
       /;
 
-my @classes = $root->fetch_element('class')->fetch_all_indexes;
-is_deeply(\@classes, \@expected_classes, "found all configuration classes of Itself model");
+my $ref_cds;
+my @ref_elements;
+subtest "Dog food Itself" => sub {
+    my $inst = $meta_model->instance (
+        root_class_name   => 'Itself::Model',
+        instance_name     => 'itself_instance',
+        root_dir          => $wr_test,
+    );
+    ok($inst,"Read Itself::Model and created instance") ;
 
+    my $root = $inst -> config_root ;
 
-my @apps = $root->fetch_element('application')->fetch_all_indexes;
-is_deeply(\@apps, [], "found no applications as they are filtered out");
+    my $rw_obj    = Config::Model::Itself->new(
+        cm_lib_dir  => $target_cm_dir->stringify,
+        model_object => $root
+    );
 
-my $cds = $root->dump_tree (mode => 'backend') ;
+    # filter out applications not related to "Itself" model.  when using
+    # "system" libraries
+    my $map = $rw_obj->read_all( root_model => 'Itself', application => 'itself' );
 
-print $cds if $trace ;
-ok($cds,"dumped full tree in cds format") ;
+    ok(1,"Read all models from $target_model_dir") ;
 
-#create a 2nd empty model
-my $inst2 = $meta_model->instance (
-    root_class_name   => 'Itself::Model',
-    instance_name     => 'itself_instance2'
-);
+    my @classes = $root->fetch_element('class')->fetch_all_indexes;
+    is_deeply(\@classes, \@expected_classes, "found all configuration classes of Itself model");
 
-my $root2 = $inst2 -> config_root ;
-foreach my $class (@expected_classes) {
-    $root2->fetch_element('class')->fetch_with_id($class);
-}
-$root2 -> load ($cds) ;
-ok(1,"Created and loaded 2nd instance") ;
+    # TODO: check order of these elments after write_all, need to load written data
+    @ref_elements = $root->grab('class:"Itself::NonWarpableElement" element')->fetch_all_indexes;
 
-my $cds2 = $root2 ->dump_tree (mode => 'backend') ;
-print $cds2 if $trace ;
+    my @apps = $root->fetch_element('application')->fetch_all_indexes;
+    is_deeply(\@apps, [], "found no applications as they are filtered out");
 
-is(my_diff(\$cds,\$cds2),'',"Compared the 2 full dumps") ;
+    $ref_cds = $root->dump_tree (mode => 'custom') ;
 
-my $pdata2 = $root2 -> dump_as_data ;
-print Dumper $pdata2 if $trace ;
+    print $ref_cds if $trace ;
+    ok($ref_cds,"dumped full tree in cds format") ;
 
-# create 3rd instance
+    $rw_obj->write_all();
+    ok (1,"wrote back model") ;
+};
 
-my $inst3 = $meta_model->instance (
-    root_class_name   => 'Itself::Model',
-    instance_name     => 'itself_instance3'
-);
+my $ref_pdata;
+subtest "load model with cds data" => sub {
+    #create a 2nd empty model
+    my $inst = $meta_model->instance (
+        root_class_name   => 'Itself::Model',
+        instance_name     => 'itself_instance2'
+    );
 
-my $root3 = $inst -> config_root ;
-foreach my $class (@expected_classes) {
-    $root3->fetch_element('class')->fetch_with_id($class);
-}
-$root3 -> load_data ($pdata2) ;
-ok(1,"Created and loaded 3nd instance with perl data") ;
+    my $root = $inst -> config_root ;
+    # need to pre-load classes, otherwise loading warp fails on
+    # unknown classes
+    foreach my $class (@expected_classes) {
+        $root->fetch_element('class')->fetch_with_id($class);
+    }
 
-my $cds3 = $root3 ->dump_tree (mode => 'backend') ;
+    $root-> load ($ref_cds) ;
+    ok(1,"Created and loaded instance with cds data") ;
 
-is( my_diff(\$cds, \$cds3),'',"Compared the 3rd full dump with first one") ; 
+    my $cds = $root ->dump_tree (mode => 'custom') ;
+    print $cds if $trace ;
 
-$rw_obj->write_all() ;
+    is(my_diff(\$ref_cds,\$cds),'',"Compared the 2 full dumps") ;
+
+    $ref_pdata = $root -> dump_as_data(mode => 'custom') ;
+    print Dumper $ref_pdata if $trace ;
+};
+
+# create 3rd instance - test load after dump_as_data
+subtest "load model with Perl data" => sub {
+    my $inst = $meta_model->instance (
+        root_class_name   => 'Itself::Model',
+        instance_name     => 'itself_instance3'
+    );
+
+    my $root = $inst -> config_root ;
+    # need to pre-load classes, otherwise loading warp fails on
+    # unknown classes
+    foreach my $class (@expected_classes) {
+        $root->fetch_element('class')->fetch_with_id($class);
+    }
+
+    $root -> load_data ($ref_pdata) ;
+    ok(1,"Created and loaded instance with perl data") ;
+
+    my $cds = $root ->dump_tree (mode => 'custom') ;
+
+    is( my_diff(\$ref_cds, \$cds),'',"Compared the full dump with first one");
+};
+
+subtest "load the model that was written back" => sub {
+    my $inst = $meta_model->instance (
+        root_class_name   => 'Itself::Model',
+        instance_name     => 'itself_instance4'
+    );
+
+    my $root = $inst -> config_root ;
+
+    my $rw_obj = Config::Model::Itself->new(
+        cm_lib_dir  => $target_cm_dir->stringify,
+        model_object => $root
+    );
+
+    # filter out applications not related to "Itself" model.  when using
+    # "system" libraries
+    my $map = $rw_obj->read_all( root_model => 'Itself', application => 'itself' );
+
+    ok(1,"Created and loaded  instance with written back model") ;
+
+    my $cds = $root->dump_tree(mode => 'custom');
+
+    is( my_diff(\$ref_cds, \$cds),'',"Compared the full dump with the first one");
+
+    my @elements = $root->grab('class:"Itself::NonWarpableElement" element')->fetch_all_indexes;
+
+    eq_or_diff(\@elements, \@ref_elements, "check element list of a class");
+};
 
 # require Tk::ObjScanner; Tk::ObjScanner::scan_object($meta_model) ;
 

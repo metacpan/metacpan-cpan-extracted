@@ -1,7 +1,4 @@
-
-[![](https://travis-ci.org/dod38fr/config-model-itself.svg?branch=master)](https://travis-ci.org/dod38fr/config-model-itself)
-
-## What is Config::Model::Itself ##
+## What is Config::Model::Itself ? ##
 
 Config::Model::Itself provides a graphical editor to edit configuration model
 for Config::Model. 

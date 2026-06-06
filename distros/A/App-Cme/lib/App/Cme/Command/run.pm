@@ -10,7 +10,7 @@
 # ABSTRACT: Run a cme script
 
 package App::Cme::Command::run ;
-$App::Cme::Command::run::VERSION = '1.047';
+$App::Cme::Command::run::VERSION = '1.048';
 use strict;
 use warnings;
 use v5.20;
@@ -87,8 +87,9 @@ sub check_script_arguments ($self, $opt, $script_name) {
         }
         say $opt->{list} ? "Available scripts:" : "Missing script argument. Choose one of:";
         foreach my $script_path (sort @scripts) {
-            my $data = $self->get_script_data($script_path);
-            printf("- %s (app: %s)\n",$script_path, $data->{app} );
+            my ($file, $data) = $self->get_script_data($script_path);
+            my $app_info = $data->{app} ? sprintf(" (app %s)", $data->{app}) : "";
+            printf("- %s%s\n",$script_path, $app_info );
         }
         say "";
         say "Run 'cme run <script> -doc' to get more details on a script.";
@@ -327,7 +328,9 @@ sub get_script_data ($self, $script_name, $opt = {}) {
     my $content = $script_file->slurp_utf8;
 
     if ($content =~ m/^#!/ and -x $script_file) {
-        return $script_file, {};
+        my ($app) = $content =~ /# app:\s?(.*?)\n/;
+        my @doc = grep {s/^##\s?//;} split /\n/, $content;
+        return $script_file, {doc => \@doc, app => $app};
     }
 
     # parse variables passed on command line
@@ -366,16 +369,16 @@ sub execute {
         return;
     }
 
-    if (not defined $script_data->{app}) {
-        $self->run_script_as_code ($script_name, $script_file);
-        return;
-    }
-
     my $commit_msg = $script_data->{commit_msg};
 
     if ($opt->doc) {
         say join "\n", $script_data->{doc}->@*;
         say "will commit with message: '$commit_msg'" if $commit_msg;
+        return;
+    }
+
+    if (not defined $script_data->{app}) {
+        $self->run_script_as_code ($script_name, $script_file);
         return;
     }
 
@@ -496,7 +499,7 @@ sub run_script ($self, $opt, $app_args, $script_data, $user_args){
 }
 
 package App::Cme::Run::Var; ## no critic (Modules::ProhibitMultiplePackages)
-$App::Cme::Run::Var::VERSION = '1.047';
+$App::Cme::Run::Var::VERSION = '1.048';
 require Tie::Hash;
 
 ## no critic (ClassHierarchies::ProhibitExplicitISA)
@@ -524,7 +527,7 @@ App::Cme::Command::run - Run a cme script
 
 =head1 VERSION
 
-version 1.047
+version 1.048
 
 =head1 SYNOPSIS
 
@@ -607,6 +610,10 @@ avoid polluting global namespace, i.e. there's no need to store a
 script using L<cme function|Config::Model/cme> in C</usr/local/bin/>.
 Note that the script must begin with the usual shebang line (C<#!>)
 and be executable.
+
+To help management with C<cme run>, comment lines beginning with C<##>
+are shown as doc (with C<cme run xxx --doc>), comment line beginning
+with C<# app:> indicates the app shown by C<cme run --list> command.
 
 =back
 

@@ -9,7 +9,7 @@
 #
 # ABSTRACT: Work on the configuration model of an application
 
-package App::Cme::Command::meta 2.030;
+package App::Cme::Command::meta 2.031;
 
 use strict ;
 use warnings ;
@@ -30,6 +30,7 @@ use Tk ;
 use Config::Model::TkUI 1.381;
 use Config::Model::Itself::TkEditUI ;
 use Path::Tiny 0.125; # for mkdir
+use List::Util 1.33 qw/all/;
 
 binmode STDOUT, ':encoding(UTF-8)';
 
@@ -73,6 +74,11 @@ sub validate_args {
     return;
 }
 
+sub validate_factorize ($flag) {
+    return 1 if $flag eq 'all';
+    return all {/^description|summary|warp|status|level$/;} split /,/,$flag;
+}
+
 sub opt_spec {
     my ( $class, $app ) = @_;
 
@@ -87,6 +93,11 @@ sub opt_spec {
             {callbacks => { 'expected values' => sub { $_[0] =~ m/^full|preset|custom$/ ; }}}
         ],
         [ "dev!"          => 'use model in ./lib to create a plugin'],
+        [
+            "factorize=s"   => 'factorize class parameters. Comma separated list of either '.
+            '"description", "summary", "level", "warp", "status, or just "all"',
+             {callbacks => { 'expected "all" or a list' => sub { validate_factorize($_[0]); }}},
+        ],
 		[ "open-item=s"   => "force the UI to open the specified node"],
 		[ "plugin-file=s" => "create a model plugin in this file" ],
         [ "load-yaml=s"   => "load model from YAML file. Use '-' to load from STDIN" ],
@@ -204,9 +215,10 @@ sub load_meta_root {
     $self->load_optional_data($args, $opt, $root_model, $meta_root) ;
 
     my $write_sub = sub {
-            my $wr_dir = shift || $cm_lib_dir ;
-            $rw_obj->write_all( );
-        } ;
+        my $wr_dir = shift || $cm_lib_dir ;
+        $rw_obj->write_all(factorize => $opt->{factorize} // 'none');
+        return;
+    } ;
     return ($rw_obj, $cm_lib_dir, $meta_root, $write_sub);
 }
 
@@ -422,7 +434,7 @@ App::Cme::Command::meta - Work on the configuration model of an application
 
 =head1 VERSION
 
-version 2.030
+version 2.031
 
 =head1 SYNOPSIS
 

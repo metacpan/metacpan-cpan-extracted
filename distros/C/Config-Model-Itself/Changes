@@ -1,3 +1,21 @@
+2.031 2026-06-05
+
+  Feature:
+    * cme meta command: add -factorize option. The goal is to
+      reduce the size of written models and using the element
+      property factorization brought by Config::Model 2.163
+
+  Model changes:
+    * add gist to Element and CargoElement classes
+    * WarpValue model: change warp property to use "when <test> => apply ..."
+      (Requires Config::Model 2.163)
+
+  Bug fix:
+    * Itself: add "use utf8;" when writing back models
+
+  Misc:
+    * Requires Config::Model >= 2.163
+
 2.030 2026-04-23
 
   Bug fix:

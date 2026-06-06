@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::BackendMgr 2.162;
+package Config::Model::BackendMgr 2.163;
 
 use Mouse;
 use strict;
@@ -490,7 +490,7 @@ Config::Model::BackendMgr - Load configuration node on demand
 
 =head1 VERSION
 
-version 2.162
+version 2.163
 
 =head1 SYNOPSIS
 
@@ -504,11 +504,13 @@ version 2.162
  $model->create_config_class(
     name    => "Foo",
     element => [
-        [qw/foo bar/] => {
-            type       => 'leaf',
-            value_type => 'string'
-        },
+      'foo' => {
+        'value_type' => 'string',
+        'type' => 'leaf'
+      },
+      'bar' => '*foo'
     ]
+
  );
 
  $model->create_config_class(
@@ -523,18 +525,19 @@ version 2.162
     },
 
     element => [
-        [qw/foo bar/] => {
-            type       => 'leaf',
-            value_type => 'string'
-        },
-        hash_of_nodes => {
-            type       => 'hash',     # hash id
-            index_type => 'string',
-            cargo      => {
-                type              => 'node',
-                config_class_name => 'Foo'
-            },
-        },
+      'foo' => {
+        'value_type' => 'string',
+        'type' => 'leaf'
+      },
+      'bar' => '*foo'
+      hash_of_nodes => {
+          type       => 'hash',     # hash id
+          index_type => 'string',
+          cargo      => {
+              type              => 'node',
+              config_class_name => 'Foo'
+          },
+      },
     ],
  );
 

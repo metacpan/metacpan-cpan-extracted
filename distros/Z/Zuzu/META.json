@@ -53,10 +53,11 @@
             "Moo" : "0",
             "Net::DNS" : "0",
             "Net::SSLeay" : "0",
-            "Path::Tiny" : "0",
+            "Path::Tiny" : "0.142",
             "Plack" : "0",
             "Prima" : "0",
             "Regexp::Util" : "0",
+            "Sub::Quote" : "2.006009",
             "Term::ReadLine::Perl" : "0",
             "Text::CSV_XS" : "0",
             "Tie::Hash::MultiValueOrdered" : "0",
@@ -88,6 +89,6 @@
          "web" : "https://github.com/zuzuscript/zuzu-perl"
       }
    },
-   "version" : "0.001003",
+   "version" : "0.001005",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::AnyId 2.162;
+package Config::Model::AnyId 2.163;
 
 use 5.020;
 
@@ -1075,7 +1075,7 @@ Config::Model::AnyId - Base class for hash or list element
 
 =head1 VERSION
 
-version 2.162
+version 2.163
 
 =head1 SYNOPSIS
 
@@ -1086,10 +1086,11 @@ version 2.162
  $model->create_config_class(
     name    => "Foo",
     element => [
-        [qw/foo bar/] => {
+        foo => {
             type       => 'leaf',
             value_type => 'string'
         },
+        bar => '*foo',
     ]
  );
 
@@ -1109,7 +1110,9 @@ version 2.162
             index_type => 'integer',
 
             # hash boundaries
-            min_index => 1, max_index => 123, max_nb => 2,
+            min_index => 1,
+            max_index => 123,
+            max_nb => 2,
 
             # specify cargo held by hash
             cargo => {

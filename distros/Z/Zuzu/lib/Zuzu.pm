@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.001003';
+our $VERSION = '0.001005';
 
 use Exporter qw( import );
 our @EXPORT_OK = qw(

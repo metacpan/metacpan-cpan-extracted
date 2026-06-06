@@ -4,7 +4,7 @@
       "Lukas Mai <l.mai@web.de>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -26,7 +26,7 @@
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.70",
+            "ExtUtils::MakeMaker" : "7.0",
             "File::Find" : "0",
             "File::Spec" : "0",
             "strict" : "0",
@@ -36,6 +36,7 @@
       "develop" : {
          "requires" : {
             "Pod::Markdown" : "3.005",
+            "Pod::Markdown::Githubert" : "0",
             "Pod::Text" : "4.09",
             "Test::Pod" : "1.22"
          }
@@ -60,12 +61,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/mauke/Quote-Code/issues"
+      },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/mauke/Quote-Code",
-         "web" : "https://github.com/mauke/Quote-Code"
+         "url" : "https://codeberg.org/mauke/Quote-Code.git",
+         "web" : "https://codeberg.org/mauke/Quote-Code"
       }
    },
-   "version" : "1.0104",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "1.0105",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -1,5 +1,15 @@
 Revision history for Concierge
 
+v0.8.4  2026-06-05
+    - Desk::Setup POD: add UI Formatting Hints section documenting format_as
+      with template example using app-native tokens (t/b/sel)
+    - Desk::Setup POD: add format_as to field attribute reference
+    - Desk::Setup POD: fix field table -- move last_login_date from standard
+      to system fields; fix standard count 12 -> 11; fix Complete Example
+      system count 2 -> 3, total 15 -> 16
+    - Desk::Setup POD: update get_field_hints() return comment to include
+      format_as
+
 v0.8.3  2026-06-01
     - Fix MANIFEST: remove .perl-version (file does not exist in repo,
       causing CPAN Testers MANIFEST mismatch error)

@@ -371,9 +371,8 @@ subtest 'Date validator (term_ends)' => sub {
 subtest 'Timestamp validator (last_login_date)' => sub {
     my $storage_dir = tempdir(CLEANUP => 1);
     my $config = {
-        storage_dir             => $storage_dir,
-        backend                 => 'database',
-        include_standard_fields => [qw/ last_login_date /],
+        storage_dir => $storage_dir,
+        backend     => 'database',
     };
     my $setup_result = Concierge::Users->setup($config);
     my $users = Concierge::Users->new($setup_result->{config_file});

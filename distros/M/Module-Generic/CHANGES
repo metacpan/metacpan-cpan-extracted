@@ -1,5 +1,37 @@
 Revision history for Perl module Module::Generic
 
+v1.5.10 2026-06-06T06:27:47+0900
+    [Bug fixes]
+    - Module::Generic::Number::format_money() now follows the LC_MONETARY category
+      (mon_grouping, mon_thousands_sep, mon_decimal_point) instead of the numeric
+      formatting, so money is grouped according to the monetary locale.
+
+    [Improvements]
+    - Added a monetary trio (mon_decimal, mon_thousand, mon_grouping) as constructor
+      options and accessors, plus a boolean posix_strict option (true by default).
+      When false, a value absent from its own locale category is filled from the
+      sibling category, restoring the previous tolerant cross-category resolution.
+
+v1.5.9 2026-06-05T21:50:44+0900
+    [Bug fixes]
+    - Fixed a thread-safety defect in Module::Generic::Finfo::_datetime() that caused
+      atime(), ctime() and mtime() to return a false value under ithreads in a
+      non-deterministic, scheduling-dependent manner. The shared local_tz capability
+      flag was resolved under a lock, but the DateTime::Lite object was built only
+      inside that same locked initialisation block. Any thread that acquired the lock
+      after another thread had already populated the flag skipped the block and left
+      the object undefined, which then died on set_formatter(). The lock now resolves
+      only the boolean capability flag, and the DateTime::Lite object is always built
+      afterwards, outside the initialisation block, so every thread produces its own
+      object regardless of which thread won the initialisation race. This clears the
+      intermittent t/11.finfo.t "All threads accessed datetime successfully" failure
+      observed on perl 5.18.2 smokers.
+    - Hardened _datetime() to treat an undefined return from
+      DateTime::Lite->from_epoch() as a failure even when no exception is raised, both
+      when probing for local time zone support and when building the final object.
+      Previously a quiet undef return could set the local_tz flag to true incorrectly,
+      or fall through to set_formatter() on an undefined object.
+
 v1.5.8 2026-06-05T16:05:06+0900
     [Bug fixes]
     - Applied the POSIX::localeconv grouping normalisation (_normalise_lconv_grouping)

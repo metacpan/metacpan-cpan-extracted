@@ -1,5 +1,5 @@
 requires 'Moo';
-requires 'Path::Tiny';
+requires 'Path::Tiny', '0.142';
 requires 'Archive::Zip';
 requires 'CBOR::Free';
 requires 'HTTP::CookieJar';
@@ -23,6 +23,7 @@ requires 'JSON::MultiValueOrdered';
 requires 'Tie::Hash::MultiValueOrdered';
 requires 'Plack';
 requires 'Regexp::Util';
+requires 'Sub::Quote', '2.006009';
 requires 'Coro';
 requires 'CryptX', '0.088';
 requires 'Crypt::OpenSSL::PKCS12';

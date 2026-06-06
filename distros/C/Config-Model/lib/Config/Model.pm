@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model 2.162;
+package Config::Model 2.163;
 
 use 5.20.0;
 use strict ;
@@ -149,6 +149,14 @@ has log_level => (
     is => 'ro',
 );
 
+my %log_map = (
+    ERROR => $ERROR,
+    WARN => $WARN,
+    INFO => $INFO,
+    DEBUG => $DEBUG,
+    TRACE => $TRACE
+);
+
 has skip_inheritance => (
     isa     => 'Bool',
     is      => 'ro',
@@ -203,7 +211,12 @@ sub initialize_log4perl (@args) {
 sub BUILD {
     my $self = shift;
     my $args = shift;
-    initialize_log4perl(verbose => $args->{verbose}) unless Log::Log4perl->initialized();
+    if (my $level = $self->log_level) {
+        Log::Log4perl->easy_init($log_map{$level});
+    }
+    else {
+        initialize_log4perl(verbose => $args->{verbose}) unless Log::Log4perl->initialized();
+    }
     return;
 }
 
@@ -329,7 +342,7 @@ my @legal_params_to_move = (
     qw/class_description author copyright gist license include include_after include_backend class/
 );
 
-my @other_legal_params = qw/ author element status description summary level accept/;
+my @other_legal_params = qw/author element status description summary level accept warp/;
 
 # keep as external API. All internal call go through _store_model
 #  See comments around raw_models attribute for explanations
@@ -413,20 +426,192 @@ sub include_backend {
     return;
 }
 
-sub normalize_class_parameters {
-    my $self              = shift;
-    my $config_class_name = shift || die;
-    my $normalized_model  = shift || die;
+sub copy_element_information ($self, $model, $raw_model, $config_class_name) {
+    if (my $elt_info = delete $raw_model->{element}) {
+        # TODO: remove in 2029
+        $self->translate_legacy_element_info($config_class_name, $elt_info, 'name');
 
-    my $model = {};
+        my @raw_info = $elt_info->@*;
+        my %elt_info;
+        while (@raw_info) {
+            my ( $name, $info ) = splice @raw_info, 0, 2;
 
-    # sanity check
-    my $raw_name = delete $normalized_model->{name};
-    if ( defined $raw_name and $config_class_name ne $raw_name ) {
-        my $e = "internal: config_class_name $config_class_name ne model name $raw_name";
-        Config::Model::Exception::ModelDeclaration->throw( error => $e );
+            my $actual_info;
+            if (ref $info) {
+                # warp can be found only in element item
+                $self->translate_legacy_info( $config_class_name, $name, $info );
+                $actual_info = $info;
+                $elt_info{$name} = $info;
+            }
+            elsif ($info =~ /^\*(.*)/) {
+                my $target = $1;
+                $actual_info = $elt_info{$target};
+                if (not defined $actual_info) {
+                    Config::Model::Exception::ModelDeclaration->throw(
+                        error => "Element alias '$info' points to unknown element. ".
+                        " Aliased element must be declared before alias. Expected one of ".
+                        join(' ',sort keys %elt_info)
+                    );
+                }
+            }
+            else {
+                Config::Model::Exception::ModelDeclaration->throw(
+                    error => "Unpexpected element info: $info"
+                );
+            }
+
+            $model->{element}{$name} = dclone($actual_info);
+        }
+    }
+    return;
+}
+
+# translate [qw/A B C/ => <info>]
+# in [ A => <info>, B => '*A', c => '*A']
+sub translate_legacy_element_info($self, $config_class_name, $elt_info, $info_name) {
+    my @raw_info = $elt_info->@*;
+    my @new_info;
+
+    while (@raw_info) {
+        my ( $item, $info ) = splice @raw_info, 0, 2;
+
+        my @element_names = ref($item) ? @$item : ($item);
+        my $first = shift @element_names;
+        push @new_info, $first, $info;
+
+        if (@element_names > 0) {
+            $self->show_legacy_issue("$config_class_name: element $info_name '@element_names': ".
+                                     "should use aliases to $first instead of array ref.", 'warn');
+        }
+        foreach my $name (@element_names) {
+            push @new_info, $name, '*'.$first;
+        }
     }
 
+    $elt_info->@* = @new_info;
+
+    return;
+}
+
+sub copy_aliased_element_properties ($self, $model, $raw_model, $config_class_name, $properties) {
+    foreach my $prop_name ($properties->@*) {
+        my $raw_prop = $self->translate_legacy_aliased_element_properties(
+            $config_class_name,
+            delete $raw_model->{$prop_name},
+            $prop_name
+        );
+
+        next unless defined $raw_prop;
+
+        Config::Model::Exception::ModelDeclaration->throw(
+            error => "Data for parameter $prop_name of $config_class_name"
+            . " is not a hash ref" )
+            unless ref($raw_prop) eq 'HASH';
+
+
+        while (my ( $elt_name, $prop ) = each $raw_prop->%*) {
+            my $actual_prop;
+            if (not ref $prop and $prop =~ /^\*(.*)/) {
+                $actual_prop = $raw_prop->{$1};
+                if (not defined $actual_prop) {
+                    my @allowed = grep {! /^\*/ } sort keys $raw_prop->%*;
+                    Config::Model::Exception::ModelDeclaration->throw(
+                        error => "$prop_name alias '$prop' points to unknown $prop_name. ".
+                        " Expected one of @allowed"
+                    );
+                }
+            }
+            else {
+                $actual_prop = $prop;
+            }
+            # move some property information into element declaration (without clobberring)
+            if ($prop_name eq 'warp') {
+                $self->translate_warp_info( $config_class_name, $elt_name, $actual_prop );
+            }
+            if (not defined $model->{element}{$elt_name}) {
+                Config::Model::Exception::ModelDeclaration->throw(
+                    error => "create class $config_class_name: '$prop_name' "
+                    . "declaration for non declared element '$elt_name'" );
+            }
+
+            $model->{element}{$elt_name}{$prop_name} //= $actual_prop;
+        }
+    }
+    return;
+}
+
+# reversed means declared like prop_name => { prop_value => [qw/eltA eltB/]}
+sub copy_reversed_element_properties ( $self, $model, $raw_model, $config_class_name, $properties) {
+    foreach my $prop_name ($properties->@*) {
+        my $raw_prop =
+          $self->translate_legacy_reversed_element_properties( $config_class_name,
+            delete $raw_model->{$prop_name}, $prop_name );
+
+        next unless defined $raw_prop;
+
+        Config::Model::Exception::ModelDeclaration->throw(
+            error => "Data for parameter $prop_name of $config_class_name"
+              . " is not a hash ref" )
+          unless ref($raw_prop) eq 'HASH';
+
+        while (my ($prop_value, $elts) = each $raw_prop->%*) {
+            foreach my $elt_name (ref $elts ? $elts->@* : ($elts)) {
+                if ( not defined $model->{element}{$elt_name} ) {
+                    Config::Model::Exception::ModelDeclaration->throw(
+                        error => "create class $config_class_name: '$prop_name' "
+                        . "declaration for non declared element '$elt_name'" );
+                }
+
+                $model->{element}{$elt_name}{$prop_name} //= $prop_value;
+            }
+        }
+    }
+    return;
+}
+
+# translate [qw/A B C/ => <info>]
+# in { A => <info>, B => '*A', c => '*A' }
+sub translate_legacy_aliased_element_properties($self, $cfg_class_name, $properties, $prop_name) {
+    if (ref $properties ne 'ARRAY') {
+        return $properties;
+    }
+
+    $self->translate_legacy_element_info($cfg_class_name, $properties, $prop_name);
+    my %new_prop = $properties->@*;
+
+    return \%new_prop;
+}
+
+# translate for $prop_name: [qw/A B C/ => <prop_value>]
+# in { <prop_value> => [qw/A B C/]
+sub translate_legacy_reversed_element_properties($self, $cfg_class_name, $properties, $prop_name) {
+    if (ref $properties ne 'ARRAY') {
+        return $properties;
+    }
+
+    my @raw_info = $properties->@*;
+    my %new_info;
+
+    while (@raw_info) {
+        my ( $item, $prop_value ) = splice @raw_info, 0, 2;
+
+        my @element_names = ref($item) ? @$item : ($item);
+        $new_info{$prop_value} //=[];
+        push $new_info{$prop_value}->@*, @element_names;
+
+        if (@element_names > 0) {
+            $self->show_legacy_issue(
+                "$cfg_class_name: element $prop_name '@element_names': ".
+                "should use reversed declaration (i.e $prop_value => [ @element_names]) ".
+                "instead of array ref.", 'warn'
+            );
+        }
+    }
+
+    return \%new_info;
+}
+
+sub extract_element_list ($self, $normalized_model) {
     my @element_list;
 
     # first construct the element list
@@ -437,30 +622,13 @@ sub normalize_class_parameters {
         # store the order of element as declared in 'element'
         push @element_list, ref($item) ? @$item : ($item);
     }
+    return @element_list;
+}
 
-    if ( defined $normalized_model->{inherit_after} ) {
-        $self->show_legacy_issue([ "Model $config_class_name: inherit_after is deprecated ",
-            "in favor of include_after" ]);
-        $normalized_model->{include_after} = delete $normalized_model->{inherit_after};
-    }
-    if ( defined $normalized_model->{inherit} ) {
-        $self->show_legacy_issue(
-            "Model $config_class_name: inherit is deprecated in favor of include");
-        $normalized_model->{include} = delete $normalized_model->{inherit};
-    }
-
-    foreach my $info (@legal_params_to_move) {
-        next unless defined $normalized_model->{$info};
-        $model->{$info} = delete $normalized_model->{$info};
-    }
-
-    # first deal with perl file and cds_file backend
-    $self->translate_legacy_backend_info( $config_class_name, $model );
-
-    # handle accept parameter
+sub extract_accept_parameter ($self, $config_class_name, $model, $raw_model) {
     my @accept_list;
     my %accept_hash;
-    my $accept_info = delete $normalized_model->{'accept'} || [];
+    my $accept_info = delete $raw_model->{'accept'} || [];
     while (@$accept_info) {
         my $name_match = shift @$accept_info;    # should be a regexp
 
@@ -479,88 +647,77 @@ sub normalize_class_parameters {
 
     $model->{accept}      = \%accept_hash;
     $model->{accept_list} = \@accept_list;
+    return;
+}
 
+sub check_element_duplicates ($self, $config_class_name, $element_list) {
     # check for duplicate in @element_list.
     my %check_list;
-    foreach (@element_list) { $check_list{$_}++ };
+    foreach my $name ($element_list->@*) {
+        $check_list{$name}++
+    };
+
     my @extra = grep { $check_list{$_} > 1 } keys %check_list;
     if (@extra) {
         Config::Model::Exception::ModelDeclaration->throw(
             error => "class $config_class_name: @extra element "
                 . "is declared more than once. Check the included parts" );
     }
+    return;
+}
 
-    $self->handle_experience_permission( $config_class_name, $normalized_model );
+sub normalize_class_parameters ($self, $config_class_name, $raw_model) {
+    my $model = {};
 
-    # element is handled first
-    foreach my $info_name (qw/element status description summary level/) {
-        my $raw_compact_info = delete $normalized_model->{$info_name};
-
-        next unless defined $raw_compact_info;
-
-        Config::Model::Exception::ModelDeclaration->throw(
-            error => "Data for parameter $info_name of $config_class_name"
-                . " is not an array ref" )
-            unless ref($raw_compact_info) eq 'ARRAY';
-
-        my @raw_info = @$raw_compact_info;
-        while (@raw_info) {
-            my ( $item, $info ) = splice @raw_info, 0, 2;
-            my @element_names = ref($item) ? @$item : ($item);
-
-            # move element informations (handled first)
-            if ( $info_name eq 'element' ) {
-
-                # warp can be found only in element item
-                $self->translate_legacy_info( $config_class_name, $element_names[0], $info );
-
-                $self->handle_experience_permission( $config_class_name, $info );
-
-                # copy in element data *after* legacy translation
-                foreach (@element_names) { $model->{element}{$_} = dclone($info); };
-            }
-
-            # move some information into element declaration (without clobberring)
-            elsif ( $info_name =~ /description|level|summary|status/ ) {
-                foreach (@element_names) {
-                    Config::Model::Exception::ModelDeclaration->throw(
-                        error => "create class $config_class_name: '$info_name' "
-                            . "declaration for non declared element '$_'" )
-                        unless defined $model->{element}{$_};
-
-                    $model->{element}{$_}{$info_name} ||= $info;
-                }
-            }
-            else {
-                die "Unexpected element $item in $config_class_name model";
-            }
-
-        }
+    # sanity check
+    my $raw_name = delete $raw_model->{name};
+    if ( defined $raw_name and $config_class_name ne $raw_name ) {
+        my $e = "internal: config_class_name $config_class_name ne model name $raw_name";
+        Config::Model::Exception::ModelDeclaration->throw( error => $e );
     }
 
-    Config::Model::Exception::ModelDeclaration->throw(
-              error => "create class $config_class_name: unexpected "
-            . "parameters '"
-            . join( ', ', sort keys %$normalized_model ) . "' "
-            . "Expected '"
-            . join( "', '", @legal_params_to_move, @other_legal_params )
-            . "'" )
-        if keys %$normalized_model;
+    my @element_list = $self->extract_element_list($raw_model);
+
+    foreach my $info (@legal_params_to_move) {
+        next unless defined $raw_model->{$info};
+        $model->{$info} = delete $raw_model->{$info};
+    }
+
+    # first deal with perl file and cds_file backend
+    $self->translate_legacy_backend_info( $config_class_name, $model );
+
+    # handle accept parameter
+    $self->extract_accept_parameter($config_class_name, $model, $raw_model);
+
+    $self->check_element_duplicates($config_class_name, \@element_list);
+
+    # element is handled first
+    $self->copy_element_information($model, $raw_model, $config_class_name);
+
+    # copy factorized element properties that are declared as class properties
+    $self->copy_element_properties($model, $raw_model, $config_class_name);
+
+    if (keys %$raw_model) {
+        my $msg = sprintf(
+            "create class $config_class_name: unexpected property '%s'. Expected '%s'",
+            join( ', ', sort keys %$raw_model ),
+            join( "', '", @legal_params_to_move, @other_legal_params )
+        );
+        Config::Model::Exception::ModelDeclaration->throw(error => $msg);
+    }
 
     $model->{element_list} = \@element_list;
 
     return $model;
 }
 
-sub handle_experience_permission {
-    my ( $self, $config_class_name, $model ) = @_;
-
-    if (delete $model->{permission}) {
-        die "$config_class_name: parameter permission is obsolete\n";
-    }
-    if (delete $model->{experience}) {
-        carp "experience parameter is deprecated";
-    }
+sub copy_element_properties($self, $model, $raw_model, $config_class_name) {
+    # 2026-05-14 experiment: also copy warp information. This does not apply to
+    # warp property inside cargo spec.
+    $self->copy_aliased_element_properties( $model, $raw_model,
+        $config_class_name, [qw/description summary warp/] );
+    $self->copy_reversed_element_properties( $model, $raw_model,
+        $config_class_name, [qw/status level/] );
     return;
 }
 
@@ -570,11 +727,11 @@ sub translate_legacy_info {
     my $elt_name          = shift;
     my $info              = shift;
 
-    $self->translate_warped_node_info( $config_class_name, $elt_name, 'warped_node', $info );
+    $self->translate_warped_node_info( $config_class_name, $elt_name, $info );
 
     #translate legacy warp information
     if ( defined $info->{warp} ) {
-        $self->translate_warp_info( $config_class_name, $elt_name, $info->{type}, $info->{warp} );
+        $self->translate_warp_info( $config_class_name, $elt_name, $info->{warp} );
     }
 
     $self->translate_cargo_info( $config_class_name, $elt_name, $info );
@@ -582,15 +739,12 @@ sub translate_legacy_info {
     if (   defined $info->{cargo}
         && defined $info->{cargo}{type}
         && $info->{cargo}{type} eq 'warped_node' ) {
-        $self->translate_warped_node_info( $config_class_name, $elt_name, 'warped_node', $info->{cargo} );
+        $self->translate_warped_node_info( $config_class_name, $elt_name, $info->{cargo} );
     }
 
     if (    defined $info->{cargo}
         and defined $info->{cargo}{warp} ) {
-        $self->translate_warp_info(
-            $config_class_name, $elt_name,
-            $info->{cargo}{type},
-            $info->{cargo}{warp} );
+        $self->translate_warp_info($config_class_name, $elt_name, $info->{cargo}{warp} );
     }
 
     # compute cannot be warped
@@ -626,12 +780,8 @@ sub translate_legacy_info {
             $self->translate_id_auto_create( $config_class_name, $elt_name, $info );
         }
         $self->translate_id_min_max( $config_class_name, $elt_name, $info );
-        $self->translate_id_names( $config_class_name, $elt_name, $info );
         if ( defined $info->{warp} ) {
-            my $rules_a = $info->{warp}{rules};
-            my %h       = @$rules_a;
-            foreach my $rule_effect ( values %h ) {
-                $self->translate_id_names( $config_class_name, $elt_name, $rule_effect );
+            foreach my $rule_effect ( map { $_->{apply} } $info->{warp}{rules}->@*) {
                 $self->translate_id_min_max( $config_class_name, $elt_name, $rule_effect );
                 next unless defined $rule_effect->{default};
                 $self->translate_id_default_info( $config_class_name, $elt_name, $rule_effect );
@@ -740,30 +890,6 @@ sub translate_cargo_info {
     $legacy_logger->debug( 
         Data::Dumper->Dump( [$info], [ 'translated_' . $elt_name ] ) 
     ) if $legacy_logger->is_debug;
-    return;
-}
-
-sub translate_id_names {
-    my $self              = shift;
-    my $config_class_name = shift;
-    my $elt_name          = shift;
-    my $info              = shift;
-    $self->translate_name( $config_class_name, $elt_name, $info, 'allow',      'allow_keys',       'die' );
-    $self->translate_name( $config_class_name, $elt_name, $info, 'allow_from', 'allow_keys_from',  'die' );
-    $self->translate_name( $config_class_name, $elt_name, $info, 'follow',     'follow_keys_from', 'die' );
-    return;
-}
-
-sub translate_name {
-    my ($self, $config_class_name, $elt_name, $info, $from, $to, $legacy) = @_;
-
-    if ( defined $info->{$from} ) {
-        $self->show_legacy_issue(
-            "$config_class_name->$elt_name: parameter $from is deprecated in favor of $to",
-            $legacy
-        );
-        $info->{$to} = delete $info->{$from};
-    }
     return;
 }
 
@@ -935,20 +1061,18 @@ sub translate_id_min_max {
     foreach my $bad (qw/min max/) {
         next unless defined $info->{$bad};
 
-        $legacy_logger->debug( "translate_id_min_max $elt_name $bad:")
-            if $legacy_logger->is_debug;
-
         my $good = $bad . '_index';
         my $warn = "$config_class_name->$elt_name: '$bad' parameter for list or "
             . "hash element is deprecated. Use '$good'";
 
+        $self->show_legacy_issue( $warn);
         $info->{$good} = delete $info->{$bad};
     }
     return;
 }
 
 sub translate_warped_node_info {
-    my ( $self, $config_class_name, $elt_name, $type, $info ) = @_;
+    my ( $self, $config_class_name, $elt_name, $info ) = @_;
 
     $legacy_logger->debug(
         "translate_warped_node_info $elt_name input:\n",
@@ -976,7 +1100,7 @@ sub translate_warped_node_info {
 
 # internal: translate warp information into 'boolean expr' => { ... }
 sub translate_warp_info {
-    my ( $self, $config_class_name, $elt_name, $type, $warp_info ) = @_;
+    my ( $self, $config_class_name, $elt_name, $warp_info ) = @_;
 
     $legacy_logger->debug(
         "translate_warp_info $elt_name input:\n",
@@ -991,7 +1115,7 @@ sub translate_warp_info {
     my $multi_follow = @warper_items > 1 ? 1 : 0;
 
     my $rules =
-        $self->translate_rules_arg( $config_class_name, $elt_name, $type, \@warper_items,
+        $self->translate_rules_arg( $config_class_name, $elt_name, \@warper_items,
         $warp_info->{rules} );
 
     $warp_info->{follow} = $follow;
@@ -1002,56 +1126,6 @@ sub translate_warp_info {
         Data::Dumper->Dump( [$warp_info], [qw/new_warp_info/] )
     ) if $legacy_logger->is_debug;
     return;
-}
-
-# internal
-sub translate_multi_follow_legacy_rules {
-    my ( $self, $config_class_name, $elt_name, $warper_items, $raw_rules ) = @_;
-    my @rules;
-
-    # we have more than one warper_items
-
-    for ( my $r_idx = 0 ; $r_idx < $#$raw_rules ; $r_idx += 2 ) {
-        my $key_set = $raw_rules->[$r_idx];
-        my @keys = ref($key_set) ? @$key_set : ($key_set);
-
-        # legacy: check the number of keys in the @rules set
-        if ( @keys != @$warper_items and $key_set !~ /\$\w+/ ) {
-            Config::Model::Exception::ModelDeclaration->throw( error => "Warp rule error in "
-                    . "'$config_class_name->$elt_name'"
-                    . ": Wrong nb of keys in set '@keys',"
-                    . " Expected "
-                    . scalar @$warper_items
-                    . " keys" );
-        }
-
-        # legacy:
-        # if a key of a rule (e.g. f1 or b1) is an array ref, all the
-        # values passed in the array are considered as valid.
-        # i.e. [ [ f1a, f1b] , b1 ] => { ... }
-        # is equivalent to
-        # [ f1a, b1 ] => { ... }, [  f1b , b1 ] => { ... }
-
-        # now translate [ [ f1a, f1b] , b1 ] => { ... }
-        # into "( $f1 eq f1a or $f1 eq f1b ) and $f2 eq b1)" => { ... }
-        my @bool_expr;
-        my $b_idx = 0;
-        foreach my $key (@keys) {
-            if ( ref $key ) {
-                my @expr = map { "\$f$b_idx eq '$_'" } @$key;
-                push @bool_expr, "(" . join( " or ", @expr ) . ")";
-            }
-            elsif ( $key !~ /\$\w+/ ) {
-                push @bool_expr, "\$f$b_idx eq '$key'";
-            }
-            else {
-                push @bool_expr, $key;
-            }
-            $b_idx++;
-        }
-        push @rules, join( ' and ', @bool_expr ), $raw_rules->[ $r_idx + 1 ];
-    }
-    return @rules;
 }
 
 sub translate_follow_arg {
@@ -1066,6 +1140,9 @@ sub translate_follow_arg {
         return $raw_follow;
     }
     elsif ( ref($raw_follow) eq 'ARRAY' ) {
+        # TODO: remove in 2028
+        $self->show_legacy_issue("$config_class_name $elt_name: using follow with array is deprecated. "
+                                 . "Please use hash with named parameters.");
 
         # translate legacy follow arguments ['warp1','warp2',...]
         my $follow = {};
@@ -1084,55 +1161,81 @@ sub translate_follow_arg {
 }
 
 sub translate_rules_arg {
-    my ( $self, $config_class_name, $elt_name, $type, $warper_items, $raw_rules ) = @_;
+    my ( $self, $config_class_name, $elt_name, $warper_items, $raw_rules ) = @_;
 
-    my $multi_follow = @$warper_items > 1 ? 1 : 0;
     my $follow = @$warper_items;
 
-    # $rules is either:
-    # { f1 => { ... } }  (  may be [ f1 => { ... } ] ?? )
-    # [ 'boolean expr' => { ... } ]
+    # $rules is translated to:
+    # [ { if => <boolean expr>, ...} , ... ]
     # legacy:
-    # [ f1, b1 ] => {..} ,[ f1,b2 ] => {...}, [f2,b1] => {...} ...
+    # [ 'boolean expr' => { ... } ]
+    # { follow_value => { ... } }
     # foo => {...} , bar => {...}
+    # older legacy:
+    # [ f1, b1 ] => {..} ,[ f1,b2 ] => {...}, [f2,b1] => {...} ...
     my @rules;
     if ( ref($raw_rules) eq 'HASH' ) {
-
+        # TODO: remove in 2028
         # transform the hash { foo => { ...} }
-        # into array ref [ '$f1 eq foo' => { ... } ]
-        my $h = $raw_rules;
-        @rules = $follow ? map { ( "\$f1 eq '$_'", $h->{$_} ) } keys %$h : keys %$h;
-    }
-    elsif ( ref($raw_rules) eq 'ARRAY' ) {
-        if ($multi_follow) {
-            push @rules,
-                $self->translate_multi_follow_legacy_rules( $config_class_name, $elt_name,
-                $warper_items, $raw_rules );
+        # into array ref [ { if => '$f1 eq foo', ... } ]
+        foreach my $key (keys $raw_rules->%*) {
+            my %h = (
+                when  => $follow ? "\$f1 eq '$key'" : $key,
+                apply => $raw_rules->{$key},
+            );
+            push @rules, \%h;
         }
-        else {
-            # now translate [ f1a, f1b]  => { ... }
-            # into "$f1 eq f1a or $f1 eq f1b " => { ... }
-            my @raw_rules = @{$raw_rules};
-            for ( my $r_idx = 0 ; $r_idx < $#raw_rules ; $r_idx += 2 ) {
-                my $key_set   = $raw_rules[$r_idx];
-                my @keys      = ref($key_set) ? @$key_set : ($key_set);
-                my @bool_expr = $follow ? map { /\$/ ? $_ : "\$f1 eq '$_'" } @keys : @keys;
-                push @rules, join( ' or ', @bool_expr ), $raw_rules[ $r_idx + 1 ];
+        $self->show_legacy_issue(
+            "$config_class_name $elt_name: using a hash for warp rule is deprecated. ".
+            qq!Please use a array ref [ when => "$rules[0]{when}", apply => ...].!
+        );
+    }
+    elsif ( ref($raw_rules) eq 'ARRAY' and ref $raw_rules->[0] eq 'HASH') {
+        # no translation needed
+        @rules = $raw_rules->@*;
+    }
+    elsif ( ref($raw_rules) eq 'ARRAY') {
+        # now translate [ f1a, f1b]  => { ... }
+        # into { when => "$f1 eq f1a or $f1 eq f1b ", ... }
+        my @raw_rules = @{$raw_rules};
+        for ( my $r_idx = 0 ; $r_idx < $#raw_rules ; $r_idx += 2 ) {
+            my $key_set   = $raw_rules[$r_idx];
+            # TODO: remove $key_set as array ref in 2028
+            my @keys      = ref($key_set) ? @$key_set : ($key_set);
+            my @bool_expr;
+            foreach my $key (@keys) {
+                my $expr = sprintf(q!$f1 eq '%s'!, $key);
+                push @bool_expr, ($follow and $key !~ /\$/) ? $expr : $key;
             }
+            my $rule_ref = $raw_rules[ $r_idx + 1 ];
+            if (ref $rule_ref ne 'HASH') {
+                Config::Model::Exception::ModelDeclaration->throw(
+                    error => "Warp rule error in element "
+                    . "'$config_class_name->$elt_name': "
+                    . "rule effect must be a hash ref. Got '$rule_ref'" );
+            }
+            
+            my %new_rule = (
+                when => join( ' or ', @bool_expr ),
+                apply => $rule_ref,
+            );
+            push @rules, \%new_rule;
+            $self->show_legacy_issue(
+                "$config_class_name $elt_name: using an array for warp rule test is deprecated. ".
+                "Please use a string with named parameters like «$new_rule{when}»."
+            ) if @keys > 1;
         }
     }
     elsif ( defined $raw_rules ) {
         Config::Model::Exception::ModelDeclaration->throw(
                   error => "Warp rule error in element "
                 . "'$config_class_name->$elt_name': "
-                . "rules must be a hash ref. Got '$raw_rules'" );
+                . "rules must be an array ref. Got '$raw_rules'" );
     }
 
-    for ( my $idx = 1 ; $idx < @rules ; $idx += 2 ) {
-        next unless ( ref $rules[$idx] eq 'HASH' );    # other cases are illegal and trapped later
-        $self->handle_experience_permission( $config_class_name, $rules[$idx] );
-        next unless defined $type and $type eq 'leaf';
-        $self->translate_legacy_builtin( $config_class_name, $rules[$idx], $rules[$idx] );
+    for my $rule (@rules) {
+        # no effect on non leaf type which cannot have old built_in
+        $self->translate_legacy_builtin( $config_class_name, $rule, $rule );
     }
 
     return \@rules;
@@ -1401,8 +1504,6 @@ sub load {
     return @loaded_classes;
 }
 
-# New subroutine "_load_model_in_hash" extracted - Fri Apr 12 17:29:56 2013.
-#
 sub _merge_model_in_hash {
     my ( $self, $hash_ref, $model, $load_file ) = @_;
 
@@ -1634,9 +1735,6 @@ sub get_model_doc {
     return \%result;
 }
 
-#
-# New subroutine "get_migrate_doc" extracted - Tue Jun  5 13:31:20 2012.
-#
 sub get_migrate_doc {
     my ( $self, $elt_name, $desc, $migr ) = @_;
 
@@ -1888,7 +1986,7 @@ Config::Model - a framework to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.162
+version 2.163
 
 =head1 SYNOPSIS
 
@@ -1914,10 +2012,17 @@ version 2.162
  # file in lib/Config/Model/models. Then, run cme as explained below
  $model ->create_config_class (
    name => "MiniModel",
-   element => [ [qw/foo bar baz/ ] => { type => 'leaf', value_type => 'uniline' }, ],
-   rw_config => { backend => 'IniFile', auto_create => 1,
-                  config_dir => '.', file => 'mini.ini',
-                }
+   element => [
+     foo => { type => 'leaf', value_type => 'uniline' },
+     bar => '*foo',
+     baz => '*foo',
+   ],
+   rw_config => {
+     backend => 'IniFile',
+     auto_create => 1,
+     config_dir => '.',
+     file => 'mini.ini',
+   }
  ) ;
 
  # create instance (Config::Model::Instance object)
@@ -1938,7 +2043,7 @@ version 2.162
 
  $ mkdir -p lib/Config/Model/models/
  $ echo "[ { name => 'MiniModel', \
-             element => [ [qw/foo bar baz/ ] => { type => 'leaf', value_type => 'uniline' }, ], \
+             element => [ foo => { type => 'leaf', value_type => 'uniline' }, qw/bar *foo baz *foo/], \
              rw_config => { backend => 'IniFile', auto_create => 1, \
                             config_dir => '.', file => 'mini.ini', \
                           } \
@@ -1964,7 +2069,7 @@ To provide these tools, Config::Model needs:
 =item *
 
 A description of the structure and constraints of the project's configuration
-(fear not, a GUI is available with L<App::Cme>)
+(fear not, a GUI is available with L<App::Cme> to create this structure)
 
 =item *
 
@@ -2074,10 +2179,6 @@ generic user interfaces)
 
 The properties of each element (boundaries check, integer or string,
 enum like type, default value ...)
-
-=item *
-
-The targeted audience (beginner, advanced, master)
 
 =item *
 
@@ -2253,6 +2354,8 @@ configuration file.
 
 =head1 Configuration Model
 
+=head2 Configuration Model structure
+
 To validate a configuration tree, we must create a configuration model
 that defines all the properties of the validation engine you want to
 create.
@@ -2329,6 +2432,8 @@ classes). But they must be declared as a DAG (directed acyclic graph).
 See also
 L<Directed acyclic graph on Wikipedia|http://en.wikipedia.org/wiki/Directed_acyclic_graph">More on DAGs>
 
+=head2 Configuration Model declaration
+
 Each configuration class declaration specifies:
 
 =over
@@ -2343,11 +2448,11 @@ A C<class_description> used in user interfaces (optional)
 
 =item *
 
-Optional include specification to avoid duplicate declaration of elements.
+Optional include specification to avoid duplicated declaration of elements.
 
 =item *
 
-The class elements
+The class elements (usually matching configuration parameters)
 
 =back
 
@@ -2357,7 +2462,7 @@ Each element specifies:
 
 =item *
 
-Most importantly, the type of the element (mostly C<leaf>, or C<node>)
+First and foremost, the type of the element (mostly C<leaf>, or C<node>)
 
 =item *
 
@@ -2374,45 +2479,54 @@ Whether the parameter is mandatory
 
 =item *
 
-Targeted audience (beginner, advance, master), i.e. the level of
-expertise required to tinker a parameter (to hide expert parameters
-from newbie eyes)
-
-=item *
-
 On-line help (for each parameter or value of parameter)
 
 =back
 
-See L<Config::Model::Node> for details on how to declare a
-configuration class.
+L<Config::Model::Node/"Configuration class declaration"> provides more
+details on how to declare a configuration class.
 
 Example:
 
- $ cat lib/Config/Model/models/Xorg.pl
- [
+ $ cat lib/Config/Model/models/Popcon.pl
+ use strict;
+ use warnings;
+
+ return [
    {
-     name => 'Xorg',
-     class_description => 'Top level Xorg configuration.',
-     include => [ 'Xorg::ConfigDir'],
-     element => [
-                 Files => {
-                           type => 'node',
-                           description => 'File pathnames',
-                           config_class_name => 'Xorg::Files'
-                          },
-                 # snip
-                ]
-   },
-   {
-     name => 'Xorg::DRI',
-     element => [
-                 Mode => {
-                          type => 'leaf',
-                          value_type => 'uniline',
-                          description => 'DRI mode, usually set to 0666'
-                         }
-                ]
+     'name' => 'PopCon',
+     'author' => ['Dominique Dumont'],
+     'copyright' => ['2010,2011 Dominique Dumont'],
+     'license' => 'LGPL2',
+     'element' => [
+       'PARTICIPATE',
+       {
+         'description' => 'If you don\'t want to participate [...]',
+         'type' => 'leaf',
+         'upstream_default' => '0',
+         'value_type' => 'boolean',
+         'write_as' => ['no', 'yes']
+       },
+       'ENCRYPT',
+       {
+         'choice' => ['no', 'maybe', 'yes'],
+         'description' => 'encrypt popcon submission.',
+         'help' => {
+           'maybe' => 'encrypt if gpg is available',
+           'yes' => 'try to encrypt and fail if gpg is not available'
+         },
+         'summary' => 'support for encrypted submissions',
+         'type' => 'leaf',
+         'upstream_default' => 'no',
+         'value_type' => 'enum'
+       },
+       # [etc ...]
+     ],
+     'rw_config' => {
+       'backend' => 'ShellVar',
+       'config_dir' => '/etc',
+       'file' => 'popularity-contest.conf'
+     }
    }
  ];
 
@@ -2509,33 +2623,6 @@ several other properties:
 
 =over
 
-=item level
-
-Level is C<important>, C<normal> or C<hidden>.
-
-The level is used to set how configuration data is presented to the
-user in browsing mode. C<Important> elements are shown to the user no
-matter what. C<hidden> elements are well, hidden. Their purpose is
-explained with the I<warp> notion.
-
-=item status
-
-Status is C<obsolete>, C<deprecated> or C<standard> (default).
-
-Using a deprecated element raises a warning. Using an obsolete
-element raises an exception.
-
-=item description
-
-Description of the element. This description is used while
-generating user interfaces.
-
-=item summary
-
-Summary of the element. This description is used while generating
-a user interfaces and may be used in comments when writing the
-configuration file.
-
 =item class_description
 
 Description of the configuration class. This description is used
@@ -2617,11 +2704,10 @@ can also be declared within the element declaration:
   (
    config_class_name => 'SomeRootClass',
    class_description => "SomeRootClass description",
-   'element'
-   => [
-        tree_macro => { level => 'important'},
-        X          => { description => 'X-ray', } ,
-      ]
+   'element' => [
+     tree_macro => { level => 'important'},
+     X          => { description => 'X-ray', } ,
+   ]
   ) ;
 
 =head1 Load predeclared model

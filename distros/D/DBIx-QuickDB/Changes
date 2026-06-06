@@ -1,3 +1,5 @@
+0.000047  2026-06-05 22:35:47-07:00 America/Los_Angeles
+
 0.000046  2026-06-03 14:58:27-07:00 America/Los_Angeles
 
     - Made the server start timeout tunable via the QDB_START_TIMEOUT environment variable, keeping the previous 10s default. Slow hosts (e.g. CPAN smoke boxes) could need longer to bring a server up -- especially a clone doing crash recovery -- and were timing out with "Timed out waiting for server to start"

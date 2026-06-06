@@ -44,8 +44,11 @@ return [
                 level      => 'hidden',
                 value_type => 'uniline',
                 warp       => {
-                    follow  => { 't'            => '?type' },
-                    'rules' => [ '$t eq "hash"' => { level => 'normal', } ]
+                    follow  => { 't' => '?type' },
+                    'rules' => [{
+                        when => '$t eq "hash"',
+                        apply => { level => 'normal', }
+                    }]
                 }
             },
 
@@ -55,10 +58,10 @@ return [
                 value_type => 'boolean',
                 warp       => {
                     follow  => { 't' => '?type' },
-                    'rules' => [
-                        '$t eq "hash" or $t eq "check_list"' =>
-                          { level => 'normal', }
-                    ]
+                    'rules' => [{
+                        when => '$t eq "hash" or $t eq "check_list"',
+                        apply => { level => 'normal', }
+                    }]
                 }
             },
 
@@ -68,7 +71,10 @@ return [
                 cargo      => { type => 'leaf', value_type => 'string' },
                 warp       => {
                     follow  => { 't'            => '?type' },
-                    'rules' => [ '$t eq "hash"' => { level => 'normal', } ]
+                    'rules' => [{
+                        when => '$t eq "hash"',
+                        apply => { level => 'normal', }
+                    }]
                 }
             },
 
@@ -78,7 +84,10 @@ return [
                 value_type => 'string',
                 warp       => {
                     follow  => { 't'            => '?type' },
-                    'rules' => [ '$t eq "list"' => { level => 'normal', } ]
+                    'rules' => [{
+                        when => '$t eq "list"',
+                        apply => { level => 'normal', }
+                    }]
                 }
             },
 
@@ -89,7 +98,10 @@ return [
                 cargo      => { type => 'leaf', value_type => 'string' },
                 warp       => {
                     follow  => { 't'            => '?type' },
-                    'rules' => [ '$t eq "hash" or $t eq "list"' => { level => 'normal', } ]
+                    'rules' => [{
+                        when =>  '$t eq "hash" or $t eq "list"',
+                        apply => { level => 'normal', }
+                    }]
                 }
             },
 
@@ -99,7 +111,10 @@ return [
                 value_type => 'integer',
                 warp       => {
                     follow  => { 'type'            => '?type', },
-                    'rules' => [ '$type eq "hash"' => { level => 'normal', } ]
+                    'rules' => [{
+                        when =>  '$type eq "hash"',
+                        apply => { level => 'normal', }
+                    }]
                 }
             },
 
@@ -109,10 +124,10 @@ return [
                 level      => 'hidden',
                 warp       => {
                     follow  => { 't' => '?type' },
-                    'rules' => [
-                        '$t eq "leaf" or $t eq "check_list"' =>
-                          { level => 'normal', }
-                    ]
+                    'rules' => [{
+                        when => '$t eq "leaf" or $t eq "check_list"',
+                        apply => { level => 'normal', }
+                    }]
                 },
 
                 # TBD this could be a reference if we restrict replace to
@@ -127,8 +142,11 @@ return [
                 choice     => [qw/allow suppress warn forbid/],
                 upstream_default => 'allow',
                 warp       => {
-                    follow  => { 't'                            => '?type' },
-                    'rules' => [ '$t eq "hash" or $t eq "list"' => { level => 'normal', } ]
+                    follow  => { 't' => '?type' },
+                    'rules' => [{
+                        when =>  '$t eq "hash" or $t eq "list"',
+                        apply => { level => 'normal', }
+                    }]
                 }
             },
 
@@ -138,10 +156,10 @@ return [
                 level      => 'hidden',
                 warp       => {
                     follow  => { 't' => '?type' },
-                    'rules' => [
-                        '$t eq "leaf" or $t eq "check_list"' =>
-                          { level => 'normal', }
-                    ]
+                    'rules' => [{
+                        when => '$t eq "leaf" or $t eq "check_list"',
+                        apply => { level => 'normal', }
+                    }]
                 },
 
                 # TBD this could be a reference if we restrict replace to

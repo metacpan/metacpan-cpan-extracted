@@ -1,6 +1,3 @@
-# -*- cperl -*-
-
-
 use ExtUtils::testlib;
 use Test::More;
 use Test::Memory::Cycle;
@@ -63,12 +60,12 @@ $model->create_config_class(
                 type    => 'warped_node',
                 morph   => 1,
                 warp => {
-                    follow  => [ '! macro1', '- macro2' ],
+                    follow  => { m1 => '! macro1', m2 => '- macro2' },
                     'rules' => [
-                        [qw/A C/] => { 'config_class_name' => 'SlaveY' },
-                        [qw/A D/] => { 'config_class_name' => 'SlaveY' },
-                        [qw/B C/] => { 'config_class_name' => 'SlaveZ' },
-                        [qw/B D/] => { 'config_class_name' => 'SlaveZ' },
+                        '$m1 eq "A" and $m2 eq "C"' => { 'config_class_name' => 'SlaveY' },
+                        '$m1 eq "A" and $m2 eq "D"' => { 'config_class_name' => 'SlaveY' },
+                        '$m1 eq "B" and $m2 eq "C"' => { 'config_class_name' => 'SlaveZ' },
+                        '$m1 eq "B" and $m2 eq "D"' => { 'config_class_name' => 'SlaveZ' },
                     ]
                 }
             }
@@ -87,16 +84,12 @@ my $root = $inst->config_root;
 ok( $root, "Created Root" );
 
 is( $root->is_element_available( name => 'bar' ),
-    0, 'check element bar for beginner user (not available because macro* are undef)' );
-is( $root->is_element_available( name => 'bar' ),
-    0, 'check element bar for advanced user (not available because macro* are undef)' );
+    0, 'check element bar (not available because macro* are undef)' );
 
 ok( $root->load('macro1=A'), 'set macro1 to A' );
 
 is( $root->is_element_available( name => 'bar' ),
-    0, 'check element bar for beginner user (not available because macro2 is undef)' );
-is( $root->is_element_available( name => 'bar' ),
-    0, 'check element bar for advanced user (not available because macro2 is undef)' );
+    0, 'check element bar (not available because macro2 is undef)' );
 
 eval { $root->load('bar:1 X=Av') };
 ok( $@, "writing to slave->bar (fails tree_macro is undef)" );

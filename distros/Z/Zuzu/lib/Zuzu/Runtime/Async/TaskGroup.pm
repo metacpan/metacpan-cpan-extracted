@@ -2,7 +2,7 @@ package Zuzu::Runtime::Async::TaskGroup;
 
 use utf8;
 
-our $VERSION = '0.001003';
+our $VERSION = '0.001005';
 
 use Moo;
 use Scalar::Util qw( refaddr weaken );

@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Node 2.162;
+package Config::Model::Node 2.163;
 
 use Mouse;
 with "Config::Model::Role::NodeLoader";
@@ -93,9 +93,15 @@ sub fetch_gist {
     my $self = shift;
     my $gist = $self->gist // '';
     # handle hash or list element count
-    $gist =~ s!\@\{([\w -]+)}!$self->grab($1)->fetch_size!ge;
+    $gist =~ s!\@\{([\w -]+)\}!$self->grab($1)->fetch_size!ge;
     # handle element value
     $gist =~ s!{([\w -]+)}!$self->grab($1)->fetch // ''!ge;
+
+    # cleanup extra white spaces
+    $gist =~ s!\s+! !g;
+    $gist =~ s/^\s//;
+    $gist =~ s/\s$//;
+
     return $gist;
 }
 
@@ -1185,7 +1191,7 @@ Config::Model::Node - Class for configuration tree node
 
 =head1 VERSION
 
-version 2.162
+version 2.163
 
 =head1 SYNOPSIS
 
@@ -1197,17 +1203,18 @@ version 2.162
     name              => 'OneConfigClass',
     class_description => "OneConfigClass detailed description",
 
-    element => [
-        [qw/X Y Z/] => {
+    element => [ # use array ref to keep element ordering
+        X => {
             type       => 'leaf',
             value_type => 'enum',
             choice     => [qw/Av Bv Cv/]
-        }
+            status     => 'deprecated',
+            description => 'A description (can be long)',
+            summary     => 'A summary',
+        },
+        Y => '*X', # same properties as X element
+        Z => '*X', # same properties as X element
     ],
-
-    status      => [ X => 'deprecated' ],
-    description => [ X => 'X-ray description (can be long)' ],
-    summary     => [ X => 'X-ray' ],
 
     accept => [
         'ip.*' => {
@@ -1294,17 +1301,21 @@ Optional C<string> to specify a Perl class to override the default
 implementation (L<Config::Model::Node>).  This Perl Class B<must>
 inherit L<Config::Model::Node>. Use with care.
 
+=item B<copyright>
+
+Optional array of C<strings>.
+
+=item B<license>
+
+Optional string.
+
 =item B<element>
 
-Mandatory C<list ref> of elements of the configuration class :
+Mandatory C<array ref> of elements of the configuration class :
 
   element => [ foo => { type = 'leaf', ... },
                bar => { type = 'leaf', ... }
              ]
-
-Element names can be grouped to save typing:
-
-  element => [ [qw/foo bar/] => { type = 'leaf', ... } ]
 
 See below for details on element declaration.
 
@@ -1318,45 +1329,16 @@ may contain element values in the form "C<{foo} and
 by the value of element C<foo>, and C<@{a_hash_of_list}> is replaced
 by the number of elements of the hash or list element.
 
-=item B<level>
-
-Optional C<list ref> of the elements whose level are different from
-default value (C<normal>). Possible values are C<important>, C<normal>
-or C<hidden>.
-
-The level is used to set how configuration data is presented to the
-user in browsing mode. C<Important> elements are shown to the user
-no matter what. C<hidden> elements are explained with the I<warp>
-notion.
-
-  level  => [ [qw/X Y/] => 'important' ]
-
-=item B<status>
-
-Optional C<list ref> of the elements whose status are different from
-default value (C<standard>). Possible values are C<obsolete>,
-C<deprecated> or C<standard>.
-
-Using a deprecated element issues a warning. Using an obsolete
-element raises an exception (See L<Config::Model::Exception>.
-
-  status  => [ [qw/X Y/] => 'obsolete' ]
-
-=item B<description>
-
-Optional C<list ref> of element summaries. These summaries may be used
-when generating user interfaces.
-
-=item B<description>
-
-Optional C<list ref> of element descriptions. These descriptions may be
-used when generating user interfaces.
+Resulting gist is trimmed of extra spaces.
 
 =item B<rw_config>
 
+Parameter used to load on demand configuration data.
+See L<Config::Model::BackendMgr> for details.
+
 =item B<config_dir>
 
-Parameters used to load on demand configuration data.
+Configuration directory.
 See L<Config::Model::BackendMgr> for details.
 
 =item B<accept>
@@ -1384,8 +1366,8 @@ Example:
 
 All C<element> parameters can be used in specifying accepted elements.
 
-If L<Text::Levenshtein::Damerau> is installed, a warning is issued if an accepted
-element is too close to an existing element.
+If L<Text::Levenshtein::Damerau> module is installed, a warning is
+issued if an accepted element is too close to an existing element.
 
 The parameter C<accept_after> to specify where to insert the accepted element.
 This does not change much the behavior of the tree, but helps generate
@@ -1414,7 +1396,7 @@ The model snippet above ensures that C<Bug-Debian> is shown right after C<bug>.
 
 =head2 Element type
 
-Each element is declared with a list ref that contains all necessary
+Each element is declared with an array ref that contains all necessary
 information:
 
   element => [
@@ -1424,7 +1406,7 @@ information:
 This most important information from this hash ref is the mandatory
 B<type> parameter. The I<type> type can be:
 
-=over 8
+=over
 
 =item C<node>
 
@@ -1463,12 +1445,45 @@ L</"List element">
 The element is a collection of values which are unique in the
 check_list. See L<CheckList>.
 
+=back
+
+Other element properties are:
+
+=over
+
 =item C<class>
 
 Override the default class for leaf, list and hash elements. The override
-class be inherit L<Config::Model::Value> for leaf element,
+class must inherit L<Config::Model::Value> for leaf element,
 L<Config::Model::HashId> for hash element and
 L<Config::Model::ListId> for list element.
+
+=item B<level>
+
+Level is used to set how configuration data is presented to the user
+in GUI. Possible level values are C<important>, C<normal>
+or C<hidden>.
+
+<Important> elements are shown to the user no matter what. C<hidden>
+elements are, well, hidden. The mechanism used to show them is
+explained with the I<warp> notion
+(See L<Config::Model::Value/"Warp: dynamic value configuration"> for details).
+
+=item B<status>
+
+Possible values are C<obsolete>, C<deprecated> or C<standard> (default).
+
+Using a deprecated element issues a warning. Using an obsolete
+element raises an exception (See L<Config::Model::Exception>.
+
+=item B<summary>
+
+Summry of the element. This may be used when generating user interfaces.
+
+=item B<description>
+
+Long description of the element. This descriptions is used when
+generating user interfaces.
 
 =back
 
@@ -1511,6 +1526,40 @@ C<leaf> (default).
 
 See L<Config::Model::ListId> and L<Config::Model::AnyId> for more
 details.
+
+=head1 Declaration re-use
+
+Element names can be aliases to save typing:
+
+  element => [
+    foo => { type = 'leaf', ... },
+    bar => '*foo'
+  ]
+
+Since each element probably have different purpose, their description
+can be declared outside of the element list using aliases:
+
+  element => [
+    foo => { type = 'leaf', ... },
+    bar => '*foo',
+  ],
+  description => {
+    foo => 'foo description'
+    bar => 'bar description'
+  }
+
+The element properties C<summary> and C<warp> can also be aliased.
+
+C<status> and C<level> can be factorized using a different mechanism:
+
+  element => [
+    foo => { type = 'leaf', ... },
+    bar => '*foo',
+    baz => '*foo',
+  ],
+
+  status => { deprecated => ['bar']}
+  level => { important => ['foo','baz']}
 
 =head1 Constructor
 
@@ -1701,12 +1750,14 @@ Retrieve a property of an element.
 
 I.e. for a model :
 
-  status     => [ X => 'deprecated' ]
   element    => [ X => { ... } ]
+  status     => { X => 'deprecated' }
 
-This call returns C<deprecated>:
+This call:
 
   $node->get_element_property ( element => 'X', property => 'status' )
+
+returns C<deprecated>
 
 =head2 set_element_property
 

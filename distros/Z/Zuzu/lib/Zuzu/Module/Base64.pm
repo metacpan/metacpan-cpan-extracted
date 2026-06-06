@@ -2,7 +2,7 @@ package Zuzu::Module::Base64;
 
 use utf8;
 
-our $VERSION = '0.001003';
+our $VERSION = '0.001005';
 
 use MIME::Base64 qw( decode_base64 encode_base64 );
 use Scalar::Util qw( blessed );

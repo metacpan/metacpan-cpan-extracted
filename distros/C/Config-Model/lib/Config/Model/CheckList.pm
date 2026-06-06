@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::CheckList 2.162;
+package Config::Model::CheckList 2.163;
 
 use Mouse;
 use 5.020;
@@ -833,7 +833,7 @@ Config::Model::CheckList - Handle check list element
 
 =head1 VERSION
 
-version 2.162
+version 2.163
 
 =head1 SYNOPSIS
 
@@ -979,14 +979,20 @@ the value of the C<macro> parameter:
  warped_choice_list => {
      type => 'check_list',
      warp => {
-         follow => '- macro',
-         rules  => {
-             AD => {
+         follow => { m => '- macro'},
+         rules  => [
+          {
+             when => '$m eq "AD"',
+             apply => {
                  choice => [ 'A' .. 'D' ],
                  default_list => ['A', 'B' ]
              },
-             AH => { choice => [ 'A' .. 'H' ] },
-         }
+          },
+          {
+             when => '$m eq "AH"',
+             apply => { choice => [ 'A' .. 'H' ] },
+          }
+        ]
      }
  },
 

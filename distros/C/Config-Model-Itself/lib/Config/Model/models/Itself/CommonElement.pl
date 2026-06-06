@@ -34,10 +34,10 @@ my @warp_in_string_like_parameter = (
             'type'  => '?type',
             'vtype' => '?value_type',
         },
-        'rules' => [
-            '$type eq "leaf" and ($vtype eq "uniline" or $vtype eq "string" or $vtype eq "enum")'
-              => { level => 'normal', }
-        ]
+        'rules' => [{
+            when => '$type eq "leaf" and ($vtype eq "uniline" or $vtype eq "string" or $vtype eq "enum")',
+            apply => { level => 'normal', }
+        }]
     },
 
 );
@@ -57,11 +57,11 @@ my @warp_in_leaf_parameter = (
     warp => {
         follow => {
             'type'  => '?type',
-            'vtype' => '?value_type',
         },
-        'rules' => [
-            '$type eq "leaf"' => { level => 'normal', }
-        ]
+        'rules' => [{
+            when => '$type eq "leaf"',
+            apply => { level => 'normal', }
+        }]
     },
 
 );
@@ -175,13 +175,14 @@ return [
                 value_type => 'boolean',
                 level      => 'hidden',
                 warp       => {
-                    follow  => '?type',
-                    'rules' => {
-                        'leaf' => {
+                    follow  => { type => '?type'},
+                    'rules' => [{
+                        when => '$type eq "leaf"',
+                        apply => {
                             upstream_default => 0,
                             level            => 'normal',
                         }
-                    }
+                    }]
                 }
             },
 

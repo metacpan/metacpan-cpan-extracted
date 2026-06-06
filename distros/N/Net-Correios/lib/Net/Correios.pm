@@ -11,7 +11,7 @@ $Carp::Internal{ 'Net::Correios' }++;
 
 package Net::Correios;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 my %libs = (
   token        => 'Token',
@@ -51,6 +51,7 @@ sub new {
         unless $args{username} && $args{password};
     my $auth_basic = MIME::Base64::encode_base64($args{username} . ':' . $args{password}, '');
     return bless {
+        debug => $args{debug},
         contrato => $args{contrato},
         cartao => $args{cartao},
         sandbox => !!$args{sandbox},
@@ -96,6 +97,14 @@ sub make_request {
     my $token = $self->access_token($token_type);
     $args->{headers}{Authorization} = 'Bearer ' . $token;
     my $res = $self->{agent}->request($method, $url, $args);
+
+    if ($self->{debug}) {
+	$self->_debug(
+            "curl -X $method '$url' -H 'accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer $token' " . (exists $args->{content} && defined $args->{content} && length($args->{content}) ? ("-d '" . $args->{content} . "'") : ''),
+            "Response: " . $res->{status} . "\n" . $res->{content}
+        );
+    }
+
     return $res;
 }
 
@@ -111,6 +120,17 @@ sub parse_response {
         $error .= "\n  " . $res->{url};
         Carp::croak($error);
     }
+}
+
+sub debug {
+    my ($self, $debug) = @_;
+    $self->{debug} = $debug if @_ > 1;
+    return $self->{debug};
+}
+
+sub _debug {
+    my ($self, @msg) = @_;
+    print STDERR '[' . __PACKAGE__ . ']' . join("\n", @msg);
 }
 
 1;
@@ -213,6 +233,18 @@ Cria um novo objeto para se comunicar com a API dos Correios. Este objeto pode
 ser reaproveitado em todos os endpoints que seu programa usar, já que ele faz
 automaticamente a gestão dos tokens de acesso à API.
 
+=head3 Depurando requisições à API
+
+Muitas vezes, para depuração, pode ser interessante observar exatamente como está
+sendo feita a chamada. Este módulo possui uma opção "debug" que você pode passar
+ao construtor com um valor verdadeiro. Nesse caso, junto com a requisição, o módulo
+vai imprimir no STDERR o comando 'curl' equivalente da sua requisição, assim como
+a resposta tal como ela veio dos servidores dos Correios.
+
+Utilize para enviar ao suporte dos Correios sempre que achar algo errado, eles podem
+usar esse formato para identificar e resolver problemas (relacionado ao seu uso
+incorreto ou a algum outro problema.
+
 =head1 ATRIBUTOS
 
 =head2 is_sandbox
@@ -226,6 +258,10 @@ produção.
 Retorna o token de acesso atual para o tipo solicitado. Você provavelmente
 não precisa se preocupar com isso já que a criação e renovação dos tokens
 de acesso são feitas automaticamente por este módulo e seus submódulos.
+
+=head2 debug( $bool )
+
+Ativa/desativa o modo de depuração. Ver "Depurando requisições à API" acima.
 
 =head1 MÉTODOS
 
@@ -257,11 +293,20 @@ este método diretamente.
 
 =head2 empresas
 
-TBD
+Retorna um objeto L<Net::Correios::Empresas> para consulta de contratos
+e serviços disponíveis.
 
 =head2 prepostagens
 
-TBD
+Retorna um objeto L<Net::Correios::Prepostagens> para consulta e criação
+de PLP/PPN (Pré-Postagens), emissão de rótulos (etiquetas) e geração de
+ Declaração de Conteúdo Eletrônica (DCe).
+
+=head2 manifestacao
+
+Retorna um objeto L<Net::Correios::Manifestacao> para cadastro/registro
+de manifestações nos Correios em caso de pedidos violados, devolvidos,
+não entregues, atrasados, etc.
 
 =head2 faturas
 

@@ -1,5 +1,32 @@
 Revision history for Concierge-Users
 
+v0.9.1  2026-06-05
+    - Add format_as test coverage to t/06-field-metadata.t: built-in
+      convention values, app-supplied tokens via app_fields, field_overrides
+      pass-through, and missing format_as returns undef
+
+v0.9.0  2026-06-05
+    - get_field_hints: add format_as to returned hashref
+    - Add format_as property to all built-in field definitions (core,
+      standard, system); enum fields use 'options', others use the
+      type-appropriate convention (text, boolean, date, datetime)
+    - format_as is not validated by Concierge; apps may supply their own
+      native format codes via app_fields or field_overrides during setup
+      and retrieve them unchanged via get_field_hints()
+    - Conventional format_as values: text, options, boolean, number,
+      date, datetime, time
+    - Fix stale POD VERSION sections in Database, File, and YAML backends
+      (were v0.8.2, now in sync at v0.9.0)
+
+v0.8.5  2026-05-31
+    - Refactor: replace field_use => 'system' with system => 1 boolean on
+      last_mod_date and created_date; remove field_use => 'identity' from
+      user_id (identity field identified by name only)
+    - Move last_login_date from Standard Fields (12) to System Fields (3);
+      system fields bypass validation
+    - get_field_hints: returns system => 1/0 for all fields
+    - config_to_yaml: emits system: 1 instead of field_use: system
+
 v0.8.4  2026-05-31
     - Fix version consistency: bump Database, File, and YAML backend modules
       to v0.8.4 (were not bumped during v0.8.3 release)

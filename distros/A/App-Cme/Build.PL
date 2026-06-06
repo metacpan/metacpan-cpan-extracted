@@ -27,7 +27,7 @@ my %module_build_args = (
     "Dominique Dumont"
   ],
   "dist_name" => "App-Cme",
-  "dist_version" => "1.047",
+  "dist_version" => "1.048",
   "license" => "lgpl",
   "module_name" => "App::Cme",
   "recommends" => {
@@ -68,6 +68,7 @@ my %module_build_args = (
     "File::Spec" => 0,
     "Path::Tiny" => "0.125",
     "Term::ANSIColor" => "2.01",
+    "Test::Differences" => 0,
     "Test::File::Contents" => 0,
     "Test::More" => 0,
     "Test::Perl::Critic" => 0,
@@ -86,6 +87,7 @@ my %fallback_build_requires = (
   "Module::Build" => "0.34",
   "Path::Tiny" => "0.125",
   "Term::ANSIColor" => "2.01",
+  "Test::Differences" => 0,
   "Test::File::Contents" => 0,
   "Test::More" => 0,
   "Test::Perl::Critic" => 0,

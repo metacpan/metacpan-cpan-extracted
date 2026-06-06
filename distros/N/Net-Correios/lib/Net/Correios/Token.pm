@@ -37,6 +37,12 @@ sub autentica {
             (defined $json_body? (content => $json_body) : ()),
         },
     );
+    if ($parent->{debug}) {
+        $parent->_debug(
+            "curl -X POST '$endpoint_url' -H 'accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Basic $parent->{auth_basic}' " . ((defined $json_body && length($json_body)) ? ("-d '" . $json_body . "'") : ''),
+            "Response: " . $res->{status} . "\n" . $res->{content}
+        );
+    }
     return $parent->parse_response($res);
 }
 

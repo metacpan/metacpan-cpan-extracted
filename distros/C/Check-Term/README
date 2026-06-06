@@ -1,0 +1,100 @@
+NAME
+    Check::Term - Check terminal functionality.
+
+SYNOPSIS
+     use Check::Term qw(check_term_capabilities $ERROR_MESSAGE);
+
+     my $ret = check_term_capabilities(@capabilities);
+     print $ERROR_MESSAGE."\n";
+
+DESCRIPTION
+    There is need of check for terminal capabilities in tests. Actually we
+    have duplicated checks in distributions.
+
+    Intent of this module is create common code for check string terminal
+    capabilities via Term::Terminfo. Extra thing is error message which
+    describe issue.
+
+SUBROUTINES
+  check_term_capabilities
+     my $ret = check_term_capabilities(@capabilities);
+
+    Check possibility of string terminal capabilities on system.
+
+    Variables @capabilities are terminal capability variable names for
+    "str_by_varname" in Term::Terminfo.
+
+    Return value is 1 as supported terminal capabilities or 0 as not
+    supported capability. If return value is 0, set $ERROR_MESSAGE variable.
+
+    Returns 0/1.
+
+EXAMPLES
+  EXAMPLE1
+     use strict;
+     use warnings;
+
+     use Check::Term qw(check_term_capabilities $ERROR_MESSAGE);
+
+     if (check_term_capabilities('parm_ich')) {
+             print "We could use terminal 'parm_ich' capability.\n";
+     } else {
+             print "We couldn't use terminal 'parm_ich' capability.\n";
+             print "Error message: $ERROR_MESSAGE\n";
+     }
+
+     # Output with 'parm_ich' capability:
+     # We could use terminal 'parm_ich' capability.
+
+     # Output without 'parm_ich' capability:
+     # We couldn't use terminal 'parm_ich' capability.
+     # Error message: Terminal capability 'parm_ich' ins't supported.
+
+  EXAMPLE2
+     use strict;
+     use warnings;
+
+     use Check::Term qw(check_term_capabilities);
+     use Test::More 'tests' => 1;
+
+     SKIP: {
+             skip $Check::Term::ERROR_MESSAGE, 1
+                     unless check_term_capabilities('parm_ich');
+
+             ok(1, "Terminal 'parm_ich' capability test");
+     };
+
+     # Output with 'parm_ich' capability:
+     # 1..1
+     # ok 1 - Terminal 'parm_ich' capability test
+
+     # Output without 'parm_ich' capability:
+     # 1..1
+     # ok 1 # skip Terminal capability 'parm_ich' ins't supported.
+
+DEPENDENCIES
+    Exporter, Readonly, Term::Terminfo.
+
+SEE ALSO
+    Term::Terminfo
+        Access to terminfo database.
+
+    Test2::Require::TermSize
+        Skip a test file unless terminal is at least a certain size.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Check-Term>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2026 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

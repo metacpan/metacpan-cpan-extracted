@@ -2,7 +2,7 @@ package Zuzu::Runtime;
 
 use utf8;
 
-our $VERSION = '0.001003';
+our $VERSION = '0.001005';
 our $DEBUG_LEVEL = 0;
 
 use Digest::MD5 qw( md5_hex );
@@ -1475,7 +1475,18 @@ sub _resolve_lvalue_target {
 				line => $expr->line,
 			};
 		}
-		die Zuzu::Error->new_runtime(message => "Index assignment expects Array", file => $expr->file, line => $expr->line);
+		if ( blessed($col) and $col->isa('Zuzu::Value::BinaryString') ) {
+			$self->_assert_mutable_collection( $col, $expr->file, $expr->line );
+
+			return {
+				kind => 'binary_string_index',
+				binary_string => $col,
+				target_expr => $expr,
+				file => $expr->file,
+				line => $expr->line,
+			};
+		}
+		die Zuzu::Error->new_runtime(message => "Index assignment expects Array, String, or BinaryString", file => $expr->file, line => $expr->line);
 	}
 	if ( blessed($expr) and $expr->isa('Zuzu::AST::Expr::DictGet') ) {
 		my $dict = $expr->dict->evaluate($self);
@@ -1550,7 +1561,18 @@ sub _resolve_lvalue_target {
 				line => $expr->line,
 			};
 		}
-		die Zuzu::Error->new_runtime(message => "Slice assignment expects Array or String", file => $expr->file, line => $expr->line);
+		if ( blessed($col) and $col->isa('Zuzu::Value::BinaryString') ) {
+			$self->_assert_mutable_collection( $col, $expr->file, $expr->line );
+
+			return {
+				kind => 'binary_string_slice',
+				binary_string => $col,
+				target_expr => $expr,
+				file => $expr->file,
+				line => $expr->line,
+			};
+		}
+		die Zuzu::Error->new_runtime(message => "Slice assignment expects Array, String, or BinaryString", file => $expr->file, line => $expr->line);
 	}
 	if ( $self->_is_path_lvalue_expr($expr) ) {
 		my $file = $expr->file;
@@ -1619,7 +1641,11 @@ sub eval_assign {
 	}
 
 	my $target = $self->_resolve_lvalue_target($node->target);
-	my ( $ref, $name, $target_env, $file, $line, $slice_col, $string_ref, $string_index, $pairlist, $pairlist_key )
+	my (
+		$ref, $name, $target_env, $file, $line, $slice_col, $string_ref,
+		$string_index, $binary_string, $binary_string_index, $pairlist,
+		$pairlist_key
+	)
 		= (
 			$target->{ref},
 			$target->{name},
@@ -1629,6 +1655,8 @@ sub eval_assign {
 			$target->{slice_col},
 			$target->{string_ref},
 			$target->{kind} && $target->{kind} eq 'string_index',
+			$target->{binary_string},
+			$target->{kind} && $target->{kind} eq 'binary_string_index',
 			$target->{pairlist},
 			$target->{pairlist_key},
 		);
@@ -1698,6 +1726,23 @@ sub eval_assign {
 				$rhs,
 				$name,
 				$target_env,
+				$file,
+				$line,
+			);
+	}
+	if ( $binary_string ) {
+		return $binary_string_index
+			? $self->_assign_binary_string_index(
+				$binary_string,
+				$node->target,
+				$rhs,
+				$file,
+				$line,
+			)
+			: $self->_assign_binary_string_slice(
+				$binary_string,
+				$node->target,
+				$rhs,
 				$file,
 				$line,
 			);
@@ -1839,6 +1884,54 @@ sub _assign_string_index {
 	$$string_ref = $current;
 
 	return $current;
+}
+
+sub _assign_binary_string_slice {
+	my ( $self, $binary, $target, $value, $file, $line ) = @_;
+
+	die Zuzu::Error->new_runtime(
+		message => "BinaryString slice assignment RHS must be BinaryString",
+		file => $file,
+		line => $line,
+	) if !blessed($value) or !$value->isa('Zuzu::Value::BinaryString');
+
+	my $start = defined $target->start
+		? 0 + ( $target->start->evaluate($self) // 0 )
+		: 0;
+	my $current = $binary->bytes // '';
+	my $size = length($current);
+	$start += $size if $start < 0;
+	$start = 0 if $start < 0;
+	$start = $size if $start > $size;
+	my $len = defined $target->length
+		? 0 + ( $target->length->evaluate($self) // 0 )
+		: $size - $start;
+	$len = 0 if $len < 0;
+	substr( $current, $start, $len ) = $value->bytes // '';
+	$binary->bytes($current);
+
+	return $binary;
+}
+
+sub _assign_binary_string_index {
+	my ( $self, $binary, $target, $value, $file, $line ) = @_;
+
+	die Zuzu::Error->new_runtime(
+		message => "BinaryString index assignment RHS must be BinaryString",
+		file => $file,
+		line => $line,
+	) if !blessed($value) or !$value->isa('Zuzu::Value::BinaryString');
+
+	my $current = $binary->bytes // '';
+	my $size = length($current);
+	my $idx = 0 + ( $target->index->evaluate($self) // 0 );
+	$idx += $size if $idx < 0;
+	$idx = 0 if $idx < 0;
+	$idx = $size if $idx > $size;
+	substr( $current, $idx, 1 ) = $value->bytes // '';
+	$binary->bytes($current);
+
+	return $binary;
 }
 
 sub _eval_path_assignment {
@@ -3051,7 +3144,15 @@ sub eval_index {
 			bytes => substr( $bytes, $idx, 1 ),
 		);
 	}
-	die Zuzu::Error->new_runtime(message => "Indexing expects Array or BinaryString", file => $node->file, line => $node->line);
+	if ( defined($target) and !ref($target) ) {
+		my $text = "$target";
+		my $len = length($text);
+		$idx += $len if $idx < 0;
+		return undef if $idx < 0 or $idx >= $len;
+
+		return substr( $text, $idx, 1 );
+	}
+	die Zuzu::Error->new_runtime(message => "Indexing expects Array, String, or BinaryString", file => $node->file, line => $node->line);
 }
 
 sub eval_slice {
@@ -3216,7 +3317,11 @@ sub _make_lvalue_ref_closure {
 			}
 			else {
 				my $target_info = $self->_resolve_lvalue_target( $target );
-				my ( $ref, $name, $target_env, $file, $line, $slice_col, $string_ref, $string_index, $pairlist, $pairlist_key )
+				my (
+					$ref, $name, $target_env, $file, $line, $slice_col,
+					$string_ref, $string_index, $binary_string,
+					$binary_string_index, $pairlist, $pairlist_key
+				)
 					= (
 						$target_info->{ref},
 						$target_info->{name},
@@ -3226,6 +3331,8 @@ sub _make_lvalue_ref_closure {
 						$target_info->{slice_col},
 						$target_info->{string_ref},
 						$target_info->{kind} && $target_info->{kind} eq 'string_index',
+						$target_info->{binary_string},
+						$target_info->{kind} && $target_info->{kind} eq 'binary_string_index',
 						$target_info->{pairlist},
 						$target_info->{pairlist_key},
 					);
@@ -3317,6 +3424,27 @@ sub _make_lvalue_ref_closure {
 							$newval,
 							$name,
 							$target_env,
+							$file,
+							$line,
+						);
+					}
+					$ret = $newval;
+				}
+				elsif ( $binary_string ) {
+					if ( $binary_string_index ) {
+						$self->_assign_binary_string_index(
+							$binary_string,
+							$target,
+							$newval,
+							$file,
+							$line,
+						);
+					}
+					else {
+						$self->_assign_binary_string_slice(
+							$binary_string,
+							$target,
+							$newval,
 							$file,
 							$line,
 						);

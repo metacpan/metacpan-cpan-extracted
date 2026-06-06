@@ -1,3 +1,11 @@
+1.048 2026-06-05
+
+  New feature:
+    * allow doc and app extraction from Perl script managed by cme run
+
+  Bug fix:
+    * run: fix uninitialized value warning
+
 1.047 2026-03-21
 
   Bug fix:

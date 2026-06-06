@@ -11,7 +11,7 @@ Config::Model::models::Itself::WarpValue - Configuration class Itself::WarpValue
 
 Configuration classes used by L<Config::Model>
 
-Warp functionality enable a Value object to change its properties (i.e. default value or its type) dynamically according to the value of another Value object locate elsewhere in the configuration tree.
+Warp functionality enable a Value object to change its properties (i.e. default value or its type) dynamically according to the value of another Value object located elsewhere in the configuration tree.
 
 =head1 Elements
 
@@ -21,7 +21,7 @@ Specify with the path of the configuration element that drives the warp, i.e .th
 
 =head2 rules
 
-Each key of the ordered hash is a test (as formula using the variables defined in "follow" element) that are tried in sequences to apply its associated effects. Only the first match is applied. I< Optional. Type hash of warped_node.  > 
+Specify a set of test and paramaters to apply. Only the fist matching test is used to apply its parameters. I< Optional. Type list of node of class L<Itself::WarpApply|Config::Model::models::Itself::WarpApply> .  > 
 
 =head1 SEE ALSO
 
@@ -30,6 +30,10 @@ Each key of the ordered hash is a test (as formula using the variables defined i
 =item *
 
 L<cme>
+
+=item *
+
+L<Config::Model::models::Itself::WarpApply>
 
 =back
 

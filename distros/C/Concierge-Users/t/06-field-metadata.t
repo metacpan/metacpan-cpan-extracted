@@ -86,7 +86,7 @@ subtest 'Field definitions structure' => sub {
     is($defs->{user_id}{field_name}, 'user_id', 'field_name correct');
     is($defs->{user_id}{label}, 'User ID', 'label correct');
     is($defs->{user_id}{type}, 'text', 'type correct');
-    is($defs->{user_id}{field_use}, 'identity', 'field_use correct');
+    ok(!$defs->{user_id}{system}, 'user_id has no system flag');
     ok($defs->{user_id}{required}, 'required flag set');
     is($defs->{user_id}{max_length}, 30, 'max_length set');
 
@@ -98,7 +98,7 @@ subtest 'Field definitions structure' => sub {
     # Test 3: System field definitions
     ok($defs->{created_date}, 'created_date has definition');
     is($defs->{created_date}{type}, 'timestamp', 'created_date type correct');
-    is($defs->{created_date}{field_use}, 'system', 'created_date field_use correct');
+    ok($defs->{created_date}{system}, 'created_date system flag set');
     is($defs->{created_date}{null_value}, '0000-00-00 00:00:00', 'null_value set');
 
     # Test 4: Enum field with auto-default
@@ -268,7 +268,7 @@ subtest 'get_field_definition' => sub {
     my $created_def = $users->get_field_definition('created_date');
     ok($created_def, 'Got created_date definition');
     is($created_def->{type}, 'timestamp', 'created_date is timestamp type');
-    is($created_def->{field_use}, 'system', 'created_date field_use is system');
+    ok($created_def->{system}, 'created_date system flag set');
 
     # Test 4: Non-existent field
     my $missing = $users->get_field_definition('nonexistent');
@@ -305,12 +305,22 @@ subtest 'get_field_hints' => sub {
     is($hints->{type}, 'email', 'Type in hints');
     is($hints->{required}, 0, 'Required flag in hints');
     is($hints->{max_length}, 255, 'max_length in hints');
+    is($hints->{system}, 0, 'email system flag is 0');
 
     # Get hints for enum field
     my $status_hints = $users->get_field_hints('user_status');
     ok($status_hints, 'Got enum field hints');
     ok($status_hints->{options}, 'Enum field has options');
     is(ref $status_hints->{options}, 'ARRAY', 'Options is array');
+
+    # Get hints for system field
+    my $created_hints = $users->get_field_hints('created_date');
+    ok($created_hints, 'Got created_date field hints');
+    is($created_hints->{system}, 1, 'created_date system flag is 1');
+
+    my $login_hints = $users->get_field_hints('last_login_date');
+    ok($login_hints, 'Got last_login_date field hints');
+    is($login_hints->{system}, 1, 'last_login_date system flag is 1');
 };
 
 # ==============================================================================
@@ -451,8 +461,10 @@ subtest 'Class array access methods' => sub {
     ok((grep { $_ eq 'phone' }  @standard), 'phone in standard fields');
 
     ok(scalar @system > 0, 'user_system_fields returns fields');
-    ok((grep { $_ eq 'created_date'  } @system), 'created_date in system fields');
-    ok((grep { $_ eq 'last_mod_date' } @system), 'last_mod_date in system fields');
+    ok((grep { $_ eq 'last_login_date' } @system), 'last_login_date in system fields');
+    ok((grep { $_ eq 'created_date'    } @system), 'created_date in system fields');
+    ok((grep { $_ eq 'last_mod_date'   } @system), 'last_mod_date in system fields');
+    ok(!(grep { $_ eq 'last_login_date' } @standard), 'last_login_date not in standard fields');
 };
 
 # ==============================================================================
@@ -617,6 +629,109 @@ subtest '_yaml_scalar_value edge cases' => sub {
 
     # Negative integer
     is(Concierge::Users::Meta::_yaml_scalar_value(-5), '-5', 'Negative integer passes through');
+};
+
+# ==============================================================================
+# Test Group 18: format_as property
+# ==============================================================================
+subtest 'format_as in field definitions and get_field_hints' => sub {
+    my $storage_dir = tempdir(CLEANUP => 1);
+
+    my $config = {
+        storage_dir             => $storage_dir,
+        backend                 => 'database',
+        include_standard_fields => [qw/ email phone text_ok term_ends prefix suffix /],
+        app_fields => [
+            {
+                field_name => 'widget_type',
+                type       => 'enum',
+                options    => ['*basic', 'pro'],
+                format_as  => 'sel',          # app's own native token
+            },
+            {
+                field_name => 'bio',
+                type       => 'text',
+                format_as  => 'textarea',     # app's own native token
+            },
+            {
+                field_name => 'score',
+                type       => 'integer',
+                format_as  => 'number',       # Concierge convention
+            },
+            {
+                field_name => 'no_format',    # deliberately no format_as
+                type       => 'text',
+            },
+        ],
+        field_overrides => [
+            {
+                field_name => 'email',
+                format_as  => 't',            # override with app token
+            },
+        ],
+    };
+
+    my $result = Concierge::Users->setup($config);
+    my $users  = Concierge::Users->new($result->{config_file});
+
+    # --- Built-in convention values ---
+
+    my $h = $users->get_field_hints('user_id');
+    is($h->{format_as}, 'text', 'user_id format_as is text');
+
+    $h = $users->get_field_hints('moniker');
+    is($h->{format_as}, 'text', 'moniker format_as is text');
+
+    $h = $users->get_field_hints('user_status');
+    is($h->{format_as}, 'options', 'user_status (enum) format_as is options');
+
+    $h = $users->get_field_hints('access_level');
+    is($h->{format_as}, 'options', 'access_level (enum) format_as is options');
+
+    $h = $users->get_field_hints('prefix');
+    is($h->{format_as}, 'options', 'prefix (enum) format_as is options');
+
+    $h = $users->get_field_hints('suffix');
+    is($h->{format_as}, 'options', 'suffix (enum) format_as is options');
+
+    $h = $users->get_field_hints('phone');
+    is($h->{format_as}, 'text', 'phone format_as is text');
+
+    $h = $users->get_field_hints('text_ok');
+    is($h->{format_as}, 'boolean', 'text_ok format_as is boolean');
+
+    $h = $users->get_field_hints('term_ends');
+    is($h->{format_as}, 'date', 'term_ends format_as is date');
+
+    $h = $users->get_field_hints('last_login_date');
+    is($h->{format_as}, 'datetime', 'last_login_date format_as is datetime');
+
+    $h = $users->get_field_hints('last_mod_date');
+    is($h->{format_as}, 'datetime', 'last_mod_date format_as is datetime');
+
+    $h = $users->get_field_hints('created_date');
+    is($h->{format_as}, 'datetime', 'created_date format_as is datetime');
+
+    # --- App-supplied format_as passes through unchanged ---
+
+    $h = $users->get_field_hints('widget_type');
+    is($h->{format_as}, 'sel', 'app enum field: custom token passes through');
+
+    $h = $users->get_field_hints('bio');
+    is($h->{format_as}, 'textarea', 'app text field: custom token passes through');
+
+    $h = $users->get_field_hints('score');
+    is($h->{format_as}, 'number', 'app integer field: convention value passes through');
+
+    # --- Missing format_as returns undef ---
+
+    $h = $users->get_field_hints('no_format');
+    ok(!defined $h->{format_as}, 'app field with no format_as returns undef');
+
+    # --- field_overrides format_as passes through ---
+
+    $h = $users->get_field_hints('email');
+    is($h->{format_as}, 't', 'field_overrides format_as passes through unchanged');
 };
 
 done_testing();

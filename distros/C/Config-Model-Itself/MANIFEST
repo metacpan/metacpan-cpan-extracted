@@ -44,10 +44,10 @@ lib/Config/Model/models/Itself/Element.pod
 lib/Config/Model/models/Itself/MigratedValue.pl
 lib/Config/Model/models/Itself/Model.pl
 lib/Config/Model/models/Itself/NonWarpableElement.pl
+lib/Config/Model/models/Itself/WarpApply.pod
 lib/Config/Model/models/Itself/WarpOnlyElement.pl
 lib/Config/Model/models/Itself/WarpValue.pl
 lib/Config/Model/models/Itself/WarpValue.pod
-lib/Config/Model/models/Itself/WarpableCargoElement.pl
 lib/Config/Model/models/Itself/WarpableElement.pl
 t/application.t
 t/author-critic.t
@@ -57,6 +57,7 @@ t/cme-meta-plugin.t
 t/cme-meta.t
 t/dot_graph.t
 t/itself-editor.t
+t/itself-model.t
 t/itself.t
 t/itself_snippet.t
 t/list_itself_structure.t

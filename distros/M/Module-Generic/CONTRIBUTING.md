@@ -43,7 +43,7 @@ Issues are currently reported using CPAN [bug tracker](https://gitlab.com/degues
 
 ## More information
 
-Please refer to the [README](https://metacpan.org/source/JDEGUEST/Module-Generic-Number-v2.3.5/README.md)
+Please refer to the [README](https://metacpan.org/source/JDEGUEST/Module-Generic-Number-v2.3.6/README.md)
 
 ## Author
 

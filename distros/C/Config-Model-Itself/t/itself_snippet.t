@@ -64,6 +64,8 @@ my %expected_plugin;
 $expected_plugin{MasterModel} = << "EOS" ;
 use strict;
 use warnings;
+use v5.20;
+use utf8;
 
 return [
   {
@@ -86,6 +88,8 @@ EOS
 $expected_plugin{"MasterModel/X_base_class2"} = << "EOS" ;
 use strict;
 use warnings;
+use v5.20;
+use utf8;
 
 return [
   {

@@ -46,19 +46,19 @@ WriteMakefile(
         provides => {
             'Concierge' => {
                 file    => 'lib/Concierge.pm',
-                version => 'v0.8.3',
+                version => 'v0.8.4',
             },
             'Concierge::Desk::Base' => {
                 file    => 'lib/Concierge/Desk/Base.pm',
-                version => 'v0.8.3',
+                version => 'v0.8.4',
             },
             'Concierge::Desk::Setup' => {
                 file    => 'lib/Concierge/Desk/Setup.pm',
-                version => 'v0.8.3',
+                version => 'v0.8.4',
             },
             'Concierge::Desk::User' => {
                 file    => 'lib/Concierge/Desk/User.pm',
-                version => 'v0.8.3',
+                version => 'v0.8.4',
             },
         },
     },

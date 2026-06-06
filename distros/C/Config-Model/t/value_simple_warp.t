@@ -1,5 +1,3 @@
-# -*- cperl -*-
-
 use warnings;
 use strict;
 
@@ -40,7 +38,7 @@ $model->create_config_class(
             class => 'Config::Model::Value',
             warp  => {
                 follow => '- enum',
-                rules  => [ F => [ default => 'F' ] ]
+                rules  => [ F => { default => 'F' } ]
             },
             @args
         },
@@ -48,10 +46,6 @@ $model->create_config_class(
             type  => 'leaf',
             class => 'Config::Model::Value',
             @args,
-            warp => {
-                follow => '- enum',
-                rules  => \@rules
-            }
         },
         recursive_warped_object => {
             type  => 'leaf',
@@ -63,7 +57,6 @@ $model->create_config_class(
             type  => 'leaf',
             class => 'Config::Model::Value',
             @args,
-            warp => { follow => '- enum', rules => \@rules },
         },
         'Standards-Version' => {
             'default' => '4.1.0',
@@ -92,7 +85,11 @@ $model->create_config_class(
             }
         },
 
-    ],    # dummy class
+    ],
+    # experimental
+    warp => [
+        [qw/warped_object w2 w3/] => { follow => '- enum', rules => \@rules },
+    ]
 );
 
 # check model content
@@ -102,15 +99,21 @@ is_deeply(
     {
         'follow' => { 'f1' => '- enum' },
         'rules'  => [
-            '$f1 eq \'F\'',
             {
-                'default' => 'F',
-                'choice'  => [ 'A', 'B', 'C', 'F', 'F2' ]
+                when => '$f1 eq \'F\'',
+                apply => {
+                    'default' => 'F',
+                    'choice'  => [ 'A', 'B', 'C', 'F', 'F2' ]
+                    }
             },
-            '$f1 eq \'G\'',
             {
-                'default' => 'G',
-                'choice'  => [ 'A', 'B', 'C', 'G', 'G2' ] } ]
+                when => '$f1 eq \'G\'',
+                apply => {
+                    'default' => 'G',
+                    'choice'  => [ 'A', 'B', 'C', 'G', 'G2' ]
+                }
+            }
+        ]
     },
     "check munged warp arguments"
 );
@@ -126,10 +129,6 @@ my $root = $inst->config_root;
 my $tlogger = Test::Log::Log4perl->get_logger("User");
 
 my ( $w1, $w2, $w3, $bad_w, $rec_wo, $t );
-
-eval { $bad_w = $root->fetch_element('wrong_syntax_rule'); };
-ok( $@, "set up warped object with wrong rules syntax" );
-print "normal error:\n", $@, "\n" if $trace;
 
 eval { $t = $bad_w->fetch; };
 ok( $@, "wrong rules semantic warped object blows up" );

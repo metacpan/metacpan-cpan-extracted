@@ -4,6 +4,19 @@ use ExtUtils::MakeMaker;
 use File::Spec ();
 use File::Find ();
 
+sub MY::postamble {
+    my ($self, %args) = @_;
+    if ((my $harness_options = delete $args{HARNESS_OPTIONS}) && $self->can('is_make_type')) {
+        my $value = join ':', @$harness_options;
+        if ($self->is_make_type('gmake')) {
+            $args{text} .= "export HARNESS_OPTIONS := $value\n";
+        } elsif ($self->is_make_type('nmake')) {
+            $args{text} .= "!if [set HARNESS_OPTIONS=$value]\n!endif\n";
+        }
+    }
+    $args{text} || ''
+}
+
 sub find_tests_recursively_in {
     my ($dir) = @_;
     -d $dir or die "$dir is not a directory";
@@ -27,6 +40,8 @@ $::MAINT_MODE = !-f 'META.yml';
 my $settings_file = 'Makefile_PL_settings.plx';
 my %settings = %{do "./$settings_file" or die "Internal error: can't do $settings_file: ", $@ || $!};
 
+(do './maint/eumm-fixup.pl' || die $@ || $!)->(\%settings) if $::MAINT_MODE;
+
 {
     $settings{depend}{Makefile} .= " $settings_file";
     $settings{LICENSE} ||= 'perl';
@@ -34,11 +49,11 @@ my %settings = %{do "./$settings_file" or die "Internal error: can't do $setting
 
     $settings{CONFIGURE_REQUIRES}{strict}                ||= 0;
     $settings{CONFIGURE_REQUIRES}{warnings}              ||= 0;
-    $settings{CONFIGURE_REQUIRES}{'ExtUtils::MakeMaker'} ||= 0;
-    $settings{CONFIGURE_REQUIRES}{'ExtUtils::MakeMaker'} = '6.70'
-        if $settings{CONFIGURE_REQUIRES}{'ExtUtils::MakeMaker'} < '6.70';
     $settings{CONFIGURE_REQUIRES}{'File::Find'}          ||= 0;
     $settings{CONFIGURE_REQUIRES}{'File::Spec'}          ||= 0;
+    for ($settings{CONFIGURE_REQUIRES}{'ExtUtils::MakeMaker'}) {
+        $_ = '7.0' if !$_ || $_ < 7;
+    }
 
     my $module_file = $settings{NAME};
     $module_file =~ s!::!/!g;
@@ -47,7 +62,10 @@ my %settings = %{do "./$settings_file" or die "Internal error: can't do $setting
     $settings{VERSION_FROM}  ||= $module_file;
     $settings{ABSTRACT_FROM} ||= $module_file;
 
-    $settings{test}{TESTS} ||= find_tests_recursively_in 't';
+    $settings{test}{TESTS} ||= do {
+        my $extra_test_dirs = delete $settings{EXTRA_TEST_DIRS};
+        join ' ', map find_tests_recursively_in($_), 't', @{$extra_test_dirs || []}
+    };
 
     $settings{DISTNAME} ||= do {
         my $name = $settings{NAME};
@@ -85,7 +103,11 @@ my %settings = %{do "./$settings_file" or die "Internal error: can't do $setting
     if (my $repo = delete $settings{REPOSITORY}) {
         if (ref($repo) eq 'ARRAY') {
             my ($type, @args) = @$repo;
-            if ($type eq 'github') {
+            my %sites = (
+                github   => 'github.com',
+                codeberg => 'codeberg.org',
+            );
+            if (defined(my $site = $sites{$type})) {
                 my ($account, $project) = @args;
                 $project ||= '%d';
                 $project =~ s{%(L?)(.)}{
@@ -96,10 +118,10 @@ my %settings = %{do "./$settings_file" or die "Internal error: can't do $setting
                         die "Internal error: unknown placeholder %$1$2";
                     $1 ? lc($x) : $x
                 }seg;
-                my $addr = "github.com/$account/$project";
+                my $addr = "$site/$account/$project";
                 $repo = {
                     type => 'git',
-                    url  => "git://$addr",
+                    url  => "https://$addr.git",
                     web  => "https://$addr",
                 };
             } else {
@@ -109,8 +131,14 @@ my %settings = %{do "./$settings_file" or die "Internal error: can't do $setting
         ref($repo) eq 'HASH' or die "Internal error: REPOSITORY must be a hashref, not $repo";
         @{$settings{META_MERGE}{resources}{repository}}{keys %$repo} = values %$repo;
     }
-}
 
-(do './maint/eumm-fixup.pl' || die $@ || $!)->(\%settings) if $::MAINT_MODE;
+    if (my $bugtracker = delete $settings{BUGTRACKER}) {
+        $settings{META_MERGE}{resources}{bugtracker}{web} = $bugtracker;
+    }
+
+    if (my $harness_options = delete $settings{HARNESS_OPTIONS}) {
+        $settings{postamble}{HARNESS_OPTIONS} = $harness_options;
+    }
+}
 
 WriteMakefile %settings;

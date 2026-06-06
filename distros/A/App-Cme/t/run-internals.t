@@ -3,6 +3,7 @@ use warnings;
 
 use App::Cme::Command::run;
 use Test::More;
+use Test::Differences;
 use Config::Model;
 use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
 
@@ -18,6 +19,8 @@ s/^(a)a+/ # comment
 /xe}
 ---
 load: ! MY_HOSTID=~"$change_it"
+doc: doc a
+doc: doc b
 EOS
 
     my %user_args = (fooname => 'foo');
@@ -25,6 +28,7 @@ EOS
     my $data = App::Cme::Command::run::parse_script('test', $content, \%user_args);
 
     is($data->{load}[0], '! MY_HOSTID=~" s/^(a)a+/  $1.\"foo\" x2 /xe"', "test parsed script");
+    eq_or_diff($data->{doc}, ['doc a','doc b'], "test doc extraction");
 };
 
 subtest "process_script_vars" => sub {

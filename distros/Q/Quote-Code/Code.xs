@@ -5,7 +5,7 @@ This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
-See http://dev.perl.org/licenses/ for more information.
+See https://dev.perl.org/licenses/ for more information.
  */
 
 #ifdef __GNUC__
@@ -677,6 +677,32 @@ static int my_keyword_plugin(pTHX_ char *keyword_ptr, STRLEN keyword_len, OP **o
     return ret;
 }
 
+/* https://github.com/Perl/perl5/issues/16229 */
+#ifndef wrap_keyword_plugin
+#define wrap_keyword_plugin(A, B) S_wrap_keyword_plugin(aTHX_ A, B)
+static void S_wrap_keyword_plugin(pTHX_ Perl_keyword_plugin_t new_plugin, Perl_keyword_plugin_t *old_plugin_p) {
+    PERL_UNUSED_CONTEXT;
+    if (*old_plugin_p) {
+        return;
+    }
+    MUTEX_LOCK(&PL_op_mutex);
+    if (!*old_plugin_p) {
+        *old_plugin_p = PL_keyword_plugin;
+        PL_keyword_plugin = new_plugin;
+    }
+    MUTEX_UNLOCK(&PL_op_mutex);
+}
+#endif
+
+static void my_boot(pTHX) {
+    HV *const stash = gv_stashpvs(MY_PKG, GV_ADD);
+
+    newCONSTSUB(stash, "HINTK_QC",    newSVpvs(HINTK_QC));
+    newCONSTSUB(stash, "HINTK_QC_TO", newSVpvs(HINTK_QC_TO));
+    newCONSTSUB(stash, "HINTK_QCW",   newSVpvs(HINTK_QCW));
+
+    wrap_keyword_plugin(my_keyword_plugin, &next_keyword_plugin);
+}
 
 WARNINGS_RESET
 
@@ -684,13 +710,4 @@ MODULE = Quote::Code   PACKAGE = Quote::Code
 PROTOTYPES: ENABLE
 
 BOOT:
-WARNINGS_ENABLE {
-    HV *const stash = gv_stashpvs(MY_PKG, GV_ADD);
-    /**/
-    newCONSTSUB(stash, "HINTK_QC",    newSVpvs(HINTK_QC));
-    newCONSTSUB(stash, "HINTK_QC_TO", newSVpvs(HINTK_QC_TO));
-    newCONSTSUB(stash, "HINTK_QCW",   newSVpvs(HINTK_QCW));
-    /**/
-    next_keyword_plugin = PL_keyword_plugin;
-    PL_keyword_plugin = my_keyword_plugin;
-} WARNINGS_RESET
+    my_boot(aTHX);

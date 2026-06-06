@@ -1,4 +1,5 @@
 from test/more import *;
+from std/eval import eval;
 
 function pair ( a, b ) {
 	return a + b;
@@ -31,4 +32,56 @@ like( exception( function() {
 	pair(1);
 }
 ), /Wrong number of arguments/, "fixed-arity functions reject missing args", );
+like(
+	exception( function () {
+		eval( "function f (x) { x := 2; return x; } f(1);" );
+	} ),
+	/const|immutable/i,
+	"function parameters reject assignment",
+);
+like(
+	exception( function () {
+		eval( "function f (x) { x ?:= 2; return x; } f(null);" );
+	} ),
+	/const|immutable/i,
+	"function parameters reject defined-or assignment",
+);
+like(
+	exception( function () {
+		eval( "function f (x) { x += 1; return x; } f(1);" );
+	} ),
+	/const|immutable/i,
+	"function parameters reject compound assignment",
+);
+like(
+	exception( function () {
+		eval( "function f (x) { x++; return x; } f(1);" );
+	} ),
+	/const|immutable/i,
+	"function parameters reject update operators",
+);
+like(
+	exception( function () {
+		eval( "let f := function (x) { x := 2; return x; }; f(1);" );
+	} ),
+	/const|immutable/i,
+	"anonymous function parameters reject assignment",
+);
+like(
+	exception( function () {
+		eval( "let f := fn x -> do { x := 2; x; }; f(1);" );
+	} ),
+	/const|immutable/i,
+	"lambda parameters reject assignment",
+);
+like(
+	exception( function () {
+		eval(
+			"class C { method f (x) { x := 2; return x; } } "
+			_ "(new C()).f(1);",
+		);
+	} ),
+	/const|immutable/i,
+	"method parameters reject assignment",
+);
 done_testing();

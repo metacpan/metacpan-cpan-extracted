@@ -1,7 +1,6 @@
-# -*- cperl -*-
-
 use ExtUtils::testlib;
 use Test::More ;
+use Test::Differences;
 use Config::Model 2.142;
 use Config::Model::Tester::Setup qw/init_test setup_test_dir/;
 use Data::Dumper ;
@@ -14,6 +13,8 @@ use Test::File::Contents;
 
 use warnings;
 use strict;
+use v5.20;
+use utf8;
 
 my ($meta_model, $trace) = init_test();
 
@@ -133,6 +134,9 @@ my $master_model = $meta_inst->grab('class:MasterModel');
 is($master_model->grab_value('rw_config backend'), 'cds_file', "read_config data was migrated in rw_config");
 is($master_model->grab_value('rw_config file'), 'mymaster.cds', "write_config data was migrated in rw_config");
 
+# check that utf8 description is not garbled
+is($master_model->grab_value('element:std_id description'), "test utf8 😀", "test utf8 description");
+
 # add a new class 
 $meta_root->load("class:Master::Created element:created1 type=leaf value_type=number"
                      ." - element:created2 type=leaf value_type=uniline") ;
@@ -151,7 +155,7 @@ ok($cds,"dumped full tree in cds format") ;
 
 #like($cds,qr/dumb/,"check for a peculiar warp effet") ;
 
-$wr_conf1->child("orig.cds")->spew($cds);
+$wr_conf1->child("orig.cds")->spew_utf8($cds);
 
 $rw_obj -> write_all();
 ok( ! $wr_model1->child("models/MasterModel/ToTrash.pl")->exists,
@@ -170,14 +174,14 @@ $meta_root2 -> load (steps => $cds, check => 'no') ;
 ok(1,"Created and loaded 2nd instance") ;
 
 my $cds2 = $meta_root2 ->dump_tree () ;
-$wr_conf1->child("inst2.cds")->spew($cds2);
+$wr_conf1->child("inst2.cds")->spew_utf8($cds2);
 
 is_deeply([split /\n/,$cds2],\@cds_orig,"Compared the 2 full dumps") ; 
 
 my $pdata2 = $meta_root2 -> dump_as_data ;
 print Dumper $pdata2 if $trace ;
 
-$wr_conf1->child("inst2.pl")->spew(Dumper $pdata2);
+$wr_conf1->child("inst2.pl")->spew_utf8(Dumper $pdata2);
 
 my $rw_obj2 = Config::Model::Itself -> new(
     model_object => $meta_root2,
@@ -202,21 +206,22 @@ $meta_root3 -> load_data (data => $pdata2, check => 'no') ;
 ok(1,"Created and loaded 3nd instance with perl data") ;
 
 my $cds3 = $meta_root3 ->dump_tree () ;
-$wr_conf1->child("inst3.cds")->spew($cds3);
+$wr_conf1->child("inst3.cds")->spew_utf8($cds3);
 
 is_deeply([split /\n/,$cds3],\@cds_orig,"Compared the 3rd full dump with first one") ; 
 
 # check dump of one class
-my $dump = $rw_obj -> get_perl_data_model ( class_name => 'MasterModel' ) ;
+my $dump = $rw_obj -> get_perl_data_model ('MasterModel') ;
 
 print Dumper $dump if $trace ;
 ok($dump,"Checked dump of one class");
 
 $rw_obj->write_all( ) ;
 
+my $model_dir4 = $wr_model1->child("models")->relative($wr_lib)->stringify;
 my $model4 = Config::Model->new(
     legacy => 'ignore',
-    model_dir => $wr_model1->child("models")->relative($wr_lib)->stringify
+    model_dir => $model_dir4,
 ) ;
 
 my $inst4 = $model4->instance (
@@ -224,13 +229,13 @@ my $inst4 = $model4->instance (
     instance_name     => 'test_instance4',
     root_dir  => $wr_conf1->stringify,
 );
-ok($inst4,"Read MasterModel and created instance") ;
+ok($inst4,"Read MasterModel and created instance from $model_dir4") ;
 
 my $root4 = $inst4->config_root ;
 ok($root4,"Created MasterModel root") ;
 
 my @elt4 = $root4->get_element_name() ;
-is(scalar @elt4,scalar @elt1,"Check number of elements of root4") ;
+eq_or_diff(\@elt4, \@elt1,"Check number of elements of root4") ;
 
 # require Tk::ObjScanner; Tk::ObjScanner::scan_object($meta_model) ;
 

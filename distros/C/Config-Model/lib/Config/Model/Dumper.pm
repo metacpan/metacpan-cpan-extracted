@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Dumper 2.162;
+package Config::Model::Dumper 2.163;
 
 use Carp;
 use strict;
@@ -141,7 +141,7 @@ sub dump_tree ($self, %args) {
         my $list_note = note_quote( $list_obj->annotation );
         $$data_r .= "\n$pad$element#$list_note" if $list_note;
 
-        if ( $list_obj->cargo_type eq 'node' ) {
+        if ( $list_obj->cargo_type =~ 'node' ) {
             foreach my $k (@keys) {
                 $scanner->scan_list( $data_r, $node, $element, $k );
             }
@@ -253,7 +253,7 @@ Config::Model::Dumper - Serialize data of config tree
 
 =head1 VERSION
 
-version 2.162
+version 2.163
 
 =head1 SYNOPSIS
 

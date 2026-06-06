@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::TermUI 2.162;
+package Config::Model::TermUI 2.163;
 
 use Carp;
 use utf8;      # so literals and identifiers can be in UTF-8
@@ -280,7 +280,7 @@ Config::Model::TermUI - Interactive command line interface for cme
 
 =head1 VERSION
 
-version 2.162
+version 2.163
 
 =head1 SYNOPSIS
 
@@ -292,21 +292,22 @@ version 2.162
   $model->create_config_class(
     name    => "Foo",
     element => [
-        [qw/foo bar/] => {
+        foo => {
             type       => 'leaf',
             value_type => 'string'
         },
+        bar => '*foo',
     ]
  );
  $model ->create_config_class (
     name => "MyClass",
 
     element => [
-
-        [qw/foo bar/] => {
+        foo => {
             type       => 'leaf',
             value_type => 'string'
         },
+        bar => '*foo',
         hash_of_nodes => {
             type       => 'hash',     # hash id
             index_type => 'string',

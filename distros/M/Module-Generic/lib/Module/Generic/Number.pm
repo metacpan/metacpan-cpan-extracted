@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Number.pm
-## Version v2.3.6
+## Version v2.4.0
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2026/06/05
+## Modified 2026/06/06
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -164,7 +164,7 @@ BEGIN
         threads::shared->import();
         our $LOCALE_LOCK :shared;
     }
-    our( $VERSION ) = 'v2.3.6';
+    our( $VERSION ) = 'v2.4.0';
 };
 
 # use strict;
@@ -517,12 +517,15 @@ $DEFAULT =
     thousands_sep       => ',',
 };
 
-my $map =
+my $map_flexible =
 {
     decimal             => [qw( decimal_point mon_decimal_point )],
     grouping            => [qw( grouping mon_grouping )],
+    mon_decimal         => [qw( mon_decimal_point decimal_point )],
+    mon_grouping        => [qw( mon_grouping grouping )],
+    mon_thousand        => [qw( mon_thousands_sep thousands_sep )],
     position_neg        => [qw( n_sign_posn int_n_sign_posn )],
-    position_pos        => [qw( n_sign_posn int_p_sign_posn )],
+    position_pos        => [qw( p_sign_posn int_p_sign_posn )],
     precede             => [qw( p_cs_precedes int_p_cs_precedes )],
     precede_neg         => [qw( n_cs_precedes int_n_cs_precedes )],
     precision           => [qw( frac_digits int_frac_digits )],
@@ -533,6 +536,28 @@ my $map =
     symbol              => [qw( currency_symbol int_curr_symbol )],
     thousand            => [qw( thousands_sep mon_thousands_sep )],
 };
+
+my $map_posix_strict =
+{
+    decimal             => [qw( decimal_point )],
+    grouping            => [qw( grouping )],
+    mon_decimal         => [qw( mon_decimal_point )],
+    mon_grouping        => [qw( mon_grouping )],
+    mon_thousand        => [qw( mon_thousands_sep )],
+    position_neg        => [qw( n_sign_posn int_n_sign_posn )],
+    position_pos        => [qw( p_sign_posn int_p_sign_posn )],
+    precede             => [qw( p_cs_precedes int_p_cs_precedes )],
+    precede_neg         => [qw( n_cs_precedes int_n_cs_precedes )],
+    precision           => [qw( frac_digits int_frac_digits )],
+    sign_neg            => [qw( negative_sign )],
+    sign_pos            => [qw( positive_sign )],
+    space_pos           => [qw( p_sep_by_space int_p_sep_by_space )],
+    space_neg           => [qw( n_sep_by_space int_n_sep_by_space )],
+    symbol              => [qw( currency_symbol int_curr_symbol )],
+    thousand            => [qw( thousands_sep )],
+};
+
+my $map = $map_flexible;
 
 # This serves 2 purposes:
 # 1) to silence warnings issued from Number::Format when it uses an empty string when evaluating a number, e.g. '' == 1
@@ -576,8 +601,9 @@ sub init
     }
     use utf8;
     my @k = keys( %$map );
-    @$self{ @k } = ( '' x scalar( @k ) );
+    @$self{ @k } = ( '' ) x scalar( @k );
     $self->{lang} = '';
+    $self->{posix_strict} = 1;
     $self->{default} = $DEFAULT;
     $self->{decimal_fill}   = 0;
     $self->{encoding}       = 'utf-8';
@@ -592,8 +618,8 @@ sub init
     $self->SUPER::init( @_ );
     $self->{_original} = $num;
     $self->{_fields} = [qw(
-        lang decimal_fill encoding neg_format kilo_suffix mega_suffix giga_suffix
-        kibi_suffix mebi_suffix gibi_suffix _number
+        lang posix_strict decimal_fill encoding neg_format kilo_suffix mega_suffix
+        giga_suffix kibi_suffix mebi_suffix gibi_suffix _number
     )];
     my $default = $self->default;
     my $curr_locale = POSIX::setlocale( &POSIX::LC_ALL );
@@ -726,9 +752,10 @@ sub init
     }
 
     no warnings 'uninitialized';
-    foreach my $prop ( keys( %$map ) )
+    my $active_map = $self->{posix_strict} ? $map_posix_strict : $map_flexible;
+    foreach my $prop ( keys( %$active_map ) )
     {
-        my $ref = $map->{ $prop };
+        my $ref = $active_map->{ $prop };
         # Already set by user
         next if( CORE::length( $self->{ $prop } ) );
         foreach my $lconv_prop ( @$ref )
@@ -945,6 +972,7 @@ sub decode_lconv
 
     foreach my $prop ( keys( %$ref ) )
     {
+        next if( $prop eq 'grouping' || $prop eq 'mon_grouping' );
         my $v = $ref->{ $prop };
         next if( utf8::is_utf8( $v ) || $self->_is_empty( $v ) );
         my $rv = eval
@@ -1193,7 +1221,17 @@ sub format_money
     # See comment in format() method
     return( $number ) if( !defined( $number ) );
 
-    # Taken from Number::Format. Credit to William R. Ward
+    # NOTE: Money follows the LC_MONETARY category through the dedicated monetary trio
+    # resolved in init() (mon_decimal, mon_thousand, mon_grouping). We fall back to the
+    # numeric trio only when a monetary value was not resolved at all, so that a locale
+    # missing monetary data still produces a sensible result.
+    my $mon_decimal_point = $self->mon_decimal->scalar;
+    my $mon_thousands_sep = $self->mon_thousand->scalar;
+    my $mon_grouping      = $self->mon_grouping->scalar;
+    $mon_decimal_point    = $self->decimal->scalar  if( !defined( $mon_decimal_point ) || !CORE::length( $mon_decimal_point ) );
+    $mon_thousands_sep    = $self->thousand->scalar if( !defined( $mon_thousands_sep ) || !CORE::length( $mon_thousands_sep ) );
+    $mon_grouping         = $self->grouping->scalar if( !defined( $mon_grouping )      || !CORE::length( $mon_grouping ) );
+
     my $frac_digits = $self->precision->scalar;
 
     # Determine precision for decimal portion
@@ -1210,11 +1248,14 @@ sub format_money
     # format it first
     $number = $self->format(
         precision => $precision,
+        decimal   => $mon_decimal_point,
+        thousand  => $mon_thousands_sep,
+        grouping  => $mon_grouping,
     );
     return( $self->pass_error ) if( !defined( $number ) );
 
     # Now we make sure the decimal part has enough zeroes
-    my $decimal_point = $self->decimal->scalar;
+    my $decimal_point = $mon_decimal_point;
     my( $integer, $decimal ) = CORE::split( /\Q$decimal_point\E/, "$number", 2 );
     $decimal //= '';
     # $decimal = '0' x $precision if( !$decimal && $precision );
@@ -1240,7 +1281,7 @@ sub format_money
 
     # Combine it all back together.
     my $result = $precision
-        ? CORE::join( $self->decimal, $integer, $decimal )
+        ? CORE::join( $mon_decimal_point, $integer, $decimal )
         : $integer;
 
     # Determine where spaces go, if any
@@ -1636,9 +1677,17 @@ sub min
 
 sub mod { return( shift->_func( 'fmod', @_, { posix => 1 } ) ); }
 
+sub mon_decimal { return( shift->_set_get_prop( 'mon_decimal', @_ ) ); }
+
+sub mon_grouping { return( shift->_set_get_prop( 'mon_grouping', @_ ) ); }
+
+sub mon_thousand { return( shift->_set_get_prop( 'mon_thousand', @_ ) ); }
+
 sub neg_format { return( shift->_set_get_prop( 'neg_format', @_ ) ); }
 
 sub oct { return( shift->_func( 'oct' ) ); }
+
+sub posix_strict { return( shift->_set_get_boolean( 'posix_strict', @_ ) ); }
 
 sub position_neg { return( shift->_set_get_prop( 'position_neg', @_ ) ); }
 

@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::DumpAsData 2.162;
+package Config::Model::DumpAsData 2.163;
 
 use Carp;
 use strict;
@@ -30,9 +30,8 @@ sub dump_as_data ($self, %args) {
     my $mode = delete $args{mode} // '';
     my $skip_aw = delete $args{skip_auto_write} || '';
     my $auto_v  = delete $args{auto_vivify}     || 0;
-    my $ordered_hash_as_list = delete $args{ordered_hash_as_list};
+    my $ordered_hash_as_list = delete $args{ordered_hash_as_list} // 1;
     my $to_boolean = delete $args{to_boolean} // sub ($input) {return $input;};
-    $ordered_hash_as_list = 1 unless defined $ordered_hash_as_list;
 
     # mode and full_dump params are both accepted
     my $full = delete $args{full_dump} || 0;
@@ -254,7 +253,7 @@ Config::Model::DumpAsData - Dump configuration content as a perl data structure
 
 =head1 VERSION
 
-version 2.162
+version 2.163
 
 =head1 SYNOPSIS
 

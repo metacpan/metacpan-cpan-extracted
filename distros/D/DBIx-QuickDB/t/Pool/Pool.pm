@@ -81,6 +81,83 @@ sub check_rows {
     return $vals_ok && $ids_ok;
 }
 
+# Diagnostics for the intermittent freebsd/PostgreSQL-9.3 failure where a clone
+# that started fine is dead by the time we connect to it. Dumps everything we
+# can about a db -- socket/pid liveness and, crucially, the server's own log --
+# to STDERR so it shows up in CPAN smoke reports. Best-effort; never dies.
+sub qdb_diag {
+    my ($db, $label) = @_;
+    return unless $db;
+
+    my @out = ("==== QDB-DIAG [$label] pid=$$ ====");
+
+    my $dir  = eval { $db->dir };
+    push @out, "  dir: " . (defined $dir ? $dir : '?');
+
+    my $sock = eval { $db->socket };
+    push @out, "  socket: " . (defined $sock ? $sock : '?')
+        . " exists=" . (defined $sock && -e $sock ? 1 : 0)
+        . " is_socket=" . (defined $sock && -S $sock ? 1 : 0);
+
+    push @out, "  started(): " . (eval { $db->started } ? 1 : 0);
+
+    my $w = $db->{ +DBIx::QuickDB::Driver::WATCHER() };
+    if ($w) {
+        my $spid = eval { $w->server_pid };
+        push @out, "  server_pid: " . (defined $spid ? $spid : '?')
+            . " alive=" . (defined $spid && kill(0, $spid) ? 1 : 0);
+    }
+    else {
+        push @out, "  watcher: none (object thinks it is stopped)";
+    }
+
+    my $log = eval { $db->error_log };
+    if ($log && -f $log) {
+        open(my $fh, '<', $log) or push(@out, "  error.log: open failed: $!");
+        if ($fh) {
+            my @l = <$fh>;
+            close($fh);
+            @l = @l[-25 .. -1] if @l > 25;
+            push @out, "  --- $log (last " . scalar(@l) . " lines) ---";
+            for my $line (@l) { chomp $line; push @out, "    | $line" }
+        }
+    }
+    else {
+        push @out, "  error.log: " . (defined $log ? "$log (missing)" : 'n/a');
+    }
+
+    my $ipcs = eval { `ipcs -m 2>/dev/null | wc -l` };
+    my $ipss = eval { `ipcs -s 2>/dev/null | wc -l` };
+    chomp($ipcs) if defined $ipcs;
+    chomp($ipss) if defined $ipss;
+    push @out, "  ipcs shmem-lines=" . (defined $ipcs ? $ipcs : '?')
+        . " sem-lines=" . (defined $ipss ? $ipss : '?');
+
+    print STDERR join("\n", @out), "\n";
+    return;
+}
+
+# Wrap a connect; on failure dump diagnostics for the db, its sibling, and the
+# sources it was cloned from, then rethrow so the test still fails.
+sub diag_connect {
+    my ($db, $label, @others) = @_;
+    my $dbh;
+    return $dbh if eval { $dbh = $db->connect(); 1 };
+    my $err = $@;
+    print STDERR "==== QDB-DIAG connect FAILED for [$label]: $err\n";
+    qdb_diag($db, $label);
+    qdb_diag($_->[1], $_->[0]) for @others;
+
+    # Global snapshot: which postgres processes are alive (orphans?), and the
+    # System V IPC objects in play -- the prime suspect for this 9.3 race.
+    my $ps = eval { `ps -axww 2>/dev/null | grep '[p]ostgres'` };
+    print STDERR "==== QDB-DIAG postgres processes ====\n", (length($ps // '') ? $ps : "  (none)\n");
+    my $ipcs = eval { `ipcs -a 2>/dev/null` };
+    print STDERR "==== QDB-DIAG ipcs -a ====\n", (length($ipcs // '') ? $ipcs : "  (none)\n");
+
+    die $err;
+}
+
 ok($driver, "Got a driver ($driver)") or die "Cannot continue without a driver";
 
 use DBIx::QuickDB::Pool cache_dir => tempdir(CLEANUP => 1), verbose => 0;
@@ -184,8 +261,10 @@ isnt($foo1->dir, $foo2->dir, "Both instances have different directories");
 ok(!QDB_POOL()->{databases}->{foo}->{db}->started, "The original 'foo' is stopped")
     unless $driver eq 'SQLite' || $driver eq 'DuckDB';
 
-my $fooh1 = $foo1->connect();
-my $fooh2 = $foo2->connect();
+my $foo_src  = QDB_POOL()->{databases}->{foo}->{db};
+my $base_src = QDB_POOL()->{databases}->{$driver}->{db};
+my $fooh1 = diag_connect($foo1, 'foo1', ['foo2', $foo2], ['foo source', $foo_src], ['base source', $base_src]);
+my $fooh2 = diag_connect($foo2, 'foo2', ['foo1', $foo1], ['foo source', $foo_src], ['base source', $base_src]);
 
 ok($fooh1->do("INSERT INTO quick_test(test_val) VALUES('foo 1')"), "Insert success (foo 1)");
 ok($fooh2->do("INSERT INTO quick_test(test_val) VALUES('foo 2')"), "Insert success (foo 2)");

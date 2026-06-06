@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::TreeSearcher 2.162;
+package Config::Model::TreeSearcher 2.163;
 
 use Mouse;
 use Mouse::Util::TypeConstraints;
@@ -153,7 +153,7 @@ Config::Model::TreeSearcher - Search tree for match in value, description...
 
 =head1 VERSION
 
-version 2.162
+version 2.163
 
 =head1 SYNOPSIS
 
@@ -164,10 +164,11 @@ version 2.162
  $model ->create_config_class (
     name => "MyClass",
     element => [ 
-        [qw/foo bar/] => { 
-            type => 'leaf',
+        foo => {
+            type       => 'leaf',
             value_type => 'string'
         },
+        bar => '*foo',
         baz => { 
             type => 'hash',
             index_type => 'string' ,
@@ -176,7 +177,6 @@ version 2.162
                 value_type => 'string',
             },
         },
-        
     ],
  ) ;
 

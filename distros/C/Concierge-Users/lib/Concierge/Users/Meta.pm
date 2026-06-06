@@ -1,4 +1,4 @@
-package Concierge::Users::Meta v0.8.4;
+package Concierge::Users::Meta v0.9.1;
 use v5.36;
 use Carp qw/ croak carp /;
 use YAML::Tiny;
@@ -332,10 +332,12 @@ sub get_field_validator {
 
 # Get UI-friendly field hints for calling applications
 # Returns hashref with: label, type, validate_as, max_length, options,
-#   description, required, default, null
+#   description, required, default, null, format_as
 # 'null' is the field's null_value (the sentinel for "no data").
 # 'required' means operationally required at the service layer -- always,
 #   regardless of channel -- not app-level conditional required logic.
+# 'format_as' hints how to present or input this field in a UI.
+#   Not validated; apps may supply their own format codes via setup.
 sub get_field_hints {
 	my ($self, $field) = @_;
 
@@ -345,6 +347,7 @@ sub get_field_hints {
 	return {
 		label       => $field_def->{label} || labelize($field_def->{field_name} || $field),
 		type        => $field_def->{type},
+		system      => $field_def->{system} // 0,
 		validate_as => $field_def->{validate_as},
 		max_length  => $field_def->{max_length},
 		options     => $field_def->{options},
@@ -352,6 +355,7 @@ sub get_field_hints {
 		required    => $field_def->{required},
 		default     => $field_def->{default},
 		null        => $field_def->{null_value},
+		format_as   => $field_def->{format_as},
 	};
 }
 
@@ -453,7 +457,7 @@ sub config_to_yaml {
 			$yaml .= "    $field:\n";
 			$yaml .= "      field_name: $def->{field_name}\n";
 			$yaml .= "      type: $def->{type}\n";
-			$yaml .= "      field_use: $def->{field_use}\n" if $def->{field_use};
+			$yaml .= "      system: 1\n" if $def->{system};
 			$yaml .= "      required: $def->{required}\n";
 
 			# Only show validate_as if it's different from type
@@ -761,13 +765,13 @@ sub validate_name_field {
 	email
 	phone
 	text_ok
-	last_login_date
 	term_ends
 / );
 
 @Concierge::Users::Meta::system_fields	= ( qw/
-        last_mod_date
-        created_date
+	last_login_date
+	last_mod_date
+	created_date
 / );
 
 %Concierge::Users::Meta::field_definitions	= (
@@ -777,13 +781,13 @@ sub validate_name_field {
 		label => 'User ID',
 		description => 'User login ID - Primary authentication identifier',
 		type => 'text',
-		field_use => 'identity',
 		required => 1,
 		options => [],
 		default => '',
 		null_value => '',
 		max_length => 30,
 		must_validate => 0,
+		format_as => 'text',
 	},
 	moniker => {
 		field_name => 'moniker',
@@ -797,6 +801,7 @@ sub validate_name_field {
 		max_length => 24,
 		validate_as => 'moniker',
 		must_validate => 1,
+		format_as => 'text',
 	},
 	user_status => {
 		field_name => 'user_status',
@@ -810,6 +815,7 @@ sub validate_name_field {
 		max_length => 20,
 		validate_as => 'enum',
 		must_validate => 1,
+		format_as => 'options',
 	},
 	access_level => {
 		field_name => 'access_level',
@@ -823,6 +829,7 @@ sub validate_name_field {
 		max_length => 20,
 		validate_as => 'enum',
 		must_validate => 1,
+		format_as => 'options',
 	},
 
 	# Standard field definitions
@@ -838,6 +845,7 @@ sub validate_name_field {
 		max_length => 50,
 		validate_as => 'name',
 		must_validate => 1,
+		format_as => 'text',
 	},
 	middle_name => {
 		field_name => 'middle_name',
@@ -851,6 +859,7 @@ sub validate_name_field {
 		max_length => 50,
 		validate_as => 'name',
 		must_validate => 1,
+		format_as => 'text',
 	},
 	last_name => {
 		field_name => 'last_name',
@@ -864,6 +873,7 @@ sub validate_name_field {
 		max_length => 50,
 		validate_as => 'name',
 		must_validate => 1,
+		format_as => 'text',
 	},
 	prefix => {
 		field_name => 'prefix',
@@ -877,6 +887,7 @@ sub validate_name_field {
 		max_length => 10,
 		validate_as => 'enum',
 		must_validate => 0,
+		format_as => 'options',
 	},
 	suffix => {
 		field_name => 'suffix',
@@ -890,6 +901,7 @@ sub validate_name_field {
 		max_length => 10,
 		validate_as => 'enum',
 		must_validate => 0,
+		format_as => 'options',
 	},
 	organization => {
 		field_name => 'organization',
@@ -903,6 +915,7 @@ sub validate_name_field {
 		max_length => 100,
 		validate_as => 'text',
 		must_validate => 0,
+		format_as => 'text',
 	},
 	title => {
 		field_name => 'title',
@@ -916,6 +929,7 @@ sub validate_name_field {
 		max_length => 100,
 		validate_as => 'text',
 		must_validate => 0,
+		format_as => 'text',
 	},
 	email => {
 		field_name => 'email',
@@ -929,6 +943,7 @@ sub validate_name_field {
 		max_length => 255,
 		validate_as => 'email',
 		must_validate => 0,
+		format_as => 'text',
 	},
 	phone => {
 		field_name => 'phone',
@@ -942,6 +957,7 @@ sub validate_name_field {
 		max_length => 20,
 		validate_as => 'phone',
 		must_validate => 0,
+		format_as => 'text',
 	},
 	text_ok => {
 		field_name => 'text_ok',
@@ -955,6 +971,7 @@ sub validate_name_field {
 		max_length => 1,
 		validate_as => 'boolean',
 		must_validate => 0,
+		format_as => 'boolean',
 	},
 	term_ends => {
 		field_name => 'term_ends',
@@ -968,19 +985,21 @@ sub validate_name_field {
 		max_length => 10,
 		validate_as => 'date',
 		must_validate => 0,
+		format_as => 'date',
 	},
 	last_login_date => {
 		field_name => 'last_login_date',
 		label => 'Last Login Date',
 		description => 'Timestamp of last successful login',
 		type => 'timestamp',
+		system => 1,
 		required => 0,
 		options => [],
 		default => '0000-00-00 00:00:00',
 		null_value => '0000-00-00 00:00:00',
 		max_length => 19,
-		validate_as => 'timestamp',
 		must_validate => 0,
+		format_as => 'datetime',
 	},
 
 	# System field definitions
@@ -989,26 +1008,28 @@ sub validate_name_field {
 		label => 'Last Modification Date',
 		description => 'Timestamp of last profile modification',
 		type => 'timestamp',
-		field_use => 'system',
+		system => 1,
 		required => 0,
 		options => [],
 		default => '0000-00-00 00:00:00',
 		null_value => '0000-00-00 00:00:00',
 		max_length => 19,
 		must_validate => 0,
+		format_as => 'datetime',
 	},
 	created_date => {
 		field_name => 'created_date',
 		label => 'Created Date',
 		description => 'Timestamp when user account was created',
 		type => 'timestamp',
-		field_use => 'system',
+		system => 1,
 		required => 1,
 		options => [],
 		default => '0000-00-00 00:00:00',
 		null_value => '0000-00-00 00:00:00',
 		max_length => 19,
 		must_validate => 0,
+		format_as => 'datetime',
 	},
 );
 
@@ -1127,7 +1148,7 @@ utilities for Concierge::Users
 
 =head1 VERSION
 
-v0.8.3
+v0.9.1
 
 =head1 SYNOPSIS
 
@@ -1174,7 +1195,6 @@ Always present in every setup.
 Primary authentication identifier.
 
     type:          text
-    field_use:     identity
     required:      1
     max_length:    30
     default:       ""
@@ -1230,7 +1250,7 @@ C<field_overrides>.  See L</Field Overrides>.
 
 =back
 
-=head2 Standard Fields (12)
+=head2 Standard Fields (11)
 
 Included by default when C<include_standard_fields> is omitted or set
 to C<'all'>.  Pass an arrayref of names to select specific fields, or
@@ -1278,9 +1298,6 @@ B<Temporal fields:>
 
 =over 4
 
-=item B<last_login_date> -- type C<timestamp>, validate_as C<timestamp>,
-default C<0000-00-00 00:00:00>, max 19
-
 =item B<term_ends> -- type C<date>, validate_as C<date>,
 null_value C<0000-00-00>, max 10
 
@@ -1288,16 +1305,19 @@ null_value C<0000-00-00>, max 10
 
 All standard fields have C<required =E<gt> 0> by default.
 
-=head2 System Fields (2)
+=head2 System Fields (3)
 
-Always appended to the field list.  Auto-managed by the backends;
-cannot be set through the public API.  Protected from overrides.
+Always appended to the field list.  Auto-managed; not set through
+user or app data.  Protected from overrides.
 
 =over 4
 
-=item B<last_mod_date> -- type C<timestamp>, C<field_use =E<gt> 'system'>, updated on every write
+=item B<last_login_date> -- type C<timestamp>, C<system =E<gt> 1>, set by
+C<login_user()>; default C<0000-00-00 00:00:00>
 
-=item B<created_date> -- type C<timestamp>, C<field_use =E<gt> 'system'>, set once on
+=item B<last_mod_date> -- type C<timestamp>, C<system =E<gt> 1>, updated on every write
+
+=item B<created_date> -- type C<timestamp>, C<system =E<gt> 1>, set once on
 creation, C<required =E<gt> 1>
 
 =back
@@ -1317,10 +1337,9 @@ Set automatically; protected from overrides.
 =item C<type> -- Data type: C<text>, C<email>, C<phone>, C<date>,
 C<timestamp>, C<boolean>, C<integer>, C<enum>.
 
-=item C<field_use> -- Operational role of the field.  Omitted for normal
-user-writable fields.  C<identity> marks fields set once at creation and
-never changed (e.g. C<user_id>).  C<system> marks fields auto-managed by
-the backend (e.g. C<created_date>, C<last_mod_date>).
+=item C<system> -- Boolean flag (C<1> or absent).  Set on fields that are
+auto-managed and never supplied as user or app data: C<last_login_date>,
+C<last_mod_date>, C<created_date>.  Absent (false) for all other fields.
 
 =item C<validate_as> -- Validator to use if different from C<type>.
 See L</VALIDATOR TYPES>.
@@ -1650,7 +1669,7 @@ C<validate_as> or C<type>, or C<undef> if no validator is available.
 
 Returns a hashref of consumer-friendly attributes for a field:
 C<label>, C<type>, C<validate_as>, C<max_length>, C<options>,
-C<description>, C<required>, C<default>, C<null>.
+C<description>, C<required>, C<default>, C<null>, C<format_as>.
 
 C<null> is the field's null value (the sentinel for "no data").
 
@@ -1658,6 +1677,25 @@ C<required> means operationally required at the service layer -- always,
 regardless of channel (web form, CLI, programmatic).  It is distinct
 from app-level conditional required logic, which calling applications
 manage independently.
+
+C<format_as> is a hint for the consuming application about how to present
+or input this field.  It is not used or validated by Concierge itself.
+
+Standard fields always have C<format_as> set to one of the Concierge
+conventions.  Applications may override C<format_as> on any standard
+field via C<field_overrides> during setup, and may set it to any value
+on app-defined fields via C<app_fields>.  Whatever value is supplied
+passes through unchanged and is returned by C<get_field_hints()>,
+allowing an application to store its own native format codes or
+identifiers directly in the field definition and retrieve them later
+without any translation layer.
+
+Concierge convention values for C<format_as>: C<text>, C<options>,
+C<boolean>, C<number>, C<date>, C<datetime>, C<time>.  All built-in
+enum fields use C<options>; the C<options> key in the hints hashref
+carries the full list of valid values, which consuming applications
+may use for both input widgets and display (e.g. rendering a
+previously selected value in context of its full option set).
 
 =head3 get_user_fields
 
@@ -1738,7 +1776,7 @@ __DATA__
 ################################################################################
 
 Configuration:
-  Version: v0.8.3
+  Version: v0.9.1
   Backend: Concierge::Users::Database  # Default; can be 'database', 'file', or 'yaml'
   Storage Directory: /path/to/storage  # Set during setup
   Generated: 2026-01-06 19:10:18
@@ -1748,12 +1786,12 @@ Field Definitions:
     user_id:
       field_name: user_id
       type: text
-      field_use: identity
       required: 1
       default: ""
       description: "User login ID - Primary authentication identifier"
       max_length: 30
       null_value: ""
+      format_as: text
 
     moniker:
       field_name: moniker
@@ -1765,6 +1803,7 @@ Field Definitions:
       max_length: 24
       must_validate: 1
       null_value: ""
+      format_as: text
 
     user_status:
       field_name: user_status
@@ -1779,6 +1818,7 @@ Field Definitions:
       max_length: 20
       must_validate: 1
       null_value: ""
+      format_as: options
 
     access_level:
       field_name: access_level
@@ -1796,6 +1836,7 @@ Field Definitions:
       validate_as: enum
       must_validate: 1
       null_value: ""
+      format_as: options
 
   Standard Fields:
     first_name:
@@ -1808,6 +1849,7 @@ Field Definitions:
       max_length: 50
       must_validate: 1
       null_value: ""
+      format_as: text
 
     middle_name:
       field_name: middle_name
@@ -1819,6 +1861,7 @@ Field Definitions:
       max_length: 50
       must_validate: 1
       null_value: ""
+      format_as: text
 
     last_name:
       field_name: last_name
@@ -1830,6 +1873,7 @@ Field Definitions:
       max_length: 50
       must_validate: 1
       null_value: ""
+      format_as: text
 
     prefix:
       field_name: prefix
@@ -1851,6 +1895,7 @@ Field Definitions:
       max_length: 10
       validate_as: enum
       null_value: ""
+      format_as: options
 
     suffix:
       field_name: suffix
@@ -1873,6 +1918,7 @@ Field Definitions:
       max_length: 10
       validate_as: enum
       null_value: ""
+      format_as: options
 
     organization:
       field_name: organization
@@ -1883,6 +1929,7 @@ Field Definitions:
       max_length: 100
       validate_as: text
       null_value: ""
+      format_as: text
 
     title:
       field_name: title
@@ -1893,6 +1940,7 @@ Field Definitions:
       max_length: 100
       validate_as: text
       null_value: ""
+      format_as: text
 
     email:
       field_name: email
@@ -1903,6 +1951,7 @@ Field Definitions:
       max_length: 255
       validate_as: email
       null_value: ""
+      format_as: text
 
     phone:
       field_name: phone
@@ -1913,6 +1962,7 @@ Field Definitions:
       max_length: 20
       validate_as: phone
       null_value: ""
+      format_as: text
 
     text_ok:
       field_name: text_ok
@@ -1923,16 +1973,7 @@ Field Definitions:
       max_length: 1
       validate_as: boolean
       null_value: ""
-
-    last_login_date:
-      field_name: last_login_date
-      type: timestamp
-      required: 0
-      default: "0000-00-00 00:00:00"
-      description: "Timestamp of last successful login"
-      max_length: 19
-      validate_as: timestamp
-      null_value: "0000-00-00 00:00:00"
+      format_as: boolean
 
     term_ends:
       field_name: term_ends
@@ -1943,24 +1984,38 @@ Field Definitions:
       max_length: 10
       validate_as: date
       null_value: 0000-00-00
+      format_as: date
 
   System Fields:
+    last_login_date:
+      field_name: last_login_date
+      type: timestamp
+      system: 1
+      required: 0
+      default: "0000-00-00 00:00:00"
+      description: "Timestamp of last successful login"
+      max_length: 19
+      null_value: "0000-00-00 00:00:00"
+      format_as: datetime
+
     last_mod_date:
       field_name: last_mod_date
       type: timestamp
-      field_use: system
+      system: 1
       required: 0
       default: "0000-00-00 00:00:00"
       description: "Timestamp of last profile modification"
       max_length: 19
       null_value: "0000-00-00 00:00:00"
+      format_as: datetime
 
     created_date:
       field_name: created_date
       type: timestamp
-      field_use: system
+      system: 1
       required: 1
       default: "0000-00-00 00:00:00"
       description: "Timestamp when user account was created"
       max_length: 19
       null_value: "0000-00-00 00:00:00"
+      format_as: datetime

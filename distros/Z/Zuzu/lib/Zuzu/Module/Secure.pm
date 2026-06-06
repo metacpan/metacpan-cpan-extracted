@@ -2,7 +2,7 @@ package Zuzu::Module::Secure;
 
 use utf8;
 
-our $VERSION = '0.001003';
+our $VERSION = '0.001005';
 
 use Crypt::AuthEnc::GCM qw(
 	gcm_decrypt_verify

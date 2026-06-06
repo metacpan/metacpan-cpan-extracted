@@ -12,29 +12,22 @@ use warnings;
 
 =head1 NAME
 
-=item Tstregex - A Hybrid Regex Diagnostic Tool (single file Library module and command tool)
+Tstregex - A Hybrid Regex Diagnostic Tool (single file Library module and command tool)
 
-=item shows the longest Regular Expression match / highlight the rejected part>
+ shows the longest Regular Expression match / highlight the rejected part
+ 
+ Example:
+ 
+ $ perl lib/Tstregex.pm '/^[a-z]*\d{3}$/' 'abc123' 'abc12a'
+ abc123
+ abc12a (^[a-z]*\d{3}$)
+    ^^^         ^^^^^^ (actually rendered in bold on terminal)
+ 
+ # Above, the normal parts are the longuest matching substring when bold parts highlights the rejected substring
+ #(idem with regexp lexical groups between parenthesis)
 
-=item .
-
-=item Example:
-
-=item .
-
-=item $ perl lib/Tstregex.pm '/^[a-z]*\d{3}$/' 'abc123' 'abc12a'
-
-=item abc123
-
-=item abcB<12a> (^[a-z]*B<\d{3}$>)
-
-=item .
-
-=item # Above, the normal parts are the longuest matching substring when bold parts highlights the rejected substring
-
-=item # (idem with regexp lexical groups between parenthesis)
-
-
+=cut
+ 
 =head1 SYNOPSIS
 
 C<$tstregex 'regex' string1 string2 ...   stringN>
@@ -51,17 +44,23 @@ shows key info on (un)matching..
 
 =head2 -d --diag
 
-Triggers the Enriched Diagnostic View. It displays:
-- The string with the failing part highlighted.
-- The exact token in the regex that caused the break.
-- A visual pointer (C<^--- HERE>) aligned with the regex syntax.
-- Execution time (useful for spotting ReDoS/Exponential backtracking).
+=over
+
+=item Triggers the Enriched Diagnostic View. It displays:
+
+=item - The string with the failing part highlighted.
+
+=item - The exact token in the regex that caused the break.
+
+=item - A visual pointer (C<^--- HERE>) aligned with the regex syntax.
+
+=item - Execution time (useful for spotting ReDoS/Exponential backtracking).
+
+=back
 
 =head2 -a --assert
 
 Misc: performs a huge test suite various a large collection of regexp tests with Tstregex..
-
-=head2
 
 =head1 Perl Module SYNOPSIS
 
@@ -116,16 +115,27 @@ Returns the offset of the original regexp in the raw regexp
 
 =head1 DESCRIPTION
 
-C<tstregex> is designed to solve the "Black Box" problem of Regular Expressions.
-When a complex regex fails, Perl usually just says "No Match". This tool
-identifies exactly B<where> and B<why> it failed by finding the longest possible
-partial match.
+=over
+
+=item B<tstregex> is designed to solve the "Black Box" problem of Regular Expressions.
+
+=item When a complex regex fails, Perl usually just says "No Match".
+
+=item This tool identifies exactly B<where> and B<why> it failed by finding the longest possible partial match.
+
+=back 
 
 =head1 EXAMPLE
 
-  $ perl lib/Tstregex.pm '/^[a-z]*\d{3}$/' 'abc123' 'abc12a'
-  abc123
-  abcB<12a> (B<^[a-z]*>\d{3}$)
+=over
+
+=item $ perl lib/Tstregex.pm '/^[a-z]*\d{3}$/' 'abc123' 'abc12a'
+
+=item abc123
+
+=item abcB<12a> (^[a-z]*B<\d{3}$>)
+
+=back
 
 I<The tool highlights the part of the string where the match failed.>
 
@@ -141,7 +151,17 @@ The engine breaks down your regex into a hierarchy of valid sub-patterns (lexica
 
 =item 2. Longest Match Search
 
-It iteratively tests these sub-patterns against the input string. It's not just checking if the start matches, but what is the I<maximum> sequence of instructions the engine could follow before hitting a wall.
+=back
+
+=over 4
+
+It iteratively tests these sub-patterns against the input string. 
+
+It's not just checking if the start matches, but what is the I<maximum> sequence of instructions the engine could follow before hitting a wall.
+
+=back
+
+=over 4
 
 =item 3. Failure Point Identification
 
@@ -321,24 +341,29 @@ package main;
             print '-' x 40, "\n";
             }
         }
+        
+    sub _get_re_val
+        {
+        return (
+                Tstregex::tstregex_get_match_len ($_[0]), 
+                Tstregex::tstregex_get_fail_token($_[0]), 
+                Tstregex::tstregex_get_re_clean  ($_[0])
+               );
+        }
 
     sub _display_standard
         {
         my ($pattern, $ctx) = @_;
         if (Tstregex::tstregex_is_full_match($ctx))
             {
-            print "$pattern";
-            print "\n";
+            print "$pattern\n";
+            return undef;
             }
-        else
-            {
-            my $match_len  = Tstregex::tstregex_get_match_len ($ctx);
-            my $fail_token = Tstregex::tstregex_get_fail_token($ctx);
-            my $re_clean   = Tstregex::tstregex_get_re_clean  ($ctx);
-            print substr($pattern, 0, $match_len), BOLD, substr($pattern, $match_len), RESET;
-            my $off = length($re_clean) - length($fail_token);
-            print ' (', substr($re_clean, 0, $off), BOLD, $fail_token, RESET, ")\n";
-            }
+        my ($match_len, $fail_token, $re_clean ) = _get_re_val($ctx);
+        print substr($pattern, 0, $match_len), BOLD, substr($pattern, $match_len), RESET;
+        my $off = length($re_clean) - length($fail_token);
+        print ' (', substr($re_clean, 0, $off), BOLD, $fail_token, RESET, ")\n";
+        undef;
         }
 
     sub _display_enriched
@@ -349,26 +374,23 @@ package main;
         if (Tstregex::tstregex_is_full_match($ctx))
             {
             print GREEN, '  Result: ', RESET, "$pattern (FULL MATCH)\n";
+            return undef;
             }
-        else
-            {
-            my $match_len  = Tstregex::tstregex_get_match_len    ($ctx);
-            my $fail_token = Tstregex::tstregex_get_fail_token   ($ctx);
-            my $re_clean   = Tstregex::tstregex_get_re_clean     ($ctx);
-            my $prefix_off = Tstregex::tstregex_get_prefix_offset($ctx);
-            my $re_raw     = Tstregex::tstregex_get_re_raw        ($ctx);
+        my ($match_len, $fail_token, $re_clean ) = _get_re_val($ctx);
+        my $prefix_off = Tstregex::tstregex_get_prefix_offset($ctx);
+        my $re_raw     = Tstregex::tstregex_get_re_raw        ($ctx);
 
-            print YELLOW, '  Result: ', RESET, substr($pattern, 0, $match_len),
-                  BOLD, WHITE, substr($pattern, $match_len), RESET;
-            print ' (at ', CYAN, $fail_token, RESET, ")\n";
+        print YELLOW, '  Result: ', RESET, substr($pattern, 0, $match_len),
+              BOLD, WHITE, substr($pattern, $match_len), RESET;
+        print ' (at ', CYAN, $fail_token, RESET, ")\n";
 
-            my $err_pos_in_clean = length($re_clean) - length($fail_token);
-            my $final_pointer_pos = $prefix_off + $err_pos_in_clean;
+        my $err_pos_in_clean = length($re_clean) - length($fail_token);
+        my $final_pointer_pos = $prefix_off + $err_pos_in_clean;
 
-            print '  Syntax: ', WHITE, $re_raw, RESET, "\n";
-            print '            ', ' ' x $final_pointer_pos, BOLD, RED, '^--- HERE', RESET, "\n";
-            }
+        print '  Syntax: ', WHITE, $re_raw, RESET, "\n";
+        print '            ', ' ' x $final_pointer_pos, BOLD, RED, '^--- HERE', RESET, "\n";
         printf "  Time:    %.4fs\n\n", $elapsed;
+        undef;
         }
 
     sub help
@@ -394,7 +416,7 @@ package main;
 
 package Tstregex;
     {
-    our $VERSION = '1.08';
+    our $VERSION = '1.10';
     use Exporter qw(import);
 
     our @EXPORT  = qw(

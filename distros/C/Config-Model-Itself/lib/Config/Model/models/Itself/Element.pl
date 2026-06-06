@@ -35,6 +35,8 @@ return [
   include => ['Itself::NonWarpableElement' ,'Itself::WarpableElement'],
   include_after => 'type' , 
 
+  gist => '{level} {status} {type}',
+
   'element' 
   => [
 
@@ -86,9 +88,10 @@ return [
           config_class_name => 'Itself::WarpValue',
           warp => {
               follow => { elt_type => '- type' },
-              rules  => [
-                  '$elt_type ne "node"' => { level => 'normal' }
-              ]
+              rules  => [{
+                  when => '$elt_type ne "node"',
+                  apply => { level => 'normal' }
+              }]
           },
           description => "change the properties (i.e. default value or its value_type) dynamically according to the value of another Value object located elsewhere in the configuration tree. "
       },
@@ -98,15 +101,17 @@ return [
       => { type => 'leaf',
            value_type => 'enum',
            level      => 'hidden' ,
-           warp => { follow => '?type',
-                     'rules'
-                     => { 'hash' => {
-                                     level => 'important',
-                                     mandatory => 1,
-                                     choice => [qw/string integer/] ,
-                                    }
-                        }
-                   },
+           warp => {
+               follow => { type => '?type'},
+               'rules' => [{
+                   when => '$type eq "hash"',
+                   apply => {
+                       level => 'important',
+                       mandatory => 1,
+                       choice => [qw/string integer/] ,
+                   }
+               }]
+           },
            description => 'Specify the type of allowed index for the hash. "String" means no restriction.',
          },
 
@@ -115,12 +120,13 @@ return [
           level => 'hidden',
           warp => {
               follow => { 't' => '- type' },
-              'rules' => [
-                  '$t eq "list" or $t eq "hash"' => {
+              'rules' => [{
+                  when => '$t eq "list" or $t eq "hash"',
+                  apply => {
                       level => 'normal',
                       config_class_name => 'Itself::CargoElement',
                   },
-              ],
+              }],
           },
           description => 'Specify the properties of the configuration element configuration in this hash or list',
       }

@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Itself 2.030;
+package Config::Model::Itself 2.031;
 
 use Mouse ;
 use Mouse::Util::TypeConstraints;
@@ -18,7 +18,7 @@ use warnings;
 use feature qw/postderef signatures/;
 no warnings qw/experimental::postderef experimental::signatures/;
 
-use Config::Model 2.157;
+use Config::Model 2.163;
 use IO::File ;
 use Log::Log4perl 1.11;
 use Carp ;
@@ -342,8 +342,6 @@ sub normalize_model {
     my $raw_model =  $tmp_model -> get_raw_model( $model_name ) ;
     my $new_model =  $tmp_model -> get_model_clone( $model_name ) ;
 
-    $self->upgrade_model($model_name, $new_model);
-
     # track read class to identify later classes added by user
     $self->add_tracked_class($model_name);
 
@@ -351,14 +349,8 @@ sub normalize_model {
     # was done, mark the class as changed so it will be saved later
     $self->add_modified_class($model_name) unless Compare($raw_model, $new_model) ;
 
-    foreach my $item (qw/description summary level experience status/) {
-        foreach my $elt_name (keys %{$new_model->{element}}) {
-            my $moved_data = delete $new_model->{$item}{$elt_name}  ;
-            next unless defined $moved_data ;
-            $new_model->{element}{$elt_name}{$item} = $moved_data ;
-        }
-        delete $new_model->{$item} ;
-    }
+    # translate legacy and copy packed status, level, etc inside element hash
+    $tmp_model->copy_element_properties($new_model, $raw_model, $model_name);
 
     # Since accept specs and elements are stored in a ordered hash,
     # load_data expects a array ref instead of a hash ref.
@@ -383,46 +375,9 @@ sub normalize_model {
     return $new_model ;
 }
 
-# can be removed end of 2019 (after buster is released)
-sub upgrade_model {
-    my ($self, $config_class_name, $model) = @_ ;
-
-    my $multi_backend = 0;
-    foreach my $config (qw/read_config write_config/) {
-        my $ref = $model->{$config};
-        if ($ref and ref($ref) eq 'ARRAY') {
-            if (@$ref == 1) {
-                $model->{$config} = $ref->[0];
-            }
-            elsif (@$ref > 1){
-                $logger->warn("$config_class_name $config: cannot migrate multiple backends to rw_config");
-                $multi_backend++;
-            }
-        }
-    }
-
-    if ($model->{read_config} and not $multi_backend) {
-        say ("Model $config_class_name: moving read_config specification to rw_config");
-        $model->{rw_config} = delete $model->{read_config};
-    }
-
-    if ($model->{write_config} and not $multi_backend) {
-        say "Model $config_class_name: merging write_config specification in rw_config";
-        if (not $multi_backend) {
-            foreach my $spec ( keys %{$model->{write_config}} ) {
-                $model->{rw_config}{$spec} = $model->{write_config}{$spec}
-            } ;
-            delete $model->{write_config};
-        }
-    }
-    return;
-}
-
 # internal
-sub get_perl_data_model ($self, %args) {
+sub get_perl_data_model ($self, $class_name, $factorize = 'all') {
     my $root_obj = $self->{meta_root};
-    my $class_name = $args{class_name}
-      || croak __PACKAGE__," read: undefined class name";
 
     my $class_element = $root_obj->fetch_element('class') ;
 
@@ -437,10 +392,147 @@ sub get_perl_data_model ($self, %args) {
     # - Do NOT translate legacy warp parameters
     # - Do not compact elements name
 
+    factorize_model($model, $factorize);
+
     # don't forget to add name
     $model->{name} = $class_name if keys %$model;
 
     return $model ;
+}
+
+# depending on property, the factorization method is different
+my %may_factorize = (
+    description => \&factorize_with_alias,
+    level => \&factorize_reverse_packed,
+    status => \&factorize_reverse_packed,
+    summary => \&factorize_with_alias,
+    warp => \&factorize_with_alias,
+);
+
+# move some element data out of element structure, and reduce
+# redundancies
+sub factorize_model ($model, $factorize = 'none') {
+    my $to_factorize = get_properties_to_factorize($factorize);
+
+    move_properties_out_of_element($model, $to_factorize);
+
+    factorize_element($model->{element});
+
+    # compare elements data and remove duplicated data
+    while (my ($prop, $sub) = each $to_factorize->%*) {
+        $sub->($model->{$prop});
+    }
+}
+
+sub get_properties_to_factorize($factorize) {
+    my %to_factorize;
+    if ($factorize eq 'all') {
+        %to_factorize =  %may_factorize;
+    }
+    elsif ($factorize ne 'none') {
+        my @factorize = split /,/,$factorize;
+        foreach my $prop (@factorize) {
+            if ($may_factorize{$prop}) {
+                $to_factorize{$prop} = $may_factorize{$prop};
+            } else {
+                carp "unexpected item to factorize: $prop. Expected ".
+                    join(' ', sort keys %may_factorize);
+            }
+        }
+    }
+    return \%to_factorize;
+}
+
+sub move_properties_out_of_element ($model, $to_factorize) {
+    my $moved;
+    for my $prop (sort keys $to_factorize->%*) {
+        $moved->{$prop} = $model->{$prop} // {};
+        next unless defined $model->{element};
+
+        for (my $idx = 0; $idx < $model->{element}->@*; $idx+=2) {
+            my $elt_name = $model->{element}[$idx];
+            my $data = $model->{element}[$idx+1];
+            if (ref $data and $data->{$prop}) {
+                $moved->{$prop}{$elt_name} = delete $data->{$prop};
+            }
+        }
+        if (keys $moved->{$prop}->%* > 0) {
+            $model->{$prop} = $moved->{$prop};
+        }
+    }
+}
+
+# transform { eltA => data, eltB => data}
+# in { eltA => data, eltB => '*eltA' }
+sub factorize_with_alias ($property_set) {
+    return unless defined $property_set;
+    my %equiv;
+    foreach my $property_name (sort keys $property_set->%*) {
+        my $property_data = $property_set->{$property_name};
+
+        my $found;
+        foreach my $equiv_key (sort keys %equiv) {
+            if (Compare($property_data, $equiv{$equiv_key})) {
+                $found = $equiv_key;
+                last;
+            }
+        }
+        if ($found) {
+            $property_set->{$property_name} = "*$found";
+        }
+        else {
+            $equiv{$property_name} = $property_data;
+        }
+    }
+}
+
+# transform { eltA => str, eltB => other, eltC => str}
+# in { str => [eltA, eltC], other => eltB }
+sub factorize_reverse_packed ($property_set) {
+    return unless defined $property_set;
+    my %old = $property_set->%*;
+    my %new;
+
+    foreach my $property_name (sort keys %old) {
+        my $property_data = $old{$property_name};
+        if (ref $property_data) {
+            carp "value of $property_name is not a scalar";
+        }
+
+        if (not exists $new{$property_data}) {
+            $new{$property_data} = $property_name;
+        }
+        elsif (not ref $new{$property_data}) {
+            $new{$property_data} = [ $new{$property_data} , $property_name];
+        }
+        else {
+            push $new{$property_data}->@*, $property_name;
+        }
+    }
+    $property_set->%* = %new;
+    return;
+}
+
+# this is similar to factorize_data, but the element order must be
+# preserved.
+sub factorize_element ($factorized_element) {
+    return unless defined $factorized_element;
+    my $previous_data;
+    my $previous_name;
+
+    for (my $idx = 0; $idx < $factorized_element->@*; $idx+=2) {
+        my $name = $factorized_element->[$idx];
+        my $data = $factorized_element->[$idx+1];
+
+        if (Compare($data, $previous_data)) {
+            $factorized_element->[$idx+1] = "*$previous_name";
+        }
+        elsif (ref $data) {
+            $previous_name = $name;
+            $previous_data = $data;
+        }
+        # else $data is already an alias
+    }
 }
 
 sub write_app_files {
@@ -481,6 +573,7 @@ sub write_app_files {
 sub write_all ($self, %args) {
     my $root_obj = $self->meta_root ;
     my $dir = $self->model_dir ;
+    my $factorize = delete $args{factorize} // 'all';
 
     croak "write_all: unexpected parameters ",join(' ', keys %args) if %args ;
 
@@ -512,7 +605,7 @@ sub write_all ($self, %args) {
     my %map_to_write = (%$map,%new_map) ;
 
     foreach my $file (keys %map_to_write) {
-        my $data = $self->check_model_to_write($file, \%map_to_write, \%loaded_classes);
+        my $data = $self->check_model_to_write($file, $factorize, \%map_to_write, \%loaded_classes);
         next unless @$data ; # don't write empty model
         write_model_file ($dir->child($file), $self->{header}{$file}, $data);
         delete $map_to_write{$file};
@@ -527,8 +620,7 @@ sub write_all ($self, %args) {
     return;
 }
 
-sub check_model_to_write {
-    my ($self, $file, $map_to_write, $loaded_classes) = @_;
+sub check_model_to_write ($self, $file, $factorize, $map_to_write, $loaded_classes) {
     $logger->info("checking model file $file");
 
     my @data ;
@@ -543,10 +635,9 @@ sub check_model_to_write {
     if ($file_needs_write) {
         foreach my $class_name (@{$map_to_write->{$file}}) {
             $logger->info("writing class $class_name");
-            my $model = $self-> get_perl_data_model(class_name => $class_name) ;
+            my $model = $self-> get_perl_data_model($class_name, $factorize) ;
             push @data, $model if defined $model and keys %$model;
 
-            my $node = $self->{meta_root}->grab("class:".$class_name) ;
             # remove class name from above list
             delete $loaded_classes->{$class_name} ;
         }
@@ -653,7 +744,9 @@ sub write_model_file {
     $wr_file->spew_utf8(
         @$comments,
         "use strict;\n",
-        "use warnings;\n\n",
+        "use warnings;\n",
+        "use v5.20;\n",
+        "use utf8;\n\n",
         "return $dump;\n",
     );
 
@@ -811,7 +904,7 @@ Config::Model::Itself - Model (or schema) editor for Config::Model
 
 =head1 VERSION
 
-version 2.030
+version 2.031
 
 =head1 SYNOPSIS
 

@@ -9,13 +9,13 @@ build_requires:
   strict: '0'
   utf8: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.70'
+  ExtUtils::MakeMaker: '7.0'
   File::Find: '0'
   File::Spec: '0'
   strict: '0'
   warnings: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,6 +32,7 @@ requires:
   perl: '5.014000'
   warnings: '0'
 resources:
-  repository: git://github.com/mauke/Quote-Code
-version: '1.0104'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  bugtracker: https://codeberg.org/mauke/Quote-Code/issues
+  repository: https://codeberg.org/mauke/Quote-Code.git
+version: '1.0105'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

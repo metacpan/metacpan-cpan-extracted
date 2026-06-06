@@ -2,7 +2,7 @@ package Zuzu::Module::DB;
 
 use utf8;
 
-our $VERSION = '0.001003';
+our $VERSION = '0.001005';
 
 use DBI ();
 use Scalar::Util qw( blessed );

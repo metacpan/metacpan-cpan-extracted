@@ -2,7 +2,7 @@ package Zuzu::Module::CLib;
 
 use utf8;
 
-our $VERSION = '0.001003';
+our $VERSION = '0.001005';
 
 use FFI::Platypus 2.00;
 use FFI::Platypus::Buffer qw( scalar_to_buffer buffer_to_scalar );

@@ -39,12 +39,6 @@ or
 
     dzil test
 
-`dzil` may complain about missing `EmailNotify` or `Twitter`
-plugin. You may ignore this or edit [dist.ini](dist.ini) to comment
-out the last 2 sections. These are useful only to the author when
-releasing a new version.
-
-
 `dzil` may also return an error like `Cannot determine local time
 zone`. In this case, you should specify explicitely your timezone in
 a `TZ` environement variable. E.g run `dzil` this way:

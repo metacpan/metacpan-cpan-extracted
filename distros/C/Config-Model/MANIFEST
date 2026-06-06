@@ -82,6 +82,7 @@ lib/Config/Model/models/Fstab/SwapOptions.pl
 lib/Config/Model/models/Fstab/UsbFsOptions.pl
 lib/Config/Model/models/PopCon.pl
 lib/Config/Model/models/PopCon.pod
+lib/Config/Model/scripts/translate_legacy
 lib/Config/Model/system.d/fstab
 lib/Config/Model/system.d/popcon
 t/README.md

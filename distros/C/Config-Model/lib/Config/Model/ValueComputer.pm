@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::ValueComputer 2.162;
+package Config::Model::ValueComputer 2.163;
 
 use Mouse;
 use MouseX::StrictConstructor;
@@ -544,7 +544,7 @@ Config::Model::ValueComputer - Provides configuration value computation
 
 =head1 VERSION
 
-version 2.162
+version 2.163
 
 =head1 SYNOPSIS
 
@@ -556,10 +556,11 @@ version 2.162
     name => "MyClass",
 
     element => [
-       [qw/av bv/] => {
+       av => {
            type => 'leaf',
            value_type => 'integer',
        },
+       bv => '*av',
        compute_int => {
 	       type => 'leaf',
                value_type => 'integer',
@@ -865,10 +866,11 @@ Example:
 
 =head2 String substitution
 
- [qw/sav sbv/] => {
+ sav => {
      type       => 'leaf',
      value_type => 'string',
    },
+ sbv => '*sav',
  compute_string => {
      type       => 'leaf',
      value_type => 'string',

@@ -1,8 +1,20 @@
-2.099005 - 2026-05-31
+2.099007 - 2026-06-05
 
   [BUG FIXES]
 
-  * reengineer GH builder workflow to migrate from qemu to matrix native
+  * fix syntax error after inadvertent GH push
+
+2.099006 - 2026-06-05
+
+  [ENHANCEMENTS]
+
+  * #1282 #1466 fix mis-encoded MACs 7 bytes with a leading 0x06
+
+2.099005 - 2026-05-31
+
+  [ENHANCEMENTS]
+
+  * migrate github build from qemu to matrix for multi-arch
 
 2.099004 - 2026-05-29
 

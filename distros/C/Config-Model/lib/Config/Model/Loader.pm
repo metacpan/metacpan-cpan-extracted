@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Loader 2.162;
+package Config::Model::Loader 2.163;
 
 use Carp;
 use strict;
@@ -110,10 +110,6 @@ sub load ($self, %args) {
     croak "load error: missing 'steps' parameter" unless defined $steps;
 
     my $caller_is_root = delete $args{caller_is_root};
-
-    if (delete $args{experience}) {
-        carp "load: experience parameter is deprecated";
-    }
 
     my $inst = $node->instance;
 
@@ -1160,7 +1156,7 @@ Config::Model::Loader - Load serialized data into config tree
 
 =head1 VERSION
 
-version 2.162
+version 2.163
 
 =head1 SYNOPSIS
 
@@ -1171,10 +1167,11 @@ version 2.162
   $model->create_config_class(
     name    => "Foo",
     element => [
-        [qw/foo bar/] => {
+        foo => {
             type       => 'leaf',
             value_type => 'string'
         },
+        bar => '*foo',
     ]
  );
 
@@ -1183,10 +1180,11 @@ version 2.162
 
     element => [
 
-        [qw/foo bar/] => {
+        foo => {
             type       => 'leaf',
             value_type => 'string'
         },
+        bar => '*foo',
         hash_of_nodes => {
             type       => 'hash',     # hash id
             index_type => 'string',
@@ -1195,12 +1193,14 @@ version 2.162
                 config_class_name => 'Foo'
             },
         },
-        [qw/lista listb/] => {
-			      type => 'list',
-			      cargo =>  {type => 'leaf',
-					 value_type => 'string'
-					}
-			      },
+        lista => {
+            type => 'list',
+            cargo =>  {
+                type => 'leaf',
+                value_type => 'string'
+            }
+        },
+        listb => '*lista',
     ],
  ) ;
 

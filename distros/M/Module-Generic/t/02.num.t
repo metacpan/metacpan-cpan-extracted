@@ -65,6 +65,7 @@ $lconv = $Module::Generic::Number::DEFAULT if( !$curr_locale );
 #         @$lconv{ @$fail } = ( -1 ) x scalar( @$fail );
 # POSIX::setlocale( &POSIX::LC_ALL, $prev_locale );
 my( $sep_space, $tho_sep, $dec_sep, $grouping, $n );
+my( $mon_tho_sep, $mon_dec_sep, $mon_grouping );
 
 # NOTE: Mirror the normalisation done in Module::Generic::Number for
 # POSIX::localeconv()->{grouping}. The first byte is the size of the first digit group;
@@ -87,7 +88,23 @@ if( !scalar( keys( %$lconv ) ) || [split(/\./, $curr_locale)]->[0] eq 'C' )
     $tho_sep = ',';
     $dec_sep = '.';
     $grouping = 3;
-    $n = Module::Generic::Number->new( 10, precision => 2, thousand => $tho_sep, decimal => $dec_sep, grouping => $grouping, debug => $DEBUG );
+    # NOTE: When no real locale is available we fake an en_US style numeric format. Since
+    # format_money() now follows the monetary category independently, we must fake the
+    # monetary trio too, otherwise it would resolve to the C locale (no grouping) and
+    # diverge from the numeric expectation below.
+    $mon_tho_sep = ',';
+    $mon_dec_sep = '.';
+    $mon_grouping = 3;
+    $n = Module::Generic::Number->new( 10,
+        precision    => 2,
+        thousand     => $tho_sep,
+        decimal      => $dec_sep,
+        grouping     => $grouping,
+        mon_thousand => $mon_tho_sep,
+        mon_decimal  => $mon_dec_sep,
+        mon_grouping => $mon_grouping,
+        debug        => $DEBUG
+    );
 }
 else
 {
@@ -97,8 +114,24 @@ else
     $dec_sep = CORE::length( $lconv->{decimal_point} // '' )
         ? $lconv->{decimal_point}
         : $lconv->{mon_decimal_point};
+    # NOTE: Plain number grouping follows the LC_NUMERIC category only, exactly as
+    # Module::Generic::Number resolves it. We deliberately do not fall back to
+    # mon_grouping here. The module normalises lconv->{grouping} to a defined 0 before
+    # its own grouping/mon_grouping fallback runs, so a defined 0 always wins and the
+    # monetary grouping is never reached for a plain number. Under a mixed locale such
+    # as LC_NUMERIC=C with LC_MONETARY=en_US.UTF-8, the correct grouping for a plain
+    # number is therefore 0 (no grouping), and the expectation must mirror that.
     $grouping = normalise_lconv_grouping( $lconv->{grouping} );
-    $grouping = normalise_lconv_grouping( $lconv->{mon_grouping} ) if( !$grouping );
+    # NOTE: Money follows the LC_MONETARY category. Mirror format_money(): use the
+    # monetary value when present, otherwise fall back to the numeric one. mon_grouping
+    # is normalised the same way as grouping.
+    $mon_tho_sep = CORE::length( $lconv->{mon_thousands_sep} // '' )
+        ? $lconv->{mon_thousands_sep}
+        : $tho_sep;
+    $mon_dec_sep = CORE::length( $lconv->{mon_decimal_point} // '' )
+        ? $lconv->{mon_decimal_point}
+        : $dec_sep;
+    $mon_grouping = normalise_lconv_grouping( $lconv->{mon_grouping} );
     $n = Module::Generic::Number->new( 10, precision => 2, debug => $DEBUG );
 }
 $sep_space = int( $lconv->{p_sep_by_space} // 0 ) > 0 ? qr/[[:blank:]\h]+/ : '';
@@ -296,6 +329,8 @@ is( $n3, 1281284, 'Unformat resulting value' );
 is( $n3->precision, 2, 'New object precision' );
 $dec_sep = '' if( !defined( $dec_sep ) );
 $tho_sep = '' if( !defined( $tho_sep ) );
+$mon_dec_sep = $dec_sep if( !defined( $mon_dec_sep ) );
+$mon_tho_sep = $tho_sep if( !defined( $mon_tho_sep ) );
 # NOTE: Build the expected formatted string honestly based on what the system locale
 # really supports. If grouping is 0 (or thousand separator is empty),
 # the formatted output will not contain any group separator, and the test must reflect
@@ -315,14 +350,27 @@ if( $ENV{AUTOMATED_TESTING} || $ENV{AUTHOR_TESTING} )
 # diag( "Number::Format object is: ", Dumper( $n3->{_fmt} ) );
 is( $n3->format, $expected_number, "Formatting number using format() -> ${expected_number}" );
 is( $n3->currency, '€', "Currency symbol -> '€'" );
+# NOTE: format_money() follows the monetary category, which can differ from the numeric
+# one (e.g. LC_NUMERIC=C with a populated LC_MONETARY), so its expected value is built
+# from the monetary trio rather than from $expected_number.
+my $mon_grouped_int = '1281284';
+if( $mon_grouping && $mon_grouping > 0 && CORE::length( $mon_tho_sep ) )
+{
+    $mon_grouped_int = reverse( join( $mon_tho_sep, unpack( "(A${mon_grouping})*", reverse( '1281284' ) ) ) );
+}
+my $expected_money = "${mon_grouped_int}${mon_dec_sep}00";
+if( $ENV{AUTOMATED_TESTING} || $ENV{AUTHOR_TESTING} )
+{
+    diag( "Expected money: '${expected_money}' (mon_grouping=${mon_grouping}, mon_tho_sep='${mon_tho_sep}', mon_dec_sep='${mon_dec_sep}')" );
+}
 my $n_money = $n3->format_money;
 if( $n3->precede )
 {
-    like( "$n_money", qr/€${sep_space}\Q${expected_number}\E/, 'Formatting money using format_money()' );
+    like( "$n_money", qr/€${sep_space}\Q${expected_money}\E/, 'Formatting money using format_money()' );
 }
 else
 {
-    like( "$n_money", qr/\Q${expected_number}\E${sep_space}€/, 'Formatting money using format_money()' );
+    like( "$n_money", qr/\Q${expected_money}\E${sep_space}€/, 'Formatting money using format_money()' );
 }
 isa_ok( $n_money, 'Module::Generic::Scalar', 'Returns string object upon formatting' );
 $n3 *= -1;
@@ -549,6 +597,103 @@ subtest 'Thread-safe operations' => sub
             ok( 1, 'Skipped format test due to C locale' );
         }
     };
+};
+
+# NOTE: Monetary formatting must follow its own trio (mon_decimal, mon_thousand,
+# mon_grouping) independently from the numeric trio used by format(). These cases are
+# built with explicit values so they remain deterministic regardless of the system
+# locale installed on the smoker.
+subtest 'Monetary trio independent from numeric trio' => sub
+{
+    my $saved_locale = POSIX::setlocale( &POSIX::LC_ALL );
+    POSIX::setlocale( &POSIX::LC_ALL, 'C' );
+
+    ok( Module::Generic::Number->new( 1 )->posix_strict, 'posix_strict defaults to true' );
+
+    # Numeric: no grouping. Monetary: grouped by 3 with a comma.
+    my $n = Module::Generic::Number->new( 1281284,
+        precision    => 2,
+        decimal      => '.',
+        thousand     => ',',
+        grouping     => 0,
+        mon_decimal  => '.',
+        mon_thousand => ',',
+        mon_grouping => 3,
+        currency     => '€',
+        precede      => 0,
+        space_pos    => 0,
+        debug        => $DEBUG,
+    );
+    isa_ok( $n, 'Module::Generic::Number', 'object with explicit numeric and monetary trios' );
+    is( $n->grouping, 0, 'numeric grouping accessor returns 0' );
+    is( $n->mon_grouping, 3, 'monetary grouping accessor returns 3' );
+    is( $n->mon_decimal, '.', 'monetary decimal accessor' );
+    is( $n->mon_thousand, ',', 'monetary thousand accessor' );
+    is( $n->format, '1281284.00', 'format() is not grouped when numeric grouping is 0' );
+    like( $n->format_money, qr/\Q1,281,284.00\E€/, 'format_money() groups using the monetary trio' );
+
+    # The mirror image: numeric grouped, monetary not grouped.
+    my $n2 = Module::Generic::Number->new( 1281284,
+        precision    => 2,
+        decimal      => '.',
+        thousand     => ',',
+        grouping     => 3,
+        mon_decimal  => '.',
+        mon_thousand => '',
+        mon_grouping => 0,
+        currency     => '€',
+        precede      => 0,
+        space_pos    => 0,
+        debug        => $DEBUG,
+    );
+    is( $n2->format, '1,281,284.00', 'format() groups when numeric grouping is 3' );
+    like( $n2->format_money, qr/\Q1281284.00\E€/, 'format_money() is not grouped when monetary grouping is 0' );
+
+    # Distinct separators between the two categories.
+    my $n3 = Module::Generic::Number->new( 1281284,
+        precision    => 2,
+        decimal      => ',',
+        thousand     => '.',
+        grouping     => 3,
+        mon_decimal  => ',',
+        mon_thousand => ' ',
+        mon_grouping => 3,
+        currency     => '€',
+        precede      => 0,
+        space_pos    => 1,
+        debug        => $DEBUG,
+    );
+    is( $n3->format, '1.281.284,00', 'numeric format uses its own separators' );
+    like( $n3->format_money, qr/\Q1 281 284,00 €\E/, 'money format uses its own separators and spacing' );
+
+    POSIX::setlocale( &POSIX::LC_ALL, $saved_locale ) if( defined( $saved_locale ) );
+};
+
+# NOTE: Resolution path under a real mixed locale (numeric C, monetary en_US). This is
+# environment-dependent, so it is skipped when the required locales are not installed or
+# when localeconv does not actually expose a monetary grouping on this system.
+subtest 'Mixed locale resolution (LC_NUMERIC=C, LC_MONETARY=en_US)' => sub
+{
+    my $saved_locale = POSIX::setlocale( &POSIX::LC_ALL );
+    SKIP:
+    {
+        my $mon_ok = eval{ POSIX::setlocale( &POSIX::LC_MONETARY, 'en_US.UTF-8' ) };
+        my $num_ok = eval{ POSIX::setlocale( &POSIX::LC_NUMERIC, 'C' ) };
+        if( !defined( $mon_ok ) || !$mon_ok || !defined( $num_ok ) )
+        {
+            skip( 'en_US.UTF-8 monetary locale not available', 2 );
+        }
+        my $lconv = POSIX::localeconv();
+        my $mg = normalise_lconv_grouping( $lconv->{mon_grouping} );
+        if( !$mg || $mg <= 0 )
+        {
+            skip( 'Monetary grouping not exposed by this system', 2 );
+        }
+        my $n = Module::Generic::Number->new( 1281284, precision => 2, currency => '€', precede => 0, space_pos => 0, debug => $DEBUG );
+        is( $n->format, '1281284.00', 'strict: plain number not grouped under LC_NUMERIC=C' );
+        like( $n->format_money, qr/\Q1,281,284.00\E/, 'strict: money grouped following LC_MONETARY' );
+    };
+    POSIX::setlocale( &POSIX::LC_ALL, $saved_locale ) if( defined( $saved_locale ) );
 };
 
 done_testing();

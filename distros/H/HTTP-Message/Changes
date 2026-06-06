@@ -1,5 +1,8 @@
 Revision history for HTTP-Message
 
+7.02      2026-06-05 23:28:36Z
+    - now handling HTTP method '0' (GH#211) (Karen Etheridge)
+
 7.01      2025-10-19 17:22:21Z
     - Fix HTTP::Response and HTTP::Request as_string/parse commutativity issue
       #62959 (GH#212) (Copilot)

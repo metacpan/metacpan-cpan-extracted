@@ -5,7 +5,6 @@ Makefile.PL
 Makefile_PL_settings.plx
 MANIFEST
 MANIFEST.SKIP
-README
 t/00-load.t
 t/01-bare.t
 t/02-unload.t
@@ -19,3 +18,4 @@ t/09-words.t
 xt/pod.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   generated from Quote::Code POD (added by maint/eumm-fixup.pl)

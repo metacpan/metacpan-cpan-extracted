@@ -4,6 +4,7 @@
 ^docs(?:/|$)
 ^Makefile$
 ^MYMETA\.(?:json|yml)$
+^blib(?:/|$)
 zuzu-test.sock
 MANIFEST.bak
 ^Zuzu-[0-9._]+\.tar\.gz$

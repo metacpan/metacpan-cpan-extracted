@@ -151,8 +151,10 @@ SKIP: {
     MainLoop ;                  # Tk's
 }
 
-note("testing memory cycles. Please wait...");
-memory_cycle_ok($meta_model,"memory cycles");
+unless ($args->{show} || $args->{interactive}) {
+    note("testing memory cycles. Please wait...");
+    memory_cycle_ok($meta_model,"memory cycles");
+}
 
 done_testing;
 

@@ -1,12 +1,13 @@
 (?<![^/])\.
 ^[^/]*\.(?:tar|gz)\z
-\.(?:[iocs]|bs)\z
-^Quote-Code-
+^Code\.(?:[iocs]|bs)\z
 ^MANIFEST\.(?!SKIP\z)
 ^MYMETA\.
 ^Makefile\z
 ^Makefile\.(?!PL\z)
+^Makefile_PL_settings_maint.plx\z
 ^blib/
 ^maint/
 ^pm_to_blib\z
-^untracked
+^untracked/
+^xt/

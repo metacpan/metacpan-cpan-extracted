@@ -1,10 +1,9 @@
 Changes
 lib/Tstregex.pm
-main
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-META_new.yml
+META_new.json
 README.md
 t/01-engine.t
 t/02-captures.t
@@ -22,6 +21,5 @@ t/13-bounds-quantifiers.t
 t/14-look-around.t
 t/15-anchors.t
 t/Helper.pm
-test_doc.html
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

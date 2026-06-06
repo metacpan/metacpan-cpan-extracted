@@ -133,7 +133,7 @@ subtest "minimal modification" => sub {
     is($ok->stdout.'', '', 'modify: no message on stdout' );
 
     file_contents_like $conf_file->stringify,   qr/cme/,       "updated header";
-    file_contents_like $conf_file->stringify, qr/yes"\nMY/, "reordered file";
+    file_contents_like $conf_file->stringify, qr/yes"\nMY/, "reordered file"; #"
     file_contents_unlike $conf_file->stringify, qr/removed/,   "double comment is removed";
 
     # check backup
@@ -160,7 +160,7 @@ subtest "modification with good parameter" => sub {
     is($ok->stderr.'', '', 'modify: no log on stderr' );
     is($ok->stdout.'', '', 'modify: no message on stdout' );
     file_contents_like $conf_file->stringify,   qr/cme/,      "updated header";
-    file_contents_unlike $conf_file->stringify, qr/removed`/, "double comment is removed";
+    file_contents_unlike $conf_file->stringify, qr/removed`/, "double comment is removed"; #`
 };
 
 subtest "modification with verbose option" => sub {
@@ -359,6 +359,22 @@ Changes applied to popcon configuration:
 - MY_HOSTID: 'aaaaaaaaaaaaaaaaaaaa' -> 'with_code'
 )
     },
+    {
+        label => "line ".__LINE__.": get doc from script with Perl format",
+        script => [
+            <<'EOS'
+#!/usr/bin/perl
+
+## some documentation
+## some more
+EOS
+        ],
+        exec_mode => 1,
+        args => [qw/--doc/],
+        stdout => q(some documentation
+some more
+)
+    },
 );
 
 
@@ -381,8 +397,10 @@ foreach my $test ( @script_tests) {
         is( $ok->error, undef, 'threw no exceptions');
         is( $ok->exit_code, 0, "all went well" ) or diag("Failed command: @$cmd");
 
-        file_contents_like $conf_file->stringify, $test->{test},
-            "updated MY_HOSTID with script" ,{ encoding => 'UTF-8' };
+        if ($test->{test}) {
+            file_contents_like $conf_file->stringify, $test->{test},
+                "updated MY_HOSTID with script" ,{ encoding => 'UTF-8' };
+        }
         is(colorstrip($ok->stderr), $test->{stderr} || '', 'run "'.$test->{label}.'" stderr content' );
         is(colorstrip($ok->stdout.''), $test->{stdout} || '', 'run "'.$test->{label}.'": stdout content' );
     };

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Finfo.pm
-## Version v0.5.6
+## Version v0.5.7
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2026/04/05
+## Modified 2026/06/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -63,7 +63,7 @@ BEGIN
     };
     our %EXPORT_TAGS = ( all => [qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE )] );
     our @EXPORT_OK = qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE );
-    our $VERSION = 'v0.5.6';
+    our $VERSION = 'v0.5.7';
 };
 
 use strict;
@@ -432,24 +432,38 @@ sub _datetime
     my $repo = Module::Generic::Global->new( 'local_tz' => 'system' );
     my $has_local_tz = $repo->get;
     my $dt;
+    # NOTE: Only the boolean capability flag is cached in the shared repository. The
+    # DateTime::Lite object itself is always built locally, further below, from the
+    # resolved flag. A previous implementation built $dt only inside the locked
+    # initialisation block, so any thread that acquired the lock after another thread
+    # had already populated the flag would skip the inner block entirely and leave $dt
+    # undefined. That undefined value then died on ->set_formatter, which made atime()
+    # and its siblings return a false value under ithreads in a non-deterministic,
+    # scheduling-dependent way.
     if( !defined( $has_local_tz ) )
     {
         $repo->lock;
-        $has_local_tz = $repo->get; # Double-check
+        # Double-check now that we hold the lock.
+        $has_local_tz = $repo->get;
         if( !defined( $has_local_tz ) )
         {
             # try-catch
             local $@;
-            eval
+            # We only need to know whether the local time zone resolves. The probe
+            # object is discarded; the real object is built once, after the lock.
+            my $dt_test = eval
             {
-                $dt = DateTime::Lite->from_epoch( epoch => $t, time_zone => 'local' );
-                $has_local_tz = 1;
+                DateTime::Lite->from_epoch( epoch => $t, time_zone => 'local' );
             };
-            if( $@ )
+            # Either an unexpected error has occurred, or DateTime::Lite has returned an error
+            if( $@ || !defined( $dt_test ) )
             {
                 $has_local_tz = 0;
-                warn( "Your system is missing key timezone components. ${class}::_datetime is reverting to UTC instead of local time zone.\n" );
-                $dt = DateTime::Lite->from_epoch( epoch => $t, time_zone => 'UTC' );
+                warn( "Your system is missing key timezone components. ${class}::_datetime is reverting to UTC instead of local time zone." ) if( $self->_is_warnings_enabled( 'Module::Generic' ) );
+            }
+            else
+            {
+                $has_local_tz = 1;
             }
             $repo->set( $has_local_tz );
             # unlocks automatically at end of scope.
@@ -457,28 +471,24 @@ sub _datetime
         # Not strictly necessary
         $repo->unlock;
     }
-    else
-    {
-        # try-catch
-        local $@;
-        eval
-        {
-            $dt = DateTime::Lite->from_epoch( epoch => $t, time_zone => ( $has_local_tz ? 'local' : 'UTC' ) );
-        };
-        if( $@ )
-        {
-            warn( "Error trying to set a DateTime::Lite object using ", ( $has_local_tz ? 'local' : 'UTC' ), " time zone\n" );
-            $dt = DateTime::Lite->from_epoch( epoch => $t, time_zone => 'UTC' );
-        }
-        elsif( !$dt && DateTime::Lite->error )
-        {
-            warn( "Error trying to set a DateTime::Lite object using ", ( $has_local_tz ? 'local' : 'UTC' ), " time zone: ", DateTime::Lite->error, "\n" );
-            $dt = DateTime::Lite->from_epoch( epoch => $t, time_zone => 'UTC' );
-        }
-    }
 
+    # NOTE: Build the object from the resolved flag, unconditionally, so that every
+    # thread produces its own object regardless of which thread won the initialisation
+    # race above.
     # try-catch
     local $@;
+    eval
+    {
+        $dt = DateTime::Lite->from_epoch( epoch => $t, time_zone => ( $has_local_tz ? 'local' : 'UTC' ) );
+    };
+    if( $@ || !defined( $dt ) )
+    {
+        warn( "Error trying to set a DateTime::Lite object using ", ( $has_local_tz ? 'local' : 'UTC' ), " time zone: ", ( $@ || DateTime::Lite->error || 'unknown error' ) ) if( $self->_is_warnings_enabled( 'Module::Generic' ) );
+        $dt = DateTime::Lite->from_epoch( epoch => $t, time_zone => 'UTC' );
+    }
+    return( $self->error( "Could not build a DateTime::Lite object for epoch \"$t\"." ) ) if( !defined( $dt ) );
+
+    # try-catch
     my $o;
     eval
     {
@@ -658,7 +668,7 @@ Module::Generic::Finfo - File Info Object Class
 
 =head1 VERSION
 
-    v0.5.6
+    v0.5.7
 
 =head1 DESCRIPTION
 

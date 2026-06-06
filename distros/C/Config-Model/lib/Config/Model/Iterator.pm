@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Iterator 2.162;
+package Config::Model::Iterator 2.163;
 
 use v5.20;
 use Carp;
@@ -30,10 +30,6 @@ sub new ($type, %args){
         forward                => 1,
         status                 => 'standard',
     };
-
-    if (delete $args{experience}) {
-        carp "experience parameter is deprecated";
-    }
 
     foreach my $p (qw/root/) {
         $self->{$p} = delete $args{$p}
@@ -288,7 +284,7 @@ Config::Model::Iterator - Iterates forward or backward a configuration tree
 
 =head1 VERSION
 
-version 2.162
+version 2.163
 
 =head1 SYNOPSIS
 

@@ -64,6 +64,28 @@ Module::Generic::Number - Number Manipulation Object Class
     $n2->format_hex # 0x400
     $n2->format_money # € 1,024.00
     $n2->format_money( '$' ) # $1,024.00
+
+    # format_money() follows the monetary category (LC_MONETARY), independently from
+    # format() which follows the numeric category (LC_NUMERIC). Under posix_strict
+    # (true by default), the two can therefore be grouped differently:
+    my $m = Module::Generic::Number->new( 1281284,
+    {
+        precision    => 2,
+        grouping     => 0,     # numeric: no grouping
+        mon_grouping => 3,     # monetary: grouped by 3
+        mon_thousand => ',',
+        mon_decimal  => '.',
+        symbol       => '€',
+        precede      => 0,
+        space_pos    => 0,
+    });
+    $m->format       # 1281284.00
+    $m->format_money # 1,281,284.00€
+
+    # Set posix_strict to false to fill a value absent from one category from the
+    # sibling category (the previous, more tolerant resolution).
+    my $loose = Module::Generic::Number->new( 1000, { posix_strict => 0 } );
+
     $n2->format_negative # -1,024.00
     $n2->format_picture( '(x)' ) # (1,024.00)
     $n2->formatter( $new_Number_Format_object );
@@ -105,7 +127,7 @@ Module::Generic::Number - Number Manipulation Object Class
 
 =head1 VERSION
 
-    v2.3.6
+    v2.4.0
 
 =head1 DESCRIPTION
 
@@ -192,6 +214,18 @@ When no C<lang> is provided, it uses the default language set in the system to r
 
 Any of those properties can be overriden by specifying its value when creating an object.
 
+=item C<mon_decimal>
+
+Specifies the monetary decimal separator, used by L</format_money>. When not provided, it is resolved from the C<LC_MONETARY> category of the current locale. This can also be changed or retrieved with the method L</mon_decimal>
+
+=item C<mon_grouping>
+
+The size of the groups of digits for monetary values, used by L</format_money>. When not provided, it is resolved from the C<mon_grouping> field of the C<LC_MONETARY> category. This can also be changed or retrieved with the method L</mon_grouping>
+
+=item C<mon_thousand>
+
+Specifies the monetary thousand separator, used by L</format_money>. When not provided, it is resolved from the C<LC_MONETARY> category. This can also be changed or retrieved with the method L</mon_thousand>
+
 =item C<position_neg>
 
 Boolea value to define whether the negative sign (typically "-") should be positioned at the begining (true) or at the end (false) of the negative numbers.
@@ -199,6 +233,16 @@ Boolea value to define whether the negative sign (typically "-") should be posit
 =item C<position_pos>
 
 Boolea value to define whether the positive sign (typically and empty string) should be positioned at the begining (true) or at the end (false) of the positive numbers.
+
+=item C<posix_strict>
+
+Boolean value, true by default.
+
+When true, plain number formatting follows the C<LC_NUMERIC> category and monetary formatting (L</format_money>) follows the C<LC_MONETARY> category, with no fall back from one category to the other. This is the strict POSIX-conformant behaviour: under a mixed locale such as C<LC_NUMERIC=C> with C<LC_MONETARY=en_US.UTF-8>, a plain number is not grouped whereas money is.
+
+When false, a more tolerant resolution is used: a value absent from its own category is filled from the sibling category. This is meant for incompletely configured locales, where a missing value is treated as a misconfiguration to be worked around rather than honoured.
+
+This can also be changed or retrieved with the method L</posix_strict>
 
 =item C<precede>
 
@@ -454,6 +498,8 @@ object, using the inital format parameters specified during object instantiation
     $n->format_money # € 1,000.00
     $n->format_money(3) # € 1,000.000
 
+The digit grouping, thousand separator and decimal separator are taken from the monetary trio (L</mon_grouping>, L</mon_thousand>, L</mon_decimal>), which follows the C<LC_MONETARY> category of the locale. Under L</posix_strict> (the default), this is independent from the plain number formatting used by L</format>, so on a mixed locale such as C<LC_NUMERIC=C> with C<LC_MONETARY=en_US.UTF-8>, money is grouped even though a plain number is not. The currency symbol and sign placement always follow the monetary category.
+
 It returns a L<scalar object|Module::Generic::Scalar> upon success or an L<error|Module::Generic/error> if an error occurred.
 
 =head2 format_negative
@@ -651,9 +697,25 @@ Returns the remainder for the number bject divided by another number provided as
     # Assuming 1000
     $n->mod(3) # 1
 
+=head2 mon_decimal
+
+Sets or gets the monetary decimal separator used by L</format_money>. When not set explicitly, it is resolved from the C<LC_MONETARY> category of the current locale.
+
+=head2 mon_grouping
+
+Sets or gets the size of the groups of digits for monetary values, used by L</format_money>. When not set explicitly, it is resolved from the C<mon_grouping> field of the C<LC_MONETARY> category.
+
+=head2 mon_thousand
+
+Sets or gets the monetary thousand separator used by L</format_money>. When not set explicitly, it is resolved from the C<LC_MONETARY> category of the current locale.
+
 =head2 oct
 
 Provided an octal value, this returns the corresponding number as an object. See L<perlfunc/"oct"> for more details.
+
+=head2 posix_strict
+
+Boolean, true by default. Controls how the number and monetary formatting properties are resolved from the locale. See the C<posix_strict> option in the constructor L</new> for the full description.
 
 =head2 position_neg
 

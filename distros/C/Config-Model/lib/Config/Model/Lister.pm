@@ -7,13 +7,14 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Lister 2.162;
+package Config::Model::Lister 2.163;
 
 use strict;
 use warnings;
 use Exporter;
 use v5.20;
 
+## no critic (Modules::ProhibitAutomaticExportation)
 use vars qw/@EXPORT/;
 
 use feature qw/postderef signatures/;
@@ -41,31 +42,38 @@ sub available_models ($test = 0) {
 
             # ensure that an appli file of a cat is not parsed twice
             # (useful in dev, where system appli file may clobber
-            # appli file in dvelopment
+            # appli file in development
             next if $done_cat{$cat}{$appli};
 
             $appli_info{$appli}{_file} = $file;
             $appli_info{$appli}{_category} = $cat;
             open my $fh, '<', $file || die "Can't open file $file:$!";
-            while (my $line = <$fh>) {
-                chomp($line);
-                $line =~ s/^\s+//;
-                $line =~ s/\s+$//;
-                $line =~ s/#.*//;
-                my ( $k, $v ) = split /\s*=\s*/, $line;
-                next unless $v;
-                if ( $k =~ /model/i ) {
-                    push @{ $categories{$cat} }, $appli unless $done_cat{$cat}{$appli};
-                    $done_cat{$cat}{$appli} = 1;
-                }
-
-                $appli_info{$appli}{$k} = $v;
-                $applications{$appli} = $v if $k =~ /model/i;
-            }
+            process_app_data($appli, $fh, \%categories, \%done_cat, \%appli_info, \%applications);
+            close $fh;
             die "Missing model line in file $file\n" unless $done_cat{$cat}{$appli};
         }
     }
     return \%categories, \%appli_info, \%applications;
+}
+
+sub process_app_data($appli, $fh, $categories, $done_cat, $appli_info, $applications) {
+    my $cat = $appli_info->{$appli}{_category};
+    while (my $line = <$fh>) {
+        chomp($line);
+        $line =~ s/^\s+//;
+        $line =~ s/\s+$//;
+        $line =~ s/#.*//;
+        my ( $k, $v ) = split /\s*=\s*/, $line;
+        next unless $v;
+        if ( $k =~ /model/i ) {
+            push @{ $categories->{$cat} }, $appli unless $done_cat->{$cat}{$appli};
+            $done_cat->{$cat}{$appli} = 1;
+        }
+
+        $appli_info->{$appli}{$k} = $v;
+        $applications->{$appli} = $v if $k =~ /model/i;
+    }
+    return;
 }
 
 sub models ($test = 0) {
@@ -94,7 +102,7 @@ Config::Model::Lister - List available models and applications
 
 =head1 VERSION
 
-version 2.162
+version 2.163
 
 =head1 SYNOPSIS
 

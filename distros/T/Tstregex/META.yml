@@ -1,5 +1,5 @@
 ---
-abstract: unknown
+abstract: 'A Hybrid Regex Diagnostic Tool (single file Library module and command tool)'
 author:
   - 'Olivier Delouya <olivier_delouya@hotmail.com>'
 build_requires:
@@ -23,5 +23,5 @@ requires:
   perl: '5.010'
 resources:
   repository: https://github.com/odjectif/tstregex.git
-version: '1.08'
+version: '1.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

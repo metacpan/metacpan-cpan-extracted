@@ -7,7 +7,7 @@ use Carp qw(croak);
 
 use XSLoader;
 BEGIN {
-    our $VERSION = '1.0104';
+    our $VERSION = '1.0105';
     XSLoader::load;
 }
 
@@ -46,31 +46,33 @@ __END__
 
 =encoding UTF-8
 
+=for highlighter language=perl
+
 =head1 NAME
 
 Quote::Code - quoted strings with arbitrary code interpolation
 
 =head1 SYNOPSIS
 
- use Quote::Code;
- print qc"2 + 2 = {2 + 2}";  # "2 + 2 is 4"
- my $msg = qc{The {$obj->name()} is {$obj->state()}.};
- 
- my $heredoc = qc_to <<'EOT';
- .trigger:hover .message:after {
-   content: "The #{get_adjective()} brown fox #{get_verb()} over the lazy dog.";
- }
- EOT
- print $heredoc;
+    use Quote::Code;
+    print qc"2 + 2 = {2 + 2}";  # "2 + 2 is 4"
+    my $msg = qc{The {$obj->name()} is {$obj->state()}.};
 
- my $name = "A B C";
- my @words = qcw(
-   foo
-   bar\ baz
-   {2 + 2}
-   ({$name})
- );
- # @words = ("foo", "bar baz", "4", "(A B C)");
+    my $heredoc = qc_to <<'EOT';
+    .trigger:hover .message:after {
+      content: "The #{get_adjective()} brown fox #{get_verb()} over the lazy dog.";
+    }
+    EOT
+    print $heredoc;
+
+    my $name = "A B C";
+    my @words = qcw(
+      foo
+      bar\ baz
+      {2 + 2}
+      ({$name})
+    );
+    # @words = ("foo", "bar baz", "4", "(A B C)");
 
 =head1 DESCRIPTION
 
@@ -101,15 +103,15 @@ escaping them gets annoying.
 
 C<qc_to> has two syntactic forms:
 
- qc_to <<'FOO'
- ...
- FOO
+    qc_to <<'FOO'
+    ...
+    FOO
 
 and
 
- qc_to <<"FOO"
- ...
- FOO
+    qc_to <<"FOO"
+    ...
+    FOO
 
 After C<qc_to> there must always be a C<E<lt>E<lt>> (this is to give syntax
 highlighters a chance to get things right). After that, there are two
@@ -161,32 +163,34 @@ C<qcw(a b\ c d)> is equivalent to C<('a', 'b c', 'd')>.
 C<qc>, C<qcw>, and C<<< qc_to <<"..." >>> support the following backslash
 escape sequences:
 
- \\         backslash
- \a         alarm/bell       (BEL)
- \b         backspace        (BS)
- \e         escape           (ESC)
- \f         form feed        (FF)
- \n         newline          (LF)
- \r         carriage return  (CR)
- \t         tab              (HT)
+=for highlighter language=
 
- \cX        control-X
-            X can be any character from the set
-              ?, @, a-z, A-Z, [, \, ], ^, _
+    \\         backslash
+    \a         alarm/bell       (BEL)
+    \b         backspace        (BS)
+    \e         escape           (ESC)
+    \f         form feed        (FF)
+    \n         newline          (LF)
+    \r         carriage return  (CR)
+    \t         tab              (HT)
 
- \o{FOO}    the character whose octal code is FOO
- \FOO       the character whose octal code is FOO
-            (where FOO is at most 3 octal digits long)
+    \cX        control-X
+               X can be any character from the set
+                 ?, @, a-z, A-Z, [, \, ], ^, _
 
- \x{FOO}    the character whose hexadecimal code is FOO
- \xFOO      the character whose hexadecimal code is FOO
-            (where FOO is at most 2 hexadecimal digits long)
- \x         a NUL byte (if \x is not followed by '{' or a hex digit)
-            (don't use this, it might go away in a future release)
+    \o{FOO}    the character whose octal code is FOO
+    \FOO       the character whose octal code is FOO
+               (where FOO is at most 3 octal digits long)
 
- \N{U+FOO}  the character whose hexadecimal code is FOO
- \N{FOO}    the character whose Unicode name is FOO
-            (as determined by the charnames pragma)
+    \x{FOO}    the character whose hexadecimal code is FOO
+    \xFOO      the character whose hexadecimal code is FOO
+               (where FOO is at most 2 hexadecimal digits long)
+    \x         a NUL byte (if \x is not followed by '{' or a hex digit)
+               (don't use this, it might go away in a future release)
+
+    \N{U+FOO}  the character whose hexadecimal code is FOO
+    \N{FOO}    the character whose Unicode name is FOO
+               (as determined by the charnames pragma)
 
 Any other backslashed character (including delimiters) is taken literally. In
 particular this means e.g. both C<qc!a\!b!> and C<qc(a\!b)> represent the
@@ -198,6 +202,45 @@ C<\u>, C<\F>, C<\E>.
 Starting with perl v5.16, if you specify a named Unicode character with
 C<\N{...}> and L<C<charnames>|charnames> hasn't been loaded yet, it is
 automatically loaded as if by C<use charnames ':full', ':short';>.
+
+=begin :README
+
+=head1 INSTALLATION
+
+To download and install this module, use your favorite CPAN client, e.g.
+L<C<cpan>|cpan>:
+
+=for highlighter language=sh
+
+    cpan Quote::Code
+
+Or L<C<cpanm>|cpanm>:
+
+    cpanm Quote::Code
+
+To do it manually, run the following commands (after downloading and unpacking
+the tarball):
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+=end :README
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+L<C<perldoc>|perldoc> command.
+
+=for highlighter language=sh
+
+    perldoc Quote::Code
+
+You can also look for information at L<https://metacpan.org/pod/Quote::Code>.
+
+To see a list of open bugs or report a new bug, visit
+L<https://codeberg.org/mauke/Quote-Code/issues>.
 
 =head1 AUTHOR
 
@@ -211,6 +254,6 @@ This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
-See http://dev.perl.org/licenses/ for more information.
+See L<https://dev.perl.org/licenses/> for more information.
 
 =cut

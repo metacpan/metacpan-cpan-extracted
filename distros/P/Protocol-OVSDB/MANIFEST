@@ -1,0 +1,12 @@
+CHANGES
+cpanfile
+examples/list-dbs.pl
+lib/Protocol/OVSDB.pm
+lib/Protocol/OVSDB/Lock.pm
+lib/Protocol/OVSDB/Monitor.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -16,13 +16,16 @@ sub cadastra {
     die 'cadastra() espera um hash de parametros' unless keys %args;
 
     my $parent = $self->{parent};
+    my $contrato = $args{contrato} || $parent->{contrato};
+    die 'cadastra() precisa receber "contrato" (em si ou no construtor)'
+        unless defined $contrato;
 
     # fazemos o pedido do token antes para garantirmos que temos
     # os dados de contrato e DR dentro do objeto. É no-op se já fez.
-    $parent->access_token('cartao');
+    $parent->access_token();
 
     my $request_data = {
-        contrato => ($args{contrato} || $parent->{contrato}),
+        contrato => $contrato,
         cartao   => ($args{cartao} || $parent->{cartao}),
         #telefone => $args{telefone},
         pedidos  => [{
@@ -34,9 +37,8 @@ sub cadastra {
             tipoManifestacao       => ($args{ressarcimento} ? 'I' : 'R'),
         }],
     };
-
     my $res = $parent->make_request(
-        'contrato',
+        undef,
         'POST',
         'pedido-informacao/v1/externo/pedidos/cadastra',
         { content => JSON::encode_json($request_data) }

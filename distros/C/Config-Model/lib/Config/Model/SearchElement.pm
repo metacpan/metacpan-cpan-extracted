@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::SearchElement 2.162;
+package Config::Model::SearchElement 2.163;
 use v5.20;
 
 use Log::Log4perl qw(get_logger :levels);
@@ -88,11 +88,9 @@ sub _sniff_class ($self, $class, $found_ref) {
 
 sub _sniff_warped_node ($self, $element_model, $found_ref) {
     my %warp_tmp;
-    my $ref = $element_model->{warp}{rules};
-    my @rules = ref $ref eq 'HASH' ? %$ref : @$ref;
 
-    for ( my $r_idx = 0 ; $r_idx < $#rules ; $r_idx += 2 ) {
-        my $res = $rules[ $r_idx + 1 ]{config_class_name};
+    foreach my $apply ( map { $_->{apply} } $element_model->{warp}{rules}->@* ) {
+        my $res = $apply->{config_class_name};
         my $sub_class = ref $res ? $res->[0] : $res;
 
         # sniff all classes mentionned in warped node rules
@@ -304,7 +302,7 @@ Config::Model::SearchElement - Search an element in a configuration model
 
 =head1 VERSION
 
-version 2.162
+version 2.163
 
 =head1 SYNOPSIS
 
@@ -315,21 +313,22 @@ version 2.162
   $model->create_config_class(
     name    => "Foo",
     element => [
-        [qw/foo bar/] => {
+        foo => {
             type       => 'leaf',
             value_type => 'string'
         },
+        bar => '*foo',
     ]
  );
  $model ->create_config_class (
     name => "MyClass",
 
     element => [
-
-        [qw/foo bar/] => {
+        foo => {
             type       => 'leaf',
             value_type => 'string'
         },
+        bar => '*foo',
         hash_of_nodes => {
             type       => 'hash',     # hash id
             index_type => 'string',

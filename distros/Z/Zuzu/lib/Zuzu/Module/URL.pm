@@ -2,7 +2,7 @@ package Zuzu::Module::URL;
 
 use utf8;
 
-our $VERSION = '0.001003';
+our $VERSION = '0.001005';
 
 use URI ();
 use URI::Escape qw( uri_escape_utf8 uri_unescape );

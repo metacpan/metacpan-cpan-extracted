@@ -87,14 +87,14 @@ my @fixtures = (
 for my $fixture (@fixtures) {
 	my ( $name, $body ) = @{ $fixture };
 	my $runtime = Zuzu::Runtime->new;
-	my $source = <<~"ZUZU";
-		from std/marshal import dump, load;
-		from std/string/base64 import encode;
-		$body
-		let blob := dump(fixture_value);
-		load(blob);
-		encode(blob);
-		ZUZU
+	my $source = join "\n",
+		'from std/marshal import dump, load;',
+		'from std/string/base64 import encode;',
+		$body,
+		'let blob := dump(fixture_value);',
+		'load(blob);',
+		'encode(blob);',
+		'';
 
 	my $actual = $runtime->eval_with_current_scope(
 		$source,

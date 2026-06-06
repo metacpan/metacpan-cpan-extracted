@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value 2.162;
+package Config::Model::Value 2.163;
 
 use v5.20;
 
@@ -1383,9 +1383,6 @@ sub store ($self, @args) {
     return $ok || ($check eq 'no');
 }
 
-#
-# New subroutine "_store_value" extracted - Wed Jan 16 18:46:22 2013.
-#
 sub _store_value {
     my $self          = shift;
     my $value         = shift;
@@ -1464,9 +1461,6 @@ sub _store ($self, %args) {
     return;
 }
 
-#
-# New subroutine "transform_boolean" extracted - Thu Sep 19 18:58:21 2013.
-#
 sub transform_boolean {
     my $self  = shift;
     my $v_ref = shift;
@@ -2028,7 +2022,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.162
+version 2.163
 
 =head1 SYNOPSIS
 
@@ -2040,21 +2034,19 @@ version 2.162
     name => "MyClass",
 
     element => [
-
-        [qw/foo bar/] => {
+        foo => {
             type	   => 'leaf',
             value_type => 'string',
             description => 'foobar',
-        }
-        ,
+        },
+        bar => '*foo',
         country => {
             type =>		  'leaf',
             value_type => 'enum',
             choice =>	   [qw/France US/],
             description => 'big countries',
         }
-    ,
-    ],
+    ]
  ) ;
 
  my $inst = $model->instance(root_class_name => 'MyClass' );
@@ -2554,22 +2546,26 @@ For instance if you declare 2 C<Value> element this way:
                      # this points to the warp master
                      c => '- country'
                  },
-                 rules => {
-                     '$c eq "US"' => {
-                          default => 'NTSC'
+                 rules => [
+                      {
+                          when => '$c eq "US"',
+                          apply => { default => 'NTSC' }
                       },
-                     '$c eq "France"' => {
-                          default => 'SECAM'
+                      {
+                          when => '$c eq "France"',
+                          apply => { default => 'SECAM' }
                       },
-                     '$c eq "Japan"' => {
-                          default => 'NTSC'
+                      {
+                          when => '$c eq "Japan"',
+                          apply => { default => 'NTSC' }
                       },
-                     '$c eq "Europe"' => {
-                          default => 'PAL'
-                     },
-                 }
+                      {
+                          when => '$c eq "Europe"',
+                          apply => { default => 'PAL' }
+                      },
+                 ]
              }
-         } ,
+         }
      ]
  );
 
@@ -2586,17 +2582,20 @@ possible values of an enum element:
          follow => {
              c => '- country'
          },
-         rules => {
-             '$c eq "US"'	 => {
-                  choice => ['Kansas', 'Texas' ]
-              },
-             '$c eq "Europe"' => {
-                  choice => ['France', 'Spain' ]
+         rules => [
+             {
+                  when => '$c eq "US"',
+                  apply => { choice => ['Kansas', 'Texas' ] }
              },
-             '$c eq "Japan"' => {
-                  choice => ['Honshu', 'Hokkaido' ]
+             {
+                  when => '$c eq "Europe"',
+                  apply => { choice => ['France', 'Spain' ] }
+             },
+             {
+                  when => '$c eq "Japan"',
+                  apply => { choice => ['Honshu', 'Hokkaido' ] }
              }
-         }
+         ]
      }
  }
 

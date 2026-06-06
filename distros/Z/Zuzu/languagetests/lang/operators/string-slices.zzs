@@ -7,6 +7,17 @@ let read_error := exception( function () {
 } );
 is( read_error, null, "string slices can be read without throwing" );
 is( got, "ell", "string slice read uses start and length" );
+is( text[0], "H", "string index read returns one character" );
+is( text[-1], "o", "negative string index read counts back from end" );
+is( text[1:], "ello", "open-ended string slice reads to end" );
+
+{
+	let unicode := "a😀b";
+	is( length unicode, 3, "unicode string length counts characters" );
+	is( unicode[1], "😀", "string index read uses character offsets" );
+	is( unicode[1:1], "😀", "string slice read uses character counts" );
+	is( unicode[1:], "😀b", "open-ended string slice uses character counts" );
+}
 
 {
 	let mutable := "Hello World";
@@ -80,6 +91,88 @@ is( "abcdef"[-3:2], "de", "negative slice read counts back from end" );
 	} );
 	is( assign_error, null, "negative string index can be assigned without throwing" );
 	is( mutable, "abcdXYf", "negative string index assignment counts back from end" );
+}
+
+{
+	let mutable := "a😀b";
+	let assign_error := exception( function () {
+		mutable[1] := "Z";
+	} );
+	is( assign_error, null, "unicode string index can be assigned without throwing" );
+	is( mutable, "aZb", "string index assignment uses character offsets" );
+}
+
+{
+	let mutable := "a😀b";
+	let assign_error := exception( function () {
+		mutable[1:1] := "XYZ";
+	} );
+	is( assign_error, null, "unicode string slice can be assigned without throwing" );
+	is( mutable, "aXYZb", "string slice assignment uses character counts" );
+}
+
+{
+	let bytes := to_binary("Hello");
+	is( typeof bytes[0], "BinaryString", "BinaryString index read returns BinaryString" );
+	is( to_string(bytes[0]), "H", "BinaryString index read returns one byte" );
+	is( to_string(bytes[-1]), "o", "negative BinaryString index counts back from end" );
+	is( typeof bytes[1:3], "BinaryString", "BinaryString slice read returns BinaryString" );
+	is( to_string(bytes[1:3]), "ell", "BinaryString slice uses start and byte length" );
+	is( to_string(bytes[1:]), "ello", "open-ended BinaryString slice reads to end" );
+}
+
+{
+	let utf8_bytes := to_binary("é");
+	is( length utf8_bytes, 2, "UTF-8 BinaryString length counts bytes" );
+	is( length utf8_bytes[0], 1, "BinaryString index returns one byte" );
+	is( length utf8_bytes[0:1], 1, "BinaryString slice length counts bytes" );
+	is( length utf8_bytes[1:1], 1, "BinaryString slice can read a trailing byte" );
+	is( length utf8_bytes[0:], 2, "open-ended BinaryString slice keeps remaining bytes" );
+}
+
+{
+	let bytes := to_binary("Hello");
+	let assign_error := exception( function () {
+		bytes[0] := to_binary("Y");
+	} );
+	is( assign_error, null, "BinaryString index can be assigned without throwing" );
+	is( to_string(bytes), "Yello", "BinaryString index assignment replaces one byte" );
+}
+
+{
+	let bytes := to_binary("Hello");
+	let assign_error := exception( function () {
+		bytes[1:3] := to_binary("ipp");
+	} );
+	is( assign_error, null, "BinaryString slice can be assigned without throwing" );
+	is( to_string(bytes), "Hippo", "BinaryString slice assignment replaces byte length slice" );
+}
+
+{
+	let bytes := to_binary("Hello");
+	let assign_error := exception( function () {
+		bytes[1:3] := to_binary("i");
+	} );
+	is( assign_error, null, "BinaryString slice assignment can shorten bytes" );
+	is( to_string(bytes), "Hio", "BinaryString slice assignment can shorten BinaryString" );
+}
+
+{
+	let bytes := to_binary("Hello");
+	let assign_error := exception( function () {
+		bytes[1:1] := to_binary("ipp");
+	} );
+	is( assign_error, null, "BinaryString slice assignment can lengthen bytes" );
+	is( to_string(bytes), "Hippllo", "BinaryString slice assignment can lengthen BinaryString" );
+}
+
+{
+	let bytes := to_binary("Hello");
+	let assign_error := exception( function () {
+		bytes[2:0] := to_binary("YY");
+	} );
+	is( assign_error, null, "BinaryString zero-length slice inserts bytes" );
+	is( to_string(bytes), "HeYYllo", "zero-length BinaryString slice inserts bytes" );
 }
 
 done_testing();

@@ -22,8 +22,10 @@ return {
         'warnings' => 0,
     },
     DEVELOP_REQUIRES => {
-        'Test::Pod' => 1.22,
+        'Pod::Markdown::Githubert' => 0,
+        'Test::Pod'                => 1.22,
     },
 
-    REPOSITORY => [ github => 'mauke' ],
+    REPOSITORY => [ codeberg => 'mauke' ],
+    BUGTRACKER => 'https://codeberg.org/mauke/Quote-Code/issues',
 };

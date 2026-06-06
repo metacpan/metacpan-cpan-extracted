@@ -1,7 +1,7 @@
-package Concierge::Desk::Setup v0.8.3;
+package Concierge::Desk::Setup v0.8.4;
 use v5.36;
 
-our $VERSION = 'v0.8.3';
+our $VERSION = 'v0.8.4';
 
 # ABSTRACT: Setup and configuration for Concierge desk initialization
 
@@ -261,7 +261,7 @@ Concierge::Desk::Setup - One-time desk creation and configuration for Concierge
 
 =head1 VERSION
 
-v0.8.3
+v0.8.4
 
 =head1 SYNOPSIS
 
@@ -401,13 +401,13 @@ B<Standard fields> (selectable at setup):
     email          email    max 255
     phone          phone    max 20
     text_ok        boolean
-    last_login_date timestamp
     term_ends      date
 
 B<System fields> (auto-managed, always present):
 
-    last_mod_date  system   Updated on every write
-    created_date   system   Set once on creation
+    last_login_date system   Updated on every successful login
+    last_mod_date   system   Updated on every write
+    created_date    system   Set once on creation
 
 Core and system fields cannot be removed.  Standard fields default to
 C<< required => 0 >>.
@@ -453,7 +453,7 @@ Or pick only the ones your application needs:
 Pass an empty arrayref C<[]> to exclude all standard fields -- useful
 when your application defines its own fields from scratch.  Omitting
 C<include_standard_fields> (or setting it to any falsy value) includes
-all 12 standard fields, the same as C<'all'>.
+all 11 standard fields, the same as C<'all'>.
 
 =head3 Adding Application Fields
 
@@ -559,6 +559,12 @@ C<null_value> are treated as empty.
 Maximum character length; enforced by the C<text> validator and
 available as a UI hint.
 
+=item C<format_as>
+
+Optional hint for consuming applications (UI, CLI, report generators,
+etc.) describing how to present or input this field.  Not used or
+validated by Concierge.  See L</UI Formatting Hints> below.
+
 =back
 
 See L<Concierge::Users::Meta/FIELD ATTRIBUTES> for the complete
@@ -610,6 +616,64 @@ setting C<< required => 1 >> auto-enables C<must_validate>.
 See L<Concierge::Users::Meta/FIELD CUSTOMIZATION> for the complete
 customization reference and L<Concierge::Users::Meta/FIELD CATALOG> for
 full field specifications.
+
+=head3 UI Formatting Hints
+
+The C<format_as> field attribute lets an application store
+presentation instructions directly in the field definition and retrieve
+them at runtime via C<get_field_hints()>.  Concierge does not use or
+validate C<format_as>; it simply passes whatever value was supplied
+straight through.
+
+All built-in fields carry a C<format_as> value using Concierge
+conventions (C<text>, C<options>, C<boolean>, C<number>, C<date>,
+C<datetime>, C<time>).  Applications may override these on any standard
+field via C<field_overrides>, or set any value on app-defined fields via
+C<app_fields> -- including the application's own native format codes.
+
+B<Example:> a template-based UI uses three input tokens: C<t> (text
+input), C<b> (checkbox), C<sel> (select list).  Templates reference
+fields by name and token:
+
+    {{labeled_input=first_name,t}}
+    {{labeled_input=last_name,t}}
+    {{labeled_input=user_status,sel}}
+    {{labeled_input=phone,t}}
+    {{labeled_input=text_ok,b}}
+
+Store the tokens in the field definitions at setup time:
+
+    field_overrides => [
+        { field_name => 'first_name',  format_as => 't'   },
+        { field_name => 'last_name',   format_as => 't'   },
+        { field_name => 'user_status', format_as => 'sel' },
+        { field_name => 'phone',       format_as => 't'   },
+        { field_name => 'text_ok',     format_as => 'b'   },
+    ],
+
+Retrieve them at runtime -- no translation table needed:
+
+    for my $field (@{$users->get_user_fields()}) {
+        my $hints = $users->get_field_hints($field);
+        my $token = $hints->{format_as} or next;
+        print "{{labeled_input=$field,$token}}\n";
+    }
+
+App-defined fields work the same way:
+
+    app_fields => [
+        {
+            field_name => 'department',
+            type       => 'enum',
+            options    => ['*Engineering', 'Sales', 'Support'],
+            format_as  => 'sel',
+        },
+    ],
+
+The C<format_as> value set during setup is returned unchanged by
+C<get_field_hints()>, making it a lightweight, zero-overhead channel
+for passing application-specific formatting instructions through
+Concierge without any involvement from the Concierge layer itself.
 
 =head3 Complete Example
 
@@ -672,8 +736,8 @@ standard fields, and modified built-in defaults:
     });
 
 This produces a user schema with 4 core fields, 5 selected standard
-fields (C<email> now required), 4 application fields, and 2 system
-timestamps -- 15 fields total.  The core C<user_status> field keeps its
+fields (C<email> now required), 4 application fields, and 3 system
+fields -- 16 fields total.  The core C<user_status> field keeps its
 usual role but uses makerspace-specific statuses (defaulting to
 C<Applicant>).  New members default to the C<Community> tier (marked
 with C<*>) and must provide a C<badge_name> that passes moniker
@@ -696,7 +760,7 @@ through L<Concierge::Users> (inherited from L<Concierge::Users::Meta>):
     # Get UI-friendly hints for building forms dynamically
     my $hints = $users->get_field_hints('membership_tier');
     # Returns: { label, type, validate_as, options, max_length,
-    #            description, required, default, null }
+    #            description, required, default, null, format_as }
 
     # Get the ordered field list for this schema
     my $fields = $users->get_user_fields();
