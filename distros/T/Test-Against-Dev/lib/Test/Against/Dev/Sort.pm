@@ -1,7 +1,7 @@
 package Test::Against::Dev::Sort;
 use strict;
 use 5.14.0;
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 use Carp;
 use Data::Dump ( qw| dd pp | );
 

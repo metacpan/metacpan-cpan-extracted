@@ -1,48 +1,72 @@
-BATsh 치트 시트 [KO] 한국어
-==============================
+BATsh 치트시트 [KO] 한국어
+==========================
 
 ----------------------------------------------------------------------
 요약
-  BATsh는 cmd.exe 배치와 bash/sh 구문이 한 파일에 공존하는 스크립트를
-  순수 Perl로 실행하는 이중 언어 셸. 줄 단위로 모드를 자동 판별.
-  외부 셸 불필요. 파이프, 리다이렉션, 함수, 변수 확장 지원.
+  BATsh는 cmd.exe 배치와 bash/sh 구문을 같은 스크립트 파일에서 실행하는
+  이중 언어 셸입니다. 줄/구역 단위로 모드를 자동 전환합니다.
+  외부 셸이 필요 없습니다 -- 순수 Perl 구현.
+  파이프라인, 리디렉션, 함수, 변수 확장 기능을 지원합니다.
 
-혼합 모드 샘플
-  :: CMD 섹션 (첫 토큰이 대문자)
+혼합 모드 예제
+  :: CMD 구역 (첫 토큰이 대문자)
   @ECHO OFF
   SET LANG=BATsh
+  SET COUNT=3
 
-  # SH 섹션 (소문자 포함)
-  greet() { echo "안녕하세요 $1 (bash 모드)"; }
+  # SH 구역 (첫 토큰이 소문자)
+  greet() { echo "Hello from $1 (bash mode)"; }
   greet $LANG
-  result=$(echo $LANG | perl -e 'while(<STDIN>){chomp;print uc}')
-  echo "대문자: $result"
+  for i in 1 2 3; do echo "  item $i of $COUNT"; done
+  result=$(echo $LANG | perl -ne "print uc")
+  echo "Uppercase: $result"
 
-  :: CMD 섹션 재개 (SH 결과 참조)
-  ECHO CMD 복귀: %result%
+  :: 다시 CMD 구역 (브리지를 통해 SH 결과를 읽음)
+  ECHO Back in CMD: %result%
 
   # 실행: perl lib/BATsh.pm script.batsh
+  # 또는: use BATsh; BATsh->run('script.batsh');
 ----------------------------------------------------------------------
 
 
-BATsh는 같은 스크립트에서 cmd.exe와 bash/sh 구문을 모두 실행할 수 있는
-이중 언어 셸입니다. 각 줄의 첫 번째 토큰이 실행 모드를 결정합니다.
+BATsh는 cmd.exe와 bash/sh 구문을 같은 스크립트에서 실행하는 이중 언어
+셸입니다.  스크립트는 여러 구역으로 나뉘며, 각 구역은 해당 셸이 그대로
+실행합니다.
 
 1. 모드 감지
 ------------
-  ECHO hello          -> cmd.exe 모드 (첫 번째 토큰이 모두 대문자)
-  echo hello          -> bash/sh 모드 (첫 번째 토큰에 소문자 포함)
-  # 주석              -> 주석 (무시)
-  :: 주석             -> 주석 (CMD 스타일, 무시)
-  REM 주석            -> 주석 (CMD 스타일, 무시)
+  구역의 첫 번째 의미 있는 줄의 「첫 토큰」이 어떤 셸이 그 구역을
+  실행할지 결정합니다:
 
-2. 셸 시작
-----------
-  perl lib/BATsh.pm                    # 대화형 REPL
-  perl lib/BATsh.pm script.batsh       # 스크립트 파일 실행
-  perl lib/BATsh.pm -e "echo hello"    # 인라인 한 줄 명령
+  CMD 모드: 첫 토큰이 전부 [A-Z 0-9 _ - \ / : . @ %] 로 구성되고
+            대문자 A-Z를 적어도 하나 포함합니다.
 
-  Perl API에서:
+    ECHO hello          -> CMD 구역 (cmd.exe)
+    SET FOO=bar baz     -> CMD 구역  (값 부분은 검사하지 않음)
+    @ECHO OFF           -> CMD 구역
+    IF "%X%"=="Y" (     -> CMD 구역
+
+  SH 모드: 그 외 모든 경우 (소문자가 있거나, 글자가 전혀 없음).
+
+    echo hello          -> SH 구역  (bash/sh)
+    export FOO=bar      -> SH 구역
+    if [ -f "$f" ]; then  -> SH 구역
+    #!/bin/sh           -> SH 구역  (shebang은 SH 줄)
+
+  주석과 빈 줄은 현재 구역에 흡수됩니다.
+  주석 구문:
+    ::           CMD 스타일 주석
+    REM ...      CMD 스타일 주석 (대소문자 구분 없음)
+    @REM ...     CMD 스타일 주석
+    # ...        SH 스타일 주석  (#! shebang 아님)
+
+2. 셸 시작하기
+--------------
+  perl lib/BATsh.pm               # 대화형 REPL
+  perl lib/BATsh.pm script.batsh  # 스크립트 파일 실행
+  perl lib/BATsh.pm -e "echo hi"  # 인라인 한 줄 명령
+
+  Perl에서:
     use BATsh;
     BATsh->run('script.batsh');
     BATsh->run_string("echo hello");
@@ -50,34 +74,55 @@ BATsh는 같은 스크립트에서 cmd.exe와 bash/sh 구문을 모두 실행할
 
 3. 환경 변수 브리지
 -------------------
-  CMD 블록과 SH 블록은 Perl의 %ENV를 통해 변수를 공유합니다.
+  각 구역이 실행되기 전에 BATsh는 현재 %ENV를 머리말로 주입합니다
+  (CMD에는 SET 줄, SH에는 export 줄).  구역이 끝나면 셸의 최종 환경을
+  다시 %ENV로 읽어들입니다.
 
-  export FOO=hello   # SH가 FOO 설정
-  ECHO %FOO%         # CMD가 브리지를 통해 FOO 읽기 (Windows)
+  export FOO=hello   # SH가 FOO를 설정
+  ECHO %FOO%         # CMD가 브리지를 통해 FOO를 읽음 (Windows)
 
-  SET BAR=world      # CMD가 BAR 설정
-  echo $BAR          # SH가 브리지를 통해 BAR 읽기
+  SET BAR=world      # CMD가 BAR를 설정
+  echo $BAR          # SH가 브리지를 통해 BAR를 읽음
 
 4. SETLOCAL / ENDLOCAL
------------------------
-  SETLOCAL           # %ENV 스냅샷 저장
+----------------------
+  SETLOCAL           # %ENV 스냅샷 (cmd.exe가 아닌 BATsh가 처리)
   SET TMP=local_val
   ECHO %TMP%
   ENDLOCAL           # %ENV 복원 (TMP 사라짐)
 
-  중첩 가능합니다.
+  범위는 중첩될 수 있습니다.
 
-5. 중첩 (혼합 모드)
--------------------
-  블록 구조는 올바르게 쌍을 이루어야 합니다.
-  중첩 블록 내의 혼합 모드 줄이 허용됩니다.
+5. 구역 경계 감지
+-----------------
+  구역은 블록 깊이가 0으로 돌아오고 다음 의미 있는 줄이 다른 모드에
+  속할 때 끝납니다.
 
-  for x in 1 2; do   # SH가 블록 시작
-      ECHO item $x   # SH 블록 내 CMD 줄 (그대로 전달)
-  done               # SH가 블록 종료
+  CMD 구역은 따옴표 밖의 ( 와 ) 깊이를 추적합니다:
 
-  CMD 키워드: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
-  SH  키워드: if/fi  for/done  while/done  until/done  case/esac  { }
+    IF "%X%"=="Y" (     <- 블록 열기 (깊이 1)
+        ECHO yes
+    ) ELSE (            <- 닫고 다시 열기 (깊이 >=1 유지)
+        ECHO no
+    )                   <- 블록 닫기 (깊이 0) -> 구역이 끝날 수 있음
+
+  SH 구역은 키워드 깊이를 추적합니다:
+
+    for x in 1 2; do   <- 블록 열기 (깊이 1)
+        echo $x
+    done                <- 블록 닫기 (깊이 0) -> 구역이 끝날 수 있음
+
+  열린 블록 안의 줄은 첫 토큰이 다른 모드처럼 보여도 현재 구역에
+  흡수됩니다. 덕분에 다음이 가능합니다:
+
+    for x in A B; do
+        ECHO $x          <- SH 블록 안의 대문자: 여전히 SH 구역
+    done
+
+  SH 키워드 쌍:
+    여는 것 (+1) : if  for  while  until  case  function  select  {
+    닫는 것 (-1) : fi  done  esac  }
+    중립    ( 0) : then  do  else  elif
 
 6. 서브루틴 정의
 ----------------
@@ -85,11 +130,12 @@ BATsh는 같은 스크립트에서 cmd.exe와 bash/sh 구문을 모두 실행할
   echo "Hello $BATSH_ARG1"
   RET
 
-  레이블은 :로 시작하고 RET 또는 RETURN으로 끝납니다.
+  레이블은 : 로 시작하고 RET 또는 RETURN 으로 끝납니다.
   본문은 실행 전에 추출됩니다 (인라인으로 실행되지 않음).
+  본문에는 CMD 줄, SH 줄, 또는 둘의 혼합이 들어갈 수 있습니다.
 
-7. CALL 및 source
-------------------
+7. CALL 과 source
+-----------------
   CALL :GREET world      # 인수와 함께 서브루틴 호출
   CALL other.batsh       # 다른 .batsh 파일 포함/실행 (CMD)
   source other.batsh     # 다른 .batsh 파일 포함/실행 (SH)
@@ -104,40 +150,81 @@ BATsh는 같은 스크립트에서 cmd.exe와 bash/sh 구문을 모두 실행할
   BATsh->run_string($source)   # 소스 문자열 실행
   BATsh->run_lines(@lines)     # 줄 배열 실행
   BATsh->repl()                # 대화형 REPL
-  BATsh->classify_token($tok)  # 'CMD' 또는 'SH' 반환
+  BATsh->classify_token($tok)  # 'CMD' 또는 'SH'
   BATsh->setlocal()            # %ENV 스냅샷
   BATsh->endlocal()            # %ENV 복원
   BATsh->call_sub($lbl, @args) # 서브루틴 호출
   BATsh->source_file($file)    # .batsh 파일 포함
   BATsh->version()             # 버전 문자열
 
-9. 플랫폼 참고 사항
--------------------
-  Windows: CMD와 SH 모두 순수 Perl로 실행 -- 외부 cmd.exe/bash/sh 불필요.
-  UNIX:    CMD와 SH 모두 순수 Perl로 실행 -- 외부 cmd.exe/bash/sh 불필요.
+9. 플랫폼 참고
+--------------
+  Windows: CMD 구역과 SH 구역 모두 순수 Perl로 실행됩니다 -- 외부 cmd.exe, bash, sh 불필요.
+  UNIX:    CMD 구역과 SH 구역 모두 순수 Perl로 실행됩니다 -- 외부 cmd.exe, bash, sh 불필요.
 
 10. 요구 사항
 -------------
-  Perl 5.005_03 이상. 핵심 모듈만 사용 (File::Spec, Carp).
-  CPAN 의존성 불필요.
+  Perl 5.005_03 이상.  코어 모듈만 사용 (File::Spec, Carp).
+  CPAN 의존성 없음.
 
-참조: https://metacpan.org/dist/BATsh
+11. CMD 파이프라인과 매개변수 수정자
+------------------------------------
+  cmd1 | cmd2              # 임시 파일을 통한 파이프라인 (순수 Perl)
+  ECHO hello | perl -e "while(<STDIN>){print uc}"
 
-11. CMD 파이프라인 및 매개변수 수정자
---------------------------------------
-  cmd1 | cmd2              # 임시 파일을 통한 파이프라인 (Pure Perl)
-  SET /P VAR=프롬프트:     # STDIN에서 한 줄을 VAR에 읽기
-  %~dp0                    # %0의 드라이브+디렉터리 (가장 일반적)
-  %~n1, %~x1, %~nx1       # 파일명, 확장자, 둘 다
+  SET /P VAR=Prompt:       # STDIN에서 한 줄을 읽어 VAR에 저장
 
-12. SH 함수 및 변수 확장
-------------------------
-  f() { echo $1; }         # 함수 정의
-  ${var%.*}  ${var%%.*}    # 접미사 제거 (최단/최장)
-  ${var#*.}  ${var##*.}    # 접두사 제거 (최단/최장)
-  ${var/a/b} ${var//a/b}   # 치환 (첫 번째/모두)
-  ${var^^} ${var,,}        # 대문자/소문자
-  ${var:2:4} ${#var}       # 부분 문자열, 길이
-  cmd > f  cmd >> f  2>&1  # 리다이렉션
-  cmd1 && cmd2             # AND 연결
-  cmd1 || cmd2             # OR 연결
+  배치 매개변수 물결표 수정자 (예: %0=C:\scripts\deploy.bat 일 때):
+    %~0   -> C:\scripts\deploy.bat  (따옴표 제거만)
+    %~f0  -> C:/scripts/deploy.bat  (전체 절대 경로)
+    %~d0  -> C:                     (드라이브 문자)
+    %~p0  -> /scripts/              (디렉터리 경로)
+    %~n0  -> deploy                 (확장자 없는 파일 이름)
+    %~x0  -> .bat                   (확장자)
+    %~dp0 -> C:/scripts/            (드라이브 + 디렉터리, 가장 일반적)
+    %~nx1 -> deploy.bat             (이름 + 확장자)
+
+12. SH 함수와 확장
+------------------
+  greet() {              # 함수 정의
+      echo "Hi $1"
+  }
+  function add {         # 대체 구문
+      echo $(( $1 + $2 ))
+  }
+  greet world            # 함수 호출
+  add 3 4                # -> 7
+
+  ${var%.*}    .* 에 일치하는 가장 짧은 접미사 제거
+  ${var%%.*}   .* 에 일치하는 가장 긴   접미사 제거
+  ${var#*.}    *. 에 일치하는 가장 짧은 접두사 제거
+  ${var##*.}   *. 에 일치하는 가장 긴   접두사 제거
+  ${var/a/b}   첫 번째 a 를 b 로 치환
+  ${var//a/b}  모든 a 를 b 로 치환
+  ${var^^}     전부 대문자
+  ${var,,}     전부 소문자
+  ${var:2:4}   오프셋 2 부터 길이 4 의 부분 문자열
+  ${#var}      문자열 길이
+  ${var:-def}  설정되어 있으면 그 값, 아니면 def
+
+13. SH 입출력 리디렉션
+----------------------
+  cmd > file      stdout 덮어쓰기
+  cmd >> file     stdout 추가
+  cmd < file      파일에서 stdin
+  cmd 2> file     stderr 를 파일로
+  cmd 2>&1        stderr 를 stdout 에 병합
+  cmd > f 2>&1    stdout 과 stderr 를 모두 파일로
+
+  Here-document (stdin 입력):
+    cmd <<EOF       EOF 까지의 본문 줄; $VAR 확장됨
+    cmd <<'EOF'     EOF 까지의 본문 줄; 확장 없음 (그대로)
+    cmd <<-EOF      <<EOF 와 같으나 줄 앞의 TAB 문자 제거
+
+14. SH 복합 명령
+----------------
+  cmd1 && cmd2    cmd1 이 성공할 때만 cmd2 실행
+  cmd1 || cmd2    cmd1 이 실패할 때만 cmd2 실행
+  cmd1 ; cmd2     무조건 cmd2 실행
+
+참고: https://metacpan.org/dist/BATsh

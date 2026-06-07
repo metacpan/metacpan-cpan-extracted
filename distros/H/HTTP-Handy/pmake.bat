@@ -24,7 +24,7 @@ package pmake;
 # Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
-$PMAKE_BAT_VERSION = '0.33';
+$PMAKE_BAT_VERSION = '0.35';
 $PMAKE_BAT_VERSION = $PMAKE_BAT_VERSION;
 use strict;
 BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
@@ -149,12 +149,14 @@ for my $target (@ARGV) {
     # make dist
     elsif ($target eq 'dist') {
 
-        # dist-time check flags (both ON by default)
+        # dist-time check flags (all ON by default)
         my $dist_check1 = 1;
         my $dist_check2 = 1;
+        my $dist_check3 = 1;
         for my $arg (@ARGV) {
             $dist_check1 = 0 if $arg eq '--no-check1';
             $dist_check2 = 0 if $arg eq '--no-check2';
+            $dist_check3 = 0 if $arg eq '--no-check3';
         }
 
         # your PAUSE ID here
@@ -936,6 +938,20 @@ TO_SECURITY
         # check source files in MANIFEST (lib/*.pm lib/*.pl t/*.t eg/*.pl bin/*.pl etc.)
         _dist_check_sources(\@file, $dist_check1, $dist_check2);
 
+        # check the test suite for TAP plan sanity: exactly one plan line
+        # per file, plan count == number of ok/not-ok lines, and no failing
+        # tests. This runs t/*.t (and xt/*.t) in a child Perl, catching the
+        # defects that "perl t/foo.t" by hand hides but a real harness (and
+        # therefore CPAN Testers) exposes. Disable with --no-check3.
+        if ($dist_check3 and -f q{t/lib/INA_CPAN_Check.pm}) {
+            print STDERR "pmake dist: running test-suite plan self-check...\n";
+            my $rc = system($^X, q{-Ilib}, q{-It/lib}, q{-MINA_CPAN_Check},
+                            q{-e}, q{exit(INA_CPAN_Check::selfcheck_suite())});
+            if ($rc != 0) {
+                die "pmake dist aborted: test-suite plan self-check failed.\n";
+            }
+        }
+
         # make work directory
         my $dirname = (dirname($file[0]) eq 'bin') ? 'App' : dirname($file[0]);
         $dirname =~ tr#/#-#;
@@ -1613,9 +1629,30 @@ sub _selfcheck_p1p12 {
         "$label P1: no bare use 5.006+");
 
     # P2: 3-arg open guarded or absent
-    my $has_3arg = ($code =~ /\bopen\s*\(\s*(?:(?:my\s+)?\$\w+|[A-Z_][A-Z0-9_]*)\s*,\s*['"](?:>>?|<<?|\+>|\+<)['"]\s*,/);
-    _sc_ok(!$has_3arg || $guarded,
-        "$label P2: 3-arg open guarded or absent");
+    do {
+        # Scan per line, skipping comment lines and stripping quoted
+        # strings, so a 3-arg open() shown in a descriptive comment or
+        # quoted inside a diagnostic message is not mistaken for executable
+        # code. Once strings collapse to ''/"", a genuine 3-arg open still
+        # carries an empty mode-string between two commas
+        # (open($fh,'<',$f) -> open($fh,'',$f)), while a 2-arg open
+        # (open(FH,"<$file")) collapses to a single argument and is not
+        # flagged. (Masking discipline carried over from
+        # Perl500503Syntax::OrDie.)
+        my $has_3arg = 0;
+        for my $l (split /\n/, $code) {
+            next if $l =~ /^\s*#/;
+            my $s = $l;
+            $s =~ s/'(?:[^'\\]|\\.)*'/''/g;
+            $s =~ s/"(?:[^"\\]|\\.)*"/""/g;
+            $s =~ s/#.*$//;
+            if ($s =~ /\bopen\s*\(\s*(?:(?:my\s+)?\$\w+|[A-Z_][A-Z0-9_]*)\s*,\s*(?:''|"")\s*,/) {
+                $has_3arg = 1; last;
+            }
+        }
+        _sc_ok(!$has_3arg || $guarded,
+            "$label P2: 3-arg open guarded or absent");
+    };
 
     # P3: open(my $fh...) guarded or absent
     do {
@@ -1664,6 +1701,18 @@ sub _selfcheck_p1p12 {
             $s =~ s/'(?:[^'\\]|\\.)*'/''/g;
             $s =~ s/"(?:[^"\\]|\\.)*"/""/g;
             $s =~ s/#.*$//;
+            # Strip quote-like regex operators whose delimiters are braces,
+            # brackets, parens or angles (m{...} qr{...} s{...}{...} m[...]
+            # m(...) m<...>) so a regex *pattern* such as m{//=} -- data,
+            # not an operator -- does not leak its text into the scan below.
+            # A bare /.../ is intentionally left alone: an empty-pattern
+            # match // is indistinguishable from the // of the //= operator,
+            # so stripping it would hide a real //=. (Masking discipline
+            # carried over from Perl500503Syntax::OrDie.)
+            $s =~ s/\b(?:m|qr|s)\s*\{[^{}]*\}(?:\s*\{[^{}]*\})?[a-z]*//g;
+            $s =~ s/\b(?:m|qr|s)\s*\[[^\[\]]*\](?:\s*\[[^\[\]]*\])?[a-z]*//g;
+            $s =~ s/\b(?:m|qr|s)\s*\([^()]*\)(?:\s*\([^()]*\))?[a-z]*//g;
+            $s =~ s/\b(?:m|qr|s)\s*<[^<>]*>(?:\s*<[^<>]*>)?[a-z]*//g;
             next if $s =~ m{://};
             # Built from single characters so this detector does not itself
             # contain a literal defined-or-assignment token in its source.

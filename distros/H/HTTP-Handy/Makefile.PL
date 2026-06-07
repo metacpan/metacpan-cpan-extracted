@@ -5,7 +5,7 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{HTTP::Handy},
-    'VERSION'   => q{1.06},
+    'VERSION'   => q{1.07},
     'ABSTRACT'  => q{A tiny HTTP/1.0 server for Perl 5.5.3+},
     'PREREQ_PM' => {
         'Carp' => '0',
@@ -44,11 +44,11 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'HTTP::Handy' => {
                 'file'    => 'lib/HTTP/Handy.pm',
-                'version' => '1.06',
+                'version' => '1.07',
             },
             'HTTP::Handy::Input' => {
                 'file'    => 'lib/HTTP/Handy.pm',
-                'version' => '1.06',
+                'version' => '1.07',
             }
         },
     };

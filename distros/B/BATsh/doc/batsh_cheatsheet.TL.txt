@@ -1,94 +1,148 @@
-BATsh Cheat Sheet [TL] Filipino
-=================================
+BATsh Cheat Sheet [TL] Tagalog
+==============================
 
 ----------------------------------------------------------------------
 BUOD
-  Ang BATsh ay isang bilinggwal na shell interpreter na nagpapatakbo ng
-  cmd.exe batch at bash/sh syntax sa iisang script file, awtomatikong
-  nagpapalit ng mode bawat linya. Walang kailangan na panlabas na shell.
+  Ang BATsh ay isang bilinggwal na shell na nagpapatakbo ng cmd.exe batch
+  at bash/sh na sintaks sa iisang script file. Awtomatiko itong lumilipat
+  ng mode kada linya/seksyon.
+  Walang kailangang panlabas na shell -- purong Perl na implementasyon.
+  Sinusuportahan ang pipeline, redireksyon, function, at variable-expansion.
 
-HALIMBAWA NG HALO
-  :: CMD na seksyon (unang token ay malalaking titik)
+HALIMBAWANG MIXED-MODE
+  :: seksyong CMD (malaking titik ang unang token)
   @ECHO OFF
   SET LANG=BATsh
+  SET COUNT=3
 
-  # SH na seksyon (unang token ay may maliliit na titik)
-  greet() { echo "Kamusta $1 (bash mode)"; }
+  # seksyong SH (maliit na titik ang unang token)
+  greet() { echo "Hello from $1 (bash mode)"; }
   greet $LANG
-  result=$(echo $LANG | perl -e 'while(<STDIN>){chomp;print uc}')
-  echo "Malalaking titik: $result"
+  for i in 1 2 3; do echo "  item $i of $COUNT"; done
+  result=$(echo $LANG | perl -ne "print uc")
+  echo "Uppercase: $result"
 
-  :: Balik sa CMD (basahin ang resulta ng SH)
-  ECHO Balik CMD: %result%
+  :: seksyong CMD muli (binabasa ang resulta ng SH sa pamamagitan ng tulay)
+  ECHO Back in CMD: %result%
 
-  # Patakbuhin: perl lib/BATsh.pm script.batsh
+  # Patakbuhin gamit ang: perl lib/BATsh.pm script.batsh
+  # O kaya:               use BATsh; BATsh->run('script.batsh');
 ----------------------------------------------------------------------
 
 
-Ang BATsh ay isang dalawang-wikang shell na nagpapatakbo ng cmd.exe
-at bash/sh na syntax sa iisang script. Ang unang token ng bawat linya
-ang nagtatakda ng mode.
+Ang BATsh ay isang bilinggwal na shell na nagpapatakbo ng cmd.exe at
+bash/sh na sintaks sa iisang script.  Hinahati ang script sa mga seksyon;
+bawat seksyon ay isinasagawa nang buo ng angkop na shell.
 
-1. Pagtuklas ng Mode
----------------------
-  ECHO hello          -> cmd.exe mode (unang token puro malaking titik)
-  echo hello          -> bash/sh mode (unang token may maliit na titik)
-  # komento           -> komento (hindi pinapansin)
-  :: komento          -> komento (estilo ng CMD, hindi pinapansin)
-  REM komento         -> komento (estilo ng CMD, hindi pinapansin)
+1. Pagtukoy ng Mode
+-------------------
+  Ang UNANG TOKEN ng unang makabuluhang linya ng isang seksyon ang
+  nagtatakda kung aling shell ang magpapatakbo ng seksyong iyon:
+
+  Mode CMD: ang unang token ay binubuo lamang ng
+            [A-Z 0-9 _ - \ / : . @ %] AT naglalaman ng kahit isang
+            malaking titik A-Z.
+
+    ECHO hello          -> seksyong CMD (cmd.exe)
+    SET FOO=bar baz     -> seksyong CMD  (hindi sinusuri ang bahaging halaga)
+    @ECHO OFF           -> seksyong CMD
+    IF "%X%"=="Y" (     -> seksyong CMD
+
+  Mode SH: lahat ng iba pa (may maliit na titik, o walang titik).
+
+    echo hello          -> seksyong SH  (bash/sh)
+    export FOO=bar      -> seksyong SH
+    if [ -f "$f" ]; then  -> seksyong SH
+    #!/bin/sh           -> seksyong SH  (ang shebang ay linyang SH)
+
+  Ang mga komento at blangkong linya ay nasasama sa kasalukuyang seksyon.
+  Sintaks ng komento:
+    ::           komentong estilong CMD
+    REM ...      komentong estilong CMD (hindi sensitibo sa laki ng titik)
+    @REM ...     komentong estilong CMD
+    # ...        komentong estilong SH  (HINDI ang shebang #!)
 
 2. Pagsisimula ng Shell
-------------------------
-  perl lib/BATsh.pm                    # interactive na REPL
-  perl lib/BATsh.pm script.batsh       # patakbuhin ang script file
-  perl lib/BATsh.pm -e "echo kumusta"  # isang linyang utos
+-----------------------
+  perl lib/BATsh.pm               # interaktibong REPL
+  perl lib/BATsh.pm script.batsh  # patakbuhin ang isang script file
+  perl lib/BATsh.pm -e "echo hi"  # one-liner sa isang linya
 
-  Mula sa Perl API:
+  Mula sa Perl:
     use BATsh;
     BATsh->run('script.batsh');
-    BATsh->run_string("echo kumusta");
+    BATsh->run_string("echo hello");
     BATsh->repl();
 
 3. Tulay ng Environment Variable
-----------------------------------
-  Ang CMD at SH blocks ay nagbabahagi ng mga variable sa pamamagitan ng %ENV ng Perl.
+--------------------------------
+  Bago tumakbo ang bawat seksyon, ini-inject ng BATsh ang kasalukuyang %ENV
+  bilang panimula (mga linyang SET para sa CMD, mga linyang export para sa
+  SH).  Pagkatapos ng seksyon, binabasa muli sa %ENV ang panghuling
+  environment ng shell.
 
-  export FOO=kumusta  # itinakda ng SH ang FOO
-  ECHO %FOO%          # binabasa ng CMD ang FOO sa pamamagitan ng tulay (Windows)
+  export FOO=hello   # itinatakda ng SH ang FOO
+  ECHO %FOO%         # binabasa ng CMD ang FOO sa pamamagitan ng tulay (Windows)
 
-  SET BAR=mundo       # itinakda ng CMD ang BAR
-  echo $BAR           # binabasa ng SH ang BAR sa pamamagitan ng tulay
+  SET BAR=world      # itinatakda ng CMD ang BAR
+  echo $BAR          # binabasa ng SH ang BAR sa pamamagitan ng tulay
 
 4. SETLOCAL / ENDLOCAL
------------------------
-  SETLOCAL           # larawan ng %ENV
-  SET TMP=lokal
+----------------------
+  SETLOCAL           # snapshot ng %ENV (hinahawakan ng BATsh, hindi cmd.exe)
+  SET TMP=local_val
   ECHO %TMP%
-  ENDLOCAL           # ibalik ang %ENV (mawawala ang TMP)
+  ENDLOCAL           # ibinabalik ang %ENV (nawawala ang TMP)
 
-5. Pagtatago (Mixed Mode)
---------------------------
-  Ang mga block construct ay dapat tamang ipares.
+  Maaaring i-nest ang mga saklaw.
 
-  for x in 1 2; do   # binubuksan ng SH ang block
-      ECHO item $x   # linya ng CMD sa loob ng SH block
-  done               # isinasara ng SH ang block
+5. Pagtukoy ng Hangganan ng Seksyon
+-----------------------------------
+  Nagtatapos ang isang seksyon kapag bumalik sa zero ang lalim ng block
+  nito AT ang susunod na makabuluhang linya ay kabilang sa ibang mode.
 
-  CMD keywords: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
-  SH  keywords: if/fi  for/done  while/done  until/done  case/esac  { }
+  Sinusubaybayan ng seksyong CMD ang lalim ng ( at ) na wala sa panipi:
+
+    IF "%X%"=="Y" (     <- nagbubukas ng block (lalim 1)
+        ECHO yes
+    ) ELSE (            <- nagsasara at muling nagbubukas (lalim nananatili >=1)
+        ECHO no
+    )                   <- nagsasara ng block (lalim 0) -> maaaring magtapos
+
+  Sinusubaybayan ng seksyong SH ang lalim ng keyword:
+
+    for x in 1 2; do   <- nagbubukas ng block (lalim 1)
+        echo $x
+    done                <- nagsasara ng block (lalim 0) -> maaaring magtapos
+
+  Ang mga linya sa loob ng bukas na block ay nasasama sa kasalukuyang seksyon
+  kahit mukhang ibang mode ang unang token. Pinapayagan nito ang:
+
+    for x in A B; do
+        ECHO $x          <- malaking titik sa loob ng SH block: SH pa rin
+    done
+
+  Mga pares ng keyword sa SH:
+    Pambukas (+1) : if  for  while  until  case  function  select  {
+    Pansara  (-1) : fi  done  esac  }
+    Neutral  ( 0) : then  do  else  elif
 
 6. Mga Kahulugan ng Subroutine
---------------------------------
+------------------------------
   :GREET
-  echo "Kumusta $BATSH_ARG1"
+  echo "Hello $BATSH_ARG1"
   RET
 
+  Nagsisimula sa : ang mga label at nagtatapos sa RET o RETURN.
+  Kinukuha ang katawan bago isagawa (hindi pinapatakbo inline).
+  Maaaring maglaman ang katawan ng mga linyang CMD, SH, o pinaghalo.
+
 7. CALL at source
-------------------
-  CALL :GREET mundo      # tumawag ng subroutine na may argumento
-  CALL iba.batsh         # isama/patakbuhin ang isa pang .batsh file (CMD)
-  source iba.batsh       # isama/patakbuhin ang isa pang .batsh file (SH)
-  . iba.batsh            # POSIX na tuldok na notasyon
+-----------------
+  CALL :GREET world      # tawagin ang subroutine na may argumento
+  CALL other.batsh       # isama/patakbuhin ang ibang .batsh file (CMD)
+  source other.batsh     # isama/patakbuhin ang ibang .batsh file (SH)
+  . other.batsh          # POSIX dot notation
 
   Mga argumento: $BATSH_ARG1 .. $BATSH_ARGn  (%BATSH_ARG1% sa CMD)
   Bilang:        $BATSH_ARGC
@@ -98,22 +152,82 @@ ang nagtatakda ng mode.
   BATsh->run($file)            # patakbuhin ang .batsh file
   BATsh->run_string($source)   # patakbuhin ang source string
   BATsh->run_lines(@lines)     # patakbuhin ang array ng mga linya
-  BATsh->repl()                # interactive na REPL
-  BATsh->classify_token($tok)  # ibalik ang 'CMD' o 'SH'
-  BATsh->setlocal()            # larawan ng %ENV
+  BATsh->repl()                # interaktibong REPL
+  BATsh->classify_token($tok)  # 'CMD' o 'SH'
+  BATsh->setlocal()            # snapshot ng %ENV
   BATsh->endlocal()            # ibalik ang %ENV
-  BATsh->call_sub($lbl, @args) # tumawag ng subroutine
+  BATsh->call_sub($lbl, @args) # tawagin ang subroutine
   BATsh->source_file($file)    # isama ang .batsh file
   BATsh->version()             # string ng bersyon
 
 9. Mga Tala sa Platform
-------------------------
-  Windows: Parehong CMD at SH na seksyon ay tumatakbo sa purong Perl -- walang kailangan na cmd.exe/bash/sh.
-  UNIX:    Parehong CMD at SH na seksyon ay tumatakbo sa purong Perl -- walang kailangan na cmd.exe/bash/sh.
+-----------------------
+  Windows: Parehong tumatakbo ang seksyong CMD at SH sa purong Perl -- walang kailangang panlabas na cmd.exe, bash, o sh.
+  UNIX:    Parehong tumatakbo ang seksyong CMD at SH sa purong Perl -- walang kailangang panlabas na cmd.exe, bash, o sh.
 
 10. Mga Kinakailangan
 ---------------------
-  Perl 5.005_03 o mas mataas. Mga core module lamang (File::Spec, Carp).
-  Walang CPAN na dependensya.
+  Perl 5.005_03 o mas bago.  Mga core module lamang (File::Spec, Carp).
+  Walang dependency sa CPAN.
+
+11. CMD Pipeline at mga Modifier ng Parameter
+---------------------------------------------
+  cmd1 | cmd2              # pipeline sa pamamagitan ng pansamantalang file (Purong Perl)
+  ECHO hello | perl -e "while(<STDIN>){print uc}"
+
+  SET /P VAR=Prompt:       # magbasa ng isang linya mula sa STDIN papuntang VAR
+
+  Mga tilde modifier ng batch-parameter (hal. kapag %0=C:\scripts\deploy.bat):
+    %~0   -> C:\scripts\deploy.bat  (pag-alis lang ng panipi)
+    %~f0  -> C:/scripts/deploy.bat  (buong absolutong path)
+    %~d0  -> C:                     (titik ng drive)
+    %~p0  -> /scripts/              (path ng direktoryo)
+    %~n0  -> deploy                 (pangalan ng file na walang extension)
+    %~x0  -> .bat                   (extension)
+    %~dp0 -> C:/scripts/            (drive + direktoryo, pinakakaraniwan)
+    %~nx1 -> deploy.bat             (pangalan + extension)
+
+12. Mga Function at Expansion sa SH
+-----------------------------------
+  greet() {              # kahulugan ng function
+      echo "Hi $1"
+  }
+  function add {         # alternatibong sintaks
+      echo $(( $1 + $2 ))
+  }
+  greet world            # tawagin ang function
+  add 3 4                # -> 7
+
+  ${var%.*}    alisin ang pinakamaikling suffix na tumutugma sa .*
+  ${var%%.*}   alisin ang pinakamahabang suffix na tumutugma sa .*
+  ${var#*.}    alisin ang pinakamaikling prefix na tumutugma sa *.
+  ${var##*.}   alisin ang pinakamahabang prefix na tumutugma sa *.
+  ${var/a/b}   palitan ang unang paglitaw ng a ng b
+  ${var//a/b}  palitan lahat ng paglitaw ng a ng b
+  ${var^^}     lahat ng malaking titik
+  ${var,,}     lahat ng maliit na titik
+  ${var:2:4}   substring mula offset 2, haba 4
+  ${#var}      haba ng string
+  ${var:-def}  halaga kung naka-set, kung hindi def
+
+13. SH I/O Redireksyon
+----------------------
+  cmd > file      i-overwrite ang stdout
+  cmd >> file     idugtong sa stdout
+  cmd < file      stdin mula sa file
+  cmd 2> file     stderr papuntang file
+  cmd 2>&1        pagsamahin ang stderr sa stdout
+  cmd > f 2>&1    stdout at stderr papuntang file
+
+  Here-document (input sa stdin):
+    cmd <<EOF       mga linya ng katawan hanggang EOF; pinapalawak ang $VAR
+    cmd <<'EOF'     mga linya ng katawan hanggang EOF; walang expansion (literal)
+    cmd <<-EOF      gaya ng <<EOF, ngunit inaalis ang mga TAB sa simula ng linya
+
+14. SH Compound na mga Utos
+---------------------------
+  cmd1 && cmd2    patakbuhin ang cmd2 lamang kung nagtagumpay ang cmd1
+  cmd1 || cmd2    patakbuhin ang cmd2 lamang kung nabigo ang cmd1
+  cmd1 ; cmd2     patakbuhin ang cmd2 nang walang kundisyon
 
 Tingnan din: https://metacpan.org/dist/BATsh

@@ -287,11 +287,11 @@ EOT
     @lines = $io->getlines;
     is( scalar( @lines ), 6, 'truncate' );
     diag( "String now is:\n$io" ) if( $DEBUG );
-    
+
     ok( $io->close, 'close' );
     ok( !tied( $io ), 'untied' );
     ok( !$io->opened, 'opened' );
-    
+
     my $s2 = Module::Generic::Scalar->new( \$text );
     $io = $s2->open( '<' );
     isa_ok( $io => 'Module::Generic::Scalar::IO' );
@@ -379,7 +379,7 @@ subtest 'callback' => sub
     $test->append( "\nLe jour de gloire est arrivé." );
     diag( "String is: '", $test->scalar, "'" ) if( $DEBUG );
     is( $test->substr( -7, 6 ), 'arrivé', 'append (2)' );
-    
+
     $test->callback( add => sub
     {
         my $this = shift( @_ );
@@ -391,7 +391,7 @@ subtest 'callback' => sub
     $test->substr( 31, 6, 'a journée' );
     is( $test->scalar, "Allons enfants de la Patrie !\nLa journée de gloire est arrivé.", 'substr (2)' );
     my $copy = $$test;
-    
+
     diag( "Blocking modification." ) if( $DEBUG );
     my $try = 0;
     $test->callback( add => sub
@@ -417,7 +417,7 @@ subtest 'callback' => sub
     $test->reset;
     is( $try, 1, 'removal rejected' );
     is( $$test, $copy, 'removal rejected' );
-    
+
     $test->callback( remove => sub
     {
         my $this = shift( @_ );

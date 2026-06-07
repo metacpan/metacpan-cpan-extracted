@@ -1,6 +1,6 @@
 package Sys::Export;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 # ABSTRACT: Export a subset of an OS file tree, for chroot/initrd
 
 use v5.26;
@@ -420,6 +420,8 @@ the global exporter object get exported as functions:
 
 =back
 
+along with the exports L</exporter> and L</filedata>.
+
 =head2 C<:isa> bundle
 
   use Sys::Export ":isa";
@@ -538,7 +540,7 @@ Dies if the number is less than 0.
   $scalar_ref= map_or_load_file($path, $offset, $length);
 
 If L<File::Map> is available, this creates a read-only memory map of the file (from the
-specified offset) and rreturns a scalar ref to it.  If not, it simply loads the file into
+specified offset) and returns a scalar ref to it.  If not, it simply loads the file into
 a scalar and returns a ref to that.  You should assume the data in the scalar is read-only.
 
 =head2 filedata
@@ -571,7 +573,7 @@ If any syscall fails, or can't write the full size, this croaks.
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

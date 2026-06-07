@@ -1,116 +1,230 @@
-BATsh អ្នឹកស្រួល [KM] ភាសាខ្មែរ
-==============================
+BATsh សន្លឹកសង្ខេប [KM] ភាសាខ្មែរ
+=================================
 
 ----------------------------------------------------------------------
-សង្ខេបការប្រតិបត្តិ
-  BATsh គឺជាអ្នកបកប្រែ shell ពីរភាសា ដែលដំណើរការ cmd.exe batch
-  និង bash/sh ក្នុងឯកសារ script តែមួយ ប្ដូរប្រភេទដោយស្វ័យប្រវត្តិ។
-  មិនត្រូវការ shell ខាងក្រៅ -- Perl ពិតប្រាកដ។
+សេចក្ដីសង្ខេប
+  BATsh គឺជា shell ពីរភាសា ដែលដំណើរការ syntax batch cmd.exe និង bash/sh
+  នៅក្នុងឯកសារ script តែមួយ។ វាប្ដូររបៀបដោយស្វ័យប្រវត្តិតាមបន្ទាត់/ផ្នែក។
+  មិនត្រូវការ shell ខាងក្រៅ -- ការអនុវត្ត Perl សុទ្ធ។
+  គាំទ្រ pipeline ការបញ្ជូនបន្ត មុខងារ និងផ្នែកបន្ថែមនៃការពង្រីកអថេរ។
 
-គំរូចម្រុះ
+គំរូរបៀបចម្រុះ
   :: ផ្នែក CMD (token ដំបូងជាអក្សរធំ)
   @ECHO OFF
   SET LANG=BATsh
+  SET COUNT=3
 
-  # ផ្នែក SH (token ដំបូងមានអក្សរតូច)
-  greet() { echo "សួស្តី $1 (bash mode)"; }
+  # ផ្នែក SH (token ដំបូងជាអក្សរតូច)
+  greet() { echo "Hello from $1 (bash mode)"; }
   greet $LANG
-  result=$(echo $LANG | perl -e 'while(<STDIN>){chomp;print uc}')
-  echo "អក្សរធំ: $result"
+  for i in 1 2 3; do echo "  item $i of $COUNT"; done
+  result=$(echo $LANG | perl -ne "print uc")
+  echo "Uppercase: $result"
 
-  :: ត្រឡប់ CMD (អានលទ្ធផល SH)
-  ECHO ត្រឡប់ CMD: %result%
+  :: ផ្នែក CMD ម្ដងទៀត (អានលទ្ធផល SH តាមរយៈ bridge)
+  ECHO Back in CMD: %result%
 
-  # ដំណើរការ: perl lib/BATsh.pm script.batsh
+  # ដំណើរការដោយ: perl lib/BATsh.pm script.batsh
+  # ឬ:           use BATsh; BATsh->run('script.batsh');
 ----------------------------------------------------------------------
 
 
-BATsh គឺជាសែលត្តរសងខ្នានល្បិស័ល្រែក cmd.exe នឹង bash/sh
-នៅក្នុងសក្រិបិតត្វ្យតាមួយគ្នា। ទោក័នតិកតាមួយនៃលឃិត្ឥកាលត់តើមោតផ័រ।
+BATsh គឺជា shell ពីរភាសា ដែលដំណើរការ syntax cmd.exe និង bash/sh នៅក្នុង
+script តែមួយ។  Script ត្រូវបានបែងចែកជាផ្នែកៗ; ផ្នែកនីមួយៗ ត្រូវបានប្រតិបត្តិ
+ដូចដើមដោយ shell ដែលសមស្រប។
 
-1. ការស័ងកើតមោត
-------------------
-  ECHO hello          -> មោត cmd.exe (ទោក័នតិកត័លទាមុនជាែក័ល)
-  echo hello          -> មោត bash/sh (ទោក័នតិកមានក័លតូច)
-  # ក័ណត់           -> ក័ណត់ (លែកអើស)
-  :: ក័ណត់          -> ក័ណត់ (CMD, លែកអើស)
-  REM ក័ណត់         -> ក័ណត់ (CMD, លែកអើស)
+1. ការរកឃើញរបៀប
+---------------
+  «Token ដំបូង» នៃបន្ទាត់មានន័យដំបូងនៃផ្នែកមួយ កំណត់ថា shell ណាមួយ
+  ដំណើរការផ្នែកនោះ៖
 
-2. ចាम្បើករែ Shell
-------------------
-  perl lib/BATsh.pm                    # REPL ផ័ល័អាចារយ
-  perl lib/BATsh.pm script.batsh       # ដោរតើសក្រិបិត
-  perl lib/BATsh.pm -e "echo chomnob"  # ប័ណតាតាមួយមួយ
+  របៀប CMD: token ដំបូងផ្សំឡើងទាំងស្រុងពី [A-Z 0-9 _ - \ / : . @ %]
+            ហើយមានអក្សរធំ A-Z យ៉ាងហោចណាស់មួយ។
 
-  ពី Perl API:
+    ECHO hello          -> ផ្នែក CMD (cmd.exe)
+    SET FOO=bar baz     -> ផ្នែក CMD  (មិនពិនិត្យផ្នែកតម្លៃ)
+    @ECHO OFF           -> ផ្នែក CMD
+    IF "%X%"=="Y" (     -> ផ្នែក CMD
+
+  របៀប SH: អ្វីៗផ្សេងទៀត (មានអក្សរតូច ឬគ្មានអក្សរទាល់តែសោះ)។
+
+    echo hello          -> ផ្នែក SH  (bash/sh)
+    export FOO=bar      -> ផ្នែក SH
+    if [ -f "$f" ]; then  -> ផ្នែក SH
+    #!/bin/sh           -> ផ្នែក SH  (shebang ជាបន្ទាត់ SH)
+
+  មតិយោបល់ និងបន្ទាត់ទទេ ត្រូវបានបញ្ចូលទៅក្នុងផ្នែកបច្ចុប្បន្ន។
+  Syntax មតិយោបល់៖
+    ::           មតិយោបល់រចនាប័ទ្ម CMD
+    REM ...      មតិយោបល់រចនាប័ទ្ម CMD (មិនប្រកាន់អក្សរធំតូច)
+    @REM ...     មតិយោបល់រចនាប័ទ្ម CMD
+    # ...        មតិយោបល់រចនាប័ទ្ម SH  (មិនមែន shebang #!)
+
+2. ការចាប់ផ្ដើម Shell
+---------------------
+  perl lib/BATsh.pm               # REPL អន្តរកម្ម
+  perl lib/BATsh.pm script.batsh  # ដំណើរការឯកសារ script
+  perl lib/BATsh.pm -e "echo hi"  # ពាក្យបញ្ជាមួយបន្ទាត់ inline
+
+  ពី Perl៖
     use BATsh;
     BATsh->run('script.batsh');
-    BATsh->run_string("echo chomnob");
+    BATsh->run_string("echo hello");
     BATsh->repl();
 
-3. សែតុ ត័វ័រនៅក្នុងបរិស្ថាន
-----------------------------------------
-  ប័ណ័ក័រ CMD នឹង SH ចំស្នើរត័វ័រក័ន័ឥនើយ %ENV ស័បើល់អ្នកបើល់
+3. Bridge អថេរបរិស្ថាន
+----------------------
+  មុនពេលផ្នែកនីមួយៗដំណើរការ BATsh បញ្ចូល %ENV បច្ចុប្បន្នជាបុព្វកថា
+  (បន្ទាត់ SET សម្រាប់ CMD, បន្ទាត់ export សម្រាប់ SH)។  បន្ទាប់ពីផ្នែកនោះ
+  បរិស្ថានចុងក្រោយរបស់ shell ត្រូវបានអានត្រឡប់ទៅក្នុង %ENV។
 
-  export FOO=chomnob   # SH កំណត់ FOO
-  ECHO %FOO%           # CMD អានសែតុ FOO (Windows)
+  export FOO=hello   # SH កំណត់ FOO
+  ECHO %FOO%         # CMD អាន FOO តាមរយៈ bridge (Windows)
 
-  SET BAR=lok          # CMD កំណត់ BAR
-  echo $BAR            # SH អានសែតុ BAR
+  SET BAR=world      # CMD កំណត់ BAR
+  echo $BAR          # SH អាន BAR តាមរយៈ bridge
 
 4. SETLOCAL / ENDLOCAL
------------------------
-  SETLOCAL           # អ័តតែនៅក្នុង %ENV
-  SET TMP=តម្លែ
+----------------------
+  SETLOCAL           # ថតរូប %ENV (គ្រប់គ្រងដោយ BATsh មិនមែន cmd.exe)
+  SET TMP=local_val
   ECHO %TMP%
-  ENDLOCAL           # ប័លាស័ក័រលើអិត %ENV
+  ENDLOCAL           # ស្ដារ %ENV (TMP បាត់)
 
-5. ការតំសែរ (មោតឆ្លេស)
+  វិសាលភាពអាចដាក់ត្រួតគ្នាបាន។
+
+5. ការរកឃើញព្រំដែនផ្នែក
 -----------------------
-  for x in 1 2; do   # SH បើកប័ណតា
-      ECHO item $x   # ប័ណតា CMD នៅក្នុងប័ណតា SH
-  done               # SH បទាប័ណតា
+  ផ្នែកមួយបញ្ចប់ នៅពេលជម្រៅ block របស់វាត្រឡប់ទៅសូន្យ ហើយបន្ទាត់មានន័យ
+  បន្ទាប់ជាកម្មសិទ្ធិរបស់របៀបផ្សេង។
 
-  CMD: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
-  SH:  if/fi  for/done  while/done  until/done  case/esac  { }
+  ផ្នែក CMD តាមដានជម្រៅ ( និង ) ក្រៅសញ្ញាសម្រង់៖
 
-6. ការកំណត់អនុក្រម
--------------------------
+    IF "%X%"=="Y" (     <- បើក block (ជម្រៅ 1)
+        ECHO yes
+    ) ELSE (            <- បិទ ហើយបើកឡើងវិញ (ជម្រៅនៅ >=1)
+        ECHO no
+    )                   <- បិទ block (ជម្រៅ 0) -> ផ្នែកអាចបញ្ចប់
+
+  ផ្នែក SH តាមដានជម្រៅ keyword៖
+
+    for x in 1 2; do   <- បើក block (ជម្រៅ 1)
+        echo $x
+    done                <- បិទ block (ជម្រៅ 0) -> ផ្នែកអាចបញ្ចប់
+
+  បន្ទាត់នៅក្នុង block ដែលបើក ត្រូវបានបញ្ចូលទៅក្នុងផ្នែកបច្ចុប្បន្ន ទោះបី
+  token ដំបូងរបស់វាមើលទៅដូចរបៀបផ្សេងក៏ដោយ។ នេះអនុញ្ញាតឱ្យ៖
+
+    for x in A B; do
+        ECHO $x          <- អក្សរធំក្នុង block SH: នៅតែជាផ្នែក SH
+    done
+
+  គូ keyword SH៖
+    អ្នកបើក (+1) : if  for  while  until  case  function  select  {
+    អ្នកបិទ (-1) : fi  done  esac  }
+    អព្យាក្រឹត ( 0) : then  do  else  elif
+
+6. និយមន័យ Subroutine
+---------------------
   :GREET
-  echo "Chomnob $BATSH_ARG1"
+  echo "Hello $BATSH_ARG1"
   RET
 
-7. CALL នឹង source
-------------------
-  CALL :GREET lok        # ហើអនុក្រម ត្រឹមជម៝តផ័រ
-  CALL phaseh.batsh      # ដោរហើសក្រិបិត .batsh ផសើង (CMD)
-  source phaseh.batsh    # ដោរហើសក្រិបិត .batsh ផសើង (SH)
-  . phaseh.batsh         # សញ្ញា POSIX
+  Label ចាប់ផ្ដើមដោយ : ហើយបញ្ចប់ដោយ RET ឬ RETURN។
+  តួ ត្រូវបានស្រង់ចេញមុនពេលប្រតិបត្តិ (មិនដំណើរការ inline)។
+  តួ អាចមានបន្ទាត់ CMD, បន្ទាត់ SH, ឬល្បាយ។
 
-  ជម៝ត: $BATSH_ARG1 .. $BATSH_ARGn  (%BATSH_ARG1% នៅក្នុង CMD)
-  ចំនួន: $BATSH_ARGC
+7. CALL និង source
+------------------
+  CALL :GREET world      # ហៅ subroutine ជាមួយ argument
+  CALL other.batsh       # រួមបញ្ចូល/ដំណើរការឯកសារ .batsh ផ្សេង (CMD)
+  source other.batsh     # រួមបញ្ចូល/ដំណើរការឯកសារ .batsh ផ្សេង (SH)
+  . other.batsh          # សញ្ញាចំណុច POSIX
+
+  Argument: $BATSH_ARG1 .. $BATSH_ARGn  (ក្នុង CMD គឺ %BATSH_ARG1%)
+  ចំនួន:    $BATSH_ARGC
 
 8. Perl API
 -----------
-  BATsh->run($file)            # ដោរសក្រិបិត .batsh
-  BATsh->run_string($source)   # ដោរសក្រិបិតសក័រក័រ
-  BATsh->run_lines(@lines)     # ដោរប័គាថទែត
-  BATsh->repl()                # REPL ផ័ល័អាចារយ
-  BATsh->classify_token($tok)  # ត័រលឹក 'CMD' តើ 'SH'
-  BATsh->setlocal()            # អ័តតែនៅក្នុង %ENV
-  BATsh->endlocal()            # ប័លាស័ក័រលើអិត %ENV
-  BATsh->call_sub($lbl, @args) # ហើអនុក្រម
-  BATsh->source_file($file)    # ដោរសក្រិបិត .batsh ផសើង
-  BATsh->version()             # កើន់ប័ភ័ត
+  BATsh->run($file)            # ដំណើរការឯកសារ .batsh
+  BATsh->run_string($source)   # ដំណើរការ string ប្រភព
+  BATsh->run_lines(@lines)     # ដំណើរការ array នៃបន្ទាត់
+  BATsh->repl()                # REPL អន្តរកម្ម
+  BATsh->classify_token($tok)  # 'CMD' ឬ 'SH'
+  BATsh->setlocal()            # ថតរូប %ENV
+  BATsh->endlocal()            # ស្ដារ %ENV
+  BATsh->call_sub($lbl, @args) # ហៅ subroutine
+  BATsh->source_file($file)    # រួមបញ្ចូលឯកសារ .batsh
+  BATsh->version()             # string កំណែ
 
-9. កំណត់សម័កភ្ណាបក័ររ
----------------------------------
-  Windows: ផ្នែក CMD និង SH ដំណើរការក្នុង Perl សុទ្ធ -- មិនត្រូវការ cmd.exe/bash/sh ខាងក្រៅទេ។
-  UNIX:    ផ្នែក CMD និង SH ដំណើរការក្នុង Perl សុទ្ធ -- មិនត្រូវការ cmd.exe/bash/sh ខាងក្រៅទេ។
+9. កំណត់សម្គាល់វេទិកា
+--------------------
+  Windows: ផ្នែក CMD និង SH ដំណើរការក្នុង Perl សុទ្ធ -- មិនត្រូវការ cmd.exe, bash, ឬ sh ខាងក្រៅ។
+  UNIX:    ផ្នែក CMD និង SH ដំណើរការក្នុង Perl សុទ្ធ -- មិនត្រូវការ cmd.exe, bash, ឬ sh ខាងក្រៅ។
 
-10. ត្រូវការ
------------
-  Perl 5.005_03 តាម អកគង័ពាថមួយ। តែមានត័រត័កក័អតឹតជាែនកែលសាក័រញែក (File::Spec, Carp)।
-  គ្មានការអាស័អឆ្នើនៅលើ CPAN।
+10. តម្រូវការ
+-------------
+  Perl 5.005_03 ឬថ្មីជាង។  module ស្នូលតែប៉ុណ្ណោះ (File::Spec, Carp)។
+  គ្មាន CPAN dependency ទេ។
 
-មើលស្វែគត់: https://metacpan.org/dist/BATsh
+11. CMD Pipeline និងកម្មវិធីកែប្រែ Parameter
+-------------------------------------------
+  cmd1 | cmd2              # pipeline តាមឯកសារបណ្ដោះអាសន្ន (Perl សុទ្ធ)
+  ECHO hello | perl -e "while(<STDIN>){print uc}"
+
+  SET /P VAR=Prompt:       # អានបន្ទាត់មួយពី STDIN ចូល VAR
+
+  កម្មវិធីកែប្រែ tilde នៃ batch-parameter (ឧ. ពេល %0=C:\scripts\deploy.bat):
+    %~0   -> C:\scripts\deploy.bat  (ដកសញ្ញាសម្រង់តែប៉ុណ្ណោះ)
+    %~f0  -> C:/scripts/deploy.bat  (ផ្លូវដាច់ខាតពេញលេញ)
+    %~d0  -> C:                     (អក្សរ drive)
+    %~p0  -> /scripts/              (ផ្លូវ directory)
+    %~n0  -> deploy                 (ឈ្មោះឯកសារគ្មានកន្ទុយ)
+    %~x0  -> .bat                   (កន្ទុយ)
+    %~dp0 -> C:/scripts/            (drive + directory ប្រើច្រើនបំផុត)
+    %~nx1 -> deploy.bat             (ឈ្មោះ + កន្ទុយ)
+
+12. មុខងារ SH និងការពង្រីក
+--------------------------
+  greet() {              # និយមន័យមុខងារ
+      echo "Hi $1"
+  }
+  function add {         # syntax ជំនួស
+      echo $(( $1 + $2 ))
+  }
+  greet world            # ហៅមុខងារ
+  add 3 4                # -> 7
+
+  ${var%.*}    ដក suffix ខ្លីបំផុតដែលត្រូវនឹង .*
+  ${var%%.*}   ដក suffix វែងបំផុតដែលត្រូវនឹង .*
+  ${var#*.}    ដក prefix ខ្លីបំផុតដែលត្រូវនឹង *.
+  ${var##*.}   ដក prefix វែងបំផុតដែលត្រូវនឹង *.
+  ${var/a/b}   ជំនួស a លើកដំបូងដោយ b
+  ${var//a/b}  ជំនួស a ទាំងអស់ដោយ b
+  ${var^^}     ធ្វើជាអក្សរធំទាំងអស់
+  ${var,,}     ធ្វើជាអក្សរតូចទាំងអស់
+  ${var:2:4}   substring ចាប់ពី offset 2 ប្រវែង 4
+  ${#var}      ប្រវែង string
+  ${var:-def}  តម្លៃ បើបានកំណត់ បើពុំនោះ def
+
+13. ការបញ្ជូនបន្ត I/O របស់ SH
+-----------------------------
+  cmd > file      សរសេរជាន់ពីលើ stdout
+  cmd >> file     បន្ថែមទៅ stdout
+  cmd < file      stdin ពីឯកសារ
+  cmd 2> file     stderr ទៅឯកសារ
+  cmd 2>&1        បញ្ចូល stderr ទៅក្នុង stdout
+  cmd > f 2>&1    ទាំង stdout និង stderr ទៅឯកសារ
+
+  Here-document (input លើ stdin):
+    cmd <<EOF       បន្ទាត់តួរហូតដល់ EOF; $VAR ត្រូវបានពង្រីក
+    cmd <<'EOF'     បន្ទាត់តួរហូតដល់ EOF; គ្មានការពង្រីក (តាមអក្សរ)
+    cmd <<-EOF      ដូច <<EOF ប៉ុន្តែតួអក្សរ TAB នៅដើមបន្ទាត់ត្រូវបានដក
+
+14. ពាក្យបញ្ជាផ្សំ SH
+--------------------
+  cmd1 && cmd2    ដំណើរការ cmd2 តែពេល cmd1 ជោគជ័យ
+  cmd1 || cmd2    ដំណើរការ cmd2 តែពេល cmd1 បរាជ័យ
+  cmd1 ; cmd2     ដំណើរការ cmd2 ដោយគ្មានលក្ខខណ្ឌ
+
+មើលផងដែរ: https://metacpan.org/dist/BATsh

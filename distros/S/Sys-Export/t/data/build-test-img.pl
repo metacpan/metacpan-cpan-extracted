@@ -5,7 +5,11 @@ use Getopt::Long;
 use Sys::Export qw/ filedata /;
 use Sys::Export::GPT;
 use Sys::Export::ISO9660Hybrid qw/ GPT_TYPE_GRUB /;
-use Log::Any::Adapter 'TAP';
+# Log::Any output merged into TAP stream is nice, but not required
+BEGIN {
+   eval q{use Log::Any::Adapter 'TAP'; 1}
+   or eval q{use Log::Any::Adapter 'Stderr', log_level => 'warn'; 1}
+}
 
 GetOptions(
    'mbr=s'      => \my $mbr_img,

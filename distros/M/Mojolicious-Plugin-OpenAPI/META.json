@@ -37,7 +37,7 @@
             "Text::Markdown" : "v1.0.31"
          },
          "requires" : {
-            "JSON::Validator" : "5.13",
+            "JSON::Validator" : "5.17",
             "Mojolicious" : "9.00",
             "perl" : "5.016"
          }
@@ -67,7 +67,7 @@
          "web" : "https://web.libera.chat/#perl-openapi"
       }
    },
-   "version" : "5.11",
+   "version" : "5.12",
    "x_contributors" : [
       "Bernhard Graf <augensalat@gmail.com>",
       "Doug Bell <doug@preaction.me>",

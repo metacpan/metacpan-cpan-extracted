@@ -1,7 +1,10 @@
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Test::More;
 use IO::Socket::INET;
+use HypersonicTest qw(spawn_server wait_for_port);
 
 
 use Hypersonic;
@@ -13,12 +16,11 @@ plan skip_all => 'fork not available' unless $^O ne 'MSWin32';
 my $port = 18880 + ($$ % 1000);
 my $cache_dir = "_test_run_cache_$$";
 
-# Fork a server process
-my $pid = fork();
-die "Fork failed: $!" unless defined $pid;
-
-if ($pid == 0) {
-    # Child - run test server
+# Use spawn_server/wait_for_port so a cold JIT compile on slow CPAN
+# smokers gets the full 60s minimum floor wait_for_port enforces,
+# with child stderr capture for diag. Pre-0.18 the bare 50x0.1s
+# probe was nowhere near enough for a cold compile.
+my ($pid, $log) = spawn_server(sub {
     my $server = Hypersonic->new(cache_dir => $cache_dir);
 
     $server->get('/task/1' => sub { '{"task":1,"done":true}' });
@@ -33,10 +35,15 @@ if ($pid == 0) {
 
     $server->compile();
     $server->run(port => $port, workers => 1);
-    exit(0);
+});
+
+my $bound = wait_for_port($port, { pid => $pid, log => $log, tries => 100 });
+unless ($bound) {
+    kill 'TERM', $pid;
+    BAIL_OUT("server child failed to bind port $port (see diag above)");
 }
 
-# Parent - wait for server to start with retries
+# Parent - request-level probe to confirm dispatch is wired up
 my $server_ready = 0;
 for my $attempt (1..50) {
     my $sock = IO::Socket::INET->new(
@@ -56,6 +63,10 @@ for my $attempt (1..50) {
         }
     }
     select(undef, undef, undef, 0.1);
+}
+unless ($server_ready) {
+    HypersonicTest::diag_child_log($log);
+    kill 'TERM', $pid;
 }
 
 ok($server_ready, 'Test server is running');

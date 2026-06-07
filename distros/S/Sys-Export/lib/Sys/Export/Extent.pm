@@ -1,6 +1,6 @@
 package Sys::Export::Extent;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 # ABSTRACT: Represents a range of bytes and data that needs written there
 
 use v5.26;
@@ -216,7 +216,7 @@ L<LazyFileData|Sys::Export::LazyFileData> object.
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

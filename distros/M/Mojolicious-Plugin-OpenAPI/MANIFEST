@@ -69,6 +69,7 @@ t/v3-defaults.t
 t/v3-file.t
 t/v3-invalid_file_refs.t
 t/v3-invalid_file_refs_no_path.t
+t/v3-multipart.t
 t/v3-nullable.t
 t/v3-style-array.t
 t/v3-style-object.t

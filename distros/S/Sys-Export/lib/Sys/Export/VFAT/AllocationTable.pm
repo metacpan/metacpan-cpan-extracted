@@ -1,7 +1,7 @@
 package Sys::Export::VFAT::AllocationTable;
 
 # ABSTRACT: Track which FAT clusters are used, and by what
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 
 # Element 0 of the FAT is used for an inversion list of which sectors are allocated.
@@ -328,7 +328,7 @@ clusters.  Make sure you set L</max_cluster_id> correctly before calling this.
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

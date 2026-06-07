@@ -1,141 +1,232 @@
-BATsh Hizli Basvuru [TR] Turkce
-=================================
+BATsh Hızlı Başvuru [TR] Türkçe
+===============================
 
 ----------------------------------------------------------------------
-OZET
-  BATsh, cmd.exe toplu is ve bash/sh sozdizimini ayni betik dosyasinda
-  calistiran iki dilli bir kabuk yorumlayicisidir. Satir satir mod otomatik
-  algilanir. Dis kabuk gerekmez -- saf Perl uygulamasi.
+ÖZET
+  BATsh, cmd.exe batch ve bash/sh sözdizimini aynı betik dosyasında
+  çalıştıran iki dilli bir kabuktur. Modu satır/bölüm bazında otomatik
+  olarak değiştirir.
+  Harici kabuk gerekmez -- saf Perl uygulaması.
+  İşlem hatlarını, yönlendirmeyi, işlevleri ve değişken-genişletme
+  uzantılarını destekler.
 
-KARISIK ORNEK
-  :: CMD bolumu (ilk belirtes buyuk harf)
+KARMA MOD ÖRNEĞİ
+  :: CMD bölümü (ilk belirteç büyük harf)
   @ECHO OFF
   SET LANG=BATsh
+  SET COUNT=3
 
-  # SH bolumu (ilk belirtes kucuk harf icerir)
-  greet() { echo "Merhaba $1 (bash modu)"; }
+  # SH bölümü (ilk belirteç küçük harf)
+  greet() { echo "Hello from $1 (bash mode)"; }
   greet $LANG
-  result=$(echo $LANG | perl -e 'while(<STDIN>){chomp;print uc}')
-  echo "Buyuk harf: $result"
+  for i in 1 2 3; do echo "  item $i of $COUNT"; done
+  result=$(echo $LANG | perl -ne "print uc")
+  echo "Uppercase: $result"
 
-  :: CMD'ye geri don (SH sonucunu oku)
-  ECHO CMD'ye donus: %result%
+  :: yeniden CMD bölümü (SH sonucunu köprü aracılığıyla okur)
+  ECHO Back in CMD: %result%
 
-  # Calistirma: perl lib/BATsh.pm script.batsh
+  # Şununla çalıştırın: perl lib/BATsh.pm script.batsh
+  # Ya da:             use BATsh; BATsh->run('script.batsh');
 ----------------------------------------------------------------------
 
 
-BATsh, cmd.exe ve bash/sh sozdizimini ayni betikte calistiran
-iki dilli bir kabuktur. Her satirin ilk belirteci modu belirler.
+BATsh, cmd.exe ve bash/sh sözdizimini aynı betikte çalıştıran iki dilli bir
+kabuktur.  Betik bölümlere ayrılır; her bölüm uygun kabuk tarafından olduğu
+gibi çalıştırılır.
 
-1. Mod Tespiti
---------------
-  ECHO hello          -> cmd.exe modu (ilk belirtec tamamen buyuk harf)
-  echo hello          -> bash/sh modu (ilk belirtec kucuk harf icerir)
-  # yorum             -> yorum (yoksayilir)
-  :: yorum            -> yorum (CMD stili, yoksayilir)
-  REM yorum           -> yorum (CMD stili, yoksayilir)
+1. Mod Algılama
+---------------
+  Bir bölümün ilk anlamlı satırının İLK BELİRTECİ, o bölümü hangi kabuğun
+  çalıştıracağını belirler:
 
-2. Kabugu Baslatma
--------------------
-  perl lib/BATsh.pm                    # etkilesimli REPL
-  perl lib/BATsh.pm script.batsh       # betik dosyasi calistirma
-  perl lib/BATsh.pm -e "echo merhaba"  # tek satirlik komut
+  CMD modu: ilk belirteç tamamen [A-Z 0-9 _ - \ / : . @ %] karakterlerinden
+            oluşur VE en az bir büyük harf A-Z içerir.
 
-  Perl API'sinden:
+    ECHO hello          -> CMD bölümü (cmd.exe)
+    SET FOO=bar baz     -> CMD bölümü  (değer kısmı sınanmaz)
+    @ECHO OFF           -> CMD bölümü
+    IF "%X%"=="Y" (     -> CMD bölümü
+
+  SH modu: bunun dışındaki her şey (herhangi bir küçük harf ya da hiç harf yok).
+
+    echo hello          -> SH bölümü  (bash/sh)
+    export FOO=bar      -> SH bölümü
+    if [ -f "$f" ]; then  -> SH bölümü
+    #!/bin/sh           -> SH bölümü  (shebang bir SH satırıdır)
+
+  Yorumlar ve boş satırlar geçerli bölüme dahil edilir.
+  Yorum sözdizimi:
+    ::           CMD tarzı yorum
+    REM ...      CMD tarzı yorum (büyük/küçük harf duyarsız)
+    @REM ...     CMD tarzı yorum
+    # ...        SH tarzı yorum  (#! shebang DEĞİL)
+
+2. Kabuğu Başlatma
+------------------
+  perl lib/BATsh.pm               # etkileşimli REPL
+  perl lib/BATsh.pm script.batsh  # bir betik dosyasını çalıştır
+  perl lib/BATsh.pm -e "echo hi"  # satır içi tek satırlık komut
+
+  Perl'den:
     use BATsh;
     BATsh->run('script.batsh');
-    BATsh->run_string("echo merhaba");
+    BATsh->run_string("echo hello");
     BATsh->repl();
 
-3. Ortam Degiskeni Koprusu
----------------------------
-  CMD ve SH bloklari degiskenleri Perl'in %ENV'i uzerinden paylasiр.
+3. Ortam Değişkeni Köprüsü
+--------------------------
+  Her bölüm çalışmadan önce BATsh, geçerli %ENV değerini önbilgi olarak
+  enjekte eder (CMD için SET satırları, SH için export satırları).  Bölümden
+  sonra kabuğun son ortamı %ENV içine geri okunur.
 
-  export FOO=merhaba  # SH, FOO'yu ayarlar
-  ECHO %FOO%          # CMD, kopru uzerinden FOO'yu okur (Windows)
+  export FOO=hello   # SH, FOO değerini ayarlar
+  ECHO %FOO%         # CMD, FOO değerini köprü aracılığıyla okur (Windows)
 
-  SET BAR=dunya       # CMD, BAR'i ayarlar
-  echo $BAR           # SH, kopru uzerinden BAR'i okur
+  SET BAR=world      # CMD, BAR değerini ayarlar
+  echo $BAR          # SH, BAR değerini köprü aracılığıyla okur
 
 4. SETLOCAL / ENDLOCAL
------------------------
-  SETLOCAL           # %ENV anlık goruntusu
-  SET TMP=yerel_deger
+----------------------
+  SETLOCAL           # %ENV anlık görüntüsü (cmd.exe değil, BATsh yönetir)
+  SET TMP=local_val
   ECHO %TMP%
-  ENDLOCAL           # %ENV'i geri yukler (TMP kaybolur)
+  ENDLOCAL           # %ENV geri yüklenir (TMP kaybolur)
 
-  Kapsamlar ic ice olabilir.
+  Kapsamlar iç içe olabilir.
 
-5. Ic Ice Bloкlar (Karisik Mod)
----------------------------------
-  Blok yapilari dogru eslesmeli. Ic ice bloklarda karisik mod satirlari kabul edilir.
+5. Bölüm Sınırı Algılama
+------------------------
+  Bir bölüm, blok derinliği sıfıra döndüğünde VE bir sonraki anlamlı satır
+  farklı bir moda ait olduğunda sona erer.
 
-  for x in 1 2; do   # SH blok acar
-      ECHO item $x   # SH blogunda CMD satiri
-  done               # SH blok kapar
+  CMD bölümleri tırnaksız ( ve ) derinliğini izler:
 
-  CMD anahtar sozcukleri: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
-  SH  anahtar sozcukleri: if/fi  for/done  while/done  until/done
-                          case/esac  { }
+    IF "%X%"=="Y" (     <- blok açar (derinlik 1)
+        ECHO yes
+    ) ELSE (            <- kapatır ve yeniden açar (derinlik >=1 kalır)
+        ECHO no
+    )                   <- bloğu kapatır (derinlik 0) -> bölüm bitebilir
 
-6. Alt Yordam Tanimlamalari
------------------------------
+  SH bölümleri anahtar sözcük derinliğini izler:
+
+    for x in 1 2; do   <- blok açar (derinlik 1)
+        echo $x
+    done                <- bloğu kapatır (derinlik 0) -> bölüm bitebilir
+
+  Açık bir blok içindeki satırlar, ilk belirteçleri diğer mod gibi görünse
+  bile geçerli bölüme dahil edilir. Bu şunu mümkün kılar:
+
+    for x in A B; do
+        ECHO $x          <- SH bloğu içinde büyük harf: yine de SH bölümü
+    done
+
+  SH anahtar sözcük çiftleri:
+    Açıcılar (+1) : if  for  while  until  case  function  select  {
+    Kapatıcılar (-1) : fi  done  esac  }
+    Nötr     ( 0) : then  do  else  elif
+
+6. Alt Yordam Tanımları
+-----------------------
   :GREET
-  echo "Merhaba $BATSH_ARG1"
+  echo "Hello $BATSH_ARG1"
   RET
 
-  Etiketler : ile baslar ve RET veya RETURN ile biter.
+  Etiketler : ile başlar ve RET ya da RETURN ile biter.
+  Gövde, çalıştırmadan önce ayıklanır (satır içinde çalıştırılmaz).
+  Gövde CMD satırları, SH satırları veya bir karışım içerebilir.
 
 7. CALL ve source
-------------------
-  CALL :GREET dunya      # argumanla alt yordam cagirma
-  CALL diger.batsh       # baska .batsh dosyasini dahil etme (CMD)
-  source diger.batsh     # baska .batsh dosyasini dahil etme (SH)
-  . diger.batsh          # POSIX nokta gosterimi
+-----------------
+  CALL :GREET world      # alt yordamı bağımsız değişkenle çağır
+  CALL other.batsh       # başka bir .batsh dosyasını dahil et/çalıştır (CMD)
+  source other.batsh     # başka bir .batsh dosyasını dahil et/çalıştır (SH)
+  . other.batsh          # POSIX nokta gösterimi
 
-  Argumanlar: $BATSH_ARG1 .. $BATSH_ARGn  (%BATSH_ARG1% CMD'de)
-  Sayisi:     $BATSH_ARGC
+  Bağımsız değişkenler: $BATSH_ARG1 .. $BATSH_ARGn  (CMD'de %BATSH_ARG1%)
+  Sayı:                 $BATSH_ARGC
 
 8. Perl API
 -----------
-  BATsh->run($file)            # .batsh dosyasi calistir
-  BATsh->run_string($source)   # kaynak dizgisi calistir
-  BATsh->run_lines(@lines)     # satir dizisi calistir
-  BATsh->repl()                # etkilesimli REPL
-  BATsh->classify_token($tok)  # 'CMD' veya 'SH' dondurur
-  BATsh->setlocal()            # %ENV ani goruntusu
-  BATsh->endlocal()            # %ENV geri yukle
-  BATsh->call_sub($lbl, @args) # alt yordam cagir
-  BATsh->source_file($file)    # .batsh dosyasini dahil et
-  BATsh->version()             # surum dizgisi
+  BATsh->run($file)            # bir .batsh dosyasını çalıştır
+  BATsh->run_string($source)   # kaynak dizesini çalıştır
+  BATsh->run_lines(@lines)     # satır dizisini çalıştır
+  BATsh->repl()                # etkileşimli REPL
+  BATsh->classify_token($tok)  # 'CMD' veya 'SH'
+  BATsh->setlocal()            # %ENV anlık görüntüsü
+  BATsh->endlocal()            # %ENV geri yükle
+  BATsh->call_sub($lbl, @args) # alt yordamı çağır
+  BATsh->source_file($file)    # .batsh dosyasını dahil et
+  BATsh->version()             # sürüm dizesi
 
-9. Platform Notlari
---------------------
-  Windows: CMD ve SH bloklari saf Perl ile calisir -- harici cmd.exe/bash/sh gerekmez.
-  UNIX:    CMD ve SH bloklari saf Perl ile calisir -- harici cmd.exe/bash/sh gerekmez.
+9. Platform Notları
+-------------------
+  Windows: Hem CMD hem SH bölümleri saf Perl ile çalışır -- harici cmd.exe, bash veya sh gerekmez.
+  UNIX:    Hem CMD hem SH bölümleri saf Perl ile çalışır -- harici cmd.exe, bash veya sh gerekmez.
 
 10. Gereksinimler
 -----------------
-  Perl 5.005_03 veya uzeri. Yalnizca cekirdek moduller (File::Spec, Carp).
-  CPAN bagimliligi yok.
+  Perl 5.005_03 veya üzeri.  Yalnızca çekirdek modüller (File::Spec, Carp).
+  CPAN bağımlılığı yok.
 
-Ayrica bakiniz: https://metacpan.org/dist/BATsh
+11. CMD İşlem Hattı ve Parametre Değiştiricileri
+------------------------------------------------
+  cmd1 | cmd2              # geçici dosya aracılığıyla işlem hattı (Saf Perl)
+  ECHO hello | perl -e "while(<STDIN>){print uc}"
 
-11. CMD Boru Hatti ve Parametre Degistiricileri
--------------------------------------------------
-  cmd1 | cmd2              # Gecici dosya uzerinden boru hatti (Pure Perl)
-  SET /P VAR=Giri:         # STDIN'den bir satir oku, VAR'a yaz
-  %~dp0                    # %0'in surucusu+dizini (en sik kullanim)
-  %~n1, %~x1, %~nx1       # Dosya adi, uzanti, ikisi birden
+  SET /P VAR=Prompt:       # STDIN'den bir satır okuyup VAR'a yazar
 
-12. SH Fonksiyonlari ve Degisken Genisletme
----------------------------------------------
-  f() { echo $1; }         # Fonksiyon tanimi
-  ${var%.*}  ${var%%.*}    # Sonek kaldir (en kisa/en uzun)
-  ${var#*.}  ${var##*.}    # Onek kaldir (en kisa/en uzun)
-  ${var/a/b} ${var//a/b}   # Degistir (ilk/tumune)
-  ${var^^} ${var,,}        # Buyuk/kucuk harf
-  cmd > f  cmd >> f  2>&1  # Yonlendirme
-  cmd1 && cmd2             # VE zincirleme
-  cmd1 || cmd2             # VEYA zincirleme
+  Batch parametresi tilde değiştiricileri (örn. %0=C:\scripts\deploy.bat iken):
+    %~0   -> C:\scripts\deploy.bat  (yalnızca tırnak kaldırma)
+    %~f0  -> C:/scripts/deploy.bat  (tam mutlak yol)
+    %~d0  -> C:                     (sürücü harfi)
+    %~p0  -> /scripts/              (dizin yolu)
+    %~n0  -> deploy                 (uzantısız dosya adı)
+    %~x0  -> .bat                   (uzantı)
+    %~dp0 -> C:/scripts/            (sürücü + dizin, en yaygın)
+    %~nx1 -> deploy.bat             (ad + uzantı)
+
+12. SH İşlevleri ve Genişletme
+------------------------------
+  greet() {              # işlev tanımı
+      echo "Hi $1"
+  }
+  function add {         # alternatif sözdizimi
+      echo $(( $1 + $2 ))
+  }
+  greet world            # işlevi çağır
+  add 3 4                # -> 7
+
+  ${var%.*}    .* ile eşleşen en kısa soneki kaldır
+  ${var%%.*}   .* ile eşleşen en uzun  soneki kaldır
+  ${var#*.}    *. ile eşleşen en kısa öneki kaldır
+  ${var##*.}   *. ile eşleşen en uzun  öneki kaldır
+  ${var/a/b}   a'nın ilk geçişini b ile değiştir
+  ${var//a/b}  a'nın tüm geçişlerini b ile değiştir
+  ${var^^}     tümünü büyük harf
+  ${var,,}     tümünü küçük harf
+  ${var:2:4}   2. konumdan başlayarak 4 uzunlukta alt dize
+  ${#var}      dize uzunluğu
+  ${var:-def}  ayarlıysa değeri, değilse def
+
+13. SH G/Ç Yönlendirme
+----------------------
+  cmd > file      stdout üzerine yaz
+  cmd >> file     stdout sonuna ekle
+  cmd < file      stdin dosyadan
+  cmd 2> file     stderr dosyaya
+  cmd 2>&1        stderr'i stdout'a birleştir
+  cmd > f 2>&1    hem stdout hem stderr dosyaya
+
+  Here-document (stdin üzerinde girdi):
+    cmd <<EOF       EOF'a kadar gövde satırları; $VAR genişletilir
+    cmd <<'EOF'     EOF'a kadar gövde satırları; genişletme yok (düz metin)
+    cmd <<-EOF      <<EOF gibi, ama satır başındaki TAB karakterleri atılır
+
+14. SH Bileşik Komutlar
+-----------------------
+  cmd1 && cmd2    cmd2'yi yalnızca cmd1 başarılıysa çalıştır
+  cmd1 || cmd2    cmd2'yi yalnızca cmd1 başarısızsa çalıştır
+  cmd1 ; cmd2     cmd2'yi koşulsuz çalıştır
+
+Ayrıca bakınız: https://metacpan.org/dist/BATsh

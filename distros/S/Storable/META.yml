@@ -4,11 +4,12 @@ author:
   - 'Perl 5 Porters'
 build_requires:
   ExtUtils::MakeMaker: '6.31'
-  Test::More: '0.41'
+  File::Temp: '0'
+  Test::More: '0.82'
 configure_requires:
   ExtUtils::MakeMaker: '6.31'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,11 +21,11 @@ no_index:
     - inc
 provides:
   Storable:
-    file: Storable.pm
-    version: '3.25'
+    file: lib/Storable.pm
+    version: '3.41'
 requires:
   XSLoader: '0'
 resources:
   bugtracker: https://github.com/Perl/perl5/issues
-version: '3.25'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '3.41'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

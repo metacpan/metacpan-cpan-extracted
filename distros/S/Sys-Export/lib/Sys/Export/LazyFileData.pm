@@ -1,6 +1,6 @@
 package Sys::Export::LazyFileData;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 # ABSTRACT: Reference a path and optional range of bytes and load it on demand
 
 use v5.26;
@@ -114,7 +114,7 @@ Returns the content of the range of the file as a scalar ref
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

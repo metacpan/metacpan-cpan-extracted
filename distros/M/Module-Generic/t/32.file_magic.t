@@ -95,12 +95,12 @@ subtest 'from_file() - text file' => sub
     SKIP:
     {
         skip( '/etc/passwd not available', 3 ) unless( -r( '/etc/passwd' ) );
-    
+
         $magic->flags( $MAGIC_MIME_TYPE );
         my $r = $magic->from_file( '/etc/passwd' );
         ok( defined( $r ), 'from_file(/etc/passwd) returns a value' );
         is( $r, 'text/plain', "from_file MIME type for /etc/passwd: $r" );
-    
+
         my $full = $magic->mime_from_file( '/etc/passwd' );
         like( $full, qr{^text/plain;\s*charset=}, "mime_from_file /etc/passwd: $full" );
     };
@@ -123,7 +123,7 @@ subtest 'from_file() - binary / executable' => sub
     SKIP:
     {
         skip( 'no ls binary available for testing', 2 ) unless( defined( $binary ) );
-    
+
         $magic->flags( $MAGIC_MIME_TYPE );
         my $r = $magic->from_file( $binary );
         ok( defined( $r ), "from_file($binary) returns a value" );
@@ -138,13 +138,13 @@ subtest 'mime_type_from_file / mime_encoding_from_file / mime_from_file' => sub
     {
         skip( '/etc/passwd not available', 3 ) unless( -r( '/etc/passwd' ) );
         $magic->flags( $MAGIC_NONE );    # convenience wrappers override flags internally
-    
+
         my $type = $magic->mime_type_from_file( '/etc/passwd' );
         is( $type, 'text/plain', 'mime_type_from_file' );
-    
+
         my $enc = $magic->mime_encoding_from_file( '/etc/passwd' );
         ok( defined( $enc ), "mime_encoding_from_file: $enc" );
-    
+
         my $mime = $magic->mime_from_file( '/etc/passwd' );
         like( $mime, qr{^text/plain;\s*charset=}, "mime_from_file: $mime" );
     };
@@ -238,11 +238,11 @@ subtest 'from_buffer() - ELF binary (requires correct endianness byte at offset 
     SKIP:
     {
         skip( 'no ls binary for ELF buffer test', 2 ) unless( defined( $binary ) );
-    
+
         open( my $fh, '<:raw', $binary ) or skip( "Cannot open $binary: $!", 2 );
         read( $fh, my $buf, 512 );
         close( $fh );
-    
+
         $magic->flags( $MAGIC_MIME_TYPE );
         my $r = $magic->from_buffer( $buf );
         ok( defined( $r ), 'from_buffer(ELF binary) returns a value' );
@@ -274,14 +274,14 @@ subtest 'from_filehandle()' => sub
     {
         skip( '/etc/passwd not available for filehandle test', 2 )
             unless( -r( '/etc/passwd' ) );
-    
+
         open( my $fh, '<:raw', '/etc/passwd' )
             or skip( "Cannot open /etc/passwd: $!", 2 );
-    
+
         $magic->flags( $MAGIC_MIME_TYPE );
         my $r = $magic->from_filehandle( $fh );
         close( $fh );
-    
+
         ok( defined( $r ), 'from_filehandle(/etc/passwd) returns a value' );
         is( $r, 'text/plain', "from_filehandle MIME type: ${\($r//'(undef)')}" );
     };
@@ -296,28 +296,30 @@ subtest 'Compressed archive: MAGIC_COMPRESS' => sub
             unless( $HAS_ARCHIVE_TAR );
         skip( 'xs backend required for MAGIC_COMPRESS', 4 )
             unless( $backend eq 'xs' );
-    
+
         # Create a real .tar.gz in a temp file
         my $tmp = tempfile( suffix => '.tar.gz', cleanup => 1, open => 1 );
         my $tar = Archive::Tar->new;
         $tar->add_data( 'test.txt', "hello from archive\n" );
         $tar->write( $tmp->filename, Archive::Tar::COMPRESS_GZIP() );
         $tmp->flush;
-    
+
         $magic->flags( $MAGIC_MIME_TYPE );
         my $outer = $magic->from_file( $tmp->filename );
-        is( $outer, 'application/gzip', "from_file(tgz) without COMPRESS: ${\($outer//'(undef)')}" );
-    
+        # NOTE: Older libmagic databases (e.g. on FreeBSD) report the legacy MIME type
+        # application/x-gzip rather than application/gzip. Accept both.
+        like( $outer, qr{^application/(?:x-)?gzip$}, "from_file(tgz) without COMPRESS: ${\($outer//'(undef)')}" );
+
         $magic->flags( $MAGIC_MIME_TYPE | $MAGIC_COMPRESS );
         my $inner = $magic->from_file( $tmp->filename );
         is( $inner, 'application/x-tar', "from_file(tgz) with MAGIC_COMPRESS: ${\($inner//'(undef)')}" );
-    
+
         # mime_type_from_file uses MAGIC_MIME_TYPE without COMPRESS
         my $mt = $magic->mime_type_from_file( $tmp->filename );
-        is( $mt, 'application/gzip', "mime_type_from_file(tgz): ${\($mt//'(undef)')}" );
-    
+        like( $mt, qr{^application/(?:x-)?gzip$}, "mime_type_from_file(tgz): ${\($mt//'(undef)')}" );
+
         my $mf = $magic->mime_from_file( $tmp->filename );
-        like( $mf, qr{^application/gzip}, "mime_from_file(tgz): ${\($mf//'(undef)')}" );
+        like( $mf, qr{^application/(?:x-)?gzip}, "mime_from_file(tgz): ${\($mf//'(undef)')}" );
     };
 };
 
@@ -328,12 +330,12 @@ subtest 'XS-only methods return error on non-xs backend' => sub
     {
         skip( 'xs backend active - skipping non-xs error tests', 3 )
             if( $backend eq 'xs' );
-    
+
         local $SIG{__WARN__} = sub{};
         my $r = $magic->check;
         ok( !defined( $r ), 'check() returns undef on non-xs backend' );
         like( $magic->error, qr/xs backend/i, 'check() error message mentions xs backend' );
-    
+
         my $r2 = $magic->compile( '/nonexistent' );
         ok( !defined( $r2 ), 'compile() returns undef on non-xs backend' );
     };
@@ -346,7 +348,7 @@ subtest 'Procedural interface' => sub
     {
         skip( '/etc/passwd not available for procedural tests', 2 )
             unless( -r( '/etc/passwd' ) );
-    
+
         my $mime = eval { Module::Generic::File::Magic::magic_mime_type( '/etc/passwd' ) };
         ok( !$@, 'magic_mime_type() does not die' );
         is( $mime, 'text/plain', "magic_mime_type(/etc/passwd): ${\($mime//'(undef)')}" );
@@ -356,7 +358,7 @@ subtest 'Procedural interface' => sub
         my $buf  = "\x1f\x8b\x08\x00" . ( "\x00" x 100 );
         my $mime = eval{ Module::Generic::File::Magic::magic_from_buffer( $buf, $MAGIC_MIME_TYPE ) };
         ok( !$@, 'magic_from_buffer() does not die' );
-        is( $mime, 'application/gzip', "magic_from_buffer(gzip bytes): ${\($mime//'(undef)')}" );
+        like( $mime, qr{^application/(?:x-)?gzip$}, "magic_from_buffer(gzip bytes): ${\($mime//'(undef)')}" );
     };
 };
 
@@ -378,12 +380,12 @@ subtest 'close() / cookie reuse (xs backend)' => sub
     {
         skip( 'cookie reuse test requires xs backend', 2 ) unless( $backend eq 'xs' );
         skip( '/etc/passwd not available', 2 )             unless( -r( '/etc/passwd' ) );
-    
+
         $magic->flags( $MAGIC_MIME_TYPE );
         my $r1 = $magic->from_file( '/etc/passwd' );
         my $r2 = $magic->from_file( '/etc/passwd' );    # reuses the same cookie
         is( $r1, $r2, 'cookie reuse: second call gives same result' );
-    
+
         $magic->close;
         my $r3 = $magic->from_file( '/etc/passwd' );    # opens a new cookie
         is( $r1, $r3, 'after close(): new cookie gives same result' );
@@ -399,22 +401,22 @@ subtest 'Parity: xs vs json backends (when both are available)' => sub
             unless( $backend eq 'xs' );
         skip( '/etc/passwd not available', 2 )
             unless( -r( '/etc/passwd' ) );
-    
+
         my @parity_cases = (
             [ 'passwd',  '/etc/passwd' ],
         );
         push( @parity_cases, [ 'ls', $binary ] ) if( defined( $binary ) );
-    
+
         foreach my $case ( @parity_cases )
         {
             my( $label, $path ) = @$case;
             my $xs_result = Module::Generic::File::Magic->new( flags => $MAGIC_MIME_TYPE )
                                 ->from_file( $path );
-    
+
             local $Module::Generic::File::Magic::BACKEND = 'json';
             my $json_result = Module::Generic::File::Magic->new( flags => $MAGIC_MIME_TYPE )
                                 ->from_file( $path );
-    
+
             # libmagic and the JSON database can return different but equally valid ELF
             # subtypes for the same binary: e.g. x-pie-executable, x-executable,
             # x-sharedlib, x-object. All are correct - they differ only in how precisely

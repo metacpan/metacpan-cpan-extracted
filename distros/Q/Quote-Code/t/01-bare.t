@@ -1,10 +1,11 @@
 use warnings FATAL => 'all';
 use strict;
 
-use Test::More tests => 11;
+use Test::More tests => 15;
 
 use Quote::Code;
 
+is qc!!, '';
 is "foo {2 + 2}", 'foo {2 + 2}';
 is length("{0}"), 3;
 is qc"foo {2 + 2}", "foo 4";
@@ -19,3 +20,15 @@ is qc'\x20AC', "\x20AC";
 is qc[[[*]]], q[[[*]]];
 is qc<a<b\<c>d\>e>, qq<a<b\<c>d\>e>;
 is qc{a {sqrt 4} b {0; lc qc{\{{"}C"} D};} e}, 'a 2 b {}c d e';
+
+is ref(qc{{[]}}), '';
+
+{
+    my $n = 2000;
+    my $code = join '', map "{ \$foo }{ \$bar }$_", 1 .. $n;
+    my $foo = 'F';
+    my $bar = 'B';
+    my $x = eval "qc~$code~";
+    is $@, '';
+    is $x, join '', map "FB$_", 1 .. $n;
+}

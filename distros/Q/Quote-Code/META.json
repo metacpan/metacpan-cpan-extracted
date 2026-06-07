@@ -35,6 +35,7 @@
       },
       "develop" : {
          "requires" : {
+            "ExtUtils::Manifest" : "1.75",
             "Pod::Markdown" : "3.005",
             "Pod::Markdown::Githubert" : "0",
             "Pod::Text" : "4.09",
@@ -70,6 +71,6 @@
          "web" : "https://codeberg.org/mauke/Quote-Code"
       }
    },
-   "version" : "1.0105",
+   "version" : "1.0201",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

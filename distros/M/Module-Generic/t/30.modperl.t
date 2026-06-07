@@ -107,7 +107,7 @@ subtest 'core' => sub
     {
         $ref = $j->decode( $content );
     };
-    
+
     ok( ref( $ref ) eq 'HASH', 'non_threaded_error -> JSON decoded content is an hash reference' );
     is( $resp->code, Apache2::Const::HTTP_BAD_REQUEST, 'non_threaded_error response code' );
     is( $ref->{error}->{code}, 400, 'non_threaded_error error code' );
@@ -127,7 +127,7 @@ subtest 'core' => sub
         {
             $ref = $j->decode( $content );
         };
-        
+
         ok( ref( $ref ) eq 'HASH', 'threaded_error -> JSON decoded content is an hash reference' );
         is( $resp->code, Apache2::Const::HTTP_BAD_REQUEST, 'threaded_error response code' );
         is( $ref->{error}->{code}, 400, 'threaded_error error code' );

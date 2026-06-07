@@ -1,5 +1,73 @@
 Revision history for CGI-ACL
 
+0.08
+	[ Bug Fixes ]
+	- Fixed REMOTE_ADDR || DEFAULT_ADDR using || instead of //, which silently
+	  substituted 127.0.0.1 for falsy values "0" and "" — a security bypass if
+	  loopback was in the allow-list
+	- Fixed deny_country(country => []) and allow_country(country => []) creating
+	  an empty hashref instead of being a no-op, which tripped the early-return
+	  guard and caused all traffic to require a lingua argument
+	- Fixed _set_countries() storing "" as a country key when an arrayref contained
+	  undef elements; undef elements are now silently skipped
+	- Fixed Net::CIDR::cidradd/cidrlookup dying on non-IP strings in the allow-list
+	  (e.g. injection attempts); CIDR operations are now wrapped in eval
+	- Fixed all_denied() crashing with "Can't call method on non-ref" when a
+	  plain string was passed as the lingua argument; now carps and denies
+	- Fixed all_denied() dying when the lingua object lacks a country() method;
+	  the country() call is now wrapped in eval and missing-method is treated as
+	  unknown country (deny)
+	- Fixed all_denied() propagating exceptions from _is_cloud_host() / DNS
+	  failures to the caller; cloud check now wraps _is_cloud_host in eval and
+	  fails safe (treat as non-cloud) when DNS throws
+	- Fixed deny_cloud() being bypassed when used without allow_ip or deny_country
+	- Fixed deny_country('*') with no allow_country incorrectly allowing all traffic
+	- Fixed allow_ip() emitting duplicate warnings when passed a reference
+	- Fixed allow_countries not included in all_denied() early-exit guard, causing
+	  allow_country-only ACLs to bypass all country checks
+	- Fixed auto-vivification of deny_countries when only deny_cloud and allow_country
+	  are set, which corrupted object state on subsequent calls
+	- Fixed SIGALRM race in _verified_rdns() where alarm(0) called outside eval could
+	  let a late-firing alarm kill the CGI process; alarm(0) now also called inside eval
+	- Fixed new() to restore croak on bad arguments; soft-carp+undef caused opaque
+	  method-chain crashes for all callers
+	- Fixed new() plain-function call (CGI::ACL::new()) to always carp and return undef;
+	  previously the no-argument case silently constructed an object instead of warning
+	- Removed unreachable duplicate AWS hostname pattern in _is_cloud_host()
+	- Fixed _verified_rdns() ignoring IPv6 addresses due to inet_aton being IPv4-only;
+	  IPv6 clients were bypassing deny_cloud entirely
+	- Fixed new() on an existing object (clone mode) using a shallow copy of nested
+	  hashrefs, causing mutations to deny_countries/allow_countries/allowed_ips on
+	  a clone to also modify the original object
+
+	[ Enhancements ]
+	- Cache CIDR list in all_denied() to avoid rebuilding it on every call
+	- Add 10-second timeout on DNS lookups in _verified_rdns() on non-Windows platforms
+	- Added Test Dashboard at https://nigelhorne.github.io/CGI-ACL/coverage/
+
+	[ Documentation ]
+	- Document that deny_cloud() takes precedence over allow_ip()
+
+	[ Critique refactoring ]
+	- Fixed deny_country() returning undef instead of $self on bad-ref argument (broke method chaining)
+	- Fixed deny_country() carp message incorrectly referencing $ip_address instead of $country
+	- Fixed allow_ip() and allow_country() returning undef instead of $self on bad-ref argument
+	- Replaced magic number 10 (DNS timeout), '*' wildcard, and '127.0.0.1' with Readonly named constants
+	- Replaced ten individual cloud-pattern return statements in _is_cloud_host() with a Readonly @CLOUD_PATTERNS list
+	- Extracted _set_countries() private helper to eliminate duplicated code between deny_country/allow_country
+	- Added use autodie qw(:all) for safer built-in error handling
+	- Added comprehensive POD for all public methods: FORMAL SPECIFICATION (Z calculus), API SPECIFICATION, MESSAGES table
+	- Added purpose/entry/exit/side-effects comments for all private routines
+
+	[ Tests ]
+	- Migrated t/deny_cloud.t from Test::MockModule to Test::Mockingbird
+	- Added IPv6 deny_cloud tests to t/deny_cloud.t
+	- Added chaining tests: verify deny_country/allow_country/allow_ip return $self on bad-ref args
+	- Added t/function.t: white-box function-level tests for all public and private functions,
+	  including mocked DNS helpers, $_ clobber checks, and memory cycle checks
+	- Fixed new() to carp and return undef for all plain-function calls (CGI::ACL::new()),
+	  including the no-argument case that previously fell through to create an object silently
+
 0.07	Thu Apr 16 19:38:57 EDT 2026
 	Fixed call to _verified_rdns
 	Allow an object to be configured at runtime via Object::Configure

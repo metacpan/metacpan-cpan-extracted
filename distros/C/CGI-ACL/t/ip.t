@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 10;
+use Test::Most tests => 12;
 use Test::NoWarnings;
 use Test::Carp;
 
@@ -31,4 +31,9 @@ IP: {
 
 	does_carp(sub { $acl->allow_ip() });
 	does_carp(sub { $acl->allow_ip(\'not a ref to a hash') });
+
+	# Verify bad-ref call still returns $self so method chaining is not broken
+	my $ip_ret;
+	does_carp(sub { $ip_ret = $acl->allow_ip(\'bad ref') });
+	isa_ok($ip_ret, 'CGI::ACL', 'allow_ip returns $self on bad ref');
 }

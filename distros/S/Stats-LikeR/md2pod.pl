@@ -106,16 +106,20 @@ my $pod = markdown_to_pod($md_processed);
 
 # 3. Restore the HTML tables back into the generated POD
 for my $idx (0 .. $#$tables_ref) {
-	my $placeholder = "HTMLTABLEPLACEHOLDER${idx}";
 	my $table_html = $tables_ref->[$idx];
-	$pod =~ s/\Q$placeholder\E/$table_html/g;
+	# Anchor the end of the number with \b: without it the /g replace for a
+	# short index (e.g. 1) also matches the prefix of longer placeholders
+	# (HTMLTABLEPLACEHOLDER10, ...11), dropping the wrong table there and
+	# leaving a stray leftover digit. \b stops after the last digit, so
+	# HTMLTABLEPLACEHOLDER1 no longer matches inside HTMLTABLEPLACEHOLDER10.
+	$pod =~ s/HTMLTABLEPLACEHOLDER${idx}\b/$table_html/g;
 }
 
 my @pod = split /\n/, $pod;
 unshift @pod, "=encoding utf8\n";
 
-say 'Writing README.pod from README.md, which must be copied into lib/Stats/LikeR.pm';
-open my $fh, '>', 'README.pod';
+say 'Writing read.me.pod from README.md, which must be copied into lib/Stats/LikeR.pm';
+open my $fh, '>', 'read.me.pod';
 say $fh join ("\n", @pod);
 close $fh;
 

@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Metrics::Any '$metrics';
 use Metrics::Any::Adapter 'Statsd';
@@ -91,6 +91,15 @@ my $socket = IO::Socket::INET->new(
    is( $packet, "the.timer:250|ms",
       '->report_timer sends statsd packet'
    );
+}
+
+# forbidden names should complain (CVE-2026-50637)
+{
+   foreach my $name ( qw( bad:name bad|name ), "bad\x01name" ) {
+      like dies { $metrics->make_counter( $name => name => $name ) },
+         qr/^Metric name '.*' is not allowed by statsd at /,
+         'Bad metric name is rejected';
+   }
 }
 
 done_testing;

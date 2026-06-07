@@ -1,5 +1,58 @@
 Revision history for HTTP-Handy
 
+1.07  2026-06-06 JST (Japan Standard Time)
+
+    Fixes:
+      - t/lib/INA_CPAN_Check.pm: emit exactly one TAP plan line per test
+        file. Each check_* helper previously called plan_tests() itself,
+        while the .t files also called plan_tests(count_*); this produced
+        multiple "1..N" lines in a single file. Under a real TAP harness
+        (prove / Test::Harness, as used by CPAN Testers) this raised
+        "More than one plan found in TAP output" and made the affected
+        files FAIL, even though every individual "ok" line passed when the
+        scripts were run by hand. Affected files: t/9010-encoding.t,
+        t/9030-distribution.t, t/9040-style.t. The plan_tests() call is
+        now removed from every check_* helper, leaving the .t file as the
+        sole owner of the plan line.
+      - t/lib/INA_CPAN_Check.pm: count_A() now returns the actual number
+        of MANIFEST entries instead of a fixed 1, so that the plan
+        computed by t/9030-distribution.t matches the number of A1 checks
+        that check_A() emits.
+      - t/lib/INA_CPAN_Check.pm: remove the mid-stream plan_skip() calls
+        from check_A() and check_C(); the MANIFEST-absent guard is handled
+        by the .t file and by count_C() before any plan line is printed.
+      - t/lib/INA_CPAN_Check.pm: check_K() now honours the k3_exempt
+        option passed by t/9040-style.t. The argument was previously
+        discarded by "my ($root) = @_;", so the intended exemption of
+        accessor-style hash names (%env, %opts, %args) never took effect;
+        the K3 detector also did not capture the hash name. check_K() now
+        accepts "k3_exempt => REGEX", captures the returned hash name via
+        /return \%(\w*)/, and skips a "return \%name" only when the name
+        matches the supplied pattern. Behaviour is unchanged when
+        k3_exempt is not passed (every "return \%..." is still flagged),
+        so distributions that call check_K($root) without the option are
+        unaffected.
+      - t/lib/INA_CPAN_Check.pm: add a regression guard for the two TAP
+        defect classes above. plan_tests() now refuses to emit a second
+        "1..N" line, and an end-of-run reconciliation reports
+        "planned X but ran Y" (setting a non-zero exit) when the emitted
+        plan does not match the number of ok()/not-ok() lines. Both
+        problems now FAIL immediately on a plain "perl t/foo.t", not only
+        under a real harness.
+      - t/lib/INA_CPAN_Check.pm: add selfcheck_suite(), which runs t/*.t
+        (and xt/*.t) in a child Perl and verifies one plan line per file,
+        plan == number of ok/not-ok lines, and no failures.
+      - pmake.bat: at "pmake dist" time, after the existing source checks,
+        run INA_CPAN_Check::selfcheck_suite() as check3 and abort the
+        build if any test file fails the plan-sanity check (disable with
+        --no-check3). Bump $PMAKE_BAT_VERSION to 0.34.
+      - t/lib/INA_CPAN_Check.pm: pass \@files / \@pm_files (a reference)
+        instead of [ @files ] (an anonymous copy) to _find_pm_t() in
+        _scan_code(), check_D(), check_E(), and check_K(). The copy form
+        meant the collected file list never reached the caller, so E1
+        (no shebang in lib/*.pm) and K3 (return { %hash } form) silently
+        scanned zero files and always passed.
+
 1.06  2026-06-03 JST (Japan Standard Time)
 
     Fixes:

@@ -55,6 +55,7 @@ t/QuickDB/QuickDB.pm
 t/QuickDB/SQLite.t
 t/Tools/QuickDB.t
 t/clone_dir.t
+t/clone_sequence.t
 t/schema/duckdb.sql
 t/schema/mariadb.sql
 t/schema/mysql.sql

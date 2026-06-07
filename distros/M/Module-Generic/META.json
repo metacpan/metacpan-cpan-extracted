@@ -36,6 +36,7 @@
             "Clone" : "0.43",
             "Config" : "0",
             "Data::Dump" : "1.23",
+            "Data::Pretty" : "v0.2.0",
             "Data::UUID" : "1.226",
             "DateTime::Format::Lite" : "v0.1.3",
             "DateTime::Lite" : "v0.7.3",
@@ -110,6 +111,6 @@
          "web" : "https://gitlab.com/deguest/Module-Generic"
       }
    },
-   "version" : "v1.5.10",
+   "version" : "v1.5.11",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

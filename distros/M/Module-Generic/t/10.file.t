@@ -197,7 +197,7 @@ subtest 'children' => sub
             ok( $f->is_part_of( $d ), 'is_part_of' );
         }
     }
-    
+
     SKIP:
     {
         ok( scalar( @files ) == $n_files, 'test files touched' );
@@ -248,7 +248,7 @@ subtest 'collapse_dots' => sub
         '/path/page/#anchor/page'                                   => '/path/page/#anchor/page',
         '/path/page/../#anchor/page'                                => '/path/#anchor/page',
     ];
-    
+
     my $dummy = file( 'dummy.txt' );
     isa_ok( $dummy, 'Module::Generic::File', 'instantiating object' );
     for( my $i = 0; $i < scalar( @$tests ); $i += 2 )
@@ -400,7 +400,7 @@ if( $f5 )
             skip( "Digest::MD5 not available on your system" );
         }
     }
-    
+
     $f5->empty;
     is( $f5->length, 0, 'empty' );
     ok( $f5->is_empty, 'is_empty' );
@@ -585,7 +585,7 @@ subtest 'mmap' => sub
         # Now try pre-filled variable and see if the size is picked up
         undef( $var );
         $mapfile->close;
-    
+
         use utf8;
         my $var2 = <<EOT;
 Mignonne, allons voir si la rose
@@ -609,7 +609,7 @@ EOT
         # diag( "mmap file size is $fsize and content is '", length( $ct ), "' versus original size of '", length( $var2 ), "' -> '$ct'" ) if( $DEBUG );
         # diag( "Original data:\n", $mapfile2->dump_hex( $var2 ), "\nData loaded from file:\n", $mapfile2->dump_hex( $ct ) ) if( $DEBUG );
         ok( length( $var2 ) == $fsize, 'size set to variable length' );
-    
+
         # Now, try using File::Map, unless of course the perl version is already below 5.16.0
         # in which case we would have already performed such test earlier above
         if( $] < version->parse( 'v5.16.0' ) )
@@ -641,7 +641,7 @@ EOT
         # is( $var3, $content3, 'mmap variable value with File::Map' );
         is( $test, 'Good bye John', 'mmap variable value with File::Map' );
         $filemap->close;
-        
+
         # Now trying with fork if available
         if( $^O eq 'amigaos' || $^O eq 'riscos' || $^O eq 'VMS' )
         {
@@ -657,7 +657,7 @@ EOT
             diag( "Failed to create mmap: ", $mapfile->error ) if( $DEBUG );
             skip( 'failed to create mmap', 2 );
         }
-        
+
         diag( "Starting to fork" ) if( $DEBUG );
         # Block signal for fork
         my $sigset = POSIX::SigSet->new( POSIX::SIGINT );

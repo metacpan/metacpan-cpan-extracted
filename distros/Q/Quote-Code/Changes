@@ -1,5 +1,12 @@
 Revision history for Quote-Code
 
+1.0201  2026-06-06
+        - Support indented here-docs using the new 'qc_to <<~"FOO"' syntax.
+          (This brings feature parity with perl 5.26.)
+        - Explicitly check for and complain about literal newlines in here-doc
+          delimiter strings. (They didn't work anyway, but now the error
+          message tells you what's wrong.)
+
 1.0105  2026-06-06
         - Fix crash when Quote::Code is loaded at runtime by multiple threads
           (a stack overflow due to infinite recursion). See

@@ -34,5 +34,5 @@ requires:
 resources:
   bugtracker: https://codeberg.org/mauke/Quote-Code/issues
   repository: https://codeberg.org/mauke/Quote-Code.git
-version: '1.0105'
+version: '1.0201'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

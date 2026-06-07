@@ -32,10 +32,10 @@
       },
       "runtime" : {
          "requires" : {
-            "DateTime::Lite" : "v0.6.6",
-            "DateTime::Locale::FromCLDR" : "v0.8.2",
+            "DateTime::Lite" : "v0.7.3",
+            "DateTime::Locale::FromCLDR" : "v0.8.7",
             "Locale::Intl" : "v0.3.0",
-            "Locale::Unicode::Data" : "v1.8.3",
+            "Locale::Unicode::Data" : "v1.8.4",
             "Scalar::Util" : "0",
             "Wanted" : "v0.1.0",
             "parent" : "0",
@@ -67,6 +67,6 @@
          "web" : "https://gitlab.com/deguest/DateTime-Format-RelativeTime"
       }
    },
-   "version" : "v0.2.3",
+   "version" : "v0.2.4",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

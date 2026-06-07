@@ -1,5 +1,5 @@
 ---
-abstract: 'Decide whether to allow a client to run this script'
+abstract: 'Decide whether to allow a client to run a CGI script'
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
@@ -13,11 +13,13 @@ build_requires:
   Test::CleanNamespaces: '0'
   Test::DescribeMe: '0'
   Test::Distribution: '0'
-  Test::MockModule: '0'
+  Test::Memory::Cycle: '0'
   Test::MockObject: '0'
+  Test::Mockingbird: '0'
   Test::Most: '0'
   Test::Needs: '0'
   Test::NoWarnings: '0'
+  Test::Returns: '0'
   WWW::RT::CPAN: '0'
   autodie: '0'
   strict: '0'
@@ -47,5 +49,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/CGI-ACL/issues
   repository: git://github.com/nigelhorne/CGI-ACL.git
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

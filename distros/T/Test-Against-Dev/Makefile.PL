@@ -33,8 +33,8 @@ WriteMakefile(
                     'Data::Dump'                        => 0,
                     'JSON'                              => 0,
                     'Path::Tiny'                        => 0,
-                    'Perl::Download::FTP'               => 0.03,
                     'Text::CSV_XS'                      => 0,
+                    'URI'                               => 0,
     },
     ( $mm_ver < 6.63_03 ? 'BUILD_REQUIRES' : 'TEST_REQUIRES' ) =>  {
                      'Test::Simple'                     => 0.44,

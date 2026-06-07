@@ -1,48 +1,70 @@
 BATsh 速查表 [ZH] 简体中文
-==============================
+==========================
 
 ----------------------------------------------------------------------
-执行摘要
-  BATsh 是一个双语 Shell，在同一脚本文件中运行 cmd.exe 批处理和
-  bash/sh 语法，逐行自动切换模式，无需外部 Shell，纯 Perl 实现。
-  支持管道、重定向、函数、变量展开扩展。
+概要
+  BATsh 是一个双语 shell，可在同一脚本文件中运行 cmd.exe 批处理与
+  bash/sh 语法。它按行/按节自动切换模式。
+  无需外部 shell —— 纯 Perl 实现。
+  支持管道、重定向、函数以及变量展开扩展。
 
 混合模式示例
-  :: CMD 段（首标记为大写）
+  :: CMD 节（首个标记为大写）
   @ECHO OFF
   SET LANG=BATsh
+  SET COUNT=3
 
-  # SH 段（首标记包含小写字母）
-  greet() { echo "你好 $1 (bash 模式)"; }
+  # SH 节（首个标记为小写）
+  greet() { echo "Hello from $1 (bash mode)"; }
   greet $LANG
-  result=$(echo $LANG | perl -e 'while(<STDIN>){chomp;print uc}')
-  echo "大写: $result"
+  for i in 1 2 3; do echo "  item $i of $COUNT"; done
+  result=$(echo $LANG | perl -ne "print uc")
+  echo "Uppercase: $result"
 
-  :: 再次进入 CMD 段（读取 SH 结果）
-  ECHO 返回CMD: %result%
+  :: 再次进入 CMD 节（经桥接读取 SH 的结果）
+  ECHO Back in CMD: %result%
 
-  # 运行: perl lib/BATsh.pm script.batsh
+  # 运行方式： perl lib/BATsh.pm script.batsh
+  # 或者：     use BATsh; BATsh->run('script.batsh');
 ----------------------------------------------------------------------
 
 
-BATsh 是一个双语 Shell，可以在同一脚本中同时运行 cmd.exe 和 bash/sh 语法。
-每行的第一个令牌决定执行模式。
+BATsh 是一个双语 shell，可在同一脚本中运行 cmd.exe 与 bash/sh 语法。
+脚本被划分为若干节；每一节都由相应的 shell 原样执行。
 
-1. 模式判断
+1. 模式检测
 -----------
-  ECHO hello          -> cmd.exe 模式（第一个令牌全部大写）
-  echo hello          -> bash/sh 模式（第一个令牌含有小写字母）
-  # 注释             -> 注释（忽略）
-  :: 注释             -> 注释（CMD 风格，忽略）
-  REM 注释            -> 注释（CMD 风格，忽略）
+  一个节的首个有效行的「首个标记」决定由哪个 shell 执行该节：
+
+  CMD 模式：首个标记完全由 [A-Z 0-9 _ - \ / : . @ %] 组成，
+            且至少包含一个大写字母 A-Z。
+
+    ECHO hello          -> CMD 节 (cmd.exe)
+    SET FOO=bar baz     -> CMD 节  （不检测取值部分）
+    @ECHO OFF           -> CMD 节
+    IF "%X%"=="Y" (     -> CMD 节
+
+  SH 模式：其他任何情形（含小写字母，或完全不含字母）。
+
+    echo hello          -> SH 节  (bash/sh)
+    export FOO=bar      -> SH 节
+    if [ -f "$f" ]; then  -> SH 节
+    #!/bin/sh           -> SH 节  （shebang 属于 SH 行）
+
+  注释与空行被并入当前节。
+  注释语法：
+    ::           CMD 风格注释
+    REM ...      CMD 风格注释（不区分大小写）
+    @REM ...     CMD 风格注释
+    # ...        SH 风格注释  （不含 #! shebang）
 
 2. 启动 Shell
---------------
-  perl lib/BATsh.pm                    # 交互式 REPL
-  perl lib/BATsh.pm script.batsh       # 运行脚本文件
-  perl lib/BATsh.pm -e "echo hello"    # 内联单行命令
+-------------
+  perl lib/BATsh.pm               # 交互式 REPL
+  perl lib/BATsh.pm script.batsh  # 运行脚本文件
+  perl lib/BATsh.pm -e "echo hi"  # 内联单行命令
 
-  通过 Perl API：
+  从 Perl 调用：
     use BATsh;
     BATsh->run('script.batsh');
     BATsh->run_string("echo hello");
@@ -50,93 +72,155 @@ BATsh 是一个双语 Shell，可以在同一脚本中同时运行 cmd.exe 和 b
 
 3. 环境变量桥接
 ---------------
-  CMD 块和 SH 块通过 Perl 的 %ENV 共享变量。
+  在每一节运行之前，BATsh 会将当前的 %ENV 作为前导注入（CMD 用 SET 行，
+  SH 用 export 行）。该节结束后，shell 的最终环境会被读回到 %ENV。
 
   export FOO=hello   # SH 设置 FOO
-  ECHO %FOO%         # CMD 通过桥接读取 FOO（Windows）
+  ECHO %FOO%         # CMD 经桥接读取 FOO（Windows）
 
   SET BAR=world      # CMD 设置 BAR
-  echo $BAR          # SH 通过桥接读取 BAR
+  echo $BAR          # SH 经桥接读取 BAR
 
 4. SETLOCAL / ENDLOCAL
------------------------
-  SETLOCAL           # 快照 %ENV
+----------------------
+  SETLOCAL           # 对 %ENV 拍快照（由 BATsh 处理，而非 cmd.exe）
   SET TMP=local_val
   ECHO %TMP%
   ENDLOCAL           # 恢复 %ENV（TMP 消失）
 
-  支持嵌套。
+  作用域可以嵌套。
 
-5. 嵌套（混合模式）
---------------------
-  块结构必须正确配对。嵌套块内允许混合模式行。
+5. 节边界检测
+-------------
+  当节的块深度归零，且下一有效行属于不同模式时，该节结束。
 
-  for x in 1 2; do   # SH 开启块
-      ECHO item $x   # CMD 行（在 SH 块内原样传递）
-  done               # SH 关闭块
+  CMD 节跟踪引号外的 ( 与 ) 的深度：
 
-  CMD 关键字: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
-  SH  关键字: if/fi  for/done  while/done  until/done  case/esac  { }
+    IF "%X%"=="Y" (     <- 打开块（深度 1）
+        ECHO yes
+    ) ELSE (            <- 关闭并重新打开（深度保持 >=1）
+        ECHO no
+    )                   <- 关闭块（深度 0）-> 节可能结束
 
-6. 子程序定义
---------------
+  SH 节跟踪关键字深度：
+
+    for x in 1 2; do   <- 打开块（深度 1）
+        echo $x
+    done                <- 关闭块（深度 0）-> 节可能结束
+
+  即便处于打开块内的行其首个标记看起来像另一种模式，也会被并入当前节。
+  这样便允许：
+
+    for x in A B; do
+        ECHO $x          <- SH 块内的大写：仍为 SH 节
+    done
+
+  SH 关键字配对：
+    开启者 (+1)：if  for  while  until  case  function  select  {
+    闭合者 (-1)：fi  done  esac  }
+    中性   ( 0)：then  do  else  elif
+
+6. 子例程定义
+-------------
   :GREET
   echo "Hello $BATSH_ARG1"
   RET
 
-  标签以 : 开头，以 RET 或 RETURN 结束。
-  主体在执行前提取（不内联运行）。
+  标签以 : 开头，以 RET 或 RETURN 结尾。
+  函数体在执行前被提取（不会内联运行）。
+  函数体可包含 CMD 行、SH 行，或两者混合。
 
-7. CALL 和 source
-------------------
-  CALL :GREET world      # 带参数调用子程序
+7. CALL 与 source
+-----------------
+  CALL :GREET world      # 带参数调用子例程
   CALL other.batsh       # 包含/运行另一个 .batsh 文件（CMD）
   source other.batsh     # 包含/运行另一个 .batsh 文件（SH）
   . other.batsh          # POSIX 点号写法
 
-  参数: $BATSH_ARG1 .. $BATSH_ARGn  （CMD 中用 %BATSH_ARG1%）
-  个数: $BATSH_ARGC
+  参数：$BATSH_ARG1 .. $BATSH_ARGn  （CMD 中为 %BATSH_ARG1%）
+  个数：$BATSH_ARGC
 
 8. Perl API
-------------
+-----------
   BATsh->run($file)            # 运行 .batsh 文件
   BATsh->run_string($source)   # 运行源字符串
   BATsh->run_lines(@lines)     # 运行行数组
   BATsh->repl()                # 交互式 REPL
-  BATsh->classify_token($tok)  # 返回 'CMD' 或 'SH'
-  BATsh->setlocal()            # 快照 %ENV
+  BATsh->classify_token($tok)  # 'CMD' 或 'SH'
+  BATsh->setlocal()            # 对 %ENV 拍快照
   BATsh->endlocal()            # 恢复 %ENV
-  BATsh->call_sub($lbl, @args) # 调用子程序
+  BATsh->call_sub($lbl, @args) # 调用子例程
   BATsh->source_file($file)    # 包含 .batsh 文件
   BATsh->version()             # 版本字符串
 
 9. 平台说明
 -----------
-  Windows: CMD 和 SH 两种块均以纯 Perl 运行 -- 无需外部 cmd.exe/bash/sh。
-  UNIX:    CMD 和 SH 两种块均以纯 Perl 运行 -- 无需外部 cmd.exe/bash/sh。
+  Windows：CMD 节与 SH 节均以纯 Perl 运行 —— 无需外部 cmd.exe、bash 或 sh。
+  UNIX：   CMD 节与 SH 节均以纯 Perl 运行 —— 无需外部 cmd.exe、bash 或 sh。
 
 10. 运行要求
 ------------
-  Perl 5.005_03 或更高版本。仅使用核心模块（File::Spec, Carp）。
-  无需 CPAN 依赖。
+  Perl 5.005_03 或更高版本。  仅核心模块（File::Spec, Carp）。
+  无 CPAN 依赖。
 
-参见: https://metacpan.org/dist/BATsh
+11. CMD 管道与参数修饰符
+------------------------
+  cmd1 | cmd2              # 经由临时文件的管道（纯 Perl）
+  ECHO hello | perl -e "while(<STDIN>){print uc}"
 
-11. CMD 管道和参数修饰符
---------------------------
-  cmd1 | cmd2              # 通过临时文件的管道（纯 Perl）
-  SET /P VAR=提示:         # 从 STDIN 读取一行到 VAR
-  %~dp0                    # %0 的驱动器+目录（最常用）
-  %~n1, %~x1, %~nx1       # 文件名、扩展名、两者
+  SET /P VAR=Prompt:       # 从 STDIN 读取一行存入 VAR
 
-12. SH 函数和变量展开
+  批处理参数波浪号修饰符（例如当 %0=C:\scripts\deploy.bat 时）：
+    %~0   -> C:\scripts\deploy.bat  （仅去引号）
+    %~f0  -> C:/scripts/deploy.bat  （完整绝对路径）
+    %~d0  -> C:                     （驱动器盘符）
+    %~p0  -> /scripts/              （目录路径）
+    %~n0  -> deploy                 （不含扩展名的文件名）
+    %~x0  -> .bat                   （扩展名）
+    %~dp0 -> C:/scripts/            （驱动器 + 目录，最常用）
+    %~nx1 -> deploy.bat             （文件名 + 扩展名）
+
+12. SH 函数与展开
+-----------------
+  greet() {              # 函数定义
+      echo "Hi $1"
+  }
+  function add {         # 备用语法
+      echo $(( $1 + $2 ))
+  }
+  greet world            # 调用函数
+  add 3 4                # -> 7
+
+  ${var%.*}    删除匹配 .* 的最短后缀
+  ${var%%.*}   删除匹配 .* 的最长后缀
+  ${var#*.}    删除匹配 *. 的最短前缀
+  ${var##*.}   删除匹配 *. 的最长前缀
+  ${var/a/b}   将首个 a 替换为 b
+  ${var//a/b}  将全部 a 替换为 b
+  ${var^^}     全部转为大写
+  ${var,,}     全部转为小写
+  ${var:2:4}   从偏移量 2 起、长度 4 的子串
+  ${#var}      字符串长度
+  ${var:-def}  若已设置则取其值，否则取 def
+
+13. SH 输入输出重定向
 ---------------------
-  f() { echo $1; }         # 函数定义
-  ${var%.*}  ${var%%.*}    # 删除后缀（最短/最长）
-  ${var#*.}  ${var##*.}    # 删除前缀（最短/最长）
-  ${var/a/b} ${var//a/b}   # 替换（第一个/全部）
-  ${var^^} ${var,,}        # 大写/小写
-  ${var:2:4} ${#var}       # 子字符串、长度
-  cmd > f  cmd >> f  2>&1  # 重定向
-  cmd1 && cmd2             # AND 链接
-  cmd1 || cmd2             # OR 链接
+  cmd > file      覆盖写入 stdout
+  cmd >> file     追加写入 stdout
+  cmd < file      从文件读取 stdin
+  cmd 2> file     stderr 写入文件
+  cmd 2>&1        将 stderr 合并到 stdout
+  cmd > f 2>&1    stdout 与 stderr 均写入文件
+
+  Here-document（在 stdin 上输入）：
+    cmd <<EOF       直至 EOF 的正文行；展开 $VAR
+    cmd <<'EOF'     直至 EOF 的正文行；不展开（按字面）
+    cmd <<-EOF      同 <<EOF，但去除行首的 TAB 字符
+
+14. SH 复合命令
+---------------
+  cmd1 && cmd2    仅当 cmd1 成功时运行 cmd2
+  cmd1 || cmd2    仅当 cmd1 失败时运行 cmd2
+  cmd1 ; cmd2     无条件运行 cmd2
+
+另见： https://metacpan.org/dist/BATsh

@@ -36,6 +36,7 @@ my %WriteMakefileArgs = (
         'Clone'                 => '0.43',
         'Config'                => 0,
         'Data::Dump'            => '1.23',
+        'Data::Pretty'          => 'v0.2.0',
         'Data::UUID'            => '1.226',
         # version v0.7.3 needed for _parse_timestamp
         'DateTime::Lite'        => 'v0.7.3',

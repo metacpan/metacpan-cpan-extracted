@@ -16,7 +16,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Geo::Coder::OpenCage",
   "PREREQ_PM" => {
-    "Carp" => "1.54",
+    "Carp" => "1.50",
     "Cpanel::JSON::XS" => "4.40",
     "HTTP::Tiny" => "0.083",
     "IO::Socket::SSL" => "2.068",
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.92",
     "Test::Warn" => "0.37"
   },
-  "VERSION" => "0.42",
+  "VERSION" => "0.43",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +41,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Carp" => "1.54",
+  "Carp" => "1.50",
   "Cpanel::JSON::XS" => "4.40",
   "HTTP::Tiny" => "0.083",
   "IO::Socket::SSL" => "2.068",

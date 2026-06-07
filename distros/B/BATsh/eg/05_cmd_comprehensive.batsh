@@ -21,9 +21,9 @@ ECHO   ECHO ON/OFF suppresses the prompt (always OFF in BATsh)
 :: 2. SET and variable expansion
 :: ---------------------------------------------------------------
 ECHO [2] SET and variable expansion
-SET LANG=BATsh
+SET GREETING=BATsh
 SET VERSION=1
-ECHO   LANG=%LANG%  VERSION=%VERSION%
+ECHO   GREETING=%GREETING%  VERSION=%VERSION%
 
 :: ---------------------------------------------------------------
 :: 3. SET /A arithmetic
@@ -39,18 +39,18 @@ ECHO   6*7=%R1%  100/4=%R2%  17%%5=%R3%  (3+4)*2=%R4%
 :: 4. IF string comparison
 :: ---------------------------------------------------------------
 ECHO [4] IF string comparison
-IF "%LANG%"=="BATsh" (
-    ECHO   IF PASS: LANG is BATsh
+IF "%GREETING%"=="BATsh" (
+    ECHO   IF PASS: GREETING is BATsh
 ) ELSE (
     ECHO   IF FAIL
 )
 
-IF NOT "%LANG%"=="Other" (
-    ECHO   NOT PASS: LANG is not Other
+IF NOT "%GREETING%"=="Other" (
+    ECHO   NOT PASS: GREETING is not Other
 )
 
 :: 4b. IF /I case-insensitive
-IF /I "%LANG%"=="batsh" (
+IF /I "%GREETING%"=="batsh" (
     ECHO   IF /I PASS: case-insensitive match
 )
 
@@ -73,7 +73,7 @@ ECHO [6] IF ERRORLEVEL
 :: ERRORLEVEL starts at 0 after normal commands
 SET /A ELTEST=0
 IF ERRORLEVEL 0 SET /A ELTEST=1
-ECHO   ERRORLEVEL>=0: ELTEST=%ELTEST%
+ECHO   ERRORLEVEL ^>= 0: ELTEST=%ELTEST%
 
 :: ---------------------------------------------------------------
 :: 7. IF EXIST (file)
@@ -186,7 +186,7 @@ ECHO [CMD comprehensive] Done.
 :: 9. Pipeline (|)
 :: ----------------------------------------------------------------
 ECHO [9] Pipeline (pipe via temporary file)
-ECHO hello BATsh | perl -e "while(<STDIN>){chomp;print uc($_).chr(10)}"
+ECHO hello BATsh | perl -ne "print uc"
 
 :: ----------------------------------------------------------------
 :: 10. SET /P (interactive prompt -- value piped from echo for demo)

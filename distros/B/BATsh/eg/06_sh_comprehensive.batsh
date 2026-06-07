@@ -226,7 +226,7 @@ echo "[SH comprehensive] Done."
 # 21. Pipelines (cmd1 | cmd2)
 # ---------------------------------------------------------------
 echo "[21] Pipelines"
-echo "hello pipeline" | perl -e "while(<STDIN>){chomp;print uc(\$_).chr(10)}"
+echo "hello pipeline" | perl -ne "print uc"
 COUNT=$(echo "alpha beta gamma" | perl -e "my @w=split;print scalar @w")
 echo "  word count: $COUNT"
 
@@ -238,11 +238,11 @@ TMPF=$(perl -e "use File::Spec; print File::Spec->catfile(File::Spec->tmpdir(),'
 echo "line1" > $TMPF
 echo "line2" >> $TMPF
 echo "  file contents:"
-while IFS= read -r LINE 2>/dev/null || true; do
+while IFS= read -r LINE; do
     echo "    $LINE"
 done < $TMPF
 echo "hello stderr" 2>&1
-perl -e 'print STDERR "captured_err\n"' > /dev/null 2>&1
+perl -e "print STDERR qq(captured_err\n)" > /dev/null 2>&1
 echo "  (stderr was merged to stdout above)"
 rm -f $TMPF 2>/dev/null || true
 

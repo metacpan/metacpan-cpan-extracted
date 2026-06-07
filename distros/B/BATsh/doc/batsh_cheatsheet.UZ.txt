@@ -1,0 +1,232 @@
+BATsh Qoʻllanma [UZ] Oʻzbekcha
+==============================
+
+----------------------------------------------------------------------
+QISQACHA MAZMUN
+  BATsh — bu cmd.exe batch va bash/sh sintaksisini bitta skript faylida
+  ishga tushiradigan ikki tilli qobiq. U rejimni satr/boʻlim boʻyicha
+  avtomatik almashtiradi.
+  Tashqi qobiq talab qilinmaydi -- sof Perl amalga oshirilishi.
+  Quvurlar, qayta yoʻnaltirish, funksiyalar va oʻzgaruvchi-kengaytirish
+  imkoniyatlarini qoʻllab-quvvatlaydi.
+
+ARALASH REJIM NAMUNASI
+  :: CMD boʻlimi (birinchi token bosh harf)
+  @ECHO OFF
+  SET LANG=BATsh
+  SET COUNT=3
+
+  # SH boʻlimi (birinchi token kichik harf)
+  greet() { echo "Hello from $1 (bash mode)"; }
+  greet $LANG
+  for i in 1 2 3; do echo "  item $i of $COUNT"; done
+  result=$(echo $LANG | perl -ne "print uc")
+  echo "Uppercase: $result"
+
+  :: yana CMD boʻlimi (SH natijasini koʻprik orqali oʻqiydi)
+  ECHO Back in CMD: %result%
+
+  # Ishga tushirish: perl lib/BATsh.pm script.batsh
+  # Yoki:            use BATsh; BATsh->run('script.batsh');
+----------------------------------------------------------------------
+
+
+BATsh — bu cmd.exe va bash/sh sintaksisini bitta skriptda ishga tushiradigan
+ikki tilli qobiq.  Skript boʻlimlarga boʻlinadi; har bir boʻlim mos qobiq
+tomonidan oʻzgartirilmasdan bajariladi.
+
+1. Rejimni Aniqlash
+-------------------
+  Boʻlimning birinchi mazmunli satrining BIRINCHI TOKENI qaysi qobiq oʻsha
+  boʻlimni bajarishini belgilaydi:
+
+  CMD rejimi: birinchi token toʻliq [A-Z 0-9 _ - \ / : . @ %] dan iborat VA
+              kamida bitta A-Z bosh harfini oʻz ichiga oladi.
+
+    ECHO hello          -> CMD boʻlimi (cmd.exe)
+    SET FOO=bar baz     -> CMD boʻlimi  (qiymat qismi tekshirilmaydi)
+    @ECHO OFF           -> CMD boʻlimi
+    IF "%X%"=="Y" (     -> CMD boʻlimi
+
+  SH rejimi: qolgan hamma narsa (kichik harf bor, yoki umuman harf yoʻq).
+
+    echo hello          -> SH boʻlimi  (bash/sh)
+    export FOO=bar      -> SH boʻlimi
+    if [ -f "$f" ]; then  -> SH boʻlimi
+    #!/bin/sh           -> SH boʻlimi  (shebang — SH satri)
+
+  Izohlar va boʻsh satrlar joriy boʻlimga qoʻshib yuboriladi.
+  Izoh sintaksisi:
+    ::           CMD uslubidagi izoh
+    REM ...      CMD uslubidagi izoh (katta/kichik harfga sezgir emas)
+    @REM ...     CMD uslubidagi izoh
+    # ...        SH uslubidagi izoh  (#! shebang EMAS)
+
+2. Qobiqni Ishga Tushirish
+--------------------------
+  perl lib/BATsh.pm               # interaktiv REPL
+  perl lib/BATsh.pm script.batsh  # skript faylini ishga tushirish
+  perl lib/BATsh.pm -e "echo hi"  # bir satrli buyruq
+
+  Perldan:
+    use BATsh;
+    BATsh->run('script.batsh');
+    BATsh->run_string("echo hello");
+    BATsh->repl();
+
+3. Muhit Oʻzgaruvchilari Koʻprigi
+---------------------------------
+  Har bir boʻlim ishga tushishidan oldin BATsh joriy %ENV ni muqaddima
+  sifatida kiritadi (CMD uchun SET satrlari, SH uchun export satrlari).
+  Boʻlimdan keyin qobiqning yakuniy muhiti %ENV ga qayta oʻqiladi.
+
+  export FOO=hello   # SH FOO ni oʻrnatadi
+  ECHO %FOO%         # CMD FOO ni koʻprik orqali oʻqiydi (Windows)
+
+  SET BAR=world      # CMD BAR ni oʻrnatadi
+  echo $BAR          # SH BAR ni koʻprik orqali oʻqiydi
+
+4. SETLOCAL / ENDLOCAL
+----------------------
+  SETLOCAL           # %ENV suratga olish (cmd.exe emas, BATsh boshqaradi)
+  SET TMP=local_val
+  ECHO %TMP%
+  ENDLOCAL           # %ENV ni tiklash (TMP yoʻqoladi)
+
+  Doiralar ichma-ich joylashishi mumkin.
+
+5. Boʻlim Chegarasini Aniqlash
+------------------------------
+  Boʻlim, blok chuqurligi nolga qaytganda VA keyingi mazmunli satr boshqa
+  rejimga tegishli boʻlganda tugaydi.
+
+  CMD boʻlimlari qoʻshtirnoqsiz ( va ) chuqurligini kuzatadi:
+
+    IF "%X%"=="Y" (     <- blok ochadi (chuqurlik 1)
+        ECHO yes
+    ) ELSE (            <- yopadi va qayta ochadi (chuqurlik >=1 qoladi)
+        ECHO no
+    )                   <- blokni yopadi (chuqurlik 0) -> boʻlim tugashi mumkin
+
+  SH boʻlimlari kalit soʻz chuqurligini kuzatadi:
+
+    for x in 1 2; do   <- blok ochadi (chuqurlik 1)
+        echo $x
+    done                <- blokni yopadi (chuqurlik 0) -> boʻlim tugashi mumkin
+
+  Ochiq blok ichidagi satrlar, ularning birinchi tokeni boshqa rejimga
+  oʻxshasa ham, joriy boʻlimga qoʻshiladi. Bu quyidagiga imkon beradi:
+
+    for x in A B; do
+        ECHO $x          <- SH blokidagi bosh harf: baribir SH boʻlimi
+    done
+
+  SH kalit soʻz juftliklari:
+    Ochuvchilar (+1) : if  for  while  until  case  function  select  {
+    Yopuvchilar (-1) : fi  done  esac  }
+    Neytral     ( 0) : then  do  else  elif
+
+6. Quyi Dasturlar Taʼrifi
+-------------------------
+  :GREET
+  echo "Hello $BATSH_ARG1"
+  RET
+
+  Yorliqlar : bilan boshlanadi va RET yoki RETURN bilan tugaydi.
+  Tana bajarishdan oldin ajratib olinadi (satr ichida ishlamaydi).
+  Tana CMD satrlari, SH satrlari yoki ularning aralashmasini oʻz ichiga oladi.
+
+7. CALL va source
+-----------------
+  CALL :GREET world      # quyi dasturni argument bilan chaqirish
+  CALL other.batsh       # boshqa .batsh faylini qoʻshish/ishga tushirish (CMD)
+  source other.batsh     # boshqa .batsh faylini qoʻshish/ishga tushirish (SH)
+  . other.batsh          # POSIX nuqta yozuvi
+
+  Argumentlar: $BATSH_ARG1 .. $BATSH_ARGn  (CMD da %BATSH_ARG1%)
+  Soni:        $BATSH_ARGC
+
+8. Perl API
+-----------
+  BATsh->run($file)            # .batsh faylini ishga tushirish
+  BATsh->run_string($source)   # manba satrini ishga tushirish
+  BATsh->run_lines(@lines)     # satrlar massivini ishga tushirish
+  BATsh->repl()                # interaktiv REPL
+  BATsh->classify_token($tok)  # 'CMD' yoki 'SH'
+  BATsh->setlocal()            # %ENV suratga olish
+  BATsh->endlocal()            # %ENV ni tiklash
+  BATsh->call_sub($lbl, @args) # quyi dasturni chaqirish
+  BATsh->source_file($file)    # .batsh faylini qoʻshish
+  BATsh->version()             # versiya satri
+
+9. Platforma Eslatmalari
+------------------------
+  Windows: CMD va SH boʻlimlari ham sof Perlda ishlaydi -- tashqi cmd.exe, bash yoki sh kerak emas.
+  UNIX:    CMD va SH boʻlimlari ham sof Perlda ishlaydi -- tashqi cmd.exe, bash yoki sh kerak emas.
+
+10. Talablar
+------------
+  Perl 5.005_03 yoki undan keyingi.  Faqat asosiy modullar (File::Spec, Carp).
+  CPAN bogʻliqliklari yoʻq.
+
+11. CMD Quvuri va Parametr Modifikatorlari
+------------------------------------------
+  cmd1 | cmd2              # vaqtinchalik fayl orqali quvur (Sof Perl)
+  ECHO hello | perl -e "while(<STDIN>){print uc}"
+
+  SET /P VAR=Prompt:       # STDIN dan bir satr oʻqib VAR ga yozadi
+
+  Batch parametr tilde modifikatorlari (masalan, %0=C:\scripts\deploy.bat boʻlganda):
+    %~0   -> C:\scripts\deploy.bat  (faqat qoʻshtirnoqni olib tashlash)
+    %~f0  -> C:/scripts/deploy.bat  (toʻliq mutlaq yoʻl)
+    %~d0  -> C:                     (disk harfi)
+    %~p0  -> /scripts/              (katalog yoʻli)
+    %~n0  -> deploy                 (kengaytmasiz fayl nomi)
+    %~x0  -> .bat                   (kengaytma)
+    %~dp0 -> C:/scripts/            (disk + katalog, eng keng tarqalgan)
+    %~nx1 -> deploy.bat             (nom + kengaytma)
+
+12. SH Funksiyalari va Kengaytirish
+-----------------------------------
+  greet() {              # funksiya taʼrifi
+      echo "Hi $1"
+  }
+  function add {         # muqobil sintaksis
+      echo $(( $1 + $2 ))
+  }
+  greet world            # funksiyani chaqirish
+  add 3 4                # -> 7
+
+  ${var%.*}    .* ga mos eng qisqa qoʻshimchani olib tashlash
+  ${var%%.*}   .* ga mos eng uzun  qoʻshimchani olib tashlash
+  ${var#*.}    *. ga mos eng qisqa old qoʻshimchani olib tashlash
+  ${var##*.}   *. ga mos eng uzun  old qoʻshimchani olib tashlash
+  ${var/a/b}   a ning birinchi uchrashini b ga almashtirish
+  ${var//a/b}  a ning barcha uchrashlarini b ga almashtirish
+  ${var^^}     hammasini bosh harf
+  ${var,,}     hammasini kichik harf
+  ${var:2:4}   2-oʻrindan boshlab 4 uzunlikdagi qism satr
+  ${#var}      satr uzunligi
+  ${var:-def}  oʻrnatilgan boʻlsa qiymati, aks holda def
+
+13. SH I/O Qayta Yoʻnaltirish
+-----------------------------
+  cmd > file      stdout ni qayta yozish
+  cmd >> file     stdout ga qoʻshish
+  cmd < file      stdin fayldan
+  cmd 2> file     stderr faylga
+  cmd 2>&1        stderr ni stdout ga birlashtirish
+  cmd > f 2>&1    stdout va stderr ni faylga
+
+  Here-document (stdin orqali kirish):
+    cmd <<EOF       EOF gacha tana satrlari; $VAR kengaytiriladi
+    cmd <<'EOF'     EOF gacha tana satrlari; kengaytirishsiz (asl matn)
+    cmd <<-EOF      <<EOF kabi, lekin satr boshidagi TAB belgilar olib tashlanadi
+
+14. SH Murakkab Buyruqlar
+-------------------------
+  cmd1 && cmd2    cmd2 ni faqat cmd1 muvaffaqiyatli boʻlsa ishga tushirish
+  cmd1 || cmd2    cmd2 ni faqat cmd1 muvaffaqiyatsiz boʻlsa ishga tushirish
+  cmd1 ; cmd2     cmd2 ni shartsiz ishga tushirish
+
+Shuningdek qarang: https://metacpan.org/dist/BATsh

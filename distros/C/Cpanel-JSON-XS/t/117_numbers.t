@@ -3,7 +3,7 @@ use Cpanel::JSON::XS;
 use Test::More;
 use Config;
 plan skip_all => "Yet unhandled inf/nan with $^O" if $^O eq 'dec_osf';
-plan tests => 25;
+plan tests => 30;
 
 # infnan_mode = 0:
 is encode_json([9**9**9]),         '[null]', "inf -> null stringify_infnan(0)";
@@ -132,4 +132,34 @@ is encode_json({test => [$num, $str]}), qq|{"test":[$resnum,"bar"]}|,
   setlocale(&POSIX::LC_ALL, "fr_FR.utf-8");
   is encode_json({"invalid" => 123.45}), qq|{"invalid":123.45}|,
     "numeric radix";
+}
+
+
+# GH #112: On 32-bit Perl, whole-number NVs exceeding UV_MAX (e.g. large
+# IDs) were encoded with trailing .0 because Perl stores them as float.
+# Fix: skip the .0 when the NV value exceeds native integer range,
+# since Perl was forced to use NV (not because user wrote a float literal).
+# Floats that fit in native range (like 1.0) still get .0.
+is encode_json([1.0]), '[1.0]', 'GH#112 float 1.0 stays 1.0';
+is encode_json([5439409363]), '[5439409363]', 'GH#112 large int (in IV) no .0';
+is encode_json([3.14]), '[3.14]', 'GH#112 fractional float unchanged';
+
+# GH #197: IOK + pNOK but not NOK — NV imprecise, IV accurate
+# When a large int is used in a float expression, perl upgrades the
+# scalar to PVNV and sets pNOK, but not NOK (NV lost precision).
+# We must encode the accurate integer, not the imprecise float.
+{
+    my $l = 412345678901234567;
+    my $g = $l + 1.2;  # upgrades $l: sets pNOK, keeps IOK, does NOT set NOK
+    is encode_json([$l]), '[412345678901234567]',
+        'GH#197 large int with stale NV: use IOK, not pNOK';
+}
+
+# GH #197: after int($float), both NOK and IOK are set.
+# The NV is the accurate full value (with fraction), prefer it.
+{
+    my $f = 1.5;
+    int($f);  # sets IOK (IV=1), keeps NOK (NV=1.5)
+    is encode_json([$f]), '[1.5]',
+        'GH#197 int($float) still encodes as float (NOK set)';
 }

@@ -1,6 +1,6 @@
 package Sys::Export::VFAT;
 # ABSTRACT: Write minimal FAT12/16/32 filesystems with control over stored file extents
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use v5.26;
 use warnings;
@@ -1027,15 +1027,16 @@ is generated, you can specify it with C<FAT_shortname>.
 =item FAT_attrs
 
 An ORed combination of L</ATTR_READONLY>, L</ATTR_HIDDEN>, L</ATTR_SYSTEM>, or L</ATTR_ARCHIVE>.
-If this value is defined, this module will *not* use the C<mode> user-write bit to determine
-C<ATTR_READONLY> and will not use leading "." to determine C<ATTR_HIDDEN>.
+This lets you directly specify the FAT attributes instead of this module guessing them for you.
+If not defined, this module guesses C<ATTR_READONLY> based on the unix mode user-write bit,
+and guesses C<ATTR_HIDDEN> if there is a leading "." on C<name>.
 
 =item device_offset
 
-For integration with ISOHybrid, you may specify C<device_offset> to request the file be placed
-at an exact location, and as a single un-fragmented extent.  This accounts for the
-L</device_offset> of the whole filesystem.  If you did not set that attribute, this becomes a
-byte offset from the start of this filesystem.
+For integration with L<ISOHybrid|Sys::Export::ISO9660Hybrid>, you may specify C<device_offset>
+to request the file be placed at an exact disk location, and as a single un-fragmented extent.
+This accounts for the L</device_offset> of the whole filesystem.  If you did not set that
+attribute, this becomes a byte offset from the start of this filesystem.
 
 This offset must fall on the address of one of the clusters of the data region, and will
 generate an exception if it can't be honored.  It must also agree with any C<device_align> you
@@ -1049,8 +1050,8 @@ location is decided.
 =item device_align
 
 Like C<device_offset>, but if you just want to request the file be aligned to the device rather
-than needing it to exist at a specific offset.  This is a power of 2 in bytes, such as '2048'.
-This takes attribute L</volume_offset> into account, possibly providing alignment that
+than needing it to exist at a specific offset.  This is a power of 2 measured in bytes, such as
+'2048'.  This takes attribute L</volume_offset> into account, possibly providing alignment that
 is a multiple of a power-of-2 from the start of the device but not from the start of the volume.
 
 =back
@@ -1093,7 +1094,7 @@ lowercase ASCII and replacing illegal characters with '_' or the character of yo
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use constant MAX_HEADER_SIZE => 16384;
 use constant DECODE_BUF_SIZE => 1048576;

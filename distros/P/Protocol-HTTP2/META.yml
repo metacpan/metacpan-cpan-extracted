@@ -30,7 +30,7 @@ no_index:
 provides:
   Protocol::HTTP2:
     file: lib/Protocol/HTTP2.pm
-    version: '1.12'
+    version: '1.13'
   Protocol::HTTP2::Client:
     file: lib/Protocol/HTTP2/Client.pm
   Protocol::HTTP2::Connection:
@@ -85,7 +85,7 @@ resources:
   bugtracker: https://github.com/vlet/p5-Protocol-HTTP2/issues
   homepage: https://github.com/vlet/p5-Protocol-HTTP2
   repository: https://github.com/vlet/p5-Protocol-HTTP2.git
-version: '1.12'
+version: '1.13'
 x_contributors:
   - 'Daniil Bondarev <bondarev@amazon.com>'
   - 'Daniil Bondarev <xonatius@gmail.com>'

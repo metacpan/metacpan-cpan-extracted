@@ -1,7 +1,7 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v1.5.10
+## Version v1.5.11
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
@@ -118,7 +118,7 @@ BEGIN
     # shared state on the way out.
     *_in_end_phase = sub{ ${^GLOBAL_PHASE} eq 'END' };
 
-    our $VERSION   = 'v1.5.10';
+    our $VERSION   = 'v1.5.11';
 };
 
 # Load the XS shared library (Generic.so) which provides faster implementations of
@@ -13352,7 +13352,7 @@ Quick way to create a class with feature-rich methods
 
 =head1 VERSION
 
-    v1.5.10
+    v1.5.11
 
 =head1 DESCRIPTION
 

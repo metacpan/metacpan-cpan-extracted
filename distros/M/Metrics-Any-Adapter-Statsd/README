@@ -16,7 +16,7 @@ DESCRIPTION
     variables, defaulting to
 
        $Net::Statsd::HOST = "127.0.0.1";
-       $Net::Statsd::PORT = 8125
+       $Net::Statsd::PORT = 8125;
 
     The configuration can be changed by setting new values or by passing
     arguments to the import line:

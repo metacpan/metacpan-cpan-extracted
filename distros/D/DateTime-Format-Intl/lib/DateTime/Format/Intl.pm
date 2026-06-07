@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## DateTime Format Intl - ~/lib/DateTime/Format/Intl.pm
-## Version v0.1.8
+## Version v0.1.9
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/09/16
-## Modified 2025/01/05
+## Modified 2026/06/07
 ## All rights reserved
 ## 
 ## 
@@ -29,7 +29,7 @@ BEGIN
     use Locale::Unicode::Data;
     use Scalar::Util ();
     use Want;
-    our $VERSION = 'v0.1.8';
+    our $VERSION = 'v0.1.9';
     our $CACHE = {};
     our $LAST_CACHE_CLEAR = time();
     our $MAX_CACHE_SIZE = 30;
@@ -5249,7 +5249,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v0.1.8
+    v0.1.9
 
 =head1 DESCRIPTION
 

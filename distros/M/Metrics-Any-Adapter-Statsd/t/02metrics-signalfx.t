@@ -3,7 +3,7 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
 use Metrics::Any '$metrics';
 use Metrics::Any::Adapter 'SignalFx';
@@ -79,6 +79,21 @@ my $socket = IO::Socket::INET->new(
    $socket->recv( my $packet, 512 );
    is( $packet, "the.[label=labvalue]timer:250|ms",
       '->report_timer sends statsd packet'
+   );
+}
+
+# escaping of invalid characters (CVE-2026-50639)
+{
+   $metrics->make_counter( escaped =>
+      name => "escaped",
+      labels => [qw( bad|label )],
+   );
+
+   $metrics->inc_counter( escaped => "bad=value" );
+
+   $socket->recv( my $packet, 512 );
+   is( $packet, "[bad_label=bad_value]escaped:1|c",
+      '->inc_counter sends statsd packet'
    );
 }
 

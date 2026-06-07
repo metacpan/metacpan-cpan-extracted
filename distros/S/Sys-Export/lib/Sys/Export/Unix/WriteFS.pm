@@ -1,7 +1,7 @@
 package Sys::Export::Unix::WriteFS;
 
 # ABSTRACT: An export target that writes files to a directory in the host filesystem
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 
 use v5.26;
@@ -47,9 +47,21 @@ sub dst($self)          { $self->{dst} }
 sub dst_abs($self)      { $self->{dst_abs} }
 sub tmp($self)          { $self->{tmp} }
 
-sub on_collision($self, @value) {
-   $self->{on_collision}= $value[0] if @value;
-   $self->{on_collision}
+sub on_collision {
+   return shift->_set_on_collision(@_) if @_ > 1;
+   shift->{on_collision}
+}
+my %_valid_on_collision= (
+   croak          => 'croak',
+   ignore_if_same => 'croak',
+   ignore         => 'ignore',
+   overwrite      => 'overwrite',
+);
+sub _set_on_collision($self, $val) {
+   $self->{on_collision}= ref $val eq 'CODE'? $val
+                        : $_valid_on_collision{$val}
+                           // croak("Invalid 'on_collision' value '$val'");
+   $self;
 }
 
 # a hashref tracking files with link-count higher than 1, so that hardlinks can be preserved.
@@ -67,17 +79,23 @@ sub add($self, $file) {
    my $mode= $file->{mode} // croak "attribute 'mode' is required, for '$file->{name}'";
    # Does it already exist?
    my $dst_abs= $self->dst_abs . $file->{name};
-   my %old;
+   my %old= (name => $file->{name});
    if (@old{qw( dev ino mode nlink uid gid rdev size atime mtime)}= lstat($dst_abs)) {
-      # If the user says to ignore it, nothing to do:
-      my $action= $self->on_collision // 'ignore_if_same';
-      $action= $action->($dst_abs, $file)
-         if ref $action eq 'CODE';
+      my $action= $self->on_collision // 'croak';
+      # Nothing to do if user wants collisions ignored
       return !!0 if $action eq 'ignore';
-      return !!0 if $action eq 'ignore_if_same' && $self->_croak_if_different($file, \%old);
-      croak "Unknown on_collision action '$action'" unless $action eq 'overwrite';
-      # overwrite, but directory might not be empty, so handle that later
-      unlink $dst_abs unless S_ISDIR($old{mode});
+      if (defined(my $difference= $self->_compare_dirent($file, \%old))) {
+         # Call user callback, if any
+         $action= $action->($dst_abs, $file)
+            if ref $action eq 'CODE';
+         # validate its return value
+         $action= $_valid_on_collision{$action // ''}
+               // croak "Unknown on_collision action '$action'";
+         return !!0 if $action eq 'ignore';
+         croak $difference unless $action eq 'overwrite';
+         # overwrite, but directory might not be empty, so handle that later
+         unlink $dst_abs unless S_ISDIR($old{mode});
+      }
    }
    return S_ISREG($mode)? $self->_add_file($file)
         : S_ISDIR($mode)? $self->_add_dir($file, (defined $old{mode}? \%old : undef))
@@ -103,36 +121,36 @@ our %_mode_name= (
 );
 sub _mode_name($mode) { $_mode_name{($mode & S_IFMT)} // '(unknown)' }
 
-# Compare two dirents and croak if new is not equivalent to old
-sub _croak_if_different($self, $file, $old) {
+# Compare two dirents and return error msg if new is not equivalent to old
+sub _compare_dirent($self, $file, $old) {
    my $dst_abs= $self->dst_abs . $file->{name};
-   croak "Attempt to write "._mode_name($file->{mode})." overtop existing "._mode_name($old->{mode})." at $dst_abs"
+   return "Attempt to write "._mode_name($file->{mode})." overtop existing "._mode_name($old->{mode})." at $dst_abs"
       if ($file->{mode} & S_IFMT) != ($old->{mode} & S_IFMT);
-   croak "Attempt to write ownership $file->{uid}:$file->{gid} to $dst_abs which was previously $old->{uid}:$old->{gid}"
+   return "Attempt to write ownership $file->{uid}:$file->{gid} to $dst_abs which was previously $old->{uid}:$old->{gid}"
       if (defined $file->{uid} && $file->{uid} != $old->{uid}) || (defined $file->{gid} && $file->{gid} != $old->{gid});
    # For symlinks, compare only the content of the link.  Permissions are ignored.
    if (S_ISLNK($file->{mode})) {
       my $targ= readlink $dst_abs;
-      croak "Attempt to rewrite symlink $dst_abs from $targ to $file->{data}"
+      return "Attempt to rewrite symlink $dst_abs from $targ to $file->{data}"
          if $targ ne $file->{data};
       return !!0;
    }
    # For everything else, compare permissions
-   croak "Attempt to write permissions ".($file->{mode} & ~S_IFMT)." overtop existing ".($old->{mode} & ~S_IFMT)." at $dst_abs"
+   return "Attempt to write permissions ".($file->{mode} & ~S_IFMT)." overtop existing ".($old->{mode} & ~S_IFMT)." at $dst_abs"
       unless $file->{mode} == $old->{mode};
 
    if (S_ISREG($file->{mode})) {
       # compare file contents
-      croak "Attempt to overwrite $dst_abs with different content"
+      return "Attempt to overwrite $dst_abs with different content"
          if (defined $file->{size} && $file->{size} != $old->{size})
             || !_contents_same($file, $dst_abs);
    }
    elsif (S_ISBLK($file->{mode}) || S_ISCHR($file->{mode})) {
       # compare major/minor numbers
-      croak "Attempt to overwrite $dst_abs with different major/minor value"
+      return "Attempt to overwrite $dst_abs with different major/minor value"
          if $file->{rdev} != $old->{rdev};
    }
-   1;
+   undef;
 }
 
 # Compare file contents for equality
@@ -379,20 +397,20 @@ same volume as the destination, in which case it will create a temp directory wi
 
 =item on_collision
 
-Specifies what to do if there is a name collision in the destination.  The default
-'ignore_if_same' causes an exception unless the existing file is identical to the one that
-would be written.
+Specifies what to do if there is a name collision (type or content or permissions different from
+the existing directory entry) in the destination.  The default is C<'croak'>.
 
-Setting this to 'overwrite' will unconditionally replace files as it runs.  Setting it to
-'ignore' will silently ignore collisions and leave the existing file in place.
-Setting it to a coderef will provide you with the path and content thata was about to be
-written to it:
+  on_collision => 'croak'      # die
+  
+  on_collision => 'overwrite'  # replace directory entry if possible, or die
+  
+  on_collision => 'ignore'     # leave existing file, no error
 
   on_collision => sub ($dst_abs, $fileinfo) {
     # dst_abs is the absolute path about to be written
     # fileinfo is the hash of file attributes passed to ->add
     # _ will be set to an lstat of $dst_abs
-    return $action; # 'ignore' or 'overwrite' or 'ignore_if_same'
+    return $action; # 'ignore' or 'overwrite' or 'croak'
   }
 
 =back
@@ -453,7 +471,7 @@ to directories since writing the contents of the directory would have changed th
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

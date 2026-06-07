@@ -1,6 +1,6 @@
 package Sys::Export::VFAT::Directory;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 # ABSTRACT: Represents a case-folded directory in VFAT
 
 
@@ -259,7 +259,7 @@ They may also contain other keys specific to the filesystem type.
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

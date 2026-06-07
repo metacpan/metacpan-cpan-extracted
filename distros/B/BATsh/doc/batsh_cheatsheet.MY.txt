@@ -1,120 +1,231 @@
-BATsh Helaian Rujukan [MY] Bahasa Melayu
-==========================================
+BATsh အတိုချုပ်စာရွက် [MY] မြန်မာဘာသာ
+=====================================
 
 ----------------------------------------------------------------------
-RINGKASAN
-  BATsh ialah penterjemah shell dwibahasa yang menjalankan sintaks
-  cmd.exe batch dan bash/sh dalam fail skrip yang sama, bertukar mod
-  secara automatik baris demi baris. Tiada shell luaran diperlukan.
+အကျဉ်းချုပ်
+  BATsh သည် cmd.exe batch နှင့် bash/sh syntax ကို script ဖိုင်တစ်ခုတည်းတွင်
+  အလုပ်လုပ်စေသော နှစ်ဘာသာ shell ဖြစ်သည်။ ၎င်းသည် စာကြောင်း/အပိုင်းအလိုက်
+  mode ကို အလိုအလျောက်ပြောင်းသည်။
+  ပြင်ပ shell မလိုအပ်ပါ -- Perl သက်သက်ဖြင့် တည်ဆောက်ထားသည်။
+  pipeline၊ redirection၊ function နှင့် variable-expansion တိုးချဲ့မှုများကို ပံ့ပိုးသည်။
 
-CONTOH CAMPURAN
-  :: Bahagian CMD (token pertama huruf besar)
+ရောနှော mode နမူနာ
+  :: CMD အပိုင်း (ပထမ token သည် စာလုံးကြီး)
   @ECHO OFF
   SET LANG=BATsh
+  SET COUNT=3
 
-  # Bahagian SH (token pertama mengandungi huruf kecil)
-  greet() { echo "Helo $1 (mod bash)"; }
+  # SH အပိုင်း (ပထမ token သည် စာလုံးသေး)
+  greet() { echo "Hello from $1 (bash mode)"; }
   greet $LANG
-  result=$(echo $LANG | perl -e 'while(<STDIN>){chomp;print uc}')
-  echo "Huruf besar: $result"
+  for i in 1 2 3; do echo "  item $i of $COUNT"; done
+  result=$(echo $LANG | perl -ne "print uc")
+  echo "Uppercase: $result"
 
-  :: Kembali ke CMD (baca hasil SH)
-  ECHO Kembali CMD: %result%
+  :: CMD အပိုင်း ထပ်မံ (bridge မှတစ်ဆင့် SH ၏ရလဒ်ကို ဖတ်သည်)
+  ECHO Back in CMD: %result%
 
-  # Jalankan: perl lib/BATsh.pm script.batsh
+  # ဖြင့်အလုပ်လုပ်ရန်: perl lib/BATsh.pm script.batsh
+  # သို့မဟုတ်:        use BATsh; BATsh->run('script.batsh');
 ----------------------------------------------------------------------
 
 
-BATsh ialah shell dwibahasa yang menjalankan sintaks cmd.exe dan bash/sh
-dalam skrip yang sama. Token pertama setiap baris menentukan mod.
+BATsh သည် cmd.exe နှင့် bash/sh syntax ကို script တစ်ခုတည်းတွင်
+အလုပ်လုပ်စေသော နှစ်ဘာသာ shell ဖြစ်သည်။  Script ကို အပိုင်းများ ခွဲထားသည်;
+အပိုင်းတစ်ခုစီကို သင့်လျော်သော shell က မူရင်းအတိုင်း လုပ်ဆောင်သည်။
 
-1. Pengesanan Mod
------------------
-  ECHO hello          -> mod cmd.exe (token pertama semua huruf besar)
-  echo hello          -> mod bash/sh (token pertama mengandungi huruf kecil)
-  # ulasan            -> ulasan (diabaikan)
-  :: ulasan           -> ulasan (gaya CMD, diabaikan)
-  REM ulasan          -> ulasan (gaya CMD, diabaikan)
+1. Mode ရှာဖွေခြင်း
+-------------------
+  အပိုင်းတစ်ခု၏ ပထမအဓိပ္ပါယ်ရှိစာကြောင်း၏ «ပထမ token» သည် မည်သည့် shell က
+  ထိုအပိုင်းကို လုပ်ဆောင်မည်ကို ဆုံးဖြတ်သည်။
 
-2. Memulakan Shell
+  CMD mode: ပထမ token သည် [A-Z 0-9 _ - \ / : . @ %] ဖြင့်သာ ဖွဲ့စည်းပြီး
+            အနည်းဆုံး စာလုံးကြီး A-Z တစ်လုံး ပါဝင်သည်။
+
+    ECHO hello          -> CMD အပိုင်း (cmd.exe)
+    SET FOO=bar baz     -> CMD အပိုင်း  (တန်ဖိုးအပိုင်းကို မစစ်ပါ)
+    @ECHO OFF           -> CMD အပိုင်း
+    IF "%X%"=="Y" (     -> CMD အပိုင်း
+
+  SH mode: အခြားအရာအားလုံး (စာလုံးသေးပါသည် သို့မဟုတ် စာလုံးလုံးဝမပါ)။
+
+    echo hello          -> SH အပိုင်း  (bash/sh)
+    export FOO=bar      -> SH အပိုင်း
+    if [ -f "$f" ]; then  -> SH အပိုင်း
+    #!/bin/sh           -> SH အပိုင်း  (shebang သည် SH စာကြောင်း)
+
+  မှတ်ချက်များနှင့် စာကြောင်းအလွတ်များကို လက်ရှိအပိုင်းထဲ စုပ်ယူသည်။
+  မှတ်ချက် syntax:
+    ::           CMD ပုံစံ မှတ်ချက်
+    REM ...      CMD ပုံစံ မှတ်ချက် (စာလုံးကြီးသေး ခွဲခြားမှုမရှိ)
+    @REM ...     CMD ပုံစံ မှတ်ချက်
+    # ...        SH ပုံစံ မှတ်ချက်  (#! shebang မဟုတ်)
+
+2. Shell စတင်ခြင်း
 ------------------
-  perl lib/BATsh.pm                    # REPL interaktif
-  perl lib/BATsh.pm script.batsh       # jalankan fail skrip
-  perl lib/BATsh.pm -e "echo helo"     # arahan satu baris
+  perl lib/BATsh.pm               # အပြန်အလှန် REPL
+  perl lib/BATsh.pm script.batsh  # script ဖိုင်ကို အလုပ်လုပ်စေသည်
+  perl lib/BATsh.pm -e "echo hi"  # inline တစ်ကြောင်းတည်း command
 
-  Daripada API Perl:
+  Perl မှ:
     use BATsh;
     BATsh->run('script.batsh');
-    BATsh->run_string("echo helo");
+    BATsh->run_string("echo hello");
     BATsh->repl();
 
-3. Jambatan Pemboleh Ubah Persekitaran
----------------------------------------
-  Blok CMD dan SH berkongsi pemboleh ubah melalui %ENV Perl.
+3. Environment Variable Bridge
+------------------------------
+  အပိုင်းတစ်ခုစီ မလုပ်ဆောင်မီ BATsh သည် လက်ရှိ %ENV ကို နိဒါန်းအဖြစ်
+  ထည့်သွင်းသည် (CMD အတွက် SET စာကြောင်းများ၊ SH အတွက် export စာကြောင်းများ)။
+  အပိုင်းပြီးနောက် shell ၏ နောက်ဆုံး environment ကို %ENV သို့ ပြန်ဖတ်သည်။
 
-  export FOO=helo    # SH menetapkan FOO
-  ECHO %FOO%         # CMD membaca FOO melalui jambatan (Windows)
+  export FOO=hello   # SH က FOO ကို သတ်မှတ်
+  ECHO %FOO%         # CMD က bridge မှတစ်ဆင့် FOO ကို ဖတ် (Windows)
 
-  SET BAR=dunia      # CMD menetapkan BAR
-  echo $BAR          # SH membaca BAR melalui jambatan
+  SET BAR=world      # CMD က BAR ကို သတ်မှတ်
+  echo $BAR          # SH က bridge မှတစ်ဆင့် BAR ကို ဖတ်
 
 4. SETLOCAL / ENDLOCAL
------------------------
-  SETLOCAL           # cempadan %ENV
-  SET TMP=nilai_lokal
+----------------------
+  SETLOCAL           # %ENV ကို ဓာတ်ပုံရိုက် (cmd.exe မဟုတ် BATsh က ကိုင်တွယ်)
+  SET TMP=local_val
   ECHO %TMP%
-  ENDLOCAL           # pulihkan %ENV (TMP hilang)
+  ENDLOCAL           # %ENV ကို ပြန်လည်ရယူ (TMP ပျောက်)
 
-  Skop boleh disarangkan.
+  Scope များ ထပ်နေနိုင်သည်။
 
-5. Sarang (Mod Campuran)
--------------------------
-  Struktur blok mesti dipasangkan dengan betul.
+5. အပိုင်းနယ်နိမိတ် ရှာဖွေခြင်း
+-----------------------------
+  အပိုင်းတစ်ခုသည် ၎င်း၏ block အနက် သုညသို့ ပြန်ရောက်ပြီး နောက်အဓိပ္ပါယ်ရှိ
+  စာကြောင်းသည် မတူသော mode နှင့် သက်ဆိုင်သည့်အခါ ပြီးဆုံးသည်။
 
-  for x in 1 2; do   # SH buka blok
-      ECHO item $x   # baris CMD dalam blok SH
-  done               # SH tutup blok
+  CMD အပိုင်းများသည် ကိုးကားအမှတ်အပြင်ဘက်ရှိ ( နှင့် ) အနက်ကို ခြေရာခံသည်:
 
-  Kata kunci CMD: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
-  Kata kunci SH:  if/fi  for/done  while/done  until/done  case/esac  { }
+    IF "%X%"=="Y" (     <- block ဖွင့် (အနက် 1)
+        ECHO yes
+    ) ELSE (            <- ပိတ်ပြီး ပြန်ဖွင့် (အနက် >=1 ဆက်ရှိ)
+        ECHO no
+    )                   <- block ပိတ် (အနက် 0) -> အပိုင်း ပြီးဆုံးနိုင်
 
-6. Definisi Subrutin
----------------------
+  SH အပိုင်းများသည် keyword အနက်ကို ခြေရာခံသည်:
+
+    for x in 1 2; do   <- block ဖွင့် (အနက် 1)
+        echo $x
+    done                <- block ပိတ် (အနက် 0) -> အပိုင်း ပြီးဆုံးနိုင်
+
+  ဖွင့်ထားသော block အတွင်းရှိ စာကြောင်းများသည် ၎င်းတို့၏ ပထမ token က
+  အခြား mode နှင့်တူသော်လည်း လက်ရှိအပိုင်းထဲ စုပ်ယူခံရသည်။ ၎င်းက ခွင့်ပြုသည်:
+
+    for x in A B; do
+        ECHO $x          <- SH block အတွင်း စာလုံးကြီး: SH အပိုင်းအတိုင်းပင်
+    done
+
+  SH keyword အတွဲများ:
+    ဖွင့်သူ (+1) : if  for  while  until  case  function  select  {
+    ပိတ်သူ (-1) : fi  done  esac  }
+    ကြားနေ ( 0) : then  do  else  elif
+
+6. Subroutine သတ်မှတ်ချက်များ
+-----------------------------
   :GREET
-  echo "Helo $BATSH_ARG1"
+  echo "Hello $BATSH_ARG1"
   RET
 
-7. CALL dan source
--------------------
-  CALL :GREET dunia      # panggil subrutin dengan argumen
-  CALL lain.batsh        # sertakan fail .batsh lain (CMD)
-  source lain.batsh      # sertakan fail .batsh lain (SH)
-  . lain.batsh           # notasi titik POSIX
+  Label များသည် : ဖြင့် စတင်ပြီး RET သို့မဟုတ် RETURN ဖြင့် ပြီးဆုံးသည်။
+  ကိုယ်ထည်ကို လုပ်ဆောင်မီ ထုတ်ယူသည် (inline မလုပ်ဆောင်ပါ)။
+  ကိုယ်ထည်တွင် CMD စာကြောင်း၊ SH စာကြောင်း သို့မဟုတ် ရောနှောမှု ပါနိုင်သည်။
 
-  Argumen: $BATSH_ARG1 .. $BATSH_ARGn  (%BATSH_ARG1% dalam CMD)
-  Bilangan: $BATSH_ARGC
+7. CALL နှင့် source
+--------------------
+  CALL :GREET world      # argument ဖြင့် subroutine ကို ခေါ်
+  CALL other.batsh       # အခြား .batsh ဖိုင်ကို ထည့်သွင်း/အလုပ်လုပ် (CMD)
+  source other.batsh     # အခြား .batsh ဖိုင်ကို ထည့်သွင်း/အလုပ်လုပ် (SH)
+  . other.batsh          # POSIX dot သင်္ကေတ
 
-8. API Perl
+  Argument: $BATSH_ARG1 .. $BATSH_ARGn  (CMD တွင် %BATSH_ARG1%)
+  အရေအတွက်: $BATSH_ARGC
+
+8. Perl API
 -----------
-  BATsh->run($file)            # jalankan fail .batsh
-  BATsh->run_string($source)   # jalankan rentetan sumber
-  BATsh->run_lines(@lines)     # jalankan tatasusunan baris
-  BATsh->repl()                # REPL interaktif
-  BATsh->classify_token($tok)  # kembalikan 'CMD' atau 'SH'
-  BATsh->setlocal()            # cempadan %ENV
-  BATsh->endlocal()            # pulihkan %ENV
-  BATsh->call_sub($lbl, @args) # panggil subrutin
-  BATsh->source_file($file)    # sertakan fail .batsh
-  BATsh->version()             # rentetan versi
+  BATsh->run($file)            # .batsh ဖိုင်ကို အလုပ်လုပ်
+  BATsh->run_string($source)   # source string ကို အလုပ်လုပ်
+  BATsh->run_lines(@lines)     # စာကြောင်း array ကို အလုပ်လုပ်
+  BATsh->repl()                # အပြန်အလှန် REPL
+  BATsh->classify_token($tok)  # 'CMD' သို့မဟုတ် 'SH'
+  BATsh->setlocal()            # %ENV ဓာတ်ပုံရိုက်
+  BATsh->endlocal()            # %ENV ပြန်လည်ရယူ
+  BATsh->call_sub($lbl, @args) # subroutine ကို ခေါ်
+  BATsh->source_file($file)    # .batsh ဖိုင်ကို ထည့်သွင်း
+  BATsh->version()             # version string
 
-9. Nota Platform
-----------------
-  Windows: Blok CMD dan SH berjalan dalam Perl tulen -- tidak perlu cmd.exe/bash/sh luaran.
-  UNIX:    Blok CMD dan SH berjalan dalam Perl tulen -- tidak perlu cmd.exe/bash/sh luaran.
+9. Platform မှတ်စုများ
+----------------------
+  Windows: CMD နှင့် SH အပိုင်းနှစ်ခုစလုံး Perl သက်သက်ဖြင့် အလုပ်လုပ် -- ပြင်ပ cmd.exe, bash, sh မလို။
+  UNIX:    CMD နှင့် SH အပိုင်းနှစ်ခုစလုံး Perl သက်သက်ဖြင့် အလုပ်လုပ် -- ပြင်ပ cmd.exe, bash, sh မလို။
 
-10. Keperluan
--------------
-  Perl 5.005_03 atau lebih tinggi. Modul teras sahaja (File::Spec, Carp).
-  Tiada kebergantungan CPAN.
+10. လိုအပ်ချက်များ
+-----------------
+  Perl 5.005_03 သို့မဟုတ် နောက်ပိုင်း။  Core module များသာ (File::Spec, Carp)။
+  CPAN dependency မရှိ။
 
-Lihat juga: https://metacpan.org/dist/BATsh
+11. CMD Pipeline နှင့် Parameter Modifier များ
+----------------------------------------------
+  cmd1 | cmd2              # ယာယီဖိုင်မှတစ်ဆင့် pipeline (Perl သက်သက်)
+  ECHO hello | perl -e "while(<STDIN>){print uc}"
+
+  SET /P VAR=Prompt:       # STDIN မှ စာကြောင်းတစ်ကြောင်း ဖတ်၍ VAR ထဲထည့်
+
+  Batch-parameter tilde modifier များ (ဥပမာ %0=C:\scripts\deploy.bat ဖြစ်သောအခါ):
+    %~0   -> C:\scripts\deploy.bat  (ကိုးကားအမှတ်ဖယ်ရှားရုံ)
+    %~f0  -> C:/scripts/deploy.bat  (အပြည့်အစုံ absolute path)
+    %~d0  -> C:                     (drive အက္ခရာ)
+    %~p0  -> /scripts/              (directory path)
+    %~n0  -> deploy                 (extension မပါ ဖိုင်အမည်)
+    %~x0  -> .bat                   (extension)
+    %~dp0 -> C:/scripts/            (drive + directory၊ အသုံးအများဆုံး)
+    %~nx1 -> deploy.bat             (အမည် + extension)
+
+12. SH Function များနှင့် Expansion
+-----------------------------------
+  greet() {              # function သတ်မှတ်ချက်
+      echo "Hi $1"
+  }
+  function add {         # အစားထိုး syntax
+      echo $(( $1 + $2 ))
+  }
+  greet world            # function ကို ခေါ်
+  add 3 4                # -> 7
+
+  ${var%.*}    .* နှင့်ကိုက်ညီသော အတိုဆုံး suffix ကို ဖယ်
+  ${var%%.*}   .* နှင့်ကိုက်ညီသော အရှည်ဆုံး suffix ကို ဖယ်
+  ${var#*.}    *. နှင့်ကိုက်ညီသော အတိုဆုံး prefix ကို ဖယ်
+  ${var##*.}   *. နှင့်ကိုက်ညီသော အရှည်ဆုံး prefix ကို ဖယ်
+  ${var/a/b}   ပထမဆုံး a ကို b ဖြင့် အစားထိုး
+  ${var//a/b}  a အားလုံးကို b ဖြင့် အစားထိုး
+  ${var^^}     အားလုံး စာလုံးကြီး
+  ${var,,}     အားလုံး စာလုံးသေး
+  ${var:2:4}   offset 2 မှ အရှည် 4 substring
+  ${#var}      string အရှည်
+  ${var:-def}  သတ်မှတ်ထားလျှင် တန်ဖိုး၊ မဟုတ်လျှင် def
+
+13. SH I/O Redirection
+----------------------
+  cmd > file      stdout ကို ထပ်ရေး
+  cmd >> file     stdout သို့ ဖြည့်စွက်
+  cmd < file      ဖိုင်မှ stdin
+  cmd 2> file     stderr ကို ဖိုင်သို့
+  cmd 2>&1        stderr ကို stdout ထဲ ပေါင်းစည်း
+  cmd > f 2>&1    stdout နှင့် stderr နှစ်ခုလုံး ဖိုင်သို့
+
+  Here-document (stdin ပေါ် input):
+    cmd <<EOF       EOF အထိ ကိုယ်ထည်စာကြောင်းများ; $VAR ချဲ့ထွင်ခံရ
+    cmd <<'EOF'     EOF အထိ ကိုယ်ထည်စာကြောင်းများ; ချဲ့ထွင်မှုမရှိ (စာသားအတိုင်း)
+    cmd <<-EOF      <<EOF နှင့်တူ၊ သို့သော် စာကြောင်းရှေ့ TAB များ ဖယ်ရှားသည်
+
+14. SH Compound Command များ
+----------------------------
+  cmd1 && cmd2    cmd1 အောင်မြင်မှသာ cmd2 အလုပ်လုပ်
+  cmd1 || cmd2    cmd1 မအောင်မြင်မှသာ cmd2 အလုပ်လုပ်
+  cmd1 ; cmd2     ခြွင်းချက်မရှိ cmd2 အလုပ်လုပ်
+
+ကြည့်ရန်: https://metacpan.org/dist/BATsh

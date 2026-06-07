@@ -80,7 +80,7 @@ while( my( $k, $type ) = each( %$hash ) )
             {
                 skip( overload::StrVal( $k ) . ' is not a reference. It is a ' . ( Scalar::Util::reftype( $k ) // 'string' ), 1 );
             }
-            
+
             if( $type eq 'array' )
             {
                 is_deeply( $k => $array, "$type key -> value" );

@@ -12,19 +12,12 @@ use warnings;
 
 =head1 NAME
 
-Tstregex - A Hybrid Regex Diagnostic Tool (single file Library module and command tool)
+Tstregex - A Diagnostic Tool that quickly shows the longest Regular Expression string match, highlighting the rejected part. The terminal command 
+tstregex '/^[a-z]*\d{3}$/' 'abc12a' shows: abcB<12a> (^[a-z]*B<\d{3}$>)
 
- shows the longest Regular Expression match / highlight the rejected part
- 
- Example:
- 
- $ perl lib/Tstregex.pm '/^[a-z]*\d{3}$/' 'abc123' 'abc12a'
- abc123
- abc12a (^[a-z]*\d{3}$)
-    ^^^         ^^^^^^ (actually rendered in bold on terminal)
- 
  # Above, the normal parts are the longuest matching substring when bold parts highlights the rejected substring
  #(idem with regexp lexical groups between parenthesis)
+ # A Hybrid Regex Diagnostic Tool (single file Library module with API and command tool) 
 
 =cut
  
@@ -73,6 +66,9 @@ Misc: performs a huge test suite various a large collection of regexp tests with
       my $pos   = tstregex_get_match_len($res);
       print "Failure on token '$token' at column $pos\n";
       }
+  Note that if your purpose is just to display the result as the command would do, you can call directly 
+  the main with the appropriate (argc, argv) style parameters to avoid to spawn another perl process.
+  See the tstregex file stub for details..
 
 =head1 API
 
@@ -188,6 +184,7 @@ package main;
     $SIG{__WARN__} = 'confess';
     $SIG{__DIE__ } = 'confess';
 
+    use IO::Handle;
     use Term::ANSIColor qw(:constants);
     use Time::HiRes qw(gettimeofday tv_interval);
     use utf8;
@@ -360,9 +357,9 @@ package main;
             return undef;
             }
         my ($match_len, $fail_token, $re_clean ) = _get_re_val($ctx);
-        print substr($pattern, 0, $match_len), BOLD, substr($pattern, $match_len), RESET;
+        print substr($pattern, 0, $match_len); STDOUT->flush(); print STDERR BOLD, substr($pattern, $match_len), RESET;
         my $off = length($re_clean) - length($fail_token);
-        print ' (', substr($re_clean, 0, $off), BOLD, $fail_token, RESET, ")\n";
+        print STDERR ' (', substr($re_clean, 0, $off), BOLD, $fail_token, RESET, ")\n";
         undef;
         }
 
@@ -416,7 +413,7 @@ package main;
 
 package Tstregex;
     {
-    our $VERSION = '1.10';
+    our $VERSION = '1.12';
     use Exporter qw(import);
 
     our @EXPORT  = qw(

@@ -1,5 +1,8 @@
 Revision history for Perl module DateTime::Locale::FromCLDR
 
+v0.8.7 2026-06-07T07:55:45+0900
+    - Updated dependency for Locale::Unicode::Data
+
 v0.8.6 2026-06-03T19:18:57+0900
     - t/01.locale.t: compare fractional CLDR values (territory_info -> literacy_percent)
       numerically within a small tolerance instead of as strings, so the test no longer

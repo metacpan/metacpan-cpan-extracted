@@ -1,7 +1,7 @@
 package Sys::Export::VFAT::Geometry;
 
 # ABSTRACT: Calculate addresses and sizes of structures within a FAT filesystem
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 
 use v5.26;
@@ -401,6 +401,38 @@ The math within is derived from the official published formulas in
   Version 1.03, December 6, 2000
   Microsoft Corporation
 
+=head2 FAT Structure
+
+To understand the attributes of this module, it helps to first understand how FAT is structured.
+
+FAT defines a Sector as some number of bytes (generally 512) and then a Cluster as a number of
+Sectors.  The overall image consists of a header ("reserved clusters"), one or more allocation
+tables, and then the data area.
+The allocation table is essentially an array of cluster pointers, the optional additional
+allocation tables are backup copies of the first, and the data area is an array of clusters.
+The allocation table is sized so that it has one cluster pointer per data-area cluster.
+This forms a linked list of clusters, so for any file or directory larger than one cluster,
+you consult that cluster's entry in the allocation table to find the next cluster.
+All files and directories are rounded up to the cluster size when they are stored.  The size of
+the cluster pointers depends on the total number of clusters in the filesystem, so for a total
+cluster count that fits in 12 bits you get FAT12, if it fits in 16 bits you get FAT16, and up
+to 28 bits uses FAT32.  This means that if you specifically need "FAT32" for interoperability
+resons (such as badly written BIOSes), there is a minimum filesystem size of ~32MB, because the
+selection of 12/16/32 is driven by the cluster count you specify in the header.
+
+The "V" in VFAT refers to the long file name support that Microsoft added with Windows 95.
+The directory encoding for FAT only has 11 characters available for each file name, with the
+last 3 interpreted as a file extension separated from the name with a dot. (the dot is not
+stored)  Rather than inventing a new directory entry encoding, in VFAT they store longer file
+names (or any name not conforming to the 8.3 notation) in one or more hidden directory entries
+right before the visible one that actually references the file.  This is backward compatible,
+so it applies equally well to all the FAT bit-widths.
+
+The newer exFAT format (not supported by this module) is a completely different format, more
+similar to modern filesystems which store variable-length directory entries and which describe
+file data locations with "extents" (offset and length) rather than an awkward linked list of
+cluster numbers.
+
 =head1 CONSTRUCTORS
 
 =head2 new
@@ -696,41 +728,9 @@ multiplier and offset for cluster numbers that will land on that device alignmen
 
 This dies if the specified alignment dosn't fall on any cluster boundary.
 
-=head1 FAT STRUCTURE
-
-To understand the attributes of this module, it helps to first understand how FAT is structured.
-
-FAT defines a Sector as some number of bytes (generally 512) and then a Cluster as a number of
-Sectors.  The overall image consists of a header ("reserved clusters"), one or more allocation
-tables, and then the data area.
-The allocation table is essentially an array of cluster pointers, the optional additional
-allocation tables are backup copies of the first, and the data area is an array of clusters.
-The allocation table is sized so that it has one cluster pointer per data-area cluster.
-This forms a linked list of clusters, so for any file or directory larger than one cluster,
-you consult that cluster's entry in the allocation table to find the next cluster.
-All files and directories are rounded up to the cluster size when they are stored.  The size of
-the cluster pointers depends on the total number of clusters in the filesystem, so for a total
-cluster count that fits in 12 bits you get FAT12, if it fits in 16 bits you get FAT16, and up
-to 28 bits uses FAT32.  This means that if you specifically need "FAT32" for interoperability
-resons (such as badly written BIOSes), there is a minimum filesystem size of ~32MB, because the
-selection of 12/16/32 is driven by the cluster count you specify in the header.
-
-The "V" in VFAT refers to the long file name support that Microsoft added with Windows 95.
-The directory encoding for FAT only has 11 characters available for each file name, with the
-last 3 interpreted as a file extension separated from the name with a dot. (the dot is not
-stored)  Rather than inventing a new directory entry encoding, in VFAT they store longer file
-names (or any name not conforming to the 8.3 notation) in one or more hidden directory entries
-right before the visible one that actually references the file.  This is backward compatible,
-so it applies equally well to all the FAT bit-widths.
-
-The newer exFAT format (not supported by this module) is a completely different format, more
-similar to modern filesystems which store variable-length directory entries and which describe
-file data locations with "extents" (offset and length) rather than an awkward linked list of
-cluster numbers.
-
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

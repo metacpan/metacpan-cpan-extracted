@@ -1,5 +1,8 @@
 Revision history for Perl module DateTime::Format::RelativeTime
 
+v0.2.4 2026-06-07T08:03:51+0900
+    - Updated dependencies.
+
 v0.2.3 2026-05-04T13:22:50+0900
     - Updating dependencies for DateTime::Lite
 

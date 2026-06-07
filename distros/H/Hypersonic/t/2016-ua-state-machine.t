@@ -1,7 +1,10 @@
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Test::More;
 use IO::Socket::INET;
+use HypersonicTest qw(spawn_server wait_for_port);
 
 
 use Hypersonic;
@@ -12,24 +15,28 @@ plan skip_all => 'fork not available' unless $^O ne 'MSWin32';
 my $port = 18883 + ($$ % 1000);
 my $cache_dir = "_test_poll_cache_$$";
 
-my $pid = fork();
-die "Fork failed: $!" unless defined $pid;
-
-if ($pid == 0) {
+# spawn_server + wait_for_port give us the 60s minimum floor + child
+# stderr capture; the old `for (1..10) { sleep(1) }` budget was too
+# short for a cold JIT compile on a slow CPAN smoker.
+my ($pid, $log) = spawn_server(sub {
     my $server = Hypersonic->new(cache_dir => $cache_dir);
-    
+
     $server->get('/poll-test' => sub { 'poll response' });
-    
+
     $server->compile();
     $server->run(port => $port, workers => 1);
-    exit(0);
+});
+
+my $bound = wait_for_port($port, { pid => $pid, log => $log, tries => 100 });
+unless ($bound) {
+    kill 'TERM', $pid;
+    BAIL_OUT("server child failed to bind port $port (see diag above)");
 }
 
-# Wait for server with retries
 my $ready = 0;
-for (1..10) {
+for (1..50) {
     my $sock = IO::Socket::INET->new(
-        PeerAddr => '127.0.0.1', PeerPort => $port, Proto => 'tcp', Timeout => 1
+        PeerAddr => '127.0.0.1', PeerPort => $port, Proto => 'tcp', Timeout => 1,
     );
     if ($sock) {
         print $sock "GET /poll-test HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n";
@@ -37,7 +44,11 @@ for (1..10) {
         close($sock);
         if ($resp && $resp =~ /poll response/) { $ready = 1; last; }
     }
-    sleep(1);
+    select undef, undef, undef, 0.1;
+}
+unless ($ready) {
+    HypersonicTest::diag_child_log($log);
+    kill 'TERM', $pid;
 }
 ok($ready, 'Test server is running');
 

@@ -4,7 +4,7 @@ require 5.010;
 use strict;
 use feature 'say';
 package Stats::LikeR;
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 require XSLoader;
 use Devel::Confess 'color';
 use warnings FATAL => 'all';
@@ -12,7 +12,7 @@ use autodie ':default';
 use Exporter 'import';
 use Scalar::Util 'looks_like_number';
 XSLoader::load('Stats::LikeR', $VERSION);
-our @EXPORT_OK = qw(add_data aov chisq_test cor cor_test cov dnorm fisher_test glm group_by hist kruskal_test ks_test ljoin lm matrix max mean median min mode oneway_test p_adjust power_t_test prcomp quantile rbinom read_table rnorm runif sample scale sd seq shapiro_test sum summary t_test value_counts var var_test wilcox_test write_table);
+our @EXPORT_OK = qw(add_data aov chisq_test col2col cor cor_test cov dnorm fisher_test glm group_by hist kruskal_test ks_test ljoin lm matrix max mean median min mode oneway_test p_adjust power_t_test prcomp quantile rbinom read_table rnorm runif sample scale sd seq shapiro_test sum summary t_test transpose value_counts var var_test wilcox_test write_table);
 our @EXPORT = @EXPORT_OK;
 
 require XSLoader;
@@ -454,50 +454,125 @@ There B<are> other modules on CPAN that can do B<PARTS> of this, but this works 
 
 =head1 Functions/Subroutines
 
+========================================================================
+
 =head2 add_data
 
-Add data to a hash
+Add data to an existing hash or array reference. This function acts as the equivalent of adding new rows, as well as an C<ljoin> (described below). It dynamically infers your target data structure, handles deeply nested records, and seamlessly coerces mismatched data shapes to preserve the structural integrity of your primary reference.
+
+=head3 Hash of Hashes (HoH)
+
+When the target is a Hash of Hashes, incoming hash keys update existing rows, and new keys create new rows.
 
  $data = { 'Jack Smith' => { age => 30 } };
+ 
  $n = { 
-     'Jack Smith' => { dept => 'Engineering' },             # Update existing (Hash)
-     'Jane Doe'   => { age => 25, dept => 'Sales' },        # Add new (Hash)
-     'Bob Brown'  => [ 'age', 40, 'dept', 'IT' ],           # Add new (Array)
-     'Invalid'    => 'Not a reference'                      # Edge case safety
+     'Jack Smith' => {    # Update existing (Hash)
+         dept => 'Engineering'
+      },
+     'Jane Doe'   => { age => 25, dept => 'Sales' }, # Add new (Hash)
+     'Invalid'    => 'Not a reference'               # Edge case safety
  };
- add_data($data, $n); # will add data to 'Jack Smith', as well as new keys for Jane and Bob.
+ 
+ add_data($data, $n); 
 
-this is the equivalent of adding new rows, as well as C<ljoin>, which is described below.
-
-where the resulting hash-of-hash looks like:
+B<Resulting Structure:>
 
  {
-     1st   {
-         a   "A",
-         b   "B"
+     "Jack Smith":  {
+         "age":  30,
+         "dept": "Engineering"
      },
-     2nd   {
-         a   "C",
-         b   "D"
+     "Jane Doe":    {
+         "age":  25,
+         "dept": "Sales"
      }
  }
 
-=head3 no pivot key/row name
+=head3 Hash of Arrays (HoA)
 
-with no pivot key, each array index becomes a hash key, which is less useful, but necessary for completeness.  The same C<@aoh> above becomes:
+When the target is a Hash of Arrays, incoming arrays are pushed onto the existing arrays, appending the new elements, similarly to R's C<rbind>.
+
+ $data = { 'Project Alpha' => [ 'task1', 'task2' ] };
+ 
+ $n = {
+     'Project Alpha' => [ 'task3' ],              # Appends to existing array
+     'Project Beta'  => [ 'task1', 'task2' ]      # Creates new array row
+ };
+ 
+ add_data($data, $n);
+
+B<Resulting Structure:>
 
  {
-     0   {
-         a   "A",
-         b   "B",
-         r   "1st" (dualvar: 1)
-     },
-     1   {
-         a   "C",
-         b   "D",
-         r   "2nd" (dualvar: 2)
-     }
+     "Project Alpha": [ "task1", "task2", "task3" ],
+     "Project Beta":  [ "task1", "task2" ]
  }
+
+=head3 Array of Hashes / Arrays (AoH / AoA)
+
+C<add_data> now natively supports Array references at the root level. When targeting an Array, it iterates through the source array and merges data at the corresponding indices.
+
+ $data = [ 
+     { id => 1, name => 'Alice' } 
+ ];
+ 
+ $n = [ 
+     { role => 'Admin' },             # Updates index 0
+     { id => 2, name => 'Bob' }       # Creates index 1
+ ];
+ 
+ add_data($data, $n);
+
+B<Resulting Structure:>
+
+ [
+     { "id": 1, "name": "Alice", "role": "Admin" },
+     { "id": 2, "name": "Bob" }
+ ]
+
+=head3 Advanced Structural Coercion & Cross-Merging
+
+C<add_data> strictly enforces the primary structure of your target reference (determined by inspecting its outer and inner bounds). If you mix Array and Hash types, the function automatically coerces the incoming data to match the target.
+
+B<1. Inner Coercion (Mixing Rows):>
+
+=over
+
+=item * B<Target is HoH:> Source Array rows are read in pairs and converted to key-value pairs.
+
+=item * B<Target is HoA:> Source Hash rows are flattened into key-value pairs and pushed onto the array.
+
+=back
+
+B<2. Root-Level Coercion (Mixing Outer Containers):>
+
+=over
+
+=item * B<Target is Array, Source is Hash:> The function evaluates the Hash keys as numeric indices. (e.g., source key C<"0"> merges into target array index C<[0]>). Non-numeric keys are safely ignored.
+
+=item * B<Target is Hash, Source is Array:> The function converts the Array indices into stringified Hash keys. (e.g., source array index C<[1]> merges into target hash key C<"1">).
+
+=back
+
+=head3 Source is a mixed Hash. Keys dictate the target array index!
+
+ $n = {
+     '0' => { y => 20 },                 # Merges into $data->[0]
+     '1' => [ 'z', 30 ],                 # Array pair coerced to Hash, creates $data->[1]
+     'ignored' => { k => 'v' }           # Ignored: cannot map to an array index
+ };
+ 
+ add_data($data, $n);
+
+B<Resulting Structure strictly remains an Array of Hashes:>
+
+ [
+     { "x": 10, "y": 20 },
+     { "z": 30 }
+ ]
+
+NB: If C<add_data> is called on a completely empty target reference (e.g., C<$data = {}> or C<$data = []>), it will intelligently infer the required inner structure (Hashes vs Arrays) by inspecting the first valid row of the source data.
 
 =head2 aov
 
@@ -552,10 +627,10 @@ It is robust against rank deficiency; collinear terms will gracefully receive 0 
 <tbody>
 <tr>
   <td><code>data_sv</code></td>
-  <td><code>HashRef</code></td>
-  <td><code>ArrayRef</code></td>
+  <td><code>HashRef</code> or <code>ArrayRef</code></td>
   <td><i>(Required)</i></td>
   <td>The dataset to analyze. Accepts a Hash of Arrays (HoA) or Array of Hashes (AoH). If no formula is provided, it must be an HoA to allow automatic stacking (mimicking R's <code>stack()</code> on a named list).</td>
+  <td></td>
 </tr>
 <tr>
   <td><code>formula_sv</code></td>
@@ -650,52 +725,412 @@ in R
 
 =head2 chisq_test
 
- my @test_data = ([762, 327, 468], [484, 239, 477]);
- my $test_data = chisq_test(\@test_data);
+The C<chisq_test> function performs chi-squared contingency table tests and goodness-of-fit tests. It natively accepts both arrays and hashes (1D and 2D) and mathematically mirrors R's C<chisq.test()>, returning a structured hash reference of the results.
 
-which outputs:
+For 2x2 matrices, Yates' Continuity Correction is applied automatically.
+
+=head3 Accepted Inputs
+
+
+
+=begin html
+
+<table>
+<thead>
+<tr>
+  <th>Input Type</th>
+  <th>Data Structure</th>
+  <th>Applied Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><b>1D Array</b></td>
+  <td><code>[ $v1, $v2, ... ]</code></td>
+  <td>Chi-squared test for given probabilities</td>
+</tr>
+<tr>
+  <td><b>2D Array</b></td>
+  <td><code>[ [ $v1, $v2 ], [ $v3, $v4 ] ]</code></td>
+  <td>Pearson's Chi-squared test (Yates' correction if 2x2)</td>
+</tr>
+<tr>
+  <td><b>1D Hash</b></td>
+  <td><code>{ key1 => $v1, key2 => $v2 }</code></td>
+  <td>Chi-squared test for given probabilities</td>
+</tr>
+<tr>
+  <td><b>2D Hash</b></td>
+  <td><code>{ row1 => { c1 => $v1, c2 => $v2 } }</code></td>
+  <td>Pearson's Chi-squared test (Yates' correction if 2x2)</td>
+</tr>
+</tbody>
+</table>
+
+=end html
+
+
+
+=head3 Output Object Structure
+
+The function returns a single Hash Reference containing the following key-value pairs. The internal structure of C<expected> and C<observed> will always identically match the structure of your input.
+
+
+
+=begin html
+
+<table>
+<thead>
+<tr>
+  <th>Key</th>
+  <th>Data Type</th>
+  <th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><b>data.name</b></td>
+  <td>String</td>
+  <td>Identifies the input type (e.g., <code>"Perl ArrayRef"</code> or <code>"Perl HashRef"</code>).</td>
+</tr>
+<tr>
+  <td><b>expected</b></td>
+  <td>Array/Hash Ref</td>
+  <td>The expected frequencies, matching the geometry of the input.</td>
+</tr>
+<tr>
+  <td><b>method</b></td>
+  <td>String</td>
+  <td>The specific statistical test applied.</td>
+</tr>
+<tr>
+  <td><b>observed</b></td>
+  <td>Array/Hash Ref</td>
+  <td>The original data passed to the function.</td>
+</tr>
+<tr>
+  <td><b>p.value</b></td>
+  <td>Float</td>
+  <td>The calculated p-value of the test.</td>
+</tr>
+<tr>
+  <td><b>parameter</b></td>
+  <td>Hash Ref</td>
+  <td>Contains the degrees of freedom (<code>df</code>).</td>
+</tr>
+<tr>
+  <td><b>statistic</b></td>
+  <td>Hash Ref</td>
+  <td>Contains the test statistic (<code>X-squared</code>).</td>
+</tr>
+</tbody>
+</table>
+
+=end html
+
+
+
+=head3 1. Two-Dimensional Array
+
+Passing an Array of Arrays (AoA) triggers a standard Pearson's Chi-squared test. If the input is exactly a 2x2 matrix, Yates' continuity correction is applied automatically.
+
+ my $test_data = [
+     [762, 327, 468], 
+     [484, 239, 477]
+ ];
+ my $res = chisq_test($test_data);
+
+B<Output:>
 
  {
- data.name   "Perl ArrayRef",
- expected    [
-     [0] [
-             [0] 703.671381936888,
-             [1] 319.645266594124,
-             [2] 533.683351468988
-         ],
-     [1] [
-             [0] 542.328618063112,
-             [1] 246.354733405876,
-             [2] 411.316648531012
-         ]
- ],
- method      "Pearson's Chi-squared test",
- observed    [
-     [0] [
-             [0] 762,
-             [1] 327,
-             [2] 468
-         ],
-     [1] [
-             [0] 484,
-             [1] 239,
-             [2] 477
-         ]
- ],
- p.value     2.95358918321176e-07,
- parameter   {
-     df   2
+     'data.name' => 'Perl ArrayRef',
+     'expected'  => [
+         [ 703.671381936888, 319.645266594124, 533.683351468988 ],
+         [ 542.328618063112, 246.354733405876, 411.316648531012 ]
+     ],
+     'method'    => "Pearson's Chi-squared test",
+     'observed'  => [
+         [ 762, 327, 468 ],
+         [ 484, 239, 477 ]
+     ],
+     'p.value'   => 2.95358918321176e-07,
+     'parameter' => { 'df' => 2 },
+     'statistic' => { 'X-squared' => 30.0701490957547 }
+ }
+
+=head3 2. One-Dimensional Array (Goodness of Fit)
+
+Passing a flat Array Reference triggers a Goodness of Fit test, assuming equal expected probabilities across all items.
+
+ my $data = [10, 20, 30];
+ my $res = chisq_test($data);
+
+B<Output:>
+
+ {
+     'data.name' => 'Perl ArrayRef',
+     'expected'  => [ 20, 20, 20 ],
+     'method'    => 'Chi-squared test for given probabilities',
+     'observed'  => [ 10, 20, 30 ],
+     'p.value'   => 0.00673794699908547,
+     'parameter' => { 'df' => 2 },
+     'statistic' => { 'X-squared' => 10 }
+ }
+
+=head3 3. Two-Dimensional Hash (Pearson's Chi-squared)
+
+Passing a Hash of Hashes (HoH) applies the exact same logic as a 2D Array, but preserves your nested string keys in the output. This is particularly useful when mapping data extracted directly from JSON, databases, or categorical mappings.
+
+ my $data = {
+     GroupA => { Success => 10, Failure => 15 },
+     GroupB => { Success => 20, Failure => 5  }
+ };
+ 
+ my $res = chisq_test($data);
+
+B<Output:>
+
+ {
+     'data.name' => 'Perl HashRef',
+     'expected'  => {
+     'GroupA' => { 'Failure' => 10, 'Success' => 15 },
+     'GroupB' => { 'Failure' => 10, 'Success' => 15 }
  },
- statistic   {
-     X-squared   30.0701490957547
+ 'method'    => "Pearson's Chi-squared test with Yates' continuity correction",
+     'observed'  => {
+     'GroupA' => { 'Failure' => 15, 'Success' => 10 },
+     'GroupB' => { 'Failure' => 5,  'Success' => 20 }
+     },
+     'p.value'   => 0.00937475878430379,
+     'parameter' => { 'df' => 1 },
+     'statistic' => { 'X-squared' => 6.75 }
  }
- }
 
-It also supports 1D arrays for Goodness of Fit tests:
+=head3 4. One-Dimensional Hash (Goodness of Fit)
 
- my $chisq_1d = chisq_test([10, 20, 30]);
+Flat Hash References evaluate Goodness of Fit while preserving your categorical keys in the C<expected> and C<observed> output blocks.
 
-For 2x2 matrices, Yates' Continuity Correction is applied automatically, exactly like in R.
+ my $data = { 
+     Apples  => 10, 
+     Oranges => 20, 
+     Bananas => 30 
+ };
+ 
+ my $res = chisq_test($data);
+
+=head2 col2col
+
+ my $result = col2col( $data, $command );
+ my $result = col2col( $data, $command, $cols );   # restrict the "from" columns
+
+Compares B<every column against every other column> in a dataset and returns a
+hash of hashes:
+
+ $result->{ $col_a }{ $col_b }   # outcome of comparing column A with column B
+
+The diagonal is skipped (a column is never compared with itself), so each inner
+hash holds an entry for every I<other> column.
+
+C<$data> may be given in any of three shapes — I<array of hashes>, I<hash of
+arrays>, or I<hash of hashes> — and C<col2col> detects which one it received.
+
+C<$command> is usually a B<block (anonymous sub)> that compares the two columns.
+The two columns are passed to the block in C<@_>, so you read them as C<$_[0]>
+and C<$_[1]>:
+
+ my $result = col2col( \%data, sub { cor( $_[0], $_[1], 'spearman' ) } );
+
+C<$_[0]> and C<$_[1]> are array refs holding the two columns. There are B<no
+package globals>, so nothing you declare in your own script (a C<$c1>, an C<$a>,
+etc.) can ever clash, and you need no C<our>/C<use vars> declarations. If you
+prefer names, unpack into your own lexicals first:
+
+ my $result = col2col( \%data, sub { my ( $c1, $c2 ) = @_; cor( $c1, $c2, 'spearman' ) } );
+
+ > B<Pass the columns as explicit scalars.> Because the built-ins are prototyped,
+ > write C<cor( $_[0], $_[1], 'spearman' )>, not C<cor( @_, 'spearman' )> — a
+ > prototyped sub forces C<@_> into scalar context, collapsing it to the element
+ > I<count> (C<2>) instead of the two columns. (C<&cor( @_, 'spearman' )> also works,
+ > since the C<&> sigil bypasses the prototype, but the explicit form is clearer.)
+
+As a shorthand, C<$command> may instead be a B<bare function name> (a string),
+which is treated as C<fn( $col_a, $col_b )>:
+
+ my $result = col2col( \%data, 'cor' );   # same as sub { cor( $_[0], $_[1] ) }
+
+Whatever the block or function returns is stored verbatim.
+
+B<Undefined values are always removed pairwise.> For each pair, any row where
+I<either> column is undef or non-numeric is dropped, so the two columns are
+always aligned and the same length — exactly what correlation needs, and a
+sound (complete-case) basis for the two-sample tests too. If you need a column's
+full set of values regardless of the other column, clean it yourself inside the
+block.
+
+=head3 Restricting which columns are compared
+
+By default every column is compared against every other, which is C<N * (N-1)>
+calls. When you only care about how one column, or a handful, relates to the
+rest, pass an optional third argument: a B<column name>, or an B<array ref of
+names>. Only those columns are then used as the I<first> (C<$col_a>, outer-key)
+side of each comparison; each is still compared against B<every other column>.
+This runs faster and returns a smaller result, because the work and the output
+shrink to C<(chosen columns) * (N-1)>.
+
+How does just "age" relate to every other column?
+
+ my $r = col2col( $data, sub { cor( $_[0], $_[1] ) }, 'age' );
+ print $r->{age}{weight}, "\n";    # only the "age" row is present
+ # $r has no {height}{...} or {weight}{...} rows
+ 
+ # A handful of columns of interest, each vs everything else
+ my $r2 = col2col( $data, sub { cor( $_[0], $_[1] ) }, [ 'age', 'height' ] );
+ # $r2 has exactly the {age}{...} and {height}{...} rows
+
+The result is identical to the corresponding rows of an unrestricted run, only
+the rows you didn't ask for are omitted. Naming a column that isn't in the data
+is a fatal error, so typos surface immediately. Omitting the argument (or
+passing C<undef>) keeps the original every-column-vs-every-column behavior.
+
+========================================================================
+
+=head3 array of hash input
+
+Row-major: an array ref whose elements are hash refs (C<< $data-E<gt>[$row]{$col} >>).
+Column names are the union of the keys seen across all rows.
+
+ my $rows = [
+     { height => 170, weight => 65, age => 31 },
+     { height => 182, weight => 84, age => 45 },
+     { height => 168, weight => 60, age => 29 },
+     { height => 191, weight => 92, age => 52 },
+     { height => 175, weight => 71, age => 38 },
+ ];
+ 
+ my $cor = col2col( $rows, 'cor' );
+ 
+ print $cor->{height}{weight}, "\n";   # Pearson r between height and weight
+ print $cor->{weight}{age},    "\n";
+
+========================================================================
+
+=head3 hash of array input
+
+Column-major: a hash ref whose values are array refs (C<< $data-E<gt>{$col}[$row] >>).
+The keys are the column names. This is the most direct shape — each value is
+already a column.
+
+ my $data = {
+     height => [ 170, 182, 168, 191, 175 ],
+     weight => [  65,  84,  60,  92,  71 ],
+     age    => [  31,  45,  29,  52,  38 ],
+ };
+ 
+ my $cov = col2col( $data, 'cov' );
+ 
+ print $cov->{height}{weight}, "\n";   # sample covariance
+
+Undefined entries are skipped. For C<cor>/C<cov>/C<cor_test> they are dropped
+pairwise, so the pair below is compared on its three complete rows only:
+
+ my $data = {
+     a => [ 1,      2,     3,  4,  5 ],
+     b => [ 2,  undef,     6,  8, 10 ],   # row 1 dropped for any pair touching b
+ };
+ 
+ my $cor = col2col( $data, 'cor' );
+ print $cor->{a}{b}, "\n";              # correlation over rows 0,2,3,4
+
+========================================================================
+
+=head3 hash of hash input
+
+Row-major and keyed: a hash ref whose values are hash refs
+(C<< $data-E<gt>{$row}{$col} >>). The outer keys label the rows (e.g. sample IDs); the
+inner keys are the column names (the union across all rows).
+
+ my $samples = {
+     s1 => { height => 170, weight => 65, age => 31 },
+     s2 => { height => 182, weight => 84, age => 45 },
+     s3 => { height => 168, weight => 60, age => 29 },
+     s4 => { height => 191, weight => 92, age => 52 },
+     s5 => { height => 175, weight => 71, age => 38 },
+ };
+ 
+ my $cor = col2col( $samples, 'cor' );
+ 
+ print $cor->{age}{weight}, "\n";
+
+Because pairing is done within each row, the (unordered) row-key order does not
+affect the result — all three shapes above give the same numbers.
+
+========================================================================
+
+=head3 Examples with different C<Stats::LikeR> functions
+
+The same dataset can be run through any comparison function just by changing the
+block. Using the hash-of-arrays C<$data> from above:
+
+ # Correlation coefficients (Pearson) — returns a number per pair
+ my $r = col2col( $data, sub { cor( $_[0], $_[1] ) } );
+ print $r->{height}{weight}, "\n";
+ 
+ # Covariance — returns a number per pair
+ my $c = col2col( $data, sub { cov( $_[0], $_[1] ) } );
+ 
+ # Correlation test — returns whatever cor_test returns
+ # (e.g. estimate, statistic, p_value) for each pair
+ my $ct = col2col( $data, sub { cor_test( $_[0], $_[1] ) } );
+ print $ct->{height}{weight}{p_value}, "\n";
+ 
+ # Welch two-sample t-test between every pair of columns
+ my $t = col2col( $data, sub { t_test( $_[0], $_[1] ) } );
+ say $t->{height}{age}{p_value};
+ 
+ # Two-sample Kolmogorov–Smirnov test
+ my $ks = col2col( $data, sub { ks_test( $_[0], $_[1] ) } );
+ print $ks->{height}{age}{statistic}, "\n";
+ 
+ # Other two-sample comparisons work the same way
+ my $w  = col2col( $data, sub { wilcox_test( $_[0], $_[1] ) } );   # Wilcoxon rank-sum
+ my $f  = col2col( $data, sub { var_test( $_[0], $_[1] ) } );      # F test for equal variances
+ my $kw = col2col( $data, sub { kruskal_test( $_[0], $_[1] ) } );  # Kruskal–Wallis
+ 
+ # For the no-argument case, a bare function name is a handy shorthand:
+ my $r2 = col2col( $data, 'cor' );   # same as sub { cor( $_[0], $_[1] ) }
+
+=head4 Passing arguments
+
+Because the block is just ordinary Perl, you pass arguments exactly the way you
+would call the function directly:
+
+ # Spearman instead of the default Pearson correlation (method is cor's 3rd arg)
+ my $sp = col2col( $data, sub { cor( $_[0], $_[1], 'spearman' ) } );
+ 
+ # Whatever extra arguments a function takes, pass them inline. For example, if
+ # t_test accepts a trailing paired flag, t_test($x, $y, $paired):
+ my $tp = col2col( $data, sub { t_test( $_[0], $_[1], 1 ) } );
+ 
+ # Combine results, scale them, call several functions — anything goes:
+ my $scaled = col2col( $data, sub { cor( $_[0], $_[1] ) * 100 } );
+
+=head4 Custom subroutine
+
+The block can run any analysis you like; C<$_[0]> and C<$_[1]> are the two columns
+(array refs, pairwise complete cases) and the return value is stored verbatim.
+
+ # Mean difference between every pair of columns
+ my $diff = col2col( $data, sub {
+     my ( $x, $y ) = @_;
+     my $mx = 0; $mx += $_ for @$x; $mx /= @$x;
+     my $my = 0; $my += $_ for @$y; $my /= @$y;
+     return $mx - $my;
+ } );
+ 
+ print $diff->{height}{weight}, "\n";
+ 
+ # Wrap a built-in and post-process its result — it reads like a normal call
+ my $pct = col2col( $data, sub { cor( $_[0], $_[1] ) * 100 } );
 
 =head2 cor
 
@@ -712,7 +1147,7 @@ If you provide an array of arrays (a matrix), C<cor> will compute the correlatio
  my $result = cor_test(
          'x'         => $x,
          'y'         => $y,
-         alternative => 'two.sided'
+         alternative => 'two.sided',
          method      => 'pearson',
          continuity  => 1
      );
@@ -955,11 +1390,7 @@ In addition to the C<gaussian> default, it fully supports logistic regression us
 <tr>
   <td><code>summary</code></td>
   <td><code>HashRef</code></td>
-  <td>A nested hash mapping each term to its detailed summary statistics, including <code>Estimate</code>, <code>Std. Error</code>, <code>t value</code> / <code>z value</code>, and `Pr(></td>
-  <td>t</td>
-  <td>)<code> / </code>Pr(></td>
-  <td>z</td>
-  <td>)<code>. Aliased parameters return </code>"NaN"`.</td>
+  <td>A nested hash mapping each term to its detailed summary statistics, including <code>Estimate</code>, <code>Std. Error</code>, <code>t value</code> / <code>z value</code>, and <code>Pr(> t )</code> / <code>Pr(> z )</code>. Aliased parameters return <code>"NaN"</code>.</td>
   <td><code>{'wt' => {'Estimate' => -0.5, 'Std. Error' => 0.1, ...}}</code></td>
 </tr>
 <tr>
@@ -1009,7 +1440,7 @@ then run the function thus:
 
 The output can be thought of like a hash, with the first string broken down by the second.
 
-all become the hash of arrays:
+all become hash of arrays:
 
  {
      Female   [
@@ -1030,7 +1461,7 @@ Data can be further broken down with filter/subs like in C<read_table>:
  my $testosterone = group_by($d, # group testosterone by "Gender"
      'Testosterone, total (nmol/L)',
      'Gender',
-     { 'Race/Hispanic origin w/ NH Asian' => sub { $_ eq $n } },
+     { 'Race/Hispanic origin w/ NH Asian' => sub { $_ eq $n } },# filter
      { 'Testosterone, total (nmol/L)' => sub { $_ ne 'NA' } } # filter
  );
 
@@ -1060,11 +1491,7 @@ I feel that this is better, and more easily read, than what you get in R:
  'obs. airway disease' => [3.8, 2.7, 4.0, 2.4],
  'asbestosis' => [2.8, 3.4, 3.7, 2.2, 2.0]
  );
- $t0 = Time::HiRes::time();
  $kt = kruskal_test(\%x);
- $t1 = Time::HiRes::time();
- printf("Kruskal calculation via HoA in %g seconds.\n", $t1-$t0);
- p $kt;
 
 =head3 R-like array entry
 
@@ -1077,11 +1504,7 @@ I feel that this is better, and more easily read, than what you get in R:
      (map {'Subjects with obstructive airway disease'} 0..3),
      map {'Subjects with asbestosis'} 0..4
  );
- my $t0 = Time::HiRes::time();
  my $kt = kruskal_test(\@x, \@g);
- my $t1 = Time::HiRes::time();
- printf("Kruskal calculation in %g seconds.\n", $t1-$t0);
- p $kt;
 
 =head2 ks_test
 
@@ -1362,7 +1785,7 @@ It also allows configuring the test type (C<< type =E<gt> 'one.sample' >>, C<'tw
 <tr>
   <td><code>strict</code></td>
   <td>Boolean</td>
-  <td><code>FALSE</code></td>
+  <td>0 (False)</td>
   <td>Use strict interpretation of two-sided power calculations.</td>
 </tr>
 <tr>
@@ -1437,7 +1860,7 @@ Principal Component Analysis
 
 =head3 Results
 
-=head3 Returned Data Structure
+=head4 Returned Data Structure
 
 The C<prcomp> function returns a HashRef containing the following keys representing the results of the Principal Component Analysis:
 
@@ -1518,7 +1941,7 @@ which returns
                  [1] -0.707106781186547
              ]
      ],
-     scale      false,
+     scale      0,
      sdev       [
          [0] 2.44948974278318,
          [1] 1.4142135623731
@@ -1566,7 +1989,7 @@ I've tried to make this as simple as possible, trying to follow from R:
 
  my $test_data = read_table('t/HepatitisCdata.csv');
 
-=head2 options
+=head3 options
 
 
 
@@ -1682,7 +2105,7 @@ or, alternatively, with arrays:
 
 You can also pass an options hash to disable centering or scaling:
 
- my @scaled_results = scale(1..5, { center => false, scale => true });
+ my @scaled_results = scale(1..5, { center => false, scale => 1 });
 
 It fully supports matrix operations. By passing an array of arrays, C<scale> processes the data column by column independently:
 
@@ -1704,7 +2127,7 @@ As of version 0.02, sd will croak/die if any undefined values are provided.
 
 Works as closely as I can to R's seq, which is very similar to Perl's C<for> loops.  Returns an array, not an array reference.
 
-=head3 Example 1: Standard integer sequence
+=head3 Standard integer sequence
 
  say 'seq(1, 5):';
  my @seq = seq(1, 5);
@@ -1713,7 +2136,7 @@ Works as closely as I can to R's seq, which is very similar to Perl's C<for> loo
  say 'seq(1, 2, 0.25):';
  @seq = seq(1, 2, 0.25);
 
-=head3 Example 2: Fractional steps
+=head3 Fractional steps
 
  say 'seq(1, 2, 0.25):';
  @seq = seq(1, 2, 0.25);
@@ -1722,7 +2145,7 @@ Works as closely as I can to R's seq, which is very similar to Perl's C<for> loo
      is_approx(pop @seq, $idx, "seq item $idx with fractional step");
  }
 
-=head3 Example 3: Negative steps
+=head3 Negative steps
 
  say 'seq(10, 5, -1):';
  @seq = seq(10, 5, -1);
@@ -1801,7 +2224,7 @@ and then C<summary(\@arr)>, or C<summary(@arr)>
 
 There are 1-sample and 2-sample t-tests, from one or two arrays:
 
- my $t_test = t_test( $array1, mu => mean( 0.2334 ));
+ my $t_test = t_test( $array1, mu => 0.2334 );
 
 or 2-sample:
 
@@ -1941,6 +2364,52 @@ the two groups compared can be specified, though not necessarily, as C<x> and C<
 
 
 
+=head2 transpose
+
+Transposes a two-dimensional data structure, swapping rows and columns. Accepts either an array of arrays or a hash of hashes.
+Returns a new reference of the same type; the input is never modified.
+
+=head3 Array of array input
+
+Takes a reference to an array of array references and returns a new AoA where C<output[j][i] = input[i][j]>.
+
+ my $matrix = [[1, 2, 3], [4, 5, 6]];
+ my $t = transpose($matrix);
+ # [[1, 4],
+ #  [2, 5],
+ #  [3, 6]]
+
+All rows must be the same length; a ragged input is a fatal error.
+C<undef> is valid as an element value and is preserved exactly. An empty outer array or an array of empty rows both return C<[]>.
+
+Dies if:
+- any inner element is not an array reference
+- rows differ in length (ragged array)
+
+=head3 Hash of hash input
+
+Takes a reference to a hash of hash references and returns a new HoH where C<output{col}{row} = input{row}{col}>.
+
+ my $table = { alice => { score => 97, grade => 'A' }, bob   => { score => 84, grade => 'B' } };
+ my $t = transpose($table);
+ # { score => { alice => 97,  bob => 84  },
+ #   grade => { alice => 'A', bob => 'B' } }
+
+Inner keys do not need to be uniform across rows. If a given column key appears in only some rows, the output hash for that column will simply contain only those rows — no padding or C<undef>-filling is performed.
+
+ my $sparse = {
+ a => { x => 1, y => 2 },
+ b => { x => 3, z => 4 } };
+ 
+ my $t = transpose($sparse);
+ # { x => { a => 1, b => 3 },
+ #   y => { a => 2 },
+ #   z => { b => 4 } }
+
+An empty outer hash or an outer hash whose inner hashes are all empty both return C<{}>.
+
+Dies if any inner element is not a hash reference
+
 =head2 value_counts
 
 Count the values in a given data set, return a hash reference showing how many times each particular value is present.
@@ -2035,13 +2504,13 @@ as well as a ratio (from R: the hypothesized ratio of the population variances o
      [0.878, 0.647, 0.598, 2.05, 1.06, 1.29, 1.06, 3.14, 1.29]
  );
 
-It fully supports paired tests (C<< paired =E<gt> true >>) and can calculate exact p-values (the default for C<< N E<lt> 50 >> without ties). If ties are encountered, it automatically switches to an approximation with continuity correction.
+It fully supports paired tests (C<< paired =E<gt> 1 >>) and can calculate exact p-values (the default for C<< N E<lt> 50 >> without ties). If ties are encountered, it automatically switches to an approximation with continuity correction.
 
 =head2 write_table
 
 mimics R's C<write.table>, with data as first argument to subroutine, and output file as second
 
- write_table(\@data_aoh, $tmp_file, sep => "\t", 'row.names' => true);
+ write_table(\@data_aoh, $tmp_file, sep => "\t", 'row.names' => 1);
 
 You can also precisely filter and reorder which columns are written by passing an array reference to C<col.names>:
 
@@ -2053,7 +2522,39 @@ undefined variables are printed as C<NA> by default, but can be set as you wish 
 
 as of version 0.07, C<write_table> determines comma and tab-separated delimiters from the filename, but will override if C<sep> or C<delim> are explicitly set.
 
+Args can also be accepted:
+
+ write_table( 'data' => \%flat, 'file' => $f );
+
 =head1 changes
+
+=head2 0.12
+
+C<add_data> can also take hash of arrays, and various mixes of data types
+
+C<ljoin>: Addition of C<restrict> keywords in many places; should improve CPU performance
+
+Better POD formatting, correction of output hash for README's C<add_data>
+
+C<chisq_test> can now accept hash of hashes as input
+
+new C<transpose> function for switching 2D hash keys and 2D array indices, and C<col2col> for comparing columns against columns
+
+removed unused function from C helpers
+
+C<value_counts>: addition of restrict keywords in preinit, should improve CPU performance
+
+MANIFEST.skip changed to MANIFEST.SKIP to improve CPAN testing
+
+using C<is_deeply> for tests of C<transpose>, which may or may not work with CPAN testers (experimental)
+
+Added function name to warnings, so I actually know which function is producing the error
+
+C<write_table> can also take C<file> and C<data> as args, in addition to positions
+
+fixed C<write_table> as it could hang if given empty C<col.names> or C<row.names>
+
+Added C<__EXTENSIONS__> to source XS file for better CPAN testing
 
 =head2 0.11
 
@@ -2144,7 +2645,5 @@ mean, min, sum, median, var, and max die with undefined values, and print the of
 "group_stats" added to aov, for TukeyHSD in the future
 
 "cor" dies when given data with standard deviation of 0
-
-var_test added
 
 C<write_table> now has C<undef.val> option, which shows how undefined values are printed to tables, which is C<NA> by default.

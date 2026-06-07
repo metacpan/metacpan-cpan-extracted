@@ -1,9 +1,8 @@
 NAME
     BATsh - Bilingual Shell for cmd.exe and bash in one script
-    (self-contained)
 
 VERSION
-    Version 0.02
+    Version 0.04
 
 SYNOPSIS
       use BATsh;
@@ -20,7 +19,7 @@ SYNOPSIS
       BATsh->repl();
 
       # CMD features: pipe, tilde modifiers, SET /P
-      BATsh->run_string('ECHO hello | perl -e "while(<STDIN>){chomp;print uc(\$_).chr(10)}"');
+      BATsh->run_string('ECHO hello | perl -ne "print uc"');
       BATsh->run_string("SET /P NAME=Enter name: ");
 
       # SH features: functions, expansions, pipelines, redirection
@@ -29,7 +28,7 @@ SYNOPSIS
           echo "Hello, \$1"
       }
       greet world
-      x=\$(echo hello | perl -e 'while(<STDIN>){chomp;print uc}')
+      x=\$(echo hello | perl -ne "print uc")
       echo \$x
       echo out > /tmp/out.txt
       BATSH
@@ -38,7 +37,7 @@ SYNOPSIS
 
 DESCRIPTION
   Executive Summary
-    BATsh is a self-contained bilingual shell interpreter written in pure
+    BATsh is a bilingual shell interpreter written in pure
     Perl. It runs cmd.exe batch syntax and bash/sh syntax in the same script
     file, switching automatically between CMD mode and SH mode on a
     line-by-line basis. No external cmd.exe, bash, or sh is required --
@@ -59,7 +58,7 @@ DESCRIPTION
       }
       greet $LANG
       for i in 1 2 3; do echo "  item $i of $COUNT"; done
-      result=$(echo "$LANG" | perl -e 'while(<STDIN>){chomp;print uc}')
+      result=$(echo "$LANG" | perl -ne "print uc")
       echo "Uppercase: $result"
       echo "log line" >> /tmp/batsh_demo.txt
 
@@ -72,7 +71,7 @@ DESCRIPTION
     shift, local.
 
 FULL DESCRIPTION
-    BATsh is a self-contained bilingual shell interpreter written in pure
+    BATsh is a bilingual shell interpreter written in pure
     Perl. It implements both the cmd.exe command set and the sh/bash command
     set entirely in Perl -- no external cmd.exe, bash, or sh is required.
 
@@ -167,8 +166,10 @@ SH MODE
       cmd1 | cmd2 [| cmd3 ...]  (pipeline via temporary file)
       cmd1 && cmd2, cmd1 || cmd2, cmd1 ; cmd2  (compound commands)
       > >> < 2> 2>> 2>&1 1>&2  (I/O redirection)
+      cmd << DELIM ... DELIM    (here-document; <<-DELIM, <<'DELIM' too)
+      cmd &                     (background execution; external commands)
       name() { ... }, function name { ... }  (function definitions)
-      $VAR, ${VAR}, $1..$9, $@, $*, $#, $?, $$, $0
+      $VAR, ${VAR}, $1..$9, $@, $*, $#, $?, $$, $0, $!
       ${VAR:-default}, ${VAR:=default}, ${VAR:+alt}
       ${VAR%pat}, ${VAR%%pat}   -- shortest/longest suffix removal
       ${VAR#pat}, ${VAR##pat}   -- shortest/longest prefix removal
@@ -182,21 +183,90 @@ REQUIREMENTS
     Perl 5.005_03 or later. Core modules only. No external shell required.
 
 BUGS AND LIMITATIONS
-    The built-in CMD interpreter does not support:
+    Commands that are not built in -- "FINDSTR", "SORT", "MORE", "CHOICE",
+    "TIMEOUT", "XCOPY", "ROBOCOPY" and the like in CMD mode, and any
+    non-builtin program in SH mode -- are NOT reimplemented in Perl. They
+    are invoked as external programs (via Perl's "system"), so they work
+    only where the host operating system provides the corresponding
+    executable (e.g. FINDSTR.EXE on Windows). Only the built-in command set
+    is guaranteed to run identically on every platform.
+
+    The built-in CMD interpreter does not implement:
+
+    *   Variable substring "%VAR:~n,m%" and substitution "%VAR:str1=str2%"
+        expansion.
+
+    *   Dynamic pseudo-variables "%RANDOM%", "%DATE%", "%TIME%", "%CD%",
+        "%CMDCMDLINE%", and "%ERRORLEVEL%" used as a variable reference.
 
     *   "FOR /F" with "usebackq" backtick-quoted commands on Windows (the
-        "cmd /c" subprocess path is untested on Windows)
-
-    *   "CHOICE", "TIMEOUT", "XCOPY", "ROBOCOPY", "FINDSTR", "SORT", "MORE"
-        and other external utilities (delegated to the OS)
+        "cmd /c" subprocess path is untested on Windows).
 
     The built-in SH interpreter does not support:
 
-    *   Background execution ("&" at end of command)
+    *   Arrays, indexed and associative ("arr[i]", "${arr[@]}",
+        "declare -A").
 
-    *   Here-documents ("<<")
+    *   Filename (pathname) globbing such as "echo *.txt" or "for f in
+        *.pl". The "*", "?" and "[abc]" metacharacters are honoured in
+        "case" patterns and in "${VAR%pat}" / "${VAR#pat}" expansion only,
+        not for expanding filenames on the command line.
 
-    *   Process substitution ("<(cmd)")
+    *   Tilde expansion "~/path" and "~user" (only "cd" with no argument
+        uses "$HOME").
+
+    *   Brace expansion "{a,b}" and "{1..5}".
+
+    *   Here-strings ("<<< word") and process substitution ("<(cmd)",
+        ">(cmd)").
+
+    *   The shell options "set -e", "set -u", "set -x", and the builtins
+        "trap", "getopts", "select", "alias", "declare"/"typeset", "eval"
+        and "exec".
+
+    Common to both modes: a parenthesised group "( ... )" does not run in a
+    separate sub-shell; it shares the one variable store, so there is no
+    variable-scope isolation.
+
+    Here-documents ("<<", "<<-", "<<'DELIM'") ARE supported on STDIN, with
+    these limitations:
+
+    *   Recognised only in SH mode; "<<" has no meaning in CMD mode.
+
+    *   One here-document per command line only (no "cmd <<A <<B").
+
+    *   Here-strings ("<<< word") are not supported.
+
+    *   Combining a here-document with a pipeline or compound operator on
+        the same line is best-effort only; use a separate command.
+
+    *   The closing delimiter must be on a line by itself and match
+        exactly (after tab stripping for "<<-").
+
+    Background execution (a trailing "&") IS supported in SH mode, with
+    these limitations:
+
+    *   Applies to external commands only. A trailing "&" on a built-in, a
+        defined function, a variable assignment, or a control keyword is
+        ignored and the command runs in the foreground. In CMD mode "&"
+        keeps its cmd.exe meaning as a sequential separator (unchanged).
+
+    *   Only a trailing "&" is recognised; a mid-line "&" (e.g. "a & b")
+        is not supported. An "&" inside "&&", in ">&"/"2>&1" fd
+        duplication, in quotes, or escaped as "\&" is not background.
+
+    *   No job control: "jobs", "wait", "wait %n", "fg", "bg" and "%n"
+        job specifications are not implemented; signals are not delivered
+        to background jobs.
+
+    *   A backgrounded pipeline or compound list is delegated as a unit to
+        the OS shell after BATsh expands variables and substitutions, so
+        its redirections and operators follow OS-shell rules.
+
+    *   On a successful launch "$?" is 0; the job's own exit status is not
+        awaited. "$!" holds the most recent background PID (empty before
+        any job). On Win32 the job is spawned via "system(1, ...)"; on
+        Unix it is started through /bin/sh without using a Perl fork.
 
     Pipeline ("|"), I/O redirection (">" ">>" "<" "2>" "2>>" "2>&1"),
     compound commands ("&&" "||" ";"), and function definitions are all
@@ -208,11 +278,27 @@ BUGS AND LIMITATIONS
     Please report bugs via the issue tracker:
     <https://github.com/ina-cpan/BATsh/issues>
 
+EXAMPLES
+    The eg/ directory contains runnable example scripts:
+
+      eg/00_hello.pl                Minimal Perl driver calling BATsh->run
+      eg/01_hello.batsh             Hello world in both modes
+      eg/02_env_bridge.batsh        Environment-variable bridge (CMD <-> SH)
+      eg/03_cmd_features.batsh      CMD-mode features and parameter modifiers
+      eg/04_sh_features.batsh       SH-mode features and expansions
+      eg/05_cmd_comprehensive.batsh Comprehensive CMD-mode tour
+      eg/06_sh_comprehensive.batsh  Comprehensive SH-mode tour
+      eg/07_mixed_comprehensive.batsh  Mixed CMD/SH comprehensive tour
+
+    Run a .batsh example with:
+
+      perl -Ilib -MBATsh -e "BATsh->run(shift)" eg/01_hello.batsh
+
 SEE ALSO
     BATsh::CMD, BATsh::SH, BATsh::Env
 
 AUTHOR
-    INABA Hitoshi <ina@cpan.org>
+    INABA Hitoshi <ina.cpan@gmail.com>
 
 LICENSE
     This software is free software; you can redistribute it and/or modify it

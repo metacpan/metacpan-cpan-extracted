@@ -25,7 +25,7 @@ BEGIN { pop @INC if $INC[-1] eq '.' }
 use IO::Socket;
 use Carp qw(croak);
 use vars qw($VERSION $ACCESS_LOG_FH $CURRENT_LOG_FILE $_fh_seq);
-$VERSION = '1.06';
+$VERSION = '1.07';
 $VERSION = $VERSION;
 $_fh_seq = 0;
 # $VERSION self-assignment suppresses "used only once" warning under strict.
@@ -825,7 +825,7 @@ HTTP::Handy - A tiny HTTP/1.0 server for Perl 5.5.3 and later
 
 =head1 VERSION
 
-Version 1.06
+Version 1.07
 
 =head1 SYNOPSIS
 

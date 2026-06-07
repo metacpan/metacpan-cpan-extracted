@@ -1,6 +1,6 @@
 package Sys::Export::ISO9660::File;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 # ABSTRACT: Represents a file in ISO9660, including packed encodings of directories
 
 use v5.26;
@@ -78,7 +78,7 @@ True if the flags include C<FLAG_DIRECTORY>
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

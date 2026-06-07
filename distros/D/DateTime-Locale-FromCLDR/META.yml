@@ -26,7 +26,7 @@ no_index:
     - inc
 requires:
   Locale::Unicode: v0.4.0
-  Locale::Unicode::Data: v1.8.0
+  Locale::Unicode::Data: v1.8.4
   Scalar::Util: '0'
   Wanted: v0.1.0
   overload: '1.06'
@@ -38,5 +38,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/deguest/DateTime-Locale-FromCLDR/issues
   repository: https://gitlab.com/deguest/DateTime-Locale-FromCLDR
-version: v0.8.6
+version: v0.8.7
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

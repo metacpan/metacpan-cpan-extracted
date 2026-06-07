@@ -2,7 +2,7 @@ package DBIx::QuickDB::Watcher;
 use strict;
 use warnings;
 
-our $VERSION = '0.000047';
+our $VERSION = '0.000048';
 
 use Carp qw/croak/;
 use POSIX qw/:sys_wait_h/;
@@ -246,16 +246,23 @@ sub _watcher_kill {
     return;
 }
 
+# stop(), eliminate(), and detach() each signal the watcher process by pid. Once
+# ANY terminal teardown has been initiated, the watcher is exiting (or already
+# gone) and the OS may recycle its pid to an unrelated process -- notably a
+# sibling database's postmaster. A second signal would then land on the wrong
+# process and shut down a live server out from under its owner. So once a stop
+# or eliminate has been sent, never signal this pid again. (Data-dir cleanup for
+# a stopped database is handled by Driver::DESTROY, not by a second signal.)
 sub stop {
     my $self = shift;
-    return if $self->{+STOPPED}++;
+    return if $self->{+STOPPED}++ || $self->{+ELIMINATED};
     my $pid = $self->{+WATCHER_PID} or return;
     kill('INT', $pid);
 }
 
 sub eliminate {
     my $self = shift;
-    return if $self->{+ELIMINATED}++;
+    return if $self->{+ELIMINATED}++ || $self->{+STOPPED};
     my $pid = $self->{+WATCHER_PID} or return;
     kill('TERM', $pid);
 }
@@ -263,6 +270,7 @@ sub eliminate {
 sub detach {
     my $self = shift;
     return if $self->{+DETACHED}++;
+    return if $self->{+STOPPED} || $self->{+ELIMINATED};
     my $pid = $self->{+WATCHER_PID} or return;
     kill('HUP', $pid);
 }
@@ -289,6 +297,10 @@ sub wait {
         }
         sleep 0.02;
     }
+
+    # The watcher has exited; forget its pid so no later teardown signal (e.g.
+    # from DESTROY) can land on a recycled pid now owned by another process.
+    delete $self->{+WATCHER_PID};
 }
 
 sub DESTROY {

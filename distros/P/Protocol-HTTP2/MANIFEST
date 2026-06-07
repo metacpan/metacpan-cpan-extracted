@@ -53,6 +53,7 @@ t/11_server_stream.t
 t/12_leaks.t
 t/13_request_with_body.t
 t/14_keepalive.t
+t/15_headersize.t
 t/lib/PH2ClientServerTest.pm
 t/lib/PH2Test.pm
 META.yml

@@ -1,6 +1,6 @@
 package Sys::Export::ISO9660Hybrid;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 # ABSTRACT: Write ISO9660 filesystem overlaid on MBR+GPT partition EFI filesystem
 
 use v5.26;
@@ -257,7 +257,7 @@ of that volume.
 Legacy i386 BIOS looks through the CDROM Volume Descriptor entries looking for an entry that
 describes an extent which is a virtual floppy disk image.  It then loads that extent as if it
 were a floppy disk, which means it essentially just starts executing it.
-This image is large enough that it doesn't require GRUB to be split into two parts.
+This image is large enough that it doesn't require GRUB stage 1 to be split into two parts.
 GRUB then loads stage 2 from the ISO filesystem, which are the same files described by the
 ESP VFAT filesystem.
 
@@ -361,7 +361,7 @@ and MBR partition tables.
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

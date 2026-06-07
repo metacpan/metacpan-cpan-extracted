@@ -1,141 +1,232 @@
 BATsh Lembar Contekan [ID] Bahasa Indonesia
-============================================
+===========================================
 
 ----------------------------------------------------------------------
 RINGKASAN
-  BATsh adalah interpreter shell dua bahasa yang menjalankan sintaks
-  cmd.exe batch dan bash/sh dalam satu file skrip yang sama, beralih mode
-  secara otomatis per baris. Tidak perlu shell eksternal -- murni Perl.
+  BATsh adalah shell dwibahasa yang menjalankan sintaks batch cmd.exe dan
+  bash/sh dalam satu berkas skrip yang sama. Mode beralih otomatis per
+  baris/bagian.
+  Tidak perlu shell eksternal -- implementasi Perl murni.
+  Mendukung pipeline, pengalihan, fungsi, dan ekstensi ekspansi variabel.
 
-CONTOH CAMPURAN
-  :: Bagian CMD (token pertama huruf besar)
+CONTOH MODE CAMPURAN
+  :: bagian CMD (token pertama huruf besar)
   @ECHO OFF
   SET LANG=BATsh
+  SET COUNT=3
 
-  # Bagian SH (token pertama berisi huruf kecil)
-  greet() { echo "Halo $1 (mode bash)"; }
+  # bagian SH (token pertama huruf kecil)
+  greet() { echo "Hello from $1 (bash mode)"; }
   greet $LANG
-  result=$(echo $LANG | perl -e 'while(<STDIN>){chomp;print uc}')
-  echo "Huruf besar: $result"
+  for i in 1 2 3; do echo "  item $i of $COUNT"; done
+  result=$(echo $LANG | perl -ne "print uc")
+  echo "Uppercase: $result"
 
-  :: Kembali ke CMD (baca hasil SH)
-  ECHO Kembali CMD: %result%
+  :: bagian CMD lagi (membaca hasil SH lewat jembatan)
+  ECHO Back in CMD: %result%
 
-  # Jalankan: perl lib/BATsh.pm script.batsh
+  # Jalankan dengan: perl lib/BATsh.pm script.batsh
+  # Atau:            use BATsh; BATsh->run('script.batsh');
 ----------------------------------------------------------------------
 
 
-BATsh adalah shell bilingual yang menjalankan sintaks cmd.exe dan bash/sh
-dalam satu skrip. Token pertama setiap baris menentukan mode eksekusi.
+BATsh adalah shell dwibahasa yang menjalankan sintaks cmd.exe dan bash/sh
+dalam satu skrip yang sama.  Skrip dibagi menjadi beberapa bagian; setiap
+bagian dijalankan apa adanya oleh shell yang sesuai.
 
-1. Pendeteksian Mode
----------------------
-  ECHO hello          -> mode cmd.exe (token pertama semua huruf kapital)
-  echo hello          -> mode bash/sh (token pertama ada huruf kecil)
-  # komentar          -> komentar (diabaikan)
-  :: komentar         -> komentar (gaya CMD, diabaikan)
-  REM komentar        -> komentar (gaya CMD, diabaikan)
+1. Deteksi Mode
+---------------
+  TOKEN PERTAMA dari baris bermakna pertama suatu bagian menentukan shell
+  mana yang menjalankan bagian tersebut:
+
+  Mode CMD: token pertama seluruhnya terdiri dari
+            [A-Z 0-9 _ - \ / : . @ %] DAN mengandung setidaknya satu
+            huruf besar A-Z.
+
+    ECHO hello          -> bagian CMD (cmd.exe)
+    SET FOO=bar baz     -> bagian CMD  (bagian nilai tidak diuji)
+    @ECHO OFF           -> bagian CMD
+    IF "%X%"=="Y" (     -> bagian CMD
+
+  Mode SH: selain itu (ada huruf kecil, atau tidak ada huruf sama sekali).
+
+    echo hello          -> bagian SH  (bash/sh)
+    export FOO=bar      -> bagian SH
+    if [ -f "$f" ]; then  -> bagian SH
+    #!/bin/sh           -> bagian SH  (shebang adalah baris SH)
+
+  Komentar dan baris kosong diserap ke dalam bagian saat ini.
+  Sintaks komentar:
+    ::           komentar gaya CMD
+    REM ...      komentar gaya CMD (tidak peka huruf besar/kecil)
+    @REM ...     komentar gaya CMD
+    # ...        komentar gaya SH  (BUKAN shebang #!)
 
 2. Menjalankan Shell
----------------------
-  perl lib/BATsh.pm                    # REPL interaktif
-  perl lib/BATsh.pm script.batsh       # menjalankan file skrip
-  perl lib/BATsh.pm -e "echo hello"    # satu baris perintah
+--------------------
+  perl lib/BATsh.pm               # REPL interaktif
+  perl lib/BATsh.pm script.batsh  # menjalankan berkas skrip
+  perl lib/BATsh.pm -e "echo hi"  # satu baris sebaris
 
-  Dari Perl API:
+  Dari Perl:
     use BATsh;
     BATsh->run('script.batsh');
     BATsh->run_string("echo hello");
     BATsh->repl();
 
 3. Jembatan Variabel Lingkungan
---------------------------------
-  Variabel dari blok CMD dan SH dibagi melalui %ENV Perl.
+-------------------------------
+  Sebelum setiap bagian berjalan, BATsh menyuntikkan %ENV saat ini sebagai
+  pembuka (baris SET untuk CMD, baris export untuk SH).  Setelah bagian
+  selesai, lingkungan akhir shell dibaca kembali ke dalam %ENV.
 
-  export FOO=hello   # SH mengatur FOO
-  ECHO %FOO%         # CMD membaca FOO melalui jembatan (Windows)
+  export FOO=hello   # SH menetapkan FOO
+  ECHO %FOO%         # CMD membaca FOO lewat jembatan (Windows)
 
-  SET BAR=world      # CMD mengatur BAR
-  echo $BAR          # SH membaca BAR melalui jembatan
+  SET BAR=world      # CMD menetapkan BAR
+  echo $BAR          # SH membaca BAR lewat jembatan
 
 4. SETLOCAL / ENDLOCAL
------------------------
-  SETLOCAL           # simpan snapshot %ENV
+----------------------
+  SETLOCAL           # cuplikan %ENV (ditangani BATsh, bukan cmd.exe)
   SET TMP=local_val
   ECHO %TMP%
-  ENDLOCAL           # pulihkan %ENV (TMP hilang)
+  ENDLOCAL           # memulihkan %ENV (TMP hilang)
 
-  Mendukung penyarangan (nesting).
+  Lingkup dapat disarangkan.
 
-5. Penyarangan (Mode Campuran)
--------------------------------
-  Konstruksi blok harus dipasangkan dengan benar.
-  Baris mode berbeda di dalam blok diteruskan apa adanya.
+5. Deteksi Batas Bagian
+-----------------------
+  Suatu bagian berakhir ketika kedalaman bloknya kembali ke nol DAN baris
+  bermakna berikutnya termasuk mode yang berbeda.
 
-  for x in 1 2; do   # SH membuka blok
-      ECHO item $x   # baris CMD di dalam blok SH
-  done               # SH menutup blok
+  Bagian CMD melacak kedalaman ( dan ) di luar tanda kutip:
 
-  Kata kunci CMD: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
-  Kata kunci SH:  if/fi  for/done  while/done  until/done
-                  case/esac  { }
+    IF "%X%"=="Y" (     <- membuka blok (kedalaman 1)
+        ECHO yes
+    ) ELSE (            <- menutup lalu membuka lagi (kedalaman tetap >=1)
+        ECHO no
+    )                   <- menutup blok (kedalaman 0) -> bagian bisa berakhir
+
+  Bagian SH melacak kedalaman kata kunci:
+
+    for x in 1 2; do   <- membuka blok (kedalaman 1)
+        echo $x
+    done                <- menutup blok (kedalaman 0) -> bagian bisa berakhir
+
+  Baris di dalam blok yang terbuka diserap ke dalam bagian saat ini meskipun
+  token pertamanya tampak seperti mode lain. Ini memungkinkan:
+
+    for x in A B; do
+        ECHO $x          <- huruf besar di dalam blok SH: tetap bagian SH
+    done
+
+  Pasangan kata kunci SH:
+    Pembuka (+1) : if  for  while  until  case  function  select  {
+    Penutup (-1) : fi  done  esac  }
+    Netral  ( 0) : then  do  else  elif
 
 6. Definisi Subrutin
----------------------
+--------------------
   :GREET
   echo "Hello $BATSH_ARG1"
   RET
 
-  Label dimulai dengan : dan diakhiri dengan RET atau RETURN.
+  Label diawali dengan : dan diakhiri dengan RET atau RETURN.
+  Badan diekstrak sebelum dieksekusi (tidak dijalankan sebaris).
+  Badan dapat berisi baris CMD, baris SH, atau campuran.
 
 7. CALL dan source
--------------------
-  CALL :GREET world      # panggil subrutin dengan argumen
-  CALL other.batsh       # sertakan file .batsh lain (CMD)
-  source other.batsh     # sertakan file .batsh lain (SH)
+------------------
+  CALL :GREET world      # memanggil subrutin dengan argumen
+  CALL other.batsh       # menyertakan/menjalankan berkas .batsh lain (CMD)
+  source other.batsh     # menyertakan/menjalankan berkas .batsh lain (SH)
   . other.batsh          # notasi titik POSIX
 
   Argumen: $BATSH_ARG1 .. $BATSH_ARGn  (%BATSH_ARG1% di CMD)
   Jumlah:  $BATSH_ARGC
 
-8. Perl API
-------------
-  BATsh->run($file)            # jalankan file .batsh
-  BATsh->run_string($source)   # jalankan string sumber
-  BATsh->run_lines(@lines)     # jalankan array baris
+8. API Perl
+-----------
+  BATsh->run($file)            # menjalankan berkas .batsh
+  BATsh->run_string($source)   # menjalankan string sumber
+  BATsh->run_lines(@lines)     # menjalankan larik baris
   BATsh->repl()                # REPL interaktif
-  BATsh->classify_token($tok)  # kembalikan 'CMD' atau 'SH'
-  BATsh->setlocal()            # snapshot %ENV
-  BATsh->endlocal()            # pulihkan %ENV
-  BATsh->call_sub($lbl, @args) # panggil subrutin
-  BATsh->source_file($file)    # sertakan file .batsh
+  BATsh->classify_token($tok)  # 'CMD' atau 'SH'
+  BATsh->setlocal()            # cuplikan %ENV
+  BATsh->endlocal()            # memulihkan %ENV
+  BATsh->call_sub($lbl, @args) # memanggil subrutin
+  BATsh->source_file($file)    # menyertakan berkas .batsh
   BATsh->version()             # string versi
 
 9. Catatan Platform
---------------------
-  Windows: Blok CMD dan SH berjalan di Perl murni -- tidak perlu cmd.exe/bash/sh eksternal.
-  UNIX:    Blok CMD dan SH berjalan di Perl murni -- tidak perlu cmd.exe/bash/sh eksternal.
+-------------------
+  Windows: Bagian CMD dan SH berjalan dalam Perl murni -- tidak perlu cmd.exe, bash, atau sh eksternal.
+  UNIX:    Bagian CMD dan SH berjalan dalam Perl murni -- tidak perlu cmd.exe, bash, atau sh eksternal.
 
 10. Persyaratan
-----------------
-  Perl 5.005_03 atau lebih baru. Hanya modul inti (File::Spec, Carp).
+---------------
+  Perl 5.005_03 atau lebih baru.  Hanya modul inti (File::Spec, Carp).
+  Tanpa dependensi CPAN.
+
+11. Pipeline CMD dan Pengubah Parameter
+---------------------------------------
+  cmd1 | cmd2              # pipeline lewat berkas sementara (Perl murni)
+  ECHO hello | perl -e "while(<STDIN>){print uc}"
+
+  SET /P VAR=Prompt:       # membaca satu baris dari STDIN ke VAR
+
+  Pengubah tilde parameter batch (mis. saat %0=C:\scripts\deploy.bat):
+    %~0   -> C:\scripts\deploy.bat  (hanya melepas tanda kutip)
+    %~f0  -> C:/scripts/deploy.bat  (jalur absolut lengkap)
+    %~d0  -> C:                     (huruf drive)
+    %~p0  -> /scripts/              (jalur direktori)
+    %~n0  -> deploy                 (nama berkas tanpa ekstensi)
+    %~x0  -> .bat                   (ekstensi)
+    %~dp0 -> C:/scripts/            (drive + direktori, paling umum)
+    %~nx1 -> deploy.bat             (nama + ekstensi)
+
+12. Fungsi SH dan Ekspansi
+--------------------------
+  greet() {              # definisi fungsi
+      echo "Hi $1"
+  }
+  function add {         # sintaks alternatif
+      echo $(( $1 + $2 ))
+  }
+  greet world            # memanggil fungsi
+  add 3 4                # -> 7
+
+  ${var%.*}    hapus sufiks terpendek yang cocok dengan .*
+  ${var%%.*}   hapus sufiks terpanjang yang cocok dengan .*
+  ${var#*.}    hapus prefiks terpendek yang cocok dengan *.
+  ${var##*.}   hapus prefiks terpanjang yang cocok dengan *.
+  ${var/a/b}   ganti kemunculan pertama a dengan b
+  ${var//a/b}  ganti semua kemunculan a dengan b
+  ${var^^}     semua huruf besar
+  ${var,,}     semua huruf kecil
+  ${var:2:4}   substring dari offset 2, panjang 4
+  ${#var}      panjang string
+  ${var:-def}  nilai jika diset, jika tidak def
+
+13. Pengalihan I/O SH
+---------------------
+  cmd > file      menimpa stdout
+  cmd >> file     menambah ke stdout
+  cmd < file      stdin dari berkas
+  cmd 2> file     stderr ke berkas
+  cmd 2>&1        menggabungkan stderr ke stdout
+  cmd > f 2>&1    stdout dan stderr ke berkas
+
+  Here-document (masukan pada stdin):
+    cmd <<EOF       baris badan hingga EOF; $VAR diekspansi
+    cmd <<'EOF'     baris badan hingga EOF; tanpa ekspansi (literal)
+    cmd <<-EOF      seperti <<EOF, tetapi TAB di awal baris dihapus
+
+14. Perintah Majemuk SH
+-----------------------
+  cmd1 && cmd2    jalankan cmd2 hanya jika cmd1 berhasil
+  cmd1 || cmd2    jalankan cmd2 hanya jika cmd1 gagal
+  cmd1 ; cmd2     jalankan cmd2 tanpa syarat
 
 Lihat juga: https://metacpan.org/dist/BATsh
-
-11. Jalur CMD dan Pengubah Parameter
---------------------------------------
-  cmd1 | cmd2              # Jalur pipa melalui file sementara (Pure Perl)
-  SET /P VAR=Perintah:     # Baca satu baris dari STDIN ke VAR
-  %~dp0                    # Drive+direktori %0 (paling umum digunakan)
-  %~n1, %~x1, %~nx1       # Nama file, ekstensi, keduanya
-
-12. Fungsi SH dan Ekspansi Variabel
---------------------------------------
-  f() { echo $1; }         # Definisi fungsi
-  ${var%.*}  ${var%%.*}    # Hapus sufiks (terpendek/terpanjang)
-  ${var#*.}  ${var##*.}    # Hapus prefiks (terpendek/terpanjang)
-  ${var/a/b} ${var//a/b}   # Ganti (pertama/semua)
-  ${var^^} ${var,,}        # Huruf besar/kecil
-  cmd > f  cmd >> f  2>&1  # Pengalihan
-  cmd1 && cmd2             # Rantai DAN
-  cmd1 || cmd2             # Rantai ATAU

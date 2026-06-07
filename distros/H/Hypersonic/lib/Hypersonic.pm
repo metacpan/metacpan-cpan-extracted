@@ -4,9 +4,10 @@ use strict;
 use warnings;
 use 5.010;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Scalar::Util qw(blessed);
+use Config ();
 use XS::JIT;
 use XS::JIT::Builder;
 use Hypersonic::Socket;
@@ -52,6 +53,11 @@ sub new {
         routes    => [],
         compiled  => 0,
         cache_dir => $opts{cache_dir} // '_hypersonic_cache',
+        # Legacy fallback id: only used by compile() when Digest::MD5
+        # isn't installable (extremely rare). The active code path uses
+        # a content hash of the generated C source so identical server
+        # configurations share the same JIT cache entry across fresh
+        # perl processes - see compile() for details.
         id        => int(rand(100000)),
         # Server options
         host      => $opts{host} // '0.0.0.0',
@@ -758,7 +764,47 @@ sub compile {
     my $c_code = $self->_generate_server_code(\@full_responses);
 
     # Compile via XS::JIT
-    my $module_name = 'Hypersonic::_Server_' . $self->{id};
+    #
+    # Derive a STABLE module id from a hash of the generated C source
+    # (plus this dist's $VERSION and the target perl's archname/version
+    # so a cache built for one perl is never loaded into another).
+    #
+    # Pre-0.18 we used 'Hypersonic::_Server_' . int(rand(100000)) which
+    # gave a different module name on every fresh perl process; because
+    # XS::JIT's on-disk cache lives at
+    #   <cache_dir>/lib/auto/<safe_name>/<safe_name>.<dlext>
+    # (see XS-JIT/lib/XS/JIT/xs_jit.c xs_jit_cache_path()), a different
+    # $name on every run forced a full gcc/cc re-invocation EVERY time
+    # the test suite or a user re-ran their server. On slow CPAN smoker
+    # boxes that gcc invocation takes 30-60+ seconds per server, which
+    # is what caused the SIGKILL cascade in CPAN tester reports for
+    # 0.17 (t/0035-e2e-streaming.t, t/2012..t/2017, t/2102).
+    #
+    # Using a content hash means: identical route+option configurations
+    # produce the same module name -> warm cache hit -> dlopen() of a
+    # 100ms .so instead of a 30s gcc rebuild. The random fallback id is
+    # retained for the degenerate case where Digest::MD5 isn't available.
+    my $module_id;
+    {
+        my $hash_input = join("\0",
+            $c_code,
+            $VERSION,
+            (defined $Config::Config{archname}
+                ? $Config::Config{archname} : ''),
+            $] || '',
+        );
+        if (eval { require Digest::MD5; 1 }) {
+            # 16 hex chars (64 bits) is plenty of namespace for one
+            # process and short enough to keep the on-disk file names
+            # readable. md5_hex is core since perl 5.7.3.
+            $module_id = substr(Digest::MD5::md5_hex($hash_input), 0, 16);
+        } else {
+            # No Digest::MD5? Fall back to the legacy random id. Cache
+            # won't be reused across runs but at least nothing breaks.
+            $module_id = $self->{id};
+        }
+    }
+    my $module_name = 'Hypersonic::_Server_' . $module_id;
     
     # Build compile options - add TLS flags if enabled
     my %functions = (

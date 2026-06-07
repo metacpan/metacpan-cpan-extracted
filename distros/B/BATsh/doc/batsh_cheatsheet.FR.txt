@@ -1,142 +1,233 @@
-BATsh Aide-memoire [FR] Francais
-=================================
+BATsh Aide-mémoire [FR] Français
+================================
 
 ----------------------------------------------------------------------
-RESUME
-  BATsh est un interpreteur de shell bilingue qui execute la syntaxe
-  cmd.exe et bash/sh dans le meme fichier de script, en changeant de
-  mode ligne par ligne automatiquement. Aucun shell externe requis.
+RÉSUMÉ
+  BATsh est un shell bilingue qui exécute la syntaxe batch cmd.exe et
+  bash/sh dans un même fichier de script. Il change de mode automatiquement,
+  ligne par ligne / section par section.
+  Aucun shell externe requis -- implémentation en Perl pur.
+  Prend en charge les tubes, la redirection, les fonctions et les extensions
+  d'expansion de variables.
 
-EXEMPLE MIXTE
-  :: Section CMD (premier jeton en majuscules)
+EXEMPLE EN MODE MIXTE
+  :: section CMD (premier jeton en majuscules)
   @ECHO OFF
   SET LANG=BATsh
+  SET COUNT=3
 
-  # Section SH (premier jeton avec minuscules)
-  greet() { echo "Bonjour $1 (mode bash)"; }
+  # section SH (premier jeton en minuscules)
+  greet() { echo "Hello from $1 (bash mode)"; }
   greet $LANG
-  result=$(echo $LANG | perl -e 'while(<STDIN>){chomp;print uc}')
-  echo "Majuscules: $result"
+  for i in 1 2 3; do echo "  item $i of $COUNT"; done
+  result=$(echo $LANG | perl -ne "print uc")
+  echo "Uppercase: $result"
 
-  :: Retour en CMD (lecture resultat SH)
-  ECHO Retour CMD: %result%
+  :: à nouveau section CMD (lit le résultat SH via le pont)
+  ECHO Back in CMD: %result%
 
-  # Execution: perl lib/BATsh.pm script.batsh
+  # Exécuter avec : perl lib/BATsh.pm script.batsh
+  # Ou :            use BATsh; BATsh->run('script.batsh');
 ----------------------------------------------------------------------
 
 
-BATsh est un shell bilingue qui execute la syntaxe cmd.exe et bash/sh
-dans le meme script. Le premier token de chaque ligne determine le mode.
+BATsh est un shell bilingue qui exécute la syntaxe cmd.exe et bash/sh dans
+un même script.  Le script est divisé en sections ; chaque section est
+exécutée telle quelle par le shell approprié.
 
-1. Detection du mode
----------------------
-  ECHO hello          -> mode cmd.exe  (premier token tout en majuscules)
-  echo hello          -> mode bash/sh  (premier token contient minuscules)
-  # commentaire       -> commentaire (ignore)
-  :: commentaire      -> commentaire (style CMD, ignore)
-  REM commentaire     -> commentaire (style CMD, ignore)
+1. Détection du mode
+--------------------
+  Le PREMIER JETON de la première ligne significative d'une section
+  détermine quel shell exécute cette section :
 
-2. Demarrage du shell
-----------------------
-  perl lib/BATsh.pm                    # REPL interactif
-  perl lib/BATsh.pm script.batsh       # executer un fichier script
-  perl lib/BATsh.pm -e "echo bonjour"  # ligne unique en ligne
+  Mode CMD : le premier jeton est composé uniquement de
+             [A-Z 0-9 _ - \ / : . @ %] ET contient au moins une
+             lettre majuscule A-Z.
 
-  Depuis l'API Perl :
+    ECHO hello          -> section CMD (cmd.exe)
+    SET FOO=bar baz     -> section CMD  (la partie valeur n'est pas testée)
+    @ECHO OFF           -> section CMD
+    IF "%X%"=="Y" (     -> section CMD
+
+  Mode SH : tout le reste (toute lettre minuscule, ou aucune lettre).
+
+    echo hello          -> section SH  (bash/sh)
+    export FOO=bar      -> section SH
+    if [ -f "$f" ]; then  -> section SH
+    #!/bin/sh           -> section SH  (le shebang est une ligne SH)
+
+  Les commentaires et les lignes vides sont absorbés dans la section courante.
+  Syntaxe des commentaires :
+    ::           commentaire de style CMD
+    REM ...      commentaire de style CMD (insensible à la casse)
+    @REM ...     commentaire de style CMD
+    # ...        commentaire de style SH  (PAS le shebang #!)
+
+2. Démarrer le shell
+--------------------
+  perl lib/BATsh.pm               # REPL interactif
+  perl lib/BATsh.pm script.batsh  # exécuter un fichier de script
+  perl lib/BATsh.pm -e "echo hi"  # commande sur une seule ligne
+
+  Depuis Perl :
     use BATsh;
     BATsh->run('script.batsh');
-    BATsh->run_string("echo bonjour");
+    BATsh->run_string("echo hello");
     BATsh->repl();
 
-3. Pont de variables d'environnement
---------------------------------------
-  Les blocs CMD et SH partagent les variables via %ENV de Perl.
+3. Pont des variables d'environnement
+-------------------------------------
+  Avant l'exécution de chaque section, BATsh injecte le %ENV courant en
+  préambule (lignes SET pour CMD, lignes export pour SH).  Après la section,
+  l'environnement final du shell est relu dans %ENV.
 
-  export FOO=bonjour  # SH definit FOO
-  ECHO %FOO%          # CMD lit FOO via le pont (Windows)
+  export FOO=hello   # SH définit FOO
+  ECHO %FOO%         # CMD lit FOO via le pont (Windows)
 
-  SET BAR=monde       # CMD definit BAR
-  echo $BAR           # SH lit BAR via le pont
+  SET BAR=world      # CMD définit BAR
+  echo $BAR          # SH lit BAR via le pont
 
 4. SETLOCAL / ENDLOCAL
------------------------
-  SETLOCAL           # instantane de %ENV
+----------------------
+  SETLOCAL           # capture %ENV (géré par BATsh, pas par cmd.exe)
   SET TMP=local_val
   ECHO %TMP%
-  ENDLOCAL           # restaure %ENV (TMP disparait)
+  ENDLOCAL           # restaure %ENV (TMP disparaît)
 
-  Les portees peuvent etre imbriquees.
+  Les portées peuvent être imbriquées.
 
-5. Imbrication (mode mixte)
-----------------------------
-  Les constructions de blocs doivent etre correctement appariees.
-  Les lignes en mode mixte a l'interieur d'un bloc sont acceptees.
+5. Détection des limites de section
+-----------------------------------
+  Une section se termine lorsque la profondeur de son bloc revient à zéro
+  ET que la ligne significative suivante appartient à un mode différent.
 
-  for x in 1 2; do   # SH ouvre le bloc
-      ECHO item $x   # ligne CMD dans le bloc SH (transmise telle quelle)
-  done               # SH ferme le bloc
+  Les sections CMD suivent la profondeur des ( et ) hors guillemets :
 
-  Mots-cles CMD : IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
-  Mots-cles SH  : if/fi  for/done  while/done  until/done  case/esac  { }
+    IF "%X%"=="Y" (     <- ouvre un bloc (profondeur 1)
+        ECHO yes
+    ) ELSE (            <- ferme et rouvre (la profondeur reste >=1)
+        ECHO no
+    )                   <- ferme le bloc (profondeur 0) -> fin possible
 
-6. Definitions de sous-routines
----------------------------------
+  Les sections SH suivent la profondeur des mots-clés :
+
+    for x in 1 2; do   <- ouvre un bloc (profondeur 1)
+        echo $x
+    done                <- ferme le bloc (profondeur 0) -> fin possible
+
+  Les lignes à l'intérieur d'un bloc ouvert sont absorbées dans la section
+  courante même si leur premier jeton ressemble à l'autre mode. Cela permet :
+
+    for x in A B; do
+        ECHO $x          <- majuscules dans un bloc SH : reste une section SH
+    done
+
+  Paires de mots-clés SH :
+    Ouvrants (+1) : if  for  while  until  case  function  select  {
+    Fermants (-1) : fi  done  esac  }
+    Neutres  ( 0) : then  do  else  elif
+
+6. Définitions de sous-routines
+-------------------------------
   :GREET
-  echo "Bonjour $BATSH_ARG1"
+  echo "Hello $BATSH_ARG1"
   RET
 
-  Les etiquettes commencent par : et se terminent par RET ou RETURN.
-  Le corps est extrait avant l'execution (non execute en ligne).
+  Les étiquettes commencent par : et se terminent par RET ou RETURN.
+  Le corps est extrait avant l'exécution (pas exécuté en ligne).
+  Le corps peut contenir des lignes CMD, des lignes SH, ou un mélange.
 
 7. CALL et source
-------------------
-  CALL :GREET monde      # appeler une sous-routine avec argument
-  CALL autre.batsh       # inclure/executer un autre fichier .batsh (CMD)
-  source autre.batsh     # inclure/executer un autre fichier .batsh (SH)
-  . autre.batsh          # notation point POSIX
+-----------------
+  CALL :GREET world      # appeler une sous-routine avec un argument
+  CALL other.batsh       # inclure/exécuter un autre fichier .batsh (CMD)
+  source other.batsh     # inclure/exécuter un autre fichier .batsh (SH)
+  . other.batsh          # notation pointée POSIX
 
   Arguments : $BATSH_ARG1 .. $BATSH_ARGn  (%BATSH_ARG1% en CMD)
-  Nombre    : $BATSH_ARGC
+  Nombre :    $BATSH_ARGC
 
 8. API Perl
 -----------
-  BATsh->run($file)            # executer un fichier .batsh
-  BATsh->run_string($source)   # executer une chaine source
-  BATsh->run_lines(@lines)     # executer un tableau de lignes
+  BATsh->run($file)            # exécuter un fichier .batsh
+  BATsh->run_string($source)   # exécuter une chaîne source
+  BATsh->run_lines(@lines)     # exécuter un tableau de lignes
   BATsh->repl()                # REPL interactif
-  BATsh->classify_token($tok)  # retourne 'CMD' ou 'SH'
-  BATsh->setlocal()            # instantane de %ENV
+  BATsh->classify_token($tok)  # 'CMD' ou 'SH'
+  BATsh->setlocal()            # capture %ENV
   BATsh->endlocal()            # restaure %ENV
   BATsh->call_sub($lbl, @args) # appeler une sous-routine
   BATsh->source_file($file)    # inclure un fichier .batsh
-  BATsh->version()             # chaine de version
+  BATsh->version()             # chaîne de version
 
 9. Notes de plateforme
------------------------
-  Windows : Les blocs CMD et SH s'executent en Perl pur -- aucun cmd.exe/bash/sh externe requis.
-  UNIX    : Les blocs CMD et SH s'executent en Perl pur -- aucun cmd.exe/bash/sh externe requis.
+----------------------
+  Windows : les sections CMD et SH s'exécutent en Perl pur -- aucun cmd.exe, bash ou sh externe requis.
+  UNIX :    les sections CMD et SH s'exécutent en Perl pur -- aucun cmd.exe, bash ou sh externe requis.
 
-10. Conditions requises
+10. Prérequis
+-------------
+  Perl 5.005_03 ou ultérieur.  Modules de base uniquement (File::Spec, Carp).
+  Aucune dépendance CPAN.
+
+11. Tube CMD et modificateurs de paramètres
+-------------------------------------------
+  cmd1 | cmd2              # tube via fichier temporaire (Perl pur)
+  ECHO hello | perl -e "while(<STDIN>){print uc}"
+
+  SET /P VAR=Prompt:       # lit une ligne de STDIN dans VAR
+
+  Modificateurs tilde de paramètres batch (p. ex. quand %0=C:\scripts\deploy.bat) :
+    %~0   -> C:\scripts\deploy.bat  (déguillemets seulement)
+    %~f0  -> C:/scripts/deploy.bat  (chemin absolu complet)
+    %~d0  -> C:                     (lettre de lecteur)
+    %~p0  -> /scripts/              (chemin du répertoire)
+    %~n0  -> deploy                 (nom de fichier sans extension)
+    %~x0  -> .bat                   (extension)
+    %~dp0 -> C:/scripts/            (lecteur + répertoire, le plus courant)
+    %~nx1 -> deploy.bat             (nom + extension)
+
+12. Fonctions SH et expansion
+-----------------------------
+  greet() {              # définition de fonction
+      echo "Hi $1"
+  }
+  function add {         # syntaxe alternative
+      echo $(( $1 + $2 ))
+  }
+  greet world            # appel de fonction
+  add 3 4                # -> 7
+
+  ${var%.*}    supprime le plus court suffixe correspondant à .*
+  ${var%%.*}   supprime le plus long  suffixe correspondant à .*
+  ${var#*.}    supprime le plus court préfixe correspondant à *.
+  ${var##*.}   supprime le plus long  préfixe correspondant à *.
+  ${var/a/b}   remplace la première occurrence de a par b
+  ${var//a/b}  remplace toutes les occurrences de a par b
+  ${var^^}     tout en majuscules
+  ${var,,}     tout en minuscules
+  ${var:2:4}   sous-chaîne à partir de l'offset 2, longueur 4
+  ${#var}      longueur de la chaîne
+  ${var:-def}  valeur si définie, sinon def
+
+13. Redirection d'E/S SH
 ------------------------
-  Perl 5.005_03 ou superieur. Modules de base uniquement (File::Spec, Carp).
-  Aucune dependance CPAN.
+  cmd > file      écrase la sortie standard
+  cmd >> file     ajoute à la sortie standard
+  cmd < file      entrée standard depuis un fichier
+  cmd 2> file     erreur standard vers un fichier
+  cmd 2>&1        fusionne stderr dans stdout
+  cmd > f 2>&1    stdout et stderr vers un fichier
+
+  Documents en ligne (entrée sur stdin) :
+    cmd <<EOF       lignes du corps jusqu'à EOF ; $VAR est développé
+    cmd <<'EOF'     lignes du corps jusqu'à EOF ; pas d'expansion (littéral)
+    cmd <<-EOF      comme <<EOF, mais les TAB en début de ligne sont supprimés
+
+14. Commandes composées SH
+--------------------------
+  cmd1 && cmd2    exécute cmd2 seulement si cmd1 réussit
+  cmd1 || cmd2    exécute cmd2 seulement si cmd1 échoue
+  cmd1 ; cmd2     exécute cmd2 sans condition
 
 Voir aussi : https://metacpan.org/dist/BATsh
-
-11. Pipeline CMD et modificateurs de parametres
--------------------------------------------------
-  cmd1 | cmd2              # Pipeline via fichier temporaire (Pure Perl)
-  SET /P VAR=Invite:       # Lire une ligne de STDIN dans VAR
-  %~dp0                    # Lecteur+repertoire de %0 (usage le plus courant)
-  %~n1, %~x1, %~nx1       # Nom de fichier, extension, les deux
-
-12. Fonctions SH et expansion de variables
--------------------------------------------
-  f() { echo $1; }         # Definition de fonction
-  ${var%.*}  ${var%%.*}    # Supprimer suffixe (court/long)
-  ${var#*.}  ${var##*.}    # Supprimer prefixe (court/long)
-  ${var/a/b} ${var//a/b}   # Remplacer (premier/tous)
-  ${var^^} ${var,,}        # Majuscules/minuscules
-  cmd > f  cmd >> f  2>&1  # Redirection
-  cmd1 && cmd2             # Enchainement ET
-  cmd1 || cmd2             # Enchainement OU

@@ -1,5 +1,8 @@
 Revision history for Geo-Coder-OpenCage
 
+0.43    2026-06-07
+        - dependency Carp version 1.54 doesn't exist (yet), use 1.50 -- thanks blb8
+
 0.42    2026-06-02
         - only run Perl::Critic tests locally, not as part of perltesters
 

@@ -3,7 +3,7 @@ package BATsh::SH;
 #
 # BATsh::SH - Pure Perl sh/bash interpreter
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com>
 #
 # Implements sh/bash command set in Perl.
 # No external sh or bash required.
@@ -28,7 +28,9 @@ package BATsh::SH;
 #   cmd1 | cmd2 [| cmd3 ...]  (pipeline via tmpfile, 5.005_03)
 #   cmd1 && cmd2, cmd1 || cmd2, cmd1 ; cmd2  (compound commands)
 #   > >> < 2> 2>> 2>&1 1>&2  (I/O redirection)
-#   $VAR, ${VAR}, $1..$9, $@, $*, $#, $?, $$, $0
+#   cmd << DELIM ... DELIM, <<-DELIM, <<'DELIM'  (here-document)
+#   cmd &  (background execution of an external command; SH mode)
+#   $VAR, ${VAR}, $1..$9, $@, $*, $#, $?, $$, $0, $!
 #   ${VAR:-def}, ${VAR:=def}, ${VAR:+alt}
 #   ${VAR%pat}, ${VAR%%pat}  (shortest/longest suffix removal)
 #   ${VAR#pat}, ${VAR##pat}  (shortest/longest prefix removal)
@@ -47,8 +49,9 @@ BEGIN { pop @INC if $INC[-1] eq '.' }
 
 use File::Spec ();
 use Carp qw(croak);
+use Fcntl qw(O_WRONLY O_CREAT O_EXCL);
 use vars qw($VERSION);
-$VERSION = '0.02';
+$VERSION = '0.04';
 $VERSION = $VERSION;
 
 # Bareword filehandle globs for SH pipeline (Perl 5.005_03 compatible)
@@ -56,6 +59,32 @@ use vars qw(*_SH_PIPE_SAVOUT *_SH_PIPE_SAVIN *_SH_PIPE_WFH *_SH_PIPE_RFH);
 
 # Bareword filehandle globs for SH I/O redirection (Perl 5.005_03 compatible)
 use vars qw(*_SH_REDIR_SRC *_SH_REDIR_DST *_SH_REDIR_SAVOUT *_SH_REDIR_SAVERR *_SH_REDIR_SAVIN);
+
+# Bareword filehandle glob for here-document temp file (Perl 5.005_03 compatible)
+use vars qw(*_HD_TMP);
+
+# Bareword filehandle globs for background-job PID temp file (Perl 5.005_03 compatible)
+use vars qw(*_BG_TMP *_BG_PIDFH);
+
+# $!  -- PID of the most recent background job (package-level so _expand and
+# the test suite can read it).  Empty string before any background job.
+use vars qw($_LAST_BG_PID);
+$_LAST_BG_PID = '';
+
+# Active nesting depth of command substitution _cmd_subst().  Each active
+# level uses a distinct capture temp file so that a nested $( ... $( ... ) )
+# does not truncate/unlink the file the outer level is still capturing into.
+# (Sequential, non-overlapping substitutions safely reuse the same depth.)
+use vars qw($_SUBST_DEPTH);
+$_SUBST_DEPTH = 0;
+
+# Active nesting depth of pipeline execution _exec_sh_pipe().  A pipeline
+# segment may itself contain a $(...) whose body is another pipeline; each
+# active pipeline must use distinct stage temp files so the inner pipeline
+# does not clobber/unlink the outer pipeline's stage file (which would leave
+# the outer's final segment reading from the real STDIN and hanging).
+use vars qw($_PIPE_DEPTH);
+$_PIPE_DEPTH = 0;
 
 # SH function registry -- must be package-level for access from _expand and _exec_line
 use vars qw(%_SH_FUNCTIONS);
@@ -68,6 +97,14 @@ my $_EXIT_CODE    = undef;   # undef = no exit pending
 my $_BREAK        = 0;       # break out of loop
 my $_CONTINUE     = 0;       # continue next iteration
 my $_RETURN       = 0;       # return from function/source
+
+# Here-document state (Perl 5.005_03 compatible)
+my $_HD_SEQ       = 0;        # per-process counter for unique temp names
+my @_HD_TMPFILES  = ();       # tempfiles to remove on END (failsafe cleanup)
+
+# Background-job state (Perl 5.005_03 compatible)
+my $_BG_SEQ       = 0;        # per-process counter for unique pidfile names
+my @_BG_TMPFILES  = ();       # pidfiles to remove on END (failsafe cleanup)
 
 # ----------------------------------------------------------------
 # Public: execute an array of SH lines
@@ -136,6 +173,34 @@ sub _run_lines {
             next;
         }
 
+        # Here-document: cmd << [-] [QUOTE]DELIM[QUOTE]
+        # Detected on a simple command line; body is read from following
+        # lines up to a line equal to DELIM (after optional tab strip for <<-).
+        my @hd = _hd_detect($line);
+        if (@hd) {
+            my ($cmd_part, $dash, $delim, $quoted) = @hd;
+            my @body = ();
+            my $terminated = 0;
+            while ($i <= $#lines) {
+                my $bl = $lines[$i];
+                $i++;
+                $bl =~ s/\r?\n\z//;
+                my $probe = $bl;
+                $probe =~ s/\A\t+// if $dash;   # <<- strips leading tabs
+                if ($probe eq $delim) { $terminated = 1; last }
+                $bl =~ s/\A\t+// if $dash;       # also strip tabs from body
+                push @body, $bl;
+            }
+            if (!$terminated) {
+                warn "sh: unexpected EOF while looking for here-document delimiter \`$delim'\n";
+                $LAST_STATUS = 2;
+                $status = 2;
+                next;
+            }
+            $status = _hd_run($class, $cmd_part, \@body, $quoted, $opts_ref);
+            next;
+        }
+
         $status = _exec_line($class, $line, $opts_ref);
         $_CONTINUE = 0 if $_CONTINUE;
     }
@@ -156,6 +221,33 @@ sub _exec_line {
     # Shebang: treat as comment
     return 0 if $line =~ /\A#!/;
 
+    # ----------------------------------------------------------------
+    # Background execution: an unquoted trailing & (v1).
+    # Detected here, BEFORE _split_sh_compound, so that the bare & is
+    # never mistaken for && and so that an internal & (e.g. in 2>&1 or
+    # >&2) is left untouched.  Only the single & at the very end of the
+    # line is consumed.  Builtins / functions / control words / variable
+    # assignments run in the FOREGROUND (the & is ignored); only external
+    # commands are launched asynchronously.
+    # ----------------------------------------------------------------
+    my ($_is_bg, $_bg_line) = _split_trailing_bg($line);
+    if ($_is_bg) {
+        $line = $_bg_line;
+        my $probe = $line;
+        $probe =~ s/\A\s+//;
+        my $w0 = '';
+        ($w0) = ($probe =~ /\A(\S+)/);
+        $w0 = '' unless defined $w0;
+        if (_sh_word_is_foreground($w0)) {
+            # & ignored: run the stripped line in the foreground.
+            return _exec_line($class, $line, $opts_ref);
+        }
+        my $exp = _expand($class, $line);
+        $exp =~ s/\A\s+//;
+        $exp =~ s/\s+\z//;
+        return _bg_launch($class, $exp);
+    }
+
     # Detect && / || / ; compound commands BEFORE expansion.
     # These must be split before _expand so that short-circuit logic works.
     my @compound = _split_sh_compound($line);
@@ -169,6 +261,24 @@ sub _exec_line {
     my @pipe_segs = _split_sh_pipe($line);
     if (@pipe_segs > 1) {
         return _exec_sh_pipe($class, \@pipe_segs, $opts_ref);
+    }
+
+    # POSIX assignment prefix on the RAW line: `VAR=value command args`.
+    # Detected before expansion so that a value containing $(...) or quoted
+    # spaces is not mistaken for a trailing command.  Pure assignments (no
+    # command following) fall through to the post-expansion handler below.
+    {
+        my ($pairs_ref, $remainder) = _sh_assign_prefix($line);
+        if ($pairs_ref && defined $remainder && $remainder ne '') {
+            for my $p (@{$pairs_ref}) {
+                my ($var, $rawval) = @{$p};
+                my $val = _expand($class, $rawval);
+                $val =~ s/\A"(.*)"\z/$1/s;
+                $val =~ s/\A'(.*)'\z/$1/s;
+                BATsh::Env->set($var, $val);
+            }
+            return _exec_line($class, $remainder, $opts_ref);
+        }
     }
 
     # Expand variables and command substitutions
@@ -190,8 +300,11 @@ sub _exec_line {
 
     my $lc_cmd = lc($cmd);
 
-    # Simple assignment: VAR=value (no spaces around =)
-    if ($cmd =~ /\A([A-Za-z_][A-Za-z0-9_]*)=(.*)\z/s) {
+    # Pure assignment: VAR=value (no spaces around =).  Assignment prefixes
+    # of the form `VAR=value command` were already handled before expansion,
+    # so anything reaching here is a standalone assignment.  Match the whole
+    # (expanded) line so values containing spaces are preserved in full.
+    if ($line =~ /\A([A-Za-z_][A-Za-z0-9_]*)=(.*)\z/s) {
         my ($var, $val) = ($1, $2);   # capture before $1 is clobbered
         # Strip outermost quotes from value
         $val =~ s/\A"(.*)"\z/$1/s;
@@ -237,6 +350,20 @@ sub _expand {
     my ($class, $str) = @_;
     return '' unless defined $str;
 
+    # Protect backslash escapes before any expansion.  In POSIX shells the
+    # backslash inside double quotes keeps its special meaning only before
+    # $ ` " \ and newline, so "\$" is a literal dollar (NO expansion), "\`"
+    # is a literal backtick (NO command substitution) and "\\" is a literal
+    # backslash.  Earlier releases performed the $-/`-substitutions globally
+    # with no escape awareness, so "\$_" expanded $_ to empty and left the
+    # stray backslash (giving e.g. perl -e "...uc(\)..." -> syntax error).
+    # We stash the escaped specials under NUL-delimited sentinels (a NUL can
+    # never occur in shell source) and restore them as literals at the end.
+    # Order matters: "\\" first so that "\\$" means backslash + expansion.
+    $str =~ s/\\\\/\x00BATSH_BS\x00/g;   # \\  -> literal backslash
+    $str =~ s/\\\$/\x00BATSH_DL\x00/g;   # \$  -> literal dollar (no expand)
+    $str =~ s/\\`/\x00BATSH_BT\x00/g;    # \`  -> literal backtick (no subst)
+
     # $(( arithmetic ))
     $str =~ s/\$\(\(\s*(.*?)\s*\)\)/_eval_arith($1)/ge;
 
@@ -254,32 +381,32 @@ sub _expand {
 
     # ${VAR%%pattern} -- remove longest suffix   (MUST be before single %)
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)%%([^}]*)\}/
-        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_remove_suffix($v,$2,1) }
+        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_remove_suffix($v, $2, 1) }
     /ge;
 
     # ${VAR%pattern}  -- remove shortest suffix  (single %, not %%)
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)%(?!%)([^}]*)\}/
-        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_remove_suffix($v,$2,0) }
+        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_remove_suffix($v, $2, 0) }
     /ge;
 
     # ${VAR##pattern} -- remove longest prefix   (MUST be before single #)
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)##([^}]*)\}/
-        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_remove_prefix($v,$2,1) }
+        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_remove_prefix($v, $2, 1) }
     /ge;
 
     # ${VAR#pattern}  -- remove shortest prefix  (single #, not ##)
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)#(?!#)([^}]*)\}/
-        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_remove_prefix($v,$2,0) }
+        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_remove_prefix($v, $2, 0) }
     /ge;
 
     # ${VAR//pat/rep} -- replace all occurrences  (MUST be before single /)
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)\/\/([^\/}]*)\/([^}]*)\}/
-        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_replace($v,$2,$3,1) }
+        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_replace($v, $2, $3, 1) }
     /ge;
 
     # ${VAR/pat/rep} -- replace first occurrence  (single /, not //)
     $str =~ s/\$\{([A-Za-z_][A-Za-z0-9_]*)\/(?!\/)([^\/}]*)\/([^}]*)\}/
-        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_replace($v,$2,$3,0) }
+        do { my $v = BATsh::Env->get($1); $v = defined $v ? $v : ''; _sh_replace($v, $2, $3, 0) }
     /ge;
 
     # ${VAR^^} -- uppercase all
@@ -348,6 +475,9 @@ sub _expand {
     # $$  PID
     $str =~ s/\$\$/$$/g;
 
+    # $!  PID of the most recent background job (empty before any)
+    $str =~ s/\$\!/$_LAST_BG_PID/g;
+
 
     # $0 script name
     $str =~ s/\$0/do { my $v=BATsh::Env->get('%0'); defined $v ? $v : '' }/ge;
@@ -383,6 +513,12 @@ sub _expand {
     $str =~ s/\$([A-Za-z_][A-Za-z0-9_]*)/
         do { my $v = BATsh::Env->get($1); defined $v ? $v : '' }
     /ge;
+
+    # Restore the escaped specials as literal characters (reverse order of
+    # protection is not required, the sentinels are disjoint).
+    $str =~ s/\x00BATSH_DL\x00/\$/g;
+    $str =~ s/\x00BATSH_BT\x00/`/g;
+    $str =~ s/\x00BATSH_BS\x00/\\/g;
 
     return $str;
 }
@@ -495,8 +631,13 @@ sub _cmd_subst {
     # Capture stdout via temporary file (Perl 5.005_03 compatible).
     # We use _run_lines so that all BATsh::SH builtins, functions,
     # and pipelines work recursively inside $(...) and `...`.
+    # Tag the capture file with the active nesting depth so a nested
+    # $( ... $( ... ) ) gets a distinct file per level (the inner level
+    # must not truncate/unlink the file the outer level captures into).
+    local $_SUBST_DEPTH = $_SUBST_DEPTH + 1;
     my $tmpfile = File::Spec->catfile(
-        File::Spec->tmpdir(), "batsh_cap_$$.tmp");
+        File::Spec->tmpdir(),
+        'batsh_cap_' . $$ . '_' . $_SUBST_DEPTH . '.tmp');
     local *_SUBST_SAVOUT;
     open(_SUBST_SAVOUT, '>&STDOUT') or return '';
     local *_SUBST_CAPFH;
@@ -656,12 +797,25 @@ sub _cmd_exit {
 # ----------------------------------------------------------------
 sub _cmd_read {
     my ($rest) = @_;
+    $rest = '' unless defined $rest;
     $rest =~ s/\A\s+//;
     $rest =~ s/\s+\z//;
+
+    # Drop option flags such as -r (we always read a raw line); only the
+    # bareword names that follow are treated as target variables.
+    my @vars = grep { length && !/\A-/ } split /\s+/, $rest;
+
     my $line = <STDIN>;
-    $line = '' unless defined $line;
+    if (!defined $line) {
+        # End of input.  POSIX read returns non-zero at EOF so that a
+        # 'while read VAR; do ...; done < file' loop terminates instead
+        # of spinning forever.
+        for my $v (@vars) { BATsh::Env->set($v, '') }
+        $LAST_STATUS = 1;
+        return 1;
+    }
     chomp $line;
-    my @vars = split /\s+/, $rest;
+
     if (@vars == 1) {
         BATsh::Env->set($vars[0], $line);
     }
@@ -1031,14 +1185,45 @@ sub _parse_while {
     # Collect body
     my @body = ();
     my $depth = 1;
+    my $done_line = '';
     while ($i <= $#lines) {
         my $l = $lines[$i]; $i++;
         $l =~ s/\r?\n\z//;
         my $ls = $l; $ls =~ s/\A\s+//;
         my $lc_f = lc( ($ls =~ /\A(\S+)/) ? $1 : '' );
         if ($lc_f eq 'for' || $lc_f eq 'while' || $lc_f eq 'until') { $depth++ }
-        if ($lc_f eq 'done') { $depth--; last if $depth == 0 }
+        if ($lc_f eq 'done') { $depth--; if ($depth == 0) { $done_line = $ls; last } }
         push @body, $l unless ($lc_f eq 'do' && $depth == 1);
+    }
+
+    # Honor an input redirection on the `done' line, e.g.
+    #   while read LINE; do ...; done < FILE
+    # by reopening STDIN from FILE for the duration of the loop so that the
+    # loop's `read' built-in consumes the file.  Perl 5.005_03 compatible:
+    # 2-argument open and bareword filehandle duplication.
+    my $saved_in = 0;
+    if ($done_line ne '') {
+        my $done_rest = $done_line;
+        $done_rest =~ s/\Adone\b\s*//i;
+        if ($done_rest ne '') {
+            my ($dc, $rd) = _sh_strip_redirects(_expand($class, $done_rest));
+            my $in_file;
+            for my $r (@{$rd}) {
+                my ($fd, $append, $file) = @{$r};
+                $in_file = $file if $fd == 0;
+            }
+            if (defined $in_file && $in_file ne '') {
+                if (open(_WH_REDIR_SRC, "< $in_file")) {
+                    if (open(_WH_REDIR_SAVIN, '<&STDIN')) {
+                        if (open(STDIN, '<&_WH_REDIR_SRC')) { $saved_in = 1 }
+                    }
+                    close(_WH_REDIR_SRC);
+                }
+                else {
+                    warn "sh: $in_file: $!\n";
+                }
+            }
+        }
     }
 
     my $status = 0;
@@ -1054,6 +1239,11 @@ sub _parse_while {
         last if $_BREAK;
     }
     $_BREAK = 0;
+
+    if ($saved_in) {
+        open(STDIN, '<&_WH_REDIR_SAVIN');
+        close(_WH_REDIR_SAVIN);
+    }
 
     return ($status, $i);
 }
@@ -1538,9 +1728,13 @@ sub _split_sh_pipe {
         # Enter single-quote
         if ($ch eq "'") { $in_sq = 1; $cur .= $ch; $i++; next }
 
-        # $( command substitution: track nesting so | inside is not a pipe
+        # $( command substitution: consume BOTH characters and bump the
+        # nesting depth exactly ONCE here, so the standalone-'(' handler
+        # below does not double-count the '(' of a $( and leave depth
+        # stuck at 1 after the matching ')'.  (That stale depth made a
+        # bare '|' following a nested $(...) fail to split as a pipe.)
         if ($ch eq '$' && $i+1 < $n && $chars[$i+1] eq '(') {
-            $depth++; $cur .= $ch; $i++; next;
+            $depth++; $cur .= '$('; $i += 2; next;
         }
         if ($ch eq '(' ) { $depth++ if $depth > 0; $cur .= $ch; $i++; next }
         if ($ch eq ')' ) {
@@ -1580,7 +1774,16 @@ sub _exec_sh_pipe {
     my ($class, $segs_ref, $opts_ref) = @_;
     my @segs   = @{$segs_ref};
     my $n_segs = scalar @segs;
-    my $base   = File::Spec->catfile(File::Spec->tmpdir(), "batsh_shp_$$");
+    # Tag the stage files with the active pipeline-nesting depth so a nested
+    # pipeline (reached when a segment contains a $(...) that is itself a
+    # pipeline) gets distinct stage files and does not clobber this one.
+    local $_PIPE_DEPTH = $_PIPE_DEPTH + 1;
+    my $base   = File::Spec->catfile(File::Spec->tmpdir(),
+                                     'batsh_shp_' . $$ . '_' . $_PIPE_DEPTH);
+    # Localize the dup/stage filehandle globs so that a nested pipeline
+    # (a segment whose $(...) body is itself a pipeline) does not overwrite
+    # this pipeline's saved STDOUT/STDIN handles.  Perl 5.005_03 compatible.
+    local (*_SH_PIPE_RFH, *_SH_PIPE_WFH, *_SH_PIPE_SAVIN, *_SH_PIPE_SAVOUT);
     my $rc     = 0;
     my $input_f = undef;   # tmpfile that feeds this segment's STDIN
 
@@ -1770,7 +1973,7 @@ sub _parse_function {
             $part =~ s/\A\s+//; $part =~ s/\s+\z//;
             push @body, $part if $part =~ /\S/;
         }
-        $_SH_FUNCTIONS{$name} = \@body;
+        $_SH_FUNCTIONS{$name} = [ @body ];
         return (0, $i);
     }
 
@@ -1797,7 +2000,7 @@ sub _parse_function {
         push @body, $l;
     }
 
-    $_SH_FUNCTIONS{$name} = \@body;
+    $_SH_FUNCTIONS{$name} = [ @body ];
     return (0, $i);
 }
 
@@ -1900,6 +2103,185 @@ sub _cmd_external {
 }
 
 # ----------------------------------------------------------------
+# Background execution helpers (v1)
+# ----------------------------------------------------------------
+# _split_trailing_bg: detect an unquoted single & at the very end of a
+# line.  Returns (1, $line_without_amp) when present, else (0, $line).
+# Rules:
+#   * only the last non-space character may be the background &
+#   * it must not be part of && (i.e. preceding char must not be &)
+#   * it must not be an fd-duplication >&  (preceding char must not be >)
+#   * it must be outside single/double quotes
+#   * the remaining command must be non-empty
+sub _split_trailing_bg {
+    my ($line) = @_;
+    return (0, $line) unless defined $line;
+
+    # Find the index of the last character, ignoring trailing whitespace.
+    my $rtrim = $line;
+    $rtrim =~ s/\s+\z//;
+    return (0, $line) if $rtrim eq '';
+
+    my @chars = split //, $rtrim;
+    my $last  = $#chars;
+    return (0, $line) unless $chars[$last] eq '&';
+
+    # && is a compound operator, not background.
+    return (0, $line) if $last >= 1 && $chars[$last-1] eq '&';
+    # >& is fd duplication, not background.
+    return (0, $line) if $last >= 1 && $chars[$last-1] eq '>';
+
+    # Verify the trailing & is outside quotes and not backslash-escaped by
+    # scanning up to it.  $esc_last becomes true if the char at $last is
+    # escaped by an immediately preceding (unquoted) backslash.
+    my $in_sq    = 0;
+    my $in_dq    = 0;
+    my $esc_last = 0;
+    my $i        = 0;
+    while ($i < $last) {
+        my $ch = $chars[$i];
+        if ($in_sq) {
+            $in_sq = 0 if $ch eq "'";
+            $i++; next;
+        }
+        if ($ch eq '\\' && !$in_sq) {       # backslash escapes next char
+            $esc_last = 1 if $i + 1 == $last;
+            $i += 2; next;
+        }
+        if ($ch eq "'" && !$in_dq) { $in_sq = 1; $i++; next }
+        if ($ch eq '"' && !$in_sq) { $in_dq = !$in_dq; $i++; next }
+        $i++;
+    }
+    return (0, $line) if $in_sq || $in_dq;   # & is inside a quote
+    return (0, $line) if $esc_last;          # & is backslash-escaped
+
+    # Strip the trailing & (and surrounding whitespace before it).
+    my $stripped = join('', @chars[0 .. $last-1]);
+    $stripped =~ s/\s+\z//;
+    return (0, $line) if $stripped eq '';     # nothing to run
+
+    return (1, $stripped);
+}
+
+# _sh_word_is_foreground: true when the first word of a backgrounded line
+# is a BATsh builtin, defined SH function, control keyword, or a variable
+# assignment.  Such commands run in the foreground and the trailing &
+# is ignored (documented limitation: only external commands background).
+sub _sh_word_is_foreground {
+    my ($w) = @_;
+    return 0 unless defined $w && $w ne '';
+
+    # VAR=value assignment
+    return 1 if $w =~ /\A[A-Za-z_][A-Za-z0-9_]*=/;
+
+    # test bracket and no-op
+    return 1 if $w eq '[' || $w eq ':' || $w eq '.';
+
+    my $lc = lc($w);
+
+    my %builtin = (
+        export => 1, unset => 1, echo => 1, printf => 1, cd => 1,
+        pwd => 1, exit => 1, 'true' => 1, 'false' => 1, read => 1,
+        test => 1, source => 1, 'return' => 1, 'break' => 1,
+        'continue' => 1, shift => 1, local => 1, set => 1,
+    );
+    return 1 if $builtin{$lc};
+
+    # Control keywords (defensive; these are normally handled in _run_lines)
+    my %kw = (
+        'if' => 1, then => 1, 'else' => 1, elif => 1, fi => 1,
+        'for' => 1, 'while' => 1, until => 1, 'do' => 1, done => 1,
+        case => 1, esac => 1, function => 1, in => 1,
+    );
+    return 1 if $kw{$lc};
+
+    # Defined SH function (case-sensitive, as in _exec_line dispatch)
+    return 1 if exists $_SH_FUNCTIONS{$w};
+
+    return 0;
+}
+
+# _bg_tempfile: create a unique, empty temp file (O_CREAT|O_EXCL to avoid
+# symlink races) for capturing a background job's PID on Unix-like systems.
+# Returns the path, or undef on failure.
+sub _bg_tempfile {
+    my $dir = $ENV{'TMPDIR'} || $ENV{'TEMP'} || $ENV{'TMP'} || '';
+    $dir = '/tmp' if $dir eq '' && -d '/tmp';
+    $dir = '.'    if $dir eq '';
+    $dir =~ s{[\\/]+\z}{};
+    $dir = '.' if !(-d $dir && -w $dir);
+
+    my $attempt = 0;
+    while ($attempt < 1000) {
+        $_BG_SEQ++;
+        $attempt++;
+        my $path = $dir . '/' . 'batsh_bg_' . $$ . '_' . $_BG_SEQ;
+        if (sysopen(_BG_TMP, $path, O_WRONLY | O_CREAT | O_EXCL, 0600)) {
+            close(_BG_TMP);
+            push @_BG_TMPFILES, $path;
+            return $path;
+        }
+        # EEXIST or transient error: retry with next sequence number
+    }
+    warn "sh: cannot create background pidfile in $dir: $!\n";
+    return undef;
+}
+
+# _bg_launch: start $cmdline asynchronously.
+#   Win32      : system(1, STRING) spawns via the command shell (P_NOWAIT)
+#                and returns the PID directly.
+#   Unix-like  : delegate to /bin/sh so the job is backgrounded without a
+#                Perl fork; the shell's $! (the job PID) is written to a
+#                temp file and read back into BATsh's own $!.
+# On a successful launch $? (LAST_STATUS) is 0; the exit code of the
+# background job itself is not awaited (sh semantics).
+sub _bg_launch {
+    my ($class, $cmdline) = @_;
+    $cmdline = '' unless defined $cmdline;
+    return 0 if $cmdline =~ /\A\s*\z/;
+    BATsh::Env->sync_to_env();
+
+    if ($^O =~ /MSWin32/i) {
+        my $pid = system(1, $cmdline);
+        if (defined $pid && $pid > 0) {
+            $_LAST_BG_PID = $pid;
+            $LAST_STATUS  = 0;
+        }
+        else {
+            warn "sh: failed to start background process\n";
+            $LAST_STATUS = 1;
+        }
+        return $LAST_STATUS;
+    }
+
+    # Unix-like
+    my $pidfile = _bg_tempfile();
+    my $rc;
+    if (defined $pidfile) {
+        # Group the command so that the whole list (pipelines, &&, ...) is
+        # backgrounded as a unit, then echo the job PID ($!) to the file.
+        $rc = system("{ $cmdline ; } & echo \$! > '$pidfile'");
+        if (open(_BG_PIDFH, "< $pidfile")) {
+            local $/;
+            my $buf = <_BG_PIDFH>;
+            close(_BG_PIDFH);
+            $buf = '' unless defined $buf;
+            my $pid = '';
+            ($pid) = ($buf =~ /(\d+)/);
+            $_LAST_BG_PID = $pid if defined $pid && $pid ne '';
+        }
+        unlink $pidfile;
+        @_BG_TMPFILES = grep { $_ ne $pidfile } @_BG_TMPFILES;
+    }
+    else {
+        $rc = system("{ $cmdline ; } &");
+    }
+    $LAST_STATUS = (defined $rc && $rc != -1) ? 0 : 1;
+    return $LAST_STATUS;
+}
+
+
+# ----------------------------------------------------------------
 # Split "cmd rest" honouring quoted strings
 # ----------------------------------------------------------------
 sub _split_sh {
@@ -1909,6 +2291,222 @@ sub _split_sh {
     }
     return ($line, '');
 }
+
+# ----------------------------------------------------------------
+# _sh_assign_prefix: detect POSIX assignment prefixes on a RAW (un-expanded)
+# command line, e.g. `IFS= read -r LINE` or `LC_ALL=C sort file`.
+#
+# Parses one or more leading VAR=VALUE words, where VALUE is read with
+# quote / $(...) / backtick awareness so that an assignment whose value
+# merely *contains* spaces (e.g. UPPER=$(echo "a b")) is NOT mistaken for
+# a prefix followed by a command.
+#
+# Returns (\@pairs, $remainder):
+#   - @pairs is a list of [VAR, RAW_VALUE] (value still un-expanded)
+#   - $remainder is the rest of the line (the command to run), '' if none
+# Returns () when the line does not begin with an assignment.
+# ----------------------------------------------------------------
+sub _sh_assign_prefix {
+    my ($line) = @_;
+    my @chars = split //, $line;
+    my $n     = scalar @chars;
+    my $i     = 0;
+    my @pairs = ();
+
+    while (1) {
+        # Skip leading spaces between successive assignments.
+        $i++ while $i < $n && ($chars[$i] eq ' ' || $chars[$i] eq "\t");
+        last if $i >= $n;
+
+        # Match a variable name followed by '='.
+        my $j    = $i;
+        my $name = '';
+        if ($chars[$j] =~ /[A-Za-z_]/) {
+            $name .= $chars[$j]; $j++;
+            while ($j < $n && $chars[$j] =~ /[A-Za-z0-9_]/) { $name .= $chars[$j]; $j++ }
+        }
+        last unless length($name) && $j < $n && $chars[$j] eq '=';
+        $j++;   # consume '='
+
+        # Read the value with quote / $() / backtick awareness.
+        my $val   = '';
+        my $in_sq = 0;
+        my $in_dq = 0;
+        my $depth = 0;   # $( ) nesting
+        my $in_bt = 0;   # backticks
+        while ($j < $n) {
+            my $c = $chars[$j];
+            if ($in_sq) { $val .= $c; $in_sq = 0 if $c eq "'"; $j++; next }
+            if ($c eq "'" && !$in_dq && !$in_bt) { $in_sq = 1; $val .= $c; $j++; next }
+            if ($c eq '"' && !$in_bt) { $in_dq = !$in_dq; $val .= $c; $j++; next }
+            if (!$in_dq && $c eq '`') { $in_bt = !$in_bt; $val .= $c; $j++; next }
+            if (!$in_dq && !$in_bt && $c eq '$' && $j + 1 < $n && $chars[$j+1] eq '(') {
+                $depth++; $val .= '$('; $j += 2; next;
+            }
+            if (!$in_dq && !$in_bt && $depth > 0 && $c eq ')') {
+                $depth--; $val .= ')'; $j++; next;
+            }
+            if (!$in_sq && !$in_dq && !$in_bt && $depth == 0
+                && ($c eq ' ' || $c eq "\t")) {
+                last;   # end of this value word
+            }
+            $val .= $c; $j++;
+        }
+
+        push @pairs, [$name, $val];
+        $i = $j;
+
+        # Peek: is there a following non-space token?
+        my $k = $i;
+        $k++ while $k < $n && ($chars[$k] eq ' ' || $chars[$k] eq "\t");
+        last if $k >= $n;   # nothing follows: trailing pure assignment(s)
+
+        # Is the next token another assignment?  If so, loop; otherwise the
+        # remainder is the command.
+        my $m    = $k;
+        my $nm2  = '';
+        if ($chars[$m] =~ /[A-Za-z_]/) {
+            $nm2 .= $chars[$m]; $m++;
+            while ($m < $n && $chars[$m] =~ /[A-Za-z0-9_]/) { $nm2 .= $chars[$m]; $m++ }
+        }
+        if (length($nm2) && $m < $n && $chars[$m] eq '=') {
+            $i = $k;   # next assignment; continue the loop
+            next;
+        }
+
+        # Remainder is a command.
+        my $remainder = join('', @chars[$k .. $n-1]);
+        return (\@pairs, $remainder);
+    }
+
+    # No command remainder: either not an assignment at all, or pure
+    # assignment(s) which the normal post-expansion path handles.
+    return () unless @pairs;
+    return (\@pairs, '');
+}
+
+# ----------------------------------------------------------------
+# Here-document support (Perl 5.005_03 compatible)
+# ----------------------------------------------------------------
+# _hd_detect: scan a command line for an *unquoted* << operator.
+# Returns () if none found, otherwise:
+#   ($cmd_part, $dash, $delim, $quoted)
+# where $cmd_part is the command with the "<< DELIM" token removed
+# (text after the delimiter, e.g. trailing redirections, is preserved),
+# $dash is 1 for <<- (strip leading tabs), $delim is the delimiter word,
+# and $quoted is 1 when the delimiter was quoted (suppresses expansion).
+sub _hd_detect {
+    my ($line) = @_;
+    my @chars = split //, $line;
+    my $n     = scalar @chars;
+    my $in_sq = 0;
+    my $in_dq = 0;
+    my $i     = 0;
+
+    while ($i < $n) {
+        my $ch = $chars[$i];
+
+        if ($in_sq) {
+            $in_sq = 0 if $ch eq "'";
+            $i++; next;
+        }
+        if ($ch eq "'" && !$in_dq) { $in_sq = 1; $i++; next }
+        if ($ch eq '"' && !$in_sq) { $in_dq = !$in_dq; $i++; next }
+        if ($ch eq '\\') { $i += 2; next }
+
+        # Unquoted << (but not <<<, which is a here-string: not supported)
+        if (!$in_dq && $ch eq '<' && $i+1 < $n && $chars[$i+1] eq '<'
+                && !($i+2 < $n && $chars[$i+2] eq '<')) {
+            my $cmd_part = join('', @chars[0 .. $i-1]);
+            my $j = $i + 2;
+            my $dash = 0;
+            if ($j < $n && $chars[$j] eq '-') { $dash = 1; $j++ }
+            $j++ while $j < $n && ($chars[$j] eq ' ' || $chars[$j] eq "\t");
+
+            my $quoted = 0;
+            my $q = '';
+            if ($j < $n && ($chars[$j] eq "'" || $chars[$j] eq '"')) {
+                $quoted = 1; $q = $chars[$j]; $j++;
+            }
+            my $delim = '';
+            if ($quoted) {
+                while ($j < $n && $chars[$j] ne $q) { $delim .= $chars[$j]; $j++ }
+                $j++ if $j < $n;   # skip closing quote
+            }
+            else {
+                while ($j < $n && $chars[$j] =~ /\w/) { $delim .= $chars[$j]; $j++ }
+            }
+            return () if $delim eq '';   # malformed; treat as ordinary line
+
+            my $rest = join('', @chars[$j .. $n-1]);
+            $cmd_part .= $rest;          # preserve trailing tokens
+            return ($cmd_part, $dash, $delim, $quoted);
+        }
+
+        $i++;
+    }
+    return ();
+}
+
+# _hd_tempfile: write $body to a uniquely-named temp file using
+# sysopen(... O_CREAT|O_EXCL ...) to avoid symlink races.
+# Returns the path, or undef on failure.
+sub _hd_tempfile {
+    my ($body) = @_;
+
+    my $dir = $ENV{'TMPDIR'} || $ENV{'TEMP'} || $ENV{'TMP'} || '';
+    $dir = '/tmp' if $dir eq '' && -d '/tmp';
+    $dir = '.'    if $dir eq '';
+    $dir =~ s{[\\/]+\z}{};
+    $dir = '.' if !(-d $dir && -w $dir);
+
+    my $attempt = 0;
+    while ($attempt < 1000) {
+        $_HD_SEQ++;
+        $attempt++;
+        my $path = $dir . '/' . 'batsh_hd_' . $$ . '_' . $_HD_SEQ;
+        if (sysopen(_HD_TMP, $path, O_WRONLY | O_CREAT | O_EXCL, 0600)) {
+            binmode(_HD_TMP);
+            print _HD_TMP $body;
+            close(_HD_TMP);
+            push @_HD_TMPFILES, $path;
+            return $path;
+        }
+        # EEXIST or transient error: retry with next sequence number
+    }
+    warn "sh: cannot create here-document temp file in $dir: $!\n";
+    return undef;
+}
+
+# _hd_run: materialise the here-document body and run the command with
+# its STDIN connected to the body, reusing the existing redirect path.
+sub _hd_run {
+    my ($class, $cmd_part, $body_ref, $quoted, $opts_ref) = @_;
+
+    my @body = @{$body_ref};
+    if (!$quoted) {
+        for my $b (@body) { $b = _expand($class, $b) }
+    }
+    my $text = '';
+    for my $b (@body) { $text .= $b . "\n" }
+
+    my $tmp = _hd_tempfile($text);
+    if (!defined $tmp) { $LAST_STATUS = 2; return 2 }
+
+    my @redir = ( [0, 0, $tmp] );   # fd=0 (stdin), append=0, source=tmp
+    my $rc = _sh_exec_with_redirs($class, $cmd_part, \@redir, $opts_ref);
+
+    unlink $tmp;
+    @_HD_TMPFILES = grep { $_ ne $tmp } @_HD_TMPFILES;
+    return $rc;
+}
+
+# Failsafe: remove any here-document temp files left behind on abnormal exit.
+END { for my $f (@_HD_TMPFILES) { unlink $f if defined $f } }
+
+# Failsafe: remove any background-job pidfiles left behind on abnormal exit.
+END { for my $f (@_BG_TMPFILES) { unlink $f if defined $f } }
+
 
 # ----------------------------------------------------------------
 # Accessors
@@ -1950,7 +2548,7 @@ BATsh::SH - Pure Perl bash/sh interpreter for BATsh
   for i in 1 2 3; do
       echo item $i
   done
-  ls /tmp | perl -e 'while(<STDIN>){print}'
+  ls /tmp | perl -ne "print"
   echo out > /tmp/out.txt
   END
 
@@ -1975,7 +2573,7 @@ and rich parameter expansion: ${var%pat}, ${var^^}, ${var:N:L}, ${#var}.
   greet() { echo "Hello from $1!"; }
   greet $CITY
   echo "lower: ${CITY,,}"
-  echo $CITY | perl -e 'while(<STDIN>){chomp;print uc,chr(10)}'
+  echo $CITY | perl -ne "print uc"
   SCRIPT
 
 =head1 FULL DESCRIPTION
@@ -1996,7 +2594,7 @@ No external sh or bash is required.
   cd, pwd, exit, true, false, :, read, shift, local, set
   $(( arithmetic )) -- supports $1..$9 positional params
   $( command substitution ), `backtick substitution`
-  $VAR, ${VAR}, $1..$9, $@, $*, $#, $?, $$
+  $VAR, ${VAR}, $1..$9, $@, $*, $#, $?, $$, $0, $!
   ${VAR:-default}, ${VAR:=default}, ${VAR:+alt}
   ${VAR%pat}, ${VAR%%pat}  -- suffix removal (shortest/longest)
   ${VAR#pat}, ${VAR##pat}  -- prefix removal (shortest/longest)
@@ -2013,12 +2611,19 @@ No external sh or bash is required.
   > file, >> file, < file  (I/O redirection)
   2> file, 2>> file        (stderr redirect)
   2>&1                     (merge stderr into stdout)
+  cmd << DELIM ... DELIM   (here-document on STDIN)
+  cmd <<-DELIM             (here-document, strip leading tabs)
+  cmd <<'DELIM'            (here-document, no expansion)
+  cmd &                    (background execution; external commands)
 
 =head2 Variable Expansion
 
 C<$VAR>, C<${VAR}>, and positional parameters C<$1>..C<$9> are expanded
 before each line executes.  C<$@> and C<$*> expand to all positional
-parameters space-joined; C<$#> gives their count.
+parameters space-joined; C<$#> gives their count.  The special parameters
+C<$?> (last exit status), C<$$> (process id), C<$0> (script name) and
+C<$!> (process id of the most recent background job, empty before any) are
+also expanded.
 
 The following parameter expansion forms are supported:
 
@@ -2072,6 +2677,166 @@ Redirections are parsed B<after> variable expansion, so filenames may
 contain variables (e.g. C<echo text E<gt> $outfile>).  All file handles
 use bareword globs for Perl 5.005_03 compatibility.
 
+=head2 Here-Documents
+
+A here-document attaches the lines following the command, up to a line
+equal to a delimiter word, to the command's standard input:
+
+  cat <<EOF
+  line one
+  line two
+  EOF
+
+Three forms are recognised:
+
+  cmd <<DELIM      body is variable-expanded
+  cmd <<'DELIM'    body is literal (no expansion); "DELIM" also works
+  cmd <<-DELIM     leading tab characters are stripped from body and
+                   from the line carrying the closing delimiter
+
+When the delimiter is unquoted, each body line is expanded exactly like
+an ordinary SH line (C<$VAR>, C<${...}>, C<$(...)>).  When the delimiter
+is quoted, the body is passed through verbatim.
+
+The body is written to a uniquely named temporary file created with
+C<sysopen(...,O_CREAT|O_EXCL,...)> to avoid symlink races, and that file
+is supplied as standard input through the same redirection path used by
+C<E<lt> file>.  Both built-ins (e.g. C<read>) and external commands run
+via C<system()> therefore see the body on STDIN.  The temporary file is
+removed immediately after the command finishes, with an C<END> block as a
+failsafe.  This implementation is Pure Perl and Perl 5.005_03 compatible.
+
+The closing delimiter must appear on a line by itself and match exactly
+(after tab stripping for C<<-E<lt>E<lt>->>); trailing whitespace is not
+ignored.  If no matching delimiter is found before end of input, a
+warning is issued and C<$?> is set to a non-zero value.
+
+=head3 Here-Document Limitations
+
+The following are B<not> supported in this release and are documented as
+known limitations:
+
+=over 4
+
+=item *
+
+Here-documents are recognised only in SH mode.  The C<E<lt>E<lt>>
+sequence has no special meaning in CMD mode (C<BATsh::CMD>) and is left
+untouched there.
+
+=item *
+
+Only a single here-document per command line is handled.  Multiple
+here-documents on one line (C<cmd E<lt>E<lt>A E<lt>E<lt>B>) are not
+supported.
+
+=item *
+
+Here-strings (C<E<lt>E<lt>E<lt> word>) are not supported; C<E<lt>E<lt>E<lt>>
+is deliberately not treated as a here-document opener.
+
+=item *
+
+Combining a here-document with a pipeline or compound operator on the
+same line (e.g. C<cmd E<lt>E<lt>EOF | other>) is best-effort only and not
+guaranteed; use a separate command for portable behaviour.
+
+=item *
+
+The delimiter word is matched literally; the C<E<lt>E<lt>"a b"> form with
+an embedded space in the delimiter is not supported.
+
+=item *
+
+A here-document body line that looks like a BATsh subroutine marker
+(a line of the form C<:LABEL> later followed by C<RET>/C<RETURN>) may be
+consumed by subroutine extraction, which runs before mode dispatch.
+Avoid such lines inside here-document bodies.
+
+=back
+
+=head2 Background Execution
+
+An unquoted C<&> at the very end of an SH command line starts the command
+asynchronously and returns control immediately, in the style of POSIX
+shells:
+
+  longjob &
+  echo "next prompt"
+
+Only the single C<&> at the end of the line is consumed.  An C<&> that is
+part of C<&&>, of an fd-duplication such as C<2E<gt>&1> or C<1E<gt>&2>,
+inside single or double quotes, or backslash-escaped (C<\&>) is B<not>
+treated as a background operator and is left in place.
+
+The launch is Pure Perl and Perl 5.005_03 compatible, with a portable
+split by platform:
+
+=over 4
+
+=item *
+
+On Win32, the command is spawned through the command shell with
+C<system(1, ...)> (P_NOWAIT), which returns the process id directly.
+
+=item *
+
+On Unix-like systems the command is started by delegating to F</bin/sh>
+(no Perl C<fork> is used), and the background job's process id is captured
+through the shell's own C<$!> into a uniquely named temporary file created
+with C<sysopen(...,O_CREAT|O_EXCL,...)>.  The temporary file is removed
+immediately, with an C<END> block as a failsafe.
+
+=back
+
+On a successful launch C<$?> is set to C<0>; the exit status of the
+background job itself is B<not> awaited.  The process id of the most
+recently started background job is available through C<$!>, which expands
+to the empty string before any background job has been started.
+
+=head3 Background Execution Limitations
+
+The following are B<not> supported in this release and are documented as
+known limitations:
+
+=over 4
+
+=item *
+
+Background execution applies only to B<external> commands in SH mode.
+A trailing C<&> on a built-in, a defined function, a variable assignment,
+or a control keyword is ignored and the command runs in the foreground.
+In CMD mode (C<BATsh::CMD>) C<&> keeps its cmd.exe meaning as a sequential
+command separator and is unchanged.
+
+=item *
+
+Only a trailing C<&> is recognised.  A mid-line C<&> that backgrounds part
+of a line (e.g. C<a & b>) is not supported; write C<a> on its own line
+with a trailing C<&> instead.
+
+=item *
+
+There is no job control: C<jobs>, C<wait>, C<wait %n>, C<fg>, C<bg> and
+job-specification (C<%n>) syntax are not implemented.  Signals are not
+delivered to background jobs by BATsh.
+
+=item *
+
+A backgrounded pipeline or compound list is delegated as a unit to the
+underlying OS shell; BATsh expands variables and command substitutions
+first, then hands the resulting line to that shell, so redirections and
+operators inside a backgrounded line follow OS-shell rules rather than
+BATsh's own redirection engine.
+
+=item *
+
+When the command word is supplied by a variable (e.g. C<$CMD &>), the
+foreground/background decision is made on the literal first token before
+expansion; such lines are treated as external and backgrounded.
+
+=back
+
 =head2 Compound Commands
 
   cmd1 && cmd2    run cmd2 only if cmd1 exits with status 0
@@ -2095,7 +2860,7 @@ value of C<VAR> in the function's stack frame and restores it on return.
 
 =head1 AUTHOR
 
-INABA Hitoshi E<lt>ina@cpan.orgE<gt>
+INABA Hitoshi E<lt>ina.cpan@gmail.comE<gt>
 
 =head1 LICENSE
 

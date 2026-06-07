@@ -11,7 +11,7 @@ use File::Spec::Functions ( qw| catdir catfile | );
 use File::Path ( qw| make_path | );
 use File::Temp ( qw| tempdir tempfile |);
 use Data::Dump ( qw| dd pp | );
-use Test::RequiresInternet ('ftp.funet.fi' => 21);
+use Test::RequiresInternet;
 use Test::Against::Dev;
 use Test::More;
 use lib ('./t/lib');

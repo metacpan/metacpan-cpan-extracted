@@ -7,8 +7,9 @@ use Carp qw(croak);
 
 use XSLoader;
 BEGIN {
-    our $VERSION = '1.0105';
+    our $VERSION = '1.0201';
     XSLoader::load;
+    #$VERSION =~ tr/_//d;
 }
 
 my %export = (
@@ -99,39 +100,54 @@ For longer strings you can use C<qc_to>, which provides a
 L<heredoc-like|perlop/<<I<EOF>> syntax. The main difference between C<qc> and
 C<qc_to> is that C<qc_to> uses the Ruby-like C<#{ ... }> to interpolate code
 (not C<{ ... }>). This is because C<{ }> are more common in longer texts and
-escaping them gets annoying.
+having to always escape them gets annoying.
 
 C<qc_to> has two syntactic forms:
 
-    qc_to <<'FOO'
-    ...
-    FOO
+    qc_to <<~'FOO'
+        ...
+        FOO
 
 and
 
-    qc_to <<"FOO"
-    ...
-    FOO
+    qc_to <<~"FOO"
+        ...
+        FOO
 
 After C<qc_to> there must always be a C<E<lt>E<lt>> (this is to give syntax
-highlighters a chance to get things right). After that, there are two
-possibilities:
+highlighters a chance to get things right), optionally followed by a C<~>
+(tilde). If the C<~> modifier is included, indentation will be stripped from
+the contents of the here-doc (see below).
+
+After that, there are two possibilities:
 
 =over
 
 =item *
 
-An identifier in single quotes. Backslash isn't treated specially in the
+A delimiter in single quotes. Backslash isn't treated specially in the
 string. To embed a literal C<#{>, you need to write C<#{'#{'}>.
 
 =item *
 
-An identifier in double quotes. Backslash escapes are recognized. You can
+A delimiter in double quotes. Backslash escapes are recognized. You can
 escape C<#{> by writing either C<\#{> or C<#\{>.
 
 =back
 
 Variables aren't interpolated in either case.
+
+Without the C<~> modifier, the here-doc construct is terminated by a line
+containing exactly the specified delimiter.
+
+With the C<~> modifier, the here-doc construct is terminated by a line
+containing optional indentation (spaces or tabs) followed by the delimiter. The
+indentation preceding the delimiter will be stripped from all lines in the
+here-doc and it is an error if any line in the here-doc does not start with the
+exact sequence of spaces and tabs preceding the delimiter. (In particular, tabs
+are not considered equivalent to 8 spaces.) This feature allows you to indent
+the contents of the here-doc in your source code (including the delimiter)
+without the indentation becoming part of the string data.
 
 =head2 qcw
 

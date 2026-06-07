@@ -1,5 +1,9 @@
 Revision history for Perl module Locale::Unicode::Data
 
+v1.8.4 2026-06-07T07:20:16+0900
+    - Fixed SQLite handle caching under ithreads. Database handles are now cached
+      properly per thread.
+
 v1.8.3 2026-04-23T21:36:14+0900
     - Correcting tests when running under non-threaded perl
 

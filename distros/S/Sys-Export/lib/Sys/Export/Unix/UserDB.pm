@@ -1,7 +1,7 @@
 package Sys::Export::Unix::UserDB;
 
 # ABSTRACT: Abstractions for Unix passwd/group/shadow files
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 use v5.26;
 use warnings;
@@ -1009,7 +1009,7 @@ Group password, which should never be used anyway.  Leave this C<undef> or C<'*'
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

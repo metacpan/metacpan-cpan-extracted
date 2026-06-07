@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Unicode Locale Identifier - ~/lib/Locale/Unicode/Data.pm
-## Version v1.8.3
+## Version v1.8.4
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/06/15
-## Modified 2026/04/23
+## Modified 2026/06/07
 ## All rights reserved
 ## 
 ## 
@@ -40,7 +40,7 @@ BEGIN
     our $CLDR_VERSION = '48.2';
     our $DBH = {};
     our $STHS = {};
-    our $VERSION = 'v1.8.3';
+    our $VERSION = 'v1.8.4';
 };
 
 use strict;
@@ -3230,7 +3230,8 @@ sub _dbh
     {
         $dbh->{sqlite_string_mode} = DBD::SQLite::Constants::DBD_SQLITE_STRING_MODE_UNICODE_FALLBACK;
     }
-    return( $DBH->{ $file } = $dbh );
+    $DBH->{ $tid } //= {};
+    return( $DBH->{ $tid }->{ $file } = $dbh );
 }
 
 sub _decode_sql_arrays
@@ -5038,7 +5039,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v1.8.3
+    v1.8.4
 
 =head1 DESCRIPTION
 

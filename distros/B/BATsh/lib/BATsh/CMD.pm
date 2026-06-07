@@ -1,5 +1,5 @@
 package BATsh::CMD;
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com>
 ######################################################################
 #
 # BATsh::CMD - Pure Perl cmd.exe interpreter
@@ -36,7 +36,7 @@ use File::Copy ();
 use File::Path ();
 use Carp qw(croak);
 use vars qw($VERSION);
-$VERSION = '0.02';
+$VERSION = '0.04';
 $VERSION = $VERSION;
 
 require BATsh::Env;
@@ -74,7 +74,7 @@ sub exec_block {
         my $raw = $lines[$i];
         $i++;
         $raw =~ s/\r?\n\z//;
-        my $rc = _exec_line($class, $raw, \@lines, \%labels, \$i, \%opts);
+        my $rc = _exec_line($class, $raw, \@lines, { %labels }, \$i, { %opts });
 
         if ($_GOTO_LABEL ne '') {
             my $lbl = $_GOTO_LABEL;
@@ -914,7 +914,7 @@ sub _exec_body {
         my $sl = $sub_lines[$sub_i];
         $sub_i++;
         # For pre_expanded blocks: still need to handle !VAR! at runtime
-        my $rc = _exec_line($class, $sl, \@sub_lines, \%sub_labels, \$sub_i, $opts_ref, $pre_expanded);
+        my $rc = _exec_line($class, $sl, \@sub_lines, { %sub_labels }, \$sub_i, $opts_ref, $pre_expanded);
         return $rc if defined $rc && $rc eq '__EXIT__';
         if ($_GOTO_LABEL ne '') {
             my $lbl = $_GOTO_LABEL;
@@ -1563,7 +1563,7 @@ ECHO does B<not> reset ERRORLEVEL (unlike some broken implementations).
 
 =head1 AUTHOR
 
-INABA Hitoshi E<lt>ina@cpan.orgE<gt>
+INABA Hitoshi E<lt>ina.cpan@gmail.comE<gt>
 
 =head1 LICENSE
 

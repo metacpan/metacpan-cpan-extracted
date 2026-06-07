@@ -13,7 +13,7 @@ my $build = Module::Build->new(
    },
    test_requires => {
       'Metrics::Any' => '0.05',
-      'Test::More' => '0.88', # done_testing
+      'Test2::V0' => 0,
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

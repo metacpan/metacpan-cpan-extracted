@@ -61,7 +61,7 @@ subtest 'parse' => sub
                     $def->{ $att } eq $elem->param( $att ) or ++$fail, last ELEM;
                 }
             }
-        
+
             if( $fail )
             {
                 fail( $t->{test} );
@@ -81,7 +81,7 @@ subtest 'stringify' => sub
     { value => 'site_prefs=lang%3Den-GB', params => { path => '/', expires => 'Monday, 01-Nov-2021 17:12:40 GMT', domain => 'www.example.com', secure => undef }, expect => 'site_prefs=lang%3Den-GB; domain=www.example.com; expires="Monday, 01-Nov-2021 17:12:40 GMT"; path="/"; secure' },
     { value => 'site_prefs=lang%3Den-GB', params => { path => '/', expires => 'Monday, 01-Nov-2021 17:12:40 GMT', domain => 'www.example.com' }, expect => 'site_prefs=lang%3Den-GB; domain=www.example.com; expires="Monday, 01-Nov-2021 17:12:40 GMT"; path="/"', decode => 1, encode => 1 }
     ];
-    
+
     foreach my $t ( @$tests )
     {
         my $expect = delete( $t->{expect} );

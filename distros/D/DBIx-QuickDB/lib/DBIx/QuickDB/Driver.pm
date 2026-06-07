@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver;
 use strict;
 use warnings;
 
-our $VERSION = '0.000047';
+our $VERSION = '0.000048';
 
 use Carp qw/croak confess/;
 use File::Path qw/remove_tree/;
@@ -363,26 +363,16 @@ sub stop {
         }
     );
 
-    my $server_pid = $watcher->server_pid;
     $watcher->stop();
 
     unless ($params{no_wait}) {
+        # wait() blocks until the watcher process exits, and the watcher reaps
+        # the server before it exits -- so once wait() returns the server is
+        # gone. Trust that instead of polling a stored server pid: after the
+        # watcher exits that pid may have been recycled by the OS to an
+        # unrelated process, and polling it could hang/confess on the wrong
+        # process (the same pid-reuse hazard the watcher teardown guards against).
         $watcher->wait();
-
-        # The watcher reaps the server process before it exits, so once wait()
-        # has returned the server is gone. Confirm via the pid rather than the
-        # unix socket file: a server killed with SIGKILL (e.g. a slow shutdown
-        # that blew the watcher's grace period) never gets to remove its socket,
-        # so waiting for the socket to disappear would hang and then time out.
-        # The watcher escalates to SIGKILL after QDB_STOP_GRACE and gives up at
-        # twice that; outlast the watcher's give-up so we never confess before
-        # it has finished reaping the server. Defaults to 10s (grace 4).
-        my $stop_timeout = env_timeout(QDB_STOP_GRACE => 4) * 2 + 2;
-        my $start = time;
-        while ($server_pid && kill(0, $server_pid)) {
-            confess "Timed out waiting for server to stop" if time - $start > $stop_timeout;
-            sleep 0.01;
-        }
 
         # Remove a stale unix socket left behind by a hard kill so it does not
         # confuse callers or a later run that reuses the same directory.
@@ -406,23 +396,16 @@ sub DESTROY {
     return unless $self->{+ROOT_PID} && $self->{+ROOT_PID} == $$;
 
     if (my $watcher = delete $self->{+WATCHER}) {
-        my $server_pid = $watcher->server_pid;
+        # eliminate() signals the watcher to stop the server and delete the data
+        # dir; destroying the watcher then blocks (via Watcher::wait) until the
+        # watcher process has exited, and the watcher reaps the server before it
+        # exits. So once $watcher is gone the server is gone too. We deliberately
+        # do NOT fall back to signalling a stored server pid here: after the
+        # watcher exits that pid may have been recycled to an unrelated process
+        # (the pid-reuse hazard), so a stray TERM/KILL could hit the wrong one.
         $watcher->eliminate();
-        # Watcher::DESTROY (triggered by $watcher going out of scope) calls
-        # wait(), which blocks until the watcher process exits. After that,
-        # the server should be stopped and the dir cleaned up. But as a
-        # fallback, kill the server directly if it's still alive.
         undef $watcher;
 
-        if ($server_pid && kill(0, $server_pid)) {
-            kill('TERM', $server_pid);
-            my $start = time;
-            while (kill(0, $server_pid)) {
-                last if time - $start > 5;
-                sleep 0.1;
-            }
-            kill('KILL', $server_pid) if kill(0, $server_pid);
-        }
         $self->cleanup() if $self->should_cleanup;
     }
     elsif ($self->should_cleanup) {

@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2026 -- leonerd@leonerd.org.uk
 
-package Metrics::Any::Adapter::SignalFx 0.03;
+package Metrics::Any::Adapter::SignalFx 0.04;
 
 use v5.14;
 use warnings;
@@ -18,10 +18,17 @@ C<Metrics::Any::Adapter::SignalFx> - a metrics reporting adapter for SignalFx
 
 =head1 SYNOPSIS
 
+=for highlighter language=perl
+
    use Metrics::Any::Adapter 'SignalFx';
 
+=head1 DESCRIPTION
+
 This extension of L<Metrics::Any::Adapter::Statsd> supports the additional tag
-reporting syntax defined by F<SignalFx> to report labelled metrics.
+reporting syntax defined by F<SignalFx> to report labelled metrics. Due to
+limitations of the line-based protocol, certain characters are not allowed in
+label names or values. Any C<[>, C<]>, C<,>, C<|>, C<=> or linefeeds are
+replaced by C<_>.
 
 =cut
 
@@ -31,7 +38,12 @@ sub _labels
 
    my @labels;
    foreach ( 0 .. $#$labelnames ) {
-      push @labels, "$labelnames->[$_]=$labelvalues->[$_]";
+      my $name  = $labelnames->[$_];
+      my $value = $labelvalues->[$_];
+      # Replace disallowed characters with '_'
+      $_ =~ s/[][,|=\n]/_/g for $name, $value;
+
+      push @labels, "$name=$value";
    }
 
    return "[" . join( ",", @labels ) . "]";

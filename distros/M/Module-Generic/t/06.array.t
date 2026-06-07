@@ -443,7 +443,7 @@ subtest 'callback' => sub
     });
     $test->splice( 2, 0, 'Raphael' );
     is( $test->index(2), 'Raphael', 'splice (2)' );
-    
+
     # Now do removing tests
     diag( "Now do removing tests" ) if( $DEBUG );
     diag( "Elements are: '", $test->join( "', '" ), "'" ) if( $DEBUG );
@@ -482,7 +482,7 @@ subtest 'callback' => sub
     my @removed = $test->splice( 1, 2 );
     is( scalar( @removed ), 2, 'splice (2)' );
     is( "@removed", 'Raphael Peter', 'splice (3)' );
-    
+
     diag( "Elements are: '", $test->join( "', '" ), "'" ) if( $DEBUG );
     $test->callback( remove => sub
     {
@@ -499,7 +499,7 @@ subtest 'callback' => sub
     # diag( "Removing '", $test->[1], "'" ) if( $DEBUG );
     $removed = delete( $test->[1] );
     is( $removed, 'Paul', 'delete (2)' );
-    
+
     diag( "No check blocking addition." ) if( $DEBUG );
     diag( "Elements are: '", $test->join( "', '" ), "'" ) if( $DEBUG );
     $test->callback( add => sub
@@ -565,7 +565,7 @@ subtest 'callback' => sub
     $test->push( qw( Madeleine Isabelle Gabrielle ) );
     is( $test->length, 4, 'remove callback' );
     diag( "Elements are: '", $test->join( "', '" ), "'" ) if( $DEBUG );
-    
+
     $test->callback( remove => sub
     {
         my $this = shift( @_ );
@@ -579,7 +579,7 @@ subtest 'callback' => sub
     $removed = $test->pop;
     is( $removed, undef, 'pop rejected' );
     is( $test->length, 4, 'pop rejected' );
-    
+
     $test->callback( remove => sub
     {
         my $this = shift( @_ );
@@ -593,7 +593,7 @@ subtest 'callback' => sub
     $removed = delete( $test->[2] );
     is( $removed, undef, 'direct removal' );
     is( $test->length, 4, 'direct removal' );
-    
+
     $test->callback( remove => sub
     {
         my $this = shift( @_ );
@@ -606,7 +606,7 @@ subtest 'callback' => sub
     });
     @removed = $test->splice( 1, 2 );
     is( scalar( @removed ), 0, 'splice removed rejected' );
-    
+
     diag( "Removing callbacks" ) if( $DEBUG );
     $test->callback( add => undef );
     $test->callback( remove => undef );

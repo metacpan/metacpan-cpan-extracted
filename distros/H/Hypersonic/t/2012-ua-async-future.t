@@ -1,7 +1,10 @@
 use strict;
 use warnings;
+use FindBin;
+use lib "$FindBin::Bin/lib";
 use Test::More;
 use IO::Socket::INET;
+use HypersonicTest qw(spawn_server wait_for_port);
 
 
 use Hypersonic;
@@ -12,26 +15,34 @@ plan skip_all => 'fork not available' unless $^O ne 'MSWin32';
 my $port = 18879 + ($$ % 1000);
 my $cache_dir = "_test_async_future_cache_$$";
 
-my $pid = fork();
-die "Fork failed: $!" unless defined $pid;
-
-if ($pid == 0) {
+# Use spawn_server/wait_for_port so a cold JIT compile on slow CPAN
+# smokers (e.g. perl 5.18.4 / 5.20 DCANTRELL) gets the full 60s
+# minimum floor wait_for_port enforces, with the child's stderr
+# captured so we can diag the real cause if it bails.
+# Pre-0.18 this test had `for (1..10) { sleep(1) }` (10s budget)
+# which was nowhere near enough for a cold compile, hence the
+# CPAN tester `Test server is running` failures.
+my ($pid, $log) = spawn_server(sub {
     my $server = Hypersonic->new(cache_dir => $cache_dir);
-    
+
     $server->get('/async1' => sub { 'async response 1' });
     $server->get('/async2' => sub { 'async response 2' });
     $server->post('/async-post' => sub { my ($req) = @_; 'posted:' . ($req->{body} // '') });
-    
+
     $server->compile();
     $server->run(port => $port, workers => 1);
-    exit(0);
+});
+
+my $bound = wait_for_port($port, { pid => $pid, log => $log, tries => 100 });
+unless ($bound) {
+    kill 'TERM', $pid;
+    BAIL_OUT("server child failed to bind port $port (see diag above)");
 }
 
-# Wait for server with retries
 my $ready = 0;
-for (1..10) {
+for (1..50) {
     my $sock = IO::Socket::INET->new(
-        PeerAddr => '127.0.0.1', PeerPort => $port, Proto => 'tcp', Timeout => 1
+        PeerAddr => '127.0.0.1', PeerPort => $port, Proto => 'tcp', Timeout => 1,
     );
     if ($sock) {
         print $sock "GET /async1 HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n";
@@ -39,7 +50,11 @@ for (1..10) {
         close($sock);
         if ($resp && $resp =~ /async response 1/) { $ready = 1; last; }
     }
-    sleep(1);
+    select undef, undef, undef, 0.1;
+}
+unless ($ready) {
+    HypersonicTest::diag_child_log($log);
+    kill 'TERM', $pid;
 }
 ok($ready, 'Test server is running');
 

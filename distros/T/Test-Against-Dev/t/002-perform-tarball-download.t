@@ -7,7 +7,7 @@ use Test::More;
 use File::Temp ( qw| tempdir |);
 use Data::Dump ( qw| dd pp | );
 use Capture::Tiny ( qw| capture_stdout capture_stderr | );
-use Test::RequiresInternet ('ftp.funet.fi' => 21);
+use Test::RequiresInternet;
 BEGIN { use_ok( 'Test::Against::Dev' ); }
 
 my $tdir = tempdir(CLEANUP => 1);
@@ -18,8 +18,6 @@ $self = Test::Against::Dev->new( {
 } );
 isa_ok ($self, 'Test::Against::Dev');
 
-my $host = 'ftp.funet.fi';
-my $hostdir = '/pub/languages/perl/CPAN/src/5.0';
 
 {
     local $@;
@@ -33,8 +31,7 @@ my $hostdir = '/pub/languages/perl/CPAN/src/5.0';
     local $@;
     eval {
         my ($tarball_path, $work_dir) = $self->perform_tarball_download( [
-            host                => $host,
-            hostdir             => $hostdir,
+            path                => 'src/5.0',
             perl_version        => 'perl-5.27.1',
             compression         => 'gz',
             verbose             => 0,
@@ -50,8 +47,7 @@ my $hostdir = '/pub/languages/perl/CPAN/src/5.0';
     my $bad_key = 'foo';
     eval {
         my ($tarball_path, $work_dir) = $self->perform_tarball_download( {
-            host                => $host,
-            hostdir             => $hostdir,
+            path                => 'src/5.0',
             perl_version        => 'perl-5.27.1',
             compression         => 'gz',
             verbose             => 0,
@@ -68,8 +64,7 @@ my $hostdir = '/pub/languages/perl/CPAN/src/5.0';
     my $bad_perl_version = '5.27.1';
     eval {
         my ($tarball_path, $work_dir) = $self->perform_tarball_download( {
-            host                => $host,
-            hostdir             => $hostdir,
+            path                => 'src/5.0',
             perl_version        => $bad_perl_version,
             compression         => 'gz',
             verbose             => 0,
@@ -85,8 +80,7 @@ my $hostdir = '/pub/languages/perl/CPAN/src/5.0';
     my $bad_compression = 'foo';
     eval {
         my ($tarball_path, $work_dir) = $self->perform_tarball_download( {
-            host                => $host,
-            hostdir             => $hostdir,
+            path                => 'src/5.0',
             perl_version        => 'perl-5.27.1',
             compression         => $bad_compression,
             verbose             => 0,
@@ -102,8 +96,7 @@ my $hostdir = '/pub/languages/perl/CPAN/src/5.0';
     my $bad_work_dir = '/foo/bar/baz';
     eval {
         my ($tarball_path, $work_dir) = $self->perform_tarball_download( {
-            host                => $host,
-            hostdir             => $hostdir,
+            path                => 'src/5.0',
             perl_version        => 'perl-5.27.1',
             compression         => 'gz',
             work_dir            => $bad_work_dir,
@@ -126,9 +119,9 @@ SKIP: {
         like($@, qr/release directory has not yet been defined; run perform_tarball_download\(\)/,
             "get_release_dir: Got expected error message for premature call");
     };
+    note("gz/non-verbose/mock");
     ($tarball_path, $work_dir) = $self->perform_tarball_download( {
-        host                => $host,
-        hostdir             => $hostdir,
+        path                => 'src/5.0',
         perl_version        => 'perl-5.27.1',
         compression         => 'gz',
         verbose             => 0,
@@ -156,11 +149,11 @@ SKIP: {
     $make_install_command = $self->access_make_install_command($alt);
     is($make_install_command, $alt, "Got user specified make install command");
 
+    note("xz/verbose/mock");
     $stdout = capture_stdout {
         ($tarball_path, $work_dir) = $self->perform_tarball_download( {
-            host                => $host,
-            hostdir             => $hostdir,
-            perl_version        => 'perl-5.27.2',
+            path                => 'src/5.0',
+            perl_version        => 'perl-5.43.10',
             compression         => 'xz',
             verbose             => 1,
             mock                => 1,
@@ -172,13 +165,13 @@ SKIP: {
     ok(-d $release_dir, "Located release dir: $release_dir");
 
     SKIP: {
-        skip 'Live FTP download', 13 unless $ENV{PERL_AUTHOR_TESTING};
-        note("Performing live FTP download of Perl tarball;\n  this may take a while.");
+        skip 'Live HTTPS download', 13 unless $ENV{PERL_AUTHOR_TESTING};
+        note("Performing live HTTPS download of Perl tarball;\n  this may take a while.");
+        note("xz/verbose/real");
         $stdout = capture_stdout {
             ($tarball_path, $work_dir) = $self->perform_tarball_download( {
-                host                => $host,
-                hostdir             => $hostdir,
-                perl_version        => 'perl-5.27.2',
+                path                => 'src/5.0',
+                perl_version        => 'perl-5.43.10',
                 compression         => 'xz',
                 verbose             => 1,
                 mock                => 0,
@@ -189,16 +182,16 @@ SKIP: {
         ok(-d $release_dir, "Located release dir: $release_dir");
         ok(-f $tarball_path, "Downloaded tarball: $tarball_path");
         ok(-d $work_dir, "Located work directory: $work_dir");
-        like($stdout, qr/Beginning FTP download/s,
+        like($stdout, qr/Beginning HTTPS download/s,
             "Got expected verbose output: starting download");
         like($stdout, qr/Perl configure-build-install cycle will be performed in $work_dir/s,
             "Got expected verbose output: cycle location");
         like($stdout, qr/Path to tarball is $tarball_path/s,
             "Got expected verbose output: tarball path");
 
+        note("xz/implicitly non-verbose/implicitly real");
         ($tarball_path, $work_dir) = $self->perform_tarball_download( {
-            host                => $host,
-            hostdir             => $hostdir,
+            path                => 'src/5.0',
             perl_version        => 'perl-5.27.3',
             compression         => 'xz',
         } );

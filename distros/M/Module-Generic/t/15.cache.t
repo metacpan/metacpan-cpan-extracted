@@ -84,7 +84,7 @@ SKIP:
     {
         fail( 'read data check' );
     }
-    
+
     my $os = lc( $^O );
     if( $os eq 'amigaos' || $os eq 'riscos' || $os eq 'vms' )
     {
@@ -142,7 +142,7 @@ SKIP:
             {
                 fail( 'different read data check' );
             }
-            
+
             my $rv = $s->lock || diag( "Unable to lock: ", $s->error );
             ok( $rv, 'lock' );
             ok( $s->locked, 'locked' );

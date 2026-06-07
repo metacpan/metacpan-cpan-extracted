@@ -457,6 +457,7 @@ INLINE void
 json_init (JSON *json)
 {
   Zero (json, 1, JSON);
+  json->flags        = F_ALLOW_NONREF;  /* GH #241: default like JSON::XS 4.0 */
   json->max_depth     = 512;
   json->indent_length = INDENT_STEP;
   json->magic = JSON_MAGIC;
@@ -886,6 +887,7 @@ typedef struct
   char *end;  /* SvEND (sv) */
   SV *sv;     /* result scalar */
   JSON json;
+  JSON *orig_json; /* pointer to original JSON object (for recursion guard) */
   U32 indent; /* indentation level */
   UV limit;   /* escape character values >= this value when encoding */
 } enc_t;
@@ -1635,7 +1637,15 @@ encode_stringify(pTHX_ enc_t *enc, SV *sv, int isref)
       }
 #endif
 #if PERL_VERSION > 13
-      pv = AMG_CALLunary(rv, string_amg);
+      {
+        /* GH #128: protect from endless recursion via "" overload.
+           Temporarily clear convert_blessed and allow_stringify on the
+           original JSON object so re-entrant encode calls won't loop. */
+        U32 flags = enc->orig_json->flags;
+        enc->orig_json->flags &= ~(F_ALLOW_STRINGIFY|F_CONV_BLESSED);
+        pv = AMG_CALLunary(rv, string_amg);
+        enc->orig_json->flags = flags;
+      }
 #else
       pv = AMG_CALLun(rv, string);
 #endif
@@ -1847,8 +1857,14 @@ encode_rv (pTHX_ enc_t *enc, SV *rv)
       else if (enc->json.flags & F_ALLOW_BLESSED)
         encode_const_str (aTHX_ enc, "null", 4, 0);
       else
-        croak ("encountered object '%s', but neither allow_blessed, convert_blessed nor allow_tags settings are enabled (or TO_JSON/FREEZE method missing)",
-               SvPV_nolen (sv_2mortal (newRV_inc (sv))));
+        {
+          /* Use default stringification, bypassing any "" overload (GH #191). */
+          const char *name = HvNAME(SvSTASH(sv));
+          SV *desc = sv_2mortal(newSVpvf("%s=%s(0x%p)",
+            name ? name : "(unknown)", sv_reftype(sv, 0), sv));
+          croak ("encountered object '%s', but neither allow_blessed, convert_blessed nor allow_tags settings are enabled (or TO_JSON/FREEZE method missing)",
+                 SvPV_nolen (desc));
+        }
     }
   }
   else if (svt < SVt_PVAV && svt != SVt_PVGV && svt != SVt_PVHV && svt != SVt_PVAV)
@@ -1860,15 +1876,26 @@ encode_rv (pTHX_ enc_t *enc, SV *rv)
           else if (enc->json.flags & F_ALLOW_UNKNOWN)
             encode_const_str (aTHX_ enc, "null", 4, 0);
           else
-            croak ("cannot encode reference to scalar '%s' unless the scalar is 0 or 1",
-                   SvPV_nolen (sv_2mortal (newRV_inc (sv))));
+            {
+              /* Use default stringification, bypassing any "" overload (GH #191). */
+              const char *name = SvOBJECT(sv) ? HvNAME(SvSTASH(sv)) : NULL;
+              SV *desc = sv_2mortal(newSVpvf("%s=%s(0x%p)",
+                name ? name : "(unknown)", sv_reftype(sv, 0), sv));
+              croak ("cannot encode reference to scalar '%s' unless the scalar is 0 or 1",
+                     SvPV_nolen (desc));
+            }
         }
     }
   else if (enc->json.flags & F_ALLOW_UNKNOWN)
     encode_const_str (aTHX_ enc, "null", 4, 0);
   else
-    croak ("encountered %s, but JSON can only represent references to arrays or hashes",
-           SvPV_nolen (sv_2mortal (newRV_inc (sv))));
+    {
+      /* Use default stringification, bypassing any "" overload (GH #191). */
+      SV *desc = sv_2mortal(newSVpvf("%s(0x%p)",
+        sv_reftype(sv, 0), sv));
+      croak ("encountered %s, but JSON can only represent references to arrays or hashes",
+             SvPV_nolen (desc));
+    }
 }
 
 static void
@@ -1909,18 +1936,36 @@ encode_bool (pTHX_ enc_t *enc, SV *sv)
       if (UNLIKELY (SvOBJECT (sv)))
         {
           if (!encode_bool_obj (aTHX_ enc, sv, 1, 0))
-            croak ("encountered object '%s', but convert_blessed is not enabled",
-                   SvPV_nolen (sv_2mortal (newRV_inc (sv))));
+            {
+              /* Use default stringification, bypassing any "" overload (GH #191). */
+              const char *name = HvNAME(SvSTASH(sv));
+              SV *desc = sv_2mortal(newSVpvf("%s=%s(0x%p)",
+                name ? name : "(unknown)", sv_reftype(sv, 0), sv));
+              croak ("encountered object '%s', but convert_blessed is not enabled",
+                     SvPV_nolen (desc));
+            }
         }
       else if (svt < SVt_PVAV && svt != SVt_PVGV)
         {
           if (!encode_bool_ref (aTHX_ enc, sv))
-            croak ("cannot encode reference to scalar '%s' unless the scalar is 0 or 1",
-                   SvPV_nolen (sv_2mortal (newRV_inc (sv))));
+            {
+              /* Use default stringification, bypassing any "" overload (GH #191). */
+              const char *name = HvNAME(SvSTASH(sv));
+              SV *desc = sv_2mortal(newSVpvf("%s=%s(0x%p)",
+                name ? name : "(unknown)", sv_reftype(sv, 0), sv));
+              croak ("cannot encode reference to scalar '%s' unless the scalar is 0 or 1",
+                     SvPV_nolen (desc));
+            }
         }
       else
-        croak ("encountered %s, but does not represent boolean",
-               SvPV_nolen (sv_2mortal (newRV_inc (sv))));
+        {
+          /* Use default stringification, bypassing any "" overload (GH #191). */
+          const char *name = SvOBJECT(sv) ? HvNAME(SvSTASH(sv)) : NULL;
+          SV *desc = sv_2mortal(newSVpvf("%s=%s(0x%p)",
+            name ? name : "(unknown)", sv_reftype(sv, 0), sv));
+          croak ("encountered %s, but does not represent boolean",
+                 SvPV_nolen (desc));
+        }
     }
 }
 
@@ -1968,12 +2013,26 @@ encode_sv (pTHX_ enc_t *enc, SV *sv, SV *typesv)
     }
 
   if (UNLIKELY (!(SvOK (typesv)) && (enc->json.flags & F_TYPE_ALL_STRING)))
-    typesv = sv_2mortal (newSViv (JSON_TYPE_STRING | JSON_TYPE_CAN_BE_NULL));
+    {
+      /* Don't force STRING on blessed objects that would be handled by
+         allow_blessed/convert_blessed/allow_tags (GH #175). */
+      if (!(SvROK (sv) && SvOBJECT (SvRV (sv))
+            && (enc->json.flags & (F_ALLOW_BLESSED|F_CONV_BLESSED|F_ALLOW_TAGS))
+            && !is_bool_obj (aTHX_ SvRV (sv))
+            && !is_bignum_obj (aTHX_ SvRV (sv))))
+        typesv = sv_2mortal (newSViv (JSON_TYPE_STRING | JSON_TYPE_CAN_BE_NULL));
+    }
 
   if (UNLIKELY (SvOK (typesv)))
     {
       if (SvROK (sv) && SvOBJECT (SvRV (sv)) && !(enc->json.flags & (F_ALLOW_TAGS|F_CONV_BLESSED|F_ALLOW_BLESSED)) && !is_bool_obj (aTHX_ SvRV (sv)) && !is_bignum_obj (aTHX_ SvRV (sv)))
-        croak ("encountered object '%s', but neither allow_blessed, convert_blessed nor allow_tags settings are enabled (or TO_JSON/FREEZE method missing)", SvPV_nolen (sv));
+        {
+          /* Use default stringification, bypassing any "" overload (GH #191). */
+          const char *name = HvNAME(SvSTASH(SvRV(sv)));
+          SV *desc = sv_2mortal(newSVpvf("%s=%s(0x%p)",
+            name ? name : "(unknown)", sv_reftype(SvRV(sv), 0), SvRV(sv)));
+          croak ("encountered object '%s', but neither allow_blessed, convert_blessed nor allow_tags settings are enabled (or TO_JSON/FREEZE method missing)", SvPV_nolen (desc));
+        }
 
       if (!SvIOKp (typesv))
         {
@@ -2024,7 +2083,7 @@ encode_sv (pTHX_ enc_t *enc, SV *sv, SV *typesv)
         UNLIKELY (sv == &PL_sv_yes || sv == &PL_sv_no)
 #endif
      ) type = JSON_TYPE_BOOL;
-      else if (SvNOKp (sv)) type = JSON_TYPE_FLOAT;
+      else if (SvNOK (sv)) type = JSON_TYPE_FLOAT;
       else if (SvIOKp (sv)) type = JSON_TYPE_INT;
       else if (SvPOKp (sv)) type = JSON_TYPE_STRING;
       else if (SvROK (sv)) process_ref = 1;
@@ -2390,6 +2449,8 @@ encode_sv (pTHX_ enc_t *enc, SV *sv, SV *typesv)
       else {
         NV intpart;
         if (!( inf_or_nan || (had_nokp && Perl_modf(SvNVX(sv), &intpart))
+            || (!force_conversion && had_nokp
+                && (SvNVX(sv) > (NV)UV_MAX || SvNVX(sv) < (NV)IV_MIN))
             || (!force_conversion && SvIOK(sv))
             || strchr(enc->cur,'e')
             || strchr(enc->cur,'E')
@@ -2738,6 +2799,7 @@ encode_json (pTHX_ SV *scalar, JSON *json, SV *typesv)
     croak ("hash- or arrayref expected (not a simple scalar, use allow_nonref to allow this)");
 
   enc.json      = *json;
+  enc.orig_json = json;
   enc.sv        = sv_2mortal (NEWSV (0, INIT_SIZE));
   enc.cur       = SvPVX (enc.sv);
   enc.end       = SvEND (enc.sv);
@@ -4884,14 +4946,23 @@ void END(...)
         return;
 
 void new (char *klass)
+    PREINIT:
+        HV *stash;
     PPCODE:
         dMY_CXT;
-  	SV *pv = NEWSV (0, sizeof (JSON));
+        SV *pv = NEWSV (0, sizeof (JSON));
         SvPOK_only (pv);
         json_init ((JSON *)SvPVX (pv));
+        if (SvROK (ST(0))) {
+          /* called as $obj->new — extract real class name from the object */
+          stash = SvSTASH (SvRV (ST(0)));
+          if (!stash)
+            croak ("Cannot create a %s object from an unblessed reference", klass);
+        } else {
+          stash = strEQc (klass, "Cpanel::JSON::XS") ? JSON_STASH : gv_stashpv (klass, 1);
+        }
         XPUSHs (sv_2mortal (sv_bless (
-           newRV_noinc (pv),
-           strEQc (klass, "Cpanel::JSON::XS") ? JSON_STASH : gv_stashpv (klass, 1)
+           newRV_noinc (pv), stash
         )));
 
 void ascii (JSON *self, int enable = 1)
@@ -5267,8 +5338,11 @@ void decode_json (SV *jsonstr, SV *allow_nonref = NULL, SV *typesv = NULL)
         JSON json;
         json_init (&json);
         json.flags |= ix;
-        if (ix && SvTRUE (allow_nonref))
-          json.flags |= F_ALLOW_NONREF;
+        if (items > 1) {
+          /* allow_nonref arg explicitly given: override the default */
+          if (!SvTRUE (allow_nonref))
+            json.flags &= ~F_ALLOW_NONREF;
+        }
         PUTBACK; jsonstr = decode_json (aTHX_ jsonstr, &json, 0, typesv); SPAGAIN;
         XPUSHs (jsonstr);
 }

@@ -25,7 +25,12 @@ plan_skip('no doc/*.txt files found') unless @doc_files;
 plan_tests(scalar(@doc_files) * 3);
 
 my %native_script = map { $_ => 1 }
-    qw(JA ZH TW KO TH HI BN KM MN RU AR);
+    qw(JA ZH TW KO TH HI BN KM MN MY SI NE UR);
+# 21 cheat-sheet languages total:
+#   non-Latin (must contain non-ASCII, listed above) -- 13:
+#     JA ZH TW KO TH HI BN KM MN MY SI NE UR
+#   Latin script (no non-ASCII required, skipped by S1)  -- 8:
+#     EN FR ID BM TL TR UZ VI
 
 for my $doc (@doc_files) {
     my $path = "$ROOT/$doc";

@@ -91,16 +91,55 @@ WARNINGS_ENABLE
 
 static int (*next_keyword_plugin)(pTHX_ char *, STRLEN, OP **);
 
+enum ChunkType {
+    CHUNK_SV,
+    CHUNK_OP
+};
+
+union ptr_sv_op {
+    SV *sv;
+    OP *op;
+};
+
+typedef struct {
+    enum ChunkType type;
+    unsigned int line;
+    union ptr_sv_op ptr;
+} Chunk;
+
+typedef struct {
+    size_t size, len;
+    Chunk *data;
+} ChunkVec;
+
 static void free_ptr_op(pTHX_ void *vp) {
     OP **pp = vp;
     op_free(*pp);
     Safefree(pp);
 }
 
+static void free_ptr_chunks(pTHX_ void *vp) {
+    ChunkVec **pp = vp;
+    ChunkVec *p = *pp;
+    if (p) {
+        size_t i;
+        for (i = 0; i < p->len; i++) {
+            switch (p->data[i].type) {
+                case CHUNK_SV: /* nop, already mortal */ break;
+                case CHUNK_OP: op_free(p->data[i].ptr.op); break;
+            }
+        }
+        Safefree(p->data);
+        Safefree(p);
+    }
+    Safefree(pp);
+}
+
 enum {
     FLAG_BACKSLASH_ESCAPE = 0x1,
     FLAG_HASH_INTERPOLATE = 0x2,
-    FLAG_STOP_AT_SPACE    = 0x4
+    FLAG_STOP_AT_SPACE    = 0x4,
+    FLAG_HEREDOC_UNDENT   = 0x8
 };
 
 typedef struct {
@@ -153,15 +192,53 @@ static U32 hex2int(unsigned char c) {
 }
 
 static void my_op_cat_sv(pTHX_ OP **pop, SV *sv) {
+    assert(sv != NULL);
     OP *const str = newSVOP(OP_CONST, 0, SvREFCNT_inc_simple_NN(sv));
     *pop = !*pop ? str : newBINOP(OP_CONCAT, 0, *pop, str);
 }
 
+static void chunk_push(pTHX_ ChunkVec *vec, enum ChunkType type, line_t line, union ptr_sv_op ptr) {
+    Chunk *p;
+    if (vec->len == vec->size) {
+        if (vec->size >= ~(size_t)0 / 3) {
+            croak("Out of memory while parsing " MY_PKG " qc (vec->size: %zu)", vec->size);
+        }
+        vec->size *= 3;
+        vec->size /= 2;
+        Renew(vec->data, vec->size, Chunk);
+    }
+    p = &vec->data[vec->len];
+    p->type = type;
+    p->line = line;
+    p->ptr = ptr;
+    #if 0
+    PerlIO_printf(PerlIO_stderr(), ">>> chunk[%zu] @ %u - [%s]\n", vec->len, p->line, type == CHUNK_SV ? SvPVX(ptr.sv) : "(block)");
+    #endif
+    vec->len++;
+}
+
+static int all_ws(const char *s, const char *e) {
+    for (; s < e; s++) {
+        if (*s != ' ' && *s != '\t') {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+static SV *mortal_buf_sv(pTHX) {
+    SV *sv = sv_2mortal(newSVpvs(""));
+    if (lex_bufutf8()) {
+        SvUTF8_on(sv);
+    }
+    return sv;
+}
+
 static OP *parse_qctail(pTHX_ const QCSpec *spec, int *pnesting) {
     I32 c;
-    OP **gen_sentinel;
+    ChunkVec **gen_sentinel, *vec;
     SV *sv;
-    line_t start;
+    line_t start, chunk_start;
     SV *const delim_str = spec->delim_str;
     const int
         have_delim_stop = spec->delim_stop != -1;
@@ -170,15 +247,19 @@ static OP *parse_qctail(pTHX_ const QCSpec *spec, int *pnesting) {
     assert(!delim_str || spec->leftover);
 
     start = CopLINE(PL_curcop);
+    chunk_start = start;
 
-    Newx(gen_sentinel, 1, OP *);
+    Newx(gen_sentinel, 1, ChunkVec *);
     *gen_sentinel = NULL;
-    SAVEDESTRUCTOR_X(free_ptr_op, gen_sentinel);
+    SAVEDESTRUCTOR_X(free_ptr_chunks, gen_sentinel);
 
-    sv = sv_2mortal(newSVpvs(""));
-    if (lex_bufutf8()) {
-        SvUTF8_on(sv);
-    }
+    Newx(*gen_sentinel, 1, ChunkVec);
+    vec = *gen_sentinel;
+    vec->size = 16;
+    Newx(vec->data, vec->size, Chunk);
+    vec->len = 0;
+
+    sv = mortal_buf_sv(aTHX);
     c = '\n';
 
     for (;;) {
@@ -195,24 +276,99 @@ static OP *parse_qctail(pTHX_ const QCSpec *spec, int *pnesting) {
         if (
             b == '\n' &&
             delim_str &&
-            /* c == spec->delim_start && */
-            (STRLEN)(PL_parser->bufend - PL_parser->bufptr) >= SvCUR(delim_str) &&
-            (elim = PL_parser->bufptr + SvCUR(delim_str),
-             memcmp(PL_parser->bufptr, SvPVX(delim_str), SvCUR(delim_str)) == 0) && (
-                !(
-                    (STRLEN)(PL_parser->bufend - PL_parser->bufptr) > SvCUR(delim_str) ||
-                    lex_next_chunk(0)
-                ) ||
-                (elim++, PL_parser->bufptr[SvCUR(delim_str)] == '\n') || (
-                    elim++,
-                    PL_parser->bufptr[SvCUR(delim_str)] == '\r' &&
-                    PL_parser->bufptr[SvCUR(delim_str) + 1] == '\n'
-                )
-            )
+            (STRLEN)(PL_parser->bufend - PL_parser->bufptr) >= SvCUR(delim_str)
         ) {
-            lex_read_to(elim);
-            lex_stuff_sv(spec->leftover, 0);
-            break;
+
+            if (spec->flags & FLAG_HEREDOC_UNDENT) {
+                char *nl;
+                while (
+                    !(nl = memchr(PL_parser->bufptr, '\n', PL_parser->bufend - PL_parser->bufptr))
+                    && lex_next_chunk(0)
+                ) {}
+
+                const char *t = nl ? nl : PL_parser->bufend;
+                if (t > PL_parser->bufptr && nl && t[-1] == '\r') {
+                    t--;
+                }
+                if (
+                    (STRLEN)(t - PL_parser->bufptr) >= SvCUR(delim_str) &&
+                    memcmp(t - SvCUR(delim_str), SvPVX(delim_str), SvCUR(delim_str)) == 0 &&
+                    all_ws(PL_parser->bufptr, t - SvCUR(delim_str))
+                ) {
+                    const char *prefix = PL_parser->bufptr;
+                    size_t prefix_len = t - SvCUR(delim_str) - prefix;
+                    {
+                        union ptr_sv_op ptr;
+                        ptr.sv = sv;
+                        chunk_push(aTHX_ vec, CHUNK_SV, chunk_start, ptr);
+                        sv = mortal_buf_sv(aTHX);
+                        chunk_start = CopLINE(PL_curcop);
+                    }
+                    if (prefix_len) {
+                        size_t i;
+                        int at_bol = 1;
+                        for (i = 0; i < vec->len; i++) {
+                            const Chunk *p = &vec->data[i];
+                            unsigned line = p->line - vec->data[0].line + 1;
+                            switch (p->type) {
+                                case CHUNK_SV: {
+                                    SV *xsv = p->ptr.sv;
+                                    char *xr, *xw, *xend;
+                                    xr = xw = SvPVX(xsv);
+                                    xend = SvEND(xsv);
+                                    while (xr < xend) {
+                                        if (at_bol) {
+                                            if (
+                                                (size_t)(xend - xr) < prefix_len ||
+                                                memNE(xr, prefix, prefix_len)
+                                            ) {
+                                                croak("Indentation on line %u of here-doc doesn't match delimiter", line);
+                                            }
+                                            xr += prefix_len;
+                                            at_bol = 0;
+                                            continue;
+                                        }
+                                        at_bol = *xr == '\n';
+                                        if (at_bol) {
+                                            line++;
+                                        }
+                                        *xw++ = *xr++;
+                                    }
+                                    *xw = '\0';
+                                    SvCUR_set(xsv, xw - SvPVX(xsv));
+                                    break;
+                                }
+                                case CHUNK_OP:
+                                    if (at_bol) {
+                                        croak("Indentation on line %u of here-doc doesn't match delimiter", line);
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+
+                    lex_read_to(nl ? nl + 1 : PL_parser->bufend);
+                    lex_stuff_sv(spec->leftover, 0);
+                    break;
+                }
+            } else if (
+                (elim = PL_parser->bufptr + SvCUR(delim_str),
+                 memcmp(PL_parser->bufptr, SvPVX(delim_str), SvCUR(delim_str)) == 0) && (
+                    !(
+                        (STRLEN)(PL_parser->bufend - PL_parser->bufptr) > SvCUR(delim_str) ||
+                        lex_next_chunk(0)
+                    ) ||
+                    (elim++, elim[-1] == '\n') || (
+                        elim++,
+                        elim[-2] == '\r' &&
+                        elim[-1] == '\n'
+                    )
+                )
+            ) {
+                lex_read_to(elim);
+                lex_stuff_sv(spec->leftover, 0);
+                break;
+            }
         }
 
         if (
@@ -224,23 +380,24 @@ static OP *parse_qctail(pTHX_ const QCSpec *spec, int *pnesting) {
                   (lex_read_unichar(0), 1)
         ) {
             OP *op;
+            line_t tmp_start = CopLINE(PL_curcop);
 
             op = parse_block(0);
             op = newUNOP(OP_NULL, OPf_SPECIAL, op_scope(op));
 
             if (SvCUR(sv)) {
-                my_op_cat_sv(aTHX_ gen_sentinel, sv);
+                union ptr_sv_op ptr;
+                ptr.sv = sv;
+                chunk_push(aTHX_ vec, CHUNK_SV, chunk_start, ptr);
 
-                sv = sv_2mortal(newSVpvs(""));
-                if (lex_bufutf8()) {
-                    SvUTF8_on(sv);
-                }
+                sv = mortal_buf_sv(aTHX);
+                chunk_start = CopLINE(PL_curcop);
             }
 
-            if (*gen_sentinel) {
-                *gen_sentinel = newBINOP(OP_CONCAT, 0, *gen_sentinel, op);
-            } else {
-                *gen_sentinel = op;
+            {
+                union ptr_sv_op ptr;
+                ptr.op = op;
+                chunk_push(aTHX_ vec, CHUNK_OP, tmp_start, ptr);
             }
 
             c = -1;
@@ -340,10 +497,7 @@ static OP *parse_qctail(pTHX_ const QCSpec *spec, int *pnesting) {
                         croak("Missing braces on \\N{}");
                     }
 
-                    name = sv_2mortal(newSVpvs(""));
-                    if (lex_bufutf8()) {
-                        SvUTF8_on(name);
-                    }
+                    name = mortal_buf_sv(aTHX);
 
                     while ((c = lex_read_unichar(0)) != '}') {
                         if (c == -1) {
@@ -465,24 +619,39 @@ static OP *parse_qctail(pTHX_ const QCSpec *spec, int *pnesting) {
         my_sv_cat_c(aTHX_ sv, c);
     }
 
-    if (SvCUR(sv) || !*gen_sentinel) {
-        my_op_cat_sv(aTHX_ gen_sentinel, sv);
-    }
-
     {
-        OP *gen = *gen_sentinel;
-        *gen_sentinel = NULL;
-
-        if (gen->op_type == OP_CONST) {
-            SvPOK_only_UTF8(((SVOP *)gen)->op_sv);
-        } else if (gen->op_type != OP_CONCAT) {
-            /* can't do this because B::Deparse dies on it:
-             * gen = newUNOP(OP_STRINGIFY, 0, gen);
-             */
-            gen = newBINOP(OP_CONCAT, 0, gen, newSVOP(OP_CONST, 0, newSVpvs("")));
+        OP *op = NULL;
+        size_t i;
+        for (i = 0; i < vec->len; i++) {
+            switch (vec->data[i].type) {
+                case CHUNK_SV:
+                    my_op_cat_sv(aTHX_ &op, vec->data[i].ptr.sv);
+                    break;
+                case CHUNK_OP:
+                    op = !op ? vec->data[i].ptr.op : newBINOP(OP_CONCAT, 0, op, vec->data[i].ptr.op);
+                    vec->data[i].ptr.op = NULL;
+                    break;
+            }
         }
 
-        return gen;
+        if (SvCUR(sv)) {
+            my_op_cat_sv(aTHX_ &op, sv);
+        }
+
+        if (!op) {
+            op = newSVOP(OP_CONST, 0, newSVpvs(""));
+        }
+
+        if (op->op_type == OP_CONST) {
+            SvPOK_only_UTF8(((SVOP *)op)->op_sv);
+        } else if (op->op_type != OP_CONCAT) {
+            /* can't do this because B::Deparse dies on it:
+             * op = newUNOP(OP_STRINGIFY, 0, op);
+             */
+            op = newBINOP(OP_CONCAT, 0, op, newSVOP(OP_CONST, 0, newSVpvs("")));
+        }
+
+        return op;
     }
 }
 
@@ -582,12 +751,19 @@ static void parse_qc_to(pTHX_ OP **op_ptr) {
     I32 c, qdelim;
     SV *delim, *leftover;
     line_t start;
+    int saw_tilde;
 
     lex_read_space(0);
     if (!strnEQ(PL_parser->bufptr, "<<", 2)) {
         croak("Missing \"<<\" after qc_to");
     }
     lex_read_to(PL_parser->bufptr + 2);
+
+    saw_tilde = 0;
+    if (lex_peek_unichar(0) == '~') {
+        lex_read_unichar(0);
+        saw_tilde = 1;
+    }
 
     lex_read_space(0);
     start = CopLINE(PL_curcop);
@@ -598,16 +774,13 @@ static void parse_qc_to(pTHX_ OP **op_ptr) {
     qdelim = c;
     lex_read_unichar(0);
 
-    delim = sv_2mortal(newSVpvs(""));
-    if (lex_bufutf8()) {
-        SvUTF8_on(delim);
-    }
+    delim = mortal_buf_sv(aTHX);
 
     for (;;) {
         c = lex_read_unichar(0);
-        if (c == -1) {
+        if (c == -1 || c == '\n') {
             CopLINE_set(PL_curcop, start);
-            croak("Can't find string terminator %s anywhere before EOF", qdelim == '"' ? "'\"'" : "\"'\"");
+            croak("Unterminated delimiter for here document");
         }
         if (c == qdelim) {
             break;
@@ -631,7 +804,9 @@ static void parse_qc_to(pTHX_ OP **op_ptr) {
         const QCSpec spec = {
             -1, -1,
             delim, leftover,
-            FLAG_HASH_INTERPOLATE | (qdelim == '"' ? FLAG_BACKSLASH_ESCAPE : 0)
+            FLAG_HASH_INTERPOLATE
+                | (qdelim == '"' ? FLAG_BACKSLASH_ESCAPE : 0)
+                | (saw_tilde ? FLAG_HEREDOC_UNDENT : 0)
         };
         *op_ptr = parse_qctail(aTHX_ &spec, NULL);
     }

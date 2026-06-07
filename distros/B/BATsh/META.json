@@ -1,12 +1,12 @@
 {
     "name" : "BATsh",
-    "version" : "0.02",
+    "version" : "0.04",
     "abstract" : "Bilingual Shell for cmd.exe and bash in one script",
     "author" : [
-        "ina <ina@cpan.org>"
+        "ina <ina.cpan@gmail.com>"
     ],
     "dynamic_config" : 1,
-    "generated_by" : "pmake.bat",
+    "generated_by" : "pmake.bat version 0.35",
     "license" : [
         "perl_5"
     ],
@@ -32,68 +32,64 @@
         "build" : {
             "requires" : {
                 "Carp" : "0",
+                "ExtUtils::MakeMaker" : "5.4302",
+                "Fcntl" : "1.03",
                 "File::Copy" : "2.02",
                 "File::Path" : "1.0401",
                 "File::Spec" : "0",
-                "perl" : "5.00503",
-                "strict" : "1.01",
-                "vars" : "0",
-                "warnings" : "0"
+                "perl" : "5.00503"
             }
         },
         "configure" : {
             "requires" : {
                 "Carp" : "0",
+                "ExtUtils::MakeMaker" : "5.4302",
+                "Fcntl" : "1.03",
                 "File::Copy" : "2.02",
                 "File::Path" : "1.0401",
                 "File::Spec" : "0",
-                "perl" : "5.00503",
-                "strict" : "1.01",
-                "vars" : "0",
-                "warnings" : "0"
+                "perl" : "5.00503"
             }
         },
         "runtime" : {
             "requires" : {
                 "Carp" : "0",
+                "ExtUtils::MakeMaker" : "5.4302",
+                "Fcntl" : "1.03",
                 "File::Copy" : "2.02",
                 "File::Path" : "1.0401",
                 "File::Spec" : "0",
-                "perl" : "5.00503",
-                "strict" : "1.01",
-                "vars" : "0",
-                "warnings" : "0"
+                "perl" : "5.00503"
             }
         },
         "test" : {
             "requires" : {
                 "Carp" : "0",
+                "ExtUtils::MakeMaker" : "5.4302",
+                "Fcntl" : "1.03",
                 "File::Copy" : "2.02",
                 "File::Path" : "1.0401",
                 "File::Spec" : "0",
-                "perl" : "5.00503",
-                "strict" : "1.01",
-                "vars" : "0",
-                "warnings" : "0"
+                "perl" : "5.00503"
             }
         }
     },
     "provides" : {
         "BATsh" : {
             "file" : "lib/BATsh.pm",
-            "version" : "0.02"
+            "version" : "0.04"
         },
         "BATsh::CMD" : {
             "file" : "lib/BATsh/CMD.pm",
-            "version" : "0.02"
+            "version" : "0.04"
         },
         "BATsh::Env" : {
             "file" : "lib/BATsh/Env.pm",
-            "version" : "0.02"
+            "version" : "0.04"
         },
         "BATsh::SH" : {
             "file" : "lib/BATsh/SH.pm",
-            "version" : "0.02"
+            "version" : "0.04"
         }
     }
 }

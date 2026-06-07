@@ -1,5 +1,253 @@
 Revision history for BATsh
 
+0.04  2026-06-07 JST (Japan Standard Time)
+
+    - Inline-Perl portability: every shelled-out Perl one-liner in the
+      distribution is rewritten into a form that satisfies BOTH external
+      shells that BATsh dispatches to -- cmd.exe (system STRING on Win32)
+      and /bin/sh -c (system STRING on Unix/BSD). The previous forms hit
+      two distinct, OS-specific foot-guns:
+        (A) Unix: a dollar token inside the code (e.g. "$_") was expanded
+            by /bin/sh from the environment variable "_" (the last-arg /
+            path that the shell exports), which is unpredictable on CPAN
+            smokers and produced random failures such as
+            "Bareword found where operator expected ... 1EERDtQcrK".
+        (B) Win32: cmd.exe does not honour single quotes, so a one-liner
+            wrapped in '...' was split on whitespace and Perl died with
+            "Can't find string terminator".
+      The portable form uses DOUBLE quotes and no shell-expandable dollar
+      token, e.g.  perl -e "..."  ->  perl -ne "print uc"  (the default
+      variable is consumed implicitly by uc, so nothing leaks to the
+      shell). Rewritten in: lib/BATsh.pm POD, lib/BATsh/SH.pm POD, README,
+      all 21 doc/batsh_cheatsheet.*.txt files, eg/05_cmd_comprehensive.batsh,
+      eg/06_sh_comprehensive.batsh, and t/0006-new-features.t. The stderr
+      sample in eg/06_sh_comprehensive.batsh is likewise switched from a
+      single-quoted body to a double-quoted "print STDERR qq(...)" form.
+
+    - t/0007-extcmd-env.t: new regression test that locks in the
+      portability fix above. EE01/EE02 run the pipeline and here-document
+      patterns under several hostile values of the environment variable
+      "_" and confirm correct uppercase output (this passes on every OS
+      and actively defeats vector (A) on Unix). EE03 is the clean-
+      environment baseline. EE04 is a static guard against vector (B):
+      no inline "perl -e/-ne/-pe" anywhere in t/ eg/ doc/ lib/ README may
+      be wrapped in single quotes. EE05 is a static guard against vector
+      (A): no double-quoted inline Perl may contain a shell-expandable
+      dollar token ($name, $_, ${...}, $1..$9); the harmless numeric $$
+      is exempt. Both static guards run on any OS, so a Windows run still
+      catches a Unix-introduced regression and vice versa. Added to
+      MANIFEST.
+
+    - External-Perl PATH portability (vector C): the test suite and the
+      eg/ examples shell out to a bareword "perl", but a CPAN smoker
+      frequently does NOT have the perl under test on PATH as "perl"
+      (perlbrew/plenv, or perl invoked by absolute path). The bareword
+      then resolves to nothing ("perl: not found", empty output), which
+      failed t/0007 EE01/EE02 and t/0006 NF23/NF60 and -- worse -- let
+      t/0006 NF07/NF21/NF22 report a corrupted, empty-named "ok" when the
+      failed pipe disturbed the captured-STDOUT save/restore; in eg/06 it
+      also hung (an empty "perl" command substitution fed a
+      "while read ... < $EMPTY" redirect whose read fell back to terminal
+      STDIN and blocked). Fixed WITHOUT touching the command strings or
+      the examples (a bareword "perl" is the correct thing for an end
+      user to type, and embedding an absolute $^X path would expose a
+      Win32 backslash path to SH-mode quote/escape processing): each
+      affected test now prepends the directory of the running interpreter
+      ($^X) to PATH so the bareword "perl" resolves to the very perl now
+      running the suite. The prepend is installed before the first
+      BATsh::Env::init() (init() snapshots %ENV into STORE and
+      sync_to_env() copies STORE back to %ENV before each external
+      command). Touched: t/0006-new-features.t, t/0007-extcmd-env.t,
+      t/9070-examples.t (the last for the eg/ child process). Verified on
+      Linux with perl deliberately removed from the child PATH (and under
+      a hostile "_"): all 606 tests pass, no failures, no hangs; the
+      command strings and all eg/*.batsh examples are byte-for-byte
+      unchanged.
+
+    - t/0006-new-features.t: the END block now sets "$? = 1 if $fail"
+      instead of calling "exit 1", matching the INA_CPAN_Check.pm END-block
+      convention adopted in 0.03 (an END block must not call exit, so that
+      the harness sees the real plan/ok reconciliation).
+
+    - Documentation: the "self-contained" qualifier is removed from
+      lib/BATsh.pm (header comment, module description, the run() banner,
+      and the NAME / DESCRIPTION POD) and from README. BATsh dispatches
+      external commands to a real shell, so describing the interpreter
+      itself as "self-contained" was misleading; "bilingual shell
+      interpreter written in pure Perl" is retained and accurate.
+
+    - SH nested command substitution fixed (lib/BATsh/SH.pm). $( ... )
+      has been advertised as supporting full nesting since 0.02, but a
+      nested $( ... $( ... ) ) -- especially with a pipeline at each
+      level -- collapsed to an empty string, and on Unix a nested
+      pipeline could hang; the failure mode also differed between Windows
+      and Unix. Three independent defects were responsible:
+        (1) _cmd_subst() named its stdout-capture temp file with the
+            process id alone (batsh_cap_$$.tmp). An inner $(...) reused
+            the same path and unlink()'d it, so the outer level captured
+            nothing. The capture file is now tagged with the active
+            substitution-nesting depth.
+        (2) _split_sh_pipe() counted the "(" of a "$(" twice, leaving the
+            $( nesting depth stuck at 1 after a nested $(...); a bare "|"
+            that followed it was then not recognised as a pipe. "$(" now
+            consumes both characters and bumps the depth exactly once.
+        (3) _exec_sh_pipe() named its per-stage temp files with the
+            process id alone (batsh_shp_$$) and left its dup STDOUT/STDIN
+            globs un-local()ised. A nested pipeline therefore clobbered
+            the outer pipeline's stage file and saved handles; the outer's
+            final segment found no input file and blocked on the real
+            STDIN (a hang on Unix). The stage files are now tagged with
+            the active pipeline-nesting depth and the handle globs are
+            local()ised. All fixes are Perl 5.005_03 compatible (use vars
+            package globals, bareword filehandles, 2-argument open). The
+            command strings and the externally-visible API are unchanged.
+
+    - t/0008-nested-subst.t: new regression test for the fix above. NS01/
+      NS02 prove the capture-file depth fix with pure builtins (no "perl"
+      on PATH required); NS03 is the single-level pipeline-in-$() baseline;
+      NS04/NS05 cover nested $() with a pipeline at each level (defects 2
+      and 3); NS06 checks that two sibling $() pipelines on one line do
+      not collide; NS07 covers an assignment from a nested pipeline
+      substitution and its reuse. Like t/0006/0007 it prepends the running
+      interpreter's directory to PATH so the bareword "perl" resolves on a
+      smoker. Added to MANIFEST.
+
+    - eg/05_cmd_comprehensive.batsh: the SET/IF demonstration variable was
+      renamed LANG -> GREETING. As LANG, the example exported LANG=BATsh
+      into %ENV, and the external "perl" it later spawns then emitted a
+      glibc "Setting locale failed ... LANG = BATsh" warning to STDERR on
+      Unix (harmless, and invisible during "make test" because
+      t/9070-examples.t captures and discards child STDERR, but visible
+      when the example is run by hand; Windows perl does not warn). The
+      rename keeps the example's behaviour identical and silences the
+      Unix-only noise.
+
+    - eg/00_hello.pl: normalised from a CRLF line ending to LF, matching
+      the rest of eg/ (the other examples are already LF). Perl tolerates
+      the trailing CR on Unix, so this is a cosmetic consistency fix.
+
+    - Version bumped to 0.04 in lib/BATsh.pm, lib/BATsh/CMD.pm,
+      lib/BATsh/SH.pm, lib/BATsh/Env.pm, Makefile.PL, META.yml and
+      META.json. BATsh::CMD and BATsh::Env carry no changes other than
+      the version; BATsh::SH changes are the version, the two POD
+      one-liner rewrites noted above, and the nested command-substitution
+      fix noted above.
+
+0.03  2026-06-06 JST (Japan Standard Time)
+
+    - t/lib/INA_CPAN_Check.pm: emit exactly one TAP plan line per test
+      file. Each check_* helper previously called plan_tests() itself,
+      while the .t files also called plan_tests(count_*); this produced
+      multiple "1..N" lines in a single file. Under a real TAP harness
+      (prove / Test::Harness, as used by CPAN Testers) this raised
+      "More than one plan found in TAP output" and made the affected
+      files FAIL, even though every individual "ok" line passed when the
+      scripts were run by hand. Affected files: t/9010-encoding.t,
+      t/9030-distribution.t, t/9040-style.t. The plan_tests() call is
+      now removed from every check_* helper, leaving the .t file as the
+      sole owner of the plan line.
+    - t/lib/INA_CPAN_Check.pm: count_A() now returns the actual number
+      of MANIFEST entries instead of a fixed 1, so that the plan
+      computed by t/9030-distribution.t matches the number of A1 checks
+      that check_A() emits.
+    - t/lib/INA_CPAN_Check.pm: remove the mid-stream plan_skip() calls
+      from check_A() and check_C(); the MANIFEST-absent guard is handled
+      by the .t file and by count_C() before any plan line is printed.
+    - t/lib/INA_CPAN_Check.pm: check_K() now honours the k3_exempt
+      option passed by t/9040-style.t. The argument was previously
+      discarded by "my ($root) = @_;", so the intended exemption of
+      accessor-style hash names (%env, %opts, %args) never took effect;
+      the K3 detector also did not capture the hash name. check_K() now
+      accepts "k3_exempt => REGEX", captures the returned hash name via
+      /return \%(\w*)/, and skips a "return \%name" only when the name
+      matches the supplied pattern. Behaviour is unchanged when
+      k3_exempt is not passed (every "return \%..." is still flagged),
+      so distributions that call check_K($root) without the option are
+      unaffected.
+    - t/lib/INA_CPAN_Check.pm: add a regression guard for the two TAP
+      defect classes above. plan_tests() now refuses to emit a second
+      "1..N" line, and an end-of-run reconciliation reports
+      "planned X but ran Y" (setting a non-zero exit) when the emitted
+      plan does not match the number of ok()/not-ok() lines. Both
+      problems now FAIL immediately on a plain "perl t/foo.t", not only
+      under a real harness.
+    - t/lib/INA_CPAN_Check.pm: add selfcheck_suite(), which runs t/*.t
+      (and xt/*.t) in a child Perl and verifies one plan line per file,
+      plan == number of ok/not-ok lines, and no failures.
+    - pmake.bat: at "pmake dist" time, after the existing source checks,
+      run INA_CPAN_Check::selfcheck_suite() as check3 and abort the
+      build if any test file fails the plan-sanity check (disable with
+      --no-check3). Bump $PMAKE_BAT_VERSION to 0.34.
+    - t/lib/INA_CPAN_Check.pm: pass \@files / \@pm_files (a reference)
+      instead of [ @files ] (an anonymous copy) to _find_pm_t() in
+      _scan_code(), check_D(), check_E(), and check_K(). The copy form
+      meant the collected file list never reached the caller, so E1
+      (no shebang in lib/*.pm) and K3 (return { %hash } form) silently
+      scanned zero files and always passed.
+
+    - Documentation: BATsh.pm BUGS AND LIMITATIONS corrected. It no longer
+      claims SH-mode background execution is unsupported (it is supported
+      for external commands; see above and BATsh::SH), and it now clarifies
+      that non-builtin commands (FINDSTR, SORT, etc.) are invoked as
+      external programs rather than "unsupported". README and BATsh.pm POD
+      additionally enumerate previously undocumented limitations: CMD
+      "%VAR:~n,m%" / "%VAR:str1=str2%" and dynamic "%RANDOM%/%DATE%/%TIME%/
+      %CD%" variables; SH arrays, filename globbing, "~" tilde expansion,
+      brace expansion, and the trap/getopts/select/alias/declare/eval/exec
+      builtins and set -e/-u/-x options; and the shared (no sub-shell)
+      "( ... )" grouping common to both modes.
+
+    - SH expansion: a backslash-escaped "\$", "\`" or "\\" inside double
+      quotes is now preserved literally and no longer triggers variable
+      or command substitution (e.g. "\$_" yields a literal "$_").
+
+    - SH read: the "read" built-in now returns a non-zero status at end of
+      input so that "while read VAR; do ...; done < FILE" terminates
+      instead of looping. Leading option flags such as "-r" are skipped
+      and are no longer treated as target variable names.
+
+    - SH assignment prefix: "VAR=value command args" (POSIX) now applies
+      the assignment and then runs the command (e.g. "IFS= read -r LINE",
+      "LC_ALL=C sort"); multiple prefixes are supported. A standalone
+      assignment whose value merely contains spaces or a "$(...)"
+      substitution (e.g. UPPER=$(echo "a b")) keeps the full value and is
+      no longer mistaken for a prefix.
+
+    - SH while/until: an input redirection on the "done" line
+      ("while read L; do ...; done < FILE") now reopens STDIN from FILE for
+      the duration of the loop so the loop's "read" consumes the file.
+
+    - eg/06_sh_comprehensive.batsh: I/O-redirection section simplified to a
+      plain "while read" loop now that the loop terminates correctly.
+
+    - Tests: t/9070-examples.t now executes each eg/*.batsh in a child
+      process and guards against runaway output and "syntax error"
+      breakage (E4). t/9060-readme.t verifies the README advertises every
+      eg/ example by name (R5). README gains an EXAMPLES section.
+
+    - SH background execution: an unquoted trailing "&" starts an external
+      command asynchronously and returns immediately. On Win32 the job is
+      spawned via system(1, ...) (P_NOWAIT, PID returned); on Unix it is
+      started through /bin/sh without a Perl fork, capturing the job PID
+      via the shell's $! into a sysopen O_CREAT|O_EXCL temp file (Pure
+      Perl, 5.005_03). The new $! parameter expands to the most recent
+      background PID (empty before any job); $? is 0 on a successful
+      launch (the job's own exit status is not awaited). Built-ins,
+      functions, assignments and control words ignore the trailing "&"
+      and run in the foreground; "&&", ">&"/"2>&1", quoted and escaped
+      "\&" are not treated as background. No job control; CMD-mode "&"
+      remains a sequential separator (see BUGS AND LIMITATIONS).
+
+    - eg/05_cmd_comprehensive.batsh: the "IF ERRORLEVEL" diagnostic line
+      "ECHO   ERRORLEVEL>=0: ELTEST=%ELTEST%" contained a bare ">", which
+      CMD mode correctly treats as output redirection (matching cmd.exe).
+      As written, the message was silently redirected to a file named
+      "=0:" instead of being printed, and that stray file was created in
+      the current directory each time the example ran (including under
+      "make test" via t/9070-examples.t). The ">" is now caret-escaped
+      ("ECHO   ERRORLEVEL ^>= 0: ELTEST=%ELTEST%"), so the line prints
+      as intended and no file is written.
+
 0.02  2026-04-28 JST (Japan Standard Time)
 
     [Highlights]
@@ -13,6 +261,15 @@ Revision history for BATsh
     - I/O redirection: stdout overwrite (>), append (>>), stdin (<),
       stderr (2>), stderr-to-stdout (2>&1), stdout-to-stderr (1>&2).
       Supported in both CMD mode and SH mode.
+    - SH here-documents on STDIN: cmd <<DELIM ... DELIM, <<-DELIM (strip
+      leading tabs), and <<'DELIM' (literal, no expansion). Body is
+      materialised to a temp file created with sysopen O_CREAT|O_EXCL
+      (Pure Perl, 5.005_03) and fed through the existing "< file" path,
+      so both built-ins (read) and external commands see it on STDIN.
+      Top-level mode dispatch is here-document aware, so uppercase body
+      lines are not misrouted to CMD mode. Single here-document per line;
+      here-strings (<<<) and same-line pipeline/compound combos are not
+      supported (see BUGS AND LIMITATIONS).
     - cmd.exe batch-parameter tilde modifiers: %~0, %~f1, %~dp0, %~nx1,
       %~n0, %~x0, %~p1 etc. (f d p n x modifiers, combinable).
     - SET /P VAR=Prompt  interactive prompt input from STDIN.

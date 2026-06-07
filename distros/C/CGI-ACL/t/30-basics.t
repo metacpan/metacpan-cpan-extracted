@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::Most tests => 21;
+use Test::Most tests => 23;
 use Test::MockObject;
 
 BEGIN { use_ok('CGI::ACL') };
@@ -74,4 +74,12 @@ BEGIN { use_ok('CGI::ACL') };
 
 	$mock_lingua->mock('country', sub { 'GB' });
 	is($acl->all_denied(lingua => $mock_lingua), 1, 'Access denied for unlisted country');
+
+	# Test deny_country('*') with no allow_country denies everyone
+	$mock_lingua->mock('country', sub { 'US' });
+	$acl = CGI::ACL->new()->deny_country('*');
+	is($acl->all_denied(lingua => $mock_lingua), 1, 'deny_country(*) alone denies known country');
+
+	$mock_lingua->mock('country', sub { undef });
+	is($acl->all_denied(lingua => $mock_lingua), 1, 'deny_country(*) alone denies unknown country');
 }

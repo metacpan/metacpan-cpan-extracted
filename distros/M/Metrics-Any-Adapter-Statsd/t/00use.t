@@ -3,10 +3,11 @@
 use v5.14;
 use warnings;
 
-use Test::More;
+use Test2::V0;
 
-use_ok( "Metrics::Any::Adapter::Statsd" );
-use_ok( "Metrics::Any::Adapter::DogStatsd" );
-use_ok( "Metrics::Any::Adapter::SignalFx" );
+require Metrics::Any::Adapter::Statsd;
+require Metrics::Any::Adapter::DogStatsd;
+require Metrics::Any::Adapter::SignalFx;
 
+pass( 'Modules loaded' );
 done_testing;

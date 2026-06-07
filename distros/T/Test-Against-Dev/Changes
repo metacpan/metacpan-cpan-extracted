@@ -1,5 +1,10 @@
 Revision history for Perl module Test::Against::Dev
 
+0.15 Sat Jun  6 06:56:03 AM EDT 2026
+    - Discontinue use of FTP for obtaining tarball of dev release, including
+      dependency on Perl::Download::FTP.  Entails change in arguments passed
+      to Test::Against::Dev::perform_tarball_download().
+
 0.14 Tue Sep 23 09:34:24 AM EDT 2025
     - Rework tests so that dummy tarballs are pre-positioned in CPAN index
       order.

@@ -1,7 +1,7 @@
 package Sys::Export::Linux;
 
 # ABSTRACT: Export subsets of a Linux system
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 
 use v5.26;
@@ -205,7 +205,7 @@ can't find this timezone in any of those locations, it dies.
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

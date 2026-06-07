@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2026 -- leonerd@leonerd.org.uk
 
-package Metrics::Any::Adapter::Statsd 0.03;
+package Metrics::Any::Adapter::Statsd 0.04;
 
 use v5.14;
 use warnings;
@@ -26,6 +26,8 @@ C<Metrics::Any::Adapter::Statsd> - a metrics reporting adapter for statsd
 
 =head1 SYNOPSIS
 
+=for highlighter language=perl
+
    use Metrics::Any::Adapter 'Statsd';
 
 =head1 DESCRIPTION
@@ -37,7 +39,7 @@ The default location of the statsd server is set by two package variables,
 defaulting to
 
    $Net::Statsd::HOST = "127.0.0.1";
-   $Net::Statsd::PORT = 8125
+   $Net::Statsd::PORT = 8125;
 
 The configuration can be changed by setting new values or by passing arguments
 to the import line:
@@ -141,6 +143,8 @@ sub _make
    my ( $handle, %args ) = @_;
 
    my $name = $self->mangle_name( delete $args{name} // $handle );
+   $name =~ m/[\x00-\x1f:\|]/ and
+      croak "Metric name '$name' is not allowed by statsd";
 
    $self->{metrics}{$handle} = {
       name   => $name,

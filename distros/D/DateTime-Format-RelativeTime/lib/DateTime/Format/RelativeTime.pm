@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## DateTime Format Relative Time - ~/lib/m
-## Version v0.2.3
+## Version v0.2.4
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/12/30
-## Modified 2026/05/04
+## Modified 2026/06/07
 ## All rights reserved
 ## 
 ## 
@@ -27,7 +27,7 @@ BEGIN
     use Locale::Unicode::Data v0.8.2;
     use Scalar::Util ();
     use Wanted;
-    our $VERSION = 'v0.2.3';
+    our $VERSION = 'v0.2.4';
 };
 
 use strict;
@@ -1162,7 +1162,7 @@ For users requiring exact decimal representation beyond this precision, consider
 
 =head1 VERSION
 
-    v0.2.3
+    v0.2.4
 
 =head1 DESCRIPTION
 

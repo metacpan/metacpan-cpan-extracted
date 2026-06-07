@@ -3,11 +3,9 @@ package BATsh;
 #
 # BATsh - Bilingual Shell for cmd.exe and bash in one script
 #
-# Version 0.02 -- Self-contained interpreter
-#
 # https://metacpan.org/dist/BATsh
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com>
 #
 # This version implements both cmd.exe and sh/bash command sets
 # entirely in Perl.  No external cmd.exe, bash, or sh is required.
@@ -24,7 +22,7 @@ use File::Spec ();
 BEGIN { eval { require Cwd } }
 use Carp qw(croak);
 use vars qw($VERSION);
-$VERSION = '0.02';
+$VERSION = '0.04';
 $VERSION = $VERSION;
 
 require BATsh::Env;
@@ -35,7 +33,7 @@ require BATsh::SH;
 # Architecture
 ###############################################################################
 #
-# BATsh is a self-contained bilingual shell interpreter.
+# BATsh is a bilingual shell interpreter.
 #
 # It splits a script into CMD sections and SH sections, then executes
 # each section using its own pure-Perl interpreter:
@@ -243,7 +241,10 @@ sub _extract_subroutines {
             if ($s =~ /\A(?:RET|RETURN)\s*\z/i) {
                 $_SUBROUTINES{$in_sub} = [@sub_body];
                 $in_sub = ''; @sub_body = ();
-            } else { push @sub_body, $line }
+            }
+            else {
+                push @sub_body, $line;
+            }
             next;
         }
         push @out, $line;
@@ -375,9 +376,46 @@ sub _process_lines {
 
     my @pending = (); my $cur_mode = ''; my $depth = 0;
 
+    # Here-document tracking: while a here-document body is being collected,
+    # body lines are appended to the current section verbatim and are NOT
+    # reclassified (so an uppercase-leading body line is not misrouted to CMD).
+    # Activation is deferred by one line so the trigger line itself is
+    # classified normally.
+    my $hd_delim         = undef;   # active delimiter (collecting body)
+    my $hd_dash          = 0;
+    my $pending_hd_delim = undef;   # set on the trigger line, activated next iter
+    my $pending_hd_dash  = 0;
+
     for my $raw (@source) {
         chomp $raw;
+
+        # Promote a pending here-document to active (trigger line already pushed)
+        if (defined $pending_hd_delim) {
+            $hd_delim         = $pending_hd_delim;
+            $hd_dash          = $pending_hd_dash;
+            $pending_hd_delim = undef;
+        }
+
+        # Collecting a here-document body: pass through unclassified.
+        if (defined $hd_delim) {
+            push @pending, $raw;
+            my $probe = $raw;
+            $probe =~ s/\A\t+// if $hd_dash;
+            $hd_delim = undef if $probe eq $hd_delim;
+            next;
+        }
+
         my ($mode, $line, $first) = _parse_line($raw);
+
+        # Detect a here-document opener on an SH line; defer activation so the
+        # trigger line is classified normally this iteration.
+        if ($mode eq 'SH') {
+            my @hd = BATsh::SH::_hd_detect($raw);
+            if (@hd) {
+                $pending_hd_delim = $hd[2];
+                $pending_hd_dash  = $hd[1];
+            }
+        }
 
         if ($mode eq 'EMPTY' || $mode eq 'COMMENT') {
             push @pending, $line if $cur_mode ne '';
@@ -423,23 +461,49 @@ sub _flush_section {
 sub repl {
     my ($class_or_self) = @_;
     _ensure_env_init();
-    print "BATsh $VERSION - Self-contained Bilingual Shell\n";
+    print "BATsh $VERSION - Bilingual Shell\n";
     print "Uppercase => CMD mode, lowercase => SH mode. EXIT/exit to quit.\n\n";
 
     my (@buf, $depth, $cur_mode) = ((), 0, '');
+    my ($hd_delim, $hd_dash, $pending_hd_delim, $pending_hd_dash)
+        = (undef, 0, undef, 0);
     while (1) {
-        print $depth > 0 ? '    +> ' : 'BATsh> ';
+        print $depth > 0 || defined($hd_delim) ? '    +> ' : 'BATsh> ';
         my $line = <STDIN>;
         last unless defined $line;
         chomp $line;
+
+        # Promote pending here-document (trigger already buffered)
+        if (defined $pending_hd_delim) {
+            $hd_delim = $pending_hd_delim; $hd_dash = $pending_hd_dash;
+            $pending_hd_delim = undef;
+        }
+        # Collecting here-document body: buffer verbatim, do not flush/classify
+        if (defined $hd_delim) {
+            push @buf, $line;
+            my $probe = $line;
+            $probe =~ s/\A\t+// if $hd_dash;
+            $hd_delim = undef if $probe eq $hd_delim;
+            if (!defined($hd_delim) && $depth == 0) {
+                _flush_section($cur_mode, @buf);
+                @buf = (); $cur_mode = ''; $depth = 0;
+            }
+            next;
+        }
+
         if ($line =~ /\A\s*(?:EXIT|exit)\s*\z/) { print "Bye.\n"; last }
         next if $depth == 0 && $line =~ /\A\s*\z/;
         push @buf, $line;
         my (undef, undef, $first) = _parse_line($line);
         $cur_mode = classify_token($first) if $depth == 0 && $cur_mode eq '';
+        # Detect here-document opener (SH only); defer activation one line
+        if ($cur_mode eq 'SH') {
+            my @hd = BATsh::SH::_hd_detect($line);
+            if (@hd) { $pending_hd_delim = $hd[2]; $pending_hd_dash = $hd[1] }
+        }
         $depth += ($cur_mode eq 'CMD') ? _cmd_paren_delta($line) : _sh_depth_delta($first);
         $depth = 0 if $depth < 0;
-        if ($depth == 0) {
+        if ($depth == 0 && !defined($pending_hd_delim)) {
             _flush_section($cur_mode, @buf);
             @buf = (); $cur_mode = ''; $depth = 0;
         }
@@ -468,11 +532,11 @@ __END__
 
 =head1 NAME
 
-BATsh - Bilingual Shell for cmd.exe and bash in one script (self-contained)
+BATsh - Bilingual Shell for cmd.exe and bash in one script
 
 =head1 VERSION
 
-Version 0.02
+Version 0.04
 
 =head1 SYNOPSIS
 
@@ -490,7 +554,7 @@ Version 0.02
   BATsh->repl();
 
   # CMD features: pipe, tilde modifiers, SET /P
-  BATsh->run_string('ECHO hello | perl -e "while(<STDIN>){chomp;print uc(\$_).chr(10)}"');
+  BATsh->run_string('ECHO hello | perl -ne "print uc"');
   BATsh->run_string("SET /P NAME=Enter name: ");
 
   # SH features: functions, expansions, pipelines, redirection
@@ -499,7 +563,7 @@ Version 0.02
       echo "Hello, \$1"
   }
   greet world
-  x=\$(echo hello | perl -e 'while(<STDIN>){chomp;print uc}')
+  x=\$(echo hello | perl -ne "print uc")
   echo \$x
   echo out > /tmp/out.txt
   BATSH
@@ -510,7 +574,7 @@ Version 0.02
 
 =head2 Executive Summary
 
-BATsh is a self-contained bilingual shell interpreter written in pure Perl.
+BATsh is a bilingual shell interpreter written in pure Perl.
 It runs cmd.exe batch syntax and bash/sh syntax in the B<same script file>,
 switching automatically between CMD mode and SH mode on a line-by-line basis.
 No external cmd.exe, bash, or sh is required -- everything runs inside Perl.
@@ -531,7 +595,7 @@ sharing variables through the common BATsh::Env variable store.
   }
   greet $LANG
   for i in 1 2 3; do echo "  item $i of $COUNT"; done
-  result=$(echo "$LANG" | perl -e 'while(<STDIN>){chomp;print uc}')
+  result=$(echo "$LANG" | perl -ne "print uc")
   echo "Uppercase: $result"
   echo "log line" >> /tmp/batsh_demo.txt
 
@@ -544,7 +608,7 @@ variable expansion (${var%pat} ${var^^} ${#var}), functions, shift, local.
 
 =head1 FULL DESCRIPTION
 
-BATsh is a self-contained bilingual shell interpreter written in pure Perl.
+BATsh is a bilingual shell interpreter written in pure Perl.
 It implements both the cmd.exe command set and the sh/bash command set
 entirely in Perl -- no external cmd.exe, bash, or sh is required.
 
@@ -660,33 +724,76 @@ Perl 5.005_03 or later. Core modules only. No external shell required.
 
 =head1 BUGS AND LIMITATIONS
 
-The built-in CMD interpreter does not support:
+Commands that are not built in -- C<FINDSTR>, C<SORT>, C<MORE>, C<CHOICE>,
+C<TIMEOUT>, C<XCOPY>, C<ROBOCOPY> and the like in CMD mode, and any
+non-builtin program in SH mode -- are B<not> reimplemented in Perl. They
+are invoked as external programs (via Perl's C<system>), so they work only
+where the host operating system provides the corresponding executable
+(e.g. F<FINDSTR.EXE> on Windows). This is by design: only the built-in
+command set is guaranteed to run identically on every platform.
+
+The built-in CMD interpreter does not implement:
 
 =over
+
+=item * Variable substring C<%VAR:~n,m%> and substitution
+C<%VAR:str1=str2%> expansion.
+
+=item * Dynamic pseudo-variables C<%RANDOM%>, C<%DATE%>, C<%TIME%>,
+C<%CD%>, C<%CMDCMDLINE%>, and C<%ERRORLEVEL%> used as a variable reference.
 
 =item * C<FOR /F> with C<usebackq> backtick-quoted commands on Windows
-(the C<cmd /c> subprocess path is untested on Windows)
-
-=item * C<CHOICE>, C<TIMEOUT>, C<XCOPY>, C<ROBOCOPY>, C<FINDSTR>, C<SORT>,
-C<MORE> and other external utilities (delegated to the OS)
+(the C<cmd /c> subprocess path is untested on Windows).
 
 =back
 
-The built-in SH interpreter does not support:
+The built-in SH interpreter does not implement:
 
 =over
 
-=item * Background execution (C<&> at end of command)
+=item * Arrays, indexed and associative: C<arr[i]>, C<${arr[@]}>,
+C<declare -A>.
 
-=item * Here-documents (C<E<lt>E<lt>>)
+=item * Filename (pathname) globbing such as C<echo *.txt> or
+C<for f in *.pl>. (The C<*>, C<?> and C<[abc]> metacharacters are honoured
+in C<case> patterns and in C<${VAR%pat}> / C<${VAR#pat}> expansion only,
+not for expanding filenames on the command line.)
 
-=item * Process substitution (C<E<lt>(cmd)>)
+=item * Tilde expansion C<~/path> and C<~user> (only C<cd> with no
+argument uses C<$HOME>).
+
+=item * Brace expansion C<{a,b}> and C<{1..5}>.
+
+=item * Here-strings (C<E<lt>E<lt>E<lt> word>) and process substitution
+(C<E<lt>(cmd)>, C<E<gt>(cmd)>).
+
+=item * The shell options C<set -e>, C<set -u>, C<set -x>, and the
+builtins C<trap>, C<getopts>, C<select>, C<alias>, C<declare>/C<typeset>,
+C<eval> and C<exec>.
 
 =back
+
+Common to both modes: a parenthesised group C<( ... )> does not run in a
+separate sub-shell; it shares the one variable store, so there is no
+variable-scope isolation.
 
 Pipeline (C<|>), I/O redirection (C<E<gt>> C<E<gt>E<gt>> C<E<lt>>
 C<2E<gt>> C<2E<gt>E<gt>> C<2E<gt>&1>), compound commands
-(C<&&> C<||> C<;>), and function definitions are all supported.
+(C<&&> C<||> C<;>), and function definitions are supported in both modes.
+
+Here-documents (C<E<lt>E<lt>EOF>, C<E<lt>E<lt>'EOF'>, C<E<lt>E<lt>-EOF>)
+B<are> supported in SH mode, with the limitations described in
+L<BATsh::SH>: one here-document per command line, no here-strings, and
+best-effort behaviour when combined with a pipeline or compound operator
+on the same line.
+
+Background execution (a trailing C<&>) B<is> supported in SH mode for
+B<external> commands only, with the limitations described in
+L<BATsh::SH>: only a trailing C<&> is recognised, built-ins/functions/
+assignments/control words ignore it, there is no job control
+(C<jobs>, C<wait>, C<fg>, C<bg>, C<%n>), and no signals are delivered to
+background jobs. In CMD mode C<&> keeps its cmd.exe meaning as a
+sequential separator.
 
 Section boundary detection is token-based (uppercase vs. lowercase first
 token). Mixed-case first tokens are treated as SH.
@@ -700,7 +807,7 @@ L<BATsh::CMD>, L<BATsh::SH>, L<BATsh::Env>
 
 =head1 AUTHOR
 
-INABA Hitoshi E<lt>ina@cpan.orgE<gt>
+INABA Hitoshi E<lt>ina.cpan@gmail.comE<gt>
 
 =head1 LICENSE
 

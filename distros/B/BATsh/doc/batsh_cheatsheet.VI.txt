@@ -1,138 +1,230 @@
-BATsh Bang Cheat Sheet [VI] Tieng Viet
-=======================================
+BATsh Tài Liệu Tham Khảo Nhanh [VI] Tiếng Việt
+==============================================
 
 ----------------------------------------------------------------------
-TOM TAT
-  BATsh la mot trinh thong dich shell song ngu chay cu phap cmd.exe
-  va bash/sh trong cung mot tep lenh, tu dong chuyen che do tung dong.
-  Khong can shell ngoai -- thuan Perl.
+TÓM TẮT
+  BATsh là một shell song ngữ chạy cú pháp batch cmd.exe và bash/sh trong
+  cùng một tệp kịch bản. Nó tự động chuyển chế độ theo từng dòng/phần.
+  Không cần shell bên ngoài -- triển khai bằng Perl thuần.
+  Hỗ trợ đường ống, chuyển hướng, hàm và các mở rộng khai triển biến.
 
-VI DU HON HOP
-  :: Phan CMD (token dau la chu hoa)
+VÍ DỤ CHẾ ĐỘ HỖN HỢP
+  :: phần CMD (token đầu tiên viết hoa)
   @ECHO OFF
   SET LANG=BATsh
+  SET COUNT=3
 
-  # Phan SH (token dau chua chu thuong)
-  greet() { echo "Xin chao $1 (che do bash)"; }
+  # phần SH (token đầu tiên viết thường)
+  greet() { echo "Hello from $1 (bash mode)"; }
   greet $LANG
-  result=$(echo $LANG | perl -e 'while(<STDIN>){chomp;print uc}')
-  echo "Chu hoa: $result"
+  for i in 1 2 3; do echo "  item $i of $COUNT"; done
+  result=$(echo $LANG | perl -ne "print uc")
+  echo "Uppercase: $result"
 
-  :: Tro lai CMD (doc ket qua SH)
-  ECHO Tro lai CMD: %result%
+  :: lại phần CMD (đọc kết quả SH qua cầu nối)
+  ECHO Back in CMD: %result%
 
-  # Chay: perl lib/BATsh.pm script.batsh
+  # Chạy bằng: perl lib/BATsh.pm script.batsh
+  # Hoặc:      use BATsh; BATsh->run('script.batsh');
 ----------------------------------------------------------------------
 
 
-BATsh la mot shell song ngu chay ca cu phap cmd.exe va bash/sh
-trong cung mot script. Token dau tien cua moi dong xac dinh che do.
+BATsh là một shell song ngữ chạy cú pháp cmd.exe và bash/sh trong cùng một
+kịch bản.  Kịch bản được chia thành các phần; mỗi phần được thực thi nguyên
+văn bởi shell phù hợp.
 
-1. Phat hien che do
---------------------
-  ECHO hello          -> che do cmd.exe (token dau tien toan chu hoa)
-  echo hello          -> che do bash/sh (token dau tien co chu thuong)
-  # binh luan         -> binh luan (bo qua)
-  :: binh luan        -> binh luan (kieu CMD, bo qua)
-  REM binh luan       -> binh luan (kieu CMD, bo qua)
-
-2. Khoi dong Shell
+1. Phát Hiện Chế Độ
 -------------------
-  perl lib/BATsh.pm                    # REPL tuong tac
-  perl lib/BATsh.pm script.batsh       # chay file script
-  perl lib/BATsh.pm -e "echo xin chao" # lenh mot dong
+  TOKEN ĐẦU TIÊN của dòng có nội dung đầu tiên trong một phần quyết định
+  shell nào sẽ thực thi phần đó:
 
-  Tu Perl API:
+  Chế độ CMD: token đầu tiên hoàn toàn gồm [A-Z 0-9 _ - \ / : . @ %] VÀ chứa
+              ít nhất một chữ hoa A-Z.
+
+    ECHO hello          -> phần CMD (cmd.exe)
+    SET FOO=bar baz     -> phần CMD  (không kiểm tra phần giá trị)
+    @ECHO OFF           -> phần CMD
+    IF "%X%"=="Y" (     -> phần CMD
+
+  Chế độ SH: mọi thứ khác (có chữ thường, hoặc không có chữ cái nào).
+
+    echo hello          -> phần SH  (bash/sh)
+    export FOO=bar      -> phần SH
+    if [ -f "$f" ]; then  -> phần SH
+    #!/bin/sh           -> phần SH  (shebang là một dòng SH)
+
+  Chú thích và dòng trống được thu vào phần hiện tại.
+  Cú pháp chú thích:
+    ::           chú thích kiểu CMD
+    REM ...      chú thích kiểu CMD (không phân biệt hoa thường)
+    @REM ...     chú thích kiểu CMD
+    # ...        chú thích kiểu SH  (KHÔNG phải shebang #!)
+
+2. Khởi Động Shell
+------------------
+  perl lib/BATsh.pm               # REPL tương tác
+  perl lib/BATsh.pm script.batsh  # chạy một tệp kịch bản
+  perl lib/BATsh.pm -e "echo hi"  # lệnh một dòng nội tuyến
+
+  Từ Perl:
     use BATsh;
     BATsh->run('script.batsh');
-    BATsh->run_string("echo xin chao");
+    BATsh->run_string("echo hello");
     BATsh->repl();
 
-3. Cau noi bien moi truong
-----------------------------
-  Cac khoi CMD va SH chia se bien qua %ENV cua Perl.
+3. Cầu Nối Biến Môi Trường
+--------------------------
+  Trước khi mỗi phần chạy, BATsh chèn %ENV hiện tại làm phần mở đầu (các dòng
+  SET cho CMD, các dòng export cho SH).  Sau phần đó, môi trường cuối cùng
+  của shell được đọc ngược lại vào %ENV.
 
-  export FOO=xin_chao # SH dat FOO
-  ECHO %FOO%          # CMD doc FOO qua cau noi (Windows)
+  export FOO=hello   # SH đặt FOO
+  ECHO %FOO%         # CMD đọc FOO qua cầu nối (Windows)
 
-  SET BAR=the_gioi    # CMD dat BAR
-  echo $BAR           # SH doc BAR qua cau noi
+  SET BAR=world      # CMD đặt BAR
+  echo $BAR          # SH đọc BAR qua cầu nối
 
 4. SETLOCAL / ENDLOCAL
------------------------
-  SETLOCAL           # luu anh chup %ENV
-  SET TMP=gia_tri_cuc_bo
+----------------------
+  SETLOCAL           # chụp nhanh %ENV (do BATsh xử lý, không phải cmd.exe)
+  SET TMP=local_val
   ECHO %TMP%
-  ENDLOCAL           # khoi phuc %ENV (TMP bien mat)
+  ENDLOCAL           # khôi phục %ENV (TMP biến mất)
 
-  Pham vi co the long nhau.
+  Các phạm vi có thể lồng nhau.
 
-5. Long nhau (Che do hon hop)
+5. Phát Hiện Ranh Giới Phần
+---------------------------
+  Một phần kết thúc khi độ sâu khối của nó trở về 0 VÀ dòng có nội dung
+  tiếp theo thuộc về một chế độ khác.
+
+  Phần CMD theo dõi độ sâu ( và ) ngoài dấu nháy:
+
+    IF "%X%"=="Y" (     <- mở khối (độ sâu 1)
+        ECHO yes
+    ) ELSE (            <- đóng rồi mở lại (độ sâu giữ >=1)
+        ECHO no
+    )                   <- đóng khối (độ sâu 0) -> phần có thể kết thúc
+
+  Phần SH theo dõi độ sâu từ khóa:
+
+    for x in 1 2; do   <- mở khối (độ sâu 1)
+        echo $x
+    done                <- đóng khối (độ sâu 0) -> phần có thể kết thúc
+
+  Các dòng bên trong một khối đang mở được thu vào phần hiện tại ngay cả khi
+  token đầu tiên của chúng trông giống chế độ khác. Điều này cho phép:
+
+    for x in A B; do
+        ECHO $x          <- chữ hoa trong khối SH: vẫn là phần SH
+    done
+
+  Các cặp từ khóa SH:
+    Mở (+1)    : if  for  while  until  case  function  select  {
+    Đóng (-1)  : fi  done  esac  }
+    Trung tính ( 0) : then  do  else  elif
+
+6. Định Nghĩa Chương Trình Con
 ------------------------------
-  Cac cau truc khoi phai duoc ghep cap dung.
-
-  for x in 1 2; do   # SH mo khoi
-      ECHO item $x   # dong CMD trong khoi SH
-  done               # SH dong khoi
-
-  Tu khoa CMD: IF/ENDIF  FOR/NEXT  WHILE/WEND  DO/LOOP
-  Tu khoa SH:  if/fi  for/done  while/done  until/done  case/esac  { }
-
-6. Dinh nghia Chương trinh con
--------------------------------
   :GREET
-  echo "Xin chao $BATSH_ARG1"
+  echo "Hello $BATSH_ARG1"
   RET
 
-7. CALL va source
-------------------
-  CALL :GREET the_gioi   # goi chương trinh con voi tham so
-  CALL khac.batsh        # them/chay file .batsh khac (CMD)
-  source khac.batsh      # them/chay file .batsh khac (SH)
-  . khac.batsh           # ky hieu cham POSIX
+  Nhãn bắt đầu bằng : và kết thúc bằng RET hoặc RETURN.
+  Thân được trích xuất trước khi thực thi (không chạy nội tuyến).
+  Thân có thể chứa các dòng CMD, dòng SH, hoặc hỗn hợp.
 
-  Tham so: $BATSH_ARG1 .. $BATSH_ARGn  (%BATSH_ARG1% trong CMD)
-  So luong: $BATSH_ARGC
+7. CALL và source
+-----------------
+  CALL :GREET world      # gọi chương trình con với đối số
+  CALL other.batsh       # bao gồm/chạy tệp .batsh khác (CMD)
+  source other.batsh     # bao gồm/chạy tệp .batsh khác (SH)
+  . other.batsh          # ký pháp dấu chấm POSIX
+
+  Đối số: $BATSH_ARG1 .. $BATSH_ARGn  (%BATSH_ARG1% trong CMD)
+  Số lượng: $BATSH_ARGC
 
 8. Perl API
 -----------
-  BATsh->run($file)            # chay file .batsh
-  BATsh->run_string($source)   # chay chuoi nguon
-  BATsh->run_lines(@lines)     # chay mang dong
-  BATsh->repl()                # REPL tuong tac
-  BATsh->classify_token($tok)  # tra ve 'CMD' hoac 'SH'
-  BATsh->setlocal()            # anh chup %ENV
-  BATsh->endlocal()            # khoi phuc %ENV
-  BATsh->call_sub($lbl, @args) # goi chương trinh con
-  BATsh->source_file($file)    # them file .batsh
-  BATsh->version()             # chuoi phien ban
+  BATsh->run($file)            # chạy một tệp .batsh
+  BATsh->run_string($source)   # chạy chuỗi nguồn
+  BATsh->run_lines(@lines)     # chạy mảng các dòng
+  BATsh->repl()                # REPL tương tác
+  BATsh->classify_token($tok)  # 'CMD' hoặc 'SH'
+  BATsh->setlocal()            # chụp nhanh %ENV
+  BATsh->endlocal()            # khôi phục %ENV
+  BATsh->call_sub($lbl, @args) # gọi chương trình con
+  BATsh->source_file($file)    # bao gồm tệp .batsh
+  BATsh->version()             # chuỗi phiên bản
 
-9. Ghi chu nen tang
---------------------
-  Windows: Ca hai khoi CMD va SH chay bang Perl thuan tuy -- khong can cmd.exe/bash/sh ngoai.
-  UNIX:    Ca hai khoi CMD va SH chay bang Perl thuan tuy -- khong can cmd.exe/bash/sh ngoai.
+9. Ghi Chú Nền Tảng
+-------------------
+  Windows: Cả phần CMD và SH đều chạy bằng Perl thuần -- không cần cmd.exe, bash, hay sh bên ngoài.
+  UNIX:    Cả phần CMD và SH đều chạy bằng Perl thuần -- không cần cmd.exe, bash, hay sh bên ngoài.
 
-10. Yeu cau
+10. Yêu Cầu
 -----------
-  Perl 5.005_03 tro len. Chi module loi (File::Spec, Carp).
-  Khong phu thuoc CPAN.
+  Perl 5.005_03 trở lên.  Chỉ các mô-đun lõi (File::Spec, Carp).
+  Không phụ thuộc CPAN.
 
-Xem them: https://metacpan.org/dist/BATsh
+11. Đường Ống CMD và Bộ Sửa Đổi Tham Số
+---------------------------------------
+  cmd1 | cmd2              # đường ống qua tệp tạm (Perl thuần)
+  ECHO hello | perl -e "while(<STDIN>){print uc}"
 
-11. Duong ong CMD va cac bien the tham so
--------------------------------------------
-  cmd1 | cmd2              # Duong ong qua file tam thoi (Pure Perl)
-  SET /P VAR=Nhac:         # Doc mot dong tu STDIN vao VAR
-  %~dp0                    # O dia+thu muc cua %0 (dung nhieu nhat)
-  %~n1, %~x1, %~nx1       # Ten file, phan mo rong, ca hai
+  SET /P VAR=Prompt:       # đọc một dòng từ STDIN vào VAR
 
-12. Ham SH va mo rong bien
-----------------------------
-  f() { echo $1; }         # Dinh nghia ham
-  ${var%.*}  ${var%%.*}    # Xoa hau to (ngan nhat/dai nhat)
-  ${var#*.}  ${var##*.}    # Xoa tien to (ngan nhat/dai nhat)
-  ${var/a/b} ${var//a/b}   # Thay the (dau tien/tat ca)
-  ${var^^} ${var,,}        # Chu hoa/chu thuong
-  cmd > f  cmd >> f  2>&1  # Chuyen huong
-  cmd1 && cmd2             # Noi AND
-  cmd1 || cmd2             # Noi OR
+  Bộ sửa đổi dấu ngã của tham số batch (ví dụ khi %0=C:\scripts\deploy.bat):
+    %~0   -> C:\scripts\deploy.bat  (chỉ bỏ dấu nháy)
+    %~f0  -> C:/scripts/deploy.bat  (đường dẫn tuyệt đối đầy đủ)
+    %~d0  -> C:                     (ký tự ổ đĩa)
+    %~p0  -> /scripts/              (đường dẫn thư mục)
+    %~n0  -> deploy                 (tên tệp không phần mở rộng)
+    %~x0  -> .bat                   (phần mở rộng)
+    %~dp0 -> C:/scripts/            (ổ đĩa + thư mục, phổ biến nhất)
+    %~nx1 -> deploy.bat             (tên + phần mở rộng)
+
+12. Hàm SH và Khai Triển
+------------------------
+  greet() {              # định nghĩa hàm
+      echo "Hi $1"
+  }
+  function add {         # cú pháp thay thế
+      echo $(( $1 + $2 ))
+  }
+  greet world            # gọi hàm
+  add 3 4                # -> 7
+
+  ${var%.*}    bỏ hậu tố ngắn nhất khớp với .*
+  ${var%%.*}   bỏ hậu tố dài nhất  khớp với .*
+  ${var#*.}    bỏ tiền tố ngắn nhất khớp với *.
+  ${var##*.}   bỏ tiền tố dài nhất  khớp với *.
+  ${var/a/b}   thay thế lần xuất hiện đầu tiên của a bằng b
+  ${var//a/b}  thay thế tất cả lần xuất hiện của a bằng b
+  ${var^^}     viết hoa tất cả
+  ${var,,}     viết thường tất cả
+  ${var:2:4}   chuỗi con từ vị trí 2, độ dài 4
+  ${#var}      độ dài chuỗi
+  ${var:-def}  giá trị nếu đã đặt, nếu không thì def
+
+13. Chuyển Hướng I/O của SH
+---------------------------
+  cmd > file      ghi đè stdout
+  cmd >> file     nối thêm vào stdout
+  cmd < file      stdin từ tệp
+  cmd 2> file     stderr ra tệp
+  cmd 2>&1        gộp stderr vào stdout
+  cmd > f 2>&1    cả stdout và stderr ra tệp
+
+  Here-document (đầu vào trên stdin):
+    cmd <<EOF       các dòng thân cho đến EOF; $VAR được khai triển
+    cmd <<'EOF'     các dòng thân cho đến EOF; không khai triển (nguyên văn)
+    cmd <<-EOF      như <<EOF, nhưng các ký tự TAB đầu dòng bị loại bỏ
+
+14. Lệnh Phức Hợp SH
+--------------------
+  cmd1 && cmd2    chạy cmd2 chỉ khi cmd1 thành công
+  cmd1 || cmd2    chạy cmd2 chỉ khi cmd1 thất bại
+  cmd1 ; cmd2     chạy cmd2 vô điều kiện
+
+Xem thêm: https://metacpan.org/dist/BATsh

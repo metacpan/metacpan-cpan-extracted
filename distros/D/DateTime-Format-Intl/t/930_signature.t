@@ -1,7 +1,7 @@
 #!perl
 use Test::More;
 
-my $keyserver = $ENV{MODULE_SIGNATURE_KEYSERVER} || 'pool.sks-keyservers.net';
+my $keyserver = $ENV{MODULE_SIGNATURE_KEYSERVER} || 'keyserver.ubuntu.com';
 if (!$ENV{AUTHOR_TESTING}) {
     plan skip_all =>
       "Set the environment variable AUTHOR_TESTING to enable this test.";

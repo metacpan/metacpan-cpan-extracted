@@ -20,6 +20,26 @@ use File::Spec ();
 use lib "$FindBin::Bin/../lib";
 
 eval { require BATsh } or die "Cannot load BATsh: $@";
+
+# Portability: the commands below shell out to a bareword "perl".  On a
+# CPAN smoker the perl under test is frequently NOT on PATH as "perl"
+# (perlbrew/plenv, or perl invoked by absolute path), so the bareword
+# would yield "perl: not found" and an empty result.  Prepend the
+# directory of the running interpreter ($^X) to PATH so "perl" always
+# resolves to the very perl now running the suite.  This is done by
+# environment (not by embedding $^X in the command string), so a Win32
+# path with backslashes never reaches SH-mode quote/escape processing.
+# Must run BEFORE the first init(), because init() snapshots %ENV into
+# BATsh's STORE and sync_to_env() later copies STORE back to %ENV.
+{
+    my ($pvol, $pdirs) = File::Spec->splitpath($^X);
+    my $perldir = File::Spec->catpath($pvol, $pdirs, '');
+    if (length $perldir) {
+        my $sep = ($^O =~ /^(?:MSWin32|dos|os2)$/) ? ';' : ':';
+        $ENV{'PATH'} = (defined($ENV{'PATH'}) && length($ENV{'PATH'}))
+                     ? "$perldir$sep$ENV{'PATH'}" : $perldir;
+    }
+}
 BATsh::Env::init();
 
 my @tests = (
@@ -47,7 +67,7 @@ my @tests = (
         my $found = 0;
         if (open(PMFH2, $pmake)) {
             while (<PMFH2>) {
-                if (/Copyright \(c\) 2008-2021, 2026 INABA Hitoshi/) {
+                if (/Copyright \(c\) 2008, 2009, 2010, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi/) {
                     $found = 1; last;
                 }
             }
@@ -295,7 +315,7 @@ my @tests = (
         BATsh::Env::init();
         my $out = _capture(sub {
             BATsh->run_string(
-                'echo pipetest | perl -e "while(<STDIN>){chomp;print uc($_),chr(10)}"'
+                "echo pipetest | perl -ne \"print uc\""
             );
         });
         $out =~ s/\r//g;
@@ -307,7 +327,7 @@ my @tests = (
         BATsh::Env::init();
         my $out = _capture(sub {
             BATsh->run_string(
-                'echo leftside | perl -e "while(<STDIN>){chomp;print uc($_),chr(10)}"'
+                "echo leftside | perl -ne \"print uc\""
             );
         });
         $out =~ s/\r//g;
@@ -564,7 +584,7 @@ my @tests = (
         my $out = _capture(sub { BATsh->run_string('echo a; echo b') });
         $out =~ s/\r//g; my @g = split /\n/, $out;
         _ok(@g == 2 && $g[0] eq 'a' && $g[1] eq 'b',
-            "NF46: semicolon chain (got [" . join('|',@g) . "])");
+            "NF46: semicolon chain (got [" . join('|', @g) . "])");
     },
 
     # NF47: false && X || Y gives Y
@@ -586,7 +606,7 @@ my @tests = (
         my $out = _capture(sub { BATsh->run_string("echo \$1\nshift\necho \$1\n") });
         $out =~ s/\r//g; my @g = split /\n/, $out;
         _ok($g[0] eq 'one' && $g[1] eq 'two',
-            "NF48: shift updates \$1 (got [" . join('|',@g) . "])");
+            "NF48: shift updates \$1 (got [" . join('|', @g) . "])");
     },
 
     # NF49: shift rebuilds $*
@@ -613,7 +633,7 @@ my @tests = (
         });
         $out =~ s/\r//g; my @g = split /\n/, $out;
         _ok(@g == 2 && $g[0] eq 'inner' && $g[1] eq 'outer',
-            "NF50: local scope restored (got [" . join('|',@g) . "])");
+            "NF50: local scope restored (got [" . join('|', @g) . "])");
     },
 
     # NF51: local without =value still restores original
@@ -627,7 +647,7 @@ my @tests = (
         });
         $out =~ s/\r//g; my @g = split /\n/, $out;
         _ok(@g == 2 && $g[0] eq 'changed' && $g[1] eq 'keep',
-            "NF51: local var restores after return (got [" . join('|',@g) . "])");
+            "NF51: local var restores after return (got [" . join('|', @g) . "])");
     },
 
     ##################################################################
@@ -650,6 +670,227 @@ my @tests = (
         BATsh::_set_batch_args($abs);
         my $v = BATsh::Env->get('%0'); $v = '' unless defined $v;
         _ok($v eq $abs, "NF53: absolute \$0 preserved (got [$v])");
+    },
+
+    ##################################################################
+    # Here-document (<<)
+    ##################################################################
+
+    # NF54: here-document feeds STDIN to a builtin (read)
+    sub {
+        BATsh::Env::init();
+        delete $BATsh::Env::STORE{'NF54_V'};
+        BATsh->run_string("read NF54_V <<EOF\nfromheredoc\nEOF");
+        my $v = $BATsh::Env::STORE{'NF54_V'};
+        $v = '' unless defined $v;
+        _ok($v eq 'fromheredoc', "NF54: heredoc feeds builtin read (got [$v])");
+    },
+
+    # NF55: unquoted delimiter expands variables in body
+    sub {
+        BATsh::Env::init();
+        delete $BATsh::Env::STORE{'NF55_V'};
+        BATsh->run_string("NF55_N=ina\nread NF55_V <<EOF\nhi \$NF55_N\nEOF");
+        my $v = $BATsh::Env::STORE{'NF55_V'};
+        $v = '' unless defined $v;
+        _ok($v eq 'hi ina', "NF55: unquoted heredoc expands (got [$v])");
+    },
+
+    # NF56: quoted delimiter suppresses expansion
+    sub {
+        BATsh::Env::init();
+        delete $BATsh::Env::STORE{'NF56_V'};
+        BATsh->run_string("NF56_N=ina\nread NF56_V <<'EOF'\nhi \$NF56_N\nEOF");
+        my $v = $BATsh::Env::STORE{'NF56_V'};
+        $v = '' unless defined $v;
+        _ok($v eq 'hi $NF56_N', "NF56: quoted heredoc no expansion (got [$v])");
+    },
+
+    # NF57: <<- strips leading tabs from body and delimiter
+    sub {
+        BATsh::Env::init();
+        delete $BATsh::Env::STORE{'NF57_V'};
+        BATsh->run_string("read NF57_V <<-EOF\n\t\tindented\n\tEOF");
+        my $v = $BATsh::Env::STORE{'NF57_V'};
+        $v = '' unless defined $v;
+        _ok($v eq 'indented', "NF57: <<- strips leading tabs (got [$v])");
+    },
+
+    # NF58: an uppercase body line is NOT reclassified to CMD mode
+    #       (top-level classification protection); it stays literal text.
+    sub {
+        BATsh::Env::init();
+        delete $BATsh::Env::STORE{'NF58_V'};
+        BATsh->run_string("read NF58_V <<EOF\nECHO LITERAL TEXT\nEOF");
+        my $v = $BATsh::Env::STORE{'NF58_V'};
+        $v = '' unless defined $v;
+        _ok($v eq 'ECHO LITERAL TEXT',
+            "NF58: uppercase body line stays literal (got [$v])");
+    },
+
+    # NF59: a section after a heredoc still executes (no section break)
+    sub {
+        BATsh::Env::init();
+        my $out = _capture(sub {
+            BATsh->run_string("read NF59_V <<EOF\nbody\nEOF\necho after=\$NF59_V");
+        });
+        $out =~ s/\r//g;
+        _ok($out =~ /after=body/, "NF59: command after heredoc runs (got [$out])");
+    },
+
+    # NF60: heredoc feeds STDIN to an external command (portable perl)
+    sub {
+        BATsh::Env::init();
+        my $out = _capture(sub {
+            BATsh->run_string(
+                "perl -ne \"print uc\" <<EOF\nhello\nworld\nEOF"
+            );
+        });
+        $out =~ s/\r//g;
+        _ok($out =~ /HELLO/ && $out =~ /WORLD/,
+            "NF60: heredoc feeds external command stdin (got [$out])");
+    },
+
+    # NF61: empty body yields EOF immediately, following command runs
+    sub {
+        BATsh::Env::init();
+        my $out = _capture(sub {
+            BATsh->run_string("read NF61_V <<EOF\nEOF\necho done61");
+        });
+        $out =~ s/\r//g;
+        _ok($out =~ /done61/, "NF61: empty heredoc body ok (got [$out])");
+    },
+
+    # NF62: unterminated here-document sets non-zero status
+    sub {
+        BATsh::Env::init();
+        _capture(sub {
+            local $SIG{'__WARN__'} = sub { };   # silence expected warning
+            BATsh->run_string("read NF62_V <<EOF\nno terminator");
+        });
+        _ok(BATsh::SH::last_status() != 0,
+            "NF62: unterminated heredoc => non-zero status (got ["
+            . BATsh::SH::last_status() . "])");
+    },
+
+    # NF63: << inside quotes is NOT treated as a here-document opener
+    sub {
+        BATsh::Env::init();
+        my $out = _capture(sub {
+            BATsh->run_string('echo "a << b"');
+        });
+        $out =~ s/\r//g;
+        _ok($out =~ /a << b/, "NF63: quoted << not a heredoc (got [$out])");
+    },
+
+    ##################################################################
+    # 5. Background execution (trailing &)  -- SH mode, v1
+    ##################################################################
+
+    # NF64: trailing & is detected and stripped
+    sub {
+        my ($bg, $s) = BATsh::SH::_split_trailing_bg('echo hi &');
+        _ok($bg == 1 && $s eq 'echo hi',
+            "NF64: trailing & stripped (bg=$bg strip=[$s])");
+    },
+
+    # NF65: && compound operator is NOT background
+    sub {
+        my ($bg, $s) = BATsh::SH::_split_trailing_bg('echo a && echo b');
+        _ok($bg == 0 && $s eq 'echo a && echo b',
+            "NF65: && is not background (bg=$bg)");
+    },
+
+    # NF66: internal & of 2>&1 preserved, only trailing & removed
+    sub {
+        my ($bg, $s) = BATsh::SH::_split_trailing_bg('cmd 2>&1 &');
+        _ok($bg == 1 && $s eq 'cmd 2>&1',
+            "NF66: 2>&1 not mis-split (bg=$bg strip=[$s])");
+    },
+
+    # NF67: fd-duplication >&2 preserved, only trailing & removed
+    sub {
+        my ($bg, $s) = BATsh::SH::_split_trailing_bg('cmd >&2 &');
+        _ok($bg == 1 && $s eq 'cmd >&2',
+            "NF67: >&2 not mis-split (bg=$bg strip=[$s])");
+    },
+
+    # NF68: & inside quotes is NOT background
+    sub {
+        my ($bg, $s) = BATsh::SH::_split_trailing_bg('echo "a & b"');
+        _ok($bg == 0, "NF68: quoted & not background (bg=$bg)");
+    },
+
+    # NF69: a bare & (nothing to run) is NOT background
+    sub {
+        my ($bg, $s) = BATsh::SH::_split_trailing_bg('&');
+        _ok($bg == 0, "NF69: bare & not background (bg=$bg)");
+    },
+
+    # NF70: foreground-word predicate (builtin / assignment vs external)
+    sub {
+        my $b1 = BATsh::SH::_sh_word_is_foreground('echo');     # builtin
+        my $b2 = BATsh::SH::_sh_word_is_foreground('NF70_V=1'); # assignment
+        my $b3 = BATsh::SH::_sh_word_is_foreground('myextprog');# external
+        _ok($b1 && $b2 && !$b3,
+            "NF70: fg predicate (echo=$b1 assign=$b2 ext=$b3)");
+    },
+
+    # NF71: $! expands to the last background PID (empty before any job)
+    sub {
+        BATsh::Env::init();
+        $BATsh::SH::_LAST_BG_PID = '';
+        my $empty = BATsh::SH::_expand('BATsh::SH', '[$!]');
+        $BATsh::SH::_LAST_BG_PID = 4242;
+        my $set   = BATsh::SH::_expand('BATsh::SH', 'pid=$!');
+        $BATsh::SH::_LAST_BG_PID = '';
+        _ok($empty eq '[]' && $set eq 'pid=4242',
+            "NF71: \$! expansion (empty=[$empty] set=[$set])");
+    },
+
+    # NF72: builtin echo with trailing & runs in the foreground
+    sub {
+        BATsh::Env::init();
+        my $out = _capture(sub {
+            BATsh->run_string('echo fgbuiltin &');
+        });
+        $out =~ s/\r//g;
+        _ok($out =~ /fgbuiltin/,
+            "NF72: builtin & runs foreground (got [$out])");
+    },
+
+    # NF73: assignment with trailing & still runs in the foreground
+    sub {
+        BATsh::Env::init();
+        delete $BATsh::Env::STORE{'NF73_V'};
+        BATsh->run_string('NF73_V=fgvalue &');
+        my $v = $BATsh::Env::STORE{'NF73_V'};
+        $v = '' unless defined $v;
+        _ok($v eq 'fgvalue',
+            "NF73: assignment & runs foreground (got [$v])");
+    },
+
+    # NF74: launching an external in the background sets $? = 0 and a
+    # numeric (or empty) $!, without blocking.  Uses $^X (the running
+    # perl) so the test is portable.
+    sub {
+        BATsh::Env::init();
+        $BATsh::SH::_LAST_BG_PID = '';
+        my $perl = $^X;
+        my $pid;
+        _capture(sub {
+            BATsh->run_string("\"$perl\" -e 1 &\necho st=\$?");
+        });
+        $pid = $BATsh::SH::_LAST_BG_PID;
+        $pid = '' unless defined $pid;
+        _ok($pid =~ /\A\d*\z/,
+            "NF74: background launch records numeric/empty PID (pid=[$pid])");
+    },
+
+    # NF75: a backslash-escaped trailing & is NOT background
+    sub {
+        my ($bg, $s) = BATsh::SH::_split_trailing_bg('cmd \\&');
+        _ok($bg == 0, "NF75: escaped \\& not background (bg=$bg)");
     },
 
 );
@@ -689,4 +930,4 @@ sub _ok {
     print +($ok ? '' : 'not ') . "ok $run - $name\n";
 }
 $_->() for @tests;
-END { exit 1 if $fail }
+END { $? = 1 if $fail }

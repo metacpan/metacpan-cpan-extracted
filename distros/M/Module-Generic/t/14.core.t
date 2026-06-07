@@ -597,7 +597,7 @@ subtest "serialisation" => sub
             is_deeply( $orig => $test, 'deserialised data is identical' );
         }
     };
-    
+
     SKIP:
     {
         local $SIG{__WARN__} = sub{};
@@ -676,7 +676,7 @@ subtest "on demand" => sub
     {
         &Module::Generic::_autoload_subs();
     }
-    
+
     foreach my $sub ( sort( keys( %$Module::Generic::AUTOLOAD_SUBS ) ) )
     {
         my $code = $o->can( $sub );

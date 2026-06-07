@@ -1,0 +1,231 @@
+BATsh කෙටි මාර්ගෝපදේශය [SI] සිංහල
+================================
+
+----------------------------------------------------------------------
+සාරාංශය
+  BATsh යනු cmd.exe batch සහ bash/sh වාක්‍ය ඛණ්ඩ එකම script ගොනුවක
+  ක්‍රියාත්මක කරන ද්විභාෂා shell එකකි. එය පේළිය/කොටස අනුව ස්වයංක්‍රීයව
+  ආකාරය මාරු කරයි.
+  බාහිර shell අවශ්‍ය නැත -- පිරිසිදු Perl ක්‍රියාත්මක කිරීමකි.
+  pipeline, redirection, ශ්‍රිත සහ විචල්‍ය-විස්තාරණ දිගු සඳහා සහාය දක්වයි.
+
+මිශ්‍ර ආකාර නියැදිය
+  :: CMD කොටස (පළමු token ලොකු අකුරු)
+  @ECHO OFF
+  SET LANG=BATsh
+  SET COUNT=3
+
+  # SH කොටස (පළමු token කුඩා අකුරු)
+  greet() { echo "Hello from $1 (bash mode)"; }
+  greet $LANG
+  for i in 1 2 3; do echo "  item $i of $COUNT"; done
+  result=$(echo $LANG | perl -ne "print uc")
+  echo "Uppercase: $result"
+
+  :: නැවත CMD කොටස (bridge හරහා SH ප්‍රතිඵලය කියවයි)
+  ECHO Back in CMD: %result%
+
+  # මෙයින් ධාවනය කරන්න: perl lib/BATsh.pm script.batsh
+  # හෝ:                use BATsh; BATsh->run('script.batsh');
+----------------------------------------------------------------------
+
+
+BATsh යනු cmd.exe සහ bash/sh වාක්‍ය ඛණ්ඩ එකම script එකක ක්‍රියාත්මක කරන
+ද්විභාෂා shell එකකි.  script එක කොටස් වලට බෙදේ; සෑම කොටසක්ම සුදුසු shell
+මගින් යථා පරිදි ක්‍රියාත්මක කරයි.
+
+1. ආකාරය හඳුනා ගැනීම
+--------------------
+  කොටසක පළමු අර්ථවත් පේළියේ «පළමු token» මගින් එම කොටස ක්‍රියාත්මක කරන්නේ
+  කුමන shell දැයි තීරණය වේ:
+
+  CMD ආකාරය: පළමු token සම්පූර්ණයෙන්ම [A-Z 0-9 _ - \ / : . @ %] වලින්
+             සෑදී ඇති අතර අවම වශයෙන් එක් ලොකු අකුරක් A-Z අඩංගු වේ.
+
+    ECHO hello          -> CMD කොටස (cmd.exe)
+    SET FOO=bar baz     -> CMD කොටස  (අගය කොටස පරීක්ෂා නොකෙරේ)
+    @ECHO OFF           -> CMD කොටස
+    IF "%X%"=="Y" (     -> CMD කොටස
+
+  SH ආකාරය: අන් සියල්ල (කුඩා අකුරක් ඇත, හෝ අකුරක් කිසිසේත් නැත).
+
+    echo hello          -> SH කොටස  (bash/sh)
+    export FOO=bar      -> SH කොටස
+    if [ -f "$f" ]; then  -> SH කොටස
+    #!/bin/sh           -> SH කොටස  (shebang යනු SH පේළියකි)
+
+  අදහස් සහ හිස් පේළි වත්මන් කොටසට අවශෝෂණය වේ.
+  අදහස් වාක්‍ය ඛණ්ඩය:
+    ::           CMD ශෛලියේ අදහස
+    REM ...      CMD ශෛලියේ අදහස (ලොකු/කුඩා අකුරු වෙනස නොසලකයි)
+    @REM ...     CMD ශෛලියේ අදහස
+    # ...        SH ශෛලියේ අදහස  (#! shebang නොවේ)
+
+2. Shell ආරම්භ කිරීම
+--------------------
+  perl lib/BATsh.pm               # අන්තර්ක්‍රියාකාරී REPL
+  perl lib/BATsh.pm script.batsh  # script ගොනුවක් ධාවනය කරන්න
+  perl lib/BATsh.pm -e "echo hi"  # inline එක්-පේළි විධානය
+
+  Perl වෙතින්:
+    use BATsh;
+    BATsh->run('script.batsh');
+    BATsh->run_string("echo hello");
+    BATsh->repl();
+
+3. පරිසර විචල්‍ය Bridge
+-----------------------
+  සෑම කොටසක් ධාවනය වීමට පෙර, BATsh වත්මන් %ENV පූර්විකාව ලෙස එක් කරයි
+  (CMD සඳහා SET පේළි, SH සඳහා export පේළි).  කොටසෙන් පසු, shell හි අවසාන
+  පරිසරය නැවත %ENV වෙත කියවයි.
+
+  export FOO=hello   # SH මගින් FOO සකසයි
+  ECHO %FOO%         # CMD මගින් bridge හරහා FOO කියවයි (Windows)
+
+  SET BAR=world      # CMD මගින් BAR සකසයි
+  echo $BAR          # SH මගින් bridge හරහා BAR කියවයි
+
+4. SETLOCAL / ENDLOCAL
+----------------------
+  SETLOCAL           # %ENV ඡායාරූපය (cmd.exe නොව BATsh විසින් හසුරුවයි)
+  SET TMP=local_val
+  ECHO %TMP%
+  ENDLOCAL           # %ENV ප්‍රතිස්ථාපනය (TMP අතුරුදහන් වේ)
+
+  විෂය පථ එකිනෙක තුළ තැබිය හැක.
+
+5. කොටස් සීමා හඳුනා ගැනීම
+------------------------
+  කොටසක block ගැඹුර බිංදුවට පැමිණ, ඊළඟ අර්ථවත් පේළිය වෙනස් ආකාරයකට
+  අයත් වන විට එම කොටස අවසන් වේ.
+
+  CMD කොටස් උද්ධෘත ලකුණු වලින් පිටත ( සහ ) ගැඹුර නිරීක්ෂණය කරයි:
+
+    IF "%X%"=="Y" (     <- block විවෘත කරයි (ගැඹුර 1)
+        ECHO yes
+    ) ELSE (            <- වසා නැවත විවෘත කරයි (ගැඹුර >=1 පවතී)
+        ECHO no
+    )                   <- block වසයි (ගැඹුර 0) -> කොටස අවසන් විය හැක
+
+  SH කොටස් keyword ගැඹුර නිරීක්ෂණය කරයි:
+
+    for x in 1 2; do   <- block විවෘත කරයි (ගැඹුර 1)
+        echo $x
+    done                <- block වසයි (ගැඹුර 0) -> කොටස අවසන් විය හැක
+
+  විවෘත block එකක් තුළ ඇති පේළි, ඒවායේ පළමු token වෙනත් ආකාරයක් සේ පෙනුණද,
+  වත්මන් කොටසට අවශෝෂණය වේ. මෙය මෙය හැකි කරයි:
+
+    for x in A B; do
+        ECHO $x          <- SH block තුළ ලොකු අකුරු: තවමත් SH කොටසයි
+    done
+
+  SH keyword යුගල:
+    විවෘත කරන්නා (+1) : if  for  while  until  case  function  select  {
+    වසන්නා (-1) : fi  done  esac  }
+    මධ්‍යස්ථ ( 0) : then  do  else  elif
+
+6. උපරුටින් නිර්වචන
+-------------------
+  :GREET
+  echo "Hello $BATSH_ARG1"
+  RET
+
+  ලේබල : වලින් ආරම්භ වී RET හෝ RETURN වලින් අවසන් වේ.
+  ශරීරය ක්‍රියාත්මක කිරීමට පෙර උපුටා ගනී (inline ධාවනය නොවේ).
+  ශරීරයේ CMD පේළි, SH පේළි, හෝ මිශ්‍රණයක් අඩංගු විය හැක.
+
+7. CALL සහ source
+-----------------
+  CALL :GREET world      # argument සමඟ උපරුටිනය ඇමතීම
+  CALL other.batsh       # වෙනත් .batsh ගොනුවක් ඇතුළත් කරන්න/ධාවනය කරන්න (CMD)
+  source other.batsh     # වෙනත් .batsh ගොනුවක් ඇතුළත් කරන්න/ධාවනය කරන්න (SH)
+  . other.batsh          # POSIX තිත් අංකනය
+
+  Argument: $BATSH_ARG1 .. $BATSH_ARGn  (CMD තුළ %BATSH_ARG1%)
+  ගණන:      $BATSH_ARGC
+
+8. Perl API
+-----------
+  BATsh->run($file)            # .batsh ගොනුව ධාවනය කරන්න
+  BATsh->run_string($source)   # source string ධාවනය කරන්න
+  BATsh->run_lines(@lines)     # පේළි array ධාවනය කරන්න
+  BATsh->repl()                # අන්තර්ක්‍රියාකාරී REPL
+  BATsh->classify_token($tok)  # 'CMD' හෝ 'SH'
+  BATsh->setlocal()            # %ENV ඡායාරූපය
+  BATsh->endlocal()            # %ENV ප්‍රතිස්ථාපනය
+  BATsh->call_sub($lbl, @args) # උපරුටිනය ඇමතීම
+  BATsh->source_file($file)    # .batsh ගොනුව ඇතුළත් කරන්න
+  BATsh->version()             # අනුවාද string
+
+9. වේදිකා සටහන්
+---------------
+  Windows: CMD සහ SH කොටස් දෙකම පිරිසිදු Perl තුළ ධාවනය වේ -- බාහිර cmd.exe, bash, හෝ sh අවශ්‍ය නැත.
+  UNIX:    CMD සහ SH කොටස් දෙකම පිරිසිදු Perl තුළ ධාවනය වේ -- බාහිර cmd.exe, bash, හෝ sh අවශ්‍ය නැත.
+
+10. අවශ්‍යතා
+------------
+  Perl 5.005_03 හෝ නවතම.  මූලික module පමණි (File::Spec, Carp).
+  CPAN යැපීම් නැත.
+
+11. CMD Pipeline සහ Parameter විකරණ
+-----------------------------------
+  cmd1 | cmd2              # තාවකාලික ගොනුවක් හරහා pipeline (පිරිසිදු Perl)
+  ECHO hello | perl -e "while(<STDIN>){print uc}"
+
+  SET /P VAR=Prompt:       # STDIN වෙතින් එක් පේළියක් කියවා VAR වෙත දමයි
+
+  Batch-parameter tilde විකරණ (උදා. %0=C:\scripts\deploy.bat විට):
+    %~0   -> C:\scripts\deploy.bat  (උද්ධෘත ඉවත් කිරීම පමණි)
+    %~f0  -> C:/scripts/deploy.bat  (සම්පූර්ණ නිරපේක්ෂ මාර්ගය)
+    %~d0  -> C:                     (drive අකුර)
+    %~p0  -> /scripts/              (නාමාවලි මාර්ගය)
+    %~n0  -> deploy                 (දිගුවක් නැති ගොනු නාමය)
+    %~x0  -> .bat                   (දිගුව)
+    %~dp0 -> C:/scripts/            (drive + නාමාවලිය, වඩාත් සුලභ)
+    %~nx1 -> deploy.bat             (නාමය + දිගුව)
+
+12. SH ශ්‍රිත සහ විස්තාරණය
+--------------------------
+  greet() {              # ශ්‍රිත නිර්වචනය
+      echo "Hi $1"
+  }
+  function add {         # විකල්ප වාක්‍ය ඛණ්ඩය
+      echo $(( $1 + $2 ))
+  }
+  greet world            # ශ්‍රිතය ඇමතීම
+  add 3 4                # -> 7
+
+  ${var%.*}    .* සමඟ ගැළපෙන කෙටිම අගපසුව ඉවත් කරයි
+  ${var%%.*}   .* සමඟ ගැළපෙන දිගම  අගපසුව ඉවත් කරයි
+  ${var#*.}    *. සමඟ ගැළපෙන කෙටිම පෙරපසුව ඉවත් කරයි
+  ${var##*.}   *. සමඟ ගැළපෙන දිගම  පෙරපසුව ඉවත් කරයි
+  ${var/a/b}   a හි පළමු සිදුවීම b වෙත ආදේශ කරයි
+  ${var//a/b}  a හි සියලු සිදුවීම් b වෙත ආදේශ කරයි
+  ${var^^}     සියල්ල ලොකු අකුරු
+  ${var,,}     සියල්ල කුඩා අකුරු
+  ${var:2:4}   offset 2 සිට දිග 4 උපපෙළ
+  ${#var}      string දිග
+  ${var:-def}  සකසා ඇත්නම් එහි අගය, නැතිනම් def
+
+13. SH I/O යළි-යොමුකිරීම
+------------------------
+  cmd > file      stdout උඩින් ලියයි
+  cmd >> file     stdout වෙත එක් කරයි
+  cmd < file      ගොනුවෙන් stdin
+  cmd 2> file     stderr ගොනුවට
+  cmd 2>&1        stderr stdout වෙත ඒකාබද්ධ කරයි
+  cmd > f 2>&1    stdout සහ stderr දෙකම ගොනුවට
+
+  Here-document (stdin මත ආදානය):
+    cmd <<EOF       EOF තෙක් ශරීර පේළි; $VAR විස්තාරණය වේ
+    cmd <<'EOF'     EOF තෙක් ශරීර පේළි; විස්තාරණයක් නැත (අක්ෂරාර්ථ)
+    cmd <<-EOF      <<EOF මෙන්, නමුත් පේළි ආරම්භයේ TAB අකුරු ඉවත් කරයි
+
+14. SH සංයුක්ත විධාන
+--------------------
+  cmd1 && cmd2    cmd1 සාර්ථක වුවහොත් පමණක් cmd2 ධාවනය කරයි
+  cmd1 || cmd2    cmd1 අසාර්ථක වුවහොත් පමණක් cmd2 ධාවනය කරයි
+  cmd1 ; cmd2     කොන්දේසි විරහිතව cmd2 ධාවනය කරයි
+
+බලන්න: https://metacpan.org/dist/BATsh

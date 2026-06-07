@@ -1,6 +1,6 @@
 package Sys::Export::GPT;
 
-our $VERSION = '0.004'; # VERSION
+our $VERSION = '0.005'; # VERSION
 # ABSTRACT: Implementation of GUID Partition Table
 
 use v5.26;
@@ -487,7 +487,7 @@ Writes the complete GPT structure to the given filehandle, including:
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 AUTHOR
 

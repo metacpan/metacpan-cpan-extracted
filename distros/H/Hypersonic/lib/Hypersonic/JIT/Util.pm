@@ -5,7 +5,7 @@ use warnings;
 use Config;
 use Carp qw(croak);
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 # =============================================================================
 # Cache Directory Management
@@ -421,12 +421,41 @@ sub detect_library {
     my $pkg_name = $opts{pkg_config} // $lib_name;
     my ($cflags, $ldflags);
 
-    if ($class->_has_extutils_pkgconfig() && ExtUtils::PkgConfig->exists($pkg_name)) {
-        eval {
-            my %pkg_info = ExtUtils::PkgConfig->find($pkg_name);
-            $cflags = $pkg_info{cflags} // '';
-            $ldflags = $pkg_info{libs} // '';
+    # ExtUtils::PkgConfig only grew the ->exists() class method in
+    # later releases (it's not in the 1.16 shipped with some
+    # vendor perls). Older versions die with
+    #   method 'exists' not implemented at ... line 424
+    # which is exactly what the CPAN tester report for Hypersonic
+    # 0.17 on perl 5.20 showed. Probe with ->find() inside an eval
+    # when the class can't ->exists, and treat any failure as
+    # "not available via pkg-config" so we fall through to the
+    # command-line pkg-config branch below.
+    if ($class->_has_extutils_pkgconfig()) {
+        my $is_available = eval {
+            if (ExtUtils::PkgConfig->can('exists')) {
+                ExtUtils::PkgConfig->exists($pkg_name) ? 1 : 0;
+            } else {
+                # Older API: ->find dies if the package is missing,
+                # returns a key/value list (cflags/libs/modversion) on
+                # success. Either outcome is fine here - we just want
+                # a 1/0 answer.
+                my %info = ExtUtils::PkgConfig->find($pkg_name);
+                ($info{cflags} || $info{libs} || $info{modversion}) ? 1 : 0;
+            }
         };
+        # If the probe died OR returned a false value, fall back to
+        # the shell pkg-config below; never propagate the die.
+        if ($is_available) {
+            eval {
+                my %pkg_info = ExtUtils::PkgConfig->find($pkg_name);
+                $cflags = $pkg_info{cflags} // '';
+                $ldflags = $pkg_info{libs} // '';
+            };
+            # Same defensive eval - some old versions of
+            # ExtUtils::PkgConfig die on find() in odd corner cases
+            # (e.g. when the .pc file references an unresolvable
+            # Requires:). Swallow and fall through to shell pkg-config.
+        }
     }
 
     # Fallback to command-line pkg-config

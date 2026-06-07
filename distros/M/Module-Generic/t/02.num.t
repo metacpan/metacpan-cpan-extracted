@@ -108,12 +108,13 @@ if( !scalar( keys( %$lconv ) ) || [split(/\./, $curr_locale)]->[0] eq 'C' )
 }
 else
 {
-    $tho_sep = CORE::length( $lconv->{thousands_sep} // '' )
-        ? $lconv->{thousands_sep} 
-        : $lconv->{mon_thousands_sep};
-    $dec_sep = CORE::length( $lconv->{decimal_point} // '' )
-        ? $lconv->{decimal_point}
-        : $lconv->{mon_decimal_point};
+    # NOTE: With posix_strict (the default), the numeric trio follows LC_NUMERIC only,
+    # without any fall back to the monetary category. We must mirror that here, otherwise
+    # under a mixed locale such as LC_NUMERIC=C with LC_MONETARY=en_US.UTF-8 the test
+    # would expect a separator that the module deliberately does not use for plain
+    # numbers. The monetary expectation is computed separately, further below.
+    $tho_sep = $lconv->{thousands_sep};
+    $dec_sep = $lconv->{decimal_point};
     # NOTE: Plain number grouping follows the LC_NUMERIC category only, exactly as
     # Module::Generic::Number resolves it. We deliberately do not fall back to
     # mon_grouping here. The module normalises lconv->{grouping} to a defined 0 before

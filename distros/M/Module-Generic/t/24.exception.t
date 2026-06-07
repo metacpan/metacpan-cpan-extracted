@@ -99,7 +99,7 @@ subtest 'create_class' => sub
     }
     my $ex = Other::Exception->new( "Another bad thing has happened" );
     isa_ok( $ex => 'Other::Exception', 'exception object' );
-    
+
 };
 
 subtest 'basic exception creation' => sub
@@ -166,7 +166,7 @@ subtest 'exception as object and string' => sub
 
     use strict;
     use warnings;
-    
+
     sub init
     {
         my $self = shift( @_ );
@@ -177,13 +177,13 @@ subtest 'exception as object and string' => sub
         $self->SUPER::init( @_ );
         return( $self );
     }
-    
+
     sub as_string { return( shift->value->scalar ); }
-    
+
     sub locale { return( shift->_set_get_scalar_as_object( 'locale', @_ ) ); }
 
     sub value { return( shift->_set_get_scalar_as_object( 'value', @_ ) ); }
-    
+
     sub TO_JSON { return( shift->as_string ); }
 }
 

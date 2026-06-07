@@ -49,7 +49,7 @@ subtest 'file io' => sub
         my $fh = $class->new;
         isa_ok( $fh, $class );
         ok( $fh->open( $file ), "Opened '$file'" );
-    
+
         my $cont = do { local $/; <$fh> };
         unlike( $cont, qr/$expect/, "Content match fails without binmode" );
     }    
@@ -107,7 +107,7 @@ subtest 'getline' => sub
     }
     like( $io->error->message, qr/usage.*getline\(\) at .* line /, 'getline usage' );
     is( $line, undef, 'return value is undef upon exception' );
-    
+
     {
         no warnings 'Module::Generic';
         ( $list, $context ) = $io->getlines( 'Boom' );
@@ -115,7 +115,7 @@ subtest 'getline' => sub
     is( $list, undef, 'caught another exception' );
     like( $io->error->message, qr/usage.*getlines\(\) at .* line /, 'getlines usage' );
     is( $list, undef, 'empty return list in list context upon exception' );
-    
+
     {
         no warnings 'Module::Generic';
         is( ( $line = $io->getlines ), undef, 'caught another exception' );

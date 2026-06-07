@@ -198,18 +198,43 @@ subtest 'Thread-safe datetime access' => sub
         require threads::shared;
 
         my $file = $IS_WINDOWS_OS ? '.\t\test_finfo.bat' : './t/test_finfo.pl';
-        my $finfo = Module::Generic::Finfo->new( $file, debug => $DEBUG );
+
+        # NOTE: Resolve atime once in the parent, before spawning. This loads
+        # DateTime::Lite, DateTime::Format::Lite and Module::Generic::DateTime, and
+        # populates the shared local_tz flag, so the child threads inherit fully loaded
+        # classes and resolved state. Without this, the five threads would each require
+        # those modules for the first time concurrently, and concurrent require is not
+        # safe under ithreads.
+        my $parent_finfo = Module::Generic::Finfo->new( $file, debug => $DEBUG );
+        my $parent_atime = $parent_finfo->atime;
+
+        if( !$parent_atime )
+        {
+            diag( "Parent failed to get atime: ", $parent_finfo->error ) if( $DEBUG || $ENV{AUTOMATED_TESTING} || $ENV{AUTHOR_TESTING} );
+        }
+
         my @threads = map
         {
             threads->create(sub
             {
                 my $tid = threads->tid();
-                if( !( my $atime = $finfo->atime ) )
+                my $local_finfo = Module::Generic::Finfo->new( $file, debug => $DEBUG );
+
+                if( !$local_finfo )
                 {
-                    diag( "Thread $tid: Failed to get atime: ", $finfo->error ) if( $DEBUG );
+                    diag( "Thread $tid: Failed to instantiate Module::Generic::Finfo." ) if( $DEBUG || $ENV{AUTOMATED_TESTING} || $ENV{AUTHOR_TESTING} );
                     return(0);
                 }
-                return(1);
+
+                my $atime = $local_finfo->atime;
+
+                if( !$atime )
+                {
+                    diag( "Thread $tid: Failed to get atime: ", $local_finfo->error ) if( $DEBUG || $ENV{AUTOMATED_TESTING} || $ENV{AUTHOR_TESTING} );
+                    return(0);
+                }
+
+                return( $atime->isa( 'Module::Generic::DateTime' ) ? 1 : 0 );
             });
         } 1..5;
 
@@ -220,8 +245,9 @@ subtest 'Thread-safe datetime access' => sub
         my @results = map{ $_->join() } @threads;
         my $success = !scalar( grep( !$_, @results ) );
 
+        ok( $parent_atime, 'Parent accessed datetime successfully' );
         ok( $success, 'All threads accessed datetime successfully' );
-        isa_ok( $finfo->atime, 'Module::Generic::DateTime', 'atime type' );
+        isa_ok( $parent_finfo->atime, 'Module::Generic::DateTime', 'atime type' );
     };
 };
 

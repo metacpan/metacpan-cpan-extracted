@@ -1,7 +1,7 @@
 package Test::Against::Dev;
 use strict;
 use 5.14.0;
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 use Carp;
 use Cwd;
 use File::Basename;
@@ -14,8 +14,8 @@ use CPAN::cpanminus::reporter::RetainReports;
 use Data::Dump ( qw| dd pp | );
 use JSON;
 use Path::Tiny;
-use Perl::Download::FTP;
 use Text::CSV_XS;
+use URI;
 
 =head1 NAME
 
@@ -28,11 +28,11 @@ Test::Against::Dev - Test CPAN modules against Perl dev releases
     } );
 
     my ($tarball_path, $work_dir) = $self->perform_tarball_download( {
-        host                => 'ftp.funet.fi',
-        hostdir             => /pub/languages/perl/CPAN/src/5.0,
-        perl_version        => 'perl-5.27.6',
-        compression         => 'gz',
-        work_dir            => "~/tmp/Downloads",
+        base_url            => 'https://www.cpan.org',
+        path                => 'authors/id/B/BO/BOOK',  # or 'src/5.0',
+        perl_version        => 'perl-5.43.10',
+        compression         => 'gz',                    # or 'xz',
+        work_dir            => '/tmp',
         verbose             => 1,
         mock                => 0,
     } );
@@ -83,23 +83,20 @@ Unlike other efforts, F<Test-Against-Dev> does not depend on test reports
 sent to L<CPANtesters.org|http://www.cpantesters.org/>.  Hence, it should be
 unaffected by any technical problems which that site may face.  As a
 consequence, however, a user of this library must be willing to maintain more
-of her own local infrastructure than a typical CPANtester would maintain.
+of their own local infrastructure than a typical CPANtester would maintain.
 
 While this library could, in principle, be used to test the entirety of CPAN,
 it is probably better suited for testing selected subsets of CPAN libraries
-which the user deems important to her individual or organizational needs.
+which the user deems important to their individual or organizational needs.
 
 This library is currently focused on monthly development releases of Perl 5.
 It does not directly provide a basis for identifying individual commits to
 blead which adversely impacted particular CPAN libraries.  It "tests against
 dev" more than it "tests against blead" -- hence, the name of the library.
-However, once it has gotten some production experience, it may be extended to,
-say, measure the effect of individual commits to blead on CPAN libraries using
-the previous monthly development release as a baseline.
-
-This library is currently focused on Perl 5 libraries publicly available on
-CPAN.  In the future, it may be extended to be able to include an
-organization's private libraries as well.
+I<If you are more interested in testing CPAN libraries against particular
+B<commits> to the Perl 5 core distribution, please consider using
+L<Test-Against-Commit|https://metacpan.org/pod/Test::Against::Commit> by the
+same author.>
 
 This library is currently focused on blead, the master branch of the Perl 5
 core distribution.  However, it could, in principle, be extended to assess the
@@ -193,13 +190,13 @@ Here are some approaches that come to mind:
 
 =over 4
 
-=item * CPAN river
+=item * CPAN River
 
-The CPAN river is a concept developed by Neil Bowers and other participants in
+The CPAN River is a concept developed by Neil Bowers and other participants in
 the Perl Toolchain Gang and Perl QA Hackathons and Summits.  The concept
 starts from the premise that CPAN libraries upon which many other CPAN
 libraries depend are more important than those upon which few other libraries
-depend.  That's a useful definition of importance even if it is not strictly
+depend.  That's a useful definition of importance even though it is not strictly
 true.  Modules "way upstream" feed modules and real-world code "farther
 downstream".  Hence, if Perl 5's development branch changes in a way such that
 "upstream" modules start to fail to configure, build, test and install
@@ -274,6 +271,19 @@ development cycle, I<i.e.,> once Perl 5.28.0 has been released.
 As a consequence of this change, the C<analyze_json_logs()> method no longer
 needs a key-value pair like C<run =E<gt> 1> in the hash reference passed to the
 method as argument.
+
+=head2 Notice of Change in Version 0.15 (June 05 2026)
+
+Test-Against-Dev originally assumed that you could download a Perl development
+release tarball by an FTP call to L<ftp.perl.org>.  That call was conducted by
+a CPAN module known as Perl::Download::FTP and written by the same author as
+Test-Against-Dev, upon which Test-Against-Dev had a dependency.
+L<ftp.perl.org>, however, was
+L<deprecated|https://log.perl.org/2022/06/cpan-ftpcpanorg-depreciation.html>
+in June 2022 and decommissioned sometime thereafter.  It therefore became
+necessary to discontinue use of Perl::Download::FTP within
+C<perform_tarball_download()>.  While this should not break existing programs,
+YMMV.
 
 =head1 METHODS
 
@@ -372,14 +382,18 @@ sub get_results_dir {
 
 =item * Purpose
 
+Download a tarball (in C<.tar.gz> or C<.tar.xz> format) of a Perl release from
+CPAN and place it in a directory suitable for building a new F<perl>
+executable.
+
 =item * Arguments
 
-    ($tarball_path, $work_dir) = $self->perform_tarball_download( {
-        host                => 'ftp.funet.fi',
-        hostdir             => /pub/languages/perl/CPAN/src/5.0,
-        perl_version        => 'perl-5.27.6',
-        compression         => 'gz',
-        work_dir            => "~/tmp/Downloads",
+    my ($tarball_path, $work_dir) = $self->perform_tarball_download( {
+        base_url            => 'https://www.cpan.org',
+        path                => 'authors/id/B/BO/BOOK',  # or 'src/5.0',
+        perl_version        => 'perl-5.43.10',
+        compression         => 'gz',                    # or 'xz',
+        work_dir            => '/tmp',
         verbose             => 1,
         mock                => 0,
     } );
@@ -388,15 +402,37 @@ Hash reference with the following elements:
 
 =over 4
 
-=item * C<host>
+=item * C<base_url>
 
-String.  The FTP mirror from which you wish to download a tarball of a Perl
-release.  Required.
+String.  The web site from which you wish to download a tarball of a Perl
+release.  Optional, but defaults to C<https://www.cpan.org> -- and you should
+probably not change it unless you are running a CPAN mirror.
 
-=item * C<hostdir>
+=item * C<path>
 
-String.  The directory on the FTP mirror specified by C<host> in which the
-tarball is located.  Required.
+String. On C<https://www.cpan.org> or a mirror thereof, there are B<two>
+locations where a tarball of a particular Perl development release may be
+stored.
+
+=over 4
+
+=item *
+
+I<Immediately upon release> the tarball resides in the CPAN directory of the
+person performing the release.  That will be represented by a string holding a
+directory tree like C<authors/id/B/BO/BOOK>.
+
+=item *
+
+I<Approximately one day after release> the tarball becomes available in a more
+permanent location independent of whoever served as release manager.  That
+will be represented by a string holding the directory tree C<src/5.0>.
+
+=back
+
+So if you've just seen an announcement on L<irc.perl.org> or on the Perl 5
+Porters mailing list about a new development release, you should probably use
+the first version.  Thereafter you should probably use the second version.
 
 =item * C<perl_version>
 
@@ -407,13 +443,10 @@ The major version is always C<5>.  Required.
 =item * C<compression>
 
 String denoting the compression format of the tarball you wish to download.
-Eligible compression formats are C<gz>, C<bz2> and C<bz2>.  Required.
+Eligible compression formats are C<gz> and C<xz>.  Required.
 
-Note that not all compression formats are available for all tarballs on our
-FTP mirrors and that the compression formats offered may change over time.
-
-Note further that C<gz> is currently the recommended format, as the other
-methods have not been thorougly tested.
+Note that not all compression formats are available for all tarballs on the
+server and that the compression formats offered may change over time.
 
 =item * C<work_dir>
 
@@ -424,7 +457,7 @@ temporary directory created via C<File::Temp::tempdir()> will be used.
 =item * C<verbose>
 
 Extra information provided on STDOUT.  Optional; defaults to being off;
-provide a Perl-true value to turn it on.  Scope is limited to this method.
+provide a Perl-true value to turn it on.  I<Scope is limited to this method.>
 
 =item * C<mock>
 
@@ -473,7 +506,7 @@ sub perform_tarball_download {
     my $verbose = delete $args->{verbose} || '';
     my $mock = delete $args->{mock} || '';
     my %eligible_args = map { $_ => 1 } ( qw|
-        host hostdir perl_version compression work_dir
+        base_url path perl_version compression work_dir
     | );
     for my $k (keys %$args) {
         croak "perform_tarball_download: '$k' is not a valid element"
@@ -482,33 +515,29 @@ sub perform_tarball_download {
     croak "perform_tarball_download: '$args->{perl_version}' does not conform to pattern"
         unless $args->{perl_version} =~ m/$self->{perl_version_pattern}/;
 
-    my %eligible_compressions = map { $_ => 1 } ( qw| gz bz2 xz | );
+    my %eligible_compressions = map { $_ => 1 } ( qw| gz xz | );
     croak "perform_tarball_download: '$args->{compression}' is not a valid compression format"
         unless $eligible_compressions{$args->{compression}};
 
     croak "Could not locate '$args->{work_dir}' for purpose of downloading tarball and building perl"
         if (exists $args->{work_dir} and (! -d $args->{work_dir}));
 
-    # host, hostdir, compression are only used within the scope of this
+    # base_url, path and compression are only used within the scope of this
     # method.  Hence, they don't need to be inserted into the object.
 
+    my $base_url = delete $args->{base_url} || 'https://www.cpan.org';
     for my $k ( qw| perl_version work_dir | ) {
         $self->{$k} = $args->{$k};
     }
-
-    my $this_tarball = "$self->{perl_version}.tar.$args->{compression}";
 
     my $this_release_dir = File::Spec->catdir($self->get_testing_dir(), $self->{perl_version});
     unless (-d $this_release_dir) { make_path($this_release_dir, { mode => 0755 }); }
     croak "Could not locate $this_release_dir" unless (-d $this_release_dir);
     $self->{release_dir} = $this_release_dir;
 
-    my $ftpobj = Perl::Download::FTP->new( {
-        host        => $args->{host},
-        dir         => $args->{hostdir},
-        Passive     => 1,
-        verbose     => $verbose,
-    } );
+    my $this_tarball = "$self->{perl_version}.tar.$args->{compression}";
+    my $uri = URI->new($base_url);
+    $uri->path(File::Spec->catdir("", $args->{path}, $this_tarball));
 
     unless ($mock) {
         if (! $self->{work_dir}) {
@@ -516,24 +545,22 @@ sub perform_tarball_download {
             $self->{work_dir} = tempdir(CLEANUP => 1);
         }
         if ($verbose) {
-            say "Beginning FTP download (this will take a few minutes)";
+            say "Fetching tarball from $uri";
+            say "Beginning HTTPS download (this may take a few minutes)";
             say "Perl configure-build-install cycle will be performed in $self->{work_dir}";
         }
-        my $tarball_path = $ftpobj->get_specific_release( {
-            release         => $this_tarball,
-            path            => $self->{work_dir},
-        } );
+        my $ff = File::Fetch->new(uri => $uri)->fetch(to => $self->{work_dir})
+            or croak "Unable to fetch tarball from $uri";
+        my $tarball_path = File::Spec->catfile($self->{work_dir}, $this_tarball);
         unless (-f $tarball_path) {
             croak "Tarball $tarball_path not found: $!";
         }
-        else {
-            say "Path to tarball is $tarball_path" if $verbose;
-            $self->{tarball_path} = $tarball_path;
-            return ($tarball_path, $self->{work_dir});
-        }
+        say "Path to tarball is $tarball_path" if $verbose;
+        $self->{tarball_path} = $tarball_path;
+        return ($tarball_path, $self->{work_dir});
     }
     else {
-        say "Mocking; not really attempting FTP download" if $verbose;
+        say "Mocking; not really attempting HTTPS download" if $verbose;
         return 1;
     }
 }
@@ -749,7 +776,7 @@ Hash reference with these elements:
 =item * C<uri>
 
 String holding URI from which F<cpanm> will be downloaded.  Optional; defaults
-to L<http://cpansearch.perl.org/src/MIYAGAWA/App-cpanminus-1.7043/bin/cpanm>.
+to L<http://cpansearch.perl.org/src/MIYAGAWA/App-cpanminus-1.7049/bin/cpanm>.
 
 =item * C<verbose>
 
@@ -780,7 +807,7 @@ sub fetch_cpanm {
     my $verbose = delete $args->{verbose} || '';
     my $uri = (exists $args->{uri} and length $args->{uri})
         ? $args->{uri}
-        : 'http://cpansearch.perl.org/src/MIYAGAWA/App-cpanminus-1.7043/bin/cpanm';
+        : 'http://cpansearch.perl.org/src/MIYAGAWA/App-cpanminus-1.7049/bin/cpanm';
 
     my $cpanm_dir = File::Spec->catdir($self->get_release_dir(), '.cpanm');
     unless (-d $cpanm_dir) { make_path($cpanm_dir, { mode => 0755 }); }
@@ -788,6 +815,7 @@ sub fetch_cpanm {
     $self->{cpanm_dir} = $cpanm_dir;
 
     my $bin_dir = $self->get_bin_dir();
+    my $this_cpan = File::Spec->catfile($bin_dir, 'cpan');
     my $this_cpanm = File::Spec->catfile($bin_dir, 'cpanm');
     # If cpanm is already installed in bin_dir, we don't need to try to
     # reinstall it.
@@ -795,9 +823,8 @@ sub fetch_cpanm {
         say "'$this_cpanm' already installed" if $verbose;
     }
     else {
-       say "Fetching 'cpanm' from $uri" if $verbose;
-       my $ff = File::Fetch->new(uri => $uri)->fetch(to => $bin_dir)
-           or croak "Unable to fetch 'cpanm' from $uri";
+        system(qq|$this_cpan App::cpanminus|)
+            and croak "Unable to install cpanm via $this_cpan";
     }
     my $cnt = chmod 0755, $this_cpanm;
     croak "Unable to make '$this_cpanm' executable" unless $cnt;
@@ -1402,7 +1429,7 @@ it and/or modify it under the same terms as Perl itself.
 The full text of the license can be found in the
 LICENSE file included with this module.
 
-Copyright James E Keenan 2017-2025.  All rights reserved.
+Copyright James E Keenan 2017-2026.  All rights reserved.
 
 =head1 ACKNOWLEDGEMENTS
 
@@ -1438,7 +1465,7 @@ generous contributions from the following companies:
 
 =head1 SEE ALSO
 
-perl(1). CPAN::cpanminus::reporter::RetainReports(3).  Perl::Download::FTP(3).
+perl(1). CPAN::cpanminus::reporter::RetainReports(3).
 App::cpanminus::reporter(3).  cpanm(3).
 
 L<2017 Perl 5 Core Hackathon Discussion on Testing|https://github.com/p5h/2017/wiki/What-Do-We-Want-and-Need-from-Smoke-Testing%3F>.

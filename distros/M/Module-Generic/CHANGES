@@ -1,5 +1,16 @@
 Revision history for Perl module Module::Generic
 
+v1.5.11 2026-06-06T23:17:55+0900
+    [Bug fixes]
+    - t/02.num.t: expect the numeric thousand and decimal separators from LC_NUMERIC
+      only, with no monetary fallback, matching the strict module under mixed locales.
+    - t/11.finfo.t: pre-warm atime() in the parent and use a per-thread Finfo object,
+      avoiding a concurrent first-time require of DateTime::Lite under ithreads.
+    - t/12.sharedmem.t: skip the existence assertion when the SysV query cannot
+      determine existence (observed on FreeBSD), and re-query after cleanup.
+    - t/32.file_magic.t: accept the legacy application/x-gzip MIME type reported by
+      older libmagic databases such as on FreeBSD.
+
 v1.5.10 2026-06-06T06:27:47+0900
     [Bug fixes]
     - Module::Generic::Number::format_money() now follows the LC_MONETARY category

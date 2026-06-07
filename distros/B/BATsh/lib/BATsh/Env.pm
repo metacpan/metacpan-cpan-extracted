@@ -1,5 +1,5 @@
 package BATsh::Env;
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com>
 ######################################################################
 #
 # BATsh::Env - Shared environment variable store
@@ -23,7 +23,7 @@ use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 
 use vars qw($VERSION);
-$VERSION = '0.02';
+$VERSION = '0.04';
 
 use File::Spec ();
 BEGIN { eval { require Cwd } }
@@ -55,7 +55,7 @@ sub set        { my ($c,$n,$v)=@_; $STORE{_key($n)} = defined $v ? $v : '' }
 sub unset      { my ($c,$n)=@_; delete $STORE{_key($n)} }
 sub exists_var { my ($c,$n)=@_; return exists $STORE{_key($n)} ? 1 : 0 }
 sub sync_to_env { %ENV = %STORE }
-sub snapshot   { my %s = %STORE; return \%s }
+sub snapshot   { my %s = %STORE; return { %s } }
 sub restore    { my ($c,$s)=@_; %STORE = %{$s} }
 sub delayed_expansion { return $DELAYED_EXPANSION }
 
@@ -63,7 +63,7 @@ sub setlocal {
     my ($opts) = @_;
     $opts = '' unless defined $opts;
     my %snap = %STORE;
-    push @SETLOCAL_STACK, { store => \%snap, delayed => $DELAYED_EXPANSION };
+    push @SETLOCAL_STACK, { store => { %snap }, delayed => $DELAYED_EXPANSION };
     if    ($opts =~ /ENABLEDELAYEDEXPANSION/i)  { $DELAYED_EXPANSION = 1 }
     elsif ($opts =~ /DISABLEDELAYEDEXPANSION/i) { $DELAYED_EXPANSION = 0 }
     # ENABLEEXTENSIONS / DISABLEEXTENSIONS: accepted, not modelled
@@ -341,7 +341,7 @@ Returns the current value of C<$DELAYED_EXPANSION> (0 or 1).
 
 =head1 AUTHOR
 
-INABA Hitoshi E<lt>ina@cpan.orgE<gt>
+INABA Hitoshi E<lt>ina.cpan@gmail.comE<gt>
 
 =head1 LICENSE
 

@@ -1,0 +1,176 @@
+rm -f \
+  LikeR.bso LikeR.def \
+  LikeR.exp LikeR.x \
+  LikeR.bs blib/arch/auto/Stats/LikeR/extralibs.all \
+  blib/arch/auto/Stats/LikeR/extralibs.ld Makefile.aperl \
+  *.a *.o \
+  *perl.core LikeR.base \
+  LikeR.bs LikeR.bso \
+  LikeR.c LikeR.def \
+  LikeR.exp LikeR.o \
+  LikeR_def.old MYMETA.json \
+  MYMETA.yml blibdirs.ts \
+  bu.LikeR.base bu.LikeR.bs \
+  bu.LikeR.bso bu.LikeR.c \
+  bu.LikeR.def bu.LikeR.exp \
+  bu.LikeR.o bu.LikeR_def.old \
+  con.LikeR.base con.LikeR.bs \
+  con.LikeR.bso con.LikeR.c \
+  con.LikeR.def con.LikeR.exp \
+  con.LikeR.o con.LikeR_def.old \
+  core core.*perl.*.? \
+  core.[0-9] core.[0-9][0-9] \
+  core.[0-9][0-9][0-9] core.[0-9][0-9][0-9][0-9] \
+  core.[0-9][0-9][0-9][0-9][0-9] libLikeR.def \
+  mon.out perl \
+  perl perl.exe \
+  perlmain.c pm_to_blib \
+  pm_to_blib.ts so_locations \
+  tmon.out 
+rm -rf \
+  blib 
+mv Makefile Makefile.old > /dev/null 2>&1
+Checking if your kit is complete...
+Looks good
+Generating a Unix-style Makefile
+Writing Makefile for Stats::LikeR
+Writing MYMETA.yml and MYMETA.json
+cp fisher.test.pl blib/lib/Stats/fisher.test.pl
+cp dnorm.pl blib/lib/Stats/dnorm.pl
+cp get.funcs.pl blib/lib/Stats/get.funcs.pl
+cp var.test.pl blib/lib/Stats/var.test.pl
+cp prcomp.pl blib/lib/Stats/prcomp.pl
+cp vers.test.pl blib/lib/Stats/vers.test.pl
+cp ljoin.pl blib/lib/Stats/ljoin.pl
+cp aoh2hoh.pl blib/lib/Stats/aoh2hoh.pl
+cp kruskal.pl blib/lib/Stats/kruskal.pl
+cp md2pod.pl blib/lib/Stats/md2pod.pl
+cp matrix.pl blib/lib/Stats/matrix.pl
+cp summary.pl blib/lib/Stats/summary.pl
+cp wilcox.text.pl blib/lib/Stats/wilcox.text.pl
+cp oneway_test.pl blib/lib/Stats/oneway_test.pl
+cp sample.pl blib/lib/Stats/sample.pl
+cp hist.pl blib/lib/Stats/hist.pl
+cp lib/Stats/bu.LikeR.pm blib/lib/Stats/bu.LikeR.pm
+cp examples.pl blib/lib/Stats/examples.pl
+cp lm.pl blib/lib/Stats/lm.pl
+cp sha512.pl blib/lib/Stats/sha512.pl
+cp ks.test.pl blib/lib/Stats/ks.test.pl
+cp benchmark.pl blib/lib/Stats/benchmark.pl
+cp chisq.test.pl blib/lib/Stats/chisq.test.pl
+cp mode.pl blib/lib/Stats/mode.pl
+cp xs.check.pl blib/lib/Stats/xs.check.pl
+cp lib/Stats/LikeR.pm blib/lib/Stats/LikeR.pm
+cp sd.pl blib/lib/Stats/sd.pl
+cp cor.test.pl blib/lib/Stats/cor.test.pl
+cp aov.pl blib/lib/Stats/aov.pl
+cp quantile.pl blib/lib/Stats/quantile.pl
+cp var.pl blib/lib/Stats/var.pl
+cp group_by.pl blib/lib/Stats/group_by.pl
+cp runif.pl blib/lib/Stats/runif.pl
+cp cor.pl blib/lib/Stats/cor.pl
+cp t.test.pl blib/lib/Stats/t.test.pl
+cp read.table.pl blib/lib/Stats/read.table.pl
+cp add_data.pl blib/lib/Stats/add_data.pl
+cp rnorm.pl blib/lib/Stats/rnorm.pl
+cp power.t.test.pl blib/lib/Stats/power.t.test.pl
+cp min.pl blib/lib/Stats/min.pl
+cp write.table.pl blib/lib/Stats/write.table.pl
+Running Mkbootstrap for LikeR ()
+chmod 644 "LikeR.bs"
+"/home/con/perl5/perlbrew/perls/perl-5.10.1/bin/perl" -MExtUtils::Command::MM -e 'cp_nonempty' -- LikeR.bs blib/arch/auto/Stats/LikeR/LikeR.bs 644
+"/home/con/perl5/perlbrew/perls/perl-5.10.1/bin/perl" "/home/con/perl5/perlbrew/perls/perl-5.10.1/lib/5.10.1/ExtUtils/xsubpp" -noprototypes -typemap '/home/con/perl5/perlbrew/perls/perl-5.10.1/lib/5.10.1/ExtUtils/typemap'  LikeR.xs > LikeR.xsc
+mv LikeR.xsc LikeR.c
+cc -c   -fwrapv -fno-strict-aliasing -pipe -fstack-protector -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64 -Wall   -DVERSION=\"0.12\" -DXS_VERSION=\"0.12\" -fPIC "-I/home/con/perl5/perlbrew/perls/perl-5.10.1/lib/5.10.1/x86_64-linux/CORE"   LikeR.c
+rm -f blib/arch/auto/Stats/LikeR/LikeR.so
+cc  -shared -O2 -L/usr/local/lib -fstack-protector  LikeR.o  -o blib/arch/auto/Stats/LikeR/LikeR.so  \
+      \
+  
+chmod 755 blib/arch/auto/Stats/LikeR/LikeR.so
+"/home/con/perl5/perlbrew/perls/perl-5.10.1/bin/perl" "-Iblib/arch" "-Iblib/lib" bu.Makefile.PL bu.Makefile 
+Generating a Unix-style Makefile
+Writing Makefile for Stats::LikeR
+Writing MYMETA.yml and MYMETA.json
+"/home/con/perl5/perlbrew/perls/perl-5.10.1/bin/perl" "-Iblib/arch" "-Iblib/lib" dev.Makefile.PL dev.Makefile 
+Generating a Unix-style Makefile
+Writing Makefile for Stats::LikeR
+Writing MYMETA.yml and MYMETA.json
+Manifying 2 pod documents
+Running Mkbootstrap for LikeR ()
+chmod 644 "LikeR.bs"
+"/home/con/perl5/perlbrew/perls/perl-5.10.1/bin/perl" -MExtUtils::Command::MM -e 'cp_nonempty' -- LikeR.bs blib/arch/auto/Stats/LikeR/LikeR.bs 644
+cc -c  -I. -std=c99 -O2   -DVERSION=\"0.12\" -DXS_VERSION=\"0.12\" -fPIC "-I/home/con/perl5/perlbrew/perls/perl-5.10.1/lib/5.10.1/x86_64-linux/CORE"   LikeR.c
+rm -f blib/arch/auto/Stats/LikeR/LikeR.so
+cc  -shared -O2 -L/usr/local/lib -fstack-protector  LikeR.o  -o blib/arch/auto/Stats/LikeR/LikeR.so  \
+   -lm   \
+  
+chmod 755 blib/arch/auto/Stats/LikeR/LikeR.so
+Skip blib/lib/Stats/fisher.test.pl (unchanged)
+Skip blib/lib/Stats/dnorm.pl (unchanged)
+Skip blib/lib/Stats/get.funcs.pl (unchanged)
+Skip blib/lib/Stats/var.test.pl (unchanged)
+Skip blib/lib/Stats/prcomp.pl (unchanged)
+Skip blib/lib/Stats/vers.test.pl (unchanged)
+Skip blib/lib/Stats/ljoin.pl (unchanged)
+Skip blib/lib/Stats/aoh2hoh.pl (unchanged)
+Skip blib/lib/Stats/kruskal.pl (unchanged)
+Skip blib/lib/Stats/md2pod.pl (unchanged)
+Skip blib/lib/Stats/matrix.pl (unchanged)
+Skip blib/lib/Stats/summary.pl (unchanged)
+Skip blib/lib/Stats/wilcox.text.pl (unchanged)
+Skip blib/lib/Stats/oneway_test.pl (unchanged)
+Skip blib/lib/Stats/sample.pl (unchanged)
+Skip blib/lib/Stats/hist.pl (unchanged)
+Skip blib/lib/Stats/bu.LikeR.pm (unchanged)
+Skip blib/lib/Stats/examples.pl (unchanged)
+Skip blib/lib/Stats/lm.pl (unchanged)
+Skip blib/lib/Stats/sha512.pl (unchanged)
+Skip blib/lib/Stats/ks.test.pl (unchanged)
+Skip blib/lib/Stats/benchmark.pl (unchanged)
+Skip blib/lib/Stats/chisq.test.pl (unchanged)
+Skip blib/lib/Stats/mode.pl (unchanged)
+Skip blib/lib/Stats/xs.check.pl (unchanged)
+Skip blib/lib/Stats/LikeR.pm (unchanged)
+Skip blib/lib/Stats/sd.pl (unchanged)
+Skip blib/lib/Stats/cor.test.pl (unchanged)
+Skip blib/lib/Stats/aov.pl (unchanged)
+Skip blib/lib/Stats/quantile.pl (unchanged)
+Skip blib/lib/Stats/var.pl (unchanged)
+Skip blib/lib/Stats/group_by.pl (unchanged)
+Skip blib/lib/Stats/runif.pl (unchanged)
+Skip blib/lib/Stats/cor.pl (unchanged)
+Skip blib/lib/Stats/t.test.pl (unchanged)
+Skip blib/lib/Stats/read.table.pl (unchanged)
+Skip blib/lib/Stats/add_data.pl (unchanged)
+Skip blib/lib/Stats/rnorm.pl (unchanged)
+Skip blib/lib/Stats/power.t.test.pl (unchanged)
+Skip blib/lib/Stats/min.pl (unchanged)
+Skip blib/lib/Stats/write.table.pl (unchanged)
+"/home/con/perl5/perlbrew/perls/perl-5.10.1/bin/perl" "-Iblib/arch" "-Iblib/lib" bu.Makefile.PL bu.Makefile 
+Generating a Unix-style Makefile
+Writing Makefile for Stats::LikeR
+Writing MYMETA.yml and MYMETA.json
+"/home/con/perl5/perlbrew/perls/perl-5.10.1/bin/perl" "-Iblib/arch" "-Iblib/lib" dev.Makefile.PL dev.Makefile 
+Generating a Unix-style Makefile
+Writing Makefile for Stats::LikeR
+Writing MYMETA.yml and MYMETA.json
+PERL_DL_NONLAZY=1 "/home/con/perl5/perlbrew/perls/perl-5.10.1/bin/perl" "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/01.t ............ ok
+t/add_data.t ...... ok
+t/chisq_test.t .... ok
+t/col2col.t ....... 
+Dubious, test returned 255 (wstat 65280, 0xff00)
+No subtests run 
+t/glm.t ........... ok
+t/prcomp.t ........ ok
+t/transpose.t ..... ok
+t/value_counts.t .. ok
+t/write_table.t ... ok
+
+Test Summary Report
+-------------------
+t/col2col.t     (Wstat: 65280 (exited 255) Tests: 0 Failed: 0)
+  Non-zero exit status: 255
+  Parse errors: No plan found in TAP output
+Files=9, Tests=1581,  1 wallclock secs ( 0.04 usr  0.01 sys +  0.98 cusr  0.05 csys =  1.08 CPU)
+Result: FAIL

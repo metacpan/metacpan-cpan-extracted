@@ -1,22 +1,22 @@
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
+BEGIN { pop @INC if $INC[-1] eq '.' }
 use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{BATsh},
-    'VERSION'   => q{0.02},
+    'VERSION'   => q{0.04},
     'ABSTRACT'  => q{Bilingual Shell for cmd.exe and bash in one script},
     'PREREQ_PM' => {
         'Carp' => '0',
+        'ExtUtils::MakeMaker' => '5.4302',
+        'Fcntl' => '1.03',
         'File::Copy' => '2.02',
         'File::Path' => '1.0401',
         'File::Spec' => '0',
         'perl' => '5.00503',
-        'strict' => '1.01',
-        'vars' => '0',
-        'warnings' => '0',
     },
-    'AUTHOR'    => q{ina <ina@cpan.org>},
+    'AUTHOR'    => q{ina <ina.cpan@gmail.com>},
 );
 
 # LICENSE was introduced in ExtUtils::MakeMaker 6.31 (2006).
@@ -47,19 +47,19 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'BATsh' => {
                 'file'    => 'lib/BATsh.pm',
-                'version' => '0.02',
+                'version' => '0.04',
             },
             'BATsh::CMD' => {
                 'file'    => 'lib/BATsh/CMD.pm',
-                'version' => '0.02',
+                'version' => '0.04',
             },
             'BATsh::Env' => {
                 'file'    => 'lib/BATsh/Env.pm',
-                'version' => '0.02',
+                'version' => '0.04',
             },
             'BATsh::SH' => {
                 'file'    => 'lib/BATsh/SH.pm',
-                'version' => '0.02',
+                'version' => '0.04',
             }
         },
     };

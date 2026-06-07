@@ -1,5 +1,16 @@
 Revision history for Metrics-Any-Adapter-Statsd
 
+0.04    2026-06-06
+        [CHANGES]
+         * Various style updates to Pod and unit testing
+
+        [BUGFIXES]
+         * Fix three CVE notices, all about handling disallowed characters
+           in metric or label names:
+            + CVE-2026-50637
+            + CVE-2026-50638
+            + CVE-2026-50639
+
 0.03    2021-05-20
         [BUGFIXES]
          * Fix DogStatsd tagged packet format (RT136566)

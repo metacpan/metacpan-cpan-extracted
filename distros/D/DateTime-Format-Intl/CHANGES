@@ -1,5 +1,8 @@
 Revision history for Perl module DateTime::Format::Intl
 
+v0.1.9 2026-06-07T07:59:54+0900
+    - Updated dependency for Locale::Unicode::Data
+
 v0.1.8 2025-01-05T14:30:41+0900
     - Updated dependencies
 

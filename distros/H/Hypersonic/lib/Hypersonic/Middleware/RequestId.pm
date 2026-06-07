@@ -2,7 +2,7 @@ package Hypersonic::Middleware::RequestId;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 # Middleware builder pattern - generates inline C at compile time
 # Zero Perl in the hot path - ID generation is pure C

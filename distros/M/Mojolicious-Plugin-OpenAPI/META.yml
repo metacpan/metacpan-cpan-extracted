@@ -23,7 +23,7 @@ no_index:
 recommends:
   Text::Markdown: v1.0.31
 requires:
-  JSON::Validator: '5.13'
+  JSON::Validator: '5.17'
   Mojolicious: '9.00'
   perl: '5.016'
 resources:
@@ -34,7 +34,7 @@ resources:
   homepage: https://github.com/jhthorsen/mojolicious-plugin-openapi
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/jhthorsen/mojolicious-plugin-openapi.git
-version: '5.11'
+version: '5.12'
 x_contributors:
   - 'Bernhard Graf <augensalat@gmail.com>'
   - 'Doug Bell <doug@preaction.me>'

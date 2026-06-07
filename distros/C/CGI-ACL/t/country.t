@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 35;
+use Test::Most tests => 39;
 use Test::Carp;
 use Test::NoWarnings;
 
@@ -81,4 +81,11 @@ COUNTRY: {
 	does_carp(sub { $acl->allow_country({}) });
 	does_carp(sub { $acl->allow_country(\'not a ref to a hash') });
 	does_carp(sub { $acl->all_denied() });
+
+	# Verify bad-ref calls still return $self so method chaining is not broken
+	my ($dc_ret, $ac_ret);
+	does_carp(sub { $dc_ret = $acl->deny_country(\'bad ref') });
+	isa_ok($dc_ret, 'CGI::ACL', 'deny_country returns $self on bad ref');
+	does_carp(sub { $ac_ret = $acl->allow_country(\'bad ref') });
+	isa_ok($ac_ret, 'CGI::ACL', 'allow_country returns $self on bad ref');
 }
