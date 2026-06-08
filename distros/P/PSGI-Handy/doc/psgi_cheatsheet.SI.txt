@@ -1,0 +1,285 @@
+======================================================================
+ PSGI::Handy Framework Cheat Sheet                  [SI] සිංහල
+======================================================================
+
+[ 1. යෙදුම තැනීම සහ ධාවනය ]
+
+  use PSGI::Handy;
+
+  my $app = PSGI::Handy->new(
+      renderer  => \&renderer,   # විකල්ප: CODE($t,\%v) or obj->render()
+      db        => $dbh,         # විකල්ප: any database handle
+      config    => { title => 'Site' },  # විකල්ප: hash reference
+      not_found => \&not_found,  # විකල්ප: 404 handler ($c)
+  );
+
+  # Register routes; every call is chainable and the handler gets $c.
+  $app->get   ('/',          \&home);
+  $app->post  ('/users',     \&create);
+  $app->put   ('/users/:id', \&replace);
+  $app->patch ('/users/:id', \&modify);
+  $app->del   ('/users/:id', \&remove);    # HTTP DELETE
+  $app->head  ('/health',    \&health);
+  $app->any   ('/ping',      \&ping);      # all common methods
+
+  # Serve with HTTP::Handy (blocks in an accept loop):
+  use HTTP::Handy;
+  HTTP::Handy->run(app => $app->to_app, host => '127.0.0.1', port => 8080);
+
+  # Or obtain the PSGI app and call it yourself:
+  my $psgi = $app->to_app;        # sub { my $env = shift; ... }
+  my $out  = $psgi->($env);       # [ $status, \@headers, \@body ]
+
+[ 2. මාර්ගගත කිරීමේ රටා ]
+
+  '/users'          literal segment (dots are NOT wildcards; quotemeta)
+  '/users/:id'      named parameter; :name matches [^/]+ (no slash)
+  '/files/*'        trailing splat; matches the rest including slashes,
+                    captured under the name 'splat'
+
+  # Matching rules:
+  #   anchored exact match (\A ... \z)
+  #   a trailing slash is significant      ('/x' is not '/x/')
+  #   the first registered matching route wins
+  #   the method is normalised to upper case
+  #   path matched, method not  -> 405 with an Allow header
+  #   no route matched          -> 404 (or your not_found handler)
+  #   HEAD with no HEAD route falls back to the GET route
+
+  $c->param('id')      # value captured by /users/:id
+  $c->param('splat')   # value captured by a trailing *
+
+  # Over HTTP::Handy only GET and POST arrive; the other verbs are
+  # reachable through to_app under any PSGI server that sends them.
+
+[ 3. සන්දර්භ වස්තුව ($c) ]
+
+  Every handler is called as $handler->($c) and returns a Response
+  object, a raw PSGI arrayref, or a plain string (becomes HTML 200).
+
+  $c->req                 # PSGI::Handy::Request   (section 4)
+  $c->app                 # the PSGI::Handy application
+  $c->params              # all path parameters (hash reference)
+  $c->param('id')         # one value; path param wins over query/body
+  $c->db                  # the injected database handle (section 8)
+  $c->config              # the whole config hash reference
+  $c->config('title')     # one config value
+  $c->stash               # per-request scratch hash reference
+  $c->stash('user')       # one stash value
+  $c->stash(user => $u)   # set value(s); returns $c
+
+  # Response shortcuts (return a Response, see section 5):
+  $c->html($html [, $code])      $c->text($txt  [, $code])
+  $c->json($json [, $code])      $c->redirect($url [, $code])
+  $c->res(status => , type => , body => )
+  $c->render($template, \%vars)          # section 7
+
+[ 4. ඉල්ලීම කියවීම ($c->req) ]
+
+  my $r = $c->req;
+  $r->method            # 'GET', 'POST', ...
+  $r->path              # PATH_INFO, e.g. '/users/42'
+  $r->query_string      # raw QUERY_STRING
+  $r->content_type      # request Content-Type
+  $r->content_length    # request Content-Length
+  $r->env               # the underlying PSGI %env (hash reference)
+
+  # Header by name (case- and format-insensitive):
+  $r->header('Content-Type')      # same as $r->content_type
+
+  # Parameters (query string merged with urlencoded body):
+  $r->param('name')       # first value, or undef
+  $r->param_all('tag')    # every value, as a list
+  $r->param_names         # all parameter names
+  $r->params              # { name => first_value, ... } (hash reference)
+
+  # Raw body and cookies:
+  $r->body                # raw request body (read once, then cached)
+  $r->cookie('sid')       # one cookie value
+  $r->cookies             # { name => value, ... } (hash reference)
+
+[ 5. ප්‍රතිචාරය තැනීම ]
+
+  # Class shortcuts (also reachable as $c->... in section 3):
+  PSGI::Handy::Response->html($str [, $code])      # text/html;  utf-8
+  PSGI::Handy::Response->text($str [, $code])      # text/plain; utf-8
+  PSGI::Handy::Response->json($str [, $code])      # application/json
+  PSGI::Handy::Response->redirect($url [, $code])  # 302 + Location
+  PSGI::Handy::Response->new(status => 200, type => ..., body => ...)
+
+  # Chainable mutators (each returns the Response):
+  $res->set_status(201)
+  $res->set_body('...')                   # a scalar or an arrayref
+  $res->content_type('text/csv')
+  $res->header('X-Trace', 'abc')          # append (duplicates allowed)
+  $res->set_header('X-Trace', 'abc')      # replace any existing header
+  $res->remove_header('X-Trace')
+  $res->cookie('sid', $value, %opts)      # section 6
+
+  # Read-only accessors:
+  $res->status            $res->body
+
+  # Build the PSGI triple (Content-Length added when absent):
+  my $psgi = $res->finalize;    # [ $status, \@headers, \@body ]
+
+  # json() does NOT encode for you; pass an already-encoded JSON
+  # string (for example produced with mb::JSON).
+
+[ 6. කුකීස් ]
+
+  # Set a cookie on the response:
+  $res->cookie('sid', 'abc123',
+      path     => '/',            # Path=
+      domain   => '.example.com', # Domain=
+      max_age  => 3600,           # Max-Age=
+      expires  => $http_date,     # Expires=
+      secure   => 1,              # adds '; Secure'
+      httponly => 1,              # adds '; HttpOnly'
+  );
+
+  # Read cookies from the request:
+  my $sid = $c->req->cookie('sid');
+  my $all = $c->req->cookies;     # { name => value, ... }
+
+[ 7. අච්චු විදැහුම ]
+
+  # Inject a renderer into new(). It is one of:
+  #   a CODE reference:  $renderer->($template, \%vars) -> string
+  #   an object with a   $obj->render($template, \%vars) method
+
+  # HP::Handy has render_string/render_file (not a plain render()),
+  # so bridge it with a CODE renderer mapping a name to its source:
+  use HP::Handy;
+  my $hp   = HP::Handy->new(auto_escape => 1);
+  my %tpl  = ('hello.html' => 'Hello {{ name }}!');
+  my $renderer = sub {
+      my ($name, $vars) = @_;
+      return $hp->render_string($tpl{$name}, $vars);
+  };
+  my $app  = PSGI::Handy->new(renderer => $renderer);
+
+  $app->get('/hi/:name', sub {
+      my $c = shift;
+      return $c->render('hello.html', { name => $c->param('name') });
+  });
+
+  # render() merges the stash with \%vars (vars win) and returns an
+  # HTML response. With no renderer configured it dies (DIAGNOSTICS).
+
+[ 8. දත්ත සමුදා ප්‍රවේශය ($c->db) ]
+
+  # Whatever you pass as db => ... is returned unchanged by $c->db.
+  # With DB::Handy, connect using POSITIONAL arguments:
+  use DB::Handy;
+  my $dbh = DB::Handy->connect($base_dir, 'memo',
+                               { RaiseError => 0, PrintError => 0 });
+  my $app = PSGI::Handy->new(db => $dbh);
+
+  $dbh->do('CREATE TABLE memo (id INT, body VARCHAR(200))');
+
+  $app->get('/', sub {
+      my $c   = shift;
+      my $sth = $c->db->prepare('SELECT id, body FROM memo ORDER BY id');
+      $sth->execute();
+      my @rows;
+      my $row;
+      while ($row = $sth->fetchrow_hashref()) { push @rows, $row; }
+      $sth->finish;
+      return $c->json(...);   # encode @rows yourself, e.g. mb::JSON
+  });
+
+  $app->post('/add', sub {
+      my $c   = shift;
+      my $ins = $c->db->prepare('INSERT INTO memo (id, body) VALUES (?, ?)');
+      $ins->execute($id, $c->param('body'));
+      $ins->finish;
+      return $c->redirect('/');
+  });
+
+  # DB::Handy notes:
+  #   DSN 'dbi:Handy:dbname=X' does NOT select the database; pass the
+  #     base_dir and the db name as positional arguments instead.
+  #   column types: INT FLOAT CHAR VARCHAR DATE only
+  #     (INTEGER / NUMERIC raise "Unknown type").
+
+[ 9. Hook (before / after) ]
+
+  # before($c): return a reference (a Response or a PSGI arrayref) to
+  #             short-circuit the request; return nothing to continue.
+  $app->before(sub {
+      my $c = shift;
+      return $c->redirect('/login') unless logged_in($c);
+      return;     # fall through to the matched handler
+  });
+
+  # after($c, $out): return a value to replace the output; return
+  #                  nothing to leave it unchanged.
+  $app->after(sub {
+      my ($c, $out) = @_;
+      return $out;
+  });
+
+  # Hooks run in registration order. A die() inside a handler is caught
+  # and turned into a 500 response, logged to psgi.errors.
+
+[ 10. වින්‍යාසය සහ stash ]
+
+  # Config: read-only data shared by every request.
+  my $app = PSGI::Handy->new(
+      config => { title => 'Site', per_page => 20 });
+  $c->config;             # the whole hash reference
+  $c->config('title');    # one value
+
+  # Stash: per-request scratch space, useful between hooks and render.
+  $app->before(sub { my $c = shift; $c->stash(now => time()); return });
+  $app->get('/', sub {
+      my $c = shift;
+      return $c->render('home.html', { extra => 1 });  # 'now' is visible
+  });
+
+[ 11. සම්පූර්ණ ත්‍රිස්තර උදාහරණය ]
+
+  use HTTP::Handy;    # delivery layer
+  use HP::Handy;      # view layer
+  use DB::Handy;      # model layer
+  use PSGI::Handy;   # the framework
+
+  my $hp  = HP::Handy->new(auto_escape => 1);
+  my %tpl = ('list.html' =>
+      '<ul>{% for u in users %}<li>{{ u.name }}</li>{% endfor %}</ul>');
+
+  my $dbh = DB::Handy->connect($dir, 'app',
+                               { RaiseError => 0, PrintError => 0 });
+
+  my $app = PSGI::Handy->new(
+      renderer => sub { $hp->render_string($tpl{$_[0]}, $_[1]) },
+      db       => $dbh,
+  );
+
+  $app->get('/users', sub {
+      my $c   = shift;
+      my $sth = $c->db->prepare('SELECT name FROM users ORDER BY name');
+      $sth->execute();
+      my @users;
+      my $row;
+      while ($row = $sth->fetchrow_hashref()) { push @users, $row; }
+      $sth->finish;
+      return $c->render('list.html', { users => [ @users ] });
+  });
+
+  HTTP::Handy->run(app => $app->to_app, host => '127.0.0.1', port => 8080);
+
+[ 12. නිල සම්පත් ]
+
+  PSGI::Handy on MetaCPAN:
+    https://metacpan.org/dist/PSGI-Handy
+
+  The rest of the Handy stack:
+    https://metacpan.org/dist/HTTP-Handy
+    https://metacpan.org/dist/HP-Handy
+    https://metacpan.org/dist/DB-Handy
+
+  PSGI specification:
+    https://github.com/plack/psgi-specs/blob/master/PSGI.pod
+
+======================================================================

@@ -1,0 +1,233 @@
+======================================================================
+ PSGI::Handy Tutorial (tut/)
+ Tutorial Manual                                         [EN] English
+======================================================================
+
+ tut/ is the official teaching tutorial for PSGI::Handy: a six-chapter, twenty-four-step curriculum that builds a web application from the ground up with no black boxes, starting at a bare HTTP response and ending with a full CRUD application. Each step is one self-contained, runnable Perl program. The whole stack is pure Perl and dependency-free: PSGI::Handy (framework), HTTP::Handy (server), HP::Handy (templates) and DB::Handy (database).
+
+[ How to run ]
+
+  Run one step at a time from inside the tut/ directory, for example perl 01_step01_text.pl  . Each program starts a server and prints its URL; open http://127.0.0.1:8080/ in a browser and press Ctrl-C to stop. The templates/ directory and data.csv must be reachable from the current directory, so always start the programs from within tut/.
+
+[ Common header ]
+
+  Every .pl file opens with the same header: use 5.00503; use strict; a small BEGIN block that supplies a no-op warnings stub on Perl older than 5.6; then use warnings; local $^W = 1;  . The programs use bareword filehandles and two-argument open so they stay valid all the way back to Perl 5.005_03. This header is identical in every step and is not repeated below.
+
+----------------------------------------------------------------------
+ Root files
+----------------------------------------------------------------------
+
+  00_README.txt
+      The curriculum overview: every chapter and step with its learning goal. Read this first to see the whole arc before opening any program.
+
+  data.csv
+      The sample data for Chapter 4 (the CSV steps): three comma-separated rows of id,name,age. Steps 12, 14 and 15 rewrite this file, so keep a backup if you want to reset it. 1,Alice,20 / 2,Bob,22 / 3,Charlie,25
+
+----------------------------------------------------------------------
+ Chapter 1 — HTTP response basics (static to dynamic)
+----------------------------------------------------------------------
+
+  The simplest possible exchange between browser and server, with no template engine, to understand the shape of an HTTP response.
+
+  01_step01_text.pl
+      Returns the plain text '.' for GET / via $c->text(). The smallest possible app: the browser receives raw characters (text/plain).
+
+  01_step02_html.pl
+      Returns '<a>.' as text/html via $c->html(). The same bytes as Step 1, but the Content-Type tells the browser to treat them as markup. Shows the text-vs-HTML distinction.
+
+  01_step03_dyn_text.pl
+      Returns the current time as plain text, read fresh on every request with scalar localtime(). The first taste of dynamic output: the response changes each time.
+
+  01_step04_dyn_html.pl
+      Wraps the dynamic time in <h1>/<p> markup and returns it as HTML. Building a screen by assembling a string from variables.
+
+----------------------------------------------------------------------
+ Chapter 2 — User input and state (forms and branching)
+----------------------------------------------------------------------
+
+  Sending data from the browser to the server, and branching on what arrives.
+
+  02_step05_form.pl
+      GET / shows an HTML form (a text box plus a submit button) that POSTs to /echo. There is no handler for the submission yet; this step is only about the form markup.
+
+  02_step06_echo.pl
+      Adds the POST /echo handler. It reads the 'message' field with $c->param('message') and echoes it back inside the HTML response: the basic request-to-response round trip.
+
+  02_step07_auth.pl
+      A minimal login. POST /login reads 'username' and 'password' and uses an if to branch: admin/secret reaches the success page, anything else the failure page. The seed of authentication and conditional flow.
+
+----------------------------------------------------------------------
+ Chapter 3 — Separating the View (introducing HP::Handy)
+----------------------------------------------------------------------
+
+  Stop writing HTML inside the program; move it into template files. HP::Handy exposes render_file()/render_string(), so it is wired into PSGI::Handy through a small CODE renderer that maps a template name to render_file(). That renderer block is identical in every templated step.
+
+  03_step08_template.pl
+      Renders the static templates/step08.html with no variables. The HTML now lives in its own file, separate from the logic.
+
+  03_step09_template_var.pl
+      Passes { current_time => ... } to templates/step09.html, which prints it with the {{ current_time }} placeholder. Data flows from program to template.
+
+  03_step10_template_form.pl
+      Rewrites the Step 6 echo using two templates: step10_form.html for input and step10_result.html for the result. The handler logic becomes tiny.
+
+----------------------------------------------------------------------
+ Chapter 4 — File I/O and CSV persistence (CRUD basics)
+----------------------------------------------------------------------
+
+  Implement Create/Read/Update/Delete against a plain CSV file, with no database. Feeling the cost of manual data handling motivates the move to a database in Chapter 5.
+
+  04_step11_csv_readall.pl
+      Read All. Opens data.csv, splits each line on commas into { id, name, age } hashes, and renders the list as an HTML table (step11_list.html).
+
+  04_step12_csv_create.pl
+      Create. POST /add appends one 'id,name,age' line to data.csv in append mode (>>), then shows a completion page.
+
+  04_step13_csv_readone.pl
+      Read One. The route /user/:id captures an id; the program scans data.csv for the matching row and shows its detail (step13_detail.html), or returns 404 if not found.
+
+  04_step14_csv_update.pl
+      Update. To change one row it reads every line, replaces the matching one and rewrites the whole file: the 'read all, swap, write all' chore a database will remove.
+
+  04_step15_csv_delete.pl
+      Delete. The same whole-file rewrite, but the matching row is skipped instead of replaced.
+
+----------------------------------------------------------------------
+ Chapter 5 — Introducing the Model (moving to DB::Handy)
+----------------------------------------------------------------------
+
+  Replace the CSV with DB::Handy. The handle is created with DB::Handy->connect('data','app',{...}) and injected via db => $dbh, then reached in handlers as $c->db. A _bootstrap() routine creates and seeds the 'users' table once, so each example runs standalone.
+
+  05_step16_db_readall.pl
+      Read All. selectall_arrayref(..., { Slice => {} }) fetches every users row as hashes for the list template (step16_list.html). No more manual file parsing.
+
+  05_step17_db_create.pl
+      Create. POST /add inserts one row with a placeholder INSERT, then redirects to / (the list): the standard post-then-redirect pattern.
+
+  05_step18_db_readone.pl
+      Read One. /user/:id fetches a single row by primary key with selectrow_hashref(), or returns 404. A direct key lookup instead of scanning every row.
+
+  05_step19_db_update.pl
+      Update. GET /user/:id/edit shows the edit form; the POST runs UPDATE ... WHERE id=? and redirects to the detail page. No in-memory whole-file rewrite.
+
+  05_step20_db_delete.pl
+      Delete. DELETE ... WHERE id=? is run, then a redirect to /. The state-changing route is POST only, to avoid accidental deletes from a GET.
+
+----------------------------------------------------------------------
+ Chapter 6 — Relational data and a real application
+----------------------------------------------------------------------
+
+  Two related tables (users and depts) in a second database 'app2'. The JOIN is done by hand in Perl so it is not a black box, then everything is assembled into one full application.
+
+  06_step21_db_join_list.pl
+      JOIN List. Reads both tables, builds a dept_id => name lookup, attaches dept_name to each user (a hand-written JOIN), and lists them (step21_join_list.html).
+
+  06_step22_db_join_detail.pl
+      JOIN Read One. Fetches one user, then looks up that user's single department and attaches its name for the detail page (step22_join_detail.html).
+
+  06_step23_db_form_select.pl
+      Select form. Loads the department master and renders it as a <select> dropdown (step23_form_select.html), so the user picks a department instead of typing an id.
+
+  06_step24_fullstack_app.pl
+      The full application in one file: list, detail, add, edit and delete over the users+depts data, with department names attached, a select dropdown, post-then-redirect everywhere, and a _next_id() helper (DB::Handy has no auto-increment). Uses app_list.html and app_form.html.
+
+----------------------------------------------------------------------
+ Templates (templates/)
+----------------------------------------------------------------------
+
+  HP::Handy templates use a Jinja2-like syntax: {{ var }} prints a value (dotted paths like {{ user.name }} reach into hashes), {% for x in list %} ... {% endfor %} loops, and {% if ... %} branches. The renderer is created with auto_escape => 1, so printed values are HTML-escaped.
+
+  templates/step08.html
+      A fully static page used by Step 8; no placeholders.
+
+  templates/step09.html
+      Prints the server time through {{ current_time }} (Step 9).
+
+  templates/step10_form.html
+      The input form for the Step 10 echo; POSTs 'message' to /echo.
+
+  templates/step10_result.html
+      Shows the echoed {{ message }} for Step 10.
+
+  templates/step11_list.html
+      Loops over {{ users }} to draw the CSV table (Step 11).
+
+  templates/step12_form.html
+      The add form (id, name, age) for Step 12.
+
+  templates/step12_result.html
+      The Step 12 "Added" confirmation: shows {{ name }} and a link back.
+
+  templates/step13_list.html
+      The Step 13 index: each user links to its /user/:id detail page.
+
+  templates/step13_detail.html
+      Shows one user's id/name/age for Step 13.
+
+  templates/step14_list.html
+      The Step 14 page: the current rows and an update form posting to /update.
+
+  templates/step15_list.html
+      The Step 15 page: the current rows and a delete form posting to /delete.
+
+  templates/step16_list.html
+      The plain DB user list for Step 16 (no links yet).
+
+  templates/step17_form.html
+      The add-user form for Step 17.
+
+  templates/step17_list.html
+      The Step 17 list with an "Add New User" link to /add.
+
+  templates/step18_list.html
+      The Step 18 list: each name links to its /user/:id detail.
+
+  templates/step18_detail.html
+      Plain user detail for Step 18, with a Back link.
+
+  templates/step19_list.html
+      The Step 19 list: each name links to its detail page.
+
+  templates/step19_detail.html
+      User detail for Step 19, with an Edit link and a Back link.
+
+  templates/step19_edit.html
+      The edit form (name, age) for Step 19; POSTs to /user/:id/edit.
+
+  templates/step20_list.html
+      The Step 20 list with a confirm-guarded POST Delete button on each row.
+
+  templates/step21_join_list.html
+      The employee list with the joined {{ user.dept_name }} column (Step 21).
+
+  templates/step22_join_list.html
+      The Step 22 employee index: each name links to its detail page.
+
+  templates/step22_join_detail.html
+      Employee detail showing the department name (Step 22).
+
+  templates/step23_list.html
+      The Step 23 employee list with an "Add New Employee" link to /add.
+
+  templates/step23_form_select.html
+      The add form with a department <select> built from {{ depts }} (Step 23).
+
+  templates/app_list.html
+      The full app's employee list (Step 24): ID, linked name, department, plus Edit and a confirm-guarded POST Delete per row, and an Add link.
+
+  templates/app_form.html
+      The full app's shared add/edit form (Step 24): the {{ action }} target switches between create and update, and the department <select> pre-selects {{ user.dept_id }} via {% if %}.
+
+----------------------------------------------------------------------
+ References
+----------------------------------------------------------------------
+
+  PSGI::Handy and the rest of the Handy stack on MetaCPAN, and the PSGI specification:
+
+    https://metacpan.org/dist/PSGI-Handy
+    https://metacpan.org/dist/HTTP-Handy
+    https://metacpan.org/dist/HP-Handy
+    https://metacpan.org/dist/DB-Handy
+    https://github.com/plack/psgi-specs/blob/master/PSGI.pod
+
+======================================================================

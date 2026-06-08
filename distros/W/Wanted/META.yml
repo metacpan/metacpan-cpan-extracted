@@ -37,8 +37,8 @@ requires:
   vars: '0'
   warnings: '0'
 resources:
-  bugtracker: https://gitlab.com/jackdeguest/Wanted/issues
-  homepage: https://gitlab.com/jackdeguest/Wanted
-  repository: https://gitlab.com/jackdeguest/Wanted
-version: v0.1.0
+  bugtracker: https://gitlab.com/deguest/Wanted/issues
+  homepage: https://gitlab.com/deguest/Wanted
+  repository: https://gitlab.com/deguest/Wanted
+version: v0.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

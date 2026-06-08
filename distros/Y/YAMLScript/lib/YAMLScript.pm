@@ -1,4 +1,4 @@
-# Copyright 2023-2025 Ingy dot Net
+# Copyright 2023-2026 Ingy dot Net
 # This code is licensed under MIT license (See License for details)
 
 use strict;
@@ -10,7 +10,7 @@ use FFI::CheckLib ();
 use FFI::Platypus;
 use Cpanel::JSON::XS ();
 
-our $VERSION = '0.2.8';
+our $VERSION = '0.2.13';
 
 our $libys_version = $VERSION;
 

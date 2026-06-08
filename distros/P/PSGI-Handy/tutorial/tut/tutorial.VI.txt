@@ -1,0 +1,233 @@
+======================================================================
+ PSGI::Handy Tutorial (tut/)
+ Sổ tay hướng dẫn                                     [VI] Tiếng Việt
+======================================================================
+
+ tut/ là hướng dẫn giảng dạy chính thức của PSGI::Handy: một chương trình học gồm sáu chương và hai mươi bốn bước, xây dựng một ứng dụng web từ đầu, không có hộp đen nào, bắt đầu từ một phản hồi HTTP trần trụi nhất đến một ứng dụng CRUD hoàn chỉnh. Mỗi bước là một chương trình Perl độc lập và có thể chạy được. Toàn bộ ngăn xếp là Perl thuần túy và không có phụ thuộc: PSGI::Handy (khung), HTTP::Handy (máy chủ), HP::Handy (mẫu) và DB::Handy (cơ sở dữ liệu).
+
+[ Cách chạy ]
+
+  Chạy từng bước một từ bên trong thư mục tut/, ví dụ  perl 01_step01_text.pl  . Mỗi chương trình khởi động một máy chủ và in ra URL của nó; mở http://127.0.0.1:8080/ trong trình duyệt và nhấn Ctrl-C để dừng. Thư mục templates/ và data.csv phải có thể truy cập được từ thư mục hiện tại, vì vậy hãy luôn khởi động các chương trình từ bên trong tut/.
+
+[ Phần đầu chung ]
+
+  Mỗi tệp .pl mở đầu bằng cùng một phần đầu: use 5.00503; use strict; một khối BEGIN nhỏ cung cấp một warnings stub không hoạt động trên Perl cũ hơn 5.6; sau đó use warnings; local $^W = 1;  . Các chương trình sử dụng bareword filehandle và open hai đối số để chúng vẫn hợp lệ cho đến tận Perl 5.005_03. Phần đầu này giống nhau trong mọi bước và không được lặp lại bên dưới.
+
+----------------------------------------------------------------------
+ Tệp gốc
+----------------------------------------------------------------------
+
+  00_README.txt
+      Tổng quan chương trình học: mọi chương và bước cùng mục tiêu học tập của nó. Hãy đọc phần này trước để thấy toàn bộ mạch trước khi mở bất kỳ chương trình nào.
+
+  data.csv
+      Dữ liệu mẫu cho Chương 4 (các bước CSV): ba hàng phân tách bằng dấu phẩy id,name,age. Các bước 12, 14 và 15 ghi lại tệp này, vì vậy hãy giữ một bản sao lưu nếu bạn muốn đặt lại nó. 1,Alice,20 / 2,Bob,22 / 3,Charlie,25
+
+----------------------------------------------------------------------
+ Chương 1 — Cơ bản về phản hồi HTTP (từ tĩnh đến động)
+----------------------------------------------------------------------
+
+  Trao đổi đơn giản nhất có thể giữa trình duyệt và máy chủ, không có công cụ mẫu, để hiểu hình dạng của một phản hồi HTTP.
+
+  01_step01_text.pl
+      Trả về văn bản thuần '.' cho GET / thông qua $c->text(). Ứng dụng nhỏ nhất có thể: trình duyệt nhận các ký tự thô (text/plain).
+
+  01_step02_html.pl
+      Trả về '<a>.' dưới dạng text/html thông qua $c->html(). Cùng các byte như Bước 1, nhưng Content-Type cho trình duyệt biết phải coi chúng là đánh dấu. Cho thấy sự phân biệt giữa văn bản và HTML.
+
+  01_step03_dyn_text.pl
+      Trả về thời gian hiện tại dưới dạng văn bản thuần, được đọc mới trên mỗi yêu cầu bằng scalar localtime(). Hương vị đầu tiên của đầu ra động: phản hồi thay đổi mỗi lần.
+
+  01_step04_dyn_html.pl
+      Bọc thời gian động trong đánh dấu <h1>/<p> và trả về dưới dạng HTML. Xây dựng một màn hình bằng cách lắp ráp một chuỗi từ các biến.
+
+----------------------------------------------------------------------
+ Chương 2 — Đầu vào người dùng và trạng thái (biểu mẫu và phân nhánh)
+----------------------------------------------------------------------
+
+  Gửi dữ liệu từ trình duyệt đến máy chủ, và phân nhánh dựa trên những gì đến.
+
+  02_step05_form.pl
+      GET / hiển thị một biểu mẫu HTML (một hộp văn bản cộng với nút gửi) POST đến /echo. Chưa có trình xử lý cho việc gửi; bước này chỉ về đánh dấu biểu mẫu.
+
+  02_step06_echo.pl
+      Thêm trình xử lý POST /echo. Nó đọc trường 'message' bằng $c->param('message') và lặp lại nó bên trong phản hồi HTML: vòng lặp cơ bản từ yêu cầu đến phản hồi.
+
+  02_step07_auth.pl
+      Một đăng nhập tối thiểu. POST /login đọc 'username' và 'password' và sử dụng một if để phân nhánh: admin/secret đến trang thành công, mọi thứ khác đến trang thất bại. Hạt giống của xác thực và luồng có điều kiện.
+
+----------------------------------------------------------------------
+ Chương 3 — Tách View (giới thiệu HP::Handy)
+----------------------------------------------------------------------
+
+  Ngừng viết HTML bên trong chương trình; chuyển nó vào các tệp mẫu. HP::Handy cung cấp render_file()/render_string(), vì vậy nó được kết nối vào PSGI::Handy thông qua một CODE renderer nhỏ ánh xạ tên mẫu đến render_file(). Khối renderer đó giống nhau trong mọi bước có mẫu.
+
+  03_step08_template.pl
+      Kết xuất templates/step08.html tĩnh mà không có biến. HTML giờ đây nằm trong tệp riêng của nó, tách biệt khỏi logic.
+
+  03_step09_template_var.pl
+      Truyền { current_time => ... } đến templates/step09.html, in nó với trình giữ chỗ {{ current_time }}. Dữ liệu chảy từ chương trình đến mẫu.
+
+  03_step10_template_form.pl
+      Viết lại echo của Bước 6 bằng hai mẫu: step10_form.html cho đầu vào và step10_result.html cho kết quả. Logic của trình xử lý trở nên rất nhỏ.
+
+----------------------------------------------------------------------
+ Chương 4 — I/O tệp và lưu trữ CSV (cơ bản về CRUD)
+----------------------------------------------------------------------
+
+  Triển khai Create/Read/Update/Delete với một tệp CSV thuần, không có cơ sở dữ liệu. Cảm nhận được chi phí của việc xử lý dữ liệu thủ công thúc đẩy việc chuyển sang cơ sở dữ liệu ở Chương 5.
+
+  04_step11_csv_readall.pl
+      Read All. Mở data.csv, tách mỗi dòng theo dấu phẩy thành các hash { id, name, age }, và kết xuất danh sách dưới dạng bảng HTML (step11_list.html).
+
+  04_step12_csv_create.pl
+      Create. POST /add thêm một dòng 'id,name,age' vào data.csv ở chế độ thêm (>>), sau đó hiển thị một trang hoàn thành.
+
+  04_step13_csv_readone.pl
+      Read One. Tuyến /user/:id bắt một id; chương trình quét data.csv để tìm hàng khớp và hiển thị chi tiết của nó (step13_detail.html), hoặc trả về 404 nếu không tìm thấy.
+
+  04_step14_csv_update.pl
+      Update. Để thay đổi một hàng, nó đọc mọi dòng, thay thế dòng khớp và ghi lại toàn bộ tệp: công việc nhọc nhằn 'đọc tất cả, hoán đổi, ghi tất cả' mà cơ sở dữ liệu sẽ loại bỏ.
+
+  04_step15_csv_delete.pl
+      Delete. Cùng việc ghi lại toàn bộ tệp, nhưng hàng khớp bị bỏ qua thay vì thay thế.
+
+----------------------------------------------------------------------
+ Chương 5 — Giới thiệu Model (chuyển sang DB::Handy)
+----------------------------------------------------------------------
+
+  Thay thế CSV bằng DB::Handy. Handle được tạo bằng DB::Handy->connect('data','app',{...}) và được tiêm qua db => $dbh, sau đó được truy cập trong các trình xử lý dưới dạng $c->db. Một quy trình _bootstrap() tạo và gieo bảng 'users' một lần, vì vậy mỗi ví dụ chạy độc lập.
+
+  05_step16_db_readall.pl
+      Read All. selectall_arrayref(..., { Slice => {} }) lấy mọi hàng users dưới dạng hash cho mẫu danh sách (step16_list.html). Không còn phân tích tệp thủ công.
+
+  05_step17_db_create.pl
+      Create. POST /add chèn một hàng với INSERT có trình giữ chỗ, sau đó chuyển hướng đến / (danh sách): mẫu post-then-redirect tiêu chuẩn.
+
+  05_step18_db_readone.pl
+      Read One. /user/:id lấy một hàng duy nhất theo khóa chính bằng selectrow_hashref(), hoặc trả về 404. Tra cứu khóa trực tiếp thay vì quét mọi hàng.
+
+  05_step19_db_update.pl
+      Update. GET /user/:id/edit hiển thị biểu mẫu chỉnh sửa; POST chạy UPDATE ... WHERE id=? và chuyển hướng đến trang chi tiết. Không ghi lại toàn bộ tệp trong bộ nhớ.
+
+  05_step20_db_delete.pl
+      Delete. DELETE ... WHERE id=? được chạy, sau đó chuyển hướng đến /. Tuyến thay đổi trạng thái chỉ là POST, để tránh xóa do nhầm lẫn từ một GET.
+
+----------------------------------------------------------------------
+ Chương 6 — Dữ liệu quan hệ và một ứng dụng thực sự
+----------------------------------------------------------------------
+
+  Hai bảng liên quan (users và depts) trong cơ sở dữ liệu thứ hai 'app2'. JOIN được thực hiện thủ công trong Perl để nó không phải là hộp đen, sau đó mọi thứ được lắp ráp thành một ứng dụng hoàn chỉnh.
+
+  06_step21_db_join_list.pl
+      JOIN List. Đọc cả hai bảng, xây dựng tra cứu dept_id => name, gắn dept_name vào mỗi người dùng (một JOIN viết tay), và liệt kê chúng (step21_join_list.html).
+
+  06_step22_db_join_detail.pl
+      JOIN Read One. Lấy một người dùng, sau đó tra cứu phòng ban duy nhất của người dùng đó và gắn tên của nó cho trang chi tiết (step22_join_detail.html).
+
+  06_step23_db_form_select.pl
+      Biểu mẫu chọn. Tải dữ liệu chính của phòng ban và kết xuất nó dưới dạng menu thả xuống <select> (step23_form_select.html), để người dùng chọn một phòng ban thay vì gõ một id.
+
+  06_step24_fullstack_app.pl
+      Ứng dụng hoàn chỉnh trong một tệp: list, detail, add, edit và delete trên dữ liệu users+depts, với tên phòng ban được gắn, một menu thả xuống select, post-then-redirect ở mọi nơi, và một trình trợ giúp _next_id() (DB::Handy không có tự động tăng). Sử dụng app_list.html và app_form.html.
+
+----------------------------------------------------------------------
+ Mẫu (templates/)
+----------------------------------------------------------------------
+
+  Các mẫu HP::Handy sử dụng cú pháp giống Jinja2: {{ var }} in một giá trị (các đường dẫn có dấu chấm như {{ user.name }} truy cập vào các hash), {% for x in list %} ... {% endfor %} lặp, và {% if ... %} phân nhánh. Renderer được tạo với auto_escape => 1, vì vậy các giá trị được in được HTML-escape.
+
+  templates/step08.html
+      Một trang hoàn toàn tĩnh được Bước 8 sử dụng; không có trình giữ chỗ.
+
+  templates/step09.html
+      In thời gian máy chủ qua {{ current_time }} (Bước 9).
+
+  templates/step10_form.html
+      Biểu mẫu đầu vào cho echo của Bước 10; POST 'message' đến /echo.
+
+  templates/step10_result.html
+      Hiển thị {{ message }} được lặp lại cho Bước 10.
+
+  templates/step11_list.html
+      Lặp qua {{ users }} để vẽ bảng CSV (Bước 11).
+
+  templates/step12_form.html
+      Biểu mẫu thêm (id, name, age) cho Bước 12.
+
+  templates/step12_result.html
+      Trang xác nhận "Added" của Bước 12: hiển thị {{ name }} và liên kết quay lại.
+
+  templates/step13_list.html
+      Chỉ mục của Bước 13: mỗi người dùng liên kết đến trang chi tiết /user/:id.
+
+  templates/step13_detail.html
+      Hiển thị id/name/age của một người dùng cho Bước 13.
+
+  templates/step14_list.html
+      Trang của Bước 14: các hàng hiện tại và biểu mẫu cập nhật POST tới /update.
+
+  templates/step15_list.html
+      Trang của Bước 15: các hàng hiện tại và biểu mẫu xóa POST tới /delete.
+
+  templates/step16_list.html
+      Danh sách người dùng DB đơn giản cho Bước 16 (chưa có liên kết).
+
+  templates/step17_form.html
+      Biểu mẫu thêm người dùng cho Bước 17.
+
+  templates/step17_list.html
+      Danh sách Bước 17 với liên kết "Add New User" tới /add.
+
+  templates/step18_list.html
+      Danh sách Bước 18: mỗi tên liên kết đến chi tiết /user/:id.
+
+  templates/step18_detail.html
+      Chi tiết người dùng đơn giản cho Bước 18, có liên kết quay lại.
+
+  templates/step19_list.html
+      Danh sách Bước 19: mỗi tên liên kết đến trang chi tiết.
+
+  templates/step19_detail.html
+      Chi tiết người dùng Bước 19, có liên kết Edit và liên kết quay lại.
+
+  templates/step19_edit.html
+      Biểu mẫu chỉnh sửa (name, age) cho Bước 19; POST đến /user/:id/edit.
+
+  templates/step20_list.html
+      Danh sách Bước 20 với nút Delete (POST, có xác nhận) trên mỗi hàng.
+
+  templates/step21_join_list.html
+      Danh sách nhân viên với cột {{ user.dept_name }} đã được nối (Bước 21).
+
+  templates/step22_join_list.html
+      Chỉ mục nhân viên Bước 22: mỗi tên liên kết đến trang chi tiết.
+
+  templates/step22_join_detail.html
+      Chi tiết nhân viên hiển thị tên phòng ban (Bước 22).
+
+  templates/step23_list.html
+      Danh sách nhân viên Bước 23 với liên kết "Add New Employee" tới /add.
+
+  templates/step23_form_select.html
+      Biểu mẫu thêm với một <select> phòng ban được xây dựng từ {{ depts }} (Bước 23).
+
+  templates/app_list.html
+      Danh sách nhân viên của ứng dụng hoàn chỉnh (Bước 24): ID, tên được liên kết, phòng ban, cộng với Edit và một POST Delete được bảo vệ bằng xác nhận trên mỗi hàng, và một liên kết Add.
+
+  templates/app_form.html
+      Biểu mẫu thêm/chỉnh sửa dùng chung của ứng dụng hoàn chỉnh (Bước 24): mục tiêu {{ action }} chuyển đổi giữa tạo và cập nhật, và <select> phòng ban chọn trước {{ user.dept_id }} qua {% if %}.
+
+----------------------------------------------------------------------
+ Tài liệu tham khảo
+----------------------------------------------------------------------
+
+  PSGI::Handy và phần còn lại của ngăn xếp Handy trên MetaCPAN, và đặc tả PSGI:
+
+    https://metacpan.org/dist/PSGI-Handy
+    https://metacpan.org/dist/HTTP-Handy
+    https://metacpan.org/dist/HP-Handy
+    https://metacpan.org/dist/DB-Handy
+    https://github.com/plack/psgi-specs/blob/master/PSGI.pod
+
+======================================================================

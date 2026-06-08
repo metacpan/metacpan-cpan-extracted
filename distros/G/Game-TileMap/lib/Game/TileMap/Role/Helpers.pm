@@ -1,10 +1,10 @@
 package Game::TileMap::Role::Helpers;
-$Game::TileMap::Role::Helpers::VERSION = '1.000';
+$Game::TileMap::Role::Helpers::VERSION = '1.001';
 use v5.10;
 use strict;
 use warnings;
 
-use Moo::Role;
+use Mooish::Base -stardard, -role;
 
 requires qw(
 	legend

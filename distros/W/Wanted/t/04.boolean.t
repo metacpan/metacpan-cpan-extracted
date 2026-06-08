@@ -34,9 +34,9 @@ sub wb
     my $a = Wanted::want_boolean(0);
     # 'is' does not work, because want_boolean(0) return '' (empty string), while we expect 0, but using $w == $a, force '' to become 0, and then the test becomes true... Not sure this is really good. Both ends up being false, which is ok for boolean, but it is not the same return value
     # if( !is( $a, $w, "want_boolean(0) -> " . ( $a // 'undef' ) ) )
-    if( !ok( $a == $w, ( defined( $name ) ? "$name: " : '' ) . "want_boolean(0) -> '" . ( $a // 'undef' ) . "'" ) )
+    if( !ok( $a == $w, ( defined( $name ) ? "$name: " : '' ) . "want_boolean(0) -> '" . ( defined( $a ) ? $a : 'undef' ) . "'" ) )
     {
-        diag( "\$a = '", ( $a // 'undef' ), "'" );
+        diag( "\$a = '", ( defined( $a ) ? $a : 'undef' ), "'" );
     }
     return( $r );
 }

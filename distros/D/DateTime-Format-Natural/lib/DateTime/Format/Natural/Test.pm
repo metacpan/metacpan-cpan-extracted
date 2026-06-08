@@ -16,7 +16,7 @@ use Test::More;
 our ($VERSION, @EXPORT_OK, %EXPORT_TAGS, %time, $case_strings, $time_entries);
 my @set;
 
-$VERSION = '0.13';
+$VERSION = '0.15';
 
 @set = qw(truncated unaltered %time $case_strings
           $time_entries _run_tests _result_string
@@ -71,7 +71,6 @@ $time_entries = sub
     if ($string =~ /\{(?:min_)?sec\}/) {
         my ($desc, @values);
         my $sec = sprintf '%02d', int rand(60);
-        local $1;
         if ($string =~ /\{(min_sec)\}/) {
             @values = (
                 [ '',         '00:00'   ], # hour
@@ -107,9 +106,7 @@ sub _run_tests
 
     $tests *= 3; # case tests
 
-    local $@;
-
-    if (eval "require Date::Calc") {
+    if (!$DateTime::Format::Natural::Compat::Pure) {
         plan tests => $tests * 2;
         foreach my $set (@$sets) {
             $check->(@$set);

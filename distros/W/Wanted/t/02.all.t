@@ -122,9 +122,9 @@ sub hm
 {
     my $x = shift( @_ );
     my $h = Wanted::howmany();
-    if( !ok( ( !defined( $x ) && !defined( $h ) || $x eq $h ), "howmany returns " . ( defined( $h ) ? "$h" : 'undef' ) . " vs " . ( $x // 'undef' ) ) )
+    if( !ok( ( !defined( $x ) && !defined( $h ) || $x eq $h ), "howmany returns " . ( defined( $h ) ? "$h" : 'undef' ) . " vs " . ( defined( $x ) ? $x : 'undef' ) ) )
     {
-        diag( "\$h is '", ( $h // 'undef' ), "'" );
+        diag( "\$h is '", ( defined( $h ) ? $h : 'undef' ), "'" );
     }
 }
 
@@ -241,7 +241,7 @@ sub tCOUNT
     }
     else
     {
-        is( $a, $w, "expected count is " . ( $w // 'undef' ) . " vs actual " . ( $a // 'undef' ) );
+        is( $a, $w, "expected count is " . ( defined( $w ) ? $w : 'undef' ) . " vs actual " . ( defined( $a ) ? $a : 'undef' ) );
     }
     return
 }
@@ -254,7 +254,7 @@ sub tREF
 {
     my( $w ) = @_;
     my $a = want('REF');
-    is( $a, $w, "want('REF') -> " . ( $a // 'undef' ) );
+    is( $a, $w, "want('REF') -> " . ( defined( $a ) ? $a : 'undef' ) );
     return( \undef );
 }
 

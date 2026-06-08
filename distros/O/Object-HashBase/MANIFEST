@@ -21,5 +21,6 @@ t/inline.t
 t/parent_prefix.t
 t/role_consume.t
 t/role_define.t
+t/role_modifiers.t
 t/role_old_perl.t
 xt/author/pod-syntax.t

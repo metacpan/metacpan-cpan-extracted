@@ -1,0 +1,233 @@
+======================================================================
+ PSGI::Handy Tutorial (tut/)
+ Qo'llanma (Tutorial)                                     [UZ] O'zbek
+======================================================================
+
+ tut/ — bu PSGI::Handy'ning rasmiy o'quv qo'llanmasi: olti bobdan va yigirma to'rt bosqichdan iborat kurs bo'lib, hech qanday qora quti bo'lmagan holda veb-ilovani noldan, eng oddiy HTTP javobdan boshlab to'liq CRUD ilovasigacha quradi. Har bir bosqich — mustaqil va ishga tushiriladigan bitta Perl dasturi. Butun stek sof Perl va bog'liqliksiz: PSGI::Handy (freymvork), HTTP::Handy (server), HP::Handy (shablonlar) va DB::Handy (ma'lumotlar bazasi).
+
+[ Qanday ishga tushirish ]
+
+  Har safar bitta bosqichni tut/ katalogi ichidan ishga tushiring, masalan  perl 01_step01_text.pl  . Har bir dastur serverni ishga tushiradi va URL manzilini chop etadi; brauzerda http://127.0.0.1:8080/ ni oching va to'xtatish uchun Ctrl-C bosing. templates/ katalogi va data.csv joriy katalogdan kirish mumkin bo'lishi kerak, shuning uchun dasturlarni har doim tut/ ichidan ishga tushiring.
+
+[ Umumiy sarlavha ]
+
+  Har bir .pl fayl bir xil sarlavha bilan ochiladi: use 5.00503; use strict; 5.6 dan eski Perl'da no-op warnings stub beruvchi kichik BEGIN blok; so'ng use warnings; local $^W = 1;  . Dasturlar Perl 5.005_03 gacha amal qilishi uchun bareword filehandle va ikki argumentli open ishlatadi. Bu sarlavha har bir bosqichda bir xil va quyida takrorlanmaydi.
+
+----------------------------------------------------------------------
+ Ildiz fayllar
+----------------------------------------------------------------------
+
+  00_README.txt
+      Kurs umumiy ko'rinishi: har bir bob va bosqich o'zining o'quv maqsadi bilan. Biror dasturni ochishdan oldin butun yo'lni ko'rish uchun avval buni o'qing.
+
+  data.csv
+      4-bob uchun namuna ma'lumotlar (CSV bosqichlari): id,name,age ko'rinishidagi vergul bilan ajratilgan uchta qator. 12, 14 va 15-bosqichlar bu faylni qayta yozadi, shuning uchun uni qayta tiklamoqchi bo'lsangiz nusxasini saqlang. 1,Alice,20 / 2,Bob,22 / 3,Charlie,25
+
+----------------------------------------------------------------------
+ Bob 1 — HTTP javob asoslari (statikdan dinamikga)
+----------------------------------------------------------------------
+
+  HTTP javobining shaklini tushunish uchun brauzer va server o'rtasidagi, shablon dvigatelisiz, eng oddiy almashinuv.
+
+  01_step01_text.pl
+      GET / uchun $c->text() orqali oddiy matn '.' qaytaradi. Eng kichik ilova: brauzer xom belgilarni oladi (text/plain).
+
+  01_step02_html.pl
+      $c->html() orqali '<a>.' ni text/html sifatida qaytaradi. 1-bosqich bilan bir xil baytlar, lekin Content-Type brauzerga ularni markup sifatida ko'rishni aytadi. Matn va HTML o'rtasidagi farqni ko'rsatadi.
+
+  01_step03_dyn_text.pl
+      Joriy vaqtni oddiy matn sifatida qaytaradi, har bir so'rovda scalar localtime() bilan yangidan o'qiladi. Dinamik chiqishning birinchi ta'mi: javob har safar o'zgaradi.
+
+  01_step04_dyn_html.pl
+      Dinamik vaqtni <h1>/<p> markupga o'raydi va HTML sifatida qaytaradi. O'zgaruvchilardan satr yig'ish orqali ekran qurish.
+
+----------------------------------------------------------------------
+ Bob 2 — Foydalanuvchi kiritishi va holat (formalar va shoxlanish)
+----------------------------------------------------------------------
+
+  Brauzerdan serverga ma'lumot yuborish va kelganiga qarab shoxlanish.
+
+  02_step05_form.pl
+      GET / , /echo ga POST qiluvchi HTML forma (matn maydoni va yuborish tugmasi) ko'rsatadi. Yuborish uchun hali ishlov beruvchi yo'q; bu bosqich faqat forma markupi haqida.
+
+  02_step06_echo.pl
+      POST /echo ishlov beruvchisini qo'shadi. U 'message' maydonini $c->param('message') bilan o'qiydi va uni HTML javobi ichida qaytaradi: so'rovdan javobgacha asosiy aylanma.
+
+  02_step07_auth.pl
+      Minimal kirish. POST /login 'username' va 'password' ni o'qiydi va shoxlanish uchun if ishlatadi: admin/secret muvaffaqiyat sahifasiga, qolgan hammasi muvaffaqiyatsizlik sahifasiga boradi. Autentifikatsiya va shartli oqimning urug'i.
+
+----------------------------------------------------------------------
+ Bob 3 — View'ni ajratish (HP::Handy bilan tanishtirish)
+----------------------------------------------------------------------
+
+  Dastur ichida HTML yozishni to'xtating; uni shablon fayllariga ko'chiring. HP::Handy render_file()/render_string() ni taqdim etadi, shuning uchun u shablon nomini render_file() ga moslaydigan kichik CODE renderer orqali PSGI::Handy ga ulanadi. Bu renderer bloki har bir shablonli bosqichda bir xil.
+
+  03_step08_template.pl
+      O'zgaruvchilarsiz statik templates/step08.html ni render qiladi. HTML endi mantiqdan ajralgan o'z faylida joylashgan.
+
+  03_step09_template_var.pl
+      templates/step09.html ga { current_time => ... } uzatadi, u buni {{ current_time }} joy egasi bilan chop etadi. Ma'lumot dasturdan shablonga oqadi.
+
+  03_step10_template_form.pl
+      6-bosqich echosini ikkita shablon bilan qayta yozadi: kirish uchun step10_form.html va natija uchun step10_result.html. Ishlov beruvchi mantiqi juda kichik bo'ladi.
+
+----------------------------------------------------------------------
+ Bob 4 — Fayl I/O va CSV doimiyligi (CRUD asoslari)
+----------------------------------------------------------------------
+
+  Ma'lumotlar bazasisiz, oddiy CSV faylga qarshi Create/Read/Update/Delete ni amalga oshiring. Qo'lda ma'lumot bilan ishlash narxini his qilish 5-bobda ma'lumotlar bazasiga o'tishni rag'batlantiradi.
+
+  04_step11_csv_readall.pl
+      Read All. data.csv ni ochadi, har bir qatorni vergullar bo'yicha { id, name, age } hashlarga ajratadi va ro'yxatni HTML jadval sifatida render qiladi (step11_list.html).
+
+  04_step12_csv_create.pl
+      Create. POST /add data.csv ga qo'shish rejimida (>>) bitta 'id,name,age' qatorini qo'shadi, so'ng yakunlash sahifasini ko'rsatadi.
+
+  04_step13_csv_readone.pl
+      Read One. /user/:id marshruti id ni ushlaydi; dastur mos qator uchun data.csv ni skanerlaydi va uning tafsilotini ko'rsatadi (step13_detail.html) yoki topilmasa 404 qaytaradi.
+
+  04_step14_csv_update.pl
+      Update. Bitta qatorni o'zgartirish uchun u har bir qatorni o'qiydi, mosini almashtiradi va butun faylni qayta yozadi: ma'lumotlar bazasi olib tashlaydigan 'hammasini o'qi, almashtir, hammasini yoz' yumushi.
+
+  04_step15_csv_delete.pl
+      Delete. Xuddi shu butun fayl qayta yozish, lekin mos qator almashtirilish o'rniga o'tkazib yuboriladi.
+
+----------------------------------------------------------------------
+ Bob 5 — Model bilan tanishtirish (DB::Handy ga o'tish)
+----------------------------------------------------------------------
+
+  CSV ni DB::Handy bilan almashtiring. Tutqich DB::Handy->connect('data','app',{...}) bilan yaratiladi va db => $dbh orqali kiritiladi, so'ng ishlov beruvchilarda $c->db sifatida erishiladi. _bootstrap() tartibi 'users' jadvalini bir marta yaratadi va to'ldiradi, shuning uchun har bir misol mustaqil ishlaydi.
+
+  05_step16_db_readall.pl
+      Read All. selectall_arrayref(..., { Slice => {} }) ro'yxat shabloni uchun (step16_list.html) har bir users qatorini hash sifatida oladi. Endi qo'lda fayl tahlili yo'q.
+
+  05_step17_db_create.pl
+      Create. POST /add joy egasi INSERT bilan bitta qator kiritadi, so'ng / (ro'yxatga) yo'naltiradi: standart post-then-redirect namunasi.
+
+  05_step18_db_readone.pl
+      Read One. /user/:id selectrow_hashref() bilan birlamchi kalit bo'yicha bitta qatorni oladi yoki 404 qaytaradi. Har bir qatorni skanerlash o'rniga to'g'ridan-to'g'ri kalit qidiruvi.
+
+  05_step19_db_update.pl
+      Update. GET /user/:id/edit tahrirlash formasini ko'rsatadi; POST UPDATE ... WHERE id=? ni ishga tushiradi va tafsilot sahifasiga yo'naltiradi. Xotirada butun fayl qayta yozilmaydi.
+
+  05_step20_db_delete.pl
+      Delete. DELETE ... WHERE id=? ishga tushiriladi, so'ng / ga yo'naltirish. Holatni o'zgartiruvchi marshrut faqat POST, GET dan tasodifiy o'chirishni oldini olish uchun.
+
+----------------------------------------------------------------------
+ Bob 6 — Relatsion ma'lumotlar va haqiqiy ilova
+----------------------------------------------------------------------
+
+  Ikkinchi 'app2' ma'lumotlar bazasidagi ikkita bog'liq jadval (users va depts). JOIN qora quti bo'lmasligi uchun Perl'da qo'lda bajariladi, so'ng hamma narsa bitta to'liq ilovaga yig'iladi.
+
+  06_step21_db_join_list.pl
+      JOIN List. Ikkala jadvalni o'qiydi, dept_id => name qidiruvini quradi, har bir foydalanuvchiga dept_name biriktiradi (qo'lda yozilgan JOIN) va ularni ro'yxatga oladi (step21_join_list.html).
+
+  06_step22_db_join_detail.pl
+      JOIN Read One. Bitta foydalanuvchini oladi, so'ng o'sha foydalanuvchining yagona bo'limini qidiradi va tafsilot sahifasi uchun uning nomini biriktiradi (step22_join_detail.html).
+
+  06_step23_db_form_select.pl
+      Select forma. Bo'lim asosini yuklaydi va uni <select> ochiladigan ro'yxat sifatida render qiladi (step23_form_select.html), shunda foydalanuvchi id terish o'rniga bo'limni tanlaydi.
+
+  06_step24_fullstack_app.pl
+      Bitta fayldagi to'liq ilova: users+depts ma'lumotlari ustida list, detail, add, edit va delete; biriktirilgan bo'lim nomlari, select ochiladigan ro'yxat, hamma joyda post-then-redirect va _next_id() yordamchisi (DB::Handy'da avtomatik o'sish yo'q). app_list.html va app_form.html dan foydalanadi.
+
+----------------------------------------------------------------------
+ Shablonlar (templates/)
+----------------------------------------------------------------------
+
+  HP::Handy shablonlari Jinja2 ga o'xshash sintaksisdan foydalanadi: {{ var }} qiymatni chop etadi ({{ user.name }} kabi nuqtali yo'llar hashlar ichiga kiradi), {% for x in list %} ... {% endfor %} sikl qiladi va {% if ... %} shoxlanadi. Renderer auto_escape => 1 bilan yaratiladi, shuning uchun chop etilgan qiymatlar HTML-escape qilinadi.
+
+  templates/step08.html
+      8-bosqich tomonidan ishlatiladigan to'liq statik sahifa; joy egalari yo'q.
+
+  templates/step09.html
+      Server vaqtini {{ current_time }} orqali chop etadi (9-bosqich).
+
+  templates/step10_form.html
+      10-bosqich echosi uchun kirish formasi; 'message' ni /echo ga POST qiladi.
+
+  templates/step10_result.html
+      10-bosqich uchun aks ettirilgan {{ message }} ni ko'rsatadi.
+
+  templates/step11_list.html
+      CSV jadvalini chizish uchun {{ users }} ustida sikl qiladi (11-bosqich).
+
+  templates/step12_form.html
+      12-bosqich uchun qo'shish formasi (id, name, age).
+
+  templates/step12_result.html
+      12-qadamning "Added" tasdiq sahifasi: {{ name }} va orqaga havolani ko'rsatadi.
+
+  templates/step13_list.html
+      13-qadam indeksi: har bir foydalanuvchi o'zining /user/:id tafsilot sahifasiga bog'lanadi.
+
+  templates/step13_detail.html
+      13-bosqich uchun bitta foydalanuvchining id/name/age ni ko'rsatadi.
+
+  templates/step14_list.html
+      14-qadam sahifasi: joriy qatorlar va /update ga POST qiluvchi yangilash formasi.
+
+  templates/step15_list.html
+      15-qadam sahifasi: joriy qatorlar va /delete ga POST qiluvchi o'chirish formasi.
+
+  templates/step16_list.html
+      16-qadam uchun oddiy DB foydalanuvchilar ro'yxati (hali havola yo'q).
+
+  templates/step17_form.html
+      17-bosqich uchun foydalanuvchi qo'shish formasi.
+
+  templates/step17_list.html
+      /add ga "Add New User" havolasi bilan 17-qadam ro'yxati.
+
+  templates/step18_list.html
+      18-qadam ro'yxati: har bir ism o'zining /user/:id tafsilotiga bog'lanadi.
+
+  templates/step18_detail.html
+      18-qadam uchun oddiy foydalanuvchi tafsiloti, orqaga havola bilan.
+
+  templates/step19_list.html
+      19-qadam ro'yxati: har bir ism o'zining tafsilot sahifasiga bog'lanadi.
+
+  templates/step19_detail.html
+      19-qadam foydalanuvchi tafsiloti, Edit havolasi va orqaga havola bilan.
+
+  templates/step19_edit.html
+      19-bosqich uchun tahrirlash formasi (name, age); /user/:id/edit ga POST qiladi.
+
+  templates/step20_list.html
+      Har bir qatorda tasdiqli POST Delete tugmasi bilan 20-qadam ro'yxati.
+
+  templates/step21_join_list.html
+      Birlashtirilgan {{ user.dept_name }} ustuni bilan xodimlar ro'yxati (21-bosqich).
+
+  templates/step22_join_list.html
+      22-qadam xodimlar indeksi: har bir ism o'zining tafsilot sahifasiga bog'lanadi.
+
+  templates/step22_join_detail.html
+      Bo'lim nomini ko'rsatuvchi xodim tafsiloti (22-bosqich).
+
+  templates/step23_list.html
+      /add ga "Add New Employee" havolasi bilan 23-qadam xodimlar ro'yxati.
+
+  templates/step23_form_select.html
+      {{ depts }} dan qurilgan bo'lim <select> bilan qo'shish formasi (23-bosqich).
+
+  templates/app_list.html
+      To'liq ilovaning xodimlar ro'yxati (24-bosqich): ID, bog'langan nom, bo'lim, shuningdek har bir qator uchun Edit va tasdiq bilan himoyalangan POST Delete, va Add havolasi.
+
+  templates/app_form.html
+      To'liq ilovaning umumiy qo'shish/tahrirlash formasi (24-bosqich): {{ action }} maqsadi yaratish va yangilash o'rtasida almashadi va bo'lim <select> {% if %} orqali {{ user.dept_id }} ni oldindan tanlaydi.
+
+----------------------------------------------------------------------
+ Manbalar
+----------------------------------------------------------------------
+
+  MetaCPAN'da PSGI::Handy va Handy stekining qolgan qismi, va PSGI spetsifikatsiyasi:
+
+    https://metacpan.org/dist/PSGI-Handy
+    https://metacpan.org/dist/HTTP-Handy
+    https://metacpan.org/dist/HP-Handy
+    https://metacpan.org/dist/DB-Handy
+    https://github.com/plack/psgi-specs/blob/master/PSGI.pod
+
+======================================================================

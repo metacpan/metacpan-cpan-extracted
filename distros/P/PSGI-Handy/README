@@ -1,0 +1,170 @@
+NAME
+
+  PSGI::Handy - a tiny dependency-free PSGI web framework for Perl 5.005_03 and later
+
+SYNOPSIS
+
+  use PSGI::Handy;
+
+  my $app = PSGI::Handy->new(
+      renderer => \&renderer,   # optional: CODE($t,\%v) or obj->render()
+      db       => $dbh,         # optional: any database handle
+  );
+
+  $app->get('/', sub {
+      my $c = shift;
+      return $c->html('<h1>Hello</h1>');
+  });
+
+  $app->get('/users/:id', sub {
+      my $c = shift;
+      return $c->render('user.html', { id => $c->param('id') });
+  });
+
+  $app->post('/users', sub {
+      my $c = shift;
+      # ... use $c->param('name') and $c->db ...
+      return $c->redirect('/');
+  });
+
+  # PSGI::Handy builds the PSGI app; serve it with any PSGI server:
+  my $psgi = $app->to_app;      # sub { my $env = shift; ... }
+
+  # for example, with HTTP::Handy as the delivery layer:
+  use HTTP::Handy;
+  HTTP::Handy->run(app => $psgi, host => '127.0.0.1', port => 8080);
+
+DESCRIPTION
+
+  PSGI::Handy is the application layer of the "Handy" stack. It wires a
+  router, request/response objects and a per-request context into a single
+  PSGI-subset $app through to_app. A template renderer and a database
+  handle are injected at construction time, so the framework loads
+  nothing outside the Perl core and stays easy to test. You serve the
+  resulting $app with any PSGI server, such as HTTP::Handy.
+
+  The Handy stack:
+
+    PSGI::Handy  the framework that builds one PSGI $app (this module)
+    HTTP::Handy   a PSGI-subset server             (delivery layer)
+    HP::Handy     a Jinja2-compatible template     (view layer)
+    DB::Handy     a pure-Perl flat-file RDB         (model layer)
+
+  Every route handler receives a PSGI::Handy::Context ($c) and may return
+  a Response object, a raw PSGI array reference, or a plain string (treated
+  as an HTML 200 response).
+
+  PSGI::Handy is meant for isolated networks and legacy in-house servers
+  where installing CPAN modules is impractical. It is NOT intended for
+  production or internet-facing deployment.
+
+INCLUDED DOCUMENTATION
+
+  The eg/ directory contains sample programs:
+
+    eg/01_hello.pl              Minimal app (get, path parameter, text)
+    eg/02_param.pl              Query / body / cookie / JSON (no DB or template)
+    eg/03_form_db.pl            HTML form backed by DB::Handy
+    eg/04_template_db.pl        The full three-layer stack in one file
+    eg/05_yasohachi.pl          Yaso-Hachi rice-grain manager (no-DB build)
+    eg/06_yasohachi_db.pl       Yaso-Hachi on PSGI::Handy + DB::Handy
+    eg/07_yasohachi_db_hp.pl    Yaso-Hachi, full four-layer build (+ HP::Handy)
+    eg/08_jacode4e_converter.pl a Japanese character-code converter, served by the full four-layer Handy stack
+
+  The doc/ directory contains framework cheat sheets in 21 languages
+  (English, Japanese, Chinese, Korean, French, and 16 more). Each sheet
+  covers building and running an app, routing patterns, the context
+  object, request reading, response building, cookies, template
+  rendering, database access, hooks, configuration and stash, a full
+  three-layer example, and official resource links.
+
+INSTALLATION
+
+  Manual (no build tools required):
+
+    cp -r lib/PSGI /path/to/your/project/lib/
+
+  Via CPAN:
+
+    cpan PSGI::Handy
+    cpanm PSGI::Handy
+
+  Via perl Makefile.PL:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+  Via pmake.bat (Windows, no make required):
+
+    pmake.bat test
+    pmake.bat install
+
+  PSGI::Handy has no required dependencies beyond the Perl core. To
+  serve an app you supply a PSGI server such as HTTP::Handy; HP::Handy
+  and DB::Handy are optional and only needed when you use template
+  rendering or DB::Handy as the injected database handle.
+
+COMPATIBILITY
+
+  This module works with Perl 5.005_03 and later.
+
+  WHY PERL 5.005_03 SPECIFICATION?
+
+  This module adheres to the Perl 5.005_03 specification--not because we
+  use the old interpreter, but because this specification represents the
+  simple, original Perl programming model that makes programming enjoyable.
+
+  THE STRENGTH OF MODERN TIMES
+
+  Some people think the strength of modern times is the ability to use
+  modern technology. That thinking is insufficient. The strength of modern
+  times is the ability to use ALL technology up to the present day.
+
+  By adhering to the Perl 5.005_03 specification, we gain access to the
+  entire history of Perl--from 5.005_03 to 5.42 and beyond--rather than
+  limiting ourselves to only the latest versions.
+
+  Key reasons:
+
+  - Simplicity: Original Perl approach keeps programming "raku" (easy/fun)
+  - JPerl: Final version of JPerl (Japanese Perl)
+  - Universal: Runs on ALL Perl versions (5.005_03 through 5.42+)
+  - Philosophy: Programming should be enjoyable (Camel Book readers know!)
+
+  Perl 5.6+ introduced character encoding complexity that made programming
+  harder. By following the 5.005_03 specification, we maintain the joy of
+  Perl programming.
+
+TARGET USE CASES
+
+  - Isolated networks where CPAN cannot be installed
+  - Legacy in-house servers running old Perl
+  - Local development and rapid prototyping
+  - Small data-entry and reporting web tools
+  - Educational use
+
+LIMITATIONS
+
+  - The app always returns the buffered PSGI form [ $status, \@headers,
+    \@body ]; the PSGI delayed-response (streaming responder callback)
+    form is not produced ("PSGI-subset")
+  - Concurrency and the HTTP version depend on the PSGI server you choose
+  - Some servers deliver only GET and POST; PUT/PATCH/DELETE routes are
+    reachable through to_app under a PSGI server that sends them
+  - No multipart uploads and no WebSocket in this version
+  - HEAD requests are served by the matching GET route with the body removed
+  - No built-in session management (cookies are provided; sessions are not)
+  - No HTTPS (use a reverse proxy for TLS)
+
+AUTHOR
+
+  INABA Hitoshi <ina.cpan@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+  This software is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself.
+
+  See http://www.perl.com/perl/misc/Artistic.html

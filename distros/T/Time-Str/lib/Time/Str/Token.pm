@@ -6,7 +6,7 @@ use v5.10.1;
 use Exporter qw[import];
 
 BEGIN {
-  our $VERSION     = '0.89';
+  our $VERSION     = '0.90';
   our @EXPORT_OK   = qw[ parse_day
                          parse_day_name
                          parse_month

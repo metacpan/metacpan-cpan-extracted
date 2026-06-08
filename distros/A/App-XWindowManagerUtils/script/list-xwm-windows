@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-03-26'; # DATE
+our $DATE = '2026-03-27'; # DATE
 our $DIST = 'App-XWindowManagerUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/XWindowManagerUtils/list_xwm_windows",
@@ -40,7 +40,7 @@ list-xwm-windows - List all Windows
 
 =head1 VERSION
 
-This document describes version 0.001 of list-xwm-windows (from Perl distribution App-XWindowManagerUtils), released on 2026-03-26.
+This document describes version 0.002 of list-xwm-windows (from Perl distribution App-XWindowManagerUtils), released on 2026-03-27.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ B<list-xwm-windows> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">
 
 B<list-xwm-windows> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<list-xwm-windows> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- [I<L<query|/"--query=s@">>] ...
+B<list-xwm-windows> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--with-kde-activity|/"--with-kde-activity">>|B<L<--without-kde-activity|/"--with-kde-activity">>] -- [I<L<query|/"--query=s@">>] ...
 
 =head1 OPTIONS
 
@@ -77,6 +77,11 @@ Can also be specified as the 1st command-line argument and onwards.
 Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
+
+=item B<--with-kde-activity>
+
+(No description)
+
 
 =back
 

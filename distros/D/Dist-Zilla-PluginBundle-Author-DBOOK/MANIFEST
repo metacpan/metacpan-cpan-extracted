@@ -18,6 +18,7 @@ profiles/default/skel/.github/workflows/test.yml
 profiles/default/skel/.gitignore
 profiles/default/skel/Changes
 profiles/default/skel/prereqs.yml
+share/CONTRIBUTING.md.tmpl
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/00_info.t

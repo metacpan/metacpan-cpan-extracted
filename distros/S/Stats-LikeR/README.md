@@ -1120,7 +1120,7 @@ I've tried to make this as simple as possible, trying to follow from R:
 
 | Option | Description | Example |
 | -------- | ------- | ------- |
-|`comment` | Comment character, by default `#` | `comment = %` or whatever|
+|`comment` | Comment character, by default `#` | `comment => %` or whatever; does not apply with header|
 |`output.type`| data type for output: array of hash, hash of array, or hash of hash | `'output.type' => 'aoh'`|
 |`filter`| Only take in rows with a certain filter | `filter => {	Sex => sub {$_ eq 'f'} }`|
 |`row.names` | include row names in retrieved data; off by default | |
@@ -1524,6 +1524,21 @@ Args can also be accepted:
     write_table( 'data' => \%flat, 'file' => $f );
 
 # changes
+
+## 0.13
+
+`read_table`: speed improvements; commented headers are now allowed
+
+`write_table`: fix for 
+
+    Attempt to free temp prematurely: SV 0x56417a2ae610 at t/write_table.t line 182.
+    	main::wrote_ok(",age\x{a}Alice,30\x{a}Bob,25\x{a}", "row.names => 'name' uses that column as labels", HASH(0x56417a272250), "row.names", "name") called at t/write_table.t line 203
+    Attempt to free unreferenced scalar: SV 0x56417a2ae610 at t/write_table.t line 183.
+    	main::wrote_ok(",age\x{a}Alice,30\x{a}Bob,25\x{a}", "row.names => 'name' uses that column as labels", HASH(0x56417a272250), "row.names", "name") called at t/write_table.t line 203
+
+`write_table` gives better warnings for incorrect types of data given
+
+Numerous changes to dist.ini to improve CPAN testing, especially for Win32
 
 ## 0.12
 

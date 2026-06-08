@@ -1,0 +1,233 @@
+======================================================================
+ PSGI::Handy Tutorial (tut/)
+ 튜토리얼 설명서                                                    [KO] 한국어
+======================================================================
+
+ tut/ 는 PSGI::Handy 의 공식 교육용 튜토리얼입니다. 총 6장, 24단계 커리큘럼으로 어떤 블랙박스도 없이 웹 애플리케이션을 처음부터 만들어 나가며, 가장 단순한 HTTP 응답에서 시작해 완전한 CRUD 애플리케이션으로 끝납니다. 각 단계는 단독으로 실행 가능한 하나의 Perl 프로그램입니다. 스택 전체가 순수 Perl이며 의존성이 없습니다: PSGI::Handy(프레임워크), HTTP::Handy(서버), HP::Handy(템플릿), DB::Handy(데이터베이스).
+
+[ 실행 방법 ]
+
+  tut/ 디렉터리 안에서 한 단계씩 실행합니다. 예: perl 01_step01_text.pl . 각 프로그램은 서버를 띄우고 URL을 출력합니다. 브라우저에서 http://127.0.0.1:8080/ 을 열고 Ctrl-C 로 중지합니다. templates/ 디렉터리와 data.csv 는 현재 디렉터리에서 접근할 수 있어야 하므로 항상 tut/ 안에서 프로그램을 시작하십시오.
+
+[ 공통 헤더 ]
+
+  모든 .pl 파일은 동일한 헤더로 시작합니다: use 5.00503; use strict; 5.6 미만의 Perl에서 아무 동작도 하지 않는 warnings 스텁을 제공하는 작은 BEGIN 블록; 이어서 use warnings; local $^W = 1; . 프로그램은 베어워드 파일핸들과 2인자 open 을 사용해 Perl 5.005_03 까지 거슬러 유효하게 유지됩니다. 이 헤더는 모든 단계에서 동일하므로 아래에서는 반복하지 않습니다.
+
+----------------------------------------------------------------------
+ 루트 파일
+----------------------------------------------------------------------
+
+  00_README.txt
+      커리큘럼 개요: 모든 장과 단계 및 각 학습 목표 목록입니다. 어떤 프로그램이든 열기 전에 먼저 읽고 전체 흐름을 파악하십시오.
+
+  data.csv
+      4장(CSV 단계)의 예제 데이터: id,name,age 형식의 콤마 구분 3행. Step 12, 14, 15 가 이 파일을 다시 씁니다. 되돌리려면 백업을 보관하십시오. 1,Alice,20 / 2,Bob,22 / 3,Charlie,25
+
+----------------------------------------------------------------------
+ 제 1 — HTTP 응답 기초(정적에서 동적으로)
+----------------------------------------------------------------------
+
+  템플릿 엔진 없이 브라우저와 서버 사이의 가장 단순한 주고받음으로 HTTP 응답의 형태를 이해합니다.
+
+  01_step01_text.pl
+      GET / 에 대해 $c->text() 로 평문 '.' 을 반환합니다. 가장 작은 앱: 브라우저는 원시 문자(text/plain)를 받습니다.
+
+  01_step02_html.pl
+      $c->html() 로 '<a>.' 을 text/html 로 반환합니다. 바이트는 Step 1 과 같지만 Content-Type 이 브라우저에 마크업으로 처리하라고 알립니다. 텍스트와 HTML의 차이를 보여줍니다.
+
+  01_step03_dyn_text.pl
+      요청마다 scalar localtime() 으로 현재 시각을 새로 읽어 평문으로 반환합니다. 동적 출력의 첫 경험으로, 응답이 매번 달라집니다.
+
+  01_step04_dyn_html.pl
+      동적 시각을 <h1>/<p> 마크업으로 감싸 HTML로 반환합니다. 변수에서 문자열을 조립해 화면을 구성합니다.
+
+----------------------------------------------------------------------
+ 제 2 — 사용자 입력과 상태(폼과 분기)
+----------------------------------------------------------------------
+
+  브라우저에서 서버로 데이터를 보내고, 도착한 내용에 따라 분기합니다.
+
+  02_step05_form.pl
+      GET / 가 /echo 로 POST 하는 HTML 폼(텍스트 상자와 전송 버튼)을 보여줍니다. 아직 전송 처리는 없으며, 이 단계는 폼 마크업만 다룹니다.
+
+  02_step06_echo.pl
+      POST /echo 핸들러를 추가합니다. $c->param('message') 로 'message' 필드를 읽어 HTML 응답 안에 그대로 되돌려줍니다. 요청에서 응답으로의 기본 왕복입니다.
+
+  02_step07_auth.pl
+      최소 로그인. POST /login 이 'username' 과 'password' 를 읽고 if 로 분기합니다. admin/secret 이면 성공 페이지, 그 외에는 실패 페이지로. 인증과 조건 흐름의 씨앗입니다.
+
+----------------------------------------------------------------------
+ 제 3 — View 분리(HP::Handy 도입)
+----------------------------------------------------------------------
+
+  프로그램 안에 HTML을 쓰는 것을 그만두고 템플릿 파일로 옮깁니다. HP::Handy 는 render_file()/render_string() 을 제공하므로, 템플릿 이름을 render_file() 에 대응시키는 작은 CODE renderer 를 통해 PSGI::Handy 에 주입합니다. 이 renderer 블록은 템플릿을 쓰는 모든 단계에서 동일합니다.
+
+  03_step08_template.pl
+      변수 없이 정적 templates/step08.html 을 렌더링합니다. 이제 HTML은 로직과 분리되어 자체 파일에 있습니다.
+
+  03_step09_template_var.pl
+      templates/step09.html 에 { current_time => ... } 을 전달하고, {{ current_time }} 자리표시자로 출력합니다. 데이터가 프로그램에서 템플릿으로 흐릅니다.
+
+  03_step10_template_form.pl
+      Step 6 의 에코를 두 템플릿으로 다시 씁니다: 입력용 step10_form.html, 결과용 step10_result.html. 핸들러 로직이 아주 작아집니다.
+
+----------------------------------------------------------------------
+ 제 4 — 파일 I/O와 CSV 영속화(CRUD 기초)
+----------------------------------------------------------------------
+
+  데이터베이스 없이 순수 CSV 파일에 대해 생성/읽기/수정/삭제를 구현합니다. 수작업 데이터 관리의 비용을 체감하는 것이 5장의 데이터베이스 전환 동기가 됩니다.
+
+  04_step11_csv_readall.pl
+      Read All. data.csv 를 열어 각 줄을 콤마로 { id, name, age } 해시로 나누고, HTML 테이블(step11_list.html)로 목록을 렌더링합니다.
+
+  04_step12_csv_create.pl
+      Create. POST /add 가 추가 모드(>>)로 data.csv 에 'id,name,age' 한 줄을 덧붙이고 완료 페이지를 보여줍니다.
+
+  04_step13_csv_readone.pl
+      Read One. 라우트 /user/:id 가 id 를 캡처하고, 프로그램이 data.csv 에서 일치 행을 찾아 상세(step13_detail.html)를 보여줍니다. 없으면 404 를 반환합니다.
+
+  04_step14_csv_update.pl
+      Update. 한 행을 바꾸려면 모든 줄을 읽고 일치 행을 교체한 뒤 파일 전체를 다시 씁니다. '전체 읽고, 바꾸고, 전체 쓰기' 라는 잡일을 나중에 데이터베이스가 없애줍니다.
+
+  04_step15_csv_delete.pl
+      Delete. 동일하게 파일 전체를 다시 쓰지만, 일치 행을 교체하는 대신 건너뜁니다.
+
+----------------------------------------------------------------------
+ 제 5 — Model 도입(DB::Handy 로 전환)
+----------------------------------------------------------------------
+
+  CSV를 DB::Handy 로 대체합니다. 핸들은 DB::Handy->connect('data','app',{...}) 로 만들고 db => $dbh 로 주입하며, 핸들러에서 $c->db 로 접근합니다. _bootstrap() 루틴이 'users' 테이블을 한 번만 생성·초기화하므로 각 예제가 단독으로 동작합니다.
+
+  05_step16_db_readall.pl
+      Read All. selectall_arrayref(..., { Slice => {} }) 가 users 전 행을 해시로 가져와 목록 템플릿(step16_list.html)에 넘깁니다. 더 이상 수작업 파일 파싱이 없습니다.
+
+  05_step17_db_create.pl
+      Create. POST /add 가 자리표시자 INSERT 로 한 행을 넣고 /(목록)로 리다이렉트합니다. 표준적인 post-then-redirect 패턴입니다.
+
+  05_step18_db_readone.pl
+      Read One. /user/:id 가 selectrow_hashref() 로 기본 키로 한 행만 가져오거나 404 를 반환합니다. 전 행 탐색 대신 직접 키 조회입니다.
+
+  05_step19_db_update.pl
+      Update. GET /user/:id/edit 가 편집 폼을 보여주고, POST 가 UPDATE ... WHERE id=? 를 실행한 뒤 상세 페이지로 리다이렉트합니다. 메모리상 파일 전체 재작성이 필요 없습니다.
+
+  05_step20_db_delete.pl
+      Delete. DELETE ... WHERE id=? 를 실행한 뒤 /로 리다이렉트합니다. 상태를 바꾸는 라우트는 GET 으로 인한 실수 삭제를 막기 위해 POST 만 받습니다.
+
+----------------------------------------------------------------------
+ 제 6 — 관계형 데이터와 실용 애플리케이션
+----------------------------------------------------------------------
+
+  두 번째 데이터베이스 'app2' 에 관련된 두 테이블(users 와 depts). JOIN 을 블랙박스로 두지 않고 Perl 로 손수 수행한 뒤, 모든 것을 하나의 완전한 애플리케이션으로 조립합니다.
+
+  06_step21_db_join_list.pl
+      JOIN List. 두 테이블을 읽고 dept_id => name 조회표를 만들어 각 user 에 dept_name 을 붙이고(손으로 쓴 JOIN), 목록으로 보여줍니다(step21_join_list.html).
+
+  06_step22_db_join_detail.pl
+      JOIN Read One. user 하나를 가져온 뒤 그 user 가 속한 단일 부서를 조회해 이름을 붙여 상세 페이지(step22_join_detail.html)에 표시합니다.
+
+  06_step23_db_form_select.pl
+      Select 폼. 부서 마스터를 불러와 <select> 드롭다운(step23_form_select.html)으로 렌더링하여, 사용자가 id 를 직접 입력하지 않고 부서를 고르게 합니다.
+
+  06_step24_fullstack_app.pl
+      한 파일 안의 완전한 애플리케이션: users+depts 에 대한 목록, 상세, 추가, 편집, 삭제. 부서명 부착, select 드롭다운, 곳곳의 post-then-redirect, 그리고 _next_id() 헬퍼(DB::Handy 에는 auto-increment 가 없음)를 갖춥니다. app_list.html 과 app_form.html 사용.
+
+----------------------------------------------------------------------
+ 템플릿 (templates/)
+----------------------------------------------------------------------
+
+  HP::Handy 템플릿은 Jinja2 유사 문법을 씁니다: {{ var }} 는 값을 출력하고({{ user.name }} 같은 점 경로는 해시 안으로 들어감), {% for x in list %} ... {% endfor %} 는 반복, {% if ... %} 는 분기입니다. renderer 는 auto_escape => 1 로 생성되어 출력 값이 HTML 이스케이프됩니다.
+
+  templates/step08.html
+      Step 8 이 쓰는 완전 정적 페이지; 자리표시자 없음.
+
+  templates/step09.html
+      {{ current_time }} 으로 서버 시각을 표시합니다(Step 9).
+
+  templates/step10_form.html
+      Step 10 에코의 입력 폼; 'message' 를 /echo 로 POST 합니다.
+
+  templates/step10_result.html
+      Step 10 의 에코된 {{ message }} 를 보여줍니다.
+
+  templates/step11_list.html
+      {{ users }} 를 반복해 CSV 테이블을 그립니다(Step 11).
+
+  templates/step12_form.html
+      Step 12 의 추가 폼(id, name, age).
+
+  templates/step12_result.html
+      12단계의 "Added" 확인 페이지: {{ name }}와 돌아가기 링크를 표시합니다.
+
+  templates/step13_list.html
+      13단계 색인: 각 사용자가 자신의 /user/:id 상세 페이지로 연결됩니다.
+
+  templates/step13_detail.html
+      Step 13 의 한 사용자 id/name/age 를 보여줍니다.
+
+  templates/step14_list.html
+      14단계 페이지: 현재 행과 /update로 POST하는 수정 폼.
+
+  templates/step15_list.html
+      15단계 페이지: 현재 행과 /delete로 POST하는 삭제 폼.
+
+  templates/step16_list.html
+      16단계의 단순 DB 사용자 목록(아직 링크 없음).
+
+  templates/step17_form.html
+      Step 17 의 사용자 추가 폼.
+
+  templates/step17_list.html
+      /add로 가는 "Add New User" 링크가 있는 17단계 목록.
+
+  templates/step18_list.html
+      18단계 목록: 각 이름이 자신의 /user/:id 상세로 연결됩니다.
+
+  templates/step18_detail.html
+      18단계의 단순 사용자 상세, 돌아가기 링크 포함.
+
+  templates/step19_list.html
+      19단계 목록: 각 이름이 자신의 상세 페이지로 연결됩니다.
+
+  templates/step19_detail.html
+      19단계 사용자 상세, 수정 링크와 돌아가기 링크 포함.
+
+  templates/step19_edit.html
+      Step 19 의 편집 폼(name, age); /user/:id/edit 로 POST 합니다.
+
+  templates/step20_list.html
+      각 행에 확인을 거치는 POST 삭제 버튼이 있는 20단계 목록.
+
+  templates/step21_join_list.html
+      연결된 {{ user.dept_name }} 열이 있는 직원 목록(Step 21).
+
+  templates/step22_join_list.html
+      22단계 직원 색인: 각 이름이 자신의 상세 페이지로 연결됩니다.
+
+  templates/step22_join_detail.html
+      부서명을 보여주는 직원 상세(Step 22).
+
+  templates/step23_list.html
+      /add로 가는 "Add New Employee" 링크가 있는 23단계 직원 목록.
+
+  templates/step23_form_select.html
+      {{ depts }} 로 만든 부서 <select> 가 있는 추가 폼(Step 23).
+
+  templates/app_list.html
+      완전 앱의 직원 목록(Step 24): ID, 링크된 이름, 부서에 더해 행마다 편집과 확인이 걸린 POST 삭제, 그리고 추가 링크.
+
+  templates/app_form.html
+      완전 앱의 공용 추가/편집 폼(Step 24): {{ action }} 대상이 생성과 갱신 사이에서 바뀌고, 부서 <select> 는 {% if %} 로 {{ user.dept_id }} 를 미리 선택합니다.
+
+----------------------------------------------------------------------
+ 참고 자료
+----------------------------------------------------------------------
+
+  MetaCPAN 의 PSGI::Handy 및 Handy 스택의 나머지 모듈, 그리고 PSGI 명세:
+
+    https://metacpan.org/dist/PSGI-Handy
+    https://metacpan.org/dist/HTTP-Handy
+    https://metacpan.org/dist/HP-Handy
+    https://metacpan.org/dist/DB-Handy
+    https://github.com/plack/psgi-specs/blob/master/PSGI.pod
+
+======================================================================

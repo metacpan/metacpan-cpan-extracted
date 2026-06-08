@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head><title>Step 23 - Employee List</title></head>
+<body>
+    <h1>Employee List</h1>
+    <table border="1">
+        <tr><th>ID</th><th>Name</th><th>Department</th></tr>
+        {% for user in users %}
+        <tr><td>{{ user.id }}</td><td>{{ user.name }}</td><td>{{ user.dept_name }}</td></tr>
+        {% endfor %}
+    </table>
+    <p><a href="/add">Add New Employee</a></p>
+</body>
+</html>

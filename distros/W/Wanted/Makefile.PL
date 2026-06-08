@@ -50,14 +50,14 @@ my %WriteMakefileArgs = (
         dynamic_config => 1,
         keywords => [ 'context', 'XS', 'Want', 'perl', 'scalar', 'array', 'list' ],
         resources => {
-            homepage    => 'https://gitlab.com/jackdeguest/Wanted',
+            homepage    => 'https://gitlab.com/deguest/Wanted',
             repository  => {
-                url         => 'git@gitlab.com:jackdeguest/Wanted.git',
-                web         => 'https://gitlab.com/jackdeguest/Wanted',
+                url         => 'git@gitlab.com:deguest/Wanted.git',
+                web         => 'https://gitlab.com/deguest/Wanted',
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://gitlab.com/jackdeguest/Wanted/issues',
+                web         => 'https://gitlab.com/deguest/Wanted/issues',
             },
         },
         prereqs => {

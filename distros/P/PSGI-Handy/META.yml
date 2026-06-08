@@ -1,0 +1,36 @@
+--- #YAML:1.0
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+name: PSGI-Handy
+version: 0.01
+abstract: a tiny dependency-free PSGI web framework for Perl 5.005_03+
+author:
+  - ina <ina.cpan@gmail.com>
+license: perl
+generated_by: pmake.bat version 0.36
+requires:
+  Carp: 0
+  ExtUtils::MakeMaker: 5.4302
+  perl: 5.00503
+minimum_perl_version: 5.00503
+provides:
+  PSGI::Handy:
+    file: lib/PSGI/Handy.pm
+    version: 0.01
+  PSGI::Handy::Context:
+    file: lib/PSGI/Handy.pm
+    version: 0.01
+  PSGI::Handy::Request:
+    file: lib/PSGI/Handy.pm
+    version: 0.01
+  PSGI::Handy::Response:
+    file: lib/PSGI/Handy.pm
+    version: 0.01
+  PSGI::Handy::Router:
+    file: lib/PSGI/Handy.pm
+    version: 0.01
+resources:
+  license: http://dev.perl.org/licenses/
+  bugtracker: https://github.com/ina-cpan/PSGI-Handy/issues
+  repository: https://github.com/ina-cpan/PSGI-Handy

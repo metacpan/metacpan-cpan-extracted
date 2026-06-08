@@ -1,11 +1,10 @@
 package Game::TileMap::Legend;
-$Game::TileMap::Legend::VERSION = '1.000';
+$Game::TileMap::Legend::VERSION = '1.001';
 use v5.10;
 use strict;
 use warnings;
 
-use Moo;
-use Mooish::AttributeBuilder -standard;
+use Mooish::Base -standard;
 use Carp qw(croak);
 
 use constant TERRAIN_CLASS => 'terrain';
@@ -13,39 +12,33 @@ use constant WALL_OBJECT => 'wall';
 use constant VOID_OBJECT => 'void';
 
 has field 'classes' => (
+	isa => HashRef [ ArrayRef [Str]],
 	default => sub { {} },
-
-	# isa => HashRef [ ArrayRef [Str]],
 );
 
 has param 'characters_per_tile' => (
+	isa => PositiveInt,
 	default => sub { 1 },
-
-	# isa => PositiveInt,
 );
 
 has field '_object_map' => (
+	isa => HashRef [Str],
 	lazy => 1,
-
-	# isa => HashRef [Str],
 );
 
 has field 'objects' => (
+	isa => HashRef [Any],
 	default => sub { {} },
-
-	# isa => HashRef [Any],
 );
 
 has field 'walls' => (
+	isa => HashRef [Bool],
 	default => sub { {} },
-
-	# isa => HashRef [Bool],
 );
 
 has field 'voids' => (
+	isa => HashRef [Bool],
 	default => sub { {} },
-
-	# isa => HashRef [Bool],
 );
 
 sub _build_object_map

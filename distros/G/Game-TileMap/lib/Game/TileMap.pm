@@ -1,11 +1,10 @@
 package Game::TileMap;
-$Game::TileMap::VERSION = '1.000';
+$Game::TileMap::VERSION = '1.001';
 use v5.10;
 use strict;
 use warnings;
 
-use Moo;
-use Mooish::AttributeBuilder -standard;
+use Mooish::Base -standard;
 use Storable qw(dclone);
 use Carp qw(croak);
 
@@ -13,32 +12,27 @@ use Game::TileMap::Legend;
 use Game::TileMap::Tile;
 
 has param 'legend' => (
-
-	# isa => InstanceOf ['Game::TileMap::Legend'],
+	isa => InstanceOf ['Game::TileMap::Legend'],
 );
 
 has field 'coordinates' => (
+	isa => ArrayRef [ArrayRef [Any]],
 	writer => -hidden,
-
-	# isa => ArrayRef [ArrayRef [Any]],
 );
 
 has field 'size_x' => (
+	isa => PositiveInt,
 	writer => -hidden,
-
-	# isa => PositiveInt,
 );
 
 has field 'size_y' => (
+	isa => PositiveInt,
 	writer => -hidden,
-
-	# isa => PositiveInt,
 );
 
 has field '_guide' => (
+	isa => HashRef [ArrayRef [InstanceOf ['Game::TileMap::Tile']]],
 	writer => 1,
-
-	# isa => HashRef [ArrayRef [Tuple [Any, PositiveInt, PositiveInt]]],
 );
 
 with qw(
@@ -163,6 +157,17 @@ sub to_string_and_mark
 		reverse
 		map { join '', @{$_} } @lines;
 }
+
+sub get_tile
+{
+	my ($self, $x, $y) = @_;
+
+	return undef if $x < 0 || $y < 0;
+	my $coord = $self->coordinates->[$x];
+
+	return $coord && $coord->[$y];
+}
+
 
 1;
 
@@ -365,6 +370,13 @@ Creates a string from a map and marks given positions with a marker. The
 default marker is C<'!'> (times the number of characters per tile).
 
 Useful during debugging.
+
+=head3 get_tile
+
+	my $tile = $map->get_tile($pos_x, $pos_y);
+
+Returns a tile at given coordinates, or undef. Unlike raw access to
+L</coordinates>, this will never autovivify.
 
 =head3 check_within_map
 

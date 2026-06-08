@@ -1,0 +1,233 @@
+======================================================================
+ PSGI::Handy Tutorial (tut/)
+ Manwal ng Tutorial                                     [TL] Filipino
+======================================================================
+
+ Ang tut/ ang opisyal na panturong tutorial ng PSGI::Handy: isang kurso na may anim na kabanata at dalawampu't apat na hakbang na bumubuo ng web application mula sa wala, walang anumang black box, mula sa pinakahubad na HTTP response hanggang sa kumpletong CRUD application. Ang bawat hakbang ay isang malaya at napapatakbong programang Perl. Buong-Perl at walang dependency ang stack: PSGI::Handy (framework), HTTP::Handy (server), HP::Handy (mga template) at DB::Handy (database).
+
+[ Paano patakbuhin ]
+
+  Patakbuhin ang isang hakbang sa bawat pagkakataon mula sa loob ng tut/ directory, halimbawa  perl 01_step01_text.pl  . Magsisimula ng server ang bawat programa at ipi-print ang URL nito; buksan ang http://127.0.0.1:8080/ sa browser at pindutin ang Ctrl-C para ihinto. Dapat maabot ang templates/ directory at ang data.csv mula sa kasalukuyang directory, kaya palaging magsimula sa loob ng tut/.
+
+[ Karaniwang header ]
+
+  Bawat .pl file ay nagbubukas sa parehong header: use 5.00503; use strict; isang maliit na BEGIN block na nagbibigay ng no-op warnings stub sa Perl na mas luma sa 5.6; pagkatapos ay use warnings; local $^W = 1;  . Gumagamit ang mga programa ng bareword filehandle at two-argument open upang manatiling balido hanggang Perl 5.005_03. Magkapareho ang header na ito sa bawat hakbang at hindi na inuulit sa ibaba.
+
+----------------------------------------------------------------------
+ Mga root file
+----------------------------------------------------------------------
+
+  00_README.txt
+      Ang pangkalahatang-ideya ng kurso: bawat kabanata at hakbang kasama ang layunin nito sa pagkatuto. Basahin muna ito upang makita ang buong daloy bago buksan ang anumang programa.
+
+  data.csv
+      Ang sample na datos para sa Kabanata 4 (ang mga hakbang sa CSV): tatlong hanay na pinaghihiwalay ng kuwit na id,name,age. Muling isinusulat ng mga hakbang 12, 14 at 15 ang file na ito, kaya mag-ingat ng backup kung nais itong i-reset. 1,Alice,20 / 2,Bob,22 / 3,Charlie,25
+
+----------------------------------------------------------------------
+ Kabanata 1 — Mga pangunahing kaalaman sa HTTP response (static patungong dynamic)
+----------------------------------------------------------------------
+
+  Ang pinakasimpleng palitan sa pagitan ng browser at server, walang template engine, upang maunawaan ang hugis ng isang HTTP response.
+
+  01_step01_text.pl
+      Ibinabalik ang plain text na '.' para sa GET / sa pamamagitan ng $c->text(). Ang pinakamaliit na app: tumatanggap ang browser ng hilaw na karakter (text/plain).
+
+  01_step02_html.pl
+      Ibinabalik ang '<a>.' bilang text/html sa pamamagitan ng $c->html(). Pareho ang byte sa Hakbang 1, ngunit sinasabi ng Content-Type sa browser na ituring itong markup. Ipinapakita ang pagkakaiba ng text at HTML.
+
+  01_step03_dyn_text.pl
+      Ibinabalik ang kasalukuyang oras bilang plain text, sariwang binabasa sa bawat request gamit ang scalar localtime(). Unang lasa ng dynamic na output: nagbabago ang tugon sa bawat pagkakataon.
+
+  01_step04_dyn_html.pl
+      Binabalot ang dynamic na oras sa <h1>/<p> markup at ibinabalik bilang HTML. Pagbuo ng screen sa pamamagitan ng pagtitipon ng string mula sa mga variable.
+
+----------------------------------------------------------------------
+ Kabanata 2 — Input ng user at estado (mga form at branching)
+----------------------------------------------------------------------
+
+  Pagpapadala ng datos mula sa browser patungo sa server, at pag-branch ayon sa dumating.
+
+  02_step05_form.pl
+      Ipinapakita ng GET / ang isang HTML form (text box at submit button) na nagPO-POST sa /echo. Wala pang handler para sa pagsumite; tungkol lamang sa markup ng form ang hakbang na ito.
+
+  02_step06_echo.pl
+      Idinaragdag ang POST /echo handler. Binabasa nito ang field na 'message' gamit ang $c->param('message') at ini-echo ito pabalik sa loob ng HTML response: ang pangunahing round trip mula request patungong response.
+
+  02_step07_auth.pl
+      Isang minimal na login. Binabasa ng POST /login ang 'username' at 'password' at gumagamit ng if upang mag-branch: ang admin/secret ay umaabot sa success page, ang iba ay sa failure page. Ang binhi ng authentication at conditional flow.
+
+----------------------------------------------------------------------
+ Kabanata 3 — Paghihiwalay ng View (pagpapakilala sa HP::Handy)
+----------------------------------------------------------------------
+
+  Itigil ang pagsulat ng HTML sa loob ng programa; ilipat ito sa mga template file. Inilalantad ng HP::Handy ang render_file()/render_string(), kaya nakakabit ito sa PSGI::Handy sa pamamagitan ng maliit na CODE renderer na nagmamapa ng pangalan ng template sa render_file(). Magkapareho ang block na iyon sa bawat hakbang na may template.
+
+  03_step08_template.pl
+      Ini-render ang static na templates/step08.html nang walang variable. Nasa sariling file na ngayon ang HTML, hiwalay sa lohika.
+
+  03_step09_template_var.pl
+      Ipinapasa ang { current_time => ... } sa templates/step09.html, na ipi-print ito gamit ang placeholder na {{ current_time }}. Dumadaloy ang datos mula programa patungong template.
+
+  03_step10_template_form.pl
+      Muling isinusulat ang echo ng Hakbang 6 gamit ang dalawang template: step10_form.html para sa input at step10_result.html para sa resulta. Nagiging napakaliit ng lohika ng handler.
+
+----------------------------------------------------------------------
+ Kabanata 4 — File I/O at CSV persistence (mga pangunahing kaalaman sa CRUD)
+----------------------------------------------------------------------
+
+  Ipatupad ang Create/Read/Update/Delete laban sa isang payak na CSV file, walang database. Ang pakiramdam ng gastos ng manual na paghawak ng datos ang nag-uudyok sa paglipat sa database sa Kabanata 5.
+
+  04_step11_csv_readall.pl
+      Read All. Binubuksan ang data.csv, hinahati ang bawat linya sa kuwit patungong { id, name, age } na hash, at ini-render ang listahan bilang HTML table (step11_list.html).
+
+  04_step12_csv_create.pl
+      Create. Idinaragdag ng POST /add ang isang linyang 'id,name,age' sa data.csv sa append mode (>>), pagkatapos ay ipinapakita ang completion page.
+
+  04_step13_csv_readone.pl
+      Read One. Kinukuha ng route na /user/:id ang isang id; ina-scan ng programa ang data.csv para sa tumutugmang hanay at ipinapakita ang detalye nito (step13_detail.html), o ibinabalik ang 404 kung hindi nahanap.
+
+  04_step14_csv_update.pl
+      Update. Upang baguhin ang isang hanay, binabasa nito ang bawat linya, pinapalitan ang tumutugma at muling isinusulat ang buong file: ang gawaing 'basahin lahat, palitan, isulat lahat' na aalisin ng database.
+
+  04_step15_csv_delete.pl
+      Delete. Parehong muling pagsusulat ng buong file, ngunit nilalaktawan ang tumutugmang hanay sa halip na palitan.
+
+----------------------------------------------------------------------
+ Kabanata 5 — Pagpapakilala sa Model (paglipat sa DB::Handy)
+----------------------------------------------------------------------
+
+  Palitan ang CSV ng DB::Handy. Nililikha ang handle gamit ang DB::Handy->connect('data','app',{...}) at inii-inject sa pamamagitan ng db => $dbh, pagkatapos ay inaabot sa mga handler bilang $c->db. Isang _bootstrap() na routine ang lumilikha at naghahasik sa 'users' table nang isang beses, kaya tumatakbo nang mag-isa ang bawat halimbawa.
+
+  05_step16_db_readall.pl
+      Read All. Kinukuha ng selectall_arrayref(..., { Slice => {} }) ang bawat hanay ng users bilang hash para sa list template (step16_list.html). Wala nang manual na pag-parse ng file.
+
+  05_step17_db_create.pl
+      Create. Nag-iinsert ang POST /add ng isang hanay gamit ang placeholder na INSERT, pagkatapos ay nagre-redirect sa / (ang listahan): ang karaniwang post-then-redirect pattern.
+
+  05_step18_db_readone.pl
+      Read One. Kinukuha ng /user/:id ang isang hanay ayon sa primary key gamit ang selectrow_hashref(), o ibinabalik ang 404. Direktang paghahanap sa key sa halip na i-scan ang bawat hanay.
+
+  05_step19_db_update.pl
+      Update. Ipinapakita ng GET /user/:id/edit ang edit form; pinapatakbo ng POST ang UPDATE ... WHERE id=? at nagre-redirect sa detail page. Walang muling pagsusulat ng buong file sa memory.
+
+  05_step20_db_delete.pl
+      Delete. Pinapatakbo ang DELETE ... WHERE id=?, pagkatapos ay redirect sa /. POST lamang ang state-changing route, upang maiwasan ang aksidenteng pagbura mula sa GET.
+
+----------------------------------------------------------------------
+ Kabanata 6 — Relational na datos at isang totoong aplikasyon
+----------------------------------------------------------------------
+
+  Dalawang magkaugnay na table (users at depts) sa pangalawang database na 'app2'. Ginagawa ang JOIN nang mano-mano sa Perl upang hindi ito maging black box, pagkatapos ay pinagsasama-sama ang lahat sa isang buong aplikasyon.
+
+  06_step21_db_join_list.pl
+      JOIN List. Binabasa ang dalawang table, gumagawa ng dept_id => name lookup, ikinakabit ang dept_name sa bawat user (isang JOIN na isinulat nang kamay), at inililista ang mga ito (step21_join_list.html).
+
+  06_step22_db_join_detail.pl
+      JOIN Read One. Kinukuha ang isang user, pagkatapos ay hinahanap ang nag-iisang departamento ng user na iyon at ikinakabit ang pangalan nito para sa detail page (step22_join_detail.html).
+
+  06_step23_db_form_select.pl
+      Select form. Niloload ang department master at ini-render bilang <select> dropdown (step23_form_select.html), kaya pumipili ng departamento ang user sa halip na mag-type ng id.
+
+  06_step24_fullstack_app.pl
+      Ang buong aplikasyon sa isang file: list, detail, add, edit at delete sa datos ng users+depts, may nakakabit na mga pangalan ng departamento, isang select dropdown, post-then-redirect sa lahat ng dako, at isang _next_id() helper (walang auto-increment ang DB::Handy). Gumagamit ng app_list.html at app_form.html.
+
+----------------------------------------------------------------------
+ Mga template (templates/)
+----------------------------------------------------------------------
+
+  Gumagamit ang mga template ng HP::Handy ng syntax na tulad ng Jinja2: {{ var }} ay nagpi-print ng halaga (ang mga dotted path tulad ng {{ user.name }} ay umaabot sa loob ng mga hash), {% for x in list %} ... {% endfor %} ay nag-loop, at {% if ... %} ay nag-branch. Nilikha ang renderer gamit ang auto_escape => 1, kaya na-HTML-escape ang mga naipi-print na halaga.
+
+  templates/step08.html
+      Isang ganap na static na pahina na ginagamit ng Hakbang 8; walang placeholder.
+
+  templates/step09.html
+      Ipinapakita ang oras ng server sa pamamagitan ng {{ current_time }} (Hakbang 9).
+
+  templates/step10_form.html
+      Ang input form para sa echo ng Hakbang 10; nagPO-POST ng 'message' sa /echo.
+
+  templates/step10_result.html
+      Ipinapakita ang na-echo na {{ message }} para sa Hakbang 10.
+
+  templates/step11_list.html
+      Nag-loop sa {{ users }} upang iguhit ang CSV table (Hakbang 11).
+
+  templates/step12_form.html
+      Ang add form (id, name, age) para sa Hakbang 12.
+
+  templates/step12_result.html
+      Ang "Added" na kumpirmasyon ng Hakbang 12: ipinapakita ang {{ name }} at isang link pabalik.
+
+  templates/step13_list.html
+      Ang indeks ng Hakbang 13: bawat user ay naka-link sa sariling detail page na /user/:id.
+
+  templates/step13_detail.html
+      Ipinapakita ang id/name/age ng isang user para sa Hakbang 13.
+
+  templates/step14_list.html
+      Ang pahina ng Hakbang 14: ang kasalukuyang mga row at isang update form na nag-POST sa /update.
+
+  templates/step15_list.html
+      Ang pahina ng Hakbang 15: ang kasalukuyang mga row at isang delete form na nag-POST sa /delete.
+
+  templates/step16_list.html
+      Ang simpleng DB user list para sa Hakbang 16 (wala pang link).
+
+  templates/step17_form.html
+      Ang add-user form para sa Hakbang 17.
+
+  templates/step17_list.html
+      Ang listahan ng Hakbang 17 na may "Add New User" na link sa /add.
+
+  templates/step18_list.html
+      Ang listahan ng Hakbang 18: bawat pangalan ay naka-link sa sariling /user/:id detail.
+
+  templates/step18_detail.html
+      Simpleng user detail para sa Hakbang 18, na may link pabalik.
+
+  templates/step19_list.html
+      Ang listahan ng Hakbang 19: bawat pangalan ay naka-link sa sariling detail page.
+
+  templates/step19_detail.html
+      User detail ng Hakbang 19, na may Edit na link at link pabalik.
+
+  templates/step19_edit.html
+      Ang edit form (name, age) para sa Hakbang 19; nagPO-POST sa /user/:id/edit.
+
+  templates/step20_list.html
+      Ang listahan ng Hakbang 20 na may POST Delete button (na may kumpirmasyon) sa bawat row.
+
+  templates/step21_join_list.html
+      Ang listahan ng empleyado na may na-join na column na {{ user.dept_name }} (Hakbang 21).
+
+  templates/step22_join_list.html
+      Ang indeks ng empleyado ng Hakbang 22: bawat pangalan ay naka-link sa sariling detail page.
+
+  templates/step22_join_detail.html
+      Detalye ng empleyado na nagpapakita ng pangalan ng departamento (Hakbang 22).
+
+  templates/step23_list.html
+      Ang listahan ng empleyado ng Hakbang 23 na may "Add New Employee" na link sa /add.
+
+  templates/step23_form_select.html
+      Ang add form na may <select> ng departamento na binuo mula sa {{ depts }} (Hakbang 23).
+
+  templates/app_list.html
+      Ang listahan ng empleyado ng buong app (Hakbang 24): ID, naka-link na pangalan, departamento, kasama ang Edit at isang confirm-guarded na POST Delete sa bawat hanay, at isang Add link.
+
+  templates/app_form.html
+      Ang ibinabahaging add/edit form ng buong app (Hakbang 24): ang target na {{ action }} ay lumilipat sa pagitan ng create at update, at ang <select> ng departamento ay pre-selected ang {{ user.dept_id }} sa pamamagitan ng {% if %}.
+
+----------------------------------------------------------------------
+ Mga sanggunian
+----------------------------------------------------------------------
+
+  Ang PSGI::Handy at ang iba pang bahagi ng Handy stack sa MetaCPAN, at ang PSGI specification:
+
+    https://metacpan.org/dist/PSGI-Handy
+    https://metacpan.org/dist/HTTP-Handy
+    https://metacpan.org/dist/HP-Handy
+    https://metacpan.org/dist/DB-Handy
+    https://github.com/plack/psgi-specs/blob/master/PSGI.pod
+
+======================================================================

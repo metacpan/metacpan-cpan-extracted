@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head><title>Step 20 - DB List</title></head>
+<body>
+    <h1>User List (DB)</h1>
+    <table border="1">
+        <tr><th>ID</th><th>Name</th><th>Age</th><th>Action</th></tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.name }}</td>
+            <td>{{ user.age }}</td>
+            <td>
+                <form action="/user/{{ user.id }}/delete" method="POST" style="display:inline" onsubmit="return confirm('Really delete?');">
+                    <input type="submit" value="Delete">
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

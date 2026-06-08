@@ -1,35 +1,32 @@
 ---
-abstract: 'Program in YAML — Code is Data'
+abstract: 'Program in YAML - Code is Data'
 author:
-  - 'Ingy döt Net <ingy@ingy.net>'
+  - 'Ingy dot Net <ingy@ingy.net>'
 build_requires:
+  ExtUtils::MakeMaker: '0'
   Test2::V0: '0.000159'
 configure_requires:
   ExtUtils::MakeMaker: '0'
-dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010'
-license: perl
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: YAMLScript
 no_index:
   directory:
-    - example
-    - inc
     - t
-    - xt
+    - inc
 requires:
-  Alien::YAMLScript: v0.2.8
+  Alien::YAMLScript: v0.2.12
   Cpanel::JSON::XS: '4.37'
   FFI::CheckLib: '0.31'
   FFI::Platypus: '2.08'
-  perl: v5.16.0
+  perl: '5.016'
 resources:
-  bugtracker: https://github.com/ingydotnet/yamlscript/issues
-  homepage: https://github.com/ingydotnet/yamlscript
-  repository: https://github.com/ingydotnet/yamlscript.git
-version: 0.2.8
-x_generated_by_perl: v5.38.2
-x_serialization_backend: 'YAML::Tiny version 1.74'
-x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+  bugtracker: https://github.com/yaml/yamlscript/issues
+  homepage: https://yamlscript.org
+  repository: https://github.com/yaml/yamlscript.git
+version: v0.2.13
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

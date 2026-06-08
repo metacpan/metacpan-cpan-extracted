@@ -1,0 +1,61 @@
+{
+   "abstract" : "Mojolicious integration for BarefootJS",
+   "author" : [
+      "kobaken <kentafly88@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-BarefootJS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::CPANfile" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "BarefootJS" : "0",
+            "Mojolicious" : "9.0",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0",
+            "Test::Mojo" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/piconic-ai/barefootjs/issues"
+      },
+      "homepage" : "https://barefootjs.dev",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/piconic-ai/barefootjs.git",
+         "web" : "https://github.com/piconic-ai/barefootjs"
+      }
+   },
+   "version" : "v0.10.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

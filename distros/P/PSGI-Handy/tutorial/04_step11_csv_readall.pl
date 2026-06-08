@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+use 5.00503;
+use strict;
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } }
+use warnings; local $^W = 1;
+
+use PSGI::Handy;
+use HTTP::Handy;
+use HP::Handy;
+
+# Inject HP::Handy through a CODE renderer (see Step 8 for the reason).
+my $hp = HP::Handy->new( template_dir => 'templates', auto_escape => 1 );
+my $renderer = sub {
+    my ($name, $vars) = @_;
+    return $hp->render_file($name, $vars);
+};
+
+my $app = PSGI::Handy->new( renderer => $renderer );
+
+$app->get('/', sub {
+    my $c = shift;
+    my @rows = ();
+
+    # 2-argument open and a bareword filehandle (5.005_03 compliant).
+    if (open(IN, "data.csv")) {
+        while (my $line = <IN>) {
+            $line =~ s/\r?\n\z//;
+            my @cols = split(/,/, $line);
+            # Use hash references so the template loop can address fields by name.
+            push @rows, { id => $cols[0], name => $cols[1], age => $cols[2] };
+        }
+        close(IN);
+    }
+
+    return $c->render('step11_list.html', { users => \@rows });
+});
+
+my $psgi_app = $app->to_app;
+print "Starting server on http://127.0.0.1:8080/ (Step 11: Read All)\n";
+HTTP::Handy->run(app => $psgi_app, host => '127.0.0.1', port => 8080);

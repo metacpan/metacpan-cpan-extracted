@@ -2,7 +2,7 @@ NAME
     HTTP::Tiny - A small, simple, correct HTTP/1.1 client
 
 VERSION
-    version 0.094
+    version 0.096
 
 SYNOPSIS
         use HTTP::Tiny;
@@ -41,9 +41,22 @@ METHODS
     This constructor returns a new HTTP::Tiny object. Valid attributes
     include:
 
-    *   "agent" â A user-agent string (defaults to 'HTTP-Tiny/$VERSION'). If
-        "agent" â ends in a space character, the default user-agent string
-        is appended.
+    *   "agent" â A user-agent string (defaults to '"HTTP-Tiny/$VERSION"').
+        If "agent" â ends in a space character, the default user-agent
+        string is appended.
+
+    *   "allow_credentialed_redirects" - If a "3XX" redirects to a different
+        scheme, host or port, by default HTTP::Tiny will strip away
+        caller-supplied "Authorization", "Cookie" and "Proxy-Authorization"
+        headers from the redirected request and from all subsequent requests
+        in the chain. Set this to a true value to revert to the legacy
+        behavior of forwarding those headers. Default is "false".
+
+    *   "allow_downgrade" â If a "3XX" redirect changes the scheme from
+        "https" to plain "http", HTTP::Tiny will by default refuse to follow
+        it, returning the "3XX" response. Set this to a true value to revert
+        to the legacy behavior of redirecting "https" to "http". Default is
+        "false".
 
     *   "cookie_jar" â An instance of HTTP::CookieJar â or equivalent class
         that supports the "add" and "cookie_header" methods
@@ -130,7 +143,7 @@ METHODS
     response.
 
     The "success" field of the response will be true if the status code is
-    2XX.
+    "2XX".
 
   post_form
         $response = $http->post_form($url, $form_data);
@@ -150,7 +163,7 @@ METHODS
     will be ignored.
 
     The "success" field of the response will be true if the status code is
-    2XX.
+    "2XX".
 
   mirror
         $response = $http->mirror($url, $file, \%options)
@@ -166,7 +179,7 @@ METHODS
     header yourself in the "$options->{headers}" hash.
 
     The "success" field of the response will be true if the status code is
-    2XX or if the status code is 304 (unmodified).
+    "2XX" or if the status code is 304 (unmodified).
 
     If the file was modified and the server response includes a properly
     formatted "Last-Modified" header, the file modification time will be
@@ -185,8 +198,7 @@ METHODS
     this applies to redirection.
 
     If the URL includes a "user:password" stanza, they will be used for
-    Basic-style authorization headers. (Authorization headers will not be
-    included in a redirected request.) For example:
+    Basic-style authorization headers. For example:
 
         $http->request('GET', 'http://Aladdin:open sesame@example.com/');
 
@@ -194,6 +206,10 @@ METHODS
     percent-escaped:
 
         $http->request('GET', 'http://john%40example.com:password@example.com/');
+
+    Caller-supplied "Authorization", "Cookie" and "Proxy-Authorization"
+    headers are stripped on cross-origin redirects. See "new"'s
+    "allow_credentialed_redirects" attribute to opt out.
 
     A hashref of options may be appended to modify the request.
 
@@ -249,8 +265,8 @@ METHODS
     The "request" method returns a hashref containing the response. The
     hashref will have the following keys:
 
-    *   "success" â Boolean indicating whether the operation returned a 2XX
-        status code
+    *   "success" â Boolean indicating whether the operation returned a
+        "2XX" status code
 
     *   "url" â URL that provided the response. This is the URL of the
         request unless there were redirections, in which case it is the last

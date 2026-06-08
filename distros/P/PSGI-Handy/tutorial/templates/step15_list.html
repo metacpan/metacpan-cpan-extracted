@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head><title>Step 15 - Delete</title></head>
+<body>
+    <h1>Current Rows</h1>
+    <table border="1">
+        <tr><th>ID</th><th>Name</th><th>Age</th></tr>
+        {% for user in users %}
+        <tr><td>{{ user.id }}</td><td>{{ user.name }}</td><td>{{ user.age }}</td></tr>
+        {% endfor %}
+    </table>
+    <h2>Delete a Row</h2>
+    <form action="/delete" method="POST">
+        ID: <input type="text" name="id"><br>
+        <input type="submit" value="Delete">
+    </form>
+</body>
+</html>

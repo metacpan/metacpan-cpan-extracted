@@ -25,7 +25,7 @@ use Storable qw(dclone);
 
 use DateTime::Format::Natural::Utils qw(trim);
 
-our $VERSION = '1.26';
+our $VERSION = '1.27';
 
 validation_options(
     on_fail => sub
@@ -73,7 +73,7 @@ sub _init
     $self->{Daytime} = $opts{daytime} || {};
 
     my $mod = join '::', (__PACKAGE__, 'Lang', uc $self->{Lang});
-    eval "require $mod" or die $@;
+    eval "require $mod; 1" or die $@;
 
     $self->{data} = $mod->__new();
     $self->{grammar_class} = $mod;

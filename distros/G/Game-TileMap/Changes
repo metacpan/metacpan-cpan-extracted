@@ -1,3 +1,9 @@
+1.001 Sun Jun 7, 2026
+	- add get_tile method which does not autovivify
+	- fix autovivification in check methods
+	- move to Mooish::Base
+	- parameters are now type-checked on object construction
+
 1.000 Dec 18 2022
 	- whitespace is now stripped completely from map string
 	- add get_class_of_object method to Game::TileMap objects

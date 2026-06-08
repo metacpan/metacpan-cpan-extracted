@@ -4,6 +4,8 @@ use Test::More;
 
 BEGIN {
     eval { require Role::Tiny; 1 } or plan skip_all => 'Role::Tiny required';
+    plan skip_all => 'Role::Tiny 1.003000 or newer required (is_role missing)'
+        unless Role::Tiny->can('is_role');
 }
 
 BEGIN {

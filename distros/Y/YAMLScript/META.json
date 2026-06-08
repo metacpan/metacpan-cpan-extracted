@@ -1,12 +1,12 @@
 {
-   "abstract" : "Program in YAML \u2014 Code is Data",
+   "abstract" : "Program in YAML - Code is Data",
    "author" : [
-      "Ingy d\u00f6t Net <ingy@ingy.net>"
+      "Ingy dot Net <ingy@ingy.net>"
    ],
-   "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.031, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -15,30 +15,28 @@
    "name" : "YAMLScript",
    "no_index" : {
       "directory" : [
-         "example",
-         "inc",
          "t",
-         "xt"
+         "inc"
       ]
    },
    "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0"
          }
       },
-      "develop" : {
-         "requires" : {
-            "Test::Pod" : "1.41"
-         }
-      },
       "runtime" : {
          "requires" : {
-            "Alien::YAMLScript" : "v0.2.8",
+            "Alien::YAMLScript" : "v0.2.12",
             "Cpanel::JSON::XS" : "4.37",
             "FFI::CheckLib" : "0.31",
             "FFI::Platypus" : "2.08",
-            "perl" : "v5.16.0"
+            "perl" : "5.016"
          }
       },
       "test" : {
@@ -50,18 +48,15 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/ingydotnet/yamlscript/issues"
+         "web" : "https://github.com/yaml/yamlscript/issues"
       },
-      "homepage" : "https://github.com/ingydotnet/yamlscript",
+      "homepage" : "https://yamlscript.org",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/ingydotnet/yamlscript.git",
-         "web" : "https://github.com/ingydotnet/yamlscript"
+         "url" : "https://github.com/yaml/yamlscript.git",
+         "web" : "https://github.com/yaml/yamlscript"
       }
    },
-   "version" : "0.2.8",
-   "x_generated_by_perl" : "v5.38.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.37",
-   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+   "version" : "v0.2.13",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }
-

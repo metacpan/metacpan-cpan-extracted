@@ -1,0 +1,233 @@
+======================================================================
+ PSGI::Handy Tutorial (tut/)
+ チュートリアル説明書                                                  [JA] 日本語
+======================================================================
+
+ tut/ は PSGI::Handy の公式教材チュートリアルです。全6章・24ステップで、ブラックボックスを一切作らずにWebアプリケーションをゼロから組み上げます。素のHTTP応答から始まり、完全なCRUDアプリケーションで終わります。各ステップは単体で実行可能な1本のPerlプログラムです。スタック全体がpure Perlで依存なし: PSGI::Handy (フレームワーク)、HTTP::Handy (サーバ)、HP::Handy (テンプレート)、DB::Handy (データベース)。
+
+[ 実行方法 ]
+
+  tut/ ディレクトリの中から1ステップずつ実行します。例: perl 01_step01_text.pl 。各プログラムはサーバを起動してURLを表示します。ブラウザで http://127.0.0.1:8080/ を開き、Ctrl-C で停止します。templates/ ディレクトリと data.csv はカレントディレクトリから参照できる必要があるため、必ず tut/ の中から起動してください。
+
+[ 共通ヘッダ ]
+
+  すべての .pl ファイルは同じヘッダで始まります: use 5.00503; use strict; 5.6より古いPerlで何もしない warnings スタブを供給する小さな BEGIN ブロック;続けて use warnings; local $^W = 1; 。バーワードのファイルハンドルと2引数 open を用い、Perl 5.005_03 まで遡って有効に保っています。このヘッダは全ステップで同一なので以下では繰り返しません。
+
+----------------------------------------------------------------------
+ ルートのファイル
+----------------------------------------------------------------------
+
+  00_README.txt
+      カリキュラム概要。全章・全ステップとその学習目標の一覧です。プログラムを開く前に、まずこれを読んで全体の流れを把握してください。
+
+  data.csv
+      第4章 (CSVステップ) のサンプルデータ。id,name,age 形式のカンマ区切り3行です。Step 12・14・15 はこのファイルを書き換えるので、戻したい場合はバックアップを取ってください。1,Alice,20 / 2,Bob,22 / 3,Charlie,25
+
+----------------------------------------------------------------------
+ 第 1 — HTTP応答の基本 (静的から動的へ)
+----------------------------------------------------------------------
+
+  テンプレートエンジンを使わない、ブラウザとサーバの最も単純なやり取り。HTTP応答のかたちを理解します。
+
+  01_step01_text.pl
+      GET / に対して $c->text() で平文 '.' を返します。最小のアプリ。ブラウザは生の文字 (text/plain) を受け取ります。
+
+  01_step02_html.pl
+      $c->html() で '<a>.' を text/html として返します。バイト列は Step 1 と同じですが、Content-Type がブラウザにマークアップとして扱うよう伝えます。テキストとHTMLの違いを示します。
+
+  01_step03_dyn_text.pl
+      リクエスト毎に scalar localtime() で現在時刻を取得し、平文で返します。動的出力の最初の体験で、応答が毎回変わります。
+
+  01_step04_dyn_html.pl
+      動的な時刻を <h1>/<p> のマークアップで包み、HTMLとして返します。変数から文字列を組み立てて画面を作ります。
+
+----------------------------------------------------------------------
+ 第 2 — ユーザー入力と状態 (フォームと分岐)
+----------------------------------------------------------------------
+
+  ブラウザからサーバへのデータ送信と、届いた値に基づく分岐を学びます。
+
+  02_step05_form.pl
+      GET / で /echo に POST するHTMLフォーム (テキストボックスと送信ボタン) を表示します。送信側の処理はまだなく、このステップはフォームのマークアップだけが対象です。
+
+  02_step06_echo.pl
+      POST /echo ハンドラを追加します。$c->param('message') で 'message' フィールドを読み、HTML応答の中にそのまま返します。リクエストから応答への基本的な往復です。
+
+  02_step07_auth.pl
+      最小のログイン。POST /login で 'username'と 'password' を読み、if で分岐します。admin/secret なら成功ページ、それ以外は失敗ページへ。認証と条件分岐の芽です。
+
+----------------------------------------------------------------------
+ 第 3 — Viewの分離 (HP::Handy の導入)
+----------------------------------------------------------------------
+
+  プログラム内にHTMLを書くのをやめ、テンプレートファイルへ移します。HP::Handy は render_file()/render_string() を持つため、テンプレート名を render_file() に対応づける小さな CODE renderer を介して PSGI::Handy に注入します。この renderer ブロックはテンプレートを使う全ステップで同一です。
+
+  03_step08_template.pl
+      変数なしで静的な templates/step08.html を描画します。HTMLがロジックから分離され、独立したファイルに置かれます。
+
+  03_step09_template_var.pl
+      templates/step09.html に { current_time => ... } を渡し、{{ current_time }} プレースホルダで表示します。プログラムからテンプレートへデータが流れます。
+
+  03_step10_template_form.pl
+      Step 6 のおうむ返しを2つのテンプレートで書き直します: 入力用 step10_form.html と結果用 step10_result.html。ハンドラのロジックが非常に小さくなります。
+
+----------------------------------------------------------------------
+ 第 4 — ファイルI/OとCSVによる永続化 (CRUDの基礎)
+----------------------------------------------------------------------
+
+  データベースを使わず、素のCSVファイルに対して作成/読取/更新/削除を実装します。手作業のデータ管理の重さが、第5章でのデータベース移行の動機になります。
+
+  04_step11_csv_readall.pl
+      Read All。data.csv を開き、各行をカンマで分割して { id, name, age } のハッシュにし、HTMLテーブル (step11_list.html) として一覧表示します。
+
+  04_step12_csv_create.pl
+      Create。POST /add で 'id,name,age'の1行を追記モード (>>) で data.csv に追加し、完了ページを表示します。
+
+  04_step13_csv_readone.pl
+      Read One。ルート /user/:id が id を取得し、data.csv を走査して一致行を探し、詳細 (step13_detail.html) を表示します。見つからなければ 404 を返します。
+
+  04_step14_csv_update.pl
+      Update。1行を変更するため、全行を読み、一致行を差し替え、ファイル全体を書き直します。「全読み→差替→全書き」という雑務を、後でデータベースが解消します。
+
+  04_step15_csv_delete.pl
+      Delete。同じく全ファイル書き直しですが、一致行を差し替えるのではなくスキップします。
+
+----------------------------------------------------------------------
+ 第 5 — Modelの導入 (DB::Handy への移行)
+----------------------------------------------------------------------
+
+  CSVを DB::Handy に置き換えます。ハンドルは DB::Handy->connect('data','app',{...}) で作り、db => $dbh で注入し、ハンドラ内では $c->dbで参照します。_bootstrap() ルーチンが 'users'テーブルを一度だけ作成・初期投入するので、各例が単体で動きます。
+
+  05_step16_db_readall.pl
+      Read All。selectall_arrayref(...,{ Slice => {} }) で users の全行をハッシュとして取得し、一覧テンプレート (step16_list.html) に渡します。手作業のファイル解析は不要に。
+
+  05_step17_db_create.pl
+      Create。POST /add がプレースホルダ付き INSERT で1行挿入し、/ (一覧) へリダイレクトします。post-then-redirect の定石です。
+
+  05_step18_db_readone.pl
+      Read One。/user/:id が selectrow_hashref() で主キーから1行だけ取得します。全行走査ではなく直接のキー検索です。見つからなければ 404。
+
+  05_step19_db_update.pl
+      Update。GET /user/:id/edit が編集フォームを表示し、POST が UPDATE ... WHERE id=? を実行して詳細ページへリダイレクトします。メモリ上での全書き直しは不要です。
+
+  05_step20_db_delete.pl
+      Delete。DELETE ... WHERE id=? を実行し、/ へリダイレクトします。状態を変えるルートは誤削除を避けるため POST のみで受け付けます。
+
+----------------------------------------------------------------------
+ 第 6 — リレーショナルデータと実践アプリケーション
+----------------------------------------------------------------------
+
+  2つ目のデータベース 'app2' に、関連する2つのテーブル (users と depts)。JOIN をブラックボックスにせず Perl で手作業で行い、最後にすべてを1つの完全なアプリにまとめます。
+
+  06_step21_db_join_list.pl
+      JOIN List。両テーブルを読み、dept_id => name の対応表を作り、各 user に dept_name を付与し (手書きのJOIN)、一覧表示します (step21_join_list.html)。
+
+  06_step22_db_join_detail.pl
+      JOIN Read One。1人の user を取得し、その user が属する単一の部署を引いて名前を付与し、詳細ページ (step22_join_detail.html) に表示します。
+
+  06_step23_db_form_select.pl
+      Select フォーム。部署マスタを読み込み、<select> ドロップダウン (step23_form_select.html) として描画します。利用者は id を手入力せず部署を選びます。
+
+  06_step24_fullstack_app.pl
+      1ファイルにまとめた完全なアプリ: users+depts に対する一覧・詳細・追加・編集・削除。部署名の付与、selectドロップダウン、随所での post-then-redirect、そして _next_id() ヘルパ (DB::Handy に auto-increment はない) を備えます。app_list.html と app_form.html を使用。
+
+----------------------------------------------------------------------
+ テンプレート (templates/)
+----------------------------------------------------------------------
+
+  HP::Handy のテンプレートは Jinja2 風の構文です: {{ var }} は値を出力し ({{ user.name }} のようなドット表記でハッシュ内を参照)、{% for x in list %} ... {% endfor %} で繰り返し、{% if... %} で分岐します。renderer は auto_escape => 1 で生成されるので、出力値はHTMLエスケープされます。
+
+  templates/step08.html
+      Step 8 で使う完全に静的なページ。プレースホルダなし。
+
+  templates/step09.html
+      {{ current_time }} でサーバ時刻を表示します (Step 9)。
+
+  templates/step10_form.html
+      Step 10 のおうむ返し用入力フォーム。'message' を /echo に POST します。
+
+  templates/step10_result.html
+      Step 10 のおうむ返し結果 {{ message }} を表示します。
+
+  templates/step11_list.html
+      {{ users }} を繰り返してCSVテーブルを描画します (Step 11)。
+
+  templates/step12_form.html
+      Step 12 の追加フォーム (id, name, age)。
+
+  templates/step12_result.html
+      Step 12 の「Added」確認ページ。{{ name }} と戻りリンクを表示します。
+
+  templates/step13_list.html
+      Step 13 の索引。各ユーザーが /user/:id の詳細ページへリンクします。
+
+  templates/step13_detail.html
+      Step 13 の1件分の id/name/age を表示します。
+
+  templates/step14_list.html
+      Step 14 のページ。現在の行と、/update へ POST する更新フォーム。
+
+  templates/step15_list.html
+      Step 15 のページ。現在の行と、/delete へ POST する削除フォーム。
+
+  templates/step16_list.html
+      Step 16 の素の DB ユーザー一覧（まだリンクなし）。
+
+  templates/step17_form.html
+      Step 17 のユーザー追加フォーム。
+
+  templates/step17_list.html
+      Step 17 の一覧。/add への「Add New User」リンク付き。
+
+  templates/step18_list.html
+      Step 18 の一覧。各氏名が /user/:id の詳細へリンクします。
+
+  templates/step18_detail.html
+      Step 18 の素のユーザー詳細。戻るリンク付き。
+
+  templates/step19_list.html
+      Step 19 の一覧。各氏名が詳細ページへリンクします。
+
+  templates/step19_detail.html
+      Step 19 のユーザー詳細。編集リンクと戻るリンク付き。
+
+  templates/step19_edit.html
+      Step 19 の編集フォーム (name, age)。/user/:id/edit に POST します。
+
+  templates/step20_list.html
+      Step 20 の一覧。各行に確認付き POST 削除ボタン。
+
+  templates/step21_join_list.html
+      結合した {{ user.dept_name }} 列を持つ従業員一覧 (Step 21)。
+
+  templates/step22_join_list.html
+      Step 22 の従業員索引。各氏名が詳細ページへリンクします。
+
+  templates/step22_join_detail.html
+      部署名を表示する従業員詳細 (Step 22)。
+
+  templates/step23_list.html
+      Step 23 の従業員一覧。/add への「Add New Employee」リンク付き。
+
+  templates/step23_form_select.html
+      {{ depts }} から部署の <select> を組み立てた追加フォーム (Step 23)。
+
+  templates/app_list.html
+      完全アプリの従業員一覧 (Step 24): ID・リンク付き氏名・部署に加え、各行に編集と確認付きPOST削除、そして追加リンク。
+
+  templates/app_form.html
+      完全アプリの共有 追加/編集 フォーム (Step 24): {{ action }} の送信先が作成と更新で切り替わり、部署 <select> は {% if %} で {{ user.dept_id }} を初期選択します。
+
+----------------------------------------------------------------------
+ 参考資料
+----------------------------------------------------------------------
+
+  MetaCPAN 上の PSGI::Handy と Handy スタックの他モジュール、および PSGI 仕様書:
+
+    https://metacpan.org/dist/PSGI-Handy
+    https://metacpan.org/dist/HTTP-Handy
+    https://metacpan.org/dist/HP-Handy
+    https://metacpan.org/dist/DB-Handy
+    https://github.com/plack/psgi-specs/blob/master/PSGI.pod
+
+======================================================================

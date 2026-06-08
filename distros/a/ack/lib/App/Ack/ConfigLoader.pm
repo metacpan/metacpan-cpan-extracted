@@ -124,8 +124,9 @@ sub _uninvert_filter {
     for ( my $i = 0; $i < @{ $opt->{filters} }; $i++ ) {
         my $opt_filter = @{ $opt->{filters} }[$i];
 
-        # XXX Do a real list comparison? This just checks string equivalence.
-        if ( $opt_filter->is_inverted() && "$opt_filter->{filter}" eq "@filters" ) {
+        if ( $opt_filter->is_inverted()
+            && grep { $_ == $opt_filter->{filter} } @filters )
+        {
             splice @{ $opt->{filters} }, $i, 1;
             $i--;
         }
@@ -175,6 +176,9 @@ sub _process_filetypes {
             my @filters = @{ $App::Ack::mappings{$name} };
             if ( not $value ) {
                 @filters = map { $_->invert() } @filters;
+            }
+            else {
+                _uninvert_filter( $opt, @filters );
             }
 
             push @{ $opt->{'filters'} }, @filters;
@@ -369,8 +373,17 @@ sub get_arg_spec {
 sub _context_value {
     my $val = shift;
 
-    # Contexts default to 2.
-    return (!defined($val) || ($val < 0)) ? 2 : $val;
+      # Contexts default to 2.
+      return 2 if !defined($val) || $val < 0;
+
+      if ( $val > 10_000 ) {
+          App::Ack::die(
+              "Context value $val exceeds the maximum allowed "
+              . "value of 10000."
+          );
+      }
+
+      return $val;
 }
 
 
@@ -423,6 +436,7 @@ sub _process_other {
             $args_for_source = {
                 %{$args_for_source},
                 'pager:s' => $illegal,
+                'follow!' => $illegal,
             };
         }
 

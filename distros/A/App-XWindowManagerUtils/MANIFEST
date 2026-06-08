@@ -8,6 +8,7 @@ Makefile.PL
 README
 dist.ini
 lib/App/XWindowManagerUtils.pm
+script/get-xwm-window-kde-activity
 script/list-xwm-windows
 t/00-compile.t
 t/author-critic.t

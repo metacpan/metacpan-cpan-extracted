@@ -12,7 +12,7 @@ use Time::Str::Util     qw[upper_bound
                            find_tzdb_directory];
 
 BEGIN {
-  our $VERSION     = '0.89';
+  our $VERSION     = '0.90';
   our @EXPORT_OK   = qw[ posix_tai_offset
                          posix_to_tai
                          tai_to_posix

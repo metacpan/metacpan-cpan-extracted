@@ -1,3 +1,13 @@
+0.017     2026-06-07 12:38:24-07:00 America/Los_Angeles
+
+    - List Role::Tiny (1.003000+) and Class::Method::Modifiers as
+      RuntimeSuggests in dist.ini
+    - Skip role tests when Role::Tiny is missing or older than 1.003000
+      (no is_role), so install is not blocked
+    - Move 'around' modifier test to its own file (t/role_modifiers.t)
+      that skips when Class::Method::Modifiers is unavailable; Role::Tiny
+      loads it lazily only for method modifiers (fixes #5)
+
 0.016     2026-05-11 23:14:43-07:00 America/Los_Angeles
 
     - Add [PruneCruft] to dist.ini so build artifacts (blib/,

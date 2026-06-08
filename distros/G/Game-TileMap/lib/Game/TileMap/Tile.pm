@@ -1,40 +1,34 @@
 package Game::TileMap::Tile;
-$Game::TileMap::Tile::VERSION = '1.000';
+$Game::TileMap::Tile::VERSION = '1.001';
 use v5.10;
 use strict;
 use warnings;
 
-use Moo;
-use Mooish::AttributeBuilder -standard;
+use Mooish::Base -standard;
 use Carp qw(croak);
 
 has param ['x', 'y'] => (
-
-	# isa => PositiveInt,
+	isa => PositiveOrZeroInt,
 );
 
 has param 'contents' => (
+	isa => Any,
 	writer => 1,
-
-	# isa => Any,
 );
 
 has field 'is_wall' => (
+	isa => Bool,
 	writer => -hidden,
-
-	# isa => Bool,
 );
 
 has field 'is_void' => (
+	isa => Bool,
 	writer => -hidden,
-
-	# isa => Bool,
 );
 
 has field 'type' => (
+	isa => Any,
 	writer => -hidden,
-
-	# isa => Any,
 );
 
 sub BUILD

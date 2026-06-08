@@ -1,0 +1,233 @@
+======================================================================
+ PSGI::Handy Tutorial (tut/)
+ 教程手册                                                     [ZH] 中文（简体）
+======================================================================
+
+ tut/ 是 PSGI::Handy 的官方教学教程：共6章、24步的课程，不留任何黑箱地从零搭建一个Web应用，从最朴素的HTTP响应开始，到完整的CRUD应用结束。每一步都是一个独立可运行的Perl程序。整个技术栈为纯Perl且无依赖：PSGI::Handy(框架)、HTTP::Handy(服务器)、HP::Handy(模板)、DB::Handy(数据库)。
+
+[ 运行方法 ]
+
+  在 tut/ 目录内逐步运行，例如 perl 01_step01_text.pl 。每个程序会启动服务器并打印其URL；在浏览器中打开 http://127.0.0.1:8080/ ，按 Ctrl-C 停止。templates/ 目录和 data.csv 必须能从当前目录访问，因此请务必在 tut/ 内启动这些程序。
+
+[ 通用头部 ]
+
+  每个 .pl 文件都以相同的头部开始：use 5.00503; use strict; 一个在低于5.6的Perl上提供空 warnings 桩的小 BEGIN 块；随后是 use warnings; local $^W = 1; 。程序使用裸字文件句柄和2参数 open，因此一直向下兼容到 Perl 5.005_03。该头部在每一步都相同，下文不再重复。
+
+----------------------------------------------------------------------
+ 根目录文件
+----------------------------------------------------------------------
+
+  00_README.txt
+      课程总览：列出全部章节与步骤及其学习目标。请先阅读它，在打开任何程序之前掌握整体脉络。
+
+  data.csv
+      第4章(CSV步骤)的示例数据：三行以逗号分隔的 id,name,age。Step 12、14、15 会改写此文件，若想还原请先备份。1,Alice,20 / 2,Bob,22 / 3,Charlie,25
+
+----------------------------------------------------------------------
+ 第 1 — HTTP响应基础(从静态到动态)
+----------------------------------------------------------------------
+
+  浏览器与服务器之间最简单的交互，不用模板引擎，以理解HTTP响应的形态。
+
+  01_step01_text.pl
+      对 GET / 通过 $c->text() 返回纯文本 '.'。最小的应用：浏览器收到原始字符(text/plain)。
+
+  01_step02_html.pl
+      通过 $c->html() 把 '<a>.' 作为 text/html 返回。字节与 Step 1 相同，但 Content-Type 告诉浏览器将其当作标记处理。展示文本与HTML的区别。
+
+  01_step03_dyn_text.pl
+      每次请求用 scalar localtime() 重新读取当前时间并以纯文本返回。首次体验动态输出：响应每次都变。
+
+  01_step04_dyn_html.pl
+      把动态时间包进 <h1>/<p> 标记并作为HTML返回。通过变量拼装字符串来构建页面。
+
+----------------------------------------------------------------------
+ 第 2 — 用户输入与状态(表单与分支)
+----------------------------------------------------------------------
+
+  将数据从浏览器发往服务器，并根据收到的内容进行分支。
+
+  02_step05_form.pl
+      GET / 显示一个会向 /echo 提交 POST 的HTML表单(文本框加提交按钮)。此步尚无提交处理，只关注表单标记本身。
+
+  02_step06_echo.pl
+      加入 POST /echo 处理器。它用 $c->param('message') 读取 'message' 字段，并原样回显在HTML响应中：请求到响应的基本往返。
+
+  02_step07_auth.pl
+      最小登录。POST /login 读取 'username' 和'password' 并用 if 分支：admin/secret 进入成功页，其余进入失败页。认证与条件流程的雏形。
+
+----------------------------------------------------------------------
+ 第 3 — 分离View(引入 HP::Handy)
+----------------------------------------------------------------------
+
+  不再在程序里写HTML，而是移入模板文件。HP::Handy 提供 render_file()/render_string()，因此通过一个把模板名映射到 render_file() 的小 CODE renderer 注入到 PSGI::Handy。该 renderer 块在所有用模板的步骤中都相同。
+
+  03_step08_template.pl
+      无变量地渲染静态的 templates/step08.html。HTML 现在独立成文件，与逻辑分离。
+
+  03_step09_template_var.pl
+      向 templates/step09.html 传入 { current_time => ... }，由 {{ current_time }} 占位符输出。数据从程序流向模板。
+
+  03_step10_template_form.pl
+      用两个模板重写 Step 6 的回显：输入用 step10_form.html，结果用 step10_result.html。处理器逻辑变得很小。
+
+----------------------------------------------------------------------
+ 第 4 — 文件I/O与CSV持久化(CRUD基础)
+----------------------------------------------------------------------
+
+  在不用数据库的情况下，对一个纯CSV文件实现 增/查/改/删。手工管理数据的代价，正是第5章转向数据库的动机。
+
+  04_step11_csv_readall.pl
+      Read All。打开 data.csv，按逗号把每行拆成 { id, name, age } 哈希，并渲染为HTML表格(step11_list.html)。
+
+  04_step12_csv_create.pl
+      Create。POST /add 以追加模式(>>)向 data.csv 追加一行 'id,name,age'，然后显示完成页。
+
+  04_step13_csv_readone.pl
+      Read One。路由 /user/:id 捕获 id；程序扫描data.csv 找匹配行并显示详情(step13_detail.html)，未找到则返回 404。
+
+  04_step14_csv_update.pl
+      Update。为改一行，需读取全部行、替换匹配行、再重写整个文件：这种「全读→替换→全写」的苦差事，数据库稍后会替你免去。
+
+  04_step15_csv_delete.pl
+      Delete。同样重写整个文件，但跳过匹配行而非替换它。
+
+----------------------------------------------------------------------
+ 第 5 — 引入Model(转向 DB::Handy)
+----------------------------------------------------------------------
+
+  用 DB::Handy 取代 CSV。句柄由 DB::Handy->connect('data','app',{...}) 创建，经 db => $dbh 注入，在处理器中以 $c->db 访问。_bootstrap() 例程只创建并填充一次 'users' 表，故各示例可独立运行。
+
+  05_step16_db_readall.pl
+      Read All。selectall_arrayref(...,{ Slice => {} }) 把 users 全部行取为哈希，交给列表模板(step16_list.html)。不再需要手工解析文件。
+
+  05_step17_db_create.pl
+      Create。POST /add 用带占位符的 INSERT 插入一行，然后重定向到 /(列表)：标准的「提交后重定向」模式。
+
+  05_step18_db_readone.pl
+      Read One。/user/:id 用 selectrow_hashref() 按主键只取一行，未找到则返回 404。用直接的键查找代替逐行扫描。
+
+  05_step19_db_update.pl
+      Update。GET /user/:id/edit 显示编辑表单；POST 执行 UPDATE ... WHERE id=? 并重定向到详情页。无需在内存中重写整个文件。
+
+  05_step20_db_delete.pl
+      Delete。执行 DELETE ... WHERE id=?，再重定向到 /。改变状态的路由仅接受 POST，以避免由 GET引起的误删。
+
+----------------------------------------------------------------------
+ 第 6 — 关系数据与一个实用应用
+----------------------------------------------------------------------
+
+  在第二个数据库 'app2' 中放两张关联表(users 和 depts)。JOIN 用 Perl 手工完成，不做成黑箱，最后把一切组装成一个完整应用。
+
+  06_step21_db_join_list.pl
+      JOIN List。读取两张表，建立 dept_id => name 查找表，为每个 user 附上 dept_name(手写的JOIN)，并列出(step21_join_list.html)。
+
+  06_step22_db_join_detail.pl
+      JOIN Read One。取一个 user，再查该 user 所属的单个部门并附上其名称，用于详情页(step22_join_detail.html)。
+
+  06_step23_db_form_select.pl
+      Select 表单。载入部门主表并渲染为 <select> 下拉框(step23_form_select.html)，让用户选择部门而非手输 id。
+
+  06_step24_fullstack_app.pl
+      单文件里的完整应用：对 users+depts 的列表、详情、添加、编辑、删除，附部门名、select 下拉框、处处「提交后重定向」，以及 _next_id() 辅助函数(DB::Handy 无自增列)。使用 app_list.html 与 app_form.html。
+
+----------------------------------------------------------------------
+ 模板 (templates/)
+----------------------------------------------------------------------
+
+  HP::Handy 模板使用类 Jinja2 语法：{{ var }} 输出一个值(像 {{ user.name }} 这样的点路径可深入哈希)，{% for x in list %} ... {% endfor %} 循环，{% if ... %} 分支。renderer 以 auto_escape => 1 创建，故输出值会被HTML转义。
+
+  templates/step08.html
+      Step 8 使用的完全静态页面；无占位符。
+
+  templates/step09.html
+      通过 {{ current_time }} 显示服务器时间(Step 9)。
+
+  templates/step10_form.html
+      Step 10 回显的输入表单；向 /echo 提交 'message'。
+
+  templates/step10_result.html
+      显示 Step 10 回显的 {{ message }}。
+
+  templates/step11_list.html
+      遍历 {{ users }} 绘制CSV表格(Step 11)。
+
+  templates/step12_form.html
+      Step 12 的添加表单(id, name, age)。
+
+  templates/step12_result.html
+      第 12 步的"Added"确认页：显示 {{ name }} 和返回链接。
+
+  templates/step13_list.html
+      第 13 步的索引：每个用户链接到各自的 /user/:id 详情页。
+
+  templates/step13_detail.html
+      显示 Step 13 中某用户的 id/name/age。
+
+  templates/step14_list.html
+      第 14 步的页面：当前各行以及一个向 /update 提交的更新表单。
+
+  templates/step15_list.html
+      第 15 步的页面：当前各行以及一个向 /delete 提交的删除表单。
+
+  templates/step16_list.html
+      第 16 步的纯 DB 用户列表（暂无链接）。
+
+  templates/step17_form.html
+      Step 17 的添加用户表单。
+
+  templates/step17_list.html
+      带有指向 /add 的"Add New User"链接的第 17 步列表。
+
+  templates/step18_list.html
+      第 18 步的列表：每个名字链接到各自的 /user/:id 详情。
+
+  templates/step18_detail.html
+      第 18 步的纯用户详情，带返回链接。
+
+  templates/step19_list.html
+      第 19 步的列表：每个名字链接到各自的详情页。
+
+  templates/step19_detail.html
+      第 19 步的用户详情，带编辑链接和返回链接。
+
+  templates/step19_edit.html
+      Step 19 的编辑表单(name, age)；向 /user/:id/edit 提交。
+
+  templates/step20_list.html
+      第 20 步的列表，每行带有需确认的 POST 删除按钮。
+
+  templates/step21_join_list.html
+      含已连接的 {{ user.dept_name }} 列的员工列表(Step 21)。
+
+  templates/step22_join_list.html
+      第 22 步的员工索引：每个名字链接到各自的详情页。
+
+  templates/step22_join_detail.html
+      显示部门名的员工详情(Step 22)。
+
+  templates/step23_list.html
+      带有指向 /add 的"Add New Employee"链接的第 23 步员工列表。
+
+  templates/step23_form_select.html
+      含由 {{ depts }} 构建的部门 <select> 的添加表单(Step 23)。
+
+  templates/app_list.html
+      完整应用的员工列表(Step 24)：ID、带链接的姓名、部门，外加每行的编辑与带确认的 POST 删除，以及一个添加链接。
+
+  templates/app_form.html
+      完整应用共享的 添加/编辑 表单(Step 24)：{{ action }} 的目标在创建与更新间切换，部门 <select> 通过 {% if %} 预选 {{ user.dept_id }}。
+
+----------------------------------------------------------------------
+ 参考资料
+----------------------------------------------------------------------
+
+  MetaCPAN 上的 PSGI::Handy 及 Handy 栈的其余模块，以及 PSGI 规范：
+
+    https://metacpan.org/dist/PSGI-Handy
+    https://metacpan.org/dist/HTTP-Handy
+    https://metacpan.org/dist/HP-Handy
+    https://metacpan.org/dist/DB-Handy
+    https://github.com/plack/psgi-specs/blob/master/PSGI.pod
+
+======================================================================

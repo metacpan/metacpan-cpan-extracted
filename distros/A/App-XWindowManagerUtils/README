@@ -2,17 +2,51 @@ NAME
     App::XWindowManagerUtils - Utilities related to X Window Manager
 
 VERSION
-    This document describes version 0.001 of App::XWindowManagerUtils (from
-    Perl distribution App-XWindowManagerUtils), released on 2026-03-26.
+    This document describes version 0.002 of App::XWindowManagerUtils (from
+    Perl distribution App-XWindowManagerUtils), released on 2026-03-27.
 
 SYNOPSIS
 DESCRIPTION
     This distribution includes several utilities related to X Window
     Manager:
 
+    *   get-xwm-window-kde-activity
+
     *   list-xwm-windows
 
 FUNCTIONS
+  get_xwm_window_kde_activity
+    Usage:
+
+     get_xwm_window_kde_activity(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Get the KDE activity GUID(s) of a specific window.
+
+    A window can be displayed in more than one KDE activities, so this
+    utility can return a comma-separated list of GUIDs.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   id* => *str*
+
+        Window ID, specified in hex form with 0x prefix, e.g. 0x05a0000e.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
   list_xwm_windows
     Usage:
 
@@ -29,6 +63,10 @@ FUNCTIONS
         (No description)
 
     *   query => *array[str]*
+
+        (No description)
+
+    *   with_kde_activity => *bool*
 
         (No description)
 

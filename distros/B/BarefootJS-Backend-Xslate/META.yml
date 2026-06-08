@@ -1,0 +1,30 @@
+---
+abstract: 'Text::Xslate (Kolon) rendering backend for BarefootJS'
+author:
+  - 'kobaken <kentafly88@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test2::V0: '0'
+configure_requires:
+  Module::CPANfile: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: BarefootJS-Backend-Xslate
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  BarefootJS: '0'
+  Text::Xslate: v3.4.0
+  perl: '5.020'
+resources:
+  bugtracker: https://github.com/piconic-ai/barefootjs/issues
+  homepage: https://barefootjs.dev
+  repository: https://github.com/piconic-ai/barefootjs.git
+version: v0.10.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

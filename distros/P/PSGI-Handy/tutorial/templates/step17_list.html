@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head><title>Step 17 - DB List</title></head>
+<body>
+    <h1>User List (DB)</h1>
+    <table border="1">
+        <tr><th>ID</th><th>Name</th><th>Age</th></tr>
+        {% for user in users %}
+        <tr><td>{{ user.id }}</td><td>{{ user.name }}</td><td>{{ user.age }}</td></tr>
+        {% endfor %}
+    </table>
+    <p><a href="/add">Add New User</a></p>
+</body>
+</html>

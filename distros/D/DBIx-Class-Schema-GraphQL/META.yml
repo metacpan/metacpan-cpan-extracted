@@ -1,0 +1,39 @@
+---
+abstract: 'Auto-generate a GraphQL schema from a DBIx::Class schema'
+author:
+  - 'Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>'
+build_requires:
+  DBD::SQLite: '1.70'
+  ExtUtils::MakeMaker: '0'
+  GraphQL::Execution: '0'
+  Test::More: '1.302'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-Schema-GraphQL
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  DBIx::Class::Schema::GraphQL:
+    file: lib/DBIx/Class/Schema/GraphQL.pm
+    version: v0.0.1
+requires:
+  DBIx::Class: '0.082843'
+  GraphQL::Schema: '0'
+  GraphQL::Type::List: '0'
+  GraphQL::Type::NonNull: '0'
+  GraphQL::Type::Object: '0'
+  GraphQL::Type::Scalar: '0'
+  perl: '5.016'
+resources:
+  bugtracker: https://github.com/manwar/DBIx-Class-Schema-GraphQL/issues
+  repository: https://github.com/yourname/DBIx-Class-Schema-GraphQL.git
+version: v0.0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

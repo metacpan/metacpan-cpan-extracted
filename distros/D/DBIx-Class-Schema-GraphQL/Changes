@@ -1,0 +1,4 @@
+Revision history for DBIx::Class::Schema::GraphQL
+
+v0.0.1  2026-06-07
+        - First draft released.

@@ -59,7 +59,7 @@
    "provides" : {
       "App::XWindowManagerUtils" : {
          "file" : "lib/App/XWindowManagerUtils.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -74,7 +74,7 @@
          "web" : "https://github.com/perlancar/perl-App-XWindowManagerUtils"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.042000"
@@ -83,6 +83,11 @@
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript list-xwm-windows",
+            "version" : "0.425"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript get-xwm-window-kde-activity",
             "version" : "0.425"
          },
          {

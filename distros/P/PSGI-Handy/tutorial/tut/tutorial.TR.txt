@@ -1,0 +1,233 @@
+======================================================================
+ PSGI::Handy Tutorial (tut/)
+ Öğretici El Kitabı                                       [TR] Türkçe
+======================================================================
+
+ tut/, PSGI::Handy'nin resmi öğretim öğreticisidir: altı bölümlük ve yirmi dört adımlık, bir web uygulamasını sıfırdan, hiçbir kara kutu olmadan, en çıplak HTTP yanıtından tam bir CRUD uygulamasına kadar kuran bir müfredattır. Her adım, kendi içinde bağımsız ve çalıştırılabilir tek bir Perl programıdır. Tüm yığın saf Perl'dir ve bağımlılıksızdır: PSGI::Handy (çerçeve), HTTP::Handy (sunucu), HP::Handy (şablonlar) ve DB::Handy (veritabanı).
+
+[ Nasıl çalıştırılır ]
+
+  Her seferinde bir adımı tut/ dizini içinden çalıştırın, örneğin perl 01_step01_text.pl  . Her program bir sunucu başlatır ve URL'sini yazdırır; tarayıcıda http://127.0.0.1:8080/ adresini açın ve durdurmak için Ctrl-C'ye basın. templates/ dizinine ve data.csv'ye geçerli dizinden erişilebilmelidir, bu nedenle programları her zaman tut/ içinden başlatın.
+
+[ Ortak başlık ]
+
+  Her .pl dosyası aynı başlıkla açılır: use 5.00503; use strict; 5.6'dan eski Perl'lerde işlemsiz bir warnings stub sağlayan küçük bir BEGIN bloğu; ardından use warnings; local $^W = 1;  . Programlar, Perl 5.005_03'e kadar geçerli kalmaları için bareword filehandle ve iki argümanlı open kullanır. Bu başlık her adımda aynıdır ve aşağıda tekrarlanmaz.
+
+----------------------------------------------------------------------
+ Kök dosyalar
+----------------------------------------------------------------------
+
+  00_README.txt
+      Müfredat genel görünümü: her bölüm ve adım, öğrenme hedefiyle birlikte. Herhangi bir programı açmadan önce tüm akışı görmek için önce bunu okuyun.
+
+  data.csv
+      Bölüm 4 için örnek veri (CSV adımları): id,name,age biçiminde virgülle ayrılmış üç satır. 12, 14 ve 15. adımlar bu dosyayı yeniden yazar, bu yüzden sıfırlamak isterseniz bir yedek tutun. 1,Alice,20 / 2,Bob,22 / 3,Charlie,25
+
+----------------------------------------------------------------------
+ Bölüm 1 — HTTP yanıt temelleri (statikten dinamiğe)
+----------------------------------------------------------------------
+
+  Bir HTTP yanıtının biçimini anlamak için tarayıcı ile sunucu arasındaki, şablon motoru olmayan, mümkün olan en basit alışveriş.
+
+  01_step01_text.pl
+      GET / için $c->text() aracılığıyla düz metin '.' döndürür. Mümkün olan en küçük uygulama: tarayıcı ham karakterleri alır (text/plain).
+
+  01_step02_html.pl
+      $c->html() aracılığıyla '<a>.' ifadesini text/html olarak döndürür. 1. Adım ile aynı baytlar, ancak Content-Type tarayıcıya bunları biçimlendirme olarak görmesini söyler. Metin ile HTML arasındaki ayrımı gösterir.
+
+  01_step03_dyn_text.pl
+      Geçerli zamanı düz metin olarak döndürür, her istekte scalar localtime() ile yeniden okunur. Dinamik çıktının ilk tadı: yanıt her seferinde değişir.
+
+  01_step04_dyn_html.pl
+      Dinamik zamanı <h1>/<p> biçimlendirmesine sarar ve HTML olarak döndürür. Değişkenlerden bir dize birleştirerek ekran oluşturma.
+
+----------------------------------------------------------------------
+ Bölüm 2 — Kullanıcı girişi ve durum (formlar ve dallanma)
+----------------------------------------------------------------------
+
+  Tarayıcıdan sunucuya veri gönderme ve gelene göre dallanma.
+
+  02_step05_form.pl
+      GET / , /echo'ya POST yapan bir HTML form (metin kutusu artı gönder düğmesi) gösterir. Gönderim için henüz bir işleyici yok; bu adım yalnızca form biçimlendirmesiyle ilgilidir.
+
+  02_step06_echo.pl
+      POST /echo işleyicisini ekler. 'message' alanını $c->param('message') ile okur ve HTML yanıtının içinde geri yansıtır: temel istekten yanıta gidiş-dönüş.
+
+  02_step07_auth.pl
+      Minimal bir oturum açma. POST /login, 'username' ve 'password' okur ve dallanmak için bir if kullanır: admin/secret başarı sayfasına ulaşır, diğer her şey başarısızlık sayfasına gider. Kimlik doğrulamanın ve koşullu akışın tohumu.
+
+----------------------------------------------------------------------
+ Bölüm 3 — View'ı ayırma (HP::Handy'nin tanıtımı)
+----------------------------------------------------------------------
+
+  Programın içine HTML yazmayı bırakın; onu şablon dosyalarına taşıyın. HP::Handy, render_file()/render_string() sunar, bu yüzden bir şablon adını render_file()'a eşleyen küçük bir CODE renderer aracılığıyla PSGI::Handy'ye bağlanır. Bu renderer bloğu her şablonlu adımda aynıdır.
+
+  03_step08_template.pl
+      Değişken olmadan statik templates/step08.html'i işler. HTML artık mantıktan ayrı, kendi dosyasında yaşar.
+
+  03_step09_template_var.pl
+      templates/step09.html'e { current_time => ... } iletir; bu şablon onu {{ current_time }} yer tutucusuyla yazdırır. Veri programdan şablona akar.
+
+  03_step10_template_form.pl
+      6. Adım yankısını iki şablonla yeniden yazar: girdi için step10_form.html ve sonuç için step10_result.html. İşleyici mantığı çok küçük hale gelir.
+
+----------------------------------------------------------------------
+ Bölüm 4 — Dosya G/Ç ve CSV kalıcılığı (CRUD temelleri)
+----------------------------------------------------------------------
+
+  Veritabanı olmadan, düz bir CSV dosyasına karşı Create/Read/Update/Delete uygulayın. Manuel veri işlemenin maliyetini hissetmek, Bölüm 5'te bir veritabanına geçmeyi motive eder.
+
+  04_step11_csv_readall.pl
+      Read All. data.csv'yi açar, her satırı virgüllerle { id, name, age } hash'lerine böler ve listeyi bir HTML tablosu olarak işler (step11_list.html).
+
+  04_step12_csv_create.pl
+      Create. POST /add, data.csv'ye ekleme modunda (>>) bir 'id,name,age' satırı ekler, ardından bir tamamlama sayfası gösterir.
+
+  04_step13_csv_readone.pl
+      Read One. /user/:id rotası bir id yakalar; program data.csv'yi eşleşen satır için tarar ve ayrıntısını gösterir (step13_detail.html) veya bulunamazsa 404 döndürür.
+
+  04_step14_csv_update.pl
+      Update. Bir satırı değiştirmek için her satırı okur, eşleşeni değiştirir ve tüm dosyayı yeniden yazar: veritabanının kaldıracağı 'hepsini oku, değiştir, hepsini yaz' angaryası.
+
+  04_step15_csv_delete.pl
+      Delete. Aynı tüm dosya yeniden yazımı, ancak eşleşen satır değiştirilmek yerine atlanır.
+
+----------------------------------------------------------------------
+ Bölüm 5 — Model'in tanıtımı (DB::Handy'ye geçiş)
+----------------------------------------------------------------------
+
+  CSV'yi DB::Handy ile değiştirin. Tanıtıcı, DB::Handy->connect('data','app',{...}) ile oluşturulur ve db => $dbh aracılığıyla enjekte edilir, ardından işleyicilerde $c->db olarak erişilir. Bir _bootstrap() rutini 'users' tablosunu bir kez oluşturur ve tohumlar, böylece her örnek bağımsız çalışır.
+
+  05_step16_db_readall.pl
+      Read All. selectall_arrayref(..., { Slice => {} }), liste şablonu için (step16_list.html) her users satırını hash olarak getirir. Artık manuel dosya ayrıştırma yok.
+
+  05_step17_db_create.pl
+      Create. POST /add, bir yer tutucu INSERT ile bir satır ekler, ardından / (listeye) yönlendirir: standart post-then-redirect deseni.
+
+  05_step18_db_readone.pl
+      Read One. /user/:id, selectrow_hashref() ile birincil anahtara göre tek bir satır getirir veya 404 döndürür. Her satırı taramak yerine doğrudan anahtar araması.
+
+  05_step19_db_update.pl
+      Update. GET /user/:id/edit düzenleme formunu gösterir; POST, UPDATE ... WHERE id=? çalıştırır ve ayrıntı sayfasına yönlendirir. Bellekte tüm dosya yeniden yazımı yok.
+
+  05_step20_db_delete.pl
+      Delete. DELETE ... WHERE id=? çalıştırılır, ardından /'a yönlendirme yapılır. Durum değiştiren rota yalnızca POST'tur, GET'ten kazara silmeleri önlemek için.
+
+----------------------------------------------------------------------
+ Bölüm 6 — İlişkisel veri ve gerçek bir uygulama
+----------------------------------------------------------------------
+
+  İkinci bir 'app2' veritabanında iki ilişkili tablo (users ve depts). JOIN, bir kara kutu olmaması için Perl'de elle yapılır, ardından her şey tek bir tam uygulamada birleştirilir.
+
+  06_step21_db_join_list.pl
+      JOIN List. Her iki tabloyu okur, bir dept_id => name araması oluşturur, her kullanıcıya dept_name ekler (elle yazılmış bir JOIN) ve onları listeler (step21_join_list.html).
+
+  06_step22_db_join_detail.pl
+      JOIN Read One. Bir kullanıcı getirir, ardından o kullanıcının tek departmanını arar ve ayrıntı sayfası için adını ekler (step22_join_detail.html).
+
+  06_step23_db_form_select.pl
+      Select form. Departman ana verisini yükler ve onu bir <select> açılır listesi olarak işler (step23_form_select.html), böylece kullanıcı bir id yazmak yerine bir departman seçer.
+
+  06_step24_fullstack_app.pl
+      Tek bir dosyada tam uygulama: users+depts verileri üzerinde list, detail, add, edit ve delete; eklenmiş departman adları, bir select açılır listesi, her yerde post-then-redirect ve bir _next_id() yardımcısı (DB::Handy'de otomatik artırma yoktur). app_list.html ve app_form.html kullanır.
+
+----------------------------------------------------------------------
+ Şablonlar (templates/)
+----------------------------------------------------------------------
+
+  HP::Handy şablonları Jinja2 benzeri bir sözdizimi kullanır: {{ var }} bir değer yazdırır ({{ user.name }} gibi noktalı yollar hash'lerin içine ulaşır), {% for x in list %} ... {% endfor %} döngü yapar ve {% if ... %} dallanır. Renderer auto_escape => 1 ile oluşturulur, bu nedenle yazdırılan değerler HTML-escape edilir.
+
+  templates/step08.html
+      8. Adım tarafından kullanılan tamamen statik bir sayfa; yer tutucu yok.
+
+  templates/step09.html
+      Sunucu zamanını {{ current_time }} aracılığıyla yazdırır (9. Adım).
+
+  templates/step10_form.html
+      10. Adım yankısı için girdi formu; 'message'ı /echo'ya POST eder.
+
+  templates/step10_result.html
+      10. Adım için yankılanan {{ message }} gösterir.
+
+  templates/step11_list.html
+      CSV tablosunu çizmek için {{ users }} üzerinde döngü yapar (11. Adım).
+
+  templates/step12_form.html
+      12. Adım için ekleme formu (id, name, age).
+
+  templates/step12_result.html
+      12. Adımın "Added" onay sayfası: {{ name }} ve bir geri bağlantısı gösterir.
+
+  templates/step13_list.html
+      13. Adım dizini: her kullanıcı kendi /user/:id ayrıntı sayfasına bağlanır.
+
+  templates/step13_detail.html
+      13. Adım için bir kullanıcının id/name/age değerini gösterir.
+
+  templates/step14_list.html
+      14. Adım sayfası: mevcut satırlar ve /update adresine POST eden bir güncelleme formu.
+
+  templates/step15_list.html
+      15. Adım sayfası: mevcut satırlar ve /delete adresine POST eden bir silme formu.
+
+  templates/step16_list.html
+      16. Adım için sade DB kullanıcı listesi (henüz bağlantı yok).
+
+  templates/step17_form.html
+      17. Adım için kullanıcı ekleme formu.
+
+  templates/step17_list.html
+      /add adresine "Add New User" bağlantısı olan 17. Adım listesi.
+
+  templates/step18_list.html
+      18. Adım listesi: her ad kendi /user/:id ayrıntısına bağlanır.
+
+  templates/step18_detail.html
+      18. Adım için sade kullanıcı ayrıntısı, geri bağlantısıyla.
+
+  templates/step19_list.html
+      19. Adım listesi: her ad kendi ayrıntı sayfasına bağlanır.
+
+  templates/step19_detail.html
+      19. Adım kullanıcı ayrıntısı, Edit bağlantısı ve geri bağlantısıyla.
+
+  templates/step19_edit.html
+      19. Adım için düzenleme formu (name, age); /user/:id/edit'e POST eder.
+
+  templates/step20_list.html
+      Her satırda onay isteyen POST Delete düğmesi olan 20. Adım listesi.
+
+  templates/step21_join_list.html
+      Birleştirilmiş {{ user.dept_name }} sütununa sahip çalışan listesi (21. Adım).
+
+  templates/step22_join_list.html
+      22. Adım çalışan dizini: her ad kendi ayrıntı sayfasına bağlanır.
+
+  templates/step22_join_detail.html
+      Departman adını gösteren çalışan ayrıntısı (22. Adım).
+
+  templates/step23_list.html
+      /add adresine "Add New Employee" bağlantısı olan 23. Adım çalışan listesi.
+
+  templates/step23_form_select.html
+      {{ depts }} kaynağından oluşturulan departman <select>'i ile ekleme formu (23. Adım).
+
+  templates/app_list.html
+      Tam uygulamanın çalışan listesi (24. Adım): ID, bağlantılı ad, departman, ayrıca her satır için Edit ve onay korumalı bir POST Delete ve bir Add bağlantısı.
+
+  templates/app_form.html
+      Tam uygulamanın paylaşılan ekleme/düzenleme formu (24. Adım): {{ action }} hedefi oluşturma ile güncelleme arasında geçiş yapar ve departman <select>'i {% if %} aracılığıyla {{ user.dept_id }} değerini önceden seçer.
+
+----------------------------------------------------------------------
+ Kaynaklar
+----------------------------------------------------------------------
+
+  MetaCPAN'de PSGI::Handy ve Handy yığınının geri kalanı ve PSGI spesifikasyonu:
+
+    https://metacpan.org/dist/PSGI-Handy
+    https://metacpan.org/dist/HTTP-Handy
+    https://metacpan.org/dist/HP-Handy
+    https://metacpan.org/dist/DB-Handy
+    https://github.com/plack/psgi-specs/blob/master/PSGI.pod
+
+======================================================================

@@ -76,11 +76,11 @@ Also works in threads, where the context is set at thread creation.
     {
         return( want('VOID') ? 1 : 0 );
     });
-    my $is_void = $thr_void->join; # undef
+    my $is_void = $thr->join; # true
 
 # VERSION
 
-    v0.1.0
+    v0.1.1
 
 # DESCRIPTION
 
@@ -310,6 +310,12 @@ A full list of the permitted keyword is in the ["ARGUMENTS"](#arguments) section
 ## rreturn
 
 Use this function instead of [return](https://metacpan.org/pod/perlfunc#return) from inside an lvalue subroutine when you know that you are in `RVALUE` context. If you try to use a normal [return](https://metacpan.org/pod/perlfunc#return), you will get a compile-time error in Perl 5.6.1 and above unless you return an lvalue. (Note: this is no longer true in Perl 5.16, where an ordinary return will once again work.)
+
+**`rreturn` inside `eval`:** In Perl 5.36 and later, `rreturn` may fail to detect lvalue context inside an `eval` block due to a Perl core limitation (see ["Detection of Lvalue Context Inside `eval`"](#detection-of-lvalue-context-inside-eval)). This can lead to incorrect behaviour, as the necessary stack context is not properly propagated. For example:
+
+    eval { lvalue_sub() = 42 };  # lvalue context not detected, rreturn may not die as expected
+
+**Recommendation:** Avoid using `rreturn` inside an `eval` block when the subroutine is in lvalue context. Instead, move the lvalue operation outside the `eval` or explicitly handle the context in your subroutine logic.
 
 ## lnoreturn
 
@@ -577,11 +583,41 @@ However, consider an expression like `my $x = foo() && "yes"`. The subroutine is
 
 At the moment `want('BOOL')` is true in either pure or pseudo boolean context.
 
+# LIMITATIONS
+
+## Detection of Lvalue Context Inside `eval`
+
+Due to a known limitation in Perl's core behaviour, lvalue context cannot be reliably detected from within an `eval` block in modern Perl versions (5.36 and later).
+
+For example, the following will NOT be detected as lvalue context:
+
+    eval { lvalue_sub() = 42 };
+
+This occurs because Perl does not propagate lvalue context into the internal call frame used for `eval`. As a result, `want_lvalue()` will return false even though the subroutine is used in an lvalue assignment.
+
+This limitation affects all XS-based context-detection modules, including [Want](https://metacpan.org/pod/Want), and is not specific to `Wanted`. It is a change in Perl's internals introduced in versions after 5.16, where the original [Want](https://metacpan.org/pod/Want) module was last updated.
+
+**Recommendation:** Avoid relying on lvalue context detection inside `eval` blocks. Instead, move the assignment outside the `eval`, or handle lvalue semantics explicitly in the subroutine logic. For example:
+
+    my $result = lvalue_sub();
+    $result = 42;  # Perform assignment outside eval
+
+## Code Reference Detection with Prototypes in Scalar Context
+
+In scalar context, `want('CODE')` may incorrectly return true when the caller does not expect a code reference, particularly when the subroutine has a prototype (e.g., `sub foo($)`). This is a known issue (RT#47963) from the original [Want](https://metacpan.org/pod/Want) module, which has not been resolved in `Wanted`.
+
+For example:
+
+    sub foo($) { sub { } }  # Prototype forces scalar context
+    my $x = foo();          # Scalar context, but want('CODE') returns true
+
+In this case, `want('CODE')` should return false because the caller does not expect a code reference, but it returns true due to limitations in context detection.
+
+**Recommendation:** Be cautious when using `want('CODE')` in scalar context with prototyped subroutines. If necessary, explicitly check the context using `want('SCALAR')` or avoid prototypes in such cases.
+
 # CREDITS
 
 Robin Houston, <robin@cpan.org> wrote the original module [Want](https://metacpan.org/pod/Want) on which this is based.
-
-Also, credits to Grok from [xAI](https://x.ai) for its support in updating the XS code, providing unit tests, and helping resolve several bugs from the original [Want](https://metacpan.org/pod/Want) module.
 
 # AUTHOR
 

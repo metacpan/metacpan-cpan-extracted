@@ -1,0 +1,21 @@
+Changes
+lib/DBIx/Class/Schema/GraphQL.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-scalar-mapping.t
+t/02-schema-shape.t
+t/03-queries.t
+t/04-mutations.t
+t/05-composite-pk.t
+t/06-pagination-filter.t
+t/lib/My/Schema.pm
+t/lib/My/Schema/Result/Author.pm
+t/lib/My/Schema/Result/Book.pm
+t/manifest.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,9 +1,0 @@
-aoh2hoa
-aoh2hoh
-hoa2aoh
-hoa2hoh
-hoh2aoh
-hoh2hoa
-agg(df, 'cols|rows', na.remove => true, min, max,...)
-sort: returning either hoa and aoh (array is sorted in both cases, obviously)
-corrdf

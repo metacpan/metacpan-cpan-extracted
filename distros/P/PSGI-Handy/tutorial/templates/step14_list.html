@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head><title>Step 14 - Update</title></head>
+<body>
+    <h1>Current Rows</h1>
+    <table border="1">
+        <tr><th>ID</th><th>Name</th><th>Age</th></tr>
+        {% for user in users %}
+        <tr><td>{{ user.id }}</td><td>{{ user.name }}</td><td>{{ user.age }}</td></tr>
+        {% endfor %}
+    </table>
+    <h2>Update a Row</h2>
+    <form action="/update" method="POST">
+        ID: <input type="text" name="id"><br>
+        Name: <input type="text" name="name"><br>
+        Age: <input type="text" name="age"><br>
+        <input type="submit" value="Update">
+    </form>
+</body>
+</html>

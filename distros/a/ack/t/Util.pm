@@ -88,7 +88,7 @@ my @temp_files; # We store temp files here to make sure they're properly reclaim
 
 sub prep_environment {
     my @ack_args   = qw( ACKRC ACK_PAGER HOME ACK_COLOR_MATCH ACK_COLOR_FILENAME ACK_COLOR_LINENO ACK_COLOR_COLNO );
-    my @taint_args = qw( PATH CDPATH IFS ENV );
+    my @taint_args = qw( PATH CDPATH IFS ENV PERLDOC );
     delete @ENV{ @ack_args, @taint_args };
 
     if ( is_windows() ) {
@@ -1231,6 +1231,18 @@ sub adjust_executable {
     my @cmd = @_;
 
     my $perl = caret_X();
+
+    # ACK_TEST_MODULE_OPTS
+    # If a .t test file wishes to load a module for debug or provocation before Ack starts
+    # e.g.
+    # $ENV{'ACK_TEST_MODULE_OPTS'} = 're=eval' ; attempts to enable runtime code injection in REs
+    #    (which we block, but this is needed to test that we block it)
+    # $ENV{'ACK_TEST_MODULE_OPTS'} = 're=debug' ; would trace REs compilation and execution,
+    #    (which gets rather long so don't check in that way!)
+    if ($ENV{'ACK_TEST_MODULE_OPTS'}){
+        # warn "ACK_TEST_MODULE_OPTS=-M$ENV{'ACK_TEST_MODULE_OPTS'}" ;  #############DEBUG #####
+        unshift( @cmd, "-M$ENV{'ACK_TEST_MODULE_OPTS'}" );
+    }
 
     if ( $ENV{'ACK_TEST_STANDALONE'} ) {
         unshift( @cmd, $perl );

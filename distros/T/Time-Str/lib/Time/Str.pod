@@ -45,13 +45,17 @@ ambiguity.
     my $time = str2time($string, format => $format);
     my $time = str2time($string, format => $format, precision => $precision);
     my $time = str2time($string, format => 'ASN1UT', pivot_year => 2000);
+    my $time = str2time($string, timezone => $tz);
+    my $time = str2time($string, timezone_map => \%map);
 
 Parses a date/time string and returns a Unix timestamp (seconds since
 1970-01-01T00:00:00Z). The timestamp may include fractional seconds.
 
-The input B<must> include a UTC designator (C<Z>, C<UTC>, C<GMT>) or a
-numeric timezone offset. Strings with only an unresolved timezone abbreviation
-(e.g., C<EST>, C<IST>) will croak. See L</TIMEZONE ABBREVIATIONS>.
+The input must resolve to a UTC offset. This can come from the string itself
+(a UTC designator C<Z>/C<UTC>/C<GMT> or a numeric offset), from a C<timezone>
+object that resolves the parsed local time, or - when the string carries a
+timezone abbreviation - from a C<timezone_map> entry. Without any of these,
+C<str2time> croaks. See L</TIMEZONE ABBREVIATIONS>.
 
 =head3 Parameters
 
@@ -82,6 +86,36 @@ the current century.
 With the default pivot of 1950: C<49> becomes 2049, C<50> becomes 1950,
 C<99> becomes 1999.
 
+=item * C<timezone> (optional)
+
+A timezone object used to resolve the offset when the string carries no
+numeric offset or UTC designator. The object must provide an
+C<offset_for_local> method: given the parsed local time as a Unix
+timestamp, it returns the UTC offset in seconds. C<str2time> subtracts
+this to obtain the true UTC time. DST gaps and overlaps are handled by
+the object's own defaults.
+
+A numeric offset or UTC designator in the string always takes precedence
+over C<timezone>. The object is B<not> consulted for timezone
+abbreviations - see C<timezone_map> below.
+
+L<Time::TZif> and L<Time::TZif::POSIX> provide suitable objects.
+
+=item * C<timezone_map> (optional)
+
+A hash reference mapping timezone abbreviations (as captured in
+C<tz_abbrev>, e.g. C<'CET'>, C<'EST'>) to timezone objects. When the
+parsed string carries an abbreviation, the map is consulted and the
+matched object's C<offset_for_local> method resolves the offset
+(DST-aware: the same abbreviation can yield different offsets depending
+on the instant). Each value used must be a blessed object with an
+C<offset_for_local> method.
+
+A matching C<timezone_map> entry takes precedence over a bare
+C<timezone> object. If the string carries an abbreviation that is not
+present in the map, C<str2time> croaks - it does not fall back to
+C<timezone>.
+
 =back
 
 =head3 Returns
@@ -99,7 +133,16 @@ Croaks if:
 
 =item * Date or time components are out of valid ranges
 
-=item * No timezone offset or UTC designator is present
+=item * No offset, UTC designator, or C<timezone> object is available to
+resolve the time
+
+=item * The string carries a timezone abbreviation that C<timezone_map>
+does not resolve
+
+=item * C<timezone> is not an object with an C<offset_for_local> method
+
+=item * C<timezone_map> is not a hash reference, or a matched value lacks
+an C<offset_for_local> method
 
 =item * A named parameter is unrecognised or out of range
 
@@ -127,6 +170,20 @@ Croaks if:
 
     my $t = str2time('2024-12-24T15:30:45.999999Z', precision => 3);
     # 1735052445.999
+
+    # Resolve a local time through a timezone object
+    use Time::TZif::POSIX;
+    my $tz = Time::TZif::POSIX->new(
+        tz_string => 'CET-1CEST,M3.5.0/2,M10.5.0/3');
+    my $t = str2time('2024-01-15T13:00:00', format => 'ISO8601',
+                     timezone => $tz);
+    # 1705320000  (13:00 CET = 12:00 UTC)
+
+    # Resolve an abbreviation through a timezone_map
+    my $t = str2time('Mon, 15 Jul 2024 12:00:00 CET',
+                     format => 'RFC2822',
+                     timezone_map => { CET => $tz });
+    # 1721037600  (CET in July resolves to CEST +02:00, so 10:00 UTC)
 
 =head2 str2date
 
@@ -268,6 +325,7 @@ Croaks if:
     my $str = time2str($time);
     my $str = time2str($time, format => $format);
     my $str = time2str($time, format => $format, offset => $offset);
+    my $str = time2str($time, timezone => $tz);
     my $str = time2str($time, nanosecond => $ns, precision => $prec);
 
 Formats a Unix timestamp into a date/time string.
@@ -290,7 +348,19 @@ fractional seconds or timezone offsets.
 =item * C<offset> (optional, default: 0)
 
 Timezone offset in minutes from UTC. Positive is east, negative is west.
-Valid range: -1439 to +1439 (-23:59 to +23:59).
+Valid range: -1439 to +1439 (-23:59 to +23:59). Mutually exclusive with
+C<timezone>.
+
+=item * C<timezone> (optional)
+
+A timezone object used to derive the offset for the given instant, as a
+DST-aware alternative to a fixed C<offset>. The object must provide an
+C<offset_for_utc> method: given the timestamp (a UTC Unix time), it
+returns the UTC offset in seconds. C<time2str> converts to minutes and
+renders the local time at that offset. Mutually exclusive with
+C<offset>: supplying both croaks.
+
+L<Time::TZif> and L<Time::TZif::POSIX> provide suitable objects.
 
 =item * C<precision> (optional)
 
@@ -326,6 +396,10 @@ Croaks if:
 =over 4
 
 =item * C<$time> is outside the supported range
+
+=item * C<timezone> is not an object with an C<offset_for_utc> method
+
+=item * Both C<timezone> and C<offset> are supplied (mutually exclusive)
 
 =item * A named parameter is unrecognised or out of range
 
@@ -380,6 +454,15 @@ Croaks if:
     # Common Log Format
     my $str = time2str(1735052445, format => 'CLF', offset => 60);
     # '24/Dec/2024:16:30:45 +0100'
+
+    # Timezone object (DST-aware offset)
+    use Time::TZif::POSIX;
+    my $tz = Time::TZif::POSIX->new(
+        tz_string => 'CET-1CEST,M3.5.0/2,M10.5.0/3');
+    my $str = time2str(1705320000, timezone => $tz);
+    # '2024-01-15T13:00:00+01:00'   (winter: CET, +01:00)
+    my $str = time2str(1721044800, timezone => $tz);
+    # '2024-07-15T14:00:00+02:00'   (summer: CEST, +02:00)
 
 =head1 FORMAT OVERVIEW
 
@@ -1432,9 +1515,21 @@ UTC+2, or Irish Standard Time UTC+1).
 
 =back
 
-C<str2time> requires a resolved offset and will croak if only an
-unresolved abbreviation is present. Use C<str2date> to retrieve the
-components including C<tz_abbrev>, then resolve externally:
+C<str2time> can resolve abbreviations via a C<timezone_map> hash that
+maps each abbreviation to a timezone object whose C<offset_for_local>
+method determines the offset (DST-aware). Without such a map, an
+unresolved abbreviation croaks:
+
+    use Time::TZif::POSIX;
+    my %map = (CET => Time::TZif::POSIX->new(
+        tz_string => 'CET-1CEST,M3.5.0/2,M10.5.0/3'));
+
+    my $t = str2time('Mon, 15 Jul 2024 12:00:00 CET',
+                     format => 'RFC2822', timezone_map => \%map);
+    # CET in July resolves to CEST (+02:00) via the mapped object
+
+Alternatively, use C<str2date> to retrieve the components including
+C<tz_abbrev> and resolve externally:
 
     my %d = str2date('24 Dec 2012 15:30:45 IST', format => 'RFC2822');
     # (..., tz_abbrev => 'IST')
@@ -1648,10 +1743,45 @@ not subject to C<@CARP_NOT>.
 
 (F) C<str2date> or C<str2time> could not parse the input string.
 
+=item Parameter 'timezone' is not an object with an 'offset_for_utc' method
+
+(F) C<time2str> was given a C<timezone> value that is not a blessed
+object providing an C<offset_for_utc> method.
+
+=item Parameter 'timezone' is not an object with an 'offset_for_local' method
+
+(F) C<str2time> was given a C<timezone> value that is not a blessed
+object providing an C<offset_for_local> method.
+
+=item Parameter 'timezone' is mutually exclusive with 'offset'
+
+=item Parameter 'offset' is mutually exclusive with 'timezone'
+
+(F) C<time2str> was given both C<timezone> and C<offset>; supply only
+one.
+
+=item Parameter 'timezone_map' is not a HASH reference
+
+(F) C<str2time> was given a C<timezone_map> that is not a hash
+reference.
+
+=item timezone_map value for '%s' is not an object with an 'offset_for_local' method
+
+(F) C<str2time> resolved the abbreviation C<%s> in C<timezone_map>, but
+the corresponding value is not a blessed object providing an
+C<offset_for_local> method.
+
+=item Unable to convert: cannot resolve abbreviated timezone '%s'
+
+(F) C<str2time> parsed a timezone abbreviation C<%s> for which no
+C<timezone_map> entry exists.  Provide a C<timezone_map> with a mapping
+for the abbreviation, or use C<str2date> and resolve it externally.
+
 =item Unable to convert: timestamp string without a UTC designator or numeric offset
 
 (F) C<str2time> successfully parsed the input string but cannot convert
-it to a Unix timestamp without a UTC designator or numeric offset.
+it to a Unix timestamp: the string carries no UTC designator or numeric
+offset, and no C<timezone> object was supplied.
 
 =item Unable to convert: a leap second must occur at 23:59:60 UTC
 

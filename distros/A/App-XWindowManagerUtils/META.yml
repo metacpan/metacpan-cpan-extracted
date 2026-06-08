@@ -19,7 +19,7 @@ name: App-XWindowManagerUtils
 provides:
   App::XWindowManagerUtils:
     file: lib/App/XWindowManagerUtils.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Data::Sah::Compiler::perl::TH::array: '0.914'
   Data::Sah::Compiler::perl::TH::bool: '0.914'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-XWindowManagerUtils
   homepage: https://metacpan.org/release/App-XWindowManagerUtils
   repository: git://github.com/perlancar/perl-App-XWindowManagerUtils.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.042000'
@@ -45,6 +45,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript list-xwm-windows'
+      version: '0.425'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript get-xwm-window-kde-activity'
       version: '0.425'
     -
       class: Dist::Zilla::Plugin::InsertExecsList

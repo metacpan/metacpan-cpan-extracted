@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head><title>Employee Management</title></head>
+<body>
+    <h1>Employee List</h1>
+    <table border="1">
+        <tr><th>ID</th><th>Name</th><th>Department</th><th>Actions</th></tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td><a href="/user/{{ user.id }}">{{ user.name }}</a></td>
+            <td>{{ user.dept_name }}</td>
+            <td>
+                <a href="/user/{{ user.id }}">Edit</a>
+                <form action="/user/{{ user.id }}/delete" method="POST" style="display:inline" onsubmit="return confirm('Really delete?');">
+                    <input type="submit" value="Delete">
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p><a href="/add">Add New Employee</a></p>
+</body>
+</html>

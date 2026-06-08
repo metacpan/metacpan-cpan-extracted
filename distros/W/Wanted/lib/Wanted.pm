@@ -1,11 +1,12 @@
 ##----------------------------------------------------------------------------
 ## Wanted - ~/lib/Wanted.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2025/05/16
-## Modified 2025/05/24
+## Modified 2026/06/08
 ## All rights reserved
+## 
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
@@ -18,7 +19,7 @@ require DynaLoader;
 our @ISA = qw( Exporter DynaLoader );
 our @EXPORT = qw( want rreturn lnoreturn );
 our @EXPORT_OK = qw( context howmany wantref );
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.1.1';
 our $DEBUG;
 
 bootstrap Wanted $VERSION;
@@ -388,7 +389,7 @@ Also works in threads, where the context is set at thread creation.
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -1078,10 +1079,6 @@ B<Recommendation:> Be cautious when using C<want('CODE')> in scalar context with
 =head1 CREDITS
 
 Robin Houston, E<lt>robin@cpan.orgE<gt> wrote the original module L<Want> on which this is based.
-
-Grok from L<xAI|https://x.ai> for its contribution on some XS code, providing unit tests to tackle edge cases, and help resolving several bugs from the original L<Want> module.
-
-Albert (OpenAI) for its contribution on some XS code.
 
 =head1 AUTHOR
 

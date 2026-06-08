@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head><title>Step 21 - JOIN List</title></head>
+<body>
+    <h1>Employee List</h1>
+    <table border="1">
+        <tr><th>ID</th><th>Name</th><th>Department</th></tr>
+        {% for user in users %}
+        <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.name }}</td>
+            <td>{{ user.dept_name }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

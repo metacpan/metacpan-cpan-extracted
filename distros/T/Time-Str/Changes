@@ -1,3 +1,19 @@
+0.90 2026-06-07
+  - str2time now accepts a 'timezone' argument: an object with an
+    offset_for_local method used to resolve a parsed local time that
+    carries no UTC designator or numeric offset. A string offset
+    takes precedence; the object is DST-aware. Time::TZif and
+    Time::TZif::POSIX provide suitable objects.
+  - str2time now accepts a 'timezone_map' argument: a hash mapping
+    timezone abbreviations (e.g. CET, EST) to objects with an
+    offset_for_local method, used to resolve an abbreviation parsed
+    from the string. A map entry takes precedence over a bare
+    'timezone' object; an abbreviation absent from the map croaks.
+  - time2str now accepts a 'timezone' argument: an object with an
+    offset_for_utc method used to derive the offset for the given
+    instant (DST-aware), as an alternative to a fixed 'offset'. The
+    two are mutually exclusive.
+
 0.89 2026-06-02
   - str2time now folds a leap second (23:59:60) onto 23:59:59
     instead of rolling it over to the next day's 00:00:00, and

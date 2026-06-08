@@ -3,9 +3,11 @@
 use strict;
 use warnings;
 
-our $VERSION = 'v3.9.0'; # Check https://beyondgrep.com/ for updates
+our $VERSION = 'v3.10.0'; # Check https://beyondgrep.com/ for updates
 
 use 5.010001;
+
+no re 'eval'; # Enforce default and block -Mre=eval to block RCE security problem.
 
 use File::Spec ();
 use File::Next ();
@@ -297,6 +299,13 @@ MAIN: {
 
 exit 0;
 
+# Sanitize a filename for display: replace control chars with '?'
+sub _safe_filename {
+    my $s = shift;
+    $s =~ s/[^\x20-\x7E\t]/?/g;
+    return $s;
+}
+
 
 sub file_loop_fg {
     my $files = shift;
@@ -307,10 +316,10 @@ sub file_loop_fg {
             App::Ack::show_types( $file );
         }
         elsif ( $opt_g ) {
-            print_line_with_options( undef, $file->name, 0, $App::Ack::ors );
+            print_line_with_options( undef, _safe_filename( $file->name ), 0, $App::Ack::ors );
         }
         else {
-            App::Ack::say( $file->name );
+            App::Ack::say( _safe_filename( $file->name ) );
         }
         ++$nmatches;
         last if defined($opt_m) && ($nmatches >= $opt_m);
@@ -615,7 +624,7 @@ sub file_loop_normal {
 sub print_matches_in_file {
     my $file = shift;
 
-    my $filename  = $file->name;
+    my $filename = _safe_filename($file->name);
 
     my $fh = $file->open;
     if ( !$fh ) {
@@ -2002,8 +2011,8 @@ There are four different colors ack uses:
 
     Aspect      Option              Env. variable       Default
     --------    -----------------   ------------------  ---------------
-    filename    --color-filename    ACK_COLOR_FILENAME  black on_yellow
-    match       --color-match       ACK_COLOR_MATCH     bold green
+    filename    --color-filename    ACK_COLOR_FILENAME  bold green
+    match       --color-match       ACK_COLOR_MATCH     black on_yellow
     line no.    --color-lineno      ACK_COLOR_LINENO    bold yellow
     column no.  --color-colno       ACK_COLOR_COLNO     bold yellow
 
@@ -2395,6 +2404,7 @@ mailing list.
 How appropriate to have I<ack>nowledgements!
 
 Thanks to everyone who has contributed to ack in any way, including
+Dmitri Vereshchagin,
 Geraint Edwards,
 Loren Howard,
 Yaroslav Halchenko,
@@ -2531,7 +2541,7 @@ Andy Lester, C<< <andy at petdance.com> >>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2005-2025 Andy Lester.
+Copyright 2005-2026 Andy Lester.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the Artistic License v2.0.

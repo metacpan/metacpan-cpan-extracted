@@ -2,6 +2,7 @@
 #include "EXTERN.h"
 #include "perl.h"
 #include "XSUB.h"
+#include <limits.h>
 
 #include "tstr_param.h"
 #include "tstr_format.h"
@@ -117,10 +118,33 @@ static void load_regexps(pTHX_ my_cxt_t *cxt) {
   LEAVE;
 }
 
-/* Calls $timezone->offset_for_local($local) and returns the UTC offset
- * in seconds. The argument is a local time expressed as a pseudo-epoch
- * (seconds since the Unix epoch with no offset applied). */
-static int64_t tstr_offset_for_local(pTHX_ SV *obj, int64_t local) {
+static bool tstr_is_hashref(pTHX_ SV *sv) {
+  SvGETMAGIC(sv);
+  if (!SvROK(sv))
+    return false;
+  sv = SvRV(sv);
+  SvGETMAGIC(sv);
+  if (SvOBJECT(sv))
+    return false;
+  return SvTYPE(sv) == SVt_PVHV;
+}
+
+static bool tstr_fetch_method(pTHX_ SV *sv, const char *name, GV **method) {
+  SvGETMAGIC(sv);
+  if (!SvROK(sv))
+    return false;
+  sv = SvRV(sv);
+  SvGETMAGIC(sv);
+  if (!SvOBJECT(sv))
+    return false;
+
+  HV *stash = SvSTASH(sv);
+  if ((*method = gv_fetchmethod_autoload (stash, name, 0)))
+    return true;
+  return false;
+}
+
+static int64_t tstr_call_offset_method(pTHX_ SV *obj, GV *method, int64_t value) {
   dSP;
   int count;
   int64_t offset;
@@ -132,14 +156,14 @@ static int64_t tstr_offset_for_local(pTHX_ SV *obj, int64_t local) {
   PUSHMARK(SP);
   EXTEND(SP, 2);
   PUSHs(obj);
-  mPUSHs(newSVi64v(local));
+  mPUSHs(newSVi64v(value));
+
   PUTBACK;
-
-  count = call_method("offset_for_local", G_SCALAR);
-
+  count = call_sv((SV *)GvCV(method), G_SCALAR);
   SPAGAIN;
+
   if (count != 1)
-    croak("panic: offset_for_local returned %d values", count);
+    croak("panic: method returned %d values", count);
   ret = POPs;
   offset = SvIV(ret);
   PUTBACK;
@@ -180,11 +204,13 @@ time2str(...)
   PREINIT:
     dXSTARG;
     int64_t epoch;
-    int offset = 0;
+    int offset = INT_MAX;
     int nanosecond = -1;
     int precision = -1;
     tstr_format_t fmt = TSTR_FORMAT_RFC3339;
     tstr_datetime_t dt;
+    GV *method = NULL;
+    SV *timezone = NULL;
     int i;
   PPCODE:
     if (items < 1 || !(items & 1))
@@ -206,12 +232,21 @@ time2str(...)
           break;
         case TSTR_PARAM_OFFSET:
           offset = tstr_sv_offset(aTHX_ val);
+          if (timezone)
+            croak("Parameter 'offset' is mutually exclusive with 'timezone'");
           break;
         case TSTR_PARAM_PRECISION:
           precision = tstr_sv_precision(aTHX_ val);
           break;
         case TSTR_PARAM_NANOSECOND:
           nanosecond = tstr_sv_nanosecond(aTHX_ val);
+          break;
+        case TSTR_PARAM_TIMEZONE:
+          if (!tstr_fetch_method(aTHX_ val, "offset_for_utc", &method))
+            croak("Parameter 'timezone' is not an object with an 'offset_for_utc' method");
+          if (offset != INT_MAX)
+            croak("Parameter 'timezone' is mutually exclusive with 'offset'");
+          timezone = val;
           break;
         default:
           croak("Unrecognised named parameter: '%"SVf"'", ST(i));
@@ -240,6 +275,11 @@ time2str(...)
 
     if (nanosecond < 0)
       nanosecond = 0;
+
+    if (timezone)
+      offset = tstr_call_offset_method(aTHX_ timezone, method, epoch) / 60;
+    else if (offset == INT_MAX)
+      offset = 0;
 
     if (offset) {
       int64_t local = epoch + (int64_t)offset * 60;
@@ -272,7 +312,9 @@ str2time(...)
     tstr_format_t fmt = TSTR_FORMAT_RFC3339;
     int pivot_year = -1;
     int precision = -1;
+    GV *method;
     SV *timezone = NULL;
+    HV *timezone_map = NULL;
     tstr_parsed_t parsed;
     int i;
   PPCODE:
@@ -298,10 +340,14 @@ str2time(...)
           precision = tstr_sv_precision(aTHX_ val);
           break;
         case TSTR_PARAM_TIMEZONE:
-          if (!sv_isobject(val) ||
-              !gv_fetchmethod_autoload(SvSTASH(SvRV(val)), "offset_for_local", FALSE))
+          if (!tstr_fetch_method(aTHX_ val, "offset_for_local", &method))
             croak("Parameter 'timezone' is not an object with an 'offset_for_local' method");
           timezone = val;
+          break;
+        case TSTR_PARAM_TIMEZONE_MAP:
+          if (!tstr_is_hashref(aTHX_ val))
+            croak("Parameter 'timezone_map' is not a HASH reference");
+          timezone_map = (HV *)SvRV(val);
           break;
         default:
           croak("Unrecognised named parameter: '%"SVf"'", ST(i));
@@ -311,19 +357,37 @@ str2time(...)
     tstr_parse(aTHX_ ST(0), fmt, pivot_year,
                MY_CXT.regexps, &MY_CXT.keys, &parsed);
 
+    if (parsed.flags & TSTR_PARSED_HAS_TZ_ABBREV) {
+      SV **svp = NULL;
+      if (timezone_map)
+        svp = hv_fetch(timezone_map, parsed.tz_abbrev, (I32)parsed.tz_abbrev_len, 0);
+      if (timezone_map && svp) {
+        SV *obj = *svp;
+        if (!tstr_fetch_method(aTHX_ obj, "offset_for_local", &method))
+          tstr_croakf("timezone_map value for '%.*s' is not an object with an 'offset_for_local' method",
+                      (int)parsed.tz_abbrev_len, parsed.tz_abbrev);
+        timezone = obj;
+      }
+      else {
+        tstr_croakf("Unable to convert: cannot resolve abbreviated timezone '%.*s'", 
+                    (int)parsed.tz_abbrev_len, parsed.tz_abbrev);
+      }
+    }
+
     if (!(parsed.flags & TSTR_PARSED_HAS_OFFSET) && !timezone)
       tstr_croak("Unable to convert: timestamp string without a UTC designator or numeric offset");
 
-    /* A timezone object resolves an offset-less local time, but it cannot
-     * interpret a zone abbreviation in the string (which may name a
-     * different zone than the object). Reject rather than guess. */
-    if (timezone && (parsed.flags & TSTR_PARSED_HAS_TZ_ABBREV))
-      tstr_croak("Unable to convert: cannot resolve abbreviated timezone");
-
     {
+      int month = parsed.month;
+      int day = parsed.day;
       int hour = parsed.hour;
       int leap_second;
       int second;
+      
+      if (!(parsed.flags & TSTR_PARSED_HAS_MONTH))
+        month = 1;
+      if (!(parsed.flags & TSTR_PARSED_HAS_DAY))
+        day = 1;
 
       if (parsed.flags & TSTR_PARSED_HAS_MERIDIEM)
         hour = hour % 12 + parsed.meridiem;
@@ -336,7 +400,7 @@ str2time(...)
       leap_second = (parsed.second == 60);
       second      = parsed.second - leap_second;
 
-      uint32_t rdn = tstr_calendar_ymd_to_rdn(parsed.year, parsed.month, parsed.day);
+      uint32_t rdn = tstr_calendar_ymd_to_rdn(parsed.year, month, day);
       int64_t sod  = ((int64_t)hour * 60 + parsed.minute) * 60 + second;
       int64_t epoch = ((int64_t)rdn - TSTR_CALENDAR_RDN_UNIX_EPOCH) * 86400 + sod;
 
@@ -345,7 +409,7 @@ str2time(...)
       if (parsed.flags & TSTR_PARSED_HAS_OFFSET)
         epoch -= (int64_t)parsed.offset * 60;
       else
-        epoch -= tstr_offset_for_local(aTHX_ timezone, epoch);
+        epoch -= tstr_call_offset_method(aTHX_ timezone, method, epoch);
 
       if (leap_second) {
         switch (tstr_time_leap_check(epoch)) {

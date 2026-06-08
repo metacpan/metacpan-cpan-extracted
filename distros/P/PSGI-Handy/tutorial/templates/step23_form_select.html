@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head><title>Step 23 - Add with Select</title></head>
+<body>
+    <h1>Add Employee</h1>
+    <form action="/add" method="POST">
+        Name: <input type="text" name="name"><br>
+        Department:
+        <select name="dept_id">
+            {% for dept in depts %}
+            <option value="{{ dept.id }}">{{ dept.name }}</option>
+            {% endfor %}
+        </select><br>
+        <input type="submit" value="Save">
+    </form>
+</body>
+</html>

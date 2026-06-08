@@ -12,6 +12,7 @@ typedef enum {
   TSTR_PARAM_OFFSET,
   TSTR_PARAM_PIVOT_YEAR,
   TSTR_PARAM_TIMEZONE,
+  TSTR_PARAM_TIMEZONE_MAP,
 } tstr_param_t;
 
 static inline tstr_param_t tstr_param_from_string(const char* src, size_t len) {
@@ -35,6 +36,10 @@ static inline tstr_param_t tstr_param_from_string(const char* src, size_t len) {
         return TSTR_PARAM_NANOSECOND;
       if (!memcmp(src, "pivot_year", 10))
         return TSTR_PARAM_PIVOT_YEAR;
+      break;
+    case 12:
+      if (!memcmp(src, "timezone_map", 12))
+        return TSTR_PARAM_TIMEZONE_MAP;
       break;
   }
   return TSTR_PARAM_UNKNOWN;

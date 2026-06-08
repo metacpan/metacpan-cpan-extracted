@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head><title>Employee Form</title></head>
+<body>
+    <h1>Employee Form</h1>
+    <form action="{{ action }}" method="POST">
+        Name: <input type="text" name="name" value="{{ user.name }}"><br>
+        Department:
+        <select name="dept_id">
+            {% for dept in depts %}
+            <option value="{{ dept.id }}"{% if dept.id == user.dept_id %} selected{% endif %}>{{ dept.name }}</option>
+            {% endfor %}
+        </select><br>
+        <input type="submit" value="Save">
+    </form>
+    <p><a href="/">Cancel</a></p>
+</body>
+</html>

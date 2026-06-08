@@ -1,0 +1,83 @@
+{
+    "name" : "PSGI-Handy",
+    "version" : "0.01",
+    "abstract" : "a tiny dependency-free PSGI web framework for Perl 5.005_03+",
+    "author" : [
+        "ina <ina.cpan@gmail.com>"
+    ],
+    "dynamic_config" : 1,
+    "generated_by" : "pmake.bat version 0.36",
+    "license" : [
+        "perl_5"
+    ],
+    "meta-spec" : {
+        "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+        "version" : 2
+    },
+    "release_status" : "stable",
+    "resources" : {
+        "license" : [
+            "http://dev.perl.org/licenses/"
+        ],
+        "bugtracker" : {
+            "web" : "https://github.com/ina-cpan/PSGI-Handy/issues"
+        },
+        "repository" : {
+            "url"  : "https://github.com/ina-cpan/PSGI-Handy",
+            "web"  : "https://github.com/ina-cpan/PSGI-Handy",
+            "type" : "git"
+        }
+    },
+    "prereqs" : {
+        "build" : {
+            "requires" : {
+                "Carp" : "0",
+                "ExtUtils::MakeMaker" : "5.4302",
+                "perl" : "5.00503"
+            }
+        },
+        "configure" : {
+            "requires" : {
+                "Carp" : "0",
+                "ExtUtils::MakeMaker" : "5.4302",
+                "perl" : "5.00503"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+                "Carp" : "0",
+                "ExtUtils::MakeMaker" : "5.4302",
+                "perl" : "5.00503"
+            }
+        },
+        "test" : {
+            "requires" : {
+                "Carp" : "0",
+                "ExtUtils::MakeMaker" : "5.4302",
+                "perl" : "5.00503"
+            }
+        }
+    },
+    "provides" : {
+        "PSGI::Handy" : {
+            "file" : "lib/PSGI/Handy.pm",
+            "version" : "0.01"
+        },
+        "PSGI::Handy::Context" : {
+            "file" : "lib/PSGI/Handy.pm",
+            "version" : "0.01"
+        },
+        "PSGI::Handy::Request" : {
+            "file" : "lib/PSGI/Handy.pm",
+            "version" : "0.01"
+        },
+        "PSGI::Handy::Response" : {
+            "file" : "lib/PSGI/Handy.pm",
+            "version" : "0.01"
+        },
+        "PSGI::Handy::Router" : {
+            "file" : "lib/PSGI/Handy.pm",
+            "version" : "0.01"
+        }
+    }
+}

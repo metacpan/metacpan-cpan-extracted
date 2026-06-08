@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head><title>Step 13 - Index</title></head>
+<body>
+    <h1>User Index</h1>
+    <ul>
+        {% for user in users %}
+        <li><a href="/user/{{ user.id }}">{{ user.id }}: {{ user.name }}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

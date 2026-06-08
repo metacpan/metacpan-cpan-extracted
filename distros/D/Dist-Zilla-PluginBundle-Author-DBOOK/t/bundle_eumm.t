@@ -4,6 +4,7 @@ use Git::Wrapper;
 use Path::Tiny;
 use Test::More;
 use Test::DZil;
+use Test::File::ShareDir::Dist {'Dist-Zilla-PluginBundle-Author-DBOOK' => 'share'};
 
 eval { Git::Wrapper->new(Path::Tiny->cwd)->version; 1 } or plan skip_all => 'git is not available for testing';
 

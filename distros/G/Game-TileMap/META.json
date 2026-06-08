@@ -4,7 +4,7 @@
       "Bartosz Jarzyna <bbrtj.pro@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -26,9 +26,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Moo" : "2",
-            "Mooish::AttributeBuilder" : "1.002",
-            "perl" : "5.010"
+            "Mooish::Base" : "1.005",
+            "perl" : "5.010000"
          }
       }
    },
@@ -43,9 +42,9 @@
          "web" : "https://github.com/bbrtj/perl-game-tilemap"
       }
    },
-   "version" : "1.000",
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
+   "version" : "1.001",
+   "x_generated_by_perl" : "v5.42.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.39",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

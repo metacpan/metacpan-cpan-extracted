@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head><title>Step 19 - Edit User</title></head>
+<body>
+    <h1>Edit User</h1>
+    <form action="/user/{{ user.id }}/edit" method="POST">
+        ID: {{ user.id }}<br>
+        Name: <input type="text" name="name" value="{{ user.name }}"><br>
+        Age: <input type="text" name="age" value="{{ user.age }}"><br>
+        <input type="submit" value="Update">
+    </form>
+    <a href="/user/{{ user.id }}">Cancel</a>
+</body>
+</html>

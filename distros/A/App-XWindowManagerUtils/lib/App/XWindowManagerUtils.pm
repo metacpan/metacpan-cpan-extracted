@@ -9,9 +9,9 @@ use Exporter qw(import);
 use IPC::System::Options 'system', -log=>1;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-03-26'; # DATE
+our $DATE = '2026-03-27'; # DATE
 our $DIST = 'App-XWindowManagerUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our @EXPORT_OK = qw(
                        list_xwm_windows
@@ -37,6 +37,9 @@ $SPEC{list_xwm_windows} = {
             schema => 'bool*',
             cmdline_aliases => {l=>{}},
         },
+        with_kde_activity => {
+            schema => 'bool*',
+        },
     },
     deps => {
         prog => 'wmctrl',
@@ -44,6 +47,10 @@ $SPEC{list_xwm_windows} = {
 };
 sub list_xwm_windows {
     my %args = @_;
+
+    my $with_kde_activity = $args{with_kde_activity};
+    my $detail = $args{detail};
+    $detail //=1 if $with_kde_activity;
 
     my @rows;
     system({capture_stdout => \my $stdout}, "wmctrl", "-lpG");
@@ -117,6 +124,16 @@ sub list_xwm_windows {
             } # QUERY
         } # FILTER
 
+      GET_KDE_ACTIVITY: {
+            last unless $with_kde_activity;
+            my $res_get_act = get_xwm_window_kde_activity(id => $row->{id});
+            if ($res_get_act->[0] != 200) {
+                log_warn "Can't get KDE activity for window id %s: %d - %s", $row->{id}, $res_get_act->[0], $res_get_act->[1];
+                last;
+            }
+            $row->{kde_activity} = $res_get_act->[2];
+        }
+
         push @rows, $row;
     } # for line
 
@@ -125,6 +142,51 @@ sub list_xwm_windows {
     }
 
     [200, "OK", \@rows];
+}
+
+$SPEC{get_xwm_window_kde_activity} = {
+    v => 1.1,
+    summary => "Get the KDE activity GUID(s) of a specific window",
+    description => <<'MARKDOWN',
+
+A window can be displayed in more than one KDE activities, so this utility can
+return a comma-separated list of GUIDs.
+
+MARKDOWN
+    args => {
+        id => {
+            summary => 'Window ID, specified in hex form with 0x prefix, e.g. 0x05a0000e',
+            schema => ['str*'],
+            req => 1,
+            pos => 0,
+        },
+    },
+    deps => {
+        all => [
+            {prog => 'wmctrl'},
+            {prog => 'xprop'},
+        ],
+    },
+};
+sub get_xwm_window_kde_activity {
+    my %args = @_;
+
+    my $id = $args{id} or return [400, "Please specify id"];
+
+    system({capture_stdout => \my $stdout, capture_stderr => \my $stderr},
+           "xprop", "-id", $id, "_KDE_NET_WM_ACTIVITIES");
+    if ($?) {
+        if ($stderr =~ /BadWindow.*invalid Window parameter/) {
+            return [404, "No such window ID"];
+        } else {
+            return [500, "Can't successfully run xprop"];
+        }
+    } else {
+        # sample output: _KDE_NET_WM_ACTIVITIES(STRING) = "40eabb80-2103-48af-8977-23b6e06fbcc3"
+        my ($guid) = $stdout =~ /^_KDE_NET_WM_ACTIVITIES.+"([^"]+)"/;
+
+        return [200, "OK", $guid];
+    }
 }
 
 1;
@@ -142,7 +204,7 @@ App::XWindowManagerUtils - Utilities related to X Window Manager
 
 =head1 VERSION
 
-This document describes version 0.001 of App::XWindowManagerUtils (from Perl distribution App-XWindowManagerUtils), released on 2026-03-26.
+This document describes version 0.002 of App::XWindowManagerUtils (from Perl distribution App-XWindowManagerUtils), released on 2026-03-27.
 
 =head1 SYNOPSIS
 
@@ -152,11 +214,50 @@ This distribution includes several utilities related to X Window Manager:
 
 =over
 
+=item * L<get-xwm-window-kde-activity>
+
 =item * L<list-xwm-windows>
 
 =back
 
 =head1 FUNCTIONS
+
+
+=head2 get_xwm_window_kde_activity
+
+Usage:
+
+ get_xwm_window_kde_activity(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Get the KDE activity GUID(s) of a specific window.
+
+A window can be displayed in more than one KDE activities, so this utility can
+return a comma-separated list of GUIDs.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<id>* => I<str>
+
+Window ID, specified in hex form with 0x prefix, e.g. 0x05a0000e.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
 
 
 =head2 list_xwm_windows
@@ -178,6 +279,10 @@ Arguments ('*' denotes required arguments):
 (No description)
 
 =item * B<query> => I<array[str]>
+
+(No description)
+
+=item * B<with_kde_activity> => I<bool>
 
 (No description)
 

@@ -1,0 +1,284 @@
+======================================================================
+ PSGI::Handy Framework Cheat Sheet                  [JA] 日本語
+======================================================================
+
+[ 1. アプリの構築と起動 ]
+
+  use PSGI::Handy;
+
+  my $app = PSGI::Handy->new(
+      renderer  => \&renderer,   # 省略可: CODE($t,\%v) または render() を持つオブジェクト
+      db        => $dbh,         # 省略可: 任意のデータベースハンドル
+      config    => { title => 'Site' },  # 省略可: ハッシュリファレンス
+      not_found => \&not_found,  # 省略可: 404 ハンドラ ($c)
+  );
+
+  # ルートを登録 (すべて連鎖可能。ハンドラは $c を受け取る)。
+  $app->get   ('/',          \&home);
+  $app->post  ('/users',     \&create);
+  $app->put   ('/users/:id', \&replace);
+  $app->patch ('/users/:id', \&modify);
+  $app->del   ('/users/:id', \&remove);    # HTTP DELETE
+  $app->head  ('/health',    \&health);
+  $app->any   ('/ping',      \&ping);      # 主要メソッドすべて
+
+  # HTTP::Handy で配信 (accept ループでブロックする):
+  use HTTP::Handy;
+  HTTP::Handy->run(app => $app->to_app, host => '127.0.0.1', port => 8080);
+
+  # または PSGI アプリを取得して自分で呼び出す:
+  my $psgi = $app->to_app;        # sub { my $env = shift; ... }
+  my $out  = $psgi->($env);       # [ $status, \@headers, \@body ]
+
+[ 2. ルーティングパターン ]
+
+  '/users'          リテラル区間 (ドットはワイルドカードではない; quotemeta)
+  '/users/:id'      名前付きパラメータ; :name は [^/]+ に一致 (スラッシュ不可)
+  '/files/*'        末尾スプラット; スラッシュを含む残り全部に一致し、
+                    名前 'splat' で取得できる
+
+  # 照合規則:
+  #   完全一致をアンカー (\A ... \z)
+  #   末尾スラッシュは有意           ('/x' と '/x/' は別)
+  #   最初に登録された一致ルートが勝つ
+  #   メソッドは大文字に正規化される
+  #   パスは一致しメソッド不一致  -> 405 (Allow ヘッダ付き)
+  #   どのルートにも不一致        -> 404 (または not_found ハンドラ)
+  #   HEAD ルートが無い HEAD は GET ルートにフォールバック
+
+  $c->param('id')      # /users/:id で取得した値
+  $c->param('splat')   # 末尾 * で取得した値
+
+  # HTTP::Handy 経由では GET と POST のみ到達する。他のメソッドは
+  # それらを送る任意の PSGI サーバ下で to_app から到達可能。
+
+[ 3. コンテキストオブジェクト ($c) ]
+
+  すべてのハンドラは $handler->($c) として呼ばれ、Response オブジェクト、
+  生の PSGI 配列リファレンス、または平文字列 (HTML 200 になる) を返す。
+
+  $c->req                 # PSGI::Handy::Request   (セクション 4)
+  $c->app                 # PSGI::Handy アプリケーション
+  $c->params              # すべての経路パラメータ (ハッシュリファレンス)
+  $c->param('id')         # 単一値; 経路パラメータが query/body より優先
+  $c->db                  # 注入されたDBハンドル (セクション 8)
+  $c->config              # 設定ハッシュリファレンス全体
+  $c->config('title')     # 設定の単一値
+  $c->stash               # リクエスト毎の作業用ハッシュリファレンス
+  $c->stash('user')       # スタッシュの単一値
+  $c->stash(user => $u)   # 値を設定; $c を返す
+
+  # レスポンスの近道 (Response を返す。セクション 5):
+  $c->html($html [, $code])      $c->text($txt  [, $code])
+  $c->json($json [, $code])      $c->redirect($url [, $code])
+  $c->res(status => , type => , body => )
+  $c->render($template, \%vars)          # セクション 7
+
+[ 4. リクエストの読み取り ($c->req) ]
+
+  my $r = $c->req;
+  $r->method            # 'GET', 'POST', ...
+  $r->path              # PATH_INFO (例: '/users/42')
+  $r->query_string      # 生の QUERY_STRING
+  $r->content_type      # リクエストの Content-Type
+  $r->content_length    # リクエストの Content-Length
+  $r->env               # 元の PSGI %env (ハッシュリファレンス)
+
+  # 名前でヘッダ取得 (大文字小文字・書式を問わない):
+  $r->header('Content-Type')      # $r->content_type と同じ
+
+  # パラメータ (クエリ文字列と urlencoded ボディをマージ):
+  $r->param('name')       # 最初の値、なければ undef
+  $r->param_all('tag')    # すべての値をリストで
+  $r->param_names         # すべてのパラメータ名
+  $r->params              # { name => first_value, ... } (ハッシュリファレンス)
+
+  # 生ボディとクッキー:
+  $r->body                # 生のリクエストボディ (一度読みキャッシュ)
+  $r->cookie('sid')       # 単一クッキー値
+  $r->cookies             # { name => value, ... } (ハッシュリファレンス)
+
+[ 5. レスポンスの構築 ]
+
+  # クラスの近道 (セクション 3 の $c->... からも到達可能):
+  PSGI::Handy::Response->html($str [, $code])      # text/html;  utf-8
+  PSGI::Handy::Response->text($str [, $code])      # text/plain; utf-8
+  PSGI::Handy::Response->json($str [, $code])      # application/json
+  PSGI::Handy::Response->redirect($url [, $code])  # 302 + Location
+  PSGI::Handy::Response->new(status => 200, type => ..., body => ...)
+
+  # 連鎖可能なミューテータ (各々 Response を返す):
+  $res->set_status(201)
+  $res->set_body('...')                   # スカラーまたは配列リファレンス
+  $res->content_type('text/csv')
+  $res->header('X-Trace', 'abc')          # 追加 (重複を許容)
+  $res->set_header('X-Trace', 'abc')      # 既存ヘッダを置換
+  $res->remove_header('X-Trace')
+  $res->cookie('sid', $value, %opts)      # セクション 6
+
+  # 読み取り専用アクセサ:
+  $res->status            $res->body
+
+  # PSGI 3要素を生成 (未設定時は Content-Length を自動付与):
+  my $psgi = $res->finalize;    # [ $status, \@headers, \@body ]
+
+  # json() はエンコードしない。エンコード済み JSON 文字列を渡すこと
+  # (例: mb::JSON で生成)。
+
+[ 6. クッキー ]
+
+  # レスポンスにクッキーを設定:
+  $res->cookie('sid', 'abc123',
+      path     => '/',            # Path=
+      domain   => '.example.com', # Domain=
+      max_age  => 3600,           # Max-Age=
+      expires  => $http_date,     # Expires=
+      secure   => 1,              # '; Secure' を付与
+      httponly => 1,              # '; HttpOnly' を付与
+  );
+
+  # リクエストからクッキーを読む:
+  my $sid = $c->req->cookie('sid');
+  my $all = $c->req->cookies;     # { name => value, ... }
+
+[ 7. テンプレートの描画 ]
+
+  # new() に renderer を注入する。次のいずれか:
+  #   CODE リファレンス:  $renderer->($template, \%vars) -> 文字列
+  #   render() メソッドを持つオブジェクト  $obj->render($template, \%vars)
+
+  # HP::Handy は render_string/render_file を持つ (素の render() は無い)。
+  # 名前からソースを引く CODE renderer で橋渡しする:
+  use HP::Handy;
+  my $hp   = HP::Handy->new(auto_escape => 1);
+  my %tpl  = ('hello.html' => 'Hello {{ name }}!');
+  my $renderer = sub {
+      my ($name, $vars) = @_;
+      return $hp->render_string($tpl{$name}, $vars);
+  };
+  my $app  = PSGI::Handy->new(renderer => $renderer);
+
+  $app->get('/hi/:name', sub {
+      my $c = shift;
+      return $c->render('hello.html', { name => $c->param('name') });
+  });
+
+  # render() は stash と \%vars をマージ (vars 優先) し HTML レスポンスを
+  # 返す。renderer 未設定なら die する (DIAGNOSTICS 参照)。
+
+[ 8. データベースアクセス ($c->db) ]
+
+  # db => ... に渡した値は $c->db でそのまま返る。
+  # DB::Handy では位置引数で connect する:
+  use DB::Handy;
+  my $dbh = DB::Handy->connect($base_dir, 'memo',
+                               { RaiseError => 0, PrintError => 0 });
+  my $app = PSGI::Handy->new(db => $dbh);
+
+  $dbh->do('CREATE TABLE memo (id INT, body VARCHAR(200))');
+
+  $app->get('/', sub {
+      my $c   = shift;
+      my $sth = $c->db->prepare('SELECT id, body FROM memo ORDER BY id');
+      $sth->execute();
+      my @rows;
+      my $row;
+      while ($row = $sth->fetchrow_hashref()) { push @rows, $row; }
+      $sth->finish;
+      return $c->json(...);   # @rows は自分でエンコード (例: mb::JSON)
+  });
+
+  $app->post('/add', sub {
+      my $c   = shift;
+      my $ins = $c->db->prepare('INSERT INTO memo (id, body) VALUES (?, ?)');
+      $ins->execute($id, $c->param('body'));
+      $ins->finish;
+      return $c->redirect('/');
+  });
+
+  # DB::Handy の注意:
+  #   DSN 'dbi:Handy:dbname=X' はDBを選択しない。base_dir と db 名を
+  #     位置引数で渡すこと。
+  #   列の型: INT FLOAT CHAR VARCHAR DATE のみ
+  #     (INTEGER / NUMERIC は "Unknown type" になる)。
+
+[ 9. フック (before / after) ]
+
+  # before($c): リファレンス (Response か PSGI 配列リファレンス) を返すと
+  #             リクエストを短絡する。何も返さなければ続行。
+  $app->before(sub {
+      my $c = shift;
+      return $c->redirect('/login') unless logged_in($c);
+      return;     # 一致したハンドラへ進む
+  });
+
+  # after($c, $out): 値を返すと出力を置換。何も返さなければそのまま。
+  $app->after(sub {
+      my ($c, $out) = @_;
+      return $out;
+  });
+
+  # フックは登録順に実行。ハンドラ内の die() は捕捉され 500 レスポンス
+  # となり psgi.errors に記録される。
+
+[ 10. 設定とスタッシュ ]
+
+  # Config: すべてのリクエストで共有される読み取り専用データ。
+  my $app = PSGI::Handy->new(
+      config => { title => 'Site', per_page => 20 });
+  $c->config;             # ハッシュリファレンス全体
+  $c->config('title');    # 単一値
+
+  # Stash: リクエスト毎の作業領域。フックと render の間で便利。
+  $app->before(sub { my $c = shift; $c->stash(now => time()); return });
+  $app->get('/', sub {
+      my $c = shift;
+      return $c->render('home.html', { extra => 1 });  # 'now' も見える
+  });
+
+[ 11. 三層構成の完全な例 ]
+
+  use HTTP::Handy;    # 配信層
+  use HP::Handy;      # 表示層
+  use DB::Handy;      # モデル層
+  use PSGI::Handy;   # フレームワーク
+
+  my $hp  = HP::Handy->new(auto_escape => 1);
+  my %tpl = ('list.html' =>
+      '<ul>{% for u in users %}<li>{{ u.name }}</li>{% endfor %}</ul>');
+
+  my $dbh = DB::Handy->connect($dir, 'app',
+                               { RaiseError => 0, PrintError => 0 });
+
+  my $app = PSGI::Handy->new(
+      renderer => sub { $hp->render_string($tpl{$_[0]}, $_[1]) },
+      db       => $dbh,
+  );
+
+  $app->get('/users', sub {
+      my $c   = shift;
+      my $sth = $c->db->prepare('SELECT name FROM users ORDER BY name');
+      $sth->execute();
+      my @users;
+      my $row;
+      while ($row = $sth->fetchrow_hashref()) { push @users, $row; }
+      $sth->finish;
+      return $c->render('list.html', { users => [ @users ] });
+  });
+
+  HTTP::Handy->run(app => $app->to_app, host => '127.0.0.1', port => 8080);
+
+[ 12. 公式資料リンク ]
+
+  PSGI::Handy (MetaCPAN):
+    https://metacpan.org/dist/PSGI-Handy
+
+  Handy スタックの他のモジュール:
+    https://metacpan.org/dist/HTTP-Handy
+    https://metacpan.org/dist/HP-Handy
+    https://metacpan.org/dist/DB-Handy
+
+  PSGI 仕様書:
+    https://github.com/plack/psgi-specs/blob/master/PSGI.pod
+
+======================================================================

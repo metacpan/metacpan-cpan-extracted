@@ -39,7 +39,7 @@ no_index:
 provides:
   HTTP::Tiny:
     file: lib/HTTP/Tiny.pm
-    version: '0.094'
+    version: '0.096'
 recommends:
   HTTP::CookieJar: '0.001'
   IO::Socket::IP: '0.32'
@@ -61,7 +61,7 @@ resources:
   bugtracker: https://github.com/Perl-Toolchain-Gang/HTTP-Tiny/issues
   homepage: https://github.com/Perl-Toolchain-Gang/HTTP-Tiny
   repository: https://github.com/Perl-Toolchain-Gang/HTTP-Tiny.git
-version: '0.094'
+version: '0.096'
 x_authority: cpan:DAGOLDEN
 x_contributors:
   - 'Alan Gardner <gardner@pythian.com>'

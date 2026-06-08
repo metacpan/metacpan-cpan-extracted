@@ -4,7 +4,7 @@ require 5.010;
 use strict;
 use feature 'say';
 package Stats::LikeR;
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 require XSLoader;
 use Devel::Confess 'color';
 use warnings FATAL => 'all';
@@ -119,36 +119,30 @@ sub read_table {
 	die "\"$file\" is not a file" unless -f $file;
 	die "\"$file\" is not readable" unless -r $file;
 
-	# 1. Parse the incoming arguments into a temporary hash
 	my %input_args = @_;
-
-	# 2. Handle 'delim' as a synonym for 'sep'
 	if (defined $input_args{delim}) {
 	  $input_args{sep} = delete $input_args{delim};
 	}
 
-	# 3. Determine the default separator based on the file extension
-	my $default_sep = ','; # fallback default
+	my $default_sep = ',';
 	if ($file =~ /\.tsv$/i) {
 	  $default_sep = "\t";
 	} elsif ($file =~ /\.csv$/i) {
 	  $default_sep = ",";
 	}
 
-	# 4. Merge defaults with user inputs (user inputs override defaults)
 	my %args = (
 	  sep     => $default_sep,
 	  comment => '#',
 	  %input_args,
 	);
 
-	# 5. Define allowed arguments (including 'delim' since it can be passed in)
 	my %allowed_args = map {$_ => 1} (
 	  'comment', 'output.type', 'filter', 'row.names', 'sep', 'delim'
 	);
 	my @undef_args = sort grep {!$allowed_args{$_}} keys %args;
-	my $current_sub = (split(/::/,(caller(0))[3]))[-1];
 	if (scalar @undef_args > 0) {
+		my $current_sub = (split(/::/,(caller(0))[3]))[-1]; # only needed on the error path
 		say join (', ', @undef_args);
 		die "the above args aren't defined for $current_sub";
 	}
@@ -156,35 +150,35 @@ sub read_table {
 	if ($args{'output.type'} !~ m/^(?:aoh|hoa|hoh)$/) {
 		die "\"$args{'output.type'}\" isn't allowed";
 	}
-	# Normalize the filter argument
 	my $filter = $args{filter};
 	if (defined $filter && ref($filter) eq 'CODE') {
-		$filter = { 0 => $filter }; # 0 means the whole row
+		$filter = { 0 => $filter };
 	} elsif (defined $filter && ref($filter) ne 'HASH') {
 		die "'filter' must be a CODE or HASH reference";
 	}
-	my (@data, %data, @header, %mapped_filters);
-	# Execute the fast C-state machine. Pass an anonymous coderef to process streams.
-	# This bypasses creating an intermediate AoA memory spike.
+	my (@data, %data, @header, %mapped_filters, @sorted_filter_flds, %seen_rownames);
 	_parse_csv_file($file, $args{sep} // '', $args{comment} // '', sub {
 		my ($line_ref) = @_;
-		my @line = @$line_ref;
 		if (!@header) {
-			# --- HEADER PROCESSING ---
+			# --- HEADER PROCESSING (copy made only here; runs once) ---
+			my @line = @$line_ref;
 			$line[0] =~ s/^\Q$args{comment}\E// if @line && defined $line[0];
-			while (@line && $line[-1] eq '') { pop @line }
-			@header = @line; 
-			# R-LIKE BEHAVIOR
+			# NOTE: trailing-empty stripping removed — the header is now treated like
+			# data rows, so a consistent trailing separator no longer produces a false
+			# "Alignment error". The alignment check still rejects genuinely ragged rows.
+			@header = @line;
 			if ((scalar @header > 0) && ($header[0] eq '')) {
-				$header[0] = 'row_name'; 
+				$header[0] = 'row_name';
 			}
+			my %seen_h;
+			my @dup_cols = grep { $seen_h{$_}++ } @header;
+			warn "read_table: duplicate column name(s) in $file: @dup_cols (later values win)\n" if @dup_cols;
 			if (($args{'output.type'} eq 'hoh') && (not defined $args{'row.names'})) {
 				$args{'row.names'} = $header[0];
 			}
 			if ((defined $args{'row.names'}) && (!grep {$_ eq $args{'row.names'}} @header)) {
 				die "\"$args{'row.names'}\" isn't in the header of $file";
 			}
-			# Map filters to 1-based indices (or 0 for whole row)
 			if ($filter) {
 				for my $k (keys %$filter) {
 					if ($k =~ /^\d+$/) {
@@ -195,67 +189,51 @@ sub read_table {
 						$mapped_filters{$idx + 1} = $filter->{$k};
 					}
 				}
+				@sorted_filter_flds = sort { $a <=> $b } keys %mapped_filters; # constant per file
 			}
-			return; # Equivalent to 'next' out of the closure
+			return;
 		}
-		# Check for column alignment
-		if (scalar @line != scalar @header) {
-			die "Alignment error on $file (" . scalar(@line) . " fields vs " . scalar(@header) . " headers).";
+		# --- DATA PROCESSING (operate on $line_ref directly; no per-row array copy) ---
+		if (scalar @$line_ref != scalar @header) {
+			die "Alignment error on $file (" . scalar(@$line_ref) . " fields vs " . scalar(@header) . " headers).";
 		}
-		# --- DATA PROCESSING ---
 		my %line_hash;
 		for my $i (0 .. $#header) {
-			if (!defined($line[$i]) || $line[$i] eq '') {
-         	$line_hash{$header[$i]} = 'NA';
-         } else {
-         	$line_hash{$header[$i]} = $line[$i];
-         }
+			my $v = $line_ref->[$i];
+			$line_hash{$header[$i]} = (!defined($v) || $v eq '') ? 'NA' : $v;
 		}
 		# --- APPLY FILTERS ---
-		my $skip = 0;
-		if (%mapped_filters) {
-			foreach my $fld (sort { $a <=> $b } keys %mapped_filters) {
-				local %_ = %line_hash; # Make %_ available to the callback
-				local $_ = $fld == 0 ? $line_ref : $line[$fld - 1]; # Localize $_
-
-				my $keep = $mapped_filters{$fld}->($line_ref, \%line_hash);
-				if (!$keep) {
-					$skip = 1;
-					last;
-				}
-
-				# If the callback modified $_, write the mutation back to the data
-				if ($fld > 0) {
-					$line[$fld - 1] = $_;
+		if (@sorted_filter_flds) {
+			local %_ = %line_hash; # row available as %_; set once per row, not per field
+			my $skip = 0;
+			foreach my $fld (@sorted_filter_flds) {
+				local $_ = $fld == 0 ? $line_ref : $line_ref->[$fld - 1];
+				if (!$mapped_filters{$fld}->($line_ref, \%line_hash)) { $skip = 1; last; }
+				if ($fld > 0) { # write back any mutation the callback made to $_
+					$line_ref->[$fld - 1] = $_;
 					$line_hash{$header[$fld - 1]} = (defined($_) && $_ eq '') ? 'NA' : $_;
 				}
 			}
+			return if $skip;
 		}
-		return if $skip; # Reject the row if it failed the filter, skipping memory allocation
-
 		# Populate requested data structure
 		if ($args{'output.type'} eq 'aoh') {
 			push @data, \%line_hash;
 		} elsif ($args{'output.type'} eq 'hoa') {
-			foreach my $col (@header) {
-				push @{ $data{$col} }, $line_hash{$col};
-			}
+			push @{ $data{$_} }, $line_hash{$_} for @header;
 		} elsif ($args{'output.type'} eq 'hoh') {
 			my $row_name = $line_hash{$args{'row.names'}};
+			warn "read_table: duplicate row name '$row_name' in $file (later values win)\n"
+				if $seen_rownames{$row_name}++;
 			foreach my $col (@header) {
 				next if $col eq $args{'row.names'};
 				$data{$row_name}{$col} = $line_hash{$col};
 			}
 		}
 	});
-	@header = ();
-	%mapped_filters = ();
 	if ($args{'output.type'} eq 'aoh') {
-		undef %data;
-		my $final_ref = \@data;
-		return $final_ref;
-	} elsif ($args{'output.type'} =~ m/^(?:hoa|hoh)$/) {
-		@data = ();
+		return \@data;
+	} else { # hoa or hoh
 		return \%data;
 	}
 }
@@ -2007,7 +1985,7 @@ I've tried to make this as simple as possible, trying to follow from R:
 <tr>
   <td><code>comment</code></td>
   <td>Comment character, by default <code>#</code></td>
-  <td><code>comment = %</code> or whatever</td>
+  <td><code>comment => %</code> or whatever; does not apply with header</td>
 </tr>
 <tr>
   <td><code>output.type</code></td>
@@ -2527,6 +2505,21 @@ Args can also be accepted:
  write_table( 'data' => \%flat, 'file' => $f );
 
 =head1 changes
+
+=head2 0.13
+
+C<read_table>: speed improvements; commented headers are now allowed
+
+C<write_table>: fix for 
+
+ Attempt to free temp prematurely: SV 0x56417a2ae610 at t/write_table.t line 182.
+     main::wrote_ok(",age\x{a}Alice,30\x{a}Bob,25\x{a}", "row.names => 'name' uses that column as labels", HASH(0x56417a272250), "row.names", "name") called at t/write_table.t line 203
+ Attempt to free unreferenced scalar: SV 0x56417a2ae610 at t/write_table.t line 183.
+     main::wrote_ok(",age\x{a}Alice,30\x{a}Bob,25\x{a}", "row.names => 'name' uses that column as labels", HASH(0x56417a272250), "row.names", "name") called at t/write_table.t line 203
+
+C<write_table> gives better warnings for incorrect types of data given
+
+Numerous changes to dist.ini to improve CPAN testing, especially for Win32
 
 =head2 0.12
 

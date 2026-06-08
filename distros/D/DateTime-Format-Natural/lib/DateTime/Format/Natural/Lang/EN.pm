@@ -14,7 +14,7 @@ use constant milli_to_nano => 1_000_000;
 
 use DateTime::Format::Natural::Helpers qw(%flag);
 
-our $VERSION = '1.77';
+our $VERSION = '1.78';
 
 our (%init,
      %timespan,
@@ -249,7 +249,6 @@ $regexes{format} = qr/^$regexes{format_}(?:(?=\s)|$)/;
 
         my $fail_message = sub { "letter suffix should be '$_[0]'" };
 
-        local $1;
         if ($numeral == 0) {
             unless ($suffix eq 'th') {
                 $$error = $fail_message->('th');

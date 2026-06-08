@@ -8,11 +8,12 @@ use DateTime ();
 
 our ($VERSION, $Pure);
 
-$VERSION = '0.07';
+$VERSION = '0.08';
 
 BEGIN
 {
-    if (eval "require Date::Calc") {
+    if (eval {
+        require Date::Calc;
         Date::Calc->import(qw(
             Add_Delta_Days
             Day_of_Week
@@ -23,6 +24,8 @@ BEGIN
             check_date
             check_time
         ));
+        1;
+    }) {
         $Pure = false;
     }
     else {

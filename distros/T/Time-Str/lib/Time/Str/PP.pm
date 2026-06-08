@@ -10,8 +10,19 @@ our @EXPORT_OK = qw[ time2str
 our @CARP_NOT  = qw[ Time::Str::PP::Calendar
                      Time::Str::PP::Token ];
 
-use Carp     qw[croak];
-use Exporter qw[import];
+use Carp              qw[croak];
+use Exporter          qw[import];
+use Time::Str::Regexp qw[];
+
+BEGIN {
+  if ($^V ge v5.40) {
+    builtin->import(qw(floor blessed));
+  }
+  else {
+    require Scalar::Util; Scalar::Util->import(qw(blessed));
+    require POSIX; POSIX->import(qw(floor));
+  }
+}
 
 {
   package
@@ -527,23 +538,6 @@ use Exporter qw[import];
     return $lo;
   }
 
-  sub range_bounds {
-    @_ == 3 or croak q/Usage: range_bounds(array, min_value, max_value)/;
-    my ($array, $min_value, $max_value) = @_;
-
-    ref $array eq 'ARRAY'
-      or croak q/Parameter 'array' must be an array reference/;
-    ($min_value <= $max_value)
-      or croak q/Parameter 'min_value' must not exceed 'max_value'/;
-
-    my $lo = lower_bound($array, $min_value);
-    my $hi = $lo;
-    while ($hi < @$array && $array->[$hi] <= $max_value) {
-      $hi++;
-    }
-    return ($lo, $hi);
-  }
-
   sub upper_bound {
     (@_ >= 2 && @_ <= 4) or croak q/Usage: upper_bound(array, value [, lo [, hi ]])/;
     my ($array, $value, $lo, $hi) = @_;
@@ -559,6 +553,23 @@ use Exporter qw[import];
       else                            { $hi = $mid     }
     }
     return $lo;
+  }
+
+  sub range_bounds {
+    @_ == 3 or croak q/Usage: range_bounds(array, min_value, max_value)/;
+    my ($array, $min_value, $max_value) = @_;
+
+    ref $array eq 'ARRAY'
+      or croak q/Parameter 'array' must be an array reference/;
+    ($min_value <= $max_value)
+      or croak q/Parameter 'min_value' must not exceed 'max_value'/;
+
+    my $lo = lower_bound($array, $min_value);
+    my $hi = $lo;
+    while ($hi < @$array && $array->[$hi] <= $max_value) {
+      $hi++;
+    }
+    return ($lo, $hi);
   }
 }
 
@@ -615,7 +626,6 @@ my %CanonicalFormatName = (
 my (%RegexpMap, $RFC2616_Rx, $RFC3339_Rx);
 
 BEGIN {
-  require Time::Str::Regexp;
   %RegexpMap = Time::Str::Regexp::mapping();
 
   $RFC2616_Rx = $RegexpMap{rfc2616};
@@ -767,20 +777,11 @@ sub str2date {
   return wantarray ? %r : \%r;
 }
 
-BEGIN {
-  if ($^V ge v5.40) {
-    builtin->import(qw(blessed));
-  }
-  else {
-    require Scalar::Util; Scalar::Util->import(qw(blessed));
-  }
-}
-
 sub str2time {
   @_ & 1 or croak q/Usage: str2time(string [, format => 'RFC3339' ])/;
   my ($string, %p) = @_;
 
-  my ($precision, $timezone);
+  my ($precision, $timezone, $timezone_map);
 
   if (exists $p{precision}) {
     $precision = delete $p{precision};
@@ -792,19 +793,33 @@ sub str2time {
     (blessed($timezone) && $timezone->can('offset_for_local'))
       or croak q/Parameter 'timezone' is not an object with an 'offset_for_local' method/;
   }
+  if (exists $p{timezone_map}) {
+    $timezone_map = delete $p{timezone_map};
+    (defined $timezone_map && ref $timezone_map eq 'HASH')
+      or croak q/Parameter 'timezone_map' is not a HASH reference/;
+  }
 
   my $r = str2date($string, %p);
+
+  if (exists $r->{tz_abbrev}) {
+    my $name = $r->{tz_abbrev};
+    if (defined $timezone_map && exists $timezone_map->{$name}) {
+      $timezone = $timezone_map->{$name};
+      (blessed $timezone && $timezone->can('offset_for_local'))
+        or croak qq/timezone_map value for '$name' is not an object with an 'offset_for_local' method/;
+    }
+    else {
+      croak qq/Unable to convert: cannot resolve abbreviated timezone '$name'/;
+    }
+  }
 
   (defined $timezone || exists $r->{tz_offset})
     or croak q/Unable to convert: timestamp string without a UTC designator or numeric offset/;
 
-  # A timezone object resolves an offset-less local time, but it cannot
-  # interpret a zone abbreviation in the string (which may name a
-  # different zone than the object). Reject rather than guess.
-  (!defined $timezone || !exists $r->{tz_abbrev})
-    or croak q/Unable to convert: cannot resolve abbreviated timezone/;
-
   my ($Y, $M, $D, $h, $m, $s) = @$r{qw(year month day hour minute second)};
+  $M //= 1;
+  $D //= 1;
+  $h //= 0;
   $m //= 0;
   $s //= 0;
 
@@ -832,17 +847,17 @@ sub str2time {
 
   if ($leap_second) {
     my $days = int($time / 86400);
-    my $usod = $time - $days * 86400;
-    if ($usod < 0) {
-      $usod += 86400;
+    $sod = $time - $days * 86400;
+    if ($sod < 0) {
+      $sod += 86400;
       $days--;
     }
 
-    ($usod == 86399)
+    ($sod == 86399)
       or croak q/Unable to convert: a leap second must occur at 23:59:60 UTC/;
 
-    my ($uy, $um, $ud) = rdn_to_ymd($days + 719163);
-    ($uy >= 1972 && (($um == 6 && $ud == 30) || ($um == 12 && $ud == 31)))
+    ($Y, $M, $D) = rdn_to_ymd($days + 719163);
+    ($Y >= 1972 && (($M == 6 && $D == 30) || ($M == 12 && $D == 31)))
       or croak q/Unable to convert: no leap second on this UTC date/;
   }
 
@@ -1081,48 +1096,50 @@ my %FormatMap = (
   x509       => \&format_RFC5280,
 );
 
-BEGIN {
-  if ($^V ge v5.40) {
-    builtin->import(qw(floor));
-  }
-  else {
-    require POSIX; POSIX->import(qw(floor));
-  }
-}
-
 use constant MIN_TIME => -62135596800; # 0001-01-01T00:00:00Z
 use constant MAX_TIME => 253402300799; # 9999-12-31T23:59:59Z
 
 sub time2str {
   @_ & 1 or croak(q/Usage: time2str(time [, format => 'RFC3339' ])/);
-  my ($time, %p) = @_;
+  my $time = shift;
 
   # Rejects NaN and Inf
   ($time >= MIN_TIME && $time < MAX_TIME + 1)
     or croak q/Parameter 'time' is out of range/;
 
-  my ($formatter, $offset, $precision, $nanosecond) = (\&format_RFC3339, 0);
+  my ($formatter, $timezone, $offset, $precision, $nanosecond) = (\&format_RFC3339);
 
-  while (my ($name, $v) = each %p) {
+  while (@_) {
+    my $name = shift;
     if ($name eq 'format') {
-      $formatter = $FormatMap{lc $v};
+      my $format = shift;
+      $formatter = $FormatMap{lc $format};
       (defined $formatter)
-        or croak qq/Parameter 'format' is unknown: '$v'/;
+        or croak qq/Parameter 'format' is unknown: '$format'/;
     }
     elsif ($name eq 'precision') {
-      $precision = $v;
+      $precision = shift;
       ($precision >= 0 && $precision <= 9)
         or croak q/Parameter 'precision' is out of range [0, 9]/;
     }
     elsif ($name eq 'nanosecond') {
-      $nanosecond = $v;
+      $nanosecond = shift;
       ($nanosecond >= 0 && $nanosecond <= 999_999_999)
         or croak q/Parameter 'nanosecond' is out of range [0, 999_999_999]/;
     }
+    elsif ($name eq 'timezone') {
+      $timezone = shift;
+      (blessed($timezone) && $timezone->can('offset_for_utc'))
+        or croak q/Parameter 'timezone' is not an object with an 'offset_for_utc' method/;
+      (!defined $offset)
+        or croak q/Parameter 'timezone' is mutually exclusive with 'offset'/;
+    }
     elsif ($name eq 'offset') {
-      $offset = $v;
+      $offset = shift;
       ($offset >= -1439 && $offset <= 1439)
         or croak q/Parameter 'offset' is out of range [-1439, 1439]/;
+      (!defined $timezone)
+        or croak q/Parameter 'offset' is mutually exclusive with 'timezone'/;
     }
     else {
       croak qq/Unrecognised named parameter: '$name'/;
@@ -1142,6 +1159,13 @@ sub time2str {
       $nanosecond -= NANOS_PER_SECOND;
       $time++;
     }
+  }
+
+  if (defined $timezone) {
+    $offset = int($timezone->offset_for_utc($time) / 60);
+  }
+  else {
+    $offset //= 0;
   }
 
   if ($offset) {

@@ -66,14 +66,14 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://gitlab.com/jackdeguest/Wanted/issues"
+         "web" : "https://gitlab.com/deguest/Wanted/issues"
       },
-      "homepage" : "https://gitlab.com/jackdeguest/Wanted",
+      "homepage" : "https://gitlab.com/deguest/Wanted",
       "repository" : {
          "type" : "git",
-         "web" : "https://gitlab.com/jackdeguest/Wanted"
+         "web" : "https://gitlab.com/deguest/Wanted"
       }
    },
-   "version" : "v0.1.0",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "v0.1.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

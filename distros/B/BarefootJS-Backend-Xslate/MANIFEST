@@ -1,0 +1,9 @@
+Changes
+cpanfile
+lib/BarefootJS/Backend/Xslate.pm
+LICENSE
+MANIFEST
+Makefile.PL
+t/render.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

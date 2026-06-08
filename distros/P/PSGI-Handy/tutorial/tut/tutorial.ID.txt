@@ -1,0 +1,233 @@
+======================================================================
+ PSGI::Handy Tutorial (tut/)
+ Panduan Tutorial                               [ID] Bahasa Indonesia
+======================================================================
+
+ tut/ adalah tutorial pengajaran resmi PSGI::Handy: kurikulum enam bab dan dua puluh empat langkah yang membangun aplikasi web dari nol tanpa kotak hitam, mulai dari respons HTTP paling sederhana hingga aplikasi CRUD lengkap. Setiap langkah adalah satu program Perl mandiri yang dapat dijalankan. Seluruh tumpukan berupa Perl murni dan tanpa dependensi: PSGI::Handy (kerangka), HTTP::Handy (server), HP::Handy (templat), dan DB::Handy (basis data).
+
+[ Cara menjalankan ]
+
+  Jalankan satu langkah pada satu waktu dari dalam direktori tut/, misalnya  perl 01_step01_text.pl  . Setiap program memulai server dan mencetak URL-nya; buka http://127.0.0.1:8080/ di peramban dan tekan Ctrl-C untuk berhenti. Direktori templates/ dan data.csv harus dapat dijangkau dari direktori saat ini, jadi selalu mulai program dari dalam tut/.
+
+[ Header umum ]
+
+  Setiap berkas .pl dibuka dengan header yang sama: use 5.00503; use strict; sebuah blok BEGIN kecil yang menyediakan stub warnings tanpa-aksi pada Perl lebih lama dari 5.6; lalu use warnings; local $^W = 1; . Program memakai filehandle bareword dan open dua argumen agar tetap sah hingga Perl 5.005_03. Header ini identik di setiap langkah dan tidak diulang di bawah.
+
+----------------------------------------------------------------------
+ Berkas akar
+----------------------------------------------------------------------
+
+  00_README.txt
+      Ikhtisar kurikulum: setiap bab dan langkah beserta tujuan belajarnya. Baca ini lebih dulu untuk melihat keseluruhan alur sebelum membuka program apa pun.
+
+  data.csv
+      Data contoh untuk Bab 4 (langkah CSV): tiga baris dipisah koma berformat id,name,age. Langkah 12, 14, dan 15 menulis ulang berkas ini, jadi simpan cadangan jika ingin mengembalikannya. 1,Alice,20 / 2,Bob,22 / 3,Charlie,25
+
+----------------------------------------------------------------------
+ Bab 1 — Dasar respons HTTP (dari statis ke dinamis)
+----------------------------------------------------------------------
+
+  Pertukaran paling sederhana antara peramban dan server, tanpa mesin templat, untuk memahami bentuk sebuah respons HTTP.
+
+  01_step01_text.pl
+      Mengembalikan teks polos '.' untuk GET / lewat $c->text(). Aplikasi terkecil: peramban menerima karakter mentah (text/plain).
+
+  01_step02_html.pl
+      Mengembalikan '<a>.' sebagai text/html lewat $c->html(). Byte yang sama dengan Langkah 1, tetapi Content-Type memberi tahu peramban untuk memperlakukannya sebagai markup. Menunjukkan perbedaan teks vs HTML.
+
+  01_step03_dyn_text.pl
+      Mengembalikan waktu saat ini sebagai teks polos, dibaca ulang pada tiap permintaan dengan scalar localtime(). Cicipan pertama keluaran dinamis: respons berubah setiap kali.
+
+  01_step04_dyn_html.pl
+      Membungkus waktu dinamis dalam markup <h1>/<p> dan mengembalikannya sebagai HTML. Membangun layar dengan merangkai string dari variabel.
+
+----------------------------------------------------------------------
+ Bab 2 — Masukan pengguna dan keadaan (formulir dan percabangan)
+----------------------------------------------------------------------
+
+  Mengirim data dari peramban ke server, dan bercabang berdasarkan apa yang tiba.
+
+  02_step05_form.pl
+      GET / menampilkan formulir HTML (kotak teks dan tombol kirim) yang POST ke /echo. Belum ada penanganan pengiriman; langkah ini hanya tentang markup formulir.
+
+  02_step06_echo.pl
+      Menambahkan penangan POST /echo. Ia membaca medan 'message' dengan $c->param('message') dan menggemakannya kembali di dalam respons HTML: putaran dasar permintaan-ke-respons.
+
+  02_step07_auth.pl
+      Login minimal. POST /login membaca 'username' dan 'password' lalu bercabang dengan if: admin/secret mencapai halaman sukses, selain itu halaman gagal. Benih autentikasi dan alur bersyarat.
+
+----------------------------------------------------------------------
+ Bab 3 — Memisahkan View (memperkenalkan HP::Handy)
+----------------------------------------------------------------------
+
+  Berhenti menulis HTML di dalam program; pindahkan ke berkas templat. HP::Handy memaparkan render_file()/render_string(), sehingga ia dirangkai ke PSGI::Handy melalui renderer CODE kecil yang memetakan nama templat ke render_file(). Blok renderer itu identik di setiap langkah bertemplat.
+
+  03_step08_template.pl
+      Merender templates/step08.html yang statis tanpa variabel. HTML kini berada di berkasnya sendiri, terpisah dari logika.
+
+  03_step09_template_var.pl
+      Mengoper { current_time => ... } ke templates/step09.html, yang mencetaknya lewat penanda {{ current_time }}. Data mengalir dari program ke templat.
+
+  03_step10_template_form.pl
+      Menulis ulang echo Langkah 6 dengan dua templat: step10_form.html untuk masukan dan step10_result.html untuk hasil. Logika penangan menjadi sangat kecil.
+
+----------------------------------------------------------------------
+ Bab 4 — I/O berkas dan persistensi CSV (dasar CRUD)
+----------------------------------------------------------------------
+
+  Mengimplementasikan Buat/Baca/Ubah/Hapus pada berkas CSV biasa, tanpa basis data. Merasakan biaya pengelolaan data manual memotivasi pindah ke basis data di Bab 5.
+
+  04_step11_csv_readall.pl
+      Read All. Membuka data.csv, memecah tiap baris pada koma menjadi hash { id, name, age }, dan merender daftar sebagai tabel HTML (step11_list.html).
+
+  04_step12_csv_create.pl
+      Create. POST /add menambahkan satu baris 'id,name,age' ke data.csv dalam mode tambah (>>), lalu menampilkan halaman selesai.
+
+  04_step13_csv_readone.pl
+      Read One. Rute /user/:id menangkap sebuah id; program memindai data.csv untuk baris yang cocok dan menampilkan detailnya (step13_detail.html), atau mengembalikan 404 jika tak ditemukan.
+
+  04_step14_csv_update.pl
+      Update. Untuk mengubah satu baris, ia membaca semua baris, mengganti yang cocok, dan menulis ulang seluruh berkas: pekerjaan 'baca semua, ganti, tulis semua' yang akan dihapus oleh basis data.
+
+  04_step15_csv_delete.pl
+      Delete. Penulisan ulang seluruh berkas yang sama, tetapi baris yang cocok dilewati alih-alih diganti.
+
+----------------------------------------------------------------------
+ Bab 5 — Memperkenalkan Model (pindah ke DB::Handy)
+----------------------------------------------------------------------
+
+  Mengganti CSV dengan DB::Handy. Handle dibuat dengan DB::Handy->connect('data','app',{...}) dan disuntikkan via db => $dbh, lalu dijangkau di penangan sebagai $c->db. Rutin _bootstrap() membuat dan mengisi tabel 'users' sekali saja, agar tiap contoh berjalan mandiri.
+
+  05_step16_db_readall.pl
+      Read All. selectall_arrayref(..., { Slice => {} }) mengambil semua baris users sebagai hash untuk templat daftar (step16_list.html). Tak ada lagi penguraian berkas manual.
+
+  05_step17_db_create.pl
+      Create. POST /add menyisipkan satu baris dengan INSERT berpenanda, lalu mengalihkan ke / (daftar): pola standar post-lalu-alihkan.
+
+  05_step18_db_readone.pl
+      Read One. /user/:id mengambil satu baris berdasarkan kunci utama dengan selectrow_hashref(), atau mengembalikan 404. Pencarian kunci langsung alih-alih memindai tiap baris.
+
+  05_step19_db_update.pl
+      Update. GET /user/:id/edit menampilkan formulir sunting; POST menjalankan UPDATE ... WHERE id=? dan mengalihkan ke halaman detail. Tanpa penulisan ulang seluruh berkas di memori.
+
+  05_step20_db_delete.pl
+      Delete. DELETE ... WHERE id=? dijalankan, lalu pengalihan ke /. Rute yang mengubah keadaan hanya menerima POST, untuk mencegah penghapusan tak sengaja dari GET.
+
+----------------------------------------------------------------------
+ Bab 6 — Data relasional dan aplikasi nyata
+----------------------------------------------------------------------
+
+  Dua tabel terkait (users dan depts) di basis data kedua 'app2'. JOIN dilakukan dengan tangan di Perl agar bukan kotak hitam, lalu semuanya dirakit menjadi satu aplikasi lengkap.
+
+  06_step21_db_join_list.pl
+      JOIN List. Membaca kedua tabel, membangun pencarian dept_id => name, menempelkan dept_name ke tiap user (JOIN tulisan tangan), dan mendaftarnya (step21_join_list.html).
+
+  06_step22_db_join_detail.pl
+      JOIN Read One. Mengambil satu user, lalu mencari satu departemen milik user itu dan menempelkan namanya untuk halaman detail (step22_join_detail.html).
+
+  06_step23_db_form_select.pl
+      Formulir pilih. Memuat master departemen dan merendernya sebagai dropdown <select> (step23_form_select.html), agar pengguna memilih departemen alih-alih mengetik id.
+
+  06_step24_fullstack_app.pl
+      Aplikasi lengkap dalam satu berkas: daftar, detail, tambah, sunting, dan hapus atas data users+depts, dengan nama departemen terlampir, dropdown select, post-lalu-alihkan di mana-mana, dan pembantu _next_id() (DB::Handy tak punya auto-increment). Memakai app_list.html dan app_form.html.
+
+----------------------------------------------------------------------
+ Templat (templates/)
+----------------------------------------------------------------------
+
+  Templat HP::Handy memakai sintaks mirip Jinja2: {{ var }} mencetak sebuah nilai (jalur bertitik seperti {{ user.name }} masuk ke dalam hash), {% for x in list %} ... {% endfor %} berulang, dan {% if ... %} bercabang. Renderer dibuat dengan auto_escape => 1, jadi nilai yang dicetak di-escape HTML.
+
+  templates/step08.html
+      Halaman sepenuhnya statis yang dipakai Langkah 8; tanpa penanda.
+
+  templates/step09.html
+      Mencetak waktu server lewat {{ current_time }} (Langkah 9).
+
+  templates/step10_form.html
+      Formulir masukan untuk echo Langkah 10; POST 'message' ke /echo.
+
+  templates/step10_result.html
+      Menampilkan {{ message }} yang digemakan untuk Langkah 10.
+
+  templates/step11_list.html
+      Berulang atas {{ users }} untuk menggambar tabel CSV (Langkah 11).
+
+  templates/step12_form.html
+      Formulir tambah (id, name, age) untuk Langkah 12.
+
+  templates/step12_result.html
+      Halaman konfirmasi "Added" untuk Langkah 12: menampilkan {{ name }} dan tautan kembali.
+
+  templates/step13_list.html
+      Indeks Langkah 13: setiap pengguna menaut ke halaman detail /user/:id miliknya.
+
+  templates/step13_detail.html
+      Menampilkan id/name/age satu pengguna untuk Langkah 13.
+
+  templates/step14_list.html
+      Halaman Langkah 14: baris saat ini dan formulir pembaruan yang mem-POST ke /update.
+
+  templates/step15_list.html
+      Halaman Langkah 15: baris saat ini dan formulir hapus yang mem-POST ke /delete.
+
+  templates/step16_list.html
+      Daftar pengguna DB sederhana untuk Langkah 16 (belum ada tautan).
+
+  templates/step17_form.html
+      Formulir tambah pengguna untuk Langkah 17.
+
+  templates/step17_list.html
+      Daftar Langkah 17 dengan tautan "Add New User" ke /add.
+
+  templates/step18_list.html
+      Daftar Langkah 18: setiap nama menaut ke detail /user/:id miliknya.
+
+  templates/step18_detail.html
+      Detail pengguna sederhana untuk Langkah 18, dengan tautan kembali.
+
+  templates/step19_list.html
+      Daftar Langkah 19: setiap nama menaut ke halaman detailnya.
+
+  templates/step19_detail.html
+      Detail pengguna Langkah 19, dengan tautan Edit dan tautan kembali.
+
+  templates/step19_edit.html
+      Formulir sunting (name, age) untuk Langkah 19; POST ke /user/:id/edit.
+
+  templates/step20_list.html
+      Daftar Langkah 20 dengan tombol Delete (POST, dengan konfirmasi) di setiap baris.
+
+  templates/step21_join_list.html
+      Daftar pegawai dengan kolom tergabung {{ user.dept_name }} (Langkah 21).
+
+  templates/step22_join_list.html
+      Indeks pegawai Langkah 22: setiap nama menaut ke halaman detailnya.
+
+  templates/step22_join_detail.html
+      Detail pegawai yang menampilkan nama departemen (Langkah 22).
+
+  templates/step23_list.html
+      Daftar pegawai Langkah 23 dengan tautan "Add New Employee" ke /add.
+
+  templates/step23_form_select.html
+      Formulir tambah dengan <select> departemen dari {{ depts }} (Langkah 23).
+
+  templates/app_list.html
+      Daftar pegawai aplikasi lengkap (Langkah 24): ID, nama tertaut, departemen, ditambah Sunting dan Hapus POST berkonfirmasi per baris, serta tautan tambah.
+
+  templates/app_form.html
+      Formulir tambah/sunting bersama aplikasi lengkap (Langkah 24): target {{ action }} beralih antara buat dan ubah, dan <select> departemen memilih-awal {{ user.dept_id }} via {% if %}.
+
+----------------------------------------------------------------------
+ Rujukan
+----------------------------------------------------------------------
+
+  PSGI::Handy dan sisa tumpukan Handy di MetaCPAN, serta spesifikasi PSGI:
+
+    https://metacpan.org/dist/PSGI-Handy
+    https://metacpan.org/dist/HTTP-Handy
+    https://metacpan.org/dist/HP-Handy
+    https://metacpan.org/dist/DB-Handy
+    https://github.com/plack/psgi-specs/blob/master/PSGI.pod
+
+======================================================================

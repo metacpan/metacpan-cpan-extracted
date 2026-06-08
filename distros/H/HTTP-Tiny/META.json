@@ -107,7 +107,7 @@
    "provides" : {
       "HTTP::Tiny" : {
          "file" : "lib/HTTP/Tiny.pm",
-         "version" : "0.094"
+         "version" : "0.096"
       }
    },
    "release_status" : "stable",
@@ -122,7 +122,7 @@
          "web" : "https://github.com/Perl-Toolchain-Gang/HTTP-Tiny"
       }
    },
-   "version" : "0.094",
+   "version" : "0.096",
    "x_authority" : "cpan:DAGOLDEN",
    "x_contributors" : [
       "Alan Gardner <gardner@pythian.com>",

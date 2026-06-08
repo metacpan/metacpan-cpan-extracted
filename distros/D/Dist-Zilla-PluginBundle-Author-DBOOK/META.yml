@@ -8,13 +8,14 @@ build_requires:
   Git::Wrapper: '0'
   Path::Tiny: '0.079'
   Test::DZil: '0'
+  Test::File::ShareDir::Dist: '0'
   Test::File::ShareDir::Module: '0'
   Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version (undef), CPAN::Meta::Converter version 2.150013'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,10 +33,10 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Author::DBOOK:
     file: lib/Dist/Zilla/MintingProfile/Author/DBOOK.pm
-    version: v1.0.7
+    version: v1.0.8
   Dist::Zilla::PluginBundle::Author::DBOOK:
     file: lib/Dist/Zilla/PluginBundle/Author/DBOOK.pm
-    version: v1.0.7
+    version: v1.0.8
 requires:
   Data::Section: '0'
   Dist::Zilla: '0'
@@ -47,7 +48,7 @@ requires:
   Dist::Zilla::Plugin::ExecDir: '0'
   Dist::Zilla::Plugin::FakeRelease: '0'
   Dist::Zilla::Plugin::GatherDir::Template: '0'
-  Dist::Zilla::Plugin::GenerateFile: '0'
+  Dist::Zilla::Plugin::GenerateFile::FromShareDir: '0'
   Dist::Zilla::Plugin::Git::Check: '0'
   Dist::Zilla::Plugin::Git::Commit: '0'
   Dist::Zilla::Plugin::Git::Contributors: '0'
@@ -98,7 +99,7 @@ resources:
   bugtracker: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Author-DBOOK/issues
   homepage: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Author-DBOOK
   repository: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Author-DBOOK.git
-version: v1.0.7
+version: v1.0.8
 x_contributors:
   - 'Dan Book <grinnz@gmail.com>'
   - 'Dan Book <grinnz@grinnz.com>'
