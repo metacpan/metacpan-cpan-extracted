@@ -5,20 +5,21 @@ use IPC::SysV qw(IPC_RMID);
 use Mock::Sub;
 use Test::More;
 
+use FindBin;
+use lib $FindBin::Bin;
+use IPCShareableTest qw(assert_clean_process unique_glue);
+
 #plan skip_all => "TEST FILE NOT READY";
 
 use IPC::Shareable;
 IPC::Shareable->testing_set('IPC::Shareable');
 
-my $segs_before = IPC::Shareable::seg_count();
-my $sems_before = IPC::Shareable::sem_count();
-warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 
 {
     # exclusive duplicate
 
     my $opts = {
-        key       => 1234,
+        key       => unique_glue('k1234'),
         create    => 1,
         exclusive => 1,
         destroy   => 1,
@@ -45,11 +46,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 
 IPC::Shareable::_end;
 
-my $segs_after = IPC::Shareable::seg_count();
-warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
-is $segs_after, $segs_before, "All segs cleaned up ok";
-my $sems_after = IPC::Shareable::sem_count();
-is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
+assert_clean_process();
 
 # _decode_json: croaks when decode_json returns undef (mocked)
 {
@@ -117,16 +114,20 @@ is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
             "_tie: error message mentions semaphore set";
     }
 
-    # The shm segment was created before IPC::Semaphore->new failed, so it
-    # is not in any register.  Clean it up manually to keep the shm count clean.
+    # The segment was created before the semaphore set failed; _tie() now removes
+    # it before croaking, so it is no longer orphaned.
     my $leaked_id = shmget($key_int, 0, 0);
-    shmctl($leaked_id, IPC_RMID, 0) if defined $leaked_id;
+    ok ! defined $leaked_id,
+        "_tie: the just-created segment is removed, not orphaned, on sem-create failure";
+    shmctl($leaked_id, IPC_RMID, 0) if defined $leaked_id;   # Safety net if it regresses
 }
 
-# _thaw: croaks when Storable::thaw returns undef (munged segment)
+# _thaw: croaks when Storable::thaw returns undef (munged segment).
+# Uses an aggregate (hash) tie: a scalar holding a plain value is now stored
+# verbatim and never reaches _thaw, so the freeze/thaw path is exercised here.
 {
-    tie my $sv, 'IPC::Shareable', { create => 1, destroy => 1 , serializer => 'storable' };
-    $sv = 'hello';   # write so the segment carries the IPC::Shareable tag
+    tie my %h, 'IPC::Shareable', { create => 1, destroy => 1 , serializer => 'storable' };
+    %h = (k => 'hello');   # aggregate => Storable freeze (carries the tag)
 
     {
         # Override thaw via local typeglob, not Mock::Sub: Mock::Sub 1.08 (on
@@ -136,7 +137,7 @@ is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
         no warnings 'redefine';
         local *IPC::Shareable::thaw = sub { return };
 
-        is eval { my $x = $sv; 1 }, undef,
+        is eval { my $x = $h{k}; 1 }, undef,
             "_thaw: croaks when Storable::thaw returns undef";
         like $@, qr/Munged shared memory segment/,
             "_thaw: error message mentions munged segment";

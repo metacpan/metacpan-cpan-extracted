@@ -7457,6 +7457,24 @@ sub _cleanup_and_exit
 {
     my $exit = shift( @_ );
     $exit = 0 if( !length( $exit // '' ) || $exit !~ /^\d+$/ );
+    # NOTE: optional local release hook
+    # On a successful run, invoke dev/release.sh if it is present and executable. That
+    # script pushes the freshly built SQLite database to the CI runner host before a
+    # release is tagged. It is kept out of the MANIFEST and out of this file, so the
+    # distribution shipped on CPAN carries no infrastructure detail, and anyone else
+    # rebuilding the database simply does not have the hook.
+    if( $exit == 0 )
+    {
+        my $hook = file( $0 )->parent->parent->child( 'dev', 'release.sh' );
+        if( $hook->exists && -x( "$hook" ) )
+        {
+            print( "Running local release hook ${hook}\n" );
+            if( system( "$hook" ) != 0 )
+            {
+                warn( "Release hook ${hook} exited with a non-zero status.\n" );
+            }
+        }
+    }
     exit($exit);
 }
 

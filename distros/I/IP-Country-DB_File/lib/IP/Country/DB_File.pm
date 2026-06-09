@@ -1,5 +1,5 @@
 package IP::Country::DB_File;
-$IP::Country::DB_File::VERSION = '3.03';
+$IP::Country::DB_File::VERSION = '4.00';
 use strict;
 use warnings;
 
@@ -119,7 +119,7 @@ IP::Country::DB_File - IPv4 and IPv6 to country translation using DB_File
 
 =head1 VERSION
 
-version 3.03
+version 4.00
 
 =head1 SYNOPSIS
 
@@ -230,7 +230,7 @@ Nick Wellnhofer <wellnhofer@aevum.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Nick Wellnhofer.
+This software is copyright (c) 2026 by Nick Wellnhofer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

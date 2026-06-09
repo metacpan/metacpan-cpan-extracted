@@ -2,10 +2,10 @@ package Zuzu::Module::DB;
 
 use utf8;
 
-our $VERSION = '0.001005';
+our $VERSION = '0.002000';
 
 use DBI ();
-use Scalar::Util qw( blessed );
+use Scalar::Util qw( blessed weaken );
 use Zuzu::Error;
 use Zuzu::Value::Boolean;
 
@@ -110,10 +110,22 @@ sub _dbi_call {
 	return $result;
 }
 
-sub _new_dbh_object {
-	my ( $dbh_class, $dbh, $settings ) = @_;
+sub _track_native_object {
+	my ( $runtime, $object ) = @_;
 
-	return native_object(
+	return $object
+		if !blessed($object) or !$object->isa('Zuzu::Value::Object');
+
+	push @{ $runtime->{_demolish_objects} }, $object;
+	weaken( $runtime->{_demolish_objects}[-1] );
+
+	return $object;
+}
+
+sub _new_dbh_object {
+	my ( $runtime, $dbh_class, $dbh, $settings ) = @_;
+
+	my $object = native_object(
 		class => $dbh_class,
 		slots => {
 			_dbh => $dbh,
@@ -123,12 +135,28 @@ sub _new_dbh_object {
 			_dbh => 1,
 		},
 	);
+	$object->demolish_hook(
+		sub {
+			my ( $target ) = @_;
+			my $dbh = delete $target->slots->{_dbh};
+			delete $target->slots->{_isolation_level};
+			return if !defined $dbh;
+			local $@;
+			eval {
+				$dbh->disconnect if $dbh->{Active};
+				1;
+			};
+			return;
+		},
+	);
+
+	return _track_native_object( $runtime, $object );
 }
 
 sub _new_sth_object {
-	my ( $sth_class, $sth ) = @_;
+	my ( $runtime, $sth_class, $sth ) = @_;
 
-	return native_object(
+	my $object = native_object(
 		class => $sth_class,
 		slots => {
 			_sth => $sth,
@@ -137,6 +165,21 @@ sub _new_sth_object {
 			_sth => 1,
 		},
 	);
+	$object->demolish_hook(
+		sub {
+			my ( $target ) = @_;
+			my $sth = delete $target->slots->{_sth};
+			return if !defined $sth;
+			local $@;
+			eval {
+				$sth->finish if $sth->{Active};
+				1;
+			};
+			return;
+		},
+	);
+
+	return _track_native_object( $runtime, $object );
 }
 
 sub _columns_metadata {
@@ -239,7 +282,12 @@ sub IMPORT {
 			my ( $self, $dsn, $settings ) = @_;
 			my $connect_settings = _connection_options( $settings );
 			my $dbh = _connect( defined $dsn ? "$dsn" : '', $settings );
-			return _new_dbh_object( $dbh_class, $dbh, $connect_settings );
+			return _new_dbh_object(
+				$runtime,
+				$dbh_class,
+				$dbh,
+				$connect_settings,
+			);
 		},
 	);
 
@@ -249,7 +297,12 @@ sub IMPORT {
 			my ( $self, $settings ) = @_;
 			my $connect_settings = _connection_options( $settings );
 			my $dbh = _connect( 'dbi:SQLite:dbname=:memory:', $settings );
-			return _new_dbh_object( $dbh_class, $dbh, $connect_settings );
+			return _new_dbh_object(
+				$runtime,
+				$dbh_class,
+				$dbh,
+				$connect_settings,
+			);
 		},
 	);
 
@@ -262,7 +315,12 @@ sub IMPORT {
 			my $dsn = "dbi:SQLite:dbname=$string_path";
 			my $connect_settings = _connection_options( $settings );
 			my $dbh = _connect( $dsn, $settings );
-			return _new_dbh_object( $dbh_class, $dbh, $connect_settings );
+			return _new_dbh_object(
+				$runtime,
+				$dbh_class,
+				$dbh,
+				$connect_settings,
+			);
 		},
 	);
 
@@ -277,7 +335,7 @@ sub IMPORT {
 				},
 				'prepare failed',
 			);
-			return _new_sth_object( $sth_class, $sth );
+			return _new_sth_object( $runtime, $sth_class, $sth );
 		},
 	);
 

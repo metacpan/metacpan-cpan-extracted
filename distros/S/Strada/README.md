@@ -1,5 +1,7 @@
 # Strada - Perl XS Module
 
+Version 1.0
+
 This Perl XS module allows Perl programs to load and call functions from compiled Strada shared libraries.
 
 ## Overview
@@ -7,8 +9,11 @@ This Perl XS module allows Perl programs to load and call functions from compile
 The `Strada` module provides a bridge from Perl to Strada, enabling you to:
 - Load Strada shared libraries (.so files)
 - Call Strada functions with automatic type conversion
-- Pass Perl scalars, arrays, and hashes to Strada
+- Pass Perl scalars, arrays, and hashes to Strada (arrays/hashes map to Strada references)
 - Receive Strada return values as Perl types
+- Call functions with any number of arguments (with libffi), including variadic functions and constructors
+- Construct Strada objects and call methods on them (`Strada::Object`)
+- Catch Strada exceptions as Perl `die` (`eval` / `Try::Tiny`)
 - Inspect library metadata (version, function signatures)
 
 ## Installation
@@ -18,6 +23,8 @@ The `Strada` module provides a bridge from Perl to Strada, enabling you to:
 - Perl 5.10 or later
 - Strada compiler and runtime (from parent directory)
 - C compiler (gcc)
+- libffi (optional) — `libffi-dev` / `libffi-devel`. When present, `call()`
+  accepts any number of arguments; without it, calls are capped at 4.
 
 ### Build Steps
 
@@ -210,12 +217,51 @@ When calling from Perl, you can use either format:
 | hash | Hash reference |
 | undef | undef |
 | ref | Dereferenced value |
+| blessed object | `Strada::Object` (see below) |
+
+## Objects and Methods
+
+A blessed Strada object returned from the runtime comes back as a
+`Strada::Object` — a wrapper that dispatches method calls back into Strada
+(rather than flattening to a plain hashref and losing the class). Construct
+objects with `new_object` (sugar for calling `Class::new`) and call methods
+directly:
+
+```perl
+my $lib = Strada::Library->new('./example/math_lib.so');
+
+my $c = $lib->new_object('Counter', count => 10, name => 'hits');
+# (equivalent to: my $c = $lib->call('Counter::new', count => 10, name => 'hits'))
+
+$c->increment;             # method dispatch -> 11
+$c->add(5);                # method with arguments -> 16
+print $c->describe, "\n";  # "hits=16"
+
+$c->strada_class;          # "Counter" (the Strada package)
+$c->isa('Counter');        # true (checks the Strada class hierarchy)
+
+# A Strada::Object can be passed back into the runtime as an argument:
+my $d = $lib->new_object('Counter', count => 2);
+$c->merge($d);             # $d is handed straight through to the method
+```
+
+The wrapper holds a reference to the underlying value and releases it on
+`DESTROY`. `isa`/`can` check the Perl class first, then the Strada hierarchy.
 
 ## Limitations
 
-- Maximum of 4 arguments per function call
-- Complex nested references may not convert perfectly
-- Strada objects/classes are not directly supported
+- Without libffi, a function call is limited to 4 arguments (calls with more
+  `croak`). Build with libffi (see Prerequisites) for unlimited arguments.
+- Argument conversion is by value: mutations a Strada function makes to an
+  array/hash argument are not reflected back in the Perl data structure.
+- The deep array/hash converter does not detect reference cycles; converting a
+  self-referential Perl (or Strada) structure will recurse without bound.
+- Typed numeric widths (`int8`, `uint64`, `float`, …) round-trip as Perl IV/NV;
+  the specific C width is not preserved across the boundary.
+- A blessed Perl object other than a `Strada::Object` is converted as a plain
+  hash — its Perl class is not carried into Strada.
+- The Strada runtime is single-threaded; do not call into Strada concurrently
+  from multiple Perl threads.
 
 ## Example Directory
 
@@ -242,7 +288,8 @@ Get a function pointer by name. Returns the pointer on success, 0 if not found.
 
 #### Strada::call($func, @args)
 
-Call a Strada function with 0-4 arguments. Returns the result converted to Perl.
+Call a Strada function. With libffi, any number of arguments is supported;
+without it, 0-4 arguments (more will `croak`). Returns the result converted to Perl.
 
 #### Strada::get_export_info($handle)
 
@@ -301,6 +348,8 @@ Unload the library and clear cached function pointers.
 
 ## See Also
 
+- [Strada Website](https://strada-lang.github.io/) - Official Strada language website
+- [Cannoli](https://github.com/strada-lang/cannoli) - Preforking web server and framework for Strada
 - `lib/perl5/` - The reverse integration (calling Perl from Strada)
 - `docs/LANGUAGE_GUIDE.md` - Strada language documentation
 - `docs/RUNTIME_API.md` - Strada runtime API reference

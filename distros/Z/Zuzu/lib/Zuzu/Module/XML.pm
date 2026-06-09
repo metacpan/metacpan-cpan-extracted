@@ -2,9 +2,10 @@ package Zuzu::Module::XML;
 
 use utf8;
 
-our $VERSION = '0.001005';
+our $VERSION = '0.002000';
 
 use Scalar::Util qw( blessed );
+use Encode qw( decode encode FB_CROAK );
 use HTML::Selector::XPath ();
 use XML::LibXML ();
 use Zuzu::Error;
@@ -21,6 +22,25 @@ sub _is_zuzu_object {
 
 	return blessed($value)
 		and $value->isa('Zuzu::Value::Object');
+}
+
+sub _xml_text {
+	my ( $value ) = @_;
+	$value = defined $value ? "$value" : '';
+	$value = decode( 'UTF-8', $value ) if not utf8::is_utf8($value);
+	if ( $value =~ /[\x{00c2}-\x{00f4}][\x{0080}-\x{00bf}]/ ) {
+		my $decoded = eval {
+			decode( 'UTF-8', encode( 'ISO-8859-1', $value, FB_CROAK ), FB_CROAK );
+		};
+		return $decoded if defined $decoded;
+	}
+	return $value;
+}
+
+sub _xml_maybe_text {
+	my ( $value ) = @_;
+	return undef if not defined $value;
+	return _xml_text($value);
 }
 
 sub _unwrap_node {
@@ -232,7 +252,7 @@ sub IMPORT {
 		name => 'parse',
 		native => sub {
 			my ( $self, $xml_text ) = @_;
-			$xml_text = defined $xml_text ? "$xml_text" : '';
+			$xml_text = _xml_text($xml_text);
 
 			my $parser = XML::LibXML->new();
 			my $doc = $parser->parse_string( $xml_text );
@@ -246,7 +266,7 @@ sub IMPORT {
 			my ( $self, $path_obj ) = @_;
 			$runtime->assert_capability( 'fs', "XML.load is denied by runtime policy" );
 			my $path_tiny = _unwrap_path_tiny( $path_obj, 'XML.load' );
-			my $xml_text = $path_tiny->slurp_utf8;
+			my $xml_text = _xml_text($path_tiny->slurp_utf8);
 
 			my $parser = XML::LibXML->new();
 			my $doc = $parser->parse_string( $xml_text );
@@ -388,7 +408,7 @@ sub IMPORT {
 		name => 'toXML',
 		native => sub {
 			my ( $self, $pretty ) = @_;
-			return _unwrap_doc( $self )->toString( _bool( $pretty ) );
+			return _xml_text( _unwrap_doc( $self )->toString( _bool( $pretty ) ) );
 		},
 	);
 
@@ -396,7 +416,7 @@ sub IMPORT {
 		name => 'to_String',
 		native => sub {
 			my ( $self ) = @_;
-			return _unwrap_doc( $self )->toString(0);
+			return _xml_text( _unwrap_doc( $self )->toString(0) );
 		},
 	);
 
@@ -421,11 +441,11 @@ sub IMPORT {
 		$node_class->methods->{$name} = native_function(
 			name => $name,
 			native => sub {
-				my ( $self ) = @_;
-				my $value = _unwrap_node( $self )->$name();
-				return defined $value ? "$value" : undef;
-			},
-		);
+			my ( $self ) = @_;
+			my $value = _unwrap_node( $self )->$name();
+			return _xml_maybe_text($value);
+		},
+	);
 	}
 
 	$node_class->methods->{uniqueKey} = native_function(
@@ -464,7 +484,7 @@ sub IMPORT {
 			elsif ( $node->can('localname') ) {
 				$value = $node->localname();
 			}
-			return defined $value ? "$value" : undef;
+			return _xml_maybe_text($value);
 		},
 	);
 
@@ -475,7 +495,7 @@ sub IMPORT {
 			my $node = _unwrap_node( $self );
 			return undef if not $node->can('namespaceURI');
 			my $value = $node->namespaceURI();
-			return defined $value ? "$value" : undef;
+			return _xml_maybe_text($value);
 		},
 	);
 
@@ -750,7 +770,7 @@ sub IMPORT {
 			my $node = _unwrap_node( $self );
 			return undef if not $node->can('getAttribute');
 			my $value = $node->getAttribute( $name );
-			return defined $value ? "$value" : undef;
+			return _xml_maybe_text($value);
 		},
 	);
 
@@ -821,7 +841,7 @@ sub IMPORT {
 		name => 'toXML',
 		native => sub {
 			my ( $self, $pretty ) = @_;
-			return _unwrap_node( $self )->toString( _bool( $pretty ) );
+			return _xml_text( _unwrap_node( $self )->toString( _bool( $pretty ) ) );
 		},
 	);
 
@@ -829,7 +849,7 @@ sub IMPORT {
 		name => 'to_String',
 		native => sub {
 			my ( $self ) = @_;
-			return _unwrap_node( $self )->toString(0);
+			return _xml_text( _unwrap_node( $self )->toString(0) );
 		},
 	);
 
@@ -846,7 +866,7 @@ sub IMPORT {
 		native => sub {
 			my ( $self ) = @_;
 			my $value = _unwrap_node( $self )->getAttribute('id');
-			return defined $value ? "$value" : undef;
+			return _xml_maybe_text($value);
 		},
 	);
 

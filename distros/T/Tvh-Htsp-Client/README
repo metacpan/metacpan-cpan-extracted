@@ -1,0 +1,56 @@
+Tvh-Htsp-Client
+
+NAME
+
+Tvh::Htsp::Client - a simple Tvheadend HTSP client library written in perl
+
+VERSION
+
+Version 0.02
+
+SYNOPSIS
+
+ use Tvh::Htsp::Client;
+ my $htsp = Tvh::Htsp::Client->new( { host => $host, port => $port, debug_info => $debug_info } );
+ # Setup
+ my $msg = { 'method' => 'hello', 'htspversion' => 43, 'clientname' => "$creator", 'clientversion' => '0.1' };
+ my $reply = $htsp->htsp_send_recv($msg);
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Tvh::Htsp::Client
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Tvh-Htsp-Client
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Tvh-Htsp-Client
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/Tvh-Htsp-Client
+
+    Search CPAN
+        https://metacpan.org/release/Tvh-Htsp-Client
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2025 by Ulrich Buck.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

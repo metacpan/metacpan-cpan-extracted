@@ -1,5 +1,13 @@
 Revision history for Database-Abstraction
 
+0.35	Mon Jun  8 08:25:03 EDT 2026
+	[ Bug fixes ]
+	- Pass f_dir on open
+	- Canonicalize directory path via Cwd::abs_path to fix DBD::File safety check rejecting paths containing '..'
+
+	[ Enhancements ]
+	Updated to the latest test dashboard
+
 0.34	Mon Jan 19 21:20:49 EST 2026
 	Fix logger with array test when a configuration file has been set up
 	Allow execute() to take an argument(s)

@@ -1,5 +1,5 @@
 /*
- This file is part of the Strada Language (https://github.com/mjflick/strada-lang).
+ This file is part of the Strada Language (https://github.com/strada-lang/strada-lang).
  Copyright (c) 2026 Michael J. Flickinger
  
  This program is free software: you can redistribute it and/or modify  
@@ -47,13 +47,23 @@ func greet(str $name) str {
 # Sum an array of numbers
 func sum_array(scalar $arr) int {
     my int $total = 0;
-    my int $len = length($arr);
+    my int $len = size(@$arr);   # $arr is an array ref; size(@$arr) is its length
     my int $i = 0;
     while ($i < $len) {
         $total = $total + $arr->[$i];
         $i = $i + 1;
     }
     return $total;
+}
+
+# Sum six integers — exercises >4-argument calls (libffi dispatch)
+func sum6(int $a, int $b, int $c, int $d, int $e, int $f) int {
+    return $a + $b + $c + $d + $e + $f;
+}
+
+# Concatenate eight strings — another >4-arg case, string-typed
+func concat8(str $a, str $b, str $c, str $d, str $e, str $f, str $g, str $h) str {
+    return $a . $b . $c . $d . $e . $f . $g . $h;
 }
 
 # Return an array
@@ -76,4 +86,55 @@ func describe_person(scalar $person) str {
     my str $name = $person->{"name"};
     my str $age = $person->{"age"};
     return $name . " is " . $age . " years old";
+}
+
+# Throws an exception — exercises exception bridging to Perl (eval/die).
+func boom(str $msg) int {
+    throw $msg;
+    return 0;
+}
+
+# Throws a blessed OBJECT — the catch in Perl should receive a Strada::Object.
+func boom_obj() int {
+    throw Counter::new("count", 99, "name", "boom");
+    return 0;
+}
+
+# An OOP class to exercise Strada method dispatch from Perl.
+package Counter;
+
+has rw int $count = 0;
+has ro str $name = "counter";
+
+# No-arg method (accessor-style), returns the new count
+func increment(scalar $self) int {
+    $self->set_count($self->count() + 1);
+    return $self->count();
+}
+
+# Method with an argument
+func add(scalar $self, int $n) int {
+    $self->set_count($self->count() + $n);
+    return $self->count();
+}
+
+# Method returning a string built from attributes
+func describe(scalar $self) str {
+    return $self->name() . "=" . $self->count();
+}
+
+# Method taking ANOTHER Counter object — exercises passing a Strada object
+# from Perl back into the runtime (object round-trip)
+func merge(scalar $self, scalar $other) int {
+    $self->set_count($self->count() + $other->count());
+    return $self->count();
+}
+
+# Method that throws — exercises exception bridging from a method call
+func checked_add(scalar $self, int $n) int {
+    if ($n < 0) {
+        throw "negative amount not allowed";
+    }
+    $self->set_count($self->count() + $n);
+    return $self->count();
 }

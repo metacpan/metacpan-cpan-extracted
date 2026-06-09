@@ -15,7 +15,7 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 # VERSION
 
-Version 0.34
+Version 0.35
 
 # DESCRIPTION
 
@@ -358,10 +358,6 @@ so if XML fails for you on a small file force non-slurping mode with
 
 Copyright 2015-2026 Nigel Horne.
 
-This program is released under the following licence: GPL2.
-Usage is subject to licence terms.
-The licence terms of this software are as follows:
-Personal single user, single computer use: GPL2
-All other users (for example, Commercial, Charity, Educational, Government)
-must apply in writing for a licence for use from Nigel Horne at the
-above e-mail.
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.

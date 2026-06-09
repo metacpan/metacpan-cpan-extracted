@@ -4,11 +4,14 @@ use strict;
 use IPC::Shareable;
 IPC::Shareable->testing_set('IPC::Shareable');
 use Test::More;
+
+use FindBin;
+use lib $FindBin::Bin;
+use IPCShareableTest qw(
+    assert_clean_process barrier_new barrier_release barrier_wait unique_glue
+);
 use Test::SharedFork;
 
-my $segs_before = IPC::Shareable::seg_count();
-my $sems_before = IPC::Shareable::sem_count();
-warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 
 my $protect_lock = 441;
 
@@ -16,7 +19,7 @@ my $protect_lock = 441;
 # the protected attribute from the semaphore.
 {
     tie my %p, 'IPC::Shareable', {
-        key       => 'pp66a',
+        key       => unique_glue('pp66a'),
         create    => 1,
         exclusive => 1,
         destroy   => 0,
@@ -27,7 +30,7 @@ my $protect_lock = 441;
 
     # Attach again (no protected specified)
     tie my %p2, 'IPC::Shareable', {
-        key    => 'pp66a',
+        key    => unique_glue('pp66a'),
         create => 0,
         serializer => 'storable',
     };
@@ -45,18 +48,17 @@ my $protect_lock = 441;
 # when the caller omits the protected option. child's clean_up_all then
 # correctly skips the segment.
 {
-    my $awake = 0;
-    local $SIG{ALRM} = sub { $awake = 1 };
+    my $ready = barrier_new();   # parent -> child: protected segment created
 
     my $pid = fork;
     die "Cannot fork: $!" unless defined $pid;
 
     if ($pid == 0) {
         # child: wait for parent to create segment then attach
-        sleep unless $awake;
+        barrier_wait($ready);
 
         tie my %child_p, 'IPC::Shareable', {
-            key    => 'pp66b',
+            key    => unique_glue('pp66b'),
             create => 0,
             serializer => 'storable',
         };
@@ -76,7 +78,7 @@ my $protect_lock = 441;
     else {
         # parent: create the protected segment, wake child, then verify
         tie my %p, 'IPC::Shareable', {
-            key       => 'pp66b',
+            key       => unique_glue('pp66b'),
             create    => 1,
             exclusive => 1,
             destroy   => 0,
@@ -85,7 +87,7 @@ my $protect_lock = 441;
         };
         $p{val} = 'cross_proc';
 
-        kill ALRM => $pid;
+        barrier_release($ready);
         waitpid($pid, 0);
 
         # Segment must have survived child's clean_up_all
@@ -101,10 +103,6 @@ my $protect_lock = 441;
 
 IPC::Shareable::_end;
 
-my $segs_after = IPC::Shareable::seg_count();
-warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
-is $segs_after, $segs_before, "All segs cleaned up ok";
-my $sems_after = IPC::Shareable::sem_count();
-is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
+assert_clean_process();
 
 done_testing();

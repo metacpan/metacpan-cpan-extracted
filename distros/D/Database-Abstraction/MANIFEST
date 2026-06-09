@@ -1,5 +1,6 @@
 Changes
 config.yaml
+cpanfile
 lib/Database/Abstraction.pm
 LICENSE
 Makefile.PL

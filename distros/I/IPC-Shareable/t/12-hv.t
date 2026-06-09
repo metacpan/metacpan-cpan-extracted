@@ -6,9 +6,9 @@ use Test::More;
 use IPC::Shareable;
 IPC::Shareable->testing_set('IPC::Shareable');
 
-my $segs_before = IPC::Shareable::seg_count();
-my $sems_before = IPC::Shareable::sem_count();
-warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
+use FindBin;
+use lib $FindBin::Bin;
+use IPCShareableTest qw(assert_clean_process live_seg_count unique_glue);
 
 my $mod = 'IPC::Shareable';
 
@@ -16,7 +16,7 @@ my $mod = 'IPC::Shareable';
 {
     my $knot = tie my %hv, $mod, {
         create     => 1,
-        key        => 1234,
+        key        => unique_glue('k1234'),
         destroy    => 1,
         # serializer => 'json',
         #    persist => 1
@@ -76,9 +76,9 @@ my $mod = 'IPC::Shareable';
     is ref($hv{nested}), 'HASH', "nested child segment created ok";
     is $hv{nested}{inner}, 42,   "nested child segment value ok";
 
-    my $child_segs_before = IPC::Shareable::seg_count();
+    my $child_segs_before = live_seg_count();
     delete $hv{nested};
-    my $child_segs_after = IPC::Shareable::seg_count();
+    my $child_segs_after = live_seg_count();
     is exists($hv{nested}), '', "delete of child-segment key removes it ok";
     is $child_segs_after, $child_segs_before - 1, "DELETE child: child segment removed from system ok";
 
@@ -88,9 +88,9 @@ my $mod = 'IPC::Shareable';
     $hv{nested} = { inner => 99 };
     is $hv{nested}{inner}, 99, "nested child for CLEAR test set ok";
 
-    my $clear_segs_before = IPC::Shareable::seg_count();
+    my $clear_segs_before = live_seg_count();
     %hv = ();
-    my $clear_segs_after = IPC::Shareable::seg_count();
+    my $clear_segs_after = live_seg_count();
     is keys(%hv), 0, "clearing a hash with child segments works ok";
     is $clear_segs_after, $clear_segs_before - 1, "CLEAR: child segment removed from system ok";
 
@@ -103,7 +103,7 @@ my $mod = 'IPC::Shareable';
 {
     my $knot = tie my %hv, $mod, {
         create     => 1,
-        key        => 1234,
+        key        => unique_glue('k1234'),
         destroy    => 1,
         serializer => 'json',
         #    persist => 1
@@ -162,9 +162,9 @@ my $mod = 'IPC::Shareable';
     is ref($hv{nested}), 'HASH', "json: nested child segment created ok";
     is $hv{nested}{inner}, 42,   "json: nested child segment value ok";
 
-    my $child_segs_before = IPC::Shareable::seg_count();
+    my $child_segs_before = live_seg_count();
     delete $hv{nested};
-    my $child_segs_after = IPC::Shareable::seg_count();
+    my $child_segs_after = live_seg_count();
     is exists($hv{nested}), '', "json: delete of child-segment key removes it ok";
     is $child_segs_after, $child_segs_before - 1, "json: DELETE child: child segment removed from system ok";
 
@@ -173,9 +173,9 @@ my $mod = 'IPC::Shareable';
     $hv{nested} = { inner => 99 };
     is $hv{nested}{inner}, 99, "json: nested child for CLEAR test set ok";
 
-    my $clear_segs_before = IPC::Shareable::seg_count();
+    my $clear_segs_before = live_seg_count();
     %hv = ();
-    my $clear_segs_after = IPC::Shareable::seg_count();
+    my $clear_segs_after = live_seg_count();
     is keys(%hv), 0, "json: clearing a hash with child segments works ok";
     is $clear_segs_after, $clear_segs_before - 1, "json: CLEAR: child segment removed from system ok";
 
@@ -186,11 +186,7 @@ my $mod = 'IPC::Shareable';
 
 IPC::Shareable::_end;
 
-my $segs_after = IPC::Shareable::seg_count();
-warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
-is $segs_after, $segs_before, "All segs cleaned up ok";
-my $sems_after = IPC::Shareable::sem_count();
-is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
+assert_clean_process();
 
 done_testing();
 

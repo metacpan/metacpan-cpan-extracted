@@ -1,0 +1,21 @@
+cpanfile
+lib/Sub/Protected.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/attribute.t
+t/basic.t
+t/bypass.t
+t/caller_integrity.t
+t/declarative.t
+t/edge_cases.t
+t/function.t
+t/integration.t
+t/locales.t
+t/subclass.t
+t/unit.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

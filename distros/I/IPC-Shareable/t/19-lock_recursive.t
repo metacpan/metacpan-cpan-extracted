@@ -7,14 +7,14 @@ use Test::More;
 use Test::SharedFork;
 use Time::HiRes qw(time);
 
-my $segs_before = IPC::Shareable::seg_count();
-my $sems_before = IPC::Shareable::sem_count();
-warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
+use FindBin;
+use lib $FindBin::Bin;
+use IPCShareableTest qw(unique_glue assert_clean);
 
 # --- Test 1: LOCK_EX on root holds child semaphore (LOCK_NB returns 0) ---
 {
     my $root = tie my %h, 'IPC::Shareable', {
-        key        => 'LR191',
+        key        => unique_glue('LR191'),
         create     => 1,
         destroy    => 1,
         serializer => 'json',
@@ -51,7 +51,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 # --- Test 2: child semaphore released after parent unlock ---
 {
     my $root = tie my %h, 'IPC::Shareable', {
-        key        => 'LR192',
+        key        => unique_glue('LR192'),
         create     => 1,
         destroy    => 1,
         serializer => 'json',
@@ -94,7 +94,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 # --- Test 3: LOCK_SH on root holds LOCK_SH on child (blocks writers, not readers) ---
 {
     my $root = tie my %h, 'IPC::Shareable', {
-        key        => 'LR193',
+        key        => unique_glue('LR193'),
         create     => 1,
         destroy    => 1,
         serializer => 'json',
@@ -139,7 +139,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 # --- Test 4: child _was_changed flushed to shared memory on parent unlock ---
 {
     my $root = tie my %h, 'IPC::Shareable', {
-        key        => 'LR194',
+        key        => unique_glue('LR194'),
         create     => 1,
         destroy    => 1,
         serializer => 'json',
@@ -165,7 +165,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 # --- Test 5: 3-level deep nesting — all semaphores held ---
 {
     my $root = tie my %h, 'IPC::Shareable', {
-        key        => 'LR195',
+        key        => unique_glue('LR195'),
         create     => 1,
         destroy    => 1,
         serializer => 'json',
@@ -208,7 +208,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 # --- Test 6: LOCK_NB rollback — grandchild pre-locked, root LOCK_NB returns 0 ---
 {
     my $root = tie my %h, 'IPC::Shareable', {
-        key        => 'LR196',
+        key        => unique_glue('LR196'),
         create     => 1,
         destroy    => 1,
         serializer => 'json',
@@ -260,7 +260,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 # --- Test 7: _locked_children cleared after unlock ---
 {
     my $root = tie my %h, 'IPC::Shareable', {
-        key        => 'LR197',
+        key        => unique_glue('LR197'),
         create     => 1,
         destroy    => 1,
         serializer => 'json',
@@ -280,10 +280,6 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 
 IPC::Shareable::_end;
 
-my $segs_after = IPC::Shareable::seg_count();
-warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
-is $segs_after, $segs_before, "All segs cleaned up ok";
-my $sems_after = IPC::Shareable::sem_count();
-is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
+assert_clean(map { unique_glue($_) } qw(LR191 LR192 LR193 LR194 LR195 LR196 LR197));
 
 done_testing;

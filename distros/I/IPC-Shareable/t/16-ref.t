@@ -7,9 +7,10 @@ use IPC::Shareable;
 IPC::Shareable->testing_set('IPC::Shareable');
 use Test::More;
 
-my $segs_before = IPC::Shareable::seg_count();
-my $sems_before = IPC::Shareable::sem_count();
-warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
+use FindBin;
+use lib $FindBin::Bin;
+use IPCShareableTest qw(assert_clean_process unique_glue);
+
 
 # serializer: storable
 {
@@ -175,8 +176,8 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
     # work correctly when there is no prior _data cache (new tie to the same key).
 
     {
-        tie my $sv,    'IPC::Shareable', { key => '16svp', serializer => 'json', create => 1, destroy => 0 };
-        tie my $child, 'IPC::Shareable', { key => '16svc', serializer => 'json', create => 1, destroy => 0 };
+        tie my $sv,    'IPC::Shareable', { key => unique_glue('16svp'), serializer => 'json', create => 1, destroy => 0 };
+        tie my $child, 'IPC::Shareable', { key => unique_glue('16svc'), serializer => 'json', create => 1, destroy => 0 };
 
         $child = 'hello';
         $sv    = \$child;
@@ -189,7 +190,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 
         # Cold re-attach: new tie to the same parent key, no prior _data cache.
         # _decode_json must reattach the child scalar segment from the __ics__ marker.
-        tie my $sv2, 'IPC::Shareable', { key => '16svp', serializer => 'json', create => 0, destroy => 0 };
+        tie my $sv2, 'IPC::Shareable', { key => unique_glue('16svp'), serializer => 'json', create => 0, destroy => 0 };
         is ref($sv2), 'SCALAR', "json: cold re-attach of scalar child: parent holds scalar ref";
         is $$sv2,     'world',  "json: cold re-attach of scalar child: correct value via re-attached child";
 
@@ -199,10 +200,6 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 
 IPC::Shareable::_end;
 
-my $segs_after = IPC::Shareable::seg_count();
-warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
-is $segs_after, $segs_before, "All segs cleaned up ok";
-my $sems_after = IPC::Shareable::sem_count();
-is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
+assert_clean_process();
 
 done_testing();

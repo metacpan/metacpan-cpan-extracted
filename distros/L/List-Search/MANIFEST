@@ -1,12 +1,18 @@
 Build.PL
+CONTRIBUTING
 CHANGES
+LICENSE
 examples/list_contains_vs_hash.pl
 lib/List/Search.pm
-Makefile.PL
 MANIFEST			This list of files
-META.yml
+t/00_load.t
 t/custom_list_search.t
 t/edge_cases.t
 t/list_contains.t
 t/list_search.t
-TODO
+t/rt_53521.t
+README
+SECURITY
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build

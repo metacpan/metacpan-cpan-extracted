@@ -2,7 +2,7 @@ package Zuzu::Module::Proc;
 
 use utf8;
 
-our $VERSION = '0.001005';
+our $VERSION = '0.002000';
 
 use File::Temp qw( tempfile );
 use IPC::Run qw( harness run timeout );

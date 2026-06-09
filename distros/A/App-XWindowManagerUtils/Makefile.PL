@@ -24,6 +24,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::array" => "0.914",
     "Data::Sah::Compiler::perl::TH::bool" => "0.914",
     "Data::Sah::Compiler::perl::TH::str" => "0.914",
+    "Desktop::KDEActivity::Util" => "0.002",
     "Exporter" => "5.57",
     "IPC::System::Options" => "0.339",
     "Log::ger" => "0.038",
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,6 +51,7 @@ my %FallbackPrereqs = (
   "Data::Sah::Compiler::perl::TH::array" => "0.914",
   "Data::Sah::Compiler::perl::TH::bool" => "0.914",
   "Data::Sah::Compiler::perl::TH::str" => "0.914",
+  "Desktop::KDEActivity::Util" => "0.002",
   "Exporter" => "5.57",
   "File::Spec" => 0,
   "IO::Handle" => 0,

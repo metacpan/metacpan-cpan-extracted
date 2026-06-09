@@ -1,0 +1,55 @@
+{
+   "abstract" : "fast searching of sorted lists",
+   "author" : [
+      "Edmund von der Burg <evdb@ecclestoad.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "List-Search",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.61"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "List::Search" : {
+         "file" : "lib/List/Search.pm",
+         "version" : "0.44"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-list-search@rt.cpan.org",
+         "web" : "https://codeberg.org/rapidcow/p5-List-Search/issues"
+      },
+      "homepage" : "https://foss.rapidcow.org/CPAN/List-Search/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://codeberg.org/rapidcow/p5-List-Search.git",
+         "web" : "https://codeberg.org/rapidcow/p5-List-Search"
+      }
+   },
+   "version" : "0.44",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

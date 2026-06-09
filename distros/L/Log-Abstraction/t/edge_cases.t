@@ -293,7 +293,7 @@ subtest 'file — null byte in filename croaks' => sub {
 	);
 	throws_ok(
 		sub { $logger->debug('trigger') },
-		qr/Tainted or unsafe filename/i,
+		qr/Invalid file name/i,
 		'null byte in top-level file path rejected'
 	);
 };
@@ -307,7 +307,7 @@ subtest 'file — shell metacharacter in filename croaks' => sub {
 	);
 	throws_ok(
 		sub { $logger->debug('trigger') },
-		qr/Tainted or unsafe filename/i,
+		qr/Invalid file name/i,
 		'pipe character in top-level file path rejected'
 	);
 };
@@ -321,7 +321,7 @@ subtest 'file — backtick in filename croaks' => sub {
 	);
 	throws_ok(
 		sub { $logger->debug('trigger') },
-		qr/Tainted or unsafe filename/i,
+		qr/Invalid file name/i,
 		'backtick in top-level file path rejected'
 	);
 };

@@ -4,13 +4,13 @@ BEGIN { *PIPE_BUF = Atomic::Pipe->can('PIPE_BUF') }
 
 BEGIN {
     my $path = __FILE__;
-    $path =~ s{[^/]+\.t$}{worker.pm};
+    $path =~ s{[^/\\]+\.t$}{worker.pm};
     require "./$path";
 }
 
 BEGIN {
     my $path = __FILE__;
-    $path =~ s{[^/]+\.t$}{select_mode.pm};
+    $path =~ s{[^/\\]+\.t$}{select_mode.pm};
     require "./$path";
 }
 

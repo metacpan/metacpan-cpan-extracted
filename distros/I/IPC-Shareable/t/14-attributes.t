@@ -5,11 +5,13 @@ use Data::Dumper;
 use IPC::Shareable;
 use Test::More;
 
-my $segs_before = IPC::Shareable::seg_count();
-my $sems_before = IPC::Shareable::sem_count();
-warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
+use FindBin;
+use lib $FindBin::Bin;
+use IPCShareableTest qw(assert_clean_process unique_glue);
 
-my $k = tie my $sv, 'IPC::Shareable', 'testing', {create => 1, destroy => 1, serializer => 'storable' };
+
+my $glue = unique_glue('testing');
+my $k = tie my $sv, 'IPC::Shareable', $glue, {create => 1, destroy => 1, serializer => 'storable' };
 
 my $attrs_tied = (tied $sv)->attributes;
 is ref $attrs_tied, 'HASH', "tied var attributes() returns a hash ref ok";
@@ -49,7 +51,7 @@ for (@attr_list) {
 
 is $attrs->{warn},      0, "warn is set ok";
 is $attrs->{exclusive}, 0, "exclusive is set ok";
-is $attrs->{key},       'testing', "key is set ok";
+is $attrs->{key},       $glue, "key is set ok";
 is $attrs->{serializer},'storable', "serializer is set ok";
 is $attrs->{size},      65536, "size is set ok";
 is $attrs->{protected}, 0, "protected is set ok";
@@ -106,10 +108,6 @@ is $k->attributes('no_exist'), undef, "attributes() on an undefined attr is unde
 
 IPC::Shareable::_end;
 
-my $segs_after = IPC::Shareable::seg_count();
-warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
-is $segs_after, $segs_before, "All segs cleaned up ok";
-my $sems_after = IPC::Shareable::sem_count();
-is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
+assert_clean_process();
 
 done_testing;

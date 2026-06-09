@@ -1,5 +1,10 @@
 Revision history for perl module Text::Hogan
 
+2.04 2026-06-08
+    * replace eval in find_in_scope
+    * use HTML::Escape
+    * use YAML::XS instead of YAML
+
 2.03 2019-12-17
     * Use Ref::Util, which will use Ref::Util::XS where available, thanks to Ed Freyfogle and opencagedata.com
 

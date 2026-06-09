@@ -31,6 +31,7 @@ languagetests/lang/functions/argument-spread.zzs
 languagetests/lang/functions/lambdas.zzs
 languagetests/lang/functions/named-args.zzs
 languagetests/lang/functions/predeclarations.zzs
+languagetests/lang/functions/return-if.zzs
 languagetests/lang/functions/signatures.zzs
 languagetests/lang/functions/variadic.zzs
 languagetests/lang/keywords/debug-assert.zzs
@@ -42,6 +43,7 @@ languagetests/lang/keywords/import-optional.zzs
 languagetests/lang/keywords/loop-control.zzs
 languagetests/lang/keywords/modules.zzs
 languagetests/lang/keywords/runtime-debug.zzs
+languagetests/lang/keywords/statement-semicolons.zzs
 languagetests/lang/keywords/static.zzs
 languagetests/lang/modules/aliasing.zzs
 languagetests/lang/modules/module_import_cycle_error.zzs

@@ -1,0 +1,47 @@
+*** List::Search - fast searching of sorted lists
+
+For bug report/patches, see CONTRIBUTING.
+
+To report security vulnerabilities, see SECURITY.
+
+This module uses Module::Build.  To install it, run:
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+Then read the documentation:
+
+  perldoc List::Search
+  man 3 List::Search
+
+...More on this module itself...
+
+I took this module into maintenance because I wanted
+to improve existing binary search modules on CPAN
+while I am developing my own.  The Git repository
+<https://codeberg.org/rapidcow/p5-List-Search> keeps
+a history of my patches, but the code is otherwise:
+
+  Copyright (c) 2007 by Edmund von der Burg.
+  This module is free software; you can redistribute it
+  and/or modify it under the same terms as Perl itself.
+  If it breaks you get to keep both pieces.
+
+The (old) Module::Build name for this license is "perl",
+but (new) CPAN Meta Spec version 2 calls it "perl_5".
+The license full text is in LICENSE, for those accessing
+this file from the Git repository.
+
+I imported code from the original BackPAN tarballs
+with permission from author over email; the author
+used to keep a history on an SVN repository (at least
+it seems from the pod), but I was told that said SVN
+repository did not survive. :(  Do believe me when I
+say I retain most original files in good faith....
+
+There is more meta-information regarding this
+on the web site:
+
+  <https://foss.rapidcow.org/CPAN/List-Search/>

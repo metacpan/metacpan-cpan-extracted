@@ -3,7 +3,7 @@ package Zuzu::Module::CSV;
 use strict;
 use utf8;
 
-our $VERSION = '0.001005';
+our $VERSION = '0.002000';
 
 use Encode ();
 use Scalar::Util qw( blessed );

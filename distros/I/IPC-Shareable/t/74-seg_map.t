@@ -5,9 +5,10 @@ use IPC::Shareable;
 IPC::Shareable->testing_set('IPC::Shareable');
 use Test::More;
 
-my $segs_before = IPC::Shareable::seg_count();
-my $sems_before = IPC::Shareable::sem_count();
-warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
+use FindBin;
+use lib $FindBin::Bin;
+use IPCShareableTest qw(assert_clean_process unique_glue);
+
 
 # Class method call croaks
 {
@@ -17,7 +18,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 
 # Single segment (scalar, no children)
 {
-    my $k = tie my $sv, 'IPC::Shareable', { key => 'sm74a', create => 1, exclusive => 1, destroy => 1 , serializer => 'storable' };
+    my $k = tie my $sv, 'IPC::Shareable', { key => unique_glue('sm74a'), create => 1, exclusive => 1, destroy => 1 , serializer => 'storable' };
     $sv = 'hello';
 
     my $map = $k->seg_map;
@@ -41,7 +42,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 # Protected segment - PROTECTED semaphore slot should reflect the value
 {
     my $kp = tie my %h, 'IPC::Shareable', {
-        key       => 'sm74b',
+        key       => unique_glue('sm74b'),
         create    => 1,
         exclusive => 1,
         destroy   => 0,
@@ -59,7 +60,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 
 # Nested segment (hash with a reference child) - parent and child both appear
 {
-    my $kn = tie my %h, 'IPC::Shareable', { key => 'sm74c', create => 1, exclusive => 1, destroy => 1 , serializer => 'storable' };
+    my $kn = tie my %h, 'IPC::Shareable', { key => unique_glue('sm74c'), create => 1, exclusive => 1, destroy => 1 , serializer => 'storable' };
     $h{nested} = { val => 42 };
 
     # Force a read to ensure child segment is created
@@ -76,8 +77,8 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 
 # Object method only shows its own segment tree, not other segments
 {
-    my $k1 = tie my $sv1, 'IPC::Shareable', { key => 'sm74d', create => 1, exclusive => 1, destroy => 1 , serializer => 'storable' };
-    my $k2 = tie my $sv2, 'IPC::Shareable', { key => 'sm74e', create => 1, exclusive => 1, destroy => 1 , serializer => 'storable' };
+    my $k1 = tie my $sv1, 'IPC::Shareable', { key => unique_glue('sm74d'), create => 1, exclusive => 1, destroy => 1 , serializer => 'storable' };
+    my $k2 = tie my $sv2, 'IPC::Shareable', { key => unique_glue('sm74e'), create => 1, exclusive => 1, destroy => 1 , serializer => 'storable' };
     $sv1 = 'first';
     $sv2 = 'second';
 
@@ -97,10 +98,6 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 
 IPC::Shareable::_end;
 
-my $segs_after = IPC::Shareable::seg_count();
-warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
-is $segs_after, $segs_before, "All segs cleaned up ok";
-my $sems_after = IPC::Shareable::sem_count();
-is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
+assert_clean_process();
 
 done_testing();

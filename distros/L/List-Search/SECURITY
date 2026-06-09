@@ -1,0 +1,24 @@
+*** List-Search Security Policy
+
+This is the Security Policy for the CPAN distribution 'List-Search'.
+This is based on the CPAN Security Group's Guidelines for
+policy to Perl Distributions, version 1.4.2.
+<https://security.metacpan.org/docs/guides/security-policy-for-authors.html>
+The latest version of the Security Policy can be found at:
+<https://github.com/CPAN-Security/Software-Security-Policy/blob/main/SECURITY.md>
+
+List-Search is written by EVDB and maintained by RAPIDCOW (me!)
+Report security vulnerabilities to me at <security@rapidcow.org>.
+
+If the issue is urgent, consider also notifying the CPAN Security
+Group (CPANSec) <cpan-security@security.metacpan.org>.  If I don't
+get back to you in 7 days, don't wait for me; just email CPANSec.
+
+If the email is addressed to me, I recommend encrypting to the
+OpenPGP key identified by the long key ID 9536149F905DC1DB:
+
+$ gpg [--keyserver hkps://...] --recv-keys 9536149F905DC1DB
+
+or by the email address <security@rapidcow.org>:
+
+$ gpg [--auto-key-locate dane,wkd] --locate-keys security@rapidcow.org

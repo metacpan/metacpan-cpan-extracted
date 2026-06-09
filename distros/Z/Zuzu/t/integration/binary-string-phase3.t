@@ -49,6 +49,14 @@ let m := ( "abc123" ~ /([0-9]+)/ );
 ( m[0] eq "123" ) and ( m[1] eq "123" );
 SRC
 
+is eval_src(<<'SRC'), 1, 'String index and slice reads are supported';
+let s := "abcd";
+( s[1] eq "b" )
+	and ( s[-1] eq "d" )
+	and ( s[1:2] eq "bc" )
+	and ( s[-2:] eq "cd" );
+SRC
+
 like dies {
 	eval_src(<<'SRC');
 to_binary( "abc" ) & to_binary( "xy" );
@@ -65,10 +73,10 @@ SRC
 
 like dies {
 	eval_src(<<'SRC');
-"abc"[0];
+true[0];
 SRC
-}, qr/Indexing expects Array or BinaryString/,
-	'indexing non-Array and non-BinaryString still throws clear error';
+}, qr/Indexing expects Array, String, or BinaryString/,
+	'indexing non-Array, non-String, and non-BinaryString still throws clear error';
 
 
 done_testing;

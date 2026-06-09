@@ -12,7 +12,6 @@ build_requires:
   IPC::System::Simple: '0'
   JSON::MaybeXS: '0'
   POSIX: '0'
-  Readonly: '0'
   Test::DescribeMe: '0'
   Test::Mockingbird: '0.1'
   Test::Most: '0'
@@ -40,7 +39,8 @@ requires:
   Log::Log4perl: '0'
   POSIX: '0'
   Params::Get: '0.13'
-  Readonly::Values::Syslog: '0.03'
+  Readonly: '0'
+  Readonly::Values::Syslog: '0.04'
   Return::Set: '0'
   Scalar::Util: '0'
   Sys::Syslog: '0.28'
@@ -49,5 +49,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-Abstraction
   homepage: https://metacpan.org/pod/Log::Abstraction
   repository: git://github.com/nigelhorne/Log-Abstraction.git
-version: 0.29
+version: 0.31
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

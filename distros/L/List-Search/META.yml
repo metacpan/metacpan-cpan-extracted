@@ -1,23 +1,28 @@
 ---
-name: List-Search
-version: 0.3
+abstract: 'fast searching of sorted lists'
 author:
   - 'Edmund von der Burg <evdb@ecclestoad.co.uk>'
-abstract: fast searching of sorted lists
-license: perl
-resources:
-  license: http://dev.perl.org/licenses/
-requires:
-  Carp: 0
 build_requires:
-  Data::Dumper: 0
-  Module::Build: 0
-  Test::More: 0
+  Test::More: '0.61'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: List-Search
 provides:
   List::Search:
     file: lib/List/Search.pm
-    version: 0.3
-generated_by: Module::Build version 0.28
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
+    version: '0.44'
+requires:
+  Exporter: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://codeberg.org/rapidcow/p5-List-Search/issues
+  homepage: https://foss.rapidcow.org/CPAN/List-Search/
+  repository: https://codeberg.org/rapidcow/p5-List-Search.git
+version: '0.44'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

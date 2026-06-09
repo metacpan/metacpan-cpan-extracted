@@ -1,5 +1,5 @@
 package Text::Hogan;
-$Text::Hogan::VERSION = '2.03';
+$Text::Hogan::VERSION = '2.04';
 use strict;
 use warnings;
 
@@ -13,7 +13,7 @@ Text::Hogan - A mustache templating engine statement-for-statement cloned from h
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 DESCRIPTION
 

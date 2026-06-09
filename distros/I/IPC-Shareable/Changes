@@ -1,5 +1,48 @@
 Revision history for Perl extension IPC::Shareable.
 
+1.18    2026-06-08
+    - Fix intermittent CPAN failures under parallel smokers, which assumed
+      exclusive use of System V IPC. Added t/IPCShareableTest.pm (unique_glue,
+      assert_clean, assert_clean_process, live_seg_count) and moved the fork
+      tests (t/18, 19, 24, 26, 28, 32, 44) to per-run keys with run-scoped
+      cleanup checks
+    - t/26-ipcav.t and t/38-lsync.t: replace the racy SIGALRM/sleep handshake
+      (lost-wakeup; could hang under smokers or emulation) with a two-pipe
+      handshake
+    - t/47-seg_size.t: skip the "size > max RAM must croak" check on 32-bit
+      size_t, where the size wraps to an allocatable value and the tie succeeds
+    - Replace global seg_count()/sem_count() cleanup checks with a
+      process-scoped assert_clean_process(); the suite now passes under
+      `prove -j4`. t/00-base and t/99-end keep a global count check, serial-only
+    - Re-key ~30 more tests with per-run keys so concurrent runs can't collide.
+      t/06-key stays serial-only (it pins the key-generation algorithm)
+    - clean_up_testing() now removes only segments the caller created or whose
+      creator has exited, leaving another live process's segments alone -- safe
+      under `prove -j` and concurrent smokers
+    - Tied SCALARs holding a plain (non-reference) value now store it verbatim
+      rather than JSON/Storable-wrapping it; references still share their
+      structure as before. (Numbers read back in string form, but still compare
+      equal numerically)
+    - Fix a shared-memory segment leak when a tie created its segment but failed
+      to set up its semaphore (eg. ENOSPC) or acquire its initial lock: the
+      segment (and any semaphore set we created) is now removed before croaking,
+      which still reports the underlying cause
+    - Make the suite resilient on hosts with a small semaphore budget (eg.
+      OpenBSD, semmni=10): t/94 and t/95 release their IPC between steps there.
+      Adds sem_set_limit/low_sem_resources/relieve_ipc_pressure helpers, plus
+      t/96 and t/97
+    - Tolerate a semaphore set removed by another process (EINVAL on the next
+      operation), the cause of intermittent CPAN-tester failures on heavily
+      parallel smokers. _write_permitted() now skips its advisory lock check
+      when getval() returns undef (it had been emitting "uninitialized value
+      in numeric gt" warnings), and unlock() warns once and continues rather
+      than croaking "Could not release semaphore lock". Adds
+      t/81-sem-removed-under-lock.t
+    - Finish migrating the forked tests off the lost-wakeup SIGALRM/sleep
+      handshake (which could hang a smoker or desync the processes): t/03, 18,
+      28, 30, 36, 66 and 85 now use a shared pipe-barrier helper
+      (barrier_new/barrier_wait/barrier_release in t/IPCShareableTest.pm)
+
 1.17    2026-05-31
     - POD enhancements regarding testing_set() and clean_up_testing()
     - Test VM enhancements (now allows Async::Event::Interval to piggy back

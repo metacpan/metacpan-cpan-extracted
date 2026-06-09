@@ -2,7 +2,7 @@ package Zuzu::Module::Marshal;
 
 use utf8;
 
-our $VERSION = '0.001005';
+our $VERSION = '0.002000';
 
 use POSIX qw( isfinite );
 use Scalar::Util qw( blessed looks_like_number refaddr );

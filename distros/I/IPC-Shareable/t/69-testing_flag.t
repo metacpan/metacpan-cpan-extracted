@@ -6,11 +6,12 @@ use IPC::Semaphore;
 use String::CRC32;
 use Test::More;
 
-my $segs_before = IPC::Shareable::seg_count();
-my $sems_before = IPC::Shareable::sem_count();
-warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
+use FindBin;
+use lib $FindBin::Bin;
+use IPCShareableTest qw(assert_clean_process unique_glue);
 
-my $DIST = 'IPC::Shareable::Test::69';
+
+my $DIST = unique_glue('IPC::Shareable::Test::69');
 my $expected_hash = (String::CRC32::crc32($DIST) & 0x7FFF) || 1;
 
 # 1. testing_set() croaks with no argument or empty string
@@ -28,7 +29,7 @@ my $expected_hash = (String::CRC32::crc32($DIST) & 0x7FFF) || 1;
 #    SEM_TESTING holds the correct hash
 {
     tie my %h, 'IPC::Shareable', {
-        key     => 'tf02',
+        key     => unique_glue('tf02'),
         create  => 1,
         destroy => 1,
         testing => $DIST,
@@ -51,7 +52,7 @@ my $expected_hash = (String::CRC32::crc32($DIST) & 0x7FFF) || 1;
 # 3. Segment created without testing => has 4 semaphore slots
 {
     tie my %h, 'IPC::Shareable', {
-        key     => 'tf03',
+        key     => unique_glue('tf03'),
         create  => 1,
         destroy => 1,
     };
@@ -69,7 +70,7 @@ my $expected_hash = (String::CRC32::crc32($DIST) & 0x7FFF) || 1;
     IPC::Shareable->testing_set($DIST);
 
     tie my %auto, 'IPC::Shareable', {
-        key     => 'tf04a',
+        key     => unique_glue('tf04a'),
         create  => 1,
         destroy => 1,
     };
@@ -80,7 +81,7 @@ my $expected_hash = (String::CRC32::crc32($DIST) & 0x7FFF) || 1;
         "Auto-tagged tie has correct SEM_TESTING hash";
 
     tie my %no, 'IPC::Shareable', {
-        key     => 'tf04b',
+        key     => unique_glue('tf04b'),
         create  => 1,
         destroy => 1,
         testing => 0,
@@ -96,17 +97,17 @@ my $expected_hash = (String::CRC32::crc32($DIST) & 0x7FFF) || 1;
 
 # 5. clean_up_testing() removes only matching segments, not others
 {
-    my $other_dist = 'IPC::Shareable::Test::OTHER';
+    my $other_dist = unique_glue('IPC::Shareable::Test::OTHER');
 
     tie my %target, 'IPC::Shareable', {
-        key     => 'tf05t',
+        key     => unique_glue('tf05t'),
         create  => 1,
         destroy => 0,       # must survive to be found by clean_up_testing
         testing => $DIST,
     };
 
     tie my %other, 'IPC::Shareable', {
-        key     => 'tf05o',
+        key     => unique_glue('tf05o'),
         create  => 1,
         destroy => 1,
         testing => $other_dist,
@@ -130,7 +131,7 @@ my $expected_hash = (String::CRC32::crc32($DIST) & 0x7FFF) || 1;
 # 6. clean_up_testing() finds orphans (segments not in global_register)
 {
     # Create a segment, capture its key, clear global_register by untying
-    my $key_str = 'tf06o';
+    my $key_str = unique_glue('tf06o');
 
     {
         tie my %orphan, 'IPC::Shareable', {
@@ -156,7 +157,7 @@ my $expected_hash = (String::CRC32::crc32($DIST) & 0x7FFF) || 1;
     IPC::Shareable->testing_set($DIST);
 
     tie my %parent, 'IPC::Shareable', {
-        key     => 'tf07',
+        key     => unique_glue('tf07'),
         create  => 1,
         destroy => 1,
     };
@@ -183,7 +184,7 @@ my $expected_hash = (String::CRC32::crc32($DIST) & 0x7FFF) || 1;
 # 8. clean_up_testing() ignores protected — both-attributed segments are removed
 {
     tie my %both, 'IPC::Shareable', {
-        key       => 'tf08',
+        key       => unique_glue('tf08'),
         create    => 1,
         destroy   => 0,
         protected => 9999,
@@ -205,8 +206,8 @@ my $expected_hash = (String::CRC32::crc32($DIST) & 0x7FFF) || 1;
 
 # 9. clean_up_testing() returns the count of removed segments
 {
-    tie my %a, 'IPC::Shareable', { key => 'tf09a', create => 1, destroy => 0, testing => $DIST };
-    tie my %b, 'IPC::Shareable', { key => 'tf09b', create => 1, destroy => 0, testing => $DIST };
+    tie my %a, 'IPC::Shareable', { key => unique_glue('tf09a'), create => 1, destroy => 0, testing => $DIST };
+    tie my %b, 'IPC::Shareable', { key => unique_glue('tf09b'), create => 1, destroy => 0, testing => $DIST };
 
     my $removed = IPC::Shareable::clean_up_testing($DIST);
     is $removed, 2, "clean_up_testing() returns count of removed segments (2)";
@@ -220,11 +221,7 @@ my $expected_hash = (String::CRC32::crc32($DIST) & 0x7FFF) || 1;
     IPC::Shareable::_end();
 }
 
-my $segs_after = IPC::Shareable::seg_count();
-warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
-is $segs_after, $segs_before, "All segments cleaned up — count matches baseline";
+assert_clean_process();
 
-my $sems_after = IPC::Shareable::sem_count();
-is $sems_after, $sems_before, "All semaphore sets cleaned up — count matches baseline";
 
 done_testing();

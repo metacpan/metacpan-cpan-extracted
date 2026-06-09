@@ -2,7 +2,7 @@ package Object::HashBase;
 use strict;
 use warnings;
 
-our $VERSION = '0.017';
+our $VERSION = '0.018';
 our $HB_VERSION = $VERSION;
 # The next line is for inlining
 # <-- START -->
@@ -90,10 +90,11 @@ sub do_import {
         $pm =~ s{::}{/}g;
         $pm .= '.pm';
         unless ($INC{$pm}) {
-            local ($@);
-            unless (eval { require $pm; 1 }) {
-                Carp::croak("Could not load parent class '$parent': $@");
-            }
+            # croak outside the local($@) scope: perl < 5.14 clobbers $@ when
+            # the local is restored during unwind, losing the exception.
+            my $err;
+            { local $@; $err = ($@ || 'unknown error') unless eval { require $pm; 1 }; }
+            Carp::croak("Could not load parent class '$parent': $err") if defined $err;
         }
         no strict 'refs';
         push @{"$into\::ISA"}, $parent unless grep { $_ eq $parent } @{"$into\::ISA"};
@@ -109,7 +110,9 @@ sub do_import {
     my $add_new = _is_role($into) ? 0 : 1;
 
     if ($add_new && (my $have_new = $into->can('new'))) {
-        my $new_lookup = $Object::HashBase::NEW_LOOKUP //= {};
+        # '//=' is perl 5.10+; this module supports 5.008001.
+        $Object::HashBase::NEW_LOOKUP = {} unless defined $Object::HashBase::NEW_LOOKUP;
+        my $new_lookup = $Object::HashBase::NEW_LOOKUP;
         $add_new = 0 unless $new_lookup->{$have_new};
     }
 
@@ -135,10 +138,9 @@ sub do_import {
             if $] < 5.010;
 
         unless ($INC{'Role/Tiny.pm'}) {
-            local ($@);
-            unless (eval { require Role::Tiny; 1 }) {
-                Carp::croak("Object::HashBase '&' role prefix requires Role::Tiny but it could not be loaded: $@");
-            }
+            my $err;
+            { local $@; $err = ($@ || 'unknown error') unless eval { require Role::Tiny; 1 }; }
+            Carp::croak("Object::HashBase '&' role prefix requires Role::Tiny but it could not be loaded: $err") if defined $err;
         }
 
         unless (Role::Tiny->can('is_role')) {
@@ -151,10 +153,9 @@ sub do_import {
             $pm .= '.pm';
 
             unless ($INC{$pm}) {
-                local ($@);
-                unless (eval { require $pm; 1 }) {
-                    Carp::croak("Could not load role '$role': $@");
-                }
+                my $err;
+                { local $@; $err = ($@ || 'unknown error') unless eval { require $pm; 1 }; }
+                Carp::croak("Could not load role '$role': $err") if defined $err;
             }
 
             Carp::croak("'$role' is not a Role::Tiny role")
@@ -318,7 +319,8 @@ sub _build_new {
         $self;
     };
 
-    my $new_lookup = $Object::HashBase::NEW_LOOKUP //= {};
+    $Object::HashBase::NEW_LOOKUP = {} unless defined $Object::HashBase::NEW_LOOKUP;
+    my $new_lookup = $Object::HashBase::NEW_LOOKUP;
     $new_lookup->{$new} = 1;
 
     my %out;

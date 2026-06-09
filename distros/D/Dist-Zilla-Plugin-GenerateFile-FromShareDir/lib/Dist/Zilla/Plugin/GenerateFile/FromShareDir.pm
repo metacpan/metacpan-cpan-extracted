@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::GenerateFile::FromShareDir; # git description: v0.014-9-g84393db
+package Dist::Zilla::Plugin::GenerateFile::FromShareDir; # git description: v0.015-8-ga328db9
 # vim: set ts=8 sts=2 sw=2 tw=115 et :
 # ABSTRACT: Create files in the repository or build, using a sharedir template
 # KEYWORDS: plugin distribution generate create file sharedir template
 
-our $VERSION = '0.015';
+our $VERSION = '0.016';
 
 use Moose;
 with (
@@ -17,7 +17,6 @@ with (
     'Dist::Zilla::Role::AfterRelease',
 );
 
-use MooseX::SlurpyConstructor 1.2;
 use Moose::Util 'find_meta';
 use File::ShareDir 'dist_file';
 use Path::Tiny 0.04;
@@ -68,12 +67,10 @@ has phase => (
 
 has _extra_args => (
     isa => 'HashRef[Str]',
-    init_arg => undef,
     lazy => 1,
     default => sub { {} },
     traits => ['Hash'],
     handles => { _extra_args => 'elements' },
-    slurpy => 1,
 );
 
 around BUILDARGS => sub
@@ -84,7 +81,13 @@ around BUILDARGS => sub
     my $args = $class->$orig(@_);
     $args->{'-destination_filename'} = delete $args->{'-filename'} if exists $args->{'-filename'};
 
-    return $args;
+    my %extra_args = %$args;
+    delete @extra_args{qw(plugin_name zilla -dist -destination_filename -source_filename -encoding -location -phase)};
+
+    return +{
+        %$args,
+        _extra_args => \%extra_args,
+    };
 };
 
 around dump_config => sub
@@ -127,7 +130,7 @@ sub gather_files
 
     $self->log_debug([ 'using template in %s', $file_path ]);
     my $content = path($file_path)->slurp_raw;
-    $content = Encode::decode($self->encoding, $content, Encode::FB_CROAK());
+    $content = Encode::decode($self->encoding, $content, Encode::DIE_ON_ERR);
 
     require Dist::Zilla::File::InMemory;
     my $file = Dist::Zilla::File::InMemory->new(
@@ -193,7 +196,7 @@ sub munge_file
     );
 
     # older Dist::Zilla wrote out all files :raw, so we need to encode manually here.
-    $content = Encode::encode($self->encoding, $content, Encode::FB_CROAK()) if not $file->can('encoded_content');
+    $content = Encode::encode($self->encoding, $content, Encode::DIE_ON_ERR) if not $file->can('encoded_content');
 
     $file->content($content);
 }
@@ -226,14 +229,14 @@ Dist::Zilla::Plugin::GenerateFile::FromShareDir - Create files in the repository
 
 =head1 VERSION
 
-version 0.015
+version 0.016
 
 =head1 SYNOPSIS
 
 In your F<dist.ini>:
 
     [GenerateFile::FromShareDir]
-    -dist = Dist::Zilla::PluginBundle::Author::ME
+    -dist = Dist-Zilla-PluginBundle-Author-ME
     -source_filename = my_data_template.txt
     -destination_filename = examples/my_data.txt
     key1 = value to pass to template
@@ -253,7 +256,7 @@ L<[GatherDir::Template]|Dist::Zilla::Plugin::GatherDir::Template>
 or L<[GenerateFile]|Dist::Zilla::Plugin::GenerateFile>
 to generate the file directly, without needing a sharedir.)
 
-=for Pod::Coverage::TrustPod gather_files
+=for Pod::Coverage gather_files
     munge_file
     after_build
     after_release
@@ -325,6 +328,14 @@ L<[GenerateFile]|Dist::Zilla::Plugin::GenerateFile> - generate a (possibly-templ
 
 =back
 
+=head1 GIVING THANKS
+
+=for stopwords MetaCPAN GitHub
+
+If you found this module to be useful, please show your appreciation by
+adding a +1 in L<MetaCPAN|https://metacpan.org/dist/Dist-Zilla-Plugin-GenerateFile-FromShareDir>
+and a star in L<GitHub|https://github.com/karenetheridge/Dist-Zilla-Plugin-GenerateFile-FromShareDir>.
+
 =head1 SUPPORT
 
 Bugs may be submitted through L<the RT bug tracker|https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-GenerateFile-FromShareDir>
@@ -336,7 +347,7 @@ L<http://dzil.org/#mailing-list>.
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.freenode.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHOR
 
@@ -344,13 +355,17 @@ Karen Etheridge <ether@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Dave Rolsky Kent Fredric
+=for stopwords Dave Rolsky Grinnz Kent Fredric
 
 =over 4
 
 =item *
 
 Dave Rolsky <autarch@urth.org>
+
+=item *
+
+Grinnz <grinnz@gmail.com>
 
 =item *
 

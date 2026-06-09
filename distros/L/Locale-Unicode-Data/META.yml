@@ -7,7 +7,7 @@ build_requires:
   File::Find: '0'
   Test::More: '1.302120'
   Test::Pod: '1.52'
-  lib: '0.63'
+  lib: '0'
   open: '0'
   utf8: '0'
 configure_requires:
@@ -29,7 +29,7 @@ requires:
   Encode: '2.24'
   File::Spec: '3.2501'
   JSON: '2.00'
-  Locale::Unicode: v0.3.11
+  Locale::Unicode: v0.4.3
   Scalar::Util: '0'
   Wanted: v0.1.0
   perl: '5.010001'
@@ -39,7 +39,7 @@ requires:
   warnings: '0'
   warnings::register: '0'
 resources:
-  bugtracker: https://gitlab.com/jackdeguest/Locale-Unicode-Data/issues
-  repository: https://gitlab.com/jackdeguest/Locale-Unicode-Data
-version: v1.8.4
+  bugtracker: https://gitlab.com/deguest/Locale-Unicode-Data/issues
+  repository: https://gitlab.com/deguest/Locale-Unicode-Data
+version: v1.8.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

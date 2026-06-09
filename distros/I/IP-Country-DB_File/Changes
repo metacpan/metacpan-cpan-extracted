@@ -1,5 +1,10 @@
 Revision history for Perl module IP::Country::DB_File
 
+4.00  Jun 9 2026
+        - Fetch statistics files via HTTPS
+        - Generate META.json (Mohammad S Anwar)
+        - Update getaddrinfo support diagnostics
+
 3.03  Aug 25 2014
         - Skip db_time test on Windows
         - More conservative check for broken Socket

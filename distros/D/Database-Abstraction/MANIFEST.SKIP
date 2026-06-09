@@ -69,3 +69,6 @@
 Database-.*
 .test-script-*
 typescript
+CLAUDE.md
+\.claude
+mutation.json

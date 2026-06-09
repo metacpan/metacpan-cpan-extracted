@@ -4,7 +4,7 @@ User data management with multiple storage backends.
 
 ## VERSION
 
-v0.7.1
+v0.9.2
 
 ## SYNOPSIS
 

@@ -6,9 +6,12 @@ use IPC::Shareable;
 IPC::Shareable->testing_set('IPC::Shareable');
 use Test::More;
 
-my $segs_before = IPC::Shareable::seg_count();
-my $sems_before = IPC::Shareable::sem_count();
-warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
+use FindBin;
+use lib $FindBin::Bin;
+use IPCShareableTest qw(
+    assert_clean_process barrier_new barrier_release barrier_wait unique_glue
+);
+
 
 my $t  = 1;
 my $ok = 1;
@@ -37,8 +40,10 @@ my $ok = 1;
     }
 }
 
-my $awake = 0;
-local $SIG{ALRM} = sub { $awake = 1 };
+# A pipe barrier (see IPCShareableTest::barrier_new) replaces the old
+# SIGALRM/sleep handshake and its lost-wakeup race.
+
+my $ready = barrier_new();   # parent -> child: segment created
 
 my $pid = fork;
 defined $pid or die "Cannot fork : $!";
@@ -46,9 +51,9 @@ defined $pid or die "Cannot fork : $!";
 if ($pid == 0) {
     # child
 
-    sleep unless $awake;
+    barrier_wait($ready);
 
-    tie my $d, 'IPC::Shareable', 'obj', { destroy => 0 , serializer => 'storable' };
+    tie my $d, 'IPC::Shareable', unique_glue('obj'), { destroy => 0 , serializer => 'storable' };
 #    is ref($d), 'Dummy', "child: shared var has object ok";
 
 #    is $d->first(), 'foobar', "child: shared obj first() returns ok";
@@ -64,7 +69,7 @@ if ($pid == 0) {
 } else {
     # parent
 
-    my $s = tie my $d, 'IPC::Shareable', 'obj', { create => 1, destroy => 1 , serializer => 'storable' };
+    my $s = tie my $d, 'IPC::Shareable', unique_glue('obj'), { create => 1, destroy => 1 , serializer => 'storable' };
 
 #    my $id = $s->{_shm}->{_id};
 
@@ -76,7 +81,7 @@ if ($pid == 0) {
     $d->first('foobar');
     $d->second('barfoo');
 
-    kill ALRM => $pid;
+    barrier_release($ready);
     waitpid($pid, 0);
 
     is $d->first(), 'kid did', "parent: shared obj first() returns ok";
@@ -89,11 +94,7 @@ if ($pid == 0) {
 
 IPC::Shareable::_end;
 
-my $segs_after = IPC::Shareable::seg_count();
-warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
-is $segs_after, $segs_before, "All segs cleaned up ok";
-my $sems_after = IPC::Shareable::sem_count();
-is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
+assert_clean_process();
 
 done_testing();
 

@@ -1,0 +1,223 @@
+from std/eval import eval;
+from test/more import *;
+
+const STATEMENT_ERROR_RE :=
+	/parse|syntax|Expected|Unexpected|semicolon|terminator|statement/i;
+
+function eval_ok ( String source, String name ) {
+	is(
+		exception( function () {
+			eval(source);
+		} ),
+		null,
+		name,
+	);
+}
+
+function eval_rejects ( String source, String name ) {
+	like(
+		exception( function () {
+			eval(source);
+		} ),
+		STATEMENT_ERROR_RE,
+		name,
+	);
+}
+
+eval_ok( """let value := 1""", "final let declaration may omit semicolon" );
+eval_ok( """const value := 1""", "final const declaration may omit semicolon" );
+eval_ok( """from std/math import *""", "final import may omit semicolon" );
+eval_ok(
+	"""let value := 0; value := 1""",
+	"final assignment may omit semicolon",
+);
+eval_ok( """1 + 1""", "final expression statement may omit semicolon" );
+eval_ok(
+	"""function f () { return 1 } f();""",
+	"final return statement in block may omit semicolon",
+);
+eval_ok(
+	"""let seen := 0; for ( let value in[ 1 ] ) { seen += value; next }""",
+	"final next statement in block may omit semicolon",
+);
+eval_ok(
+	"""let seen := 0; for ( let value in[ 1 ] ) { seen += value; last }""",
+	"final last statement in block may omit semicolon",
+);
+eval_ok(
+	"""switch ( "hit": eq ) { case "hit": { continue } default: { } }""",
+	"final continue statement in block may omit semicolon",
+);
+eval_ok(
+	"""try { throw new Exception( message: "thrown" ) }
+	catch ( Exception err ) { }""",
+	"final throw statement in block may omit semicolon",
+);
+eval_ok(
+	"""try { die "died" } catch ( Exception err ) { }""",
+	"final die statement in block may omit semicolon",
+);
+eval_ok(
+	"""let value := 0; value += 1 if true""",
+	"final postfix-if statement may omit semicolon",
+);
+eval_ok(
+	"""let values := []; values.push(^^) for [ 1, 2 ]""",
+	"final postfix-for statement may omit semicolon",
+);
+
+eval_rejects(
+	"""let first := 1
+let second := 2;""",
+	"non-final let declaration requires semicolon",
+);
+eval_rejects(
+	"""const first := 1
+let second := 2;""",
+	"non-final const declaration requires semicolon",
+);
+eval_rejects(
+	"""from std/math import *
+let value := 1;""",
+	"non-final import requires semicolon",
+);
+eval_rejects(
+	"""let value := 0; value := 1
+let second := 2;""",
+	"non-final assignment requires semicolon",
+);
+eval_rejects(
+	"""1 + 1
+let value := 2;""",
+	"non-final expression statement requires semicolon",
+);
+eval_rejects(
+	"""function f () { return 1
+let value := 2; } f();""",
+	"non-final return statement requires semicolon",
+);
+eval_rejects(
+	"""for ( let value in[ 1 ] ) { next
+let second := 2; }""",
+	"non-final next statement requires semicolon",
+);
+eval_rejects(
+	"""for ( let value in[ 1 ] ) { last
+let second := 2; }""",
+	"non-final last statement requires semicolon",
+);
+eval_rejects(
+	"""switch ( "hit": eq ) { case "hit": { continue
+let second := 2; } default: { } }""",
+	"non-final continue statement requires semicolon",
+);
+eval_rejects(
+	"""try { throw new Exception( message: "thrown" )
+let second := 2; } catch ( Exception err ) { }""",
+	"non-final throw statement requires semicolon",
+);
+eval_rejects(
+	"""try { die "died"
+let second := 2; } catch ( Exception err ) { }""",
+	"non-final die statement requires semicolon",
+);
+eval_rejects(
+	"""let value := 0; value += 1 if true
+let second := 2;""",
+	"non-final postfix-if statement requires semicolon",
+);
+eval_rejects(
+	"""let values := []; values.push(^^) for [ 1, 2 ]
+let second := 2;""",
+	"non-final postfix-for statement requires semicolon",
+);
+
+eval_ok(
+	"""let value := 0; { value += 1; } let after := value;""",
+	"block statement does not require trailing semicolon",
+);
+eval_ok(
+	"""function f () { return 1 } let after := f();""",
+	"function definition does not require trailing semicolon",
+);
+eval_ok(
+	"""class SemicolonClass { method value () { return 1 } }
+let after := (new SemicolonClass()).value();""",
+	"class definition does not require trailing semicolon",
+);
+eval_ok(
+	"""trait SemicolonTrait { method value () { return 1 } }
+let after := 1;""",
+	"trait definition does not require trailing semicolon",
+);
+eval_ok(
+	"""let value := 0; if ( true ) { value := 1; } let after := value;""",
+	"if statement does not require trailing semicolon",
+);
+eval_ok(
+	"""let value := 0; while ( value < 1 ) { value += 1; } let after := value;""",
+	"while statement does not require trailing semicolon",
+);
+eval_ok(
+	"""let total := 0; for ( let value in[ 1 ] ) { total += value; }
+let after := total;""",
+	"for statement does not require trailing semicolon",
+);
+eval_ok(
+	"""let picked := 0; switch ( 1 ) { case 1: picked := 1; }
+let after := picked;""",
+	"switch statement does not require trailing semicolon",
+);
+eval_ok(
+	"""try { let value := 1; } catch ( Exception err ) { }
+let after := 1;""",
+	"try/catch statement does not require trailing semicolon",
+);
+
+eval_ok(
+	"""let value := 0; { value += 1; }; let after := value;""",
+	"block statement may be followed by extra semicolon",
+);
+eval_ok(
+	"""function f () { return 1 }; let after := f();""",
+	"function definition may be followed by extra semicolon",
+);
+eval_ok(
+	"""class SemicolonClassExtra { method value () { return 1 } };
+let after := (new SemicolonClassExtra()).value();""",
+	"class definition may be followed by extra semicolon",
+);
+eval_ok(
+	"""trait SemicolonTraitExtra { method value () { return 1 } };
+let after := 1;""",
+	"trait definition may be followed by extra semicolon",
+);
+eval_ok(
+	"""let value := 0; if ( true ) { value := 1; }; let after := value;""",
+	"if statement may be followed by extra semicolon",
+);
+eval_ok(
+	"""let value := 0; while ( value < 1 ) { value += 1; }; let after := value;""",
+	"while statement may be followed by extra semicolon",
+);
+eval_ok(
+	"""let total := 0; for ( let value in[ 1 ] ) { total += value; };
+let after := total;""",
+	"for statement may be followed by extra semicolon",
+);
+eval_ok(
+	"""let picked := 0; switch ( 1 ) { case 1: picked := 1; };
+let after := picked;""",
+	"switch statement may be followed by extra semicolon",
+);
+eval_ok(
+	"""try { let value := 1; } catch ( Exception err ) { };
+let after := 1;""",
+	"try/catch statement may be followed by extra semicolon",
+);
+eval_ok(
+	"""let first := 1;;;; let second := 2;;;;""",
+	"extra semicolons are allowed between statements",
+);
+
+done_testing();

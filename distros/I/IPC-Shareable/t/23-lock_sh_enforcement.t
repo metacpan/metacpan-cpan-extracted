@@ -5,14 +5,15 @@ use IPC::Shareable qw(:lock SEM_READERS SEM_WRITERS);
 IPC::Shareable->testing_set('IPC::Shareable');
 use Test::More;
 
-my $segs_before = IPC::Shareable::seg_count();
-my $sems_before = IPC::Shareable::sem_count();
-warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
+use FindBin;
+use lib $FindBin::Bin;
+use IPCShareableTest qw(assert_clean_process unique_glue);
+
 
 # --- LOCK_SH blocks writes from other knots (enforced_write_locking) ---
 {
     my $k1 = tie my %h1, 'IPC::Shareable', {
-        key              => 'SLCK1',
+        key              => unique_glue('SLCK1'),
         create           => 1,
         destroy          => 1,
         enforced_write_locking => 1,
@@ -20,7 +21,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
             serializer => 'storable',
     };
     my $k2 = tie my %h2, 'IPC::Shareable', {
-        key              => 'SLCK1',
+        key              => unique_glue('SLCK1'),
         enforced_write_locking => 1,
         enforced_read_locking  => 1,
             serializer => 'storable',
@@ -59,7 +60,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 # --- LOCK_SH holder itself cannot write (must upgrade to LOCK_EX) ---
 {
     my $k1 = tie my %h1, 'IPC::Shareable', {
-        key              => 'SLCK2',
+        key              => unique_glue('SLCK2'),
         create           => 1,
         destroy          => 1,
         enforced_write_locking => 1,
@@ -98,7 +99,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 # --- violated_write_lock_warn fires with 'active readers' message ---
 {
     my $k1 = tie my %h1, 'IPC::Shareable', {
-        key              => 'SLCK3',
+        key              => unique_glue('SLCK3'),
         create           => 1,
         destroy          => 1,
         enforced_write_locking => 1,
@@ -106,7 +107,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
             serializer => 'storable',
     };
     my $k2 = tie my %h2, 'IPC::Shareable', {
-        key                => 'SLCK3',
+        key                => unique_glue('SLCK3'),
         enforced_write_locking => 1,
         enforced_read_locking  => 1,
         violated_write_lock_warn => 1,
@@ -146,7 +147,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 # --- LOCK_EX blocking still works (regression) ---
 {
     my $k1 = tie my %h1, 'IPC::Shareable', {
-        key              => 'SLCK4',
+        key              => unique_glue('SLCK4'),
         create           => 1,
         destroy          => 1,
         enforced_write_locking => 1,
@@ -154,7 +155,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
             serializer => 'storable',
     };
     my $k2 = tie my %h2, 'IPC::Shareable', {
-        key              => 'SLCK4',
+        key              => unique_glue('SLCK4'),
         enforced_write_locking => 1,
         enforced_read_locking  => 1,
             serializer => 'storable',
@@ -187,7 +188,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 #     another knot holds LOCK_EX (no warning, no block) ---
 {
     my $k1 = tie my %h1, 'IPC::Shareable', {
-        key                       => 'SLCK5',
+        key                       => unique_glue('SLCK5'),
         create                    => 1,
         destroy                   => 1,
         enforced_write_locking    => 0,
@@ -197,7 +198,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
         serializer                => 'storable',
     };
     my $k2 = tie my %h2, 'IPC::Shareable', {
-        key                       => 'SLCK5',
+        key                       => unique_glue('SLCK5'),
         enforced_write_locking    => 0,
         violated_write_lock_warn  => 0,
         enforced_read_locking     => 0,
@@ -220,10 +221,6 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 
 IPC::Shareable::_end;
 
-my $segs_after = IPC::Shareable::seg_count();
-warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
-is $segs_after, $segs_before, "All segs cleaned up ok";
-my $sems_after = IPC::Shareable::sem_count();
-is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
+assert_clean_process();
 
 done_testing;

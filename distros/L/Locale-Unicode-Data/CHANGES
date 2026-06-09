@@ -1,5 +1,17 @@
 Revision history for Perl module Locale::Unicode::Data
 
+v1.8.5 2026-06-07T14:38:10+0900
+    - Fixed a segmentation fault (SIGSEGV) on teardown under OpenBSD, and on any
+      other platform whose memory allocator is strict about use-after-free. The
+      END block now finalises the cached prepared statement handles, and then
+      disconnects the cached database handles, in a deterministic order before
+      Perl global destruction begins.
+    - Previously the END block only called finish() on the statement handles
+      without releasing them, so during global destruction a statement handle
+      could be finalised after its parent SQLite connection had already been
+      closed. On OpenBSD this use-after-free aborts the process: all subtests
+      passed, then the test file dumped core during teardown.
+
 v1.8.4 2026-06-07T07:20:16+0900
     - Fixed SQLite handle caching under ithreads. Database handles are now cached
       properly per thread.

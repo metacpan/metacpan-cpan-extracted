@@ -4,13 +4,13 @@ BEGIN { *PIPE_BUF = Atomic::Pipe->can('PIPE_BUF') }
 
 BEGIN {
     my $path = __FILE__;
-    $path =~ s{[^/]+\.t$}{worker.pm};
+    $path =~ s{[^/\\]+\.t$}{worker.pm};
     require "./$path";
 }
 
 BEGIN {
     my $path = __FILE__;
-    $path =~ s{[^/]+\.t$}{select_mode.pm};
+    $path =~ s{[^/\\]+\.t$}{select_mode.pm};
     require "./$path";
 }
 
@@ -90,7 +90,15 @@ for my $use_select (io_select_modes()) {
             $w->write_message("aa" x PIPE_BUF);
         }
 
-        ok(!can_write_now($w->wh), "OS pipe is full; a blocking write would block");
+        # Cygwin pipes don't report a saturated write end via select() the way
+        # Linux/BSD do, so we can't reliably observe "pipe full" there. The
+        # blocking-drain behavior below is still exercised; only the fullness
+        # probe is skipped.
+        SKIP: {
+            skip "cygwin select() does not report pipe-full reliably", 1
+                if $^O eq 'cygwin';
+            ok(!can_write_now($w->wh), "OS pipe is full; a blocking write would block");
+        }
 
         $w->blocking(1);
         sync_signal($sync->{to_worker_w});

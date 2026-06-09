@@ -36,6 +36,7 @@ use Data::Dumper;
 use Data::Reuse;
 use DBD::SQLite::Constants qw/:file_open/;	# For SQLITE_OPEN_READONLY
 use Fcntl;	# For O_RDONLY
+use Cwd;
 use File::Spec;
 use File::pfopen 0.03;	# For $mode and list context
 use File::Temp;
@@ -54,11 +55,11 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 =head1 VERSION
 
-Version 0.34
+Version 0.35
 
 =cut
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 =head1 DESCRIPTION
 
@@ -430,7 +431,7 @@ sub _open
 	# Read in the database
 	my $dbh;
 
-	my $dir = $self->{'directory'} || $defaults{'directory'};
+	my $dir = Cwd::abs_path($self->{'directory'} || $defaults{'directory'});
 	my $dbname = $self->{'dbname'} || $defaults{'dbname'} || $table;
 	my $slurp_file = File::Spec->catfile($dir, "$dbname.sql");
 
@@ -498,10 +499,13 @@ sub _open
 								col_names => $params->{'column_names'},
 							},
 						},
+						f_dir      => $dir,
+						RaiseError => 1,
+						PrintError => 0
 					}
 				);
 			} else {
-				$dbh = DBI->connect("dbi:CSV:db_name=$slurp_file", undef, undef, { csv_sep_char => $sep_char});
+				$dbh = DBI->connect("dbi:CSV:db_name=$slurp_file", undef, undef, { csv_sep_char => $sep_char, f_dir => $dir, RaiseError => 1 });
 			}
 			$dbh->{'RaiseError'} = 1;
 
@@ -1742,13 +1746,9 @@ so if XML fails for you on a small file force non-slurping mode with
 
 Copyright 2015-2026 Nigel Horne.
 
-This program is released under the following licence: GPL2.
-Usage is subject to licence terms.
-The licence terms of this software are as follows:
-Personal single user, single computer use: GPL2
-All other users (for example, Commercial, Charity, Educational, Government)
-must apply in writing for a licence for use from Nigel Horne at the
-above e-mail.
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
 
 =cut
 

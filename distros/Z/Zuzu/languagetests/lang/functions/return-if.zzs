@@ -1,0 +1,31 @@
+from test/more import *;
+
+function postfix_stop ( condition ) {
+	return if condition;
+	return "kept going";
+}
+
+function block_stop ( condition ) {
+	if ( condition ) {
+		return;
+	}
+	return "kept going";
+}
+
+is(
+	postfix_stop(false),
+	block_stop(false),
+	"return if false continues like block form",
+);
+is(
+	postfix_stop(true),
+	block_stop(true),
+	"return if true returns like block form",
+);
+isnt(
+	postfix_stop(true),
+	"kept going",
+	"return if true skips following statements",
+);
+
+done_testing();

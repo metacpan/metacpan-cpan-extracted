@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.93.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA256 f3c37f40e863e58ff8c67a3d0bda89bf22b751f073e267eb5074c16160c183a1 Build.PL
+SHA256 d9277bd3829816fce94d394c0499b24f0b85366760994ef29f0b9873b13e2850 CHANGES
+SHA256 53b472d57d563a42ccd8b9ad5340af9b3260e94663a9b545e492ed5d292231a8 CONTRIBUTING
+SHA256 d767ae5dc1da942e4c08ce84c421d4363568f25ae804d840c9515e02c4fe52ae LICENSE
+SHA256 d379bf178a183e552eacd17092dc3f749274b8d1f4291dafd4241034f62496b1 MANIFEST
+SHA256 bfb9b06ac5972179c369845aa5aa7549f6405972ba028108b62873f8e6b49e55 META.json
+SHA256 ff63e6ef72917012ca8ae6bad75b7592224306651e77137b7ca1e77c85809117 META.yml
+SHA256 4d0d4471d2de562b15ac3bb0afec495dc7a866212ab191ad0a5fec045571f59f README
+SHA256 892150df4bc90f24e4899910aeb01564168ebe60ddf176c2aa038a09a4b57a37 SECURITY
+SHA256 8c1b2cd7fab4d99d4834a530f8e57b2a2102d0e09aac699c8f071e66883c4db7 examples/list_contains_vs_hash.pl
+SHA256 81a8d30e95e8e0b4b37f1b1638ac0459275da3c8ab46dc78808fba674b8e22df lib/List/Search.pm
+SHA256 6d6623db2119d657c09d14f7fc442d4b1603c94ac8a14938a39ba3b9adaf0514 t/00_load.t
+SHA256 f0a067cbc25c6c3743de663382901286f69e4ec8af9d9b95a236494b9c2b1655 t/custom_list_search.t
+SHA256 3976a359a33827ffabbcf259b1848f934b51b8431a0ea3a6bb3325e4a5a5e5ac t/edge_cases.t
+SHA256 e8cacc69a4580b91a1b87f6800efd0a149220d7980741e7778133cfc3cd815f4 t/list_contains.t
+SHA256 6602b904d7d67f7ecf3137840c991834aaeaa96786a81c295f781041dd6f2e9e t/list_search.t
+SHA256 8164c0cbe0164c67b795ec455b9d9d6be95731036dbc4b76e796d4d267d9a0d8 t/rt_53521.t
+
+-----BEGIN PGP SIGNATURE-----
+
+iIgEARYKADAWIQRsFXB92gzJVQ+DlJX0p/2sOpwkBAUCaid35hIccGVybEByYXBp
+ZGNvdy5vcmcACgkQ9Kf9rDqcJARXBQD+LeMxibuarLStB/Gxp/nCqk6DfMg7eO4z
+7fjYUwmzYRkBAOZtOQIV/N5WTmQCw5Ct7sN5DAgqPQooUrq+Cd4OnrcP
+=YNAc
+-----END PGP SIGNATURE-----

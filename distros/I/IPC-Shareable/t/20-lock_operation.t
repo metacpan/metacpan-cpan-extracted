@@ -9,11 +9,12 @@ IPC::Shareable->testing_set('IPC::Shareable');
 use IPC::SysV qw(IPC_CREAT);
 use Mock::Sub;
 use Test::More;
+
+use FindBin;
+use lib $FindBin::Bin;
+use IPCShareableTest qw(assert_clean_process unique_glue);
 use Test::SharedFork;
 
-my $segs_before = IPC::Shareable::seg_count();
-my $sems_before = IPC::Shareable::sem_count();
-warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 
 # Probe for adequate semaphore resources. OpenBSD defaults to semmni=10
 # (max 10 concurrent semaphore sets system-wide), so we only probe with 3
@@ -55,7 +56,7 @@ my $sv;
 #    # child
 #
 #    sleep unless $awake;
-#    tie($sv, 'IPC::Shareable', 'TEST', { destroy => 0 , serializer => 'storable' });
+#    tie($sv, 'IPC::Shareable', unique_glue('TEST'), { destroy => 0 , serializer => 'storable' });
 #
 #    for (0 .. 99) {
 #        (tied $sv)->lock;
@@ -68,7 +69,7 @@ my $sv;
 #} else {
 #    # parent
 #
-#    tie($sv, 'IPC::Shareable', 'TEST', { create => 1, destroy => 1 , serializer => 'storable' })
+#    tie($sv, 'IPC::Shareable', unique_glue('TEST'), { create => 1, destroy => 1 , serializer => 'storable' })
 #        or die "parent process can't tie \$sv";
 #    $sv = 0;
 #    kill ALRM => $pid;
@@ -83,8 +84,8 @@ my $sv;
 
 # Advisory locking
 {
-    my $k1 = tie my %h1, 'IPC::Shareable', { key => 'TEST1', create => 1, destroy => 1, enforced_write_locking => 0, enforced_read_locking => 0, serializer => 'storable' };
-    my $k2 = tie my %h2, 'IPC::Shareable', { key => 'TEST1', create => 1, destroy => 1, enforced_write_locking => 0, enforced_read_locking => 0, serializer => 'storable' };
+    my $k1 = tie my %h1, 'IPC::Shareable', { key => unique_glue('TEST1'), create => 1, destroy => 1, enforced_write_locking => 0, enforced_read_locking => 0, serializer => 'storable' };
+    my $k2 = tie my %h2, 'IPC::Shareable', { key => unique_glue('TEST1'), create => 1, destroy => 1, enforced_write_locking => 0, enforced_read_locking => 0, serializer => 'storable' };
 
     $h1{a} = {b => 1};
 
@@ -116,14 +117,14 @@ my $sv;
 # enforced_write_locking with warn defaulted on: write blocked AND warning fires
 {
     my $k1 = tie my %h1, 'IPC::Shareable', {
-        key              => 'TEST2',
+        key              => unique_glue('TEST2'),
         create           => 1,
         destroy          => 1,
         enforced_write_locking => 1, enforced_read_locking => 1,
         serializer => 'storable',
     };
     my $k2 = tie my %h2, 'IPC::Shareable', {
-        key              => 'TEST2',
+        key              => unique_glue('TEST2'),
         enforced_write_locking => 1, enforced_read_locking => 1,
         serializer => 'storable',
     };
@@ -158,7 +159,7 @@ my $sv;
 # enforced_write_locking with warn: k2 attempting a write while k1 holds LOCK_EX must croak
 {
     my $k1 = tie my %h1, 'IPC::Shareable', {
-        key                => 'TEST2',
+        key                => unique_glue('TEST2'),
         create             => 1,
         destroy            => 1,
         enforced_write_locking => 1,
@@ -166,7 +167,7 @@ my $sv;
         serializer => 'storable',
     };
     my $k2 = tie my %h2, 'IPC::Shareable', {
-        key                 => 'TEST2',
+        key                 => unique_glue('TEST2'),
         enforced_write_locking => 1,
         enforced_read_locking  => 1,
         violated_write_lock_warn => 1,
@@ -205,7 +206,7 @@ my $sv;
 # enforced_write_locking ON + violated_write_lock_warn OFF: write blocked but no warning
 {
     my $k1 = tie my %h1, 'IPC::Shareable', {
-        key                      => 'TEST2A',
+        key                      => unique_glue('TEST2A'),
         create                   => 1,
         destroy                  => 1,
         enforced_write_locking   => 1,
@@ -215,7 +216,7 @@ my $sv;
         serializer               => 'storable',
     };
     my $k2 = tie my %h2, 'IPC::Shareable', {
-        key                      => 'TEST2A',
+        key                      => unique_glue('TEST2A'),
         enforced_write_locking   => 1,
         enforced_read_locking    => 1,
         violated_write_lock_warn => 0,
@@ -246,7 +247,7 @@ my $sv;
 # enforced_write_locking OFF + violated_write_lock_warn OFF: no enforcement, no warnings (degenerate)
 {
     my $k1 = tie my %h1, 'IPC::Shareable', {
-        key                      => 'TEST2B',
+        key                      => unique_glue('TEST2B'),
         create                   => 1,
         destroy                  => 1,
         enforced_write_locking   => 0,
@@ -256,7 +257,7 @@ my $sv;
         serializer               => 'storable',
     };
     my $k2 = tie my %h2, 'IPC::Shareable', {
-        key                      => 'TEST2B',
+        key                      => unique_glue('TEST2B'),
         enforced_write_locking   => 0,
         enforced_read_locking    => 0,
         violated_write_lock_warn => 0,
@@ -283,7 +284,7 @@ my $sv;
 
 # LOCK_EX + CLEAR on a hash: _was_changed deferred write
 {
-    my $k = tie my %h, 'IPC::Shareable', { key => 'T3', create => 1, destroy => 1 , serializer => 'storable' };
+    my $k = tie my %h, 'IPC::Shareable', { key => unique_glue('T3'), create => 1, destroy => 1 , serializer => 'storable' };
     $h{a} = 1;
     $h{b} = 2;
     $k->lock(IPC::Shareable::LOCK_EX);
@@ -295,7 +296,7 @@ my $sv;
 
 # LOCK_EX + DELETE on a hash: _was_changed deferred write
 {
-    my $k = tie my %h, 'IPC::Shareable', { key => 'T4', create => 1, destroy => 1 , serializer => 'storable' };
+    my $k = tie my %h, 'IPC::Shareable', { key => unique_glue('T4'), create => 1, destroy => 1 , serializer => 'storable' };
     $h{x} = 10;
     $h{y} = 20;
     $k->lock(IPC::Shareable::LOCK_EX);
@@ -308,7 +309,7 @@ my $sv;
 
 # LOCK_EX + array mutation ops: PUSH, POP, SHIFT, UNSHIFT, SPLICE
 {
-    my $k = tie my @a, 'IPC::Shareable', { key => 'T5', create => 1, destroy => 1 , serializer => 'storable' };
+    my $k = tie my @a, 'IPC::Shareable', { key => unique_glue('T5'), create => 1, destroy => 1 , serializer => 'storable' };
     @a = (1, 2, 3);
 
     $k->lock(IPC::Shareable::LOCK_EX);
@@ -343,7 +344,7 @@ IPC::Shareable::_end;  # flush cleanup to stay under OpenBSD semmni=10
 
 # LOCK_SH: hash read ops skip _decode when already locked (EXISTS, FIRSTKEY)
 {
-    my $k = tie my %h, 'IPC::Shareable', { key => 'T6', create => 1, destroy => 1 , serializer => 'storable' };
+    my $k = tie my %h, 'IPC::Shareable', { key => unique_glue('T6'), create => 1, destroy => 1 , serializer => 'storable' };
     $h{a} = 1;
     $k->lock(IPC::Shareable::LOCK_SH);
     ok  exists($h{a}), "LOCK_SH EXISTS: returns true for existing key (uses cached _data)";
@@ -355,7 +356,7 @@ IPC::Shareable::_end;  # flush cleanup to stay under OpenBSD semmni=10
 
 # LOCK_SH: array FETCHSIZE skips _decode when already locked
 {
-    my $k = tie my @a, 'IPC::Shareable', { key => 'T7', create => 1, destroy => 1, serializer => 'storable' };
+    my $k = tie my @a, 'IPC::Shareable', { key => unique_glue('T7'), create => 1, destroy => 1, serializer => 'storable' };
     @a = (1, 2, 3);
     $k->lock(IPC::Shareable::LOCK_SH);
     is scalar(@a), 3, "LOCK_SH FETCHSIZE: scalar(\@array) correct while locked (uses cached _data)";
@@ -364,7 +365,7 @@ IPC::Shareable::_end;  # flush cleanup to stay under OpenBSD semmni=10
 
 # LOCK_EX + STORESIZE ($#array = N): _was_changed deferred write
 {
-    my $k = tie my @a, 'IPC::Shareable', { key => 'T8', create => 1, destroy => 1 , serializer => 'storable' };
+    my $k = tie my @a, 'IPC::Shareable', { key => unique_glue('T8'), create => 1, destroy => 1 , serializer => 'storable' };
     @a = (1, 2, 3, 4, 5);
     $k->lock(IPC::Shareable::LOCK_EX);
     $#a = 1;
@@ -376,10 +377,10 @@ IPC::Shareable::_end;  # flush cleanup to stay under OpenBSD semmni=10
 # enforced_write_locking: array write ops blocked when another knot holds LOCK_EX
 {
     my $k1 = tie my @a1, 'IPC::Shareable', {
-        key => 'T9', create => 1, destroy => 1, enforced_write_locking => 1, enforced_read_locking => 1, serializer => 'storable',
+        key => unique_glue('T9'), create => 1, destroy => 1, enforced_write_locking => 1, enforced_read_locking => 1, serializer => 'storable',
     };
     my $k2 = tie my @a2, 'IPC::Shareable', {
-        key => 'T9', enforced_write_locking => 1, enforced_read_locking => 1, serializer => 'storable',
+        key => unique_glue('T9'), enforced_write_locking => 1, enforced_read_locking => 1, serializer => 'storable',
     };
 
     @a1 = (1, 2, 3);
@@ -418,10 +419,10 @@ IPC::Shareable::_end;  # flush cleanup to stay under OpenBSD semmni=10
 # enforced_write_locking: hash CLEAR and DELETE blocked when another knot holds LOCK_EX
 {
     my $k1 = tie my %h1, 'IPC::Shareable', {
-        key => 'TA', create => 1, destroy => 1, enforced_write_locking => 1, enforced_read_locking => 1, serializer => 'storable',
+        key => unique_glue('TA'), create => 1, destroy => 1, enforced_write_locking => 1, enforced_read_locking => 1, serializer => 'storable',
     };
     my $k2 = tie my %h2, 'IPC::Shareable', {
-        key => 'TA', enforced_write_locking => 1, enforced_read_locking => 1, serializer => 'storable',
+        key => unique_glue('TA'), enforced_write_locking => 1, enforced_read_locking => 1, serializer => 'storable',
     };
 
     $h1{a} = 1;
@@ -446,7 +447,7 @@ IPC::Shareable::_end;  # flush cleanup to stay under OpenBSD semmni=10
 
 # lock() re-throws exception from code-ref (covers: die $err if !$ok)
 {
-    my $k = tie my %h, 'IPC::Shareable', { key => 'TB', create => 1, destroy => 1 , serializer => 'storable' };
+    my $k = tie my %h, 'IPC::Shareable', { key => unique_glue('TB'), create => 1, destroy => 1 , serializer => 'storable' };
     $h{a} = 1;
 
     is
@@ -461,7 +462,7 @@ IPC::Shareable::_end;  # flush cleanup to stay under OpenBSD semmni=10
 
 # unlock() croaks when _encode fails with _was_changed set (covers: croak in unlock _encode block)
 {
-    my $k = tie my %h, 'IPC::Shareable', { key => 'TC', create => 1, destroy => 1 , serializer => 'storable' };
+    my $k = tie my %h, 'IPC::Shareable', { key => unique_glue('TC'), create => 1, destroy => 1 , serializer => 'storable' };
     $h{a} = 1;
     $k->lock(IPC::Shareable::LOCK_EX);
     $h{a} = 2;  # STORE sets _was_changed = 1
@@ -488,7 +489,7 @@ IPC::Shareable::_end;  # flush cleanup to stay under OpenBSD semmni=10
 
 # unlock() croaks when sem->op fails (covers: croak "Could not release semaphore lock")
 {
-    my $k = tie my %h, 'IPC::Shareable', { key => 'TD', create => 1, destroy => 1 , serializer => 'storable' };
+    my $k = tie my %h, 'IPC::Shareable', { key => unique_glue('TD'), create => 1, destroy => 1 , serializer => 'storable' };
     $h{a} = 1;
     $k->lock(IPC::Shareable::LOCK_EX);
     $k->{_was_changed} = 0;  # skip the _encode block
@@ -509,10 +510,6 @@ IPC::Shareable::_end;  # flush cleanup to stay under OpenBSD semmni=10
 
 IPC::Shareable::_end;
 
-my $segs_after = IPC::Shareable::seg_count();
-warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
-is $segs_after, $segs_before, "All segs cleaned up ok";
-my $sems_after = IPC::Shareable::sem_count();
-is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
+assert_clean_process();
 
 done_testing();

@@ -1,4 +1,4 @@
-package Concierge::Users::Meta v0.9.1;
+package Concierge::Users::Meta v0.9.2;
 use v5.36;
 use Carp qw/ croak carp /;
 use YAML::Tiny;
@@ -108,10 +108,14 @@ sub init_field_meta {
 				next;
 			}
 
-			# Check if field is protected
-# 			if ($protected_fields{$field_name}) {
-			if ( $field_name =~ /user_id|created_date|last_mod_date/) {
-				carp "Cannot override protected field '$field_name'; skipping";
+			# Check if field is protected; only format_as and label may be overridden
+			if ( $field_name =~ /^(?:user_id|last_login_date|last_mod_date|created_date)$/) {
+				my %allowed  = map { $_ => 1 } qw/format_as label/;
+				my @apply    = grep {  $allowed{$_} } keys %$override;
+				my @blocked  = grep { !$allowed{$_} && $_ ne 'field_name' } keys %$override;
+				carp "Field '$field_name' is protected; ignoring: " . join(', ', sort @blocked)
+					if @blocked;
+				$merged_definitions{$field_name}{$_} = $override->{$_} for @apply;
 				next;
 			}
 
@@ -347,7 +351,6 @@ sub get_field_hints {
 	return {
 		label       => $field_def->{label} || labelize($field_def->{field_name} || $field),
 		type        => $field_def->{type},
-		system      => $field_def->{system} // 0,
 		validate_as => $field_def->{validate_as},
 		max_length  => $field_def->{max_length},
 		options     => $field_def->{options},
@@ -457,7 +460,6 @@ sub config_to_yaml {
 			$yaml .= "    $field:\n";
 			$yaml .= "      field_name: $def->{field_name}\n";
 			$yaml .= "      type: $def->{type}\n";
-			$yaml .= "      system: 1\n" if $def->{system};
 			$yaml .= "      required: $def->{required}\n";
 
 			# Only show validate_as if it's different from type
@@ -484,6 +486,7 @@ sub config_to_yaml {
 			$yaml .= "      max_length: $def->{max_length}\n" if $def->{max_length};
 			$yaml .= "      must_validate: $def->{must_validate}\n" if $def->{must_validate};
 			$yaml .= "      null_value: " . _yaml_scalar_value($def->{null_value}) . "\n";
+			$yaml .= "      format_as: $def->{format_as}\n" if defined $def->{format_as};
 
 			$yaml .= "\n";
 		}
@@ -992,7 +995,6 @@ sub validate_name_field {
 		label => 'Last Login Date',
 		description => 'Timestamp of last successful login',
 		type => 'timestamp',
-		system => 1,
 		required => 0,
 		options => [],
 		default => '0000-00-00 00:00:00',
@@ -1008,7 +1010,6 @@ sub validate_name_field {
 		label => 'Last Modification Date',
 		description => 'Timestamp of last profile modification',
 		type => 'timestamp',
-		system => 1,
 		required => 0,
 		options => [],
 		default => '0000-00-00 00:00:00',
@@ -1022,7 +1023,6 @@ sub validate_name_field {
 		label => 'Created Date',
 		description => 'Timestamp when user account was created',
 		type => 'timestamp',
-		system => 1,
 		required => 1,
 		options => [],
 		default => '0000-00-00 00:00:00',
@@ -1148,7 +1148,7 @@ utilities for Concierge::Users
 
 =head1 VERSION
 
-v0.9.1
+v0.9.2
 
 =head1 SYNOPSIS
 
@@ -1312,13 +1312,13 @@ user or app data.  Protected from overrides.
 
 =over 4
 
-=item B<last_login_date> -- type C<timestamp>, C<system =E<gt> 1>, set by
-C<login_user()>; default C<0000-00-00 00:00:00>
+=item B<last_login_date> -- type C<timestamp>, set by C<login_user()>;
+default C<0000-00-00 00:00:00>
 
-=item B<last_mod_date> -- type C<timestamp>, C<system =E<gt> 1>, updated on every write
+=item B<last_mod_date> -- type C<timestamp>, updated on every write
 
-=item B<created_date> -- type C<timestamp>, C<system =E<gt> 1>, set once on
-creation, C<required =E<gt> 1>
+=item B<created_date> -- type C<timestamp>, set once on creation,
+C<required =E<gt> 1>
 
 =back
 
@@ -1336,10 +1336,6 @@ Set automatically; protected from overrides.
 
 =item C<type> -- Data type: C<text>, C<email>, C<phone>, C<date>,
 C<timestamp>, C<boolean>, C<integer>, C<enum>.
-
-=item C<system> -- Boolean flag (C<1> or absent).  Set on fields that are
-auto-managed and never supplied as user or app data: C<last_login_date>,
-C<last_mod_date>, C<created_date>.  Absent (false) for all other fields.
 
 =item C<validate_as> -- Validator to use if different from C<type>.
 See L</VALIDATOR TYPES>.
@@ -1518,8 +1514,9 @@ Each must contain C<field_name> to identify the target:
         },
     ],
 
-B<Protected fields> that cannot be overridden: C<user_id>,
-C<created_date>, C<last_mod_date>.
+B<Protected fields> (structural attributes blocked; C<format_as> and
+C<label> are allowed): C<user_id>, C<last_login_date>, C<last_mod_date>,
+C<created_date>.
 
 B<Protected attributes> that cannot be changed: C<field_name>,
 C<category>.
@@ -1627,8 +1624,8 @@ Returns the list of standard field names (12 fields).
 
     my @fields = Concierge::Users::Meta::user_system_fields();
 
-Returns the list of system field names: C<last_mod_date>,
-C<created_date>.
+Returns the list of system field names: C<last_login_date>,
+C<last_mod_date>, C<created_date>.
 
 =head3 init_field_meta
 
@@ -1776,7 +1773,7 @@ __DATA__
 ################################################################################
 
 Configuration:
-  Version: v0.9.1
+  Version: v0.9.2
   Backend: Concierge::Users::Database  # Default; can be 'database', 'file', or 'yaml'
   Storage Directory: /path/to/storage  # Set during setup
   Generated: 2026-01-06 19:10:18
@@ -1990,7 +1987,6 @@ Field Definitions:
     last_login_date:
       field_name: last_login_date
       type: timestamp
-      system: 1
       required: 0
       default: "0000-00-00 00:00:00"
       description: "Timestamp of last successful login"
@@ -2001,7 +1997,6 @@ Field Definitions:
     last_mod_date:
       field_name: last_mod_date
       type: timestamp
-      system: 1
       required: 0
       default: "0000-00-00 00:00:00"
       description: "Timestamp of last profile modification"
@@ -2012,7 +2007,6 @@ Field Definitions:
     created_date:
       field_name: created_date
       type: timestamp
-      system: 1
       required: 1
       default: "0000-00-00 00:00:00"
       description: "Timestamp when user account was created"

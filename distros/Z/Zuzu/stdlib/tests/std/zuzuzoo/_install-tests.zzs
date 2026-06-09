@@ -66,6 +66,36 @@ function archive_path () {
 	return path;
 }
 
+function skip_all_archive_path () {
+	let path := Path.tempfile();
+	Archive.dump(
+		path,
+		{
+			entries: [
+				{
+					path: "skip-all-tests-1.0.0/zuzu-distribution.json",
+					data: to_binary(
+						"{\"name\":\"skip-all-tests\",\"version\":\"1.0.0\"," _
+						"\"author\":\"Example\",\"license\":\"MIT\"}\n",
+					),
+				},
+				{
+					path: "skip-all-tests-1.0.0/modules/skip/all.zzm",
+					data: to_binary("// module\n"),
+				},
+				{
+					path: "skip-all-tests-1.0.0/tests/author.zzs",
+					data: to_binary(
+						"say \"1..0 # SKIP requires AUTHOR_TESTING=1\";\n",
+					),
+				},
+			],
+		},
+		"zip",
+	);
+	return path;
+}
+
 function replacement_archive_path () {
 	let path := Path.tempfile();
 	Archive.dump(
@@ -180,6 +210,39 @@ is( skipped{tests}, [], "no_test result has no test runs" );
 ok(
 	skipped_root{lib_obj}.child("install").child("tests.zzm").exists(),
 	"no_test install copies module",
+);
+
+let skip_all_root := root();
+let skip_all_result := zoo_for( skip_all_root, zuzu ).install(
+	skip_all_archive_path().to_String(),
+);
+ok( skip_all_result{ok}, "TAP skip-all test plan allows install" );
+is( skip_all_result{tests}.length(), 1, "skip-all test run is recorded" );
+ok(
+	skip_all_result{tests}[0]{ok},
+	"skip-all distribution test summary is successful",
+);
+is(
+	skip_all_result{tests}[0]{tests}.length(),
+	1,
+	"skip-all TAP file result is recorded",
+);
+ok(
+	skip_all_result{tests}[0]{tests}[0]{ok},
+	"skip-all test run is successful",
+);
+is(
+	skip_all_result{tests}[0]{tests}[0]{tap}{planned},
+	0,
+	"skip-all test run records zero planned tests",
+);
+ok(
+	skip_all_result{tests}[0]{tests}[0]{tap}{skip_all},
+	"skip-all test run is marked skip-all",
+);
+ok(
+	skip_all_root{lib_obj}.child("skip").child("all.zzm").exists(),
+	"skip-all install copies module",
 );
 
 let removal_root := root();

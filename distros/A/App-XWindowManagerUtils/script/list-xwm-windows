@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2026-03-27'; # DATE
+our $DATE = '2026-04-06'; # DATE
 our $DIST = 'App-XWindowManagerUtils'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/XWindowManagerUtils/list_xwm_windows",
@@ -40,7 +40,7 @@ list-xwm-windows - List all Windows
 
 =head1 VERSION
 
-This document describes version 0.002 of list-xwm-windows (from Perl distribution App-XWindowManagerUtils), released on 2026-03-27.
+This document describes version 0.003 of list-xwm-windows (from Perl distribution App-XWindowManagerUtils), released on 2026-04-06.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,11 @@ B<list-xwm-windows> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">
 
 B<list-xwm-windows> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<list-xwm-windows> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--with-kde-activity|/"--with-kde-activity">>|B<L<--without-kde-activity|/"--with-kde-activity">>] -- [I<L<query|/"--query=s@">>] ...
+B<list-xwm-windows> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>|B<L<--no-detail|/"--detail, -l">>|B<L<--nodetail|/"--detail, -l">>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--with-kde-activity|/"--with-kde-activity">>|B<L<--without-kde-activity|/"--with-kde-activity">>] [B<L<--with-kde-activity-guid|/"--with-kde-activity-guid">>|B<L<--without-kde-activity-guid|/"--with-kde-activity-guid">>] [B<L<--with-kde-activity-name|/"--with-kde-activity-name, -k">>|B<L<-k|/"--with-kde-activity-name, -k">>|B<L<--without-kde-activity-name|/"--with-kde-activity-name, -k">>] -- [I<L<query|/"--query=s@">>] ...
+
+=head1 DESCRIPTION
+
+This utility is currently a wrapper for L<wmctrl>.
 
 =head1 OPTIONS
 
@@ -63,6 +67,24 @@ C<*> marks required options.
 (No description)
 
 
+=item B<--with-kde-activity>
+
+Show KDE activity GUID for each window (old name for with_kde_activity_guid).
+
+=item B<--with-kde-activity-guid>
+
+Show KDE activity GUID for each window.
+
+=item B<--with-kde-activity-name>, B<-k>
+
+Show KDE activity name for each window.
+
+=back
+
+=head2 Filtering options
+
+=over
+
 =item B<--query-json>=I<s>
 
 See C<--query>.
@@ -71,17 +93,13 @@ Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--query>=I<s@>
 
-(No description)
+Queries are matched against window titles, IDs, and KDE activity names & GUIDs
+(if KDE activity names & GUIDs are requested).
 
 
 Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
-
-=item B<--with-kde-activity>
-
-(No description)
-
 
 =back
 

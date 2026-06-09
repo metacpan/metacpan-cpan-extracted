@@ -8,8 +8,17 @@ BEGIN {
     use_ok('IPC::Shareable');
 };
 
+# Clear stale testing segments left behind by a previously crashed run.
+# clean_up_testing() only removes segments this process created or whose creator
+# process has exited, so it is safe to run even under a parallel harness -- it
+# will not touch a concurrently-running sibling test file's live segments.
 IPC::Shareable->clean_up_testing('IPC::Shareable');
 IPC::Shareable->testing_set('IPC::Shareable');
+
+# The whole-suite *count* comparison (below, and in t/99-end) is still inherently
+# global, so it stays serial-only: skip it under a parallel harness (eg. a
+# smoker running with HARNESS_OPTIONS=jN).
+my $parallel = defined $ENV{HARNESS_OPTIONS} && $ENV{HARNESS_OPTIONS} =~ /(?:^|:)j[0-9]/;
 
 my $segs_before = IPC::Shareable::seg_count();
 my $sems_before = IPC::Shareable::sem_count();
@@ -41,6 +50,11 @@ $store{sems} = IPC::Shareable::sem_count() - 1;
 IPC::Shareable::_end;
 
 warn "Segs After: " . IPC::Shareable::seg_count() . "\n" if $ENV{PRINT_SEGS};
-is IPC::Shareable::seg_count(), $segs_before + 1, "No segs left after test suite run ok";
+
+SKIP: {
+    skip "whole-suite IPC count check is serial-only (parallel harness detected)", 1
+        if $parallel;
+    is IPC::Shareable::seg_count(), $segs_before + 1, "No segs left after test suite run ok";
+}
 
 done_testing();

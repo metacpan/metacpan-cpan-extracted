@@ -11,7 +11,7 @@ use File::Spec;
 
 BEGIN {
     my $path = __FILE__;
-    $path =~ s{[^/]+\.t$}{select_mode.pm};
+    $path =~ s{[^/\\]+\.t$}{select_mode.pm};
     require "./$path";
 }
 

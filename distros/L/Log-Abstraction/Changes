@@ -1,5 +1,89 @@
 Revision history for Log-Abstraction
 
+0.31	Jun  8 20:55:28 EDT 2026
+	[ Architecture ]
+	- Added use autodie qw(:all); file writes wrapped in eval{} to keep
+	  logging failures silent (app must not crash when log file is unavailable)
+	- Extracted _format_message($self, $level, $str, $use_class) helper,
+	  eliminating 4+ copies of the format-token substitution block
+	- Extracted _validate_file_path($self, $path) helper, unifying path
+	  validation for hash-backend file, scalar-path, and self->{'file'} under
+	  one implementation
+	- Added Readonly constants for all magic strings and numbers (SMTP defaults,
+	  port range, syslog defaults, format strings, validation regexes)
+	- Collapsed _high_priority duplicate if/else blocks into one
+	- All public void methods now return $self to allow method chaining;
+	  level() setter returns undef on invalid input to signal the error
+	- Fixed syslog priority mapping: all levels (trace→debug, debug→debug,
+	  info→info, notice→notice, warn→warning, error→err) now correctly mapped
+	  via %LEVEL_TO_SYSLOG_PRIORITY hash instead of a binary error/warning test
+	- Moved Readonly from test-only to runtime dependency (Makefile.PL, cpanfile)
+
+	[ Documentation ]
+	- Added Z-notation FORMAL SPECIFICATION to every public method POD
+	- Added API Specification (Params::Validate::Strict input and Return::Set
+	  output schemas) to every public method POD
+	- Added MESSAGES table to every public method POD
+	- Added internal-routine comment blocks (purpose, entry, exit, side
+	  effects, notes) for _log, _high_priority, _format_message,
+	  _validate_file_path, _sanitize_email_header, DESTROY
+	- Suppressed %class% for the base Log::Abstraction class (appears empty,
+	  as it added no useful information when not subclassed)
+
+	[ Tests ]
+	- Added t/locales.t: covers geographic (Locale::Country ISO-code sanity
+	  with BAIL_OUT on drift, case-insensitive codes, concurrent instances) and
+	  POSIX system-locale (LC_ALL en_US.UTF-8/de_DE.UTF-8/ja_JP.UTF-8 error
+	  paths using local $! = ENOENT; my $msg = "$!" pattern)
+	- Updated edge_cases.t and function.t to use unified "Invalid file name"
+	  error message (standardised via _validate_file_path)
+
+	[ Security ]
+	- Fixed path traversal in HASH-backend file logger: path regex now blocks
+	  '..' sequences, preventing writes outside the intended directory
+	- Fixed open() in HASH-backend file logger to use the untainted $file
+	  variable rather than the original $logger->{'file'} value
+	- Added path validation (same allowlist + '..' check) to the scalar-string
+	  logger path, which previously called open() with no validation at all
+	- Validated SMTP host in sendmail backend: only [a-zA-Z0-9.-] characters
+	  accepted, preventing header/protocol injection via a crafted hostname
+	- Validated SMTP port in sendmail backend: must be an integer 1-65535,
+	  preventing SSRF port-scanning via an attacker-controlled config file
+	- Fixed %env_*% format expansion in HASH file backend to use /ge with
+	  defined-or fallback, consistent with the fd and scalar-path backends
+
+	[ Bug Fixes ]
+	- Fixed use Readonly::Values::Syslog version in source to 0.04, matching
+	  Makefile.PL and cpanfile (was still 0.03 after the 0.30 bump)
+
+	[ Documentation ]
+	- Fixed EXAMPLES POD: sample output class field was "main"; corrected to
+	  "Log::Abstraction" (blessed class of the logger object)
+	- Fixed EXAMPLES POD: sample output warn-row level field was "warning";
+	  corrected to "warn" to match what the module actually passes to callbacks
+	- Added note explaining that file/line resolve to the module's internal
+	  dispatch for warn/error calls due to the extra _high_priority stack frame
+	- Replaced broken combined file+sendmail example (file backend writes
+	  native text format, not CSV) with a correct sendmail-only example; added
+	  level => 'warn' key to restrict emails to warn-and-above; noted that
+	  combining CSV output with email requires both in a single code-ref
+
+	[ Tests ]
+	- Simplified $parse_line regex in integration.t: removed dead |"$ alternation
+	  subsumed by "(?:,|$)
+
+0.30	Wed May 27 13:09:35 EDT 2026
+
+	[ Enhancements ]
+	- Added EXAMPLES POD section: CSV file logging for BI import (code-ref
+	  backend writing timestamp/level/class/file/line/message rows, with a
+	  combined sendmail+min_interval variant for real-time alerting)
+
+	[ Bug Fixes]
+	- Bump minimum Readonly::Values::Syslog to 0.04 to fix is_debug() returning
+	  false at trace level on older installations
+	  Fixes https://www.cpantesters.org/cpan/report/32b653da-59c4-11f1-ba50-8ade6d8775ea
+
 0.29	Tue May 26 20:36:13 EDT 2026
 
 	[ Enhancements ]
@@ -7,7 +91,6 @@ Revision history for Log-Abstraction
 	  configured interval (seconds); cooldown state stored in _last_email_sent
 	  on the object and inherited by clones
 
-	[ Bug Fixes]
 	- Bump minimum Test::Mockingbird version to fix https://www.cpantesters.org/cpan/report/f148a3e6-50a2-11f1-8224-a122dd379578
 
 0.28 Fri May 15 20:28:07 EDT 2026

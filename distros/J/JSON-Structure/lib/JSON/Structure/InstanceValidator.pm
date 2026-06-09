@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use v5.20;
 
-our $VERSION = '0.6.2';
+our $VERSION = '0.7.0';
 
 use JSON::MaybeXS;
 use B;

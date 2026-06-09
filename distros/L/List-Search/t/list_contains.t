@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More 'no_plan';
+use Test::More tests => 32;
 
 use List::Search qw( list_contains nlist_contains );
 

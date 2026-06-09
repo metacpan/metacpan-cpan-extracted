@@ -39,7 +39,7 @@ my $build_dir = path($tzil->tempdir)->child('build');
 my $file = $build_dir->child('data', 'useless_file.txt');
 ok(-e $file, 'file created');
 
-my $content = Encode::decode('Latin1', $file->slurp_raw, Encode::FB_CROAK());
+my $content = Encode::decode('Latin1', $file->slurp_raw, Encode::DIE_ON_ERR);
 
 my $zilla_version = Dist::Zilla->VERSION;
 

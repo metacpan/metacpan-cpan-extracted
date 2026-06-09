@@ -372,7 +372,7 @@ subtest 'Field overrides - protected fields' => sub {
 
     my $storage_dir = "$temp_base/protected-fields";
 
-    # Test user_id protection
+    # Blocked attribute on user_id: warns with new message, setup still succeeds
     my $config1 = make_config($storage_dir . '/test1', 'database', {
         field_overrides => [
             {
@@ -386,16 +386,16 @@ subtest 'Field overrides - protected fields' => sub {
         Concierge::Users->setup($config1);
     };
 
-    like($stderr1, qr/Cannot override protected field 'user_id'/,
-        'Warns about protected user_id field');
-    ok($result1->{success}, 'Setup still succeeds despite protected field attempt');
+    like($stderr1, qr/Field 'user_id' is protected; ignoring: max_length/,
+        'Warns about blocked attribute on protected user_id field');
+    ok($result1->{success}, 'Setup still succeeds despite blocked override on protected field');
 
-    # Test created_date protection
+    # Blocked attribute on created_date: warns, setup succeeds
     my $config2 = make_config($storage_dir . '/test2', 'database', {
         field_overrides => [
             {
                 field_name => 'created_date',
-                label => 'Creation Time',
+                required => 1,
             },
         ],
     });
@@ -404,15 +404,16 @@ subtest 'Field overrides - protected fields' => sub {
         Concierge::Users->setup($config2);
     };
 
-    like($stderr2, qr/Cannot override protected field 'created_date'/,
-        'Warns about protected created_date field');
+    like($stderr2, qr/Field 'created_date' is protected; ignoring: required/,
+        'Warns about blocked attribute on protected created_date field');
+    ok($result2->{success}, 'Setup succeeds');
 
-    # Test last_mod_date protection
+    # Blocked attribute on last_mod_date: warns, setup succeeds
     my $config3 = make_config($storage_dir . '/test3', 'database', {
         field_overrides => [
             {
                 field_name => 'last_mod_date',
-                label => 'Last Modified',
+                required => 1,
             },
         ],
     });
@@ -421,8 +422,34 @@ subtest 'Field overrides - protected fields' => sub {
         Concierge::Users->setup($config3);
     };
 
-    like($stderr3, qr/Cannot override protected field 'last_mod_date'/,
-        'Warns about protected last_mod_date field');
+    like($stderr3, qr/Field 'last_mod_date' is protected; ignoring: required/,
+        'Warns about blocked attribute on protected last_mod_date field');
+    ok($result3->{success}, 'Setup succeeds');
+
+    # Allowed overrides (format_as, label) on protected fields: applied silently
+    my $config4 = make_config($storage_dir . '/test4', 'database', {
+        field_overrides => [
+            { field_name => 'user_id',         format_as => 'uid'      },
+            { field_name => 'last_login_date',  format_as => 'dt',
+                                                label     => 'Last Login' },
+            { field_name => 'last_mod_date',    format_as => 'dt'      },
+            { field_name => 'created_date',     label     => 'Created'  },
+        ],
+    });
+
+    my ($stderr4, $result4) = capture_stderr sub {
+        Concierge::Users->setup($config4);
+    };
+
+    is($stderr4, '', 'No warning when only format_as/label overridden on protected fields');
+    ok($result4->{success}, 'Setup succeeds with allowed overrides on protected fields');
+
+    my $users4 = Concierge::Users->new($result4->{config_file});
+    is($users4->get_field_hints('user_id')->{format_as},        'uid',       'format_as applied to user_id');
+    is($users4->get_field_hints('last_login_date')->{format_as},'dt',        'format_as applied to last_login_date');
+    is($users4->get_field_hints('last_login_date')->{label},    'Last Login','label applied to last_login_date');
+    is($users4->get_field_hints('last_mod_date')->{format_as},  'dt',        'format_as applied to last_mod_date');
+    is($users4->get_field_hints('created_date')->{label},       'Created',   'label applied to created_date');
 
     # Cleanup
     remove_tree($storage_dir);

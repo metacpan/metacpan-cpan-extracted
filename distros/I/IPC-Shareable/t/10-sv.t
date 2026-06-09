@@ -5,9 +5,10 @@ use IPC::Shareable;
 IPC::Shareable->testing_set('IPC::Shareable');
 use Test::More;
 
-my $segs_before = IPC::Shareable::seg_count();
-my $sems_before = IPC::Shareable::sem_count();
-warn "Segs Before $segs_before\n" if $ENV{PRINT_SEGS};
+use FindBin;
+use lib $FindBin::Bin;
+use IPCShareableTest qw(assert_clean_process unique_glue);
+
 
 tie my $sv, 'IPC::Shareable', {destroy => 1, serializer => 'storable' };
 
@@ -31,7 +32,7 @@ for my $mod (qw/HASH SCALAR ARRAY/){
 
 # FETCH from a never-written scalar segment returns undef (empty segment path)
 {
-    tie my $sv, 'IPC::Shareable', { key => 'sv10e', create => 1, destroy => 1 , serializer => 'storable' };
+    tie my $sv, 'IPC::Shareable', { key => unique_glue('sv10e'), create => 1, destroy => 1 , serializer => 'storable' };
     is $sv, undef, "FETCH on never-written scalar returns undef ok";
 }
 
@@ -41,7 +42,7 @@ for my $mod (qw/HASH SCALAR ARRAY/){
 # STORE then exercises the truthy-but-dereferences-to-undef branch in
 # _remove_child without exploding.
 {
-    my $k = tie my $sv, 'IPC::Shareable', { key => 'sv10f', create => 1, destroy => 1, serializer => 'storable' };
+    my $k = tie my $sv, 'IPC::Shareable', { key => unique_glue('sv10f'), create => 1, destroy => 1, serializer => 'storable' };
 
     $sv = undef;
     is $sv, undef, "scalar tied var assigned undef ok";
@@ -62,10 +63,6 @@ for my $mod (qw/HASH SCALAR ARRAY/){
 
 IPC::Shareable::_end;
 
-my $segs_after = IPC::Shareable::seg_count();
-warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
-is $segs_after, $segs_before, "All segs, even those created in separate procs, cleaned up ok";
-my $sems_after = IPC::Shareable::sem_count();
-is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
+assert_clean_process();
 
 done_testing();

@@ -590,7 +590,7 @@ subtest 'top-level file — tainted filename croaks' => sub {
 	my $logger = Log::Abstraction->new(file => "/bad\0path", level => 'debug');
 	throws_ok(
 		sub { $logger->debug('tainted') },
-		qr/Tainted or unsafe filename/i,
+		qr/Invalid file name/i,
 		'tainted top-level file path croaks'
 	);
 };

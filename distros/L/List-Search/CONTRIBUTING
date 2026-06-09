@@ -1,0 +1,30 @@
+*** List-Search contribution guide
+
+NOTE! These following are public channels.  Quite
+the opposite of what you want if you are reporting
+security vulnerabilities...  For that see SECURITY.
+
+To report bugs, you can either use Codeberg:
+
+  <https://codeberg.org/rapidcow/p5-List-Search/issues>
+
+or RT.cpan.org:
+
+  <https://rt.cpan.org/Dist/Display.html?Name=List-Search>
+  <mailto:bug-list-search@rt.cpan.org>
+
+If you would like to change code directly, TIMTOWTDI!
+
+  * Open a pull request from your branch at
+    <https://codeberg.org/rapidcow/p5-List-Search/pulls>;
+
+  * Publish your branch to a Git server of your choice,
+    and use git-request-pull(1);
+
+You can also send the patches produced with "diff -u" or
+"git format-patch --stdout" if the changes are small enough.
+
+Oh and, definitely regression tests whenever possible.
+I can write those for you, but people may find it more
+reassuring to add a minimal reprod of their code to
+ensure upstream won't break it for them. :)

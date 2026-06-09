@@ -62,7 +62,7 @@ build_ipcc.pl - Build database for IP::Country::DB_File
 
 =head1 VERSION
 
-version 3.03
+version 4.00
 
 =head1 SYNOPSIS
 
@@ -85,7 +85,7 @@ otherwise this command does nothing.
 
 =head2 -f
 
-Fetch statistics files via FTP.
+Fetch statistics files via HTTPS.
 
 =head2 -b
 
@@ -109,7 +109,7 @@ Nick Wellnhofer <wellnhofer@aevum.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Nick Wellnhofer.
+This software is copyright (c) 2026 by Nick Wellnhofer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

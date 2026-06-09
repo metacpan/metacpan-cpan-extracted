@@ -154,4 +154,110 @@ sub gql {
        'row is gone from DB' );
 }
 
+# patchAuthor — change one column, verify the other is untouched
+{
+    my ($db, $schema, $ctx) = fresh();
+    my $res = gql($schema, $ctx, 'mutation {
+        patchAuthor(id: 1, name: "Patched Name") {
+            id name email
+        }
+    }');
+
+    ok(!$res->{errors}, 'patchAuthor single column: no errors')
+        or diag explain $res->{errors};
+    my $a = $res->{data}{patchAuthor};
+    is($a->{name},  'Patched Name',      'patchAuthor: name was updated'   );
+    is($a->{email}, 'seed@example.com',  'patchAuthor: email was untouched');
+
+    my $row = $db->resultset('Author')->find(1);
+    is($row->name,  'Patched Name',     'DB: name reflects patch'          );
+    is($row->email, 'seed@example.com', 'DB: email unchanged after patch'  );
+}
+
+# patchAuthor — change a different column, verify the first is still intact
+{
+    my ($db, $schema, $ctx) = fresh();
+    my $res = gql($schema, $ctx, 'mutation {
+        patchAuthor(id: 1, email: "patched@example.com") {
+            id name email
+        }
+    }');
+
+    ok(!$res->{errors}, 'patchAuthor email only: no errors')
+        or diag explain $res->{errors};
+    my $a = $res->{data}{patchAuthor};
+    is($a->{email}, 'patched@example.com', 'patchAuthor: email was updated' );
+    is($a->{name},  'Seed Author',         'patchAuthor: name was untouched');
+
+    my $row = $db->resultset('Author')->find(1);
+    is($row->email, 'patched@example.com', 'DB: email reflects patch'       );
+    is($row->name,  'Seed Author',         'DB: name unchanged after patch' );
+}
+
+# patchAuthor — by unique constraint
+{
+    my ($db, $schema, $ctx) = fresh();
+    my $res = gql($schema, $ctx, 'mutation {
+        patchAuthor(email: "seed@example.com", name: "UQ Patched") {
+            id name email
+        }
+    }');
+
+    ok(!$res->{errors}, 'patchAuthor by unique constraint: no errors')
+        or diag explain $res->{errors};
+    is($res->{data}{patchAuthor}{name},  'UQ Patched',         'name updated via UQ lookup');
+    is($res->{data}{patchAuthor}{email}, 'seed@example.com',   'email untouched via UQ patch');
+}
+
+# patchAuthor — row not found surfaces in errors array
+{
+    my ($db, $schema, $ctx) = fresh();
+    my $res = gql($schema, $ctx, 'mutation {
+        patchAuthor(id: 9999, name: "Ghost") { id }
+    }');
+
+    ok(($res->{errors} && @{$res->{errors}}) || !defined $res->{data}{patchAuthor},
+        'patchAuthor with unknown id returns null data or populates errors');
+}
+
+# patchAuthor — no non-key columns supplied is an error
+{
+    my ($db, $schema, $ctx) = fresh();
+    my $res = gql($schema, $ctx, 'mutation {
+        patchAuthor(id: 1) { id name }
+    }');
+
+    ok($res->{errors} && @{$res->{errors}},
+        'patchAuthor with only PK and no data columns populates errors array');
+    my $row = $db->resultset('Author')->find(1);
+    is($row->name, 'Seed Author', 'DB: row is untouched after no-op patch attempt');
+}
+
+# patchBook — patch only price, title untouched
+{
+    my ($db, $schema, $ctx) = fresh();
+    $db->resultset('Book')->create({
+        id        => 1,
+        title     => 'Original Title',
+        author_id => 1,
+        price     => 9.99,
+    });
+
+    my $res = gql($schema, $ctx, 'mutation {
+        patchBook(id: 1, price: 19.99) {
+            id title price
+        }
+    }');
+
+    ok(!$res->{errors}, 'patchBook price only: no errors')
+        or diag explain $res->{errors};
+    my $b = $res->{data}{patchBook};
+    is($b->{price}, 19.99,            'patchBook: price was updated'   );
+    is($b->{title}, 'Original Title', 'patchBook: title was untouched' );
+
+    my $row = $db->resultset('Book')->find(1);
+    is($row->price, 19.99,            'DB: price reflects patch'       );
+    is($row->title, 'Original Title', 'DB: title unchanged after patch');
+}
+
 done_testing;

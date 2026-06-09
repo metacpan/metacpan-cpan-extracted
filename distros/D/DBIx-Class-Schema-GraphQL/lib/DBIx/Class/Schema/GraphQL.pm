@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v0.0.1');
+our $VERSION   = qv('v0.0.2');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,7 +13,7 @@ DBIx::Class::Schema::GraphQL - Auto-generate a GraphQL schema from a DBIx::Class
 
 =head1 VERSION
 
-Version v0.0.1
+Version v0.0.2
 
 =cut
 
@@ -66,9 +66,14 @@ use GraphQL::Type::Scalar qw($Int $String $Float $Boolean);
             }
         }', undef, $result->{context}, { after => $cursor });
 
-    # Mutation
+    # Mutation: Full update (all non-key columns)
     execute($result->{schema},
         'mutation { createBook(title: "Dune", author_id: 4) { id title } }',
+        undef, $result->{context});
+
+    # Mutation: Sparse update (only supplied columns are changed)
+    execute($result->{schema},
+        'mutation { patchBook(id: 1, title: "Dune Messiah") { id title } }',
         undef, $result->{context});
 
 =head1 DESCRIPTION
@@ -88,8 +93,8 @@ a List type; C<belongs_to> / C<might_have> resolve to a single object type).
 C<allE<lt>SourceE<gt>s> queries supporting filtering, ordering, and both
 offset and cursor pagination.
 
-=item * A root C<Mutation> type with C<createX>, C<updateX>, and C<deleteX>
-entry points for every source.
+=item * A root C<Mutation> type with C<createX>, C<updateX>, C<patchX>, and
+C<deleteX> entry points for every source.
 
 =back
 
@@ -259,7 +264,7 @@ sub to_graphql {
 
     my $mutation_type = GraphQL::Type::Object->new(
         name        => 'Mutation',
-        description => 'Auto-generated create/update/delete mutations',
+        description => 'Auto-generated create/update/patch/delete mutations',
         fields      => \%mutation_fields,
     );
 
@@ -675,7 +680,7 @@ sub _build_mutation_fields {
         },
     };
 
-    # updateX
+    # updateX — full replacement; all non-key columns should be supplied.
     my %update_lookup_args = %{ _build_lookup_args($source) };
     my %update_data_args   = map {
         $_ => { type => _scalar_for_column($source, $_) }
@@ -684,14 +689,44 @@ sub _build_mutation_fields {
     $fields{ 'update' . ucfirst($moniker) } = {
         type        => $gql_type,
         args        => { %update_lookup_args, %update_data_args },
-        description => "Update an existing $moniker row identified by its primary key "
-                     . "or any unique constraint.  Pass all non-key columns.",
+        description => "Full update of a $moniker row identified by its primary key "
+                     . "or any unique constraint.  All non-key columns should be "
+                     . "supplied; omitted columns are left unchanged in the database "
+                     . "but that is incidental — use patchX for intentional sparse updates.",
         resolve     => sub {
             my ($root, $args, $ctx) = @_;
             my $row = _resolve_row($ctx, $moniker, $args);
             die "No $moniker row found for the supplied key(s)\n" unless $row;
             my %data = map  { $_ => $args->{$_} }
                        grep { !$is_pk{$_} && defined $args->{$_} } keys %$args;
+            $row = eval { $row->update(\%data); $row->discard_changes; $row };
+            die $@ if $@;
+            return { $row->get_columns };
+        },
+    };
+
+    # patchX — sparse update; only columns explicitly provided are changed.
+    # Identified by primary key or any unique constraint, same as updateX.
+    # Every non-key column is optional (nullable).  Only defined arguments
+    # are sent to ->update(), so the caller can safely omit any column they
+    # do not wish to change.
+    $fields{ 'patch' . ucfirst($moniker) } = {
+        type        => $gql_type,
+        args        => { %update_lookup_args, %update_data_args },
+        description => "Sparse update of a $moniker row identified by its primary key "
+                     . "or any unique constraint.  Supply only the columns you want "
+                     . "to change; all other columns are left untouched.",
+        resolve     => sub {
+            my ($root, $args, $ctx) = @_;
+            my $row = _resolve_row($ctx, $moniker, $args);
+            die "No $moniker row found for the supplied key(s)\n" unless $row;
+            # Only send columns the client explicitly provided.
+            # GraphQL omits absent args from the hash entirely, so a
+            # defined-check is sufficient to distinguish "not sent" from null.
+            my %data = map  { $_ => $args->{$_} }
+                       grep { !$is_pk{$_} && defined $args->{$_} } keys %$args;
+            die "patchX: no non-key columns supplied — nothing to update\n"
+                unless %data;
             $row = eval { $row->update(\%data); $row->discard_changes; $row };
             die $@ if $@;
             return { $row->get_columns };
@@ -798,7 +833,7 @@ treated as implementation details subject to change.
 
 =head1 MUTATIONS
 
-For every source C<X>, three mutations are generated:
+For every source C<X>, four mutations are generated:
 
 =head2 createX
 
@@ -811,12 +846,32 @@ in the top-level C<errors> array of the response.
 
 =head2 updateX
 
-    mutation { updateBook(id: 1, title: "Dune Messiah") { id title } }
+    mutation { updateBook(id: 1, title: "Dune Messiah", author_id: 4) { id title } }
 
-Identifies the target row by its primary key B<or> by a complete set of
-columns from any unique constraint declared on the source.  All non-key
-columns must be supplied (full update).  C<die>s if the row cannot be found
+Full update. Identifies the target row by its primary key B<or> by a
+complete set of columns from any unique constraint declared on the source.
+All non-key columns should be supplied.  C<die>s if the row cannot be found
 or the update fails.
+
+Use C<patchX> when you only want to change a subset of columns.
+
+=head2 patchX
+
+    mutation { patchBook(id: 1, title: "Dune Messiah") { id title } }
+
+Sparse (partial) update.  Identifies the target row the same way as
+C<updateX> (primary key or unique constraint), but only the non-key columns
+you explicitly supply are written to the database.  Any column you omit is
+left exactly as it is.
+
+    # Change only the title - author_id is untouched
+    mutation { patchBook(id: 1, title: "Dune Messiah") { id title author { name } } }
+
+    # Change only the foreign key - title is untouched
+    mutation { patchBook(id: 1, author_id: 2) { id title author { name } } }
+
+C<die>s if the row cannot be found, the update fails, or no non-key
+columns are supplied at all.
 
 =head2 deleteX
 
@@ -844,8 +899,8 @@ not accept C<filter>, C<orderBy>, or pagination arguments.
 only scalar column values.  Related rows must be created or linked separately
 using their own mutations and raw foreign-key values.
 
-=item * B<updateX is a full update.>  All non-primary-key columns must be
-supplied; partial (sparse) updates are not supported.
+=item * B<updateX is a full update.>  All non-primary-key columns should be
+supplied; use C<patchX> for intentional sparse / partial updates.
 
 =item * B<Cursor pagination assumes primary-key order.>  The C<after> cursor
 encodes the primary key of the last returned row and applies a

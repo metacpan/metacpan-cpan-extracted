@@ -79,6 +79,21 @@ unless (-f $runtime_src) {
         "The runtime source is required to build the Perl module.\n";
 }
 
+# Detect libffi. When present, Strada::call() dispatches through libffi and
+# accepts an arbitrary number of arguments; without it, calls are capped at 4.
+# The module builds either way.
+my ($ffi_inc, $ffi_libs, $ffi_define) = ('', '', '');
+if (system('pkg-config --exists libffi 2>/dev/null') == 0) {
+    chomp($ffi_inc  = `pkg-config --cflags libffi 2>/dev/null`);
+    chomp($ffi_libs = `pkg-config --libs libffi 2>/dev/null`);
+    $ffi_libs ||= '-lffi';
+    $ffi_define = ' -DHAVE_LIBFFI';
+    print "libffi found: Strada::call() supports unlimited arguments\n";
+} else {
+    print "libffi NOT found: Strada::call() limited to 4 arguments\n" .
+          "  (install libffi-dev / libffi-devel and re-run Makefile.PL to lift the cap)\n";
+}
+
 WriteMakefile(
     NAME         => 'Strada',
     VERSION_FROM => 'Strada.pm',
@@ -87,14 +102,14 @@ WriteMakefile(
     LICENSE      => 'gpl_2',
 
     # Include paths
-    INC          => "-I$runtime_inc",
+    INC          => "-I$runtime_inc $ffi_inc",
 
     # Include Strada runtime in OBJECT list
     OBJECT       => '$(O_FILES) strada_runtime$(OBJ_EXT)',
-    LIBS         => ['-ldl -lm'],
+    LIBS         => ["-ldl -lm $ffi_libs"],
 
     # Compiler flags
-    CCFLAGS      => '-fPIC',
+    CCFLAGS      => "-fPIC$ffi_define",
 
     # Extra files to clean
     clean        => { FILES => '*.o strada_runtime.o' },
@@ -108,8 +123,8 @@ WriteMakefile(
             homepage   => 'https://strada-lang.github.io/',
             repository => {
                 type => 'git',
-                url  => 'https://github.com/strada-lang/strada.git',
-                web  => 'https://github.com/strada-lang/strada',
+                url  => 'https://github.com/strada-lang/strada-lang.git',
+                web  => 'https://github.com/strada-lang/strada-lang',
             },
         },
     },

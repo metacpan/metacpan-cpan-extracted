@@ -1,5 +1,19 @@
 Revision history for Concierge-Users
 
+v0.9.2  2026-06-08
+    - Remove 'system' attribute entirely: drop from field definitions,
+      get_field_hints(), config_to_yaml() YAML output, POD, __DATA__
+      template, and tests; system fields are identifiable via
+      user_system_fields() or field name
+    - Fix Field Overrides POD: add last_login_date to protected fields list
+    - Fix user_system_fields POD: add last_login_date to listed return values
+    - Fix README version (was stale at v0.7.1)
+    - Fix config_to_yaml() show_config() bug: format_as was omitted from
+      generated YAML (v0.9.1 fix, documented here)
+    - Fix init_field_meta() protection logic: last_login_date added to
+      protected field set; format_as and label now pass through on all
+      protected fields without warning (v0.9.1 fix, documented here)
+
 v0.9.1  2026-06-05
     - Add format_as test coverage to t/06-field-metadata.t: built-in
       convention values, app-supplied tokens via app_fields, field_overrides

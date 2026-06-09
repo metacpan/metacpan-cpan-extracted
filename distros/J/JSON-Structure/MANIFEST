@@ -20,5 +20,6 @@ t/04_test_assets.t
 t/05_format_validation.t
 t/06_comprehensive.t
 t/07_cli.t
+t/08_metadata.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

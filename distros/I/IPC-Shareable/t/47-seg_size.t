@@ -6,15 +6,16 @@ use IPC::Shareable;
 IPC::Shareable->testing_set('IPC::Shareable');
 use Test::More;
 
+use FindBin;
+use lib $FindBin::Bin;
+use IPCShareableTest qw(assert_clean_process);
+
 BEGIN {
     if ($Config{ivsize} < 8) {
         plan skip_all => "This test script can't be run on a perl < 64-bit";
     }
 }
 
-my $segs_before = IPC::Shareable::seg_count();
-my $sems_before = IPC::Shareable::sem_count();
-warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 
 use constant BYTES => 2000000; # ~2MB
 
@@ -53,7 +54,17 @@ use constant BYTES => 2000000; # ~2MB
 }
 
 # beyond RAM limits
-{
+#
+# With limit => 0 the module's own size guard is disabled, so this relies on
+# the OS rejecting an absurdly large segment. That only holds where size_t is
+# 64-bit: on a 32-bit size_t (eg. i686 perls built with use64bitint, whose
+# ivsize is 8 so the skip at the top of this file does not catch them) the
+# requested size wraps modulo 2**32 to an allocatable value and the tie
+# succeeds, so skip these two checks there.
+SKIP: {
+    skip "32-bit size_t wraps a > 4 GB segment size instead of failing", 2
+        if $Config{sizesize} < 8;
+
     my $size_ok = eval {
         tie my $var, 'IPC::Shareable', {
             limit   => 0,
@@ -113,10 +124,6 @@ $k->clean_up_all;
 
 IPC::Shareable::_end;
 
-my $segs_after = IPC::Shareable::seg_count();
-warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
-is $segs_after, $segs_before, "All segs cleaned up ok";
-my $sems_after = IPC::Shareable::sem_count();
-is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
+assert_clean_process();
 
 done_testing();

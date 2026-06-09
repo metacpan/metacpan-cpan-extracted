@@ -1,6 +1,6 @@
 ##----------------------------------------------------------------------------
-## Unicode Locale Identifier - ~/lib/Locale/Unicode/Data.pm
-## Version v1.8.4
+## Unicode Locale Identifier - ~/lib/m
+## Version v1.8.5
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/06/15
@@ -40,7 +40,7 @@ BEGIN
     our $CLDR_VERSION = '48.2';
     our $DBH = {};
     our $STHS = {};
-    our $VERSION = 'v1.8.4';
+    our $VERSION = 'v1.8.5';
 };
 
 use strict;
@@ -3974,6 +3974,14 @@ sub _get_args_as_hash
 # NOTE: END
 END
 {
+    # On systems with a strict memory allocator, such as OpenBSD, a cached statement
+    # handle must be finalised while its parent database handle is still alive. During
+    # Perl global destruction the order in which the package globals and the cached
+    # handles are reclaimed is not guaranteed, so a statement handle may be finalised
+    # after its SQLite connection has already been closed. That is a use-after-free,
+    # and OpenBSD aborts the process with a SIGSEGV. We therefore tear everything down
+    # here, in a deterministic order, before global destruction begins: the statement
+    # handles first, then the database handles.
     if( defined( $STHS ) && ref( $STHS ) eq 'HASH' )
     {
         foreach my $tid ( keys( %$STHS ) )
@@ -3982,14 +3990,37 @@ END
             foreach my $db ( keys( %{ $STHS->{ $tid } } ) )
             {
                 next unless( ref( $STHS->{ $tid }->{ $db } ) eq 'HASH' );
-                foreach my $sth ( values( %{ $STHS->{ $tid }->{ $db } } ) )
+                foreach my $id ( keys( %{$STHS->{ $tid }->{ $db }} ) )
                 {
+                    my $sth = delete( $STHS->{ $tid }->{ $db }->{ $id } );
                     if( defined( $sth ) &&
                         Scalar::Util::blessed( $sth ) )
                     {
                         $sth->finish;
                     }
+                    # Drop our reference now so the handle is finalised while its
+                    # database handle is still open.
+                    undef( $sth );
                 }
+            }
+        }
+    }
+
+    if( defined( $DBH ) && ref( $DBH ) eq 'HASH' )
+    {
+        foreach my $tid ( keys( %$DBH ) )
+        {
+            next unless( ref( $DBH->{ $tid } ) eq 'HASH' );
+            foreach my $db ( keys( %{ $DBH->{ $tid } } ) )
+            {
+                my $dbh = delete( $DBH->{ $tid }->{ $db } );
+                if( defined( $dbh ) &&
+                    Scalar::Util::blessed( $dbh ) &&
+                    $dbh->isa( 'DBI::db' ) )
+                {
+                    $dbh->disconnect;
+                }
+                undef( $dbh );
             }
         }
     }
@@ -5039,7 +5070,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v1.8.4
+    v1.8.5
 
 =head1 DESCRIPTION
 

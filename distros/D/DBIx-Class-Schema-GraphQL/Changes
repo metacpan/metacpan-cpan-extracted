@@ -1,4 +1,52 @@
 Revision history for DBIx::Class::Schema::GraphQL
 
+v0.0.2  2026-06-08
+        [New Features]
+        - Added patchX mutations for every source alongside the existing
+          updateX. patchX performs a sparse (partial) update: only the
+          non-key columns explicitly supplied by the caller are written to
+          the database; all omitted columns are left exactly as they are.
+          The lookup mechanism (primary key or any declared unique
+          constraint) is identical to updateX.
+
+          Example:
+           # change only the title - author_id is untouched
+           mutation { patchBook(id: 1, title: "Dune Messiah") { id title } }
+
+        [Behaviour Changes]
+        - updateX description updated to clarify it is a full update and to
+          direct callers toward patchX when sparse intent is deliberate.
+          The resolver itself is unchanged; this is a documentation
+          clarification only.
+
+        [Error Handling]
+        - patchX dies with a descriptive message ("patchX: no non-key columns
+          supplied - nothing to update") when the caller provides only key
+          columns and no data columns. The error surfaces in the top-level
+          GraphQL errors array; the database is not touched.
+
+        [Tests]
+        - t/04-mutations.t: added six new test blocks covering patchX:
+          * patchAuthor - single column patched, sibling column verified
+            untouched in-both the GraphQL response and the database
+          * patchAuthor - patch the other column, first column verified intact
+          * patchAuthor - lookup by unique constraint
+          * patchAuthor - unknown row surfaces in errors array
+          * patchAuthor - no non-key columns supplied raises an error and
+            leaves the database row unchanged
+          * patchBook - patch a Float column (price) on a second source,
+            title verified untouched; confirms patchX generation is correct
+            across all sources, not only the seed source
+
+        [Documentation]
+        - MUTATIONS section: patchX documented with description, example,
+          and behaviour notes. updateX example updated to show a
+          full-column call.
+        - DESCRIPTION: patchX added to the list of generated mutation entry
+          points.
+        - LIMITATIONS: "updateX is a full update" bullet updated to reference
+          patchX as the supported path for partial updates.
+        - SYNOPSIS: patchX example added.
+
 v0.0.1  2026-06-07
         - First draft released.

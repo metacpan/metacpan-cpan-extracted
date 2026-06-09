@@ -939,4 +939,87 @@ subtest 'clone + parent write to same array in document order' => sub {
 	is($log[3]{message}, 'c2', 'fourth is child c2');
 };
 
+# ============================================================
+# 19. CSV file logging — POD example end-to-end
+# ============================================================
+
+subtest 'CSV file logger — creates correctly formatted file' => sub {
+	plan tests => 13;
+
+	my ($fh, $csv_path) = tempfile(SUFFIX => '.csv', UNLINK => 1);
+	close $fh;
+
+	# Write header row (mirrors the POD example)
+	open my $hdr, '>', $csv_path or die "Cannot open $csv_path: $!";
+	print $hdr "timestamp,level,class,file,line,message\n";
+	close $hdr;
+
+	my $csv_field = sub {
+		my $v = defined $_[0] ? $_[0] : '';
+		$v =~ s/"/""/g;
+		return qq{"$v"};
+	};
+
+	my $logger = Log::Abstraction->new(
+		level  => 'trace',
+		logger => sub {
+			my $args = $_[0];
+			my $timestamp = POSIX::strftime('%Y-%m-%dT%H:%M:%SZ', gmtime);
+			my $message   = join(' ', @{ $args->{message} // [] });
+			open my $out, '>>', $csv_path or return;
+			print $out join(',',
+				$csv_field->($timestamp),
+				$csv_field->($args->{level}),
+				$csv_field->($args->{class}),
+				$csv_field->($args->{file}),
+				$csv_field->($args->{line}),
+				$csv_field->($message),
+			), "\n";
+			close $out;
+		},
+	);
+
+	$logger->trace('application started');
+	$logger->info('user logged in');
+	$logger->warn({ warning => 'disk usage above 80%' });
+
+	open my $in, '<', $csv_path or die "Cannot read $csv_path: $!";
+	my @lines = grep { /\S/ } <$in>;
+	close $in;
+	chomp @lines;
+
+	is(scalar(@lines), 4, 'header + 3 data rows written');
+	is($lines[0], 'timestamp,level,class,file,line,message', 'header row exact match');
+	like($lines[1], qr/^"/, 'data rows use double-quoted fields');
+
+	# Minimal RFC-4180-compatible parser for double-quoted fields
+	my $parse_line = sub {
+		my ($line) = @_;
+		my @fields;
+		while (length $line) {
+			last unless $line =~ s/^"((?:[^"]|"")*)"(?:,|$)//;
+			my $f = $1;
+			$f =~ s/""/"/g;
+			push @fields, $f;
+		}
+		return @fields;
+	};
+
+	my @r1 = $parse_line->($lines[1]);
+	is(scalar(@r1),  6,                     'trace row has 6 fields');
+	like($r1[0],     qr/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/, 'timestamp is ISO-8601 UTC');
+	is($r1[1],       'trace',               'trace row level field');
+	ok(length $r1[2],                        'class field populated');
+	ok(length $r1[3],                        'file field populated');
+	is($r1[5],       'application started', 'trace row message field');
+
+	my @r2 = $parse_line->($lines[2]);
+	is($r2[1], 'info',          'info row level field');
+	is($r2[5], 'user logged in','info row message field');
+
+	my @r3 = $parse_line->($lines[3]);
+	is($r3[1], 'warn',                 'warn row level field');
+	is($r3[5], 'disk usage above 80%', 'warn row message field');
+};
+
 done_testing();

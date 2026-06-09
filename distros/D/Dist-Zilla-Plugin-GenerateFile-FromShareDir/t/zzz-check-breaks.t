@@ -1,9 +1,10 @@
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::CheckBreaks 0.019
+# this test was generated with Dist::Zilla::Plugin::Test::CheckBreaks 0.020
 
 use Test::More tests => 3;
+use Term::ANSIColor 'colored';
 
 SKIP: {
     eval { +require Module::Runtime::Conflicts; Module::Runtime::Conflicts->check_conflicts };

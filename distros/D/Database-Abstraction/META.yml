@@ -28,7 +28,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -40,6 +40,7 @@ no_index:
     - inc
 requires:
   Carp: '0'
+  Cwd: '0'
   DBD::SQLite::Constants: '0'
   Data::Dumper: '0'
   Data::Reuse: '0'
@@ -59,5 +60,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Abstraction
   repository: git://github.com/nigelhorne/Database-Abstraction.git
-version: '0.34'
+version: '0.35'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

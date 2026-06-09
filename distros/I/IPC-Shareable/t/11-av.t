@@ -5,15 +5,16 @@ use IPC::Shareable;
 IPC::Shareable->testing_set('IPC::Shareable');
 use Test::More;
 
+use FindBin;
+use lib $FindBin::Bin;
+use IPCShareableTest qw(assert_clean_process unique_glue);
+
 my $mod = 'IPC::Shareable';
 
-my $segs_before = IPC::Shareable::seg_count();
-my $sems_before = IPC::Shareable::sem_count();
-warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 
 # serializer: storable
 {
-    tie my @av, $mod, { key => 'av11', create => 1, destroy => 1 };
+    tie my @av, $mod, { key => unique_glue('av11'), create => 1, destroy => 1 };
 
     my @words = qw(tic tac toe);
     @av = qw(tic tac toe);
@@ -88,7 +89,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 
 # serializer: json
 {
-    tie my @av, $mod, { key => 'av11', create => 1, destroy => 1, serializer => 'json' };
+    tie my @av, $mod, { key => unique_glue('av11'), create => 1, destroy => 1, serializer => 'json' };
 
     my @words = qw(tic tac toe);
     @av = qw(tic tac toe);
@@ -163,16 +164,12 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 
 # FETCH from a never-written array segment returns undef (empty segment path)
 {
-    tie my @av, $mod, { key => 'av11e', create => 1, destroy => 1 };
+    tie my @av, $mod, { key => unique_glue('av11e'), create => 1, destroy => 1 };
     is $av[0], undef, "FETCH on never-written array element returns undef ok";
 }
 
 IPC::Shareable::_end;
 
-my $segs_after = IPC::Shareable::seg_count();
-warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
-is $segs_after, $segs_before, "All segs cleaned up ok";
-my $sems_after = IPC::Shareable::sem_count();
-is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
+assert_clean_process();
 
 done_testing();

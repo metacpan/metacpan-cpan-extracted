@@ -38,5 +38,17 @@ is( parsed{assertions}{skipped}, 2, "assertion skip count" );
 is( parsed{assertions}{total}, 11, "assertion total count" );
 
 is( parsed{planned}, 5, "captures top-level plan" );
+is( parsed{plan_directive}, "", "plan without directive has empty directive" );
+is( parsed{skip_all}, false, "normal plan is not skip-all" );
+
+let skip_plan := parse("1..0 # SKIP requires AUTHOR_TESTING=1\n");
+is( skip_plan{planned}, 0, "skip-all plan captures zero plan" );
+is(
+	skip_plan{plan_directive},
+	"SKIP requires AUTHOR_TESTING=1",
+	"skip-all plan captures directive",
+);
+is( skip_plan{skip_all}, true, "skip-all plan is marked" );
+is( skip_plan{top_level}{total}, 0, "skip-all plan has no top-level tests" );
 
 done_testing();

@@ -7,11 +7,14 @@ use IPC::Shareable;
 IPC::Shareable->testing_set('IPC::Shareable');
 use IPC::Shareable::SharedMem;
 use Test::More;
+
+use FindBin;
+use lib $FindBin::Bin;
+use IPCShareableTest qw(
+    assert_clean_process barrier_new barrier_release barrier_wait unique_glue
+);
 use Test::SharedFork;
 
-my $segs_before = IPC::Shareable::seg_count();
-my $sems_before = IPC::Shareable::sem_count();
-warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 
 sub shm_cleaned {
     # shmread fails with EINVAL when the segment has been removed
@@ -23,7 +26,7 @@ sub shm_cleaned {
 
 # create not sent in
 {
-    my $ret = eval { my $s = tie(my $sv, 'IPC::Shareable', 'child_sv', { destroy => 0 , serializer => 'storable' }); 1; };
+    my $ret = eval { my $s = tie(my $sv, 'IPC::Shareable', unique_glue('child_sv'), { destroy => 0 , serializer => 'storable' }); 1; };
     is $ret, undef, "We croak if a key is specified, create is not called and no segment exists";
     like $@, qr/ERROR: Could not acquire/, "...and error message is sane";
 }
@@ -55,7 +58,7 @@ sub shm_cleaned {
 
 # remove()
 {
-    my $s = tie my $sv, 'IPC::Shareable', 'test', { create => 1, destroy => 0 , serializer => 'storable' };
+    my $s = tie my $sv, 'IPC::Shareable', unique_glue('test'), { create => 1, destroy => 0 , serializer => 'storable' };
     $sv = 'foobar';
     is $sv, 'foobar', "SV set and value is 'foobar'";
 
@@ -80,7 +83,7 @@ sub shm_cleaned {
 
 # clean_up()
 {
-    my $s = tie my $sv, 'IPC::Shareable', 'test', { create => 1, destroy => 0 , serializer => 'storable' };
+    my $s = tie my $sv, 'IPC::Shareable', unique_glue('test'), { create => 1, destroy => 0 , serializer => 'storable' };
     $sv = 'foobar';
     is $sv, 'foobar', "SV set and value is 'foobar'";
 
@@ -105,7 +108,7 @@ sub shm_cleaned {
 
 # clean_up_all()
 {
-    my $s = tie my $sv, 'IPC::Shareable', 'test', { create => 1, destroy => 0 , serializer => 'storable' };
+    my $s = tie my $sv, 'IPC::Shareable', unique_glue('test'), { create => 1, destroy => 0 , serializer => 'storable' };
     $sv = 'foobar';
     is $sv, 'foobar', "SV set and value is 'foobar'";
 
@@ -132,8 +135,7 @@ my ($z, $y, $x, $w);
 
 # parent/child
 {
-    my $awake = 0;
-    local $SIG{ALRM} = sub { $awake = 1 };
+    my $ready = barrier_new();   # parent -> child: segment created
 
     my $pid = fork;
     defined $pid or die "Cannot fork : $!";
@@ -141,9 +143,9 @@ my ($z, $y, $x, $w);
     if ($pid == 0) {
         # child
 
-        sleep unless $awake;
+        barrier_wait($ready);
 
-        my $s = tie(my $sv, 'IPC::Shareable', 'kids', { destroy => 0 , serializer => 'storable' });
+        my $s = tie(my $sv, 'IPC::Shareable', unique_glue('kids'), { destroy => 0 , serializer => 'storable' });
         $sv = 'baz';
 
         is $sv, 'baz', "SV initialized and set to 'baz' ok";
@@ -168,9 +170,9 @@ my ($z, $y, $x, $w);
     else {
         # parent
 
-        my $s = tie(my $sv, 'IPC::Shareable', 'kids', { create => 1, destroy => 0 , serializer => 'storable' });
+        my $s = tie(my $sv, 'IPC::Shareable', unique_glue('kids'), { create => 1, destroy => 0 , serializer => 'storable' });
 
-        kill ALRM => $pid;
+        barrier_release($ready);
         my $id = $s->seg->id;
         waitpid($pid, 0);
 
@@ -188,11 +190,7 @@ my ($z, $y, $x, $w);
 
 IPC::Shareable::_end;
 
-my $segs_after = IPC::Shareable::seg_count();
-warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
-is $segs_after, $segs_before, "All segs cleaned up ok";
-my $sems_after = IPC::Shareable::sem_count();
-is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
+assert_clean_process();
 
 # remove($key) warns when shmget fails for a non-existent key
 {
@@ -212,7 +210,7 @@ is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
     # destroy => 0: the shm segment is already gone after $k->remove, so no
     # double-remove on scope exit.  Save the semaphore before mocking so we can
     # clean it up manually after the block (mock prevents normal cleanup).
-    my $k = tie my %h, 'IPC::Shareable', { key => 'TE', create => 1, destroy => 0 , serializer => 'storable' };
+    my $k = tie my %h, 'IPC::Shareable', { key => unique_glue('TE'), create => 1, destroy => 0 , serializer => 'storable' };
     $h{a} = 1;
 
     my $orphan_sem = $k->sem;

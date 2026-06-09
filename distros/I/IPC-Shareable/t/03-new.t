@@ -5,16 +5,21 @@ use Data::Dumper;
 use IPC::Shareable;
 IPC::Shareable->testing_set('IPC::Shareable');
 use Test::More;
+
+use FindBin;
+use lib $FindBin::Bin;
+use IPCShareableTest qw(
+    assert_clean_process barrier_new barrier_release barrier_wait unique_glue
+);
 use Test::SharedFork;
 
-my $segs_before = IPC::Shareable::seg_count();
-my $sems_before = IPC::Shareable::sem_count();
-warn "Segs Before $segs_before\n" if $ENV{PRINT_SEGS};
 
 my $mod = 'IPC::Shareable';
 
-my $awake = 0;
-local $SIG{ALRM} = sub { $awake = 1 };
+# A pipe barrier (see IPCShareableTest::barrier_new) replaces the old
+# SIGALRM/sleep handshake and its lost-wakeup race.
+
+my $ready = barrier_new();   # parent -> child: segments created
 
 # locking
 
@@ -24,33 +29,33 @@ defined $pid or die "Cannot fork: $!\n";
 if ($pid == 0) {
     # child
 
-    sleep unless $awake;
+    barrier_wait($ready);
 
-    my $ch = $mod->new(key => 'hash2');
+    my $ch = $mod->new(key => unique_glue('hash2'));
     $ch->{child} = 'child';
 
-    my $ca = $mod->new(key => 'array2', var => 'ARRAY');
+    my $ca = $mod->new(key => unique_glue('array2'), var => 'ARRAY');
     $ca->[1] = 'child';
 
-    my $cs = $mod->new(key => 'scalar2', var => 'SCALAR');
+    my $cs = $mod->new(key => unique_glue('scalar2'), var => 'SCALAR');
     $$cs = 'child';
 
 } else {
     # parent
 
-    my $ph = $mod->new(key => 'hash2', create => 1, destroy => 1);
+    my $ph = $mod->new(key => unique_glue('hash2'), create => 1, destroy => 1);
     like tied(%$ph), qr/IPC::Shareable/, "new() tied hash is proper object ok";
     like tied(%$ph)->can('seg_count'), qr/CODE/, "...and it can call its methods ok";
 
-    my $pa = $mod->new(key => 'array2', create => 1, destroy => 1, var => 'ARRAY');
+    my $pa = $mod->new(key => unique_glue('array2'), create => 1, destroy => 1, var => 'ARRAY');
     like tied(@$pa), qr/IPC::Shareable/, "new() tied array is proper object ok";
     like tied(@$pa)->can('seg_count'), qr/CODE/, "...and it can call its methods ok";
 
-    my $ps = $mod->new(key => 'scalar2', create => 1, destroy => 1, var => 'SCALAR');
+    my $ps = $mod->new(key => unique_glue('scalar2'), create => 1, destroy => 1, var => 'SCALAR');
     like tied($$ps), qr/IPC::Shareable/, "new() tied scalar is proper object ok";
     like tied($$ps)->can('seg_count'), qr/CODE/, "...and it can call its methods ok";
 
-    kill ALRM => $pid;
+    barrier_release($ready);
     waitpid($pid, 0);
 
     is $ph->{child}, 'child', 'child set the hash value ok';
@@ -68,11 +73,7 @@ if ($pid == 0) {
 
     IPC::Shareable->clean_up_all;
 
-    my $segs_after = IPC::Shareable::seg_count();
-    warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
-    is $segs_after, $segs_before, "All segs, even those created in separate procs, cleaned up ok";
-    my $sems_after = IPC::Shareable::sem_count();
-    is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
+    assert_clean_process();
 
     done_testing();
 }

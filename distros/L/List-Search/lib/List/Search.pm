@@ -1,11 +1,14 @@
+use 5.006;
 use strict;
 use warnings;
 
 package List::Search;
 
-our $VERSION = '0.3';
+our $VERSION = '0.44';
+$VERSION = eval $VERSION;
 
-use vars qw(@ISA @EXPORT_OK);
+use Exporter ();
+our (@ISA, @EXPORT_OK);
 @ISA       = qw(Exporter);
 @EXPORT_OK = qw(
   list_search   nlist_search   custom_list_search
@@ -30,12 +33,13 @@ List::Search - fast searching of sorted lists
 
     # Search numerically
     my @numbers = sort { $a <=> $b } ( 10, 20, 100, 200, );
-    print nlist_search( 20, \@numbers );       #  2
+    print nlist_search( 20, \@numbers );       #  1
 
     # Search using some other comparison
     my $cmp_code = sub { lc( $_[0] ) cmp lc( $_[1] ) };
-    my @custom_list = sort { $cmp_code->( $a, $b ) } qw( FOO bar BAZ bundy );
-    print list_search_generic( $cmp_code, 'foo', \@custom_list );
+    my @custom_list = sort { $cmp_code->( $a, $b ) }
+          qw( FOO bar BAZ bundy );        # bar < BAZ < bundy < FOO
+    print custom_list_search( $cmp_code, 'foo', \@custom_list );  # 3
 
 =head1 DESCRIPTION
 
@@ -48,7 +52,7 @@ C<dave> will return C<1> as C<$list[1] eq 'dave'>. Searching for C<charles>
 will also return C<1> as C<dave> is the first entry that is greater than
 C<charles>.
 
-If there are none of the entries match then C<-1> is returned. You can either
+If none of the entries match then C<-1> is returned. You can either
 check for this or use it as an index to get the last values in the list.
 Whichever approach you choose will depend on what you are trying to do.
 
@@ -88,10 +92,6 @@ sub nlist_search {
 
 =head2 custom_list_search
 
-WARNING: I intend to change this method so that it accepts a block in the same
-way that C<sort> does. This means that you will be able to use $a and $b as
-expected. Until then take care with this one : )
-
   my $cmp_sub = sub { $_[0] cmp $_[1] };
   my $idx = custom_list_search( $cmp_sub, $key, \@sorted_list );
 
@@ -110,6 +110,9 @@ sub custom_list_search {
 
     my $max_index = scalar(@$array_ref) - 1;
     return -1 if $max_index < 0;
+
+    # Early return if there are no matches in the array
+    return -1 if $cmp_code->( $key, $array_ref->[-1] ) > 0;
 
     my $low  = 0;
     my $mid  = undef;
@@ -131,11 +134,8 @@ sub custom_list_search {
 
     # Look at the values here and work out what to return.
 
-    # Perhaps there are no matches in the array
-    return -1 if $cmp_code->( $key, $array_ref->[-1] ) == 1;
-
     # Perhaps $mid is just before the best match
-    return $mid + 1 if $cmp_code->( $key, $array_ref->[$mid] ) == 1;
+    return $mid + 1 if $cmp_code->( $key, $array_ref->[$mid] ) > 0;
 
     # $mid is correct
     return $mid;
@@ -167,6 +167,7 @@ sub custom_list_contains {
 
     # Get the index of the key
     my $idx = custom_list_search( $code, $key, $array_ref );
+    return 0 if $idx == -1;
 
     # Compare the key to the index
     my $cmp_result = $code->( $key, $array_ref->[$idx] );
@@ -195,11 +196,19 @@ list try L<List::MoreUtils>.
 
 Sean Woolcock submitted several bug fixes which were included in 0.3
 
-=head1 SVN ACCESS
+=head1 LINKS
 
-You can access the latest (possibly unstable) code here:
+Starting May 2026, the source code repository of List::Search
+lives on L<https://codeberg.org/rapidcow/p5-List-Search>.
 
-L<http://dev.ecclestoad.co.uk/svn/cpan/List-Search>
+To report bugs, use Codeberg's built-in issue tracker
+at L<https://codeberg.org/rapidcow/p5-List-Search/issues>.
+Alternatively, use RT at
+L<https://rt.cpan.org/Dist/Display.html?Name=List-Search>
+or by emailing L<bug-list-search@rt.cpan.org>.
+
+There is an information page regarding List::Search at
+L<https://foss.rapidcow.org/CPAN/List-Search/>.
 
 =head1 COPYRIGHT
 

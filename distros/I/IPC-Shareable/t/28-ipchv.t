@@ -7,21 +7,26 @@ IPC::Shareable->testing_set('IPC::Shareable');
 use Test::More;
 use Test::SharedFork;
 
-my $segs_before = IPC::Shareable::seg_count();
-my $sems_before = IPC::Shareable::sem_count();
-warn "Segs Before $segs_before\n" if $ENV{PRINT_SEGS};
+use FindBin;
+use lib $FindBin::Bin;
+use IPCShareableTest qw(
+    assert_clean barrier_new barrier_release barrier_wait unique_glue
+);
 
-#plan tests => 8;
+# A pipe-based barrier handshake (see IPCShareableTest::barrier_new) replaces
+# the old SIGALRM/sleep handshake, which had a lost-wakeup race: a signal
+# delivered between the "unless $awake" check and sleep() was dropped and the
+# sleeper blocked forever (the FreeBSD smoker hang) or the two processes
+# desynced (the long-double Linux undef reads). Each section walks the child
+# and parent through three barriers: segment-ready (parent -> child),
+# child-wrote (child -> parent), and parent-wrote (parent -> child). Waiting on
+# child-wrote also replaces the old non-deterministic "sleep 1".
 
-my %shareOpts = (
-		 create =>       'yes',
-		 exclusive =>    0,
-		 mode =>         0644,
-		 destroy =>      'yes',
-		 );
+# --- serializer: storable -------------------------------------------------
 
-my $awake = 0;
-local $SIG{ALRM} = sub { $awake = 1 };
+my $seg_ready    = barrier_new();   # parent -> child: segment created
+my $child_wrote  = barrier_new();   # child  -> parent: child's keys written
+my $parent_wrote = barrier_new();   # parent -> child: parent's keys written
 
 my $pid = fork;
 defined $pid or die "Cannot fork: $!";
@@ -29,15 +34,14 @@ defined $pid or die "Cannot fork: $!";
 if ($pid == 0) {
     # child
 
-    sleep unless $awake;
-    $awake = 0;
+    barrier_wait($seg_ready);
 
-    my $ipch = tie my %hv, 'IPC::Shareable', "test", {
-        create    => 'yes',
-        exclusive => 0,
-        mode      => 0644,
-        destroy   => 0,
-            serializer => 'storable',
+    my $ipch = tie my %hv, 'IPC::Shareable', unique_glue('test'), {
+        create     => 'yes',
+        exclusive  => 0,
+        mode       => 0644,
+        destroy    => 0,
+        serializer => 'storable',
     };
 
     for (qw(fee fie foe fum)) {
@@ -46,42 +50,36 @@ if ($pid == 0) {
         $ipch->shunlock();
     }
 
-    sleep unless $awake;
-
-#    for (qw(fee fie foe fum)) {
-#        is $hv{$_}, $$, "child: HV key $_ has val $$";
-#    }
+    barrier_release($child_wrote);
+    barrier_wait($parent_wrote);
 
     my $parent = getppid;
     $parent == 1 and die "Parent process has unexpectedly gone away";
-
-#    for (qw(eenie meenie minie moe)) {
-#        is $hv{$_}, $parent, "child: HV key $_ has val $parent (parent PID)";
-#    }
-} else {
+}
+else {
     # parent
 
-    my $ipch = tie my %hv, 'IPC::Shareable', "test", {
-        create    => 1,
-        exclusive => 0,
-        mode      => 0666,
-        size      => 1024*512,
-        destroy   => 'yes',
-            serializer => 'storable',
+    my $ipch = tie my %hv, 'IPC::Shareable', unique_glue('test'), {
+        create     => 1,
+        exclusive  => 0,
+        mode       => 0666,
+        size       => 1024*512,
+        destroy    => 'yes',
+        serializer => 'storable',
     };
 
     %hv = ();
 
-    kill ALRM => $pid;
-    sleep 1;           # Allow time for child to process the signal before next ALRM comes in
-    
+    barrier_release($seg_ready);
+    barrier_wait($child_wrote);
+
     for (qw(eenie meenie minie moe)) {
         $ipch->shlock();
         $hv{$_} = $$;
         $ipch->shunlock();
     }
 
-    kill ALRM => $pid;
+    barrier_release($parent_wrote);
     waitpid($pid, 0);
 
     for (qw(fee fie foe fum)) {
@@ -93,10 +91,12 @@ if ($pid == 0) {
     }
 }
 
-# serializer: json — only run from the parent (original child has no explicit exit)
+# --- serializer: json (parent only) ---------------------------------------
+
 if ($pid != 0) {
-    my $awake2 = 0;
-    local $SIG{ALRM} = sub { $awake2 = 1 };
+    my $seg_ready2    = barrier_new();
+    my $child_wrote2  = barrier_new();
+    my $parent_wrote2 = barrier_new();
 
     my $pid2 = fork;
     defined $pid2 or die "Cannot fork: $!";
@@ -104,10 +104,9 @@ if ($pid != 0) {
     if ($pid2 == 0) {
         # child
 
-        sleep unless $awake2;
-        $awake2 = 0;
+        barrier_wait($seg_ready2);
 
-        my $ipch2 = tie my %hv, 'IPC::Shareable', "testj", {
+        my $ipch2 = tie my %hv, 'IPC::Shareable', unique_glue('testj'), {
             create     => 'yes',
             exclusive  => 0,
             mode       => 0644,
@@ -121,16 +120,18 @@ if ($pid != 0) {
             $ipch2->shunlock();
         }
 
-        sleep unless $awake2;
+        barrier_release($child_wrote2);
+        barrier_wait($parent_wrote2);
 
         my $parent = getppid;
         $parent == 1 and die "Parent process has unexpectedly gone away";
 
         exit;
-    } else {
+    }
+    else {
         # parent
 
-        my $ipch2 = tie my %hv, 'IPC::Shareable', "testj", {
+        my $ipch2 = tie my %hv, 'IPC::Shareable', unique_glue('testj'), {
             create     => 1,
             exclusive  => 0,
             mode       => 0666,
@@ -141,8 +142,8 @@ if ($pid != 0) {
 
         %hv = ();
 
-        kill ALRM => $pid2;
-        sleep 1;
+        barrier_release($seg_ready2);
+        barrier_wait($child_wrote2);
 
         for (qw(eenie meenie minie moe)) {
             $ipch2->shlock();
@@ -150,7 +151,7 @@ if ($pid != 0) {
             $ipch2->shunlock();
         }
 
-        kill ALRM => $pid2;
+        barrier_release($parent_wrote2);
         waitpid($pid2, 0);
 
         for (qw(fee fie foe fum)) {
@@ -166,11 +167,6 @@ if ($pid != 0) {
 IPC::Shareable::_end;
 
 if ($pid != 0) {
-    my $segs_after = IPC::Shareable::seg_count();
-    warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
-    is $segs_after, $segs_before, "All segs, even those created in separate procs, cleaned up ok";
-    my $sems_after = IPC::Shareable::sem_count();
-    is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
+    assert_clean(unique_glue('test'), unique_glue('testj'));
     done_testing();
 }
-

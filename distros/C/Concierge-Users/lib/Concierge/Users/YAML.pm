@@ -1,4 +1,4 @@
-package Concierge::Users::YAML v0.9.1;
+package Concierge::Users::YAML v0.9.2;
 use v5.36;
 use Carp qw/ croak /;
 use YAML::Tiny;

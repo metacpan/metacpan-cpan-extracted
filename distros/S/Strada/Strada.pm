@@ -3,7 +3,13 @@ package Strada;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '1.0';
+
+# Load this XS object with RTLD_GLOBAL so the Strada runtime it statically
+# links (strada_pending_cleanup_count, strada_decref, the GC/arena globals,
+# etc.) is visible to the Strada libraries we dlopen at runtime — otherwise
+# they fail with "undefined symbol: strada_*". Must be defined before load().
+sub dl_load_flags { 0x01 }
 
 require XSLoader;
 XSLoader::load('Strada', $VERSION);
@@ -64,7 +70,8 @@ Get a function pointer from a loaded library.
 
 =head3 Strada::call($func, @args)
 
-Call a Strada function with arguments. Up to 4 arguments supported.
+Call a Strada function with arguments. With libffi (see Makefile.PL), any
+number of arguments is supported; without it, up to 4 (more will croak).
 
 =head2 High-level API
 
@@ -96,9 +103,11 @@ Returns a hash reference describing all exported functions:
 
     {
         'func_name' => {
-            return      => 'int',      # Return type
-            param_count => 2,          # Number of parameters
-            params      => ['int', 'str'],  # Parameter types
+            return       => 'int',      # Return type
+            param_count  => 2,          # Number of parameters
+            params       => ['int', 'str'],  # Parameter types
+            variadic_idx => -1,         # Index of variadic param (-1 if not variadic)
+            is_variadic  => 0,          # 1 if function is variadic
         },
         ...
     }
@@ -150,7 +159,29 @@ sub call {
         $self->{funcs}{$c_func_name} = $func;
     }
 
-    return Strada::call($func, @args);
+    # Variadic functions (constructors, @_-style, `...@rest`) take their tail
+    # arguments packed into one Strada array. The export metadata records the
+    # packing boundary as variadic_idx; route those through _call_variadic.
+    my $vidx = $self->_variadic_idx($c_func_name);
+    return $vidx >= 0 ? Strada::_call_variadic($func, $vidx, @args)
+                      : Strada::call($func, @args);
+}
+
+# variadic_idx for a C function name (-1 if not variadic / unknown), cached.
+sub _variadic_idx {
+    my ($self, $c_name) = @_;
+    unless ($self->{vidx}) {
+        my $funcs = $self->functions();
+        $self->{vidx} = { map { $_ => $funcs->{$_}{variadic_idx} } keys %$funcs };
+    }
+    return defined($self->{vidx}{$c_name}) ? $self->{vidx}{$c_name} : -1;
+}
+
+# Construct a Strada object: calls "${class}::new" and returns the blessed
+# Strada::Object (sugar for $lib->call("Counter::new", @args)).
+sub new_object {
+    my ($self, $class, @args) = @_;
+    return $self->call("${class}::new", @args);
 }
 
 sub unload {
@@ -175,7 +206,7 @@ sub version {
 }
 
 # Get all exported functions with their signatures
-# Returns a hash ref: { func_name => { return => 'type', params => [...], param_count => N } }
+# Returns a hash ref: { func_name => { return => 'type', params => [...], param_count => N, variadic_idx => N, is_variadic => 0/1 } }
 sub functions {
     my ($self) = @_;
 
@@ -186,7 +217,7 @@ sub functions {
     for my $line (split /\n/, $info) {
         next unless $line =~ /^func:/;
 
-        # Format: func:name:return_type:param_count:param_types
+        # Format: func:name:return_type:param_count:param_types:variadic_idx
         my @parts = split /:/, $line;
         next unless @parts >= 4;
 
@@ -194,11 +225,14 @@ sub functions {
         my $ret = $parts[2];
         my $param_count = $parts[3];
         my @param_types = $parts[4] ? split(/,/, $parts[4]) : ();
+        my $variadic_idx = defined($parts[5]) ? $parts[5] : -1;
 
         $funcs{$name} = {
-            return      => $ret,
-            param_count => $param_count,
-            params      => \@param_types,
+            return       => $ret,
+            param_count  => $param_count,
+            params       => \@param_types,
+            variadic_idx => $variadic_idx,
+            is_variadic  => ($variadic_idx >= 0) ? 1 : 0,
         };
     }
 
@@ -222,10 +256,16 @@ sub describe {
         my $f = $funcs->{$name};
         my @params;
         my $i = 0;
+        my $variadic_idx = $f->{variadic_idx};
         for my $type (@{$f->{params}}) {
             my $var = chr(ord('a') + $i);
             $var = "arg$i" if $i >= 26;
-            push @params, "$type \$$var";
+            # Check if this is the variadic parameter
+            if ($i == $variadic_idx) {
+                push @params, "$type ...\@$var";  # Show with ... prefix and @ sigil
+            } else {
+                push @params, "$type \$$var";
+            }
             $i++;
         }
         my $sig = "func $name(" . join(", ", @params) . ") $f->{return}";
@@ -233,6 +273,46 @@ sub describe {
     }
 
     return join("\n", @lines);
+}
+
+# Wrapper for a blessed Strada object returned from the runtime. Constructed by
+# the XS strada_to_sv() when it sees a blessed value; holds the live
+# StradaValue* (in {ptr}) and its Strada class name (in {class}). Method calls
+# are dispatched through the runtime via Strada::_method_call.
+package Strada::Object;
+
+our $AUTOLOAD;
+
+sub AUTOLOAD {
+    my $self = shift;
+    (my $method = $AUTOLOAD) =~ s/.*:://;
+    return if $method eq 'DESTROY';
+    return Strada::_method_call($self->{ptr}, $method, @_);
+}
+
+# The Strada class this object is blessed into (e.g. "Counter").
+sub strada_class { $_[0]->{class} }
+
+# isa/can check the Perl class first (so isa_ok($obj, 'Strada::Object') and other
+# UNIVERSAL semantics keep working), then fall back to the Strada class
+# hierarchy via the runtime (so $obj->isa('Counter') reflects extends/with).
+sub isa {
+    my ($self, $class) = @_;
+    return 1 if defined($class) && $self->UNIVERSAL::isa($class);
+    return Strada::_method_call($self->{ptr}, 'isa', $class) ? 1 : 0;
+}
+
+sub can {
+    my ($self, $method) = @_;
+    my $code = defined($method) ? $self->UNIVERSAL::can($method) : undef;
+    return $code if $code;
+    return Strada::_method_call($self->{ptr}, 'can', $method) ? 1 : 0;
+}
+
+sub DESTROY {
+    my $self = shift;
+    Strada::_obj_release($self->{ptr}) if $self->{ptr};
+    $self->{ptr} = 0;
 }
 
 1;
@@ -257,6 +337,15 @@ Create a Strada library (math_lib.strada):
         return "Hello, " . $name . "!";
     }
 
+    # Variadic function - receives all args as an array
+    func sum_all(int ...@nums) int {
+        my int $total = 0;
+        foreach my int $n (@nums) {
+            $total = $total + $n;
+        }
+        return $total;
+    }
+
 Compile it as a shared library:
 
     ./stradac -shared math_lib.strada libmath.so
@@ -274,7 +363,9 @@ Use from Perl:
     # Get function details programmatically
     my $funcs = $lib->functions();
     for my $name (keys %$funcs) {
-        print "Function: $name returns $funcs->{$name}{return}\n";
+        print "Function: $name returns $funcs->{$name}{return}";
+        print " (variadic)" if $funcs->{$name}{is_variadic};
+        print "\n";
     }
 
     # Both calling conventions work:
@@ -282,6 +373,9 @@ Use from Perl:
     print $lib->call('math_lib::add', 2, 3), "\n";     # 5 (Perl/Strada style)
     print $lib->call('math_lib::multiply', 4, 5), "\n"; # 20
     print $lib->call('math_lib::greet', 'Perl'), "\n";  # Hello, Perl!
+
+    # Calling variadic functions - pass array reference
+    print $lib->call('math_lib::sum_all', [1, 2, 3, 4, 5]), "\n";  # 15
 
     $lib->unload();
 

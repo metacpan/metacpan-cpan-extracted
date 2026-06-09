@@ -1,4 +1,31 @@
-CHANGES
+List-Search CHANGES
+
+0.44 - Mon Jun 08 2026
+  * ( Fix README link... )
+
+0.4 - Fri May 29 2026
+
+  * Pin Test::More (Test-Simple) 0.61
+  * Add contribution guide as CONTRIBUTION
+  * Add installation guide to README
+
+0.3_1 - Wed May 20 2026 [beta!]
+
+  [Build.PL]
+  * Cleanup dependencies
+  * M::B compat Makefile removed
+
+  [lib/List/Search.pm]
+  * Fix RT #53521: require Exporter
+  * Fix pod typos
+  * Cleanup old links in pod
+  * ( $a $b aliasing is NOT planned! )
+  * Ensure contains returns false on search fail
+
+  [t/*.t]
+  * Add regression test for RT #53521
+  * Add load test
+  * Add pod tests (for pod typos)
 
 0.3 - Mon Jan 22 2007 - evdb
 

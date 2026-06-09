@@ -72,9 +72,9 @@
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/json-structure/sdk.git",
-         "web" : "https://github.com/json-structure/sdk/tree/main/perl"
+         "web" : "https://github.com/json-structure/sdk/tree/master/perl"
       }
    },
-   "version" : "v0.6.2",
+   "version" : "v0.7.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

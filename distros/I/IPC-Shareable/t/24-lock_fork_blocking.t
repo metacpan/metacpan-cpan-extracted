@@ -21,9 +21,9 @@ use Test::More;
 use Test::SharedFork;
 use Time::HiRes qw(time);
 
-my $segs_before = IPC::Shareable::seg_count();
-my $sems_before = IPC::Shareable::sem_count();
-warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
+use FindBin;
+use lib $FindBin::Bin;
+use IPCShareableTest qw(unique_glue assert_clean);
 
 # --- Test 1: LOCK_SH blocks until LOCK_EX released (enforced_write_locking disabled) ---
 {
@@ -31,7 +31,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
     pipe($r, $w) or die "Cannot create pipe: $!";
 
     tie my $sv, 'IPC::Shareable', {
-        key              => 'LFBK1',
+        key              => unique_glue('LFBK1'),
         create           => 1,
         destroy          => 1,
         enforced_write_locking => 0,
@@ -82,7 +82,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
     pipe($r, $w) or die "Cannot create pipe: $!";
 
     tie my $sv, 'IPC::Shareable', {
-        key              => 'LFBK2',
+        key              => unique_glue('LFBK2'),
         create           => 1,
         destroy          => 1,
         enforced_write_locking => 1,
@@ -129,7 +129,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
     pipe($r, $w) or die "Cannot create pipe: $!";
 
     tie my $sv, 'IPC::Shareable', {
-        key        => 'LFBK3',
+        key        => unique_glue('LFBK3'),
         create     => 1,
         destroy    => 1,
         serializer => 'storable',
@@ -173,7 +173,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
     pipe($r, $w) or die "Cannot create pipe: $!";
 
     tie my $sv, 'IPC::Shareable', {
-        key              => 'LFBK4',
+        key              => unique_glue('LFBK4'),
         create           => 1,
         destroy          => 1,
         enforced_write_locking => 0,
@@ -229,7 +229,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
     pipe($r, $w) or die "Cannot create pipe: $!";
 
     tie my $sv, 'IPC::Shareable', {
-        key        => 'LFBK5',
+        key        => unique_glue('LFBK5'),
         create     => 1,
         destroy    => 1,
         serializer => 'storable',
@@ -278,7 +278,7 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
     pipe($r, $w) or die "Cannot create pipe: $!";
 
     tie my $sv, 'IPC::Shareable', {
-        key        => 'LFBK6',
+        key        => unique_glue('LFBK6'),
         create     => 1,
         destroy    => 1,
         serializer => 'storable',
@@ -318,10 +318,6 @@ warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 
 IPC::Shareable::_end;
 
-my $segs_after = IPC::Shareable::seg_count();
-warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
-is $segs_after, $segs_before, "All segs cleaned up ok";
-my $sems_after = IPC::Shareable::sem_count();
-is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
+assert_clean(map { unique_glue($_) } qw(LFBK1 LFBK2 LFBK3 LFBK4 LFBK5 LFBK6));
 
 done_testing;

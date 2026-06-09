@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
         'File::Spec'            => '3.2501',
         # 2007-12-19
         'JSON'                  => '2.00',
-        'Locale::Unicode'       => 'v0.3.11',
+        'Locale::Unicode'       => 'v0.4.3',
         'Scalar::Util'          => 0,
         # 2004-11-05
         # 'URI::file'             => '4.19',
@@ -49,7 +49,7 @@ my %WriteMakefileArgs = (
     },
     TEST_REQUIRES =>
     {
-        'lib'           => '0.63',
+        'lib'           => 0,
         'open'          => 0,
         'utf8'          => 0,
         'File::Find'    => 0,
@@ -69,12 +69,12 @@ my %WriteMakefileArgs = (
         resources => {
         #    homepage    => undef,
             repository  => {
-                url         => 'git@gitlab.com:jackdeguest/Locale-Unicode-Data.git',
-                web         => 'https://gitlab.com/jackdeguest/Locale-Unicode-Data',
+                url         => 'git@gitlab.com:deguest/Locale-Unicode-Data.git',
+                web         => 'https://gitlab.com/deguest/Locale-Unicode-Data',
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://gitlab.com/jackdeguest/Locale-Unicode-Data/issues',
+                web         => 'https://gitlab.com/deguest/Locale-Unicode-Data/issues',
             },
         },
     }) : ()),

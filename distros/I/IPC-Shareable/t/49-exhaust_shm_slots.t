@@ -5,6 +5,10 @@ use IPC::Shareable;
 IPC::Shareable->testing_set('IPC::Shareable');
 use Test::More;
 
+use FindBin;
+use lib $FindBin::Bin;
+use IPCShareableTest qw(assert_clean_process unique_glue);
+
 # Determine the shm segment limit for this platform.
 # On macOS, kern.sysv.shmseg gives a per-process limit (typically 32).
 # On Linux, kernel.shmmni is a system-wide limit (typically 4096).
@@ -33,15 +37,12 @@ my $limit;
     }
 }
 
-my $segs_before = IPC::Shareable::seg_count();
-my $sems_before = IPC::Shareable::sem_count();
-warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 
 my $mod = 'IPC::Shareable';
 
 my $knot = tie my %hv, $mod, {
     create  => 1,
-    key     => 1234,
+    key     => unique_glue('k1234'),
     destroy => 1,
     size    => 1_048_576,   # large enough that kernel slot limit is hit first
 };
@@ -73,10 +74,6 @@ IPC::Shareable->clean_up_all;
 
 IPC::Shareable::_end;
 
-my $segs_after = IPC::Shareable::seg_count();
-warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
-is $segs_after, $segs_before, "All segs cleaned up ok";
-my $sems_after = IPC::Shareable::sem_count();
-is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
+assert_clean_process();
 
 done_testing();

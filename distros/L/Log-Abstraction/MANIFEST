@@ -20,6 +20,7 @@ t/error.t
 t/extended_tests.t
 t/function.t
 t/integration.t
+t/locales.t
 t/manifest.t
 t/mutant_killers.t
 t/pod-cm.t

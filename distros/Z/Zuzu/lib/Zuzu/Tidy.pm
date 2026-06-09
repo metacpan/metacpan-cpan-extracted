@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.001005';
+our $VERSION = '0.002000';
 
 use Zuzu::Lexer;
 use Zuzu::Parser;

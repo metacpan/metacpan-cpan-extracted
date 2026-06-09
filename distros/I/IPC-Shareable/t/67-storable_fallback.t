@@ -2,6 +2,10 @@ use warnings;
 use strict;
 
 use Test::More;
+
+use FindBin;
+use lib $FindBin::Bin;
+use IPCShareableTest qw(assert_clean_process);
 use IPC::Shareable;
 IPC::Shareable->testing_set('IPC::Shareable');
 
@@ -11,9 +15,6 @@ IPC::Shareable->testing_set('IPC::Shareable');
 # IPC::Shareable should detect the mismatch, switch to storable for the
 # session, and emit a carp warning.
 
-my $segs_before = IPC::Shareable::seg_count();
-my $sems_before = IPC::Shareable::sem_count();
-warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
 
 # -----------------------------------------------------------------------
 # Helper: capture warnings into an array
@@ -27,7 +28,10 @@ sub capture_warns (&) {
 }
 
 # -----------------------------------------------------------------------
-# 1. Scalar written with storable, re-attached with json default
+# 1. A scalar holding a plain value is stored verbatim regardless of the
+#    configured serializer, so it reads back cross-serializer with NO
+#    fallback. (The storable->json fallback below still applies to aggregate
+#    ties and to legacy Storable-frozen scalar segments.)
 # -----------------------------------------------------------------------
 {
     my $key = 'sf_sv';
@@ -37,13 +41,14 @@ sub capture_warns (&) {
 
     my @warns = capture_warns {
         tie my $sv2, 'IPC::Shareable', { key => $key, create => 0, destroy => 1 };
-        is $sv2, 'hello', 'scalar: data readable after storable->json fallback';
+        is $sv2, 'hello', 'scalar: plain value readable cross-serializer (verbatim)';
         my $sv2_knot = tied $sv2;
-        is $sv2_knot->attributes('serializer'), 'storable',
-            'scalar: serializer switched to storable for session';
+        is $sv2_knot->attributes('serializer'), 'json',
+            'scalar: no fallback needed - serializer stays json';
     };
 
-    ok scalar(grep { /Storable-encoded/ } @warns), 'scalar: carp warning emitted';
+    ok ! scalar(grep { /Storable-encoded/ } @warns),
+        'scalar: no fallback warning for a verbatim plain scalar';
 }
 
 # -----------------------------------------------------------------------
@@ -143,10 +148,6 @@ sub capture_warns (&) {
 
 IPC::Shareable::_end;
 
-my $segs_after = IPC::Shareable::seg_count();
-warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
-is $segs_after, $segs_before, 'all segments cleaned up';
-my $sems_after = IPC::Shareable::sem_count();
-is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
+assert_clean_process();
 
 done_testing;

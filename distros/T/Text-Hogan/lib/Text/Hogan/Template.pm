@@ -1,9 +1,10 @@
 package Text::Hogan::Template;
-$Text::Hogan::Template::VERSION = '2.03';
+$Text::Hogan::Template::VERSION = '2.04';
 use strict;
 use warnings;
 
 use Clone qw(clone);
+use HTML::Escape qw(escape_html);
 use Ref::Util qw( is_ref is_arrayref is_coderef is_hashref);
 use Scalar::Util qw(looks_like_number);
 
@@ -34,23 +35,9 @@ sub r {
     return "";
 }
 
-my %mapping = ( 
-    '&' => '&amp;',
-    '<' => '&lt;',
-    '>' => '&gt;',
-    q{'} => '&#39;',
-    '"' => '&quot;',
-);
-
-# create regex once
-my $mapping_re = join('', '[', ( sort keys %mapping ), ']');
-
 sub v {
     my ($self, $str) = @_;
-    $str //= "";
-    $str =~ s/($mapping_re)/$mapping{$1}/ge;
-
-    return $str;
+    return escape_html($str // "");
 }
 
 sub t {
@@ -313,7 +300,7 @@ sub sub {
 sub find_in_scope {
     my ($key, $scope) = @_;
 
-    return eval { $scope->{$key} };
+    return is_hashref($scope) ? $scope->{$key} : undef;
 }
 
 sub create_specialized_partial {
@@ -366,7 +353,7 @@ Text::Hogan::Template - represent and render compiled templates
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 SYNOPSIS
 

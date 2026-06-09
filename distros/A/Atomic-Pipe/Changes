@@ -1,3 +1,9 @@
+0.030     2026-06-08 15:09:48-07:00 America/Los_Angeles
+
+    - Fix Windows test FAILs: test include shim now matches "\" as a path separator, so it no longer strips the t/ dir from __FILE__.
+    - t/resize.t: don't fail on environmental EINVAL from the raw fcntl(F_SETPIPE_SZ) probe; the regression is now caught via a deterministic max_size() numeric check (GitHub issue #4).
+    - t/write_block.t: skip the IO::Select path and pipe-full probe on cygwin, whose select() doesn't report a saturated pipe.
+
 0.029     2026-04-30 09:15:03-07:00 America/Los_Angeles
 
     - Add [PruneCruft] to dist.ini so build artifacts (blib/,

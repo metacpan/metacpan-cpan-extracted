@@ -1,0 +1,10 @@
+Revision history for Tvh-Htsp-Client
+
+0.03    18 July 2025
+        added 'htsmsg_deserialise' method
+
+0.02    12 July 2025
+        added 'getChanUuidId' method
+
+0.01    11 July 2025
+        Version 0.01 - initial release

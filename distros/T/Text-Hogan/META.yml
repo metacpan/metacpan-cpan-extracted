@@ -7,13 +7,13 @@ build_requires:
   Path::Tiny: '0.059'
   Test::More: '1.001008'
   Try::Tiny: '0.22'
-  YAML: '1.13'
+  YAML::XS: '0.67'
   perl: v5.10.0
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: v5.10.0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,6 +21,7 @@ meta-spec:
 name: Text-Hogan
 requires:
   Clone: '0.37'
+  HTML::Escape: '1.11'
   Ref::Util: '0.204'
   Scalar::Util: '1.41'
   Text::Trim: '1.02'
@@ -28,5 +29,7 @@ requires:
 resources:
   bugtracker: https://github.com/kaoru/Text-Hogan/issues
   repository: git://github.com/kaoru/Text-Hogan
-version: '2.03'
-x_serialization_backend: 'YAML::Tiny version 1.69'
+version: '2.04'
+x_generated_by_perl: v5.34.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

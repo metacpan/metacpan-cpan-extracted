@@ -8,9 +8,14 @@ use IPC::SysV qw(IPC_CREAT IPC_EXCL);
 use Mock::Sub;
 use Test::More;
 
-my $segs_before = IPC::Shareable::seg_count();
-my $sems_before = IPC::Shareable::sem_count();
-warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
+use FindBin;
+use lib $FindBin::Bin;
+use IPCShareableTest qw(unique_glue);
+
+# Unique per-process keys so concurrent runs (eg. a parallel smoker) can't
+# collide on the same raw System V segment. SharedMem requires an integer key.
+my $key     = IPC::Shareable::_key_str_to_int(unique_glue('shm80'));
+my $hex_key = sprintf '0x%08x', $key;
 
 my $mod = 'IPC::Shareable::SharedMem';
 
@@ -38,12 +43,12 @@ my $mod = 'IPC::Shareable::SharedMem';
 
     {
         my $seg;
-        my $ok = eval { $seg = $mod->new(key => 5555, flags => IPC_CREAT); 1; };
+        my $ok = eval { $seg = $mod->new(key => $key, flags => IPC_CREAT); 1; };
         is $ok, 1, "segment object created ok";
 
         is ref $seg, 'IPC::Shareable::SharedMem', "object is of proper type ok";
 
-        is $seg->key, 5555, "key attr set ok";
+        is $seg->key, $key, "key attr set ok";
         is $seg->size, 1024, "size attr default ok";
         is $seg->flags, 950, "flags attr default ok";
         is $seg->mode, 0666, "mode attr default ok";
@@ -63,7 +68,7 @@ my $mod = 'IPC::Shareable::SharedMem';
         my $warning;
         local $SIG{__WARN__} = sub { $warning = shift; };
 
-        my $seg = $mod->new(key => 5555, flags => IPC_CREAT);
+        my $seg = $mod->new(key => $key, flags => IPC_CREAT);
         $seg->size(2048);
         like $warning, qr/instantiated/, "size() warns that it can't be set after obj created";
         is $seg->size, 1024, "...and it hasn't been changed ok";
@@ -75,7 +80,7 @@ my $mod = 'IPC::Shareable::SharedMem';
 
     {
         my $seg;
-        my $ok = eval { $seg = $mod->new(key => 5555, size => 'aaaa'); 1; };
+        my $ok = eval { $seg = $mod->new(key => $key, size => 'aaaa'); 1; };
         is $ok, undef, "size() requires an integer";
         like $@, qr/size\(\) requires an integer/, "...and error is sane";
     }
@@ -89,7 +94,7 @@ my $mod = 'IPC::Shareable::SharedMem';
         my $warning;
         local $SIG{__WARN__} = sub { $warning = shift; };
 
-        my $seg = $mod->new(key => 5555, flags => IPC_CREAT);
+        my $seg = $mod->new(key => $key, flags => IPC_CREAT);
         $seg->flags(1024);
         like $warning, qr/instantiated/, "flags() warns that it can't be set after obj created";
         is $seg->flags, 950, "...and it hasn't been changed ok";
@@ -107,7 +112,7 @@ my $mod = 'IPC::Shareable::SharedMem';
         my $warning;
         local $SIG{__WARN__} = sub { $warning = shift; };
 
-        my $seg = $mod->new(key => 5555, flags => IPC_CREAT);
+        my $seg = $mod->new(key => $key, flags => IPC_CREAT);
         $seg->mode(0666);
         like $warning, qr/instantiated/, "mode() warns that it can't be set after obj created";
         is $seg->mode, 0666, "...and it hasn't been changed ok";
@@ -118,7 +123,7 @@ my $mod = 'IPC::Shareable::SharedMem';
     # Successful change
 
     {
-        my $seg = $mod->new(key => 5555, flags => IPC_CREAT, mode => 0444);
+        my $seg = $mod->new(key => $key, flags => IPC_CREAT, mode => 0444);
         is $seg->mode, 0444, "mode() set ok in new";
         is $seg->remove, 1, "seg cleaned up ok";
     }
@@ -133,7 +138,7 @@ my $mod = 'IPC::Shareable::SharedMem';
         my $warning;
         local $SIG{__WARN__} = sub { $warning = shift; };
 
-        my $seg = $mod->new(key => 5555, flags => IPC_CREAT, type => 'TESTING');
+        my $seg = $mod->new(key => $key, flags => IPC_CREAT, type => 'TESTING');
         $seg->type('HELLO');
         like $warning, qr/instantiated/, "type() warns that it can't be set after obj created";
         is $seg->type, 'TESTING', "...and it hasn't been changed ok";
@@ -150,7 +155,7 @@ my $mod = 'IPC::Shareable::SharedMem';
         my $warning;
         local $SIG{__WARN__} = sub { $warning = shift; };
 
-        my $seg = $mod->new(key => 5555, flags => IPC_CREAT);
+        my $seg = $mod->new(key => $key, flags => IPC_CREAT);
         my $created_id = $seg->id;
 
         $seg->id(9998);
@@ -164,7 +169,7 @@ my $mod = 'IPC::Shareable::SharedMem';
 
 # shmread() & shmwrite()
 {
-    my $seg = $mod->new(key => 5555, flags => IPC_CREAT);
+    my $seg = $mod->new(key => $key, flags => IPC_CREAT);
 
     my $data = "blah";
 
@@ -177,25 +182,25 @@ my $mod = 'IPC::Shareable::SharedMem';
 
 # new() with a hex string key
 {
-    my $seg = $mod->new(key => '0x00001571', flags => IPC_CREAT);
+    my $seg = $mod->new(key => $hex_key, flags => IPC_CREAT);
     is ref($seg), 'IPC::Shareable::SharedMem', "new() with hex string key creates object ok";
-    is $seg->key, hex('0x00001571'), "new() with hex key: integer key stored correctly";
+    is $seg->key, hex($hex_key), "new() with hex key: integer key stored correctly";
     is $seg->remove, 1, "seg removed ok";
 }
 
 # key() croak when called as setter after object is established
 {
-    my $seg = $mod->new(key => 5555, flags => IPC_CREAT);
+    my $seg = $mod->new(key => $key, flags => IPC_CREAT);
     my $ok = eval { $seg->key(9999); 1 };
     is $ok, undef, "key() croaks when set after object established";
     like $@, qr/after object is already established/, "...and error message is correct";
-    is $seg->key, 5555, "...and key is unchanged";
+    is $seg->key, $key, "...and key is unchanged";
     is $seg->remove, 1, "seg removed ok";
 }
 
 # stat() returns undef when the underlying segment has been removed
 {
-    my $seg = $mod->new(key => 5555, flags => IPC_CREAT);
+    my $seg = $mod->new(key => $key, flags => IPC_CREAT);
     $seg->remove;
     my $stat = $seg->stat;
     is $stat, undef, "stat() returns undef when segment has been removed";
@@ -203,14 +208,14 @@ my $mod = 'IPC::Shareable::SharedMem';
 
 # remove() returns 0 on second call (segment already gone)
 {
-    my $seg = $mod->new(key => 5555, flags => IPC_CREAT);
+    my $seg = $mod->new(key => $key, flags => IPC_CREAT);
     is $seg->remove, 1, "remove() returns 1 on first call";
     is $seg->remove, 0, "remove() returns 0 on second call (segment already removed)";
 }
 
 # stat
 {
-    my $seg = $mod->new(key => 5555, flags => IPC_CREAT, mode => 0644);
+    my $seg = $mod->new(key => $key, flags => IPC_CREAT, mode => 0644);
 
     my $data = "blah";
     is $seg->shmwrite($data), 1, "shmwrite() returns 1 on success";
@@ -281,10 +286,8 @@ SKIP: {
     }
 }
 
-my $segs_after = IPC::Shareable::seg_count();
-warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
-is $segs_after, $segs_before, "All segs cleaned up ok";
-my $sems_after = IPC::Shareable::sem_count();
-is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
+# Scoped cleanup backstop: every segment this run created used $key, so confirm
+# none survive. Immune to other processes (unlike a global seg_count compare).
+is shmget($key, 0, 0), undef, "this run's SharedMem segment cleaned up ok";
 
 done_testing();

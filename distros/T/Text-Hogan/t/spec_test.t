@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-use YAML;
+use YAML::XS qw(Load);
 use Path::Tiny;
 use Try::Tiny;
 use Data::Visitor::Callback;
@@ -36,9 +36,9 @@ my $data_fixer = Data::Visitor::Callback->new(
 my @spec_files = path("t", "specs")->children(qr/[.]yml$/);
 
 for my $file (sort @spec_files) {
-    my $yaml = $file->slurp_utf8;
+    my $yaml = $file->slurp;
 
-    my $specs = YAML::Load($yaml);
+    my $specs = Load($yaml);
 
     note "----- $file ", ("-" x (70-length($file)));
 

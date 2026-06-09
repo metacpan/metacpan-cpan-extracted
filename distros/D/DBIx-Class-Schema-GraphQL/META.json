@@ -52,7 +52,7 @@
    "provides" : {
       "DBIx::Class::Schema::GraphQL" : {
          "file" : "lib/DBIx/Class/Schema/GraphQL.pm",
-         "version" : "v0.0.1"
+         "version" : "v0.0.2"
       }
    },
    "release_status" : "stable",
@@ -66,6 +66,6 @@
          "web" : "https://github.com/yourname/DBIx-Class-Schema-GraphQL"
       }
    },
-   "version" : "v0.0.1",
+   "version" : "v0.0.2",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

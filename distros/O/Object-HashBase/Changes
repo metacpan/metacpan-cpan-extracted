@@ -1,3 +1,11 @@
+0.018     2026-06-08 09:34:50-07:00 America/Los_Angeles
+
+    - Fix bogus parent/role croaks losing their message on perl < 5.14:
+      croak now happens outside the local($@) scope, so the exception is
+      no longer clobbered when the local is restored during unwind
+    - Replace '//=' (perl 5.10+) with a defined check so the module
+      compiles on perl 5.8.x as declared by MIN_PERL_VERSION 5.008001
+
 0.017     2026-06-07 12:38:24-07:00 America/Los_Angeles
 
     - List Role::Tiny (1.003000+) and Class::Method::Modifiers as

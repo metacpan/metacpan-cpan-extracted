@@ -2,17 +2,25 @@ NAME
     App::XWindowManagerUtils - Utilities related to X Window Manager
 
 VERSION
-    This document describes version 0.002 of App::XWindowManagerUtils (from
-    Perl distribution App-XWindowManagerUtils), released on 2026-03-27.
+    This document describes version 0.003 of App::XWindowManagerUtils (from
+    Perl distribution App-XWindowManagerUtils), released on 2026-04-06.
 
 SYNOPSIS
 DESCRIPTION
-    This distribution includes several utilities related to X Window
-    Manager:
+    This distribution includes several utilities related to "X Window
+    Manager":
 
     *   get-xwm-window-kde-activity
 
     *   list-xwm-windows
+
+    Under the hood, it's currently a wrapper to tools like "wmctrl", etc.
+
+    "wmctrl" works on EWMH-compliant X11 window managers. This means
+    mainstream desktop environments like KWin, Xfwm, Mutter (GNOME). It
+    works partially or doesn't work with minimalist window managers like
+    dwm, suckless. It partially works with Wayland where there is an X
+    compatibility layer, e.g. GNOME Wayland, KDE Plasma Wayland.
 
 FUNCTIONS
   get_xwm_window_kde_activity
@@ -54,6 +62,8 @@ FUNCTIONS
 
     List all Windows.
 
+    This utility is currently a wrapper for wmctrl.
+
     This function is not exported by default, but exportable.
 
     Arguments ('*' denotes required arguments):
@@ -64,11 +74,21 @@ FUNCTIONS
 
     *   query => *array[str]*
 
-        (No description)
+        Queries are matched against window titles, IDs, and KDE activity
+        names & GUIDs (if KDE activity names & GUIDs are requested).
 
     *   with_kde_activity => *bool*
 
-        (No description)
+        Show KDE activity GUID for each window (old name for
+        with_kde_activity_guid).
+
+    *   with_kde_activity_guid => *bool*
+
+        Show KDE activity GUID for each window.
+
+    *   with_kde_activity_name => *bool*
+
+        Show KDE activity name for each window.
 
     Returns an enveloped result (an array).
 

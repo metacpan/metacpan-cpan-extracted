@@ -6,9 +6,10 @@ use IPC::Shareable;
 IPC::Shareable->testing_set('IPC::Shareable');
 use Test::More;
 
-my $segs_before = IPC::Shareable::seg_count();
-my $sems_before = IPC::Shareable::sem_count();
-warn "Segs Before: $segs_before\n" if $ENV{PRINT_SEGS};
+use FindBin;
+use lib $FindBin::Bin;
+use IPCShareableTest qw(assert_clean_process unique_glue);
+
 
 my $protect_lock = 292;
 
@@ -31,7 +32,7 @@ my $protect_lock = 292;
     like $@, qr/integer/, "...and error msg is sane";
 
     tie my %test, 'IPC::Shareable', {
-        key     => 100,
+        key     => unique_glue('k100'),
         create  => 1,
         exclusive => 1,
         destroy => 1,
@@ -56,7 +57,7 @@ my $protect_lock = 292;
 }
 
 tie my %p, 'IPC::Shareable', {
-    key     => 10,
+    key     => unique_glue('k10'),
     create  => 1,
     exclusive => 1,
     destroy => 1,
@@ -65,7 +66,7 @@ tie my %p, 'IPC::Shareable', {
 };
 
 tie my %u, 'IPC::Shareable', {
-    key     => 20,
+    key     => unique_glue('k20'),
     create  => 1,
     exclusive => 1,
     destroy => 1,
@@ -90,10 +91,6 @@ is $segs, 0, "After clean_up_protected(), global register has 0 segments ok";
 
 IPC::Shareable::_end;
 
-my $segs_after = IPC::Shareable::seg_count();
-warn "Segs After: $segs_after\n" if $ENV{PRINT_SEGS};
-is $segs_after, $segs_before, "All segs cleaned up ok";
-my $sems_after = IPC::Shareable::sem_count();
-is $sems_after, $sems_before, "All semaphore sets cleaned up ok";
+assert_clean_process();
 
 done_testing();

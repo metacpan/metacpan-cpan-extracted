@@ -37,7 +37,7 @@
             "Encode" : "2.24",
             "File::Spec" : "3.2501",
             "JSON" : "2.00",
-            "Locale::Unicode" : "v0.3.11",
+            "Locale::Unicode" : "v0.4.3",
             "Scalar::Util" : "0",
             "Wanted" : "v0.1.0",
             "perl" : "5.010001",
@@ -53,7 +53,7 @@
             "File::Find" : "0",
             "Test::More" : "1.302120",
             "Test::Pod" : "1.52",
-            "lib" : "0.63",
+            "lib" : "0",
             "open" : "0",
             "utf8" : "0"
          }
@@ -62,13 +62,13 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://gitlab.com/jackdeguest/Locale-Unicode-Data/issues"
+         "web" : "https://gitlab.com/deguest/Locale-Unicode-Data/issues"
       },
       "repository" : {
          "type" : "git",
-         "web" : "https://gitlab.com/jackdeguest/Locale-Unicode-Data"
+         "web" : "https://gitlab.com/deguest/Locale-Unicode-Data"
       }
    },
-   "version" : "v1.8.4",
+   "version" : "v1.8.5",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

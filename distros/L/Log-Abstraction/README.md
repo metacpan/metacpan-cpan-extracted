@@ -4,7 +4,7 @@ Log::Abstraction - Logging Abstraction Layer
 
 # VERSION
 
-0.29
+0.31
 
 # SYNOPSIS
 
@@ -20,229 +20,649 @@ Log::Abstraction - Logging Abstraction Layer
 
 # DESCRIPTION
 
-The `Log::Abstraction` class provides a flexible logging layer on top of different types of loggers,
-including code references, arrays, file paths, and objects.
-It also supports logging to syslog if configured.
+The `Log::Abstraction` class provides a flexible logging layer on top of
+different types of loggers, including code references, arrays, file paths,
+and objects.  It also supports logging to syslog if configured.
 
 # METHODS
 
 ## new
 
     my $logger = Log::Abstraction->new(%args);
+    my $logger = Log::Abstraction->new(\%args);
+    my $logger = Log::Abstraction->new($file_path);
 
-Creates a new `Log::Abstraction` object.
+    # Clone with optional overrides
+    my $clone = $logger->new(level => 'debug');
 
-The argument can be a hash,
-a reference to a hash or the `logger` value.
-The following arguments can be provided:
+Creates a new `Log::Abstraction` instance, or clones an existing one when
+called on an object.
+
+### Arguments
 
 - `carp_on_warn`
 
-    If set to 1,
-    and `logger` is not given,
-    call `Carp:carp` on `warn()`.
-
-    Causes `error()` to `carp` if `croak_on_error` is not given.
+    If set to 1, and no `logger` is given, call `Carp::carp` on `warn()`.
+    Also causes `error()` to `carp` if `croak_on_error` is not set.
 
 - `croak_on_error`
 
-    If set to 1,
-    and `logger` is not given,
-    call `Carp:croak` on `error()`.
+    If set to 1, and no `logger` is given, call `Carp::croak` on `error()`.
 
 - `config_file`
 
-    Points to a configuration file which contains the parameters to `new()`.
-    The file can be in any common format,
-    including `YAML`, `XML`, and `INI`.
-    This allows the parameters to be set at run time.
-
-    On a non-Windows system,
-    the class can be configured using environment variables starting with `"Log::Abstraction::"`.
-    For example:
+    Path to a configuration file (YAML, XML, INI, etc.) whose contents are
+    merged with the constructor arguments.  On non-Windows systems the class
+    can also be configured via environment variables prefixed with
+    `"Log::Abstraction::"`.  For example:
 
         export Log::Abstraction::script_name=foo
 
-    It doesn't work on Windows because of the case-insensitive nature of that system.
+- `ctx`
 
-- `level`
-
-    The minimum level at which to log something,
-    the default is "warning".
-
-- `logger`
-
-    A logger can be one or more of:
-
-    - a code reference
-
-        The code will be called with a hashref containing:
-
-        - class
-        - file
-        - line
-        - level
-        - message - an arrayref of messages
-        - ctx - passed to `new()`, an argument that can help to give context to the caller
-
-    - an object
-    - a hash of options
-    - sendmail - send higher priority messages to an email address
-
-        To send an e-mail,
-        you need ["require Email::Simple"](#require-email-simple), ["require Email::Sender::Simple"](#require-email-sender-simple) and [Email::Sender::Transport::SMTP](https://metacpan.org/pod/Email%3A%3ASender%3A%3ATransport%3A%3ASMTP).
-
-        The `sendmail` hash also accepts a `min_interval` key (seconds).
-        When set, at most one email is sent per `min_interval` seconds; any
-        messages that arrive during the cooldown are still logged to other
-        backends but do not trigger a new email.
-        The send time is stored in `_last_email_sent` on the object, so each
-        instance has its own cooldown window; cloned objects inherit the
-        parent's last-send timestamp at the moment of cloning.
-
-    - array - a reference to an array
-    - fd - containing a file descriptor to log to
-    - file - containing the filename
-
-    Defaults to [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl).
-    In that case,
-    the argument 'verbose' to new() will raise the logging level.
+    Arbitrary context value passed through to CODE-ref logger callbacks as
+    `$args->{ctx}`.
 
 - `format`
 
-    The format of the message.
-    Expands:
+    Format string for file/fd backends.  Tokens expanded at log time:
 
-    - %callstack%
-    - %level%
-    - %class%
-    - %message%
-    - %timestamp%
+        %callstack%   caller file and line number
+        %class%       blessed class of the logger object
+        %level%       upper-cased level name
+        %message%     the joined log message
+        %timestamp%   YYYY-MM-DD HH:MM:SS (local time)
+        %env_FOO%     value of $ENV{FOO}, or empty string if unset
 
-        &#x3d;%item \* %env\_foo%
+    **Security note:** because `format` may contain `%env_*%` tokens, avoid
+    granting untrusted sources write access to config files that set this key.
 
-        Replaces with `$ENV{foo}`
+- `level`
 
-- `syslog`
+    Minimum level at which to emit log entries.  Defaults to `"warning"`.
+    Valid values (case-insensitive): `trace`, `debug`, `info`, `notice`,
+    `warn`/`warning`, `error`.
 
-    A hash reference for syslog configuration.
-    Only warnings and above will be sent to syslog.
-    This restriction should be lifted in the future,
-    since it's reasonable to send notices and above to the syslog.
+- `logger`
+
+    One of:
+
+    - A code reference -- called with a hashref `{ class, file, line, level, message, ctx }`
+    - An object -- method matching the level name is called on it
+    - A hash reference -- may contain `file`, `array`, `fd`, `syslog`, and/or `sendmail` keys
+    - An array reference -- `{ level, message }` hashrefs are pushed onto it
+    - A scalar string -- treated as a file path to append to
+
+    When not supplied, [Log::Log4perl](https://metacpan.org/pod/Log%3A%3ALog4perl) is initialised as the default backend.
+
+    The `sendmail` sub-hash supports:
+    `host`, `port`, `to`, `from`, `subject`, `level`, `min_interval`.
+    At most one email is sent per `min_interval` seconds per instance.
 
 - `script_name`
 
-    The name of the script.
-    It's needed when `syslog` is given,
-    if none is passed, the value is guessed.
+    Script name reported to syslog.  Auto-detected from `$0` if not supplied.
 
-Clone existing objects with or without modifications:
+- `verbose`
 
-    my $clone = $logger->new();
+    When using the default Log::Log4perl backend, raises the logging level to
+    DEBUG when set to a true value.
 
-## \_sanitize\_email\_header
+### Returns
 
-    my $clean_value = _sanitize_email_header($raw_value);
+A blessed `Log::Abstraction` object.
 
-Internal routine to remove carriage return and line feed characters from an email header value to prevent header injection or formatting issues.
+### Side Effects
 
-- Input
+Loads `File::Basename` if `syslog` is configured and `script_name` is
+not supplied.  Loads `Log::Log4perl` if no logger backend is specified.
 
-    Takes a single scalar value, typically a string representing an email header field.
+### Example
 
-- Behavior
+    my $logger = Log::Abstraction->new(
+        level  => 'debug',
+        logger => \@messages,
+    );
 
-    If the input is undefined, returns \`undef\`. Otherwise, removes all newline characters (\`\\n\`), carriage returns (\`\\r\`), and CRLF pairs from the string.
+    my $clone = $logger->new(level => 'info');
 
-- Output
+### API Specification
 
-    Returns the sanitized string with CR/LF characters removed.
+#### Input
 
-### FORMAL SPECIFICATION
+    {
+        carp_on_warn   => { type => BOOLEAN, optional => 1 },
+        config_file    => { type => SCALAR,  optional => 1 },
+        croak_on_error => { type => BOOLEAN, optional => 1 },
+        ctx            => { optional => 1 },
+        format         => { type => SCALAR,  optional => 1 },
+        level          => { type => SCALAR,  regex => qr/^(trace|debug|info|notice|warn(?:ing)?|error)$/i, optional => 1 },
+        logger         => { optional => 1 },
+        script_name    => { type => SCALAR,  optional => 1 },
+        verbose        => { type => BOOLEAN, optional => 1 },
+    }
 
-If the input is undefined (∅), the output is also undefined (∅).
+#### Output
 
-If the input is defined, the result is a defined string with CR and LF characters removed.
+    { type => 'object', class => 'Log::Abstraction' }
 
-    [CHAR]
+### MESSAGES
 
-    CR, LF : CHAR
-    CR == '\r'
-    LF == '\n'
+    Error                                     Meaning / Action
+    ----------------------------------------  -----------------------------------------
+    "<class>: <path>: File not readable"      config_file path exists but is unreadable.
+                                              Check file permissions.
+    "<class>: Can't load configuration       Config::Abstraction could not parse the
+      from <path>"                            file.  Check syntax and format.
+    "<class>: syslog needs to know the        syslog backend requested but script_name
+      script name"                            could not be determined.  Pass it explicitly.
+    "<class>: attempt to encapsulate          logger => Log::Abstraction would create
+      Log::Abstraction as a logging class,    a needless forwarding loop.  Use a
+      that would add a needless indirection"  different backend.
+    "<class>: invalid syslog level '<l>'"     level value is not a recognised syslog
+                                              level name.  Use trace/debug/info/notice/
+                                              warn/warning/error.
 
-    STRING == seq CHAR
+## level
 
-    SanitizeEmailHeader
-        raw?: STRING
-        sanitized!: STRING
-        -------------------------------------------------
-        sanitized! = [ c : raw? | c ≠ CR ∧ c ≠ LF ]
+    my $current = $logger->level();
+    $logger->level('debug');
 
-## level($self, $level)
+Get or set the minimum logging level.  When setting, returns `$self` to
+allow method chaining.  When getting, returns the current level as an
+integer (per the syslog numeric scale; lower numbers are higher priority).
 
-Get/set the minimum level to log at.
-Returns the current level, as an integer.
+### Arguments
+
+- `$level` (optional)
+
+    A level name string: `trace`, `debug`, `info`, `notice`, `warn`/`warning`,
+    or `error`.  Case-insensitive.  Omit to perform a pure get.
+
+### Returns
+
+In getter mode: an integer in the range 0 (emergency) to 7 (debug/trace).
+
+In setter mode: `$self` (to allow chaining).
+
+### Side Effects
+
+When setting, updates `$self->{level}`.
+
+### Example
+
+    $logger->level('debug');
+    my $n = $logger->level();   # e.g. 7
+
+    # Method chaining
+    $logger->level('info')->info('Now at info level');
+
+### API Specification
+
+#### Input
+
+    {
+        level => { type => SCALAR, regex => qr/^(trace|debug|info|notice|warn(?:ing)?|error)$/i, optional => 1 },
+    }
+
+#### Output
+
+    Getter: { type => 'integer', min => 0, max => 7 }
+    Setter: { type => 'object', class => 'Log::Abstraction' }
+
+### MESSAGES
+
+    Warning                                   Meaning / Action
+    ----------------------------------------  ------------------------------------------
+    "<class>: invalid syslog level '<l>'"     The supplied level name is not recognised.
+                                              Use trace/debug/info/notice/warn/error.
 
 ## is\_debug
 
-Are we at a debug level that will emit debug messages?
-For compatibility with [Log::Any](https://metacpan.org/pod/Log%3A%3AAny).
+    if($logger->is_debug()) { ... }
+
+Returns a true value when the logger is configured at `debug` level or
+below (i.e. debug messages will actually be emitted).  Provided for
+compatibility with [Log::Any](https://metacpan.org/pod/Log%3A%3AAny).
+
+### Arguments
+
+None.
+
+### Returns
+
+`1` if the current level threshold includes debug (or trace) messages;
+`0` otherwise.
+
+### Example
+
+    if($logger->is_debug()) {
+        $logger->debug('Expensive diagnostic: ' . Dumper(\%state));
+    }
+
+### API Specification
+
+#### Input
+
+    {} (no arguments)
+
+#### Output
+
+    { type => 'boolean' }
 
 ## messages
 
-Return all the messages emitted so far
+    my $aref = $logger->messages();
 
-## debug
+Returns a reference to a shallow copy of all messages emitted through this
+logger since it was created (or since the last clone).
 
-    $logger->debug(@messages);
+### Arguments
 
-Logs a debug message.
+None.
 
-## info
+### Returns
 
-    $logger->info(@messages);
+An array reference of hashrefs, each with keys `level` (string) and
+`message` (string).
 
-Logs an info message.
+### Side Effects
 
-## notice
+None.  The returned array is a copy; modifying it does not affect the
+internal history.
 
-    $logger->notice(@messages);
+### Example
 
-Logs a notice message.
+    $logger->info('hello');
+    my $msgs = $logger->messages();
+    # $msgs->[0] = { level => 'info', message => 'hello' }
 
-## error
+### API Specification
 
-    $logger->error(@messages);
+#### Input
 
-Logs an error message. This method also supports logging to syslog if configured.
-If not logging mechanism is set,
-falls back to `croak`.
+    {} (no arguments)
 
-## fatal
+#### Output
 
-    $logger->fatal(@messages);
-
-Synonym of error.
+    { type => 'arrayref', element_type => { level => SCALAR, message => SCALAR } }
 
 ## trace
 
     $logger->trace(@messages);
+    $logger->trace(\@messages);
 
-Logs a trace message.
+Logs a message at `trace` level (the most verbose level, below `debug`).
+The message is dropped silently when the configured level threshold is above
+`trace`.
+
+### Arguments
+
+- `@messages`
+
+    One or more strings, or a single array reference.  All elements are joined
+    without a separator before storage.
+
+### Returns
+
+`$self`, to allow method chaining.
+
+### Side Effects
+
+Appends to the internal message history and dispatches to configured backends.
+
+### Example
+
+    $logger->trace('entering sub foo, args=', join(',', @args));
+
+    # Chaining
+    $logger->trace('start')->debug('details')->info('summary');
+
+### API Specification
+
+#### Input
+
+    { messages => { type => ARRAYREF | SCALAR } }
+
+#### Output
+
+    { type => 'object', class => 'Log::Abstraction' }
+
+## debug
+
+    $logger->debug(@messages);
+    $logger->debug(\@messages);
+
+Logs a message at `debug` level.
+
+### Arguments
+
+- `@messages`
+
+    One or more strings, or a single array reference.
+
+### Returns
+
+`$self`, to allow method chaining.
+
+### Side Effects
+
+Appends to the internal message history and dispatches to configured backends.
+
+### Example
+
+    $logger->debug('Query took ', $elapsed, 'ms');
+
+### API Specification
+
+#### Input
+
+    { messages => { type => ARRAYREF | SCALAR } }
+
+#### Output
+
+    { type => 'object', class => 'Log::Abstraction' }
+
+## info
+
+    $logger->info(@messages);
+    $logger->info(\@messages);
+
+Logs a message at `info` level.
+
+### Arguments
+
+- `@messages`
+
+    One or more strings, or a single array reference.
+
+### Returns
+
+`$self`, to allow method chaining.
+
+### Side Effects
+
+Appends to the internal message history and dispatches to configured backends.
+
+### Example
+
+    $logger->info('Server started on port ', $port);
+
+### API Specification
+
+#### Input
+
+    { messages => { type => ARRAYREF | SCALAR } }
+
+#### Output
+
+    { type => 'object', class => 'Log::Abstraction' }
+
+## notice
+
+    $logger->notice(@messages);
+    $logger->notice(\@messages);
+
+Logs a message at `notice` level (higher priority than `info`, lower than
+`warn`).
+
+### Arguments
+
+- `@messages`
+
+    One or more strings, or a single array reference.
+
+### Returns
+
+`$self`, to allow method chaining.
+
+### Side Effects
+
+Appends to the internal message history and dispatches to configured backends.
+
+### Example
+
+    $logger->notice('Configuration reloaded');
+
+### API Specification
+
+#### Input
+
+    { messages => { type => ARRAYREF | SCALAR } }
+
+#### Output
+
+    { type => 'object', class => 'Log::Abstraction' }
 
 ## warn
 
     $logger->warn(@messages);
     $logger->warn(\@messages);
-    $logger->warn(warning => \@messages);
+    $logger->warn(warning => $text);
+    $logger->warn({ warning => $text });
+    $logger->warn(warning => \@parts);
 
-Logs a warning message. This method also supports logging to syslog if configured.
-If not logging mechanism is set,
-falls back to `Carp`.
+Logs a warning message.  Also dispatches to syslog and/or email backends
+when those are configured.  Falls back to `Carp::carp` when no logger
+backend is set.
 
-## \_high\_priority
+A `warn()` call with an empty or all-undef argument list is a silent no-op.
 
-Helper to handle important messages.
+### Arguments
+
+- `@messages`
+
+    A plain list of strings joined without separator, **or** a named `warning`
+    parameter whose value may be a string or an array reference of strings.
+
+### Returns
+
+`$self`, to allow method chaining.
+
+### Side Effects
+
+Appends to internal message history.  Writes to all configured backends.
+May call `Carp::carp` if `carp_on_warn` is set or no backend is active.
+
+### Example
+
+    $logger->warn('Disk usage is high');
+    $logger->warn(warning => 'Connection reset', ' retrying');
+    $logger->warn({ warning => ['Part A', 'Part B'] });
+
+### API Specification
+
+#### Input
+
+    # Named form
+    { warning => { type => SCALAR | ARRAYREF } }
+    # Plain-list form
+    { messages => { type => ARRAYREF } }
+
+#### Output
+
+    { type => 'object', class => 'Log::Abstraction' }
+
+### MESSAGES
+
+    (no croak/carp messages from this method itself; see _high_priority)
+
+## error
+
+    $logger->error(@messages);
+    $logger->error(warning => $text);
+
+Logs an error-level message.  Behaves identically to `warn()` but at the
+`error` level, which triggers `Carp::croak` if `croak_on_error` is set
+or no logger backend is active.
+
+### Arguments
+
+Same argument forms as `warn()`.
+
+### Returns
+
+`$self`, to allow method chaining.  Note: if `croak_on_error` is set, the
+method never returns -- execution unwinds via `Carp::croak`.
+
+### Side Effects
+
+Same as `warn()` plus optional `Carp::croak` escalation.
+
+### Example
+
+    $logger->error('Fatal: database unavailable');
+
+### API Specification
+
+#### Input
+
+    { warning => { type => SCALAR | ARRAYREF, optional => 1 } }
+
+#### Output
+
+    { type => 'object', class => 'Log::Abstraction' }
+
+### MESSAGES
+
+    Croak                                     Meaning / Action
+    ----------------------------------------  ------------------------------------------
+    (the error message text itself)           croak_on_error is set, or no backend is
+                                              active.  The call stack is unwound.
+
+## fatal
+
+    $logger->fatal(@messages);
+
+Synonym for `error()`.  Provided for compatibility with logging frameworks
+that use `fatal` as the highest-severity level name.
+
+### Arguments
+
+Same as `error()`.
+
+### Returns
+
+`$self`.
+
+### Side Effects
+
+Same as `error()`.
+
+### Example
+
+    $logger->fatal('Unrecoverable state; aborting');
+
+### API Specification
+
+#### Input
+
+    { warning => { type => SCALAR | ARRAYREF, optional => 1 } }
+
+#### Output
+
+    { type => 'object', class => 'Log::Abstraction' }
+
+### MESSAGES
+
+Same as `error()`.
+
+# EXAMPLES
+
+## CSV file logging for BI import
+
+The code-reference backend gives you full control over the output format.
+The example below writes every message at `trace` level and above as a
+CSV row to a file, producing output that can be loaded directly into a
+spreadsheet or BI tool (Tableau, Power BI, Metabase, etc.).
+
+Each row contains: `timestamp`, `level`, `class`, `file`, `line`, `message`.
+
+    use Log::Abstraction;
+
+    my $csv_file = 'app_events.csv';
+
+    # Write the header row once (skip if the file already exists and has data).
+    unless (-s $csv_file) {
+        open my $fh, '>', $csv_file or die "Cannot open $csv_file: $!";
+        print $fh qq{timestamp,level,class,file,line,message\n};
+        close $fh;
+    }
+
+    # Helper: quote a single CSV field (escapes embedded double-quotes).
+    my $csv_field = sub {
+        my $v = defined $_[0] ? $_[0] : '';
+        $v =~ s/"/""/g;
+        return qq{"$v"};
+    };
+
+    my $logger = Log::Abstraction->new(
+        level  => 'trace',        # capture everything from trace upwards
+        logger => sub {
+            my $args = $_[0];
+
+            my $timestamp = POSIX::strftime('%Y-%m-%dT%H:%M:%SZ', gmtime);
+            my $message  = join(' ', @{ $args->{message} // [] });
+
+            open my $fh, '>>', $csv_file or return;
+            print $fh join(',',
+                $csv_field->($timestamp),
+                $csv_field->($args->{level}),
+                $csv_field->($args->{class}),
+                $csv_field->($args->{file}),
+                $csv_field->($args->{line}),
+                $csv_field->($message),
+            ), "\n";
+            close $fh;
+        },
+    );
+
+    $logger->trace('application started');
+    $logger->info('user logged in', { user => 'alice' });
+    $logger->warn({ warning => 'disk usage above 80%' });
+
+The resulting `app_events.csv` looks like:
+
+    timestamp,level,class,file,line,message
+    "2026-05-27T14:00:00Z","trace","Log::Abstraction","app.pl","42","application started"
+    "2026-05-27T14:00:01Z","info","Log::Abstraction","app.pl","43","user logged in"
+    "2026-05-27T14:00:02Z","warn","Log::Abstraction","Log/Abstraction.pm","820","disk usage above 80%"
+
+Note: `class` is always `Log::Abstraction` (or the subclass name if you subclass the
+module).  For `trace`, `debug`, `info`, and `notice` calls, `file` and `line`
+resolve to the caller's source location.  For `warn` and `error` calls the
+extra `_high_priority` stack frame shifts the resolution one level inward, so
+`file` and `line` point into the module rather than the calling script.
+
+For production use, consider replacing the manual `$csv_field` quoting with
+[Text::CSV](https://metacpan.org/pod/Text%3A%3ACSV) for correct handling of embedded newlines and other edge cases.
+
+If you also want real-time alerting on critical events, add the email logic
+directly inside the code-ref callback -- test `$args->{level}` and call
+your mailer for `warn` / `error` messages while still writing the CSV row
+for every message.
+
+Alternatively, use the `sendmail` hash-ref backend on its own (without the
+code-ref) and add a `level` key to restrict emails to warn-and-above:
+
+    my $logger = Log::Abstraction->new(
+        level  => 'warn',
+        logger => {
+            sendmail => {
+                host         => 'smtp.example.com',
+                to           => 'ops@example.com',
+                from         => 'logger@example.com',
+                subject      => 'Application alert',
+                level        => 'warn',   # only email at warn level and above
+                min_interval => 300,      # at most one alert email per 5 minutes
+            },
+        },
+    );
+
+Note: the `sendmail` backend writes the module's standard text format, not
+CSV.  To produce CSV rows _and_ send email alerts from the same logger,
+embed both the CSV-write and the mail-send logic inside a single code-ref
+callback as described above.
 
 # AUTHOR
 
@@ -283,6 +703,143 @@ You can also look for information at:
 - CPAN Testers Dependencies
 
     [http://deps.cpantesters.org/?module=Log::Abstraction](http://deps.cpantesters.org/?module=Log::Abstraction)
+
+## FORMAL SPECIFICATION
+
+### new
+
+    ┌─ LogState ──────────────────────────────────────────────────
+    │ level    : ℤ
+    │ messages : seq { level : STRING; message : STRING }
+    │ logger   : LOGGER
+    └─────────────────────────────────────────────────────────────
+
+    ┌─ New ───────────────────────────────────────────────────────
+    │ args? : Args
+    │ result! : LogState
+    ├─────────────────────────────────────────────────────────────
+    │ result!.level = syslog_values(args?.level ∨ 'warning')
+    │ result!.messages = ⟨⟩
+    │ result!.logger = args?.logger
+    └─────────────────────────────────────────────────────────────
+
+    Clone operation (called on an existing object):
+
+    ┌─ Clone ─────────────────────────────────────────────────────
+    │ ΔLogState
+    │ overrides? : Args
+    ├─────────────────────────────────────────────────────────────
+    │ result!.level    = syslog_values(overrides?.level ∨ level)
+    │ result!.messages = messages   {deep copy}
+    │ result!.logger   = overrides?.logger ∨ logger
+    └─────────────────────────────────────────────────────────────
+
+### level
+
+    ┌─ LevelGet ─────────────────────────────────────────────────
+    │ ΞLogState
+    │ result! : ℤ
+    ├─────────────────────────────────────────────────────────────
+    │ result! = level
+    │ 0 ≤ result! ∧ result! ≤ 7
+    └─────────────────────────────────────────────────────────────
+
+    ┌─ LevelSet ─────────────────────────────────────────────────
+    │ ΔLogState
+    │ new_level? : STRING
+    ├─────────────────────────────────────────────────────────────
+    │ new_level? ∈ dom(syslog_values)
+    │ level' = syslog_values(new_level?)
+    └─────────────────────────────────────────────────────────────
+
+### is\_debug
+
+    ┌─ IsDebug ──────────────────────────────────────────────────
+    │ ΞLogState
+    │ result! : BOOLEAN
+    ├─────────────────────────────────────────────────────────────
+    │ result! = (level ≥ syslog_values('debug'))
+    └─────────────────────────────────────────────────────────────
+
+### messages
+
+    ┌─ Messages ─────────────────────────────────────────────────
+    │ ΞLogState
+    │ result! : seq { level : STRING; message : STRING }
+    ├─────────────────────────────────────────────────────────────
+    │ result! = messages
+    └─────────────────────────────────────────────────────────────
+
+### trace
+
+    ┌─ Trace ────────────────────────────────────────────────────
+    │ ΔLogState
+    │ msg? : seq STRING
+    ├─────────────────────────────────────────────────────────────
+    │ msg? ≠ ⟨⟩
+    │ syslog_values('trace') ≤ level
+    │ messages' = messages ⌢ ⟨{level ↦ 'trace', message ↦ ⊕(msg?)}⟩
+    └─────────────────────────────────────────────────────────────
+
+### debug
+
+    ┌─ Debug ────────────────────────────────────────────────────
+    │ ΔLogState
+    │ msg? : seq STRING
+    ├─────────────────────────────────────────────────────────────
+    │ msg? ≠ ⟨⟩
+    │ syslog_values('debug') ≤ level
+    │ messages' = messages ⌢ ⟨{level ↦ 'debug', message ↦ ⊕(msg?)}⟩
+    └─────────────────────────────────────────────────────────────
+
+### info
+
+    ┌─ Info ─────────────────────────────────────────────────────
+    │ ΔLogState
+    │ msg? : seq STRING
+    ├─────────────────────────────────────────────────────────────
+    │ msg? ≠ ⟨⟩
+    │ syslog_values('info') ≤ level
+    │ messages' = messages ⌢ ⟨{level ↦ 'info', message ↦ ⊕(msg?)}⟩
+    └─────────────────────────────────────────────────────────────
+
+### notice
+
+    ┌─ Notice ───────────────────────────────────────────────────
+    │ ΔLogState
+    │ msg? : seq STRING
+    ├─────────────────────────────────────────────────────────────
+    │ msg? ≠ ⟨⟩
+    │ syslog_values('notice') ≤ level
+    │ messages' = messages ⌢ ⟨{level ↦ 'notice', message ↦ ⊕(msg?)}⟩
+    └─────────────────────────────────────────────────────────────
+
+### warn
+
+    ┌─ Warn ─────────────────────────────────────────────────────
+    │ ΔLogState
+    │ msg? : seq STRING | { warning : STRING | seq STRING }
+    ├─────────────────────────────────────────────────────────────
+    │ msg? ≠ ∅ ∧ join(msg?) ≠ ''
+    │ syslog_values('warn') ≤ level
+    │ messages' = messages ⌢ ⟨{level ↦ 'warn', message ↦ join(msg?)}⟩
+    └─────────────────────────────────────────────────────────────
+
+### error
+
+    ┌─ Error ────────────────────────────────────────────────────
+    │ ΔLogState
+    │ msg? : seq STRING | { warning : STRING | seq STRING }
+    ├─────────────────────────────────────────────────────────────
+    │ msg? ≠ ∅ ∧ join(msg?) ≠ ''
+    │ syslog_values('error') ≤ level
+    │ messages' = messages ⌢ ⟨{level ↦ 'error', message ↦ join(msg?)}⟩
+    │ croak_on_error = 1 ⟹ execution_continues = false
+    └─────────────────────────────────────────────────────────────
+
+### fatal
+
+    fatal ≡ error   (identical operation schema)
 
 # COPYRIGHT AND LICENSE
 

@@ -25,7 +25,8 @@ WriteMakefile(
 		'Log::Log4perl' => 0,
 		'Params::Get' => 0.13,
 		'POSIX' => 0,
-		'Readonly::Values::Syslog' => 0.03,
+		'Readonly' => 0,
+		'Readonly::Values::Syslog' => 0.04,
 		'Return::Set' => 0,
 		'Sys::Syslog' => 0.28,
 		'Scalar::Util'=> 0
@@ -38,7 +39,6 @@ WriteMakefile(
 		'File::Temp' => 0,
 		'JSON::MaybeXS' => 0,
 		'POSIX' => 0,
-		'Readonly' => 0,
 		'IPC::System::Simple' => 0,
 		'Test::DescribeMe' => 0,
 		'Test::Mockingbird' => 0.10,

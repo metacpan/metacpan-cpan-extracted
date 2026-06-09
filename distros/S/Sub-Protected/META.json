@@ -1,0 +1,72 @@
+{
+   "abstract" : "Enforce protected subroutine access (Java/C++ semantics)",
+   "author" : [
+      "Nigel Horne <njh@nigelhorne.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Sub-Protected",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Attribute::Handlers" : "0",
+            "Carp" : "0",
+            "Params::Get" : "0",
+            "Params::Validate::Strict" : "0",
+            "Readonly" : "0",
+            "Return::Set" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IPC::System::Simple" : "0",
+            "Moo" : "0",
+            "Test::Exception" : "0",
+            "Test::Memory::Cycle" : "0",
+            "Test::Mockingbird" : "0",
+            "Test::Most" : "0",
+            "Test::Returns" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Sub-Protected@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Sub-Protected",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Sub-Protected"
+      },
+      "homepage" : "https://metacpan.org/pod/Sub::Protected",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Sub-Protected.git",
+         "web" : "https://github.com/nigelhorne/Sub-Protected"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}
