@@ -90,30 +90,32 @@ C<99> becomes 1999.
 
 A timezone object used to resolve the offset when the string carries no
 numeric offset or UTC designator. The object must provide an
-C<offset_for_local> method: given the parsed local time as a Unix
-timestamp, it returns the UTC offset in seconds. C<str2time> subtracts
-this to obtain the true UTC time. DST gaps and overlaps are handled by
-the object's own defaults.
+C<offset_for_local> method: given a local time (the Unix epoch obtained
+by reading the wall-clock fields as if they were UTC), it returns that
+zone's UTC offset in seconds, which C<str2time> subtracts to recover the
+UTC time. How ambiguous or nonexistent local times - the repeated hour
+at a DST fall-back, the skipped hour at spring-forward - are resolved is
+left to the object.
 
 A numeric offset or UTC designator in the string always takes precedence
-over C<timezone>. The object is B<not> consulted for timezone
-abbreviations - see C<timezone_map> below.
+over C<timezone>, and the object is B<not> consulted for timezone
+abbreviations (use C<timezone_map> for those).
 
 L<Time::TZif> and L<Time::TZif::POSIX> provide suitable objects.
 
 =item * C<timezone_map> (optional)
 
-A hash reference mapping timezone abbreviations (as captured in
-C<tz_abbrev>, e.g. C<'CET'>, C<'EST'>) to timezone objects. When the
-parsed string carries an abbreviation, the map is consulted and the
-matched object's C<offset_for_local> method resolves the offset
-(DST-aware: the same abbreviation can yield different offsets depending
-on the instant). Each value used must be a blessed object with an
-C<offset_for_local> method.
+A hash reference mapping timezone abbreviations (e.g. C<'CET'>, C<'EST'>)
+to timezone objects. When the parsed string carries an abbreviation,
+C<str2time> looks it up in the map and uses the matched object's
+C<offset_for_local> method to resolve the offset. Each mapped value must 
+be a blessed object with an C<offset_for_local> method.
 
-A matching C<timezone_map> entry takes precedence over a bare
-C<timezone> object. If the string carries an abbreviation that is not
-present in the map, C<str2time> croaks - it does not fall back to
+C<timezone> and C<timezone_map> apply to disjoint cases: C<timezone_map>
+resolves a string that carries an abbreviation, whereas C<timezone>
+resolves one that carries no zone information at all. A bare C<timezone>
+object is never consulted for an abbreviation - an abbreviation absent
+from the map causes C<str2time> to croak rather than falling back to
 C<timezone>.
 
 =back

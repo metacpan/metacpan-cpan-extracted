@@ -1,5 +1,13 @@
 Revision history for Data-HashMap-Shared
 
+0.11  2026-06-09
+    - Atomic max/min for integer-value maps (monotonic, insert-if-absent)
+    - Sharded stats: max_entries/max_size/mmap_size now aggregate across shards
+    - get_with_ttl registers an LRU access (clock bit), consistent with get
+    - new_sharded with an undef path now dies cleanly instead of creating stray files
+    - Exception-safe drain buffer; fix max_entries overflow at 2^31 capacity
+    - Robustness: O_CLOEXEC on the backing fd; retry flock/msync on EINTR
+
 0.10  2026-05-29
     - Exception-safe batch ops; integer-overflow and edge-case fixes
     - Documentation fixes; -Wall -Wextra clean

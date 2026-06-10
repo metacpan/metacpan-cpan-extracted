@@ -2808,13 +2808,14 @@ my @data_aoh = (
 	{ 'c2' => "tab\tin" },
 );
 
-write_table(\@data_aoh, $tmp_file, sep => "\t", 'row.names' => 1);
+write_table(\@data_aoh, $tmp_file, sep => "\t", 'row.names' => 1, 'undef.val' => 'NA');
 $str = file2string($tmp_file);
 if (sha512_base64($str) eq 'Nx/3jb/smu2Jdk2SNCXhxK7yaAO0GO5TAbwztb16fYqDT8nSMzdbdK61I30pfB3KVPtZ5w5rT4Ex2d4+pJFm5g') {
 	pass('write_table successfully wrote a tab-delimited file (Array of Hashes)');
 	unlink $tmp_file;
 } else {
 	fail("sha512 does not match for write_table AoH; see $tmp_file");
+	die;
 }
 #-------------------------------------------------------------------
 #  read_table & write_table specific bug checks
@@ -2867,7 +2868,7 @@ my %data_hoh_col = (
 );
 
 # Requesting a column 'Z' missing in Row1, and 'X' missing in Row2
-write_table(\%data_hoh_col, $tmp_file, sep => ',', 'row.names' => 1, 'col.names' => ['Y', 'Z', 'X']);
+write_table(\%data_hoh_col, $tmp_file, sep => ',', 'row.names' => 1, 'col.names' => ['Y', 'Z', 'X'], 'undef.val' => 'NA');
 $str = file2string($tmp_file);
 
 $expected_str = ",Y,Z,X\nRow1,20,NA,10\nRow2,30,40,NA\n";
@@ -2889,7 +2890,7 @@ no_leaks_ok {
 } 'write_table: no leaks with hash-of-array input'  unless $INC{'Devel/Cover.pm'};
 my $f = '/tmp/hoa.test2.tsv';
 write_table(
-	\%hoa, $f,	sep => "\t", 'col.names' => ['B', 'C', 'A']
+	\%hoa, $f,	sep => "\t", 'col.names' => ['B', 'C', 'A'], 'undef.val' => 'NA'
 );
 $str = file2string($f);
 if (sha512_base64($str) eq 'gSDXQI2aBVJgsuzGvuHY4bbDSkCSNI6JPFWRjc2+2Khp7YdTyjew+lIKuakxKAHO758CcjTLhdMw15J7vf3P/g') {
@@ -2905,7 +2906,7 @@ no_leaks_ok {
 #----- repeat above with nondigit
 %hoa = (A => ['x',1..4], B => ['y',-3..3], C => ['z',9,3,4]);
 write_table(
-	\%hoa, $f,	sep => "\t", 'col.names' => ['B', 'C', 'A']
+	\%hoa, $f,	sep => "\t", 'col.names' => ['B', 'C', 'A'], 'undef.val' => 'NA'
 );
 $str = file2string($f);
 if (sha512_base64($str) eq 'z7qR91AqEvKUb6QSftcaH0gctut3oOF/p1O62cFyR0LPeJs7syAudEohZ2mOHtZiqwQO3U+rCH/YCl7yveqf8w') {
@@ -2976,7 +2977,7 @@ foreach my $key (sort keys %correct) {
 }
 write_table(
 	\%correct,   $fh->filename,
-	sep => "\t", 'row.names' => 0
+	sep => "\t", 'row.names' => 0, 'undef.val' => 'NA'
 );
 $str = file2string($fh->filename);
 if (sha512_base64($str) eq 'mSFIF/IuIR3GfRWvnv+4OkMi12JwoIV4zxt57vv2QQxuEGOde8w8hD7xSBNsMjczFLqZRqmlvOq0tcWAkhF0ag') {

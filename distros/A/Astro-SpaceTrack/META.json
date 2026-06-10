@@ -1,7 +1,7 @@
 {
    "abstract" : "Download satellite orbital elements from Space Track",
    "author" : [
-      "Tom Wyant (wyant at cpan dot org)"
+      "Tom Wyant (harryfmudd at comcast dot net)"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4234",
@@ -72,14 +72,14 @@
    "provides" : {
       "Astro::SpaceTrack" : {
          "file" : "lib/Astro/SpaceTrack.pm",
-         "version" : "0.181"
+         "version" : "0.182"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "wyant@cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SpaceTrack"
+         "mailto" : "harryfmudd@comcast.net",
+         "web" : "https://github.com/trwyant/perl-Astro-SpaceTrack/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -90,6 +90,6 @@
          "web" : "https://github.com/trwyant/perl-Astro-SpaceTrack"
       }
    },
-   "version" : "0.181",
+   "version" : "0.182",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

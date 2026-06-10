@@ -434,6 +434,9 @@ ok(valid_posix_timezone('IST-5:30'),
 ok(valid_posix_timezone('NPT-5:45:00'),
   'valid_posix_timezone: offset with seconds');
 
+ok(valid_posix_timezone('<+05>-5'),
+  'valid_posix_timezone: quoted name');
+
 # valid strings — with DST and M rules
 ok(valid_posix_timezone('EST5EDT,M3.2.0,M11.1.0'),
   'valid_posix_timezone: US Eastern');
@@ -489,9 +492,6 @@ ok(!valid_posix_timezone('EST5EDT'),
 
 ok(!valid_posix_timezone('EST5EDT,M3.2.0'),
   'valid_posix_timezone: only one rule');
-
-ok(!valid_posix_timezone('<+05>-5'),
-  'valid_posix_timezone: quoted name (not POSIX)');
 
 ok(!valid_posix_timezone('EST5EDT,M3.2.0,M11.1.0,M12.1.0'),
   'valid_posix_timezone: too many rules');

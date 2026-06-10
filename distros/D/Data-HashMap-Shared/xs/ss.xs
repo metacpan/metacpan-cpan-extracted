@@ -11,8 +11,9 @@ new(char* class, SV* path_sv, UV max_entries, UV lru_max = 0, UV ttl_default = 0
         RETVAL
 
 SV*
-new_sharded(char* class, char* path_prefix, UV num_shards, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0)
+new_sharded(char* class, SV* path_prefix_sv, UV num_shards, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0)
     CODE:
+        const char* path_prefix = SvOK(path_prefix_sv) ? SvPV_nolen(path_prefix_sv) : NULL;
         char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_ss_create_sharded(path_prefix, (uint32_t)num_shards, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, errbuf);
         if (!map) croak("Data::HashMap::Shared::SS: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
@@ -563,6 +564,7 @@ drain(SV* self_sv, UV limit)
         SAVEFREEPV(entries);
         char *buf = NULL; uint32_t buf_cap = 0;
         uint32_t n = shm_ss_drain(h, (uint32_t)limit, entries, &buf, &buf_cap);
+        if (buf) SAVEDESTRUCTOR_X(shm_free_cleanup, buf);
 
         EXTEND(SP, n * 2);
         for (uint32_t i = 0; i < n; i++) {
@@ -573,7 +575,6 @@ drain(SV* self_sv, UV limit)
             if (entries[i].val_utf8) SvUTF8_on(vsv);
             mPUSHs(vsv);
         }
-        if (buf) free(buf);
 
 
 UV

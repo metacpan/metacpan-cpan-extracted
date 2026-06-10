@@ -8,7 +8,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.181';
+our $VERSION = '0.182';
 
 our @EXPORT_OK = qw{ __any };
 
@@ -144,13 +144,12 @@ modules are needed it returns nothing.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SpaceTrack>,
-L<https://github.com/trwyant/perl-Astro-SpaceTrack/issues/>, or in
+L<https://github.com/trwyant/perl-Astro-SpaceTrack/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Tom Wyant (wyant at cpan dot org)
+Tom Wyant (harryfmudd at comcast dot net)
 
 =head1 COPYRIGHT AND LICENSE
 

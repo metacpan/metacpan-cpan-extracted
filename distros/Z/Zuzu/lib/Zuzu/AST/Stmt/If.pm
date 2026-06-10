@@ -2,7 +2,7 @@ package Zuzu::AST::Stmt::If;
 
 use utf8;
 
-our $VERSION = '0.002000';
+our $VERSION = '0.003000';
 
 use Moo;
 

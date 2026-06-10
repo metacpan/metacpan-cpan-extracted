@@ -143,6 +143,38 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink glob "$prefix*";
 }
 
+# Sharded stats/accessors report aggregate totals across all shards
+# (regression guard: max_entries/max_size/mmap_size must sum the shards, not
+# report shard 0 only -- otherwise size/max_entries load factor is wrong).
+{
+    my $shards = 4;
+    # reference single shard with identical per-shard parameters
+    my $sp = tmpfile();
+    # max_size high enough that the 200 puts below never evict (tests size
+    # aggregation), but nonzero so max_size aggregation is meaningful.
+    my $single = Data::HashMap::Shared::II->new($sp, 1000, 1000);  # max_entries, max_size
+    my $s_me = shm_ii_max_entries $single;
+    my $s_ms = shm_ii_max_size $single;
+    my $s_mm = shm_ii_mmap_size $single;
+    unlink $sp;
+
+    my $prefix = tmpfile();
+    my $map = Data::HashMap::Shared::II->new_sharded($prefix, $shards, 1000, 1000);
+    is(shm_ii_max_entries $map, $shards * $s_me, 'sharded max_entries sums across shards');
+    is(shm_ii_max_size $map,    $shards * $s_ms, 'sharded max_size sums across shards');
+    is(shm_ii_mmap_size $map,   $shards * $s_mm, 'sharded mmap_size sums across shards');
+
+    shm_ii_put $map, $_, $_ for 1..200;
+    is(shm_ii_size $map, 200, 'sharded size counts all shards');
+
+    my $st = $map->stats;
+    is($st->{max_entries}, $shards * $s_me, 'stats max_entries aggregate matches accessor');
+    is($st->{mmap_size},   $shards * $s_mm, 'stats mmap_size aggregate matches accessor');
+    is($st->{size}, 200, 'stats size aggregate');
+
+    unlink glob "$prefix*";
+}
+
 # cursor_seek with TTL expired key
 {
     my $path = tmpfile();

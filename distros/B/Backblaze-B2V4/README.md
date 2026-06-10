@@ -8,48 +8,48 @@ Backblaze::B2V4 - Client library for the Backblaze B2 Cloud Storage Service V4 A
         use Backblaze::B2V4;
 
         # create an API client object
-
         my $b2 = Backblaze::B2V4->new(
-                application_key => $application_key,
-                application_key_id => $application_key_id,
+          application_key => $application_key,
+          application_key_id => $application_key_id,
         );
-
         # please encrypt/protect those keys when not in use!
 
         # let's say we have a B2 bucket called 'GingerAnna' and a JPG called 'ginger_was_perfect.jpg'.
 
         # upload a file from your file system
         my $response = $b2->b2_upload_file(
-                bucket_name => 'GingerAnna',
-                file_location => '/path/to/ginger_was_perfect.jpg'
+          bucket_name => 'GingerAnna',
+          file_location => '/path/to/ginger_was_perfect.jpg'
         );
 
         # upload a file you have in a scalar
         my $response = $b2->b2_upload_file(
-                bucket_name => 'GingerAnna',
-                new_file_name => 'ginger_was_perfect.jpg',
-                file_contents => $file_contents
+          bucket_name => 'GingerAnna',
+          new_file_name => 'ginger_was_perfect.jpg',
+          file_contents => $file_contents
         );
         # B2 file ID (fGUID) is now in $response->{fileId}
         # Best to load $file_contents via Path::Tiny's slurp_raw() method
 
         # download that file to /opt/majestica/tmp
         my $response = $b2->b2_download_file_by_name(
-                bucket_name => 'GingerAnna', 
-                file_name => 'ginger_was_perfect.jpg', 
-                save_to_location => '/opt/majestica/tmp'
+          bucket_name => 'GingerAnna', 
+          file_name => 'ginger_was_perfect.jpg', 
+          save_to_location => '/opt/majestica/tmp'
         );
 
         # if you would rather download with the 84-character GUID
         my $response = $b2->b2_download_file_by_id(
-                file_id => 'X-Bz-File-Id GUID from above',
-                save_to_location => '/opt/majestica/tmp'
+          file_id => 'X-Bz-File-Id GUID from above',
+          save_to_location => '/opt/majestica/tmp'
         );
         
         # For all of these $response is the output from the B2 V4 API
         
         # to confirm all is well
         my $all_is_well = $b2->current_status_is_not_ok != 1;
+        # or 
+        my $all_is_well = $b2->current_status_is_ok());
         
         # to get the latest error
         print $b2->latest_error();
@@ -185,16 +185,16 @@ See: https://www.backblaze.com/b2/docs/b2\_upload\_file.html
 Example 1: Uploading from a file on disk:
 
         my $file_id = $b2->b2_upload_file(
-                'bucket_name' => 'GingerAnna',
-                'file_location' => '/opt/majestica/tmp/ginger_was_perfect.jpg',
+          bucket_name => 'GingerAnna',
+          file_location => '/opt/majestica/tmp/ginger_was_perfect.jpg',
         );
 
 Example 2: Uploading when the file is loaded into a scalar:
 
         my $file_id = $b2->b2_upload_file(
-                'bucket_name' => 'GingerAnna',
-                'new_file_name' => 'ginger_was_perfect.jpg',
-                'file_contents' => $file_contents
+          bucket_name => 'GingerAnna',
+          new_file_name => 'ginger_was_perfect.jpg',
+          file_contents => $file_contents
         );
 
 ## b2\_upload\_large\_file
@@ -205,8 +205,8 @@ than 100MB.
 Example:
 
         my $file_id = $b2->b2_upload_large_file(
-                'bucket_name' => 'GingerAnna',
-                'file_location' => '/opt/majestica/tmp/gingers_whole_life_story.mp4',
+          bucket_name => 'GingerAnna',
+          file_location => '/opt/majestica/tmp/gingers_whole_life_story.mp4',
         );
 
 ## b2\_list\_file\_info
@@ -232,7 +232,7 @@ file info hashes.
 Basic call:
 
         my $files_ref = $b2->b2_list_file_names(
-                bucket_name => 'MyBucketName'
+          bucket_name => 'MyBucketName'
         );
 
 ## b2\_get\_file\_info
@@ -241,7 +241,7 @@ Given a GUID for a file, will retrieve its info a $response hash
 See https://www.backblaze.com/b2/docs/b2\_get\_file\_info.html 
 
         my $response = $b2->b2_get_file_info(
-                file_id => 'AN84_CHAR_GUID_FROM_B2'
+          file_id => 'AN84_CHAR_GUID_FROM_B2'
         );
 
 ## b2\_bucket\_maker
@@ -264,7 +264,7 @@ Select a name that willbe unique globally.
 Example:
 
         my $success = $b2->b2_bucket_maker(
-                bucket_name => 'NewBucketName'
+          bucket_name => 'NewBucketName'
         );
 
 By default the new bucket will be set to use the 'Server-Side 
@@ -273,8 +273,8 @@ described here: https://www.backblaze.com/b2/docs/server\_side\_encryption.html
 You can send a second param to disable that (not recommended):
 
         my $success = $b2->b2_bucket_maker(
-                bucket_name => 'UnEncryptedBucketName', 
-                disable_encryption => 1
+          bucket_name => 'UnEncryptedBucketName', 
+          disable_encryption => 1
         );
         
 
@@ -294,7 +294,7 @@ See: https://www.backblaze.com/b2/docs/b2\_delete\_bucket.html
 Example:
 
         my $success = $b2->b2_delete_bucket(
-                bucket_name => 'DeletingBucketName'
+          bucket_name => 'DeletingBucketName'
         );
 
 ## b2\_delete\_file\_version
@@ -312,44 +312,27 @@ Required named args
 Returns 1 (success) or 0 (failure)
 
         my $success = $b2->b2_delete_file_version(
-                file_name => 'SomeFileName.ext',
-                file_id => 'AN84_CHAR_GUID_FROM_B2'
+          file_name => 'SomeFileName.ext',
+          file_id => 'AN84_CHAR_GUID_FROM_B2'
         );
 
-## send\_request / b2\_get\_upload\_info  / b2\_list\_buckets
+## b2\_get\_bucket\_id
 
-send\_request() handles all the communications with B2.
-You should be able to use this to make calls not explicitly
-provided by this library.
+If/when you need the ID for a bucket, call 'b2\_get\_bucket\_id'
 
-If send\_request() gets a 200 HTTP status from B2, then the call went
-great, $b2->current\_status\_is\_not\_ok will be 0, and 
-the JSON response will be returned.
+Example:
 
-If a 200 is not received from B2, $b2->current\_status\_is\_not\_ok
-will be 1, and you can find an error in $b2->latest\_error()
-
-Note that the base URL for this API session will be stored
-under $b2->api\_info->{api\_url} so that you build a URL like so:
-
-$list\_buckets\_url = $b2->api\_info->{api\_url}.'/b2api/v4/b2\_list\_buckets';
-
-Example of a GET API request:
-
-        my $response = $b2->send_request(
-                'url' => 'https://SomeB2.API.URL?with=GETparams',
+        my $bucket_id = $b2->b2_get_bucket_id(
+          bucket_name => 'MyBucketName',
+          auto_create_bucket => 0 or 1,
         );
+        
 
-Example of a POST API request:
+Pass 1 for 'auto\_create\_bucket' to make the bucket if one does not exist for your 'bucket\_name'
+and return the new bucket ID.  If you pass 0 for 'auto\_create\_bucket' and the bucket doesn't
+exist, you will receive back a 0.
 
-        my $response = $b2->send_request(
-                'url' => 'https://SomeB2.API.URL',
-                'post_params' => {
-                        'param1_name' => 'param1_value',
-                        'param2_name' => 'param2_value',
-                        'param3_name' => 'param3_value',
-                },
-        );
+## b2\_get\_upload\_info
 
 Almost all the API calls use the Account Authorization Token for the
 authorization header, but the file uploader calls require a bucket-specific
@@ -370,15 +353,39 @@ just FYI if you roll your own.
 
 See: https://www.backblaze.com/b2/docs/b2\_get\_upload\_info.html
 
-If you need the ID for one or more buckets, you can use b2\_list\_buckets.  If
-a bucket name is provided, only that bucket's ID will be retrieved.  If no
-argument is provided, all the ID's will be retrieved for all buckets in your
-account.
+## send\_request
 
-Example:
+send\_request() handles all the communications with B2.
+You should be able to use this to make calls not explicitly
+provided by this library.
 
-        my $bucket_id = $b2->b2_list_buckets(
-                'bucket_name' => 'MyBucketName'
+If send\_request() gets a 200 HTTP status from B2, then the call went
+great, $b2->current\_status\_is\_not\_ok will be 0, and 
+the JSON response will be returned.
+
+If a 200 is not received from B2, $b2->current\_status\_is\_not\_ok
+will be 1, and you can find an error in $b2->latest\_error()
+
+Note that the base URL for this API session will be stored
+under $b2->api\_info->{api\_url} so that you build a URL like so:
+
+$list\_buckets\_url = $b2->api\_info->{api\_url}.'/b2api/v4/b2\_list\_buckets';
+
+Example of a GET API request:
+
+        my $response = $b2->send_request(
+          url => 'https://SomeB2.API.URL?with=GETparams',
+        );
+
+Example of a POST API request:
+
+        my $response = $b2->send_request(
+          url => 'https://SomeB2.API.URL',
+          post_params => {
+            param1_name => 'param1_value',
+            param2_name => 'param2_value',
+            param3_name => 'param3_value',
+          },
         );
 
 See: https://www.backblaze.com/b2/docs/b2\_list\_buckets.html

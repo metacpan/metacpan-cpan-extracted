@@ -23,7 +23,7 @@ WriteMakefile(
         'Attribute::Handlers' => 0,
         'Carp'                => 0,
 	'Params::Get' => 0,
-	'Params::Validate::Strict' => 0,
+	'Params::Validate::Strict' => 0.33,
 	'Readonly' => 0,
 	'Return::Set' => 0,
     }, TEST_REQUIRES    => {

@@ -151,7 +151,7 @@ use Exporter;
 
 our @ISA = qw{ Exporter };
 
-our $VERSION = '0.181';
+our $VERSION = '0.182';
 our @EXPORT_OK = qw{
     shell
 
@@ -313,6 +313,7 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	'gps-ops' => {name => 'GPS Operational'},
 	'glo-ops' => {name => 'Glonass Operational'},
 	galileo => {name => 'Galileo'},
+	sar	=> { name => 'Synthetic Aperture Radar' },
 	sbas => {name =>
 	    'Satellite-Based Augmentation System (WAAS/EGNOS/MSAS)'},
 	# Removed April 16 2026
@@ -391,6 +392,11 @@ my %catalogs = (	# Catalog names (and other info) for each source.
 	css		=> {
 	    name	=> 'CSS (no match data)',
 	    rms		=> 1,
+	},
+	eumetsat	=> {
+	    name	=> 'EUMETSAT',
+	    rms		=> 1,
+	    match	=> 1,
 	},
 	gps		=> {
 	    name	=> 'GPS Operational',
@@ -1080,7 +1086,7 @@ Space Track ($url/) you must register and
 get a username and password, and you may not make the data available to
 a third party without prior permission from Space Track.
 
-Copyright 2005-2022 by T. R. Wyant (wyant at cpan dot org).
+Copyright 2005-2022 by T. R. Wyant (harryfmudd at comcast dot net).
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
@@ -7241,8 +7247,7 @@ for example, that the module will die horribly if run with an
 insufficiently-up-to-date version of LWP.
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SpaceTrack>,
-L<https://github.com/trwyant/perl-Astro-SpaceTrack/issues/>, or in
+L<https://github.com/trwyant/perl-Astro-SpaceTrack/issues/> or in
 electronic mail to the author.
 
 =head1 MODIFICATIONS OF HISTORICAL INTEREST
@@ -7290,11 +7295,11 @@ assistance and encouragement.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III (F<wyant at cpan dot org>)
+Thomas R. Wyant, III (F<harryfmudd at comcast dot net>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2005-2026 by Thomas R. Wyant, III (F<wyant at cpan dot org>).
+Copyright 2005-2026 by Thomas R. Wyant, III (F<harryfmudd at comcast dot net>).
 
 =head1 LICENSE
 

@@ -50,8 +50,8 @@ lib/Astro/App/Satpass2/TUTORIAL.pod
 lib/Astro/App/Satpass2/Utils.pm
 lib/Astro/App/Satpass2/Warner.pm
 lib/Astro/App/Satpass2/Wrap/Array.pm
-LICENSES/Artistic
-LICENSES/Copying
+LICENSE-Artistic
+LICENSE-GPL
 Makefile.PL
 MANIFEST
 META.json

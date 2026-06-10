@@ -1,3 +1,4 @@
+Changes
 cpanfile
 lib/Sub/Protected.pm
 LICENSE
@@ -12,6 +13,7 @@ t/bypass.t
 t/caller_integrity.t
 t/declarative.t
 t/edge_cases.t
+t/extended_tests.t
 t/function.t
 t/integration.t
 t/locales.t

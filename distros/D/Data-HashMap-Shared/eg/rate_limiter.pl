@@ -11,7 +11,7 @@ my $max_requests = 100;
 
 sub check_rate_limit {
     my ($ip) = @_;
-    shm_si_get_or_set $limits, $ip, 0;  # ensure key exists
+    # incr auto-creates a missing key at 0, so the first request returns 1
     my $count = shm_si_incr $limits, $ip;
     return $count <= $max_requests ? 1 : 0;
 }

@@ -2,7 +2,7 @@ package Data::HashMap::Shared::I32;
 use strict;
 use warnings;
 use Data::HashMap::Shared;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 sub import {
     $^H{"Data::HashMap::Shared::I32/shm_i32_put"}        = 1;
@@ -12,6 +12,8 @@ sub import {
     $^H{"Data::HashMap::Shared::I32/shm_i32_incr"}       = 1;
     $^H{"Data::HashMap::Shared::I32/shm_i32_decr"}       = 1;
     $^H{"Data::HashMap::Shared::I32/shm_i32_incr_by"}    = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_max"}        = 1;
+    $^H{"Data::HashMap::Shared::I32/shm_i32_min"}        = 1;
     $^H{"Data::HashMap::Shared::I32/shm_i32_size"}       = 1;
     $^H{"Data::HashMap::Shared::I32/shm_i32_keys"}       = 1;
     $^H{"Data::HashMap::Shared::I32/shm_i32_values"}     = 1;

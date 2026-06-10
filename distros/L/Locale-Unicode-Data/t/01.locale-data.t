@@ -5,7 +5,7 @@ BEGIN
     use warnings;
     use lib './lib';
     use open ':std' => ':utf8';
-    use vars qw( $DEBUG $CLDR_VERSION );
+    use vars qw( $AUTHOR_TESTING $DEBUG $CLDR_VERSION );
     use utf8;
     use version;
     use Config;
@@ -20,6 +20,7 @@ BEGIN
         plan skip_all => 'Weird memory bug out of my control on OpenBSD for v5.12.0 to 5';
     }
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
+    our $AUTHOR_TESTING = $DEBUG;  # Same thing, but different meaning
     our $CLDR_VERSION = '48.2';
 };
 
@@ -32,7 +33,18 @@ use strict;
 use warnings;
 use utf8;
 
+sub is_unbounded_array_scan
+{
+    my( $def ) = @_;
+
+    return(0) unless( ref( $def ) eq 'HASH' );
+    return(0) unless( exists( $def->{expect} ) && !ref( $def->{expect} ) && $def->{expect} eq 'array' );
+    return(0) unless( exists( $def->{args} ) && ref( $def->{args} ) eq 'ARRAY' );
+    return( scalar( @{$def->{args}} ) ? 0 : 1 );
+}
+
 my $cldr = Locale::Unicode::Data->new;
+# $cldr->database_handler->do( "PRAGMA cache_size = -65536" );
 isa_ok( $cldr, 'Locale::Unicode::Data' );
 
 # To generate this list:
@@ -2576,11 +2588,20 @@ foreach my $test_name ( sort( keys( %$tests ) ) )
         next;
     }
 
+    # Some unbounded CLDR scans are intentionally author-only: they validate the
+    # bundled database exhaustively, but are too I/O-heavy for slow CPAN Testers
+    # smokers.
     subtest $test_name => sub
     {
         my $test_data = $tests->{ $test_name };
         foreach my $def ( @$test_data )
         {
+            if( !$AUTHOR_TESTING && is_unbounded_array_scan( $def ) )
+            {
+                note( "Skipping unbounded $def->{method}() scan outside AUTHOR_TESTING" );
+                next;
+            }
+
             foreach my $param ( qw( method args expect ) )
             {
                 if( !exists( $def->{ $param } ) )

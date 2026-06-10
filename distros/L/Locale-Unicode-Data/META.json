@@ -69,6 +69,6 @@
          "web" : "https://gitlab.com/deguest/Locale-Unicode-Data"
       }
    },
-   "version" : "v1.8.5",
+   "version" : "v1.8.6",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

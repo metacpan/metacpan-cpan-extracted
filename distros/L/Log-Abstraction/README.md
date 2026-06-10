@@ -4,7 +4,7 @@ Log::Abstraction - Logging Abstraction Layer
 
 # VERSION
 
-0.31
+0.32
 
 # SYNOPSIS
 
@@ -163,6 +163,47 @@ not supplied.  Loads `Log::Log4perl` if no logger backend is specified.
                                               level name.  Use trace/debug/info/notice/
                                               warn/warning/error.
 
+### PSEUDOCODE
+
+    FUNCTION new(class_or_obj, args...)
+
+      Parse args:
+        IF single non-hash scalar
+        THEN store as logger shorthand
+        ELSE extract named params via Params::Get
+
+      IF config_file present:
+        CROAK if file is not readable
+        Load via Config::Abstraction, merge into args (constructor args win)
+        Restore caller-supplied array ref that config merge would have dropped
+
+      IF called on a blessed instance (clone form):
+        shallow-clone self merged with override args
+        validate and store new level integer if level given in args
+        deep-copy message history list
+        RETURN clone
+
+      IF syslog requested and script_name not supplied:
+        auto-detect script name via File::Basename
+        CROAK if still undefined
+
+      IF logger arg is a Log::Abstraction object:
+        CROAK (would create a needless forwarding loop)
+
+      IF no logger AND no file AND no array:
+        load Log::Log4perl, easy_init at DEBUG or ERROR per verbose flag
+        store Log4perl logger as the backend
+
+      Normalise and validate level:
+        IF level is an arrayref, take first element
+        lc() the level string
+        CROAK if not in syslog_values lookup
+        default to $DEFAULT_LEVEL if not supplied
+
+      RETURN bless { messages => [], merged args, level => numeric } as class
+
+    END FUNCTION
+
 ## level
 
     my $current = $logger->level();
@@ -216,6 +257,20 @@ When setting, updates `$self->{level}`.
     ----------------------------------------  ------------------------------------------
     "<class>: invalid syslog level '<l>'"     The supplied level name is not recognised.
                                               Use trace/debug/info/notice/warn/error.
+
+### PSEUDOCODE
+
+    FUNCTION level(self, level?)
+
+      IF level argument supplied:
+        CARP and RETURN undef if level is not a recognised syslog name
+        Store syslog_values{level} in self->{'level'}
+        RETURN self  (allows method chaining)
+
+      ELSE (getter mode):
+        RETURN self->{'level'}  (current numeric threshold)
+
+    END FUNCTION
 
 ## is\_debug
 

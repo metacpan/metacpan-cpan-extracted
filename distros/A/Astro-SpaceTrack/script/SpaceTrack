@@ -15,7 +15,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.181';
+our $VERSION = '0.182';
 
 use Astro::SpaceTrack qw{shell};
 use Getopt::Long 2.39;
@@ -88,12 +88,12 @@ module.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III (F<wyant at cpan dot org>).
+Thomas R. Wyant, III (F<harryfmudd at comcast dot net>).
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2005-2006, 2010-2026 by Thomas R. Wyant, III
-(F<wyant at cpan dot org>).
+(F<harryfmudd at comcast dot net>).
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

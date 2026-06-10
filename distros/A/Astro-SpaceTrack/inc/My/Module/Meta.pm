@@ -26,7 +26,7 @@ sub add_to_cleanup {
 }
 
 sub author {
-    return 'Tom Wyant (wyant at cpan dot org)';
+    return 'Tom Wyant (harryfmudd at comcast dot net)';
 }
 
 sub build_requires {
@@ -59,7 +59,6 @@ sub distribution {
     return $self->{distribution};
 }
 
-
 sub license {
     return 'perl';
 }
@@ -73,9 +72,8 @@ sub meta_merge {
 	dynamic_config	=> 1,
 	resources	=> {
 	    bugtracker	=> {
-		web	=> 'https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SpaceTrack',
-		# web	=> 'https://github.com/trwyant/perl-Astro-SpaceTrack/issues',
-		mailto  => 'wyant@cpan.org',
+		web	=> 'https://github.com/trwyant/perl-Astro-SpaceTrack/issues',
+		mailto  => 'harryfmudd@comcast.net',
 	    },
 	    license	=> 'http://dev.perl.org/licenses/',
 	    repository	=> {
@@ -87,7 +85,6 @@ sub meta_merge {
 	@extra,
     };
 }
-
 
 sub module_name {
     return 'Astro::SpaceTrack';
@@ -218,7 +215,6 @@ sub requires {
 sub requires_perl {
     return 5.006002;
 }
-
 
 sub script_files {
     return [
@@ -389,7 +385,6 @@ distribution's version is to be derived.
 
 This class has no public attributes.
 
-
 =head1 ENVIRONMENT
 
 =head2 MAKING_MODULE_DISTRIBUTION
@@ -398,17 +393,15 @@ This environment variable should be set to a true value if you are
 making a distribution. This ensures that no configuration-specific
 information makes it into F<META.yml>.
 
-
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SpaceTrack>,
-L<https://github.com/trwyant/perl-Astro-SpaceTrack/issues/>, or in
+L<https://github.com/trwyant/perl-Astro-SpaceTrack/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III F<wyant at cpan dot org>
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT AND LICENSE
 

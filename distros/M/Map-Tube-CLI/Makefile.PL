@@ -27,18 +27,26 @@ WriteMakefile(
         'Moo'                  => '2.000000',
         'namespace::autoclean' => '0.28',
         'MIME::Base64'         => '3.14',
-        'Map::Tube::Exception' => '3.24',
+        'Map::Tube::Exception' => '3.25',
         'Map::Tube'            => '4.10',
         'Carp'                 => 0,
         'Path::Tiny'           => 0,
         'Encode::Locale'       => '1.05',
         'Text::ASCIITable'     => '0.22',
+        'Try::Tiny'            => 0,
         'utf8::all'            => '0.024',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Map-Tube-CLI-*' },
     (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
         'meta-spec' => { version => 2 },
+        prereqs => {
+            runtime => {
+                recommends => {
+                    'Unicode::Collate' => '0',
+                },
+            },
+        },
         provides    => {
             'Map::Tube::CLI' => {
                 file    => 'lib/Map/Tube/CLI.pm',

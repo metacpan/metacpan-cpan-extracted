@@ -2,7 +2,7 @@ package Zuzu::Module::String;
 
 use utf8;
 
-our $VERSION = '0.002000';
+our $VERSION = '0.003000';
 
 our %REGEXP_CACHE;
 our %SPLIT_LITERAL_CACHE;

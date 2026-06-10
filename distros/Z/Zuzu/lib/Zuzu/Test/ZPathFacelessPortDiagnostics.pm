@@ -3,7 +3,7 @@ package Zuzu::Test::ZPathFacelessPortDiagnostics;
 use strict;
 use warnings;
 
-our $VERSION = '0.002000';
+our $VERSION = '0.003000';
 
 use Exporter qw( import );
 

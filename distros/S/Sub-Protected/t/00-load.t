@@ -6,6 +6,7 @@ use Test::Most;
 # Note: use_ok loads the module at runtime (past CHECK), which triggers
 # "Too late to run CHECK block" -- that is expected and harmless here
 # because this file does not exercise the declarative import form.
+diag('Ignore the "Too late to run CHECK block" message');
 use_ok 'Sub::Protected';
 
 ok defined(&Sub::Protected::_wrap),         '_wrap is defined';
@@ -57,4 +58,4 @@ lives_ok { Sub::Protected->import() }
 	ok ref($wrapped) eq 'CODE', '_wrap returns a CODE ref when bypassed';
 }
 
-done_testing;
+done_testing();

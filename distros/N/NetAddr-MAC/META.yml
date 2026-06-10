@@ -8,6 +8,7 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Module::Build: '0.28'
+  Test::Exception: '0'
   Test::More: '0'
   Test::Trap: '0'
   perl: v5.10.0
@@ -16,7 +17,7 @@ configure_requires:
   Module::Build: '0.28'
   perl: v5.10.0
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
 license: mit
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -38,7 +39,7 @@ resources:
   bugtracker: https://github.com/djzort/NetAddr-MAC/issues
   homepage: https://github.com/djzort/NetAddr-MAC
   repository: https://github.com/djzort/NetAddr-MAC.git
-version: '1.00'
+version: '1.01'
 x_author_pledge:
   version: 1
 x_contributors:

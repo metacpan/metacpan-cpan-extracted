@@ -22,6 +22,8 @@ lib/Time/Str/Regexp.pm
 lib/Time/Str/Regexp.pod
 lib/Time/Str/Time.pm
 lib/Time/Str/Time.pod
+lib/Time/Str/TimeZone.pm
+lib/Time/Str/TimeZone.pod
 lib/Time/Str/Token.pm
 lib/Time/Str/Token.pod
 lib/Time/Str/Util.pm
@@ -63,6 +65,7 @@ t/module/Regexp.t
 t/module/TZif-POSIX.t
 t/module/TZif.t
 t/module/Time.t
+t/module/TimeZone.t
 t/module/Token.t
 t/module/Util.t
 t/timezone.t

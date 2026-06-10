@@ -92,7 +92,7 @@ use constant NULL_REF	=> ref NULL;
 
 use constant SUN_CLASS_DEFAULT	=> 'Astro::Coord::ECI::Sun';
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 # The following 'cute' code is so that we do not determine whether we
 # actually have optional modules until we really need them, and yet do
@@ -3352,6 +3352,48 @@ sub source : Verb( optional! ) {
 
 {
 
+    use constant _FORMAT_NONE		=> undef;	# Must be undef
+    use constant _FORMAT_DEFAULT	=> 'json';	# Must be defined
+
+    my %default_format = (
+	new		=> _FORMAT_NONE,
+	amsat		=> _FORMAT_NONE,
+	attribute_names	=> _FORMAT_NONE,
+	banner		=> _FORMAT_NONE,
+	box_score	=> _FORMAT_DEFAULT,
+	celestrak	=> _FORMAT_DEFAULT,
+	celestrak_supplemental	=> _FORMAT_DEFAULT,
+	cache_hit	=> _FORMAT_NONE,
+	content_source	=> _FORMAT_NONE,
+	content_type	=> _FORMAT_NONE,
+	content_interface	=> _FORMAT_NONE,
+	country_names	=> _FORMAT_DEFAULT,
+	favorite	=> _FORMAT_DEFAULT,
+	file		=> _FORMAT_DEFAULT,
+	get		=> _FORMAT_NONE,
+	getv		=> _FORMAT_NONE,
+	help		=> _FORMAT_NONE,
+	iridium_status	=> _FORMAT_NONE,
+	launch_sites	=> _FORMAT_DEFAULT,
+	login		=> _FORMAT_NONE,
+	logout		=> _FORMAT_NONE,
+	mccants		=> _FORMAT_NONE,
+	names		=> _FORMAT_NONE,	# ??
+	retrieve	=> _FORMAT_DEFAULT,
+	search_date	=> _FORMAT_DEFAULT,
+	search_decay	=> _FORMAT_DEFAULT,
+	search_id	=> _FORMAT_DEFAULT,
+	search_name	=> _FORMAT_DEFAULT,
+	search_oid	=> _FORMAT_DEFAULT,
+	set		=> _FORMAT_NONE,
+	shell		=> _FORMAT_NONE,
+	source		=> _FORMAT_NONE,
+	spacetrack	=> _FORMAT_DEFAULT,
+	spacetrack_query_v2	=> _FORMAT_DEFAULT,
+	update		=> _FORMAT_DEFAULT,
+	flush_identity_cache	=> _FORMAT_NONE,
+    );
+
     my %handler = (
 	config	=> sub {
 	    my ( $self, $obj, undef, $opt, @args ) = @_;	# $method unused
@@ -3391,6 +3433,11 @@ sub source : Verb( optional! ) {
 		    qw{ spacetrack set }, $args[0], $rslt->content() ) );
 	    return $rslt;
 	},
+	mccants	=> sub {
+	    my ( undef, $obj, undef, $opt, @args ) = @_;	# Invocant, $method unused
+	    delete $opt->{format};	# You get what he gives you
+	    return $obj->mccants( @args );
+	},
 	set	=> sub {
 	    my ( undef, $obj, $method, undef, @args ) = @_;	# Invocant, $opt unused
 	    return $obj->$method( @args );
@@ -3404,7 +3451,7 @@ sub source : Verb( optional! ) {
 
     # Attributes must all be on one line to process correctly under
     # 5.8.8.
-    sub spacetrack : Verb( all! changes! descending! effective! end_epoch=s exclude=s last5! raw! rcs! status=s sort=s start_epoch=s tle! verbose! ) {
+    sub spacetrack : Verb( all! changes! descending! effective! end_epoch=s exclude=s format=s last5! raw! rcs! status=s sort=s start_epoch=s tle! verbose! ) {
 	my ( $self, $opt, $method, @args ) = __arguments( @_ );
 
 	exists $opt->{raw}
@@ -3423,6 +3470,15 @@ sub source : Verb( optional! ) {
 	$opt->{end_epoch}
 	    and $opt->{end_epoch} = $self->__parse_time(
 		$opt->{end_epoch} );
+
+	if ( defined( my $df = $default_format{$method} ) ) {
+	    defined $opt->{format}
+		or $opt->{format} = $df;
+	} else {
+	    # FIXME I would prefer to error out here, but not sure I
+	    # can.
+	    delete $opt->{format};
+	}
 
 	my ( $rslt, @rest );
        	if ( $handler{$method} ) {
@@ -3662,7 +3718,7 @@ sub version : Verb() {
 
 @{[__PACKAGE__]} $VERSION - Satellite pass predictor
 based on Astro::Coord::ECI @{[Astro::Coord::ECI->VERSION]}
-Copyright (C) 2009-2025 by Thomas R. Wyant, III
+Copyright (C) 2009-2026 by Thomas R. Wyant, III
 
 EOD
 }
@@ -4104,7 +4160,6 @@ sub _file_reader__encoding {
 	and substr $encoding, 0, 0, ':crlf';
     return $encoding;
 }
-
 
 sub _file_reader__validate_url {
     my ( undef, $url ) = @_;		# Invocant unused
@@ -5463,6 +5518,7 @@ EOD
 
 sub _templates_to_options {
     my ( $self, $name, $opt ) = @_;
+
     $opt->{_template} = $name;
     my $code = sub {
 	my ( $opt_name, $opt_value ) = @_;
@@ -5471,14 +5527,24 @@ sub _templates_to_options {
     };
     my $re = qr< \A \Q$name\E _ ( \w+ ) \z >smx;
     my @rslt;
+    my %valid_format;
     my $fmtr = $self->get( 'formatter' );
     if ( $fmtr->can( '__list_templates' ) ) {
 	foreach ( $fmtr->__list_templates() ) {
 	    $_ =~ $re
 		or next;
+	    $valid_format{$1} = 1;
 	    push @rslt, "$1!", $code;
 	}
     }
+    @rslt
+	and push @rslt, 'format=s', sub {
+	my ( undef, $opt_value ) = @_;
+	$valid_format{$opt_value}
+	    or $self->wail( "Invalid format '$opt_value'" );
+	$opt->{_template} = "${name}_$opt_value";
+	return;
+    };
     return @rslt;
 }
 
@@ -7991,6 +8057,20 @@ the default. It can be negated by prefixing C<no>.
 
 The default is C<-nochanges>.
 
+=item -format
+
+ -format json
+
+This option specifies the data format to be downloaded. This needs to be
+something both supported by the source and able to be parsed by
+L<Astro::Coord::ECI::TLE|Astro::Coord::ECI::TLE>. In practice, it is
+either C<tle> or C<json>.
+
+The default is currently C<tle> for historical reasons, but C<json> is
+preferred because C<tle> does not support OIDs greater than C<69999>,
+which will probably be reached some time in July 2026. This will be
+ignored unless the source supports it.
+
 =item -raw
 
 This option causes the method to return whatever the underlying method
@@ -8194,6 +8274,10 @@ C<'tle_json'> to format the TLE.
 The template selector options can be negated by prefixing C<'no'> to the
 option name (e.g. C<-noverbose>). Negating the option specifies template
 C<'tle'>, the default.
+
+You can also specify template C<tle_*> by specifying C<-format *>, where
+the C<*> is understood as the part of the format name after the initial
+C<tle_>.
 
 If more than one template selector option is specified, the rightmost
 one riles. For example, given template C<'tle_json'>,
@@ -9792,21 +9876,20 @@ in its default location.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-App-Satpass2>,
-L<https://github.com/trwyant/perl-Astro-App-Satpass2/issues>, or in
+L<https://github.com/trwyant/perl-Astro-App-Satpass2/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III (F<wyant at cpan dot org>)
+Thomas R. Wyant, III (F<harryfmudd at comcast dot net>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2025 by Thomas R. Wyant, III
+Copyright (C) 2009-2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

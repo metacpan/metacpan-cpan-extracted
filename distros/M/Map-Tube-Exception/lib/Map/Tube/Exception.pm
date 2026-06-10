@@ -1,13 +1,13 @@
 package Map::Tube::Exception;
 $Map::Tube::Exception::AUTHORITY = 'cpan:MANWAR';
-$Map::Tube::Exception::VERSION = '3.24';
+$Map::Tube::Exception::VERSION = '3.25';
 =head1 NAME
 
 Map::Tube::Exception - Base exception package as Moo Role for Map::Tube::* family.
 
 =head1 VERSION
 
-version 3.24
+version 3.25
 
 =cut
 
@@ -80,6 +80,7 @@ Map::Tube and it's Map::Tube::* family. It has been re-structured in the process
     |     131     | Invalid color name.                                         |
     |     132     | Invalid station line id.                                    |
     |     133     | Route not found.                                            |
+    |     134     | Missing map name.                                           |
     +-------------+-------------------------------------------------------------+
 
 =head1 AUTHOR
@@ -122,7 +123,7 @@ L<https://metacpan.org/dist/Map-Tube-Exception/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2015 - 2024 Mohammad Sajid Anwar.
+Copyright (C) 2015 - 2026 Mohammad Sajid Anwar.
 
 This  program  is  free software; you can redistribute it and/or  modify it under
 the  terms  of the the Artistic License (2.0).  You may obtain a copy of the full

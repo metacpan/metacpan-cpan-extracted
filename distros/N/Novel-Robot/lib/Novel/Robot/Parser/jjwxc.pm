@@ -24,14 +24,14 @@ sub base_url { 'https://www.jjwxc.net' }
 sub domain { 'jjwxc.net' }
 
 sub generate_novel_url {
-  my ( $self, $index_url ) = @_;
+  my ( $self, $index_url, @args ) = @_;
   my ( $novelid ) = $index_url =~ m#novelid=(\d+)#;
   my $u = $novelid ? "https://m.jjwxc.net/book2/$novelid?more=0&whole=1" : $index_url;
   return $u;
 }
 
 sub parse_novel {
-  my ( $self, $h , $r) = @_;
+  my ( $self, $h, $r) = @_;
   $$h =~ s#本书霸王票读者排行.*##s;
 
   my ($title)= $$h=~m#<title>(.+?)<\/title>#s;

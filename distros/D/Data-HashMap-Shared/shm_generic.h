@@ -56,7 +56,7 @@
 /* ---- Constants ---- */
 
 #define SHM_MAGIC       0x53484D31U  /* "SHM1" */
-#define SHM_VERSION     9
+#define SHM_VERSION     9U
 #define SHM_READER_SLOTS 1024  /* max concurrent reader processes for dead-process recovery */
 #define SHM_INITIAL_CAP 16
 #define SHM_MAX_STR_LEN 0x3FFFFFFFU  /* ~1GB, bit 30 reserved for inline flag */
@@ -385,6 +385,12 @@ static inline void shm_rwlock_spin_pause(void) {
 #define SHM_RWLOCK_WR(pid)    (SHM_RWLOCK_WRITER_BIT | ((uint32_t)(pid) & SHM_RWLOCK_PID_MASK))
 
 /* Check if a PID is alive. Returns 1 if alive or unknown, 0 if definitely dead. */
+/* Liveness via kill(pid,0). NOTE: cannot detect PID reuse — if a dead
+ * lock-holder's PID is recycled to an unrelated live process before recovery
+ * runs, this reports "alive" and that slot's orphaned contribution is not
+ * reclaimed until the recycled process exits. Robust detection would require
+ * a per-slot process-start-time epoch (a header-layout/SHM_VERSION change).
+ * Documented under "Crash Safety" in the POD. */
 static inline int shm_pid_alive(uint32_t pid) {
     if (pid == 0) return 1; /* no owner recorded, assume alive */
     return !(kill((pid_t)pid, 0) == -1 && errno == ESRCH);
@@ -864,6 +870,16 @@ static inline uint32_t shm_next_pow2(uint32_t v) {
     return v + 1;
 }
 
+/* Largest power-of-2 table capacity for a given max_entries.
+ * Cap at 2^31 (largest power-of-2 table the design supports) before
+ * next_pow2: a huge max_entries would otherwise overflow the uint32
+ * cast or make next_pow2 return 0, silently yielding a tiny table. */
+static inline uint32_t shm_max_tcap_from_entries(uint32_t max_entries) {
+    uint64_t want = (uint64_t)max_entries * 4 / 3 + 1;
+    uint32_t cap = (want > 0x80000000ULL) ? 0x80000000U : shm_next_pow2((uint32_t)want);
+    return cap < SHM_INITIAL_CAP ? SHM_INITIAL_CAP : cap;
+}
+
 /* Convert lru_skip percentage (0-99) to power-of-2 mask used by lru_promote.
  * skip=50→mask=1 (every 2nd), 75→3 (every 4th), 90→15 (every 16th),
  * 95→31 (every 32nd).  Values outside 1..99 disable skipping (mask=0). */
@@ -1227,13 +1243,7 @@ static ShmHandle *shm_create_map(const char *path, uint32_t max_entries,
                                   uint32_t default_ttl, uint32_t lru_skip,
                                   char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
-    /* Cap at 2^31 (largest power-of-2 table the design supports) before
-     * next_pow2: a huge max_entries would otherwise overflow the uint32
-     * cast or make next_pow2 return 0, silently yielding a tiny table. */
-    uint64_t max_tcap_want = (uint64_t)max_entries * 4 / 3 + 1;
-    uint32_t max_tcap = (max_tcap_want > 0x80000000ULL)
-        ? 0x80000000U : shm_next_pow2((uint32_t)max_tcap_want);
-    if (max_tcap < SHM_INITIAL_CAP) max_tcap = SHM_INITIAL_CAP;
+    uint32_t max_tcap = shm_max_tcap_from_entries(max_entries);
 
     int has_lru = (max_size > 0);
     int has_ttl = (default_ttl > 0);
@@ -1255,10 +1265,13 @@ static ShmHandle *shm_create_map(const char *path, uint32_t max_entries,
         if (base == MAP_FAILED) { SHM_ERR("mmap(anon): %s", strerror(errno)); return NULL; }
         is_new = 1;
     } else {
-        fd = open(path, O_RDWR | O_CREAT, 0666);
+        fd = open(path, O_RDWR | O_CREAT | O_CLOEXEC, 0666);
         if (fd < 0) { SHM_ERR("open(%s): %s", path, strerror(errno)); return NULL; }
 
-        if (flock(fd, LOCK_EX) < 0) { SHM_ERR("flock(%s): %s", path, strerror(errno)); close(fd); return NULL; }
+        while (flock(fd, LOCK_EX) < 0) {
+            if (errno == EINTR) continue;  /* retry: a signal interrupted the blocking lock */
+            SHM_ERR("flock(%s): %s", path, strerror(errno)); close(fd); return NULL;
+        }
 
         if (fstat(fd, &st) < 0) { SHM_ERR("fstat(%s): %s", path, strerror(errno)); flock(fd, LOCK_UN); close(fd); return NULL; }
 
@@ -1320,13 +1333,7 @@ static ShmHandle *shm_create_memfd(const char *name, uint32_t max_entries,
                                     char *errbuf) {
     if (errbuf) errbuf[0] = '\0';
 
-    /* Cap at 2^31 (largest power-of-2 table the design supports) before
-     * next_pow2: a huge max_entries would otherwise overflow the uint32
-     * cast or make next_pow2 return 0, silently yielding a tiny table. */
-    uint64_t max_tcap_want = (uint64_t)max_entries * 4 / 3 + 1;
-    uint32_t max_tcap = (max_tcap_want > 0x80000000ULL)
-        ? 0x80000000U : shm_next_pow2((uint32_t)max_tcap_want);
-    if (max_tcap < SHM_INITIAL_CAP) max_tcap = SHM_INITIAL_CAP;
+    uint32_t max_tcap = shm_max_tcap_from_entries(max_entries);
     int has_lru = (max_size > 0);
     int has_ttl = (default_ttl > 0);
 
@@ -1407,14 +1414,19 @@ static inline int shm_msync(ShmHandle *h) {
     if (!h) return 0;
     if (h->shard_handles) {
         for (uint32_t i = 0; i < h->num_shards; i++) {
-            int rc = msync(h->shard_handles[i]->hdr,
-                           h->shard_handles[i]->mmap_size, MS_SYNC);
+            int rc;
+            do { rc = msync(h->shard_handles[i]->hdr,
+                            h->shard_handles[i]->mmap_size, MS_SYNC); }
+            while (rc != 0 && errno == EINTR);  /* retry on signal interruption */
             if (rc != 0) return rc;
         }
         return 0;
     }
     if (!h->hdr) return 0;
-    return msync(h->hdr, h->mmap_size, MS_SYNC);
+    int rc;
+    do { rc = msync(h->hdr, h->mmap_size, MS_SYNC); }
+    while (rc != 0 && errno == EINTR);
+    return rc;
 }
 
 static void shm_close_map(ShmHandle *h) {
@@ -3635,7 +3647,12 @@ static SHM_VAL_INT_TYPE SHM_FN(incr_by)(ShmHandle *h,
     SHM_NODE_TYPE *nodes = (SHM_NODE_TYPE *)h->nodes;
     uint32_t now = h->expires_at ? shm_now() : 0;
 
-    /* fast path: existing key under read lock + atomic add (no LRU/TTL) */
+    /* fast path: existing key under read lock + atomic add (no LRU/TTL).
+     * No seqlock bump is needed here: only the single `value` word changes, and
+     * a concurrent get() reads it with one atomic load, so per-location coherence
+     * hands it old-or-new (never torn) on every arch including aarch64. The
+     * seqlock exists to guard multi-field snapshots against structural writers
+     * (resize / key-replace / expire); this path touches neither key nor state. */
     if (!h->lru_prev && !h->expires_at) {
         shm_rwlock_rdlock(h);
         uint32_t idx;
@@ -3742,6 +3759,149 @@ static SHM_VAL_INT_TYPE SHM_FN(incr_by)(ShmHandle *h,
     shm_rwlock_wrunlock(h);
     *ok = 1;
     return delta;
+}
+
+/* ---- Atomic max / min (monotonic raise/lower; insert-if-absent) ---- */
+/* want_max != 0: store max(current, desired); else min(current, desired).
+ * Returns the resulting stored value; an absent key inserts `desired`. The
+ * compare-and-set happens under a single lock acquisition, so there is no
+ * read->modify gap for a concurrent incr_by / cas / max / min to slip into. */
+static SHM_VAL_INT_TYPE SHM_FN(set_minmax)(ShmHandle *h,
+#ifdef SHM_KEY_IS_INT
+    SHM_KEY_INT_TYPE key,
+#else
+    const char *key_str, uint32_t key_len, bool key_utf8,
+#endif
+    SHM_VAL_INT_TYPE desired, int want_max, int *ok) {
+#ifdef SHM_KEY_IS_INT
+    SHM_SHARD_DISPATCH(h, key);
+#else
+    SHM_SHARD_DISPATCH(h, key_str, key_len);
+#endif
+    ShmHeader *hdr = h->hdr;
+    SHM_NODE_TYPE *nodes = (SHM_NODE_TYPE *)h->nodes;
+    uint32_t now = h->expires_at ? shm_now() : 0;
+
+    /* fast path: existing key under read lock + atomic compare-and-set loop
+       (no LRU/TTL). The common "already past the bound" case returns read-only,
+       writing nothing. No seqlock bump needed (see incr_by): only the single
+       `value` word changes, read atomically by get(); key/state are untouched. */
+    if (!h->lru_prev && !h->expires_at) {
+        shm_rwlock_rdlock(h);
+        uint32_t idx;
+#ifdef SHM_KEY_IS_INT
+        if (SHM_FN(find_slot)(h, key, &idx)) {
+#else
+        if (SHM_FN(find_slot)(h, key_str, key_len, key_utf8, &idx)) {
+#endif
+            SHM_VAL_INT_TYPE cur = __atomic_load_n(&nodes[idx].value, __ATOMIC_ACQUIRE);
+            while (want_max ? (desired > cur) : (desired < cur)) {
+                /* on failure __atomic_compare_exchange_n reloads cur, so a
+                   concurrent raise/lower is observed and the loop re-checks */
+                if (__atomic_compare_exchange_n(&nodes[idx].value, &cur, desired,
+                        0, __ATOMIC_ACQ_REL, __ATOMIC_ACQUIRE)) {
+                    cur = desired;
+                    break;
+                }
+            }
+            shm_rwlock_rdunlock(h);
+            *ok = 1;
+            return cur;
+        }
+        shm_rwlock_rdunlock(h);
+    }
+
+    /* slow path: find-or-insert under write lock (handles LRU/TTL like incr_by) */
+    shm_rwlock_wrlock(h);
+    shm_seqlock_write_begin(&hdr->seq);
+
+    SHM_FN(maybe_grow)(h);
+    uint32_t mask = hdr->table_cap - 1;
+#ifdef SHM_KEY_IS_INT
+    uint32_t hash = SHM_HASH_KEY(key);
+#else
+    uint32_t hash = SHM_HASH_KEY_STR(key_str, key_len);
+#endif
+    uint32_t pos = hash & mask;
+    uint32_t insert_pos = UINT32_MAX;
+
+    uint8_t tag = SHM_MAKE_TAG(hash);
+    for (uint32_t i = 0; i <= mask; i++) {
+        uint32_t slot = (pos + i) & mask;
+        uint8_t st = h->states[slot];
+        __builtin_prefetch(&nodes[slot], 0, 1);
+        __builtin_prefetch(&nodes[(slot + 1) & mask], 0, 1);
+        if (st == SHM_EMPTY) {
+            if (insert_pos == UINT32_MAX) insert_pos = slot;
+            break;
+        }
+        if (st == SHM_TOMBSTONE) {
+            if (insert_pos == UINT32_MAX) insert_pos = slot;
+            continue;
+        }
+        if (st != tag) continue;
+#ifdef SHM_KEY_IS_INT
+        if (SHM_KEY_EQ(&nodes[slot], key)) {
+#else
+        if (SHM_KEY_EQ_STR(&nodes[slot], h->arena, key_str, key_len, key_utf8)) {
+#endif
+            if (SHM_IS_EXPIRED(h, slot, now)) {
+                SHM_FN(expire_at)(h, slot);
+                /* treat as not found — will insert below */
+                if (insert_pos == UINT32_MAX) insert_pos = slot;
+                break;
+            }
+
+            SHM_VAL_INT_TYPE cur = nodes[slot].value;
+            SHM_VAL_INT_TYPE result =
+                want_max ? (desired > cur ? desired : cur)
+                         : (desired < cur ? desired : cur);
+            nodes[slot].value = result;
+            if (h->lru_prev) shm_lru_promote(h, slot);
+            if (h->expires_at && hdr->default_ttl > 0 && h->expires_at[slot] != 0)
+                h->expires_at[slot] = shm_expiry_ts(hdr->default_ttl);
+            shm_seqlock_write_end(&hdr->seq);
+            shm_rwlock_wrunlock(h);
+            *ok = 1;
+            return result;
+        }
+    }
+
+    if (insert_pos == UINT32_MAX) {
+        shm_seqlock_write_end(&hdr->seq);
+        shm_rwlock_wrunlock(h);
+        *ok = 0;
+        return 0;
+    }
+
+    /* LRU eviction only when actually inserting */
+    if (hdr->max_size > 0 && hdr->size >= hdr->max_size)
+        SHM_FN(lru_evict_one)(h);
+
+    int was_tombstone = (h->states[insert_pos] == SHM_TOMBSTONE);
+#ifdef SHM_KEY_IS_INT
+    nodes[insert_pos].key = key;
+#else
+    if (!shm_str_store(hdr, h->arena, &nodes[insert_pos].key_off, &nodes[insert_pos].key_len, key_str, key_len, key_utf8)) {
+        shm_seqlock_write_end(&hdr->seq);
+        shm_rwlock_wrunlock(h);
+        *ok = 0;
+        return 0;
+    }
+#endif
+    nodes[insert_pos].value = desired;
+    h->states[insert_pos] = SHM_MAKE_TAG(hash);
+    hdr->size++;
+    if (was_tombstone) hdr->tombstones--;
+
+    if (h->lru_prev) shm_lru_push_front(h, insert_pos);
+    if (h->expires_at && hdr->default_ttl > 0)
+        h->expires_at[insert_pos] = shm_expiry_ts(hdr->default_ttl);
+
+    shm_seqlock_write_end(&hdr->seq);
+    shm_rwlock_wrunlock(h);
+    *ok = 1;
+    return desired;
 }
 
 /* ---- Compare-and-swap (atomic, integer-value variants) ---- */
@@ -3918,14 +4078,25 @@ static inline uint32_t SHM_FN(size)(ShmHandle *h) {
 /* ---- Max entries ---- */
 
 static inline uint32_t SHM_FN(max_entries)(ShmHandle *h) {
-    if (h->shard_handles) return SHM_FN(max_entries)(h->shard_handles[0]);
-    return h->hdr->max_table_cap * 3 / 4;
+    if (h->shard_handles) {
+        uint64_t total = 0;
+        for (uint32_t i = 0; i < h->num_shards; i++)
+            total += SHM_FN(max_entries)(h->shard_handles[i]);
+        return (uint32_t)(total > UINT32_MAX ? UINT32_MAX : total);
+    }
+    /* cast first: max_table_cap can be 2^31, where *3 would overflow uint32 */
+    return (uint32_t)((uint64_t)h->hdr->max_table_cap * 3 / 4);
 }
 
 /* ---- Accessors ---- */
 
 static inline uint32_t SHM_FN(max_size)(ShmHandle *h) {
-    if (h->shard_handles) return SHM_FN(max_size)(h->shard_handles[0]);
+    if (h->shard_handles) {
+        uint64_t total = 0;
+        for (uint32_t i = 0; i < h->num_shards; i++)
+            total += SHM_FN(max_size)(h->shard_handles[i]);
+        return (uint32_t)(total > UINT32_MAX ? UINT32_MAX : total);
+    }
     return h->hdr->max_size;
 }
 
@@ -4007,6 +4178,9 @@ static int SHM_FN(get_with_ttl)(ShmHandle *h,
 #else
             *out_value = nodes[idx].value;
 #endif
+            /* count as an access for LRU second-chance, like get() does */
+            if (h->lru_accessed)
+                __atomic_store_n(&h->lru_accessed[idx], 1, __ATOMIC_RELAXED);
             if (out_ttl_remaining) {
                 if (!h->expires_at) *out_ttl_remaining = -1;
                 else if (h->expires_at[idx] == 0) *out_ttl_remaining = 0;
@@ -4240,7 +4414,12 @@ static inline uint32_t SHM_FN(tombstones)(ShmHandle *h) {
 }
 
 static inline size_t SHM_FN(mmap_size)(ShmHandle *h) {
-    if (h->shard_handles) return SHM_FN(mmap_size)(h->shard_handles[0]);
+    if (h->shard_handles) {
+        size_t total = 0;
+        for (uint32_t i = 0; i < h->num_shards; i++)
+            total += SHM_FN(mmap_size)(h->shard_handles[i]);
+        return total;
+    }
     return h->mmap_size;
 }
 

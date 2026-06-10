@@ -1,3 +1,12 @@
+0.182		2026-06-10	T. R. Wyant
+    Add Celestrak primary catalog 'sar', Synthetic Aperture Radar.
+
+    Remove references to the RT bug tracking system.
+
+    Replace wyant@cpan.org with harryfmudd@comcast.net.
+
+    Add EUMETSAT to Celestrack supplemental data.
+
 0.181		2026-04-23	T. R. Wyant
     Drop Celestrak catalogs 'musson', 'nnss', and 'other' because they
     were dropped from the Celestrak web site itself on or about April 16
@@ -209,10 +218,6 @@
     observing list.
 
     Use https: for Celestrak.
-
-commit 64bce81410add91be6b014cda3b39cd8b18871a2
-Author: Tom Wyant <wyant@cpan.org>
-Date:   Tue Nov 16 10:48:11 2021 -0500
 
     Add file CONTRIBUTING
 

@@ -1,0 +1,130 @@
+from std/eval import eval;
+from test/more import *;
+
+function assert_rejects ( String source, String name ) {
+	let err := exception( function () {
+		eval(source);
+	} );
+	isnt( err, null, name );
+}
+
+class DotCallBox {
+	let items_data := [ 1, 2 ];
+	let options_data := { key: 1, "my key": 2 };
+
+	method value () {
+		return 7;
+	}
+
+	static method static_value () {
+		return 9;
+	}
+
+	method items () {
+		return items_data;
+	}
+
+	method options () {
+		return options_data;
+	}
+}
+
+let object := new DotCallBox();
+
+is( object.value, 7, "dot name without parens calls object method" );
+is( DotCallBox.static_value, 9, "dot name without parens calls static method" );
+
+object.items()[0] := 42;
+is( object.items()[0], 42, "method-call result can be indexed and assigned" );
+
+object.options{key} := 3;
+is( object.options{key}, 3, "method-call result can be keyed and assigned" );
+
+function shared_options () {
+	return object.options;
+}
+
+shared_options(){"my key"} := 99;
+is(
+	object.options{"my key"},
+	99,
+	"function-call result can be keyed and assigned",
+);
+
+assert_rejects(
+	"""class Bad { let hidden := 1; }
+let object := new Bad();
+let got := object.hidden;""",
+	"dot name without a method does not read an object field",
+);
+assert_rejects(
+	"""class Bad;
+let got := Bad.missing;""",
+	"dot name without a static method does not read a class property",
+);
+assert_rejects(
+	"""class Bad { method value () { return 1; } }
+let object := new Bad();
+object.value := 2;""",
+	"direct assignment to dot method call is rejected",
+);
+assert_rejects(
+	"""class Bad { method value () { return 1; } }
+let object := new Bad();
+object.value() := 2;""",
+	"direct assignment to explicit method call is rejected",
+);
+assert_rejects(
+	"""function value () { return 1; }
+value() := 2;""",
+	"direct assignment to function call is rejected",
+);
+assert_rejects(
+	"""class Bad { method value () { return 1; } }
+let object := new Bad();
+object.value += 2;""",
+	"compound assignment to dot method call is rejected",
+);
+assert_rejects(
+	"""class Bad { method value () { return "a"; } }
+let object := new Bad();
+object.value _= "b";""",
+	"string assignment to dot method call is rejected",
+);
+assert_rejects(
+	"""class Bad { method value () { return 1; } }
+let object := new Bad();
+++object.value;""",
+	"prefix increment of dot method call is rejected",
+);
+assert_rejects(
+	"""class Bad { method value () { return 1; } }
+let object := new Bad();
+object.value++;""",
+	"postfix increment of dot method call is rejected",
+);
+assert_rejects(
+	"""class Bad { method value () { return 1; } }
+let object := new Bad();
+--object.value;""",
+	"prefix decrement of dot method call is rejected",
+);
+assert_rejects(
+	"""class Bad { method value () { return 1; } }
+let object := new Bad();
+object.value--;""",
+	"postfix decrement of dot method call is rejected",
+);
+assert_rejects(
+	"""class Bad { method value () { return 1; } }
+let object := new Bad();
+object.value() += 2;""",
+	"compound assignment to explicit method call is rejected",
+);
+assert_rejects(
+	"""function value () { return 1; }
+value()++;""",
+	"postfix increment of function call is rejected",
+);
+
+done_testing();

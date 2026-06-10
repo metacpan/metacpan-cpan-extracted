@@ -1,3 +1,25 @@
+0.032     2026-06-09 23:53:57-07:00 America/Los_Angeles
+
+    - _get_from_buffer() no longer drops its parameters, so the eof_invalid guards actually fire: a message truncated by EOF now throws instead of being mistaken for a clean EOF.
+    - read_message() on a message whose payload is cut short by EOF now throws instead of returning undef (silent data loss).
+    - get_line_burst_or_data() no longer spins forever at 100% CPU inside a single call when a message is truncated by EOF (it throws) or still in flight on a non-blocking pipe (it returns empty so the caller can select and retry).
+
+0.031     2026-06-09 20:43:38-07:00 America/Los_Angeles
+
+    - Fix infinite retry loop in _write_burst() on hard syswrite errors such as EBADF; the pipe is now marked invalid and throws.
+    - Only consult $! when syswrite actually fails, avoiding misreads of stale errno after a successful write.
+    - Treat EWOULDBLOCK like EAGAIN on platforms where they differ.
+    - close() and reader() now flush output buffered by non-blocking writes instead of silently dropping it and croaking in DESTROY.
+    - DESTROY now localizes $., $@, $!, $^E and $? so a destructor flush cannot clobber the caller's error state.
+    - A truncated message header at EOF now throws instead of reading as a clean EOF.
+    - Fix eof() mixed-mode buffer check that inspected the wrong slot (lines vs burst).
+    - from_fh() and from_fd() now accept the same %params as the other constructors, as the docs already claimed.
+    - mixed_data_mode => 1 is now honored as a constructor param by all constructors, not just pair().
+    - fits_in_burst() followed by write_burst() no longer compresses the payload twice.
+    - SSIZE_MAX fallback raised from 512 to 32767 (_POSIX_SSIZE_MAX).
+    - Remove dead code (unused debug() helper, do_extra_loop bookkeeping).
+    - Documentation fixes: correct 16-byte chunk header description, max_size() fallback behavior, byte-string payload note, typos.
+
 0.030     2026-06-08 15:09:48-07:00 America/Los_Angeles
 
     - Fix Windows test FAILs: test include shim now matches "\" as a path separator, so it no longer strips the t/ dir from __FILE__.

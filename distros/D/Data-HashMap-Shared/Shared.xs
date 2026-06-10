@@ -46,6 +46,14 @@ static void shm_wrseq_unlock_cleanup(pTHX_ void *ptr) {
     shm_seqlock_write_begin(&(handle)->hdr->seq); \
     SAVEDESTRUCTOR_X(shm_wrseq_unlock_cleanup, (void*)(handle))
 
+/* Exception-safe free() for malloc'd scratch buffers (e.g. drain's value
+ * buffer) held across newSVpvn() in a result-build loop: an OOM croak there
+ * must not leak the buffer. free() (not Safefree) — the buffer comes from the
+ * C realloc() in shm_grow_buf, a different pool than the Perl allocator. */
+static void shm_free_cleanup(pTHX_ void *ptr) {
+    free(ptr);
+}
+
 /* ---- Helper macros ---- */
 
 #define EXTRACT_MAP(classname, sv) \
@@ -188,6 +196,8 @@ DEFINE_KW_HOOK(i16, "I16", exists,      2, build_kw_2arg)
 DEFINE_KW_HOOK(i16, "I16", incr,        2, build_kw_2arg)
 DEFINE_KW_HOOK(i16, "I16", decr,        2, build_kw_2arg)
 DEFINE_KW_HOOK(i16, "I16", incr_by,     3, build_kw_3arg)
+DEFINE_KW_HOOK(i16, "I16", max,         3, build_kw_3arg)
+DEFINE_KW_HOOK(i16, "I16", min,         3, build_kw_3arg)
 DEFINE_KW_HOOK(i16, "I16", size,        1, build_kw_1arg)
 DEFINE_KW_HOOK(i16, "I16", keys,        1, build_kw_1arg_list)
 DEFINE_KW_HOOK(i16, "I16", values,      1, build_kw_1arg_list)
@@ -240,6 +250,8 @@ DEFINE_KW_HOOK(i32, "I32", exists,      2, build_kw_2arg)
 DEFINE_KW_HOOK(i32, "I32", incr,        2, build_kw_2arg)
 DEFINE_KW_HOOK(i32, "I32", decr,        2, build_kw_2arg)
 DEFINE_KW_HOOK(i32, "I32", incr_by,     3, build_kw_3arg)
+DEFINE_KW_HOOK(i32, "I32", max,         3, build_kw_3arg)
+DEFINE_KW_HOOK(i32, "I32", min,         3, build_kw_3arg)
 DEFINE_KW_HOOK(i32, "I32", size,        1, build_kw_1arg)
 DEFINE_KW_HOOK(i32, "I32", keys,        1, build_kw_1arg_list)
 DEFINE_KW_HOOK(i32, "I32", values,      1, build_kw_1arg_list)
@@ -292,6 +304,8 @@ DEFINE_KW_HOOK(ii, "II", exists,      2, build_kw_2arg)
 DEFINE_KW_HOOK(ii, "II", incr,        2, build_kw_2arg)
 DEFINE_KW_HOOK(ii, "II", decr,        2, build_kw_2arg)
 DEFINE_KW_HOOK(ii, "II", incr_by,     3, build_kw_3arg)
+DEFINE_KW_HOOK(ii, "II", max,         3, build_kw_3arg)
+DEFINE_KW_HOOK(ii, "II", min,         3, build_kw_3arg)
 DEFINE_KW_HOOK(ii, "II", size,        1, build_kw_1arg)
 DEFINE_KW_HOOK(ii, "II", keys,        1, build_kw_1arg_list)
 DEFINE_KW_HOOK(ii, "II", values,      1, build_kw_1arg_list)
@@ -491,6 +505,8 @@ DEFINE_KW_HOOK(si16, "SI16", exists,      2, build_kw_2arg)
 DEFINE_KW_HOOK(si16, "SI16", incr,        2, build_kw_2arg)
 DEFINE_KW_HOOK(si16, "SI16", decr,        2, build_kw_2arg)
 DEFINE_KW_HOOK(si16, "SI16", incr_by,     3, build_kw_3arg)
+DEFINE_KW_HOOK(si16, "SI16", max,         3, build_kw_3arg)
+DEFINE_KW_HOOK(si16, "SI16", min,         3, build_kw_3arg)
 DEFINE_KW_HOOK(si16, "SI16", size,        1, build_kw_1arg)
 DEFINE_KW_HOOK(si16, "SI16", keys,        1, build_kw_1arg_list)
 DEFINE_KW_HOOK(si16, "SI16", values,      1, build_kw_1arg_list)
@@ -543,6 +559,8 @@ DEFINE_KW_HOOK(si32, "SI32", exists,      2, build_kw_2arg)
 DEFINE_KW_HOOK(si32, "SI32", incr,        2, build_kw_2arg)
 DEFINE_KW_HOOK(si32, "SI32", decr,        2, build_kw_2arg)
 DEFINE_KW_HOOK(si32, "SI32", incr_by,     3, build_kw_3arg)
+DEFINE_KW_HOOK(si32, "SI32", max,         3, build_kw_3arg)
+DEFINE_KW_HOOK(si32, "SI32", min,         3, build_kw_3arg)
 DEFINE_KW_HOOK(si32, "SI32", size,        1, build_kw_1arg)
 DEFINE_KW_HOOK(si32, "SI32", keys,        1, build_kw_1arg_list)
 DEFINE_KW_HOOK(si32, "SI32", values,      1, build_kw_1arg_list)
@@ -595,6 +613,8 @@ DEFINE_KW_HOOK(si, "SI", exists,      2, build_kw_2arg)
 DEFINE_KW_HOOK(si, "SI", incr,        2, build_kw_2arg)
 DEFINE_KW_HOOK(si, "SI", decr,        2, build_kw_2arg)
 DEFINE_KW_HOOK(si, "SI", incr_by,     3, build_kw_3arg)
+DEFINE_KW_HOOK(si, "SI", max,         3, build_kw_3arg)
+DEFINE_KW_HOOK(si, "SI", min,         3, build_kw_3arg)
 DEFINE_KW_HOOK(si, "SI", size,        1, build_kw_1arg)
 DEFINE_KW_HOOK(si, "SI", keys,        1, build_kw_1arg_list)
 DEFINE_KW_HOOK(si, "SI", values,      1, build_kw_1arg_list)
@@ -713,6 +733,8 @@ BOOT:
     REGISTER_KW(i16, incr,        "Data::HashMap::Shared::I16::incr");
     REGISTER_KW(i16, decr,        "Data::HashMap::Shared::I16::decr");
     REGISTER_KW(i16, incr_by,     "Data::HashMap::Shared::I16::incr_by");
+    REGISTER_KW(i16, max,         "Data::HashMap::Shared::I16::max");
+    REGISTER_KW(i16, min,         "Data::HashMap::Shared::I16::min");
     REGISTER_KW(i16, size,        "Data::HashMap::Shared::I16::size");
     REGISTER_KW(i16, keys,        "Data::HashMap::Shared::I16::keys");
     REGISTER_KW(i16, values,      "Data::HashMap::Shared::I16::values");
@@ -763,6 +785,8 @@ BOOT:
     REGISTER_KW(i32, incr,        "Data::HashMap::Shared::I32::incr");
     REGISTER_KW(i32, decr,        "Data::HashMap::Shared::I32::decr");
     REGISTER_KW(i32, incr_by,     "Data::HashMap::Shared::I32::incr_by");
+    REGISTER_KW(i32, max,         "Data::HashMap::Shared::I32::max");
+    REGISTER_KW(i32, min,         "Data::HashMap::Shared::I32::min");
     REGISTER_KW(i32, size,        "Data::HashMap::Shared::I32::size");
     REGISTER_KW(i32, keys,        "Data::HashMap::Shared::I32::keys");
     REGISTER_KW(i32, values,      "Data::HashMap::Shared::I32::values");
@@ -813,6 +837,8 @@ BOOT:
     REGISTER_KW(ii, incr,        "Data::HashMap::Shared::II::incr");
     REGISTER_KW(ii, decr,        "Data::HashMap::Shared::II::decr");
     REGISTER_KW(ii, incr_by,     "Data::HashMap::Shared::II::incr_by");
+    REGISTER_KW(ii, max,         "Data::HashMap::Shared::II::max");
+    REGISTER_KW(ii, min,         "Data::HashMap::Shared::II::min");
     REGISTER_KW(ii, size,        "Data::HashMap::Shared::II::size");
     REGISTER_KW(ii, keys,        "Data::HashMap::Shared::II::keys");
     REGISTER_KW(ii, values,      "Data::HashMap::Shared::II::values");
@@ -1004,6 +1030,8 @@ BOOT:
     REGISTER_KW(si16, incr,        "Data::HashMap::Shared::SI16::incr");
     REGISTER_KW(si16, decr,        "Data::HashMap::Shared::SI16::decr");
     REGISTER_KW(si16, incr_by,     "Data::HashMap::Shared::SI16::incr_by");
+    REGISTER_KW(si16, max,         "Data::HashMap::Shared::SI16::max");
+    REGISTER_KW(si16, min,         "Data::HashMap::Shared::SI16::min");
     REGISTER_KW(si16, size,        "Data::HashMap::Shared::SI16::size");
     REGISTER_KW(si16, keys,        "Data::HashMap::Shared::SI16::keys");
     REGISTER_KW(si16, values,      "Data::HashMap::Shared::SI16::values");
@@ -1054,6 +1082,8 @@ BOOT:
     REGISTER_KW(si32, incr,        "Data::HashMap::Shared::SI32::incr");
     REGISTER_KW(si32, decr,        "Data::HashMap::Shared::SI32::decr");
     REGISTER_KW(si32, incr_by,     "Data::HashMap::Shared::SI32::incr_by");
+    REGISTER_KW(si32, max,         "Data::HashMap::Shared::SI32::max");
+    REGISTER_KW(si32, min,         "Data::HashMap::Shared::SI32::min");
     REGISTER_KW(si32, size,        "Data::HashMap::Shared::SI32::size");
     REGISTER_KW(si32, keys,        "Data::HashMap::Shared::SI32::keys");
     REGISTER_KW(si32, values,      "Data::HashMap::Shared::SI32::values");
@@ -1104,6 +1134,8 @@ BOOT:
     REGISTER_KW(si, incr,        "Data::HashMap::Shared::SI::incr");
     REGISTER_KW(si, decr,        "Data::HashMap::Shared::SI::decr");
     REGISTER_KW(si, incr_by,     "Data::HashMap::Shared::SI::incr_by");
+    REGISTER_KW(si, max,         "Data::HashMap::Shared::SI::max");
+    REGISTER_KW(si, min,         "Data::HashMap::Shared::SI::min");
     REGISTER_KW(si, size,        "Data::HashMap::Shared::SI::size");
     REGISTER_KW(si, keys,        "Data::HashMap::Shared::SI::keys");
     REGISTER_KW(si, values,      "Data::HashMap::Shared::SI::values");

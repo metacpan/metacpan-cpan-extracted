@@ -1,7 +1,11 @@
 package Map::Tube::CLI;
 
-$Map::Tube::CLI::VERSION   = '0.84';
-$Map::Tube::CLI::AUTHORITY = 'cpan:MANWAR';
+use strict;
+use warnings;
+use version;
+
+our $VERSION   = qv('v0.850.0');
+our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -9,7 +13,7 @@ Map::Tube::CLI - Command Line Interface for Map::Tube::* map.
 
 =head1 VERSION
 
-Version 0.84
+Version v0.850.0
 
 =cut
 
@@ -19,12 +23,13 @@ use Carp qw(croak);
 use Data::Dumper;
 use MIME::Base64;
 use Map::Tube::Utils qw(is_valid_color);
-use Map::Tube::Exception::MissingStationName;
-use Map::Tube::Exception::InvalidStationName;
+use Map::Tube::Exception::FoundUnsupportedMap;
 use Map::Tube::Exception::InvalidBackgroundColor;
 use Map::Tube::Exception::InvalidLineName;
+use Map::Tube::Exception::InvalidStationName;
+use Map::Tube::Exception::MissingStationName;
+use Map::Tube::Exception::MissingMapName;
 use Map::Tube::Exception::MissingSupportedMap;
-use Map::Tube::Exception::FoundUnsupportedMap;
 use Map::Tube::CLI::Option;
 use Module::Pluggable
     search_path => [ 'Map::Tube' ],
@@ -34,6 +39,7 @@ use Module::Pluggable
 
 use Path::Tiny;
 use Text::ASCIITable;
+use Try::Tiny;
 use Moo;
 use namespace::autoclean;
 use MooX::Options;
@@ -41,40 +47,43 @@ with 'Map::Tube::CLI::Option';
 
 =head1 DESCRIPTION
 
-It provides simple command line interface  to the package consuming L<Map::Tube>.
-The distribution contains a script C<map-tube>, using package L<Map::Tube::CLI>.
+This module provides a simple command line interface  to the package consuming L<Map::Tube>.
+The distribution also contains a script C<map-tube> for use at the command line which uses this package.
 
 =head1 SYNOPSIS
 
-You can list all command line options by giving C<-h> flag.
+You can list all command line options by giving the C<-h> flag.
 
     $ map-tube -h
-    USAGE: map-tube [-h] [long options...]
+    USAGE: map-tube [-h] [options...]
 
-        --map=String      Map name
-        --start=String    Start station name
-        --end=String      End station name
-        --preferred       Show preferred route
-        --generate_map    Generate map as image
-        --line=String     Line name for map
-        --bgcolor=String  Map background color
-        --line_mappings   Generate line mappings
-        --line_notes      Generate line notes
-        --list_lines      List lines
-        --force           Force unsupported map (map name becomes case
-                          sensitive)
-        --debug           Run in debug mode
+        -m --map=String      Map name
+        -s --start=String    Start station name
+        -e --end=String      End station name
+        -p --preferred       Show preferred route
+        -g --generate_map    Generate map as image
+        -l --line=String     Line name to map
+        -b --bgcolor=String  Map background color
+        --line_mappings      Generate line mappings as table
+        --line_notes         Generate line notes
+        -M --list_maps       List supported maps
+        -L --list_lines      List lines in given map
+        -S --list_stations   List stations in given map
+        -t --tabular         Show route as table (not as list)
+        -f --force           Force unsupported map (map name becomes case sensitive)
+        -D --debug           Run in debug mode
+        -V --version         Show version information
 
-        --usage           show a short help message
-        -h                show a compact help message
-        --help            show a long help message
-        --man             show the manual
+        --usage              show a short help message
+        -h                   show a compact help message
+        --help               show a long help message
+        --man                show the manual
 
 =head1 COMMON USAGES
 
 =head2 Shortest Route
 
-You can also ask for shortest route in London Tube Map as below:
+You can ask for the shortest route in the London Tube Map as below: (Under Windows use double quotes.)
 
     $ map-tube --map London --start 'Baker Street' --end 'Wembley Park'
 
@@ -82,9 +91,26 @@ You can also ask for shortest route in London Tube Map as below:
 
 =head2 Preferred Shortest Route
 
-Now request for preferred route as below:
+Now a request for the preferred route:
 
     $ map-tube --map London --start 'Baker Street' --end 'Euston Square' --preferred
+
+    Baker Street (Circle, Hammersmith & City, Metropolitan), Great Portland Street (Circle, Hammersmith & City, Metropolitan), Euston Square (Circle, Hammersmith & City, Metropolitan)
+
+=head2 Preferred Shortest Route in Tabular Form
+
+And a request for the preferred route displayed as a table: (This also shows the use of short options.)
+
+    $ map-tube -m London -s 'Baker Street' -e 'Euston Square' -p -t
+    Metro Map London: Route from Baker Street to Euston Square.
+
+    .--------------------------------------------------------------------.
+    | Station Name          | Lines                                      |
+    +-----------------------+--------------------------------------------+
+    | Baker Street          | Circle, Hammersmith and City, Metropolitan |
+    | Great Portland Street | Circle, Hammersmith and City, Metropolitan |
+    | Euston Square         | Circle, Hammersmith and City, Metropolitan |
+    '-----------------------+--------------------------------------------'
 
     Baker Street (Circle, Hammersmith & City, Metropolitan), Great Portland Street (Circle, Hammersmith & City, Metropolitan), Euston Square (Circle, Hammersmith & City, Metropolitan)
 
@@ -96,24 +122,24 @@ directory. (It will silently overwrite any pre-existing file of the same name.)
 
     $ map-tube --map Delhi --generate_map
 
-In case you want different background color to the map then you can try below:
+In case you want a different background color to the map then you can try this:
 
     $ map-tube --map Delhi --bgcolor gray --generate_map
 
 =head2 Generate Just a Line Map
 
-To generate a graphical representation of just a particular line map, follow
+To generate a graphical representation of just a particular line, follow
 the command below. This will generate a PNG file named after the line in your
 current working directory. (It will silently overwrite any pre-existing file
 of the same name.)
 
     $ map-tube --map London --line Bakerloo --generate_map
 
-In case you want different background color to the map then you can try below:
+In case you want a different background color to the map then you can try this:
 
     $ map-tube --map London --line DLR --bgcolor yellow --generate_map
 
-=head2 Generate Line Mappings
+=head2 Generate Line Mappings as a Table
 
     $ map-tube --map London --line Bakerloo --line_mappings
 
@@ -121,27 +147,51 @@ In case you want different background color to the map then you can try below:
 
     $ map-tube --map London --line Bakerloo --line_notes
 
-=head2 List lines for the given map
+=head2 List the Lines for the Given Map
 
     $ map-tube --map London --list_lines
 
+=head2 List the Stations for the Given Map
+
+    $ map-tube --map London --list_stations
+
+=head2 List all Supported Maps
+
+This will show you a list of all officially supported maps. It will also show you
+which of these maps are not currently installed on your machine.
+
+    $ map-tube --list_maps
+
+=head2 Using a Map that is Not Officially Supported
+
+It is also possible to use tube maps that are not officially supported, e.g.,
+privately created maps: (This is also helpful while developing a new map.)
+
+    $ map-tube --map 'Slippery Rock' --start 'College Park' --end 'Greyhound station' --force
+
 =head2 General Error
 
-If encountered  invalid  map  or  missing map i.e not installed, you get an error
+If encountering an invalid map or a missing map (i.e not installed), you get an error
 message like below:
 
     $ map-tube --map xYz --start 'Baker Street' --end 'Euston Square'
     ERROR: Unsupported Map [xYz].
+
+This will produce a similar message if you do not have the tube map of Kazan installed;
+if you do have it, it will notify you that the starting station does not exist in this map:
 
     $ map-tube --map Kazan --start 'Baker Street' --end 'Euston Square'
     ERROR: Missing Map [Kazan].
 
 =head1 SUPPORTED MAPS
 
-The command line parameter C<map> can take one of the following map names.  It is
-case insensitive i.e. 'London' and 'lOndOn' are the same.
+The command line parameter C<map> can take one of the following map names. It is
+case insensitive, i.e. 'London' and 'lOndOn' are the same.
+Use the C<--list_maps> option describe above to get an up-to-date version of this list.
+Use the C<--force> option described above to use locally installed maps that are not on
+that list.
 
-You could use L<Task::Map::Tube::Bundle> to install the supported maps.Please make
+You could use L<Task::Map::Tube::Bundle> to install the supported maps. Please make
 sure you have the latest maps when you install.
 
 =over 4
@@ -267,10 +317,12 @@ sub BUILD {
 
     my $plugins = [ plugins ];
     my $map = $self->{map};
-    foreach my $plugin (@$plugins) {
-        my $key = _map_key($plugin);
-        if (defined $key && (uc($map) eq $key)) {
-            $self->{maps}->{uc($key)} = $plugin->new;
+    if ($map) {
+        foreach my $plugin (@$plugins) {
+            my $key = _map_key($plugin);
+            if (defined $key && (uc($map) eq $key)) {
+                $self->{maps}->{uc($key)} = $plugin->new;
+            }
         }
     }
 
@@ -310,42 +362,70 @@ expect any parameter. Here is the code from the supplied C<map-tube> script.
 sub run {
     my ($self) = @_;
 
-    my $start   = $self->start;
-    my $end     = $self->end;
-    my $map     = $self->map;
-    my $line    = $self->line;
-    my $bgcolor = $self->bgcolor;
-    my $map_obj = $self->{maps}->{uc($map)};
+    my $map_obj = $self->map ? $self->{maps}->{uc($self->map)} : undef;
 
-    if ($self->preferred) {
-        print $map_obj->get_shortest_route($start, $end)->preferred, "\n";
+    # Handle these two options first because map name may not be present:
+    if ($self->version) {
+        print _prepare_version_info($map_obj, $self->map), "\n";
+        return;
     }
-    elsif ($self->generate_map) {
-        $map_obj->bgcolor($bgcolor) if defined $bgcolor;
-        my $image_file = _clean_path( ( $line // $map ) . '.png' );
-        my $image_data = $map_obj->as_image($line);
+    elsif ($self->list_maps) {
+        my $map_list = _prepare_map_list();
+        if ($self->tabular) {
+            my $map_table = Text::ASCIITable->new;
+            $map_table->setCols('Map Name','Description');
+            $map_table->addRow(@$_) for @$map_list;
+            print "Supported Metro Maps\n\n";
+            no warnings;
+            print $map_table;
+        } else {
+            no warnings;
+            print join(', ', @$_), "\n" for @$map_list;
+        }
+        return;
+    }
+
+    if ($self->generate_map) {
+        $map_obj->bgcolor($self->bgcolor) if defined $self->bgcolor;
+        my $image_file = _clean_path( ( $self->line // $self->map ) . '.png' );
+        my $image_data = $map_obj->as_image($self->line);
 
         open(my $IMAGE, '>', $image_file);
         binmode($IMAGE);
         print $IMAGE decode_base64($image_data);
         close($IMAGE);
     }
-    elsif ($self->line_mappings || $self->line_notes) {
-        my ($line_map_table, $line_map_notes) = _prepare_mapping_notes($map_obj, $line);
-
-        if ($self->line_mappings) {
-            print sprintf("\n=head1 DESCRIPTION\n\n%s Metro Map: %s Line.\n\n", $map, $line);
-            print $line_map_table;
-        }
-        if ($self->line_notes) {
-            print _line_notes($map_obj, $map, $line, $line_map_notes);
-        }
+    elsif ($self->line_mappings) {
+        printf("\n=head1 DESCRIPTION\n\n%s Metro Map: %s Line.\n\n", $self->map, $self->line);
+        print _prepare_line_mappings($map_obj, $self->line);
+    }
+    elsif ($self->line_notes) {
+        print _prepare_line_notes($map_obj, $self->map, $self->line);
     }
     elsif ($self->list_lines) {
         print join(",\n", sort @{$map_obj->get_lines}), "\n";
     }
+    elsif ($self->list_stations) {
+        my $station_list_table = _prepare_station_list($map_obj);
+        printf("Metro Map %s: Stations.\n\n", $self->map);
+        print $station_list_table;
+    }
     else {
-        eval { print $map_obj->get_shortest_route($start, $end), "\n"; };
+        my $route = $map_obj->get_shortest_route($self->start, $self->end);
+        $route = $route->preferred if $self->preferred;
+        if ($self->tabular) {
+            my $route_table = Text::ASCIITable->new;
+            $route_table->setCols('Station Name','Lines');
+            $route_table->alignCol('Lines','left');
+            for my $station(@{$route->nodes()}) {
+                $route_table->addRow($station->name, join(', ', @{ $station->line }));
+            }
+            printf("Metro Map %s: Route from %s to %s.\n\n", $self->map, $self->start, $self->end);
+            print $route_table;
+        } else {
+            no warnings;
+            print $route, "\n";
+        }
         if ($self->debug) {
             print "\n---------DEBUG-----------\n";
             foreach my $id (sort keys %{$map_obj->{tables}}) {
@@ -353,7 +433,7 @@ sub run {
             }
             print "-------------------------\n";
         }
-        print "$@\n" if ($@);
+        print "$@\n" if $@;
     }
 }
 
@@ -361,45 +441,33 @@ sub run {
 #
 # PRIVATE METHODS
 
-sub _prepare_mapping_notes {
+sub _prepare_line_mappings {
     my ($map, $line_name) = @_;
 
     my $map_table = Text::ASCIITable->new;
     $map_table->setCols('Station Name','Connected To');
 
-    my $stations = $map->get_stations($line_name);
-
-    my @station_names = ();
-    foreach my $station (@$stations) {
-        push @station_names, $station->name;
+    foreach my $station (map { $_->name } @{ $map->get_stations($line_name) }) {
+        $map_table->addRow($station, join(", ", @{$map->get_linked_stations($station)}));
     }
 
-    my $i = 0;
-    my $map_notes = {};
-    foreach (@station_names) {
-        my $a = $station_names[$i];
-        my $linked_stations = $map->get_linked_stations($a);
-        my $b = join(", ", @$linked_stations);
-
-        $map_table->addRow($a, $b);
-
-        _add_notes($map, $line_name, $map_notes, $a);
-
-        $i++;
-    }
-
-    return ($map_table, $map_notes);
+    return $map_table;
 }
 
-sub _line_notes {
-    my ($map, $map_name, $line_name, $line_map_notes) = @_;
+sub _prepare_line_notes {
+    my ($map, $map_name, $line_name) = @_;
+
+    my $line_map_notes = {};
+    foreach my $station (map { $_->name } @{ $map->get_stations($line_name) }) {
+        _add_notes($map, $line_name, $line_map_notes, $station);
+    }
 
     my $all_lines = $map->get_lines;
     my $line_package = {};
     foreach my $line (@$all_lines) {
-        next unless (scalar(@{$line->get_stations}));
         my $_line_name = $line->name;
         next if (uc($line_name) eq uc($_line_name));
+        next unless (scalar(@{$line->get_stations}));
         $line_package->{$_line_name} = 1;
     }
 
@@ -407,28 +475,91 @@ sub _line_notes {
     $notes   .= "=head1 NOTE\n\n";
     $notes   .= "=over 2\n";
 
-    foreach my $station (sort keys %$line_map_notes) {
-        my $i = 1;
-        my $lines = $line_map_notes->{$station};
+    my @stations = keys %$line_map_notes;
+    if ( eval { require Unicode::Collate; 1 } ) {
+        my $collator = Unicode::Collate->new(level => 1);
+        @stations = $collator->sort(@stations);
+    } else {
+        @stations = sort { lc($a) cmp lc($b) } @stations;
+    }
+
+    foreach my $station (@stations) {
+        my $delim = ' ';
+        my $lines   = $line_map_notes->{$station};
         my $_notes .= sprintf("\n=item * The station \"%s\" is also part of\n", $station);
         foreach my $line (@$lines) {
             next unless (exists $line_package->{$line});
-            if ($i == 1) {
-                $_notes .= sprintf("          L<%s Line|Map::Tube::%s::Line::%s>\n", $line, $map_name, _guess_package_name($line));
-                $i++;
-            }
-            else {
-                $_notes .= sprintf("        | L<%s Line|Map::Tube::%s::Line::%s>\n", $line, $map_name, _guess_package_name($line));
-            }
+            $_notes .= sprintf("        %s L<%s Line|Map::Tube::%s::Line::%s>\n",
+                               $delim, $line, $map_name, _guess_package_name($line));
+            $delim = '|';
         }
-        if ($i > 1) {
-            $notes .= $_notes;
-        }
+        $notes .= $_notes if $delim;
     }
 
     $notes .= "\n=back\n";
 
     return $notes;
+}
+
+sub _prepare_version_info {
+   my ($map, $map_name) = @_;
+    my $msg = "Map::Tube::CLI version $VERSION, Map::Tube version: $Map::Tube::VERSION";
+    if ($map_name) {
+        my $supported_maps  = _supported_maps();
+        my $map_module_name = $supported_maps->{uc($map_name)} // ( 'Map::Tube::' . $map_name );
+        my $version_ref     = $map_module_name . '::VERSION';
+        my $map_desc        = $map ? $map->name() // $map_name : '';
+        my $map_version;
+        {
+            no strict;
+            $map_version = ${$version_ref} // 'unknown';
+        }
+        $msg .= ", map $map_name: $map_desc version: $map_version";
+    }
+    return $msg;
+}
+
+sub _prepare_map_list {
+    my $supported_maps  = _supported_maps();
+    my %plugins = map { $_ => 1 } plugins;
+    my @map_list;
+    for my $map ( sort values %$supported_maps ) {
+        my $map_name = '(not installed)';
+        if (exists $plugins{$map}) {
+            try {
+                $map_name = $map->new->name();
+            } catch {
+                $map_name = '(not loadable)';
+            }
+        }
+        $map =~ s/^.*:://;
+        push(@map_list, [$map, $map_name]);
+    }
+
+    return \@map_list;
+}
+
+sub _prepare_station_list {
+    my ($map) = @_;
+
+    my $station_table = Text::ASCIITable->new;
+    $station_table->setCols('Station Name','Served by lines');
+    $station_table->alignCol('Served by lines','left');
+
+    my @stations = @{ $map->get_stations() };
+
+    if ( eval { require Unicode::Collate; 1 } ) {
+        my $collator = Unicode::Collate->new(level => 1);
+        @stations = $collator->sort(@stations);
+    } else {
+        @stations = sort { lc($a) cmp lc($b) } @stations;
+    }
+
+    foreach my $station (@stations) {
+      $station_table->addRow( $station->name, join(', ', @{ $station->line }));
+    }
+
+    return $station_table;
 }
 
 sub _guess_package_name {
@@ -482,9 +613,18 @@ sub _validate_param {
     my $line    = $self->line;
     my $bgcolor = $self->bgcolor;
 
+    return if $self->version || $self->list_maps;
+
+    Map::Tube::Exception::MissingMapName->throw({
+        method      => __PACKAGE__."::_validate_param",
+        message     => "ERROR: Missing Map Name.",
+        filename    => $caller[1],
+        line_number => $caller[2] })
+        unless (defined $map);
+
     my $supported_maps = _supported_maps();
     if ($self->force) {
-        $supported_maps->{uc($map)} = 'Map::Tube::'. $map;
+        $supported_maps->{uc($map)} //= 'Map::Tube::'. $map;
     }
 
     Map::Tube::Exception::FoundUnsupportedMap->throw({
@@ -521,12 +661,6 @@ sub _validate_param {
     }
 
     if ($self->line_mappings || $self->line_notes) {
-        Map::Tube::Exception::MissingLineName->throw({
-            method      => __PACKAGE__."::_validate_param",
-            message     => "ERROR: Missing Line Name.",
-            filename    => $caller[1],
-            line_number => $caller[2] })
-            unless (defined $line);
 
         Map::Tube::Exception::InvalidLineName->throw({
             method      => __PACKAGE__."::_validate_param",
@@ -539,7 +673,11 @@ sub _validate_param {
     unless (   $self->generate_map
             || $self->line_mappings
             || $self->line_notes
-            || $self->list_lines) {
+            || $self->list_lines
+            || $self->list_stations) {
+
+        # warn "--line option will be ignored" if defined $line;     # *** Should we warn if the --line option has been used for no good? ***
+
         Map::Tube::Exception::MissingStationName->throw({
             method      => __PACKAGE__."::_validate_param",
             message     => "ERROR: Missing Station Name [start].",
@@ -568,6 +706,7 @@ sub _validate_param {
             line_number => $caller[2] })
             unless defined $self->{maps}->{uc($map)}->get_node_by_name($end);
     }
+
 }
 
 sub _clean_path {
@@ -674,8 +813,7 @@ L<https://github.com/manwar/Map-Tube-CLI>
 =head1 BUGS
 
 Please report any bugs or feature requests through the web interface at L<https://github.com/manwar/Map-Tube-CLI/issues>.
-I will  be notified and then you'll automatically be notified of progress on your
-bug as I make changes.
+I will  be notified and then you'll automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 

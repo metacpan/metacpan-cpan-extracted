@@ -1,5 +1,9 @@
 NetAddr::MAC - A MAC address object
 
+1.01    2026-05-09
+        - Add Test::Exception to build requirements (GH#7)
+        - No functional changes at all
+
 1.00    2025-03-22
         - Fix broken is_hsrp2 function
         - Implement random()

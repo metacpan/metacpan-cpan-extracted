@@ -1,3 +1,14 @@
+0.000049  2026-06-09 17:14:55-07:00 America/Los_Angeles
+
+    - Added Driver::destroy_quietly(): fast-destroy teardown for disposable clones (cleanup => 1) that kills, reaps, and removes the data dir immediately instead of a graceful shutdown that can block 2*QDB_STOP_GRACE+2 seconds.
+    - Added an opt-in fast_destroy attribute: DESTROY uses destroy_quietly() when cleanup => 1, falls through to the graceful path when cleanup => 0, and is inherited by clones via clone_data().
+    - Added per-driver fast_stop_sig() for fast/forced teardown: default SIGKILL, PostgreSQL overrides to SIGQUIT so the postmaster releases its SysV semaphores instead of leaking them; watcher escalates to SIGKILL if it does not stop promptly.
+    - Added a watcher fast-eliminate request (SIGUSR1) that kills with fast_stop_sig, reaps, and deletes the data dir; blocked (not ignored) across the startup exec so a request racing startup stays pending instead of being dropped.
+    - The graceful teardown path (stop()/eliminate()) now escalates a stuck shutdown through fast_stop_sig before SIGKILL, so it releases SysV semaphores instead of leaking them.
+    - get_db() and the pool tests skip_all instead of failing when a host is out of System V semaphores/shared memory; added skipall_on_resource_error(), also covering the DBIx::QuickDB->import path (t/QuickDB) and mid-run pool clone builds (t/Pool).
+    - On a start timeout, start() now reports the server's launch log and whether its process is still alive, instead of only the often-empty error log.
+    - Added t/fast_destroy.t, t/watcher_fast_kill.t, and t/resource_skip.t.
+
 0.000048  2026-06-06 10:53:27-07:00 America/Los_Angeles
 
     - Fixed a pid-reuse race that could shut down the wrong database server. After a server was stopped, its watcher exited and the OS could recycle the watcher's pid; a later teardown signal (e.g. eliminate() from the watcher object's DESTROY, which Driver::stop triggers as its lexical goes out of scope) would then land on whatever now held that pid -- often a sibling cloned database's postmaster, smart-shutting-down a live server out from under its owner. The watcher now refuses to signal its pid once a stop/eliminate has been initiated, and forgets the pid once the watcher has exited. This was the intermittent FreeBSD/PostgreSQL-9.3 t/Pool/postgresql.t failure where a freshly cloned db was already shut down by the time the test connected to it

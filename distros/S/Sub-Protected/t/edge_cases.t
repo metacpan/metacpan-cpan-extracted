@@ -101,4 +101,56 @@ lives_ok { Twin->new->get_q } 'Twin: owner can call _q';
 throws_ok { Twin::_p(Twin->new) } qr/protected method/, 'Twin: _p blocked from outside';
 throws_ok { Twin::_q(Twin->new) } qr/protected method/, 'Twin: _q blocked from outside independently';
 
+# ---- import() with undef or reference sub name -- must reject cleanly ----
+# Previously undef slipped past validate_strict and reached _process_one,
+# producing a misleading "is not defined" message instead of the documented one.
+
+throws_ok { Sub::Protected->import(undef) }
+	qr/is not a valid Perl identifier/,
+	'import(undef): croaks with "not a valid Perl identifier", not a downstream error';
+
+throws_ok { Sub::Protected->import({}) }
+	qr/is not a valid Perl identifier/,
+	'import({}): hashref sub name croaks with "not a valid Perl identifier"';
+
+# ---- Protected sub returning false values -- they must propagate intact ----
+
+{
+	package FalseReturn;
+	use Sub::Protected;
+	sub new        { bless {}, shift }
+	sub _undef     :Protected { return undef }
+	sub _zero      :Protected { return 0 }
+	sub _empty     :Protected { return q{} }
+	sub get_undef  { (shift)->_undef }
+	sub get_zero   { (shift)->_zero }
+	sub get_empty  { (shift)->_empty }
+}
+
+{
+	local $ENV{HARNESS_ACTIVE}    = 0;
+	local $Sub::Protected::BYPASS = 0;
+
+	ok(!defined(FalseReturn->new->get_undef), 'edge: protected sub returning undef: propagates');
+	is(FalseReturn->new->get_zero,  0,   'edge: protected sub returning 0: propagates');
+	is(FalseReturn->new->get_empty, q{}, 'edge: protected sub returning "": propagates');
+}
+
+# ---- goto &$code forwards args -- positional args reach the protected body ----
+
+{
+	package ArgPass;
+	use Sub::Protected;
+	sub new    { bless {}, shift }
+	sub _sum   :Protected { my (undef, $a, $b) = @_; $a + $b }
+	sub run    { my $s = shift; $s->_sum(@_) }
+}
+
+{
+	local $ENV{HARNESS_ACTIVE}    = 0;
+	local $Sub::Protected::BYPASS = 0;
+
+	is(ArgPass->new->run(10, 20), 30, 'edge: goto &$code forwards positional args (10+20=30)');
+}
+
 done_testing;

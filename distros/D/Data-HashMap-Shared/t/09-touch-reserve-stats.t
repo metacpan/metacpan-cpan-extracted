@@ -283,4 +283,41 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_test') . '.shm' }
     unlink $path;
 }
 
+# === flush_expired_partial: bounded scan, ($n, $done) return, convergence ===
+{
+    my $path = tmpfile();
+    my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 1);  # ttl=1s
+    $map->put($_, $_ * 10) for 1 .. 30;
+    is($map->size, 30, 'flush_expired_partial: 30 live entries before expiry');
+    sleep 2;                                   # everything expires (ttl=1s)
+    my ($total, $done, $calls) = (0, 0, 0);
+    while (!$done) {
+        my ($n, $d) = $map->flush_expired_partial(8);   # 8 slots per call
+        $total += $n;
+        $done = $d;
+        last if ++$calls > 1000;               # safety net against a stuck cursor
+    }
+    ok($done, 'flush_expired_partial: reports done after a full table cycle');
+    is($total, 30, 'flush_expired_partial: cumulative flushed == expired entries');
+    is($map->size, 0, 'flush_expired_partial: all expired entries removed');
+    unlink $path;
+}
+
+# === swap TTL semantics on a TTL-enabled map (documented; previously untested) ===
+{
+    my $path = tmpfile();
+    my $map = Data::HashMap::Shared::II->new($path, 1000, 0, 30);  # default_ttl=30
+
+    $map->put_ttl(2, 100, 5);                  # short 5s TTL
+    $map->swap(2, 200);                        # swap refreshes to the default (30)
+    my (undef, $t) = $map->get_with_ttl(2);
+    ok(defined $t && $t > 10, "swap refreshes an existing entry's TTL to default (got @{[$t // 'undef']})");
+
+    $map->put_ttl(1, 100, 0);                  # permanent (ttl=0)
+    $map->swap(1, 200);                        # must stay permanent
+    my (undef, $tp) = $map->get_with_ttl(1);
+    is($tp, 0, 'swap leaves a permanent entry permanent');
+    unlink $path;
+}
+
 done_testing;

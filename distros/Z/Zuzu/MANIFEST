@@ -54,6 +54,7 @@ languagetests/lang/oop/basic.zzs
 languagetests/lang/oop/builtin-subclassing.zzs
 languagetests/lang/oop/class-internals.zzs
 languagetests/lang/oop/classes-basic.zzs
+languagetests/lang/oop/dot-method-call-lvalues.zzs
 languagetests/lang/oop/dynamic-member-call.zzs
 languagetests/lang/oop/field-accessors.zzs
 languagetests/lang/oop/inheritance.zzs

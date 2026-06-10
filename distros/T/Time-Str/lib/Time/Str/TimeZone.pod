@@ -1,0 +1,88 @@
+=head1 NAME
+
+Time::Str::TimeZone - cached lookup of IANA and local timezones
+
+=head1 SYNOPSIS
+
+    use Time::Str::TimeZone qw(timezone);
+
+    my $tz    = timezone('Europe/Stockholm');  # a Time::TZif object
+    my $local = timezone('local');             # the system timezone
+
+    Time::Str::TimeZone->reset;                # drop cached zones
+
+=head1 DESCRIPTION
+
+Resolves timezone names to timezone objects (L<Time::TZif>) and caches
+them, so repeated lookups of the same name return the same object.
+
+The zone database directory is located once, on first use, via
+L<< Time::Str::Util::find_tzdb_directory|Time::Str::Util/find_tzdb_directory >>;
+set the C<TZDIR> environment variable to override it.
+
+=head1 FUNCTIONS
+
+=head2 timezone
+
+    my $tz = timezone($name);
+
+Returns the timezone object for C<$name>, which must be a valid IANA
+Time Zone Database name (e.g. C<'Europe/Stockholm'>) or the special name
+C<'local'>.
+
+For C<'local'>, the system timezone is resolved via
+L<< Time::Str::Util::find_local_timezone|Time::Str::Util/find_local_timezone >>
+(honoring C<TZ>, then F</etc/localtime>); the result may therefore be a
+L<Time::TZif::POSIX> object when C<TZ> holds a POSIX rule.
+
+The returned object is cached, so a later change to C<TZ> or
+F</etc/localtime> is not reflected until L</reset> is called.
+
+Croaks if C<$name> is not a valid IANA name, if the zone database
+directory cannot be located, or if the named zone (or the system
+timezone) cannot be resolved.
+
+C<timezone> is exported on request:
+
+    use Time::Str::TimeZone qw(timezone);
+
+=head1 METHODS
+
+=head2 reset
+
+    Time::Str::TimeZone->reset;
+
+Clears the cache of resolved timezones (and the remembered database
+directory), so the next lookup re-resolves from scratch. Useful after
+C<TZ> or the zone database changes within a running process.
+
+=head1 PROVIDERS
+
+Lookups are dispatched through a provider, the package named in
+C<$Time::Str::TimeZone::PROVIDER> (by default this package). The public
+C<timezone> and C<reset> calls are thin wrappers over the provider's
+C<locate> and C<flush> methods:
+
+=over 4
+
+=item C<< $PROVIDER->locate($name) >>
+
+Returns the timezone object for C<$name>, or croaks. Responsible for any
+caching.
+
+=item C<< $PROVIDER->flush >>
+
+Discards whatever C<locate> has cached.
+
+=back
+
+A replacement provider must implement both methods and return objects
+that provide the C<offset_for_local> and C<offset_for_utc> methods used
+elsewhere in L<Time::Str>.
+
+=head1 SEE ALSO
+
+L<Time::TZif>, L<Time::TZif::POSIX>, L<Time::Str::Util>
+
+=cut
+

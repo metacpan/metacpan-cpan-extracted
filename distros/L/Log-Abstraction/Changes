@@ -1,5 +1,12 @@
 Revision history for Log-Abstraction
 
+0.32	Tue Jun  9 19:34:45 EDT 2026
+	[ Bug Fixes ]
+	- Fixed SMTP host/port validation in sendmail backend: croak calls were
+	  inside the eval{} that catches delivery failures, so bad config was
+	  silently swallowed instead of propagating. Validation now runs before
+	  the eval so misconfigured host/port croaks immediately to the caller.
+
 0.31	Jun  8 20:55:28 EDT 2026
 	[ Architecture ]
 	- Added use autodie qw(:all); file writes wrapped in eval{} to keep

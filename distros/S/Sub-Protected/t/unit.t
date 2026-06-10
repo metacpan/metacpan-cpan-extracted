@@ -589,4 +589,21 @@ subtest 'POD/code: documented identity of BYPASS or HARNESS_ACTIVE (OR logic)' =
 	}
 };
 
+# ===================================================================
+# SECTION 11: import() with undef sub name
+#
+# Regression test for the bug where undef bypassed validate_strict and
+# reached _process_one, producing "is not defined" instead of the
+# documented "is not a valid Perl identifier" message.
+# ===================================================================
+
+subtest 'import(): undef sub name is rejected with documented error' => sub {
+	plan tests => 1;
+
+	# Must croak with the identifier-validation message, not a downstream error.
+	throws_ok { Sub::Protected->import(undef) }
+		qr/is not a valid Perl identifier/,
+		'import(undef) croaks with "not a valid Perl identifier"';
+};
+
 done_testing;

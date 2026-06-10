@@ -160,7 +160,21 @@ sub diag_connect {
 
 ok($driver, "Got a driver ($driver)") or die "Cannot continue without a driver";
 
+use Test2::Tools::QuickDB qw/skipall_on_resource_error/;
 use DBIx::QuickDB::Pool cache_dir => tempdir(CLEANUP => 1), verbose => 0;
+
+# db() that builds/clones a new server can fail on a host out of System V IPC at
+# any point in the run, not just the very first build. Wrap the new-server
+# allocations so such a host skips (environment limit) instead of failing; any
+# other error is rethrown.
+sub db_or_skip {
+    my @out;
+    my $ok = eval { @out = db(@_); 1 };
+    return wantarray ? @out : $out[0] if $ok;
+    my $err = $@;
+    skipall_on_resource_error($err);
+    die $err;
+}
 is(\@Test::Pool::EXPORT_OK, ['db'], "Added db to export_ok");
 
 isa_ok(QDB_POOL(), [$CLASS], "We have access to the $CLASS instance");
@@ -192,7 +206,14 @@ driver $driver => (
 );
 
 my $start = time();
-my $base = db($driver);
+# This is the first server built from scratch (initdb + start). On a smoke host
+# already out of System V semaphores/shared memory it fails right here; treat
+# that as a skip (environment limit), not a failure. Any other error is real.
+my $base = eval { db($driver) };
+if (my $err = $@) {
+    skipall_on_resource_error($err);
+    die $err;
+}
 my $total = time() - $start;
 note(sprintf("Initialized DB from scratch in %.6f seconds", $total));
 
@@ -206,7 +227,7 @@ ok(!-d $dir, "Deleted the directory when expiring cache");
 ok(!-e "$dir.READY", "Deleted the READY file when expiring cache");
 ok(!-e "$dir.lock", "Deleted the lock when expiring cache");
 
-$base = db($driver);
+$base = db_or_skip($driver);
 my $stamp = check_cloned(QDB_POOL->{databases}->{$driver}->{db});
 
 isa_ok($base, ['DBIx::QuickDB::Driver', "DBIx::QuickDB::Driver::$driver"], "Got the database");
@@ -243,7 +264,7 @@ build foo => (
 );
 
 $start = time();
-my $foo1 = db('foo');
+my $foo1 = db_or_skip('foo');
 $total = time() - $start;
 note(sprintf("Initialized 'foo' from $driver in %.6f seconds", $total));
 isnt($foo1->dir, QDB_POOL()->{databases}->{foo}->{dir}, "The copy does not have the original data dir");
@@ -305,7 +326,7 @@ build bar => (
 );
 
 $start = time();
-my $bar = db('bar');
+my $bar = db_or_skip('bar');
 $total = time() - $start;
 note(sprintf("Initialized 'bar' from 'foo' in %.6f seconds", $total));
 

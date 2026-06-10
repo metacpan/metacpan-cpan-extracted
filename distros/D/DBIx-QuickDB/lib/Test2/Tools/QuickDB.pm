@@ -2,7 +2,7 @@ package Test2::Tools::QuickDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000048';
+our $VERSION = '0.000049';
 
 use Carp qw/croak/;
 use Test2::API qw/context/;
@@ -10,7 +10,44 @@ use DBIx::QuickDB();
 
 use Importer Importer => 'import';
 
-our @EXPORT = qw/get_db_or_skipall get_db skipall_unless_can_db/;
+our @EXPORT = qw/get_db_or_skipall get_db skipall_unless_can_db skipall_on_resource_error/;
+
+# Match the errors a host throws when it cannot give a database server the
+# System V IPC resources it needs to start -- semaphore or shared-memory table
+# exhaustion. These come through as the failed initdb/start command's captured
+# output (e.g. PostgreSQL: "could not create semaphores: No space left on
+# device", "semget(...)", SEMMNI/SEMMNS hints). Returns a human reason if the
+# error is one of these, else undef.
+sub resource_exhaustion_reason {
+    my ($err) = @_;
+    return undef unless defined $err;
+
+    return "host is out of System V semaphores (cannot start a database server)"
+        if $err =~ /could not create semaphores/i
+        || $err =~ /\bsemget\(/
+        || $err =~ /\bSEMM(?:NI|NS)\b/;
+
+    return "host is out of System V shared memory (cannot start a database server)"
+        if $err =~ /could not create shared memory/i
+        || $err =~ /\bshmget\(/;
+
+    return undef;
+}
+
+# If $err is a host IPC-exhaustion error, skip the whole test (it is an
+# environment limit, not a fault in this distribution) -- this does not return,
+# it terminates like skip_all. Otherwise returns false so the caller can rethrow.
+sub skipall_on_resource_error {
+    my ($err) = @_;
+
+    my $reason = resource_exhaustion_reason($err) or return 0;
+
+    my $ctx = context();
+    $ctx->plan(0, SKIP => ucfirst($reason));
+    $ctx->release;
+
+    return 1;
+}
 
 sub skipall_unless_can_db {
     my %spec;
@@ -67,7 +104,16 @@ sub get_db {
     # Get a context in case anything below here has testing code.
     my $ctx = context();
 
-    my $db = DBIx::QuickDB->build_db(@_);
+    my $db = eval { DBIx::QuickDB->build_db(@_) };
+    if (my $err = $@) {
+        # A host out of System V semaphores/shared memory cannot start a server;
+        # that is an environment limit, not a fault here, so skip rather than
+        # fail. skipall_on_resource_error() terminates the test in that case;
+        # any other error is real and is rethrown.
+        skipall_on_resource_error($err);
+        $ctx->release;
+        die $err;
+    }
 
     $ctx->release;
 
@@ -168,6 +214,23 @@ L<DBIx::QuickDB/"SPEC HASH">.
 
 This combines C<get_db()> and C<skipall_unless_can_db()>. The arguments
 supported are identical to C<get_db()>.
+
+=item $bool = skipall_on_resource_error($error)
+
+Given an exception thrown while building or starting a database, skip the entire
+test (like C<skip_all>) if it is a host System V IPC-exhaustion error -- the
+server could not get the semaphores or shared memory it needs to start. This is
+an environment limit, not a fault in the code under test, so a skip is more
+appropriate than a failure. In that case this does not return (it terminates the
+test); for any other error it returns false so the caller can rethrow:
+
+    my $db = eval { get_db(...) };
+    if (my $err = $@) {
+        skipall_on_resource_error($err);
+        die $err;
+    }
+
+C<get_db()> already applies this automatically.
 
 =back
 

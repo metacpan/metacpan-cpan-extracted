@@ -28,7 +28,7 @@ use Readonly;
 # -------------------------------------------------------------------
 
 Readonly::Scalar my $SP      => 'Sub::Protected';
-Readonly::Scalar my $VERSION => '0.01';
+Readonly::Scalar my $VERSION => '0.02';
 
 my %config = (
 	n_instances    => 5,       # number of concurrent objects in concurrency test
@@ -722,6 +722,74 @@ subtest 'deep chain: Kitten(Child of Cat, Child of Animal) can call Animal prote
 		'Kitten (2 hops from Animal) can call Animal::_breathe';
 	like $result, qr/\Q$config{breathe_result}\E/,
 		'result contains the Animal breathe string';
+};
+
+# ===================================================================
+# SECTION 15: can() on a protected method -- wrapper enforces access
+#
+# can() returns the wrapper closure (not the unwrapped sub).  An
+# unrelated caller invoking the wrapper must still be blocked.
+# ===================================================================
+
+subtest 'can(): wrapper returned by can() still blocks unrelated caller' => sub {
+	plan tests => 2;
+
+	local $ENV{HARNESS_ACTIVE}    = 0;
+	local $Sub::Protected::BYPASS = 0;
+
+	# Obtain the wrapper for IntAnimal::_breathe via can()
+	my $code = IntAnimal->can('_breathe');
+	ok defined($code), 'can() returns defined value for :Protected sub';
+
+	# Calling the wrapper from a package unrelated to IntAnimal must croak
+	throws_ok {
+		package IntCanProber;
+		$code->(IntAnimal->new);
+	} qr/protected method/,
+		'wrapper obtained via can() blocks unrelated caller';
+};
+
+# ===================================================================
+# SECTION 16: Cross-package protected-to-protected call is blocked
+#
+# IT::CrossX has _data protected.  IT::CrossY has _invade protected;
+# _invade tries to call IT::CrossX::_data.  Since CrossY is unrelated
+# to CrossX, the access check for _data finds CrossY as the caller
+# and must croak.
+# ===================================================================
+
+{
+	package IT::CrossX;
+	use Sub::Protected;
+	sub new   { bless {}, shift }
+	sub _data :Protected { 'cross_x_data' }
+	sub get   { (shift)->_data }
+}
+
+{
+	package IT::CrossY;
+	use Sub::Protected;
+	sub new     { bless {}, shift }
+	# _invade calls IT::CrossX::_data from IT::CrossY context
+	sub _invade :Protected { IT::CrossX->new->_data }
+	sub attempt { (shift)->_invade }
+}
+
+subtest 'cross-package: protected sub in CrossY blocked from CrossX protected sub' => sub {
+	plan tests => 2;
+
+	local $ENV{HARNESS_ACTIVE}    = 0;
+	local $Sub::Protected::BYPASS = 0;
+
+	# CrossX owner can call its own protected sub
+	lives_ok { IT::CrossX->new->get }
+		'IT::CrossX owner can call its own protected sub';
+
+	# CrossY::_invade (protected) calling CrossX::_data (protected) must be blocked;
+	# the stack walk unwinds the CrossY wrapper via goto and finds CrossY as the caller
+	throws_ok { IT::CrossY->new->attempt }
+		qr/_data\(\) is a protected method of IT::CrossX/,
+		'IT::CrossY is blocked from IT::CrossX::_data';
 };
 
 done_testing;

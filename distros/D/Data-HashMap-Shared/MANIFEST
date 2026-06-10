@@ -57,6 +57,7 @@ t/17-resize.t
 t/18-dead-reader-recovery.t
 t/19-lock-exception-safety.t
 t/20-maxcap-overflow.t
+t/21-minmax.t
 t/pod_synopsis.t
 t/version_check.t
 typemap

@@ -1,7 +1,7 @@
 package Data::HashMap::Shared;
 use strict;
 use warnings;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 require XSLoader;
 XSLoader::load('Data::HashMap::Shared', $VERSION);
@@ -34,6 +34,7 @@ Data::HashMap::Shared - Type-specialized shared-memory hash maps for multiproces
     # Atomic counters (lock-free fast path)
     shm_ii_incr $map, 1;
     shm_ii_incr_by $map, 1, 10;
+    shm_ii_max $map, 1, 50;         # monotonic: store max(current, 50)
 
     # Compare-and-swap (all variants; byte-compare for string values)
     shm_ii_cas $map, 1, 11, 42;     # swap to 42 only if current == 11
@@ -142,6 +143,7 @@ C<new_memfd> creates an unlinked memfd-backed map whose file descriptor
 can be passed to another process (via C<SCM_RIGHTS>, C<fork>+C<exec>, or
 duped+open). C<new_from_fd> reopens such a descriptor. Both require a
 64-bit Perl on Linux (C<memfd_create(2)>).
+
 C<$max_entries>, C<$max_size>, C<$ttl>, and C<$lru_skip> are used only when
 creating a new file; when opening an existing one, all parameters are read
 from the stored header and the constructor arguments are ignored.
@@ -156,13 +158,19 @@ accessed entries before evicting.
 
 Optional C<$ttl> sets a default time-to-live in seconds for all entries.
 Expired entries are lazily removed on access. Set to 0 (default) to disable.
-When TTL is active, C<get> and C<exists> check expiry.
+When TTL is active, C<get> and C<exists> check expiry. Expiry is measured
+against a monotonic clock (C<CLOCK_MONOTONIC_COARSE>): TTLs track elapsed
+running time and do not advance while the system is suspended or hibernating.
 
-Optional C<$lru_skip> (0-99, default 0) sets the probability (as a percentage)
-of skipping LRU promotion on C<get>. This reduces write-lock contention for
-Zipfian (power-law) access patterns where a small set of hot keys dominates
-reads. The LRU tail (eviction victim) is never skipped, preserving eviction
-correctness. Set to 0 for strict LRU ordering.
+Optional C<$lru_skip> (0-99, default 0) reduces how often LRU promotion
+reorders the recency list: higher values skip more promotions. Promotion runs
+only when an operation updates an existing entry under the write lock
+(C<put>/C<incr>/C<get_or_set> on a hit, the update family); plain C<get> and
+C<get_with_ttl> never promote — they set a lock-free accessed bit that the clock
+eviction consumes. Skipping promotions cuts write-lock churn for Zipfian
+(power-law) patterns where a few hot keys dominate. The LRU tail (eviction
+victim) is never skipped, preserving eviction correctness. Set to 0 for strict
+LRU ordering.
 
 B<Zero-cost when disabled>: with both C<$max_size=0> and C<$ttl=0>, the fast
 lock-free read path is used. The only overhead is a branch (predicted away).
@@ -206,16 +214,25 @@ Creates C<$shards> independent maps (files C<$path_prefix.0>, C<$path_prefix.1>,
 ...) behind a single handle, each with up to C<$max_entries> entries
 (total capacity is C<$shards * $max_entries>). Per-key operations automatically
 route to the correct shard via hash dispatch. Writes to different shards
-proceed in parallel with independent locks.
+proceed in parallel with independent locks. C<new_sharded> requires a
+filesystem C<$path_prefix>; anonymous (C<undef>-path) sharded maps are not
+supported.
 
 All operations work transparently on sharded maps: C<put>, C<get>, C<remove>,
-C<exists>, C<add>, C<update>, C<swap>, C<take>, C<incr>, C<cas>, C<cas_take>,
+C<exists>, C<add>, C<update>, C<swap>, C<take>, C<incr>, C<max>, C<min>, C<cas>, C<cas_take>,
 C<get_or_set>, C<put_ttl>, C<add_ttl>, C<update_ttl>, C<touch>, C<persist>,
 C<set_ttl>, C<keys>, C<values>, C<items>, C<to_hash>, C<set_multi> (method only),
 C<remove_multi> (method only), C<get_multi> (method only),
 C<get_with_ttl> (method only), C<each>, C<pop>, C<shift>, C<drain>,
 C<clear>, C<flush_expired>, C<flush_expired_partial>, C<size>,
 C<stats> (method only), C<reserve>, and all diagnostic keywords.
+
+Diagnostic counters and capacities reported for a sharded handle are
+aggregate totals across all shards: C<size>, C<capacity>, C<max_entries>,
+C<max_size>, C<tombstones>, C<mmap_size>, C<arena_used>, C<arena_cap>, and the
+C<stats> eviction/expiry/recovery counts all sum over the shards. (C<ttl> is
+the shared per-entry default, so it reports a single shard's value.)
+C<reserve $n> pre-grows B<each> shard to C<$n> entries (not C<$n> in total).
 
 Cursors chain across shards automatically. C<cursor_seek> routes to the
 correct shard based on key hash. C<$shards> is rounded up to the next
@@ -229,13 +246,13 @@ C<i32s>, C<is>, C<si16>, C<si32>, C<si>, C<ss>.
     my $ok = shm_xx_put $map, $key, $value;   # insert or overwrite
     my $ok = shm_xx_add $map, $key, $value;   # insert only if key absent
     my $ok = shm_xx_update $map, $key, $value; # overwrite only if key exists
-    my $old = shm_xx_swap $map, $key, $value; # put + return old value (undef if new); on TTL maps, refreshes TTL for keys that already had one and assigns default_ttl on insert (permanent entries stay permanent)
+    my $old = shm_xx_swap $map, $key, $value; # put + return old value (undef if new)
     my $ok = shm_xx_cas $map, $key, $expected, $desired; # compare-and-swap
     my $v  = shm_xx_cas_take $map, $key, $expected; # compare-and-remove; returns value on match, undef otherwise
     my $n  = $map->set_multi($k, $v, ...);   # batch put under single lock, returns count
     my $n  = $map->remove_multi(@keys);      # batch remove under single lock, returns count
     my @v  = $map->get_multi($k1, $k2, ...); # batch get under single lock with prefetch pipeline
-    my ($v, $ttl) = $map->get_with_ttl($key); # atomic snapshot; () if missing, $ttl is undef on non-TTL map, 0 = permanent; does not promote in LRU
+    my ($v, $ttl) = $map->get_with_ttl($key); # atomic snapshot; () if missing, $ttl is undef on non-TTL map, 0 = permanent; sets LRU clock bit
     my $v  = shm_xx_get $map, $key;           # returns undef if not found
     my $ok = shm_xx_remove $map, $key;        # returns false if not found
     my $ok = shm_xx_exists $map, $key;        # returns boolean
@@ -250,6 +267,11 @@ C<i32s>, C<is>, C<si16>, C<si32>, C<si>, C<ss>.
     my $href = shm_xx_to_hash $map;
     my $v  = shm_xx_get_or_set $map, $key, $default;  # returns value
 
+C<get_or_set> returns the existing value, or stores and returns C<$default>
+when the key is absent. It returns C<undef> only if the key is absent and the
+value cannot be stored — the map is at C<max_entries>, or (string-value
+variants) the arena is full.
+
 C<cas> is available for all variants. Returns true when the stored value
 matched C<$expected> and was atomically replaced with C<$desired>; false
 if the key is missing or expired, the value did not match, or (string-value
@@ -261,19 +283,34 @@ C<swap> returns the previous value, or C<undef> when the key did not exist
 stored — the map is already at C<max_entries> capacity, or (string-value
 variants) the arena is full — in which case an existing key keeps its old
 value. C<swap> by itself therefore cannot distinguish a fresh insert from a
-full-map failure; check C<exists> or C<size> first if that matters.
+full-map failure; check C<exists> or C<size> first if that matters. On TTL
+maps, C<swap> refreshes an existing entry's TTL to the default and assigns the
+default TTL on insert, but leaves a permanent entry (TTL 0) permanent.
 
 Integer-value variants also have:
 
     my $n = shm_xx_incr $map, $key;           # returns new value
     my $n = shm_xx_decr $map, $key;           # returns new value
     my $n = shm_xx_incr_by $map, $key, $delta;
+    my $n = shm_xx_max $map, $key, $desired;  # store max(current, desired), return it
+    my $n = shm_xx_min $map, $key, $desired;  # store min(current, desired), return it
 
 A missing key is created starting from zero (Redis-style): the first
 C<incr> returns 1, C<decr> returns -1, and C<incr_by> returns C<$delta>.
 These die only when the key is new and the map is already at
 C<max_entries> (no room to insert). The result wraps at the variant's
 integer width (see L</"Integer Range and Wrapping">).
+
+C<max>/C<min> atomically store C<max($current, $desired)> /
+C<min($current, $desired)> and return the resulting value; a missing key is
+inserted as C<$desired>. The compare-and-set runs under a single lock
+acquisition, so there is no read-modify-write gap for a concurrent
+C<incr_by>/C<cas>/C<max>/C<min> on the same key: the result is monotonic
+(C<max> never lowers, C<min> never raises) and never clobbers a concurrent
+increment. The common "value already past the bound" case completes under a
+shared read lock, writing nothing. Like C<incr_by>, they die only when the
+key is new and the map is at C<max_entries>, and the result wraps at the
+variant's integer width.
 
 LRU/TTL operations (C<put_ttl>, C<add_ttl>, and C<update_ttl> require a TTL-enabled map):
 
@@ -283,7 +320,7 @@ LRU/TTL operations (C<put_ttl>, C<add_ttl>, and C<update_ttl> require a TTL-enab
     my $ms = shm_xx_max_size $map;            # LRU capacity (0 = disabled)
     my $t  = shm_xx_ttl $map;                 # default TTL in seconds
     my $r  = shm_xx_ttl_remaining $map, $key; # seconds left (0 = permanent, undef if missing/expired/no TTL)
-    my $ok = shm_xx_touch $map, $key;         # reset TTL to default; promotes in LRU; false if no TTL/LRU
+    my $ok = shm_xx_touch $map, $key;         # refresh TTL to default (permanent entries stay permanent); promotes in LRU; false if no TTL/LRU
     my $ok = shm_xx_persist $map, $key;       # remove TTL, make key permanent; false on non-TTL maps
     my $ok = shm_xx_set_ttl $map, $key, $sec; # change TTL without changing value (0 = permanent); false on non-TTL maps
     my $n  = shm_xx_flush_expired $map;       # proactively expire all stale entries, returns count
@@ -320,7 +357,7 @@ Diagnostics:
     my $au  = shm_xx_arena_used $map;         # arena bytes used (0 for int-only)
     my $ac  = shm_xx_arena_cap $map;          # arena total capacity (0 for int-only)
     my $sz  = shm_xx_mmap_size $map;          # backing file size in bytes
-    my $ok  = shm_xx_reserve $map, $n;          # pre-grow (false if exceeds max)
+    my $ok  = shm_xx_reserve $map, $n;        # pre-grow (false if exceeds max)
     my $ev  = shm_xx_stat_evictions $map;     # cumulative LRU eviction count
     my $ex  = shm_xx_stat_expired $map;       # cumulative TTL expiration count
     my $rc  = shm_xx_stat_recoveries $map;    # cumulative stale lock recovery count
@@ -366,6 +403,16 @@ slot tracking and fall back to the slow per-timeout drain.
 The same path validates and rebuilds the LRU doubly-linked list if a
 dead writer left it inconsistent.  C<stat_recoveries> in C<stats> counts
 every recovery event.
+
+Recovery uses C<kill($pid, 0)> for liveness, which cannot distinguish a
+reused PID from the original. Hitting a false "alive" requires a process to
+die in the brief window it holds a read lock B<and> the kernel to cycle
+through the entire PID space back to that exact number within the ~2-second
+recovery window B<and> hand it to a long-lived process — i.e. a runaway fork
+storm. Even then the effect is bounded: writers stall until the recycled
+process exits; reads are unaffected and no data is corrupted. Writer-crash
+recovery is immune (the writer PID lives in the lock word and is reclaimed
+independently of the slot table).
 
 B<Limitation>: PID-based recovery assumes all processes share the same
 PID namespace. Cross-container sharing (different PID namespaces) is not

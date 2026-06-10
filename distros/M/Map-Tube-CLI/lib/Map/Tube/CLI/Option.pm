@@ -1,7 +1,11 @@
 package Map::Tube::CLI::Option;
 
-$Map::Tube::CLI::Option::VERSION   = '0.84';
-$Map::Tube::CLI::Option::AUTHORITY = 'cpan:MANWAR';
+use strict;
+use warnings;
+use version;
+
+our $VERSION   = qv('v0.850.0');
+our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
 
@@ -9,7 +13,7 @@ Map::Tube::CLI::Option - Option as Moo Role for Map::Tube::CLI.
 
 =head1 VERSION
 
-Version 0.84
+Version v0.850.0
 
 =cut
 
@@ -23,18 +27,22 @@ use Types::Standard -all;
 use MooX::Options;
 
 has maps             => (is => 'rw');
-option map           => (is => 'ro', order => 1,  isa => Str, format => 's', required => 1, doc => 'Map name');
-option start         => (is => 'ro', order => 2,  isa => Str, format => 's', doc => 'Start station name');
-option end           => (is => 'ro', order => 3,  isa => Str, format => 's', doc => 'End station name'  );
-option preferred     => (is => 'ro', order => 4,  doc => 'Show preferred route');
-option generate_map  => (is => 'ro', order => 5,  doc => 'Generate map as image');
-option line          => (is => 'ro', order => 6,  isa => Str, format => 's', doc => 'Line name for map'    );
-option bgcolor       => (is => 'ro', order => 7,  isa => Str, format => 's', doc => 'Map background color' );
-option line_mappings => (is => 'ro', order => 8,  doc => 'Generate line mappings');
-option line_notes    => (is => 'ro', order => 9,  doc => 'Generate line notes');
-option list_lines    => (is => 'ro', order => 10, doc => 'List lines');
-option force         => (is => 'ro', order => 11, doc => 'Force unsupported map (map name becomes case sensitive)');
-option debug         => (is => 'ro', order => 12, doc => 'Run in debug mode');
+option map           => (is => 'ro', order => 1,  isa => Str, format => 's', doc => 'Map name',                   short => 'm');
+option start         => (is => 'ro', order => 2,  isa => Str, format => 's', doc => 'Start station name',         short => 's');
+option end           => (is => 'ro', order => 3,  isa => Str, format => 's', doc => 'End station name',           short => 'e');
+option preferred     => (is => 'ro', order => 4,                             doc => 'Show preferred route',       short => 'p');
+option generate_map  => (is => 'ro', order => 5,                             doc => 'Generate map as image',      short => 'g');
+option line          => (is => 'ro', order => 6,  isa => Str, format => 's', doc => 'Line name to map',           short => 'l');
+option bgcolor       => (is => 'ro', order => 7,  isa => Str, format => 's', doc => 'Map background color',       short => 'b');
+option line_mappings => (is => 'ro', order => 8,                             doc => 'Generate line mappings as table');
+option line_notes    => (is => 'ro', order => 9,                             doc => 'Generate line notes');
+option list_maps     => (is => 'ro', order => 10,                            doc => 'List supported maps',        short => 'M');
+option list_lines    => (is => 'ro', order => 11,                            doc => 'List lines in given map',    short => 'L');
+option list_stations => (is => 'ro', order => 12,                            doc => 'List stations in given map', short => 'S');
+option tabular       => (is => 'ro', order => 13,                            doc => 'Show route as table (not as list)',                       short => 't');
+option force         => (is => 'ro', order => 14,                            doc => 'Force unsupported map (map name becomes case sensitive)', short => 'f');
+option debug         => (is => 'ro', order => 15,                            doc => 'Run in debug mode',          short => 'D');
+option version       => (is => 'ro', order => 16,                            doc => 'Show version information',   short => 'V');
 
 =head1 DESCRIPTION
 

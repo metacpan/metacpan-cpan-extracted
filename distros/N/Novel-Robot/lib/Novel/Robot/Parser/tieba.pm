@@ -13,7 +13,7 @@ sub base_url { 'http://tieba.baidu.com' }
 
 sub charset { 'utf8' }
 
-sub site_type { 'tiezi' }
+sub class { 'tiezi' }
 
 sub scrape_novel {
   { title  => { path => '//h3' },

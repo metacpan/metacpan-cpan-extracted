@@ -10,7 +10,7 @@ use Getopt::Long 2.33 qw{ :config auto_version };
 use LWP::UserAgent;
 use Pod::Usage;
 
-our $VERSION = '0.181';
+our $VERSION = '0.182';
 
 my %opt = (
     https	=> 1,
@@ -110,7 +110,7 @@ accessed at all.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III F<wyant at cpan dot org>
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT AND LICENSE
 

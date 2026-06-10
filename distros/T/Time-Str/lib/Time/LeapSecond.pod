@@ -50,10 +50,10 @@ F<leapseconds> file; if that file is absent, unreadable, or malformed
 the built-in table remains in effect. The table can also be refreshed
 explicitly from either the TZDB or the IERS/NIST file format.
 
-The table stores the cumulative TAI-UTC offset at each transition, so
-it represents both positive (inserted) and negative (removed) leap
-seconds. No negative leap second has ever been scheduled, but the data
-structure and the parsers support them.
+The leap second table stores the cumulative TAI-UTC offset at each
+transition, so it represents both positive (inserted) and negative
+(removed) leap seconds. No negative leap second has ever been scheduled,
+but the data structure and the parsers support them.
 
 All functions are exportable on request. Use C<:all> to import
 everything.
@@ -106,41 +106,47 @@ day number from a year, month, and day.
 
 =head2 parse_leapseconds_tzdb
 
-    my ($days, $corrections) = parse_leapseconds_tzdb($path);
+    my ($days, $corrections, $expires) = parse_leapseconds_tzdb($path);
 
-Parses an IANA Time Zone Database F<leapseconds> file and returns two
-array references describing each leap second as a property of the
-calendar day it falls on: C<$days> holds the Rata Die day number of
-each leap day, and C<$corrections> the matching change in the TAI-UTC
-offset (C<+1> for a positive leap second, C<-1> for a negative one).
-Both are in ascending order of day. Comments and blank lines are
+Parses an IANA Time Zone Database F<leapseconds> file and returns three
+values: two array references describing each leap second as a property
+of the calendar day it falls on (C<$days> holds the Rata Die day number
+of each leap day, and C<$corrections> the matching change in the
+TAI-UTC offset: C<+1> for a positive leap second, C<-1> for a negative
+one; both in ascending order of day), and C<$expires>, the POSIX epoch
+at which the file expires, extracted from a C<#expires
+E<lt>timestampE<gt>> comment. Comments and blank lines are otherwise
 ignored.
 
 Croaks if the file cannot be opened, if a C<Leap> line is malformed, if
 a C<Leap> line's time does not match its sign (a positive leap second
-must be C<23:59:60>, a negative one C<23:59:59>), or if the entries are
-not in ascending order of day. An out-of-order file is treated as
-malformed rather than silently reordered.
+must be C<23:59:60>, a negative one C<23:59:59>), if the entries are
+not in ascending order of day, or if no expiration line is found. An
+out-of-order file is treated as malformed rather than silently
+reordered.
 
 This function has no side effects; it does not modify the tables used by
 the other functions.
 
 =head2 parse_leapseconds_iers
 
-    my ($days, $corrections) = parse_leapseconds_iers($path);
+    my ($days, $corrections, $expires) = parse_leapseconds_iers($path);
 
 Parses an IERS/NIST F<leap-seconds.list> file and returns the same
-C<($days, $corrections)> pair as C<parse_leapseconds_tzdb>. This file is
-keyed on NTP time (seconds since 1900-01-01) and lists the I<absolute>
-TAI-UTC offset at each transition; epochs are converted to Rata Die day 
-number and each change is turned into a C<+1>/C<-1> correction on the
-preceding day. The leading base row anchors the table and is dropped.
+C<($days, $corrections, $expires)> triple as C<parse_leapseconds_tzdb>.
+This file is keyed on NTP time (seconds since 1900-01-01) and lists the
+I<absolute> TAI-UTC offset at each transition; epochs are converted to
+Rata Die day number and each change is turned into a C<+1>/C<-1>
+correction on the preceding day. The leading base row anchors the table
+and is dropped. The C<$expires> value is extracted from the C<#@>
+comment line and converted from NTP to POSIX.
 
 Croaks if the file cannot be opened, if a data line is malformed, if an
 epoch is not a UTC midnight, if the first (base) row does not state the
 base offset of C<10> seconds (which would indicate a truncated file),
 if the offset changes by more than one second between consecutive
-transitions, or if the entries are not in ascending order of time.
+transitions, if the entries are not in ascending order of time, or if
+no expiration (C<#@>) line is found.
 
 This function has no side effects.
 
@@ -208,6 +214,12 @@ second) or C<-1> (negative leap second) from one entry to the next.
 The per-leap-second C<+1>/C<-1> change, aligned with C<@OFFSETS>:
 C<$CORRECTIONS[0]> is C<0> (the no-correction base) and
 C<$CORRECTIONS[$k]> is the change applied by the C<$k>-th leap second.
+
+=item C<$Time::LeapSecond::EXPIRES>
+
+The POSIX epoch at which the currently loaded leap second table
+expires, taken from the source file (the TZDB C<#expires> line or the
+IERS C<#@> line); the built-in fallback supplies a hardcoded value.
 
 =back
 

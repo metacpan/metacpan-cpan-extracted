@@ -453,7 +453,9 @@ execute( 'list', <<'EOD', 'List the loaded items' );
 EOD
 
 {
+    no warnings qw{ uninitialized };	# Needed before Perl 5.8.9.
     local $ENV{FUBAR} = undef;
+    use warnings qw{ uninitialized };
     local $ENV{FROBOZZ} = 'Plugh';
 
     execute( 'if loaded 88888 then echo OID 88888 is loaded',

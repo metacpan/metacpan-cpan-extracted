@@ -171,4 +171,36 @@ sub tmpfile { File::Temp::tempnam(File::Spec->tmpdir, 'shm_newops') . '.shm' }
     unlink $path;
 }
 
+# get_with_ttl on a non-TTL map: value present, TTL undef
+{
+    my $path = tmpfile();
+    my $map = Data::HashMap::Shared::II->new($path, 100);   # no TTL
+    $map->put(5, 99);
+    my ($v, $t) = $map->get_with_ttl(5);
+    is($v, 99, 'get_with_ttl on non-TTL map: returns value');
+    ok(!defined $t, 'get_with_ttl on non-TTL map: TTL is undef');
+    unlink $path;
+}
+
+# get_or_set returns undef for a new key when a non-LRU map is full
+{
+    my $path = tmpfile();
+    my $map = Data::HashMap::Shared::II->new($path, 4);   # tiny, LRU off
+    my $full = 0;
+    for my $k (1 .. 1000) {
+        defined($map->get_or_set($k, $k)) or do { $full = $k; last };
+    }
+    ok($full, "get_or_set returns undef for a new key on a full non-LRU map (failed at key $full, size @{[$map->size]})");
+    # an existing key still returns its stored value (not undef) when full
+    is($map->get_or_set(1, -1), 1, 'get_or_set on existing key returns stored value even when full');
+    unlink $path;
+}
+
+# new_sharded requires a real path_prefix (anonymous sharded maps unsupported)
+{
+    my $ok = eval { Data::HashMap::Shared::II->new_sharded(undef, 2, 100); 1 };
+    ok(!$ok, 'new_sharded(undef, ...) dies');
+    like($@, qr/path_prefix/, '  ...with a path_prefix diagnostic');
+}
+
 done_testing;

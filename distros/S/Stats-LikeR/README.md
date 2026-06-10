@@ -200,6 +200,65 @@ is the equivalent of:
 
 in R
 
+## cfilter
+
+Select **columns** out of a table and return it in the same shape. A column is
+the inner (second-level) key of a **hash of hashes** or an **array of hashes**,
+or the outer key of a **hash of arrays**:
+
+    use Stats::LikeR;
+    my %hoa = ( x => [1,2,3], y => [4,5,6], z => [0,0,0] );
+    cfilter(\%hoa, keep   => ['x','y']);  # { x => [1,2,3], y => [4,5,6] }
+    cfilter(\%hoa, remove => ['z']);      # { x => [1,2,3], y => [4,5,6] }
+
+`cfilter` takes exactly one of `keep` or `remove`. `keep` returns only the
+matching columns; `remove` returns everything except them. The result is the
+same shape as the input (HoH → HoH, HoA → HoA, AoH → AoH), with cell values
+copied and the original structure left untouched.
+
+### Selecting by name
+
+Pass an array ref of column names. Naming a column that is not present in the
+data is an error (it catches typos), and a row that happens not to contain a
+kept column simply comes back without it:
+
+    my @aoh = ( { a => 1, b => 2 }, { a => 3 } );
+    cfilter(\@aoh, keep => ['b']);   # [ { b => 2 }, {} ]
+
+### Selecting by a predicate
+
+Instead of names, `keep`/`remove` accept a **predicate** — a CODE ref or a
+function name — evaluated once per column. It is called as
+
+    $predicate->($column_values, $column_name)
+
+where `$column_values` is an array ref of the column's **defined** cells (undef
+and missing cells are dropped, so functions like `sd` get clean input).
+With `keep`, columns for which the predicate is true are kept; with `remove`,
+those columns are dropped.
+
+    # Keep only the constant columns (standard deviation zero):
+    my $const = cfilter(\%hoa, keep => sub { sd($_[0]) == 0 });   # { z => [0,0,0] }
+    # Drop the constant columns instead:
+    my $varying = cfilter(\%hoa, remove => sub { sd($_[0]) == 0 }); # { x=>..., y=>... }
+    # A bare function name resolves in Stats::LikeR:: (use a package for your own):
+    cfilter(\%hoa, keep => 'some_predicate');
+
+A bare string is always treated as a **function name**, not a single column
+name, so to keep one column by name use an array ref: `keep => ['x']`.
+
+### Errors
+
+`cfilter` dies (via `croak`) when:
+
+- neither `keep` nor `remove` is given, or both are,
+- a named column is not present in the data,
+- the selector is neither an array ref nor a code ref / function name, or the
+  function name cannot be resolved,
+- an unknown option is given, or the options are not `name => value` pairs,
+- the data is not a hash/array reference of the expected shape (a hash of hash
+  refs or array refs, or an array of hash refs).
+
 ## chisq_test
 
 The `chisq_test` function performs chi-squared contingency table tests and goodness-of-fit tests. It natively accepts both arrays and hashes (1D and 2D) and mathematically mirrors R's `chisq.test()`, returning a structured hash reference of the results.
@@ -229,7 +288,7 @@ The function returns a single Hash Reference containing the following key-value 
 | **parameter** | Hash Ref | Contains the degrees of freedom (`df`). |
 | **statistic** | Hash Ref | Contains the test statistic (`X-squared`). |
 
-### 1. Two-Dimensional Array
+### Two-Dimensional Array
 
 Passing an Array of Arrays (AoA) triggers a standard Pearson's Chi-squared test. If the input is exactly a 2x2 matrix, Yates' continuity correction is applied automatically.
 
@@ -258,7 +317,7 @@ Passing an Array of Arrays (AoA) triggers a standard Pearson's Chi-squared test.
     }
 
 
-### 2. One-Dimensional Array (Goodness of Fit)
+### 1-Dimensional Array (Goodness of Fit)
 
 Passing a flat Array Reference triggers a Goodness of Fit test, assuming equal expected probabilities across all items.
 
@@ -277,9 +336,7 @@ Passing a flat Array Reference triggers a Goodness of Fit test, assuming equal e
         'statistic' => { 'X-squared' => 10 }
     }
 
-
-
-### 3. Two-Dimensional Hash (Pearson's Chi-squared)
+### 2-Dimensional Hash (Pearson's Chi-squared)
 
 Passing a Hash of Hashes (HoH) applies the exact same logic as a 2D Array, but preserves your nested string keys in the output. This is particularly useful when mapping data extracted directly from JSON, databases, or categorical mappings.
 
@@ -309,7 +366,7 @@ Passing a Hash of Hashes (HoH) applies the exact same logic as a 2D Array, but p
     }
 
 
-### 4. One-Dimensional Hash (Goodness of Fit)
+### One-Dimensional Hash (Goodness of Fit)
 
 Flat Hash References evaluate Goodness of Fit while preserving your categorical keys in the `expected` and `observed` output blocks.
 
@@ -322,219 +379,219 @@ Flat Hash References evaluate Goodness of Fit while preserving your categorical 
 	
 	my $res = chisq_test($data);
 
-## col2col
+# `col2col`
 
-    my $result = col2col( $data, $command );
-    my $result = col2col( $data, $command, $cols );   # restrict the "from" columns
+Apply a **two-column function** to every pair of columns in a table and collect
+the answers in a hash of hashes.
 
-Compares **every column against every other column** in a dataset and returns a
-hash of hashes:
+It's the workhorse behind things like correlation matrices: give it your data and
+the name of a function that takes two columns (`cor`, `t_test`, …) and you get
+back every column compared against every other column.
 
-    $result->{ $col_a }{ $col_b }   # outcome of comparing column A with column B
+    use Stats::LikeR;
+    
+    my %data = (
+        height => [ 170, 165, 180, 175 ],
+        weight => [  70,  60,  85,  77 ],
+        age    => [  30,  41,  25,  38 ],
+    );
 
-The diagonal is skipped (a column is never compared with itself), so each inner
-hash holds an entry for every *other* column.
-
-`$data` may be given in any of three shapes — *array of hashes*, *hash of
-arrays*, or *hash of hashes* — and `col2col` detects which one it received.
-
-`$command` is usually a **block (anonymous sub)** that compares the two columns.
-The two columns are passed to the block in `@_`, so you read them as `$_[0]`
-and `$_[1]`:
-
-    my $result = col2col( \%data, sub { cor( $_[0], $_[1], 'spearman' ) } );
-
-`$_[0]` and `$_[1]` are array refs holding the two columns. There are **no
-package globals**, so nothing you declare in your own script (a `$c1`, an `$a`,
-etc.) can ever clash, and you need no `our`/`use vars` declarations. If you
-prefer names, unpack into your own lexicals first:
-
-    my $result = col2col( \%data, sub { my ( $c1, $c2 ) = @_; cor( $c1, $c2, 'spearman' ) } );
-
-> **Pass the columns as explicit scalars.** Because the built-ins are prototyped,
-> write `cor( $_[0], $_[1], 'spearman' )`, not `cor( @_, 'spearman' )` — a
-> prototyped sub forces `@_` into scalar context, collapsing it to the element
-> *count* (`2`) instead of the two columns. (`&cor( @_, 'spearman' )` also works,
-> since the `&` sigil bypasses the prototype, but the explicit form is clearer.)
-
-As a shorthand, `$command` may instead be a **bare function name** (a string),
-which is treated as `fn( $col_a, $col_b )`:
-
-    my $result = col2col( \%data, 'cor' );   # same as sub { cor( $_[0], $_[1] ) }
-
-Whatever the block or function returns is stored verbatim.
-
-**Undefined values are always removed pairwise.** For each pair, any row where
-*either* column is undef or non-numeric is dropped, so the two columns are
-always aligned and the same length — exactly what correlation needs, and a
-sound (complete-case) basis for the two-sample tests too. If you need a column's
-full set of values regardless of the other column, clean it yourself inside the
-block.
-
-### Restricting which columns are compared
-
-By default every column is compared against every other, which is `N * (N-1)`
-calls. When you only care about how one column, or a handful, relates to the
-rest, pass an optional third argument: a **column name**, or an **array ref of
-names**. Only those columns are then used as the *first* (`$col_a`, outer-key)
-side of each comparison; each is still compared against **every other column**.
-This runs faster and returns a smaller result, because the work and the output
-shrink to `(chosen columns) * (N-1)`.
-
-How does just "age" relate to every other column?
-
-    my $r = col2col( $data, sub { cor( $_[0], $_[1] ) }, 'age' );
-    print $r->{age}{weight}, "\n";    # only the "age" row is present
-    # $r has no {height}{...} or {weight}{...} rows
-
-    # A handful of columns of interest, each vs everything else
-    my $r2 = col2col( $data, sub { cor( $_[0], $_[1] ) }, [ 'age', 'height' ] );
-    # $r2 has exactly the {age}{...} and {height}{...} rows
-
-The result is identical to the corresponding rows of an unrestricted run, only
-the rows you didn't ask for are omitted. Naming a column that isn't in the data
-is a fatal error, so typos surface immediately. Omitting the argument (or
-passing `undef`) keeps the original every-column-vs-every-column behavior.
+    my $result = col2col(\%data, 'cor');
+    
+    # $result->{height}{weight}  == correlation of height vs weight
+    # $result->{height}{age}     == correlation of height vs age
+    # ...and so on for every pair
 
 ---
 
-### array of hash input
+## Arguments
 
-Row-major: an array ref whose elements are hash refs (`$data->[$row]{$col}`).
-Column names are the union of the keys seen across all rows.
+    col2col( $data, $command, $cols, %options )
+    col2col( $data, $command, \%options )      # options in place of $cols
 
-    my $rows = [
-        { height => 170, weight => 65, age => 31 },
-        { height => 182, weight => 84, age => 45 },
-        { height => 168, weight => 60, age => 29 },
-        { height => 191, weight => 92, age => 52 },
-        { height => 175, weight => 71, age => 38 },
-    ];
-
-    my $cor = col2col( $rows, 'cor' );
-
-    print $cor->{height}{weight}, "\n";   # Pearson r between height and weight
-    print $cor->{weight}{age},    "\n";
+| Position | Argument    | What it is |
+|----------|-------------|------------|
+| 1        | `$data`     | Your table, as a reference (see **Data shapes** below). |
+| 2        | `$command`  | A code block **or** the name of a two-column function. |
+| 3        | `$cols`     | *(optional)* Which columns to use as the "from" side. Omit for all. |
+| 4+       | `%options`  | *(optional)* `na`, `skip.errors`, … (see **Options**). |
 
 ---
 
-### hash of array input
+## Data shapes
 
-Column-major: a hash ref whose values are array refs (`$data->{$col}[$row]`).
-The keys are the column names. This is the most direct shape — each value is
-already a column.
+`col2col` understands three layouts. In every case a **column** is the thing that
+gets compared, and the result is keyed by column name.
 
-    my $data = {
-        height => [ 170, 182, 168, 191, 175 ],
-        weight => [  65,  84,  60,  92,  71 ],
-        age    => [  31,  45,  29,  52,  38 ],
-    };
+**Hash of arrays (HoA)** — keys are column names:
 
-    my $cov = col2col( $data, 'cov' );
+    my %hoa = ( a => [1, 2, 3], b => [4, 5, 6] );
 
-    print $cov->{height}{weight}, "\n";   # sample covariance
+**Hash of hashes (HoH)** — First keys are row names, second keys are columns:
 
-Undefined entries are skipped. For `cor`/`cov`/`cor_test` they are dropped
-pairwise, so the pair below is compared on its three complete rows only:
+    my %hoh = (
+        row1 => { a => 1, b => 4 },
+        row2 => { a => 2, b => 5 },
+    );
 
-    my $data = {
-        a => [ 1,      2,     3,  4,  5 ],
-        b => [ 2,  undef,     6,  8, 10 ],   # row 1 dropped for any pair touching b
-    };
+**Array of hashes (AoH)** — each element is a row, inner keys are columns:
 
-    my $cor = col2col( $data, 'cor' );
-    print $cor->{a}{b}, "\n";              # correlation over rows 0,2,3,4
+    my @aoh = ( { a => 1, b => 4 }, { a => 2, b => 5 } );
+
+All three produce the same result for the same underlying numbers. Missing or
+`undef` cells are handled by the `na` option (below).
 
 ---
 
-### hash of hash input
+## The command
 
-Row-major and keyed: a hash ref whose values are hash refs
-(`$data->{$row}{$col}`). The outer keys label the rows (e.g. sample IDs); the
-inner keys are the column names (the union across all rows).
+The second argument is the function applied to each pair of columns. It is called
+as:
 
-    my $samples = {
-        s1 => { height => 170, weight => 65, age => 31 },
-        s2 => { height => 182, weight => 84, age => 45 },
-        s3 => { height => 168, weight => 60, age => 29 },
-        s4 => { height => 191, weight => 92, age => 52 },
-        s5 => { height => 175, weight => 71, age => 38 },
-    };
+    $command->( $column_a, $column_b )    # two ARRAY refs
 
-    my $cor = col2col( $samples, 'cor' );
+so inside a block the two columns arrive in `@_`:
 
-    print $cor->{age}{weight}, "\n";
+    my $result = col2col(\%data, sub {
+        my ($x, $y) = @_;       # $x and $y are array refs
+        cor($x, $y);
+    });
 
-Because pairing is done within each row, the (unordered) row-key order does not
-affect the result — all three shapes above give the same numbers.
+You can also pass a **function name as a string**. A bare name is looked up in
+`Stats::LikeR::`, so these two are equivalent:
+
+    col2col(\%data, 'cor');
+    col2col(\%data, sub { cor($_[0], $_[1]) });
 
 ---
 
-### Examples with different `Stats::LikeR` functions
+## The result
 
-The same dataset can be run through any comparison function just by changing the
-block. Using the hash-of-arrays `$data` from above:
+Always a hash of hashes: **`$result->{from}{to}`**.
 
-    # Correlation coefficients (Pearson) — returns a number per pair
-    my $r = col2col( $data, sub { cor( $_[0], $_[1] ) } );
-    print $r->{height}{weight}, "\n";
+    for my $from (sort keys %$result) {
+       for my $to (sort keys %{ $result->{$from} }) {
+          printf "%s vs %s = %s\n", $from, $to, $result->{$from}{$to};
+       }
+    }
 
-    # Covariance — returns a number per pair
-    my $c = col2col( $data, sub { cov( $_[0], $_[1] ) } );
+A column is never compared with itself, so `$result->{a}{a}` does not exist.
 
-    # Correlation test — returns whatever cor_test returns
-    # (e.g. estimate, statistic, p_value) for each pair
-    my $ct = col2col( $data, sub { cor_test( $_[0], $_[1] ) } );
-    print $ct->{height}{weight}{p_value}, "\n";
+---
 
-    # Welch two-sample t-test between every pair of columns
-    my $t = col2col( $data, sub { t_test( $_[0], $_[1] ) } );
-    say $t->{height}{age}{p_value};
+## Restricting columns (`$cols`)
 
-    # Two-sample Kolmogorov–Smirnov test
-    my $ks = col2col( $data, sub { ks_test( $_[0], $_[1] ) } );
-    print $ks->{height}{age}{statistic}, "\n";
+By default every column is used as the "from" side. The third argument narrows
+that down — handy when you only care about one variable.
 
-    # Other two-sample comparisons work the same way
-    my $w  = col2col( $data, sub { wilcox_test( $_[0], $_[1] ) } );   # Wilcoxon rank-sum
-    my $f  = col2col( $data, sub { var_test( $_[0], $_[1] ) } );      # F test for equal variances
-    my $kw = col2col( $data, sub { kruskal_test( $_[0], $_[1] ) } );  # Kruskal–Wallis
+    # all columns vs all columns
+    my $all = col2col(\%data, 'cor');
+    # just ONE column vs every other column
+    my $one = col2col(\%data, 'cor', 'height');
+    my $cors = $one->{height};          # { weight => ..., age => ... }
+    # a FEW specific columns vs every other column
+    my $few = col2col(\%data, 'cor', ['height', 'weight']);
 
-    # For the no-argument case, a bare function name is a handy shorthand:
-    my $r2 = col2col( $data, 'cor' );   # same as sub { cor( $_[0], $_[1] ) }
+The "to" side is always every other column; `$cols` only limits the outer keys.
 
-#### Passing arguments
+---
 
-Because the block is just ordinary Perl, you pass arguments exactly the way you
-would call the function directly:
+## Options
 
-    # Spearman instead of the default Pearson correlation (method is cor's 3rd arg)
-    my $sp = col2col( $data, sub { cor( $_[0], $_[1], 'spearman' ) } );
+Options can be given two ways:
 
-    # Whatever extra arguments a function takes, pass them inline. For example, if
-    # t_test accepts a trailing paired flag, t_test($x, $y, $paired):
-    my $tp = col2col( $data, sub { t_test( $_[0], $_[1], 1 ) } );
+    col2col(\%data, 'cor', $cols, 'skip.errors' => 0);   # after $cols
+    col2col(\%data, 'cor', { 'skip.errors' => 0 });      # hash ref, no $cols needed
 
-    # Combine results, scale them, call several functions — anything goes:
-    my $scaled = col2col( $data, sub { cor( $_[0], $_[1] ) * 100 } );
+The hash-ref form is convenient when you have **no** column restriction — it saves
+you from passing a placeholder. (A hash ref *replaces* `$cols`, so you can't use
+it to restrict columns at the same time; use the trailing form for that.)
 
-#### Custom subroutine
+### `na` — how undefined values are handled
 
-The block can run any analysis you like; `$_[0]` and `$_[1]` are the two columns
-(array refs, pairwise complete cases) and the return value is stored verbatim.
+Real data has gaps. `na` decides what the function sees.
 
-    # Mean difference between every pair of columns
-    my $diff = col2col( $data, sub {
-        my ( $x, $y ) = @_;
-        my $mx = 0; $mx += $_ for @$x; $mx /= @$x;
-        my $my = 0; $my += $_ for @$y; $my /= @$y;
-        return $mx - $my;
-    } );
+| Value                   | Behaviour | Use for |
+|-------------------------|-----------|---------|
+| `'pairwise'` *(default)*| A row is used for a pair only if **both** columns are defined there. The two columns arrive aligned and equal-length. | Paired stats like `cor`. |
+| `'omit'`                | Each column drops **its own** undefined values independently. The two columns may end up **different lengths**. | Unpaired tests like `t_test`, `kruskal_test`, where a gap in one sample shouldn't discard a value in the other. |
+| `'keep'`                | Every row is passed through, `undef` and all. | When your function does its own missing-data handling. |
 
-    print $diff->{height}{weight}, "\n";
+    # correlation: keep only complete pairs (the default)
+    col2col(\%data, 'cor');
+    # two-sample test: each column keeps its own values
+    col2col(\%data, 't_test', undef, na => 'omit');
+    col2col(\%data, 't_test', { na => 'omit' });        # same, no placeholder
 
-    # Wrap a built-in and post-process its result — it reads like a normal call
-    my $pct = col2col( $data, sub { cor( $_[0], $_[1] ) * 100 } );
+`rm.undef` / `rm.na` remain as boolean aliases for backward compatibility:
+`true` means `'pairwise'`, `false` means `'keep'`. Don't combine them with `na`.
+
+### `skip.errors` — keep going when a pair fails *(default: true)*
+
+Some functions croak on degenerate input — for example `cor` dies if a column has
+zero variance. By default `col2col` **traps** that croak per pair: instead of
+aborting the whole run, it stores the **first line** of the error message in that
+cell, so the result tells you *which* pair failed and *why*. Every other cell is
+computed normally.
+
+    my $r = col2col(\%data, 'cor');
+    # a good pair:   $r->{a}{b} == 0.83
+    # a bad pair:    $r->{a}{const} eq 'cor: standard deviation of y is 0'
+
+To restore the old "die on the first error" behaviour, turn it off:
+
+    col2col(\%data, 'cor', undef, 'skip.errors' => 0);
+    col2col(\%data, 'cor', { 'skip.errors' => 0 });
+
+Only errors from **your function** are trapped. Mistakes in the call itself
+(unknown column, bad data, unknown function name, unknown option) always die.
+
+---
+
+## Worked examples
+
+**Full correlation matrix:**
+
+    my $m = col2col(\%data, 'cor');
+
+**One variable against all others, sorted strongest first, skipping failures:**
+
+    my $col  = 'Testosterone, total (nmol/L)';
+    my $cors = col2col($hoa, 'cor', $col)->{$col};
+    for my $other (sort { ($cors->{$b} // -2) <=> ($cors->{$a} // -2) } keys %$cors) {
+        next unless $cors->{$other} =~ /^-?\d/;        # skip cells holding an error message
+        printf "%-30s % .3f\n", $other, $cors->{$other};
+    }
+
+**Two-sample test across columns of unequal completeness:**
+
+    my $t = col2col($hoa, 't_test', undef, na => 'omit');
+
+**Find which pairs could not be computed:**
+
+    my $m = col2col($hoa, 'cor');
+    for my $from (sort keys %$m) {
+        for my $to (sort keys %{ $m->{$from} }) {
+            my $v = $m->{$from}{$to};
+            warn "$from vs $to: $v\n" if defined $v && $v !~ /^-?\d/;   # non-numeric = error
+        }
+    }
+
+---
+
+## Gotchas
+
+- **Your function receives two array refs**, `($col_a, $col_b)` — not a column and
+  a name. Unpack with `my ($x, $y) = @_;`.
+- **`'pairwise'` can still hit a constant *subset*.** A column with overall
+  variance can be flat on just the rows it shares with one partner, so `cor` may
+  still croak for that pair. With the default `skip.errors`, that shows up as a
+  message in the single offending cell rather than killing the run.
+- **`col2col` does not modify your data.** It reads the table and returns a new
+  hash of hashes.
+- **In the error message, "x" is the first column and "y" is the second** — i.e.
+  `y` is the inner ("to") key. So `$result->{A}{B}` reading `…deviation of y is 0`
+  means column `B` is the degenerate one for that pair.
 
 ## cor
 
@@ -586,6 +643,93 @@ but default mean, standard deviation, and log can be passed as parameters:
 
     $x = dnorm(0, mean => 0, sd => 2, 'log' => 0);
 
+## filter
+
+Return a new data frame containing only the rows of `$df` that match a predicate. The original `$df` is never modified.
+
+    my $df2 = filter($df, col('column.name') > 4);
+
+`filter` accepts a predicate in one of two forms:
+
+1. a **`col()` expression** — a small, composable comparison built with overloaded operators, and
+2. a **code reference** — for anything the operators can't express (multiple columns, regexes, arbitrary logic), in the same spirit as the `filter` option of [`read_table`](#).
+
+Both `filter` and `col` are exported by default.
+
+### Arguments
+
+| Position | Name | Description |
+| --- | --- | --- |
+| 1 | `$df` | The data frame to filter. Either an **array of hashes** (AoH — e.g. the default output of `read_table`) or a **hash of arrays** (HoA). |
+| 2 | predicate | Either a `col()` comparison object or a `CODE` reference. |
+
+The return value is a **new** data frame of the **same shape** as the input (AoH in → AoH out, HoA in → HoA out). For an HoA, every column is filtered in parallel by row index, so all returned columns stay the same length and aligned.
+
+### The `col()` form
+
+`col('name')` is a deferred reference to a column. It carries no data — only the column name — so it can be compared with a literal (or another value) to build a predicate that `filter` evaluates once per row.
+
+    filter($df, col('age') >= 18);   # keep rows where age >= 18
+    filter($df, col('sex') eq 'f');  # keep rows where sex is 'f'
+    filter($df, 18 <= col('age'));   # operands may be in either order
+
+### Comparison operators
+
+| Kind | Operators | Comparison |
+| --- | --- | --- |
+| Numeric | `>` `<` `>=` `<=` `==` `!=` | numeric (the cell and the value are compared as numbers) |
+| String | `gt` `lt` `ge` `le` `eq` `ne` | string (the cell and the value are compared as strings) |
+
+`col('x')` may appear on either side of the operator; `4 < col('x')` is automatically rewritten to the equivalent `col('x') > 4`.
+
+### Combining predicates: `&`, `|`, `!`
+
+Predicates compose with bitwise `&` (and), `|` (or), and `!` (not):
+
+    filter($df, (col('age') > 18) & (col('sex') eq 'f'));   # and
+    filter($df, (col('grp') eq 'a') | (col('grp') eq 'c')); # or
+    filter($df, !(col('x') > 100));                         # not
+
+Comparison operators bind more tightly than `&` and `|`, so `(col('a') > 4) & (col('b') < 2)` is parsed correctly, but the parentheses are recommended for readability.
+
+### The code-reference form
+
+For logic the operators can't express, pass a `sub`. It is called once per row; the **row is a hash reference**, available both as `$_` and as the first argument `$_[0]`. Return a true value to keep the row.
+
+    filter($df, sub { $_->{x} > 4 && $_->{grp} eq 'a' });
+    filter($df, sub { $_->{name} =~ /^A/ });
+    filter($df, sub { $_[0]{score} > $_[0]{threshold} });
+
+For an HoA, each row is assembled into a temporary hash reference (`{ column => value, ... }`) before the sub is called, so the same `$_->{column}` syntax works regardless of the input shape.
+
+### Examples
+
+    use Stats::LikeR;
+    my $df = read_table('patients.csv');                 # array of hashes
+    # numeric threshold
+    my $adults = filter($df, col('Age') >= 18);
+    # combine conditions
+    my $target = filter($df, (col('Age') >= 18) & (col('Sex') eq 'f'));
+    # arbitrary logic with a coderef
+    my $flagged = filter($df, sub { $_->{ALT} > 40 || $_->{AST} > 40 });
+    # hash-of-arrays input -> hash-of-arrays output, columns filtered in parallel
+    my $hoa = read_table('patients.csv', 'output.type' => 'hoa');
+    my $sub = filter($hoa, col('Age') > 32);
+    # $sub->{Age}, $sub->{Sex}, ... are all the same length and row-aligned
+
+### Behavior and notes
+
+- **The input is never modified.** `filter` builds and returns a new frame; `$df` is left untouched.
+- **A missing or `undef` cell never matches** a `col()` comparison. For example `col('x') > 0` silently drops any row that has no `x` value or whose `x` is `undef`.
+- **AoH rows are shared, not deep-copied**, into the returned frame: the returned array references the *same* row hashes as the input (fast, low-memory). Mutating a row in the result would therefore also change it in the original. HoA values are copied into fresh arrays.
+- **Keep-all / keep-none** are well defined: a predicate true for every row returns a copy-shaped frame with all rows; a predicate true for none returns an empty frame (`[]` for AoH, a hash of empty arrays for HoA).
+- **Supported shapes are AoH and HoA.** Passing a non-reference, an array element that is not a hash reference, or an HoA column that is not an array reference raises a descriptive error.
+- **Perl 5.10 compatible.** The `col()`/operator layer is pure Perl (operator overloading); the per-row evaluation is done in XS.
+
+### See also
+
+`read_table` (whose `filter` option applies the same coderef convention while reading a file), `col2col`.
+
 ## fisher_test
 
 ### array reference entry
@@ -601,14 +745,15 @@ which returns a hash reference:
     {
     alternative   "two.sided",
     conf_int      [
-        [0] 2.75338278824932,
-        [1] 301.462337971516
+        [0] 2.75343836564204,
+        [1] 300.682787419401
     ],
+    conf_level    0.95,
     estimate      {
-        "odds ratio"   21.3053175567504
+        "odds ratio"   21.3053312750168
     },
     method        "Fisher's Exact Test for Count Data",
-    p_value       0.00053672411914343
+    p_value       0.000536724119143435
     }
 
 ### hash reference entry
@@ -621,8 +766,6 @@ which returns a hash reference:
             Milk => 1, Tea => 3
         }
     });
-
-I have the p-value calculated very precisely, but there are some inexactness (approximately 1% for the confidence intervals) which I couldn't rectify.  The answers are very close to R besides the p-value, where they are identical.
 
 ## glm
 
@@ -740,6 +883,81 @@ Data can be further broken down with filter/subs like in `read_table`:
     );
 
 where each filter filters on the columns, e.g. second hash keys.
+
+## hoh2hoa
+
+Convert a **hash of hashes** (row-major: outer key = row, inner key = column)
+into a **hash of arrays** (column-major: key = column, value = that column's
+cells down the rows).
+
+    use Stats::LikeR;
+
+    my %hoh = (
+        'r1' => { 'a' => 1, 'b' => 2 },
+        'r2' => { 'a' => 3, 'b' => 4 },
+    );
+    
+    my $hoa = hoh2hoa(\%hoh);
+
+which returns
+    {
+      a => [1, 3],
+      b => [2, 4],
+    }
+
+### Behavior
+
+- **Columns** are the union of every inner key, so a key that appears in only
+  some rows still becomes a column.
+- **Rows** are emitted in sorted outer-key (row-name) order, and that one order
+  is used for every column, so the arrays stay aligned and the result is
+  reproducible regardless of hash ordering.
+- **Gaps** — a missing inner key, or a cell whose value is `undef` — are filled
+  with the fill value (see `undef.val` below). Every column therefore has
+  exactly one entry per row.
+- Values are **copied** into the result; the original structure is left
+  untouched.
+- An **empty** hash of hashes returns an empty hash of arrays (it is not an
+  error).
+
+### Options
+
+Options are passed as trailing `name => value` pairs.
+
+| Option | Default | Meaning |
+| --- | --- | --- |
+| `undef.val` | `undef` | Value used to fill a missing key or an `undef` cell. Any defined scalar works, including `0` and `''`. Passing `undef` keeps the default. |
+| `row.names` | *(none)* | If set to a string, an extra column of that name is added holding the sorted row labels, aligned with the data. Dies if the name collides with an existing column. |
+
+    # Ragged input with an explicit fill string:
+    my %ragged = (
+        'r1' => { 'a' => 1, 'b' => 2 },
+        'r2' => { 'a' => 3, 'c' => 9 },
+    );
+    my $hoa = hoh2hoa(\%ragged, 'undef.val' => 'NA');
+    # {
+    #   a => [1,    3   ],
+    #   b => [2,    'NA'],
+    #   c => ['NA', 9   ],
+    # }
+    
+    # Keep the row labels as a column:
+    my $with_ids = hoh2hoa(\%ragged, 'row.names' => 'id');
+    # {
+    #   id => ['r1', 'r2'],
+    #   a  => [1,    3   ],
+    #   b  => [2,    undef],
+    #   c  => [undef, 9  ],
+    # }
+
+### Errors
+
+`hoh2hoa` dies (via `croak`) when:
+
+- the argument is not a hash reference,
+- any value in the hash is not itself a hash reference,
+- an unknown option is given, or the options are not `name => value` pairs,
+- `row.names` is not a plain string, or it names an already-present column.
 
 ## hist
 
@@ -1524,6 +1742,26 @@ Args can also be accepted:
     write_table( 'data' => \%flat, 'file' => $f );
 
 # changes
+
+## 0.14
+
+`filter` function added for rows
+
+`read_table` reads undefined values to `undef` instead of `NA`, which makes calculations easier
+
+`write_table` writes undef by default as an empty string `''`
+
+`hoh2hoa` transforms a hash of hashes into an hash of arrays
+
+`quantile` uses `NV` instead of `double` to allow for high-precision 128-bit floats to be used on quadmath machines when available: https://www.cpantesters.org/cpan/report/296f4868-631f-11f1-abba-ff15558d240b
+
+Numerous switches from `double` to `NV` for local precision, like above
+
+numerous changes to `col2col` for ease of use and working with datasets with numerous undefined values
+
+dist.ini now links to math library when compiling: https://www.cpantesters.org/cpan/report/785e26d8-6397-11f1-89c0-dc066e8775ea
+
+`fisher_test` now should be complete, errors with confidence intervals fixed
 
 ## 0.13
 

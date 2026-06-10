@@ -12,7 +12,12 @@ cpanfile
 dist.ini
 lib/Atomic/Pipe.pm
 t/burst.t
+t/close_pending.t
+t/compress_cache.t
 t/compression.t
+t/constructor_params.t
+t/destroy_state.t
+t/eof_buffer.t
 t/epipe.t
 t/fifo.t
 t/ipc.t
@@ -25,6 +30,9 @@ t/simple.t
 t/stress.t
 t/stress_fifo.t
 t/takeover.t
+t/truncated.t
+t/truncated_mixed.t
 t/worker.pm
 t/write_block.t
+t/write_errors.t
 xt/author/pod-syntax.t

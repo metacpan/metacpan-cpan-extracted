@@ -2,7 +2,7 @@ package Zuzu::Runtime;
 
 use utf8;
 
-our $VERSION = '0.002000';
+our $VERSION = '0.003000';
 our $DEBUG_LEVEL = 0;
 
 use Digest::MD5 qw( md5_hex );
@@ -2436,7 +2436,7 @@ sub eval_class_def {
 		trait_methods => {},
 		static_methods => {},
 		nested_classes => {},
-		closure_env => $self->_env,
+		closure_env => undef,
 		source_node => $node,
 	);
 
@@ -2476,6 +2476,7 @@ sub eval_class_def {
 	for my $method ( values %{ $klass->static_methods } ) {
 		$method->closure_env($class_env);
 	}
+	$klass->closure_env($class_env);
 
 	my $ref = $self->_env->find_ref($node->name);
 	if (!$ref) {
@@ -5891,7 +5892,18 @@ sub _instantiate_slots {
 
 	for my $spec (@{ $klass->field_specs // [] }) {
 		my $name = $spec->{name};
-		my $val = defined($spec->{init}) ? $spec->{init}->evaluate($self) : undef;
+		my $val = undef;
+		if ( defined $spec->{init} ) {
+			my $init_env = Zuzu::Env->_new_fast( $klass->closure_env // $self->_env );
+			$self->_push_env($init_env);
+			my $ok = eval {
+				$val = $spec->{init}->evaluate($self);
+				1;
+			};
+			my $err = $@;
+			$self->_pop_env;
+			die $err if !$ok;
+		}
 		my $declared_type = $spec->{declared_type} // 'Any';
 		if ( defined $spec->{init} ) {
 			$self->_assert_declared_type( $declared_type, $val, $klass->name, 0, $name );

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use v5.10;
 package NetAddr::MAC;
-$NetAddr::MAC::VERSION = '1.00';
+$NetAddr::MAC::VERSION = '1.01';
 
 use Carp qw( croak );
 use Exporter 'import';
@@ -1072,7 +1072,7 @@ NetAddr::MAC - MAC hardware address functions and object (EUI48 and EUI64)
 
 =head1 VERSION
 
-version 1.00
+version 1.01
 
 =head1 SYNOPSIS
 
@@ -1671,7 +1671,7 @@ Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2026 by Dean Hamstad.
+This software is Copyright (c) 2026 by Dean Hamstead.
 
 This is free software, licensed under:
 

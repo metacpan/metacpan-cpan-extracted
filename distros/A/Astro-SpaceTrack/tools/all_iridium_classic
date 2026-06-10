@@ -11,7 +11,7 @@ use JSON;
 use List::Util qw{ max };
 use Pod::Usage;
 
-our $VERSION = '0.181';
+our $VERSION = '0.182';
 
 my %opt;
 
@@ -278,7 +278,7 @@ You need a Space Track username and password to use this script.
 
 =head1 AUTHOR
 
-Tom Wyant (wyant at cpan dot org)
+Tom Wyant (harryfmudd at comcast dot net)
 
 =head1 COPYRIGHT AND LICENSE
 

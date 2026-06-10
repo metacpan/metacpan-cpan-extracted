@@ -1,5 +1,9 @@
 Revision history for Perl extension Backblaze-B2V4
 
+0.02 2026-06-10T03:14:08Z
+
+    - Improve documentation / add current_status_is_ok()
+
 0.01 2026-06-01T06:21:44Z
 
     - original version

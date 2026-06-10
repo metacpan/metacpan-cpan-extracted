@@ -13,7 +13,7 @@ use JSON;
 
 sub charset { 'utf8' }
 
-sub site_type { 'tiezi' }
+sub class { 'tiezi' }
 
 sub domain { 'lofter.com' }
 

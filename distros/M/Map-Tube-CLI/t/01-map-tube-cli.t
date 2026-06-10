@@ -16,6 +16,20 @@ is(capture_stdout { Map::Tube::CLI->new({ map => 'London', start => 'Baker Stree
    "Route check"
   );
 
+is(capture_stdout { Map::Tube::CLI->new({ map => 'London', start => 'Baker Street', end => 'Euston Square', preferred => 1, tabular => 1 })->run },
+   "Metro Map London: Route from Baker Street to Euston Square.
+
+.--------------------------------------------------------------------.
+| Station Name          | Lines                                      |
++-----------------------+--------------------------------------------+
+| Baker Street          | Circle, Hammersmith and City, Metropolitan |
+| Great Portland Street | Circle, Hammersmith and City, Metropolitan |
+| Euston Square         | Circle, Hammersmith and City, Metropolitan |
+'-----------------------+--------------------------------------------'
+",
+   "Preferred route check, tabular"
+  );
+
 is(capture_stdout { Map::Tube::CLI->new({ map => 'London', list_lines => 1 })->run },
 "Bakerloo,
 Central,
@@ -43,7 +57,7 @@ Windrush
   );
 
 eval { Map::Tube::CLI->new };
-like($@, qr/Missing required arguments: map/, 'Missing map argument');
+like($@, qr/Missing Map Name/, 'Missing map argument');
 
 eval { Map::Tube::CLI->new({ map => 'X' }) };
 like($@, qr/ERROR: Unsupported Map/, 'Non-existent map');

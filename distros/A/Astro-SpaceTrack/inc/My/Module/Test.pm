@@ -13,7 +13,7 @@ use HTTP::Date;
 use HTTP::Status qw{ :constants };
 use Test::More 0.96;	# For subtest
 
-our $VERSION = '0.181';
+our $VERSION = '0.182';
 
 # Set the following to zero if Space Track (or any other SSL host)
 # starts using a certificate that can not be verified.
@@ -121,7 +121,6 @@ sub is_success_or_skip {	## no critic (RequireArgUnpacking)
     return 1;
 }
 
-
 sub last_modified {
     $rslt
 	or return;
@@ -182,7 +181,6 @@ sub not_defined {
     }
 
 }
-
 
 # Determine whether a given web site is to be skipped.
 
@@ -420,7 +418,6 @@ sub throws_exception {	## no critic (RequireArgUnpacking)
     goto &like;
 }
 
-
 1;
 
 __END__
@@ -597,13 +594,12 @@ the exception text.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SpaceTrack>,
-L<https://github.com/trwyant/perl-Astro-SpaceTrack/issues/>, or in
+L<https://github.com/trwyant/perl-Astro-SpaceTrack/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III F<wyant at cpan dot org>
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT AND LICENSE
 

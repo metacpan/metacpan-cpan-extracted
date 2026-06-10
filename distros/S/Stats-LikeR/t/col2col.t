@@ -108,9 +108,106 @@ dies_ok { col2col( \%hoa, 'no_such_function' ) } 'unknown function name dies';
 dies_ok { col2col( \%hoa, undef ) } 'undef command dies';
 dies_ok { col2col( \%hoa, { 'a' => 1 } ) } 'hash-ref command dies';
 # 15. No memory leaks across the block, function-name, and column-subset paths.
-no_leaks_ok { col2col( \%hoa, sub { cor( $_[0], $_[1] ) } ) } 'no leaks: code block';
-no_leaks_ok { col2col( \%hoa, 'cor' ) } 'no leaks: function-name shorthand';
-no_leaks_ok { col2col( \@aoh, sub { cor( $_[0], $_[1] ) } ) } 'no leaks: array-of-hashes input';
-no_leaks_ok { col2col( \%hoh, sub { cor( $_[0], $_[1] ) } ) } 'no leaks: hash-of-hashes input';
-no_leaks_ok { col2col( \%hoa, sub { cor( $_[0], $_[1] ) }, [ 'x', 'y' ] ) } 'no leaks: column subset';
+no_leaks_ok { col2col( \%hoa, sub { cor( $_[0], $_[1] ) } ) } 'no leaks: code block' unless $INC{'Devel/Cover.pm'};
+no_leaks_ok { col2col( \%hoa, 'cor' ) } 'no leaks: function-name shorthand' unless $INC{'Devel/Cover.pm'};
+no_leaks_ok { col2col( \@aoh, sub { cor( $_[0], $_[1] ) } ) } 'no leaks: array-of-hashes input' unless $INC{'Devel/Cover.pm'};
+no_leaks_ok { col2col( \%hoh, sub { cor( $_[0], $_[1] ) } ) } 'no leaks: hash-of-hashes input' unless $INC{'Devel/Cover.pm'};
+no_leaks_ok { col2col( \%hoa, sub { cor( $_[0], $_[1] ) }, [ 'x', 'y' ] ) } 'no leaks: column subset' unless $INC{'Devel/Cover.pm'};
+# 16. rm.undef (synonym rm.na) toggles the pairwise-complete-cases behaviour.
+#     It defaults to TRUE: a row that is undef in either column is dropped so
+#     both columns reach the block complete and equal length (sections 7-8).
+#     Setting it false keeps every row, passing undef through in the gaps. cols
+#     is positional, so pass it (undef is fine) ahead of any trailing option.
+my %gap2 = ( 'a' => [ 1, 2, 3, 4, 5 ], 'b' => [ 2, undef, 6, 8, 10 ] );
+my $len_block = sub { return scalar( @{ $_[0] } ) . ',' . scalar( @{ $_[1] } ) };
+my $rm_default = col2col( \%gap2, $len_block );
+is( $rm_default->{'a'}{'b'}, '4,4', 'rm.undef defaults to TRUE: gap row dropped pairwise' );
+my $rm_true = col2col( \%gap2, $len_block, undef, 'rm.undef' => 1 );
+is( $rm_true->{'a'}{'b'}, '4,4', 'rm.undef => 1 drops the gap row, like the default' );
+is_deeply( $rm_true, $rm_default, 'omitting rm.undef equals rm.undef => 1 (TRUE by default)' );
+my $rm_false = col2col( \%gap2, $len_block, undef, 'rm.undef' => 0 );
+is( $rm_false->{'a'}{'b'}, '5,5', 'rm.undef => 0 keeps all rows, so columns stay full length' );
+my $na_false = col2col( \%gap2, $len_block, undef, 'rm.na' => 0 );
+is( $na_false->{'a'}{'b'}, '5,5', 'rm.na => 0 is a synonym for rm.undef => 0' );
+is_deeply( $na_false, $rm_false, 'rm.na and rm.undef name the same option' );
+my $mark = col2col( \%gap2, sub { my ( $x, $y ) = @_; return join( ',', map { defined($_) ? 'D' : 'U' } @$y ) }, undef, 'rm.undef' => 0 );
+is( $mark->{'a'}{'b'}, 'D,U,D,D,D', 'rm.undef => 0 passes undef through in place (col b, row 2)' );
+is( $mark->{'b'}{'a'}, 'D,D,D,D,D', 'the gap-free column still has every row defined' );
+my $col_false = col2col( \%gap2, $len_block, 'a', 'rm.na' => 0 );
+is_deeply( [ sort keys %$col_false ], [ 'a' ], 'a cols restriction still applies alongside an option' );
+is( $col_false->{'a'}{'b'}, '5,5', 'cols restriction + rm.na => 0 keeps full length' );
+dies_ok { col2col( \%gap2, $len_block, undef, 'rm.bogus' => 1 ) } 'unknown option name dies';
+dies_ok { col2col( \%gap2, $len_block, undef, 'rm.undef' ) } 'an option without a value dies (odd trailing args)';
+no_leaks_ok { col2col( \%gap2, $len_block, undef, 'rm.undef' => 0 ) } 'no leaks: rm.undef => 0 keeps every row' unless $INC{'Devel/Cover.pm'};
+no_leaks_ok { col2col( \%gap2, $len_block, 'a', 'rm.na' => 0 ) } 'no leaks: cols restriction plus rm.na => 0' unless $INC{'Devel/Cover.pm'};
+# 17. na => 'pairwise' | 'omit' | 'keep' chooses how undef is handled when one
+#     column is paired with another. 'pairwise' (the default) keeps only rows
+#     defined in BOTH, so the block gets equal aligned columns (paired stats
+#     such as cor). 'omit' drops each column's own undef independently, so the
+#     two columns may differ in length (unpaired tests such as t_test and
+#     kruskal_test, where a gap in one sample must not discard a value in the
+#     other). 'keep' passes every row through with undef in the gaps.
+my %gap3 = ( 'a' => [ 1, 2, 3, 4, 5 ], 'b' => [ 10, undef, undef, 40, 50 ] );
+my $show3 = sub { my ( $x, $y ) = @_; return join( ',', map { defined($_) ? $_ : 'U' } @$x ) . '|' . join( ',', map { defined($_) ? $_ : 'U' } @$y ) };
+my $len3  = sub { return scalar( @{ $_[0] } ) . ',' . scalar( @{ $_[1] } ) };
+# pairwise: rows defined in both are 0,3,4 -> a=[1,4,5], b=[10,40,50]
+my $na_pw = col2col( \%gap3, $show3, undef, 'na' => 'pairwise' );
+is( $na_pw->{'a'}{'b'}, '1,4,5|10,40,50', "na => 'pairwise' keeps only rows defined in both" );
+is_deeply( col2col( \%gap3, $show3 ), $na_pw, "pairwise is the default na mode" );
+is_deeply( col2col( \%gap3, $show3, undef, 'rm.undef' => 1 ), $na_pw, "rm.undef => 1 is an alias for na => 'pairwise'" );
+# omit: a keeps all 5, b keeps its 3 -> different lengths, each column's own undef gone
+my $na_om = col2col( \%gap3, $show3, undef, 'na' => 'omit' );
+is( $na_om->{'a'}{'b'}, '1,2,3,4,5|10,40,50', "na => 'omit' drops each column's own undef independently" );
+is( col2col( \%gap3, $len3, undef, 'na' => 'omit' )->{'a'}{'b'}, '5,3', "na => 'omit' columns may differ in length" );
+# keep: every row, undef passed through
+my $na_kp = col2col( \%gap3, $show3, undef, 'na' => 'keep' );
+is( $na_kp->{'a'}{'b'}, '1,2,3,4,5|10,U,U,40,50', "na => 'keep' passes undef through" );
+is_deeply( col2col( \%gap3, $show3, undef, 'rm.na' => 0 ), $na_kp, "rm.na => 0 is an alias for na => 'keep'" );
+# a column with no defined values under omit -> that pair is skipped (undef), no crash
+my %allundef = ( 'a' => [ 1, 2, 3 ], 'z' => [ undef, undef, undef ] );
+my $au = col2col( \%allundef, $show3, undef, 'na' => 'omit' );
+ok( !defined $au->{'a'}{'z'}, "na => 'omit' yields undef for a pair with an all-undef column" );
+dies_ok { col2col( \%gap3, $show3, undef, 'na' => 'omit', 'rm.undef' => 1 ) } 'na together with rm.undef dies';
+dies_ok { col2col( \%gap3, $show3, undef, 'na' => 'bogus' ) } 'an invalid na value dies';
+no_leaks_ok { col2col( \%gap3, $show3, undef, 'na' => 'omit' ) } 'no leaks: na => omit' unless $INC{'Devel/Cover.pm'};
+no_leaks_ok { col2col( \%gap3, $show3, undef, 'na' => 'keep' ) } 'no leaks: na => keep' unless $INC{'Devel/Cover.pm'};
+# 18. skip.errors defaults to TRUE: a block that croaks for a pair does not abort
+#     col2col; the offending cell keeps the FIRST LINE of the error message so the
+#     caller sees which (outer => inner) pair failed and why, while every other
+#     cell is computed as usual. Storing only the first line keeps cells tidy even
+#     when Carp / Devel::Confess append a multi-line stack trace. Set
+#     skip.errors => 0 to make a croak propagate and abort the whole call.
+my %se = ( 'p' => [ 1, 2, 3 ], 'q' => [ 4, 5, 6 ], 'r' => [ 7, 8, 9 ] );
+my $boom = sub { my ( $a, $b ) = @_; die "boom for this pair\n" if $b->[0] == 4; return $a->[0] + $b->[0] };
+# default (no option): the croak is trapped, not propagated
+my $se_def = col2col( \%se, $boom );
+is( ref $se_def, 'HASH', 'skip.errors defaults to true: col2col returns rather than dying' );
+is( $se_def->{'p'}{'q'}, 'boom for this pair', 'default: failing cell holds the first line of the croak message' );
+is( $se_def->{'r'}{'q'}, 'boom for this pair', 'default: every pair that hits the croak is reported' );
+is( $se_def->{'p'}{'r'}, 1 + 7, 'default: a pair that does not croak is computed normally' );
+unlike( $se_def->{'p'}{'q'}, qr/\n/, 'default: stored message is a single line' );
+# explicit skip.errors => 1 is identical to the default
+my $se_r = col2col( \%se, $boom, undef, 'skip.errors' => 1 );
+is_deeply( $se_r, $se_def, 'skip.errors => 1 matches the default' );
+# skip.errors => 0 opts out: the croak propagates and aborts the call
+dies_ok { col2col( \%se, $boom, undef, 'skip.errors' => 0 ) } 'skip.errors => 0 lets a croaking block abort the whole call';
+# a message carrying a trailing stack trace (as Devel::Confess / Carp add) is
+# reduced to its first line:
+my $trace = sub { my ( $a, $b ) = @_; die "bad pair\n at file line 9.\n\tmain::__ANON__ called at x line 3\n" if $b->[0] == 4; return 0 };
+my $tr = col2col( \%se, $trace );
+is( $tr->{'p'}{'q'}, 'bad pair', 'a multi-line (trace-augmented) message keeps only its first line' );
+no_leaks_ok { col2col( \%se, $boom ) } 'no leaks: trapping a croaking block by default' unless $INC{'Devel/Cover.pm'};
+
+# 19. Options may be passed as a hash ref in place of cols, so no undef
+#     placeholder is needed when there is no column restriction. It is
+#     equivalent to the trailing name => value form.
+my $hash_form = col2col( \%se, $boom, { 'skip.errors' => 1 } );
+is_deeply( $hash_form, $se_def, 'options as a hash ref == default (no undef placeholder needed)' );
+my %gap4 = ( 'a' => [ 1, 2, 3, 4, 5 ], 'b' => [ 10, undef, undef, 40, 50 ] );
+my $hash_na = col2col( \%gap4, sub { my ( $x, $y ) = @_; scalar(@$x) . ',' . scalar(@$y) }, { 'na' => 'omit' } );
+is( $hash_na->{'a'}{'b'}, '5,3', "na => 'omit' via the hash-ref form" );
+my $hash_off = col2col( \%gap4, sub { my ( $x, $y ) = @_; scalar(@$x) . ',' . scalar(@$y) }, { 'skip.errors' => 0 } );
+is( $hash_off->{'a'}{'b'}, '3,3', 'skip.errors => 0 via the hash-ref form (default na still pairwise)' );
+dies_ok { col2col( \%se, $boom, { 'skip.errors' => 1 }, 'na' => 'keep' ) } 'a hash ref of options must be the last argument';
+dies_ok { col2col( \%se, $boom, { 'bogus' => 1 } ) } 'an unknown option in the hash ref dies';
 done_testing();

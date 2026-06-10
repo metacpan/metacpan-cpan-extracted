@@ -24,17 +24,19 @@ L<Novel::Robot::Packer>
 
 for example, on debian, 以debian环境为例
 
-    $ apt-get install parallel ansible calibre cpanminus
-    $ cpanm Novel::Robot
+    apt install parallel ansible calibre cpanminus firefox chromium-browser
+    cpanm Novel::Robot
 
-=head2 example
+=head2 EXAMPLE
 
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t epub
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o mytest.epub
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o abc.epub -i 1-3
+    novel-robot -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t epub
+    novel-robot -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o mytest.epub
+    novel-robot -u "http://www.jjwxc.net/onebook.php?novelid=14838" -o abc.epub -i 1-3
 
 
 =head2 ARG
+
+    Usage: novel-robot [options]
 
     -s : site, 指定站点
 
@@ -43,7 +45,6 @@ for example, on debian, 以debian环境为例
     -w : writer name 作者名
     -b : book name，书名
     -f : txt file / txt file dir, 指定文本文件来源(可以是单个目录或文件)
-    -c : firefox cookies.sqlite / netscape HTTP cookie file / cookie string, details in Novel::Robot::Browser
 
     -t : packer type (html/txt), 小说保存类型，例如txt/html
     -o : output packer filename, 保存的小说文件名
@@ -52,32 +53,43 @@ for example, on debian, 以debian环境为例
     --back_index: back item num, 不取 倒数 back_index 章/楼
     -j : min_page_num-max_page_num, 只取 x-y 页
 
+    --cookie : firefox cookies.sqlite / netscape HTTP cookie file / cookie string, details in Novel::Robot::Browser
     -D : only print info, not download, 只输出信息，不下载
-    --single_page: only download single page, not parse content url，只下载当前页面，不作为章节目录解析
-
+    -c : class, 指定类型 novel, teizi, page
     -v : verbose
-    --progress: 显示进度条(默认不显示)
 
-    --use_chrome      : use chrome dump_dom, only support GET method
+    --progress: 显示进度条(默认不显示)
+    -h, --help: 显示帮助
+
+    --agent           : default, firefox (GET), chrome (GET)
     --with_toc        : 小说保存时是否生成目录(默认是)
     --grep_content    : 提取关键字
     --filter_content  : 过滤关键字
     --only_poster     : 贴子只看楼主
     --min_content_word_num : 贴子每楼层最小字数
     --max_process_num : 进程个数 
-    --chapter_regex: 指定分割章节的正则表达式(例如："第[ \\t\\d]+章")
 
-    --item_list_path : xpath to extract item_list, 提取item_list的路径
+    --chapter_regex: 指定分割章节的正则表达式(例如："第[ \\t\\d]+章")
     --content_path    : xpath to extract content, 提取content的路径
     --writer_path     : xpath to extract writer, 提取writer的路径
     --book_path       : xpath to extract book, 提取book的路径
+    --item_list_path : xpath to extract item_list, 提取item_list的路径
     --content_regex   : regex to extract content, 提取content的正则
     --writer_regex    : regex to extract writer, 提取writer的正则
     --book_regex      : regex to extract book, 提取book的正则
 
-    -B : board_url / board_id  版块url，或版块编号
     -q : query type, 查询类型
     -k : query keyword, 查询关键字
+    -B : board_url / board_id  版块url，或版块编号
+
+    -m, --mail_msg : 消息
+    -M, --mail_server : 邮件SMTP服务器
+    -p, --mail_port : 邮件SMTP服务器端口
+    -U, --mail_usr  : 发件人账号
+    -P, --mail_pwd  : 发件人密码
+    -F, --mail_from : 发件人邮箱
+    -T, --mail_to   : 收件人邮箱
+
 
 =head2 download novel
 
@@ -85,26 +97,26 @@ download novel from url
 
 下载小说
 
-    get_novel.pl -u [url] -t [type] -i [min_item_num-max_item_num] --cookie [cookie] -o [dst_file/dst_dir]
-    get_novel.pl -u [小说目录页url] -t [目标文件类型] -i [起止章节号] --cookie [cookie登录信息] -o [目标文件名/目标文件夹]
+    novel-robot -u [url] -t [type] -i [min_item_num-max_item_num] --cookie [cookie] -o [dst_file/dst_dir]
+    novel-robot -u [小说目录页url] -t [目标文件类型] -i [起止章节号] --cookie [cookie登录信息] -o [目标文件名/目标文件夹]
 
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t txt
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html
+    novel-robot -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t txt
+    novel-robot -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html
 
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3-4
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3-
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i -3
+    novel-robot -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3
+    novel-robot -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3-4
+    novel-robot -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i 3-
+    novel-robot -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t html -i -3
 
-=head3 use chrome
+=head3 agent
 
 阿里文学
 
-    get_novel.pl -u "https://www.aliwx.com.cn/chapter?bid=7964189" --use_chrome --writer_path "//div[@class='chapterbox']//span" --book_regex "<title>(.+?)-" --content_path "//div[@class='chapter-content']"
+    novel-robot -u "https://www.aliwx.com.cn/chapter?bid=7964189" --agent chrome --writer_path "//div[@class='chapterbox']//span" --book_regex "<title>(.+?)-" --content_path "//div[@class='chapter-content']"
 
 公众号
 
-    get_novel.pl -u "https://mp.weixin.qq.com/s?xxxx" --use_chrome --content_path "//div[@id='js_content']" --item_list_path "//div[@id='js_content']//a"  -w somewriter -b somebook
+    novel-robot -u "https://mp.weixin.qq.com/s?xxxx" --agent chrome --content_path "//div[@id='js_content']" --item_list_path "//div[@id='js_content']//a"  -w somewriter -b somebook
 
 =head3 use cookie
 
@@ -114,15 +126,15 @@ download novel from url
 
 绿晋江VIP
 
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 --cookie cookies.txt
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 --cookie ~/.mozilla/firefox/*/cookies.sqlite
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 --cookie "name1=value1; name2=value2"
+    novel-robot -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 --cookie cookies.txt
+    novel-robot -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 --cookie ~/.mozilla/firefox/*/cookies.sqlite
+    novel-robot -u "http://www.jjwxc.net/onebook.php?novelid=217747" -i 33-34 --cookie "name1=value1; name2=value2"
 
 =head3  download by site, writer, book 
 
-    get_novel.pl -s lofter -t epub -w chuweizhiyu -b 时之足
-    get_novel.pl -s lofter -t epub -w chuweizhiyu -b 时之足 -i 3-
-    get_novel.pl -s lofter -t epub -w chuweizhiyu -b 时之足 -i 3-5
+    novel-robot -s lofter -t epub -w chuweizhiyu -b 时之足
+    novel-robot -s lofter -t epub -w chuweizhiyu -b 时之足 -i 3-
+    novel-robot -s lofter -t epub -w chuweizhiyu -b 时之足 -i 3-5
 
 
 =head2 parse txt
@@ -131,33 +143,33 @@ parse chapter name with regex, convert txt to ebook
 
 可指定章节标题的正则式，把txt文件转成电子书
 
-    get_novel.pl -s txt -w [writer] -b [book] -f [txt_file/directory] -t [type] -r [chapter_regex]
-    get_novel.pl -s txt -w [作者] -b [书名] -f [txt文件或目录] -t [目标文件类型] -r [章节标题匹配的正则式]
+    novel-robot -s txt -w [writer] -b [book] -f [txt_file/directory] -t [type] -r [chapter_regex]
+    novel-robot -s txt -w [作者] -b [书名] -f [txt文件或目录] -t [目标文件类型] -r [章节标题匹配的正则式]
 
-    get_novel.pl -s txt -w 牵机 -b 断情逐妖记 -f dq1.txt -t html
-    get_novel.pl -s txt -w 牵机 -b 断情逐妖记 -f dq1.txt,dq2.txt,dir1 -r "第[ \\t\\d]+章" -t html
-    get_novel.pl -s txt -f 飘灯-像妖怪一样自由.txt -t html
-    get_novel.pl -s txt -f 飘灯-风尘叹.txt -t epub
-    get_novel.pl -s txt -f fct.txt -w 飘灯 -b 风尘叹 -t epub
+    novel-robot -s txt -w 牵机 -b 断情逐妖记 -f dq1.txt -t html
+    novel-robot -s txt -w 牵机 -b 断情逐妖记 -f dq1.txt,dq2.txt,dir1 -r "第[ \\t\\d]+章" -t html
+    novel-robot -s txt -f 飘灯-像妖怪一样自由.txt -t html
+    novel-robot -s txt -f 飘灯-风尘叹.txt -t epub
+    novel-robot -s txt -f fct.txt -w 飘灯 -b 风尘叹 -t epub
 
 =head2 only print info
 
 only print info, but not download, 输出小说信息（不下载）
 
-    get_novel.pl -u [url] -D 1
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838"  -D 1
+    novel-robot -u [url] -D 1
+    novel-robot -u "http://www.jjwxc.net/onebook.php?novelid=14838"  -D 1
 
-=head1 convert ebook
+=head2 convert ebook
     
 use L<calibre|https://calibre-ebook.com/> to convert novel file into epub/epub/..., default filename format is [writer]-[bookname].[type]
 
 使用calibre将下载的 html格式 的小说转换成 其他格式的电子书，例如epub、epub等等。如果未指定writer及book选项，则需要将html源文件名称设置为 [作者-书名]
 
-    conv_novel.pl -f [input_file] -o [output_file] -t [type] -w [writer] -b [book]
-    conv_novel.pl -f [源文件] -o [目标文件] -t [目标文件类型(小写)] -w [作者] -b [书名]
+    novel-robot -f [input_file] -o [output_file] -t [type] -w [writer] -b [book]
+    novel-robot -f [源文件] -o [目标文件] -t [目标文件类型(小写)] -w [作者] -b [书名]
 
-    conv_novel.pl -f 天平-风起阿房.html -t epub
-    conv_novel.pl -f mxj.html -w 施定柔 -b 迷侠记 -t epub
+    novel-robot -f 天平-风起阿房.html -t epub
+    novel-robot -f mxj.html -w 施定柔 -b 迷侠记 -t epub
 
 =head2 send email 
 
@@ -167,14 +179,14 @@ download/convert novel, use calibre-smtp to send ebook to email address : xxx@ki
 
 local smtp service 本地已安装smtp服务
 
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t epub -T "xxx@kindle.com" -F "yyy@somesite.cn"
-    get_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -t epub -T "xxx@kindle.com" -F "yyy@somesite.cn"
+    novel-robot -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t epub -T "xxx@kindle.com" -F "yyy@somesite.cn"
+    novel-robot -f fct.txt -w 飘灯 -b 风尘叹 -t epub -T "xxx@kindle.com" -F "yyy@somesite.cn"
 
 remote smtp service 使用远程smtp服务
 
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t epub -T "xxx@kindle.com" -i 1-3  -M smtp.src.com -p 587 -U xxx -P somepwd -F yyy@somesite.cn
-    get_novel.pl -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t epub -T "xxx@kindle.com" -M smtp.qq.com -p 587 -U yyy -P 'aaaaaaaaaaaaagga' -F yyy@qq.com
-    get_novel.pl -f fct.txt -w 飘灯 -b 风尘叹 -t epub  -T "xxx@kindle.com" -M smtp.qq.com -p 587 -U yyy -P 'aaaaaaaaaaaaagga' -F yyy@qq.com
+    novel-robot -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t epub -T "xxx@kindle.com" -i 1-3  -M smtp.src.com -p 587 -U xxx -P somepwd -F yyy@somesite.cn
+    novel-robot -u "http://www.jjwxc.net/onebook.php?novelid=14838" -t epub -T "xxx@kindle.com" -M smtp.qq.com -p 587 -U yyy -P 'aaaaaaaaaaaaagga' -F yyy@qq.com
+    novel-robot -f fct.txt -w 飘灯 -b 风尘叹 -t epub  -T "xxx@kindle.com" -M smtp.qq.com -p 587 -U yyy -P 'aaaaaaaaaaaaagga' -F yyy@qq.com
 
 use L<ansible|https://www.ansible.com/>，push ebook to remote host, and then send email 
 
@@ -188,42 +200,59 @@ use L<ansible|https://www.ansible.com/>，push ebook to remote host, and then se
 
 查询关键字，不下载  
 
-    get_novel.pl -s jjwxc -q 作者 -k 牵机 -i 1-10 -D 1
-    get_novel.pl -s hjj -b 153 -q 贴子主题 -k 迷侠记 -D 1
+    novel-robot -s jjwxc -q 作者 -k 牵机 -i 1-10 -D 1
+    novel-robot -s hjj -b 153 -q 贴子主题 -k 迷侠记 -D 1
 
 =head3 board
 
 批量获取版块/作者专栏的小说信息
 
-    get_novel.pl -B "http://www.jjwxc.net/oneauthor.php?authorid=14644" -D 1
-    get_novel.pl -B "http://www.jjwxc.net/oneauthor.php?authorid=14644" -i 1-3 -D 1
-    get_novel.pl -B "http://bbs.jjwxc.net/board.php?board=153&page=0" -P 1-2 -D 1
-    get_novel.pl -B "http://bbs.jjwxc.net/board.php?board=153&page=0" -i 1-20 -D 1
+    novel-robot -B "http://www.jjwxc.net/oneauthor.php?authorid=14644" -D 1
+    novel-robot -B "http://www.jjwxc.net/oneauthor.php?authorid=14644" -i 1-3 -D 1
+    novel-robot -B "http://bbs.jjwxc.net/board.php?board=153&page=0" -P 1-2 -D 1
+    novel-robot -B "http://bbs.jjwxc.net/board.php?board=153&page=0" -i 1-20 -D 1
 
 
 =head3 bulk download
 
 下载专栏内的所有小说
 
-    get_novel.pl -B "http://www.jjwxc.net/oneauthor.php?authorid=14644" -D 0
+    novel-robot -B "http://www.jjwxc.net/oneauthor.php?authorid=14644" -D 0
 
 manually select some novels, use parallel for multiple novels download
     
-手动选择下载部分小说，用L<parallel|https://www.gnu.org/software/parallel/>批量调用get_novel.pl获取epub
+手动选择下载部分小说，用L<parallel|https://www.gnu.org/software/parallel/>批量调用novel-robot获取epub
 
-    get_novel.pl -s jjwxc -q 作者 -k 牵机 -D 1  > raw_booklist.txt
+    novel-robot -s jjwxc -q 作者 -k 牵机 -D 1  > raw_booklist.txt
     awk -F, '$1=="牵机"' raw_booklist.txt > refine_booklist.txt
-    parallel --colsep , get_novel.pl -u "{3}" -t epub :::: refine_booklist.txt
+    parallel --colsep , novel-robot -u "{3}" -t epub :::: refine_booklist.txt
 
 =head1 FUNCTION
 
+=head2 get_novel
 
     my $xs = Novel::Robot->new(
     site => 'jjwxc',
     type => 'html', 
     );
 
-    my $index_url = 'http://www.jjwxc.net/onebook.php?novelid=2456';
+    my $index_url = 'http://www.jjwxc.net/onebook.php?novelid=14838';
     $xs->get_novel($index_url);
+
+=head2 get_novel_ref
+
+get novel / forum thread data hash ref 
+
+获取小说/贴子内容，返回一个hash引用
+
+       my $r = $xs->get_novel_ref($url, %opt);
+
+=head2 get_novel_info
+
+get novel index info / forum thread first page info
+
+获取小说/贴子首页信息
+
+       my $r = $xs->get_novel_info($url);
 
 =cut

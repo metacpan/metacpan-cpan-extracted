@@ -92,4 +92,57 @@ sub tmpcsv {
 	} 'repeated callback-path reads run without error (XS undef-return path)';
 	ok( $all_ok, 'every repeated read returned the expected structure' );
 }
+# Change: an empty / missing field is now stored as undef rather than the
+# string 'NA'. The empty *value* maps to undef across all three output shapes,
+# while a field whose literal text is "NA" is a real value and survives verbatim.
+#
+# aoh (default): the empty middle field becomes undef, neighbours untouched.
+{
+	my $f = tmpcsv("a,b,c\n1,,3\n");
+	my $rows = read_table($f);
+	ok( exists $rows->[0]{b}, 'aoh: an empty field still produces its key' );
+	ok( !defined $rows->[0]{b}, 'aoh: an empty field is now undef, not the string NA' );
+	is( $rows->[0]{a}, 1, 'aoh: a non-empty field to the left is preserved' );
+	is( $rows->[0]{c}, 3, 'aoh: a non-empty field to the right is preserved' );
+}
+# hoa: the undef lands inside the column's array.
+{
+	my $f = tmpcsv("a,b,c\n1,,3\n");
+	my $h = read_table($f, 'output.type' => 'hoa');
+	ok( !defined $h->{b}[0], 'hoa: the empty field is undef inside the column array' );
+	is( $h->{a}[0], 1, 'hoa: a non-empty field is preserved' );
+}
+# hoh: the undef lands in the per-row hash.
+{
+	my $f = tmpcsv("id,b,c\nr1,,3\n");
+	my $h = read_table($f, 'output.type' => 'hoh', 'row.names' => 'id');
+	ok( exists $h->{r1}{b}, 'hoh: the empty field still produces its key' );
+	ok( !defined $h->{r1}{b}, 'hoh: the empty field is undef' );
+	is( $h->{r1}{c}, 3, 'hoh: a non-empty field is preserved' );
+}
+# A field whose text is literally "NA" is real data and must NOT be turned into
+# undef (the conversion only ever applied to empty / missing fields).
+{
+	my $f = tmpcsv("a,b\nNA,2\n");
+	my $rows = read_table($f);
+	ok( defined $rows->[0]{a}, 'a literal "NA" in the data stays defined (it is a real value)' );
+	is( $rows->[0]{a}, 'NA', 'a literal "NA" is preserved verbatim, not invented or dropped' );
+}
+# The trailing-separator column (see Bug 1 above) now carries undef, not 'NA'.
+{
+	my $f = tmpcsv("a,b,c,\n1,2,3,\n");
+	my $rows = read_table($f);
+	ok( exists $rows->[0]{''}, 'trailing-separator column is still present' );
+	ok( !defined $rows->[0]{''}, 'trailing-separator empty value is undef' );
+}
+# Filter write-back: a callback that blanks $_ stores undef, not the string NA.
+{
+	my $f = tmpcsv("a,b\n1,keep\n2,blank\n");
+	my $rows = read_table($f, filter => {
+		b => sub { $_ = '' if $_ eq 'blank'; 1 }, # mutate in place, keep every row
+	});
+	is( scalar @$rows, 2, 'filter kept both rows' );
+	is( $rows->[0]{b}, 'keep', 'a value left alone by the filter is preserved' );
+	ok( !defined $rows->[1]{b}, 'a value blanked inside a filter is written back as undef' );
+}
 done_testing();

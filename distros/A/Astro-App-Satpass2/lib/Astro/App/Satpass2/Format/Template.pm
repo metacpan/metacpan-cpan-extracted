@@ -10,6 +10,7 @@ use Astro::App::Satpass2::Locale qw{ __localize };
 use Astro::App::Satpass2::FormatValue::Formatter;
 use Astro::App::Satpass2::Utils qw{
     instance
+    load_package
     ARRAY_REF
     HASH_REF
     SCALAR_REF
@@ -27,7 +28,7 @@ use Template;
 use Text::Abbrev;
 use Text::Wrap qw{ wrap };
 
-our $VERSION = '0.057';
+our $VERSION = '0.058';
 
 use constant FORMAT_VALUE	=> 'Astro::App::Satpass2::FormatValue';
 
@@ -250,6 +251,21 @@ sub format : method {	## no critic (ProhibitBuiltInHomonyms)
 	return;
     };
 
+    local $Template::Stash::LIST_OPS->{to_json} = do {
+	local $@ = undef;
+	eval {
+	    load_package( 'JSON' );
+	    sub {
+		my ( $list ) = @_;
+		my $json = JSON->new()->utf8()->allow_blessed()->convert_blessed();
+		$json->pretty()->canonical();
+		return $json->encode( $list );
+	    }
+	} || sub {
+	    $self->wail( 'Module JSON could not be loaded' );
+	};
+    };
+
     $data{localize} = sub {
 	return _localize( $tplt_name, @_ );
     };
@@ -428,10 +444,23 @@ sub _process {
     my $output;
     my $tt = $self->{tt};
 
-    my $tplt_text;
-    not ref $tplt
-	and defined( $tplt_text = $self->template( $tplt ) )
-	and $tplt = \$tplt_text;
+    # NOTE that what I really want is to be able to hook into the
+    # Template-Toolkit loading system. Because that is impossible (or at
+    # least I can't figure out how to do it) the following code
+    # special-cases template '%% INCLUDE ( \w+ )' (and reasonable
+    # equivalents) and loads the template directly. Note that this is
+    # what Template-Toolkit calls outline-tag syntax, but it works
+    # independentl;y of whether outline tags are enabled.
+    unless ( ref $tplt ) {
+	while ( defined( my $tplt_text = $self->template( $tplt ) ) ) {
+	    if ( $tplt_text =~ m/\A %% \s* include \s+ ( \w+ ) \s* \z /smxi ) {
+		$tplt = $1;
+	    } else {
+		$tplt = \$tplt_text;
+		last;
+	    }
+	}
+    }
 
     $tt->process( $tplt, \%arg, \$output )
 	or $self->wail( $tt->error() );
@@ -800,6 +829,14 @@ found, nothing is returned.
 
 If called on an array of anything else the results are undefined.
 
+=item to_json
+
+If called on an array, converts that array to JSON.
+
+TLEs would be displayed as JSON by something like
+
+ [% data.bodies.to_json %]
+
 =back
 
 Also, the following subroutines are defined:
@@ -877,6 +914,12 @@ L<formatter()|Astro::App::Satpass2/formatter> method. If the C<data> value is
 not provided, each of the default templates will call an appropriate
 L<Astro::App::Satpass2|Astro::App::Satpass2> method on the C<sp> value,
 passing it the C<arg> value as arguments.
+
+The templates themselves are C<Template-Toolkit> templates using the
+default start, end, and outline tag delimiters. They are specified as
+literal strings, not as files. As a special case, a template consisting
+entirely of an outline-format include (i.e. C<%% INCLUDE name> will be
+executed by this code, not the template system.
 
 The following documentation no longer shows the default templates, since
 it has proven difficult to maintain. Instead it simply (and probably
@@ -1050,21 +1093,20 @@ is returned, to allow call chaining.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-App-Satpass2>,
-L<https://github.com/trwyant/perl-Astro-App-Satpass2/issues>, or in
+L<https://github.com/trwyant/perl-Astro-App-Satpass2/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III F<wyant at cpan dot org>
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2025 by Thomas R. Wyant, III
+Copyright (C) 2010-2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

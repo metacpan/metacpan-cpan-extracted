@@ -2,7 +2,7 @@ package Data::HashMap::Shared::II;
 use strict;
 use warnings;
 use Data::HashMap::Shared;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 sub import {
     $^H{"Data::HashMap::Shared::II/shm_ii_put"}        = 1;
@@ -12,6 +12,8 @@ sub import {
     $^H{"Data::HashMap::Shared::II/shm_ii_incr"}       = 1;
     $^H{"Data::HashMap::Shared::II/shm_ii_decr"}       = 1;
     $^H{"Data::HashMap::Shared::II/shm_ii_incr_by"}    = 1;
+    $^H{"Data::HashMap::Shared::II/shm_ii_max"}        = 1;
+    $^H{"Data::HashMap::Shared::II/shm_ii_min"}        = 1;
     $^H{"Data::HashMap::Shared::II/shm_ii_size"}       = 1;
     $^H{"Data::HashMap::Shared::II/shm_ii_keys"}       = 1;
     $^H{"Data::HashMap::Shared::II/shm_ii_values"}     = 1;

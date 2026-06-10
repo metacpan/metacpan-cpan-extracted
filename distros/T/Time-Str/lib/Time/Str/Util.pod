@@ -121,6 +121,80 @@ F</usr/share/lib/zoneinfo>, F</etc/zoneinfo>, F</usr/share/zoneinfo.default>.
 A candidate directory is accepted only if it exists and contains a
 F<UTC> file.
 
+=head3 find_local_timezone
+
+    my $tz = find_local_timezone();
+    my $tz = find_local_timezone($tzdb_directory);
+
+Determines the system's local timezone and returns it as a timezone
+object: a L<Time::TZif> object for a zoneinfo file, or a
+L<Time::TZif::POSIX> object for a POSIX C<TZ> rule. Returns C<undef> if
+the local timezone cannot be determined.
+
+The optional C<$tzdb_directory> is the root of the zoneinfo database used
+to resolve zone names; it defaults to the result of
+L<< find_tzdb_directory|/find_tzdb_directory >>. If no directory is
+available (neither given nor found), only forms that do not require the
+database can be resolved.
+
+If the C<TZ> environment variable is set, it is interpreted as follows
+(an empty C<TZ> selects UTC, per the BSD/GNU convention):
+
+=over 4
+
+=item *
+
+As a zoneinfo name relative to C<$tzdb_directory> (e.g.
+C<Europe/Stockholm>). This is tried before the POSIX form, matching the C
+library, so a name that exists as a zoneinfo file (e.g. C<EST5EDT>)
+resolves to that file rather than to a bare POSIX rule.
+
+=item *
+
+As a POSIX C<TZ> rule (e.g. C<CET-1CEST,M3.5.0/2,M10.5.0/3> or the
+quoted form C<< <+05>-5 >>), yielding a L<Time::TZif::POSIX> object.
+
+=item *
+
+As a path containing C<zoneinfo/> (e.g.
+C<:/usr/share/zoneinfo/Europe/Stockholm>); the portion after C<zoneinfo/>
+is taken as the zone name and resolved under C<$tzdb_directory>.
+
+=item *
+
+As a zoneinfo name with an optional leading colon (e.g.
+C<:Europe/Stockholm>).
+
+=item *
+
+As a literal path to a TZif file.
+
+=back
+
+If C<TZ> is not set, the symlink target of F</etc/localtime> is resolved
+to a zone name under C<$tzdb_directory> when possible; otherwise
+F</etc/localtime> is read directly as a TZif file.
+
+Zone names taken from C<TZ> or from a resolved path are validated with
+L<< valid_tzdb_timezone|/valid_tzdb_timezone >> before being joined to
+C<$tzdb_directory>, so a malicious C<TZ> cannot escape the database
+directory.
+
+Note that resolving a path that exists but is not a valid TZif file
+propagates the error from L<Time::TZif>; this function only returns
+C<undef> when no candidate matches at all.
+
+Examples:
+
+    # TZ=Europe/Stockholm
+    my $tz = find_local_timezone();        # Time::TZif (zoneinfo file)
+
+    # TZ=CET-1CEST,M3.5.0/2,M10.5.0/3
+    my $tz = find_local_timezone();        # Time::TZif::POSIX (rule)
+
+    # TZ unset, /etc/localtime -> .../zoneinfo/Europe/Stockholm
+    my $tz = find_local_timezone();        # Time::TZif (zoneinfo file)
+
 =head2 Validation
 
 =head3 valid_tzdb_timezone
@@ -152,9 +226,10 @@ A POSIX TZ string has the form:
 
 Examples:
 
-    EST5EDT,M3.2.0,M11.1.0          # US Eastern
-    CET-1CEST,M3.5.0/2,M10.5.0/3    # Central European
-    UTC0                            # Fixed UTC
+    EST5EDT,M3.2.0,M11.1.0            US Eastern
+    CET-1CEST,M3.5.0/2,M10.5.0/3      Central European
+    <+05>-5                           Fixed UTC+5 (no DST)
+    NZST-12NZDT,M9.5.0,M4.1.0/3       New Zealand
 
 Transition rules may use C<Mm.w.d> (month/week/weekday), C<Jn>
 (Julian day excluding Feb 29), or C<n> (zero-based Julian day
@@ -162,8 +237,6 @@ including Feb 29) forms.
 
 This validates the syntactic structure of the string only, not the
 semantic validity of field values (e.g., month ranges, day ranges).
-Quoted timezone designations (C<< <+05> >>) as used in TZif extensions
-are not part of the POSIX standard and are not accepted.
 
 =head1 SEE ALSO
 

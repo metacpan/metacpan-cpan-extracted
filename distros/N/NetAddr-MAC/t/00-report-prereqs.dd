@@ -2,6 +2,7 @@ do { my $x = {
        'build' => {
                     'requires' => {
                                     'Module::Build' => '0.28',
+                                    'Test::Exception' => '0',
                                     'Test::Trap' => '0'
                                   }
                   },

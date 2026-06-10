@@ -1,7 +1,7 @@
 {
    "abstract" : "Fragmentary distro for Test-Prereq-Meta testing",
    "author" : [
-      "Thomas R. Wyant, III F<wyant at cpan dot org>"
+      "Thomas R. Wyant, III F<harryfmudd at comcast dot net>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4231, with edits",
@@ -37,7 +37,7 @@
    "release_status" : "testing",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "wyant@cpan.org",
+         "mailto" : "harryfmudd@comcast.net",
          "web" : "https://github.com/trwyant/perl-Test-Prereq-Meta/issues"
       },
       "license" : [

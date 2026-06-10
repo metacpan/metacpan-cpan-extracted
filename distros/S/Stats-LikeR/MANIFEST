@@ -13,9 +13,12 @@ t/01.t
 t/HepatitisCdata.csv
 t/add_data.t
 t/bodyfat.csv
+t/cfilter.t
 t/chisq_test.t
 t/col2col.t
+t/filter.t
 t/glm.t
+t/hoh2hoa.t
 t/prcomp.t
 t/read_table.t
 t/transpose.t

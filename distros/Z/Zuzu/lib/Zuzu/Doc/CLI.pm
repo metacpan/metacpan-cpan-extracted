@@ -4,8 +4,9 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.002000';
+our $VERSION = '0.003000';
 
+use File::Spec;
 use Getopt::Long qw(
 	Configure
 	GetOptionsFromArray
@@ -32,7 +33,7 @@ sub run {
 	}
 
 	my $runtime = _build_runtime($options);
-	my $doc_file = _resolve_target_path( $runtime, $target );
+	my $doc_file = _resolve_target_path( $runtime, $target, $options );
 	if ( not defined $doc_file ) {
 		print STDERR "Could not locate documentation for '$target'\n";
 		return 1;
@@ -57,6 +58,7 @@ sub _parse_options {
 	my $ok = GetOptionsFromArray(
 		$argv,
 		'I=s@' => $options->{include_dirs},
+		'bin' => \$options->{bin},
 		'h|help' => \$options->{help},
 	);
 	return ( undef, undef, undef ) if not $ok;
@@ -87,12 +89,35 @@ sub _build_runtime {
 }
 
 sub _resolve_target_path {
-	my ( $runtime, $target ) = @_;
+	my ( $runtime, $target, $options ) = @_;
 
 	return $target if _is_existing_file($target);
 
+	if ( $options->{bin} ) {
+		my $bin_path = _resolve_path_target($target);
+		return $bin_path if defined $bin_path;
+	}
+
 	for my $candidate ( $runtime->_module_candidates( $target, undef ) ) {
 		return $candidate if -f $candidate;
+	}
+
+	my $bin_path = _resolve_path_target($target);
+	return $bin_path if defined $bin_path;
+
+	return undef;
+}
+
+sub _resolve_path_target {
+	my ( $target ) = @_;
+
+	return undef if not defined $target;
+	return undef if $target eq '';
+
+	for my $dir ( File::Spec->path ) {
+		next if not defined $dir or $dir eq '';
+		my $candidate = File::Spec->catfile( $dir, $target );
+		return $candidate if _is_existing_file($candidate);
 	}
 
 	return undef;
@@ -140,7 +165,7 @@ sub _print_usage {
 	if ( defined $message and $message ne '' ) {
 		print STDERR $message, "\n";
 	}
-	print STDERR "Usage: zuzudoc.pl [-I/path/to/lib] path/to/file.zzs|module/name\n";
+	print STDERR "Usage: zuzudoc.pl [--bin] [-I/path/to/lib] path/to/file.zzs|module/name\n";
 
 	return;
 }

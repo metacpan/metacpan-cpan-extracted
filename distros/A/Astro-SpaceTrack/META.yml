@@ -1,7 +1,7 @@
 ---
 abstract: 'Download satellite orbital elements from Space Track'
 author:
-  - 'Tom Wyant (wyant at cpan dot org)'
+  - 'Tom Wyant (harryfmudd at comcast dot net)'
 build_requires:
   File::Temp: '0'
   Test::More: '0.96'
@@ -30,7 +30,7 @@ no_index:
 provides:
   Astro::SpaceTrack:
     file: lib/Astro/SpaceTrack.pm
-    version: '0.181'
+    version: '0.182'
 requires:
   Carp: '0'
   Config: '0'
@@ -57,8 +57,8 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SpaceTrack
+  bugtracker: https://github.com/trwyant/perl-Astro-SpaceTrack/issues
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Astro-SpaceTrack.git
-version: '0.181'
+version: '0.182'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

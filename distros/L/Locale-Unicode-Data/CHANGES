@@ -1,5 +1,20 @@
 Revision history for Perl module Locale::Unicode::Data
 
+v1.8.6 2026-06-09T21:41:51+0900
+    - Test-only maintenance release; no changes to the bundled CLDR data.
+    - Reduced the default CPAN Testers workload in t/01.locale-data.t by making the most
+      expensive unbounded CLDR scans author-only.
+      Methods called without arguments that return every row of a CLDR table are now
+      bypassed in smoke environments. On old hardware such as FreeBSD 10.1
+      (vintage 2014) these exhaustive scans can take too much time an cause a SIGKILL.
+    - Kept the exhaustive locale-data checks available under AUTHOR_TESTING for release
+      validation.
+    - Increased SQLite's per-connection page cache to 64 MiB for the bundled CLDR
+      database, reducing repeated disk I/O during large lookup batches and exhaustive
+      test runs.
+    - Added diagnostic handling when SQLite PRAGMA setup fails, without making cache
+      tuning fatal.
+
 v1.8.5 2026-06-07T14:38:10+0900
     - Fixed a segmentation fault (SIGSEGV) on teardown under OpenBSD, and on any
       other platform whose memory allocator is strict about use-after-free. The

@@ -1,3 +1,20 @@
+0.91 2026-06-09
+  - Add Time::Str::TimeZone for resolving IANA Time Zone Database
+    names (and the special name 'local') to cached Time::TZif
+    objects via the exported timezone function. Lookups dispatch
+    through an overridable provider and the cache is cleared with
+    the reset method.
+  - Track the leap second table expiration in Time::LeapSecond.
+    parse_leapseconds_tzdb and parse_leapseconds_iers now return
+    (\@days, \@corrections, $expires), reading the TZDB #expires line
+    and the IERS #@ line (converted from NTP to POSIX) and croaking
+    if absent; the value is exposed as $Time::LeapSecond::EXPIRES.
+  - Accept POSIX quoted timezone designations (e.g. <+05>) in
+    valid_posix_timezone in Time::Str::Util.
+  - Add find_local_timezone to Time::Str::Util for resolving the
+    system's local timezone (via TZ or /etc/localtime) into a
+    Time::TZif or Time::TZif::POSIX object.
+
 0.90 2026-06-07
   - str2time now accepts a 'timezone' argument: an object with an
     offset_for_local method used to resolve a parsed local time that

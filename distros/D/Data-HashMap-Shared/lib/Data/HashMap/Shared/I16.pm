@@ -2,7 +2,7 @@ package Data::HashMap::Shared::I16;
 use strict;
 use warnings;
 use Data::HashMap::Shared;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 sub import {
     $^H{"Data::HashMap::Shared::I16/shm_i16_put"}        = 1;
@@ -12,6 +12,8 @@ sub import {
     $^H{"Data::HashMap::Shared::I16/shm_i16_incr"}       = 1;
     $^H{"Data::HashMap::Shared::I16/shm_i16_decr"}       = 1;
     $^H{"Data::HashMap::Shared::I16/shm_i16_incr_by"}    = 1;
+    $^H{"Data::HashMap::Shared::I16/shm_i16_max"}        = 1;
+    $^H{"Data::HashMap::Shared::I16/shm_i16_min"}        = 1;
     $^H{"Data::HashMap::Shared::I16/shm_i16_size"}       = 1;
     $^H{"Data::HashMap::Shared::I16/shm_i16_keys"}       = 1;
     $^H{"Data::HashMap::Shared::I16/shm_i16_values"}     = 1;

@@ -1,5 +1,21 @@
 Revision history for Map::Tube::CLI
 
+v0.85.0 Wed Jun 10 01:45:00 2026 (GWS)
+      This release prepared by @GWS
+      - Updated README.
+      - Introduced short options (in additon to long options).
+      - Added option --version/-V.
+      - Added option --list_maps/-M.
+      - Added option --list_stations/-S.
+      - Added option --tabular/-t.
+      - Require Map::Tube::Exception 3.25.
+      - Minor code optimisations.
+      - Make some sortings Unicode-aware (if Unicode::Collate is available)
+      - Updated dependencies in Makefile.PL.
+      - Handle cases of non-printable characters in route listings slightly better.
+      - Added test case.
+      - Updated POD.
+
 0.84  Tue Mar 31 22:45:00 2026
       This release prepared by @GWS
       - Added support for new maps: Brussels, Chicago, Leipzig, Muenchen,

@@ -2,7 +2,7 @@ package DBIx::QuickDB::Watcher;
 use strict;
 use warnings;
 
-our $VERSION = '0.000048';
+our $VERSION = '0.000049';
 
 use Carp qw/croak/;
 use POSIX qw/:sys_wait_h/;
@@ -82,6 +82,7 @@ sub watch {
     my $hup = 0;
     local $SIG{TERM} = sub { $kill = 'TERM' };
     local $SIG{INT}  = sub { $kill = 'INT' };
+    local $SIG{USR1} = sub { $kill = 'FAST_TERM' };
     local $SIG{HUP} = sub { $hup = 1 };
 
     my $start_pid = $$;
@@ -94,6 +95,7 @@ sub watch {
 
     my $ddir = $self->{+DB}->dir;
     my $ssig = $self->{+DB}->stop_sig // 'TERM';
+    my $fsig = $self->{+DB}->fast_stop_sig // 'KILL';
 
     # Ignore SIGTERM/SIGINT before exec so the watcher cannot be killed
     # during startup before _do_watch installs its signal handlers.
@@ -102,17 +104,27 @@ sub watch {
     $SIG{TERM} = 'IGNORE';
     $SIG{INT}  = 'IGNORE';
 
+    # Block (rather than ignore) the fast-eliminate signal across the exec. A
+    # blocked signal stays *pending* instead of being discarded, so a
+    # fast_eliminate() that races server startup -- arriving after the socket is
+    # up (so the caller's start() has returned) but before _do_watch has
+    # installed its handler -- is not lost: _do_watch unblocks it once the
+    # handler is in place and it fires immediately. SIG_IGN would silently drop
+    # it, leaving the caller's wait() to block for the full stop-grace timeout.
+    POSIX::sigprocmask(POSIX::SIG_BLOCK(), POSIX::SigSet->new(POSIX::SIGUSR1()));
+
     exec(
         $^X, '-Ilib',
 
         '-e' => "require DBIx::QuickDB::Watcher; DBIx::QuickDB::Watcher->_do_watch()",
 
-        master_pid => $mpid,
-        data_dir   => $ddir,
-        server_pid => $spid,
-        signal     => $ssig,
-        kill       => $kill,
-        hup        => $hup,
+        master_pid  => $mpid,
+        data_dir    => $ddir,
+        server_pid  => $spid,
+        signal      => $ssig,
+        fast_signal => $fsig,
+        kill        => $kill,
+        hup         => $hup,
     );
 }
 
@@ -127,16 +139,24 @@ sub _do_watch {
     my $hup  = $params{hup}  // 0;
     local $SIG{TERM} = sub { $kill = 'TERM' };
     local $SIG{INT}  = sub { $kill = 'INT' };
+    local $SIG{USR1} = sub { $kill = 'FAST_TERM' };
     local $SIG{HUP}  = sub { $hup  = 1 };
+
+    # watch() blocked SIGUSR1 before exec so a fast_eliminate() racing startup
+    # would stay pending rather than be discarded. Now that the handler above is
+    # installed, unblock it -- any pending fast-eliminate fires here and sets
+    # $kill before we enter the watch loop.
+    POSIX::sigprocmask(POSIX::SIG_UNBLOCK(), POSIX::SigSet->new(POSIX::SIGUSR1()));
 
     my $blah;
     close(STDIN);
     open(STDIN, '<', \$blah) or warn "$!";
 
-    my $master_pid = $params{master_pid} or die "No master pid provided";
-    my $server_pid = $params{server_pid} or die "No server pid provided";
-    my $data_dir   = $params{data_dir}   or die "No data dir provided";
-    my $signal     = $params{signal} // 'TERM';
+    my $master_pid  = $params{master_pid} or die "No master pid provided";
+    my $server_pid  = $params{server_pid} or die "No server pid provided";
+    my $data_dir    = $params{data_dir}   or die "No data dir provided";
+    my $signal      = $params{signal} // 'TERM';
+    my $fast_signal = $params{fast_signal} // 'KILL';
 
     my $hupped = 0;
     while (!$kill) {
@@ -153,7 +173,7 @@ sub _do_watch {
         $kill = 'TERM';
     }
 
-    unless (eval { $class->_watcher_terminate(send_sig => $signal, got_sig => $kill, pid => $server_pid, dir => $data_dir); 1 }) {
+    unless (eval { $class->_watcher_terminate(send_sig => $signal, fast_sig => $fast_signal, got_sig => $kill, pid => $server_pid, dir => $data_dir); 1 }) {
         my $err = $@;
         eval { warn $@ };
         POSIX::_exit(1);
@@ -188,7 +208,22 @@ sub _watcher_terminate {
     my $got_sig  = $params{got_sig};
     my $send_sig = $params{send_sig} // $got_sig // 'TERM';
 
-    $class->_watcher_kill($send_sig, $pid);
+    # fast_eliminate(): kill the server immediately with its fast-stop signal
+    # (SIGKILL by default, or a clean immediate-shutdown signal the driver picks
+    # to avoid leaking OS resources), reap it, drop the data dir. No graceful
+    # shutdown -- the data dir is disposable so its integrity does not matter.
+    # Used only for clones being deleted.
+    if ($got_sig && $got_sig eq 'FAST_TERM') {
+        $class->_watcher_kill_fast($pid, $params{fast_sig});
+
+        # Ignore errors here.
+        my $err = [];
+        remove_tree($dir, {safe => 1, error => \$err}) if -d $dir;
+
+        return;
+    }
+
+    $class->_watcher_kill($send_sig, $pid, $params{fast_sig});
 
     if ($got_sig && $got_sig eq 'TERM') {
         # Ignore errors here.
@@ -197,44 +232,109 @@ sub _watcher_terminate {
     }
 }
 
+sub _watcher_kill_fast {
+    my $class = shift;
+    my ($pid, $sig) = @_;
+
+    $sig ||= 'KILL';
+
+    kill($sig, $pid) or return;
+
+    # Reap the server. With SIGKILL this resolves almost immediately. With a
+    # clean immediate-shutdown signal (e.g. PostgreSQL's SIGQUIT, chosen so the
+    # postmaster releases its SysV semaphores instead of leaking them) the
+    # server needs a moment to abort its backends and exit; give it a short
+    # window, then escalate to SIGKILL so teardown always completes even if that
+    # signal is caught and ignored. The outer cap guards pathological cases
+    # (e.g. a process stuck in uninterruptible IO).
+    my $escalated = $sig eq 'KILL';
+    my ($check, $exit);
+    my $start = time;
+
+    until ($check) {
+        local $?;
+
+        $check = waitpid($pid, WNOHANG);
+        $exit = $?;
+        last if $check;
+
+        my $delta = time - $start;
+
+        if (!$escalated && $delta > 2) {
+            kill('KILL', $pid);
+            $escalated = 1;
+        }
+
+        last if $delta > 5;
+
+        sleep 0.01;
+    }
+
+    die "PID refused to exit after fast kill" unless $check;
+    die "Something else reaped our process" if $check < 0;
+    die "Reaped the wrong process '$check' instead of '$pid'" if $pid != $check;
+
+    return;
+}
+
 sub _watcher_kill {
     my $class = shift;
-    my ($sig, $pid) = @_;
+    my ($sig, $pid, $fast_sig) = @_;
+
+    $fast_sig ||= 'KILL';
 
     kill($sig, $pid) or die "Could not send kill signal";
 
-    # How long to wait for a graceful shutdown before escalating to SIGKILL,
-    # and how much longer before giving up entirely. Keep this generous: a slow
-    # or loaded host (e.g. a CPAN smoke box) can need well over a few seconds to
-    # finish PostgreSQL's shutdown checkpoint. A premature SIGKILL leaves the
-    # data dir in a crash-recovery state, and a clone of that dir then replays
-    # WAL on first start, jumping SERIAL sequences forward by SEQ_LOG_VALS (32)
-    # -- silently corrupting cloned databases. Tunable via QDB_STOP_GRACE.
+    # How long to wait for a graceful shutdown before escalating, and how much
+    # longer before giving up entirely. Keep this generous: a slow or loaded
+    # host (e.g. a CPAN smoke box) can need well over a few seconds to finish
+    # PostgreSQL's shutdown checkpoint. A premature hard kill leaves the data dir
+    # in a crash-recovery state, and a clone of that dir then replays WAL on
+    # first start, jumping SERIAL sequences forward by SEQ_LOG_VALS (32) --
+    # silently corrupting cloned databases. Tunable via QDB_STOP_GRACE.
     my $kill_after = $ENV{QDB_STOP_GRACE};
     $kill_after = 4 unless defined($kill_after) && $kill_after =~ /^\d+$/ && $kill_after > 0;
-    my $give_up = $kill_after * 2;
 
-    my ($check, $exit, $killed);
+    # Two-stage escalation once the graceful signal has not stopped the server by
+    # $kill_after. First send the driver's fast-stop signal -- an immediate but
+    # *clean* shutdown (e.g. PostgreSQL SIGQUIT) that still lets the server run
+    # its exit cleanup and RELEASE OS resources such as SysV semaphores. Only if
+    # that is also ignored do we SIGKILL. Going straight to SIGKILL here would
+    # orphan those semaphores permanently -- the data dir is about to be deleted
+    # so no future server reuses the IPC key -- and a suite that kills many
+    # servers this way exhausts the host's SEMMNI/SEMMNS limits. When the driver
+    # leaves fast_stop_sig at its 'KILL' default both stages are SIGKILL, which
+    # is harmless. A final reap window after the SIGKILL lets it take effect
+    # before we give up; the whole budget stays under Driver::stop's wait()
+    # timeout (2*grace+2) so the watcher is not killed mid-reap.
+    my $step    = $kill_after > 1 ? int($kill_after / 2) : 1;
+    my $fast_at = $kill_after;
+    my $kill_at = $fast_at + $step;
+    my $give_up = $kill_at + $step;
+
+    my ($check, $exit, $sent_fast, $sent_kill);
     my $start = time;
     until ($check) {
         local $?;
         my $delta = time - $start;
 
-        if ($delta >= $kill_after) {
-            if ($killed) {
-                my $delta2 = time - $killed;
-                next unless $delta2 >= 1;
-            }
+        if ($delta >= $fast_at && !$sent_fast) {
+            warn "Server taking too long to shut down, sending SIG$fast_sig";
+            kill($fast_sig, $pid);
+            $sent_fast = 1;
+        }
 
-            warn "Server taking too long to shut down, sending SIGKILL";
-            $killed = time;
+        if ($delta >= $kill_at && !$sent_kill) {
+            warn "Server still running, sending SIGKILL" unless $fast_sig eq 'KILL';
             kill('KILL', $pid);
-
-            last if $delta > $give_up;
+            $sent_kill = 1;
         }
 
         $check = waitpid($pid, WNOHANG);
         $exit = $?;
+
+        last if $check;
+        last if $delta > $give_up;
 
         sleep 0.1;
     }
@@ -265,6 +365,18 @@ sub eliminate {
     return if $self->{+ELIMINATED}++ || $self->{+STOPPED};
     my $pid = $self->{+WATCHER_PID} or return;
     kill('TERM', $pid);
+}
+
+# Like eliminate(), but the watcher kills the server immediately with the
+# driver's fast_stop_sig (SIGKILL by default, or a clean immediate-shutdown
+# signal) rather than attempting a graceful shutdown. Sets ELIMINATED so the
+# normal teardown signals are never also sent to this (possibly
+# soon-to-be-recycled) pid.
+sub fast_eliminate {
+    my $self = shift;
+    return if $self->{+ELIMINATED}++ || $self->{+STOPPED};
+    my $pid = $self->{+WATCHER_PID} or return;
+    kill('USR1', $pid);
 }
 
 sub detach {
@@ -352,6 +464,17 @@ This will stop the server, but keep the data dir intact.
 
 This will stop the server, and if the instance is supposed to be cleaned up
 then the data dir will be deleted.
+
+=item SIGUSR1 - Fast eliminate: kill the server immediately, delete the data
+
+Like SIGTERM, but the server is killed straight away with the driver's
+C<fast_stop_sig()> (C<SIGKILL> by default, or a clean immediate-shutdown signal
+the driver picks to avoid leaking OS resources) instead of being given a chance
+to shut down gracefully, then reaped -- escalating to C<SIGKILL> if it does not
+exit promptly -- then the data dir is removed. Used for disposable clones being
+deleted (see L<DBIx::QuickDB::Driver/destroy_quietly>). The watcher blocks this
+signal across its startup C<exec> so a fast-eliminate that races server startup
+stays pending rather than being lost.
 
 =item SIGHUP - Do not report errors
 

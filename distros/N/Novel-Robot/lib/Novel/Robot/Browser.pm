@@ -5,9 +5,11 @@ use strict;
 use warnings;
 use utf8;
 
-our $VERSION = 0.22;
+our $VERSION = 0.23;
 
 #use Data::Dumper;
+#use Parallel::ForkManager;
+#use Smart::Comments;
 
 use Encode::Detect::CJK qw/detect/;
 use Encode;
@@ -15,10 +17,11 @@ use File::Slurp qw/slurp/;
 use HTTP::CookieJar;
 use HTTP::Tiny;
 use IO::Uncompress::Gunzip qw(gunzip);
-#use Parallel::ForkManager;
 use Term::ProgressBar;
 use URI::Escape;
 use URI;
+use Firefox::Marionette();
+
 
 our $DEFAULT_URL_CONTENT = '';
 our %DEFAULT_HEADER      = (
@@ -36,153 +39,106 @@ sub new {
   my ( $self, %opt ) = @_;
   $opt{retry}           ||= 5;
   $opt{max_process_num} ||= 5;
-  $opt{browser}         ||= _init_browser( $opt{browser_headers} );
-  $opt{use_chrome}      ||= 0;
+  $opt{agent} ||= 'default';
+
+  $opt{browser_agent}   ||= init_browser_agent( \%opt );
+
   bless {%opt}, __PACKAGE__;
 }
 
-sub _init_browser {
-  my ( $headers ) = @_;
+sub init_browser_agent {
+	my ( $o ) = @_;
 
-  $headers ||= {};
-  my %h = ( %DEFAULT_HEADER, %$headers );
+	$o->{browser_headers}  ||= {};
+	my %h = ( %DEFAULT_HEADER, %{$o->{browser_headers}} );
 
-  #my $cookie_jar = Novel::Robot::Browser::CookieJar->new();
-  my $cookie_jar = HTTP::CookieJar->new;
+	my $cookie_jar = HTTP::CookieJar->new;
+	my $agent = HTTP::Tiny->new(
+		default_headers => \%h,
+		cookie_jar      => $cookie_jar,
+	);
 
-  my $http = HTTP::Tiny->new(
-    default_headers => \%h,
-    cookie_jar      => $cookie_jar,
-  );
-
-  return $http;
-}
-
-sub request_url_whole {
-  my ( $self, $url, %o ) = @_;
-
-  my $html = $self->request_url( $url, $o{post_data} );
-
-  my $info      = $o{info_sub}->( \$html )     || {};
-  my $data_list = $o{item_list} || $o{item_list_sub}->( \$html ) || [];
-
-  my $i = 1;
-  unless ( $o{stop_sub} and $o{stop_sub}->( $info, $data_list, $i, %o ) or defined $o{item_list}) {
-    $data_list = [] if ( $o{min_page_num} and $o{min_page_num} > 1 );
-    my $page_list = exists $o{page_list_sub} ? $o{page_list_sub}->( \$html ) : undef;
-    while ( 1 ) {
-      $i++;
-      my $u = 
-        $page_list ?  $page_list->[ $i - 2 ] : 
-        ( exists $o{next_page_sub} ? $o{next_page_sub}->( $url, $i, \$html ) : undef );
-      last unless ( $u );
-      next if ( $o{min_page_num} and $i < $o{min_page_num} );
-      last if ( $o{max_page_num} and $i > $o{max_page_num} );
-
-
-      my ( $u_url, $u_post_data ) = ref( $u ) eq 'HASH' ? @{$u}{qw/url post_data/} : ( $u, undef );
-      my $c = $self->request_url( $u_url, $u_post_data );
-      my $fs = $o{item_list_sub}->( \$c );
-      last unless ( $fs );
-
-      push @$data_list, @$fs;
-      last if ( $o{stop_sub} and $o{stop_sub}->( $info, $data_list, $i, %o ) );
-    }
-  } ## end unless ( $o{stop_sub} and ...)
-
-  #lofter倒序
-  if ( $o{reverse_item_list} ){
-      $data_list = [ reverse @$data_list ];
-      my $max_id = $data_list->[0]{id};
-      if($max_id){
-          $_->{id} = $max_id - $_->{id} +1 for(@$data_list);
-      }
-  }
-  $info->{item_num} = ( $#$data_list >= 0 and exists $data_list->[-1]{id} ) ? $data_list->[-1]{id} : ( scalar( @$data_list ) || $i );
-
-  if ( $o{item_sub} ) {
-    my $item_id = 0;
-    print "\n\n" if ( $o{progress} );
-    my $progress;
-    $progress = Term::ProgressBar->new( { count => scalar(@$data_list) } ) if ( $o{progress} );
-
-    for my $i ( 0 .. $#$data_list ) {
-      my $r = $data_list->[$i];
-      $r->{id} //= ++$item_id;
-      $r->{url} = URI->new_abs( $r->{url}, $url )->as_string;
-      next unless ( $self->is_item_in_range( $r->{id}, $o{min_item_num}, $o{max_item_num} ) );
-      if(exists $o{back_index}){
-          last if($i + $o{back_index} > $#$data_list);
-      }
-
-      if($r->{url}){
-          my $c = $self->request_url( $r->{url}, $r->{post_data} );
-          my $temp_r = $o{item_sub}->( \$c );
-          $r->{$_} //= $temp_r->{$_} for keys(%$temp_r);
-      }else{
-          $r = $o{item_sub}->( $r );
-      }
-
-      my $next_url = URI->new_abs( $data_list->[$i+1]->{url}, $url )->as_string;
-      while($r->{next_url}){
-          $r->{next_url} = URI->new_abs( $r->{next_url}, $url )->as_string;
-          if($r->{next_url} ne $next_url){
-              my $c = $self->request_url( $r->{next_url}, $r->{post_data} );
-              my $temp_r = $o{item_sub}->( \$c );
-              $r->{content} .= "\n\n".$temp_r->{content};
-              last unless(exists $temp_r->{next_url});
-              $r->{next_url} = $temp_r->{next_url};
-          }else{
-              last;
-          }
-      }
-
-           $progress->update( $item_id ) if ( $o{progress} );
-    }
-
-   $progress->update( scalar(@$data_list) ) if ( $o{progress} ); 
-  }
-  print "\n\n" if ( $o{progress} );
-  return ( $info, $data_list );
-} ## end sub request_url_whole
-
-sub is_item_in_range {
-  my ( $self, $id, $min, $max ) = @_;
-  return 1 unless ( $id );
-  return 0 if ( $min and $id < $min );
-  return 0 if ( $max and $id > $max );
-  return 1;
-}
-
-sub is_list_overflow {
-  my ( $self, $r, $max ) = @_;
-
-  return unless ( $max );
-
-  my $item_num = scalar( @$r );
-  my $id        = $r->[-1]{id} // $item_num;
-
-  return if ( $id < $max );
-
-  $#{$r} = $max - 1;
-  return 1;
+	return $agent;
 }
 
 sub request_url {
-  my ( $self, $url, $form ) = @_;
-  return $DEFAULT_URL_CONTENT unless ( $url );
+	my ( $self, $url, $form ) = @_;
+	return $DEFAULT_URL_CONTENT unless ( $url );
 
-  my $c;
-  for my $i ( 1 .. $self->{retry} ) {
-    eval { $c = $self->request_url_simple( $url, $form ); };
-    last if ( $c );
-    sleep 2;
-  }
+	### $url
 
-  return $c || $DEFAULT_URL_CONTENT;
+	my $c;
+	for my $i ( 1 .. $self->{retry} ) {
+		if ( $self->{agent} eq 'firefox' ) {
+			$c = $self->request_url_firefox($url);
+		}elsif($self->{agent} eq 'chrome') {
+			$c = $self->request_url_chrome($url);
+		}else{
+			$c = $self->request_url_tiny($url);
+		}
+		last if ( $c );
+		sleep 2;
+	}
+
+	return $DEFAULT_URL_CONTENT unless($c);
+
+	my $charset = detect( $c );
+	$c = decode( $charset, $c, Encode::FB_XMLCREF );
+
+	return $c;
 }
 
-sub format_post_content {
+
+sub request_url_firefox {
+	my ($self, $url) = @_;
+	my $firefox = Firefox::Marionette->new()->go($url);
+	sleep 5;
+	my $c = $firefox->html();
+	return $c;
+}
+
+sub request_url_chrome {
+	my ($self, $url) = @_;
+	my $c = `chrome --no-sandbox --user-data-dir --headless --disable-gpu --dump-dom "$url" 2>/dev/null`;
+	return $c;
+}
+
+sub request_url_tiny {
+  my ( $self, $url, $form ) = @_;
+
+  my $res;
+  if ( $form ) {
+	  $res = $self->{browser_agent}->request(
+		  'POST', $url,
+		  { content => $self->post_form_data( $form ),
+			  headers => {
+				  'content-type' => 'application/x-www-form-urlencoded',
+			  },
+		  } );
+  } else {
+	  $res = $self->{browser_agent}->get( $url );
+  }
+
+  
+  return unless ( $res->{success} );
+
+  my $content = $res->{content};
+
+
+  my $html;
+  if ( 
+	  $res->{headers} 
+		  and $res->{headers}{'content-encoding'}
+		  and $res->{headers}{'content-encoding'} eq 'gzip' ) {
+	  gunzip \$content => \$html, MultiStream => 1, Append => 1;
+  }
+  $content = $html || $content;
+
+
+  return $content;
+} ## end sub request_url_tiny
+
+sub post_form_data {
   my ( $self, $form ) = @_;
 
   return $form unless ( ref( $form ) eq 'HASH' );
@@ -195,39 +151,6 @@ sub format_post_content {
   my $post_str = join( "&", @params );
   return $post_str;
 }
-
-sub request_url_simple {
-  my ( $self, $url, $form ) = @_;
-
-  my $res;
-  if ( $form ) {
-    $res = $self->{browser}->request(
-      'POST', $url,
-      { content => $self->format_post_content( $form ),
-        headers => {
-          'content-type' => 'application/x-www-form-urlencoded',
-        },
-      } );
-  } elsif ( $self->{use_chrome} ) {
-    $res->{content} = `chrome --no-sandbox --user-data-dir --headless --disable-gpu --dump-dom "$url" 2>/dev/null`;
-    $res->{success} = 1;
-  } else {
-    $res = $self->{browser}->get( $url );
-  }
-  return $DEFAULT_URL_CONTENT unless ( $res->{success} );
-
-  my $html;
-  my $content = $res->{content};
-  if (  $res->{headers}{'content-encoding'}
-    and $res->{headers}{'content-encoding'} eq 'gzip' ) {
-    gunzip \$content => \$html, MultiStream => 1, Append => 1;
-  }
-
-  my $charset = detect( $html || $content );
-  my $r = decode( $charset, $html || $content, Encode::FB_XMLCREF );
-
-  return $r || $DEFAULT_URL_CONTENT;
-} ## end sub request_url_simple
 
 sub read_moz_cookie {
   my ( $self, $cookie, $dom ) = @_;
@@ -245,11 +168,10 @@ sub read_moz_cookie {
     @segment = map { my @c = split /=/; [ $dom, undef, '/', undef, 0, $c[0], $c[1] ] } @ck;
   }
 
-
   @segment = grep { defined $_->[6] and $_->[6] =~ /\S/ } @segment;
 
   my @jar = map { "$_->[5]=$_->[6]; Domain=$_->[0]; Path=$_->[2]; Expiry=$_->[4]" } @segment;
-  $self->{browser}{cookie_jar}->load_cookies( @jar );
+  $self->{browser_agent}{cookie_jar}->load_cookies( @jar );
 
   $cookie = join( "; ", map { "$_->[5]=$_->[6]" } @segment );
 

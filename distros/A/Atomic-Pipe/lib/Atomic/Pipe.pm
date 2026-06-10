@@ -2,7 +2,7 @@ package Atomic::Pipe;
 use strict;
 use warnings;
 
-our $VERSION = '0.030';
+our $VERSION = '0.032';
 
 use IO();
 use IO::Handle();
@@ -24,10 +24,14 @@ use List::Util qw/min/;
 use Scalar::Util qw/blessed/;
 
 use Errno qw/EINTR EAGAIN EPIPE/;
-my %RETRY_ERRNO;
+my (%RETRY_ERRNO, %NONBLOCK_ERRNO);
 BEGIN {
     %RETRY_ERRNO = (EINTR() => 1);
     $RETRY_ERRNO{Errno->ERESTART} = 1 if Errno->can('ERESTART');
+
+    # EWOULDBLOCK == EAGAIN on most platforms, but POSIX allows them to differ.
+    %NONBLOCK_ERRNO = (EAGAIN() => 1);
+    $NONBLOCK_ERRNO{Errno->EWOULDBLOCK} = 1 if Errno->can('EWOULDBLOCK');
 }
 
 BEGIN {
@@ -45,7 +49,8 @@ BEGIN {
         *SSIZE_MAX = \&POSIX::SSIZE_MAX;
     }
     else {
-        *SSIZE_MAX = sub() { 512 };
+        # POSIX guarantees SSIZE_MAX is at least 32767 (_POSIX_SSIZE_MAX).
+        *SSIZE_MAX = sub() { 32767 };
     }
 
     {
@@ -177,7 +182,7 @@ sub fill_buffer {
         my $rbuff = '';
         my $got = sysread($rh, $rbuff, $to_read);
         unless(defined $got) {
-            return 0 if $! == EAGAIN; # NON-BLOCKING
+            return 0 if $NONBLOCK_ERRNO{0 + $!}; # NON-BLOCKING
             if ($RETRY_ERRNO{0 + $!}) {
                 next unless $use_select; # retry on EINTR in fallback mode
                 return 0;               # IO::Select handles EINTR
@@ -199,7 +204,9 @@ sub fill_buffer {
     return 0;
 }
 
-sub _get_from_buffer  { $_[0]->_from_buffer($_[1], remove => 1) }
+# Must forward %params: callers rely on eof_invalid to turn a truncated
+# message at EOF into an exception instead of a clean-looking EOF.
+sub _get_from_buffer  { my $self = shift; $self->_from_buffer(@_, remove => 1) }
 sub _peek_from_buffer { shift->_from_buffer(@_) }
 
 sub _from_buffer {
@@ -291,8 +298,8 @@ sub eof {
     return 0 if $self->{+IN_BUFFER_SIZE};
 
     if (my $buffer = $self->{+MIXED_BUFFER}) {
-        return 0 if $buffer->{lines} || defined($buffer->{lines}) && length($buffer->{lines});
-        return 0 if $buffer->{burst} || defined($buffer->{lines}) && length($buffer->{burst});
+        return 0 if defined($buffer->{lines}) && length($buffer->{lines});
+        return 0 if defined($buffer->{burst}) && length($buffer->{burst});
     }
 
     return 1;
@@ -349,7 +356,7 @@ sub read_fifo {
     open(my $fh, '+<', $fifo) or die "Could not open fifo ($fifo) for reading: $!";
     binmode($fh);
 
-    return bless({%params, RH() => $fh}, $class);
+    return $class->_new_from_params(\%params, RH() => $fh);
 }
 
 sub write_fifo {
@@ -362,13 +369,19 @@ sub write_fifo {
     open(my $fh, '>', $fifo) or die "Could not open fifo ($fifo) for writing: $!";
     binmode($fh);
 
-    return bless({%params, WH() => $fh}, $class);
+    return $class->_new_from_params(\%params, WH() => $fh);
 }
 
 sub from_fh {
     my $class = shift;
-    my $ifh = pop;
-    my ($mode) = @_;
+
+    # Mode is optional: from_fh($fh, %params) or from_fh($mode, $fh, %params).
+    my $mode;
+    $mode = shift if @_ && !ref($_[0]) && $MODE_TO_DIR{$_[0]};
+    my $ifh = shift;
+    my %params = @_;
+
+    $class->_check_params(%params);
 
     croak "Filehandle is not a pipe (-p check)" unless -p $ifh;
 
@@ -378,12 +391,14 @@ sub from_fh {
     open(my $fh, $mode, $ifh) or croak "Could not clone ($mode) filehandle: $!";
     binmode($fh);
 
-    return bless({$dir => $fh}, $class);
+    return $class->_new_from_params(\%params, $dir => $fh);
 }
 
 sub from_fd {
     my $class = shift;
-    my ($mode, $fd) = @_;
+    my ($mode, $fd, %params) = @_;
+
+    $class->_check_params(%params);
 
     my $dir = $class->_mode_to_dir($mode) // croak "Invalid mode: $mode";
     open(my $fh, $mode, $fd) or croak "Could not open ($mode) fd$fd: $!";
@@ -391,7 +406,18 @@ sub from_fd {
     croak "Filehandle is not a pipe (-p check)" unless -p $fh;
 
     binmode($fh);
-    return bless({$dir => $fh}, $class);
+    return $class->_new_from_params(\%params, $dir => $fh);
+}
+
+sub _new_from_params {
+    my ($class, $params, @handles) = @_;
+
+    my $mixed = delete $params->{mixed_data_mode};
+
+    my $self = bless({%$params, @handles}, $class);
+    $self->set_mixed_data_mode() if $mixed;
+
+    return $self;
 }
 
 sub new {
@@ -406,7 +432,7 @@ sub new {
     binmode($wh);
     binmode($rh);
 
-    return bless({%params, RH() => $rh, WH() => $wh}, $class);
+    return $class->_new_from_params(\%params, RH() => $rh, WH() => $wh);
 }
 
 sub pair {
@@ -415,21 +441,14 @@ sub pair {
 
     $class->_check_params(%params);
 
-    my $mixed = delete $params{mixed_data_mode};
-
     my ($rh, $wh);
     pipe($rh, $wh) or die "Could not create pipe: $!";
 
     binmode($wh);
     binmode($rh);
 
-    my $r = bless({%params, RH() => $rh}, $class);
-    my $w = bless({%params, WH() => $wh}, $class);
-
-    if ($mixed) {
-        $r->set_mixed_data_mode();
-        $w->set_mixed_data_mode();
-    }
+    my $r = $class->_new_from_params({%params}, RH() => $rh);
+    my $w = $class->_new_from_params({%params}, WH() => $wh);
 
     return ($r, $w);
 }
@@ -457,6 +476,7 @@ sub set_compression {
         delete $self->{_compression_cdict};
         delete $self->{_decompression_ctx};
         delete $self->{_decompression_ddict};
+        delete $self->{_compress_cache};
         return;
     }
 
@@ -474,6 +494,7 @@ sub set_compression {
     delete $self->{_compression_cdict};
     delete $self->{_decompression_ctx};
     delete $self->{_decompression_ddict};
+    delete $self->{_compress_cache};
 
     return;
 }
@@ -491,6 +512,7 @@ sub set_compression_dictionary {
     }
     delete $self->{_compression_cdict};
     delete $self->{_decompression_ddict};
+    delete $self->{_compress_cache};
     return;
 }
 
@@ -507,6 +529,7 @@ sub set_compression_dictionary_file {
     }
     delete $self->{_compression_cdict};
     delete $self->{_decompression_ddict};
+    delete $self->{_compress_cache};
     return;
 }
 
@@ -527,12 +550,11 @@ sub get_line_burst_or_data {
     my $key     = $self->{+MESSAGE_KEY}   // croak "missing 'message_key', not in mixed_data_mode";
 
     my $buffer = $self->{+MIXED_BUFFER} //= {
-        lines         => '',
-        burst         => '',
-        in_burst      => 0,
-        in_message    => 0,
-        do_extra_loop => 0,
-        strip_term    => 0,
+        lines      => '',
+        burst      => '',
+        in_burst   => 0,
+        in_message => 0,
+        strip_term => 0,
     };
 
     my $peek;
@@ -557,8 +579,17 @@ sub get_line_burst_or_data {
             my ($id, $message) = $self->_extract_message(one_part_only => 1);
 
             unless(defined $id) {
-                next unless $self->{+EOF} && !$self->{+IN_BUFFER_SIZE};
-                $self->throw_invalid('Incomplete burst data received before end of pipe');
+                $self->throw_invalid('Incomplete burst data received before end of pipe')
+                    if $self->{+EOF} && !$self->{+IN_BUFFER_SIZE};
+
+                my $before = $self->{+IN_BUFFER_SIZE};
+                $self->fill_buffer;
+                next if $self->{+EOF} || $self->{+IN_BUFFER_SIZE} > $before;
+
+                # Not EOF and no new bytes arrived: another pass cannot make
+                # progress. Return empty so a non-blocking caller can wait and
+                # retry instead of spinning inside this call.
+                return;
             }
 
             $buffer->{strip_term}++;
@@ -600,7 +631,6 @@ sub get_line_burst_or_data {
             if ($term) {
                 $self->{+IN_BUFFER_SIZE} = length($self->{+IN_BUFFER});
                 $buffer->{in_burst} = 0;
-                $buffer->{do_extra_loop}++;
                 my $compressed = delete $buffer->{burst};
                 if ($self->{+COMPRESSION}) {
                     my $decompressed = $self->_decompress($compressed);
@@ -641,21 +671,6 @@ sub get_line_burst_or_data {
             $self->{+IN_BUFFER_SIZE} = 0;
         }
     }
-}
-
-sub debug {
-    my ($id, $buffer) = @_;
-
-    print "---debug $id---\n";
-    for my $key (sort keys %$buffer) {
-        my $val = $buffer->{$key} // '<UNDEF>';
-        $val =~ s/\x0E/\\x0E/g;
-        $val =~ s/\x0F/\\x0F/g;
-        $val =~ s/\x10/\\x10/g;
-        $val =~ s/\n/\\n/g;
-        $val =~ s/\r/\\r/g;
-        print "$key: |$val|\n\n";
-    };
 }
 
 # This is a heavily modified version of a pattern suggested on stack-overflow
@@ -838,13 +853,26 @@ sub reader {
 
     return 1 unless $self->{+WH};
 
+    $self->_flush_before_close;
     close(delete $self->{+WH});
     return 1;
 }
 
+# Buffered bursts from non-blocking writes must not be silently dropped when
+# the write handle goes away (DESTROY would also croak trying to flush them
+# without a handle).
+sub _flush_before_close {
+    my $self = shift;
+    return if $self->{+HIT_EPIPE} || $self->{+INVALID_STATE};
+    $self->flush(blocking => 1) if $self->pending_output;
+}
+
 sub close {
     my $self = shift;
-    close(delete $self->{+WH}) if $self->{+WH};
+    if ($self->{+WH}) {
+        $self->_flush_before_close;
+        close(delete $self->{+WH});
+    }
     close(delete $self->{+RH}) if $self->{+RH};
     return;
 }
@@ -857,11 +885,24 @@ sub delimiter_size {
     return $_[0]->{+DELIMITER_SIZE} //= bytes::length($_[0]->{+BURST_PREFIX} // '') + bytes::length($_[0]->{+BURST_POSTFIX} // '');
 }
 
+# The typical fits_in_burst() then write_burst() sequence would compress the
+# same payload twice; remember the last result.
+sub _compress_cached {
+    my ($self, $data) = @_;
+
+    my $cache = $self->{_compress_cache};
+    return $cache->[1] if $cache && $cache->[0] eq $data;
+
+    my $out = $self->_compress($data);
+    $self->{_compress_cache} = [$data, $out];
+    return $out;
+}
+
 sub fits_in_burst {
     my $self = shift;
     my ($data) = @_;
 
-    $data = $self->_compress($data) if $self->{+COMPRESSION};
+    $data = $self->_compress_cached($data) if $self->{+COMPRESSION};
 
     my $size = bytes::length($data) + ($self->{+DELIMITER_SIZE} // $self->delimiter_size);
     return undef unless $size <= PIPE_BUF;
@@ -873,9 +914,8 @@ sub write_burst {
     my $self = shift;
     my ($data) = @_;
 
-    $data = $self->_compress($data) if $self->{+COMPRESSION};
+    $data = $self->_compress_cached($data) if $self->{+COMPRESSION};
 
-    # Intentionally not delegating to fits_in_burst() — that would compress twice.
     my $size = bytes::length($data) + ($self->{+DELIMITER_SIZE} // $self->delimiter_size);
     return undef unless $size <= PIPE_BUF;
 
@@ -887,8 +927,9 @@ sub write_burst {
 
 sub DESTROY {
     my $self = shift;
-    return if $self->{+HIT_EPIPE};
-    $self->flush(blocking => 1) if $self->pending_output;
+    local ($., $@, $!, $^E, $?);
+    return if $self->{+HIT_EPIPE} || $self->{+INVALID_STATE};
+    $self->flush(blocking => 1) if $self->{+WH} && $self->pending_output;
 }
 
 sub pending_output {
@@ -932,19 +973,24 @@ sub _write_burst {
     $data = "${prefix}${data}${postfix}" if length($prefix) || length($postfix);
 
     my $wrote;
-    my $loop = 0;
     SWRITE: {
         $wrote = syswrite($wh, $data, $size);
-        if ($! == EPIPE || (IS_WIN32 && $! == 22)) {
-            $self->{+HIT_EPIPE} = 1;
-            delete $self->{+OUT_BUFFER};
-            croak "Disconnected pipe";
+
+        # $! is only meaningful when syswrite fails.
+        unless (defined $wrote) {
+            if ($! == EPIPE || (IS_WIN32 && $! == 22)) {
+                $self->{+HIT_EPIPE} = 1;
+                delete $self->{+OUT_BUFFER};
+                croak "Disconnected pipe";
+            }
+            return undef if $NONBLOCK_ERRNO{0 + $!} || (IS_WIN32 && $! == 28);    # NON-BLOCKING
+            redo SWRITE if $RETRY_ERRNO{0 + $!};
+            $self->throw_invalid("syswrite failed: $!");
         }
-        return undef if $! == EAGAIN || (IS_WIN32 && $! == 28); # NON-BLOCKING
-        redo SWRITE if !$wrote || $RETRY_ERRNO{0 + $!};
+
+        redo SWRITE unless $wrote;
         last SWRITE if $wrote == $size;
-        $wrote //= "<NULL>";
-        die "$wrote vs $size: $!";
+        die "partial write: $wrote vs $size: $!";
     }
 
     return $wrote;
@@ -1037,7 +1083,15 @@ sub _extract_message {
 
     while (1) {
         unless ($state->{key}) {
-            my $key_bytes = $self->_get_from_buffer($psize) or return;
+            my $key_bytes = $self->_get_from_buffer($psize);
+            unless (defined($key_bytes) && length($key_bytes)) {
+                # Leftover bytes smaller than a header at EOF mean a writer
+                # died mid-message; a plain return here would look like a
+                # clean EOF and silently drop data.
+                $self->throw_invalid("EOF inside message header (truncated message)")
+                    if $self->{+EOF} && $self->{+IN_BUFFER_SIZE};
+                return;
+            }
 
             my %key;
             @key{qw/pid tid id size/} = unpack('l2L2', $key_bytes);
@@ -1110,16 +1164,20 @@ Also: L<https://man7.org/linux/man-pages/man7/pipe.7.html>
     PIPE_BUF is 4096 bytes.) [...]
 
 Under the hood this module will split your message into small sections of
-slightly smaller than the PIPE_BUF limit. Each message will be sent as 1 atomic
-chunk with a 4 byte prefix indicating what process id it came from, what thread
-id it came from, a chunk ID (in descending order, so if there are 3 chunks the
-first will have id 2, the second 1, and the final chunk is always 0 allowing a
-flush as it knows it is done) and then 1 byte with the length of the data
+slightly smaller than the PIPE_BUF limit. Each section is sent as 1 atomic
+chunk with a 16 byte header consisting of four 32-bit fields: the process id it
+came from, the thread id it came from, a chunk ID (in descending order, so if
+there are 3 chunks the first will have id 2, the second 1, and the final chunk
+is always 0 allowing a flush as it knows it is done) and the length of the data
 section to follow.
+
+B<NOTE:> Payloads are byte strings. If you have a wide-character (unicode)
+string, encode it (e.g. with L<Encode/encode>) before passing it to
+C<write_message()> or C<write_burst()>; decode on the read side.
 
 On the receiving end this module will read chunks and re-assemble them based on
 the header data. So the reader will always get complete messages. Note that
-message order is not guarenteed when messages are sent from multiple processes
+message order is not guaranteed when messages are sent from multiple processes
 or threads. Though all messages from any given thread/process should be in
 order.
 
@@ -1157,7 +1215,7 @@ Fork example from tests:
 
     my ($r, $w) = Atomic::Pipe->pair;
 
-    # For simplicty
+    # For simplicity
     $SIG{CHLD} = 'IGNORE';
 
     # Forks and runs your coderef, then exits.
@@ -1173,7 +1231,7 @@ Fork example from tests:
     is(
         [sort @messages],
         [sort(('aa' x PIPE_BUF), ('bb' x PIPE_BUF), ('cc' x PIPE_BUF))],
-        "Got all 3 long messages, not mangled or mixed, order not guarenteed"
+        "Got all 3 long messages, not mangled or mixed, order not guaranteed"
     );
 
     done_testing;
@@ -1239,7 +1297,7 @@ length so an embedded SHIFT IN will not terminate things early.
 
     print "Start a line ..."; # Note no "\n"
 
-    # Any number of newlines is fine the message will send/recieve as a whole.
+    # Any number of newlines is fine the message will send/receive as a whole.
     $w->write_burst("This is a burst message\n\n\n");
 
     # Data will be broken into atomic chunks and sent
@@ -1461,18 +1519,26 @@ relying on blocking C<sysread()> with an EINTR retry loop.
 
 =item ($r, $w) = Atomic::Pipe->pair
 
+=item ($r, $w) = Atomic::Pipe->pair(%params)
+
 Create a pipe, returns a list consisting of a reader and a writer.
+
+All constructors accept the same optional C<%params>: the compression options
+documented in L</COMPRESSION>, and C<< mixed_data_mode => 1 >> (see
+L</"MIXED DATA MODE">).
 
 =item $p = Atomic::Pipe->new
 
+=item $p = Atomic::Pipe->new(%params)
+
 If you really must have a C<new()> method it is here for you to abuse. The
 returned pipe has both handles, it is your job to then turn it into 2 clones
-one with the reader and one with the writer. It is also your job to make you do
-not have too many handles floating around preventing an EOF.
+one with the reader and one with the writer. It is also your job to make sure
+you do not have too many handles floating around preventing an EOF.
 
-=item $r = Atomic::Pipe->read_fifo($FIFO_PATH)
+=item $r = Atomic::Pipe->read_fifo($FIFO_PATH, %params)
 
-=item $w = Atomic::Pipe->write_fifo($FIFO_PATH)
+=item $w = Atomic::Pipe->write_fifo($FIFO_PATH, %params)
 
 These 2 constructors let you connect to a FIFO by filesystem path.
 
@@ -1484,9 +1550,9 @@ You need to figure out when the last message is received on your own somehow.
 If you use blocking reads in a loop with no loop exit condition then the loop
 will never end even after all writers are gone.
 
-=item $p = Atomic::Pipe->from_fh($fh)
+=item $p = Atomic::Pipe->from_fh($fh, %params)
 
-=item $p = Atomic::Pipe->from_fh($mode, $fh)
+=item $p = Atomic::Pipe->from_fh($mode, $fh, %params)
 
 Create an instance around an existing filehandle (A clone of the handle will be
 made and kept internally).
@@ -1519,7 +1585,7 @@ Read-only and reuse fileno.
 
 =back
 
-=item $p = Atomic::Pipe->from_fd($mode, $fd)
+=item $p = Atomic::Pipe->from_fd($mode, $fd, %params)
 
 C<$fd> must be a file descriptor number.
 
@@ -1600,7 +1666,7 @@ non-blocking mode, it is a no-op everywhere else.
 True if all writers are closed, and the buffers do not contain any usable data.
 
 Usable data means raw data that has yet to be processed, complete messages, or
-complete data bursts. Any of these can still be retreieved using
+complete data bursts. Any of these can still be retrieved using
 C<read_message()>, or C<get_line_burst_or_data()>.
 
 =item $p->close
@@ -1608,9 +1674,13 @@ C<read_message()>, or C<get_line_burst_or_data()>.
 Close this end of the pipe (or both ends if this is not yet split into
 reader/writer pairs).
 
+If the writer has output buffered by non-blocking writes, it is flushed
+(blocking) before the write handle is closed so the data is not lost. The
+flush is skipped if the pipe already hit C<EPIPE> or is in an invalid state.
+
 =item $undef_or_bytes = $p->fits_in_burst($data)
 
-This will return C<undef> if the data DES NOT fit in a burst. This will return
+This will return C<undef> if the data DOES NOT fit in a burst. This will return
 the size of the data in bytes if it will fit in a burst.
 
 =item $undef_or_true = $p->write_burst($data)
@@ -1626,7 +1696,7 @@ on the receiving end.
 
 The primary use case of this is if you have multiple writers sending short
 plain-text messages that will not exceed the atomic pipe buffer limit (minimum
-of 512 bytes on systems that support atomic pipes accoring to POSIX).
+of 512 bytes on systems that support atomic pipes according to POSIX).
 
 =item $fh = $p->rh
 
@@ -1684,7 +1754,9 @@ Current size of the pipe buffer.
 
 =item $bytes = $p->max_size
 
-Maximum size, or undef if that cannot be determined. (Linux only for now).
+Maximum size the pipe buffer can be resized to. On Linux this is read from
+C</proc/sys/fs/pipe-max-size>; on systems where it cannot be determined this
+falls back to a conservative 1MB.
 
 =item $p->resize($bytes)
 
@@ -1723,13 +1795,16 @@ This copies the object into a writer-only copy.
 
 =item $p->reader
 
-This turnes the object into a reader-only. Note that if you have no
+This turns the object into a reader-only. Note that if you have no
 writer-copies then effectively makes it impossible to write to the pipe as you
 cannot get a writer anymore.
 
+Any output buffered by non-blocking writes is flushed (blocking) before the
+write handle is closed.
+
 =item $p->writer
 
-This turnes the object into a writer-only. Note that if you have no
+This turns the object into a writer-only. Note that if you have no
 reader-copies then effectively makes it impossible to read from the pipe as you
 cannot get a reader anymore.
 

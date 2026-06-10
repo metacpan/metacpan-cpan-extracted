@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project roughly adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
 but using Perlish version numbers like `x.yyyzzz` instead of `x.y.z`.
 
+## 0.003000 - 2026-06-10
+
+*stdlib tag 20260610, languagetests tag 20260610.*
+
+### Changed
+
+- Bumped version to 0.003000.
+
+### Fixed
+
+- Fixed class field initializer evaluation so default values are evaluated in the
+  class’s declaration environment, resolving missing-module-constant lookups.
+
+### Added
+
+- Added shared conformance coverage for dot syntax as method calls, including
+  rejection of direct method/function call lvalues and continued support for
+  assigning into collections returned from calls.
+
 ## 0.002000 - 2026-06-08
 
 *stdlib tag 20260608, languagetests tag 20260608.*

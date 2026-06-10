@@ -21,7 +21,6 @@ __DATA__
 Dean
 EUI
 Gorwits
-Hamstad
 Hamstead
 James
 Jon

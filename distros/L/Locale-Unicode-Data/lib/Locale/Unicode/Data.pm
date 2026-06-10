@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
-## Unicode Locale Identifier - ~/lib/m
-## Version v1.8.5
+## Unicode Locale Identifier - ~/lib/Locale/Unicode/Data.pm
+## Version v1.8.6
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2024/06/15
-## Modified 2026/06/07
+## Modified 2026/06/09
 ## All rights reserved
 ## 
 ## 
@@ -40,7 +40,7 @@ BEGIN
     our $CLDR_VERSION = '48.2';
     our $DBH = {};
     our $STHS = {};
-    our $VERSION = 'v1.8.5';
+    our $VERSION = 'v1.8.6';
 };
 
 use strict;
@@ -3223,8 +3223,23 @@ sub _dbh
     };
     $dbh = DBI->connect( "dbi:SQLite:dbname=${file}", '', '', $params ) ||
         return( $self->error( "Unable to make connection to Unicode CLDR SQLite database file ${file}: ", $DBI::errstr ) );
+    # Raise the SQLite page cache so that repeated queries against the 112 MB bundled
+    # database do not require repeated disk reads on every call. The default cache
+    # (2000 pages, about 8 MB) is too small for this database. A negative value is
+    # interpreted by SQLite as kilobytes, so -65536 sets a 64 MB ceiling.
+    # The cache is allocated lazily: only pages actually read are cached, so the
+    # true resident-memory impact under normal use (a few locale lookups per
+    # request) remains well below this ceiling.
+    my $rv = $dbh->do( "PRAGMA cache_size = -65536" );
+    if( !defined( $rv ) )
+    {
+        # Unable to set SQLite cache_size pragma
+    }
     # See: <https://metacpan.org/release/ADAMK/DBD-SQLite-1.27/view/lib/DBD/SQLite.pm#Foreign-Keys>
-    $dbh->do("PRAGMA foreign_keys = ON");
+    if( !defined( $dbh->do( "PRAGMA foreign_keys = ON" ) ) )
+    {
+        # Unable to enable SQLite foreign_keys pragma
+    }
     # UTF-8 decoding is done natively from version 1.68 onward
     if( !MISSING_AUTO_UTF8_DECODING )
     {
@@ -5070,7 +5085,7 @@ Or, you could set the global variable C<$FATAL_EXCEPTIONS> instead:
 
 =head1 VERSION
 
-    v1.8.5
+    v1.8.6
 
 =head1 DESCRIPTION
 

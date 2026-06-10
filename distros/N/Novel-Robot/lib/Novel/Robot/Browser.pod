@@ -14,11 +14,12 @@ get/post url, return unicode content, auto detect CJK charset
 
 =head2 request_url
   
-    my $browser = Novel::Robot::Browser->new();
+    my $agent = 'default'; # default, firefox, chrome
+    my $browser = Novel::Robot::Browser->new( agent => $agent );
 	
 =head3  get
 
-    my $url = 'http://www.jjwxc.net/onebook.php?novelid=2456';
+    my $url = 'http://www.jjwxc.net/onebook.php?novelid=14838';
     my $content_get_ref = $browser->request_url($url);
 
 =head3  post
@@ -30,26 +31,6 @@ get/post url, return unicode content, auto detect CJK charset
     };
     my $content_post_ref = $browser->request_url($form_url, $post_data);
 
-=head2 request_url_whole
-
-    my $url = 'http://www.jjwxc.net/onebook.php?novelid=14089';
-    my $res = $browser->request_url_whole( $url, 
-        #post_data => ...,
-        info_sub => sub { 
-            my ($html_ref) = @_; 
-            # ...
-        }, 
-        item_list_sub => sub {
-            my ($src_arr) = @_; 
-            # ...
-        }, 
-        #min_item_num => ..., 
-        #max_item_num => ..., 
-        item_sub => sub { 
-            my ($html_ref) = @_; 
-            # ...
-        }, 
-    ); 
 
 =head2 read_moz_cookie
     

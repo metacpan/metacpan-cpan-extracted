@@ -608,4 +608,83 @@ subtest 'attribute handler: Sub::Protected wrapper is invisible in caller()' => 
 		'attribute handler: protected sub callable through owner public method';
 };
 
+# ===================================================================
+# SECTION 7: harness_bypass=0 -- guards still fire with HARNESS_ACTIVE=1
+#
+# These tests verify the interaction of %config{harness_bypass} with
+# HARNESS_ACTIVE across _check_access, _wrap, and _process_one.
+# ===================================================================
+
+subtest '_check_access(): harness_bypass=0 suppresses HARNESS_ACTIVE bypass' => sub {
+	plan tests => 2;
+
+	# With harness_bypass=0, HARNESS_ACTIVE=1 must NOT bypass _check_access.
+	local $Sub::Protected::config{harness_bypass} = 0;
+	local $ENV{HARNESS_ACTIVE}                    = 1;
+	local $Sub::Protected::BYPASS                 = 0;
+
+	# Owner (FT::CheckOwner) must still be allowed
+	lives_ok { FT::CheckOwner::call_check() }
+		'_check_access() still allows owner when harness_bypass=0';
+
+	# Stranger must still be blocked
+	throws_ok { FT::CheckStranger::call_check() }
+		qr/protected method/,
+		'_check_access() still blocks stranger when harness_bypass=0 + HARNESS_ACTIVE=1';
+};
+
+subtest '_wrap(): guard fires even with HARNESS_ACTIVE=1 when harness_bypass=0' => sub {
+	plan tests => 1;
+
+	local $Sub::Protected::config{harness_bypass} = 0;
+	local $ENV{HARNESS_ACTIVE}                    = 1;
+	local $Sub::Protected::BYPASS                 = 0;
+
+	# _wrap called from main:: must croak despite HARNESS_ACTIVE=1
+	throws_ok {
+		Sub::Protected::_wrap($OWNER, '_bare_unwrapped', sub { 1 });
+	} qr/_wrap\(\) is a private method of \Q$SP\E/,
+		'_wrap() guard fires when harness_bypass=0 and HARNESS_ACTIVE=1';
+};
+
+subtest '_process_one(): guard fires even with HARNESS_ACTIVE=1 when harness_bypass=0' => sub {
+	plan tests => 1;
+
+	local $Sub::Protected::config{harness_bypass} = 0;
+	local $ENV{HARNESS_ACTIVE}                    = 1;
+	local $Sub::Protected::BYPASS                 = 0;
+
+	# _process_one called from main:: must croak despite HARNESS_ACTIVE=1
+	throws_ok {
+		Sub::Protected::_process_one($OWNER, $config{proc_sub});
+	} qr/_process_one\(\) is a private method of \Q$SP\E/,
+		'_process_one() guard fires when harness_bypass=0 and HARNESS_ACTIVE=1';
+};
+
+# ===================================================================
+# SECTION 8: _assert_private_caller -- isa() branch
+#
+# The guard: return if $caller eq $SELF || eval { $caller->isa($SELF) }
+# Test that a Sub::Protected subclass passes via the isa() arm.
+# ===================================================================
+
+# FT::SP::Sub: a Sub::Protected subclass compiled so caller(1) from inside
+# _assert_private_caller reports FT::SP::Sub, and ->isa('Sub::Protected') = true.
+{
+	package FT::SP::Sub;
+	our @ISA = ('Sub::Protected');
+
+	sub _isa_inner { Sub::Protected::_assert_private_caller('_isa_inner') }
+	sub _isa_outer { FT::SP::Sub::_isa_inner() }
+}
+
+subtest '_assert_private_caller(): allows Sub::Protected subclass (isa branch)' => sub {
+	plan tests => 1;
+
+	# Calling via FT::SP::Sub makes caller(1) = FT::SP::Sub inside the guard.
+	# FT::SP::Sub->isa('Sub::Protected') is true, so the guard returns normally.
+	lives_ok { FT::SP::Sub::_isa_outer() }
+		'_assert_private_caller() allows caller that is a Sub::Protected subclass';
+};
+
 done_testing;

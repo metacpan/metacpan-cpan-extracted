@@ -1,3 +1,18 @@
+0.058		2026-06-10	T. R. Wyant
+    Remove references to the RT bug tracking system.
+
+    Replace wyant@cpan.org with harryfmudd@comcast.net
+
+    Repackage licenses so GitHub can find them.
+
+    Add --format option to spacetrack().
+
+    Note that spacetrack() --last5 is deprecated in Astro::SpaceTrack. It
+    will be removed from Astro-App-Satpass2 when it is removed from
+    Astro-SpaceTrack.
+
+    Recommend Term::ReadLine::Perl for cmd line editing
+
 0.057		2025-07-24	T. R. Wyant
     Fix error handling in height() command and add testing to try to
     ensure it stays fixed.

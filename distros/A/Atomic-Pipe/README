@@ -25,16 +25,20 @@ DESCRIPTION
         PIPE_BUF is 4096 bytes.) [...]
 
     Under the hood this module will split your message into small sections
-    of slightly smaller than the PIPE_BUF limit. Each message will be sent
-    as 1 atomic chunk with a 4 byte prefix indicating what process id it
-    came from, what thread id it came from, a chunk ID (in descending
-    order, so if there are 3 chunks the first will have id 2, the second 1,
-    and the final chunk is always 0 allowing a flush as it knows it is
-    done) and then 1 byte with the length of the data section to follow.
+    of slightly smaller than the PIPE_BUF limit. Each section is sent as 1
+    atomic chunk with a 16 byte header consisting of four 32-bit fields:
+    the process id it came from, the thread id it came from, a chunk ID (in
+    descending order, so if there are 3 chunks the first will have id 2,
+    the second 1, and the final chunk is always 0 allowing a flush as it
+    knows it is done) and the length of the data section to follow.
+
+    NOTE: Payloads are byte strings. If you have a wide-character (unicode)
+    string, encode it (e.g. with "encode" in Encode) before passing it to
+    write_message() or write_burst(); decode on the read side.
 
     On the receiving end this module will read chunks and re-assemble them
     based on the header data. So the reader will always get complete
-    messages. Note that message order is not guarenteed when messages are
+    messages. Note that message order is not guaranteed when messages are
     sent from multiple processes or threads. Though all messages from any
     given thread/process should be in order.
 
@@ -72,7 +76,7 @@ SYNOPSIS
     
         my ($r, $w) = Atomic::Pipe->pair;
     
-        # For simplicty
+        # For simplicity
         $SIG{CHLD} = 'IGNORE';
     
         # Forks and runs your coderef, then exits.
@@ -88,7 +92,7 @@ SYNOPSIS
         is(
             [sort @messages],
             [sort(('aa' x PIPE_BUF), ('bb' x PIPE_BUF), ('cc' x PIPE_BUF))],
-            "Got all 3 long messages, not mangled or mixed, order not guarenteed"
+            "Got all 3 long messages, not mangled or mixed, order not guaranteed"
         );
     
         done_testing;
@@ -156,7 +160,7 @@ MIXED DATA MODE
     
         print "Start a line ..."; # Note no "\n"
     
-        # Any number of newlines is fine the message will send/recieve as a whole.
+        # Any number of newlines is fine the message will send/receive as a whole.
         $w->write_burst("This is a burst message\n\n\n");
     
         # Data will be broken into atomic chunks and sent
@@ -367,19 +371,27 @@ METHODS
 
     ($r, $w) = Atomic::Pipe->pair
 
+    ($r, $w) = Atomic::Pipe->pair(%params)
+
       Create a pipe, returns a list consisting of a reader and a writer.
 
+      All constructors accept the same optional %params: the compression
+      options documented in "COMPRESSION", and mixed_data_mode => 1 (see
+      "MIXED DATA MODE").
+
     $p = Atomic::Pipe->new
+
+    $p = Atomic::Pipe->new(%params)
 
       If you really must have a new() method it is here for you to abuse.
       The returned pipe has both handles, it is your job to then turn it
       into 2 clones one with the reader and one with the writer. It is also
-      your job to make you do not have too many handles floating around
-      preventing an EOF.
+      your job to make sure you do not have too many handles floating
+      around preventing an EOF.
 
-    $r = Atomic::Pipe->read_fifo($FIFO_PATH)
+    $r = Atomic::Pipe->read_fifo($FIFO_PATH, %params)
 
-    $w = Atomic::Pipe->write_fifo($FIFO_PATH)
+    $w = Atomic::Pipe->write_fifo($FIFO_PATH, %params)
 
       These 2 constructors let you connect to a FIFO by filesystem path.
 
@@ -393,9 +405,9 @@ METHODS
       exit condition then the loop will never end even after all writers
       are gone.
 
-    $p = Atomic::Pipe->from_fh($fh)
+    $p = Atomic::Pipe->from_fh($fh, %params)
 
-    $p = Atomic::Pipe->from_fh($mode, $fh)
+    $p = Atomic::Pipe->from_fh($mode, $fh, %params)
 
       Create an instance around an existing filehandle (A clone of the
       handle will be made and kept internally).
@@ -425,7 +437,7 @@ METHODS
 
 	Read-only and reuse fileno.
 
-    $p = Atomic::Pipe->from_fd($mode, $fd)
+    $p = Atomic::Pipe->from_fd($mode, $fd, %params)
 
       $fd must be a file descriptor number.
 
@@ -501,16 +513,21 @@ METHODS
 
       Usable data means raw data that has yet to be processed, complete
       messages, or complete data bursts. Any of these can still be
-      retreieved using read_message(), or get_line_burst_or_data().
+      retrieved using read_message(), or get_line_burst_or_data().
 
     $p->close
 
       Close this end of the pipe (or both ends if this is not yet split
       into reader/writer pairs).
 
+      If the writer has output buffered by non-blocking writes, it is
+      flushed (blocking) before the write handle is closed so the data is
+      not lost. The flush is skipped if the pipe already hit EPIPE or is in
+      an invalid state.
+
     $undef_or_bytes = $p->fits_in_burst($data)
 
-      This will return undef if the data DES NOT fit in a burst. This will
+      This will return undef if the data DOES NOT fit in a burst. This will
       return the size of the data in bytes if it will fit in a burst.
 
     $undef_or_true = $p->write_burst($data)
@@ -528,7 +545,7 @@ METHODS
       The primary use case of this is if you have multiple writers sending
       short plain-text messages that will not exceed the atomic pipe buffer
       limit (minimum of 512 bytes on systems that support atomic pipes
-      accoring to POSIX).
+      according to POSIX).
 
     $fh = $p->rh
 
@@ -585,8 +602,9 @@ METHODS
 
     $bytes = $p->max_size
 
-      Maximum size, or undef if that cannot be determined. (Linux only for
-      now).
+      Maximum size the pipe buffer can be resized to. On Linux this is read
+      from /proc/sys/fs/pipe-max-size; on systems where it cannot be
+      determined this falls back to a conservative 1MB.
 
     $p->resize($bytes)
 
@@ -621,13 +639,16 @@ METHODS
 
     $p->reader
 
-      This turnes the object into a reader-only. Note that if you have no
+      This turns the object into a reader-only. Note that if you have no
       writer-copies then effectively makes it impossible to write to the
       pipe as you cannot get a writer anymore.
 
+      Any output buffered by non-blocking writes is flushed (blocking)
+      before the write handle is closed.
+
     $p->writer
 
-      This turnes the object into a writer-only. Note that if you have no
+      This turns the object into a writer-only. Note that if you have no
       reader-copies then effectively makes it impossible to read from the
       pipe as you cannot get a reader anymore.
 

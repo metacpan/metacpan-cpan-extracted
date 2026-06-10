@@ -2,7 +2,7 @@ package Data::HashMap::Shared::SI32;
 use strict;
 use warnings;
 use Data::HashMap::Shared;
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 sub import {
     $^H{"Data::HashMap::Shared::SI32/shm_si32_put"}        = 1;
@@ -12,6 +12,8 @@ sub import {
     $^H{"Data::HashMap::Shared::SI32/shm_si32_incr"}       = 1;
     $^H{"Data::HashMap::Shared::SI32/shm_si32_decr"}       = 1;
     $^H{"Data::HashMap::Shared::SI32/shm_si32_incr_by"}    = 1;
+    $^H{"Data::HashMap::Shared::SI32/shm_si32_max"}        = 1;
+    $^H{"Data::HashMap::Shared::SI32/shm_si32_min"}        = 1;
     $^H{"Data::HashMap::Shared::SI32/shm_si32_size"}       = 1;
     $^H{"Data::HashMap::Shared::SI32/shm_si32_keys"}       = 1;
     $^H{"Data::HashMap::Shared::SI32/shm_si32_values"}     = 1;

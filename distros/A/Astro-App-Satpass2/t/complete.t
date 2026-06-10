@@ -13,7 +13,16 @@ use Astro::App::Satpass2;
 use Test2::V0;
 
 my $app = Astro::App::Satpass2->new();
-$app->_get_readline();	# To initialize internals.
+{
+    # We need to ensure Astro::App::Satpass2 thinks we're interactive to
+    # get the initializatoin we need.
+    my $mock = mock 'Astro::App::Satpass2' => (
+	override	=> [
+	    _get_interactive	=> sub { 1 },
+	],
+    );
+    $app->_get_readline();	# To initialize internals.
+}
 $INC{'Term/ReadLine/Perl.pm'}
     or skip_all 'Term::ReadLine::Perl not available';
 

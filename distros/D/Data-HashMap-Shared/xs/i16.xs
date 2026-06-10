@@ -11,8 +11,9 @@ new(char* class, SV* path_sv, UV max_entries, UV lru_max = 0, UV ttl_default = 0
         RETVAL
 
 SV*
-new_sharded(char* class, char* path_prefix, UV num_shards, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0)
+new_sharded(char* class, SV* path_prefix_sv, UV num_shards, UV max_entries, UV lru_max = 0, UV ttl_default = 0, UV lru_skip = 0)
     CODE:
+        const char* path_prefix = SvOK(path_prefix_sv) ? SvPV_nolen(path_prefix_sv) : NULL;
         char errbuf[SHM_ERR_BUFLEN]; ShmHandle* map = shm_i16_create_sharded(path_prefix, (uint32_t)num_shards, (uint32_t)max_entries, (uint32_t)lru_max, (uint32_t)ttl_default, (uint32_t)lru_skip, errbuf);
         if (!map) croak("Data::HashMap::Shared::I16: %s", errbuf[0] ? errbuf : "unknown error");
         RETVAL = sv_setref_pv(newSV(0), class, (void*)map);
@@ -128,6 +129,28 @@ incr_by(SV* self_sv, int16_t key, int16_t delta)
         int ok;
         int16_t val = shm_i16_incr_by(h, key, delta, &ok);
         if (!ok) croak("Data::HashMap::Shared::I16: incr_by failed");
+        RETVAL = newSViv(val);
+    OUTPUT:
+        RETVAL
+
+SV*
+max(SV* self_sv, int16_t key, int16_t desired)
+    CODE:
+        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        int ok;
+        int16_t val = shm_i16_set_minmax(h, key, desired, 1, &ok);
+        if (!ok) croak("Data::HashMap::Shared::I16: max failed");
+        RETVAL = newSViv(val);
+    OUTPUT:
+        RETVAL
+
+SV*
+min(SV* self_sv, int16_t key, int16_t desired)
+    CODE:
+        EXTRACT_MAP("Data::HashMap::Shared::I16", self_sv);
+        int ok;
+        int16_t val = shm_i16_set_minmax(h, key, desired, 0, &ok);
+        if (!ok) croak("Data::HashMap::Shared::I16: min failed");
         RETVAL = newSViv(val);
     OUTPUT:
         RETVAL
@@ -338,13 +361,13 @@ drain(SV* self_sv, UV limit)
         SAVEFREEPV(entries);
         char *buf = NULL; uint32_t buf_cap = 0;
         uint32_t n = shm_i16_drain(h, (uint32_t)limit, entries, &buf, &buf_cap);
+        if (buf) SAVEDESTRUCTOR_X(shm_free_cleanup, buf);
 
         EXTEND(SP, n * 2);
         for (uint32_t i = 0; i < n; i++) {
             mPUSHi(entries[i].key);
             mPUSHi(entries[i].value);
         }
-        if (buf) free(buf);
 
 
 UV

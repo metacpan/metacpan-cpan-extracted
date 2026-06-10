@@ -47,6 +47,8 @@ sub midnight_after {
   is(scalar @Time::LeapSecond::DAYS,      scalar @t, 'DAYS is parallel to TIMES');
   is(scalar @Time::LeapSecond::CORRECTIONS, scalar @o, 'CORRECTIONS is parallel to OFFSETS');
   is($Time::LeapSecond::CORRECTIONS[0], 0, 'CORRECTIONS[0] is the no-correction base');
+  ok(defined $Time::LeapSecond::EXPIRES && $Time::LeapSecond::EXPIRES > 0,
+    'EXPIRES is set after the initial load');
 
   my ($ascending, $unit_steps) = (1, 1);
   for my $i (1 .. $#t) {
@@ -82,6 +84,8 @@ sub midnight_after {
   );
   my $n = load_leapseconds_tzdb($path);
   is($n, 3, 'load_leapseconds_tzdb: returns number of entries');
+  is($Time::LeapSecond::EXPIRES, 1735344000,
+    'load_leapseconds_tzdb: sets EXPIRES from the file');
   is_deeply([@Time::LeapSecond::OFFSETS], [10, 11, 12, 11],
     'negative leap second lowers the cumulative offset (OFFSETS[0] is the base)');
   is_deeply([@Time::LeapSecond::CORRECTIONS], [0, 1, 1, -1],
@@ -158,23 +162,38 @@ throws_ok { parse_leapseconds_tzdb('/this/path/does/not/exist') }
     "Leap\t1972\tDec\t31\t23:59:60\t+\tS\n",
     "#Expires 1735344000\n",
   );
-  my ($days, $corrections) = parse_leapseconds_tzdb($path);
+  my ($days, $corrections, $expires) = parse_leapseconds_tzdb($path);
   is_deeply($days, [ ymd_to_rdn(1972,  6, 30), 
                      ymd_to_rdn(1972, 12, 31) ],
     'parse_leapseconds_tzdb: returns leap days as RDNs');
   is_deeply($corrections, [1, 1],
     'parse_leapseconds_tzdb: returns per-transition corrections');
+  is($expires, 1735344000,
+    'parse_leapseconds_tzdb: returns the expiration timestamp');
 }
 
 {
   # Negative leap seconds are now supported, not rejected.
-  my $path = write_temp("Leap\t2030\tDec\t31\t23:59:59\t-\tS\n");
-  my ($days, $corrections) = parse_leapseconds_tzdb($path);
+  my $path = write_temp(
+    "Leap\t2030\tDec\t31\t23:59:59\t-\tS\n",
+    "#expires 1924905600\n",
+  );
+  my ($days, $corrections, $expires) = parse_leapseconds_tzdb($path);
   is_deeply($days, [ymd_to_rdn(2030, 12, 31)],
     'parse_leapseconds_tzdb: negative leap day as RDN');
   is_deeply($corrections, [-1],
     'parse_leapseconds_tzdb: negative leap is a -1 correction');
+  is($expires, 1924905600,
+    'parse_leapseconds_tzdb: expiration extracted from negative-leap fixture');
 }
+
+throws_ok {
+  parse_leapseconds_tzdb(write_temp(
+    "Leap\t1972\tJun\t30\t23:59:60\t+\tS\n",
+    "# no expires line here\n",
+  ))
+} qr/no expiration found/,
+  'parse_leapseconds_tzdb: missing expires line croaks';
 
 throws_ok { parse_leapseconds_tzdb(write_temp("Leap not a real line\n")) }
   qr/malformed line/,
@@ -217,14 +236,25 @@ throws_ok { parse_leapseconds_iers('/this/path/does/not/exist') }
     "2303683200\t12\t# 1 Jan 1973\n",
     "2335219200\t11\t# 1 Jan 1974 (negative)\n",
   );
-  my ($days, $corrections) = parse_leapseconds_iers($path);
+  my ($days, $corrections, $expires) = parse_leapseconds_iers($path);
   is_deeply($days, [ ymd_to_rdn(1972,  6, 30), 
                      ymd_to_rdn(1972, 12, 31),
                      ymd_to_rdn(1973, 12, 31) ],
     'parse_leapseconds_iers: NTP epochs converted to leap-day RDNs, base row dropped');
   is_deeply($corrections, [1, 1, -1],
     'parse_leapseconds_iers: absolute offsets turned into corrections, negative handled');
+  # #@ 3944332800 NTP -> 3944332800 - 2208988800 = 1735344000 POSIX
+  is($expires, 1735344000,
+    'parse_leapseconds_iers: expiration extracted from #@ line and converted to POSIX');
 }
+
+throws_ok {
+  parse_leapseconds_iers(write_temp(
+    "2272060800\t10\n",   # base
+    "2287785600\t11\n",   # 1 Jul 1972
+  ))
+} qr/no expiration found/,
+  'parse_leapseconds_iers: missing #@ line croaks';
 
 throws_ok { parse_leapseconds_iers(write_temp("not numbers here\n")) }
   qr/malformed line/,
@@ -269,10 +299,12 @@ SKIP: {
   skip "system leapseconds/leap-seconds.list not both present", 1
     unless -f $tzdb && -f $iers;
 
-  my ($td, $tc) = parse_leapseconds_tzdb($tzdb);
-  my ($id, $ic) = parse_leapseconds_iers($iers);
+  my ($td, $tc, $te) = parse_leapseconds_tzdb($tzdb);
+  my ($id, $ic, $ie) = parse_leapseconds_iers($iers);
   ok(eq_array($td, $id) && eq_array($tc, $ic),
-    'parse_leapseconds_tzdb and parse_leapseconds_iers agree on system files');
+    'parse_leapseconds_tzdb and parse_leapseconds_iers agree on system files (days/corrections)');
+  is($te, $ie,
+    'parse_leapseconds_tzdb and parse_leapseconds_iers agree on system files (expires)');
 }
 
 ## Loaders: error policy

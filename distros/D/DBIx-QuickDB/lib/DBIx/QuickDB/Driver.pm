@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver;
 use strict;
 use warnings;
 
-our $VERSION = '0.000048';
+our $VERSION = '0.000049';
 
 use Carp qw/croak confess/;
 use File::Path qw/remove_tree/;
@@ -27,6 +27,7 @@ use DBIx::QuickDB::Util::HashBase qw{
     env_vars
     <watcher
     <cloned_from
+    -fast_destroy
 };
 
 sub viable { (0, "viable() is not implemented for the " . $_[0]->name . " driver") }
@@ -48,11 +49,29 @@ sub read_error_log {
     return join "" => <$fh>;
 }
 
+# Slurp a file for diagnostics; returns "" if it is missing or unreadable.
+sub _read_file {
+    my $self = shift;
+    my ($file) = @_;
+    return "" unless $file && -f $file;
+    open(my $fh, '<', $file) or return "";
+    return join "" => <$fh>;
+}
+
 sub list_env_vars { qw/DBI_USER DBI_PASS DBI_DSN/ }
 
 sub version_string { 'unknown' }
 
 sub stop_sig { 'TERM' }
+
+# Signal the watcher sends to the server for fast (disposable) teardown via
+# destroy_quietly()/fast_destroy. The default SIGKILL is the quickest possible
+# stop. Drivers whose server leaks an OS resource on a hard kill should override
+# this with a clean-but-immediate shutdown signal (see PostgreSQL, which returns
+# 'QUIT' so the postmaster releases its SysV semaphores instead of orphaning
+# them). The watcher escalates to SIGKILL if the chosen signal does not exit the
+# server promptly, so teardown always completes.
+sub fast_stop_sig { 'KILL' }
 
 sub write_config {}
 
@@ -145,6 +164,8 @@ sub clone_data {
         AUTOSTART() => $self->{+AUTOSTART},
 
         cleanup => $self->{+_CLEANUP},
+
+        FAST_DESTROY() => $self->{+FAST_DESTROY},
 
         ENV_VARS() => {%{$self->{+ENV_VARS}}},
     );
@@ -326,10 +347,25 @@ sub start {
         my $waited = time - $start;
 
         if ($waited > $timeout) {
-            my $error_log = $self->read_error_log;
+            # Capture diagnostics BEFORE eliminate() removes the data dir (which
+            # holds both the error log and the watcher's launch log). The server
+            # process's own stdout/stderr go to the watcher's log_file, not the
+            # driver's error_log, so a server that died (or never launched)
+            # before writing error_log leaves error_log showing only inherited
+            # template history -- the real failure is in the launch log. Also
+            # report whether the server pid is still alive: "not running" points
+            # at a launch/early-exit failure, "alive" at a slow or hung startup.
+            my $spid       = $watcher->server_pid;
+            my $alive      = ($spid && kill(0, $spid)) ? "alive (pid $spid)" : "not running";
+            my $error_log  = $self->read_error_log;
+            my $launch_log = $self->_read_file($watcher->log_file);
+
             $watcher->eliminate();
-            confess "Timed out waiting for server to start\n$error_log";
-            last;
+
+            my $msg = "Timed out waiting for server to start after ${timeout}s; server process is $alive.";
+            $msg .= "\n=== server launch log ===\n$launch_log" if length $launch_log;
+            $msg .= "\n=== error log ===\n$error_log"          if length $error_log;
+            confess $msg;
         }
 
         sleep 0.01;
@@ -383,6 +419,47 @@ sub stop {
     return;
 }
 
+# Immediate disposable teardown for clones that are about to be deleted. Unlike
+# stop()/DESTROY this does NOT checkpoint or attempt a graceful shutdown: it asks
+# the watcher to SIGKILL+reap the server and remove the data dir. Only safe when
+# the data dir is disposable (cleanup => 1). Idempotent: after the first call
+# clears the watcher, later calls and DESTROY become no-ops apart from an
+# idempotent cleanup().
+sub destroy_quietly {
+    my $self = shift;
+    return unless $self->{+ROOT_PID} && $self->{+ROOT_PID} == $$;
+
+    if (my $watcher = delete $self->{+WATCHER}) {
+        # Disconnect our DBI handles before the server dies so this process does
+        # not retain broken handles that later report "server has gone away".
+        DBI->visit_handles(
+            sub {
+                my ($driver_handle) = @_;
+
+                $driver_handle->disconnect
+                   if $driver_handle->{Type} && $driver_handle->{Type} eq 'db'
+                   && $driver_handle->{Name} && index($driver_handle->{Name}, $self->{+DIR}) >= 0;
+
+                return 1;
+            }
+        ) if $INC{'DBI.pm'};
+
+        # The watcher is the server's parent, so it is the correct process to
+        # kill and reap it. Do NOT signal the stored server pid directly here.
+        $watcher->fast_eliminate();
+        $watcher->wait();
+
+        # The watcher removes the data dir; this is a defensive fallback in case
+        # it exited before doing so.
+        $self->cleanup() if $self->should_cleanup;
+    }
+    elsif ($self->should_cleanup) {
+        $self->cleanup();
+    }
+
+    return;
+}
+
 sub shell {
     my $self = shift;
     my ($db_name) = @_;
@@ -394,6 +471,13 @@ sub shell {
 sub DESTROY {
     my $self = shift;
     return unless $self->{+ROOT_PID} && $self->{+ROOT_PID} == $$;
+
+    # Opt-in fast teardown for disposable clones. Only honored when the data dir
+    # is actually disposable (_CLEANUP); a contradictory fast_destroy + cleanup
+    # => 0 falls through to the normal graceful path below so a reusable data dir
+    # is never hard-killed.
+    return $self->destroy_quietly()
+        if $self->{+FAST_DESTROY} && $self->{+_CLEANUP};
 
     if (my $watcher = delete $self->{+WATCHER}) {
         # eliminate() signals the watcher to stop the server and delete the data
@@ -599,6 +683,39 @@ running.
 Stop the database. Most drivers will make this a no-op if the db is already
 stopped.
 
+=item $db->destroy_quietly
+
+Immediate, disposable teardown for a clone that is about to be deleted. Instead
+of a graceful shutdown (which can block for up to C<2 * QDB_STOP_GRACE + 2>
+seconds while the server checkpoints), this asks the watcher to kill the server
+straight away with the driver's C<fast_stop_sig()> (C<SIGKILL> by default), reap
+it, and remove the data dir.
+
+This is B<only> appropriate for disposable databases (C<< cleanup => 1 >>): it
+does B<not> checkpoint and does B<not> attempt a clean shutdown, so the on-disk
+state is left in whatever condition the hard kill produced. Never use it for a
+template/cache database or anything whose data dir will be reused.
+
+The watcher (the server's parent) is what performs the kill and reap; the driver
+never signals the stored server pid directly. Any of this process's DBI handles
+for the database are disconnected first so they do not linger as broken handles.
+
+Safe to call more than once; later calls (and C<DESTROY>) become no-ops apart
+from an idempotent C<cleanup()>.
+
+See also the C<fast_destroy> attribute, which makes C<DESTROY> call this
+automatically.
+
+=item $bool = $db->fast_destroy
+
+True if this db was created with C<< fast_destroy => 1 >>. When set B<and> the db
+is disposable (C<< cleanup => 1 >>), C<DESTROY> uses C<destroy_quietly()> instead
+of the normal graceful teardown. With C<< cleanup => 0 >> the flag is ignored and
+the graceful path is used, so a reusable data dir is never hard-killed.
+
+The attribute is inherited by clones via C<clone_data()>, so a clone of a
+fast_destroy database is itself fast_destroy.
+
 =item $db->resync
 
 If the database is a clone of another, it will re-clone the data from the
@@ -640,6 +757,34 @@ no-op on the base class, used in cloning.
 =item $sig = $db->stop_sig()
 
 What signal to send to the database server to stop it. Default: C<'TERM'>.
+
+=item $sig = $db->fast_stop_sig()
+
+What signal the watcher uses to force the server down when a polite stop does not
+work. Default: C<'KILL'>. Drivers whose server would leak an OS resource on a
+hard kill should override this with a clean-but-immediate shutdown signal; for
+example L<DBIx::QuickDB::Driver::PostgreSQL> returns C<'QUIT'> ("immediate
+shutdown") so the postmaster releases its SysV semaphores instead of orphaning
+them.
+
+It is used in two places, both escalating to C<SIGKILL> if the signal does not
+stop the server promptly:
+
+=over 4
+
+=item *
+
+Fast disposable teardown (C<destroy_quietly()> / C<fast_destroy>) sends it
+straight away instead of a graceful shutdown.
+
+=item *
+
+The normal graceful teardown (C<stop()> / C<eliminate()>) escalates to it after
+C<QDB_STOP_GRACE> seconds, before finally resorting to C<SIGKILL> -- so a server
+that ignores its polite stop signal still gets a chance to release OS resources
+rather than being hard-killed outright.
+
+=back
 
 =item $db->DESTROY
 

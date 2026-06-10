@@ -73,11 +73,11 @@ Log::Abstraction - Logging Abstraction Layer
 
 =head1 VERSION
 
-0.31
+0.32
 
 =cut
 
-our $VERSION = 0.31;
+our $VERSION = 0.32;
 
 =head1 SYNOPSIS
 
@@ -248,6 +248,47 @@ not supplied.  Loads C<Log::Log4perl> if no logger backend is specified.
                                             level name.  Use trace/debug/info/notice/
                                             warn/warning/error.
 
+=head3 PSEUDOCODE
+
+  FUNCTION new(class_or_obj, args...)
+
+    Parse args:
+      IF single non-hash scalar
+      THEN store as logger shorthand
+      ELSE extract named params via Params::Get
+
+    IF config_file present:
+      CROAK if file is not readable
+      Load via Config::Abstraction, merge into args (constructor args win)
+      Restore caller-supplied array ref that config merge would have dropped
+
+    IF called on a blessed instance (clone form):
+      shallow-clone self merged with override args
+      validate and store new level integer if level given in args
+      deep-copy message history list
+      RETURN clone
+
+    IF syslog requested and script_name not supplied:
+      auto-detect script name via File::Basename
+      CROAK if still undefined
+
+    IF logger arg is a Log::Abstraction object:
+      CROAK (would create a needless forwarding loop)
+
+    IF no logger AND no file AND no array:
+      load Log::Log4perl, easy_init at DEBUG or ERROR per verbose flag
+      store Log4perl logger as the backend
+
+    Normalise and validate level:
+      IF level is an arrayref, take first element
+      lc() the level string
+      CROAK if not in syslog_values lookup
+      default to $DEFAULT_LEVEL if not supplied
+
+    RETURN bless { messages => [], merged args, level => numeric } as class
+
+  END FUNCTION
+
 =cut
 
 sub new {
@@ -415,6 +456,30 @@ sub _validate_file_path {
 # Exit:         Returns the formatted log line (without trailing newline).
 # Notes:        %env_FOO% tokens are expanded with a // '' fallback so that
 #               missing environment variables expand silently to empty string.
+#
+# Pseudocode:
+#   FUNCTION _format_message(self, level, str, use_class)
+#     Choose default format template:
+#       use_class=1 → DEFAULT_FORMAT (includes %class%)
+#       use_class=0 → DEFAULT_FORMAT_NOCLASS
+#     Override with self->{'format'} if the caller supplied a custom format
+#
+#     Compute token values:
+#       ulevel    = uc(level)
+#       class     = blessed class if it is a subclass, else '' (base package)
+#       callstack = filename and line number from caller(2)
+#       timestamp = strftime 'YYYY-MM-DD HH:MM:SS'
+#
+#     Expand tokens in format string:
+#       %level%       → ulevel
+#       %class%       → class (may be empty)
+#       %message%     → str
+#       %callstack%   → callstack
+#       %timestamp%   → timestamp
+#       %env_FOO%     → $ENV{FOO} // '' (silent if env var unset)
+#
+#     RETURN formatted line string
+#   END FUNCTION
 # ---------------------------------------------------------------------------
 sub _format_message {
 	my ($self, $level, $str, $use_class) = @_;
@@ -459,6 +524,62 @@ sub _format_message {
 #               The caller depth used for file/line in CODE-ref callbacks is
 #               caller(1), which resolves correctly for trace/debug/info/notice
 #               but points one frame inward for warn/error (via _high_priority).
+#
+# Pseudocode:
+#   FUNCTION _log(self, level, messages...)
+#     CROAK if caller package is not this package (private method guard)
+#     CROAK if level is not a recognised syslog level name
+#     RETURN early if syslog_values{level} > self->{'level'} (below threshold)
+#
+#     Flatten single-arrayref argument to a list; filter out undefs; join to $str
+#     Push { level, message } onto self->{messages} (always recorded)
+#     Set $class = '' for base package, else the blessed class name
+#
+#     IF self->{'logger'} is a CODE ref:
+#       Build args hashref { class, file, line, level, message, ctx? }
+#       Call logger->( args )
+#
+#     ELSIF self->{'logger'} is an ARRAY ref:
+#       Push { level, message }
+#
+#     ELSIF self->{'logger'} is a HASH ref:
+#       IF 'file' key present:
+#         validate path; format line; (eval) open>>file, print, close
+#       IF 'array' key present:
+#         push { level, message }
+#       IF 'sendmail' key present with a 'to' address:
+#         IF level passes threshold AND not throttled:
+#           CROAK if host contains unsafe characters
+#           CROAK if port is out of 1-65535 range
+#           (eval) load Email::* modules; build email with sanitised headers;
+#                  send via SMTP transport; carp on delivery failure
+#           Record timestamp for throttle
+#       IF 'syslog' key present:
+#         IF level passes threshold:
+#           Open syslog connection on first use (setlogsock, openlog)
+#           (eval) map level to syslog priority; call Sys::Syslog::syslog;
+#                  carp with Data::Dumper output on failure
+#       IF 'fd' key present:
+#         Format line; print to filehandle
+#       ELSIF no actionable key:
+#         CROAK (configuration error)
+#
+#     ELSIF self->{'logger'} is an unblessed scalar (file path):
+#       Validate path; format line; (eval) open>>file, print, close
+#
+#     ELSIF self->{'logger'} is a blessed object:
+#       Map 'notice' to 'info' for backends without notice() (e.g. Log::Log4perl)
+#       CROAK if object cannot handle the level
+#       Call $logger->$level(@messages)
+#
+#     ELSIF self->{'array'} top-level key:
+#       Push { level, message }
+#
+#     IF self->{'file'} top-level key:
+#       Validate path; format line; (eval) open>>file, print, close
+#     IF self->{'fd'} top-level key:
+#       Format line; print to filehandle
+#   END FUNCTION
 # ---------------------------------------------------------------------------
 sub _log {
 	my ($self, $level, @messages) = @_;
@@ -558,7 +679,17 @@ sub _log {
 					}
 
 					if(!$throttled) {
-						# Load mail modules lazily; wrap in eval to handle failures
+						# Validate host and port before any eval so bad config croaks immediately
+						my $host = $sm->{'host'} || $DEFAULT_SMTP_HOST;
+						Carp::croak(ref($self), ": Invalid SMTP host: $host")
+							if $host =~ $RE_SAFE_HOST;
+						my $port = $sm->{'port'} || $DEFAULT_SMTP_PORT;
+						Carp::croak(ref($self), ": Invalid SMTP port: $port")
+							unless $port =~ $RE_PORT
+								&& $port >= $MIN_PORT
+								&& $port <= $MAX_PORT;
+
+						# Load mail modules lazily; wrap only I/O in eval to handle delivery failures
 						eval {
 							require Email::Simple;
 							require Email::Sender::Simple;
@@ -586,16 +717,6 @@ sub _log {
 								);
 							}
 							$email->body_set(join(' ', @messages));
-
-							# Validate host and port before constructing transport
-							my $host = $sm->{'host'} || $DEFAULT_SMTP_HOST;
-							Carp::croak(ref($self), ": Invalid SMTP host: $host")
-								if $host =~ $RE_SAFE_HOST;
-							my $port = $sm->{'port'} || $DEFAULT_SMTP_PORT;
-							Carp::croak(ref($self), ": Invalid SMTP port: $port")
-								unless $port =~ $RE_PORT
-									&& $port >= $MIN_PORT
-									&& $port <= $MAX_PORT;
 
 							my $transport = Email::Sender::Transport::SMTP->new({
 								host => $host,
@@ -737,6 +858,34 @@ sub _log {
 #               configured backends.  May call Carp::carp or Carp::croak.
 # Notes:        The duplicated extraction logic that appeared in earlier
 #               versions has been collapsed into a single if/else block.
+#
+# Pseudocode:
+#   FUNCTION _high_priority(self, level, args...)
+#     RETURN early if no args supplied
+#     RETURN early if level is below WARNING threshold (defensive guard)
+#
+#     Attempt to parse args as named-parameter form via Params::Get (in eval)
+#
+#     IF named 'warning' key found in result:
+#       Extract warning value; RETURN if value is undef
+#       IF value is an arrayref: join defined elements into a string
+#     ELSE (plain list form):
+#       Join defined elements of @_ into a string
+#       RETURN if resulting string is empty
+#
+#     IF called as a class method (self is the package name, not an object):
+#       IF error level: CROAK with warning text; RETURN
+#       CARP with warning text; RETURN
+#
+#     Call self->_log(level, warning)
+#
+#     IF error level:
+#       IF croak_on_error flag set OR no logger/array backend configured:
+#         CROAK with warning text
+#
+#     IF carp_on_warn flag set OR no logger/array backend configured:
+#       CARP with warning text
+#   END FUNCTION
 # ---------------------------------------------------------------------------
 sub _high_priority {
 	my $self  = shift;
@@ -852,6 +1001,20 @@ When setting, updates C<$self-E<gt>{level}>.
   ----------------------------------------  ------------------------------------------
   "<class>: invalid syslog level '<l>'"     The supplied level name is not recognised.
                                             Use trace/debug/info/notice/warn/error.
+
+=head3 PSEUDOCODE
+
+  FUNCTION level(self, level?)
+
+    IF level argument supplied:
+      CARP and RETURN undef if level is not a recognised syslog name
+      Store syslog_values{level} in self->{'level'}
+      RETURN self  (allows method chaining)
+
+    ELSE (getter mode):
+      RETURN self->{'level'}  (current numeric threshold)
+
+  END FUNCTION
 
 =cut
 

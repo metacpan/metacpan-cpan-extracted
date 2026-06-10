@@ -4,7 +4,7 @@
       "Dean Hamstead <dean@fragfest.com.au>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.033, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "mit"
    ],
@@ -23,6 +23,7 @@
       "build" : {
          "requires" : {
             "Module::Build" : "0.28",
+            "Test::Exception" : "0",
             "Test::Trap" : "0"
          }
       },
@@ -89,7 +90,7 @@
          "web" : "https://github.com/djzort/NetAddr-MAC"
       }
    },
-   "version" : "1.00",
+   "version" : "1.01",
    "x_author_pledge" : {
       "version" : 1
    },

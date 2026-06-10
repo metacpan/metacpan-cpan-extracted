@@ -10,7 +10,7 @@ use IO::File;
 use Tk;
 use Tk::Pane;
 
-our $VERSION = '0.181';
+our $VERSION = '0.182';
 
 my @pad = qw{ -padx 5 -pady 5 };	# Standard cell padding
 
@@ -1111,7 +1111,7 @@ to the L<Astro::SpaceTrack|Astro::SpaceTrack> C<set()> method.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III F<wyant at cpan dot org>
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT AND LICENSE
 

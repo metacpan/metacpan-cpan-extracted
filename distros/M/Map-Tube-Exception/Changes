@@ -1,5 +1,10 @@
 Revision history for Map::Tube::Exception
 
+3.25  Mon Jun 10 01:40:00 2026 (GWS)
+      - Added exception for map not specified.
+      - Augmented list of tests.
+      - Updated README.
+
 3.24  Thu Dec 12 15:45:00 2024
       - Added exception for route not found.
 

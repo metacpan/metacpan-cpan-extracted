@@ -1,0 +1,240 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use utf8;
+
+use Encode::Locale;
+use Encode;
+use Getopt::Long qw(:config no_ignore_case);
+use Novel::Robot;
+#use Data::Dumper;
+
+$| = 1;
+binmode( STDIN,  ":encoding(console_in)" );
+binmode( STDOUT, ":encoding(console_out)" );
+binmode( STDERR, ":encoding(console_out)" );
+
+my %opt;
+GetOptions(
+    \%opt,
+
+    'site|s=s',       'url|u=s', 'file|f=s', 'writer|w=s', 'book|b=s',
+    'type|t=s',       'output|o=s',
+    'item|i=s',      'back_index=s', 
+    'page|j=s', 
+    'cookie=s',
+    'not_download|D', 'class|c=s', 'verbose|v',
+    'progress',
+    'help|h', 
+
+    'agent=s',
+    'with_toc', 'grep_content=s', 'filter_content=s', 'only_poster', 'min_content_word_num=i',
+    'max_process_num=i',
+    'chapter_regex=s',
+    'content_path=s',  'writer_path=s',  'book_path=s', 'item_list_path=s',
+    'content_regex=s', 'writer_regex=s', 'book_regex=s',
+
+    'query_type|q=s', 'query_keyword|k=s', 'board|B=s', 
+
+    # remote ansible host
+    #'remote|R=s',
+
+    # mail
+    'mail_msg|m=s',
+    'mail_server|M=s',
+    'mail_port|p=s',
+    'mail_usr|U=s',
+    'mail_pwd|P=s',
+    'mail_from|F=s', 'mail_to|T=s',
+);
+
+%opt = read_option( %opt );
+
+help(\%opt);
+
+our $xs = Novel::Robot->new( %opt );
+if ( $opt{cookie} ) {
+    my ( $dom, $base_dom ) = $xs->{parser}->detect_domain( $xs->{parser}->domain() || $opt{url} );
+    $xs->{browser}->read_moz_cookie( $opt{cookie}, $base_dom );
+}
+
+my ( $outf, $bookr );
+if ( $opt{file} ) {
+    if ( $opt{site} eq 'txt' ) { # parse txt
+        my @path = split ',', $opt{file};
+        ( $outf, $bookr ) = $xs->get_novel( \@path, %opt );
+    } else { # convert ebook
+        $outf = $xs->{packer}->convert_novel( $opt{file}, $opt{output}, \%opt );
+    }
+} elsif ( $opt{url} ) {
+    if ( $opt{not_download} ) { # print novel info, not download
+        my $r = $xs->get_novel_info( $opt{url}, %opt, max_page_num => 1 );
+	#print encode(locale=>join( ",", $r->{writer} || '', $r->{book} || $r->{title} || '', $r->{url} || '', $r->{item_num} || '' )), "\n";
+        print join( ",", $r->{writer} || '', $r->{book} || $r->{title} || '', $r->{url} || '', $r->{item_num} || '' ), "\n";
+    }else{ # download novel/tiezi/page from url
+        ( $outf, $bookr ) = $xs->get_novel( $opt{url}, %opt );
+    }
+} elsif ( $opt{site} and $opt{writer} and $opt{book} ) {
+    ( $outf, $bookr ) = $xs->get_novel( "$opt{writer}:$opt{book}", %opt );
+} elsif ( defined $opt{query_keyword} or defined $opt{board}) {
+    my $info_ref;
+    if(defined $opt{query_keyword}){
+        $info_ref  = $xs->{parser}->get_query_ref( $opt{query_keyword}, %opt );
+    }else{
+        $info_ref = $xs->{parser}->get_board_ref($opt{board}, %opt);
+    }
+
+    my $items_ref = $info_ref->{item_list};
+
+    for my $r ( @$items_ref ) {
+        my $u = $r->{url};
+        next unless($u);
+        if ( $opt{not_download} ) {
+		#print encode(locale=>join( ",", $r->{writer} // $info_ref->{writer} // 'unknown', $r->{book} // $r->{title}, $r->{url} )), "\n";
+		print join( ",", $r->{writer} // $info_ref->{writer} // 'unknown', $r->{book} // $r->{title}, $r->{url} ), "\n";
+        } else {
+            $xs->get_novel( $u, %opt );
+        }
+    }
+}
+
+if($opt{mail_to} and -f $outf){
+    send_novel( $outf, $bookr, %opt );
+}
+
+sub send_novel {
+    my ( $outf, $bookr, %o ) = @_;
+
+    my $outfname= decode(locale=>$outf);
+    my $msg = $bookr->{writer} ? qq[$bookr->{writer}-$bookr->{book}-$bookr->{item_num}] : $outfname;
+    $msg=~s#^.*/##;
+
+    my $cmd = qq[calibre-smtp -a "$outfname" -s "$msg" --relay $o{mail_server} --port $o{mail_port} -u "$o{mail_usr}" -p "$o{mail_pwd}" "$o{mail_from}" "$o{mail_to}" "$msg"];
+    print encode(locale=>$cmd), "\n";
+    print $cmd, "\n";
+
+    system( $cmd );
+
+    unlink($outf) if($o{url});
+
+}
+
+sub read_option {
+    my ( %opt ) = @_;
+    $opt{site} ||= $opt{url} || $opt{file} || $opt{board};
+    $opt{type} ||= 'html';
+    $opt{class} ||= 'novel';
+    $opt{agent} ||= 'default';
+    $opt{with_toc}        //= 1;
+    $opt{progress}        //= 0;
+    $opt{max_process_num} //= 1;
+    $opt{verbose}         //= 0;
+
+#    for my $k (
+#        qw/writer writer_path writer_regex book book_path book_regex content_path content_regex item_list_path
+#        chapter_regex
+#        grep_content filter_content
+#        query_keyword query_type
+#        /
+#    ) {
+#        next unless ( exists $opt{$k} );
+#	$opt{$k} = decode( locale => $opt{$k} );
+#    }
+
+
+    if ( $opt{page} ) {
+        @opt{qw/min_page_num max_page_num/} = split_index( $opt{page} );
+    }
+
+    if ( $opt{item} ) {
+        @opt{qw/min_item_num max_item_num/} = split_index( $opt{item} );
+    }
+
+    if ( $opt{file} ) {
+        my $tf = $opt{file};
+        my ( $tw, $tb, $suffix ) = $tf =~ m#([^\/\\]+)-([^\/\\]+)\.([^.]+)$#;
+        $opt{writer} = $tw unless ( defined $opt{writer} );
+        $opt{book}   = $tb unless ( defined $opt{book} );
+	$opt{file} = encode( locale => $opt{file} );
+    }
+
+    return %opt;
+} ## end sub read_option
+
+sub split_index {
+  my $s = $_[-1];
+  return ( $s, $s ) if ( $s =~ /^\d+$/ );
+  if ( $s =~ /^\d*-\d*$/ ) {
+    my ( $min, $max ) = split '-', $s;
+    return ( $min, $max );
+  }
+  return;
+}
+
+sub help {
+	my ($o) = @_;
+
+	return unless($o->{help});
+
+	while(<DATA>){
+		print $_;
+	}
+
+	exit;
+}
+
+__DATA__
+
+Usage: novel-robot [options]
+
+-s : site, 指定站点
+
+-u : book url，小说url
+
+-w : writer name 作者名
+-b : book name，书名
+-f : txt file / txt file dir, 指定文本文件来源(可以是单个目录或文件)
+
+-t : packer type (html/txt), 小说保存类型，例如txt/html
+-o : output packer filename, 保存的小说文件名
+
+-i : min_item_num-max_item_num, 只取 x-y 章/楼
+--back_index: back item num, 不取 倒数 back_index 章/楼
+-j : min_page_num-max_page_num, 只取 x-y 页
+
+--cookie : firefox cookies.sqlite / netscape HTTP cookie file / cookie string, details in Novel::Robot::Browser
+-D : only print info, not download, 只输出信息，不下载
+-c : class, 指定类型 novel, teizi, page
+-v : verbose
+
+--progress: 显示进度条(默认不显示)
+-h, --help: 显示帮助
+
+--agent           : default, firefox (GET), chrome (GET)
+--with_toc        : 小说保存时是否生成目录(默认是)
+--grep_content    : 提取关键字
+--filter_content  : 过滤关键字
+--only_poster     : 贴子只看楼主
+--min_content_word_num : 贴子每楼层最小字数
+--max_process_num : 进程个数 
+
+--chapter_regex: 指定分割章节的正则表达式(例如："第[ \\t\\d]+章")
+--content_path    : xpath to extract content, 提取content的路径
+--writer_path     : xpath to extract writer, 提取writer的路径
+--book_path       : xpath to extract book, 提取book的路径
+--item_list_path : xpath to extract item_list, 提取item_list的路径
+--content_regex   : regex to extract content, 提取content的正则
+--writer_regex    : regex to extract writer, 提取writer的正则
+--book_regex      : regex to extract book, 提取book的正则
+
+-q : query type, 查询类型
+-k : query keyword, 查询关键字
+-B : board_url / board_id  版块url，或版块编号
+
+-m, --mail_msg : 消息
+-M, --mail_server : 邮件SMTP服务器
+-p, --mail_port : 邮件SMTP服务器端口
+-U, --mail_usr  : 发件人账号
+-P, --mail_pwd  : 发件人密码
+-F, --mail_from : 发件人邮箱
+-T, --mail_to   : 收件人邮箱

@@ -33,6 +33,7 @@ lib/Map/Tube/Exception/MalformedMapData.pm
 lib/Map/Tube/Exception/MissingLineId.pm
 lib/Map/Tube/Exception/MissingLineName.pm
 lib/Map/Tube/Exception/MissingMapData.pm
+lib/Map/Tube/Exception/MissingMapName.pm
 lib/Map/Tube/Exception/MissingNodeObject.pm
 lib/Map/Tube/Exception/MissingPluginFormatter.pm
 lib/Map/Tube/Exception/MissingPluginFuzzyFind.pm

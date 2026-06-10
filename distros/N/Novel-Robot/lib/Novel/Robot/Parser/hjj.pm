@@ -14,7 +14,7 @@ sub base_url { 'http://bbs.jjwxc.net' }
 
 sub charset { 'cp936' }
 
-sub site_type { 'tiezi' }
+sub class { 'tiezi' }
 
 sub parse_novel {
   my ( $self, $h, $r) = @_;

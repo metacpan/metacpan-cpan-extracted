@@ -2,7 +2,7 @@ package Zuzu::Util::NativeHelpers;
 
 use utf8;
 
-our $VERSION = '0.002000';
+our $VERSION = '0.003000';
 
 use Exporter qw( import );
 use Scalar::Util qw( blessed );

@@ -5,7 +5,7 @@ use warnings;
 use IPC::Cmd qw/can_run/;
 use Scalar::Util qw/reftype/;
 
-our $VERSION = '0.000048';
+our $VERSION = '0.000049';
 
 use parent 'DBIx::QuickDB::Driver';
 

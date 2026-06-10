@@ -19,7 +19,7 @@ our @ISA = qw{ Astro::SpaceTrack };
 use Mock::LWP::UserAgent;
 use My::Module::Test;
 
-our $VERSION = '0.181';
+our $VERSION = '0.182';
 
 sub new {
     my ( $class, %arg ) = @_;
@@ -277,13 +277,12 @@ L<Astro::SpaceTrack|Astro::SpaceTrack>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Astro-SpaceTrack>,
-L<https://github.com/trwyant/perl-Astro-SpaceTrack/issues/>, or in
+L<https://github.com/trwyant/perl-Astro-SpaceTrack/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III F<wyant at cpan dot org>
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT AND LICENSE
 

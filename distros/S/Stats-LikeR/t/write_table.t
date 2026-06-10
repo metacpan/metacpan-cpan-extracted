@@ -18,7 +18,7 @@ my %data = (
 	'Row_B' => { 'Col1' => 30, 'Col3' => 40 },
 );
 my $tmp_file = '/tmp/test.tsv';
-write_table(\%data, $tmp_file, sep => "\t", 'row.names' => 1);
+write_table(\%data, $tmp_file, sep => "\t", 'row.names' => 1, 'undef.val' => 'NA');
 my $str = file2string($tmp_file);
 if (sha512_base64($str) eq 'FInYAXZcS7lK1n7osAhVkp5SiQNpt3h4kql9yZ2YCoPQslHKjwfGAXgdiphDSc6wMhlpU5toNmSifEUz1OgHNQ') {
 	pass('write_table successfully wrote a tab-delimited file');
@@ -43,7 +43,7 @@ my %data_hoh = (
 	'r3' => { 'c2' => "tab\tin", 'c4' => undef },
 );
 
-write_table(\%data_hoh, $tmp_file, sep => "\t", 'row.names' => 1);
+write_table(\%data_hoh, $tmp_file, sep => "\t", 'row.names' => 1, 'undef.val' => 'NA');
 $str = file2string($tmp_file);
 if (sha512_base64($str) eq 'ZYK6zmrT47CLrEc4PSFtCtvdkLtv47MCIMHIg70bARlWO5J9MuzybnV5h7dBSyQn8dOKojaX6pinxOvbTVaI+g') {
 	pass('write_table successfully wrote a tab-delimited file (Hash of Hashes)');
@@ -53,7 +53,7 @@ if (sha512_base64($str) eq 'ZYK6zmrT47CLrEc4PSFtCtvdkLtv47MCIMHIg70bARlWO5J9Muzy
 }
 no_leaks_ok {
 	eval {
-		write_table(\%data_hoh, $tmp_file, sep => "\t", 'row.names' => 1);
+		write_table(\%data_hoh, $tmp_file, sep => "\t", 'row.names' => 1, 'undef.val' => 'NA');
 	};
 } 'write_table: no memory leaks with hash-of-hash input' unless $INC{'Devel/Cover.pm'};
 # === TEST 2: HASH OF ARRAYS (positional) ===
@@ -66,7 +66,7 @@ my %data_hoa = (
 	'r3' => [undef, "tab\tin", undef, undef],
 );
 
-write_table(\%data_hoa, $tmp_file, sep => "\t", 'row.names' => 1);
+write_table(\%data_hoa, $tmp_file, sep => "\t", 'row.names' => 1, 'undef.val' => 'NA');
 $str = file2string($tmp_file);
 if (sha512_base64($str) eq '1wv8uFDVQkQ9UZ+50n+r/Z8oj4VFP4eusApZDAY1DB3dXhT+gFFyCR2Z1ZVQDTOJrUaMRpfWt6vLSlaSsNps7g') {
     pass('write_table successfully wrote a tab-delimited file (Hash of Arrays)');
@@ -118,7 +118,7 @@ close $fh;
 write_table(
 	\%hoa, $fh->filename,
 	'col.names' => [qw(a b)],
-	'row.names' => 0
+	'row.names' => 0, 'undef.val' => 'NA'
 );
 $str = file2string($fh->filename);
 say $str;
@@ -188,30 +188,30 @@ my %hoh  = ( 'r1' => { 'a' => 1, 'b' => 2 }, 'r2' => { 'a' => 3, 'b' => 4 } );
 my @aoh  = ( { 'x' => 1, 'y' => 2 }, { 'x' => 3, 'y' => 4 } );
 my %flat = ( 'a' => 1, 'b' => 2, 'c' => 3 );
 # 1. Hash of arrays: columns sorted, numeric row names by default.
-wrote_ok( ",age,name\n1,30,Alice\n2,25,Bob\n", 'HoA: sorted cols + numeric row names', \%hoa );
+wrote_ok( ",age,name\n1,30,Alice\n2,25,Bob\n", 'HoA: sorted cols + numeric row names', \%hoa, 'undef.val' => 'NA' );
 # 2. Hash of hashes: rows sorted, columns sorted, outer key as the row label.
-wrote_ok( ",a,b\nr1,1,2\nr2,3,4\n", 'HoH: sorted rows and columns', \%hoh );
+wrote_ok( ",a,b\nr1,1,2\nr2,3,4\n", 'HoH: sorted rows and columns', \%hoh, 'undef.val' => 'NA' );
 # 3. Array of hashes: union of keys sorted, numeric row names.
-wrote_ok( ",x,y\n1,1,2\n2,3,4\n", 'AoH: union of keys, numeric row names', \@aoh );
+wrote_ok( ",x,y\n1,1,2\n2,3,4\n", 'AoH: union of keys, numeric row names', \@aoh, 'undef.val' => 'NA' );
 # 4. Flat hash: one row, columns sorted.
 wrote_ok( ",a,b,c\n1,1,2,3\n", 'flat hash: single row', \%flat );
 # 5. col.names selects/orders columns.
-wrote_ok( ",name\n1,Alice\n2,Bob\n", 'col.names selects a subset in order', \%hoa, 'col.names' => [ 'name' ] );
+wrote_ok( ",name\n1,Alice\n2,Bob\n", 'col.names selects a subset in order', \%hoa, 'col.names' => [ 'name' ], 'undef.val' => 'NA' );
 # 6. row.names => 0 turns off the row-name column.
-wrote_ok( "age,name\n30,Alice\n25,Bob\n", 'row.names => 0 omits the label column', \%hoa, 'row.names' => 0 );
+wrote_ok( "age,name\n30,Alice\n25,Bob\n", 'row.names => 0 omits the label column', \%hoa, 'row.names' => 0, 'undef.val' => 'NA' );
 # 7. row.names => 'col' uses that column as the labels and drops it from headers.
-wrote_ok( ",age\nAlice,30\nBob,25\n", "row.names => 'name' uses that column as labels", \%hoa, 'row.names' => 'name' );
+wrote_ok( ",age\nAlice,30\nBob,25\n", "row.names => 'name' uses that column as labels", \%hoa, 'row.names' => 'name', 'undef.val' => 'NA' );
 # 8. Explicit separator.
-wrote_ok( ";a;b;c\n1;1;2;3\n", 'sep => ";" is honored', \%flat, 'sep' => ';' );
+wrote_ok( ";a;b;c\n1;1;2;3\n", 'sep => ";" is honored', \%flat, 'sep' => ';', 'undef.val' => 'NA' );
 # 9. delim is an alias for sep.
-wrote_ok( "|a|b|c\n1|1|2|3\n", 'delim => "|" is honored', \%flat, 'delim' => '|' );
+wrote_ok( "|a|b|c\n1|1|2|3\n", 'delim => "|" is honored', \%flat, 'delim' => '|', 'undef.val' => 'NA' );
 # 10. undef.val fills missing cells (jagged hash of arrays).
 my %jag = ( 'a' => [ 1, 2 ], 'b' => [ 10 ] );
-wrote_ok( ",a,b\n1,1,10\n2,2,NA\n", 'missing cells default to NA', \%jag );
+wrote_ok( ",a,b\n1,1,10\n2,2,NA\n", 'missing cells default to NA', \%jag, 'undef.val' => 'NA' );
 wrote_ok( ",a,b\n1,1,10\n2,2,NULL\n", 'undef.val overrides the fill', \%jag, 'undef.val' => 'NULL' );
 # 11. CSV quoting: separators, quotes and newlines are quoted; quotes are doubled.
-my %quote = ( 'a' => [ 'x,y' ], 'b' => [ 'p"q' ], 'c' => [ "line1\nline2" ] );
-wrote_ok( qq{,a,b,c\n1,"x,y","p""q","line1\nline2"\n}, 'quoting: comma, quote, newline', \%quote );
+my %quote = ( 'a' => [ 'x,y' ], 'b' => [ 'p"q' ], 'c' => [ "line1\nline2" ]);
+wrote_ok( qq{,a,b,c\n1,"x,y","p""q","line1\nline2"\n}, 'quoting: comma, quote, newline', \%quote, 'undef.val' => 'NA' );
 # 12. Auto-detect tab separator from a .tsv extension.
 {
 	my $f = "$dir/auto.tsv";

@@ -37,7 +37,7 @@ resources:
   homepage: https://github.com/jhthorsen/json-validator
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/jhthorsen/json-validator.git
-version: '5.18'
+version: '5.19'
 x_contributors:
   - 'Aleksandr Orlenko <zxteam@gmail.com>'
   - 'Alexander Hartmaier <alexander.hartmaier@t-systems.at>'

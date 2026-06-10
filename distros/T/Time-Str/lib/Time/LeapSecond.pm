@@ -12,7 +12,7 @@ use Time::Str::Util     qw[upper_bound
                            find_tzdb_directory];
 
 BEGIN {
-  our $VERSION     = '0.90';
+  our $VERSION     = '0.91';
   our @EXPORT_OK   = qw[ posix_tai_offset
                          posix_to_tai
                          tai_to_posix
@@ -61,7 +61,7 @@ use constant NTP_UNIX_DELTA => 2208988800;  # 1900-01-01T00:00:00Z
 #
 
 our (
-  @TIMES, @OFFSETS, @CORRECTIONS, # Part of the public API
+  @TIMES, @OFFSETS, @CORRECTIONS, $EXPIRES, # Part of the public API
   @TAI_TIMES, @DAYS
 );
 
@@ -75,7 +75,7 @@ our (
 # preceding 23:59:59 as tz/TZif does), and installs all five tables. Returns
 # the number of leap seconds installed.
 sub _load_tables {
-  my ($days, $corrections) = @_;
+  my ($days, $corrections, $expires) = @_;
   my (@times, @offsets, @tai_times);
   my $offset = TAI_UTC_BASE;
   push @offsets, $offset;
@@ -92,6 +92,7 @@ sub _load_tables {
   @OFFSETS     = @offsets;
   @TAI_TIMES   = @tai_times;
   @CORRECTIONS = (0, @$corrections);
+  $EXPIRES     = $expires;
   return scalar @TIMES;
 }
 
@@ -149,7 +150,12 @@ sub rdn_leap_correction {
       or croak qq/Unable to parse leap seconds: could not open '$path': '$!'/;
 
     my (@days, @corrections);
+    my $expires;
     while (my $line = <$fh>) {
+      if ($line =~ /\A \s* [#] \s* expires \s+ ([0-9]{10,}) \b/ix) {
+        $expires = 0 + $1;
+        next;
+      }
       next if $line !~ /\A Leap \b/x; # ignore other directives
 
       ($line =~ $LeapLine_Rx)
@@ -172,7 +178,10 @@ sub rdn_leap_correction {
     }
     close($fh);
 
-    return (\@days, \@corrections);
+    (defined $expires)
+      or croak q/Unable to parse leap seconds: no expiration found/;
+
+    return (\@days, \@corrections, $expires);
   }
 }
 
@@ -207,8 +216,13 @@ sub rdn_leap_correction {
     my $prev     = $base;
     my $prev_ntp;
     my $anchored = 0;
+    my $expires;
     while (my $line = <$fh>) {
       chomp $line;
+      if ($line =~ /\A \s* [#][@] \s+ ([0-9]+)/x) {
+        $expires = $1 - NTP_UNIX_DELTA;
+        next;
+      }
       next if $line =~ /\A \s* (?: [#] | \z )/x;
 
       ($line =~ $IersLine_Rx)
@@ -242,7 +256,10 @@ sub rdn_leap_correction {
     }
     close($fh);
 
-    return (\@days, \@corrections);
+    (defined $expires)
+      or croak q/Unable to parse leap seconds: no expiration found/;
+
+    return (\@days, \@corrections, $expires);
   }
 }
 
@@ -269,11 +286,11 @@ sub load_leapseconds_tzdb {
     return undef unless defined $path && -f $path;
   }
 
-  my ($days, $corrections) = parse_leapseconds_tzdb($path);
+  my ($days, $corrections, $expires) = parse_leapseconds_tzdb($path);
   @$days
     or croak qq/Unable to parse leap seconds: no entries found in '$path'/;
 
-  return _load_tables($days, $corrections);
+  return _load_tables($days, $corrections, $expires);
 }
 
 sub load_leapseconds_iers {
@@ -286,11 +303,11 @@ sub load_leapseconds_iers {
     return undef unless defined $path && -f $path;
   }
 
-  my ($days, $corrections) = parse_leapseconds_iers($path);
+  my ($days, $corrections, $expires) = parse_leapseconds_iers($path);
   @$days
     or croak qq/Unable to parse leap seconds: no entries found in '$path'/;
 
-  return _load_tables($days, $corrections);
+  return _load_tables($days, $corrections, $expires);
 }
 
 # Populate the tables at load time. Try the system TZDB leap seconds file
@@ -331,7 +348,7 @@ sub load_leapseconds_iers {
   );
   local $@;
   unless (eval { load_leapseconds_tzdb() }) {
-    _load_tables(\@fallback, [ (1) x @fallback ]);
+    _load_tables(\@fallback, [ (1) x @fallback ], 1798416000);
   }
 }
 
