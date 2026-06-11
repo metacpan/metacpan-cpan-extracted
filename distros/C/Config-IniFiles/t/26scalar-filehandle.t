@@ -13,7 +13,7 @@ use Test::More;
 use strict;
 use warnings;
 
-use Carp qw(cluck);
+use Carp    qw(cluck);
 use English qw(-no_match_vars);
 
 use Config::IniFiles;

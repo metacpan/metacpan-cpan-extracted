@@ -1,6 +1,6 @@
 package Sys::Export;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 # ABSTRACT: Export a subset of an OS file tree, for chroot/initrd
 
 use v5.26;
@@ -10,19 +10,31 @@ use Carp;
 use Scalar::Util qw( blessed looks_like_number );
 use Sys::Export::LogAny '$log';
 use Exporter ();
+use Fcntl ':mode';
 BEGIN {
    # Fcntl happily exports macros that don't exist, then fails at runtime.
    # Replace non-existent test macros with 'false', and nonexistent modes with 0.
-   require Fcntl;
-   eval { Fcntl->can($_)->($_ =~ /_IS/? (0) : ()); 1 }? Fcntl->import($_) : eval "sub $_ { 0 }"
-      for qw( S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK S_ISWHT
-              S_IFREG S_IFDIR S_IFLNK S_IFBLK S_IFCHR S_IFIFO  S_IFSOCK S_IFWHT S_IFMT );
+   # But, on MSWin32, the constant for S_IFLNK is 0x4000 and just isn't defined in Fcntl
+   # because the headers don't define it.
+   for (qw( S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK S_ISWHT
+            S_IFREG S_IFDIR S_IFLNK S_IFBLK S_IFCHR S_IFIFO  S_IFSOCK S_IFWHT S_IFMT )
+   ) {
+      next if eval { __PACKAGE__->can($_)->($_ =~ /_IS/? (0) : ()); 1 };
+      delete ${Sys::Export::}{$_};
+      if ($^O eq 'MSWin32' && $_ eq 'S_IFLNK') {
+         eval 'sub Sys::Export::S_IFLNK { 0x6000 } 1' or die "S_IFLNK $@";
+      } elsif ($^O eq 'MSWin32' && $_ eq 'S_ISLNK') {
+         eval 'sub Sys::Export::S_ISLNK { S_IFMT($_[0]) == 0x6000 } 1' or die "S_ISLNK $@";
+      } else {
+         eval "sub Sys::Export::$_ { 0 } 1" or die "$@";
+      }
+   }
 }
 our @EXPORT_OK= qw(
    isa_exporter isa_export_dst isa_userdb isa_user isa_group exporter isa_hash isa_array isa_int
    isa_handle isa_pow2 isa_data_ref round_up_to_pow2 round_up_to_multiple map_or_load_file filedata
    add skip find which finish rewrite_path rewrite_user rewrite_group expand_stat_shorthand
-   write_file_extent
+   write_file_extent _pack _unpack
    S_ISREG S_ISDIR S_ISLNK S_ISBLK S_ISCHR S_ISFIFO S_ISSOCK S_ISWHT
    S_IFREG S_IFDIR S_IFLNK S_IFBLK S_IFCHR S_IFIFO  S_IFSOCK S_IFWHT S_IFMT
 );
@@ -252,6 +264,67 @@ sub write_file_extent($fh, $addr, $size, $data_ref, $ofs=0, $descrip=undef) {
    return 1;
 }
 
+if (eval { pack('Q<', 1) }) {
+   *_pack= \*CORE::pack;
+   *_unpack= \*CORE::unpack;
+} else {
+   eval <<'END';
+   # On perl without 64-bit support, replace all 'Q' with 32-bit operations
+   # This does not handle full pack syntax, just what is used in this module collection.
+   sub _pack {
+      my $fmt= shift;
+      my $new_fmt= '';
+      my @new_args;
+      require Math::BigInt;
+      my $mask32= Math::BigInt->new('4294967295');
+      for (split / +/, $fmt) {
+         if ($_ eq 'Q>') {
+            # Convert a 64-bit integer into two 32-bit big-endian arguments
+            $new_fmt .= 'NN';
+            my $qw= Math::BigInt->new(shift);
+            push @new_args, ($qw >> 32)->numify(), ($qw & $mask32)->numify();
+         } elsif ($_ eq 'Q<') {
+            # Convert 64-bit integer into two 32-bit little-endian arguments
+            $new_fmt .= 'VV';
+            my $qw= Math::BigInt->new(shift);
+            push @new_args, ($qw & $mask32)->numify(), ($qw >> 32)->numify();
+         } else {
+            $new_fmt .= $_;
+            push @new_args, shift;
+         }
+      }
+      return pack $new_fmt, @new_args;
+   }
+   # This does not handle full unpack syntax, just what is used in this module collection.
+   sub _unpack {
+      my $fmt= shift;
+      my $new_fmt= '';
+      my @replacements;
+      require Math::BigInt;
+      my @fields= split / +/, $fmt;
+      for (reverse 0 .. $#fields) {
+         if ($fields[$_] eq 'Q>') {
+            $new_fmt .= 'a8';
+            push @replacements, [ $_, sub {
+               my ($h,$l)= unpack('NN', $_[0]);
+               (Math::BigInt->new($h) << 32) | $l
+            }];
+         } elsif ($fields[$_] eq 'Q<') {
+            $new_fmt .= 'a8';
+            push @replacements, [ $_, sub {
+               my ($l, $h)= unpack('VV', $_[0]);
+               (Math::BigInt->new($h) << 32) | $l
+            }];
+         }
+      }
+      my @vals= unpack $new_fmt;
+      for (@replacements) {
+         $vals[$_->[0]]= $_->[1]->($vals[$_->[0]]);
+      }
+      return @vals;
+   }
+END
+}
 
 1;
 
@@ -573,7 +646,7 @@ If any syscall fails, or can't write the full size, this croaks.
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

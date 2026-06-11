@@ -24,7 +24,7 @@ SYNOPSIS
 DESCRIPTION
 
     This is an XS-based module, and requires wiringPi <http://wiringpi.com>
-    version 2.36+ to be installed. The wiringPiDev shared library is also
+    version 3.18+ to be installed. The wiringPiDev shared library is also
     required (for the LCD functionality), but it's installed by default
     with wiringPi.
 
@@ -42,8 +42,8 @@ EXPORT_OK
     direct wrappers; several have additional/modified functionality than
     the wrapped versions, but are still 100% compatible.
 
-        setup           setup_sys       setup_phys          setup_gpio 
-        pull_up_down    read_pin        write_pin           pwm_write
+        setup           setup_gpio      pull_up_down        read_pin
+        write_pin       pwm_write
         get_alt         gpio_layout     wpi_to_gpio         phys_to_gpio
         pwm_set_range   lcd_init        lcd_home            lcd_clear
         lcd_display     lcd_cursor      lcd_cursor_blink    lcd_send_cmd
@@ -133,26 +133,6 @@ CORE FUNCTIONS
 
     Personally, this is the setup routine that I always use, due to the
     GPIO numbers physically printed right on the Pi board.
-
- setup_phys()
-
-    Maps to int wiringPiSetupPhys()
-
-    Sets the pin mapping to use the physical pin position number on the
-    board.
-
- setup_sys()
-
-    Maps to int wiringPiSetupSys()
-
-    DEPRECATED.
-
-    This function is here for legacy purposes only, to provide non-root
-    user access to the GPIO. It required exporting the pins manually before
-    use. wiringPi now uses /dev/gpiomem by default, which does not require
-    root level access.
-
-    Sets the pin numbering scheme to GPIO.
 
  pin_mode($pin, $mode)
 
@@ -1154,7 +1134,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    Copyright (C) 2017 by Steve Bertrand
+    Copyright (C) 2017-2026 by Steve Bertrand
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself, either Perl version 5.18.2 or, at

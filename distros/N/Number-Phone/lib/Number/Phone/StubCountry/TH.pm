@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20260306161714;
+our $VERSION = 1.20260610205505;
 
 my $formatters = [
                 {
@@ -66,15 +66,20 @@ my $validators = {
           )\\d{6}
         ',
                 'mobile' => '
-          67(?:
-            1[0-8]|
-            2[4-7]
-          )\\d{5}|
           (?:
-            14|
-            6[1-6]|
-            [89]\\d
-          )\\d{7}
+            (?:
+              14|
+              [89]\\d
+            )\\d\\d|
+            6(?:
+              [1-6]\\d\\d|
+              7(?:
+                1[0-8]|
+                2[4-7]|
+                3[1-6]
+              )
+            )
+          )\\d{5}
         ',
                 'pager' => '',
                 'personal_number' => '',
@@ -88,60 +93,60 @@ my $validators = {
                 'voip' => '6[08]\\d{7}'
               };
 my %areanames = ();
-$areanames{th} = {"6653", "เชียงใหม่\/เชียงราย\/ลำพูน\/แม่ฮ่องสอน",
-"6618", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
-"6654", "ลำปาง\/น่าน\/พะเยา\/แพร่",
-"6645", "อำนาจเจริญ\/ศรีสะเกษ\/อุบลราชธานี\/ยโสธร",
-"6616", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
-"6656", "ชัยนาท\/นครสวรรค์\/เพชรบูรณ์\/พิจิตร\/อุทัยธานี",
-"6635", "อ่างทอง\/พระนครศรีอยุธยา\/สุพรรณบุรี",
-"6677", "ชุมพร\/ระนอง\/สุราษฎร์ธานี",
-"662", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
-"6642", "เลย\/มุกดาหาร\/นครพนม\/หนองคาย\/สกลนคร\/อุดรธานี",
-"6639", "จันทบุรี\/ตราด",
-"6632", "เพชรบุรี\/ประจวบคีรีขันธ์\/ราชบุรี",
-"6637", "นครนายก\/ปราจีนบุรี\/สระแก้ว",
-"6675", "กระบี่\/นครศรีธรรมราช\/ตรัง",
-"6673", "นราธิวาส\/ปัตตานี\/ยะลา",
-"6652", "เชียงใหม่\/เชียงราย\/ลำพูน\/แม่ฮ่องสอน",
-"6619", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
-"6674", "พัทลุง\/สตูล\/สงขลา",
-"6610", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
-"6676", "พังงา\/ภูเก็ต",
-"6633", "ฉะเชิงเทรา\/ชลบุรี\/ระยอง",
-"6638", "ฉะเชิงเทรา\/ชลบุรี\/ระยอง",
-"6643", "กาฬสินธุ์\/ขอนแก่น\/มหาสารคาม\/ร้อยเอ็ด",
-"6634", "กาญจนบุรี\/นครปฐม\/สมุทรสาคร\/สมุทรสงคราม",
-"6636", "ลพบุรี\/สระบุรี\/สิงห์บุรี",
-"6655", "กำแพงเพชร\/พิษณุโลก\/สุโขทัย\/ตาก\/อุตรดิตถ์",
-"6644", "บุรีรัมย์\/ชัยภูมิ\/นครราชสีมา\/สุรินทร์",};
-$areanames{en} = {"6636", "Lop\ Buri\/Saraburi\/Sing\ Buri",
-"6655", "Kamphaeng\ Phet\/Phitsanulok\/Sukhothai\/Tak\/Uttaradit",
+$areanames{en} = {"6635", "Ang\ Thong\/Phra\ Nakhon\ Si\ Ayutthaya\/Suphan\ Buri",
+"6632", "Phetchaburi\/Prachuap\ Khiri\ Khan\/Ratchaburi",
+"6618", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
+"6653", "Chiang\ Mai\/Chiang\ Rai\/Lamphun\/Mae\ Hong\ Son",
+"6639", "Chanthaburi\/Trat",
+"6677", "Chumphon\/Ranong\/Surat\ Thani",
+"6610", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
 "6644", "Buri\ Ram\/Chaiyaphum\/Nakhon\ Ratchasima\/Surin",
+"6633", "Chachoengsao\/Chon\ Buri\/Rayong",
+"6676", "Phang\ Nga\/Phuket",
+"6655", "Kamphaeng\ Phet\/Phitsanulok\/Sukhothai\/Tak\/Uttaradit",
+"6652", "Chiang\ Mai\/Chiang\ Rai\/Lamphun\/Mae\ Hong\ Son",
+"6616", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
+"6674", "Phatthalung\/Satun\/Songkhla",
+"6673", "Narathiwat\/Pattani\/Yala",
+"6636", "Lop\ Buri\/Saraburi\/Sing\ Buri",
+"662", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
 "6634", "Kanchanaburi\/Nakhon\ Pathom\/Samut\ Sakhon\/Samut\ Songkhram",
 "6643", "Kalasin\/Khon\ Kaen\/Maha\ Sarakham\/Roi\ Et",
-"6633", "Chachoengsao\/Chon\ Buri\/Rayong",
-"6638", "Chachoengsao\/Chon\ Buri\/Rayong",
-"6610", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
-"6676", "Phang\ Nga\/Phuket",
-"6674", "Phatthalung\/Satun\/Songkhla",
-"6652", "Chiang\ Mai\/Chiang\ Rai\/Lamphun\/Mae\ Hong\ Son",
-"6619", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
-"6673", "Narathiwat\/Pattani\/Yala",
-"6637", "Nakhon\ Nayok\/Prachin\ Buri\/Sa\ Kaeo",
 "6675", "Krabi\/Nakhon\ Si\ Thammarat\/Trang",
-"6632", "Phetchaburi\/Prachuap\ Khiri\ Khan\/Ratchaburi",
-"6642", "Loei\/Mukdahan\/Nakhon\ Phanom\/Nong\ Khai\/Sakon\ Nakhon\/Udon\ Thani",
-"6639", "Chanthaburi\/Trat",
 "6656", "Chai\ Nat\/Nakhon\ Sawan\/Phetchabun\/Phichit\/Uthai\ Thani",
-"6635", "Ang\ Thong\/Phra\ Nakhon\ Si\ Ayutthaya\/Suphan\ Buri",
-"662", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
-"6677", "Chumphon\/Ranong\/Surat\ Thani",
+"6619", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
+"6638", "Chachoengsao\/Chon\ Buri\/Rayong",
 "6654", "Lampang\/Nan\/Phayao\/Phrae",
 "6645", "Amnat\ Charoen\/Si\ Sa\ Ket\/Ubon\ Ratchathani\/Yasothon",
-"6616", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
-"6618", "Bangkok\/Nonthaburi\/Pathum\ Thani\/Samut\ Prakan",
-"6653", "Chiang\ Mai\/Chiang\ Rai\/Lamphun\/Mae\ Hong\ Son",};
+"6642", "Loei\/Mukdahan\/Nakhon\ Phanom\/Nong\ Khai\/Sakon\ Nakhon\/Udon\ Thani",
+"6637", "Nakhon\ Nayok\/Prachin\ Buri\/Sa\ Kaeo",};
+$areanames{th} = {"6677", "ชุมพร\/ระนอง\/สุราษฎร์ธานี",
+"6639", "จันทบุรี\/ตราด",
+"6653", "เชียงใหม่\/เชียงราย\/ลำพูน\/แม่ฮ่องสอน",
+"6618", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
+"6632", "เพชรบุรี\/ประจวบคีรีขันธ์\/ราชบุรี",
+"6635", "อ่างทอง\/พระนครศรีอยุธยา\/สุพรรณบุรี",
+"6674", "พัทลุง\/สตูล\/สงขลา",
+"6616", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
+"6652", "เชียงใหม่\/เชียงราย\/ลำพูน\/แม่ฮ่องสอน",
+"6676", "พังงา\/ภูเก็ต",
+"6655", "กำแพงเพชร\/พิษณุโลก\/สุโขทัย\/ตาก\/อุตรดิตถ์",
+"6644", "บุรีรัมย์\/ชัยภูมิ\/นครราชสีมา\/สุรินทร์",
+"6633", "ฉะเชิงเทรา\/ชลบุรี\/ระยอง",
+"6610", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
+"6643", "กาฬสินธุ์\/ขอนแก่น\/มหาสารคาม\/ร้อยเอ็ด",
+"6634", "กาญจนบุรี\/นครปฐม\/สมุทรสาคร\/สมุทรสงคราม",
+"662", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
+"6636", "ลพบุรี\/สระบุรี\/สิงห์บุรี",
+"6673", "นราธิวาส\/ปัตตานี\/ยะลา",
+"6642", "เลย\/มุกดาหาร\/นครพนม\/หนองคาย\/สกลนคร\/อุดรธานี",
+"6645", "อำนาจเจริญ\/ศรีสะเกษ\/อุบลราชธานี\/ยโสธร",
+"6654", "ลำปาง\/น่าน\/พะเยา\/แพร่",
+"6637", "นครนายก\/ปราจีนบุรี\/สระแก้ว",
+"6638", "ฉะเชิงเทรา\/ชลบุรี\/ระยอง",
+"6619", "กรุงเทพ\/นนทบุรี\/ปทุมธานี\/สมุทรปราการ",
+"6656", "ชัยนาท\/นครสวรรค์\/เพชรบูรณ์\/พิจิตร\/อุทัยธานี",
+"6675", "กระบี่\/นครศรีธรรมราช\/ตรัง",};
 my $timezones = {
                '' => [
                        'Asia/Bangkok'

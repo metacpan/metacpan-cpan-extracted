@@ -2,7 +2,7 @@ package Dancer2::Plugin::Auth::OAuth;
 
 use strict;
 use 5.008_005;
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 
 use Dancer2::Plugin;
 use Module::Load;
@@ -280,7 +280,7 @@ An example of a Facebook response:
 
 =over
 
-=item Full site needs a user authentication for a specific IdP.
+=item Full site needs a user authentication from a specific IdP.
 
 An example of a simple single system authentication.
 
@@ -311,8 +311,8 @@ If you want to be sure they have a valid "id_token" at all times:
     };
 
 in the case where you're using the refresh functionality, a failure of the
-refresh will send the user back to the "error_url". If you want to them
-to instead be directed back to the main authentication (log in page) then
+refresh will send the user back to the "error_url". If, instead, you want them
+to be directed back to the main authentication (log in page) then
 please set the configuration option C<reauth_on_refresh_fail>.
 
 If the provider(s) you are using don't have the "id_token"
@@ -367,7 +367,8 @@ a link to "/auth/<lc-name-of-the-provider>"
 
 You can mix this plugin with C<Dancer2::Plugin::Auth::Tiny> and
 on '/login/ok' you just define the 'user' session. Afterwards
-all validation can be against 'user' and not 'oauth'.
+you can just add C<needs login> to all your routes and don't use
+any route preamble to validate 'oauth'.
 
 =back
 
@@ -377,7 +378,9 @@ Menno Blom E<lt>blom@cpan.orgE<gt>
 
 =head1 COPYRIGHT
 
-Copyright 2014- Menno Blom
+Copyright 2014-2020 - Menno Blom
+
+2020- Maintained by Biafra E<lt>biafra@cpan.orgE<gt>
 
 =head1 LICENSE
 

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20260306161714;
+our $VERSION = 1.20260610205505;
 
 my $formatters = [
                 {
@@ -43,12 +43,7 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2 $3 $4',
-                  'leading_digits' => '
-            5(?:
-              [0-579]|
-              61[06]1
-            )
-          ',
+                  'leading_digits' => '5[0-79]',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{3})(\\d{3})(\\d{2})(\\d{2})'
                 },
@@ -73,9 +68,9 @@ my $validators = {
                 'fixed_line' => '
           (?:
             2(?:
-              [13][26]|
+              1[26]|
               [28][2468]|
-              [45][268]|
+              [3-5][268]|
               [67][246]
             )|
             3(?:
@@ -94,9 +89,9 @@ my $validators = {
                 'geographic' => '
           (?:
             2(?:
-              [13][26]|
+              1[26]|
               [28][2468]|
-              [45][268]|
+              [3-5][268]|
               [67][246]
             )|
             3(?:
@@ -118,11 +113,11 @@ my $validators = {
             61\\d
           )\\d{4}|
           5(?:
-            0[15-7]|
+            [03-5]\\d|
             1[06]|
-            [27]4|
-            [34]\\d|
-            5[1-59]|
+            24|
+            6[24]|
+            7[245]|
             9[46]
           )\\d{7}
         ',
@@ -150,127 +145,127 @@ my $validators = {
                 'voip' => '850\\d{7}'
               };
 my %areanames = ();
-$areanames{en} = {"90412", "Diyarbakir",
-"90368", "Sinop",
-"90436", "Mus",
-"90472", "Agri",
-"90372", "Zongdulak",
-"90312", "Ankara",
-"90366", "Kastamonu",
-"90438", "Hakkari",
-"90252", "Mugla",
-"90264", "Sakarya",
-"90338", "Karaman",
-"90466", "Artvin",
-"90364", "Corum",
-"90452", "Ordu",
-"90266", "Balikesir",
-"90352", "Kayseri",
-"90464", "Rize",
-"90236", "Manisa",
-"90272", "Afyon",
-"90434", "Bitlis",
-"90212", "Istanbul\ \(Europe\)",
-"90342", "Gaziantep",
-"90326", "Hatay",
-"90426", "Bingol",
-"90442", "Erzurum",
-"90224", "Bursa",
-"90382", "Aksaray",
-"90328", "Osmaniye",
-"90428", "Tuniceli",
-"90482", "Mardin",
-"90282", "Tekirdag",
-"90228", "Bilecik",
-"90324", "Icel",
-"90242", "Antalya",
-"90424", "Elazig",
-"90226", "Yalova",
-"90284", "Edirne",
-"90380", "Duzce",
-"90486", "Sirnak",
-"90386", "Kirsehir",
-"90348", "Kilis",
-"90422", "Malatya",
-"90488", "Batman",
-"90446", "Erzincan",
-"90346", "Sivas",
-"90388", "Nigde",
-"90322", "Adana",
-"90246", "Isparta",
-"90288", "Kirklareli",
-"90222", "Esksehir",
-"90344", "K\.\ Maras",
-"90286", "Canakkale",
-"90248", "Burdur",
-"90484", "Stirt",
-"90384", "Nevsehir",
-"9039", "Northern\ Cyprus",
-"90378", "Bartin",
-"90462", "Trabzon",
-"90318", "Kirikkale",
-"90354", "Yozgat",
-"90454", "Giresun",
-"90362", "Samsun",
-"90478", "Ardahan",
-"90256", "Aydin",
-"90332", "Konya",
-"90376", "Cankiri",
-"90416", "Adiyaman",
-"90274", "Kutahya",
-"90370", "Karabuk",
-"90476", "Igdir",
-"90432", "Van",
-"90258", "Denizli",
-"90374", "Bolu",
-"90358", "Amasya",
-"90232", "Izmir",
-"90458", "Bayburt",
-"90276", "Usak",
-"90414", "Sanliurfa",
-"90474", "Kars",
-"90216", "Istanbul\ \(Anatolia\)",
-"90262", "Kocaeli",
-"90356", "Tokat",
-"90456", "Gumushane",};
-$areanames{tr} = {"90252", "Muğla",
+$areanames{tr} = {"9039", "Kuzey\ Kıbrıs",
+"90276", "Uşak",
+"90436", "Muş",
+"90416", "Adıyaman",
+"90386", "Kırşehir",
+"90324", "Mersin",
+"90252", "Muğla",
+"90222", "Eskisehir",
+"90370", "Karabük",
 "90264", "Sakarya\ \(Adapazarı\)",
 "90412", "Diyarbakır",
-"90436", "Muş",
-"90472", "Ağrı",
-"90372", "Zonguldak",
-"90212", "Istanbul\ \(Avrupa\)",
-"90364", "Çorum",
-"90266", "Balıkesir",
-"90428", "Tunceli",
-"90426", "Bingöl",
-"90324", "Mersin",
-"90424", "Elazığ",
-"90282", "Tekirdağ",
-"90388", "Niğde",
-"90380", "Düzce",
-"90486", "Şırnak",
-"90386", "Kırşehir",
-"90286", "Çanakkale",
-"90484", "Siirt",
-"90384", "Nevşehir",
-"9039", "Kuzey\ Kıbrıs",
-"90288", "Kırklareli",
-"90222", "Eskisehir",
-"90344", "Kahramanmaraş",
-"90376", "Çankırı",
-"90416", "Adıyaman",
-"90274", "Kütahya",
-"90370", "Karabük",
-"90476", "Iğdır",
 "90378", "Bartın",
-"90318", "Kırıkkale",
+"90486", "Şırnak",
+"90428", "Tunceli",
+"90424", "Elazığ",
 "90256", "Aydın",
-"90262", "Kocaeli\ \(İzmit\)",
-"90456", "Gümüşhane",
+"90288", "Kırklareli",
+"90286", "Çanakkale",
+"90318", "Kırıkkale",
+"90212", "Istanbul\ \(Avrupa\)",
+"90472", "Ağrı",
 "90232", "İzmir",
-"90276", "Uşak",
-"90414", "Şanlıurfa",};
+"90380", "Düzce",
+"90266", "Balıkesir",
+"90426", "Bingöl",
+"90456", "Gümüşhane",
+"90484", "Siirt",
+"90376", "Çankırı",
+"90388", "Niğde",
+"90476", "Iğdır",
+"90384", "Nevşehir",
+"90282", "Tekirdağ",
+"90364", "Çorum",
+"90372", "Zonguldak",
+"90414", "Şanlıurfa",
+"90274", "Kütahya",
+"90344", "Kahramanmaraş",
+"90262", "Kocaeli\ \(İzmit\)",};
+$areanames{en} = {"90386", "Kirsehir",
+"90474", "Kars",
+"90478", "Ardahan",
+"90324", "Icel",
+"90354", "Yozgat",
+"90462", "Trabzon",
+"90328", "Osmaniye",
+"90358", "Amasya",
+"90222", "Esksehir",
+"90252", "Mugla",
+"90370", "Karabuk",
+"90312", "Ankara",
+"90442", "Erzurum",
+"90332", "Konya",
+"90482", "Mardin",
+"9039", "Northern\ Cyprus",
+"90366", "Kastamonu",
+"90416", "Adiyaman",
+"90276", "Usak",
+"90436", "Mus",
+"90346", "Sivas",
+"90226", "Yalova",
+"90256", "Aydin",
+"90288", "Kirklareli",
+"90284", "Edirne",
+"90446", "Erzincan",
+"90382", "Aksaray",
+"90466", "Artvin",
+"90264", "Sakarya",
+"90412", "Diyarbakir",
+"90432", "Van",
+"90342", "Gaziantep",
+"90272", "Afyon",
+"90248", "Burdur",
+"90378", "Bartin",
+"90486", "Sirnak",
+"90374", "Bolu",
+"90362", "Samsun",
+"90428", "Tuniceli",
+"90458", "Bayburt",
+"90424", "Elazig",
+"90454", "Giresun",
+"90380", "Duzce",
+"90266", "Balikesir",
+"90456", "Gumushane",
+"90426", "Bingol",
+"90484", "Stirt",
+"90246", "Isparta",
+"90376", "Cankiri",
+"90488", "Batman",
+"90286", "Canakkale",
+"90338", "Karaman",
+"90318", "Kirikkale",
+"90224", "Bursa",
+"90258", "Denizli",
+"90228", "Bilecik",
+"90464", "Rize",
+"90352", "Kayseri",
+"90322", "Adana",
+"90472", "Agri",
+"90232", "Izmir",
+"90212", "Istanbul\ \(Europe\)",
+"90452", "Ordu",
+"90422", "Malatya",
+"90368", "Sinop",
+"90364", "Corum",
+"90242", "Antalya",
+"90372", "Zongdulak",
+"90348", "Kilis",
+"90438", "Hakkari",
+"90434", "Bitlis",
+"90344", "K\.\ Maras",
+"90274", "Kutahya",
+"90414", "Sanliurfa",
+"90262", "Kocaeli",
+"90356", "Tokat",
+"90326", "Hatay",
+"90388", "Nigde",
+"90476", "Igdir",
+"90236", "Manisa",
+"90384", "Nevsehir",
+"90216", "Istanbul\ \(Anatolia\)",
+"90282", "Tekirdag",};
 my $timezones = {
                '' => [
                        'Europe/Istanbul'

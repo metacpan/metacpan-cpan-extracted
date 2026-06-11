@@ -3,14 +3,14 @@ package Tvh::Htsp::Client;
 # https://docs.tvheadend.org/documentation/development/htsp
 use strict;
 use warnings;
-use v5.12;
+use v5.28;
 use feature 'say';
 use feature 'state';
 use namespace::autoclean;
 use IO::Socket qw(AF_INET SOCK_STREAM);
 use LooksLike;
 use List::Util qw(min max);
-our $VERSION     = '0.03';    # set the version for version checking
+our $VERSION     = '0.05';    # set the version for version checking
 sub new {
   my ($class, $args) = @_;
   my $self = {
@@ -73,7 +73,7 @@ sub getChanNamId {
     if ($reply->{'channelName'} and $reply->{'channelId'} eq "$channel") {
       $chan_name = $reply->{'channelName'};
     }
-    else {die "Error: channelId '$channel' not found -- ".join(', ', map {"'$_ => $reply->{$_}'"} (sort keys $reply->%*))}
+    else {die "Error ".__PACKAGE__.": channelId '$channel' not found -- ".join(', ', map {"'$_ => $reply->{$_}'"} (sort keys $reply->%*))}
   }
   else {
     # Enable async to find channel ID from channel name
@@ -99,7 +99,7 @@ sub getChanNamId {
     else {
       # channel name not found
       my $chan_nam_sorted = join(', ', map {"'$_'"} (sort keys $chan_nam_id->%*));
-      die ("Error: channel name '$channel' not found in $chan_nam_sorted");
+      die ("Error ".__PACKAGE__.": channel name '$channel' not found in $chan_nam_sorted");
     }
   }
   return ($chan_name, $chan_id);
@@ -129,46 +129,46 @@ sub htsp_recv {
   my ($buffer, $length) = ('', 0);
   state $rest = '';
   state $i = 0;
-  $buffer = $rest;    # den Rest vom vorigen Aufruf übernehmen
+  $buffer = $rest;    # take over the 'rest' = remaining buffer from the previous call
   $length = unpack("N",substr($buffer,0,4,'')) if ($buffer);    # Total length of message = 4 byte integer "network" big-endian byte-order
   while (not $buffer) {
     # Anfang der Nachricht sowie deren Länge ermitteln
-    $self->{client}->recv($buffer, 4096) // die "Error from socket: $IO::Socket::errstr";    # Bytes vom HTSP Server abrufen
-    die "Error: received '$buffer' of length ".length($buffer) unless $buffer;
+    $self->{client}->recv($buffer, 4096) // die "Error from socket: $IO::Socket::errstr";    # get bytes from HTSP server
+    die "Error ".__PACKAGE__.": received '$buffer' of length ".length($buffer) unless $buffer;
     say "Received data of length ".length($buffer) if $self->{debug_info};
     say STDERR $buffer if $self->{debug_info};
     while ($length == 0 and $buffer) {
-      # enableAsyncMetadata schickt zuerst ein Null-Byte, das müssen wir los werden
+      # enableAsyncMetadata first transmits a Null-Byte, we need to get rid of this
       $length = unpack("N",substr($buffer,0,4,''));    # Total length of message = 4 byte integer "network" big-endian byte-order
       say "$i length -- $length" if $self->{debug_info};
     }
     return({ response => 0 }) if ($length == 0 and not $buffer and $self->{msg}->{method} ne "enableAsyncMetadata");
   }
   if ($length > 10000000 and $self->{debug_info}) {
-    # eine vermutlich nicht korrekte Überlänge, weil die Bytes nicht korrekt interpretiert werden
+    # a likely incorrect excessive length, because the bytes are not being interpreted correctly
     say STDERR $buffer;
-    die ("Error: message length '$length' > 10000000, not realistic");
+    die ("Error ".__PACKAGE__.": message length '$length' > 10000000, not realistic");
   }
   while ($length > length($buffer)) {
-    # die Länge verlangt nach mehr Bytes
+    # the message length requires more bytes
     say '$length > length($buffer)' if $self->{debug_info};
-    $self->{client}->recv(my $buffer0, min($length-length($buffer),4096)) // die "Error from socket: $IO::Socket::errstr";    # Bytes vom HTPS Server abrufen
-    die "Error: received  '$buffer0' of length ".length($buffer0) unless $buffer0;
+    $self->{client}->recv(my $buffer0, min($length-length($buffer),4096)) // die "Error from socket: $IO::Socket::errstr";    # get bytes from HTSP server
+    die "Error ".__PACKAGE__.": received  '$buffer0' of length ".length($buffer0) unless $buffer0;
     say "Received data of length ".length($buffer0) if $self->{debug_info};
     say STDERR $buffer0 if $self->{debug_info};
-    $buffer .= $buffer0;    # erhaltene Bytes der Antwort anfügen
+    $buffer .= $buffer0;    # append the received bytes to the response '$buffer'
   }
   if ($length <= length($buffer)) {
-    # die Antwort enthält zusätzliche Bytes der nachfolgenden Nachricht
+    # the response contains additional bytes of the next following message
     say '$length <= length($buffer)' if $self->{debug_info};
-    $rest = $buffer;    # Antwort auf '$rest' übertragen
-    $buffer = substr($rest,0,$length,'');    # Antwort '$buffer' auf $length kürzen, den Rest auf '$rest' behalten für den nachfolgenden Aufruf von 'htsp_recv'
+    $rest = $buffer;    # transfer response to '$rest'
+    $buffer = substr($rest,0,$length,'');    # shorten response '$buffer' to the required message '$length', keep the remainder in '$rest' for the next following call to 'htsp_recv'
   }
   say "$i resp -- ".length($buffer) if $self->{debug_info};
   # exit if $i == 15;
   $i++;
-  my $htspmsg = pack("N",$length).$buffer;    # die 4 Bytes mit der Länge der Nachricht vorne wieder anhängen
-  return $self->htsmsg_deserialise(\$htspmsg);    # Nachricht entpacken und zurückgeben
+  my $htspmsg = pack("N",$length).$buffer;    # prepend the previously removed 4 bytes with the message length
+  return $self->htsmsg_deserialise(\$htspmsg);    # deserialise the message an return it
 }
 sub htsmsg_serialise {
   # serialise a HTSP message
@@ -188,7 +188,7 @@ sub htsmsg_serialise {
     @vals = values $msg->@*;
   }
   else {
-    die ("Error: message must be a reference of type of 'HASH' or 'ARRAY', not '".ref($msg)."'");
+    die ("Error ".__PACKAGE__.": message must be a reference of type of 'HASH' or 'ARRAY', not '".ref($msg)."'");
   }
   for my $key (@keys) {
     my $val = shift @vals;
@@ -218,7 +218,7 @@ sub htsmsg_serialise {
       my $name = $ishash ? $key : '';   # string
       my $data = pack("q<",$val);    #  64 bit = 8 byte signed integer little-endian byte-order -> q = signed quad (64-bit) value
       # Integers are encoded using a very simple variable length encoding. All leading bytes that are 0 is discarded.
-      $data =~ s/\0{1,7}$//;    # 'NUL' Bytes am Ende wegnehmen, ein erstes behalten
+      $data =~ s/\0{1,7}$//;    # remove Null-Byte from the end, keep a first one
       my $datalength = pack("N",length($data));    # 4 byte integer "network" big-endian byte-order
       $htspmsg .= $type.$namelength.$datalength.$name.$data;
     }
@@ -247,7 +247,7 @@ sub htsmsg_deserialise {
   # deserialise a HTSP message
   # https://docs.tvheadend.org/documentation/development/htsp/htsmsg-binary-format
   my $self = shift;
-  my $htsmsg = shift;    # Referenz auf die zu de serialisierende message
+  my $htsmsg = shift;    # reference to the message to be deserialised
   state $i=0;
   my $bd={};
   $i++;
@@ -300,7 +300,7 @@ sub htsmsg_field_deserialise {
   elsif ($type == 2) {
     # S64 = 2 = Signed 64bit integer
     # Integers are encoded using a very simple variable length encoding. All leading bytes that are 0 is discarded.
-    while (length($data) < 8) {$data .= chr(0);}    # mit "NUL" Bytes auffüllen
+    while (length($data) < 8) {$data .= chr(0);}    # fill up with Null-Bytes
     $data = unpack("q<",$data);    # 64 bit = 8 byte signed integer little-endian byte-order -> q = signed quad (64-bit) value
     if (ref $bd eq "HASH") {
       $bd->{"$name"} = $data;
@@ -384,14 +384,14 @@ sub htsmsg_field_deserialise {
   }
 }
 sub htsmsg_message_length {
-  # determine message or data length of a htsp message to be desirialised
+  # determine message or data length of a htsp message to be deserialised
   my $self = shift;
   my $bytes = shift;
   my $template = $self->{template};
-  # database version 3 -> a variable-length integer discarding leading zero bytes
+  # for database version 3 -> a variable-length integer discarding leading zero bytes
   # -> template = "w" a BER compressed integer, Bit eight (the high bit) is set on each byte except the last
   # -- or --
-  # HTSP protocol or database version 2 -> 4 byte integer "network" big-endian byte-order
+  # for HTSP protocol and database version 2 -> 4 byte integer "network" big-endian byte-order
   # -> template = "N"
   my $length = unpack("$template", $$bytes);
   substr($$bytes,0,length(pack("$template", $length)),'');    # remove number of bytes consumed
@@ -406,7 +406,7 @@ sub htsmsg_message_length {
   # return oct('0b'.$seven_bit_chunks);    # convert bits to value
 }
 1;
-# __end of package htsp_client__
+# __ end of package htsp_tvh_client __
 __END__
 
 =pod
@@ -421,7 +421,7 @@ Refer to L<HTSP|https://docs.tvheadend.org/documentation/development/htsp>
 
 =head1 Version
 
-Version 0.03
+Version 0.05
 
 =head1 Synopsis
 
@@ -430,10 +430,12 @@ Version 0.03
  use Tvh::Htsp::Client;
 
  my $htsp = Tvh::Htsp::Client->new( { host => $host, port => $port, debug_info => $debug_info } );
- # Be sure to use HTSP port, defaults to '9982'
- # host defaults to 'localhost'
+ #   Be sure to use HTSP 'port', defaults to '9982'
+ #   'host' defaults to 'localhost'
+ #   'debug_info' defaults to 0
+ #    setting it to 1 will output all details of client to server communication, which is normally not required
  # Setup
- my $msg = { 'method' => 'hello', 'htspversion' => 43, 'clientname' => "$creator", 'clientversion' => "v$Tvh::Htsp::Client::VERSION" };
+ my $msg = { method => 'hello', htspversion => 43, clientname => $creator, clientversion => "v$Tvh::Htsp::Client::VERSION" };
  my $reply = $htsp->htsp_send_recv($msg);
  # Tvheadend HTSP API or JSON API via HTTP Proxy using HTSP 'api' method
  $msg = { method => 'api', path => 'channel/grid', args => { start => 0, limit => 99999, sort => 'number', dir => 'desc' } };
@@ -443,6 +445,9 @@ Version 0.03
  # -- or --
  #
  # Dump epgdb.v3 TVH Electronic Program Guide (EPG) database in json format
+ #   we do not need the client connection to the HTSP server and set parameter 'no_client' to 1
+ #   database version 3 sligthly deviates from the HTSP protocol, we  set parameter 'epgdb_v3' to 1
+ #   database version 2 uses HTSP protocol, no need to set 'epgdb_v3' in this case
  my $htsp = Tvh::Htsp::Client->new( { no_client => 1, epgdb_v3 => 1 } );
  my $epgdb = qx(7zz e -so /var/lib/tvheadend/epgdb.v3 2>/dev/null);    # unzip epgdb.v3 to string
  my $db=[];
@@ -534,7 +539,7 @@ Ulrich Buck, C<< <ulibuck at cpan.org> >>
 
 =head1 License and Copyright
 
-This software is Copyright (c) 2025 by Ulrich Buck.
+This software is Copyright (c) 2026 by Ulrich Buck.
 
 This is free software, licensed under:
 

@@ -1,6 +1,6 @@
 package Sys::Export::ISO9660::Directory;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 # ABSTRACT: Represents a case-folded directory in ISO9660
 
 use v5.26;
@@ -60,7 +60,7 @@ encoding is stored in C<joliet_file>.
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

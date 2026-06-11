@@ -32,7 +32,7 @@ subtest is_valid_joliet_name => sub {
 };
 
 subtest empty_fs => sub {
-   my $tmp= File::Temp->new;
+   my $tmp= tmpfile;
    my $dst= Sys::Export::ISO9660->new($tmp);
    $dst->finish;
    my $sectors= 16 # system
@@ -44,7 +44,7 @@ subtest empty_fs => sub {
 };
 
 subtest empty_with_boot_loader => sub {
-   my $tmp= File::Temp->new;
+   my $tmp= tmpfile;
    my $dst= Sys::Export::ISO9660->new($tmp);
    my $boot_code_size= 1000000;
    my $sectors= 16 # system
@@ -110,7 +110,7 @@ subtest empty_with_boot_loader => sub {
 };
 
 subtest readme_fs => sub {
-   my $tmp= File::Temp->new;
+   my $tmp= tmpfile;
    my $dst= Sys::Export::ISO9660->new(
       filename => $tmp,
       volume_label => 'TESTVOL',
@@ -136,7 +136,7 @@ END
    subtest mount_fs => sub {
       skip_all 'Set TEST_MOUNT=1 to enable tests that mount the generated filesystem'
          unless $ENV{TEST_MOUNT};
-      my $mnt= File::Temp->newdir;
+      my $mnt= tmpdir;
       if (is( system('mount', '-r', -t => 'iso9660', -o => 'loop', "$tmp", "$mnt"), 0, "mount $tmp on $mnt" )) {
          ok( -f "$mnt/README.TXT", 'README.TXT exists' );
          is( slurp("$mnt/README.TXT"), $readme, 'README.TXT content' );

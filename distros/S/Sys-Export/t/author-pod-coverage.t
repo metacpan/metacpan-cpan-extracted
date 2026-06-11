@@ -36,7 +36,10 @@ plan tests => scalar @modules;
 my %trustme = (
              'Sys::Export' => [
                                 qr/S_I[FS]WHT/
-                              ]
+                              ],
+             'Sys::Export::Unix' => [
+                                      qr/src_exe_PATH/
+                                    ]
            );
 
 my @also_private;

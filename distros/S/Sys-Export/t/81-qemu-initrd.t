@@ -20,8 +20,6 @@ Example Usage:
 
 =cut
 
-#$File::Temp::KEEP_ALL=1;
-
 # Docker access is equivalent to root access, so not enabled by default
 skip_all 'Set env DOCKER_TESTS=1 to run this test'
    unless $ENV{DOCKER_TESTS};
@@ -38,8 +36,7 @@ skip_all 'No docker access, or unable to fetch alpine image'
 # If the user provided a docker image name, we can cache things into the image.
 # Otherwise we need to pass all of that into the 'run' command and perform the
 # package installs as part of the entrypoint.
-my $tmp= File::Temp->newdir(CLEANUP => !$ENV{DEBUG_INITRD});
-diag "Leaving temp files at $tmp" if $ENV{DEBUG_INITRD};
+my $tmp= tmpfile;
 my @cmd;
 if ($ENV{DOCKER_TEST_IMAGE_NAME}) {
    mkfile("$tmp/Dockerfile", <<~'END');

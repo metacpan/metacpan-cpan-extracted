@@ -19,7 +19,7 @@ use Devel::Deprecations::Environmental
     OldPerl => { unsupported_from => '2024-03-09', older_than => '5.14.0' };
 
 # MUST be in format N.NNNN, see https://github.com/DrHyde/perl-modules-Number-Phone/issues/58
-our $VERSION = '4.0010';
+our $VERSION = '4.0011';
 
 my $NOSTUBS = 0;
 sub import {
@@ -60,7 +60,7 @@ my @is_methods = qw(
     is_valid is_allocated is_in_use
     is_geographic is_fixed_line is_mobile is_pager
     is_tollfree is_specialrate is_adult is_network_service is_personal
-    is_corporate is_government is_international
+    is_corporate is_government
     is_ipphone is_isdn is_drama
 );
 
@@ -73,6 +73,37 @@ foreach my $method (
 ) {
     no strict 'refs';
     *{__PACKAGE__."::$method"} = sub { undef; }
+}
+
+# class and object method
+sub _may_be_noncanonical_number { 0 }
+
+# object method
+sub canonical_number {
+    my $self = shift;
+    return $self unless($self->_may_be_noncanonical_number);
+
+    my $canonical_number = Number::Phone::Country::canonicalize_number( '+'.$self->format_using('MSISDN'));
+
+    # if we built --without_uk but Number::Phone::UK has been installed (like,
+    # say, on a dev machine) then we need to force this to build a stub object
+    # for UK numbers when testing. We can detect this weird situation by
+    # seeing if the sub that detects it while testing exists and returns true.
+    # Yes, this is a monstrous evil.
+    if(
+        exists(&{'nptestutils::building_without_uk'}) &&
+        nptestutils::building_without_uk() &&
+        index($canonical_number, '+44') == 0) {
+        return Number::Phone::Lib->new($canonical_number);
+    }
+    return Number::Phone->new($canonical_number);
+}
+
+sub is_international {
+    my $self = shift;
+    return 0 unless($self->_may_be_noncanonical_number);
+
+    return !!($self->country_code ne $self->canonical_number->country_code);
 }
 
 sub type {
@@ -91,16 +122,13 @@ sub dial_to {
   my $from = shift;
   my $to   = shift;
 
+  $from = $from->canonical_number;
+
   if($from->country_code() != $to->country_code()) {
-    return Number::Phone::Country::idd_code($from->country()).
+    return
+        Number::Phone::Country::idd_code($from->country()).
         $to->country_code().
-        ($to->isa('Number::Phone::StubCountry')
-          ? $to->raw_number()
-          : (
-              ($to->areacode() ? $to->areacode() : '').
-              $to->subscriber()
-            )
-        );
+        $to->raw_number();
   }
 
   # do we know how to do this?
@@ -108,8 +136,17 @@ sub dial_to {
   return undef if($@); # no
   return $intra_country_dial_to if(defined($intra_country_dial_to)); # yes, and here's how
 
-  # if we get here, then we can use the default implementation ...
-
+  # if we get here, then we can use the default implementation, which
+  # is to either:
+  # * for calls within an area code
+  #     return the destination subscriber number
+  # * otherwise concatenate
+  #     the national direct dialling code (eg 0 for the UK, if the UK used this)
+  #     the area code
+  #     the subscriber number
+  # NB the UK can't use this because in a few places such as Brighton (01273)
+  # numbers are now being allocate with E digit 0, eg 0127300xxxx. 00xxxx begins
+  # with 00, the international access code, so can't be dialled on its own.
   if(
     defined($from->areacode()) &&
     defined($to->areacode())   &&
@@ -119,6 +156,11 @@ sub dial_to {
   return Number::Phone::Country::ndd_code($from->country()).
          ($to->areacode() ? $to->areacode() : '').
          $to->subscriber();
+}
+
+sub raw_number {
+    my $self = shift;
+    return ($self->areacode() ? $self->areacode() : '').$self->subscriber();
 }
 
 sub intra_country_dial_to { die("don't know how\n"); }
@@ -263,6 +305,10 @@ when extra data is available in, for example, Number::Phone::UK. You might
 want to do this for compatibility or performance. Number::Phone::UK is quite
 slow, because it uses a huge database for some of its features.
 
+As an exception, it will always use the libphonenumber-derived stub for Irish
+numbers, even if L<Number::Phone::IE> is installed. That module hasn't been
+maintained for a long time.
+
 =head1 PERL VERSIONS SUPPORTED
 
 Your perl must support 64 bit ints.
@@ -313,7 +359,7 @@ sub _new_args {
     $number =~ s/[^+0-9]//g;
     $number = "+$number" unless($number =~ /^\+/);
 
-    $country = Number::Phone::Country::phone2country($number) or return;
+    $country = Number::Phone::Country::phone2country($number, 1) or return;
     if($country eq 'AQ' && $number =~ /^\+882/) {
         $original_country = 'InternationalNetworks882';
     }
@@ -343,8 +389,8 @@ sub new {
     } elsif($country =~ /^(GG|JE|IM)$/) {
         $country = "UK::$country";
     }
-    eval "use Number::Phone::$country";
-    if($@ || !"Number::Phone::$country"->isa('Number::Phone')) {
+    eval "use Number::Phone::$country" unless($country eq 'IE');
+    if($@ || $country eq 'IE' || !"Number::Phone::$country"->isa('Number::Phone')) {
         if($@ =~ /--without_uk/) {
             # a test unexpectedly tried to load Number::Phone::UK, argh!
             die $@
@@ -489,8 +535,8 @@ return true for this method.
 
 The number is charged like a domestic number (including toll-free or special
 rate), but actually terminates in a different country.  This covers the
-special dialling arrangements between Spain and Gibraltar, and between the
-Republic of Ireland and Northern Ireland, as well as services such as the
+special dialling arrangements between the Republic of Ireland and Northern
+Ireland and between Italy and San Marino, as well as services such as the
 various "Country Direct"-a-likes.  See also the C<country()> method.
 
 =item is_network_service
@@ -636,6 +682,16 @@ country, or as a nationally-preferred international number if not. Internally
 this uses the National and NationallyPreferredIntl formatters. Beware of the
 potential performance hit!
 
+=item canonical_number
+
+If this is a number which is a part of a national number plan which maps to
+another country then this will return an object representing the number that it
+is mapped to. Otherwise you just get your object back.
+
+This is similar to, and more useful than, C<translates_to>, which will either
+return an object for the canonical number or C<undef> if the number is already
+canonical.
+
 =item country
 
 The two letter ISO country code for the country in which the call will
@@ -653,17 +709,28 @@ returns the last two-letter code it finds.  eg ...
   from Number::Phone::NANP::US, it would return US
   from Number::Phone::FR::Full, it would return FR
 
+=item raw_number
+
+Returns all the digits of a number, except any leading country code or national
+dialling prefix. Exactly equivalent to the area code (if such a thing exists)
+and the subscriber number, concatenated together.
+
 =item translates_to
+
+B<DEPRECATED>
 
 If the number forwards to another number (such as a special rate number
 forwarding to a geographic number), or is part of a chunk of number-space
 mapped onto another chunk of number-space (such as where a country has a
-shortcut to (part of) another country's number-space, like how Gibraltar
-used to appear as an area code in Spain's numbering plan as well as having its
-own country code), then this method may return an object representing the
-target number.  Otherwise it returns undef.
+shortcut to (part of) another country's number-space, like how Northern Ireland
+appears as an area code in the Irish republic's numbering plan as well as being
+canonically an area code in the UK's numbering plan, then this method may
+return an object representing the target number.  Otherwise it returns undef.
 
-The superclass implementation returns undef.
+The superclass implementation returns undef, and it was never implemented for
+any of the country-specific subclasses bundled with Number::Phone. You are
+encouraged to not implement this in subclasses, and users should use
+C<canonical_number> instead.
 
 =back
 

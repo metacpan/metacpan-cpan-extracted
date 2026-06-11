@@ -2,7 +2,7 @@ package DBIx::QuickDB::Watcher;
 use strict;
 use warnings;
 
-our $VERSION = '0.000049';
+our $VERSION = '0.000050';
 
 use Carp qw/croak/;
 use POSIX qw/:sys_wait_h/;
@@ -245,8 +245,11 @@ sub _watcher_kill_fast {
     # postmaster releases its SysV semaphores instead of leaking them) the
     # server needs a moment to abort its backends and exit; give it a short
     # window, then escalate to SIGKILL so teardown always completes even if that
-    # signal is caught and ignored. The outer cap guards pathological cases
-    # (e.g. a process stuck in uninterruptible IO).
+    # signal is caught and ignored. After SIGKILL we block on the reap: SIGKILL
+    # cannot be ignored, so the only thing that can delay the zombie appearing is
+    # transient (kernel delivery, brief uninterruptible IO), and racing a fixed
+    # deadline against it only produces a spurious "PID refused to exit" on a
+    # loaded host.
     my $escalated = $sig eq 'KILL';
     my ($check, $exit);
     my $start = time;
@@ -254,18 +257,20 @@ sub _watcher_kill_fast {
     until ($check) {
         local $?;
 
+        if ($escalated) {
+            $check = waitpid($pid, 0);
+            $exit  = $?;
+            last;
+        }
+
         $check = waitpid($pid, WNOHANG);
         $exit = $?;
         last if $check;
 
-        my $delta = time - $start;
-
-        if (!$escalated && $delta > 2) {
+        if (time - $start > 2) {
             kill('KILL', $pid);
             $escalated = 1;
         }
-
-        last if $delta > 5;
 
         sleep 0.01;
     }
@@ -304,13 +309,10 @@ sub _watcher_kill {
     # so no future server reuses the IPC key -- and a suite that kills many
     # servers this way exhausts the host's SEMMNI/SEMMNS limits. When the driver
     # leaves fast_stop_sig at its 'KILL' default both stages are SIGKILL, which
-    # is harmless. A final reap window after the SIGKILL lets it take effect
-    # before we give up; the whole budget stays under Driver::stop's wait()
-    # timeout (2*grace+2) so the watcher is not killed mid-reap.
+    # is harmless.
     my $step    = $kill_after > 1 ? int($kill_after / 2) : 1;
     my $fast_at = $kill_after;
     my $kill_at = $fast_at + $step;
-    my $give_up = $kill_at + $step;
 
     my ($check, $exit, $sent_fast, $sent_kill);
     my $start = time;
@@ -330,11 +332,24 @@ sub _watcher_kill {
             $sent_kill = 1;
         }
 
+        # SIGKILL cannot be caught or ignored, so the server WILL terminate and
+        # become reapable -- block until it does instead of racing a wall-clock
+        # deadline. The old give-up window shrank with QDB_STOP_GRACE (only ~1s
+        # at grace=1) and a loaded host could take longer than that just to
+        # deliver the kill and surface the zombie, tripping a spurious "PID
+        # refused to exit". A normal reap returns in well under a second, so the
+        # blocking wait still finishes inside Driver::stop's 2*grace+2 wait()
+        # budget and the watcher is not killed mid-reap.
+        if ($sent_kill) {
+            $check = waitpid($pid, 0);
+            $exit  = $?;
+            last;
+        }
+
         $check = waitpid($pid, WNOHANG);
         $exit = $?;
 
         last if $check;
-        last if $delta > $give_up;
 
         sleep 0.1;
     }

@@ -4,7 +4,7 @@ require 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '3.000003';
+our $VERSION = '3.001000';
 use Carp;
 use Symbol 'gensym', 'qualify_to_ref';    # For the 'any data type' hack
 use Fcntl qw( SEEK_SET SEEK_CUR );
@@ -12,7 +12,7 @@ use Fcntl qw( SEEK_SET SEEK_CUR );
 use List::Util 1.33 qw(any none);
 
 use File::Basename qw( dirname );
-use File::Temp qw/ tempfile /;
+use File::Temp     qw/ tempfile /;
 
 @Config::IniFiles::errors = ();
 
@@ -927,7 +927,7 @@ sub ReadConfig
         {}; # this will store trailing comments at the end of single-line params
     $self->{e}   = {};    # If a section already exists
     $self->{mye} = {};    # If a section already exists
-         # import shadowing, see below, and WriteConfig($fn, -delta=>1)
+        # import shadowing, see below, and WriteConfig($fn, -delta=>1)
 
     if ( defined $self->{imported} )
     {
@@ -2158,9 +2158,10 @@ sub _make_filehandle
     my $fh = qualify_to_ref( $thing, caller(1) );
     return $fh if defined( fileno $fh );
 
-    # otherwise treat it as a file to open
+    # otherwise treat it as a file to open; 3-arg open so the filename is
+    # not interpreted as a command or redirect
     $fh = gensym;
-    open( $fh, $thing ) || return;
+    open( $fh, '<', $thing ) || return;
 
     return $fh;
 }    # end _make_filehandle
@@ -2393,7 +2394,7 @@ Config::IniFiles - A module for reading .ini-style configuration files.
 
 =head1 VERSION
 
-version 3.000003
+version 3.001000
 
 =head1 SYNOPSIS
 

@@ -1,7 +1,7 @@
 requires 'perl', '5.008005';
 requires 'Dancer2', '0.150000';
 requires 'DateTime';
-requires 'Digest::MD5';
+requires 'Crypt::SysRandom';
 requires 'JSON::MaybeXS';
 requires 'Module::Load';
 requires 'Net::OAuth';

@@ -44,7 +44,7 @@ subtest is_valid_longname => sub {
 };
 
 subtest empty_fs => sub {
-   my $tmp= File::Temp->new;
+   my $tmp= tmpfile;
    my $dst= Sys::Export::VFAT->new($tmp);
    $dst->finish;
    # one boot sector, two FATs, one root dir, one empty cluster
@@ -53,7 +53,7 @@ subtest empty_fs => sub {
 };
 
 subtest one_file => sub {
-   my $tmp= File::Temp->new;
+   my $tmp= tmpfile;
    my $dst= Sys::Export::VFAT->new($tmp);
    $dst->add([ file => "README.TXT", "Hello World!\r\n" ]);
    $dst->finish;
@@ -63,7 +63,7 @@ subtest one_file => sub {
 };
 
 subtest one_dir => sub {
-   my $tmp= File::Temp->new;
+   my $tmp= tmpfile;
    my $dst= Sys::Export::VFAT->new($tmp);
    $dst->add([ dir => "a" ]);
    $dst->finish;
@@ -75,7 +75,7 @@ subtest root_dir_math => sub {
    # Root directory has one volume label dirent, no '.' or '..' entries, and 16 dirents per sector
    # Test crossing of threshold to more sectors.
    for (510, 511, 512) {
-      my $tmp= File::Temp->new;
+      my $tmp= tmpfile;
       my $dst= Sys::Export::VFAT->new($tmp);
       $dst->add([ file => "$_.TXT", "Some Data" ]) for 1..$_;
       $dst->finish;
@@ -93,7 +93,7 @@ subtest large_deep_directory => sub {
               + int(($files+2+15)/16) # 1 dir of ceil((N+2)/16) sectors @ 1 sector per cluster
             + ($bits == FAT32? 1 : 0);# in fat32, root dir gets a cluster
 
-      my $tmp= File::Temp->new;
+      my $tmp= tmpfile;
       my $dst= Sys::Export::VFAT->new(filehandle => $tmp, bytes_per_sector => 512, sectors_per_cluster => 1);
       my $fourk= "\1"x4096;
       for (1..$files) {
@@ -114,7 +114,7 @@ subtest large_deep_directory => sub {
 };
 
 subtest shortname_conflict => sub {
-   my $tmp= File::Temp->new;
+   my $tmp= tmpfile;
    my $dst= Sys::Export::VFAT->new($tmp);
    $dst->add([ file => 'bitmap_scale.mod', 'test' ]);
    $dst->add([ file => 'bitmap.mod', 'test2' ]);
@@ -133,7 +133,7 @@ subtest shortname_conflict => sub {
 };
 
 subtest device_addr_placement => sub {
-   my $tmp= File::Temp->new;
+   my $tmp= tmpfile;
    my $dst= Sys::Export::VFAT->new($tmp);
    my $token= "UniqueString".("0123456789"x50);
    my $addr= 4096*256;
@@ -152,7 +152,7 @@ subtest device_addr_placement => sub {
 subtest device_align_placement => sub {
    for my $align (1<<9, 1<<10, 1<<11, 1<<12, 1<<13, 1<<14) {
       for my $vol_ofs (0, 512, 1536) {
-         my $tmp= File::Temp->new;
+         my $tmp= tmpfile;
          my $dst= Sys::Export::VFAT->new($tmp);
          my $token= "UniqueString".("0123456789"x50);
          my $token2= "UniqueString9876543210";
@@ -181,7 +181,7 @@ subtest test_mounts => sub {
    skip_all 'Set TEST_MOUNTS=1 to enable tests that call "mount"'
       unless $ENV{TEST_MOUNTS};
 
-   my $tmp= File::Temp->newdir;
+   my $tmp= tmpdir;
    my $dst= Sys::Export::VFAT->new(filename => "$tmp/fs");
    $dst->add([ dir => "a" ]);
    $dst->add([ dir => "a/b" ]);

@@ -4,7 +4,7 @@ use strict;
 use Number::Phone::Country::Data;
 
 # *_codes are global so we can mock in some tests
-use vars qw($VERSION %idd_codes %prefix_codes);
+use vars qw($VERSION %idd_codes %prefix_codes %number_translations);
 $VERSION = '2.00';
 my $use_uk = 0;
 
@@ -19,11 +19,6 @@ sub import {
              warn("Deprecated, will become fatal: Unknown param to ".__PACKAGE__." '$param' at ".join(' line ', (caller())[1,2])."\n");
         }
     }
-}
-
-sub phone2country {
-    my ($phone) = @_;
-    return (phone2country_and_idd($phone))[0];
 }
 
 our %NANP_areas = (
@@ -158,8 +153,12 @@ sub _non_US_CA_area_codes {
 
 }
 
+sub phone2country {
+    return (phone2country_and_idd(@_))[0];
+}
+
 sub phone2country_and_idd {
-    my ($phone) = @_;
+    my ($phone, $ignore_translations) = @_;
     $phone =~ s/[^\+?\d+]//g;
     $phone = '+1'.$phone unless(substr($phone, 0, 1) =~ /[1+]/);
     $phone =~ s/\D//g;
@@ -177,6 +176,11 @@ sub phone2country_and_idd {
         my @prefixes = map { substr($phone, 0, $_) } reverse 1..length($phone);
         foreach my $idd (@prefixes) {
             if(exists $idd_codes{$idd}) {
+                next if(
+                    $ignore_translations &&
+                    exists($number_translations{$idd})
+                );
+
                 my $country = $idd_codes{$idd};
                 if(ref($country) eq 'ARRAY'){
                     foreach my $country_code (@$country) {
@@ -232,6 +236,22 @@ sub ndd_code {
     my $data = $prefix_codes{$country} or return;
 
     return $$data[2];
+}
+
+# Translate numbers that exist in one country's number plan but end up in
+# another country, e.g. +353 48 for Northern Ireland, +39 0549 for SM)
+# to their canonical form for the target country (e.g. +35348 -> +4428)
+sub canonicalize_number {
+    my $number = shift;
+    my ($digits) = $number =~ /^\+(\d+)/;
+    return $number unless defined $digits;
+    foreach my $translated_prefix (sort { length($b) <=> length($a) } keys %number_translations) {
+        if(substr($digits, 0, length($translated_prefix)) eq $translated_prefix) {
+            (my $translated = $number) =~ s/^\+$translated_prefix/+$number_translations{$translated_prefix}/;
+            return $translated;
+        }
+    }
+    return $number;
 }
 
 1;
@@ -360,15 +380,38 @@ are calling.  For example, in the US, the NDD prefix is "1", so you must
 dial 1 before the area code to place a long distance call within the
 country.
 
-=item phone2country($phone)
+=item phone2country
+
+Wrapper around phone2country_and_idd, that takes the same
+arguments.
 
 B<DEPRECATED> Returns the ISO country code (or XK for Kosovo) for a phone number.
 eg, for +441234567890 it returns 'GB' (or 'UK' if you've told it to).
 
-=item phone2country_and_idd($phone)
+=item phone2country_and_idd($phone, $ignore_translations)
 
 Returns a list containing the ISO country code and IDD prefix for the given
 phone number.  eg for +441234567890 it returns ('GB', 44).
+
+By default, if a number is translated from one country to another -
+for example +353 48 xxx numbers in the Irish numbering plan are
+really just a mapping to +44 28 xxx numbers in the UK plan - then the
+data for the translated number is returned. If you want the country
+according to the ITU country code then set C<$ignore_translations> to
+a true value.
+
+=item canonicalize_number($phone)
+
+Translates a phone number that exists in one country's number plan but ends up
+in another country to its canonical E.164 form. Some numbers are reachable via
+another country's dial plan, for example Northern Ireland (+44 28 ...) can be
+dialled as +353 48 ... in the republic of Ireland's number plan, and the entire
+country of San Marino (+378) is also the Italian area code +39 0549.
+
+This function translates such numbers to their canonical form, ie +353 48 ...
+is translated to +44 28 ...
+
+Numbers that have no such translation are returned unchanged.
 
 =back
 

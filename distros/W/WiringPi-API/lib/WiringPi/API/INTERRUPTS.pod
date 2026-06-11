@@ -1,0 +1,698 @@
+=head1 NAME
+
+WiringPi::API::INTERRUPTS - Interrupt (ISR) usage examples
+
+=head1 DESCRIPTION
+
+Worked, runnable examples for handling GPIO interrupts with L<WiringPi::API>.
+The self-pipe interrupt API described here is implemented in C<WiringPi::API>
+3.18 and verified on Pi 5 hardware; the snippets run as written.
+
+This document is B<ISR-only and uses no> C<use threads> - general
+concurrency/worker examples (C<worker()>) live in L<WiringPi::API::WORKERS> /
+C<docs/threads-examples.md>. Callbacks fire in your own interpreter when you
+service dispatch, so they work on B<any> Perl, threaded or not.
+
+See the L<WiringPi::API> POD for the authoritative per-function reference.
+
+=head1 ABOUT THESE EXAMPLES
+
+=over 4
+
+=item *
+
+B<Interrupts never require> C<use threads>. wiringPi runs its own C threads
+internally and writes events to a pipe; your Perl reads that pipe. Hands-off
+handling uses an in-process signal (scenario 7) or a forked process (scenarios
+8 and 10) - never threads.
+
+=item *
+
+B<Callbacks receive> C<($edge, $timestamp_us)> - the edge that fired
+(C<INT_EDGE_FALLING>=1 / C<INT_EDGE_RISING>=2) and a microsecond timestamp.
+
+=item *
+
+B<Pin numbering> follows whichever setup you call: C<setup()> = wiringPi
+numbering, C<setup_gpio()> = BCM. Examples use C<setup()>.
+
+=item *
+
+B<Mode constants> for C<pin_mode>: C<INPUT>=0, C<OUTPUT>=1 (shown as integers).
+
+=item *
+
+B<To hide the most work, prefer the hands-off options.>
+C<auto_dispatch_interrupts> (scenario 7) fires callbacks in your own process
+with no loop; C<background_interrupt> (scenario 8) runs an independent handler
+in its own process. Sections 1-6 (cooperative) explain the explicit dispatch
+model that 7 and 8 hide - read them to understand what happens under the
+hands-off calls, but most programs only need 7 or 8.
+
+=item *
+
+B<If you fork yourself> (scenario 9): call C<setup()> and C<pin_mode> in the
+parent B<before> forking, and arm the interrupt in the child that dispatches it.
+
+=back
+
+=head1 DECISION GUIDE
+
+None of these need C<use threads>. To hide the most plumbing, prefer the
+hands-off rows (7, 8, 10).
+
+B<7 vs 8 in one line:> C<auto_dispatch_interrupts> (7) gives you lock-free
+shared state but I<defers> during a long non-yielding C call;
+C<background_interrupt> (8) fires regardless of what main is doing but B<can't
+touch main's variables>. No long C calls? Pick 7. Long C calls? Pick 8.
+
+=over 4
+
+=item *
+
+Attach a handler and forget it; it updates my program's state - scenario 7
+(C<auto_dispatch_interrupts>).
+
+=item *
+
+Independent handler that fires even during long/blocking work - scenario 8
+(C<background_interrupt>).
+
+=item *
+
+The same, but several pins in one background process - scenario 10
+(C<background_interrupts>).
+
+=item *
+
+React to a pin while running my own loop, on my terms - scenarios 1, 3.
+
+=item *
+
+A program whose only job is reacting to pins - scenario 2.
+
+=item *
+
+Several pins, each with its own handler - scenario 4.
+
+=item *
+
+Specific edges / debounce a noisy input - scenario 5.
+
+=item *
+
+Tear down or re-arm a pin - scenario 6.
+
+=item *
+
+Deliver edges back to the parent to handle there - scenario 9 (or the
+C<results> channel in scenario 8 for simple value reporting).
+
+=back
+
+=head1 REACTING TO INTERRUPTS
+
+=head2 1. Cooperative dispatch in your main loop
+
+B<Why/when:> You already have a main loop and want to control exactly when
+callbacks run. Simplest model, works on any Perl - but a callback only fires
+when you call C<dispatch_interrupts()>, so keep the loop snappy. (Want it fully
+hands-off? See scenario 7.)
+
+B<Main & interrupt:> One thread. The callback runs I<inside>
+C<dispatch_interrupts()>, so it can read/write any of main's variables with no
+locking - but it only fires when main calls dispatch, and it blocks main while
+it runs.
+
+    use strict;
+    use warnings;
+    use WiringPi::API qw(setup pin_mode set_interrupt dispatch_interrupts INT_EDGE_RISING);
+
+    setup();
+    pin_mode(0, 0);            # INPUT
+
+    set_interrupt(0, INT_EDGE_RISING, sub {
+        my ($edge, $ts_us) = @_;
+        print "pin 0 rising at ${ts_us}us\n";
+    });
+
+    while (1) {
+        do_other_work();
+        dispatch_interrupts();  # non-blocking: runs callbacks for any events that arrived
+    }
+
+Tradeoff: if C<do_other_work()> blocks for a long time, callbacks wait until the
+next C<dispatch_interrupts()>. Conversely, if it returns instantly with nothing
+to do, this loop B<busy-spins at 100% CPU> - pace it with real periodic work, a
+short C<sleep>, or by C<select>ing on C<interrupt_fd> with a timeout (scenario 3).
+
+=head2 2. Blocking wait loop
+
+B<Why/when:> Reacting to pins I<is> the whole job - there's no other work to do.
+The process sleeps efficiently until an edge arrives.
+
+B<Main & interrupt:> One thread. Main is blocked in C<wait_interrupts()> until an
+edge, then runs the callback inline (full access to program state).
+
+    use strict;
+    use warnings;
+    use WiringPi::API qw(setup pin_mode set_interrupt wait_interrupts INT_EDGE_BOTH);
+
+    setup();
+    pin_mode(0, 0);            # INPUT
+
+    set_interrupt(0, INT_EDGE_BOTH, \&on_change);
+
+    while (1) {
+        wait_interrupts(1000);  # block up to 1000ms, dispatch whatever fired
+    }
+
+    sub on_change {
+        my ($edge, $ts_us) = @_;
+        print "edge $edge at ${ts_us}us\n";
+    }
+
+B<Shortcut.> If the loop is literally just C<< wait_interrupts while 1 >>, call
+the built-in helper instead of writing it yourself:
+
+    run_interrupt_loop(1000);             # blocks, dispatching, forever
+    run_interrupt_loop(1000, 50);         # ... or until 50 events have fired
+
+It returns the number of events dispatched and stops when
+C<stop_interrupt_loop()> is called (from inside a callback, or a signal handler)
+or after the optional event cap. When nothing is armed it sleeps the poll
+interval instead of busy-spinning.
+
+=head2 3. Event-loop integration with the interrupt fd
+
+B<Why/when:> You already run an event loop (AnyEvent/IO::Async) or juggle
+sockets/timers, and want GPIO to be just another fd in it.
+
+C<interrupt_fd()> returns a read fd you can C<select>/poll alongside your other
+descriptors - so one loop handles sockets, timers, and GPIO together.
+
+    use strict;
+    use warnings;
+    use WiringPi::API qw(setup pin_mode set_interrupt dispatch_interrupts interrupt_fd INT_EDGE_RISING);
+
+    setup();
+    pin_mode(0, 0);            # INPUT
+    set_interrupt(0, INT_EDGE_RISING, \&on_edge);
+
+    my $fd = interrupt_fd();
+    vec(my $mask = '', $fd, 1) = 1;
+
+    while (1) {
+        select(my $ready = $mask, undef, undef, undef);  # block until readable
+        if (vec($ready, $fd, 1)) {
+            dispatch_interrupts();
+        }
+    }
+
+    sub on_edge {
+        my ($edge, $ts_us) = @_;
+        print "edge!\n";
+    }
+
+The same C<$fd> plugs into C<< AnyEvent->io >> or C<IO::Async::Handle>.
+
+=head2 4. Multiple pins and callbacks
+
+B<Why/when:> Several inputs, each with its own handler, serviced by one loop.
+
+    use strict;
+    use warnings;
+    use WiringPi::API qw(setup pin_mode set_interrupt wait_interrupts
+                         INT_EDGE_RISING INT_EDGE_FALLING INT_EDGE_BOTH);
+
+    setup();
+    pin_mode($_, 0) for (0, 2, 3);   # INPUT
+
+    set_interrupt(0, INT_EDGE_RISING,  sub { print "button A\n" });
+    set_interrupt(2, INT_EDGE_FALLING, sub { print "button B\n" });
+    set_interrupt(3, INT_EDGE_BOTH,    \&sensor);
+
+    while (1) {
+        wait_interrupts(1000);
+    }
+
+    sub sensor {
+        my ($edge, $ts_us) = @_;
+        print "sensor edge=$edge\n";
+    }
+
+B<One shared handler for several pins.> The callback only receives
+C<($edge, $ts_us)>, not the pin. If you arm the I<same> coderef on multiple
+pins, call C<last_interrupt()> inside it to recover which pin (and the BCM
+number) fired:
+
+    my $cb = sub {
+        my $i = last_interrupt();   # { pin, pin_bcm, edge, status, ts_us }
+        printf "pin %d (BCM %d) edge %d\n", $i->{pin}, $i->{pin_bcm}, $i->{edge};
+    };
+    set_interrupt($_, INT_EDGE_BOTH, $cb) for (0, 2, 3);
+
+C<last_interrupt()> returns a hash reference describing the most recently
+dispatched event (or C<undef> if none yet); it is published I<before> the
+callback runs, so the callback can read it.
+
+=head2 5. Edge types and debounce
+
+B<Why/when:> You care about a specific edge, or the input is electrically noisy
+(a button) and you want the kernel to suppress bounce so the callback fires once
+per press.
+
+Edge constants: C<INT_EDGE_FALLING>=1, C<INT_EDGE_RISING>=2, C<INT_EDGE_BOTH>=3.
+An optional 4th argument sets a B<kernel debounce period> in B<microseconds>
+(default 0 = off). wiringPi applies it as a Linux B<GPIO-v2 line attribute>
+(C<GPIO_V2_LINE_ATTR_ID_DEBOUNCE>) at arm time, so the kernel drops bounce edges
+before they reach the pipe - it is I<not> a hardware debounce. The attribute's
+field is a C<u32>, so the effective maximum is ~2**32 us (~71 minutes).
+
+    use WiringPi::API qw(setup pin_mode set_interrupt wait_interrupts INT_EDGE_FALLING);
+
+    setup();
+    pin_mode(0, 0);
+
+    # debounce a noisy button: ignore repeat edges within 5ms
+    set_interrupt(0, INT_EDGE_FALLING, \&pressed, 5000);
+
+    wait_interrupts(1000) while 1;
+
+    sub pressed {
+        print "clean press\n";
+    }
+
+=head2 6. Teardown and re-arming
+
+B<Why/when:> You need to stop watching a pin, swap a handler at runtime, or
+clean up on exit.
+
+    set_interrupt(0, INT_EDGE_RISING, \&handler_a);
+
+    # Re-arm the same pin with a different handler - the old listener is stopped
+    # automatically first, so no stacked/duplicate registration:
+    set_interrupt(0, INT_EDGE_RISING, \&handler_b);
+
+    stop_interrupt(0);    # stop one pin, forget its callback
+    stop_interrupts();    # stop every pin, drain + close the pipe
+
+B<Bursts and dropped edges.> Edges are FIFO-queued in a kernel pipe until you
+dispatch them. If a fast source outruns your dispatching the queue fills, and
+the overflowing edges are B<dropped - never merged, never blocked> - and
+counted, so loss is never silent:
+
+    my $lost = interrupt_dropped();       # 0 unless the pipe overflowed
+
+If you expect bursts, enlarge the queue with C<interrupt_buffer($bytes)> (it may
+be set before arming and persists across teardown):
+
+    interrupt_buffer(1 << 20);            # ~1 MiB of queue; returns the granted size
+    my $size = interrupt_buffer;          # read the current capacity
+
+The kernel rounds up to a page and caps at C</proc/sys/fs/pipe-max-size>. Other
+mitigations: dispatch faster, use C<background_interrupt> (a dedicated process
+keeps the pipe drained), or debounce (scenario 5) to cut the edge rate.
+
+=head1 HANDS-OFF HANDLING (NO DISPATCH LOOP)
+
+=head2 7. Fire with no loop (auto_dispatch_interrupts)
+
+B<Why/when:> The most hands-off in-process option - "attach a handler and forget
+it," closest to Arduino's C<attachInterrupt>. The callback runs in I<your>
+program (it can read/update your variables, no locking) and fires on its own
+while your code runs, with no dispatch loop. Caveat: a long non-yielding C/XS
+call can delay it.
+
+B<Main & interrupt:> The callback runs in B<main's interpreter> at op boundaries
+(and on interrupted sleeps), so it can read/write main's variables with B<no
+locking> - but a long non-yielding C call defers it until that call returns.
+
+    use strict;
+    use warnings;
+    use WiringPi::API qw(setup pin_mode set_interrupt auto_dispatch_interrupts INT_EDGE_RISING);
+
+    setup();
+    pin_mode(0, 0);            # INPUT
+
+    auto_dispatch_interrupts(1);          # callbacks now fire on their own - no loop to write
+
+    my $count = 0;
+    set_interrupt(0, INT_EDGE_RISING, sub { $count++ });   # updates your own variable
+
+    while (1) {
+        do_main_work();        # the callback fires between ops, and during the sleep
+        print "edges so far: $count\n";
+        sleep 1;
+    }
+
+The one caveat: a long, non-yielding C/XS call delays the callback until it
+returns (it fires at Perl's safe points). To fire even during such work, use
+scenario 8.
+
+B<Choosing the signal.> By default the fd is wired to C<SIGIO>. If your program
+already uses C<SIGIO>/C<O_ASYNC>, pass a different signal so they don't clash:
+
+    auto_dispatch_interrupts(1, 'USR1');  # deliver via SIGUSR1 instead (F_SETSIG)
+
+B<Opt in while arming.> Instead of a separate C<auto_dispatch_interrupts(1)>
+call, you can turn it on as part of C<set_interrupt> - this enables the same
+process-wide switch:
+
+    set_interrupt(0, INT_EDGE_RISING, sub { $count++ }, { auto_dispatch => 1 });
+    # or pick the signal:  { auto_dispatch => 'USR1' }
+
+=head2 8. A background process (background_interrupt)
+
+B<Why/when:> True fire-while-busy with zero servicing, even during long blocking
+work - because the handler runs in a I<separate process>. Best for
+B<independent> handlers (drive a pin, log, notify) that don't need your main
+program's variables.
+
+B<Main & interrupt:> The callback runs in a B<separate process>, truly
+concurrently - it fires even while main blocks, but B<cannot> see or change
+main's variables (separate memory; share via IPC).
+
+    use strict;
+    use warnings;
+    use WiringPi::API qw(setup pin_mode background_interrupt INT_EDGE_RISING);
+
+    setup();
+    pin_mode(0, 0);            # INPUT
+
+    my $h = background_interrupt(0, INT_EDGE_RISING, sub {
+        my ($edge, $ts_us) = @_;
+        # runs in the background on each rising edge - independent work only
+    });
+
+    # main carries on; the handler fires on its own
+    for (1 .. 10) {
+        do_other_work();
+        sleep 1;
+    }
+
+    $h->stop;                  # stops + reaps the background handler
+
+No C<pipe>, no C<fork>, no C<select>, no C<waitpid> - the library owns all of it
+(and an C<END> hook reaps the child even if you forget C<stop>). C<< $h->stop >>
+is B<idempotent>: safe to call more than once, and safe after the child has
+already exited. Needs no threaded Perl.
+
+B<Reporting values back (the> C<results> B<channel).> For a handler that just
+needs to report a value to the parent, you don't need the manual fork of
+scenario 9 - pass C<< { results => 1 } >> and B<return> a value from the
+handler; the parent drains it:
+
+    my $h = background_interrupt(0, INT_EDGE_RISING, sub {
+        my ($edge, $ts_us) = @_;
+        return "$edge\@$ts_us";            # shipped back to the parent
+    }, { results => 1 });
+
+    while (defined(my $msg = $h->read)) {  # non-blocking drain
+        print "handler reported: $msg\n";
+    }
+    # $h->fh is the read filehandle, for select / IO::Select
+
+For anything more elaborate than reporting the handler's return value, scenario
+9 shows the manual fork with your own results channel.
+
+=head2 9. Under the hood: manual fork
+
+B<Why/when:> You rarely write this by hand - it's what scenario 8 does for you.
+Use it directly only when you need each edge B<delivered back to the parent> to
+handle there, rather than handled in the child.
+
+The child runs the wiringPi handler and only forwards events over a pipe; the
+parent drains and reacts (in main's interpreter, full access to its state).
+
+    use strict;
+    use warnings;
+    use IO::Select;
+    use WiringPi::API qw(setup pin_mode set_interrupt wait_interrupts INT_EDGE_RISING);
+
+    setup();
+    pin_mode(0, 0);                          # INPUT - plain config, before fork
+
+    pipe(my $rx, my $tx) or die "pipe: $!";  # YOUR OWN results channel (child -> parent)
+
+    my $pid = fork // die "fork: $!";
+
+    if ($pid == 0) {
+        close $rx;
+        set_interrupt(0, INT_EDGE_RISING, sub {
+            my ($edge, $ts_us) = @_;
+            syswrite $tx, "$edge $ts_us\n";          # one text line up to the parent
+        });
+        wait_interrupts(1000) while 1;
+        exit 0;
+    }
+
+    close $tx;
+    my $sel = IO::Select->new($rx);
+    my $buf = '';
+
+    # Reap the child on normal exit/die even if you forget to stop it explicitly.
+    END { if ($pid) { kill 'TERM', $pid; waitpid $pid, 0; $pid = undef; } }
+
+    while (1) {
+        do_other_work();
+
+        while ($sel->can_read(0)) {
+            my $n = sysread($rx, my $chunk, 4096);
+            if (!defined $n) {
+                last if $!{EINTR};                    # signal: retry next pass
+                $sel->remove($rx); last;              # other error: stop, don't spin
+            }
+            if ($n == 0) { $sel->remove($rx); last }  # EOF: child exited
+            $buf .= $chunk;
+            while ($buf =~ s/^([^\n]*)\n//) {         # consume only complete lines
+                print "edge: $1\n";
+            }
+        }
+    }
+
+Use newline-delimited text framing (self-delimiting and portable). A stalled
+parent blocks the child's C<syswrite>, which backpressures the internal
+self-pipe and can drop edges - observable via C<interrupt_dropped()>. After the
+fork only the child reads the interrupt fd; the parent uses the results pipe.
+
+=head2 10. Many pins in one background child (background_interrupts)
+
+B<Why/when:> You want background handling (scenario 8) for I<several> pins, but
+a separate child per pin is wasteful. C<background_interrupts> forks B<one> child
+that services them all, and lets you arm/disarm individual pins at runtime.
+
+B<Main & interrupt:> Each callback runs in the one shared child (separate memory
+from main, as in scenario 8). The callbacks are fixed when the child forks -
+C<fork> can't carry new code - so C<arm>/C<disarm> only toggle pins registered
+in the initial call.
+
+    use strict;
+    use warnings;
+    use WiringPi::API qw(setup pin_mode background_interrupts
+                         INT_EDGE_RISING INT_EDGE_BOTH);
+
+    setup();
+    pin_mode($_, 0) for (0, 2);
+
+    my $h = background_interrupts(
+        [0, INT_EDGE_RISING, \&on_button],
+        [2, INT_EDGE_BOTH,   \&on_sensor, 5000],   # optional debounce
+    );
+
+    # ... main does its own thing; both pins are handled in the one child ...
+
+    $h->disarm(2);    # stop servicing pin 2 (the child keeps running for pin 0)
+    $h->arm(2);       # resume it
+    $h->stop;         # tear down and reap the single child
+
+The handle has the same C<stop>/C<pid>/C<running> as scenario 8, plus
+C<arm($pin)>/C<disarm($pin)>. Arming a pin that wasn't in the initial list
+croaks.
+
+=head1 NON-THREADED PERL
+
+The interrupt API needs nothing special. Everything in this document - including
+background handling via C<auto_dispatch_interrupts> (7) or C<fork> (8, 10) -
+works on a Perl built B<without> ithreads. "Background" does not imply
+C<use threads>; only the ithread variants in C<docs/threads-examples.md> do.
+
+=head1 ANTI-PATTERNS TO AVOID
+
+=over 4
+
+=item *
+
+B<Forgetting to service the fd in cooperative mode.> If you never call
+C<dispatch_interrupts()>/C<wait_interrupts()>, callbacks never fire - there is no
+background process doing it for you unless you set one up (scenarios 7-8, 10).
+
+=item *
+
+B<Forking I<after> arming interrupts.> wiringPi's ISR pthreads don't survive
+C<fork>, and a mutex held at fork time is left locked in the child. Fork first,
+then arm in the child that dispatches.
+
+=item *
+
+B<Sharing one device fd across forked processes.> An i2c/spi/serial handle
+should be used by a single process; two processes transacting on it interleave.
+
+=item *
+
+B<Two processes reading the same interrupt fd.> After a C<fork>, exactly one
+context should drain the library's interrupt fd. A second reader steals records
+from the first.
+
+=item *
+
+B<Relying on> C<auto_dispatch_interrupts> B<during a long non-yielding C/XS
+call.> Its callbacks fire at Perl's safe points (op boundaries, interrupted
+sleeps); a long C call that never yields delays them. Use
+C<background_interrupt> (separate process) if a handler must fire during such
+work.
+
+=item *
+
+B<Enabling> C<auto_dispatch_interrupts> B<when your program already uses>
+C<SIGIO>/C<O_ASYNC>. It claims that signal; pick one owner, or choose a different
+delivery signal (eg C<auto_dispatch_interrupts(1, 'USR1')>).
+
+=item *
+
+B<Busy-spinning a> C<do_work + poll> B<loop.> A
+C<< while (1) { do_other_work(); dispatch_interrupts() } >> (scenario 1) or
+C<can_read(0)> drain (scenario 9) burns 100% CPU if the work returns instantly.
+Pace it, sleep, or select with a timeout. C<run_interrupt_loop> avoids this when
+nothing is armed.
+
+=back
+
+=head1 API REFERENCE FOR THESE EXAMPLES
+
+See the L<WiringPi::API> POD for full per-function documentation.
+
+=over 4
+
+=item C<< setup() >> / C<< setup_gpio() >>
+
+Init (wiringPi / BCM numbering); once, in main. Returns an int status (C<0> = ok).
+
+=item C<< pin_mode($pin, $mode) >>
+
+C<0>=INPUT, C<1>=OUTPUT.
+
+=item C<< set_interrupt($pin, $edge, $cb [, $debounce_us] [, \%opts]) >>
+
+Arm an interrupt; C<< $cb->($edge, $ts_us) >>. The optional C<\%opts> accepts
+C<< { auto_dispatch => 1 } >> (or a signal name) to enable auto-dispatch as part
+of arming. Returns true on success.
+
+=item C<< background_interrupt($pin, $edge, $cb [, $debounce_us] [, \%opts]) >>
+
+Run the handler in a forked child. C<\%opts> accepts C<< { results => 1 } >> to
+ship the handler's return value back to the parent. Returns a handle
+(C<stop>/C<pid>/C<running>, plus C<read>/C<fh> when C<results> is on).
+
+=item C<< background_interrupts([$pin, $edge, $cb [, $deb]], ...) >>
+
+One shared child servicing many pins. Returns a handle with the usual methods
+plus C<arm($pin)>/C<disarm($pin)>.
+
+=item C<< auto_dispatch_interrupts($bool [, $signal]) >>
+
+Fire C<set_interrupt> callbacks automatically in-process with no loop (default
+C<SIGIO>; a named signal is wired via C<F_SETSIG>). Returns true.
+
+=item C<< wait_interrupts($timeout_ms) >>
+
+Block until an event or timeout, then dispatch. Returns the count dispatched
+(C<0> on timeout).
+
+=item C<< run_interrupt_loop($timeout_ms [, $max]) >> / C<< stop_interrupt_loop() >>
+
+A built-in blocking dispatch loop; stops via the flag or the optional event cap.
+Returns the count dispatched.
+
+=item C<< dispatch_interrupts() >>
+
+Non-blocking: dispatch pending events. Returns the count dispatched.
+
+=item C<< interrupt_fd() >>
+
+The read fd, for C<select>/event loops.
+
+=item C<< interrupt_dropped() >>
+
+Count of events dropped because the pipe was full.
+
+=item C<< interrupt_buffer([$bytes]) >>
+
+Get or set the event-queue (pipe) capacity in bytes.
+
+=item C<< last_interrupt() >>
+
+Full status of the most recent dispatched event - a hash reference
+C<{pin, pin_bcm, edge, status, ts_us}>, or C<undef>.
+
+=item C<< stop_interrupt($pin) >> / C<< stop_interrupts() >>
+
+Teardown (one pin / all pins).
+
+=item C<INT_EDGE_FALLING> (1) / C<INT_EDGE_RISING> (2) / C<INT_EDGE_BOTH> (3)
+
+Edge constants.
+
+=back
+
+=head1 CODE FLOW - PERL -E<gt> API.PM -E<gt> API.XS -E<gt> WIRINGPI
+
+Worked numbers use C<setup()> (wiringPi numbering) where B<wpi pin 0 = BCM 17>,
+showing why C<userdata> (the caller's pin) is the dispatch key, not
+C<wfiStatus.pinBCM>.
+
+Arming - C<< set_interrupt(0, 2, \&cb) >>:
+
+    1 Perl (user)     set_interrupt(0, 2, \&cb);
+    2 Perl (API.pm)   $_interrupt_cb{0} = \&cb;  _arm_interrupt(0, 2, 0);     # callback stays in Perl
+    3 API.xs          _arm_interrupt(pin=0,edge=2,deb=0):
+                        (lazily create the pipe, both ends O_NONBLOCK)
+                        wiringPiISR2(0, 2, isr2_writer, 0, (void*)0);          # userdata = caller pin 0
+    4 wiringPi.c      wiringPiISR2 -> wiringPiISRInternal: ToBCMPin 0->17;
+                        isrFunctionsV2[17]=isr2_writer; isrUserdata[17]=(void*)0;
+                        pthread_create(&isrThreads[17], ..., interruptHandlerV2);
+
+Firing - a rising edge on GPIO 17 (NO Perl on this path):
+
+    4 wiringPi.c      interruptHandlerV2 (BCM-17 thread): wfiStatus={pinBCM=17,edge=2,ts};
+                        isrFunctionsV2[17](wfiStatus, isrUserdata[17]);        # -> isr2_writer(.., (void*)0)
+    3 API.xs          isr2_writer(wfiStatus, ud):
+                        rec = { .pin=(int)(intptr_t)ud /*=0, the caller pin*/, .pin_bcm=17, .edge=2,
+                                .status=wfiStatus.statusOK, .ts_us=wfiStatus.timeStamp_us };
+                        if (write(pipe_wr, &rec, sizeof rec) != sizeof rec) dropped++;   # 24-byte record
+                        # returns immediately; interpreter never touched
+
+Dispatch - when Perl services the fd (main thread, or a fork child):
+
+    2 Perl (API.pm)   wait_interrupts($ms): select(interrupt_fd) -> dispatch_interrupts():
+                        while (sysread interrupt_fd, $buf, 24) {
+                            ($pin,$pin_bcm,$edge,$status,$ts) = unpack "i I i i q", $buf;
+                            $_last_interrupt = {...}; $_interrupt_cb{$pin}->($edge,$ts);   # $pin==0 -> matches
+                        }
+    1 Perl (user)     &cb runs in the consuming interpreter, in normal context (G_EVAL-able).
+
+Keying on C<userdata> (0) - not C<pinBCM> (17) - is what makes
+C<$_interrupt_cb{0}> match under C<setup()>; under C<setup_gpio()> they'd
+coincide. The wiringPi ISR thread only ever does a C<write()> of the fixed
+24-byte record; it never enters the Perl interpreter, which is why this works on
+any Perl without locking.
+
+=head1 SEE ALSO
+
+L<WiringPi::API>
+
+=head1 AUTHOR
+
+Steve Bertrand, E<lt>steveb@cpan.orgE<gt>
+
+=cut

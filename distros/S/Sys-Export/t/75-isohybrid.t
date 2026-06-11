@@ -12,7 +12,7 @@ use Sys::Export::ISO9660Hybrid qw( GPT_TYPE_ESP GPT_TYPE_GRUB );
 my $isoinfo= do { chomp(my $x= `which isoinfo`); $? == 0? $x : undef };
 
 subtest empty_fs => sub {
-   my $tmp= File::Temp->new;
+   my $tmp= tmpfile;
    my $dst= Sys::Export::ISO9660Hybrid->new($tmp);
    $dst->finish;
    my $iso_sectors= 16 # system, partition table fits here
@@ -52,7 +52,7 @@ subtest empty_fs => sub {
 };
 
 subtest readme_fs => sub {
-   my $tmp= File::Temp->new;
+   my $tmp= tmpfile;
    my $dst= Sys::Export::ISO9660Hybrid->new($tmp);
    my $readme= <<END;
 Hello World
@@ -69,7 +69,7 @@ END
       my $loopdev= `losetup -Pf $tmp`;
       if (ok( $? == 0, 'losetup' )) {
          chomp $loopdev;
-         my $mnt= File::Temp->newdir;
+         my $mnt= tmpdir;
          if (is( system('mount', '-r', -t => 'iso9660', $loopdev, "$mnt"), 0, "mount $loopdev on $mnt" )) {
             ok( -f "$mnt/README.TXT", 'README.TXT exists' );
             is( slurp("$mnt/README.TXT"), $readme, 'README.TXT content' );
@@ -101,7 +101,7 @@ sub find_grub2_lib_dir {
       unless $? == 0;
    chomp($grub_mkimage);
 
-   my $tmp= File::Temp->newdir;
+   my $tmp= tmpdir;
    system("$grub_mkimage -O i386-pc -o $tmp/gpt-core.img -p '(hd0,gpt1)/boot/grub' "
       . "biosdisk part_gpt part_msdos fat normal") == 0
       or die "mkimage -o gpt-core.img failed";

@@ -21,7 +21,7 @@ sub t_file
 {
     my $filename = shift;
 
-    return File::Spec->catfile(File::Spec->curdir(), "t", $filename);
+    return File::Spec->catfile( File::Spec->curdir(), "t", $filename );
 }
 
 =head2 t_unlink($filename)
@@ -34,7 +34,7 @@ sub t_unlink
 {
     my $filename = shift;
 
-    return unlink(t_file($filename));
+    return unlink( t_file($filename) );
 }
 
 1;

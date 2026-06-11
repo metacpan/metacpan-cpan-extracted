@@ -9,9 +9,9 @@ use Socket;
 use Fcntl qw( S_IFDIR S_IFREG S_IFLNK S_ISLNK S_IFCHR S_IFSOCK );
 use autodie;
 
-my $tmp= File::Temp->newdir;
+my $tmp= tmpdir;
 
-my $exporter= Sys::Export::Unix->new(src => $tmp, dst => File::Temp->newdir);
+my $exporter= Sys::Export::Unix->new(src => $tmp, dst => tmpdir);
 note "exporter src: '".$exporter->src."' dst: '".$exporter->dst."'";
 
 mkdir "$tmp/usr";

@@ -1,7 +1,7 @@
 package Sys::Export::CPIO;
 
 # ABSTRACT: Write CPIO archives needed for Linux initrd
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use v5.26;
 use warnings;
@@ -242,7 +242,7 @@ Writes end-of-file signature, and closes the handle if L</autoclose> is true.
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

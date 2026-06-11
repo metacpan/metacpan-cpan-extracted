@@ -48,7 +48,7 @@ WWW::Crawl4AI::Strategy::Callback - last-resort Crawl4AI strategy delegating to 
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 

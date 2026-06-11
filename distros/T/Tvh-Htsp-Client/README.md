@@ -6,7 +6,7 @@ Refer to [HTSP](https://docs.tvheadend.org/documentation/development/htsp)
 
 # Version
 
-Version 0.03
+Version 0.05
 
 # Synopsis
 
@@ -15,10 +15,12 @@ Version 0.03
     use Tvh::Htsp::Client;
 
     my $htsp = Tvh::Htsp::Client->new( { host => $host, port => $port, debug_info => $debug_info } );
-    # Be sure to use HTSP port, defaults to '9982'
-    # host defaults to 'localhost'
+    #   Be sure to use HTSP 'port', defaults to '9982'
+    #   'host' defaults to 'localhost'
+    #   'debug_info' defaults to 0
+    #    setting it to 1 will output all details of client to server communication, which is normally not required
     # Setup
-    my $msg = { 'method' => 'hello', 'htspversion' => 43, 'clientname' => "$creator", 'clientversion' => "v$Tvh::Htsp::Client::VERSION" };
+    my $msg = { method => 'hello', htspversion => 43, clientname => $creator, clientversion => "v$Tvh::Htsp::Client::VERSION" };
     my $reply = $htsp->htsp_send_recv($msg);
     # Tvheadend HTSP API or JSON API via HTTP Proxy using HTSP 'api' method
     $msg = { method => 'api', path => 'channel/grid', args => { start => 0, limit => 99999, sort => 'number', dir => 'desc' } };
@@ -28,6 +30,9 @@ Version 0.03
     # -- or --
     #
     # Dump epgdb.v3 TVH Electronic Program Guide (EPG) database in json format
+    #   we do not need the client connection to the HTSP server and set parameter 'no_client' to 1
+    #   database version 3 sligthly deviates from the HTSP protocol, we  set parameter 'epgdb_v3' to 1
+    #   database version 2 uses HTSP protocol, no need to set 'epgdb_v3' in this case
     my $htsp = Tvh::Htsp::Client->new( { no_client => 1, epgdb_v3 => 1 } );
     my $epgdb = qx(7zz e -so /var/lib/tvheadend/epgdb.v3 2>/dev/null);    # unzip epgdb.v3 to string
     my $db=[];
@@ -119,7 +124,7 @@ Ulrich Buck, `<ulibuck at cpan.org>`
 
 # License and Copyright
 
-This software is Copyright (c) 2025 by Ulrich Buck.
+This software is Copyright (c) 2026 by Ulrich Buck.
 
 This is free software, licensed under:
 

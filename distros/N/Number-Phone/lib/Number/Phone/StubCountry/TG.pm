@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20260306161714;
+our $VERSION = 1.20260610205505;
 
 my $formatters = [
                 {
@@ -66,24 +66,24 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{es} = {"22824", "Región\ Plateaux",
-"22826", "Región\ de\ Kara",
-"22823", "Región\ Marítima",
-"22825", "Región\ Central",
-"22822", "Lomé",
-"22827", "Región\ de\ Savannah",};
-$areanames{fr} = {"22823", "Région\ Maritime",
-"22826", "Région\ de\ la\ Kara",
-"22824", "Région\ des\ Plateaux",
-"22827", "Région\ des\ Savanes",
-"22822", "Lomé",
-"22825", "Région\ Centrale",};
-$areanames{en} = {"22824", "Plateaux\ region",
-"22826", "Kara\ region",
-"22823", "Maritime\ region",
-"22825", "Central\ region",
+$areanames{en} = {"22826", "Kara\ region",
 "22822", "Lome",
-"22827", "Savannah\ region",};
+"22825", "Central\ region",
+"22827", "Savannah\ region",
+"22823", "Maritime\ region",
+"22824", "Plateaux\ region",};
+$areanames{es} = {"22824", "Región\ Plateaux",
+"22823", "Región\ Marítima",
+"22827", "Región\ de\ Savannah",
+"22826", "Región\ de\ Kara",
+"22822", "Lomé",
+"22825", "Región\ Central",};
+$areanames{fr} = {"22822", "Lomé",
+"22826", "Région\ de\ la\ Kara",
+"22825", "Région\ Centrale",
+"22823", "Région\ Maritime",
+"22824", "Région\ des\ Plateaux",
+"22827", "Région\ des\ Savanes",};
 my $timezones = {
                '' => [
                        'Africa/Lome'

@@ -1,3 +1,8 @@
+0.000050  2026-06-10 14:14:43-07:00 America/Los_Angeles
+
+    - Watcher teardown blocks on the reap after sending SIGKILL instead of racing a deadline that was too short at low QDB_STOP_GRACE.
+    - t/Pool wraps every server-spawning db()/fetch_db() in the resource-skip helper so a semaphore-exhausted host skips instead of failing.
+
 0.000049  2026-06-09 17:14:55-07:00 America/Los_Angeles
 
     - Added Driver::destroy_quietly(): fast-destroy teardown for disposable clones (cleanup => 1) that kills, reaps, and removes the data dir immediately instead of a graceful shutdown that can block 2*QDB_STOP_GRACE+2 seconds.

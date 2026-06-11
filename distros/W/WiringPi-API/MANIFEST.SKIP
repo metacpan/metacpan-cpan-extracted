@@ -1,4 +1,5 @@
 examples/a.out$
+^plans/
 _Inline
 .bs$
 .c$
@@ -35,3 +36,5 @@ build/
 .bblog$
 .base$
 main$
+^.claude/
+patch/

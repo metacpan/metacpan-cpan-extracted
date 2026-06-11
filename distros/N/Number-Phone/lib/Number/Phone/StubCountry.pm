@@ -24,7 +24,18 @@ sub country_code {
 
 sub country {
     my $self = shift;
+
     if(exists($self->{country})) { return $self->{country}; }
+
+    if($self->_may_be_noncanonical_number) {
+        my $digits = $self->format_using('MSISDN');
+        foreach my $translated_prefix (keys %Number::Phone::Country::number_translations) {
+            if($digits =~ /^$translated_prefix/) {
+                return $self->{country} = $self->canonical_number->country;
+            }
+        }
+    }
+
     ref($self)=~ /::(\w+?)$/;
     return $self->{country} = $1;
 }
@@ -110,6 +121,27 @@ sub timezones {
   }
 
   return undef;
+}
+
+sub _intra_country_dial_to_leading_0 {
+    my($from, $to) = @_;
+    return '0'.$to->raw_number;
+}
+
+sub intra_country_dial_to {
+    my($from, $to) = @_;
+    if(
+        my $icdt_sub = {
+            IE => \&_intra_country_dial_to_leading_0,
+            GB => \&_intra_country_dial_to_leading_0,
+            JE => \&_intra_country_dial_to_leading_0,
+            GG => \&_intra_country_dial_to_leading_0,
+            IM => \&_intra_country_dial_to_leading_0,
+        }->{$from->country}
+    ) {
+        return $icdt_sub->($from, $to);
+    }
+    return $from->SUPER::intra_country_dial_to();
 }
 
 1;

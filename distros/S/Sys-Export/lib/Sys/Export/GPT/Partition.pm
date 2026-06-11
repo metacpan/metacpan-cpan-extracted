@@ -1,6 +1,6 @@
 package Sys::Export::GPT::Partition;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 # ABSTRACT: Describes a partition entry for a GPT partition table
 
 use v5.26;
@@ -73,7 +73,7 @@ Bitwise-or of flags.
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

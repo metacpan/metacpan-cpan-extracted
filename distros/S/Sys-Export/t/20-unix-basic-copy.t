@@ -4,14 +4,14 @@ use lib (__FILE__ =~ s,[^\\/]+$,lib,r);
 use Test2AndUtils;
 use experimental qw( signatures );
 use Sys::Export::Unix;
+use Sys::Export qw( S_IFDIR S_IFREG S_IFLNK S_ISLNK S_IFCHR S_IFSOCK );
 use File::stat;
 use Socket;
-use Fcntl qw( S_IFDIR S_IFREG S_IFLNK S_ISLNK S_IFCHR S_IFSOCK );
 use autodie;
 
-my $tmp= File::Temp->newdir;
+my $tmp= tmpdir;
 
-my $exporter= Sys::Export::Unix->new(src => $tmp, dst => File::Temp->newdir);
+my $exporter= Sys::Export::Unix->new(src => $tmp, dst => tmpdir);
 note "exporter src: '".$exporter->src."' dst: '".$exporter->dst."'";
 
 umask 022;
@@ -28,7 +28,7 @@ my @mode_check= (
 
 subtest symlinks => sub {
    # Only test symlink creation on platforms that support it
-   unless (eval { symlink "./datafile", "$tmp/usr/local/datafile2" or die }) {
+   unless (eval { symlink "datafile", "$tmp/usr/local/datafile2" or die }) {
       note "symlink check: ".($@//$!);
       skip_all "No symlink support on $^O";
    }

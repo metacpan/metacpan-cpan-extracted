@@ -1,6 +1,6 @@
 package Sys::Export::ISO9660Hybrid;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 # ABSTRACT: Write ISO9660 filesystem overlaid on MBR+GPT partition EFI filesystem
 
 use v5.26;
@@ -361,7 +361,7 @@ and MBR partition tables.
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

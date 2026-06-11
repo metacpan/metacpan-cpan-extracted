@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20260306161712;
+our $VERSION = 1.20260610205502;
 
 my $formatters = [
                 {
@@ -49,34 +49,27 @@ my $validators = {
                 'fixed_line' => '
           9619\\d{5}|
           (?:
-            1\\d|
-            2[013-79]|
-            3[0-8]|
+            [1-3]\\d|
             4[013-689]
           )\\d{6}
         ',
                 'geographic' => '
           9619\\d{5}|
           (?:
-            1\\d|
-            2[013-79]|
-            3[0-8]|
+            [1-3]\\d|
             4[013-689]
           )\\d{6}
         ',
                 'mobile' => '
+          5(?:
+            4[0-29]|
+            6[0-4]
+          )\\d{6}|
           (?:
-            5(?:
-              4[0-29]|
-              5\\d|
-              6[0-3]
-            )|
-            6(?:
-              [569]\\d|
-              7[0-6]
-            )|
-            7[7-9]\\d
-          )\\d{6}
+            55|
+            6\\d|
+            7[7-9]
+          )\\d{7}
         ',
                 'pager' => '',
                 'personal_number' => '',
@@ -85,20 +78,27 @@ my $validators = {
                 'voip' => '98[23]\\d{6}'
               };
 my %areanames = ();
-$areanames{en} = {"21338", "Annaba\/Skikda",
+$areanames{en} = {"21322", "Algiers",
+"21329", "Ghardaia\/Illizi\/Tamanrasset",
+"21341", "Oran",
+"21327", "Chlef",
+"21338", "Annaba\/Skikda",
+"21326", "Bouira\/Tizi\ Ouzou",
+"21325", "Blida\/Médéa",
 "21334", "Béjaïa\/Jijel",
 "21321", "Algiers",
-"21327", "Chlef",
 "21333", "Batna\/Beskra",
-"21329", "Ghardaia\/Illizi\/Tamanrasset",
-"21335", "Bordj\ Bou\ Arreridj",
-"21332", "El\ Oued",
-"21331", "Constantine",
-"21337", "Tebessa",
+"21349", "Adrar\/Béchar\/Tindouf",
 "21344", "Blida",
 "21343", "Tlemcen",
-"21349", "Adrar\/Béchar\/Tindouf",
-"21341", "Oran",};
+"21337", "Tebessa",
+"21332", "El\ Oued",
+"21339", "Skikda",
+"21328", "Algiers",
+"21335", "Bordj\ Bou\ Arreridj",
+"21324", "Boumerdès\/Tipaza",
+"21331", "Constantine",
+"21323", "Algiers",};
 my $timezones = {
                '' => [
                        'Europe/Paris'

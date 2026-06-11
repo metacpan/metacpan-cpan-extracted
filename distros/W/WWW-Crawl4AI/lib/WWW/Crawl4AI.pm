@@ -12,7 +12,7 @@ use WWW::Crawl4AI::Detect ();
 use WWW::Crawl4AI::StrategyChain ();
 use WWW::Crawl4AI::DeepCrawlIterator ();
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 
 has strategy_chain => (
@@ -312,7 +312,7 @@ WWW::Crawl4AI - Perl client and fallback orchestrator for Crawl4AI
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

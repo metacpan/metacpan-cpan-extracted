@@ -157,7 +157,7 @@ WWW::Crawl4AI::Result - normalized result of a WWW::Crawl4AI strategy chain
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

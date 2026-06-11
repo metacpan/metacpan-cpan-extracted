@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20260306161713;
+our $VERSION = 1.20260610205503;
 
 my $formatters = [
                 {
@@ -55,7 +55,7 @@ my $validators = {
                 48
               )
             )|
-            8[0-589]\\d\\d
+            8[0-389]\\d\\d
           )\\d{3}
         ',
                 'geographic' => '
@@ -80,7 +80,7 @@ my $validators = {
                 48
               )
             )|
-            8[0-589]\\d\\d
+            8[0-389]\\d\\d
           )\\d{3}
         ',
                 'mobile' => '
@@ -89,7 +89,7 @@ my $validators = {
             [23679]\\d|
             4[015]|
             5[0-489]|
-            8[67]
+            8[4-7]
           )\\d{5}
         ',
                 'pager' => '',
@@ -99,51 +99,51 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"220567", "Sotuma",
-"2205676", "Georgetown",
-"2205541", "Kwenella",
-"2204414", "Sanyang",
-"22043", "Bundung\/Serekunda",
-"2204486", "Gunjur",
-"22042", "Banjul",
-"2205542", "Nyorojattaba",
-"2204487", "Faraba",
-"220566", "Baja\ Kunda\/Basse\/Fatoto\/Gambisara\/Garawol\/Misera\/Sambakunda\/Sudowol",
-"2204481", "Brikama\/Kanilia",
-"2205666", "Numeyel",
-"2204419", "Kartong",
-"2205546", "Kudang",
-"2204482", "Brikama\/Kanilia",
-"2205547", "Jareng",
-"2204488", "Sibanor",
-"2205545", "Pakaliba",
-"2205674", "Bansang",
-"2204416", "Tujereng",
-"2205678", "Brikama\-Ba",
-"2205710", "Barra",
-"2204417", "Sanyang",
-"2205665", "Kuntaur",
+$areanames{en} = {"2205545", "Pakaliba",
 "2204484", "Brikama\/Kanilia",
-"220447", "Yundum",
-"2205738", "Ngensanjal",
-"2204489", "Bwiam",
-"2205725", "Iliasa",
-"2204485", "Kafuta",
-"2205544", "Bureng",
-"2205735", "Farafenni",
-"2204412", "Tanji",
-"220446", "Kotu\/Senegambia",
-"220574", "Kaur",
-"220553", "Soma",
-"2204410", "Brufut",
-"2205543", "Japeneh\/Soma",
-"22044195", "Berending",
-"220449", "Bakau",
+"2204414", "Sanyang",
+"220567", "Sotuma",
 "2205540", "Kaiaf",
-"2205723", "Njabakunda",
+"2205547", "Jareng",
+"220447", "Yundum",
+"2205674", "Bansang",
+"2205665", "Kuntaur",
+"220449", "Bakau",
+"2205738", "Ngensanjal",
+"22044195", "Berending",
 "2204483", "Brikama\/Kanilia",
-"2205714", "Ndugukebbe",
+"22042", "Banjul",
+"2204481", "Brikama\/Kanilia",
+"2205725", "Iliasa",
+"2205710", "Barra",
+"2204486", "Gunjur",
+"2204416", "Tujereng",
+"2205735", "Farafenni",
 "2205720", "Kerewan",
+"2205676", "Georgetown",
+"2204419", "Kartong",
+"2204489", "Bwiam",
+"2205542", "Nyorojattaba",
+"2204412", "Tanji",
+"2204488", "Sibanor",
+"2205666", "Numeyel",
+"2204482", "Brikama\/Kanilia",
+"220553", "Soma",
+"2205678", "Brikama\-Ba",
+"2205541", "Kwenella",
+"2205543", "Japeneh\/Soma",
+"2205546", "Kudang",
+"22043", "Bundung\/Serekunda",
+"2205714", "Ndugukebbe",
+"220446", "Kotu\/Senegambia",
+"2204487", "Faraba",
+"220574", "Kaur",
+"2204417", "Sanyang",
+"2204410", "Brufut",
+"2205723", "Njabakunda",
+"2205544", "Bureng",
+"2204485", "Kafuta",
+"220566", "Baja\ Kunda\/Basse\/Fatoto\/Gambisara\/Garawol\/Misera\/Sambakunda\/Sudowol",
 "2204480", "Bondali",};
 my $timezones = {
                '' => [

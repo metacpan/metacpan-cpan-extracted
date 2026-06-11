@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use DateTime;
-use Digest::MD5 qw(md5_hex);
+use Crypt::SysRandom qw(random_bytes);
 use HTTP::Request::Common;
 use JSON::MaybeXS;
 use LWP::UserAgent;
@@ -67,7 +67,7 @@ sub _default_args_v1 {
         consumer_secret  => $self->provider_settings->{tokens}{consumer_secret},
         signature_method => $self->provider_settings->{signature_method} || 'HMAC-SHA1',
         timestamp        => DateTime->now->epoch,
-        nonce            => md5_hex(time),
+        nonce            => unpack('H*', random_bytes(16)),
     );
 }
 
@@ -177,7 +177,7 @@ sub _get_token {
     my $session_data = $session->read('oauth') || {};
 
     if( $self->protocol_version < 2 ) {
-	    return $self->settings->{error_url} || '/' unless( defined($request->param('oauth_token')) );
+        return $self->settings->{error_url} || '/' unless( defined($request->param('oauth_token')) );
         my $at_request = Net::OAuth->request( 'access token' )->new(
            $self->_default_args_v1,
             token          => $request->param('oauth_token'),
@@ -209,6 +209,8 @@ sub _get_token {
         $args{client_id} = $self->provider_settings->{tokens}{client_id};
         $args{client_secret} = $self->provider_settings->{tokens}{client_secret};
         $args{redirect_uri} = $self->_callback_url;
+        %args = (%args, %{ $self->provider_settings->{query_params}{authorize} || {} });
+
         my $response = $self->{ua}->request( POST $uri->as_string, \%args );
 
         if( $response->is_success ) {
@@ -248,6 +250,7 @@ sub _get_token {
 
         } else {
           $self->{dsl}->app->log(debug => "Auth::OAuth::Provider::".$self->_provider.": Token request for grant_type ".$args{grant_type}." failed with ".$response->status_line);
+          $self->{dsl}->app->log(debug => "Auth::OAuth::Provider::".$self->_provider.": payload returned is ". $response->content);
           return undef;
         }
     }

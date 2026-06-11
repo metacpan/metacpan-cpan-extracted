@@ -1,7 +1,27 @@
 Revision history for Sub-Private
 
+0.05	Wed Jun 10 08:32:26 EDT 2026
+	[ Enhancements ]
+	Added enforce mode for OO-safe private access ($config{mode} = 'enforce')
+	Added declarative form: use Sub::Private qw(_helper) (enforce mode only)
+	Added $BYPASS and %config public variables
+	Added _wrap/_check_access/_process_one/_assert_private_caller internals
+	Subclasses are blocked in enforce mode (private = owner only, no isa check)
+	Updated POD: SYNOPSIS, both modes, CONFIGURATION, BYPASS, MESSAGES, FORMAL SPEC
+	Fixed http => https in SUPPORT links
+	Added SEE ALSO entry for Sub::Protected
+	Added Test Dashboard
+
+	[ Testing ]
+	Added test suite: basic.t, enforce.t, bypass.t, declarative.t, edge_cases.t,
+	    function.t, unit.t, integration.t
+
+	[ Build ]
+	Migrated build system from Module::Build (Build.PL) to ExtUtils::MakeMaker (Makefile.PL)
+	Updated CI: .travis.yml and .appveyor.yml use perl Makefile.PL && make && make test
+
 0.04	Mon Jul 15 07:57:40 EDT 2024
-	Added dependancy on Test::More (RT#154368)
+	Added dependency on Test::More (RT#154368)
 
 0.03	Fri Jul 12 08:29:42 EDT 2024
 	Added SEE ALSO link to Sub::Deprecated (thanks to neilb)

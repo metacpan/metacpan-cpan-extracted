@@ -3,10 +3,10 @@ use warnings;
 use lib (__FILE__ =~ s,[^\\/]+$,lib,r);
 use Test2AndUtils;
 use experimental qw( signatures );
-my $tmp = File::Temp->newdir;
-
 use Sys::Export::Unix::UserDB;
 use File::Spec::Functions qw(catfile catdir);
+
+my $tmp = tmpdir;
 
 subtest 'constructor and attributes' => sub {
    my $db = Sys::Export::Unix::UserDB->new;

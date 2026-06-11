@@ -1,7 +1,7 @@
 package Sys::Export::Unix;
 
 # ABSTRACT: Export subsets of a UNIX system
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 
 use v5.26;
@@ -28,9 +28,12 @@ sub new {
       : croak "Expected hashref or even-length list";
 
    defined $attrs{src} or croak "Require 'src' attribute";
-   my $abs_src= abs_path($attrs{src} =~ s,(?<=[^/])$,/,r)
+   # must end with trailing '/'
+   $attrs{src} .= '/' unless $attrs{src} =~ m{/\z};
+   my $src_abs= abs_path($attrs{src})
       or croak "src directory '$attrs{src}' does not exist";
-   $attrs{src_abs}= $abs_src eq '/'? $abs_src : "$abs_src/";
+   $src_abs .= '/' unless $src_abs =~ m{/\z};
+   $attrs{src_abs}= $src_abs;
 
    defined $attrs{dst} or croak "Require 'dst' attribute";
    if (isa_export_dst $attrs{dst}) {
@@ -71,14 +74,11 @@ sub new {
       }
    }
 
-   $attrs{src_exe_PATH} //= "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-                          . ($abs_src eq '/'? ":$ENV{PATH}" : '');
-
    my $self= bless \%attrs, $class;
 
-   # Run the accessor logic to initialize the parameter
-   for my $method (qw( src_exe_PATH log )) {
-      $self->$method(delete $self->{$method})
+   # Run the accessor logic to coerce the parameter properly
+   for my $method (qw( src_exe_path src_lib_path log )) {
+      $self->$method(delete $self->{$method}) if exists $self->{$method};
    }
    # Special cases - call the method once for each key/value pair
    for my $method (qw( rewrite_path rewrite_user rewrite_group )) {
@@ -111,26 +111,70 @@ sub log {
    $_[0]{log};
 }
 
-sub src_exe_PATH($self, @value) {
-   $self->src_exe_PATH_list(map split(/:/, $_, -1), @value) if @value;
-   return join ':', map "/$_", $self->src_exe_PATH_list;
+sub _distinct_abs_directories($self, $warn, @list) {
+   for (@list) {
+      my $abs= $self->_src_abs_path($_); # resolve symlinks
+      if (defined $abs && -d $self->src_abs . $abs) {
+         $_= $abs;
+      } else {
+         $self->log->warn("No such directory $_") if $warn;
+         $_= undef;
+      }
+   }
+   my %seen;
+   return [ grep defined && !$seen{$_}++, @list ]
 }
 
-sub src_exe_PATH_list($self, @value) {
+sub src_exe_path($self, @value) {
+   $self->src_exe_path_list(
+      ref $value[0] eq 'ARRAY'? @{ $value[0] }
+      : map split(/:/, $_, -1), @value
+   ) if @value;
+   return join ':', map "/$_", $self->src_exe_path_list;
+}
+
+sub src_exe_path_list($self, @value) {
    if (@value) {
-      for (grep length, @value) {
-         $_= $self->_src_abs_path($_); # resolve symlinks
-         $_= undef unless length && -d $self->src_abs . $_;
-      }
-      my %seen;
-      $self->{src_exe_PATH_list}= [ grep length && !$seen{$_}++, @value ];
+      $self->{src_exe_path}= $self->_distinct_abs_directories(1, @value);
    }
-   return @{ $self->{src_exe_PATH_list} // [] };
+   return @{ $self->{src_exe_path} //= $self->_build_src_exe_path };
+}
+
+sub _build_src_exe_path($self) {
+   my @exe_path= qw( usr/local/sbin usr/local/bin usr/sbin usr/bin sbin bin );
+   push @exe_path, grep s{^/}{}, split /:/, $ENV{PATH}
+      if $self->src_abs eq '/';
+   return $self->_distinct_abs_directories(0, @exe_path);
+}
+
+# back-compat
+*src_exe_PATH= *src_exe_path;
+*src_exe_PATH_list= *src_exe_path_list;
+
+sub src_lib_path($self, @value) {
+   $self->src_lib_path_list(
+      ref $value[0] eq 'ARRAY'? @{ $value[0] }
+      : map split(/:/, $_, -1), @value
+   ) if @value;
+   return join ':', map "/$_", $self->src_lib_path_list;
+}
+
+sub src_lib_path_list($self, @value) {
+   if (@value) {
+      $self->{src_lib_path}= $self->_distinct_abs_directories(1, @value);
+   }
+   return @{ $self->{src_lib_path} //= $self->_build_src_lib_path };
+}
+
+sub _build_src_lib_path($self) {
+   return $self->_distinct_abs_directories(0,
+      qw( usr/local/lib64 usr/local/lib usr/lib64 usr/lib lib64 lib )
+   );
 }
 
 #=attribute _can_run_in_src
 #
-#This is a boolean that indicates whether executable in the source directory can be executed
+#This is a boolean that indicates whether executables in the source directory can be executed
 #on this host.  This is always true if "src" is '/', since perl wouldn't be able to run in this
 #environment to run Sys::Export if that weren't true.  If src is any other path, this module
 #needs 'chroot' permission, and tests using C<< chroot $srcdir /bin/sh -c 'exit 0' >>.
@@ -275,6 +319,7 @@ sub _chroot_abs_path($self, $root, $path) {
       elsif (S_ISLNK($mode)) {
          return undef if --$lim <= 0;
          defined (my $newpath= readlink $abs) or return undef;
+         $newpath =~ s{\\}{/}g if $^O eq 'MSWin32';
          @abs= @base if $newpath =~ m,^/,;
          unshift @parts, grep length && $_ ne '.', split '/', $newpath;
       }
@@ -291,6 +336,10 @@ sub _chroot_abs_path($self, $root, $path) {
 sub _src_abs_path($self, $path) {
    $self->_chroot_abs_path($self->{src_abs}, $path);
 }
+
+# Like src_abs_path, this performs a logical abs_path on all path components *except* the final
+# one, so the parent directories will be resolved to an absolute path, but the leaf directory
+# entry is not resolved and doesn't even need to exist.
 sub _src_parent_abs_path($self, $path) {
    # Determine the final path component, ignoring '.'
    my @path= grep length && $_ ne '.', split '/', $path;
@@ -538,6 +587,17 @@ sub add {
 }
 
 
+sub src_glob($self, @patterns) {
+   my $src_abs= $self->src_abs;
+   # remove leading '/' from patterns
+   s{^/}{} for @patterns;
+   my @ret;
+   push @ret, map substr($_, length $src_abs), glob "$src_abs$_"
+      for @patterns;
+   return @ret;
+}
+
+
 my sub isa_filter { ref $_[0] eq 'Regexp' || ref $_[0] eq 'CODE' }
 sub src_find($self, @paths) {
    my $filter;
@@ -593,8 +653,10 @@ sub src_find($self, @paths) {
 
 sub src_which($self, $name) {
    $name =~ m,/, and croak '->src_which($name) should not include a path separator';
-   for ($self->src_exe_PATH_list) {
-      return "$_/$name" if -x $self->src_abs . "$_/$name";
+   for ($self->src_exe_path_list) {
+      return "$_/$name" if -x $self->src_abs . "$_/$name"
+                        # -x isn't meaningful on Win32, so fall back to -e
+                        or $^O eq 'MSWin32' && -e _;
    }
    return undef;
 }
@@ -714,7 +776,7 @@ sub process_file($self, $file, $notes) {
 }
 
 sub _resolve_src_library($self, $libname, $rpath) {
-   my @paths= ((grep length, split /:/, ($rpath//'')), qw( lib lib64 usr/lib usr/lib64 ));
+   my @paths= ((grep length, split /:/, ($rpath//'')), $self->src_lib_path_list);
    for my $path (@paths) {
       $path =~ s,^/,,; # remove leading slash because src_abs ends with slash
       $path =~ s,(?<=[^/])\z,/, if length $path; # add trailing slash if it isn't the root
@@ -747,35 +809,39 @@ sub process_elf_file($self, $file, $notes) {
          $self->add($interpreter);
       }
       $self->log->debugf("  interpreter = %s, libs = %s", $interpreter, \@libs);
-   }
-   # Is any path rewriting requested?
-   if ($self->_has_rewrites && length $file->{src_path} && defined $interpreter) {
-      # If any dep gets its path rewritten, need to modify interpreter and/or rpath
-      my $rre= $self->path_rewrite_regex;
-      if (grep m/^$rre/, $interpreter, @libs) {
-         # the interpreter and rpath need to be absolute URLs, but within the logical root
-         # of 'dst'.  They're already relative to 'dst', so just prefix a slash.
-         $interpreter= '/'.$self->get_dst_for_src($interpreter);
-         my %rpath;
-         for (@libs) {
-            my $dst_lib= $self->get_dst_for_src($_);
-            $dst_lib =~ s,[^/]+$,,; # path of lib
-            $rpath{$dst_lib}= 1;
+      # Is any path rewriting requested?
+      if ($self->_has_rewrites && (defined $interpreter || @libs)) {
+         # If any dep gets its path rewritten, need to modify interpreter and/or rpath
+         my $rre= $self->path_rewrite_regex;
+         my @patchelf;
+         if (defined $interpreter && $interpreter =~ m/^$rre/) {
+            # the interpreter and rpath need to be absolute URLs, but within the logical root
+            # of 'dst'.  They're already relative to 'dst', so just prefix a slash.
+            push @patchelf, '--set-interpreter' => '/'.$self->get_dst_for_src($interpreter);
          }
-         my $rpath= join ':', map "/$_", keys %rpath;
-         $self->log->debugf("  rewritten interpreter = %s, rpath = %s", $interpreter, $rpath);
-
-         # Create a temporary file so we can run patchelf on it
-         my $tmp= File::Temp->new(DIR => $self->tmp, UNLINK => 0);
-         _syswrite_all($tmp, $file->{data});
-         $tmp->close;
-         my @patchelf= ( '--set-interpreter' => $interpreter );
-         push @patchelf, ( '--set-rpath' => $rpath ) if length $rpath;
-         $self->_patchelf($tmp, @patchelf);
-         $file->{data}= map_or_load_file("$tmp");
-         push @$notes, '+patchelf';
-      } else {
-         $self->log->debug("  no interpreter/lib paths affected by rewrites");
+         if (grep m/^$rre/, @libs) {
+            my %rpath;
+            for (@libs) {
+               my $dst_lib= $self->get_dst_for_src($_);
+               $dst_lib =~ s,[^/]+$,,; # path of lib
+               $rpath{$dst_lib}= 1;
+            }
+            if (keys %rpath) {
+               push @patchelf, '--set-rpath' => join(':', map "/$_", keys %rpath);
+            }
+         }
+         if (@patchelf) {
+            $self->log->debug(join ' ', "  patchelf rewrites: ", @patchelf);
+            # Create a temporary file so we can run patchelf on it
+            my $tmp= File::Temp->new(DIR => $self->tmp, UNLINK => 0);
+            _syswrite_all($tmp, $file->{data});
+            $tmp->close;
+            $self->_patchelf($tmp, @patchelf);
+            $file->{data}= map_or_load_file("$tmp");
+            push @$notes, '+patchelf';
+         } else {
+            $self->log->debug("  no interpreter/lib paths affected by rewrites");
+         }
       }
    }
 }
@@ -1182,7 +1248,7 @@ paths inside this filesystem, or things will break.
 
 The C<abs_path> of the root of the source filesystem, always ending with '/'.
 
-=head2 src_exe_PATH
+=head2 src_exe_path
 
 A string like the Unix PATH environment variable which lists the directories to search for
 executables.  Each directory path is relative to the C<src> dir.
@@ -1198,9 +1264,21 @@ When you set a new value (or the initial value from the constructor) for this va
 performs sanitization and deduplication of the paths.   The actual value is stored in list form
 at L</src_exe_PATH_list>, but reading this attribute re-joins them with colons.
 
-=head2 src_exe_PATH_list
+=head2 src_exe_path_list
 
 Same logical value as C<src_exe_PATH>, but returns a list of paths relative to C<src>, useful
+for iteration.
+
+=head2 src_lib_path
+
+A string like the Unix LD_LIBRARY_PATH environment variable which lists the directories to
+search for ELF libraries.  Each directory path is relative to the C<src> dir.  The default is
+
+  "lib:lib64:usr/lib:usr/lib64"
+
+=head2 src_lib_path_list
+
+Same logical value as C<src_lib_path>, but returns a list of paths relative to C<src>, useful
 for iteration.
 
 =head2 src_userdb
@@ -1353,6 +1431,15 @@ Array-notation provides a C<name> attribute rather than a C<src_path>, so those 
 rewritten.
 
 Returns C<$exporter> for chaining.
+
+=head2 src_glob
+
+This is a helper to build a list of source files using shell wildcard "glob" notation.
+This accepts patterns relative to L</src_abs> and returns filenames relative to L</src_abs>.
+
+  my @files= $exporter->src_glob("foo/bar/*/baz", ...);
+
+It uses perl's own C<glob> function.
 
 =head2 src_find
 
@@ -1508,7 +1595,7 @@ needed for that source ID.
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

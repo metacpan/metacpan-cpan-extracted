@@ -1,6 +1,6 @@
 package Sys::Export::VFAT::File;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 # ABSTRACT: Represents a file in VFAT, including packed encodings of directories
 
 use v5.26;
@@ -113,7 +113,7 @@ True if L</flags> indicate that this is a directory.
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

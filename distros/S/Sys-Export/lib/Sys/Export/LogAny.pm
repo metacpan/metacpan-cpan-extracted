@@ -1,6 +1,6 @@
 package Sys::Export::LogAny;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 # ABSTRACT: Use Log::Any without depending on it
 
 
@@ -9,7 +9,8 @@ use warnings;
 
 if (eval 'use Log::Any 1.051; 1') {
    our @ISA= ( 'Log::Any' );
-   Log::Any->import(default_adapter => [ 'Stderr', log_level => 'info' ]);
+   my $lev= !$ENV{DEBUG}? 'info' : $ENV{DEBUG} > 1? 'trace' : 'debug';
+   Log::Any->import(default_adapter => [ 'Stderr', log_level => $lev ]);
 } else {
    *get_logger= sub { bless {}, 'Sys::Export::LogAny::_Logger'; };
    *import= sub {
@@ -74,7 +75,7 @@ minimum log object that logs to STDERR.
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

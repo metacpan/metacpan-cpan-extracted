@@ -29,7 +29,7 @@ skip_all 'No docker access, or unable to fetch alpine image'
 # If the user provided a docker image name, we can cache things into the image.
 # Otherwise we need to pass all of that into the 'run' command and perform the
 # package installs as part of the entrypoint.
-my $tmp= File::Temp->newdir;
+my $tmp= tmpdir;
 my @cmd;
 if ($ENV{DOCKER_TEST_IMAGE_NAME}) {
    mkfile("$tmp/Dockerfile", <<~'END');

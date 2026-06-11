@@ -18,55 +18,55 @@ name: WWW-Crawl4AI
 provides:
   WWW::Crawl4AI:
     file: lib/WWW/Crawl4AI.pm
-    version: '0.002'
+    version: '0.003'
   WWW::Crawl4AI::Attempt:
     file: lib/WWW/Crawl4AI/Attempt.pm
-    version: '0.002'
+    version: '0.003'
   WWW::Crawl4AI::Client:
     file: lib/WWW/Crawl4AI/Client.pm
-    version: '0.002'
+    version: '0.003'
   WWW::Crawl4AI::DeepCrawlIterator:
     file: lib/WWW/Crawl4AI/DeepCrawlIterator.pm
-    version: '0.002'
+    version: '0.003'
   WWW::Crawl4AI::Detect:
     file: lib/WWW/Crawl4AI/Detect.pm
-    version: '0.002'
+    version: '0.003'
   WWW::Crawl4AI::Error:
     file: lib/WWW/Crawl4AI/Error.pm
-    version: '0.002'
+    version: '0.003'
   WWW::Crawl4AI::Markdown:
     file: lib/WWW/Crawl4AI/Markdown.pm
-    version: '0.002'
+    version: '0.003'
   WWW::Crawl4AI::Request:
     file: lib/WWW/Crawl4AI/Request.pm
-    version: '0.002'
+    version: '0.003'
   WWW::Crawl4AI::Result:
     file: lib/WWW/Crawl4AI/Result.pm
-    version: '0.002'
+    version: '0.003'
   WWW::Crawl4AI::Strategy:
     file: lib/WWW/Crawl4AI/Strategy.pm
-    version: '0.002'
+    version: '0.003'
   WWW::Crawl4AI::Strategy::Browser:
     file: lib/WWW/Crawl4AI/Strategy/Browser.pm
-    version: '0.002'
+    version: '0.003'
   WWW::Crawl4AI::Strategy::Callback:
     file: lib/WWW/Crawl4AI/Strategy/Callback.pm
-    version: '0.002'
+    version: '0.003'
   WWW::Crawl4AI::Strategy::CloakBrowser:
     file: lib/WWW/Crawl4AI/Strategy/CloakBrowser.pm
-    version: '0.002'
+    version: '0.003'
   WWW::Crawl4AI::Strategy::Plain:
     file: lib/WWW/Crawl4AI/Strategy/Plain.pm
-    version: '0.002'
+    version: '0.003'
   WWW::Crawl4AI::Strategy::Proxy:
     file: lib/WWW/Crawl4AI/Strategy/Proxy.pm
-    version: '0.002'
+    version: '0.003'
   WWW::Crawl4AI::Strategy::Stealth:
     file: lib/WWW/Crawl4AI/Strategy/Stealth.pm
-    version: '0.002'
+    version: '0.003'
   WWW::Crawl4AI::StrategyChain:
     file: lib/WWW/Crawl4AI/StrategyChain.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   HTTP::Message: '6.00'
   JSON::MaybeXS: '1.004000'
@@ -82,7 +82,7 @@ resources:
   bugtracker: https://github.com/Getty/p5-www-crawl4ai/issues
   homepage: https://github.com/Getty/p5-www-crawl4ai
   repository: https://github.com/Getty/p5-www-crawl4ai.git
-version: '0.002'
+version: '0.003'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -356,7 +356,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.002'
+          tag: '0.003'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:

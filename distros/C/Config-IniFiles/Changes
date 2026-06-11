@@ -1,3 +1,7 @@
+3.001000    2026-06-08
+    * Fix for CVE 2026-11527 .
+    * Add t/19utf8.t .
+
 3.000003    2020-03-24
     * Fix stray non-ASCII characters in the versions in the Changes log.
         - https://rt.cpan.org/Ticket/Display.html?id=125161

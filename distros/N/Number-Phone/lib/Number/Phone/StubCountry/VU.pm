@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20260306161714;
+our $VERSION = 1.20260610205505;
 
 my $formatters = [
                 {
@@ -58,7 +58,7 @@ my $validators = {
                 'mobile' => '
           (?:
             [58]\\d|
-            7[013-7]
+            7[0-7]
           )\\d{5}
         ',
                 'pager' => '',
@@ -78,19 +78,19 @@ my $validators = {
         '
               };
 my %areanames = ();
-$areanames{en} = {"67836", "Sanma",
-"67826", "Port\ Vila\,\ Shefa",
-"67838", "Penama\/Torba",
-"67888", "Tafea",
-"67829", "Port\ Vila\,\ Shefa",
-"67822", "Port\ Vila\,\ Shefa",
-"67825", "Port\ Vila\,\ Shefa",
-"67823", "Port\ Vila\,\ Shefa",
+$areanames{en} = {"67837", "Luganville",
+"67836", "Sanma",
 "67828", "Port\ Vila\,\ Shefa",
+"67823", "Port\ Vila\,\ Shefa",
+"67824", "Port\ Vila\,\ Shefa",
+"67822", "Port\ Vila\,\ Shefa",
+"67829", "Port\ Vila\,\ Shefa",
 "6784", "Malampa",
 "67827", "Port\ Vila\,\ Shefa",
-"67837", "Luganville",
-"67824", "Port\ Vila\,\ Shefa",};
+"67826", "Port\ Vila\,\ Shefa",
+"67825", "Port\ Vila\,\ Shefa",
+"67838", "Penama\/Torba",
+"67888", "Tafea",};
 my $timezones = {
                '' => [
                        'Pacific/Efate'

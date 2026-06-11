@@ -51,8 +51,7 @@ sub Config::IniFiles::_assert_invariants
 "Key $parm in \$self->{v}{'$sect'} and not in \$self->{parms}{'$sect'}"
                 unless ( $set{$parm}++ );
         }
-        grep
-        {
+        grep {
             croak
 "Key $_ in \$self->{parms}{'$sect'} and not in in \$self->{v}{'$sect'}"
                 unless $set{$_} eq 2

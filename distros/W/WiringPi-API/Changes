@@ -1,5 +1,254 @@
 Revision history for Perl extension WiringPi::API.
 
+3.1802  UNREL
+        - Switched from using die() to croak()
+        - Completely rewrote the C pin interrupt routine to fix a bug where
+          multiple interrupts did not work correctly
+        - Update required version of wiringPi to 3.18
+        - Fixed broken camelCase exports that resolved to no XS sub:
+          wpiToGpio -> wpiPinToGpio, lcdDefChar -> lcdCharDef,
+          lcdPutChar -> lcdPutchar
+        - Implemented wiringPiVersion(), which was exported but never defined;
+          added wiringpi_version() returning the wiringPi library version (the
+          string in scalar context, a (major, minor) pair in list context)
+        - Added t/20-board_map_precheck.t validating the phys/wpi/gpio pin maps
+          against the installed wiringPi, and t/25-wiringpi_version.t
+        - Aligned XS prototypes with the wiringPi 3.18 headers: lcdSendCommand()
+          second arg char -> unsigned char, and digitalReadByte() return type
+          int -> unsigned int
+        - Makefile.PL: corrected the stale "version 2.36+" message to report the
+          actual minimum required wiringPi version (3.18)
+        - Bumped $VERSION 2.3617 -> 3.1801 (note: 2.x -> 3.x scheme change for
+          downstream version pins); refreshed POD/README version references from
+          2.36 to 3.18 and updated the copyright year
+        - BREAKING: removed setup_sys()/setup_phys() and the backing
+          wiringPiSetupSys()/wiringPiSetupPhys() XS wraps; only setup() and
+          setup_gpio() remain supported
+        - Added Perl wrappers + exports + POD for XS subs that previously had no
+          Perl layer: soft_pwm_create/soft_pwm_write/soft_pwm_stop,
+          pi_lock/pi_unlock, and digital_read_byte/digital_read_byte2/
+          digital_write_byte/digital_write_byte2 (the byte-bank ops are
+          unsupported on the Raspberry Pi 5 - see POD)
+        - Wrapped the timing/scheduling core: delay, delayMicroseconds
+          (delay_microseconds), millis, micros, piMicros64 (pi_micros64) and
+          piHiPri (pi_hi_pri) - XS + Perl + POD
+        - Implemented the previously-unimplemented setPadDrive (set_pad_drive),
+          setPadDrivePin (set_pad_drive_pin), pwmToneWrite (pwm_tone_write) and
+          gpioClockSet (gpio_clock_set) - XS + Perl + POD
+        - Wrapped board/identity helpers: piBoardId (pi_board_id, returns a list
+          or hashref), piBoard40Pin (pi_board40_pin), piRP1Model (pi_rp1_model),
+          getPinModeAlt (get_pin_mode_alt), wiringPiGlobalMemoryAccess
+          (wiringpi_global_memory_access) and wiringPiUserLevelAccess
+          (wiringpi_user_level_access) - XS + Perl + POD
+        - Wrapped the 3.3 setup variants wiringPiSetupPinType
+          (wiringpi_setup_pin_type) and wiringPiSetupGpioDevice
+          (wiringpi_setup_gpio_device, libgpiod char-device backend) plus
+          wiringPiGpioDeviceGetFd (wiringpi_gpio_device_get_fd); added the
+          WPI_PIN_BCM / WPI_PIN_WPI constants (new :constants export tag). The
+          wrappers croak on anything but BCM/WPI - physical-pin setup stays
+          unsupported (WPI_PIN_PHYS is not exported)
+        - Wrapped the I2C block/raw additions: i2c_read_block
+          (wiringPiI2CReadBlockData), i2c_raw_read (wiringPiI2CRawRead),
+          i2c_write_block (wiringPiI2CWriteBlockData) and i2c_raw_write
+          (wiringPiI2CRawWrite) - reads return a list of bytes, writes take an
+          array reference; up to 255 bytes
+        - Implemented i2c_interface() (maps to wiringPiI2CSetupInterface); it
+          previously croaked "not available"
+        - Wrapped the SPI additions: spi_get_fd (wiringPiSPIGetFd),
+          spi_setup_mode (wiringPiSPISetupMode) and spi_close (wiringPiSPIClose)
+          - XS + Perl + POD
+        - Wrapped softTone: soft_tone_create (softToneCreate), soft_tone_write
+          (softToneWrite) and soft_tone_stop (softToneStop) - XS + Perl + POD.
+          softServo is not built into the wiringPi 3.18 library, so it is not
+          wrapped
+        - Fixed i2c_read_word() to read a 16-bit register (wiringPiI2CReadReg16)
+          instead of an 8-bit one; it now returns the full word (return value
+          changes for callers that relied on the truncated value)
+        - Fixed i2c_setup() address validation: it rejected any multi-digit
+          address (e.g. 72 / 0x48); it now accepts full decimal and 0x-hex
+          addresses and croaks on non-numeric input
+        - Fixed shift_reg_setup() range guards: the && in the bounds checks
+          could never be true, so out-of-range $num_pins (0-32) and pin
+          numbers (0-40) were silently passed through; they now croak
+        - XS serialGets() and spiDataRW() now croak() on error instead of
+          calling exit(), which killed the whole interpreter; the errors are
+          now catchable. Replaced the spiDataRW() variable-length stack array
+          with a heap buffer (Newx/Safefree)
+        - Moved #define PERL_NO_GET_CONTEXT above the perl headers so the
+          context optimisation actually applies (it was a no-op after the
+          include) - internal build change, no consumer-visible effect
+        - lcd_char_def() no longer writes a stray newline to the display
+          before defining the character (visible only if a consumer relied on
+          that side effect)
+        - Removed a duplicate pwm_set_range entry from the export list
+          (internal; pwm_set_range is still exported and unchanged)
+        - Removed the dead testChar export: it was listed in @EXPORT_OK /
+          :all / :perl but backed by no XS or Perl sub (importing succeeded,
+          calling it died). An :all or explicit import of testChar now fails
+          at use-time instead
+        - Added interrupt edge constants INT_EDGE_SETUP / INT_EDGE_FALLING /
+          INT_EDGE_RISING / INT_EDGE_BOTH (exported via :constants and :all)
+        - set_interrupt() now validates its arguments and croaks on bad input:
+          $pin must be a positive integer, $edge must be INT_EDGE_FALLING (1),
+          INT_EDGE_RISING (2) or INT_EDGE_BOTH (3), and $callback must be a
+          CODE reference
+        - Wrapped wiringPiISRStop($pin) to stop/remove an armed interrupt
+          (exported via :wiringPi and :all)
+        - Reworked the interrupt subsystem to use wiringPi's wiringPiISR2()
+          with a self-pipe: the wiringPi ISR thread now writes a fixed event
+          record to a pipe instead of calling a Perl callback from a foreign
+          thread, removing the per-pin trampolines and the dispatcher thread
+          (eliminates the cross-thread callback races). Added interrupt_fd()
+          returning the readable end of the pipe; the Perl-side dispatch
+          helpers (wait_interrupts/dispatch_interrupts) follow
+        - Removed the camelCase setInterrupt export (use set_interrupt()) and
+          the dead, never-exposed initThread
+        - Added the interrupt dispatch helpers: dispatch_interrupts() drains all
+          pending events from the self-pipe and runs each pin's callback with
+          ($edge, $timestamp_us); wait_interrupts($timeout_ms) selects on the
+          interrupt fd then dispatches. set_interrupt() callbacks fire again,
+          now in whichever interpreter services the fd. Added interrupt_dropped()
+          returning the count of events lost to a full pipe
+        - Added interrupt teardown: stop_interrupt($pin) stops the wiringPi ISR
+          for that pin and forgets its callback; stop_interrupts() stops every
+          armed pin, closes the self-pipe and resets state (a later
+          set_interrupt() re-creates it). No dispatcher thread to join
+        - set_interrupt() takes an optional 4th argument $debounce_us (default 0)
+          passed through to wiringPiISR2(); rewrote the INTERRUPT FUNCTIONS POD
+          for the self-pipe dispatch model (no threaded Perl required) and fixed
+          pre-existing POD errors (the ADC FUNCTIONS / digitalReadByte internal
+          links and stray whitespace) so podchecker is clean
+        - Added t/75-interrupts.t: hardware-free coverage of the constants,
+          set_interrupt() validation and dispatch routing on every run, plus
+          real-GPIO exercisers (both numbering schemes, re-arm, fork background,
+          teardown) gated behind PI_BOARD. Verified the full interrupt chain on
+          Pi 5 hardware with no leaks or fd leaks attributable to the module
+        - Added background_interrupt($pin, $edge, $callback, $debounce_us): forks
+          a child that arms the interrupt and runs $callback on each edge, for
+          fire-while-busy handling with one call. Returns a handle with stop/pid/
+          running; stop() is idempotent, a DESTROY + END block reap the child so
+          a forgotten stop() can't leak a zombie. Args validated before forking
+        - Added auto_dispatch_interrupts($bool): puts the interrupt fd into async
+          (SIGIO) mode and installs a $SIG{IO} handler so set_interrupt()
+          callbacks fire automatically in-process with no dispatch loop; runs at
+          Perl safe points (lock-free shared state); disable restores the prior
+          handler. Both verified on Pi 5 hardware
+        - Added last_interrupt(): returns a hashref {pin, pin_bcm, edge, status,
+          ts_us} for the most recently dispatched event (undef if none), so a
+          callback - which only receives ($edge, $ts_us) - can obtain the BCM pin
+          and status. The self-pipe record widened to carry wfiStatus.pinBCM and
+          wfiStatus.statusOK (now a 24-byte {pin, pin_bcm, edge, status, ts}
+          record); the callback signature is unchanged
+        - Added interrupt_buffer([$bytes]): get/set the self-pipe capacity
+          (F_GETPIPE_SZ/F_SETPIPE_SZ). May be set before arming (applied when the
+          pipe is created) and persists across stop_interrupts(). Documented the
+          overflow policy in the interrupt_dropped() POD: edges FIFO-queue and,
+          on a full pipe, are dropped (not merged, not blocked) and counted - so
+          loss is never silent
+        - Added run_interrupt_loop($timeout_ms, $max) and stop_interrupt_loop():
+          a blocking dispatch loop so you needn't write "wait_interrupts while 1"
+          yourself. Returns the total dispatched; stops on stop_interrupt_loop()
+          (callback/signal-safe) or after $max events; sleeps rather than
+          busy-spinning when nothing is armed
+        - background_interrupt() gained an optional trailing options hashref; the
+          {results => 1} option ships the callback's defined return value back to
+          the parent over a length-framed pipe, drained via the handle's read()
+          (non-blocking) / fh() (for select). Default behaviour is unchanged
+        - Added background_interrupts([$pin,$edge,$cb,$deb], ...): one shared
+          background child services many pins (instead of one child per pin). The
+          handle adds arm($pin)/disarm($pin) over a control pipe (callbacks are
+          fixed at fork time; the control channel toggles the registered set)
+        - auto_dispatch_interrupts() now takes an optional second argument, the
+          delivery signal (default SIGIO). A named signal (eg 'USR1') is wired
+          via F_SETSIG so it won't clash with other SIGIO/O_ASYNC users
+        - set_interrupt() now accepts an optional trailing options hashref; the
+          {auto_dispatch => 1} (or {auto_dispatch => 'USR1'}) option turns on
+          auto-dispatch as part of arming (the process-wide switch)
+        - Added lib/WiringPi/API/INTERRUPTS.pod (perldoc WiringPi::API::INTERRUPTS):
+          a complete, runnable guide to the interrupt API (cooperative dispatch,
+          hands-off auto_dispatch/background, the shared-child and results
+          channels, queue sizing, and the code flow)
+        - Fixed a heap buffer overflow in serial_gets(): the Perl wrapper passed
+          a zero-length scalar that the XS serialGets() then wrote up to $nbytes
+          into. serialGets() is now a self-allocating XSUB (Newx/Safefree) that
+          returns the exact bytes read; serial_gets() is binary-safe (embedded
+          NULs and trailing whitespace preserved - no more unpack "A*") and
+          validates its arguments. serialGets() also clears O_NONBLOCK on the fd
+          so the port's VTIME read timeout applies (short/idle reads return the
+          partial data instead of spuriously failing), and croaks on a read
+          error. Documented serial_gets() in the POD (it was exported but
+          previously undocumented)
+        - Hardened the XS spiDataRW() (backing spi_data()): each av_fetch() is
+          now NULL-checked so a sparse or undefined element in the data aref
+          croaks cleanly instead of crashing, each byte is converted once
+          (was twice), and the function was rewritten as an idiomatic PPCODE
+          XSUB (dropping the plagued dXSARGS-in-plain-C + PL_markstack_ptr
+          juggling). Behaviour for valid input is unchanged - it still returns
+          a list of the bytes read
+        - Fixed an out-of-bounds read in physPinToWpi() (and the phys_to_wpi()
+          wrapper): it indexed the 64-entry phys_wpi_map with no bounds check,
+          so a physical pin number below 0 or above 63 read past the array.
+          Out-of-range input now returns the -1 "no such pin" sentinel; the
+          Perl wrapper mirrors the guard (and treats undef/non-integer as -1).
+          Added t/80-phys_to_wpi_bounds.t
+        - Added worker($body, \%opts): forks a child that runs $body repeatedly
+          in the background (no "use threads", no threaded Perl needed), for
+          hands-off background GPIO work. Returns a WiringPi::API::Worker handle
+          with idempotent stop/pid/running; a DESTROY + END block reap the child
+          so a forgotten stop() can't leak a zombie. $body is validated to be a
+          CODE reference before forking
+        - worker() gained {results => 1} and {shared => 1} options that ship
+          $body's defined return value back to the parent over a length-framed
+          pipe. {results} streams every value, drained via the handle's read()
+          (non-blocking) / fh() (for select); {shared} keeps only the latest
+          value (lossy, non-blocking child write) read via the handle's value().
+          Default behaviour is unchanged
+        - worker() gained {interval => $secs} (the helper paces the loop, so the
+          body needs no sleep of its own) and {once => 1} (run the body exactly
+          once, then the child exits and running() goes false). interval is
+          validated to be a positive number before forking; stop() stays
+          responsive during an interval sleep
+        - worker() gained {mechanism => 'fork'|'thread'} (default 'fork'). The
+          opt-in 'thread' mechanism runs the body in an ithread for shared-memory
+          ergonomics; it croaks clearly if threads is not loaded, and rejects the
+          {results}/{shared} pipe channels (use a shared variable with pi_lock).
+          threads::shared is required only on this path - the module never loads
+          threads itself and stays usable on non-threaded Perl
+        - pi_lock()/pi_unlock() now validate the lock key (0..3) and croak on a
+          bad key, instead of passing it through to the XS layer unchecked
+        - Documented the worker concurrency API in the POD: a new "CONCURRENCY /
+          BACKGROUND WORKERS" section covering worker(), all its options, the
+          handle, the setup-once-in-main contract and a hands-off one-liner, plus
+          a cross-link from THREAD/LOCK FUNCTIONS
+        - Added t/85-worker.t covering worker(): argument-validation croaks,
+          pi_lock/pi_unlock key validation, handle lifecycle (pid/running/
+          idempotent stop), child reaping, the {results}/{shared} channels and
+          {once}/{interval} pacing off-Pi, plus a PI_BOARD-gated block driving a
+          real pin through a worker (self-skips without hardware)
+        - background_interrupts() handle now rejects read()/fh() with a clear
+          message instead of silently returning undef: the shared-child handle
+          has no per-pin results channel (that is the singular
+          background_interrupt({results => 1}) contract). The methods were only
+          inherited from the lifecycle base class, never part of the documented
+          plural surface
+        - t/pod-coverage.t whitelists the undocumented C-wrapper subs via
+          Pod::Coverage trustme so the author test passes; remove each name as
+          its POD is written
+        - Split the background interrupt/worker handle classes
+          (WiringPi::API::BackgroundInterrupt, ::BackgroundInterrupts, ::Worker,
+          ::WorkerThread) out of API.pm into their own lib files, each with its
+          own POD; API.pm now use()s them
+        - Reorganized the @wpi_c_functions and @wpi_perl_functions export lists
+          into labelled groups (setup and pin ops first, then alphabetical),
+          and expanded the EXPORT_OK POD to list every Perl wrapper in the same
+          grouping
+        - pin_mode_alt() now accepts ALT6-ALT8 (8-10) on the Pi 5 (RP1), where
+          wiringPi supports them; the 0-7 range is unchanged on a Pi 0-4. Added
+          POD documenting the RP1 alt-function differences and t/90-pin_mode_alt.t
+        - Source all constants from RPi::Const (now a prerequisite, min 1.05)
+          instead of defining them locally; the :constants/:all tags re-export
+          them, so every existing name (WPI_PIN_*, INT_EDGE_*) is unchanged
+
 2.3616  2018-03-27
         - merged PR#34; Ensure that one test always runs if PI_BOARD (Thanks
           for the pull request James Keenan!)

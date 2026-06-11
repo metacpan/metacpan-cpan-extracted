@@ -24,7 +24,7 @@ is( filedata(\'abcdef', 3, 1), object {
    call size   => 1;
 }, 'scalar ref + offset + len' );
 
-my $tmp= File::Temp->new;
+my $tmp= tmpfile;
 my $content= "A"x4096 . "B"x4096 . "C"x4096;
 $tmp->print($content);
 $tmp->close;

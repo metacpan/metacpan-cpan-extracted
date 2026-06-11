@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20260306161714;
+our $VERSION = 1.20260610205505;
 
 my $formatters = [
                 {
@@ -47,12 +47,20 @@ my $formatters = [
                 },
                 {
                   'format' => '$1 $2',
-                  'leading_digits' => '1',
+                  'leading_digits' => '
+            1(?:
+              2[02]|
+              [89]
+            )
+          ',
                   'pattern' => '(\\d{4})(\\d{4,6})'
                 },
                 {
                   'format' => '$1 $2 $3 $4',
-                  'leading_digits' => '6',
+                  'leading_digits' => '
+            1[26]|
+            6
+          ',
                   'national_rule' => '0$1',
                   'pattern' => '(\\d{2})(\\d{3})(\\d{2})(\\d{2})'
                 },
@@ -104,21 +112,27 @@ my $validators = {
           )\\d{7}
         ',
                 'mobile' => '
+          121[0-3]\\d{5}|
           (?:
+            160|
+            (?:
+              3\\d|
+              7[06-9]
+            )\\d|
             5(?:
+              [1689]\\d|
               2[238]|
               59
             )|
-            89[6-9]|
-            99[013-9]
-          )\\d{6}|
-          (?:
-            3\\d|
-            5[1689]|
-            7[06-9]|
-            8[1-8]|
-            9[0-8]
-          )\\d{7}
+            8(?:
+              [1-8]\\d|
+              9[6-9]
+            )|
+            9(?:
+              [0-8]\\d|
+              9[013-9]
+            )
+          )\\d{6}
         ',
                 'pager' => '',
                 'personal_number' => '',
@@ -139,132 +153,132 @@ my $validators = {
                 'voip' => '672\\d{6}'
               };
 my %areanames = ();
-$areanames{vi} = {"84252", "Bình\ Thuận",
-"84234", "Thừa\ Thiên\-Huế",
-"84221", "Hưng\ Yên",
-"84291", "Bạc\ Liêu",
-"84236", "TP\ Đà\ Nẵng",
-"84272", "Long\ An",
-"84269", "Gia\ Lai",
-"84203", "Quảng\ Ninh",
-"84212", "Sơn\ La",
-"84213", "Lai\ Châu",
-"84273", "Tiền\ Giang",
-"84238", "Nghệ\ An",
-"84260", "Kon\ Tum",
-"84239", "Hà\ Tĩnh",
-"84235", "Quảng\ Nam",
-"8424", "Thủ\ đô\ Hà\ Nội",
-"84277", "Đồng\ Tháp",
-"84261", "Đăk\ Nông",
-"84207", "Tuyên\ Quang",
-"8428", "Thành\ phố\ Hồ\ Chí\ Minh",
-"84294", "Trà\ Vinh",
-"84257", "Phú\ Yên",
-"84220", "Hải\ Dương",
-"84296", "An\ Giang",
-"84290", "Cà\ Mau",
-"84226", "Hà\ Nam",
-"84229", "Ninh\ Bình",
-"84225", "Thành\ phố\ Hải\ Phòng",
-"84299", "Sóc\ Trăng",
-"84228", "Nam\ Định",
-"84211", "Vĩnh\ Phúc",
-"84271", "Bình\ Phước",
-"84237", "Thanh\ Hóa",
-"84251", "Đồng\ Nai",
-"84293", "Hậu\ Giang",
-"84222", "Bắc\ Ninh",
-"84292", "Thành\ phố\ Cần\ Thơ",
-"84204", "Bắc\ Giang",
-"84259", "Ninh\ Thuận",
-"84255", "Quảng\ Ngãi",
-"84274", "Bình\ Dương",
-"84214", "Lào\ Cai",
-"84258", "Khánh\ Hòa",
-"84227", "Thái\ Bình",
-"84297", "Kiên\ Giang",
-"84256", "Bình\ Định",
-"84208", "Thái\ Nguyên",
-"84275", "Bến\ Tre",
-"84262", "Đăk\ Lăk",
-"84215", "Điện\ Biên",
-"84219", "Hà\ Giang",
-"84205", "Lạng\ Sơn",
-"84209", "Tỉnh\ Bắc\ Kạn",
-"84263", "Lâm\ Đồng",
-"84218", "Hòa\ Bình",
-"84254", "Bà\ Rịa\-Vũng\ Tàu",
-"84210", "Phú\ Thọ",
-"84206", "Cao\ Bằng",
-"84270", "Vĩnh\ Long",
-"84233", "Quảng\ Trị",
-"84276", "Tây\ Ninh",
-"84232", "Quảng\ Bình",
-"84216", "Yên\ Bái",};
-$areanames{en} = {"84297", "Kien\ Giang\ province",
-"84256", "Binh\ Dinh\ province",
+$areanames{en} = {"84275", "Ben\ Tre\ province",
+"84219", "Ha\ Giang\ province",
+"84270", "Ving\ Long\ province",
+"84239", "Ha\ Tinh\ province",
+"84212", "Son\ La\ province",
+"84232", "Quang\ Binh\ province",
+"84211", "Vinh\ Phuc\ province",
+"84254", "Ba\ Ria\ Vung\ Tau\ province",
+"84294", "Tra\ Vinh\ province",
+"84228", "Nam\ Dinh\ province",
+"84258", "Khanh\ Hoa\ province",
+"84277", "Dong\ Thap\ province",
+"84203", "Quang\ Ninh\ province",
+"84273", "Tien\ Giang\ province",
+"84207", "Tuyen\ Quang\ province",
+"84205", "Lang\ Son\ province",
+"84216", "Yen\ Bai\ province",
+"84236", "Da\ Nang",
+"84293", "Hau\ Giang\ province",
+"84204", "Bac\ Giang\ province",
+"84208", "Thai\ Nguyen\ province",
+"84262", "Dak\ Lak\ province",
+"84297", "Kien\ Giang\ province",
+"84269", "Gia\ Lai\ province",
+"84257", "Phu\ Yen\ province",
 "84227", "Thai\ Binh\ province",
 "84274", "Binh\ Duong\ province",
-"84258", "Khanh\ Hoa\ province",
-"84214", "Lao\ Cai\ province",
-"84204", "Bac\ Giang\ province",
-"84255", "Quang\ Ngai\ province",
-"84259", "Ninh\ Thuan\ province",
-"84276", "Tay\ Ninh\ province",
-"84232", "Quang\ Binh\ province",
-"84216", "Yen\ Bai\ province",
-"84210", "Phu\ Tho\ province",
-"84206", "Cao\ Bang\ province",
-"84233", "Quang\ Tri\ province",
-"84270", "Ving\ Long\ province",
-"84209", "Bac\ Can\ province",
-"84205", "Lang\ Son\ province",
-"84254", "Ba\ Ria\ Vung\ Tau\ province",
-"84263", "Lam\ Dong\ province",
-"84218", "Hoa\ Binh\ province",
-"84262", "Dak\ Lak\ province",
-"84275", "Ben\ Tre\ province",
-"84208", "Thai\ Nguyen\ province",
-"84219", "Ha\ Giang\ province",
-"84215", "Dien\ Bien\ province",
-"84237", "Thanh\ Hoa\ province",
-"84211", "Vinh\ Phuc\ province",
-"84271", "Binh\ Phuoc\ province",
-"84292", "Can\ Tho\ City",
-"84293", "Hau\ Giang\ province",
-"84222", "Bac\ Ninh\ province",
-"84251", "Dong\ Nai\ province",
-"8428", "Ho\ Chi\ Minh\ City",
-"84294", "Tra\ Vinh\ province",
-"84207", "Tuyen\ Quang\ province",
-"8424", "Hanoi\ City",
 "84261", "Dak\ Nong\ province",
-"84277", "Dong\ Thap\ province",
-"84299", "Soc\ Trang\ province",
-"84228", "Nam\ Dinh\ province",
-"84225", "Hai\ Phong\ City",
-"84229", "Ninh\ Binh\ province",
 "84290", "Ca\ Mau\ province",
-"84226", "Ha\ Nam\ province",
+"84255", "Quang\ Ngai\ province",
 "84220", "Hai\ Duong\ province",
-"84257", "Phu\ Yen\ province",
-"84296", "An\ Giang\ province",
-"84291", "Bac\ Lieu\ province",
+"84225", "Hai\ Phong\ City",
+"84276", "Tay\ Ninh\ province",
+"84263", "Lam\ Dong\ province",
+"84259", "Ninh\ Thuan\ province",
+"84229", "Ninh\ Binh\ province",
+"84292", "Can\ Tho\ City",
+"84252", "Binh\ Thuan\ province",
+"84222", "Bac\ Ninh\ province",
+"84299", "Soc\ Trang\ province",
+"84260", "Kon\ Tum\ province",
+"84206", "Cao\ Bang\ province",
 "84221", "Hung\ Yen\ province",
 "84234", "Thua\ Thien\-Hue\ province",
-"84252", "Binh\ Thuan\ province",
-"84235", "Quang\ Nam\ province",
-"84239", "Ha\ Tinh\ province",
+"84214", "Lao\ Cai\ province",
+"84251", "Dong\ Nai\ province",
+"84291", "Bac\ Lieu\ province",
 "84238", "Nghe\ An\ province",
-"84260", "Kon\ Tum\ province",
-"84213", "Lai\ Chau\ province",
-"84273", "Tien\ Giang\ province",
-"84269", "Gia\ Lai\ province",
+"84218", "Hoa\ Binh\ province",
+"84271", "Binh\ Phuoc\ province",
+"84237", "Thanh\ Hoa\ province",
 "84272", "Long\ An\ province",
-"84236", "Da\ Nang",
-"84212", "Son\ La\ province",
-"84203", "Quang\ Ninh\ province",};
+"8428", "Ho\ Chi\ Minh\ City",
+"84215", "Dien\ Bien\ province",
+"84235", "Quang\ Nam\ province",
+"84210", "Phu\ Tho\ province",
+"84209", "Bac\ Can\ province",
+"8424", "Hanoi\ City",
+"84213", "Lai\ Chau\ province",
+"84233", "Quang\ Tri\ province",
+"84296", "An\ Giang\ province",
+"84256", "Binh\ Dinh\ province",
+"84226", "Ha\ Nam\ province",};
+$areanames{vi} = {"84220", "Hải\ Dương",
+"84255", "Quảng\ Ngãi",
+"84225", "Thành\ phố\ Hải\ Phòng",
+"84290", "Cà\ Mau",
+"84261", "Đăk\ Nông",
+"84274", "Bình\ Dương",
+"84257", "Phú\ Yên",
+"84269", "Gia\ Lai",
+"84227", "Thái\ Bình",
+"84262", "Đăk\ Lăk",
+"84297", "Kiên\ Giang",
+"84208", "Thái\ Nguyên",
+"84204", "Bắc\ Giang",
+"84216", "Yên\ Bái",
+"84293", "Hậu\ Giang",
+"84236", "TP\ Đà\ Nẵng",
+"84205", "Lạng\ Sơn",
+"84273", "Tiền\ Giang",
+"84207", "Tuyên\ Quang",
+"84277", "Đồng\ Tháp",
+"84203", "Quảng\ Ninh",
+"84228", "Nam\ Định",
+"84294", "Trà\ Vinh",
+"84258", "Khánh\ Hòa",
+"84254", "Bà\ Rịa\-Vũng\ Tàu",
+"84211", "Vĩnh\ Phúc",
+"84212", "Sơn\ La",
+"84232", "Quảng\ Bình",
+"84275", "Bến\ Tre",
+"84219", "Hà\ Giang",
+"84270", "Vĩnh\ Long",
+"84239", "Hà\ Tĩnh",
+"84256", "Bình\ Định",
+"84226", "Hà\ Nam",
+"84213", "Lai\ Châu",
+"84233", "Quảng\ Trị",
+"84296", "An\ Giang",
+"8424", "Thủ\ đô\ Hà\ Nội",
+"84209", "Tỉnh\ Bắc\ Kạn",
+"84215", "Điện\ Biên",
+"84210", "Phú\ Thọ",
+"84235", "Quảng\ Nam",
+"84272", "Long\ An",
+"8428", "Thành\ phố\ Hồ\ Chí\ Minh",
+"84237", "Thanh\ Hóa",
+"84271", "Bình\ Phước",
+"84238", "Nghệ\ An",
+"84291", "Bạc\ Liêu",
+"84218", "Hòa\ Bình",
+"84234", "Thừa\ Thiên\-Huế",
+"84221", "Hưng\ Yên",
+"84214", "Lào\ Cai",
+"84251", "Đồng\ Nai",
+"84206", "Cao\ Bằng",
+"84260", "Kon\ Tum",
+"84252", "Bình\ Thuận",
+"84222", "Bắc\ Ninh",
+"84299", "Sóc\ Trăng",
+"84259", "Ninh\ Thuận",
+"84292", "Thành\ phố\ Cần\ Thơ",
+"84229", "Ninh\ Bình",
+"84263", "Lâm\ Đồng",
+"84276", "Tây\ Ninh",};
 my $timezones = {
                '' => [
                        'Asia/Ho_Chi_Minh'

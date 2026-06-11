@@ -67,6 +67,31 @@ subtest 'embedded captcha widget on rich page is not a wall' => sub {
   is WWW::Crawl4AI::Detect::why_failed($p), undef, 'no failure reason';
 };
 
+subtest 'reCAPTCHA cookie-banner mention on rich page is not a wall' => sub {
+  # The aquaponik regression: a content-rich page whose markdown ALSO carries a
+  # cookie-banner / privacy-policy mention of reCAPTCHA -- but NO captcha-prompt
+  # language. This is an incidental mention, not a gate. Must stay good.
+  my $body = 'real article body text about aquaponik systems ' x 30;  # >500 chars
+
+  my $de = {
+    success     => 1,
+    status_code => 200,
+    markdown    => $body . ' Wird von Google reCAPTCHA gesetzt, um Spam zu verhindern. ' . $body,
+    title       => 'Aquaponik Ratgeber',
+  };
+  ok !WWW::Crawl4AI::Detect::signals($de)->{captcha}, 'german cookie-banner mention: no captcha signal';
+  ok WWW::Crawl4AI::Detect::is_good($de), 'rich page with german reCAPTCHA mention is good';
+
+  my $en = {
+    success     => 1,
+    status_code => 200,
+    markdown    => $body . ' This site uses Google reCAPTCHA to protect against spam. ' . $body,
+    title       => 'Aquaponics Guide',
+  };
+  ok !WWW::Crawl4AI::Detect::signals($en)->{captcha}, 'english cookie-banner mention: no captcha signal';
+  ok WWW::Crawl4AI::Detect::is_good($en), 'rich page with english reCAPTCHA mention is good';
+};
+
 subtest 'html-only captcha marker on a thin page still walls' => sub {
   # JS-rendered captcha gate: markdown is empty, marker lives in the markup.
   my $p = {
@@ -76,6 +101,89 @@ subtest 'html-only captcha marker on a thin page still walls' => sub {
   };
   ok WWW::Crawl4AI::Detect::signals($p)->{captcha}, 'html marker + thin = captcha signal';
   is WWW::Crawl4AI::Detect::why_failed($p), 'captcha', 'reason captcha';
+};
+
+subtest 'redirect to Cloudflare challenge URL walls a rich page' => sub {
+  # WAF gate: the body looks fine (rich markdown), but the request was
+  # redirected to a /cdn-cgi/challenge URL. Final_url is the tell.
+  my $p = {
+    success     => 1,
+    status_code => 200,
+    markdown    => ( 'plenty of real-looking content text ' x 30 ),  # >500 chars
+    url         => 'https://site.de/',
+    final_url   => 'https://site.de/cdn-cgi/challenge-platform/h/g/orchestrate/chl_page/v1',
+  };
+  ok WWW::Crawl4AI::Detect::signals($p)->{blocked}, 'blocked via challenge final_url';
+  ok !WWW::Crawl4AI::Detect::is_good($p), 'challenge redirect not good';
+  is WWW::Crawl4AI::Detect::why_failed($p), 'bot_wall_detected', 'reason bot_wall_detected';
+};
+
+subtest 'redirect to reCAPTCHA endpoint sets captcha' => sub {
+  my $p = {
+    success     => 1,
+    status_code => 200,
+    markdown    => ( 'otherwise rich body content here ' x 30 ),  # >500 chars
+    url         => 'https://shop.example/',
+    final_url   => 'https://www.google.com/recaptcha/api2/anchor?ar=1&k=abc',
+  };
+  ok WWW::Crawl4AI::Detect::signals($p)->{captcha}, 'captcha via recaptcha final_url';
+  ok !WWW::Crawl4AI::Detect::is_good($p), 'recaptcha redirect not good';
+  is WWW::Crawl4AI::Detect::why_failed($p), 'captcha', 'reason captcha';
+};
+
+subtest 'redirect to DataDome captcha-delivery walls' => sub {
+  my $p = {
+    success     => 1,
+    status_code => 200,
+    markdown    => ( 'rich content body filler ' x 30 ),  # >500 chars
+    url         => 'https://retailer.fr/produit',
+    final_url   => 'https://geo.captcha-delivery.com/captcha/?initialCid=xyz',
+  };
+  ok WWW::Crawl4AI::Detect::signals($p)->{blocked}, 'blocked via datadome final_url';
+  ok !WWW::Crawl4AI::Detect::is_good($p), 'datadome redirect not good';
+  is WWW::Crawl4AI::Detect::why_failed($p), 'bot_wall_detected', 'reason bot_wall_detected';
+};
+
+subtest 'cosmetic redirect (http->https upgrade) does not trigger' => sub {
+  my $p = {
+    success     => 1,
+    status_code => 200,
+    markdown    => ( 'real article body text ' x 60 ),  # >500 chars
+    url         => 'http://site.de',
+    final_url   => 'https://site.de/',
+  };
+  my $s = WWW::Crawl4AI::Detect::signals($p);
+  is $s->{blocked}, 0, 'no blocked on https upgrade';
+  is $s->{captcha}, 0, 'no captcha on https upgrade';
+  ok WWW::Crawl4AI::Detect::is_good($p), 'cosmetic redirect stays good';
+};
+
+subtest 'final_url absent entirely is a graceful no-op' => sub {
+  my $p = {
+    success     => 1,
+    status_code => 200,
+    markdown    => ( 'real article body text ' x 60 ),  # >500 chars
+  };
+  my $s = WWW::Crawl4AI::Detect::signals($p);
+  is $s->{blocked}, 0, 'no blocked when final_url absent';
+  is $s->{captcha}, 0, 'no captcha when final_url absent';
+  ok WWW::Crawl4AI::Detect::is_good($p), 'page with no url keys stays good';
+};
+
+subtest 'body mentioning "challenge" with a normal final_url stays good' => sub {
+  # The regex keys on final_url host/path, not the body. A page that merely
+  # talks about a "challenge" in its content must not be flagged.
+  my $p = {
+    success     => 1,
+    status_code => 200,
+    markdown    => ( 'we discuss the great challenge of our era at length ' x 20 ),
+    url         => 'https://blog.example/the-challenge',
+    final_url   => 'https://blog.example/the-challenge',
+  };
+  my $s = WWW::Crawl4AI::Detect::signals($p);
+  is $s->{blocked}, 0, 'no blocked from body word "challenge"';
+  is $s->{captcha}, 0, 'no captcha from body word "challenge"';
+  ok WWW::Crawl4AI::Detect::is_good($p), 'body-only "challenge" stays good';
 };
 
 subtest 'http soft/hard fail' => sub {

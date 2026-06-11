@@ -1,7 +1,7 @@
 package Sys::Export::Unix::WriteFS;
 
 # ABSTRACT: An export target that writes files to a directory in the host filesystem
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 
 use v5.26;
@@ -471,7 +471,7 @@ to directories since writing the contents of the directory would have changed th
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

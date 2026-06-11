@@ -9,7 +9,7 @@ my %WriteMakefileArgs = (
     VERSION_FROM     => 'lib/Tvh/Htsp/Client.pm',
     ABSTRACT_FROM    => 'lib/Tvh/Htsp/Client.pm',
     LICENSE          => 'artistic_2',
-    MIN_PERL_VERSION => '5.012',
+    MIN_PERL_VERSION => '5.028',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
     },

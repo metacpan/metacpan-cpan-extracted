@@ -1,3 +1,21 @@
+0.003     2026-06-11 02:22:02Z
+
+ - Detect: captcha signal no longer false-positives on cookie-banner /
+   privacy-policy mentions of reCAPTCHA. A content-rich page now only walls when
+   a markdown captcha marker co-occurs with captcha-PROMPT language ("complete
+   the captcha to continue", "I'm not a robot", "verify you are human", …); thin
+   pages still wall on any marker (JS-rendered gate) and html-only markers on
+   rich pages still never wall
+
+ - Detect: signals now also flags WAF / bot-management gates that REDIRECT to a
+   challenge URL instead of embedding a widget. When the page's final_url
+   matches a known challenge endpoint, blocked is raised for Cloudflare /
+   DataDome / PerimeterX (/cdn-cgi/challenge, __cf_chl, /challenge-platform/,
+   datadome, geo.captcha-delivery.com, /px/captcha, perimeterx) and captcha for
+   provider verification endpoints (google.com/recaptcha, /recaptcha/api,
+   hcaptcha.com). Additive and OR-ed in; cosmetic redirects (http->https, www,
+   trailing slash) and an absent final_url never trigger
+
 0.002     2026-05-30 22:57:39Z
 
  - Result: expose response_headers (lowercased keys) from the origin HTTP fetch,

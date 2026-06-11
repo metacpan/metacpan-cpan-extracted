@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20260306161714;
+our $VERSION = 1.20260610205505;
 
 my $formatters = [
                 {
@@ -48,34 +48,24 @@ my $formatters = [
                 {
                   'format' => '$1 $2',
                   'leading_digits' => '
-            (?:
-              2|
-              90
-            )4|
-            [67]
+            1|
+            28|
+            9[2-9]
+          ',
+                  'pattern' => '(\\d{2})(\\d{5,7})'
+                },
+                {
+                  'format' => '$1 $2',
+                  'leading_digits' => '
+            [267]|
+            904
           ',
                   'pattern' => '(\\d)(\\d{7})'
                 },
                 {
                   'format' => '$1 $2 $3',
-                  'leading_digits' => '
-            [348]|
-            64|
-            79|
-            90
-          ',
-                  'pattern' => '(\\d{3})(\\d{3})(\\d{3})'
-                },
-                {
-                  'format' => '$1 $2',
-                  'leading_digits' => '
-            1|
-            28|
-            6[0-35-9]|
-            7[67]|
-            9[2-9]
-          ',
-                  'pattern' => '(\\d{2})(\\d{5,7})'
+                  'leading_digits' => '[346-9]',
+                  'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 }
               ];
 
@@ -114,7 +104,7 @@ my $validators = {
                 3[59]|
                 4[89]|
                 6\\d|
-                7[679]|
+                7[0-35-9]|
                 8[08]
               )\\d|
               9(?:
@@ -139,8 +129,8 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"2521", "Mogadishu",
-"2524", "Garowe",
+$areanames{en} = {"2524", "Garowe",
+"2521", "Mogadishu",
 "2523", "Hargeisa",};
 my $timezones = {
                '' => [

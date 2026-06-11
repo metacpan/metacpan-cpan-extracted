@@ -22,27 +22,33 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20260306161714;
+our $VERSION = 1.20260610205505;
 
 my $formatters = [];
 
 my $validators = {
                 'fixed_line' => '
-          269(?:
-            0[0-467]|
-            15|
-            5[0-4]|
-            6\\d|
-            [78]0
+          26(?:
+            89\\d|
+            9(?:
+              0[0-467]|
+              15|
+              5[0-4]|
+              6\\d|
+              [78]0
+            )
           )\\d{4}
         ',
                 'geographic' => '
-          269(?:
-            0[0-467]|
-            15|
-            5[0-4]|
-            6\\d|
-            [78]0
+          26(?:
+            89\\d|
+            9(?:
+              0[0-467]|
+              15|
+              5[0-4]|
+              6\\d|
+              [78]0
+            )
           )\\d{4}
         ',
                 'mobile' => '
@@ -84,6 +90,12 @@ my $timezones = {
                '263' => [
                           'Indian/Reunion'
                         ],
+               '2688' => [
+                           'Indian/Reunion'
+                         ],
+               '2689' => [
+                           'Indian/Mayotte'
+                         ],
                '269' => [
                           'Indian/Mayotte'
                         ],

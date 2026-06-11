@@ -15,7 +15,7 @@ package Sys::Export::MockDst {
    sub finish($self)      {}
 }
 
-my $tmp= File::Temp->newdir;
+my $tmp= tmpdir;
 my $dst= Sys::Export::MockDst->new();
 my $exporter= Sys::Export::Linux->new(src => "/", dst => $dst);
 

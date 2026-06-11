@@ -2548,6 +2548,24 @@
     },
 {
         class   => 'Number::Phone::Lib',
+        args    => ['BL','+590810123456'],
+        methods => ['is_specialrate'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['BL','810123456'],
+        methods => ['is_specialrate'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['+590810123456'],
+        methods => ['is_specialrate'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
         args    => ['BL','+590976012345'],
         methods => ['is_ipphone'],
         test_country => 1,
@@ -7438,6 +7456,24 @@
     },
 {
         class   => 'Number::Phone::Lib',
+        args    => ['GF','+594890123456'],
+        methods => ['is_specialrate'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['GF','890123456'],
+        methods => ['is_specialrate'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['+594890123456'],
+        methods => ['is_specialrate'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
         args    => ['GF','+594976012345'],
         methods => ['is_ipphone'],
         test_country => 1,
@@ -7938,6 +7974,24 @@
         class   => 'Number::Phone::Lib',
         args    => ['+590800012345'],
         methods => ['is_tollfree'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['GP','+590810123456'],
+        methods => ['is_specialrate'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['GP','810123456'],
+        methods => ['is_specialrate'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['+590810123456'],
+        methods => ['is_specialrate'],
         test_country => 1,
     },
 {
@@ -13050,6 +13104,24 @@
         class   => 'Number::Phone::Lib',
         args    => ['+590800012345'],
         methods => ['is_tollfree'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['MF','+590810123456'],
+        methods => ['is_specialrate'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['MF','810123456'],
+        methods => ['is_specialrate'],
+        test_country => 1,
+    },
+{
+        class   => 'Number::Phone::Lib',
+        args    => ['+590810123456'],
+        methods => ['is_specialrate'],
         test_country => 1,
     },
 {

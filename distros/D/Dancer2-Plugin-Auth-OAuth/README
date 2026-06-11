@@ -203,7 +203,7 @@ AUTHENTICATION EXAMPLES
             }
         }
 
-    Full site needs a user authentication for a specific IdP.
+    Full site needs a user authentication from a specific IdP.
 
       An example of a simple single system authentication.
 
@@ -234,8 +234,8 @@ AUTHENTICATION EXAMPLES
           };
 
       in the case where you're using the refresh functionality, a failure
-      of the refresh will send the user back to the "error_url". If you
-      want to them to instead be directed back to the main authentication
+      of the refresh will send the user back to the "error_url". If,
+      instead, you want them to be directed back to the main authentication
       (log in page) then please set the configuration option
       reauth_on_refresh_fail.
 
@@ -289,8 +289,9 @@ AUTHENTICATION EXAMPLES
       "/auth/<lc-name-of-the-provider>"
 
       You can mix this plugin with Dancer2::Plugin::Auth::Tiny and on
-      '/login/ok' you just define the 'user' session. Afterwards all
-      validation can be against 'user' and not 'oauth'.
+      '/login/ok' you just define the 'user' session. Afterwards you can
+      just add needs login to all your routes and don't use any route
+      preamble to validate 'oauth'.
 
 AUTHOR
 
@@ -298,7 +299,9 @@ AUTHOR
 
 COPYRIGHT
 
-    Copyright 2014- Menno Blom
+    Copyright 2014-2020 - Menno Blom
+
+    2020- Maintained by Biafra <biafra@cpan.org>
 
 LICENSE
 

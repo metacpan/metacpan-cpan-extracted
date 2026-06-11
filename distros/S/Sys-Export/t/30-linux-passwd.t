@@ -16,7 +16,7 @@ package Sys::Export::MockDst {
 # my $pass_hash= crypt("test", q{$6$12345678$});   breaks on Win32, so just hard-code it
 my $pass_hash= '$6$12345678$8Vkis/4wY9G5zD48pxdrbx3GyPCSsno5BigQ5pCfBXdoDBRxHNrLoKOWo9uI8DJ6i7vliOboPQaqxwn3knEOh.';
 
-my $tmp= File::Temp->newdir;
+my $tmp= tmpdir;
 my $dst= Sys::Export::MockDst->new();
 my $exporter= Sys::Export::Linux->new(
    src => $tmp,

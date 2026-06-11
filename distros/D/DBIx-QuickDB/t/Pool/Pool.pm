@@ -271,7 +271,7 @@ isnt($foo1->dir, QDB_POOL()->{databases}->{foo}->{dir}, "The copy does not have 
 isnt($stamp, check_cloned(QDB_POOL->{databases}->{$driver}->{db}), "clone stamp changed");
 
 $start = time();
-my $foo2 = db('foo');
+my $foo2 = db_or_skip('foo');
 $total = time() - $start;
 note(sprintf("Initialized 'foo2' from cache in %.6f seconds", $total));
 
@@ -331,7 +331,7 @@ $total = time() - $start;
 note(sprintf("Initialized 'bar' from 'foo' in %.6f seconds", $total));
 
 subtest resync => sub {
-    my $bar = db('bar');
+    my $bar = db_or_skip('bar');
 
     my $dbh = $bar->connect;
 
@@ -366,7 +366,7 @@ subtest checksum_change_update => sub {
     $foo_sum++;
 
     $start = time;
-    my $x = db('bar');
+    my $x = db_or_skip('bar');
     $total = time - $start;
     note(sprintf("Re-Initialized 'foo' and 'bar' from $driver in %.6f seconds", $total));
 
@@ -389,7 +389,7 @@ subtest checksum_change_no_update => sub {
     local $foo_sum = $foo_sum;
     $foo_sum++;
 
-    my $x = db('bar');
+    my $x = db_or_skip('bar');
 
     is($called, $c, "Did not call foo builder again");
     is(QDB_POOL->{databases}->{$driver}->{db}, $cached->{$driver}, "Base db did not change");
@@ -416,7 +416,7 @@ subtest reclaim => sub {
     }
 
     $start = time();
-    ok(db('bar'), "Got bar");
+    ok(db_or_skip('bar'), "Got bar");
     $total = time() - $start;
     note(sprintf("Initialized 'bar' from reclaiming the entire chain in %.6f seconds", $total));
 
@@ -557,7 +557,8 @@ subtest instance_dir => sub {
         )
     );
 
-    my $db = $one->fetch_db('xyz');
+    my $db = eval { $one->fetch_db('xyz') };
+    if (my $err = $@) { skipall_on_resource_error($err); die $err }
     opendir(my $dh, $instdir) or die "Could not open dir: $!";
 
     my $found = 0;

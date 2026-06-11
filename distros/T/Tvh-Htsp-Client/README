@@ -6,7 +6,7 @@ Tvh::Htsp::Client - a simple Tvheadend HTSP client library written in perl
 
 VERSION
 
-Version 0.02
+Version 0.05
 
 SYNOPSIS
 
@@ -49,7 +49,7 @@ You can also look for information at:
 
 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2025 by Ulrich Buck.
+This software is Copyright (c) 2026 by Ulrich Buck.
 
 This is free software, licensed under:
 

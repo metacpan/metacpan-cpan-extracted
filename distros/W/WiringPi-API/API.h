@@ -1,7 +1,7 @@
 /*
  * API.h file for WiringPi::API Perl distribution
  *
- * Copyright (c) 2017 by Steve Bertrand
+ * Copyright (c) 2017-2026 by Steve Bertrand
  *
  * This library is free software; you can redistribute it and/or modify it under
  * the same terms as Perl itself, either Perl version 5.18.2 or, at your option,
@@ -14,13 +14,6 @@ int bmp180Setup(int pin_base);
 int bmp180Pressure(int pin);
 int bmp180Temp(int pin);
 
-// threads
-int initThread(char * callback);
-
-// interrupts
-int setInterrupt(int pin, int edge, char* callback);
-void interruptHandler();
-
 // setup routines
 int wiringPiI2CSetup (int devId);
 int wiringPiI2CSetupInterface (char* device, int devId);
@@ -32,6 +25,10 @@ int wiringPiI2CReadReg16 (int fd, int reg);
 int wiringPiI2CWrite (int fd, int data);
 int wiringPiI2CWriteReg8 (int fd, int reg, int data);
 int wiringPiI2CWriteReg16 (int fd, int reg, int data);
+int wiringPiI2CReadBlockData (int fd, int reg, uint8_t *values, uint8_t size);
+int wiringPiI2CRawRead (int fd, uint8_t *values, uint8_t size);
+int wiringPiI2CWriteBlockData (int fd, int reg, const uint8_t *values, uint8_t size);
+int wiringPiI2CRawWrite (int fd, const uint8_t *values, uint8_t size);
 
 // GPIO pin specific
 int physPinToWpi(int wpi_pin);

@@ -22,6 +22,6 @@ requires:
   IO::Socket: '0'
   List::Util: '0'
   LooksLike: '0'
-  perl: '5.012'
-version: '0.03'
+  perl: '5.028'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

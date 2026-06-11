@@ -1,0 +1,57 @@
+{
+   "abstract" : "DBI driver for Cloudflare D1 (serverless SQLite)",
+   "author" : [
+      "Aldo Montes Zapata <amontes@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBD-D1",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "1.640",
+            "HTTP::Tiny" : "0.070",
+            "IO::Socket::SSL" : "1.42",
+            "JSON::PP" : "2.97",
+            "Net::SSLeay" : "1.49",
+            "perl" : "5.014"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/amzt/DBD-D1/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/amzt/DBD-D1.git",
+         "web" : "https://github.com/amzt/DBD-D1"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

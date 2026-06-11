@@ -1,0 +1,24 @@
+Changes
+cpanfile
+lib/Sub/Abstract.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/attribute.t
+t/basic.t
+t/bypass.t
+t/declarative.t
+t/edge_cases.t
+t/eof.t
+t/eol.t
+t/extended_tests.t
+t/function.t
+t/mutant_killers.t
+t/integration.t
+t/subclass.t
+t/unit.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

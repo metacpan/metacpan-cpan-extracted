@@ -1,6 +1,6 @@
 package Sys::Export::ISO9660;
 
-our $VERSION= 0; our $VERSION = '0.005'; # VERSION
+our $VERSION= 0; our $VERSION = '0.006'; # VERSION
 # ABSTRACT: Write ISO9660 filesystems with Joliet filename and El Torrito boot catalog support
 
 
@@ -1202,7 +1202,7 @@ Returns a string with any invalid characters replaced with the supplied replacem
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

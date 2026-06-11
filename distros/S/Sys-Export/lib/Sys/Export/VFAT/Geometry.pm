@@ -1,10 +1,10 @@
 package Sys::Export::VFAT::Geometry;
 
 # ABSTRACT: Calculate addresses and sizes of structures within a FAT filesystem
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 
-use v5.26;
+use v5.28;
 use warnings;
 use experimental qw( signatures );
 use Sys::Export qw( isa_hash isa_int isa_pow2 round_up_to_pow2 round_up_to_multiple );
@@ -730,7 +730,7 @@ This dies if the specified alignment dosn't fall on any cluster boundary.
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

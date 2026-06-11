@@ -1,10 +1,10 @@
 {
    "abstract" : "Private subroutines and methods",
    "author" : [
-      "Nigel Horne <njh@bandsman.co.uk>"
+      "Nigel Horne <njh@nigelhorne.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4234",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -13,51 +13,62 @@
       "version" : 2
    },
    "name" : "Sub-Private",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::More" : "0",
-            "Test::NoWarnings" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.42"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Attribute::Handlers" : "0",
-            "B::Hooks::EndOfScope" : "0",
+            "Carp" : "0",
+            "Params::Validate::Strict" : "0.33",
+            "Readonly" : "0",
+            "Return::Set" : "0",
             "Sub::Identify" : "0",
-            "namespace::clean" : "0"
+            "namespace::clean" : "0",
+            "perl" : "5.008"
          }
       },
       "test" : {
          "requires" : {
+            "IPC::System::Simple" : "0",
+            "Moo" : "0",
+            "Moose" : "0",
+            "Test::DescribeMe" : "0",
+            "Test::Memory::Cycle" : "0",
             "Test::Most" : "0",
-            "Test::Needs" : "0"
+            "Test::Needs" : "0",
+            "Test::NoWarnings" : "0"
          }
-      }
-   },
-   "provides" : {
-      "Sub::Private" : {
-         "file" : "lib/Sub/Private.pm",
-         "version" : "0.04"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/nigelhorne/Sub-Private/issues"
+         "mailto" : "bug-Sub-Private@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Sub-Private",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Sub-Private"
       },
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
+      "homepage" : "https://metacpan.org/pod/Sub::Private",
       "repository" : {
-         "url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Sub-Private"
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Sub-Private.git",
+         "web" : "https://github.com/nigelhorne/Sub-Private"
       }
    },
-   "version" : "0.04",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

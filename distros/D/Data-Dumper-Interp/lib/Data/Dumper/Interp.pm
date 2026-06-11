@@ -6,7 +6,8 @@
 ##FIXME: Refaddr(1) has no effect inside Blessed structures
 #
 
-use strict; use warnings FATAL => 'all'; use utf8;
+##use strict; use warnings FATAL => 'all'; use utf8;
+use strict; use warnings; use utf8;
 #use 5.010; # say, state
 #use 5.011; # cpantester gets warning that 5.11 is the minimum acceptable
 #use 5.014; # /r for non-destructive substitution
@@ -26,8 +27,8 @@ package
 package Data::Dumper::Interp;
 
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 997.999; }
-our $VERSION = '8.000'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2026-04-22'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '8.001'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2026-06-11'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # Arrgh!  Moose forcibly enables experimental feature warnings!
 # So import Moose first and then adjust warnings...
@@ -88,6 +89,7 @@ our %EXPORT_TAGS = (
 );
 
 sub _generate_sub($;$); # forward
+sub u(_); # forward
 
 our ($COND_LB, $COND_RB, $COND_MULT, $LQ, $RQ);
 
@@ -121,9 +123,9 @@ sub AUTOLOAD {  # invoked on call to undefined *method*
   our $AUTOLOAD;
   _SaveAndResetPunct();
   our $Debug;
-  local $Debug = $AUTOLOAD_debug;
-  carp "AUTOLOAD $AUTOLOAD" if $Debug;
-  _generate_sub($AUTOLOAD);
+  { local $Debug = $AUTOLOAD_debug;
+    _generate_sub($AUTOLOAD);
+  }
   _RestorePunct();
   no strict 'refs';
   goto &$AUTOLOAD;
@@ -133,7 +135,6 @@ sub AUTOLOAD {  # invoked on call to undefined *method*
 ############################################################################
 # Internal debug-message utilities
 
-sub u(_); # forward
 sub oops(@) { @_=("\n".(caller)." oops:\n",@_,"\n"); goto &Carp::confess }
 sub btwN($@) { my $N=shift; local $_=join("",map{u} @_); s/\n\z//s; printf "%4d: %s\n",(caller($N))[2],$_; }
 sub btw(@) { unshift @_,0; goto &btwN }
@@ -160,9 +161,9 @@ sub _dbvisnew($) {
               #->Useperl(1)
 }
 sub _dbvis(_) {chomp(my $s=_dbvisnew(shift)->Useqq(1)->Dump); $s }
+sub _dbvis1(_){chomp(my $s=_dbvisnew(shift)->Useqq(1)->Maxdepth(1)->Dump); $s }
+sub _dbvis2(_){chomp(my $s=_dbvisnew(shift)->Useqq(1)->Maxdepth(2)->Dump); $s }
 sub _dbvisq(_){chomp(my $s=_dbvisnew(shift)->Useqq(0)->Dump); $s }
-sub _dbvis1(_){chomp(my $s=_dbvisnew(shift)->Maxdepth(1)->Useqq(1)->Dump); $s }
-sub _dbvis2(_){chomp(my $s=_dbvisnew(shift)->Maxdepth(3)->Useqq(1)->Dump); $s }
 sub _dbavis(@){ "(" . join(", ", map{_dbvis} @_) . ")" }
 sub _dbavis2(@){ "(" . join(", ", map{_dbvis2} @_) . ")" }
 sub _dbrvis(_) { (ref($_[0]) ? addrvis(refaddr $_[0]) : "")._dbvis($_[0])  }
@@ -174,7 +175,7 @@ sub _dbshow(_) {
               : _dbvis($v)               # something else
 }
 our $_dbmaxlen = 300;
-sub _dbrawstr(_) { "${LQ}".(length($_[0])>$_dbmaxlen ? substr($_[0],0,$_dbmaxlen-3)."..." : $_[0])."${RQ}" }
+sub _dbrawstr(_) { ($LQ//"<<").(length($_[0])>$_dbmaxlen ? substr($_[0],0,$_dbmaxlen-3)."..." : $_[0]).(${RQ}//">>") }
 sub _dbstr($) {
   local $_ = shift;
   return "undef" if !defined;
@@ -288,6 +289,7 @@ has Foldwidth      => (is=>'rw', default => sub{
                        });
 has Foldwidth1     => (is=>'rw', default => sub{ $Foldwidth1            });
 has _Listform      => (is=>'rw');
+has _VisitState    => (is=>'rw', default => sub{ {my_visit_depth => 0} });
 
 sub _SetDefaults {
     my $self = shift;
@@ -499,7 +501,7 @@ sub __getself { # Return $self if passed or else create a new object
   local $@;
   my $blessed = eval{ blessed($_[0]) }; # In case a tie handler throws
   croak _chop_ateval($@) if $@;
-  $blessed && $_[0]->isa(__PACKAGE__) ? shift : __PACKAGE__->new()
+  ($blessed && $_[0]->isa(__PACKAGE__)) ? shift(@_) : __PACKAGE__->new()
 }
 sub __getself_s { &__getself->Values([$_[0]]) }
 sub __getself_a { &__getself->Values([[@_]])   }
@@ -645,6 +647,7 @@ sub visnew()  { __PACKAGE__->new() }  # shorthand
 # The optional options are for use when currying, e.g.
 #   $Carp::RefArgFormatter = sub($) { Data::Dumper::Interp::CarpArgFormatter($_[0], Maxdepth=9, ...) }
 sub RefArgFormatter {
+  local $Carp::RefArgFormatter = undef;  # prevent recursion
   my ($item, %opts) = @_;
   $opts{Maxdepth} //= 3;
   $opts{MaxStringwidth} //= 1000;
@@ -726,12 +729,9 @@ use constant {
 };
 
 #---------------------------------------------------------------------------
-my  $my_maxdepth;
-our $my_visit_depth = 0;
 
-my ($maxstringwidth, $truncsuffix, $trunctailwidth, $objects,
-    $opt_refaddr, $listform, $debug);
-my ($sortkeys, $ovopt);
+# We may be called recursively via $Carp::RefArgFormatter !
+# So can't use globals which might change.
 
 sub _Do {
   oops unless @_ == 1;
@@ -740,14 +740,16 @@ sub _Do {
   local $_;
   &_SaveAndResetPunct;
 
-  ($maxstringwidth, $truncsuffix, $trunctailwidth, $objects, $opt_refaddr, $listform, $debug)
+  local $Carp::RefArgFormatter = undef;  # prevent recursion
+
+  my ($maxstringwidth, $truncsuffix, $trunctailwidth, $objects, $opt_refaddr, $listform, $debug)
     = @$self{qw/MaxStringwidth Truncsuffix Trunctailwidth Objects Refaddr _Listform Debug/};
-  $sortkeys = $self->Sortkeys;
+  my $sortkeys = $self->Sortkeys;
 
   $maxstringwidth = 0 if ($maxstringwidth //= 0) >= INT_MAX;
   $truncsuffix //= "...";
   $trunctailwidth = min($trunctailwidth//0, $maxstringwidth);
-  $ovopt = "tagged";
+  my $ovopt = "tagged";
   if (ref($objects) eq "HASH") {
     foreach my $key (keys %$objects) {
       if ($key eq 'show_classname') { # DEPRECATED
@@ -771,7 +773,8 @@ sub _Do {
   }
   $objects = [ $objects ] unless ref($objects //= []) eq 'ARRAY';
 
-  my @orig_values = $self->dd->Values;
+  my $dd = $self->dd || oops vis($self->dd);
+  my @orig_values = $dd->Values;
   croak "Exactly one item may be in Values" if @orig_values != 1;
   my $original = $orig_values[0];
   btw "##ORIGINAL=",u($original),"=",_dbvis($original) if $debug;
@@ -780,14 +783,24 @@ sub _Do {
     if ! defined wantarray;
 
   # Allow one extra level if we wrapped the user's args in __getself_[ah]
-  $my_maxdepth = $self->Maxdepth || INT_MAX;
+  my $my_maxdepth = $self->Maxdepth || INT_MAX;
   ++$my_maxdepth if $listform && $my_maxdepth < INT_MAX;
 
-  oops unless $my_visit_depth == 0;
+  @{ $self->{_VisitState} }{ qw/maxstringwidth truncsuffix trunctailwidth
+       objects opt_refaddr listform debug ovopt my_maxdepth my_visit_depth
+       in_overload_replacement/ }
+    =
+  ($maxstringwidth, $truncsuffix, $trunctailwidth, $objects, $opt_refaddr, $listform, $debug, $ovopt, $my_maxdepth, 0, 0);
+
   my $modified = $self->visit($original); # see Data::Visitor
 
-  btw "## DD input : ",_dbvis($modified) if $debug;
-  $self->dd->Values([$modified]);
+  ($maxstringwidth, $truncsuffix, $trunctailwidth, $objects, $opt_refaddr, $listform, $debug, $ovopt, $my_maxdepth)
+  =
+  @{ $self->{_VisitState} }{ qw/maxstringwidth truncsuffix trunctailwidth
+       objects opt_refaddr listform debug ovopt my_maxdepth/ };
+
+  btw "## DD input : ",_dbvis($modified)," my_maxdepth=$my_maxdepth" if $debug;
+  $dd->Values([$modified]);
 
   # Always call Data::Dumper with Indent(0) and Pad("") to get a single
   # maximally-compact string, and then manually fold the result to Foldwidth,
@@ -804,7 +817,7 @@ sub _Do {
   { my $dd_warning = "";
 
     { local $SIG{__WARN__} = sub{ $dd_warning .= $_[0] };
-      eval{ $dd_result = $self->dd->Dump };
+      eval{ $dd_result = $dd->Dump };
     }
     if ($dd_warning || $@) {
       warn "Data::Dumper complained:\n$dd_warning\n$@" if $debug;
@@ -820,7 +833,7 @@ sub _Do {
 
   # Allow deletion of the possibly-recursive clone
   circular_off($modified);
-  $self->dd->Values([]);
+  $dd->Values([]);
 
   &_RestorePunct;
   $our_result;
@@ -829,15 +842,17 @@ sub _Do {
 #----------------------------------------------------------------------------
 # methods called from Data::Visitor (and helpers) when transforming the input
 
-our $in_overload_replacement = 0;
-
-sub _prefix_refaddr($;$) {
-  my ($item, $original) = @_;
+sub _prefix_refaddr {
+  my ($self, $item, $original) = @_;
   # If enabled by Refaddr(true):
   #
   # Prefix (the formatted representation of) a ref with it's abbreviated
   # address.  This is done by wrapping the ref in a temporary [array] with the
   # prefix, and unwrapping the Data::Dumper result in _postprocess_DD_result().
+  my ($my_visit_depth, $opt_refaddr, $listform, $in_overload_replacement,
+      $debug) = @{ $self->{_VisitState} }
+  { qw/my_visit_depth   opt_refaddr   listform   in_overload_replacement
+       debug/ };
   return $item
     unless $opt_refaddr
            && ! $in_overload_replacement
@@ -855,8 +870,10 @@ say "_prefix_refaddr: ior=$in_overload_replacement pfx=$pfx ix=$ix original=",_d
   $item
 }#_prefix_refaddr
 
-sub _object_subst($) {
-  my $item = shift;
+sub _object_subst {
+  my ($self, $item) = @_;
+  my ($ovopt, $debug, $objects) = @{ $self->{_VisitState} }
+  { qw/ovopt   debug   objects/ };
   my $overload_depth;
   CHECKObject: {
     if (my $class = blessed($item)) {
@@ -948,15 +965,24 @@ btw '@@@repl (no overload repl, not Regexp)' if $debug;
 }#_object_subst
 
 sub visit_value {
-  my $self = shift;
-  say "!V value ",_dbravis2(@_)," depth:$my_visit_depth" if $debug;
-  my $item = shift;
+  my ($self, $item) = @_;
   # N.B. Not called for hash keys (short-circuited in visit_hash_key)
+
+  my ($my_visit_depth, $my_maxdepth, $opt_refaddr, $listform,
+      $in_overload_replacement, $maxstringwidth, $truncsuffix,
+      $trunctailwidth, $debug) = @{ $self->{_VisitState} }
+  { qw/my_visit_depth   my_maxdepth   opt_refaddr   listform
+       in_overload_replacement   maxstringwidth   truncsuffix
+       trunctailwidth   debug/ };
+
+  say "!V value ",_dbravis2(@_)," depth:$my_visit_depth" if $debug;
+  btw "!         vd=$my_visit_depth my_maxdepth=$my_maxdepth" if $debug;
+
 
   return $item
     if !defined($item);
 
-  return _object_subst($item)
+  return $self->_object_subst($item)
     if defined(blessed $item);
 
   return $item
@@ -997,17 +1023,23 @@ btw '@@@repl truncating ',substr($item,0,10),"...","[ msw=$maxstringwidth l=",le
 
 sub visit_hash_key {
   my ($self, $item) = @_;
-  say "!V visit_hash_key ",_dbravis2($item)," depth:$my_visit_depth" if $debug;
+  my ($debug) = @{ $self->{_VisitState} } { qw/debug/ };
+
+  say "!V visit_hash_key ",_dbvis($item) if $debug;
   return $item; # don't truncate or otherwise munge
 }
 
 sub visit_object {
-  my $self = shift;
-  my $item = shift;
+  my ($self, $item) = @_;
+  my ($my_visit_depth, $debug) = @{ $self->{_VisitState} }
+  { qw/my_visit_depth   debug/ };
+
   say "!V object a=",_refaddrdechex($item)," depth:$my_visit_depth"," item=",_dbvis1($item) if $debug;
   my $original = $item;
 
-  local $my_visit_depth = $my_visit_depth + 1;
+  local $self->{_VisitState}->{my_visit_depth}
+      = $self->{_VisitState}->{my_visit_depth} + 1;
+
   # FIXME: with Objects(0) we should visit object internals so $my_maxdepth
   #  can be applied correctly.  Currently we just leave object refs as-is
   #  for D::D to expand, and Maxdepth will be handled incorrectly if this
@@ -1016,12 +1048,14 @@ sub visit_object {
   # First register the ref (to detect duplicates); this calls visit_seen()
   # which usually substitutes something.
   { # Suppress Refaddr treatment of the results of any overloads
-    local $in_overload_replacement = $in_overload_replacement + 1;
+    local $self->{_VisitState}->{in_overload_replacement}
+      = $self->{_VisitState}->{in_overload_replacement} + 1;
+
     my $nitem = $self->SUPER::visit_object($item);
     # Can not compare object refs with != in case that op is not defined!
     # (and refaddr() returns undef if $nitem is e.g. a "magic string")
     if (u(refaddr($nitem)) ne u(refaddr($item))) {
-      say "!     (obj) new: $item --> ",_dbvis2($nitem) if $debug;
+      say "!     (obj) new: $item --> ",_dbrvis2($nitem) if $debug;
       $item = $nitem;
       # Re-visit the replacement item, which might contain inner structure.
       $nitem = $self->SUPER::visit($item);
@@ -1029,16 +1063,20 @@ sub visit_object {
       $item = $nitem;
     }
   }
-  $item = _prefix_refaddr($item, $original);
+  $item = $self->_prefix_refaddr($item, $original);
   $item
 }#visit_object
 
 sub visit_ref {
   my ($self, $item) = @_;
+
+  my ($my_visit_depth, $my_maxdepth, $debug) = @{ $self->{_VisitState} }
+  { qw/my_visit_depth   my_maxdepth   debug/ };
+
   if (ref($item) eq 'ARRAY') {
-    say "!V ref  A=",_refaddrdechex($item)," depth:$my_visit_depth max:$my_maxdepth item=",_dbavis2(@$item) if $debug;
+    say "!V ref  ",addrvis($item)," depth:$my_visit_depth max:$my_maxdepth item=",_dbavis2(@$item) if $debug;
   } else {
-    say "!V ref  a=",_refaddrdechex($item)," depth:$my_visit_depth max:$my_maxdepth item=",_dbvis1($item) if $debug;
+    say "!V ref  ",addrvis($item)," depth:$my_visit_depth max:$my_maxdepth item=",_dbvis1($item) if $debug;
   }
   my $original = $item;
 
@@ -1046,7 +1084,7 @@ sub visit_ref {
   # Data::Dumper's Maxdepth() option will not work as we intend.
   # Therefore we implement Maxdepth ourself
   if ($my_visit_depth >= $my_maxdepth) {
-    oops "vd=$my_visit_depth maxd=$my_maxdepth debug=",_dbvis($debug)," item=",_dbshow($item),"\n   self=",_dbvis($self)
+    oops "[vd=$my_visit_depth maxd=$my_maxdepth debug=",_dbvis($debug),"]\n\n   item=",_dbshow($item),"\n\n   self=",_dbvis($self), "\n\n"
       unless $my_visit_depth == $my_maxdepth;
     $item = _MAGIC_NOQUOTES_PFX.addrvis($item);
     say "!       maxdepth reached, returning ",_dbvis2($item) if $debug;
@@ -1062,26 +1100,36 @@ sub visit_ref {
       $subname .= "\@".basename($file).":$line";
     }
     $item = _MAGIC_NOQUOTES_PFX.'\&'.$subname;
-    say "!       CODEref without DEPARSE, returning ",_dbvis2($item) if $debug;
+    say "!       CODEref without Deparse, returning ",_dbvis2($item) if $debug;
     #return $item;
   }
 
   # First descend into the structure, probably returning a clone
-  local $my_visit_depth = $my_visit_depth + 1;
+  local $self->{_VisitState}->{my_visit_depth}
+      = $self->{_VisitState}->{my_visit_depth} + 1;
+
   if (ref($item)) { # not replaced above...
     #my $nitem = $self->SUPER::visit_ref($item);
+btw "# descending... vd=$my_visit_depth my_maxdepth=$my_maxdepth" if $debug;
     my $nitem = $self->SUPER::visit_ref($item);
-    say "!       (ref) new: ",_dbvis2($item), " --> ",_dbvis2($nitem) if $debug;
+btw "# ...back up... vd=$my_visit_depth my_maxdepth=$my_maxdepth" if $debug;
+    say "!       (ref) new: ",_dbrvis2($item),
+      "\n               --> ",_dbrvis2($nitem) if $debug;
     $item = $nitem;
   }
 
   # Prepend the original address to whatever the representation is now
-  $item = _prefix_refaddr($item, $original);
+  $item = $self->_prefix_refaddr($item, $original);
 
   $item
-}
+}#visit_ref
 sub visit_hash_entries {
   my ($self, $hash) = @_;
+  my ($my_visit_depth, $my_maxdepth, $sortkeys, $debug) = @{ $self->{_VisitState} }
+  { qw/my_visit_depth   my_maxdepth   sortkeys   debug/ };
+
+  say "!V hash_entries ",addrvis($hash) if $debug;
+  btw "!                vd=$my_visit_depth my_maxdepth=$my_maxdepth" if $debug;
   # Visit in sorted order
   return map { $self->visit_hash_entry( $_, $hash->{$_}, $hash ) }
              (ref($sortkeys) ? @{ $sortkeys->($hash) } : (sort keys %$hash));
@@ -1089,6 +1137,9 @@ sub visit_hash_entries {
 
 sub visit_glob {
   my ($self, $item) = @_;
+  my ($my_visit_depth, $debug) = @{ $self->{_VisitState} }
+  { qw/my_visit_depth   debug/ };
+
   say "!V glob ref()=",ref($item)," depth:$my_visit_depth"," item=",_dbravis2($item) if $debug;
   # By default Data::Visitor will create a new anon glob in the output tree.
   # Instead, put the original into the output so the user can recognize
@@ -1098,6 +1149,9 @@ sub visit_glob {
 
 sub visit_seen {
   my ($self, $data, $first_result) = @_;
+  my ($my_visit_depth, $opt_refaddr, $debug) = @{ $self->{_VisitState} }
+  { qw/my_visit_depth   opt_refaddr   debug/ };
+
   say "!V seen orig=",_dbrvis2($data)," depth:$my_visit_depth","  1stres=",_dbrvis2($first_result)
     if $debug;
 
@@ -1510,6 +1564,7 @@ use constant _WRAP_STYLE => (_WRAP_ALLHASH);
 sub _get_useqq_set_widechars {
   my ($self) = @_;
   my $useqq = $self->Useqq();
+  my $unesc_unicode;
   if ($useqq) {
 
     carp "WARNING: The Useqq specification string ",_dbvis($useqq)," contains a non-ASCII character but 'use utf8;' was not in effect when the literal was compiled; the intended chracter was probably not used.\n"
@@ -1554,7 +1609,7 @@ sub _postprocess_DD_result {
       $showspaces        = 1,next if /space/;
       $underscores      = 1,next if /under/;
       $_ = "qq={}" if $_ eq "qq"; # deprecated
-      if (/^qq=(.)(.)$/) { # deprecated
+      if (/^qq=(.)(.)$/) {
         $q_pfx = "qq"; $q_lq = $1; $q_rq = $2;
         next
       }
@@ -1974,7 +2029,7 @@ sub _postprocess_DD_result {
 
 sub _Interpolate {
   my ($self, $input, $i_or_d) = @_;
-  _croak_or_confess $i_or_d."vis('$input') called in void context.\nDid you forget to 'say ...'?"
+  _croak_or_confess $i_or_d."vis called in void context.\nDid you forget to 'say ...'?"
     unless defined wantarray;
 
   return "<undef arg>" if ! defined $input;
@@ -2154,7 +2209,7 @@ sub import {
     if (/^:debug(.*)/) {
       my $rhs = $1;
       my $level = $rhs eq "" ? 1 : $rhs =~ /^=(\d+)$/ ? $1 : croak "INVALID import $_";
-      $import_debug = $AUTOLOAD_debug = $Debug = $level; # show generated code
+      $import_debug = $AUTOLOAD_debug = $level; # show generated code
     }
     elsif (/^:DEFAULT/) {
       push @args, @EXPORT;
@@ -2243,7 +2298,9 @@ sub DB_Vis_Interpolate {
       if ($foldwidth) {
         $self->{Foldwidth1} -= $leftwid if $leftwid < $self->{Foldwidth1}
       }
-      $result .= $self->$methname( DB::DB_Vis_Eval($funcname, $arg) );
+      $result .= $self->$methname(
+                           DB::DB_Vis_Eval($funcname, $arg)
+      );
     }
   }
 
@@ -2258,7 +2315,7 @@ sub DB_Vis_Interpolate {
 sub DB_Vis_Eval($$) {
   my ($label_for_errmsg, $evalarg) = @_;
   Carp::confess("Data::Dumper::Interp bug:empty evalarg") if $evalarg eq "";
-  # Inspired perl5db.pl but at this point has been rewritten
+  # Originally inspired by perl5db.pl but at this point has been rewritten
 
   # Find the closest non-DB caller.  The eval will be done in that package.
   #
@@ -2324,6 +2381,7 @@ sub DB_Vis_Eval($$) {
 
   if ($errmsg) {
     $errmsg = Data::Dumper::Interp::_chop_ateval($errmsg);
+    $errmsg =~ s/Global symbol "([^"]*)" requires explicit package name.*/$1 does not exist (or has been optimized out)/;
     Carp::carp("${label_for_errmsg} interpolation error: $errmsg\n");
     @result = ( (defined($result[0]) ? $result[0] : "")."<invalid/error>"
                 , "" # second item in case this ends up in %{ ... }
@@ -2334,7 +2392,7 @@ sub DB_Vis_Eval($$) {
 }# DB_Vis_Eval
 
 1;
- __END__
+__END__
 
 =pod
 
@@ -2369,8 +2427,7 @@ Data::Dumper::Interp - interpolate Data::Dumper output into strings for human co
     #   and @ARGV=("-i","/file/path")
 
   # Functions to format one thing
-  say vis $href;     # {abc => [1,2,3,4,5], def => undef}
-  say vis \@ARGV;    # ["-i", "/file/path"]  # any scalar
+  say vis $href;     # {abc => [1,2,3,4,5], def => undef}  #any scalar
   say avis @ARGV;    # ("-i", "/file/path")
   say hvis %hash;    # (abc => [1,2,3,4,5], def => undef)
 
@@ -2378,9 +2435,9 @@ Data::Dumper::Interp - interpolate Data::Dumper output into strings for human co
   say visr $href;     # HASH<457:1c9>{abc => [1,2,3,4,5], ...}
 
   # Just abbreviate a referent address or arbitrary number
-  say addrvis refaddr($href);  # 457:1c9
-  say addrvis $href;           # HASH<457:1c9>
   say addrvis $obj;            # Foo::Bar<984:ef8>
+  say addrvis $href;           # HASH<457:1c9>
+  say addrvis refaddr($href);  # 457:1c9
 
   # Stringify objects
   { use bigint;
@@ -2391,12 +2448,9 @@ Data::Dumper::Interp - interpolate Data::Dumper output into strings for human co
     # But if you do want to see object internals...
     #
     say visnew->viso($struct);
-      # --> {debt => bless({...lots of stuff...},'Math::BigInt')}
-
-    # These all do the same thing
+     OR
     say visnew->Objects(0)->vis($struct);
-    { local $Data::Dumper::Interp::Objects=0; say vis $struct; }
-    say viso $struct;   # 'viso' is not exported by default
+      # --> {debt => bless({...lots of stuff...},'Math::BigInt')}
   }
 
   # Wide characters are readable
@@ -2408,9 +2462,6 @@ Data::Dumper::Interp - interpolate Data::Dumper output into strings for human co
   #-------- OO API --------
 
   say visnew->MaxStringwidth(50)->Maxdepth($levels)->vis($datum);
-
-  say Data::Dumper::Interp->new()
-            ->MaxStringwidth(50)->Maxdepth($levels)->vis($datum);
 
   #-------- RefArgFormatter for Carp --------
 
@@ -2479,7 +2530,7 @@ Expressions are evaluated in the caller's context using Perl's debugger
 hooks, and may refer to almost any lexical or global visible at
 the point of call (see "LIMITATIONS").
 
-IMPORTANT: The argument must be single-quoted to prevent Perl
+IMPORTANT: The argument string must be single-quoted to prevent Perl
 from interpolating it beforehand.
 
 =head2 dvis I<'string to be interpolated'>
@@ -2511,7 +2562,7 @@ show strings in single-quoted form (implied by the 'B<q>' suffix).
 There are no fixed function names; you can use any modifier
 characters in any order, prefixed or suffixed to the primary name
 with optional '_' separators.
-The function will be I<generated> when it is imported* or called as a method.
+The function will be I<generated> when it is imported or called as a method.
 
 The available modifier characters are:
 
@@ -2622,9 +2673,7 @@ call them as methods and import only the C<visnew> function:
 (C<visnew> creates a new object.  Non-existent methods are auto-generated
 via the AUTOLOAD mechanism).
 
-* Only stub declarations with prototypes are generated
-when functions are imported; bodies are auto-generated when first called.
-Use the C<:debug> import tag to see details.
+Use the C<:debug> import tag to see function/method generation.
 
 =head1 Showing Abbreviated Addresses
 
@@ -2750,8 +2799,6 @@ B<overloads =E<gt> "ignore"> : Overloaded operators are not evaluated at all;
 the original object's abbreviated refaddr is shown
 (if you want to see object internals, disable I<Objects> entirely.)
 
-Deprecated: B<show_classname =E<gt> False> : Please use S<< B<overloads =E<gt> "transparent"> instead. >>
-
 =back
 
 The I<objects> value indicates whether and for which classes special
@@ -2827,14 +2874,6 @@ Show numbers with '_' seprating groups of 3 digits.
 
 Use the given symbols instead of double quotes.  The symbols may
 contain multiple characters. Escape , or : with backslash(E<92>).
-
-=item "qq=XY"
-
-(Deprecated) Equivalent to "style=qqX,Y"
-
-=item "qq"
-
-(Deprecated) Equivalent to "style=qq{,}"
 
 =back
 
@@ -2967,7 +3006,7 @@ When the address of a shared variable is shown
 (e.d. when the B<Refaddr> option is enabled or if calling B<addrvis()>),
 the variable's I<globally unique ID> shown instead of the C<refaddr>.
 
-(The C<refaddr> of a shared variable is misleading it refers
+(The C<refaddr> of a shared variable is misleading; it refers
 to a thread-local intermediary and may be different in
 each thread even though the same shared object is being referenced).
 
@@ -3026,7 +3065,6 @@ and '␤' may be shown for newline (and similarly for other ASCII controls).
 
 =item *
 
-Unless B<Deparse> is enabled,
 CODE refs show the name of the referenced sub using L<Sub::Identify>
 instead of C<sub{ "DUMMY" }>.  If the sub is anonymous, the file:lineno
 where it was defined is shown.

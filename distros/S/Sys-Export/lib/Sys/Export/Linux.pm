@@ -1,7 +1,7 @@
 package Sys::Export::Linux;
 
-# ABSTRACT: Export subsets of a Linux system
-our $VERSION = '0.005'; # VERSION
+# ABSTRACT: Export subsets of a Linux system, including GNU libc special cases
+our $VERSION = '0.006'; # VERSION
 
 
 use v5.26;
@@ -10,10 +10,14 @@ use experimental qw( signatures );
 use parent 'Sys::Export::Unix';
 use Cwd 'abs_path';
 use Carp;
+use Sys::Export 'filedata';
+use Sys::Export::LogAny '$log';
 
 sub _build__trace_deps {
    my $self= shift;
    if ($self->_can_run_in_src) {
+      # Seems Solaris has an 'strace' but it isn't compatible enough to pass tests.
+      $^O eq 'linux' or croak "Only Linux strace is supported";
       # Are we going to attempt chrooting?
       if ($self->src_abs ne '/') {
          $self->{cmd_path_chroot} //= do {
@@ -86,6 +90,81 @@ sub _trace_deps_linux_strace($self, @argv) {
 }
 
 
+sub parse_ld_so_conf($self, $conf_path= 'etc/ld.so.conf') {
+   my $data= filedata($self->src_abs . $conf_path);
+   my @libs;
+   for (split /\n/, $$data) {
+      chomp;
+      next if /^\s*(#|\z)/;
+      if (/^\s*include (\S+)/) {
+         my $pattern= $1;
+         # relative paths are relative to the config file's parent directory
+         my $prefix= $pattern =~ s{^/}{}? '' : ($conf_path =~ s{[^/]+\z}{}r);
+         push @libs, $self->parse_ld_so_conf($_)
+            for $self->src_glob($prefix.$pattern);
+      }
+      elsif (m{^/}) {
+         push @libs, substr($_, 1);
+      }
+      else {
+         $log->warn("parse_ld_so_conf: unknown syntax at '$_'");
+      }
+   }
+   return @libs;
+}
+
+sub _build_src_lib_path($self) {
+   my $paths= $self->next::method();
+   # ld.so.conf may or may not be used on this host
+   if (defined $self->_src_abs_path('etc/ld.so.conf')) {
+      eval { $paths= $self->_distinct_abs_directories(1, @$paths, $self->parse_ld_so_conf) }
+         or $self->log->warn("Failed to parse ld.so.conf: $@");
+   }
+   return $paths;
+}
+
+
+sub parse_nsswitch_conf($self, $conf_path= 'etc/nsswitch.conf') {
+   my $data= filedata($self->src_abs . $conf_path);
+   my @db_conf;
+   for (split /\n/, $$data) {
+      chomp;
+      next if /^\s*(#|\z)/;
+      if (m{^\s*([^\s:]+)\s*:\s*(\S.+)}) {
+         push @db_conf, $1 => [ split /\s+/, $2 ];
+      }
+      else {
+         $log->warn("parse_nsswitch_conf: unknown syntax at '$_'");
+      }
+   }
+   return @db_conf;
+}
+
+
+sub add_nsswitch_libs($self, @module_names) {
+   if (!@module_names) {
+      my %seen;
+      for ($self->parse_nsswitch_conf) {
+         next unless ref eq 'ARRAY';
+         ++$seen{$_} for @$_;
+      }
+      @module_names= sort keys %seen;
+   }
+   my @libpath= $self->src_lib_path_list;
+   ns_module: for (@module_names) {
+      my $pattern= "libnss_$_.*";
+      for my $libdir (@libpath) {
+         $log->tracef("Look for %s in %s", $pattern, $libdir);
+         if (my @match= $self->src_glob("$libdir/$pattern")) {
+            $self->add(@match);
+            next ns_module;
+         }
+      }
+      $log->warn("glibc nss module not found: $_");
+   }
+}
+
+
 sub add_passwd($self, %options) {
    # If the dst_userdb hasn't been created, create it by filtering the src_userdb by which
    # group and user ids have been seen during the export.
@@ -123,7 +202,7 @@ sub add_localtime($self, $tz_name) {
 }
 
 # Avoiding dependency on namespace::clean
-delete @{Sys::Export::Linux::}{qw( croak carp confess abs_path )};
+delete @{Sys::Export::Linux::}{qw( croak carp confess abs_path filedata )};
 1;
 
 __END__
@@ -134,7 +213,7 @@ __END__
 
 =head1 NAME
 
-Sys::Export::Linux - Export subsets of a Linux system
+Sys::Export::Linux - Export subsets of a Linux system, including GNU libc special cases
 
 =head1 SYNOPSIS
 
@@ -148,11 +227,50 @@ Sys::Export::Linux - Export subsets of a Linux system
 
 =head1 DESCRIPTION
 
-This object extends L<Sys::Export::Unix> with Linux-specific helpers and special cases.
+This object extends L<Sys::Export::Unix> with Linux-specific and GNU-libc-specific helpers and
+special cases.  It also supports Linux without GNU libc, and possibly GNU libc without Linux.
 
 See C<Sys::Export::Unix> for the list of core attributes and methods.
 
 =head1 METHODS
+
+=head2 parse_ld_so_conf
+
+  @lib_paths= $exporter->parse_ld_so_conf($filename = 'etc/ld.so.conf');
+
+Return a list of library paths parsed from a ld.so.conf file.
+
+=head2 parse_nsswitch_conf
+
+  %db_info= $exporter->parse_nsswitch_conf($filename => 'etc/nsswitch.conf');
+  # (
+  #    aliases => [ @module_names ],
+  #    hosts   => [ @module_names ],
+  #    ...
+  # )
+
+The GNU Libc "nsswitch" system lets you dynamically configure libraries to support various libc
+database lookups.  This method returns a name/value list (suitable for constructing a hashref)
+where the key is the name of the database, like C<'hosts'> or C<'passwd'>, and the value is an
+arrayref of which plugins will be queries, and in what order they will be queried.
+
+=head2 add_nsswitch_libs
+
+  $exporter->add_nsswitch_libs;
+  $exporter->add_nsswitch_libs(@module_names);
+
+With glibc, the binaries do not directly refer to the dynamically-configured nsswitch modules,
+so the modules won't get automatically included.  If you want your chroot image to be able to
+do things like DNS name lookups or passwd file lookups, you need to include any NSS module
+configured for them.
+
+This method defaults to the set of all modules returned by L</parse_nsswitch_conf>, and then
+adds libraries for each of them, like C<"lib64/libnss_dns.so.2">.  Missing libraries generate a
+warning (not an exception).
+
+With newer glibc, the modules 'files' and 'dns' are built-in, to aid with chroots, though the
+libnss_files.so and libnss_dns.so still exist in the lib directory.
+This method doesn't attempt to add a special case for omitting them.
 
 =head2 add_passwd
 
@@ -205,7 +323,7 @@ can't find this timezone in any of those locations, it dies.
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

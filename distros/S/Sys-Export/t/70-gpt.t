@@ -8,7 +8,7 @@ use Sys::Export qw( filedata );
 use Sys::Export::GPT;
 
 subtest fit_to_partitions => sub {
-   my $tmp= File::Temp->new;
+   my $tmp= tmpfile;
    my $guid_012= '00112233-4455-6677-8899-AABBCCDDEEFF';
    my $guid_fed= 'FFEEDDCC-BBAA-9988-7766-554433221100';
    my $gpt= Sys::Export::GPT->new(

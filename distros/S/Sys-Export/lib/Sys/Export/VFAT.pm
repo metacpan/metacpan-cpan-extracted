@@ -1,6 +1,6 @@
 package Sys::Export::VFAT;
 # ABSTRACT: Write minimal FAT12/16/32 filesystems with control over stored file extents
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 
 use v5.26;
 use warnings;
@@ -1094,7 +1094,7 @@ lowercase ASCII and replacing illegal characters with '_' or the character of yo
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

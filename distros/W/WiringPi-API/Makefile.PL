@@ -4,7 +4,7 @@ use strict;
 use ExtUtils::MakeMaker;
 use version;
 
-my $min_wpi_ver = 2.36;
+my $min_wpi_ver = 3.18;
 
 if (! -f '/usr/include/wiringPi.h' && ! -f '/usr/local/include/wiringPi.h'){
     print "wiringPi is not installed, exiting...\n";
@@ -28,8 +28,8 @@ if (my $path = (grep { -x "$_/gpio" } split /:/, $ENV{PATH})[0]){
     }
 }
 else {
-    print "\ncan not determine wiringPi version. Ensure version 2.36+ " .
-          " is installed. Can't continue\n";
+    print "\ncan not determine wiringPi version. Ensure version " .
+          "$min_wpi_ver+ is installed. Can't continue\n";
     exit;
 }
 
@@ -58,5 +58,6 @@ WriteMakefile(
     MIN_PERL_VERSION  => 5.006,
     LICENSE           => 'perl_5',
     PREREQ_PM         => {
+        'RPi::Const' => '1.05',
     },
 );

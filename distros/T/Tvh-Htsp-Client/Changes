@@ -1,5 +1,14 @@
 Revision history for Tvh-Htsp-Client
 
+0.05    10 June 2026
+        bumped minimum Perl version to 5.28 due to 'Tests are failing with perls < 5.28.0'
+
+0.04    10 June 2026
+        no functional changes
+        changed German code comments to English
+        amended documentation
+        added __PACKAGE__ to Error messages to itentify their origin
+
 0.03    18 July 2025
         added 'htsmsg_deserialise' method
 

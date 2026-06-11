@@ -42,6 +42,7 @@ t/21-unix-with-rewrites.t
 t/22-unix-src-find.t
 t/30-linux-passwd.t
 t/31-linux-strace.t
+t/32-gnu-libc.t
 t/70-gpt.t
 t/71-vfat-geometry.t
 t/72-vfat-allocation-table.t

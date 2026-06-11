@@ -1,16 +1,16 @@
 package Sys::Export::GPT;
 
-our $VERSION = '0.005'; # VERSION
+our $VERSION = '0.006'; # VERSION
 # ABSTRACT: Implementation of GUID Partition Table
 
-use v5.26;
+use v5.28;
 use warnings;
 use experimental qw( signatures );
 use Scalar::Util qw( blessed );
 use List::Util qw( min max );
 use Encode qw( encode );
 use Sys::Export::LogAny '$log';
-use Sys::Export qw( write_file_extent isa_array isa_pow2 isa_handle round_up_to_multiple );
+use Sys::Export qw( write_file_extent isa_array isa_pow2 isa_handle round_up_to_multiple _pack );
 use Sys::Export::GPT::Partition;
 use Carp;
 
@@ -309,7 +309,7 @@ sub _pack_partition_entry($self, $part) {
    my $name_utf16= encode('UTF-16LE', $part->name // '');
    carp "Partition name '".part->name."' was truncated" if length $name_utf16 > $name_max;
    $part->block_size($self->block_size); # ensure accurate LBA numbers
-   pack 'a16 a16 Q< Q< Q< a'.$name_max,
+   _pack 'a16 a16 Q< Q< Q< a'.$name_max,
       _pack_guid($part->type), _pack_guid($part->guid), $part->start_lba, $part->end_lba,
       $part->flags // 0, $name_utf16
 }
@@ -321,7 +321,7 @@ sub _pack_header($self, $is_backup, $entries_crc) {
    my $entries_lba = $is_backup ? $self->backup_table_lba : $self->entry_table_lba;
    my $num_entries = scalar @{$self->partitions};
    # Build header without CRC first
-   my $header = pack('a8 V V V V Q< Q< Q< Q< a16 Q< V V V',
+   my $header = _pack('a8 V V V V Q< Q< Q< Q< a16 Q< V V V',
       'EFI PART',              # Signature
       0x00010000,              # Revision 1.0
       92,                      # Header size
@@ -347,7 +347,7 @@ sub _pack_header($self, $is_backup, $entries_crc) {
 # Avoiding dependency on namespace::clean
 delete @{Sys::Export::GPT::}{qw(
    carp croak confess blessed min max encode write_file_extent round_up_to_multiple
-   isa_array isa_handle isa_pow2
+   isa_array isa_handle isa_pow2 _pack
 )};
 1;
 
@@ -487,7 +487,7 @@ Writes the complete GPT structure to the given filehandle, including:
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 AUTHOR
 

@@ -9,7 +9,7 @@ use parent 'Exporter';
 
 use vars (qw(@EXPORT_OK));
 
-@EXPORT_OK = (qw( bin_slurp slurp ));
+@EXPORT_OK = (qw( bin_slurp slurp utf8_slurp utf8_spew ));
 
 =head2 slurp()
 
@@ -54,5 +54,33 @@ sub bin_slurp
     return $contents;
 }
 
-1;
+sub utf8_slurp
+{
+    my $filename = shift;
 
+    open my $in, '<:encoding(utf8)', $filename
+        or die "Cannot open '$filename' for slurping - $!";
+
+    local $/;
+    my $contents = <$in>;
+
+    close($in);
+
+    return $contents;
+}
+
+sub utf8_spew
+{
+    my $filename = shift;
+
+    open my $out, '>:encoding(utf8)', $filename
+        or die "Cannot open '$filename' for spewing - $!";
+
+    print {$out} @_;
+
+    close($out);
+
+    return;
+}
+
+1;
