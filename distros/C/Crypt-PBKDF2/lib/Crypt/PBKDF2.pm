@@ -1,11 +1,12 @@
 package Crypt::PBKDF2; 
 # ABSTRACT: The PBKDF2 password hashing algorithm.
-our $VERSION = '0.161520'; # VERSION
+our $VERSION = '0.261630'; # VERSION
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
 use Moo 2;
 use strictures 2;
 use namespace::autoclean;
 use MIME::Base64 ();
+use Crypt::URandom ();
 use Carp qw(croak);
 use Module::Runtime;
 use Try::Tiny;
@@ -22,7 +23,7 @@ sub BUILD {
 has hash_class => (
   is => 'ro',
   isa => Str,
-  default => 'HMACSHA1',
+  default => 'HMACSHA2',
   predicate => 'has_hash_class',
 );
 
@@ -66,7 +67,7 @@ sub _build_hasher {
 has iterations => (
   is => 'ro',
   isa => Int,
-  default => 1000,
+  default => 600000,
 );
 
 
@@ -85,11 +86,7 @@ has salt_len => (
 
 sub _random_salt {
   my ($self) = @_;
-  my $ret = "";
-  for my $n (1 .. $self->salt_len) {
-    $ret .= chr(int rand 256);
-  }
-  return $ret;
+  return Crypt::URandom::urandom($self->salt_len);
 }
 
 
@@ -144,7 +141,19 @@ sub validate {
 
   my $check_hash = $checker->PBKDF2($info->{salt}, $password);
 
-  return ($check_hash eq $info->{hash});
+  return _secure_compare($check_hash, $info->{hash});
+}
+
+# Constant-time string comparison, to avoid timing attacks on the hash check.
+sub _secure_compare {
+  my ($a, $b) = @_;
+
+  my $r = length($a) != length($b);
+  $a = $b if $r;
+
+  $r |= ord(substr($a, $_)) ^ ord(substr($b, $_)) for 0 .. length($a) - 1;
+
+  return $r == 0;
 }
 
 
@@ -364,16 +373,16 @@ Crypt::PBKDF2 - The PBKDF2 password hashing algorithm.
 
 =head1 VERSION
 
-version 0.161520
+version 0.261630
 
 =head1 SYNOPSIS
 
     use Crypt::PBKDF2;
 
     my $pbkdf2 = Crypt::PBKDF2->new(
-        hash_class => 'HMACSHA1', # this is the default
-        iterations => 1000,       # so is this
-        output_len => 20,         # and this
+        hash_class => 'HMACSHA2', # this is the default (HMAC-SHA256)
+        iterations => 600000,     # so is this
+        output_len => 32,         # and this
         salt_len => 4,            # and this.
     );
 
@@ -397,12 +406,15 @@ be, and the salt may also be of arbitrary size.
 
 =head2 hash_class
 
-B<Type:> String, B<Default:> HMACSHA1
+B<Type:> String, B<Default:> HMACSHA2
 
 The name of the default class that will provide PBKDF2's Pseudo-Random
 Function (the backend hash). If the value starts with a C<+>, the C<+> will
 be removed and the remainder will be taken as a fully-qualified package
 name. Otherwise, the value will be appended to C<Crypt::PBKDF2::Hash::>.
+
+The default class is C<HMACSHA2>, which (with its own default C<sha_size> of
+256) provides HMAC-SHA256.
 
 =head2 hash_args
 
@@ -419,7 +431,7 @@ C<hash_class> and C<hash_args> are ignored.
 
 =head2 iterations
 
-B<Type:> Integer, B<Default:> 1000.
+B<Type:> Integer, B<Default:> 600000.
 
 The default number of iterations of the hashing function to use for the
 C<generate> and C<PBKDF2> methods.
@@ -568,11 +580,11 @@ L<http://tools.ietf.org/html/rfc2307>
 
 =head1 AUTHOR
 
-Andrew Rodland <arodland@cpan.org>
+Andrew Rodland <andrew@cleverdomain.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Andrew Rodland.
+This software is copyright (c) 2026 by Andrew Rodland.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

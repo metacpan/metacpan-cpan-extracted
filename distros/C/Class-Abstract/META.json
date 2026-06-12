@@ -1,0 +1,67 @@
+{
+   "abstract" : "Enforce abstract (non-instantiable) base classes for plain-Perl OO",
+   "author" : [
+      "Nigel Horne <njh@nigelhorne.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Class-Abstract",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Readonly" : "0",
+            "Return::Set" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Memory::Cycle" : "0",
+            "Test::Mockingbird" : "0",
+            "Test::Most" : "0",
+            "Test::Returns" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Class-Abstract@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Abstract",
+         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Class-Abstract"
+      },
+      "homepage" : "https://metacpan.org/pod/Class::Abstract",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/nigelhorne/Class-Abstract.git",
+         "web" : "https://github.com/nigelhorne/Class-Abstract"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

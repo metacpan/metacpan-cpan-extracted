@@ -1,7 +1,7 @@
 {
    "abstract" : "Test POD links",
    "author" : [
-      "Thomas R. Wyant, III F<wyant at cpan dot org>"
+      "Thomas R. Wyant, III F<harryfmudd at comcast dot net>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4234",
@@ -63,14 +63,14 @@
    "provides" : {
       "Test::Pod::LinkCheck::Lite" : {
          "file" : "lib/Test/Pod/LinkCheck/Lite.pm",
-         "version" : "0.013"
+         "version" : "0.014"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "wyant@cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Pod-LinkCheck-Lite"
+         "mailto" : "harryfmudd@comcast.net",
+         "web" : "https://github.com/trwyant/perl-Test-Pod-LinkCheck-Lite/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -81,6 +81,6 @@
          "web" : "https://github.com/trwyant/perl-Test-Pod-LinkCheck-Lite"
       }
    },
-   "version" : "0.013",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.014",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

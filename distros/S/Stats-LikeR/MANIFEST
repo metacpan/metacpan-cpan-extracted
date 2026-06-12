@@ -17,10 +17,12 @@ t/cfilter.t
 t/chisq_test.t
 t/col2col.t
 t/filter.t
+t/fisher_test.t
 t/glm.t
 t/hoh2hoa.t
 t/prcomp.t
 t/read_table.t
 t/transpose.t
 t/value_counts.t
+t/view.t
 t/write_table.t

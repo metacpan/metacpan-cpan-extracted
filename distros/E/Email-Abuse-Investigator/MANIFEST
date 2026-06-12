@@ -11,6 +11,7 @@ README.md
 t/00-load.t
 t/conf/new.yml
 t/conf/originating_ip.yml
+t/conf/risk_assessment.yml
 t/critic.t
 t/edge_cases.t
 t/eof.t
@@ -20,7 +21,9 @@ t/function.t
 t/fuzz.t
 t/integration.t
 t/kwalitee.t
+t/locales.t
 t/manifest.t
+t/mutant_killers.t
 t/mutation_survivors.t
 t/pod-coverage.t
 t/pod.t

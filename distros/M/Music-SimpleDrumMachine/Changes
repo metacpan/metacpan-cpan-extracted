@@ -1,5 +1,9 @@
 Revision history for Music-SimpleDrumMachine
 
+0.0510 2026-06-11 16:02:23
+    - Drop unused cruft: "notes."
+    - Use `try` to improve / simplify the error message when opening the port.
+
 0.0509 2026-04-21 14:39:49
     - Add eg/no-fills.pl to illustrate not filling.
     - Fix-up an undefined situation.

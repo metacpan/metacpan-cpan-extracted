@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Simple 16th-note-phrase Drummer
 
-our $VERSION = '0.0509';
+our $VERSION = '0.0510';
 
 use v5.36;
 use feature 'try';
@@ -68,9 +68,9 @@ sub _build_drums {
         kick         => { num => 36, chan => $self->chan < 0 ?  0 : $self->chan, pat => [] },
         snare        => { num => 38, chan => $self->chan < 0 ?  1 : $self->chan, pat => [] },
         closed       => { num => 42, chan => $self->chan < 0 ?  2 : $self->chan, pat => [] },
-        fillcrash    => { num => 49, chan => $self->chan < 0 ?  3 : $self->chan, pat => [] },
+        fillcrash    => { num => 49, chan => $self->chan < 0 ?  3 : $self->chan, pat => [] }, # used for fills
         open         => { num => 46, chan => $self->chan < 0 ?  4 : $self->chan, pat => [] },
-        rimshot      => { num => 37, chan => $self->chan < 0 ?  5 : $self->chan, pat => [] },
+        rimshot      => { num => 37, chan => $self->chan < 0 ?  5 : $self->chan, pat => [] }, # actually, "side-stick"
         clap         => { num => 39, chan => $self->chan < 0 ?  6 : $self->chan, pat => [] },
         shaker       => { num => 70, chan => $self->chan < 0 ?  7 : $self->chan, pat => [] },
         cowbell      => { num => 56, chan => $self->chan < 0 ?  8 : $self->chan, pat => [] },
@@ -80,9 +80,9 @@ sub _build_drums {
         low_tom      => { num => 45, chan => $self->chan < 0 ? 13 : $self->chan, pat => [] },
         conga        => { num => 45, chan => $self->chan < 0 ? 14 : $self->chan, pat => [] },
         kick2        => { num => 35, chan => $self->chan < 0 ? 15 : $self->chan, pat => [] },
-        snare2       => { num => 40, chan => $self->chan < 0 ? 16 : $self->chan, pat => [] }, # bogus channels now...
-        pedal        => { num => 44, chan => $self->chan < 0 ? 19 : $self->chan, pat => [] },
-        low_floor    => { num => 41, chan => $self->chan < 0 ? 17 : $self->chan, pat => [] },
+        snare2       => { num => 40, chan => $self->chan < 0 ? 16 : $self->chan, pat => [] }, # Bogus channels now.
+        pedal        => { num => 44, chan => $self->chan < 0 ? 19 : $self->chan, pat => [] }, # If multi-timbral:
+        low_floor    => { num => 41, chan => $self->chan < 0 ? 17 : $self->chan, pat => [] }, # redefine with add_drums
         hi_floor     => { num => 43, chan => $self->chan < 0 ? 18 : $self->chan, pat => [] },
         hihi_tom     => { num => 50, chan => $self->chan < 0 ? 20 : $self->chan, pat => [] },
         ride         => { num => 51, chan => $self->chan < 0 ? 21 : $self->chan, pat => [] },
@@ -150,13 +150,6 @@ has next_fill => (
 has next_part => (
     is      => 'rw',
     default => sub { '_default_part' },
-);
-
-
-has notes => (
-    is      => 'rw',
-    isa     => sub { croak "$_[0] is not an array-ref" unless ref($_[0]) eq 'ARRAY' },
-    default => sub { [qw(60 64 67)] },
 );
 
 
@@ -235,7 +228,12 @@ sub _build__midi_out {
     }
     catch ($e) {}
     my $name = $self->port_name;
-    $midi_out->open_port_by_name(qr/\Q$name/i);
+    try {
+        $midi_out->open_port_by_name(qr/\Q$name/i);
+    }
+    catch ($e) {
+        die "Can't open MIDI port: $name";
+    }
     return $midi_out;
 }
 
@@ -492,7 +490,7 @@ Music::SimpleDrumMachine - Simple 16th-note-phrase Drummer
 
 =head1 VERSION
 
-version 0.0509
+version 0.0510
 
 =head1 SYNOPSIS
 
@@ -714,15 +712,6 @@ If this is an array-reference, the named parts or fills are played in
 succession.
 
 Default: C<'_default_part'>
-
-=head2 notes
-
-  $notes = $dm->notes;
-  $dm->notes($notes);
-
-The notes to set for each drum - why not?
-
-Default: C<[60, 64, 67]>
 
 =head2 parts
 

@@ -54,7 +54,7 @@ WWW::Crawl4AI::Strategy - role for a single crawl strategy in the WWW::Crawl4AI 
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

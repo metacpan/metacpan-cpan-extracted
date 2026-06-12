@@ -1,7 +1,7 @@
 {
    "abstract" : "Critique unused variables in Perl source",
    "author" : [
-      "Thomas R. Wyant, III (wyant at cpan dot org)"
+      "Thomas R. Wyant, III (harryfmudd at comcast dot net)"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4234",
@@ -66,14 +66,14 @@
    "provides" : {
       "Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter" : {
          "file" : "lib/Perl/Critic/Policy/Variables/ProhibitUnusedVarsStricter.pm",
-         "version" : "0.115"
+         "version" : "0.116"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "wyant@cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter"
+         "mailto" : "harryfmudd@comcast.net",
+         "web" : "https://github.com/trwyant/perl-Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -84,6 +84,6 @@
          "web" : "https://github.com/trwyant/perl-Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter"
       }
    },
-   "version" : "0.115",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.116",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

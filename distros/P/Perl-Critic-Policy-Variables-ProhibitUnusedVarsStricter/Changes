@@ -1,3 +1,15 @@
+0.116		2026-06-11	T. R. Wyant
+    Remove references to the RT bug tracking system.
+
+    Replace wyant@cpan.org with harryfmudd@comcast.net.
+
+    Repackage licenses so that GitHub can find them (maybe).
+    Thanks to Mikko Koivunalho (specifically his blog post
+    https://blogs.perl.org/users/mikko_koivunalho/2025/11/github-and-the-perl-license.html
+    for the how-to.
+
+    No functional changes.
+
 0.115		2025-01-15	T. R. Wyant
     Re-implement signatures in terms of PPI::Structure::Signature. This
     requires PPI 1.281 or above.

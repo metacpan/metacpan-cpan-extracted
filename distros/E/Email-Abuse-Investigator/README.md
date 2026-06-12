@@ -5,7 +5,7 @@ hosted URLs, and suspicious domains
 
 # VERSION
 
-Version 0.08
+Version 0.10
 
 # SYNOPSIS
 
@@ -57,24 +57,6 @@ and answers the questions manual abuse investigators ask:
     - Mail-hosting IP and network owner (MX record -> RDAP)
     - DNS nameserver operator (NS record -> RDAP)
     - Whether the domain was recently registered (potential flag)
-
-# REQUIRED MODULES
-
-The following modules are mandatory:
-
-    Readonly::Values::Months
-    Socket              (core since Perl 5)
-    IO::Socket::INET    (core since Perl 5)
-    MIME::QuotedPrint   (core since Perl 5.8)
-    MIME::Base64        (core since Perl 5.8)
-
-The following are optional but strongly recommended:
-
-    Net::DNS            -- enables MX, NS, AAAA record lookups
-    LWP::UserAgent      -- enables RDAP (faster and richer than raw WHOIS)
-    HTML::LinkExtor     -- enables structural HTML link extraction
-    CHI                 -- enables cross-message IP/domain result caching
-    IO::Socket::IP      -- enables IPv6 WHOIS connections
 
 # METHODS
 
@@ -175,25 +157,9 @@ work correctly on Windows and in threaded Perl interpreters.
 #### Output
 
     {
-        type => 'Email::Abuse::Investigator',
+        type => 'object',
         isa  => 'Email::Abuse::Investigator',
     }
-
-### FORMAL SPECIFICATION
-
-    -- Z notation (simplified)
-    new == [
-      timeout        : N;
-      trusted_relays : seq STRING;
-      verbose        : BOOL;
-      _raw           : STRING;
-      _headers       : seq (STRING x STRING);
-      _origin?       : IP_INFO | undefined;
-      _urls?         : seq URL_INFO | undefined;
-      _risk?         : RISK_INFO | undefined
-    ]
-    pre: timeout >= 0
-    post: self.timeout = params.timeout /\ self._raw = ''
 
 ## parse\_email( $text )
 
@@ -219,7 +185,7 @@ cached from prior messages are retained.
 
 ### Arguments
 
-- `$text` (scalar or scalar reference, required)
+- `$text` (string or string reference, required)
 
     Complete raw RFC 2822 email message, including all headers and the body.
     Both LF-only and CRLF line endings are accepted.
@@ -247,29 +213,16 @@ bytes are used in place of correct output to prevent exceptions.
 
     [
         {
-            type => 'scalar | scalarref',
+            type => [ 'string', 'stringref' ]
         },
     ]
 
 #### Output
 
     {
-        type => 'Email::Abuse::Investigator',
+        type => 'object',
         isa  => 'Email::Abuse::Investigator',
     }
-
-### FORMAL SPECIFICATION
-
-    -- Z notation
-    parse_email == [
-      Delta Email::Abuse::Investigator;
-      text? : STRING | ref STRING
-    ]
-    pre:  defined text?
-    post: self._raw = deref(text?) /\
-          self._origin = undefined /\
-          self._urls   = undefined /\
-          self._risk   = undefined
 
 ## originating\_ip()
 
@@ -320,28 +273,17 @@ Only the first (oldest) external IP in the chain is reported.  See
 #### Output
 
     {
-        type => 'hashref | undef',
+        type => [ 'hashref', 'undef' ],
         keys => {
-            ip         => { type => 'scalar', regex => qr/[\d.:a-fA-F]/ },
-            rdns       => { type => 'scalar' },
-            org        => { type => 'scalar' },
-            abuse      => { type => 'scalar' },
-            confidence => { type => 'scalar', regex => qr/^(?:high|medium|low)$/ },
-            note       => { type => 'scalar' },
-            country    => { type => 'scalar', optional => 1 },
+            ip         => { type => 'string', regex => qr/[\d.:a-fA-F]/ },
+            rdns       => { type => 'string' },
+            org        => { type => 'string' },
+            abuse      => { type => 'string' },
+            confidence => { type => 'string', memberof => [ 'high', 'medium', 'low' ] },
+            note       => { type => 'string' },
+            country    => { type => 'string', optional => 1 },
         },
     }
-
-### FORMAL SPECIFICATION
-
-    -- Z notation
-    originating_ip == [
-      Xi Email::Abuse::Investigator;
-      result! : IP_INFO | undefined
-    ]
-    pre:  self._raw /= ''
-    post: result! = self._origin /\
-          (result! /= undefined => result!.ip in EXTERNAL_IPS)
 
 ## embedded\_urls()
 
@@ -396,27 +338,16 @@ are included in the returned list (they are flagged by `risk_assessment()`).
         {
             type => 'hashref',
             keys => {
-                url     => { type => 'scalar', regex => qr{^https?://}i },
-                host    => { type => 'scalar' },
-                ip      => { type => 'scalar' },
-                org     => { type => 'scalar' },
-                abuse   => { type => 'scalar' },
-                country => { type => 'scalar', optional => 1 },
+                url     => { type => 'string', regex => qr{^https?://}i },
+                host    => { type => 'string' },
+                ip      => { type => 'string' },
+                org     => { type => 'string' },
+                abuse   => { type => 'string' },
+                country => { type => 'string', optional => 1 },
             },
         },
         ...
     )
-
-### FORMAL SPECIFICATION
-
-    -- Z notation
-    embedded_urls == [
-      Xi Email::Abuse::Investigator;
-      result! : seq URL_INFO
-    ]
-    pre:  self._raw /= ''
-    post: result! = self._urls /\
-          forall u : result! @ u.url =~ m{^https?://}i
 
 ## mailto\_domains()
 
@@ -468,24 +399,13 @@ from every returned hashref.
         {
             type => 'hashref',
             keys => {
-                domain  => { type => 'scalar' },
-                source  => { type => 'scalar' },
+                domain  => { type => 'string' },
+                source  => { type => 'string' },
                 # All other keys optional -- see main POD
             },
         },
         ...
     )
-
-### FORMAL SPECIFICATION
-
-    -- Z notation
-    mailto_domains == [
-      Xi Email::Abuse::Investigator;
-      result! : seq DOMAIN_INFO
-    ]
-    pre:  self._raw /= ''
-    post: result! = self._mailto_domains /\
-          forall d : result! @ d.domain =~ /\.[a-zA-Z]{2,}$/
 
 ## all\_domains()
 
@@ -527,20 +447,9 @@ back to a built-in heuristic otherwise.
 #### Output
 
     (
-        { type => 'scalar', regex => qr/^[a-z0-9][a-z0-9.-]*\.[a-z]{2,}$/ },
+        { type => 'string', regex => qr/^[a-z0-9][a-z0-9.-]*\.[a-z]{2,}$/ },
         ...
     )
-
-### FORMAL SPECIFICATION
-
-    -- Z notation
-    all_domains == [
-      Xi Email::Abuse::Investigator;
-      result! : seq STRING
-    ]
-    post: result! = deduplicate(
-                      map(_registrable, url_hosts union mailto_domains)
-                    )
 
 ## unresolved\_contacts()
 
@@ -587,23 +496,13 @@ Domains sourced only from spoofable sending headers (`From:`,
         {
             type => 'hashref',
             keys => {
-                domain => { type => 'scalar' },
-                type   => { type => 'scalar', regex => qr/^(?:url_host|domain)$/ },
-                source => { type => 'scalar' },
+                domain => { type => 'string' },
+                type   => { type => 'string', memberof => [ 'url_host', 'domain' ] },
+                source => { type => 'string' },
             },
         },
         ...
     )
-
-### FORMAL SPECIFICATION
-
-    -- Z notation
-    unresolved_contacts == [
-      Xi Email::Abuse::Investigator;
-      result! : seq UNRESOLVED_INFO
-    ]
-    post: forall u : result! @
-            u.domain not_in covered_domains(abuse_contacts, form_contacts)
 
 ## sending\_software()
 
@@ -651,22 +550,13 @@ Header names are lower-cased.  Header values are stored verbatim.
         {
             type => 'hashref',
             keys => {
-                header => { type => 'scalar' },
-                value  => { type => 'scalar' },
-                note   => { type => 'scalar' },
+                header => { type => 'string' },
+                value  => { type => 'string' },
+                note   => { type => 'string' },
             },
         },
         ...
     )
-
-### FORMAL SPECIFICATION
-
-    -- Z notation
-    sending_software == [
-      Xi Email::Abuse::Investigator;
-      result! : seq SW_INFO
-    ]
-    post: result! = self._sending_sw
 
 ## received\_trail()
 
@@ -715,23 +605,14 @@ are returned as found.  Filtering is applied only by `originating_ip()`.
         {
             type => 'hashref',
             keys => {
-                received => { type => 'scalar' },
-                ip       => { type => 'scalar', optional => 1 },
-                for      => { type => 'scalar', optional => 1 },
-                id       => { type => 'scalar', optional => 1 },
+                received => { type => 'string' },
+                ip       => { type => 'string', optional => 1 },
+                for      => { type => 'string', optional => 1 },
+                id       => { type => 'string', optional => 1 },
             },
         },
         ...
     )
-
-### FORMAL SPECIFICATION
-
-    -- Z notation
-    received_trail == [
-      Xi Email::Abuse::Investigator;
-      result! : seq HOP_INFO
-    ]
-    post: result! = self._rcvd_tracking
 
 ## risk\_assessment()
 
@@ -782,27 +663,11 @@ Flag weights: HIGH=3, MEDIUM=2, LOW=1, INFO=0.
     {
         type => 'hashref',
         keys => {
-            level => { type => 'scalar', regex => qr/^(?:HIGH|MEDIUM|LOW|INFO)$/ },
-            score => { type => 'scalar', regex => qr/^\d+$/ },
+            level => { type => 'string', memberof => ['HIGH', 'MEDIUM', 'LOW', 'INFO'] },
+            score => { type => 'integer' },
             flags => { type => 'arrayref' },
         },
     }
-
-### FORMAL SPECIFICATION
-
-    -- Z notation
-    risk_assessment == [
-      Xi Email::Abuse::Investigator;
-      result! : RISK_INFO
-    ]
-    post: result!.score = sum({ w(f.severity) | f in result!.flags }) /\
-          result!.level = classify(result!.score)
-    where:
-      w(HIGH) = 3; w(MEDIUM) = 2; w(LOW) = 1; w(INFO) = 0
-      classify(s) = HIGH   if s >= 9
-                  | MEDIUM if s >= 5
-                  | LOW    if s >= 2
-                  | INFO   otherwise
 
 ## abuse\_report\_text()
 
@@ -849,16 +714,7 @@ HTML rendering are stripped from all user-derived content before inclusion.
 
 #### Output
 
-    { type => 'scalar' }
-
-### FORMAL SPECIFICATION
-
-    -- Z notation
-    abuse_report_text == [
-      Xi Email::Abuse::Investigator;
-      result! : STRING
-    ]
-    post: result! /= '' /\ result! ends_with '\n'
+    { type => 'string' }
 
 ## abuse\_contacts()
 
@@ -907,25 +763,15 @@ list from the cached results of the underlying methods.
         {
             type => 'hashref',
             keys => {
-                role    => { type => 'scalar' },
+                role    => { type => 'string' },
                 roles   => { type => 'arrayref' },
-                address => { type => 'scalar', regex => qr/\@/ },
-                note    => { type => 'scalar' },
-                via     => { type => 'scalar', regex => qr/^(?:provider-table|ip-whois|domain-whois)$/ },
+                address => { type => 'string', regex => qr/\@/ },
+                note    => { type => 'string' },
+                via     => { type => 'string', memberof => [ 'provider-table', 'ip-whois', 'domain-whois' ] }
             },
         },
         ...
     )
-
-### FORMAL SPECIFICATION
-
-    -- Z notation
-    abuse_contacts == [
-      Xi Email::Abuse::Investigator;
-      result! : seq CONTACT_INFO
-    ]
-    post: forall c : result! @ c.address contains '@' /\
-          forall c1, c2 : result! @ c1 /= c2 => c1.address /= c2.address
 
 ## form\_contacts()
 
@@ -972,26 +818,16 @@ Deduplication is by form URL.
         {
             type => 'hashref',
             keys => {
-                form        => { type => 'scalar', regex => qr{^https?://} },
-                role        => { type => 'scalar' },
-                note        => { type => 'scalar' },
-                form_paste  => { type => 'scalar', optional => 1 },
-                form_upload => { type => 'scalar', optional => 1 },
-                via         => { type => 'scalar' },
+                form        => { type => 'string', regex => qr{^https?://} },
+                role        => { type => 'string' },
+                note        => { type => 'string' },
+                form_paste  => { type => 'string', optional => 1 },
+                form_upload => { type => 'string', optional => 1 },
+                via         => { type => 'string' },
             },
         },
         ...
     )
-
-### FORMAL SPECIFICATION
-
-    -- Z notation
-    form_contacts == [
-      Xi Email::Abuse::Investigator;
-      result! : seq FORM_CONTACT_INFO
-    ]
-    post: forall c : result! @ c.form =~ m{^https?://} /\
-          forall c1, c2 : result! @ c1 /= c2 => c1.form /= c2.form
 
 ## report()
 
@@ -1038,16 +874,21 @@ before output.
 
 #### Output
 
-    { type => 'scalar' }
+    { type => 'string' }
 
-### FORMAL SPECIFICATION
+## header\_value
 
-    -- Z notation
-    report == [
-      Xi Email::Abuse::Investigator;
-      result! : STRING
-    ]
-    post: result! /= '' /\ result! ends_with '\n'
+Returns the value of the first occurrence of a named header field, or
+`undef` if the header is absent.  The name comparison is case-insensitive.
+
+### API SPECIFICATION
+
+    Input:  name => Str  (required) - header field name, e.g. 'Subject'
+    Output: Str | undef
+
+### MESSAGES
+
+    (none - returns undef on missing header, never throws)
 
 # ALGORITHM: DOMAIN INTELLIGENCE PIPELINE
 
@@ -1149,6 +990,239 @@ You can also look for information at:
 - CPAN Testers Dependencies
 
     [http://deps.cpantesters.org/?module=Email-Abuse-Investigator](http://deps.cpantesters.org/?module=Email-Abuse-Investigator)
+
+# REQUIRED MODULES
+
+The following modules are mandatory:
+
+    Readonly::Values::Months
+    Socket              (core since Perl 5)
+    IO::Socket::INET    (core since Perl 5)
+    MIME::QuotedPrint   (core since Perl 5.8)
+    MIME::Base64        (core since Perl 5.8)
+
+The following are optional but strongly recommended:
+
+    Net::DNS            -- enables MX, NS, AAAA record lookups
+    LWP::UserAgent      -- enables RDAP (faster and richer than raw WHOIS)
+    HTML::LinkExtor     -- enables structural HTML link extraction
+    CHI                 -- enables cross-message IP/domain result caching
+    IO::Socket::IP      -- enables IPv6 WHOIS connections
+
+# LIMITATIONS
+
+- No charset conversion
+
+    Body text is stored as raw bytes.  Non-ASCII content (UTF-8, Latin-1,
+    ISO-2022-JP, etc.) is not decoded to Perl's internal Unicode representation.
+    URL and domain extraction from non-ASCII bodies may miss or misparse content.
+    Use `Email::MIME` if full charset support is needed.
+
+- Hand-rolled MIME parser
+
+    The built-in MIME parser handles common cases but is not a conforming
+    implementation of RFC 2045/2046.  It silently drops parts it cannot decode,
+    does not handle `message/rfc822` attachments, and does not parse
+    `Content-Disposition` filenames.  Replace with `Email::MIME` or
+    `MIME::Entity` for production use with untrusted input.
+
+- IPv4-only CIDR matching for trusted\_relays
+
+    `_ip_in_cidr()` and the `trusted_relays` constructor argument only support
+    IPv4 CIDR notation.  IPv6 trusted relay entries are accepted but silently
+    never match.
+
+- WHOIS rate-limiting not handled
+
+    `_raw_whois()` does not retry on rate-limit responses (typically a
+    "quota exceeded" reply).  Under high-volume processing the module will
+    silently return empty enrichment data for affected IPs and domains.
+
+- Not thread-safe
+
+    The class-level `$_cache` variable and the optional-module `$HAS_*` flags
+    are shared across all threads.  Create a separate object per thread and do
+    not share objects across threads.
+
+- DMARC policy not fetched
+
+    The module reads the `Authentication-Results: dmarc=` result from the
+    message headers but does not perform live `_dmarc.domain` TXT record
+    lookups.  A missing DMARC result in the headers is not independently flagged.
+
+- `abuse_contacts()` routes duplicated in `form_contacts()`
+
+    Both methods iterate the same six discovery routes independently.  Any new
+    discovery route must be added to both.  A future refactor should share a
+    single routing pass.
+
+- CHI cache is a class-level mutable global
+
+    The cross-message cache is shared across all instances in the process.
+    Tests that populate the cache will affect subsequent tests.  Pass the cache
+    in via `new()` (not currently supported) to enable proper isolation.
+
+# FORMAL SPECIFICATION
+
+## new
+
+    -- Z notation (simplified)
+    new == [
+      timeout        : N;
+      trusted_relays : seq STRING;
+      verbose        : BOOL;
+      _raw           : STRING;
+      _headers       : seq (STRING x STRING);
+      _origin?       : IP_INFO | undefined;
+      _urls?         : seq URL_INFO | undefined;
+      _risk?         : RISK_INFO | undefined
+    ]
+    pre: timeout >= 0
+    post: self.timeout = params.timeout /\ self._raw = ''
+
+## parse\_email
+
+    -- Z notation
+    parse_email == [
+      Delta Email::Abuse::Investigator;
+      text? : STRING | ref STRING
+    ]
+    pre:  defined text?
+    post: self._raw = deref(text?) /\
+          self._origin = undefined /\
+          self._urls   = undefined /\
+          self._risk   = undefined
+
+## originating\_ip
+
+    -- Z notation
+    originating_ip == [
+      Xi Email::Abuse::Investigator;
+      result! : IP_INFO | undefined
+    ]
+    pre:  self._raw /= ''
+    post: result! = self._origin /\
+          (result! /= undefined => result!.ip in EXTERNAL_IPS)
+
+## embedded\_urls
+
+    -- Z notation
+    embedded_urls == [
+      Xi Email::Abuse::Investigator;
+      result! : seq URL_INFO
+    ]
+    pre:  self._raw /= ''
+    post: result! = self._urls /\
+          forall u : result! @ u.url =~ m{^https?://}i
+
+## mailto\_domains
+
+    -- Z notation
+    mailto_domains == [
+      Xi Email::Abuse::Investigator;
+      result! : seq DOMAIN_INFO
+    ]
+    pre:  self._raw /= ''
+    post: result! = self._mailto_domains /\
+          forall d : result! @ d.domain =~ /\.[a-zA-Z]{2,}$/
+
+## all\_domains
+
+    -- Z notation
+    all_domains == [
+      Xi Email::Abuse::Investigator;
+      result! : seq STRING
+    ]
+    post: result! = deduplicate(
+                      map(_registrable, url_hosts union mailto_domains)
+                    )
+
+## unresolved\_contacts
+
+    -- Z notation
+    unresolved_contacts == [
+      Xi Email::Abuse::Investigator;
+      result! : seq UNRESOLVED_INFO
+    ]
+    post: forall u : result! @
+            u.domain not_in covered_domains(abuse_contacts, form_contacts)
+
+## sending\_software
+
+    -- Z notation
+    sending_software == [
+      Xi Email::Abuse::Investigator;
+      result! : seq SW_INFO
+    ]
+    post: result! = self._sending_sw
+
+## received\_trail
+
+    -- Z notation
+    received_trail == [
+      Xi Email::Abuse::Investigator;
+      result! : seq HOP_INFO
+    ]
+    post: result! = self._rcvd_tracking
+
+## risk\_assessment
+
+    -- Z notation
+    risk_assessment == [
+      Xi Email::Abuse::Investigator;
+      result! : RISK_INFO
+    ]
+    post: result!.score = sum({ w(f.severity) | f in result!.flags }) /\
+          result!.level = classify(result!.score)
+    where:
+      w(HIGH) = 3; w(MEDIUM) = 2; w(LOW) = 1; w(INFO) = 0
+      classify(s) = HIGH   if s >= 9
+                  | MEDIUM if s >= 5
+                  | LOW    if s >= 2
+                  | INFO   otherwise
+
+## abuse\_report\_text
+
+    -- Z notation
+    abuse_report_text == [
+      Xi Email::Abuse::Investigator;
+      result! : STRING
+    ]
+    post: result! /= '' /\ result! ends_with '\n'
+
+## abuse\_contacts
+
+    -- Z notation
+    abuse_contacts == [
+      Xi Email::Abuse::Investigator;
+      result! : seq CONTACT_INFO
+    ]
+    post: forall c : result! @ c.address contains '@' /\
+          forall c1, c2 : result! @ c1 /= c2 => c1.address /= c2.address
+
+## form\_contacts
+
+    -- Z notation
+    form_contacts == [
+      Xi Email::Abuse::Investigator;
+      result! : seq FORM_CONTACT_INFO
+    ]
+    post: forall c : result! @ c.form =~ m{^https?://} /\
+          forall c1, c2 : result! @ c1 /= c2 => c1.form /= c2.form
+
+## report
+
+    -- Z notation
+    report == [
+      Xi Email::Abuse::Investigator;
+      result! : STRING
+    ]
+    post: result! /= '' /\ result! ends_with '\n'
+
+## header\_value
+
+    header_value : Object × FieldName → Maybe FieldValue
+    header_value(o, n) ≜ first { lc(h.name) = lc(n) } o._headers .value
 
 # LICENCE AND COPYRIGHT
 

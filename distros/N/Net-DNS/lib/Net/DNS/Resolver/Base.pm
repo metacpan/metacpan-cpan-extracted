@@ -2,7 +2,7 @@ package Net::DNS::Resolver::Base;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Base.pm 2031 2025-07-28 13:52:18Z willem $)[2];
+our $VERSION = (qw$Id: Base.pm 2049 2026-06-08 10:44:36Z willem $)[2];
 
 
 #
@@ -42,8 +42,8 @@ use constant SOCKS => scalar eval { require Config; $Config::Config{usesocks}; }
 
 
 # Allow taint tests to be optimised away when appropriate.
-use constant TAINT => eval { ${^TAINT} };
-use constant TESTS => TAINT && defined eval { require Scalar::Util; };
+use constant TFLAG => eval { ${^TAINT} };
+use constant TAINT => TFLAG && defined eval { require Scalar::Util; };
 
 
 use integer;
@@ -515,10 +515,6 @@ NAMESERVER: foreach my $ns (@ns) {
 			$socket->send( $query_data, 0, $sockaddr );
 			$self->errorstring( $$ns[3] = $! );
 
-			# handle failure to detect taint inside socket->send()
-			die 'Insecure dependency while running with -T switch'
-					if TESTS && Scalar::Util::tainted($sockaddr);
-
 			my $reply;
 			while ( my @ready = $select->can_read($timeout) ) {
 				my $socket = shift @ready;
@@ -613,10 +609,6 @@ sub _bgsend_udp {
 
 		$socket->send( $packet_data, 0, $sockaddr );
 		$self->errorstring($!);
-
-		# handle failure to detect taint inside $socket->send()
-		die 'Insecure dependency while running with -T switch'
-				if TESTS && Scalar::Util::tainted($sockaddr);
 
 		my $expire = time() + $self->{udp_timeout};
 		${*$socket}{net_dns_bg} = [$expire, $packet];
@@ -844,7 +836,7 @@ sub _read_tcp {
 	return $buffer if length($header) < 2;			# uncoverable branch true
 	my $size = unpack 'n', $header;
 
-	while ( my $fragment = _read_socket( $socket, $size - length $buffer ) ) {
+	while ( length( my $fragment = _read_socket( $socket, $size - length $buffer ) ) ) {
 		$buffer .= $fragment;
 	}
 	return $buffer;
@@ -869,6 +861,9 @@ sub _create_tcp_socket {
 		return $socket if $socket->connected;
 		$self->_diag('socket disconnected (trying to connect)');
 	}
+
+	Carp::confess 'Insecure dependency while running with -T switch'
+			if TAINT && Scalar::Util::tainted( $ip || $self->{port} );
 
 	my $ip6_addr = IPv6 && _ipv6($ip);
 	$socket = IO::Socket::IP->new(
@@ -948,13 +943,16 @@ my $ip6 = {
 
 sub _create_dst_sockaddr {		## create UDP destination sockaddr structure
 	my ( $self, $ip, $port ) = @_;
+	my $addrinfo;
+	($addrinfo) = grep {ref} Socket::getaddrinfo( $ip, $port, _ipv6($ip) ? $ip6 : $ip4 ), {}
+			if USE_SOCKET_IP;
+	$addrinfo = _ipv6($ip) ? undef : sockaddr_in( $port, inet_aton($ip) )
+			unless USE_SOCKET_IP;
+	my $sockaddr = USE_SOCKET_IP ? $addrinfo->{addr} : $addrinfo;
 
-	unless (USE_SOCKET_IP) {				# NB: errors raised in socket->send
-		return _ipv6($ip) ? undef : sockaddr_in( $port, inet_aton($ip) );
-	}
-
-	my @addrinfo = Socket::getaddrinfo( $ip, $port, _ipv6($ip) ? $ip6 : $ip4 );
-	return ( grep {ref} @addrinfo, {} )[0]->{addr};
+	Carp::confess 'Insecure dependency while running with -T switch'
+			if TAINT && Scalar::Util::tainted($sockaddr);
+	return $sockaddr;
 }
 
 
@@ -990,7 +988,7 @@ sub _make_query_packet {
 		my $header = $packet->header;
 		$header->ad( $self->{adflag} );			# RFC6840, 5.7
 		$header->cd( $self->{cdflag} );			# RFC6840, 5.9
-		$header->do(1) if $self->{dnssec};
+		$header->do( $self->{dnssec} );
 		$header->rd( $self->{recurse} );
 	}
 

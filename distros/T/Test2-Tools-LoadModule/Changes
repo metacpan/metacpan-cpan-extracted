@@ -1,3 +1,10 @@
+0.010		2026-06-11	T. R. Wyant
+    Remove references to the RT bug tracking system.
+
+    Replace wyant@cpan.org with harryfmudd@comcast.net.
+
+    No functional changes.
+
 0.009		2026-01-06	T. R. Wyant
     Repackage licenses so that GitHub can find them (maybe). Thanks to
     Mikko Koivunalho (specifically his blog post

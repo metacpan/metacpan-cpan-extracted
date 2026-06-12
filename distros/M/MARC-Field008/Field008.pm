@@ -18,7 +18,7 @@ use List::Util 1.33 qw(any);
 use Mo::utils 0.08 qw(check_bool check_isa check_required);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -69,9 +69,9 @@ sub parse {
 		$field_008 .= (' ' x (40 - length($field_008)));
 	}
 
-	# XXX Dashes are spaces.
+	# Dashes are spaces.
 	if (! $self->{'mode_strict'}) {
-		$field_008 =~ s/-/\ /msg;
+		$field_008 =~ s/\-/\ /msg;
 	}
 
 	# Check length.
@@ -85,6 +85,9 @@ sub parse {
 	}
 
 	my $field_008_obj = eval {
+		my %material_params = eval {
+			$self->_parse_different($field_008);
+		};
 		my %params = (
 			'raw' => $field_008,
 
@@ -93,7 +96,7 @@ sub parse {
 			'date1' => (substr $field_008, 7, 4),
 			'date2' => (substr $field_008, 11, 4),
 			'place_of_publication' => (substr $field_008, 15, 3),
-			$self->_parse_different($field_008),
+			%material_params,
 			'language' => (substr $field_008, 35, 3),
 			'modified_record' => (substr $field_008, 38, 1),
 			'cataloging_source' => (substr $field_008, 39, 1),
@@ -630,6 +633,6 @@ the Czech Republic (DKRVO 2024–2028), Area 11: Linked Open Data.
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

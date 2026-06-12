@@ -48,6 +48,6 @@
          "web" : "https://github.com/ehuelsmann/perl-protocol-ovsdb"
       }
    },
-   "version" : "v0.99.0",
+   "version" : "v0.99.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

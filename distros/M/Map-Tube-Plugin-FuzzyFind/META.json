@@ -4,7 +4,7 @@
       "Gisbert W. Selke <gws@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.74, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "artistic_2"
    ],
@@ -64,7 +64,7 @@
    "provides" : {
       "Map::Tube::Plugin::FuzzyFind" : {
          "file" : "lib/Map/Tube/Plugin/FuzzyFind.pm",
-         "version" : "v0.81.2"
+         "version" : "v0.81.3"
       }
    },
    "release_status" : "stable",
@@ -73,6 +73,6 @@
          "mailto" : "bug-Map-Tube-Plugin-FuzzyFind@rt.cpan.org"
       }
    },
-   "version" : "v0.81.2",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "v0.81.3",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

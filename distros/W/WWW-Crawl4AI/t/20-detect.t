@@ -29,10 +29,27 @@ subtest 'min_markdown override' => sub {
 };
 
 subtest 'js required' => sub {
-  my $p = { status_code => 200, markdown => 'Please enable JavaScript to continue ' x 20 };
+  # A real JS shell is THIN: its only text is the enable-JavaScript notice.
+  my $p = { status_code => 200, markdown => 'Please enable JavaScript to continue.' };
   my $s = WWW::Crawl4AI::Detect::signals($p);
-  ok $s->{js_required}, 'js_required signal';
-  is WWW::Crawl4AI::Detect::why_failed($p), 'js_required', 'reason js_required';
+  ok $s->{js_required}, 'js_required signal on thin shell';
+  is WWW::Crawl4AI::Detect::why_failed($p), 'js_required', 'reason js_required (more specific than thin)';
+};
+
+subtest 'rich page that merely mentions JavaScript is good' => sub {
+  # Regression: a fully-rendered page (e.g. a CV with a "browsers without
+  # JavaScript / enable JavaScript to explore" footer) was being discarded by a
+  # bare word-match. Once we hold 500+ chars of markdown the scrape succeeded;
+  # the phrase is incidental and must not raise js_required.
+  my $body = 'real rendered article body about an engineer and their work ' x 12;  # >500
+  my $p = {
+    success     => 1,
+    status_code => 200,
+    markdown    => $body . ' Enable JavaScript to explore the full interactive experience. ' . $body,
+  };
+  ok !WWW::Crawl4AI::Detect::signals($p)->{js_required}, 'no js_required on rich page';
+  ok WWW::Crawl4AI::Detect::is_good($p), 'rich page mentioning JavaScript is good';
+  is WWW::Crawl4AI::Detect::why_failed($p), undef, 'no failure reason';
 };
 
 subtest 'bot wall via html fingerprint' => sub {
@@ -47,9 +64,24 @@ subtest 'bot wall via html fingerprint' => sub {
 };
 
 subtest 'captcha' => sub {
-  my $p = { status_code => 200, markdown => 'Please complete the hCaptcha challenge ' x 20 };
-  ok WWW::Crawl4AI::Detect::signals($p)->{captcha}, 'captcha signal';
+  # A real captcha gate is THIN: the challenge replaces the content.
+  my $p = { status_code => 200, markdown => 'Please complete the hCaptcha challenge to continue.' };
+  ok WWW::Crawl4AI::Detect::signals($p)->{captcha}, 'captcha signal on thin gate';
   is WWW::Crawl4AI::Detect::why_failed($p), 'captcha', 'captcha wins over thin/js';
+};
+
+subtest 'rich page with captcha-prompt wording in its body is not a wall' => sub {
+  # A content-rich page (a help article, a docs page about CAPTCHAs) may quote
+  # "complete the captcha to continue" / "I'm not a robot" in its prose. With the
+  # content present, body wording can never prove the scrape was walled.
+  my $body = 'a long help article explaining how captchas protect web forms ' x 12;  # >500
+  my $p = {
+    success     => 1,
+    status_code => 200,
+    markdown    => $body . " To submit, complete the reCAPTCHA to continue. I'm not a robot. " . $body,
+  };
+  ok !WWW::Crawl4AI::Detect::signals($p)->{captcha}, 'no captcha on rich page with prompt wording';
+  ok WWW::Crawl4AI::Detect::is_good($p), 'rich page is good';
 };
 
 subtest 'embedded captcha widget on rich page is not a wall' => sub {

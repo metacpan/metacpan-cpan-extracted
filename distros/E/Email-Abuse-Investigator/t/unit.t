@@ -1344,4 +1344,543 @@ subtest '_decode_multipart() — depth >= MAX_MULTIPART_DEPTH carps and returns'
 	 is $a->{_body_plain}, '', 'body not populated when depth limit reached';
 };
 
+# =============================================================================
+# parse_email() — named-arg form and croak on non-string ref
+# =============================================================================
+subtest 'parse_email() — accepts named arg text => $raw' => sub {
+	my $raw = make_email(subject => 'Named arg test');
+	my $a = Email::Abuse::Investigator->new();
+	my $ret = $a->parse_email(text => $raw);
+	is $ret, $a, 'parse_email(text => ...) returns $self';
+	is $a->header_value('subject'), 'Named arg test',
+		'named-arg form parses headers correctly';
+};
+
+subtest 'parse_email() — croaks when passed a non-string reference' => sub {
+	my $a = Email::Abuse::Investigator->new();
+
+	# An arrayref is not a string or scalar-ref; should croak
+	eval { $a->parse_email([]) };
+	like $@, qr/parse_email.*string/i,
+		'arrayref argument causes croak mentioning string';
+
+	# A ref-to-ref (REF type) is also not a scalar-ref; should croak
+	my $aref = [];
+	eval { $a->parse_email(\$aref) };
+	like $@, qr/parse_email.*string/i,
+		'ref-to-ref argument causes croak mentioning string';
+};
+
+# =============================================================================
+# header_value()
+# =============================================================================
+subtest 'header_value() — returns value for a known header' => sub {
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email(subject => 'Contract test subject'));
+	is $a->header_value('Subject'), 'Contract test subject',
+		'header_value returns correct subject string';
+	is $a->header_value('From'), 'Sender <sender@spamsite.example>',
+		'header_value returns From: value';
+};
+
+subtest 'header_value() — returns undef for absent header' => sub {
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email());
+	is $a->header_value('X-Nonexistent-Header'), undef,
+		'undef returned for a header that does not exist';
+	is $a->header_value('X-Originating-IP'), undef,
+		'undef returned for optional header when not present';
+};
+
+subtest 'header_value() — lookup is case-insensitive' => sub {
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email(subject => 'Case test'));
+	my $upper = $a->header_value('SUBJECT');
+	my $lower = $a->header_value('subject');
+	my $mixed = $a->header_value('Subject');
+	is $upper, 'Case test', 'SUBJECT (all caps) returns value';
+	is $lower, 'Case test', 'subject (lower) returns value';
+	is $mixed, 'Case test', 'Subject (title case) returns value';
+	is $upper, $lower, 'all three casings return the same value';
+};
+
+subtest 'header_value() — returns first occurrence when header repeated' => sub {
+	# Build an email with two Date: headers; only the first should be returned
+	my $raw = "Received: from x (x [91.198.174.1]) by mx\n"
+	        . "From: x\@y.com\n"
+	        . "Date: Mon, 01 Jan 2024 00:00:00 +0000\n"
+	        . "Date: Tue, 02 Jan 2024 00:00:00 +0000\n"
+	        . "Subject: dup\n\nbody";
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email($raw);
+	is $a->header_value('Date'), 'Mon, 01 Jan 2024 00:00:00 +0000',
+		'first occurrence of repeated header is returned';
+};
+
+subtest 'header_value() — never throws' => sub {
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email());
+	# Even a completely empty name should not throw
+	my $ret = eval { $a->header_value('') };
+	ok !$@, 'header_value("") does not throw';
+	is $ret, undef, 'header_value("") returns undef';
+};
+
+# =============================================================================
+# sending_software()
+# =============================================================================
+subtest 'sending_software() — returns empty list when no fingerprint headers present' => sub {
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email());
+	my @sw = $a->sending_software();
+	is scalar @sw, 0, 'empty list when no X-Mailer/X-PHP/User-Agent headers';
+};
+
+subtest 'sending_software() — documented hashref structure' => sub {
+	my $raw = "Received: from ext (ext [91.198.174.1]) by mx\n"
+	        . "From: Sender <sender\@spamsite.example>\n"
+	        . "To: victim\@bandsman.co.uk\n"
+	        . "Subject: SW test\n"
+	        . "Date: Mon, 01 Jan 2024 00:00:00 +0000\n"
+	        . "Message-ID: <sw001\@test>\n"
+	        . "Content-Type: text/plain\n"
+	        . "X-Mailer: Thunderbird 91.0\n"
+	        . "\nBody text";
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email($raw);
+	my @sw = $a->sending_software();
+	ok @sw > 0, 'X-Mailer header produces at least one result';
+	for my $s (@sw) {
+		is reftype($s), 'HASH', 'each entry is a hashref';
+		for my $key (qw(header value note)) {
+			ok exists $s->{$key},  "hashref has key '$key'";
+			ok defined $s->{$key}, "key '$key' is defined";
+		}
+		ok !ref($s->{header}), 'header is a plain string';
+		ok !ref($s->{value}),  'value is a plain string';
+		ok !ref($s->{note}),   'note is a plain string';
+	}
+};
+
+subtest 'sending_software() — captures X-PHP-Originating-Script' => sub {
+	my $raw = "Received: from ext (ext [91.198.174.1]) by mx\n"
+	        . "From: Sender <sender\@spamsite.example>\n"
+	        . "To: victim\@bandsman.co.uk\n"
+	        . "Subject: PHP test\n"
+	        . "Date: Mon, 01 Jan 2024 00:00:00 +0000\n"
+	        . "Message-ID: <php001\@test>\n"
+	        . "Content-Type: text/plain\n"
+	        . "X-PHP-Originating-Script: 1000:mailer.php\n"
+	        . "\nBody";
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email($raw);
+	my @sw    = $a->sending_software();
+	my ($php) = grep { $_->{header} eq 'x-php-originating-script' } @sw;
+	ok defined $php, 'X-PHP-Originating-Script entry present';
+	is $php->{value}, '1000:mailer.php', 'PHP script value preserved verbatim';
+	like $php->{note}, qr/PHP script/i, 'note mentions PHP script';
+};
+
+subtest 'sending_software() — header names are lower-cased in results' => sub {
+	my $raw = "Received: from ext (ext [91.198.174.1]) by mx\n"
+	        . "From: Sender <sender\@spamsite.example>\n"
+	        . "To: victim\@bandsman.co.uk\n"
+	        . "Subject: Case test\n"
+	        . "Date: Mon, 01 Jan 2024 00:00:00 +0000\n"
+	        . "Message-ID: <case001\@test>\n"
+	        . "Content-Type: text/plain\n"
+	        . "X-Mailer: TheMail 1.0\n"
+	        . "\nBody";
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email($raw);
+	my @sw = $a->sending_software();
+	for my $s (@sw) {
+		is $s->{header}, lc($s->{header}),
+			"header name '$s->{header}' is already lower-cased";
+	}
+};
+
+subtest 'sending_software() — results are in alphabetical header-name order' => sub {
+	# Include both user-agent and x-mailer so we get two entries
+	my $raw = "Received: from ext (ext [91.198.174.1]) by mx\n"
+	        . "From: Sender <sender\@spamsite.example>\n"
+	        . "To: victim\@bandsman.co.uk\n"
+	        . "Subject: Sort test\n"
+	        . "Date: Mon, 01 Jan 2024 00:00:00 +0000\n"
+	        . "Message-ID: <sort001\@test>\n"
+	        . "Content-Type: text/plain\n"
+	        . "User-Agent: Mozilla/5.0\n"
+	        . "X-Mailer: TheMail 1.0\n"
+	        . "\nBody";
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email($raw);
+	my @sw    = $a->sending_software();
+	my @names = map { $_->{header} } @sw;
+	my @sorted = sort @names;
+	is_deeply \@names, \@sorted, 'sending_software() entries are alphabetically sorted';
+};
+
+# =============================================================================
+# received_trail()
+# =============================================================================
+subtest 'received_trail() — returns empty list when no Received: headers' => sub {
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email("From: x\@y.com\nSubject: bare\n\nbody");
+	my @trail = $a->received_trail();
+	is scalar @trail, 0, 'empty list when no Received: headers present';
+};
+
+subtest 'received_trail() — documented hashref structure' => sub {
+	# A single Received: header with extractable IP, for-addr, and id
+	my $raw = "Received: from r1 (r1 [91.198.174.1]) by mx (Postfix) with SMTP"
+	        . " id ABCDEF123 for <victim\@bandsman.co.uk>; Mon, 01 Jan 2024 00:00:00 +0000\n"
+	        . "From: x\@y.com\nSubject: s\n\nbody";
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email($raw);
+	my @trail = $a->received_trail();
+	ok @trail > 0, 'at least one hop returned';
+	my $hop = $trail[0];
+	is reftype($hop), 'HASH', 'each hop entry is a hashref';
+	ok exists $hop->{received}, 'hashref has key "received"';
+	ok defined $hop->{received}, '"received" key is defined';
+	# ip, for, id are optional per POD (may be undef)
+	for my $key (qw(ip for id)) {
+		ok exists $hop->{$key}, "hashref has optional key '$key'";
+	}
+};
+
+subtest 'received_trail() — oldest hop is first (oldest-first order)' => sub {
+	# Two Received: headers; newest is first in the email, oldest is last.
+	# The module reverses them so the oldest appears first in the trail.
+	my $raw = "Received: from hop2 (hop2 [91.198.174.2]) by hop1"
+	        . " (Postfix) id HOP2ID; Mon, 01 Jan 2024 00:00:01 +0000\n"
+	        . "Received: from hop1 (hop1 [91.198.174.1]) by origin"
+	        . " (Postfix) id HOP1ID; Mon, 01 Jan 2024 00:00:00 +0000\n"
+	        . "From: x\@y.com\nSubject: s\n\nbody";
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email($raw);
+	my @trail = $a->received_trail();
+	is scalar @trail, 2, 'two hops returned for two Received: headers';
+	is $trail[0]{ip}, '91.198.174.1', 'first trail entry is the oldest hop';
+	is $trail[1]{ip}, '91.198.174.2', 'second trail entry is the newer hop';
+};
+
+subtest 'received_trail() — private IPs are NOT filtered (RFC 1918 included)' => sub {
+	# POD explicitly states: "Private IPs are NOT filtered here"
+	my $raw = "Received: from internal (internal [10.0.0.1]) by mx"
+	        . " (Postfix) id PRIVID; Mon, 01 Jan 2024 00:00:00 +0000\n"
+	        . "From: x\@y.com\nSubject: s\n\nbody";
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email($raw);
+	my @trail   = $a->received_trail();
+	my @rfc1918 = grep { defined $_->{ip} && $_->{ip} eq '10.0.0.1' } @trail;
+	ok scalar @rfc1918, 'RFC 1918 IP (10.0.0.1) is included in received_trail';
+};
+
+subtest 'received_trail() — extracts for-addr and id from Received: header' => sub {
+	my $raw = "Received: from smtp.example.com (smtp.example.com [91.198.174.3])"
+	        . " by mx.bandsman.co.uk (Postfix) with ESMTP id 3A9B0C1D2E"
+	        . " for <target\@bandsman.co.uk>; Mon, 01 Jan 2024 12:00:00 +0000\n"
+	        . "From: x\@y.com\nSubject: trail\n\nbody";
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email($raw);
+	my @trail = $a->received_trail();
+	ok @trail > 0, 'at least one trail entry present';
+	my $hop = $trail[0];
+	is $hop->{ip},  '91.198.174.3',         'IP extracted from Received: header';
+	is $hop->{for}, 'target@bandsman.co.uk', 'for-addr extracted from Received: header';
+	like $hop->{id}, qr/3A9B0C1D2E/, 'message-id extracted from Received: header';
+};
+
+# =============================================================================
+# form_contacts()
+# =============================================================================
+subtest 'form_contacts() — returns a list (not a reference)' => sub {
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email());
+	$a->{_origin}         = undef;
+	$a->{_urls}           = [];
+	$a->{_mailto_domains} = [];
+	my @result = $a->form_contacts();
+	ok !ref(\@result) || ref(\@result) eq 'ARRAY',
+		'form_contacts() returns a list in list context';
+};
+
+subtest 'form_contacts() — each hashref has form, role, note, via keys' => sub {
+	# GoDaddy is a form-only provider; trigger via From: account provider route
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email(from => 'Abuse <abuse@godaddy.com>'));
+	$a->{_origin}         = undef;
+	$a->{_urls}           = [];
+	$a->{_mailto_domains} = [];
+	my @forms = $a->form_contacts();
+	ok @forms > 0, 'at least one form contact for godaddy.com From: sender';
+	for my $f (@forms) {
+		is reftype($f), 'HASH', 'each entry is a hashref';
+		for my $key (qw(form role note via)) {
+			ok exists $f->{$key},  "hashref has key '$key'";
+			ok defined $f->{$key}, "key '$key' is defined";
+		}
+	}
+};
+
+subtest 'form_contacts() — form URL always starts with https://' => sub {
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email(from => 'Abuse <abuse@godaddy.com>'));
+	$a->{_origin}         = undef;
+	$a->{_urls}           = [];
+	$a->{_mailto_domains} = [];
+	my @forms = $a->form_contacts();
+	for my $f (@forms) {
+		like $f->{form}, qr{^https?://},
+			"form URL '$f->{form}' starts with https://";
+	}
+};
+
+subtest 'form_contacts() — returns empty list when no form-only providers involved' => sub {
+	# gmail.com is an email provider, not a form-only provider
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email(from => 'Spammer <spammer@gmail.com>'));
+	$a->{_origin}         = undef;
+	$a->{_urls}           = [];
+	$a->{_mailto_domains} = [];
+	my @forms = $a->form_contacts();
+	ok !scalar(grep { $_->{form} =~ /gmail/i } @forms),
+		'no gmail.com form contact returned (gmail uses email, not web form)';
+};
+
+subtest 'form_contacts() — deduplication: same form URL appears at most once' => sub {
+	# From: and Reply-To: both @godaddy.com should produce only one form entry
+	my $raw = "Received: from ext (ext [91.198.174.1]) by mx\n"
+	        . "From: A <a\@godaddy.com>\n"
+	        . "Reply-To: B <b\@godaddy.com>\n"
+	        . "To: victim\@bandsman.co.uk\n"
+	        . "Subject: Dedup test\n"
+	        . "Date: Mon, 01 Jan 2024 00:00:00 +0000\n"
+	        . "Message-ID: <dedup\@test>\n"
+	        . "Content-Type: text/plain\n"
+	        . "\nBody";
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email($raw);
+	$a->{_origin}         = undef;
+	$a->{_urls}           = [];
+	$a->{_mailto_domains} = [];
+	my @forms = $a->form_contacts();
+	my %seen;
+	my @dups = grep { $seen{$_->{form}}++ } @forms;
+	is scalar @dups, 0, 'same form URL appears at most once (deduplicated)';
+};
+
+subtest 'form_contacts() — via is always "provider-table"' => sub {
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email(from => 'Abuse <abuse@godaddy.com>'));
+	$a->{_origin}         = undef;
+	$a->{_urls}           = [];
+	$a->{_mailto_domains} = [];
+	my @forms = $a->form_contacts();
+	for my $f (@forms) {
+		is $f->{via}, 'provider-table',
+			"form contact via is 'provider-table' (got '$f->{via}')";
+	}
+};
+
+# =============================================================================
+# unresolved_contacts()
+# =============================================================================
+subtest 'unresolved_contacts() — returns list of hashrefs with domain/type/source' => sub {
+	# Pre-inject a URL with no abuse contact so it appears as unresolved
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email(body => 'nothing'));
+	$a->{_origin}         = undef;
+	$a->{_contacts}       = [];   # abuse_contacts() returns []
+	$a->{_urls}           = [{
+		url   => 'https://unknown-host.example/path',
+		host  => 'unknown-host.example',
+		ip    => undef,
+		org   => undef,
+		abuse => '(unknown)',
+	}];
+	$a->{_mailto_domains} = [];
+	my @unres = $a->unresolved_contacts();
+	ok @unres > 0, 'at least one unresolved entry for unknown-host.example';
+	my $u = $unres[0];
+	is reftype($u), 'HASH', 'each entry is a hashref';
+	for my $key (qw(domain type source)) {
+		ok exists $u->{$key},  "hashref has key '$key'";
+		ok defined $u->{$key}, "key '$key' is defined";
+	}
+};
+
+subtest 'unresolved_contacts() — type is "url_host" for URL hosts' => sub {
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email(body => 'nothing'));
+	$a->{_origin}         = undef;
+	$a->{_contacts}       = [];
+	$a->{_urls}           = [{
+		url   => 'https://urlonly.example/page',
+		host  => 'urlonly.example',
+		ip    => undef,
+		org   => undef,
+		abuse => '(unknown)',
+	}];
+	$a->{_mailto_domains} = [];
+	my @unres = $a->unresolved_contacts();
+	my ($url_entry) = grep { $_->{domain} eq 'urlonly.example' } @unres;
+	ok defined $url_entry, 'urlonly.example appears in unresolved contacts';
+	is $url_entry->{type}, 'url_host', 'type is "url_host" for URL host';
+};
+
+subtest 'unresolved_contacts() — type is "domain" for mailto domains' => sub {
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email(body => 'contact info@mailonly.example'));
+	$a->{_origin}         = undef;
+	$a->{_contacts}       = [];
+	$a->{_urls}           = [];
+	# Source must NOT be a spoofable header for it to appear in unresolved
+	$a->{_mailto_domains} = [{
+		domain => 'mailonly.example',
+		source => 'body',
+	}];
+	my @unres = $a->unresolved_contacts();
+	my ($dom_entry) = grep { $_->{domain} eq 'mailonly.example' } @unres;
+	ok defined $dom_entry, 'mailonly.example appears in unresolved contacts';
+	is $dom_entry->{type}, 'domain', 'type is "domain" for mailto domain';
+};
+
+subtest 'unresolved_contacts() — covered hosts are excluded' => sub {
+	# A host already in abuse_contacts must not appear in unresolved
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email(body => 'nothing'));
+	$a->{_origin}         = undef;
+	# Pre-cache abuse_contacts to include covered.example
+	$a->{_contacts}       = [{
+		role    => 'Sending ISP',
+		address => 'abuse@covered.example',
+		via     => 'ip-whois',
+	}];
+	$a->{_urls}           = [{
+		url   => 'https://covered.example/page',
+		host  => 'covered.example',
+		ip    => '1.2.3.4',
+		org   => 'Covered Corp',
+		abuse => 'abuse@covered.example',
+	}];
+	$a->{_mailto_domains} = [];
+	my @unres = $a->unresolved_contacts();
+	ok !scalar(grep { $_->{domain} eq 'covered.example' } @unres),
+		'covered.example does not appear in unresolved contacts';
+};
+
+subtest 'unresolved_contacts() — From:/Return-Path:/Sender: sourced domains excluded' => sub {
+	# POD: "Domains sourced only from spoofable sending headers are excluded"
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email(body => 'nothing'));
+	$a->{_origin}         = undef;
+	$a->{_contacts}       = [];
+	$a->{_urls}           = [];
+	# The source matches the spoofable header exclusion pattern
+	$a->{_mailto_domains} = [{
+		domain => 'spoofable.example',
+		source => 'From: header',
+	}];
+	my @unres = $a->unresolved_contacts();
+	ok !scalar(grep { $_->{domain} eq 'spoofable.example' } @unres),
+		'spoofable.example (From: header source) excluded from unresolved';
+};
+
+subtest 'unresolved_contacts() — returns empty list when no URLs or domains' => sub {
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email());
+	$a->{_origin}         = undef;
+	$a->{_contacts}       = [];
+	$a->{_urls}           = [];
+	$a->{_mailto_domains} = [];
+	my @unres = $a->unresolved_contacts();
+	is scalar @unres, 0, 'empty list when there are no URLs or domains to check';
+};
+
+# =============================================================================
+# risk_assessment() — HIGH / MEDIUM / LOW threshold validation
+# =============================================================================
+subtest 'risk_assessment() — HIGH level when score >= 9' => sub {
+	# SPF=fail(+3) + DKIM=fail(+3) + DMARC=fail(+3) = score 9 -> HIGH
+	# Pre-set a clean origin so _risk_check_origin adds no extra flags
+	stub_net();
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email(
+		auth => 'mx; spf=fail; dkim=fail; dmarc=fail',
+	));
+	$a->{_origin} = {
+		ip         => '91.198.174.1',
+		rdns       => 'mail.corp.example',
+		confidence => 'high',
+		org        => 'Corp ISP',
+		abuse      => 'abuse@corp.example',
+		note       => '',
+		country    => undef,
+	};
+	$a->{_urls}           = [];
+	$a->{_mailto_domains} = [];
+	my $risk = $a->risk_assessment();
+	is $risk->{level}, 'HIGH', 'spf=fail + dkim=fail + dmarc=fail produces HIGH level';
+	ok $risk->{score} >= 9, "score $risk->{score} is >= 9 (HIGH threshold)";
+	restore_net();
+};
+
+subtest 'risk_assessment() — MEDIUM level when score is 5..8' => sub {
+	# SPF=softfail(+2) + DKIM=fail(+3) = score 5 -> MEDIUM
+	stub_net();
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email(
+		auth => 'mx; spf=softfail; dkim=fail',
+	));
+	$a->{_origin} = {
+		ip         => '91.198.174.1',
+		rdns       => 'mail.corp.example',
+		confidence => 'high',
+		org        => 'Corp ISP',
+		abuse      => 'abuse@corp.example',
+		note       => '',
+		country    => undef,
+	};
+	$a->{_urls}           = [];
+	$a->{_mailto_domains} = [];
+	my $risk = $a->risk_assessment();
+	is $risk->{level}, 'MEDIUM', 'spf=softfail + dkim=fail produces MEDIUM level';
+	ok $risk->{score} >= 5 && $risk->{score} < 9,
+		"score $risk->{score} is in MEDIUM range [5, 9)";
+	restore_net();
+};
+
+subtest 'risk_assessment() — LOW level when score is 2..4' => sub {
+	# SPF=softfail(+2) alone = score 2 -> LOW
+	stub_net();
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email(
+		auth => 'mx; spf=softfail',
+	));
+	$a->{_origin} = {
+		ip         => '91.198.174.1',
+		rdns       => 'mail.corp.example',
+		confidence => 'high',
+		org        => 'Corp ISP',
+		abuse      => 'abuse@corp.example',
+		note       => '',
+		country    => undef,
+	};
+	$a->{_urls}           = [];
+	$a->{_mailto_domains} = [];
+	my $risk = $a->risk_assessment();
+	is $risk->{level}, 'LOW', 'spf=softfail alone produces LOW level';
+	ok $risk->{score} >= 2 && $risk->{score} < 5,
+		"score $risk->{score} is in LOW range [2, 5)";
+	restore_net();
+};
+
 done_testing();

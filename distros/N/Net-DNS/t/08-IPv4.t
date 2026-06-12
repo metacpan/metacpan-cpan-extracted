@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# $Id: 08-IPv4.t 2017 2025-06-27 13:48:03Z willem $ -*-perl-*-
+# $Id: 08-IPv4.t 2046 2026-06-01 13:23:01Z willem $ -*-perl-*-
 #
 
 use strict;
@@ -69,7 +69,7 @@ diag join( "\n\t", 'will use nameservers', @$IP ) if $debug;
 Net::DNS::Resolver->debug($debug);
 
 
-plan tests => 62;
+plan tests => 61;
 
 NonFatalBegin();
 
@@ -86,21 +86,6 @@ NonFatalBegin();
 	$packet->edns->option( PADDING => ( 'OPTION-LENGTH' => 500 ) );	   # force TCP
 	delete $packet->{id};
 	ok( $resolver->send($packet), '$resolver->send(...)	TCP' );
-}
-
-
-{
-	my $resolver = Net::DNS::Resolver->new( nameservers => $IP );
-	$resolver->dnssec(1);
-	$resolver->udppacketsize(513);
-
-	$resolver->igntc(1);
-	my $udp = $resolver->send(qw(net-dns.org DNSKEY IN));
-	ok( $udp && $udp->header->tc, '$resolver->send(...)	truncated UDP reply' );
-
-	$resolver->igntc(0);
-	my $retry = $resolver->send(qw(net-dns.org DNSKEY IN));
-	ok( $retry && !$retry->header->tc, '$resolver->send(...)	automatic TCP retry' );
 }
 
 
@@ -126,12 +111,25 @@ NonFatalBegin();
 
 {
 	my $resolver = Net::DNS::Resolver->new( nameservers => $IP );
-	$resolver->dnssec(1);
+	$resolver->udppacketsize(513);
+
+	$resolver->igntc(1);
+	my $udp = $resolver->send(qw(doc.net-dns.org TXT IN));
+	ok( $udp && $udp->header->tc, '$resolver->send(...)	expecting truncated UDP reply' );
+
+	$resolver->igntc(0);
+	my $retry = $resolver->send(qw(doc.net-dns.org TXT IN));
+	ok( $retry && !$retry->header->tc, '$resolver->send(...)	automatic TCP retry' );
+}
+
+
+{
+	my $resolver = Net::DNS::Resolver->new( nameservers => $IP );
 	$resolver->udppacketsize(513);
 	$resolver->igntc(1);
 
-	my $handle = $resolver->bgsend(qw(net-dns.org DNSKEY IN));
-	ok( $handle, '$resolver->bgsend(...)	truncated UDP' );
+	my $handle = $resolver->bgsend(qw(doc.net-dns.org TXT IN));
+	ok( $handle, '$resolver->bgsend(...)	expecting truncated UDP reply' );
 	my $packet = $resolver->bgread($handle);
 	ok( $packet && $packet->header->tc, '$resolver->bgread($udp)	ignore UDP truncation' );
 }
@@ -139,12 +137,11 @@ NonFatalBegin();
 
 {
 	my $resolver = Net::DNS::Resolver->new( nameservers => $IP );
-	$resolver->dnssec(1);
 	$resolver->udppacketsize(513);
 	$resolver->igntc(0);
 
-	my $handle = $resolver->bgsend(qw(net-dns.org DNSKEY IN));
-	ok( $handle, '$resolver->bgsend(...)	truncated UDP' );
+	my $handle = $resolver->bgsend(qw(doc.net-dns.org TXT IN));
+	ok( $handle, '$resolver->bgsend(...)	expecting truncated UDP reply' );
 	my $udp	   = $handle;
 	my $packet = $resolver->bgread($handle);
 	isnt( $handle, $udp, '$resolver->bgbusy($udp)	handle changed to TCP' );
@@ -154,11 +151,10 @@ NonFatalBegin();
 
 {
 	my $resolver = Net::DNS::Resolver->new( nameservers => $IP );
-	$resolver->dnssec(1);
 	$resolver->udppacketsize(513);
 	$resolver->igntc(0);
 
-	my $handle = $resolver->bgsend(qw(net-dns.org DNSKEY IN));
+	my $handle = $resolver->bgsend(qw(doc.net-dns.org TXT IN));
 	$resolver->nameserver();				# no nameservers
 	my $packet = $resolver->bgread($handle);
 	ok( $packet && $packet->header->tc, '$resolver->bgread($udp)	background TCP fail' );
@@ -363,13 +359,6 @@ SKIP: {
 	ok( $resolver->bgsend($query), '$resolver->bgsend() + automatic TSIG' );
 	delete $query->{id};
 	ok( $resolver->bgsend($query), '$resolver->bgsend() + existing TSIG' );
-}
-
-
-{
-	my $resolver = Net::DNS::Resolver->new();
-	$resolver->nameserver('cname.t.net-dns.org');
-	ok( scalar( $resolver->nameservers ), 'resolve nameserver cname' );
 }
 
 

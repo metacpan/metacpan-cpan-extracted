@@ -12,7 +12,7 @@ use Test2::V0;
 use Test2::Tools::EventDumper;
 use Test2::Tools::LoadModule;
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 my %opt;
 
@@ -214,7 +214,7 @@ they are
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III F<wyant at cpan dot org>
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT AND LICENSE
 

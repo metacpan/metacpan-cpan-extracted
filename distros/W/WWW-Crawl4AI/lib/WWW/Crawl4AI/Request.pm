@@ -93,7 +93,7 @@ WWW::Crawl4AI::Request - builds Crawl4AI /crawl and /md request payloads
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

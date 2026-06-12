@@ -57,3 +57,4 @@ is_deeply( a2n($ret), [ 'Baker Street' ], 'Finding many stations Bkstrt based on
 $ret = [ $tube->fuzzy_find( 'Pxqxq', objects => 'stations', method => 'daitchmokotoff' ) ];
 is_deeply( $ret, [ ], 'Finding many stations Pxqxq based on Daitch-Mokotoff should fail' );
 
+diag( "*** End of many messages saying 'Negative repeat count does nothing at ...' -- ignore these messages above, please! *** \n" );

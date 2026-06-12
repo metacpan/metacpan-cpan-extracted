@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# Use no auto-fills and only play parts.
+# Use no auto-fills and only play user defined parts and fills.
 # Examples:
 #   perl eg/user-defined.pl 'gs wavetable' 90 # on windows
 #   perl eg/user-defined.pl fluid 90 # with fluidsynth

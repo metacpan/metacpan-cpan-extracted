@@ -14,8 +14,7 @@ meta-spec:
 name: Stats-LikeR
 requires:
   Devel::Confess: '0'
-  Digest::SHA: '0'
-  Scalar::Util: '0'
+  Scalar::Util: '1.22'
   Test::Exception: '0'
   Test::LeakTrace: '0'
   Test::More: '0'
@@ -25,7 +24,7 @@ resources:
   bugtracker: https://github.com/hhg7/stats/issues
   homepage: https://metacpan.org/dist/stats
   repository: https://github.com/hhg7/stats.git
-version: '0.14'
+version: '0.15'
 x_generated_by_perl: v5.42.2
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

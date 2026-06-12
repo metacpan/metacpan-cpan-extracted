@@ -34,9 +34,11 @@ requires:
   MIME::QuotedPrint: '0'
   Object::Configure: '0'
   Params::Get: '0'
-  Params::Validate::Strict: '0'
+  Params::Validate::Strict: '0.33'
   Readonly::Values::Months: '0'
   Socket: '0'
+  Sub::Private: '0.05'
+  Sub::Protected: '0.02'
   Time::Piece: '0'
   autodie: '0'
   perl: '5.010'
@@ -44,5 +46,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Email-Abuse-Investigator
   homepage: https://metacpan.org/pod/Email::Abuse::Investigator
   repository: git://github.com/nigelhorne/Email-Abuse-Investigator.git
-version: '0.09'
+version: '0.10'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,6 +1,6 @@
 package Crypt::PBKDF2::Hash::HMACSHA3;
 # ABSTRACT: HMAC-SHA3 support for Crypt::PBKDF2 using Digest::SHA
-our $VERSION = '0.161520'; # VERSION
+our $VERSION = '0.261630'; # VERSION
 our $AUTHORITY = 'cpan:ARODLAND'; # AUTHORITY
 use Moo 2;
 use strictures 2;
@@ -70,7 +70,7 @@ Crypt::PBKDF2::Hash::HMACSHA3 - HMAC-SHA3 support for Crypt::PBKDF2 using Digest
 
 =head1 VERSION
 
-version 0.161520
+version 0.261630
 
 =head1 DESCRIPTION
 
@@ -82,11 +82,11 @@ seemed nice to have a uniform interface to HMACSHA*.
 
 =head1 AUTHOR
 
-Andrew Rodland <arodland@cpan.org>
+Andrew Rodland <andrew@cleverdomain.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by Andrew Rodland.
+This software is copyright (c) 2026 by Andrew Rodland.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

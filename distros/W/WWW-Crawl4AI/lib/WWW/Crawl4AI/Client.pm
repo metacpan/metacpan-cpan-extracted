@@ -533,7 +533,7 @@ WWW::Crawl4AI::Client - UA-agnostic REST client for the Crawl4AI Docker API
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

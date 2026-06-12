@@ -1,3 +1,7 @@
+0.06 2026-06-11T12:01:31+02:00
+ - Fix processing of all errors from data objects.
+ - Improve regexp for rewriting of dashes to spaces.
+
 0.05 2026-04-26T16:41:37+02:00
  - Add support for parsing of dashes instead of spaces in field 008. New
    'mode_strict' (0) constructor parameter for parsing with/without dashes.

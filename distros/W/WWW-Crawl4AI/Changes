@@ -1,3 +1,18 @@
+0.004     2026-06-11 14:24:19Z
+
+ - Detect: content volume is now the master signal. Every signal derived from a
+   page's VISIBLE rendered text -- js_required, the blocked body-phrase arm, and
+   the captcha marker -- only fires on a THIN page. A content-rich page that
+   merely mentions JavaScript ("enable JavaScript" footer), quotes a bot-wall
+   phrase ("unusual traffic", "access denied"), or carries captcha-prompt wording
+   is no longer discarded: once 500+ chars of markdown are in hand the scrape
+   succeeded, and body words can never prove otherwise. STRUCTURAL fingerprints
+   are unchanged and still fire regardless of size -- WAF tokens in the HTML
+   markup (__cf_chl, datadome), a "Just a moment" / "Access denied" <title>, and
+   redirects to a known WAF / captcha challenge endpoint. Removes the rich-page
+   captcha-PROMPT heuristic (and $RE_CAPTCHA_PROMPT) added in 0.003: same
+   word-on-a-rendered-page false-positive class
+
 0.003     2026-06-11 02:22:02Z
 
  - Detect: captcha signal no longer false-positives on cookie-banner /

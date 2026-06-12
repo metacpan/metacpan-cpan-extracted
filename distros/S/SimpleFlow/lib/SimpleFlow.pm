@@ -1,3 +1,4 @@
+# ABSTRACT: SimpleFlow - easy, simple workflow manager (and logger); for keeping track of and debugging large and complex shell command workflows
 use strict;
 use warnings FATAL => 'all';
 require 5.010;
@@ -6,9 +7,20 @@ use DDP {output => 'STDOUT', array_max => 10, show_memsize => 1};
 use Devel::Confess 'color';
 use Cwd 'getcwd';
 package SimpleFlow;
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 use Time::HiRes;
 use Term::ANSIColor;
+# Windows portability: the legacy Windows console (cmd.exe) prints raw ANSI
+# escape sequences as garbage. Disable colouring there unless a terminal that
+# understands ANSI is in use (Windows Terminal, ConEmu, ANSICON). Unix and
+# modern Windows terminals are left untouched.
+BEGIN {
+	$ENV{ANSI_COLORS_DISABLED} = 1
+		if $^O eq 'MSWin32'
+		&& !$ENV{WT_SESSION} # Windows Terminal
+		&& !$ENV{ConEmuANSI} # ConEmu
+		&& !$ENV{ANSICON};   # ANSICON
+}
 use Scalar::Util 'openhandle';
 use DDP {output => 'STDOUT', array_max => 10, show_memsize => 1};
 use Devel::Confess 'color';
@@ -147,10 +159,9 @@ sub task {
 		$r{done} = 'before';
 		$r{'will.do'} = 'no';
 		say colored(['black on_green'], "\"$args->{cmd}\"\n") . ' has been done before';
-		$r{done} = 'before';
 		$r{'output.file.size'} = \%output_file_size;
-		p(%r, output => $args->{'log.fh'}, string_max => $string_max) if defined $args->{'log.fh'};
 		$r{duration} = 0;
+		p(%r, output => $args->{'log.fh'}, string_max => $string_max) if defined $args->{'log.fh'};
 		p %r, string_max => $string_max;
 		return \%r;
 	} else {
@@ -165,17 +176,32 @@ sub task {
 		return \%r;
 	}
 	my $t0 = Time::HiRes::time();
-	($r{stdout}, $r{stderr}, $r{'exit'}) = capture {
+	my $status;
+	($r{stdout}, $r{stderr}, $status) = capture {
 		system( $args->{cmd} );
 	};
 	my $t1 = Time::HiRes::time();
 	$r{duration} = $t1-$t0;
-	$r{'exit'} = $r{'exit'} >> 8;
+	# Decode the raw wait status. On Unix the low 7 bits hold the death
+	# signal and the high byte holds the exit code. The signal MUST be read
+	# from the raw status *before* shifting -- the old code shifted first and
+	# then did ($exit & 127), so $r{signal} was always 0 and could never
+	# detect a kill by signal 9/15. Windows has no POSIX signals, and a -1
+	# return from system() means the command never launched.
+	if (!defined $status || $status == -1) {
+		$r{'exit'}   = -1;
+		$r{signal}   = 0;
+	} elsif ($^O eq 'MSWin32') {
+		$r{signal}   = 0;
+		$r{'exit'}   = $status >> 8;
+	} else {
+		$r{signal}   = $status & 127; # FIX: taken from raw status, not from $exit
+		$r{'exit'}   = $status >> 8;
+	}
 	foreach my $std ('stderr', 'stdout') {
 		$r{$std} =~ s/\s+$//; # remove trailing whitespace/newline
 		$string_max = max($string_max, length $r{$std});
 	}
-	$r{signal} = $r{'exit'} & 127;# Useful to see if it was killed by signal 9 or 15
 	$r{done} = 'now';
 	$r{'will.do'} = 'done';
 	my @missing_output_files = grep {not -f -r $_} @output_files;
@@ -200,7 +226,7 @@ sub task {
 	%output_file_size = map {$_ => -s $_} @output_files;
 	$r{'output.file.size'} = \%output_file_size;
 #	p %output_file_size;
-	my @files_with_zero_size = grep { $output_file_size{$_} == 0} @output_files;
+	my @files_with_zero_size = grep { ($output_file_size{$_} // 0) == 0 } @output_files;
 	if (scalar @files_with_zero_size > 0) {
 		p @files_with_zero_size;
 		warn 'the above output files have 0 size.';
@@ -215,128 +241,377 @@ sub task {
 	return \%r;
 }
 1;
-__END__
 
 =encoding utf8
 
-=head1 NAME
+A tiny workflow manager and logger for Perl, like SnakeMake or NextFlow, but in pure Perl and aimed at making long, error-prone shell pipelines easy to B<debug> and B<reproduce>.
 
-SimpleFlow - easy, simple workflow manager (and logger); for keeping track of and debugging large and complex shell command workflows
+Every step is a single C<task()> call. SimpleFlow checks the inputs before a
+command runs and the outputs after, times the command, captures its C<stdout>,
+C<stderr>, exit code and signal, optionally logs a full structured record, and
+skips work that has already been done.
 
-=head1 SYNOPSIS
+Two subroutines are exported by default: L</"task"> and L</"say2">.
 
-This is similar to snakeMake or NextFlow, but running in Perl.
-The simplest use case is
+=head1 Install
 
-    my $t = task({
-        cmd => 'which ls'
-    });
+With a CPAN client:
 
-All tasks return a hash, showing at a minimum 1) exit code, 2) the directory that the job was done in, 3) stderr, and 4) stdout.
+ cpanm SimpleFlow
 
-the only required key/argument is `cmd`, but other arguments are possible:
+Or from a checkout:
 
-    die          # die if not successful; 'true' or 'false'
-    input.files  # check for input files before running; SCALAR or ARRAY
-    log.fh       # print to filehandle
-    note         # a note for the log
-    overwrite    # overwrite previously existing files: "true" or "false"
-    output.files # product files that need to be checked; SCALAR or ARRAY
+ perl Makefile.PL
+ make
+ make test
+ make install
 
-You may wish to output results to a logfile using a previously opened filehandle thus:
+=head1 Synopsis
 
-    my ($fh, $fname) = tempfile( UNLINK => 0, DIR => '/tmp');
-    my $t = task({
-        cmd            => 'which ln',
-        'log.fh'       => $fh,
-        'note'         => 'testing where ln comes from',
-        'output.files' => $fname,
-        overwrite      => 1
-    });
-    close $fh;
+The simplest useful case: run a command and confirm it produced its output:
 
-=head1 Examples
+ use SimpleFlow qw(task say2);
+ 
+ my $t = task({
+     cmd            => 'which ls',
+     'output.files' => '/tmp/AFK3mnEK8L.log',
+ });
 
-Consider a very complex pipeline in which mistakes are *very* easily made, and there are numerous files to keep track of.  SimpleFlow is designed to simplify these steps with a script, with automated checks at every step, in a very intuitive way:
+C<task> returns a hash reference describing exactly what happened:
 
-    my $g_tpr = "3md.$group.tpr";
-    task({
-    	cmd           => "echo $val | gmx convert-tpr -s 3md.tpr -o $g_tpr -n cpx.ndx",
-    	'input.files' => ['3md.tpr', 'cpx.ndx'],
-    	'log.fh'      => $log,
-    	'output.files'=> $g_tpr, # only do this once
-    	overwrite     => 'true'
-    });
-    my $subset_xtc = "3md.$group.$n.xtc";
-    task({
-    	cmd            => "echo $val | gmx trjconv -s $g_tpr -f 3md_out$n.xtc -o $subset_xtc -n cpx.ndx",
-    	'input.files'  => ["3md_out$n.xtc", $g_tpr],
-    	'log.fh'       => $log,
-    	'output.files' => $subset_xtc,
-    	overwrite      => 'true'
-    });
-    my $gro = "3md.$group.$n.gro";
-    task({
-    	'input.files'  => [$g_tpr, $subset_xtc],
-    	'log.fh'       => $log,
-    	cmd            => "echo $val | gmx trjconv -s $g_tpr -f $subset_xtc -o $gro",
-    	'output.files' => $gro,
-    	overwrite      => 'true'
-    });
-    mkdir "xvg/$group" unless -d "xvg/$group";
-    my $dir = "xvg/$group/" . sprintf '%u', $n;
-    mkdir $dir unless -d $dir;
-    task({
-    	cmd            => "gmx chi -s $g_tpr -f $subset_xtc -phi -psi -all",
-    	'log.fh'       => $log,
-    	'input.files'  => [$gro, $subset_xtc],
-    	overwrite      => 'true'
-    });
-    foreach my $f (list_regex_files('\.xvg$')) {
-    	rename $f, "$dir/$f";
-    	say2("Moved $f to $dir/$f", $log);
-    }
+ {
+     cmd            "which ls",
+     die            1,
+     dir            "/home/con/Scripts/SimpleFlow",
+     done           "now",
+     dry.run        0,
+     duration       0.00191903114318848,
+     exit           0,
+     note           "",
+     output.files   [
+         [0] "/tmp/AFK3mnEK8L.log"
+     ],
+     overwrite      1,
+     signal         0,
+     source.file    "t/01.t",
+     source.line    29,
+     stderr         "",
+     stdout         "/usr/bin/ls",
+     will.do        "done"
+ }
 
-Every `task` returns a hash, which is printed to a log if specified:
+ > B<Portability note.> SimpleFlow runs whatever shell command you give it via
+ > C<system()>, so the I<commands themselves> are your responsibility to keep
+ > cross-platform (e.g. C<which ls> is Unix-only). SimpleFlow's own behaviour
+ > exit/signal decoding and coloured output is cross-platform; see the
+ > L<change log|/"Change log">.
 
-    {
-    cmd               "gmx chi -s 3md.Receptor.tpr -f 3md.Receptor.09.xtc -phi -psi -all",
-    die               1,
-    dir               "/home/con/ui/pipelinePepPriML/default/2puy",
-    done              "now",
-    dry.run           0,
-    duration          0.0776150226593018,
-    exit              0,
-    input.file.size   {
-        3md.Receptor.09.gro   12874711,
-        3md.Receptor.09.xtc   2208928
-    },
-    input.files       [
-        [0] "3md.Receptor.09.gro" (dualvar: 3),
-        [1] "3md.Receptor.09.xtc" (dualvar: 3)
-    ],
-    note              "",
-    output.files      [],
-    overwrite         "true",
-    source.file       "0.sanity.check.pl",
-    source.line       73,
-    stderr            "                       :-) GROMACS - gmx chi, 2025.3 (-:
+=head1 C<task>
 
-    Executable:   /home/con/prog/gromacs-2025.3/build/bin/gmx
-    Data prefix:  /home/con/prog/gromacs-2025.3 (source tree)
-    Working dir:  /home/con/ui/pipelinePepPriML/default/2puy
-    Command line:
-      gmx chi -s 3md.Receptor.tpr -f 3md.Receptor.09.xtc -phi -psi -all
+ my $result = task(\%args);
 
-    Reading file 3md.Receptor.tpr, VERSION 2025.3 (single precision)
-    Reading file 3md.Receptor.tpr, VERSION 2025.3 (single precision)
-    Analyzing from residue 1 to residue 61
-    60 residues with dihedrals found
-    305 dihedrals found
-    Reading frame     500 time  500.000   
-    j after resetting (nr. active dihedrals) = 179
-    Printing psiMET19.x(...skipping 1338 chars...)",
-        stdout            "",
-        will.do           "done"
-    }
+Runs one shell command with checking, timing, capture and logging. Takes a
+B<single hash reference>; the only required key is C<cmd>.
 
+=head2 Arguments
+
+
+
+=begin html
+
+<table>
+<thead>
+<tr>
+  <th>Key</th>
+  <th>Type</th>
+  <th>Default</th>
+  <th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>cmd</code></td>
+  <td>scalar</td>
+  <td><code>undef</code></td>
+  <td><b>Required.</b> The shell command to run.</td>
+</tr>
+<tr>
+  <td><code>die</code></td>
+  <td>bool (<code>0</code>/<code>1</code>)</td>
+  <td><code>1</code></td>
+  <td>Die if the command fails (non-zero exit) or an output file is missing. Set to <code>0</code> to warn and continue instead.</td>
+</tr>
+<tr>
+  <td><code>dry.run</code></td>
+  <td>bool</td>
+  <td><code>0</code></td>
+  <td>Print the command (and log it) but do not execute it.</td>
+</tr>
+<tr>
+  <td><code>input.files</code></td>
+  <td>scalar or array</td>
+  <td><code>undef</code></td>
+  <td>File(s) that must exist and be readable <b>before</b> running; otherwise <code>task</code> dies.</td>
+</tr>
+<tr>
+  <td><code>output.files</code></td>
+  <td>scalar or array</td>
+  <td><code>undef</code></td>
+  <td>File(s) expected to exist <b>after</b> running; used both for the missing-output check and for skip detection.</td>
+</tr>
+<tr>
+  <td><code>log.fh</code></td>
+  <td>open filehandle</td>
+  <td><code>undef</code></td>
+  <td>If given, the full result record is also written here. Must be a real, open filehandle.</td>
+</tr>
+<tr>
+  <td><code>note</code></td>
+  <td>scalar</td>
+  <td><code>''</code></td>
+  <td>Free-text note copied into the result and the log.</td>
+</tr>
+<tr>
+  <td><code>overwrite</code></td>
+  <td>bool</td>
+  <td><code>0</code></td>
+  <td>If false and all <code>output.files</code> already exist, the command is skipped. Set true to always run.</td>
+</tr>
+</tbody>
+</table>
+
+=end html
+
+
+
+Passing an unrecognised key, an empty filename, or a non-filehandle C<log.fh>
+causes C<task> to die: these are usually mistakes worth catching early.
+
+=head2 Return value
+
+C<task> always returns a hash reference. The fields below are present after a
+normal run; the L<skip|/"Skipping completed work"> and L<dry-run|/"Dry runs"> paths
+omit the execution-only fields (C<exit>, C<signal>, C<stdout>, C<stderr>).
+
+
+
+=begin html
+
+<table>
+<thead>
+<tr>
+  <th>Field</th>
+  <th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><code>cmd</code></td>
+  <td>The command that was run.</td>
+</tr>
+<tr>
+  <td><code>dir</code></td>
+  <td>Working directory at execution time.</td>
+</tr>
+<tr>
+  <td><code>done</code></td>
+  <td><code>"now"</code> (just ran), <code>"before"</code> (skipped, outputs already existed), or <code>"not yet"</code> (dry run).</td>
+</tr>
+<tr>
+  <td><code>will.do</code></td>
+  <td><code>"done"</code>, <code>"no"</code> (skipped), <code>"no: dry run"</code>, or <code>"FAILED"</code>.</td>
+</tr>
+<tr>
+  <td><code>duration</code></td>
+  <td>Wall-clock seconds the command took (<code>0</code> for skips/dry runs).</td>
+</tr>
+<tr>
+  <td><code>exit</code></td>
+  <td>Exit code of the command (<code>-1</code> if it could not be launched).</td>
+</tr>
+<tr>
+  <td><code>signal</code></td>
+  <td>Signal number if the command process was killed by a signal, else <code>0</code>. Always <code>0</code> on Windows (no POSIX signals).</td>
+</tr>
+<tr>
+  <td><code>stdout</code>, <code>stderr</code></td>
+  <td>Captured output, with trailing whitespace stripped.</td>
+</tr>
+<tr>
+  <td><code>die</code>, <code>dry.run</code>, <code>overwrite</code>, <code>note</code></td>
+  <td>The (defaulted) argument values used.</td>
+</tr>
+<tr>
+  <td><code>output.files</code></td>
+  <td>Array ref of the output files (a scalar argument is normalised to a one-element array).</td>
+</tr>
+<tr>
+  <td><code>output.file.size</code></td>
+  <td>Hash of <code>filename => size in bytes</code> for the outputs.</td>
+</tr>
+<tr>
+  <td><code>input.files</code></td>
+  <td>The input argument, as given (present only if you passed <code>input.files</code>).</td>
+</tr>
+<tr>
+  <td><code>input.file.size</code></td>
+  <td>Hash of <code>filename => size in bytes</code> for the inputs (present only if you passed <code>input.files</code>).</td>
+</tr>
+<tr>
+  <td><code>source.file</code>, <code>source.line</code></td>
+  <td>Where in <i>your</i> code the <code>task</code> was called: handy when debugging a long pipeline.</td>
+</tr>
+</tbody>
+</table>
+
+=end html
+
+
+
+=head2 Skipping completed work
+
+If C<overwrite> is false (the default) and every file in C<output.files> already
+exists, C<task> does B<not> re-run the command. This makes pipelines
+restartable: re-running the script picks up where it left off.
+
+ open my $log, '>', 'logfile.txt';
+ my $t = task({
+     cmd            => 'gmx grompp -f em.mdp -c box.gro -p topol.top -o em.tpr',
+     'input.files'  => ['em.mdp', 'box.gro', 'topol.top'],
+     'output.files' => 'em.tpr',
+     'log.fh'       => $log,
+ });
+ close $log;
+
+On the first run C<done> is C<"now">; on a re-run (with C<em.tpr> present) C<done>
+is C<"before"> and C<will.do> is C<"no">. Pass C<< overwrite =E<gt> 1 >> to force it.
+
+=head2 Dry runs
+
+Useful for inspecting a pipeline without executing anything expensive:
+
+ my $t = task({
+     cmd       => 'a long-running, time-consuming command',
+     'dry.run' => 1,
+     'log.fh'  => $fh,
+ });
+
+The command is printed (and logged) but not run; C<will.do> is C<"no: dry run">.
+
+=head2 Failure behaviour
+
+By default (C<< die =E<gt> 1 >>) C<task> dies if the command exits non-zero or if any
+declared C<output.files> are missing afterwards, so a broken step stops the
+pipeline immediately. With C<< die =E<gt> 0 >>, C<task> instead warns and returns its
+result hash (with C<< will.do =E<gt> "FAILED" >>), letting you decide what to do.
+
+=head2 C<say2>
+
+ say2($message, $filehandle);
+
+"Say to two places": prints C<$message> to standard output B<and> to the given
+log filehandle, prefixed with the calling file and line number so log entries
+are traceable. The filehandle must be open, or C<say2> dies.
+
+ open my $log, '>', 'run.log';
+ say2('starting equilibration', $log);   # -> STDOUT and run.log
+ close $log;
+
+=head1 Dependencies
+
+Core/runtime modules used by SimpleFlow:
+
+=over
+
+=item * L<Capture::Tiny> captures C<stdout>/C<stderr>
+
+=item * L<Data::Printer> (C<DDP>) pretty result/record printing
+
+=item * L<Devel::Confess> better backtraces on death
+
+=item * L<Term::ANSIColor> coloured terminal output
+
+=item * C<List::Util>, C<Scalar::Util>, C<Time::HiRes>, C<Cwd> core utilities
+
+=back
+
+The test suite additionally uses C<Test::More> and
+L<Test::Exception>.
+
+=head1 Change log
+
+=head2 0.13 (2026-06-11)
+
+=head3 Fixed (Claude Opus 4.8 helped)
+
+=over
+
+=item * B<Exit status and signal are now decoded correctly.> C<task()> previously
+computed the exit code (C<< $status E<gt>E<gt> 8 >>) and I<then> derived the signal as
+C<$exit & 127>. Because the signal lives in the low byte of the raw wait
+status, which C<< E<gt>E<gt> 8 >> discards the C<signal> field was always wrong: a clean
+C<exit 42> was reported as C<signal 42>, and a process actually killed by a
+signal reported C<signal 0>. The signal is now read from the raw status before
+shifting, so C<exit> and C<signal> are independent and accurate.
+
+=item * B<< No longer dies on a missing output file when C<< die =E<gt> 0 >>. >> The zero-size
+check did C<(-s $file) == 0>, which is C<undef == 0> when a declared output file
+is absent. Under C<< use warnings FATAL =E<gt> 'all' >> that "uninitialized value"
+warning was fatal, so a task that was meant to I<warn> about missing output
+(with C<< die =E<gt> 0 >>) crashed instead. Missing sizes are now treated as C<0>, so
+the task warns and returns its result hash as intended.
+
+=item * B<< The "already done" result is now logged with its C<duration>. >> In the
+short-circuit path (output files already exist), C<duration> was set I<after>
+the record was written to the log, so the logged hash was missing it; the
+duplicate C<< done =E<gt> 'before' >> assignment was also removed.
+
+=back
+
+=head3 Changed / Windows support
+
+=over
+
+=item * B<Portable exit-status handling.> Decoding now branches on C<$^O>: Windows has
+no POSIX signals (C<signal> is reported as C<0> there), and a C<system()> that
+fails to launch the command (C<-1>) yields C<< exit =E<gt> -1 >> instead of a garbage
+value from shifting C<-1>.
+
+=item * B<ANSI colour is disabled on the legacy Windows console.> C<Term::ANSIColor>
+output is suppressed on C<MSWin32> unless an ANSI-capable terminal is detected
+(Windows Terminal, ConEmu, or ANSICON), so C<cmd.exe> no longer prints raw
+escape sequences and redirected logs stay clean. Unix and modern Windows
+terminals are unaffected.
+
+=back
+
+=head3 Tests
+
+=over
+
+=item * Rewrote C<t/01.t> to be cross-platform: shell commands now invoke the running
+Perl interpreter (C<"$^X" -e ...>) instead of Unix-only tools (C<which>, C<ls>,
+C<ln>, C<cp>), and temp files use the system temp directory instead of a
+hard-coded C</tmp>.
+
+=item * Added regression tests for both fixed bugs (exit/signal decoding; surviving a
+missing output file with C<< die =E<gt> 0 >>).
+
+=item * Added coverage for the C<note> field, the C<input.file.size> / C<output.file.size>
+hashes, scalar-vs-array normalisation of C<input.files> / C<output.files>, the
+C<dir> / C<source.file> / C<source.line> metadata, captured C<stdout> / C<stderr>
+(including trailing-whitespace stripping), and argument validation (missing
+C<cmd>, unknown keys, bad C<log.fh>, missing input files).
+
+=back
+
+=head2 0.12
+
+exit code now matches what shell would show it as; signal now appears
+
+=head2 0.11
+
+max string length now corresponds to max of output strings, no more truncated output
+added List::Util dependency for string length maxes
+memory size now shows when output
+directory is now output during dry runs

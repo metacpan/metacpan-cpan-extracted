@@ -3,13 +3,13 @@ package Net::DNS::Parameters;
 ################################################
 ##
 ##	Domain Name System (DNS) Parameters
-##	(last updated 2025-12-29)
+##	(last updated 2026-04-28)
 ##
 ################################################
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: Parameters.pm 2043 2026-01-14 13:35:59Z willem $)[2];
+our $VERSION = (qw$Id: Parameters.pm 2046 2026-06-01 13:23:01Z willem $)[2];
 
 use integer;
 use Carp;
@@ -52,6 +52,7 @@ our %classbyname = ( '*' => 255, @classbyname );
 my @typebyname = (
 	DELEG	   => 65432,					# draft-ietf-deleg-02
 	DELEG	   => 61440,					# draft-ietf-deleg-03
+	DELEGPARAM => 65433,					# draft-ietf-deleg-07
 	DELEGI	   => 65433,					# draft-ietf-deleg-03
 	A	   => 1,					# RFC1035
 	NS	   => 2,					# RFC1035
@@ -202,28 +203,32 @@ our %rcodebyname = @rcodebyname;
 
 # Registry: DNS EDNS0 Option Codes (OPT)
 my @ednsoptionbyname = (
-	LLQ		  => 1,					# RFC8764
-	'UPDATE-LEASE'	  => 2,					# RFC9664
-	NSID		  => 3,					# RFC5001
-	DAU		  => 5,					# RFC6975
-	DHU		  => 6,					# RFC6975
-	N3U		  => 7,					# RFC6975
-	'CLIENT-SUBNET'	  => 8,					# RFC7871
-	EXPIRE		  => 9,					# RFC7314
-	COOKIE		  => 10,				# RFC7873
-	'TCP-KEEPALIVE'	  => 11,				# RFC7828
-	PADDING		  => 12,				# RFC7830
-	CHAIN		  => 13,				# RFC7901
-	'KEY-TAG'	  => 14,				# RFC8145
-	'EXTENDED-ERROR'  => 15,				# RFC8914
-	'CLIENT-TAG'	  => 16,				# draft-bellis-dnsop-edns-tags-01
-	'SERVER-TAG'	  => 17,				# draft-bellis-dnsop-edns-tags-01
-	'REPORT-CHANNEL'  => 18,				# RFC9567
-	ZONEVERSION	  => 19,				# RFC9660
-	'MQTYPE-QUERY'	  => 20,				# draft-ietf-dnssd-multi-qtypes-07
-	'MQTYPE-RESPONSE' => 21,				# draft-ietf-dnssd-multi-qtypes-07
-	'UMBRELLA-IDENT'  => 20292,				# https://developer.cisco.com/docs/cloud-security/#!integrating-network-devic
-	DEVICEID	  => 26946,				# https://developer.cisco.com/docs/cloud-security/#!network-devices-getting-s
+	LLQ			  => 1,				# RFC8764
+	'UPDATE-LEASE'		  => 2,				# RFC9664
+	NSID			  => 3,				# RFC5001
+	DAU			  => 5,				# RFC6975
+	DHU			  => 6,				# RFC6975
+	N3U			  => 7,				# RFC6975
+	'CLIENT-SUBNET'		  => 8,				# RFC7871
+	EXPIRE			  => 9,				# RFC7314
+	COOKIE			  => 10,			# RFC7873
+	'TCP-KEEPALIVE'		  => 11,			# RFC7828
+	PADDING			  => 12,			# RFC7830
+	CHAIN			  => 13,			# RFC7901
+	'KEY-TAG'		  => 14,			# RFC8145
+	'EXTENDED-ERROR'	  => 15,			# RFC8914
+	'CLIENT-TAG'		  => 16,			# draft-bellis-dnsop-edns-tags-01
+	'SERVER-TAG'		  => 17,			# draft-bellis-dnsop-edns-tags-01
+	'REPORT-CHANNEL'	  => 18,			# RFC9567
+	ZONEVERSION		  => 19,			# RFC9660
+	'MQTYPE-QUERY'		  => 20,			# RFC-ietf-dnssd-multi-qtypes-14
+	'MQTYPE-RESPONSE'	  => 21,			# RFC-ietf-dnssd-multi-qtypes-14
+	'EDE-EXTRA-TEXT-LANGUAGE' => 22,			# draft-muks-dns-filtering-05
+	'FILTERING-CONTACT'	  => 23,			# draft-muks-dns-filtering-05
+	'FILTERING-ORGANIZATION'  => 24,			# draft-muks-dns-filtering-05
+	'FILTERING-DB'		  => 25,			# draft-muks-dns-filtering-05
+	'UMBRELLA-IDENT' => 20292,				# https://developer.cisco.com/docs/cloud-security/#!integrating-network-devic
+	DEVICEID	 => 26946,				# https://developer.cisco.com/docs/cloud-security/#!network-devices-getting-s
 	);
 our %ednsoptionbyval = reverse @ednsoptionbyname;
 push @ednsoptionbyname, map { /^\d/ ? $_ : lc($_) } @ednsoptionbyname;
@@ -300,6 +305,8 @@ my @dnserrorbyval = (
 	28 => 'Unable to conform to policy',			# draft-homburg-dnsop-codcp-00
 	29 => 'Synthesized',					# https://github.com/PowerDNS/pdns/pull/12334
 	30 => 'Invalid Query Type',				# RFC9824
+	31 => 'Rate Limited',					# draft-muks-dns-ede-rate-limited-02
+	32 => 'Over Quota',					# draft-muks-dns-ede-rate-limited-02
 	);
 our %dnserrorbyval = @dnserrorbyval;
 

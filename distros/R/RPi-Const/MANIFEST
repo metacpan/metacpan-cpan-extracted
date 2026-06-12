@@ -3,7 +3,7 @@ lib/RPi/Const.pm
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
-README
+README.md
 t/00-load.t
 t/23-const_pull.t
 t/24-const_edge.t
@@ -14,6 +14,8 @@ t/30-const_all.t
 t/35-pwm_mode.t
 t/40-pwm_defaults.t
 t/45-mcp23017_registers.t
+t/46-wpi_pin.t
+t/47-int_edge.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

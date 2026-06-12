@@ -2,11 +2,12 @@ use strict;
 use warnings;
 
 use English;
-use Error::Pure::Utils qw(clean);
+use Error::Pure::Utils qw(clean err_get);
 use MARC::Leader;
 use MARC::Field008;
-use Test::More 'tests' => 116;
+use Test::More 'tests' => 118;
 use Test::NoWarnings;
+use Unicode::UTF8 qw(decode_utf8);
 
 # Test.
 diag('book');
@@ -245,3 +246,32 @@ eval {
 is($EVAL_ERROR, "Couldn't parse MARC 008 field.\n",
 	"Couldn't parse MARC 008 field.");
 clean();
+
+# Test.
+## Real record in library of České Budějovice.
+$leader = MARC::Leader->new->parse('00000nam-a22     3a-4500');
+$obj = MARC::Field008->new(
+	'leader' => $leader,
+	'mode_strict' => 1,
+);
+$field_008 = decode_utf8('09l3Čes1984----xr-               0 cze-|');
+eval {
+	$obj->parse($field_008);
+};
+is($EVAL_ERROR, "Couldn't parse MARC 008 field.\n",
+	"Couldn't parse MARC 008 field.");
+my @errors = err_get(1);
+my @error_texts = sort { $a cmp $b } map { $_->{'msg'}->[0] } @errors;
+is_deeply(
+	\@error_texts,
+	[
+		"Couldn't create data object of book.",
+		"Couldn't parse MARC 008 field.",
+		"Parameter 'conference_publication' has bad value.",
+		"Parameter 'date_entered_on_file' must be a number.",
+		"Parameter 'festschrift' has bad value.",
+		"Parameter 'index' has bad value."
+	],
+	'List of errors from bad field 008.',
+);
+

@@ -16,9 +16,6 @@ sub a2n { return [ map { $_->name( ) } @{ $_[0] } ]; }
 my $tube = new_ok( 'Sample' );
 my $ret;
 
-diag( "*** Expect many messages saying 'Negative repeat count does nothing at ...' -- ignore these, please! *** \n",
-      "*** (They are coming from Text::Phonetic::Phonix. They are ugly but functionally harmless.)           ***" );
-
 $ret = $tube->fuzzy_find( 'Bakerloo', objects => 'lines', method => 'phonix' );
 is( $ret, 'Bakerloo', 'Finding line Bakerloo based on Phonix' );
 

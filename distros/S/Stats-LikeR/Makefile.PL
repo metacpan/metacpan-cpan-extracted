@@ -21,14 +21,13 @@ my %WriteMakefileArgs = (
   "NAME" => "Stats::LikeR",
   "PREREQ_PM" => {
     "Devel::Confess" => 0,
-    "Digest::SHA" => 0,
-    "Scalar::Util" => 0,
+    "Scalar::Util" => "1.22",
     "Test::Exception" => 0,
     "Test::LeakTrace" => 0,
     "Test::More" => 0,
     "autodie" => 0
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.15",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,8 +40,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Devel::Confess" => 0,
-  "Digest::SHA" => 0,
-  "Scalar::Util" => 0,
+  "Scalar::Util" => "1.22",
   "Test::Exception" => 0,
   "Test::LeakTrace" => 0,
   "Test::More" => 0,

@@ -1758,4 +1758,460 @@ EMAIL
 	like $report, qr/120\.88\.161\.249/,   'firmluminary: IP in report';
 }
 
+# ===========================================================================
+# 35. header_value() — public accessor delegates to _header_value()
+# ===========================================================================
+note '=== 35. header_value() public accessor ===';
+{
+	# Verify the public method is reachable from outside the package and that
+	# it behaves identically to the private _header_value() it wraps.
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email(subject => 'Public Accessor Test'));
+
+	is $a->header_value('subject'), 'Public Accessor Test', 'header_value() finds header';
+	is $a->header_value('Subject'), 'Public Accessor Test', 'header_value() is case-insensitive';
+	is $a->header_value('x-absent'), undef, 'missing header returns undef';
+
+	# can_ok proves the method exists on the public interface
+	can_ok $a, 'header_value';
+}
+
+# ===========================================================================
+# 36. sending_software() and received_trail()
+# ===========================================================================
+note '=== 36. sending_software() and received_trail() ===';
+{
+	# X-PHP-Originating-Script and X-Mailer reveal shared-hosting injection
+	my $sw_email = make_email(
+		extra_hdrs => "X-PHP-Originating-Script: 100-PHPMailer.php\n"
+					. "X-Mailer: PHPMailer 6.0\n",
+		received   => 'from web.example.com (web.example.com [91.198.174.42])'
+					. ' by mx id MSGID42; Mon, 01 Jan 2024 00:00:00 +0000',
+	);
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email($sw_email);
+
+	my @sw = $a->sending_software();
+	ok @sw > 0, 'sending_software() returns entries';
+
+	my ($php) = grep { $_->{header} eq 'x-php-originating-script' } @sw;
+	ok defined $php,					   'x-php-originating-script captured';
+	is $php->{value}, '100-PHPMailer.php', 'PHP script value correct';
+	like $php->{note}, qr/shared hosting/i,'PHP note mentions shared hosting';
+
+	my ($mailer) = grep { $_->{header} eq 'x-mailer' } @sw;
+	ok defined $mailer,				   'x-mailer captured';
+	is $mailer->{value}, 'PHPMailer 6.0', 'x-mailer value correct';
+
+	# Results are sorted alphabetically by header name (per %sw_notes sort)
+	my @sorted = sort { ($a->{header} // '') cmp ($b->{header} // '') } @sw;
+	is_deeply \@sw, \@sorted, 'sending_software() sorted by header name';
+
+	# No software headers -> empty list
+	my $b = Email::Abuse::Investigator->new();
+	$b->parse_email(make_email());
+	is scalar($b->sending_software()), 0, 'no software headers -> empty list';
+
+	# received_trail() assembles oldest-first per-hop data
+	my @trail = $a->received_trail();
+	ok @trail > 0, 'received_trail() returns entries';
+
+	my ($ip_hop) = grep { defined $_->{ip} && $_->{ip} eq '91.198.174.42' } @trail;
+	ok defined $ip_hop, 'hop with extracted IP in trail';
+
+	my ($id_hop) = grep { defined $_->{id} } @trail;
+	ok defined $id_hop, 'hop with message-ID in trail';
+
+	# No Received: headers -> empty trail
+	my $c = Email::Abuse::Investigator->new();
+	$c->parse_email("From: x\@y.com\nSubject: s\n\nbody");
+	is scalar($c->received_trail()), 0, 'no Received -> empty trail';
+}
+
+# ===========================================================================
+# 37. unresolved_contacts()
+# ===========================================================================
+note '=== 37. unresolved_contacts() ===';
+{
+	# A URL host with a known abuse contact must be excluded; a body email
+	# domain with no contact must appear.
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email(body => 'email bob@mystery.example'));
+	$a->{_origin}         = { ip=>'1.2.3.4', rdns=>'mail.ok', confidence=>'high',
+							   org=>'X', abuse=>'a@b', note=>'', country=>undef };
+	$a->{_urls}           = [{
+		url   => 'https://known-host.example/',
+		host  => 'known-host.example',
+		ip    => '5.5.5.5',
+		org   => 'Known Host',
+		abuse => 'abuse@known-host.example',   # this domain is "covered"
+	}];
+	$a->{_mailto_domains} = [{
+		domain => 'mystery.example',
+		source => 'body',
+	}];
+
+	my @unresolved = $a->unresolved_contacts();
+	ok !scalar(grep { $_->{domain} eq 'known-host.example' } @unresolved),
+		'covered URL host excluded from unresolved';
+	ok  scalar(grep { $_->{domain} eq 'mystery.example'    } @unresolved),
+		'uncovered email domain appears in unresolved';
+
+	# From: / Return-Path: / Sender: header sources are spoofable and must be
+	# skipped so investigators are not chasing spoofed addresses.
+	my $b = Email::Abuse::Investigator->new();
+	$b->parse_email(make_email(from => 'x@spoofable.example'));
+	$b->{_origin}         = undef;
+	$b->{_urls}           = [];
+	$b->{_mailto_domains} = [{
+		domain => 'spoofable.example',
+		source => 'From: header',
+	}];
+	my @unresolved2 = $b->unresolved_contacts();
+	ok !scalar(grep { $_->{domain} eq 'spoofable.example' } @unresolved2),
+		'From: header domain excluded from unresolved (spoofable)';
+
+	# Empty state -> no unresolved entries
+	my $c = Email::Abuse::Investigator->new();
+	$c->parse_email(make_email());
+	$c->{_origin}         = undef;
+	$c->{_urls}           = [];
+	$c->{_mailto_domains} = [];
+	is scalar($c->unresolved_contacts()), 0, 'empty state -> no unresolved';
+}
+
+# ===========================================================================
+# 38. form_contacts()
+# ===========================================================================
+note '=== 38. form_contacts() ===';
+{
+	# GoDaddy is a form-only registrar in %PROVIDER_ABUSE — its abuse email
+	# bounces, so it must NOT appear in abuse_contacts() but MUST appear here.
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email());
+	$a->{_origin}         = undef;
+	$a->{_urls}           = [];
+	$a->{_mailto_domains} = [{
+		domain          => 'example-godaddy.tld',
+		source          => 'body',
+		registrar       => 'GoDaddy LLC',
+		registrar_abuse => 'abuse@godaddy.com',
+	}];
+
+	my @forms = $a->form_contacts();
+	ok @forms > 0, 'form_contacts() returns entries for form-only registrar';
+
+	my ($gd) = grep { ($_->{form} // '') =~ /godaddy/i } @forms;
+	ok defined $gd,	   'GoDaddy form contact present';
+	ok $gd->{form_paste},  'GoDaddy form_paste instructions present';
+	ok $gd->{form_upload}, 'GoDaddy form_upload instructions present';
+
+	# Deduplication: calling form_contacts() twice must not return extra entries
+	my @forms2 = $a->form_contacts();
+	is scalar @forms2, scalar @forms, 'no duplicates on repeat call';
+
+	# Empty state -> no form entries
+	my $b = Email::Abuse::Investigator->new();
+	$b->parse_email(make_email());
+	$b->{_origin}         = undef;
+	$b->{_urls}           = [];
+	$b->{_mailto_domains} = [];
+	is scalar($b->form_contacts()), 0, 'no form-only providers -> empty form_contacts()';
+}
+
+# ===========================================================================
+# 39. _sanitise_output()
+# ===========================================================================
+note '=== 39. _sanitise_output() ===';
+{
+	# _sanitise_output is a plain package function, NOT a method:
+	# it takes ($str) with no $self.  Call it as a function, not via ->().
+	use Email::Abuse::Investigator;
+
+	# C0 control characters that MUST be stripped
+	is Email::Abuse::Investigator::_sanitise_output("hello\x00world"), 'helloworld', 'NUL (0x00) stripped';
+	is Email::Abuse::Investigator::_sanitise_output("hi\x07there"),    'hithere',    'BEL (0x07) stripped';
+	is Email::Abuse::Investigator::_sanitise_output("a\x08b"),         'ab',         'BS (0x08) stripped';
+	is Email::Abuse::Investigator::_sanitise_output("a\x0Bb"),         'ab',         'VT (0x0B) stripped';
+	is Email::Abuse::Investigator::_sanitise_output("a\x0Cb"),         'ab',         'FF (0x0C) stripped';
+	is Email::Abuse::Investigator::_sanitise_output("a\x1Fb"),         'ab',         'US (0x1F) stripped';
+
+	# DEL must be stripped
+	is Email::Abuse::Investigator::_sanitise_output("a\x7Fb"), 'ab', 'DEL (0x7F) stripped';
+
+	# Tab, LF, CR are deliberately kept for email formatting
+	is Email::Abuse::Investigator::_sanitise_output("col1\tcol2"),  "col1\tcol2",  'tab (0x09) preserved';
+	is Email::Abuse::Investigator::_sanitise_output("line1\nline2"),"line1\nline2",'LF (0x0A) preserved';
+	is Email::Abuse::Investigator::_sanitise_output("cr\r\nlf"),    "cr\r\nlf",    'CR+LF preserved';
+
+	# High bytes (0x80–0xFF) pass through for non-ASCII content
+	is Email::Abuse::Investigator::_sanitise_output("caf\xE9"), "caf\xE9", 'high byte (0xE9) preserved';
+
+	# Boundary: undef and empty
+	is Email::Abuse::Investigator::_sanitise_output(undef), '', 'undef input -> empty string';
+	is Email::Abuse::Investigator::_sanitise_output(''),    '', 'empty string -> empty string';
+
+	# Clean ASCII must pass through untouched
+	is Email::Abuse::Investigator::_sanitise_output('hello world 123'), 'hello world 123', 'clean ASCII unchanged';
+}
+
+# ===========================================================================
+# 40. _parse_rfc2822_date() — RFC 2822 date header parsing
+# ===========================================================================
+note '=== 40. _parse_rfc2822_date() ===';
+{
+	# _parse_rfc2822_date is a package-level function, not a method
+	my $epoch;
+
+	$epoch = Email::Abuse::Investigator::_parse_rfc2822_date(
+		'Mon, 01 Jan 2024 00:00:00 +0000');
+	ok defined($epoch) && $epoch > 0, 'standard RFC 2822 date parsed';
+
+	# Day without weekday prefix is valid per RFC 2822
+	$epoch = Email::Abuse::Investigator::_parse_rfc2822_date(
+		'01 Jan 2024 12:30:00 +0000');
+	ok defined($epoch) && $epoch > 0, 'date without weekday parsed';
+
+	# Month names are case-insensitive
+	$epoch = Email::Abuse::Investigator::_parse_rfc2822_date(
+		'15 dec 2023 08:00:00 -0500');
+	ok defined($epoch) && $epoch > 0, 'lowercase month name parsed';
+
+	# Unrecognised month -> undef
+	$epoch = Email::Abuse::Investigator::_parse_rfc2822_date(
+		'15 Xyz 2023 00:00:00 +0000');
+	is $epoch, undef, 'unknown month -> undef';
+
+	# Degenerate input
+	is Email::Abuse::Investigator::_parse_rfc2822_date(undef),       undef, 'undef -> undef';
+	is Email::Abuse::Investigator::_parse_rfc2822_date('not a date'), undef, 'garbage -> undef';
+
+	# Chronological ordering must be preserved
+	my $early = Email::Abuse::Investigator::_parse_rfc2822_date(
+		'01 Jan 2020 00:00:00 +0000');
+	my $late  = Email::Abuse::Investigator::_parse_rfc2822_date(
+		'01 Jan 2025 00:00:00 +0000');
+	ok $late > $early, 'later RFC 2822 date has larger epoch value';
+}
+
+# ===========================================================================
+# 41. _risk_check_date() branches: missing / implausible TZ / past / future
+# ===========================================================================
+note '=== 41. _risk_check_date() branches ===';
+{
+	# Missing Date: header is a mandatory field (RFC 5322 s.3.6.1)
+	{
+		my $a = Email::Abuse::Investigator->new();
+		$a->parse_email("From: x\@y.com\nSubject: s\n\nbody");
+		$a->{_origin}         = { ip=>'1.2.3.4', rdns=>'mail.ok', confidence=>'high',
+								   org=>'X', abuse=>'a@b', note=>'', country=>undef };
+		$a->{_urls}           = [];
+		$a->{_mailto_domains} = [];
+		ok any_flag($a->risk_assessment()->{flags}, 'missing_date'),
+			'missing_date flagged when Date: absent';
+	}
+
+	# +3000 is way outside the +14:00 real-world maximum
+	{
+		my $a = Email::Abuse::Investigator->new();
+		$a->parse_email(make_email(date => 'Mon, 01 Jan 2024 00:00:00 +3000'));
+		$a->{_origin}         = { ip=>'1.2.3.4', rdns=>'mail.ok', confidence=>'high',
+								   org=>'X', abuse=>'a@b', note=>'', country=>undef };
+		$a->{_urls}           = [];
+		$a->{_mailto_domains} = [];
+		ok any_flag($a->risk_assessment()->{flags}, 'implausible_timezone'),
+			'implausible_timezone flagged for +3000';
+	}
+
+	# Date 30 days in the past exceeds the 7-day skew window
+	{
+		my $old_date = POSIX::strftime(
+			'%a, %d %b %Y %H:%M:%S +0000', gmtime(time() - 30 * 86400));
+		my $a = Email::Abuse::Investigator->new();
+		$a->parse_email(make_email(date => $old_date));
+		$a->{_origin}         = { ip=>'1.2.3.4', rdns=>'mail.ok', confidence=>'high',
+								   org=>'X', abuse=>'a@b', note=>'', country=>undef };
+		$a->{_urls}           = [];
+		$a->{_mailto_domains} = [];
+		ok any_flag($a->risk_assessment()->{flags}, 'suspicious_date'),
+			'suspicious_date flagged for date 30 days in the past';
+	}
+
+	# Date 30 days in the future is also suspicious (header likely forged)
+	{
+		my $future_date = POSIX::strftime(
+			'%a, %d %b %Y %H:%M:%S +0000', gmtime(time() + 30 * 86400));
+		my $a = Email::Abuse::Investigator->new();
+		$a->parse_email(make_email(date => $future_date));
+		$a->{_origin}         = { ip=>'1.2.3.4', rdns=>'mail.ok', confidence=>'high',
+								   org=>'X', abuse=>'a@b', note=>'', country=>undef };
+		$a->{_urls}           = [];
+		$a->{_mailto_domains} = [];
+		ok any_flag($a->risk_assessment()->{flags}, 'suspicious_date'),
+			'suspicious_date flagged for date 30 days in the future';
+	}
+}
+
+# ===========================================================================
+# 42. _risk_check_auth() extra branches: SPF softfail + DKIM domain mismatch
+# ===========================================================================
+note '=== 42. _risk_check_auth() extra branches ===';
+{
+	# SPF softfail (~all) is lower severity than hard fail
+	{
+		my $a = mk_risk(
+			auth    => 'mx; spf=softfail',
+			_origin => { ip=>'1.2.3.4', rdns=>'mail.ok',
+						 confidence=>'high', org=>'X', abuse=>'a@b',
+						 note=>'', country=>undef },
+		);
+		ok any_flag($a->risk_assessment()->{flags}, 'spf_softfail'),
+			'spf_softfail flagged for softfail result';
+		my ($f) = grep { $_->{flag} eq 'spf_softfail' } @{ $a->risk_assessment()->{flags} };
+		is $f->{severity}, 'MEDIUM', 'spf_softfail severity is MEDIUM';
+	}
+
+	# DKIM signed by ESP domain != From: domain, but DKIM passes -> INFO
+	# This is normal for bulk/ESP senders and should not be alarming.
+	{
+		my $a = Email::Abuse::Investigator->new();
+		$a->parse_email(make_email(
+			from       => 'Sender <sender@brand.com>',
+			auth       => 'mx; spf=pass; dkim=pass header.d=esp-service.net; dmarc=pass',
+			extra_hdrs => "DKIM-Signature: v=1; d=esp-service.net; s=s1; b=xxx\n",
+		));
+		$a->{_origin}         = { ip=>'1.2.3.4', rdns=>'mail.ok', confidence=>'high',
+								   org=>'X', abuse=>'a@b', note=>'', country=>undef };
+		$a->{_urls}           = [];
+		$a->{_mailto_domains} = [];
+		my $risk = $a->risk_assessment();
+		ok any_flag($risk->{flags}, 'dkim_domain_mismatch'),
+			'dkim_domain_mismatch flagged when signed by different registrable domain';
+		my ($f) = grep { $_->{flag} eq 'dkim_domain_mismatch' } @{ $risk->{flags} };
+		is $f->{severity}, 'INFO',
+			'passing-DKIM mismatch is INFO (normal for ESPs)';
+	}
+
+	# DKIM signed by different domain AND DKIM fails -> MEDIUM (possible forgery)
+	{
+		my $a = Email::Abuse::Investigator->new();
+		$a->parse_email(make_email(
+			from       => 'Sender <sender@brand.com>',
+			auth       => 'mx; spf=pass; dkim=fail header.d=forgery.net; dmarc=fail',
+			extra_hdrs => "DKIM-Signature: v=1; d=forgery.net; s=s1; b=xxx\n",
+		));
+		$a->{_origin}         = { ip=>'1.2.3.4', rdns=>'mail.ok', confidence=>'high',
+								   org=>'X', abuse=>'a@b', note=>'', country=>undef };
+		$a->{_urls}           = [];
+		$a->{_mailto_domains} = [];
+		my $risk = $a->risk_assessment();
+		my ($f) = grep { $_->{flag} eq 'dkim_domain_mismatch' } @{ $risk->{flags} };
+		ok defined $f, 'dkim_domain_mismatch flagged for fail+different domain';
+		is $f->{severity}, 'MEDIUM', 'fail+mismatch is MEDIUM severity';
+	}
+
+	# Same registrable domain (sub.brand.com signing brand.com) -> no mismatch
+	{
+		my $a = Email::Abuse::Investigator->new();
+		$a->parse_email(make_email(
+			from       => 'Sender <sender@brand.com>',
+			auth       => 'mx; spf=pass; dkim=pass header.d=mta.brand.com; dmarc=pass',
+			extra_hdrs => "DKIM-Signature: v=1; d=mta.brand.com; s=s1; b=xxx\n",
+		));
+		$a->{_origin}         = { ip=>'1.2.3.4', rdns=>'mail.ok', confidence=>'high',
+								   org=>'X', abuse=>'a@b', note=>'', country=>undef };
+		$a->{_urls}           = [];
+		$a->{_mailto_domains} = [];
+		ok !any_flag($a->risk_assessment()->{flags}, 'dkim_domain_mismatch'),
+			'same registrable domain (subdomain signing) does not flag mismatch';
+	}
+}
+
+# ===========================================================================
+# 43. _decode_ew() — single encoded-word component (B and Q)
+# ===========================================================================
+note '=== 43. _decode_ew() direct ===';
+{
+	# _decode_ew is a package-level helper, not a method
+	my $b_payload = encode_base64('Hello World', '');
+
+	is Email::Abuse::Investigator::_decode_ew('UTF-8', 'B', $b_payload),
+		'Hello World', 'B encoding decoded correctly';
+
+	# Q encoding: underscore substitutes for space, =HH for other specials
+	is Email::Abuse::Investigator::_decode_ew('UTF-8', 'Q', 'Hello_World=21'),
+		'Hello World!', 'Q encoding decoded with _->space and =HH';
+
+	# Specifier is case-insensitive per RFC 2047
+	is Email::Abuse::Investigator::_decode_ew('UTF-8', 'b', $b_payload),
+		'Hello World', 'lowercase b treated as base64';
+
+	is Email::Abuse::Investigator::_decode_ew('UTF-8', 'q', 'test_value'),
+		'test value', 'lowercase q treated as QP with underscore substitution';
+}
+
+# ===========================================================================
+# 44. _parse_domain_whois_abuse() — WHOIS registrar contact extraction
+# ===========================================================================
+note '=== 44. _parse_domain_whois_abuse() ===';
+{
+	my $a = Email::Abuse::Investigator->new();
+
+	# Standard "Registrar Abuse Contact Email:" format (ICANN-mandated field)
+	my $whois1 = "Registrar: Super Registrar Ltd\n"
+			   . "Registrar Abuse Contact Email: abuse\@superreg.example\n";
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_domain_whois = sub { $whois1 };
+	my $r1 = $a->_parse_domain_whois_abuse('example.com');
+	is $r1->{org},   'Super Registrar Ltd',     'registrar name extracted';
+	is $r1->{abuse}, 'abuse@superreg.example',  'ICANN abuse email extracted';
+
+	# Alternative "Abuse Contact Email:" pattern used by some registrars
+	my $whois2 = "Registrar: Alt Reg\nAbuse Contact Email: abuse\@altreg.example\n";
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_domain_whois = sub { $whois2 };
+	my $r2 = $a->_parse_domain_whois_abuse('alt.example');
+	is $r2->{abuse}, 'abuse@altreg.example', 'Abuse Contact Email: alternative pattern';
+
+	# No WHOIS data available -> empty hashref (caller must handle gracefully)
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	my $r3 = $a->_parse_domain_whois_abuse('nope.example');
+	is_deeply $r3, {}, 'no WHOIS response -> empty hashref returned';
+}
+
+# ===========================================================================
+# 45. abuse_contacts() caching and _contacts invalidation on parse_email()
+# ===========================================================================
+note '=== 45. abuse_contacts() caching ===';
+{
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_email(from => 'x@gmail.com'));
+	$a->{_origin} = {
+		ip         => '209.85.218.67',
+		rdns       => 'mail-ej1-f67.google.com',
+		org        => 'Google LLC',
+		abuse      => 'abuse@google.com',
+		confidence => 'medium',
+		note       => '',
+		country    => undef,
+	};
+	$a->{_urls}           = [];
+	$a->{_mailto_domains} = [];
+
+	# First call should populate the _contacts lazy cache
+	my @first = $a->abuse_contacts();
+	ok defined $a->{_contacts}, '_contacts slot populated after first call';
+	ok @first > 0,               'at least one contact returned';
+
+	# Second call must return the cached value without recomputing
+	my @second = $a->abuse_contacts();
+	is scalar @first, scalar @second, 'cached result has same element count';
+
+	# parse_email() must clear _contacts so a re-parse starts fresh.
+	# Without this reset, a second message would see the previous message's contacts.
+	$a->parse_email(make_email());
+	is $a->{_contacts}, undef, '_contacts invalidated by parse_email()';
+}
+
 done_testing();

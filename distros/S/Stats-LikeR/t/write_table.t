@@ -5,7 +5,6 @@ use feature 'say';
 use File::Temp qw(tempdir tempfile);
 use Stats::LikeR;
 use Test::Exception;
-use Digest::SHA 'sha512_base64';
 use Test::LeakTrace 'no_leaks_ok';
 
 sub file2string {
@@ -20,11 +19,11 @@ my %data = (
 my $tmp_file = '/tmp/test.tsv';
 write_table(\%data, $tmp_file, sep => "\t", 'row.names' => 1, 'undef.val' => 'NA');
 my $str = file2string($tmp_file);
-if (sha512_base64($str) eq 'FInYAXZcS7lK1n7osAhVkp5SiQNpt3h4kql9yZ2YCoPQslHKjwfGAXgdiphDSc6wMhlpU5toNmSifEUz1OgHNQ') {
-	pass('write_table successfully wrote a tab-delimited file');
+my $expected = "\tCol1\tCol2\tCol3\nRow_A\t10\t20\tNA\nRow_B\t30\tNA\t40\n";
+if (is($str, $expected, 'write_table successfully wrote a tab-delimited file')) {
 	unlink $tmp_file;
 } else {
-	fail("sha512 does not match for write_table; see $tmp_file");
+	diag("see $tmp_file");
 }
 no_leaks_ok {
 	eval {
@@ -45,11 +44,11 @@ my %data_hoh = (
 
 write_table(\%data_hoh, $tmp_file, sep => "\t", 'row.names' => 1, 'undef.val' => 'NA');
 $str = file2string($tmp_file);
-if (sha512_base64($str) eq 'ZYK6zmrT47CLrEc4PSFtCtvdkLtv47MCIMHIg70bARlWO5J9MuzybnV5h7dBSyQn8dOKojaX6pinxOvbTVaI+g') {
-	pass('write_table successfully wrote a tab-delimited file (Hash of Hashes)');
+$expected = "\tc1\tc2\tc3\tc4\nr1\t42\thello,world\tNA\tNA\nr2\t99\tNA\t\"quote\"\"here\"\tNA\nr3\tNA\t\"tab\tin\"\tNA\tNA\n";
+if (is($str, $expected, 'write_table successfully wrote a tab-delimited file (Hash of Hashes)')) {
 	unlink $tmp_file;
 } else {
-	fail("sha512 does not match for write_table HoH; see $tmp_file");
+	diag("see $tmp_file");
 }
 no_leaks_ok {
 	eval {
@@ -68,11 +67,11 @@ my %data_hoa = (
 
 write_table(\%data_hoa, $tmp_file, sep => "\t", 'row.names' => 1, 'undef.val' => 'NA');
 $str = file2string($tmp_file);
-if (sha512_base64($str) eq '1wv8uFDVQkQ9UZ+50n+r/Z8oj4VFP4eusApZDAY1DB3dXhT+gFFyCR2Z1ZVQDTOJrUaMRpfWt6vLSlaSsNps7g') {
-    pass('write_table successfully wrote a tab-delimited file (Hash of Arrays)');
+$expected = "\tr1\tr2\tr3\n1\t42\t99\tNA\n2\thello,world\tNA\t\"tab\tin\"\n3\tNA\t\"quote\"\"here\"\tNA\n4\tNA\tNA\tNA\n";
+if (is($str, $expected, 'write_table successfully wrote a tab-delimited file (Hash of Arrays)')) {
     unlink $tmp_file;
 } else {
-    fail("sha512 does not match for write_table HoA; see $tmp_file");
+    diag("see $tmp_file");
 }
 no_leaks_ok {
 	eval {
@@ -82,11 +81,8 @@ no_leaks_ok {
 #---------
 write_table(\%data_hoa, '/tmp/undef.val.tsv', sep => "\t", 'undef.val' => 'nan');
 $str = file2string('/tmp/undef.val.tsv');
-if (sha512_base64($str) eq 'Pbohr5w8D4e6691E0WV3W6RjtjIEvgS1egsPixNkXhZ0Jhu3vmRHoR6Lkxsm0GBJ2c0iT7yYZq4G45w/qwDnKQ') {
-	pass('undefined values are switched to nan');
-} else {
-	fail('undefined values are NOT switched to nan');
-}
+$expected = "\tr1\tr2\tr3\n1\t42\t99\tnan\n2\thello,world\tnan\t\"tab\tin\"\n3\tnan\t\"quote\"\"here\"\tnan\n4\tnan\tnan\tnan\n";
+is($str, $expected, 'undefined values are switched to nan');
 
 # ==============================================================================
 # 4. write_table: Nested Reference Memory Leaks
@@ -248,4 +244,155 @@ dies_ok { write_table( \%hoa, path(), 'bogus' => 1 ) } 'unknown option dies';
 dies_ok { write_table( \%hoa, path(), 'col.names' => 'x' ) } 'col.names must be an array ref';
 # 17. Empty col.names must NOT hang (regression: size_t vs av_len == -1).
 lives_ok { write_table( \%flat, path(), 'col.names' => [], 'row.names' => 0 ) } 'empty col.names does not loop forever';
+# ==============================================================================
+# 18+. Expanded coverage targeting bugs found in the write_table XS.
+# These tests assume the updated XS: undef cells render as EMPTY fields by
+# default (a,,c), 'undef.val' still overrides, and print_string_row emits
+# zero-length fields bare (never '' or "").
+# ==============================================================================
+
+# 18. Default undef rendering is an empty field (no 'undef.val' supplied).
+my %u_jag = ( 'a' => [ 1, 2 ], 'b' => [ 10 ] );
+wrote_ok( ",a,b\n1,1,10\n2,2,\n", 'default undef renders as an empty field', \%u_jag );
+
+# 19. 'undef.val' => undef must behave like the default and emit NO
+#     "uninitialized value" warning (regression: SvPV_nolen on PL_sv_undef).
+{
+	my @warnings;
+	local $SIG{__WARN__} = sub { push @warnings, @_ };
+	my $f = path();
+	write_table( \%u_jag, $f, 'undef.val' => undef );
+	is( slurp($f), ",a,b\n1,1,10\n2,2,\n", "undef.val => undef behaves like the default" );
+	is( scalar @warnings, 0, "undef.val => undef emits no warnings" )
+		or diag( join '', @warnings );
+	$f = path();
+	write_table( \%u_jag, $f, 'undef.val' => '' );
+	is( slurp($f), ",a,b\n1,1,10\n2,2,\n", "undef.val => '' is identical to the default" );
+}
+
+# 20. Empty col.names per input shape. A HANG on any of these is the
+#     size_t-index vs av_len() == -1 regression (test 17 covers flat hash).
+{
+	# HoH: degenerate but defined output - only the row-label column survives.
+	my %hoh2 = ( 'r1' => { 'a' => 1 }, 'r2' => { 'a' => 2 } );
+	my $f = path();
+	lives_ok { write_table( \%hoh2, $f, 'col.names' => [] ) }
+		'HoH: empty col.names terminates';
+	is( slurp($f), "\nr1\nr2\n", 'HoH: empty col.names leaves only sorted row labels' );
+
+	# AoH: numeric row labels survive.
+	my @aoh2 = ( { 'x' => 1 }, { 'x' => 2 } );
+	$f = path();
+	lives_ok { write_table( \@aoh2, $f, 'col.names' => [] ) }
+		'AoH: empty col.names terminates';
+	is( slurp($f), "\n1\n2\n", 'AoH: empty col.names leaves only numeric row labels' );
+
+	# HoA croaks ("Could not get headers") - and that croak path must close
+	# the already-open filehandle and free headers_av (regression: both leaked).
+	my %hoa2 = ( 'a' => [ 1, 2 ] );
+	throws_ok { write_table( \%hoa2, path(), 'col.names' => [] ) }
+		qr/Could not get headers/, 'HoA: empty col.names croaks cleanly';
+	no_leaks_ok {
+		eval { write_table( \%hoa2, path(), 'col.names' => [] ) };
+	} 'HoA: no leaks (fh, headers_av) on the empty-header croak' unless $INC{'Devel/Cover.pm'};
+}
+
+# 21. Empty col.names combined with a named row.names column exercises the
+#     filtered-headers loop over an EMPTY headers array (second size_t site).
+{
+	my @aoh3 = ( { 'x' => 'p' }, { 'x' => 'q' } );
+	my $f = path();
+	lives_ok { write_table( \@aoh3, $f, 'col.names' => [], 'row.names' => 'x' ) }
+		"AoH: empty col.names + row.names => 'x' terminates (filtered-header loop)";
+	is( slurp($f), "\np\nq\n", 'AoH: row labels taken from x; no data columns' );
+}
+
+# 22. Numeric row labels in sequence across many rows (regression guard for
+#     the per-row label buffer: each label must be printed before reuse).
+{
+	my @many = map { { 'v' => $_ * 10 } } 1 .. 12;
+	my $expected = ",v\n" . join( '', map { "$_," . ( $_ * 10 ) . "\n" } 1 .. 12 );
+	wrote_ok( $expected, 'numeric row labels 1..12 correct in sequence', \@many );
+}
+
+# 23. Unopenable output path: must die, and must not leak the pre-gathered
+#     HoH row keys (regression: rows_av leaked when PerlIO_open failed).
+{
+	my %hoh3 = ( 'r1' => { 'a' => 1 } );
+	my $bad = "$dir/no/such/subdir/file.csv";
+	dies_ok { write_table( \%hoh3, $bad ) } 'unopenable path dies';
+	no_leaks_ok {
+		eval { write_table( \%hoh3, $bad ) };
+	} 'no leaks (rows_av) when the output file cannot be opened' unless $INC{'Devel/Cover.pm'};
+}
+
+# 24. Quoting corners.
+# Carriage return forces quoting just like newline.
+wrote_ok( qq{,a\n1,"x\ry"\n}, 'embedded \r is quoted', { 'a' => [ "x\ry" ] } );
+# A column NAME containing the separator is quoted in the header row.
+wrote_ok( qq{"a,b"\n1\n}, 'column name containing the separator is quoted',
+	{ 'a,b' => [ 1 ] }, 'row.names' => 0 );
+# Multi-character separator: only a full separator match triggers quoting.
+wrote_ok( qq{a::b\n"x::y"::x:y\n}, 'multi-char separator: full match quotes, partial stays bare',
+	{ 'a' => [ 'x::y' ], 'b' => [ 'x:y' ] }, 'sep' => '::', 'row.names' => 0 );
+
+# 25. undef entries inside col.names are skipped, order otherwise preserved.
+wrote_ok( ",b,a\n1,2,1\n", 'undef entries in col.names are skipped',
+	{ 'a' => [ 1 ], 'b' => [ 2 ] }, 'col.names' => [ 'b', undef, 'a' ] );
+
+# 26. col.names naming a column absent from the data pads with undef.val
+#     (or empty by default).
+wrote_ok( "a,ghost\n1,NA\n2,NA\n", 'missing col.names column pads with undef.val',
+	{ 'a' => [ 1, 2 ] }, 'col.names' => [ 'a', 'ghost' ], 'row.names' => 0, 'undef.val' => 'NA' );
+wrote_ok( "a,ghost\n1,\n2,\n", 'missing col.names column pads empty by default',
+	{ 'a' => [ 1, 2 ] }, 'col.names' => [ 'a', 'ghost' ], 'row.names' => 0 );
+
+# 27. Empty data returns an empty list and writes NO file (the early return
+#     happens before the file is opened).
+{
+	my $f = path();
+	my @r = write_table( {}, $f );
+	is( scalar @r, 0, 'empty hash returns an empty list' );
+	ok( !-e $f, 'empty hash creates no file' );
+	$f = path();
+	@r = write_table( [], $f );
+	is( scalar @r, 0, 'empty array returns an empty list' );
+	ok( !-e $f, 'empty array creates no file' );
+}
+
+# 28. Documented limitation: a positional filename equal to an option key is
+#     not consumed as a filename (use file => 'sep' for such names).
+dies_ok { write_table( { 'a' => 1 }, 'sep' ) }
+	"positional filename 'sep' collides with an option key and dies";
+
+# 29. Header loop index width: >65535 columns must terminate (regression:
+#     'unsigned short' loop index wrapped and never finished). Gated because
+#     it builds a 70k-key hash.
+SKIP: {
+	skip 'set EXTENDED_TESTING=1 for the 70k-column header test', 2
+		unless $ENV{EXTENDED_TESTING};
+	my %wide = ( 'r' => { map { ( sprintf( 'c%06d', $_ ) => $_ ) } 1 .. 70_000 } );
+	my $f = path();
+	lives_ok { write_table( \%wide, $f ) } '70k columns terminates';
+	my ($header) = split /\n/, slurp($f), 2;
+	my @cells = split /,/, $header, -1;
+	is( scalar @cells, 70_001, 'all 70k column names plus the row-label cell are present' );
+}
+
+# 30. Wide-character (UTF-8-flagged) hash keys round-trip: column names and
+#     HoH row keys are fetched by SV (hv_fetch_ent) and sorted as SVs, so the
+#     flag survives. (Formerly a TODO documenting the raw-bytes hv_fetch bug.)
+{
+	my $col = "caf\x{263a}";
+	my $f = path();
+	write_table( { 'r1' => { $col => 7 } }, $f );
+	like( slurp($f), qr/7/, 'value under a wide-character column name is written' );
+
+	my $row = "zeile\x{263a}";
+	$f = path();
+	write_table( { $row => { 'a' => 9 } }, $f );
+	is( slurp($f), ",a\nzeile\x{e2}\x{98}\x{ba},9\n",
+		'wide-character HoH row key sorts and fetches correctly (UTF-8 bytes on disk)' );
+}
+
 done_testing();

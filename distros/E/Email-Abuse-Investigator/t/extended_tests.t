@@ -3318,4 +3318,1144 @@ subtest 'abuse_contacts route 2 -- trusted domain URL host skipped' => sub {
 		'ups.com URL host skipped in abuse_contacts() route 2';
 };
 
+
+# =============================================================================
+# 47. report() -- originating host section with full enrichment metadata
+#
+# All existing tests use make_email()'s default Received header which has
+# 198.51.100.1 (TEST-NET-2, filtered as private). None of them exercise the
+# if ($orig) block in report(). These subtests use a real external IP so
+# originating_ip() returns a hashref and every metadata branch fires.
+# =============================================================================
+
+subtest 'report() -- origin rdns/country/org/abuse/note all populated' => sub {
+	# 91.198.174.20 is not in any @PRIVATE_RANGES block, so _find_origin
+	# accepts it as the first external hop and calls _enrich_ip().
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { 'mail.spammer.example' };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub {
+		{ org => 'Spammer Corp', abuse => 'abuse@spammer.example', country => 'CN' }
+	};
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		received => 'from evil.example (evil.example [91.198.174.20])'
+		          . ' by mx.nigelhorne.com with ESMTP',
+		from     => 'Sender <spam@evil.example>',
+		to       => '<victim@nigelhorne.com>',
+		body     => 'Buy now.',
+	));
+	my $rpt = $a->report();
+
+	like $rpt, qr/IP\s+:\s+91\.198\.174\.20/,
+		'report() contains originating IP';
+	like $rpt, qr/Reverse DNS\s+:\s+mail\.spammer\.example/,
+		'report() contains rdns when _reverse_dns is populated';
+	like $rpt, qr/Country\s+:\s+CN/,
+		'report() contains country from WHOIS';
+	like $rpt, qr/Organisation\s+:\s+Spammer Corp/,
+		'report() contains org from WHOIS';
+	like $rpt, qr/Abuse addr\s+:\s+abuse\@spammer\.example/,
+		'report() contains abuse address from WHOIS';
+	like $rpt, qr/Note\s+:\s+First external hop/,
+		'report() contains note from _find_origin';
+	like $rpt, qr/Confidence\s+:\s+medium/,
+		'report() contains confidence level';
+};
+
+subtest 'report() -- origin with no reverse DNS shows fallback' => sub {
+	# _reverse_dns returns undef -> _enrich_ip sets rdns to '(no reverse DNS)'
+	# The rdns field is always truthy, so this hits the TRUE branch of
+	# if $orig->{rdns} with the fallback string.
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		received => 'from evil.example (evil.example [91.198.174.20])'
+		          . ' by mx.nigelhorne.com with ESMTP',
+		to       => '<victim@nigelhorne.com>',
+		body     => 'Buy now.',
+	));
+	my $rpt = $a->report();
+	like $rpt, qr/Reverse DNS\s+:\s+\(no reverse DNS\)/,
+		'report() shows fallback rdns when no reverse DNS found';
+	unlike $rpt, qr/Country/,
+		'report() omits Country line when WHOIS has no country';
+};
+
+subtest 'report() -- origin absent shows fallback text' => sub {
+	# All Received: IPs are private -> originating_ip() returns undef ->
+	# the else branch "could not determine originating IP" fires.
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	# Default make_email uses 198.51.100.1 which is TEST-NET-2 -> filtered
+	$a->parse_email(make_email(
+		to   => '<victim@nigelhorne.com>',
+		body => 'Buy now.',
+	));
+	my $rpt = $a->report();
+	like $rpt, qr/could not determine originating IP/,
+		'report() shows fallback when originating IP absent';
+};
+
+# =============================================================================
+# 48. report() -- multiple URLs per hostname (>1 path) triggers grouped display
+#
+# When two URLs share the same hostname, report() groups them under a single
+# host block using the "URLs (N)     :" format instead of "URL :" (singular).
+# The @paths == 1 conditional FALSE branch is the target here.
+# =============================================================================
+
+subtest 'report() -- multiple URLs same host uses grouped "URLs (N)" format' => sub {
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to   => '<victim@nigelhorne.com>',
+		# Two distinct paths under the same hostname
+		body => 'Visit https://spamsite.example/offer1 and https://spamsite.example/offer2',
+	));
+	my $rpt = $a->report();
+	like $rpt, qr/URLs \(2\)\s+:/,
+		'report() uses "URLs (N)     :" format when 2 paths share a hostname';
+	unlike $rpt, qr/URL\s+: https?:\/\/spamsite\.example\/offer1\b/,
+		'report() does not use singular "URL :" when multiple paths grouped';
+};
+
+subtest 'report() -- single URL uses singular "URL :" format' => sub {
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to   => '<victim@nigelhorne.com>',
+		body => 'Visit https://spamsite.example/offer1 for details',
+	));
+	my $rpt = $a->report();
+	like $rpt, qr/URL\s+:/,
+		'report() uses singular "URL :" format for a single-path host';
+	unlike $rpt, qr/URLs \(\d+\)/,
+		'report() does not use grouped format for single URL';
+};
+
+# =============================================================================
+# 49. report() -- URL section with IP / country / org / abuse metadata
+#
+# These four fields inside the URL host block each have a conditional branch
+# that fires only when the URL's resolved IP has WHOIS data. Previous tests
+# use _whois_ip returning {} so those fields are always absent.
+# =============================================================================
+
+subtest 'report() -- URL host IP/country/org/abuse metadata present' => sub {
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { '1.2.3.4' };
+	local *Email::Abuse::Investigator::_whois_ip     = sub {
+		{ org => 'Evil ISP', abuse => 'abuse@evilisp.example', country => 'RU' }
+	};
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to   => '<victim@nigelhorne.com>',
+		body => 'Visit https://badhost.example/malware for details',
+	));
+	my $rpt = $a->report();
+	like $rpt, qr/IP\s+:\s+1\.2\.3\.4/,
+		'report() URL section shows resolved IP';
+	like $rpt, qr/Country\s+:\s+RU/,
+		'report() URL section shows country from WHOIS';
+	like $rpt, qr/Organisation\s+:\s+Evil ISP/,
+		'report() URL section shows org from WHOIS';
+	like $rpt, qr/Abuse addr\s+:\s+abuse\@evilisp\.example/,
+		'report() URL section shows abuse address from WHOIS';
+};
+
+subtest 'report() -- URL host with URL-shortener flag' => sub {
+	# The URL_SHORTENERS hash causes a "*** URL SHORTENER ***" annotation to
+	# appear on the Host line. Uses bit.ly which is in %URL_SHORTENERS.
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to   => '<victim@nigelhorne.com>',
+		body => 'Click https://bit.ly/3xABC123 now',
+	));
+	my $rpt = $a->report();
+	like $rpt, qr/URL SHORTENER.*real destination hidden/i,
+		'report() annotates bit.ly URL with URL-shortener warning';
+};
+
+# =============================================================================
+# 50. report() -- CONTACT / REPLY-TO DOMAINS section with full domain metadata
+#
+# The domain block in report() has many optional-field branches. Inject all
+# fields directly into _domain_info to avoid network I/O yet exercise every
+# branch: recently_registered, registered, expires, registrar, registrar_abuse,
+# web_ip / web_org / web_abuse, mx_host / mx_ip / mx_org / mx_abuse, and
+# ns_host / ns_ip / ns_org / ns_abuse.
+# =============================================================================
+
+subtest 'report() -- domain with full WHOIS + MX + NS metadata' => sub {
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		from => 'Spammer <spam@fulldomain.example>',
+		to   => '<victim@nigelhorne.com>',
+		body => 'Buy now.',
+	));
+
+	# Inject a fully-populated domain record, bypassing network I/O.
+	# This simulates what _analyse_domain() would return after real lookups.
+	$a->{_mailto_domains} = [
+		{
+			domain              => 'fulldomain.example',
+			source              => 'Reply-To: header',
+			recently_registered => 1,
+			registered          => '2024-12-01',
+			expires             => '2025-12-01',
+			registrar           => 'Dodgy Registrar Inc',
+			registrar_abuse     => 'abuse@dodgyregistrar.example',
+			web_ip              => '5.6.7.8',
+			web_org             => 'Web Hosting Co',
+			web_abuse           => 'abuse@webhostingco.example',
+			mx_host             => 'mail.fulldomain.example',
+			mx_ip               => '5.6.7.9',
+			mx_org              => 'Mail Provider Ltd',
+			mx_abuse            => 'abuse@mailprovider.example',
+			ns_host             => 'ns1.fulldomain.example',
+			ns_ip               => '5.6.7.10',
+			ns_org              => 'DNS Corp',
+			ns_abuse            => 'abuse@dnscorp.example',
+		},
+	];
+
+	my $rpt = $a->report();
+	like $rpt, qr/WARNING: RECENTLY REGISTERED/,
+		'report() shows recently-registered warning when flag set';
+	like $rpt, qr/Registered\s+:\s+2024-12-01/,
+		'report() shows Registered date';
+	like $rpt, qr/Expires\s+:\s+2025-12-01/,
+		'report() shows Expires date';
+	like $rpt, qr/Registrar\s+:\s+Dodgy Registrar Inc/,
+		'report() shows Registrar name';
+	like $rpt, qr/Reg\. abuse\s+:\s+abuse\@dodgyregistrar\.example/,
+		'report() shows registrar abuse address';
+	like $rpt, qr/Web host IP\s+:\s+5\.6\.7\.8/,
+		'report() shows web host IP';
+	like $rpt, qr/Web host org\s+:\s+Web Hosting Co/,
+		'report() shows web host org';
+	like $rpt, qr/Web abuse\s+:\s+abuse\@webhostingco\.example/,
+		'report() shows web host abuse';
+	like $rpt, qr/MX host\s+:\s+mail\.fulldomain\.example/,
+		'report() shows MX host name';
+	like $rpt, qr/MX IP\s+:\s+5\.6\.7\.9/,
+		'report() shows MX IP';
+	like $rpt, qr/MX org\s+:\s+Mail Provider Ltd/,
+		'report() shows MX org';
+	like $rpt, qr/MX abuse\s+:\s+abuse\@mailprovider\.example/,
+		'report() shows MX abuse address';
+	like $rpt, qr/NS host\s+:\s+ns1\.fulldomain\.example/,
+		'report() shows NS host name';
+	like $rpt, qr/NS IP\s+:\s+5\.6\.7\.10/,
+		'report() shows NS IP';
+	like $rpt, qr/NS org\s+:\s+DNS Corp/,
+		'report() shows NS org';
+	like $rpt, qr/NS abuse\s+:\s+abuse\@dnscorp\.example/,
+		'report() shows NS abuse address';
+};
+
+subtest 'report() -- domain with no A record shows fallback' => sub {
+	# web_ip absent -> "no A record / unreachable" path; mx_host absent ->
+	# "none found" path. Also covers the else branches of if ($d->{web_ip})
+	# and if ($d->{mx_host}).
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		from => 'Spammer <spam@emptydomain.example>',
+		to   => '<victim@nigelhorne.com>',
+		body => 'Buy now.',
+	));
+	$a->{_mailto_domains} = [
+		{
+			domain  => 'emptydomain.example',
+			source  => 'Reply-To: header',
+			# Deliberately no web_ip, mx_host, ns_host, registered, or expires
+		},
+	];
+	my $rpt = $a->report();
+	like $rpt, qr/no A record \/ unreachable/,
+		'report() shows no-A-record fallback for domain with no web_ip';
+	like $rpt, qr/MX host\s+:\s+\(none found\)/,
+		'report() shows none-found fallback for domain with no mx_host';
+	unlike $rpt, qr/NS host/,
+		'report() omits NS host block entirely when ns_host absent';
+};
+
+# =============================================================================
+# 51. report() -- WHERE TO SEND ABUSE REPORTS contact note field
+#
+# The 'note' key of a contact is optional; the report() code has
+# push @out, '  Note : ...' if $c->{note}. Trigger with an originating
+# IP whose _whois_ip returns a real abuse address (non-unknown), causing
+# Route 1 ip-whois to add a contact with a note.
+# =============================================================================
+
+subtest 'report() -- abuse contact with note field shown in report' => sub {
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { 'mail.evil.example' };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub {
+		{ org => 'Evil Hosting', abuse => 'abuse@evilhosting.example' }
+	};
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		received => 'from evil.example (evil.example [91.198.174.20])'
+		          . ' by mx.nigelhorne.com with ESMTP',
+		to       => '<victim@nigelhorne.com>',
+		body     => 'Buy now.',
+	));
+	my $rpt = $a->report();
+	# Route 1 ip-whois adds: note => "Network owner of originating IP ..."
+	like $rpt, qr/Note\s+:\s+Network owner of originating IP/,
+		'report() shows contact Note field for ip-whois route';
+};
+
+# =============================================================================
+# 52. report() -- WHERE TO FILE WEB-FORM REPORTS section
+#
+# The form_contacts section in report() covers: form_domain (Domain/URL),
+# note (Note), form_paste with word-wrap at ROLE_WRAP_LEN=66 chars, and
+# form_upload (Upload). GoDaddy is a form-only provider with a paste
+# string exceeding 66 chars -- ideal for exercising the word-wrap logic.
+# =============================================================================
+
+subtest 'report() -- form contact with form_domain, form_paste word-wrap, form_upload' => sub {
+	# From: @godaddy.com causes form_contacts() Route 4 to look up godaddy.com
+	# in %PROVIDER_ABUSE and find a form-only entry with form_paste > 66 chars.
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		from => 'Spammer <spam@godaddy.com>',
+		to   => '<victim@nigelhorne.com>',
+		body => 'Buy now.',
+	));
+
+	my @fc = $a->form_contacts();
+	my ($gd) = grep { $_->{form} =~ /godaddy/i } @fc;
+	skip 'no godaddy form contact found', 6 unless $gd;
+
+	my $rpt = $a->report();
+	like $rpt, qr/WHERE TO FILE WEB-FORM REPORTS/,
+		'report() includes web-form section';
+	like $rpt, qr/godaddy\.com/i,
+		'report() web-form section mentions godaddy';
+	like $rpt, qr/Paste\s+:/,
+		'report() web-form section contains Paste line';
+	# The GoDaddy form_paste is >66 chars; word-wrap must produce continuation line
+	like $rpt, qr/^\s{17}/m,
+		'report() word-wraps form_paste continuation line at 17-char indent';
+	like $rpt, qr/Upload\s+:/,
+		'report() web-form section contains Upload line';
+	# GoDaddy URL host has no form_domain in Route 4 (no URL in body) but note is set
+	like $rpt, qr/Note\s+:/,
+		'report() web-form section shows Note line';
+};
+
+subtest 'report() -- form contact with form_domain from URL host route' => sub {
+	# Route 2 of form_contacts() sets form_domain = the URL host when the host
+	# is a form-only provider. Use a URL from godaddy.com in the body.
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to   => '<victim@nigelhorne.com>',
+		body => 'Visit https://godaddy.com/offer now',
+	));
+	my @fc = $a->form_contacts();
+	my ($gd) = grep { $_->{form} =~ /godaddy/i } @fc;
+	skip 'no godaddy form contact', 2 unless $gd;
+
+	my $rpt = $a->report();
+	like $rpt, qr/Domain\/URL\s+:\s+godaddy\.com/i,
+		'report() shows Domain/URL line from form_domain for URL host route';
+	like $rpt, qr/WHERE TO FILE WEB-FORM REPORTS/,
+		'report() includes web-form section for URL-host form route';
+};
+
+# =============================================================================
+# 53. report() -- SENDING SOFTWARE / INFRASTRUCTURE CLUES section
+#
+# The section is only emitted when @sw is non-empty. Parse an email with an
+# X-Mailer header to exercise the if (@sw) TRUE branch.
+# =============================================================================
+
+subtest 'report() -- sending software section present when X-Mailer header set' => sub {
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(join("\n",
+		'Received: from evil.example (evil.example [91.198.174.20])'
+		. ' by mx.nigelhorne.com with ESMTP',
+		'From: Spammer <spam@spammer.example>',
+		'To: <victim@nigelhorne.com>',
+		'Subject: Test',
+		'Date: ' . POSIX::strftime('%a, %d %b %Y %H:%M:%S +0000', gmtime),
+		'Message-ID: <sw1@test>',
+		'X-Mailer: PHPMailer 6.2.0 (https://github.com/PHPMailer/PHPMailer)',
+		'Content-Type: text/plain',
+		'',
+		'Buy now.',
+	));
+	my $rpt = $a->report();
+	like $rpt, qr/SENDING SOFTWARE/,
+		'report() includes SENDING SOFTWARE section when X-Mailer present';
+	like $rpt, qr/PHPMailer/,
+		'report() shows X-Mailer value in software section';
+	like $rpt, qr/x-mailer\s+:/,
+		'report() shows header name in software section';
+};
+
+subtest 'report() -- X-PHP-Originating-Script included in software section' => sub {
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(join("\n",
+		'Received: from evil.example (evil.example [91.198.174.20])'
+		. ' by mx.nigelhorne.com with ESMTP',
+		'From: Spammer <spam@spammer.example>',
+		'To: <victim@nigelhorne.com>',
+		'Subject: Test',
+		'Date: ' . POSIX::strftime('%a, %d %b %Y %H:%M:%S +0000', gmtime),
+		'Message-ID: <sw2@test>',
+		'X-PHP-Originating-Script: 500:sendmail.php',
+		'Content-Type: text/plain',
+		'',
+		'Buy now.',
+	));
+	my $rpt = $a->report();
+	like $rpt, qr/SENDING SOFTWARE/,
+		'report() includes SENDING SOFTWARE section for X-PHP-Originating-Script';
+	like $rpt, qr/sendmail\.php/,
+		'report() shows PHP script name';
+	like $rpt, qr/PHP script on shared hosting/,
+		'report() shows PHP-specific note';
+};
+
+# =============================================================================
+# 54. report() -- RECEIVED CHAIN TRACKING IDs section
+#
+# The section appears only for hops with a defined 'id' or 'for' field.
+# Parse an email whose Received header contains both fields.
+# =============================================================================
+
+subtest 'report() -- received tracking IDs section with for and id fields' => sub {
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(join("\n",
+		'Received: from evil.example (evil.example [91.198.174.20])'
+		. ' by mx.nigelhorne.com with ESMTP'
+		. ' for <victim@nigelhorne.com> id ABC123XYZ',
+		'From: Spammer <spam@spammer.example>',
+		'To: <victim@nigelhorne.com>',
+		'Subject: Test',
+		'Date: ' . POSIX::strftime('%a, %d %b %Y %H:%M:%S +0000', gmtime),
+		'Message-ID: <trail1@test>',
+		'Content-Type: text/plain',
+		'',
+		'Buy now.',
+	));
+	my $rpt = $a->report();
+	like $rpt, qr/RECEIVED CHAIN TRACKING IDs/,
+		'report() includes tracking-IDs section when Received has for/id';
+	like $rpt, qr/Envelope for\s+:\s+victim\@nigelhorne\.com/,
+		'report() shows envelope-for address from Received header';
+	like $rpt, qr/Server ID\s+:\s+ABC123XYZ/,
+		'report() shows server ID from Received header';
+};
+
+subtest 'report() -- no tracking IDs when Received has neither for nor id' => sub {
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to   => '<victim@nigelhorne.com>',
+		body => 'Buy now.',
+		# Default Received header has no 'for' or 'id' tokens
+	));
+	my $rpt = $a->report();
+	unlike $rpt, qr/RECEIVED CHAIN TRACKING IDs/,
+		'report() omits tracking-IDs section when Received header has no for/id';
+};
+
+# =============================================================================
+# 55. abuse_report_text() -- form contacts with form_domain / form_paste /
+#     form_upload fields
+#
+# abuse_report_text() has its own form-contacts block (lines 1745-1755) with
+# separate conditional branches for form_domain, form_paste, form_upload.
+# Use a From: @godaddy.com to trigger a form-only contact entry.
+# =============================================================================
+
+subtest 'abuse_report_text() -- form contact with form_domain/paste/upload fields' => sub {
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		from => 'Spammer <spam@godaddy.com>',
+		to   => '<victim@nigelhorne.com>',
+		body => 'Buy now.',
+	));
+
+	my @fc = $a->form_contacts();
+	my ($gd) = grep { $_->{form} =~ /godaddy/i } @fc;
+	skip 'no godaddy form contact', 4 unless $gd;
+
+	my $art = $a->abuse_report_text();
+	like $art, qr/WEB-FORM REPORTS REQUIRED/,
+		'abuse_report_text() contains WEB-FORM section';
+	like $art, qr/Form\s+:/,
+		'abuse_report_text() form contact has Form line';
+	like $art, qr/Paste\s+:/,
+		'abuse_report_text() form contact has Paste line (form_paste set)';
+	like $art, qr/Upload\s+:/,
+		'abuse_report_text() form contact has Upload line (form_upload set)';
+};
+
+subtest 'abuse_report_text() -- with risk flags' => sub {
+	# Ensure the RED FLAGS block in abuse_report_text() is exercised. Use a
+	# free-webmail From: (gmail) to trigger the free_webmail risk flag.
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		from => 'Spammer <spam@gmail.com>',
+		to   => '<victim@nigelhorne.com>',
+		body => 'Buy now.',
+	));
+	my $art = $a->abuse_report_text();
+	like $art, qr/RED FLAGS IDENTIFIED/,
+		'abuse_report_text() RED FLAGS section present when flags exist';
+	like $art, qr/RISK LEVEL:/,
+		'abuse_report_text() contains RISK LEVEL line';
+};
+
+subtest 'abuse_report_text() -- with originating IP and abuse contacts' => sub {
+	# Exercises the ORIGINATING IP and ABUSE CONTACTS blocks.
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { 'mail.evil.example' };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub {
+		{ org => 'Evil Corp', abuse => 'abuse@evil.example' }
+	};
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		received => 'from evil.example (evil.example [91.198.174.20])'
+		          . ' by mx.nigelhorne.com with ESMTP',
+		to       => '<victim@nigelhorne.com>',
+		body     => 'Buy now.',
+	));
+	my $art = $a->abuse_report_text();
+	like $art, qr/ORIGINATING IP:\s+91\.198\.174\.20/,
+		'abuse_report_text() ORIGINATING IP line present';
+	like $art, qr/NETWORK OWNER:\s+Evil Corp/,
+		'abuse_report_text() NETWORK OWNER line present';
+	like $art, qr/ABUSE CONTACTS:/,
+		'abuse_report_text() ABUSE CONTACTS section present';
+};
+
+# =============================================================================
+# 56. report() -- MIME-encoded subject header: $decoded ne $v branch
+#
+# When a header value contains RFC 2047 encoded-words, _decode_mime_words()
+# returns a different string. The ternary in report() appends
+# "  [encoded: $v]" to show the original alongside the decoded value.
+# =============================================================================
+
+subtest 'report() -- MIME-encoded Subject shows decoded and original' => sub {
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	# =?UTF-8?B?...?= encodes "Special Offer"
+	my $encoded_subj = '=?UTF-8?B?U3BlY2lhbCBPZmZlcg==?=';
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to      => '<victim@nigelhorne.com>',
+		subject => $encoded_subj,
+		body    => 'Buy now.',
+	));
+	my $rpt = $a->report();
+	like $rpt, qr/Special Offer/,
+		'report() shows decoded value of MIME-encoded Subject';
+	like $rpt, qr/\[encoded:.*=\?UTF-8\?B\?/,
+		'report() appends [encoded: original] suffix for encoded Subject';
+};
+
+# =============================================================================
+# 57. unresolved_contacts() -- all branch paths
+#
+# Target the branches:
+#  a) URL with abuse = "(unknown)" -> covered check false -> appears in result
+#  b) URL with real abuse -> covered -> NOT in result
+#  c) Duplicate URL bare host -> seen{"url:$bare"}++ fires
+#  d) Domain from From:/Return-Path:/Sender: header -> skipped by source filter
+#  e) Domain from Reply-To: header -> NOT skipped
+#  f) Domain already covered by abuse_contacts() -> not in result
+#  g) unless ($dom) -> fires when form_contacts entry has no address / form_domain
+# =============================================================================
+
+subtest 'unresolved_contacts() -- URL with unknown abuse appears unresolved' => sub {
+	# _whois_ip returning {} means $u->{abuse} is absent (set to '(unknown)' by
+	# _extract_and_resolve_urls). The covered-check in unresolved_contacts is
+	# false, so the URL host appears in the unresolved list.
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { '1.2.3.4' };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to   => '<victim@nigelhorne.com>',
+		body => 'Visit https://unknown-isp-host.example/offer now',
+	));
+	my @u = $a->unresolved_contacts();
+	my ($entry) = grep { $_->{domain} =~ /unknown-isp-host/ } @u;
+	ok defined $entry,
+		'URL host with unknown abuse appears in unresolved_contacts()';
+	is $entry->{type}, 'url_host',
+		'entry type is url_host';
+};
+
+subtest 'unresolved_contacts() -- URL with real abuse not in unresolved' => sub {
+	# When $u->{abuse} is a real address (not "(unknown)"), covered{$bare} is
+	# incremented and the host is suppressed from the unresolved list.
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { '5.6.7.8' };
+	local *Email::Abuse::Investigator::_whois_ip     = sub {
+		{ abuse => 'abuse@known-isp.example' }
+	};
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to   => '<victim@nigelhorne.com>',
+		body => 'Visit https://covered-host.example/offer now',
+	));
+	my @u = $a->unresolved_contacts();
+	ok !scalar(grep { $_->{domain} =~ /covered-host/ } @u),
+		'URL host with real abuse NOT in unresolved_contacts()';
+};
+
+subtest 'unresolved_contacts() -- duplicate URL bare host deduplicated' => sub {
+	# Two URLs with the same bare hostname produce only one unresolved entry.
+	# The second URL hits the $seen{"url:$bare"}++ guard.
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to   => '<victim@nigelhorne.com>',
+		body => 'See https://duphost.example/a and https://duphost.example/b',
+	));
+	my @u = $a->unresolved_contacts();
+	my @dups = grep { $_->{domain} =~ /duphost/ } @u;
+	is scalar(@dups), 1,
+		'duplicate URL bare host appears only once in unresolved_contacts()';
+};
+
+subtest 'unresolved_contacts() -- domain from From: header skipped by source filter' => sub {
+	# The From: domain is in mailto_domains() with source "From: header".
+	# unresolved_contacts() filters out spoofable-header-only sources.
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		from => 'Spammer <spam@fromonly.example>',
+		to   => '<victim@nigelhorne.com>',
+		body => 'Buy now.',
+	));
+	my @u = $a->unresolved_contacts();
+	ok !scalar(grep { $_->{domain} eq 'fromonly.example' } @u),
+		'domain from From: header only is skipped in unresolved_contacts()';
+};
+
+subtest 'unresolved_contacts() -- domain from Reply-To: header not skipped' => sub {
+	# Reply-To: is NOT in the spoofable-header source filter, so such domains
+	# do appear in unresolved_contacts() when they have no abuse contact.
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		from     => 'Spammer <spam@spammer.example>',
+		reply_to => 'replyto@replyonlydomain.example',
+		to       => '<victim@nigelhorne.com>',
+		body     => 'Buy now.',
+	));
+	my @u = $a->unresolved_contacts();
+	ok scalar(grep { $_->{domain} eq 'replyonlydomain.example' } @u),
+		'domain from Reply-To: header appears in unresolved_contacts()';
+};
+
+subtest 'unresolved_contacts() -- domain already covered not listed' => sub {
+	# gmail.com is in %PROVIDER_ABUSE so abuse_contacts() returns a google
+	# contact for it. unresolved_contacts() should NOT list it.
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		from     => 'Spammer <spam@gmail.com>',
+		reply_to => 'spam@gmail.com',
+		to       => '<victim@nigelhorne.com>',
+		body     => 'Buy now.',
+	));
+	my @u = $a->unresolved_contacts();
+	ok !scalar(grep { $_->{domain} =~ /gmail/ } @u),
+		'gmail.com is already covered and not in unresolved_contacts()';
+};
+
+subtest 'unresolved_contacts() -- duplicate domain not listed twice' => sub {
+	# Same domain from two sources -> only one entry via $seen{"dom:$dom"}++.
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		from     => 'Spammer <spam@spammer.example>',
+		reply_to => 'reply@dupdomain.example',
+		to       => '<victim@nigelhorne.com>',
+		# Body also mentions the same domain
+		body     => 'Contact user@dupdomain.example for details',
+	));
+	my @u = $a->unresolved_contacts();
+	my @dups = grep { $_->{domain} eq 'dupdomain.example' } @u;
+	is scalar(@dups), 1,
+		'same domain from two sources appears only once in unresolved_contacts()';
+};
+
+# =============================================================================
+# 58. form_contacts() -- DKIM signer and List-Unsubscribe form-only providers
+#
+# DKIM-Signature d= and List-Unsubscribe domains are collected by
+# _extract_and_analyse_domains() into mailto_domains(). This means Route 3
+# (contact-domain loop) always fires first and adds the form contact before
+# Routes 5/6 can. Routes 5 and 6 are preempted via form-URL deduplication
+# ($seen{$form}++) whenever the domain is also in mailto_domains().
+#
+# These tests verify the END RESULT (form contact IS produced) while
+# documenting the Route 3 preemption. The role for Route-3-preempted entries
+# is "Web host of <domain>" rather than "DKIM signer:" or "ESP / bulk sender".
+# =============================================================================
+
+subtest 'form_contacts() -- DKIM signer from form-only provider produces form entry' => sub {
+	# godaddy.com is form-only in %PROVIDER_ABUSE. A DKIM-Signature d=godaddy.com
+	# causes _extract_and_analyse_domains() to include godaddy.com in
+	# mailto_domains(), so Route 3 of form_contacts() fires and adds the form
+	# entry with role "Web host of godaddy.com". Route 5 is then preempted by
+	# the $seen{$form}++ guard. Verify the form entry is present regardless.
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(join("\n",
+		'Received: from evil.example (evil.example [91.198.174.20])'
+		. ' by mx.nigelhorne.com with ESMTP',
+		'From: Spammer <spam@spammer.example>',
+		'To: <victim@nigelhorne.com>',
+		'Subject: Test',
+		'Date: ' . POSIX::strftime('%a, %d %b %Y %H:%M:%S +0000', gmtime),
+		'Message-ID: <dkim5@test>',
+		'DKIM-Signature: v=1; a=rsa-sha256; d=godaddy.com; s=default;'
+		. ' h=from:to:subject; bh=abc; b=xyz',
+		'Content-Type: text/plain',
+		'',
+		'Buy now.',
+	));
+	my @fc = $a->form_contacts();
+	# Route 3 preempts Route 5: look for any form contact referencing godaddy.com
+	my ($gd_fc) = grep { ($_->{form} // '') =~ /godaddy\.com/i } @fc;
+	ok defined $gd_fc,
+		'DKIM signer godaddy.com (form-only) produces a form contact entry';
+	like $gd_fc->{form}, qr/godaddy\.com/i,
+		'form contact form URL references godaddy.com';
+	# Route 3 preempts Route 5 -- role says "Web host of" not "DKIM signer:"
+	like $gd_fc->{role}, qr/godaddy\.com/i,
+		'form contact role mentions godaddy.com domain';
+};
+
+subtest 'form_contacts() -- List-Unsubscribe https URL from form-only provider' => sub {
+	# markmonitor.com is form-only. List-Unsubscribe URL domain corp.markmonitor.com
+	# is collected by _extract_and_analyse_domains() -> Route 3 preempts Route 6.
+	# Verify the form contact is present with the markmonitor.com form URL.
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(join("\n",
+		'Received: from evil.example (evil.example [91.198.174.20])'
+		. ' by mx.nigelhorne.com with ESMTP',
+		'From: Spammer <spam@spammer.example>',
+		'To: <victim@nigelhorne.com>',
+		'Subject: Test',
+		'Date: ' . POSIX::strftime('%a, %d %b %Y %H:%M:%S +0000', gmtime),
+		'Message-ID: <unsub6@test>',
+		'List-Unsubscribe: <https://corp.markmonitor.com/unsub/abc123>',
+		'Content-Type: text/plain',
+		'',
+		'Buy now.',
+	));
+	my @fc = $a->form_contacts();
+	my ($mm_fc) = grep { ($_->{form} // '') =~ /markmonitor\.com/i } @fc;
+	ok defined $mm_fc,
+		'List-Unsubscribe markmonitor.com URL produces a form entry (via Route 3)';
+	like $mm_fc->{form}, qr/markmonitor\.com/i,
+		'form contact form URL references markmonitor.com';
+};
+
+subtest 'form_contacts() -- List-Unsubscribe mailto: from form-only provider' => sub {
+	# mailto: variant exercises the second regex in Route 6's unsub parser.
+	# The domain godaddy.com is added to mailto_domains() via List-Unsubscribe:
+	# header source, and Route 3 picks it up.
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(join("\n",
+		'Received: from evil.example (evil.example [91.198.174.20])'
+		. ' by mx.nigelhorne.com with ESMTP',
+		'From: Spammer <spam@spammer.example>',
+		'To: <victim@nigelhorne.com>',
+		'Subject: Test',
+		'Date: ' . POSIX::strftime('%a, %d %b %Y %H:%M:%S +0000', gmtime),
+		'Message-ID: <unsubmailto@test>',
+		'List-Unsubscribe: <mailto:unsub@godaddy.com>',
+		'Content-Type: text/plain',
+		'',
+		'Buy now.',
+	));
+	my @fc = $a->form_contacts();
+	my ($gd_fc) = grep { ($_->{form} // '') =~ /godaddy\.com/i } @fc;
+	ok defined $gd_fc,
+		'List-Unsubscribe mailto godaddy.com produces form entry';
+};
+
+# =============================================================================
+# 59. form_contacts() / abuse_contacts() -- bare email address (no angle-brackets)
+#     in From: header exercises the false branch of the angle-bracket ternary.
+# =============================================================================
+
+subtest 'form_contacts() -- From: bare address (no angle-brackets) Route 4' => sub {
+	# From: spam@gmail.com (no display name, no angle brackets)
+	# addr_spec = val = "spam@gmail.com" (false branch of /<([^>]*)>\s*$/).
+	# gmail.com is in %PROVIDER_ABUSE with email only, no form, so this also
+	# exercises the "pa but no form" skip in form_contacts() Route 4.
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	# Construct raw email directly to avoid make_email wrapping with angle brackets
+	$a->parse_email(join("\n",
+		'Received: from evil.example (evil.example [91.198.174.20])'
+		. ' by mx.nigelhorne.com with ESMTP',
+		'From: spam@gmail.com',
+		'To: <victim@nigelhorne.com>',
+		'Subject: Test bare address',
+		'Date: ' . POSIX::strftime('%a, %d %b %Y %H:%M:%S +0000', gmtime),
+		'Message-ID: <bare1@test>',
+		'Content-Type: text/plain',
+		'',
+		'Buy now.',
+	));
+	my @ac = $a->abuse_contacts();
+	my @google = grep { $_->{address} eq 'abuse@google.com' } @ac;
+	ok scalar(@google),
+		'bare From: address (no angle-brackets) still produces abuse contact via Route 4';
+};
+
+subtest 'abuse_contacts() -- From: display-name only (no email addr) skipped' => sub {
+	# If the From: header has no @ at all, addr_domain is undef and we skip.
+	# This hits the TRUE branch of "next unless $addr_domain".
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub { undef };
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(join("\n",
+		'Received: from evil.example (evil.example [91.198.174.20])'
+		. ' by mx.nigelhorne.com with ESMTP',
+		'From: John Doe',
+		'To: <victim@nigelhorne.com>',
+		'Subject: Test no email',
+		'Date: ' . POSIX::strftime('%a, %d %b %Y %H:%M:%S +0000', gmtime),
+		'Message-ID: <bare2@test>',
+		'Content-Type: text/plain',
+		'',
+		'Buy now.',
+	));
+	# Should not croak; From: domain lookup is simply skipped
+	my @ac = $a->abuse_contacts();
+	ok !scalar(grep { !defined $_->{address} } @ac),
+		'all abuse contacts have defined addresses even with no-email From:';
+	# No From: domain means no google/yahoo/hotmail contact from Route 4
+	ok !scalar(grep { ($_->{role} // '') =~ /Account provider \(from:/ } @ac),
+		'no account-provider route-4 contact when From: has no email address';
+};
+
+# =============================================================================
+# 60. risk_assessment() -- cached path (second call returns same object)
+#
+# The if ($self->{'_risk'}) guard at the top of risk_assessment() short-circuits
+# on the second call. Test that both calls return the identical hashref.
+# =============================================================================
+
+subtest 'risk_assessment() -- cached result returned on second call' => sub {
+	null_net();
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		to   => '<victim@nigelhorne.com>',
+		body => 'Buy now.',
+	));
+	my $r1 = $a->risk_assessment();
+	my $r2 = $a->risk_assessment();
+	is $r1, $r2, 'risk_assessment() returns same hashref on second call (cached)';
+	restore_net();
+};
+
+# =============================================================================
+# 61. abuse_contacts() -- Route 3 registrar form-only via WHOIS
+#
+# When a domain's registrar_abuse address belongs to a form-only provider
+# (e.g. markmonitor.com), _compute_abuse_contacts() must suppress the email
+# address (Route 3 registrar add() call returns early because the provider
+# has form but no email). The corresponding form_contacts() Route 3 sub-path
+# exercises the $d->{registrar_abuse} && $d->{registrar_abuse} =~ /\@.../ branch.
+# =============================================================================
+
+subtest 'form_contacts() -- Route 3 registrar is form-only (WHOIS abuse address)' => sub {
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub {
+		return "Registrar: MarkMonitor Inc.\n"
+		     . "Registrar Abuse Contact Email: abusecomplaints\@markmonitor.com\n";
+	};
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		# Unique domain so CHI cache from earlier subtests doesn't interfere
+		from => 'Spammer <spam@registrar-form-rt3-x9.example>',
+		to   => '<victim@nigelhorne.com>',
+		body => 'Buy now.',
+	));
+	my @fc = $a->form_contacts();
+	my ($mm) = grep { ($_->{form} // '') =~ /markmonitor/i } @fc;
+	ok defined $mm,
+		'form_contacts() Route 3: markmonitor.com registrar produces form entry';
+	like $mm->{role}, qr/Domain registrar.*form only/i,
+		'Route 3 registrar form contact has correct role';
+	like $mm->{form}, qr{markmonitor\.com},
+		'Route 3 registrar form URL references markmonitor.com';
+	ok $mm->{form_domain},
+		'Route 3 form contact has form_domain set to the registrant domain';
+};
+
+subtest 'abuse_contacts() -- Route 3 form-only registrar suppressed from email contacts' => sub {
+	no warnings 'redefine';
+	local *Email::Abuse::Investigator::_reverse_dns  = sub { undef };
+	local *Email::Abuse::Investigator::_resolve_host = sub { undef };
+	local *Email::Abuse::Investigator::_whois_ip     = sub { {} };
+	local *Email::Abuse::Investigator::_domain_whois = sub {
+		return "Registrar: MarkMonitor Inc.\n"
+		     . "Registrar Abuse Contact Email: abusecomplaints\@markmonitor.com\n";
+	};
+	local *Email::Abuse::Investigator::_rdap_lookup  = sub { {} };
+	local *Email::Abuse::Investigator::_raw_whois    = sub { undef };
+
+	my $a = new_ok('Email::Abuse::Investigator');
+	$a->parse_email(make_email(
+		from => 'Spammer <spam@registrar-form-ac-rt3-x9.example>',
+		to   => '<victim@nigelhorne.com>',
+		body => 'Visit https://registrar-form-ac-rt3-x9.example/offer now',
+	));
+	my @ac = $a->abuse_contacts();
+	# The markmonitor.com abuse address (abusecomplaints@markmonitor.com) is a
+	# form-only provider; the $add->() closure must suppress it.
+	ok !scalar(grep { ($_->{address} // '') =~ /markmonitor/i } @ac),
+		'form-only registrar address not included in abuse_contacts() email list';
+};
+
 done_testing();
+

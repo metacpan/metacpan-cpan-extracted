@@ -494,15 +494,15 @@ sub _build_feedback_report {
 
     # Original-Mail-From -- envelope sender of the spam
     # Prefer Return-Path (true envelope sender); fall back to From:
-    my $mail_from = $inv->_header_value('return-path')
-                 // $inv->_header_value('from')
+    my $mail_from = $inv->header_value('return-path')
+                 // $inv->header_value('from')
                  // '';
     $mail_from =~ s/^\s*<?\s*|\s*>?\s*$//g;   # strip angle brackets and whitespace
     push @fields, "Original-Mail-From: <$mail_from>" if $mail_from;
 
     # Original-Rcpt-To -- envelope recipient(s) of the spam
     # Use the To: header; for each distinct address found
-    my $rcpt_to = $inv->_header_value('to') // '';
+    my $rcpt_to = $inv->header_value('to') // '';
     # Extract individual addresses (bare addr@domain or <addr@domain>)
     my %rcpt_seen;
     while ($rcpt_to =~ /<?([^\s<>,;]+\@[\w.-]+)>?/g) {
@@ -511,7 +511,7 @@ sub _build_feedback_report {
     }
 
     # Arrival-Date -- when we (the reporter) received the spam
-    my $arrival = $inv->_header_value('date') // '';
+    my $arrival = $inv->header_value('date') // '';
     push @fields, "Arrival-Date: $arrival" if $arrival;
 
     # Reported-Domain -- the primary contact domain
@@ -526,7 +526,7 @@ sub _build_feedback_report {
     }
 
     # Authentication-Results -- forwarded verbatim from the spam headers
-    my $auth_res = $inv->_header_value('authentication-results') // '';
+    my $auth_res = $inv->header_value('authentication-results') // '';
     push @fields, "Authentication-Results: $auth_res" if $auth_res;
 
     return join("\r\n", @fields) . "\r\n";

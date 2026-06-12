@@ -2,7 +2,7 @@
 use v5.36;
 use experimental qw( class signatures );
 
-class Protocol::OVSDB::Monitor v0.99.0;
+class Protocol::OVSDB::Monitor v0.99.1;
 
 =head1 NAME
 
@@ -47,9 +47,6 @@ content.
 
 =cut
 
-use builtin qw( weaken );
-no warnings qw( experimental::builtin );
-
 
 my $next_id = 1;
 
@@ -65,7 +62,6 @@ method id() {
 
 method _set_conn($conn) {
     $_conn = $conn;
-    weaken $_conn;
 }
 
 
@@ -106,7 +102,12 @@ method notify( $updates ) {
     $_on_update->( $updates );
 }
 
+=head1 DESTRUCTORS
+
 =head2 DESTROY
+
+Called by Perl internally when the monitor goes out of scope. If the
+monitor is still active, this cancels the monitor.
 
 =cut
 
@@ -127,7 +128,7 @@ method DESTROY() {
 
 =head1 SEE ALSO
 
-L<RFC 7047|https://www.rfc-editor.org/rfc/rfc7047.html>
+L<Protocol::OVSDB>, L<RFC 7047|https://www.rfc-editor.org/rfc/rfc7047.html>
 
 =head1 LICENSE AND COPYRIGHT
 

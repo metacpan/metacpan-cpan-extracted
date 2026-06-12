@@ -3,7 +3,6 @@
 require 5.010;
 use warnings FATAL => 'all';
 use feature 'say';
-use Digest::SHA 'sha512_base64';
 use File::Temp;
 use Scalar::Util 'looks_like_number';
 use Stats::LikeR;

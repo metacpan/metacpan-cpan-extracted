@@ -1,10 +1,10 @@
 #!/usr/bin/perl
-# $Id: 01-resolver.t 1993 2024-11-07 14:06:53Z willem $	-*-perl-*-
+# $Id: 01-resolver.t 2046 2026-06-01 13:23:01Z willem $	-*-perl-*-
 #
 
 use strict;
 use warnings;
-use Test::More tests => 38;
+use Test::More tests => 39;
 use TestToolkit;
 
 BEGIN {					## off-line dry tests
@@ -110,9 +110,13 @@ noexception( 'no repeated deprecation warning', $deprecated );
 for my $recursive ( Net::DNS::Resolver::Recurse->new( retrans => 0, retry => 0 ) ) {
 	my $domain = 'net-dns.org';
 	my $packet = Net::DNS::Packet->new( "$domain", 'NS' );
+
+	$recursive->_referral($packet);
+	my $non_referral = $recursive->_recurse( $packet, $domain );
+	is( $non_referral, undef, 'non-referral packet' );
+
 	$packet->push( ans => Net::DNS::RR->new("$domain NS nx$$.$domain") );
 	$packet->push( add => Net::DNS::RR->new("nx$$.$domain AAAA ::") );
-
 	$recursive->_referral($packet);
 
 	my $result = $recursive->_recurse( $packet, $domain );

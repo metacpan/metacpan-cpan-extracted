@@ -49,12 +49,10 @@ When the target is a Hash of Hashes, incoming hash keys update existing rows, an
 When the target is a Hash of Arrays, incoming arrays are pushed onto the existing arrays, appending the new elements, similarly to R's `rbind`.
 
     $data = { 'Project Alpha' => [ 'task1', 'task2' ] };
-    
     $n = {
-        'Project Alpha' => [ 'task3' ],              # Appends to existing array
-        'Project Beta'  => [ 'task1', 'task2' ]      # Creates new array row
+        'Project Alpha' => [ 'task3' ],         # Appends to existing array
+        'Project Beta'  => [ 'task1', 'task2' ] # Creates new array row
     };
-
     add_data($data, $n);
 
 **Resulting Structure:**
@@ -379,7 +377,7 @@ Flat Hash References evaluate Goodness of Fit while preserving your categorical 
 	
 	my $res = chisq_test($data);
 
-# `col2col`
+## `col2col`
 
 Apply a **two-column function** to every pair of columns in a table and collect
 the answers in a hash of hashes.
@@ -404,7 +402,7 @@ back every column compared against every other column.
 
 ---
 
-## Arguments
+### Arguments
 
     col2col( $data, $command, $cols, %options )
     col2col( $data, $command, \%options )      # options in place of $cols
@@ -418,7 +416,7 @@ back every column compared against every other column.
 
 ---
 
-## Data shapes
+### Data shapes
 
 `col2col` understands three layouts. In every case a **column** is the thing that
 gets compared, and the result is keyed by column name.
@@ -443,7 +441,7 @@ All three produce the same result for the same underlying numbers. Missing or
 
 ---
 
-## The command
+### The command
 
 The second argument is the function applied to each pair of columns. It is called
 as:
@@ -465,7 +463,7 @@ You can also pass a **function name as a string**. A bare name is looked up in
 
 ---
 
-## The result
+### The result
 
 Always a hash of hashes: **`$result->{from}{to}`**.
 
@@ -479,7 +477,7 @@ A column is never compared with itself, so `$result->{a}{a}` does not exist.
 
 ---
 
-## Restricting columns (`$cols`)
+### Restricting columns (`$cols`)
 
 By default every column is used as the "from" side. The third argument narrows
 that down — handy when you only care about one variable.
@@ -496,7 +494,7 @@ The "to" side is always every other column; `$cols` only limits the outer keys.
 
 ---
 
-## Options
+### Options
 
 Options can be given two ways:
 
@@ -507,7 +505,7 @@ The hash-ref form is convenient when you have **no** column restriction — it s
 you from passing a placeholder. (A hash ref *replaces* `$cols`, so you can't use
 it to restrict columns at the same time; use the trailing form for that.)
 
-### `na` — how undefined values are handled
+#### `na` — how undefined values are handled
 
 Real data has gaps. `na` decides what the function sees.
 
@@ -526,7 +524,7 @@ Real data has gaps. `na` decides what the function sees.
 `rm.undef` / `rm.na` remain as boolean aliases for backward compatibility:
 `true` means `'pairwise'`, `false` means `'keep'`. Don't combine them with `na`.
 
-### `skip.errors` — keep going when a pair fails *(default: true)*
+#### `skip.errors` — keep going when a pair fails *(default: true)*
 
 Some functions croak on degenerate input — for example `cor` dies if a column has
 zero variance. By default `col2col` **traps** that croak per pair: instead of
@@ -548,7 +546,7 @@ Only errors from **your function** are trapped. Mistakes in the call itself
 
 ---
 
-## Worked examples
+### Worked examples
 
 **Full correlation matrix:**
 
@@ -579,7 +577,7 @@ Only errors from **your function** are trapped. Mistakes in the call itself
 
 ---
 
-## Gotchas
+### Gotchas
 
 - **Your function receives two array refs**, `($col_a, $col_b)` — not a column and
   a name. Unpack with `my ($x, $y) = @_;`.
@@ -1712,6 +1710,96 @@ as well as a ratio (from R: the hypothesized ratio of the population variances o
 
     $test_data = var_test(\@xk, \@yk, ratio => 2);
 
+## view
+
+An R-style `head` for the structures `read_table` returns. Prints the first
+few rows of a dataframe as an aligned text table, with numeric columns
+right-justified, string columns left-justified, and undefined cells shown as
+`NA`. Works on all three `output.type` values:
+
+| `output.type` | Perl structure     | What `view` shows                          |
+|---------------|--------------------|--------------------------------------------|
+| `aoh`         | array of hash refs | one line per row, sequential row numbers   |
+| `hoa`         | hash of array refs | values gathered column-wise by row index   |
+| `hoh`         | hash of hash refs  | top-level keys become the row label column |
+
+
+### Synopsis
+
+    my $aoh = read_table('all.data.tsv', 'output.type' => 'aoh');
+
+    view($aoh);                       # first 6 rows, like head()
+    view($aoh, n => 20);              # first 20 rows
+    view($aoh, cols => [qw(id age tt)]);   # force a column order
+    view($aoh, 'row.names' => 'id');  # use column 'id' as the row label
+    view($aoh, na => '.', max_width => 30);
+
+    my $txt = view($aoh, return_only => 1);  # capture the string, print nothing
+    view($aoh, to => \*STDERR);              # print somewhere other than STDOUT
+
+### Output
+
+    # AoH: 7 rows x 3 cols  (showing 6)
+    row_name  Testosterone, total (nmol/L)  age  sex
+    p1                                18.2   41  M
+    p2                                  NA    7  F
+    p3                                1.05   33  F
+    p4                                22.9   55  M
+    p5                                  14   29  M
+    p6                                  NA   62  F
+    # ... 1 more row
+
+The banner reports the structure type, full dimensions, and how many rows are
+displayed. A footer appears only when rows are hidden.
+
+### Arguments
+
+All arguments after the data reference are optional name/value pairs.
+
+| Argument        | Default | Meaning                                                                 |
+|-----------------|---------|-------------------------------------------------------------------------|
+| `n`             | `6`     | Number of rows to show. `n` greater than the table shows everything.    |
+| `cols` / `columns` | —    | Array ref pinning column order (and which columns appear).              |
+| `row.names`     | —       | Column to use as the row label (for `aoh`/`hoa`). See ordering note.    |
+| `na`            | `'NA'`  | Token printed for undefined cells.                                      |
+| `max_width`     | `50`    | Truncate any cell wider than this (column names are never truncated).   |
+| `ellipsis`      | `'...'` | Marker appended to truncated cells.                                     |
+| `gap`           | `2`     | Spaces between columns.                                                 |
+| `to`            | STDOUT  | Filehandle to print to.                                                 |
+| `return_only`   | `0`     | If true, return the string and print nothing.                           |
+
+`view` always returns the formatted string, whether or not it also prints.
+
+### A note on column order
+
+`read_table` stores rows as hashes, so the original CSV column order is not
+preserved. `view` therefore sorts columns by name for a stable, reproducible
+layout. Two conveniences soften this:
+
+* A column literally named `row_name` (the label `read_table` assigns to a
+  leading blank header) is detected automatically and moved to the left as the
+  row label.
+* Pass `cols => [ ... ]` to control both the order and the selection of columns
+  shown.
+
+When no label column is present, `view` numbers the rows `1, 2, 3, …`, the way
+R prints row names for an unnamed data frame.
+
+### Edge cases
+
+* Empty input (`[]` or `{}`) prints a clean `0 rows x 0 cols` banner.
+* Tabs, carriage returns, and newlines inside a cell are escaped (`\t`, `\r`,
+  `\n`) so one record always stays on one line.
+* A non-reference argument, or a hash whose values are plain scalars, dies with
+  a clear message rather than producing garbled output.
+
+### Tests
+
+The behavior above is covered by `view.t` (run with `prove view.t`): the three
+structure types, `n` boundaries, alignment, `NA` rendering, truncation,
+`row.names`/`cols` handling, control-character escaping, the `return_only` and
+`to` output paths, empty structures, and the error cases.
+
 ## wilcox_test
 
     $test_data = wilcox_test(
@@ -1742,6 +1830,98 @@ Args can also be accepted:
     write_table( 'data' => \%flat, 'file' => $f );
 
 # changes
+
+## 0.15
+
+`view` function added, similar to R's `head`
+
+`read_table`:
+    filter => {
+        'Testosterone, total (nmol/L)' => sub { defined $_ },
+    }
+
+was broken by the change in undefined variables in 0.14, but is back to being `undef`
+
+`col2col` improvement in sectioning in README
+
+Numerous changes to prevent quadmath/long double CPAN test failures
+
+Minimum Scalar::Util version in dist.ini is now 1.22, see https://www.cpantesters.org/cpan/report/6b682236-6567-11f1-a3bc-a055f9c4ba34
+
+`Digest::SHA` is no longer needed, and removed as a dependency
+
+### `write_table`
+
+#### Behavior change
+
+- **`undef` cells now write as an empty field, not an empty string.** A missing
+  or `undef` value renders as nothing between separators (`a,,c`) rather than a
+  quoted empty string (`a,'',c` / `a,"",c`). Supplying `'undef.val' => 'NA'`
+  (or any other token) still overrides this, exactly as before. This is the
+  only change that can alter the bytes of an existing output file; if you relied
+  on the previous default, pass `'undef.val' => ''` to keep an explicit empty
+  field, or your chosen placeholder.
+
+#### Bug fixes
+
+- **Wide-character / UTF-8 column names and row keys now round-trip.**
+  Previously, cells were looked up with the raw bytes of the column name
+  (`hv_fetch(..., SvPV_nolen(name), strlen(name), ...)`), which fails to match a
+  UTF-8-flagged hash key: the column header printed correctly but every cell
+  under it came back empty. All lookups now fetch by SV (`hv_fetch_ent`), header
+  lists are gathered and sorted as SVs (`sortsv` + `sv_cmp`, preserving the
+  flag) instead of being round-tripped through `char *`, and the `row.names`
+  column is matched with `sv_eq` rather than `strcmp`. Embedded NUL bytes in
+  keys are handled correctly as a side effect.
+
+- **`col.names => []` no longer loops forever.** An empty `col.names` array made
+  `av_len()` return `-1`, which — compared against an unsigned `size_t` loop
+  index — wrapped to `SIZE_MAX` and ran effectively without end. This was fixed
+  for flat hashes previously; it was still present for hash-of-hashes,
+  hash-of-arrays, and array-of-hashes, plus both `row.names` header-filtering
+  loops. All such loops now use a signed index.
+
+- **Tables wider than 65,535 columns no longer hang.** One header loop used an
+  `unsigned short` index that silently wrapped past 65,535 and never terminated.
+  It now uses `size_t` like the rest of the code.
+
+- **Flat-hash cells holding a reference now croak.** Every other input shape
+  rejects a nested reference with
+  *"Cannot write nested reference types to table"*; a flat hash instead
+  stringified it (e.g. `ARRAY(0x55...)`) into the file. It now croaks
+  consistently.
+
+- **`'undef.val' => undef` is handled cleanly.** It previously called
+  `SvPV_nolen` on `undef`, raising an *"uninitialized value"* warning and
+  yielding an empty string by accident. It is now treated explicitly as an empty
+  field, with no warning.
+
+#### Memory-leak fixes (exception paths)
+
+- The row-key list gathered for hash-of-hashes input was leaked when the output
+  file could not be opened.
+- The *"Could not get headers"* croak on hash-of-arrays input leaked both the
+  already-open filehandle and the headers array.
+
+#### Internal / non-behavioral
+
+- Numeric row labels are now formatted into a reused stack buffer instead of a
+  per-row `savepv()` / `safefree()` allocation (no functional change; removes a
+  cast-away-`const` and one allocation per row).
+- Several signed/unsigned index types were made consistent (`SSize_t` vs
+  `size_t`) to match `av_len()` and silence the conditions behind the loop bugs
+  above.
+
+#### Tests
+
+- `t/write_table.t` expanded from 17 to 69 assertions. New coverage targets each
+  fix above: the empty-field default and `undef.val => undef` (no warning),
+  `col.names => []` termination across all four input shapes, the
+  >65,535-column header loop (gated behind `EXTENDED_TESTING=1`), in-sequence
+  numeric row labels, nested-reference rejection, CSV quoting corners
+  (carriage return, separators inside column names, multi-character separators),
+  empty input writing no file, and UTF-8 column names and row keys. Two leak
+  assertions cover the exception paths above.
 
 ## 0.14
 

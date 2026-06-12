@@ -19,8 +19,8 @@ for my $encoding (qw(ldap crypt)) {
     my $hash = $pbkdf2->generate($password);
     ok $pbkdf2->validate($hash, $password), "Validate password $i: $password ($encoding)";
 
-    is length $pbkdf2->PBKDF2('test', $password), 20, "raw length $password";
-    is length $pbkdf2->PBKDF2_hex('test', $password), 40, "hex length $password";
-    is length $pbkdf2->PBKDF2_base64('test', $password), 28, "base64 length $password";
+    is length $pbkdf2->PBKDF2('test', $password), 32, "raw length $password";
+    is length $pbkdf2->PBKDF2_hex('test', $password), 64, "hex length $password";
+    is length $pbkdf2->PBKDF2_base64('test', $password), 44, "base64 length $password";
   }
 }

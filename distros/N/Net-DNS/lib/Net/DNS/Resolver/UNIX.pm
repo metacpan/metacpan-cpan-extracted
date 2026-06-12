@@ -2,7 +2,7 @@ package Net::DNS::Resolver::UNIX;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: UNIX.pm 2007 2025-02-08 16:45:23Z willem $)[2];
+our $VERSION = (qw$Id: UNIX.pm 2046 2026-06-01 13:23:01Z willem $)[2];
 
 
 =head1 NAME
@@ -18,12 +18,9 @@ my $homedir = $ENV{HOME};
 my $dotfile = '.resolv.conf';
 my @dotfile = grep { -f $_ && -o $_ } map {"$_/$dotfile"} grep {$_} $homedir, '.';
 
-
-my $path = $ENV{PATH};
-local $ENV{PATH} = join ':', grep {$_} qw(/bin /usr/bin), $path;
-my $uname = eval {`uname -n 2>/dev/null`} || '';
-chomp $uname;
-my ( $host, @domain ) = split /\./, $uname, 2;
+my ($name) = _nosh(qw(uname -n));
+chomp $name;
+my ( undef, @domain ) = split /\./, $name, 2;
 
 
 sub _init {
@@ -40,6 +37,18 @@ sub _init {
 	return;
 }
 
+sub _nosh {				## shell-free backtick emulation
+	my ( $prog, @arg ) = @_;
+	if ( open( PIPE, '-|' ) ) {
+		my @retval = <PIPE>;
+		close PIPE;
+		return @retval;
+	} else {
+		$ENV{PATH} = '/bin:/usr/bin';
+		exec $prog, @arg;
+		exit;			## uncoverable statement
+	}
+}
 
 1;
 __END__

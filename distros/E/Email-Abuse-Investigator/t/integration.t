@@ -1893,4 +1893,632 @@ subtest 'Scenario 29: Domain::PublicSuffix — _registrable() does not die on an
 	restore_stubs();
 };
 
+# ---------------------------------------------------------------------------
+# Scenario 30 — Concurrent objects: no state leakage between instances
+#
+# Two independent Email::Abuse::Investigator objects analyse different emails
+# in the same process.  Methods on each object must reflect only that object's
+# email, proving that no state is shared at the class level.
+# ---------------------------------------------------------------------------
+subtest 'Scenario 30: two concurrent objects — independent state, no cross-contamination' => sub {
+	restore_stubs();
+	install_stubs(
+		rdns => sub {
+			my (undef, $ip) = @_;
+			return 'mail.first.example'  if $ip eq '91.198.174.101';
+			return 'mail.second.example' if $ip eq '91.198.174.102';
+			return undef;
+		},
+		resolve => sub {
+			my (undef, $host) = @_;
+			return '91.198.174.11' if $host =~ /first-url/;
+			return '91.198.174.12' if $host =~ /second-url/;
+			return undef;
+		},
+		whois_ip => sub {
+			my (undef, $ip) = @_;
+			return { org => 'First ISP',  abuse => 'abuse@first-isp.example'  }
+				if $ip =~ /^91\.198\.174\.10/;
+			return { org => 'Second ISP', abuse => 'abuse@second-isp.example' };
+		},
+		domain_whois => undef,
+	);
+
+	my $a = Email::Abuse::Investigator->new();
+	my $b = Email::Abuse::Investigator->new();
+
+	# Parse different emails on each object
+	$a->parse_email(make_raw_email(
+		received => 'from first (first [91.198.174.101]) by mx.test',
+		from	 => 'spammer-a@first-sender.example',
+		subject  => 'First email subject',
+		body	 => 'Click https://first-url.example/offer to claim your prize.',
+	));
+	$b->parse_email(make_raw_email(
+		received => 'from second (second [91.198.174.102]) by mx.test',
+		from	 => 'spammer-b@second-sender.example',
+		subject  => 'Second email subject',
+		body	 => 'Visit https://second-url.example/deals for savings.',
+	));
+
+	# originating_ip() must reflect each object's email independently
+	my $orig_a = $a->originating_ip();
+	my $orig_b = $b->originating_ip();
+	is $orig_a->{ip}, '91.198.174.101', 'object A: correct originating IP';
+	is $orig_b->{ip}, '91.198.174.102', 'object B: correct originating IP';
+	isnt $orig_a->{ip}, $orig_b->{ip},  'objects A and B have different origin IPs';
+
+	# embedded_urls() must reflect each object's email independently
+	my @urls_a = $a->embedded_urls();
+	my @urls_b = $b->embedded_urls();
+	is scalar @urls_a, 1, 'object A: one URL';
+	is scalar @urls_b, 1, 'object B: one URL';
+	is $urls_a[0]{host}, 'first-url.example',  'object A: correct URL host';
+	is $urls_b[0]{host}, 'second-url.example',  'object B: correct URL host';
+
+	# header_value() must reflect each object's headers independently
+	is $a->header_value('subject'), 'First email subject',
+		'object A: correct Subject header';
+	is $b->header_value('subject'), 'Second email subject',
+		'object B: correct Subject header';
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 31 — Date more than 7 days in the future triggers suspicious_date
+#
+# POD risk_assessment: "date more than DATE_SKEW_DAYS (7) in the future"
+# triggers the suspicious_date LOW flag — same flag as a date far in the past.
+# ---------------------------------------------------------------------------
+subtest 'Scenario 31: date header in the future triggers suspicious_date flag' => sub {
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.datetest.example',
+		whois_ip => { org => 'Date ISP', abuse => 'abuse@datetest.example' },
+		domain_whois => undef,
+	);
+
+	# A date 30 days in the future — beyond the 7-day tolerance window
+	my $future_date = strftime('%a, %d %b %Y %H:%M:%S +0000',
+	                            gmtime(time() + 30 * 86400));
+
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		received => 'from dt (dt [91.198.174.1]) by mx.test',
+		date	 => $future_date,
+		body	 => 'No links.',
+	));
+
+	my $risk = $a->risk_assessment();
+	ok scalar(grep { $_->{flag} eq 'suspicious_date' } @{ $risk->{flags} }),
+		'suspicious_date flagged for a date 30 days in the future';
+
+	# The suspicious_date flag should be LOW severity
+	my ($date_flag) = grep { $_->{flag} eq 'suspicious_date' } @{ $risk->{flags} };
+	is $date_flag->{severity}, 'LOW', 'suspicious_date flag has LOW severity';
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 32 — Plain HTTP (not HTTPS) URL triggers http_not_https LOW flag
+#
+# POD risk_assessment: a URL linked over http:// (no TLS) raises the
+# http_not_https LOW flag once per unique host.
+# ---------------------------------------------------------------------------
+subtest 'Scenario 32: plain HTTP URL triggers http_not_https LOW risk flag' => sub {
+	restore_stubs();
+	install_stubs(
+		rdns	=> 'mail.http-test.example',
+		resolve => { 'plain-http.example' => '91.198.174.50' },
+		whois_ip => { org => 'HTTP ISP', abuse => 'abuse@http-isp.example' },
+		domain_whois => undef,
+	);
+
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		received => 'from ht (ht [91.198.174.50]) by mx.test',
+		body	 => 'Order now at http://plain-http.example/buy — no link encryption.',
+	));
+
+	my $risk = $a->risk_assessment();
+	ok scalar(grep { $_->{flag} eq 'http_not_https' } @{ $risk->{flags} }),
+		'http_not_https flag raised for plain http:// URL';
+
+	my ($http_flag) = grep { $_->{flag} eq 'http_not_https' } @{ $risk->{flags} };
+	is $http_flag->{severity}, 'LOW', 'http_not_https has LOW severity';
+	like $http_flag->{detail}, qr/plain-http\.example/, 'detail names the host';
+
+	# The URL itself must be found and correctly catalogued
+	my @urls = $a->embedded_urls();
+	my ($u)  = grep { $_->{host} eq 'plain-http.example' } @urls;
+	ok defined $u, 'plain-http.example URL extracted';
+	like $u->{url}, qr{^http://}, 'URL retains the original http:// scheme';
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 33 — DKIM signing domain mismatch
+#
+# When the DKIM-Signature d= domain differs from the From: domain:
+#   a) DKIM pass + different registrable → INFO dkim_domain_mismatch (ESP normal)
+#   b) DKIM fail + different registrable → MEDIUM dkim_domain_mismatch (suspicious)
+# ---------------------------------------------------------------------------
+subtest 'Scenario 33a: DKIM pass from third-party sender → INFO dkim_domain_mismatch' => sub {
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.esp.example',
+		whois_ip => { org => 'ESP ISP', abuse => 'abuse@esp-isp.example' },
+		domain_whois => undef,
+	);
+
+	# DKIM signed by mailchimp.com, From: is @brand.example — ESP scenario
+	my $raw = "Received: from esp.example (esp.example [91.198.174.1]) by mx.test\n"
+	        . "Authentication-Results: mx.test; dkim=pass header.d=mailchimp.com\n"
+	        . "DKIM-Signature: v=1; a=rsa-sha256; d=mailchimp.com; s=k1;\n"
+	        . " h=from:to:subject; b=fakebase64==\n"
+	        . "From: Brand Newsletter <newsletter\@brand-corp.example>\n"
+	        . "To: subscriber\@test.example\n"
+	        . "Subject: Monthly news\n"
+	        . "Date: Mon, 01 Jan 2024 00:00:00 +0000\n"
+	        . "Message-ID: <dkim-info\@brand-corp.example>\n"
+	        . "Content-Type: text/plain\n"
+	        . "\n"
+	        . "Newsletter content.\n";
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email($raw);
+
+	my $risk       = $a->risk_assessment();
+	my @flag_names = map { $_->{flag} } @{ $risk->{flags} };
+
+	ok scalar(grep { $_ eq 'dkim_domain_mismatch' } @flag_names),
+		'dkim_domain_mismatch flagged when DKIM signer differs from From: domain';
+
+	my ($mismatch) = grep { $_->{flag} eq 'dkim_domain_mismatch' } @{ $risk->{flags} };
+	is $mismatch->{severity}, 'INFO',
+		'DKIM pass with different registrable domain → INFO severity (normal ESP)';
+
+	restore_stubs();
+};
+
+subtest 'Scenario 33b: DKIM fail with domain mismatch → MEDIUM dkim_domain_mismatch' => sub {
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.impersonator.example',
+		whois_ip => { org => 'Impersonator ISP', abuse => 'abuse@imp-isp.example' },
+		domain_whois => undef,
+	);
+
+	# DKIM fail + signing domain different from From: = possible impersonation
+	my $raw = "Received: from imp.example (imp.example [91.198.174.2]) by mx.test\n"
+	        . "Authentication-Results: mx.test; dkim=fail\n"
+	        . "DKIM-Signature: v=1; a=rsa-sha256; d=evilsigner.example; s=k1;\n"
+	        . " h=from:to:subject; b=brokenbase64==\n"
+	        . "From: Legit Corp <support\@legit-corp.example>\n"
+	        . "To: victim\@test.example\n"
+	        . "Subject: Urgent account notice\n"
+	        . "Date: Mon, 01 Jan 2024 00:00:00 +0000\n"
+	        . "Message-ID: <dkim-medium\@legit-corp.example>\n"
+	        . "Content-Type: text/plain\n"
+	        . "\n"
+	        . "Your account needs verification.\n";
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email($raw);
+
+	my $risk       = $a->risk_assessment();
+	my @flag_names = map { $_->{flag} } @{ $risk->{flags} };
+
+	ok scalar(grep { $_ eq 'dkim_domain_mismatch' } @flag_names),
+		'dkim_domain_mismatch flagged when DKIM fails with a different signing domain';
+
+	my ($mismatch) = grep { $_->{flag} eq 'dkim_domain_mismatch' } @{ $risk->{flags} };
+	is $mismatch->{severity}, 'MEDIUM',
+		'DKIM fail with domain mismatch → MEDIUM severity (suspicious impersonation)';
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 34 — sending_software() fingerprints appear in report()
+#
+# When X-PHP-Originating-Script (or X-Mailer) headers are present,
+# report() must contain the "SENDING SOFTWARE / INFRASTRUCTURE CLUES" section.
+# ---------------------------------------------------------------------------
+subtest 'Scenario 34: sending_software() data reflected in report() output' => sub {
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.sharedhost.example',
+		whois_ip => { org => 'Shared Host', abuse => 'abuse@sharedhost.example' },
+		domain_whois => undef,
+	);
+
+	my $raw = "Received: from sh (sh [91.198.174.1]) by mx.test\n"
+	        . "From: Spammer <spam\@sharedhost.example>\n"
+	        . "To: victim\@test.example\n"
+	        . "Subject: PHP spam\n"
+	        . "Date: Mon, 01 Jan 2024 00:00:00 +0000\n"
+	        . "Message-ID: <php-report\@sh.example>\n"
+	        . "Content-Type: text/plain\n"
+	        . "X-PHP-Originating-Script: 2000:mailer_script.php\n"
+	        . "X-Source: /home/shareduser/public_html/send.php\n"
+	        . "\n"
+	        . "Buy cheap goods now.\n";
+
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email($raw);
+
+	# Verify sending_software() found the headers
+	my @sw = $a->sending_software();
+	ok @sw >= 2, 'at least two sending software entries found';
+	my @hdrs = map { $_->{header} } @sw;
+	ok scalar(grep { $_ eq 'x-php-originating-script' } @hdrs),
+		'X-PHP-Originating-Script in sending_software()';
+	ok scalar(grep { $_ eq 'x-source' } @hdrs),
+		'X-Source in sending_software()';
+
+	# Verify report() contains the sending software section
+	my $report = $a->report();
+	like $report, qr/SENDING SOFTWARE/i,
+		'report() contains SENDING SOFTWARE section heading';
+	like $report, qr/x-php-originating-script/i,
+		'report() contains X-PHP-Originating-Script header';
+	like $report, qr/2000:mailer_script\.php/,
+		'report() contains the PHP script value';
+	like $report, qr/shared hosting/i,
+		'report() contains the hosting note for PHP script';
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 35 — received_trail() tracking IDs appear in report()
+#
+# When Received: headers contain session IDs and envelope recipients,
+# report() must contain the "RECEIVED CHAIN TRACKING IDs" section with
+# the hop data that postmasters need to trace the session in their logs.
+# ---------------------------------------------------------------------------
+subtest 'Scenario 35: received_trail() hop data reflected in report() output' => sub {
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.relay.example',
+		whois_ip => { org => 'Relay ISP', abuse => 'abuse@relay-isp.example' },
+		domain_whois => undef,
+	);
+
+	my $raw = "Received: from relay.example (relay.example [91.198.174.1])"
+	        . " by mx.test with ESMTP id MSGID999ZZZ"
+	        . " for <postmaster-check\@test.example>;"
+	        . " Mon, 01 Jan 2024 12:00:00 +0000\n"
+	        . "From: spam\@relay.example\n"
+	        . "To: victim\@test.example\n"
+	        . "Subject: Trail test\n"
+	        . "Date: Mon, 01 Jan 2024 12:00:00 +0000\n"
+	        . "Message-ID: <trail-report\@relay.example>\n"
+	        . "Content-Type: text/plain\n"
+	        . "\n"
+	        . "Spam body.\n";
+
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email($raw);
+
+	# Verify received_trail() found the tracking data
+	my @trail = $a->received_trail();
+	ok @trail > 0, 'received_trail() returns at least one hop';
+	my ($hop) = grep { defined $_->{id} && $_->{id} =~ /MSGID999ZZZ/ } @trail;
+	ok defined $hop, 'tracking ID MSGID999ZZZ found in trail';
+
+	# Verify report() contains the tracking section
+	my $report = $a->report();
+	like $report, qr/RECEIVED CHAIN TRACKING/i,
+		'report() contains RECEIVED CHAIN TRACKING section';
+	like $report, qr/MSGID999ZZZ/,
+		'report() contains the specific session ID from Received: header';
+	like $report, qr/postmaster-check\@test\.example/,
+		'report() contains the envelope recipient from Received: header';
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 36 — form_contacts() surfaced via URL host route
+#
+# When an embedded URL's host is a form-only provider (GoDaddy), that
+# provider must appear in form_contacts() and NOT in abuse_contacts().
+# This tests the URL-host route (Route 2) in form_contacts().
+# ---------------------------------------------------------------------------
+subtest 'Scenario 36: form_contacts() triggered by URL host (form-only provider)' => sub {
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.test.example',
+		resolve  => { 'www.godaddy.com' => '72.167.20.43' },
+		whois_ip => { org => 'GoDaddy', abuse => 'abuse@godaddy.com' },
+		domain_whois => undef,
+	);
+
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		received => 'from test (test [91.198.174.1]) by mx.test',
+		# From: sender NOT a godaddy address — only the URL host should trigger
+		from	 => 'Spammer <spam@otherdomain.example>',
+		body	 => 'Manage your domain at https://www.godaddy.com/dns for info.',
+	));
+
+	my @email_cs = $a->abuse_contacts();
+	my @form_cs  = $a->form_contacts();
+
+	# GoDaddy must appear in form_contacts() via URL host route
+	my @gd_forms = grep { $_->{form} =~ /godaddy/i } @form_cs;
+	ok @gd_forms > 0, 'GoDaddy form contact found via URL host route';
+	is $gd_forms[0]{via}, 'provider-table', 'form contact via is provider-table';
+	like $gd_forms[0]{role}, qr/URL host/i, 'role indicates URL host discovery';
+
+	# GoDaddy must NOT appear as an email abuse_contacts() entry
+	ok !scalar(grep { lc($_->{address}) =~ /godaddy/ } @email_cs),
+		'GoDaddy not in email abuse_contacts (form-only, no email)';
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 37 — high_spam_country INFO flag for known spam-volume countries
+#
+# POD risk_assessment: when the originating IP is in CN, RU, NG, VN, IN, PK,
+# or BD, the 'high_spam_country' INFO flag is raised.
+# ---------------------------------------------------------------------------
+subtest 'Scenario 37: high_spam_country INFO flag raised for IP in CN/RU/NG' => sub {
+	restore_stubs();
+
+	for my $country (qw(CN RU NG)) {
+		install_stubs(
+			rdns	 => "mail.host.${\lc $country}.example",
+			whois_ip => { org => "ISP in $country", abuse => "abuse\@isp-${\lc $country}.example",
+			              country => $country },
+			domain_whois => undef,
+		);
+
+		my $a = Email::Abuse::Investigator->new();
+		$a->parse_email(make_raw_email(
+			received => 'from h (h [91.198.174.200]) by mx.test',
+			body	 => 'Spam content.',
+		));
+
+		my $risk       = $a->risk_assessment();
+		my @flag_names = map { $_->{flag} } @{ $risk->{flags} };
+
+		ok scalar(grep { $_ eq 'high_spam_country' } @flag_names),
+			"high_spam_country flag raised for IP in $country";
+
+		my ($hsf) = grep { $_->{flag} eq 'high_spam_country' } @{ $risk->{flags} };
+		is $hsf->{severity}, 'INFO', "high_spam_country is INFO severity for $country";
+		like $hsf->{detail}, qr/$country/, "detail mentions country code $country";
+	}
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 38 — parse_email(text => ...) named-arg form works end-to-end
+#
+# POD parse_email: "Accept both positional string and named 'text' argument."
+# The full pipeline (originating_ip, embedded_urls, risk_assessment, report)
+# must produce identical output regardless of whether a scalar or named arg
+# is used.
+# ---------------------------------------------------------------------------
+subtest 'Scenario 38: parse_email(text => ...) named-arg form works end-to-end' => sub {
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.named-arg.example',
+		resolve  => { 'namedarg.example' => '91.198.174.77' },
+		whois_ip => { org => 'Named ISP', abuse => 'abuse@named-isp.example' },
+		domain_whois => undef,
+	);
+
+	my $raw = make_raw_email(
+		received => 'from na (na [91.198.174.77]) by mx.test',
+		from	 => 'Spammer <spam@namedarg.example>',
+		body	 => 'Buy at https://namedarg.example/offer for the best deal.',
+	);
+
+	# Parse using the named-argument form
+	my $a = Email::Abuse::Investigator->new();
+	my $ret = $a->parse_email(text => $raw);
+	is $ret, $a, 'parse_email(text => ...) returns $self for chaining';
+
+	# Full pipeline must work identically to positional-arg form
+	my $orig = $a->originating_ip();
+	is $orig->{ip}, '91.198.174.77', 'named-arg: originating IP correct';
+
+	my @urls = $a->embedded_urls();
+	is scalar @urls, 1, 'named-arg: one URL found';
+	is $urls[0]{host}, 'namedarg.example', 'named-arg: correct URL host';
+
+	my $report = $a->report();
+	like $report, qr/namedarg\.example/, 'named-arg: domain in report';
+
+	# Compare with positional-arg form — results must be identical
+	my $b = Email::Abuse::Investigator->new();
+	$b->parse_email($raw);
+	is_deeply $a->{_headers}, $b->{_headers},
+		'named-arg and positional-arg produce identical parsed headers';
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 39 — abuse_report_text() shows WEB-FORM REPORTS section
+#
+# When form_contacts() returns form-only providers, abuse_report_text() must
+# include a "WEB-FORM REPORTS REQUIRED:" section describing the manual action.
+# ---------------------------------------------------------------------------
+subtest 'Scenario 39: abuse_report_text() includes WEB-FORM REPORTS section for form contacts' => sub {
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.test.example',
+		whois_ip => { org => 'Test ISP', abuse => 'abuse@test-isp.example' },
+		domain_whois => undef,
+	);
+
+	# GoDaddy as the From: account provider — a form-only provider
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		received => 'from test (test [91.198.174.1]) by mx.test',
+		from	 => 'Registrar Abuse <abuse@godaddy.com>',
+		body	 => 'Domain registration spam.',
+	));
+	# Clear origin and URLs so only the From: contact route fires
+	$a->{_origin}         = undef;
+	$a->{_urls}           = [];
+	$a->{_mailto_domains} = [];
+
+	my @forms = $a->form_contacts();
+	ok @forms > 0, 'GoDaddy form contact found (precondition)';
+
+	my $art = $a->abuse_report_text();
+	like $art, qr/WEB-FORM REPORTS REQUIRED/i,
+		'abuse_report_text() contains WEB-FORM REPORTS REQUIRED section';
+	like $art, qr/godaddy/i,
+		'GoDaddy form URL appears in abuse_report_text()';
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 40 — MIME-encoded Subject triggers encoded_subject LOW flag
+#
+# POD risk_assessment: a Base64 or QP encoded Subject header raises the
+# 'encoded_subject' LOW flag because it may be filter evasion.
+# ---------------------------------------------------------------------------
+subtest 'Scenario 40: MIME-encoded Subject triggers encoded_subject LOW flag' => sub {
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.enc-subj.example',
+		whois_ip => { org => 'Enc ISP', abuse => 'abuse@enc-isp.example' },
+		domain_whois => undef,
+	);
+
+	# Base64-encoded Subject that decodes to plain ASCII
+	my $enc_subj = '=?UTF-8?B?' . encode_base64('Win a free prize today!', '') . '?=';
+
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		received => 'from enc (enc [91.198.174.1]) by mx.test',
+		subject  => $enc_subj,
+		body	 => 'No links here.',
+	));
+
+	my $risk       = $a->risk_assessment();
+	my @flag_names = map { $_->{flag} } @{ $risk->{flags} };
+
+	ok scalar(grep { $_ eq 'encoded_subject' } @flag_names),
+		'encoded_subject flag raised for MIME-encoded Subject';
+
+	my ($es_flag) = grep { $_->{flag} eq 'encoded_subject' } @{ $risk->{flags} };
+	is $es_flag->{severity}, 'LOW', 'encoded_subject has LOW severity';
+	like $es_flag->{detail}, qr/Win a free prize today!/,
+		'flag detail contains the decoded subject text';
+
+	# The report should decode and display the subject
+	my $report = $a->report();
+	like $report, qr/Win a free prize today!/, 'decoded Subject appears in report';
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 41 — unresolved_contacts() in full pipeline integration
+#
+# Exercises the unresolved_contacts() method as part of a real end-to-end
+# pipeline: no internal state injection, all data flows from parse_email().
+# Verifies that a domain with no WHOIS abuse contact surfaces as unresolved
+# while a domain with a known abuse contact does not.
+# ---------------------------------------------------------------------------
+subtest 'Scenario 41: unresolved_contacts() full pipeline — unknown vs. known abuse' => sub {
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.sender.example',
+		resolve  => sub {
+			my (undef, $host) = @_;
+			return '91.198.174.10' if $host eq 'known-abuse.example';
+			return '91.198.174.11' if $host eq 'unknown-abuse.example';
+			return undef;
+		},
+		whois_ip => sub {
+			my (undef, $ip) = @_;
+			return { org => 'Known Corp',   abuse => 'abuse@known-abuse.example'  }
+				if $ip eq '91.198.174.10';
+			return { org => 'Unknown Corp', abuse => undef }
+				if $ip eq '91.198.174.11';
+			return {};
+		},
+		domain_whois => sub { undef },
+	);
+
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		received => 'from sender (sender [91.198.174.1]) by mx.test',
+		# Both domains appear in the body so they are not From: spoofable sources
+		from	 => 'spammer@sender.example',
+		body	 => 'Visit https://unknown-abuse.example/buy '
+		          . 'and https://known-abuse.example/page for our offers.',
+	));
+
+	my @unresolved = $a->unresolved_contacts();
+
+	# unknown-abuse.example has no abuse contact → must be in unresolved
+	ok scalar(grep { $_->{domain} eq 'unknown-abuse.example' } @unresolved),
+		'unknown-abuse.example appears in unresolved_contacts()';
+
+	# known-abuse.example has an abuse contact → must NOT be in unresolved
+	ok !scalar(grep { $_->{domain} eq 'known-abuse.example' } @unresolved),
+		'known-abuse.example does NOT appear in unresolved_contacts()';
+
+	# All returned entries conform to the documented type values
+	for my $u (@unresolved) {
+		ok $u->{type} =~ /^(?:url_host|domain)$/,
+			"type '$u->{type}' is a documented value";
+	}
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 42 — all_domains() union is stable across repeated calls
+#
+# all_domains() must return the same set on repeated calls (idempotent) and
+# contain no duplicates even when the same domain appears as both a URL host
+# and a mailto domain.
+# ---------------------------------------------------------------------------
+subtest 'Scenario 42: all_domains() is idempotent and deduplicates URL+mailto overlap' => sub {
+	restore_stubs();
+	install_stubs(
+		rdns	 => 'mail.overlap.example',
+		resolve  => { 'overlap.example' => '91.198.174.20' },
+		whois_ip => { org => 'Overlap ISP', abuse => 'abuse@overlap.example' },
+		domain_whois => undef,
+	);
+
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		received => 'from ov (ov [91.198.174.20]) by mx.test',
+		from	 => 'Sender <sender@overlap.example>',
+		body	 => 'Click https://overlap.example/offer and reply to info@overlap.example',
+	));
+
+	my @first  = $a->all_domains();
+	my @second = $a->all_domains();
+
+	# Results are stable
+	is scalar @second, scalar @first, 'all_domains() returns same count on second call';
+	is_deeply \@first, \@second, 'all_domains() returns identical results on second call';
+
+	# overlap.example appears in both URL hosts and mailto domains but should be listed once
+	my @occurrences = grep { $_ eq 'overlap.example' } @first;
+	is scalar @occurrences, 1,
+		'overlap.example (URL host AND mailto domain) appears exactly once in all_domains()';
+
+	restore_stubs();
+};
+
 done_testing();

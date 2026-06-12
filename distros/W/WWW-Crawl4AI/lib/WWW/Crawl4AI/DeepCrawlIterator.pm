@@ -143,7 +143,7 @@ WWW::Crawl4AI::DeepCrawlIterator - breadth-first iterator for deep_crawl, separa
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

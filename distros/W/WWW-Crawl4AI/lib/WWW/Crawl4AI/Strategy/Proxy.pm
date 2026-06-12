@@ -46,7 +46,7 @@ WWW::Crawl4AI::Strategy::Proxy - Crawl4AI strategy routing through a configured 
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 

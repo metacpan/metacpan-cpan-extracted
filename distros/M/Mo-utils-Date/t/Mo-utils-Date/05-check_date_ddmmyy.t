@@ -47,7 +47,6 @@ clean();
 $self = {'key' => '10213'};
 eval {
 	check_date_ddmmyy($self, 'key');
-	
 };
 is($EVAL_ERROR, "Parameter 'key' is in bad date format.\n",
 	"Parameter 'key' is in bad date format (10213).");

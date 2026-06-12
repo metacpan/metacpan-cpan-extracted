@@ -2,7 +2,7 @@ package Net::DNS::RR::DELEG;
 
 use strict;
 use warnings;
-our $VERSION = (qw$Id: DELEG.pm 2043 2026-01-14 13:35:59Z willem $)[2];
+our $VERSION = (qw$Id: DELEG.pm 2046 2026-06-01 13:23:01Z willem $)[2];
 
 use base qw(Net::DNS::RR);
 
@@ -25,7 +25,7 @@ my %keybycode = (
 	1 => 'server-ipv4',
 	2 => 'server-ipv6',
 	3 => 'server-name',
-	4 => 'include-delegi',
+	4 => 'include-delegparam',
 	);
 my %keybyname = reverse %keybycode;
 
@@ -74,6 +74,7 @@ sub _format_rdata {			## format rdata portion of RR string.
 		my $val = shift @parameters;
 		if ( my $name = $keybycode{$key} ) {
 			my @val = grep {length} $self->$name;
+			s/,/\\,/g foreach @val;			# escape embedded commas
 			my @rhs = grep {length} join ',', @val;
 			push @rdata, join '=', $name, @rhs;
 		} else {
@@ -169,7 +170,7 @@ sub server_name {			## server-name=nameserver.example
 	return _list( map { $_->fqdn } @value );
 }
 
-sub include_delegi {			## include-delegi=devolved.example
+sub include_delegparam {		## include-delegparam=provider.example
 	my ( $self, @value ) = @_;
 	return $self->_parameter( 4, _domain(@value) ) if @value;
 	my $packed = $self->_parameter(4) || return;
@@ -288,7 +289,7 @@ __END__
 	$rr = Net::DNS::RR->new('zone DELEG server-ipv4=192.0.2.1 ...');
 	$rr = Net::DNS::RR->new('zone DELEG server-ipv6=2001:db8::53 ...');
 	$rr = Net::DNS::RR->new('zone DELEG server-name=nameserver.example ...');
-	$rr = Net::DNS::RR->new('zone DELEG include-delegi=devolved.example');
+	$rr = Net::DNS::RR->new('zone DELEG include-delegparam=provider.example');
 
 =head1 DESCRIPTION
 
@@ -335,10 +336,10 @@ Specifies the domain name of the nameserver.
 Returns the nameserver domain name or the undefined value if not specified.
 
 
-=head2 include_delegi
+=head2 include_delegparam
 
-	eg.example. DELEG include-delegi=devolved.example.
-	$destination = $rr->include_delegi;
+	eg.example. DELEG include-delegparam=provider.example.
+	$destination = $rr->include_delegparam;
 
 Specifies the location of a devolved nameserver configuration.
 
@@ -347,7 +348,7 @@ Returns the destination domain name or the undefined value if not specified.
 
 =head1 COPYRIGHT
 
-Copyright (c)2025 Dick Franks. 
+Copyright (c)2025-2026 Dick Franks. 
 
 All rights reserved.
 
@@ -376,6 +377,6 @@ DEALINGS IN THE SOFTWARE.
 =head1 SEE ALSO
 
 L<perl> L<Net::DNS> L<Net::DNS::RR>
-draft-ietf-deleg-06
+draft-ietf-deleg-08
 
 =cut

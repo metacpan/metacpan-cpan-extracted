@@ -3,7 +3,7 @@ package RPi::Const;
 use strict;
 use warnings;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 require Exporter;
 use base qw( Exporter );
@@ -230,6 +230,45 @@ use constant {
     $EXPORT_TAGS{mcp23017_registers} = \@const;
 }
 
+use constant {
+    WPI_PIN_BCM => 1,
+    WPI_PIN_WPI => 2,
+};
+
+{ # WPIPinType pin-numbering (wiringPiSetupPinType / wiringPiSetupGpioDevice)
+
+    # WPI_PIN_PHYS is intentionally omitted - physical-pin setup is not
+    # supported anywhere in the RPi:: suite.
+
+    my @const = qw(
+        WPI_PIN_BCM
+        WPI_PIN_WPI
+    );
+
+    push @EXPORT_OK, @const;
+    $EXPORT_TAGS{wpi_pin} = \@const;
+}
+
+use constant {
+    INT_EDGE_SETUP   => EDGE_SETUP,
+    INT_EDGE_FALLING => EDGE_FALLING,
+    INT_EDGE_RISING  => EDGE_RISING,
+    INT_EDGE_BOTH    => EDGE_BOTH,
+};
+
+{ # wiringPi-native edge names (mirror wiringPi's INT_EDGE_* #defines)
+
+    my @const = qw(
+        INT_EDGE_SETUP
+        INT_EDGE_FALLING
+        INT_EDGE_RISING
+        INT_EDGE_BOTH
+    );
+
+    push @EXPORT_OK, @const;
+    $EXPORT_TAGS{int_edge} = \@const;
+}
+
 sub _vim{1;};
 1;
 __END__
@@ -362,13 +401,34 @@ Hardware register locations and related info for the MCP23107 GPIO Expander
     MCP23017_INPUT      => 1,
     MCP23017_OUTPUT     => 0
 
+=head2 :wpi_pin
+
+The C<WPIPinType> pin-numbering scheme passed to wiringPi's
+C<wiringPiSetupPinType()> / C<wiringPiSetupGpioDevice()> setup variants. Note
+that C<WPI_PIN_PHYS> is intentionally not provided - physical-pin setup is not
+supported within the suite.
+
+    WPI_PIN_BCM => 1,
+    WPI_PIN_WPI => 2,
+
+=head2 :int_edge
+
+wiringPi-native names for the interrupt edge-detection triggers (these mirror
+wiringPi's own C<INT_EDGE_*> C<#define>s). Same values as the C<:interrupt>
+(C<EDGE_*>) tag.
+
+    INT_EDGE_SETUP   => 0,  # reserved
+    INT_EDGE_FALLING => 1,
+    INT_EDGE_RISING  => 2,
+    INT_EDGE_BOTH    => 3,
+
 =head1 AUTHOR
 
 Steve Bertrand, E<lt>steveb@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016 by Steve Bertrand
+Copyright (C) 2016-2026 by Steve Bertrand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.2 or,

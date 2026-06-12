@@ -1,11 +1,24 @@
-$Id: Changes 2045 2026-01-16 12:30:12Z willem $                       -*-text-*-
+$Id: Changes 2052 2026-06-11 14:08:37Z willem $                       -*-text-*-
+
+
+**** 1.55 Jun 11, 2026
+
+	Fix UDP truncation tests which relied on large RSA RRSIGs.
+
+Fix rt.cpan.org #178183
+	Unhelpful TAINT error
+
+Fix rt.cpan.org #177003
+	TCP read loop treats 1-byte recv() of "0" (0x30) as EOF, corrupting AXFRs
+
+Fix rt.cpan.org #176900
+	UNIX.pm: avoid `backticks` which depends on shell
 
 
 **** 1.54 Jan 16, 2026
 
 	Resync with IANA DNS parameters registry.
 	Resync with IANA DNSSEC algorithms registry.
-	Implement DELEGI as derived subtype of DELEG RR.
 	Backport DELEG parser to SVCB.
 
 

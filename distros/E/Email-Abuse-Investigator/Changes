@@ -1,5 +1,188 @@
 Revision history for Email-Abuse-Investigator
 
+0.10	Thu Jun 11 21:54:37 EDT 2026
+
+  [Enhancements]
+
+  - Added public header_value($name) accessor.  Previously only the private
+    _header_value() existed; bin/submit_abuse_report was calling it directly,
+    breaking encapsulation.  The new public method is a thin wrapper with
+    full POD (API spec, formal Z-notation spec).  All _header_value() calls
+    in bin/submit_abuse_report updated to header_value().
+
+  - Added abuse_contacts() result cache.  The method now stores its result
+    in $self->{_contacts} on first call and returns the cached copy on
+    subsequent calls.  The computation was moved to a new private method
+    _compute_abuse_contacts().  The cache slot is initialised to undef in
+    new() and reset in parse_email() alongside the other per-message caches.
+
+  - Decomposed risk_assessment() (cyclomatic complexity 71) into five focused
+    private methods: _risk_check_origin, _risk_check_auth, _risk_check_date,
+    _risk_check_identity, _risk_check_urls_and_domains.  Each takes the $flag
+    accumulator coderef.  risk_assessment() is now a thin orchestrator.
+
+  - Added Readonly::Array @LOOKALIKE_BRANDS constant (16 brand names) and
+    replaced the inline qw(...) list in _risk_check_urls_and_domains with a
+    reference to the constant.
+
+  - Replaced hand-rolled _assert_internal_caller() guard with Sub::Private
+    (enforce mode) and Sub::Protected.  All 33 purely internal _* methods are
+    now decorated :Private (callable only from Email::Abuse::Investigator
+    itself); the six network I/O seams (_resolve_host, _reverse_dns, _whois_ip,
+    _domain_whois, _raw_whois, _rdap_lookup) are decorated :Protected so
+    subclasses can override them.  White-box tests are automatically exempted
+    because Sub::Private/Sub::Protected bypass enforcement when
+    $ENV{HARNESS_ACTIVE} is set (which prove always sets).  Sub::Private 0.05
+    and Sub::Protected 0.02 added to PREREQ_PM and cpanfile.
+
+  - Added t/locales.t: new test file covering geographic country-code flags
+    (CN/RU/NG/VN/IN/PK/BD raise high_spam_country; GB/US/FR/DE/AU do not),
+    case-sensitivity (lowercase 'cn' must not trigger the flag), concurrent
+    instance isolation, POSIX errno stringification across en_US/de_DE/C.UTF-8
+    locales, ENOENT vs EACCES distinctness, absence of hard-coded English errno
+    strings in source, and report() output stability across locales.
+
+  [Tests]
+
+  - Expanded t/function.t with sections 35-45 (white-box coverage):
+    _sanitise_output C0-control stripping, _parse_auth_results all branches,
+    received_trail chain population, sending_software header fingerprints,
+    _risk_check_* helper delegation, form_contacts six-route coverage,
+    abuse_contacts deduplication and caching.  Total: 361 tests.
+
+  - Expanded t/unit.t with subtests 71-101 (public API contract tests):
+    header_value() case-insensitive lookup and undef-on-miss, sending_software()
+    and received_trail() return shapes, form_contacts() and unresolved_contacts()
+    full pipeline, parse_email() named-arg form and scalar-ref form, croak on
+    non-string-reference arguments, risk_assessment() HIGH/MEDIUM/LOW/INFO
+    score-threshold boundaries.  Total: 101 subtests.
+
+  - Expanded t/integration.t with scenarios 30-42 (black-box end-to-end):
+    concurrent object isolation, future-date suspicious_date flag, plain-HTTP
+    http_not_https flag, DKIM pass with different registrable domain (INFO) vs
+    DKIM absent with different domain (MEDIUM), sending_software and
+    received_trail sections in report(), form_contacts via URL host route,
+    high_spam_country INFO flag, parse_email() named-arg calling convention,
+    abuse_report_text() WEB-FORM section, encoded_subject flag, unresolved_contacts()
+    full pipeline, all_domains() idempotency.  Total: 48 subtests.
+
+  - Expanded t/edge_cases.t with sections 26-40 (49 new tests):
+    - _parse_rfc2822_date: all 12 months, day-of-week prefix, single/double-digit
+      day, case-insensitive months, timezone offset ignored, bogus string -> undef.
+    - _country_name: all 7 known spam-country codes, unknown code returned as-is.
+    - parse_email hostile reference types: CODE ref and non-empty ARRAY ref cause
+      module croak; REF-to-hashref silently consumed as empty named-params
+      (Params::Get unwraps REF -> HASH); GLOB ref causes Params::Get Usage error;
+      undef treated as empty email without croaking.
+    - All 13 public methods called on a fresh object (no prior parse_email) must
+      not die and must return empty/undef sentinel values.
+    - Non-HTTP URL schemes (javascript:, data:, ftp:, file:) not extracted by
+      embedded_urls() -- only http:// and https:// are recognised.
+    - CRLF and C0 control injection: NUL, ESC, SOH, BEL, and BS in header values
+      are stripped by parse_email sanitisation and _sanitise_output before reaching
+      report() output.
+    - header_value() edge cases: all-caps, mixed-case, and lowercase lookups return
+      the same result; missing header returns undef; all standard headers accessible.
+    - sending_software() fingerprints: X-PHP-Originating-Script, X-Mailer, X-Source
+      all captured; multiple SW headers all returned; absent headers -> empty list.
+    - received_trail() specifics: RFC 1918 IPs included (not filtered); entries in
+      oldest-first order; for= and id= fields extracted correctly.
+    - Context abuse: all seven list-returning public methods behave safely in scalar
+      context without dying.
+    - _parse_whois_text injection safety: shell metacharacters, HTML special chars,
+      CRLF-terminated lines, and 64 KB org names all handled safely.
+    - all_domains() idempotency: repeated calls return the same sorted list; result
+      is a deduplicated union of URL hosts and mailto domains.
+    - parse_email cache invalidation: _contacts, _risk, and _auth_results slots are
+      all reset to undef on a second parse_email() call.
+    - Sparse internal state: risk_assessment() does not die when _origin, _urls,
+      or _mailto_domains contain empty hashrefs (all keys absent).
+    - unresolved_contacts() and form_contacts(): return empty lists for an empty
+      object; domain with no abuse contacts appears in unresolved list.
+    Total: 155 tests.
+
+  - Expanded t/extended_tests.t with sections 47-61 (35 new tests targeting
+    branches previously at 0% coverage due to 198.51.100.x TEST-NET-2 IPs
+    being filtered as private in all prior tests):
+    - report() originating host with rdns/country/org/abuse/note all populated,
+      and fallback text when no origin found.
+    - report() multiple URLs per hostname ("URLs (N)" grouped format).
+    - report() URL metadata block with IP/country/org/abuse fields.
+    - report() domain block with all WHOIS/MX/NS metadata fields, recently-
+      registered warning, and no-A-record/no-MX fallback lines.
+    - report() abuse contact note field (ip-whois route).
+    - report() web-form section with form_paste word-wrap (>ROLE_WRAP_LEN),
+      form_domain, form_upload, and note fields.
+    - report() SENDING SOFTWARE section via X-Mailer and X-PHP-Originating-Script.
+    - report() RECEIVED CHAIN TRACKING IDs section with for/id fields.
+    - abuse_report_text() with risk flags, originating IP, abuse contacts,
+      and form contacts with form_domain/form_paste/form_upload.
+    - report() MIME-encoded Subject header ($decoded ne $v branch).
+    - unresolved_contacts(): URL with unknown abuse, URL with real abuse,
+      duplicate URL host, From:/Return-Path:/Sender: filter, Reply-To: not
+      filtered, already-covered domain, and duplicate domain deduplication.
+    - form_contacts() DKIM signer and List-Unsubscribe form-only providers
+      (both https and mailto: variants); Route 3 preemption documented.
+    - form_contacts() Route 4 bare address (no angle-brackets) in From:.
+    - abuse_contacts() From: with display-name only (no email addr) skip path.
+    - risk_assessment() cached-result path (second call returns same hashref).
+    - form_contacts() Route 3 registrar form-only (markmonitor.com via WHOIS).
+    - abuse_contacts() Route 3 form-only registrar suppressed from email list.
+    Total: 186 tests (up from 151).
+
+  - Added t/mutant_killers.t: 49 subtests explicitly targeting HIGH and MEDIUM
+    difficulty survivors from xt/mutant_20260612_003229.t.  Covers all six
+    survivor classes with precise boundary and branch engineering:
+    - NUM_BOUNDARY (6 subtests): all three risk score thresholds (SCORE_HIGH=9,
+      SCORE_MEDIUM=5, SCORE_LOW=2) tested at boundary and boundary-1; TZ offset
+      boundaries (+14:00/−12:00) at exact limit and one-minute over; date skew
+      (±8 days flags, ±6 days clean); domain expiry "expires soon" vs "expired"
+      boundary tested with UTC-anchored gmtime dates to prevent timezone drift.
+    - COND_INV (38 subtests): both true and false branches exercised for every
+      conditional in _risk_check_origin (residential rDNS, absent rDNS, low
+      confidence, high-spam-country), _risk_check_auth (SPF/DKIM/DMARC flags),
+      _risk_check_date (missing date, TZ regex, implausible_timezone guard),
+      _risk_check_identity (display-name spoof, free webmail, Reply-To mismatch,
+      undisclosed recipients, encoded subject), _risk_check_urls_and_domains
+      (URL shortener, plain HTTP, recently_registered, domain expiry, lookalike
+      domain), abuse_report_text() flag/IP/contact/form sections, and
+      _compute_abuse_contacts() dedup and all six contact routes.
+    - BOOL_NEGATE (5 subtests): parse_email(), originating_ip(), all_domains(),
+      unresolved_contacts(), and risk_assessment() return exact typed values.
+    - COND_INV_1094_3: unresolved_contacts() unless($dom) domain-extraction path;
+      killed by injecting a contact whose address domain covers a mailto domain
+      (source set to Reply-To: to bypass the spoofable-header skip at line 1125).
+    - BOOL_NEGATE_596_2: new() always returns a distinct blessed object regardless
+      of CHI cache state.
+
+  - Overall test count: 969 tests across 18 files (up from 920).
+
+  [Code Quality]
+
+  - Removed dead-code double-dereference block in parse_email().  A second
+    `if (ref $text eq 'SCALAR')` branch was unreachable because the preceding
+    line had already dereferenced $text.  Replaced with a single clean
+    dereference followed by a croak on any remaining non-scalar reference.
+
+  - Added =head1 LIMITATIONS POD section documenting eight known constraints:
+    no charset conversion, hand-rolled MIME parser, IPv4-only CIDR matching,
+    WHOIS rate-limiting, non-thread-safe class-level cache, DMARC policy not
+    fetched, routing logic duplication risk, and CHI cache as a global.
+
+  - Fixed all Perl::Critic severity-5 findings: replaced every `return undef`
+    with bare `return` across _extract_ip_from_received, _reverse_dns,
+    _domain_whois, _raw_whois, _provider_abuse_for_host,
+    _provider_abuse_for_ip, _registrable, _header_value, _parse_date_to_epoch,
+    and _parse_rfc2822_date.
+
+  - Fixed Perl::Critic severity-3 findings: converted all `unless` with
+    comparison operators to negated `if`; moved capture variables inside
+    their conditionals in _rdap_lookup, _parse_auth_results, and
+    _parse_whois_text; replaced multi-statement map block with a for loop.
+
+  - Removed two hard-tab characters introduced in earlier edits (Object::Configure
+    overlay comment on line ~643; logger condition in _debug).
+
 0.09	Fri May 15 08:24:33 EDT 2026
 
   [Bug Fixes]

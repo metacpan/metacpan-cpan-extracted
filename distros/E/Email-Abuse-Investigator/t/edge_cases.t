@@ -1283,4 +1283,647 @@ subtest '_raw_whois -- does not die regardless of IO::Socket::IP availability' =
 };
 
 
+# =============================================================================
+# 26. _parse_rfc2822_date -- RFC 2822 DATE FORMAT BOUNDARY CASES
+# =============================================================================
+# _parse_rfc2822_date is a plain package function (no $self), not a method.
+# Tests verify the RFC 2822 date regex and Time::Local bridge.
+
+subtest '_parse_rfc2822_date -- full RFC 2822 date string' => sub {
+	my $fn = \&Email::Abuse::Investigator::_parse_rfc2822_date;
+	my $e = $fn->('15 Jan 2024 12:00:00 +0000');
+	ok defined($e) && $e > 0, 'full RFC 2822 date parses to positive epoch';
+};
+
+subtest '_parse_rfc2822_date -- optional day-of-week prefix' => sub {
+	my $fn = \&Email::Abuse::Investigator::_parse_rfc2822_date;
+	my $e1 = $fn->('Mon, 15 Jan 2024 12:00:00 +0000');
+	my $e2 = $fn->('15 Jan 2024 12:00:00 +0000');
+	ok defined($e1), 'day-of-week prefix: parses';
+	ok defined($e2), 'no day-of-week prefix: parses';
+	is $e1, $e2, 'same epoch regardless of day-of-week prefix';
+};
+
+subtest '_parse_rfc2822_date -- single-digit day' => sub {
+	my $fn = \&Email::Abuse::Investigator::_parse_rfc2822_date;
+	ok defined($fn->('1 Jan 2024 00:00:00 +0000')),
+		'single-digit day ("1 Jan") parses';
+	ok defined($fn->('01 Jan 2024 00:00:00 +0000')),
+		'zero-padded day ("01 Jan") parses';
+};
+
+subtest '_parse_rfc2822_date -- case-insensitive month abbreviation' => sub {
+	my $fn = \&Email::Abuse::Investigator::_parse_rfc2822_date;
+	ok defined($fn->('1 JAN 2024 00:00:00 +0000')), 'uppercase JAN parses';
+	ok defined($fn->('1 jan 2024 00:00:00 +0000')), 'lowercase jan parses';
+	ok defined($fn->('1 Jan 2024 00:00:00 +0000')), 'mixed-case Jan parses';
+};
+
+subtest '_parse_rfc2822_date -- timezone offset ignored: same epoch' => sub {
+	my $fn = \&Email::Abuse::Investigator::_parse_rfc2822_date;
+	my $utc  = $fn->('15 Jan 2024 12:00:00 +0000');
+	my $east = $fn->('15 Jan 2024 12:00:00 +0500');
+	my $west = $fn->('15 Jan 2024 12:00:00 -0800');
+	ok defined($utc),  '+0000 parses';
+	ok defined($east), '+0500 parses';
+	ok defined($west), '-0800 parses';
+	# The parser ignores timezone, so all three resolve to the same epoch
+	is $utc, $east, '+0500 and +0000 yield same epoch (TZ ignored)';
+	is $utc, $west, '-0800 and +0000 yield same epoch (TZ ignored)';
+};
+
+subtest '_parse_rfc2822_date -- bogus string returns undef' => sub {
+	my $fn = \&Email::Abuse::Investigator::_parse_rfc2822_date;
+	is $fn->('not a date at all'),	undef, 'garbage string: undef';
+	is $fn->('2024-01-15'),		   undef, 'ISO date without time: undef';
+	is $fn->(''),				     undef, 'empty string: undef';
+};
+
+subtest '_parse_rfc2822_date -- all twelve months parse correctly' => sub {
+	my $fn = \&Email::Abuse::Investigator::_parse_rfc2822_date;
+	for my $mon (qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)) {
+		ok defined($fn->("15 $mon 2024 00:00:00 +0000")),
+			"month $mon parses";
+	}
+};
+
+# =============================================================================
+# 27. _country_name -- FULL TABLE AND FALLBACK
+# =============================================================================
+# _country_name is a plain package function; returns human name or code as-is.
+
+subtest '_country_name -- known spam-country codes return full names' => sub {
+	my $fn = \&Email::Abuse::Investigator::_country_name;
+	is $fn->('CN'), 'China',	  'CN -> China';
+	is $fn->('RU'), 'Russia',	 'RU -> Russia';
+	is $fn->('NG'), 'Nigeria',	'NG -> Nigeria';
+	is $fn->('VN'), 'Vietnam',	'VN -> Vietnam';
+	is $fn->('IN'), 'India',	  'IN -> India';
+	is $fn->('PK'), 'Pakistan',   'PK -> Pakistan';
+	is $fn->('BD'), 'Bangladesh', 'BD -> Bangladesh';
+};
+
+subtest '_country_name -- unknown code returned as-is' => sub {
+	my $fn = \&Email::Abuse::Investigator::_country_name;
+	is $fn->('ZZ'), 'ZZ', 'unknown ZZ returned as-is';
+	is $fn->('GB'), 'GB', 'GB (not in table) returned as-is';
+	is $fn->('US'), 'US', 'US (not in table) returned as-is';
+};
+
+# =============================================================================
+# 28. parse_email -- HOSTILE REFERENCE TYPES CAUSE CROAK
+# =============================================================================
+# The module croaks on any reference type other than SCALAR (e.g., ARRAY, CODE,
+# GLOB, REF).  Hashref is consumed as empty named-params (undef text -> ok).
+
+subtest 'parse_email -- CODE ref causes croak' => sub {
+	my $a = Email::Abuse::Investigator->new();
+	eval { $a->parse_email(sub { 'evil' }) };
+	like $@, qr/parse_email.*string/i, 'CODE ref causes croak';
+};
+
+subtest 'parse_email -- ARRAY ref causes croak' => sub {
+	my $a = Email::Abuse::Investigator->new();
+	eval { $a->parse_email(['item1', 'item2']) };
+	like $@, qr/parse_email.*string/i, 'ARRAY ref causes croak';
+};
+
+subtest 'parse_email -- REF-to-hashref silently treated as empty named-params' => sub {
+	# Params::Get unwraps REF -> HASH and treats it as named-params (no 'text'
+	# key) -> text=undef -> silent empty parse, same as parse_email({}).
+	# This is an inherited Params::Get behaviour, not a module bug.
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	my $inner = {};
+	lives_ok { $a->parse_email(\$inner) }
+		'REF-to-hashref silently consumed as empty named-params (no croak)';
+	is $a->originating_ip(), undef, 'REF-to-hashref: no origin (empty parse)';
+	restore_net();
+};
+
+subtest 'parse_email -- GLOB ref causes an error (any kind)' => sub {
+	# Params::Get raises its own Usage error before the module croak check,
+	# so the error text is Params::Get-originated, not parse_email-originated.
+	my $a = Email::Abuse::Investigator->new();
+	eval { $a->parse_email(\*STDIN) };
+	ok $@, 'GLOB ref causes some error';
+	like $@, qr/Usage:/i, 'GLOB ref causes Params::Get Usage error';
+};
+
+subtest 'parse_email -- undef does NOT croak (treated as empty email)' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	lives_ok { $a->parse_email(undef) } 'undef does not croak';
+	is $a->originating_ip(), undef, 'undef email: no origin';
+	restore_net();
+};
+
+# =============================================================================
+# 29. PUBLIC METHODS WITHOUT PRIOR parse_email
+# =============================================================================
+# A freshly constructed object has safe initial state; all public methods
+# should return empty/undef results without dying.
+
+subtest 'public methods before parse_email -- all return safely' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	# No parse_email called
+	lives_ok { $a->originating_ip()        } 'originating_ip without parse_email';
+	lives_ok { [$a->embedded_urls()]       } 'embedded_urls without parse_email';
+	lives_ok { [$a->mailto_domains()]      } 'mailto_domains without parse_email';
+	lives_ok { [$a->all_domains()]         } 'all_domains without parse_email';
+	lives_ok { [$a->abuse_contacts()]      } 'abuse_contacts without parse_email';
+	lives_ok { [$a->form_contacts()]       } 'form_contacts without parse_email';
+	lives_ok { [$a->sending_software()]    } 'sending_software without parse_email';
+	lives_ok { [$a->received_trail()]      } 'received_trail without parse_email';
+	lives_ok { $a->risk_assessment()       } 'risk_assessment without parse_email';
+	lives_ok { $a->report()               } 'report() without parse_email';
+	lives_ok { $a->abuse_report_text()    } 'abuse_report_text without parse_email';
+	lives_ok { $a->header_value('from')   } 'header_value without parse_email';
+	lives_ok { [$a->unresolved_contacts()] } 'unresolved_contacts without parse_email';
+
+	is $a->originating_ip(),        undef, 'originating_ip returns undef';
+	is scalar($a->embedded_urls()),  0,    'embedded_urls returns empty list';
+	is scalar($a->mailto_domains()), 0,    'mailto_domains returns empty list';
+	is scalar($a->all_domains()),    0,    'all_domains returns empty list';
+	is $a->header_value('from'),    undef, 'header_value returns undef';
+	restore_net();
+};
+
+# =============================================================================
+# 30. SECURITY -- NON-HTTP SCHEMES NOT EXTRACTED
+# =============================================================================
+# Only http:// and https:// URLs should be extracted.  Dangerous schemes like
+# javascript:, data:, ftp:, and file: must not appear in embedded_urls().
+
+subtest 'embedded_urls -- javascript: scheme not extracted' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email("From: x\@y.com\n\nClick javascript:alert(1) for more info");
+	my @urls = $a->embedded_urls();
+	ok !scalar(grep { $_->{url} =~ /^javascript:/i } @urls),
+		'javascript: scheme not extracted';
+	restore_net();
+};
+
+subtest 'embedded_urls -- data: scheme not extracted' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email("From: x\@y.com\n\ndata:text/html,<h1>XSS</h1> is nasty");
+	my @urls = $a->embedded_urls();
+	ok !scalar(grep { $_->{url} =~ /^data:/i } @urls),
+		'data: scheme not extracted';
+	restore_net();
+};
+
+subtest 'embedded_urls -- ftp: scheme not extracted' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email("From: x\@y.com\n\nftp://ftp.example.com/file.txt");
+	my @urls = $a->embedded_urls();
+	ok !scalar(grep { $_->{url} =~ /^ftp:/i } @urls),
+		'ftp: scheme not extracted (only http/https)';
+	restore_net();
+};
+
+subtest 'embedded_urls -- file: scheme not extracted' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email("From: x\@y.com\n\nfile:///etc/passwd is a common target");
+	my @urls = $a->embedded_urls();
+	ok !scalar(grep { $_->{url} =~ /^file:/i } @urls),
+		'file: scheme not extracted';
+	restore_net();
+};
+
+# =============================================================================
+# 31. SECURITY -- CRLF INJECTION IN HEADER DATA FLOWING TO REPORT
+# =============================================================================
+# The From: and Subject: headers may contain attacker-controlled data.
+# CR/LF sequences are sanitised by parse_email before storage, and
+# _sanitise_output strips any C0 controls from report output.
+
+subtest 'NUL in Subject: -- stripped from report output' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email("From: x\@y.com\nSubject: Normal\x00Subject\n\nbody");
+	my $report = $a->report();
+	ok $report !~ /\x00/, 'NUL bytes absent from report output';
+	restore_net();
+};
+
+subtest 'ESC and C0 controls in From: -- stripped from report output' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	# ESC sequences could confuse terminal emulators and ANSI parsers.
+	$a->parse_email("From: evil\x1B[31mred\x1B[0m\@bad.example\n\nbody");
+	my $report = $a->report();
+	ok $report !~ /\x1B/, 'ESC sequences absent from report output';
+	restore_net();
+};
+
+subtest 'SOH/BEL/BS in Subject: -- stripped from report output' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email("From: x\@y.com\nSubject: bad\x01\x07\x08chars\n\nbody");
+	my $report = $a->report();
+	ok $report !~ /[\x01\x07\x08]/, 'SOH/BEL/BS stripped from report';
+	restore_net();
+};
+
+# =============================================================================
+# 32. header_value() -- COMPREHENSIVE CASE INSENSITIVITY AND EDGE CASES
+# =============================================================================
+
+subtest 'header_value -- case-insensitive lookup' => sub {
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email("From: user\@example.com\nSubject: Test subject\n\nbody");
+	is $a->header_value('from'),    'user@example.com', 'lowercase name works';
+	is $a->header_value('FROM'),    'user@example.com', 'uppercase name works';
+	is $a->header_value('From'),    'user@example.com', 'mixed-case name works';
+	is $a->header_value('subject'), 'Test subject',     'subject lowercase';
+	is $a->header_value('SUBJECT'), 'Test subject',     'subject uppercase';
+};
+
+subtest 'header_value -- nonexistent header returns undef' => sub {
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email("From: x\@y.com\n\nbody");
+	is $a->header_value('x-nonexistent-header'), undef,
+		'missing header returns undef';
+};
+
+subtest 'header_value -- standard headers accessible by name' => sub {
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(
+		"From: sender\@a.example\n"
+	  . "To: rcpt\@b.example\n"
+	  . "Reply-To: reply\@c.example\n"
+	  . "Message-ID: <abc123\@mail.example>\n"
+	  . "Return-Path: <bounce\@a.example>\n"
+	  . "\nbody");
+	is $a->header_value('to'),          'rcpt@b.example',        'To: accessible';
+	is $a->header_value('reply-to'),    'reply@c.example',       'Reply-To: accessible';
+	is $a->header_value('message-id'),  '<abc123@mail.example>', 'Message-ID: accessible';
+	is $a->header_value('return-path'), '<bounce@a.example>',    'Return-Path: accessible';
+};
+
+# =============================================================================
+# 33. sending_software() -- HEADER FINGERPRINTS
+# =============================================================================
+# All six SW-fingerprint headers must be detected and returned.
+
+subtest 'sending_software -- X-PHP-Originating-Script fingerprint' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(
+		"From: x\@y.com\n"
+	  . "X-PHP-Originating-Script: 1000:mailer.php\n"
+	  . "\nbody");
+	my @sw = $a->sending_software();
+	ok scalar @sw >= 1, 'at least one SW entry detected';
+	ok scalar(grep { $_->{header} eq 'x-php-originating-script' } @sw),
+		'X-PHP-Originating-Script header captured';
+	restore_net();
+};
+
+subtest 'sending_software -- X-Mailer fingerprint' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(
+		"From: x\@y.com\n"
+	  . "X-Mailer: BulkMailer Pro 2.1\n"
+	  . "\nbody");
+	my @sw = $a->sending_software();
+	ok scalar(grep { $_->{header} eq 'x-mailer' } @sw),
+		'X-Mailer header captured';
+	is $sw[0]{value}, 'BulkMailer Pro 2.1', 'X-Mailer value preserved';
+	restore_net();
+};
+
+subtest 'sending_software -- multiple SW headers all returned' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(
+		"From: x\@y.com\n"
+	  . "X-Mailer: SpamSend 1.0\n"
+	  . "X-PHP-Originating-Script: 999:spam.php\n"
+	  . "X-Source: /var/www/script.php\n"
+	  . "\nbody");
+	my @sw = $a->sending_software();
+	my %headers = map { $_->{header} => 1 } @sw;
+	ok $headers{'x-mailer'},                   'X-Mailer in results';
+	ok $headers{'x-php-originating-script'},   'X-PHP-Originating-Script in results';
+	ok $headers{'x-source'},                   'X-Source in results';
+	restore_net();
+};
+
+subtest 'sending_software -- absent SW headers: empty list' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email("From: x\@y.com\nSubject: plain\n\nbody");
+	my @sw = $a->sending_software();
+	is scalar @sw, 0, 'no SW headers: empty list returned';
+	restore_net();
+};
+
+# =============================================================================
+# 34. received_trail() -- RFC 1918 IPs INCLUDED AND OLDEST-FIRST ORDERING
+# =============================================================================
+# received_trail() is NOT filtered like originating_ip().  Private IPs appear
+# in the trail.  Entries are in oldest-first order (reversed from message).
+
+subtest 'received_trail -- RFC 1918 IPs included (not filtered)' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(
+		"Received: from mx (mx [10.0.0.1]) by final id ABC\n"
+	  . "Received: from h (h [91.198.174.1]) by mx id DEF\n"
+	  . "From: x\@y.com\n\nbody");
+	my @trail = $a->received_trail();
+	ok scalar @trail >= 2, 'both hops in trail';
+	my @ips = map { $_->{ip} // '' } @trail;
+	ok scalar(grep { $_ eq '10.0.0.1' } @ips),
+		'RFC 1918 IP 10.0.0.1 included in trail';
+	ok scalar(grep { $_ eq '91.198.174.1' } @ips),
+		'public IP 91.198.174.1 included in trail';
+	restore_net();
+};
+
+subtest 'received_trail -- oldest-first ordering' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	# Received: headers in raw message are newest-first;
+	# received_trail() reverses to oldest-first.
+	$a->parse_email(
+		"Received: from newest (newest [91.198.174.3]) by final id C\n"
+	  . "Received: from middle (middle [91.198.174.2]) by relay id B\n"
+	  . "Received: from oldest (oldest [91.198.174.1]) by origin id A\n"
+	  . "From: x\@y.com\n\nbody");
+	my @trail = $a->received_trail();
+	is scalar @trail, 3, 'all three hops captured';
+	is $trail[0]{ip}, '91.198.174.1', 'first entry is oldest hop';
+	is $trail[2]{ip}, '91.198.174.3', 'last entry is newest hop';
+	restore_net();
+};
+
+subtest 'received_trail -- for= and id= fields extracted' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(
+		"Received: from smtp (smtp [91.198.174.1]) by mx"
+	  . " for <victim\@domain.example> id MSG-ABC\n"
+	  . "From: x\@y.com\n\nbody");
+	my @trail = $a->received_trail();
+	ok scalar @trail >= 1, 'trail non-empty';
+	is $trail[0]{for}, 'victim@domain.example', 'for= field extracted';
+	is $trail[0]{id},  'MSG-ABC',               'id= field extracted';
+	restore_net();
+};
+
+# =============================================================================
+# 35. CONTEXT ABUSE -- SCALAR VS LIST CONTEXT
+# =============================================================================
+# Methods returning lists must behave predictably in scalar context.
+# The module does not document scalar-context semantics, but must not die.
+
+subtest 'list methods in scalar context -- all survive without dying' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email("From: x\@y.com\n\nhttps://spam.example/page");
+	my $n_urls  = do { my @x = $a->embedded_urls();    scalar @x };
+	my $n_mdom  = do { my @x = $a->mailto_domains();   scalar @x };
+	my $n_adom  = do { my @x = $a->all_domains();      scalar @x };
+	my $n_abuse = do { my @x = $a->abuse_contacts();   scalar @x };
+	my $n_form  = do { my @x = $a->form_contacts();    scalar @x };
+	my $n_sw    = do { my @x = $a->sending_software(); scalar @x };
+	my $n_trail = do { my @x = $a->received_trail();   scalar @x };
+	ok defined($n_urls),  'embedded_urls scalar context: defined';
+	ok defined($n_mdom),  'mailto_domains scalar context: defined';
+	ok defined($n_adom),  'all_domains scalar context: defined';
+	ok defined($n_abuse), 'abuse_contacts scalar context: defined';
+	ok defined($n_form),  'form_contacts scalar context: defined';
+	ok defined($n_sw),    'sending_software scalar context: defined';
+	ok defined($n_trail), 'received_trail scalar context: defined';
+	restore_net();
+};
+
+# =============================================================================
+# 36. _parse_whois_text -- INJECTION SAFETY
+# =============================================================================
+# WHOIS responses are external data.  Embedded CR/LF, shell metacharacters,
+# and HTML special chars must survive safely without code execution or
+# field injection into the parsed result.
+
+subtest '_parse_whois_text -- shell metacharacters in org name passed through' => sub {
+	my $a = Email::Abuse::Investigator->new();
+	my $evil_org = 'Acme; rm -rf / | cat /etc/passwd `whoami`';
+	my $r = $a->_parse_whois_text("OrgName: $evil_org\n");
+	is $r->{org}, $evil_org,
+		'shell metacharacters in org name passed through safely (no exec)';
+};
+
+subtest '_parse_whois_text -- HTML special chars in org name passed through' => sub {
+	my $a = Email::Abuse::Investigator->new();
+	my $html_org = 'Acme <script>alert(1)</script> & "Corp"';
+	my $r = $a->_parse_whois_text("OrgName: $html_org\n");
+	is $r->{org}, $html_org,
+		'HTML special chars in org name unchanged (no HTML encoding at this level)';
+};
+
+subtest '_parse_whois_text -- 64 KB OrgName does not crash parser' => sub {
+	my $a = Email::Abuse::Investigator->new();
+	my $huge = 'X' x 65536;
+	my $r;
+	lives_ok { $r = $a->_parse_whois_text("OrgName: $huge\n") }
+		'64 KB OrgName does not crash';
+	ok defined $r, 'result defined after 64 KB OrgName';
+};
+
+subtest '_parse_whois_text -- CRLF embedded in block: second field still parsed' => sub {
+	my $a = Email::Abuse::Investigator->new();
+	# An attacker-controlled WHOIS server may embed CRLF to inject extra lines.
+	# The second line should be parsed as a separate field, not smuggled into org.
+	my $r = $a->_parse_whois_text(
+		"OrgName: Evil Corp\r\nOrgAbuseEmail: abuse\@evil.example\r\n");
+	like $r->{org}, qr/Evil Corp/, 'org name parsed despite CRLF line ending';
+	ok defined($r->{abuse}), 'abuse email parsed from CRLF-terminated block';
+};
+
+# =============================================================================
+# 37. all_domains() -- IDEMPOTENCY AND UNION PROPERTY
+# =============================================================================
+
+subtest 'all_domains -- same result on repeated calls (idempotent)' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(
+		"From: sender\@contact.example\n\n"
+	  . "https://urlhost.example/page and email\@contact.example");
+	my @d1 = $a->all_domains();
+	my @d2 = $a->all_domains();
+	is scalar @d1, scalar @d2, 'same count on repeated call';
+	is_deeply [sort @d1], [sort @d2], 'same domains on repeated call';
+	restore_net();
+};
+
+subtest 'all_domains -- every member comes from URL hosts or mailto domains' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(
+		"From: x\@mail-domain.example\n\n"
+	  . "Visit https://url-host.example/path");
+	my @all  = $a->all_domains();
+	my @mdom = map { $_->{domain} } $a->mailto_domains();
+	my @udom = map { $_->{host}   } $a->embedded_urls();
+	my %union = map { $_ => 1 } @mdom, @udom;
+	for my $d (@all) {
+		ok exists($union{$d}),
+			"all_domains member '$d' is from URL hosts or mailto domains";
+	}
+	restore_net();
+};
+
+subtest 'all_domains -- no duplicates when domain appears in both sources' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	# Same domain in both From: (mailto) and body URL
+	$a->parse_email(
+		"From: x\@shared.example\n\n"
+	  . "Visit https://shared.example/page");
+	my @all = $a->all_domains();
+	my %seen;
+	my @dups = grep { $seen{$_}++ } @all;
+	is scalar @dups, 0, 'no duplicate domains in all_domains()';
+	restore_net();
+};
+
+# =============================================================================
+# 38. parse_email CACHE INVALIDATION
+# =============================================================================
+# Calling parse_email() a second time must reset ALL per-message caches,
+# including _contacts, _risk, _urls, _mailto_domains, and _auth_results.
+
+subtest 'parse_email -- _contacts cache cleared on re-parse' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email("From: x\@y.com\n\nbody");
+	$a->{_contacts} = ['STALE'];     # Manually poison the cache
+	$a->parse_email("From: x\@y.com\n\nbody");  # Re-parse
+	is $a->{_contacts}, undef, '_contacts invalidated by re-parse';
+	restore_net();
+};
+
+subtest 'parse_email -- _risk cache cleared on re-parse' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email("From: x\@y.com\n\nbody");
+	$a->{_risk} = { level => 'STALE', score => 999, flags => [] };
+	$a->parse_email("From: x\@y.com\n\nbody");
+	is $a->{_risk}, undef, '_risk invalidated by re-parse';
+	restore_net();
+};
+
+subtest 'parse_email -- _auth_results cache cleared on re-parse' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(
+		"Authentication-Results: mx; spf=fail\n"
+	  . "From: x\@y.com\n\nbody");
+	$a->parse_email("From: x\@y.com\n\nbody");  # Re-parse without auth header
+	is $a->{_auth_results}, undef, '_auth_results invalidated by re-parse';
+	restore_net();
+};
+
+# =============================================================================
+# 39. risk_assessment -- SPARSE / EMPTY INTERNAL STATE HASHREFS
+# =============================================================================
+# If internal caches contain incomplete hashrefs (missing keys), risk_assessment
+# must not die when attempting to access those keys.
+
+subtest 'risk_assessment -- _origin={} (no ip/rdns) does not die' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email("From: x\@y.com\n\nbody");
+	$a->{_origin}         = {};   # All keys absent
+	$a->{_urls}           = [];
+	$a->{_mailto_domains} = [];
+	my $risk;
+	lives_ok { $risk = $a->risk_assessment() }
+		'risk_assessment with empty _origin hashref does not die';
+	ok defined $risk, 'result defined with empty _origin';
+	restore_net();
+};
+
+subtest 'risk_assessment -- _urls=[{}] (no host/ip) does not die' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email("From: x\@y.com\n\nbody");
+	$a->{_origin}         = undef;
+	$a->{_urls}           = [{}];  # URL entry with no keys
+	$a->{_mailto_domains} = [];
+	my $risk;
+	lives_ok { $risk = $a->risk_assessment() }
+		'risk_assessment with empty URL hashref does not die';
+	restore_net();
+};
+
+subtest 'risk_assessment -- _mailto_domains=[{}] (no domain) does not die' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email("From: x\@y.com\n\nbody");
+	$a->{_origin}         = undef;
+	$a->{_urls}           = [];
+	$a->{_mailto_domains} = [{}];  # Domain entry with no keys
+	my $risk;
+	lives_ok { $risk = $a->risk_assessment() }
+		'risk_assessment with empty domain hashref does not die';
+	restore_net();
+};
+
+# =============================================================================
+# 40. unresolved_contacts() AND form_contacts() EDGE CASES
+# =============================================================================
+
+subtest 'unresolved_contacts -- empty object returns empty list' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email("From: x\@y.com\n\nbody");
+	$a->{_origin}         = undef;
+	$a->{_urls}           = [];
+	$a->{_mailto_domains} = [];
+	my @unres = $a->unresolved_contacts();
+	is scalar @unres, 0, 'empty state: no unresolved contacts';
+	restore_net();
+};
+
+subtest 'unresolved_contacts -- domain with no abuse contacts listed' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email("From: x\@y.com\n\nbody");
+	$a->{_origin}         = undef;
+	$a->{_urls}           = [];
+	# Domain with no abuse-email fields at all
+	$a->{_mailto_domains} = [{
+		domain => 'nocontact.example',
+		source => 'body',
+	}];
+	my @unres = $a->unresolved_contacts();
+	ok scalar @unres >= 1, 'domain with no abuse email appears in unresolved list';
+	ok scalar(grep { $_->{domain} eq 'nocontact.example' } @unres),
+		'nocontact.example in unresolved list';
+	restore_net();
+};
+
+subtest 'form_contacts -- empty object returns empty list' => sub {
+	null_net();
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email("From: x\@y.com\n\nbody");
+	$a->{_origin}         = undef;
+	$a->{_urls}           = [];
+	$a->{_mailto_domains} = [];
+	my @forms = $a->form_contacts();
+	is scalar @forms, 0, 'empty state: no form contacts';
+	restore_net();
+};
+
 done_testing();

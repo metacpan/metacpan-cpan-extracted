@@ -9,9 +9,10 @@ use English;
 use Error::Pure qw(err);
 use Readonly;
 
-Readonly::Array our @EXPORT_OK => qw(check_date check_date_dmy check_date_ddmmyy check_date_order);
+Readonly::Array our @EXPORT_OK => qw(check_date check_date_dmy check_date_ddmmyy
+	check_date_yymmdd check_date_order);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 sub check_date {
 	my ($self, $key) = @_;
@@ -93,9 +94,43 @@ sub check_date_ddmmyy {
 	my ($day, $month, $year) = ($1, $2, $3);
 	eval {
 		DateTime->new(
-			'day' => $1,
-			'month' => $2,
-			'year' => 2000 + $3,
+			'day' => $day,
+			'month' => $month,
+			'year' => 2000 + $year,
+		);
+	};
+	if ($EVAL_ERROR) {
+		err "Parameter '$key' is bad date.",
+			'Value' => $self->{$key},
+			'DateTime error' => $EVAL_ERROR,
+		;
+	}
+
+	return;
+}
+
+sub check_date_yymmdd {
+	my ($self, $key) = @_;
+
+	if (! exists $self->{$key}) {
+		return;
+	}
+
+	if (! defined $self->{$key}) {
+		return;
+	}
+
+	if ($self->{$key} !~ m/^(\d{2})(\d{2})(\d{2})$/ms) {
+		err "Parameter '$key' is in bad date format.",
+			'Value', $self->{$key},
+		;
+	}
+	my ($year, $month, $day) = ($1, $2, $3);
+	eval {
+		DateTime->new(
+			'day' => $day,
+			'month' => $month,
+			'year' => 2000 + $year,
 		);
 	};
 	if ($EVAL_ERROR) {
@@ -183,16 +218,17 @@ Mo::utils::Date - Mo date utilities.
 
 =head1 SYNOPSIS
 
- use Mo::utils::Date qw(check_date);
+ use Mo::utils::Date qw(check_date check_date_dmy check_date_ddmmyy check_date_yymmdd check_date_order);
 
  check_date($self, $key);
  check_date_dmy($self, $key);
  check_date_ddmmyy($self, $key);
+ check_date_yymmdd($self, $key);
  check_date_order($self, $key1, $key2);
 
 =head1 DESCRIPTION
 
-Utilities for checking of data values.
+Utilities for checking of date values.
 
 =head1 SUBROUTINES
 
@@ -253,6 +289,25 @@ Put error if check isn't ok.
 
 Returns undef.
 
+=head2 C<check_date_yymmdd>
+
+ check_date_yymmdd($self, $key);
+
+I<Since version 0.05.>
+
+Check parameter defined by C<$key> which is date in yymmdd format.
+
+Possible dates.
+ - YYMMDD
+
+Function is working only for date years > 2000.
+
+Date is checked via L<DateTime> if it is real.
+
+Put error if check isn't ok.
+
+Returns undef.
+
 =head2 C<check_date_order>
 
  check_date_order($self, $key1, $key2);
@@ -300,6 +355,13 @@ Returns undef.
                  Value: %s
                  DateTime error: %s
 
+ check_date_yymmdd():
+         Parameter '%s' for date is in bad date format.
+                 Value: %s
+         Parameter '%s' is bad date.
+                 Value: %s
+                 DateTime error: %s
+
  check_date_order():
          Cannot parse date/time string.
                  Value: %s
@@ -308,7 +370,9 @@ Returns undef.
                  DateTime error: %s
          Parameter '%s' has date greater or same as parameter '%s' date.
 
-=head1 EXAMPLE1
+=head1 EXAMPLES
+
+=head2 EXAMPLE1
 
 =for comment filename=check_date_ok.pl
 
@@ -328,7 +392,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE2
+=head2 EXAMPLE2
 
 =for comment filename=check_date_fail.pl
 
@@ -351,7 +415,7 @@ Returns undef.
  # Output like:
  # #Error [..Utils.pm:?] Parameter 'key' is in bad format.
 
-=head1 EXAMPLE3
+=head2 EXAMPLE3
 
 =for comment filename=check_date_ddmmyy_ok.pl
 
@@ -371,7 +435,7 @@ Returns undef.
  # Output:
  # ok
 
-=head1 EXAMPLE4
+=head2 EXAMPLE4
 
 =for comment filename=check_date_ddmmyy_fail.pl
 
@@ -387,6 +451,49 @@ Returns undef.
          'key' => 'foo',
  };
  check_date_ddmmyy($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output like:
+ # #Error [..Utils.pm:?] Parameter 'key' for date is in bad format.
+
+=head2 EXAMPLE5
+
+=for comment filename=check_date_yymmdd_ok.pl
+
+ use strict;
+ use warnings;
+
+ use Mo::utils::Date qw(check_date_yymmdd);
+
+ my $self = {
+         'key' => '201115',
+ };
+ check_date_yymmdd($self, 'key');
+
+ # Print out.
+ print "ok\n";
+
+ # Output:
+ # ok
+
+=head2 EXAMPLE6
+
+=for comment filename=check_date_yymmdd_fail.pl
+
+ use strict;
+ use warnings;
+
+ use Error::Pure;
+ use Mo::utils::Date qw(check_date_yymmdd);
+
+ $Error::Pure::TYPE = 'Error';
+
+ my $self = {
+         'key' => 'foo',
+ };
+ check_date_yymmdd($self, 'key');
 
  # Print out.
  print "ok\n";
@@ -424,12 +531,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2022-2024
+© 2022-2026 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

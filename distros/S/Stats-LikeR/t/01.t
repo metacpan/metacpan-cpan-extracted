@@ -3,7 +3,6 @@
 require 5.010;
 use warnings FATAL => 'all';
 use feature 'say';
-use Digest::SHA 'sha512_base64';
 use File::Temp;
 use Scalar::Util 'looks_like_number';
 use Stats::LikeR;
@@ -333,8 +332,8 @@ $t_test = t_test(
 	'x' => $test_data[0][0],
 	mu  => mean( $test_data[0][0] )
 );
-is_approx( $t_test->{'p_value'}, 1, 't_test: single distribution p-value', 0);
-is_approx( $t_test->{statistic}, 0, 't_test: single distribution statistic', 0);
+is_approx( $t_test->{'p_value'}, 1, 't_test: single distribution p-value', 1e-13);
+is_approx( $t_test->{statistic}, 0, 't_test: single distribution statistic', 1e-13);
 #-repeat without "x"
 
 $t_test = t_test( $test_data[0][0], $test_data[0][1]);
@@ -2810,11 +2809,11 @@ my @data_aoh = (
 
 write_table(\@data_aoh, $tmp_file, sep => "\t", 'row.names' => 1, 'undef.val' => 'NA');
 $str = file2string($tmp_file);
-if (sha512_base64($str) eq 'Nx/3jb/smu2Jdk2SNCXhxK7yaAO0GO5TAbwztb16fYqDT8nSMzdbdK61I30pfB3KVPtZ5w5rT4Ex2d4+pJFm5g') {
-	pass('write_table successfully wrote a tab-delimited file (Array of Hashes)');
+$expected = "\tc1\tc2\tc3\n1\t42\thello,world\tNA\n2\t99\tNA\t\"quote\"\"here\"\n3\tNA\t\"tab\tin\"\tNA\n";
+if (is($str, $expected, 'write_table successfully wrote a tab-delimited file (Array of Hashes)')) {
 	unlink $tmp_file;
 } else {
-	fail("sha512 does not match for write_table AoH; see $tmp_file");
+	diag("see $tmp_file");
 	die;
 }
 #-------------------------------------------------------------------
@@ -2893,11 +2892,8 @@ write_table(
 	\%hoa, $f,	sep => "\t", 'col.names' => ['B', 'C', 'A'], 'undef.val' => 'NA'
 );
 $str = file2string($f);
-if (sha512_base64($str) eq 'gSDXQI2aBVJgsuzGvuHY4bbDSkCSNI6JPFWRjc2+2Khp7YdTyjew+lIKuakxKAHO758CcjTLhdMw15J7vf3P/g') {
-	pass('write_table: hoa with "col.names"');
-} else {
-	fail('write_table: hoa with "col.names"');
-}
+$expected = "\tB\tC\tA\n1\t-3\t9\t1\n2\t-2\t3\t2\n3\t-1\t4\t3\n4\t0\tNA\t4\n5\t1\tNA\tNA\n6\t2\tNA\tNA\n7\t3\tNA\tNA\n";
+is($str, $expected, 'write_table: hoa with "col.names"');
 no_leaks_ok {
 	eval {
 		\%hoa, $f,	sep => "\t", 'col.names' => ['B', 'C', 'A']
@@ -2909,11 +2905,8 @@ write_table(
 	\%hoa, $f,	sep => "\t", 'col.names' => ['B', 'C', 'A'], 'undef.val' => 'NA'
 );
 $str = file2string($f);
-if (sha512_base64($str) eq 'z7qR91AqEvKUb6QSftcaH0gctut3oOF/p1O62cFyR0LPeJs7syAudEohZ2mOHtZiqwQO3U+rCH/YCl7yveqf8w') {
-	pass('write_table: hoa input with col.names and nondigit input');
-} else {
-	fail('write_table: hoa input with col.names and nondigit input');
-}
+$expected = "\tB\tC\tA\n1\ty\tz\tx\n2\t-3\t9\t1\n3\t-2\t3\t2\n4\t-1\t4\t3\n5\t0\tNA\t4\n6\t1\tNA\tNA\n7\t2\tNA\tNA\n8\t3\tNA\tNA\n";
+is($str, $expected, 'write_table: hoa input with col.names and nondigit input');
 %correct = (
 	'r1' => [42, 'hello,world', undef, undef],
 	'r2' => [99, undef, 'quote"here', undef],
@@ -2980,13 +2973,9 @@ write_table(
 	sep => "\t", 'row.names' => 0, 'undef.val' => 'NA'
 );
 $str = file2string($fh->filename);
-if (sha512_base64($str) eq 'mSFIF/IuIR3GfRWvnv+4OkMi12JwoIV4zxt57vv2QQxuEGOde8w8hD7xSBNsMjczFLqZRqmlvOq0tcWAkhF0ag') {
-	pass('write_table was successful');
-} else {
-	fail('failed to write_table');
-	say sha512_base64($str);
-	die 'write_table failed';
-}
+$expected = "r1\tr2\tr3\n42\t99\tNA\nhello,world\tNA\t\"tab\tin\"\nNA\t\"quote\"\"here\"\tNA\nNA\tNA\tNA\n";
+is($str, $expected, 'write_table was successful')
+	or die 'write_table failed';
 no_leaks_ok {
 	eval {
 		write_table(
@@ -2997,9 +2986,9 @@ no_leaks_ok {
 		);
 	}
 } 'write_table: no memory leaks w/ tab separator and "row.names" set to false' unless $INC{'Devel/Cover.pm'};
-#-------------------------------------------------------------------
+#
 #  aov: Categorical Variables & Interactions (Bug Fix Validations)
-#-------------------------------------------------------------------
+#
 
 # 'aov: One-Way ANOVA with Categorical Factor (>2 Levels)' => sub {
 # If the bug is present, 'group' is evaluated as a string (yielding 0.0), 
@@ -3059,9 +3048,8 @@ is_approx($res_2way->{'supp:dose'}{'Pr(>F)'}, 0.225133, 'aov 2-way: supp:dose Pr
 is($res_2way->{Residuals}{Df}, 16, 'aov 2-way: Residuals Df');
 is_approx($res_2way->{Residuals}{'Sum Sq'}, 168.2920, 'aov 2-way: Residuals Sum Sq', 1e-4);
 is_approx($res_2way->{Residuals}{'Mean Sq'}, 10.51825, 'aov 2-way: Residuals Mean Sq', 1e-4);
-#-------------------------------------------------------------------
+
 #  aov: Robustness, Rank Deficiency & Parsing Exceptions
-#-------------------------------------------------------------------
 # 'aov: Collinearity and Rank Deficiency' => sub {
 my $data_collinear = {
 	'y'  => [1.2, 2.3, 3.1, 4.0, 5.1],
@@ -3156,8 +3144,6 @@ is_approx($test_data->{'p_value'}, 0.0390625, 'Wilcox test (paired) statistic', 
 #$test_data = ks_test('x' => $x, 'y' => $y);
 #p $test_data;
 #-------------------------------------------------------------------
-#  wilcox_test: Extended and Edge Cases
-#-------------------------------------------------------------------
 # 'wilcox_test: Extended and Edge Cases'
 # 1. One-sample exact test
 # R equivalent: wilcox.test(c(1, 2, 3, 4, 5), mu = 0)
@@ -3186,7 +3172,6 @@ like($@, qr/'x' is a required argument/, 'wilcox_test: dies when x is missing');
 eval { wilcox_test('x' => [1..5], 'y' => [1..4], paired => 1) };
 like($@, qr/same length for paired test/, 'wilcox_test: dies on length mismatch for paired');
 
-#-------------------------------------------------------------------
 #  chisq_test: Goodness of Fit and Yates Continuity
 #-------------------------------------------------------------------
 # 'chisq_test: Goodness of Fit and Yates Continuity'
@@ -3207,9 +3192,9 @@ is_approx($chisq_2x2->{statistic}{'X-squared'}, 3.831933, 'chisq_test: 2x2 Yates
 is_approx($chisq_2x2->{parameter}{df}, 1, 'chisq_test: 2x2 df', 1e-14);
 is_approx($chisq_2x2->{'p.value'}, 0.05028492, 'chisq_test: 2x2 p-value', 1e-7);
 like($chisq_2x2->{method}, qr/Yates' continuity correction/, 'chisq_test: method includes Yates correction');
-#---------------------
+#-------------
 # power t-test
-#---------------------
+#-------------
 $test_data = power_t_test(#ptt <- power.t.test(n = 30, delta=0.5, sd = 1, sig.level=0.05)
 	n  => 30,	delta     => 0.5, 
 	sd => 1.0,	sig_level => 0.05
@@ -3254,9 +3239,9 @@ foreach my $alt ('two.sided', 'one.sided') {
 	} "power_t_test: n with alternative = \"$alt\" with no leaks" unless $INC{'Devel/Cover.pm'};
 	$idx++;
 }
-#-------------------------------------------------------------------
+#---------------------------------------
 #  lm & aov: Dot (.) Operator Expansion
-#-------------------------------------------------------------------
+#---------------------------------------
 #subtest 'lm & aov: Dot (.) operator formula expansion' => sub {
 my $dot_data = {
 	'y'  => [10, 15, 20, 25, 30],
@@ -3290,9 +3275,9 @@ my $sum_ss_dot      = $aov_dot->{x1}{'Sum Sq'}      + $aov_dot->{x2}{'Sum Sq'};
 
 is_approx($sum_ss_dot, $sum_ss_explicit, 'aov: total explained Sum Sq matches regardless of variable order');
 is_approx($aov_dot->{Residuals}{'Sum Sq'}, $aov_explicit->{Residuals}{'Sum Sq'}, 'aov: dot operator produces identical Residual Sum Sq');
-#-------------------------------------------------------------------
+#
 #  lm: Relative Tolerance / Collinearity (Bug Fix #3)
-#-------------------------------------------------------------------
+#
 # 'lm: Relative collinearity tolerance on unscaled data'
 # 1. Microscopic Variance Test
 my $micro_data = {
@@ -3521,9 +3506,9 @@ dies_ok {
 dies_ok {
 	var_test(\@xk, [1]);
 } 'var_test: dies with insufficient # of observations in y';
-#------------------
-#    sample
-#------------------
+#----------
+# sample
+#----------
 %h = (a => 1, b => 2, c => 3, d => 4);
 
 @arr = qw(apple banana cherry date elderberry);
@@ -3572,9 +3557,9 @@ foreach my $s (1..3) {
 		}
 	} "sample: array with $s samples doesn't have leaks" unless $INC{'Devel/Cover.pm'};
 }
-#-----------------
+#---------------
 #   oneway_test
-#-----------------
+#---------------
 # hash of array
 $test_data = oneway_test({
 	yield => [5.5, 5.4, 5.8, 4.5, 4.8, 4.2],

@@ -2,7 +2,7 @@
 use v5.36;
 use experimental qw( class signatures );
 
-class Protocol::OVSDB v0.99.0;
+class Protocol::OVSDB v0.99.1;
 
 =head1 NAME
 
@@ -41,6 +41,9 @@ database, because those tools ensure validity of the database. Those validations
 are I<not> in the server. Updates coming from this module won't be validated.
 
 =cut
+
+use builtin qw( weaken );
+no warnings qw( experimental::builtin );
 
 use JSON::PP;
 
@@ -102,14 +105,16 @@ method _handle_message($msg) {
             # monitor notification
             my ($monitor_id, $table_updates) = $msg->{params}->@*;
             my $monitor = $_monitors->{$monitor_id};
-            $monitor->notify($table_updates);
+            $monitor->notify($table_updates)
+                if $monitor;
         }
         elsif ($method eq 'locked'
                or $method eq 'stolen') {
             # lock notification
             my ($lock_id) = $msg->{params}->@*;
             my $lock = $_locks->{$lock_id};
-            $lock->notify( $method eq 'locked', $method );
+            $lock->notify( $method eq 'locked', $method )
+                if $lock;
         }
         else {
             $_on_notification->( $msg->{method}, $msg->{params} );
@@ -118,12 +123,14 @@ method _handle_message($msg) {
     elsif (defined $msg->{result}) {
         # result response
         my $cb = delete $_pending->{$id};
-        $cb->( $msg->{result}, undef );
+        $cb->( $msg->{result}, undef )
+            if $cb;
     }
     elsif (defined $msg->{error}) {
         # error response
         my $cb = delete $_pending->{$id};
-        $cb->( undef, $msg->{error} );
+        $cb->( undef, $msg->{error} )
+            if $cb;
     }
     else {
         # request
@@ -302,6 +309,7 @@ method monitor( $db, $monitor, $requests, $cb ) {
                 return;
             }
             $_monitors->{$monitor->id} = $monitor;
+            weaken $_monitors->{$monitor->id};
             $cb->( $monitor, undef );
             $monitor->notify( $table_updates );
             return;
@@ -335,6 +343,7 @@ method lock( $lock, $cb ) {
                 return;
             }
             $_locks->{$lock->id} = $lock;
+            weaken $_locks->{$lock->id};
             $cb->( $lock, undef );
             $lock->notify( $result->{locked}, 'lock' );
         });
@@ -362,6 +371,7 @@ method steal( $lock, $cb ) {
                 return;
             }
             $_locks->{$lock->id} = $lock;
+            weaken $_locks->{$lock->id};
             $cb->( $lock, undef );
             $lock->notify( $result->{locked}, 'stolen' );
         });

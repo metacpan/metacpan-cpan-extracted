@@ -1,5 +1,11 @@
 Revision history for RPi-Const
 
+1.05    2026-06-11
+        - Added :wpi_pin tag (WPI_PIN_BCM, WPI_PIN_WPI) for wiringPi's
+          WPIPinType setup variants
+        - Added :int_edge tag (INT_EDGE_SETUP/FALLING/RISING/BOTH), wiringPi's
+          native edge names, aliasing the :edge (EDGE_*) values
+
 1.04    2018-06-05
         - added constants for MCP23017 GPIO expander register locations
           (mcp23017_registers tag) for upcoming RPi::GPIOExpander::MCP23017

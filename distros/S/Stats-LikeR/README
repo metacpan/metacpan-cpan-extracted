@@ -1,5 +1,5 @@
 This archive contains the distribution Stats-LikeR,
-version 0.14:
+version 0.15:
 
   Get basic statistical functions, like in R, but with Perl using XS for performance
 

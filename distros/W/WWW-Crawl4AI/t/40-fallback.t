@@ -20,7 +20,15 @@ package Mock::Client {
 }
 
 my $thin    = { status_code => 200, markdown => 'too short' };
-my $blocked = { status_code => 403, markdown => 'Access Denied ' x 50 };
+# A real bot wall is structural, not a fat "Access Denied" body: a thin
+# Cloudflare interstitial (200) whose markup carries the __cf_chl token and whose
+# title is "Just a moment...". (A bare 403 would surface as http_403 instead.)
+my $blocked = {
+  status_code => 200,
+  markdown    => 'Just a moment...',
+  raw_html    => '<script>window.__cf_chl_opt={}</script>',
+  title       => 'Just a moment...',
+};
 my $good    = { status_code => 200, markdown => ( 'real useful content ' x 40 ), title => 'OK' };
 
 # Clear env so applicability is deterministic.

@@ -1,0 +1,10 @@
+# Build artifacts
+^backup.pm$
+^md2pod.pl$
+
+# Makemaker generated files
+^Makefile$
+^MYMETA\.
+
+# Release archives
+^SimpleFlow.*\.tar\.gz$
