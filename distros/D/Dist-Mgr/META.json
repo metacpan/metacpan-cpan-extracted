@@ -4,7 +4,7 @@
       "Steve Bertrand <steveb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -45,7 +45,7 @@
             "PPI" : "0",
             "Term::ReadKey" : "0",
             "Tie::File" : "0",
-            "perl" : "5.010",
+            "perl" : "5.014",
             "version" : "0"
          }
       }
@@ -61,6 +61,6 @@
          "web" : "https://github.com/stevieb9/dist-mgr"
       }
    },
-   "version" : "1.13",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.14",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

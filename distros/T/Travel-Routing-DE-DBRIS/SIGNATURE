@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.93.
+signed via the Module::Signature module, version 0.96.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -14,28 +14,29 @@ not run its Makefile.PL or Build.PL.
 -----BEGIN PGP SIGNED MESSAGE-----
 Hash: RIPEMD160
 
-SHA256 f12f16a5a37724cafa8518defce022a5fab4db16ebcd17cb381042bad905f87b Build.PL
-SHA256 a72c2482ac767cdcdbdd1314e6c34e3341e87ee8bfd358170adf8e706375f7ac Changelog
+SHA256 68d62cbba7664ba0f739ba0ac3410a553489057ad90264bd91ffc16053ea0e0d Build.PL
+SHA256 f7ecd6fd572edc58d8cdd9a434afa3c2a672f51d3829953d3de76dead06cf4ee Changelog
 SHA256 83c28e4ec908897703676c72f3c3dcd7f3b60731b0ef449c969b0c5295a95678 Dockerfile
-SHA256 f84eff326a1aa1914645205b91f4740be6b63c5c00dc54fb2fe7228566f0b91c MANIFEST
-SHA256 c6c8907d7ac51e4639828d529e3455c0ed4dca3c43adf01b18a8024070380901 META.json
-SHA256 1021869a76d35d7f7242a0286e9543184ae45b6fa2bf2f6856cadb8cb2f93702 META.yml
+SHA256 9cd6a8d6d628d258bed7e29e485fac2bd6e56e516b7a0732780626e10558dd56 MANIFEST
+SHA256 6fbb28c3627f49528c3bf8aa4f91071bd9e05bbb8c5478bbad62c5b0899da838 META.json
+SHA256 a4b5d54cae473254a6bb4b83fa2fb6d9dc76b85bac4d343aef182364c4456e2c META.yml
 SHA256 43e102fcb7ab4e280fee4d24b368fd4b3fb5c997f4aa6233a6db5a7c99f5a53c README.md
-SHA256 f91ce774ee9459863e7287dbfc875efef8bfbea124550b151e813803f8dbb09e bin/dbris
-SHA256 799570cf4cdb37877fbf81cbe8e17e9fa39279b73e83f4f60bc74f5e1211a77e lib/Travel/Routing/DE/DBRIS.pm
-SHA256 df2246c9a7a93f39f8c9533b70d4d77f1adb8db6c7287608e636d6c8090a1c8d lib/Travel/Routing/DE/DBRIS/Connection.pm
-SHA256 2e15901021dab7ab9df74a6b3868141628d04dee22c6b89da14d8ad9b0f10d64 lib/Travel/Routing/DE/DBRIS/Connection/Segment.pm
-SHA256 05f548c6fdaac55628c5be0a84c18356f2728bb07f67c45e59686912528ac78b lib/Travel/Routing/DE/DBRIS/Offer.pm
+SHA256 8255311cc735238cbf8e7bb01240cf22dce3cf0eb3c0f8967c55ef78b9621e66 bin/dbris
+SHA256 be104bb58e06e5c840fc4a21bcea4b329ce3e4bef7e79cc7af8c0332e90ab818 lib/Travel/Routing/DE/DBRIS.pm
+SHA256 a245c0c0b11366858dc5c8570b9de6c4a5f891cadd390ced836d376f2cbdc612 lib/Travel/Routing/DE/DBRIS/Connection.pm
+SHA256 71c6d16ddfae69bfd6b292dd18b11550c48a549a1339661300f75c93d9dc4c0d lib/Travel/Routing/DE/DBRIS/Connection/Segment.pm
+SHA256 5dab1201e5816e7d99c9baa8d7d51dd13d64b19d119b9bf769abf00a36753ddc lib/Travel/Routing/DE/DBRIS/Offer.pm
 SHA256 590be69919931c53809f40714f57c0a6fc2793f5709510752bf7dbe593394c6c scripts/makedeb-docker
-SHA256 ae5a4a2559fbcb9f3bccfe517de2a20c35cc123be4cbb8976f0b7c60ad5707e9 scripts/makedeb-docker-helper
+SHA256 4d09032ca1a253098e7042285a8b35de84c28107cc04bffc1e6fc0fe4a87d64a scripts/makedeb-docker-helper
+SHA256 1ac020cb6c4b636b1aee3d6f477d9dbc0248d162613cb9d1d0e458ef6f2dbadd scripts/publish-deb
 SHA256 da7ebca09808efd75c47933168722ee38ab07ee912bcf93652ea8b796d1d0f7a scripts/publish-docker
 SHA256 588a60b456403a9f2a901b11646918be3f2fe413d4b1b792dccd18a80bb264e9 xt/00-compile-pm.t
 SHA256 32c2f94b5292bcf6ef1994151a5d84b4581c5cf920418841c551d6f5489621cd xt/01-compile-pl.t
 SHA256 574e3508c4f991d21b61f06a070d71f04f4403b094f55423150cb5dbb18194a9 xt/10-pod-coverage.t
 -----BEGIN PGP SIGNATURE-----
 
-iHUEARYDAB0WIQRk/m7AVVYPnvE6MEQZ5uUk67F3ugUCafoUqgAKCRAZ5uUk67F3
-unqIAQD/3bxkZjAEmTRW/FcQScwenwBzYurUfylqEkKOmXiApwEA8mbYtHDKF+6c
-nRqSNKLIdoFjHhh05DMdCAmlnPWkfwQ=
-=Xc/M
+iHUEARYDAB0WIQRk/m7AVVYPnvE6MEQZ5uUk67F3ugUCaizm2QAKCRAZ5uUk67F3
+unTDAQD3qladLrl4gI+LB4OJdwYOthBF203ihJmo9b3jAuiVeAD/eTOafnnd5JNG
+V0jc3AYwQVbIT/F0PHUJLLPab5U1Kg4=
+=e+K5
 -----END PGP SIGNATURE-----

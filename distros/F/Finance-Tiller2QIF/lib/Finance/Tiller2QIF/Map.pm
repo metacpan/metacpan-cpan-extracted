@@ -1,6 +1,6 @@
 package Finance::Tiller2QIF::Map;
 # ABSTRACT: Apply mapping rules to categorize transactions
-$Finance::Tiller2QIF::Map::VERSION = '1.06';
+$Finance::Tiller2QIF::Map::VERSION = '1.08';
 =head1 DESCRIPTION
 
 Applies user-defined mapping rules to transactions in the SQLite database. Rules can filter by account, match transaction fields (category, payee, memo, date, amount), and set or suppress categories. Rules are evaluated in order; the first match wins.

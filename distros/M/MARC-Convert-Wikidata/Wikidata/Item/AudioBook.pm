@@ -10,7 +10,7 @@ use Wikibase::Datatype::Snak;
 use Wikibase::Datatype::Statement;
 use Wikibase::Datatype::Value::Item;
 
-our $VERSION = 0.33;
+our $VERSION = 0.34;
 
 sub wikidata {
 	my $self = shift;
@@ -24,7 +24,7 @@ sub wikidata {
 				'snak' => Wikibase::Datatype::Snak->new(
 					'datatype' => 'wikibase-item',
 					'datavalue' => Wikibase::Datatype::Value::Item->new(
-						'value' => 'Q3331189',
+						'value' => 'Q122731938',
 					),
 					'property' => 'P31',
 				),

@@ -8,7 +8,7 @@ use WiringPi::API qw(:perl :wiringPi);
 # snake_case wiringpi_version wrapper (scalar = string, list = major/minor pair).
 
 BEGIN {
-    if (! $ENV{PI_BOARD}){
+    if (! $ENV{RPI_BOARD}){
         plan skip_all => "not a Pi board";
         exit;
     }

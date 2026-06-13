@@ -1,0 +1,12 @@
+Filesystem     1K-blocks    Used Available Use% Mounted on
+udev             4083024       0   4083024   0% /dev
+tmpfs            1650368   14672   1635696   1% /run
+/dev/mmcblk0p2  60780940 9808504  48425032  17% /
+tmpfs            4125888     448   4125440   1% /dev/shm
+tmpfs               5120      48      5072   1% /run/lock
+tmpfs               1024       0      1024   0% /run/credentials/systemd-journald.service
+tmpfs            4125888  514656   3611232  13% /tmp
+/dev/mmcblk0p1    522230   80590    441640  16% /boot/firmware
+tmpfs             825168     272    824896   1% /run/user/1000
+tmpfs               1024       0      1024   0% /run/credentials/getty@tty1.service
+tmpfs               1024       0      1024   0% /run/credentials/serial-getty@ttyAMA10.service

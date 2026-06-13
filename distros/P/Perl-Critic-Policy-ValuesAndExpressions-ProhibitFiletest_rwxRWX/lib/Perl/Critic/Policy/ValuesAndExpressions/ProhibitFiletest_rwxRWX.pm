@@ -15,7 +15,7 @@ use Perl::Critic::Utils qw{ :severities :classification :ppi :booleans
 use PPI;
 use PPI::Document;
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 #-----------------------------------------------------------------------------
 
@@ -95,17 +95,16 @@ L<https://blogs.perl.org/users/tom_wyant/2022/06/the-file-access-operators-to-us
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-ValuesAndExpressions-ProhibitFiletest_rwxRWX>,
-L<https://github.com/trwyant/perl-Perl-Critic-Policy-ValuesAndExpressions-ProhibitFiletest_rwxRWX/issues>,
-or in electronic mail to the author.
+L<https://github.com/trwyant/perl-Perl-Critic-Policy-ValuesAndExpressions-ProhibitFiletest_rwxRWX/issues> or in
+electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III F<wyant at cpan dot org>.
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>.
 
 =head1 COPYRIGHT
 
-Copyright 2022 Thomas R. Wyant, III.
+Copyright 2022, 2026 Thomas R. Wyant, III.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

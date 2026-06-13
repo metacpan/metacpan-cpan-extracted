@@ -4,6 +4,12 @@ use warnings;
 
 use ExtUtils::MakeMaker;
 
+if ($^O ne 'linux') {
+    warn "OS unsupported: RPi::I2C requires the Linux I2C interface " .
+         "(/dev/i2c-*); it cannot be built on '$^O'.\n";
+    exit 0;
+}
+
 WriteMakefile(
     NAME             => 'RPi::I2C',
     AUTHOR           => q{Steve Bertrand <steveb@cpan.org>},

@@ -1,5 +1,8 @@
 Revision history for Monitoring-Sneck
 
+1.4.0   2026-06-13/00:00
+        - add missing depend on Proc::PID::File
+
 1.3.0   2026-02-02/12:45
 		- add -q to be quiet
 		- add -l for locking

@@ -14,6 +14,8 @@
 #include <pthread.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <errno.h>
+#include <string.h>
 
 #define PERL_NO_GET_CONTEXT
 
@@ -56,6 +58,15 @@ static unsigned long interrupts_dropped = 0;          /* events lost to a full p
  * atomic counter bump - it never enters the Perl interpreter. The caller's pin
  * arrives via userdata (keyed to the user's numbering scheme); wfiStatus.pinBCM
  * is always BCM and would mis-key callbacks under setup() (wiringPi numbering).
+ *
+ * interrupt_pipe[1] is read here without synchronization, and that is safe by
+ * lifecycle invariant, not by luck: the Perl side always stops the wiringPi ISR
+ * threads (wiringPiISRStop, which joins them) BEFORE _close_interrupt_pipe()
+ * touches the fds, so no instance of this function is in flight during a close.
+ * Do NOT "harden" this with an atomic load of the fd: an atomic read does not
+ * close the check->write() window (the fd could still be closed and reused
+ * between them), so it would imply a thread-safety this code does not need and
+ * does not have. The real guarantee is the stop-before-close ordering.
  */
 
 static void isr2_writer(struct WPIWfiStatus wfiStatus, void *userdata){
@@ -91,7 +102,14 @@ static int ensure_interrupt_pipe(void){
 
     for (i = 0; i < 2; i++){
         int flags = fcntl(interrupt_pipe[i], F_GETFL, 0);
-        fcntl(interrupt_pipe[i], F_SETFL, flags | O_NONBLOCK);
+        if (flags == -1
+            || fcntl(interrupt_pipe[i], F_SETFL, flags | O_NONBLOCK) == -1){
+            close(interrupt_pipe[0]);
+            close(interrupt_pipe[1]);
+            interrupt_pipe[0] = -1;
+            interrupt_pipe[1] = -1;
+            return -1;
+        }
     }
 
     return 0;
@@ -124,7 +142,10 @@ int interrupt_fd(void){
 /* Count of interrupt events dropped because the pipe was full (F24). */
 
 unsigned long interrupt_dropped(void){
-    return interrupts_dropped;
+    /* Atomic load: the ISR thread may be bumping this concurrently (line uses
+       __sync_fetch_and_add). __ATOMIC_RELAXED is sufficient - it is a standalone
+       counter with no ordering dependency on other state. */
+    return __atomic_load_n(&interrupts_dropped, __ATOMIC_RELAXED);
 }
 
 /* Close both ends of the self-pipe and reset interrupt state. The Perl side
@@ -140,16 +161,16 @@ void _close_interrupt_pipe(void){
         close(interrupt_pipe[1]);
         interrupt_pipe[1] = -1;
     }
-    interrupts_dropped = 0;
+    __atomic_store_n(&interrupts_dropped, 0, __ATOMIC_RELAXED);
 }
 
-int physPinToWpi(int wpi_pin){
+int physPinToWpi(int phys_pin){
     /* phys_wpi_map has 64 entries (physical header positions); -1 means
        "no such pin". Guard out-of-range input to avoid an OOB read. */
-    if (wpi_pin < 0 || wpi_pin >= (int)(sizeof(phys_wpi_map) / sizeof(phys_wpi_map[0]))){
+    if (phys_pin < 0 || phys_pin >= (int)(sizeof(phys_wpi_map) / sizeof(phys_wpi_map[0]))){
         return -1;
     }
-    return phys_wpi_map[wpi_pin];
+    return phys_wpi_map[phys_pin];
 }
 
 int bmp180Pressure(int pin){
@@ -222,17 +243,15 @@ analogWrite(pin, value)
     int pin
     int value
 
-char *
+void
 wiringPiVersion()
-    CODE:
+    PREINIT:
         int major;
         int minor;
-        char ver[16];
+    PPCODE:
         wiringPiVersion(&major, &minor);
-        snprintf(ver, sizeof(ver), "%d.%d", major, minor);
-        RETVAL = ver;
-    OUTPUT:
-        RETVAL
+        ST(0) = sv_2mortal(newSVpvf("%d.%d", major, minor));
+        XSRETURN(1);
 
 #
 # board
@@ -489,8 +508,8 @@ void
 _close_interrupt_pipe()
 
 int
-physPinToWpi(wpi_pin)
-    int wpi_pin
+physPinToWpi(phys_pin)
+    int phys_pin
 
 int
 ads1115Setup(pin_base, addr)

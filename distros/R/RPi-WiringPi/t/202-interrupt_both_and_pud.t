@@ -3,28 +3,28 @@ use warnings;
 
 use lib 't/';
 
-use RPiTest qw(check_pin_status);
+use RPiTest;
 use RPi::WiringPi;
 use RPi::Const qw(:all);
 use Test::More;
 
+rpi_running_test(__FILE__);
+
 my $mod = 'RPi::WiringPi';
 
-if (! $ENV{PI_BOARD}){
-    $ENV{NO_BOARD} = 1;
-    plan skip_all => "Not on a Pi board\n";
+# In-process interrupt callback counter (a file lexical, not an env var gate)
+
+my $interrupts = 0;
+
+sub handler {
+    $interrupts++;
 }
 
-BEGIN {
-    my $c;
-
-    sub handler {
-        $c++;
-        $ENV{PI_INTERRUPT} = $c;
-    }
-}
-
-my $pi = $mod->new;
+my $pi = $mod->new(
+    label => 't/202-interrupt_both_and_pud.t',
+    shared => 0,
+    shm_key => 'rpit'
+);
 
 # pin specific interrupts
 
@@ -36,7 +36,7 @@ if (! $ENV{NO_BOARD}){
     
     $pin->pull(PUD_DOWN);
 
-    $pin->set_interrupt(EDGE_BOTH, 'main::handler');
+    $pin->set_interrupt(EDGE_BOTH, \&handler);
 
     # trigger the interrupt
 
@@ -46,7 +46,8 @@ if (! $ENV{NO_BOARD}){
     $pin->pull(PUD_DOWN);
     select(undef, undef, undef, 0.02);
 
-    is $ENV{PI_INTERRUPT}, 2, "both interrupt up/down == 2 ok";
+    $pi->wait_interrupts(500);
+    is $interrupts, 2, "both interrupt up/down == 2 ok";
 
     # trigger the interrupt
 
@@ -55,7 +56,8 @@ if (! $ENV{NO_BOARD}){
     $pin->pull(PUD_DOWN);
     select(undef, undef, undef, 0.02);
 
-    is $ENV{PI_INTERRUPT}, 4, "both interrupt up/down x2 == 4 ok";
+    $pi->wait_interrupts(500);
+    is $interrupts, 4, "both interrupt up/down x2 == 4 ok";
 
     # trigger the interrupt
 
@@ -64,12 +66,13 @@ if (! $ENV{NO_BOARD}){
     $pin->pull(PUD_DOWN);
     select(undef, undef, undef, 0.02);
 
-    is $ENV{PI_INTERRUPT}, 6, "both interrupt up/down x3 == 6 ok";
-    
+    $pi->wait_interrupts(500);
+    is $interrupts, 6, "both interrupt up/down x3 == 6 ok";
+
 }
 
 $pi->cleanup;
 
-check_pin_status();
+rpi_check_pin_status();
 
 done_testing();

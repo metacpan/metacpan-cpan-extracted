@@ -2,7 +2,7 @@ package Mail::DMARC::Report::Aggregate;
 use strict;
 use warnings;
 
-our $VERSION = '1.20260306';
+our $VERSION = '1.20260612';
 
 use Carp;
 use Data::Dumper;
@@ -175,11 +175,14 @@ sub get_policy_evaluated_as_xml {
     my $reasons = $rec->{row}{policy_evaluated}{reason};
     if ( $reasons && scalar @$reasons ) {
         foreach my $reason ( @$reasons ) {
-            my $typeval    = XML::LibXML::Text->new( $reason->{type} )->toString();
-            my $commentval = XML::LibXML::Text->new( $reason->{comment} )->toString();
+            my $typeval = XML::LibXML::Text->new( $reason->{type} )->toString();
             $pe .= "\t\t\t\t<reason>\n";
             $pe .= "\t\t\t\t\t<type>$typeval</type>\n";
-            $pe .= "\t\t\t\t\t<comment>$commentval</comment>\n";
+            # comment is minOccurs=0 in the RFC 7489 schema; only emit when present
+            if ( defined $reason->{comment} && $reason->{comment} =~ /\S/ ) {
+                my $commentval = XML::LibXML::Text->new( $reason->{comment} )->toString();
+                $pe .= "\t\t\t\t\t<comment>$commentval</comment>\n";
+            }
             $pe .= "\t\t\t\t</reason>\n";
         }
     };
@@ -199,7 +202,7 @@ Mail::DMARC::Report::Aggregate - aggregate report object
 
 =head1 VERSION
 
-version 1.20260306
+version 1.20260612
 
 =head1 DESCRIPTION
 

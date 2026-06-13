@@ -1,0 +1,8 @@
+arm_64bit=1
+arm_boost=1
+arm_freq=2400
+arm_freq_min=1500
+arm_peri_high=1
+audio_pwm_mode=2
+auto_initramfs=1
+avs_temp=48821

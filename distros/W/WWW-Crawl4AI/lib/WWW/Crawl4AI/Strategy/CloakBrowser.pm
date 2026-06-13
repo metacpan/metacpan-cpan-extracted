@@ -76,7 +76,7 @@ WWW::Crawl4AI::Strategy::CloakBrowser - Crawl4AI strategy attaching to CloakBrow
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 

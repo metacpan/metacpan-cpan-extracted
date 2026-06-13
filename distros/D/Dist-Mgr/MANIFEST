@@ -1,4 +1,3 @@
-.DS_Store
 bin/distmgr
 bin/distmgr.pod
 Changes
@@ -11,7 +10,6 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
-t/.DS_Store
 t/00-load.t
 t/01-_config.t
 t/03-copyright.t
@@ -38,8 +36,6 @@ t/95-build_cycle.t
 t/96-release_cycle.t
 t/97-distmgr.t
 t/99-cleanup.t
-t/data/.DS_Store
-t/data/distmgr/.DS_Store
 t/data/distmgr/create_test-module/.github/workflows/github_ci_default.yml
 t/data/distmgr/create_test-module/.gitignore
 t/data/distmgr/create_test-module/Changes

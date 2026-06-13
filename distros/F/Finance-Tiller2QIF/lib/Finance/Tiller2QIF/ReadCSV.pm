@@ -1,6 +1,6 @@
 package Finance::Tiller2QIF::ReadCSV;
 # ABSTRACT: Read and parse Tiller CSV export files
-$Finance::Tiller2QIF::ReadCSV::VERSION = '1.06';
+$Finance::Tiller2QIF::ReadCSV::VERSION = '1.08';
 =head1 DESCRIPTION
 
 Ingests Tiller CSV exports into a SQLite database.

@@ -1,8 +1,33 @@
 Revision history for Web::Microformats2
 
+0.512 2026-06-12T18:29:11Z
+
+    - Parser no longer dies when resolving malformed or legacy URLs, such as
+      pre-RFC-5870 "geo:" URIs that URI::geo (bundled with URI 5.28+) rejects.
+      Unresolvable URLs now fall back to their raw string instead of aborting
+      the parse of the whole document. (GitHub issues #5 and #6.)
+
+    - Fixed a global-state leak: parsing no longer permanently registers HTML5
+      elements in HTML::TreeBuilder's package-global element table. The
+      override is now scoped to each parse() call, so Web::Microformats2 no
+      longer changes HTML::TreeBuilder's behavior for other code running in
+      the same process. (GitHub issue #11.)
+
+    - Now uses JSON::MaybeXS, which selects the best available JSON backend
+      (such as Cpanel::JSON::XS), rather than always using the pure-Perl JSON
+      module. The unused Readonly dependency has also been dropped. (GitHub
+      issues #9 and #10.)
+
+    - Switched continuous integration from Travis CI to GitHub Actions, and
+      added an AI-disclosure statement to the documentation.
+
+    - Several of the above improvements were suggested by Matt S. Trout (mst).
+      This version of Web::Microformats2 is dedicated to his memory.
+      Thanks for everything, Matt. 🍺
+
 0.511 2020-06-08T23:19:37Z
 
-    - Adding a dependency whose lack causes some tests to fail.
+    - Adding a dependency whose lack causes some tests to fail. Thanks to Mohammad S Anwar for the patch.
 
 0.510 2020-04-28T23:07:03Z
 

@@ -1,6 +1,6 @@
 package Finance::Tiller2QIF;
 # ABSTRACT: Convert Tiller CSV exports to QIF format
-$Finance::Tiller2QIF::VERSION = '1.06';
+$Finance::Tiller2QIF::VERSION = '1.08';
 use v5.34;
 use strict;
 use warnings;
@@ -201,7 +201,9 @@ during import.
 The C<run> command always checkpoints, even without this flag.
 
 =item B<--confirm> Run preview before emit (including on C<run>) and prompt for
-confirmation before writing the QIF file.
+confirmation before writing the QIF file. When used with C<--checkpoint>, adds
+a revert option (press C<r>) to restore the database to its checkpoint state,
+useful if you want to undo changes made during ingest or mapping.
 
 =item B<--verbose> Print detailed progress information during each phase.  Also
 runs C<checkconfig> automatically before any operations begin.
@@ -317,7 +319,9 @@ and after the map phase without having to break the workflow into separate comma
 This is the preferred way to preprocess or post-process transactions when using C<run>,
 or C<map> as a single step.
 
-The C<preview> command is meant to be run between map and emit. You may run the steps individually (ingest, map, preview, emit), or use the --confirm option to run preview before emit (including run).
+The C<preview> command is meant to be run between map and emit. You may run the steps individually (ingest, map, preview, emit), or use the C<--confirm> option to run preview before emit (including run).
+
+When using C<--confirm> with C<--checkpoint>, three choices Y=Yes N=No R=Revert are offered. No keeps the database state while not completing the export, Revert restores the database to the checkpoint in addition to aborting.
 
 While other CSV export sources are not directly supported, you can write a script to remap the fields for ingestion or just import into the table, and then use the map and emit stages to complete your export. If translating other CSV sources be aware that Tiller currently only provides it's data in the US 'MM/DD/YYYY' format, this program can also accept dates in ISO 8601 'YYYY-MM-DD'. Data is written into the SQLite database using the ISO 8601 format.
 
@@ -376,6 +380,7 @@ sub _checkpoint($file) {
   my $new = "$file." . localtime()->datetime();
   $new =~ s/[T:]/_/g;
   path($file)->copy($new);
+  return $new;
 }
 
 sub _clean_checkpoints($file) {
@@ -385,6 +390,30 @@ sub _clean_checkpoints($file) {
     say "Removed checkpoint: $cp";
   }
   return scalar @checkpoints;
+}
+
+sub _confirm ( %options ) {
+  # uncoverable branch true
+  # uncoverable branch false
+  if ( $options{confirm} ) {
+    my $count = _preview(%options);
+    say '-'x60;
+    say "${count} transaction(s) pending export.";
+    say '-'x60;
+    my $msg = "Complete export? Y/n: ";
+    if( $options{confirm} && $options{checkpoint}) {
+      $msg = "Y=Yes N=No R=No and Revert to last Checkpoint\nComplete export? Y/n/r: ";
+    }
+    say $msg;
+    my $response = <STDIN>;
+    return 1 if $response =~ /^y/i; # user confirmed
+    if ( $response =~ /^r/i ) {
+      # copy checkpoint over db
+      path($options{checkpointfile})->copy($options{db_path});
+    }
+    return 0; # didn't confirm
+  }
+  return 1; # confirmation not requested return true as if confirmed.
 }
 
 # ---------------------------------------------------------------------------
@@ -507,6 +536,7 @@ sub run_cli {
     my $val = $opt->$key();
     $options{$key} = $val if defined $val;
   }
+  $options{checkpoint} = 1 if $cmd eq 'run';
 
   $options{db_path} = delete $options{db} if defined $options{db};
 
@@ -541,7 +571,7 @@ sub run_cli {
   }
 
   if ( $options{checkpoint} || $cmd eq 'run' ) {
-    _checkpoint( $options{db_path} );
+    $options{checkpointfile} = _checkpoint( $options{db_path} );
   }
 
   if ( $cmd =~ /^(?:ingest|run)$/ ) {
@@ -563,16 +593,9 @@ sub run_cli {
   }
 
   if ( $cmd =~ /^(?:emit|run)$/ ) {
-    if ( $options{confirm} ) {
-      my $count = _preview(%options);
-      say "${count} transaction(s) pending export.";
-      say '?'x60;
-      print "Complete export? Y/n: ";
-      my $response = <STDIN>;
-      # uncoverable branch true
-      # uncoverable branch false
-      return unless $response =~ /^y/i;
-    }
+    # uncoverable branch true
+    # uncoverable branch false
+    return unless _confirm ( %options );
     vPrint( $options{verbose}, "Writing QIF: " . $options{output} );
     my $changed = _emit(%options);
     say "QIF written: ${\ $options{output}}, ${changed} records emitted!";

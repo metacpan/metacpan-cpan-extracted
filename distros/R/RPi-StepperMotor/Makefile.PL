@@ -33,8 +33,8 @@ WriteMakefile(
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'RPi::Const'    => 0,
-        'WiringPi::API' => 2.3614,
+        'RPi::Const'    => 1.05,
+        'WiringPi::API' => 3.1803,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'RPi-StepperMotor-*' },

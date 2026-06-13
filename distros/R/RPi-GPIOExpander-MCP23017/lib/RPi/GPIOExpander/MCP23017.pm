@@ -6,7 +6,7 @@ use warnings;
 use Carp qw(croak);
 use RPi::Const qw(:all);
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 require XSLoader;
 XSLoader::load('RPi::GPIOExpander::MCP23017', $VERSION);

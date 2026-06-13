@@ -1,0 +1,4 @@
+arm_freq=1200
+core_freq=400
+gpu_mem=76
+hdmi_force_hotplug=0

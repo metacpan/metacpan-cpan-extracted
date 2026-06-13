@@ -1,5 +1,8 @@
 Revision history for RPi-SPI
 
+3.1801    2026-06-12
+        - Fix undefined subs in bit-bang CS path against WiringPi::API 3.18
+
 2.3609  2018-10-03
         - fix documentation that claimed the return from rw() was an array
           reference, where really it's an array (closes #6)

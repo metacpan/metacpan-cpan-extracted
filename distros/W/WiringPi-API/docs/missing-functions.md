@@ -1,6 +1,6 @@
 # Missing WiringPi Function Wrappers
 
-Generated: 2026-06-02
+Generated: 2026-06-10
 
 This lists every function declared in the WiringPi library headers that does
 **not** have a corresponding wrapper in this distribution's `API.xs`.
@@ -16,15 +16,17 @@ This lists every function declared in the WiringPi library headers that does
 ## Summary
 
 - Functions found in headers: **183**
-- Already wrapped: **62**
-- Missing wrappers: **121** (across 37 headers)
+- Already wrapped: **92**
+- Missing wrappers: **91** (across 35 headers)
 
-Three functions are wrapped under different XS names and are therefore **not**
+One function is wrapped under a different XS name and is therefore **not**
 listed as missing:
 
-- `wiringPiISR` → wrapped by `setInterrupt`
-- `piThreadCreate` → wrapped by `initThread`
 - `wiringPiSPIDataRW` → wrapped by `spiDataRW`
+
+`wiringPiISR` and `piThreadCreate` have **no** wrapper — the XS names once
+claimed to wrap them never existed, and the interrupt path uses `wiringPiISR2`
+(which *is* wrapped) instead. Both are listed as missing below.
 
 ---
 
@@ -185,52 +187,19 @@ listed as missing:
 - `softServoSetup`
 - `softServoWrite`
 
-## wiringPi/softTone.h
-
-- `softToneCreate`
-- `softToneStop`
-- `softToneWrite`
-
 ## wiringPi/wiringPi.h
 
-- `delay`
-- `delayMicroseconds`
-- `getPinModeAlt`
-- `gpioClockSet`
-- `micros`
-- `millis`
-- `piBoard40Pin`
-- `piBoardId`
 - `piBoardRev`
 - `piGpioLayoutOops`
-- `piHiPri`
-- `piMicros64`
-- `piRP1Model`
-- `pwmToneWrite`
-- `setPadDrive`
-- `setPadDrivePin`
+- `piThreadCreate`
 - `waitForInterrupt2`
 - `waitForInterruptClose`
 - `wiringPiFailure`
 - `wiringPiFindNode`
-- `wiringPiGlobalMemoryAccess`
-- `wiringPiGpioDeviceGetFd`
-- `wiringPiISR2`
-- `wiringPiISRStop`
+- `wiringPiISR`
 - `wiringPiNewNode`
-- `wiringPiSetupGpioDevice`
 - `wiringPiSetupPiFace`
 - `wiringPiSetupPiFaceForGpioProg`
-- `wiringPiSetupPinType`
-- `wiringPiUserLevelAccess`
-- `wiringPiVersion`
-
-## wiringPi/wiringPiI2C.h
-
-- `wiringPiI2CRawRead`
-- `wiringPiI2CRawWrite`
-- `wiringPiI2CReadBlockData`
-- `wiringPiI2CWriteBlockData`
 
 ## wiringPi/wiringPiLegacy.h
 
@@ -238,9 +207,6 @@ listed as missing:
 
 ## wiringPi/wiringPiSPI.h
 
-- `wiringPiSPIClose`
-- `wiringPiSPIGetFd`
-- `wiringPiSPISetupMode`
 - `wiringPiSPIxClose`
 - `wiringPiSPIxDataRW`
 - `wiringPiSPIxGetFd`

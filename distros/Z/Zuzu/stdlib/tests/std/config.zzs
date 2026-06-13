@@ -29,6 +29,12 @@ is( cfg.source(), "inline", "Config.from_data stores source metadata" );
 is( cfg.format(), "json", "Config.from_data stores format metadata" );
 is( cfg.layers().length(), 0, "Config.from_data starts with no file layers" );
 
+let cloned := cfg.clone();
+is( cloned.source(), "inline", "clone preserves source metadata" );
+is( cloned.format(), "json", "clone preserves format metadata" );
+is( cloned.layers().length(), 0, "clone preserves layer metadata" );
+is( cloned @ "/app/name", "zuzu", "clone preserves raw data" );
+
 is( cfg.get( "/app/name", "x" ), "zuzu", "get returns first matching value" );
 is( cfg @ "/database/host", "db.example.test", "@ reads through Config object" );
 ok( cfg @? "/database/pool", "@? reports existing path on Config object" );

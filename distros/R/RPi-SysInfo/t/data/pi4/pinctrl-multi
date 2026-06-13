@@ -1,0 +1,4 @@
+ 2: ip    pu | hi // GPIO2 = input
+ 4: ip    pu | hi // GPIO4 = input
+ 6: ip    pd | lo // GPIO6 = input
+ 8: ip    pu | hi // GPIO8 = input

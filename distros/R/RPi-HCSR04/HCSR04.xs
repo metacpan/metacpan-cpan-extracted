@@ -20,9 +20,11 @@ int _setup(int trig, int echo){
             exit(1);
     }
     else {
-        char mode_env_var[20];
-        sprintf(mode_env_var, "RPI_PIN_MODE=%d", setup_mode);
-        putenv(mode_env_var);
+        /* setenv() copies its args; putenv() with a stack buffer left
+           environ pointing at a dead frame once _setup() returned */
+        char mode_value[12];
+        sprintf(mode_value, "%d", setup_mode);
+        setenv("RPI_PIN_MODE", mode_value, 1);
     }
 
     pinMode(trig, OUTPUT);

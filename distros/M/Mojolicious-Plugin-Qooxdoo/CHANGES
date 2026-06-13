@@ -1,3 +1,17 @@
+1.1.0 2026-06-11 00:00:00 +0100 Fritz Zaucker <fritz.zaucker@oetiker.ch>
+
+ - support JSON-RPC 2.0 in addition to the legacy qooxdoo protocol; the
+   dispatcher auto-detects the envelope (a 'jsonrpc' member selects 2.0).
+   The 2.0 path drops the 'service' concept, is POST-only, returns
+   {jsonrpc,id,result|error}, uses an integer error code, carries the
+   non-standard 'origin' inside error.data, and accepts named (object)
+   params as a single hashref. Legacy qx1 behaviour is unchanged.
+ - realign $VERSION across Qooxdoo.pm and JsonRpcController.pm
+
+1.0.15 2024-09-04 23:36:54 +0100 Fritz Zaucker <fritz.zaucker@oetiker.ch>
+
+ - add warning about log level debug
+
 1.0.14 2023-02-28 11:39:54 +0100 Tobias Oetiker <tobi@oetiker.ch>
 
  - do not send raw errors to client only log them

@@ -12,9 +12,32 @@
 #include <termios.h>
 #include <sys/ioctl.h>
 
+#define POLY 0x8408
+
+unsigned short crc16(char *data_p, unsigned short length){
+      unsigned char i;
+      unsigned int data;
+      unsigned int crc = 0xffff;
+
+      if (length == 0)
+            return (~crc);
+      do {
+            for (i=0, data=(unsigned int)0xff & *data_p++; i < 8; i++, data >>= 1){
+                  if ((crc & 0x0001) ^ (data & 0x0001))
+                        crc = (crc >> 1) ^ POLY;
+                  else  crc >>= 1;
+            }
+      } while (--length);
+
+      crc = ~crc;
+      data = crc;
+      crc = (crc << 8) | (data >> 8 & 0xff);
+
+      return crc;
+}
+
 void tty_close (int fd){
-  printf("%d\n", fd);
-  close (fd) ;
+  close (fd);
 }
 
 int tty_available (int fd){
@@ -45,24 +68,6 @@ int tty_getc (int fd){
     return -1;
 
   return ((int)x) & 0xFF;
-}
-
-char* tty_gets(int fd, char* buf, int nbytes){
-    int bytes_read = 0;
-
-    while (bytes_read < nbytes){
-        int result = read(fd, buf + bytes_read, nbytes - bytes_read);
-
-        if (0 >= result){
-            if (0 > result){
-                exit(-1);
-            }
-            break;
-        }
-        bytes_read += result;
-    }
-
-    return buf;
 }
 
 int tty_open(const char *serialport, int baud){
@@ -135,28 +140,63 @@ tty_available (fd)
 int
 tty_putc (fd, b)
 	int	fd
-	char	b
+	char b
 
 int
 tty_puts (fd, str)
 	int	fd
-	const char *	str
+	const char *str
 
 int
 tty_getc (fd)
 	int	fd
 
-char *
-tty_gets (fd, buf, nbytes)
+void
+tty_gets (fd, nbytes)
 	int	fd
-	char *	buf
 	int	nbytes
+    PREINIT:
+        char *buf;
+        int got = 0;
+        int flags;
+        int result;
+    PPCODE:
+        if (nbytes < 0)
+            croak("tty_gets: nbytes must be a non-negative integer");
+        /* tty_open() opens with O_NDELAY (non-blocking), which defeats the
+           port's VMIN/VTIME read timeout. Clear it so a read blocks up to
+           that timeout instead of returning EAGAIN immediately. */
+        flags = fcntl(fd, F_GETFL, 0);
+        if (flags != -1 && (flags & O_NONBLOCK))
+            fcntl(fd, F_SETFL, flags & ~O_NONBLOCK);
+        Newx(buf, nbytes > 0 ? nbytes : 1, char);
+        while (got < nbytes) {
+            result = read(fd, buf + got, nbytes - got);
+            if (result > 0) {
+                got += result;
+                continue;
+            }
+            if (result == 0)
+                break;                  /* VTIME timeout or EOF */
+            if (errno == EINTR)
+                continue;               /* interrupted by a signal; retry */
+            Safefree(buf);
+            croak("tty_gets: read error: %s", strerror(errno));
+        }
+        ST(0) = sv_2mortal(newSVpvn(buf, got));
+        Safefree(buf);
+        XSRETURN(1);
 
 int
 tty_open (serialport, baud)
-	const char *	serialport
+	const char *serialport
 	int	baud
 
 void
 tty_close (fd)
     int fd
+
+unsigned short
+crc16(data_p, length)
+    char *data_p
+    unsigned short length

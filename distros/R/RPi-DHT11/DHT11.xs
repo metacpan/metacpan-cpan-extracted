@@ -184,9 +184,11 @@ bool setup(){
                 exit(1);
         }
         else {
-            char modeEnvVar[20];
-            sprintf(modeEnvVar, "RPI_PIN_MODE=%d", setupMode);
-            putenv(modeEnvVar);
+            /* setenv() copies its args; putenv() with a stack buffer left
+               environ pointing at a dead frame once setup() returned */
+            char modeValue[12];
+            sprintf(modeValue, "%d", setupMode);
+            setenv("RPI_PIN_MODE", modeValue, 1);
         }
     }
     return true;

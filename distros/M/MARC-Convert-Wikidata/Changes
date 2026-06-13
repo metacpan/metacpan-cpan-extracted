@@ -1,3 +1,10 @@
+0.34 2026-06-12T16:16:30+02:00
+ - Add use case for series_ordinal.
+ - Change instance of audiobook to Q122731938 (hierarchy of edition).
+ - NDK Kramerius to Czech Digital Library.
+ - Process author name without qid.
+ - Rewrite roman number in series ordinal to arabic.
+
 0.33 2026-04-11T14:26:15+02:00
  - Add error if field 008 isn't present.
  - Add example (cnb000144384).

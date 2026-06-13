@@ -9,7 +9,7 @@ use File::Touch;
 use DateTime;
 use RPi::WiringPi;
 
-my $oled_lock = '/tmp/oled_in_use';
+my $oled_lock = '/dev/shm/oled_in_use';
 touch $oled_lock;
 
 $SIG{INT} = sub { unlink $oled_lock or die $!; };
@@ -18,7 +18,12 @@ $SIG{INT} = sub { unlink $oled_lock or die $!; };
 
 $SIG{TERM} = sub { print "$0: Terminated\n"; unlink $oled_lock or die $!; };
 
-my $pi = RPi::WiringPi->new;
+my $pi = RPi::WiringPi->new(
+    label => 'oled display date/time',
+    rpi_register => 0,
+    shm_key => 'rpit'
+);
+
 my $oled = RPi::WiringPi->oled('128x64', 0x3C, 0);
 my $bmp = $pi->bmp(400);
 
@@ -26,7 +31,7 @@ $oled->text_size(2);
 
 while (1){
 
-    if (-e '/tmp/oled_unavailable.rpi-wiringpi'){
+    if (-e '/dev/shm/oled_unavailable.rpi-wiringpi'){
         sleep 30;
         next;
     }

@@ -2,10 +2,14 @@ package Zuzu::Module::URL;
 
 use utf8;
 
-our $VERSION = '0.003000';
+our $VERSION = '0.004000';
 
+use Scalar::Util qw( blessed );
 use URI ();
 use URI::Escape qw( uri_escape_utf8 uri_unescape );
+use URI::Template ();
+
+use Zuzu::Error;
 
 use Zuzu::Util::NativeHelpers qw(
 	native_function
@@ -29,29 +33,65 @@ sub _hash_from {
 	return $perl;
 }
 
-sub _template_var {
-	my ( $data, $name ) = @_;
+# RFC 6570 expression grammar: optional operator, then a comma list of
+# varspecs (varname with optional :N prefix or * explode modifier).
+my $TEMPLATE_VARCHAR = qr/(?:[A-Za-z0-9_]|%[0-9A-Fa-f]{2})/;
+my $TEMPLATE_VARSPEC =
+	qr/$TEMPLATE_VARCHAR(?:\.?$TEMPLATE_VARCHAR)*(?::[1-9][0-9]{0,3}|\*)?/;
 
-	return '' if not exists $data->{$name};
-	return '' if not defined $data->{$name};
-	return uri_escape_utf8( _str( $data->{$name}, '' ) );
+sub _die_template {
+	my ( $source ) = @_;
+
+	die Zuzu::Error->new_runtime(
+		message => "invalid URL template: $source",
+		file => '<std/net/url>',
+		line => 0,
+	);
 }
 
-sub _template_query {
-	my ( $data, $names ) = @_;
+sub _validate_template {
+	my ( $source, $data ) = @_;
 
-	my @parts;
-	for my $name ( split /\s*,\s*/, $names ) {
-		next if $name eq '';
-		next if not exists $data->{$name};
-		next if not defined $data->{$name};
-		my $key = uri_escape_utf8($name);
-		my $val = uri_escape_utf8( _str( $data->{$name}, '' ) );
-		push @parts, "$key=$val";
+	my $rest = $source;
+	while ( length $rest ) {
+		my $open = index( $rest, '{' );
+		my $close = index( $rest, '}' );
+		last if $open < 0 and $close < 0;
+		_die_template( $source ) if $open < 0;
+		_die_template( $source ) if $close < 0 or $close < $open;
+		my $expression = substr( $rest, $open + 1, $close - $open - 1 );
+		_die_template( $source )
+			if $expression !~ /\A[+#.\/;?&]?$TEMPLATE_VARSPEC(?:,$TEMPLATE_VARSPEC)*\z/;
+		# The :N prefix modifier only applies to string values; using it
+		# with a list or associative value is an expansion failure.
+		( my $specs = $expression ) =~ s/\A[+#.\/;?&]//;
+		for my $spec ( split /,/, $specs ) {
+			if ( $spec =~ /\A(.*):[1-9][0-9]{0,3}\z/ ) {
+				_die_template( $source ) if ref $data->{$1};
+			}
+		}
+		$rest = substr( $rest, $close + 1 );
 	}
+}
 
-	return '' if scalar @parts == 0;
-	return '?' . join '&', @parts;
+sub _template_value {
+	my ( $value ) = @_;
+
+	return undef if not defined $value;
+	if ( blessed($value) and $value->isa('Zuzu::Value::Boolean') ) {
+		return $value->value ? 'true' : 'false';
+	}
+	if ( ref($value) eq 'ARRAY' ) {
+		# RFC 6570: a zero-member list is undefined.
+		return undef if not @{$value};
+		return [ map { _str( $_, '' ) } @{$value} ];
+	}
+	if ( ref($value) eq 'HASH' ) {
+		# RFC 6570: a zero-member associative array is undefined.
+		return undef if not keys %{$value};
+		return { map { $_ => _str( $value->{$_}, '' ) } keys %{$value} };
+	}
+	return _str( $value, '' );
 }
 
 sub _parse_url {
@@ -78,13 +118,16 @@ sub _parse_url {
 sub _fill_template {
 	my ( $template, $values ) = @_;
 
-	my $out = _str( $template, '' );
-	my $data = _hash_from( $values );
+	my $source = _str( $template, '' );
+	my $raw = _hash_from( $values );
+	my %data;
+	for my $key ( keys %{$raw} ) {
+		my $converted = _template_value( $raw->{$key} );
+		$data{$key} = $converted if defined $converted;
+	}
+	_validate_template( $source, \%data );
 
-	$out =~ s/\{\?([^}]+)\}/_template_query( $data, $1 )/ge;
-	$out =~ s/\{([a-zA-Z_][a-zA-Z0-9_]*)\}/_template_var( $data, $1 )/ge;
-
-	return $out;
+	return URI::Template->new( $source )->process_to_string( %data );
 }
 
 sub IMPORT {

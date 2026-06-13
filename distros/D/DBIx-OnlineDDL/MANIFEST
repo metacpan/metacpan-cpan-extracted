@@ -38,4 +38,5 @@ t/lib/CDTest/Schema/Result/Track.pm
 t/lib/CDTest/Schema/Result/Year2000CD.pm
 t/lib/Test/OnlineDDL.pm
 t/lib/sqlite.sql
+t/long_table_names.t
 t/standard.t

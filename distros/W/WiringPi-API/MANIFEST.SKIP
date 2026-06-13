@@ -1,5 +1,6 @@
 examples/a.out$
 ^plans/
+^proposal/
 _Inline
 .bs$
 .c$

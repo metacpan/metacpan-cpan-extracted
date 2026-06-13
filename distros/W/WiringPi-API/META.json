@@ -48,6 +48,6 @@
          "web" : "https://github.com/stevieb9/wiringpi-api"
       }
    },
-   "version" : "3.1802",
+   "version" : "3.1803",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

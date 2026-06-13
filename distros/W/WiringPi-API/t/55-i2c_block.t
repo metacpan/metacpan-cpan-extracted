@@ -12,7 +12,7 @@ use WiringPi::API qw(:wiringPi :perl);
 # never used because validation fails first.
 
 BEGIN {
-    if (! $ENV{PI_BOARD}){
+    if (! $ENV{RPI_BOARD}){
         plan skip_all => "not a Pi board";
         exit;
     }

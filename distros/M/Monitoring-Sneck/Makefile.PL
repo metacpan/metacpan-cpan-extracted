@@ -25,6 +25,7 @@ my %WriteMakefileArgs = (
 		'MIME::Base64'       => '0',
 		'IO::Compress::Gzip' => '0',
 		'Pod::Usage'         => '0',
+		'Proc::PID::File'    => '0',
 	},
 	dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
 	clean      => { FILES    => 'Monitoring-Sneck-*' },

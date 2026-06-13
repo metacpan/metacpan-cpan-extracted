@@ -3,7 +3,7 @@ package WiringPi::API::BackgroundInterrupt;
 use strict;
 use warnings;
 
-use POSIX qw(WNOHANG);
+use POSIX qw(WNOHANG ECHILD);
 
 # Handle returned by background_interrupt(). Owns one forked child that arms the
 # interrupt and runs the callback on each edge; stop() reaps it.
@@ -32,8 +32,13 @@ sub read {
     my $nfound = select(my $rout = $rin, undef, undef, 0);
     return undef if ! $nfound || $nfound < 0;
 
-    # One length-framed record is present and was written atomically by the
-    # single child, so reading it through won't block.
+    # One length-framed record is present. The single child writes each record
+    # with one syswrite, so while the payload stays under PIPE_BUF (4096B, incl.
+    # the 4-byte length frame) the write is atomic and the whole record is
+    # buffered once the pipe is readable - _read_exact won't block. NOTE (B4): a
+    # larger return value can be split across writes, and _read_exact would then
+    # block waiting for the tail. Keep returned values under ~4KB for the
+    # non-blocking guarantee (a non-blocking partial-buffer drain is a TODO).
     my $len_buf = _read_exact($fh, 4);
     return undef if ! defined $len_buf;
 
@@ -44,9 +49,13 @@ sub running {
 
     return 0 if ! $self->{running};
 
-    # reap-if-exited so running() reflects reality without blocking
+    # Reap-if-exited so running() reflects reality without blocking. The child is
+    # gone on a positive reap, or on -1/ECHILD (already reaped / no such child).
+    # Any OTHER errno from waitpid - notably EINTR, where the call was interrupted
+    # by a signal and says nothing about the child - is left alone, so a stray
+    # signal can't latch a still-running handle as stopped (and leak the child).
     my $reaped = waitpid($self->{pid}, WNOHANG);
-    if ($reaped == $self->{pid} || $reaped == -1) {
+    if ($reaped == $self->{pid} || ($reaped == -1 && $! == ECHILD)) {
         $self->{running} = 0;
         return 0;
     }

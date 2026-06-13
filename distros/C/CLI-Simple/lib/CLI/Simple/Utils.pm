@@ -11,9 +11,68 @@ use List::Util qw(none);
 
 use parent qw(Exporter);
 
-our @EXPORT_OK = qw( slurp slurp_json dump_json normalize_options dmp choose);
+our @EXPORT_OK = qw(
+  choose
+  dmp
+  dump_json
+  normalize_options
+  slurp
+  slurp_json
+  toPascalCase
+  toCamelCase
+  to_snake_case
+);
 
-our $VERSION = '2.0.2';
+our $VERSION = '2.0.3';
+
+sub toPascalCase { goto &_toCamelCase; }
+sub ToCamelCase  { goto &_toCamelCase; }
+sub toCamelCase  { return _toCamelCase( $_[0], $_[1], 1 ); }
+########################################################################
+sub _toCamelCase {
+########################################################################
+  my ( $snake_case, $want_hash, $lc_first ) = @_;
+
+  $snake_case = ref $snake_case ? $snake_case : [$snake_case];
+
+  $want_hash //= wantarray ? 0 : 1;
+
+  my @CamelCase = map {
+    ( $want_hash ? $_ : (), join q{}, map {ucfirst} split /[_-]/xsm )
+  } @{$snake_case};
+
+  return $want_hash ? {@CamelCase} : @CamelCase
+    if !$lc_first;
+
+  return map {lcfirst} @CamelCase
+    if !$want_hash;
+
+  my %camelCase = @CamelCase;
+
+  %camelCase = map { $_ => lcfirst $camelCase{$_} } keys %camelCase;
+
+  return \%camelCase;
+}
+
+########################################################################
+sub to_snake_case {
+########################################################################
+  my ($str) = @_;
+
+  return q{}
+    if !defined $str;
+
+  # 1. Handle acronym boundaries (e.g., HTMLParser -> HTML_Parser)
+  #    We look for a sequence of UpperCase followed by (UpperCase + LowerCase)
+  $str =~ s/([[:upper:]]+)([[:upper:]][[:lower:]])/$1_$2/xsmg;
+
+  # 2. Handle normal Camel/Pascal boundaries (e.g., UserID -> User_ID)
+  #    We look for (LowerCase/Digit) followed by (UpperCase)
+  $str =~ s/([[:lower:]\d])([[:upper:]])/$1_$2/xsmg;
+
+  # 3. Lowercase everything
+  return lc $str;
+}
 
 ########################################################################
 sub choose(&) { ## no critic

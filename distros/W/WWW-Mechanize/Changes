@@ -1,5 +1,10 @@
 Revision history for WWW::Mechanize
 
+2.21      2026-06-13 07:53:14Z
+    [FIXED]
+    - Link extraction no longer drops links which follow an unclosed <a> tag
+      (GH#212) (Olaf Alders)
+
 2.20      2025-10-22 19:04:44Z
     [ENHANCEMENTS]
     - WWW::Mechanize no longer taints the responses it receives.  This also

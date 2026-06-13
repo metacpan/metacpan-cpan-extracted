@@ -126,21 +126,6 @@ function _normalize_schema_type ( raw_type ) {
 	if ( raw_type ≡ null ) {
 		return "Boolean";
 	}
-	if ( raw_type instanceof Function ) {
-		let function_name := null;
-		try {
-			function_name := raw_type.name;
-		}
-		catch {
-		}
-		if (
-			function_name ≡ "Boolean" or
-			function_name ≡ "Number" or
-			function_name ≡ "String"
-		) {
-			return function_name;
-		}
-	}
 	if ( raw_type ≡ Boolean ) {
 		return "Boolean";
 	}
@@ -148,6 +133,9 @@ function _normalize_schema_type ( raw_type ) {
 		return "Number";
 	}
 	if ( raw_type ≡ String ) {
+		return "String";
+	}
+	if ( raw_type instanceof Function ) {
 		return "String";
 	}
 	let type_name := "" _ raw_type;

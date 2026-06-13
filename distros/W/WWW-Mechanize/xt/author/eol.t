@@ -45,6 +45,7 @@ my @files = (
     't/find_link.t',
     't/find_link_id.html',
     't/find_link_id.t',
+    't/find_link_unclosed.t',
     't/find_link_xhtml.html',
     't/find_link_xhtml.t',
     't/form-parsing.t',

@@ -2,7 +2,7 @@ package Zuzu::Module::Task;
 
 use utf8;
 
-our $VERSION = '0.003000';
+our $VERSION = '0.004000';
 
 use Coro qw( cede );
 use Time::HiRes qw( time );

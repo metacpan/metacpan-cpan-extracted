@@ -32,8 +32,8 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'RPi::Const'    => 1.04,
-        'WiringPi::API' => 2.3616,
+        'RPi::Const'    => 1.05,
+        'WiringPi::API' => 3.1803,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'RPi-LCD-*' },

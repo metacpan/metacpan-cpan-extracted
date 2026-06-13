@@ -1,0 +1,95 @@
+=encoding utf8
+
+=head1 NAME
+
+std/string/encode - Character-encoding conversions between Strings and BinaryStrings.
+
+=head1 SYNOPSIS
+
+  from std/string/encode import *;
+
+  let bytes := encode( "héllo", ENCODING_UTF16 );
+  let text := decode( bytes, "UTF-16" );
+
+=head1 IMPLEMENTATION SUPPORT
+
+This module is supported by all implementations of ZuzuScript.
+
+=head1 DESCRIPTION
+
+This module converts between text (C<String>) and encoded bytes
+(C<BinaryString>).
+
+All implementations support UTF-8, UTF-16, UTF-32, and ISO-8859-1
+(Latin-1). Implementations are encouraged to support additional
+encodings where the host platform makes that practical; programs that
+need to run on every implementation should restrict themselves to the
+four required encodings.
+
+Encoding names are matched case-insensitively, so C<"utf-8"> and
+C<"UTF-8"> are equivalent.
+
+For UTF-16 and UTF-32, C<encode> produces the canonical form: big-endian
+with no byte order mark. This is deterministic and identical across
+implementations. C<decode> honours a leading byte order mark (consuming
+it and switching to little-endian where it says so) and otherwise
+assumes big-endian input.
+
+Invalid input raises an exception: unknown encoding names, bytes that do
+not form valid text in the requested encoding, and characters that the
+target encoding cannot represent (for example, encoding C<"😀"> as
+ISO-8859-1) all throw.
+
+=head1 EXPORTS
+
+=head2 Functions
+
+=over
+
+=item * C<encode(String text, String encoding)>
+
+Parameters: C<text> is the text to encode; C<encoding> names the target
+encoding and defaults to C<"UTF-8">. Returns: C<BinaryString>. Encodes
+C<text> as bytes. Throws a TypeException if C<text> is not a C<String>,
+and an exception if the encoding is unknown or cannot represent a
+character in C<text>.
+
+=item * C<decode(BinaryString bytes, String encoding)>
+
+Parameters: C<bytes> is the encoded input; C<encoding> names the source
+encoding and defaults to C<"UTF-8">. Returns: C<String>. Decodes
+C<bytes> into text. Throws a TypeException if C<bytes> is not a
+C<BinaryString>, and an exception if the encoding is unknown or the
+bytes are not valid for it.
+
+=back
+
+=head2 Constants
+
+=over
+
+=item C<ENCODING_UTF8>
+
+Type: C<String>. The value C<"UTF-8">.
+
+=item C<ENCODING_UTF16>
+
+Type: C<String>. The value C<"UTF-16">.
+
+=item C<ENCODING_UTF32>
+
+Type: C<String>. The value C<"UTF-32">.
+
+=item C<ENCODING_LATIN>
+
+Type: C<String>. The value C<"ISO-8859-1">.
+
+=back
+
+=head1 COPYRIGHT AND LICENCE
+
+B<< std/string/encode >> is copyright Toby Inkster.
+
+It is free software; you may redistribute it and/or modify it under
+the terms of either the Artistic License 1.0 or the GNU General Public
+License version 2.

@@ -30,10 +30,7 @@ sub arm {
         croak "arm(): pin must be one registered at background_interrupts() time";
     }
 
-    return 0 if ! $self->{running};
-
-    syswrite $self->{control_fh}, "arm $pin\n";
-    return 1;
+    return $self->_send("arm $pin\n");
 }
 sub disarm {
     my ($self, $pin) = @_;
@@ -42,10 +39,7 @@ sub disarm {
         croak "disarm(): pin must be one registered at background_interrupts() time";
     }
 
-    return 0 if ! $self->{running};
-
-    syswrite $self->{control_fh}, "disarm $pin\n";
-    return 1;
+    return $self->_send("disarm $pin\n");
 }
 sub fh {
     croak "background_interrupts() has no results channel; use a per-pin " .
@@ -66,6 +60,21 @@ sub stop {
     }
 
     return $self->SUPER::stop;
+}
+
+sub _send {
+    my ($self, $cmd) = @_;
+
+    # running() (not the raw field) so a just-dead child is reaped and refused
+    # here; one that dies between this check and the write surfaces as a failed
+    # syswrite below - with SIGPIPE ignored - rather than killing this process.
+    return 0 if ! $self->running;
+
+    local $SIG{PIPE} = 'IGNORE';
+    my $wrote = syswrite $self->{control_fh}, $cmd;
+
+    return 0 if ! defined $wrote || $wrote != length $cmd;
+    return 1;
 }
 
 1;
@@ -116,13 +125,17 @@ rather than silently return C<undef>.
 
 Resume servicing C<$pin>, which must be one of the pins registered in the
 original C<background_interrupts()> call. Croaks otherwise. Returns C<0> if the
-child is no longer running, C<1> once the arm command is sent.
+child is no longer running or the command could not be delivered (e.g. the
+child died mid-call - this never raises C<SIGPIPE>), C<1> once the arm command
+is sent.
 
 =head2 disarm($pin)
 
 Stop servicing C<$pin> (without killing the child), which must be one of the
 pins registered in the original call. Croaks otherwise. Returns C<0> if the
-child is no longer running, C<1> once the disarm command is sent.
+child is no longer running or the command could not be delivered (e.g. the
+child died mid-call - this never raises C<SIGPIPE>), C<1> once the disarm
+command is sent.
 
 =head2 stop
 

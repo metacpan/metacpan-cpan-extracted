@@ -1,0 +1,3 @@
+device_tree=-
+overlay_prefix=overlays/
+hdmi_cvt:0=

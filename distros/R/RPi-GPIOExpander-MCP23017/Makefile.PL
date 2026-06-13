@@ -2,9 +2,16 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 
-if (! -f '/usr/include/linux/i2c.h' && ! -f '/usr/local/include/linux/i2c.h'){
-    print "i2c is not available, exiting...\n";
-    exit;
+# RPI_DIST_RELEASE allows cutting release tarballs on non-Pi machines by
+# bypassing the i2c presence check below. Without it, missing i2c exits
+# before WriteMakefile so CPAN testers report NA, not FAIL
+
+if (! $ENV{RPI_DIST_RELEASE}){
+    if (! -f '/usr/include/linux/i2c.h' && ! -f '/usr/local/include/linux/i2c.h'){
+        print "i2c is not available and RPI_DIST_RELEASE is not set, " .
+              "exiting...\n";
+        exit;
+    }
 }
 
 WriteMakefile(
@@ -37,7 +44,7 @@ WriteMakefile(
         'Test::More' => '0',
     },
     PREREQ_PM => {
-        'RPi::Const'    => 1.04,
+        'RPi::Const'    => 1.05,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'RPi-GPIOExpander-MCP23017-*' },

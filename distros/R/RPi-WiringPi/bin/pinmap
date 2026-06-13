@@ -17,7 +17,7 @@ for (1..40){
     my $wpi = $wpi_map->{$_};
     my $gpio = $gpio_map->{$_};
 
-    next if $wpi == -1;
+    next if ! defined $wpi || $wpi == -1;
     print "$_\t$wpi\t$gpio\n"
 }
 
@@ -27,6 +27,6 @@ print "PHYS:  WPI:   GPIO:\n";
 for (41..63){
     my $wpi = $wpi_map->{$_};
     my $gpio = $gpio_map->{$_};
-    next if $wpi == -1;
+    next if ! defined $wpi || $wpi == -1;
     print "$_\t$wpi\t$gpio\n"
 }

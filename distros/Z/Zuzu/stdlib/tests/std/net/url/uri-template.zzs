@@ -1,0 +1,63 @@
+from test/more import *;
+requires_capability( "fs" );
+
+from std/data/json import *;
+from std/io import Path;
+from std/net/url import fill_template;
+
+// Runs the official RFC 6570 test suite
+// (https://github.com/uri-templates/uritemplate-test, vendored in
+// test-fixtures/uritemplate-test) against fill_template. Expected
+// results are a string (exact match), an array (any listed expansion
+// is acceptable), or false (the template is invalid and expansion
+// must throw).
+
+const FIXTURES := __file__.parent.parent.parent.parent.parent
+	.child( "test-fixtures/uritemplate-test" );
+
+const FILES := [
+	"spec-examples.json",
+	"spec-examples-by-section.json",
+	"extended-tests.json",
+	"negative-tests.json",
+];
+
+let codec := new JSON();
+
+for ( const file in FILES ) {
+	let suites := codec.decode( FIXTURES.child(file).slurp_utf8() );
+	for ( const suite_name in suites ) {
+		let suite := suites{(suite_name)};
+		let variables := suite{variables};
+		for ( const testcase in suite{testcases} ) {
+			let template := testcase[0];
+			let expected := testcase[1];
+			let label := file _ ": " _ suite_name _ ": " _ template;
+
+			if ( expected instanceof Array ) {
+				let result := fill_template( template, variables );
+				ok(
+					expected.contains(result),
+					label _ " expands to an acceptable form",
+				) or diag( "got: " _ result );
+			}
+			else if ( expected instanceof String ) {
+				is(
+					fill_template( template, variables ),
+					expected,
+					label,
+				);
+			}
+			else {
+				ok(
+					exception( function () {
+						fill_template( template, variables );
+					} ) != null,
+					label _ " is rejected",
+				);
+			}
+		}
+	}
+}
+
+done_testing();

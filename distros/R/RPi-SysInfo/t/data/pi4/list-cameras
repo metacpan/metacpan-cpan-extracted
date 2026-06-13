@@ -1,0 +1,3 @@
+Available cameras
+-----------------
+0 : imx708 [4608x2592 10-bit RGGB] (/base/soc/i2c0mux/i2c@1/imx708@1a)

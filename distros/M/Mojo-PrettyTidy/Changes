@@ -1,0 +1,47 @@
+Revision history for Mojo-PrettyTidy
+
+0.01  2026-03-07
+      - Unreleased initial development
+      - Added conservative normalization
+      - Added narrow indentation pass for obvious HTML-only lines
+      - Added plain text indentation inside safe HTML structure
+      - Preserved lines containing Embedded Perl markers
+      - Added conservative handling for single-line and multiline HTML comments
+      - Added protected handling for script and style blocks
+      - Added conservative handling for multiline inline style="..." attributes
+      - Added CLI with --write, --check, --stdin, --diff, and --version
+      - Added --backup and --backup-ext support for safer in-place writes
+      - Added pure-Perl diff support with minimal unified-style output
+      - Added sample-driven, diff, indentation, and CLI tests
+      - Added --output support for writing tidied content to a separate file
+      - add JSON config file support via --config
+      - auto-detect .mojo-prettytidy.json from the current working directory
+      - allow config defaults for prefix/outdir and formatter width settings
+      - ensure CLI options override config values
+      - extend CLI test helper to support child cwd
+
+Then I re-thought it and many moving parts got changed out.
+
+0.01  2026-06-09
+Unreleased
+  - Resurrected Mojo::PrettyTidy as an active formatter project.
+  - Added bin/mojo-prettytidy formatter CLI.
+  - Added development bootstrap helper.
+  - Added Kate External Tool helper.
+  - Added smoke tests using installed Mojolicious templates.
+
+0.01  2026-06-12
+Unreleased
+  - create dzil-experiment branch
+
+  0.01  2026-06-12
+  - First CPAN release.
+  - Added mojo-prettytidy command-line formatter.
+  - Added conservative formatting for Mojolicious .html.ep templates.
+  - Added optional JavaScript beautification safeguards.
+  - Added Kate External Tool helper.
+
+
+
+  0.02  2026-06-12
+  CPAN/POD NAME entry, so MetaCPAN has something to see.

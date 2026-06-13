@@ -222,7 +222,7 @@ like($@, qr/unknown signal/, 'auto_dispatch_interrupts() rejects an unknown sign
 }
 
 # ---------------------------------------------------------------------------
-# Real hardware (opt-in via PI_BOARD). Uses BCM17 driven by toggling its
+# Real hardware (opt-in via RPI_BOARD). Uses BCM17 driven by toggling its
 # internal pull resistor - electrically safe (a weak pull can't damage a wired
 # device and can't override an external driver) and produces real edges on a
 # floating pin. Each setup mode runs in its own forked child so wiringPi's
@@ -230,8 +230,8 @@ like($@, qr/unknown signal/, 'auto_dispatch_interrupts() rejects an unknown sign
 # ---------------------------------------------------------------------------
 
 SKIP: {
-    skip "set PI_BOARD=1 (and wire nothing to BCM17) to run the GPIO interrupt tests", 7
-        unless $ENV{PI_BOARD};
+    skip "set RPI_BOARD=1 (and wire nothing to BCM17) to run the GPIO interrupt tests", 7
+        unless $ENV{RPI_BOARD};
 
     # setup_gpio() / BCM numbering: arm BCM17, re-arm, drive 5 pull cycles,
     # then tear down.

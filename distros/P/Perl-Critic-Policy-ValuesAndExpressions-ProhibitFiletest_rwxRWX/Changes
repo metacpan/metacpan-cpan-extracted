@@ -1,3 +1,19 @@
+0.003		2026-06-12	T. R. Wyant
+    Remove references to the RT bug tracking system.
+
+    Replace wyant@cpan.org with harryfmudd@comcast.net.
+
+    Repackage licenses so that GitHub can find them (maybe).
+    Thanks to Mikko Koivunalho (specifically his blog post
+    https://blogs.perl.org/users/mikko_koivunalho/2025/11/github-and-the-perl-license.html
+    for the how-to.
+
+    Add SECURITY policy.
+
+    Fix copy-and-paste errors in examples/file-access-tests.
+
+    No other functional changes.
+
 0.002		2022-06-30	T. R. Wyant
     Fix issue #1: Wrong abstract.  That's what I get for starting a new
     policy by copying an old one. Many thanks to Robert Rothenberg for

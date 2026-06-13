@@ -161,10 +161,6 @@
 - [DEVELOPER FUNCTIONS](#developer-functions)
   - [pseudoPinsSetup(int pinBase)](#pseudopinssetupint-pinbase)
   - [pinModeAlt(int pin, int mode)](#pinmodealtint-pin-int-mode)
-  - [digitalWriteByte(const int value)](#digitalwritebyteconst-int-value)
-  - [digitalWriteByte2(const int value)](#digitalwritebyte2const-int-value)
-  - [digitalReadByte()](#digitalreadbyte)
-  - [digitalReadByte2()](#digitalreadbyte2)
 - [AUTHOR](#author)
 - [COPYRIGHT AND LICENSE](#copyright-and-license)
 
@@ -803,7 +799,9 @@ Parameters:
 
     $range
 
-Mandatory: An integer between `0` and `1023`.
+Mandatory: An unsigned integer specifying the PWM range register. The duty
+cycle then spans `0` to one less than this value (the default `1024` gives
+`0-1023`).
 
 ## pwm\_set\_clock($divisor)
 
@@ -1305,7 +1303,7 @@ Mandatory: Row position. `0` is the top row.
 
 ## lcd\_char\_def($fd, $index, $data)
 
-Maps to `void lcdCharDef(int fd, unsigned char data [8])`. This function is
+Maps to `void lcdCharDef(int fd, unsigned char data [8])`.
 
 This allows you to re-define one of the 8 user-definable characters in the
 display.
@@ -1329,7 +1327,7 @@ unsigned char byte. These bytes represent the character from the top-line to
 the bottom line. 
 
 Note that the characters are actually 5 x 8, so only the lower 5 bits are of
-each element are used (ie. \`0b11111\` or 0b00011111\`). The index is from 0 to 7
+each element are used (ie. `0b11111` or `0b00011111`). The index is from 0 to 7
 and you can subsequently print the character defined using the lcdPutchar()
 call using the same index sent in to this function.
 
@@ -1806,12 +1804,22 @@ must be a hash reference. The options are:
     over an inherited pipe. Drain it with `$w->read` (non-blocking) or select on
     `$w->fh` - identical to `background_interrupt`'s results channel.
 
+    **Size limit:** the drain stays non-blocking only while each record fits one
+    atomic pipe write - keep returned values under `PIPE_BUF` (4096 bytes, which
+    includes a 4-byte length frame). A larger value can be split across writes, and
+    `$w->read` will then block until the remainder of that record arrives.
+
 - `shared => 1`
 
     Publish the body's return value as a **lossy latest value**: the parent reads the
     most recent value with `$w->value`. The child never blocks on a slow or
     absent reader (a full pipe simply drops the update), so this suits a sampler
     whose intermediate readings don't matter.
+
+    Values larger than `PIPE_BUF` (4096 bytes, including a 4-byte length frame) are
+    **dropped** on this channel: a non-blocking write of an oversized frame could be
+    truncated and desync the reader, so the writer skips it. This fits the lossy
+    contract - if you need every large value intact, use `results` instead.
 
 - `mechanism => 'fork' | 'thread'`
 
@@ -1847,12 +1855,15 @@ must be a hash reference. The options are:
 - `$w->read` / `$w->fh`
 
     Drain the next streamed value / get the readable filehandle, when the worker was
-    started with `results => 1` (otherwise `undef`).
+    started with `results => 1` (otherwise `undef`). On a **thread** worker these
+    croak instead - thread mode has no pipe channels (use shared memory with
+    [pi_lock($key)](#pi_lockkey) / [pi_unlock($key)](#pi_unlockkey)).
 
 - `$w->value`
 
     The latest published value, when the worker was started with `shared => 1`
-    (otherwise `undef`).
+    (otherwise `undef`). On a **thread** worker this croaks for the same reason as
+    `$w->read`.
 
 ## Periodic sampler handing data back to main
 
@@ -2512,7 +2523,9 @@ NOTE: To get the raw sensor pressure, call the C function
 These functions are under testing, or don't potentially have a use to the end
 user. They may be risky to use, so use at your own risk.
 
-The functions in this section do not have a Perl wrapper equivalent.
+Most are called directly by their C name. Where a snake_case Perl wrapper does
+exist (e.g. `pin_mode_alt()` for `pinModeAlt`), that wrapper is the
+recommended interface.
 
 ## pseudoPinsSetup(int pinBase)
 
@@ -2545,33 +2558,6 @@ Mandatory: Signed integer, any valid GPIO pin number.
     mode
 
 Mandatory: Signed integer, any valid wiringPi pin mode.
-
-## digitalWriteByte(const int value)
-
-Writes an 8-bit byte to the first eight GPIO pins.
-
-Parameters:
-
-    value
-
-Mandatory: Unsigned int, the byte value you want to send in.
-
-Return: void
-
-## digitalWriteByte2(const int value)
-
-Same as ["digitalWriteByte(const int value)"](#digitalwritebyte-const-int-value), but writes to the second group
-of eight GPIO pins.
-
-## digitalReadByte()
-
-Reads an 8-bit byte from the first eight GPIO pins on the Pi.
-
-Takes no parameters, returns the byte value as an unsigned int.
-
-## digitalReadByte2()
-
-Same as ["digitalReadByte()"](#digitalreadbyte), but reads from the second group of eight GPIO pins.
 
 # AUTHOR
 

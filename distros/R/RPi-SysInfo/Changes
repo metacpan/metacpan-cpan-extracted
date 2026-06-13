@@ -1,5 +1,46 @@
 Revision history for RPi-SysInfo
 
+1.02    2026-06-12
+        - Added pi_model(), returning the normalized board name from the
+          devicetree model, with a /proc/cpuinfo Revision-code decode fallback
+          (handles both old-style and new-style revision codes, Pi 1 through 5)
+        - pi_details() now reports camera status via libcamera
+          (rpicam-hello/libcamera-hello) when the legacy vcgencmd get_camera
+          command is unavailable (Bookworm and the Pi 5, where it was removed),
+          and now includes a decoded SoC/RAM/RP1 board summary
+        - core_temp() now falls back to the kernel thermal zone
+          (/sys/class/thermal/thermal_zone0/temp) when vcgencmd is unavailable
+        - network_info() now falls back to `ip addr` when ifconfig (net-tools)
+          is not installed, as on current Raspberry Pi OS Lite
+        - Routed all external command and file access through _run()/_slurp()
+          seams so the module can be validated against Pi 3/4/5 fixtures with no
+          such board present
+        - Added private helpers _board_summary(), _camera_info(), _camera_tool(),
+          _core_temp_c(), _cpuinfo_field(), _decode_revision(), _first_tool(),
+          _mem_human(), _net_tool(), _run() and _slurp()
+        - Added t/50-helpers.t (exhaustive helper/edge-case coverage) and
+          t/55-board-fixtures.t (Pi 3/4/5 fixture replay), with t/data fixtures
+          and t/capture-fixtures.sh to capture ground truth from real boards
+        - The test suite board gate is now RPI_BOARD (ecosystem-wide rename
+          from PI_BOARD); the old name is no longer honored
+
+1.01
+        - gpio_info() now collects data with pinctrl, falling back to the legacy
+          raspi-gpio. Fixes the method on current Raspberry Pi OS (raspi-gpio was
+          removed) and on the Pi 5/RP1 (where raspi-gpio never existed), both of
+          which previously returned an empty string
+        - raspi_config() now reads the active config.txt from
+          /boot/firmware/config.txt (Bookworm and later), falling back to
+          /boot/config.txt; previously it read only the old path, which is now a
+          "moved" stub, so user directives were missing from the output
+        - Added private helpers _gpio_tool() and _config_file()
+        - Rewrote t/20-gpio_info.t for the pinctrl output, and made
+          t/25-raspi_config.t, t/35-file_system.t and t/40-pi_details.t
+          board/OS-agnostic (root device, swap, SoC name) with expanded coverage
+        - Check fopen()/fscanf() return values in the cpuPercent() XS, silencing
+          a -Wunused-result build warning and guarding against an unreadable
+          /proc/stat
+
 1.00    2019-06-21
         - modify object shifting to include all RPi modules
         - added chomp() calls to certain method return values

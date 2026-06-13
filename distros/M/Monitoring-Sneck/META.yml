@@ -24,9 +24,10 @@ requires:
   JSON: '0'
   MIME::Base64: '0'
   Pod::Usage: '0'
+  Proc::PID::File: '0'
   Sys::Hostname: '0'
   perl: '5.006'
 resources:
   repository: https://github.com/VVelox/Monitoring-Sneck.git
-version: v1.3.0
+version: v1.4.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

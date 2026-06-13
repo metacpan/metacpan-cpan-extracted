@@ -1,5 +1,9 @@
 Changes
+crc16.h
+examples/base_rx_crc_arduino/rx.pl
+examples/base_rx_crc_arduino/rx_example.ino
 examples/ser.pl
+examples/tx.pl
 lib/RPi/Serial.pm
 Makefile.PL
 MANIFEST			This list of files

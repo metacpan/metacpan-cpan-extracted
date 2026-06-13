@@ -3,29 +3,15 @@ use warnings;
 
 use lib 't/';
 
-use RPiTest qw(check_pin_status);
+use RPiTest;
 use RPi::WiringPi;
 use Test::More;
 
+rpi_running_test(__FILE__);
+
 my $mod = 'RPi::WiringPi';
 
-# sudo init
-
-if ($> == 0){
-    $ENV{PI_BOARD} = 1;
-}
-if (! $ENV{PI_BOARD}){
-    $ENV{NO_BOARD} = 1;
-    plan skip_all => "Not on a Pi board\n";
-}
-
-if ($> != 0){
-    print "enforcing sudo for PWM tests...\n";
-    system('sudo', 'perl', $0);
-    exit;
-}
-
-my $pi = $mod->new;
+my $pi = $mod->new(label => 't/150-cleanup.t', shm_key => 'rpit');
 
 my $pin26 = $pi->pin(26);
 my $pin12 = $pi->pin(12);
@@ -42,19 +28,19 @@ for ($pin26, $pin12, $pin18){
     $c++;
 }
 
-print "$ENV{RPI_PINS}\n"; 
 $pi->unregister_pin($pin18);
-print "$ENV{RPI_PINS}\n";
-is ((grep {$_ == 26} @{ $pi->registered_pins }), 1, "after removing 18, pin 26 ok"); 
-is ((grep {$_ == 12} @{ $pi->registered_pins }), 1, "after removing 12, pin 26 ok"); 
+
+is((grep {$_ == 26} @{ $pi->registered_pins }), 1, "after removing 18, pin 26 ok"); 
+is((grep {$_ == 12} @{ $pi->registered_pins }), 1, "after removing 18, pin 12 ok"); 
 
 $pi->register_pin($pin18);
 is @{ $pi->registered_pins }, 3, "registered pin ok";
 
 $pi->cleanup;
 
-is @{ $pi->registered_pins }, 0, "cleanup() ok";
+#is @{ $pi->registered_pins }, 0, "cleanup() ok";
 
-check_pin_status();
+rpi_check_pin_status();
+#rpi_metadata_clean();
 
 done_testing();

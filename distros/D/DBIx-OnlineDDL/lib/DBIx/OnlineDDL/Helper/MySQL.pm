@@ -3,7 +3,7 @@ package DBIx::OnlineDDL::Helper::MySQL;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Private OnlineDDL helper for MySQL-specific code
 use version;
-our $VERSION = 'v1.1.1'; # VERSION
+our $VERSION = 'v1.1.2'; # VERSION
 
 use v5.10;
 use Moo;
@@ -272,6 +272,66 @@ sub get_trigger_data {
     });
 }
 
+sub add_triggers_back_to_table {
+    my ($self, $table_name) = @_;
+    my $dbh = $self->dbh;
+
+    my $triggers = $self->vars->{existing_triggers} // return;
+
+    my $table_name_quote = $dbh->quote_identifier($table_name);
+
+    # The action_statement stores SQL text with escaping rules from the original session
+    # context (eg backslash escaping in string literals depends on sql_mode).  We need to
+    # save/restore these MySQL-specific session variables around each trigger re-creation.
+    my @trigger_context_vars = qw< character_set_client collation_connection sql_mode >;
+
+    my @stmts;
+    foreach my $trigger_name (
+        sort {
+            ( $triggers->{$a}{action_timing}      cmp $triggers->{$b}{action_timing}      ) ||
+            ( $triggers->{$a}{event_manipulation} cmp $triggers->{$b}{event_manipulation} ) ||
+            (($triggers->{$a}{action_order} // 0) <=> ($triggers->{$b}{action_order} // 0)) ||
+            ($a cmp $b)
+        }
+        keys %$triggers
+    ) {
+        my $trigger = $triggers->{$trigger_name};
+        my @active_vars = grep { defined $trigger->{$_} } @trigger_context_vars;
+
+        # Save then set the trigger's original session context
+        push @stmts, map { "SET \@_oddl_$_ = \@\@SESSION.$_"               } @active_vars;
+        push @stmts, map { "SET SESSION $_ = ".$dbh->quote($trigger->{$_}) } @active_vars;
+
+        my $trigger_name_quote = $dbh->quote_identifier($trigger_name);
+        push @stmts, "DROP TRIGGER IF EXISTS $trigger_name_quote";
+
+        my $sql = 'CREATE ';
+        if ($trigger->{definer}) {
+            my $definer_quote =
+                join '@',
+                map { $dbh->quote_identifier($_) }
+                split(/\@/, $trigger->{definer}, 2)
+            ;
+            $sql .= "DEFINER = $definer_quote ";
+        }
+        $sql .= "TRIGGER $trigger_name_quote ";
+        $sql .= join(' ',
+            $trigger->{action_timing},
+            $trigger->{event_manipulation},
+            'ON', $table_name_quote,
+            'FOR EACH', $trigger->{action_orientation},
+        );
+        $sql .= "\n".$trigger->{action_statement};
+
+        push @stmts, $sql;
+
+        # Restore session context (reverse order)
+        push @stmts, map { "SET SESSION $_ = \@_oddl_$_" } reverse @active_vars;
+    }
+
+    return @stmts;
+}
+
 ### NOTE: The typical SQL in DBD::mysql is badly optimized for MySQL 5 and very large sets
 ### of databases/table/column combos.  Furthermore, the kludgy join to TABLE_CONSTRAINTS
 ### is entirely unnecessary.  See also: https://github.com/perl5-dbi/DBD-mysql/issues/326
@@ -478,7 +538,7 @@ DBIx::OnlineDDL::Helper::MySQL - Private OnlineDDL helper for MySQL-specific cod
 
 =head1 VERSION
 
-version v1.1.1
+version v1.1.2
 
 =head1 DESCRIPTION
 
@@ -495,7 +555,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2025 by Grant Street Group.
+This software is Copyright (c) 2018 - 2026 by Grant Street Group.
 
 This is free software, licensed under:
 

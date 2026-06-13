@@ -36,7 +36,7 @@ WWW::Crawl4AI::Strategy::Browser - Crawl4AI strategy with full JS rendering (wai
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 

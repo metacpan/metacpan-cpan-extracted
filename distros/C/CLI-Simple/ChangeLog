@@ -1,3 +1,16 @@
+Tue Jun  9 14:44:42 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[2.0.3]:
+	* release-notes.mod: updated
+	* release-notes/release-notes-2.0.3.md: new
+	* VERSION: bump
+	* README.md: updated
+	* lib/CLI/Simple/Utils.pm.in
+	(toPascalCase): new
+	(ToCamelCase): new
+	(toCamelCase): new
+	(to_snake_case): new
+
 Tue May 19 14:51:05 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.0.2]:

@@ -4,7 +4,7 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '0.003000';
+our $VERSION = '0.004000';
 
 use Zuzu::Lexer;
 use Zuzu::Parser;
@@ -20,6 +20,8 @@ my %BINARY_OP = map { $_ => 1 } qw(
 	instanceof does can
 	default
 	& | ^
+	<< >> « »
+	∣ ∤ divides
 	@ @? @@
 	▷ ◁ |> <|
 	:= ~= += -= *= /= ×= ÷= **= _= ?:=

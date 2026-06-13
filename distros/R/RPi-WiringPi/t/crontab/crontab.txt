@@ -1,0 +1,19 @@
+SHELL=/bin/bash
+PATH=/home/pi/perl5/perlbrew/perls/perl-5.30.0/bin:/home/pi/perl5/perlbrew/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+
+source $HOME/.profile
+
+# RPi::WiringPi scripts (this line is required!)
+
+@reboot sleep 5; perl /home/pi/repos/rpi-wiringpi/script/oled_display_date_time_temp.pl > /dev/null 2> /tmp/cron_oled.log
+
+@reboot sleep 5; perl /home/pi/repos/rpi-wiringpi/script/serial_arduino_display/serial_arduino_display.pl > /dev/null 2> /tmp/cron_serial.log
+
+#@reboot sleep 15; perl /home/pi/repos/rpi-wiringpi/script/hc12_security_monitor/hc12_security_monitor.pl > /dev/null 2> /tmp/cron_hc12_security_monitor.log
+
+# BrewBuild RPi Testing
+
+@reboot sleep 15; bbtester start -a -c > /dev/null 2> /tmp/cron_bbtester.log
+
+@reboot sleep 20; cd /home/pi/brewbuild; bbdispatch -t localhost -r stevieb9/rpi-wiringpi -a -R -c "brewbuild -o 5.30.0" > /dev/null 2> /tmp/cron_bbdispatch.log
+

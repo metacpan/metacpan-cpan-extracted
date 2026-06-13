@@ -4,60 +4,24 @@ use MooX::HandlesVia;
 use Types::Standard qw(HashRef ArrayRef Str Maybe InstanceOf);
 use Carp;
 
-has 'properties' => (
-    is => 'ro',
-    isa => HashRef,
-    handles_via => 'Hash',
-    default => sub { {} },
-    handles => {
-        has_properties => 'count',
-        has_property   => 'get',
-    },
-);
-
-has 'p_properties' => (
-    is => 'ro',
-    isa => HashRef,
-    handles_via => 'Hash',
-    default => sub { {} },
-    handles => {
-        has_p_properties => 'count',
-        has_p_property   => 'get',
-    },
-);
-
-has 'u_properties' => (
-    is => 'ro',
-    isa => HashRef,
-    handles_via => 'Hash',
-    default => sub { {} },
-    handles => {
-        has_u_properties => 'count',
-        has_u_property   => 'get',
-    },
-);
-
-has 'e_properties' => (
-    is => 'ro',
-    isa => HashRef,
-    handles_via => 'Hash',
-    default => sub { {} },
-    handles => {
-        has_e_properties => 'count',
-        has_e_property   => 'get',
-    },
-);
-
-has 'dt_properties' => (
-    is => 'ro',
-    isa => HashRef,
-    handles_via => 'Hash',
-    default => sub { {} },
-    handles => {
-        has_dt_properties => 'count',
-        has_dt_property   => 'get',
-    },
-);
+# The MF2 property stores: one catch-all ('properties') plus one per typed
+# prefix (p-, u-, e-, dt-). They are identical in shape, so declare them in a
+# loop. Each gets has_<name>_properties (count) and has_<name>_property (get)
+# accessors; the catch-all uses the bare has_properties / has_property names.
+for my $prefix ( '', qw( p u e dt ) ) {
+    my $attr = $prefix ? "${prefix}_properties" : 'properties';
+    my $stem = $prefix ? "${prefix}_propert"    : 'propert';
+    has $attr => (
+        is => 'ro',
+        isa => HashRef,
+        handles_via => 'Hash',
+        default => sub { {} },
+        handles => {
+            "has_${stem}ies" => 'count',
+            "has_${stem}y"   => 'get',
+        },
+    );
+}
 has 'parent' => (
     is => 'ro',
     isa => Maybe[InstanceOf['Web::Microformats2::Item']],
@@ -173,6 +137,11 @@ sub all_types {
     return @types;
 }
 
+# TO_JSON: This is the hook the JSON encoder calls on each item while
+# serializing (under convert_blessed), returning an unblessed structure -- it
+# is not meant to be called directly. The public, document-level entry point
+# for getting a JSON string is Web::Microformats2::Document::as_json, which
+# drives that encoder over the whole item tree.
 sub TO_JSON {
     my $self = shift;
 

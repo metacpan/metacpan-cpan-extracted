@@ -14,7 +14,7 @@ use WiringPi::API qw(:perl);
 # downstream RPi::WiringPi i2c hardware suite (UPGRADE-3.18.md V33).
 
 BEGIN {
-    if (! $ENV{PI_BOARD}){
+    if (! $ENV{RPI_BOARD}){
         plan skip_all => "not a Pi board";
         exit;
     }

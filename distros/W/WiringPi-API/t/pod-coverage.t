@@ -26,7 +26,8 @@ plan skip_all => "Pod::Coverage $min_pc required for testing POD coverage"
 my @undocumented = qw(
     ads1115Setup analogRead analogWrite
     bmp180Pressure bmp180Setup bmp180Temp
-    delayMicroseconds digitalRead digitalWrite
+    delayMicroseconds digitalRead digitalReadByte digitalReadByte2
+    digitalWrite digitalWriteByte digitalWriteByte2
     getAlt getPinModeAlt gpioClockSet
     lcdCharDef lcdClear lcdCursor lcdCursorBlink lcdDisplay lcdHome
     lcdInit lcdPosition lcdPutchar lcdPuts lcdSendCommand

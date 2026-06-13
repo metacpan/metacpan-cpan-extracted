@@ -7,7 +7,7 @@ package Amazon::S3::Lite::Logger;
 use strict;
 use warnings;
 
-our $VERSION = '1.1.4';
+our $VERSION = '1.1.5';
 
 sub new { return bless {}, shift }
 

@@ -1583,6 +1583,8 @@ bar({
 	'output.file' => '/tmp/bar.sub.svg'
 });
 bar({
+	execute => 0,
+	fh      => $fh,
 	data => {
 		C => 3, D => 4
 	},

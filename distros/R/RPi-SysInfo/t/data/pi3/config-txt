@@ -1,0 +1,3 @@
+dtparam=audio=on
+dtoverlay=vc4-kms-v3d
+enable_uart=1

@@ -1,5 +1,13 @@
 Revision history for RPi-DigiPot-MCP4XXXX
 
+3.1801    2026-06-12
+        - Migrated constants from removed RPi::WiringPi::Constant to
+          RPi::Const (incl. Makefile.PL prereq)
+        - The test suite board gate is now RPI_BOARD (ecosystem-wide rename
+          from PI_BOARD); the old name is no longer honored
+        - Bump prereq of WiringPi::API to 3.1801
+        - Bump prereq of RPi::Const to 1.05
+
 2.3604 2017-06-28
         - bump prereq ver of WiringPi::API to 2.3612
         - bump prereq ver of RPi::WiringPi::Constant to 1.00

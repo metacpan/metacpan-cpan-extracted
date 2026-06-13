@@ -1,0 +1,4 @@
+Filesystem     1K-blocks    Used Available Use% Mounted on
+/dev/root       30401234 5123456  23900000  18% /
+devtmpfs          470000       0    470000   0% /dev
+/dev/mmcblk0p1     258095   49000    209095  19% /boot

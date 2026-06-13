@@ -4,7 +4,7 @@ use strict;
 use RPi::SysInfo qw(:all);
 use Test::More;
 
-if (! $ENV{PI_BOARD}){
+if (! $ENV{RPI_BOARD}){
     plan skip_all => "Not on a Pi board";
 }
 

@@ -1,6 +1,6 @@
 package Finance::Tiller2QIF::WriteQIF;
 # ABSTRACT: Write transactions to QIF format
-$Finance::Tiller2QIF::WriteQIF::VERSION = '1.06';
+$Finance::Tiller2QIF::WriteQIF::VERSION = '1.08';
 =head1 DESCRIPTION
 
 Exports transactions from the SQLite database to QIF (Quicken Interchange Format) for import into financial software. Transactions are grouped by account and sorted by date. Skipped transactions and those without effective categories are handled appropriately.

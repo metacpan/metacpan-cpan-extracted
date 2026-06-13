@@ -3,7 +3,7 @@ package RPi::I2C;
 use strict;
 use warnings;
 
-our $VERSION = '2.3608';
+our $VERSION = '3.1801';
 our @ISA = qw(IO::Handle);
  
 use Carp;
@@ -400,7 +400,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2017-2019 by Steve Bertrand
+Copyright (C) 2017-2026 by Steve Bertrand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.2 or,

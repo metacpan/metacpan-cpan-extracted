@@ -1,3 +1,10 @@
+Travel::Status::DE::DBRIS 0.30 - Sat Jun 13 2026
+
+    * Fix each request being delayed for 10 seconds by Akamai BMP
+    * New dependencies: HTTP::Message ≥ 6.37 and
+      IO::Uncompress::Brotli ≥ 0.004_002
+    * Update operators and train names (patches by Lili Urban and Thulmi)
+
 Travel::Status::DE::DBRIS 0.29 - Sun May 24 2026
 
     * dbris-m: location search: show distances if GIS::Distance is available

@@ -3,8 +3,7 @@ use strict;
 
 use lib 't/';
 
-use RPiTest qw(check_pin_status);
-
+use RPiTest;
 use RPi::WiringPi;
 use RPi::Const qw(:all);
 use Test::More;
@@ -17,10 +16,6 @@ if (! $ENV{RPI_ADC}){
     plan skip_all => "RPI_ADC environment variable not set\n";
 
 }
-if (! $ENV{PI_BOARD}){
-    $ENV{NO_BOARD} = 1;
-    plan skip_all => "Not on a Pi board\n";
-}
 
 use constant {
     DPOT_CS => 13,
@@ -28,9 +23,16 @@ use constant {
     ADC_CH => 1,
 };
 
-my $pi = RPi::WiringPi->new;
+rpi_running_test(__FILE__);
 
-my $adc = $pi->adc;
+my $pi = RPi::WiringPi->new(label => 't/345-dpot.t', shm_key => 'rpit');
+# Belt-and-braces: if an assertion or library call dies mid-run, release the
+# pins/registration this object holds (the library END reap is best-effort)
+
+END { $pi->cleanup if $pi && ! $pi->{clean}; }
+
+
+my $adc = $pi->adc(addr => 0x48);   # ADS1115 #1 (dpot wiper on ch 1)
 my $pot = $pi->dpot(DPOT_CS, DPOT_CH);
 
 my @values = (
@@ -63,6 +65,7 @@ for (0..255){
 
 $pi->cleanup;
 
-check_pin_status();
+rpi_check_pin_status();
+#rpi_metadata_clean();
 
 done_testing();

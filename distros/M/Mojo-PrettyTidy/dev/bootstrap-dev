@@ -1,0 +1,89 @@
+#!/usr/bin/env perl
+use v5.40.0;
+use common::sense;
+use feature 'signatures';
+use FindBin qw($Bin);
+use File::Spec;
+use Getopt::Long qw(GetOptions);
+use Cwd          qw(abs_path);
+
+my $install = 0;
+my $missing = 0;
+
+GetOptions( 'install!' => \$install, ) or die "usage: $0 [--install]\n";
+
+sub have_cmd ( $cmd ) {
+  for my $dir ( split /:/, $ENV{PATH} // '' ) {
+    my $path = File::Spec->catfile( $dir, $cmd );
+    return $path if -x $path;
+  }
+
+  return;
+}
+
+sub have_module ( $module ) {
+  my $out =
+      qx("$^X" -M$module -e "print $module->VERSION // 'unknown'" 2>/dev/null);
+  chomp $out;
+
+  return length $out ? $out : undef;
+}
+
+sub say_check ( $label, $ok, $detail = '' ) {
+  my $mark = $ok ? 'ok' : 'MISSING';
+
+  $missing++ if !$ok;
+
+  say sprintf "%-24s %s%s", $label, $mark, length $detail ? " ($detail)" : '';
+}
+
+my $root = abs_path( File::Spec->catdir( $Bin, '..' ) );
+
+say "Mojo::PrettyTidy dev bootstrap";
+say "Project root: $root";
+say '';
+
+say_check 'perl',         1,           $^X;
+say_check 'perl version', $] >= 5.040, "running $]";
+
+for my $cmd ( qw(prove perltidy cpanm) ) {
+  my $path = have_cmd( $cmd );
+  say_check $cmd, $path ? 1 : 0, $path // 'not found in PATH';
+}
+
+for my $module ( qw(Mojolicious JavaScript::Beautifier) ) {
+  my $version = have_module( $module );
+  say_check $module, defined $version, defined $version
+      ? "v$version"
+      : 'not installed';
+}
+
+if ( $install ) {
+  say '';
+  say 'Installing project Perl dependencies with cpanm --installdeps .';
+
+  if ( !have_cmd( 'cpanm' ) ) {
+    die "cpanm not found for this Perl. Install it with:\n"
+        . "  curl -L https://cpanmin.us | $^X - App::cpanminus\n";
+  }
+
+  chdir $root or die "chdir $root failed: $!\n";
+
+  system $^X, '-S', 'cpanm', '--installdeps', '.';
+
+  if ( $? != 0 ) {
+    die "cpanm --installdeps . failed\n";
+  }
+
+  say '';
+  say 'Dependency install completed.';
+} else {
+  say '';
+
+  if ( $missing ) {
+    say 'To install missing Perl deps, run:';
+    say '  bin/bootstrap-dev --install';
+  } else {
+    say 'All dependencies satisfied.';
+  }
+}

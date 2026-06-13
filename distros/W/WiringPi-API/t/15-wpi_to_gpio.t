@@ -7,7 +7,7 @@ use WiringPi::API qw(:perl);
 my $mod = 'WiringPi::API';
 
 BEGIN {
-    if (! $ENV{PI_BOARD}){
+    if (! $ENV{RPI_BOARD}){
         plan skip_all => "not a Pi board";
         exit;
     }

@@ -3,7 +3,7 @@ package Zuzu::Module::JSON;
 use strict;
 use utf8;
 
-our $VERSION = '0.003000';
+our $VERSION = '0.004000';
 
 use Scalar::Util qw( blessed );
 use Zuzu::Error;
@@ -222,6 +222,9 @@ sub IMPORT {
 			my ( $self, @args ) = @_;
 			my $json = @args ? $args[0] : '';
 			$json = defined($json) ? "$json" : '';
+			# The JSON::Tiny backend mishandles non-ASCII characters in
+			# character strings; escape them like decode_binarystring does.
+			$json = _escape_non_ascii_for_json_backend( $json );
 			return _decode_json_to_zuzu( $self, $json );
 		},
 	);

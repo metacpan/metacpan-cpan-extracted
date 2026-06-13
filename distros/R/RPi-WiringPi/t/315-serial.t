@@ -3,7 +3,7 @@ use warnings;
 
 use lib 't/';
 
-use RPiTest qw(check_pin_status);
+use RPiTest;
 use RPi::WiringPi;
 use RPi::Const qw(:all);
 use Test::More;
@@ -14,14 +14,12 @@ if (! $ENV{RPI_SERIAL}){
     plan skip_all => "RPI_SERIAL environment variable not set\n";
 }
 
-if (! $ENV{PI_BOARD}){
-    $ENV{NO_BOARD} = 1;
-    plan skip_all => "Not on a Pi board\n";
-}
+rpi_running_test(__FILE__);
 
-my $pi = $mod->new;
+my $pi = $mod->new(label => 't/315-serial.t', shm_key => 'rpit');
 
-my $s = $pi->serial("/dev/ttyS0", 115200);
+my $dev = rpi_serial_device();
+my $s = $pi->serial($dev, 115200);
 
 isa_ok $s, 'RPi::Serial';
 
@@ -46,6 +44,7 @@ like $s->gets(13), qr/^hello, world!/, "puts() and gets() ok";
 
 $pi->cleanup;
 
-check_pin_status();
+rpi_check_pin_status();
+#rpi_metadata_clean();
 
 done_testing();

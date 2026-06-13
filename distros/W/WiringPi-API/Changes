@@ -1,6 +1,81 @@
 Revision history for Perl extension WiringPi::API.
 
-3.1802  UNREL
+3.1803     2026-06-12
+        - Check both fcntl() return values in ensure_interrupt_pipe(); on
+          failure close the pipe fds, reset them and fail arming cleanly
+          instead of silently leaving the self-pipe blocking
+        - Add explicit errno.h/string.h includes to API.xs (previously
+          relied on transitive includes via perl.h)
+        - Added t/76-interrupt_pipe_failure.t covering the
+          ensure_interrupt_pipe() failure paths: pipe() EMFILE via fd
+          exhaustion, and fcntl() failures via an LD_PRELOAD shim (croak,
+          no fd leak, state reset)
+        - Added ^proposal/ to MANIFEST.SKIP (planning docs, like ^plans/)
+        - BackgroundInterrupts arm()/disarm() no longer die of SIGPIPE (or
+          silently lose the command) when the child has died: liveness is
+          refreshed before writing, the syswrite return is checked with
+          SIGPIPE ignored, and 0 is returned on failure
+        - Added t/77-background_interrupts_control.t covering arm()/disarm()
+          delivery, the EPIPE/dead-child paths and pin validation
+        - Fixed POD/doc glitches in API.pm, docs/pod.md and README:
+          dropped the dangling "This function is" in lcd_char_def, balanced
+          the lower-5-bits backtick example, corrected lcdPutChar ->
+          lcdPutchar in README, and reworded pwm_set_range's $range (it
+          sets the range register, not a 0-1023 duty bound)
+        - Reworded the stale "What changed vs isr-examples.md" appendix in
+          docs/interrupt-examples.md so it no longer claims the interrupt
+          API is unimplemented/provisional (it ships and is implemented)
+        - Regenerated docs/missing-functions.md against the current API.xs:
+          dropped the bogus setInterrupt/initThread aliases, moved the 32
+          now-wrapped functions (version, ISR2/ISRStop, I2C raw/block, SPI,
+          RP1, soft tone, timing, pad/clock, board) out of the missing
+          list, listed the genuinely-unwrapped wiringPiISR/piThreadCreate,
+          and refreshed the counts to 92 wrapped / 91 missing
+        - Replaced the stale plain-text README with a markdown README.md
+          regenerated from the current POD (pod2markdown): restores the
+          interrupt/worker, soft_pwm, soft_tone, timing, pi_lock and board
+          identity sections that were missing, drops the retired "interrupts
+          need a threaded Perl or they segfault" caveat, and updates MANIFEST
+        - Made the interrupts_dropped counter fully race-free: its read
+          (interrupt_dropped()) and reset now use __atomic_load_n/store_n to
+          pair with the ISR thread's atomic increment (previously plain
+          read/write concurrent with the atomic bump)
+        - Documented the PIPE_BUF (4KB) size limit on the results/shared
+          channels: a returned value larger than that can block the otherwise
+          non-blocking read()/value() drain (full non-blocking drain pending)
+        - WorkerThread read()/fh()/value() now croak with a guiding message
+          (thread mode has no pipe channels; use shared memory + pi_lock())
+          instead of silently returning undef - a consistent contract with
+          the BackgroundInterrupts sibling. Added t/86-worker_thread.t and
+          direct WorkerThread contract assertions to t/85-worker.t
+        - BackgroundInterrupt::running() no longer treats every waitpid -1 as
+          a clean exit: only a positive reap or -1/ECHILD marks the child
+          gone, so a stray EINTR can't latch a live handle stopped (and leak
+          the child). Added t/87-running_waitpid.t
+        - Reconciled the byte-bank ops: the snake_case wrappers
+          (digital_read_byte(2)/digital_write_byte(2)) are the sole public
+          interface. Removed their duplicate C-name entries from the
+          DEVELOPER FUNCTIONS POD (which states it holds only wrapper-less
+          calls) and dropped the lone digitalWriteByte from the :wiringPi
+          export tag; clarified the DEVELOPER FUNCTIONS intro
+        - Guarded WorkerThread's thread join in stop()/running(): join only
+          when is_joinable and under eval, and detach instead of join during
+          global destruction, so a forgotten stop() (reaped by DESTROY) or a
+          double/self join can no longer die or warn at interpreter teardown
+        - Fixed a framing-desync risk on the worker {shared} channel: the
+          non-blocking writer now skips any value whose framed record exceeds
+          PIPE_BUF (4KB) rather than risk a partial write that would corrupt
+          value()'s length-framing. Oversized shared values are dropped (the
+          channel is lossy); {results} still delivers large values intact.
+          Added t/88-shared_channel_framing.t
+        - The test suite board gate is now RPI_BOARD (ecosystem-wide rename
+          from PI_BOARD); the old name is no longer honored
+        - Makefile.PL's wiringPi presence/version checks can now be bypassed
+          with RPI_DIST_RELEASE=1 so release tarballs can be cut on non-Pi
+          machines; without it the checks still exit before WriteMakefile
+          (CPAN testers report NA, not FAIL)
+
+3.1802     2026-06-10
         - Switched from using die() to croak()
         - Completely rewrote the C pin interrupt routine to fix a bug where
           multiple interrupts did not work correctly

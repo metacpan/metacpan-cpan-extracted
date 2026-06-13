@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /home/steve/repos/rpi-pin remote -v)",
+      "Bash(git -C /home/steve/repos/rpi-pin log --oneline -5)",
+      "Read(//home/steve/repos/wiringpi-api/**)",
+      "Bash(git -C /home/steve/repos/wiringpi-api log --oneline -10)",
+      "Read(//home/steve/repos/rpi-wiringpi/**)"
+    ]
+  }
+}

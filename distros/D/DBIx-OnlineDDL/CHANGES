@@ -1,6 +1,13 @@
 Changelog for DBIx-OnlineDDL
 
-v1.1.1 2025-06-02T22:01:20
+v1.1.2 2026-06-12T17:06:21
+ - Update README (Brendan Byrd)
+ - Pull request #10: SM-6537 (Brendan Byrd)
+ - Use the original trigger's sql_mode when re-creating its SQL (Brendan
+   Byrd)
+ - Add smarter logic for ID truncation during ID searches (Brendan Byrd)
+
+v1.1.1 2025-06-02T21:48:20
  - Pull request #9: SM-5600 (Brendan Byrd)
  - Update README (Brendan Byrd)
  - Fix bug with FetchHashKeyName usage propagating to SHOW CREATE TABLE

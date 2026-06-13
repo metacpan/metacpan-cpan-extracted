@@ -1,6 +1,9 @@
 use warnings;
 use strict;
 
+use lib 't/';
+
+use RPiTest;
 use RPi::WiringPi;
 use Test::More;
 
@@ -10,14 +13,11 @@ if (! $ENV{RPI_RTC}){
     plan(skip_all => "RPI_RTC environment variable not set");
 }
 
-if (! $ENV{PI_BOARD}){
-    $ENV{NO_BOARD} = 1;
-    plan skip_all => "Not on a Pi board\n";
-}
-
 $SIG{__DIE__} = sub {};
 
-my $pi = RPi::WiringPi->new;
+rpi_running_test(__FILE__);
+
+my $pi = RPi::WiringPi->new(fatal_exit => 0, label => 't/320-rtc.t', shm_key => 'rpit');
 my $rtc = $pi->rtc;
 
 { # sec()
@@ -332,5 +332,10 @@ my $rtc = $pi->rtc;
 
     like $@, qr/parameter must be in the format/, "...and error is sane";
 }
+
+$pi->cleanup;
+
+rpi_check_pin_status();
+#rpi_metadata_clean();
 
 done_testing();

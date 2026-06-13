@@ -1,7 +1,7 @@
 ---
 abstract: 'Prohibit file access tests.'
 author:
-  - 'Thomas R. Wyant, III F<wyant at cpan dot org>.'
+  - 'Thomas R. Wyant, III F<harryfmudd at comcast dot net>.'
 build_requires:
   English: '0'
   Perl::Critic::TestUtils: '0'
@@ -12,7 +12,7 @@ configure_requires:
   strict: '0'
   warnings: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,7 +26,7 @@ no_index:
 provides:
   Perl::Critic::Policy::ValuesAndExpressions::ProhibitFiletest_rwxRWX:
     file: lib/Perl/Critic/Policy/ValuesAndExpressions/ProhibitFiletest_rwxRWX.pm
-    version: '0.002'
+    version: '0.003'
 requires:
   PPI: '0'
   PPI::Document: '0'
@@ -39,8 +39,8 @@ requires:
   version: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-ValuesAndExpressions-ProhibitFiletest_rwxRWX
+  bugtracker: https://github.com/trwyant/perl-Perl-Critic-Policy-ValuesAndExpressions-ProhibitFiletest_rwxRWX/issues
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Perl-Critic-Policy-ValuesAndExpressions-ProhibitFiletest_rwxRWX.git
-version: '0.002'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.003'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

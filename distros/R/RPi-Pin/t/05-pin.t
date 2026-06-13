@@ -6,7 +6,7 @@ use Test::More;
 
 my $mod = 'RPi::Pin';
 
-if (! $ENV{PI_BOARD}){
+if (! $ENV{RPI_BOARD}){
     $ENV{NO_BOARD} = 1;
     plan skip_all => "not on a pi board\n";
 }

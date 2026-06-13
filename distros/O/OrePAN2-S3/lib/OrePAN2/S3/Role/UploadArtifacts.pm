@@ -28,14 +28,17 @@ sub cmd_upload_artifacts {
 
   for my $src ( sort keys %{$files} ) {
     my $entry = $files->{$src};
-    my $dest  = ref $entry ? $entry->{dest} : $entry;
 
-    if ( !-e $src ) {
-      $self->get_logger->warn("$src not found, skipping...");
+    my $path = $src !~ /^\//xsm ? $src : sprintf '%s/%s', $self->get_dist_dir, $src;
+
+    my $dest = ref $entry ? $entry->{dest} : $entry;
+
+    if ( !-e $path ) {
+      $self->get_logger->warn("$path not found, skipping...");
       next;
     }
 
-    my $content = slurp($src);
+    my $content = slurp($path);
     my $md5     = md5_base64($content);
     my $stored  = ref $entry ? $entry->{md5} : undef;
 
@@ -45,9 +48,9 @@ sub cmd_upload_artifacts {
     }
 
     $self->get_s3->put_object( $self->get_bucket_name, $dest, $content,
-      content_type => LWP::MediaTypes::guess_media_type($src), );
+      content_type => LWP::MediaTypes::guess_media_type($path), );
 
-    $self->get_logger->info( sprintf 'uploaded %s => %s', $src, $dest );
+    $self->get_logger->info( sprintf 'uploaded %s => %s', $path, $dest );
 
     $files->{$src} = { dest => $dest, md5 => $md5 };
     $config_dirty = $TRUE;

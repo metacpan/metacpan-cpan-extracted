@@ -1,28 +1,26 @@
 use strict;
 use warnings;
 
+use lib 't/';
+
+use RPiTest;
 use RPi::WiringPi;
 use RPi::Const qw(:all);
 use Test::More;
 
-use lib 't/';
+rpi_running_test(__FILE__);
 
 my $mod = 'RPi::WiringPi';
 
 BEGIN {
     if (! $ENV{RPI_ARDUINO}){
-        plan skip_all => "RPI_ARUDINO environment variable not set\n";
-    }
-
-    if (! $ENV{PI_BOARD}){
-        $ENV{NO_BOARD} = 1;
-        plan skip_all => "Not on a Pi board\n";
+        plan skip_all => "RPI_ARDUINO environment variable not set\n";
     }
 }
 
 $SIG{__DIE__} = sub {};
 
-my $pi = $mod->new;
+my $pi = $mod->new(fatal_exit => 0, label => 't/300-i2c_exceptions.t', shm_key => 'rpit');
 
 { # catch device not found
     is eval { $pi->i2c(0x99); 1; }, undef, "I2C init dies if device not found";
@@ -52,6 +50,10 @@ my $pi = $mod->new;
 }
 
 $ENV{I2C_TESTING} = 0;
+
+$pi->cleanup;
+rpi_check_pin_status();
+# rpi_metadata_clean();
 
 done_testing();
 

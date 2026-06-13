@@ -8,7 +8,7 @@ use Carp qw(croak);
 use RPi::Const qw(:all);
 use WiringPi::API qw(:perl);
 
-our $VERSION = '2.3605';
+our $VERSION = '3.1801';
 
 use constant FULL => 2;
 use constant HALF => 1;
@@ -364,7 +364,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018 Steve Bertrand.
+Copyright 2018-2026 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

@@ -3,7 +3,7 @@ use strict;
 
 use lib 't/';
 
-use RPiTest qw(check_pin_status);
+use RPiTest;
 use RPi::WiringPi;
 use RPi::Const qw(:all);
 use Test::More;
@@ -16,14 +16,16 @@ if (! $ENV{RPI_MCP3008}){
     plan skip_all => "RPI_MCP3008 environment variable not set\n";
 }
 
-if (! $ENV{PI_BOARD}){
-    $ENV{NO_BOARD} = 1;
-    plan skip_all => "Not on a Pi board\n";
-}
+rpi_running_test(__FILE__);
 
 my $adc_pin = 26;
 
-my $pi = RPi::WiringPi->new;
+my $pi = RPi::WiringPi->new(label => 't/335-shift_reg_adc.t', shm_key => 'rpit');
+# Belt-and-braces: if an assertion or library call dies mid-run, release the
+# pins/registration this object holds (the library END reap is best-effort)
+
+END { $pi->cleanup if $pi && ! $pi->{clean}; }
+
 
 my $adc = $pi->adc(
     model => 'MCP3008',
@@ -64,6 +66,8 @@ ok $adc->percent(2) < 2, "SR pin 1 low ok";
 $pi->cleanup;
 
 select(undef, undef, undef, 0.2);
-check_pin_status();
+
+rpi_check_pin_status();
+#rpi_metadata_clean();
 
 done_testing();

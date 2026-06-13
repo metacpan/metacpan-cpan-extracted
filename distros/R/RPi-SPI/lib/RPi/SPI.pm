@@ -5,7 +5,7 @@ use warnings;
 
 use WiringPi::API qw(:wiringPi);
 
-our $VERSION = '2.3609';
+our $VERSION = '3.1801';
 
 sub new {
     my ($class, $channel, $speed) = @_;
@@ -18,8 +18,8 @@ sub new {
     # check if we're in bit-banging mode
 
     if ($self->_cs){
-        pin_mode($self->_cs, 1);
-        write_pin($self->_cs, 1);
+        pinMode($self->_cs, 1);
+        digitalWrite($self->_cs, 1);
     }
 
     if (wiringPiSPISetup($self->_channel, $self->_speed) < 0){
@@ -32,9 +32,9 @@ sub rw {
     my ($self, $buf, $len) = @_;
 
     if ($self->_cs){
-        pin_mode($self->_cs, 0);
+        digitalWrite($self->_cs, 0);
         @$buf = spiDataRW($self->_channel, $buf, $len);
-        pin_mode($self->_cs, 1);
+        digitalWrite($self->_cs, 1);
     }
     else {
         @$buf = spiDataRW($self->_channel, $buf, $len);
@@ -162,7 +162,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017,2018 Steve Bertrand.
+Copyright 2017-2026 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

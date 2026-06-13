@@ -9,7 +9,7 @@ use parent 'Class::Accessor';
 use DateTime::Duration;
 use Travel::Status::DE::DBRIS::Location;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 Travel::Routing::DE::DBRIS::Connection::Segment->mk_ro_accessors(
 	qw(

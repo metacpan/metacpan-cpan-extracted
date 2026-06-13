@@ -1,5 +1,13 @@
 Revision history for RPi-ADC-MCP3008
 
+3.1801    2026-06-12
+        - Migrated constants from removed RPi::WiringPi::Constant to
+          RPi::Const (incl. Makefile.PL prereq)
+        - Replaced wpi_setup()/spi_setup() with wiringPiSetupGpio()/
+          wiringPiSPISetup() for WiringPi::API 3.18; aligns Perl-level
+          setup with the XS (GPIO numbering) and fixes the undefined
+          spi_setup() under the :wiringPi-only import
+
 2.3605  2019-11-18
         - modified what we send in to SPI setup. A recent change in WiringPi
           broke sending in the GPIO pin as a channel

@@ -18,7 +18,7 @@ use Ref::Util           qw( is_arrayref );
 use Time::Moment;
 # RECOMMEND PREREQ: Cpanel::JSON::XS
 
-our $VERSION = '6.3';
+our $VERSION = '6.4';
 
 # Default for Handling Parsing
 our $DateParsing     = 1;
@@ -672,7 +672,7 @@ Parse::Syslog::Line - Simple syslog line parser
 
 =head1 VERSION
 
-version 6.3
+version 6.4
 
 =head1 SYNOPSIS
 
@@ -1194,7 +1194,7 @@ Brad Lhotsky <brad@divisionbyzero.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2017 by Brad Lhotsky.
+This software is Copyright (c) 2025 by Brad Lhotsky.
 
 This is free software, licensed under:
 

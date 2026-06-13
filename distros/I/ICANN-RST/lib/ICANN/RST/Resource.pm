@@ -21,7 +21,7 @@ ICANN::RST::Resource - an object representing an RST resource.
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 DESCRIPTION
 
@@ -45,7 +45,7 @@ Gavin Brown <gavin.brown@icann.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Internet Corporation for Assigned Names and Number (ICANN).
+This software is copyright (c) 2026 by Internet Corporation for Assigned Names and Number (ICANN).
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

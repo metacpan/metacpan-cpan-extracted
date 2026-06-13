@@ -24,7 +24,7 @@ use Log::Log4perl qw();
 use Pod::Usage;
 use Scalar::Util qw(reftype);
 
-our $VERSION              = '2.0.2';
+our $VERSION              = '2.0.3';
 our $GETOPT_EXIT_ON_ERROR = $TRUE;
 our $GETOPT_STATUS;
 our $GETOPT_ERROR_MESSAGE;
@@ -840,7 +840,7 @@ distribution in one step.
 
 =head1 VERSION
 
-This documentation refers to version 2.0.2.
+This documentation refers to version 2.0.3.
 
 =head1 FEATURES
 

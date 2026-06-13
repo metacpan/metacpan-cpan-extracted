@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+use Data::Dumper;
+use RPi::WiringPi;
+use RPi::Const qw(:all);
+
+my $shm_key = @ARGV && $ARGV[0] ? $ARGV[0] : 'rpiw';
+
+if (! RPi::WiringPi->meta_key_check($shm_key)){
+    die "shared memory segment with key '$shm_key' doesn't exist. Can't continue...\n";
+}
+
+my $pi = RPi::WiringPi->new(
+    label => 'pimeta',
+    shm_key => $shm_key,
+    );
+
+my %meta = %{ $pi->meta_fetch };
+delete $meta{objects}{$pi->uuid};
+$meta{object_count}--;
+
+$pi->cleanup;
+
+print Dumper \%meta;

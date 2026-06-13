@@ -6,13 +6,14 @@ examples/var-names-with-leading-zero
 inc/My/Module/Build.pm
 inc/My/Module/Meta.pm
 lib/Perl/Critic/Policy/Variables/ProhibitNumericNamesWithLeadingZero.pm
-LICENSES/Artistic
-LICENSES/Copying
+LICENSE-Artistic
+LICENSE-GPL
 Makefile.PL
 MANIFEST
 META.json
 META.yml
 README
+SECURITY
 t/00_modules.t
 t/20_policies.t
 t/Variables/ProhibitNumericNamesWithLeadingZero.run

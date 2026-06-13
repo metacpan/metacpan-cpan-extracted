@@ -55,15 +55,15 @@
    "provides" : {
       "Amazon::S3::Lite" : {
          "file" : "lib/Amazon/S3/Lite.pm",
-         "version" : "v1.1.4"
+         "version" : "v1.1.5"
       },
       "Amazon::S3::Lite::Credentials" : {
          "file" : "lib/Amazon/S3/Lite/Credentials.pm",
-         "version" : "v1.1.4"
+         "version" : "v1.1.5"
       },
       "Amazon::S3::Lite::Logger" : {
          "file" : "lib/Amazon/S3/Lite/Logger.pm",
-         "version" : "v1.1.4"
+         "version" : "v1.1.5"
       }
    },
    "release_status" : "stable",
@@ -79,6 +79,6 @@
          "web" : "http://github.com/rlauer6/Amazon-S3-Lite.git"
       }
    },
-   "version" : "v1.1.4",
+   "version" : "v1.1.5",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

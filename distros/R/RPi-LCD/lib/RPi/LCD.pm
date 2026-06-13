@@ -3,7 +3,7 @@ package RPi::LCD;
 use strict;
 use warnings;
 
-our $VERSION = '2.3604';
+our $VERSION = '3.1801';
 
 use parent 'WiringPi::API';
 use Carp qw(confess);
@@ -11,8 +11,8 @@ use RPi::Const qw(:all);
 
 sub new {
     my $self = bless {}, shift;
-    if (! defined $ENV{RPI_PIN_SCHEME}){
-        $ENV{RPI_PIN_SCHEME} = RPI_MODE_GPIO;
+    if (! defined $ENV{RPI_PIN_MODE}){
+        $ENV{RPI_PIN_MODE} = RPI_MODE_GPIO;
         $self->setup_gpio;
     }
     return $self;
@@ -289,7 +289,7 @@ Steve Bertrand, E<lt>steveb@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017 by Steve Bertrand
+Copyright (C) 2017-2026 by Steve Bertrand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.2 or,

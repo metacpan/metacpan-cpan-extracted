@@ -8,7 +8,7 @@ use WiringPi::API qw(:wiringPi :perl);
 # millis, micros, piMicros64 (pi_micros64), piHiPri (pi_hi_pri).
 
 BEGIN {
-    if (! $ENV{PI_BOARD}){
+    if (! $ENV{RPI_BOARD}){
         plan skip_all => "not a Pi board";
         exit;
     }

@@ -13,7 +13,7 @@ use WiringPi::API qw(:wiringPi :perl);
 # isn't) wired to the board running the suite.
 
 BEGIN {
-    if (! $ENV{PI_BOARD}){
+    if (! $ENV{RPI_BOARD}){
         plan skip_all => "not a Pi board";
         exit;
     }

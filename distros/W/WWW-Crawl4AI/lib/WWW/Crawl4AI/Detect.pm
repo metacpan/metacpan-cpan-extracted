@@ -12,12 +12,6 @@ our $MIN_MARKDOWN = 500;
 # HTTP status codes that mean "the target pushed back", not "transport broke".
 my %SOFT_FAIL = map { $_ => 1 } ( 401, 403, 429 );
 
-my $RE_JS      = qr/enable\s+javascript|please\s+enable\s+js|requires?\s+javascript/i;
-my $RE_BLOCK   = qr/access\s+denied|checking\s+your\s+browser|are\s+you\s+(?:a\s+)?human|verify\s+you\s+are\s+human|unusual\s+traffic/i;
-my $RE_CAPTCHA = qr/(?:\b(?:re)?captcha\b|hcaptcha|g-recaptcha|cf-turnstile)/i;
-my $RE_WALL    = qr/cf-chl|cf_chl|__cf_|datadome|perimeterx|px-captcha|akamai|incapsula|imperva/i;
-my $RE_TITLE   = qr/^\s*just\s+a\s+moment|^\s*attention\s+required|^\s*access\s+denied/i;
-
 # A WAF / bot-management gate (Cloudflare, DataDome, PerimeterX, Akamai) often
 # does not embed a widget into the requested page -- it REDIRECTS to a dedicated
 # challenge URL. reCAPTCHA / hCaptcha redirects land on the provider's own
@@ -50,8 +44,6 @@ sub signals {
   my $min = defined $opt{min_markdown} ? $opt{min_markdown} : $MIN_MARKDOWN;
   $page ||= {};
   my $md    = $page->{markdown} // '';
-  my $html  = ( $page->{raw_html} // $page->{html} // '' );
-  my $title = $page->{title} // '';
   my $code  = $page->{status_code} // 0;
   # The post-redirect URL, falling back to the requested URL when the normalized
   # page omits it. Either may be absent (signals() is also called on bare test
@@ -60,51 +52,32 @@ sub signals {
   my $final = $page->{final_url} // $page->{url} // '';
 
   # Content volume is the master signal. A bot-wall / JS-shell / captcha gate
-  # REPLACES the page content -- it is, by definition, thin. So every signal
-  # derived from VISIBLE rendered text (the markdown) is only trustworthy on a
-  # thin page: on a content-rich page those same words are incidental mentions
-  # (a footer "enable JavaScript", an article quoting "unusual traffic", a
-  # privacy note about reCAPTCHA) and must NOT discard a successful scrape --
-  # body words can never prove a scrape was impossible once we hold the content.
-  # STRUCTURAL fingerprints are exempt: WAF tokens in the HTML markup
-  # (__cf_chl, datadome), a "Just a moment" <title>, or a redirect whose
-  # final_url is a known challenge endpoint -- a real content page never carries
-  # those, regardless of size.
+  # REPLACES the page content -- it is, by definition, thin. So a content-rich
+  # page (>= $min markdown chars) that came back 200 IS the scrape: nothing in
+  # its body text or <title> may discard it. The body/title phrase heuristics
+  # ($RE_BLOCK, $RE_JS, $RE_CAPTCHA body arms, $RE_WALL HTML-token, $RE_TITLE)
+  # were removed in 0.005: on a thin page they were redundant (thin_html already
+  # fails the page), and on a full page they were pure false-positives -- a
+  # 386 KB article carrying Cloudflare's passive __cf_ beacon, or a legit
+  # "Access Denied" <title>, was wrongly thrown away. The ONLY size-independent
+  # block signals kept are the fingerprints a real content page can never carry:
+  # an HTTP push-back status, or a redirect whose final_url is a known WAF /
+  # captcha challenge endpoint (the page physically left the origin).
   my $thin = length($md) < $min;
 
-  # 'blocked' is a bot-wall fingerprint, not HTTP status (status lives on the
-  # http_error axis, so a bare 403 reads http_403 while a Cloudflare body reads
-  # bot_wall_detected). The visible-text match ($RE_BLOCK) only counts on a thin
-  # page; the structural arms (WAF tokens in HTML, "Just a moment" title,
-  # redirect to a challenge URL) stand alone.
-  my $blocked =
-       ( $thin  && $md  =~ $RE_BLOCK )
-    || ( $html  =~ $RE_WALL )
-    || ( $title =~ $RE_TITLE )
-    || ( $final =~ $RE_CHALLENGE_WALL );
-
-  # 'captcha' is a captcha *wall*, not an incidental widget or mention:
-  #   * thin page + any marker (markdown OR html) -> wall. A near-empty page that
-  #     carries a captcha marker is a JS-rendered gate (real content never loaded).
-  #   * redirect to a CAPTCHA provider's own verification endpoint
-  #     (google.com/recaptcha, hcaptcha.com) -> wall. The final_url left the
-  #     origin and landed on the captcha provider; size-independent.
-  #   * rich page + marker (markdown OR html-only) -> NOT a wall. A cookie-banner
-  #     reCAPTCHA note, an embedded comment-form widget, a Turnstile login box --
-  #     the real content is present, so the marker is incidental.
-  my $captcha =
-       ( $thin && ( $md =~ $RE_CAPTCHA || $html =~ $RE_CAPTCHA ) )
-    || ( $final =~ $RE_CHALLENGE_CAPTCHA );
+  # 'blocked' / 'captcha' fire only when the post-redirect final_url is a known
+  # WAF / captcha challenge endpoint. Not HTTP status -- that lives on the
+  # http_error axis. A site that soft-blocks us by serving one identical
+  # interstitial for every URL (200, no redirect) is caught one level up, by the
+  # caller comparing markdown across the fetched pages -- not here, per-page.
+  my $blocked = ( $final =~ $RE_CHALLENGE_WALL )    ? 1 : 0;
+  my $captcha = ( $final =~ $RE_CHALLENGE_CAPTCHA )  ? 1 : 0;
 
   return {
-    # A thin JS shell whose only text is "enable JavaScript" -- the real content
-    # never rendered. A rich page that merely mentions JavaScript is already
-    # rendered, so the match is incidental.
-    js_required => ( $thin && $md =~ $RE_JS ) ? 1 : 0,
-    blocked     => $blocked ? 1 : 0,
-    captcha     => $captcha ? 1 : 0,
-    thin_html   => $thin ? 1 : 0,
-    http_error  => ( $code >= 500 || $SOFT_FAIL{$code} ) ? 1 : 0,
+    blocked    => $blocked,
+    captcha    => $captcha,
+    thin_html  => $thin ? 1 : 0,
+    http_error => ( $code >= 500 || $SOFT_FAIL{$code} ) ? 1 : 0,
   };
 }
 
@@ -116,7 +89,7 @@ sub is_good {
   my $code = $page->{status_code} // 0;
   return 0 if $code && ( $code >= 500 || $SOFT_FAIL{$code} );
   my $sig = signals( $page, %opt );
-  return 0 if $sig->{js_required} || $sig->{blocked} || $sig->{captcha} || $sig->{thin_html};
+  return 0 if $sig->{blocked} || $sig->{captcha} || $sig->{thin_html};
   return 1;
 }
 
@@ -128,7 +101,6 @@ sub why_failed {
   my $sig = signals( $page, %opt );
   return 'captcha'           if $sig->{captcha};
   return 'bot_wall_detected' if $sig->{blocked};
-  return 'js_required'       if $sig->{js_required};
   my $code = $page->{status_code} // 0;
   return "http_$code"        if $code && ( $code >= 500 || $SOFT_FAIL{$code} );
   return 'thin_content'      if $sig->{thin_html};
@@ -177,14 +149,14 @@ WWW::Crawl4AI::Detect - service detection and content-quality classification for
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
   use WWW::Crawl4AI::Detect ();
 
   my $sig = WWW::Crawl4AI::Detect::signals($page);
-  # { js_required => 0, blocked => 1, captcha => 0, thin_html => 0, http_error => 0 }
+  # { blocked => 1, captcha => 0, thin_html => 0, http_error => 0 }
 
   if ( !WWW::Crawl4AI::Detect::is_good($page) ) {
     my $why = WWW::Crawl4AI::Detect::why_failed($page);  # 'bot_wall_detected'
@@ -200,38 +172,36 @@ backends to put into the strategy chain. Pure functions; nothing is exported.
 
 =head2 signals
 
-Given a normalized page, returns a hashref of boolean signals: C<js_required>,
-C<blocked>, C<captcha>, C<thin_html>, C<http_error>. Accepts
-C<< min_markdown => N >> to override the thin-content threshold
-(C<$WWW::Crawl4AI::Detect::MIN_MARKDOWN>, default 500).
+Given a normalized page, returns a hashref of boolean signals: C<blocked>,
+C<captcha>, C<thin_html>, C<http_error>. Accepts C<< min_markdown => N >> to
+override the thin-content threshold (C<$WWW::Crawl4AI::Detect::MIN_MARKDOWN>,
+default 500).
 
 Master rule: content volume decides. A bot-wall, a JS shell, and a captcha gate
-all I<replace> the page content, so they are thin by construction. Every signal
-derived from the B<visible rendered text> (the markdown) therefore only fires on
-a B<thin> page — on a content-rich page the same words ("enable JavaScript" in a
-footer, "unusual traffic" quoted in an article, a privacy note mentioning
-reCAPTCHA) are incidental and never discard a successful scrape. B<Structural>
-fingerprints are exempt and fire regardless of size, because a real content page
-never carries them: WAF tokens in the HTML markup (C<__cf_chl>, C<datadome>), a
-"Just a moment" / "Access denied" C<< <title> >>, and a redirect whose
-C<final_url> (the post-redirect URL, falling back to C<url>) is a known WAF or
-captcha challenge endpoint.
+all I<replace> the page content, so they are thin by construction — C<thin_html>
+catches them. A content-rich page (>= C<min_markdown> chars) that returned 200
+B<is> the scrape, and nothing in its body text or C<< <title> >> may discard it.
+As of 0.005 there are no body/title phrase heuristics: they were either redundant
+(on a thin page C<thin_html> already fails it) or outright false-positives (a
+full article carrying Cloudflare's passive C<__cf_> beacon in its markup, or a
+legit "Access denied" C<< <title> >>, was wrongly thrown away). The only
+size-independent block signals left are the ones a real content page can never
+carry.
 
-C<js_required> — thin page whose markdown asks to enable JavaScript: a JS shell
-that never rendered.
-
-C<blocked> — a bot-wall body phrase on a thin page (C<$RE_BLOCK>), OR a WAF token
-in the HTML, OR a C<< <title> >> WAF banner, OR a redirect to a WAF challenge URL
+C<blocked> — the post-redirect C<final_url> is a known WAF challenge endpoint
 (C</cdn-cgi/challenge>, C<__cf_chl>, C</challenge-platform/>, C<datadome>,
-C<geo.captcha-delivery.com>, C</px/captcha>, C<perimeterx>). Not HTTP status —
-that lives on the C<http_error> axis, so a bare 403 reads C<http_403> while a
-Cloudflare body reads C<bot_wall_detected>.
+C<geo.captcha-delivery.com>, C</px/captcha>, C<perimeterx>): the request left the
+origin and landed on the gate. Not HTTP status — that lives on the C<http_error>
+axis, so a bare 403 reads C<http_403>.
 
-C<captcha> — a captcha marker (markdown I<or> HTML markup) on a thin page, OR a
-redirect to a captcha provider's own verification endpoint
-(C<google.com/recaptcha>, C</recaptcha/api>, C<hcaptcha.com>). A captcha marker
-on a content-rich page (cookie-banner note, embedded comment-form reCAPTCHA,
-Turnstile login box) is B<not> a wall — the real content is present.
+C<captcha> — the post-redirect C<final_url> is a captcha provider's own
+verification endpoint (C<google.com/recaptcha>, C</recaptcha/api>,
+C<hcaptcha.com>).
+
+A site that soft-blocks by serving one identical interstitial for every URL
+(200, no redirect, no challenge final_url) is invisible to per-page C<signals>
+by design — it is caught one level up, by the caller comparing markdown across
+the fetched pages.
 
 =head2 is_good
 
@@ -241,8 +211,8 @@ HTTP failure, and no negative signal.
 =head2 why_failed
 
 Returns the most specific failure reason as a short token
-(C<captcha>, C<bot_wall_detected>, C<js_required>, C<http_NNN>,
-C<thin_content>) or C<undef> when the page is good.
+(C<captcha>, C<bot_wall_detected>, C<http_NNN>, C<thin_content>) or C<undef>
+when the page is good.
 
 =head2 probe_cloakbrowser
 

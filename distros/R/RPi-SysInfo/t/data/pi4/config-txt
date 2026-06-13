@@ -1,0 +1,4 @@
+dtparam=audio=on
+dtoverlay=vc4-kms-v3d
+camera_auto_detect=1
+arm_64bit=1

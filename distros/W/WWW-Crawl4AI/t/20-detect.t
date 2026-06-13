@@ -28,46 +28,66 @@ subtest 'min_markdown override' => sub {
   ok WWW::Crawl4AI::Detect::is_good( $p, min_markdown => 50 ), 'above lowered threshold';
 };
 
-subtest 'js required' => sub {
-  # A real JS shell is THIN: its only text is the enable-JavaScript notice.
+subtest 'thin JS shell fails as thin_content' => sub {
+  # A real JS shell is THIN: its only text is the enable-JavaScript notice. As of
+  # 0.005 there is no dedicated js_required signal -- the page is simply thin, and
+  # thin_html already disqualifies it. The reason token is thin_content.
   my $p = { status_code => 200, markdown => 'Please enable JavaScript to continue.' };
   my $s = WWW::Crawl4AI::Detect::signals($p);
-  ok $s->{js_required}, 'js_required signal on thin shell';
-  is WWW::Crawl4AI::Detect::why_failed($p), 'js_required', 'reason js_required (more specific than thin)';
+  ok !exists $s->{js_required}, 'js_required signal is gone';
+  ok $s->{thin_html}, 'thin_html signal';
+  ok !WWW::Crawl4AI::Detect::is_good($p), 'thin JS shell not good';
+  is WWW::Crawl4AI::Detect::why_failed($p), 'thin_content', 'reason thin_content';
 };
 
 subtest 'rich page that merely mentions JavaScript is good' => sub {
-  # Regression: a fully-rendered page (e.g. a CV with a "browsers without
-  # JavaScript / enable JavaScript to explore" footer) was being discarded by a
-  # bare word-match. Once we hold 500+ chars of markdown the scrape succeeded;
-  # the phrase is incidental and must not raise js_required.
+  # A fully-rendered page (e.g. a CV with a "browsers without JavaScript / enable
+  # JavaScript to explore" footer) must not be discarded by a bare word-match.
+  # Once we hold 500+ chars of markdown the scrape succeeded.
   my $body = 'real rendered article body about an engineer and their work ' x 12;  # >500
   my $p = {
     success     => 1,
     status_code => 200,
     markdown    => $body . ' Enable JavaScript to explore the full interactive experience. ' . $body,
   };
-  ok !WWW::Crawl4AI::Detect::signals($p)->{js_required}, 'no js_required on rich page';
   ok WWW::Crawl4AI::Detect::is_good($p), 'rich page mentioning JavaScript is good';
   is WWW::Crawl4AI::Detect::why_failed($p), undef, 'no failure reason';
 };
 
-subtest 'bot wall via html fingerprint' => sub {
+subtest 'rich page carrying a passive Cloudflare beacon is good (delphin regression)' => sub {
+  # THE 0.005 fix. www.delphin.de returns a full 386 KB page (200, real title)
+  # that carries Cloudflare's passive JS-detections beacon
+  # (/cdn-cgi/challenge-platform/.../jsd/main.js) -- injected on EVERY CF content
+  # page, NOT an interstitial. The old $RE_WALL `__cf_` substring + $RE_TITLE
+  # "Just a moment" arms fired on the full body/title and threw the whole scrape
+  # away across all four strategies. A real content page that came back 200 with
+  # 500+ chars of markdown is the scrape; a token in its markup can never prove
+  # otherwise. final_url is the origin (no redirect to a challenge endpoint).
+  my $body = 'Messdatenerfassung und Datenlogger fuer industrielle Messtechnik. ' x 30;  # >500
   my $p = {
+    success     => 1,
     status_code => 200,
-    markdown    => ( 'filler text ' x 60 ),
-    raw_html    => '<script>window.__cf_chl_opt</script>',
-    title       => 'Just a moment...',
+    markdown    => $body,
+    raw_html    => $body
+      . q{<script>var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';window.__cf_bm='x';</script>},
+    title       => 'Just a moment with Delphin Technology AG',   # legit title even starting with the old trap phrase
+    url         => 'https://www.delphin.de/',
+    final_url   => 'https://www.delphin.de/',
   };
-  ok WWW::Crawl4AI::Detect::signals($p)->{blocked}, 'blocked via cf-chl + title';
-  is WWW::Crawl4AI::Detect::why_failed($p), 'bot_wall_detected', 'reason bot_wall_detected';
+  my $s = WWW::Crawl4AI::Detect::signals($p);
+  is $s->{blocked}, 0, 'passive __cf_ beacon in markup does NOT block';
+  ok WWW::Crawl4AI::Detect::is_good($p), 'full content page is good despite CF beacon + trap title';
+  is WWW::Crawl4AI::Detect::why_failed($p), undef, 'no failure reason';
 };
 
-subtest 'captcha' => sub {
-  # A real captcha gate is THIN: the challenge replaces the content.
+subtest 'thin captcha gate fails as thin_content' => sub {
+  # A real captcha gate is THIN: the challenge replaces the content. As of 0.005
+  # the captcha signal is final_url-only, so a body captcha phrase no longer sets
+  # it -- the page is simply thin.
   my $p = { status_code => 200, markdown => 'Please complete the hCaptcha challenge to continue.' };
-  ok WWW::Crawl4AI::Detect::signals($p)->{captcha}, 'captcha signal on thin gate';
-  is WWW::Crawl4AI::Detect::why_failed($p), 'captcha', 'captcha wins over thin/js';
+  is WWW::Crawl4AI::Detect::signals($p)->{captcha}, 0, 'no captcha from body phrase';
+  ok !WWW::Crawl4AI::Detect::is_good($p), 'thin captcha gate not good';
+  is WWW::Crawl4AI::Detect::why_failed($p), 'thin_content', 'reason thin_content';
 };
 
 subtest 'rich page with captcha-prompt wording in its body is not a wall' => sub {
@@ -124,15 +144,19 @@ subtest 'reCAPTCHA cookie-banner mention on rich page is not a wall' => sub {
   ok WWW::Crawl4AI::Detect::is_good($en), 'rich page with english reCAPTCHA mention is good';
 };
 
-subtest 'html-only captcha marker on a thin page still walls' => sub {
-  # JS-rendered captcha gate: markdown is empty, marker lives in the markup.
+subtest 'thin JS-rendered gate fails as thin_content' => sub {
+  # JS-rendered captcha gate: markdown is empty, the marker lives only in the
+  # markup. As of 0.005 html-token sniffing is gone -- but the gate is THIN, so
+  # thin_html still disqualifies it. The page never yields content either way;
+  # only the reason label changed from captcha to thin_content.
   my $p = {
     status_code => 200,
     markdown    => 'loading',
     raw_html    => '<div class="cf-turnstile"></div>',
   };
-  ok WWW::Crawl4AI::Detect::signals($p)->{captcha}, 'html marker + thin = captcha signal';
-  is WWW::Crawl4AI::Detect::why_failed($p), 'captcha', 'reason captcha';
+  is WWW::Crawl4AI::Detect::signals($p)->{captcha}, 0, 'no captcha from html marker';
+  ok !WWW::Crawl4AI::Detect::is_good($p), 'thin gate not good';
+  is WWW::Crawl4AI::Detect::why_failed($p), 'thin_content', 'reason thin_content';
 };
 
 subtest 'redirect to Cloudflare challenge URL walls a rich page' => sub {

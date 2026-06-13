@@ -42,8 +42,10 @@
             "CPAN::Meta" : "2.150010",
             "DarkPAN::Utils" : "v1.0.0",
             "DarkPAN::Utils::Docs" : "v1.0.0",
+            "File::ShareDir" : "1.118",
             "JSON" : "4.10",
             "LWP::MediaTypes" : "6.04",
+            "Log::Log4perl" : "1.57",
             "OrePAN2::Index" : "0",
             "Readonly" : "2.05",
             "Role::Tiny" : "2.002004",
@@ -60,7 +62,11 @@
    "provides" : {
       "OrePAN2::S3" : {
          "file" : "lib/OrePAN2/S3.pm",
-         "version" : "v1.2.1"
+         "version" : "v1.2.3"
+      },
+      "OrePAN2::S3::Indexer" : {
+         "file" : "lib/OrePAN2/S3/Indexer.pm",
+         "version" : "0"
       },
       "OrePAN2::S3::Role::Delete" : {
          "file" : "lib/OrePAN2/S3/Role/Delete.pm",
@@ -88,6 +94,6 @@
          "web" : "http://github.com/rlauer6/OrePAN2-S3.git"
       }
    },
-   "version" : "v1.2.1",
+   "version" : "v1.2.3",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -1,0 +1,28 @@
+.mojo-prettytidy.json
+bin/kate-tool
+bin/mojo-prettytidy
+Changes
+dev/bootstrap-dev
+lib/Mojo/PrettyTidy.pm
+lib/Mojo/PrettyTidy/Diff.pm
+LICENSE
+Makefile.old
+Makefile.PL
+MANIFEST
+Manual.pod
+README.md
+t/00-load.t
+t/attributes.t
+t/basic.t
+t/cleanup.t
+t/cli.t
+t/columns.t
+t/config.t
+t/diff.t
+t/indent.t
+t/javascript.t
+t/perl.t
+t/samples.t
+t/TestCapture.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

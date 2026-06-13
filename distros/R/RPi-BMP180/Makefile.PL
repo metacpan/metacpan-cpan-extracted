@@ -12,6 +12,19 @@ WriteMakefile(
     LIBS             => ['-lwiringPi', '-lwiringPiDev'],
     PL_FILES         => {},
     MIN_PERL_VERSION => 5.006,
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        resources   => {
+            bugtracker => {
+                web => 'https://github.com/stevieb9/rpi-bmp180/issues',
+            },
+            repository => {
+                type => 'git',
+                url => 'https://github.com/stevieb9/rpi-bmp180.git',
+                web => 'https://github.com/stevieb9/rpi-bmp180',
+            },
+        },
+    },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
     },
@@ -19,8 +32,8 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'WiringPi::API'           => 2.3612,
-        'RPi::WiringPi::Constant' => 1.00,
+        'WiringPi::API' => 3.1803,
+        'RPi::Const'    => 1.05,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'RPi-BMP180-*' },

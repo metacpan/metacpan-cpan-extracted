@@ -29,6 +29,8 @@ Module::Build->new(
 		'DateTime'                   => 0,
 		'DateTime::Format::Strptime' => 0,
 		'Getopt::Long'               => 0,
+		'HTTP::Request'              => '7.00',
+		'IO::Uncompress::Brotli'     => '0.004_002',
 		'JSON'                       => 0,
 		'List::Util'                 => 0,
 		'LWP::UserAgent'             => 0,

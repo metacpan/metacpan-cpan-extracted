@@ -1,5 +1,5 @@
 package Mail::DMARC::Base;
-our $VERSION = '1.20260306';
+our $VERSION = '1.20260612';
 use strict;
 use warnings;
 use 5.10.0;
@@ -10,11 +10,11 @@ use File::ShareDir;
 use HTTP::Tiny;
 use IO::File;
 use Net::DNS::Resolver;
-use Net::IDN::Encode qw/domain_to_unicode/;
 use Net::IP;
 use Regexp::Common 2013031301 qw /net/;
 use Socket;
 use Socket6 qw//;    # don't export symbols
+require URI::_idna;
 
 sub new {
     my ( $class, @args ) = @_;
@@ -143,14 +143,21 @@ sub is_public_suffix {
 
     my $public_suffixes = $self->get_public_suffix_list();
 
-    $zone = domain_to_unicode( $zone ) if $zone =~ /xn--/;
+    $zone = URI::_idna::decode( $zone, 0 ) // $zone if $zone =~ /xn--/;
 
+    # Check for exception rules
+    return 0 if $public_suffixes->{"!$zone"};
+
+    # Check for direct match
     return 1 if $public_suffixes->{$zone};
 
+    # Check for wildcard match
     my @labels = split /\./, $zone;
-    $zone = join '.', '*', (@labels)[ 1 .. scalar(@labels) - 1 ];
+    if (scalar @labels > 1) {
+        my $wildcard = join '.', '*', (@labels)[ 1 .. scalar(@labels) - 1 ];
+        return 1 if $public_suffixes->{$wildcard};
+    }
 
-    return 1 if $public_suffixes->{$zone};
     return 0;
 }
 
@@ -264,6 +271,21 @@ sub set_resolver {
     return;
 }
 
+sub to_ascii_domain {
+    my ($self, $domain) = @_;
+    return $domain unless $domain =~ /[^\x00-\x7F]/;  # fast path: ASCII only
+    # Convert each U-label to its A-label (punycode) equivalent per RFC 8616 §6
+    my @ascii_labels = map {
+        if ( /[^\x00-\x7F]/ ) {
+            my $ascii = eval { URI::_idna::encode($_) };
+            $ascii // $_;
+        } else {
+            $_;
+        }
+    } split /\./, $domain;
+    return join '.', @ascii_labels;
+}
+
 sub is_valid_ip {
     my ( $self, $ip ) = @_;
 
@@ -285,6 +307,7 @@ sub is_valid_domain {
     return 1 if $self->is_public_suffix($tld);
     return 0 if $domain eq 'localhost';
     return 0 if $tld eq 'localdomain';
+    return 0 if -1 == index($domain, '.');
     $tld = join( '.', ( split /\./, $domain )[ -2, -1 ] );
     return 1 if $self->is_public_suffix($tld);
     return 0;
@@ -330,7 +353,7 @@ Mail::DMARC::Base - DMARC utility functions
 
 =head1 VERSION
 
-version 1.20260306
+version 1.20260612
 
 =head1 METHODS
 

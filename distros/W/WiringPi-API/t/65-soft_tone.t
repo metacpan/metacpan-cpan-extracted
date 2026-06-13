@@ -12,7 +12,7 @@ use WiringPi::API qw(:wiringPi :perl);
 # (wiringPi's softServo is not in the 3.18 shared library, so it is not wrapped.)
 
 BEGIN {
-    if (! $ENV{PI_BOARD}){
+    if (! $ENV{RPI_BOARD}){
         plan skip_all => "not a Pi board";
         exit;
     }

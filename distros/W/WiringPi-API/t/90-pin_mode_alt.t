@@ -10,7 +10,7 @@ use WiringPi::API qw(:perl);
 # exercised here - the success path writes real pin hardware.
 
 BEGIN {
-    if (! $ENV{PI_BOARD}){
+    if (! $ENV{RPI_BOARD}){
         plan skip_all => "not a Pi board";
         exit;
     }

@@ -13,7 +13,7 @@ use Encode;
 
 has toUTF8 => sub { find_encoding('utf8') };
 
-our $VERSION = '1.0.14';
+our $VERSION = '1.1.0';
 
 has 'service';
 
@@ -83,6 +83,13 @@ sub dispatch {
         $self->render(text => $error, status=>500);
         return;
     }        
+    # Detect protocol: a 'jsonrpc' member selects strict JSON-RPC 2.0;
+    # its absence keeps the legacy qooxdoo "qx1" behaviour intact. Stored as a
+    # private instance field (no 'has' accessor) so it is not part of the
+    # public interface, yet the public render methods can still read it when a
+    # subclass calls them directly (e.g. from a render_later callback).
+    $self->{_jsonRpc20} = defined $data->{jsonrpc} ? 1 : 0;
+
     if (not defined $self->requestId){
         my $error = "Missing 'id' property in JsonRPC request.";
         $log->error($error);
@@ -90,22 +97,46 @@ sub dispatch {
         return;
     }
 
-
-    # Check if service is property is available
-    my $service = $data->{service} or do {
-        my $error = "Missing service property in JsonRPC request.";
-        $log->error($error);
-        $self->render(text => $error, status=>500);
-        return;
-    };
-
-    # Check if method is specified in the request
-    my $method = $data->{method} or do {
-        my $error = "Missing method property in JsonRPC request.";
-        $log->error($error);
-        $self->render(text => $error, status=>500);
-        return;
-    };
+    my $method;
+    if ($self->{_jsonRpc20}) {
+        # --- JSON-RPC 2.0 ---
+        if ($data->{jsonrpc} ne '2.0') {
+            my $error = "Invalid 'jsonrpc' version (must be \"2.0\").";
+            $log->error($error);
+            $self->render(text => $error, status=>500);
+            return;
+        }
+        if ($self->req->method ne 'POST') {
+            my $error = "JSON-RPC 2.0 requests must be POST.";
+            $log->error($error);
+            $self->render(text => $error, status=>500);
+            return;
+        }
+        $method = $data->{method};
+        if (not defined $method) {
+            my $error = "Missing 'method' property in JsonRPC request.";
+            $log->error($error);
+            $self->render(text => $error, status=>500);
+            return;
+        }
+    }
+    else {
+        # --- legacy qx1 ---
+        # Check if service property is available
+        $data->{service} or do {
+            my $error = "Missing service property in JsonRPC request.";
+            $log->error($error);
+            $self->render(text => $error, status=>500);
+            return;
+        };
+        # Check if method is specified in the request
+        $method = $data->{method} or do {
+            my $error = "Missing method property in JsonRPC request.";
+            $log->error($error);
+            $self->render(text => $error, status=>500);
+            return;
+        };
+    }
     $self->methodName($method);
 
     $self->rpcParams($data->{params} // []);
@@ -120,9 +151,9 @@ sub dispatch {
 
         die {
             origin => 1,
-            message => "service $service not available",
+            message => "service ".$data->{service}." not available",
             code=> 2
-        } if not $self->service eq $service;
+        } if not $self->{_jsonRpc20} and not $self->service eq $data->{service};
 
         die {
              origin => 1, 
@@ -144,10 +175,21 @@ sub dispatch {
         } if not $self->can($method);
 
         $self->logRpcCall($method,dclone($self->rpcParams));
-        
+
         # reply
         no strict 'refs';
-        return $self->$method(@{$self->rpcParams});
+        my $params = $self->rpcParams;
+        if (ref $params eq 'ARRAY') {
+            return $self->$method(@$params);          # positional params
+        }
+        elsif (ref $params eq 'HASH') {
+            return $self->$method($params);           # named params -> single hashref
+        }
+        die {
+            origin  => 1,
+            message => "'params' must be an array or an object",
+            code    => 4
+        };
     };
     if ($@){
         $self->renderJsonRpcError($@);
@@ -192,7 +234,9 @@ sub logRpcCall {
 sub renderJsonRpcResult {
     my $self = shift;
     my $data = shift;
-    my $reply = { id => $self->requestId, result => $data };
+    my $reply = $self->{_jsonRpc20}
+        ? { jsonrpc => '2.0', id => $self->requestId, result => $data }
+        : {                   id => $self->requestId, result => $data };
     $self->logRpcReturn(dclone($reply));
     $self->finalizeJsonRpcReply(encode_json($reply));
 }
@@ -213,33 +257,48 @@ sub logRpcReturn {
 sub renderJsonRpcError {
     my $self = shift;
     my $exception = shift;
-    my $error;
+    my ($origin, $message, $code);
     for (ref $exception){
         /HASH/ && $exception->{message} && do {
-            $error = {
-                origin  => $exception->{origin} || 2,
-                message => $exception->{message}, 
-                code    => $exception->{code}
-            };
+            $origin  = $exception->{origin} // 2;
+            $message = $exception->{message};
+            $code    = $exception->{code};
             last;
         };
         /.+/ && $exception->can('message') && $exception->can('code') && do {
-            $error = {
-                origin  => 2,
-                message => $exception->message(), 
-                code    => $exception->code()
-            };
+            $origin  = 2;
+            $message = $exception->message();
+            $code    = $exception->code();
             last;
         };
-        $self->log->error("Error while processing " . $self->service. "::" . $self->methodName . ": $exception");
-        $error = {
-            origin  => 2,
-            message => "Couldn't process request",
-            code    => 9999
+        $self->log->error("Error while processing " . ($self->service // '') . "::" . $self->methodName . ": $exception");
+        $origin  = 2;
+        $message = "Couldn't process request";
+        $code    = 9999;
+    }
+    $self->log->error("JsonRPC error sent to client: '" . ($code // 'undef') . ": $message'");
+
+    my $reply;
+    if ($self->{_jsonRpc20}) {
+        # JSON-RPC 2.0: error.code must be an integer; non-standard 'origin'
+        # is carried inside the permitted 'data' member.
+        $reply = {
+            jsonrpc => '2.0',
+            id      => $self->requestId,
+            error   => {
+                code    => defined $code ? int($code) : 9999,
+                message => $message,
+                data    => { origin => $origin },
+            },
         };
     }
-    $self->log->error("JsonRPC error sent to client: '$error->{code}: $error->{message}'");
-    $self->finalizeJsonRpcReply(encode_json({ id => $self->requestId, error => $error }));
+    else {
+        $reply = {
+            id    => $self->requestId,
+            error => { origin => $origin || 2, message => $message, code => $code },
+        };
+    }
+    $self->finalizeJsonRpcReply(encode_json($reply));
 }
 
 sub finalizeJsonRpcReply {
@@ -400,6 +459,10 @@ browser in your debug log, set the MOJO_QX_FULL_RPC_DETAILS environment
 variable to 1.  Otherwise you will only see the first 60 characters even
 when logging at debug level.
 
+NOTE: At debug log level will log the payload of RPC calls will be logged. This might
+      lead to sensitive data like passwords being logged.
+      You might want to override the logRpc* methods appropriately in your application.
+
 =head1 AUTHOR
 
 S<Matthias Bloch, E<lt>matthias@puffin.chE<gt>>,
@@ -409,7 +472,7 @@ This Module is sponsored by OETIKER+PARTNER AG.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010,2013
+Copyright (C) 2010,2013,2024
 
 =head1 LICENSE
 

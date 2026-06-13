@@ -1,7 +1,7 @@
 from test/more import *;
 from std/math/bignum import *;
 
-plan(29);
+plan(36);
 
 let n := BigNum.from_dec("12345");
 let m := BigNum.from_hex("0xABCDEF");
@@ -24,23 +24,38 @@ is( p.bneg.to_dec, "12345.6789", "bneg works" );
 is( n.badd(5).to_dec, "12350", "badd works" );
 is( n.bsub(45).to_dec, "12300", "bsub works" );
 is( n.bmul(2).to_dec, "24690", "bmul works" );
-is( n.bdiv(3).to_dec, 4115, "bdiv works" );
-is( n.bmod(10).to_dec, 5, "bmod works" );
-is( BigNum.from_dec("2").bpow(10).to_dec, 1024, "bpow works" );
+is( n.bdiv(3).to_dec, "4115", "bdiv works" );
+is( n.bmod(10).to_dec, "5", "bmod works" );
+is( BigNum.from_dec("2").bpow(10).to_dec, "1024", "bpow works" );
 is( n.binv.to_dec, n.binv.to_dec, "binv works" );
+let big_pow := BigNum.from_dec("10").bpow( BigNum.from_dec("1000") );
+let big_expected := "1";
+let i := 0;
+while ( i < 1000 ) {
+	big_expected _= "0";
+	i++;
+}
+let big_pow_plain := BigNum.from_dec("10").bpow(1000);
+is( big_pow.to_String, big_expected, "bpow handles large integer exponents" );
+like( big_pow.to_String, /^10{1000}$/, "bpow handles huge powers with regular expression check" );
+like( big_pow_plain.to_String, /^10{1000}$/, "bpow handles plain integer exponent form with large powers" );
 
 is( BigNum.from_dec("0").bsin.to_dec, "0", "bsin works" );
-is( BigNum.from_dec("0").bcos.to_dec, 1, "bcos works" );
+is( BigNum.from_dec("0").bcos.to_dec, "1", "bcos works" );
 is( BigNum.from_dec("0").btan.to_dec, "0", "btan works" );
 
-is( BigNum.from_dec("16").bsqrt.to_dec, 4, "bsqrt works" );
-is( BigNum.from_dec("1.5").bround.to_dec, 2, "bround works" );
-is( BigNum.from_dec("1.5").bfloor.to_dec, 1, "bfloor works" );
-is( BigNum.from_dec("1.5").bceil.to_dec, 2, "bceil works" );
+is( BigNum.from_dec("16").bsqrt.to_dec, "4", "bsqrt works" );
+is( BigNum.from_dec("1.5").bround.to_dec, "2", "bround works" );
+is( BigNum.from_dec("1.5").bfloor.to_dec, "1", "bfloor works" );
+is( BigNum.from_dec("1.5").bceil.to_dec, "2", "bceil works" );
 
 is( m.to_hex, "0xabcdef", "to_hex works" );
-is( m.to_dec, 11259375, "to_dec works" );
-is( m.to_String, 11259375, "to_String alias works" );
+is( BigNum.from_dec("17").to_hex, "0x11", "from_dec to_hex works" );
+is( m.to_dec, "11259375", "to_dec works" );
+is( m.to_String, "11259375", "to_String alias works" );
 is( m.to_Number, 11259375, "to_Number works" );
+is( typeof m.to_dec, "String", "to_dec returns String" );
+is( typeof m.to_String, "String", "to_String returns String" );
+is( typeof m.to_Number, "Number", "to_Number returns Number" );
 
 done_testing();

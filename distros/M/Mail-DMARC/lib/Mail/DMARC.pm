@@ -2,7 +2,7 @@ package Mail::DMARC;
 use strict;
 use warnings;
 
-our $VERSION = '1.20260306';
+our $VERSION = '1.20260612';
 
 use Carp;
 our $psl_loads = 0;
@@ -65,6 +65,12 @@ sub header_from_raw {
     return $_[0]->{header_from_raw} if 1 == scalar @_;
 #croak "invalid header_from_raw: $_[1]" if 'from:' ne lc substr($_[1], 0, 5);
     return $_[0]->{header_from_raw} = lc $_[1];
+}
+
+sub sender {
+    return $_[0]->{sender} if 1 == scalar @_;
+    croak "invalid sender" if !$_[0]->is_valid_domain( lc $_[1] );
+    return $_[0]->{sender} = lc $_[1];
 }
 
 sub local_policy {
@@ -308,7 +314,7 @@ Mail::DMARC - Perl implementation of DMARC
 
 =head1 VERSION
 
-version 1.20260306
+version 1.20260612
 
 =head1 SYNOPSIS
 

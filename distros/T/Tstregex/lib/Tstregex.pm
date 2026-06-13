@@ -13,7 +13,7 @@ use warnings;
 =head1 NAME
 
 Tstregex - A Diagnostic Tool that quickly shows the longest Regular Expression string match, highlighting the rejected part. The terminal command 
-tstregex '/^[a-z]*\d{3}$/' 'abc12a' shows: abcB<12a> (^[a-z]*B<\d{3}$>)
+tstregex '/^[a-z]*\d{3}$/' 'abc12a' shows: Tstregex - Diagnostic Tool ... shows: abc·B<12a>· (^[a-z]*·B<\d{3}$>·)
 
  # Above, the normal parts are the longuest matching substring when bold parts highlights the rejected substring
  #(idem with regexp lexical groups between parenthesis)
@@ -173,6 +173,26 @@ Olivier Delouya - 2026
 
 Artistic Version 2
 
+=head1 SEE ALSO
+
+This tool belongs to the family of Perl regex development utilities. It is 
+intended for developers looking for a lightweight perl regex debugger, 
+providing automated regex diagnostics when a regular expression fails 
+or requires deep troubleshooting in the CLI terminal.
+
+=head1 DESCRIPTION
+
+Tstregex is a CLI tool designed for Perl regex debugging and diagnostics. 
+If you need to debug a Perl regular expression, find where a regex fails, 
+or pinpoint the exact character that broke your pattern, this module 
+automates the process.
+
+=head1 KEYWORDS
+
+perl regex debugger, debug regular expression perl, regex failure pinpoint, 
+match longest regex string, regular expression diagnostic tool, 
+perl regex troubleshooting.
+
 =cut
 
 
@@ -296,6 +316,23 @@ package main;
             }
         return $global_result;
         }
+        
+    sub help
+        {
+        print BOLD, WHITE, "Tstregex.pm - Longest match Regular Expression Diagnostic Tool (2026 - PerlOD)\n", RESET;
+        print "Usage:\n";
+        print "  perl Tstregex.pm [options] 'regex' 'string1' ['string2' ...]\n\n";
+        print "Examples:\n";
+        print "  perl Tstregex.pm '([0-3][0-9])/[0-1][0-9]/\\d{4}' '21/72/1985'\n";
+        print '  21/', BOLD, '72/1985', RESET, ' ([0-3][0-9]/', BOLD, '[0-1][0-9]/\d{4}', RESET, ")\n\n";
+        print BOLD, 'DELIMITERS ', RESET, "are optional\n";
+        print "  Supported: /.../, m!...!, m{...}. Modifiers (/i, /x, /s...) and captures are supported.\n\n";
+        print "Options:\n";
+        print "-h --help            Shows that help\n";
+        print "-v --verbose         Shows keys info on match/unmatch\n";
+        print "-d --diag            Enriched diagnostic with timing and syntax pointers\n";
+        print "-a --assert          Misc: shows a large test of regexp against tstregex..\n";
+        }
 
     sub _run_internal_tests
         {
@@ -390,30 +427,13 @@ package main;
         undef;
         }
 
-    sub help
-        {
-        print BOLD, WHITE, "Tstregex.pm - Longest match Regular Expression Diagnostic Tool (2026 - PerlOD)\n", RESET;
-        print "Usage:\n";
-        print "  perl Tstregex.pm [options] 'regex' 'string1' ['string2' ...]\n\n";
-        print "Examples:\n";
-        print "  perl Tstregex.pm '([0-3][0-9])/[0-1][0-9]/\\d{4}' '21/72/1985'\n";
-        print '  21/', BOLD, '72/1985', RESET, ' ([0-3][0-9]/', BOLD, '[0-1][0-9]/\d{4}', RESET, ")\n\n";
-        print BOLD, 'DELIMITERS ', RESET, "are optional\n";
-        print "  Supported: /.../, m!...!, m{...}. Modifiers (/i, /x, /s...) and captures are supported.\n\n";
-        print "Options:\n";
-        print "-h --help            Shows that help\n";
-        print "-v --verbose         Shows keys info on match/unmatch\n";
-        print "-d --diag            Enriched diagnostic with timing and syntax pointers\n";
-        print "-a --assert          Misc: shows a large test of regexp against tstregex..\n";
-        }
-
     }
 
 1;
 
 package Tstregex;
     {
-    our $VERSION = '1.12';
+    our $VERSION = '1.14';
     use Exporter qw(import);
 
     our @EXPORT  = qw(
@@ -1036,13 +1056,13 @@ warning: Test with timeout or few characters first!
 (?=(a+)+)a*b ::: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ::: 0
 
 # Test 1 : L'Euro bloque le chiffre (ton cas actuel)
-(?=€)\d+ ::: €100 ::: 0
+(?=â‚¬)\d+ ::: â‚¬100 ::: 0
 
 # Test 2 : On consomme l'Euro, puis on cherche le chiffre
-€\d+ ::: €100 ::: 0
+â‚¬\d+ ::: â‚¬100 ::: 0
 
 # Test 3 : L'assertion sur l'Euro, mais on commence APRES l'Euro
-\d+ ::: €100 ::: 3
+\d+ ::: â‚¬100 ::: 3
 
 # === t/01-engine.t (Core Logic) ===
 abc ::: abc ::: 1

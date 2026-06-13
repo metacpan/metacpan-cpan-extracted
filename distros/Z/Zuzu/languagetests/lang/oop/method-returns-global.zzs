@@ -1,0 +1,48 @@
+from test/more import *;
+
+// Regression test: a zero-parameter method whose entire body is a
+// bare-identifier return used to be short-circuited as a trivial field
+// getter, so returning a module-level global from a method yielded
+// Null (fixed in zuzu-rust, June 2026).
+
+const GLOBAL_DICT := { colour: "red" };
+const GLOBAL_STR := "hello";
+let global_let := "world";
+
+class Box {
+	let contents := "field-value";
+
+	method get_global_dict () {
+		return GLOBAL_DICT;
+	}
+
+	method get_global_str () {
+		return GLOBAL_STR;
+	}
+
+	method get_global_parens () {
+		return (GLOBAL_STR);
+	}
+
+	method get_global_implicit () {
+		GLOBAL_STR;
+	}
+
+	method get_global_let () {
+		return global_let;
+	}
+
+	method get_contents () {
+		return contents;
+	}
+}
+
+let box := new Box();
+is( box.get_global_dict(){colour}, "red", "method returns module const Dict" );
+is( box.get_global_str(), "hello", "method returns module const String" );
+is( box.get_global_parens(), "hello", "parenthesised bare return works" );
+is( box.get_global_implicit(), "hello", "implicit bare-identifier return works" );
+is( box.get_global_let(), "world", "method returns module let" );
+is( box.get_contents(), "field-value", "trivial field getter still works" );
+
+done_testing();

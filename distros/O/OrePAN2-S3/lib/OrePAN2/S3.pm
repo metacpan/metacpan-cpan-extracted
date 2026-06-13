@@ -12,6 +12,7 @@ use Data::Dumper;
 use English qw(-no_match_vars);
 use Encode qw(encode_utf8);
 use File::Basename qw(basename);
+use File::ShareDir qw(dist_dir);
 use File::Temp qw(tempfile);
 use JSON;
 use List::Util qw(pairs);
@@ -20,7 +21,7 @@ use Scalar::Util qw(openhandle);
 use Readonly;
 
 Readonly::Scalar our $PACKAGE_INDEX  => '02packages.details.txt.gz';
-Readonly::Scalar our $DEFAULT_CONFIG => $ENV{HOME} . '/.orepan2-s3.json';
+Readonly::Scalar our $DEFAULT_CONFIG => sprintf '%s/%s', $ENV{HOME} // q{}, '/.orepan2-s3.json';
 Readonly::Scalar our $METACPAN_URL   => 'https://metacpan.org/pod';
 Readonly::Scalar our $AUTHOR_PATH    => 'D/DU/DUMMY';
 
@@ -32,7 +33,7 @@ with 'OrePAN2::S3::Role::UploadArtifacts';
 
 use parent qw(CLI::Simple);
 
-our $VERSION = '1.2.1';
+our $VERSION = '1.2.3';
 
 __PACKAGE__->use_log4perl( level => 'info' );
 
@@ -260,43 +261,6 @@ sub update_index {
   $self->get_logger->info( sprintf 'updated index at %s', $index_key );
 
   return;
-}
-
-########################################################################
-sub scan_provides {
-########################################################################
-  my ( $self, $file ) = @_;
-
-  require Archive::Tar;
-  require CPAN::Meta;
-
-  my $tar = Archive::Tar->new;
-  $tar->read($file);
-
-  # find the top-level prefix, e.g. "CPAN-Maker-1.8.2"
-  my ($entry) = grep { $_->name =~ m{/META\.(?:json|yml|yaml)$}xsm } $tar->get_files;
-
-  if ( !$entry ) {
-    $self->get_logger->warn("no META file found in $file");
-    return {};
-  }
-
-  my ($prefix) = ( split m{/}xsm, $entry->name )[0];
-
-  for my $metafile (qw(META.json META.yml META.yaml)) {
-    my $content = eval { $tar->get_content("$prefix/$metafile") };
-    next if !$content;
-
-    my $meta = eval { CPAN::Meta->load_string($content) };
-    next if !$meta || $EVAL_ERROR;
-
-    return $meta->{provides} if $meta->{provides};
-  }
-
-  # Should not happen - injecting tarballs we create with CPAN::Maker
-  $self->get_logger->warn("META found but no provides in $file");
-
-  return {};
 }
 
 ########################################################################
@@ -545,8 +509,14 @@ sub cmd_create_index {
   my %pod_links;
 
   foreach my $distribution ( keys %{$repo} ) {
+    $self->get_logger->info( 'distribution: ' . $distribution );
 
     my ($distribution_name) = DarkPAN::Utils::parse_distribution_path($distribution);
+
+    if ( !$distribution_name ) {
+      warn "WARN: could not get distribution name from $distribution\n";
+      next;
+    }
 
     my $readme = $self->look_for_object( $distribution_name, 'README.html' );
 
@@ -686,6 +656,10 @@ sub init {
 
   my $profile = $config->{AWS}->{profile};
 
+  my $dist = __PACKAGE__;
+  $dist =~ s/::/-/xsmg;
+  my $dist_dir = $self->set_dist_dir( dist_dir($dist) );
+
   my $credentials = Amazon::Credentials->new( profile => $profile );
   $self->set_credentials($credentials);
 
@@ -715,6 +689,7 @@ sub fetch_template {
   # see if the index is set in the config file...
   if ( !$template && $index->{template} ) {
     $template = $index->{template};
+    $template = $template =~ /^\//xsm ? $template : sprintf '%s/%s', $self->get_dist_dir, $template;
   }
 
   my $index_template = $template eq 'default' ? slurp_file(*DATA) : slurp_file($template);
@@ -763,6 +738,7 @@ sub main {
         url|U=s
         distribution|d=s
         upload|u
+        upload-only|U
       )
     ],
     default_options => {
@@ -770,20 +746,21 @@ sub main {
       profile_name => 'default',
       profile      => $ENV{AWS_PROFILE}
     },
-    extra_options => [qw(config credentials template author_path s3)],
+    extra_options => [qw(config credentials template author_path s3 dist_dir)],
     commands      => {
+      'create'        => \&cmd_create_index,
       'create-docs'   => \&cmd_create_docs,
-      create          => \&cmd_create_index,
-      delete          => \&cmd_delete,
-      download        => \&cmd_download_orepan_index,
+      'create-index'  => \&cmd_create_index,
+      'delete'        => \&cmd_delete,
+      'download'      => \&cmd_download_orepan_index,
       'dump-template' => sub {
         print {*STDOUT} shift->get_template;
         return 0;
       },
-      inject             => \&cmd_inject,
+      'inject'           => \&cmd_inject,
       'invalidate-index' => \&cmd_invalidate_index,
-      show               => \&cmd_show_orepan_index,
-      upload             => \&cmd_upload_index,
+      'show'             => \&cmd_show_orepan_index,
+      'upload'           => \&cmd_upload_index,
       'upload-artifacts' => \&cmd_upload_artifacts,
     },
   );

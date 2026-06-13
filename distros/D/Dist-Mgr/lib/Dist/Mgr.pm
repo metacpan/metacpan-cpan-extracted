@@ -69,7 +69,7 @@ our %EXPORT_TAGS = (
     private => _export_private(),
 );
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 use constant {
     CONFIG_FILE         => 'dist-mgr.json',
@@ -286,8 +286,21 @@ sub copyright_bump {
         my ($contents, $tie) = _pod_tie($pod_file);
 
         for (0 .. $#$contents) {
-            if ($contents->[$_] =~ /^(Copyright\s+)\d{4}(\s+.*)/) {
-                $contents->[$_] = "$1$year$2";
+            # Match a single year (Copyright 2016), a dash range
+            # (Copyright 2016-2019) or a comma range (Copyright 2016,2019)
+            if ($contents->[$_] =~ /^(Copyright\s+)(\d{4})(?:\s*[-,]\s*(\d{4}))?(\s+.*)/) {
+                my ($prefix, $first, $second, $rest) = ($1, $2, $3, $4);
+
+                if (defined $second) {
+                    # A range: keep the first year, bump the latter to the
+                    # current year, and normalize the separator to a dash
+                    $contents->[$_] = "$prefix$first-$year$rest";
+                }
+                else {
+                    # A single year: replace it with the current year
+                    $contents->[$_] = "$prefix$year$rest";
+                }
+
                 $info{$pod_file} = $year;
                 last;
             }
@@ -414,13 +427,23 @@ sub init {
         croak("init()'s 'modules' parameter must be an array reference");
     }
 
+    # Module::Starter 1.79+ added multi-author support and now requires
+    # 'author' to be an arrayref of 'Name <email>' strings; older versions
+    # expect a plain scalar. Normalize for the installed version while
+    # leaving $args{author} untouched for _module_write_template() below
+    my %distro_args = %args;
+
+    if ($Module::Starter::VERSION >= 1.79) {
+        $distro_args{author} = ["$args{author} <$args{email}>"];
+    }
+
     if ($args{verbose}) {
-        delete $args{verbose};
-        Module::Starter->create_distro(%args);
+        delete $distro_args{verbose};
+        Module::Starter->create_distro(%distro_args);
     }
     else {
         capture_merged {
-            Module::Starter->create_distro(%args);
+            Module::Starter->create_distro(%distro_args);
         };
     }
 
@@ -648,10 +671,15 @@ sub version_incr {
 
     croak("version_incr() needs a version number sent in") if ! defined $version;
 
-    my $incremented_version;
-
     _validate_version($version);
-    return sprintf("%.2f", $version + '0.01');
+
+    # Increment the least-significant digit while preserving the version's
+    # precision (eg. 3.1802 -> 3.1803, not 3.19)
+
+    my $decimals  = $version =~ /\.(\d+)$/ ? length $1 : 0;
+    my $increment = 1 / 10 ** $decimals;
+
+    return sprintf("%.${decimals}f", $version + $increment);
 }
 sub version_info {
     my ($fs_entry) = @_;
@@ -1039,8 +1067,9 @@ sub _pod_extract_file_copyright {
     my $copyright_line = _pod_extract_file_copyright_line($module_file);
 
     if (defined $copyright_line) {
-        if ($copyright_line =~ /^Copyright\s+(\d{4})\s+\w+/) {
-            return $1;
+        if ($copyright_line =~ /^Copyright\s+(\d{4})(?:\s*[-,]\s*(\d{4}))?\s+\w+/) {
+            # For a range, report the latter (most recent) year
+            return defined $2 ? $2 : $1;
         }
     }
     else {
@@ -1056,7 +1085,7 @@ sub _pod_extract_file_copyright_line {
     open my $fh, '<', $pod_file or croak("Can't open POD file $pod_file: $!");
 
     while (<$fh>) {
-        if (/^Copyright\s+\d{4}\s+\w+/) {
+        if (/^Copyright\s+\d{4}(?:\s*[-,]\s*\d{4})?\s+\w+/) {
             return $_;
         }
     }
@@ -1136,7 +1165,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2022 Steve Bertrand.
+Copyright 2026 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

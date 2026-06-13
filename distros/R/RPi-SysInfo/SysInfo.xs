@@ -16,8 +16,17 @@ double cpuPercent (){
   unsigned long long totalUser, totalUserLow, totalSys, totalIdle, total;
 
   file = fopen("/proc/stat", "r");
-  fscanf(file, "cpu %llu %llu %llu %llu", &totalUser, &totalUserLow,
-         &totalSys, &totalIdle);
+
+  if (file == NULL){
+    return -1.0;
+  }
+
+  if (fscanf(file, "cpu %llu %llu %llu %llu", &totalUser, &totalUserLow,
+             &totalSys, &totalIdle) != 4){
+    fclose(file);
+    return -1.0;
+  }
+
   fclose(file);
 
   if (totalUser < lastTotalUser || totalUserLow < lastTotalUserLow ||

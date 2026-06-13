@@ -1,5 +1,7 @@
 Revision history for Finance-Tiller2QIF
 
+1.07      2026-05-27
+  - add option to revert to checkpoint when confirming run.
 1.06      2026-05-11
   - add support for qifdate (gnucash bug: it sometimes doesn't like iso dates)
   - support boolean command line options in config file.

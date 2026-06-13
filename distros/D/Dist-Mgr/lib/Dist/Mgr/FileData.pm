@@ -3,7 +3,7 @@ package Dist::Mgr::FileData;
 use warnings;
 use strict;
 
-our $VERSION = '1.13';
+our $VERSION = '1.14';
 
 use Exporter qw(import);
 our @ISA = qw(Exporter);
@@ -76,7 +76,7 @@ sub _ci_github_file {
         qq{    strategy:},
         qq{      matrix:},
         qq{        os: $os_matrix},
-        qq{        perl: [ '5.34', '5.32', '5.28', '5.24', '5.18', '5.14' ]},
+        qq{        perl: [ '5.42', '5.34', '5.32', '5.28', '5.24', '5.18', '5.14', '5.10' ]},
         qq{        include:},
         qq{          - perl: '5.32'},
         qq{            os: ubuntu-latest},
@@ -436,7 +436,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2020-2021 Steve Bertrand.
+Copyright 2020-2026 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

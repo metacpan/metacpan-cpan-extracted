@@ -1,5 +1,9 @@
 Revision history for RPi-StepperMotor
 
+3.1801    2026-06-12
+        - Bump prereq of WiringPi::API to 3.1803
+        - Bump prereq of RPi::Const to 1.05
+
 2.3605  2019-06-19
         - added new examples (multi-motor and fork)
         - added new name() feature so each motor object can have its own name

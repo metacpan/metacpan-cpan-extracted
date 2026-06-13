@@ -11,6 +11,7 @@ use Carp qw(confess);
 use DateTime;
 use DateTime::Format::Strptime;
 use Encode qw(decode encode);
+use IO::Uncompress::Brotli;
 use JSON;
 use LWP::UserAgent;
 use UUID qw(uuid4);
@@ -20,7 +21,7 @@ use Travel::Status::DE::DBRIS::JourneyAtStop;
 use Travel::Status::DE::DBRIS::Journey;
 use Travel::Status::DE::DBRIS::Location;
 
-our $VERSION = '0.29';
+our $VERSION = '0.30';
 
 # {{{ Constructors
 
@@ -59,6 +60,7 @@ sub new {
 		ua             => $ua,
 		header         => {
 			'accept'           => 'application/json',
+			'accept-encoding'  => 'gzip, br',
 			'content-type'     => 'application/json; charset=utf-8',
 			'Origin'           => 'https://www.bahn.de',
 			'Referer'          => 'https://www.bahn.de/buchung/fahrplan/suche',
@@ -301,7 +303,7 @@ sub get_with_cache {
 		}
 		return ( undef, $reply->status_line );
 	}
-	my $content = $reply->content;
+	my $content = $reply->decoded_content;
 
 	if ($cache) {
 		$cache->freeze( $url, \$content );
@@ -362,6 +364,14 @@ sub get_with_cache_p {
 				return;
 			}
 			my $content = $tx->res->body;
+
+			if (   $tx->res->headers->content_encoding
+				&& $tx->res->headers->content_encoding eq 'br' )
+			{
+				$content = IO::Uncompress::Brotli::unbro(
+					$tx->res->content->asset->slurp );
+			}
+
 			if ($cache) {
 				$cache->freeze( $url, \$content );
 			}
@@ -502,7 +512,7 @@ Non-blocking variant;
 
 =head1 VERSION
 
-version 0.29
+version 0.30
 
 =head1 DESCRIPTION
 

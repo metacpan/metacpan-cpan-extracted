@@ -2,7 +2,7 @@ package Zuzu::Runtime;
 
 use utf8;
 
-our $VERSION = '0.003000';
+our $VERSION = '0.004000';
 our $DEBUG_LEVEL = 0;
 
 use Digest::MD5 qw( md5_hex );
@@ -33,6 +33,7 @@ use Zuzu::Value::PairList;
 use Zuzu::Value::Regexp;
 use Zuzu::Value::Set;
 use Zuzu::Value::Bag;
+use POSIX ();
 use Zuzu::Value::Boolean;
 use Zuzu::Value::BinaryString;
 use Zuzu::Value::Task;
@@ -109,6 +110,7 @@ has 'builtin' => ( is => 'rw', default => sub {
 		'std/io/socks' => 'Zuzu::Module::Socks',
 		'std/string' => 'Zuzu::Module::String',
 		'std/string/base64' => 'Zuzu::Module::Base64',
+		'std/string/encode' => 'Zuzu::Module::String::Encode',
 		'std/digest/md5' => 'Zuzu::Module::DigestMD5',
 		'std/digest/sha' => 'Zuzu::Module::DigestSHA',
 		'std/secure' => 'Zuzu::Module::Secure',
@@ -2057,8 +2059,16 @@ sub eval_for {
 				@items = $array_like->resolved_items;
 			}
 		}
+	} elsif ( blessed($col) and $col->isa('Zuzu::Value::BinaryString') ) {
+		# Iterate byte-by-byte, each as a 1-byte BinaryString.
+		@items = map {
+			Zuzu::Value::BinaryString->new( bytes => $_ )
+		} split //, ( $col->bytes // '' );
+	} elsif ( !ref($col) and defined($col) and Zuzu::Value::Equality::equality_type($col) eq 'String' ) {
+		# Iterate character-by-character, each as a 1-char String.
+		@items = split //, $col;
 	} else {
-		die Zuzu::Error->new_runtime(message => "for(...) expects Array, Dict, PairList, Set, Bag, Function, or convertible Object", file => $node->file, line => $node->line);
+		die Zuzu::Error->new_runtime(message => "for(...) expects Array, Dict, PairList, Set, Bag, Function, String, BinaryString, or convertible Object", file => $node->file, line => $node->line);
 	}
 
 	if ( !@items and !defined $iter_fn ) {
@@ -3743,10 +3753,13 @@ sub _eval_binary_op_values {
 	if ($op eq '-' ) { return $self->_to_Number($l) - $self->_to_Number($r); }
 	if ($op eq '*' || $op eq '×') { return $self->_to_Number($l) * $self->_to_Number($r); }
 	if ($op eq '/' || $op eq '÷') { return $self->_to_Number($l) / $self->_to_Number($r); }
-	if ($op eq 'mod') { return $self->_to_Number($l) % $self->_to_Number($r); }
+	if ($op eq 'mod') { return POSIX::fmod( $self->_to_Number($l), $self->_to_Number($r) ); }
 	if ($op eq '**') { return $self->_to_Number($l) ** $self->_to_Number($r); }
 	if ($op eq '&' || $op eq '|' || $op eq '^') {
 		return $self->_bitwise_binary_op( $op, $l, $r, $file, $line );
+	}
+	if ($op eq '<<' || $op eq '«' || $op eq '>>' || $op eq '»') {
+		return $self->_shift_binary_op( $op, $l, $r, $file, $line );
 	}
 
 		if ( $op eq '_' ) {
@@ -3777,6 +3790,13 @@ sub _eval_binary_op_values {
 
 		return $self->_to_OperatorString( $l, $file, $line )
 			. $self->_to_OperatorString( $r, $file, $line );
+	}
+
+	if ($op eq '∣' || $op eq 'divides' || $op eq '∤') {
+		# The left operand is the divisor: a ∣ b tests b mod a.
+		my $remainder = POSIX::fmod( $self->_to_Number($r), $self->_to_Number($l) );
+		return $remainder if $op eq '∤';
+		return _boolify( $remainder == 0 );
 	}
 
 	# numeric comparisons
@@ -4199,6 +4219,70 @@ sub _bitwise_binary_string_pair {
 	}
 
 	return Zuzu::Value::BinaryString->new( bytes => $out );
+}
+
+sub _shift_binary_op {
+	my ( $self, $op, $left, $right, $file, $line ) = @_;
+
+	my $left_shift = ( $op eq '<<' || $op eq '«' ) ? 1 : 0;
+	my $count = $self->_to_Number( $right );
+	$count = int( $count );
+	if ( $count < 0 ) {
+		die Zuzu::Error->new_runtime(
+			message => "shift count must be a non-negative integer",
+			file => $file,
+			line => $line,
+		);
+	}
+
+	if ( blessed($left) and $left->isa('Zuzu::Value::BinaryString') ) {
+		return Zuzu::Value::BinaryString->new(
+			bytes => _shift_bitstream( $left->bytes // '', $count, $left_shift ),
+		);
+	}
+
+	my $value = int( $self->_to_Number( $left ) );
+	my $factor = 2 ** $count;
+	return $left_shift
+		? $value * $factor
+		: POSIX::floor( $value / $factor );
+}
+
+# Shift a byte string as one whole bit string: bits carry across byte
+# boundaries, length is preserved, vacated bits are 0.
+sub _shift_bitstream {
+	my ( $bytes, $count, $left ) = @_;
+
+	my $len = length( $bytes );
+	return $bytes if $len == 0;
+	return "\0" x $len if $count >= $len * 8;
+
+	my $byte_shift = int( $count / 8 );
+	my $bit_shift = $count % 8;
+	my $out = '';
+	for ( my $i = 0; $i < $len; $i++ ) {
+		my $value;
+		if ( $left ) {
+			my $src = $i + $byte_shift;
+			my $hi = $src < $len ? ord( substr( $bytes, $src, 1 ) ) : 0;
+			my $lo = $src + 1 < $len ? ord( substr( $bytes, $src + 1, 1 ) ) : 0;
+			$value = ( ( ( $hi << 8 ) | $lo ) << $bit_shift ) >> 8;
+		}
+		else {
+			if ( $i < $byte_shift ) {
+				$out .= "\0";
+				next;
+			}
+			my $lo = ord( substr( $bytes, $i - $byte_shift, 1 ) );
+			my $hi = $i > $byte_shift
+				? ord( substr( $bytes, $i - $byte_shift - 1, 1 ) )
+				: 0;
+			$value = ( ( $hi << 8 ) | $lo ) >> $bit_shift;
+		}
+		$out .= chr( $value & 0xFF );
+	}
+
+	return $out;
 }
 
 sub _bitwise_not_value {
@@ -5805,7 +5889,16 @@ sub _to_Number {
 
 	if ( !ref($value) ) {
 		return 0 + $value if equality_type($value) eq 'Number';
-		return 0 + $value if $self->_is_numeric_string($value);
+		if ( $self->_is_numeric_string($value) ) {
+			# Radix-prefixed strings coerce case-insensitively.
+			if ( $value =~ /\A([+-]?)(0[xXbB][0-9A-Fa-f]+|0[oO][0-7]+)\z/ ) {
+				my ( $sign, $digits ) = ( $1, $2 );
+				$digits =~ s/\A0[oO]/0/;
+				my $magnitude = oct( lc $digits );
+				return $sign eq '-' ? -$magnitude : $magnitude;
+			}
+			return 0 + $value;
+		}
 	}
 
 	$self->_throw_operator_coercion_error( 'Number', $value, $file, $line );
@@ -5846,6 +5939,7 @@ sub _is_numeric_string {
 	my ( $self, $value ) = @_;
 
 	return 0 if ref($value);
+	return 1 if $value =~ /\A[+-]?(?:0[xX][0-9A-Fa-f]+|0[bB][01]+|0[oO][0-7]+)\z/;
 	return $value =~ /\A[+-]?(?:(?:\d+(?:\.\d*)?)|(?:\.\d+))(?:[eE][+-]?\d+)?\z/
 		? 1
 		: 0;

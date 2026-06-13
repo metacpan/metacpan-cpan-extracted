@@ -1,5 +1,11 @@
 Revision history for RPi-GPIOExpander-MCP23017
 
+1.03    2026-06-12
+        - Makefile.PL's i2c presence check can now be bypassed with
+          RPI_DIST_RELEASE=1 so release tarballs can be cut on non-Pi
+          machines; without it the check still exits before WriteMakefile
+          (CPAN testers report NA, not FAIL)
+
 1.02    2019-10-23
         - merged PR from Mohammad S. Anwar that added a missed file in
           MANIFEST

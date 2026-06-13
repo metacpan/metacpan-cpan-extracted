@@ -1,10 +1,10 @@
 {
    "abstract" : "Beware empty alternatives, because they always match.",
    "author" : [
-      "Thomas R. Wyant, III F<wyant at cpan dot org>"
+      "Thomas R. Wyant, III F<harryfmudd at comcast dot net>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -58,14 +58,14 @@
    "provides" : {
       "Perl::Critic::Policy::RegularExpressions::ProhibitEmptyAlternatives" : {
          "file" : "lib/Perl/Critic/Policy/RegularExpressions/ProhibitEmptyAlternatives.pm",
-         "version" : "0.005"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "wyant@cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-RegularExpressions-ProhibitEmptyAlternatives"
+         "mailto" : "harryfmudd@comcast.net",
+         "web" : "https://github.com/trwyant/perl-Perl-Critic-Policy-RegularExpressions-ProhibitEmptyAlternatives/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -76,6 +76,6 @@
          "web" : "https://github.com/trwyant/perl-Perl-Critic-Policy-RegularExpressions-ProhibitEmptyAlternatives"
       }
    },
-   "version" : "0.005",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.006",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

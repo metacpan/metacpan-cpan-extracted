@@ -2106,6 +2106,14 @@ all files will be written to C<< $fh-E<gt>filename >>; be sure to put C<< execut
 
 =head1 Change log
 
+=head2 0.28
+
+colorbar options now work better in C<scatter>.
+
+Better warning when color key isn't defined for C<scatter>
+
+When giving two hash of hashes for a barplot, if one second key is defined in one subplot, but not the other, that subkey is initialized to 0.
+
 =head2 0.27
 
 Better warnings for undefined data in C<scatter>

@@ -4,7 +4,7 @@
       "Steve Bertrand <steveb@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -32,9 +32,9 @@
       },
       "runtime" : {
          "requires" : {
-            "RPi::Const" : "0",
-            "WiringPi::API" : "2.3614",
-            "perl" : "5.01"
+            "RPi::Const" : "1.05",
+            "WiringPi::API" : "3.1803",
+            "perl" : "5.010"
          }
       }
    },
@@ -49,6 +49,6 @@
          "web" : "https://github.com/stevieb9/rpi-steppermotor"
       }
    },
-   "version" : "2.3605",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "3.1801",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -9,8 +9,6 @@ use Test::Deep;
 use Test::MockTime;
 
 use Data::Dumper;
-use DateTime;
-use DateTime::TimeZone;
 use Time::Moment;
 use Storable qw(dclone);
 use YAML::XS ();
@@ -27,7 +25,7 @@ subtest 'If logdate is "in the future" it is actually "in the past"' => sub {
     my $msg = parse_syslog_line(q|<11>Mar  27 01:59:59 11.22.33.44 dhcpd: DHCPINFORM from 172.16.2.137 via vlan3|);
 
     cmp_deeply($msg, superhashof({
-        datetime_str => '2016-03-27T01:59:59Z',
+        datetime_utc => '2016-03-27T01:59:59Z',
         datetime_raw => 'Mar  27 01:59:59',
     }), 'date is "in the past" - intuitive behaviour');
 
@@ -35,7 +33,7 @@ subtest 'If logdate is "in the future" it is actually "in the past"' => sub {
     $msg = parse_syslog_line(q|<11>Mar  27 01:59:59 11.22.33.44 dhcpd: DHCPINFORM from 172.16.2.137 via vlan3|);
 
     cmp_deeply($msg, superhashof({
-        datetime_str => '2015-03-27T01:59:59Z',
+        datetime_utc => '2015-03-27T01:59:59Z',
         datetime_raw => 'Mar  27 01:59:59',
     }), 'date is "in the future" - HTTP::Date assumes it is in the past and finds a date match from previous year');
 };
@@ -48,7 +46,7 @@ subtest 'setting named timezone for syslog file' => sub {
     set_syslog_timezone('EST');
     my $msg = parse_syslog_line(q|2015-09-30T06:26:06.779373-05:00 my-host my-script.pl: {"lunchTime":1443612366.442}|);
     cmp_deeply($msg, superhashof({
-        datetime_str => '2015-09-30T06:26:06.779373-0500',
+        datetime_utc => '2015-09-30T11:26:06.779373Z',
         datetime_raw => '2015-09-30T06:26:06.779373-05:00',
     }), 'By default we will discard timezone present in message.');
 
@@ -62,7 +60,7 @@ subtest 'setting named timezone for syslog file' => sub {
 
     $msg = parse_syslog_line(q|<11>Mar  27 01:59:59 11.22.33.44 dhcpd: DHCPINFORM from 172.16.2.137 via vlan3|);
     cmp_deeply($msg, superhashof({
-        datetime_str => '2016-03-27T01:59:59+0200',
+        datetime_utc => '2016-03-26T23:59:59Z',
         datetime_raw => 'Mar  27 01:59:59',
     }), 'msg date is +02:00');
 
@@ -70,13 +68,13 @@ subtest 'setting named timezone for syslog file' => sub {
     Test::MockTime::set_fixed_time("2016-02-29T05:41:00Z"); #TZ +01:00
     $msg = parse_syslog_line(q|<11>Mar  27 01:59:59 11.22.33.44 dhcpd: DHCPINFORM from 172.16.2.137 via vlan3|);
     cmp_deeply($msg, superhashof({
-        datetime_str => '2015-03-27T01:59:59+0200',
+        datetime_utc => '2015-03-26T23:59:59Z',
         datetime_raw => 'Mar  27 01:59:59',
     }), 'msg date is +01:00 same as local timezone');
 
     $msg = parse_syslog_line(q|<11>Mar  27 03:00:01 11.22.33.44 dhcpd: DHCPINFORM from 172.16.2.137 via vlan3|);
     cmp_deeply($msg, superhashof({
-        datetime_str => '2015-03-27T03:00:01+0200',
+        datetime_utc => '2015-03-27T01:00:01Z',
         datetime_raw => 'Mar  27 03:00:01',
     }), 'msg date is +02:00 but since it is in the future, it jumped back to 2015 where DST change ocurred 2015-03-29');
     reset_time();

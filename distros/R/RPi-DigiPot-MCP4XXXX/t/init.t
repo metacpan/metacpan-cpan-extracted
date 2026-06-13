@@ -6,8 +6,8 @@ use Test::More;
 
 use RPi::DigiPot::MCP4XXXX;
 
-if (! $ENV{PI_BOARD}){
-    plan skip_all => "not a Pi board (env PI_BOARD)";
+if (! $ENV{RPI_BOARD}){
+    plan skip_all => "not a Pi board (env RPI_BOARD)";
     exit;
 }
 

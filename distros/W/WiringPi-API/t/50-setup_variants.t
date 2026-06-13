@@ -10,7 +10,7 @@ use WiringPi::API qw(:wiringPi :perl :constants);
 # on anything other than WPI_PIN_BCM / WPI_PIN_WPI.
 
 BEGIN {
-    if (! $ENV{PI_BOARD}){
+    if (! $ENV{RPI_BOARD}){
         plan skip_all => "not a Pi board";
         exit;
     }

@@ -1,5 +1,51 @@
 Revision history for RPi-Pin
 
+2.3609    2026-06-12
+        - pwm() now does a check for the UID of the calling user, and if it's
+          not root, we die (closes #7)
+        - add "comment"/label feature to SYNOPSIS (closes #5)
+        - set_interrupt() now requires $callback to be a CODE reference (the
+          WiringPi::API 3.18 self-pipe model dispatches in Perl); a string sub
+          name is no longer accepted. Validates $edge, $callback and the new
+          optional $debounce_us argument
+        - set_interrupt()/interrupt_set() now accept an optional 4th argument,
+          $debounce_us (debounce window in microseconds)
+        - interrupt_set() now correctly delegates to set_interrupt() (it was
+          passing the pin number in place of the edge)
+        - Added background_interrupt($edge, $callback, $debounce_us): handles the
+          interrupt in a forked background process (fires even while main is
+          busy); returns a handle with stop/pid/running. Maps to
+          WiringPi::API::background_interrupt()
+        - background_interrupt() now forwards an optional trailing options
+          hashref (eg. {results => 1}, which ships the handler's return value
+          back to the parent via the handle's read()/fh())
+        - set_interrupt() now forwards an optional trailing options hashref too
+          (eg. {auto_dispatch => 1} or {auto_dispatch => 'USR1'}, which turns on
+          auto-dispatch as part of arming)
+        - Added lib/INTERRUPTS.md: a guide to arming interrupts on a pin
+          (set_interrupt / background_interrupt, the dispatch gotcha, the results
+          channel) and where the process-level dispatch methods live
+        - Now uses RPi::Const internally: mode() and pwm() validate against the
+          named pin-mode constants (INPUT/OUTPUT/PWM_OUT/GPIO_CLOCK) and pull()
+          against PUD_OFF/PUD_DOWN/PUD_UP instead of magic integers. Added
+          RPi::Const 1.04 as a prerequisite
+        - Fixed a misleading inline comment in pull() that had the direction
+          values backwards (it read "0 == down, 1 == up, 2 == off"; the correct
+          mapping is PUD_OFF 0, PUD_DOWN 1, PUD_UP 2, as the POD already stated)
+        - t/40-interrupt_and_pud.t now passes the handler as a CODE reference
+          (string sub names are no longer accepted) and calls
+          wait_interrupts(500) before each assertion per the 3.18 dispatch
+          model
+        - t/15-pwm.t now accepts the Pi 5 ALT value for GPIO 18 hardware PWM
+          (ALT3/7 via RP1) in addition to the Pi 1-4 value (ALT5/2)
+        - The sudo re-exec in t/15 and t/40 now uses $^X with the blib paths
+          and re-feeds the gate env var; the bare 'sudo perl' resolved to the
+          system perl, which died with "Can't locate RPi/Pin.pm" when the
+          suite was run as non-root
+        - The test suite board gate is now RPI_BOARD (ecosystem-wide rename
+          from PI_BOARD); the old name is no longer honored. t/40's interrupt
+          callback counter is a file lexical now instead of $ENV{PI_INTERRUPT}
+
 2.3608  2019-10-19
         - add extra environment checks, and disable tests if required (work on
           stevieb9/rpi-wiringpi#159)

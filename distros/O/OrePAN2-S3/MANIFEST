@@ -3,6 +3,7 @@ bin/orepan2-s3
 bin/orepan2-s3-index
 ChangeLog
 lib/OrePAN2/S3.pm
+lib/OrePAN2/S3/Indexer.pm
 lib/OrePAN2/S3/Role/Delete.pm
 lib/OrePAN2/S3/Role/Inject.pm
 lib/OrePAN2/S3/Role/UploadArtifacts.pm

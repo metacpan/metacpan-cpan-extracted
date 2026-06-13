@@ -1,3 +1,55 @@
+Fri Jun 12 14:37:29 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.2.3]:
+	* VERSION: bump
+	* release-notes.md: updated
+	* release-notes/release-notes-1.2.3.md: new
+	* cpanfile
+	- +File::ShareDir
+	* requires: likewise
+	* lib/OrePAN2/S3.pm.in
+	(init)
+	- set dist_dir
+	(main): +dist_dir
+	* lib/OrePAN2/S3/Role/UploadArtifacts.pm.in: modified
+	(cmd_upload_artifacts):
+	- upload files from distribution or fqp
+
+Wed May 20 07:32:52 2026  Rob Lauer  <rclauer@gmail.com>
+
+	[1.2.2]:
+	* release-notes/release-notes-1.2.2.md: new
+	* release-notes.md: new
+	* VERSION: bump
+	* requires: +Log::Log4perl
+	* cpanfile: likewise
+	* lib/OrePAN2/S3/Indexer.pm.in: new
+	* bin/orepan2-s3.in
+	- -u, --upload-only upload only
+	- no need to test create_index return value
+	(create_index)
+	- add 'done uploading' message
+	- return 0
+	(invalidate_cache)
+	- test result of operation
+	- echo response
+	(cleanup): test for temp dir first
+	(add)
+	- implement upload-only path
+	* lib/OrePAN2/S3.pm.in
+	(cmd_create_index)
+	- add log messages, warn if we can't get a distribution name
+	(main): + upload-only option
+	(scan_provides): moved
+	* lib/OrePAN2/S3/Indexer.pm.in: new
+	* lib/OrePAN2/S3/Role/Inject.pm.in: modified
+	(scan_provides): move here
+	(cmd_inject): return if upload only
+	(_index_tarball): new
+	(fetch_oprepan_index): new
+	(update_index): new
+	* release-notes/release-notes-1.2.1.md: add retroactively
+
 Mon May  4 15:07:27 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[1.2.1]:

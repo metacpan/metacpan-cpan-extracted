@@ -1,0 +1,41 @@
+from test/more import *;
+
+// a ∣ b — "a divides b": Boolean, true iff b mod a = 0.
+is( 2 ∣ 6, true, "2 divides 6" );
+is( 4 ∣ 6, false, "4 does not divide 6" );
+is( 6 ∣ 6, true, "6 divides itself" );
+is( 1 ∣ 7, true, "1 divides everything" );
+is( typeof( 2 ∣ 6 ), "Boolean", "∣ returns a Boolean" );
+
+// divides is the ASCII alias for ∣.
+is( 2 divides 6, 2 ∣ 6, "divides keyword matches ∣ (true case)" );
+is( 4 divides 6, false, "divides keyword matches ∣ (false case)" );
+
+// a ∤ b — "a does not divide b": returns b mod a, truthy iff a ∤ b.
+is( 2 ∤ 6, 0, "∤ returns 0 when the divisor divides" );
+is( 4 ∤ 6, 2, "∤ returns the remainder" );
+is( typeof( 4 ∤ 6 ), "Number", "∤ returns a Number" );
+is( 4 ∤ 6 ? 1 : 0, 1, "non-zero remainder is truthy" );
+is( 2 ∤ 6 ? 1 : 0, 0, "zero remainder is falsy" );
+is( 5 ∤ 13, 13 mod 5, "∤ agrees with mod" );
+
+// Numeric operators coerce their operands to Number.
+is( "2" ∣ "6", true, "∣ coerces String operands" );
+is( "4" ∤ "6", 2, "∤ coerces String operands" );
+
+// Non-integer operands work, like mod.
+is( 0.5 ∣ 7.5, true, "0.5 divides 7.5" );
+is( 2 ∤ 2.5, 0.5, "∤ with a non-integer dividend" );
+
+// mod semantics shared by all implementations: float remainder taking
+// the sign of the left operand (the dividend).
+is( 2.5 mod 2, 0.5, "mod accepts non-integer operands" );
+is( 7.5 mod 0.5, 0, "mod with a non-integer divisor" );
+is( -7 mod 2, -1, "mod takes the sign of the dividend" );
+is( 7 mod -2, 1, "mod ignores the divisor's sign" );
+
+// Precedence: ∣ and ∤ sit at the comparison tier, so they bind tighter
+// than logical operators.
+is( 2 ∣ 6 and 3 ∣ 9, true, "∣ binds tighter than and" );
+
+done_testing();

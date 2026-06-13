@@ -27,7 +27,6 @@
 - [Anti-patterns to avoid](#anti-patterns-to-avoid)
 - [API reference for these examples](#api-reference-for-these-examples)
 - [Code flow — Perl → API.pm → API.xs → wiringPi](#code-flow--perl--apipm--apixs--wiringpi)
-- [What changed vs `isr-examples.md`](#what-changed-vs-isr-examplesmd)
 
 ## About these examples
 
@@ -39,7 +38,8 @@
   (`INT_EDGE_FALLING`=1 / `INT_EDGE_RISING`=2) and a microsecond timestamp.
 - **Pin numbering** follows whichever setup you call: `setup()` = wiringPi
   numbering, `setup_gpio()` = BCM. Examples use `setup()`.
-- **Mode constants** for `pin_mode`: `INPUT`=0, `OUTPUT`=1 (shown as integers).
+- **Mode constants** for `pin_mode`: `INPUT` and `OUTPUT` — exported by
+  `WiringPi::API` and used by name throughout (no bare `0`/`1`).
 - **To hide the most work, prefer the hands-off options.** `auto_dispatch_interrupts`
   (scenario 7) fires callbacks in your own process with no loop; `background_interrupt`
   (scenario 8) runs an independent handler in its own process. Scenario 9 is the
@@ -97,10 +97,10 @@ Do your own work, and fire any pending interrupt callbacks each pass.
 ```perl
 use strict;
 use warnings;
-use WiringPi::API qw(setup pin_mode set_interrupt dispatch_interrupts INT_EDGE_RISING);
+use WiringPi::API qw(setup pin_mode set_interrupt dispatch_interrupts INPUT INT_EDGE_RISING);
 
 setup();
-pin_mode(0, 0);            # INPUT
+pin_mode(0, INPUT);
 
 set_interrupt(0, INT_EDGE_RISING, sub {
     my ($edge, $ts_us) = @_;
@@ -141,10 +141,10 @@ arrives (or the timeout), then dispatches.
 ```perl
 use strict;
 use warnings;
-use WiringPi::API qw(setup pin_mode set_interrupt wait_interrupts INT_EDGE_BOTH);
+use WiringPi::API qw(setup pin_mode set_interrupt wait_interrupts INPUT INT_EDGE_BOTH);
 
 setup();
-pin_mode(0, 0);            # INPUT
+pin_mode(0, INPUT);
 
 set_interrupt(0, INT_EDGE_BOTH, \&on_change);
 
@@ -189,10 +189,10 @@ descriptors — so one loop handles sockets, timers, and GPIO together.
 ```perl
 use strict;
 use warnings;
-use WiringPi::API qw(setup pin_mode set_interrupt dispatch_interrupts interrupt_fd INT_EDGE_RISING);
+use WiringPi::API qw(setup pin_mode set_interrupt dispatch_interrupts interrupt_fd INPUT INT_EDGE_RISING);
 
 setup();
-pin_mode(0, 0);            # INPUT
+pin_mode(0, INPUT);
 set_interrupt(0, INT_EDGE_RISING, \&on_edge);
 
 my $fd = interrupt_fd();
@@ -231,10 +231,10 @@ One pipe, one loop, many pins — each with its own callback.
 use strict;
 use warnings;
 use WiringPi::API qw(setup pin_mode set_interrupt wait_interrupts
-                     INT_EDGE_RISING INT_EDGE_FALLING INT_EDGE_BOTH);
+                     INPUT INT_EDGE_RISING INT_EDGE_FALLING INT_EDGE_BOTH);
 
 setup();
-pin_mode($_, 0) for (0, 2, 3);   # INPUT
+pin_mode($_, INPUT) for (0, 2, 3);
 
 set_interrupt(0, INT_EDGE_RISING,  sub { print "button A\n" });
 set_interrupt(2, INT_EDGE_FALLING, sub { print "button B\n" });
@@ -290,13 +290,14 @@ pipe — it is *not* a hardware debounce. The attribute's field is a `u32`, so t
 effective maximum is ~2³² µs (≈ 71 minutes) — unlimited for any real use.
 
 ```perl
-use WiringPi::API qw(setup pin_mode set_interrupt wait_interrupts INT_EDGE_FALLING);
+use WiringPi::API qw(setup pin_mode set_interrupt wait_interrupts INPUT INT_EDGE_FALLING);
 
 setup();
-pin_mode(0, 0);
+pin_mode(0, INPUT);
 
-# debounce a noisy button: ignore repeat edges within 5ms
-set_interrupt(0, INT_EDGE_FALLING, \&pressed, 5000);
+# Debounce a noisy button: ignore repeat edges within 5ms
+
+set_interrupt(0, INT_EDGE_FALLING, \&pressed, 5 * 1000); # micros -> millis
 
 wait_interrupts(1000) while 1;
 
@@ -321,7 +322,8 @@ listener is stopped first).
 set_interrupt(0, INT_EDGE_RISING, \&handler_a);
 
 # Re-arm the same pin with a different handler — the old listener is stopped
-# automatically first, so no stacked/duplicate registration:
+# automatically first, so no stacked/duplicate registration
+
 set_interrupt(0, INT_EDGE_RISING, \&handler_b);
 
 stop_interrupt(0);    # stop one pin, forget its callback
@@ -378,10 +380,10 @@ with **no locking**.
 ```perl
 use strict;
 use warnings;
-use WiringPi::API qw(setup pin_mode set_interrupt auto_dispatch_interrupts INT_EDGE_RISING);
+use WiringPi::API qw(setup pin_mode set_interrupt auto_dispatch_interrupts INPUT INT_EDGE_RISING);
 
 setup();
-pin_mode(0, 0);            # INPUT
+pin_mode(0, INPUT);
 
 auto_dispatch_interrupts(1);          # callbacks now fire on their own — no loop to write
 
@@ -443,10 +445,10 @@ a message); it can't touch your main program's variables.
 ```perl
 use strict;
 use warnings;
-use WiringPi::API qw(setup pin_mode background_interrupt INT_EDGE_RISING);
+use WiringPi::API qw(setup pin_mode background_interrupt INPUT INT_EDGE_RISING);
 
 setup();
-pin_mode(0, 0);            # INPUT
+pin_mode(0, INPUT);
 
 my $h = background_interrupt(0, INT_EDGE_RISING, sub {
     my ($edge, $ts_us) = @_;
@@ -454,6 +456,7 @@ my $h = background_interrupt(0, INT_EDGE_RISING, sub {
 });
 
 # main carries on; the handler fires on its own
+
 for (1 .. 10) {
     do_other_work();
     sleep 1;
@@ -477,14 +480,20 @@ pass `{ results => 1 }` and **return** a value from the handler; the parent drai
 it:
 
 ```perl
-my $h = background_interrupt(0, INT_EDGE_RISING, sub {
-    my ($edge, $ts_us) = @_;
-    return "$edge\@$ts_us";            # shipped back to the parent
-}, { results => 1 });
+my $h = background_interrupt(
+    0,
+    INT_EDGE_RISING,
+    sub {
+        my ($edge, $ts_us) = @_;
+        return "$edge\@$ts_us"; # Returned to parent
+    },
+    { results => 1 }
+);
 
 while (defined(my $msg = $h->read)) {  # non-blocking drain
     print "handler reported: $msg\n";
 }
+
 # $h->fh is the read filehandle, for select / IO::Select
 ```
 
@@ -514,16 +523,17 @@ drains and dispatches.
 use strict;
 use warnings;
 use IO::Select;
-use WiringPi::API qw(setup pin_mode set_interrupt wait_interrupts INT_EDGE_RISING);
+use WiringPi::API qw(setup pin_mode set_interrupt wait_interrupts INPUT INT_EDGE_RISING);
 
 setup();
-pin_mode(0, 0);                          # INPUT — plain config, before fork
+pin_mode(0, INPUT);
 
 # This $rx/$tx pipe is YOUR OWN results channel (child -> parent), separate from
 # the library's internal self-pipe (a fixed 24-byte {pin, pin_bcm, edge, status, ts} record). You
 # choose this channel's format; here, one newline-terminated text line per edge —
 # self-delimiting, and portable (no 64-bit pack template, no fixed-width framing
 # to get wrong).
+
 pipe(my $rx, my $tx) or die "pipe: $!";
 
 my $pid = fork // die "fork: $!";
@@ -531,22 +541,31 @@ my $pid = fork // die "fork: $!";
 if ($pid == 0) {
     # Child owns interrupt handling; arm HERE (post-fork). Only the child reads
     # the library's interrupt fd — the parent never calls dispatch on it.
+
     close $rx;
-    set_interrupt(0, INT_EDGE_RISING, sub {
-        my ($edge, $ts_us) = @_;
-        syswrite $tx, "$edge $ts_us\n";          # one text line up to the parent
-    });
+
+    set_interrupt(
+        0,
+        INT_EDGE_RISING,
+        sub {
+            my ($edge, $ts_us) = @_;
+            syswrite $tx, "$edge $ts_us\n"; # One text line up to the parent
+        }
+    );
+
     wait_interrupts(1000) while 1;
     exit 0;
 }
 
-# Parent: free to work; drain results without blocking.
+# Parent: free to work; drain results without blocking
+
 close $tx;
 my $sel = IO::Select->new($rx);
 my $buf = '';
 
 # Reap the child on normal exit/die even if you forget to stop it explicitly.
 # (Not run on signal-kill — trap signals too if you need that.)
+
 END { if ($pid) { kill 'TERM', $pid; waitpid $pid, 0; $pid = undef; } }
 
 while (1) {
@@ -554,13 +573,19 @@ while (1) {
 
     while ($sel->can_read(0)) {
         my $n = sysread($rx, my $chunk, 4096);
-        if (!defined $n) {
-            last if $!{EINTR};                        # signal: retry next pass ($buf intact)
-            $sel->remove($rx); last;                  # any other error: stop, don't spin
+        if (! defined $n) {
+            last if $!{EINTR};                        # Signal: retry next pass ($buf intact)
+            $sel->remove($rx); last;                  # Any other error: stop, don't spin
         }
-        if ($n == 0)     { $sel->remove($rx); last }  # EOF: child exited — stop watching
+
+        if ($n == 0) {
+            # EOF: child exited — stop watching
+            $sel->remove($rx);
+            last
+        }  
         $buf .= $chunk;
-        while ($buf =~ s/^([^\n]*)\n//) {             # consume only complete lines
+        
+        while ($buf =~ s/^([^\n]*)\n//) {             # Consume only complete lines
             my ($edge, $ts_us) = split ' ', $1;
             print "edge $edge at ${ts_us}us\n";
         }
@@ -615,14 +640,14 @@ initial call.
 use strict;
 use warnings;
 use WiringPi::API qw(setup pin_mode background_interrupts
-                     INT_EDGE_RISING INT_EDGE_BOTH);
+                     INPUT INT_EDGE_RISING INT_EDGE_BOTH);
 
 setup();
-pin_mode($_, 0) for (0, 2);
+pin_mode($_, INPUT) for (0, 2);
 
 my $h = background_interrupts(
     [0, INT_EDGE_RISING, \&on_button],
-    [2, INT_EDGE_BOTH,   \&on_sensor, 5000],   # optional debounce
+    [2, INT_EDGE_BOTH,   \&on_sensor, 5 * 1000],   # Optional debounce
 );
 
 # ... main does its own thing; both pins are handled in the one child ...
@@ -742,49 +767,3 @@ Keying on `userdata` (0) — not `pinBCM` (17) — is what makes `$_interrupt_cb
 match under `setup()`; under `setup_gpio()` they'd coincide. The wiringPi ISR
 thread only ever does a `write()` of the fixed 24-byte record; it never enters
 the Perl interpreter, which is why this works on any Perl without locking.
-
-## What changed vs `isr-examples.md`
-
-This file is the reviewed finalization of `isr-examples.md`. Each change below is a
-correctness or clarity fix agreed during review; line references are to the
-original.
-
-1. **Status banner → two distinct claims.** "design-stable (patterns settled) /
-   implementation-provisional (API unimplemented; `API.xs` still ships the old
-   dispatcher-thread design)." The original's single "provisional" buried the lede
-   that the snippets won't run yet.
-2. **Debounce is kernel, not hardware** (orig. lines 227, 239). Verified against
-   `wiringPi.c`: `interruptHandlerInit` sets `GPIO_V2_LINE_ATTR_ID_DEBOUNCE` on the
-   GPIO-v2 line request, so the *kernel* debounces. "In the kernel" (orig. 235)
-   was already correct and is kept; "hardware" is corrected. Added the `u32`
-   (~2³² µs ≈ 71 min) range.
-3. **Scenario 9 → newline-delimited text framing** (was `pack('l q')` / `unpack`).
-   Fixes two things at once: (a) the `q`/`Q` pack template needs a 64-bit-IV Perl
-   and can **croak at compile time** on a 32-bit Pi build; (b) self-delimiting text
-   removes all fixed-width framing reasoning. Matches the spec's own example
-   (`isr-migration.md:153`). Binary records kept as a documented high-rate footnote.
-4. **Scenario 9 EOF & error handling.** The original drain (`last if !sysread`)
-   busy-spins once the child closes the pipe (EOF stays "readable"). The new drain
-   distinguishes three cases: `undef` + `EINTR` → retry next pass (`$buf` intact);
-   `undef` + any other errno → `$sel->remove` (terminal, like EOF — otherwise a
-   persistent error such as `EBADF` spins through `do_other_work` with nowhere to
-   sleep); `0` (EOF) → `$sel->remove`. A dead child *or* a hard read error stops the
-   spin.
-5. **Backpressure note** added to scenario 9: a stalled parent blocks the child's
-   `syswrite`, which backpressures the internal self-pipe and silently drops edges
-   — observable via `interrupt_dropped()`.
-6. **`END`-block reaper** in scenario 9 (was a comment) so a forgotten child is
-   reaped on normal exit/die; clears `$pid` after `waitpid` so a second END pass
-   (e.g. a failed `exec`) can't double-reap; noted that scenario 8 does this for you.
-7. **Single-reader note** (scenario 9 + anti-patterns): after fork only the child
-   reads the interrupt fd; the parent uses the results pipe.
-8. **7-vs-8 tradeoff line** at the top of the decision guide, plus a "most programs
-   only need 7 or 8" signpost in *About* — **without** reordering 1–6 (they define
-   the model 7/8 hide).
-9. **Two-channels clarification** in scenario 9: the `$rx`/`$tx` results pipe is the
-   user's own channel, distinct from the internal 24-byte self-pipe; its format is
-   independent.
-10. **Return-value column** in the API reference (flagged provisional, with the
-    "keep doc/spec/XS in sync" warning) — the original documented no return values.
-11. **`$h->stop` idempotency** noted in scenario 8; **busy-spin** caveat added to
-    scenarios 1 and 9 and the anti-patterns list.

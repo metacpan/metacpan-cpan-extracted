@@ -1,12 +1,11 @@
 requires "DateTime::Format::ISO8601";
 requires "HTML::Entities";
 requires "HTML::TreeBuilder::XPath";
-requires "JSON";
+requires "JSON::MaybeXS";
 requires "List::Util";
 requires "URI";
 requires "Moo";
 requires "MooX::HandlesVia";
-requires "Readonly";
 requires "Scalar::Util";
 requires "Type::Tiny";
 

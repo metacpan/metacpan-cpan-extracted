@@ -20,14 +20,15 @@ package Mock::Client {
 }
 
 my $thin    = { status_code => 200, markdown => 'too short' };
-# A real bot wall is structural, not a fat "Access Denied" body: a thin
-# Cloudflare interstitial (200) whose markup carries the __cf_chl token and whose
-# title is "Just a moment...". (A bare 403 would surface as http_403 instead.)
+# A real bot wall under the final_url model: the request was redirected to a
+# Cloudflare /cdn-cgi/challenge endpoint. The body can even look rich -- the tell
+# is that final_url left the origin and landed on the gate, so this reads
+# bot_wall_detected regardless of size. (A bare 403 would surface as http_403.)
 my $blocked = {
   status_code => 200,
-  markdown    => 'Just a moment...',
-  raw_html    => '<script>window.__cf_chl_opt={}</script>',
-  title       => 'Just a moment...',
+  markdown    => ( 'real useful content ' x 40 ),
+  url         => 'https://example.com',
+  final_url   => 'https://example.com/cdn-cgi/challenge-platform/h/g/orchestrate/chl_page/v1',
 };
 my $good    = { status_code => 200, markdown => ( 'real useful content ' x 40 ), title => 'OK' };
 

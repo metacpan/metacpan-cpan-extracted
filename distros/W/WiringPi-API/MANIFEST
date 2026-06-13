@@ -9,6 +9,7 @@ docs/pod.md
 docs/schematics/test_physical_setup_schem.jpg
 docs/threads-examples.md
 INLINE.h
+INT.md
 lib/WiringPi/API.pm
 lib/WiringPi/API/BackgroundInterrupt.pm
 lib/WiringPi/API/BackgroundInterrupts.pm
@@ -20,7 +21,7 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 ppport.h
-README
+README.md
 t/00-load.t
 t/05-phys_to_wpi.t
 t/10-phys-to-gpio.t
@@ -37,8 +38,13 @@ t/60-spi_additions.t
 t/65-soft_tone.t
 t/70-i2c_fixes.t
 t/75-interrupts.t
+t/76-interrupt_pipe_failure.t
+t/77-background_interrupts_control.t
 t/80-phys_to_wpi_bounds.t
 t/85-worker.t
+t/86-worker_thread.t
+t/87-running_waitpid.t
+t/88-shared_channel_framing.t
 t/90-pin_mode_alt.t
 t/manifest.t
 t/pod-coverage.t

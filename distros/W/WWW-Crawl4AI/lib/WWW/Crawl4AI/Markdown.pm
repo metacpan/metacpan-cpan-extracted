@@ -34,7 +34,7 @@ WWW::Crawl4AI::Markdown - markdown field resolution across Crawl4AI response sha
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

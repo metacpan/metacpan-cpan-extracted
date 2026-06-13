@@ -1,0 +1,43 @@
+from test/more import *;
+
+is( 1 « 1, 2, "Unicode guillemet left-shift on Number" );
+is( 8 » 1, 4, "Unicode guillemet right-shift on Number" );
+is( 1 << 1, 2, "ASCII left-shift on Number" );
+is( 8 >> 1, 4, "ASCII right-shift on Number" );
+is( 3 « 2, 12, "Unicode left-shift on Number with larger count" );
+is( 12 >> 2, 3, "Unicode right-shift on Number with larger count" );
+is( 3 << 2, 3 « 2, "ASCII left-shift matches Unicode equivalent" );
+is( 12 >> 2, 12 » 2, "ASCII right-shift matches Unicode equivalent" );
+
+let bytes := to_binary(" \x01");
+let bytes_left := bytes « 1;
+let bytes_right := bytes » 1;
+is(
+	typeof bytes_left,
+	"BinaryString",
+	"Unicode left-shift on BinaryString returns BinaryString",
+);
+is( length bytes_left, 2, "BinaryString bit-shift preserves byte length" );
+is(
+	to_string( bytes_left ),
+	"@\x02",
+	"Unicode left-shift on BinaryString shifts byte values",
+);
+is(
+	to_string( bytes_right ),
+	"\x10\x00",
+	"Unicode right-shift on BinaryString shifts byte values",
+);
+is( length bytes_right, 2, "Unicode right-shift on BinaryString preserves length" );
+is(
+	to_string( bytes « 1 ),
+	to_string( bytes_left ),
+	"ASCII << is equivalent to Unicode « on BinaryString",
+);
+is(
+	to_string( bytes >> 1 ),
+	to_string( bytes_right ),
+	"ASCII >> is equivalent to Unicode » on BinaryString",
+);
+
+done_testing();

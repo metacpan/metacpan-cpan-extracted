@@ -15,12 +15,11 @@ use Encode qw(decode encode);
 use JSON;
 use LWP::UserAgent;
 use UUID qw(uuid4);
-use IO::Uncompress::Gunzip;
 use Travel::Status::DE::DBRIS;
 use Travel::Routing::DE::DBRIS::Connection;
 use Travel::Routing::DE::DBRIS::Offer;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 Travel::Routing::DE::DBRIS->mk_ro_accessors(qw(earlier later));
 
@@ -68,6 +67,7 @@ sub new {
 		ua             => $ua,
 		header         => {
 			'accept'           => 'application/json',
+			'accept-encoding'  => 'gzip, br',
 			'content-type'     => 'application/json; charset=utf-8',
 			'Origin'           => 'https://www.bahn.de',
 			'Referer'          => 'https://www.bahn.de/buchung/fahrplan/suche',
@@ -231,18 +231,12 @@ sub new {
 			$ua->default_header( $key => $value );
 		}
 
-		my ( $raw_content, $error )
-		  = $self->post_with_cache( $req_url, $req_str );
+		my ( $content, $error ) = $self->post_with_cache( $req_url, $req_str );
 
 		if ($error) {
 			$self->{errstr} = $error;
 			return $self;
 		}
-
-		my $gunzip  = IO::Uncompress::Gunzip->new( \$raw_content, Append => 1 );
-		my $content = q{};
-
-		while ( $gunzip->read($content) ) { }
 
 		if ( $self->{developer_mode} ) {
 			say decode( 'utf-8', $content );
@@ -322,7 +316,7 @@ sub post_with_cache {
 	my $reply = $self->{ua}->post(
 		$url,
 		Accept            => 'application/json',
-		'Accept-Encoding' => 'gzip',
+		'Accept-Encoding' => 'gzip, br',
 		'Accept-Language' => $self->{language},
 		'Content-Type'    => 'application/json; charset=utf-8',
 		Content           => $req,
@@ -331,7 +325,7 @@ sub post_with_cache {
 	if ( $reply->is_error ) {
 		return ( undef, $reply->status_line );
 	}
-	my $content = $reply->content;
+	my $content = $reply->decoded_content;
 
 	if ($cache) {
 		$cache->freeze( "$url $req", \$content );
@@ -440,7 +434,7 @@ Travel::Routing::DE::DBRIS - Interface to the bahn.de itinerary service
 
 =head1 VERSION
 
-version 0.12
+version 0.13
 
 =head1 DESCRIPTION
 

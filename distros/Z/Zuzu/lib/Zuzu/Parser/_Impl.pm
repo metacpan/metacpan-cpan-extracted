@@ -2,7 +2,7 @@ package Zuzu::Parser::_Impl;
 
 use utf8;
 
-our $VERSION = '0.003000';
+our $VERSION = '0.004000';
 
 use Zuzu::AST::Block;
 use Zuzu::AST::Expr::Array;
@@ -2057,13 +2057,15 @@ sub _prec {
 
 	return 4 if $op eq '==' || $op eq '≡' || $op eq '!=' || $op eq '≢';
 
-	return 5 if $op eq '=' || $op eq '≠' || $op eq '<' || $op eq '>' || $op eq '<=' || $op eq '≤' || $op eq '>=' || $op eq '≥' || $op eq '<=>' || $op eq '≶' || $op eq '≷' || $op eq 'eq' || $op eq 'ne' || $op eq 'gt' || $op eq 'ge' || $op eq 'lt' || $op eq 'le' || $op eq 'cmp' || $op eq 'eqi' || $op eq 'nei' || $op eq 'gti' || $op eq 'gei' || $op eq 'lti' || $op eq 'lei' || $op eq 'cmpi' || $op eq 'in' || $op eq '∈' || $op eq '∉' || $op eq 'subsetof' || $op eq '⊂' || $op eq 'supersetof' || $op eq '⊃' || $op eq 'equivalentof' || $op eq '⊂⊃' || $op eq 'instanceof' || $op eq 'does' || $op eq 'can' || $op eq '~' || $op eq '@' || $op eq '@?' || $op eq '@@';
+	return 5 if $op eq '=' || $op eq '≠' || $op eq '<' || $op eq '>' || $op eq '<=' || $op eq '≤' || $op eq '>=' || $op eq '≥' || $op eq '<=>' || $op eq '≶' || $op eq '≷' || $op eq 'eq' || $op eq 'ne' || $op eq 'gt' || $op eq 'ge' || $op eq 'lt' || $op eq 'le' || $op eq 'cmp' || $op eq 'eqi' || $op eq 'nei' || $op eq 'gti' || $op eq 'gei' || $op eq 'lti' || $op eq 'lei' || $op eq 'cmpi' || $op eq 'in' || $op eq '∈' || $op eq '∉' || $op eq 'subsetof' || $op eq '⊂' || $op eq 'supersetof' || $op eq '⊃' || $op eq 'equivalentof' || $op eq '⊂⊃' || $op eq 'instanceof' || $op eq 'does' || $op eq 'can' || $op eq '~' || $op eq '@' || $op eq '@?' || $op eq '@@' || $op eq '∣' || $op eq 'divides' || $op eq '∤';
 
 	return 6 if $op eq '|';
 
 	return 7 if $op eq '^';
 
 	return 8 if $op eq '&';
+
+	return 8.5 if $op eq '<<' || $op eq '«' || $op eq '>>' || $op eq '»';
 
 	return 9 if $op eq 'union' || $op eq '⋃' || $op eq 'intersection' || $op eq '⋂' || $op eq '\\' || $op eq '∖';
 
@@ -2096,6 +2098,12 @@ sub _parse_prec {
 
 		# stop at statement terminators / closers
 		last if $op_tok->is_OP && ($op eq ';' || $op eq ')' || $op eq ']' || $op eq '}' || $op eq ',' || $op eq ':');
+
+		# Inside << ... >> or « ... » the pending closer terminates the
+		# set literal rather than acting as a shift operator.
+		last if $op_tok->is_OP
+			&& @{ $self->{_pending_set_closers} || [] }
+			&& $op eq $self->{_pending_set_closers}[-1];
 
 		my $prec = $self->_prec($op);
 		last if $prec < $min_prec || $prec == 0;
@@ -3064,6 +3072,8 @@ sub parse_set_literal {
 	my $close = $open eq '<<' ? '>>' : '»';
 	my $lb = $self->_eat('OP', $open);
 	my @items;
+	push @{ $self->{_pending_set_closers} ||= [] }, $close;
+	my $closer_guard = Zuzu::Parser::_Impl::_CloserGuard->new($self);
 	while ( ! $self->{tok}->is_OP($close) ) {
 		if ( $self->_maybe('OP', ',') ) {
 			next;
@@ -3278,5 +3288,18 @@ the terms of either the Artistic License 1.0 or the GNU General Public
 License version 2.
 
 =cut
+
+{
+	# Pops the pending set-literal closer even if parsing dies.
+	package Zuzu::Parser::_Impl::_CloserGuard;
+	sub new {
+		my ( $class, $parser ) = @_;
+		return bless { parser => $parser }, $class;
+	}
+	sub DESTROY {
+		my ( $self ) = @_;
+		pop @{ $self->{parser}{_pending_set_closers} || [] };
+	}
+}
 
 1;

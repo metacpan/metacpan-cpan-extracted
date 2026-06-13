@@ -2,7 +2,7 @@ package Zuzu::Module::String;
 
 use utf8;
 
-our $VERSION = '0.003000';
+our $VERSION = '0.004000';
 
 our %REGEXP_CACHE;
 our %SPLIT_LITERAL_CACHE;
@@ -566,7 +566,35 @@ sub IMPORT {
 		},
 	);
 
+	my $to_binary_fn = native_function(
+		name => 'to_binary',
+		native => sub {
+			my ( $value ) = @_;
+			die Zuzu::Error->new_runtime(
+				message => 'TypeException: to_binary expects String',
+				file => '<std/string>',
+				line => 0,
+			) if not defined $value or blessed($value) or ref($value);
+			return Zuzu::Value::BinaryString->from_utf8_string( $value );
+		},
+	);
+
+	my $to_string_fn = native_function(
+		name => 'to_string',
+		native => sub {
+			my ( $value ) = @_;
+			die Zuzu::Error->new_runtime(
+				message => 'TypeException: to_string expects BinaryString',
+				file => '<std/string>',
+				line => 0,
+			) if not( blessed($value) and $value->isa('Zuzu::Value::BinaryString') );
+			return $value->to_utf8_string;
+		},
+	);
+
 	return {
+		to_binary => $to_binary_fn,
+		to_string => $to_string_fn,
 		substr => $substr_fn,
 		index => $index_fn,
 		rindex => $rindex_fn,

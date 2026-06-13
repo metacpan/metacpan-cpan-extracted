@@ -1,5 +1,27 @@
 Revision history for Dist-Mgr
 
+1.14    2026-06-12
+    - In distmgr when run with '--ci' with no --user and --repo, we'd throw an
+      error for 'badges', not 'ci'. This is now fixed (fixes #60)
+    - Support Module::Starter 1.79+, which requires 'author' to be an arrayref
+      of 'Name <email>' strings; older versions still work as before
+    - Restored the file count mismatch croak in move_distribution_files() that
+      was inadvertently commented out
+    - Fixed version_incr() so it preserves a version's decimal precision when
+      bumping (eg. 3.1802 now increments to 3.1803, not 3.19)
+    - copyright_bump() now updates copyright year ranges; 'Copyright 2016-2019'
+      bumps the latter year to the current year, and comma ranges (2016,2019)
+      are normalized to a dash. Single years are still replaced as before
+    - Fixed the coverage Github Actions job; Makefile.PL is now ignored during
+      Devel::Cover reporting. The build-cycle tests run several distributions'
+      Makefile.PL under coverage, which left a structure-less entry that
+      crashed the Coveralls reporter (Can't call method "location" on an
+      undefined value)
+    - Raised the minimum Perl version to 5.14 (MIN_PERL_VERSION). The
+      libwww-perl and CPAN::Uploader dependency chain no longer installs
+      cleanly on Perl 5.10/5.12, so those were dropped from CI and 5.14/5.16
+      added
+
 1.13    2022-05-11
     - Made changes to CI Github Actions configuration file, modified Perls
       installed, only install ExtUtils::PL2Bat on Windows systems

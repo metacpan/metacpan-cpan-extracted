@@ -1,0 +1,561 @@
+=head1 NAME
+
+RPi::WiringPi::WORKERS - concurrency & background-worker examples for RPi::WiringPi
+
+=head1 DESCRIPTION
+
+Worked, runnable examples for running background work concurrently with your main
+program using the object-oriented L<RPi::WiringPi>. The C<< $pi->worker >> method
+described here is a thin proxy onto C<WiringPi::API::worker()> (shipped in
+C<WiringPi::API> 3.18 and verified on Pi 5 hardware); the snippets run as written.
+
+C<< $pi->worker >> is B<fork-based by default and needs no> C<use threads> B<and no
+threaded Perl> - an ithread mechanism is a documented opt-in only. For reacting to
+GPIO I<edges> in the background, see C<< $pi->background_interrupts >> and
+L<RPi::WiringPi::INTERRUPTS>.
+
+This is the OO companion to L<WiringPi::API::WORKERS>; that one
+covers the low-level functional API, this one the C<$pi> object. See the
+C<worker(\&body, \%opts)> entry in L<RPi::WiringPi> for the per-method reference.
+
+=head1 ABOUT THESE EXAMPLES
+
+This document covers running work B<concurrently> with the main program - distinct
+from reacting to interrupts.
+
+=over 4
+
+=item *
+
+B<Prefer> C<< $pi->worker >>. It hides the spawn mechanism, the loop B<and> the
+lifecycle: your body carries no C<fork>, no C<use threads>, no C<detach>, no
+C<while (1)> and no cleanup. It is the general-purpose sibling of
+C<< $pi->background_interrupts >>.
+
+=item *
+
+B<The object owns the lifecycle.> Every handle returned by C<< $pi->worker >> is
+tracked on the object; C<< $pi->cleanup >> (and therefore C<DESTROY>) stops them
+all. You can C<< $w->stop >> a worker yourself, but you never have to.
+
+=item *
+
+B<No threads required.> C<< $pi->worker >> forks by default and works on B<any>
+Perl, threaded or not. The ithread mechanism (scenario 6) is an opt-in for users
+who specifically want shared-memory ergonomics on a threaded Perl.
+
+=item *
+
+B<Pin numbering> follows the object's scheme (BCM/GPIO by default). Configure pins
+through the object - C<< my $pin = $pi->pin($n); $pin->mode(OUTPUT) >> - once, in
+the parent, before starting a worker.
+
+=item *
+
+Sections 7-8 (L</UNDER THE HOOD>) show the raw C<fork> / C<threads-E<gt>create>
+plumbing that C<< $pi->worker >> packages up - read them to understand what happens
+beneath the method, but most programs only need C<< $pi->worker >>.
+
+=back
+
+=head1 DECISION GUIDE
+
+None of these need C<use threads> except scenario 6. To hide the most plumbing,
+use C<< $pi->worker >> (scenarios 1-5).
+
+B<fork vs thread in one line:> the default C<fork> worker is crash-isolated and
+works on any Perl but B<can't touch main's variables> (hand data back with
+C<results>/C<shared>); a C<< mechanism => 'thread' >> worker shares memory directly
+but needs a threaded Perl and C<pi_lock> discipline. No shared-memory need? Use the
+default fork.
+
+=over 4
+
+=item *
+
+Run a background task and forget it (its own GPIO) - scenario 1.
+
+=item *
+
+Sample periodically; main reads the latest value - scenario 2
+(C<interval>/C<shared>).
+
+=item *
+
+Stream every value the worker produces back to main - scenario 3 (C<results>).
+
+=item *
+
+Do one background job once, then exit - scenario 4 (C<once>).
+
+=item *
+
+Several independent workers, each on its own pin - scenario 5.
+
+=item *
+
+Share memory directly between main and the worker - scenario 6
+(C<< mechanism => 'thread' >>).
+
+=item *
+
+React to a pin edge in the background - C<< $pi->background_interrupts >>.
+
+=item *
+
+Understand/hand-roll the raw mechanism - scenarios 7, 8.
+
+=back
+
+=head1 BACKGROUND WORKERS ($pi->worker)
+
+=head2 1. Heartbeat LED - a worker on its own pin
+
+B<Why/when:> Run a self-contained background task on its own GPIO while main does
+its own work; the simplest possible case.
+
+B<Real-world:> A status heartbeat LED blinking on its own cadence while the main
+program does its real work.
+
+B<Main & background:> The method owns the loop and the lifecycle. You write only
+the body; C<< $pi->worker >> repeats it until you C<stop> - or until
+C<< $pi->cleanup >> reaps it for you.
+
+    use strict;
+    use warnings;
+    use RPi::WiringPi;
+    use RPi::Const qw(:all);
+
+    my $pi  = RPi::WiringPi->new;
+    my $pin = $pi->pin(2);
+    $pin->mode(OUTPUT);               # once, in main
+
+    my $w = $pi->worker(sub {
+        $pin->write(HIGH); sleep 1;
+        $pin->write(LOW);  sleep 1;
+    });
+
+    # ... main does its own work ...
+
+    $pi->cleanup;                     # stops $w (and every other worker) for you
+
+No C<use threads>, no C<fork>, no C<detach>, no C<while (1)>, no C<waitpid>. You
+could also C<< $w->stop >> the heartbeat by hand (idempotent); C<cleanup> just
+makes it automatic.
+
+=head2 2. Periodic sampler handing data back (interval + shared)
+
+B<Why/when:> Timer-driven sampling where main only ever wants the B<latest>
+reading, not every sample.
+
+B<Real-world:> Polling a sensor every second into a value the main app (a web
+handler or display loop) reads on demand.
+
+B<Main & background:> C<< { interval => $secs } >> paces the loop (the body needs
+no C<sleep>); C<< { shared => 1 } >> publishes the body's return value as a lossy
+latest value the parent reads with C<< $w->value >>.
+
+    use strict;
+    use warnings;
+    use RPi::WiringPi;
+    use RPi::Const qw(:all);
+
+    my $pi  = RPi::WiringPi->new;
+    my $pin = $pi->pin(4);
+    $pin->mode(INPUT);                # once, in main
+
+    my $w = $pi->worker(sub { $pin->read }, { interval => 1, shared => 1 });
+
+    for (1 .. 5) {
+        my $latest = $w->value;       # most recent sample, or undef until the first
+        print "latest: ", (defined $latest ? $latest : 'n/a'), "\n";
+        sleep 5;
+    }
+
+    $pi->cleanup;
+
+The channel is B<lossy> - the worker never blocks on a slow reader, so C<value()>
+gives you the most recent sample and discards the ones you didn't read.
+
+=head2 3. Streaming every result (results)
+
+B<Why/when:> When you need B<every> value the worker produces, in order, not just
+the latest.
+
+B<Real-world:> A logger that records each reading, or a counter feeding an
+event-loop via C<select>.
+
+B<Main & background:> C<< { results => 1 } >> length-frames every defined return
+value back over a pipe. Drain it with C<< $w->read >> (non-blocking), or select on
+C<< $w->fh >>.
+
+    use strict;
+    use warnings;
+    use RPi::WiringPi;
+    use RPi::Const qw(:all);
+
+    my $pi  = RPi::WiringPi->new;
+    my $pin = $pi->pin(4);
+    $pin->mode(INPUT);                # once, in main
+
+    my $w = $pi->worker(sub { $pin->read }, { interval => 0.5, results => 1 });
+
+    for (1 .. 20) {
+        while (defined(my $v = $w->read)) {   # drain everything pending
+            print "sample: $v\n";
+        }
+        sleep 1;
+    }
+
+    $pi->cleanup;
+
+This is identical to C<< $pi->background_interrupts >>' C<< { results => 1 } >>
+channel.
+
+=head2 4. A one-shot background task (once)
+
+B<Why/when:> A single background job - run it off the main path and let it exit on
+its own.
+
+B<Real-world:> Firing a one-shot solenoid pulse, or taking a single sensor reading,
+without blocking main.
+
+B<Main & background:> C<< { once => 1 } >> runs the body exactly once; the child
+then exits and C<< $w->running >> becomes false. You can still C<stop> (idempotent)
+or just let C<< $pi->cleanup >> clean up.
+
+    use strict;
+    use warnings;
+    use RPi::WiringPi;
+    use RPi::Const qw(:all);
+
+    my $pi  = RPi::WiringPi->new;
+    my $pin = $pi->pin(5);
+    $pin->mode(OUTPUT);               # once, in main
+
+    my $w = $pi->worker(sub {
+        $pin->write(HIGH);
+        select(undef, undef, undef, 0.2);     # 200ms pulse
+        $pin->write(LOW);
+    }, { once => 1 });
+
+    # ... main carries on; the pulse fires in the background ...
+
+    $pi->cleanup;                     # the pulse has usually already finished
+
+=head2 5. Several workers on distinct pins
+
+B<Why/when:> Multiple independent background tasks at once, each owning its own
+pin.
+
+B<Real-world:> A multi-channel relay board where each channel toggles on its own
+cadence while main runs the control logic.
+
+B<Main & background:> Configure every pin B<once in main>, then start one worker
+per pin. Each runs independently and returns its own handle; all of them are
+tracked on the object and stopped together by C<< $pi->cleanup >>.
+
+    use strict;
+    use warnings;
+    use RPi::WiringPi;
+    use RPi::Const qw(:all);
+
+    my $pi = RPi::WiringPi->new;
+
+    my @pins = map { my $p = $pi->pin($_); $p->mode(OUTPUT); $p } (23, 24, 25);
+
+    my @workers = map {
+        my $pin = $_;
+        $pi->worker(sub { $pin->write(HIGH); sleep 1; $pin->write(LOW); sleep 1 });
+    } @pins;
+
+    # ... main's own work ...
+
+    $pi->cleanup;                     # stops all @workers at once
+
+Workers must drive B<distinct> pins - see L</THE SETUP-ONCE-IN-MAIN CONTRACT>.
+
+=head2 6. Shared memory - the opt-in ithread mechanism
+
+B<Why/when:> You specifically want to share memory directly between main and the
+worker (no IPC), and you have a threaded Perl.
+
+B<Real-world:> A counter or state machine the worker mutates and main reads in the
+same address space.
+
+B<Main & background:> C<< { mechanism => 'thread' } >> runs the body in an ithread
+instead of a fork. It B<requires> C<use threads> (croaks otherwise) and rejects
+the C<results>/C<shared> pipe channels - share a C<:shared> variable and serialize
+it with C<WiringPi::API::pi_lock>/C<WiringPi::API::pi_unlock> (keys 0-3) instead.
+There is B<no> OO proxy for the lock - thread mode is a niche opt-in, so you call
+the C<WiringPi::API> functions directly. C<< $w->stop >> sets the stop flag and
+joins the thread.
+
+    use strict;
+    use warnings;
+    use threads;                      # required for mechanism => 'thread'
+    use threads::shared;
+    use RPi::WiringPi;
+    use WiringPi::API qw(pi_lock pi_unlock);
+
+    my $pi = RPi::WiringPi->new;
+
+    my $count :shared = 0;
+
+    my $w = $pi->worker(sub {
+        pi_lock(0);
+        $count++;
+        pi_unlock(0);
+        select(undef, undef, undef, 0.1);
+    }, { mechanism => 'thread' });
+
+    for (1 .. 5) {
+        pi_lock(0);
+        my $n = $count;
+        pi_unlock(0);
+        print "count: $n\n";
+        sleep 1;
+    }
+
+    $w->stop;                         # sets the stop flag and joins
+
+Check for a threaded Perl with C<perl -V:useithreads> (Raspberry Pi OS ships one).
+The fork default (scenarios 1-5) never locks and never needs C<threads>.
+
+=head1 REACTING TO INTERRUPTS IN THE BACKGROUND
+
+C<< $pi->worker >> is for I<running> background work, not for reacting to GPIO
+B<edges>. To handle an edge in the background - fire a callback even while main is
+blocked - use B<C<< $pi->background_interrupts >>>, the interrupt-side sibling of
+C<worker>. It forks a single child that arms one or more pins and runs your
+callback on each edge, and returns a handle with the same C<stop>/C<pid>/C<running>
+shape (plus C<arm>/C<disarm>):
+
+    use RPi::WiringPi;
+    use RPi::Const qw(:all);
+
+    my $pi  = RPi::WiringPi->new;
+    my $pin = $pi->pin(4);
+    $pin->mode(INPUT);
+
+    my $h = $pi->background_interrupts(
+        [4, EDGE_RISING, \&on_edge, 0],
+    );
+
+    # ... main does its own work; the handler fires on its own ...
+
+    $pi->cleanup;                     # stops interrupts and workers together
+
+    sub on_edge { ... }               # runs in the background child on each edge
+
+The full interrupt story is in L<RPi::WiringPi::INTERRUPTS> and the interrupt
+methods in L<RPi::WiringPi>.
+
+=head1 THE SETUP-ONCE-IN-MAIN CONTRACT
+
+The rule that keeps concurrent GPIO safe: do all configuration B<once, in main,
+before> starting any worker; afterwards each context does only steady-state I/O on
+B<distinct> pins.
+
+=over 4
+
+=item *
+
+Construct the object and configure every pin (C<< $pi->pin($n) >>,
+C<< $pin->mode(...) >>) and any device B<once, in the parent, before> the first
+C<< $pi->worker >>.
+
+=item *
+
+A fork worker inherits that configuration; a thread worker shares it.
+
+=item *
+
+Afterwards, workers may freely read/write on B<distinct> pins. B<Never> configure
+pins or set up devices concurrently - they read-modify-write shared registers.
+
+=item *
+
+For shared Perl data under C<< mechanism => 'thread' >>, guard every access with
+C<WiringPi::API::pi_lock>/C<WiringPi::API::pi_unlock> (or C<threads::shared>'s
+C<lock>).
+
+=item *
+
+A forked worker shares the C<$pi> object but must not tear it down: the
+process-guard in C<cleanup()> ensures only the parent stops workers and restores
+pins, so a worker exiting never disturbs the parent's state.
+
+=back
+
+=head1 UNDER THE HOOD
+
+These are the raw mechanisms C<< $pi->worker >> packages up. You rarely need them
+directly; they are here to show what the method does and to cover cases it doesn't.
+
+=head2 7. Manual fork
+
+B<Why/when:> The fork worker (scenario 1) without the method - full control over
+the child, at the cost of writing the loop, the signal handling and the reaping
+yourself.
+
+B<Main & background:> The child is a separate process: truly concurrent and
+crash-isolated, but it B<cannot> touch main's variables - pass data back via a
+pipe, and reap it yourself.
+
+    use strict;
+    use warnings;
+    use RPi::WiringPi;
+    use RPi::Const qw(:all);
+
+    my $pi  = RPi::WiringPi->new;
+    my $pin = $pi->pin(2);
+    $pin->mode(OUTPUT);                      # before fork
+
+    my $kid = fork // die "fork: $!";
+
+    if ($kid == 0) {
+        while (1) {                          # child: heartbeat forever
+            $pin->write(HIGH); sleep 1;
+            $pin->write(LOW);  sleep 1;
+        }
+        exit 0;
+    }
+
+    # ... parent's own work ...
+
+    kill 'TERM', $kid;                       # on shutdown
+    waitpid $kid, 0;
+
+C<< $pi->worker(sub {...}) >> is exactly this - the fork, the loop, the C<TERM>
+handler and the C<waitpid> - done for you, with an idempotent C<stop>, automatic
+reaping in C<< $pi->cleanup >>, and an END-block safety net in C<WiringPi::API>.
+
+=head2 8. Raw ithreads (threads->create)
+
+B<Why/when:> The thread worker (scenario 6) without the method - when you want to
+manage the thread object yourself.
+
+B<Main & background:> The body runs in its B<own> interpreter; it can't see main's
+lexicals - share only via C<:shared> variables guarded by C<pi_lock>/C<lock>.
+
+    use strict;
+    use warnings;
+    use threads;
+    use threads::shared;
+    use RPi::WiringPi;
+    use WiringPi::API qw(pi_lock pi_unlock);
+
+    my $pi  = RPi::WiringPi->new;
+    my $pin = $pi->pin(4);
+    $pin->mode(INPUT);
+
+    my $latest :shared = 0;
+
+    my $thr = threads->create(sub {
+        while (1) {
+            my $v = $pin->read;
+            pi_lock(0); $latest = $v; pi_unlock(0);
+            select(undef, undef, undef, 0.05);
+        }
+    });
+
+    # ... main reads $latest under pi_lock(0) ...
+
+    # To stop a hand-rolled thread you need your own shared flag + join;
+    # $pi->worker({mechanism=>'thread'}) provides exactly that.
+    $thr->detach;
+
+C<< $pi->worker(sub {...}, { mechanism => 'thread' }) >> wraps this with a shared
+stop flag and a clean C<stop>/join, so you don't hand-roll the lifecycle.
+
+=head1 ANTI-PATTERNS TO AVOID
+
+=over 4
+
+=item *
+
+B<Reaching for> C<use threads> B<first.> C<< $pi->worker >> is fork-based and needs
+no threaded Perl. Only use C<< mechanism => 'thread' >> when you specifically want
+shared memory.
+
+=item *
+
+B<Putting a loop inside the body.> C<< $pi->worker >> owns the loop - the body is
+one pass. Use C<< { interval => $secs } >> for pacing and C<< { once => 1 } >> for
+a single pass; a C<while (1)> inside the body defeats C<stop>/C<once>/C<interval>.
+
+=item *
+
+B<Concurrent pin configuration / device setup.> Read-modify-write on shared
+registers; do them once, in main, before starting any worker. Only reads/writes on
+distinct pins are safe concurrently.
+
+=item *
+
+B<Expecting a fork worker to see main's variables.> Separate memory - hand data
+back with C<< { results => 1 } >> / C<< { shared => 1 } >>, not a shared Perl
+variable.
+
+=item *
+
+B<Touching> C<:shared> B<data without a lock (thread mode).> Guard every access
+with C<pi_lock>/C<pi_unlock> (or C<lock>). A bare C<$shared++> from two threads
+races.
+
+=item *
+
+B<Combining> C<< mechanism => 'thread' >> B<with> C<results>/C<shared>. Those are
+fork pipe channels and are rejected under thread mode - share a C<:shared> variable
+with C<pi_lock> instead.
+
+=back
+
+=head1 API REFERENCE FOR THESE EXAMPLES
+
+=over 4
+
+=item C<< RPi::WiringPi->new >>
+
+Construct the Pi object (GPIO/BCM numbering by default).
+
+=item C<< $pi->pin($num) >> / C<< $pin->mode($mode) >>
+
+Register a pin and set its mode (C<INPUT>/C<OUTPUT> from L<RPi::Const>).
+
+=item C<< $pin->write($val) >> / C<< $pin->read >>
+
+Pin I/O; C<read> returns the pin level (C<0>/C<1>).
+
+=item C<< $pi->worker(\&body [, \%opts]) >>
+
+Run C<\&body> in the background. C<\%opts>: C<{once, interval, results, shared,
+mechanism}>. Returns a handle C<$w> with C<stop> / C<pid> / C<running> / C<read> /
+C<fh> / C<value>. The handle is tracked on C<$pi> and stopped by C<< $pi->cleanup >>.
+
+=item C<< $pi->cleanup >>
+
+Normal teardown: stops every tracked worker, releases interrupts, and restores
+pins. Also runs from C<DESTROY>.
+
+=item C<WiringPi::API::pi_lock($key)> / C<WiringPi::API::pi_unlock($key)>
+
+Mutex (keys 0-3) for shared state under thread mode. Called directly - there is no
+OO proxy.
+
+=item C<< $pi->background_interrupts(...) >>
+
+Background B<edge> handler (the interrupt-side sibling). Returns a handle C<$h>.
+
+=back
+
+=head1 SEE ALSO
+
+L<RPi::WiringPi>, L<WiringPi::API>, and L<WiringPi::API::WORKERS> for the
+low-level functional API.
+
+=head1 AUTHOR
+
+Steve Bertrand, E<lt>steveb@cpan.orgE<gt>
+
+=cut

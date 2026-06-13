@@ -3,15 +3,25 @@ package RPi::WiringPi::Core;
 use strict;
 use warnings;
 
+# Parent order matters: WiringPi::API is listed first, so under the
+# default depth-first MRO every WiringPi::API method is found before
+# anything in Meta, Util or RPi::SysInfo. See the MRO note atop
+# RPi::WiringPi before adding any method whose name exists in another
+# parent branch.
 use parent 'WiringPi::API';
+use parent 'RPi::WiringPi::Meta';
+use parent 'RPi::WiringPi::Util';
 use parent 'RPi::SysInfo';
-use JSON;
+
+use Carp qw(croak);
+use Data::Dumper;
+use Digest::MD5 qw(md5_hex);
 use RPi::Const qw(:all);
 
-our $VERSION = '2.3633';
+our $VERSION = '3.1802';
 
 sub gpio_layout {
-    return $_[0]->gpio_layout;
+    return $_[0]->SUPER::gpio_layout;
 }
 sub identify {
     my ($self, $time) = @_;
@@ -29,17 +39,35 @@ sub identify {
 sub io_led {
     my ($self, $tweak) = @_;
 
+    my $led  = $self->_led('io');
+    my $path = "/sys/class/leds/$led->{name}";
+
     if ($tweak){
-        # stop disk activity from operating the green LED
-        `echo none | sudo tee /sys/class/leds/led0/trigger`;
-        # turn on the green LED full-time
-        `echo 1 | sudo tee /sys/class/leds/led0/brightness`;
+        # Stop disk activity from operating the green LED
+        $self->_led_cmd("echo none | sudo tee $path/trigger");
+        # Turn on the green LED full-time
+        $self->_led_cmd("echo 1 | sudo tee $path/brightness");
     }
     else {
-        # turn off the green LED from being on full-time
-        `echo 0 | sudo tee /sys/class/leds/led0/brightness`;
-        # start disk activity operating the green LED
-        `echo mmc0 | sudo tee /sys/class/leds/led0/trigger`;
+        # Turn off the green LED from being on full-time
+        $self->_led_cmd("echo 0 | sudo tee $path/brightness");
+        # Restore disk activity operating the green LED
+        $self->_led_cmd("echo $led->{trigger} | sudo tee $path/trigger");
+    }
+}
+sub pwr_led {
+    my ($self, $tweak) = @_;
+
+    my $led  = $self->_led('pwr');
+    my $path = "/sys/class/leds/$led->{name}";
+
+    if ($tweak){
+        # Turn off the red power LED
+        $self->_led_cmd("echo 0 | sudo tee $path/brightness");
+    }
+    else {
+        # Restore the red power LED to its default behavior
+        $self->_led_cmd("echo $led->{trigger} | sudo tee $path/trigger");
     }
 }
 sub label {
@@ -57,45 +85,14 @@ sub pin_to_gpio {
     if ($scheme == RPI_MODE_WPI){
         return $self->wpi_to_gpio($pin);
     }
-    elsif ($scheme == RPI_MODE_PHYS){
-        return $self->phys_to_gpio($pin);
-    }
     elsif ($scheme == RPI_MODE_GPIO){
         return $pin;
     }
-    if ($scheme == RPI_MODE_UNINIT){
-        die "setup not run; pin mapping scheme not initialized\n";
-    }
-}
-sub pin_map {
-    my ($self, $scheme) = @_;
 
-    $scheme = $self->pin_scheme if ! defined $scheme;
+    # Catch-all: an uninitialized (or unrecognized/corrupted) scheme can't
+    # map pins; never fall through to an implicit undef
 
-    return {} if $scheme eq RPI_MODE_UNINIT;
-
-    if (defined $self->{pin_map_cache}{$scheme}){
-        return $self->{pin_map_cache}{$scheme};
-    }
-
-    my %map;
-
-    for (0..63){
-        my $pin;
-        if ($scheme == RPI_MODE_WPI) {
-            $pin = $self->phys_to_wpi($_);
-        }
-        elsif ($scheme == RPI_MODE_GPIO){
-            $pin = $self->phys_to_gpio($_);
-        }
-        elsif ($scheme == RPI_MODE_PHYS){
-            $pin = $_;
-        }
-        $map{$_} = $pin;
-    }
-    $self->{pin_map_cache}{$scheme} = \%map;
-
-    return \%map;
+    croak "Setup not run; pin mapping scheme not initialized\n";
 }
 sub pin_scheme {
     my ($self, $scheme) = @_;
@@ -108,128 +105,320 @@ sub pin_scheme {
         ? $ENV{RPI_PIN_MODE}
         : RPI_MODE_UNINIT;
 }
-sub pwr_led {
-    my ($self, $tweak) = @_;
-
-    if ($tweak){
-        # turn off the red power LED
-        `echo 0 | sudo tee /sys/class/leds/led1/brightness`;
-    }
-    else {
-        # low power input to operate the red power LED
-        `echo input | sudo tee /sys/class/leds/led1/trigger`;
-    }
-}
 sub pwm_range {
     my ($self, $range) = @_;
+
+    if ($> != 0) {
+        die "\nPWM requires your script to be run as the 'root' user (sudo)\n";
+    }
+
     if (defined $range){
         $self->{pwm_range} = $range;
         $self->pwm_set_range($range);
     }
-    #FIXME: add const
-    return defined $self->{pwm_range} ? $self->{pwm_range} : 1023;
+
+    $self->_pwm_in_use(1);
+
+    return defined $self->{pwm_range} ? $self->{pwm_range} : PWM_DEFAULT_RANGE;
 }
 sub pwm_clock {
     my ($self, $divisor) = @_;
-    if (defined $divisor){
+
+    if ($> != 0) {
+        die "\nPWM requires your script to be run as the 'root' user (sudo)\n";
+    }
+
+    if (defined $divisor) {
         $self->{pwm_clock} = $divisor;
         $self->pwm_set_clock($divisor);
     }
+
+    $self->_pwm_in_use(1);
+
     return defined $self->{pwm_clock} ? $self->{pwm_clock} : PWM_DEFAULT_CLOCK;
 }
 sub pwm_mode {
     my ($self, $mode) = @_;
-    if (defined $mode && ($mode == 0 || $mode == PWM_DEFAULT_MODE)){
-        $self->{pwm_mode} = $mode;
-        $self->pwm_set_mode($mode);
+
+    if ($> != 0) {
+        die "\nPWM requires your script to be run as the 'root' user (sudo)\n";
     }
-    else {
-        die "pwm_mode() requires either 0 or 1 if a param is sent in\n";
+
+    if (defined $mode) {
+        if ($mode == PWM_MODE_MS || $mode == PWM_MODE_BAL) {
+            $self->{pwm_mode} = $mode;
+            $self->pwm_set_mode($mode);
+        }
+        else {
+            croak "pwm_mode() requires either 0 or 1 if a param is sent in\n";
+        }
+
+        $self->_pwm_in_use(1);
     }
-    return defined $self->{pwm_mode} ? $self->{pwm_mode} : 1;
-}
-sub export_pin {
-    my ($self, $pin) = @_;
-    system "sudo", "gpio", "export", $self->pin_to_gpio($pin), "in";
-}
-sub unexport_pin {
-    my ($self, $pin) = @_;
-    system "sudo", "gpio", "unexport", $self->pin_to_gpio($pin);
+
+    return defined $self->{pwm_mode} ? $self->{pwm_mode} : PWM_DEFAULT_MODE;
 }
 sub registered_pins {
     return $_[0]->_pin_registration;
 }
 sub register_pin {
-    my ($self, $pin) = @_;
-    $self->_pin_registration($pin, $pin->mode_alt, $pin->read, $pin->mode);
+    my ($self, $pin, $comment) = @_;
+
+    return if ! $self->_rpi_register_pins || ! $self->_rpi_register;
+
+    $self->_pin_registration(
+        pin         => $pin,
+        alt         => $pin->mode_alt,
+        state       => $pin->read,
+        mode        => $pin->mode,
+        comment     => $comment //= '',
+        operation   => 'register',
+        requester   => $self->uuid,
+    );
 }
 sub unregister_pin {
     my ($self, $pin) = @_;
-    $self->_pin_registration($pin);
+
+    return if ! $self->_rpi_register_pins || ! $self->_rpi_register;
+
+    $self->_pin_registration(
+        pin         => $pin,
+        operation   => 'unregister',
+        requester   => $self->uuid
+    );
 }
-sub cleanup{
-    if ($ENV{PWM_IN_USE}){
-        WiringPi::API::pwm_set_mode(PWM_DEFAULT_MODE);
-        WiringPi::API::pwm_set_clock(PWM_DEFAULT_CLOCK);
-        WiringPi::API::pwm_set_range(PWM_DEFAULT_RANGE);
+sub unregister_object {
+    my ($self) = @_;
+
+    return if ! $self->_rpi_register;
+
+    $self->_meta_txn(sub {
+        my $meta = $self->meta_fetch;
+
+        delete $meta->{objects}->{$self->uuid};
+        $meta->{object_count} = keys %{ $meta->{objects} };
+
+        $self->meta_store($meta);
+    });
+}
+sub cleanup {
+    my ($self) = @_;
+
+    # Only the process that created this object may tear it down. A forked child
+    # (eg. background_interrupt(), or any user fork) shares the object but must
+    # not reset pins, mutate the shared meta, or stop interrupts on the parent's
+    # behalf when it exits.
+
+    return if defined $self->{proc} && $self->{proc} != $$;
+
+    if ($self->_rpi_register_pins) {
+
+        $self->_meta_txn(sub {
+            my $meta = $self->meta_fetch;
+
+            if ($meta->{pwm}{in_use} && $meta->{pwm}{users}{$self->uuid}) {
+                delete $meta->{pwm}{users}{$self->uuid};
+
+                if (! keys %{ $meta->{pwm}{users} }){
+                    WiringPi::API::pwmSetMode(PWM_DEFAULT_MODE);
+                    WiringPi::API::pwmSetClock(PWM_DEFAULT_CLOCK);
+                    WiringPi::API::pwmSetRange(PWM_DEFAULT_RANGE);
+
+                    $meta->{pwm}->{in_use} = 0;
+                }
+            }
+
+            for my $pin (keys %{$meta->{pins}}) {
+                if (exists $meta->{pins}->{$pin}{users}{$self->uuid}) {
+                    delete $meta->{pins}->{$pin}{users}{$self->uuid};
+
+                    # Reset and drop the pin only when no other object still owns it
+
+                    if (! keys %{ $meta->{pins}->{$pin}{users} }) {
+                        $self->_restore_pin_alt($pin, $meta->{pins}->{$pin}{alt});
+                        WiringPi::API::digitalWrite($pin, $meta->{pins}->{$pin}{state});
+                        delete $meta->{pins}->{$pin};
+                    }
+                }
+            }
+
+            $self->meta_store($meta);
+        });
     }
 
-    return if ! $ENV{RPI_PINS};
+    # Release any armed interrupts: stops the wiringPi ISR threads and closes
+    # the self-pipe so we don't leak the kernel ISR + fds at teardown
 
-    my $pins = decode_json $ENV{RPI_PINS};
+    WiringPi::API::stop_interrupts();
 
-    for my $pin (keys %{ $pins }){
-        WiringPi::API::pin_mode_alt($pin, $pins->{$pin}{alt});
-        WiringPi::API::write_pin($pin, $pins->{$pin}{state});
-        WiringPi::API::pin_mode($pin, $pins->{$pin}{mode});
+    # Stop any background workers started via $pi->worker. stop() is idempotent
+    # (a no-op on an already-stopped handle), and the forked-child proc guard
+    # above keeps a child from reaping the parent's workers.
+
+    for my $worker (@{ $self->{workers} || [] }) {
+        $worker->stop if $worker;
     }
-    delete $ENV{RPI_PINS};
+    $self->{workers} = [];
+
+    $self->unregister_object if $self->_rpi_register;
+
+    # Drop this object's signal-cleanup entries (and restore the original
+    # handlers once the last object is gone)
+
+    if ($self->_rpi_register && $self->can('_release_signal_handlers')) {
+        $self->_release_signal_handlers;
+    }
+
+    $self->{clean} = 1;
+}
+
+sub _led {
+    my ($self, $led) = @_;
+
+    # Pi 5 / RP1 exposes its LEDs as ACT (activity) and PWR (power); earlier
+    # boards use led0 and led1. The default restore trigger differs too
+
+    my %map = WiringPi::API::pi_rp1_model()
+        ? (
+            io  => { name => 'ACT', trigger => 'mmc0' },
+            pwr => { name => 'PWR', trigger => 'none' },
+        )
+        : (
+            io  => { name => 'led0', trigger => 'mmc0' },
+            pwr => { name => 'led1', trigger => 'input' },
+        );
+
+    return $map{$led};
+}
+sub _led_cmd {
+    # Runs an LED sysfs write via the shell, surfacing failures instead of
+    # silently no-opping (eg. when sudo isn't available or isn't passwordless)
+
+    my ($self, $cmd) = @_;
+
+    if (system("$cmd > /dev/null") != 0) {
+        warn "LED command '$cmd' failed; is sudo configured on this system?\n";
+    }
+}
+sub _rpi_register {
+    # Allow defeating the entire registration process (objects and pins)
+    return $_[0]->{rpi_register} // 1;
+}
+sub _rpi_register_pins {
+    # Allow defeating the shared memory pin registration
+    return $_[0]->{rpi_register_pins} // 1;
 }
 sub _pin_registration {
-    # manages the registration duties for pins
+    # Manages the registration duties for pins
 
-    my ($self, $pin, $alt, $state, $mode) = @_;
+    my ($self, %param) = @_;
 
-    my $json = $ENV{RPI_PINS};
-    my $perl = defined $json ? decode_json $json : {};
+    return if ! $self->_rpi_register_pins || ! $self->_rpi_register;
 
-    if (! defined $pin){
-        my @registered_pins = keys %{ $perl };
+    my $pin = $param{pin};
+
+    # The whole transaction runs under _meta_txn so the lock is released even
+    # if a croak (or a die from a pin method) fires mid-section
+
+    return $self->_meta_txn(sub {
+        my $meta = $self->meta_fetch;
+
+        if (! defined $pin){
+            my @registered_pins = keys %{ $meta->{pins} };
+            return \@registered_pins;
+        }
+
+        my $pin_num = $self->pin_to_gpio($pin->num);
+
+        if ($param{operation} eq 'unregister'){
+            if (! exists $meta->{pins}{$pin_num}{users}{$param{requester}}) {
+                return;
+            }
+            if (exists $meta->{pins}{$pin_num}) {
+                $pin->mode_alt($meta->{pins}{$pin_num}{alt});
+                $pin->write($meta->{pins}{$pin_num}{state});
+                $pin->mode($meta->{pins}{$pin_num}{mode});
+
+                delete $meta->{pins}{$pin_num};
+
+                $self->meta_store($meta);
+
+                return;
+            }
+        }
+
+        if (! exists $param{state} && ! exists $param{alt}) {
+            croak "_pin_registration() requires both 'alt' and 'state' params\n";
+        }
+
+        if ($param{operation} eq 'register'){
+            if (exists $meta->{pins}{$pin_num}){
+                croak "pin $pin_num is already in use, can't continue...\n";
+            }
+
+            $meta->{pins}{$pin_num}{alt} = $param{alt};
+            $meta->{pins}{$pin_num}{state} = $param{state};
+            $meta->{pins}{$pin_num}{mode} = $param{mode};
+            $meta->{pins}{$pin_num}{comment} = $pin->comment;
+            $meta->{pins}{$pin_num}{users}{$param{requester}}++;
+        }
+
+        my @registered_pins = keys %{ $meta->{pins} };
+
+        $self->meta_store($meta);
+
         return \@registered_pins;
-    }
+    });
+}
+sub _restore_pin_alt {
+    # Restores a pin to a previously captured alt mode. On the Raspberry Pi 5 /
+    # RP1, get_alt() returns a *mode* enum rather than a classic alt-function
+    # number, so pinModeAlt() can't round-trip the simple cases: INPUT (0) and
+    # OUTPUT (1) must be restored via pinMode(), and "no function" (31, which
+    # pinModeAlt rejects outright) via pinctrl. Real alt functions still
+    # round-trip through pinModeAlt(). Off the RP1, get_alt()'s classic encoding
+    # lines up with pinModeAlt(), so legacy Pi 3/4 behaviour is unchanged.
 
-    if (! defined $alt){
-        if (defined $perl->{$self->pin_to_gpio($pin->num)}){
-            $pin->mode_alt($perl->{$pin->num}{alt});
-            $pin->write($perl->{$pin->num}{state});
-            $pin->mode($perl->{$pin->num}{mode});
-            delete $perl->{$self->pin_to_gpio($pin->num)};
-            $ENV{RPI_PINS} = encode_json $perl;
+    my ($self, $pin_num, $alt) = @_;
+
+    if (WiringPi::API::pi_rp1_model()) {
+        if ($alt == 0 || $alt == 1) {
+            WiringPi::API::pinMode($pin_num, $alt); # 0 = INPUT, 1 = OUTPUT
+            return;
+        }
+        if ($alt == 31) {
+            # Localize $?/$! so this shell-out (which often runs from cleanup at
+            # program exit) can't clobber the script's own exit status.
+
+            local ($?, $!);
+
+            if (system('pinctrl', 'set', $pin_num, 'no') != 0) {
+                warn "Couldn't restore GPIO $pin_num to 'no function' (alt 31) via " .
+                     "pinctrl; is pinctrl installed and are you in the 'gpio' group?\n";
+            }
             return;
         }
     }
 
-    die "_pin_registration() requires both \$alt and \$state params\n"
-      if ! defined $state;
-
-    if (exists $perl->{$self->pin_to_gpio($pin->num)}){
-        my $gpio_pin_num = $self->pin_to_gpio($pin->num);
-        die "pin $gpio_pin_num is already in use, can't continue...\n";
-    }
-
-    $perl->{$self->pin_to_gpio($pin->num)}{alt} = $alt;
-    $perl->{$self->pin_to_gpio($pin->num)}{state} = $state;
-    $perl->{$self->pin_to_gpio($pin->num)}{mode} = $mode;
-
-    my @registered_pins = keys %{ $perl };
-
-    $json = encode_json $perl;
-    
-    $ENV{RPI_PINS} = $json;
-
-    return \@registered_pins;
+    WiringPi::API::pinModeAlt($pin_num, $alt);
 }
+sub _pwm_in_use {
+    my $self = shift;
+
+    return if ! $self->_rpi_register_pins || ! $self->_rpi_register;
+
+    if ($_[0]){
+        $self->_meta_txn(sub {
+            my $meta = $self->meta_fetch;
+            $meta->{pwm}{in_use} = 1;
+            $meta->{pwm}{users}{$self->uuid} = 1;
+            $self->meta_store($meta);
+        });
+    }
+}
+
 sub _vim{1;};
+
 1;
 
 __END__
@@ -251,9 +440,24 @@ Besides the methods listed below, we also make available through inheritance
 all methods provided by L<RPi::SysInfo>. Please see that documentation for
 usage details.
 
-=head2 gpio_layout()
+=head2 gpio_layout
 
 Returns the GPIO layout which indicates the board revision number.
+
+=head2 identify($seconds)
+
+This method wraps the L<io_led()|/io_led($tweak)> and
+L<pwr_led()|/pwr_led($tweak)> methods.
+
+Parameters:
+
+    $seconds
+
+Optional, Integer: The number of seconds to remain in "identify" state. Defaults
+to C<5>.
+
+In "identify" state, the green disk I/O LED will remain on constantly, and the
+red power LED will stay off for the duration.
 
 =head2 io_led($tweak)
 
@@ -288,21 +492,6 @@ Optional: Sending in a true value (eg: C<1>) will turn the red power LED off.
 Sending in a false value (or omitting the parameter) will restore the power LED
 back to default state.
 
-=head2 identify($seconds)
-
-This method wraps the L<io_led()|/io_led($tweak)> and
-L<pwr_led()|/pwr_led($tweak)> methods.
-
-Parameters:
-
-    $seconds
-
-Optional, Integer: The number of seconds to remain in "identify" state. Defaults
-to C<5>.
-
-In "identify" state, the green disk I/O LED will remain on constantly, and the
-red power LED will stay off for the duration.
-
 =head2 label($label)
 
 Allows you to set and retrieve a label (aka name) for your Raspberry Pi object.
@@ -320,58 +509,19 @@ will be the empty string.
 =head2 pin_scheme([$scheme])
 
 Returns the current pin mapping in use. Returns C<0> for C<wiringPi> scheme,
-C<1> for GPIO, C<2> for System GPIO, C<3> for physical board and C<-1> if a
-scheme has not yet been configured (ie. one of the C<setup*()> methods has
-not yet been called).
+C<1> for GPIO, and C<-1> if a scheme has not yet been configured (ie. one of
+the C<setup*()> methods has not yet been called).
 
 If using L<RPi::Const>, these map out to:
 
     0  => RPI_MODE_WPI
     1  => RPI_MODE_GPIO
-    2  => RPI_MODE_GPIO_SYS # unused in RPi::WiringPi
-    3  => RPI_MODE_PHYS
     -1 => RPI_MODE_UNINIT
-
-=head2 pin_map($scheme)
-
-Returns a hash reference in the following format:
-
-    $map => {
-        phys_pin_num => pin_num,
-        ...
-    };
-
-If no scheme is in place or one isn't sent in, return will be an empty hash
-reference.
-
-Parameters:
-
-    $scheme
-
-Optional: By default, we'll check if you've already run a setup routine, and
-if so, we'll use the scheme currently in use. If one is not in use and no
-C<$scheme> has been sent in, we'll return an empty hash reference, otherwise
-if a scheme is sent in, the return will be:
-
-For C<'wiringPi'> scheme:
-
-    $map = {
-        phys_pin_num => wiringPi_pin_num,
-        ....
-    };
-
-For C<'GPIO'> scheme:
-
-    $map = {
-        phys_pin_num => gpio_pin_num,
-        ...
-    };
 
 =head2 pin_to_gpio($pin, [$scheme])
 
 Dynamically converts the specified pin from the specified scheme
-C<RPI_MODE_WPI> (wiringPi), or C<RPI_MODE_PHYS> (physical board numbering
-scheme) to the GPIO number format.
+C<RPI_MODE_WPI> (wiringPi) to the GPIO number format.
 
 If C<$scheme> is not sent in, we'll attempt to fetch the scheme currently in
 use and use that.
@@ -453,24 +603,12 @@ Parameters:
 
 Mandatory, Integer: An unsigned integer to set the pulse width to.
 
-=head2 export_pin($pin_num)
-
-Exports a pin. Only needed if using the C<setup_sys()> initialization method.
-
-Pin number must be the C<GPIO> pin number representation.
-
-=head2 unexport_pin($pin_num)
-
-Unexports a pin. Only needed if using the C<setup_sys()> initialization method.
-
-Pin number must be the C<GPIO> pin number representation.
-
 =head2 registered_pins()
 
 Returns an array reference where each element is the GPIO pin number of each
 currently registerd pin.
 
-=head2 register_pin($pin_obj)
+=head2 register_pin($pin_obj, $comment)
 
 Registers a pin within the system for error checking, and proper resetting of
 the pins in use when required.
@@ -480,6 +618,10 @@ Parameters:
     $pin_obj
 
 Mandatory: An object instance of L<RPi::Pin> class.
+
+    $comment
+
+Optional, String: A descriptive string to help identify the pin's purpose.
 
 =head2 unregister_pin($pin_obj)
 
@@ -493,10 +635,21 @@ Parameters:
 
 Mandatory: An object instance of L<RPi::Pin> class.
 
-=head2 cleanup()
+=head2 unregister_object
+
+Removes an object from the shared memory data store.
+
+B<NOTE>: This should only be used for testing purposes. It's simply a way to
+remove objects from the register while bypassing the entire C<cleanup()>
+routine.
+
+=head2 cleanup
 
 Resets all registered pins back to default settings as they were before your
-program started. It's important that this method be called in each application.
+program started. It also stops and cleans up any active interrupt handlers and
+worker threads.
+
+B<Note>: It's important that this method be called in each application.
 
 =head1 ENVIRONMENT VARIABLES
 
@@ -508,7 +661,7 @@ non-Raspberry Pi boards.
 Set to true, will bypass the C<wiringPi> board checks. False will re-enable
 them.
 
-=head2 PI_BOARD
+=head2 RPI_BOARD
 
 Useful only for unit testing. Tells us that we're on Pi hardware.
 
@@ -518,7 +671,7 @@ Steve Bertrand, E<lt>steveb@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016-2019 by Steve Bertrand
+Copyright (C) 2016-2026 by Steve Bertrand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.2 or,

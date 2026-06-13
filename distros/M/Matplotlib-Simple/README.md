@@ -1914,6 +1914,78 @@ all files will be written to `$fh->filename`; be sure to put `execute => 0` unle
 
 # Change log
 
+## 0.28
+
+colorbar options now work better in `scatter`.
+
+Better warning when color key isn't defined for `scatter`
+
+When giving two hash of hashes for a barplot, if one second key is defined in one subplot, but not the other, that subkey is initialized to 0.
+
+### Cross-platform support
+
+The module now should run on Windows in addition to Linux and macOS.
+
+The generated Python script is written to the system temporary directory (via `File::Spec->tmpdir()`) instead of a hard-coded `/tmp`, which does not exist on Windows.
+
+The Python interpreter is now discovered automatically by probing, in order, `python3`, `python`, and the Windows `py` launcher, accepting the first that reports Python 3. This fixes Windows, where the interpreter is typically named `python` (not `python3`), and correctly rejects the Microsoft Store `python3` stub and any Python 2. Set the `MPLS_PYTHON` (or `PYTHON`) environment variable to override the interpreter with a specific name or full path.
+
+The Python script is now executed with the list form of `system` rather than a single shell string, so script paths containing spaces (common on Windows, e.g. `C:\Users\First Last\AppData\Local\Temp`) no longer break execution.
+
+The `Creator` metadata embedded in the output file is now passed through `write_data` (base64), so Windows paths containing backslashes no longer produce invalid escape sequences (e.g. `\U` in `C:\Users`) in the generated Python string literal.
+
+On Windows, `Win32::Console::ANSI` is loaded if available (it is optional, not a hard dependency) so colored status messages render on legacy consoles.
+
+### Crashes / generated-code fixes
+
+`violinplot` is now a callable wrapper; it was exported and dispatched but never defined, so calling it died with "Undefined subroutine".
+
+`hist` with an array of `bins` no longer emits a stray double-quote (e.g. `[0,2,4"]`) that caused a Python `SyntaxError`.
+
+`hexbin` and `hist2d` no longer pass `cblabel` twice (once inside the option string and again as `label => ...`), which previously caused a duplicate-keyword `SyntaxError`.
+
+`scatter` with a scalar `set.options` no longer emits a doubled comma (`scatter(x, y, , ...)`), which was a `SyntaxError`.
+
+Stacked `barh` now uses the `left` keyword for stacking instead of `bottom`, which collided with `barh`'s own `bottom` (y-position) parameter and raised "got multiple values for keyword argument 'bottom'".
+
+`colored_table` with `cb_logscale` together with `cb_min`/`cb_max` no longer emits `LogNorm(, vmin=...)` with a leading comma (a `SyntaxError`).
+
+`plot` with a hash of data and a scalar `set.options` no longer crashes by dereferencing a string as a hash under `strict refs`.
+
+`plot` with a hash of data now accepts a scalar `twinx` naming a data key (e.g. `twinx => 'pressure'`); previously the value was wrongly required to be a digit string, making key-named `twinx` impossible.
+
+Grouped bar plots with a single scalar `color` (e.g. `color => 'green'`) no longer crash trying to dereference the string as an array; the color is applied to all series.
+
+### Incorrect-output fixes
+
+`colored_table` no longer clobbers asymmetric data: filling undefined cells with `np.nan` previously also overwrote the mirror cell, destroying defined values (if `A->B` was defined but `B->A` was not, both became `NaN`).
+
+`colored_table` now honors `cb_min` and `cb_max`; they were read from the wrong hash (`$args` instead of the plot options) and so were silently ignored.
+
+`colored_table` now honors the `cmap` option; the color map and `set_bad` color were hard-coded to `gist_rainbow` regardless of the `cmap` given. The colormap is copied before calling `set_bad`, as registered colormaps are immutable in current matplotlib.
+
+`colored_table` default row labels now mirror the column labels, matching the matrix that is actually built; with asymmetric data the old default could produce a row-label count mismatch ("'rowLabels' must be of length N").
+
+`scatter` (single set, three keys) now honors the `cmap` option instead of always using `gist_rainbow`.
+
+`scatter` now validates undefined values in *both* coordinate keys; the undefined-data check previously inspected only the first key.
+
+Grouped, non-stacked bar widths are now divided by the number of bar series (plus one), not by a constant; the old divisor came from a hash that always held exactly one key, so groups with more than a few series overlapped their neighbors.
+
+The `wide` plot no longer clamps the upper standard-deviation band at `1`; that clamp assumed data in the range `[0, 1]` and clipped ordinary data (the documented example reaches roughly `1.9`).
+
+Numeric arguments to `plt` methods (e.g. `margins => 0.2`) are no longer quoted into strings; `print_type` now recognizes numbers.
+
+`plt.show()` is now emitted after `plt.savefig()` (and only once), so using `show` no longer writes the file only after the interactive window is closed; `output.file` is no longer required when `show` is requested.
+
+The `add` overlay's `plot.type` now correctly falls back to the parent plot's type when omitted, in both single- and multi-plot calls; the fallback was previously unreachable dead code, and an undefined type could be dispatched on.
+
+### Cleanups
+
+Removed corrupted entries from the method whitelists (`'set_mouseover( '` and a leading-space `' FixedFormatter'`) that made those options unusable.
+
+Removed a stray default applied to the wrong hash in `violin`, two empty dead `if` blocks, and a duplicated `die`.
+
 ## 0.27
 
 Better warnings for undefined data in `scatter`

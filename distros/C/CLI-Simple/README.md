@@ -197,7 +197,7 @@ distribution in one step.
 
 # VERSION
 
-This documentation refers to version 2.0.2.
+This documentation refers to version 2.0.3.
 
 # FEATURES
 

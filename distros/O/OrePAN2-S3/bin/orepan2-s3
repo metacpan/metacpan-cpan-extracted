@@ -23,6 +23,7 @@ Options
   -d, --distribution-id  CloudFront distribution id
   -t, --tag              Name tag for CloudFront distribution
   -T, --template         Template for index
+  -u, --upload-only      Only upload the tarball - do not index
   -v, --verbose          Verbose output
 
 Commands
@@ -181,26 +182,39 @@ create_index() {
 
     echo >&2 "looking for artifacts to upload..."
     orepan2-s3-index $config_profile -c $CONFIG_FILE --log-level $LOG_LEVEL upload-artifacts
+    echo >&2 "done uploading artifacts..."
 
-    rm $index
+    rm -f $index
+
+    return 0;
 }
 
 ########################################################################
 invalidate_cache() {
 ########################################################################
-    local output=$($AWS cloudfront create-invalidation \
+
+    invalidation=$(mktemp);
+    if $AWS cloudfront create-invalidation \
          --distribution-id "$DISTRIBUTION_ID" \
          --paths "${INVALIDATION_PATHS[@]}" \
-         --no-paginate --profile "$AWS_PROFILE")
+         --no-paginate --profile "$AWS_PROFILE" >$invalidation 2>&1; then
+        echo >&2 $(cat $invalidation)
+    else
+        echo "create-invalidation: $?"
+        echo >&2 $(cat $invalidation)
+    fi
 
-    test -n "$VERBOSE" && echo "$output" >&2
+    rm -f $invalidation
 }
 
 ########################################################################
 cleanup() {
 ########################################################################
     echo >&2 "cleaning up temp directory..."
-    test -n "$TEMP_DIR" && rm -rf "$TEMP_DIR"
+
+    if [[ -n "$TEMP_DIR" ]]; then
+        rm -rf "$TEMP_DIR"
+    fi
 }
 
 ########################################################################
@@ -244,8 +258,8 @@ TEMP_DIR=""
 LOG_LEVEL=""
 
 # Parse command-line options using getopt
-OPTIONS=$(getopt -o hl:p:t:P:c:d:b:xn:T:v \
-                 --long log-level:,verbose,help,profile:,name:,tag:,template:,prefix:,config:,distribution-id:,bucket:,no-invalidate -- "$@")
+OPTIONS=$(getopt -o hl:p:t:P:c:d:b:xn:T:vu \
+                 --long log-level:,verbose,help,upload-only,profile:,name:,tag:,template:,prefix:,config:,distribution-id:,bucket:,no-invalidate -- "$@")
 
 if [ $? -ne 0 ]; then
     echo "$NOT_OK Error parsing options." >&2
@@ -318,6 +332,11 @@ while true; do
             shift 2
             ;;
 
+        -u|--upload-only)
+            UPLOAD_ONLY="--upload-only"
+            shift 1
+            ;;
+
         --)
             shift
             break
@@ -327,7 +346,6 @@ done
 
 # Set an exit trap to always run cleanup
 trap cleanup EXIT
-
 
 COMMAND=${1:-}
 
@@ -395,16 +413,13 @@ case "$COMMAND" in
 
         FILE="";
 
-        if create_index; then
+        create_index
 
-            if test -z "$NO_INVALIDATE"; then
-                if test -n "$DISTRIBUTION_ID"; then
-                    test -n "$VERBOSE" && echo "invalidating cache...\n${INVALIDATION_PATHS[@]}"
-                    invalidate_cache
-                fi
+        if test -z "$NO_INVALIDATE"; then
+            if test -n "$DISTRIBUTION_ID"; then
+                test -n "$VERBOSE" && echo "invalidating cache...\n${INVALIDATION_PATHS[@]}"
+                invalidate_cache
             fi
-        else
-            echo >&2 "$NOT_OK: could not create index"
         fi
         ;;
 
@@ -419,25 +434,35 @@ case "$COMMAND" in
             usage
         fi
 
-        orepan2-s3-index -c $CONFIG_FILE inject $FILE
+        UPLOAD_ONLY="${UPLOAD_ONLY:-}"
 
-        test -n "$VERBOSE" && echo "creating HTML index..." >&2
+        # upload the tarball and possibly index
+        orepan2-s3-index $UPLOAD_ONLY -c $CONFIG_FILE inject $FILE
+        echo >&2 "done injecting $FILE..."
 
-        if create_index; then
-
-            if test -z "$NO_INVALIDATE"; then
-                if test -n "$DISTRIBUTION_ID"; then
-                    test -n "$VERBOSE" && echo "invalidating cache...\n${INVALIDATION_PATHS[@]}"
-                    invalidate_cache
-                fi
-            fi
-        else
-            echo >&2 "$NOT_OK: could not create index"
+        if [[ -n "$UPLOAD_ONLY" ]]; then
+            echo >&2 "upload only exiting..."
+            exit 0;
         fi
-        ;;
+
+        echo >&2 "creating HTML index..."
+
+        NO_INVALIDATE="${NO_INVALIDATE:-}"
+        
+       create_index
+
+       if test -z "$NO_INVALIDATE"; then
+           if test -n "$DISTRIBUTION_ID"; then
+               echo 2>&1 "invalidating cache...\n${INVALIDATION_PATHS[@]}"
+               invalidate_cache
+           fi
+       fi
+       ;;
         
     *)
         echo "$NOT_OK no such command $COMMAND"
         exit;
         ;;
 esac
+
+exit 0;

@@ -1,0 +1,9 @@
+{
+  "columns": 80,
+  "indent_width": 2,
+  "javascript": 1,
+  "outdir": "share/samples/testing",
+  "perl": 1,
+  "prefix": "pt.",
+  "tab_width": 2
+}

@@ -1,5 +1,8 @@
 Revision history for perl module ICANN::RST:
 
+0.04 - 2026-06-12
+  - accept spec versions that are greater than the defined version.
+
 0.03 - 2025-03-28
   - removed versions() and added new_from_version().
 

@@ -15,7 +15,7 @@ Readonly::Array our @EXPORT_OK => qw(clean_cover clean_date clean_isbn clean_iss
 	clean_subtitle clean_title look_for_external_id);
 Readonly::Array our @COVERS => qw(hardback paperback);
 
-our $VERSION = 0.33;
+our $VERSION = 0.34;
 our $DEBUG = 0;
 
 sub clean_cover {
@@ -539,8 +539,8 @@ sub clean_series_ordinal {
 
 	my $c = decode_utf8('(č|Č)');
 	$ret_series_ordinal =~ s/^$c\.\s*//ms;
-	$c = decode_utf8('seš');
-	$ret_series_ordinal =~ s/^$c\.\s*//ms;
+	$c = decode_utf8('(sešit|seš|Seš)');
+	$ret_series_ordinal =~ s/^$c\.?\s*//ms;
 	$c = decode_utf8('(č|Č)íslo');
 	$ret_series_ordinal =~ s/^$c\s*//ms;
 	$c = decode_utf8('(Výstava|Výst)');
@@ -554,6 +554,11 @@ sub clean_series_ordinal {
 	$ret_series_ordinal =~ s/(\d+),\s*(\d+)/$1-$2/ms;
 
 	$ret_series_ordinal =~ s/^(\d+)\.$/$1/ms;
+
+	# Rename roman to arabic
+	if (isroman($ret_series_ordinal)) {
+		$ret_series_ordinal = arabic($ret_series_ordinal);
+	}
 
 	if ($ret_series_ordinal =~ m/^(\d+)-(\d+)$/ms) {
 		my $first = $1;
@@ -929,6 +934,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.33
+0.34
 
 =cut

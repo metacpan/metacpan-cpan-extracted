@@ -1,0 +1,4 @@
+Running the multi tests manually:
+
+- run ./test_full.sh to run cleanup tests if all procs exit cleanly
+- run ./test_die.sh to run cleanup tests if one process die()s

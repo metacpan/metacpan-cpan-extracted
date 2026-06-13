@@ -11,6 +11,7 @@ arr.pl
 css4.colors.txt
 dist.ini
 lib/Matplotlib/Simple.pm
+lib/Matplotlib/bu.Simple.pm
 make.subs.pl
 md2pod.pl
 methods.txt

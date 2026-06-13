@@ -36,8 +36,12 @@ sub value {
         my $nfound = select(my $rout = $rin, undef, undef, 0);
         last if ! $nfound || $nfound < 0;
 
-        # Each record is one atomic syswrite from the single child, so once the
-        # length prefix is readable the payload is too - read_exact won't block.
+        # Each record is one non-blocking syswrite from the single child, and
+        # the writer skips any frame larger than PIPE_BUF (4096B, incl. the
+        # 4-byte length) - a partial non-blocking write of an oversized frame
+        # would desync this length-framed read. So every frame that reaches here
+        # is whole: once the length prefix is readable the payload is too, and
+        # _read_exact won't block.
         my $len_buf = WiringPi::API::BackgroundInterrupt::_read_exact($fh, 4);
         last if ! defined $len_buf;
 

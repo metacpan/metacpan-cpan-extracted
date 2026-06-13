@@ -3,9 +3,9 @@ package RPi::DAC::MCP4922;
 use strict;
 use warnings;
 
-our $VERSION = '2.3605';
+our $VERSION = '3.1801';
 
-use RPi::WiringPi::Constant qw(:all);
+use RPi::Const qw(:all);
 use WiringPi::API qw(:all);
 
 require XSLoader;
@@ -470,7 +470,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Steve Bertrand.
+Copyright 2017-2026 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

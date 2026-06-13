@@ -2,7 +2,7 @@ package Web::Microformats2::Document;
 use Moo;
 use MooX::HandlesVia;
 use Encode qw(encode_utf8);
-use JSON qw(decode_json);
+use JSON::MaybeXS qw(decode_json);
 use List::Util qw(any);
 use Types::Standard qw(HashRef ArrayRef InstanceOf);
 
@@ -55,7 +55,8 @@ sub as_json {
         items => $self->top_level_items,
     };
 
-    return JSON->new->convert_blessed->utf8->encode( $data_for_json );
+    return JSON::MaybeXS->new( convert_blessed => 1, utf8 => 1 )
+        ->encode( $data_for_json );
 }
 
 sub as_raw_data {

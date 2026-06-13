@@ -1,0 +1,82 @@
+from std/string/encode import decode, encode,
+	ENCODING_UTF8, ENCODING_UTF16, ENCODING_UTF32, ENCODING_LATIN;
+from std/string import to_binary;
+from test/more import *;
+
+is(
+	typeof( encode( "héllo", "UTF-8" ) ),
+	"BinaryString",
+	"UTF-8 encode returns a BinaryString",
+);
+is(
+	decode( encode( "héllo", "UTF-8" ), "UTF-8" ),
+	decode( encode( "héllo", "utf-8" ), "utf-8" ),
+	"UTF-8 decoding is case-insensitive",
+);
+is(
+	decode( encode( "héllo", "UTF-8" ), "UTF-8" ),
+	"héllo",
+	"UTF-8 decode is inverse",
+);
+
+is(
+	length( encode( "😀", "UTF-16" ) ) mod 2,
+	0,
+	"UTF-16 output has 16-bit units",
+);
+is(
+	decode( encode( "h😀", "UTF-16" ), "utf-16" ),
+	"h😀",
+	"UTF-16 decode is inverse",
+);
+
+is(
+	typeof( encode( "h😀", "UTF-32" ) ),
+	"BinaryString",
+	"UTF-32 encode returns a BinaryString",
+);
+is(
+	decode( encode( "h😀", "UTF-32" ), "Utf-32" ),
+	"h😀",
+	"UTF-32 decode is inverse",
+);
+
+is(
+	decode( encode( "café", "ISO-8859-1" ), "ISO-8859-1" ),
+	"café",
+	"ISO-8859-1 supports latin-1 text",
+);
+
+like(
+	exception( function () {
+		encode( to_binary("x"), "UTF-8" );
+	}),
+	/TypeException/,
+	"encode rejects BinaryString input",
+);
+like(
+	exception( function () {
+		decode( "x", "UTF-8" );
+	}),
+	/TypeException/,
+	"decode rejects String input",
+);
+ok(
+	exception( function () {
+		encode( "x", "bogus" );
+	} ) != null,
+	"unsupported encode encodings are rejected",
+);
+ok(
+	exception( function () {
+		decode( encode( "x", "UTF-8" ), "bogus" );
+	} ) != null,
+	"unsupported decode encodings are rejected",
+);
+
+is(ENCODING_UTF8,  "UTF-8",      "ENCODING_UTF8 constant");
+is(ENCODING_UTF16, "UTF-16",     "ENCODING_UTF16 constant");
+is(ENCODING_UTF32, "UTF-32",     "ENCODING_UTF32 constant");
+is(ENCODING_LATIN, "ISO-8859-1", "ENCODING_LATIN constant");
+
+done_testing();

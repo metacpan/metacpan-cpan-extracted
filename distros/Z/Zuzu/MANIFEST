@@ -19,6 +19,7 @@ languagetests/concurrency/module_end_to_end_async_db.zzs
 languagetests/concurrency/phase-a.zzs
 languagetests/lang/control/basic.zzs
 languagetests/lang/control/conditions.zzs
+languagetests/lang/control/loops-string-binary-string.zzs
 languagetests/lang/control/loops.zzs
 languagetests/lang/control/module_switch_enum_constants.zzs
 languagetests/lang/control/nested_object_iterator_loop_control.zzs
@@ -60,6 +61,7 @@ languagetests/lang/oop/field-accessors.zzs
 languagetests/lang/oop/inheritance.zzs
 languagetests/lang/oop/lifecycle-hooks.zzs
 languagetests/lang/oop/method-predeclarations.zzs
+languagetests/lang/oop/method-returns-global.zzs
 languagetests/lang/oop/module_alias_import_oop.zzs
 languagetests/lang/oop/module_async_inside_method_trait_usage.zzs
 languagetests/lang/oop/module_cross_type_checks.zzs
@@ -80,15 +82,18 @@ languagetests/lang/oop/traits.zzs
 languagetests/lang/oop/type-checks.zzs
 languagetests/lang/operators/assignment.zzs
 languagetests/lang/operators/binary-string.zzs
+languagetests/lang/operators/bitshift.zzs
 languagetests/lang/operators/boolean-coercion.zzs
 languagetests/lang/operators/boolean.zzs
 languagetests/lang/operators/chain-operators.zzs
 languagetests/lang/operators/circumfix.zzs
 languagetests/lang/operators/collection-operators.zzs
 languagetests/lang/operators/default.zzs
+languagetests/lang/operators/divides.zzs
 languagetests/lang/operators/equality.zzs
 languagetests/lang/operators/numeric-coercion.zzs
 languagetests/lang/operators/numeric-comparison.zzs
+languagetests/lang/operators/numeric-literals-and-coercion.zzs
 languagetests/lang/operators/numeric-more.zzs
 languagetests/lang/operators/numeric-unary.zzs
 languagetests/lang/operators/numeric.zzs
@@ -199,6 +204,7 @@ lib/Zuzu/Module/Proc.pm
 lib/Zuzu/Module/Secure.pm
 lib/Zuzu/Module/Socks.pm
 lib/Zuzu/Module/String.pm
+lib/Zuzu/Module/String/Encode.pm
 lib/Zuzu/Module/Task.pm
 lib/Zuzu/Module/Time.pm
 lib/Zuzu/Module/TUI.pm
@@ -234,10 +240,13 @@ lib/Zuzu/Value/Trait.pm
 lib/Zuzu/Weak.pm
 lib/Zuzu/Web/PSGI.pm
 lib/Zuzu/Web/PSGI/CLI.pm
+Makefile.old
 Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 pm_to_blib
+README.md
+stdlib/CHANGELOG.md
 stdlib/modules/javascript.zzm
 stdlib/modules/perl.zzm
 stdlib/modules/std/archive.zzm
@@ -309,6 +318,7 @@ stdlib/modules/std/result.zzm
 stdlib/modules/std/secure.zzm
 stdlib/modules/std/string.zzm
 stdlib/modules/std/string/base64.zzm
+stdlib/modules/std/string/encode.zzm
 stdlib/modules/std/string/quoted_printable.zzm
 stdlib/modules/std/task.zzm
 stdlib/modules/std/template/z.zzm
@@ -1584,6 +1594,12 @@ stdlib/test-fixtures/toon/encode/key-folding.json
 stdlib/test-fixtures/toon/encode/objects.json
 stdlib/test-fixtures/toon/encode/primitives.json
 stdlib/test-fixtures/toon/encode/whitespace.json
+stdlib/test-fixtures/uritemplate-test/extended-tests.json
+stdlib/test-fixtures/uritemplate-test/LICENSE
+stdlib/test-fixtures/uritemplate-test/negative-tests.json
+stdlib/test-fixtures/uritemplate-test/README.md
+stdlib/test-fixtures/uritemplate-test/spec-examples-by-section.json
+stdlib/test-fixtures/uritemplate-test/spec-examples.json
 stdlib/test-fixtures/zpath/data1.json
 stdlib/test-fixtures/zpath/data2.cbor
 stdlib/test-fixtures/zpath/data2.cbor.pl
@@ -1754,6 +1770,7 @@ stdlib/tests/std/net/http/_request_builder_url_unicode.zzs
 stdlib/tests/std/net/http/_timeout_retry_all.zzs
 stdlib/tests/std/net/smtp.zzs
 stdlib/tests/std/net/url.zzs
+stdlib/tests/std/net/url/uri-template.zzs
 stdlib/tests/std/path/jsonpointer.zzs
 stdlib/tests/std/path/kdl.zzs
 stdlib/tests/std/path/simple.zzs
@@ -1800,6 +1817,7 @@ stdlib/tests/std/secure/_sign_ed25519.zzs
 stdlib/tests/std/secure/_tls_identity.zzs
 stdlib/tests/std/string.zzs
 stdlib/tests/std/string/base64.zzs
+stdlib/tests/std/string/encode.zzs
 stdlib/tests/std/string/quoted_printable.zzs
 stdlib/tests/std/task.zzs
 stdlib/tests/std/template/z.zzs

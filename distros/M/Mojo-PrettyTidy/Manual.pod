@@ -1,0 +1,692 @@
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Mojo::PrettyTidy::Manual - User guide for Mojo::PrettyTidy and mojo-prettytidy
+
+=head1 OVERVIEW
+
+C<Mojo::PrettyTidy> is a conservative formatter for Mojolicious Embedded
+Perl templates, especially C<.html.ep> files.
+
+The project favors safe, predictable cleanup over aggressive rewriting. It is
+intended to make real-world Mojolicious templates easier to inspect and maintain
+without changing template behavior.
+
+The command-line tool, C<mojo-prettytidy>, provides editor-friendly access to
+the formatter in a style similar to C<perltidy>.
+
+=head1 SCOPE
+
+C<Mojo::PrettyTidy> formats Mojolicious Embedded Perl template source,
+especially C<.html.ep> files that are intended to be rendered by a
+Mojolicious application.
+
+It is not a general-purpose HTML formatter, browser-source formatter, or
+post-rendered HTML cleanup tool. It is not intended for HTML downloaded from a
+browser's "View Source", saved web pages, scraper output, or other
+already-rendered documents.
+
+You can try that if you really want to and good luck with that, but it is outside
+the supported use case. So, I don't want to hear about your miserable experience
+for having done so. That monkey is simply not a member of this circus.
+
+=head1 QUICK START
+
+Format a single file and print the result to standard output:
+
+    mojo-prettytidy file.html.ep
+
+Check whether a file would change:
+
+    mojo-prettytidy --check file.html.ep
+
+Show a diff:
+
+    mojo-prettytidy --diff file.html.ep
+
+Rewrite a file in place:
+
+    mojo-prettytidy --write file.html.ep
+
+Rewrite a file in place and keep a backup:
+
+    mojo-prettytidy --write --backup file.html.ep
+
+Read from standard input:
+
+    mojo-prettytidy --stdin < file.html.ep
+
+Write to a specific output file:
+
+    mojo-prettytidy --output parsed.file.html.ep file.html.ep
+
+Process multiple files with a generated filename prefix:
+
+    mojo-prettytidy file1.html.ep file2.html.ep --prefix pt.
+
+Process a directory non-recursively:
+
+    mojo-prettytidy templates --prefix pt. --outdir parsed
+
+=head1 MODULE SYNOPSIS
+
+    use Mojo::PrettyTidy;
+
+    my $pt = Mojo::PrettyTidy->new(
+      indent_width => 2,
+      tab_width    => 2,
+      columns      => 80,
+      attributes   => 1,
+      javascript   => 1,
+    );
+
+    my $output = $pt->tidy($input);
+
+    if ( !$pt->check($input) ) {
+      print "changes would be made\n";
+    }
+
+=head1 COMMAND SYNOPSIS
+
+    mojo-prettytidy [options] file.html.ep
+    mojo-prettytidy [options] file1.html.ep file2.html.ep
+    mojo-prettytidy [options] templates
+    mojo-prettytidy --stdin < file.html.ep
+
+=head1 FORMATTING POLICY
+
+C<Mojo::PrettyTidy> is intentionally conservative.
+
+It aims to:
+
+=over 4
+
+=item *
+
+preserve Mojolicious template semantics
+
+=item *
+
+normalize whitespace safely
+
+=item *
+
+improve readability of mixed HTML, Embedded Perl, JavaScript, and CSS
+
+=item *
+
+keep text payloads intact unless a specific structural rule applies
+
+=item *
+
+avoid wrapping arbitrary prose, Perl expressions, JavaScript, or quoted payloads
+
+=item *
+
+prefer structural expansion over generic hard wrapping
+
+=back
+
+It is not intended to be a full HTML parser, JavaScript parser, or prose
+reformatter.
+
+=head1 CURRENT BEHAVIOR
+
+Current versions perform conservative cleanup including:
+
+=over 4
+
+=item *
+
+normalizing line endings to LF
+
+=item *
+
+removing trailing horizontal whitespace
+
+=item *
+
+ensuring exactly one trailing newline at end of file
+
+=item *
+
+applying conservative indentation to safe HTML structure
+
+=item *
+
+indenting plain text lines inside safe HTML structure
+
+=item *
+
+preserving Embedded Perl structure conservatively
+
+=item *
+
+indenting HTML lines containing Embedded Perl markers conservatively
+
+=item *
+
+indenting Embedded Perl control lines locally inside surrounding HTML blocks
+
+=item *
+
+handling single-line and multiline HTML comments conservatively
+
+=item *
+
+treating C<script> and C<style> blocks as protected regions
+
+=item *
+
+handling multiline opening tags conservatively
+
+=item *
+
+formatting selected HTML attributes conservatively
+
+=item *
+
+handling inline C<style="..."> attributes conservatively when C<--columns> is enabled
+
+=back
+
+=head1 ATTRIBUTE FORMATTING
+
+Attribute formatting is enabled by default.
+
+The formatter groups supported tags by behavior rather than by strict HTML
+taxonomy:
+
+=over 4
+
+=item * container-like tags
+
+Tags whose opening attributes can be formatted while their body is handled by
+normal structure rules. Examples include C<form>, C<select>, C<div>, C<main>,
+C<picture>, C<svg>, and C<tr>.
+
+=item * solo tags
+
+Tags with no body handling. Examples include C<input>, C<img>, C<source>, and
+C<path>.
+
+=item * paired tags
+
+Tags with an opening tag, body, and closing tag that can be expanded safely.
+Examples include C<button> and C<a>.
+
+=back
+
+Attribute continuation lines are indented more deeply than nested child
+content so that attributes do not visually collide with child elements.
+
+Quoted attribute values containing HTML-like fragments are protected from
+early tag-splitting rules. For example, tooltip content such as:
+
+    data-bs-title="<b>Regex:</b><code><%= $regex %></code>"
+
+is treated as an attribute value, not as real template structure.
+
+=head1 COLUMN-AWARE FORMATTING
+
+C<--columns>, also available as C<--cols> or C<-c>, sets a target width for
+conservative width-aware formatting. The default is C<80>. Use
+C<--no-columns> or C<--no-cols> to disable column-aware formatting.
+
+Column-aware formatting is not a generic hard-wrap engine.
+
+The first supported behavior is conservative formatting of long
+C<style="..."> attributes. Style declarations are split only on CSS
+declaration boundaries, using semicolons as legal break points. The formatter
+packs declarations into lines near the configured column target while
+preserving declaration order.
+
+The formatter intentionally does not wrap arbitrary quoted values such as:
+
+=over 4
+
+=item * SVG path C<d="..."> data
+
+=item * C<href="...">
+
+=item * C<src="...">
+
+=item * C<srcset="...">
+
+=item * C<data-*="..."> payloads
+
+=item * event handlers such as C<onclick="...">
+
+=item * Embedded Perl expressions
+
+=item * prose or text payloads
+
+=back
+
+=head1 TEXT PAYLOADS
+
+Text payloads are treated carefully because source whitespace can affect
+rendered output.
+
+Paragraph-like text payload blocks should preserve their inline content,
+including inline tags such as C<a>, C<b>, C<i>, and inline C<code>, unless a
+specific structural rule applies.
+
+The formatter avoids treating prose as a generic wrapping target. Editor or
+terminal line wrapping is preferred for long prose until an explicit safe rule
+is added.
+
+=head1 EMBEDDED PERL FORMATTING
+
+C<Mojo::PrettyTidy> uses C<perltidy> for Embedded Perl/code regions where
+possible. If C<$HOME/.perltidyrc> exists, it is passed to C<perltidy>, so
+your normal Perl indentation preferences are inherited.
+
+PrettyTidy still overrides a small number of C<perltidy> settings where needed
+for template formatting. In particular, it sets a very large line length
+(C<-l=9999>) so C<perltidy> does not make wrapping decisions. Width-aware
+template expansion is handled by PrettyTidy itself, for example through
+C<--cols>.
+
+PrettyTidy also runs C<perltidy> through standard input/output in quiet mode
+and currently uses C<-nbbc> to avoid introducing blank lines before comments.
+
+=head1 JAVASCRIPT HANDLING
+
+C<Mojo::PrettyTidy> contains a conservative JavaScript handler for inline
+C<script> blocks in Mojolicious C<.html.ep> templates.
+
+The goal is not for C<Mojo::PrettyTidy> itself to become a JavaScript
+formatter. Instead, JavaScript is treated as a language island inside the
+template.
+
+The handler attempts to:
+
+=over 4
+
+=item 1
+
+detect inline C<script> ... C</script> blocks
+
+=item 2
+
+separate the script block cleanly from surrounding EP/HTML
+
+=item 3
+
+format the JavaScript body with C<JavaScript::Beautifier>
+
+=item 4
+
+repair a small set of known modern-JavaScript token splits
+
+=item 5
+
+verify that known dangerous munges did not survive
+
+=item 6
+
+reinsert the script body into the template
+
+=back
+
+External scripts such as:
+
+    <script src="/app.js"></script>
+
+are not JavaScript-formatted because there is no inline body to format.
+
+=head2 JavaScript::Beautifier
+
+C<Mojo::PrettyTidy> currently uses C<JavaScript::Beautifier>. This keeps the
+implementation Perl-native and avoids requiring Node, npm, npx,
+C<node_modules>, or editor-specific PATH setup.
+
+The beautifier is called with the configured indentation width, so JavaScript
+indentation follows the formatter's indentation size.
+
+=head2 Modern JavaScript caveat
+
+C<JavaScript::Beautifier> is older than many modern JavaScript syntax forms.
+Some modern tokens may be split incorrectly by the beautifier. For example,
+arrow functions may be transformed incorrectly:
+
+    () => {
+
+into:
+
+    () = > {
+
+The formatter currently detects and repairs a small set of known token splits,
+including:
+
+=over 4
+
+=item * C<=E<gt>>
+
+=item * C<?.>
+
+=item * C<??>
+
+=item * C<??=>
+
+=item * C<||=>
+
+=item * C<&&=>
+
+=back
+
+If known JavaScript munging is detected after attempted repair, the original
+JavaScript body is left unchanged and a warning is emitted.
+
+=head2 JavaScript warning comment
+
+When the formatter accepts a changed JavaScript body, it injects a visible
+comment inside the script block warning that the block was reformatted and can
+be rerun with JavaScript formatting disabled.
+
+If JavaScript formatting fails or is rejected as unsafe, the original body is
+kept and no reformatting warning comment is injected.
+
+=head1 COMMAND-LINE OPTIONS
+
+=head2 --attributes, --attrib, -a
+
+Enable attribute formatting. This is enabled by default.
+
+Use C<--no-attributes> or C<--no-attrib> to disable attribute formatting.
+
+=head2 --backup
+
+When used with C<--write>, create a backup of the original file before
+rewriting it.
+
+=head2 --backup-ext
+
+When used with C<--write --backup>, choose the backup suffix. The default is
+C<.bak>.
+
+=head2 --check
+
+Exit with status C<0> if the input file is already tidy, or C<1> if changes
+would be made.
+
+This option requires a single input file.
+
+=head2 --columns, --cols, -c
+
+Set the target column width for conservative width-aware formatting. The
+default is C<80>.
+
+Use C<--no-columns> or C<--no-cols> to disable column-aware formatting.
+
+=head2 --config
+
+Load default options from the specified JSON config file.
+
+If C<--config> is not given, C<mojo-prettytidy> will look for a default
+
+configuration file and load the first one found:
+
+=over 4
+
+=item * C<$HOME/.mojo-prettytidy.json>
+
+=item * C<./.mojo-prettytidy.json>
+
+=back
+
+Command-line options override config values.
+
+The installer should create C<$HOME/.mojo-prettytidy.json> from the
+
+shipped default config when no user config already exists.
+
+=head2 --diff
+
+Print a minimal unified-style diff showing what would change. Exit with status
+C<0> if no changes would occur or C<1> if differences are found.
+
+This option requires a single input file.
+
+=head2 --help, -h
+
+Show brief help.
+
+=head2 --javascript, --js, -j
+
+Enable JavaScript formatting. This is enabled by default.
+
+Use C<--no-javascript> or C<--no-js> to disable JavaScript formatting.
+
+=head2 --man
+
+Show full documentation.
+
+=head2 --output, -o
+
+Write the tidied result to the specified output file instead of standard
+output.
+
+This option cannot be combined with C<--write>, C<--check>, or C<--diff>. It
+is intended for single-input use.
+=head2 --outdir
+
+When writing multiple outputs, place generated files in the specified
+directory.
+
+=head2 --perl / --no-perl
+
+Enable or disable C<perltidy> formatting for Embedded Perl/code regions.
+Enabled by default. When disabled, PrettyTidy still applies its template,
+HTML, attribute, JavaScript, and column-handling passes as configured, but it
+does not run C<perltidy> over Embedded Perl regions.
+
+=head2 --prefix, --pre
+
+When writing multiple outputs, prefix generated filenames with the specified
+string.
+
+=head2 --show-options, -V, -VV
+
+Show effective option values after config and command-line processing.
+
+C<-V> shows active or behavior-changing options. C<-VV> shows all effective
+options, including defaults.
+
+Intended for development use.
+
+=head2 --stdin
+
+Read template input from standard input and write formatted output to standard
+output. This is useful when piping data to C<mojo-prettytidy> from an editor,
+shell command, or another program.
+
+=head2 --version, -v
+
+Print the program version and exit.
+
+=head2 --write, -w
+
+Rewrite input files in place.
+
+=head1 CONFIG FILE
+
+Config files use JSON object syntax. Supported keys may include:
+
+=over 4
+
+=item * C<attributes>
+
+=item * C<columns>
+
+=item * C<indent_width>
+
+=item * C<javascript>
+
+=item * C<outdir>
+
+=item * C<perl>
+
+=item * C<prefix>
+
+=item * C<tab_width>
+
+=back
+
+Example:
+
+    {
+      "attributes": 1,
+      "columns": 80,
+      "javascript": 1,
+      "prefix": "pt.",
+      "outdir": "share/samples/testing"
+    }
+
+Command-line options override config values.
+
+=head1 INPUT AND OUTPUT MODES
+
+Positional inputs may be files or directories.
+
+When a positional input is a directory, C<mojo-prettytidy> scans it
+non-recursively and processes matching C<.html.ep> files.
+
+When multiple files are processed, use one of:
+
+=over 4
+
+=item * C<--write>
+
+Rewrite each file in place.
+
+=item * C<--prefix>
+
+Write sibling output files with prefixed names.
+
+=item * C<--outdir>
+
+Write generated files to the specified output directory.
+
+=back
+
+C<--output> is intended for single-file output to a specific file.
+
+C<--write> cannot be combined with C<--output>, C<--prefix>, or C<--outdir>.
+
+C<--check> and C<--diff> require a single input file.
+
+Multiple inputs require C<--write>, C<--prefix>, or C<--outdir>.
+
+=head1 EDITOR USAGE
+
+The tool is designed to work cleanly as an editor-invoked command, similar in
+spirit to C<perltidy>.
+
+Typical patterns:
+
+    bin/mojo-prettytidy %filename
+
+or:
+
+    bin/mojo-prettytidy --stdin
+
+For non-destructive inspection of generated output, C<--output>, C<--prefix>,
+and C<--outdir> are often more useful than C<--diff>.
+
+=head2 Editor integration
+
+Mojo::PrettyTidy includes an optional L<Kate|https://kate-editor.org/>
+External Tool helper:
+
+  kate-tool --install
+
+This writes a Kate External Tools configuration for running
+C<mojo-prettytidy> against the current document, when the document is saved.
+
+Other editor integrations are encouraged. If you use another editor,
+please consider contributing a small installer/helper for that editor.
+Good candidates include Vim, Neovim, VS Code, BBEdit, Sublime Text,
+and any editor that can run an external formatter command.
+
+The formatter itself is editor-agnostic; editor helpers are convenience
+wrappers around the C<mojo-prettytidy> command.
+
+=head1 EXIT STATUS
+
+=over 4
+
+=item * C<0>
+
+Success, or no changes needed in C<--check> or C<--diff> mode.
+
+=item * C<1>
+
+Changes would be made in C<--check> mode, or differences were found in
+C<--diff> mode.
+
+=item * C<2>
+
+Command-line usage error.
+
+=back
+
+=head1 DESIGN NOTES
+
+C<Mojo::PrettyTidy> favors local readability over aggressive transformation.
+
+It is intentionally conservative around:
+
+=over 4
+
+=item * Embedded Perl control flow
+
+=item * mixed HTML and Embedded Perl lines
+
+=item * script and style blocks
+
+=item * multiline inline attributes
+
+=item * multiline opening tags
+
+=item * quoted attribute values
+
+=item * text payloads
+
+=back
+
+=head1 DEVELOPMENT STATUS
+
+The project is in active development but is already useful for real-world
+inspection and iterative cleanup.
+
+The current implementation is developed on Perl 5.40. It may work with lower
+Perl versions, but that is not currently guaranteed or tested.
+
+=head1 INSTALLATION
+
+Development install from the repository:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+=head1 PROJECT HOME
+
+L<https://github.com/Harryb382003/PrettyTidy>
+
+=head1 AUTHOR
+
+Harry Bennett
+
+=head1 LICENSE
+
+Same terms as Perl itself.
+
+=cut

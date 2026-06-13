@@ -1,3 +1,9 @@
+Travel::Routing::DE::DBRIS 0.13 - Sat Jun 13 2026
+
+    * Fix each request being delayed for 10 seconds by Akamai BMP
+    * New dependencies: HTTP::Message ≥ 6.37 and
+      IO::Uncompress::Brotli ≥ 0.004_002
+
 Travel::Routing::DE::DBRIS 0.12 - Tue May 05 2026
 
     * Segment: adjust for bahn.de-internal API changes

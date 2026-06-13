@@ -44,7 +44,7 @@ ICANN::RST::Base - base class for other things.
 
 =head1 VERSION
 
-version 0.03
+version 0.04
 
 =head1 METHODS
 
@@ -66,7 +66,7 @@ Gavin Brown <gavin.brown@icann.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Internet Corporation for Assigned Names and Number (ICANN).
+This software is copyright (c) 2026 by Internet Corporation for Assigned Names and Number (ICANN).
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 
 SKIP: {
-    skip "not a Pi board", 1 unless $ENV{PI_BOARD};
+    skip "not a Pi board", 1 unless $ENV{RPI_BOARD};
     use_ok('RPi::DHT11');
 
     my $mod = 'RPi::DHT11';

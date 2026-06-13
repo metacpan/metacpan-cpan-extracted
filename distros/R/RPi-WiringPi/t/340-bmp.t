@@ -3,7 +3,7 @@ use strict;
 
 use lib 't/';
 
-use RPiTest qw(check_pin_status);
+use RPiTest;
 
 use RPi::WiringPi;
 use RPi::Const qw(:all);
@@ -13,16 +13,13 @@ if (! $ENV{RPI_BMP}){
     plan skip_all => "RPI_BMP environment variable not set\n";
 }
 
-if (! $ENV{PI_BOARD}){
-    $ENV{NO_BOARD} = 1;
-    plan skip_all => "Not on a Pi board\n";
-}
-
 use constant {
     BMP_BASE => 100,
 };
 
-my $pi = RPi::WiringPi->new;
+rpi_running_test(__FILE__);
+
+my $pi = RPi::WiringPi->new(label => 't/340-bmp.t', shm_key => 'rpit');
 my $bmp = $pi->bmp(BMP_BASE);
 
 for (1..25){
@@ -39,6 +36,7 @@ for (1..25){
 
 $pi->cleanup;
 
-check_pin_status();
+rpi_check_pin_status();
+#rpi_metadata_clean();
 
 done_testing();

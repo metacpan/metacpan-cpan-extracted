@@ -40,8 +40,6 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "CLI::Helpers" => 0,
     "Data::Dumper" => 0,
-    "DateTime" => "1.23",
-    "DateTime::TimeZone" => "2.13",
     "Digest::MD5" => 0,
     "File::Spec" => 0,
     "FindBin" => 0,
@@ -56,7 +54,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "strict" => 0
   },
-  "VERSION" => "6.3",
+  "VERSION" => "6.4",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -69,8 +67,6 @@ my %FallbackPrereqs = (
   "Const::Fast" => 0,
   "Data::Dumper" => 0,
   "Data::Printer" => 0,
-  "DateTime" => "1.23",
-  "DateTime::TimeZone" => "2.13",
   "Digest::MD5" => 0,
   "English" => 0,
   "Exporter" => 0,

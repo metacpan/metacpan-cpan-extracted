@@ -8,7 +8,7 @@ use WiringPi::API qw(:perl);
 # (softPwm*, piLock/piUnlock, digitalReadByte(2), digitalWriteByte(2)).
 
 BEGIN {
-    if (! $ENV{PI_BOARD}){
+    if (! $ENV{RPI_BOARD}){
         plan skip_all => "not a Pi board";
         exit;
     }

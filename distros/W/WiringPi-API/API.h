@@ -31,7 +31,7 @@ int wiringPiI2CWriteBlockData (int fd, int reg, const uint8_t *values, uint8_t s
 int wiringPiI2CRawWrite (int fd, const uint8_t *values, uint8_t size);
 
 // GPIO pin specific
-int physPinToWpi(int wpi_pin);
+int physPinToWpi(int phys_pin);
 void pinModeAlt(int pin, int mode);
 
 // read functions

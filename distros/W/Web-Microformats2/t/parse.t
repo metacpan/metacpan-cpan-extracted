@@ -4,7 +4,7 @@ use Test::Deep;
 use List::Util qw(first);
 use Path::Class::Dir;
 use FindBin;
-use JSON;
+use JSON::MaybeXS;
 
 use_ok ("Web::Microformats2");
 

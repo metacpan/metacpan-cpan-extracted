@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -31,10 +31,10 @@ requires:
   PPI: '0'
   Term::ReadKey: '0'
   Tie::File: '0'
-  perl: '5.010'
+  perl: '5.014'
   version: '0'
 resources:
   bugtracker: https://github.com/stevieb9/dist-mgr/issues
   repository: https://github.com/stevieb9/dist-mgr.git
-version: '1.13'
+version: '1.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

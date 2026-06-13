@@ -1,0 +1,53 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+use Data::Dumper;
+use RPi::WiringPi;
+use RPi::Const qw(:all);
+
+if (! @ARGV){
+    die "\npimetaerase requires a shared memory key argument supplied...\n\n";
+}
+
+# Positional args: <shm_key> [erase_all] [display] [remove]
+#   erase_all - if true, also wipe the user 'storage' data (see meta_erase)
+#   display   - if true, dump the meta data before (and after) erasing
+#   remove    - if true, free the shared memory segment itself after erasing,
+#               not just its contents (see meta_remove)
+
+my $shm_key = $ARGV[0];
+my $erase_all = $ARGV[1] // 0;
+my $display = $ARGV[2] // 0;
+my $remove = $ARGV[3] // 0;
+
+if (! RPi::WiringPi->meta_key_check($shm_key)){
+    die "shared memory segment with key '$shm_key' doesn't exist. Can't continue...\n";
+}
+
+my $pi = RPi::WiringPi->new(label => 'pimeta', shm_key => $shm_key);
+
+if ($display){
+    my %meta = %{ $pi->meta_fetch };
+    delete $meta{objects}{$pi->uuid};
+
+    $meta{object_count}--;
+    print "\nBEFORE ERASE:\n\n";
+
+    print Dumper \%meta;
+}
+
+$pi->meta_erase($erase_all);
+
+if ($display){
+    print "\n\nAFTER ERASE:\n\n";
+    print Dumper $pi->meta_fetch;
+}
+
+$pi->cleanup;
+
+if ($remove){
+    $pi->meta_remove;
+    print "\nshared memory segment '$shm_key' removed\n\n" if $display;
+}

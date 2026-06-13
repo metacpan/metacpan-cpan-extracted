@@ -3,7 +3,7 @@ package WiringPi::API;
 use strict;
 use warnings;
 
-our $VERSION = '3.1802';
+our $VERSION = '3.1803';
 
 use Carp qw(croak);
 use Fcntl qw(
@@ -16,7 +16,7 @@ use Fcntl qw(
     F_SETPIPE_SZ
     F_SETSIG
 );
-use POSIX qw(WNOHANG);
+use POSIX qw(WNOHANG PIPE_BUF);
 use RPi::Const qw(:all);
 use Scalar::Util qw(blessed);
 
@@ -46,7 +46,7 @@ my @wpi_c_functions = (
     qw(
         pinMode                 pinModeAlt              getAlt
         getPinModeAlt           pullUpDnControl         digitalRead
-        digitalWrite            digitalWriteByte
+        digitalWrite
     ),
     # ADC (analog to digital)
     qw(
@@ -382,6 +382,7 @@ sub set_interrupt {
     if ($opts{auto_dispatch} && ! $_auto_dispatch) {
         my $v = $opts{auto_dispatch};
         my $sig = ($v =~ /^[A-Za-z]/) ? $v : undef;
+
         auto_dispatch_interrupts(1, $sig);
     }
 
@@ -666,7 +667,7 @@ sub background_interrupt {
 
     if (! defined $edge || ! $VALID_INT_EDGE{$edge}) {
         croak "background_interrupt() \$edge must be INT_EDGE_FALLING (1), " .
-            "INT_EDGE_RISING (2) or INT_EDGE_BOTH (3)";
+              "INT_EDGE_RISING (2) or INT_EDGE_BOTH (3)";
     }
 
     if (! defined $callback || ref $callback ne 'CODE') {
@@ -1075,7 +1076,17 @@ sub worker {
             if (defined $ret) {
                 my $frame = pack("N", length "$ret") . "$ret";
                 syswrite $res_w, $frame if $res_w;
-                syswrite $val_w, $frame if $val_w;
+
+                # The shared channel is non-blocking, so a frame larger than
+                # PIPE_BUF could be written only partially - desyncing value()'s
+                # length-framing into garbage on the next read. Skip oversized
+                # frames entirely: the channel is already lossy (latest value
+                # only), so dropping one too-big update is consistent and keeps
+                # the stream aligned. (The results channel above is a blocking
+                # write, so it always emits whole records.)
+                if ($val_w && length($frame) <= PIPE_BUF) {
+                    syswrite $val_w, $frame;
+                }
             }
 
             last if $once;
@@ -2453,7 +2464,9 @@ Parameters:
 
     $range
 
-Mandatory: An integer between C<0> and C<1023>.
+Mandatory: An unsigned integer specifying the PWM range register. The duty
+cycle then spans C<0> to one less than this value (the default C<1024> gives
+C<0-1023>).
 
 =head2 pwm_set_clock($divisor)
 
@@ -2955,7 +2968,7 @@ Mandatory: Row position. C<0> is the top row.
 
 =head2 lcd_char_def($fd, $index, $data)
 
-Maps to C<void lcdCharDef(int fd, unsigned char data [8])>. This function is
+Maps to C<void lcdCharDef(int fd, unsigned char data [8])>.
 
 This allows you to re-define one of the 8 user-definable characters in the
 display.
@@ -2979,7 +2992,7 @@ unsigned char byte. These bytes represent the character from the top-line to
 the bottom line. 
 
 Note that the characters are actually 5 x 8, so only the lower 5 bits are of
-each element are used (ie. `0b11111` or 0b00011111`). The index is from 0 to 7
+each element are used (ie. C<0b11111> or C<0b00011111>). The index is from 0 to 7
 and you can subsequently print the character defined using the lcdPutchar()
 call using the same index sent in to this function.
 
@@ -3463,12 +3476,22 @@ Stream B<every> defined value the body returns back to the parent, length-framed
 over an inherited pipe. Drain it with C<< $w->read >> (non-blocking) or select on
 C<< $w->fh >> - identical to C<background_interrupt>'s results channel.
 
+B<Size limit:> the drain stays non-blocking only while each record fits one
+atomic pipe write - keep returned values under C<PIPE_BUF> (4096 bytes, which
+includes a 4-byte length frame). A larger value can be split across writes, and
+C<< $w->read >> will then block until the remainder of that record arrives.
+
 =item C<< shared => 1 >>
 
 Publish the body's return value as a B<lossy latest value>: the parent reads the
 most recent value with C<< $w->value >>. The child never blocks on a slow or
 absent reader (a full pipe simply drops the update), so this suits a sampler
 whose intermediate readings don't matter.
+
+Values larger than C<PIPE_BUF> (4096 bytes, including a 4-byte length frame) are
+B<dropped> on this channel: a non-blocking write of an oversized frame could be
+truncated and desync the reader, so the writer skips it. This fits the lossy
+contract - if you need every large value intact, use C<results> instead.
 
 =item C<< mechanism => 'fork' | 'thread' >>
 
@@ -3508,12 +3531,15 @@ worker.
 =item C<< $w->read >> / C<< $w->fh >>
 
 Drain the next streamed value / get the readable filehandle, when the worker was
-started with C<< results => 1 >> (otherwise C<undef>).
+started with C<< results => 1 >> (otherwise C<undef>). On a B<thread> worker these
+croak instead - thread mode has no pipe channels (use shared memory with
+L</pi_lock($key)> / L</pi_unlock($key)>).
 
 =item C<< $w->value >>
 
 The latest published value, when the worker was started with C<< shared => 1 >>
-(otherwise C<undef>).
+(otherwise C<undef>). On a B<thread> worker this croaks for the same reason as
+C<< $w->read >>.
 
 =back
 
@@ -4175,7 +4201,9 @@ C<bmp180Pressure($pin)> directly.
 These functions are under testing, or don't potentially have a use to the end
 user. They may be risky to use, so use at your own risk.
 
-The functions in this section do not have a Perl wrapper equivalent.
+Most are called directly by their C name. Where a snake_case Perl wrapper does
+exist (e.g. C<pin_mode_alt()> for C<pinModeAlt>), that wrapper is the
+recommended interface.
 
 =head2 pseudoPinsSetup(int pinBase)
 
@@ -4208,33 +4236,6 @@ Mandatory: Signed integer, any valid GPIO pin number.
     mode
 
 Mandatory: Signed integer, any valid wiringPi pin mode.
-
-=head2 digitalWriteByte(const int value)
-
-Writes an 8-bit byte to the first eight GPIO pins.
-
-Parameters:
-
-    value
-
-Mandatory: Unsigned int, the byte value you want to send in.
-
-Return: void
-
-=head2 digitalWriteByte2(const int value)
-
-Same as L</digitalWriteByte(const int value)>, but writes to the second group
-of eight GPIO pins.
-
-=head2 digitalReadByte()
-
-Reads an 8-bit byte from the first eight GPIO pins on the Pi.
-
-Takes no parameters, returns the byte value as an unsigned int.
-
-=head2 digitalReadByte2()
-
-Same as L</digitalReadByte()>, but reads from the second group of eight GPIO pins.
 
 =head1 AUTHOR
 

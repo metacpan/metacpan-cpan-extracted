@@ -3,6 +3,8 @@ package WiringPi::API::WorkerThread;
 use strict;
 use warnings;
 
+use Carp qw(croak);
+
 use WiringPi::API::Worker;
 
 # Handle returned by worker() under {mechanism => 'thread'}. The thread
@@ -32,9 +34,13 @@ sub running {
 
     return 0 if ! $self->{running};
 
-    # A {once} thread exits on its own; join it so running() reflects reality.
-    if ($self->{thread} && ! $self->{thread}->is_running) {
-        $self->{thread}->join;
+    # A {once} thread exits on its own; reap it so running() reflects reality.
+    # Join only when joinable and under eval, so a thread that finished between
+    # the is_running check and the join (or was already reaped) can't make
+    # running() die.
+    my $thr = $self->{thread};
+    if ($thr && ! $thr->is_running) {
+        eval { $thr->join } if $thr->is_joinable;
         $self->{thread}  = undef;
         $self->{running} = 0;
         return 0;
@@ -47,19 +53,48 @@ sub stop {
 
     return 1 if ! $self->{running};         # idempotent
 
-    ${ $self->{stop_ref} } = 1;             # cooperative stop at next pass
-    $self->{thread}->join if $self->{thread};
+    ${ $self->{stop_ref} } = 1 if $self->{stop_ref};   # cooperative stop next pass
+
+    # Reap the thread, but guard the join: never propagate a die from a double-
+    # or self-join, and during global destruction detach instead of join -
+    # joining an ithread while the interpreter is tearing down is unsafe and
+    # noisy (and DESTROY reaches here for a worker the caller forgot to stop).
+    my $thr = $self->{thread};
+    if ($thr && $thr->is_joinable) {
+        if (${^GLOBAL_PHASE} eq 'DESTRUCT') {
+            eval { $thr->detach };
+        }
+        else {
+            eval { $thr->join };
+        }
+    }
     $self->{thread}  = undef;
     $self->{running} = 0;
 
     return 1;
 }
+sub fh {
+    goto &_no_channel;
+}
+sub read {
+    goto &_no_channel;
+}
 sub value {
-    # No pipe channel under thread mode - shared-memory ergonomics replace it.
-    return undef;
+    goto &_no_channel;
+}
+
+# Thread mode has no pipe channels (results/shared are rejected at construction),
+# so the channel accessors croak with a guiding message instead of silently
+# returning undef - a consistent contract with the BackgroundInterrupts sibling,
+# which croaks the same way for its absent results channel
+
+sub _no_channel {
+    croak "worker({mechanism=>'thread'}) has no pipe channels; share a " .
+        "variable and serialise it with pi_lock()/pi_unlock() instead";
 }
 
 1;
+
 __END__
 
 =head1 NAME
@@ -91,9 +126,12 @@ the handle.
 
 It is a subclass of L<WiringPi::API::Worker>, but the thread lifecycle is
 nothing like a fork's (no pid, no signal/C<waitpid>), so this class overrides
-C<pid>/C<running>/C<stop>/C<value>. There are no pipe channels under thread
-mode - share a variable and serialise access with
-L<WiringPi::API/pi_lock($key)> / L<WiringPi::API/pi_unlock($key)> instead.
+C<pid>/C<running>/C<stop>. There are no pipe channels under thread mode (the
+C<results> and C<shared> options are rejected at construction), so the channel
+accessors C<read>/C<fh>/C<value> are also overridden to B<croak> with a guiding
+message rather than silently return C<undef> - share a variable and serialise
+access with L<WiringPi::API/pi_lock($key)> / L<WiringPi::API/pi_unlock($key)>
+instead.
 
 =head1 METHODS
 
@@ -113,10 +151,15 @@ self-finished thread so it reflects reality.
 Set the cooperative stop flag (honoured at the next pass of the body) and join
 the thread. Idempotent. Returns C<1>.
 
-=head2 value
+=head2 read / fh / value
 
-Always C<undef> under thread mode: there is no pipe channel, as shared-memory
-ergonomics replace it.
+B<Croak> under thread mode. A thread worker has no pipe channels - the
+C<results> and C<shared> options are rejected when it is constructed - so there
+is nothing for these accessors to return. They croak with a message pointing you
+at shared memory plus L<WiringPi::API/pi_lock($key)> / L<WiringPi::API/pi_unlock($key)>,
+matching the way L<WiringPi::API::BackgroundInterrupts> croaks for its absent
+results channel. (On a fork worker these instead return C<undef> when the channel
+was not requested.)
 
 =head1 SEE ALSO
 

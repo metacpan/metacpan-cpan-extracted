@@ -3,9 +3,9 @@ package RPi::DigiPot::MCP4XXXX;
 use warnings;
 use strict;
 
-our $VERSION = '2.3604';
+our $VERSION = '3.1801';
 
-use RPi::WiringPi::Constant qw(:all);
+use RPi::Const qw(:all);
 use WiringPi::API qw(:all);
 
 sub new {
@@ -162,6 +162,11 @@ use its L<SPI library|http://wiringpi.com/reference/spi-library> to communicate
 to the potentiometer over the SPI bus.
 
 =head1 SYNOPSIS
+
+    use warnings;
+    use strict;
+
+    use RPi::DigiPot::MCP4XXXX;
 
     # GPIO pin number connected to the potentiometer's
     # CS (Chip Select) pin
@@ -336,7 +341,7 @@ Steve Bertrand, C<< <steveb at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017 Steve Bertrand.
+Copyright 2017-2026 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

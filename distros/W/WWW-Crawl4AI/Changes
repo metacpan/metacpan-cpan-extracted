@@ -1,3 +1,20 @@
+0.005     2026-06-12 15:23:16Z
+
+ - Detect: removed every body-text and HTML/title fingerprint from the block
+   classifier. is_good now discards a page only on thin_html, an HTTP push-back
+   status, or a final_url that landed on a known WAF/captcha challenge endpoint.
+   The old size-independent arms -- $RE_WALL matching a bare `__cf_` substring,
+   the "Just a moment"/"Access denied" $RE_TITLE, and the thin-gated $RE_BLOCK /
+   $RE_JS / $RE_CAPTCHA body phrases -- are gone: on a thin page they were
+   redundant (thin_html already fails it) and on a full page they were pure
+   false-positives. Real regression: www.delphin.de served a full 386 KB 200
+   page carrying Cloudflare's passive /cdn-cgi/challenge-platform/.../jsd/main.js
+   beacon (a `__cf_` token), which was thrown away as bot_wall_detected across
+   all four strategies. A content-rich 200 page is now the scrape, full stop.
+   Drops the js_required signal/reason (a thin JS shell reads thin_content).
+   Soft-blocks that serve one identical interstitial for every URL are caught
+   site-level by the caller, not per-page here.
+
 0.004     2026-06-11 14:24:19Z
 
  - Detect: content volume is now the master signal. Every signal derived from a

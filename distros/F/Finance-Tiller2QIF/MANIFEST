@@ -38,4 +38,5 @@ t/testcase/wrong_sheet.csv
 t/tiller2qif.t
 t/util.t
 t/writeqif.t
+todo.txt
 xt/author/no-debug.t

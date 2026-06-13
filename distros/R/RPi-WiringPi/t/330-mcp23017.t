@@ -8,14 +8,12 @@ BEGIN {
         plan(skip_all => "RPI_MCP23017 environment variable not set");
     }
 
-    if (! $ENV{PI_BOARD}){
-        $ENV{NO_BOARD} = 1;
-        plan skip_all => "Not on a Pi board\n";
-    }
-
     use_ok( 'RPi::GPIOExpander::MCP23017' ) || print "Bail out!\n";
 }
 
+use lib 't/';
+
+use RPiTest;
 use RPi::Const qw(:all);
 use RPi::WiringPi;
 
@@ -24,7 +22,13 @@ use constant {
     BANK_B => 1,
 };
 
-my $pi = RPi::WiringPi->new(fatal_exit => 0);
+rpi_running_test(__FILE__);
+
+my $pi = RPi::WiringPi->new(
+    fatal_exit => 0,
+    label => 't/330-mcp23017.t',
+    shm_key => 'rpit'
+);
 my $o = $pi->expander(0x20);
 
 { # registers.t
@@ -210,7 +214,8 @@ my $o = $pi->expander(0x20);
         $o->mode_bank(BANK_B, MCP23017_INPUT);
         is $o->register(MCP23017_IODIRB), 0xFF, "pins in bank 1 are INPUT ok";
 
-        for (0..7){
+        # GPA0-3 drive the stepper (no A<->B loopback wire); test pins 4-7 only
+        for (4..7){
             my ($pin_a, $pin_b) = ($_, $_ + 8);
             $o->write($pin_a, HIGH);
             is
@@ -245,7 +250,8 @@ my $o = $pi->expander(0x20);
         $o->mode_bank(BANK_A, MCP23017_INPUT);
         is $o->register(MCP23017_IODIRA), 0xFF, "pins in bank 0(A) are INPUT ok";
 
-        for (0..7){
+        # GPA0-3 drive the stepper (no A<->B loopback wire); test pins 4-7 only
+        for (4..7){
             my ($pin_a, $pin_b) = ($_, $_ + 8);
             $o->write($pin_b, HIGH);
             is
@@ -309,7 +315,8 @@ my $o = $pi->expander(0x20);
 
         is $o->register(MCP23017_GPIOA), 0xFF, "pins in bank 0 are HIGH ok";
 
-        for (0..7){
+        # GPA0-3 drive the stepper (no A<->B loopback wire); test pins 4-7 only
+        for (4..7){
             my ($pin_a, $pin_b) = ($_, $_ + 8);
             is
                 $o->read($pin_b),
@@ -320,7 +327,8 @@ my $o = $pi->expander(0x20);
         $o->write_bank(BANK_A, LOW);
         is $o->register(MCP23017_GPIOA), LOW, "pins in bank 0 are LOW ok";
 
-        for (0..7){
+        # GPA0-3 drive the stepper (no A<->B loopback wire); test pins 4-7 only
+        for (4..7){
             my ($pin_a, $pin_b) = ($_, $_ + 8);
             is
                 $o->read($pin_b),
@@ -352,7 +360,8 @@ my $o = $pi->expander(0x20);
         $o->write_bank(BANK_B, HIGH);
         is $o->register(MCP23017_GPIOB), 255, "pins in bank 1(B) are HIGH ok";
 
-        for (0..7){
+        # GPA0-3 drive the stepper (no A<->B loopback wire); test pins 4-7 only
+        for (4..7){
             my ($pin_a, $pin_b) = ($_, $_ + 8);
             is
                 $o->read($pin_a),
@@ -363,7 +372,8 @@ my $o = $pi->expander(0x20);
         $o->write_bank(BANK_B, LOW);
         is $o->register(MCP23017_GPIOB), 0, "pins in bank 1 are LOW ok";
 
-        for (0..7){
+        # GPA0-3 drive the stepper (no A<->B loopback wire); test pins 4-7 only
+        for (4..7){
             my ($pin_a, $pin_b) = ($_, $_ + 8);
             is
                 $o->read($pin_a),
@@ -586,9 +596,28 @@ my $o = $pi->expander(0x20);
 
 { # default_registers.t
 
-    # let GPIO state registers reset after toggling pullups
+    # Poll (bounded ~6s) until the GPIO state registers reset after the
+    # pullup toggling above, instead of a fixed sleep; the per-register
+    # assertions below still run in full
 
-    sleep 3;
+    for (1 .. 60){
+        my $settled = 1;
+
+        for my $reg (0x00 .. 0x15){
+            my $want =
+                ($reg == MCP23017_IODIRA || $reg == MCP23017_IODIRB)
+                ? 0xFF
+                : 0x00;
+
+            if ($o->register($reg) != $want){
+                $settled = 0;
+                last;
+            }
+        }
+
+        last if $settled;
+        select(undef, undef, undef, 0.1);
+    }
 
     for (0x00..0x15){
         if ($_ == MCP23017_IODIRA || $_ == MCP23017_IODIRB){
@@ -599,5 +628,10 @@ my $o = $pi->expander(0x20);
         }
     }
 }
+
+$pi->cleanup;
+
+rpi_check_pin_status();
+#rpi_metadata_clean();
 
 done_testing();

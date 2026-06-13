@@ -1,10 +1,20 @@
 ==================================================
-Changes from 2024-05-22 00:00:00 +0000 to present.
+Changes from 2024-06-12 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 6.3 at 2026-05-22 12:49:45 +0000
+version 6.4 at 2026-06-12 12:46:26 +0000
 ----------------------------------------
+
+  Change: 673bcc29c308e8b5900e7e8cfbb53d76434fd538
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2026-06-12 08:42:58 +0000
+
+    6.4 Release
+
+    Tests only fixes
+
+    * Convert tests to only check UTC timestamps * Remove DateTime dependency 
 
   Change: d552a7daab5345432f0bbe69272ffe1a8e2580da
   Author: Brad Lhotsky <brad@divisionbyzero.net>
@@ -411,5 +421,5 @@ version 5.2 at 2024-06-20 20:56:49 +0000
     Attempt to enable GitHub Actions to run the test suite. 
 
 =================================================
-Plus 38 releases after 2024-05-22 00:00:00 +0000.
+Plus 38 releases after 2024-06-12 00:00:00 +0000.
 =================================================

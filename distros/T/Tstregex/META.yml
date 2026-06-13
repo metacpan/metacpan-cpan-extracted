@@ -1,5 +1,5 @@
 ---
-abstract: "A Diagnostic Tool that quickly shows the longest Regular Expression string match, highlighting the rejected part. The terminal command  tstregex '/^[a-z]*\\d{3}$/' 'abc12a' shows: abcB<12a> (^[a-z]*B<\\d{3}$>)"
+abstract: "A Diagnostic Tool that quickly shows the longest Regular Expression string match, highlighting the rejected part. The terminal command  tstregex '/^[a-z]*\\d{3}$/' 'abc12a' shows: Tstregex - Diagnostic Tool ... shows: abc·B<12a>· (^[a-z]*·B<\\d{3}$>·)"
 author:
   - 'Olivier Delouya <olivier_delouya@hotmail.com>'
 build_requires:
@@ -23,5 +23,5 @@ requires:
   perl: '5.010'
 resources:
   repository: https://github.com/odjectif/tstregex.git
-version: '1.12'
+version: '1.14'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

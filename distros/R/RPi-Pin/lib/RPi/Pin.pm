@@ -5,7 +5,10 @@ use warnings;
 
 use parent 'WiringPi::API';
 
-our $VERSION = '2.3608';
+use Carp qw(croak);
+use RPi::Const qw(:all);
+
+our $VERSION = '3.1801';
 
 sub new {
     my ($class, $pin, $comment) = @_;
@@ -42,7 +45,7 @@ sub mode {
         return $self->get_alt($self->num);
     }
 
-    if ($mode != 0 && $mode != 1 && $mode != 2 && $mode != 3){
+    if ($mode != INPUT && $mode != OUTPUT && $mode != PWM_OUT && $mode != GPIO_CLOCK){
         die "mode() mode param must be either 0 (input), 1 " .
             "(output), 2 (PWM output) or 3 (GPIO CLOCK output)\n";
     }
@@ -72,9 +75,9 @@ sub write {
 sub pull {
     my ($self, $direction) = @_;
 
-    # 0 == down, 1 == up, 2 == off
+    # PUD_OFF == 0, PUD_DOWN == 1, PUD_UP == 2
 
-    if ($direction != 0 && $direction != 1 && $direction != 2){
+    if ($direction != PUD_OFF && $direction != PUD_DOWN && $direction != PUD_UP){
         die "Core::pull_up_down requires either 0, 1 or 2 for direction";
     }
 
@@ -83,7 +86,11 @@ sub pull {
 sub pwm {
     my ($self, $value) = @_;
 
-    if ($self->mode != 2 && $self->num == 18){
+    if ($> != 0){
+        die "\nPWM requires your script to be run as the 'root' user (sudo)\n";
+    }
+
+    if ($self->mode != PWM_OUT && $self->num == 18){
         my $num = $self->num;
         die "\npin $num isn't set to mode 2 (PWM). pwm() can't be set\n";
     }
@@ -93,15 +100,67 @@ sub pwm {
 sub num {
     return $_[0]->{pin};
 }
+sub background_interrupt {
+    my ($self, $edge, $callback, @rest) = @_;
+
+    # An optional trailing options hashref (eg. {results => 1}) may follow the
+    # optional debounce; forward it through to WiringPi::API unchanged.
+    my $opts = (@rest && ref $rest[-1] eq 'HASH') ? pop @rest : undef;
+    my ($debounce_us) = @rest;
+
+    if (! defined $edge || $edge !~ /^[123]$/) {
+        croak "background_interrupt() \$edge must be EDGE_FALLING (1), " .
+            "EDGE_RISING (2) or EDGE_BOTH (3)";
+    }
+
+    if (! defined $callback || ref $callback ne 'CODE') {
+        croak "background_interrupt() requires \$callback to be a CODE reference";
+    }
+
+    if (defined $debounce_us && $debounce_us !~ /^\d+$/) {
+        croak "background_interrupt() \$debounce_us must be a non-negative integer";
+    }
+
+    my @args = ($self->num, $edge, $callback);
+    push @args, $debounce_us if defined $debounce_us;
+    push @args, $opts if $opts;
+
+    return WiringPi::API::background_interrupt(@args);
+}
 sub set_interrupt {
-    my ($self, $edge, $callback) = @_;
-    WiringPi::API::set_interrupt($self->num, $edge, $callback);
+    my ($self, $edge, $callback, @rest) = @_;
+
+    # An optional trailing options hashref (eg. {auto_dispatch => 1}) may follow
+    # the optional debounce; forward it through to WiringPi::API unchanged.
+    my $opts = (@rest && ref $rest[-1] eq 'HASH') ? pop @rest : undef;
+    my ($debounce_us) = @rest;
+
+    if (! defined $edge || $edge !~ /^[123]$/) {
+        croak "set_interrupt() \$edge must be EDGE_FALLING (1), " .
+            "EDGE_RISING (2) or EDGE_BOTH (3)";
+    }
+
+    if (! defined $callback || ref $callback ne 'CODE') {
+        croak "set_interrupt() requires \$callback to be a CODE reference";
+    }
+
+    if (defined $debounce_us && $debounce_us !~ /^\d+$/) {
+        croak "set_interrupt() \$debounce_us must be a non-negative integer";
+    }
+
+    my @args = ($self->num, $edge, $callback);
+    push @args, $debounce_us if defined $debounce_us;
+    push @args, $opts if $opts;
+
+    WiringPi::API::set_interrupt(@args);
 }
 sub interrupt_set {
-    my ($self, $edge, $callback) = @_;
-    $self->set_interrupt($self->num, $edge, $callback);
+    my ($self, $edge, $callback, $debounce_us) = @_;
+    $self->set_interrupt($edge, $callback, $debounce_us);
 }
+
 sub _vim{1;};
+
 1;
 __END__
 
@@ -114,12 +173,10 @@ RPi::Pin - Access and manipulate Raspberry Pi GPIO pins
     use RPi::Pin;
     use RPi::Const qw(:all);
 
-    my $pin = RPi::Pin->new(5);
+    my $pin = RPi::Pin->new(5, "Optional descriptive pin label");
 
     $pin->mode(INPUT);
     $pin->write(LOW);
-
-    $pin->set_interrupt(EDGE_RISING, 'main::pin5_interrupt_handler');
 
     my $num = $pin->num;
     my $mode = $pin->mode;
@@ -127,7 +184,13 @@ RPi::Pin - Access and manipulate Raspberry Pi GPIO pins
 
     print "pin number $num is in mode $mode with state $state\n";
 
+    # As of WiringPi::API 3.18 the callback fires only while dispatch is
+    # serviced; { auto_dispatch => 1 } services it for you (fire and forget).
+
+    $pin->set_interrupt(EDGE_RISING, \&pin5_interrupt_handler, { auto_dispatch => 1 });
+
     sub pin5_interrupt_handler {
+        my ($edge, $timestamp_us) = @_;
         print "in interrupt handler\n";
     }
 
@@ -208,6 +271,9 @@ possible values of this method are as follows:
     3       ALT4
     2       ALT5
 
+L<Here's|https://elinux.org/RPi_BCM2835_GPIOshttps://elinux.org/RPi_BCM2835_GPIOs>
+a decent guide to the various ALT settings for each pin.
+
 =head2 read()
 
 Returns C<1> if the pin is C<HIGH> (on) and C<0> if the pin is C<LOW> (off).
@@ -234,9 +300,54 @@ Parameter:
 Mandatory: C<2> for C<PUD_UP>, C<1> for C<PUD_DOWN> and C<0> for C<PUD_OFF>
 (disabled the resistor).
 
-=head2 set_interrupt($edge, $callback)
+=head2 background_interrupt($edge, $callback, $debounce_us, \%opts)
+
+Interrupts are armed on the pin but driven through the Pi object. For the
+per-method reference see L<RPi::WiringPi/"INTERRUPT METHODS">, and for full
+runnable examples - driving dispatch, auto-dispatch, the background results
+channel and teardown - see L<RPi::WiringPi::INTERRUPTS>.
+
+Like C<set_interrupt()>, but handles the interrupt in a B<background process>:
+the library forks, arms the interrupt in the child, and runs C<$callback> there
+on each edge while your main program carries on - so it fires even while your
+main code is busy in a long blocking call.
+
+Takes the same arguments as C<set_interrupt()> (C<$debounce_us> optional), all
+validated before forking. Because the callback runs in a separate process it
+B<cannot> see or change your main program's variables; use it for independent
+handlers (drive a pin, log, notify).
+
+Returns a handle:
+
+    my $h = $pin->background_interrupt(EDGE_RISING, \&handler);
+
+    $h->stop;        # Stop + reap the background handler (idempotent)
+    $h->pid;         # The child PID
+    $h->running;     # True while the child is alive
+
+A handle going out of scope stops its child, and a forgotten C<stop> is reaped
+at program exit.
+
+An optional trailing options hash reference is forwarded to L<WiringPi::API>;
+C<< { results => 1 } >> ships the handler's defined return value back to the
+parent, drained with C<< $h->read >> (and C<< $h->fh >> for C<select>):
+
+    my $h = $pin->background_interrupt(
+        EDGE_RISING,
+        sub { return "hit" },
+        { results => 1 }
+    );
+
+    while (defined(my $msg = $h->read)) { print "$msg\n" }
+
+=head2 set_interrupt($edge, $callback, $debounce_us, \%opts)
 
 Listen for an interrupt on a pin, and do something if it is triggered.
+
+Interrupts are armed on the pin but driven through the Pi object. For the
+per-method reference see L<RPi::WiringPi/"INTERRUPT METHODS">, and for full
+runnable examples - driving dispatch, auto-dispatch, the background results
+channel and teardown - see L<RPi::WiringPi::INTERRUPTS>.
 
 Parameters:
 
@@ -247,10 +358,36 @@ C<EDGE_BOTH>.
 
     $callback
 
-The string name of a Perl subroutine that you've already written within your
-code. This is the interrupt handler. When an interrupt is triggered, the code
-in this subroutine will run. If you get errors when the handler is called,
-specify the full package name to the handler (eg: C<'main::callback'>).
+Mandatory: a code reference (eg: C<\&my_handler> or C<sub {...}>) to run when
+the interrupt fires. The callback receives C<($edge, $timestamp_us)>.
+
+B<Note:> as of C<WiringPi::API> 3.18 the interrupt is dispatched in Perl rather
+than from the wiringPi ISR thread, so the callback B<must> be a code reference;
+a string sub name is no longer accepted. The callback also only runs when your
+program services the interrupt file descriptor, so you must drive dispatch (eg.
+C<< $pi->wait_interrupts($timeout_ms) >> in a loop, or
+C<< $pi->dispatch_interrupts >>).
+
+    $debounce_us
+
+Optional: debounce window in microseconds. Edges arriving within this window of
+the previous accepted edge are ignored. Defaults to C<0> (no debounce).
+
+    \%opts
+
+Optional: a trailing options hash reference, forwarded to L<WiringPi::API>. The
+C<auto_dispatch> option turns on auto-dispatch as part of arming so the callback
+fires without your own dispatch loop (process-wide; see
+C<< $pi->auto_dispatch_interrupts >>):
+
+    $pin->set_interrupt(EDGE_RISING, \&handler, { auto_dispatch => 1 });
+
+    # Or choose the delivery signal:
+
+    $pin->set_interrupt(EDGE_RISING, \&handler, { auto_dispatch => 'USR1' });
+
+C<1> uses the default C<SIGIO>; a signal name (eg C<'USR1'>) delivers via that
+signal instead, avoiding clashes with other C<SIGIO> users in your program.
 
 =head2 interrupt_set
 
@@ -284,7 +421,7 @@ Steve Bertrand, E<lt>steveb@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017-2019 by Steve Bertrand
+Copyright (C) 2017-2026 by Steve Bertrand
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.18.2 or,

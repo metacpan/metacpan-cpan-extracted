@@ -1,0 +1,20 @@
+- connect Uno with standard settings in IDE
+- load ArduinoISP example sketch
+- upload sketch to Uno
+
+- connect standalone ATMega-328P or another Uno via bootloader connection (5v, Gnd, 13, 12, 11. Pin 10 on the programmer Uno goes to Pin 1 (RST) on the chip/board to be programmed)
+
+- on the programmer Uno, select Duemilanove Board, and "Arduino as ISP" as the Programmer in Tools
+- run Tools->Burn Bootloader
+
+- disconnect the Uno board from the programmed chip
+
+- to program the new chip with the IDE, select the Duemilanove Board, and "AVRISP mkII" Programmer
+
+- Uploading to the new chip may require a couple of attempts, or even a hard reset
+
+CLI:
+
+---
+
+/home/spek/.arduino15/packages/arduino/tools/avrdude/6.3.0-arduino17/bin/avrdude -C/home/spek/.arduino15/packages/arduino/tools/avrdude/6.3.0-arduino17/etc/avrdude.conf -v -patmega328p -carduino -P/dev/ttyUSB0 -b57600 -D -Uflash:w:/tmp/arduino_build_43679/Blink.ino.hex:i 

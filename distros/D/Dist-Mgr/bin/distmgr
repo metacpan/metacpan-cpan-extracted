@@ -228,7 +228,7 @@ sub install {
 
     if (!$args{user} || !$args{repo}) {
         if ($args{install_ci}) {
-            die "ERROR: --badges requires --user and --repo\n";
+            die "ERROR: --ci requires --user and --repo\n";
         }
         if ($args{add_badges}) {
             die "ERROR: --badges requires --user and --repo\n";

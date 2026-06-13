@@ -1,0 +1,101 @@
+from test/more import *;
+from std/eval import eval;
+from std/internals import to_Number;
+
+function eval_value_ok ( String source, expected, String name ) {
+	let got := null;
+	is(
+		exception( function () {
+			got := eval(source);
+		} ),
+		null,
+		name _ ": parses and evaluates",
+	);
+	is(
+		got,
+		expected,
+		name _ ": value",
+	);
+}
+
+function eval_rejects ( String source, String name ) {
+	is(
+		exception( function () {
+			eval(source);
+		} ) != null,
+		1,
+		name _ ": rejects",
+	);
+}
+
+function to_number_ok ( String source, expected, String name ) {
+	let got := null;
+	is(
+		exception( function () {
+			got := to_Number(source);
+		} ),
+		null,
+		name _ ": to_Number parses",
+	);
+	is(
+		got,
+		expected,
+		name _ ": to_Number value",
+	);
+}
+
+function string_gt_ok ( String lhs, String rhs, expected, String name ) {
+	let got := null;
+	is(
+		exception( function () {
+			got := lhs > rhs;
+		} ),
+		null,
+		name _ ": comparison parses",
+	);
+	is(
+		got,
+		expected,
+		name _ ": value",
+	);
+}
+
+eval_value_ok( """1E3""", 1000, "source E notation (upper-case)" );
+eval_value_ok(
+	"""2.5E-7""",
+	0.00000025,
+	"source E notation with fraction",
+);
+eval_value_ok( """0x1F""", 31, "source hex literal" );
+eval_value_ok(
+	"""0xDEADBEEF""",
+	3735928559,
+	"source hex digits with uppercase A-F",
+);
+eval_value_ok( """0b11111111""", 255, "source binary literal" );
+eval_value_ok( """0o100""", 64, "source octal literal" );
+
+eval_rejects( """eval("1e3")""", "lower-case exponent literal" );
+eval_rejects( """eval("0X1F")""", "upper-case hex prefix literal" );
+eval_rejects( """eval("0B1111")""", "upper-case binary prefix literal" );
+eval_rejects( """eval("0O100")""", "upper-case octal prefix literal" );
+
+string_gt_ok( "1E3", "999", 1, "string comparison with upper-case exponent" );
+string_gt_ok( "1e3", "999", 1, "string comparison with lower-case exponent" );
+string_gt_ok( "0x1F", "30", 1, "string comparison with lowercase hex prefix" );
+string_gt_ok( "0X1F", "30", 1, "string comparison with uppercase hex prefix" );
+string_gt_ok( "0b11111111", "254", 1, "string comparison with lowercase binary prefix" );
+string_gt_ok( "0B1111", "10", 1, "string comparison with uppercase binary prefix" );
+string_gt_ok( "0o100", "63", 1, "string comparison with lowercase octal prefix" );
+string_gt_ok( "0O100", "63", 1, "string comparison with uppercase octal prefix" );
+
+to_number_ok( "1e3", 1000, "to_Number lower-case exponent" );
+to_number_ok( "1E3", 1000, "to_Number upper-case exponent" );
+to_number_ok( "0x1F", 31, "to_Number lowercase hex" );
+to_number_ok( "0X1F", 31, "to_Number uppercase hex" );
+to_number_ok( "0b11111111", 255, "to_Number lowercase binary" );
+to_number_ok( "0B11111111", 255, "to_Number uppercase binary" );
+to_number_ok( "0o100", 64, "to_Number lowercase octal" );
+to_number_ok( "0O100", 64, "to_Number uppercase octal" );
+
+done_testing();

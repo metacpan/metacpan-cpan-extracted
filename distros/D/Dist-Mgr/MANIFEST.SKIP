@@ -1,4 +1,5 @@
 ~$
+.claude/
 ^blib/
 ^pm_to_blib/
 .old$
@@ -36,3 +37,4 @@ BB-Pass/
 BB-Fail/
 cover_db/
 scrap\.pl
+\.DS_Store$

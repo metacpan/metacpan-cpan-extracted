@@ -1,5 +1,21 @@
 Revision history for RPi-Serial
 
+3.02       2026-06-12
+        - Fixed a heap buffer overflow in gets(): the Perl wrapper passed a
+          zero-length scalar that the XS tty_gets() then wrote up to $num_bytes
+          into. tty_gets() is now a self-allocating XSUB (Newx/Safefree) that
+          returns the exact bytes read
+        - gets() is now binary-safe: it returns the exact bytes read (embedded
+          NULs and trailing whitespace preserved) instead of running the result
+          through unpack "A*"
+        - tty_gets() now croaks on a read error instead of calling exit(-1),
+          and clears O_NONBLOCK on the fd so the port's VTIME read timeout
+          applies (short/idle reads return the partial data instead of
+          spuriously failing)
+
+3.01    2019-09-24
+        - added crc() method/function for calculating CRCs
+
 3.00    2019-08-02
         - added the XS file to the distribution
 

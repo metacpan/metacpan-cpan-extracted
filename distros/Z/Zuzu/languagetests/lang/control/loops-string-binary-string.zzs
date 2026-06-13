@@ -1,0 +1,99 @@
+from test/more import *;
+
+let string_chars := [ ];
+let string_types := [ ];
+for ( let c in "hélo" ) {
+	string_chars.push(c);
+	string_types.push(typeof c);
+}
+is(
+	string_chars,
+	[ "h", "é", "l", "o" ],
+	"for loops over String iterate characters",
+);
+is(
+	string_types,
+	[ "String", "String", "String", "String" ],
+	"for loops over String yield String values",
+);
+
+let postfix_string_chars := [ ];
+let postfix_string_types := [ ];
+postfix_string_chars.push(^^) for "hélo";
+postfix_string_types.push(typeof(^^)) for "hélo";
+is(
+	postfix_string_chars,
+	[ "h", "é", "l", "o" ],
+	"postfix for loops over String iterate characters",
+);
+is(
+	postfix_string_types,
+	[ "String", "String", "String", "String" ],
+	"postfix for over String yields String values",
+);
+
+let binary_bytes := [ ];
+let binary_types := [ ];
+for ( let byte in 'hello' ) {
+	binary_bytes.push(to_string(byte));
+	binary_types.push(typeof byte);
+}
+is(
+	binary_bytes,
+	[ "h", "e", "l", "l", "o" ],
+	"for loops over BinaryString iterate byte-by-byte",
+);
+is(
+	binary_types,
+	[ "BinaryString", "BinaryString", "BinaryString", "BinaryString", "BinaryString" ],
+	"for loops over BinaryString yield BinaryString values",
+);
+
+let emoji_binary_lengths := [ ];
+let emoji_binary_types := [ ];
+for ( let byte in to_binary("😀") ) {
+	emoji_binary_lengths.push(length(byte));
+	emoji_binary_types.push(typeof(byte));
+}
+is(
+	emoji_binary_lengths,
+	[ 1, 1, 1, 1 ],
+	"for loops over BinaryString emoji iterate 4 byte values",
+);
+is(
+	emoji_binary_types,
+	[ "BinaryString", "BinaryString", "BinaryString", "BinaryString" ],
+	"for loops over BinaryString emoji yield BinaryString values",
+);
+
+let postfix_binary_bytes := [ ];
+let postfix_binary_types := [ ];
+postfix_binary_bytes.push(to_string(^^)) for 'hello';
+postfix_binary_types.push(typeof(^^)) for 'hello';
+is(
+	postfix_binary_bytes,
+	[ "h", "e", "l", "l", "o" ],
+	"postfix for loops over BinaryString iterate byte-by-byte",
+);
+is(
+	postfix_binary_types,
+	[ "BinaryString", "BinaryString", "BinaryString", "BinaryString", "BinaryString" ],
+	"postfix for over BinaryString yields BinaryString values",
+);
+
+let postfix_emoji_binary_lengths := [ ];
+let postfix_emoji_binary_types := [ ];
+postfix_emoji_binary_lengths.push(length(^^)) for to_binary("😀");
+postfix_emoji_binary_types.push(typeof(^^)) for to_binary("😀");
+is(
+	postfix_emoji_binary_lengths,
+	[ 1, 1, 1, 1 ],
+	"postfix for loops over BinaryString emoji iterate 4 byte values",
+);
+is(
+	postfix_emoji_binary_types,
+	[ "BinaryString", "BinaryString", "BinaryString", "BinaryString" ],
+	"postfix for over BinaryString emoji yields BinaryString values",
+);
+
+done_testing();

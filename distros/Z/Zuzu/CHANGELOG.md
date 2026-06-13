@@ -6,6 +6,73 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project roughly adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html),
 but using Perlish version numbers like `x.yyyzzz` instead of `x.y.z`.
 
+## 0.004000 - 2026-06-12
+
+*stdlib tag 20260612, languagetests tag 20260612.*
+
+### Added
+
+- Added README.md.
+- std/net/url's `fill_template` is now a complete RFC 6570 URI
+  Template implementation (all operators, `:N` prefix and `*` explode
+  modifiers, list and associative values), implemented with
+  URI::Template plus strict template validation, and validated against
+  the official URI Template test suite. Invalid templates throw.
+- New divisibility operators: `a ∣ b` (U+2223; ASCII alias `divides`,
+  a new keyword) is a Boolean test that the left operand exactly
+  divides the right; `a ∤ b` (U+2224, no ASCII alias) returns the
+  Number `b mod a`, truthy exactly when the left operand does not
+  divide the right. Both coerce operands to Number and sit at the
+  comparison precedence tier.
+- `for` loops (including postfix `for`) iterate over the characters of a
+  String (each a 1-character String) and the bytes of a BinaryString
+  (each a 1-byte BinaryString).
+- Bitshift operators `<<`, `>>`, `«`, `»`. Numbers shift arithmetically
+  (operands truncated to integers; negative shift counts throw).
+  BinaryStrings shift as one whole bit string: bits carry across byte
+  boundaries, length is preserved, vacated bits are zero. Shifts bind
+  tighter than bitwise `&`/`|`/`^` and looser than additive operators;
+  inside a set literal the closing `>>`/`»` still terminates the
+  literal.
+- Numeric literals: uppercase-E exponents (`1E3`, `2.5E-7`), hex
+  (`0x1F`), binary (`0b1111`), and octal (`0o100`) with lowercase
+  prefixes. Lowercase `1e3` and uppercase `0X`/`0B`/`0O` prefixes remain
+  invalid in source, but String-to-Number coercion accepts either case
+  for the exponent marker and radix prefixes.
+- New `std/string/encode` module: `encode(String, encoding)` /
+  `decode(BinaryString, encoding)` with UTF-8, UTF-16, UTF-32, and
+  ISO-8859-1 codecs plus `ENCODING_UTF8`/`ENCODING_UTF16`/
+  `ENCODING_UTF32`/`ENCODING_LATIN` constants. Encoding names match
+  case-insensitively; UTF-16/UTF-32 encode big-endian without a BOM and
+  decode honours a leading BOM.
+- `std/string` exports `to_binary` and `to_string`.
+- `std/string/encode` also accepts any encoding known to Perl's Encode module.
+
+### Changed
+
+- `mod` now uses float remainder semantics (POSIX fmod), matching
+  zuzu-rust and zuzu-js: non-integer operands work and the result
+  takes the sign of the dividend. Previously operands were truncated
+  to integers and negative results followed the divisor's sign.
+
+### Fixed
+
+- `std/math/bignum` now returns String values from `BigNum.to_dec` and
+  `BigNum.to_String` consistently; use `BigNum.to_Number` for numeric
+  conversion.
+- std/data/json `decode` no longer returns null for JSON text
+  containing non-ASCII characters (the JSON::Tiny backend is now fed
+  escaped input, as decode_binarystring already did).
+- `Path.slurp_utf8`, `Path.slurp_utf8_async`, and `Path.lines_utf8` use a
+  lax UTF-8 decode (like `readline_utf8` already did), so files containing
+  well-formed sequences for noncharacter code points such as U+10FFFE can
+  be read, matching zuzu-rust and zuzu-js. The strict decode previously
+  died with "Can't interchange noncharacter code point".
+- Fix warning on Perl 5.43.x caused by backslash within `qw()`.
+- `std/math/bignum` now produces exact decimal text for integer `bpow`
+  with integer operands (for example, `BigNum.from_dec("10").bpow(1000)`
+  now yields `10` with 1000 zeros, rather than floating-point drift).
+
 ## 0.003000 - 2026-06-10
 
 *stdlib tag 20260610, languagetests tag 20260610.*

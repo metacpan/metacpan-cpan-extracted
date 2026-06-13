@@ -534,11 +534,12 @@ class Config extends Node {
 	}
 
 	method clone () {
-		let cloned := new Config( raw: _merge_values( {}, self.raw, {} ) );
-		cloned._layers := _layers.to_Array();
-		cloned._source := _source;
-		cloned._format := _format;
-		return cloned;
+		return new Config(
+			raw: _merge_values( {}, self.raw, {} ),
+			_layers: _layers.copy(),
+			_source: _source,
+			_format: _format,
+		);
 	}
 
 	method _delegate_node () {

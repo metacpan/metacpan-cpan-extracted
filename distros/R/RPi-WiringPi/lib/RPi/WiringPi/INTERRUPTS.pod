@@ -1,0 +1,303 @@
+=head1 NAME
+
+RPi::WiringPi::INTERRUPTS - interrupt (edge event) usage examples for RPi::WiringPi
+
+=head1 DESCRIPTION
+
+A practical, runnable guide to handling GPIO interrupts (edge events) with the
+object-oriented L<RPi::WiringPi>. The interrupt API described here is built on
+C<WiringPi::API> 3.18 and verified on Pi 5 hardware; the snippets run as written.
+
+This document is B<edge-only and uses no> C<use threads> - general
+concurrency/worker examples (C<< $pi->worker >>) live in
+L<RPi::WiringPi::WORKERS> / C<docs/examples/threads-examples.md>. Callbacks fire in your
+own interpreter when you service dispatch, so they work on B<any> Perl, threaded
+or not.
+
+This is the C<perldoc> form of C<docs/examples/interrupt-examples.md>. See L<RPi::WiringPi>
+for the per-method reference, and the underlying L<WiringPi::API> for the
+low-level functional API.
+
+=head1 THE MODEL
+
+Interrupts are B<armed on a pin> and B<driven from the Pi object>:
+
+=over 4
+
+=item *
+
+B<Arm> on a pin object: C<< $pin->set_interrupt(...) >> (or, when L<RPi::Pin>
+ships it, C<< $pin->background_interrupt(...) >>).
+
+=item *
+
+B<Drive and control> dispatch on the Pi object C<$pi>: C<wait_interrupts>,
+C<run_interrupt_loop>, C<dispatch_interrupts>, C<auto_dispatch_interrupts>,
+C<stop_interrupts>, C<last_interrupt>, C<interrupt_buffer>,
+C<background_interrupts>.
+
+=back
+
+The split is deliberate: arming concerns a single pin, but the dispatch queue and
+signal wiring are B<process-wide> (one shared event pipe), so those live on
+C<$pi>, not on individual pins.
+
+B<The #1 gotcha:> as of C<WiringPi::API> 3.18 a callback does B<not> auto-fire.
+It runs in I<your> interpreter only when you service dispatch. So after arming you
+must drive dispatch (a loop, or C<auto_dispatch_interrupts>, or a background
+process). The callback B<must be a code reference> - string sub names are no
+longer accepted.
+
+=head1 QUICK START
+
+    use RPi::WiringPi;
+    use RPi::Const qw(:all);
+
+    my $pi  = RPi::WiringPi->new;
+    my $pin = $pi->pin(18);
+    $pin->mode(INPUT);
+
+    # Arm: callback gets ($edge, $timestamp_us)
+
+    $pin->set_interrupt(
+        EDGE_RISING,
+        sub {
+            my ($edge, $ts_us) = @_;
+            print "rising edge at $ts_us us\n";
+        }
+    );
+
+    # Drive dispatch (callbacks fire here, in this process)
+
+    $pi->wait_interrupts(1000) while 1;
+
+=head1 DRIVING DISPATCH
+
+Pick whichever fits your program. All of these live on C<$pi>:
+
+    # 1) Block until an edge (or timeout ms), then dispatch:
+
+    $pi->wait_interrupts(1000) while 1;
+
+    # 2) The built-in loop helper (so you don't write the 'while 1' yourself):
+
+    $pi->run_interrupt_loop(1000);          # Forever
+    $pi->run_interrupt_loop(1000, 50);      # ... or until 50 events
+
+    # Break out from a callback or signal handler with:
+
+    $pi->stop_interrupt_loop;
+
+    # 3) Non-blocking, from inside your own event loop:
+
+    $pi->dispatch_interrupts; # Run any pending callbacks, return count
+
+=head1 HANDS-OFF: FIRE CALLBACKS WITH NO LOOP
+
+C<auto_dispatch_interrupts> wires the event pipe to a signal so callbacks fire
+automatically, in your own process, at safe points - no dispatch loop, and the
+callback can touch your program's variables with no locking. It is a
+B<process-wide> switch (it affects every armed pin), which is why it lives on
+C<$pi>.
+
+    $pi->auto_dispatch_interrupts(1); # On (default SIGIO)
+
+    $pin->set_interrupt(EDGE_RISING, sub { $count++ });
+
+    # ... your program runs; the callback fires on its own ...
+
+    $pi->auto_dispatch_interrupts(0); # Off
+
+    # Choose a different delivery signal to avoid clashing with other SIGIO users:
+
+    $pi->auto_dispatch_interrupts(1, 'USR1');
+
+You can also opt in while arming, instead of a separate call:
+
+    $pin->set_interrupt(EDGE_RISING, \&handler, { auto_dispatch => 1 });
+    # or:  { auto_dispatch => 'USR1' }
+
+Caveat: a long, non-yielding C/XS call defers the callback until it returns. If
+you need it to fire even then, use a background process (below).
+
+=head1 BACKGROUND HANDLING (ONE PROCESS, FIRES EVEN WHILE MAIN IS BUSY)
+
+B<Dependency note:> the per-pin C<< $pin->background_interrupt >> form shown in
+this section requires L<RPi::Pin> C<2.3609> or greater (the version this
+distribution already requires). To handle several pins, the multi-pin
+C<< $pi->background_interrupts >> form (L</"MANY PINS IN ONE BACKGROUND CHILD">)
+runs them all from a single child instead of one child per pin.
+
+C<< $pin->background_interrupt >> forks a child that runs the handler on each edge
+while your main program does anything it likes. The handler runs in the child, so
+it B<can't> touch your main variables - use it for independent work (drive a pin,
+log, notify).
+
+    my $h = $pin->background_interrupt(
+        EDGE_RISING,
+        sub {
+            my ($edge, $ts_us) = @_;
+            # Independent work, in the background
+        }
+    );
+
+    # ... main carries on ...
+
+    $h->stop;        # stop + reap (idempotent); $h->pid / $h->running too
+
+To get values back from the handler, enable the B<results channel> and I<return>
+a value:
+
+    my $h = $pin->background_interrupt(
+        EDGE_RISING,
+        sub {
+            my ($edge, $ts_us) = @_;
+            return "$edge\@$ts_us";
+        },
+        { results => 1 }
+    );
+
+    while (defined(my $msg = $h->read)) {
+        # Non-blocking drain in the parent
+        print "handler said: $msg\n";
+    }
+
+    # $h->fh is the read filehandle, for select / IO::Select
+
+This results channel is identical to C<< $pi->worker >>'s C<< { results => 1 } >>
+(see L<RPi::WiringPi::WORKERS>).
+
+=head1 MANY PINS IN ONE BACKGROUND CHILD
+
+C<< $pi->background_interrupts >> is the multi-pin version: B<one> child services
+several pins (instead of one child per pin), with runtime arm/disarm. Because it
+spans several pins it lives on C<$pi>.
+
+    my $h = $pi->background_interrupts(
+        [18, EDGE_RISING, \&on_button],
+        [23, EDGE_BOTH,   \&on_sensor, 5000],   # Optional debounce (us)
+    );
+
+    $h->disarm(23);   # Stop servicing pin 23 (child keeps running for pin 18)
+    $h->arm(23);      # Resume it
+    $h->stop;         # Tear down + reap the single child
+
+The callbacks are fixed when the child forks, so C<arm>/C<disarm> only toggle pins
+that were in the initial list (arming an unregistered pin croaks).
+
+=head1 INSPECTING THE MOST RECENT EVENT
+
+The callback only receives C<($edge, $timestamp_us)>. If one shared handler is
+armed on several pins, C<< $pi->last_interrupt >> tells you which fired:
+
+    my $cb = sub {
+        my $i = $pi->last_interrupt;   # { pin, pin_bcm, edge, status, ts_us }
+        printf "pin %d (BCM %d) edge %d\n", $i->{pin}, $i->{pin_bcm}, $i->{edge};
+    };
+
+    $pi->pin($_)->set_interrupt(EDGE_BOTH, $cb) for (18, 23);
+
+It returns the most recently dispatched event (or C<undef>), and is published
+I<before> the callback runs, so the callback can read it.
+
+=head1 QUEUE SIZING AND DROPPED EDGES
+
+Edges are FIFO-queued in a kernel pipe. If a fast source outruns your dispatching
+the queue fills and the B<newest> edges are dropped (never merged, never blocked)
+and counted - so loss is never silent:
+
+    my $lost = $pi->interrupt_dropped; # 0 unless the pipe overflowed
+    $pi->interrupt_buffer(1 << 20);    # Enlarge the queue (~1 MiB)
+    my $size = $pi->interrupt_buffer;  # Read the current capacity
+
+C<interrupt_buffer> may be set before arming and persists across teardown. Other
+mitigations: dispatch faster, use a background process, or debounce.
+
+=head1 FORKING AND CLEANUP
+
+C<< $pi->cleanup >> (called automatically at object destruction) resets pins B<and>
+releases armed interrupts (it calls C<stop_interrupts> for you). It is
+B<fork-aware>: in a forked child the call is a no-op, so a child can't reset the
+parent's pins or tear down its interrupts on exit. You can also disarm explicitly
+while running:
+
+    $pin->set_interrupt(EDGE_RISING, \&handler);
+
+    # ... later ...
+
+    $pi->stop_interrupts;   # Release every armed interrupt
+    $pi->cleanup;           # Full teardown (also releases interrupts)
+
+=head1 METHOD REFERENCE
+
+Arming methods live on a B<pin> object (C<< my $pin = $pi->pin($n) >>):
+
+=over 4
+
+=item C<< $pin->set_interrupt($edge, $cb [, $debounce_us] [, \%opts]) >>
+
+Arm an interrupt; C<\%opts> may include C<< { auto_dispatch => 1 | $signal } >>.
+
+=item C<< $pin->background_interrupt($edge, $cb [, $debounce_us] [, \%opts]) >>
+
+Handle it in a forked child; C<\%opts> may include C<< { results => 1 } >>;
+returns a handle. (Pending an L<RPi::Pin> release - see the dependency note above.)
+
+=back
+
+Dispatch and control methods live on the B<Pi> object (C<$pi>):
+
+=over 4
+
+=item C<< $pi->wait_interrupts($timeout_ms) >>
+
+Block until an edge/timeout, then dispatch.
+
+=item C<< $pi->run_interrupt_loop($timeout_ms [, $max]) >> / C<< $pi->stop_interrupt_loop >>
+
+Built-in blocking dispatch loop.
+
+=item C<< $pi->dispatch_interrupts >>
+
+Non-blocking: run pending callbacks.
+
+=item C<< $pi->auto_dispatch_interrupts($bool [, $signal]) >>
+
+Fire callbacks automatically (no loop).
+
+=item C<< $pi->background_interrupts([$pin, $edge, $cb [, $deb]], ...) >>
+
+One shared child for many pins (+ C<arm>/C<disarm>).
+
+=item C<< $pi->last_interrupt >>
+
+Hashref of the most recent dispatched event.
+
+=item C<< $pi->interrupt_buffer([$bytes]) >>
+
+Get/set the event-queue capacity.
+
+=item C<< $pi->interrupt_dropped >>
+
+Running count of edges dropped on queue overflow.
+
+=item C<< $pi->stop_interrupts >>
+
+Release every armed interrupt.
+
+=back
+
+Edge constants (C<EDGE_FALLING>=1, C<EDGE_RISING>=2, C<EDGE_BOTH>=3) and C<INPUT>
+come from C<RPi::Const qw(:all)>.
+
+=head1 SEE ALSO
+
+L<RPi::WiringPi>, L<RPi::WiringPi::WORKERS> (running background work with
+C<< $pi->worker >>), the L<RPi::WiringPi::FAQ> "Interrupt usage" section,
+C<docs/examples/interrupt-examples.md>, and the underlying L<WiringPi::API>.
+
+=head1 AUTHOR
+
+Steve Bertrand, E<lt>steveb@cpan.orgE<gt>
+
+=cut

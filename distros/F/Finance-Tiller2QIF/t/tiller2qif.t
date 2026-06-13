@@ -400,6 +400,36 @@ subtest cli_confirm_no => sub {
   ok( !-e $qiffile, '--confirm "n" did not produce QIF file' );
 };
 
+subtest cli_confirm_revert_to_checkpoint => sub {
+  my $db_path = uniqfile( 'cli_confirm_r', 'sqlite3' );
+  my $csvfile = uniqfile( 'cli_confirm_r', 'csv' );
+  my $qiffile = uniqfile( 'cli_confirm_r', 'qif' );
+  freshdb($db_path)->disconnect;
+  freshcsv( $csvfile, '04/25/2026,1,Checking,10.00,Test,Test,Food' );
+  Finance::Tiller2QIF::_ingest( input => $csvfile, db_path => $db_path );
+
+  my $checkpoint = Finance::Tiller2QIF::_checkpoint( $db_path );
+  my $checkpoint_content = path($checkpoint)->slurp_raw;
+
+  # Add another transaction after checkpoint
+  freshcsv( $csvfile, '04/25/2026,1,Checking,10.00,Test,Test,Food' );
+  Finance::Tiller2QIF::_ingest( input => $csvfile, db_path => $db_path );
+
+  local @ARGV = ( 'emit', '--db', $db_path, '--output', $qiffile, '--confirm', '--checkpoint' );
+  my $stdin = "r\n";
+  open( my $fh, '<', \$stdin ) or die $!;
+  local *STDIN = $fh;
+  my $out = '';
+  ok( lives { open( local *STDOUT, '>', \$out ); Finance::Tiller2QIF::run_cli() },
+    '--confirm with "r" returns without error' );
+  ok( !-e $qiffile, '--confirm "r" did not produce QIF file' );
+
+  my $db_after_revert = Mojo::SQLite->new($db_path)->options({ sqlite_unicode => 1 })->db;
+  my $count_after = $db_after_revert->select('transactions', ['id'])->arrays->@*;
+  $db_after_revert->disconnect;
+  is( $count_after, 1, 'revert to checkpoint restored original state (1 transaction)' );
+};
+
 done_testing();
 
 unlink glob "t/tmp/t2q_*" if test_pass();

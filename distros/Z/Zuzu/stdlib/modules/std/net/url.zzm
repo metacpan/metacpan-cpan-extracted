@@ -54,9 +54,51 @@ C<query_params>.
 
 =item C<< fill_template(template, values) >>
 
-Parameters: C<template> is an RFC6570-style template and C<values> is a
-dictionary or pair list. Returns: C<String>. Fills the template using
-C<values>.
+Parameters: C<template> is an RFC 6570 URI Template and C<values> is a
+dictionary or pair list of template variables. Returns: C<String>.
+Expands the template using C<values>.
+
+This is a complete implementation of RFC 6570 (all four levels),
+validated against the official URI Template test suite. All expression
+operators are supported:
+
+=over
+
+=item * C<{var}> - simple string expansion;
+
+=item * C<{+var}> - reserved expansion, leaving URI-reserved characters
+and percent-encoded triplets intact;
+
+=item * C<{#var}> - fragment expansion;
+
+=item * C<{.var}> - label expansion with a dot prefix;
+
+=item * C<{/var}> - path segment expansion;
+
+=item * C<{;var}> - path-style parameter expansion;
+
+=item * C<{?var}> - form-style query expansion;
+
+=item * C<{&var}> - form-style query continuation.
+
+=back
+
+Each variable in an expression may take the C<:N> prefix modifier
+(expand only the first I<N> characters of a string value, with I<N>
+between 1 and 9999) or the C<*> explode modifier (expand list and
+dictionary members as separate items), and expressions may name several
+variables separated by commas, for example C<{?q,page,lang}>.
+
+Variable values may be Strings (or Numbers and Booleans, which are
+rendered as text), Arrays (RFC 6570 list values), or Dicts and pair
+lists (RFC 6570 associative values; dictionary keys are expanded in
+sorted order). Variables that are null, missing, or empty lists or
+dictionaries are undefined per RFC 6570 and are omitted from the
+expansion.
+
+Invalid templates - unbalanced braces, unknown operators, malformed
+variable names or modifiers, or a C<:N> prefix applied to a list or
+dictionary value - throw an exception.
 
 =back
 

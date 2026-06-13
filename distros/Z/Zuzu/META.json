@@ -89,6 +89,6 @@
          "web" : "https://github.com/zuzuscript/zuzu-perl"
       }
    },
-   "version" : "0.003000",
+   "version" : "0.004000",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

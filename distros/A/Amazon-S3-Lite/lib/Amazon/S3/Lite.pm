@@ -22,7 +22,7 @@ use Readonly;
 Readonly our $TRUE  => 1;
 Readonly our $FALSE => 0;
 
-our $VERSION = '1.1.4';
+our $VERSION = '1.1.5';
 
 ########################################################################
 sub new {
@@ -910,6 +910,7 @@ sub _parse_notification_configuration {
       id         => $node->first_child_text('Id'),
       lambda_arn => $node->first_child_text('CloudFunction'),
       queue_arn  => $node->first_child_text('Queue'),
+      topic_arn  => $node->first_child_text('Topic'),
       events     => \@events,
       filters    => \@filter_rules,
       };
@@ -920,7 +921,8 @@ sub _parse_notification_configuration {
   XML::Twig->new(
     twig_handlers => {
       CloudFunctionConfiguration => $handler,
-      QueueConfiguration         => $handler
+      QueueConfiguration         => $handler,
+      TopicConfiguration         => $handler,
     }
   )->parse($xml);
 

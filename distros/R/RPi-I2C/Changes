@@ -1,5 +1,9 @@
 Revision history for RPi-I2C
 
+3.1801    2026-06-12
+        - Exit Makefile.PL gracefully on non-Linux platforms (NA instead of
+          FAIL) since the module requires the Linux I2C interface
+
 2.3608  2019-06-27
         - No functional changes
         - Add return values to all methods (closes #9)

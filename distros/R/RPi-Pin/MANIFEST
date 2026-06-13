@@ -1,4 +1,6 @@
+.claude/settings.local.json
 Changes
+docs/pod.md
 ignore.txt
 lib/RPi/Pin.pm
 Makefile.PL

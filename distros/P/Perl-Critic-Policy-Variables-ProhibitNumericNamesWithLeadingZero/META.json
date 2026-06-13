@@ -1,10 +1,10 @@
 {
    "abstract" : "Don't use numeric variable names with leading zeroes.",
    "author" : [
-      "Thomas R. Wyant, III (wyant at cpan dot org)"
+      "Thomas R. Wyant, III (harryfmudd at comcast dot net)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4231",
+   "generated_by" : "Module::Build version 0.4234",
    "license" : [
       "perl_5"
    ],
@@ -63,14 +63,14 @@
    "provides" : {
       "Perl::Critic::Policy::Variables::ProhibitNumericNamesWithLeadingZero" : {
          "file" : "lib/Perl/Critic/Policy/Variables/ProhibitNumericNamesWithLeadingZero.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "wyant@cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-Variables-ProhibitNumericNamesWithLeadingZero"
+         "mailto" : "harryfmudd@comcast.net",
+         "web" : "https://github.com/trwyant/perl-Perl-Critic-Policy-Variables-ProhibitNumericNamesWithLeadingZero/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -81,6 +81,6 @@
          "web" : "https://github.com/trwyant/perl-Perl-Critic-Policy-Variables-ProhibitNumericNamesWithLeadingZero"
       }
    },
-   "version" : "0.002",
-   "x_serialization_backend" : "JSON::PP version 4.10"
+   "version" : "0.003",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

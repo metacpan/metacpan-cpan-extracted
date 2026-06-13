@@ -1,5 +1,14 @@
 Revision history for RPi-LCD
 
+3.1801    2026-06-12
+        - new() now checks/sets $ENV{RPI_PIN_MODE} (the variable the rest of
+          the RPi:: ecosystem uses) instead of the never-read RPI_PIN_SCHEME;
+          previously the guard never fired, so setup_gpio() was always run,
+          restamping the pin numbering scheme to GPIO even when the consuming
+          application had set up WPI mode
+        - Bump prereq of WiringPi::API to 3.1801
+        - Bump prereq of RPi::Const to 1.05
+
 2.3604  2019-09-21
         - added RPi::Const as a prereq (replacing RPi::WiringPi::Constant).
           (see #7)

@@ -43,3 +43,4 @@ on 'test' => sub {
 	requires 'Test2::Require::AuthorTesting';
 	requires 'HTTP::Request::Common';
 };
+requires 'URI::Template';

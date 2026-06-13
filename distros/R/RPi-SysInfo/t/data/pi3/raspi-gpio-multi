@@ -1,0 +1,4 @@
+GPIO 2: level=1 fsel=4 alt=0 func=SDA1 pull=UP
+GPIO 4: level=1 fsel=0 func=INPUT pull=UP
+GPIO 6: level=0 fsel=0 func=INPUT pull=DOWN
+GPIO 8: level=1 fsel=1 func=OUTPUT pull=UP

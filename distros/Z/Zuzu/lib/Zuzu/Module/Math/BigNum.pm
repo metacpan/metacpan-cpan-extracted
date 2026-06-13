@@ -2,9 +2,10 @@ package Zuzu::Module::Math::BigNum;
 
 use utf8;
 
-our $VERSION = '0.003000';
+our $VERSION = '0.004000';
 
 use Math::BigFloat;
+use Math::BigInt;
 
 use Zuzu::Util::NativeHelpers qw(
 	native_class
@@ -57,6 +58,13 @@ sub _to_plain_decimal {
 		$text = $value->copy->bnormalize->bstr;
 	}
 
+	return $text;
+}
+
+sub _to_zuzu_string {
+	my ( $value ) = @_;
+	my $text = 's' . _to_plain_decimal( $value );
+	substr( $text, 0, 1, '' );
 	return $text;
 }
 
@@ -156,7 +164,12 @@ sub IMPORT {
 		bmul => sub { $_[0]->copy->bmul( $_[1] ) },
 		bdiv => sub { $_[0]->copy->bdiv( $_[1] ) },
 		bmod => sub { $_[0]->copy->bmod( $_[1] ) },
-		bpow => sub { $_[0]->copy->bpow( $_[1] ) },
+		bpow => sub {
+			my ( $lhs, $rhs ) = @_;
+			return $lhs->as_int->copy->bpow( $rhs->as_int )
+				if $lhs->is_int && $rhs->is_int && $rhs >= 0;
+			return $lhs->copy->bpow( $rhs );
+		},
 	);
 	for my $name ( sort keys %binary ) {
 		$bignum_class->methods->{$name} = native_function(
@@ -186,7 +199,7 @@ sub IMPORT {
 		name => 'to_dec',
 		native => sub {
 			my ( $self ) = @_;
-			return _to_plain_decimal( _self_value( $self ) );
+			return _to_zuzu_string( _self_value( $self ) );
 		},
 	);
 
@@ -194,7 +207,7 @@ sub IMPORT {
 		name => 'to_String',
 		native => sub {
 			my ( $self ) = @_;
-			return _to_plain_decimal( _self_value( $self ) );
+			return _to_zuzu_string( _self_value( $self ) );
 		},
 	);
 

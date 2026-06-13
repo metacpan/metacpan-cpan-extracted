@@ -41,7 +41,8 @@ from reacting to interrupts (that's `interrupt-examples.md`).
   specifically want shared-memory ergonomics on a threaded Perl.
 - **Pin numbering** follows whichever setup you call: `setup()` = wiringPi
   numbering, `setup_gpio()` = BCM. Examples use `setup()`.
-- **Mode constants** for `pin_mode`: `INPUT`=0, `OUTPUT`=1 (shown as integers).
+- **Mode constants** for `pin_mode`: `INPUT` and `OUTPUT` — exported by
+  `WiringPi::API` and used by name throughout (no bare `0`/`1`).
 - **The setup-once-in-main contract:** call `setup()`/`pin_mode` **once, in the
   parent, before** starting a worker (see
   [that section](#the-setup-once-in-main-contract)). A fork worker inherits the
@@ -91,10 +92,10 @@ the body; `worker()` repeats it until you `stop`.
 ```perl
 use strict;
 use warnings;
-use WiringPi::API qw(setup pin_mode write_pin worker);
+use WiringPi::API qw(setup pin_mode write_pin worker OUTPUT);
 
 setup();
-pin_mode(2, 1);                   # OUTPUT, once in main
+pin_mode(2, OUTPUT);              # once in main
 
 my $w = worker(sub {
     write_pin(2, 1); sleep 1;
@@ -123,10 +124,10 @@ value the parent reads with `$w->value`.
 ```perl
 use strict;
 use warnings;
-use WiringPi::API qw(setup pin_mode analog_read worker);
+use WiringPi::API qw(setup pin_mode analog_read worker INPUT);
 
 setup();
-pin_mode(0, 0);                   # INPUT, once in main
+pin_mode(0, INPUT);               # once in main
 
 my $w = worker(sub { analog_read(0) }, { interval => 1, shared => 1 });
 
@@ -156,10 +157,10 @@ back over a pipe. Drain it with `$w->read` (non-blocking), or select on `$w->fh`
 ```perl
 use strict;
 use warnings;
-use WiringPi::API qw(setup pin_mode analog_read worker);
+use WiringPi::API qw(setup pin_mode analog_read worker INPUT);
 
 setup();
-pin_mode(0, 0);                   # INPUT, once in main
+pin_mode(0, INPUT);               # once in main
 
 my $w = worker(sub { analog_read(0) }, { interval => 0.5, results => 1 });
 
@@ -191,10 +192,10 @@ let the END reaper clean up.
 ```perl
 use strict;
 use warnings;
-use WiringPi::API qw(setup pin_mode write_pin worker);
+use WiringPi::API qw(setup pin_mode write_pin worker OUTPUT);
 
 setup();
-pin_mode(5, 1);                   # OUTPUT, once in main
+pin_mode(5, OUTPUT);              # once in main
 
 my $w = worker(sub {
     write_pin(5, 1);
@@ -221,10 +222,10 @@ per pin. Each runs independently; each returns its own handle.
 ```perl
 use strict;
 use warnings;
-use WiringPi::API qw(setup pin_mode write_pin worker);
+use WiringPi::API qw(setup pin_mode write_pin worker OUTPUT);
 
 setup();
-pin_mode($_, 1) for (2, 3, 4);    # OUTPUT — all config in main, up front
+pin_mode($_, OUTPUT) for (2, 3, 4);    # all config in main, up front
 
 my @workers = (
     worker(sub { write_pin(2, 1); sleep 1; write_pin(2, 0); sleep 1 }),
@@ -296,10 +297,10 @@ forks a child that arms the interrupt and runs your callback on each edge, and
 returns a handle with the same `stop`/`pid`/`running` shape:
 
 ```perl
-use WiringPi::API qw(setup pin_mode background_interrupt INT_EDGE_RISING);
+use WiringPi::API qw(setup pin_mode background_interrupt INPUT INT_EDGE_RISING);
 
 setup();
-pin_mode(0, 0);                   # INPUT
+pin_mode(0, INPUT);
 
 my $h = background_interrupt(0, INT_EDGE_RISING, sub {
     my ($edge, $ts_us) = @_;
@@ -350,10 +351,10 @@ pipe, and reap it yourself.
 ```perl
 use strict;
 use warnings;
-use WiringPi::API qw(setup pin_mode write_pin);
+use WiringPi::API qw(setup pin_mode write_pin OUTPUT);
 
 setup();
-pin_mode(2, 1);                          # OUTPUT — before fork
+pin_mode(2, OUTPUT);                     # before fork
 
 my $pid = fork // die "fork: $!";
 
@@ -387,10 +388,10 @@ use strict;
 use warnings;
 use threads;
 use threads::shared;
-use WiringPi::API qw(setup pin_mode read_pin pi_lock pi_unlock);
+use WiringPi::API qw(setup pin_mode read_pin pi_lock pi_unlock INPUT);
 
 setup();
-pin_mode(3, 0);                          # INPUT
+pin_mode(3, INPUT);
 
 my $latest :shared = 0;
 
@@ -426,10 +427,10 @@ reads the latest value via the module's `shared_scalar` (lossy).
 use strict;
 use warnings;
 use Async::Event::Interval;
-use WiringPi::API qw(setup pin_mode read_pin);
+use WiringPi::API qw(setup pin_mode read_pin INPUT);
 
 setup();
-pin_mode(3, 0);                              # INPUT — before the event forks
+pin_mode(3, INPUT);                          # before the event forks
 
 my $event  = Async::Event::Interval->new(1, \&sample);   # forks; runs every 1s
 my $latest = $event->shared_scalar;

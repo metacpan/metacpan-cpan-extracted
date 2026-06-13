@@ -37,6 +37,10 @@ my $mech = WWW::Mechanize->new();
 $mech->{base} = 'http://example.com/';
 
 is( $mech->content, undef, 'content starts out as undef' );
+is(
+    $mech->content( raw => 1 ),
+    undef, 'raw content is just as undef as normal'
+);
 
 $mech->update_html($html);
 

@@ -2,7 +2,7 @@ package Zuzu::Module::IO;
 
 use utf8;
 
-our $VERSION = '0.003000';
+our $VERSION = '0.004000';
 
 use Encode qw( decode_utf8 );
 use Errno qw( EEXIST );
@@ -446,7 +446,10 @@ sub IMPORT {
 			my ( $self ) = @_;
 			_warn_blocking_operation( $runtime, 'std/io Path.slurp_utf8' );
 			my $p = _to_path_tiny( $self );
-			return $p->slurp_utf8();
+			# Lax decode (like readline_utf8): valid UTF-8 sequences for
+			# noncharacters such as U+10FFFE must round-trip, matching
+			# zuzu-rust and zuzu-js; strict :encoding(UTF-8) refuses them.
+			return decode_utf8( $p->slurp_raw(), 1 );
 		},
 	);
 
@@ -478,7 +481,7 @@ sub IMPORT {
 				$runtime,
 				'path.slurp_utf8_async',
 				sub {
-					return $p->slurp_utf8();
+					return decode_utf8( $p->slurp_raw(), 1 );
 				},
 			);
 		},
@@ -504,7 +507,7 @@ sub IMPORT {
 			my ( $self ) = @_;
 			_warn_blocking_operation( $runtime, 'std/io Path.lines_utf8' );
 			my $p = _to_path_tiny( $self );
-			my @lines = $p->lines_utf8();
+			my @lines = map { decode_utf8( $_, 1 ) } $p->lines( { binmode => ':raw' } );
 			return perl_to_zuzu( \@lines );
 		},
 	);

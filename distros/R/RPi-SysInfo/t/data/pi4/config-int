@@ -1,0 +1,4 @@
+arm_64bit=1
+arm_boost=1
+arm_freq=1800
+core_freq=500

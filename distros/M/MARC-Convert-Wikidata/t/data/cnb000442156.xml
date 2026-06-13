@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<collection
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  xmlns="http://www.loc.gov/MARC21/slim">
+
+<record>
+  <leader>01609nam a22003611  4500</leader>
+  <controlfield tag="001">bk196400862</controlfield>
+  <controlfield tag="003">CZ PrNK</controlfield>
+  <controlfield tag="005">19970917000000.0</controlfield>
+  <controlfield tag="008">970917s1964    xr                  cze  </controlfield>
+  <datafield tag="015" ind1=" " ind2=" ">
+    <subfield code="a">cnb000442156</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">(OCoLC)42166699</subfield>
+  </datafield>
+  <datafield tag="040" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+    <subfield code="b">cze</subfield>
+    <subfield code="c">OLA001</subfield>
+    <subfield code="d">ABA001</subfield>
+  </datafield>
+  <datafield tag="080" ind1=" " ind2=" ">
+    <subfield code="a">621.396.621+621.396.822(022)</subfield>
+    <subfield code="2">undef</subfield>
+  </datafield>
+  <datafield tag="100" ind1="1" ind2=" ">
+    <subfield code="a">Kvítek, Emil</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="245" ind1="1" ind2="0">
+    <subfield code="a">Vstupní obvody přijímačů :</subfield>
+    <subfield code="b">Určeno stř. technikům a inž. /</subfield>
+    <subfield code="c">Autoři: Emil Kvítek, Jiří Slezák a Milan Staněk</subfield>
+  </datafield>
+  <datafield tag="250" ind1=" " ind2=" ">
+    <subfield code="a">1. vyd.</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">Praha :</subfield>
+    <subfield code="b">SNTL,</subfield>
+    <subfield code="c">1964</subfield>
+    <subfield code="e">(Brno :</subfield>
+    <subfield code="f">Tisk 1)</subfield>
+  </datafield>
+  <datafield tag="300" ind1=" " ind2=" ">
+    <subfield code="a">179, [1] s. ;</subfield>
+    <subfield code="c">8°</subfield>
+  </datafield>
+  <datafield tag="490" ind1="1" ind2=" ">
+    <subfield code="a">Praktické elektrotechn. příručky ;</subfield>
+    <subfield code="v">Sv. 29</subfield>
+  </datafield>
+  <datafield tag="490" ind1="1" ind2=" ">
+    <subfield code="a">Řada elektrotechn. lit. slaboproudé</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Bibliogr.</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">S obr., tb. a grafy v textu</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">Vazba: Milan Míšek</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">8715 výt.</subfield>
+  </datafield>
+  <datafield tag="520" ind1=" " ind2=" ">
+    <subfield code="a">Pracovní pomůcka shrnuje v souborném pojetí základní poznatky o vstupních obvodech a o vlastnostech jak elektronkových a tranzistorových zesilovačů, tak i speciálních obvodů. Vyplňuje mezeru v naší literatuře, poněvadž většinaprací řeší otázky příliš speciální, a to ještě náročnou formou.</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Staněk, Milan</subfield>
+    <subfield code="7">jx20040109003</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="700" ind1="1" ind2=" ">
+    <subfield code="a">Slezák, Jiří</subfield>
+    <subfield code="4">aut</subfield>
+  </datafield>
+  <datafield tag="830" ind1=" " ind2="0">
+    <subfield code="a">Praktické elektrotechn. příručky</subfield>
+  </datafield>
+  <datafield tag="830" ind1=" " ind2="0">
+    <subfield code="a">Řada elektrotechn. lit. slaboproudé</subfield>
+  </datafield>
+  <datafield tag="856" ind1="4" ind2="1">
+    <subfield code="u">https://ndk.cz/uuid/uuid:0e5630d0-e425-11e4-82a1-005056827e52</subfield>
+    <subfield code="y">Digitalizovaný dokument</subfield>
+  </datafield>
+  <datafield tag="910" ind1=" " ind2=" ">
+    <subfield code="a">ABA001</subfield>
+  </datafield>
+  <datafield tag="964" ind1=" " ind2=" ">
+    <subfield code="a">Přijímače rádiové - obvody vstupní - příručky</subfield>
+  </datafield>
+  <datafield tag="998" ind1=" " ind2=" ">
+    <subfield code="a">000442156</subfield>
+  </datafield>
+</record>
+
+</collection>

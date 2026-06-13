@@ -1,5 +1,14 @@
 Revision history for tstregex
 
+1.14  2026/06/12
+      - Minor fixes of 1.13 for consistency across CPAN indexing tools.
+
+1.13  2026/06/12
+      - added some keywords for search engines
+
+1.08  2026-06-02
+      - dispatch longest math to stdout and unmatch to stderr
+
 1.03  2026-05-19
       - Fix Windows case-insensitivity issue in MANIFEST.
       - Ensure lib/Tstregex.pm is properly indexed with capital T.

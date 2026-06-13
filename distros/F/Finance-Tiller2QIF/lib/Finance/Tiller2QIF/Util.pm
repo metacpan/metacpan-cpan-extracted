@@ -1,6 +1,6 @@
 package Finance::Tiller2QIF::Util;
 # ABSTRACT: Utility functions for Tiller2QIF processing
-$Finance::Tiller2QIF::Util::VERSION = '1.06';
+$Finance::Tiller2QIF::Util::VERSION = '1.08';
 =head1 DESCRIPTION
 
 Provides utility functions for initializing the SQLite database and configuration files.

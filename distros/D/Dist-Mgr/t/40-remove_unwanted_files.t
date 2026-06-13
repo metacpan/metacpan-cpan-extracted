@@ -40,6 +40,12 @@ is -d 'unwanted', 1, "'unwanted' dir created ok";
 chdir 'unwanted' or die $!;
 like getcwd(), qr/$work\/unwanted$/, "in $work/unwanted directory ok";
 
+# Module::Starter 1.79+ requires 'author' to be an arrayref of
+# 'Name <email>' strings; older versions expect a plain scalar
+if ($Module::Starter::VERSION >= 1.79) {
+    $module_args{author} = ["$module_args{author} <$module_args{email}>"];
+}
+
 capture_merged {
     Module::Starter->create_distro(%module_args);
 };

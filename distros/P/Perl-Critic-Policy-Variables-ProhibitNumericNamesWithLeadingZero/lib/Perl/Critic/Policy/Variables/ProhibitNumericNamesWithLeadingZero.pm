@@ -22,7 +22,7 @@ use Perl::Critic::Utils qw< :booleans :characters hashify :severities >;
 
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 #-----------------------------------------------------------------------------
 
@@ -216,18 +216,16 @@ __END__
 
 =head1 NAME
 
-Perl::Critic::Policy::Variables::ProhibitNumericNamesWithLeadingZero - Don't use numeric variable names with leading zeroes.
-
+Perl::Critic::Policy::Variables::ProhibitNumericNamesWithLeadingZero - Don't use numeric variable names with leading zeros.
 
 =head1 AFFILIATION
 
 This Policy is stand-alone, and is not part of the core
 L<Perl::Critic|Perl::Critic>.
 
-
 =head1 DESCRIPTION
 
-Numeric variable names with leading zeroes are unsupported by Perl, and
+Numeric variable names with leading zeros are unsupported by Perl, and
 can lead to obscure bugs. In particular, they are not (or not
 straightforwardly) accessible as C<${0nnn}>.
 
@@ -244,23 +242,22 @@ standard ones.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter>,
-L<https://github.com/trwyant/perl-Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter/issues>, or in
+L<https://github.com/trwyant/perl-Perl-Critic-Policy-Variables-ProhibitNumericNamesWithLeadingZero/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III F<wyant at cpan dot org>
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT
 
-Copyright (C) 2022 Thomas R. Wyant, III
+Copyright (C) 2022, 2026 Thomas R. Wyant, III
 
 =head1 LICENSE
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

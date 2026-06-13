@@ -18,7 +18,7 @@ use WiringPi::API qw(:perl);
 # this board and must be fixed before the upgrade proceeds.
 
 BEGIN {
-    if (! $ENV{PI_BOARD}){
+    if (! $ENV{RPI_BOARD}){
         plan skip_all => "not a Pi board";
         exit;
     }

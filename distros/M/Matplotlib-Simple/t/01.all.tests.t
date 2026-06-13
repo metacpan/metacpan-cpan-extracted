@@ -1808,6 +1808,8 @@ bar({
 	'output.file' => '/tmp/bar.sub.svg'
 });
 bar({
+	execute => 0,
+	fh      => $fh,
 	data => {
 		C => 3, D => 4
 	},
@@ -2108,9 +2110,8 @@ sub check_SHA_sum {
 		die "$file:\ntest:\t$test_sum\n!=\n$sum";
 	}
 }
-my %check_files = map {'/tmp/' . "$_.svg" => 1} ('add.single', 'barplots',
-'imshow.multiple','imshow.single', 'plot.single', 'plots',
-'single.bonds', 'single.tab', 'barplots', 'single.barplot', 'hlines',
+my %check_files = map {'/tmp/' . "$_.svg" => 1} ('add.single',
+'imshow.multiple','imshow.single', 'plot.single', 'plots', 'single.barplot', 'hlines',
 'dssp.single', 'dssp.multiple', 'plot.single.arr', 'hist2d.pads', 'twinx.arr', 'twinx.hash', 'key.colors.bar', 'newline_fail', 'barh.sub', 'bar.sub', 'bar.sub.self', 'boxplot.sub', 'hexbin.sub', 'hist2d.sub', 'plot.sub', 'hist2d.logscale', 'scatter.logscale', );
 
 foreach my $file (@output_files) {

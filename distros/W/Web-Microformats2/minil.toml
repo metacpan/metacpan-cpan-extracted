@@ -1,4 +1,4 @@
 name = "Web-Microformats2"
-badges = ["travis"]
 module_maker="ModuleBuildTiny"
+badges = ["github-actions/ci.yml"]
 

@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($MARC::Convert::Wikidata::Utils::VERSION, 0.33, 'Version.');
+is($MARC::Convert::Wikidata::Utils::VERSION, 0.34, 'Version.');

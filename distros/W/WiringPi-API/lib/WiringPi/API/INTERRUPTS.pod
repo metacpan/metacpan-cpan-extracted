@@ -38,7 +38,8 @@ numbering, C<setup_gpio()> = BCM. Examples use C<setup()>.
 
 =item *
 
-B<Mode constants> for C<pin_mode>: C<INPUT>=0, C<OUTPUT>=1 (shown as integers).
+B<Mode constants> for C<pin_mode>: C<INPUT> and C<OUTPUT> - exported by
+C<WiringPi::API> and used by name throughout (no bare C<0>/C<1>).
 
 =item *
 
@@ -126,10 +127,10 @@ it runs.
 
     use strict;
     use warnings;
-    use WiringPi::API qw(setup pin_mode set_interrupt dispatch_interrupts INT_EDGE_RISING);
+    use WiringPi::API qw(setup pin_mode set_interrupt dispatch_interrupts INPUT INT_EDGE_RISING);
 
     setup();
-    pin_mode(0, 0);            # INPUT
+    pin_mode(0, INPUT);
 
     set_interrupt(0, INT_EDGE_RISING, sub {
         my ($edge, $ts_us) = @_;
@@ -156,10 +157,10 @@ edge, then runs the callback inline (full access to program state).
 
     use strict;
     use warnings;
-    use WiringPi::API qw(setup pin_mode set_interrupt wait_interrupts INT_EDGE_BOTH);
+    use WiringPi::API qw(setup pin_mode set_interrupt wait_interrupts INPUT INT_EDGE_BOTH);
 
     setup();
-    pin_mode(0, 0);            # INPUT
+    pin_mode(0, INPUT);
 
     set_interrupt(0, INT_EDGE_BOTH, \&on_change);
 
@@ -193,10 +194,10 @@ descriptors - so one loop handles sockets, timers, and GPIO together.
 
     use strict;
     use warnings;
-    use WiringPi::API qw(setup pin_mode set_interrupt dispatch_interrupts interrupt_fd INT_EDGE_RISING);
+    use WiringPi::API qw(setup pin_mode set_interrupt dispatch_interrupts interrupt_fd INPUT INT_EDGE_RISING);
 
     setup();
-    pin_mode(0, 0);            # INPUT
+    pin_mode(0, INPUT);
     set_interrupt(0, INT_EDGE_RISING, \&on_edge);
 
     my $fd = interrupt_fd();
@@ -223,10 +224,10 @@ B<Why/when:> Several inputs, each with its own handler, serviced by one loop.
     use strict;
     use warnings;
     use WiringPi::API qw(setup pin_mode set_interrupt wait_interrupts
-                         INT_EDGE_RISING INT_EDGE_FALLING INT_EDGE_BOTH);
+                         INPUT INT_EDGE_RISING INT_EDGE_FALLING INT_EDGE_BOTH);
 
     setup();
-    pin_mode($_, 0) for (0, 2, 3);   # INPUT
+    pin_mode($_, INPUT) for (0, 2, 3);
 
     set_interrupt(0, INT_EDGE_RISING,  sub { print "button A\n" });
     set_interrupt(2, INT_EDGE_FALLING, sub { print "button B\n" });
@@ -269,13 +270,14 @@ An optional 4th argument sets a B<kernel debounce period> in B<microseconds>
 before they reach the pipe - it is I<not> a hardware debounce. The attribute's
 field is a C<u32>, so the effective maximum is ~2**32 us (~71 minutes).
 
-    use WiringPi::API qw(setup pin_mode set_interrupt wait_interrupts INT_EDGE_FALLING);
+    use WiringPi::API qw(setup pin_mode set_interrupt wait_interrupts INPUT INT_EDGE_FALLING);
 
     setup();
-    pin_mode(0, 0);
+    pin_mode(0, INPUT);
 
-    # debounce a noisy button: ignore repeat edges within 5ms
-    set_interrupt(0, INT_EDGE_FALLING, \&pressed, 5000);
+    # Debounce a noisy button: ignore repeat edges within 5ms
+
+    set_interrupt(0, INT_EDGE_FALLING, \&pressed, 5 * 1000); # micros -> millis
 
     wait_interrupts(1000) while 1;
 
@@ -291,7 +293,8 @@ clean up on exit.
     set_interrupt(0, INT_EDGE_RISING, \&handler_a);
 
     # Re-arm the same pin with a different handler - the old listener is stopped
-    # automatically first, so no stacked/duplicate registration:
+    # automatically first, so no stacked/duplicate registration
+
     set_interrupt(0, INT_EDGE_RISING, \&handler_b);
 
     stop_interrupt(0);    # stop one pin, forget its callback
@@ -330,10 +333,10 @@ locking> - but a long non-yielding C call defers it until that call returns.
 
     use strict;
     use warnings;
-    use WiringPi::API qw(setup pin_mode set_interrupt auto_dispatch_interrupts INT_EDGE_RISING);
+    use WiringPi::API qw(setup pin_mode set_interrupt auto_dispatch_interrupts INPUT INT_EDGE_RISING);
 
     setup();
-    pin_mode(0, 0);            # INPUT
+    pin_mode(0, INPUT);
 
     auto_dispatch_interrupts(1);          # callbacks now fire on their own - no loop to write
 
@@ -375,10 +378,10 @@ main's variables (separate memory; share via IPC).
 
     use strict;
     use warnings;
-    use WiringPi::API qw(setup pin_mode background_interrupt INT_EDGE_RISING);
+    use WiringPi::API qw(setup pin_mode background_interrupt INPUT INT_EDGE_RISING);
 
     setup();
-    pin_mode(0, 0);            # INPUT
+    pin_mode(0, INPUT);
 
     my $h = background_interrupt(0, INT_EDGE_RISING, sub {
         my ($edge, $ts_us) = @_;
@@ -386,6 +389,7 @@ main's variables (separate memory; share via IPC).
     });
 
     # main carries on; the handler fires on its own
+
     for (1 .. 10) {
         do_other_work();
         sleep 1;
@@ -403,14 +407,20 @@ needs to report a value to the parent, you don't need the manual fork of
 scenario 9 - pass C<< { results => 1 } >> and B<return> a value from the
 handler; the parent drains it:
 
-    my $h = background_interrupt(0, INT_EDGE_RISING, sub {
-        my ($edge, $ts_us) = @_;
-        return "$edge\@$ts_us";            # shipped back to the parent
-    }, { results => 1 });
+    my $h = background_interrupt(
+        0,
+        INT_EDGE_RISING,
+        sub {
+            my ($edge, $ts_us) = @_;
+            return "$edge\@$ts_us"; # Returned to parent
+        },
+        { results => 1 }
+    );
 
     while (defined(my $msg = $h->read)) {  # non-blocking drain
         print "handler reported: $msg\n";
     }
+
     # $h->fh is the read filehandle, for select / IO::Select
 
 For anything more elaborate than reporting the handler's return value, scenario
@@ -428,30 +438,49 @@ parent drains and reacts (in main's interpreter, full access to its state).
     use strict;
     use warnings;
     use IO::Select;
-    use WiringPi::API qw(setup pin_mode set_interrupt wait_interrupts INT_EDGE_RISING);
+    use WiringPi::API qw(setup pin_mode set_interrupt wait_interrupts INPUT INT_EDGE_RISING);
 
     setup();
-    pin_mode(0, 0);                          # INPUT - plain config, before fork
+    pin_mode(0, INPUT);
 
-    pipe(my $rx, my $tx) or die "pipe: $!";  # YOUR OWN results channel (child -> parent)
+    # This $rx/$tx pipe is YOUR OWN results channel (child -> parent), separate from
+    # the library's internal self-pipe (a fixed 24-byte {pin, pin_bcm, edge, status, ts} record). You
+    # choose this channel's format; here, one newline-terminated text line per edge -
+    # self-delimiting, and portable (no 64-bit pack template, no fixed-width framing
+    # to get wrong).
+
+    pipe(my $rx, my $tx) or die "pipe: $!";
 
     my $pid = fork // die "fork: $!";
 
     if ($pid == 0) {
+        # Child owns interrupt handling; arm HERE (post-fork). Only the child reads
+        # the library's interrupt fd - the parent never calls dispatch on it.
+
         close $rx;
-        set_interrupt(0, INT_EDGE_RISING, sub {
-            my ($edge, $ts_us) = @_;
-            syswrite $tx, "$edge $ts_us\n";          # one text line up to the parent
-        });
+
+        set_interrupt(
+            0,
+            INT_EDGE_RISING,
+            sub {
+                my ($edge, $ts_us) = @_;
+                syswrite $tx, "$edge $ts_us\n"; # One text line up to the parent
+            }
+        );
+
         wait_interrupts(1000) while 1;
         exit 0;
     }
+
+    # Parent: free to work; drain results without blocking
 
     close $tx;
     my $sel = IO::Select->new($rx);
     my $buf = '';
 
     # Reap the child on normal exit/die even if you forget to stop it explicitly.
+    # (Not run on signal-kill - trap signals too if you need that.)
+
     END { if ($pid) { kill 'TERM', $pid; waitpid $pid, 0; $pid = undef; } }
 
     while (1) {
@@ -459,14 +488,21 @@ parent drains and reacts (in main's interpreter, full access to its state).
 
         while ($sel->can_read(0)) {
             my $n = sysread($rx, my $chunk, 4096);
-            if (!defined $n) {
-                last if $!{EINTR};                    # signal: retry next pass
-                $sel->remove($rx); last;              # other error: stop, don't spin
+            if (! defined $n) {
+                last if $!{EINTR};                        # Signal: retry next pass ($buf intact)
+                $sel->remove($rx); last;                  # Any other error: stop, don't spin
             }
-            if ($n == 0) { $sel->remove($rx); last }  # EOF: child exited
+
+            if ($n == 0) {
+                # EOF: child exited - stop watching
+                $sel->remove($rx);
+                last
+            }
             $buf .= $chunk;
-            while ($buf =~ s/^([^\n]*)\n//) {         # consume only complete lines
-                print "edge: $1\n";
+
+            while ($buf =~ s/^([^\n]*)\n//) {             # Consume only complete lines
+                my ($edge, $ts_us) = split ' ', $1;
+                print "edge $edge at ${ts_us}us\n";
             }
         }
     }
@@ -490,14 +526,14 @@ in the initial call.
     use strict;
     use warnings;
     use WiringPi::API qw(setup pin_mode background_interrupts
-                         INT_EDGE_RISING INT_EDGE_BOTH);
+                         INPUT INT_EDGE_RISING INT_EDGE_BOTH);
 
     setup();
-    pin_mode($_, 0) for (0, 2);
+    pin_mode($_, INPUT) for (0, 2);
 
     my $h = background_interrupts(
         [0, INT_EDGE_RISING, \&on_button],
-        [2, INT_EDGE_BOTH,   \&on_sensor, 5000],   # optional debounce
+        [2, INT_EDGE_BOTH,   \&on_sensor, 5 * 1000],   # Optional debounce
     );
 
     # ... main does its own thing; both pins are handled in the one child ...

@@ -1,0 +1,550 @@
+#!/usr/bin/env perl
+
+use v5.40.0;
+use common::sense;
+use feature 'signatures';
+
+use Getopt::Long qw(:config no_ignore_case bundling);
+use File::Copy   qw(copy);
+use File::Spec;
+use File::Path qw(make_path);
+use FindBin    qw($Bin);
+use JSON::PP   qw(decode_json);
+use Pod::Text;
+use Pod::Usage qw(pod2usage);
+
+use lib 'lib';
+use Mojo::PrettyTidy;
+use Mojo::PrettyTidy::Diff qw(unified_diff);
+
+my %opt = (
+            attributes   => 1,
+            backup       => 0,
+            backup_ext   => '.bak',
+            check        => 0,
+            columns      => 80,
+            config       => '',
+            diff         => 0,
+            help         => 0,
+            indent_width => 2,
+            javascript   => 1,
+            man          => 0,
+            outdir       => '',
+            output       => '',
+            perl         => 1,
+            prefix       => '',
+            show_options => 0,
+            stdin        => 0,
+            tab_width    => 2,
+            version      => 0,
+            write        => 0, );
+
+my %default_opt = %opt;
+my %opt_source  = map { $_ => 'default' } keys %opt;
+
+if ( $opt{help} ) {
+  my $manual = _manual_path()
+      or die "Could not find Manual.pod\n";
+
+  my $section = _pod_section( _slurp( $manual ), 'COMMAND-LINE OPTIONS' )
+      or die "Could not find COMMAND-LINE OPTIONS in $manual\n";
+
+  _print_pod_text( $section );
+  exit 0;
+}
+GetOptions(
+  'attributes|attrib|a!' => sub ( $name, $val ) {
+    $opt{attributes}        = $val ? 1 : 0;
+    $opt_source{attributes} = 'cli';
+  },
+  'backup' => sub {
+    $opt{backup}        = 1;
+    $opt_source{backup} = 'cli';
+  },
+  'backup-ext=s' => sub ( $name, $val ) {
+    $opt{backup_ext}        = $val;
+    $opt_source{backup_ext} = 'cli';
+  },
+  'check' => sub {
+    $opt{check}        = 1;
+    $opt_source{check} = 'cli';
+  },
+  'columns|cols|c=i' => sub ( $name, $val ) {
+    $opt{columns}        = $val;
+    $opt_source{columns} = 'cli';
+  },
+  'config=s' => sub ( $name, $val ) {
+    $opt{config}        = $val;
+    $opt_source{config} = 'cli';
+  },
+  'no-columns|no-cols|nocols' => sub {
+    $opt{columns}        = 0;
+    $opt_source{columns} = 'cli';
+  },
+  'diff' => sub {
+    $opt{diff}        = 1;
+    $opt_source{diff} = 'cli';
+  },
+  'help|h' => sub {
+    $opt{help}        = 1;
+    $opt_source{help} = 'cli';
+  },
+  'javascript|j!' => sub ( $name, $val ) {
+    $opt{javascript}        = $val ? 1 : 0;
+    $opt_source{javascript} = 'cli';
+  },
+  'man' => sub {
+    $opt{man}        = 1;
+    $opt_source{man} = 'cli';
+  },
+  'output|o=s' => sub ( $name, $val ) {
+    $opt{output}        = $val;
+    $opt_source{output} = 'cli';
+  },
+  'outdir=s' => sub ( $name, $val ) {
+    $opt{outdir}        = $val;
+    $opt_source{outdir} = 'cli';
+  },
+  'perl!' => sub ( $name, $val ) {
+    $opt{perl}        = $val ? 1 : 0;
+    $opt_source{perl} = 'cli';
+  },
+  'prefix|pre=s' => sub ( $name, $val ) {
+    $opt{prefix}        = $val;
+    $opt_source{prefix} = 'cli';
+  },
+
+  'show-options|V+' => \$opt{show_options},
+
+  'stdin' => sub {
+    $opt{stdin}        = 1;
+    $opt_source{stdin} = 'cli';
+  },
+  'version|v' => sub {
+    $opt{version}        = 1;
+    $opt_source{version} = 'cli';
+  },
+  'write|w' => sub {
+    $opt{write}        = 1;
+    $opt_source{write} = 'cli';
+  },
+) or pod2usage( 2 );
+
+if ( $opt{help} ) {
+  my $manual = _manual_path()
+      or die "Could not find Manual.pod\n";
+
+  my $section = _pod_section( _slurp( $manual ), 'COMMAND-LINE OPTIONS' )
+      or die "Could not find COMMAND-LINE OPTIONS in $manual\n";
+
+  _print_pod_text( $section );
+  exit 0;
+}
+
+if ( $opt{man} ) {
+  my $manual = _manual_path()
+      or die "Could not find Manual.pod\n";
+
+  _print_pod_text( _slurp( $manual ) );
+  exit 0;
+}
+
+if ( $opt{version} ) {
+  print "mojo-prettytidy $Mojo::PrettyTidy::VERSION\n";
+  exit 0;
+}
+
+my @inputs = @ARGV;
+
+my $cfg   = {};
+my @files = _collect_input_files( @inputs );
+
+if ( $opt_source{config} eq 'cli' ) {
+  $cfg = _load_config_file( $opt{config} );
+  _validate_config( $cfg, $opt{config} );
+} else {
+  my $config_path = _find_default_config_file();
+
+  if ( length $config_path ) {
+    $opt{config}        = $config_path;
+    $opt_source{config} = 'auto';
+
+    $cfg = _load_config_file( $config_path );
+    _validate_config( $cfg, $config_path );
+  }
+}
+
+for my $name (
+               qw(attributes  columns indent_width javascript outdir perl prefix
+               tab_width) )
+{
+  next unless exists $cfg->{$name};
+  next unless $opt_source{$name} eq 'default';
+
+  $opt{$name}        = $cfg->{$name};
+  $opt_source{$name} = 'config';
+}
+
+_show_options( \%opt, \%opt_source, \%default_opt, \@inputs )
+    if $opt{show_options};
+
+pod2usage( "--backup requires --write\n" )
+    if $opt{backup} && !$opt{write};
+
+pod2usage( "--backup-ext requires --write\n" )
+    if defined( $opt{backup_ext} )
+    && $opt{backup_ext} ne '.bak'
+    && !$opt{write};
+
+pod2usage( "--check requires a single input file\n" )
+    if $opt{check} && _has_directory_input( @inputs );
+
+pod2usage( "--diff requires a single input file\n" )
+    if $opt{diff} && _has_directory_input( @inputs );
+
+pod2usage( "--diff cannot be combined with --write\n" )
+    if $opt{diff} && $opt{write};
+
+pod2usage( "--diff cannot be combined with --stdin\n" )
+    if $opt{diff} && $opt{stdin};
+
+pod2usage( "--output cannot be combined with --check\n" )
+    if $opt{output} && $opt{check};
+
+pod2usage( "--output cannot be combined with --diff\n" )
+    if $opt{output} && $opt{diff};
+
+pod2usage( "--output cannot be combined with --write\n" )
+    if $opt{output} && $opt{write};
+
+pod2usage( "--write cannot be combined with --prefix\n" )
+    if $opt{write} && length $opt{prefix};
+
+pod2usage( "--write cannot be combined with --outdir\n" )
+    if $opt{write} && length $opt{outdir};
+
+pod2usage( "--stdin cannot be combined with --write\n" )
+    if $opt{stdin} && $opt{write};
+
+pod2usage( "--stdin cannot be combined with --backup\n" )
+    if $opt{stdin} && $opt{backup};
+
+pod2usage( "--stdin cannot be combined with file or directory inputs\n" )
+    if $opt{stdin} && @inputs;
+
+my $pt = Mojo::PrettyTidy->new(
+                                attributes   => $opt{attributes} ? 1 : 0,
+                                columns      => $opt{columns} || 0,
+                                indent_width => $opt{indent_width},
+                                javascript   => $opt{javascript} ? 1 : 0,
+                                perl         => $opt{perl}       ? 1 : 0,
+                                tab_width    => $opt{tab_width}, );
+
+if ( $opt{stdin} ) {
+  my $input = do { local $/; <STDIN> };
+  $pt->ep_source_file( 'stdin' );
+  my $output = $pt->tidy( $input );
+
+  if ( $opt{check} ) {
+    exit( $output eq $input ? 0 : 1 );
+  }
+
+  if ( $opt{output} ) {
+    _spew( $opt{output}, $output );
+    exit 0;
+  }
+
+  print $output;
+  exit 0;
+}
+
+pod2usage( "No input provided. Supply a file, directory, or --stdin.\n" )
+    unless @inputs;
+
+pod2usage( "--output cannot be combined with multiple inputs\n" )
+    if $opt{output} && @inputs > 1;
+
+pod2usage( "No input files found\n" ) unless @files;
+
+pod2usage( "--check requires a single input file\n" )
+    if $opt{check} && @files != 1;
+
+pod2usage( "--diff requires a single input file\n" )
+    if $opt{diff} && @files != 1;
+
+pod2usage( "multiple inputs require --write, --prefix, or --outdir\n" )
+    if @files > 1
+    && !$opt{write}
+    && !length( $opt{prefix} )
+    && !length( $opt{outdir} );
+
+_ensure_outdir( $opt{outdir} ) if length $opt{outdir};
+
+# single-file mode
+if ( @files == 1 && !length( $opt{prefix} ) && !length( $opt{outdir} ) ) {
+  my $file  = $files[0];
+  my $input = _slurp( $file );
+
+  $pt->ep_source_file( $file );
+  my $output = $pt->tidy( $input );
+  if ( $opt{check} ) {
+    exit( $output eq $input ? 0 : 1 );
+  }
+
+  if ( $opt{diff} ) {
+    my $diff_text = unified_diff(
+                                  old       => $input,
+                                  new       => $output,
+                                  old_label => "$file (original)",
+                                  new_label => "$file (tidied)", );
+
+    if ( length $diff_text ) {
+      print $diff_text;
+      exit 1;
+    }
+    $pt->_cleanup_artifacts;
+    exit 0;
+  }
+
+  if ( $opt{output} ) {
+    _spew( $opt{output}, $output );
+    exit 0;
+  }
+
+  if ( $opt{write} ) {
+    if ( $opt{backup} ) {
+      my $backup_path = $file . $opt{backup_ext};
+      copy( $file, $backup_path )
+          or die "Cannot create backup '$backup_path' from '$file': $!";
+    }
+
+    _spew( $file, $output );
+    exit 0;
+  }
+
+  print $output;
+  exit 0;
+}
+
+# multi-file / directory mode
+for my $file ( @files ) {
+  my $input = _slurp( $file );
+  $pt->ep_source_file( $file );
+  my $output = $pt->tidy( $input );
+
+  if ( $opt{write} ) {
+    if ( $opt{backup} ) {
+      my $backup_path = $file . $opt{backup_ext};
+      copy( $file, $backup_path )
+          or die "Cannot create backup '$backup_path' from '$file': $!";
+    }
+
+    _spew( $file, $output );
+    next;
+  }
+
+  my $dest = _output_path_for( $file, $opt{prefix}, $opt{outdir} );
+  _spew( $dest, $output );
+}
+
+exit 0;
+
+sub _collect_input_files ( @inputs ) {
+  my @files;
+
+  for my $path ( @inputs ) {
+    if ( -f $path ) {
+      push @files, $path;
+      next;
+    }
+
+    if ( -d $path ) {
+      opendir my $dh, $path or die "Cannot open directory '$path': $!";
+      my @children = sort grep { !/^\.\.?$/ } readdir $dh;
+      closedir $dh;
+
+      for my $name ( @children ) {
+        my $child = File::Spec->catfile( $path, $name );
+        next unless -f $child;
+        next unless _is_template_file( $child );
+        push @files, $child;
+      }
+
+      next;
+    }
+
+    die "Input path not found or unsupported: $path\n";
+  }
+
+  return @files;
+}
+
+sub _ensure_outdir ( $dir ) {
+  return unless length $dir;
+  return if -d $dir;
+  mkdir $dir or die "Cannot create output directory '$dir': $!";
+}
+
+sub _has_directory_input ( @inputs ) {
+  for my $path ( @inputs ) {
+    return 1 if -d $path;
+  }
+  return 0;
+}
+
+sub _is_template_file ( $path ) {
+  return $path =~ /\.html\.ep\z/ ? 1 : 0;
+}
+
+sub _find_default_config_file () {
+  my @candidates;
+
+  if ( defined $ENV{HOME} && length $ENV{HOME} ) {
+    push @candidates,
+        File::Spec->catfile( $ENV{HOME}, '.mojo-prettytidy.json' );
+  }
+
+  push @candidates, File::Spec->catfile( '.', '.mojo-prettytidy.json' );
+
+  for my $path ( @candidates ) {
+    return $path if -f $path;
+  }
+
+  return '';
+}
+
+sub _load_config_file ( $path ) {
+  open my $fh, '<', $path or die "Cannot open config '$path' for reading: $!";
+  local $/;
+  my $json = <$fh>;
+  close $fh;
+
+  my $cfg = eval { decode_json( $json ) };
+  die "Invalid JSON in config '$path': $@\n" if $@;
+  die "Config '$path' must contain a JSON object\n"
+      unless ref( $cfg ) eq 'HASH';
+
+  return $cfg;
+}
+
+sub _manual_path () {
+  my @candidates = (
+                     File::Spec->catfile( $Bin, '..', 'Manual.pod' ),
+                     File::Spec->catfile( $Bin, '..', 'share', 'Manual.pod' ),
+                     File::Spec->catfile( '.',  'Manual.pod' ), );
+
+  for my $path ( @candidates ) {
+    return $path if -f $path;
+  }
+
+  return;
+}
+
+sub _pod_section ( $pod, $heading ) {
+  my $quoted = quotemeta $heading;
+
+  if ( $pod =~ /^=head1\s+$quoted\b(.*?)(?=^=head1\s+|\z)/ms ) {
+    return "=head1 $heading$1";
+  }
+
+  if ( $pod =~ /^=head2\s+$quoted\b(.*?)(?=^=head[12]\s+|\z)/ms ) {
+    return "=head2 $heading$1";
+  }
+
+  return;
+}
+
+sub _print_pod_text ( $pod ) {
+  open my $in, '<', \$pod or die "Cannot open POD scalar for reading: $!";
+
+  my $parser = Pod::Text->new( sentence => 0,
+                               width    => 76, );
+
+  $parser->parse_from_filehandle( $in, \*STDOUT );
+
+  return;
+}
+
+sub _output_path_for ( $input, $prefix, $outdir ) {
+  my ( $vol, $dir, $file ) = File::Spec->splitpath( $input );
+  my $name = ( length $prefix ? $prefix : '' ) . $file;
+
+  return length $outdir
+      ? File::Spec->catfile( $outdir, $name )
+      : File::Spec->catfile( $dir,    $name );
+}
+
+sub _show_options ( $opt, $source, $defaults, $inputs ) {
+  my $show_all = ( $opt->{show_options} || 0 ) >= 2 ? 1 : 0;
+
+  print "mojo-prettytidy effective options:\n";
+
+  for my $name ( sort keys %$opt ) {
+    my $value = defined $opt->{$name} ? $opt->{$name} : '';
+    my $from  = $source->{$name} // 'unknown';
+
+    if ( !$show_all ) {
+      my $default = defined $defaults->{$name} ? $defaults->{$name} : '';
+
+      next
+          if $value eq ''
+          && $from eq 'default';
+
+      next
+          if !$value
+          && $value eq $default
+          && $from eq 'default';
+    }
+
+    my $label = $name;
+    $label =~ s/_/-/g;
+
+    printf "  %-14s =>  %-30s [%s]\n", $label, $value, $from;
+  }
+
+  if ( $show_all || @$inputs ) {
+    printf "  %-14s =>  %-30s [%s]\n", 'input-count', scalar( @$inputs ),
+        'input';
+
+    for my $i ( 0 .. $#$inputs ) {
+      printf "  %-14s =>  %-30s [%s]\n", "input[$i]", $inputs->[$i], 'input';
+    }
+  }
+
+  return;
+}
+
+sub _slurp ( $path ) {
+  open my $fh, '<', $path or die "Cannot open '$path' for reading: $!";
+  local $/;
+  my $content = <$fh>;
+  close $fh;
+
+  return $content;
+}
+
+sub _spew ( $path, $content ) {
+  open my $fh, '>', $path or die "Cannot open '$path' for writing: $!";
+  print {$fh} $content or die "Cannot write '$path': $!";
+  close $fh            or die "Cannot close '$path': $!";
+}
+
+sub _validate_config ( $cfg, $path ) {
+  my %allowed = map { $_ => 1 } qw(
+      attributes
+      columns
+      indent_width
+      javascript
+      outdir
+      prefix
+      perl
+      tab_width
+  );
+
+  for my $k ( keys %$cfg ) {
+    die "Unknown config key '$k' in '$path'\n"
+        unless $allowed{$k};
+  }
+}
+
+__END__
