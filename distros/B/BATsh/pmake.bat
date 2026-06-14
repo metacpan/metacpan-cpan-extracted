@@ -24,7 +24,7 @@ package pmake;
 # Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
-$PMAKE_BAT_VERSION = '0.35';
+$PMAKE_BAT_VERSION = '0.37';
 $PMAKE_BAT_VERSION = $PMAKE_BAT_VERSION;
 use strict;
 BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
@@ -1911,14 +1911,29 @@ sub _dist_check_sources {
     my ($files_ref, $do_check1, $do_check2) = @_;
     return unless $do_check1 || $do_check2;
 
-    # Target: lib/*.pm, lib/*.pl, t/*.t, xt/*.t, eg/*.pl, bin/*.pl, bin/*.pm
+    # Target: lib/*.pm, lib/*.pl, t/*.t, t/lib/*.pm, xt/*.t, eg/*.pl, bin/*.pl, bin/*.pm
     my @targets = grep {
         /^lib\/.*\.(pm|pl)$/i
         || /^t\/.*\.t$/i
+        || /^t\/lib\/.+\.pm$/i
         || /^xt\/.*\.t$/i
         || /^eg\/.*\.pl$/i
         || /^bin\/.*\.(pl|pm)$/i
     } @{$files_ref};
+
+    # Scope mirrors t/9020-perl5compat.t (P1-P12) and t/9040-style.t
+    # (C1/E/K1-K3): the multibyte transpiler core (lib/mb.pm) and the
+    # t/NNNN fixtures (any t/*.t that is not a t/9xxx maintenance test)
+    # intentionally carry post-5.005_03 tokens and/or non-US-ASCII bytes as
+    # transformation data, so the ina@CPAN house-style scans do not apply to
+    # them. The t/9xxx tests and t/lib/*.pm are themselves US-ASCII and
+    # 5.005_03-clean and are checked. (Without this scope every fixture
+    # false-fails C1, and lib/mb.pm false-fails P/K -- 212 spurious FAILs.)
+    @targets = grep {
+        !m{^lib/mb\.pm$}i
+        && !( m{^t/.*\.t$}i && $_ !~ m{^t/9\d{3}}i )
+    } @targets;
+
     @targets = grep { -f $_ } @targets;
 
     return unless @targets;

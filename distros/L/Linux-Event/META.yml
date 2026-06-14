@@ -20,13 +20,9 @@ no_index:
     - inc
 requires:
   Carp: '0'
-  Linux::Epoll: '0'
   Linux::Event::Clock: '0.011'
   Linux::Event::Timer: '0.01'
-  Linux::FD::Event: '0'
-  Linux::FD::Pid: '0'
-  Linux::FD::Signal: '0'
   perl: '5.036000'
 resources: {}
-version: '0.011'
+version: '0.012'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

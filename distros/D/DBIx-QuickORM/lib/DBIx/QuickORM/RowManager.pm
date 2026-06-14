@@ -2,9 +2,9 @@ package DBIx::QuickORM::RowManager;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
-use Carp qw/confess croak/;
+use Carp qw/carp confess croak/;
 use Scalar::Util qw/weaken/;
 use DBIx::QuickORM::Util qw/load_class/;
 
@@ -101,14 +101,15 @@ sub uncache { }
 
 =item $row = $mgr->cache_lookup(source => $source, ...)
 
-Look up a row in the cache by its parsed parameters. Returns the cached row
-or undef.
+Look up a row in the cache. The row may be identified by fetched data, a
+primary key, or a row object; fetched data is not required. Returns the
+cached row or undef.
 
 =cut
 
 sub cache_lookup {
     my $self = shift;
-    return $self->do_lookup($self->parse_params({@_}));
+    return $self->do_cache_lookup(($self->parse_params({@_}, fetched => 1))[0 .. 4]);
 }
 
 =pod
@@ -128,16 +129,18 @@ sub do_cache_lookup {
 
 =pod
 
-=item $mgr->invalidate(source => $source, ...)
+=item $mgr->invalidate(source => $source, row => $row, ...)
 
 Mark a row's data invalid, both on any passed-in row and on the cached copy,
-recording a reason (defaulting to the caller's file and line).
+recording a reason (defaulting to the caller's file and line). The row can
+be identified by a row object, fetched data, or a primary key; none of them
+is individually required.
 
 =cut
 
 sub invalidate {
     my $self = shift;
-    my ($source, $fetched, $old_pk, $new_pk, $row, $params) = $self->parse_params({@_});
+    my ($source, $fetched, $old_pk, $new_pk, $row, $params) = $self->parse_params({@_}, fetched => 1);
 
     my $reason = $params->{reason};
     unless ($reason) {
@@ -194,17 +197,73 @@ sub _vivify {
 
 =item $row = $mgr->vivify(source => $source, ...)
 
-Return an existing matching row, or create a new row with the fetched data
-as its pending (unsaved) state.
+Ensure there is a row object to work with for the given data, like Perl's own
+autovivification of a nested hash slot. This is a low-level primitive: it
+hands back a row to operate on before the caller necessarily knows whether
+that row is stored in the database.
+
+If a row matching the data's primary key is already loaded, that existing row
+is returned as-is (it already carries known state, so it wins). Otherwise a
+new row is created with the supplied data as its pending (unsaved) state.
+
+C<vivify> does B<not> query the database and does B<not> guarantee the row
+exists there. On a cache hit the supplied data is B<not> applied to the
+existing row; existing values win. If the supplied data would silently
+overwrite-and-lose information that way (a non-primary-key field whose value
+differs from the loaded row), a warning is emitted naming those fields. To
+change a loaded row, fetch it and call C<< $row->update >>; to ensure a row
+exists in the database, use the connection's C<find_or_insert> or
+C<update_or_insert> helpers.
 
 =cut
 
 sub vivify {
     my $self = shift;
     my ($source, $fetched, $old_pk, $new_pk, $row) = $self->parse_params({@_}, fetched => 1);
-    $row //= $self->_vivify($source, $self->_state(pending => $fetched));
 
-    return $row;
+    # Autovivification semantics: an already-loaded row wins, exactly as
+    # accessing an existing hash slot returns its current value untouched.
+    if ($row) {
+        $self->_warn_vivify_discard($source, $fetched, $row);
+        return $row;
+    }
+
+    return $self->_vivify($source, $self->_state(pending => $fetched));
+}
+
+=pod
+
+=item $mgr->_warn_vivify_discard($source, $fetched, $row)
+
+Warn when vivify returns an already-loaded row and the supplied data would
+silently lose information: a non-primary-key field present in C<$fetched>
+whose value differs from the loaded row's current value. Primary-key fields
+(the identity that found the row) and matching values are not reported.
+
+=cut
+
+sub _warn_vivify_discard {
+    my $self = shift;
+    my ($source, $fetched, $row) = @_;
+
+    my %is_pk = map { $_ => 1 } @{$source->primary_key // []};
+
+    my $row_data = $row->row_data_obj;
+    my $current  = $row->raw_fields;
+
+    my @lost;
+    for my $field (sort keys %$fetched) {
+        next if $is_pk{$field};
+        next unless $source->has_field($field);
+        next if $row_data->compare_field($field, $fetched, $current, $source, $self->{+CONNECTION});
+        push @lost => $field;
+    }
+
+    return unless @lost;
+
+    carp "vivify() returned an already-loaded row for this primary key; the supplied data for "
+        . join(', ', map { "'$_'" } @lost)
+        . " differs from the loaded row and was not applied. To change a loaded row, fetch it and call ->update(); to ensure a row exists in the database, use the connection's find_or_insert() or update_or_insert() helpers";
 }
 
 =pod

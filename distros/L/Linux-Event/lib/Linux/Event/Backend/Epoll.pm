@@ -3,10 +3,10 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
 use Carp qw(croak);
-use Linux::Epoll;
+use Linux::Event::XS ();
 
 use constant READABLE => 0x01;
 use constant WRITABLE => 0x02;
@@ -23,11 +23,11 @@ sub new ($class, %args) {
   my $oneshot = delete $args{oneshot};
   croak "unknown args: " . join(", ", sort keys %args) if %args;
 
-  my $ep = Linux::Epoll->new;
+  my $ep = Linux::Event::XS::epoll_new();
 
   return bless {
-    ep      => $ep,
-    watch   => {},  # fd -> { fh, cb, mask, tag, loop }
+    ep      => $ep, # XS epoll fd + reusable event buffer
+    watch   => Linux::Event::XS::registry_new(), # fd -> XS backend watch record
     edge    => $edge ? 1 : 0,
     oneshot => $oneshot ? 1 : 0,
   }, $class;
@@ -45,25 +45,50 @@ sub watch ($self, $fh, $mask, $cb, %opt) {
   croak "fh has no fileno" if !defined $fd;
   $fd = int($fd);
 
-  croak "fd already watched: $fd" if exists $self->{watch}{$fd};
+  croak "fd already watched: $fd" if Linux::Event::XS::registry_get($self->{watch}, $fd);
 
   my $events = _mask_to_events($self, $mask);
+  my $rec = Linux::Event::XS::backend_watch_new(
+    'Linux::Event::XS::BackendWatch',
+    $fd,
+    $fh,
+    $cb,
+    int($mask),
+    $opt{_loop},
+    $opt{tag},
+  );
 
-  my $loop = $opt{_loop};
-  my $tag  = $opt{tag};
+  Linux::Event::XS::epoll_add($self->{ep}, $fd, $events);
+  Linux::Event::XS::registry_set($self->{watch}, $fd, $rec);
 
-  $self->{ep}->add($fh, $events, sub ($ev) {
-    my $m = _events_to_mask($ev);
-    $cb->($loop, $fh, $fd, $m, $tag);
-  });
+  return $fd;
+}
 
-  $self->{watch}{$fd} = {
-    fh   => $fh,
-    cb   => $cb,
-    mask => int($mask),
-    tag  => $tag,
-    loop => $loop,
-  };
+
+sub watch_watcher ($self, $fh, $mask, $watcher, %opt) {
+  croak "fh is required" if !$fh;
+  croak "mask is required" if !defined $mask;
+  croak "watcher is required" if !$watcher;
+
+  my $fd = fileno($fh);
+  croak "fh has no fileno" if !defined $fd;
+  $fd = int($fd);
+
+  croak "fd already watched: $fd" if Linux::Event::XS::registry_get($self->{watch}, $fd);
+
+  my $events = _mask_to_events($self, $mask);
+  my $rec = Linux::Event::XS::backend_watch_new_watcher(
+    'Linux::Event::XS::BackendWatch',
+    $fd,
+    $fh,
+    $watcher,
+    int($mask),
+    $opt{_loop},
+    $opt{tag},
+  );
+
+  Linux::Event::XS::epoll_add($self->{ep}, $fd, $events);
+  Linux::Event::XS::registry_set($self->{watch}, $fd, $rec);
 
   return $fd;
 }
@@ -75,101 +100,42 @@ sub modify ($self, $fh_or_fd, $mask, %opt) {
   return 0 if !defined $fd;
   $fd = int($fd);
 
-  my $w = $self->{watch}{$fd} or return 0;
+  my $rec = Linux::Event::XS::registry_get($self->{watch}, $fd) or return 0;
 
-  my $loop = exists $opt{_loop} ? $opt{_loop} : $w->{loop};
-  my $tag  = exists $opt{tag}   ? $opt{tag}   : $w->{tag};
-
-  $w->{loop} = $loop;
-  $w->{tag}  = $tag;
+  my $loop = exists $opt{_loop} ? $opt{_loop} : undef;
+  my $tag  = exists $opt{tag}   ? $opt{tag}   : undef;
+  Linux::Event::XS::backend_watch_set_loop_tag($rec, $loop, $tag)
+    if exists($opt{_loop}) || exists($opt{tag});
 
   my $new_mask = int($mask);
-  my $old_mask = int($w->{mask});
-
-  $w->{mask} = $new_mask;
+  Linux::Event::XS::backend_watch_set_mask($rec, $new_mask);
 
   my $events = _mask_to_events($self, $new_mask);
-
-
-  # EPOLLONESHOT rearm:
-  # Rearming must be possible from inside a callback. Linux::Epoll's callback
-  # dispatch is not guaranteed to be safe against a delete+add cycle performed
-  # re-entrantly from within the callback. So for oneshot, prefer a real MOD.
-  #
-  # We still need to ensure a MOD happens even if the effective event set is
-  # unchanged; Linux::Epoll->modify performs epoll_ctl(MOD) and does not elide
-  # "no-op" masks.
-  my $need_oneshot = (($new_mask & ONESHOT) || ($old_mask & ONESHOT) || $self->{oneshot}) ? 1 : 0;
-
-  if ($self->{ep}->can('modify')) {
-    $self->{ep}->modify($w->{fh}, $events, sub ($ev) {
-      my $m = _events_to_mask($ev);
-      $w->{cb}->($loop, $w->{fh}, $fd, $m, $tag);
-    });
-    return 1;
-  }
-
-  # Fallback: delete and re-add
-  $self->{ep}->delete($w->{fh});
-  $self->{ep}->add($w->{fh}, $events, sub ($ev) {
-    my $m = _events_to_mask($ev);
-    $w->{cb}->($loop, $w->{fh}, $fd, $m, $tag);
-  });
-
+  Linux::Event::XS::epoll_modify($self->{ep}, $fd, $events);
   return 1;
 }
-
 
 sub unwatch ($self, $fh_or_fd) {
   my $fd = ref($fh_or_fd) ? fileno($fh_or_fd) : $fh_or_fd;
   return 0 if !defined $fd;
   $fd = int($fd);
 
-  my $w = $self->{watch}{$fd} or return 0;
-  $self->{ep}->delete($w->{fh});
-  delete $self->{watch}{$fd};
+  my $rec = Linux::Event::XS::registry_get($self->{watch}, $fd) or return 0;
+  Linux::Event::XS::epoll_delete($self->{ep}, $fd);
+  Linux::Event::XS::registry_delete($self->{watch}, $fd);
   return 1;
 }
 
 sub run_once ($self, $loop, $timeout_s = undef) {
-  my $max = 256;
-
-  # Linux::Epoll->wait($number, $timeout) uses fractional seconds.
-  # Keep $timeout_s in seconds (possibly fractional). undef => block, 0 => poll.
-  my $ret = $self->{ep}->wait($max, $timeout_s);
-
-  return 0 if !defined $ret;
-  return $ret;
+  # XS owns the epoll fd and reuses a fixed epoll_event buffer across waits.
+  return Linux::Event::XS::epoll_wait_dispatch($self->{ep}, $self->{watch}, $timeout_s);
 }
-
 
 sub _mask_to_events ($self, $mask) {
   $mask = int($mask);
-  my @ev;
-
-  push @ev, 'in'    if ($mask & READABLE);
-  push @ev, 'out'   if ($mask & WRITABLE);
-  push @ev, 'prio'  if ($mask & PRIO);
-  push @ev, 'rdhup' if ($mask & RDHUP);
-
-  my %have = map { $_ => 1 } @ev;
-  push @ev, 'et'      if (($mask & ET)      || ($self->{edge}    && !$have{et}));
-  push @ev, 'oneshot' if (($mask & ONESHOT) || ($self->{oneshot} && !$have{oneshot}));
-
-  return \@ev;
-}
-
-sub _events_to_mask ($ev) {
-  my $m = 0;
-  $m |= READABLE if $ev->{in};
-  $m |= WRITABLE if $ev->{out};
-  $m |= PRIO     if $ev->{prio};
-  $m |= RDHUP    if $ev->{rdhup};
-  $m |= ET       if $ev->{et};
-  $m |= ONESHOT  if $ev->{oneshot};
-  $m |= ERR      if $ev->{err};
-  $m |= HUP      if $ev->{hup};
-  return $m;
+  $mask |= ET      if $self->{edge};
+  $mask |= ONESHOT if $self->{oneshot};
+  return $mask;
 }
 
 1;
@@ -178,37 +144,39 @@ __END__
 
 =head1 NAME
 
-Linux::Event::Backend::Epoll - epoll backend for Linux::Event::Loop
-
-=head1 SYNOPSIS
-
-  # Usually constructed internally by Linux::Event::Loop.
-  my $backend = Linux::Event::Backend::Epoll->new;
+Linux::Event::Backend::Epoll - Built-in XS epoll backend for Linux::Event
 
 =head1 DESCRIPTION
 
-C<Linux::Event::Backend::Epoll> is the built-in readiness backend for
-L<Linux::Event::Loop>. It translates the readiness bitmask into the event set
-expected by L<Linux::Epoll> and translates native epoll notifications back into
-readiness masks.
+C<Linux::Event::Backend::Epoll> is the built-in readiness backend used by
+L<Linux::Event::Loop>. It owns the epoll file descriptor and uses private
+L<Linux::Event::XS> helpers for kernel registration, reusable event storage,
+fd-indexed backend records, and dispatch into loop-created watchers.
+
+This module is part of the public distribution, but its internal object layout
+is private. Code should interact with it through L<Linux::Event::Loop> or the
+backend contract documented in L<Linux::Event::Backend>.
 
 =head1 CONSTRUCTOR
 
 =head2 new(%args)
 
-Recognized optional arguments:
+Create an epoll backend. Optional backend defaults are:
 
 =over 4
 
 =item * C<edge>
 
-Enable edge-triggered mode by default for all registrations.
+Register watchers in edge-triggered mode by default.
 
 =item * C<oneshot>
 
-Enable one-shot mode by default for all registrations.
+Register watchers in one-shot mode by default.
 
 =back
+
+Most users should construct a loop with C<Linux::Event-E<gt>new> instead of
+constructing the backend directly.
 
 =head1 METHODS
 
@@ -218,16 +186,21 @@ Returns C<epoll>.
 
 =head2 watch($fh, $mask, $cb, %opt)
 
-Register a filehandle with epoll and install the standardized readiness callback.
-Returns the integer file descriptor.
+Register C<$fh> for the readiness mask documented in
+L<Linux::Event::Backend/READINESS MASKS>. This method is primarily for custom
+loop/backend integration and preserves the generic backend callback ABI:
+
+  $cb->($loop, $fh, $fd, $mask, $tag)
+
+=head2 watch_watcher($fh, $mask, $watcher, %opt)
+
+Private fast path used by L<Linux::Event::Loop> for loop-created watchers. It
+avoids allocating a Perl dispatch closure per watcher. This is not a stable
+public API.
 
 =head2 modify($fh_or_fd, $mask, %opt)
 
-Modify an existing epoll registration. If the underlying C<Linux::Epoll>
-instance provides C<modify>, it is used directly. Otherwise the backend falls
-back to delete plus add.
-
-This path is especially important for C<EPOLLONESHOT> rearm.
+Update an existing registration.
 
 =head2 unwatch($fh_or_fd)
 
@@ -235,17 +208,13 @@ Remove an existing registration.
 
 =head2 run_once($loop, $timeout_s = undef)
 
-Call epoll wait once and dispatch readiness callbacks.
-
-=head1 NOTES
-
-This backend keeps a small registration table keyed by file descriptor so it can
-preserve callback, tag, and loop information across C<modify> calls.
+Wait for readiness once and dispatch any ready backend records.
 
 =head1 SEE ALSO
 
+L<Linux::Event>,
 L<Linux::Event::Loop>,
 L<Linux::Event::Backend>,
-L<Linux::Epoll>
+L<Linux::Event::XS>
 
 =cut

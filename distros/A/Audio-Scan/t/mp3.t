@@ -3,7 +3,7 @@ use strict;
 use Digest::MD5 qw(md5_hex);
 use File::Spec::Functions;
 use FindBin ();
-use Test::More tests => 396;
+use Test::More tests => 413;
 use Test::Warn;
 
 use Audio::Scan;
@@ -478,6 +478,27 @@ eval {
     }
 }
 
+# ID3v2 (general) complex TXXX edge case (github PR #10 in lms-community 
+# fork):
+# If there is a TXXX with a zero-length value AND the key for that TXXXX
+# collides with the code for an array-valued ID3v2 frame AND an instance
+# of that frame is also in the ID3v2 tag, versions before 1.11 segfaulted.
+{
+	my $segfaulted = 0;
+	eval {
+		local $SIG{SEGV} = sub {
+			$segfaulted = 1;
+			die();
+		};
+
+		Audio::Scan->scan( _f('v2.3-zero-length-txxx.mp3') );
+	};
+	
+	# Don't crash, please.  If we did, $segfaulted will be set to 1.
+	
+	ok(!$segfaulted, "TXXX key collision with array-valued frame");
+}
+
 # ID3v2.4
 {
     my $s = Audio::Scan->scan( _f('v2.4.mp3') );
@@ -507,6 +528,16 @@ eval {
 
     # XXX: 2 WOAR frames
 }
+
+# ID3v2.4 UTF-8 with GRP1
+{
+    my $s = Audio::Scan->scan_tags( _f('v2.4-utf8-grp1.mp3') );
+
+    my $tags = $s->{tags};
+
+    is( $tags->{GRP1}, 'Last Embrace', 'ID3v2.4 GRP1 ok' );
+}
+
 
 # ID3v2.4 with negative RVA2
 {
@@ -1077,6 +1108,14 @@ eval {
     is( $tags->{TCON}, 'Blues', 'v2.3 extended header ok' );
 }
 
+# v2.4 extended header
+{
+    my $s = Audio::Scan->scan_tags( _f('v2.4-ext-header.mp3') );
+    my $tags = $s->{tags};
+
+    is( $tags->{TCON}, 'Blues', 'v2.4 extended header ok' );
+}
+
 # MCDI frame
 {
     my $s = Audio::Scan->scan( _f('v2.3-mcdi.mp3') );
@@ -1301,11 +1340,25 @@ eval {
     is( $info->{vbr}, 1, 'Xing without LAME marked as VBR ok' );
 }
 
-# File with extended header bit set but no extended header
+# v2.3 file with extended header bit set but no extended header
 {
     warning_like { Audio::Scan->scan( _f('v2.3-ext-header-invalid.mp3') ); }
         [ qr/Error: Invalid ID3 extended header size/ ],
         'v2.3 invalid extended header ok';
+}
+
+# v2.4 file with extended header bit set but invalid extended header size
+{
+    warning_like { Audio::Scan->scan( _f('v2.4-ext-header-invalid.mp3') ); }
+        [ qr/Error: Invalid ID3 extended header size/ ],
+        'v2.4 invalid extended header ok';
+}
+
+# v2.4 file with extended header bit set but extended header too short
+{
+    warning_like { Audio::Scan->scan( _f('v2.4-ext-header-invalid-too-short.mp3') ); }
+        [ qr/Error: Invalid ID3 extended header - too short/ ],
+        'v2.4 extended header too short ok';
 }
 
 # Bug 15895, bad APE tag
@@ -1319,6 +1372,39 @@ eval {
 
     is( $tags->{TALB}, 'Laundry Service', 'bad APE tag ID3 TALB ok' );
     is( $tags->{MP3GAIN_MINMAX}, '123,203', 'bad APE tag MP3GAIN_MINMAX ok' );
+}
+
+# Multi-value TXXX frames (ID3v2.4 null-separated values)
+{
+    my $s = Audio::Scan->scan( _f('v2.4-txxx-multivalue.mp3') );
+    my $tags = $s->{tags};
+
+    is( ref $tags->{ALBUMARTISTS}, 'ARRAY', 'ID3v2.4 multi-value TXXX returns arrayref' );
+    is( $tags->{ALBUMARTISTS}->[0], 'Artist1', 'ID3v2.4 multi-value TXXX value 1 ok' );
+    is( $tags->{ALBUMARTISTS}->[1], 'Artist2', 'ID3v2.4 multi-value TXXX value 2 ok' );
+    is( ref $tags->{ARTISTS}, 'ARRAY', 'ID3v2.4 multi-value TXXX ARTISTS returns arrayref' );
+    is( $tags->{ARTISTS}->[0], 'TrackArtist1', 'ID3v2.4 multi-value TXXX ARTISTS value 1 ok' );
+    is( $tags->{ARTISTS}->[1], 'TrackArtist2', 'ID3v2.4 multi-value TXXX ARTISTS value 2 ok' );
+}
+
+# Multi-value TXXX with 3 values
+{
+    my $s = Audio::Scan->scan( _f('v2.4-txxx-multivalue-3.mp3') );
+    my $tags = $s->{tags};
+
+    is( ref $tags->{ALBUMARTISTS}, 'ARRAY', 'ID3v2.4 3-value TXXX returns arrayref' );
+    is( scalar @{$tags->{ALBUMARTISTS}}, 3, 'ID3v2.4 3-value TXXX has 3 elements' );
+    is( $tags->{ALBUMARTISTS}->[2], 'Artist3', 'ID3v2.4 3-value TXXX value 3 ok' );
+}
+
+# Multi-value TXXX with empty slot (tagger bug)
+{
+    my $s = Audio::Scan->scan( _f('v2.4-txxx-multivalue-empty.mp3') );
+    my $tags = $s->{tags};
+
+    is( ref $tags->{ALBUMARTISTS}, 'ARRAY', 'ID3v2.4 TXXX with empty slot returns arrayref' );
+    is( scalar @{$tags->{ALBUMARTISTS}}, 2, 'ID3v2.4 TXXX empty slot is skipped' );
+    is( $tags->{ALBUMARTISTS}->[1], 'Artist3', 'ID3v2.4 TXXX value after empty slot ok' );
 }
 
 sub _f {

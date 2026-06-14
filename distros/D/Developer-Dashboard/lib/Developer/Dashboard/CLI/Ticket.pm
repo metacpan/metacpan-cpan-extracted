@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Ticket;
 use strict;
 use warnings;
 
-our $VERSION = '4.03';
+our $VERSION = '4.16';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -21,15 +21,63 @@ our @EXPORT_OK = qw(
   build_ticket_plan
   build_workspace_plan
   list_sessions
+  registered_workspace_dir
   resolve_ticket_request
   resolve_workspace_request
   run_ticket_command
   run_workspace_command
   session_exists
+  split_workspace_change_dir_args
   ticket_environment
   workspace_environment
   tmux_command
 );
+
+# split_workspace_change_dir_args($argv)
+# Separates the workspace -c change-directory flag from the remaining argv so
+# the flag can appear before or after the workspace name.
+# Input: array reference of workspace command arguments.
+# Output: list of cleaned argv array reference and boolean change-directory flag.
+sub split_workspace_change_dir_args {
+    my ($argv) = @_;
+    die 'Workspace args must be an array reference' if ref($argv) ne 'ARRAY';
+    my $change_dir = 0;
+    my @clean;
+    for my $arg ( @{$argv} ) {
+        if ( defined $arg && $arg eq '-c' ) {
+            $change_dir = 1;
+            next;
+        }
+        push @clean, $arg;
+    }
+    return ( \@clean, $change_dir );
+}
+
+# registered_workspace_dir($name)
+# Resolves one workspace name through the same registered-paths inventory the
+# shell cdr helper uses: the path registry plus configured path aliases.
+# Input: workspace name string.
+# Output: registered directory path string, or empty string when the name is
+# not registered.
+sub registered_workspace_dir {
+    my ($name) = @_;
+    require Developer::Dashboard::PathRegistry;
+    require Developer::Dashboard::FileRegistry;
+    require Developer::Dashboard::Config;
+    my $home = $ENV{HOME} || '';
+    my @roots = grep { defined && -d } map { "$home/$_" } qw(projects src work);
+    my $paths = Developer::Dashboard::PathRegistry->new(
+        home            => $home,
+        cwd             => cwd(),
+        workspace_roots => \@roots,
+        project_roots   => \@roots,
+    );
+    my $files  = Developer::Dashboard::FileRegistry->new( paths => $paths );
+    my $config = Developer::Dashboard::Config->new( files => $files, paths => $paths );
+    $paths->register_named_paths( $config->path_aliases );
+    my $target = eval { $paths->resolve_dir($name) };
+    return defined $target ? $target : '';
+}
 
 # resolve_workspace_request(%args)
 # Resolves the target workspace reference from argv or the current environment.
@@ -410,8 +458,26 @@ sub build_ticket_plan {
 sub run_workspace_command {
     my (%args) = @_;
     my $tmux = $args{tmux} || \&tmux_command;
+    my ( $workspace_args, $change_dir ) = split_workspace_change_dir_args( $args{args} || [] );
+    if ($change_dir) {
+        my $workspace = resolve_workspace_request(
+            args          => $workspace_args,
+            env_workspace => $args{env_workspace},
+            env_ticket    => $args{env_ticket},
+        );
+        my $resolver = $args{resolve_dir} || \&registered_workspace_dir;
+        my $target = $resolver->($workspace);
+        die "Workspace '$workspace' is not a registered dashboard path, so -c has no directory to change into\n"
+          if !defined $target || $target eq '';
+        die "Workspace '$workspace' resolves to '$target', which is not a directory\n"
+          if !-d $target;
+        chdir $target
+          or die "Unable to change directory to '$target' for workspace '$workspace': $!\n";
+        $args{cwd} = $target;
+    }
     my $plan = build_workspace_plan(
         %args,
+        args => $workspace_args,
         tmux => $tmux,
     );
 

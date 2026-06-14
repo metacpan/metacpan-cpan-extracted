@@ -2,7 +2,7 @@ package DBIx::QuickORM::ORM;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use Carp qw/croak/;
 
@@ -13,10 +13,8 @@ use Object::HashBase qw{
     +db
     <schema
     <autofill
-    <row_class
     <created
     <compiled
-    cache_class
     <default_handle_class
     <row_manager
 
@@ -68,19 +66,11 @@ The schema object. Either this or C<autofill> is required.
 
 When true, missing schema metadata is introspected from the live database.
 
-=item row_class
-
-The class used for row objects.
-
 =item created
 
 =item compiled
 
 Provenance metadata describing where this ORM came from.
-
-=item cache_class
-
-Optional class used to build the per-connection cache.
 
 =item default_handle_class
 
@@ -102,12 +92,10 @@ The active connection, created lazily and cached here.
 
 =over 4
 
-=item $db = $orm->db
+=item $orm->init
 
-=item $orm->db($db)
-
-Gets the database definition, or sets it once. Croaks on a second set or when
-fetched before being set.
+Object construction hook invoked by L<Object::HashBase>. Validates that a
+schema or autofill was provided. Not called directly.
 
 =cut
 
@@ -119,6 +107,17 @@ sub init {
     croak "You must either provide the 'schema' attribute or enable 'autofill'"
         unless $self->{+SCHEMA} || $self->{+AUTOFILL};
 }
+
+=pod
+
+=item $db = $orm->db
+
+=item $orm->db($db)
+
+Gets the database definition, or sets it once. Croaks on a second set or when
+fetched before being set.
+
+=cut
 
 sub db {
     my $self = shift;
@@ -147,7 +146,6 @@ sub connect {
     croak "'db' has not been set" unless $self->{+DB};
 
     my %params = (orm => $self);
-    $params{cache} = $self->{+CACHE_CLASS}->new() if $self->{+CACHE_CLASS};
 
     $params{+DEFAULT_HANDLE_CLASS} = $self->{+DEFAULT_HANDLE_CLASS};
 

@@ -3,11 +3,13 @@ package Developer::Dashboard::InternalCLI;
 use strict;
 use warnings;
 
-our $VERSION = '4.03';
+our $VERSION = '4.16';
 
 use Cwd qw(abs_path);
 use File::Basename qw(dirname);
 use File::Spec;
+use Developer::Dashboard::Platform qw(is_windows);
+use Time::HiRes qw(sleep);
 
 our $MODULE_SOURCE_PATH = File::Spec->rel2abs(__FILE__);
 
@@ -66,6 +68,17 @@ sub helper_path {
     return File::Spec->catfile( _helper_install_root($paths), $name );
 }
 
+# dashboard_core_path(%args)
+# Resolves the shared staged _dashboard-core helper path under the home runtime
+# DD helper namespace root.
+# Input: path registry object.
+# Output: _dashboard-core helper file path string.
+sub dashboard_core_path {
+    my (%args) = @_;
+    my $paths = $args{paths} || die 'Missing paths registry';
+    return File::Spec->catfile( _helper_install_root($paths), '_dashboard-core' );
+}
+
 # helper_content($name)
 # Loads one shipped private helper executable source body from the helper asset
 # directory.
@@ -85,11 +98,12 @@ sub helper_content {
 # ensure_helpers(%args)
 # Seeds the built-in private helper executables into the home runtime DD helper
 # namespace root.
-# Input: path registry object.
+# Input: path registry object plus optional helper names to skip.
 # Output: array reference of written helper file paths.
 sub ensure_helpers {
     my (%args) = @_;
     my $paths = $args{paths} || die 'Missing paths registry';
+    my %skip = map { $_ => 1 } grep { defined $_ && $_ ne '' } @{ $args{skip_names} || [] };
 
     my @written;
     $paths->ensure_dir( _helper_parent_root($paths) );
@@ -100,6 +114,7 @@ sub ensure_helpers {
     }
 
     for my $name ( helper_names() ) {
+        next if $skip{$name};
         my $target = helper_path( paths => $paths, name => $name );
         next if !_stage_managed_helper( paths => $paths, name => $name, target => $target );
         $paths->secure_file_permissions( $target, executable => 1 );
@@ -112,6 +127,28 @@ sub ensure_helpers {
     );
     _remove_legacy_managed_flat_helpers( paths => $paths );
 
+    return \@written;
+}
+
+# ensure_dashboard_core(%args)
+# Stages only the shared _dashboard-core helper under the managed DD helper
+# namespace root.
+# Input: path registry object.
+# Output: array reference containing the core helper path when written, or an
+# empty array reference when it was already current or intentionally deferred.
+sub ensure_dashboard_core {
+    my (%args) = @_;
+    my $paths = $args{paths} || die 'Missing paths registry';
+    my @written;
+    $paths->ensure_dir( _helper_parent_root($paths) );
+    $paths->ensure_dir( _helper_install_root($paths) );
+    my $core_target = dashboard_core_path( paths => $paths );
+    if ( !_managed_helper_file_current( $core_target, '_dashboard-core' ) ) {
+        if ( _stage_managed_helper( paths => $paths, name => '_dashboard-core', target => $core_target ) ) {
+            $paths->secure_file_permissions( $core_target, executable => 1 );
+            push @written, $core_target;
+        }
+    }
     return \@written;
 }
 
@@ -132,7 +169,7 @@ sub ensure_helper {
     $paths->ensure_dir( _helper_install_root($paths) );
 
     if ( _helper_uses_dashboard_core($name) ) {
-        my $core_target = File::Spec->catfile( _helper_install_root($paths), '_dashboard-core' );
+        my $core_target = dashboard_core_path( paths => $paths );
         if ( !_managed_helper_file_current( $core_target, '_dashboard-core' ) ) {
             if ( _stage_managed_helper( paths => $paths, name => '_dashboard-core', target => $core_target ) ) {
                 $paths->secure_file_permissions( $core_target, executable => 1 );
@@ -142,6 +179,12 @@ sub ensure_helper {
     }
 
     my $target = helper_path( paths => $paths, name => $name );
+    if ( is_windows() && _helper_uses_dashboard_core($name) && -f $target ) {
+        open my $existing_fh, '<:raw', $target or die "Unable to read $target: $!";
+        my $existing = do { local $/; <$existing_fh> };
+        close $existing_fh or die "Unable to close $target: $!";
+        return \@written if _is_dashboard_managed_helper( $existing, $name );
+    }
     if ( !_managed_helper_file_current( $target, $name ) ) {
         if ( _stage_managed_helper( paths => $paths, name => $name, target => $target ) ) {
             $paths->secure_file_permissions( $target, executable => 1 );
@@ -182,10 +225,53 @@ sub _stage_managed_helper {
         return 0 if !_is_dashboard_managed_helper( $existing, $name );
         require Developer::Dashboard::SeedSync;
         return 0 if Developer::Dashboard::SeedSync::same_content_md5( $existing, $content );
+        return 0 if _should_defer_windows_helper_refresh( $name, $target );
     }
 
     _write_helper_atomically( $target, $content );
     return 1;
+}
+
+# _should_defer_windows_helper_refresh($name, $target)
+# Skips replacing Windows helper files that can still be locked by the active
+# helper chain during command startup. The shared staged _dashboard-core helper
+# is always deferred on Windows, and the currently running wrapper helper is
+# also preserved until the next refresh pass.
+# Input: helper name string and final helper target path.
+# Output: boolean true when the Windows helper refresh should be deferred.
+sub _should_defer_windows_helper_refresh {
+    my ( $name, $target ) = @_;
+    return 0 if !is_windows();
+    return 1 if defined $name && $name eq '_dashboard-core';
+    return _running_helper_matches_target($target);
+}
+
+# _running_helper_matches_target($target)
+# Detects whether one helper target resolves to the same path as the currently
+# running staged helper process so Windows helper refresh can avoid replacing a
+# locked executable in place.
+# Input: helper target path.
+# Output: boolean true when the target is the active running helper.
+sub _running_helper_matches_target {
+    my ($target) = @_;
+    return 0 if !defined $target || $target eq '';
+    my $running = $ENV{DEVELOPER_DASHBOARD_RUNNING_HELPER};
+    return 0 if !defined $running || $running eq '';
+    return _normalized_helper_path($running) eq _normalized_helper_path($target) ? 1 : 0;
+}
+
+# _normalized_helper_path($path)
+# Canonicalizes one helper path for Windows-safe same-file comparisons between
+# the running helper environment marker and staged helper targets.
+# Input: helper path string.
+# Output: normalized lower-cased helper path string.
+sub _normalized_helper_path {
+    my ($path) = @_;
+    return '' if !defined $path || $path eq '';
+    my $resolved = eval { abs_path($path) };
+    $path = defined $resolved && $resolved ne '' ? $resolved : $path;
+    $path = File::Spec->canonpath($path);
+    return lc $path;
 }
 
 # _write_helper_atomically($target, $content)
@@ -199,12 +285,50 @@ sub _write_helper_atomically {
     open my $fh, '>:raw', $temp or die "Unable to write $temp: $!";
     print {$fh} $content;
     close $fh or die "Unable to close $temp: $!";
-    rename $temp, $target or do {
-        my $error = $!;
-        unlink $temp;
-        die "Unable to rename $temp to $target: $error";
-    };
+    _replace_helper_file( $temp, $target );
     return 1;
+}
+
+# _replace_helper_file($source, $target)
+# Replaces one staged helper file with a prepared temporary payload, including
+# the Windows retry path needed when rename cannot overwrite an existing file.
+# Input: temporary helper path and final helper target path.
+# Output: true after the helper file is fully in place.
+sub _replace_helper_file {
+    my ( $source, $target ) = @_;
+    return 1 if _rename_path( $source, $target );
+
+    my $error = $!;
+    if ( is_windows() && -e $target ) {
+        _unlink_path($target)
+          or die "Unable to remove $target before Windows helper replace retry: $!";
+        sleep 0.05;
+        return 1 if _rename_path( $source, $target );
+        $error = $!;
+    }
+
+    _unlink_path($source) if -e $source;
+    die "Unable to rename $source to $target: $error";
+}
+
+# _rename_path($source, $target)
+# Wraps rename so helper-staging tests can simulate Windows replacement
+# failures without overriding Perl's global rename behavior.
+# Input: source helper path and destination helper path.
+# Output: true when the rename succeeds, false otherwise.
+sub _rename_path {
+    my ( $source, $target ) = @_;
+    return rename $source, $target;
+}
+
+# _unlink_path($path)
+# Wraps unlink so helper-staging tests can observe cleanup and replacement
+# retries without mutating the global filesystem behavior.
+# Input: one filesystem path string.
+# Output: true when the path was removed, false otherwise.
+sub _unlink_path {
+    my ($path) = @_;
+    return unlink $path;
 }
 
 # _remove_retired_managed_helper(%args)
@@ -269,6 +393,18 @@ BLOCK
         my $managed_block = <<"BLOCK";
 my \$command = '$name';
 my \$core = File::Spec->catfile( \$Bin, '_dashboard-core' );
+my \$running_helper = eval { require Cwd; Cwd::abs_path(\$0) } || \$0;
+\$ENV{DEVELOPER_DASHBOARD_RUNNING_HELPER} ||= \$running_helper;
+if (is_windows()) {
+    eval {
+        require Developer::Dashboard::InternalCLI;
+        my \$shipped_core = Developer::Dashboard::InternalCLI::_helper_asset_path('_dashboard-core');
+        \$core = \$shipped_core if defined \$shipped_core && \$shipped_core ne q{} && -f \$shipped_core;
+        1;
+    } or do {
+        # Keep the staged sibling core path when the shipped helper asset is unavailable.
+    };
+}
 if ( !defined \$ENV{DEVELOPER_DASHBOARD_REPO_LIB} || \$ENV{DEVELOPER_DASHBOARD_REPO_LIB} eq q{} ) {
     for my \$inc (\@INC) {
         next if !defined \$inc || \$inc eq q{};

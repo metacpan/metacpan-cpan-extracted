@@ -15,6 +15,7 @@ plan skip_all => 'Scorecard guardrails are source-tree-only checks'
 
 ok( _git_tracks('LICENSE'), 'root LICENSE is tracked for Scorecard license detection' );
 ok( _git_tracks('SECURITY.md'), 'root SECURITY.md is tracked for Scorecard security-policy detection' );
+ok( _git_tracks('SECURITY_CHECKS.md'), 'root SECURITY_CHECKS.md is tracked so OWASP and release audit tests read the same repo state on CI' );
 ok( _git_tracks('.github/dependabot.yml'), 'Dependabot config is tracked for Scorecard dependency-update-tool detection' );
 ok( _git_tracks('.github/workflows/codeql.yml'), 'CodeQL workflow is tracked for Scorecard SAST detection' );
 ok( _git_tracks('.github/workflows/package-ghcr.yml'), 'GHCR packaging workflow is tracked for Scorecard packaging detection' );

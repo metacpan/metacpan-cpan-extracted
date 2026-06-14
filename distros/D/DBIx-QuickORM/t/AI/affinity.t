@@ -1,4 +1,4 @@
-use Test2::V0;
+use Test2::V0 '!meta', '!pass';
 
 # Pure-function tests for DBIx::QuickORM::Affinity. No database needed.
 #

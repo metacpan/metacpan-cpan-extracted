@@ -2,7 +2,7 @@ NAME
     BATsh - Bilingual Shell for cmd.exe and bash in one script
 
 VERSION
-    Version 0.04
+    Version 0.05
 
 SYNOPSIS
       use BATsh;
@@ -179,6 +179,20 @@ SH MODE
       ${#VAR}  -- string length
       source / . file
 
+INSTALLATION
+    To install from CPAN:
+
+        cpan BATsh
+
+    To install from a distribution tarball:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    No non-core dependencies are required.
+
 REQUIREMENTS
     Perl 5.005_03 or later. Core modules only. No external shell required.
 
@@ -193,11 +207,11 @@ BUGS AND LIMITATIONS
 
     The built-in CMD interpreter does not implement:
 
-    *   Variable substring "%VAR:~n,m%" and substitution "%VAR:str1=str2%"
-        expansion.
-
-    *   Dynamic pseudo-variables "%RANDOM%", "%DATE%", "%TIME%", "%CD%",
-        "%CMDCMDLINE%", and "%ERRORLEVEL%" used as a variable reference.
+    Variable substring "%VAR:~n,m%" / "%VAR:~n%" / "%VAR:~-n%" and
+    substitution "%VAR:str1=str2%" / "%VAR:*str1=str2%" are supported as of
+    version 0.05. Dynamic pseudo-variables "%DATE%" (YYYY-MM-DD), "%TIME%"
+    (HH:MM:SS.cc), "%CD%", "%RANDOM%" (0-32767), "%ERRORLEVEL%", and
+    "%CMDCMDLINE%" are also supported as of version 0.05.
 
     *   "FOR /F" with "usebackq" backtick-quoted commands on Windows (the
         "cmd /c" subprocess path is untested on Windows).

@@ -2,6 +2,10 @@ vim:si
 Revision history for Perl extension Business::KontoCheck.
 The complete history can be found in 0_history.txt (in german).
 
+6.16:
+   - new data file blz.lut, corrections in the test files
+   - fix KontoCheck.xs for recent perl versions
+
 6.15:
    - new data file blz.lut, corrections in the test files
    - fix for routines: 8-char default entry has higher precedence than 11-char entries

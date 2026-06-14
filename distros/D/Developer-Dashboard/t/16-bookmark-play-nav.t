@@ -63,7 +63,7 @@ my ($transient_post_code, undef, $transient_post_body) = @{ $app->handle(
     headers     => { host => '127.0.0.1' },
 ) };
 is( $transient_post_code, 200, 'transient bookmark play source route responds' );
-my ($transient_play_url) = $transient_post_body =~ m{<a href="([^"]+)" id="play-url">Play</a>};
+my ($transient_play_url) = $transient_post_body =~ m{<button[^>]*id="play-button"[^>]*data-play-url="([^"]+)"};
 ok( $transient_play_url, 'transient bookmark play url extracted from editor response' );
 my ($transient_play_query) = $transient_play_url =~ /\?(.*)\z/;
 my ($transient_play_code, undef, $transient_play_body) = @{ $app->handle(

@@ -10,7 +10,7 @@
  * #  Verwendung in anderen Programmen bzw. Programmiersprachen benutzt     #
  * #  werden.                                                               #
  * #                                                                        #
- * #  Copyright (C) 2002-2023 Michael Plugge <konto_check@yahoo.com>        #
+ * #  Copyright (C) 2002-2026 Michael Plugge <konto_check@yahoo.com>        #
  * #                                                                        #
  * #  Dieses Programm ist freie Software; Sie dürfen es unter den           #
  * #  Bedingungen der GNU Lesser General Public License, wie von der Free   #

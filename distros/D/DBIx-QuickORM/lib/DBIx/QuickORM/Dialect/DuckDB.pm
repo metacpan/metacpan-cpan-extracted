@@ -2,7 +2,7 @@ package DBIx::QuickORM::Dialect::DuckDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use DBD::DuckDB;
 use DBI ();
@@ -61,12 +61,6 @@ DuckDB has no async query support; the C<async_*> methods C<croak>.
 
 =over 4
 
-=item $ver = $dialect->fallback_ver
-
-=item $ver = $dialect->oldest_ver
-
-=item $ver = $dialect->latest_ver
-
 =item $driver = $dialect->dbi_driver
 
 =item $name = $dialect->dialect_name
@@ -81,10 +75,8 @@ DuckDB has no async query support; the C<async_*> methods C<croak>.
 
 =item $bool = $dialect->async_cancel_supported
 
-=item $bool = $dialect->version_search
-
-Feature flags and constants describing the DuckDB dialect. DuckDB has no
-versioned dialect variants and does not support async queries.
+Feature flags and constants describing the DuckDB dialect. DuckDB does not
+support async queries.
 
 =item $dialect->async_prepare_args
 
@@ -104,9 +96,6 @@ The DuckDB engine version (from C<SELECT version()>).
 
 # {{{ Feature flags, version info, and async stubs
 
-sub fallback_ver { 1 }
-sub oldest_ver   { 1 }
-sub latest_ver   { 1 }
 sub dbi_driver   { 'DBD::DuckDB' }
 sub dialect_name { 'DuckDB' }
 
@@ -118,7 +107,7 @@ sub supports_returning_delete { 1 }
 
 # DuckDB binds binary data as BLOB; SQL_BINARY (the base default) makes
 # DBD::DuckDB try duckdb_bind_varchar, which fails on binary bytes.
-sub quote_binary_data { DBI::SQL_BLOB() }
+sub quote_binary_data { my $self = shift; DBI::SQL_BLOB() }
 
 # DuckDB native types. Returns the native type name for a supported logical
 # type, undef otherwise (used by type modules to pick an affinity).
@@ -142,8 +131,6 @@ sub async_prepare_args     { croak "Dialect '" . $_[0]->dialect_name . "' does n
 sub async_ready            { croak "Dialect '" . $_[0]->dialect_name . "' does not support async queries" }
 sub async_result           { croak "Dialect '" . $_[0]->dialect_name . "' does not support async queries" }
 sub async_cancel           { croak "Dialect '" . $_[0]->dialect_name . "' does not support async queries" }
-
-sub version_search { 0 }
 
 sub db_version {
     my $self = shift;
@@ -266,6 +253,8 @@ sub build_tables_from_db {
 
     my %tables;
     while (my ($tname, $type) = $sth->fetchrow_array) {
+        next if $params{autofill}->skip(table => $tname);
+
         my $table = {name => $tname, db_name => $tname, is_temp => ($type eq 'LOCAL TEMPORARY' ? 1 : 0)};
         my $class = $TABLE_TYPES{$type} // 'DBIx::QuickORM::Schema::Table';
         $params{autofill}->hook(pre_table => {table => $table, class => \$class});
@@ -280,8 +269,10 @@ sub build_tables_from_db {
 
         $params{autofill}->hook(post_table => {table => $table, class => \$class});
 
-        $tables{$tname} = $class->new($table);
-        $params{autofill}->hook(table => {table => $tables{$tname}});
+        # Hooks may rename the table; key by the final name.
+        my $final_name = $table->{name};
+        $tables{$final_name} = $class->new($table);
+        $params{autofill}->hook(table => {table => $tables{$final_name}});
     }
 
     return \%tables;
@@ -362,6 +353,8 @@ sub build_columns_from_db {
 
     my %columns;
     while (my $res = $sth->fetchrow_hashref) {
+        next if $params{autofill}->skip(column => ($table, $res->{name}));
+
         my $col = {};
 
         $params{autofill}->hook(pre_column => {column => $col, table_name => $table, column_info => $res});
@@ -409,7 +402,10 @@ sub _generated_columns {
     return unless defined $ddl && length $ddl;
 
     my %out;
-    while ($ddl =~ /(?:^|[(,])\s*("[^"]+"|`[^`]+`|\w+)\b[^,]*?\bGENERATED\s+ALWAYS\s+AS\s*\(/sgi) {
+    # The \b belongs inside the bare-word alternative: after a closing quote
+    # there is no word boundary to match, so a trailing \b would reject every
+    # quoted column name.
+    while ($ddl =~ /(?:^|[(,])\s*("[^"]+"|`[^`]+`|\w+\b)[^,]*?\bGENERATED\s+ALWAYS\s+AS\s*\(/sgi) {
         my $name = $1;
         $name =~ s/\A["`]|["`]\z//g;
         $out{lc $name} = 1;

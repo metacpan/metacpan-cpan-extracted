@@ -216,6 +216,11 @@ my ( $apps_code, undef, undef, $apps_headers ) = @{ $app->handle( path => '/apps
 is( $apps_code, 302, '/apps redirects to default index bookmark' );
 is( $apps_headers->{Location}, '/app/index', '/apps uses index bookmark as default target' );
 
+my ( $apps_direct_code, undef, $apps_direct_body, $apps_direct_headers ) = @{ $app->apps_redirect_response() };
+is( $apps_direct_code, 302, 'direct /apps compatibility response returns a redirect' );
+is( $apps_direct_headers->{Location}, '/app/index', 'direct /apps compatibility response keeps the canonical index target' );
+like( $apps_direct_body, qr/Redirecting/, 'direct /apps compatibility response keeps the redirect body' );
+
 my $token = uri_escape( $store->encode_page($page) );
 my ( $blocked_code, $blocked_type, $blocked_body ) = @{ $app->handle( path => '/', query => "token=$token", remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' } ) };
 is( $blocked_code, 403, 'transient edit route is denied by default' );
@@ -242,7 +247,7 @@ my ( $saved_edit_code, undef, $saved_edit_body ) = @{ $app->handle( path => '/ap
 is( $saved_edit_code, 200, 'saved edit route responds with success' );
 like( $saved_edit_body, qr/Right Click Copy &amp; Share or Bookmark This Page/, 'saved edit route includes top chrome links' );
 like( $saved_edit_body, qr{<form method="post" action="/app/sample/edit" id="instruction-form">}, 'saved edit route posts back to the named bookmark edit path' );
-like( $saved_edit_body, qr{<a href="/app/sample" id="play-url">Play</a>}, 'saved edit route exposes a saved-page play link instead of a transient token url' );
+like( $saved_edit_body, qr{<button type="button" class="chrome-button" id="play-button" data-play-url="/app/sample">Play</button>}, 'saved edit route exposes a saved-page play button that submits the split editor source into render mode' );
 my ( $saved_edit_post_without_instruction_code, undef, $saved_edit_post_without_instruction_body ) = @{ $app->handle(
     path        => '/app/sample/edit',
     method      => 'POST',
@@ -677,8 +682,15 @@ PAGE
         my ( $stop_code, undef, $stop_body ) = @{ $app->handle( path => '/ajax/singleton/stop', query => 'singleton=BROWSER-STOP', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' } ) };
         is( $stop_code, 204, 'singleton stop route returns no content after lifecycle cleanup' );
         is( $stop_body, '', 'singleton stop route keeps the response body empty' );
+        my ( $direct_stop_code, undef, $direct_stop_body ) = @{ $app->ajax_singleton_stop_response( query => 'singleton=BROWSER-STOP' ) };
+        is( $direct_stop_code, 204, 'direct singleton stop response returns no content after lifecycle cleanup' );
+        is( $direct_stop_body, '', 'direct singleton stop response keeps the response body empty' );
     }
-    is_deeply( \@patterns, ['^dashboard ajax: BROWSER-STOP$'], 'singleton stop route targets the matching saved ajax worker process title' );
+    is_deeply(
+        \@patterns,
+        [ '^dashboard ajax: BROWSER-STOP$', '^dashboard ajax: BROWSER-STOP$' ],
+        'singleton stop route and direct response target the matching saved ajax worker process title',
+    );
 }
 
 {

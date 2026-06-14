@@ -1,12 +1,12 @@
 {
     "name" : "mb",
-    "version" : "0.62",
+    "version" : "0.63",
     "abstract" : "Can easy script in Big5, Big5-HKSCS, GBK, Sjis(also CP932), UHC, UTF-8, ...",
     "author" : [
-        "ina <ina@cpan.org>"
+        "ina <ina.cpan@gmail.com>"
     ],
     "dynamic_config" : 1,
-    "generated_by" : "pmake.bat",
+    "generated_by" : "pmake.bat version 0.37",
     "license" : [
         "perl_5"
     ],
@@ -31,33 +31,33 @@
     "prereqs" : {
         "build" : {
             "requires" : {
-                "perl" : "5.00503",
-                "strict" : "1.01"
+                "ExtUtils::MakeMaker" : "5.4302",
+                "perl" : "5.00503"
             }
         },
         "configure" : {
             "requires" : {
-                "perl" : "5.00503",
-                "strict" : "1.01"
+                "ExtUtils::MakeMaker" : "5.4302",
+                "perl" : "5.00503"
             }
         },
         "runtime" : {
             "requires" : {
-                "perl" : "5.00503",
-                "strict" : "1.01"
+                "ExtUtils::MakeMaker" : "5.4302",
+                "perl" : "5.00503"
             }
         },
         "test" : {
             "requires" : {
-                "perl" : "5.00503",
-                "strict" : "1.01"
+                "ExtUtils::MakeMaker" : "5.4302",
+                "perl" : "5.00503"
             }
         }
     },
     "provides" : {
         "mb" : {
             "file" : "lib/mb.pm",
-            "version" : "0.62"
+            "version" : "0.63"
         }
     }
 }

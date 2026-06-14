@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-for my $m (qw(Linux::Epoll Linux::Event::Clock Linux::Event::Timer)) {
+for my $m (qw(Linux::Event::Clock Linux::Event::Timer)) {
   eval "require $m; 1" or plan skip_all => "$m not available: $@";
 }
 

@@ -23,6 +23,14 @@ do_for_all_dbs {
     ok(my $orm = orm('my_orm')->connect, "Got a connection");
     my $h = $orm->handle('example');
     ok(my $row = $h->insert({name => 'a'}), "Inserted a row");
+
+    # Upsert is built on ON CONFLICT, which PostgreSQL gained in 9.5. Older
+    # servers cannot run these statements at all.
+    if (pg_older_than('9.5')) {
+        note "Skipping upsert on " . curname() . " (ON CONFLICT requires PostgreSQL 9.5)";
+        return;
+    }
+
     my $row2 = $h->upsert({id => $row->field('id'), name => 'b'});
     ref_is($row, $row2, "Same row ref");
     is($row->field('name'), "b", "Upsert!");

@@ -1,5 +1,18 @@
 Revision history for Net-CIDR-Set
 
+0.22      2026-06-13 14:44:25+01:00 Europe/London
+  [Toolchain]
+  - Set the static install flag
+
+  - Adjusted build prerequisites to be recommended instead of required.
+
+  - Sign distribution with SigStore.
+
+  [Tests]
+  - Added author tests.
+
+  - Update minimum prereqs for some tests.
+
 0.21      2026-06-02 17:45:44+01:00 Europe/London
   [Security]
   - Improved strictness of IP address (CVE-2026-49940) and netmask parsing (CVE-2026-49942).

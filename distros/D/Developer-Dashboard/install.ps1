@@ -400,13 +400,74 @@ function Get-RemoteJson {
     return ($jsonText | ConvertFrom-Json)
 }
 
+function Get-WindowsBootstrapArchitecture {
+    # Purpose: resolve the effective Windows CPU architecture for bootstrap package selection.
+    # Input: the current process and WOW64 environment variables exposed by Windows.
+    # Output: returns one of arm64, x64, or x86.
+    $rawArchitecture = @(
+        $env:PROCESSOR_ARCHITEW6432,
+        $env:PROCESSOR_ARCHITECTURE
+    ) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Select-Object -First 1
+
+    if ([string]::IsNullOrWhiteSpace($rawArchitecture)) {
+        $rawArchitecture = ''
+    }
+
+    switch ($rawArchitecture.ToUpperInvariant()) {
+        'ARM64' { return 'arm64' }
+        'AMD64' { return 'x64' }
+        'X86'   { return 'x86' }
+        default {
+            if ([Environment]::Is64BitOperatingSystem) {
+                return 'x64'
+            }
+            return 'x86'
+        }
+    }
+}
+
+function Add-ProcessPathSegment {
+    # Purpose: prepend one directory to the current process PATH once without duplication.
+    # Input: one directory path string.
+    # Output: returns nothing after PATH is updated in-process when needed.
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$PathSegment
+    )
+
+    if ([string]::IsNullOrWhiteSpace($PathSegment) -or -not (Test-Path $PathSegment)) {
+        return
+    }
+
+    $currentSegments = @()
+    if (-not [string]::IsNullOrWhiteSpace($env:PATH)) {
+        $currentSegments = $env:PATH -split ';'
+    }
+    if ($currentSegments -contains $PathSegment) {
+        return
+    }
+
+    $env:PATH = if ($currentSegments.Count -gt 0) {
+        "$PathSegment;$env:PATH"
+    }
+    else {
+        $PathSegment
+    }
+}
+
 function Resolve-StrawberryPerlMsiUrl {
-    # Purpose: resolve the latest 64-bit Strawberry Perl MSI URL from the official release feed.
+    # Purpose: resolve the latest supported Strawberry Perl MSI URL from the official release feed.
     # Input: none.
-    # Output: returns an https MSI URL string or throws when no supported release is available.
+    # Output: returns an https MSI URL string or throws when no supported release is available for the active Windows architecture.
+    $bootstrapArchitecture = Get-WindowsBootstrapArchitecture
+    $wantedArchname = switch ($bootstrapArchitecture) {
+        'arm64' { 'MSWin32-x64-multi-thread' }
+        'x64'   { 'MSWin32-x64-multi-thread' }
+        default { 'MSWin32-x86-multi-thread-64int' }
+    }
     $releases = Get-RemoteJson -Uri 'https://strawberryperl.com/releases.json' -Label 'Strawberry Perl releases feed'
     foreach ($release in $releases) {
-        if ($release.archname -ne 'MSWin32-x64-multi-thread') {
+        if ($release.archname -ne $wantedArchname) {
             continue
         }
 
@@ -416,15 +477,16 @@ function Resolve-StrawberryPerlMsiUrl {
         }
     }
 
-    throw 'Unable to resolve a 64-bit Strawberry Perl MSI URL from the official release feed.'
+    throw "Unable to resolve a Strawberry Perl MSI URL for Windows architecture $bootstrapArchitecture from the official release feed."
 }
 
 function Resolve-GitForWindowsInstallerUrl {
-    # Purpose: resolve the current 64-bit Git for Windows installer URL from the latest release page.
+    # Purpose: resolve the current Git for Windows installer URL for the active Windows architecture from the latest release page.
     # Input: none.
     # Output: returns an https EXE URL string or throws when the latest release page no longer exposes the expected asset.
     Set-TlsSecurityProtocol
 
+    $bootstrapArchitecture = Get-WindowsBootstrapArchitecture
     $releaseUrl = 'https://github.com/git-for-windows/git/releases/latest'
     $releasePage = ''
     try {
@@ -438,33 +500,85 @@ function Resolve-GitForWindowsInstallerUrl {
         $releasePage = Get-RemoteText -Uri $releaseUrl -Label 'Git for Windows latest release page'
     }
 
-    if ($releasePage -match 'Git-[0-9][^"''<]*-64-bit\.exe') {
+    $assetPattern = if ($bootstrapArchitecture -eq 'arm64') {
+        'Git-[0-9][^"''<]*-arm64\.exe'
+    }
+    else {
+        'Git-[0-9][^"''<]*-64-bit\.exe'
+    }
+
+    if ($releasePage -match $assetPattern) {
         $assetName = $matches[0]
         if ($releaseUrl -match '/tag/([^/?#]+)') {
             return ('https://github.com/git-for-windows/git/releases/download/{0}/{1}' -f $matches[1], $assetName)
         }
     }
 
-    throw 'Unable to resolve the latest 64-bit Git for Windows installer URL from the release page.'
+    throw "Unable to resolve the latest Git for Windows installer URL for Windows architecture $bootstrapArchitecture from the release page."
 }
 
-function Resolve-NodeLtsMsiUrl {
-    # Purpose: resolve the latest Windows x64 Node.js LTS MSI URL from the official Node.js release index.
+function Resolve-NodeLtsPackage {
+    # Purpose: resolve the latest supported Node.js LTS package for the active Windows architecture.
     # Input: none.
-    # Output: returns an https MSI URL string or throws when no supported LTS release is available.
+    # Output: returns a hash table describing the official package kind, url, version, and architecture.
+    $bootstrapArchitecture = Get-WindowsBootstrapArchitecture
     $releases = Get-RemoteJson -Uri 'https://nodejs.org/dist/index.json' -Label 'Node.js release index'
     foreach ($release in $releases) {
         if (-not $release.lts) {
             continue
         }
-        if ($release.files -notcontains 'win-x64-msi') {
-            continue
-        }
 
-        return ('https://nodejs.org/dist/{0}/node-{1}-x64.msi' -f $release.version, $release.version)
+        if ($bootstrapArchitecture -eq 'arm64') {
+            if ($release.files -contains 'win-arm64-zip') {
+                return @{
+                    kind         = 'zip'
+                    architecture = 'arm64'
+                    version      = $release.version
+                    url          = ('https://nodejs.org/dist/{0}/node-{1}-win-arm64.zip' -f $release.version, $release.version)
+                }
+            }
+        }
+        else {
+            if ($release.files -contains 'win-x64-msi') {
+                return @{
+                    kind         = 'msi'
+                    architecture = 'x64'
+                    version      = $release.version
+                    url          = ('https://nodejs.org/dist/{0}/node-{1}-x64.msi' -f $release.version, $release.version)
+                }
+            }
+        }
     }
 
-    throw 'Unable to resolve a Windows x64 Node.js LTS MSI URL from the official release index.'
+    throw "Unable to resolve a supported Node.js LTS package for Windows architecture $bootstrapArchitecture from the official release index."
+}
+
+function Install-PortableNodeZip {
+    # Purpose: install the official Node.js Windows ZIP fallback into the user-space dashboard runtime root.
+    # Input: the downloaded Node.js ZIP path plus the dashboard install root.
+    # Output: returns the stable node bin directory path after extraction and PATH activation.
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ZipPath,
+        [Parameter(Mandatory = $true)]
+        [string]$TargetInstallRoot
+    )
+
+    $extractRoot = Join-Path $TargetInstallRoot 'nodejs'
+    if (Test-Path $extractRoot) {
+        Remove-Item -Recurse -Force $extractRoot
+    }
+    $null = New-Item -ItemType Directory -Path $extractRoot -Force
+
+    Expand-Archive -LiteralPath $ZipPath -DestinationPath $extractRoot -Force
+    $nodeRoot = Get-ChildItem -Path $extractRoot -Directory | Select-Object -First 1
+    if (-not $nodeRoot) {
+        throw "Node.js ZIP fallback at $ZipPath did not extract a runtime directory"
+    }
+
+    $nodeBin = $nodeRoot.FullName
+    Add-ProcessPathSegment -PathSegment $nodeBin
+    return $nodeBin
 }
 
 function Install-WindowsPackageFallback {
@@ -504,10 +618,15 @@ function Install-WindowsPackageFallback {
             return
         }
         'OpenJS.NodeJS.LTS' {
-            $uri = Resolve-NodeLtsMsiUrl
+            $nodePackage = Resolve-NodeLtsPackage
+            $uri = $nodePackage.url
             $installerPath = Join-Path $tempRoot ([IO.Path]::GetFileName($uri))
             Write-Host "Downloading official Node.js LTS MSI to $installerPath"
             Download-RemoteFile -Uri $uri -DestinationPath $installerPath -Label 'Node.js LTS fallback installer download'
+            if ($nodePackage.kind -eq 'zip') {
+                Install-PortableNodeZip -ZipPath $installerPath -TargetInstallRoot $InstallRoot | Out-Null
+                return
+            }
             $arguments = @('/i', $installerPath, '/qn', '/norestart')
             $installLabel = 'Node.js LTS fallback installer'
             Invoke-InstallerCommand -Label $installLabel -FilePath 'msiexec.exe' -Arguments $arguments
@@ -662,6 +781,40 @@ function Add-StrawberryPaths {
             $env:PATH = "$dir;$env:PATH"
         }
     }
+}
+
+function Ensure-GnuMakeCommand {
+    # Purpose: expose a stable GNU make command for Windows skills that ship Makefiles.
+    # Input: the user-space install root where stable helper shims should live.
+    # Output: creates or refreshes a make.cmd shim that delegates to the Strawberry GNU make provider.
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$TargetInstallRoot
+    )
+
+    $makeProvider = Resolve-CommandPath -Names @(
+        'gmake.exe',
+        'gmake',
+        'mingw32-make.exe',
+        'mingw32-make',
+        'make.exe',
+        'make'
+    )
+    if ([string]::IsNullOrWhiteSpace($makeProvider)) {
+        throw 'Unable to resolve a GNU make provider after Strawberry Perl bootstrap'
+    }
+
+    $shimDir = Join-Path $TargetInstallRoot 'bin'
+    if (-not (Test-Path $shimDir)) {
+        $null = New-Item -ItemType Directory -Path $shimDir -Force
+    }
+
+    $shimPath = Join-Path $shimDir 'make.cmd'
+    $shimContent = @(
+        '@echo off',
+        ('"{0}" %*' -f $makeProvider)
+    ) -join [Environment]::NewLine
+    Set-Content -Path $shimPath -Value ($shimContent + [Environment]::NewLine) -Encoding ASCII
 }
 
 function Ensure-NodeToolchain {
@@ -843,6 +996,7 @@ Invoke-NativeCommand -Label 'cpanm local::lib bootstrap' -FilePath $perlPath -Ar
     'File::ShareDir::Install'
 )
 Sync-LocalLibEnvironmentFromPerl -PerlPath $perlPath -TargetInstallRoot $InstallRoot
+Ensure-GnuMakeCommand -TargetInstallRoot $InstallRoot
 
 $profilePerlBin = Split-Path -Parent $perlPath
 $profilePerlRoot = Split-Path -Parent $profilePerlBin
@@ -852,7 +1006,13 @@ $profilePerlRuntimePaths = @(
     (Join-Path $profilePerlRoot 'site\bin'),
     (Join-Path $profileStrawberryRoot 'c\bin')
 ) | Select-Object -Unique
+$profileExtraRuntimePaths = @()
+if (Test-Path (Join-Path $InstallRoot 'nodejs')) {
+    $profileExtraRuntimePaths += Get-ChildItem -Path (Join-Path $InstallRoot 'nodejs') -Directory | ForEach-Object { $_.FullName }
+}
+$profileExtraRuntimePaths = $profileExtraRuntimePaths | Select-Object -Unique
 $profilePerlRuntimePathLines = ($profilePerlRuntimePaths | ForEach-Object { "    '{0}'" -f $_ }) -join [Environment]::NewLine
+$profileExtraRuntimePathLines = ($profileExtraRuntimePaths | ForEach-Object { "    '{0}'" -f $_ }) -join [Environment]::NewLine
 
 $profileBlock = @"
 # >>> Developer Dashboard bootstrap >>>
@@ -860,8 +1020,14 @@ $profileBlock = @"
 `$ddInstallRootForward = `$ddInstallRoot -replace '\\', '/'
 `$ddPerlBin = Join-Path `$ddInstallRoot 'bin'
 `$ddPerlLib = Join-Path `$ddInstallRoot 'lib\perl5'
+if ([string]::IsNullOrWhiteSpace(`$env:HOME) -and -not [string]::IsNullOrWhiteSpace(`$HOME)) {
+    `$env:HOME = `$HOME
+}
 `$ddPerlRuntimePaths = @(
 $profilePerlRuntimePathLines
+)
+`$ddExtraRuntimePaths = @(
+$profileExtraRuntimePathLines
 )
 `$ddHomeHelper = Join-Path `$HOME '.developer-dashboard\cli\dd\_dashboard-core'
 if (Test-Path `$ddPerlBin) {
@@ -874,6 +1040,11 @@ foreach (`$ddPerlRuntimePath in `$ddPerlRuntimePaths) {
         `$env:PATH = "`$ddPerlRuntimePath;`$env:PATH"
     }
 }
+foreach (`$ddExtraRuntimePath in `$ddExtraRuntimePaths) {
+    if (-not [string]::IsNullOrWhiteSpace(`$ddExtraRuntimePath) -and (Test-Path `$ddExtraRuntimePath) -and `$env:PATH -notlike "*`$ddExtraRuntimePath*") {
+        `$env:PATH = "`$ddExtraRuntimePath;`$env:PATH"
+    }
+}
 `$ddPerlCommand = Get-Command perl.exe -ErrorAction SilentlyContinue
 if (`$ddPerlCommand -and (Test-Path `$ddPerlLib)) {
     `$ddLocalLibDump = & `$ddPerlCommand.Source "-I`$ddPerlLib" "-Mlocal::lib=`$ddInstallRootForward" '-e' 'for my `$key (qw(PATH PERL5LIB PERL_LOCAL_LIB_ROOT PERL_MB_OPT PERL_MM_OPT)) { next unless exists `$ENV{`$key}; print `$key, q(=), `$ENV{`$key}, chr(10); }'
@@ -883,8 +1054,20 @@ if (`$ddPerlCommand -and (Test-Path `$ddPerlLib)) {
         }
     }
 }
-if ((Get-Command dashboard -ErrorAction SilentlyContinue) -and (Test-Path `$ddHomeHelper)) {
-    `$ddShellBootstrap = & dashboard shell ps
+`$ddDashboardCommand = `$null
+foreach (`$ddDashboardCandidate in @(
+    (Join-Path `$ddPerlBin 'dashboard.bat'),
+    (Join-Path `$ddPerlBin 'dashboard.cmd'),
+    (Join-Path `$ddPerlBin 'dashboard'),
+    ((Get-Command dashboard -ErrorAction SilentlyContinue).Source)
+)) {
+    if (-not [string]::IsNullOrWhiteSpace(`$ddDashboardCandidate) -and (Test-Path `$ddDashboardCandidate)) {
+        `$ddDashboardCommand = `$ddDashboardCandidate
+        break
+    }
+}
+if (-not [string]::IsNullOrWhiteSpace(`$ddDashboardCommand) -and (Test-Path `$ddHomeHelper)) {
+    `$ddShellBootstrap = & `$ddPerlCommand.Source `$ddDashboardCommand shell ps
     `$ddShellBootstrapText = ((@(`$ddShellBootstrap | Where-Object { `$null -ne `$_ } | ForEach-Object { [string]`$_ })) -join [Environment]::NewLine)
     if (-not [string]::IsNullOrWhiteSpace(`$ddShellBootstrapText)) {
         Invoke-Expression `$ddShellBootstrapText
@@ -892,7 +1075,7 @@ if ((Get-Command dashboard -ErrorAction SilentlyContinue) -and (Test-Path `$ddHo
 }
 # <<< Developer Dashboard bootstrap <<<
 "@
-Set-StepStatus -Id 'bootstrap_perl' -Status 'ok' -Detail 'cpanm, local::lib, and configure prereqs ready'
+Set-StepStatus -Id 'bootstrap_perl' -Status 'ok' -Detail 'cpanm, local::lib, GNU make, and configure prereqs ready'
 
 $dashboardCommand = Resolve-CommandPath -Names @('dashboard.bat', 'dashboard', 'dashboard.cmd')
 if ([string]::IsNullOrWhiteSpace($dashboardCommand)) {
@@ -940,7 +1123,7 @@ Set-StepStatus -Id 'install_dashboard' -Status 'ok' -Detail ("target: {0}" -f $e
 
 Set-StepStatus -Id 'initialize_dashboard' -Status 'running'
 Invoke-NativeCommand -Label 'dashboard init' -FilePath $dashboardCommand -Arguments @('init')
-$dashboardShellBootstrap = & $dashboardCommand shell ps
+$dashboardShellBootstrap = & $perlPath $dashboardCommand shell ps
 $dashboardShellBootstrapText = Join-ScriptText -Value $dashboardShellBootstrap
 if (-not [string]::IsNullOrWhiteSpace($dashboardShellBootstrapText)) {
     Invoke-Expression $dashboardShellBootstrapText

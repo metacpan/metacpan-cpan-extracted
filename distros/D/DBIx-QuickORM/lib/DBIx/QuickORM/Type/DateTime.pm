@@ -2,7 +2,7 @@ package DBIx::QuickORM::Type::DateTime;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
@@ -95,7 +95,8 @@ sub qorm_deflate {
 sub qorm_compare {
     my $class = shift;
     my ($a, $b) = @_;
-    return $class->_compare_key($a) cmp $class->_compare_key($b);
+    # Equality contract: true when the two values are the same.
+    return $class->_compare_key($a) eq $class->_compare_key($b);
 }
 
 # A dialect-free comparison key: a never-built mask uses its stored db string,

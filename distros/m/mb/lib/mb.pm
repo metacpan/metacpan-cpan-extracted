@@ -7,13 +7,13 @@ package mb;
 #
 # https://metacpan.org/release/mb
 #
-# Copyright (c) 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.62';
+$VERSION = '0.63';
 $VERSION = $VERSION;
 
 # internal use
@@ -1453,7 +1453,7 @@ sub mb::_open_a ($) {
 sub mb::_open_r ($) {
     $mb::_fh_seq++;
     my $fhn = "mb::FH::H$mb::_fh_seq";
-    { no strict 'refs'; open($fhn, $_[0]) or return "" }
+    { no strict 'refs'; open($fhn, "< $_[0]") or return "" }
     return $fhn;
 }
 
@@ -8742,7 +8742,7 @@ upload *.tar.gz to PAUSE(The [Perl programming] Authors Upload Server)
 
 =head1 AUTHOR
 
-INABA Hitoshi E<lt>ina@cpan.orgE<gt>
+INABA Hitoshi E<lt>ina.cpan@gmail.comE<gt>
 
 This project was originated by INABA Hitoshi.
 

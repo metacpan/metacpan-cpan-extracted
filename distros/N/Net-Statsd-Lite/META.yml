@@ -3,14 +3,13 @@ abstract: 'A StatsD client that supports multimetric packets'
 author:
   - 'Robert Rothenberg <perl@rhizomnic.com>'
 build_requires:
-  ExtUtils::MakeMaker: '7.22'
   File::Spec: '0'
   IO::Handle: '0'
   IO::Select: '0'
   IO::Socket: '0'
   IPC::Open3: '0'
   Module::Load: '0'
-  Module::Metadata: '1.000015'
+  Module::Metadata: '0'
   Net::EmptyPort: '0'
   Socket: '0'
   Test::Deep: '0'
@@ -42,7 +41,7 @@ name: Net-Statsd-Lite
 provides:
   Net::Statsd::Lite:
     file: lib/Net/Statsd/Lite.pm
-    version: v0.11.1
+    version: v0.11.2
 recommends:
   Ref::Util::XS: '0'
   Socket: '2.026'
@@ -67,7 +66,7 @@ resources:
   bugtracker: https://github.com/robrwo/Net-Statsd-Lite/issues
   homepage: https://metacpan.org/release/Net-Statsd-Lite
   repository: git://github.com/robrwo/Net-Statsd-Lite.git
-version: v0.11.1
+version: v0.11.2
 x_authority: cpan:RRWO
 x_contributors:
   - 'Michael R. Davis <mrdvt@cpan.org>'
@@ -75,3 +74,4 @@ x_contributors:
 x_generated_by_perl: v5.42.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0
+x_static_install: 1

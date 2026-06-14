@@ -1,6 +1,46 @@
 Revision history for Audio::Scan
 
-Note: Bug numbers refer to bugs at http://bugs.slimdevices.com
+Note: Bug numbers refer to bugs at https://bugs-archive.lyrion.org/index.html
+
+1.13	2026-06-12
+	- ID3: Support multi-value TXXX/WXXX frames.
+	- Add support for files larger than 2GB.
+
+1.12	2026-04-22
+	- ID3: Never add undef to tag hash for empty or invalid TXXX key.
+
+1.11	2025-09-20
+	- fix compatibility with Perl 5.42
+	- mp3: fix odd reported bitrates for certain files.
+	- added support for ID3v2.4 GRP1 frame.
+
+1.10	2024-02-29
+	- ogg/flac: add support for ogf file format.
+
+1.09	2023-12-20
+	- ape/wavpack: support larger cover art embedded in track file.
+
+1.08	2023-11-29
+	- mpeg-4: Smoothly handle small and ignore empty atoms.
+	- Added Windows build support for Strawberry Perl 32/64-bit.
+
+1.07	Unreleased build
+	- ogg/opus: Improve/fix seek.
+
+1.06	2022-11-10
+	- opus: Fix parsing large comment headers (such as large embedded images)
+
+1.05    2021-09-10
+	- ID3: Fix v2.4 extended header handling.
+	- WavPack DSD: fix song_length_ms calculation (Kimmo Taskinen).
+
+1.04    2021-08-09
+        - MP4: Allow seek with sample rates > 65535 (32 bits)
+        - Fixed missing zlib reference in generated Makefile.
+	- Link zlib based on OS.
+
+1.02    2018-10-16
+        - Opus: song_length_ms and bitrate_average were not always scanned properly
 
 1.01    2018-07-09
         - Added Opus codec support. (Jeff Muizelaar)

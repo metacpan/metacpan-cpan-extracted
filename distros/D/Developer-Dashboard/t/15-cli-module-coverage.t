@@ -1293,27 +1293,36 @@ chmod 0755, $exec_script or die "Unable to chmod $exec_script: $!";
         '--route', '/ajax/leaf-second',
     );
     is( $add_secret->{exit_code}, 0, 'dashboard api add creates a new writable-layer API group from one raw secret plus repeated routes' );
-    my $add_secret_payload = json_decode( $add_secret->{stdout} );
+    like( $add_secret->{stdout}, qr/^Key\s+Secret\s+Route/m, 'dashboard api add defaults to a table summary' );
+    like( $add_secret->{stdout}, qr/leaf-client\s+\S+\s+\/ajax\/leaf-first/, 'dashboard api add table summary lists the created route rows' );
+    my $add_secret_payload = json_decode( _run_api_command_capture(
+        'add',
+        '--key', 'leaf-client',
+        '--secret', 'leaf-secret',
+        '--route', '/ajax/leaf-first',
+        '--route', '/ajax/leaf-second',
+        '-o', 'json',
+    )->{stdout} );
     is( $add_secret_payload->{file}, File::Spec->catfile( $leaf_api_dir, 'api.json' ), 'dashboard api add writes to the deepest writable layer' );
     is( $add_secret_payload->{api}{'leaf-client'}{secret}, sha256_hex('leaf-secret'), 'dashboard api add hashes the raw secret before saving it' );
     is_deeply( $add_secret_payload->{api}{'leaf-client'}{ajax}, [ '/ajax/leaf-first', '/ajax/leaf-second' ], 'dashboard api add accepts repeated routes in one command' );
 
     my $add_route = _run_api_command_capture( 'add', '--key', 'leaf-client', '--route', '/ajax/leaf' );
     is( $add_route->{exit_code}, 0, 'dashboard api add can append a route to an existing API group' );
-    my $add_route_payload = json_decode( $add_route->{stdout} );
+    my $add_route_payload = json_decode( _run_api_command_capture( 'add', '--key', 'leaf-client', '--route', '/ajax/leaf', '-o', 'json' )->{stdout} );
     is_deeply( $add_route_payload->{api}{'leaf-client'}{ajax}, [ '/ajax/leaf-first', '/ajax/leaf-second', '/ajax/leaf' ], 'dashboard api add stores later routes after an initial batched create' );
 
     my $duplicate_route = _run_api_command_capture( 'add', '--key', 'leaf-client', '--route', '/ajax/leaf' );
     is( $duplicate_route->{exit_code}, 0, 'dashboard api add accepts duplicate route requests without failing' );
-    is( json_decode( $duplicate_route->{stdout} )->{changed}, 0, 'dashboard api add reports no change when a repeated route already exists' );
+    is( json_decode( _run_api_command_capture( 'add', '--key', 'leaf-client', '--route', '/ajax/leaf', '-o', 'json' )->{stdout} )->{changed}, 0, 'dashboard api add reports no change when a repeated route already exists' );
 
     my $update_secret = _run_api_command_capture( 'add', '--key', 'leaf-client', '--secret', 'updated-secret' );
     is( $update_secret->{exit_code}, 0, 'dashboard api add updates the stored secret for an existing key' );
-    is( json_decode( $update_secret->{stdout} )->{api}{'leaf-client'}{secret}, sha256_hex('updated-secret'), 'dashboard api add rewrites the secret digest on update' );
+    is( json_decode( _run_api_command_capture( 'add', '--key', 'leaf-client', '--secret', 'updated-secret', '-o', 'json' )->{stdout} )->{api}{'leaf-client'}{secret}, sha256_hex('updated-secret'), 'dashboard api add rewrites the secret digest on update' );
 
     my $maybe_secret_update = _run_api_command_capture( 'add', '--key', 'leaf-client', '--maybe-secret', 'maybe-secret', '--route', '/ajax/maybe' );
     is( $maybe_secret_update->{exit_code}, 0, 'dashboard api add accepts --maybe-secret for route-oriented updates' );
-    my $maybe_secret_payload = json_decode( $maybe_secret_update->{stdout} );
+    my $maybe_secret_payload = json_decode( _run_api_command_capture( 'add', '--key', 'leaf-client', '--maybe-secret', 'maybe-secret', '--route', '/ajax/maybe', '-o', 'json' )->{stdout} );
     is( $maybe_secret_payload->{api}{'leaf-client'}{secret}, sha256_hex('maybe-secret'), 'dashboard api add overwrites the stored secret when --maybe-secret is supplied for an existing key' );
     is_deeply( $maybe_secret_payload->{api}{'leaf-client'}{ajax}, [ '/ajax/leaf-first', '/ajax/leaf-second', '/ajax/leaf', '/ajax/maybe' ], 'dashboard api add can append routes while updating the secret through --maybe-secret' );
 
@@ -1345,7 +1354,8 @@ chmod 0755, $exec_script or die "Unable to chmod $exec_script: $!";
 
     my $remove_route = _run_api_command_capture( 'rm', '--key', 'leaf-client', '--route', '/ajax/leaf-second' );
     is( $remove_route->{exit_code}, 0, 'dashboard api rm can remove one route from a writable API group' );
-    is_deeply( json_decode( $remove_route->{stdout} )->{api}{'leaf-client'}{ajax}, [ '/ajax/leaf-first', '/ajax/leaf', '/ajax/maybe' ], 'dashboard api rm leaves the API group in place when only one route is removed from a larger set' );
+    like( $remove_route->{stdout}, qr/^Key\s+Secret\s+Route/m, 'dashboard api rm defaults to a table summary for route removals' );
+    is_deeply( json_decode( _run_api_command_capture( 'rm', '--key', 'leaf-client', '--route', '/ajax/leaf-second', '-o', 'json' )->{stdout} )->{api}{'leaf-client'}{ajax}, [ '/ajax/leaf-first', '/ajax/leaf', '/ajax/maybe' ], 'dashboard api rm leaves the API group in place when only one route is removed from a larger set' );
     my $remove_route_table = _run_api_command_capture( 'rm', '--key', 'leaf-client', '--route', '/ajax/leaf', '-o', 'table' );
     is( $remove_route_table->{exit_code}, 0, 'dashboard api rm supports table output when one route is removed from an API group' );
     like( $remove_route_table->{stdout}, qr/^Key\s+Secret\s+Route/m, 'dashboard api rm table output includes the standard key table header for route removals' );

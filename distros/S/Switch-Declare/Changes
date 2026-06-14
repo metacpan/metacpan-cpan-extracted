@@ -1,0 +1,28 @@
+Revision history for Switch-Declare
+
+0.02    2026-06-13
+        - Fix load failure on perl 5.14-5.20.
+
+0.01    2026-06-12
+        First release.
+        - `switch (EXPR) { case PAT { ... } ... default { ... } }` as a real
+          lexical pragma, recognised only within `use Switch::Declare` scope.
+        - Compile-time keyword plugin; the construct lowers to a native
+          conditional expression. No source filter, no smartmatch, no CPAN
+          dependencies (core perl 5.14+ only).
+        - Pattern kinds: number (==), string (eq), regex /.../imsx, range
+          [LO..HI], list [a,b,c] membership, and predicates - either \&name
+          (also package-qualified, \&Pkg::name) or an inline sub { ... } that
+          closes over the enclosing lexicals. Each lowers to native ops (regex
+          compiles to a real OP_MATCH at compile time); there are no runtime
+          helper subs.
+        - Statement and expression (value-returning) forms; usable infix.
+        - Scrutinee evaluated exactly once; first matching case wins; optional
+          trailing default.
+        - Fast path: a plain variable/constant scrutinee with single-expression
+          arms compiles to exactly a hand-written if/elsif chain (0-2% in the
+          bundled benchmark).
+        - Dispatch mode: a string-keyed lookup table (>= 4 arms, constant
+          values) compiles to a single O(1) hash lookup against a compile-time
+          hash - ~2.5x faster than the if/elsif chain at 20 arms. Chosen
+          automatically; never changes behaviour.

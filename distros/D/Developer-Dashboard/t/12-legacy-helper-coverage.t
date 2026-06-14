@@ -7,7 +7,7 @@ use Errno qw(EINTR EIO);
 use File::Basename qw(dirname);
 use File::Path qw(make_path);
 use File::Spec;
-use File::Temp qw(tempdir);
+use File::Temp qw(tempdir tempfile);
 use POSIX qw(:sys_wait_h);
 use Test::More;
 use Time::HiRes qw(time);
@@ -18,6 +18,7 @@ use lib 'lib';
 use Developer::Dashboard::DataHelper qw(j je);
 use Developer::Dashboard::Auth;
 use Developer::Dashboard::FileRegistry;
+use Developer::Dashboard::JSON qw(json_encode);
 use Developer::Dashboard::PageDocument;
 use Developer::Dashboard::PageRuntime;
 use Developer::Dashboard::PageRuntime::StreamHandle;
@@ -294,11 +295,14 @@ like( $runtime->_runtime_value_text( { ok => 1 } ), qr/ok => 1/, '_runtime_value
         runtime_root => $paths->runtime_root,
         file         => 'coverage.json',
     );
+    my @saved_command = $runtime->_saved_ajax_command( path => $saved_path );
     is_deeply(
-        [ ( $runtime->_saved_ajax_command( path => $saved_path ) )[ 0, 1 ] ],
-        [ $^X, '-e' ],
-        '_saved_ajax_command defaults saved Ajax files without shebangs to the Perl bootstrap interpreter path',
+        [ @saved_command[ 0, 1 ] ],
+        [ $^X, '-MDeveloper::Dashboard::PageRuntime' ],
+        '_saved_ajax_command defaults saved Ajax files without shebangs to the Perl bootstrap interpreter path through the in-module wrapper loader',
     );
+    is( $saved_command[2], '-e', '_saved_ajax_command still launches the saved Ajax bootstrap through a Perl one-liner entrypoint' );
+    like( $saved_command[3], qr/_run_saved_ajax_perl_file/, '_saved_ajax_command delegates to the in-module saved Ajax Perl file bootstrap' );
     my %saved_env = $runtime->_saved_ajax_env(
         path      => $saved_path,
         page      => 'coverage-page',
@@ -311,6 +315,47 @@ like( $runtime->_runtime_value_text( { ok => 1 } ), qr/ok => 1/, '_runtime_value
     like( $saved_env{DEVELOPER_DASHBOARD_AJAX_PARAMS}, qr/"a"\s*:\s*"1 2"/, '_saved_ajax_env encodes request params as JSON' );
     like( $saved_env{QUERY_STRING}, qr/a=1%202/, '_saved_ajax_env rebuilds a query string for child process use' );
     ok( !$saved_env{DEVELOPER_DASHBOARD_AJAX_PARAMS_FILE}, '_saved_ajax_env keeps small request params inline instead of spilling them to a temp file' );
+}
+{
+    my $wrapper_source = Developer::Dashboard::PageRuntime->_saved_ajax_perl_wrapper;
+    like( $wrapper_source, qr/sub params/, '_saved_ajax_perl_wrapper returns the saved Ajax bootstrap source' );
+
+    my $saved_path = File::Spec->catfile( $paths->dashboards_root, 'ajax', 'wrapper-runtime.pl' );
+    open my $fh, '>', $saved_path or die $!;
+    print {$fh} <<'PERL';
+print params()->{foo} . "\n";
+print( ( $ENV{QUERY_STRING} || '' ) . "\n" );
+print $0 . "\n";
+my $stash_ref = stash( { seen => 'yes' } );
+print $stash_ref->{seen} . "\n";
+void( { void_seen => 'ok' } );
+print stash('void_seen') . "\n";
+PERL
+    close $fh;
+
+    my ( $params_fh, $params_path ) = tempfile();
+    print {$params_fh} json_encode( { foo => 'from-file' } );
+    close $params_fh or die $!;
+
+    my ( $query_fh, $query_path ) = tempfile();
+    print {$query_fh} "foo=from-file";
+    close $query_fh or die $!;
+
+    my ( $stdout, $stderr, $return_value ) = capture {
+        local $ENV{DEVELOPER_DASHBOARD_AJAX_PARAMS} = '';
+        local $ENV{DEVELOPER_DASHBOARD_AJAX_PARAMS_FILE} = $params_path;
+        local $ENV{DEVELOPER_DASHBOARD_AJAX_QUERY_STRING_FILE} = $query_path;
+        local $ENV{QUERY_STRING} = '';
+        local $ENV{DEVELOPER_DASHBOARD_AJAX_SINGLETON} = 'coverage-wrapper';
+        return Developer::Dashboard::PageRuntime->_run_saved_ajax_perl_file($saved_path);
+    };
+    is( $return_value, 1, '_run_saved_ajax_perl_file returns true after evaluating the saved Ajax Perl file' );
+    is( $stderr, '', '_run_saved_ajax_perl_file keeps stderr empty for a successful saved Ajax Perl wrapper run' );
+    like( $stdout, qr/^from-file$/m, '_run_saved_ajax_perl_file loads params from the file-backed JSON payload' );
+    like( $stdout, qr/^foo=from-file$/m, '_run_saved_ajax_perl_file loads QUERY_STRING from the file-backed payload when needed' );
+    like( $stdout, qr/^dashboard ajax: coverage-wrapper$/m, '_run_saved_ajax_perl_file applies the saved Ajax singleton process title inside the wrapper' );
+    like( $stdout, qr/^yes$/m, '_run_saved_ajax_perl_file keeps stash writes available to later wrapper code' );
+    like( $stdout, qr/^ok$/m, '_run_saved_ajax_perl_file keeps void stash writes available to later wrapper code' );
 }
 is( $runtime->_quote_process_pattern_literal('name.+(test)?'), 'name\.\+\(test\)\?', '_quote_process_pattern_literal escapes regex metacharacters safely for singleton matching' );
 eval { $runtime->_normalize_saved_ajax_singleton("bad\nname") };
@@ -420,6 +465,92 @@ PERL
     like( $error, qr/synthetic open3 failure/, 'stream_saved_ajax_file surfaces open3 launch failures for oversized payloads' );
     is( scalar @cleaned_paths, 2, 'stream_saved_ajax_file still schedules both oversized temp files for cleanup when open3 dies before the child starts' );
     ok( !grep { defined $_ && $_ ne '' && -e $_ } @cleaned_paths, 'stream_saved_ajax_file cleans oversized temp files even when open3 fails before execution' );
+}
+{
+    package Local::IdleSavedAjaxSelect;
+    sub new {
+        my ( $class, @handles ) = @_;
+        return bless { handles => \@handles }, $class;
+    }
+    sub can_read { return () }
+    sub count { return scalar @{ $_[0]{handles} } }
+    sub handles { return @{ $_[0]{handles} } }
+    sub remove { return 1 }
+}
+{
+    my $saved_path = File::Spec->catfile( $paths->dashboards_root, 'ajax', 'idle-child-exit.pl' );
+    open my $fh, '>', $saved_path or die $!;
+    print {$fh} 'print "ajax-ok\n";';
+    close $fh or die $!;
+    chmod 0700, $saved_path or die $!;
+
+    my $timed_out = 0;
+    my $stream_result;
+    my $error = '';
+    my $streamed = '';
+    {
+        local $SIG{ALRM} = sub { die "timeout\n" };
+        alarm 5;
+        eval {
+            no warnings 'redefine';
+            local *IO::Select::new = sub { return Local::IdleSavedAjaxSelect->new( $_[1], $_[2] ) };
+            $stream_result = $runtime->stream_saved_ajax_file(
+                path          => $saved_path,
+                page          => 'coverage-page',
+                type          => 'text',
+                params        => { page => 'coverage-page', file => 'idle-child-exit.pl', type => 'text' },
+                stdout_writer => sub { $streamed .= $_[0] if defined $_[0]; return 1 },
+                stderr_writer => sub { $streamed .= $_[0] if defined $_[0]; return 1 },
+            );
+            1;
+        } or do {
+            $error = $@ || '';
+            $timed_out = $error =~ /timeout/ ? 1 : 0;
+        };
+        alarm 0;
+    }
+
+    ok( !$timed_out, 'stream_saved_ajax_file does not stall forever when the child has exited but IO::Select reports no ready handles' );
+    is( $error, '', 'stream_saved_ajax_file finishes without surfacing an error in the idle-child exit case' );
+    is( $stream_result->{exit_code}, 0, 'stream_saved_ajax_file still reports a clean exit when the idle-child exit guard breaks the stream loop' );
+    is( $streamed, "ajax-ok\n", 'stream_saved_ajax_file still drains the final saved ajax stdout chunk after the idle-child exit guard notices process exit' );
+}
+{
+    my $saved_path = File::Spec->catfile( $paths->dashboards_root, 'ajax', 'post-exit-disconnect.pl' );
+    open my $fh, '>', $saved_path or die $!;
+    print {$fh} 'sleep 30;';
+    close $fh or die $!;
+    chmod 0700, $saved_path or die $!;
+
+    my $stream_result;
+    my $error = '';
+    {
+        no warnings 'redefine';
+        local *IO::Select::new = sub { return Local::IdleSavedAjaxSelect->new( $_[1], $_[2] ) };
+        local *Developer::Dashboard::PageRuntime::_saved_ajax_child_exited = sub {
+            return ( 1, 0 );
+        };
+        local *Developer::Dashboard::PageRuntime::_drain_saved_ajax_post_exit_handles = sub {
+            return 0;
+        };
+        eval {
+            $stream_result = $runtime->stream_saved_ajax_file(
+                path          => $saved_path,
+                page          => 'coverage-page',
+                type          => 'text',
+                params        => { page => 'coverage-page', file => 'post-exit-disconnect.pl', type => 'text' },
+                stdout_writer => sub { return 1 },
+                stderr_writer => sub { return 1 },
+            );
+            1;
+        } or do {
+            $error = $@ || '';
+        };
+    }
+
+    is( $error, '', 'stream_saved_ajax_file treats a post-exit writer disconnect as a handled disconnect instead of a fatal error' );
+    ok( $stream_result->{disconnected}, 'stream_saved_ajax_file marks post-exit drain disconnects as disconnected runs' );
+    is( $stream_result->{exit_code}, 0, 'stream_saved_ajax_file preserves the saved child status after a post-exit disconnect' );
 }
 {
     my $saved_path = File::Spec->catfile( $paths->dashboards_root, 'ajax', 'singleton-runner.pl' );
@@ -723,6 +854,29 @@ $pages->save_page($saved_file);
 is( $app->handle( path => '/marked.min.js', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' } )->[0], 200, 'web app serves marked shim' );
 is( $app->handle( path => '/tiff.min.js', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' } )->[0], 200, 'web app serves tiff shim' );
 is( $app->handle( path => '/loading.webp', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' } )->[0], 200, 'web app serves loading image shim' );
+is( $app->marked_js_response()->[0], 200, 'direct marked shim response returns success' );
+is( $app->tiff_js_response()->[0], 200, 'direct tiff shim response returns success' );
+is( $app->loading_image_response()->[0], 200, 'direct loading image response returns success' );
+{
+    my $fake_dist_root = tempdir( CLEANUP => 1 );
+    my $fake_asset_dir = File::Spec->catdir( $fake_dist_root, 'public', 'js' );
+    make_path($fake_asset_dir);
+    my $fake_asset = File::Spec->catfile( $fake_asset_dir, 'dist-only.js' );
+    open my $fh, '>', $fake_asset or die "Unable to write fake dist asset: $!";
+    print {$fh} "console.log('dist only');\n";
+    close $fh;
+
+    local $Developer::Dashboard::Web::App::MODULE_SOURCE_PATH
+      = File::Spec->catfile( $fake_dist_root, 'isolated', 'lib', 'Developer', 'Dashboard', 'Web', 'App.pm' );
+    no warnings 'redefine';
+    local *Developer::Dashboard::Web::App::dist_dir = sub {
+        my ($dist_name) = @_;
+        is( $dist_name, 'Developer-Dashboard', 'bundled asset lookup queries the expected dist name' );
+        return $fake_dist_root;
+    };
+    my $dist_asset = Developer::Dashboard::Web::App::_bundled_public_asset_path( 'js', 'dist-only.js' );
+    is( $dist_asset, $fake_asset, 'bundled asset lookup falls back to the installed dist share directory when the repo share tree is absent' );
+}
 
 my $login_user = $auth->add_user( username => 'helperx', password => 'helper-pass-123' );
 ok( $login_user->{username}, 'helper user can be created for login flow coverage' );

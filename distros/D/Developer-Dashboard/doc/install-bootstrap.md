@@ -94,6 +94,11 @@ What it does
    On piped `curl ... | sh` runs, the installer never probes `/dev/tty`; if
    the shell is not terminal-backed it prints the exact activation file to
    source instead of emitting `/dev/tty` noise.
+   When `SHELL` is not exported, as in blank Docker containers and piped
+   `curl ... | sh` runs, the post-install activation runner resolves the same
+   preferred shell as the bootstrap target (passwd entry or
+   `DD_INSTALL_PREFERRED_SHELL`), so bash-flavoured activation files are never
+   sourced through plain `sh`.
 11. Installs Developer Dashboard into the user account from the current local
     checkout when `install.sh` is run from a checkout, or from a freshly
     cloned GitHub `master` checkout when the installer is streamed through
@@ -110,8 +115,12 @@ What it does
     `https://cpanmin.us/`, bootstraps `local::lib` together with
     `File::ShareDir::Install`, installs Developer Dashboard with `cpanm --notest`,
     updates the current-user PowerShell profile with the `~/perl5` PATH and
-    Perl environment variables plus `dashboard shell ps`, activates that shell
-    bootstrap in the current PowerShell session, and then runs `dashboard init`.
+    Perl environment variables plus `dashboard shell ps`, seeds `env:HOME`
+    from PowerShell `HOME` inside that managed profile block when Windows did
+    not export `HOME`, writes a stable user-space `make.cmd` shim that points
+    at Strawberry Perl's GNU make provider so skill `Makefile` workflows keep
+    working in later sessions, activates that shell bootstrap in the current
+    PowerShell session, and then runs `dashboard init`.
     The packaged install path avoids test-only dependencies such as
     `Plack::Test` and `Test::Pod` so blank Windows hosts do not have to pull
     the `Test::SharedFork` chain. When `DD_INSTALL_CPAN_TARGET` is set,

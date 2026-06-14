@@ -272,13 +272,13 @@ PL
     _assert_match( $update_data->{'01-runtime-update'}{stdout} || '', qr/runtime update ok/, 'dashboard update custom command captures runtime update script stdout' );
     _assert_match( $update_data->{'02-runtime-result.pl'}{stdout} || '', qr/runtime update ok/, 'dashboard update custom command exposes the prior hook result to later hook scripts' );
 
-    my $paths = _run_shell( 'dashboard paths', 'cd ' . _shell_quote($project) . ' && dashboard paths' );
+    my $paths = _run_shell( 'dashboard paths', 'cd ' . _shell_quote($project) . ' && dashboard paths -o json' );
     _assert_match( $paths->{stdout}, qr/"runtime_root"/, 'dashboard paths returns runtime json' );
     _assert_match( $paths->{stdout}, qr/\Q$bookmarks\E/, 'dashboard paths reflects fake bookmark override' );
     _assert_match( $paths->{stdout}, qr/\Q$configs\E/, 'dashboard paths reflects fake config override' );
     _assert_match( $paths->{stdout}, qr/\Q$cli_root\E/, 'dashboard paths reflects the runtime cli root' );
 
-    my $path_list = _run_shell( 'dashboard path list', 'cd ' . _shell_quote($project) . ' && dashboard path list' );
+    my $path_list = _run_shell( 'dashboard path list', 'cd ' . _shell_quote($project) . ' && dashboard path list -o json' );
     _assert_match( $path_list->{stdout}, qr/"runtime"/, 'dashboard path list returns named paths' );
 
     my $path_resolve = _run_shell( 'dashboard path resolve home', 'cd ' . _shell_quote($project) . ' && dashboard path resolve home' );
@@ -454,10 +454,12 @@ JSON
     _assert_match( _read_text('/tmp/transient-denied.body'), qr/Transient token URLs are disabled/, 'loopback transient token denial explains the policy' );
 
     my $root = _run_shell( 'curl loopback root', q{curl -fsS http://127.0.0.1:7890/} );
-    _assert_match( $root->{stdout}, qr/instruction-editor/, 'loopback root serves the bookmark editor' );
+    _assert_match( $root->{stdout}, qr/editor-blocks/, 'loopback root serves the split-block bookmark editor' );
     my $root_dom = _run_browser_dom( 'browser loopback root', 'http://127.0.0.1:7890/', user_data_dir => $profile );
-    _assert_match( $root_dom, qr/instruction-editor/, 'browser loopback root renders the editor DOM' );
-    _assert_match( $root_dom, qr/TITLE:\s+Developer Dashboard/, 'browser loopback root shows bookmark source text' );
+    _assert_match( $root_dom, qr/editor-blocks/, 'browser loopback root renders the split-block editor DOM' );
+    _assert_match( $root_dom, qr/editor-blocks/, 'browser loopback root renders the split-block editor container' );
+    _assert_match( $root_dom, qr/instruction-block-editor/, 'browser loopback root renders split editor textarea blocks' );
+    _assert_match( $root_dom, qr/ddLoadBlocks\(ddSource\.value\);/, 'browser loopback root boots the split-block editor from the canonical hidden source' );
 
     my $project_dom = _run_browser_dom( 'browser fake project page', 'http://127.0.0.1:7890/app/project-home', user_data_dir => $profile );
     _assert_match( $project_dom, qr/project-marker/, 'browser renders fake project bookmark page' );

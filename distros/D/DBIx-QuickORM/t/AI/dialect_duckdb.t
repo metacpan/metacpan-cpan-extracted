@@ -1,4 +1,4 @@
-use Test2::V0;
+use Test2::V0 '!meta', '!pass';
 use lib 't/lib';
 
 # End-to-end coverage for DBIx::QuickORM::Dialect::DuckDB: dialect selection,

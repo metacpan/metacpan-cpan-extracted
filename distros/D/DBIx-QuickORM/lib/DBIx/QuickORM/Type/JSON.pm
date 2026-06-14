@@ -2,7 +2,7 @@ package DBIx::QuickORM::Type::JSON;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use DBIx::QuickORM::Util qw/parse_conflate_args/;
 
@@ -89,7 +89,8 @@ sub qorm_compare {
     $a = $class->CJSON->encode($a);
     $b = $class->CJSON->encode($b);
 
-    return $a cmp $b;
+    # Equality contract: true when the two values are the same.
+    return $a eq $b;
 }
 
 sub qorm_sql_type {

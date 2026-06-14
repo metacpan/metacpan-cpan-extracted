@@ -2,9 +2,9 @@ package DBIx::QuickORM::DB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
-use Carp qw/croak confess/;
+use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
 
 use Object::HashBase qw{
@@ -100,7 +100,8 @@ Provenance metadata describing where this definition came from.
 
 =item dialect
 
-The L<DBIx::QuickORM> dialect object (required). Used to build the DSN.
+The L<DBIx::QuickORM::Dialect> subclass name (required). Used to build the
+DSN and to construct per-connection dialect instances.
 
 =item dbi_driver
 
@@ -119,6 +120,15 @@ The database name, defaulting to C<name> when C<db_name> is unset.
 =cut
 
 sub db_name { $_[0]->{+DB_NAME} // $_[0]->{+NAME} }
+
+=pod
+
+=item $db->init
+
+Object construction hook invoked by L<Object::HashBase>. Validates required
+attributes and fills in default DBI attributes. Not called directly.
+
+=cut
 
 sub init {
     my $self = shift;
@@ -155,7 +165,9 @@ sub dsn {
 =item $dbh = $db->new_dbh
 
 Returns a new DBI handle, using the C<connect> callback when present or
-C<< DBI->connect >> with the resolved DSN and credentials otherwise.
+C<< DBI->connect >> with the resolved DSN and credentials otherwise. Croaks if
+the connection attempt throws or fails to produce a handle (possible when
+C<RaiseError> is disabled or the callback misbehaves).
 
 =back
 
@@ -163,22 +175,28 @@ C<< DBI->connect >> with the resolved DSN and credentials otherwise.
 
 sub new_dbh {
     my $self = shift;
-    my (%params) = @_;
 
     my $attrs = $self->attributes;
 
     my $dbh;
-    eval {
+    my $ok = eval {
         if ($self->{+CONNECT}) {
             $dbh = $self->{+CONNECT}->();
         }
         else {
             require DBI;
-            $dbh = DBI->connect($self->dsn, $self->user, $self->pass, $self->attributes);
+            $dbh = DBI->connect($self->dsn, $self->user, $self->pass, $attrs);
         }
 
         1;
-    } or confess $@;
+    };
+    my $err = $@;
+    croak $err unless $ok;
+
+    unless (blessed($dbh)) {
+        my $reason = $DBI::errstr // 'connect did not return a handle';
+        croak "Could not connect to the database: $reason";
+    }
 
     $dbh->{AutoInactiveDestroy} = 1 if $attrs->{AutoInactiveDestroy};
 

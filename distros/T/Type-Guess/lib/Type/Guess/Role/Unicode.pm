@@ -1,6 +1,6 @@
 package Type::Guess::Role::Unicode;
 
-use Mojo::Base -role;
+use Moo::Role;
 
 use Text::VisualPrintf qw/vprintf vsprintf/;
 use Text::VisualWidth::PP qw/vwidth/;
@@ -26,3 +26,4 @@ sub to_sub {
 }
 
 1
+

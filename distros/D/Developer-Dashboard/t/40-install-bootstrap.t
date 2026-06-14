@@ -23,6 +23,7 @@ my $brewfile   = File::Spec->catfile( $root, 'brewfile' );
 my $default_bootstrap_repository = 'https://github.com/manif3station/developer-dashboard.git';
 my $perlbrew_app_dist_url = 'https://cpan.metacpan.org/authors/id/G/GU/GUGOD/App-perlbrew-1.02.tar.gz';
 my $perlbrew_app_dist_basename = 'App-perlbrew-1.02.tar.gz';
+my $dashboard_entrypoint = _slurp( File::Spec->catfile( $root, 'bin', 'dashboard' ) );
 
 ok( -f $install_sh, 'install.sh exists at the repo root' );
 ok( -f $install_ps, 'install.ps1 exists at the repo root' );
@@ -37,6 +38,21 @@ like( _slurp(File::Spec->catfile( $root, 'Makefile.PL' )), qr/package\s+MY;\s*us
 like( _slurp(File::Spec->catfile( $root, 'Makefile.PL' )), qr/File::ShareDir::Install::postamble\(\s*\$self\s*\)/, 'Makefile.PL chains the share-dir installer postamble before its checkout bootstrap hook' );
 like( _slurp(File::Spec->catfile( $root, 'Makefile.PL' )), qr/install\s+::\s*\n\t\$\(NOECHO\)\s+\$\(PERL\)\s+-e\s+"1;"/, 'Makefile.PL gives the Windows gmake install target an explicit no-op recipe so it does not synthesize install from install.sh' );
 like( _slurp(File::Spec->catfile( $root, 'Makefile.PL' )), qr/pure_install\s+::\s+install-private-cli-tools/, 'Makefile.PL runs the private helper staging hook from pure_install instead of a recipe-less install target' );
+like(
+    $dashboard_entrypoint,
+    qr/sub _builtin_helper_command/,
+    'bin/dashboard resolves built-in helpers through the command-aware switchboard helper dispatcher',
+);
+like(
+    $dashboard_entrypoint,
+    qr/is_windows\(\)\s*&&\s*Developer::Dashboard::InternalCLI::_helper_uses_dashboard_core\(\$helper\)/,
+    'bin/dashboard routes Windows core-backed built-ins through the shared _dashboard-core helper directly',
+);
+like(
+    $dashboard_entrypoint,
+    qr/Developer::Dashboard::InternalCLI::ensure_dashboard_core/,
+    'bin/dashboard stages the shared _dashboard-core helper before direct Windows built-in dispatch',
+);
 {
     my $makefile_text = _slurp( File::Spec->catfile( $root, 'Makefile.PL' ) );
     like(
@@ -101,6 +117,9 @@ like( _slurp(File::Spec->catfile( $root, 'Makefile.PL' )), qr/pure_install\s+::\
     like( $install_ps_text, qr/SecurityProtocolType\]::Tls12/, 'install.ps1 explicitly enables TLS 1.2 for bootstrap web requests' );
     like( $install_ps_text, qr/function Download-RemoteFile/, 'install.ps1 defines a shared resilient file downloader for Windows bootstrap assets' );
     like( $install_ps_text, qr/function Get-RemoteJson/, 'install.ps1 defines a shared resilient JSON downloader for Windows bootstrap metadata' );
+    like( $install_ps_text, qr/function Get-WindowsBootstrapArchitecture/, 'install.ps1 detects the effective Windows bootstrap architecture before choosing vendor fallback assets' );
+    like( $install_ps_text, qr/PROCESSOR_ARCHITEW6432.*PROCESSOR_ARCHITECTURE/s, 'install.ps1 checks both WOW64 and native processor environment variables when resolving Windows architecture' );
+    like( $install_ps_text, qr/ARM64.*return 'arm64'/s, 'install.ps1 maps ARM64 Windows hosts explicitly during bootstrap architecture detection' );
     like( $install_ps_text, qr/function Invoke-InstallerCommand/, 'install.ps1 defines a dedicated installer runner for GUI and MSI bootstrap packages' );
     like( $install_ps_text, qr/Start-Process\s+-FilePath\s+\$FilePath\s+-ArgumentList\s+\$Arguments\s+-PassThru\s+-Wait/s, 'install.ps1 waits for GUI and MSI installers through Start-Process instead of piping them like console commands' );
     like( $install_ps_text, qr/curl\.exe|curl/, 'install.ps1 can fall back to curl when Invoke-WebRequest is unreliable inside the Windows guest' );
@@ -110,8 +129,16 @@ like( _slurp(File::Spec->catfile( $root, 'Makefile.PL' )), qr/pure_install\s+::\
     like( $install_ps_text, qr/git-for-windows\/git\/releases\/latest/, 'install.ps1 uses the official Git for Windows latest release page as the source of truth for the fallback installer asset' );
     like( $install_ps_text, qr/git-for-windows\/git\/releases\/download/, 'install.ps1 builds the final Git for Windows fallback asset URL from the resolved release tag and installer filename' );
     like( $install_ps_text, qr/Git-64-bit\.exe/, 'install.ps1 can fall back to the official Git for Windows installer download when winget remains broken' );
+    like( $install_ps_text, qr/Git-\[0-9\]\[\^"''<\]\*-arm64\\\.exe/, 'install.ps1 can fall back to the official Git for Windows ARM64 installer download on Windows ARM hosts' );
     like( $install_ps_text, qr/strawberryperl\.com\/releases\.json/, 'install.ps1 resolves Strawberry Perl fallback installers from the official release feed' );
+    like( $install_ps_text, qr/MSWin32-x64-multi-thread/, 'install.ps1 targets the supported Strawberry Perl release architecture from the official release feed' );
+    like( $install_ps_text, qr/arm64'.*MSWin32-x64-multi-thread/s, 'install.ps1 maps Windows ARM hosts to the official Strawberry Perl x64 build when no ARM-native Strawberry Perl release exists' );
     like( $install_ps_text, qr/nodejs\.org\/dist\/index\.json/, 'install.ps1 resolves Node.js LTS fallback installers from the official Node release index' );
+    like( $install_ps_text, qr/function Resolve-NodeLtsPackage/, 'install.ps1 resolves a Windows-architecture-aware Node.js fallback package instead of assuming one MSI shape' );
+    like( $install_ps_text, qr/win-arm64-zip/, 'install.ps1 supports the official Node.js ARM64 ZIP fallback for Windows ARM hosts' );
+    like( $install_ps_text, qr/function Install-PortableNodeZip/, 'install.ps1 defines a portable Node.js ZIP installer for Windows ARM fallback installs' );
+    like( $install_ps_text, qr/Expand-Archive -LiteralPath \$ZipPath -DestinationPath \$extractRoot -Force/, 'install.ps1 extracts the official Node.js ZIP fallback under the user-space install root on Windows ARM hosts' );
+    like( $install_ps_text, qr/Add-ProcessPathSegment -PathSegment \$nodeBin/, 'install.ps1 activates the portable Node.js fallback by prepending its runtime directory to PATH' );
     unlike( $install_ps_text, qr/Invoke-RestMethod\s+-Uri\s+'https:\/\/strawberryperl\.com\/releases\.json'/, 'install.ps1 no longer hard-codes Invoke-RestMethod for the Strawberry Perl release feed' );
     unlike( $install_ps_text, qr/Invoke-RestMethod\s+-Uri\s+'https:\/\/nodejs\.org\/dist\/index\.json'/, 'install.ps1 no longer hard-codes Invoke-RestMethod for the Node.js release index' );
     unlike( $install_ps_text, qr/Invoke-WebRequest\s+-Uri\s+'https:\/\/github\.com\/git-for-windows\/git\/releases\/latest\/download\/Git-64-bit\.exe'/, 'install.ps1 no longer hard-codes Invoke-WebRequest for the stale Git fallback installer download URL' );
@@ -135,6 +162,12 @@ like( _slurp(File::Spec->catfile( $root, 'Makefile.PL' )), qr/pure_install\s+::\
     like( $install_ps_text, qr/--notest',\s*'--local-lib-contained',\s*\$InstallRoot,\s*'\.'/s, 'install.ps1 runs cpanm against dot with an explicit local-lib target for the default cloned Windows checkout' );
     like( $install_ps_text, qr/--notest',\s*'--local-lib-contained',\s*\$InstallRoot,\s*\$effectiveCpanTarget/s, 'install.ps1 runs cpanm against explicit Windows targets with the same local-lib target' );
     like( $install_ps_text, qr/Sync-LocalLibEnvironmentFromPerl\s+-PerlPath\s+\$perlPath\s+-TargetInstallRoot\s+\$InstallRoot/s, 'install.ps1 reapplies the perl-reported local::lib environment after bootstrapping local::lib on Windows' );
+    like( $install_ps_text, qr/function Ensure-GnuMakeCommand/, 'install.ps1 defines a GNU make shim helper for Windows skill Makefiles' );
+    like( $install_ps_text, qr/Resolve-CommandPath\s+-Names\s+@\(\s*'gmake\.exe'.*?'mingw32-make\.exe'.*?'make\.exe'/s, 'install.ps1 resolves GNU make from the Strawberry Windows toolchain before creating the shim' );
+    like( $install_ps_text, qr/Join-Path\s+\$shimDir\s+'make\.cmd'/s, 'install.ps1 writes a stable make.cmd shim into the user-space Windows bin directory' );
+    like( $install_ps_text, qr/%\*/, 'install.ps1 forwards Windows make arguments through the shim without shell mangling' );
+    like( $install_ps_text, qr/Ensure-GnuMakeCommand\s+-TargetInstallRoot\s+\$InstallRoot/s, 'install.ps1 wires GNU make setup into the Windows Perl bootstrap flow' );
+    like( $install_ps_text, qr/cpanm, local::lib, GNU make, and configure prereqs ready/, 'install.ps1 reports GNU make readiness in the Windows Perl bootstrap progress detail' );
     like( $install_ps_text, qr/Ensure-ProfileContains\s+-TargetProfile\s+\$ProfilePath\s+-Block\s+\$profileBlock\s+-Marker\s+'Developer Dashboard bootstrap'/s, 'install.ps1 replaces the managed Developer Dashboard profile block instead of appending duplicate stale Windows bootstrap chunks' );
     like( $install_ps_text, qr/# >>> Developer Dashboard bootstrap >>>/, 'install.ps1 wraps the managed PowerShell profile block in a stable begin marker' );
     like( $install_ps_text, qr/# <<< Developer Dashboard bootstrap <<</, 'install.ps1 wraps the managed PowerShell profile block in a stable end marker' );
@@ -143,20 +176,25 @@ like( _slurp(File::Spec->catfile( $root, 'Makefile.PL' )), qr/pure_install\s+::\
     unlike( $install_ps_text, qr/\\Q\$beginMarker\\E|\\Q\$endMarker\\E/, 'install.ps1 avoids Perl-style \\Q...\\E regex quoting that PowerShell does not support in [Regex]::Replace' );
     like( $install_ps_text, qr/legacyManagedPattern/, 'install.ps1 strips legacy unmarked Developer Dashboard profile blocks from earlier Windows bootstrap failures' );
     like( $install_ps_text, qr/Join-Path\s+\`\$HOME\s+'.developer-dashboard\\cli\\dd\\_dashboard-core'/s, 'install.ps1 only asks dashboard shell ps for profile bootstrap when the staged home helper runtime is present' );
+    like( $install_ps_text, qr/if\s+\(\[string\]::IsNullOrWhiteSpace\(\`\$env:HOME\)\s+-and\s+-not\s+\[string\]::IsNullOrWhiteSpace\(\`\$HOME\)\)\s*\{\s*\`\$env:HOME = \`\$HOME/s, 'install.ps1 seeds env:HOME from PowerShell HOME inside the managed profile block for future sessions' );
     like( $install_ps_text, qr/\$profilePerlRuntimePaths\s*=\s*\@/s, 'install.ps1 captures the resolved Strawberry Perl runtime directories before writing the managed PowerShell profile block' );
+    like( $install_ps_text, qr/\$profileExtraRuntimePaths\s*=\s*\@/s, 'install.ps1 captures extra Windows runtime directories such as portable Node.js before writing the managed PowerShell profile block' );
     like( $install_ps_text, qr/\`\$ddPerlRuntimePaths\s*=\s*\@/s, 'install.ps1 writes the Strawberry Perl runtime directories into the managed PowerShell profile block for future sessions' );
+    like( $install_ps_text, qr/\`\$ddExtraRuntimePaths\s*=\s*\@/s, 'install.ps1 writes any extra portable Windows runtime directories into the managed PowerShell profile block for future sessions' );
     like( $install_ps_text, qr/foreach\s+\(\`\$ddPerlRuntimePath in \`\$ddPerlRuntimePaths\)/s, 'install.ps1 prepends the persisted Strawberry Perl runtime directories in future PowerShell sessions before resolving dashboard' );
-    like( $install_ps_text, qr/\$ddShellBootstrap\s*=\s*&\s+dashboard\s+shell\s+ps/s, 'install.ps1 captures dashboard shell ps output before invoking it in the profile' );
+    like( $install_ps_text, qr/foreach\s+\(\`\$ddExtraRuntimePath in \`\$ddExtraRuntimePaths\)/s, 'install.ps1 also prepends any persisted portable Windows runtime directories in future PowerShell sessions' );
+    like( $install_ps_text, qr/\$ddDashboardCandidate in \@\(\s*\(Join-Path\s+\`\$ddPerlBin\s+'dashboard\.bat'\),\s*\(Join-Path\s+\`\$ddPerlBin\s+'dashboard\.cmd'\),\s*\(Join-Path\s+\`\$ddPerlBin\s+'dashboard'\),\s*\(\(Get-Command dashboard -ErrorAction SilentlyContinue\)\.Source\)\s*\)/s, 'install.ps1 resolves the managed dashboard command from the local-lib bin directory before falling back to command discovery in the PowerShell profile block' );
+    like( $install_ps_text, qr/\$ddShellBootstrap\s*=\s*&\s+\`\$ddPerlCommand\.Source\s+\`\$ddDashboardCommand\s+shell\s+ps/s, 'install.ps1 captures dashboard shell ps output through perl plus the resolved managed dashboard command before invoking it in the profile so Windows batch shims do not return blank output' );
     unlike( $install_ps_text, qr/\$ddShellBootstrapText\s*=\s*Join-ScriptText\s+-Value\s+\`\$ddShellBootstrap/s, 'install.ps1 does not leak installer-only Join-ScriptText helper calls into the generated PowerShell profile block' );
     like( $install_ps_text, qr/\$ddShellBootstrapText\s*=\s*\(\(@\(\`\$ddShellBootstrap \| Where-Object \{ .*? \} \| ForEach-Object \{ .*? \}\)\) -join \[Environment\]::NewLine\)/s, 'install.ps1 normalizes dashboard shell ps output arrays inline inside the generated PowerShell profile block' );
     like( $install_ps_text, qr/if\s+\(-not\s+\[string\]::IsNullOrWhiteSpace\(\`\$ddShellBootstrapText\)\)\s*\{\s*Invoke-Expression\s+\`\$ddShellBootstrapText/s, 'install.ps1 skips Invoke-Expression when the normalized profile bootstrap is empty' );
-    like( $install_ps_text, qr/Invoke-NativeCommand\s+-Label\s+'dashboard init'\s+-FilePath\s+\$dashboardCommand\s+-Arguments\s+\@\(\'init\'\).*?&\s+\$dashboardCommand\s+shell\s+ps/s, 'install.ps1 initializes the dashboard runtime before asking the installed dashboard command for its PowerShell bootstrap' );
+    like( $install_ps_text, qr/Invoke-NativeCommand\s+-Label\s+'dashboard init'\s+-FilePath\s+\$dashboardCommand\s+-Arguments\s+\@\(\'init\'\).*?&\s+\$perlPath\s+\$dashboardCommand\s+shell\s+ps/s, 'install.ps1 initializes the dashboard runtime before asking perl plus the installed dashboard command for its PowerShell bootstrap on Windows' );
     like( $install_ps_text, qr/\$dashboardShellBootstrapText\s*=\s*Join-ScriptText\s+-Value\s+\$dashboardShellBootstrap/s, 'install.ps1 normalizes the current-session dashboard shell ps output into one script string' );
     unlike( $install_ps_text, qr/Invoke-Expression\s+\(&\s+\$dashboardCommand\s+shell\s+ps\)/, 'install.ps1 no longer invokes dashboard shell ps directly without checking for empty output' );
     unlike( $install_ps_text, qr/\$CpanTarget\s*=\s*if\s*\(\[string\]::IsNullOrWhiteSpace\(\$env:DD_INSTALL_CPAN_TARGET\)\)\s*\{\s*'Developer::Dashboard'\s*\}/, 'install.ps1 no longer defaults streamed Windows installs to the stale CPAN module name' );
     like( $install_ps_text, qr/cpanm.*--notest/s, 'install.ps1 installs Developer Dashboard with cpanm --notest on Windows' );
     like( $install_ps_text, qr/dashboard init/, 'install.ps1 initializes the dashboard runtime after the Windows install' );
-    like( $install_ps_text, qr/dashboard shell ps/, 'install.ps1 activates the PowerShell bootstrap after installation' );
+    like( $install_ps_text, qr/\bshell\s+ps\b/, 'install.ps1 activates the PowerShell bootstrap after installation' );
     like( $install_ps_text, qr/Set-ExecutionPolicy\s+-Scope\s+CurrentUser\s+-ExecutionPolicy\s+RemoteSigned\s+-Force/s, 'install.ps1 enables a CurrentUser PowerShell execution policy that can load the generated profile in future sessions' );
     like( $install_ps_text, qr/ExecutionPolicyOverride/, 'install.ps1 treats the benign CurrentUser execution-policy override warning explicitly during streamed bootstrap runs' );
     like( $install_ps_text, qr/kept the saved CurrentUser policy and continued/s, 'install.ps1 explains when a more specific PowerShell execution-policy scope keeps the current session in Bypass while the saved CurrentUser policy still succeeds' );
@@ -495,6 +533,59 @@ SH
         $stdout,
         qr/Post-install activation commands completed\./,
         'install.sh confirms that the post-install shell commands completed',
+    );
+}
+
+{
+    my $home = tempdir( CLEANUP => 1 );
+    my $fake_bin = tempdir( CLEANUP => 1 );
+    my $log = File::Spec->catfile( $home, 'install.log' );
+    _seed_fake_install_commands(
+        fake_bin => $fake_bin,
+        log      => $log,
+    );
+
+    my $fake_bash = File::Spec->catfile( $fake_bin, 'bash' );
+    _write_executable(
+        $fake_bash,
+        <<"SH",
+#!/bin/sh
+printf '%s\\n' "fake-bash \$*" >> "$log"
+exit 0
+SH
+    );
+
+    my $env_prefix = join ' ',
+      map { sprintf q{%s='%s'}, $_->{key}, $_->{value} } (
+        { key => 'HOME',                       value => $home },
+        { key => 'PATH',                       value => $fake_bin . ':' . ( $ENV{PATH} || '' ) },
+        { key => 'SHELL',                      value => '' },
+        { key => 'DD_INSTALL_PREFERRED_SHELL', value => 'bash' },
+        { key => 'DD_INSTALL_OS_OVERRIDE',     value => 'ubuntu' },
+        { key => 'DD_INSTALL_SHELL_COMMANDS',  value => 'dashboard version' },
+      );
+
+    my ( $stdout, $stderr, $exit ) = capture {
+        system( 'sh', '-c', "$env_prefix '$install_sh'" );
+    };
+    is( $exit >> 8, 0, 'install.sh can run post-install commands when SHELL is unset in a blank container' )
+      or diag $stdout . $stderr;
+
+    my @log_lines = _log_lines($log);
+    like(
+        join( "\n", @log_lines ),
+        qr/fake-bash -ilc \. "\Q$home\/.profile\E" .*dashboard version/s,
+        'install.sh resolves the bash bootstrap target as the post-install runner instead of falling back to sh when SHELL is unset',
+    );
+    like(
+        $stdout,
+        qr/Running post-install activation commands through bash\./,
+        'install.sh still reports the bash bootstrap target for blank-container runs',
+    );
+    like(
+        $stdout,
+        qr/Post-install activation commands completed\./,
+        'install.sh completes the post-install shell commands without a target-runner dialect mismatch',
     );
 }
 

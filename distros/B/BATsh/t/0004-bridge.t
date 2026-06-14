@@ -11,10 +11,13 @@ BEGIN { if ($] < 5.006 && !defined(&warnings::import)) {
 use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 use FindBin ();
+use File::Spec ();
 use lib "$FindBin::Bin/../lib";
 
 eval { require BATsh } or die "Cannot load BATsh: $@";
 BATsh::Env::init();
+
+my $TMPDIR = File::Spec->tmpdir();
 
 my @tests = (
 
@@ -139,6 +142,67 @@ my @tests = (
         _ok(( defined( $BATsh::Env::STORE{'BR_T10A'} ) ? $BATsh::Env::STORE{'BR_T10A'} : '' ) eq 'cmd_section'
          && ( defined( $BATsh::Env::STORE{'BR_T10B'} ) ? $BATsh::Env::STORE{'BR_T10B'} : '' ) eq 'sh_section',
             'BR10: CMD and SH sections both execute');
+    },
+
+    # BR11: a single-line "for ...; do ...; done" must NOT leave the SH
+    #       section open.  If it does, the following CMD line is absorbed into
+    #       the SH section and "SET VAR=%X%" never runs as CMD, so the bridge
+    #       value is missing.
+    sub {
+        delete $BATsh::Env::STORE{'BR_T11'};
+        delete $BATsh::Env::STORE{'BR_T11_SH'};
+        BATsh->run_string(join("\n",
+            'for i in 1 2 3; do echo $i; done',
+            'export BR_T11_SH=set_in_sh',
+            'SET BR_T11=%BR_T11_SH%',
+        ));
+        _ok(( defined( $BATsh::Env::STORE{'BR_T11'} ) ? $BATsh::Env::STORE{'BR_T11'} : '' ) eq 'set_in_sh',
+            'BR11: single-line for does not leave SH section open (CMD %VAR% bridges)');
+    },
+
+    # BR12: same guard for a single-line "while ...; do ...; done"
+    sub {
+        delete $BATsh::Env::STORE{'BR_T12'};
+        delete $BATsh::Env::STORE{'BR_T12_SH'};
+        BATsh->run_string(join("\n",
+            'N=0',
+            'while [ $N -lt 2 ]; do N=$(( N + 1 )); done',
+            'export BR_T12_SH=after_while',
+            'SET BR_T12=%BR_T12_SH%',
+        ));
+        _ok(( defined( $BATsh::Env::STORE{'BR_T12'} ) ? $BATsh::Env::STORE{'BR_T12'} : '' ) eq 'after_while',
+            'BR12: single-line while does not leave SH section open (CMD %VAR% bridges)');
+    },
+
+    # BR13: a CMD-style comment (":: ..." / "REM ...") that contains shell
+    #       metacharacters and follows an SH section must NOT be handed to the
+    #       external shell.  Before the fix it was dispatched to /bin/sh, which
+    #       failed with 'Syntax error: "(" unexpected'.  Capture STDERR and
+    #       assert no such shell error is emitted.
+    sub {
+        my $errfile = File::Spec->catfile($TMPDIR, "batsh_br13_$$.err");
+        my $captured = 0;
+        if (open(BR13_SAVERR, ">&STDERR")) {
+            if (open(STDERR, "> $errfile")) { $captured = 1 }
+            else { open(STDERR, ">&BR13_SAVERR"); close(BR13_SAVERR) }
+        }
+        BATsh->run_string(join("\n",
+            'export BR_T13=ok',
+            ':: a CMD comment (with parens) and a | pipe',
+            'REM another (comment) with > redirect',
+            'ECHO done13',
+        ));
+        my $err = '';
+        if ($captured) {
+            open(STDERR, ">&BR13_SAVERR"); close(BR13_SAVERR);
+            if (open(BR13_EF, "< $errfile")) {
+                local $/; $err = <BR13_EF>; close(BR13_EF);
+            }
+            unlink($errfile);
+        }
+        $err = '' unless defined $err;
+        _ok($err !~ /Syntax error|unexpected/i,
+            'BR13: :: / REM comment after SH section is not dispatched to the shell');
     },
 
 );

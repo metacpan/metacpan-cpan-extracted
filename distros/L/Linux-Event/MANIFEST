@@ -1,4 +1,16 @@
+bench/check-prereqs.pl
+bench/lib/Linux/Event/Bench.pm
+bench/README.md
+bench/results/.gitkeep
+bench/run-reactor-bench.pl
+bench/scenarios/callback_storm.pl
+bench/scenarios/echo_tcp.pl
+bench/scenarios/pipe_churn.pl
+bench/scenarios/timer_heap.pl
+bench/scenarios/watcher_churn.pl
+bench/VALIDATION.md
 Changes
+Event.xs
 examples/01-after.pl
 examples/02-at.pl
 examples/03-watch-pipe.pl
@@ -11,7 +23,6 @@ examples/09-waker-fork-pipe.pl
 examples/10-pid.pl
 examples/90-bench-oneshot.pl
 examples/91-stress-oneshot-edge-safe.pl
-examples/92-linux-epoll-oneshot-rearm.pl
 examples/93-regress-stop-no-backend-wait.pl
 examples/94-regress-epoll-oneshot-rearm.pl
 examples/all.pl
@@ -25,9 +36,10 @@ lib/Linux/Event/Scheduler.pm
 lib/Linux/Event/Signal.pm
 lib/Linux/Event/Wakeup.pm
 lib/Linux/Event/Watcher.pm
+lib/Linux/Event/XS.pm
 LICENSE
 Makefile.PL
-MANIFEST			This list of files
+MANIFEST
 README.md
 t/00-load.t
 t/01-timers.t
@@ -41,6 +53,11 @@ t/08-pid.t
 t/09-stop-no-backend-wait.t
 t/10-after-zero.t
 t/11-loop-constructor.t
+t/12-xs-registry.t
+t/13-xs-watcher.t
+t/14-xs-epoll-buffer.t
+t/15-xs-timer-heap.t
+t/16-optional-dep-errors.t
 t/20-epoll-oneshot-rearm.t
 t/21-oneshot-stays-active.t
 t/98-no-stray-leading-bytes.t

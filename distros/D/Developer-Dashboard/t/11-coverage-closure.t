@@ -969,6 +969,11 @@ is( $die_action->[0], 403, 'web app converts action runner exceptions into 403 r
 my $die_encoded = $web_die->_encoded_action_response( token => $encoded_token, params => {} );
 is( $die_encoded->[0], 403, 'web app converts encoded action exceptions into 403 responses' );
 
+my $provider_page = $resolver->load_named_page('cfg-provider');
+my $provider_html = $web_json->_render_page_html( $provider_page, 'render' );
+unlike( $provider_html, qr{id="view-source-url"}, 'provider pages do not expose a broken saved-bookmark view source link' );
+unlike( $provider_html, qr{id="share-url"}, 'provider pages do not expose a broken saved-bookmark share link' );
+
 my $prompt = Developer::Dashboard::Prompt->new( indicators => $indicators, paths => $paths );
 my $project_only_prompt = $prompt->render( cwd => $repo, jobs => 0 );
 like( $project_only_prompt, qr{\Q[~/projects/coverage-app]\E}, 'prompt renders the bracketed cwd when git branch is unavailable' );

@@ -23,10 +23,11 @@ use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 
 use vars qw($VERSION);
-$VERSION = '0.04';
+$VERSION = '0.05';
 
 use File::Spec ();
 BEGIN { eval { require Cwd } }
+BEGIN { eval { require POSIX } }
 $VERSION = $VERSION;
 
 # Keys stored in UPPERCASE for case-insensitive lookup
@@ -97,10 +98,13 @@ sub expand_cmd {
         do { my $k = "%$1"; exists($STORE{$k}) ? $STORE{$k} : '' }
     /ge;
 
-    # %VAR% substitution (case-insensitive lookup via _key)
-    $str =~ s/%([^%\r\n]+)%/
-        do { my $k=uc($1); exists($STORE{$k}) ? $STORE{$k} : '' }
-    /ge;
+    # %VAR:~n,m% substring and %VAR:str1=str2% substitution
+    # Must be processed BEFORE plain %VAR% expansion.
+    $str =~ s/%([A-Za-z_][A-Za-z0-9_]*):([^%
+]+)%/_expand_var_modifier($1,$2)/ge;
+
+    # %VAR% substitution: dynamic pseudo-variables first, then STORE lookup
+    $str =~ s/%([^%\r\n]+)%/_expand_named_var($1)/ge;
 
     # %% -> literal %
     $str =~ s/%%/%/g;
@@ -127,6 +131,114 @@ sub expand_cmd {
 #   x      extension only (including leading dot, e.g. ".bat")
 #
 # The value is taken from %N in the Env store (%0..%9).
+# ----------------------------------------------------------------
+# _expand_named_var: resolve %VARNAME% with dynamic pseudo-variable support
+#
+# Dynamic pseudo-variables (read-only, computed at expansion time):
+#   %RANDOM%      pseudo-random integer 0-32767 (cmd.exe range)
+#   %DATE%        current date  YYYY-MM-DD
+#   %TIME%        current time  HH:MM:SS.cc
+#   %CD%          current working directory
+#   %CMDCMDLINE%  empty string (not meaningful in a pure-Perl interpreter)
+#   %ERRORLEVEL%  current ERRORLEVEL from BATsh::CMD (via hook function)
+#
+# All other names: looked up in %STORE (case-insensitive, as cmd.exe).
+# ----------------------------------------------------------------
+sub _expand_named_var {
+    my ($name) = @_;
+    my $upper = uc($name);
+    if ($upper eq 'RANDOM') {
+        return int(rand(32768));
+    }
+    if ($upper eq 'DATE') {
+        my @t = localtime(time());
+        return sprintf('%04d-%02d-%02d', $t[5]+1900, $t[4]+1, $t[3]);
+    }
+    if ($upper eq 'TIME') {
+        my @t = localtime(time());
+        return sprintf('%02d:%02d:%02d.%02d', $t[2], $t[1], $t[0], 0);
+    }
+    if ($upper eq 'CD') {
+        return defined(&Cwd::cwd) ? Cwd::cwd() : '.';
+    }
+    if ($upper eq 'CMDCMDLINE') {
+        return '';
+    }
+    if ($upper eq 'ERRORLEVEL') {
+        return defined(&BATsh::CMD::_get_errorlevel)
+            ? BATsh::CMD::_get_errorlevel()
+            : (exists($STORE{ERRORLEVEL}) ? $STORE{ERRORLEVEL} : '0');
+    }
+    return exists($STORE{$upper}) ? $STORE{$upper} : '';
+}
+
+# ----------------------------------------------------------------
+# _expand_var_modifier: %VAR:~n,m% substring / %VAR:str1=str2% substitution
+#
+# Substring form (cmd.exe compatible):
+#   %VAR:~n%      characters from offset n to end
+#   %VAR:~n,m%    m characters starting at offset n (negative = from end)
+#
+# Substitution form:
+#   %VAR:str1=str2%   replace first occurrence of str1 with str2
+#   %VAR:*str1=str2%  replace from start up-to-and-including first str1
+#                     with str2 (cmd.exe *-prefix behaviour)
+# ----------------------------------------------------------------
+sub _expand_var_modifier {
+    my ($varname, $modifier) = @_;
+    my $val = do {
+        my $k = uc($varname);
+        exists($STORE{$k}) ? $STORE{$k} : ''
+    };
+
+    # Substring: ~n  or  ~n,m
+    if ($modifier =~ /\A~(-?\d+)(?:,(-?\d+))?\z/) {
+        my ($n, $m) = ($1, $2);
+        my $len = length($val);
+        my $start = ($n < 0) ? $len + $n : $n;
+        $start = 0 if $start < 0;
+        return '' if $start >= $len;
+        if (!defined $m) {
+            return substr($val, $start);
+        }
+        my $end;
+        if ($m < 0) {
+            $end = $len + $m;
+        }
+        else {
+            $end = $start + $m;
+        }
+        $end = $len if $end > $len;
+        return '' if $end <= $start;
+        return substr($val, $start, $end - $start);
+    }
+
+    # Substitution: str1=str2  or  *str1=str2
+    if ($modifier =~ /\A(\*?)([^=]*)=(.*)\z/) {
+        my ($star, $str1, $str2) = ($1, $2, $3);
+        if ($star eq '*') {
+            my $pos = index(lc($val), lc($str1));
+            if ($pos >= 0) {
+                return $str2 . substr($val, $pos + length($str1));
+            }
+            return $val;
+        }
+        else {
+            my $lval  = lc($val);
+            my $lstr1 = lc($str1);
+            my $pos   = index($lval, $lstr1);
+            if ($pos >= 0) {
+                return substr($val, 0, $pos) . $str2
+                     . substr($val, $pos + length($str1));
+            }
+            return $val;
+        }
+    }
+
+    # Unrecognised modifier: return as-is
+    return '%' . $varname . ':' . $modifier . '%';
+}
+
 # Uses File::Spec (platform-aware) and a hand-rolled path splitter so
 # that Windows-style paths work correctly on Windows and Unix-style
 # paths work on Unix without requiring Win32-specific modules.
@@ -273,11 +385,38 @@ Supported modifier letters: C<f> (full path), C<d> (drive), C<p> (directory),
 C<n> (basename without extension), C<x> (extension).  With no modifiers,
 surrounding double-quotes are stripped.
 
-=item 2. C<%VAR%> substitution (case-insensitive lookup via uppercase key).
+=item 2. C<%VAR:~n,m%> substring and C<%VAR:str1=str2%> substitution
+(processed before plain C<%VAR%> lookup).
+
+Substring forms:
+
+  %VAR:~n%      characters from offset n to end of value
+  %VAR:~n,m%    m characters from offset n (m negative: end offset)
+  %VAR:~-n%     last n characters
+
+Substitution forms:
+
+  %VAR:str1=str2%    replace first occurrence of str1 with str2
+  %VAR:*str1=str2%   replace from start through first str1 with str2
+
+String matching is case-insensitive, matching cmd.exe behaviour.
+If str1 is not found the value is returned unchanged.
+
+=item 3. C<%VAR%> substitution (case-insensitive lookup via uppercase key).
+Dynamic pseudo-variables are resolved at expansion time:
+
+  %DATE%        current date as YYYY-MM-DD
+  %TIME%        current time as HH:MM:SS.cc
+  %CD%          current working directory
+  %RANDOM%      pseudo-random integer 0-32767
+  %ERRORLEVEL%  exit status of the most recent command
+  %CMDCMDLINE%  empty string (not meaningful in pure-Perl mode)
+
+All other names are looked up in C<%STORE>.
 Unresolved references expand to the empty string.
 C<%%> is replaced with a literal C<%>.
 
-=item 3. C<!VAR!> substitution (only when C<$DELAYED_EXPANSION> is true).
+=item 4. C<!VAR!> substitution (only when C<$DELAYED_EXPANSION> is true).
 Unresolved C<!VAR!> references expand to the empty string.
 
 =back

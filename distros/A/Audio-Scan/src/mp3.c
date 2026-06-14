@@ -743,7 +743,7 @@ _mp3_parse(PerlIO *infile, char *file, HV *info)
   // Or if we have a Xing header, use it to determine bitrate
   if (!mp3->bitrate && (mp3->xing_frame->xing_frames && mp3->xing_frame->xing_bytes)) {
     float mfs = (float)frame.samplerate / ( frame.mpegID == MPEG2_ID || frame.mpegID == MPEG25_ID ? 72000. : 144000. );
-    mp3->bitrate = ( mp3->xing_frame->xing_bytes / mp3->xing_frame->xing_frames * mfs );
+    mp3->bitrate = ( (float)mp3->xing_frame->xing_bytes / (float)mp3->xing_frame->xing_frames * mfs );
     DEBUG_TRACE("bitrate from Xing header: %d\n", mp3->bitrate);
   }
 
@@ -903,7 +903,7 @@ out:
   return mp3;
 }
 
-int
+off_t
 mp3_find_frame(PerlIO *infile, char *file, int offset)
 {
   Buffer mp3_buf;

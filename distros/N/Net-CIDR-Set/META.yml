@@ -3,10 +3,11 @@ abstract: 'Manipulate sets of IP addresses'
 author:
   - 'Andy Armstrong <andy@hexten.net>'
 build_requires:
-  Data::Dumper: '0'
-  ExtUtils::MakeMaker: '7.22'
+  Data::Dumper: '2.154'
   File::Spec: '0'
-  Module::Metadata: '1.000015'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Metadata: '0'
   Test::Exception: '0'
   Test::More: '0.96'
 configure_requires:
@@ -28,13 +29,13 @@ name: Net-CIDR-Set
 provides:
   Net::CIDR::Set:
     file: lib/Net/CIDR/Set.pm
-    version: '0.21'
+    version: '0.22'
   Net::CIDR::Set::IPv4:
     file: lib/Net/CIDR/Set/IPv4.pm
-    version: '0.21'
+    version: '0.22'
   Net::CIDR::Set::IPv6:
     file: lib/Net/CIDR/Set/IPv6.pm
-    version: '0.21'
+    version: '0.22'
 requires:
   Carp: '0'
   namespace::autoclean: '0'
@@ -46,7 +47,7 @@ resources:
   Authority: cpan:RRWO
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Net-CIDR-Set
   repository: git://github.com/robrwo/perl-Net-CIDR-Set.git
-version: '0.21'
+version: '0.22'
 x_contributors:
   - 'Thomas Eckardt <Thomas.Eckardt@thockar.com>'
   - 'Brian Gottreu <gottreu@cpan.org>'
@@ -55,3 +56,4 @@ x_contributors:
 x_generated_by_perl: v5.42.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 1

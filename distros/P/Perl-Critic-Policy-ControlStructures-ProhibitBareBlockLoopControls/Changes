@@ -1,0 +1,13 @@
+Revision history for Perl-Critic-Policy-ControlStructures-ProhibitBareBlockLoopControls
+
+0.03    2026-06-13
+    - Adjust package name and hopefully cpan will index it
+0.02    2026-06-13
+    - Improved violation explanations (per-block-type, forbid vs require-label).
+    - Added t/explanation-messages.t (26 unit tests).
+    - Fixed POD inaccuracies around bare blocks and do blocks.
+    - Restricted releases to trunk branch.
+
+0.01    2026-06-13
+    - Initial release. Author Dean Hamstead
+    - Policy to prohibit unlabeled next/last/redo in non-loop blocks.

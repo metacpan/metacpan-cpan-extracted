@@ -2,7 +2,7 @@ package DBIx::QuickORM::Test;
 use strict;
 use warnings;
 
-use Test2::V0;
+use Test2::V0 '!meta', '!pass';
 use Test2::IPC qw/cull/;
 use List::Util qw/first/;
 use Importer Importer => 'import';
@@ -20,15 +20,19 @@ our @EXPORT = qw{
 
     do_for_all_dbs
     dialect_has_savepoints
+    curdb_version
+    pg_older_than
 };
 
-sub psql     { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'PostgreSQL', @args}) } or diag(clean_err($@)) }
-sub mysql    { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'MySQL',      @args}) } or diag(clean_err($@)) }
-sub mysqlcom { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'MySQLCom',   @args}) } or diag(clean_err($@)) }
-sub mariadb  { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'MariaDB',    @args}) } or diag(clean_err($@)) }
-sub percona  { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'Percona',    @args}) } or diag(clean_err($@)) }
-sub sqlite   { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'SQLite',     @args}) } or diag(clean_err($@)) }
-sub duckdb   { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'DuckDB',     @args}) } or diag(clean_err($@)) }
+use version ();
+
+sub psql     { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'PostgreSQL', fast_destroy => 1, @args}) } or diag(clean_err($@)) }
+sub mysql    { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'MySQL', fast_destroy => 1,      @args}) } or diag(clean_err($@)) }
+sub mysqlcom { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'MySQLCom', fast_destroy => 1,   @args}) } or diag(clean_err($@)) }
+sub mariadb  { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'MariaDB', fast_destroy => 1,    @args}) } or diag(clean_err($@)) }
+sub percona  { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'Percona', fast_destroy => 1,    @args}) } or diag(clean_err($@)) }
+sub sqlite   { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'SQLite', fast_destroy => 1,     @args}) } or diag(clean_err($@)) }
+sub duckdb   { require Test2::Tools::QuickDB; my @args = @_; eval { Test2::Tools::QuickDB::get_db({driver => 'DuckDB', fast_destroy => 1,     @args}) } or diag(clean_err($@)) }
 
 # Static sets that do not live under ~/dbs: the system-installed servers and
 # sqlite. These are always offered (and skipped at runtime if unavailable).
@@ -42,9 +46,30 @@ my @STATIC_SETS = (
 # The quickdb name of the set currently running under do_for_all_dbs.
 our $CURRENT_QDB;
 
+# The full set descriptor currently running under do_for_all_dbs.
+our $CURRENT_SET;
+
 # DuckDB has no savepoints, so it cannot run the nested-transaction (savepoint)
 # subtests. Tests that exercise nested transactions guard them with this.
 sub dialect_has_savepoints { ($CURRENT_QDB // '') ne 'DuckDB' }
+
+# Full version of the ~/dbs set currently running ("9.3.15"), parsed from its
+# name, or undef for the static system sets whose name carries no version.
+sub curdb_version {
+    my $set = $CURRENT_SET or return undef;
+    my ($v) = $set->{name} =~ m/-(\d[\d.]*)$/;
+    return $v;
+}
+
+# True when the running database is a versioned PostgreSQL install older than
+# the given major.minor (e.g. pg_older_than('9.5')). The static system
+# PostgreSQL set carries no version and is assumed current, so returns false.
+sub pg_older_than {
+    my ($want) = @_;
+    return 0 unless ($CURRENT_QDB // '') eq 'PostgreSQL';
+    my $have = curdb_version() or return 0;
+    return version->parse("v$have") < version->parse("v$want");
+}
 
 # Maps the engine prefix of a "~/dbs/<engine>-<version>" directory to its driver
 # metadata. 'server' is the binary that must exist under bin/ for the install to
@@ -144,6 +169,7 @@ sub do_for_all_dbs(&;@) {
 
                 subtest "$set->{name} x DBD::$dbi" => sub {
                     local $CURRENT_QDB = $set->{quickdb};
+                    local $CURRENT_SET = $set;
                     $ENV{$_} = $set->{env}->{$_} for keys %{$set->{env}};
                     my $qdb = "DBIx::QuickDB::Driver::$set->{quickdb}";
                     my $have_qdb = eval { require "DBIx/QuickDB/Driver/$set->{quickdb}.pm"; my ($v, $why) = $qdb->viable({load_sql => 1, bootstrap => 1}); $v || die $why } or note $@;

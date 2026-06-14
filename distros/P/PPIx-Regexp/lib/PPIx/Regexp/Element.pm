@@ -54,7 +54,7 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.091';
+our $VERSION = '0.092';
 
 =head2 accepts_perl
 
@@ -807,7 +807,7 @@ list context.
 
 This method was inspired by jb's question on Perl Monks about stripping
 comments and white space from a regular expression:
-L<https://www.perlmonks.org/?node_id=1207556>
+L<https://perlmonks.org/?node_id=1207556>
 
 This method was added in version 0.053_01
 
@@ -1029,7 +1029,7 @@ referred-to group can not be uniquely determined.
 It is possible for C<$max> to be C<Inf>. For example, for C</x*/>
 C<$max> will be C<Inf>.
 
-Elements that do not actually match anything will return zeroes.
+Elements that do not actually match anything will return zeros.
 
 B<Note:> This method was added because I wanted better detection of
 variable-length look-behinds. Both it and L<raw_width()|/raw_width>
@@ -1188,17 +1188,16 @@ __END__
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=PPIx-Regexp>,
-L<https://github.com/trwyant/perl-PPIx-Regexp/issues>, or in
+L<https://github.com/trwyant/perl-PPIx-Regexp/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III F<wyant at cpan dot org>
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2009-2023, 2025 by Thomas R. Wyant, III
+Copyright (C) 2009-2023, 2025-2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

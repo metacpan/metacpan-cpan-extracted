@@ -2,7 +2,7 @@ package Pod::Weaver::Section::RecentChanges;
 
 # ABSTRACT: generate POD with the recent changes
 
-use v5.20;
+use v5.24;
 
 use Moose;
 with 'Pod::Weaver::Role::Section';
@@ -16,11 +16,11 @@ use Pod::Elemental::Element::Pod5::Ordinary;
 use Pod::Elemental::Element::Pod5::Region;
 use Types::Common qw( Bool NonEmptySimpleStr SimpleStr );
 
-use experimental qw( lexical_subs postderef signatures );
+use experimental qw( lexical_subs signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.5.3';
+our $VERSION = 'v0.6.0';
 
 
 has header => (
@@ -195,7 +195,7 @@ Pod::Weaver::Section::RecentChanges - generate POD with the recent changes
 
 =head1 VERSION
 
-version v0.5.3
+version v0.6.0
 
 =head1 SYNOPSIS
 
@@ -266,7 +266,7 @@ L<Pod::Weaver::Section::Changes>
 
 Only the latest version of this module will be supported.
 
-This module requires Perl v5.20 or later.  Future releases may only support Perl versions released in the last ten
+This module requires Perl v5.24 or later.  Future releases may only support Perl versions released in the last ten
 years.
 
 =head2 Reporting Bugs and Submitting Feature Requests

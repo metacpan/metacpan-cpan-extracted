@@ -2,11 +2,12 @@ package DBIx::QuickORM::Connection::RowData;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use Carp qw/confess croak carp/;
-use List::Util qw/first/;
 use Scalar::Util qw/reftype blessed/;
+
+use DBIx::QuickORM::Affinity();
 
 use constant STORED      => 'stored';
 use constant PENDING     => 'pending';
@@ -46,6 +47,14 @@ Holds the mutable state behind a single row for one connection: the stored
 fields whose stored value changed underneath a pending edit. The state is
 kept as a stack of frames keyed by transaction, so that committing or rolling
 back a transaction merges or discards the right frame.
+
+The frame stack always mirrors the connection's transaction nesting: when a
+state frame is pushed for a transaction, carrier frames are inserted for any
+open transactions between the current frame's transaction and the new one,
+each starting as a copy of the data beneath it. When a transaction commits,
+its frame merges into the frame immediately below it (and no further), so
+data committed inside a savepoint is still discarded if an enclosing
+transaction later rolls back.
 
 A row becomes invalid when the transaction it was created in rolls back, or
 when explicitly invalidated; an invalid row has an empty stack and a reason.
@@ -139,14 +148,14 @@ sub invalidate {
     my $reason = $params{reason};
     unless ($reason) {
         my @caller = caller;
-        $reason = "unkown at $caller[1] line $caller[2]";
+        $reason = "unknown at $caller[1] line $caller[2]";
     }
 
     $self->{+INVALID} = $reason;
 
     my @old_stack = @{$self->{+STACK}};
 
-    my $active = $self->active(no_fatal => 1) // @old_stack ? $old_stack[-1] : undef;
+    my $active = $self->active(no_fatal => 1) // (@old_stack ? $old_stack[0] : undef);
 
     my $pending = $active ? $active->{+PENDING} : undef;
 
@@ -221,7 +230,12 @@ sub init {
 
     $self->{+CONNECTION}  = $con_sub;
     $self->{+SOURCE} = $src_sub;
-    $self->{+STACK} //= [];
+
+    # Rebuild any provided stack through _up_state so carrier frames are
+    # inserted for open transactions; the stack must mirror txn nesting.
+    my $stack = $self->{+STACK} // [];
+    $self->{+STACK} = [];
+    $self->_up_state($_) for reverse @$stack;
 }
 
 =pod
@@ -232,8 +246,9 @@ sub init {
 
 =item $frame = $data->active(no_fatal => 1)
 
-Returns the active (top) state frame, first resolving the stack: completed
-transactions are merged down or discarded as appropriate. Confesses when the
+Returns the active (top) state frame, first resolving the stack: a frame
+whose transaction rolled back is discarded, a frame whose transaction
+committed is merged into the frame immediately below it. Confesses when the
 row is invalid unless C<no_fatal> is set, in which case it returns nothing.
 
 =cut
@@ -242,21 +257,34 @@ sub active {
     my $self = shift;
     my %params = @_;
 
-    my $connection;
     my $stack = $self->{+STACK};
     while (@$stack) {
-        my $txn = $stack->[0]->{+TRANSACTION} or last; # No txn, bottom state
-        my $res = $txn->result // last; # Undef means still open
+        my $frame = $stack->[0];
+        my $txn = $frame->{+TRANSACTION} or last;    # No txn, base state
+
+        # A dataless frame on top means every frame that held this row's data
+        # was discarded with a rolled-back transaction; it cannot represent
+        # the row, discard it too.
+        unless (exists($frame->{+STORED}) || exists($frame->{+PENDING})) {
+            shift @$stack;
+            next;
+        }
+
+        my $res = $txn->result // last;    # Undef means still open
         my $done = shift @$stack;
 
-        next unless $res; # Rolled back
+        next unless $res;    # Rolled back, discard the frame
 
         if (@$stack) {
-            $self->_merge_state($done);
+            # Committed: fold into the immediate next frame only. If that
+            # frame's transaction later rolls back, the merged data is
+            # discarded along with it.
+            $self->_merge_state($done, $stack->[0]);
         }
         else {
-            $connection //= $self->connection;
-            $done->{+TRANSACTION} = first { !defined($_->result) && $_->id < $txn->id } reverse @{$connection->transactions};
+            # Frame fill guarantees no open outer transaction exists when the
+            # stack empties under a committed frame, so it becomes the base.
+            delete $done->{+TRANSACTION};
             push @$stack => $done;
         }
     }
@@ -287,11 +315,10 @@ sub change_state {
 
     my $active = $self->active(no_fatal => 1) or return $self->_up_state($state);
 
-    my $row_txn = $self->active->{+TRANSACTION};
+    my $row_txn   = $active->{+TRANSACTION};
     my $state_txn = $state->{+TRANSACTION};
 
     my $state_res = $state_txn ? $state_txn->result : undef;
-    my $row_res   = $row_txn   ? $row_txn->result   : undef;
 
     croak "Refusing to merge down a rolled-back transaction" if defined($state_res) && !$state_res;
 
@@ -300,94 +327,12 @@ sub change_state {
     $merge ||= $state_txn && $row_txn && $state_txn == $row_txn;
 
     if ($merge) {
-        # If the transactions are the same, or if there are no txns for eather, just merge.
-        $self->_merge_state($state);
+        # If the transactions are the same, or if there are no txns for either, just merge.
+        $self->_merge_state($state, $active);
     }
     else {
         $self->_up_state($state);
     }
-
-    return $self;
-}
-
-=pod
-
-=head1 PRIVATE METHODS
-
-=over 4
-
-=item $data->_up_state($state)
-
-Pushes a new state frame onto the stack. Croaks when there is already a base
-state and the new frame carries no transaction.
-
-=cut
-
-sub _up_state {
-    my $self = shift;
-    my ($state) = @_;
-
-    my $stack = $self->{+STACK};
-    croak "There is already a base state, and no txn was provided" if @$stack && !$state->{+TRANSACTION};
-    unshift @$stack => $state;
-    return $self;
-}
-
-=pod
-
-=item $data->_merge_state($merge)
-
-Merges a state frame into the active frame, reconciling stored, pending, and
-desync fields.
-
-=back
-
-=cut
-
-sub _merge_state {
-    my $self = shift;
-    my ($merge, $source, $connection) = @_;
-
-    my $into = $self->active;
-
-    if (my $stored = $merge->{+STORED}) {
-        if (my $pending = $into->{+PENDING}) {
-            for my $field (keys %{$merge->{+STORED}}) {
-                $source //= $self->source;
-                $connection  //= $self->connection;
-
-                # No change
-                next if $self->compare_field($field, $into->{+STORED}, $stored, $source, $connection);
-
-                $into->{+STORED}->{$field} = $stored->{$field};
-                $into->{+DESYNC}->{$field} = 1 if $pending->{$field};
-            }
-            $into->{+PENDING} = $pending if keys %$pending;
-        }
-        else {
-            delete $into->{+DESYNC};
-            $into->{+STORED} = $into->{+STORED} ? {%{$into->{+STORED} // {}}, %{$stored}} : $stored;
-        }
-    }
-    elsif (exists $merge->{+STORED}) {
-        delete $into->{+STORED};
-        delete $into->{+DESYNC};
-        delete $merge->{+DESYNC};
-    }
-
-    delete $into->{+DESYNC} if exists $merge->{+DESYNC} && !$merge->{+DESYNC};
-
-    my $desync = $merge->{+DESYNC};
-    if (my $pending = $merge->{+PENDING}) {
-        $into->{+PENDING} = $into->{+PENDING} ? {%{$into->{+PENDING}}, %$pending} : $pending;
-        $into->{+DESYNC}  = $into->{+DESYNC}  ? {%{$into->{+DESYNC}},  %$desync}  : $desync if $desync;
-    }
-    elsif (exists $merge->{+PENDING}) {
-        delete $into->{+PENDING};
-    }
-
-    delete $into->{+PENDING} if $into->{+PENDING} && !keys %{$into->{+PENDING}};
-    delete $into->{+DESYNC} unless $into->{+PENDING};
 
     return $self;
 }
@@ -431,11 +376,171 @@ sub compare_field {
     return 0 if ($ad xor $bd);       # One is defined, one is not
     return 1 if (!$ad) && (!$bd);    # Neither is defined
 
-    # true if different, false if same
-    return !$type->qorm_compare($a, $b) if $type;
+    # true if same, false if different
+    return $type->qorm_compare($a, $b) if $type;
 
     # true if same, false if different
     return DBIx::QuickORM::Affinity::compare_affinity_values($affinity, $a, $b);
+}
+
+=pod
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item $data->_up_state($state)
+
+Pushes a new state frame onto the stack. When the state carries a
+transaction, carrier frames are first inserted for any open transactions
+between the current top frame and the new one, and the new frame starts as a
+copy of the data beneath it with the state merged in. Croaks when there is
+already a base state and the new frame carries no transaction.
+
+=cut
+
+sub _up_state {
+    my $self = shift;
+    my ($state) = @_;
+
+    my $stack = $self->{+STACK};
+    croak "There is already a base state, and no txn was provided" if @$stack && !$state->{+TRANSACTION};
+
+    my $txn = $state->{+TRANSACTION};
+
+    unless ($txn) {
+        unshift @$stack => $state;
+        return $self;
+    }
+
+    $self->_fill_frames($txn);
+
+    my $frame = $self->_carry_frame($txn);
+    unshift @$stack => $frame;
+    $self->_merge_state($state, $frame);
+
+    # Explicit "clear" markers (a data key present but false) must survive on
+    # the frame so they still clear the layer below when this frame merges
+    # down on commit.
+    for my $key (STORED, PENDING, DESYNC) {
+        $frame->{$key} = undef if exists $state->{$key} && !$state->{$key} && !exists $frame->{$key};
+    }
+
+    return $self;
+}
+
+=pod
+
+=item $data->_fill_frames($txn)
+
+Insert carrier frames for every open transaction between the current top
+frame's transaction and C<$txn>, so the stack mirrors the connection's
+transaction nesting.
+
+=cut
+
+sub _fill_frames {
+    my $self = shift;
+    my ($txn) = @_;
+
+    my $stack = $self->{+STACK};
+    my $below_txn = @$stack ? $stack->[0]->{+TRANSACTION} : undef;
+    my $below_id  = $below_txn ? $below_txn->id : undef;
+
+    for my $open (@{$self->connection->transactions}) {
+        next unless $open && !defined($open->result);
+        next if defined($below_id) && $open->id <= $below_id;
+        last if $open->id >= $txn->id;
+        unshift @$stack => $self->_carry_frame($open);
+    }
+
+    return $self;
+}
+
+=pod
+
+=item $frame = $data->_carry_frame($txn)
+
+Build a new frame owned by C<$txn> carrying a shallow copy of the data in
+the current top frame (if any).
+
+=cut
+
+sub _carry_frame {
+    my $self = shift;
+    my ($txn) = @_;
+
+    my $frame = {TRANSACTION() => $txn};
+
+    my $below = $self->{+STACK}->[0] or return $frame;
+
+    for my $key (STORED, PENDING, DESYNC) {
+        next unless exists $below->{$key};
+        my $val = $below->{$key};
+        $frame->{$key} = ref($val) eq 'HASH' ? {%$val} : $val;
+    }
+
+    return $frame;
+}
+
+=pod
+
+=item $data->_merge_state($merge, $into)
+
+Merges the C<$merge> state frame into the C<$into> frame, reconciling
+stored, pending, and desync fields.
+
+=back
+
+=cut
+
+sub _merge_state {
+    my $self = shift;
+    my ($merge, $into) = @_;
+
+    die "No merge target frame provided" unless $into;
+
+    my ($source, $connection);
+
+    if (my $stored = $merge->{+STORED}) {
+        if (my $pending = $into->{+PENDING}) {
+            for my $field (keys %$stored) {
+                $source     //= $self->source;
+                $connection //= $self->connection;
+
+                # No change
+                next if $self->compare_field($field, $into->{+STORED}, $stored, $source, $connection);
+
+                $into->{+STORED}->{$field} = $stored->{$field};
+                $into->{+DESYNC}->{$field} = 1 if exists $pending->{$field};
+            }
+        }
+        else {
+            delete $into->{+DESYNC};
+            $into->{+STORED} = $into->{+STORED} ? {%{$into->{+STORED} // {}}, %{$stored}} : $stored;
+        }
+    }
+    elsif (exists $merge->{+STORED}) {
+        delete $into->{+STORED};
+        delete $into->{+DESYNC};
+        delete $merge->{+DESYNC};
+    }
+
+    delete $into->{+DESYNC} if exists $merge->{+DESYNC} && !$merge->{+DESYNC};
+
+    my $desync = $merge->{+DESYNC};
+    if (my $pending = $merge->{+PENDING}) {
+        $into->{+PENDING} = $into->{+PENDING} ? {%{$into->{+PENDING}}, %$pending} : $pending;
+        $into->{+DESYNC}  = $into->{+DESYNC}  ? {%{$into->{+DESYNC}},  %$desync}  : $desync if $desync;
+    }
+    elsif (exists $merge->{+PENDING}) {
+        delete $into->{+PENDING};
+    }
+
+    delete $into->{+PENDING} if $into->{+PENDING} && !keys %{$into->{+PENDING}};
+    delete $into->{+DESYNC} unless $into->{+PENDING};
+
+    return $self;
 }
 
 1;

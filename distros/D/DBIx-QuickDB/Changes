@@ -1,3 +1,5 @@
+0.000051  2026-06-13 22:02:33-07:00 America/Los_Angeles
+
 0.000050  2026-06-10 14:14:43-07:00 America/Los_Angeles
 
     - Watcher teardown blocks on the reap after sending SIGKILL instead of racing a deadline that was too short at low QDB_STOP_GRACE.

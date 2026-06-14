@@ -5,6 +5,7 @@ use utf8;
 use Capture::Tiny qw(capture);
 use Cwd qw(abs_path getcwd);
 use Encode qw(decode_utf8);
+use Errno qw(EACCES);
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
@@ -644,6 +645,20 @@ ok(
     'SeedSync file_matches_content_md5 confirms the staged helper content matches the shipped helper body',
 );
 {
+    my $core_only_home  = tempdir( CLEANUP => 1 );
+    my $core_only_paths = Developer::Dashboard::PathRegistry->new( home => $core_only_home );
+    is(
+        Developer::Dashboard::InternalCLI::dashboard_core_path( paths => $core_only_paths ),
+        File::Spec->catfile( $core_only_home, '.developer-dashboard', 'cli', 'dd', '_dashboard-core' ),
+        'dashboard_core_path resolves the staged shared core helper location',
+    );
+    is_deeply(
+        Developer::Dashboard::InternalCLI::ensure_dashboard_core( paths => $core_only_paths ),
+        [ File::Spec->catfile( $core_only_home, '.developer-dashboard', 'cli', 'dd', '_dashboard-core' ) ],
+        'ensure_dashboard_core stages only the shared _dashboard-core helper',
+    );
+}
+{
     my $single_home = tempdir( CLEANUP => 1 );
     my $single_paths = Developer::Dashboard::PathRegistry->new( home => $single_home );
     my $single_written = Developer::Dashboard::InternalCLI::ensure_helper(
@@ -683,6 +698,34 @@ ok(
         ],
         'ensure_helper stages the shared core runtime and the requested wrapper helper when the helper delegates through _dashboard-core',
     );
+}
+{
+    my $wrapper_home = tempdir( CLEANUP => 1 );
+    my $wrapper_paths = Developer::Dashboard::PathRegistry->new( home => $wrapper_home );
+    my $wrapper_target = File::Spec->catfile( $wrapper_home, '.developer-dashboard', 'cli', 'dd', 'init' );
+    my $wrapper_root = File::Spec->catdir( $wrapper_home, '.developer-dashboard', 'cli', 'dd' );
+    make_path($wrapper_root);
+    my $stale_wrapper = Developer::Dashboard::InternalCLI::_managed_helper_content('init') . "# stale\n";
+    open my $wrapper_fh, '>:raw', $wrapper_target or die "Unable to write $wrapper_target: $!";
+    print {$wrapper_fh} $stale_wrapper;
+    close $wrapper_fh or die "Unable to close $wrapper_target: $!";
+
+    no warnings 'redefine';
+    local *Developer::Dashboard::InternalCLI::is_windows = sub { return 1 };
+
+    my $written = Developer::Dashboard::InternalCLI::ensure_helper(
+        paths => $wrapper_paths,
+        name  => 'init',
+    );
+    is_deeply(
+        $written,
+        [ File::Spec->catfile( $wrapper_home, '.developer-dashboard', 'cli', 'dd', '_dashboard-core' ) ],
+        'ensure_helper refreshes only the shared core runtime on Windows when an existing managed wrapper helper is already present on the hot path',
+    );
+    open my $wrapper_read_fh, '<:raw', $wrapper_target or die "Unable to read $wrapper_target: $!";
+    local $/;
+    is( <$wrapper_read_fh>, $stale_wrapper, 'ensure_helper leaves the existing managed Windows wrapper helper untouched on the hot path' );
+    close $wrapper_read_fh or die "Unable to close $wrapper_target after verification: $!";
 }
 {
     my $legacy_flat_core = File::Spec->catfile( $ENV{HOME}, '.developer-dashboard', 'cli', '_dashboard-core' );
@@ -870,6 +913,140 @@ ok(
         [ sort glob( $rename_fail_target . '.tmp.*' ) ],
         [],
         '_write_helper_atomically cleans up the temporary helper file after a rename failure',
+    );
+}
+{
+    my $replace_home = tempdir( CLEANUP => 1 );
+    my $replace_target = File::Spec->catfile( $replace_home, '_dashboard-core' );
+    open my $replace_existing_fh, '>:raw', $replace_target or die "Unable to write $replace_target: $!";
+    print {$replace_existing_fh} "old\n";
+    close $replace_existing_fh or die "Unable to close $replace_target: $!";
+
+    my @rename_calls;
+    my @unlink_calls;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::InternalCLI::is_windows = sub { return 1 };
+        local *Developer::Dashboard::InternalCLI::_rename_path = sub {
+            my ( $source, $target ) = @_;
+            push @rename_calls, [ $source, $target ];
+            if ( @rename_calls == 1 ) {
+                $! = EACCES;
+                return 0;
+            }
+            return rename $source, $target;
+        };
+        local *Developer::Dashboard::InternalCLI::_unlink_path = sub {
+            my ($path) = @_;
+            push @unlink_calls, $path;
+            return unlink $path;
+        };
+        ok(
+            Developer::Dashboard::InternalCLI::_write_helper_atomically( $replace_target, "new\n" ),
+            '_write_helper_atomically retries the final Windows helper replace after removing the existing target',
+        );
+    }
+    is( scalar @rename_calls, 2, '_write_helper_atomically retries one Windows helper rename after the initial collision' );
+    is_deeply( \@unlink_calls, [$replace_target], '_write_helper_atomically removes the existing Windows helper target before retrying the replace' );
+    open my $replace_read_fh, '<:raw', $replace_target or die "Unable to read $replace_target: $!";
+    local $/;
+    is( <$replace_read_fh>, "new\n", '_write_helper_atomically leaves the retried Windows helper payload on disk' );
+    close $replace_read_fh or die "Unable to close $replace_target after retry verification: $!";
+}
+{
+    my $defer_home = tempdir( CLEANUP => 1 );
+    my $defer_target = File::Spec->catfile( $defer_home, '_dashboard-core' );
+    my $stale_core = Developer::Dashboard::InternalCLI::_managed_helper_content('_dashboard-core') . "# stale\n";
+    open my $defer_fh, '>:raw', $defer_target or die "Unable to write $defer_target: $!";
+    print {$defer_fh} $stale_core;
+    close $defer_fh or die "Unable to close $defer_target: $!";
+
+    local $ENV{DEVELOPER_DASHBOARD_RUNNING_HELPER} = $defer_target;
+    no warnings 'redefine';
+    local *Developer::Dashboard::InternalCLI::is_windows = sub { return 1 };
+
+    ok(
+        !Developer::Dashboard::InternalCLI::_stage_managed_helper(
+            paths  => $paths,
+            name   => '_dashboard-core',
+            target => $defer_target,
+        ),
+        '_stage_managed_helper defers replacing the running _dashboard-core helper on Windows instead of dying',
+    );
+    open my $defer_read_fh, '<:raw', $defer_target or die "Unable to read $defer_target: $!";
+    local $/;
+    is( <$defer_read_fh>, $stale_core, '_stage_managed_helper leaves the running Windows _dashboard-core helper unchanged when refresh is deferred' );
+    close $defer_read_fh or die "Unable to close $defer_target after verification: $!";
+}
+{
+    my $defer_home = tempdir( CLEANUP => 1 );
+    my $defer_target = File::Spec->catfile( $defer_home, 'init' );
+    my $stale_helper = Developer::Dashboard::InternalCLI::_managed_helper_content('init') . "# stale\n";
+    open my $defer_fh, '>:raw', $defer_target or die "Unable to write $defer_target: $!";
+    print {$defer_fh} $stale_helper;
+    close $defer_fh or die "Unable to close $defer_target: $!";
+
+    local $ENV{DEVELOPER_DASHBOARD_RUNNING_HELPER} = $defer_target;
+    no warnings 'redefine';
+    local *Developer::Dashboard::InternalCLI::is_windows = sub { return 1 };
+
+    ok(
+        !Developer::Dashboard::InternalCLI::_stage_managed_helper(
+            paths  => $paths,
+            name   => 'init',
+            target => $defer_target,
+        ),
+        '_stage_managed_helper also defers replacing the running Windows wrapper helper instead of dying',
+    );
+    open my $defer_read_fh, '<:raw', $defer_target or die "Unable to read $defer_target: $!";
+    local $/;
+    is( <$defer_read_fh>, $stale_helper, '_stage_managed_helper leaves the running Windows wrapper helper unchanged when refresh is deferred' );
+    close $defer_read_fh or die "Unable to close $defer_target after verification: $!";
+}
+{
+    my $wrapper_body = Developer::Dashboard::InternalCLI::_managed_helper_content('init');
+    like(
+        $wrapper_body,
+        qr/DEVELOPER_DASHBOARD_RUNNING_HELPER/,
+        '_managed_helper_content stamps wrapper helpers with the running-helper environment marker for Windows-safe refresh deferral',
+    );
+}
+{
+    my $core_body = Developer::Dashboard::InternalCLI::helper_content('_dashboard-core');
+    like(
+        $core_body,
+        qr/DEVELOPER_DASHBOARD_RUNNING_HELPER/,
+        'helper_content exposes the _dashboard-core init fallback that seeds the running-helper marker when older wrappers did not set it',
+    );
+    like(
+        $core_body,
+        qr/helper_path\(\s*paths => \$paths,\s*name\s*=> 'init'/s,
+        'helper_content seeds the running-helper marker from the staged init helper path inside dashboard init on Windows',
+    );
+    like(
+        $core_body,
+        qr/skip_names\} = \['init'\]/,
+        'helper_content skips rewriting the active init helper during Windows dashboard init refresh',
+    );
+}
+{
+    my $skip_home  = tempdir( CLEANUP => 1 );
+    my $skip_paths = Developer::Dashboard::PathRegistry->new( home => $skip_home );
+    my $written = Developer::Dashboard::InternalCLI::ensure_helpers(
+        paths      => $skip_paths,
+        skip_names => ['init'],
+    );
+    ok(
+        !grep( $_ =~ m{/\Qinit\E$}, @$written ),
+        'ensure_helpers can skip staging one named helper while still refreshing the rest of the managed helper set',
+    );
+    ok(
+        !-e Developer::Dashboard::InternalCLI::helper_path( paths => $skip_paths, name => 'init' ),
+        'ensure_helpers leaves the skipped helper target untouched on disk',
+    );
+    ok(
+        grep( $_ =~ m{/\Qshell\E$}, @$written ),
+        'ensure_helpers still stages non-skipped helpers when one helper name is excluded',
     );
 }
 {
@@ -1138,7 +1315,8 @@ is(
 my $paths_output = capture {
     Developer::Dashboard::CLI::Paths::run_paths_command( command => 'paths', args => [] );
 };
-like( $paths_output, qr/"home_runtime_root"/, 'CLI::Paths renders the paths payload' );
+like( $paths_output, qr/^Path\s+Value/m, 'CLI::Paths renders the default paths summary table' );
+like( $paths_output, qr/home_runtime_root/, 'CLI::Paths default table includes the home runtime row' );
 {
     my $cwd = getcwd();
     my $projects_root = File::Spec->catdir( $ENV{HOME}, 'projects' );
@@ -1162,7 +1340,7 @@ like( $paths_output, qr/"home_runtime_root"/, 'CLI::Paths renders the paths payl
     my ( $stdout, $stderr ) = capture {
         Developer::Dashboard::CLI::Paths::run_paths_command(
             command => 'path',
-            args    => [ 'add', 'named-home-target', $named_dir ],
+            args    => [ 'add', 'named-home-target', $named_dir, '-o', 'json' ],
         );
     };
     is( $stderr, '', 'CLI::Paths add writes no stderr on success' );
@@ -1244,7 +1422,7 @@ like( $paths_output, qr/"home_runtime_root"/, 'CLI::Paths renders the paths payl
     ( $stdout, $stderr ) = capture {
         Developer::Dashboard::CLI::Paths::run_paths_command(
             command => 'path',
-            args    => [ 'locate', 'sample' ],
+            args    => [ 'locate', 'sample', '-o', 'json' ],
         );
     };
     is( $stderr, '', 'CLI::Paths locate writes no stderr on success' );
@@ -1345,7 +1523,7 @@ like( $paths_output, qr/"home_runtime_root"/, 'CLI::Paths renders the paths payl
     ( $stdout, $stderr ) = capture {
         Developer::Dashboard::CLI::Paths::run_paths_command(
             command => 'path',
-            args    => ['list'],
+            args    => [ 'list', '-o', 'json' ],
         );
     };
     is( $stderr, '', 'CLI::Paths list writes no stderr on success' );
@@ -1357,7 +1535,7 @@ like( $paths_output, qr/"home_runtime_root"/, 'CLI::Paths renders the paths payl
     ( $stdout, $stderr ) = capture {
         Developer::Dashboard::CLI::Paths::run_paths_command(
             command => 'path',
-            args    => ['add', '.'],
+            args    => [ 'add', '.', '-o', 'json' ],
         );
     };
     is( $stderr, '', 'CLI::Paths add . writes no stderr on success' );
@@ -1369,7 +1547,7 @@ like( $paths_output, qr/"home_runtime_root"/, 'CLI::Paths renders the paths payl
     ( $stdout, $stderr ) = capture {
         Developer::Dashboard::CLI::Paths::run_paths_command(
             command => 'path',
-            args    => [ 'add', 'here', '.' ],
+            args    => [ 'add', 'here', '.', '-o', 'json' ],
         );
     };
     is( $stderr, '', 'CLI::Paths add NAME . writes no stderr on success' );
@@ -1381,7 +1559,7 @@ like( $paths_output, qr/"home_runtime_root"/, 'CLI::Paths renders the paths payl
     ( $stdout, $stderr ) = capture {
         Developer::Dashboard::CLI::Paths::run_paths_command(
             command => 'path',
-            args    => [ 'del', 'named-home-target' ],
+            args    => [ 'del', 'named-home-target', '-o', 'json' ],
         );
     };
     is( $stderr, '', 'CLI::Paths del writes no stderr on success' );
@@ -1392,7 +1570,7 @@ like( $paths_output, qr/"home_runtime_root"/, 'CLI::Paths renders the paths payl
     ( $stdout, $stderr ) = capture {
         Developer::Dashboard::CLI::Paths::run_paths_command(
             command => 'path',
-            args    => [ 'del', '.' ],
+            args    => [ 'del', '.', '-o', 'json' ],
         );
     };
     is( $stderr, '', 'CLI::Paths del . writes no stderr on success' );
@@ -1403,7 +1581,7 @@ like( $paths_output, qr/"home_runtime_root"/, 'CLI::Paths renders the paths payl
     ( $stdout, $stderr ) = capture {
         Developer::Dashboard::CLI::Paths::run_paths_command(
             command => 'path',
-            args    => [ 'rm', 'here' ],
+            args    => [ 'rm', 'here', '-o', 'json' ],
         );
     };
     is( $stderr, '', 'CLI::Paths rm writes no stderr on success' );
@@ -1433,7 +1611,7 @@ like( $paths_output, qr/"home_runtime_root"/, 'CLI::Paths renders the paths payl
     my ( $stdout, $stderr ) = capture {
         Developer::Dashboard::CLI::Files::run_files_command(
             command => 'file',
-            args    => [ 'add', 'notes', File::Spec->catfile( $home, 'notes.txt' ) ],
+            args    => [ 'add', 'notes', File::Spec->catfile( $home, 'notes.txt' ), '-o', 'json' ],
         );
     };
     is( $stderr, '', 'CLI::Files add writes no stderr on success' );
@@ -1454,7 +1632,7 @@ like( $paths_output, qr/"home_runtime_root"/, 'CLI::Paths renders the paths payl
     ( $stdout, $stderr ) = capture {
         Developer::Dashboard::CLI::Files::run_files_command(
             command => 'file',
-            args    => ['list'],
+            args    => [ 'list', '-o', 'json' ],
         );
     };
     is( $stderr, '', 'CLI::Files list writes no stderr on success' );
@@ -1464,7 +1642,7 @@ like( $paths_output, qr/"home_runtime_root"/, 'CLI::Paths renders the paths payl
     ( $stdout, $stderr ) = capture {
         Developer::Dashboard::CLI::Files::run_files_command(
             command => 'file',
-            args    => [ 'del', 'notes' ],
+            args    => [ 'del', 'notes', '-o', 'json' ],
         );
     };
     is( $stderr, '', 'CLI::Files del writes no stderr on success' );
@@ -1741,6 +1919,122 @@ ok( !$existing_ticket_plan->{create}, 'build_ticket_plan skips creation for exis
         scalar( grep { $_->[0] eq 'set-environment' && $_->[3] eq 'SHARED' && $_->[4] eq 'child' } @tmux_calls ),
         'run_workspace_command applies current-directory .env values as the final override when a workspace session is resumed',
     );
+}
+{
+    my ( $clean, $flag ) = Developer::Dashboard::CLI::Ticket::split_workspace_change_dir_args( [ '-c', 'foobar' ] );
+    is_deeply( $clean, ['foobar'], 'split_workspace_change_dir_args strips a leading -c flag from workspace argv' );
+    is( $flag, 1, 'split_workspace_change_dir_args reports the change-directory flag when -c leads the argv' );
+    ( $clean, $flag ) = Developer::Dashboard::CLI::Ticket::split_workspace_change_dir_args( [ 'foobar', '-c' ] );
+    is_deeply( $clean, ['foobar'], 'split_workspace_change_dir_args strips a trailing -c flag from workspace argv' );
+    is( $flag, 1, 'split_workspace_change_dir_args reports the change-directory flag when -c trails the workspace name' );
+    ( $clean, $flag ) = Developer::Dashboard::CLI::Ticket::split_workspace_change_dir_args( ['foobar'] );
+    is_deeply( $clean, ['foobar'], 'split_workspace_change_dir_args keeps plain workspace argv unchanged' );
+    is( $flag, 0, 'split_workspace_change_dir_args reports no change-directory flag for plain workspace argv' );
+    like(
+        _dies( sub { Developer::Dashboard::CLI::Ticket::split_workspace_change_dir_args('foobar') } ),
+        qr/Workspace args must be an array reference/,
+        'split_workspace_change_dir_args rejects argv that is not an array reference',
+    );
+}
+for my $flag_order ( [ '-c', 'foobar' ], [ 'foobar', '-c' ] ) {
+    my $registered_root = tempdir( CLEANUP => 1 );
+    my $registered_target = abs_path($registered_root);
+    my @tmux_calls;
+    my @resolve_calls;
+    my $old_cwd = getcwd();
+    my $plan = Developer::Dashboard::CLI::Ticket::run_workspace_command(
+        args        => [ @{$flag_order} ],
+        resolve_dir => sub { push @resolve_calls, $_[0]; return $registered_target },
+        tmux        => sub {
+            my (%call) = @_;
+            push @tmux_calls, [ @{ $call{args} } ];
+            return { exit_code => 1, stdout => '', stderr => '' } if $call{args}[0] eq 'has-session';
+            return { exit_code => 0, stdout => '', stderr => '' };
+        },
+    );
+    my $order_label = join ' ', @{$flag_order};
+    is_deeply( \@resolve_calls, ['foobar'], "workspace -c resolves the workspace name through the registered paths inventory for '$order_label'" );
+    is( abs_path( getcwd() ), $registered_target, "workspace -c changes the helper process into the registered directory first for '$order_label'" );
+    is( $plan->{session}, 'foobar', "workspace -c keeps the workspace session name free of the flag for '$order_label'" );
+    is( $plan->{cwd}, $registered_target, "workspace -c plans the tmux session from the registered directory for '$order_label'" );
+    my ($create_call) = grep { $_->[0] eq 'new-session' } @tmux_calls;
+    ok( $create_call, "workspace -c still creates the tmux session when it does not exist for '$order_label'" );
+    my %create_pairs;
+    for my $index ( 1 .. $#{$create_call} - 1 ) {
+        $create_pairs{ $create_call->[$index] } = $create_call->[ $index + 1 ];
+    }
+    is( $create_pairs{'-c'}, $registered_target, "workspace -c starts the tmux session inside the registered directory for '$order_label'" );
+    chdir $old_cwd or die "Unable to restore cwd to $old_cwd: $!";
+}
+like(
+    _dies(
+        sub {
+            Developer::Dashboard::CLI::Ticket::run_workspace_command(
+                args        => [ '-c', 'unregistered-workspace' ],
+                resolve_dir => sub { return '' },
+                tmux        => sub { return { exit_code => 0, stdout => '', stderr => '' } },
+            );
+        }
+    ),
+    qr/Workspace 'unregistered-workspace' is not a registered dashboard path/,
+    'workspace -c refuses to run when the workspace name is not a registered dashboard path',
+);
+{
+    my $not_dir_root = tempdir( CLEANUP => 1 );
+    my $not_dir = File::Spec->catfile( $not_dir_root, 'plain-file' );
+    _write_file( $not_dir, "not a directory\n" );
+    like(
+        _dies(
+            sub {
+                Developer::Dashboard::CLI::Ticket::run_workspace_command(
+                    args        => [ '-c', 'file-backed' ],
+                    resolve_dir => sub { return $not_dir },
+                    tmux        => sub { return { exit_code => 0, stdout => '', stderr => '' } },
+                );
+            }
+        ),
+        qr/resolves to '\Q$not_dir\E', which is not a directory/,
+        'workspace -c refuses to change into a registered path that is not a directory',
+    );
+}
+{
+    my $blocked_root = tempdir( CLEANUP => 1 );
+    my $blocked_dir = File::Spec->catdir( $blocked_root, 'blocked' );
+    make_path($blocked_dir);
+    chmod 0000, $blocked_dir or die "Unable to chmod $blocked_dir: $!";
+    like(
+        _dies(
+            sub {
+                Developer::Dashboard::CLI::Ticket::run_workspace_command(
+                    args        => [ '-c', 'blocked-workspace' ],
+                    resolve_dir => sub { return $blocked_dir },
+                    tmux        => sub { return { exit_code => 0, stdout => '', stderr => '' } },
+                );
+            }
+        ),
+        qr/Unable to change directory to '\Q$blocked_dir\E' for workspace 'blocked-workspace'/,
+        'workspace -c surfaces the chdir failure instead of starting the workspace from the wrong directory',
+    );
+    chmod 0700, $blocked_dir or die "Unable to restore permissions on $blocked_dir: $!";
+}
+{
+    my $alias_home = tempdir( CLEANUP => 1 );
+    my $alias_target = File::Spec->catdir( $alias_home, 'projects', 'foobar-repo' );
+    make_path($alias_target);
+    my $alias_config_dir = File::Spec->catdir( $alias_home, '.developer-dashboard', 'config' );
+    make_path($alias_config_dir);
+    _write_file(
+        File::Spec->catfile( $alias_config_dir, 'config.json' ),
+        json_encode( { path_aliases => { foobar => $alias_target } } ),
+    );
+    local $ENV{HOME} = $alias_home;
+    my $old_cwd = getcwd();
+    chdir $alias_home or die "Unable to chdir to $alias_home: $!";
+    my $resolved = Developer::Dashboard::CLI::Ticket::registered_workspace_dir('foobar');
+    my $missing  = Developer::Dashboard::CLI::Ticket::registered_workspace_dir('not-a-registered-alias');
+    chdir $old_cwd or die "Unable to restore cwd to $old_cwd: $!";
+    is( abs_path($resolved), abs_path($alias_target), 'registered_workspace_dir resolves configured path aliases like cdr does' );
+    is( $missing, '', 'registered_workspace_dir returns an empty target for names that are not registered' );
 }
 like(
     _dies(
@@ -2270,6 +2564,7 @@ _write_file(
     File::Spec->catfile( $fake_bin, 'cpanm' ),
     <<"SH",
 #!/bin/sh
+printf 'PERL_MM_USE_DEFAULT=%s NONINTERACTIVE_TESTING=%s PERL_CANARY_STABILITY_NOPROMPT=%s\\n' "\${PERL_MM_USE_DEFAULT:-}" "\${NONINTERACTIVE_TESTING:-}" "\${PERL_CANARY_STABILITY_NOPROMPT:-}" >> "$cpanm_log"
 printf '%s\\n' "\$*" >> "$cpanm_log"
 printf 'CPANM:%s\\n' "\$*" >> "$dependency_log"
 if [ "\$DD_TEST_CPANM_FAIL" = "1" ]; then
@@ -2661,6 +2956,21 @@ like( $manager->install('https://example.invalid/not-a-repo.git')->{error}, qr/F
       or diag $local_uninstall->{error};
 }
 {
+    my $windows_rsync_bin = File::Spec->catdir( $ENV{HOME}, 'fake-windows-rsync-bin' );
+    make_path($windows_rsync_bin);
+    _write_file(
+        File::Spec->catfile( $windows_rsync_bin, 'rsync.exe' ),
+        "fake windows rsync\n",
+    );
+
+    local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+    local $ENV{PATH} = $windows_rsync_bin;
+    ok( $manager->_rsync_available, '_rsync_available resolves rsync directly on Windows without requiring sh on PATH' );
+
+    local $ENV{PATH} = File::Spec->catdir( $ENV{HOME}, 'no-windows-rsync-bin' );
+    ok( !$manager->_rsync_available, '_rsync_available returns false on Windows when rsync itself is absent' );
+}
+{
     my $sync_error_repo = _create_skill_repo( $test_repos, 'local-sync-error-skill', with_cpanfile => 0 );
     open my $sync_error_env_fh, '>', File::Spec->catfile( $sync_error_repo, '.env' ) or die "Unable to write local sync error .env: $!";
     print {$sync_error_env_fh} "VERSION=1.00\n";
@@ -2774,7 +3084,9 @@ is_deeply(
 open my $cpanm_log_fh, '<', $cpanm_log or die "Unable to read $cpanm_log: $!";
 my @cpanm_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$cpanm_log_fh>;
 close $cpanm_log_fh;
-like( $cpanm_steps[-2], qr/^--notest -L \Q$ENV{HOME}\/skills-home\/perl5\E --cpanfile .*\/cpanfile --installdeps \.$/, '_install_skill_dependencies installs cpanfile dependencies into HOME perl5 with cpanm --notest from the skill root itself' );
+is( $cpanm_steps[-4], 'PERL_MM_USE_DEFAULT=1 NONINTERACTIVE_TESTING=1 PERL_CANARY_STABILITY_NOPROMPT=1', '_install_skill_dependencies forces non-interactive CPAN environment defaults for cpanfile installs' );
+like( $cpanm_steps[-3], qr/^--notest -L \Q$ENV{HOME}\/skills-home\/perl5\E --cpanfile .*\/cpanfile --installdeps \.$/, '_install_skill_dependencies installs cpanfile dependencies into HOME perl5 with cpanm --notest from the skill root itself' );
+is( $cpanm_steps[-2], 'PERL_MM_USE_DEFAULT=1 NONINTERACTIVE_TESTING=1 PERL_CANARY_STABILITY_NOPROMPT=1', '_install_skill_dependencies forces non-interactive CPAN environment defaults for cpanfile.local installs' );
 like( $cpanm_steps[-1], qr/^--notest -L .*\/perl5 --cpanfile .*\/cpanfile\.local --installdeps \.$/, '_install_skill_dependencies installs cpanfile.local dependencies into the skill-local perl5 root with cpanm --notest from the skill root itself' );
 open my $npm_log_fh, '<', $npx_log or die "Unable to read $npx_log: $!";
 my @npm_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$npm_log_fh>;

@@ -46,7 +46,16 @@ do_for_all_dbs {
     subtest json => sub {
         like($row->row_data->{stored}->{my_json}, qr/{"name":\s*"a"}/, "Stored the json as json");
         is($row->field('my_json'), {name => 'a'}, "Round trip returned the correct data structure");
-        ok(lives { $s->one({my_json => bless({name => 'a'}, 'DBIx::QuickORM::Type::JSON')}) }, "JSON object in the search does not die (but is also not useful)");
+
+        # PostgreSQL's plain `json` type has no equality operator, so searching
+        # by a JSON value needs `jsonb`, which arrived in 9.4. Older servers
+        # store the column as `json` and would die on the comparison.
+        if (pg_older_than('9.4')) {
+            note "Skipping JSON-value search on " . curname() . " (json has no = operator before jsonb in 9.4)";
+        }
+        else {
+            ok(lives { $s->one({my_json => bless({name => 'a'}, 'DBIx::QuickORM::Type::JSON')}) }, "JSON object in the search does not die (but is also not useful)");
+        }
     };
 
     my $uuid2 = DBIx::QuickORM::Type::UUID->new;

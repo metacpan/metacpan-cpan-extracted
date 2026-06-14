@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use feature qw/state/;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use Carp qw/croak confess/;
 $Carp::Internal{ (__PACKAGE__) }++;
@@ -1130,6 +1130,11 @@ sub primary_key {
     my $self = shift;
     my (@list) = @_;
 
+    my $opts = (@list && ref($list[0]) eq 'HASH') ? shift(@list) : {};
+    if (my @bad = grep { $_ ne 'override' } keys %$opts) {
+        croak "Unknown primary_key option(s): " . join(', ' => sort @bad);
+    }
+
     my $top = $self->_in_builder(qw{table column});
 
     my $meta;
@@ -1150,6 +1155,7 @@ sub primary_key {
     }
 
     $meta->{primary_key} = \@list;
+    $meta->{primary_key_override} = 1 if $opts->{override};
 }
 
 sub unique {
@@ -2249,6 +2255,8 @@ Can be nested under C<table>.
 
 =item C<primary_key(@COLUMNS)>
 
+=item C<primary_key(\%OPTIONS, @COLUMNS)>
+
 Used to define a primary key. When used under a table you must provide a
 list of columns. When used under a column builder it designates just that
 column as the primary key, no arguments would be accepted.
@@ -2270,6 +2278,24 @@ Or to make a single column the primary key:
     };
 
 Can be nested under C<table> or C<column>.
+
+When the live database reports a different primary key than the one you
+declare here, schema construction croaks rather than silently picking one.
+Pass a leading options hashref with C<< override => 1 >> to declare that your
+key is intentional and should win over the database's:
+
+    table mytable => sub {
+        column a => sub { ... };
+
+        primary_key({override => 1}, 'a');
+    };
+
+The options hashref works under a column builder too:
+
+    column a => sub {
+        ...
+        primary_key({override => 1});
+    };
 
 =item C<unique>
 

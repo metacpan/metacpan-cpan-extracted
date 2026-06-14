@@ -1,0 +1,159 @@
+NAME
+    DesktopWorkspace - DesktopWorkspace specification
+
+SPECIFICATION VERSION
+    1
+
+VERSION
+    This document describes version 1.0.0 of DesktopWorkspace (from Perl
+    distribution DesktopWorkspace), released on 2026-03-29.
+
+DESCRIPTION
+    This document specifies a way to describe windows and applications to
+    set up for a workspace on the desktop.
+
+SPECIFICATION STATUS
+    The series 1.x is still unstable. 2.x is expected to be the first series
+    to be stable.
+
+GLOSSARY
+  DesktopWorkspace specification
+    A specification of what windows, applications, URLs in browser tabs
+    should be present in a workspace on the desktop.
+
+  DesktopWorkspace specification module
+    A Perl module under "DesktopWorkspace::" namespace (or some other
+    namespace specified, e.g. "CPANID::DesktopWorkspace::",
+    "Some::App::DesktopWorkspace::") that follows at least the
+    DesktopWorkspaceRole::Spec::Basic role.
+
+    Some example module names:
+
+    *   PERLANCAR::DesktopWorkspace::Coding
+
+        Specifies items to be opened in the desktop workspace for coding,
+        e.g. which Konsole terminal tabs to open, which IDE to open.
+
+    *   PERLANCAR::DesktopWorkspace::LLM
+
+        Specifies PERLANCAR's standard sets of AI LLM websites usually
+        opened.
+
+    *   SHARYANTO::DesktopWorkspace::Writing
+
+        Specifies items to be opened in the desktop workspace for writing
+        stuffs, e.g. which dictionary, translation, and AI LLM websites to
+        open, which directories to open in the file manager.
+
+    *   SHARYANTO::DesktopWorkspace::Acme::RND
+
+        Specifies items to be opened in the desktop workspace for Steven's
+        R&D work for the company Acme, e.g. which LibreOffice Calc
+        spreadsheets and Google spreadsheets to open, which directories to
+        open in the file manager.
+
+  Workspace item
+    Either an application, a directory/file, or a URL.
+
+SPECIFICATION
+  Desktop workspace specification
+    A desktop workspace specification is a DefHash structure that contains
+    the following properties:
+
+    *   items
+
+        An array of "workspace item"s.
+
+    *   new_browser_window
+
+        Bool. When opening one or more URL's, use a new window.
+
+    *   kde_activity
+
+        Str. Switch to a KDE activity of the specified name.
+
+  Workspace item
+    A DefHash structure that contain the following properties:
+
+    *   url
+
+        A URL to be opened in a browser.
+
+    *   file
+
+        Path to a file to be opened by an appropriate desktop application.
+
+    *   dir
+
+        Path to a directory to be opened by an appropriate desktop
+        application (usually a file manager).
+
+    *   app_path
+
+        Path to a program to be run.
+
+    *   firefox_container
+
+        Str. When using Firefox to open the item, use this container.
+
+    *   new_browser_window
+
+        Bool. When opening the URL, use a new browser window.
+
+    Exactly one of "url", "file", "dir", "app_path" must be specified.
+
+NOTES
+    Currently a single desktop workspace specification can only describe
+    items for a single KDE activity. To setup multiple KDE activities, use a
+    separate desktop workspace specification for each.
+
+WISHLIST
+    Open directories in konsole tabs.
+
+    Open "screen" or "tmux" sessions, along with detailed specification on
+    window size, etc.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/DesktopWorkspace>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-DesktopWorkspace>.
+
+SEE ALSO
+    DefHash
+
+HISTORY
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2026 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=DesktopWorkspace>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

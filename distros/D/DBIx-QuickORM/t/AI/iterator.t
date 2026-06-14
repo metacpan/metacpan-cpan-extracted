@@ -1,4 +1,4 @@
-use Test2::V0;
+use Test2::V0 '!meta', '!pass';
 
 use DBIx::QuickORM::Iterator;
 

@@ -1,4 +1,4 @@
-use Test2::V0;
+use Test2::V0 '!meta', '!pass';
 
 # Coverage for DBIx::QuickORM::Type::UUID: inflate/deflate, string vs binary
 # affinity, looks_like_uuid / looks_like_bin, ->new returning a v7 UUID,
@@ -106,20 +106,22 @@ subtest deflate => sub {
 };
 
 subtest compare => sub {
-    is($C->qorm_compare($SAMPLE, $SAMPLE), 0, "identical UUID strings compare equal");
-    is($C->qorm_compare(undef, undef), 0, "two undefs compare equal");
-    isnt($C->qorm_compare($SAMPLE, undef), 0, "defined vs undef compares unequal");
-    isnt($C->qorm_compare($SAMPLE, $C->new), 0, "different UUIDs compare unequal");
+    # qorm_compare follows the equality contract: true when the values are the
+    # same, false when they differ.
+    ok($C->qorm_compare($SAMPLE, $SAMPLE), "identical UUID strings compare equal");
+    ok($C->qorm_compare(undef, undef), "two undefs compare equal");
+    ok(!$C->qorm_compare($SAMPLE, undef), "defined vs undef compares unequal");
+    ok(!$C->qorm_compare($SAMPLE, $C->new), "different UUIDs compare unequal");
 
     # A UUID inflated from packed bytes is lowercase (UUID::unparse is
     # canonical lowercase), so it compares equal to the lowercase string form.
     my $bin;
     UUID::parse($SAMPLE, $bin);
-    is($C->qorm_compare($SAMPLE, $bin), 0, "string and packed-binary forms of the same UUID compare equal");
+    ok($C->qorm_compare($SAMPLE, $bin), "string and packed-binary forms of the same UUID compare equal");
 
     # Inflation canonicalizes to lowercase, so the same UUID written in upper
     # vs lower case compares equal.
-    is($C->qorm_compare($SAMPLE, uc $SAMPLE), 0, "differing case compares equal (canonical lowercase)");
+    ok($C->qorm_compare($SAMPLE, uc $SAMPLE), "differing case compares equal (canonical lowercase)");
 };
 
 subtest autotype_registration => sub {

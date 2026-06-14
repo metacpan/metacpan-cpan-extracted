@@ -21,6 +21,7 @@ t/0005-verify_compat.t
 t/0006-new-features.t
 t/0007-extcmd-env.t
 t/0008-nested-subst.t
+t/0009-new-vars.t
 t/9001-load.t
 t/9010-encoding.t
 t/9020-perl5compat.t

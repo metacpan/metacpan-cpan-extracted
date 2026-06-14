@@ -572,6 +572,40 @@ subtest 'validate_strict: type integer — alphabetic rejected' => sub {
 	);
 };
 
+subtest 'validate_strict: type integer — scientific notation whole number accepted' => sub {
+	# 1.38255823391608e+18 is a valid integer expressed in scientific notation.
+	# The regex-based check (/^\d+$/) wrongly rejected it; the new check uses
+	# looks_like_number + ($v == int($v)).  IEEE 754 rounding means the stored
+	# integer may differ slightly from the exact decimal, so compare with ==.
+	my $r = _vs({
+		schema => { n => { type => 'integer' } },
+		input  => { n => '1.38255823391608e+18' },
+	});
+	ok($r->{n} == 1.38255823391608e+18, 'scientific-notation integer coerced to its integer value');
+	ok(!ref($r->{n}),                   'returned value is a plain scalar');
+};
+
+subtest 'validate_strict: type integer — Inf rejected' => sub {
+	# int(Inf) == Inf in IEEE 754, so the naive check $v != int($v) passes for Inf.
+	# The fix adds a ($v - $v) != 0 guard: Inf - Inf = NaN, and NaN != 0 is true.
+	for my $val ('Inf', 'inf', '-Inf', '-inf') {
+		_vs_throws(
+			{ schema => { n => { type => 'integer' } }, input => { n => $val } },
+			qr/must be an integer/,
+			"\"$val\" rejected as integer"
+		);
+	}
+};
+
+subtest 'validate_strict: type integer — overflowing scientific notation (Inf) rejected' => sub {
+	# 1e309 overflows to Inf in IEEE 754 double; must be rejected, not accepted as Inf.
+	_vs_throws(
+		{ schema => { n => { type => 'integer' } }, input => { n => '1e309' } },
+		qr/must be an integer/,
+		'"1e309" (overflows to Inf) rejected as integer'
+	);
+};
+
 # ══════════════════════════════════════════════════════════════════════════════
 # validate_strict — type: number / float
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1548,6 +1582,417 @@ subtest 'validate_strict: dependency relationship enforced' => sub {
 		},
 		qr/port requires host/,
 		'dependency relationship enforced via validate_strict'
+	);
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# validate_strict — type: stringref
+#
+# stringref is the only type that:
+#   (a) validates the *reference kind* (must be SCALAR ref),
+#   (b) *derefs* the value before any rule handler runs, and
+#   (c) returns the plain string, not the ref.
+# These tests drive all three invariants plus every rule combination.
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'validate_strict: type stringref — SCALAR ref accepted, returns dereferenced string' => sub {
+	# The return value must be the plain string, not the original reference.
+	my $s = 'hello';
+	my $r = _vs({
+		schema => { x => { type => 'stringref' } },
+		input  => { x => \$s },
+	});
+	is($r->{x}, 'hello', 'dereferenced string returned');
+	ok(!ref($r->{x}),    'returned value is a plain scalar, not a ref');
+};
+
+subtest 'validate_strict: type stringref — empty string ref accepted' => sub {
+	my $s = '';
+	my $r = _vs({
+		schema => { x => { type => 'stringref' } },
+		input  => { x => \$s },
+	});
+	is($r->{x}, '', 'empty string ref accepted and dereferenced correctly');
+};
+
+subtest 'validate_strict: type stringref — undef skips type check, _error not called' => sub {
+	# undef is the universal "absent value" sentinel; the type guard must not fire.
+	my @error_calls;
+	my $m_err = mock_scoped('Params::Validate::Strict', '_error',
+		sub { push @error_calls, 1; die join('', @_[1 .. $#_]) . "\n" });
+	lives_ok {
+		_vs({
+			schema => { x => { type => 'stringref', optional => 1 } },
+			input  => { x => undef },
+		});
+	} 'undef value for optional stringref does not croak';
+	is(scalar @error_calls, 0, '_error not called when value is undef');
+};
+
+subtest 'validate_strict: type stringref — plain scalar rejected, error says "plain scalar"' => sub {
+	my @errors;
+	my $m_err = mock_scoped('Params::Validate::Strict', '_error',
+		sub { push @errors, join('', @_[1 .. $#_]); die join('', @_[1 .. $#_]) . "\n" });
+	throws_ok {
+		_vs({ schema => { x => { type => 'stringref' } }, input => { x => 'oops' } });
+	} qr/must be a string reference/, 'croaks when plain string supplied instead of ref';
+	like($errors[0], qr/plain scalar/, 'error identifies "plain scalar" as what was passed');
+};
+
+subtest 'validate_strict: type stringref — plain integer rejected, error says "plain scalar"' => sub {
+	my @errors;
+	my $m_err = mock_scoped('Params::Validate::Strict', '_error',
+		sub { push @errors, join('', @_[1 .. $#_]); die join('', @_[1 .. $#_]) . "\n" });
+	throws_ok {
+		_vs({ schema => { x => { type => 'stringref' } }, input => { x => 42 } });
+	} qr/must be a string reference/, 'croaks when integer supplied instead of ref';
+	like($errors[0], qr/plain scalar/, 'integer is a plain scalar — error text confirms this');
+};
+
+subtest 'validate_strict: type stringref — arrayref rejected, error names ARRAY type' => sub {
+	my @errors;
+	my $m_err = mock_scoped('Params::Validate::Strict', '_error',
+		sub { push @errors, join('', @_[1 .. $#_]); die join('', @_[1 .. $#_]) . "\n" });
+	throws_ok {
+		_vs({ schema => { x => { type => 'stringref' } }, input => { x => [1, 2] } });
+	} qr/must be a string reference/, 'croaks when arrayref supplied';
+	like($errors[0], qr/ARRAY/, 'error names the ARRAY reference type');
+};
+
+subtest 'validate_strict: type stringref — hashref rejected, error names HASH type' => sub {
+	my @errors;
+	my $m_err = mock_scoped('Params::Validate::Strict', '_error',
+		sub { push @errors, join('', @_[1 .. $#_]); die join('', @_[1 .. $#_]) . "\n" });
+	throws_ok {
+		_vs({ schema => { x => { type => 'stringref' } }, input => { x => { a => 1 } } });
+	} qr/must be a string reference/, 'croaks when hashref supplied';
+	like($errors[0], qr/HASH/, 'error names the HASH reference type');
+};
+
+subtest 'validate_strict: type stringref — coderef rejected, error names CODE type' => sub {
+	my @errors;
+	my $m_err = mock_scoped('Params::Validate::Strict', '_error',
+		sub { push @errors, join('', @_[1 .. $#_]); die join('', @_[1 .. $#_]) . "\n" });
+	throws_ok {
+		_vs({ schema => { x => { type => 'stringref' } }, input => { x => sub {} } });
+	} qr/must be a string reference/, 'croaks when coderef supplied';
+	like($errors[0], qr/CODE/, 'error names the CODE reference type');
+};
+
+subtest 'validate_strict: type stringref — blessed object rejected, error names class' => sub {
+	my $obj = PVS::Test::Searcher->new;
+	my @errors;
+	my $m_err = mock_scoped('Params::Validate::Strict', '_error',
+		sub { push @errors, join('', @_[1 .. $#_]); die join('', @_[1 .. $#_]) . "\n" });
+	throws_ok {
+		_vs({ schema => { x => { type => 'stringref' } }, input => { x => $obj } });
+	} qr/must be a string reference/, 'croaks when blessed object supplied';
+	like($errors[0], qr/PVS::Test::Searcher/, 'error names the blessed class');
+};
+
+subtest 'validate_strict: type stringref — ref-of-ref (REF kind) rejected' => sub {
+	# \$inner where $inner holds a reference has ref() = 'REF', not 'SCALAR'.
+	# The type guard fires on the outer ref check, not an inner-ref check.
+	my $inner = [];
+	my @errors;
+	my $m_err = mock_scoped('Params::Validate::Strict', '_error',
+		sub { push @errors, join('', @_[1 .. $#_]); die join('', @_[1 .. $#_]) . "\n" });
+	throws_ok {
+		_vs({ schema => { x => { type => 'stringref' } }, input => { x => \$inner } });
+	} qr/must be a string reference/, 'croaks when ref-of-ref supplied';
+	like($errors[0], qr/REF/, 'error names the REF type, confirming the outer-ref check fired');
+};
+
+subtest 'validate_strict: type stringref — error_msg overrides default message' => sub {
+	my @errors;
+	my $m_err = mock_scoped('Params::Validate::Strict', '_error',
+		sub { push @errors, join('', @_[1 .. $#_]); die join('', @_[1 .. $#_]) . "\n" });
+	throws_ok {
+		_vs({ schema => { x => { type => 'stringref', error_msg => 'need a string ref here' } },
+		      input  => { x => 'bare string' } });
+	} qr/need a string ref here/, 'custom error_msg used when type check fails';
+	is($errors[0], 'need a string ref here', '_error called with only the custom message');
+};
+
+# ── stringref × min ──────────────────────────────────────────────────────────
+# Because stringref derefs $value before the rule loop, min/max see the plain
+# string and must apply character-length semantics, not numeric comparison.
+
+subtest 'validate_strict: type stringref × min — dereferenced string shorter than min → croaks' => sub {
+	my $s = 'hi';	# 2 chars
+	_vs_throws(
+		{ schema => { x => { type => 'stringref', min => 5 } }, input => { x => \$s } },
+		qr/too short/,
+		'croaks when dereferenced string length is below min'
+	);
+};
+
+subtest 'validate_strict: type stringref × min — dereferenced string exactly at min → ok' => sub {
+	my $s = 'hello';	# 5 chars
+	my $r = _vs({
+		schema => { x => { type => 'stringref', min => 5 } },
+		input  => { x => \$s },
+	});
+	is($r->{x}, 'hello', 'string at exactly min length accepted');
+};
+
+subtest 'validate_strict: type stringref × min — negative min rejected as schema error' => sub {
+	my $s = 'any';
+	_vs_throws(
+		{ schema => { x => { type => 'stringref', min => -1 } }, input => { x => \$s } },
+		qr/meaningless minimum/,
+		'negative min is a schema error for stringref'
+	);
+};
+
+# ── stringref × max ──────────────────────────────────────────────────────────
+
+subtest 'validate_strict: type stringref × max — dereferenced string longer than max → croaks' => sub {
+	my $s = 'toolong';	# 7 chars
+	_vs_throws(
+		{ schema => { x => { type => 'stringref', max => 4 } }, input => { x => \$s } },
+		qr/too long/,
+		'croaks when dereferenced string length exceeds max'
+	);
+};
+
+subtest 'validate_strict: type stringref × max — dereferenced string exactly at max → ok' => sub {
+	my $s = 'four';	# 4 chars
+	my $r = _vs({
+		schema => { x => { type => 'stringref', max => 4 } },
+		input  => { x => \$s },
+	});
+	is($r->{x}, 'four', 'string at exactly max length accepted');
+};
+
+# ── stringref × matches ───────────────────────────────────────────────────────
+
+subtest 'validate_strict: type stringref × matches — pattern satisfied on dereffed string → ok' => sub {
+	my $s = '1234';
+	my $r = _vs({
+		schema => { x => { type => 'stringref', matches => qr/^\d+$/ } },
+		input  => { x => \$s },
+	});
+	is($r->{x}, '1234', 'matches applied to dereferenced string');
+};
+
+subtest 'validate_strict: type stringref × matches — pattern fails on dereffed string → croaks' => sub {
+	my $s = 'abcd';
+	_vs_throws(
+		{ schema => { x => { type => 'stringref', matches => qr/^\d+$/ } }, input => { x => \$s } },
+		qr/must match pattern/,
+		'croaks when dereferenced string fails matches'
+	);
+};
+
+# ── stringref × memberof ──────────────────────────────────────────────────────
+
+subtest 'validate_strict: type stringref × memberof — valid member → ok' => sub {
+	my $s = 'red';
+	my $r = _vs({
+		schema => { x => { type => 'stringref', memberof => [qw(red green blue)] } },
+		input  => { x => \$s },
+	});
+	is($r->{x}, 'red', 'memberof passes on dereferenced value');
+};
+
+subtest 'validate_strict: type stringref × memberof — not a member → croaks' => sub {
+	my $s = 'purple';
+	_vs_throws(
+		{ schema => { x => { type => 'stringref', memberof => [qw(red green blue)] } }, input => { x => \$s } },
+		qr/must be one of/,
+		'croaks when dereferenced string is not in memberof list'
+	);
+};
+
+# ── stringref × transform ─────────────────────────────────────────────────────
+# The deref happens BEFORE transform, so transform must receive a plain string.
+# A transform that tries to deref its argument (${$_[0]}) would fail at runtime
+# because $_[0] is already a string, not a reference.
+
+subtest 'validate_strict: type stringref × transform — transform receives plain string, not ref' => sub {
+	my $s = 'hello';
+	my $r = _vs({
+		schema => { x => {
+			type      => 'stringref',
+			transform => sub { uc($_[0]) },	# would die if $_[0] were a ref
+		} },
+		input => { x => \$s },
+	});
+	is($r->{x}, 'HELLO', 'transform receives the already-dereferenced plain string');
+};
+
+subtest 'validate_strict: type stringref × transform + min — transform result measured for min' => sub {
+	# transform strips leading/trailing spaces; min applies to the trimmed result.
+	my $s = '  hi  ';	# 6 chars raw, 2 chars trimmed
+	_vs_throws(
+		{
+			schema => { x => {
+				type      => 'stringref',
+				transform => sub { my $v = $_[0]; $v =~ s/^\s+|\s+$//g; $v },
+				min       => 5,
+			} },
+			input => { x => \$s },
+		},
+		qr/too short/,
+		'min applied to the post-transform value'
+	);
+};
+
+# ── stringref × optional / default ───────────────────────────────────────────
+
+subtest 'validate_strict: type stringref × optional — absent param not in result' => sub {
+	my $r = _vs({
+		schema => { x => { type => 'stringref', optional => 1 } },
+		input  => {},
+	});
+	ok(!exists($r->{x}), 'absent optional stringref param not in validated result');
+};
+
+subtest 'validate_strict: type stringref × default — default returned when param absent' => sub {
+	my $r = _vs({
+		schema => { x => { type => 'stringref', optional => 1, default => 'fallback' } },
+		input  => {},
+	});
+	is($r->{x}, 'fallback', 'default value used for absent stringref param');
+};
+
+# ── stringref × callback ──────────────────────────────────────────────────────
+
+subtest 'validate_strict: type stringref × callback — callback receives plain string' => sub {
+	my $received;
+	my $s = 'world';
+	_vs({
+		schema => { x => {
+			type     => 'stringref',
+			callback => sub { $received = $_[0]; 1 },
+		} },
+		input => { x => \$s },
+	});
+	is($received,      'world', 'callback received the dereferenced plain string');
+	ok(!ref($received),         'callback argument is not a reference');
+};
+
+subtest 'validate_strict: type stringref × callback — failing callback croaks' => sub {
+	my $s = 'bad';
+	_vs_throws(
+		{
+			schema => { x => {
+				type     => 'stringref',
+				callback => sub { 0 },
+			} },
+			input => { x => \$s },
+		},
+		qr/failed custom validation/,
+		'croaks when stringref callback returns false'
+	);
+};
+
+# ── stringref × transform returning non-string ───────────────────────────────
+# The early-deref block validates the SCALAR ref and derefs $value; transform
+# then runs on the plain string.  If transform returns a reference, the
+# stringref dispatch arm must catch it — the no-op stub that existed before
+# was a confirmed bug.
+
+subtest 'validate_strict: type stringref × transform returning hashref → croaks' => sub {
+	my $s = 'hello';
+	_vs_throws(
+		{
+			schema => { x => { type => 'stringref', transform => sub { {} } } },
+			input  => { x => \$s },
+		},
+		qr/stringref transform must return a plain string/,
+		'croaks when transform returns a hashref for a stringref parameter'
+	);
+};
+
+subtest 'validate_strict: type stringref × transform returning arrayref → croaks' => sub {
+	my $s = 'hello';
+	_vs_throws(
+		{
+			schema => { x => { type => 'stringref', transform => sub { [] } } },
+			input  => { x => \$s },
+		},
+		qr/stringref transform must return a plain string/,
+		'croaks when transform returns an arrayref for a stringref parameter'
+	);
+};
+
+subtest 'validate_strict: type stringref × transform returning plain string → ok' => sub {
+	my $s = 'hello';
+	my $r = _vs({
+		schema => { x => { type => 'stringref', transform => sub { uc($_[0]) } } },
+		input  => { x => \$s },
+	});
+	is($r->{x}, 'HELLO', 'transform returning a plain string is accepted normally');
+};
+
+# ── stringref × optional => CODE receives original SCALAR ref ────────────────
+# The early-deref mutates $value to a plain string before optional => CODE is
+# evaluated.  The fix captures the original ref so the coderef sees what the
+# caller actually passed, not the module's internal representation.
+
+subtest 'validate_strict: type stringref × optional CODE receives original SCALAR ref' => sub {
+	my $received;
+	my $s = 'world';
+	_vs({
+		schema => { x => {
+			type     => 'stringref',
+			optional => sub { $received = $_[0]; 0 },	# 0 = required; just capture
+		} },
+		input => { x => \$s },
+	});
+	ok(ref($received) eq 'SCALAR', 'optional coderef receives the original SCALAR ref');
+	is(${$received}, 'world',      'the ref still points to the correct string value');
+};
+
+subtest 'validate_strict: type stringref × optional CODE returning true — param treated as optional' => sub {
+	# Confirm the coderef return value is honoured even though the value is a ref.
+	my $s = 'ignored';
+	my $r = _vs({
+		schema => {
+			x => { type => 'stringref', optional => sub { 1 } },
+		},
+		input => { x => \$s },
+	});
+	# optional => 1 means the key is present but the parameter is optional;
+	# when the value IS provided it is still validated and returned.
+	ok(exists($r->{x}), 'present stringref value returned even when optional coderef returns true');
+};
+
+# ── stringref in union types ──────────────────────────────────────────────────
+
+subtest 'validate_strict: union [string, stringref] — plain string takes string branch' => sub {
+	my $r = _vs({
+		schema => { x => { type => ['string', 'stringref'] } },
+		input  => { x => 'plain' },
+	});
+	is($r->{x}, 'plain', 'plain string accepted via string branch of union');
+};
+
+subtest 'validate_strict: union [string, stringref] — string ref takes stringref branch, deref returned' => sub {
+	my $s = 'wrapped';
+	my $r = _vs({
+		schema => { x => { type => ['string', 'stringref'] } },
+		input  => { x => \$s },
+	});
+	is($r->{x}, 'wrapped', 'string ref accepted via stringref branch; dereferenced string returned');
+	ok(!ref($r->{x}),       'returned value is a plain scalar, not a ref');
+};
+
+subtest 'validate_strict: union [string, stringref] — arrayref rejected by both branches' => sub {
+	_vs_throws(
+		{ schema => { x => { type => ['string', 'stringref'] } }, input => { x => [1, 2] } },
+		qr/must be one of/,
+		'croaks when arrayref fails both string and stringref branches'
+	);
+};
+
+subtest 'validate_strict: union [string, stringref] — hashref rejected by both branches' => sub {
+	_vs_throws(
+		{ schema => { x => { type => ['string', 'stringref'] } }, input => { x => { a => 1 } } },
+		qr/must be one of/,
+		'croaks when hashref fails both string and stringref branches'
 	);
 };
 

@@ -9,10 +9,6 @@ use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "A StatsD client that supports multimetric packets",
   "AUTHOR" => "Robert Rothenberg <perl\@rhizomnic.com>",
-  "BUILD_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "7.22",
-    "Module::Metadata" => "1.000015"
-  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -43,7 +39,7 @@ my %WriteMakefileArgs = (
     "IO::Socket" => 0,
     "IPC::Open3" => 0,
     "Module::Load" => 0,
-    "Module::Metadata" => "1.000015",
+    "Module::Metadata" => 0,
     "Net::EmptyPort" => 0,
     "Socket" => 0,
     "Test::Deep" => 0,
@@ -59,7 +55,7 @@ my %WriteMakefileArgs = (
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.11.1",
+  "VERSION" => "v0.11.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -70,7 +66,6 @@ my %FallbackPrereqs = (
   "Carp" => 0,
   "Devel::StrictMode" => 0,
   "Digest::SHA" => "5.96",
-  "ExtUtils::MakeMaker" => "7.22",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IO::Select" => 0,
@@ -78,7 +73,7 @@ my %FallbackPrereqs = (
   "IO::Socket::IP" => 0,
   "IPC::Open3" => 0,
   "Module::Load" => 0,
-  "Module::Metadata" => "1.000015",
+  "Module::Metadata" => 0,
   "Moo" => "1.000000",
   "MooX::TypeTiny" => 0,
   "Net::EmptyPort" => 0,

@@ -63,6 +63,7 @@ sub MY::postamble {
 
   push @postamble, <<"MAKE_FRAGMENT" if supported_platform();
 ALL_PM := \$(shell find lib -name "*.pm")
+TEST_PM := \$(shell find t -name "*.pm")
 ALL_EXE := script/ptp
 
 .PHONY: distupload cover critic rawcritic tidy spelling alltest clean clean_coverdb pod2html exe
@@ -82,7 +83,7 @@ rawcritic:
 \tperlcritic lib script
 
 tidy:
-\tperltidy -b -bext='/' \$(ALL_PM) \$(ALL_EXE)
+\tperltidy -b -bext='/' \$(ALL_PM) \$(TEST_PM) \$(ALL_EXE)
 
 spelling: export EXTENDED_TESTING = 1
 spelling:

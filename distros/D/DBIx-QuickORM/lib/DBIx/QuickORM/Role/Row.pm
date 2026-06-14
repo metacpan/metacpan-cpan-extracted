@@ -2,7 +2,7 @@ package DBIx::QuickORM::Role::Row;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use Carp qw/croak/;
 use List::Util qw/zip/;
@@ -209,6 +209,7 @@ requires qw{
 =item $row = $row->insert_or_save
 
 Save the row if it is already stored, or insert it if it has pending data.
+Croaks when the row is neither stored nor has pending data to write.
 
 =item $row = $row->insert
 
@@ -232,6 +233,8 @@ sub insert_or_save {
 
     return $self->save(@_)   if $self->is_stored;
     return $self->insert(@_) if $self->has_pending;
+
+    croak "This row has no data to write";
 }
 
 sub insert {

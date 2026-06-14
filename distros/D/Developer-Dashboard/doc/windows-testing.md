@@ -14,6 +14,15 @@ responsible for setting the CurrentUser execution policy to `RemoteSigned`
 when the host is still at the default `Restricted` policy, otherwise the
 generated PowerShell profile cannot load in new sessions.
 
+The bootstrap now targets both Windows Intel `x64` hosts and Windows `ARM64`
+hosts. On `x64`, the official Git for Windows, Strawberry Perl, and Node.js
+fallback installers stay native. On `ARM64`, Git for Windows uses the official
+`arm64` installer when the winget path is unavailable, Strawberry Perl falls
+back to the official `x64` build because Strawberry Perl does not currently
+publish an `ARM64` release in its release feed, and Node.js falls back to the
+official `win-arm64.zip` package under the dashboard install root so future
+PowerShell sessions still expose `node`, `npm`, and `npx`.
+
 ## Verification Layers
 
 1. Forced-Windows unit tests in `t/`
@@ -36,9 +45,17 @@ generated PowerShell profile cannot load in new sessions.
 - verify that same fresh PowerShell session can resolve `dashboard` on `PATH`
   and does not fail by sending a multi-line shell bootstrap array directly
   into `Invoke-Expression`
+- verify that same fresh PowerShell session keeps `HOME` exported for later
+  dashboard commands and exposes the user-space `make` shim expected by skill
+  `Makefile` installs
+- verify that any fresh-session skill `cpanm` work runs with explicit
+  non-interactive CPAN environment defaults instead of inheriting an
+  interactive guest shell state by accident
 - verify one PowerShell-backed collector command
-- verify one saved Ajax PowerShell handler through `Invoke-WebRequest`
+- verify one saved Ajax handler through `Invoke-WebRequest`
 - verify browser DOM rendering through Edge or Chrome when available
+- on `ARM64` hosts, verify the bootstrap keeps the portable Node.js fallback on
+  `PATH` for future PowerShell sessions when the winget path is unavailable
 
 3. Full-system QEMU smoke
 

@@ -1,9 +1,9 @@
 do { my $x = {
        'build' => {
-                    'requires' => {
-                                    'ExtUtils::MakeMaker' => '7.22',
-                                    'Module::Metadata' => '1.000015'
-                                  }
+                    'recommends' => {
+                                      'ExtUtils::MakeMaker' => '7.22',
+                                      'Module::Metadata' => '1.000015'
+                                    }
                   },
        'configure' => {
                         'requires' => {
@@ -12,6 +12,7 @@ do { my $x = {
                       },
        'develop' => {
                       'requires' => {
+                                      'Dist::AutomationPolicy' => 'v0.2.0',
                                       'Dist::Zilla::Plugin::UsefulReadme' => 'v0.4.3',
                                       'File::Spec' => '0',
                                       'IO::Handle' => '0',
@@ -78,7 +79,7 @@ do { my $x = {
                                    'IPC::Open3' => '0',
                                    'Log::Dispatch' => '2.68',
                                    'Log::Dispatch::Array' => '0',
-                                   'Module::Metadata' => '1.000015',
+                                   'Module::Metadata' => '0',
                                    'Plack::Builder' => '0',
                                    'Plack::Test' => '0',
                                    'Test2::V0' => '0',

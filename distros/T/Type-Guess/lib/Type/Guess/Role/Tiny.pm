@@ -1,19 +1,16 @@
 package Type::Guess::Role::Tiny;
 
-use Mojo::Base -role;
+use Moo::Role;
+use MooX::ClassAttribute;
 
 use Scalar::Util qw(looks_like_number);
 use Type::Tiny;
 use Types::Standard qw( Int Num Str );
-use Mojo::Util qw/dumper/;
 
-use Package::Stash;
-# use Class::Method::Modifiers;
+has "name" => ( is => "rw", default => sub { "" } );
+has "type_tiny" => ( is => "rw", default => sub { Str } ); # whats this for?
 
-has "name" => sub { };
-has "type_tiny" => sub { Str };
-
-has "types" => sub { [ Int, Num, Str, ] };
+class_has "types" => ( is => "rw", default => sub { [ Int, Num, Str, ] });
 
 # print $class_opts;
 
@@ -51,7 +48,9 @@ sub _type {
 
     my $tot = scalar @vals;
     for ($class->class_opts("types")->@*) {
+
 	my $tiny_type = ref $_ ? $_ : eval $_ || eval '$' . $_;
+
 	my $ok = scalar $tiny_type->grep(@vals);
 	if ($ok / $tot >= (1 - $class->tolerance)) {
 	    return $tiny_type
@@ -59,12 +58,5 @@ sub _type {
     }
 }
 
-
-# around "_type" => sub {
-#     my $orig = shift;
-#     my $class = shift;
-
-#     return $orig->($class, @_);
-# };
-
 1;
+

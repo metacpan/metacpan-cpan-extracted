@@ -1,7 +1,7 @@
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl lut2.t'
 
-use Test::More tests => 18;
+use Test::More tests => 16;
 
 BEGIN { use_ok('Business::KontoCheck') };
 
@@ -141,11 +141,9 @@ __DATA__
 16050000:Mittelbrandenbg Sparkasse, 14459 Potsdam
 18062678:VR Bank Lausitz, 3044 Cottbus
 20040000:Commerzbank Hamburg, 20454 Hamburg
-20050550:Haspa Hamburg, 20454 Hamburg
 20080000:Commerzbank Hamburg, 20349 Hamburg
 21050170:Förde Sparkasse, 24103 Kiel
 25010030:Postbank Ndl Deutsche Bank, 30139 Hannover
-25020600:Santander Consumer Bank, 30179 Hannover
 25050180:Sparkasse Hannover, 30001 Hannover
 30050000:Ld Bk Hess-Thür, Gz, Dus, 40019 Düsseldorf
 30070010:Deutsche Bank, 40189 Düsseldorf

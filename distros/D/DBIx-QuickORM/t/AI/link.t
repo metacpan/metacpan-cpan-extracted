@@ -1,4 +1,4 @@
-use Test2::V0;
+use Test2::V0 '!meta', '!pass';
 use Scalar::Util qw/refaddr/;
 
 # Unit-level coverage for DBIx::QuickORM::Link (construction, parse, merge,

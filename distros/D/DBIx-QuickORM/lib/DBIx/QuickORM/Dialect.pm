@@ -6,7 +6,7 @@ use Carp qw/croak confess/;
 use Scalar::Util qw/blessed/;
 use DBI();
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use DBIx::QuickORM::Util qw/load_class find_modules/;
 
@@ -66,6 +66,11 @@ Name of the database this dialect is connected to.
 
 Name of the DSN field used to specify a unix socket. Defaults to C<host>.
 
+=item $field = $dialect->dsn_dbname_field
+
+Name of the DSN field used to specify the database name. Defaults to
+C<dbname>; the MySQL family overrides this with C<database>.
+
 =item $name = $dialect->dialect_name
 
 Short name of the dialect, derived from the class name.
@@ -92,13 +97,14 @@ logical type, otherwise nothing.
 # {{{ Feature flags and simple accessors
 
 sub dsn_socket_field { 'host' }
+sub dsn_dbname_field { 'dbname' }
 
 sub quote_binary_data         { my $self = shift; DBI::SQL_BINARY() }
 sub supports_returning_update { 0 }
 sub supports_returning_insert { 0 }
 sub supports_returning_delete { 0 }
 
-sub supports_type { }
+sub supports_type { my $self = shift; return undef }
 
 sub datetime_formatter { my $self = shift; croak "No datetime formatter is defined for the '" . $self->dialect_name . "' dialect" }
 
@@ -154,6 +160,35 @@ sub rollback_savepoint { my $self = shift; croak "$self->rollback_savepoint() is
 
 =pod
 
+=item $bool = $dialect->async_supported
+
+=item $bool = $dialect->async_cancel_supported
+
+Async feature flags. False by default; dialects with async support override.
+
+=item $dialect->async_prepare_args(%params)
+
+=item $bool = $dialect->async_ready(%params)
+
+=item $result = $dialect->async_result(%params)
+
+=item $dialect->async_cancel(%params)
+
+Async query lifecycle. Stubs that croak; dialects with async support
+override.
+
+=cut
+
+sub async_supported        { 0 }
+sub async_cancel_supported { 0 }
+
+sub async_prepare_args { my $self = shift; croak "$self->async_prepare_args() is not implemented" }
+sub async_ready        { my $self = shift; croak "$self->async_ready() is not implemented" }
+sub async_result       { my $self = shift; croak "$self->async_result() is not implemented" }
+sub async_cancel       { my $self = shift; croak "$self->async_cancel() is not implemented" }
+
+=pod
+
 =item $bool = $dialect->in_txn(%params)
 
 True if a transaction is currently in progress on the handle (the C<dbh>
@@ -205,7 +240,8 @@ sub dsn {
     $dsn_driver =~ s/^DBD:://;
 
     my $db_name = $db->db_name;
-    my $dsn = "dbi:${dsn_driver}:dbname=${db_name};";
+    my $dbname_field = $self_or_class->dsn_dbname_field($driver);
+    my $dsn = "dbi:${dsn_driver}:${dbname_field}=${db_name};";
 
     if (my $socket = $db->socket) {
         $dsn .= $self_or_class->dsn_socket_field($driver) . "=$socket";
@@ -228,14 +264,16 @@ sub dsn {
 =item $sql = $dialect->upsert_statement($pk)
 
 Returns the SQL fragment implementing an upsert keyed on the given primary
-key columns.
+key columns. Column names are quoted so reserved-word or mixed-case columns
+work.
 
 =cut
 
 sub upsert_statement {
     my $self = shift;
     my ($pk) = @_;
-    return "ON CONFLICT(" . join(", " => @$pk). ") DO UPDATE SET";
+    my $dbh = $self->dbh;
+    return "ON CONFLICT(" . join(", " => map { $dbh->quote_identifier($_) } @$pk) . ") DO UPDATE SET";
 }
 
 ###############################################################################
@@ -247,7 +285,9 @@ sub upsert_statement {
 =item $schema = $dialect->build_schema_from_db(%params)
 
 Introspects the live database and returns a L<DBIx::QuickORM::Schema>.
-Requires an C<autofill> object.
+Requires an C<autofill> object. After all tables are built it runs the
+autofill C<tables> hook with the complete name-to-table hashref under the
+C<tables> key, giving callbacks one place to inspect or adjust the full set.
 
 =cut
 
@@ -261,7 +301,7 @@ sub build_schema_from_db {
 
     my $tables = $self->build_tables_from_db(%params);
 
-    $params{autofill}->hook(tables => $tables);
+    $params{autofill}->hook(tables => {tables => $tables});
 
     return DBIx::QuickORM::Schema->new(
         tables    => $tables,

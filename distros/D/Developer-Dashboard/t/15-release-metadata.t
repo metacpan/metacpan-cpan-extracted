@@ -76,8 +76,26 @@ my $skills_pod = _extract_pod($skills_pm);
 
 like( $pm, qr/our \$VERSION = '([^']+)'/, 'main module declares a version' );
 my ($version) = $pm =~ /our \$VERSION = '([^']+)'/;
-is( $version, '4.03', 'repo version bumped for layered API CLI management delivery and gate refresh' );
+is( $version, '4.16', 'repo version bumped for the workspace -c change-directory flag' );
 like( $pm, qr/^\Q$version\E$/m, 'main POD version matches the module version' );
+{
+    my @module_files;
+    find(
+        {
+            wanted   => sub { push @module_files, $File::Find::name if /\.pm\z/ },
+            no_chdir => 1,
+        },
+        File::Spec->catdir( $ROOT, 'lib' ),
+    );
+    @module_files = sort @module_files;
+    cmp_ok( scalar(@module_files), '>', 1, 'release version gate walks the full lib module tree' );
+    for my $module_file (@module_files) {
+        my $module_source = _slurp($module_file);
+        my ($module_version) = $module_source =~ /our \$VERSION = '([^']+)'/;
+        my $relative = File::Spec->abs2rel( $module_file, $ROOT );
+        is( $module_version, $version, "$relative carries the repo release version so no packaged module can drift behind a bump" );
+    }
+}
 unlike( $readme, qr/\A=(?:pod|head\d|over|item|back|cut)\b/m, 'README.md is Markdown instead of raw POD' ) if $readme ne '';
 like( $readme, qr/\A(?:<!--.*?-->\n\n)?#\s+/s, 'README.md begins with Markdown headings' ) if $readme ne '';
 like(
@@ -393,7 +411,7 @@ for my $doc ( grep { defined && $_ ne '' } ($readme) ) {
     like( $doc, qr/dashboard skills enable/, 'README documents skill enablement' );
     like( $doc, qr/dashboard skills disable/, 'README documents skill disablement' );
     like( $doc, qr/dashboard skills usage/, 'README documents skill usage inspection' );
-    like( $doc, qr/dashboard skills list -o table|dashboard skills usage example-skill -o table/, 'README documents table output for skill inspection' );
+    like( $doc, qr/dashboard skills list -o json|dashboard skills usage example-skill -o json|default output is a readable multi-section summary|default output is a padded table/is, 'README documents the human-summary plus explicit JSON contract for skill inspection' );
     like( $doc, qr/dashboard skills list -o json/, 'README documents explicit JSON output for the skills list' );
     like( $doc, qr/default output is a padded table|default output is a .*table/i, 'README documents table as the default skills list output' );
     like( $doc, qr/dashboard example-skill\.somecmd/, 'README documents dotted isolated skill command dispatch' );
@@ -416,6 +434,8 @@ for my $doc ( grep { defined && $_ ne '' } ($readme) ) {
 like( $release_doc, qr/dzil build/, 'release doc still documents the dzil build step' ) if $release_doc ne '';
 like( $release_doc, qr/OWASP ASVS 5\.0|ASVS 5\.0/, 'release doc references the current OWASP ASVS gate version' ) if $release_doc ne '';
 like( $release_doc, qr/OWASP Top 10/i, 'release doc references OWASP Top 10 coverage as part of the security gate' ) if $release_doc ne '';
+like( $release_doc, qr/tag pushes.*signed GitHub release path|signed GitHub release path.*tag pushes/is, 'release doc keeps vX.XX tags dedicated to the signed GitHub release path' ) if $release_doc ne '';
+like( $release_doc, qr/CPAN upload workflow.*manual-only|manual-only.*CPAN upload workflow/is, 'release doc states that GitHub-hosted CPAN upload stays manual-only' ) if $release_doc ne '';
 like( $release_doc, qr/exactly one unpacked\s+`Developer-Dashboard-X\.XX\/`\s+build directory and exactly one matching\s+`Developer-Dashboard-X\.XX\.tar\.gz`\s+tarball/s, 'release doc describes the enforced single-build-dir and single-tarball invariant' ) if $release_doc ne '';
 like(
     $release_doc,

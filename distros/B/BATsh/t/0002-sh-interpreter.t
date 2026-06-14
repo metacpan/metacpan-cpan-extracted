@@ -14,10 +14,13 @@ BEGIN { if ($] < 5.006 && !defined(&warnings::import)) {
 use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
 use FindBin ();
+use File::Spec ();
 use lib "$FindBin::Bin/../lib";
 
 eval { require BATsh } or die "Cannot load BATsh: $@";
 BATsh::Env::init();
+
+my $TMPDIR = File::Spec->tmpdir();
 
 my @tests = (
 
@@ -205,6 +208,119 @@ my @tests = (
     sub {
         _ok(BATsh::sh_available() == 1,
             'SH16: sh_available() returns 1 (built-in interpreter)');
+    },
+
+    # SH17: single-line for loop "for VAR in LIST; do BODY; done"
+    sub {
+        delete $BATsh::Env::STORE{'SH_T17'};
+        BATsh->run_string(join("\n",
+            'R=""',
+            'for i in 1 2 3; do R="${R}${i}"; done',
+            'export SH_T17=$R',
+        ));
+        _ok(( defined( $BATsh::Env::STORE{'SH_T17'} ) ? $BATsh::Env::STORE{'SH_T17'} : '' ) eq '123',
+            'SH17: single-line for loop');
+    },
+
+    # SH18: single-line for with two statements in the body
+    sub {
+        delete $BATsh::Env::STORE{'SH_T18'};
+        BATsh->run_string(join("\n",
+            'R=""',
+            'for x in a b; do R="${R}${x}"; R="${R}-"; done',
+            'export SH_T18=$R',
+        ));
+        _ok(( defined( $BATsh::Env::STORE{'SH_T18'} ) ? $BATsh::Env::STORE{'SH_T18'} : '' ) eq 'a-b-',
+            'SH18: single-line for with two body statements');
+    },
+
+    # SH19: single-line while loop "while COND; do BODY; done"
+    sub {
+        delete $BATsh::Env::STORE{'SH_T19'};
+        BATsh->run_string(join("\n",
+            'N=0',
+            'S=""',
+            'while [ $N -lt 3 ]; do S="${S}${N}"; N=$(( N + 1 )); done',
+            'export SH_T19=$S',
+        ));
+        _ok(( defined( $BATsh::Env::STORE{'SH_T19'} ) ? $BATsh::Env::STORE{'SH_T19'} : '' ) eq '012',
+            'SH19: single-line while loop');
+    },
+
+    # SH20: single-line until loop
+    sub {
+        delete $BATsh::Env::STORE{'SH_T20'};
+        BATsh->run_string(join("\n",
+            'M=0',
+            'U=""',
+            'until [ $M -ge 2 ]; do U="${U}${M}"; M=$(( M + 1 )); done',
+            'export SH_T20=$U',
+        ));
+        _ok(( defined( $BATsh::Env::STORE{'SH_T20'} ) ? $BATsh::Env::STORE{'SH_T20'} : '' ) eq '01',
+            'SH20: single-line until loop');
+    },
+
+    # SH21: nested single-line for loops on one line (two "; done"
+    #       terminators on one physical line; greedy must close on the LAST)
+    sub {
+        delete $BATsh::Env::STORE{'SH_T21'};
+        BATsh->run_string(join("\n",
+            'R=""',
+            'for i in 1 2; do for j in a b; do R="${R}${i}${j}"; done; done',
+            'export SH_T21=$R',
+        ));
+        _ok(( defined( $BATsh::Env::STORE{'SH_T21'} ) ? $BATsh::Env::STORE{'SH_T21'} : '' ) eq '1a1b2a2b',
+            'SH21: nested single-line for loops');
+    },
+
+    # SH22: inline for whose body assigns the literal word "done"
+    #       (the leading "done" must not be mistaken for the terminator)
+    sub {
+        delete $BATsh::Env::STORE{'SH_T22'};
+        BATsh->run_string(join("\n",
+            'R=x',
+            'for z in 1; do R=done; done',
+            'export SH_T22=$R',
+        ));
+        _ok(( defined( $BATsh::Env::STORE{'SH_T22'} ) ? $BATsh::Env::STORE{'SH_T22'} : '' ) eq 'done',
+            'SH22: inline for body assigning literal "done"');
+    },
+
+    # SH23: single-line for with a filename glob in the word list
+    sub {
+        delete $BATsh::Env::STORE{'SH_T23'};
+        my $orig = eval { Cwd::cwd() };
+        chdir($FindBin::Bin) if defined $orig;
+        BATsh->run_string(join("\n",
+            'C=0',
+            'for f in *.t; do C=$(( C + 1 )); done',
+            'export SH_T23=$C',
+        ));
+        chdir($orig) if defined $orig;
+        _ok(( defined( $BATsh::Env::STORE{'SH_T23'} ) ? $BATsh::Env::STORE{'SH_T23'} : 0 ) >= 1,
+            'SH23: single-line for with *.t glob iterates files');
+    },
+
+    # SH24: single-line while-read with a redirect on the closing done
+    sub {
+        delete $BATsh::Env::STORE{'SH_T24'};
+        my $orig  = eval { Cwd::cwd() };
+        chdir($TMPDIR) if defined $orig;
+        my $fname = "batsh_sh24_$$.tmp";   # bare name: no path separators
+        local *WF;
+        if (open(WF, "> $fname")) {
+            print WF "alpha\nbeta\ngamma\n";
+            close(WF);
+            BATsh->run_string(join("\n",
+                'C=0',
+                'while read L; do C=$(( C + 1 )); done < ' . $fname,
+                'export SH_T24=$C',
+            ));
+            unlink($fname);
+        }
+        chdir($orig) if defined $orig;
+        _ok(( defined( $BATsh::Env::STORE{'SH_T24'} ) ? $BATsh::Env::STORE{'SH_T24'} : '' ) eq '3',
+            'SH24: single-line while-read with redirect on done');
     },
 
 );

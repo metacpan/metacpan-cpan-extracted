@@ -2,7 +2,6 @@ use strict;
 use warnings;
 use Test::More;
 use Type::Guess;
-use Mojo::Util qw/dumper/;
 
 my @list;
 my $str;

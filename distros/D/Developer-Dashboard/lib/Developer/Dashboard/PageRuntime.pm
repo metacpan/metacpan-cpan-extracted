@@ -3,7 +3,7 @@ package Developer::Dashboard::PageRuntime;
 use strict;
 use warnings;
 
-our $VERSION = '4.03';
+our $VERSION = '4.16';
 
 use Capture::Tiny qw(capture);
 use Developer::Dashboard::DataHelper qw(j je);
@@ -11,6 +11,7 @@ use File::Spec;
 use File::Temp qw(tempfile);
 use IO::Select;
 use IPC::Open3 qw(open3);
+use POSIX qw(:sys_wait_h);
 use Symbol qw(gensym);
 use Developer::Dashboard::PageRuntime::StreamHandle;
 use Developer::Dashboard::JSON qw(json_encode);
@@ -428,10 +429,30 @@ sub stream_saved_ajax_file {
     my $select = IO::Select->new( $stdout, $stderr );
     my $stream_error = '';
     my $disconnected = 0;
+    my $saved_status;
     eval {
         while (1) {
             my @ready = $select->can_read(0.25);
-            last if !@ready && !$select->count;
+            if ( !@ready ) {
+                last if !$select->count;
+                my ( $child_exited, $status ) = $self->_saved_ajax_child_exited($pid);
+                if ($child_exited) {
+                    $saved_status = $status;
+                    my $continued = $self->_drain_saved_ajax_post_exit_handles(
+                        path          => $path,
+                        select        => $select,
+                        stdout        => $stdout,
+                        stdout_writer => $stdout_writer,
+                        stderr_writer => $stderr_writer,
+                    );
+                    if ( !$continued ) {
+                        $disconnected = 1;
+                        die "__DD_AJAX_STREAM_DISCONNECTED__\n";
+                    }
+                    last;
+                }
+                next;
+            }
             for my $fh (@ready) {
                 my $continued = $self->_drain_saved_ajax_ready_handle(
                     fh            => $fh,
@@ -461,14 +482,54 @@ sub stream_saved_ajax_file {
         $self->_terminate_saved_ajax_process($pid);
         $fatal_error = $stream_error if !$self->_looks_like_stream_disconnect_error($stream_error);
     }
-    waitpid( $pid, 0 );
+    my $status;
+    if ( defined $saved_status ) {
+        $status = $saved_status;
+    }
+    else {
+        waitpid( $pid, 0 );
+        $status = $?;
+    }
     $self->_cleanup_saved_ajax_temp_files(@temp_files);
     die $fatal_error if $fatal_error ne '';
     return {
         disconnected => $disconnected ? 1 : 0,
-        exit_code => $? >> 8,
-        status    => $?,
+        exit_code => $status >> 8,
+        status    => $status,
     };
+}
+
+# _drain_saved_ajax_post_exit_handles(%args)
+# Drains any remaining saved-Ajax stdout/stderr chunks after the child has
+# already exited so Windows does not lose the final response body when
+# IO::Select stops reporting the pipe handles as readable.
+# Input: saved file path, select set, stdout fh, and writer callbacks.
+# Output: true when all remaining handles were drained, otherwise false when a
+# caller-visible writer disconnect stops the stream.
+sub _drain_saved_ajax_post_exit_handles {
+    my ( $self, %args ) = @_;
+    my $select = $args{select} || die 'Missing select set';
+    my @handles = $select->can('handles') ? $select->handles : ();
+    for my $fh (@handles) {
+        while ( defined $fh && defined fileno($fh) ) {
+            my $continued = $self->_drain_saved_ajax_ready_handle(%args, fh => $fh);
+            return 0 if !$continued;
+        }
+    }
+    return 1;
+}
+
+# _saved_ajax_child_exited($pid)
+# Detects whether one saved-Ajax worker process has already exited during an
+# idle stream poll so Windows pipe EOF quirks do not stall the parent stream
+# loop forever after the child is gone.
+# Input: child process id integer.
+# Output: list of boolean child-exited flag and optional wait status word.
+sub _saved_ajax_child_exited {
+    my ( $self, $pid ) = @_;
+    return ( 1, 0 ) if !defined $pid || $pid !~ /^\d+$/ || $pid < 1;
+    my $waited = waitpid( $pid, WNOHANG );
+    return $waited == $pid ? ( 1, $? ) : ( 0, undef );
 }
 
 # _noop_writer(@parts)
@@ -578,14 +639,14 @@ sub _stream_sysread {
 sub _saved_ajax_command {
     my ( $self, %args ) = @_;
     my $path = $args{path} || die 'Missing saved ajax file path';
-    return ( $^X, '-e', $self->_saved_ajax_perl_wrapper, $path ) if $path =~ /\.pl\z/i;
+    return ( $^X, '-MDeveloper::Dashboard::PageRuntime', '-e', 'Developer::Dashboard::PageRuntime->_run_saved_ajax_perl_file(shift @ARGV)', $path ) if $path =~ /\.pl\z/i;
     return command_argv_for_path($path) if $path =~ /\.(?:ps1|cmd|bat|sh|bash)\z/i;
     return ( command_in_path('python3') || command_in_path('python') || 'python3', $path ) if $path =~ /\.py\z/i;
     open my $fh, '<', $path or die "Unable to read saved ajax file $path: $!";
     my $first_line = <$fh>;
     close $fh;
     return command_argv_for_path($path) if defined $first_line && $first_line =~ /^#!/;
-    return ( $^X, '-e', $self->_saved_ajax_perl_wrapper, $path );
+    return ( $^X, '-MDeveloper::Dashboard::PageRuntime', '-e', 'Developer::Dashboard::PageRuntime->_run_saved_ajax_perl_file(shift @ARGV)', $path );
 }
 
 # _saved_ajax_env(%args)
@@ -807,6 +868,22 @@ close $fh;
 eval "{ $code }";
 die $@ if $@;
 PERL
+}
+
+# _run_saved_ajax_perl_file($path)
+# Executes one saved Perl Ajax file through the in-module bootstrap wrapper so
+# Windows does not have to carry a multi-line `perl -e` payload through the
+# native process command line.
+# Input: saved Ajax Perl file path string.
+# Output: true value after the wrapped file has been evaluated.
+sub _run_saved_ajax_perl_file {
+    my ( $class, $path ) = @_;
+    die "Missing saved ajax Perl file path\n" if !defined $path || $path eq '';
+    my $wrapper = $class->_saved_ajax_perl_wrapper;
+    local @ARGV = ($path);
+    eval $wrapper;
+    die $@ if $@;
+    return 1;
 }
 
 # _code_header($state)

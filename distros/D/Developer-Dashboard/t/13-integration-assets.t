@@ -78,7 +78,9 @@ if ($has_source_tree_docs) {
     like( $install_ps, qr/winget/, 'Windows bootstrap installer uses winget to bootstrap missing packages' );
     like( $install_ps, qr/cpanm.*--notest/s, 'Windows bootstrap installer installs the dashboard with cpanm --notest' );
     like( $install_ps, qr/dashboard init/, 'Windows bootstrap installer initializes the runtime' );
-    like( $install_ps, qr/dashboard shell ps/, 'Windows bootstrap installer activates the PowerShell shell bootstrap' );
+    like( $install_ps, qr/\bshell ps\b/, 'Windows bootstrap installer activates the PowerShell shell bootstrap' );
+    like( $install_ps, qr/Get-WindowsBootstrapArchitecture/, 'Windows bootstrap installer detects the active Windows architecture before choosing fallback assets' );
+    like( $install_ps, qr/win-arm64-zip|arm64/i, 'Windows bootstrap installer includes an ARM-aware fallback path for Windows bootstrap dependencies' );
 
     open my $windows_doc_fh, '<', 'doc/windows-testing.md' or die $!;
     my $windows_doc = do { local $/; <$windows_doc_fh> };
@@ -93,6 +95,8 @@ if ($has_source_tree_docs) {
     like( $windows_doc, qr/Git Bash.*optional|optional.*Git Bash/i, 'Windows verification doc treats Git Bash as optional' );
     like( $windows_doc, qr/Scoop.*optional|optional.*Scoop/i, 'Windows verification doc treats Scoop as optional' );
     like( $windows_doc, qr/PowerShell.*Strawberry Perl.*supported baseline|supported baseline.*PowerShell.*Strawberry Perl/is, 'Windows verification doc defines the supported Windows runtime baseline' );
+    like( $windows_doc, qr/ARM64|arm64/i, 'Windows verification doc explains the Windows ARM support path' );
+    like( $windows_doc, qr/x64|Intel/i, 'Windows verification doc also explains the Windows Intel x64 support path' );
     unlike( $windows_doc, qr/Developer-Dashboard-1\.\d+\.tar\.gz/, 'Windows verification doc avoids hard-coded release tarball versions' );
 }
 
@@ -182,15 +186,22 @@ if ($has_integration_assets) {
     like( $windows_smoke, qr/Invoke-Expression/, 'Windows Strawberry smoke script exercises install.ps1 through Invoke-Expression to match the streamed bootstrap path' );
     like( $windows_smoke, qr/Assert-FreshPowerShellDashboardBootstrap/, 'Windows Strawberry smoke script verifies a fresh profile-loaded PowerShell session after install.ps1 completes' );
     like( $windows_smoke, qr/dd-fresh-session-bootstrap\.ps1/, 'Windows Strawberry smoke script stages the fresh-session PowerShell proof into a temporary ps1 file before launching a normal profile-loaded session' );
-    like( $windows_smoke, qr/powershell\.exe -NoLogo -File \$freshSessionScriptPath/, 'Windows Strawberry smoke script re-enters a normal profile-loaded PowerShell session through a temporary script file instead of fragile inline -Command quoting' );
+    like( $windows_smoke, qr/\& powershell\.exe \@\(\s*'-NoLogo',\s*'-File',\s*\$freshSessionScriptPath/s, 'Windows Strawberry smoke script re-enters a normal profile-loaded PowerShell session through a direct powershell.exe invocation without piping its stdout through an outer capture' );
+    like( $windows_smoke, qr/DD_FRESH_SESSION_LOG/, 'Windows Strawberry smoke script passes a dedicated fresh-session marker log path into the child PowerShell process' );
+    like( $windows_smoke, qr/Add-Content -Path \$env:DD_FRESH_SESSION_LOG -Value \$Line/, 'Windows Strawberry smoke script records fresh-session progress markers through a dedicated child-side log file instead of outer stdout capture' );
     like( $windows_smoke, qr/DASHBOARD_LOGS_START/, 'Windows Strawberry smoke script prints an explicit dashboard logs marker during the fresh PowerShell bootstrap proof' );
     like( $windows_smoke, qr/Get-Command dashboard -ErrorAction Stop/, 'Windows Strawberry smoke script requires a fresh PowerShell session to resolve dashboard through normal command discovery' );
     like( $windows_smoke, qr/DASHBOARD_RESTART_START/, 'Windows Strawberry smoke script prints an explicit dashboard restart marker during the fresh PowerShell bootstrap proof' );
-    like( $windows_smoke, qr/DASHBOARD_SKILL_INSTALL_BROWSER_START/, 'Windows Strawberry smoke script prints an explicit browser skill install marker during the fresh PowerShell bootstrap proof' );
+    like( $windows_smoke, qr/New-SmokeSkillFixture/, 'Windows Strawberry smoke script creates a deterministic local smoke skill for the fresh PowerShell bootstrap proof' );
+    like( $windows_smoke, qr/requires 'JSON::XS';/, 'Windows Strawberry smoke script gives the fresh-session smoke skill a cpanfile that exercises non-interactive cpanm without external CPAN churn' );
+    like( $windows_smoke, qr/default>>make\.log/, 'Windows Strawberry smoke script gives the fresh-session smoke skill a Makefile that records target execution' );
+    like( $windows_smoke, qr/Set-Content -Path \(Join-Path \$fixtureRoot "Makefile"\) -Encoding ASCII/, 'Windows Strawberry smoke script writes the generated fresh-session Makefile without a UTF-8 BOM that would break Windows make' );
+    like( $windows_smoke, qr/DASHBOARD_SKILL_INSTALL_START/, 'Windows Strawberry smoke script prints an explicit smoke skill install marker during the fresh PowerShell bootstrap proof' );
     like( $windows_smoke, qr/dashboard restart/, 'Windows Strawberry smoke script exercises dashboard restart in the fresh PowerShell session' );
-    like( $windows_smoke, qr/dashboard skills install browser/, 'Windows Strawberry smoke script exercises browser skill installation in the fresh PowerShell session' );
+    like( $windows_smoke, qr/dashboard skills install \$env:DD_SMOKE_SKILL_SOURCE/, 'Windows Strawberry smoke script exercises local smoke skill installation in the fresh PowerShell session' );
+    like( $windows_smoke, qr/dashboard skills install \$env:DD_SMOKE_SKILL_SOURCE 2>&1 \| Out-String/, 'Windows Strawberry smoke script captures the fresh-session smoke skill install transcript before surfacing any failure' );
     like( $windows_smoke, qr/dashboard restart failed with exit code \$LASTEXITCODE/, 'Windows Strawberry smoke script treats dashboard restart failures as fatal during the fresh PowerShell bootstrap proof' );
-    like( $windows_smoke, qr/dashboard skills install browser failed with exit code \$LASTEXITCODE/, 'Windows Strawberry smoke script treats browser skill install failures as fatal during the fresh PowerShell bootstrap proof' );
+    like( $windows_smoke, qr/dashboard skills install smoke skill failed with exit code \$LASTEXITCODE/, 'Windows Strawberry smoke script treats smoke skill install failures as fatal during the fresh PowerShell bootstrap proof' );
     like( $windows_smoke, qr/\[switch\]\$SkipCpanmTests/, 'Windows Strawberry smoke script accepts a switch to skip upstream cpanm dependency tests on Windows' );
     like( $windows_smoke, qr/--notest/, 'Windows Strawberry smoke script can install with cpanm --notest when Windows dependency tests are intentionally skipped' );
     like( $windows_smoke, qr/Get-CommandExecutablePath/, 'Windows Strawberry smoke script centralizes command-object to executable-path resolution' );
@@ -198,9 +209,12 @@ if ($has_integration_assets) {
     like( $windows_smoke, qr/foreach \(\$propertyName in \@\("Source", "Path", "Definition"\)\)/, 'Windows Strawberry smoke script falls back across Source, Path, and Definition when resolving executable paths' );
     like( $windows_smoke, qr/where\.exe/, 'Windows Strawberry smoke script uses where.exe when PowerShell command metadata does not expose a real path' );
     like( $windows_smoke, qr/\[AllowEmptyString\(\)\]\[string\]\$ResolvedPerl = ""/, 'Windows Strawberry smoke script allows an empty ResolvedPerl parameter so the fallback resolver can run inside Set-StrawberryPath' );
+    like( $windows_smoke, qr/function Invoke-AssertContains \{\s+param\(\s+\[Parameter\(Mandatory = \$true\)\]\s+\[AllowEmptyString\(\)\]\s+\[string\]\$Text/s, 'Windows Strawberry smoke script allows empty assertion input text so the harness reports the real Windows route failure instead of a PowerShell binding error' );
+    like( $windows_smoke, qr/function Invoke-AssertNotContains \{\s+param\(\s+\[Parameter\(Mandatory = \$true\)\]\s+\[AllowEmptyString\(\)\]\s+\[string\]\$Text/s, 'Windows Strawberry smoke script allows empty negative-assertion input text so blank outputs still fail through the harness logic' );
     like( $windows_smoke, qr/\[string\]::IsNullOrWhiteSpace\(\$ResolvedPerl\)/, 'Windows Strawberry smoke script guards against blank Perl path resolution before calling Test-Path' );
     like( $windows_smoke, qr/Unable to resolve a filesystem path for Perl interpreter/, 'Windows Strawberry smoke script throws an explicit error when a Perl command name cannot be resolved to a filesystem path' );
     like( $windows_smoke, qr/Write-PhaseStatus/, 'Windows Strawberry smoke script reports phase-level progress for long Windows runs' );
+    like( $windows_smoke, qr/Write-Host "PHASE: \$Phase"/, 'Windows Strawberry smoke script also emits each long-running phase to stdout for live operator visibility' );
     like( $windows_smoke, qr/Copy-StatusArtifact/, 'Windows Strawberry smoke script copies diagnostic artifacts back to the shared status root' );
     like( $windows_smoke, qr/cpanm-install\.log/, 'Windows Strawberry smoke script exports the cpanm transcript into the shared status root' );
     like( $windows_smoke, qr/\$cpanmLog = Join-Path \$StatusRoot "cpanm-install\.log"/, 'Windows Strawberry smoke script writes the cpanm transcript directly into the shared status root when available' );
@@ -213,7 +227,21 @@ if ($has_integration_assets) {
     like( $windows_smoke, qr/dashboard shell ps/, 'Windows Strawberry smoke script verifies PowerShell shell bootstrap output' );
     like( $windows_smoke, qr/dashboard collector run/, 'Windows Strawberry smoke script exercises collector command execution' );
     like( $windows_smoke, qr/Invoke-WebRequest/, 'Windows Strawberry smoke script verifies browser-facing HTTP routes with PowerShell web requests' );
+    like( $windows_smoke, qr/saved Ajax route:/, 'Windows Strawberry smoke script prints the resolved saved Ajax route during the guest smoke for route-shape diagnostics' );
+    like( $windows_smoke, qr/\/ajax\/hello\.pl\?type=text/, 'Windows Strawberry smoke script replays the deterministic saved Ajax route defined by the Windows smoke fixture' );
+    like( $windows_smoke, qr/Set-Content -Path \(Join-Path \$ajaxRoot "hello\.pl"\) -Value 'print "ajax-ok";'/, 'Windows Strawberry smoke script provisions the saved Ajax fixture file directly under dashboards/ajax before replaying it' );
+    like( $windows_smoke, qr/saved Ajax body:/, 'Windows Strawberry smoke script prints the raw saved Ajax response body during the guest smoke when asserting the saved Ajax handler output' );
     like( $windows_smoke, qr/msedge\.exe|chrome\.exe/, 'Windows Strawberry smoke script looks for a Windows browser binary for DOM smoke checks' );
+    like( $windows_smoke, qr/Browser dump-dom timed out after 20 seconds/, 'Windows Strawberry smoke script fails explicitly when the optional headless browser DOM dump stalls' );
+    like( $windows_smoke, qr/\[System\.Diagnostics\.ProcessStartInfo\]::new\(\)/, 'Windows Strawberry smoke script launches the optional headless browser dump through an explicit .NET process start info object' );
+    like( $windows_smoke, qr/RedirectStandardOutput = \$true/, 'Windows Strawberry smoke script captures browser DOM stdout directly through the .NET process runner' );
+    like( $windows_smoke, qr/RedirectStandardError = \$true/, 'Windows Strawberry smoke script captures browser DOM stderr directly through the .NET process runner' );
+    like( $windows_smoke, qr/function Quote-WindowsProcessArgument/, 'Windows Strawberry smoke script defines an explicit native Windows argument quoter for the browser DOM runner' );
+    like( $windows_smoke, qr/\$processStartInfo\.Arguments =/, 'Windows Strawberry smoke script writes the browser command line through ProcessStartInfo.Arguments on older Windows PowerShell runtimes' );
+    like( $windows_smoke, qr/--no-first-run/, 'Windows Strawberry smoke script disables first-run browser prompts during the optional DOM dump' );
+    like( $windows_smoke, qr/--disable-background-networking/, 'Windows Strawberry smoke script disables background browser networking during the optional DOM dump' );
+    like( $windows_smoke, qr/'--dump-dom',\s*\$Url/s, 'Windows Strawberry smoke script passes the target URL to Chromium dump-dom as a separate trailing argument so Edge actually navigates to the requested page' );
+    like( $windows_smoke, qr/WaitForExit\(20000\)/, 'Windows Strawberry smoke script caps the optional headless browser DOM dump at twenty seconds' );
     like( $windows_smoke, qr/__END__/, 'Windows Strawberry smoke script carries POD trailer' );
     unlike( $windows_smoke, qr/Developer-Dashboard-1\.\d+\.tar\.gz/, 'Windows Strawberry smoke script POD avoids hard-coded release tarball versions' );
     unlike( $windows_smoke, qr/\&\s+\$Command\[0\]\s+\@Command\[/, 'Windows Strawberry smoke script avoids invalid inline PowerShell splatting expressions' );

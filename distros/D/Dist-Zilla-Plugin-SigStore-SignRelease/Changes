@@ -1,8 +1,14 @@
 Revision history for Dist-Zilla-Plugin-SigStore::SignRelease
 
+0.06 -- Sat Jun 13 12:54:42 ADT 2026
+
+    [Changes since 0.05]
+    - Simplify dist.ini settings
+    - Support older json format bundle files (thanks @rrwo)
+
 0.05 -- Thu May 07 23:01:56 ADT 2026
 
-    [Changes since 0.03]
+    [Changes since 0.04]
     - Patch from @Grinnz to fix synopsis Filter bundle example
 
 0.04 -- Thu May 07 20:00:56 ADT 2026

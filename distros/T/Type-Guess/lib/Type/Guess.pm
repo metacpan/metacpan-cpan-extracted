@@ -5,8 +5,8 @@ package Type::Guess;
 use strict;
 use warnings;
 
-use Mojo::Base -base;
-use Mojo::Util qw/dumper/;
+use Moo;
+use MooX::ClassAttribute;
 use List::Util;
 
 use Class::Method::Modifiers;
@@ -16,22 +16,59 @@ use overload
     '""' =>  \&to_string,
     '&{}' => \&to_sub;
 
-has type      => "Str";
+# ------------------------------------------------------------------------------
 
-has length    => 0;
-has precision => 0;
+# has type      => "Str";
 
-has max       => 0;
-has format    => "";
-has integer_chars  => 0;
+# has length    => 0;
+# has precision => 0;
 
-# these two are set initially based
-has length_ro  => 0;
-has integer_chars_ro  => 0;
-has precision_ro  => 0;
+# has max       => 0;
+# has format    => "";
+# has integer_chars  => 0;
 
-has percentages  => 0;
-has signed  => 0;
+# # these two are set initially based
+# has length_ro  => 0;
+# has integer_chars_ro  => 0;
+# has precision_ro  => 0;
+
+# has percentages  => 0;
+# has signed  => 0;
+
+# ------------------------------------------------------------------------------
+
+has type => ( is  => 'rw', default => sub { "Str" });
+
+has length => ( is  => 'rw', default => sub { 0 });
+
+has precision => ( is  => 'rw', default => sub { 0 });
+
+has max       => ( is  => 'rw', default => sub { 0 });
+
+has format    => ( is  => 'rw', default => sub { "" });
+
+has integer_chars  => ( is  => 'rw', default => sub { 0 });
+
+has percentages  => ( is  => 'rw', default => sub { 0 });
+
+has signed  => ( is  => 'rw', default => sub { 0 });
+
+# -------------------------------------------------------
+# these three are set initially and never again
+# -------------------------------------------------------
+has length_ro  => ( is  => 'ro', default => sub { 0 });
+has integer_chars_ro  => ( is  => 'ro', default => sub { 0 });
+has precision_ro  => ( is  => 'ro', default => sub { 0 });
+
+# -------------------------------------------------------
+# class properties
+# -------------------------------------------------------
+
+# class_has "tolerance" => ( is => "rw", default => sub { 0 });
+
+# class_has "skip_empty" => ( is => "rw", default => sub { 1 });
+
+# class_has "encoding" => ( is => "rw", default => sub { "" });
 
 
 around "new" => sub {
@@ -42,8 +79,8 @@ around "new" => sub {
 	$ret = $orig->(@_);
     } else {
 	my $class = ref $_[0] ? ref shift : shift;
-	local @_ = $class->skip_empty ? @_ : grep { /^.$/ } @_;
-	return $orig->($class, $class->analyse(@_)->as_hash)
+	my @args = $class->skip_empty ? grep { defined $_ && /^.+$/ } @_ : @_;
+	return $orig->($class, $class->analyse(@args)->as_hash)
     }
 };
 
@@ -172,8 +209,10 @@ sub _type {
     my $class = shift();
     my @vals = @_;
     @vals = map { s/^\+//; s/^-//; s/%$//; $_ } @vals;
-    return "Int" if $class->_enough(sub { looks_like_number($_) && $_ == int($_) }, @vals);
-    return "Num" if $class->_enough(sub{ looks_like_number($_) }, @vals);
+    # return "Int" if $class->_enough(sub { looks_like_number($_) && $_ == int($_) }, @vals);
+    return "Int" if $class->_enough(sub { (looks_like_number($_) && $_ == int($_)) || !defined $_ || /^$/  }, @vals);
+    # return "Num" if $class->_enough(sub{ looks_like_number($_) }, @vals);
+    return "Num" if $class->_enough(sub{ looks_like_number($_) || !defined $_ || /^$/ }, @vals);
     return "Str"
 }
 
@@ -238,22 +277,15 @@ sub to_string {
     }
 }
 
+sub with_roles {
+    my ($self, @roles) = @_;
+    my $class = Scalar::Util::blessed($self) // $self;
+    @roles = map { /^\+(.+)$/ ? "${class}::Role::$1" : $_ } @roles;
+    if (Scalar::Util::blessed($self)) {
+        return Role::Tiny->apply_roles_to_object($self, @roles);
+    }
+    return Role::Tiny->create_class_with_roles($class, @roles);
+}
+
+
 1
-
-
-#     -sub sql {
-# -    my $self = shift;
-# -    if ($self->type eq "Int") {
-# -       return "integer"
-# -    }
-# -    elsif ($self->type eq "Num") {
-# -       return "float"
-# -    }
-# -    elsif ($self->type eq "Str" && $self->length <= 512) {
-# -       return sprintf "varchar(%i)", $self->length;
-# -    }
-# -    else {
-# -       return "text"
-# -    }
-# -}
-# -

@@ -1,5 +1,15 @@
 Revision history for Plack-Middleware-Security-Simple:
 
+v0.13.2   2026-06-14 10:16:01+01:00 Europe/London
+  [Toolchain]
+  - Add automation policy.
+
+  - Set the static install flag.
+
+  - Adjusted build prerequisites to be recommended instead of required.
+
+  - Sign distribution with SigStore.
+
 v0.13.1   2026-05-26 22:26:46+01:00 Europe/London
   [Security]
   - Fixed the header_injection rule CVE-2026-9658.

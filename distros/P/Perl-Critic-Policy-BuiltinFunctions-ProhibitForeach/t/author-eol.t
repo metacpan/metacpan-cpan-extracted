@@ -20,7 +20,7 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/20-policy.t',
-    't/30-methods.t',
+    't/BuiltinFunctions/ProhibitForeach.run',
     't/author-distmeta.t',
     't/author-eof.t',
     't/author-eol.t',

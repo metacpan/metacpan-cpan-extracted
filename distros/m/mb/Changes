@@ -1,5 +1,45 @@
 Revision history for this software.
 
+0.63  2026-06-14 JST (Japan Standard Time)
+  - fix t/lib/INA_CPAN_Check.pm: ok() now has prototype ($;$) so that a
+    failing regex match passed inline (e.g. ok($text =~ /pat/, "label"))
+    is evaluated in scalar context.  Without the prototype, a no-capture
+    regex failure returns an empty list in list context, causing the label
+    string to land in the first argument and the test to silently pass.
+    This masked all P10 failures for t/9xxx test files (9 false passes
+    per run).
+  - fix t/lib/INA_CPAN_Check.pm: add BEGIN { pop @INC if $INC[-1] eq '.' }
+    CVE-2016-1238 mitigation (P12 guard was missing from the file).
+  - fix t/lib/INA_CPAN_Check.pm: add $VERSION = $VERSION self-assign
+    (P10 guard was missing from the file).
+  - fix t/lib/INA_CPAN_Check.pm: check_B() B4 regex now also matches
+    'VERSION' => q{x.xx} and "VERSION" => q{x.xx} forms used in
+    ina@CPAN Makefile.PL files (the old pattern matched only single- or
+    double-quoted values, so B4 always failed for this distribution).
+  - fix t/9001-load.t, t/9010-encoding.t, t/9020-perl5compat.t,
+    t/9025-perl542compat.t, t/9030-distribution.t, t/9040-style.t,
+    t/9050-pod.t, t/9060-readme.t, t/9080-cheatsheets.t: add
+    use vars qw($VERSION); $VERSION = $VERSION; to each file so that
+    P10 ($VERSION self-assign) is satisfied when t/9020-perl5compat.t
+    scans the t/9xxx test files themselves.
+  - fix lib/mb.pm: _open_r() now prepends "< " read-mode prefix, matching
+    _open_w()/_open_a(). The old 2-arg open($fh,$_[0]) misparsed filenames
+    ending in '|' (a legal MBCS trail byte 0x7C in Shift_JIS/EUC/GBK etc.)
+    as a pipe/command open. Works on Perl 5.005_03 and all later versions.
+  - fix pmake.bat: _dist_check_sources() now scopes selfcheck targets to
+    match t/9020-perl5compat.t and t/9040-style.t. The multibyte transpiler
+    core (lib/mb.pm) and the t/NNNN fixtures (non-t/9xxx) are excluded from
+    the P1-P12 / C1 / K1-K3 house-style scans (they intentionally carry
+    post-5.005_03 tokens and non-US-ASCII bytes as transformation data);
+    t/lib/*.pm added to targets. Fixes 212 spurious 'pmake dist' FAILs.
+  - fix t/lib/INA_CPAN_Check.pm: check_C() again honours the caller's
+    utf8_ok option (the 0.63 rewrite dropped it, so lib/mb.pm and the
+    t/[1-8]xxx MBCS fixtures all false-failed C1 -- 106 spurious FAILs in
+    t/9030). _find_pm_t() now returns a list instead of taking a \@out-param,
+    so the module no longer violates its own K2 rule (1 FAIL in t/9040).
+  - add eg/mb_length.pl: minimal US-ASCII, 5.005_03-clean usage example
+    (satisfies the new check_F F1 "eg/*.pl exists"); registered in MANIFEST.
+
 0.62  2026-05-17 JST (Japan Standard Time)
   - fix lib/mb.pm: _open_a(), _open_r(), _open_w() rewritten to use a
     unique numbered package glob (mb::FH::H<n>) instead of \do{local *_}.

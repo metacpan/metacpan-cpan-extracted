@@ -3,13 +3,10 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.011';
-
-use v5.36;
-use strict;
-use warnings;
+our $VERSION = '0.012';
 
 use Carp qw(croak);
+use Linux::Event::XS ();
 
 sub new ($class, %args) {
   my $clock = delete $args{clock};
@@ -21,14 +18,8 @@ sub new ($class, %args) {
   }
 
   return bless {
-    clock     => $clock,
-    d_ns      => [],
-    cb        => [],
-    id        => [],
-    size      => 0,
-    next_id   => 1,
-    live      => {},
-    cancelled => 0,
+    clock => $clock,
+    heap  => Linux::Event::XS::timer_heap_new(),
   }, $class;
 }
 
@@ -37,18 +28,11 @@ sub at_ns ($self, $deadline_ns, $cb) {
   croak "callback is required"    if !defined $cb;
   croak "callback must be a coderef" if ref($cb) ne 'CODE';
 
-  $deadline_ns = int($deadline_ns);
-
-  my $id = $self->{next_id}++;
-  $self->{live}{$id} = 1;
-
-  my $i = $self->{size}++;
-  $self->{d_ns}[$i] = $deadline_ns;
-  $self->{cb}[$i]   = $cb;
-  $self->{id}[$i]   = $id;
-
-  _sift_up($self, $i);
-  return $id;
+  return Linux::Event::XS::timer_heap_at_ns(
+    $self->{heap},
+    int($deadline_ns),
+    $cb,
+  );
 }
 
 sub after_ns ($self, $delta_ns, $cb) {
@@ -60,139 +44,17 @@ sub after_ns ($self, $delta_ns, $cb) {
 
 sub cancel ($self, $id) {
   return 0 if !defined $id;
-  return 0 if !$self->{live}{$id};
-  delete $self->{live}{$id};
-  $self->{cancelled}++;
-  return 1;
+  return Linux::Event::XS::timer_heap_cancel($self->{heap}, int($id));
 }
 
 sub next_deadline_ns ($self) {
-  _compact($self) if $self->{cancelled} && $self->{cancelled} > 32;
-  return undef if !$self->{size};
-  my $id0 = $self->{id}[0];
-  while ($self->{size} && !$self->{live}{$id0}) {
-    _pop_root($self);
-    return undef if !$self->{size};
-    $id0 = $self->{id}[0];
-  }
-  return $self->{d_ns}[0];
+  return Linux::Event::XS::timer_heap_next_deadline_ns($self->{heap});
 }
 
 sub pop_expired ($self) {
   my $now = $self->{clock}->now_ns;
-
-  my @out;
-  while ($self->{size}) {
-    my $deadline = $self->{d_ns}[0];
-    my $id0      = $self->{id}[0];
-
-    if (!$self->{live}{$id0}) {
-      _pop_root($self);
-      next;
-    }
-
-    last if $deadline > $now;
-
-    my $cb = $self->{cb}[0];
-
-    delete $self->{live}{$id0};
-    _pop_root($self);
-
-    push @out, [ $id0, $cb, $deadline ];
-  }
-  return @out;
+  return Linux::Event::XS::timer_heap_pop_expired($self->{heap}, int($now));
 }
-
-sub _pop_root ($self) {
-  my $last = --$self->{size};
-  if ($last < 0) {
-    $self->{size} = 0;
-    return;
-  }
-  if ($last == 0) {
-    $self->{d_ns} = [];
-    $self->{cb}   = [];
-    $self->{id}   = [];
-    return;
-  }
-
-  $self->{d_ns}[0] = $self->{d_ns}[$last];
-  $self->{cb}[0]   = $self->{cb}[$last];
-  $self->{id}[0]   = $self->{id}[$last];
-
-  pop @{ $self->{d_ns} };
-  pop @{ $self->{cb} };
-  pop @{ $self->{id} };
-
-  _sift_down($self, 0);
-  return;
-}
-
-sub _sift_up ($self, $i) {
-  while ($i > 0) {
-    my $p = int(($i - 1) / 2);
-    last if $self->{d_ns}[$p] <= $self->{d_ns}[$i];
-    _swap($self, $i, $p);
-    $i = $p;
-  }
-  return;
-}
-
-sub _sift_down ($self, $i) {
-  while (1) {
-    my $l = $i * 2 + 1;
-    last if $l >= $self->{size};
-    my $r = $l + 1;
-
-    my $m = $l;
-    if ($r < $self->{size} && $self->{d_ns}[$r] < $self->{d_ns}[$l]) {
-      $m = $r;
-    }
-
-    last if $self->{d_ns}[$i] <= $self->{d_ns}[$m];
-    _swap($self, $i, $m);
-    $i = $m;
-  }
-  return;
-}
-
-sub _swap ($self, $a, $b) {
-  (@{$self->{d_ns}}[$a, $b]) = (@{$self->{d_ns}}[$b, $a]);
-  (@{$self->{cb}}[$a, $b])   = (@{$self->{cb}}[$b, $a]);
-  (@{$self->{id}}[$a, $b])   = (@{$self->{id}}[$b, $a]);
-  return;
-}
-
-sub _compact ($self) {
-  # Rebuild heap to drop cancelled entries.
-  return if !$self->{size};
-
-  my @d;
-  my @cb;
-  my @id;
-
-  for my $i (0 .. $self->{size} - 1) {
-    my $idv = $self->{id}[$i];
-    next if !$self->{live}{$idv};
-    push @d,  $self->{d_ns}[$i];
-    push @cb, $self->{cb}[$i];
-    push @id, $idv;
-  }
-
-  $self->{d_ns} = \@d;
-  $self->{cb}   = \@cb;
-  $self->{id}   = \@id;
-  $self->{size} = scalar @id;
-  $self->{cancelled} = 0;
-
-  # Heapify
-  for (my $i = int($self->{size} / 2) - 1; $i >= 0; $i--) {
-    _sift_down($self, $i);
-  }
-  return;
-}
-
-1;
 
 1;
 
@@ -206,7 +68,8 @@ Linux::Event::Scheduler - Internal monotonic timer queue for Linux::Event::Loop
 
 C<Linux::Event::Scheduler> is the internal deadline queue used by the loop.
 It stores callbacks keyed by monotonic nanosecond deadlines and returns expired
-items in deadline order.
+items in deadline order. The heap is stored in XS while preserving this
+Perl wrapper and the existing loop-facing API.
 
 This module is internal. Its API is documented only to explain the structure of
 this distribution, not as a stable user-facing contract.
@@ -237,11 +100,5 @@ Return the next live deadline, if any.
 =head2 pop_expired
 
 Return all expired entries as C<[ $id, $cb, $deadline_ns ]> tuples.
-
-=head1 SEE ALSO
-
-L<Linux::Event::Loop>,
-L<Linux::Event::Clock>,
-L<Linux::Event::Timer>
 
 =cut

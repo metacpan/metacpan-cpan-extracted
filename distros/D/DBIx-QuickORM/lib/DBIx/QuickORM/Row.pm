@@ -11,7 +11,7 @@ use DBIx::QuickORM::Util qw/column_key/;
 use DBIx::QuickORM::Affinity();
 use DBIx::QuickORM::Link();
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use DBIx::QuickORM::Connection::RowData qw{
     STORED
@@ -177,16 +177,18 @@ sub clone {
 
 =item $row = $row->check_sync
 
-Croak if the row is out of sync (refreshed while it had pending changes)
-or was fetched outside the current transaction stack; otherwise return the
-row.
+Croak if the row is out of sync (a refresh changed stored values underneath
+pending changes) and the class tracks desync (C<track_desync> is true, the
+default for this class), or if the row's state predates the current
+transaction stack; otherwise return the row. Use C<discard> or
+C<force_sync> to resolve a desynced row.
 
 =back
 
 =cut
 
 sub check_sync {
-    croak <<"    EOT" if $_[0]->row_data->{+DESYNC} && !$_[0]->track_desync;
+    croak <<"    EOT" if $_[0]->row_data->{+DESYNC} && $_[0]->track_desync;
 
 This row is out of sync, this means it was refreshed while it had pending
 changes and the data retrieved from the database does not match what was in
@@ -201,16 +203,7 @@ date data.
 
     EOT
 
-    croak <<"    EOT" if $_[0]->connection->current_txn && !$_[0]->row_data->{+TRANSACTION};
-
-This row was fetched outside of the current transaction stack. The row has not
-been refreshed since the new transaction stack started, meaning the data is
-likely stale and unreliable. The row should be refreshed before making changes.
-You can do this with a call to ->refresh().
-
-    EOT
-
-    return $_[0];
+    return $_[0]->_check_stale;
 }
 
 #####################
@@ -233,7 +226,8 @@ discrepancy.
 =item $row = $row->refresh
 
 Re-fetch the row from the database (requires a stored row with a primary
-key).
+key). If the row no longer exists in the database it is invalidated and
+this croaks.
 
 =item $row = $row->discard
 
@@ -243,7 +237,14 @@ Drop pending changes and clear desync flags.
 
 =item $row = $row->update(%changes)
 
-Apply changes to the pending data and save the row.
+Apply changes to the pending data and save the row. Croaks when a change
+names a field the row does not have, or one owned by the database (a
+generated column).
+
+Updating a field clears that field's desync flag, so an update is an
+explicit overwrite of a conflicting value. If a B<different> field is still
+desynced the save will croak; resolving the full conflict (via C<discard>,
+C<force_sync>, or updating every desynced field) is required first.
 
 =item $row->delete
 
@@ -267,7 +268,12 @@ sub refresh {
     $self->check_pk;
 
     croak "This row is not in the database yet" unless $self->is_stored;
-    return $self->connection->handle($self)->one;
+
+    my $row = $self->connection->handle($self)->one;
+    return $row if $row;
+
+    $self->connection->state_invalidate(source => $self->source, row => $self, reason => "row no longer exists in the database");
+    croak "Cannot refresh: this row no longer exists in the database";
 }
 
 # Remove pending changes (and clear desync)
@@ -303,13 +309,22 @@ sub update {
     $self->check_pk;
 
     my $source = $self->source;
-    my $row_data = $self->row_data;
     for my $field (keys %$changes) {
+        croak "This row does not have a '$field' field" unless $source->has_field($field);
         croak "Cannot set field '$field': it is a database-generated column"
             if $source->field_is_generated($field);
+    }
 
-        $row_data->{+PENDING}->{$field} = $changes->{$field};
-        delete $row_data->{+DESYNC}->{$field} if $row_data->{+DESYNC};
+    $self->_check_stale;
+
+    # Stage the changes against the current transaction so a rollback
+    # discards them along with the transaction's frame.
+    $self->{+ROW_DATA}->change_state({TRANSACTION() => $self->connection->current_txn, PENDING() => {%$changes}});
+
+    my $row_data = $self->row_data;
+    if (my $desync = $row_data->{+DESYNC}) {
+        delete $desync->{$_} for keys %$changes;
+        delete $row_data->{+DESYNC} unless keys %$desync;
     }
 
     $self->save();
@@ -336,6 +351,10 @@ sub update {
 
 Get (or, with a value, set) a single field. C<field> returns the inflated
 value; C<raw_field> returns the deflated/raw value.
+
+Setting a field stages the change against the current transaction (when one
+is open), so rolling back that transaction or savepoint discards the staged
+change.
 
 Setting a field whose column is database-generated (C<GENERATED ALWAYS>,
 stored or virtual) croaks: the database owns the value, so the ORM refuses to
@@ -407,13 +426,19 @@ sub field_is_desynced {
 
 =over 4
 
+=item $row = $row->_check_stale
+
+Croak when a transaction is open but this row's state predates the current
+transaction stack; such a row must be refreshed before changes are staged.
+
 =item $val = $row->_field($view_method, $name)
 
 =item $row->_field($view_method, $name => $value)
 
 Shared getter/setter behind C<field> / C<raw_field>: resolves the value
 from pending or stored data (fetching a missing stored field on demand)
-and runs it through C<$view_method>.
+and runs it through C<$view_method>. When the on-demand fetch finds the
+row gone from the database, the row is invalidated and this croaks.
 
 =item $hash = $row->_fields($view_method, @data_hashes)
 
@@ -433,6 +458,22 @@ Return the deflated/raw value of C<$name> from data hash C<$from>.
 
 =cut
 
+sub _check_stale {
+    my $self = shift;
+
+    return $self unless $self->connection->current_txn;
+    return $self if $self->row_data->{+TRANSACTION};
+
+    croak <<"    EOT";
+
+This row was fetched outside of the current transaction stack. The row has not
+been refreshed since the new transaction stack started, meaning the data is
+likely stale and unreliable. The row should be refreshed before making changes.
+You can do this with a call to ->refresh().
+
+    EOT
+}
+
 sub _field {
     my $self  = shift;
     my $meth  = shift;
@@ -447,7 +488,12 @@ sub _field {
             if $self->source->field_is_generated($field);
 
         $self->check_pk if $row_data->{+STORED};    # We can set a field if the row has not been inserted yet, or if it has a pk
-        $row_data->{+PENDING}->{$field} = shift;
+        $self->_check_stale;
+
+        # Stage the edit against the current transaction so a rollback
+        # discards it along with the transaction's frame.
+        $self->{+ROW_DATA}->change_state({TRANSACTION() => $self->connection->current_txn, PENDING() => {$field => shift}});
+        $row_data = $self->row_data;
     }
 
     return $self->$meth($row_data->{+PENDING}, $field) if $row_data->{+PENDING} && exists $row_data->{+PENDING}->{$field};
@@ -455,6 +501,12 @@ sub _field {
     if (my $st = $row_data->{+STORED}) {
         unless (exists $st->{$field}) {
             my $data = $self->connection->handle($self->source, where => $self->primary_key_hashref, fields => [$field])->data_only->one;
+
+            unless ($data) {
+                $self->connection->state_invalidate(source => $self->source, row => $self, reason => "row no longer exists in the database");
+                croak "Cannot fetch field '$field': this row no longer exists in the database";
+            }
+
             $st->{$field} = $data->{$field};
         }
 
@@ -473,7 +525,10 @@ sub _fields {
         next unless $hr;
 
         for my $field (keys %$hr) {
-            $out{$field} //= $self->$meth($hr, $field);
+            # An exists check, not //=, so a pending undef (staged NULL) is
+            # not masked by a defined stored value.
+            next if exists $out{$field};
+            $out{$field} = $self->$meth($hr, $field);
         }
     }
 

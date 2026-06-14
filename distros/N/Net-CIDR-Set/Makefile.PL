@@ -9,10 +9,6 @@ use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Manipulate sets of IP addresses",
   "AUTHOR" => "Andy Armstrong <andy\@hexten.net>",
-  "BUILD_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "7.22",
-    "Module::Metadata" => "1.000015"
-  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -28,13 +24,15 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
-    "Data::Dumper" => 0,
+    "Data::Dumper" => "2.154",
     "File::Spec" => 0,
-    "Module::Metadata" => "1.000015",
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
+    "Module::Metadata" => 0,
     "Test::Exception" => 0,
     "Test::More" => "0.96"
   },
-  "VERSION" => "0.21",
+  "VERSION" => "0.22",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -43,10 +41,11 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Carp" => 0,
-  "Data::Dumper" => 0,
-  "ExtUtils::MakeMaker" => "7.22",
+  "Data::Dumper" => "2.154",
   "File::Spec" => 0,
-  "Module::Metadata" => "1.000015",
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
+  "Module::Metadata" => 0,
   "Test::Exception" => 0,
   "Test::More" => "0.96",
   "namespace::autoclean" => 0,

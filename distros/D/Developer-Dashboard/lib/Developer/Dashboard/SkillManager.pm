@@ -3,7 +3,7 @@ package Developer::Dashboard::SkillManager;
 use strict;
 use warnings;
 
-our $VERSION = '4.03';
+our $VERSION = '4.16';
 
 use Cwd qw(realpath);
 use File::Copy qw(copy);
@@ -654,7 +654,7 @@ sub _sync_local_skill_source {
 # Output: boolean true when rsync can be executed from PATH, false otherwise.
 sub _rsync_available {
     my ($self) = @_;
-    return system( 'sh', '-c', 'command -v rsync >/dev/null 2>&1' ) == 0 ? 1 : 0;
+    return command_in_path('rsync') ? 1 : 0;
 }
 
 # _copy_tree($source_path, $target_path)
@@ -1198,6 +1198,8 @@ sub _run_streaming_command {
     die "Streaming command must be an array reference\n" if ref($command) ne 'ARRAY' || !@{$command};
     my $cwd = $args{cwd};
     my $banner = $args{banner};
+    my $env = $args{env};
+    die "Streaming command env must be a hash reference\n" if defined $env && ref($env) ne 'HASH';
     $self->_progress_detail_line($banner) if defined $banner && $banner ne '';
 
     my $stdout_handle;
@@ -1209,6 +1211,7 @@ sub _run_streaming_command {
     my %target_for;
 
     my $launcher = sub {
+        local @ENV{ keys %{$env} } = values %{$env} if $env;
         $pid = open3( $stdin_handle, $stdout_handle, $stderr_handle, @{$command} );
     };
 
@@ -1938,6 +1941,7 @@ sub _install_skill_cpanfile {
     my $run = $self->_run_streaming_command(
         command => [ 'cpanm', '--notest', '-L', $shared_root, '--cpanfile', $cpanfile, '--installdeps', '.' ],
         cwd     => $skill_path,
+        env     => $self->_skill_cpanm_env,
         banner  => "Installing Perl dependencies for " . basename($skill_path) . " from $cpanfile",
     );
     my ( $stdout, $stderr, $exit ) = @{$run}{qw(stdout stderr exit)};
@@ -1964,6 +1968,7 @@ sub _install_skill_cpanfile_local {
     my $run = $self->_run_streaming_command(
         command => [ 'cpanm', '--notest', '-L', $local_root, '--cpanfile', $cpanfile_local, '--installdeps', '.' ],
         cwd     => $skill_path,
+        env     => $self->_skill_cpanm_env,
         banner  => "Installing local Perl dependencies for " . basename($skill_path) . " from $cpanfile_local",
     );
     my ( $stdout, $stderr, $exit ) = @{$run}{qw(stdout stderr exit)};
@@ -1975,6 +1980,19 @@ sub _install_skill_cpanfile_local {
         success => 1,
         stdout  => $stdout,
         stderr  => $stderr,
+    };
+}
+
+# _skill_cpanm_env()
+# Returns the non-interactive CPAN environment required for skill dependency installs.
+# Input: none.
+# Output: hash reference of environment variables for cpanm child processes.
+sub _skill_cpanm_env {
+    my ($self) = @_;
+    return {
+        PERL_MM_USE_DEFAULT           => 1,
+        NONINTERACTIVE_TESTING        => 1,
+        PERL_CANARY_STABILITY_NOPROMPT => 1,
     };
 }
 

@@ -22,7 +22,7 @@ use File::Spec ();
 BEGIN { eval { require Cwd } }
 use Carp qw(croak);
 use vars qw($VERSION);
-$VERSION = '0.04';
+$VERSION = '0.05';
 $VERSION = $VERSION;
 
 require BATsh::Env;
@@ -182,12 +182,99 @@ sub _cmd_paren_delta {
 my %_SH_OPEN  = map { $_ => 1 } qw(if for while until case function select);
 my %_SH_CLOSE = map { $_ => 1 } qw(fi done esac);
 
+# Net SH block-depth change for an ENTIRE line.
+#
+# A single physical line may both open and close a block, e.g.
+#   for i in 1 2 3; do echo $i; done      (net 0)
+#   while COND; do ...; done; done         (net -1, nested close)
+# Looking only at the first token (as earlier versions did) counted the
+# leading "for"/"while" but never the inline "done", so the SH section was
+# left open and a following CMD line (e.g. ECHO ...%VAR%...) was wrongly
+# absorbed into the SH section and run by the SH interpreter.
+#
+# Opener keywords (if for while until case function select) and "{" add 1;
+# closer keywords (fi done esac) and "}" subtract 1, but only when they are in
+# command position (line start, or just after ; & | ( ) { } or do/then/else/
+# elif).  Single- and double-quoted text, $( ... ) command substitutions and
+# `...` backticks are skipped so that a "done" inside a string or substitution
+# does not affect the depth.  Perl 5.005_03 compatible (no regex features
+# beyond character classes; substr/index style scanning).
 sub _sh_depth_delta {
-    my ($first) = @_;
-    my $l = lc($first);
-    return  1 if exists $_SH_OPEN{$l} || $first eq '{';
-    return -1 if exists $_SH_CLOSE{$l} || $first eq '}';
-    return  0;
+    my ($line) = @_;
+    return 0 unless defined $line;
+
+    # Fast path: a bare single keyword token (the common multi-line case).
+    if ($line !~ /[\s;&|(){}'"`]/) {
+        my $l = lc($line);
+        return  1 if exists $_SH_OPEN{$l};
+        return -1 if exists $_SH_CLOSE{$l};
+        return  0;
+    }
+
+    my $delta  = 0;
+    my $cmdpos = 1;            # next bareword starts a new statement?
+    my $i      = 0;
+    my $n      = length($line);
+    while ($i < $n) {
+        my $c = substr($line, $i, 1);
+
+        if ($c eq "'") {                      # single-quoted region
+            $i++;
+            $i++ while $i < $n && substr($line, $i, 1) ne "'";
+            $i++; $cmdpos = 0; next;
+        }
+        if ($c eq '"') {                      # double-quoted region
+            $i++;
+            while ($i < $n && substr($line, $i, 1) ne '"') {
+                if (substr($line, $i, 1) eq '\\') { $i += 2; next }
+                $i++;
+            }
+            $i++; $cmdpos = 0; next;
+        }
+        if ($c eq '`') {                      # backtick substitution
+            $i++;
+            $i++ while $i < $n && substr($line, $i, 1) ne '`';
+            $i++; $cmdpos = 0; next;
+        }
+        if ($c eq '$' && $i + 1 < $n && substr($line, $i + 1, 1) eq '(') {
+            $i += 2;                          # $( ... ) -- skip balanced parens
+            my $d = 1;
+            while ($i < $n && $d > 0) {
+                my $ch = substr($line, $i, 1);
+                $d++ if $ch eq '(';
+                $d-- if $ch eq ')';
+                $i++;
+            }
+            $cmdpos = 0; next;
+        }
+        if ($c =~ /\s/)                 { $i++; next }
+        if ($c eq ';' || $c eq '&' || $c eq '|') { $cmdpos = 1; $i++; next }
+        if ($c eq '(')                 { $cmdpos = 1; $i++; next }
+        if ($c eq ')')                 { $cmdpos = 1; $i++; next }
+        if ($c eq '{') { $delta++ if $cmdpos; $cmdpos = 1; $i++; next }
+        if ($c eq '}') { $delta-- if $cmdpos; $cmdpos = 1; $i++; next }
+
+        # Bareword
+        my $word = '';
+        while ($i < $n) {
+            my $wc = substr($line, $i, 1);
+            last if $wc =~ /[\s;&|(){}'"`]/;
+            $word .= $wc; $i++;
+        }
+        if ($cmdpos) {
+            my $lw = lc($word);
+            if    (exists $_SH_OPEN{$lw})  { $delta++ }
+            elsif (exists $_SH_CLOSE{$lw}) { $delta-- }
+            # do/then/else/elif keep the FOLLOWING word in command position so
+            # that an opener directly after them (e.g. "do for ...") is counted.
+            $cmdpos = ($lw eq 'do' || $lw eq 'then'
+                    || $lw eq 'else' || $lw eq 'elif') ? 1 : 0;
+        }
+        else {
+            $cmdpos = 0;
+        }
+    }
+    return $delta;
 }
 
 ###############################################################################
@@ -418,30 +505,39 @@ sub _process_lines {
         }
 
         if ($mode eq 'EMPTY' || $mode eq 'COMMENT') {
-            push @pending, $line if $cur_mode ne '';
+            # A comment carries no execution effect, so it must never be handed
+            # to an interpreter verbatim.  A CMD-style comment (":: ..." or
+            # "REM ...") carried into an SH section would be dispatched to the
+            # external shell (SH treats only "#" as a comment), and any "( )" or
+            # other shell metacharacter in the comment then makes /bin/sh fail
+            # with a syntax error.  The reverse ("# ..." into CMD) is likewise
+            # not a CMD comment.  Routing it as a BLANK line is skipped
+            # identically by both interpreters and in every nesting depth, and
+            # avoids the real cmd.exe quirk of "::" inside a "( )" block.
+            push @pending, '' if $cur_mode ne '';
             next;
         }
 
         if ($cur_mode eq '') {
             $cur_mode = $mode; $depth = 0;
             push @pending, $line;
-            $depth += ($mode eq 'CMD') ? _cmd_paren_delta($line) : _sh_depth_delta($first);
+            $depth += ($mode eq 'CMD') ? _cmd_paren_delta($line) : _sh_depth_delta($line);
         }
         elsif ($mode eq $cur_mode) {
             push @pending, $line;
-            $depth += ($mode eq 'CMD') ? _cmd_paren_delta($line) : _sh_depth_delta($first);
+            $depth += ($mode eq 'CMD') ? _cmd_paren_delta($line) : _sh_depth_delta($line);
             $depth = 0 if $depth < 0;
         }
         else {
             if ($depth > 0) {
                 push @pending, $line;
-                $depth += ($cur_mode eq 'CMD') ? _cmd_paren_delta($line) : _sh_depth_delta($first);
+                $depth += ($cur_mode eq 'CMD') ? _cmd_paren_delta($line) : _sh_depth_delta($line);
                 $depth = 0 if $depth < 0;
             }
             else {
                 _flush_section($cur_mode, @pending) if @pending;
                 @pending = ($line); $cur_mode = $mode; $depth = 0;
-                $depth += ($mode eq 'CMD') ? _cmd_paren_delta($line) : _sh_depth_delta($first);
+                $depth += ($mode eq 'CMD') ? _cmd_paren_delta($line) : _sh_depth_delta($line);
             }
         }
     }
@@ -501,7 +597,7 @@ sub repl {
             my @hd = BATsh::SH::_hd_detect($line);
             if (@hd) { $pending_hd_delim = $hd[2]; $pending_hd_dash = $hd[1] }
         }
-        $depth += ($cur_mode eq 'CMD') ? _cmd_paren_delta($line) : _sh_depth_delta($first);
+        $depth += ($cur_mode eq 'CMD') ? _cmd_paren_delta($line) : _sh_depth_delta($line);
         $depth = 0 if $depth < 0;
         if ($depth == 0 && !defined($pending_hd_delim)) {
             _flush_section($cur_mode, @buf);
@@ -536,7 +632,7 @@ BATsh - Bilingual Shell for cmd.exe and bash in one script
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 SYNOPSIS
 
@@ -736,16 +832,18 @@ The built-in CMD interpreter does not implement:
 
 =over
 
-=item * Variable substring C<%VAR:~n,m%> and substitution
-C<%VAR:str1=str2%> expansion.
-
-=item * Dynamic pseudo-variables C<%RANDOM%>, C<%DATE%>, C<%TIME%>,
-C<%CD%>, C<%CMDCMDLINE%>, and C<%ERRORLEVEL%> used as a variable reference.
-
 =item * C<FOR /F> with C<usebackq> backtick-quoted commands on Windows
 (the C<cmd /c> subprocess path is untested on Windows).
 
 =back
+
+Variable substring C<%VAR:~n,m%> / C<%VAR:~n%> / C<%VAR:~-n%> / C<%VAR:~n,-m%>
+and in-place substitution C<%VAR:str1=str2%> / C<%VAR:*str1=str2%> are B<now
+supported> as of version 0.05 (see L<BATsh::Env>).
+
+Dynamic pseudo-variables C<%DATE%> (YYYY-MM-DD), C<%TIME%> (HH:MM:SS.cc),
+C<%CD%> (current directory), C<%RANDOM%> (0-32767), C<%ERRORLEVEL%>, and
+C<%CMDCMDLINE%> are B<now supported> as of version 0.05.
 
 The built-in SH interpreter does not implement:
 
@@ -753,11 +851,6 @@ The built-in SH interpreter does not implement:
 
 =item * Arrays, indexed and associative: C<arr[i]>, C<${arr[@]}>,
 C<declare -A>.
-
-=item * Filename (pathname) globbing such as C<echo *.txt> or
-C<for f in *.pl>. (The C<*>, C<?> and C<[abc]> metacharacters are honoured
-in C<case> patterns and in C<${VAR%pat}> / C<${VAR#pat}> expansion only,
-not for expanding filenames on the command line.)
 
 =item * Tilde expansion C<~/path> and C<~user> (only C<cd> with no
 argument uses C<$HOME>).

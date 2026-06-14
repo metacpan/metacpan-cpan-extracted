@@ -3,7 +3,7 @@ package Developer::Dashboard::SkillDispatcher;
 use strict;
 use warnings;
 
-our $VERSION = '4.03';
+our $VERSION = '4.16';
 
 use Config ();
 use IPC::Open3 qw(open3);
@@ -657,6 +657,7 @@ sub _skill_page_response {
       if !$args{app};
 
     my $app = $args{app};
+    $page = $app->_decorate_skill_page_routes($page);
     $page = $app->_page_with_runtime_state(
         $page,
         query_params => $args{query_params} || {},

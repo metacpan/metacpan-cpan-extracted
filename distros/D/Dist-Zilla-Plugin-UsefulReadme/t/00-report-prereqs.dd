@@ -1,9 +1,9 @@
 do { my $x = {
        'build' => {
-                    'requires' => {
-                                    'ExtUtils::MakeMaker' => '7.22',
-                                    'Module::Metadata' => '1.000015'
-                                  }
+                    'recommends' => {
+                                      'ExtUtils::MakeMaker' => '7.22',
+                                      'Module::Metadata' => '1.000015'
+                                    }
                   },
        'configure' => {
                         'requires' => {
@@ -72,7 +72,7 @@ do { my $x = {
                                       'Types::Common' => '0',
                                       'experimental' => '0',
                                       'namespace::autoclean' => '0',
-                                      'perl' => 'v5.20.0'
+                                      'perl' => 'v5.24.0'
                                     }
                     },
        'test' => {

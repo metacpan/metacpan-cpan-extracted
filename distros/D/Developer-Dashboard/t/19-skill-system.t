@@ -45,6 +45,7 @@ _write_file(
     File::Spec->catfile( $fake_bin, 'cpanm' ),
     <<"SH",
 #!/bin/sh
+printf 'PERL_MM_USE_DEFAULT=%s NONINTERACTIVE_TESTING=%s PERL_CANARY_STABILITY_NOPROMPT=%s\\n' "\${PERL_MM_USE_DEFAULT:-}" "\${NONINTERACTIVE_TESTING:-}" "\${PERL_CANARY_STABILITY_NOPROMPT:-}" >> "$cpanm_log"
 printf '%s\\n' "\$*" >> "$cpanm_log"
 printf 'CPANM:%s\\n' "\$*" >> "$dependency_log"
 exit 0
@@ -270,8 +271,10 @@ is_deeply(
 open my $cpanm_log_fh, '<', $cpanm_log or die "Unable to read $cpanm_log: $!";
 my @cpanm_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$cpanm_log_fh>;
 close $cpanm_log_fh;
-like( $cpanm_steps[0], qr/^--notest -L \Q$ENV{HOME}\/perl5\E --cpanfile \Q$install->{path}\/cpanfile\E --installdeps \.$/, 'cpanfile installs shared Perl dependencies into HOME perl5 with cpanm --notest from the skill root itself' );
-is( $cpanm_steps[1], "--notest -L $install->{path}/perl5 --cpanfile $install->{path}/cpanfile.local --installdeps .", 'cpanfile.local installs local Perl dependencies into the skill perl5 root with cpanm --notest from the skill root itself' );
+is( $cpanm_steps[0], 'PERL_MM_USE_DEFAULT=1 NONINTERACTIVE_TESTING=1 PERL_CANARY_STABILITY_NOPROMPT=1', 'cpanfile installs force non-interactive CPAN environment defaults' );
+like( $cpanm_steps[1], qr/^--notest -L \Q$ENV{HOME}\/perl5\E --cpanfile \Q$install->{path}\/cpanfile\E --installdeps \.$/, 'cpanfile installs shared Perl dependencies into HOME perl5 with cpanm --notest from the skill root itself' );
+is( $cpanm_steps[2], 'PERL_MM_USE_DEFAULT=1 NONINTERACTIVE_TESTING=1 PERL_CANARY_STABILITY_NOPROMPT=1', 'cpanfile.local installs force non-interactive CPAN environment defaults' );
+is( $cpanm_steps[3], "--notest -L $install->{path}/perl5 --cpanfile $install->{path}/cpanfile.local --installdeps .", 'cpanfile.local installs local Perl dependencies into the skill perl5 root with cpanm --notest from the skill root itself' );
 open my $npx_log_fh, '<', $npx_log or die "Unable to read $npx_log: $!";
 my @npm_steps = grep { defined && $_ ne '' } map { chomp; $_ } <$npx_log_fh>;
 close $npx_log_fh;
@@ -508,9 +511,16 @@ my ( $cli_usage_stdout, $cli_usage_stderr, $cli_usage_exit ) = capture {
     system( $^X, '-I', 'lib', $repo_bin, 'skills', 'usage', 'alpha-skill' );
 };
 is( $cli_usage_exit >> 8, 0, 'dashboard skills usage exits cleanly' );
-my $cli_usage = decode_json($cli_usage_stdout);
-is( $cli_usage->{name}, 'alpha-skill', 'dashboard skills usage returns detailed skill metadata' );
-ok( scalar( grep { $_->{name} eq 'run-test' && $_->{has_hooks} } @{ $cli_usage->{cli} } ), 'dashboard skills usage includes per-command hook metadata' );
+like( $cli_usage_stdout, qr/^Skill:\s+alpha-skill/m, 'dashboard skills usage defaults to a readable summary' );
+like( $cli_usage_stdout, qr/^CLI Commands$/m, 'dashboard skills usage default output includes the CLI command section' );
+like( $cli_usage_stdout, qr/run-test\s+yes\s+1/m, 'dashboard skills usage default output includes per-command hook metadata' );
+my ( $cli_usage_json_stdout, undef, $cli_usage_json_exit ) = capture {
+    system( $^X, '-I', 'lib', $repo_bin, 'skills', 'usage', 'alpha-skill', '-o', 'json' );
+};
+is( $cli_usage_json_exit >> 8, 0, 'dashboard skills usage -o json exits cleanly' );
+my $cli_usage = decode_json($cli_usage_json_stdout);
+is( $cli_usage->{name}, 'alpha-skill', 'dashboard skills usage -o json returns detailed skill metadata' );
+ok( scalar( grep { $_->{name} eq 'run-test' && $_->{has_hooks} } @{ $cli_usage->{cli} } ), 'dashboard skills usage -o json includes per-command hook metadata' );
 
 my ( $cli_table_stdout, $cli_table_stderr, $cli_table_exit ) = capture {
     system( $^X, '-I', 'lib', $repo_bin, 'skills', 'list', '-o', 'table' );
@@ -853,8 +863,14 @@ my ( $cli_disable_stdout, $cli_disable_stderr, $cli_disable_exit ) = capture {
     system( $^X, '-I', 'lib', $repo_bin, 'skills', 'disable', 'alpha-skill' );
 };
 is( $cli_disable_exit >> 8, 0, 'dashboard skills disable exits cleanly for an already disabled skill' );
-my $cli_disable = decode_json($cli_disable_stdout);
-ok( !$cli_disable->{enabled}, 'dashboard skills disable reports disabled JSON state' );
+like( $cli_disable_stdout, qr/^Skill\s+Status\s+Enabled/m, 'dashboard skills disable defaults to a table summary' );
+like( $cli_disable_stdout, qr/alpha-skill\s+disabled\s+no/, 'dashboard skills disable reports disabled state in the table summary' );
+my ( $cli_disable_json_stdout, undef, $cli_disable_json_exit ) = capture {
+    system( $^X, '-I', 'lib', $repo_bin, 'skills', 'disable', 'alpha-skill', '-o', 'json' );
+};
+is( $cli_disable_json_exit >> 8, 0, 'dashboard skills disable -o json exits cleanly' );
+my $cli_disable = decode_json($cli_disable_json_stdout);
+ok( !$cli_disable->{enabled}, 'dashboard skills disable -o json reports disabled JSON state' );
 my $disabled_usage = $manager->usage('alpha-skill');
 ok( !$disabled_usage->{enabled}, 'usage still works for disabled skills and reports them as disabled' );
 
@@ -872,8 +888,14 @@ my ( $cli_enable_stdout, $cli_enable_stderr, $cli_enable_exit ) = capture {
     system( $^X, '-I', 'lib', $repo_bin, 'skills', 'enable', 'alpha-skill' );
 };
 is( $cli_enable_exit >> 8, 0, 'dashboard skills enable exits cleanly for an already enabled skill' );
-my $cli_enable = decode_json($cli_enable_stdout);
-ok( $cli_enable->{enabled}, 'dashboard skills enable reports enabled JSON state' );
+like( $cli_enable_stdout, qr/^Skill\s+Status\s+Enabled/m, 'dashboard skills enable defaults to a table summary' );
+like( $cli_enable_stdout, qr/alpha-skill\s+enabled\s+yes/, 'dashboard skills enable reports enabled state in the table summary' );
+my ( $cli_enable_json_stdout, undef, $cli_enable_json_exit ) = capture {
+    system( $^X, '-I', 'lib', $repo_bin, 'skills', 'enable', 'alpha-skill', '-o', 'json' );
+};
+is( $cli_enable_json_exit >> 8, 0, 'dashboard skills enable -o json exits cleanly' );
+my $cli_enable = decode_json($cli_enable_json_stdout);
+ok( $cli_enable->{enabled}, 'dashboard skills enable -o json reports enabled JSON state' );
 
 my $uninstall = $manager->uninstall('beta-skill');
 ok( !$uninstall->{error}, 'uninstall removes the targeted skill cleanly' ) or diag $uninstall->{error};
@@ -1181,6 +1203,8 @@ my ( $uninstall_stdout, $uninstall_stderr, $uninstall_exit ) = capture {
     system( $^X, '-I', 'lib', $repo_bin, 'skills', 'uninstall', 'alpha-skill' );
 };
 is( $uninstall_exit >> 8, 0, 'dashboard skills uninstall exits cleanly' );
+like( $uninstall_stdout, qr/^Skill\s+Status/m, 'dashboard skills uninstall defaults to a table summary' );
+like( $uninstall_stdout, qr/alpha-skill\s+removed/, 'dashboard skills uninstall table summary reports the removed skill' );
 my @remaining_skills = map { $_->{name} } @{ $manager->list };
 ok( !grep { $_ eq 'alpha-skill' } @remaining_skills, 'uninstall removes the targeted base skill' );
 ok( grep { $_ eq 'home-only-skill' } @remaining_skills, 'uninstall preserves inherited home-only layered skills' );

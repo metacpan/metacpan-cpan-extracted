@@ -1,3 +1,12 @@
+0.092		2026-06-13	T. R. Wyant
+    Remove references to the RT bug tracking system.
+
+    Replace wyant@cpan.org with harryfmudd@comcast.net.
+
+    Correct documentation errors.
+
+    No functional changes.
+
 0.091		2025-10-06	T. R. Wyant
     Code review on use of 'PPI::Document'. I concluded it was not needed
     in PPIx::Regexp::Token::Interpolation and

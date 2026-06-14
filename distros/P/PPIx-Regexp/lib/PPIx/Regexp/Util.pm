@@ -33,7 +33,7 @@ our %EXPORT_TAGS = (
     width_one	=> [ qw{ raw_width width } ],
 );
 
-our $VERSION = '0.091';
+our $VERSION = '0.092';
 
 sub is_ppi_regexp_element {
     my ( $elem ) = @_;
@@ -294,17 +294,16 @@ C<_INSTANCE()> subroutine.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=PPIx-Regexp>,
-L<https://github.com/trwyant/perl-PPIx-Regexp/issues>, or in
+L<https://github.com/trwyant/perl-PPIx-Regexp/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III F<wyant at cpan dot org>
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2023, 2025 by Thomas R. Wyant, III
+Copyright (C) 2010-2023, 2025-2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

@@ -3,10 +3,11 @@ package Developer::Dashboard::CLI::Paths;
 use strict;
 use warnings;
 
-our $VERSION = '4.03';
+our $VERSION = '4.16';
 
 use Cwd qw(cwd);
 use File::Basename qw(basename);
+use Getopt::Long qw(GetOptionsFromArray);
 use Developer::Dashboard::Config;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::JSON qw(json_encode);
@@ -37,8 +38,16 @@ sub run_paths_command {
     };
 
     if ( $command eq 'paths' ) {
+        my @argv = @{$argv};
+        my $output = 'table';
+        GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
+        die "Usage: dashboard paths [-o json|table]\n" if @argv || ( $output ne 'json' && $output ne 'table' );
         $load_configured_path_aliases->();
-        print json_encode( $paths->all_paths );
+        if ( $output eq 'json' ) {
+            print json_encode( $paths->all_paths );
+            return 1;
+        }
+        print _paths_table( $paths->all_paths );
         return 1;
     }
 
@@ -51,7 +60,15 @@ sub run_paths_command {
         return 1;
     }
     if ( $action eq 'locate' ) {
-        print json_encode( [ $paths->locate_projects(@argv) ] );
+        my $output = 'table';
+        GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
+        die "Usage: dashboard path locate [-o json|table] <term...>\n" if $output ne 'json' && $output ne 'table';
+        my $matches = [ $paths->locate_projects(@argv) ];
+        if ( $output eq 'json' ) {
+            print json_encode($matches);
+            return 1;
+        }
+        print _list_table( 'Path', $matches );
         return 1;
     }
     if ( $action eq 'cdr' ) {
@@ -67,14 +84,29 @@ sub run_paths_command {
         return 1;
     }
     if ( $action eq 'add' ) {
+        my $output = 'table';
+        GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
+        die "Usage: dashboard path add <name> <path> [-o json|table]\n" if $output ne 'json' && $output ne 'table';
         my ( $name, $path ) = _normalize_add_arguments(@argv);
         my $saved = $config->save_global_path_alias( $name, $path );
         $paths->register_named_paths( { $name => $path } );
         $saved->{resolved} = $paths->resolve_dir($name);
-        print json_encode($saved);
+        if ( $output eq 'json' ) {
+            print json_encode($saved);
+            return 1;
+        }
+        print _mutation_table(
+            alias    => $saved->{name},
+            stored   => $saved->{path},
+            resolved => $saved->{resolved},
+            status   => 'saved',
+        );
         return 1;
     }
     if ( $action eq 'del' || $action eq 'rm' ) {
+        my $output = 'table';
+        GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
+        die "Usage: dashboard path del <name> [-o json|table]\n" if $output ne 'json' && $output ne 'table';
         my $name = _normalize_delete_argument(
             paths  => $paths,
             config => $config,
@@ -82,7 +114,14 @@ sub run_paths_command {
         );
         my $deleted = $config->remove_global_path_alias($name);
         $paths->unregister_named_path($name);
-        print json_encode($deleted);
+        if ( $output eq 'json' ) {
+            print json_encode($deleted);
+            return 1;
+        }
+        print _removal_table(
+            alias   => $deleted->{name},
+            removed => $deleted->{removed},
+        );
         return 1;
     }
     if ( $action eq 'project-root' ) {
@@ -91,8 +130,15 @@ sub run_paths_command {
         return 1;
     }
     if ( $action eq 'list' ) {
+        my $output = 'table';
+        GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
+        die "Usage: dashboard path list [-o json|table]\n" if @argv || ( $output ne 'json' && $output ne 'table' );
         $load_configured_path_aliases->();
-        print json_encode( $paths->all_path_aliases );
+        if ( $output eq 'json' ) {
+            print json_encode( $paths->all_path_aliases );
+            return 1;
+        }
+        print _aliases_table( $paths->all_path_aliases );
         return 1;
     }
 
@@ -297,6 +343,84 @@ sub _cdr_directory_candidates {
     return sort @candidates;
 }
 
+# _paths_table($paths_hash)
+# Renders one full path inventory as a two-column summary table.
+# Input: hash reference keyed by logical path name.
+# Output: formatted table text string.
+sub _paths_table {
+    my ($all_paths) = @_;
+    my @rows = map { [ $_, $all_paths->{$_} ] } sort keys %{ $all_paths || {} };
+    return _render_table( [ 'Path', 'Value' ], \@rows );
+}
+
+# _aliases_table($aliases_hash)
+# Renders one saved path-alias registry as a summary table.
+# Input: hash reference keyed by alias name.
+# Output: formatted table text string.
+sub _aliases_table {
+    my ($aliases) = @_;
+    my @rows = map { [ $_, $aliases->{$_} ] } sort keys %{ $aliases || {} };
+    return _render_table( [ 'Alias', 'Path' ], \@rows );
+}
+
+# _list_table($label, $items)
+# Renders one flat list as a single-column summary table.
+# Input: heading label string and array reference of scalar items.
+# Output: formatted table text string.
+sub _list_table {
+    my ( $label, $items ) = @_;
+    my @rows = map { [ $_ ] } @{ $items || [] };
+    return _render_table( [$label], \@rows );
+}
+
+# _mutation_table(%args)
+# Renders one path-alias add/update result as a summary table.
+# Input: alias, stored path, resolved path, and status strings.
+# Output: formatted table text string.
+sub _mutation_table {
+    my (%args) = @_;
+    return _render_table(
+        [ 'Alias', 'Stored', 'Resolved', 'Status' ],
+        [ [ map { $args{$_} // '' } qw(alias stored resolved status) ] ],
+    );
+}
+
+# _removal_table(%args)
+# Renders one path-alias removal result as a summary table.
+# Input: alias string and removed boolean flag.
+# Output: formatted table text string.
+sub _removal_table {
+    my (%args) = @_;
+    return _render_table(
+        [ 'Alias', 'Removed', 'Status' ],
+        [ [ $args{alias} // '', $args{removed} ? 'yes' : 'no', $args{removed} ? 'removed' : 'no-change' ] ],
+    );
+}
+
+# _render_table($header, $rows)
+# Formats one rectangular data set as a padded terminal table.
+# Input: header array reference and row array reference.
+# Output: formatted text string.
+sub _render_table {
+    my ( $header, $rows ) = @_;
+    my @widths = map { length( defined $_ ? $_ : '' ) } @{ $header || [] };
+    for my $row ( @{ $rows || [] } ) {
+        for my $idx ( 0 .. $#{$row} ) {
+            my $value = defined $row->[$idx] ? $row->[$idx] : '';
+            my $width = length($value);
+            $widths[$idx] = $width if $width > $widths[$idx];
+        }
+    }
+
+    my @lines;
+    push @lines, join( '  ', map { sprintf "%-*s", $widths[$_], ( $header->[$_] // '' ) } 0 .. $#widths );
+    push @lines, join( '  ', map { '-' x $widths[$_] } 0 .. $#widths );
+    for my $row ( @{ $rows || [] } ) {
+        push @lines, join( '  ', map { sprintf "%-*s", $widths[$_], ( defined $row->[$_] ? $row->[$_] : '' ) } 0 .. $#widths );
+    }
+    return join( "\n", @lines ) . "\n";
+}
+
 1;
 
 __END__
@@ -342,8 +466,11 @@ Use this file when changing the output of C<dashboard paths>, the behavior of C<
 
 Call C<run_paths_command> with the public command name and argv list. The
 module builds a lightweight path registry, loads configured aliases on demand,
-and returns either JSON payloads or newline-delimited path output depending on
-the selected subcommand. For C<dashboard path cdr>, the first argument is
+keeps shell-plumbing verbs such as C<resolve>, C<project-root>, C<cdr>, and
+C<complete-cdr> on their direct line or JSON contracts, and renders the
+operator-facing inventory and mutation verbs as human-readable tables by
+default with C<-o json> available for the full machine payload. For
+C<dashboard path cdr>, the first argument is
 treated as a saved alias when one exists; otherwise it becomes the first search
 regex under the current directory. Any remaining narrowing terms are
 case-insensitive regexes and all of them must match a candidate path. A single

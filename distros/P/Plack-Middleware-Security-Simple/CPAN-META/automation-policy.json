@@ -1,0 +1,7 @@
+{
+   "automated_actions" : "issue",
+   "automated_contributions" : "issue",
+   "code_generation" : "toolchain",
+   "distribution" : "Plack-Middleware-Security-Simple-v0.13.2",
+   "version" : 1
+}

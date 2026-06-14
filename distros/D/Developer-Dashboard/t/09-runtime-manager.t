@@ -11,6 +11,7 @@ BEGIN {
 }
 
 use Cwd qw(getcwd);
+use Errno qw(EACCES);
 use File::Temp qw(tempdir);
 use File::Path qw(make_path);
 use File::Spec;
@@ -3548,6 +3549,122 @@ SCRIPT
         [ 7301, 8402 ],
         '_listener_pids_for_port reads unique Windows listener pids directly from the PowerShell probe',
     );
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::RuntimeManager::is_windows = sub { return 1 };
+        my $source = $files->web_state . '.pending-test';
+        open my $source_fh, '>:raw', $source or die "Unable to write $source: $!";
+        print {$source_fh} qq({"pid":4242,"status":"running"});
+        close $source_fh or die "Unable to close $source: $!";
+        open my $target_fh, '>:raw', $files->web_state or die "Unable to seed @{[$files->web_state]}: $!";
+        print {$target_fh} qq({"status":"old"});
+        close $target_fh or die "Unable to close @{[$files->web_state]}: $!";
+        my ( $ok, $error ) = $manager->_overwrite_state_file_in_place( $source, $files->web_state );
+        ok( $ok, '_overwrite_state_file_in_place returns success for the Windows in-place overwrite fallback' )
+          or diag $error;
+        open my $web_state_fh, '<:raw', $files->web_state or die "Unable to read @{[$files->web_state]}: $!";
+        my $web_state_json = do { local $/; <$web_state_fh> };
+        close $web_state_fh or die "Unable to close @{[$files->web_state]}: $!";
+        like( $web_state_json, qr/"status":"running"/, '_overwrite_state_file_in_place persists the payload through the Windows in-place overwrite fallback' );
+        ok( !-e $source, '_overwrite_state_file_in_place removes the consumed pending state file after a successful overwrite' );
+    }
+
+    {
+        my $fakebin = tempdir( CLEANUP => 1 );
+        my $powershell = File::Spec->catfile( $fakebin, 'powershell' );
+        my $source = $files->web_state . '.pending-ps-move';
+        open my $source_fh, '>:raw', $source or die "Unable to write $source: $!";
+        print {$source_fh} qq({"pid":5151,"status":"running"});
+        close $source_fh or die "Unable to close $source: $!";
+        open my $ps_fh, '>', $powershell or die "Unable to write $powershell: $!";
+        print {$ps_fh} <<"SCRIPT";
+#!/bin/sh
+mv "$source" "@{[$files->web_state]}"
+exit 0
+SCRIPT
+        close $ps_fh or die "Unable to close $powershell: $!";
+        chmod 0755, $powershell or die "Unable to chmod $powershell: $!";
+
+        no warnings 'redefine';
+        local *Developer::Dashboard::RuntimeManager::is_windows = sub { return 1 };
+        local $ENV{PATH} = join ':', $fakebin, ( $ENV{PATH} || '' );
+        my ( $ok, $error ) = $manager->_replace_path_via_powershell( $source, $files->web_state );
+        ok( $ok, '_replace_path_via_powershell returns success when the Windows Move-Item web fallback succeeds' )
+          or diag $error;
+        ok( -f $files->web_state, '_replace_path_via_powershell leaves the web state target in place after a successful Move-Item fallback' );
+    }
+
+    {
+        my $fakebin = tempdir( CLEANUP => 1 );
+        my $powershell = File::Spec->catfile( $fakebin, 'powershell' );
+        my $source = $files->web_state . '.pending-ps-fail';
+        open my $source_fh, '>:raw', $source or die "Unable to write $source: $!";
+        print {$source_fh} qq({"pid":5252,"status":"retry"});
+        close $source_fh or die "Unable to close $source: $!";
+        open my $ps_fh, '>', $powershell or die "Unable to write $powershell: $!";
+        print {$ps_fh} <<"SCRIPT";
+#!/bin/sh
+printf '%s\n' 'web move failed' >&2
+exit 7
+SCRIPT
+        close $ps_fh or die "Unable to close $powershell: $!";
+        chmod 0755, $powershell or die "Unable to chmod $powershell: $!";
+
+        no warnings 'redefine';
+        local *Developer::Dashboard::RuntimeManager::is_windows = sub { return 1 };
+        local $ENV{PATH} = join ':', $fakebin, ( $ENV{PATH} || '' );
+        my ( $ok, $error ) = $manager->_replace_path_via_powershell( $source, $files->web_state );
+        ok( !$ok, '_replace_path_via_powershell returns failure when the Windows web Move-Item fallback exits non-zero' );
+        like( $error, qr/web move failed/, '_replace_path_via_powershell returns the native PowerShell failure text for web state replacement' );
+    }
+
+    {
+        my $source = $files->web_state . '.pending-final-fail';
+        open my $source_fh, '>:raw', $source or die "Unable to write $source: $!";
+        print {$source_fh} qq({"pid":6262,"status":"retry"});
+        close $source_fh or die "Unable to close $source: $!";
+        open my $target_fh, '>:raw', $files->web_state or die "Unable to seed @{[$files->web_state]}: $!";
+        print {$target_fh} qq({"status":"stale"});
+        close $target_fh or die "Unable to close @{[$files->web_state]}: $!";
+
+        my @rename_calls;
+        my @unlink_calls;
+        my $error;
+        {
+            no warnings 'redefine';
+            local *Developer::Dashboard::RuntimeManager::is_windows = sub { return 1 };
+            local *Developer::Dashboard::RuntimeManager::_rename_path = sub {
+                my ( undef, $from, $to ) = @_;
+                push @rename_calls, [ $from, $to ];
+                $! = EACCES;
+                return 0;
+            };
+            local *Developer::Dashboard::RuntimeManager::_unlink_path = sub {
+                my ( undef, $path ) = @_;
+                push @unlink_calls, $path;
+                return unlink $path;
+            };
+            local *Developer::Dashboard::RuntimeManager::_replace_path_via_powershell = sub {
+                return ( 0, "web Move-Item retry failed\n" );
+            };
+            local *Developer::Dashboard::RuntimeManager::_overwrite_state_file_in_place = sub {
+                return ( 0, "web overwrite retry failed\n" );
+            };
+            eval { $manager->_replace_state_file( $source, $files->web_state ); 1 } or $error = $@;
+        }
+
+        like(
+            $error,
+            qr/PowerShell Move-Item fallback failed: web Move-Item retry failed\s*;\s*in-place overwrite fallback failed: web overwrite retry failed/,
+            '_replace_state_file reports both Windows web fallback failures after exhausting retries',
+        );
+        is( scalar @rename_calls, 11, '_replace_state_file retries the Windows web rename path across all ten attempts plus the initial rename failure' );
+        is( scalar @unlink_calls, 2, '_replace_state_file unlinks the stale Windows web target once and then cleans up the pending state file before giving up' );
+        is( $unlink_calls[0], $files->web_state, '_replace_state_file removes the stale Windows web target before the retry loop continues' );
+        is( $unlink_calls[1], $source, '_replace_state_file removes the pending Windows web state file during final cleanup' );
+        ok( !-e $source, '_replace_state_file removes the pending web state file before dying after repeated Windows replacement failures' );
+    }
 }
 
 {

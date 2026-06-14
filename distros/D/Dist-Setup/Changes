@@ -1,5 +1,16 @@
 Revision history for perl distribution Dist-Setup
 
+0.17 - 2026-06-13
+
+ - Install the dependencies in the GitHub CI worflow in several steps to try to
+   break dependency loops when --with-suggests is active (typically between
+   LWP::UserAgent and LWP::Protocol::https).
+ - Pass any .pm file found in t/ through perltidy when executing `make tidy`.
+ - Update the latest version to 5.42 and never run the oldest version on the
+   Windows running in the CI.
+ - Add the .claude/ dir to the standard MANIFEST.SKIP file.
+ - Upload the distributions in the correct dir and not in the Dist-Setup one.
+
 0.16 - 2024-05-09
 
  - Disable our custom make targets on platforms that are not know to have

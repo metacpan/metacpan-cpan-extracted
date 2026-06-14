@@ -18,6 +18,6 @@
 
 int get_opus_metadata(PerlIO *infile, char *file, HV *info, HV *tags);
 int _opus_parse(PerlIO *infile, char *file, HV *info, HV *tags, uint8_t seeking);
-static int opus_find_frame(PerlIO *infile, char *file, int offset);
+static off_t opus_find_frame(PerlIO *infile, char *file, int offset);
 void _parse_vorbis_comments(PerlIO *infile, Buffer *vorbis_buf, HV *tags, int has_framing);
 int _opus_binary_search_sample(PerlIO *infile, char *file, HV *info, uint64_t target_sample);

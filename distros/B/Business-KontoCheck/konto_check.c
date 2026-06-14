@@ -13,7 +13,7 @@
  * #  wurden aus der aktuellen BLZ-Datei der Deutschen Bundesbank           #
  * #  übernommen.                                                           #
  * #                                                                        #
- * #  Copyright (C) 2002-2023 Michael Plugge <konto_check@yahoo.com>        #
+ * #  Copyright (C) 2002-2026 Michael Plugge <konto_check@yahoo.com>        #
  * #                                                                        #
  * #  Dieses Programm ist freie Software; Sie dürfen es unter den           #
  * #  Bedingungen der GNU Lesser General Public License, wie von der Free   #
@@ -49,11 +49,11 @@
 
 /* Definitionen und Includes  */
 #ifndef VERSION
-#define VERSION "6.15 (final)"
+#define VERSION "6.16 (final)"
 #define VERSION_MAJOR 6
-#define VERSION_MINOR 15
+#define VERSION_MINOR 16
 #endif
-#define VERSION_DATE "2023-04-13"
+#define VERSION_DATE "2026-06-13"
 
 #ifndef INCLUDE_KONTO_CHECK_DE
 #define INCLUDE_KONTO_CHECK_DE 1
@@ -9176,7 +9176,10 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
 #endif
 {
    char *ptr,*dptr,kto_alt[32],xkto[32];
-   int i,p1=0,tmp,kto_len,pz1=0,ok,pz;
+   int i,p1=0,tmp,kto_len,pz1=0,ok;
+#ifndef PZ_GLOBAL
+   int pz;
+#endif
    int c2,d2,a5,p,konto[11];   /* Variablen für Methode 87 */
 
       /* Konto links mit Nullen auf 10 Stellen auffüllen,
@@ -9201,7 +9204,7 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
 
    switch(pz_methode){
 
-#line 9532 "konto_check.lxx"
+#line 9535 "konto_check.lxx"
 /* Berechnungsmethoden 00 bis 09 +§§§3
    Berechnung nach der Methode 00 +§§§4 */
 /*
@@ -11540,7 +11543,7 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
  * ######################################################################
  */
 
-#line 11547 "konto_check.lxx"
+#line 11550 "konto_check.lxx"
       case 51:
          if(*(kto+2)=='9'){   /* Ausnahme */
 
@@ -11802,8 +11805,8 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
          else
             return FALSE;
 
-#line 11761 "konto_check.lxx"
-#line 11763 "konto_check.lxx"
+#line 11764 "konto_check.lxx"
+#line 11766 "konto_check.lxx"
 /*  Berechnung nach der Methode 53 +§§§4 */
 /*
  * ######################################################################
@@ -12102,7 +12105,7 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
  * # bewerten.                                                          #
  * ######################################################################
  */
-#line 12032 "konto_check.lxx"
+#line 12035 "konto_check.lxx"
       case 57:
 #if DEBUG>0
          if(retvals){
@@ -12748,7 +12751,7 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
  * # Prüfzifferberechnung)                                              #
  * ######################################################################
  */
-#line 12612 "konto_check.lxx"
+#line 12615 "konto_check.lxx"
       case 66:
 #if DEBUG>0
       case 2066:
@@ -20157,7 +20160,7 @@ static int kto_check_int(char *x_blz,int pz_methode,char *kto)
          return NOT_IMPLEMENTED;
    }
 }
-#line 18824 "konto_check.lxx"
+#line 18827 "konto_check.lxx"
 
 /*
  * ######################################################################
@@ -20255,7 +20258,7 @@ DLL_EXPORT int kto_check_blz(char *blz,char *kto)
 #if DEBUG>0    /* es werden einige Funktionen benutzt, die nur in der Debug-Variante enthalten sind */
 DLL_EXPORT int kto_check_regel_dbg(char *blz,char *kto,char *blz2,char *kto2,const char **bic,int *regel,RETVAL *retvals)
 {
-#line 18922 "konto_check.lxx"
+#line 18925 "konto_check.lxx"
    char *blz_o,buffer[32],kto_o[16],*blz_n,*kto_n,*ptr,*dptr;
    const char *bicp;
    int ret,ret_regel,r,i;
@@ -20304,7 +20307,7 @@ DLL_EXPORT int kto_check_regel_dbg(char *blz,char *kto,char *blz2,char *kto2,con
    }
    else  /* BLZ und Kto gleich */
       return ret;
-#line 18971 "konto_check.lxx"
+#line 18974 "konto_check.lxx"
 }
 
 #else   /* !DEBUG */
@@ -20455,7 +20458,7 @@ DLL_EXPORT int kto_check_blz_dbg(char *blz,char *kto,RETVAL *retvals)
  * # Copyright (C) 2007 Michael Plugge <konto_check@yahoo.com>               #
  * ###########################################################################
  */
-#line 19122 "konto_check.lxx"
+#line 19125 "konto_check.lxx"
 DLL_EXPORT int kto_check_pz_dbg(char *pz,char *kto,char *blz,RETVAL *retvals)
 {
    int untermethode,pz_methode;
@@ -20691,7 +20694,7 @@ DLL_EXPORT int get_lut_info2_b(char *lutname,int *version,char **prolog_p,char *
    }
    else
       **user_info_p=0;
-#line 19343 "konto_check.lxx"
+#line 19346 "konto_check.lxx"
    FREE(prolog);
    return OK;
 }
@@ -20833,13 +20836,13 @@ DLL_EXPORT const char *get_kto_check_version_x(int mode)
       case 5:
         return "09.09.2019";
       case 6:
-        return "13. April 2023";            /* Klartext-Datum der Bibliotheksversion */
+        return "13. Juni 2026";            /* Klartext-Datum der Bibliotheksversion */
       case 7:
         return "final";              /* Versions-Typ der Bibliotheksversion (development, beta, final) */
       case 8:
         return "6";             /* Hauptversionszahl */
       case 9:
-        return "15";             /* Unterversionszahl */
+        return "16";             /* Unterversionszahl */
    }
 }
 
@@ -20985,7 +20988,7 @@ DLL_EXPORT int dump_lutfile(char *outputname,UINT4 *required)
       default:
          break;
    }
-#line 19576 "konto_check.lxx"
+#line 19579 "konto_check.lxx"
    fputc('\n',out);
    while(--i)fputc('=',out);
    fputc('\n',out);
@@ -21310,7 +21313,7 @@ DLL_EXPORT const char *iban2bic_id(char *iban,int *retval,int *blz,int *kto)
    return iban2bic(iban,retval,b,k);
 }
 
-#line 19901 "konto_check.lxx"
+#line 19904 "konto_check.lxx"
 /* Funktion iban_gen(), iban_bic_gen() und iban_bic_gen1 +§§§1 */
 /* ###########################################################################
  * # Die Funktion iban_gen generiert aus Bankleitzahl und Kontonummer eine   #
@@ -22143,7 +22146,7 @@ DLL_EXPORT int ipi_check(char *zweck)
  * # Copyright (C) 2009,2011 Michael Plugge <konto_check@yahoo.com>          #
  * ###########################################################################
  */
-#line 20734 "konto_check.lxx"
+#line 20737 "konto_check.lxx"
 
 /* Funktion volltext_zeichen() +§§§2 */
 /* Diese Funktion gibt für Zeichen die bei der Volltextsuche gültig sind
@@ -22990,7 +22993,7 @@ static int qcmp_bic_h(const void *ap,const void *bp)
       return a-b;
 }
 
-#line 21581 "konto_check.lxx"
+#line 21584 "konto_check.lxx"
 
 /* Funktion qcmp_bic() +§§§3 */
 static int qcmp_bic(const void *ap,const void *bp)
@@ -23095,7 +23098,7 @@ static int qcmp_iban_regel(const void *ap,const void *bp)
    else 
       return a-b;
 }
-#line 21596 "konto_check.lxx"
+#line 21599 "konto_check.lxx"
 
 /* Funktion init_blzf() +§§§2
  * Diese Funktion initialisiert das Array mit den Bankleitzahlen für alle
@@ -23163,7 +23166,7 @@ DLL_EXPORT int konto_check_idx2blz(int idx,int *zweigstelle,int *retval)
 }
 
 /* Funktion suche_int1() +§§§2 */
-#line 21664 "konto_check.lxx"
+#line 21667 "konto_check.lxx"
 static int suche_int1(int a1,int a2,int *anzahl,int **start_idx,int **zweigstellen_base,int **blz_base,
       int **base_name,int **base_sort,int(*cmp)(const void *, const void *),int cnt,int such_idx)
 {
@@ -23214,7 +23217,7 @@ static int suche_int1(int a1,int a2,int *anzahl,int **start_idx,int **zweigstell
 }
 
 /* Funktion suche_int2() +§§§2 */
-#line 21715 "konto_check.lxx"
+#line 21718 "konto_check.lxx"
 static int suche_int2(int a1,int a2,int *anzahl,int **start_idx,int **zweigstellen_base,int **blz_base,
       int **base_name,int **base_sort,int(*cmp)(const void *, const void *),int such_idx,int pz_suche)
 {
@@ -23829,7 +23832,7 @@ static int cmp_suche_sort(const void *ap,const void *bp)
 DLL_EXPORT int lut_suche_sort1(int anzahl,int *blz_base,int *zweigstellen_base,int *idx,int *anzahl_o,int **idx_op,int **cnt_op,int uniq)
 {
    int i,j,last_idx,*idx_a,*cnt_o;
-#line 22331 "konto_check.lxx"
+#line 22334 "konto_check.lxx"
 
    if(idx_op)*idx_op=NULL;
    if(cnt_op)*cnt_op=NULL;
@@ -23911,7 +23914,7 @@ DLL_EXPORT int lut_suche_sort2(int anzahl,int *blz,int *zweigstellen,int *anzahl
    return OK;
 }
 
-#line 22414 "konto_check.lxx"
+#line 22417 "konto_check.lxx"
 /* Funktion lut_suche_volltext() +§§§2 */
 DLL_EXPORT int lut_suche_volltext(char *such_wort,int *anzahl,int *base_name_idx,char ***base_name,
       int *zweigstellen_anzahl,int **start_idx,int **zweigstellen_base,int **blz_base)
@@ -24041,7 +24044,7 @@ DLL_EXPORT int lut_suche_blz(int such1,int such2,int *anzahl,int **start_idx,int
    return suche_int1(such1,such2,anzahl,start_idx,zweigstellen_base,blz_base,&blz_f,&sort_blz,qcmp_blz,cnt,0);
 }
 
-#line 22564 "konto_check.lxx"
+#line 22567 "konto_check.lxx"
 /* Funktion lut_suche_bic() +§§§2 */
 DLL_EXPORT int lut_suche_bic(char *such_name,int *anzahl,int **start_idx,int **zweigstellen_base,
       char ***base_name,int **blz_base)
@@ -24132,7 +24135,7 @@ DLL_EXPORT int lut_suche_regel(int such1,int such2,int *anzahl,int **start_idx,i
    return suche_int2(such1*100,such2*100+99,anzahl,start_idx,zweigstellen_base,blz_base,&iban_regel,&sort_iban_regel,qcmp_iban_regel,LUT2_IBAN_REGEL_SORT,0);
 }
 
-#line 22597 "konto_check.lxx"
+#line 22600 "konto_check.lxx"
 
 /* Funktion lut_suche_bic_h() +§§§2 */
 DLL_EXPORT int lut_suche_bic_h(char *such_name,int *anzahl,int **start_idx,int **zweigstellen_base,
@@ -24518,7 +24521,7 @@ DLL_EXPORT const char *iban_ort(char *iban,int filiale,int*retval)
 {
    return iban_fkt_s(iban,filiale,retval,lut_ort);
 }
-#line 22686 "konto_check.lxx"
+#line 22689 "konto_check.lxx"
 
 static int bic_fkt_c(char *bic1,int mode,int filiale,int *retval,char *base,int error)
 {
@@ -25807,7 +25810,7 @@ DLL_EXPORT const char *pz2str(int pz,int *ret)
       default:   return "???";
    }
 }
-#line 23641 "konto_check.lxx"
+#line 23644 "konto_check.lxx"
 
 /* Funktion lut_keine_iban_berechnung() +§§§1 */
 /*
@@ -25971,7 +25974,7 @@ DLL_EXPORT char *kto_check_test_vars(char *txt,UINT4 i)
 #endif
 
 
-#line 23805 "konto_check.lxx"
+#line 23808 "konto_check.lxx"
 /* Funktionen *_id() +§§§1 */
 /* ###########################################################################
  * # Die folgenden Funktionen sind die id-Varianten von Funktionen, die      #
@@ -26393,13 +26396,22 @@ DLL_EXPORT int lut_write_scl_blocks(char *inputfile,char *lutfile)
    char c,*ptr,buffer[512],buffer2[128],*scl_name_block_s,*scl_bic_block_s,
         *scl_flags_block_s,*scl_flags_block_o,*ptr1,*ptr2,*ptr3,*ptr4,*base_ptr="";
    char scl_gueltigkeit[16],scl_gueltigkeit_iso[16];
-   int cnt,i,j,rv,*iptr,jahr,monat,tag,f1,f2,f3,f4,f5;
+   int max_cnt,cnt,i,j,rv,*iptr,jahr,monat,tag,f1,f2,f3,f4,f5;
    FILE *in,*lut;
-   struct stat stat_buffer;
    struct tm z;
    time_t ts;
 
    if(!(in=fopen(inputfile,"r")))RETURN(FILE_READ_ERROR);
+
+      /* In den Dateien des SCL-Verzeichnisses waren bis zum 22.4.2024 jede Zeile mit Leerzeichen auf 163 (bzw. später 200) Bytes
+       * aufgefüllt. Ab dem 29.4.2024 sind diese Blanks allerdings entfallen. Vorher konnte die Dateilänge durch 163 (bzw. 200)
+       * dividiert werden, um die Anzahl Banken zu bekommen, das ist mit variabler Zeilenlänge natürlich nicht mehr möglich.
+       * Daher wird hier einfach die Datei einmal testweise eingelesen und die Zeilen gezählt, und danach der Dateizeiger wieder
+       * auf den Anfang zurückgesetzt. Der Zähler wird mit 50 initialisiert, um noch etwas Luft zu haben.
+       */
+   for(max_cnt=50;!feof(in);max_cnt++)fgets(buffer,512,in);
+   rewind(in);
+
    if(!fgets(buffer,512,in))RETURN(SCL_INPUT_FORMAT_ERROR);
    if(strncmp(buffer,"Gueltig ab / valid from ",24))return SCL_INPUT_FORMAT_ERROR;
    for(ptr=buffer;!isdigit(*ptr);ptr++);
@@ -26419,19 +26431,16 @@ DLL_EXPORT int lut_write_scl_blocks(char *inputfile,char *lutfile)
       /* Leerzeichen aus dem Überschrift-String entfernen */
    for(ptr=buffer,ptr2=buffer2;*ptr;ptr++)if(!isspace(*ptr))*ptr2++=*ptr;
    if(strncmp(buffer2,"BIC;Name;SERVICESCT;SERVICECOR;SERVICECOR1;SERVICEB2B;SERVICESCC",64))RETURN(SCL_INPUT_FORMAT_ERROR);
-   stat(inputfile,&stat_buffer);
 
-   cnt=stat_buffer.st_size/163+300;    /* etwas großzügig die Anzahl rechnen; jede Zeile hat 163 Bytes und ist am Ende mit Leerzeichen aufgefüllt */
+   scl_bic_array=(char **)calloc(sizeof(char*),max_cnt);
+   scl_name_array=(char **)calloc(sizeof(char*),max_cnt);
+   scl_flags_array=(char **)calloc(sizeof(char*),max_cnt);
+   scl_flags_array_o=(char **)calloc(sizeof(char*),max_cnt);
 
-   scl_bic_array=(char **)calloc(sizeof(char*),cnt);
-   scl_name_array=(char **)calloc(sizeof(char*),cnt);
-   scl_flags_array=(char **)calloc(sizeof(char*),cnt);
-   scl_flags_array_o=(char **)calloc(sizeof(char*),cnt);
-
-   scl_bic_block=ptr1=(char *)calloc(12,cnt);
-   scl_name_block=ptr2=(char *)calloc(150,cnt);
-   scl_flags_block=ptr3=(char *)calloc(6,cnt);
-   scl_flags_block_orig=ptr4=(char *)calloc(6,cnt);
+   scl_bic_block=ptr1=(char *)calloc(12,max_cnt);
+   scl_name_block=ptr2=(char *)calloc(150,max_cnt);
+   scl_flags_block=ptr3=(char *)calloc(6,max_cnt);
+   scl_flags_block_orig=ptr4=(char *)calloc(6,max_cnt);
 
    /* SCL-Datei einlesen */
    for(cnt=0;fgets(buffer,512,in);){
@@ -26595,7 +26604,7 @@ DLL_EXPORT int lut_write_scl_blocks(char *inputfile,char *lutfile)
    RETURN(OK);
 }
 
-#line 24429 "konto_check.lxx"
+#line 24438 "konto_check.lxx"
 /* Funktion lut_scl_init() +§§§3 */
 /* ###########################################################################
  * # Die Funktion lut_scl_init() liest die SCL-Blocks aus einer LUT-Datei    #

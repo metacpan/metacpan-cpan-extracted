@@ -238,9 +238,9 @@ sub action_flags {
       my $opt = {%modes, comparator => \'locale'};
       push @{$cur_pipeline}, ['locale-sort', \&do_sort, $opt];
     },
-    'semver-sort|ss' => sub {
+    'version-sort|vs' => sub {
       my $opt = {%modes, comparator => \'semver'};
-      push @{$cur_pipeline}, ['semver-sort', \&do_sort, $opt];
+      push @{$cur_pipeline}, ['version-sort', \&do_sort, $opt];
     },
     'custom-sort|cs=s' => sub {
       my $opt = {%modes, comparator => $_[1]};

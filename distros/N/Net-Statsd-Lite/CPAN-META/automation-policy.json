@@ -1,0 +1,7 @@
+{
+   "automated_actions" : "issue",
+   "automated_contributions" : "issue",
+   "code_generation" : "toolchain",
+   "distribution" : "Net-Statsd-Lite-v0.11.2",
+   "version" : 1
+}

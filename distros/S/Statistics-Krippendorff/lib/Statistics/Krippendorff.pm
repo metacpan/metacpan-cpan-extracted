@@ -4,7 +4,7 @@ Statistics::Krippendorff - Calculate Krippendorff's alpha
 
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =cut
 
@@ -16,7 +16,7 @@ use Moo;
 
 use experimental qw( signatures );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use List::Util qw{ min sum };
 
@@ -99,7 +99,7 @@ sub delta_interval($, $v0, $v1) { ($v0 - $v1) ** 2 }
 
 sub delta_ordinal($self, $v0, $v1) {
     my ($from, $to) = sort { $a <=> $b } $v0, $v1;
-    (sum(map $self->frequency($_), $from .. $to)
+    (sum(map $self->frequency($_) // 0, $from .. $to)
      - ($self->frequency($from) + $self->frequency($to))/ 2) ** 2
 }
 

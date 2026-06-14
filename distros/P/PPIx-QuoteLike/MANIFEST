@@ -20,13 +20,14 @@ lib/PPIx/QuoteLike/Token/Structure.pm
 lib/PPIx/QuoteLike/Token/Unknown.pm
 lib/PPIx/QuoteLike/Token/Whitespace.pm
 lib/PPIx/QuoteLike/Utils.pm
-LICENSES/Artistic
-LICENSES/Copying
+LICENSE-Artistic
+LICENSE-GPL
 Makefile.PL
 MANIFEST
 META.json
 META.yml
 README
+SECURITY
 t/basic.t
 t/dump.t
 t/locations.t

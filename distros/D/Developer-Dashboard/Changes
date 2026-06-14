@@ -1,3 +1,84 @@
+4.16  2026-06-11
+    - teach the built-in `dashboard workspace` command a `-c` flag, accepted
+      before or after the workspace name, that changes into the registered
+      dashboard path for that name before planning the session, so
+      `dashboard workspace -c foobar` behaves like `cdr foobar` followed by
+      `dashboard workspace foobar` and the tmux session plus its layered
+      `.env` refresh start from the registered project directory
+    - fail `-c` explicitly when the workspace name is not a registered
+      dashboard path, when the registered target is not a directory, or when
+      the directory cannot be entered, instead of silently starting the
+      workspace from the wrong directory
+4.15  2026-06-11
+    - keep the `install.sh` post-install activation runner on the same shell
+      dialect as the bootstrap target, so blank hosts without `SHELL` exported
+      (fresh Docker containers, `curl ... | sh` runs) no longer source the
+      bash-flavoured activation files through plain `sh` and die on the first
+      bash-only construct
+4.14  2026-06-11
+    - align every module under `lib/` back onto the single repository release
+      version after the `4.13` bump only advanced `Developer::Dashboard`,
+      leaving the other 53 packaged modules still declaring `4.12`
+    - add a release-metadata gate that walks every `lib/**/*.pm` and asserts
+      its `$VERSION` matches the `dist.ini` release version, so a partial
+      version bump can never ship again
+    - validate IPv4 loopback octets strictly in `Auth::_ip_is_loopback`, so
+      malformed literals such as `127.0.0.999` are no longer classified as
+      loopback addresses
+    - restore the `4.12` entries in `Changes` and `FIXED_BUGS.md` that the
+      `4.13` update overwrote instead of prepending
+4.13  2026-06-11
+    - harden the GitHub-hosted `Devel::Cover` gate again by exercising the
+      installed-dist `File::ShareDir` asset lookup branch in
+      `Web::App::_bundled_public_asset_path`, so clean Ubuntu runners close
+      the final `99.9` statement gap and keep the reviewed `lib/` totals at
+      `100.0 / 100.0 / 100.0`
+4.12  2026-06-10
+    - harden the GitHub-hosted `Devel::Cover` gate by exercising the
+      low-traffic `Web::App` compatibility helpers directly in the focused web
+      coverage tests, so route fan-out timing on CI runners cannot leave the
+      reviewed `lib/` totals below `100.0 / 100.0 / 100.0`
+4.11  2026-06-10
+    - decouple the GitHub-hosted CPAN upload workflow from ordinary `vX.XX`
+      tag pushes so signed GitHub release tags can be published without
+      triggering an unasked PAUSE upload
+    - broaden the CodeQL push trigger to every branch so repository-side SAST
+      coverage is visible on more commit paths instead of only `master`
+4.10  2026-06-10
+    - move project-local isolated Docker Compose service discovery and
+      disable markers under `./.developer-dashboard/config/docker/...` so
+      the implementation matches the documented config-root contract across
+      resolver lookup, toggle writes, and exported `DDDC` paths
+4.09  2026-06-06
+    - keep smart-routed skill page browser edits on their canonical
+      `/app/<skill>` and nested `/app/<skill>/<sub-skill>` aliases by
+      teaching the edit/source routes and Play handoff to load skill index
+      pages through the same smart resolver instead of collapsing to the
+      underlying `BOOKMARK: index` id
+4.08  2026-06-06
+    - split the Web UI bookmark editor into Jupyter-like section blocks while
+      keeping the saved bookmark file format canonical, including block-aware
+      syntax overlays, Tab-created sections, hidden source recomposition, and
+      Play-mode save-and-render handoff
+    - standardize operator-facing built-in CLI output so path, file, api, and
+      skill inventory or mutation commands default to readable table summaries
+      while `-o json` returns the full raw machine payload
+4.04  2026-06-05
+    - restore the public switchboard helper path contract for dotted
+      `dashboard <skill>.<command>` dispatch, keep Windows core-backed
+      built-ins routed through the shared staged `_dashboard-core` helper,
+      and fix the staged private core import drift that broke `dashboard init`
+      and later helper refreshes
+    - harden Windows runtime helper and state-file flows so detached web,
+      collector-loop, collector-worker, and watchdog launches use the staged
+      foreground helper entrypoints and tolerate Windows rename collisions
+      through explicit replace fallbacks
+    - teach the Windows checkout bootstrap to seed `HOME` from PowerShell's
+      own `HOME`, create a stable user-space `make.cmd` shim for Strawberry
+      GNU make, and keep the fuzz gate lightweight under `Devel::Cover`
+    - force non-interactive CPAN environment defaults for skill `cpanm`
+      installs so Windows fresh-session bootstrap checks do not stall behind
+      dependency configure prompts
 4.03  2026-06-05
     - ship an explicit OWASP compliance SOW and evidence matrix, wire it into
       the OWASP and release-metadata tests, and tighten the manuals so the

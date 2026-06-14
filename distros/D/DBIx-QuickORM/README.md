@@ -748,6 +748,7 @@ You get all these when using DBIx::QuickORM.
 
 - `primary_key`
 - `primary_key(@COLUMNS)`
+- `primary_key(\%OPTIONS, @COLUMNS)`
 
     Used to define a primary key. When used under a table you must provide a
     list of columns. When used under a column builder it designates just that
@@ -770,6 +771,24 @@ You get all these when using DBIx::QuickORM.
         };
 
     Can be nested under `table` or `column`.
+
+    When the live database reports a different primary key than the one you
+    declare here, schema construction croaks rather than silently picking one.
+    Pass a leading options hashref with `override => 1` to declare that your
+    key is intentional and should win over the database's:
+
+        table mytable => sub {
+            column a => sub { ... };
+
+            primary_key({override => 1}, 'a');
+        };
+
+    The options hashref works under a column builder too:
+
+        column a => sub {
+            ...
+            primary_key({override => 1});
+        };
 
 - `unique`
 - `unique(@COLUMNS)`

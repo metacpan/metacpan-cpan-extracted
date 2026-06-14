@@ -3,6 +3,7 @@ CONTRIBUTING.md
 CONTRIBUTING.pod
 Changes
 DASHBOARD_IMPROVEMENT_PLAN.md
+FIX.md
 LICENSE
 MANIFEST
 MANIFEST.SKIP
@@ -34,6 +35,7 @@ doc/internal-operating-checklist.md
 doc/layered-env-loading.md
 doc/owasp-compliance-sow.md
 doc/path-inventory-api.md
+doc/scorecard-improvements.md
 doc/security.md
 doc/shell-bootstrap.md
 doc/skills.md
@@ -43,6 +45,7 @@ doc/update-and-release.md
 doc/web-readonly-mode.md
 doc/which-command.md
 doc/windows-testing.md
+doc/workspace-change-dir.md
 install.ps1
 install.sh
 integration/blank-env/Dockerfile

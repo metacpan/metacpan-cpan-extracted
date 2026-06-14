@@ -1,5 +1,56 @@
 Revision history for Params-Validate-Strict
 
+0.34	Sat Jun 13 15:55:13 EDT 2026
+
+  [Enhancements]
+  - New type 'stringref': accepts a reference to a scalar that contains a
+    plain string (e.g. \$var).  Rejects plain scalars, arrayrefs, hashrefs,
+    coderefs, blessed objects, and REF-of-REF values.  Dereferences the
+    string before further processing, so min/max (character length),
+    matches, nomatch, memberof, notmemberof, transform, callback, and all
+    other rules operate on the plain string.  The validated return value is
+    the dereferenced string.
+  - Union types such as type => ['string', 'stringref'] are fully supported.
+  - Integer validation now accepts any numeric representation whose value
+    has no fractional part, including scientific notation (e.g.
+    1.38255823391608e+18) and trailing-zero decimals (e.g. 42.0).  Values
+    with a non-zero fractional part (e.g. 3.14, 42.9) are still rejected.
+    The coerced return value is always a Perl integer (via int()).
+
+  [Bug Fixes]
+  - Fixed: integer type accepted "Inf", "-Inf", and overflowing scientific
+    notation (e.g. "1e309") because int(Inf)==Inf makes the $v != int($v)
+    guard transparent to infinity.  Added a ($v - $v) != 0 pre-check:
+    Inf - Inf produces NaN, and NaN != 0 is true, so non-finite values are
+    now correctly rejected.
+  - Fixed: a 'stringref' parameter whose 'transform' coderef returned a
+    reference (hashref, arrayref, etc.) was silently stored in the validated
+    result because the dispatch-loop arm for 'stringref' was a no-op stub.
+    The stub now checks ref($value) after transform and croaks if a reference
+    is returned.
+  - Fixed: when 'stringref' was combined with 'optional => CODE', the
+    coderef received the internally-dereferenced plain string rather than the
+    original SCALAR reference the caller supplied.  The pre-deref value is
+    now preserved and passed to the optional coderef for stringref parameters;
+    all other types continue to receive the post-transform value as before.
+
+  [Tests]
+  - Comprehensive stringref tests across unit.t (acceptance, rejection,
+    min, max, matches, memberof, optional, default, error_msg, logger,
+    union types), extended_tests.t (all rule combinations, union types with
+    constraints), and edge_cases.t (pathological inputs, NUL bytes, unicode,
+    transform, callback, positional args, schema reuse).
+  - function.t: 30 new stringref subtests covering all type-rejection paths,
+    min/max on dereferenced length, matches, memberof, transform ordering,
+    callback, optional/default, and union types.
+  - function.t: scientific-notation integer subtest (1.38255823391608e+18).
+  - function.t: 7 new subtests covering the three bug fixes above (Inf/-Inf/
+    1e309 rejected as integer; transform returning a ref rejected for
+    stringref; optional CODE receives the original SCALAR ref).
+  - Updated stale subtests in edge_cases.t and extended_tests.t that
+    incorrectly asserted scientific-notation and trailing-.0 integers are
+    rejected.
+
 0.33	Mon May 25 09:21:12 EDT 2026
 
   [Enhancements]

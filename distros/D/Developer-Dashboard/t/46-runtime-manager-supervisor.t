@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Cwd qw(getcwd);
+use Errno qw(EACCES);
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
@@ -170,6 +171,45 @@ ok(
     );
     ok( $manager->_cleanup_collector_supervisor_files, 'collector supervisor cleanup returns a true value' );
     ok( !-f $manager->_collector_supervisor_statefile, 'collector supervisor cleanup removes the state file' );
+}
+
+{
+    my $rename_attempt = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::RuntimeManager::is_windows = sub { return 1 };
+    local *Developer::Dashboard::RuntimeManager::_rename_path = sub {
+        my ( undef, $source, $target ) = @_;
+        $rename_attempt++;
+        if ( $rename_attempt == 1 ) {
+            $! = EACCES;
+            return 0;
+        }
+        return CORE::rename( $source, $target );
+    };
+    local *Developer::Dashboard::RuntimeManager::_replace_path_via_powershell = sub {
+        my ( undef, $source, $target ) = @_;
+        return ( CORE::rename( $source, $target ) ? 1 : 0, $! );
+    };
+    my $state = $manager->_write_collector_supervisor_state(
+        {
+            pid           => 6543,
+            process_name  => $manager->_collector_supervisor_process_title,
+            status        => 'running',
+            watched_names => ['gamma'],
+        }
+    );
+    is( $state->{pid}, 6543, '_write_collector_supervisor_state returns the payload after the Windows PowerShell replacement fallback' );
+    is_deeply(
+        $manager->_collector_supervisor_state,
+        {
+            pid           => 6543,
+            process_name  => $manager->_collector_supervisor_process_title,
+            status        => 'running',
+            watched_names => ['gamma'],
+        },
+        '_write_collector_supervisor_state persists the payload after the Windows PowerShell replacement fallback',
+    );
+    ok( $manager->_cleanup_collector_supervisor_files, 'collector supervisor cleanup still works after the Windows replacement fallback path' );
 }
 
 {

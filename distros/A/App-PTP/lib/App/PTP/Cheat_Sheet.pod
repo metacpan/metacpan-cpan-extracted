@@ -53,7 +53,7 @@ Pipeline commands are applied, in order, to all the input files.
 =item B<-M> I<module>: load the given module
 
 =item B<--sort>, B<--ns> (B<--numeric-sort>), B<--ls> (B<--locale-sort>),
-B<--ss> (B<--semver-sort>), B<--cs> I<code> (B<--custom-sort>)
+B<--vs> (B<--version-sort>), B<--cs> I<code> (B<--custom-sort>)
 
 =item B<-u> (B<--unique>), B<--gu> (B<--global-unique>)
 

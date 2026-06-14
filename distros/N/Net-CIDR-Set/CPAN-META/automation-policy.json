@@ -2,6 +2,6 @@
    "automated_actions" : "issue",
    "automated_contributions" : "issue",
    "code_generation" : "toolchain",
-   "distribution" : "Net-CIDR-Set-0.21",
+   "distribution" : "Net-CIDR-Set-0.22",
    "version" : 1
 }

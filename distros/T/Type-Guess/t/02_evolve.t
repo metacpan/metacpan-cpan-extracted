@@ -2,8 +2,11 @@ use strict;
 use warnings;
 use Test::More tests => 2;
 use Type::Guess;
+use strict;
 
-Type::Guess->tolerance(.1);
+$\ = "\n"; $, = "\t";
+
+Type::Guess->tolerance(0);
 
 my @dates = qw(
     2015-10-26
@@ -17,9 +20,14 @@ my @dates = qw(
     2093-11-10
     1954-01-05
     2027-08-18
-    1983-11-13
+    1983/11/13
+    12/30/1897
 );
-my $t = Type::Guess->with_roles("+Date")->new(@dates);
+my $t = Type::Guess->with_roles("+DateTime")->new(@dates);
 
 isa_ok ($t, "Type::Guess", "Class correct");
-ok ((ref $t) =~ /Role::Date$/ , "role applied")
+ok ((ref $t) =~ /Role::DateTime$/ , "role applied");
+# ok ("%Y-%m-%d" eq $t->datetime_format, "Format correct");
+
+# use DateTime::Format::Flexible;
+# print map { DateTime::Format::Flexible->parse_datetime($_) } @dates;

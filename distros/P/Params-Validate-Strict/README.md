@@ -4,7 +4,7 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 # VERSION
 
-Version 0.33
+Version 0.34
 
 # SYNOPSIS
 
@@ -177,9 +177,13 @@ The schema can define the following rules for each parameter:
 - `type`
 
     The data type of the parameter.
-    Valid types are `string`, `integer`, `number`, `float` `boolean`, `scalar`, `scalarref`, `hashref`, `arrayref`, `object` and `coderef`.
+    Valid types are `string`, `integer`, `number`, `float` `boolean`, `scalar`, `scalarref`, `stringref`, `hashref`, `arrayref`, `object` and `coderef`.
     `scalar` accepts any plain scalar value (string, number, boolean, etc.) but rejects references (arrayrefs, hashrefs, coderefs, objects).
     `scalarref` accepts a reference to a scalar value (e.g. `\$var`) but rejects plain scalars, arrayrefs, hashrefs, coderefs, and objects.
+    `stringref` accepts a reference to a scalar that contains a plain string (e.g. `\$str`) and rejects plain scalars, references-to-references, arrayrefs, hashrefs, coderefs, and objects.
+    The `min`/`max` constraints apply to the **length** (in characters) of the referenced string.
+    All other string rules (`matches`, `nomatch`, `memberof`, etc.) operate on the dereferenced string value.
+    The validated return value is the dereferenced plain string.
 
     A type can be an arrayref when a parameter could have different types (e.g. a string or an object).
 
@@ -964,7 +968,7 @@ Nigel Horne, `<njh at nigelhorne.com>`
 
     ValidationRule ::= SimpleType | ComplexRule | UnionType
 
-    SimpleType ::= string | integer | number | scalar | arrayref | hashref | coderef | object
+    SimpleType ::= string | integer | number | scalar | scalarref | stringref | arrayref | hashref | coderef | object
 
     UnionType ::= seq SimpleType    -- at least two members; written as type => ['a', 'b']
 

@@ -980,6 +980,22 @@ shell_command_runner() {
         return 0
     fi
 
+    # The runner must speak the same dialect as the bootstrap target, or a
+    # blank host without SHELL exported would source bash-flavoured activation
+    # files through plain sh and die on the first bash-only construct.
+    preferred_path=$(preferred_shell_path)
+    if [ -n "$preferred_path" ] && [ -x "$preferred_path" ]; then
+        printf '%s\n' "$preferred_path"
+        return 0
+    fi
+
+    preferred_name=$(preferred_shell_name)
+    resolved_preferred=$(command -v "$preferred_name" 2>/dev/null || true)
+    if [ -n "$resolved_preferred" ]; then
+        printf '%s\n' "$resolved_preferred"
+        return 0
+    fi
+
     shell_name=$(basename "${SHELL:-sh}")
     resolved_shell=$(command -v "$shell_name" 2>/dev/null || true)
     if [ -n "$resolved_shell" ]; then

@@ -15,7 +15,7 @@ install_share module => "Dist::Zilla::MintingProfile::Author::DBOOK", "profiles"
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "A plugin bundle for distributions built by DBOOK",
-  "AUTHOR" => "Dan Book <dbook\@cpan.org>",
+  "AUTHOR" => "Dan Book <book.d.wit\@proton.me>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0,
     "File::ShareDir::Install" => "0.06"
@@ -91,7 +91,7 @@ my %WriteMakefileArgs = (
     "Test::File::ShareDir::Module" => 0,
     "Test::More" => "0.88"
   },
-  "VERSION" => "v1.0.8",
+  "VERSION" => "v1.0.9",
   "test" => {
     "TESTS" => "t/*.t"
   }

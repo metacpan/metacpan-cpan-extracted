@@ -2,7 +2,7 @@ package DBIx::QuickORM::Join;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
@@ -22,6 +22,8 @@ use Object::HashBase qw{
     <order
     <lookup
     <components
+
+    <connection
 };
 
 =pod
@@ -80,11 +82,17 @@ Arrayref of component aliases in join order.
 
 =item lookup
 
-Hashref mapping a table's db moniker to the aliases it has been joined as.
+Hashref mapping a table's ORM name to the aliases it has been joined as.
 
 =item components
 
 Hashref mapping each alias to its component spec (table, link, from, type).
+
+=item connection
+
+The L<DBIx::QuickORM::Connection> the join will be queried through, when
+known. Used to quote identifiers with the active driver's quoting rules;
+without one, standard double quotes are used.
 
 =back
 
@@ -99,7 +107,7 @@ sub fields_to_omit { }
 
 sub fields_list_all {
     my $self = shift;
-    croak "Not Supported";
+    croak "fields_list_all() is not supported on a join source, select fields explicitly instead";
 }
 
 sub field_db_name {
@@ -150,8 +158,8 @@ sub init {
     $self->{+COMPONENTS} //= {};
 
     my $first = $self->{+JOIN_AS}++;
-    push @{$self->{+ORDER}}                                            => $first;
-    push @{$self->{+LOOKUP}->{$self->{+PRIMARY_SOURCE}->source_db_moniker}} => $first;
+    push @{$self->{+ORDER}}                                                => $first;
+    push @{$self->{+LOOKUP}->{$self->{+PRIMARY_SOURCE}->source_orm_name}} => $first;
     $self->{+COMPONENTS}->{$first} = {table => $self->{+PRIMARY_SOURCE}, as => $first};
 
     $self->{+ROW_CLASS} //= 'DBIx::QuickORM::Join::Row';
@@ -242,13 +250,17 @@ sub source_db_moniker {
         my $table = $comp->{table};
         my $type  = $comp->{type} // "";
 
-        if ($link) {
+        if ($type =~ m/^CROSS$/i) {
+            # CROSS JOIN takes no ON clause (PostgreSQL rejects one).
+            $out .= " CROSS JOIN " . $table->source_db_moniker . " AS $as";
+        }
+        elsif ($link) {
             my $lc = $link->local_columns;
             my $oc = $link->other_columns;
 
             my @cols;
             for (my $i = 0; $i < @$lc; $i++) {
-                push @cols => "$as.$lc->[$i] = $from.$oc->[$i]";
+                push @cols => "$as.$oc->[$i] = $from.$lc->[$i]";
             }
 
             $out .= $type =~ m/join/i ? " $type " : " $type JOIN ";
@@ -333,10 +345,11 @@ sub has_field {
 
 =pod
 
-=item $sql = $join->fields_to_fetch
+=item $fields = $join->fields_to_fetch
 
-Return a comma-joined list of aliased select expressions covering every
-component table's fetch fields, each aliased as C<"alias.field">.
+Return an arrayref of aliased select expressions (literal-SQL scalar refs)
+covering every component table's fetch fields, each aliased as
+C<"alias.field">.
 
 =cut
 
@@ -348,10 +361,27 @@ sub fields_to_fetch {
     for my $as (@{$self->{+ORDER}}) {
         my $c = $self->{+COMPONENTS}->{$as};
         my $t = $c->{table};
-        push @fields => map { my $db = $t->field_db_name($_); qq{$as.$db AS "$as.$db"} } @{$t->fields_to_fetch};
+        push @fields => map { my $db = $t->field_db_name($_); \("$as.$db AS " . $self->_quote_identifier("$as.$db")) } @{$t->fields_to_fetch};
     }
 
-    return join(', ' => @fields);
+    return \@fields;
+}
+
+=pod
+
+=item $quoted = $join->_quote_identifier($name)
+
+Quote an identifier using the connection's driver rules when a connection is
+available, falling back to standard double quotes.
+
+=cut
+
+sub _quote_identifier {
+    my $self = shift;
+    my ($name) = @_;
+
+    my $con = $self->{+CONNECTION} or return qq{"$name"};
+    return $con->dbh->quote_identifier($name);
 }
 
 =pod
@@ -427,7 +457,8 @@ sub _join_params {
 
 Clone the join and add a new component for the given link, resolving its
 alias and source-of-join (C<from>) and appending it to the order, lookup, and
-components. Returns the new join.
+components. Returns the new join. A C<CROSS> type component may omit the link
+and pass C<< table => $name >> instead; it joins without an C<ON> clause.
 
 =cut
 
@@ -452,32 +483,45 @@ sub _join {
 
     croak "A join has already been made using the identifier '$as'" if $self->{+COMPONENTS}->{$as};
 
-    if ($from && !$self->{+COMPONENTS}->{$from}) {
-        my $check = $self->{+LOOKUP}->{$from};
-        croak "'$from' is not defined" unless $check && @$check;
-        croak "'$from' source has multiple aliases: " . join(', ' => @$check) if @$check > 1;
-        ($from) = @$check;
-    }
+    my $is_cross = ($type // '') =~ m/^CROSS$/i;
+    croak "A 'link' is required (only CROSS joins may omit it)" unless $link || $is_cross;
 
-    unless ($from) {
-        my $lt = $link->local_table;
-        if ($lt eq $self->{+PRIMARY_SOURCE}->name) {
-            $from = $self->{+ORDER}->[0];
+    my $joined;
+    if ($link) {
+        if ($from && !$self->{+COMPONENTS}->{$from}) {
+            my $check = $self->{+LOOKUP}->{$from};
+            croak "'$from' is not defined" unless $check && @$check;
+            croak "'$from' source has multiple aliases: " . join(', ' => @$check) if @$check > 1;
+            ($from) = @$check;
         }
-        elsif (my $n = $self->{+LOOKUP}->{$lt}) {
-            croak "Table '$lt' has been joined multiple times, you must specify which name to use in the join" if @$n > 1;
-            $from = $n->[0];
-        }
-        else {
-            croak "Table '$lt' is not yet in the join";
-        }
-    }
 
-    my $joined = $self->schema->table($link->other_table);
+        unless ($from) {
+            my $lt = $link->local_table;
+            if ($lt eq $self->{+PRIMARY_SOURCE}->name) {
+                $from = $self->{+ORDER}->[0];
+            }
+            elsif (my $n = $self->{+LOOKUP}->{$lt}) {
+                croak "Table '$lt' has been joined multiple times, you must specify which name to use in the join" if @$n > 1;
+                $from = $n->[0];
+            }
+            else {
+                croak "Table '$lt' is not yet in the join";
+            }
+        }
+
+        $joined = $self->schema->table($link->other_table);
+    }
+    else {
+        # Link-less CROSS join: no ON clause is emitted, so no 'from' side is
+        # needed either, only the table being joined.
+        my $table = $params{table} or croak "A 'table' is required for a link-less CROSS join";
+        $joined = blessed($table) ? $table : $self->schema->table($table);
+        $from = undef;
+    }
 
     push @{$self->{+ORDER}} => $as;
 
-    push @{$self->{+LOOKUP}->{$link->other_table}} => $as;
+    push @{$self->{+LOOKUP}->{$joined->source_orm_name}} => $as;
 
     $self->{+COMPONENTS}->{$as} = {
         as    => $as,

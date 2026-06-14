@@ -2,7 +2,7 @@ package DBIx::QuickORM::Manual::Querying;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 1;
 
@@ -263,12 +263,19 @@ already carried:
 
 =head2 Vivify
 
-C<vivify> builds a row object from a data hashref B<without> touching the
-database. Nothing is written until you call C<< $row->insert >> or
-C<< $row->save >> on it:
+C<vivify> gets you a row object to work with from a data hashref B<without>
+touching the database, much like Perl autovivifies a nested hash slot. If a
+row matching the data's primary key is already loaded it hands that one back;
+otherwise it builds a new one. Nothing is written until you call
+C<< $row->insert >> or C<< $row->save >> on it:
 
     my $row = $con->handle('people')->vivify({name => 'Bob'});
     $row->insert;    # now it hits the database
+
+On a hit the existing row wins and your data is not applied to it (you get a
+warning if that would silently drop differing values). To change a loaded row
+use C<< $row->update >>; to ensure a row exists in the database use
+C<find_or_insert> or C<update_or_insert>.
 
 =head1 ROW OBJECTS
 

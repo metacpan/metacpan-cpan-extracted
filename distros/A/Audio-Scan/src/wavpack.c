@@ -264,10 +264,11 @@ _wavpack_parse_block(wvpinfo *wvp)
     if (samplerate != NULL) {
       uint32_t song_length_ms;
 
-      if (wvp->header->flags & 0x80000000)
-        wvp->header->total_samples *= 8; // DSD
-
       song_length_ms = ((wvp->header->total_samples * 1.0) / SvIV(*samplerate)) * 1000;
+
+      // flags bit 31: 0 = PCM audio; 1 = DSD audio (5.0+)
+      if (wvp->header->flags & 0x80000000)
+		  song_length_ms *= 8;
 
       my_hv_store( wvp->info, "song_length_ms", newSVuv(song_length_ms) );
       my_hv_store( wvp->info, "bitrate", newSVuv( _bitrate(wvp->file_size - wvp->audio_offset, song_length_ms) ) );

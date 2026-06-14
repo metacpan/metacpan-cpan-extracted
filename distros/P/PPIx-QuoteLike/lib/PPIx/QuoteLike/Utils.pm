@@ -39,7 +39,7 @@ our @EXPORT_OK = qw{
     __variables
 };
 
-our $VERSION = '0.023';
+our $VERSION = '0.024';
 
 # Readonly::Scalar my $BRACED_RE	=> __match_enclosed( LEFT_CURLY );
 Readonly::Scalar my $BRACKETED_RE	=> __match_enclosed( '[' ); # ]
@@ -669,21 +669,20 @@ module, because of the possibility of a circular dependency.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=PPIx-QuoteLike>,
-L<https://github.com/trwyant/perl-PPIx-QuoteLike/issues>, or in
+L<https://github.com/trwyant/perl-PPIx-QuoteLike/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III F<wyant at cpan dot org>
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2016-2022 by Thomas R. Wyant, III
+Copyright (C) 2016-2022, 2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

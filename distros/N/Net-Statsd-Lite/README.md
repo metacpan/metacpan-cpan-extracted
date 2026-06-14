@@ -47,12 +47,13 @@ specified. But it otherwise does not enforce maximum/minimum values.
 
 # RECENT CHANGES
 
-Changes for version v0.11.1 (2026-05-23)
+Changes for version v0.11.2 (2026-06-13)
 
-- Documentation
-    - Fixed inconsistent POD markup.
-    - Updated SECURITY CONSIDERATIONS about tagging extensions.
-    - Fixed a bug in an example.
+- Toolchain
+    - Set the static install flag.
+    - Adjusted build prerequisites to be recommended instead of required.
+    - Included automation-policy.json.
+    - Sign distribution with SigStore.
 
 See the `Changes` file for more details.
 

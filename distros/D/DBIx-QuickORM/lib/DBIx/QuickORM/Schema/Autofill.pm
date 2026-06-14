@@ -2,8 +2,9 @@ package DBIx::QuickORM::Schema::Autofill;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
+use Carp qw/croak/;
 use DBIx::QuickORM::Util qw/load_class/;
 
 use Object::HashBase qw{
@@ -67,21 +68,24 @@ Nested hashref describing what to skip during autofill.
 
 =cut
 
+# Maps each valid hook name to its seed key: the args key whose value is
+# threaded through the callbacks registered for that hook.
 my %HOOKS = (
-    column         => 1,
-    columns        => 1,
-    index          => 1,
-    indexes        => 1,
-    links          => 1,
-    post_column    => 1,
-    post_table     => 1,
-    pre_column     => 1,
-    pre_table      => 1,
-    primary_key    => 1,
-    table          => 1,
-    unique_keys    => 1,
-    link_accessor  => 1,
-    field_accessor => 1,
+    column         => 'column',
+    columns        => 'columns',
+    index          => 'index',
+    indexes        => 'indexes',
+    links          => 'links',
+    post_column    => 'column',
+    post_table     => 'table',
+    pre_column     => 'column',
+    pre_table      => 'table',
+    primary_key    => 'primary_key',
+    table          => 'table',
+    tables         => 'tables',
+    unique_keys    => 'unique_keys',
+    link_accessor  => 'name',
+    field_accessor => 'name',
 );
 
 =pod
@@ -105,16 +109,33 @@ sub is_valid_hook {
 
 =item $out = $autofill->hook($name, \%args, $seed)
 
-Run every callback registered for the named hook, threading the result through
-each call starting from C<$seed>, and return the final value.
+Run every callback registered for the named hook as a pipeline. Each hook has
+a designated seed key in C<\%args> (for example C<table> for the table hooks,
+C<name> for the accessor hooks). Every callback is called with the args (plus
+C<autofill>) with the running value under the seed key, and its return value
+becomes the running value passed to the next callback and ultimately returned.
+A callback that modifies the seed in place must still return it so the
+callbacks after it (and the caller) see the same value. The pipeline starts
+from C<$seed> when given, otherwise from the seed key's value in C<\%args>;
+with a single registered callback this matches the old single-callback
+behavior exactly.
 
 =cut
 
 sub hook {
     my $self = shift;
     my ($hook, $args, $seed) = @_;
-    my $out = $seed;
-    $out = $_->(%$args, autofill => $self) for @{$self->{+HOOKS}->{$hook} // []};
+
+    croak "'$hook' is not a valid hook" unless $HOOKS{$hook};
+
+    my $key = $HOOKS{$hook};
+    my $out = @_ > 2 ? $seed : $args->{$key};
+
+    for my $cb (@{$self->{+HOOKS}->{$hook} // []}) {
+        $args->{$key} = $out;
+        $out = $cb->(%$args, autofill => $self);
+    }
+
     return $out;
 }
 
@@ -131,7 +152,8 @@ sub skip {
     my $self = shift;
 
     my $from = $self->{+SKIP};
-    while(my $arg = shift @_) {
+    while (@_) {
+        my $arg = shift @_;
         $from = $from->{$arg} or return 0;
     }
     return $from;

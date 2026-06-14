@@ -4,7 +4,7 @@ Tested with Visual Studio 2010 Express.
 
 zlib
 ----
-Download zlib from http://zlib.net/zlib128.zip and extract
+Download zlib from https://zlib.net/zlib1211.zip and extract
 Open command prompt using MS Visual Studio start menu entry or run the vcvars file,
  for example C:\Program Files\Microsoft Visual Studio 10.0\VC\vcvarsall.bat
 nmake -f win32/Makefile.msc

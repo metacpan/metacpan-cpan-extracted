@@ -1,4 +1,4 @@
-use Test2::V0;
+use Test2::V0 '!meta', '!pass';
 use DBI;
 use Data::Dumper;
 use File::Temp qw/tempdir/;

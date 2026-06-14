@@ -2,7 +2,7 @@ package DBIx::QuickORM::Role::STH;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use Carp qw/croak/;
 
@@ -23,7 +23,9 @@ The common interface for the statement-handle wrappers
 contract: fetch the result, check readiness, pull rows, and finalize.
 
 Provides default C<cancel_supported> (false) and C<cancel> (croaks);
-cancellable handles override both.
+cancellable handles override both. Also provides C<cancel_on_destroy> (true):
+a handle whose destructor should wait for completion instead of cancelling an
+unfinished query overrides it to false.
 
 =head1 REQUIRED METHODS
 
@@ -35,6 +37,8 @@ C<result>, C<ready>, C<done>, C<set_done>, C<clear>, C<next>.
 sub cancel_supported { 0 }
 
 sub cancel { croak "cancel() is not supported" }
+
+sub cancel_on_destroy { 1 }
 
 1;
 

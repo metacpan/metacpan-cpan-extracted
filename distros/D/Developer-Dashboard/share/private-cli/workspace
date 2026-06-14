@@ -25,6 +25,8 @@ workspace - private tmux workspace helper for Developer Dashboard
 =head1 SYNOPSIS
 
   dashboard workspace <workspace-ref>
+  dashboard workspace -c <workspace-ref>
+  dashboard workspace <workspace-ref> -c
 
 =head1 DESCRIPTION
 
@@ -62,6 +64,14 @@ tmux session environment, refreshes layered plain-directory C<.env> values from
 the highest ancestor down to the current directory, creates a detached C<Code1>
 window when the session does not exist yet, and then attaches to that session.
 
+Adding C<-c> before or after the workspace name changes directory first: when
+the workspace name is registered in the dashboard paths inventory (the same
+registered names the shell C<cdr> helper resolves), the helper changes into
+that registered directory before planning the session, so the tmux session and
+its layered C<.env> refresh both start from the registered project directory.
+When the name is not a registered dashboard path, C<-c> fails with an explicit
+error instead of silently starting the workspace from the wrong directory.
+
 =head1 WHAT USES IT
 
 It is used by workspace-session workflows in the shell, by prompt integrations
@@ -74,6 +84,8 @@ that verify explicit workspace selection, env refresh, and environment fallback.
   dashboard workspace DD-123
   WORKSPACE_REF=DD-123 dashboard workspace
   dashboard workspace feature-branch-42
+  dashboard workspace -c foobar
+  dashboard workspace foobar -c
 
 =for comment FULL-POD-DOC END
 

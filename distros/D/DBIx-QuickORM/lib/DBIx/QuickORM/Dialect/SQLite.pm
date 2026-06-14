@@ -2,7 +2,7 @@ package DBIx::QuickORM::Dialect::SQLite;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use DBD::SQLite 1.0;
 
@@ -45,12 +45,6 @@ and savepoints via the SQLite driver, and reports SQLite's feature set
 
 =over 4
 
-=item $ver = $dialect->fallback_ver
-
-=item $ver = $dialect->oldest_ver
-
-=item $ver = $dialect->latest_ver
-
 =item $driver = $dialect->dbi_driver
 
 =item $name = $dialect->dialect_name
@@ -65,10 +59,14 @@ and savepoints via the SQLite driver, and reports SQLite's feature set
 
 =item $bool = $dialect->async_cancel_supported
 
-=item $bool = $dialect->version_search
+Feature flags and constants describing the SQLite dialect. SQLite does not
+support async queries.
 
-Feature flags and constants describing the SQLite dialect. SQLite has no
-versioned dialect variants and does not support async queries.
+=item $stype = $dialect->supports_type($type)
+
+Returns SQLite's native storage type name for a supported logical type, or
+nothing. SQLite has no native JSON type; JSON-ish types fall back to C<TEXT>
+via C<supports_type('text')>.
 
 =item $dialect->async_prepare_args
 
@@ -82,19 +80,34 @@ SQLite does not support async queries; these C<croak>.
 
 =item $version = $dialect->db_version
 
-The installed C<DBD::SQLite> version.
+The version of the SQLite library itself (not the C<DBD::SQLite> module
+version).
 
 =cut
 
 # {{{ Feature flags, version info, and async stubs
 
-sub fallback_ver { 1 }
-sub oldest_ver   { 1 }
-sub latest_ver   { 1 }
 sub dbi_driver   { 'DBD::SQLite' }
 sub dialect_name { 'SQLite' }
 
 sub datetime_formatter { 'DateTime::Format::SQLite' }
+
+# SQLite's real storage types. There is no native JSON type; types like JSON
+# fall back to TEXT via supports_type('text').
+my %TYPES = (
+    text    => 'TEXT',
+    integer => 'INTEGER',
+    int     => 'INTEGER',
+    real    => 'REAL',
+    blob    => 'BLOB',
+    numeric => 'NUMERIC',
+);
+sub supports_type {
+    my $self = shift;
+    my ($type) = @_;
+    return undef unless defined $type;
+    return $TYPES{lc($type)};
+}
 
 sub supports_returning_update { 1 }
 sub supports_returning_insert { 1 }
@@ -107,9 +120,7 @@ sub async_ready            { croak "Dialect '" . $_[0]->dialect_name . "' does n
 sub async_result           { croak "Dialect '" . $_[0]->dialect_name . "' does not support async queries" }
 sub async_cancel           { croak "Dialect '" . $_[0]->dialect_name . "' does not support async queries" }
 
-sub version_search { 0 }
-
-sub db_version { my $self = shift; DBD::SQLite->VERSION }
+sub db_version { my $self = shift; $self->dbh->{sqlite_version} }
 
 # }}} Feature flags, version info, and async stubs
 
@@ -208,6 +219,7 @@ sub build_tables_from_db {
 
         while (my ($tname, $type, $temp) = $sth->fetchrow_array) {
             next if $tname =~ m/^sqlite_/;
+            next if $params{autofill}->skip(table => $tname);
 
             my $table = {name => $tname, db_name => $tname, is_temp => $temp};
             my $class = $TABLE_TYPES{lc($type)} // 'DBIx::QuickORM::Schema::Table';
@@ -223,8 +235,10 @@ sub build_tables_from_db {
 
             $params{autofill}->hook(post_table => {table => $table, class => \$class});
 
-            $tables{$tname} = $class->new($table);
-            $params{autofill}->hook(table => {table => $tables{$tname}});
+            # Hooks may rename the table; key by the final name.
+            my $final_name = $table->{name};
+            $tables{$final_name} = $class->new($table);
+            $params{autofill}->hook(table => {table => $tables{$final_name}});
         }
     }
 
@@ -246,9 +260,10 @@ sub build_table_keys_from_db {
     my $dbh = $self->{+DBH};
 
     my $sth = $dbh->prepare(<<"    EOT");
-        SELECT il.name AS grp,
-               origin  AS type,
-               ii.name AS column
+        SELECT il.name     AS grp,
+               il.origin   AS type,
+               il.`unique` AS uniq,
+               ii.name     AS column
          FROM pragma_index_list(?)       AS il,
               pragma_index_info(il.name) AS ii
      ORDER BY seq, il.name, seqno, cid
@@ -261,12 +276,17 @@ sub build_table_keys_from_db {
     my %index;
     while (my $row = $sth->fetchrow_hashref()) {
         my $idx = $index{$row->{grp}} //= {};
-        $idx->{type} = $row->{type};
+        $idx->{type}   = $row->{type};
+        $idx->{unique} = $row->{uniq};
         push @{$idx->{cols} //= []} => $row->{column};
     }
 
-    for my $idx (sort values %index) {
-        $unique{column_key(@{$idx->{cols}})} = $idx->{cols};
+    # Only indexes flagged unique are unique constraints; a plain CREATE INDEX
+    # must not be recorded as one. The flag (not the origin) is the signal:
+    # CREATE UNIQUE INDEX also has origin 'c'.
+    for my $grp (sort keys %index) {
+        my $idx = $index{$grp};
+        $unique{column_key(@{$idx->{cols}})} = $idx->{cols} if $idx->{unique};
         $pk = $idx->{cols} if $idx->{type} eq 'pk';
     }
 
@@ -316,13 +336,16 @@ sub table_has_autoinc {
     my ($table) = @_;
 
     croak "A table name is required" unless $table;
-    my $dbh = $self->{+DBH};
 
-    my $sth = $dbh->prepare(qq{SELECT 1 FROM sqlite_master WHERE tbl_name=? AND sql LIKE "\%AUTOINCREMENT\%"});
-    $sth->execute($table);
-    my ($res) = $sth->fetchrow_array;
+    my $ddl = $self->_table_ddl($table) // return 0;
 
-    return $res ? 1 : 0;
+    # AUTOINCREMENT is only valid as part of a column definition's PRIMARY KEY
+    # constraint, so match that grammar in the table's own CREATE TABLE DDL.
+    # Matching the bare word against every sqlite_master row for the table
+    # would false-positive on triggers (separate rows, excluded by the
+    # type='table' filter in _table_ddl) and on comments or string literals
+    # (stripped by _strip_sql_noise).
+    return $self->_strip_sql_noise($ddl) =~ m/\bPRIMARY\s+KEY(?:\s+(?:ASC|DESC))?(?:\s+ON\s+CONFLICT\s+\w+)?\s+AUTOINCREMENT\b/i ? 1 : 0;
 }
 
 =pod
@@ -349,12 +372,17 @@ sub build_columns_from_db {
     my $sth = $dbh->prepare("SELECT * FROM pragma_table_xinfo(?)");
     $sth->execute($table);
 
-    my $has_autoinc = $self->table_has_autoinc($table);
+    # A rowid-alias column auto-assigns on insert (with or without
+    # AUTOINCREMENT, which only changes rowid allocation policy), matching the
+    # identity semantics of the other engines.
+    my $identity_col = $self->_rowid_alias_column($table);
 
     my (%columns, @links);
     while (my $res = $sth->fetchrow_hashref) {
         my $hidden = $res->{hidden} // 0;
         next if $hidden == 1;    # hidden virtual-table columns are not part of the ORM schema
+
+        next if $params{autofill}->skip(column => ($table, $res->{name}));
 
         my $col = {};
 
@@ -363,7 +391,7 @@ sub build_columns_from_db {
         $col->{name}    = $res->{name};
         $col->{db_name} = $res->{name};
         $col->{order}   = $res->{cid} + 1;
-        $col->{identity}  = 1 if $has_autoinc && $res->{pk};
+        $col->{identity}  = 1 if defined($identity_col) && $res->{name} eq $identity_col;
         $col->{generated} = 1 if $hidden >= 2;
 
         my $type = $res->{type};
@@ -433,8 +461,6 @@ sub build_indexes_from_db {
 
 Returns the primary-key column names for a table, ordered by key position.
 
-=back
-
 =cut
 
 sub _primary_key {
@@ -450,6 +476,82 @@ sub _primary_key {
     }
 
     return @out;
+}
+
+=pod
+
+=item $ddl_or_undef = $dialect->_table_ddl($table)
+
+The stored C<CREATE TABLE> statement for the named table (permanent or temp),
+or undef when the table does not exist.
+
+=cut
+
+sub _table_ddl {
+    my $self = shift;
+    my ($table) = @_;
+
+    my $dbh = $self->dbh;
+
+    my ($ddl) = $dbh->selectrow_array("SELECT sql FROM sqlite_master WHERE type = 'table' AND name = ?", undef, $table);
+    ($ddl) = $dbh->selectrow_array("SELECT sql FROM sqlite_temp_master WHERE type = 'table' AND name = ?", undef, $table) unless defined $ddl;
+
+    return $ddl;
+}
+
+=pod
+
+=item $sql = $dialect->_strip_sql_noise($sql)
+
+Returns the SQL with string literals replaced by empty strings and comments
+removed, so keyword matching cannot false-positive on either.
+
+=cut
+
+sub _strip_sql_noise {
+    my $self = shift;
+    my ($sql) = @_;
+
+    # One left-to-right pass so a quote inside a comment (or a comment marker
+    # inside a string) cannot derail the other rule.
+    $sql =~ s{('(?:[^']|'')*')|(--[^\n]*)|(/\*.*?\*/)}{defined $1 ? "''" : " "}ges;
+
+    return $sql;
+}
+
+=pod
+
+=item $col_or_undef = $dialect->_rowid_alias_column($table)
+
+The name of the column that aliases SQLite's rowid, or undef if the table has
+none. The alias rule: a rowid table (no C<WITHOUT ROWID>) with a single-column
+primary key whose declared type is exactly C<INTEGER> (C<INT>, C<BIGINT>, etc.
+do not alias). Not handled: the obscure C<x INTEGER PRIMARY KEY DESC>
+column-definition form, which SQLite does not treat as an alias.
+
+=back
+
+=cut
+
+sub _rowid_alias_column {
+    my $self = shift;
+    my ($table) = @_;
+
+    my $sth = $self->dbh->prepare("SELECT name, type FROM pragma_table_xinfo(?) WHERE pk > 0 AND (hidden IS NULL OR hidden < 2)");
+    $sth->execute($table);
+
+    my @pk;
+    while (my $row = $sth->fetchrow_hashref()) {
+        push @pk => $row;
+    }
+
+    return undef unless @pk == 1;
+    return undef unless uc($pk[0]->{type} // '') eq 'INTEGER';
+
+    my $ddl = $self->_table_ddl($table);
+    return undef if defined($ddl) && $self->_strip_sql_noise($ddl) =~ m/\bWITHOUT\s+ROWID\b/i;
+
+    return $pk[0]->{name};
 }
 
 ###############################################################################

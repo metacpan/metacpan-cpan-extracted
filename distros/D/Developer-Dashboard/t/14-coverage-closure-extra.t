@@ -494,6 +494,33 @@ PAGE
 }
 
 {
+    my @spawned;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::is_windows = sub { return 1 };
+        local *Developer::Dashboard::CollectorRunner::_windows_background_worker_command = sub {
+            my ( undef, $name, $loop_pid ) = @_;
+            return ( 'perl.exe', '_dashboard-core', 'collector-worker-foreground', '--name', $name, '--loop-pid', $loop_pid );
+        };
+        local *Developer::Dashboard::CollectorRunner::_spawn_windows_background_command = sub {
+            my ( undef, @command ) = @_;
+            @spawned = @command;
+            return 7171;
+        };
+        is(
+            $runner->_start_loop_worker( { command => 'true' }, 'windows.worker', 'dashboard collector: windows.worker' ),
+            7171,
+            '_start_loop_worker returns the detached Windows collector worker pid',
+        );
+    }
+    is_deeply(
+        \@spawned,
+        [ 'perl.exe', '_dashboard-core', 'collector-worker-foreground', '--name', 'windows.worker', '--loop-pid', $$ ],
+        '_start_loop_worker launches the detached Windows collector worker helper command',
+    );
+}
+
+{
     no warnings 'redefine';
     local *Developer::Dashboard::CollectorRunner::_fork_process = sub { return undef };
     my $error = eval { $runner->_start_loop_worker( { command => 'true' }, 'fork.fail', 'title' ); 1 } ? '' : $@;

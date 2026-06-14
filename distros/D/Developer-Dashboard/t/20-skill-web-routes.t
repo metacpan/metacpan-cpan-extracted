@@ -8,6 +8,7 @@ use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
 use Test::More;
+use URI::Escape qw(uri_escape);
 
 use lib 'lib';
 use Developer::Dashboard::PageDocument;
@@ -68,6 +69,48 @@ is( $index->[0], 200, 'installed skill index route returns success' );
 like( $index->[2], qr/Skill Route Index/, 'installed skill index route renders the skill index bookmark' );
 like( $index->[2], qr/Skill Route Nav/, 'installed skill index route renders skill nav fragments' );
 like( $index->[2], qr/Other Skill Nav/, 'installed skill index route also renders nav fragments from other installed skills' );
+like( $index->[2], qr{href="/app/route-skill/edit" id="view-source-url"}, 'installed skill index render exposes the smart-routed edit link' );
+
+my $index_edit = $app->handle(
+    path        => '/app/route-skill/edit',
+    method      => 'GET',
+    headers     => { host => '127.0.0.1' },
+    remote_addr => '127.0.0.1',
+);
+is( $index_edit->[0], 200, 'installed skill index edit route returns success' );
+like( $index_edit->[2], qr{<form method="post" action="/app/route-skill/edit" id="instruction-form">}, 'installed skill index edit route posts back to the smart-routed edit alias' );
+like( $index_edit->[2], qr/Skill Route Index/, 'installed skill index edit route loads the skill index bookmark source' );
+
+my $index_source = $app->handle(
+    path        => '/app/route-skill/source',
+    method      => 'GET',
+    headers     => { host => '127.0.0.1' },
+    remote_addr => '127.0.0.1',
+);
+is( $index_source->[0], 200, 'installed skill index source route returns success' );
+like( $index_source->[2], qr/TITLE: Skill Route Index/, 'installed skill index source route returns the skill source text' );
+
+my $skill_play_instruction = <<'BOOKMARK';
+TITLE: Skill Route Index
+:--------------------------------------------------------------------------------:
+BOOKMARK: index
+:--------------------------------------------------------------------------------:
+HTML:
+Skill Route Index Edited
+BOOKMARK
+my $index_play = $app->handle(
+    path        => '/app/route-skill/edit',
+    method      => 'POST',
+    body        => 'mode=render&instruction=' . _uri_escape($skill_play_instruction),
+    headers     => {
+        host           => '127.0.0.1',
+        'content-type' => 'application/x-www-form-urlencoded',
+    },
+    remote_addr => '127.0.0.1',
+);
+is( $index_play->[0], 200, 'installed skill index play POST returns success' );
+like( $index_play->[2], qr/Skill Route Index Edited/, 'installed skill index play POST renders the edited transient skill page' );
+like( $index_play->[2], qr{href="/app/route-skill/edit" id="view-source-url"}, 'installed skill index play POST keeps the smart-routed view source link' );
 
 my $render = $app->handle(
     path        => '/app/route-skill/foo',
@@ -116,6 +159,57 @@ like( $custom_page->[2], qr/Skill Route Foo/, 'custom skill app page route rende
     local *Developer::Dashboard::SkillDispatcher::resolve_route_segments = sub { return; };
     my $missing_nested_spec = $app->_skill_app_fallback_response( id => 'route-skill/foo' );
     is( $missing_nested_spec->[0], 404, 'skill route fallback returns 404 when an installed skill prefix exists but no deeper route resolves' );
+}
+
+{
+    no warnings 'redefine';
+    my $loaded_route_id = '';
+    local *Developer::Dashboard::Web::App::_resolve_skill_route_spec = sub {
+        return {
+            skill_name     => 'route-skill',
+            route_segments => [],
+            skill_layers   => ['layer'],
+        };
+    };
+    local *Developer::Dashboard::Web::App::_skill_dispatcher = sub { bless {}, 'Local::SkillDispatcherProbe' };
+    local *Local::SkillDispatcherProbe::_load_skill_page = sub {
+        my ( $self, %args ) = @_;
+        $loaded_route_id = $args{route_id};
+        return Developer::Dashboard::PageDocument->new(
+            id    => 'route-skill',
+            title => 'Skill Route Index',
+            meta  => { source_kind => 'skill' },
+        );
+    };
+    my $empty_route_page = $app->_load_skill_named_page('route-skill');
+    is( $loaded_route_id, 'index', 'empty smart route specs load the skill index bookmark id' );
+    isa_ok( $empty_route_page, 'Developer::Dashboard::PageDocument', 'empty smart route specs still return a page document' );
+    is( $empty_route_page->{meta}{render_route}, '/app/route-skill', 'empty smart route specs keep the canonical smart-routed render alias' );
+}
+
+{
+    no warnings 'redefine';
+    my $loaded_route_id = '';
+    local *Developer::Dashboard::Web::App::_resolve_skill_route_spec = sub {
+        return {
+            skill_name   => 'route-skill',
+            skill_layers => ['layer'],
+        };
+    };
+    local *Developer::Dashboard::Web::App::_skill_dispatcher = sub { bless {}, 'Local::SkillDispatcherProbeMissingSegments' };
+    local *Local::SkillDispatcherProbeMissingSegments::_load_skill_page = sub {
+        my ( $self, %args ) = @_;
+        $loaded_route_id = $args{route_id};
+        return Developer::Dashboard::PageDocument->new(
+            id    => 'route-skill',
+            title => 'Skill Route Index',
+            meta  => { source_kind => 'skill' },
+        );
+    };
+    my $missing_segments_page = $app->_load_skill_named_page('route-skill');
+    is( $loaded_route_id, 'index', 'missing smart route segments default to the skill index bookmark id' );
+    isa_ok( $missing_segments_page, 'Developer::Dashboard::PageDocument', 'missing smart route segments still return a page document' );
+    is( $missing_segments_page->{meta}{render_route}, '/app/route-skill', 'missing smart route segments keep the canonical smart-routed render alias' );
 }
 
 my $ajax_page = $app->handle(
@@ -220,6 +314,17 @@ my $nested_index = $app->handle(
 is( $nested_index->[0], 200, 'nested skill index route returns success' );
 like( $nested_index->[2], qr/Nested Skill Index/, 'nested skill index route renders the nested skill bookmark' );
 like( $nested_index->[2], qr/Nested Skill Nav/, 'nested skill index route renders nav fragments contributed by the nested skill' );
+like( $nested_index->[2], qr{href="/app/route-skill/def/edit" id="view-source-url"}, 'nested skill index render exposes the smart-routed edit link' );
+
+my $nested_index_edit = $app->handle(
+    path        => '/app/route-skill/def/edit',
+    method      => 'GET',
+    headers     => { host => '127.0.0.1' },
+    remote_addr => '127.0.0.1',
+);
+is( $nested_index_edit->[0], 200, 'nested skill index edit route returns success' );
+like( $nested_index_edit->[2], qr{<form method="post" action="/app/route-skill/def/edit" id="instruction-form">}, 'nested skill index edit route posts back to the nested smart-routed edit alias' );
+like( $nested_index_edit->[2], qr/Nested Skill Index/, 'nested skill index edit route loads the nested skill index bookmark source' );
 
 my $nested_page = $app->handle(
     path        => '/app/route-skill/def/foo',
@@ -397,6 +502,11 @@ my $missing_bookmark = $app->handle(
 );
 is( $missing_bookmark->[0], 404, 'missing skill bookmark routes return 404' );
 
+sub _uri_escape {
+    my ($text) = @_;
+    return uri_escape($text);
+}
+
 done_testing();
 
 END {
@@ -483,6 +593,7 @@ BOOKMARK
       "type" : "text/plain; charset=utf-8"
    }
 }
+
 JSON
             ($name) x 7,
         ),

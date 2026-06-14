@@ -2,7 +2,7 @@ package Pod::Weaver::Section::InstallationInstructions;
 
 # ABSTRACT: generate POD with installation instructions
 
-use v5.20;
+use v5.24;
 
 use Moose;
 with 'Pod::Weaver::Role::Section';
@@ -17,11 +17,11 @@ use Pod::Elemental::Element::Pod5::Region;
 use Pod::Elemental::Element::Pod5::Verbatim;
 use Types::Common qw( Bool Enum NonEmptySimpleStr SimpleStr );
 
-use experimental qw( lexical_subs postderef signatures );
+use experimental qw( lexical_subs signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.5.3';
+our $VERSION = 'v0.6.0';
 
 
 has header => (
@@ -203,7 +203,7 @@ Pod::Weaver::Section::InstallationInstructions - generate POD with installation 
 
 =head1 VERSION
 
-version v0.5.3
+version v0.6.0
 
 =head1 SYNOPSIS
 
@@ -298,7 +298,7 @@ L<Pod::Weaver::Section::Installation>
 
 Only the latest version of this module will be supported.
 
-This module requires Perl v5.20 or later.  Future releases may only support Perl versions released in the last ten
+This module requires Perl v5.24 or later.  Future releases may only support Perl versions released in the last ten
 years.
 
 =head2 Reporting Bugs and Submitting Feature Requests

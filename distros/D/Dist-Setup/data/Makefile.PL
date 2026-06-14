@@ -67,13 +67,14 @@ sub MY::postamble {
 
   push @postamble, <<"MAKE_FRAGMENT" if supported_platform();
 ALL_PM := \$(shell find lib -name "*.pm")
+TEST_PM := \$(shell find t -name "*.pm")
 ALL_EXE :=[% IF exe_files %][% FOREACH f IN exe_files %] [% f %][% END %][% END %]
 
 .PHONY: distupload cover critic rawcritic tidy spelling alltest clean clean_coverdb pod2html exe
 
 distupload: distcheck disttest
 \t\$(MAKE) tardist
-\tcpan-upload --directory Dist-Setup \$(DISTVNAME).tar\$(SUFFIX)
+\tcpan-upload --directory \$(DISTNAME) \$(DISTVNAME).tar\$(SUFFIX)
 
 cover:
 \tcover -test
@@ -86,7 +87,7 @@ rawcritic:
 \tperlcritic lib [% IF exe_files %]script[% END %]
 
 tidy:
-\tperltidy -b -bext='/' \$(ALL_PM) \$(ALL_EXE)
+\tperltidy -b -bext='/' \$(ALL_PM) \$(TEST_PM) \$(ALL_EXE)
 
 spelling: export EXTENDED_TESTING = 1
 spelling:

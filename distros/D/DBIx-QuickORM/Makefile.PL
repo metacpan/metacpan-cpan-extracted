@@ -63,14 +63,14 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Hash::Merge" => "0.12",
     "Parallel::Runner" => "0.013",
-    "Test2::Tools::QuickDB" => "0.000042",
+    "Test2::Tools::QuickDB" => "0.000051",
     "Test2::Util" => "0.000060",
     "Test2::V0" => "0.000060",
     "ok" => 0
   },
-  "VERSION" => "0.000022",
+  "VERSION" => "0.000023",
   "test" => {
-    "TESTS" => "t/*.t t/AI/*.t t/handle/*.t"
+    "TESTS" => "t/*.t t/AI/*.t t/AI/handle/*.t t/handle/*.t"
   }
 );
 
@@ -98,7 +98,7 @@ my %FallbackPrereqs = (
   "Scope::Guard" => "0.20",
   "Storable" => 0,
   "Sub::Util" => "1.40",
-  "Test2::Tools::QuickDB" => "0.000042",
+  "Test2::Tools::QuickDB" => "0.000051",
   "Test2::Util" => "0.000060",
   "Test2::V0" => "0.000060",
   "Time::HiRes" => 0,

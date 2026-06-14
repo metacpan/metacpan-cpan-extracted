@@ -153,8 +153,8 @@ use Audio::Scan;
     is( $info->{encoder_version}, 0x410, 'v5-dsd encoder_version ok' );
     is( $info->{file_size}, 690, 'v5-dsd file_size ok' );
     is( $info->{samplerate}, 2822400, 'v5-dsd samplerate ok' );
-    is( $info->{song_length_ms}, 1044491, 'v5-dsd song_length_ms ok' );
-    is( $info->{total_samples}, 2947973120, 'v5-dsd total_samples ok' );
+    is( $info->{song_length_ms}, 1044488, 'v5-dsd song_length_ms ok' );
+    is( $info->{total_samples}, 368496640, 'v5-dsd total_samples ok' );
 }
 
 sub _f {

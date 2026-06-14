@@ -5,6 +5,7 @@ use utf8;
 use Capture::Tiny qw(capture);
 use Cwd qw(abs_path cwd getcwd);
 use Encode qw(encode);
+use Errno qw(EACCES);
 use File::Path qw(make_path remove_tree);
 use File::Spec;
 use File::Temp qw(tempdir tempfile);
@@ -703,6 +704,71 @@ BASHRC
             '_shared_private_cli_root falls back to the first candidate when none of them contain _dashboard-core yet',
         );
     }
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::InternalCLI::dist_dir = sub { return $fake_private_cli };
+        local *Developer::Dashboard::InternalCLI::_module_install_lib_root = sub { return '' };
+        local $ENV{HOME} = '';
+        is_deeply(
+            [ Developer::Dashboard::InternalCLI::_shared_private_cli_root_candidates() ],
+            [
+                File::Spec->catdir( $fake_private_cli, 'private-cli' ),
+                $fake_private_cli,
+            ],
+            '_shared_private_cli_root_candidates keeps the explicit dist root when File::ShareDir already resolves the private-cli root itself',
+        );
+    }
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::InternalCLI::dist_dir = sub { return '' };
+        local *Developer::Dashboard::InternalCLI::_module_install_lib_root = sub { return '' };
+        local *Developer::Dashboard::InternalCLI::_home_private_cli_root_candidates = sub {
+            return ( '', undef, $fake_private_cli, $fake_private_cli );
+        };
+        is_deeply(
+            [ Developer::Dashboard::InternalCLI::_shared_private_cli_root_candidates() ],
+            [$fake_private_cli],
+            '_shared_private_cli_root_candidates filters empty and duplicate helper roots before returning them',
+        );
+    }
+
+    {
+        my $tmp = tempdir( CLEANUP => 1 );
+        my $source = File::Spec->catfile( $tmp, 'helper.pending' );
+        my $target = File::Spec->catfile( $tmp, 'helper' );
+        open my $source_fh, '>:raw', $source or die "Unable to write $source: $!";
+        print {$source_fh} "pending helper\n";
+        close $source_fh or die "Unable to close $source: $!";
+        open my $target_fh, '>:raw', $target or die "Unable to seed $target: $!";
+        print {$target_fh} "stale helper\n";
+        close $target_fh or die "Unable to close $target: $!";
+
+        my @rename_calls;
+        my @unlink_calls;
+        my $error = '';
+        {
+            no warnings 'redefine';
+            local *Developer::Dashboard::InternalCLI::is_windows = sub { return 1 };
+            local *Developer::Dashboard::InternalCLI::_rename_path = sub {
+                my ( $from, $to ) = @_;
+                push @rename_calls, [ $from, $to ];
+                $! = EACCES;
+                return 0;
+            };
+            local *Developer::Dashboard::InternalCLI::_unlink_path = sub {
+                my ($path) = @_;
+                push @unlink_calls, $path;
+                return unlink $path;
+            };
+            eval { Developer::Dashboard::InternalCLI::_replace_helper_file( $source, $target ); 1 } or $error = $@;
+        }
+
+        like( $error, qr/Unable to rename \Q$source\E to \Q$target\E: Permission denied/, '_replace_helper_file surfaces the final Windows helper rename failure after the retry also fails' );
+        is( scalar @rename_calls, 2, '_replace_helper_file attempts the Windows helper rename twice before failing' );
+        is_deeply( \@unlink_calls, [ $target, $source ], '_replace_helper_file removes the stale target and then cleans up the pending helper file after the retry fails' );
+    }
 }
 
 is( $paths->home, $home, 'home accessor works' );
@@ -719,6 +785,28 @@ dies_like(
     qr/Missing home directory/,
     'path registry requires a home directory',
 );
+
+{
+    local $ENV{HOME};
+    local $ENV{USERPROFILE} = $home;
+    is(
+        Developer::Dashboard::PathRegistry->new( home => undef )->home,
+        $home,
+        'path registry falls back to USERPROFILE when HOME is missing on Windows-shaped environments',
+    );
+}
+
+{
+    local $ENV{HOME};
+    local $ENV{USERPROFILE};
+    local $ENV{HOMEDRIVE} = 'C:';
+    local $ENV{HOMEPATH}  = '\\Users\\Docker';
+    is(
+        Developer::Dashboard::PathRegistry->new( home => undef )->home,
+        File::Spec->catdir( 'C:', '\\Users\\Docker' ),
+        'path registry falls back to HOMEDRIVE and HOMEPATH when HOME and USERPROFILE are missing',
+    );
+}
 
 my $resolved_home = $paths->resolve_dir('home');
 is( $resolved_home, $home, 'resolve_dir resolves method-backed names' );
@@ -3242,6 +3330,12 @@ chdir $original_cwd or die $!;
     is( $auth->trust_tier( remote_addr => '127.0.0.1', host => '127.0.0.1:7890' ), 'admin', 'auth trusts exact loopback host headers as admin traffic' );
     is( $auth->trust_tier( remote_addr => '::1', host => '[::1]:7890' ), 'admin', 'auth trusts exact IPv6 loopback host headers as admin traffic' );
     is( $auth->trust_tier( remote_addr => '127.0.0.1', host => 'localhost:7890' ), 'admin', 'auth trusts localhost hostnames that resolve only to loopback' );
+    is( $auth->trust_tier( remote_addr => '127.0.0.999', host => '127.0.0.1:7890' ), 'helper', 'auth keeps loopback-looking remote addresses with invalid octets out of the admin tier' );
+    ok( !$auth->_ip_is_loopback('127.0.0.999'), '_ip_is_loopback rejects final octets above 255' );
+    ok( !$auth->_ip_is_loopback('127.999.0.1'), '_ip_is_loopback rejects middle octets above 255' );
+    ok( !$auth->_ip_is_loopback('127.0.0.256'), '_ip_is_loopback rejects the first invalid octet boundary value' );
+    ok( $auth->_ip_is_loopback('127.0.0.1'), '_ip_is_loopback keeps the exact numeric loopback address trusted' );
+    ok( $auth->_ip_is_loopback('127.255.255.254'), '_ip_is_loopback accepts the full valid 127.0.0.0/8 loopback range' );
     {
         no warnings qw(redefine once);
         local *Developer::Dashboard::Auth::getaddrinfo = sub {
@@ -3869,6 +3963,52 @@ close $stale_pid;
 }
 
 {
+    my @spawned;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::is_windows = sub { return 1 };
+        local *Developer::Dashboard::CollectorRunner::_windows_background_loop_command = sub {
+            my ( undef, $name ) = @_;
+            return ( 'perl.exe', '_dashboard-core', 'collector-loop-foreground', '--name', $name );
+        };
+        local *Developer::Dashboard::CollectorRunner::_spawn_windows_background_command = sub {
+            my ( undef, @command ) = @_;
+            @spawned = @command;
+            return 6161;
+        };
+        my $pid = $runner->start_loop(
+            {
+                name     => 'windows-loop',
+                command  => q{printf 'loop'},
+                cwd      => 'home',
+                interval => 5,
+            }
+        );
+        is( $pid, 6161, 'start_loop returns the detached Windows collector loop pid' );
+    }
+    is_deeply(
+        \@spawned,
+        [ 'perl.exe', '_dashboard-core', 'collector-loop-foreground', '--name', 'windows-loop' ],
+        'start_loop launches the detached Windows collector loop helper command',
+    );
+    is(
+        $runner->loop_state('windows-loop')->{status},
+        'starting',
+        'start_loop records starting state for detached Windows collector loops',
+    );
+    is(
+        $runner->{collectors}->read_job('windows-loop')->{schedule},
+        'interval',
+        'start_loop persists the loop schedule for detached Windows collector helpers',
+    );
+    my $windows_loop_pidfile = File::Spec->catfile( $paths->collectors_root, 'windows-loop.pid' );
+    open my $windows_loop_pid_fh, '<', $windows_loop_pidfile or die $!;
+    local $/;
+    is( <$windows_loop_pid_fh>, '6161', 'start_loop writes the detached Windows collector loop pidfile' );
+    close $windows_loop_pid_fh or die $!;
+}
+
+{
     if ($under_cover) {
         pass('start_loop also returns a pid for failing jobs');
         pass('failing loops keep state metadata for management');
@@ -4014,6 +4154,43 @@ ok( !Developer::Dashboard::CollectorRunner::_cron_match('*/2', 5), 'cron matcher
 }
 
 {
+    my $name = 'error.loop';
+    my $sleep_calls = 0;
+    no warnings 'redefine';
+    local *Developer::Dashboard::CollectorRunner::_job_is_due = sub { return 1 };
+    local *Developer::Dashboard::CollectorRunner::_start_loop_worker = sub {
+        die "worker spawn exploded\n";
+    };
+    local *Developer::Dashboard::CollectorRunner::_reap_finished_loop_workers = sub { return 0 };
+    local *Developer::Dashboard::CollectorRunner::_sleep_until_next_tick = sub {
+        $sleep_calls++;
+        die "stop loop\n" if $sleep_calls >= 1;
+        return 0;
+    };
+    eval {
+        $runner->_run_loop_child(
+            job => {
+                name     => $name,
+                command  => q{printf fail},
+                cwd      => 'home',
+                interval => 9,
+            },
+            name      => $name,
+            interval  => 1,
+            daemonize => 0,
+        );
+        1;
+    };
+    like( $@, qr/stop loop/, '_run_loop_child error-path test stops after the injected tick break' );
+    my $loop_state = $runner->loop_state($name);
+    is( $loop_state->{status}, 'error', '_run_loop_child records an error status when worker launch dies' );
+    is( $loop_state->{configured_interval}, 9, '_run_loop_child preserves the configured interval when the active schedule interval is throttled for the loop' );
+    is( $loop_state->{schedule}, 'interval', '_run_loop_child records the derived interval schedule in the error state payload' );
+    like( $loop_state->{error}, qr/worker spawn exploded/, '_run_loop_child stores the worker launch error text in loop state' );
+    like( $files->read('collector_log'), qr/\[$name\] worker spawn exploded/, '_run_loop_child appends worker launch errors to the collector log' );
+}
+
+{
     my @spawned;
     my $tick_sleeps = 0;
     no warnings 'redefine';
@@ -4076,6 +4253,38 @@ ok( !Developer::Dashboard::CollectorRunner::_cron_match('*/2', 5), 'cron matcher
     };
     like( $@, qr/stop loop/, 'collector loop signal-reap test stops after the injected CHLD event' );
     ok( $reap_calls >= 2, 'collector loop reaps finished workers both during the loop and from the CHLD handler' );
+}
+
+{
+    my $name = 'worker.error.loop';
+    my $pid = fork();
+    die "fork failed for worker error test: $!" if !defined $pid;
+    if ( !$pid ) {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::run_once = sub {
+            die "worker run_once exploded\n";
+        };
+        $runner->_run_loop_worker(
+            {
+                name     => $name,
+                command  => q{printf worker},
+                cwd      => 'home',
+                interval => 12,
+            },
+            $name,
+            'dashboard collector: worker.error.loop',
+            77777,
+        );
+        POSIX::_exit(0);
+    }
+    waitpid( $pid, 0 );
+    is( $? >> 8, 255, '_run_loop_worker exits 255 when run_once dies inside the worker child' );
+    my $loop_state = $runner->loop_state($name);
+    is( $loop_state->{status}, 'error', '_run_loop_worker records an error status when the worker run dies' );
+    is( $loop_state->{pid}, 77777, '_run_loop_worker preserves the parent loop pid in the error state payload' );
+    is( $loop_state->{schedule}, 'interval', '_run_loop_worker records the derived schedule when worker error state is written' );
+    like( $loop_state->{error}, qr/worker run_once exploded/, '_run_loop_worker stores the worker failure text in loop state' );
+    like( $files->read('collector_log'), qr/\[$name\] worker run_once exploded/, '_run_loop_worker appends worker failure text to the collector log' );
 }
 
 {
@@ -4164,11 +4373,16 @@ ok( !Developer::Dashboard::CollectorRunner::_cron_match('*/2', 5), 'cron matcher
 
     is( $runner->stop_loop('singleton-live'), $loop_pid, 'stop_loop returns the singleton loop pid for a live long-running collector' );
     for ( 1 .. 40 ) {
-        last if !kill( 0, $worker_pid ) && !kill( 0, $command_pid );
+        last
+          if !$runner->_pid_is_running($worker_pid)
+          && !$runner->_pid_is_running($command_pid);
         sleep 0.1;
     }
-    ok( !kill( 0, $worker_pid ), 'stop_loop terminates the active singleton worker process' );
-    ok( !kill( 0, $command_pid ), 'stop_loop also terminates the long-running command started by the singleton worker' );
+    ok( !$runner->_pid_is_running($worker_pid), 'stop_loop terminates the active singleton worker process' );
+    ok(
+        !$runner->_pid_is_running($command_pid),
+        'stop_loop also terminates the long-running command started by the singleton worker',
+    );
     is( waitpid( $loop_pid, 1 ), -1, 'stop_loop reaps the singleton loop after shutting down the worker tree' );
 }
 
@@ -4630,6 +4844,527 @@ ok( !Developer::Dashboard::CollectorRunner::_cron_match('*/2', 5), 'cron matcher
     is( $? >> 8, 0, '_signal_stop routes to shutdown logic and exits cleanly' );
     ok( !-f $pidfile, '_signal_stop cleanup removes the pidfile' );
     ok( !defined $runner->loop_state('signal-stop'), '_signal_stop cleanup removes the loop metadata' );
+}
+
+{
+    my $state_path = File::Spec->catfile( $paths->collector_dir('windows-replace'), 'loop.json' );
+    open my $existing_fh, '>', $state_path or die $!;
+    print {$existing_fh} json_encode( { name => 'windows-replace', status => 'old' } );
+    close $existing_fh;
+
+    my @rename_calls;
+    my @unlink_calls;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::is_windows = sub { return 1 };
+        local *Developer::Dashboard::CollectorRunner::_rename_path = sub {
+            my ( undef, $source, $target ) = @_;
+            push @rename_calls, [ $source, $target ];
+            if ( @rename_calls == 1 ) {
+                $! = EACCES;
+                return 0;
+            }
+            return rename $source, $target;
+        };
+        local *Developer::Dashboard::CollectorRunner::_unlink_path = sub {
+            my ( undef, $path ) = @_;
+            push @unlink_calls, $path;
+            return unlink $path;
+        };
+        $runner->_write_loop_state(
+            'windows-replace',
+            {
+                pid          => 5151,
+                name         => 'windows-replace',
+                process_name => 'dashboard collector: windows-replace',
+                status       => 'running',
+            }
+        );
+    }
+
+    is( scalar @rename_calls, 2, '_write_loop_state retries the final replace once after a Windows rename collision' );
+    is_deeply( \@unlink_calls, [$state_path], '_write_loop_state removes the existing Windows target before retrying the replace' );
+    is(
+        json_decode( do {
+            open my $state_fh, '<', $state_path or die $!;
+            local $/;
+            <$state_fh>;
+        } )->{status},
+        'running',
+        '_write_loop_state leaves the retried Windows replacement payload on disk',
+    );
+}
+
+{
+    my $state_path = File::Spec->catfile( $paths->collector_dir('windows-powershell-replace'), 'loop.json' );
+    my @fallback_calls;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::is_windows = sub { return 1 };
+        local *Developer::Dashboard::CollectorRunner::_rename_path = sub {
+            $! = EACCES;
+            return 0;
+        };
+        local *Developer::Dashboard::CollectorRunner::_replace_path_via_powershell = sub {
+            my ( undef, $source, $target ) = @_;
+            push @fallback_calls, [ $source, $target ];
+            return ( rename( $source, $target ) ? 1 : 0, $! );
+        };
+        $runner->_write_loop_state(
+            'windows-powershell-replace',
+            {
+                pid          => 5252,
+                name         => 'windows-powershell-replace',
+                process_name => 'dashboard collector: windows-powershell-replace',
+                status       => 'running',
+            }
+        );
+    }
+
+    is( scalar @fallback_calls, 1, '_write_loop_state falls back to the Windows PowerShell move path when rename fails before the target exists' );
+    is(
+        json_decode( do {
+            open my $state_fh, '<', $state_path or die $!;
+            local $/;
+            <$state_fh>;
+        } )->{status},
+        'running',
+        '_write_loop_state leaves the PowerShell-fallback Windows replacement payload on disk',
+    );
+}
+{
+    my $state_path = File::Spec->catfile( $paths->collector_dir('windows-in-place-replace'), 'loop.json' );
+    open my $seed_fh, '>', $state_path or die "Unable to seed $state_path: $!";
+    print {$seed_fh} json_encode( { status => 'stale' } );
+    close $seed_fh or die "Unable to close seeded $state_path: $!";
+    my @overwrite_calls;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::is_windows = sub { return 1 };
+        local *Developer::Dashboard::CollectorRunner::_rename_path = sub {
+            $! = EACCES;
+            return 0;
+        };
+        local *Developer::Dashboard::CollectorRunner::_unlink_path = sub {
+            my ( $self, $path ) = @_;
+            return unlink $path;
+        };
+        local *Developer::Dashboard::CollectorRunner::_replace_path_via_powershell = sub {
+            return ( 0, 'Move-Item collision' );
+        };
+        local *Developer::Dashboard::CollectorRunner::_overwrite_state_file_in_place = sub {
+            my ( $self, $source, $target ) = @_;
+            push @overwrite_calls, [ $source, $target ];
+            open my $target_fh, '>', $target or die "Unable to open $target in overwrite test: $!";
+            print {$target_fh} json_encode(
+                {
+                    pid          => 5353,
+                    name         => 'windows-in-place-replace',
+                    process_name => 'dashboard collector: windows-in-place-replace',
+                    status       => 'running',
+                }
+            );
+            close $target_fh or die "Unable to close $target in overwrite test: $!";
+            unlink $source or die "Unable to remove $source in overwrite test: $!";
+            return ( 1, '' );
+        };
+        $runner->_write_loop_state(
+            'windows-in-place-replace',
+            {
+                pid          => 5353,
+                name         => 'windows-in-place-replace',
+                process_name => 'dashboard collector: windows-in-place-replace',
+                status       => 'running',
+            }
+        );
+    }
+
+    is( scalar @overwrite_calls, 1, '_write_loop_state falls back to the Windows in-place overwrite path when rename and PowerShell replacement both fail' );
+    is(
+        json_decode( do {
+            open my $state_fh, '<', $state_path or die $!;
+            local $/;
+            <$state_fh>;
+        } )->{status},
+        'running',
+        '_write_loop_state leaves the in-place-overwrite Windows replacement payload on disk',
+    );
+}
+
+{
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::is_windows = sub { return 1 };
+        local *Developer::Dashboard::CollectorRunner::command_in_path = sub {
+            my ($name) = @_;
+            return 'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe' if $name eq 'powershell.exe';
+            return '';
+        };
+        is(
+            $runner->_powershell_command,
+            'C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe',
+            '_powershell_command falls back across PowerShell command names on Windows before using the filesystem default',
+        );
+    }
+
+    {
+        no warnings 'redefine';
+        my $fake_system_root = tempdir( CLEANUP => 1 );
+        my $fake_powershell = File::Spec->catfile( $fake_system_root, 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe' );
+        make_path( File::Spec->catdir( $fake_system_root, 'System32', 'WindowsPowerShell', 'v1.0' ) );
+        open my $fh, '>', $fake_powershell or die $!;
+        close $fh;
+        local *Developer::Dashboard::CollectorRunner::is_windows = sub { return 1 };
+        local *Developer::Dashboard::CollectorRunner::command_in_path = sub { return '' };
+        local $ENV{SystemRoot} = $fake_system_root;
+        is(
+            $runner->_powershell_command,
+            $fake_powershell,
+            '_powershell_command falls back to the SystemRoot PowerShell path when PATH lookup is empty',
+        );
+    }
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::is_windows = sub { return 1 };
+        local *Developer::Dashboard::CollectorRunner::command_in_path = sub {
+            my ($name) = @_;
+            return 'C:\\Strawberry\\perl\\bin\\perl.exe' if $name eq 'perl.exe';
+            return '';
+        };
+        is(
+            $runner->_current_perl_command,
+            'C:\\Strawberry\\perl\\bin\\perl.exe',
+            '_current_perl_command prefers perl.exe from PATH on Windows collector launches when plain perl is unavailable',
+        );
+    }
+
+    {
+        no warnings 'redefine';
+        local $Developer::Dashboard::Platform::OS_NAME = 'linux';
+        local $^X = '/usr/bin/perl';
+        local *Developer::Dashboard::CollectorRunner::command_in_path = sub { return '' };
+        is(
+            $runner->_current_perl_command,
+            '/usr/bin/perl',
+            '_current_perl_command keeps the current non-Windows Perl interpreter path when it still exists',
+        );
+    }
+
+    {
+        no warnings 'redefine';
+        local $Developer::Dashboard::Platform::OS_NAME = 'linux';
+        local $^X = '/tmp/nonexistent-collector-perl';
+        local *Developer::Dashboard::CollectorRunner::command_in_path = sub {
+            my ($name) = @_;
+            return '/usr/local/bin/perl' if $name eq 'perl';
+            return '/usr/local/bin/perl.exe' if $name eq 'perl.exe';
+            return '';
+        };
+        is(
+            $runner->_current_perl_command,
+            '/usr/local/bin/perl',
+            '_current_perl_command falls back to perl from PATH on non-Windows hosts when the current interpreter path is missing',
+        );
+
+        local *Developer::Dashboard::CollectorRunner::command_in_path = sub {
+            my ($name) = @_;
+            return '' if $name eq 'perl';
+            return '/usr/local/bin/perl.exe' if $name eq 'perl.exe';
+            return '';
+        };
+        is(
+            $runner->_current_perl_command,
+            '/usr/local/bin/perl.exe',
+            '_current_perl_command falls back to perl.exe from PATH on non-Windows hosts when plain perl is unavailable',
+        );
+
+        local *Developer::Dashboard::CollectorRunner::command_in_path = sub { return '' };
+        is(
+            $runner->_current_perl_command,
+            '/tmp/nonexistent-collector-perl',
+            '_current_perl_command finally returns the current interpreter string on non-Windows hosts when no PATH fallback exists',
+        );
+    }
+
+    {
+        my $helper_root = File::Spec->catdir( $paths->home_runtime_root, 'cli', 'dd' );
+        make_path($helper_root);
+        my $staged_helper = File::Spec->catfile( $helper_root, '_dashboard-core' );
+        open my $helper_fh, '>', $staged_helper or die "Unable to write $staged_helper: $!";
+        print {$helper_fh} "collector-loop-foreground\ncollector-worker-foreground\n";
+        close $helper_fh or die "Unable to close $staged_helper: $!";
+
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::is_windows = sub { return 1 };
+        local *Developer::Dashboard::CollectorRunner::command_in_path = sub {
+            my ($name) = @_;
+            return 'C:\\Strawberry\\perl\\bin\\perl.exe' if $name eq 'perl.exe';
+            return '';
+        };
+
+        ok(
+            $runner->_helper_file_supports_internal_command( $staged_helper, 'collector-loop-foreground' ),
+            '_helper_file_supports_internal_command accepts staged collector helpers that expose the requested internal command',
+        );
+        ok(
+            !$runner->_helper_file_supports_internal_command( $staged_helper, 'missing-command' ),
+            '_helper_file_supports_internal_command rejects staged collector helpers that do not expose the requested internal command',
+        );
+        is(
+            $runner->_dashboard_core_helper_path('collector-loop-foreground'),
+            $staged_helper,
+            '_dashboard_core_helper_path prefers the staged helper when it already exposes the requested collector command',
+        );
+        is_deeply(
+            [ $runner->_windows_background_loop_command('alpha.collector') ],
+            [
+                'C:\\Strawberry\\perl\\bin\\perl.exe',
+                $staged_helper,
+                'collector-loop-foreground',
+                '--name',
+                'alpha.collector',
+            ],
+            '_windows_background_loop_command builds the detached loop helper argv from the staged dashboard core helper',
+        );
+        is_deeply(
+            [ $runner->_windows_background_worker_command( 'alpha.collector', 4242 ) ],
+            [
+                'C:\\Strawberry\\perl\\bin\\perl.exe',
+                $staged_helper,
+                'collector-worker-foreground',
+                '--name',
+                'alpha.collector',
+                '--loop-pid',
+                4242,
+            ],
+            '_windows_background_worker_command builds the detached worker helper argv from the staged dashboard core helper',
+        );
+    }
+
+    {
+        my $helper_root = File::Spec->catdir( $paths->home_runtime_root, 'cli', 'dd' );
+        make_path($helper_root);
+        my $staged_helper = File::Spec->catfile( $helper_root, '_dashboard-core' );
+        open my $staged_fh, '>', $staged_helper or die "Unable to write $staged_helper: $!";
+        print {$staged_fh} "collector-worker-foreground\n";
+        close $staged_fh or die "Unable to close $staged_helper: $!";
+
+        my $shipped_root = tempdir( CLEANUP => 1 );
+        my $shipped_helper = File::Spec->catfile( $shipped_root, '_dashboard-core' );
+        open my $shipped_fh, '>', $shipped_helper or die "Unable to write $shipped_helper: $!";
+        print {$shipped_fh} "collector-loop-foreground\n";
+        close $shipped_fh or die "Unable to close $shipped_helper: $!";
+
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::is_windows = sub { return 1 };
+        local *Developer::Dashboard::InternalCLI::_helper_asset_path = sub { return $shipped_helper };
+        is(
+            $runner->_dashboard_core_helper_path('collector-loop-foreground'),
+            $shipped_helper,
+            '_dashboard_core_helper_path falls back to the shipped helper when the staged helper lacks the requested collector command',
+        );
+    }
+
+    {
+        my $helper_root = File::Spec->catdir( $paths->home_runtime_root, 'cli', 'dd' );
+        make_path($helper_root);
+        my $staged_helper = File::Spec->catfile( $helper_root, '_dashboard-core' );
+        open my $staged_fh, '>', $staged_helper or die "Unable to write $staged_helper: $!";
+        print {$staged_fh} "collector-worker-foreground\n";
+        close $staged_fh or die "Unable to close $staged_helper: $!";
+
+        my $shipped_root = tempdir( CLEANUP => 1 );
+        my $shipped_helper = File::Spec->catfile( $shipped_root, '_dashboard-core' );
+        open my $shipped_fh, '>', $shipped_helper or die "Unable to write $shipped_helper: $!";
+        print {$shipped_fh} "other-command\n";
+        close $shipped_fh or die "Unable to close $shipped_helper: $!";
+
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::is_windows = sub { return 1 };
+        local *Developer::Dashboard::InternalCLI::_helper_asset_path = sub { return $shipped_helper };
+        is(
+            $runner->_dashboard_core_helper_path('collector-loop-foreground'),
+            $staged_helper,
+            '_dashboard_core_helper_path falls back to the staged helper path when neither staged nor shipped helpers expose the requested collector command',
+        );
+    }
+
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::is_windows = sub { return 1 };
+        local *Developer::Dashboard::CollectorRunner::command_in_path = sub { return '' };
+        local $ENV{SystemRoot} = File::Spec->catdir( tempdir( CLEANUP => 1 ), 'missing-system-root' );
+        is(
+            $runner->_powershell_command,
+            '',
+            '_powershell_command returns an empty string when no PowerShell binary can be resolved on Windows',
+        );
+    }
+
+    {
+        my $fakebin = tempdir( CLEANUP => 1 );
+        my $powershell = File::Spec->catfile( $fakebin, 'powershell.exe' );
+        my $source = File::Spec->catfile( $fakebin, 'pending.json' );
+        my $target = File::Spec->catfile( $fakebin, 'loop.json' );
+        open my $source_fh, '>', $source or die "Unable to write $source: $!";
+        print {$source_fh} qq({"status":"running"});
+        close $source_fh or die "Unable to close $source: $!";
+        open my $ps_fh, '>', $powershell or die "Unable to write $powershell: $!";
+        print {$ps_fh} <<"SCRIPT";
+#!/bin/sh
+mv "$source" "$target"
+exit 0
+SCRIPT
+        close $ps_fh or die "Unable to close $powershell: $!";
+        chmod 0755, $powershell or die "Unable to chmod $powershell: $!";
+
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::is_windows = sub { return 1 };
+        local *Developer::Dashboard::CollectorRunner::_powershell_command = sub { return $powershell };
+        my ( $ok, $error ) = $runner->_replace_path_via_powershell( $source, $target );
+        ok( $ok, '_replace_path_via_powershell returns success when the Windows Move-Item fallback succeeds' )
+          or diag $error;
+        ok( -f $target, '_replace_path_via_powershell leaves the target file in place after a successful Move-Item fallback' );
+
+        open my $ps_fail_fh, '>', $powershell or die "Unable to rewrite $powershell: $!";
+        print {$ps_fail_fh} <<"SCRIPT";
+#!/bin/sh
+printf '%s\n' 'collector move failed' >&2
+exit 9
+SCRIPT
+        close $ps_fail_fh or die "Unable to close $powershell after rewrite: $!";
+        chmod 0755, $powershell or die "Unable to chmod $powershell after rewrite: $!";
+
+        open my $retry_fh, '>', $source or die "Unable to rewrite $source: $!";
+        print {$retry_fh} qq({"status":"retry"});
+        close $retry_fh or die "Unable to close $source after rewrite: $!";
+
+        ( $ok, $error ) = $runner->_replace_path_via_powershell( $source, $target );
+        ok( !$ok, '_replace_path_via_powershell returns failure when the Windows Move-Item fallback exits non-zero' );
+        like( $error, qr/collector move failed/, '_replace_path_via_powershell returns the native PowerShell failure text' );
+    }
+
+    {
+        my $source = File::Spec->catfile( $paths->collector_dir('windows-overwrite-direct'), 'pending.json' );
+        my $target = File::Spec->catfile( $paths->collector_dir('windows-overwrite-direct'), 'loop.json' );
+        open my $source_fh, '>', $source or die "Unable to write $source: $!";
+        print {$source_fh} qq({"status":"running"});
+        close $source_fh or die "Unable to close $source: $!";
+        open my $target_fh, '>', $target or die "Unable to seed $target: $!";
+        print {$target_fh} qq({"status":"old"});
+        close $target_fh or die "Unable to close $target: $!";
+
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::is_windows = sub { return 1 };
+        my ( $ok, $error ) = $runner->_overwrite_state_file_in_place( $source, $target );
+        ok( $ok, '_overwrite_state_file_in_place returns success for the direct Windows collector overwrite fallback' )
+          or diag $error;
+        ok( !-e $source, '_overwrite_state_file_in_place removes the consumed collector pending state file after a successful overwrite' );
+        is(
+            Developer::Dashboard::CollectorRunner::_slurp($target),
+            qq({"status":"running"}),
+            '_overwrite_state_file_in_place replaces the target collector state payload in place',
+        );
+    }
+
+    {
+        my $path = File::Spec->catfile( $paths->collector_dir('windows-unlink-direct'), 'stale.txt' );
+        open my $stale_fh, '>', $path or die "Unable to write $path: $!";
+        print {$stale_fh} "stale\n";
+        close $stale_fh or die "Unable to close $path: $!";
+        ok( $runner->_unlink_path($path), '_unlink_path returns true when the collector helper unlinks an existing file' );
+        ok( !-e $path, '_unlink_path removes the requested collector file path' );
+    }
+
+    {
+        my $fakebin = tempdir( CLEANUP => 1 );
+        my $powershell = File::Spec->catfile( $fakebin, 'powershell' );
+        open my $ps_fh, '>', $powershell or die "Unable to write $powershell: $!";
+        print {$ps_fh} <<"SCRIPT";
+#!/bin/sh
+printf '%s\n' "\$*" > "$fakebin/powershell.args"
+printf '%s\n' 51515
+exit 0
+SCRIPT
+        close $ps_fh or die "Unable to close $powershell: $!";
+        chmod 0755, $powershell or die "Unable to chmod $powershell: $!";
+
+        my $stdout_log = $files->collector_log;
+        my $stderr_log = $stdout_log . '.stderr';
+        local $ENV{PATH} = join ':', $fakebin, ( $ENV{PATH} || '' );
+        local $Developer::Dashboard::Platform::OS_NAME = 'MSWin32';
+        is(
+            Developer::Dashboard::CollectorRunner::_powershell_single_quote(q{C:\Users\O'Hara\AppData}),
+            q{'C:\Users\O''Hara\AppData'},
+            '_powershell_single_quote doubles embedded single quotes for Windows collector PowerShell literals',
+        );
+        my $spawned_pid = $runner->_spawn_windows_background_command(
+            q{C:\Program Files\Perl\perl.exe},
+            'collector-loop-foreground',
+            q{O'Hara},
+        );
+        is( $spawned_pid, 51515, '_spawn_windows_background_command returns the detached collector pid written by Start-Process' );
+        open my $args_fh, '<', File::Spec->catfile( $fakebin, 'powershell.args' )
+          or die "Unable to read $fakebin/powershell.args: $!";
+        local $/;
+        my $args = <$args_fh>;
+        close $args_fh or die "Unable to close $fakebin/powershell.args: $!";
+        like( $args, qr/Start-Process/, '_spawn_windows_background_command shells out through Start-Process for collector helpers' );
+        like( $args, qr/'C:\\Program Files\\Perl\\perl\.exe'/, '_spawn_windows_background_command quotes the Windows collector executable path for PowerShell' );
+        like( $args, qr/'O''Hara'/, '_spawn_windows_background_command escapes embedded collector arguments for PowerShell' );
+        like( $args, qr/\Q$stdout_log\E/, '_spawn_windows_background_command redirects collector stdout to the collector log' );
+        like( $args, qr/\Q$stderr_log\E/, '_spawn_windows_background_command redirects collector stderr to the collector error log' );
+    }
+}
+
+{
+    my $tmp = tempdir( CLEANUP => 1 );
+    my $source = File::Spec->catfile( $tmp, 'loop.pending.json' );
+    my $target = File::Spec->catfile( $tmp, 'loop.json' );
+    open my $source_fh, '>:raw', $source or die "Unable to write $source: $!";
+    print {$source_fh} qq({"status":"running"});
+    close $source_fh or die "Unable to close $source: $!";
+    open my $target_fh, '>:raw', $target or die "Unable to seed $target: $!";
+    print {$target_fh} qq({"status":"stale"});
+    close $target_fh or die "Unable to close $target: $!";
+
+    my @rename_calls;
+    my @unlink_calls;
+    my $error;
+    {
+        no warnings 'redefine';
+        local *Developer::Dashboard::CollectorRunner::is_windows = sub { return 1 };
+        local *Developer::Dashboard::CollectorRunner::_rename_path = sub {
+            my ( undef, $from, $to ) = @_;
+            push @rename_calls, [ $from, $to ];
+            $! = EACCES;
+            return 0;
+        };
+        local *Developer::Dashboard::CollectorRunner::_unlink_path = sub {
+            my ( undef, $path ) = @_;
+            push @unlink_calls, $path;
+            return unlink $path;
+        };
+        local *Developer::Dashboard::CollectorRunner::_replace_path_via_powershell = sub {
+            return ( 0, "Move-Item retry failed\n" );
+        };
+        local *Developer::Dashboard::CollectorRunner::_overwrite_state_file_in_place = sub {
+            return ( 0, "overwrite retry failed\n" );
+        };
+        eval { $runner->_replace_state_file( $source, $target ); 1 } or $error = $@;
+    }
+
+    like(
+        $error,
+        qr/PowerShell Move-Item fallback failed: Move-Item retry failed; in-place overwrite fallback failed: overwrite retry failed/,
+        '_replace_state_file reports both Windows fallback failures after exhausting retries',
+    );
+    is( scalar @rename_calls, 11, '_replace_state_file retries the Windows rename path across all ten attempts plus the initial rename failure' );
+    is( scalar @unlink_calls, 2, '_replace_state_file unlinks the stale Windows target once and then cleans up the pending source before giving up' );
+    is( $unlink_calls[0], $target, '_replace_state_file removes the stale Windows target before the retry loop continues' );
+    is( $unlink_calls[1], $source, '_replace_state_file removes the pending source file during final Windows cleanup' );
+    ok( !-e $source, '_replace_state_file removes the pending source file before dying after repeated Windows replacement failures' );
 }
 
 {

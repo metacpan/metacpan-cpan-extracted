@@ -1,6 +1,5 @@
 use Type::Tiny;
 use Test::More;
-use Mojo::Util qw/dumper/;
 use Type::Guess;
 use Types::Standard qw( Int Num Str );
 use strict;
@@ -27,12 +26,11 @@ for my $l (@data) {
     is(Type::Guess->with_roles("+Tiny")->new($l->@*)->type->name, $expected[0]);
     shift @expected;
 }
-print "-" x 80;
 
 my $Date = Type::Tiny->new(
    name       => "Date",
    constraint => sub { /^\d{4,4}-\d{2,2}-\d{2,2}$/ },
-   message    => sub { "$_ ain't a date" },
+   # message    => sub { "$_ ain't a date" },
 );
 
 my @expected = qw/Str

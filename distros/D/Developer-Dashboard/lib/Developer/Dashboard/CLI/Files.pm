@@ -3,9 +3,10 @@ package Developer::Dashboard::CLI::Files;
 use strict;
 use warnings;
 
-our $VERSION = '4.03';
+our $VERSION = '4.16';
 
 use Cwd qw(cwd);
+use Getopt::Long qw(GetOptionsFromArray);
 use Developer::Dashboard::Config;
 use Developer::Dashboard::FileRegistry;
 use Developer::Dashboard::JSON qw(json_encode);
@@ -36,8 +37,16 @@ sub run_files_command {
     };
 
     if ( $command eq 'files' ) {
+        my @argv = @{$argv};
+        my $output = 'table';
+        GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
+        die "Usage: dashboard files [-o json|table]\n" if @argv || ( $output ne 'json' && $output ne 'table' );
         $load_configured_file_aliases->();
-        print json_encode( $files->all_files );
+        if ( $output eq 'json' ) {
+            print json_encode( $files->all_files );
+            return 1;
+        }
+        print _files_table( $files->all_files );
         return 1;
     }
 
@@ -50,6 +59,9 @@ sub run_files_command {
         return 1;
     }
     if ( $action eq 'locate' ) {
+        my $output = 'table';
+        GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
+        die "Usage: dashboard file locate [-o json|table] [<root-or-alias>] <term...>\n" if $output ne 'json' && $output ne 'table';
         my $root = cwd();
         if ( @argv >= 2 ) {
             $load_configured_file_aliases->();
@@ -64,27 +76,62 @@ sub run_files_command {
                 shift @argv;
             }
         }
-        print json_encode( [ $files->locate_files_under( $root, @argv ) ] );
+        my $matches = [ $files->locate_files_under( $root, @argv ) ];
+        if ( $output eq 'json' ) {
+            print json_encode($matches);
+            return 1;
+        }
+        print _list_table( 'Path', $matches );
         return 1;
     }
     if ( $action eq 'add' ) {
+        my $output = 'table';
+        GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
+        die "Usage: dashboard file add <name> <path> [-o json|table]\n" if $output ne 'json' && $output ne 'table';
         my $name = shift @argv || die "Usage: dashboard file add <name> <path>\n";
         my $path = shift @argv || die "Usage: dashboard file add <name> <path>\n";
         my $saved = $config->save_global_file_alias( $name, $path );
         $files->register_named_files( { $name => $saved->{path} } );
-        print json_encode($saved);
+        $saved->{resolved} = $files->resolve_file($name);
+        if ( $output eq 'json' ) {
+            print json_encode($saved);
+            return 1;
+        }
+        print _mutation_table(
+            alias    => $saved->{name},
+            stored   => $saved->{path},
+            resolved => $saved->{resolved},
+            status   => 'saved',
+        );
         return 1;
     }
     if ( $action eq 'del' ) {
+        my $output = 'table';
+        GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
+        die "Usage: dashboard file del <name> [-o json|table]\n" if $output ne 'json' && $output ne 'table';
         my $name = shift @argv || die "Usage: dashboard file del <name>\n";
         my $deleted = $config->remove_global_file_alias($name);
         $files->unregister_named_file($name);
-        print json_encode($deleted);
+        if ( $output eq 'json' ) {
+            print json_encode($deleted);
+            return 1;
+        }
+        print _removal_table(
+            alias   => $deleted->{name},
+            removed => $deleted->{removed},
+        );
         return 1;
     }
     if ( $action eq 'list' ) {
+        my $output = 'table';
+        GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
+        die "Usage: dashboard file list [-o json|table]\n" if @argv || ( $output ne 'json' && $output ne 'table' );
         $load_configured_file_aliases->();
-        print json_encode( $files->named_files );
+        if ( $output eq 'json' ) {
+            print json_encode( $files->named_files );
+            return 1;
+        }
+        print _aliases_table( $files->named_files );
         return 1;
     }
 
@@ -104,6 +151,83 @@ sub _build_paths {
         workspace_roots => \@roots,
         project_roots   => \@roots,
     );
+}
+
+# _files_table($files_hash)
+# Renders one full file inventory as a two-column summary table.
+# Input: hash reference keyed by logical file name.
+# Output: formatted table text string.
+sub _files_table {
+    my ($all_files) = @_;
+    my @rows = map { [ $_, $all_files->{$_} ] } sort keys %{ $all_files || {} };
+    return _render_table( [ 'File', 'Value' ], \@rows );
+}
+
+# _aliases_table($aliases_hash)
+# Renders one saved file-alias registry as a summary table.
+# Input: hash reference keyed by alias name.
+# Output: formatted table text string.
+sub _aliases_table {
+    my ($aliases) = @_;
+    my @rows = map { [ $_, $aliases->{$_} ] } sort keys %{ $aliases || {} };
+    return _render_table( [ 'Alias', 'Path' ], \@rows );
+}
+
+# _list_table($label, $items)
+# Renders one flat file-match list as a single-column summary table.
+# Input: column label string and array reference of scalar items.
+# Output: formatted table text string.
+sub _list_table {
+    my ( $label, $items ) = @_;
+    my @rows = map { [ $_ ] } @{ $items || [] };
+    return _render_table( [$label], \@rows );
+}
+
+# _mutation_table(%args)
+# Renders one file-alias add/update result as a summary table.
+# Input: alias, stored path, resolved path, and status strings.
+# Output: formatted table text string.
+sub _mutation_table {
+    my (%args) = @_;
+    return _render_table(
+        [ 'Alias', 'Stored', 'Resolved', 'Status' ],
+        [ [ map { $args{$_} // '' } qw(alias stored resolved status) ] ],
+    );
+}
+
+# _removal_table(%args)
+# Renders one file-alias removal result as a summary table.
+# Input: alias string and removed boolean flag.
+# Output: formatted table text string.
+sub _removal_table {
+    my (%args) = @_;
+    return _render_table(
+        [ 'Alias', 'Removed', 'Status' ],
+        [ [ $args{alias} // '', $args{removed} ? 'yes' : 'no', $args{removed} ? 'removed' : 'no-change' ] ],
+    );
+}
+
+# _render_table($header, $rows)
+# Formats one rectangular data set as a padded terminal table.
+# Input: header array reference and row array reference.
+# Output: formatted table text string.
+sub _render_table {
+    my ( $header, $rows ) = @_;
+    my @widths = map { length( defined $_ ? $_ : '' ) } @{ $header || [] };
+    for my $row ( @{ $rows || [] } ) {
+        for my $idx ( 0 .. $#{$row} ) {
+            my $value = defined $row->[$idx] ? $row->[$idx] : '';
+            my $width = length($value);
+            $widths[$idx] = $width if $width > $widths[$idx];
+        }
+    }
+    my @lines;
+    push @lines, join( '  ', map { sprintf "%-*s", $widths[$_], ( $header->[$_] // '' ) } 0 .. $#widths );
+    push @lines, join( '  ', map { '-' x $widths[$_] } 0 .. $#widths );
+    for my $row ( @{ $rows || [] } ) {
+        push @lines, join( '  ', map { sprintf "%-*s", $widths[$_], ( defined $row->[$_] ? $row->[$_] : '' ) } 0 .. $#widths );
+    }
+    return join( "\n", @lines ) . "\n";
 }
 
 1;
@@ -144,15 +268,17 @@ callers get one consistent behavior.
 =head1 WHEN TO USE
 
 Use this file when changing the behavior of C<dashboard file
-resolve/add/del/list/locate>, the JSON payload returned by C<dashboard files>,
-or the file alias persistence contract stored in config.
+resolve/add/del/list/locate>, the human-readable summary tables or JSON
+payloads returned by C<dashboard files>, or the file alias persistence
+contract stored in config.
 
 =head1 HOW TO USE
 
 Users run C<dashboard file E<lt>verbE<gt> ...> or C<dashboard files>. Named
-aliases are loaded from config, file paths are printed as line-oriented output
-for resolve and as JSON for list/locate/all-files style calls, and alias
-mutations are persisted into the writable config layer.
+aliases are loaded from config, the direct C<resolve> verb keeps its
+line-oriented contract for shell use, and the operator-facing inventory and
+mutation commands default to human-readable tables while C<-o json> returns
+the full raw payload.
 
 =head1 WHAT USES IT
 

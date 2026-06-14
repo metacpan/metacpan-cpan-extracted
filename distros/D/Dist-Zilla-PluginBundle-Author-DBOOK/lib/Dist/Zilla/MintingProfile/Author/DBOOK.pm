@@ -4,7 +4,7 @@ use Moose;
 with 'Dist::Zilla::Role::MintingProfile::ShareDir';
 use namespace::clean;
 
-our $VERSION = 'v1.0.8';
+our $VERSION = 'v1.0.9';
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -60,7 +60,7 @@ Report any issues on the public bugtracker.
 
 =head1 AUTHOR
 
-Dan Book, C<dbook@cpan.org>
+Dan Book, C<book.d.wit@proton.me>
 
 =head1 COPYRIGHT AND LICENSE
 

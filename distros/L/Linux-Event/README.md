@@ -20,6 +20,8 @@ Linux::Event
     +-- Linux::Event::Loop
             |
             +-- Linux::Event::Backend::Epoll
+                    |
+                    +-- Linux::Event::XS (private hot paths)
 ```
 
 ## What this distribution contains
@@ -35,6 +37,7 @@ Core modules in this repository:
 - `Linux::Event::Wakeup` - eventfd-backed wakeup primitive
 - `Linux::Event::Pid` - pidfd-backed process exit notifications
 - `Linux::Event::Scheduler` - internal monotonic deadline queue
+- `Linux::Event::XS` - private XS hot-path implementation
 
 ## Quick start
 
@@ -119,22 +122,32 @@ Listen / Connect
    your protocol
 ```
 
+## Implementation notes
+
+The public API is Perl, but the epoll backend uses private XS hot paths for fd registration, reusable epoll event storage, direct watcher dispatch records, and the internal timer heap. These details are private and may change between pre-1.0 releases.
+
 ## Dependencies
 
 Runtime dependencies are intentionally small:
 
 - Perl 5.36 or newer
-- `Linux::Epoll`
-- `Linux::FD::Event`
-- `Linux::FD::Signal`
-- `Linux::FD::Pid`
 - `Linux::Event::Timer`
 - `Linux::Event::Clock`
+
+Optional feature dependencies are loaded lazily and are only needed when the
+corresponding feature is used:
+
+- `Linux::FD::Event` for `waker()` / eventfd support
+- `Linux::FD::Signal` for `signal()` / signalfd support
+- `Linux::FD::Pid` for `pid()` / pidfd support
+
+If an optional feature dependency is missing, the method that needs it throws
+a clear error naming the missing module and feature.
 
 ## Examples
 
 See `examples/` for small programs covering timers, filehandle readiness,
-signals, wakeups, pidfds, and epoll regression cases.
+signals, wakeups, pidfds, and reactor regression cases.
 
 ## Project status
 

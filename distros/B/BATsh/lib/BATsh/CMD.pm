@@ -36,7 +36,7 @@ use File::Copy ();
 use File::Path ();
 use Carp qw(croak);
 use vars qw($VERSION);
-$VERSION = '0.04';
+$VERSION = '0.05';
 $VERSION = $VERSION;
 
 require BATsh::Env;
@@ -96,6 +96,12 @@ sub exec_block {
     }
     return $ERRORLEVEL;
 }
+
+# ----------------------------------------------------------------
+# _get_errorlevel: public accessor for the current ERRORLEVEL value.
+# Used by BATsh::Env::_expand_named_var for %ERRORLEVEL% expansion.
+# ----------------------------------------------------------------
+sub _get_errorlevel { return $ERRORLEVEL }
 
 # ----------------------------------------------------------------
 # _join_continuations: merge lines ending with bare ^ (not ^^ or "^")

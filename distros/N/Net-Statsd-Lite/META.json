@@ -21,7 +21,7 @@
    "name" : "Net-Statsd-Lite",
    "prereqs" : {
       "build" : {
-         "requires" : {
+         "recommends" : {
             "ExtUtils::MakeMaker" : "7.22",
             "Module::Metadata" : "1.000015"
          }
@@ -33,6 +33,7 @@
       },
       "develop" : {
          "requires" : {
+            "Dist::AutomationPolicy" : "v0.2.0",
             "Dist::Zilla::Plugin::UsefulReadme" : "v0.4.3",
             "File::Spec" : "0",
             "IO::Handle" : "0",
@@ -105,7 +106,7 @@
             "IO::Socket" : "0",
             "IPC::Open3" : "0",
             "Module::Load" : "0",
-            "Module::Metadata" : "1.000015",
+            "Module::Metadata" : "0",
             "Net::EmptyPort" : "0",
             "Socket" : "0",
             "Test::Deep" : "0",
@@ -126,7 +127,7 @@
    "provides" : {
       "Net::Statsd::Lite" : {
          "file" : "lib/Net/Statsd/Lite.pm",
-         "version" : "v0.11.1"
+         "version" : "v0.11.2"
       }
    },
    "release_status" : "stable",
@@ -141,14 +142,15 @@
          "web" : "https://github.com/robrwo/Net-Statsd-Lite"
       }
    },
-   "version" : "v0.11.1",
+   "version" : "v0.11.2",
    "x_authority" : "cpan:RRWO",
    "x_contributors" : [
       "Michael R. Davis <mrdvt@cpan.org>",
       "Toby Inkster <tobyink@cpan.org>"
    ],
    "x_generated_by_perl" : "v5.42.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
-   "x_spdx_expression" : "Artistic-2.0"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.42",
+   "x_spdx_expression" : "Artistic-2.0",
+   "x_static_install" : 1
 }
 

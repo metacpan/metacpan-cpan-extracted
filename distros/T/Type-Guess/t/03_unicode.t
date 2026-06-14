@@ -4,7 +4,6 @@ use Test::More;
 use List::Util qw/max/;
 use Type::Guess;
 use Mojo::Loader qw/data_section/;
-use Mojo::Util qw/dumper/;
 use Encode qw/decode encode/;
 use Text::VisualPrintf qw/vprintf vsprintf/;
 use Text::VisualWidth::PP qw/vwidth/;

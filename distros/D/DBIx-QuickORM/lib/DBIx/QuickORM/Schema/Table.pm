@@ -2,7 +2,7 @@ package DBIx::QuickORM::Schema::Table;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use Carp qw/croak/;
 use Scalar::Util qw/blessed/;
@@ -27,6 +27,10 @@ use Object::HashBase qw{
     +_links
     +db_to_orm
     +has_aliases
+    <primary_key_override
+    +fields_to_fetch
+    +fields_to_omit
+    +fields_list_all
 };
 
 =pod
@@ -102,6 +106,12 @@ Arrayref of index definitions.
 
 Arrayref of column names making up the primary key.
 
+=item primary_key_override
+
+True when this table's declared primary key is an intentional override.
+During a merge, a declared primary key that conflicts with the introspected
+one is an error unless this flag is set, in which case the declared key wins.
+
 =back
 
 =cut
@@ -166,6 +176,10 @@ name) are re-keyed onto those ORM names when they refer to the same database
 column, and the primary key is translated to ORM names, so the merged table is
 uniformly ORM-keyed.
 
+When both tables define a primary key the column sets must match (compared in
+ORM-name space); a mismatch croaks unless the other (declared) table has the
+C<primary_key_override> flag set, in which case its key wins.
+
 =cut
 
 sub merge {
@@ -186,8 +200,7 @@ sub merge {
     $params{+INDEXES} //= [@{$self->_retranslate_indexes($self->{+INDEXES}, $db_to_orm)}, @{$other->{+INDEXES} // []}]   if $self->{+INDEXES} || $other->{+INDEXES};
 
     if (!$params{+PRIMARY_KEY} && ($self->{+PRIMARY_KEY} || $other->{+PRIMARY_KEY})) {
-        my $pk = $self->{+PRIMARY_KEY} // $other->{+PRIMARY_KEY};
-        $params{+PRIMARY_KEY} = [ map { $db_to_orm->{$_} // $_ } @$pk ];
+        $params{+PRIMARY_KEY} = $self->_merge_primary_key($other, $db_to_orm);
     }
 
     return blessed($self)->new(%$self, %$other, %params);
@@ -224,6 +237,9 @@ sub init {
     # from this object's own columns.
     delete $self->{+DB_TO_ORM};
     delete $self->{+HAS_ALIASES};
+    delete $self->{+FIELDS_TO_FETCH};
+    delete $self->{+FIELDS_TO_OMIT};
+    delete $self->{+FIELDS_LIST_ALL};
 
     $self->{+DB_NAME} //= $self->{+NAME};
     $self->{+NAME}    //= $self->{+DB_NAME};
@@ -268,12 +284,6 @@ sub init {
 # {{{ Role::Source interface
 
 with 'DBIx::QuickORM::Role::Source';
-
-use Object::HashBase qw{
-    +fields_to_fetch
-    +fields_to_omit
-    +fields_list_all
-};
 
 =pod
 
@@ -419,6 +429,12 @@ sub field_affinity {
 
 Internal accessor that fetches and clears the pending raw link definitions.
 
+=item $pk = $table->_merge_primary_key($other, \%db_to_orm)
+
+Resolve the merged primary key (in ORM-name space) for C<merge>. When only
+one side defines a key it wins; identical sets pass through; a conflict
+croaks unless the other table has C<primary_key_override> set.
+
 =item $col_or_undef = $table->_column($name)
 
 Resolve a column object by either its ORM name or its database name.
@@ -454,6 +470,25 @@ aliasing is present.
 =cut
 
 sub _links { delete $_[0]->{+_LINKS} }
+
+sub _merge_primary_key {
+    my $self = shift;
+    my ($other, $db_to_orm) = @_;
+
+    my $mine   = $self->{+PRIMARY_KEY};
+    my $theirs = $other->{+PRIMARY_KEY};
+
+    my @mine_orm = map { $db_to_orm->{$_} // $_ } @{$mine // []};
+
+    return [@$theirs]  unless $mine && @$mine;
+    return [@mine_orm] unless $theirs && @$theirs;
+
+    return [@$theirs]  if $other->{+PRIMARY_KEY_OVERRIDE};
+    return [@mine_orm] if column_key(@mine_orm) eq column_key(@$theirs);
+
+    my $name = $other->{+NAME} // $self->{+NAME};
+    croak "Table '$name' has conflicting primary keys: the database defines (" . join(', ' => @mine_orm) . ") but the declaration defines (" . join(', ' => @$theirs) . "). If the declared key is intentional, mark the declaration as an intentional override via the primary_key 'override' option";
+}
 
 sub _rekey_columns {
     my $self = shift;

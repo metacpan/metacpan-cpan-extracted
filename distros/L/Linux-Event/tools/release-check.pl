@@ -16,12 +16,14 @@ my @scan_roots = grep { -e $_ } qw(
   lib
   t
   examples
+  bench
   tools
   README.md
   Changes
   LICENSE
   Makefile.PL
   MANIFEST
+  Event.xs
   .github
 );
 
@@ -244,9 +246,11 @@ sub check_syntax {
 
   my @targets = sort grep { /\.(?:pm|pl|t)\z/ } repo_files_for_scan();
   my @bad;
+  my @inc = grep { -d $_ } qw(blib/lib blib/arch lib);
+  @inc = ('lib') if !@inc;
 
   for my $file (@targets) {
-    my ($ok, $out) = run_cmd('perl', '-Ilib', '-c', $file);
+    my ($ok, $out) = run_cmd('perl', (map { ('-I', $_) } @inc), '-c', $file);
     push @bad, [$file, $out] unless $ok;
   }
 

@@ -225,7 +225,7 @@ static int sample_rate_tbl[ ] = {
 
 int get_mp3tags(PerlIO *infile, char *file, HV *info, HV *tags);
 int get_mp3fileinfo(PerlIO *infile, char *file, HV *info);
-int mp3_find_frame(PerlIO *infile, char *file, int offset);
+off_t mp3_find_frame(PerlIO *infile, char *file, int offset);
 
 mp3info * _mp3_parse(PerlIO *infile, char *file, HV *info);
 int _decode_mp3_frame(unsigned char *bptr, struct mp3frame *frame);

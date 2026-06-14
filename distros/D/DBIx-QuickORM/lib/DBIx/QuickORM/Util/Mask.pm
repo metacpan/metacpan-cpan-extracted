@@ -2,7 +2,7 @@ package DBIx::QuickORM::Util::Mask;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use Scalar::Util qw/blessed/;
 use Sub::Util qw/set_subname/;

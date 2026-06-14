@@ -3,7 +3,7 @@ package Developer::Dashboard::DockerCompose;
 use strict;
 use warnings;
 
-our $VERSION = '4.03';
+our $VERSION = '4.16';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -432,7 +432,8 @@ sub _service_folder_is_disabled {
 }
 
 # _service_lookup_roots(%args)
-# Returns the docker roots that should be searched for one isolated service across home config, installed skills, and deeper runtime layers.
+# Returns the docker roots that should be searched for one isolated service across
+# home config, installed skills, and deeper runtime-layer config/docker roots.
 # Input: service name and optional project_root.
 # Output: ordered list of docker root directory path strings.
 sub _service_lookup_roots {
@@ -441,15 +442,10 @@ sub _service_lookup_roots {
     my $project_root = $args{project_root} || cwd();
     my @roots;
     my %seen;
-    my $home_runtime_root = $self->{paths}->home_runtime_root;
-
     for my $runtime_root ( $self->{paths}->runtime_layers ) {
         my @candidates = ();
         my $config_docker_root = File::Spec->catdir( $runtime_root, 'config', 'docker' );
         push @candidates, $config_docker_root;
-        if ( $runtime_root ne $home_runtime_root ) {
-            push @candidates, File::Spec->catdir( $runtime_root, 'docker' );
-        }
         push @candidates, $self->_installed_skill_docker_roots_for_runtime($runtime_root);
 
         for my $root (@candidates) {
@@ -676,17 +672,15 @@ sub _service_disabled_marker_path {
 }
 
 # _service_toggle_root(%args)
-# Returns the deepest participating docker root where isolated-service toggle markers should be written.
+# Returns the deepest participating config/docker root where isolated-service
+# toggle markers should be written.
 # Input: optional project_root.
 # Output: absolute docker root directory path string.
 sub _service_toggle_root {
     my ( $self, %args ) = @_;
     my @layers = $self->{paths}->runtime_layers;
     my $runtime_root = @layers ? $layers[-1] : $self->{paths}->home_runtime_root;
-    my $home_runtime_root = $self->{paths}->home_runtime_root;
-    return $runtime_root eq $home_runtime_root
-      ? File::Spec->catdir( $runtime_root, 'config', 'docker' )
-      : File::Spec->catdir( $runtime_root, 'docker' );
+    return File::Spec->catdir( $runtime_root, 'config', 'docker' );
 }
 
 1;
@@ -720,7 +714,7 @@ Construct, resolve, list, and optionally execute compose operations.
 
 =head1 PURPOSE
 
-This module resolves and runs dashboard-managed Docker Compose stacks. It maps wrapper flags to compose files under layered runtime config roots, infers service names, exports the effective docker config root, and builds the final C<docker compose> command that the wrapper C<exec>s.
+This module resolves and runs dashboard-managed Docker Compose stacks. It maps wrapper flags to compose files under layered runtime C<config/docker> roots, infers service names, exports the effective docker config root, and builds the final C<docker compose> command that the wrapper C<exec>s.
 
 =head1 WHY IT EXISTS
 

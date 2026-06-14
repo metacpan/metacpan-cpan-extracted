@@ -29,7 +29,7 @@ _check_buf(PerlIO *infile, Buffer *buf, int min_wanted, int max_wanted)
     uint32_t actual_wanted;
     unsigned char *tmp;
 
-#ifdef _MSC_VER
+#ifdef _WIN32
     uint32_t pos_check = PerlIO_tell(infile);
 #endif
 
@@ -48,7 +48,7 @@ _check_buf(PerlIO *infile, Buffer *buf, int min_wanted, int max_wanted)
 
     if ( (read = PerlIO_read(infile, tmp, actual_wanted)) <= 0 ) {
       if ( PerlIO_error(infile) ) {
-#ifdef _MSC_VER
+#ifdef _WIN32
         // Show windows specific error message as Win32 PerlIO_read does not set errno
         DWORD last_error = GetLastError();
         LPWSTR *errmsg = NULL;
@@ -76,7 +76,7 @@ _check_buf(PerlIO *infile, Buffer *buf, int min_wanted, int max_wanted)
       goto out;
     }
 
-#ifdef _MSC_VER
+#ifdef _WIN32
     // Bug 16095, weird off-by-one bug seen only on Win32 and only when reading a filehandle
     if (PerlIO_tell(infile) != pos_check + read) {
       //PerlIO_printf(PerlIO_stderr(), "Win32 bug, pos should be %d, but was %d\n", pos_check + read, PerlIO_tell(infile));
@@ -205,7 +205,7 @@ _bitrate(uint32_t audio_size, uint32_t song_length_ms)
 off_t
 _file_size(PerlIO *infile)
 {
-#ifdef _MSC_VER
+#ifdef _WIN32
   // Win32 doesn't work right with fstat
   off_t file_size;
 

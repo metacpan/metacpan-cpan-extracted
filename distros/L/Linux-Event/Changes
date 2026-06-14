@@ -1,6 +1,23 @@
 Revision history for Linux-Event
 
-0.011  unreleased
+0.012  2026-06-13
+  - Add Linux::Event::XS for hot reactor paths.
+  - Replace the external epoll-wrapper runtime dependency with native XS epoll support.
+  - Add an XS fd registry used by the loop and epoll backend.
+  - Add a reusable XS epoll event buffer and event dispatch fast path.
+  - Add XS watcher construction and direct watcher dispatch fast paths.
+  - Add an internal XS timer heap while preserving the public timer API.
+  - Add an events-only run_once fast path for loops with no pending timers.
+  - Preserve the public readiness API while reducing Perl allocation and
+    dispatch overhead on hot reactor paths.
+  - Add and maintain the reactor benchmark harness under bench/ for echo_tcp,
+    pipe_churn, watcher_churn, callback_storm, and timer_heap comparisons.
+  - Refresh README, POD, tests, MANIFEST, and release metadata for the XS
+    reactor optimization release.
+  - Treat Linux::FD::Event, Linux::FD::Signal, and Linux::FD::Pid as optional
+    feature dependencies with clear lazy-load errors when the feature is used.
+
+0.011  previous
   - Simplify Linux::Event to a single readiness event loop.
   - Remove the experimental proactor/io_uring engine, operation object API,
     fake completion backend, examples, tests, and documentation.

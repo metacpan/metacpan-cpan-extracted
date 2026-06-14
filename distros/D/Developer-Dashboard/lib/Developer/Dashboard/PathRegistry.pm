@@ -3,7 +3,7 @@ package Developer::Dashboard::PathRegistry;
 use strict;
 use warnings;
 
-our $VERSION = '4.03';
+our $VERSION = '4.16';
 
 use Digest::MD5 qw(md5_hex);
 use Cwd qw(abs_path cwd);
@@ -12,6 +12,27 @@ use File::Path qw(make_path);
 use File::Spec;
 use Developer::Dashboard::JSON qw(json_encode);
 
+# _resolved_home_from_env()
+# Resolves the current user home directory from the available process
+# environment in a Windows-safe order.
+# Input: none.
+# Output: home directory path string or undef when no supported home variables exist.
+sub _resolved_home_from_env {
+    my $home = $ENV{HOME};
+    return $home if defined $home && $home ne '';
+
+    my $userprofile = $ENV{USERPROFILE};
+    return $userprofile if defined $userprofile && $userprofile ne '';
+
+    my $homedrive = $ENV{HOMEDRIVE};
+    my $homepath  = $ENV{HOMEPATH};
+    if ( defined $homedrive && $homedrive ne '' && defined $homepath && $homepath ne '' ) {
+        return File::Spec->catdir( $homedrive, $homepath );
+    }
+
+    return undef;
+}
+
 # new(%args)
 # Constructs the logical path registry for the runtime.
 # Input: home, app_name, workspace_roots, project_roots, and named_paths.
@@ -19,7 +40,7 @@ use Developer::Dashboard::JSON qw(json_encode);
 sub new {
     my ( $class, %args ) = @_;
 
-    my $home = $args{home} || $ENV{HOME} || die 'Missing home directory';
+    my $home = $args{home} || _resolved_home_from_env() || die 'Missing home directory';
 
     my $self = bless {
         home            => $home,

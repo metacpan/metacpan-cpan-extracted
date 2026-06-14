@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::API;
 use strict;
 use warnings;
 
-our $VERSION = '4.03';
+our $VERSION = '4.16';
 
 use Digest::SHA qw(sha256_hex);
 use Getopt::Long qw(GetOptionsFromArray);
@@ -74,7 +74,7 @@ sub _run_add_command {
     my $secret       = '';
     my $maybe_secret = '';
     my @routes;
-    my $output = 'json';
+    my $output = 'table';
     GetOptionsFromArray(
         \@argv,
         'key=s'          => \$key,
@@ -148,7 +148,7 @@ sub _run_remove_command {
     my (@argv) = @_;
     my $key    = '';
     my $route  = '';
-    my $output = 'json';
+    my $output = 'table';
     GetOptionsFromArray(
         \@argv,
         'key=s'      => \$key,

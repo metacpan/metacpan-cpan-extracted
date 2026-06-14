@@ -9,10 +9,6 @@ use ExtUtils::MakeMaker;
 my %WriteMakefileArgs = (
   "ABSTRACT" => "A simple security filter for Plack",
   "AUTHOR" => "Robert Rothenberg <perl\@rhizomnic.com>",
-  "BUILD_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "7.22",
-    "Module::Metadata" => "1.000015"
-  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -40,7 +36,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Log::Dispatch" => "2.68",
     "Log::Dispatch::Array" => 0,
-    "Module::Metadata" => "1.000015",
+    "Module::Metadata" => 0,
     "Plack::Builder" => 0,
     "Plack::Test" => 0,
     "Test2::V0" => 0,
@@ -48,7 +44,7 @@ my %WriteMakefileArgs = (
     "Test::Vars" => "0.015",
     "strict" => 0
   },
-  "VERSION" => "v0.13.1",
+  "VERSION" => "v0.13.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -57,7 +53,6 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Exporter::Tiny" => 0,
-  "ExtUtils::MakeMaker" => "7.22",
   "File::Spec" => 0,
   "HTTP::Exception" => 0,
   "HTTP::Request::Common" => 0,
@@ -67,7 +62,7 @@ my %FallbackPrereqs = (
   "IPC::Open3" => 0,
   "Log::Dispatch" => "2.68",
   "Log::Dispatch::Array" => 0,
-  "Module::Metadata" => "1.000015",
+  "Module::Metadata" => 0,
   "Plack::Builder" => 0,
   "Plack::Middleware" => 0,
   "Plack::Response" => 0,

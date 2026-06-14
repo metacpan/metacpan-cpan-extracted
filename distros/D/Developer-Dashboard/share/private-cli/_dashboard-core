@@ -25,6 +25,7 @@ BEGIN {
 }
 
 use Developer::Dashboard::Platform qw(
+  is_windows
   native_shell_name
   normalize_shell_name
   shell_quote_for
@@ -34,6 +35,19 @@ use Developer::Dashboard::InternalCLI ();
 use Developer::Dashboard::SeedSync ();
 
 my $dashboard_lib = File::Spec->catdir( $Bin, '..', 'lib' );
+if ( !defined $ENV{HOME} || $ENV{HOME} eq '' ) {
+    if ( defined $ENV{USERPROFILE} && $ENV{USERPROFILE} ne '' ) {
+        $ENV{HOME} = $ENV{USERPROFILE};
+    }
+    elsif (
+        defined $ENV{HOMEDRIVE} && $ENV{HOMEDRIVE} ne ''
+        && defined $ENV{HOMEPATH} && $ENV{HOMEPATH} ne ''
+      )
+    {
+        $ENV{HOME} = File::Spec->catdir( $ENV{HOMEDRIVE}, $ENV{HOMEPATH} );
+    }
+}
+$ENV{DEVELOPER_DASHBOARD_RUNNING_HELPER} ||= File::Spec->catfile( $Bin, '_dashboard-core' );
 
 my $cmd = shift @ARGV || die "Missing built-in dashboard command\n";
 $0 = join q{ }, 'developer-dashboard', $cmd, @ARGV;
@@ -640,7 +654,17 @@ elsif ( $cmd eq 'init' ) {
     my $config_file = $config->ensure_global_file;
 
     my @pages = $pages->list_saved_pages;
-    my $internal_cli = Developer::Dashboard::InternalCLI::ensure_helpers( paths => $paths );
+    if ( is_windows() && ( !defined $ENV{DEVELOPER_DASHBOARD_RUNNING_HELPER} || $ENV{DEVELOPER_DASHBOARD_RUNNING_HELPER} eq '' ) ) {
+        $ENV{DEVELOPER_DASHBOARD_RUNNING_HELPER} = Developer::Dashboard::InternalCLI::helper_path(
+            paths => $paths,
+            name  => 'init',
+        );
+    }
+    my %helper_sync_args = ( paths => $paths );
+    if (is_windows()) {
+        $helper_sync_args{skip_names} = ['init'];
+    }
+    my $internal_cli = Developer::Dashboard::InternalCLI::ensure_helpers(%helper_sync_args);
 
     print json_encode(
         {
@@ -1008,6 +1032,45 @@ elsif ( $cmd eq 'web-foreground' ) {
         port       => $port,
         workers    => $workers,
         ssl        => $ssl,
+    );
+    exit 0;
+}
+elsif ( $cmd eq 'collector-loop-foreground' ) {
+    my $name = '';
+    GetOptionsFromArray(
+        \@ARGV,
+        'name=s' => \$name,
+    );
+    die "Usage: dashboard collector-loop-foreground --name NAME\n" if !$name || @ARGV;
+    my $job = $collectors->read_job($name) || die "Unknown collector '$name'\n";
+    my $schedule_mode = $job->{schedule} || ( $job->{cron} ? 'cron' : $job->{interval} ? 'interval' : 'manual' );
+    my $interval = $runner->_effective_interval_seconds($job);
+    $runner->_run_loop_child(
+        daemonize     => 0,
+        interval      => $interval,
+        job           => $job,
+        name          => $name,
+        schedule_mode => $schedule_mode,
+        title         => $runner->_process_title($name),
+    );
+    exit 0;
+}
+elsif ( $cmd eq 'collector-worker-foreground' ) {
+    my $name = '';
+    my $loop_pid = 0;
+    GetOptionsFromArray(
+        \@ARGV,
+        'name=s'     => \$name,
+        'loop-pid=i' => \$loop_pid,
+    );
+    die "Usage: dashboard collector-worker-foreground --name NAME --loop-pid PID\n"
+      if !$name || !$loop_pid || @ARGV;
+    my $job = $collectors->read_job($name) || die "Unknown collector '$name'\n";
+    $runner->_run_loop_worker(
+        $job,
+        $name,
+        $runner->_process_title($name),
+        $loop_pid,
     );
     exit 0;
 }

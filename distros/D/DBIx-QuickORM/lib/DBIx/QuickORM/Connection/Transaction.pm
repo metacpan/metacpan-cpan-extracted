@@ -2,7 +2,7 @@ package DBIx::QuickORM::Connection::Transaction;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use Carp qw/croak confess/;
 
@@ -66,7 +66,8 @@ The transaction identifier (required).
 
 =item savepoint
 
-True when this represents a savepoint rather than a top-level transaction.
+The savepoint name when this transaction is implemented as a savepoint, undef
+for a top-level transaction. Use C<is_savepoint> for a boolean check.
 
 =item on_success
 
@@ -126,6 +127,15 @@ True when this is a savepoint.
 =cut
 
 sub is_savepoint { $_[0]->{+SAVEPOINT} ? 1 : 0 }
+
+=pod
+
+=item $txn->init
+
+Object construction hook invoked by L<Object::HashBase>. Validates the id and
+normalizes the callback queues. Not called directly.
+
+=cut
 
 sub init {
     my $self = shift;
@@ -219,6 +229,8 @@ sub rollback {
     my $self = shift;
     my ($why) = @_;
 
+    croak "Transaction is already complete" if $self->complete;
+
     if ($self->{+VERBOSE} || !$why) {
         my @caller = caller;
         my $trace = "$caller[1] line $caller[2]";
@@ -261,6 +273,8 @@ sub commit {
     my $self = shift;
     my ($why) = @_;
 
+    croak "Transaction is already complete" if $self->complete;
+
     if ($self->{+VERBOSE} || !$why) {
         my @caller = caller;
         my $trace = "$caller[1] line $caller[2]";
@@ -290,10 +304,11 @@ sub commit {
 
 =item ($ok, $errors) = $txn->terminate($res, $err)
 
-Records the final result, clears the callback queues and savepoint, then runs
-the success-or-fail callbacks followed by the completion callbacks. Returns a
+Records the final result, clears the callback queues, then runs the
+success-or-fail callbacks followed by the completion callbacks. Returns a
 list: a boolean for whether all callbacks succeeded, and an arrayref of any
-callback errors (undef when none).
+callback errors (undef when none). The savepoint name is retained so
+post-completion callbacks can still see C<is_savepoint>.
 
 =cut
 
@@ -310,7 +325,6 @@ sub terminate {
     delete $self->{+ON_SUCCESS};
     delete $self->{+ON_FAIL};
     delete $self->{+ON_COMPLETION};
-    delete $self->{+SAVEPOINT};
 
     return (1, undef) unless $todo && @$todo;
 
@@ -395,8 +409,10 @@ sub set_finalize {
 
 =item $ok = $txn->finalize($ok, $err)
 
-Runs and clears the finalize callback, passing it the transaction, C<$ok>,
-and C<$err>; returns C<$ok>. Croaks when there is no finalize callback set.
+Runs the finalize callback, passing it the transaction, C<$ok>, and C<$err>;
+returns C<$ok>. The callback is cleared only after it returns successfully, so
+a refused finalization (for example a commit attempted while an async query is
+active) can be retried later. Croaks when there is no finalize callback set.
 
 =back
 
@@ -405,14 +421,14 @@ and C<$err>; returns C<$ok>. Croaks when there is no finalize callback set.
 sub finalize {
     my $self = shift;
     my ($ok, $err) = @_;
-    my $cb = delete $self->{+FINALIZE} or croak "Nothing to finalize!";
+    my $cb = $self->{+FINALIZE} or croak "Nothing to finalize!";
     $cb->($self, $ok, $err);
+    delete $self->{+FINALIZE};
     return $ok;
 }
 
 sub DESTROY {
     my $self = shift;
-    my @caller = caller;
     my $finalize = $self->{+FINALIZE} or return;
     $self->{+IN_DESTROY} = 1;
     $self->set_exception("Transaction fell out of scope");

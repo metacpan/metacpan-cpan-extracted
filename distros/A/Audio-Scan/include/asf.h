@@ -218,5 +218,5 @@ void _parse_content_encryption(asfinfo *asf);
 void _parse_extended_content_encryption(asfinfo *asf);
 void _parse_script_command(asfinfo *asf);
 SV *_parse_picture(asfinfo *asf, uint32_t picture_offset);
-int asf_find_frame(PerlIO *infile, char *file, int offset);
+off_t asf_find_frame(PerlIO *infile, char *file, int offset);
 int _timestamp(asfinfo *asf, int offset, int *duration);

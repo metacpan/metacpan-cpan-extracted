@@ -1,5 +1,6 @@
 ^\.aspell\..*$
 ^\.aspelldict$
+^\.claude/
 [% IF github.use_devcontainer %]^\.devcontainer/
 [% END %]^\.git/
 [% IF github.use_ci %]^\.github/

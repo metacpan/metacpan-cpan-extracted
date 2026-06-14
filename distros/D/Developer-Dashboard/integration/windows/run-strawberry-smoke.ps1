@@ -283,6 +283,7 @@ function Get-DashboardBin {
 function Invoke-AssertContains {
     param(
         [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
         [string]$Text,
 
         [Parameter(Mandatory = $true)]
@@ -303,6 +304,7 @@ function Invoke-AssertContains {
 function Invoke-AssertNotContains {
     param(
         [Parameter(Mandatory = $true)]
+        [AllowEmptyString()]
         [string]$Text,
 
         [Parameter(Mandatory = $true)]
@@ -359,6 +361,22 @@ function Wait-HttpOk {
     throw "Timed out waiting for HTTP response from $Url"
 }
 
+# Purpose: quote one native Windows process argument for a ProcessStartInfo
+# Arguments string on older Windows PowerShell runtimes that lack ArgumentList.
+# Input: one native argument string.
+# Output: returns one safely quoted command-line argument string.
+function Quote-WindowsProcessArgument {
+    param([Parameter(Mandatory = $true)][string]$Argument)
+
+    if ($Argument -notmatch '[\s"]') {
+        return $Argument
+    }
+
+    $quoted = $Argument -replace '(\\*)"', '$1$1\"'
+    $quoted = $quoted -replace '(\\+)$', '$1$1'
+    return '"' + $quoted + '"'
+}
+
 # Purpose: dump the rendered DOM of a page through a real Windows browser.
 # Input: browser path, target URL, and browser user-data directory path.
 # Output: returns the dumped DOM as text or throws on browser failure.
@@ -369,11 +387,68 @@ function Get-DumpDom {
         [Parameter(Mandatory = $true)][string]$UserDataDir
     )
 
-    $dump = & $Browser --headless --disable-gpu --allow-insecure-localhost --user-data-dir=$UserDataDir --dump-dom $Url
-    if ($LASTEXITCODE -ne 0) {
-        throw "Browser dump-dom failed with exit code $LASTEXITCODE"
+    $processStartInfo = [System.Diagnostics.ProcessStartInfo]::new()
+    $processStartInfo.FileName = $Browser
+    $processStartInfo.UseShellExecute = $false
+    $processStartInfo.RedirectStandardOutput = $true
+    $processStartInfo.RedirectStandardError = $true
+    $processStartInfo.CreateNoWindow = $true
+
+    $browserArguments = @(
+        '--headless',
+        '--disable-gpu',
+        '--no-first-run',
+        '--disable-background-networking',
+        '--allow-insecure-localhost',
+        "--user-data-dir=$UserDataDir",
+        '--dump-dom',
+        $Url
+    )
+    $processStartInfo.Arguments = (($browserArguments | ForEach-Object {
+        Quote-WindowsProcessArgument -Argument $_
+    }) -join ' ')
+
+    $process = [System.Diagnostics.Process]::new()
+    $process.StartInfo = $processStartInfo
+    if (-not $process.Start()) {
+        throw "Browser dump-dom did not start"
     }
-    return ($dump | Out-String)
+
+    try {
+        $stdoutTask = $process.StandardOutput.ReadToEndAsync()
+        $stderrTask = $process.StandardError.ReadToEndAsync()
+
+        if (-not $process.WaitForExit(20000)) {
+            try {
+                $process.Kill()
+            }
+            catch {
+                Write-Warning ("Unable to kill stalled browser dump-dom process: {0}" -f $_.Exception.Message)
+            }
+            throw "Browser dump-dom timed out after 20 seconds"
+        }
+
+        $browserOutput = $stdoutTask.GetAwaiter().GetResult()
+        $browserError = $stderrTask.GetAwaiter().GetResult()
+        $process.WaitForExit()
+
+        $browserOutput = if ($null -eq $browserOutput) { '' } else { "$browserOutput" }
+        $browserError = if ($null -eq $browserError) { '' } else { "$browserError" }
+        $browserOutput = $browserOutput -replace '^\s+|\s+$', ''
+        $browserError = $browserError -replace '^\s+|\s+$', ''
+
+        if ($process.ExitCode -ne 0) {
+            if ([string]::IsNullOrWhiteSpace($browserError)) {
+                throw "Browser dump-dom failed with exit code $($process.ExitCode)"
+            }
+            throw "Browser dump-dom failed with exit code $($process.ExitCode): $browserError"
+        }
+
+        return $browserOutput
+    }
+    finally {
+        $process.Dispose()
+    }
 }
 
 # Purpose: copy the source tarball to a local temporary file so cpanm does not
@@ -430,40 +505,98 @@ Get-Content -Raw -LiteralPath `$env:DD_INSTALL_BOOTSTRAP_SCRIPT | Invoke-Express
 # the installed dashboard command after install.ps1 completes.
 # Input: none.
 # Output: returns nothing or throws when the fresh session cannot resolve
-# dashboard, print a version, restart the runtime, install the browser skill,
-# and run dashboard logs successfully.
+# dashboard, print a version, restart the runtime, install one deterministic
+# local smoke skill that exercises cpanm plus Makefile handling, and run
+# dashboard logs successfully.
+function New-SmokeSkillFixture {
+    $fixtureRoot = Join-Path ([System.IO.Path]::GetTempPath()) "dd-win-smoke-skill"
+    if (Test-Path $fixtureRoot) {
+        Remove-Item -Recurse -Force $fixtureRoot
+    }
+
+    New-Item -ItemType Directory -Force -Path $fixtureRoot | Out-Null
+    New-Item -ItemType Directory -Force -Path (Join-Path $fixtureRoot ".git") | Out-Null
+
+    @"
+VERSION=1.00
+"@ | Set-Content -Path (Join-Path $fixtureRoot ".env") -Encoding ASCII
+
+    @"
+requires 'JSON::XS';
+"@ | Set-Content -Path (Join-Path $fixtureRoot "cpanfile") -Encoding ASCII
+
+    @"
+all:
+	@echo default>>make.log
+test:
+	@echo test>>make.log
+install:
+	@echo install>>make.log
+clean:
+	@echo clean>>make.log
+"@ | Set-Content -Path (Join-Path $fixtureRoot "Makefile") -Encoding ASCII
+
+    return $fixtureRoot
+}
+
 function Assert-FreshPowerShellDashboardBootstrap {
+    $smokeSkillSource = New-SmokeSkillFixture
     $freshSessionScript = @'
 $ErrorActionPreference = "Stop"
-Write-Output "DASHBOARD_SOURCE_START"
-(Get-Command dashboard -ErrorAction Stop).Source
-Write-Output "DASHBOARD_VERSION_START"
+function Write-TraceLine {
+    param([Parameter(Mandatory = $true)][string]$Line)
+    Add-Content -Path $env:DD_FRESH_SESSION_LOG -Value $Line
+}
+Write-TraceLine "DASHBOARD_SOURCE_START"
+$dashboardSource = (Get-Command dashboard -ErrorAction Stop).Source
+Write-TraceLine $dashboardSource
+Write-TraceLine "DASHBOARD_VERSION_START"
 dashboard version
 if ($LASTEXITCODE -ne 0) { throw "dashboard version failed with exit code $LASTEXITCODE" }
-Write-Output "DASHBOARD_RESTART_START"
+Write-TraceLine "DASHBOARD_RESTART_START"
 dashboard restart
 if ($LASTEXITCODE -ne 0) { throw "dashboard restart failed with exit code $LASTEXITCODE" }
-Write-Output "DASHBOARD_RESTART_END"
-Write-Output "DASHBOARD_SKILL_INSTALL_BROWSER_START"
-dashboard skills install browser
-if ($LASTEXITCODE -ne 0) { throw "dashboard skills install browser failed with exit code $LASTEXITCODE" }
-Write-Output "DASHBOARD_SKILL_INSTALL_BROWSER_END"
-Write-Output "DASHBOARD_LOGS_START"
-dashboard logs
+Write-TraceLine "DASHBOARD_RESTART_END"
+Write-TraceLine "DASHBOARD_SKILL_INSTALL_START"
+$smokeSkillInstallOutput = dashboard skills install $env:DD_SMOKE_SKILL_SOURCE 2>&1 | Out-String
+if ($LASTEXITCODE -ne 0) { throw "dashboard skills install smoke skill failed with exit code $LASTEXITCODE`n$smokeSkillInstallOutput" }
+$smokeSkillPath = Join-Path $env:HOME '.developer-dashboard\skills\dd-win-smoke-skill'
+$smokeSkillMakeLog = Join-Path $smokeSkillPath 'make.log'
+if (-not (Test-Path $smokeSkillMakeLog)) { throw "smoke skill Makefile log missing at $smokeSkillMakeLog" }
+$smokeSkillMakeLogText = Get-Content -Raw -Path $smokeSkillMakeLog
+if ($smokeSkillMakeLogText -notmatch 'default') { throw "smoke skill Makefile default target did not run" }
+if ($smokeSkillMakeLogText -notmatch 'test') { throw "smoke skill Makefile test target did not run" }
+if ($smokeSkillMakeLogText -notmatch 'install') { throw "smoke skill Makefile install target did not run" }
+if ($smokeSkillMakeLogText -notmatch 'clean') { throw "smoke skill Makefile clean target did not run" }
+Write-TraceLine "DASHBOARD_SKILL_INSTALL_END"
+Write-TraceLine "DASHBOARD_LOGS_START"
+$dashboardLogsOutput = dashboard logs | Out-String
 if ($LASTEXITCODE -ne 0) { throw "dashboard logs failed with exit code $LASTEXITCODE" }
-Write-Output "DASHBOARD_LOGS_END"
+Write-TraceLine "DASHBOARD_LOGS_END"
 '@
 
     $freshSessionScriptPath = Join-Path ([System.IO.Path]::GetTempPath()) "dd-fresh-session-bootstrap.ps1"
+    $freshSessionLogPath = Join-Path ([System.IO.Path]::GetTempPath()) ("dd-fresh-session-bootstrap-" + [guid]::NewGuid().ToString("N") + ".log")
     try {
+        $env:DD_SMOKE_SKILL_SOURCE = $smokeSkillSource
+        $env:DD_FRESH_SESSION_LOG = $freshSessionLogPath
         Set-Content -Path $freshSessionScriptPath -Value $freshSessionScript -Encoding UTF8
-        $freshSessionOutput = & powershell.exe -NoLogo -File $freshSessionScriptPath | Out-String
+        Set-Content -Path $freshSessionLogPath -Value '' -Encoding UTF8
+        & powershell.exe @(
+            '-NoLogo',
+            '-File',
+            $freshSessionScriptPath
+        )
+        $freshSessionOutput = Get-Content -Raw -Path $freshSessionLogPath
         if ($LASTEXITCODE -ne 0) {
             throw "fresh profile-loaded PowerShell dashboard check failed with exit code $LASTEXITCODE"
         }
     }
     finally {
+        Remove-Item Env:DD_SMOKE_SKILL_SOURCE -ErrorAction SilentlyContinue
+        Remove-Item Env:DD_FRESH_SESSION_LOG -ErrorAction SilentlyContinue
         Remove-Item $freshSessionScriptPath -ErrorAction SilentlyContinue
+        Remove-Item $freshSessionLogPath -ErrorAction SilentlyContinue
     }
 
     Invoke-AssertContains -Text $freshSessionOutput -Fragment "DASHBOARD_SOURCE_START" -Label "fresh PowerShell dashboard bootstrap"
@@ -471,8 +604,8 @@ Write-Output "DASHBOARD_LOGS_END"
     Invoke-AssertContains -Text $freshSessionOutput -Fragment "DASHBOARD_VERSION_START" -Label "fresh PowerShell dashboard bootstrap"
     Invoke-AssertContains -Text $freshSessionOutput -Fragment "DASHBOARD_RESTART_START" -Label "fresh PowerShell dashboard bootstrap"
     Invoke-AssertContains -Text $freshSessionOutput -Fragment "DASHBOARD_RESTART_END" -Label "fresh PowerShell dashboard bootstrap"
-    Invoke-AssertContains -Text $freshSessionOutput -Fragment "DASHBOARD_SKILL_INSTALL_BROWSER_START" -Label "fresh PowerShell dashboard bootstrap"
-    Invoke-AssertContains -Text $freshSessionOutput -Fragment "DASHBOARD_SKILL_INSTALL_BROWSER_END" -Label "fresh PowerShell dashboard bootstrap"
+    Invoke-AssertContains -Text $freshSessionOutput -Fragment "DASHBOARD_SKILL_INSTALL_START" -Label "fresh PowerShell dashboard bootstrap"
+    Invoke-AssertContains -Text $freshSessionOutput -Fragment "DASHBOARD_SKILL_INSTALL_END" -Label "fresh PowerShell dashboard bootstrap"
     Invoke-AssertContains -Text $freshSessionOutput -Fragment "DASHBOARD_LOGS_START" -Label "fresh PowerShell dashboard bootstrap"
     Invoke-AssertContains -Text $freshSessionOutput -Fragment "DASHBOARD_LOGS_END" -Label "fresh PowerShell dashboard bootstrap"
 }
@@ -483,6 +616,8 @@ Write-Output "DASHBOARD_LOGS_END"
 # Output: returns nothing and updates status.txt best-effort.
 function Write-PhaseStatus {
     param([Parameter(Mandatory = $true)][string]$Phase)
+
+    Write-Host "PHASE: $Phase"
 
     if ($StatusRoot -eq "" -or -not (Test-Path $StatusRoot)) {
         return
@@ -520,18 +655,23 @@ function Disable-WindowsFirewallForSmoke {
             return
         }
         catch {
-            throw "Set-NetFirewallProfile failed: $($_.Exception.Message)"
+            Write-Warning "Set-NetFirewallProfile failed during disposable Windows smoke guest setup: $($_.Exception.Message)"
         }
     }
 
-    Invoke-LoggedCommand -Label "disable Windows firewall for smoke" -Command @(
-        "netsh.exe",
-        "advfirewall",
-        "set",
-        "allprofiles",
-        "state",
-        "off"
-    )
+    try {
+        Invoke-LoggedCommand -Label "disable Windows firewall for smoke" -Command @(
+            "netsh.exe",
+            "advfirewall",
+            "set",
+            "allprofiles",
+            "state",
+            "off"
+        )
+    }
+    catch {
+        Write-Warning "Unable to disable the Windows firewall inside the disposable smoke guest: $($_.Exception.Message)"
+    }
 }
 
 if (-not (Test-Path $Tarball)) {
@@ -591,6 +731,7 @@ else {
     Copy-StatusArtifact -SourcePath $cpanmLog -DestinationName "cpanm-install.log"
 }
 
+Write-PhaseStatus -Phase "disable-firewall"
 Disable-WindowsFirewallForSmoke
 
 Write-PhaseStatus -Phase "locate-dashboard-bin"
@@ -607,7 +748,7 @@ $navRoot = Join-Path $bookmarkRoot "nav"
 $configRoot = Join-Path $runtimeRoot "config"
 
 New-Item -ItemType Directory -Force -Path $homeRoot, $projectRoot, $bookmarkRoot, $ajaxRoot, $navRoot, $configRoot, $profileRoot | Out-Null
-Set-Content -Path (Join-Path $projectRoot ".git") -Value "" -NoNewline
+New-Item -ItemType Directory -Force -Path (Join-Path $projectRoot ".git") | Out-Null
 
 $env:HOME = $homeRoot
 $env:USERPROFILE = $homeRoot
@@ -619,13 +760,10 @@ TITLE: Windows Smoke
 :--------------------------------------------------------------------------------:
 HTML:
 <div id="windows-smoke-page">hello from windows smoke</div>
-CODE1:
-Ajax file => 'hello.ps1', jvar => 'ajax.url', code => q{
-Write-Output 'ajax-ok'
-};
 "@
 Set-Content -Path (Join-Path $bookmarkRoot "sample") -Value $bookmark
 Set-Content -Path (Join-Path $navRoot "home.tt") -Value '<a href="/app/sample">Home</a>'
+Set-Content -Path (Join-Path $ajaxRoot "hello.pl") -Value 'print "ajax-ok";' -Encoding ASCII
 
 $configJson = @"
 {
@@ -646,7 +784,7 @@ if ($LASTEXITCODE -ne 0) {
     throw "dashboard shell ps failed with exit code $LASTEXITCODE"
 }
 Invoke-AssertContains -Text $psBootstrap -Fragment "function prompt {" -Label "PowerShell bootstrap"
-Invoke-AssertContains -Text $psBootstrap -Fragment "dashboard ps1 --mode compact" -Label "PowerShell bootstrap"
+Invoke-AssertContains -Text $psBootstrap -Fragment "ps1 --mode compact" -Label "PowerShell bootstrap"
 Invoke-AssertNotContains -Text $psBootstrap -Fragment "PS1=" -Label "PowerShell bootstrap"
 
 $promptText = & $Dashboard ps1 | Out-String
@@ -683,7 +821,12 @@ try {
         $page = Invoke-WebRequest -UseBasicParsing -Uri "http://127.0.0.1:$Port/app/sample"
         Invoke-AssertContains -Text $page.Content -Fragment "windows-smoke-page" -Label "saved page"
 
-        $ajax = Invoke-WebRequest -UseBasicParsing -Uri "http://127.0.0.1:$Port/ajax/hello.ps1?type=text"
+        $ajaxRoute = '/ajax/hello.pl?type=text'
+        Write-Host "saved Ajax route: $ajaxRoute"
+        $ajax = Invoke-WebRequest -UseBasicParsing -Uri ("http://127.0.0.1:$Port" + $ajaxRoute)
+        Write-Host "saved Ajax status: $($ajax.StatusCode)"
+        Write-Host "saved Ajax body:"
+        Write-Host $ajax.Content
         Invoke-AssertContains -Text $ajax.Content -Fragment "ajax-ok" -Label "saved Ajax"
 
         $browser = Get-BrowserBinary
@@ -706,7 +849,12 @@ try {
 finally {
     Pop-Location
     if (-not $KeepTemp) {
-        Remove-Item -Recurse -Force $tempRoot
+        try {
+            Remove-Item -Recurse -Force $tempRoot
+        }
+        catch {
+            Write-Warning ("Unable to remove Windows smoke temp root {0}: {1}" -f $tempRoot, $_.Exception.Message)
+        }
     }
 }
 
@@ -730,7 +878,7 @@ run-strawberry-smoke.ps1 - verify the built tarball under Strawberry Perl and Po
 This script normally installs the built C<Developer::Dashboard> tarball with
 C<cpanm> under Strawberry Perl, verifies C<dashboard shell ps> and
 C<dashboard ps1>, checks one PowerShell-backed collector command, starts the
-dashboard web service, exercises one saved Ajax PowerShell handler through
+dashboard web service, exercises one saved Ajax handler through
 C<Invoke-WebRequest>, and optionally dumps DOM through Edge or Chrome when a
 browser binary is present on the Windows host.
 

@@ -136,4 +136,4 @@ void _id3_skip(id3info *id3, uint32_t size);
 char const * _id3_genre_index(unsigned int index);
 char const * _id3_genre_name(char const *string);
 static id3_compat const * _id3_compat_lookup(register char const *, register unsigned int);
-static id3_frametype const * _id3_frametype_lookup(register char const *, register unsigned int);
+const struct id3_frametype * _id3_frametype_lookup(register const char *, register size_t);

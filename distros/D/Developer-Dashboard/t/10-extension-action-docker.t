@@ -162,7 +162,7 @@ close $nested_skill_parent_env_fh;
 open my $nested_skill_leaf_env_fh, '>', File::Spec->catfile( $nested_skill_leaf_root, '.env' ) or die $!;
 print {$nested_skill_leaf_env_fh} "VERSION=zzz\nSHARED_CHAIN=zzz\n";
 close $nested_skill_leaf_env_fh;
-my $local_docker_green_root = File::Spec->catdir( $repo, '.developer-dashboard', 'docker', 'green' );
+my $local_docker_green_root = File::Spec->catdir( $repo, '.developer-dashboard', 'config', 'docker', 'green' );
 make_path($local_docker_green_root);
 open my $local_green_dev_fh, '>', File::Spec->catfile( $local_docker_green_root, 'development.compose.yml' ) or die $!;
 print {$local_green_dev_fh} "services:\n  green:\n    environment:\n      GREEN_DEV: local\n";
@@ -397,8 +397,8 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
     is_deeply( $resolved->{precedence}, [ qw(base project service addon mode) ], 'docker compose resolver exposes overlay precedence' );
     is_same_path(
         ( grep { /green\/development\.compose\.yml$/ } @{ $resolved->{files} } )[-1],
-        File::Spec->catfile( $repo, '.developer-dashboard', 'docker', 'green', 'development.compose.yml' ),
-        'docker compose resolver leaves the deepest project-local isolated service folder as the last overriding development compose layer',
+        File::Spec->catfile( $repo, '.developer-dashboard', 'config', 'docker', 'green', 'development.compose.yml' ),
+        'docker compose resolver leaves the deepest project-local config/docker service folder as the last overriding development compose layer',
     );
     ok( grep( { $_ eq 'green' } @{ $resolved->{services} } ), 'docker compose resolver infers service names from passthrough docker compose args' );
     is( $resolved->{command}[-1], 'green', 'docker compose resolver preserves passthrough docker compose service args' );
@@ -434,6 +434,29 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
     ok( !exists $resolved->{env}{DISABLED_SKILL_ENV}, 'docker compose resolver still skips disabled skill .env values during auto-discovery' );
     ok( !defined $ENV{ORANGE_SKILL_ENV}, 'docker compose resolver does not leak participating skill .env values into the caller environment' );
     is( $resolved->{command}[-1], 'config', 'docker compose resolver preserves passthrough config invocation with active auto-discovery' );
+}
+
+{
+    my $old = Cwd::getcwd();
+    chdir $repo or die $!;
+    my $docker = Developer::Dashboard::DockerCompose->new(
+        config  => $config,
+        paths   => $paths,
+    );
+    my $disabled = $docker->disable_service( service => 'green' );
+    my $enabled  = $docker->enable_service( service => 'green' );
+    chdir $old or die $!;
+    is_same_path(
+        $disabled->{marker},
+        File::Spec->catfile( $repo, '.developer-dashboard', 'config', 'docker', 'green', 'disabled.yml' ),
+        'docker compose disable writes the project-local marker under config/docker',
+    );
+    is_same_path(
+        $enabled->{marker},
+        File::Spec->catfile( $repo, '.developer-dashboard', 'config', 'docker', 'green', 'disabled.yml' ),
+        'docker compose enable removes the project-local marker under config/docker',
+    );
+    ok( !-f $enabled->{marker}, 'docker compose enable removes the project-local config/docker disabled marker' );
 }
 
 {
@@ -485,7 +508,7 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
     is( $disable->{disabled}, 1, 'disable_service reports the service as disabled' );
     is_same_path(
         $disable->{marker},
-        File::Spec->catfile( $repo, '.developer-dashboard', 'docker', 'purple', 'disabled.yml' ),
+        File::Spec->catfile( $repo, '.developer-dashboard', 'config', 'docker', 'purple', 'disabled.yml' ),
         'disable_service writes the marker into the deepest runtime docker root',
     );
     ok( -f $disable->{marker}, 'disable_service creates the disabled.yml marker file' );
@@ -499,7 +522,7 @@ like( $allowed_result->{stdout}, qr/allowed/, 'transient encoded page can opt in
     is( $enable->{disabled}, 0, 'enable_service reports the service as enabled' );
     is_same_path(
         $enable->{marker},
-        File::Spec->catfile( $repo, '.developer-dashboard', 'docker', 'purple', 'disabled.yml' ),
+        File::Spec->catfile( $repo, '.developer-dashboard', 'config', 'docker', 'purple', 'disabled.yml' ),
         'enable_service reports the same local marker path it removed',
     );
     ok( !-f $enable->{marker}, 'enable_service removes the local disabled.yml marker file' );

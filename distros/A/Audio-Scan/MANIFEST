@@ -14,6 +14,7 @@ include/md5.h
 include/mp3.h
 include/mp4.h
 include/mpc.h
+include/ogf.h
 include/ogg.h
 include/opus.h
 include/pinttypes.h
@@ -47,6 +48,7 @@ src/md5.c
 src/mp3.c
 src/mp4.c
 src/mpc.c
+src/ogf.c
 src/ogg.c
 src/opus.c
 src/wav.c
@@ -103,6 +105,7 @@ t/flac/picture.flac
 t/flac/short-duration.flac
 t/flac/test.flac
 t/flac/tiny.flac
+t/generate_txxx_fixtures.py
 t/mac.t
 t/mac/apev1.ape
 t/mac/apev2.ape
@@ -174,6 +177,7 @@ t/mp3/v2.3-utf16le.mp3
 t/mp3/v2.3-xing-no-lame.mp3
 t/mp3/v2.3-xsop.mp3
 t/mp3/v2.3-zero-frame.mp3
+t/mp3/v2.3-zero-length-txxx.mp3
 t/mp3/v2.3.mp3
 t/mp3/v2.4-ape-invalid-key.mp3
 t/mp3/v2.4-ape.mp3
@@ -185,6 +189,9 @@ t/mp3/v2.4-compressed-frame.mp3
 t/mp3/v2.4-corrupt-frame.mp3
 t/mp3/v2.4-empty-text.mp3
 t/mp3/v2.4-encrypted-frame.mp3
+t/mp3/v2.4-ext-header-invalid-too-short.mp3
+t/mp3/v2.4-ext-header-invalid.mp3
+t/mp3/v2.4-ext-header.mp3
 t/mp3/v2.4-geob-multiple.mp3
 t/mp3/v2.4-geob.mp3
 t/mp3/v2.4-group-id.mp3
@@ -196,9 +203,14 @@ t/mp3/v2.4-multiple-tcon.mp3
 t/mp3/v2.4-rva2-mp3gain.mp3
 t/mp3/v2.4-rva2-neg.mp3
 t/mp3/v2.4-tipl.mp3
+t/mp3/v2.4-txxx-multivalue-3.mp3
+t/mp3/v2.4-txxx-multivalue-empty.mp3
+t/mp3/v2.4-txxx-multivalue.mp3
+t/mp3/v2.4-txxx-single.mp3
 t/mp3/v2.4-unsync.mp3
 t/mp3/v2.4-utf16be.mp3
 t/mp3/v2.4-utf16le.mp3
+t/mp3/v2.4-utf8-grp1.mp3
 t/mp3/v2.4-utf8-null-comment.mp3
 t/mp3/v2.4-utf8.mp3
 t/mp3/v2.4.mp3
@@ -219,6 +231,10 @@ t/musepack.t
 t/musepack/apev2-cover.mpc
 t/musepack/apev2.mpc
 t/musepack/sv8.mpc
+t/ogf.t
+t/ogf/large-comment.ogf
+t/ogf/picture.ogf
+t/ogf/test.ogf
 t/ogg.t
 t/ogg/bug1155-1.ogg
 t/ogg/bug1155-2.ogg
@@ -238,9 +254,11 @@ t/ogg/old2.ogg
 t/ogg/tachos_melody.ogg
 t/ogg/test.ogg
 t/opus.t
+t/opus/3min_noise.opus
 t/opus/broken.phobosstream.opus
 t/opus/broken.testvector01.bit.opus
 t/opus/failure-end_gp_before_last_packet1.opus
+t/opus/large_embedded_picture.opus
 t/opus/test-1-mono.opus
 t/opus/test-2-stereo.opus
 t/opus/test-8-7.1.opus

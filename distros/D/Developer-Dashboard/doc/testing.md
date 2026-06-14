@@ -140,6 +140,13 @@ surface, not only installed skills. A flat alias such as `"/java":
 `/app/learn.ai`, and dispatcher coverage also locks the runtime `/ajax`,
 `/js`, `/css`, and `/others` alias families to the same route schema.
 The focused skill regression in `t/19-skill-system.t` now also exercises `PathRegistry::installed_skill_docker_roots()` directly, including the default enabled-only view and the explicit `include_disabled => 1` path, so skill docker layering changes do not quietly drag the reviewed `lib/` total below `100.0 / 100.0 / 100.0`.
+The focused web coverage suites must also call low-traffic `Web::App`
+compatibility helpers directly when their only other execution path would be
+indirect route fan-out. That is now part of the coverage contract for
+`apps_redirect_response`, the singleton stop helper, the shipped shim asset
+responses, and the installed-distribution `File::ShareDir` asset-root fallback,
+so GitHub-hosted `Devel::Cover` runs cannot drift below the local reviewed
+`100.0 / 100.0 / 100.0` result for `lib/Developer/Dashboard/Web/App.pm`.
 That same focused skill regression now also locks the same-repo
 `DD-OOP-LAYERS` fallback contract inside one skill name, including inherited
 fallback for missing `cli/<command>` files, missing bookmark files, missing
@@ -211,7 +218,7 @@ carry `tmux` because `dashboard workspace` is a first-party tmux workflow.
 
 Branch and condition reports are still generated and should be used to drive new edge-case tests, especially when adding new runtime modules.
 
-Frontend editor changes should also be checked in a real browser route, not just from HTML output. In particular, the bookmark editor overlay must keep the visible syntax-highlighted source aligned with the real textarea caret while typing, must not soft-wrap differently from the textarea, and exact saved `/app/<id>/edit` repros with multi-line `<script>` blocks must be checked in Chromium so the editor keeps its highlight spans without drifting onto the wrong line.
+Frontend editor changes should also be checked in a real browser route, not just from HTML output. In particular, the split bookmark editor must load one visible block per section while still recomposing the canonical separator-based source into the hidden `instruction` field, the visible syntax-highlighted overlays must stay aligned with the real textarea carets while typing, block `Tab` handling must create the next section instead of corrupting the source, exact saved `/app/<id>/edit` repros with multi-line `<script>` blocks must be checked in Chromium so the editor keeps its highlight spans without drifting onto the wrong line, and smart-routed skill aliases such as `/app/<skill>/edit` must keep both Edit and Play on the smart alias instead of jumping to the underlying `BOOKMARK: index` id.
 
 JSON behavior is exercised through the shared `Developer::Dashboard::JSON` wrapper, which now uses `JSON::XS`.
 Release metadata checks also verify that built tarball runtime prerequisites
@@ -365,6 +372,7 @@ The web tests also cover the access model:
 - root free-form editor behavior at `/`
 - posted instruction handling through `/`, including default denial of unsaved transient execution unless `DEVELOPER_DASHBOARD_ALLOW_TRANSIENT_URLS` is enabled
 - saved bookmark browser edits through `/app/<id>/edit`, including named-route saves and non-transient play links when transient URL execution stays disabled
+- smart-routed skill browser edits through `/app/<skill>/edit` and nested `/app/<skill>/<sub-skill>/edit`, including raw `/source` access and Play renders that stay on the smart alias instead of `/app/index`
 - malformed bookmark icon bytes from older files are repaired into stable fallback glyphs on both `/app/<id>` and `/app/<id>/edit`, so browser verification should check for visible fallback icons instead of `�`
 - nested saved bookmark ids such as `nav/foo.tt` through `/app/...`, `/app/.../edit`, and `/app/.../source`
 - shared `nav/*.tt` bookmark rendering between top chrome and the main page body in sorted filename order
@@ -452,7 +460,7 @@ For Windows-targeted changes, keep the verification layered:
 - run the full-system QEMU guest smoke with `integration/windows/run-host-windows-smoke.sh` before making a release-grade Windows compatibility claim
 
 The Strawberry smoke verifies `dashboard shell ps`, `dashboard ps1`, one
-PowerShell-backed collector command, one saved Ajax PowerShell handler through
+PowerShell-backed collector command, one saved Ajax handler through
 `Invoke-WebRequest`, and a browser DOM dump through Edge or Chrome when either
 browser is present in the Windows environment.
 In the Dockur-backed guest path, the launcher stages the Strawberry Perl MSI
@@ -464,7 +472,9 @@ in-guest smoke first runs the repo-root `install.ps1` through a streamed
 staged tarball, so the release gate matches the intended operator flow of
 `irm .../install.ps1 | iex`. That bootstrap path must also prove that a
 brand-new profile-loaded PowerShell session can resolve `dashboard`, print
-`dashboard version`, and run `dashboard logs` without a manual PATH edit.
+`dashboard version`, run `dashboard logs` without a manual PATH edit, keep
+`HOME` visible to later dashboard commands, and expose a working user-space
+`make` shim for skill `Makefile` flows.
 It must also keep test-only dependencies such as `Plack::Test` and
 `Test::Pod` out of the packaged install prerequisite chain so blank Windows
 guests do not fail while pulling `Test::SharedFork`.

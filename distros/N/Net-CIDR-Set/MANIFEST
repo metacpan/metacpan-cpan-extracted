@@ -27,8 +27,10 @@ t/operations.t
 t/private.t
 t/validation.t
 weaver.ini
+xt/00-compile.t
 xt/author/clean-namespaces.t
 xt/author/critic.t
+xt/author/cve.t
 xt/author/eof.t
 xt/author/eol.t
 xt/author/minimum-version.t
@@ -40,6 +42,7 @@ xt/author/pod-linkcheck.t
 xt/author/pod-spell.t
 xt/author/pod-syntax.t
 xt/author/portability.t
+xt/author/test-version.t
 xt/etc/perlcritic.rc
 xt/release/cpan-changes.t
 xt/release/dist-manifest.t

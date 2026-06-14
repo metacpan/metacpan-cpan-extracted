@@ -2,7 +2,6 @@ use strict;
 use warnings;
 use Test::More;
 use Type::Guess;
-use Mojo::Util qw/dumper/;
 
 my @list;
 my $str;
@@ -58,11 +57,9 @@ $str = Type::Guess->new(@list);
 
 is($str->type, 'Num', 'Type is Num with percentages');
 ok($str->precision >= 1, 'Precision for percentages is correct');
-
+ok($str->percentages, "Percentages is correct");
 ok($str->integer_chars == 4, 'Integer size matches');
-like($str->to_string, qr/%/, 'String format includes percentage symbol');
-
-
+like($str->to_string, qr/%$/, 'String format includes percentage symbol');
 is_deeply([ map { $str->($_) } @list ], [ "-100.0%", " -13.0%", "  12.1%" ], "Formatted percentages are correct");
 
 # Test case 5: Mixed positive and negative integer_chars

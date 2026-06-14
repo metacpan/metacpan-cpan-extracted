@@ -8,7 +8,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy',
 use namespace::clean;
 use Data::Section -setup;
 
-our $VERSION = 'v1.0.8';
+our $VERSION = 'v1.0.9';
 
 sub configure {
 	my $self = shift;
@@ -107,9 +107,10 @@ This is the plugin bundle that DBOOK uses. It is equivalent to:
  location = root
  phase = release
  
- [GenerateFile / Generate_Contrib]
- filename = CONTRIBUTING.md
- content = ...
+ [GenerateFile::FromShareDir / Generate_Contrib]
+ -filename = CONTRIBUTING.md
+ -source_filename = CONTRIBUTING.md.tmpl
+ -dist = Dist-Zilla-PluginBundle-Author-DBOOK
  
  [MetaProvides::Package]
  [Prereqs::FromCPANfile]
@@ -260,7 +261,7 @@ Report any issues on the public bugtracker.
 
 =head1 AUTHOR
 
-Dan Book, C<dbook@cpan.org>
+Dan Book, C<book.d.wit@proton.me>
 
 =head1 COPYRIGHT AND LICENSE
 

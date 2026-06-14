@@ -3,7 +3,7 @@ package Developer::Dashboard::Web::App;
 use strict;
 use warnings;
 
-our $VERSION = '4.03';
+our $VERSION = '4.16';
 
 use Capture::Tiny qw(capture);
 use Digest::SHA qw(sha256_hex);
@@ -817,7 +817,8 @@ sub page_source_response {
     my ( $self, %args ) = @_;
     return _no_editor_response() if $self->_editor_disabled;
     my ( $params, $body_params ) = $self->_request_params(%args);
-    my $page = $self->_load_named_page( $args{id} );
+    my $page = $self->_load_editable_named_page( $args{id} );
+    return [ 404, 'text/plain; charset=utf-8', "Not found\n" ] if !$page;
     $page->{meta}{raw_instruction} = $page->{meta}{raw_instruction} || $page->canonical_instruction;
     $page = $self->_page_with_runtime_state(
         $page,
@@ -845,23 +846,35 @@ sub page_edit_post_response {
     my ( $params, $body_params ) = $self->_request_params(%args);
     my $instruction = exists $body_params->{instruction} ? $body_params->{instruction} : $params->{instruction};
     if ( defined $instruction ) {
+        my $existing_page = $self->_load_editable_named_page( $args{id} );
         my $page = Developer::Dashboard::PageDocument->from_instruction($instruction);
         $page->{meta}{raw_instruction} = $instruction;
         $page->{id} ||= $args{id};
-        $page->{meta}{source_kind} = 'saved';
-        $self->{pages}->save_page($page);
+        my $source_kind = 'saved';
+        if ( $existing_page && ( $existing_page->{meta}{source_kind} || '' ) eq 'skill' ) {
+            $source_kind = 'skill';
+            $page->{id} = $args{id};
+            $page->{meta}{source_kind} = 'skill';
+            $self->_decorate_skill_page_routes($page);
+        }
+        else {
+            $page->{meta}{source_kind} = 'saved';
+            $self->{pages}->save_page($page);
+        }
         my $mode = $params->{mode} || $body_params->{mode} || 'edit';
+        my $request_path = $args{path} || '/app/' . $args{id} . '/edit';
+        $request_path = '/app/' . $args{id} if $mode eq 'render' && $source_kind eq 'skill';
         $page = $self->_page_with_runtime_state(
             $page,
             query_params => $params,
             body_params  => $body_params,
-            path         => $args{path} || '/app/' . $args{id} . '/edit',
+            path         => $request_path,
             remote_addr  => $args{remote_addr},
             headers      => $args{headers} || {},
         );
         $page = $self->{runtime}->prepare_page(
             page            => $page,
-            source          => 'saved',
+            source          => $source_kind,
             runtime_context => { params => { %{$params}, %{$body_params} } },
         );
         return $self->_page_response( $page, $mode );
@@ -877,7 +890,8 @@ sub page_edit_response {
     my ( $self, %args ) = @_;
     return _no_editor_response() if $self->_editor_disabled;
     my ( $params, $body_params ) = $self->_request_params(%args);
-    my $page = $self->_load_named_page( $args{id} );
+    my $page = $self->_load_editable_named_page( $args{id} );
+    return $self->_missing_named_page_response( $args{id} ) if !$page;
     $page->{meta}{raw_instruction} = $page->{meta}{raw_instruction} || $page->canonical_instruction;
     $page = $self->_page_with_runtime_state(
         $page,
@@ -958,6 +972,93 @@ sub _saved_page_exists {
     return eval { $self->{pages}->load_saved_page($id); 1 } ? 1 : 0;
 }
 
+# _load_editable_named_page($id)
+# Resolves one named editor/source route through saved bookmarks first, then smart-routed skill pages.
+# Input: page id string without the /app/ prefix.
+# Output: page document object or undef when neither a saved page nor a skill route exists.
+sub _load_editable_named_page {
+    my ( $self, $id ) = @_;
+    return if !defined $id || $id eq '';
+    return $self->_load_named_page($id) if $self->_saved_page_exists($id);
+    return $self->_load_skill_named_page($id);
+}
+
+# _load_skill_named_page($id)
+# Resolves one /app/<id> alias as a smart-routed skill page, including index aliases such as /app/<skill>.
+# Input: page id string without the /app/ prefix.
+# Output: decorated skill page document object or undef when the id is not an installed skill route.
+sub _load_skill_named_page {
+    my ( $self, $id ) = @_;
+    return if !defined $id || $id eq '';
+    my @segments = grep { defined && $_ ne '' } split m{/+}, $id;
+    return if !@segments;
+
+    my $dispatcher = $self->_skill_dispatcher;
+    my $spec = $self->_resolve_skill_route_spec(@segments);
+    return if !$spec || !@{ $spec->{skill_layers} || [] };
+
+    my @route_segments = @{ $spec->{route_segments} || [] };
+    my $route_id = @route_segments ? join( '/', @route_segments ) : 'index';
+    my $page = eval {
+        $dispatcher->_load_skill_page(
+            skill_name => $spec->{skill_name},
+            route_id   => $route_id,
+        );
+    };
+    return if !$page || $@;
+    return $self->_decorate_skill_page_routes($page);
+}
+
+# _decorate_skill_page_routes($page)
+# Stamps the canonical smart-routed browser URLs onto one loaded skill page so render and edit stay on /app/<skill>.
+# Input: skill page document object.
+# Output: the same page document object with browser route metadata attached.
+sub _decorate_skill_page_routes {
+    my ( $self, $page ) = @_;
+    return $page if ref($page) ne 'Developer::Dashboard::PageDocument';
+    return $page if ( $page->{meta}{source_kind} || '' ) ne 'skill';
+    my $page_id = $page->as_hash->{id} || '';
+    return $page if $page_id eq '';
+
+    my $page_url = $self->_saved_page_url($page_id);
+    $page->{meta}{render_route} = $page_url;
+    $page->{meta}{edit_route}   = $page_url . '/edit';
+    $page->{meta}{source_route} = $page_url . '/edit';
+    $page->{meta}{form_action}  = $page_url . '/edit';
+    return $page;
+}
+
+# _page_route_urls($page)
+# Resolves the browser edit/render/source URLs for one page, including explicit smart-routed skill aliases.
+# Input: page document object.
+# Output: hash reference with page_url, form_action, edit, render, and source URL strings.
+sub _page_route_urls {
+    my ( $self, $page ) = @_;
+    my $meta = $page->{meta} || {};
+    if ( $meta->{edit_route} || $meta->{render_route} || $meta->{source_route} || $meta->{form_action} ) {
+        return {
+            page_url    => $meta->{render_route} || '',
+            form_action => $meta->{form_action} || '/',
+            edit        => $meta->{edit_route} || '',
+            render      => $meta->{render_route} || '',
+            source      => $meta->{source_route} || '',
+        };
+    }
+
+    my $page_id = $page->as_hash->{id} || '';
+    my $source_kind = $meta->{source_kind} || '';
+    my $is_saved = $source_kind eq 'saved' && $page_id ne '';
+    my $is_transient = $source_kind eq 'transient';
+    my $page_url = $is_saved ? $self->_saved_page_url($page_id) : '';
+    return {
+        page_url    => $is_transient ? $self->{pages}->editable_url($page) : $page_url,
+        form_action => $is_saved ? $page_url . '/edit' : '/',
+        edit        => $is_saved ? $page_url . '/edit' : ( $is_transient ? $self->{pages}->editable_url($page) : '' ),
+        render      => $is_saved ? $page_url : ( $is_transient ? $self->{pages}->render_url($page) : '' ),
+        source      => $is_saved ? $page_url . '/edit' : ( $is_transient ? $self->{pages}->editable_url($page) : '' ),
+    };
+}
+
 # _page_response($page, $mode)
 # Builds a page response for edit, render, or source mode.
 # Input: page document object and mode string.
@@ -990,15 +1091,8 @@ sub _edit_html {
     $source =~ s/</&lt;/g;
     $source =~ s/>/&gt;/g;
 
-    my $page_id = $page->as_hash->{id} || '';
-    my $is_saved = ( $page->{meta}{source_kind} || '' ) ne 'transient' && $page_id ne '';
-    my $page_url = $is_saved ? $self->_saved_page_url($page_id) : '';
-    my $urls = {
-        edit   => $is_saved ? $page_url . '/edit' : $self->{pages}->editable_url($page),
-        render => $is_saved ? $page_url : $self->{pages}->render_url($page),
-        source => $is_saved ? $page_url . '/edit' : $self->{pages}->editable_url($page),
-    };
-    my $form_action = $is_saved ? $page_url . '/edit' : '/';
+    my $urls = $self->_page_route_urls($page);
+    my $form_action = $urls->{form_action} || '/';
 
     my $title = $page->as_hash->{title};
     $title =~ s/&/&amp;/g;
@@ -1023,7 +1117,7 @@ sub _edit_html {
       overflow: hidden;
     }
     .editor-overlay,
-    .instruction-editor {
+    .instruction-block-editor {
       display: block;
       width: 100%;
       min-height: 520px;
@@ -1058,10 +1152,10 @@ sub _edit_html {
       direction: ltr;
       will-change: transform;
     }
-    .instruction-editor {
+    .instruction-block-editor {
       position: relative;
       z-index: 1;
-      height: 520px;
+      min-height: 220px;
       color: transparent;
       border: 0;
       resize: vertical;
@@ -1074,9 +1168,31 @@ sub _edit_html {
       overflow: auto;
       scrollbar-gutter: stable both-edges;
     }
-    .instruction-editor::selection {
+    .instruction-block-editor::selection {
       background: rgba(121, 192, 255, 0.35);
       -webkit-text-fill-color: transparent;
+    }
+    .instruction-source {
+      display: none;
+    }
+    .editor-blocks {
+      display: grid;
+      gap: 16px;
+    }
+    .editor-block {
+      display: grid;
+      gap: 8px;
+    }
+    .editor-block-label {
+      color: #9da7b3;
+      font: 600 12px/1.4 Menlo, Consolas, "Courier New", monospace;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .editor-hint {
+      color: #727b84;
+      font-size: 12px;
+      margin-bottom: 12px;
     }
     .tok-directive { color: #ffd866; font-weight: normal; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
     .tok-separator { color: #5c6370; }
@@ -1092,23 +1208,37 @@ sub _edit_html {
     .tok-string { color: #ffd866; }
     .tok-comment { color: #727b84; }
     .tok-note { color: #ff6188; }
-    a { color: #0b7a75; margin-right: 18px; text-decoration: none; }
+    a, .chrome-button {
+      color: #0b7a75;
+      margin-right: 18px;
+      text-decoration: none;
+    }
+    .chrome-button {
+      border: 0;
+      background: none;
+      padding: 0;
+      font: inherit;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
 <main>
   __TOP_CHROME__
   <form method="post" action="__FORM_ACTION__" id="instruction-form">
-    <div class="editor-stack">
-      <div class="editor-overlay-viewport" aria-hidden="true"><pre class="editor-overlay" id="instruction-highlight">__INITIAL_HIGHLIGHT__</pre></div>
-      <textarea class="instruction-editor" id="instruction-editor" name="instruction" wrap="off" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off">__SOURCE__</textarea>
-    </div>
+    <input type="hidden" name="mode" id="instruction-mode" value="edit">
+    <div class="editor-hint">Each bookmark section is edited as its own block. Press Tab inside a block to start the next section.</div>
+    <textarea class="instruction-source" id="instruction-source" name="instruction" wrap="off" spellcheck="false" autocapitalize="off" autocomplete="off" autocorrect="off">__SOURCE__</textarea>
+    <div class="editor-blocks" id="instruction-blocks"></div>
   </form>
 </main>
 <script>
 const ddForm = document.getElementById('instruction-form');
-const ddEditor = document.getElementById('instruction-editor');
-const ddHighlight = document.getElementById('instruction-highlight');
+const ddSource = document.getElementById('instruction-source');
+const ddMode = document.getElementById('instruction-mode');
+const ddBlocks = document.getElementById('instruction-blocks');
+const ddPlayButton = document.getElementById('play-button');
+const ddLegacySep = ':--------------------------------------------------------------------------------:';
 function ddEscapeHtml(text) {
   return String(text)
     .replace(/&/g, '&amp;')
@@ -1280,6 +1410,39 @@ function ddOverlayHtml(text) {
   if (source.endsWith('\n')) html += ' ';
   return html;
 }
+function ddTrimSectionText(text) {
+  return String(text).replace(/^\s+/, '').replace(/\s+$/, '');
+}
+function ddSplitInstruction(text) {
+  const source = String(text || '').replace(/\r\n/g, '\n');
+  const lines = source.split('\n');
+  const sections = [];
+  let current = [];
+  lines.forEach(function(line) {
+    if (line === ddLegacySep || /^\s*---\s*$/.test(line)) {
+      const chunk = ddTrimSectionText(current.join('\n'));
+      if (chunk) sections.push(chunk);
+      current = [];
+      return;
+    }
+    current.push(line);
+  });
+  const tail = ddTrimSectionText(current.join('\n'));
+  if (tail) sections.push(tail);
+  if (!sections.length) {
+    const fallback = ddTrimSectionText(source);
+    if (fallback) sections.push(fallback);
+  }
+  return sections;
+}
+function ddComposeInstruction() {
+  const blocks = Array.prototype.slice.call(ddBlocks.querySelectorAll('.instruction-block-editor'))
+    .map(function(node) { return ddTrimSectionText(node.value); })
+    .filter(function(text) { return text !== ''; });
+  const source = blocks.length ? blocks.join('\n' + ddLegacySep + '\n') + '\n' : '';
+  ddSource.value = source;
+  return source;
+}
 function ddDirectiveName(line) {
   const match = String(line).match(/^([A-Za-z][A-Za-z0-9.]*)\s*:/);
   return match ? match[1].toUpperCase() : '';
@@ -1309,6 +1472,15 @@ function ddNextDirectiveForContext(textBefore, fullText) {
     break;
   }
   if (priorDirective === 'TITLE') {
+    if (!directives.BOOKMARK) return 'BOOKMARK: ';
+    return directives.HTML ? '' : 'HTML: ';
+  }
+  if (priorDirective === 'BOOKMARK') {
+    if (!directives.NOTE) return 'NOTE: ';
+    if (!directives.STASH) return 'STASH: ';
+    return directives.HTML ? '' : 'HTML: ';
+  }
+  if (priorDirective === 'NOTE' || priorDirective === 'STASH') {
     return directives.HTML ? '' : 'HTML: ';
   }
   if (priorDirective === 'HTML' || /^CODE\d+$/.test(priorDirective)) {
@@ -1316,10 +1488,10 @@ function ddNextDirectiveForContext(textBefore, fullText) {
   }
   return '';
 }
-function ddApplyDirectiveAssist() {
-  if (ddEditor.selectionStart !== ddEditor.selectionEnd) return false;
-  const caret = ddEditor.selectionStart;
-  const value = ddEditor.value;
+function ddApplyDirectiveAssist(editor) {
+  if (editor.selectionStart !== editor.selectionEnd) return false;
+  const caret = editor.selectionStart;
+  const value = editor.value;
   const lineStart = value.lastIndexOf('\n', Math.max(caret - 1, 0) - 1) + 1;
   const lineEndAt = value.indexOf('\n', caret);
   const lineEnd = lineEndAt >= 0 ? lineEndAt : value.length;
@@ -1335,34 +1507,156 @@ function ddApplyDirectiveAssist() {
     replacement += '\n' + nextDirective;
     nextCaret += 1 + nextDirective.length;
   }
-  ddEditor.value = textBefore + replacement + textAfter;
-  ddEditor.setSelectionRange(nextCaret, nextCaret);
+  editor.value = textBefore + replacement + textAfter;
+  editor.setSelectionRange(nextCaret, nextCaret);
   return true;
 }
-function ddSyncEditorOverlay() {
-  ddHighlight.style.minWidth = Math.max(ddEditor.scrollWidth, ddEditor.clientWidth) + 'px';
-  ddHighlight.style.minHeight = Math.max(ddEditor.scrollHeight, ddEditor.clientHeight) + 'px';
-  ddHighlight.style.transform = 'translate(' + (-ddEditor.scrollLeft) + 'px, ' + (-ddEditor.scrollTop) + 'px)';
+function ddSyncEditorOverlay(editor, highlight) {
+  highlight.style.minWidth = Math.max(editor.scrollWidth, editor.clientWidth) + 'px';
+  highlight.style.minHeight = Math.max(editor.scrollHeight, editor.clientHeight) + 'px';
+  highlight.style.transform = 'translate(' + (-editor.scrollLeft) + 'px, ' + (-editor.scrollTop) + 'px)';
 }
-function ddRenderEditor(text) {
-  ddHighlight.innerHTML = ddOverlayHtml(text);
-  ddSyncEditorOverlay();
+function ddAutoResizeEditor(editor) {
+  editor.style.height = 'auto';
+  editor.style.height = Math.max(editor.scrollHeight, 48) + 'px';
 }
-ddEditor.addEventListener('input', function() {
-  ddApplyDirectiveAssist();
-  ddRenderEditor(ddEditor.value);
+function ddRenderEditor(editor, highlight) {
+  highlight.innerHTML = ddOverlayHtml(editor.value);
+  ddAutoResizeEditor(editor);
+  ddSyncEditorOverlay(editor, highlight);
+}
+function ddBlockLabel(text, index) {
+  const firstLine = String(text || '').split('\n')[0] || '';
+  const directive = ddDirectiveName(firstLine);
+  return directive || ('SECTION ' + (index + 1));
+}
+function ddFocusBlock(editor) {
+  editor.focus();
+  const caret = editor.value.length;
+  editor.setSelectionRange(caret, caret);
+}
+function ddCreateEditorBlock(text, index) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'editor-block';
+
+  const label = document.createElement('div');
+  label.className = 'editor-block-label';
+  label.textContent = ddBlockLabel(text, index);
+  wrapper.appendChild(label);
+
+  const stack = document.createElement('div');
+  stack.className = 'editor-stack';
+  wrapper.appendChild(stack);
+
+  const viewport = document.createElement('div');
+  viewport.className = 'editor-overlay-viewport';
+  viewport.setAttribute('aria-hidden', 'true');
+  stack.appendChild(viewport);
+
+  const highlight = document.createElement('pre');
+  highlight.className = 'editor-overlay';
+  viewport.appendChild(highlight);
+
+  const editor = document.createElement('textarea');
+  editor.className = 'instruction-block-editor';
+  editor.wrap = 'off';
+  editor.spellcheck = false;
+  editor.autocapitalize = 'off';
+  editor.autocomplete = 'off';
+  editor.autocorrect = 'off';
+  editor.value = text;
+  stack.appendChild(editor);
+
+  function sync() {
+    label.textContent = ddBlockLabel(editor.value, index);
+    ddComposeInstruction();
+    ddRenderEditor(editor, highlight);
+  }
+
+  editor.addEventListener('input', function() {
+    ddApplyDirectiveAssist(editor);
+    sync();
+  });
+  editor.addEventListener('scroll', function() {
+    ddSyncEditorOverlay(editor, highlight);
+  });
+  editor.addEventListener('keydown', function(event) {
+    if (event.key !== 'Tab' || event.shiftKey || event.ctrlKey || event.altKey || event.metaKey) return;
+    event.preventDefault();
+    ddInsertBlockAfter(wrapper);
+  });
+
+  sync();
+  return wrapper;
+}
+function ddNextBlockSeed(afterNode) {
+  const editors = Array.prototype.slice.call(ddBlocks.querySelectorAll('.instruction-block-editor'));
+  const currentEditor = afterNode ? afterNode.querySelector('.instruction-block-editor') : null;
+  const fullText = editors.map(function(node) { return node.value; }).join('\n' + ddLegacySep + '\n');
+  let textBefore = '';
+  if (currentEditor) {
+    const index = editors.indexOf(currentEditor);
+    textBefore = editors.slice(0, index + 1).map(function(node) { return node.value; }).join('\n' + ddLegacySep + '\n');
+  }
+  return ddNextDirectiveForContext(textBefore, fullText);
+}
+function ddRefreshBlockLabels() {
+  Array.prototype.slice.call(ddBlocks.querySelectorAll('.editor-block')).forEach(function(block, index) {
+    const editor = block.querySelector('.instruction-block-editor');
+    const label = block.querySelector('.editor-block-label');
+    label.textContent = ddBlockLabel(editor.value, index);
+  });
+}
+function ddInsertBlockAfter(currentBlock) {
+  const seed = ddNextBlockSeed(currentBlock);
+  const newBlock = ddCreateEditorBlock(seed, ddBlocks.querySelectorAll('.editor-block').length);
+  if (currentBlock && currentBlock.nextSibling) {
+    ddBlocks.insertBefore(newBlock, currentBlock.nextSibling);
+  } else {
+    ddBlocks.appendChild(newBlock);
+  }
+  ddRefreshBlockLabels();
+  ddComposeInstruction();
+  ddFocusBlock(newBlock.querySelector('.instruction-block-editor'));
+}
+function ddLoadBlocks(text) {
+  ddBlocks.innerHTML = '';
+  const sections = ddSplitInstruction(text);
+  if (!sections.length) sections.push('TITLE: Untitled');
+  sections.forEach(function(section, index) {
+    ddBlocks.appendChild(ddCreateEditorBlock(section, index));
+  });
+  ddRefreshBlockLabels();
+  ddComposeInstruction();
+}
+ddForm.addEventListener('focusout', function() {
+  window.setTimeout(function() {
+    if (ddForm.contains(document.activeElement)) return;
+    ddMode.value = 'edit';
+    ddComposeInstruction();
+    ddForm.submit();
+  }, 0);
 });
-ddEditor.addEventListener('scroll', function() {
-  ddSyncEditorOverlay();
+ddForm.addEventListener('submit', function() {
+  ddComposeInstruction();
 });
-ddEditor.addEventListener('change', function() {
-  ddForm.submit();
-});
+if (ddPlayButton) {
+  ddPlayButton.addEventListener('click', function() {
+    ddMode.value = 'render';
+    ddComposeInstruction();
+    ddForm.submit();
+  });
+}
 window.addEventListener('resize', function() {
-  ddSyncEditorOverlay();
+  Array.prototype.slice.call(ddBlocks.querySelectorAll('.editor-block')).forEach(function(block) {
+    const editor = block.querySelector('.instruction-block-editor');
+    const highlight = block.querySelector('.editor-overlay');
+    ddAutoResizeEditor(editor);
+    ddSyncEditorOverlay(editor, highlight);
+  });
 });
-ddEditor.value = __SOURCE_JSON__;
-ddRenderEditor(ddEditor.value);
+ddSource.value = __SOURCE_JSON__;
+ddLoadBlocks(ddSource.value);
 </script>
 </body>
 </html>
@@ -1370,7 +1664,6 @@ HTML
 
     $html =~ s/__TITLE__/$title/g;
     $html =~ s/__TOP_CHROME__/$self->_top_chrome_html( $page, \%$urls )/ge;
-    $html =~ s/__INITIAL_HIGHLIGHT__/$self->_editor_overlay_html($raw_source)/ge;
     $html =~ s/__SOURCE__/$source/g;
     $html =~ s/__SOURCE_JSON__/_json_for_inline_script($raw_source)/ge;
     $html =~ s/__FORM_ACTION__/$form_action/g;
@@ -1644,9 +1937,11 @@ sub _render_page_html {
           ? ( $transient_allowed ? '/action?atoken=' . URI::Escape::uri_escape($atoken) : $saved_action_url )
           : $saved_action_url;
     }
-    my $page_url = ( $page->{meta}{source_kind} || '' ) eq 'transient'
-      ? $self->{pages}->editable_url($page)
-      : $self->_saved_page_url( $page->as_hash->{id} || '' );
+    my $source_kind = $page->{meta}{source_kind} || '';
+    my $is_saved = $source_kind eq 'saved';
+    my $is_transient = $source_kind eq 'transient';
+    my $urls = $self->_page_route_urls($page);
+    my $page_url = $urls->{page_url} || '';
     my $runtime_context = {
         params       => { %{ $page->{state} || {} } },
         current_page => $current_page,
@@ -1657,9 +1952,9 @@ sub _render_page_html {
         chrome_html => $self->_top_chrome_html(
             $page,
             {
-                edit   => ( ( $page->{meta}{source_kind} || '' ) eq 'transient' && $transient_allowed ) ? '/?token=' . $self->{pages}->encode_page($page) : $page_url . '/edit',
-                render => ( ( $page->{meta}{source_kind} || '' ) eq 'transient' && $transient_allowed ) ? '/?mode=render&token=' . $self->{pages}->encode_page($page) : $page_url,
-                source => ( ( $page->{meta}{source_kind} || '' ) eq 'transient' && $transient_allowed ) ? '/?token=' . $self->{pages}->encode_page($page) : $page_url . '/edit',
+                edit   => ( $is_transient && $transient_allowed ) ? '/?token=' . $self->{pages}->encode_page($page) : ( $urls->{edit} || '' ),
+                render => ( $is_transient && $transient_allowed ) ? '/?mode=render&token=' . $self->{pages}->encode_page($page) : ( $urls->{render} || '' ),
+                source => ( $is_transient && $transient_allowed ) ? '/?token=' . $self->{pages}->encode_page($page) : ( $urls->{source} || '' ),
             },
         ),
         nav_html => $self->_nav_items_html(
@@ -2321,7 +2616,7 @@ sub _top_chrome_html {
     my $mode  = $page->as_hash->{mode} || 'edit';
     my $ctx   = $page->{meta}{request_context} || {};
     my @links;
-    push @links, qq{<a href="$play" id="play-url">Play</a>} if $mode ne 'render' && $play ne '';
+    push @links, qq{<button type="button" class="chrome-button" id="play-button" data-play-url="$play">Play</button>} if $mode ne 'render' && $play ne '';
     push @links, qq{<a href="$src" id="view-source-url">View Source</a>} if $mode ne 'edit' && $src ne '';
     push @links, q{<a href="/logout" id="logout-url">Logout</a>}
       if ( $ctx->{tier} || '' ) eq 'helper';

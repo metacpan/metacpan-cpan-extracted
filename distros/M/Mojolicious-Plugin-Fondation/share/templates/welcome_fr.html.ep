@@ -1,0 +1,410 @@
+% layout 'main';
+% title 'Accueil';
+
+<style>
+  :root {
+    --bg: #f8fafd;
+    --panel: #ffffff;
+    --border: #e2e8f0;
+    --text: #1e2937;
+    --muted: #64748b;
+    --accent: #0ea5e9;
+    --accent-soft: rgba(14, 165, 233, 0.08);
+    --success: #10b981;
+    --warn: #f59e0b;
+    --warn-soft: rgba(245, 158, 11, 0.08);
+    --purple: #8b5cf6;
+    --purple-soft: rgba(139, 92, 246, 0.08);
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "JetBrains Mono", "Fira Code", system-ui, sans-serif;
+  }
+
+  .wrapper {
+    max-width: 880px;
+    margin: 60px auto;
+    padding: 0 20px;
+  }
+
+  header {
+    margin-bottom: 40px;
+  }
+
+  h1 {
+    font-size: 2.4rem;
+    margin: 0 0 12px;
+    letter-spacing: -1.2px;
+    color: #0f172a;
+  }
+
+  .tagline {
+    color: var(--muted);
+    font-size: 1.02rem;
+    font-weight: 400;
+  }
+
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    margin-bottom: 28px;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.03);
+  }
+
+  .panel h2 {
+    margin-top: 0;
+    font-size: 1.25rem;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  p {
+    line-height: 1.7;
+    color: var(--muted);
+  }
+
+  code {
+    color: #0369a1;
+    background: #f1f5f9;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+
+  pre {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    padding: 20px;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-size: 0.87rem;
+    line-height: 1.6;
+  }
+
+  .tree {
+    font-family: monospace;
+    font-size: 0.92rem;
+    line-height: 1.65;
+    color: #166534;
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    padding: 20px;
+    border-radius: 10px;
+  }
+
+  .badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 6px 14px;
+    border-radius: 9999px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(14, 165, 233, 0.2);
+  }
+
+  .concept {
+    border-left: 3px solid var(--border);
+    padding-left: 20px;
+    margin-bottom: 28px;
+  }
+
+  .concept:last-child {
+    margin-bottom: 0;
+  }
+
+  .concept.loading   { border-color: var(--accent); }
+  .concept.config    { border-color: var(--warn); }
+  .concept.actions   { border-color: var(--purple); }
+
+  .concept h3 {
+    margin: 0 0 10px;
+    font-size: 1.05rem;
+  }
+
+  .concept.loading h3  { color: var(--accent); }
+  .concept.config h3   { color: var(--warn); }
+  .concept.actions h3  { color: var(--purple); }
+
+  .concept p {
+    margin: 0 0 14px;
+  }
+
+  .concept p:last-child {
+    margin-bottom: 0;
+  }
+
+  .priority-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+  }
+
+  .priority-table td {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .priority-table td:first-child {
+    font-weight: 700;
+    color: var(--warn);
+    width: 24px;
+  }
+
+  .priority-table td:nth-child(2) {
+    font-weight: 600;
+    color: var(--text);
+    width: 100px;
+  }
+
+  .resource-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+  }
+
+  .resource-table td {
+    padding: 8px 10px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .resource-table td:first-child {
+    font-weight: 600;
+    color: var(--text);
+    width: 120px;
+  }
+
+  footer {
+    margin-top: 50px;
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+</style>
+
+<div class="wrapper">
+  <header>
+    <div class="badge">Plugin Mojolicious</div>
+    <h1>Fondation</h1>
+    <div class="tagline">
+      Chargeur de plugins récursif et moteur de composition pour Mojolicious
+    </div>
+  </header>
+
+  <!-- ① Qu'est-ce que Fondation ? -->
+  <div class="panel">
+    <h2>Qu'est-ce que Fondation ?</h2>
+    <p>
+      Fondation est un moteur de composition d'applications pour Mojolicious.
+      Au lieu de charger, configurer et raccorder manuellement chaque plugin,
+      vous déclarez simplement les fonctionnalités dont votre application a
+      besoin. Fondation construit l'arbre des dépendances, fusionne les
+      configurations, découvre les ressources fournies par chaque plugin et
+      les intègre automatiquement à l'application.
+    </p>
+    <pre>plugin 'Fondation' => {
+  dependencies => [
+    'Fondation::User',
+    'Fondation::Authorization',
+  ]
+};</pre>
+    <p>Chaque plugin devient une brique autonome capable de&nbsp;:</p>
+    <ul style="color: var(--muted); line-height: 1.8; padding-left: 20px;">
+      <li>déclarer ses dépendances&nbsp;;</li>
+      <li>fournir sa configuration par défaut&nbsp;;</li>
+      <li>exposer des templates et des assets&nbsp;;</li>
+      <li>enregistrer des contrôleurs&nbsp;;</li>
+      <li>participer au cycle de vie de l'application.</li>
+    </ul>
+    <p><strong>Fondation se charge de l'assemblage.</strong></p>
+    <p>
+      Fondation est entièrement compatible avec les plugins Mojolicious
+      standards. Les plugins qui respectent les conventions Fondation
+      bénéficient de fonctionnalités supplémentaires, tandis que les autres
+      continuent à fonctionner normalement.
+    </p>
+  </div>
+
+  <!-- ② Compatible avec les plugins Mojolicious classiques -->
+  <div class="panel">
+    <h2>Compatible avec les plugins Mojolicious classiques</h2>
+    <p>
+      Fondation peut charger aussi bien des plugins Fondation que des
+      plugins Mojolicious standards.
+    </p>
+    <pre>plugin 'Fondation' => {
+    dependencies => [
+        'Fondation::User',
+        'Mojolicious::Plugin::Mail',
+    ]
+};</pre>
+    <p>
+      Lorsqu'un plugin Fondation est chargé, Fondation exploite ses
+      métadonnées (<code>fondation_meta</code>), résout ses dépendances,
+      fusionne sa configuration et découvre automatiquement ses ressources.
+    </p>
+    <p>
+      Lorsqu'un plugin Mojolicious classique est chargé, Fondation se
+      comporte simplement comme un chargeur de plugins Mojolicious. Le
+      plugin est enregistré normalement, mais aucune fonctionnalité
+      spécifique à Fondation n'est appliquée&nbsp;:
+    </p>
+    <ul style="color: var(--muted); line-height: 1.8; padding-left: 20px;">
+      <li>pas de résolution de dépendances&nbsp;;</li>
+      <li>pas de configuration par défaut via <code>fondation_meta</code>&nbsp;;</li>
+      <li>pas de découverte automatique de templates ou d'assets&nbsp;;</li>
+      <li>pas d'actions post-chargement.</li>
+    </ul>
+  </div>
+
+  <!-- ③ Une application construite à partir de briques -->
+  <div class="panel">
+    <h2>Une application construite à partir de briques</h2>
+    <p>
+      Avec Fondation, une application n'est plus définie par une succession
+      de chargements de plugins, mais par la liste des fonctionnalités qu'elle
+      souhaite utiliser. Chaque plugin décrit ce qu'il apporte et ce dont il
+      dépend. Fondation résout automatiquement l'ensemble de l'arbre des
+      dépendances et charge les composants dans le bon ordre.
+    </p>
+    <pre class="tree">
+● Fondation
+ └─ Fondation::User
+ └─ Fondation::Authorization
+    ├─ Fondation::Role
+    └─ Fondation::Permission
+    </pre>
+    <p>
+      Lorsque <code>Fondation::Authorization</code> est demandé, Fondation
+      détecte automatiquement qu'il nécessite <code>Role</code> et
+      <code>Permission</code>, puis les charge avant lui. Les dépendances ne
+      sont chargées qu'une seule fois et les boucles sont détectées
+      automatiquement.
+    </p>
+  </div>
+
+  <!-- ④ Une convention commune -->
+  <div class="panel">
+    <h2>Une convention commune</h2>
+    <p>
+      Pour bénéficier du chargement automatique et de
+      l'intégration des ressources, les plugins suivent quelques règles
+      simples&nbsp;:
+    </p>
+    <ul style="color: var(--muted); line-height: 1.8; padding-left: 20px;">
+      <li>déclarer leurs métadonnées via <code>fondation_meta</code>&nbsp;;</li>
+      <li>exposer leurs dépendances explicitement&nbsp;;</li>
+      <li>organiser leurs ressources dans des emplacements connus&nbsp;;</li>
+      <li>utiliser les points d'extension fournis par Fondation.</li>
+    </ul>
+    <p>Exemple simplifié&nbsp;:</p>
+    <pre>Plugin/
+├── lib/
+├── share/
+│   ├── templates/
+│   ├── public/
+│   ├── fixtures/
+│   └── translations/
+└── fondation_meta()</pre>
+    <p>
+      En échange, chaque plugin devient une unité autonome, portable et
+      réutilisable dans plusieurs applications.
+    </p>
+  </div>
+
+  <!-- ⑤ Trois concepts clés -->
+  <div class="panel">
+    <h2>Trois concepts clés</h2>
+
+    <div class="concept loading">
+      <h3>① Chargement récursif des dépendances</h3>
+      <p>
+        Les plugins déclarent leurs dépendances dans
+        <code>fondation_meta</code>.
+      </p>
+      <pre>sub fondation_meta {
+    return {
+        dependencies => [
+            'Fondation::Role'
+        ]
+    };
+}</pre>
+      <p>
+        Fondation parcourt récursivement l'arbre des dépendances et charge
+        chaque plugin avant ceux qui en dépendent. Le registre interne empêche
+        les doubles chargements et protège contre les dépendances circulaires.
+      </p>
+    </div>
+
+    <div class="concept config">
+      <h3>② Configuration à trois niveaux</h3>
+      <p>
+        Chaque plugin reçoit une configuration issue de trois sources
+        fusionnées automatiquement.
+      </p>
+      <table class="priority-table">
+        <tr><td>1</td><td>Directe</td><td>Configuration passée dans la déclaration de dépendance</td></tr>
+        <tr><td>2</td><td>Globale</td><td>Configuration provenant du fichier de configuration de l'application</td></tr>
+        <tr><td>3</td><td>Défaut</td><td>Valeurs fournies par le plugin dans <code>fondation_meta</code></td></tr>
+      </table>
+      <p style="margin-top: 12px;">
+        La fusion est récursive : les structures imbriquées sont combinées
+        tandis que les valeurs les plus prioritaires remplacent les précédentes.
+      </p>
+    </div>
+
+    <div class="concept actions">
+      <h3>③ Découverte automatique des ressources</h3>
+      <p>
+        Une fois tous les plugins chargés, Fondation exécute une série
+        d'actions configurables qui découvrent et enregistrent les ressources
+        fournies par chaque plugin.
+      </p>
+      <table class="resource-table">
+        <tr><td>Templates</td><td>Ajout aux chemins du renderer</td></tr>
+        <tr><td>Assets</td><td>Ajout aux chemins statiques</td></tr>
+        <tr><td>Controllers</td><td>Découverte et enregistrement automatiques</td></tr>
+        <tr><td>DBIC</td><td>Enregistrement des classes <code>Schema::Result</code></td></tr>
+        <tr><td>Fixtures</td><td>Import des jeux de données</td></tr>
+        <tr><td>I18N</td><td>Fusion des lexiques de traduction</td></tr>
+      </table>
+      <p style="margin-top: 12px;">
+        Chaque plugin peut ainsi fournir non seulement du code, mais également
+        l'ensemble des ressources nécessaires à son fonctionnement.
+      </p>
+    </div>
+  </div>
+
+  <!-- ⑥ Utilisation -->
+  <div class="panel">
+    <h2>Utilisation</h2>
+    <pre># myapp.pl
+plugin 'Config';
+plugin 'Fondation' => {
+    dependencies => [
+        'Fondation::User',
+        'Fondation::Authorization',
+    ]
+};</pre>
+    <p>
+      À partir de cette déclaration, Fondation résout les dépendances, fusionne
+      les configurations et connecte automatiquement les ressources exposées
+      par les plugins. L'application est décrite en termes de fonctionnalités,
+      tandis que Fondation se charge de leur assemblage.
+    </p>
+  </div>
+
+  <footer>
+    Fondation — Plugin Mojolicious
+  </footer>
+</div>

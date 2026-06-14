@@ -2,7 +2,7 @@ package Dist::Zilla::Plugin::SigStore::SignRelease;
 use strict;
 use warnings;
 
-our $VERSION = '0.05'; # VERSION
+our $VERSION = '0.06'; # VERSION
 
 # ABSTRACT: Sign Release with SigStore
 
@@ -65,8 +65,15 @@ sub _load_bundle {
 sub _get_der_from_bundle {
   my $self = shift;
   my $bundle = shift;
-  my $raw_bytes = $bundle->{verificationMaterial}->{certificate}->{rawBytes};
-  return decode_base64($raw_bytes);
+  my $cert;
+  if (defined $bundle->{mediaType} && $bundle->{mediaType} eq 'application/vnd.dev.sigstore.bundle.v0.3+json')
+  {
+    $cert = $bundle->{verificationMaterial}->{certificate}->{rawBytes};
+  } else {
+    $cert = decode_base64($bundle->{cert});
+    $cert =~ s/-----[^-]*-----//gm;
+  }
+  return decode_base64($cert);
 }
 
 sub _get_x509_from_der {
@@ -193,7 +200,7 @@ Dist::Zilla::Plugin::SigStore::SignRelease - Sign Release with SigStore
 
 =head1 VERSION
 
-version 0.05
+version 0.06
 
 =head1 SYNOPSIS
 

@@ -1,10 +1,12 @@
 # This module compares version strings following the precedence rules of the
 # Semantic Versioning specification (https://semver.org, item 11). It is lenient
-# about the structure of the input: an optional path-like prefix (anything up to
-# a first '/', as long as there is no '.' before it) and an optional leading 'v'
-# are recognized, and the version core may have any number of dot-separated
-# numeric components (missing components are treated as 0, so that "1.1" and
-# "1.1.0" compare as equal).
+# about the structure of the input: an optional path-like prefix (one or more
+# leading '/'-terminated segments, none of which contains a '.') and an optional
+# leading 'v' are recognized, and the version core may have any number of
+# dot-separated numeric components (missing components are treated as 0, so that
+# "1.1" and "1.1.0" compare as equal). The prefix is compared alphabetically,
+# which lets tags such as "refs/tags/projectname/v1.0.0" be grouped by their
+# path and then ordered by their semver part.
 
 package App::PTP::Util::Semver;
 
@@ -28,7 +30,12 @@ sub parse {
   my $original = $version;
   my @warnings;
   $version =~ s/\+.*//s;
-  my $prefix = $version =~ s{^([^./]+)/}{} ? $1 : '';
+  # The prefix is any number of leading '/'-terminated segments, as long as none
+  # of them contains a '.' (a dot before a slash means we have already reached
+  # the version part, e.g. "1.2/3", and the slash is not a prefix separator).
+  # The trailing '/' is dropped so the prefix compares as a plain path string.
+  my $prefix = $version =~ s{^((?:[^./]+/)+)}{} ? $1 : '';
+  $prefix =~ s{/$}{};
   $version =~ s/^v//i;
   my ($core, $pre) = split /-/, $version, 2;
   my @core = split /\./, $core // '';

@@ -3,7 +3,7 @@ package Developer::Dashboard::CLI::Skills;
 use strict;
 use warnings;
 
-our $VERSION = '4.03';
+our $VERSION = '4.16';
 
 use Getopt::Long qw(GetOptionsFromArray);
 use Cwd qw(getcwd);
@@ -83,24 +83,45 @@ sub run_skills_command {
         return $result->{error} ? 1 : 0;
     }
     if ( $action eq 'uninstall' ) {
+        my $output = 'table';
+        GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
         my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
         my $repo_name = shift @argv || die "Usage: dashboard skills uninstall <repo-name>\n";
         my $result = $manager->uninstall($repo_name);
-        print json_encode($result);
+        if ( $output eq 'json' ) {
+            print json_encode($result);
+            return $result->{error} ? 1 : 0;
+        }
+        die "Usage: dashboard skills uninstall <repo-name> [-o json|table]\n" if $output ne 'table';
+        print _skills_state_table( $repo_name, $result->{error} ? 'error' : 'removed', undef );
         return $result->{error} ? 1 : 0;
     }
     if ( $action eq 'enable' ) {
+        my $output = 'table';
+        GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
         my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
         my $repo_name = shift @argv || die "Usage: dashboard skills enable <repo-name>\n";
         my $result = $manager->enable($repo_name);
-        print json_encode($result);
+        if ( $output eq 'json' ) {
+            print json_encode($result);
+            return $result->{error} ? 1 : 0;
+        }
+        die "Usage: dashboard skills enable <repo-name> [-o json|table]\n" if $output ne 'table';
+        print _skills_state_table( $repo_name, $result->{enabled} ? 'enabled' : 'disabled', $result->{enabled} );
         return $result->{error} ? 1 : 0;
     }
     if ( $action eq 'disable' ) {
+        my $output = 'table';
+        GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
         my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
         my $repo_name = shift @argv || die "Usage: dashboard skills disable <repo-name>\n";
         my $result = $manager->disable($repo_name);
-        print json_encode($result);
+        if ( $output eq 'json' ) {
+            print json_encode($result);
+            return $result->{error} ? 1 : 0;
+        }
+        die "Usage: dashboard skills disable <repo-name> [-o json|table]\n" if $output ne 'table';
+        print _skills_state_table( $repo_name, $result->{enabled} ? 'enabled' : 'disabled', $result->{enabled} );
         return $result->{error} ? 1 : 0;
     }
     if ( $action eq 'list' ) {
@@ -120,7 +141,7 @@ sub run_skills_command {
     }
     if ( $action eq 'usage' ) {
         my $manager = Developer::Dashboard::SkillManager->new( paths => _build_paths() );
-        my $output = 'json';
+        my $output = 'table';
         GetOptionsFromArray( \@argv, 'o|output=s' => \$output );
         my $repo_name = shift @argv || die "Usage: dashboard skills usage <repo-name> [-o json|table]\n";
         my $usage = $manager->usage($repo_name);
@@ -344,6 +365,21 @@ sub _usage_table {
     return $text;
 }
 
+# _skills_state_table($repo_name, $status, $enabled)
+# Renders one single-skill lifecycle result as a short human-readable summary table.
+# Input: skill name string, status string, and optional enabled boolean.
+# Output: formatted table text string.
+sub _skills_state_table {
+    my ( $repo_name, $status, $enabled ) = @_;
+    my @header = ('Skill', 'Status');
+    my @row = ( $repo_name, $status );
+    if ( defined $enabled ) {
+        push @header, 'Enabled';
+        push @row, _boolean_text($enabled);
+    }
+    return _render_table( \@header, [ \@row ] );
+}
+
 # _render_table($header, $rows)
 # Formats a rectangular data set as a padded text table.
 # Input: header array reference and row array reference.
@@ -448,7 +484,7 @@ Use this file when changing the public C<dashboard skills ...> verbs, the JSON p
 
 =head1 HOW TO USE
 
-Call C<run_skills_command> with the public helper name and argv array reference. The module builds a lightweight path registry, constructs a skill manager, dispatches the requested action, and prints either canonical JSON or sectioned tables depending on C<-o json> or C<-o table>. The default output for C<list> and C<usage> is JSON. The thin C<dashboard> switchboard also routes dotted skill execution through this helper with an internal action so the public execution contract stays C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>>.
+Call C<run_skills_command> with the public helper name and argv array reference. The module builds a lightweight path registry, constructs a skill manager, dispatches the requested action, and prints either canonical JSON or sectioned tables depending on C<-o json> or C<-o table>. The default output for C<install>, C<list>, C<usage>, C<enable>, C<disable>, and C<uninstall> is a human-readable summary table, while C<-o json> returns the full machine payload. The thin C<dashboard> switchboard also routes dotted skill execution through this helper with an internal action so the public execution contract stays C<dashboard E<lt>repo-nameE<gt>.E<lt>commandE<gt>>.
 
 =head1 WHAT USES IT
 

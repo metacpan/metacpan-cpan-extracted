@@ -33,7 +33,7 @@
 
 #define DEFAULT_BLOCK_SIZE 4096
 
-#ifndef _MSC_VER
+#ifndef _WIN32
 // We use the built-in GUID type on Windows
 typedef struct _GUID {
   uint32_t Data1;

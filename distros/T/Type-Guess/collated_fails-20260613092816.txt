@@ -1,0 +1,557 @@
+################################################################################
+lib/Type/Guess.pm
+################################################################################
+
+package Type::Guess;
+
+# ABSTRACT: Guess data types
+
+use strict;
+use warnings;
+
+use Moo;
+
+use MooX::ClassAttribute;
+use Class::Method::Modifiers;
+
+# use Mojo::Util qw/dumper/;
+use List::Util;
+use Scalar::Util qw(looks_like_number);
+
+use Carp;
+
+
+use overload
+    '""' =>  \&to_string,
+    '&{}' => \&to_sub;
+
+use constant ROLES => !!(eval { require Role::Tiny; Role::Tiny->VERSION('2.000001'); 1 });
+
+has type => ( is  => 'rw', default => sub { "Str" });
+
+has length => ( is  => 'rw', default => sub { 0 });
+
+has precision => ( is  => 'rw', default => sub { 0 });
+
+has max       => ( is  => 'rw', default => sub { 0 });
+
+has format    => ( is  => 'rw', default => sub { "" });
+
+has integer_chars  => ( is  => 'rw', default => sub { 0 });
+
+has percentages  => ( is  => 'rw', default => sub { 0 });
+
+has signed  => ( is  => 'rw', default => sub { 0 });
+
+# -------------------------------------------------------
+# these three are set initially and never again
+# -------------------------------------------------------
+has length_ro  => ( is  => 'ro', default => sub { 0 });
+has integer_chars_ro  => ( is  => 'ro', default => sub { 0 });
+has precision_ro  => ( is  => 'ro', default => sub { 0 });
+
+# -------------------------------------------------------
+# class properties
+# -------------------------------------------------------
+
+# class_has "tolerance" => ( is => "rw", default => sub { 0 });
+
+# class_has "skip_empty" => ( is => "rw", default => sub { 1 });
+
+# class_has "encoding" => ( is => "rw", default => sub { "" });
+
+
+our $opts = { tolerance => 0, skip_empty => 1, encoding => "" };
+
+sub class_opts {
+    my ($class, $opt, $val) = @_;
+    die sprintf "Invalid option %s\n" unless exists $opts->{$opt};
+    $opts->{$opt} = $val if defined $val;
+    return $opts->{$opt}
+}
+
+sub tolerance  { return shift->class_opts("tolerance", shift) }
+sub skip_empty { return shift->class_opts("skip_empty", shift) }
+sub encoding   { return shift->class_opts("encoding",   shift) }
+
+around "new" => sub {
+    my $orig = shift;
+    my $ret;
+
+    if ((defined $_[1] && ref $_[1] eq "HASH") || (scalar @_ == 1)) {
+	$ret = $orig->(@_);
+	return $ret;
+    } else {
+	my $class = ref $_[0] ? ref shift : shift;
+	# local @_ = $class->skip_empty ? grep { /^\s*$/ } @_ : @_;
+	my @args = $class->skip_empty ? grep { length $_ } @_ : @_;
+	return $orig->($class, $class->analyse(@args)->as_hash)
+    }
+};
+
+sub analyse {
+    my $class = ref $_[0] ? ref shift : shift;
+    my $ret;
+
+    $ret->{type}      = $class->_type(@_);
+
+    $ret->{precision} = $class->_precision(@_);
+    $ret->{precision_ro} = $ret->{precision};
+
+    $ret->{length}    = $class->_length(@_);
+    $ret->{length_ro} = $ret->{length};
+
+    $ret->{integer_chars}  = $class->_integer_chars(@_);
+    $ret->{integer_chars_ro} = $ret->{integer_chars};
+
+    $ret->{percentages}  = $class->_percentages(@_);
+    $ret->{signed}  = $class->_signed(@_);
+
+    return $class->new($ret);
+}
+
+sub as_hash {
+    my $self = shift;
+    my $ret = {};
+    for (keys $self->%*) {
+	$ret->{$_} = $self->$_
+    }
+    return $ret;
+}
+
+around "length_ro"        => sub { carp "length_ro is read-only" if defined $_[2]; return $_[0]->($_[1]) };
+around "precision_ro"     => sub { carp "precision_ro is read-only" if defined $_[2]; return $_[0]->($_[1]) };
+around "integer_chars_ro" => sub { carp "integer_chars_ro is read-only" if defined $_[2]; return $_[0]->($_[1]) };
+
+around "precision" => sub {
+    my $orig = shift;
+    my $self = shift;
+    return 0 unless $self->type =~ /^(Num)$/;
+    return $orig->($self, @_);
+};
+
+around "signed" => sub {
+    my $orig = shift;
+    my $self = shift;
+    return 0 unless $self->type =~ /^(Int|Num)$/;
+    return $orig->($self, @_);
+};
+
+around "type" => sub {
+    my $orig = shift;
+    my $self = shift;
+    if (defined $_[0] && $_[0] eq "Str") {
+	my $ret = $orig->($self, @_);
+	$self->length($self->length_ro);
+	return $ret;
+    }
+    return $orig->($self, @_);
+};
+
+around "length" => sub {
+    my $orig = shift;
+    my $self = shift;
+    return $orig->($self, @_) unless $self->type =~ /^(Int|Num)$/;
+    if ($self->type eq "Num") {
+	if (defined $_[0]) {
+	    my $int_chars = $_[0] - ($self->precision + ($self->percentages ? 1 : 0) + 1);
+	    if ($int_chars > $self->integer_chars_ro) { $self->integer_chars($int_chars) } else { carp "Length value is lower than actual length - ignoring" }
+	}
+	return $self->integer_chars + $self->precision + ($self->percentages ? 1 : 0) + 1
+    }
+    elsif ($self->type eq "Int") {
+	if (defined $_[0]) {
+	    my $int_chars = $_[0] - ($self->precision + ($self->percentages ? 1 : 0));
+	    if ($int_chars > $self->integer_chars_ro) { $self->integer_chars($int_chars) } else { carp "Length value is lower than actual length - ignoring" }
+	}
+	return $self->integer_chars + $self->precision + ($self->percentages ? 1 : 0)
+    }
+    else {
+	if (!@_) {
+	    return $orig->($self)
+	} elsif (defined $_[0]) {
+	    return $orig->($self, @_);
+	} else {
+	    $orig->($self, $self->length_ro)
+	}
+    }
+};
+
+# ------------------------------------------------------------------------------
+
+
+
+sub _enough {
+    my $class = shift;
+    my $sub = shift;
+    my @input = @_;
+    my $tolerance = $class->tolerance;
+    my $enough = scalar @input * (1 - $tolerance);
+    return (scalar grep { $sub->($_) } @input) >= $enough
+}
+
+sub _type {
+    no warnings;
+    my $class = shift();
+    my @vals = @_;
+    @vals = map { s/^\+//; s/^-//; s/%$//; $_ } @vals;
+    
+    return "Int" if $class->_enough(sub { looks_like_number($_) && $_ == int($_) }, @vals);
+    return "Num" if $class->_enough(sub{ looks_like_number($_) }, @vals);
+    return "Str"
+}
+
+sub _precision {
+    no warnings;
+    my $class = shift();
+    return List::Util::max map { /^\d*\.\d*$/ ? length($_=~ s/\d*\.//r) : 0 } map { local $_ = $_ ; s/^\+//; s/^-//; s/%$//; $_ } @_;
+}
+
+sub _integer_chars {
+    no warnings;
+    my $class = shift();
+    return List::Util::max map { /([\+\-]*\d+)\.*\d*/ ? length($1) : 0 } @_;
+}
+
+sub _signed {
+    my $class = shift();
+    no warnings;
+    return "+-" if (List::Util::any { /^([\-])/ } @_) && (List::Util::any { /^([\+])/ } @_);
+    return "-" if (List::Util::any { /^([\-])/ } @_);
+    return undef;
+}
+
+
+sub _length {
+    my $class = shift();
+    no warnings;
+
+    
+    return List::Util::max map { length($_) } @_;
+}
+
+sub _percentages {
+    no warnings;
+    my $class = shift();
+    return $class->_enough(sub { /%$/ }, @_);
+}
+
+sub to_sub {
+    my $self = shift;
+    my $format = $self->to_string;
+    no warnings;
+    return sub { return sprintf $format, shift() }
+}
+
+sub to_string {
+    my $self = shift;
+    my $format = $self->format;
+
+    if ($format) {
+	return $format;
+    } else {
+	if ($self->type eq "Int") {
+	    $format = "%" . $self->length . "i";
+	}
+	elsif ($self->type eq "Num") {
+	    $format = '%' . (1 + $self->integer_chars + $self->precision) . "." . $self->precision . "f";
+	    $format .= "%%" if $self->percentages;
+	}
+	else {
+	    $format = "%-" . $self->length . "s";
+	}
+	return $format;
+    }
+}
+
+sub with_roles {
+    Carp::croak 'Role::Tiny 2.000001+ is required for roles' unless ROLES;
+    my ($self, @roles) = @_;
+    return $self unless @roles;
+    my $class = Scalar::Util::blessed $self;
+    unless ($class) {
+	my $composed = Role::Tiny->create_class_with_roles($self, map { /^\+(.+)$/ ? "${self}::Role::$1" : $_ } @roles);
+	$Moo::MAKERS{$composed}{is_class} = 1;
+	return $composed;
+    }
+    return Role::Tiny->apply_roles_to_object($self, map { /^\+(.+)$/ ? "${class}::Role::$1" : $_ } @roles);
+}
+
+# sub with_roles {
+#     Carp::croak 'Role::Tiny 2.000001+ is required for roles' unless ROLES;
+#     my ($self, @roles) = @_;
+#     return $self unless @roles;
+#     my $class;
+#     unless ($class = Scalar::Util::blessed $self) {
+#         my $composed = Role::Tiny->create_class_with_roles(
+#             $self, 
+#             map { /^\+(.+)$/ ? "${self}::Role::$1" : $_ } @roles
+#         );
+#         $Moo::MAKERS{$composed}{is_class} = 1;   # register it
+#         return $composed;
+#     }
+#     return Role::Tiny->apply_roles_to_object(
+#         $self, 
+#         map { /^\+(.+)$/ ? "${class}::Role::$1" : $_ } @roles
+#     );
+# }
+
+sub to_sql { 
+    croak "compose a SQL role for dialect-specific output" 
+}
+
+1
+
+################################################################################
+lib/Type/Guess/Role/Tiny.pm
+################################################################################
+
+package Type::Guess::Role::Tiny;
+
+# use Mojo::Base -role;
+use Moo::Role;
+# use MooX::ClassAttribute;
+
+use Scalar::Util qw(looks_like_number);
+use Type::Tiny;
+use Types::Standard qw( Int Num Str );
+
+has "name" => ( is => "rw", default => sub { "" } );
+has "type_tiny" => ( is => "rw", default => sub { Str } ); # whats this for?
+
+# class_has "types" => ( is => "rw", default => sub { [ Int, Num, Str, ] });
+
+# print $class_opts;
+
+our $class_opts = { tolerance => 0, skip_empty => 1, encoding => "", types => [ Int, Num, Str, ] };
+
+sub class_opts {
+    my ($class, $opt, $val) = @_;
+    die sprintf "Invalid option %s\n" unless exists $class_opts->{$opt};
+    $class_opts->{$opt} = $val if defined $val;
+    return $class_opts->{$opt}
+}
+
+around "new" => sub {
+    my $orig = shift;
+    my $self = shift;
+    if (scalar @_ > 1 && !ref $_[0] && ref $_[-1]) {
+	my $opts = pop @_;
+	for (keys $opts->%*) {
+	    $self->class_opts($_, $opts->{$_}) if $class_opts->{$_};
+	}
+    }
+    my $ret = $orig->($self, @_);
+    return $ret
+};
+
+our $types = [ Int, Num, Str, ];
+
+sub _type {
+    my $class = shift;
+
+    my @vals =
+       map { looks_like_number($_) && int($_) == $_ ? int($_) : $_ }
+       map { s/(\d\.*\d*)%$/$1/r }
+       @_;
+
+    my $tot = scalar @vals;
+    for ($class->class_opts("types")->@*) {
+
+	my $tiny_type = ref $_ ? $_ : eval $_ || eval '$' . $_;
+
+	my $ok = scalar $tiny_type->grep(@vals);
+	if ($ok / $tot >= (1 - $class->tolerance)) {
+	    return $tiny_type
+	}
+    }
+}
+
+1;
+
+################################################################################
+lib/Type/Guess/Role/SQL/SQLite.pm
+################################################################################
+
+package Type::Guess::Role::SQL::SQLite;
+
+use Moo::Role;
+
+sub to_sql {
+    my $self = shift;
+    my $type = ref $self->type ? $self->type->name : $self->type;
+    return "INTEGER"                                        if $type eq "Int";
+    return "DATETIME"                                       if $self->type eq 'DateTime';
+    return "FLOAT"                                          if $type eq "Num";
+    return sprintf "VARCHAR(%d)", $self->length             if $type eq "Str" && $self->length < 1024;
+    return "TEXT";
+}
+
+1;
+
+__DATA__
+    return "DATETIME"                                       if $type eq "DateTime";
+
+################################################################################
+lib/Type/Guess/Role/SQL/Pg.pm
+################################################################################
+
+package Type::Guess::Role::SQL::Pg;
+
+use Moo::Role;
+
+sub to_sql {
+    my $self = shift;
+    my $type = ref $self->type ? $self->type->name : $self->type;
+
+    return $self->integer_chars > 9 ? "BIGINT" : "INTEGER"              if $type eq "Int";
+    return "TIMESTAMP"                                                  if $self->type eq 'DateTime';
+    return sprintf "DECIMAL(%d,%d)", $self->length, $self->precision    if $type eq "Num";
+    return sprintf "VARCHAR(%d)", $self->length                         if $type eq "Str" && $self->length < 1024;
+    return "TEXT";
+}
+
+1;
+
+
+=head2 TIMESTAMP
+
+Postgres distinguishes TIMESTAMP (no timezone) and TIMESTAMP WITH TIME ZONE.
+Type::Guess emits TIMESTAMP by default. If your application is timezone-aware,
+cast manually or compose a role that overrides to_sql for DateTime to return
+TIMESTAMP WITH TIME ZONE.
+
+=cut
+
+################################################################################
+lib/Type/Guess/Role/DateTime.pm
+################################################################################
+
+package Type::Guess::Role::DateTime;
+
+use Moo::Role;
+use Carp;
+
+use Module::Runtime qw(require_module);
+
+my $_parser = {
+	       parser_class => "DateTime::Format::Flexible",
+	       parser_opts => [],
+	       parser_method => "parse_datetime"
+	      };
+
+
+sub parser_class {
+    my $self = shift;
+    my @keys = qw/parser_class parser_opts parser_method/;
+    if (@_) {
+	my @args = @_;
+	my %args;
+	$args[0] = "DateTime::Format::" . $args[0] unless $args[0] =~ /^DateTime::Format::/;
+	@args{@keys} = @args;
+	$_parser = { %$_parser, %args };
+    }
+    require_module $_parser->{parser_class};
+    return map { $_parser->{$_} } qw/parser_class parser_opts parser_method/;
+}
+
+around '_type' => sub {
+    my ($orig, $class, @vals) = @_;
+
+    my ($parser_class, $parser_opts, $parser_method) = $class->parser_class;
+    return "DateTime" if $class->_enough(sub { eval { $parser_class->$parser_method($_, $parser_opts->@*) } }, @vals);
+    return $orig->($class, @vals);
+};
+
+
+1
+
+################################################################################
+lib/Type/Guess/Role/DateTime/Naive.pm
+################################################################################
+
+package Type::Guess::Role::DateTime::Naive;
+
+use Moo::Role;
+
+has 'datetime_format' => (is => 'rw', default => sub { "" });
+
+my @PATTERNS = (
+    [ qr/^\d{4}-(\d{2})-\d{2}$/,                    '%Y-%m-%d'          ],
+    [ qr/^\d{2}-[A-Za-z]{3}-\d{4}$/,                '%d-%b-%Y'          ],
+    [ qr/^\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}$/, '%Y-%m-%d %H:%M:%S' ],
+    [ qr/^\d{2}\.\d{2}\.\d{4}$/,                      '%d.%m.%Y'          ],
+    [ qr/^\d{2}\/\d{2}\/\d{4}$/,                    '%d/%m/%Y'          ],
+);
+
+# returns ($type_string, $datetime_format) rather than just $type_string
+sub _type_and_format {
+    my ($class, @vals) = @_;
+    for my $pat (@PATTERNS) {
+        my ($re, $fmt) = @$pat;
+        next unless $class->_enough(sub { /$re/ }, @vals);
+        return ("DateTime", $fmt);
+    }
+    return (undef, undef);
+}
+
+around '_type' => sub {
+    my ($orig, $class, @vals) = @_;
+    my ($type) = $class->_type_and_format(@vals);
+    return $type if defined $type;
+    return $orig->($class, @vals);
+};
+
+
+around "new" => sub {
+    my ($orig, $class, @vals) = @_;
+    my $result = $orig->($class, @vals);
+    return $result if ref $vals[0] eq 'HASH' || !@vals;
+    if ($result->type eq 'DateTime') {
+        my (undef, $fmt) = $class->_type_and_format(@vals);
+        $result->datetime_format($fmt);
+    }
+    return $result;
+};
+
+1;
+
+################################################################################
+lib/Type/Guess/Role/Unicode.pm
+################################################################################
+
+package Type::Guess::Role::Unicode;
+
+# use Mojo::Base -role;
+
+use Moo::Role;
+
+use Text::VisualPrintf qw/vprintf vsprintf/;
+use Text::VisualWidth::PP qw/vwidth/;
+use List::Util qw/max/;
+use Encode qw/decode encode/;
+use utf8;
+
+use overload
+    '&{}' => \&to_sub;
+
+sub _length {
+    my $class = shift();
+    binmode(STDOUT, ':utf8');
+    print @_;
+    print map { local $_ = utf8::is_utf8($_) ? $_ : decode("UTF-8", $_); vwidth($_) } @_;
+    print max map { local $_ = utf8::is_utf8($_) ? $_ : decode("UTF-8", $_); vwidth($_) } @_;
+    return max map { local $_ = utf8::is_utf8($_) ? $_ : decode("UTF-8", $_); vwidth($_) } @_;
+}
+
+sub to_sub {
+    my $self = shift;
+    my $format = $self->to_string;
+    no warnings;
+    return sub {
+	return encode "UTF-8", vsprintf $format, utf8::is_utf8($_[0]) ? $_[0] : decode("UTF-8", $_[0]);
+    }
+}
+
+1
+

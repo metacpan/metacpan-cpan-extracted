@@ -1,5 +1,108 @@
 Revision history for BATsh
 
+0.05  2026-06-14 JST (Japan Standard Time)
+
+    - SH single-line loops: "for VAR in LIST; do BODY; done" and
+      "while/until COND; do BODY; done" written entirely on one physical
+      line are now executed correctly. Previously _parse_for() captured the
+      whole inline tail (BODY; done) into the iteration list and collected
+      no body, so the loop produced no output and -- because the body
+      collector then consumed the rest of the script looking for a "done"
+      that never arrived as its own line -- it re-ran the remainder of the
+      file once per whitespace token in the list; the single-line while
+      form died with a shell "do unexpected" / "Can't exec done" error.
+      _parse_for() and _parse_while() now detect an inline ";do" (matched
+      with \b after "do" so a "; done" terminator is never taken for the
+      "do" keyword), split the header from the inline body, and recognise
+      an inline "; done" terminator (greedy, so the LAST "; done" closes the
+      loop and a body that legitimately contains the word "done" or a nested
+      single-line loop is handled). The inline while form also honours a
+      redirect on the closing done, e.g. "while read L; do ...; done < FILE".
+      Multi-line loops are byte-for-byte unaffected. All forms are Perl
+      5.005_03 compatible (no regex features beyond \A \z \b and /s). This
+      makes the single-line "for i in 1 2 3; do ... done" shown in the
+      doc/*.txt cheat-sheet MIXED-MODE SAMPLE run as documented.
+
+    - t/0002-sh-interpreter.t: added regression tests for the inline
+      single-line for/while/until forms, nested single-line loops, a body
+      that contains the literal word "done", inline filename globbing, and
+      an inline while-read with a redirect on the closing done.
+
+    - Section splitter: BATsh::_sh_depth_delta() now computes the NET block
+      depth change for an ENTIRE SH line instead of inspecting only the first
+      token. A single-line "for ...; do ...; done" (or while/until/case)
+      counted the leading "for" (+1) but never the inline "done" (-1), so the
+      SH section was left open; the FOLLOWING CMD line was then absorbed into
+      the SH section and executed by the SH interpreter, where "%VAR%" is not
+      expanded -- e.g. the cheat-sheet sample's "ECHO Back in CMD: %result%"
+      printed "%result%" literally instead of bridging the SH-side value. The
+      new scanner counts opener (if for while until case function select, "{")
+      and closer (fi done esac, "}") keywords only in command position and
+      skips quoted text, $( ) substitutions and backticks, so an inline loop
+      nets to zero and the section boundary is detected correctly. Pure
+      Perl 5.005_03 (substr-based scan, no regex features). Multi-line input
+      is unaffected (the fast path returns the previous single-token result).
+
+    - Section splitter: a CMD-style comment (":: ..." or "REM ...") that
+      follows an SH section is no longer handed to the SH interpreter
+      verbatim. _process_lines() routed every comment line into the current
+      section unchanged; because the SH interpreter treats only "#" as a
+      comment, a ":: ..."/"REM ..." line was dispatched to the external shell,
+      and any "( )", "|" or other metacharacter in the comment then made
+      /bin/sh fail with 'Syntax error: "(" unexpected'. Comment (and empty)
+      lines are now routed into a section as a BLANK line, which both
+      interpreters skip identically at every nesting depth and which also
+      avoids the real cmd.exe quirk of "::" inside a "( )" block.
+
+    - t/0004-bridge.t: added regression tests proving (a) a single-line
+      for/while does not leave the SH section open so a following CMD
+      "%VAR%" still bridges, and (b) a ":: ..."/"REM ..." comment containing
+      shell metacharacters after an SH section is not dispatched to the
+      shell (STDERR is captured and checked for no shell syntax error).
+
+    - CMD variable substring/substitution modifiers: %VAR:~n,m% and
+      %VAR:str1=str2% in-place substitution are now supported in
+      BATsh::Env::expand_cmd() via a new _expand_var_modifier() helper.
+      Substring forms: %VAR:~n% (from offset), %VAR:~n,m% (n+m chars),
+      %VAR:~-n% (last n chars), %VAR:~n,-m% (all but last m chars).
+      Substitution forms: %VAR:str1=str2% (replace first, case-insensitive),
+      %VAR:*str1=str2% (replace from start through first str1).
+      All forms are processed before the plain %VAR% pass and are
+      Perl 5.005_03 compatible (substr, index, no regex features).
+
+    - CMD dynamic pseudo-variables: %DATE%, %TIME%, %CD%, %RANDOM%,
+      %ERRORLEVEL%, and %CMDCMDLINE% are now resolved at expansion time
+      by a new _expand_named_var() dispatcher inside expand_cmd().
+      %DATE% returns YYYY-MM-DD, %TIME% returns HH:MM:SS.cc, %CD% is the
+      current working directory, %RANDOM% is a pseudo-random integer 0-32767,
+      %ERRORLEVEL% reads the current value from BATsh::CMD via the new
+      public accessor BATsh::CMD::_get_errorlevel(), and %CMDCMDLINE%
+      returns an empty string (not meaningful in pure-Perl mode).
+
+    - SH filename globbing: unquoted words that contain *, ?, or [...]
+      metacharacters are now expanded to matching pathnames using Perl's
+      built-in glob(). Expansion occurs in BATsh::SH::_parse_args() (for
+      echo and external-command arguments) and in BATsh::SH::_parse_for()
+      (for the word list of for VAR in GLOB; do ... done). Single-quoted
+      and double-quoted patterns are NOT expanded (POSIX behaviour).
+      If no file matches the pattern, the literal pattern is returned
+      unchanged (nullglob-off behaviour, which is the shell default).
+      Two new helpers are added to BATsh::SH: _glob_expand() (expand one
+      word) and _glob_expand_args() (convenience wrapper over a list).
+
+    - t/0009-new-vars.t: new test file, 25 tests (NV01-NV25) covering
+      all three feature areas above. Added to MANIFEST.
+
+    - POD updated: BATsh.pm BUGS AND LIMITATIONS now records that
+      %VAR:~n,m% / %VAR:str1=str2% and all dynamic pseudo-variables are
+      supported; the SH filename-globbing limitation item is removed.
+      BATsh::Env Variable Expansion section documents all new forms.
+      BATsh::SH Supported Features table lists glob expansion.
+
+    - Version bumped to 0.05 in lib/BATsh.pm, lib/BATsh/CMD.pm,
+      lib/BATsh/SH.pm, lib/BATsh/Env.pm, Makefile.PL, META.yml,
+      META.json, and README.
+
 0.04  2026-06-07 JST (Japan Standard Time)
 
     - Inline-Perl portability: every shelled-out Perl one-liner in the

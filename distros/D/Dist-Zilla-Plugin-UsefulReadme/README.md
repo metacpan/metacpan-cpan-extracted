@@ -36,15 +36,16 @@ This was written as a successor to [Pod::Readme](https://metacpan.org/pod/Pod%3A
 
 # RECENT CHANGES
 
-Changes for version v0.5.3 (2026-05-31)
+Changes for version v0.6.0 (2026-06-13)
 
-- Documentation
-    - Updated copyright year.
-    - Added doap.xml metadata to the distribution.
-    - Updated author email address.
+- Incompatabilities
+    - Bumped minimum Perl version to v5.24.
+- Enhancements
+    - Use newer Perl syntax features.
 - Toolchain
-    - Added automation-policy.json to the distribution.
-    - Stopped signing distributions with Module::Signature.
+    - Set the static install flag.
+    - Adjusted build prerequisites to be recommended instead of required.
+    - Sign distribution with SigStore.
 
 See the `Changes` file for more details.
 
@@ -69,7 +70,7 @@ This module lists the following modules as runtime dependencies:
 - [Types::Common](https://metacpan.org/pod/Types%3A%3ACommon)
 - [experimental](https://metacpan.org/pod/experimental)
 - [namespace::autoclean](https://metacpan.org/pod/namespace%3A%3Aautoclean)
-- [perl](https://metacpan.org/pod/perl) version v5.20.0 or later
+- [perl](https://metacpan.org/pod/perl) version v5.24.0 or later
 
 See the `cpanfile` file for the full list of prerequisites.
 
@@ -110,7 +111,7 @@ For more information, see [How to install CPAN modules](https://www.cpan.org/mod
 
 Only the latest version of this module will be supported.
 
-This module requires Perl v5.20 or later, based on the minimum Perl supported by [Dist::Zilla](https://metacpan.org/pod/Dist%3A%3AZilla).
+This module requires Perl v5.24 or later, based on the minimum Perl supported by [Dist::Zilla](https://metacpan.org/pod/Dist%3A%3AZilla).
 
 ## Reporting Bugs and Submitting Feature Requests
 

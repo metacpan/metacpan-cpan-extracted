@@ -2,7 +2,7 @@ package DBIx::QuickORM::Dialect::MySQL::MariaDB;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use Carp qw/croak/;
 
@@ -68,7 +68,7 @@ sub init {
     $self->SUPER::init();
 
     my $vendor = $self->db_vendor;
-    die "The mysql vendor is '$vendor' not MariaDB" if $vendor && $vendor !~ m/MariaDB/i;
+    croak "The mysql vendor is '$vendor' not MariaDB" if $vendor && $vendor !~ m/MariaDB/i;
 }
 
 1;

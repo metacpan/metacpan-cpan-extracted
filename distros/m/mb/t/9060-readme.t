@@ -16,6 +16,7 @@ BEGIN { if ($] < 5.006 && !defined(&warnings::import)) {
         eval 'package warnings; sub import {}' } }
 use warnings; local $^W = 1;
 BEGIN { pop @INC if $INC[-1] eq '.' }
+use vars qw($VERSION); $VERSION = $VERSION;
 use FindBin ();
 use lib "$FindBin::Bin/lib";
 use File::Spec ();

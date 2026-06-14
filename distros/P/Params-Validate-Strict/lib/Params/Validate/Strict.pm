@@ -1,6 +1,7 @@
 package Params::Validate::Strict;
 
 # FIXME: {max} doesn't play ball with non-ascii strings
+# TODO: better use of the description parameter in error messages
 
 use strict;
 use warnings;
@@ -23,11 +24,11 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.33
+Version 0.34
 
 =cut
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 =head1 SYNOPSIS
 
@@ -214,9 +215,13 @@ The schema can define the following rules for each parameter:
 =item * C<type>
 
 The data type of the parameter.
-Valid types are C<string>, C<integer>, C<number>, C<float> C<boolean>, C<scalar>, C<scalarref>, C<hashref>, C<arrayref>, C<object> and C<coderef>.
+Valid types are C<string>, C<integer>, C<number>, C<float> C<boolean>, C<scalar>, C<scalarref>, C<stringref>, C<hashref>, C<arrayref>, C<object> and C<coderef>.
 C<scalar> accepts any plain scalar value (string, number, boolean, etc.) but rejects references (arrayrefs, hashrefs, coderefs, objects).
 C<scalarref> accepts a reference to a scalar value (e.g. C<\$var>) but rejects plain scalars, arrayrefs, hashrefs, coderefs, and objects.
+C<stringref> accepts a reference to a scalar that contains a plain string (e.g. C<\$str>) and rejects plain scalars, references-to-references, arrayrefs, hashrefs, coderefs, and objects.
+The C<min>/C<max> constraints apply to the B<length> (in characters) of the referenced string.
+All other string rules (C<matches>, C<nomatch>, C<memberof>, etc.) operate on the dereferenced string value.
+The validated return value is the dereferenced plain string.
 
 A type can be an arrayref when a parameter could have different types (e.g. a string or an object).
 
@@ -1125,6 +1130,18 @@ sub validate_strict
 			if(exists($rules->{'description'})) {
 				$rule_description = $rules->{'description'};
 			}
+			# For stringref: validate and dereference before transform so that
+			# transform (and all subsequent rule handlers) see the plain string.
+			# Preserve the original ref so optional => CODE receives what the caller passed.
+			my $pre_deref_value = $value;
+			my $is_stringref_type = defined($value) && defined($rules->{'type'}) && !ref($rules->{'type'}) && lc($rules->{'type'}) eq 'stringref';
+			if($is_stringref_type) {
+				if(ref($value) ne 'SCALAR') {
+					my $got = ref($value) ? 'a ' . ref($value) . ' reference' : 'a plain scalar';
+					_error($logger, $rules->{'error_msg'} || "$rule_description: Parameter '$key' must be a string reference, not $got");
+				}
+				$value = ${$value};
+			}
 			if($rules->{'transform'} && defined($value)) {
 				if(ref($rules->{'transform'}) eq 'CODE') {
 					$value = &{$rules->{'transform'}}($value);
@@ -1134,7 +1151,11 @@ sub validate_strict
 			}
 			if(exists($rules->{optional})) {
 				if(ref($rules->{'optional'}) eq 'CODE') {
-					$is_optional = &{$rules->{optional}}($value, $args);
+					# For stringref the coderef receives the original SCALAR ref (what
+					# the caller supplied), not the internally-dereferenced plain string.
+					# For all other types the post-transform value is passed, as before.
+					my $opt_arg = $is_stringref_type ? $pre_deref_value : $value;
+					$is_optional = &{$rules->{optional}}($opt_arg, $args);
 				} else {
 					$is_optional = $rules->{'optional'};
 				}
@@ -1248,7 +1269,7 @@ sub validate_strict
 						if(!defined($value)) {
 							next;	# Skip if number is undefined
 						}
-						if($value !~ /^\s*[+\-]?\d+\s*$/) {
+						if(!Scalar::Util::looks_like_number($value) || ($value - $value) != 0 || $value != int($value)) {
 							if($rules->{'error_msg'}) {
 								_error($logger, $rules->{'error_msg'});
 							} else {
@@ -1305,6 +1326,15 @@ sub validate_strict
 						if(ref($value) ne 'SCALAR') {
 							my $got = ref($value) ? 'a ' . ref($value) . ' reference' : 'a plain scalar';
 							_error($logger, $rules->{'error_msg'} || "$rule_description: Parameter '$key' must be a scalar reference, not $got");
+						}
+					} elsif($type eq 'stringref') {
+						if(!defined($value)) {
+							next;	# Skip if undefined
+						}
+						# The early-deref block validated the SCALAR ref and set $value to the
+						# plain string.  If transform subsequently returned a reference, reject it.
+						if(ref($value)) {
+							_error($logger, $rules->{'error_msg'} || "$rule_description: Parameter '$key' stringref transform must return a plain string, not a " . ref($value) . ' reference');
 						}
 					} elsif(($type eq 'boolean') || ($type eq 'bool')) {
 						if(!defined($value)) {
@@ -1364,7 +1394,7 @@ sub validate_strict
 						$rule_value = $custom_types->{$type}->{'min'} // $custom_types->{$type}->{minumum};
 						$type = $custom_types->{$type}->{'type'};
 					}
-					if(($type eq 'string') || ($type eq 'str')) {
+					if(($type eq 'string') || ($type eq 'str') || ($type eq 'stringref')) {
 						if($rule_value < 0) {
 							if($rules->{'error_msg'}) {
 								_error($logger, $rules->{'error_msg'});
@@ -1453,7 +1483,7 @@ sub validate_strict
 						$rule_value = $custom_types->{$type}->{'max'};
 						$type = $custom_types->{$type}->{'type'};
 					}
-					if(($type eq 'string') || ($type eq 'str')) {
+					if(($type eq 'string') || ($type eq 'str') || ($type eq 'stringref')) {
 						if(!defined($value)) {
 							next;	# Skip if string is undefined
 						}
@@ -2178,7 +2208,7 @@ Nigel Horne, C<< <njh at nigelhorne.com> >>
 
     ValidationRule ::= SimpleType | ComplexRule | UnionType
 
-    SimpleType ::= string | integer | number | scalar | arrayref | hashref | coderef | object
+    SimpleType ::= string | integer | number | scalar | scalarref | stringref | arrayref | hashref | coderef | object
 
     UnionType ::= seq SimpleType    -- at least two members; written as type => ['a', 'b']
 

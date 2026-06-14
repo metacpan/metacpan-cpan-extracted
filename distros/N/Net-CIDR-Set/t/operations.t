@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Test::More tests => 4;
 use Net::CIDR::Set;
-use Data::Dumper;
+use Data::Dumper 2.154;
 
 {
   my $s1 = Net::CIDR::Set->new( '0.0.0.0-0.0.0.255',

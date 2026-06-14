@@ -7,7 +7,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = '0.091';
+our $VERSION = '0.092';
 
 use constant ARRAY_REF	=> ref [];
 
@@ -107,24 +107,17 @@ L<PPIx::Regexp::Tokenizer|PPIx::Regexp::Tokenizer>
 
 =head1 SUPPORT
 
-This module is private to the C<PPIx-Regexp> package. It is unsupported in
-the sense that the author reserves the right to modify or retract it
-without prior notice. Bug reports against this module will be accepted
-provided they document a problem with this module that results in
-spurious test results.
-
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=PPIx-Regexp>,
-L<https://github.com/trwyant/perl-PPIx-Regexp/issues>, or in
+L<https://github.com/trwyant/perl-PPIx-Regexp/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Tom Wyant (wyant at cpan dot org)
+Tom Wyant (harryfmudd at comcast dot net)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2015-2023, 2025 by Thomas R. Wyant, III
+Copyright (C) 2015-2023, 2025-2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

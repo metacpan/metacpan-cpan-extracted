@@ -4,6 +4,11 @@
 
 `SCORECARD-GATEKEEPER` is a hard release rule for this repository.
 
+> **Note**: For detailed step-by-step instructions on improving Scorecard scores through GitHub settings,
+> including branch protection, releases, and pull request workflows, see the comprehensive guide:
+> **[doc/scorecard-improvements.md](scorecard-improvements.md)**
+
+
 Before saying the work is done, before a release, and before a push that is
 meant to close a task, run the live GitHub Scorecard check through the machine
 specific authenticated path:
@@ -45,6 +50,10 @@ checksum, generates a detached signature, and creates or updates the GitHub
 release for that tag. That workflow must also install `Devel::Cover` before
 it runs the numeric `cover` gate, or the release path will die before the
 tarball, checksum, and signature assets are published.
+The GitHub-hosted CPAN upload workflow is deliberately manual-only. Do not
+wire tag pushes to automatic PAUSE uploads here; ordinary `vX.XX` tags are for
+the signed GitHub release path, while CPAN publication stays an explicit
+`workflow_dispatch` or local `dashboard pause-release` operator action.
 
 ## OWASP Gate
 
@@ -334,7 +343,7 @@ The extension layer now includes:
 - user CLI hook directories under `~/.developer-dashboard/cli`
 - project-aware Docker Compose resolution through `dashboard docker compose`
 
-Compose setup can now stay isolated in service folders under `./.developer-dashboard/docker/<service>/compose.yml` for the current project, with `~/.developer-dashboard/config/docker/<service>/compose.yml` as the fallback. The wrapper infers service names from passthrough docker compose args such as `config green` before building the final `docker compose` command. When no service name is passed, the resolver scans isolated service folders and preloads every non-disabled folder. A folder containing `disabled.yml` is skipped. Each isolated folder contributes `development.compose.yml` when present, otherwise `compose.yml`. The compose runtime also exports `DDDC` as the effective config-root docker directory for the current runtime so YAML can continue to use `${DDDC}` paths internally. Wrapper-only flags are consumed first and remaining docker compose flags such as `-d` and `--build` pass through untouched.
+Compose setup can now stay isolated in service folders under `./.developer-dashboard/config/docker/<service>/compose.yml` for the current project, with `~/.developer-dashboard/config/docker/<service>/compose.yml` as the fallback. The wrapper infers service names from passthrough docker compose args such as `config green` before building the final `docker compose` command. When no service name is passed, the resolver scans isolated service folders and preloads every non-disabled folder. A folder containing `disabled.yml` is skipped. Each isolated folder contributes `development.compose.yml` when present, otherwise `compose.yml`. The compose runtime also exports `DDDC` as the runtime `config/docker` directory for the current runtime, and project-local isolated services are discovered from that same `./.developer-dashboard/config/docker/...` tree. Wrapper-only flags are consumed first and remaining docker compose flags such as `-d` and `--build` pass through untouched.
 Without `--dry-run`, the wrapper now hands off with `exec`, so terminal users see the normal streaming output from `docker compose` itself instead of a dashboard JSON wrapper.
 Path aliases can now be managed from the CLI with `dashboard path add <name> <path>` and `dashboard path del <name>`. These commands persist user-defined aliases in the effective config root, using a project-local `./.developer-dashboard` tree first when it exists and otherwise the home runtime. Both repeated adds and repeated deletes are intentionally idempotent. When an added path lives under the current home directory, the stored config rewrites it to `$HOME/...` so a shared dashboard config directory does not hard-code one developer's absolute home path.
 Use `Developer::Dashboard::Folder` for runtime path helpers. It resolves the

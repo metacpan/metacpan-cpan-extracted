@@ -27,7 +27,7 @@ get_mp4tags(PerlIO *infile, char *file, HV *info, HV *tags)
 }
 
 // wrapper to return just the file offset
-int
+off_t
 mp4_find_frame(PerlIO *infile, char *file, int offset)
 {
   HV *info = newHV();
@@ -50,7 +50,7 @@ int
 mp4_find_frame_return_info(PerlIO *infile, char *file, int offset, HV *info)
 {
   int ret = 1;
-  uint16_t samplerate = 0;
+  uint32_t samplerate = 0;
   uint32_t sound_sample_loc;
   uint32_t i = 0;
   uint32_t j = 0;
@@ -669,7 +669,7 @@ _mp4_read_box(mp4info *mp4)
 
   mp4->rsize = 0; // remaining size in box
 
-  if ( !_check_buf(mp4->infile, mp4->buf, 16, MP4_BLOCK_SIZE) ) {
+  if ( !_check_buf(mp4->infile, mp4->buf, 8, MP4_BLOCK_SIZE) ) {
     return 0;
   }
 
@@ -678,26 +678,37 @@ _mp4_read_box(mp4info *mp4)
   type[4] = '\0';
   buffer_consume(mp4->buf, 4);
 
+  mp4->hsize = 8;
   // Check for 64-bit size
   if (size == 1) {
+    if ( !_check_buf(mp4->infile, mp4->buf, 8, MP4_BLOCK_SIZE) ) {
+      return 0;
+    }
     size = buffer_get_int64(mp4->buf);
     mp4->hsize = 16;
   }
-  else if (size == 0) {
-    // XXX: size extends to end of file
-    mp4->hsize = 8;
+
+  if (size == 0) { 
+    // XXX: box extends to end of file
+    /*nothing to do*/ ; // rsize=size=0
+  } 
+  else if (size < mp4->hsize) {
+    PerlIO_printf(PerlIO_stderr(), "Invalid box size in: %s\n", mp4->file);
+    return 0;
   }
   else {
-    mp4->hsize = 8;
-  }
-
-  if (size) {
+    // set size of the remainder of the box
     mp4->rsize = size - mp4->hsize;
-  }
+  } 
 
   mp4->size = size;
 
   DEBUG_TRACE("%s size %llu\n", type, size);
+
+  if (size == mp4->hsize) {
+    PerlIO_printf(PerlIO_stderr(), "Ignoring empty box of type %s in: %s\n", type, mp4->file);
+    return size;
+  }
 
   if (mp4->seekhdr) {
     // Copy and adjust header if seeking
@@ -791,19 +802,16 @@ _mp4_read_box(mp4info *mp4)
     || FOURCC_EQ(type, "dinf")
     || FOURCC_EQ(type, "stbl")
     || FOURCC_EQ(type, "udta")
+    || FOURCC_EQ(type, "trak")
   ) {
     // These boxes are containers for nested boxes, return only the fact that
-    // we read the header size of the container
+    // we read the header size of the container. Read the nested box the next call to this fn.
     size = mp4->hsize;
 
     if ( FOURCC_EQ(type, "trak") ) {
+      // Also a container, but we need to increment track_count too
       mp4->track_count++;
     }
-  }
-  else if ( FOURCC_EQ(type, "trak") ) {
-    // Also a container, but we need to increment track_count too
-    size = mp4->hsize;
-    mp4->track_count++;
   }
   else if ( FOURCC_EQ(type, "mvhd") ) {
     mp4->seen_moov = 1;

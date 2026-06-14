@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 package Perl::Critic::Policy::BuiltinFunctions::ProhibitForeach;
-$Perl::Critic::Policy::BuiltinFunctions::ProhibitForeach::VERSION = '0.01';
+$Perl::Critic::Policy::BuiltinFunctions::ProhibitForeach::VERSION = '0.02';
 use Perl::Critic::Utils qw(:severities :classification :ppi);
 use parent 'Perl::Critic::Policy';
 
@@ -40,7 +40,7 @@ Perl::Critic::Policy::BuiltinFunctions::ProhibitForeach - Prohibit foreach keywo
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 DESCRIPTION
 
@@ -69,7 +69,7 @@ Dean Hamstead <dean@fragfest.com.au>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Dean Hamstead.
+This software is Copyright (c) 2026 by Dean Hamstead.
 
 This is free software, licensed under:
 

@@ -23,7 +23,14 @@ for my $file (@files) {
   say '=' x 72;
 
   my $err = gensym;
-  my $pid = open3(my $in, my $out, $err, $^X, '-I', "$Bin/../lib", $path);
+  my $pid = open3(
+    my $in,
+    my $out,
+    $err,
+    $^X,
+    '-Mblib',
+    $path,
+  );
   close $in;
 
   my $sel = IO::Select->new($out, $err);

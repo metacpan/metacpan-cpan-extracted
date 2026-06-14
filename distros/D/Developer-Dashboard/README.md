@@ -5,7 +5,7 @@
 Developer::Dashboard - a local home for development work
 
 # VERSION
-4.03
+4.16
 
 # INTRODUCTION
 
@@ -72,7 +72,12 @@ Dashboard-managed child commands also keep the current interpreter's bin
 directory plus the active shell directory at the front of `PATH`, and
 collector shell commands now run through a non-login shell so macOS
 shell-session restore banners and similar startup chatter do not get prefixed
-onto JSON collector output.
+onto JSON collector output. On Windows, long-lived web, collector-loop,
+collector-worker, and watchdog launches now re-enter through staged private
+`_dashboard-core` foreground commands instead of relying on Perl
+pseudo-forking, and their runtime-state writes keep explicit replacement
+fallbacks for hosts where Windows rename collisions would otherwise leave stale
+or missing state files behind.
 
 Explicit named collector stop and restart actions also pause the watchdog
 supervisor for the targeted collector set while the lifecycle command is in
@@ -504,6 +509,16 @@ generic package names.
     public standalone binary, and completes already-open tmux session names when
     shell completion is enabled. The older `dashboard ticket` spelling remains as
     a compatibility alias.
+
+    Passing `-c` before or after the workspace name changes directory first. When
+    the workspace name is registered in the dashboard paths inventory, the same
+    registered names the shell `cdr` helper resolves, the command changes into
+    that registered directory before planning the session, so
+    `dashboard workspace -c foobar` behaves like running `cdr foobar` followed
+    by `dashboard workspace foobar`: the tmux session and its layered `.env`
+    refresh both start from the registered project directory. When the name is not
+    a registered dashboard path, `-c` fails with an explicit error instead of
+    silently starting the workspace from the wrong directory.
 
 - Runtime Manager
 
@@ -1065,10 +1080,14 @@ sets the CurrentUser PowerShell execution policy to
 `RemoteSigned` when it is still too restrictive to load profile scripts,
 updates the current-user PowerShell profile with a self-contained
 private `~/perl5` PATH and Perl environment block plus
-`dashboard shell ps`, runs `dashboard init` first so the home helper runtime
-exists, and then activates that PowerShell bootstrap in the current shell when
-possible. Future PowerShell sessions do not rely on installer-only helper
-functions while loading that generated profile block. The generated bash, zsh,
+`dashboard shell ps`, seeds `$env:HOME` from PowerShell's own `$HOME` inside
+that managed profile block when Windows did not export `HOME` itself, creates
+a stable user-space `make.cmd` shim that points at Strawberry Perl's GNU make
+provider so skill `Makefile` workflows keep working in later sessions, runs
+`dashboard init` first so the home helper runtime exists, and then activates
+that PowerShell bootstrap in the current shell when possible. Future
+PowerShell sessions do not rely on installer-only helper functions while
+loading that generated profile block. The generated bash, zsh,
 POSIX sh, and PowerShell shell bootstraps all follow the same tmux-aware
 prompt rule: when the shell starts inside a `dashboard workspace` tmux session
 that carries `DEVELOPER_DASHBOARD_TMUX_STATUS=1`, indicator glyphs move to
@@ -1232,13 +1251,17 @@ Initialize the runtime:
 Inspect resolved paths:
 
     dashboard paths
+    dashboard paths -o json
     dashboard path resolve bookmarks_root
     dashboard path add foobar /tmp/foobar
+    dashboard path add foobar /tmp/foobar -o json
     dashboard path add .
     dashboard path del foobar
     dashboard path rm foobar
     dashboard files
+    dashboard files -o json
     dashboard file add notes ~/notes.txt
+    dashboard file add notes ~/notes.txt -o json
     dashboard file resolve notes
     dashboard file del notes
     dashboard which jq
@@ -1259,6 +1282,14 @@ alias points inside the current home directory, the stored config uses
 runtime remains portable across different developer accounts. Re-adding an
 existing alias updates it without error, and deleting a missing alias is also
 safe.
+
+Developer Dashboard now uses one CLI output contract for operator-facing
+built-ins. By default, inventory and mutation commands print a human-readable
+summary table. When a script or LLM needs the full raw payload, pass
+`-o json`. Shell-plumbing commands that need one stable direct value such as
+`dashboard path resolve`, `dashboard path project-root`, `cdr`, and
+`which_dir` keep their direct output contracts instead of forcing a summary
+table.
 
 `cdr` now follows a two-stage path flow instead of only jumping to one alias
 or one top-level project name. If the first argument resolves as a saved alias
@@ -1330,8 +1361,9 @@ When the alias name is a valid Perl method token,
 is numeric such as `123`, use a scalar method name like
 `my $name = 123; Developer::Dashboard::File->$name()` because bare
 `->123` is not valid Perl syntax. `dashboard files` prints the full
-built-in plus configured file inventory, while `dashboard file list` prints
-only the named configured file aliases.
+built-in plus configured file inventory as a table by default, while
+`dashboard file list` prints only the named configured file aliases. Use
+`-o json` with either command when you need the full raw payload.
 
 `dashboard of` and `dashboard open-file` now treat configured file aliases
 as direct file targets before they fall back to Perl-module, Java-class, or
@@ -1408,7 +1440,7 @@ Start the local app:
 
     dashboard serve
 
-Open the root path with no bookmark path to get the free-form bookmark editor directly. If you start the web service with `dashboard serve --no-editor` or `dashboard serve --no-endit`, the browser stays read-only instead and direct editor/source routes are blocked. If you start it with `dashboard serve --no-indicators` or `dashboard serve --no-indicator`, the right-top browser chrome is cleared while normal page rendering still works.
+Open the root path with no bookmark path to get the free-form bookmark editor directly. The browser now splits bookmark sections into separate editor blocks instead of making you manage one long source textarea by hand, but it still saves the same on-disk bookmark file format behind the scenes. If you start the web service with `dashboard serve --no-editor` or `dashboard serve --no-endit`, the browser stays read-only instead and direct editor/source routes are blocked. If you start it with `dashboard serve --no-indicators` or `dashboard serve --no-indicator`, the right-top browser chrome is cleared while normal page rendering still works.
 
 Stop the local app and collector loops:
 
@@ -1474,7 +1506,9 @@ The `dashboard api` command manages the deepest writable runtime
 merged registry from home through the active child layer together with any
 installed-skill API fragments that contribute saved Ajax machine auth. Updates
 never rewrite installed skill files; they only change the writable runtime
-layer for the current working context.
+layer for the current working context. List, add, and remove actions print
+human-readable tables by default; use `-o json` when you need the full raw
+machine payload.
 
 When you pass `--secret`, the raw secret is hashed to a SHA-256 hex digest
 before it is stored. `--maybe-secret` is the route-friendly alias for the
@@ -1527,16 +1561,17 @@ Posting a bookmark document with `BOOKMARK: some-id` back through the root
 editor now saves it to the bookmark store so `/app/some-id` resolves it
 immediately.
 
-The browser editor now renders syntax-highlight markup again, but keeps that
-highlight layer inside a clipped overlay viewport that follows the real
-textarea scroll position by transform instead of via a second scrollbox.
-That restores the visible highlighting while keeping long bookmark lines,
-full-text selection, and caret placement aligned with the real textarea.
-When you type `:---` on its own line, the editor also expands it to the full
-separator line automatically and seeds the next sensible unique directive,
-moving from `TITLE:` to `HTML:` and then on to the next available
-`CODE<N>:` section so the common bookmark-writing flow stays fast and
-brainless.
+The browser editor now loads one visible block per bookmark section while it
+keeps the canonical separator-based bookmark source in a hidden form field for
+saves and play requests. Each visible block still uses the syntax-highlighted
+overlay viewport that follows the real textarea scroll position by transform
+instead of a second scrollbox, so long lines, full-text selection, and caret
+placement stay aligned with the real editor. Pressing `Tab` inside one block
+starts the next section block, and the browser recomposes those blocks back
+into the original separator-line bookmark document before it posts or plays
+the page. The directive assist still understands `:---` when you paste older
+single-textarea workflows into one block, expanding it to the full separator
+line and seeding the next sensible directive.
 
 Edit and source views preserve raw Template Toolkit placeholders inside
 `HTML:` sections, so values such as `[% title %]` are kept in the bookmark
@@ -1562,7 +1597,8 @@ bookmark should show its title in the page body, add it explicitly inside
 `HTML:`, for example with `[% title %]`.
 
 `/apps` redirects to `/app/index`, and `/app/<name>` can load
-either a saved bookmark document or a saved ajax/url bookmark file.
+either a saved bookmark document, a saved ajax/url bookmark file, or an
+installed skill index page when the smart route resolves to a skill.
 
 ## Working With Collectors
 
@@ -1753,9 +1789,9 @@ Include addons or modes:
     dashboard docker disable green
     dashboard docker enable green
 
-The resolver also supports old-style isolated service folders without adding
-entries to dashboard JSON config. If
-`./.developer-dashboard/docker/green/compose.yml` exists in the current
+The resolver also supports isolated service folders without adding entries to
+dashboard JSON config. If
+`./.developer-dashboard/config/docker/green/compose.yml` exists in the current
 project it wins; otherwise the resolver falls back to
 `~/.developer-dashboard/config/docker/green/compose.yml`.
 `dashboard docker compose config green` or
@@ -1768,17 +1804,19 @@ contributes `development.compose.yml` when present, otherwise `compose.yml`.
 To toggle that marker without creating or deleting the file manually, use
 `dashboard docker disable <service>` or
 `dashboard docker enable <service>`. The toggle writes to the
-deepest runtime docker root, so a child project layer can locally disable an
-inherited home service by creating
-`./.developer-dashboard/docker/<service>/disabled.yml` and can
+deepest runtime `config/docker` root, so a child project layer can locally
+disable an inherited home service by creating
+`./.developer-dashboard/config/docker/<service>/disabled.yml` and can
 re-enable it again by removing that same local marker.
 To inspect the effective marker state without walking the folders manually,
 use `dashboard docker list`. Add `--disabled` to show only disabled
 services or `--enabled` to show only enabled services.
 
-During compose execution the dashboard exports `DDDC` as the effective
-config-root docker directory for the current runtime, so compose YAML can keep using
-`${DDDC}` paths inside the YAML itself. Wrapper flags such as
+During compose execution the dashboard exports `DDDC` as the runtime
+`config/docker` directory for the current runtime, so compose YAML can keep using
+`${DDDC}` paths inside the YAML itself. Project-local isolated services are
+discovered from that same
+`./.developer-dashboard/config/docker/<service>/...` tree. Wrapper flags such as
 `--service`, `--addon`, `--mode`, `--project`, and `--dry-run` are
 consumed first, and all remaining docker compose flags such as `-d` and
 `--build` pass straight through to the real `docker compose` command.
@@ -1914,11 +1952,19 @@ That top-right area also includes the local username, the current host or IP
 link, and the current date/time in the same spirit as the old local dashboard chrome.
 The displayed address is discovered from the machine interfaces, preferring a VPN-style address when one is active, and the date/time is refreshed in the browser with JavaScript.
 `dashboard serve --no-indicators` and `dashboard serve --no-indicator` clear that whole top-right browser-only area without changing the terminal prompt or `/system/status`.
-The bookmark editor also follows the old auto-submit flow, so the form submits when the textarea changes and loses focus instead of showing a manual update button.
-For saved bookmark files, that browser save posts back to the named
-`/app/<id>/edit` route and keeps the Play link on
-`/app/<id>` instead of a transient `token=` URL, so updates still
-work while transient URLs are disabled.
+The bookmark editor also follows the old auto-submit flow, but now it waits
+until focus leaves the whole editor form instead of firing every time you move
+between section blocks. For saved bookmark files, that browser save posts back
+to the named `/app/<id>/edit` route, while the Play button
+recomposes the visible blocks, saves the hidden source payload, and submits the
+same form in render mode against `/app/<id>` instead of a transient
+`token=` URL, so updates still work while transient URLs are disabled.
+Smart-routed skill pages now follow that same browser contract on their
+canonical aliases: `/app/<skill>/edit` and nested forms such as
+`/app/<skill>/<sub-skill>/edit` load the underlying skill
+bookmark source, `/app/<skill>/source` returns the raw skill
+bookmark text, and Play keeps the browser on the smart route alias instead of
+collapsing to the underlying `BOOKMARK: index` id from the skill file.
 Bookmark parsing also treats a standalone `---` line as a section
 break, preventing pasted prose after a code block from being compiled into the
 saved `CODE*` body.
@@ -2089,6 +2135,11 @@ module upgrades can change column padding without changing the real
 The tag-driven GitHub release workflow must also install `Devel::Cover`
 before it runs that numeric coverage gate, or the signed-release path can
 fail before any release assets are published.
+The GitHub release tag path is intentionally decoupled from the repository's
+GitHub Actions CPAN upload workflow. Tag pushes in the form `vX.XX` are for
+the signed GitHub release path, while any GitHub-hosted CPAN upload remains a
+manual `workflow_dispatch` action so an ordinary release tag cannot perform an
+unasked PAUSE upload behind the operator's back.
 
 The coverage-closure suite includes managed collector loop start/stop paths
 under `Devel::Cover`, including wrapped fork coverage in
@@ -2105,6 +2156,14 @@ The focused skill regression in `t/19-skill-system.t` now also exercises
 default enabled-only view and the explicit `include_disabled => 1` path,
 so skill docker layering changes do not silently pull the `lib/` total below
 the required `100.0 / 100.0 / 100.0`.
+The focused web coverage suites must also call low-traffic
+`Developer::Dashboard::Web::App` compatibility helpers directly when their
+other execution path would only be indirect route fan-out. That is now part
+of the reviewed contract for the `/apps` redirect helper, the singleton stop
+helper, the shipped shim asset responses, and the installed-distribution
+`File::ShareDir` asset-root fallback, so GitHub-hosted `Devel::Cover` runs
+cannot drift below the local `100.0 / 100.0 / 100.0` result for
+`lib/Developer/Dashboard/Web/App.pm`.
 The packaged `t/09-runtime-manager.t` fallback assertions also stub ambient
 managed-web discovery explicitly, so tarball and PAUSE installs do not get
 contaminated by unrelated live dashboard-shaped processes already running on
@@ -2436,16 +2495,19 @@ where each item reports:
 Inspect one installed skill:
 
     dashboard skills usage example-skill
-    dashboard skills usage example-skill -o table
+    dashboard skills usage example-skill -o json
 
-The default output is JSON. It returns the installed skill state even when the
-skill is disabled, including:
+The default output is a readable multi-section summary. It still returns the
+installed skill state even when the skill is disabled, including:
 
 - CLI commands plus whether each command has hooks and how many
 - bookmark pages and `dashboards/nav/*` entries
 - docker service folders and the files inside each one
 - the merged config key such as `_example-skill`
 - declared collectors, their repo-qualified names, and indicator metadata
+
+Use `-o json` when you need the full machine-readable payload for the same
+usage data.
 
 Update registered skills to their latest versions:
 
@@ -2782,7 +2844,8 @@ interactive progress output only shows this row when the file exists
 skill-local `perl5/` tree; interactive progress output only shows this row
 when the file exists
 - skill `config/docker/...` roots participate in docker service discovery after
-the home runtime docker config and before deeper project-layer overrides
+the home runtime `config/docker` root and before deeper project-layer
+`config/docker/...` overrides
 - disabled skills are skipped by docker root discovery until they are
 re-enabled
 

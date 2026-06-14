@@ -1,0 +1,53 @@
+{
+   "abstract" : "Name reservation for ioqwerty",
+   "author" : [
+      "ioqwerty <ping@ioqwerty.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "ioqwerty",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ioqwerty/ioqwerty/issues"
+      },
+      "homepage" : "https://ioqwerty.com",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ioqwerty/ioqwerty.git",
+         "web" : "https://github.com/ioqwerty/ioqwerty"
+      }
+   },
+   "version" : "v0.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

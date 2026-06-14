@@ -3,7 +3,7 @@ package Developer::Dashboard::CollectorRunner;
 use strict;
 use warnings;
 
-our $VERSION = '4.03';
+our $VERSION = '4.16';
 
 use Capture::Tiny qw(capture);
 use Cwd qw(cwd);
@@ -12,9 +12,10 @@ use POSIX qw(close setsid strftime);
 use Template;
 use Time::HiRes qw(sleep time);
 
+use Developer::Dashboard::InternalCLI ();
 use Developer::Dashboard::JSON qw(json_encode json_decode);
 use Developer::Dashboard::PerlEnv ();
-use Developer::Dashboard::Platform qw(is_windows shell_command_argv);
+use Developer::Dashboard::Platform qw(command_in_path is_windows shell_command_argv);
 
 our $SIGNAL_RUNNER;
 our $SIGNAL_LOOP_NAME;
@@ -290,6 +291,17 @@ sub start_loop {
         $self->_cleanup_loop_files($name);
     }
 
+    if ( is_windows() ) {
+        return $self->_start_windows_loop_process(
+            configured_interval => $configured_interval,
+            interval            => $interval,
+            job                 => $job,
+            name                => $name,
+            schedule_mode       => $schedule_mode,
+            title               => $title,
+        );
+    }
+
     my $pid = $self->_fork_process();
     die "Unable to fork collector '$name': $!" if !defined $pid;
 
@@ -332,6 +344,58 @@ sub start_loop {
 # Output: child pid in parent, zero in child, or undef on failure.
 sub _fork_process {
     return fork();
+}
+
+# _start_windows_loop_process(%args)
+# Launches one detached collector loop helper on Windows instead of relying on
+# Perl pseudo-fork semantics for long-lived background processes.
+# Input: collector job hash, collector name, title, effective interval,
+# configured interval, and schedule mode.
+# Output: detached loop pid integer.
+sub _start_windows_loop_process {
+    my ( $self, %args ) = @_;
+    my $job                 = $args{job}                 || die 'Missing collector job';
+    my $name                = $args{name}                || die 'Missing collector name';
+    my $title               = $args{title}               || $self->_process_title($name);
+    my $interval            = defined $args{interval} ? $args{interval} : 30;
+    my $configured_interval = defined $args{configured_interval} ? $args{configured_interval} : 30;
+    my $schedule_mode       = $args{schedule_mode}       || 'interval';
+    my $pidfile             = $self->_pidfile($name);
+
+    $self->{collectors}->write_job(
+        $name,
+        {
+            %{$job},
+            interval => $configured_interval,
+            schedule => $schedule_mode,
+        }
+    );
+
+    my @command = $self->_windows_background_loop_command($name);
+    my $pid = $self->_spawn_windows_background_command(@command);
+    die "Unable to launch collector '$name' on Windows\n" if !$pid;
+
+    open my $fh, '>', $pidfile or die "Unable to write $pidfile: $!";
+    print {$fh} $pid;
+    close $fh;
+    $self->{paths}->secure_file_permissions($pidfile);
+    $self->_write_loop_state(
+        $name,
+        {
+            pid          => $pid,
+            name         => $name,
+            process_name => $title,
+            command      => $job->{command},
+            cwd          => $job->{cwd},
+            interval     => $interval,
+            ( $interval != $configured_interval ? ( configured_interval => $configured_interval ) : () ),
+            schedule     => $schedule_mode,
+            status       => 'starting',
+            started_at   => _now_iso8601(),
+            heartbeat_at => _now_iso8601(),
+        }
+    );
+    return $pid;
 }
 
 # _run_loop_child(%args)
@@ -518,6 +582,10 @@ sub _is_dashboard_subcommand_collector {
 # Output: worker pid integer in the parent or never returns in the child.
 sub _start_loop_worker {
     my ( $self, $job, $name, $title ) = @_;
+    if ( is_windows() ) {
+        my @command = $self->_windows_background_worker_command( $name, $$ );
+        return $self->_spawn_windows_background_command(@command);
+    }
     my $pid = $self->_fork_process();
     die "Unable to fork collector worker '$name': $!" if !defined $pid;
     return $pid if $pid;
@@ -989,10 +1057,283 @@ sub _write_loop_state {
     open my $fh, '>', $tmp or die "Unable to write $tmp: $!";
     print {$fh} json_encode( \%state );
     close $fh;
-    $self->{paths}->secure_file_permissions($tmp);
-    rename $tmp, $file or die "Unable to rename $tmp to $file: $!";
+    if ( is_windows() ) {
+        sleep 0.05;
+    }
+    else {
+        $self->{paths}->secure_file_permissions($tmp);
+    }
+    $self->_replace_state_file( $tmp, $file );
     $self->{paths}->secure_file_permissions($file);
     return \%state;
+}
+
+# _replace_state_file($source, $target)
+# Replaces one collector state file with a prepared temporary file, including a
+# Windows-specific retry path when the destination already exists and plain
+# rename replacement semantics are unavailable.
+# Input: temporary source path and final state-file path.
+# Output: true value after the target file has been replaced.
+sub _replace_state_file {
+    my ( $self, $source, $target ) = @_;
+    return 1 if $self->_rename_path( $source, $target );
+
+    my $rename_error = $!;
+    if ( is_windows() ) {
+        for my $attempt ( 1 .. 10 ) {
+            if ( -e $target ) {
+                $self->_unlink_path($target)
+                  or die "Unable to remove $target before Windows replace retry: $!";
+                return 1 if $self->_rename_path( $source, $target );
+                $rename_error = $!;
+            }
+
+            my ( $fallback_ok, $fallback_error ) = $self->_replace_path_via_powershell( $source, $target );
+            return 1 if $fallback_ok;
+            if ( defined $fallback_error && $fallback_error ne '' ) {
+                chomp $fallback_error;
+                $rename_error = "$rename_error; PowerShell Move-Item fallback failed: $fallback_error";
+            }
+            my ( $overwrite_ok, $overwrite_error ) = $self->_overwrite_state_file_in_place( $source, $target );
+            return 1 if $overwrite_ok;
+            if ( defined $overwrite_error && $overwrite_error ne '' ) {
+                chomp $overwrite_error;
+                $rename_error = "$rename_error; in-place overwrite fallback failed: $overwrite_error";
+            }
+            last if $attempt == 10;
+            sleep 0.05;
+            return 1 if $self->_rename_path( $source, $target );
+            $rename_error = $!;
+        }
+    }
+
+    $self->_unlink_path($source) if -e $source;
+    die "Unable to rename $source to $target: $rename_error";
+}
+
+# _rename_path($source, $target)
+# Wraps rename so tests can simulate platform-specific file replacement
+# failures without mutating the real filesystem behavior globally.
+# Input: source file path and destination file path.
+# Output: true when the rename succeeds, false otherwise.
+sub _rename_path {
+    my ( $self, $source, $target ) = @_;
+    return rename $source, $target;
+}
+
+# _unlink_path($path)
+# Wraps unlink so tests can observe cleanup and Windows replacement retries in
+# isolation from the caller.
+# Input: one filesystem path string.
+# Output: true when the path was removed, false otherwise.
+sub _unlink_path {
+    my ( $self, $path ) = @_;
+    return unlink $path;
+}
+
+# _replace_path_via_powershell($source, $target)
+# Uses the native Windows Move-Item path as a last-resort file replacement
+# fallback when Perl's in-process rename fails inside pseudo-forked collector
+# flows.
+# Input: source file path and destination file path.
+# Output: boolean success flag and optional failure text string.
+sub _replace_path_via_powershell {
+    my ( $self, $source, $target ) = @_;
+    return ( 0, '' ) if !is_windows();
+    my $powershell = $self->_powershell_command;
+    return ( 0, 'Unable to resolve a PowerShell executable for Windows state-file replacement' )
+      if !defined $powershell || $powershell eq '';
+    my @script = (
+        q{$ErrorActionPreference = 'Stop'},
+        'Move-Item -LiteralPath '
+          . _powershell_single_quote($source)
+          . ' -Destination '
+          . _powershell_single_quote($target)
+          . ' -Force',
+    );
+    my ( $stdout, $stderr, $exit_code ) = capture {
+        system $powershell, '-NoLogo', '-NoProfile', '-Command', join '; ', @script;
+        return $? >> 8;
+    };
+    return ( 1, '' ) if $exit_code == 0;
+    return ( 0, join '', grep { defined && $_ ne '' } $stderr, $stdout );
+}
+
+# _overwrite_state_file_in_place($source, $target)
+# Rewrites one collector state target in place from the prepared temporary
+# payload when Windows denies delete-or-move replacement but still permits a
+# direct overwrite.
+# Input: temporary source path and final state-file path.
+# Output: boolean success flag and optional failure text string.
+sub _overwrite_state_file_in_place {
+    my ( $self, $source, $target ) = @_;
+    return ( 0, '' ) if !is_windows();
+    open my $source_fh, '<', $source or return ( 0, "Unable to read $source for in-place overwrite: $!" );
+    local $/;
+    my $content = <$source_fh>;
+    close $source_fh or undef;
+
+    open my $target_fh, '>', $target or return ( 0, "Unable to open $target for in-place overwrite: $!" );
+    print {$target_fh} $content
+      or return ( 0, "Unable to write $target during in-place overwrite: $!" );
+    close $target_fh or undef;
+    if ( -e $source ) {
+        $self->_unlink_path($source) or undef;
+    }
+    return ( 1, '' );
+}
+
+# _windows_background_loop_command($name)
+# Builds the detached helper command used to host one collector loop on
+# Windows without entering the pseudo-fork code path.
+# Input: collector name string.
+# Output: command list suitable for Start-Process.
+sub _windows_background_loop_command {
+    my ( $self, $name ) = @_;
+    my $core = $self->_dashboard_core_helper_path('collector-loop-foreground');
+    my $perl = $self->_current_perl_command;
+    return (
+        $perl,
+        $core,
+        'collector-loop-foreground',
+        '--name',
+        $name,
+    );
+}
+
+# _windows_background_worker_command($name, $loop_pid)
+# Builds the detached helper command used to host one collector worker on
+# Windows when the loop schedule allows overlapping runs.
+# Input: collector name string and owning loop pid integer.
+# Output: command list suitable for Start-Process.
+sub _windows_background_worker_command {
+    my ( $self, $name, $loop_pid ) = @_;
+    my $core = $self->_dashboard_core_helper_path('collector-worker-foreground');
+    my $perl = $self->_current_perl_command;
+    return (
+        $perl,
+        $core,
+        'collector-worker-foreground',
+        '--name',
+        $name,
+        '--loop-pid',
+        $loop_pid,
+    );
+}
+
+# _current_perl_command()
+# Resolves a runnable Perl interpreter path for detached Windows helper
+# launches, including local::lib sessions where $^X is no longer valid.
+# Input: none.
+# Output: executable path string.
+sub _current_perl_command {
+    my ($self) = @_;
+    if (is_windows()) {
+        return command_in_path('perl')     if command_in_path('perl');
+        return command_in_path('perl.exe') if command_in_path('perl.exe');
+    }
+    return $^X if defined $^X && $^X ne '' && -f $^X;
+    return command_in_path('perl')     if command_in_path('perl');
+    return command_in_path('perl.exe') if command_in_path('perl.exe');
+    return $^X;
+}
+
+# _dashboard_core_helper_path($command)
+# Resolves the staged private _dashboard-core helper used by detached Windows
+# collector loop and worker launches.
+# Input: internal helper command string.
+# Output: absolute helper path string.
+sub _dashboard_core_helper_path {
+    my ( $self, $command ) = @_;
+    $command ||= 'collector-loop-foreground';
+    my $staged = File::Spec->catfile( $self->{paths}->home_runtime_root, 'cli', 'dd', '_dashboard-core' );
+    return $staged if $self->_helper_file_supports_internal_command( $staged, $command );
+
+    my $shipped = eval { Developer::Dashboard::InternalCLI::_helper_asset_path('_dashboard-core') };
+    $shipped = '' if !defined $shipped;
+    return $shipped if $self->_helper_file_supports_internal_command( $shipped, $command );
+
+    return $staged;
+}
+
+# _helper_file_supports_internal_command($path, $command)
+# Checks whether one helper source file contains the requested private command
+# branch so Windows collector launches can avoid stale staged helpers.
+# Input: helper file path and internal command string.
+# Output: boolean true when the helper source contains the requested command.
+sub _helper_file_supports_internal_command {
+    my ( $self, $path, $command ) = @_;
+    return 0 if !defined $path || $path eq '' || !-f $path;
+    return 0 if !defined $command || $command eq '';
+    open my $fh, '<:raw', $path or return 0;
+    local $/;
+    my $content = <$fh>;
+    CORE::close($fh) or return 0;
+    return $content =~ /\Q$command\E/ ? 1 : 0;
+}
+
+# _spawn_windows_background_command(@command)
+# Launches one detached background Windows helper command and returns the
+# spawned pid.
+# Input: command list.
+# Output: spawned pid integer.
+sub _spawn_windows_background_command {
+    my ( $self, @command ) = @_;
+    my $powershell = $self->_powershell_command;
+    die "Unable to launch detached Windows collector process: powershell is unavailable\n"
+      if !defined $powershell || $powershell eq '';
+
+    my $stdout_log = $self->{files}->collector_log;
+    my $stderr_log = $stdout_log . '.stderr';
+    my @script = (
+        q{$ErrorActionPreference = 'Stop'},
+        '$job = Start-Process'
+          . ' -FilePath ' . _powershell_single_quote( $command[0] )
+          . ' -ArgumentList ' . join( ', ', map { _powershell_single_quote($_) } @command[ 1 .. $#command ] )
+          . ' -WindowStyle Hidden'
+          . ' -RedirectStandardOutput ' . _powershell_single_quote($stdout_log)
+          . ' -RedirectStandardError ' . _powershell_single_quote($stderr_log)
+          . ' -PassThru',
+        q{[Console]::Out.WriteLine($job.Id)},
+    );
+    my ( $stdout, $stderr, $exit_code ) = capture {
+        system $powershell, '-NoLogo', '-NoProfile', '-Command', join '; ', @script;
+        return $? >> 8;
+    };
+    die "Unable to launch detached Windows collector process: $stderr$stdout"
+      if $exit_code != 0;
+    my ($pid) = grep { defined $_ && /^\d+$/ && $_ > 0 } split /\r?\n/, ( $stdout || '' );
+    return $pid;
+}
+
+# _powershell_command()
+# Resolves the Windows PowerShell executable path for state-file replacement
+# fallback commands, even when PATH has not been normalized yet inside a
+# pseudo-forked collector branch.
+# Input: none.
+# Output: executable path string or empty string when no usable PowerShell
+# binary can be found.
+sub _powershell_command {
+    my ($self) = @_;
+    return '' if !is_windows();
+    return command_in_path('powershell')     if command_in_path('powershell');
+    return command_in_path('powershell.exe') if command_in_path('powershell.exe');
+    my $system_root = $ENV{SystemRoot} || 'C:\\Windows';
+    my $fallback = File::Spec->catfile( $system_root, 'System32', 'WindowsPowerShell', 'v1.0', 'powershell.exe' );
+    return $fallback if -f $fallback;
+    return '';
+}
+
+# _powershell_single_quote($value)
+# Escapes one literal string for safe use inside a single-quoted PowerShell
+# command fragment.
+# Input: raw scalar string.
+# Output: single-quoted PowerShell literal string.
+sub _powershell_single_quote {
+    my ($value) = @_;
+    $value = '' if !defined $value;
+    $value =~ s/'/''/g;
+    return "'$value'";
 }
 
 # _cleanup_loop_files($name)

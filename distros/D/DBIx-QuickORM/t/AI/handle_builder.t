@@ -101,11 +101,34 @@ subtest argument_shape_parsing => sub {
     my $by_hash = $con->handle('people', {surname => 'smith'});
     is($by_hash->where, {surname => 'smith'}, "hashref argument becomes the WHERE clause");
 
-    # Arrayref => order_by (needs a where present to be legal).
+    # A table name BEFORE the connection still resolves (resolution is
+    # deferred until all arguments are consumed).
+    require DBIx::QuickORM::Handle;
+    my $reversed = DBIx::QuickORM::Handle->new('people', $con);
+    is($reversed->source->source_db_moniker, 'people', "table-name positional before the connection resolves");
+
+    like(
+        dies { DBIx::QuickORM::Handle->new('people') },
+        qr/Cannot resolve 'people' as a table name without a connection/,
+        "a table name with no connection croaks cleanly"
+    );
+
+    like(
+        dies { $con->handle('people', undef) },
+        qr/Received an undefined argument/,
+        "an undef argument croaks instead of silently ending argument parsing"
+    );
+
+    # A falsy-but-defined argument ('0') does not end argument parsing.
+    my $zero = $con->handle('people', 0, {surname => 'smith'});
+    is($zero->limit, 0, "a falsy integer argument is still parsed (limit 0)");
+    is($zero->where, {surname => 'smith'}, "arguments after a falsy argument are still parsed");
+
+    # Arrayref => order_by.
     my $by_array = $con->handle('people', {}, ['first_name']);
     is($by_array->order_by, ['first_name'], "arrayref argument becomes the ORDER BY");
 
-    # Integer => limit (needs a where present to be legal).
+    # Integer => limit.
     my $by_int = $con->handle('people', {}, 10);
     is($by_int->limit, 10, "integer argument becomes the LIMIT");
 
@@ -160,17 +183,30 @@ subtest order_by_shapes => sub {
     is($w->order_by(['surname', 'first_name'])->order_by, ['surname', 'first_name'],
         "order_by accepts an arrayref verbatim");
 
-    # order_by/limit require a WHERE or row first because the source has a
-    # primary key.
-    like(dies { my $h = $base->order_by('surname') },
-        qr/where clause or row before specifying an order_by/,
-        "order_by without a WHERE/row croaks");
+    # Plain SELECT ... ORDER BY (no WHERE) is legal.
+    is(
+        [map { $_->{first_name} } $base->order_by('first_name')->data_only->all],
+        ['al', 'bob', 'cy'],
+        "order_by without a WHERE sorts the whole table"
+    );
 };
 
 subtest limit => sub {
     my $w = $base->where({});
     is($w->limit(2)->limit, 2, "limit stores the integer");
     is(scalar($w->limit(2)->data_only->all), 2, "limit actually caps the row count");
+
+    # Plain SELECT ... LIMIT (no WHERE) is legal, alone and with ORDER BY.
+    is(scalar($base->limit(2)->data_only->all), 2, "limit without a WHERE caps the row count");
+
+    # LIMIT 0 is a real limit, not "no limit".
+    is($base->limit(0)->limit, 0, "limit(0) is stored");
+    is([$base->limit(0)->data_only->all], [], "limit(0) returns zero rows");
+    is(
+        [map { $_->{first_name} } $base->order_by('first_name')->limit(2)->data_only->all],
+        ['al', 'bob'],
+        "order_by + limit without a WHERE work together"
+    );
 };
 
 subtest fields => sub {
@@ -210,6 +246,51 @@ subtest data_only => sub {
     my @rows = $base->data_only->all;
     is(scalar(@rows), 3, "data_only handle still fetches every row");
     ref_ok($rows[0], 'HASH', "data_only yields plain hashrefs, not blessed rows");
+};
+
+subtest by_id_errors => sub {
+    like(
+        dies { $base->where({surname => 'smith'})->by_id(1) },
+        qr/Cannot call by_id\(\) on a handle with a where clause/,
+        "by_id() error message names by_id, not by_ids"
+    );
+
+    my ($db_dir) = tempdir(CLEANUP => 1);
+    my $nopk_dsn = "dbi:SQLite:dbname=$db_dir/nopk.sqlite";
+    {
+        my $dbh = DBI->connect($nopk_dsn, '', '', {RaiseError => 1, PrintError => 0});
+        $dbh->do('CREATE TABLE nopk (name TEXT)');
+        $dbh->disconnect;
+    }
+    my $nopk_con = DBIx::QuickORM->quick(credentials => {dsn => $nopk_dsn});
+
+    like(
+        dies { $nopk_con->handle('nopk')->by_id(1) },
+        qr/Cannot call by_id\(\) on a source that has no primary key/,
+        "by_id() on a pk-less source croaks instead of dereferencing undef"
+    );
+};
+
+subtest internal_transactions => sub {
+    ok($base->using_internal_transactions, "internal transactions default to on");
+
+    my $off = $base->no_internal_txns;
+    isnt(refaddr($off), refaddr($base), "no_internal_txns() returns a new handle");
+    ok(!$off->using_internal_transactions, "internal transactions are off on the new handle");
+    ok($base->using_internal_transactions, "the original handle is unchanged");
+
+    my $on = $off->internal_txns;
+    isnt(refaddr($on), refaddr($off), "internal_txns() returns a new handle");
+    ok($on->using_internal_transactions, "internal transactions are on again on the new handle");
+    ok(!$off->using_internal_transactions, "the intermediate handle is unchanged");
+
+    ok(!$base->internal_transactions(0)->using_internal_transactions, "internal_transactions(0) turns them off");
+    ok($off->no_internal_transactions(0)->using_internal_transactions, "no_internal_transactions(0) turns them on");
+
+    like(dies { $base->internal_txns; 1 },
+        qr/Must not be called in void context/, "internal_txns() croaks in void context");
+    like(dies { $base->no_internal_txns; 1 },
+        qr/Must not be called in void context/, "no_internal_txns() croaks in void context");
 };
 
 subtest connection_shortcuts => sub {

@@ -37,7 +37,7 @@ Refactored by Dan Sully
 #define APE_NO_ID3             (1 << 5)
 
 /* Artificial limits -- recommended but can be increased */
-#define APE_MAXIMUM_TAG_SIZE   100 * 1024 // recommended limit is 8KB but have seen files that are larger (Bug 15324)
+#define APE_MAXIMUM_TAG_SIZE   2048 * 1024 // recommended limit is 8KB but have seen files that are larger (Bug 15324, https://github.com/Logitech/slimserver/issues/961)
 #define APE_MAXIMUM_ITEM_COUNT 64
 #define APE_ID3_MIN_TAG_SIZE   128
 

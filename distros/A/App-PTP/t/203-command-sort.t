@@ -7,7 +7,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 
 use AppPtpTest;
-use Test::More tests => 12;
+use Test::More tests => 13;
 
 {
   my $data = ptp([qw(--sort)], 'default_data.txt');
@@ -48,20 +48,27 @@ my $numeric_input = "20ab\n1d\n20.5\n99\nabc\n";
 }
 
 {
-  my $data = ptp([qw(--ss)], \"1.10.0\n1.2.0\n1.9.0\n");
+  my $data = ptp([qw(--vs)], \"1.10.0\n1.2.0\n1.9.0\n");
   is($data, "1.2.0\n1.9.0\n1.10.0\n", 'semver sort');
 }{
   # A pre-release version sorts before the corresponding release.
-  my $data = ptp([qw(--ss)], \"1.1\n1.1-alpha1\n");
+  my $data = ptp([qw(--vs)], \"1.1\n1.1-alpha1\n");
   is($data, "1.1-alpha1\n1.1\n", 'semver pre-release sort');
 }{
   # Versions are grouped by their path-like prefix, then ordered by version
   # (the leading "v" is ignored and the major version is honored).
-  my $data = ptp([qw(--ss)], \"ptp/v1.10\nptp/v1.2\nabc/v2.0\nabc/v1.0\n");
+  my $data = ptp([qw(--vs)], \"ptp/v1.10\nptp/v1.2\nabc/v2.0\nabc/v1.0\n");
   is($data, "abc/v1.0\nabc/v2.0\nptp/v1.2\nptp/v1.10\n", 'semver prefix sort');
 }{
+  # A multi-segment path-like prefix is recognized in full, so the version part
+  # is sorted as a semver instead of the whole prefix being treated as 0.
+  my ($data, $err) = ptp([qw(--vs)],
+    \"refs/tags/ptp/v1.10\nrefs/tags/ptp/v1.2\nrefs/tags/abc/v2.0\n");
+  is($data, "refs/tags/abc/v2.0\nrefs/tags/ptp/v1.2\nrefs/tags/ptp/v1.10\n",
+     'semver sort with a multi-segment prefix');
+}{
   # A non-numeric core component is treated as 0 and triggers a warning.
-  my ($data, $err) = ptp([qw(--ss)], \"abc\n1.0\n");
+  my ($data, $err) = ptp([qw(--vs)], \"abc\n1.0\n");
   is($data, "abc\n1.0\n", 'semver sort with a non-numeric value');
   like($err, qr/WARNING: version 'abc' has a non-numeric component 'abc'/,
        'semver sort warns about non-numeric values');

@@ -3,10 +3,11 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
 use Carp qw(croak);
 use Scalar::Util qw(weaken);
+use Linux::Event::XS ();
 
 # NOTE:
 # This object is intentionally lightweight. It is a handle and a data container.
@@ -191,10 +192,7 @@ sub error_enabled ($self) { return $self->{error_enabled} ? 1 : 0 }
 
 sub cancel ($self) {
   return 0 if !$self->{active};
-
-  my $ok = $self->{loop}->_watcher_cancel($self);
-  $self->{active} = 0 if $ok;
-  return $ok ? 1 : 0;
+  return Linux::Event::XS::loop_cancel_watcher($self->{loop}, $self) ? 1 : 0;
 }
 
 1;
@@ -330,7 +328,7 @@ delivered so user code can observe EOF via C<read(2)> returning 0.
 
 =head1 VERSION
 
-This document describes Linux::Event::Watcher version 0.011.
+This document describes Linux::Event::Watcher version 0.012.
 
 =head1 SEE ALSO
 

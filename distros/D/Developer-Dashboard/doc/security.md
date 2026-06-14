@@ -5,6 +5,7 @@
 Developer Dashboard now applies these runtime protections in the active codebase:
 
 - exact `127.0.0.1` with numeric host `127.0.0.1` is the only automatic local-admin trust path
+- loopback detection validates each IPv4 octet against the real `0-255` range, so malformed literals such as `127.0.0.999` are never classified as loopback
 - home-runtime directories under `~/.developer-dashboard` are created and tightened to `0700`
 - home-runtime files under `~/.developer-dashboard` are written and tightened to `0600`, while owner-executable scripts stay at `0700`
 - helper access requires a stored helper account

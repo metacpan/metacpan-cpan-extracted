@@ -1,2 +1,6 @@
+0.02 2026-06-13
+ - Convert tests to standard .run file format with Test::Perl::Critic::Policy
+ - Add pass and fail cases for foreach prohibition
+
 0.01 2025-11-25
  - Initial revision

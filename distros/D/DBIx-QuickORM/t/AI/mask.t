@@ -1,4 +1,4 @@
-use Test2::V0;
+use Test2::V0 '!meta', '!pass';
 use Data::Dumper;
 
 use DBIx::QuickORM::Util qw/mask unmask masked/;

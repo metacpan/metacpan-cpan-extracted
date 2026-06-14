@@ -1495,7 +1495,7 @@ _parse_picture(asfinfo *asf, uint32_t picture_offset)
 
 // offset is in ms
 // Based on some code from Rockbox
-int
+off_t
 asf_find_frame(PerlIO *infile, char *file, int time_offset)
 {
   int frame_offset = -1;

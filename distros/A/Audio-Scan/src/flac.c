@@ -270,7 +270,7 @@ out:
 
 // offset is in ms, does sample-accurate seeking, using seektable if available
 // based on libFLAC seek_to_absolute_sample_
-static int
+static off_t
 flac_find_frame(PerlIO *infile, char *file, int offset)
 {
   off_t frame_offset = -1;

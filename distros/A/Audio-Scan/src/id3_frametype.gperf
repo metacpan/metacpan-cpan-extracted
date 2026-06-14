@@ -344,6 +344,7 @@ WPAY, FRAME(url),  "Payment"
 WPUB, FRAME(url),  "Publishers official webpage"
 WXXX, FRAME(WXXX), "User defined URL link frame"
 XSOP, FRAME(text), "Performer sort order (v2.3)"
+GRP1, FRAME(text), "Content group description"
 #
 # Special frames
 #

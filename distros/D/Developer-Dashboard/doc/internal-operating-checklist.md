@@ -77,6 +77,10 @@ my ($stdout, $stderr, $exit) = capture {
    - what it does
    - input arguments
    - expected output
+14. Follow the CLI output contract:
+   - operator-facing inventory and mutation commands default to human-readable summaries, preferably tables
+   - `-o json` returns the full machine payload, not a truncated summary
+   - shell-plumbing commands may keep direct raw output when a summary table would break their contract
 
 ## 4. Delivery Model
 

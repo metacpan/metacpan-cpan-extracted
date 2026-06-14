@@ -2,7 +2,7 @@ package DBIx::QuickORM::Schema;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use Carp qw/confess croak/;
 use Scalar::Util qw/blessed/;
@@ -227,8 +227,8 @@ sub _resolve_links {
         my $local_table = $self->{+TABLES}->{$local_tname} or confess "Cannot find table '$local_tname' ($debug)";
         my $other_table = $self->{+TABLES}->{$other_tname} or confess "Cannot find table '$other_tname' ($debug)";
 
-        my $local_unique //= $other_table->unique->{column_key(@{$other_cols})} ? 1 : 0;
-        my $other_unique //= $local_table->unique->{column_key(@{$local_cols})} ? 1 : 0;
+        my $local_unique = $other_table->unique->{column_key(@{$other_cols})} ? 1 : 0;
+        my $other_unique = $local_table->unique->{column_key(@{$local_cols})} ? 1 : 0;
 
         push @{$local_table->links} => DBIx::QuickORM::Link->new(
             local_table   => $local_tname,

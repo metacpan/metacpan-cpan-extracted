@@ -3,7 +3,7 @@ use v5.36;
 use strict;
 use warnings;
 
-our $VERSION = '0.011';
+our $VERSION = '0.012';
 
 use Scalar::Util qw(looks_like_number);
 use Carp qw(croak);
@@ -15,6 +15,7 @@ use Linux::Event::Watcher;
 use Linux::Event::Signal;
 use Linux::Event::Wakeup;
 use Linux::Event::Pid;
+use Linux::Event::XS ();
 
 use constant READABLE => 0x01;
 use constant WRITABLE => 0x02;
@@ -58,8 +59,9 @@ sub new ($class, %args) {
     sched   => $sched,
     running => 0,
 
-    _watchers => {},     # fd -> Linux::Event::Watcher
+    _watchers => Linux::Event::XS::registry_new(), # fd -> Linux::Event::Watcher
     _timer_w  => undef,  # internal timerfd watcher
+    _timer_armed => 0,    # whether the Linux timerfd currently has an armed deadline
   }, $class;
 
   # Internal timerfd watcher: read -> dispatch due timers -> rearm kernel timer.
@@ -196,27 +198,54 @@ sub watch ($self, $fh, %spec) {
   croak "fh has no fileno" if !defined $fd;
   $fd = int($fd);
 
-  if (my $old = $self->{_watchers}{$fd}) {
+  if (my $old = Linux::Event::XS::registry_get($self->{_watchers}, $fd)) {
     $self->_watcher_cancel($old);
   }
 
-  my $w = Linux::Event::Watcher->new(
-    loop           => $self->_public_loop,
-    fh             => $fh,
-    fd             => $fd,
-    read           => $read,
-    write          => $write,
-    error          => $error,
-    data           => $data,
-    edge_triggered => $edge_triggered ? 1 : 0,
-    oneshot        => $oneshot ? 1 : 0,
+  my $w = Linux::Event::XS::watcher_new(
+    'Linux::Event::Watcher',
+    $self->_public_loop,
+    $fh,
+    $fd,
+    $read,
+    $write,
+    $error,
+    $data,
+    $edge_triggered ? 1 : 0,
+    $oneshot ? 1 : 0,
   );
+
+  my $mask = $self->_watcher_mask($w);
+
+  # Use the single-call XS install path only for the built-in epoll
+  # backend. Custom/mock backends may not have the internal epoll/watch fields
+  # expected by this private fast path. Socket watchers keep the direct backend
+  # record path below, which is faster for the TCP dispatch workload.
+  my $can_xs_backend_fast = do {
+    my $b = $self->{backend};
+    ref($b) eq 'Linux::Event::Backend::Epoll'
+      && exists $b->{ep}
+      && exists $b->{watch};
+  };
+
+  if ($can_xs_backend_fast && !-S $fh && Linux::Event::XS::loop_watch_watcher_fast($self, $fh, $fd, $w, $mask)) {
+    return $w;
+  }
+
+  if ($self->{backend}->can('watch_watcher')) {
+    # Loop-created watchers use an XS direct-dispatch backend record.
+    # This avoids allocating one Perl dispatch closure per watcher while keeping
+    # the public Backend->watch($fh, $mask, $cb) callback API available.
+    Linux::Event::XS::registry_set($self->{_watchers}, $fd, $w);
+    $self->{backend}->watch_watcher($fh, $mask, $w, _loop => $self->_public_loop, tag => undef);
+    return $w;
+  }
 
   my $public_loop = $self->_public_loop;
   my $owner = $self;
 
   my $dispatch = sub ($ignored_loop, $fh_from_backend, $fd2, $mask, $tag) {
-    my $ww = $owner->{_watchers}{$fd2} or return;
+    my $ww = Linux::Event::XS::registry_get($owner->{_watchers}, $fd2) or return;
 
     my $fhw = $ww->{fh};
     if (!$fhw) {
@@ -250,7 +279,7 @@ sub watch ($self, $fh, %spec) {
       $ww->{read_cb}->($public_loop, $fhw, $ww);
     }
 
-    my $still = $owner->{_watchers}{$fd2};
+    my $still = Linux::Event::XS::registry_get($owner->{_watchers}, $fd2);
     if (!$still || $still != $ww) {
       return;
     }
@@ -264,9 +293,8 @@ sub watch ($self, $fh, %spec) {
 
   $w->{_dispatch_cb} = $dispatch;
 
-  $self->{_watchers}{$fd} = $w;
+  Linux::Event::XS::registry_set($self->{_watchers}, $fd, $w);
 
-  my $mask = $self->_watcher_mask($w);
   $self->{backend}->watch($fh, $mask, $dispatch, _loop => $self->_public_loop, tag => undef);
 
   return $w;
@@ -302,12 +330,21 @@ sub _watcher_update ($self, $w) {
 sub _watcher_cancel ($self, $w) {
   return 0 if !$w || !$w->{active};
 
+  my $b = $self->{backend};
+  if (ref($b) eq 'Linux::Event::Backend::Epoll'
+      && exists $b->{ep}
+      && exists $b->{watch}) {
+    return Linux::Event::XS::loop_cancel_watcher($self, $w) ? 1 : 0;
+  }
+
+  # Compatibility path for custom/mock backends used by tests and advanced
+  # callers. The XS cancellation helper intentionally assumes the built-in
+  # epoll backend layout.
+  my $fd = $w->{fd};
+  Linux::Event::XS::registry_delete($self->{_watchers}, $fd) if defined $fd;
+  $self->{backend}->unwatch($w->{fh}) if $self->{backend}->can('unwatch') && $w->{fh};
   $w->{active} = 0;
-  delete $self->{_watchers}{ $w->{fd} };
-
-  $self->{backend}->unwatch($w->{fh});
   $w->{fh} = undef;
-
   return 1;
 }
 
@@ -318,7 +355,7 @@ sub unwatch ($self, $fh) {
   return 0 if !defined $fd;
   $fd = int($fd);
 
-  my $w = delete $self->{_watchers}{$fd} or return 0;
+  my $w = Linux::Event::XS::registry_get($self->{_watchers}, $fd) or return 0;
   $self->_watcher_cancel($w);
 
   return 1;
@@ -370,15 +407,25 @@ sub run_once ($self, $timeout_s = undef) {
   # - If running was false at entry, allow manual pumping.
   return 0 if (!$self->{running} && ($self->{_in_run} || $was_running));
 
+  my $next = $self->{sched}->next_deadline_ns;
+
+  # Fast path: when the XS timer heap is empty, skip timerfd
+  # rearm/disarm churn and wait directly in the backend. Timer-heavy behavior
+  # stays on the scheduler-aware path below.
+  if (!defined $next) {
+    if ($self->{_timer_armed}) {
+      $self->{timer}->disarm;
+      $self->{_timer_armed} = 0;
+    }
+    return $self->{backend}->run_once($self, $timeout_s);
+  }
+
   # If no explicit timeout was provided, derive one from the next scheduled
   # timer deadline. This is what makes $loop->run() advance timers without
   # requiring callers to manually pass a timeout.
   if (!defined $timeout_s) {
-    my $next = $self->{sched}->next_deadline_ns;
-    if (defined $next) {
-      my $remain_ns = $self->{clock}->remaining_ns($next);
-      $timeout_s = ($remain_ns <= 0) ? 0 : ($remain_ns / 1_000_000_000);
-    }
+    my $remain_ns = $self->{clock}->remaining_ns($next);
+    $timeout_s = ($remain_ns <= 0) ? 0 : ($remain_ns / 1_000_000_000);
   }
 
   # Keep timerfd state in sync for users who may be watching the timer fd
@@ -412,7 +459,10 @@ sub _rearm_timer ($self) {
   my $next = $self->{sched}->next_deadline_ns;
 
   if (!defined $next) {
-    $self->{timer}->disarm;
+    if ($self->{_timer_armed}) {
+      $self->{timer}->disarm;
+      $self->{_timer_armed} = 0;
+    }
     return;
   }
 
@@ -425,6 +475,7 @@ sub _rearm_timer ($self) {
     # Minimal non-zero delay (fixed decimal, no exponent).
     my $min_s = sprintf('%.9f', 1 / 1_000_000_000);
     $self->{timer}->after($min_s);
+    $self->{_timer_armed} = 1;
     return;
   }
 
@@ -434,6 +485,7 @@ sub _rearm_timer ($self) {
 
   # IMPORTANT: format to fixed decimal so Timer::_num accepts it.
   $self->{timer}->after(sprintf('%.9f', $after_s));
+  $self->{_timer_armed} = 1;
 
   return;
 }

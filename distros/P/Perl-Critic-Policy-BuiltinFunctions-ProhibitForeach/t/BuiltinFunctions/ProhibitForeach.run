@@ -1,0 +1,29 @@
+## name for is allowed
+## failures 0
+## cut
+
+for my $x (1..10) { 1 }
+
+## name foreach is forbidden
+## failures 1
+## cut
+
+foreach my $x (1..10) { 1 }
+
+## name foreach with $_
+## failures 1
+## cut
+
+foreach (1..10) { 1 }
+
+## name postfix for is allowed
+## failures 0
+## cut
+
+1 for 1..10
+
+## name postfix foreach is forbidden
+## failures 1
+## cut
+
+1 foreach 1..10

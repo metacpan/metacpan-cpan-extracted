@@ -51,7 +51,7 @@ use File::Spec ();
 use Carp qw(croak);
 use Fcntl qw(O_WRONLY O_CREAT O_EXCL);
 use vars qw($VERSION);
-$VERSION = '0.04';
+$VERSION = '0.05';
 $VERSION = $VERSION;
 
 # Bareword filehandle globs for SH pipeline (Perl 5.005_03 compatible)
@@ -316,7 +316,14 @@ sub _exec_line {
 
     if ($lc_cmd eq 'export')  { return _cmd_export($rest) }
     if ($lc_cmd eq 'unset')   { return _cmd_unset($rest) }
-    if ($lc_cmd eq 'echo')    { return _cmd_echo($rest) }
+    if ($lc_cmd eq 'echo') {
+        # Apply word-splitting and glob expansion to unquoted tokens
+        if ($rest =~ /[*?\[]/) {
+            my @words = _parse_args($rest);
+            $rest = join(' ', @words);
+        }
+        return _cmd_echo($rest);
+    }
     if ($lc_cmd eq 'printf')  { return _cmd_printf($rest) }
     if ($lc_cmd eq 'cd')      { return _cmd_cd($rest) }
     if ($lc_cmd eq 'pwd')     { print Cwd::cwd(), "\n"; return 0 }
@@ -1130,27 +1137,65 @@ sub _parse_for {
     my $for_line = $lines[$i]; $i++;
     $for_line =~ s/\r?\n\z//; $for_line =~ s/\A\s+//;
 
-    # for VAR in item1 item2 ...; do
+    # for VAR in LIST [; do [BODY [; done]]]
+    #
+    # The header may stand alone (do/done on following lines) or carry an
+    # inline "; do ... ; done" tail all on one physical line.  The inline
+    # form is detected first; ";do" is matched with \b after "do" so that a
+    # "; done" terminator is never mistaken for the "do" keyword.
     my ($var, $list_str) = ('', '');
-    if ($for_line =~ /\Afor\s+([A-Za-z_][A-Za-z0-9_]*)\s+in\s+(.*?)\s*(?:;\s*do)?\s*\z/i) {
-        ($var, $list_str) = ($1, $2);
+    my $inline_body;          # defined when the header has an inline "do" tail
+    my $inline_closed = 0;    # true when that tail also held the "done"
+    if ($for_line =~ /\Afor\s+([A-Za-z_][A-Za-z0-9_]*)\s+in\s+(.*?)\s*;\s*do\b\s*(.*)\z/is) {
+        my $tail;
+        ($var, $list_str, $tail) = ($1, $2, $3);
+        $tail =~ s/\s+\z//;
+        if ($tail eq '') {
+            $inline_body = undef;                  # "for ... ; do" -> body follows
+        }
+        elsif ($tail =~ /\A(.*);\s*done\b\s*\z/s) {
+            $inline_body = $1; $inline_closed = 1; # fully inline; greedy = last done
+        }
+        elsif ($tail eq 'done') {
+            $inline_body = ''; $inline_closed = 1; # empty inline body
+        }
+        else {
+            $inline_body = $tail;                  # "for ... ; do BODY" (done later)
+        }
+    }
+    elsif ($for_line =~ /\Afor\s+([A-Za-z_][A-Za-z0-9_]*)\s+in\s+(.*?)\s*\z/i) {
+        ($var, $list_str) = ($1, $2);              # header only; do/done on later lines
     }
 
-    # Collect body until 'done'
+    # Collect body until 'done' (skipped when the tail already closed the loop)
     my @body = ();
-    my $depth = 1;
-    while ($i <= $#lines) {
-        my $l = $lines[$i]; $i++;
-        $l =~ s/\r?\n\z//;
-        my $ls = $l; $ls =~ s/\A\s+//;
-        my $lc_f = lc( ($ls =~ /\A(\S+)/) ? $1 : '' );
-        if ($lc_f eq 'for' || $lc_f eq 'while' || $lc_f eq 'until') { $depth++ }
-        if ($lc_f eq 'done') { $depth--; last if $depth == 0 }
-        push @body, $l unless ($lc_f eq 'do' && $depth == 1);
+    if (defined $inline_body) {
+        push @body, $inline_body unless $inline_body eq '';
+    }
+    if (!$inline_closed) {
+        my $depth = 1;
+        while ($i <= $#lines) {
+            my $l = $lines[$i]; $i++;
+            $l =~ s/\r?\n\z//;
+            my $ls = $l; $ls =~ s/\A\s+//;
+            my $lc_f = lc( ($ls =~ /\A(\S+)/) ? $1 : '' );
+            if ($lc_f eq 'for' || $lc_f eq 'while' || $lc_f eq 'until') { $depth++ }
+            if ($lc_f eq 'done') { $depth--; last if $depth == 0 }
+            push @body, $l unless ($lc_f eq 'do' && $depth == 1);
+        }
     }
 
-    # Expand list items
-    my @items = split /\s+/, $list_str;
+    # Expand list items; apply filename globbing to unquoted words
+    my @items_raw = split /\s+/, $list_str;
+    my @items;
+    for my $w (@items_raw) {
+        if ($w =~ /[*?\[]/) {
+            push @items, _glob_expand($w);
+        }
+        else {
+            push @items, $w;
+        }
+    }
     my $status = 0;
     for my $val (@items) {
         BATsh::Env->set($var, $val);
@@ -1176,24 +1221,62 @@ sub _parse_while {
 
     my $is_until = ($while_line =~ /\Auntil\s/i) ? 1 : 0;
 
-    # Extract condition
-    my $cond_str = $while_line;
-    $cond_str =~ s/\A(?:while|until)\s+//i;
-    $cond_str =~ s/\s*;\s*do\s*\z//i;
-    $cond_str =~ s/\s+do\s*\z//i;
+    # Extract condition, supporting an inline "COND; do BODY; done [REDIR]" form
+    # as well as the multi-line header.  As in _parse_for, ";do" is matched with
+    # \b after "do" so that a "; done" terminator is never taken for "do".
+    my $rest = $while_line;
+    $rest =~ s/\A(?:while|until)\s+//i;
 
-    # Collect body
-    my @body = ();
-    my $depth = 1;
-    my $done_line = '';
-    while ($i <= $#lines) {
-        my $l = $lines[$i]; $i++;
-        $l =~ s/\r?\n\z//;
-        my $ls = $l; $ls =~ s/\A\s+//;
-        my $lc_f = lc( ($ls =~ /\A(\S+)/) ? $1 : '' );
-        if ($lc_f eq 'for' || $lc_f eq 'while' || $lc_f eq 'until') { $depth++ }
-        if ($lc_f eq 'done') { $depth--; if ($depth == 0) { $done_line = $ls; last } }
-        push @body, $l unless ($lc_f eq 'do' && $depth == 1);
+    my $cond_str;
+    my @body          = ();
+    my $done_line     = '';
+    my $inline_body;
+    my $inline_closed = 0;
+
+    if ($rest =~ /\A(.*?)\s*;\s*do\b\s*(.*)\z/s) {
+        my $tail;
+        ($cond_str, $tail) = ($1, $2);
+        $tail =~ s/\s+\z//;
+        if ($tail eq '') {
+            $inline_body = undef;                  # "while COND; do" -> body follows
+        }
+        elsif ($tail =~ /\A(.*);\s*done\b\s*(.*)\z/s) {
+            $inline_body   = $1;                   # greedy = last "; done"
+            $inline_closed = 1;
+            my $dr = $2; $dr =~ s/\A\s+//; $dr =~ s/\s+\z//;
+            $done_line = ($dr ne '') ? "done $dr" : 'done';
+        }
+        elsif ($tail =~ /\Adone\b\s*(.*)\z/s) {
+            $inline_body   = '';                   # empty inline body
+            $inline_closed = 1;
+            my $dr = $1; $dr =~ s/\A\s+//; $dr =~ s/\s+\z//;
+            $done_line = ($dr ne '') ? "done $dr" : 'done';
+        }
+        else {
+            $inline_body = $tail;                  # done on following lines
+        }
+    }
+    else {
+        $cond_str = $rest;                         # header only; do/done on later lines
+        $cond_str =~ s/\s*;\s*do\s*\z//i;
+        $cond_str =~ s/\s+do\s*\z//i;
+    }
+
+    # Collect body (skipped when the inline tail already closed the loop)
+    if (defined $inline_body) {
+        push @body, $inline_body unless $inline_body eq '';
+    }
+    if (!$inline_closed) {
+        my $depth = 1;
+        while ($i <= $#lines) {
+            my $l = $lines[$i]; $i++;
+            $l =~ s/\r?\n\z//;
+            my $ls = $l; $ls =~ s/\A\s+//;
+            my $lc_f = lc( ($ls =~ /\A(\S+)/) ? $1 : '' );
+            if ($lc_f eq 'for' || $lc_f eq 'while' || $lc_f eq 'until') { $depth++ }
+            if ($lc_f eq 'done') { $depth--; if ($depth == 0) { $done_line = $ls; last } }
+            push @body, $l unless ($lc_f eq 'do' && $depth == 1);
+        }
     }
 
     # Honor an input redirection on the `done' line, e.g.
@@ -1871,6 +1954,38 @@ sub _exec_sh_pipe {
 # Pattern helpers for ${var%pat}, ${var#pat}, ${var/pat/rep}
 # Converts glob-style pattern to Perl regex (*, ?, [abc]).
 # ----------------------------------------------------------------
+# ----------------------------------------------------------------
+# _glob_expand: expand a single word that contains unquoted glob
+# metacharacters (* ? [...]) into a sorted list of matching pathnames.
+# Returns the original word unchanged if no matches are found (POSIX
+# "nullglob off" behaviour, which is the shell default).
+# Only words that were NOT wrapped in quotes are eligible; the caller
+# is responsible for passing only unquoted words.
+# ----------------------------------------------------------------
+sub _glob_expand {
+    my ($word) = @_;
+    # Fast path: no metacharacters
+    return ($word) unless $word =~ /[*?\[]/;
+    my @matches = glob($word);
+    return @matches ? @matches : ($word);
+}
+
+# ----------------------------------------------------------------
+# _glob_expand_args: apply filename globbing to each unquoted word in
+# an already-split argument list.  Words that were originally quoted
+# (single or double) must already have their quotes stripped by the
+# caller; we cannot distinguish them at this stage, so we re-check
+# for glob metacharacters and call _glob_expand only when present.
+# ----------------------------------------------------------------
+sub _glob_expand_args {
+    my (@words) = @_;
+    my @result;
+    for my $w (@words) {
+        push @result, _glob_expand($w);
+    }
+    return @result;
+}
+
 sub _glob_to_re {
     my ($pat, $greedy) = @_;
     my $re = '';
@@ -2069,24 +2184,39 @@ sub _parse_args {
     $str =~ s/\A\s+//; $str =~ s/\s+\z//;
     return () unless $str =~ /\S/;
     my @args;
+    my @quoted;   # parallel array: 1 if word was quoted, 0 if bare
     my $cur = '';
+    my $word_quoted = 0;
     my $in_sq = 0;
     my $in_dq = 0;
     for my $ch (split //, $str) {
         if ($in_sq) {
-            if ($ch eq "'") { $in_sq = 0 } else { $cur .= $ch }
+            if ($ch eq "'") { $in_sq = 0 } else { $cur .= $ch; $word_quoted = 1 }
             next;
         }
-        if ($ch eq "'" && !$in_dq) { $in_sq = 1; next }
-        if ($ch eq '"'  && !$in_sq) { $in_dq = !$in_dq; next }
+        if ($ch eq "'" && !$in_dq) { $in_sq = 1; $word_quoted = 1; next }
+        if ($ch eq '"'  && !$in_sq) { $in_dq = !$in_dq; $word_quoted = 1; next }
         if ($ch =~ /\s/ && !$in_sq && !$in_dq) {
-            push @args, $cur; $cur = '';
+            push @args,   $cur;
+            push @quoted, $word_quoted;
+            $cur = ''; $word_quoted = 0;
             next;
         }
         $cur .= $ch;
     }
-    push @args, $cur if $cur ne '' || @args;
-    return @args;
+    push @args,   $cur          if $cur ne '' || @args;
+    push @quoted, $word_quoted  if $cur ne '' || @quoted;
+    # Apply filename globbing to unquoted words containing metacharacters
+    my @result;
+    for my $i (0 .. $#args) {
+        if (!$quoted[$i] && $args[$i] =~ /[*?\[]/) {
+            push @result, _glob_expand($args[$i]);
+        }
+        else {
+            push @result, $args[$i];
+        }
+    }
+    return @result;
 }
 
 # ----------------------------------------------------------------
@@ -2589,6 +2719,8 @@ No external sh or bash is required.
   for VAR in list; do ... done
   while condition; do ... done
   until condition; do ... done
+  (for/while/until accept the loop body either on following lines or fully
+   inline on one line, e.g. "for i in 1 2 3; do echo $i; done")
   case $var in pattern) ... ;; esac
   test / [ ... ]  (file tests, string, integer comparisons)
   cd, pwd, exit, true, false, :, read, shift, local, set
@@ -2615,6 +2747,8 @@ No external sh or bash is required.
   cmd <<-DELIM             (here-document, strip leading tabs)
   cmd <<'DELIM'            (here-document, no expansion)
   cmd &                    (background execution; external commands)
+  echo *.txt               (filename glob expansion: *, ?, [abc])
+  for f in *.pl; do ...    (glob expansion in for-loop word list)
 
 =head2 Variable Expansion
 

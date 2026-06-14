@@ -2,23 +2,19 @@
 use strict;
 use warnings;
 
-use 5.020000;
+use 5.024000;
 
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "generate a README file with the useful bits",
   "AUTHOR" => "Robert Rothenberg <perl\@rhizomnic.com>",
-  "BUILD_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "7.22",
-    "Module::Metadata" => "1.000015"
-  },
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
   "DISTNAME" => "Dist-Zilla-Plugin-UsefulReadme",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.020000",
+  "MIN_PERL_VERSION" => "5.024000",
   "NAME" => "Dist::Zilla::Plugin::UsefulReadme",
   "PREREQ_PM" => {
     "CPAN::Changes::Parser" => "0.500002",
@@ -59,7 +55,7 @@ my %WriteMakefileArgs = (
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "v0.5.3",
+  "VERSION" => "v0.6.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -71,7 +67,6 @@ my %FallbackPrereqs = (
   "Dist::Zilla" => "6.003",
   "Dist::Zilla::Plugin::PodWeaver" => 0,
   "Dist::Zilla::Stash::PodWeaver" => 0,
-  "ExtUtils::MakeMaker" => "7.22",
   "File::Spec" => 0,
   "Hash::Ordered" => "0.005",
   "IO::Handle" => 0,

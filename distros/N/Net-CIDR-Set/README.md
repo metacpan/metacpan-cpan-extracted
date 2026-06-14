@@ -37,18 +37,15 @@ the first data that is added to it.
 
 # RECENT CHANGES
 
-Changes for version 0.21 (2026-06-02)
+Changes for version 0.22 (2026-06-13)
 
-- Security
-    - Improved strictness of IP address (CVE-2026-49940) and netmask parsing (CVE-2026-49942).
-    - Removed potential infinite loops when attempting to parse IP addresses (CVE-2026-49941).
-- Documentation
-    - Removed CONTRIBUTING.md until policies about AI are updated.
-- Tests
-    - Changed tests to use Test::Exception.
 - Toolchain
-    - Added doap.xml to the distibution.
-    - Added automation-policy.json to the distribution.
+    - Set the static install flag
+    - Adjusted build prerequisites to be recommended instead of required.
+    - Sign distribution with SigStore.
+- Tests
+    - Added author tests.
+    - Update minimum prereqs for some tests.
 
 See the `Changes` file for more details.
 

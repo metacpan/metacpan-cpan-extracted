@@ -1037,10 +1037,14 @@ subtest 'integer: " -3 " (spaces + sign) coerces correctly' => sub {
 	is($r->{n}, -3, '" -3 " accepted and coerced to -3');
 };
 
-subtest 'integer: "3.0" rejected (decimal point present)' => sub {
-	throws_ok {
-		validate_strict(schema => { n => { type => 'integer' } }, input => { n => '3.0' })
-	} qr/must be an integer/, '"3.0" rejected as non-integer';
+subtest 'integer: "3.0" accepted (whole number with trailing .0)' => sub {
+	# 3.0 has no fractional part; the validator accepts any numeric representation
+	# whose value is a whole number, regardless of how it is written.
+	my $r;
+	lives_ok {
+		$r = validate_strict(schema => { n => { type => 'integer' } }, input => { n => '3.0' })
+	} '"3.0" accepted as integer';
+	ok($r->{n} == 3, 'coerced value is 3');
 };
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -2043,6 +2047,331 @@ subtest "union [scalar, scalarref]: arrayref rejected by both branches" => sub {
 			input  => { x => [] },
 		)
 	} qr/must be one of/, 'arrayref rejected by both scalar and scalarref branches';
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# N2. stringref — type check, min×max, matches, nomatch, memberof, notmemberof,
+#     optional×default, transform, union types
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'stringref: plain string accepted; dereferenced string returned' => sub {
+	my $s = 'hello';
+	my $r = validate_strict(schema => { x => { type => 'stringref' } }, input => { x => \$s });
+	is($r->{x}, 'hello', 'dereferenced string returned');
+};
+
+subtest 'stringref: empty string ref accepted' => sub {
+	my $e = '';
+	my $r = validate_strict(schema => { x => { type => 'stringref' } }, input => { x => \$e });
+	is($r->{x}, '', 'empty string accepted');
+};
+
+subtest 'stringref: plain scalar rejected' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'stringref' } }, input => { x => 'plain' })
+	} qr/must be a string reference/, 'plain scalar rejected';
+};
+
+subtest 'stringref: arrayref rejected' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'stringref' } }, input => { x => [] })
+	} qr/must be a string reference/, 'arrayref rejected';
+};
+
+subtest 'stringref: hashref rejected' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'stringref' } }, input => { x => {} })
+	} qr/must be a string reference/, 'hashref rejected';
+};
+
+subtest 'stringref × min: string below min rejected' => sub {
+	my $s = 'hi';
+	throws_ok {
+		validate_strict(schema => { x => { type => 'stringref', min => 5 } }, input => { x => \$s })
+	} qr/too short/, 'string shorter than min rejected';
+};
+
+subtest 'stringref × min: string at exact min accepted' => sub {
+	my $s = 'hello';
+	my $r;
+	lives_ok {
+		$r = validate_strict(schema => { x => { type => 'stringref', min => 5 } }, input => { x => \$s })
+	} 'string at min boundary accepted';
+	is($r->{x}, 'hello', 'correct value returned');
+};
+
+subtest 'stringref × max: string above max rejected' => sub {
+	my $s = 'toolong';
+	throws_ok {
+		validate_strict(schema => { x => { type => 'stringref', max => 5 } }, input => { x => \$s })
+	} qr/too long/, 'string longer than max rejected';
+};
+
+subtest 'stringref × max: string at exact max accepted' => sub {
+	my $s = 'hello';
+	my $r;
+	lives_ok {
+		$r = validate_strict(schema => { x => { type => 'stringref', max => 5 } }, input => { x => \$s })
+	} 'string at max boundary accepted';
+	is($r->{x}, 'hello', 'correct value returned');
+};
+
+subtest 'stringref × min × max: within range accepted' => sub {
+	my $s = 'hello';
+	my $r;
+	lives_ok {
+		$r = validate_strict(schema => { x => { type => 'stringref', min => 3, max => 8 } }, input => { x => \$s })
+	} 'string within min..max range accepted';
+	is($r->{x}, 'hello', 'correct value returned');
+};
+
+subtest 'stringref × min × max: below range rejected' => sub {
+	my $s = 'hi';
+	throws_ok {
+		validate_strict(schema => { x => { type => 'stringref', min => 3, max => 8 } }, input => { x => \$s })
+	} qr/too short/, 'string below range rejected';
+};
+
+subtest 'stringref × min × max: above range rejected' => sub {
+	my $s = 'toolongvalue';
+	throws_ok {
+		validate_strict(schema => { x => { type => 'stringref', min => 3, max => 8 } }, input => { x => \$s })
+	} qr/too long/, 'string above range rejected';
+};
+
+subtest 'stringref × matches: matching value accepted' => sub {
+	my $s = 'hello123';
+	my $r;
+	lives_ok {
+		$r = validate_strict(schema => { x => { type => 'stringref', matches => qr/^\w+$/ } }, input => { x => \$s })
+	} 'string matching pattern accepted';
+	is($r->{x}, 'hello123', 'correct value returned');
+};
+
+subtest 'stringref × matches: non-matching value rejected' => sub {
+	my $s = 'hello world';
+	throws_ok {
+		validate_strict(schema => { x => { type => 'stringref', matches => qr/^\w+$/ } }, input => { x => \$s })
+	} qr/must match pattern/, 'string not matching pattern rejected';
+};
+
+subtest 'stringref × nomatch: non-matching value accepted' => sub {
+	my $s = 'hello';
+	my $r;
+	lives_ok {
+		$r = validate_strict(schema => { x => { type => 'stringref', nomatch => qr/\d/ } }, input => { x => \$s })
+	} 'string not matching nomatch pattern accepted';
+	is($r->{x}, 'hello', 'correct value returned');
+};
+
+subtest 'stringref × nomatch: matching value rejected' => sub {
+	my $s = 'hello123';
+	throws_ok {
+		validate_strict(schema => { x => { type => 'stringref', nomatch => qr/\d/ } }, input => { x => \$s })
+	} qr/must not match/, 'string matching nomatch pattern rejected';
+};
+
+subtest 'stringref × memberof: member value accepted' => sub {
+	my $s = 'yes';
+	my $r;
+	lives_ok {
+		$r = validate_strict(schema => { x => { type => 'stringref', memberof => ['yes', 'no'] } }, input => { x => \$s })
+	} 'member value accepted';
+	is($r->{x}, 'yes', 'correct value returned');
+};
+
+subtest 'stringref × memberof: non-member value rejected' => sub {
+	my $s = 'maybe';
+	throws_ok {
+		validate_strict(schema => { x => { type => 'stringref', memberof => ['yes', 'no'] } }, input => { x => \$s })
+	} qr/must be one of/, 'non-member value rejected';
+};
+
+subtest 'stringref × notmemberof: non-blacklisted value accepted' => sub {
+	my $s = 'alice';
+	my $r;
+	lives_ok {
+		$r = validate_strict(schema => { x => { type => 'stringref', notmemberof => ['admin', 'root'] } }, input => { x => \$s })
+	} 'non-blacklisted value accepted';
+	is($r->{x}, 'alice', 'correct value returned');
+};
+
+subtest 'stringref × notmemberof: blacklisted value rejected' => sub {
+	my $s = 'admin';
+	throws_ok {
+		validate_strict(schema => { x => { type => 'stringref', notmemberof => ['admin', 'root'] } }, input => { x => \$s })
+	} qr/must not be one of/, 'blacklisted value rejected';
+};
+
+subtest 'stringref × optional: absent parameter skipped' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => 'stringref', optional => 1 } },
+		input  => {},
+	);
+	ok(!exists($r->{x}), 'absent optional stringref not in result');
+};
+
+subtest 'stringref × default: default used when absent' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => 'stringref', optional => 1, default => 'fallback' } },
+		input  => {},
+	);
+	is($r->{x}, 'fallback', 'default value used');
+};
+
+subtest 'stringref × transform: transform receives dereferenced string' => sub {
+	# Module dereferences before calling transform; transform sees the plain string
+	my $s = '  HELLO  ';
+	my $r;
+	lives_ok {
+		$r = validate_strict(
+			schema => { x => { type => 'stringref', transform => sub { lc($_[0]) } } },
+			input  => { x => \$s },
+		)
+	} 'transform applied to dereferenced stringref value';
+	is($r->{x}, '  hello  ', 'lowercase transform applied');
+};
+
+subtest 'stringref × transform + matches: transform then match' => sub {
+	my $s = 'HELLO';
+	my $r;
+	lives_ok {
+		$r = validate_strict(
+			schema => { x => { type => 'stringref', transform => sub { lc($_[0]) }, matches => qr/^[a-z]+$/ } },
+			input  => { x => \$s },
+		)
+	} 'transform applied before matches check';
+	is($r->{x}, 'hello', 'transformed value returned');
+};
+
+subtest 'stringref × min + matches: both applied' => sub {
+	my $s = 'hi';
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'stringref', min => 3, matches => qr/^\w+$/ } },
+			input  => { x => \$s },
+		)
+	} qr/too short/, 'min failure reported even when matches would pass';
+};
+
+subtest 'stringref × error_msg: custom message on type failure' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'stringref', error_msg => 'Need a string ref here' } },
+			input  => { x => 'plain' },
+		)
+	} qr/Need a string ref here/, 'custom error_msg used on type failure';
+};
+
+subtest 'stringref × error_msg: custom message on min failure' => sub {
+	my $s = 'hi';
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'stringref', min => 5, error_msg => 'Too short!' } },
+			input  => { x => \$s },
+		)
+	} qr/Too short!/, 'custom error_msg used on min failure';
+};
+
+subtest 'stringref × error_msg: custom message on max failure' => sub {
+	my $s = 'toolongvalue';
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'stringref', max => 5, error_msg => 'Too long!' } },
+			input  => { x => \$s },
+		)
+	} qr/Too long!/, 'custom error_msg used on max failure';
+};
+
+# Union types with stringref
+
+subtest "union [string, stringref]: plain string accepted via string branch" => sub {
+	my $r = validate_strict(
+		schema => { x => { type => ['string', 'stringref'] } },
+		input  => { x => 'plain' },
+	);
+	is($r->{x}, 'plain', 'plain string accepted via string branch');
+};
+
+subtest "union [string, stringref]: stringref accepted via stringref branch" => sub {
+	my $s = 'hello';
+	my $r = validate_strict(
+		schema => { x => { type => ['string', 'stringref'] } },
+		input  => { x => \$s },
+	);
+	is($r->{x}, 'hello', 'string reference accepted; dereferenced string returned');
+};
+
+subtest "union [string, stringref]: arrayref rejected by both branches" => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => ['string', 'stringref'] } },
+			input  => { x => [] },
+		)
+	} qr/must be one of/, 'arrayref rejected by both string and stringref branches';
+};
+
+subtest "union [scalar, stringref]: plain scalar accepted via scalar branch" => sub {
+	my $r = validate_strict(
+		schema => { x => { type => ['scalar', 'stringref'] } },
+		input  => { x => 42 },
+	);
+	is($r->{x}, 42, 'plain scalar accepted via scalar branch');
+};
+
+subtest "union [scalar, stringref]: stringref accepted via stringref branch" => sub {
+	my $s = 'hello';
+	my $r = validate_strict(
+		schema => { x => { type => ['scalar', 'stringref'] } },
+		input  => { x => \$s },
+	);
+	is($r->{x}, 'hello', 'string reference accepted via stringref branch');
+};
+
+subtest "union [scalar, stringref]: arrayref rejected by both branches" => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => ['scalar', 'stringref'] } },
+			input  => { x => [] },
+		)
+	} qr/must be one of/, 'arrayref rejected by both scalar and stringref branches';
+};
+
+subtest "union [string, stringref] × min: min applied; short string rejected" => sub {
+	my $s = 'hi';
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => ['string', 'stringref'], min => 5 } },
+			input  => { x => \$s },
+		)
+	} qr/too short|must be one of/, 'short string ref rejected by union with min';
+};
+
+subtest "union [string, stringref] × min: long enough plain string accepted" => sub {
+	my $r = validate_strict(
+		schema => { x => { type => ['string', 'stringref'], min => 5 } },
+		input  => { x => 'hello world' },
+	);
+	is($r->{x}, 'hello world', 'long enough plain string accepted via string branch');
+};
+
+subtest "union [string, stringref] × matches: matched string ref accepted" => sub {
+	my $s = 'hello';
+	my $r = validate_strict(
+		schema => { x => { type => ['string', 'stringref'], matches => qr/^[a-z]+$/ } },
+		input  => { x => \$s },
+	);
+	is($r->{x}, 'hello', 'matching stringref accepted via union');
+};
+
+subtest "union [string, stringref] × matches: non-matching value rejected by both" => sub {
+	my $s = 'HELLO';
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => ['string', 'stringref'], matches => qr/^[a-z]+$/ } },
+			input  => { x => \$s },
+		)
+	} qr/must match pattern|must be one of/, 'non-matching stringref rejected by both branches';
 };
 
 subtest "union [string, object]: string accepted via string branch" => sub {

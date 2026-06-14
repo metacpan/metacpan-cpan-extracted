@@ -2,7 +2,7 @@ package DBIx::QuickORM::RowManager::Cached;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use Carp qw/croak/;
 use Scalar::Util qw/weaken/;
@@ -62,9 +62,14 @@ sub do_cache_lookup {
     my $pk = $old_pk // $new_pk // return;
     my $scache = $self->{+CACHE}->{$source->source_orm_name} or return;
 
-    my $cache_key = $self->cache_key($pk);
+    my $cache_key = $self->cache_key($pk) // return;
 
-    return $scache->{$cache_key} // undef;
+    if (exists $scache->{$cache_key}) {
+        return $scache->{$cache_key} if defined $scache->{$cache_key};
+        $self->_purge_dead($scache);
+    }
+
+    return undef;
 }
 
 =pod
@@ -73,7 +78,8 @@ sub do_cache_lookup {
 
 Store the row in its source bucket under its new primary key (held weakly),
 removing any entry under the old primary key. Returns the row, or nothing for
-sources without a primary key.
+sources without a primary key. A row whose primary key has an undef component
+cannot be keyed and is returned uncached.
 
 =cut
 
@@ -81,14 +87,20 @@ sub cache {
     my $self = shift;
     my ($source, $row, $old_pk, $new_pk) = @_;
 
-    my $scache = $self->{+CACHE}->{$source->source_orm_name} //= {};
-
-    delete $scache->{$self->cache_key($old_pk)} if $old_pk;
-
     return unless $source->primary_key;
 
+    my $scache = $self->{+CACHE}->{$source->source_orm_name} //= {};
+
+    if ($old_pk) {
+        my $old_key = $self->cache_key($old_pk);
+        delete $scache->{$old_key} if defined $old_key;
+    }
+
     $new_pk //= [$row->primary_key_value_list];
-    my $new_key = $self->cache_key($new_pk);
+    my $new_key = $self->cache_key($new_pk) // return $row;
+
+    $self->_purge_dead($scache) if exists $scache->{$new_key} && !defined $scache->{$new_key};
+
     $scache->{$new_key} = $row;
     weaken($scache->{$new_key});
     return $row;
@@ -109,17 +121,14 @@ sub uncache {
     my ($source, $row, $old_pk, $new_pk) = @_;
 
     my $pk = $old_pk // $new_pk;
-    if ($row && !$pk && $row->primary_key) {
-        my $pk_hash = $row->primary_key_hashref;
-        $pk = [values %$pk_hash];
-    }
+    $pk = [$row->primary_key_value_list] if $row && !$pk && $row->source->primary_key;
 
     # No pk, not a cachable row
     return unless $pk && @$pk;
 
     my $scache = $self->{+CACHE}->{$source->source_orm_name} or return;
 
-    my $row_key = $self->cache_key($pk);
+    my $row_key = $self->cache_key($pk) // return;
     return delete $scache->{$row_key};
 }
 
@@ -128,7 +137,9 @@ sub uncache {
 =item $key = $mgr->cache_key($pk)
 
 Build a single cache-key string from an arrayref of primary-key values,
-joining them on a separator that is escaped where it occurs in a value.
+joining them on a separator; backslashes and separator characters inside a
+value are escaped. Returns undef when any component is undef, since such a
+key cannot be distinguished from an empty string.
 
 =back
 
@@ -139,7 +150,43 @@ sub cache_key {
     my ($pk) = @_;
 
     my $sep = chr(31);
-    join $sep => map { my $x = $_; $x =~ s/\Q$sep\E/\\$sep/; $x } @$pk;
+
+    my @parts;
+    for my $val (@$pk) {
+        return undef unless defined $val;
+
+        my $part = $val;
+        $part =~ s/\\/\\\\/g;
+        $part =~ s/\Q$sep\E/\\$sep/g;
+        push @parts => $part;
+    }
+
+    return join $sep => @parts;
+}
+
+=pod
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item $mgr->_purge_dead($scache)
+
+Delete entries from a source bucket whose weakly-held row has been garbage
+collected.
+
+=back
+
+=cut
+
+sub _purge_dead {
+    my $self = shift;
+    my ($scache) = @_;
+
+    my @dead = grep { !defined $scache->{$_} } keys %$scache;
+    delete @{$scache}{@dead} if @dead;
+
+    return;
 }
 
 1;

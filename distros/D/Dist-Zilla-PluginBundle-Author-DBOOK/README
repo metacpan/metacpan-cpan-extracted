@@ -12,9 +12,10 @@ This is the plugin bundle that DBOOK uses. It is equivalent to:
  location = root
  phase = release
  
- [GenerateFile / Generate_Contrib]
- filename = CONTRIBUTING.md
- content = ...
+ [GenerateFile::FromShareDir / Generate_Contrib]
+ -filename = CONTRIBUTING.md
+ -source_filename = CONTRIBUTING.md.tmpl
+ -dist = Dist-Zilla-PluginBundle-Author-DBOOK
  
  [MetaProvides::Package]
  [Prereqs::FromCPANfile]

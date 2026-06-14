@@ -1,4 +1,4 @@
-use Test2::V0;
+use Test2::V0 '!meta', '!pass';
 
 # Coverage for DBIx::QuickORM::Type::JSON: inflate string->ref, deflate
 # ref->json, undef handling, canonical comparison, blessed-ref deflation,
@@ -75,28 +75,27 @@ subtest blessed_ref_deflation => sub {
 };
 
 subtest canonical_compare => sub {
-    is(
+    # qorm_compare follows the equality contract: true when the values are the
+    # same, false when they differ.
+    ok(
         $C->qorm_compare('{"a":1,"b":2}', '{"b":2,"a":1}'),
-        0,
         "structurally equal but differently-ordered objects compare equal",
     );
 
-    isnt(
-        $C->qorm_compare('{"a":1}', '{"a":2}'),
-        0,
+    ok(
+        !$C->qorm_compare('{"a":1}', '{"a":2}'),
         "different values compare unequal",
     );
 
     # Compare a raw JSON string against an already-inflated ref.
-    is(
+    ok(
         $C->qorm_compare('{"a":1,"b":2}', {b => 2, a => 1}),
-        0,
         "compare normalizes a raw string against an inflated ref",
     );
 
     my $nested_a = {list => [{k => 1}, {k => 2}], n => 3};
     my $nested_b = {n => 3, list => [{k => 1}, {k => 2}]};
-    is($C->qorm_compare($nested_a, $nested_b), 0, "nested structures compare canonically");
+    ok($C->qorm_compare($nested_a, $nested_b), "nested structures compare canonically");
 };
 
 subtest round_trip_through_sqlite => sub {

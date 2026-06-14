@@ -375,6 +375,208 @@ subtest 'type scalarref: logger receives error when non-scalarref supplied' => s
 };
 
 # ══════════════════════════════════════════════════════════════════════════════
+# Type: stringref
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest 'type stringref: reference to string accepted; returns plain string' => sub {
+	my $s = 'hello';
+	my $r = validate_strict(
+		schema => { x => { type => 'stringref' } },
+		input  => { x => \$s },
+	);
+	is($r->{x}, 'hello', 'dereferenced string returned');
+};
+
+subtest 'type stringref: reference to empty string accepted' => sub {
+	my $e = '';
+	my $r = validate_strict(
+		schema => { x => { type => 'stringref' } },
+		input  => { x => \$e },
+	);
+	is($r->{x}, '', 'empty string returned');
+};
+
+subtest 'type stringref: plain scalar rejected' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'stringref' } }, input => { x => 'hello' })
+	} qr/must be a string reference/, 'croaks when plain scalar passed as stringref';
+};
+
+subtest 'type stringref: plain integer rejected' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'stringref' } }, input => { x => 42 })
+	} qr/must be a string reference/, 'croaks when plain integer passed as stringref';
+};
+
+subtest 'type stringref: arrayref rejected' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'stringref' } }, input => { x => [] })
+	} qr/must be a string reference/, 'croaks when arrayref passed as stringref';
+};
+
+subtest 'type stringref: hashref rejected' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'stringref' } }, input => { x => {} })
+	} qr/must be a string reference/, 'croaks when hashref passed as stringref';
+};
+
+subtest 'type stringref: coderef rejected' => sub {
+	throws_ok {
+		validate_strict(schema => { x => { type => 'stringref' } }, input => { x => sub {} })
+	} qr/must be a string reference/, 'croaks when coderef passed as stringref';
+};
+
+subtest 'type stringref: blessed object rejected' => sub {
+	my $obj = Unit::Searcher->new;
+	throws_ok {
+		validate_strict(schema => { x => { type => 'stringref' } }, input => { x => $obj })
+	} qr/must be a string reference/, 'croaks when blessed object passed as stringref';
+};
+
+subtest 'type stringref: ref-of-ref rejected' => sub {
+	my $inner = [];	# arrayref; \$inner is type REF, not SCALAR
+	throws_ok {
+		validate_strict(schema => { x => { type => 'stringref' } }, input => { x => \$inner })
+	} qr/must be a string reference/, 'croaks when ref-of-ref passed as stringref';
+};
+
+subtest 'type stringref: min enforced on referenced string length' => sub {
+	my $short = 'hi';
+	throws_ok {
+		validate_strict(schema => { x => { type => 'stringref', min => 5 } }, input => { x => \$short })
+	} qr/too short/, 'croaks when referenced string is shorter than min';
+
+	my $ok = 'hello';
+	my $r;
+	lives_ok {
+		$r = validate_strict(schema => { x => { type => 'stringref', min => 5 } }, input => { x => \$ok })
+	} 'string at min boundary accepted';
+	is($r->{x}, 'hello', 'correct value returned after min check');
+};
+
+subtest 'type stringref: max enforced on referenced string length' => sub {
+	my $long = 'toolongstring';
+	throws_ok {
+		validate_strict(schema => { x => { type => 'stringref', max => 5 } }, input => { x => \$long })
+	} qr/too long/, 'croaks when referenced string is longer than max';
+
+	my $ok = 'hello';
+	my $r;
+	lives_ok {
+		$r = validate_strict(schema => { x => { type => 'stringref', max => 5 } }, input => { x => \$ok })
+	} 'string at max boundary accepted';
+	is($r->{x}, 'hello', 'correct value returned after max check');
+};
+
+subtest 'type stringref: matches applied to referenced string' => sub {
+	my $bad = 'hello world';
+	throws_ok {
+		validate_strict(schema => { x => { type => 'stringref', matches => qr/^\w+$/ } }, input => { x => \$bad })
+	} qr/must match pattern/, 'croaks when referenced string fails pattern';
+
+	my $good = 'hello';
+	my $r;
+	lives_ok {
+		$r = validate_strict(schema => { x => { type => 'stringref', matches => qr/^\w+$/ } }, input => { x => \$good })
+	} 'matching value accepted';
+	is($r->{x}, 'hello', 'correct value returned after matches check');
+};
+
+subtest 'type stringref: memberof applied to referenced string' => sub {
+	my $bad = 'draft';
+	throws_ok {
+		validate_strict(schema => { x => { type => 'stringref', memberof => ['yes', 'no'] } }, input => { x => \$bad })
+	} qr/must be one of/, 'croaks when referenced string is not a member';
+
+	my $good = 'yes';
+	my $r;
+	lives_ok {
+		$r = validate_strict(schema => { x => { type => 'stringref', memberof => ['yes', 'no'] } }, input => { x => \$good })
+	} 'member value accepted';
+	is($r->{x}, 'yes', 'correct value returned after memberof check');
+};
+
+subtest 'type stringref: optional — absent key is skipped' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => 'stringref', optional => 1 } },
+		input  => {},
+	);
+	ok(!exists($r->{x}), 'absent optional stringref key not present in result');
+};
+
+subtest 'type stringref: default applied when absent' => sub {
+	my $r = validate_strict(
+		schema => { x => { type => 'stringref', optional => 1, default => 'fallback' } },
+		input  => {},
+	);
+	is($r->{x}, 'fallback', 'default value used when stringref param absent');
+};
+
+subtest 'type stringref: custom error_msg used on type failure' => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'stringref', error_msg => 'Custom stringref error' } },
+			input  => { x => 'not a ref' },
+		)
+	} qr/Custom stringref error/, 'custom error_msg appears in error';
+};
+
+subtest 'type stringref: logger receives error on type failure' => sub {
+	my $logger = MockLogger->new;
+	my @logged;
+	my $m = mock_scoped('MockLogger', 'error',
+		sub { push @logged, join('', @_[1 .. $#_]) });
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => 'stringref' } },
+			input  => { x => 'not a ref' },
+			logger => $logger,
+		)
+	} qr/must be a string reference/, 'still croaks with logger present';
+	ok(scalar @logged > 0,                           'logger->error called on stringref type failure');
+	like($logged[0], qr/must be a string reference/, 'logger receives the error message');
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Union type: ['string', 'stringref']
+# ══════════════════════════════════════════════════════════════════════════════
+
+subtest "union ['string','stringref']: plain string accepted via string branch" => sub {
+	my $r = validate_strict(
+		schema => { x => { type => ['string', 'stringref'] } },
+		input  => { x => 'hello' },
+	);
+	is($r->{x}, 'hello', 'plain string accepted via string branch of union');
+};
+
+subtest "union ['string','stringref']: string reference accepted via stringref branch" => sub {
+	my $s = 'hello';
+	my $r = validate_strict(
+		schema => { x => { type => ['string', 'stringref'] } },
+		input  => { x => \$s },
+	);
+	is($r->{x}, 'hello', 'string reference accepted; dereferenced string returned');
+};
+
+subtest "union ['string','stringref']: arrayref rejected by both branches" => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => ['string', 'stringref'] } },
+			input  => { x => [] },
+		)
+	} qr/must be one of/, 'arrayref rejected by both string and stringref branches';
+};
+
+subtest "union ['string','stringref']: hashref rejected by both branches" => sub {
+	throws_ok {
+		validate_strict(
+			schema => { x => { type => ['string', 'stringref'] } },
+			input  => { x => {} },
+		)
+	} qr/must be one of/, 'hashref rejected by both string and stringref branches';
+};
+
+# ══════════════════════════════════════════════════════════════════════════════
 # Union type: ['scalar', 'scalarref']
 # ══════════════════════════════════════════════════════════════════════════════
 

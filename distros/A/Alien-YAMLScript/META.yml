@@ -41,7 +41,7 @@ resources:
   bugtracker: https://github.com/yaml/yamlscript/issues
   homepage: https://yamlscript.org
   repository: https://github.com/yaml/yamlscript.git
-version: v0.2.18
+version: v0.2.19
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.84'
   requires:

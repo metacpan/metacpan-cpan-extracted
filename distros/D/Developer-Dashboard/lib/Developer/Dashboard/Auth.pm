@@ -3,7 +3,7 @@ package Developer::Dashboard::Auth;
 use strict;
 use warnings;
 
-our $VERSION = '4.03';
+our $VERSION = '4.16';
 
 use Fcntl qw(:mode);
 use Digest::SHA qw(sha256_hex);
@@ -316,11 +316,12 @@ sub _canonical_ip {
 # _ip_is_loopback($ip)
 # Reports whether one canonical IP literal is loopback-only.
 # Input: canonical IPv4/IPv6 literal string.
-# Output: boolean true for 127.0.0.0/8 or ::1.
+# Output: boolean true for 127.0.0.0/8 with valid 0-255 octets or ::1; strings
+# with out-of-range octets such as 127.0.0.999 are not treated as loopback.
 sub _ip_is_loopback {
     my ( $self, $ip ) = @_;
     return 0 if !defined $ip || $ip eq '';
-    return 1 if $ip =~ /\A127(?:\.\d{1,3}){3}\z/;
+    return 1 if $ip =~ /\A127(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9]{2}|[1-9]?[0-9])){3}\z/;
     return 1 if $ip eq '::1' || $ip eq '0:0:0:0:0:0:0:1';
     return 0;
 }

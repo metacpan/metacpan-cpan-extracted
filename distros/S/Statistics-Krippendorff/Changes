@@ -1,5 +1,8 @@
 Revision history for Statistics-Krippendorff
 
+0.05    2026-06-13
+        - Avoid unitialised warnings (missing ordinal value).
+
 0.04    2025-09-11
         - Optimize coincidence building (runtime shortened from hours
           to seconds for large datasets).

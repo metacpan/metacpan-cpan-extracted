@@ -31,6 +31,20 @@ else{
    $define.=" -DINCLUDE_KONTO_CHECK_DE=0";
 }
 
+if($] >= 5.042){
+	print "use new KontoCheck.xs file\n";
+   system("cp KontoCheck.xs.new KontoCheck.xs");
+}
+else{
+	print "use old KontoCheck.xs file\n";
+   system("cp KontoCheck.xs.old KontoCheck.xs");
+}
+
+if($use_lx2l){
+   system("if [[ ! -f konto_check-cfg.lx ]] ; then echo 'build konto_check-cfg.lx' ; lx2l -x konto_check-cfg.lxx ; fi ; lx2l -x pm.lxx");
+   system("if [[ ! -f lib/Business/konto_check.pm ]] ; then echo 'build lib/Business/konto_check.pm' ; lx2l -x pm.lxx ; fi");
+}
+
 print "Preparing Check for zlib development package...\n";
 my $start=time();
 
@@ -110,8 +124,9 @@ else{
 if(!$have_zlib){
 # keine zlib gefunden; selbst kompilieren und makefile anpassen
    $have_zlib=0;
-	compile_zlib();
-   test_zlib();
+# aktuell nicht hier kompilieren, Fehlermeldung soll zlib holen und kompilieren. zlib wird nicht mehr mitgeliefert.
+####  compile_zlib();
+####  test_zlib();
    if($zlib_static){
 # das makefile muß mit geändertem Includepfad noch einmal geschrieben werden
       $own_zlib=1;
@@ -292,7 +307,11 @@ sub write_makefile
 
 # the following dependencies are for my private build tool lx2l (a little esoteric ;-) )
       ($use_lx2l==1 ?
-      (depend        => {
+      ( clean       => { FILES             => 'KontoCheck.xs lib/Business/KontoCheck.pm', },)
+	 : ( clean       => { FILES             => 'KontoCheck.xs', },)
+  ),
+      ($use_lx2l==1 ?
+		 ( depend     => {
                            'konto_check-cfg.lx' => "konto_check-cfg.lxx\n\tlx2l -x \$<",
                          'lib/Business/KontoCheck.pm' => "pm.lxx konto_check-cfg.lx\n\tlx2l -x \$<",
                          'META.yml'            => "META.lx konto_check-cfg.lx\n\tlx2l \$<",
@@ -301,9 +320,10 @@ sub write_makefile
                          'konto_check.c'      => "konto_check.lxx lib/Business/KontoCheck.pm META.yml retvals.h konto_check-cfg.lx \n\tlx2l -x \$< -ua1",
                          'konto_check-at.c'   => "konto_check-at.lxx konto_check-cfg.lx\n\tlx2l -x \$<",
                          'konto_check-at.h'   => "konto_check-at.lxx konto_check-cfg.lx\n\tlx2l -x \$< -uh",
-                         'KontoCheck.xs'      => "KontoCheck.lx lib/Business/KontoCheck.pm konto_check-cfg.lx\n\tlx2l \$<",
+                         'KontoCheck.xs.old KontoCheck.xs.new' => "KontoCheck.lx lib/Business/KontoCheck.pm konto_check-cfg.lx\n\tlx2l o1 \$<\n\tlx2l n1 \$<",
                          'Makefile.PL'        => "makefile.lx konto_check-cfg.lx\n\tlx2l \$< -um",
-                       }) :())
+                       })
+    : ())
   );
 }
 

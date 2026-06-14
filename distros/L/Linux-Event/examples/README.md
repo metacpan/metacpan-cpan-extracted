@@ -21,7 +21,6 @@ patterns. The 90-series files are manual benchmarks and regression runners.
 
 - `90-bench-oneshot.pl` - pipe readability throughput benchmark
 - `91-stress-oneshot-edge-safe.pl` - edge-triggered one-shot stress runner
-- `92-linux-epoll-oneshot-rearm.pl` - direct Linux::Epoll one-shot rearm check
 - `93-regress-stop-no-backend-wait.pl` - stop-before-backend-wait regression runner
 - `94-regress-epoll-oneshot-rearm.pl` - Linux::Event backend one-shot rearm regression runner
 

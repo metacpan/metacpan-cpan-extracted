@@ -1,4 +1,4 @@
-use Test2::V0;
+use Test2::V0 '!meta', '!pass';
 use DBIx::QuickORM::Schema;
 use DBIx::QuickORM::Schema::Table;
 use DBIx::QuickORM::Schema::Table::Column;
@@ -43,7 +43,7 @@ my $link = DBIx::QuickORM::Link->new(
 my $join = DBIx::QuickORM::Join->new(schema => $schema, primary_source => $foo)->left_join($link);
 
 subtest fields_to_fetch => sub {
-    my $fields = $join->fields_to_fetch;
+    my $fields = join(', ' => map { $$_ } @{$join->fields_to_fetch});
     like($fields, qr/\ba\.foo_id AS "a\.foo_id"/, "foo PK fetched by database name under its alias");
     like($fields, qr/\ba\.name AS "a\.name"/,     "foo name fetched by database name under its alias");
     like($fields, qr/\bb\.bar_id\b/,              "bar PK fetched by database name under its alias");

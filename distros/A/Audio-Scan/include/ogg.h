@@ -14,10 +14,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#define OGG_HEADER_SIZE 28
+#define OGG_MAX_PAGE_SIZE 65307
 #define OGG_BLOCK_SIZE 4500
 
 int get_ogg_metadata(PerlIO *infile, char *file, HV *info, HV *tags);
 int _ogg_parse(PerlIO *infile, char *file, HV *info, HV *tags, uint8_t seeking);
-static int ogg_find_frame(PerlIO *infile, char *file, int offset);
+static off_t ogg_find_frame(PerlIO *infile, char *file, int offset);
 void _parse_vorbis_comments(PerlIO *infile, Buffer *vorbis_buf, HV *tags, int has_framing);
 int _ogg_binary_search_sample(PerlIO *infile, char *file, HV *info, uint64_t target_sample);

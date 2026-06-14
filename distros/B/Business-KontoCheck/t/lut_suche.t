@@ -136,7 +136,7 @@ sub chk_str
       }
 
    }
-   print "\n";
+   print "\nAufruf im Array-Kontext mit uniq\n";
 
       # Aufruf in Array-Kontext mit uniq
    ($p_blz,$p_idx,$p_val,$r3x,$p_cntx)=$fkt->($arg,$r4,1);
@@ -159,7 +159,7 @@ sub chk_str
          printf("%2d/%3d %s %2d (%d Zw.) [%s] %s, %s\n",$i+1,$c41,$b,$idx[$i],$cntx[$i],$val[$i],lut_name1($b,$zw),lut_ort1($b,$zw));
       }
    }
-   print "\n";
+   print "\nAufruf im Array-Kontext mit sort\n";
 
       # Aufruf in Array-Kontext mit sort
    ($p_blz,$p_idx,$p_val,$r3x,$p_cntx)=$fkt->($arg,$r5,0,1);

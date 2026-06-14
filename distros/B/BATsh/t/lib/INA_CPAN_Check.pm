@@ -12,13 +12,15 @@ use strict;
 BEGIN { if ($] < 5.006 && !defined(&warnings::import)) {
         $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } }
 use warnings; local $^W = 1;
+BEGIN { pop @INC if $INC[-1] eq '.' }
 
 use vars qw($VERSION @EXPORT_OK);
 use Exporter ();
 use vars qw(@ISA);
 @ISA = qw(Exporter);
 
-$VERSION = '0.01';
+$VERSION = '0.37';
+$VERSION = $VERSION;
 
 @EXPORT_OK = qw(
     ok plan_tests diag plan_skip end_testing
@@ -81,7 +83,7 @@ sub plan_tests {
     print "1..$T_PLAN\n";
 }
 
-sub ok {
+sub ok ($;$) {
     my ($ok, $name) = @_;
     $T_RUN++;
     $T_FAIL++ unless $ok;
@@ -175,8 +177,7 @@ sub _slurp_lines {
 sub _scan_code {
     # returns lines of all .pm and .t files under $root
     my ($root) = @_;
-    my @files;
-    _find_pm_t($root, \@files);
+    my @files = _find_pm_t($root);
     my @lines;
     for my $f (@files) {
         my @l = _slurp_lines($f);
@@ -186,20 +187,22 @@ sub _scan_code {
 }
 
 sub _find_pm_t {
-    my ($dir, $result) = @_;
+    my ($dir) = @_;
     local *_INA_DIR;
-    opendir(_INA_DIR, $dir) or return;
+    opendir(_INA_DIR, $dir) or return ();
     my @entries = grep { !/^\./ } readdir(_INA_DIR);
     closedir _INA_DIR;
+    my @found;
     for my $e (sort @entries) {
         my $path = "$dir/$e";
         if (-d $path) {
-            _find_pm_t($path, $result);
+            push @found, _find_pm_t($path);
         }
         elsif ($e =~ /\.(?:pm|t)$/) {
-            push @{$result}, $path;
+            push @found, $path;
         }
     }
+    return @found;
 }
 
 sub _manifest_files {
@@ -268,7 +271,8 @@ sub check_B {
     if (-f "$root/Makefile.PL") {
         $mkpl = _slurp("$root/Makefile.PL");
     }
-    ok($mkpl =~ /VERSION\s*=>\s*['"]\Q$ver\E['"]/,
+    ok($mkpl =~ /VERSION['"]\s*=>\s*(?:['"]|\bq\{)\Q$ver\E(?:['"]|\})/
+    || $mkpl =~ /VERSION\s*=>\s*(?:['"]|\bq\{)\Q$ver\E(?:['"]|\})/,
         "B4: Makefile.PL VERSION matches $ver");
 
     # Changes
@@ -309,17 +313,21 @@ sub count_C {
     return scalar(@files) * 3;
 }
 sub check_C {
-    my ($root) = @_;
+    my ($root, %opt) = @_;
     return unless -f "$root/MANIFEST";
+    my $utf8_ok = exists $opt{utf8_ok} ? $opt{utf8_ok} : undef;
     my @files = _ascii_check_files($root);
     for my $rel (@files) {
         my $path = "$root/$rel";
         my $src  = -f $path ? _slurp($path) : '';
         # US-ASCII is required for Perl source and metadata (5.005_03
-        # portability), but the 21-language cheatsheets under doc/ carry
-        # native non-Latin scripts (and accented Latin) by design, so they
-        # are exempt from C1. C2/C3 still apply to them.
-        my $ascii_exempt = ($rel =~ m{^doc/.*\.txt$}i);
+        # portability).  Files that are intentionally non-US-ASCII -- the
+        # 21-language cheatsheets under doc/, the multibyte transpiler core
+        # lib/mb.pm, and the t/[1-8]xxx MBCS fixtures -- are named by the
+        # caller via the utf8_ok regex (doc/*.txt is always exempt).
+        # C2/C3 still apply to them.
+        my $ascii_exempt = ($rel =~ m{^doc/.*\.txt$}i)
+                        || (defined $utf8_ok && $rel =~ /$utf8_ok/);
         ok($ascii_exempt || $src !~ /[^\x00-\x7F]/, "C1: US-ASCII only: $rel");
         ok($src !~ /[ \t]+\n/,     "C2: no trailing whitespace: $rel");
         ok($src eq '' || $src =~ /\n\z/, "C3: ends with newline: $rel");
@@ -341,9 +349,7 @@ sub _ascii_check_files {
 sub count_D { return 2 }
 sub check_D {
     my ($root) = @_;
-    my @pm_files;
-    _find_pm_t("$root/lib", \@pm_files);
-    _find_pm_t("$root/t",   \@pm_files);
+    my @pm_files = (_find_pm_t("$root/lib"), _find_pm_t("$root/t"));
 
     my $all_pass = 1;
     my $stub_ok  = 1;
@@ -372,8 +378,7 @@ sub check_D {
 sub count_E { return 1 }
 sub check_E {
     my ($root) = @_;
-    my @pm_files;
-    _find_pm_t("$root/lib", \@pm_files);
+    my @pm_files = _find_pm_t("$root/lib");
     my $ok = 1;
     for my $f (@pm_files) {
         my $src = _slurp($f);
@@ -479,8 +484,8 @@ sub check_J {
         @t_files = grep { /\.t$/ } readdir(_TMP_DIR);
         closedir _TMP_DIR;
     }
-    my @bad = grep { /^9\d{3}/ && !/^9\d{3}-[a-z]/ } @t_files;
-    ok(!@bad, 'J1: 9NNN test files follow 9NNN-name.t naming convention');
+    my @bad = grep { /^9\d{3}/ && !/^9\d{3}[-_][a-z]/ } @t_files;
+    ok(!@bad, "J1: 9NNN test files follow 9NNN-name.t naming convention(@bad)");
 }
 
 ######################################################################
@@ -494,8 +499,7 @@ sub check_K {
     # the "return \%name" form (e.g. accessor-style %env / %opts / %args).
     # When omitted, no name is exempt and every "return \%..." is flagged.
     my $exempt = defined($opt{k3_exempt}) ? $opt{k3_exempt} : '';
-    my @pm_files;
-    _find_pm_t("$root/lib", \@pm_files);
+    my @pm_files = _find_pm_t("$root/lib");
     my $ok = 1;
     for my $f (@pm_files) {
         my $src = _slurp($f);

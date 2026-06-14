@@ -5,13 +5,13 @@ use ExtUtils::MakeMaker;
 
 my %args = (
     'NAME'      => q{mb},
-    'VERSION'   => q{0.62},
+    'VERSION'   => q{0.63},
     'ABSTRACT'  => q{Can easy script in Big5, Big5-HKSCS, GBK, Sjis(also CP932), UHC, UTF-8, ...},
     'PREREQ_PM' => {
+        'ExtUtils::MakeMaker' => '5.4302',
         'perl' => '5.00503',
-        'strict' => '1.01',
     },
-    'AUTHOR'    => q{ina <ina@cpan.org>},
+    'AUTHOR'    => q{ina <ina.cpan@gmail.com>},
 );
 
 # LICENSE was introduced in ExtUtils::MakeMaker 6.31 (2006).
@@ -42,7 +42,7 @@ if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
         'provides' => {
             'mb' => {
                 'file'    => 'lib/mb.pm',
-                'version' => '0.62',
+                'version' => '0.63',
             }
         },
     };

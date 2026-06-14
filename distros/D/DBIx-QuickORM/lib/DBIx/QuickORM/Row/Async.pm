@@ -2,7 +2,7 @@ package DBIx::QuickORM::Row::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use Carp();
 use Scalar::Util();
@@ -66,8 +66,12 @@ sub isa {
         }
 
         return 1 if $check eq $class;
-        return 1 if $check eq $this->{row_class};
-        return 1 if $this->{row_class}->isa($check);
+
+        # Constructors do not reliably supply row_class; guard its use.
+        if (my $row_class = $this->{row_class}) {
+            return 1 if $check eq $row_class;
+            return 1 if $row_class->isa($check);
+        }
     }
 
     return 0;
@@ -87,14 +91,15 @@ sub can {
 
     if (my $class = Scalar::Util::blessed($this)) {
         if ($this->ready) {
+            my $orig = $_[0];
             $_[0] = $this->swapout;
-            return $_[0]->can($check);
+            return $_[0]->can($check) unless Scalar::Util::refaddr($orig) == Scalar::Util::refaddr($_[0]);
         }
 
         return $this->{row_class}->can($check) if $this->{row_class};
     }
 
-    $this->SUPER::can($check);
+    return $this->SUPER::can($check);
 }
 
 =pod
@@ -107,16 +112,17 @@ are ready.
 =cut
 
 sub DOES {
-    my ($this) = @_;
+    my ($this, $check) = @_;
 
     my $class = Scalar::Util::blessed($this) or return undef;
 
     if ($this->ready) {
+        my $orig = $_[0];
         $_[0] = $this->swapout;
-        return $_[0]->DOES(@_);
+        return $_[0]->DOES($check) unless Scalar::Util::refaddr($orig) == Scalar::Util::refaddr($_[0]);
     }
 
-    return $this->{row_class}->DOES(@_) if $this->{row_class};
+    return $this->{row_class}->DOES($check) if $this->{row_class};
     return undef;
 }
 
@@ -158,7 +164,8 @@ Whether the materialized row will be refreshed.
 
 =item $bool = $row->is_valid
 
-Validity of the (materialized) row; both swap the proxy out first.
+Validity of the row; both swap the proxy out first and delegate to the
+materialized row when one exists.
 
 =cut
 
@@ -167,8 +174,18 @@ Validity of the (materialized) row; both swap the proxy out first.
 sub async { $_[0]->{async} }
 sub auto_refresh { $_[0]->{auto_refresh} }
 
-sub is_invalid { $_[0]->swapout(@_)->{invalid} ? 1 : 0 }
-sub is_valid   { $_[0]->swapout(@_)->{invalid} ? 0 : 1 }
+sub is_valid { $_[0]->is_invalid ? 0 : 1 }
+
+sub is_invalid {
+    my ($this) = @_;
+
+    my $row = $_[0]->swapout;
+
+    # Still the proxy (pending or invalid): peek at our own flag.
+    return $this->{invalid} ? 1 : 0 if Scalar::Util::refaddr($row) == Scalar::Util::refaddr($this);
+
+    return $row->is_invalid ? 1 : 0;
+}
 
 # }}} accessors
 
@@ -217,9 +234,7 @@ sub row {
         return $self->{row} = undef;
     }
 
-    my %args = %$self;
-    delete $args{async};
-    my $auto_refresh = delete $args{auto_refresh};
+    my $auto_refresh = $self->{auto_refresh};
 
     my $meth = $self->{state_method};
     my $row = $self->{row} = $async->connection->$meth(@{$self->{state_args}}, source => $async->source, fetched => $data);

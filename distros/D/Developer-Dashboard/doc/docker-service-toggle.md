@@ -10,7 +10,7 @@ services, and `dashboard docker list --enabled` to keep only enabled ones.
 The toggle writes to the deepest runtime docker root:
 
 - home-only runtime: `~/.developer-dashboard/config/docker/<service>/disabled.yml`
-- child project runtime: `./.developer-dashboard/docker/<service>/disabled.yml`
+- child project runtime: `./.developer-dashboard/config/docker/<service>/disabled.yml`
 
 That means a child project layer can locally disable an inherited home docker
 service by creating its own marker file and can later re-enable the inherited

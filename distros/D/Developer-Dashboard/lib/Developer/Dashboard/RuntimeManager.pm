@@ -3,7 +3,7 @@ package Developer::Dashboard::RuntimeManager;
 use strict;
 use warnings;
 
-our $VERSION = '4.03';
+our $VERSION = '4.16';
 
 use Capture::Tiny qw(capture);
 use File::Spec;
@@ -1712,7 +1712,7 @@ sub _write_collector_supervisor_state {
     print {$fh} json_encode( $data || {} );
     close $fh;
     $self->{paths}->secure_file_permissions($tmp);
-    rename $tmp, $file or die "Unable to rename $tmp to $file: $!";
+    $self->_replace_state_file( $tmp, $file );
     $self->{paths}->secure_file_permissions($file);
     return $data || {};
 }
@@ -2167,9 +2167,121 @@ sub _write_web_state {
     print {$fh} json_encode($payload);
     close $fh;
     $self->{paths}->secure_file_permissions($tmp);
-    rename $tmp, $file or die "Unable to rename $tmp to $file: $!";
+    $self->_replace_state_file( $tmp, $file );
     $self->{paths}->secure_file_permissions($file);
     return $payload;
+}
+
+# _replace_state_file($source, $target)
+# Replaces one runtime state file with a prepared temporary file, including a
+# Windows-specific retry path when the destination already exists and plain
+# rename replacement semantics are unavailable.
+# Input: temporary source path and final state-file path.
+# Output: true value after the target file has been replaced.
+sub _replace_state_file {
+    my ( $self, $source, $target ) = @_;
+    return 1 if $self->_rename_path( $source, $target );
+
+    my $rename_error = $!;
+    if ( is_windows() ) {
+        for my $attempt ( 1 .. 10 ) {
+            if ( -e $target ) {
+                $self->_unlink_path($target)
+                  or die "Unable to remove $target before Windows replace retry: $!";
+                return 1 if $self->_rename_path( $source, $target );
+                $rename_error = $!;
+            }
+
+            my ( $fallback_ok, $fallback_error ) = $self->_replace_path_via_powershell( $source, $target );
+            return 1 if $fallback_ok;
+            if ( defined $fallback_error && $fallback_error ne '' ) {
+                chomp $fallback_error;
+                $rename_error = "$rename_error; PowerShell Move-Item fallback failed: $fallback_error";
+            }
+            my ( $overwrite_ok, $overwrite_error ) = $self->_overwrite_state_file_in_place( $source, $target );
+            return 1 if $overwrite_ok;
+            if ( defined $overwrite_error && $overwrite_error ne '' ) {
+                chomp $overwrite_error;
+                $rename_error = "$rename_error; in-place overwrite fallback failed: $overwrite_error";
+            }
+            last if $attempt == 10;
+            sleep 0.05;
+            return 1 if $self->_rename_path( $source, $target );
+            $rename_error = $!;
+        }
+    }
+
+    $self->_unlink_path($source) if -e $source;
+    die "Unable to rename $source to $target: $rename_error";
+}
+
+# _rename_path($source, $target)
+# Wraps rename so tests can simulate platform-specific file replacement
+# failures without mutating the real filesystem behavior globally.
+# Input: source file path and destination file path.
+# Output: true when the rename succeeds, false otherwise.
+sub _rename_path {
+    my ( $self, $source, $target ) = @_;
+    return rename $source, $target;
+}
+
+# _unlink_path($path)
+# Wraps unlink so tests can observe cleanup and Windows replacement retries in
+# isolation from the caller.
+# Input: one filesystem path string.
+# Output: true when the path was removed, false otherwise.
+sub _unlink_path {
+    my ( $self, $path ) = @_;
+    return unlink $path;
+}
+
+# _replace_path_via_powershell($source, $target)
+# Uses the native Windows Move-Item path as a last-resort file replacement
+# fallback when Perl's in-process rename fails inside detached Windows runtime
+# flows.
+# Input: source file path and destination file path.
+# Output: boolean success flag and optional failure text string.
+sub _replace_path_via_powershell {
+    my ( $self, $source, $target ) = @_;
+    return ( 0, '' ) if !is_windows();
+    my @script = (
+        q{$ErrorActionPreference = 'Stop'},
+        'Move-Item -LiteralPath '
+          . _powershell_single_quote($source)
+          . ' -Destination '
+          . _powershell_single_quote($target)
+          . ' -Force',
+    );
+    my ( $stdout, $stderr, $exit_code ) = capture {
+        system 'powershell', '-NoLogo', '-NoProfile', '-Command', join '; ', @script;
+        return $? >> 8;
+    };
+    return ( 1, '' ) if $exit_code == 0;
+    return ( 0, join '', grep { defined && $_ ne '' } $stderr, $stdout );
+}
+
+# _overwrite_state_file_in_place($source, $target)
+# Rewrites one runtime state target in place from the prepared temporary
+# payload when Windows denies delete-or-move replacement but still permits a
+# direct overwrite.
+# Input: temporary source path and final state-file path.
+# Output: boolean success flag and optional failure text string.
+sub _overwrite_state_file_in_place {
+    my ( $self, $source, $target ) = @_;
+    return ( 0, '' ) if !is_windows();
+    open my $source_fh, '<', $source or return ( 0, "Unable to read $source for in-place overwrite: $!" );
+    local $/;
+    my $content = <$source_fh>;
+    close $source_fh or undef;
+
+    open my $target_fh, '>', $target or return ( 0, "Unable to open $target for in-place overwrite: $!" );
+    print {$target_fh} $content
+      or return ( 0, "Unable to write $target during in-place overwrite: $!" );
+    close $target_fh or undef;
+    if ( -e $source ) {
+        $self->_unlink_path($source) or undef;
+    }
+    return ( 1, '' );
 }
 
 # _cleanup_web_files()

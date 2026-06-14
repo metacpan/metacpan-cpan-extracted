@@ -18,12 +18,12 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-CIDR-Set",
    "prereqs" : {
       "build" : {
-         "requires" : {
+         "recommends" : {
             "ExtUtils::MakeMaker" : "7.22",
             "Module::Metadata" : "1.000015"
          }
@@ -37,12 +37,18 @@
          "requires" : {
             "Dist::AutomationPolicy" : "v0.2.0",
             "Dist::Zilla::Plugin::UsefulReadme" : "v0.4.3",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Markdown::Github" : "0",
             "Pod::Wordlist" : "0",
             "Software::Security::Policy::Individual" : "0.10",
+            "Test2::Require::AuthorTesting" : "0",
             "Test2::Tools::Basic" : "1.302200",
+            "Test2::V0" : "0",
             "Test::CPAN::Changes" : "0.19",
+            "Test::CVE" : "0.10",
             "Test::CleanNamespaces" : "0.15",
             "Test::DistManifest" : "0",
             "Test::EOF" : "0",
@@ -61,7 +67,8 @@
             "Test::Portability::Files" : "0",
             "Test::Spelling" : "0.17",
             "Test::TrailingSpace" : "0.0203",
-            "Test::Vars" : "0.015"
+            "Test::Vars" : "0.015",
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
@@ -79,9 +86,11 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
-            "Data::Dumper" : "0",
+            "Data::Dumper" : "2.154",
             "File::Spec" : "0",
-            "Module::Metadata" : "1.000015",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Module::Metadata" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0.96"
          }
@@ -90,15 +99,15 @@
    "provides" : {
       "Net::CIDR::Set" : {
          "file" : "lib/Net/CIDR/Set.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "Net::CIDR::Set::IPv4" : {
          "file" : "lib/Net/CIDR/Set/IPv4.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       },
       "Net::CIDR::Set::IPv6" : {
          "file" : "lib/Net/CIDR/Set/IPv6.pm",
-         "version" : "0.21"
+         "version" : "0.22"
       }
    },
    "release_status" : "stable",
@@ -113,7 +122,7 @@
       },
       "x_authority" : "cpan:RRWO"
    },
-   "version" : "0.21",
+   "version" : "0.22",
    "x_contributors" : [
       "Thomas Eckardt <Thomas.Eckardt@thockar.com>",
       "Brian Gottreu <gottreu@cpan.org>",
@@ -121,7 +130,8 @@
       "Stig Palmquist <stigtsp@cpan.org>"
    ],
    "x_generated_by_perl" : "v5.42.1",
-   "x_serialization_backend" : "JSON::XS version 4.04",
-   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.42",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_static_install" : 1
 }
 

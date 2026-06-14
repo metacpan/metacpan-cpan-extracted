@@ -1,0 +1,63 @@
+Switch-Declare
+
+Switch::Declare provides a fast, compile-time, lexically-scoped switch/case
+construct for Perl:
+
+    use Switch::Declare;
+
+    my $label = switch ($status) {
+        case 200          { "ok" }
+        case [400 .. 499] { "client error" }
+        case /^5/         { "server error" }
+        default           { "other" }
+    };
+
+The `switch` keyword is installed through the core keyword-plugin and lexer
+APIs (no source filter, no smartmatch, no CPAN dependencies) and is recognised
+only inside the lexical scope of a `use Switch::Declare`. The construct is
+parsed entirely at compile time and lowered to an ordinary conditional
+expression: for a plain variable/constant scrutinee with single-expression
+arms it is exactly as fast as a hand-written if/elsif chain.
+
+Patterns may be number (==), string (eq), regex /.../, range [LO..HI], list
+[a,b,c] membership, or a \&name predicate. The scrutinee is evaluated exactly
+once; the first matching case wins; an optional trailing default catches the
+rest. See `perldoc Switch::Declare` for full documentation, and xt/bench.pl
+for benchmarks.
+
+This distribution includes XS and requires a C compiler to build.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Switch::Declare
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=Switch-Declare
+
+    Search CPAN
+        https://metacpan.org/release/Switch-Declare
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2026 by LNATION <email@lnation.org>.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

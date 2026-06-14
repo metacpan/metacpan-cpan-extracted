@@ -1,7 +1,7 @@
 
 use utf8;
 
-use v5.20;
+use v5.24;
 use warnings;
 
 use Test::More;

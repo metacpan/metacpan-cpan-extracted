@@ -27,7 +27,7 @@ use experimental qw/ signatures /;
 # RECOMMEND PREREQ: Socket 2.026
 # RECOMMEND PREREQ: Type::Tiny::XS
 
-our $VERSION = 'v0.11.1';
+our $VERSION = 'v0.11.2';
 
 
 has host => (
@@ -245,7 +245,7 @@ Net::Statsd::Lite - A StatsD client that supports multimetric packets
 
 =head1 VERSION
 
-version v0.11.1
+version v0.11.2
 
 =head1 SYNOPSIS
 

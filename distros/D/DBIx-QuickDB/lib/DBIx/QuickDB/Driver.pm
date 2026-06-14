@@ -2,7 +2,7 @@ package DBIx::QuickDB::Driver;
 use strict;
 use warnings;
 
-our $VERSION = '0.000050';
+our $VERSION = '0.000051';
 
 use Carp qw/croak confess/;
 use File::Path qw/remove_tree/;
@@ -432,6 +432,10 @@ sub destroy_quietly {
     if (my $watcher = delete $self->{+WATCHER}) {
         # Disconnect our DBI handles before the server dies so this process does
         # not retain broken handles that later report "server has gone away".
+        # Skip this during global destruction: DBI's own structures are already
+        # being torn down (DBI->visit_handles dies with "Can't call method
+        # visit_child_handles on an undefined value"), and retaining broken
+        # handles no longer matters because the process is exiting anyway.
         DBI->visit_handles(
             sub {
                 my ($driver_handle) = @_;
@@ -442,7 +446,7 @@ sub destroy_quietly {
 
                 return 1;
             }
-        ) if $INC{'DBI.pm'};
+        ) if $INC{'DBI.pm'} && ${^GLOBAL_PHASE} ne 'DESTRUCT';
 
         # The watcher is the server's parent, so it is the correct process to
         # kill and reap it. Do NOT signal the stored server pid directly here.

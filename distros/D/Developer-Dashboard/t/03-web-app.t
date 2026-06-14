@@ -117,12 +117,15 @@ is($code1, 200, 'root editor route ok');
 like($body1, qr/<textarea[^>]*name="instruction"/, 'root route renders editable instruction textarea');
 unlike($body1, qr/Saved pages live under/, 'root route no longer renders landing list');
 unlike($body1, qr/>Update</, 'root route does not render manual update button');
-like($body1, qr/addEventListener\('change', function\(\) \{\s*ddForm\.submit\(\);/s, 'root route auto-submits textarea changes on blur');
-like($body1, qr/function ddApplyDirectiveAssist\(\)/, 'root route editor script includes directive assist helper');
-like($body1, qr/if \(priorDirective === 'TITLE'\) \{\s*return directives\.HTML \? '' : 'HTML: ';/s, 'directive assist offers HTML after TITLE only when HTML is still missing');
+like($body1, qr/class="editor-blocks" id="instruction-blocks"/, 'root route renders a split-block instruction editor container');
+like($body1, qr/ddForm\.addEventListener\('focusout', function\(\) \{/s, 'root route auto-submits when focus leaves the whole editor form');
+like($body1, qr/function ddApplyDirectiveAssist\(editor\)/, 'root route editor script includes directive assist helper for one editor block');
+like($body1, qr/function ddSplitInstruction\(\w+\)/, 'root route editor script can split bookmark source into visible blocks');
+like($body1, qr/function ddComposeInstruction\(\)/, 'root route editor script recomposes visible blocks back into the hidden bookmark source');
+like($body1, qr/if \(priorDirective === 'TITLE'\) \{\s*if \(!directives\.BOOKMARK\) return 'BOOKMARK: ';\s*return directives\.HTML \? '' : 'HTML: ';/s, 'directive assist offers BOOKMARK before HTML when TITLE is the current block');
 like($body1, qr/if \(priorDirective === 'HTML' \|\| \/\^CODE\\d\+\$\/\.test\(priorDirective\)\) \{\s*return 'CODE' \+ \(ddHighestCodeDirective\(fullText\) \+ 1\) \+ ': ';/s, 'directive assist advances CODE directives from HTML and CODE sections');
-like($body1, qr/if \(line !== ':---' \|\| caret !== lineEnd\) return false;/s, 'directive assist only expands fresh :--- separator markers at line end');
-like($body1, qr/ddEditor\.addEventListener\('input', function\(\) \{\s*ddApplyDirectiveAssist\(\);\s*ddRenderEditor\(ddEditor\.value\);/s, 'directive assist runs before overlay refresh on editor input');
+like($body1, qr/if \(event\.key !== 'Tab' \|\| event\.shiftKey \|\| event\.ctrlKey \|\| event\.altKey \|\| event\.metaKey\) return;/s, 'split editor reserves plain Tab to start a new section block');
+like($body1, qr/ddInsertBlockAfter\(wrapper\);/s, 'split editor creates a new block when the user presses Tab inside a section');
 
 my $root_index = Developer::Dashboard::PageDocument->new(
     id     => 'index',
@@ -140,6 +143,12 @@ is($unknown_code, 200, 'unknown saved app routes open the editor instead of retu
 like($unknown_body, qr/<textarea[^>]*name="instruction"/, 'unknown saved app routes render the bookmark editor');
 like($unknown_body, qr/BOOKMARK:\s+\/app\/foobar/, 'unknown saved app routes prefill the requested bookmark path');
 like($unknown_body, qr/HTML:\s*\nBlank page/s, 'unknown saved app routes prefill the blank page body');
+
+my ($unknown_edit_code, undef, $unknown_edit_body) = @{ $app->handle(path => '/app/foobar/edit', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' }) };
+is($unknown_edit_code, 200, 'unknown saved edit routes open the editor instead of dying in page resolution');
+like($unknown_edit_body, qr/<textarea[^>]*name="instruction"/, 'unknown saved edit routes render the bookmark editor');
+like($unknown_edit_body, qr/BOOKMARK:\s+\/app\/foobar/, 'unknown saved edit routes prefill the requested bookmark path');
+like($unknown_edit_body, qr/HTML:\s*\nBlank page/s, 'unknown saved edit routes prefill the blank page body');
 
 my $prefixed_saved_page = Developer::Dashboard::PageDocument->new(
     id     => '/app/prefixed-save',
@@ -196,7 +205,7 @@ is($code1b, 200, 'posted instruction route ok');
 like($body1b, qr/posted body/, 'posted instruction renders through the root route');
 unlike($body1b, qr/"instruction"\s*:/, 'posted instruction text is not folded back into stash');
 unlike($body1b, qr/"request_host"\s*:/, 'posted instruction does not persist request metadata into stash');
-my ($play_url) = $body1b =~ m{<a href="([^"]+)" id="play-url">Play</a>};
+my ($play_url) = $body1b =~ m{<button type="button" class="chrome-button" id="play-button" data-play-url="([^"]+)">Play</button>};
 ok($play_url, 'play url extracted from root editor response');
 unlike($body1b, qr/id="view-source-url"/, 'edit mode does not render view source link');
 my ($play_query) = $play_url =~ /\?(.*)\z/;
@@ -349,8 +358,8 @@ my ($code1d_tt, undef, $body1d_tt) = @{ $app->handle(
 is($code1d_tt, 200, 'posted TT bookmark instruction route ok');
 like($body1d_tt, qr/\[% title %\]/, 'editor preserves TT placeholders in the posted source view');
 like($body1d_tt, qr/HTML:\s*&lt;h1&gt;\[% title %\]&lt;\/h1&gt;/s, 'editor textarea keeps TT placeholders inside HTML sections');
-like($body1d_tt, qr/ddEditor\.value = "[^"]*\[% title %\][^"]*"\s*;\s*ddRenderEditor/s, 'editor boot script keeps TT placeholders in the browser-loaded instruction text');
-like($body1d_tt, qr/instruction-highlight[\s\S]*?<span class="tok-directive">HTML:<\/span>\s*<span class="tok-tag">&lt;h1<\/span><span class="tok-tag">&gt;<\/span><span class="tok-note">\[% title %\]<\/span>/s, 'editor syntax highlight is built from highlighted bookmark source');
+like($body1d_tt, qr/ddSource\.value = "[^"]*\[% title %\][^"]*"\s*;\s*ddLoadBlocks\(ddSource\.value\);/s, 'editor boot script keeps TT placeholders in the browser-loaded hidden instruction source before it splits blocks');
+like($app->_editor_overlay_html("HTML: <h1>[% title %]</h1>\n"), qr/<span class="tok-directive">HTML:<\/span>\s*<span class="tok-tag">&lt;h1<\/span><span class="tok-tag">&gt;<\/span><span class="tok-note">\[% title %\]<\/span>/s, 'editor syntax highlight is still built from highlighted bookmark source lines');
 my ($code1d_tt_source, $type1d_tt_source, $body1d_tt_source) = @{ $app->handle(
     path        => '/app/index/source',
     query       => '',
@@ -360,7 +369,7 @@ my ($code1d_tt_source, $type1d_tt_source, $body1d_tt_source) = @{ $app->handle(
 is($code1d_tt_source, 200, 'saved TT bookmark source route ok');
 like($type1d_tt_source, qr/text\/plain/, 'saved TT bookmark source route returns plain text');
 like($body1d_tt_source, qr/^HTML:\s+<h1>\[% title %\]<\/h1> \[% stash\.foo %\]$/m, 'saved TT bookmark source route preserves raw TT placeholders');
-my ($play_url_tt) = $body1d_tt =~ m{<a href="([^"]+)" id="play-url">Play</a>};
+my ($play_url_tt) = $body1d_tt =~ m{<button type="button" class="chrome-button" id="play-button" data-play-url="([^"]+)">Play</button>};
 ok($play_url_tt, 'TT bookmark play url extracted');
 is($play_url_tt, '/app/index', 'saved TT bookmark play url stays on the named saved route');
 my ($code1d_tt_render, undef, $body1d_tt_render) = @{ $app->handle(
@@ -430,10 +439,15 @@ my ($code1e, undef, $body1e) = @{ $app->handle(
 is($code1e, 200, 'highlight demo route ok');
 like($body1e, qr/wrap="off"/, 'editor textarea disables soft wrapping so long bookmark lines keep exact geometry');
 like($body1e, qr/white-space:\s*pre;/, 'editor stack keeps preformatted line geometry instead of wrapping overlay lines differently from the textarea');
-like($body1e, qr/class="editor-overlay-viewport"/, 'editor route renders a clipped overlay viewport above the textarea');
-like($body1e, qr/function ddSyncEditorOverlay\(\)/, 'editor route exposes a dedicated overlay sync helper');
-like($body1e, qr/ddHighlight\.style\.transform = 'translate\('/, 'editor route syncs overlay position through transforms instead of a second scrollbox');
-my ($demo_overlay) = $body1e =~ m{<pre class="editor-overlay" id="instruction-highlight">(.*?)</pre>}s;
+like($body1e, qr/viewport\.className = 'editor-overlay-viewport';/, 'editor route builds a clipped overlay viewport for each visible block');
+like($body1e, qr/function ddSyncEditorOverlay\(editor, highlight\)/, 'editor route exposes a dedicated overlay sync helper for one block overlay');
+like($body1e, qr/function ddAutoResizeEditor\(editor\)/, 'editor route exposes a dedicated auto-resize helper for each block textarea');
+like($body1e, qr/editor\.style\.height = 'auto';\s*editor\.style\.height = Math\.max\(editor\.scrollHeight, 48\) \+ 'px';/s, 'editor route grows each block textarea to match its content height');
+like($body1e, qr/highlight\.style\.transform = 'translate\('/, 'editor route syncs each block overlay position through transforms instead of a second scrollbox');
+like($body1e, qr/function ddCreateEditorBlock\(/, 'editor route builds visible block editors dynamically from bookmark sections');
+like($body1e, qr/function ddRenderEditor\(editor, highlight\) \{\s*highlight\.innerHTML = ddOverlayHtml\(editor\.value\);\s*ddAutoResizeEditor\(editor\);\s*ddSyncEditorOverlay\(editor, highlight\);/s, 'editor route auto-resizes a block before syncing its overlay');
+like($body1e, qr/window\.addEventListener\('resize', function\(\) \{\s*Array\.prototype\.slice\.call\(ddBlocks\.querySelectorAll\('\.editor-block'\)\)\.forEach\(function\(block\) \{\s*const editor = block\.querySelector\('\.instruction-block-editor'\);\s*const highlight = block\.querySelector\('\.editor-overlay'\);\s*ddAutoResizeEditor\(editor\);\s*ddSyncEditorOverlay\(editor, highlight\);/s, 'editor route reapplies auto-resize when the window size changes');
+my $demo_overlay = $app->_editor_overlay_html($highlight_source);
 like($demo_overlay, qr/<span class="tok-directive">HTML:<\/span>/, 'editor overlay highlights bookmark directives');
 like($demo_overlay, qr/<span class="tok-tag">&lt;style<\/span>/, 'editor overlay highlights HTML tag names');
 like($demo_overlay, qr/<span class="tok-js">const<\/span> run = 1;/, 'editor overlay highlights JavaScript keywords');
@@ -500,7 +514,7 @@ my ( $broken_editor_code, undef, $broken_editor_body ) = @{ $app->handle(
 ) };
 is( $broken_editor_code, 200, 'exact bookmark editor repro route ok' );
 like( $broken_editor_body, qr/Stream error:/, 'exact bookmark editor repro keeps the original bookmark text visible in the editor route' );
-my ($broken_editor_overlay) = $broken_editor_body =~ m{<pre class="editor-overlay" id="instruction-highlight">(.*?)</pre>}s;
+my $broken_editor_overlay = $app->_editor_overlay_html($broken_editor_source);
 like( $broken_editor_overlay, qr/<span class="tok-js">let<\/span> lastLength = 0;/, 'exact bookmark editor repro keeps the JavaScript source text visible in the editor overlay' );
 like( $broken_editor_overlay, qr/<span class="tok-string">'Stream error:'<\/span>/, 'exact bookmark editor repro highlights JavaScript string text in the overlay' );
 like( $broken_editor_overlay, qr/<span class="tok-string">'GET'<\/span>/, 'exact bookmark editor repro highlights JavaScript string literals without leaking markup text' );
@@ -529,7 +543,7 @@ my $beta_pos = index($body2b, 'data-nav-id="nav/beta.tt"');
 ok($nav_pos > -1 && $nav_pos < $body_pos, 'shared nav section renders before the main page body');
 ok($alpha_pos > -1 && $beta_pos > $alpha_pos, 'shared nav tt bookmarks render in sorted filename order');
 unlike($body2b, qr/display:flex;flex-direction:column/, 'shared nav markup no longer hardcodes a vertical inline flex layout');
-unlike($body2, qr/id="play-url"/, 'render mode does not render play link');
+unlike($body2, qr/id="play-button"/, 'render mode does not render play button');
 like($body2, qr{href="/app/welcome/edit"[^>]+id="view-source-url"}, 'render mode view source points to edit route');
 
 my $token = $saved_token;
@@ -578,7 +592,7 @@ my ($readonly_render_code, undef, $readonly_render_body) = @{ $app->handle(path 
 is($readonly_render_code, 200, 'no-editor mode still renders saved pages');
 unlike($readonly_render_body, qr/id="share-url"/, 'no-editor mode hides the share link from render views');
 unlike($readonly_render_body, qr/id="view-source-url"/, 'no-editor mode hides the view-source link from render views');
-unlike($readonly_render_body, qr/id="play-url"/, 'no-editor mode hides the play link from render views');
+unlike($readonly_render_body, qr/id="play-button"/, 'no-editor mode hides the play button from render views');
 my ($readonly_source_code, $readonly_source_type, $readonly_source_body) = @{ $app->handle(path => '/app/welcome/source', query => '', remote_addr => '127.0.0.1', headers => { host => '127.0.0.1' }) };
 is($readonly_source_code, 403, 'no-editor mode blocks saved page source routes');
 like($readonly_source_type, qr/text\/plain/, 'no-editor blocked source route returns plain text');
@@ -872,7 +886,7 @@ my ($script_breakout_code, undef, $script_breakout_body) = @{ $app->handle(
 ) };
 is($script_breakout_code, 200, 'editor route handles source containing literal script tags');
 like($script_breakout_body, qr{<textarea[^>]*>[\s\S]*&lt;script src="/js/jquery\.js"&gt;&lt;/script&gt;[\s\S]*</textarea>}m, 'editor textarea keeps literal script tags escaped in source view');
-like($script_breakout_body, qr/ddEditor\.value = ".*\\u003c\/script\\u003e.*"\s*;\s*ddRenderEditor/s, 'editor boot script escapes closing script tags inside inline JSON assignment');
+like($script_breakout_body, qr/ddSource\.value = ".*\\u003c\/script\\u003e.*"\s*;\s*ddLoadBlocks\(ddSource\.value\);/s, 'editor boot script escapes closing script tags inside the hidden JSON-backed source assignment before block loading');
 unlike($script_breakout_body, qr{</html>\s*[\s\S]*ddRenderEditor}m, 'editor boot script text does not leak into the rendered page body');
 
 $auth->add_user( username => 'helper_user', password => 'helper-pass-123' );

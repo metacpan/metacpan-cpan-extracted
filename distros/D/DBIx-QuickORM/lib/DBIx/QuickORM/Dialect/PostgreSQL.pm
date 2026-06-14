@@ -2,7 +2,7 @@ package DBIx::QuickORM::Dialect::PostgreSQL;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use Carp qw/croak/;
 use DBIx::QuickORM::Util qw/column_key/;
@@ -130,17 +130,24 @@ sub rollback_savepoint { my ($self, %p) = @_; my $dbh = $p{dbh} // $self->dbh; $
 
 =item $stype = $dialect->supports_type($type)
 
-Returns the native type name for a supported logical type (e.g. C<uuid>),
-or nothing.
+Returns the native type name for a supported logical type (e.g. C<uuid>,
+C<jsonb>), or nothing. Note: C<json> requires PostgreSQL 9.2+ and C<jsonb>
+9.4+.
 
 =cut
 
 my %TYPES = (
-    uuid => 'UUID',
+    uuid        => 'UUID',
+    json        => 'JSON',
+    jsonb       => 'JSONB',
+    text        => 'TEXT',
+    timestamp   => 'TIMESTAMP',
+    timestamptz => 'TIMESTAMPTZ',
 );
 sub supports_type {
     my $self = shift;
     my ($type) = @_;
+    return undef unless defined $type;
     return $TYPES{lc($type)};
 }
 
@@ -192,8 +199,11 @@ my %TEMP_TYPES = (
 
 =item $tables = $dialect->build_tables_from_db(%params)
 
-Introspects all tables and views in the database and returns a hashref of
-name to schema-table object.
+Introspects all tables and views visible through the connection's
+C<search_path> and returns a hashref of name to schema-table object. When the
+same table name exists in more than one schema on the path, the first match
+in C<search_path> order wins, mirroring how PostgreSQL itself resolves
+unqualified names.
 
 =cut
 
@@ -203,32 +213,49 @@ sub build_tables_from_db {
 
     my $dbh = $self->{+DBH};
 
+    my $schemas = $self->_search_path_schemas;
+    return {} unless @$schemas;
+
+    my $in = join(', ' => ('?') x @$schemas);
     my $sth = $dbh->prepare(<<"    EOT");
-        SELECT table_name, table_type
+        SELECT table_name, table_type, table_schema
           FROM information_schema.tables
          WHERE table_catalog = ?
-           AND table_schema  NOT IN ('pg_catalog', 'information_schema')
+           AND table_schema IN ($in)
     EOT
 
-    $sth->execute($self->{+DB_NAME});
+    $sth->execute($self->{+DB_NAME}, @$schemas);
+
+    my %rank;
+    @rank{@$schemas} = (1 .. @$schemas);
+
+    my %found;
+    while (my ($tname, $type, $tschema) = $sth->fetchrow_array) {
+        my $cur = $found{$tname};
+        next if $cur && $rank{$cur->{schema}} <= $rank{$tschema};
+        $found{$tname} = {type => $type, schema => $tschema};
+    }
 
     my %tables;
 
-    while (my ($tname, $type) = $sth->fetchrow_array) {
+    for my $tname (sort keys %found) {
         next if $params{autofill}->skip(table => $tname);
+
+        my $type    = $found{$tname}->{type};
+        my $tschema = $found{$tname}->{schema};
 
         my $table = {name => $tname, db_name => $tname, is_temp => $TEMP_TYPES{$type} // 0};
         my $class = $TABLE_TYPES{$type} // 'DBIx::QuickORM::Schema::Table';
 
         $params{autofill}->hook(pre_table => {table => $table, class => \$class});
 
-        $table->{columns} = $self->build_columns_from_db($tname, %params);
+        $table->{columns} = $self->build_columns_from_db($tname, %params, table_schema => $tschema);
         $params{autofill}->hook(columns => {columns => $table->{columns}, table => $table});
 
-        $table->{indexes} = $self->build_indexes_from_db($tname, %params);
+        $table->{indexes} = $self->build_indexes_from_db($tname, %params, table_schema => $tschema);
         $params{autofill}->hook(indexes => {indexes => $table->{indexes}, table => $table});
 
-        @{$table}{qw/primary_key unique _links/} = $self->build_table_keys_from_db($tname, %params);
+        @{$table}{qw/primary_key unique _links/} = $self->build_table_keys_from_db($tname, %params, table_schema => $tschema);
 
         $params{autofill}->hook(post_table => {table => $table, class => \$class});
 
@@ -245,7 +272,9 @@ sub build_tables_from_db {
 =item ($pk, $unique, $links) = $dialect->build_table_keys_from_db($table, %params)
 
 Introspects a table's primary key, unique keys, and foreign-key links from
-the C<pg_constraint> catalog.
+the C<pg_constraint> catalog, scoped to the table's schema (the
+C<table_schema> param, or the first C<search_path> schema containing the
+table).
 
 =cut
 
@@ -254,20 +283,27 @@ sub build_table_keys_from_db {
     my ($table, %params) = @_;
 
     my $dbh = $self->{+DBH};
+    my $tschema = $params{table_schema} // $self->_table_schema($table);
 
+    # Join on oids rather than casting conrelid through regclass (whose text
+    # form is search_path- and quoting-sensitive) or using regnamespace
+    # (PostgreSQL 9.5+); this works back to 9.3.
     my $sth = $dbh->prepare(<<"    EOT");
-        SELECT pg_get_constraintdef(oid)
-          FROM pg_constraint
-         WHERE connamespace = 'public'::regnamespace AND conrelid::regclass::text = ?
+        SELECT pg_get_constraintdef(con.oid)
+          FROM pg_constraint con
+          JOIN pg_class      rel ON rel.oid = con.conrelid
+          JOIN pg_namespace  nsp ON nsp.oid = rel.relnamespace
+         WHERE rel.relname  = ?
+           AND nsp.nspname  = ?
     EOT
 
-    $sth->execute($table);
+    $sth->execute($table, $tschema);
 
     my ($pk, %unique, @links);
 
     while (my ($spec) = $sth->fetchrow_array) {
-        if (my ($type, $columns) = $spec =~ m/^(UNIQUE|PRIMARY KEY) \(([^\)]+)\)$/gi) {
-            my @columns = split /,\s+/, $columns;
+        if (my ($type, $columns) = $spec =~ m/^(UNIQUE|PRIMARY KEY) \(([^\)]+)\)/gi) {
+            my @columns = $self->_split_identifiers($columns);
 
             $pk = \@columns if $type eq 'PRIMARY KEY';
 
@@ -275,11 +311,11 @@ sub build_table_keys_from_db {
             $unique{$key} = \@columns;
         }
 
-        if (my ($type, $columns, $ftable, $fcolumns) = $spec =~ m/(FOREIGN KEY) \(([^\)]+)\) REFERENCES\s+(\S+)\(([^\)]+)\)/gi) {
-            my @columns  = split /,\s+/, $columns;
-            my @fcolumns = split /,\s+/, $fcolumns;
+        if (my ($type, $columns, $ftable, $fcolumns) = $spec =~ m/(FOREIGN KEY) \(([^\)]+)\) REFERENCES\s+(.+?)\s*\(([^\)]+)\)/gi) {
+            my @columns  = $self->_split_identifiers($columns);
+            my @fcolumns = $self->_split_identifiers($fcolumns);
 
-            push @links => [[$table, \@columns], [$ftable, \@fcolumns]];
+            push @links => [[$table, \@columns], [$self->_referenced_table($ftable), \@fcolumns]];
         }
     }
 
@@ -294,8 +330,10 @@ sub build_table_keys_from_db {
 
 =item $columns = $dialect->build_columns_from_db($table, %params)
 
-Introspects a table's columns from C<information_schema.columns> and returns
-a hashref of column name to column object.
+Introspects a table's columns from C<information_schema.columns>, scoped to
+the table's schema (the C<table_schema> param, or the first C<search_path>
+schema containing the table), and returns a hashref of column name to column
+object.
 
 =back
 
@@ -307,16 +345,17 @@ sub build_columns_from_db {
 
     croak "A table name is required" unless $table;
     my $dbh = $self->{+DBH};
+    my $tschema = $params{table_schema} // $self->_table_schema($table);
 
     my $sth = $dbh->prepare(<<"    EOT");
         SELECT *
           FROM information_schema.columns
          WHERE table_catalog = ?
            AND table_name    = ?
-           AND table_schema  NOT IN ('pg_catalog', 'information_schema')
+           AND table_schema  = ?
     EOT
 
-    $sth->execute($self->{+DB_NAME}, $table);
+    $sth->execute($self->{+DB_NAME}, $table, $tschema);
 
     my (%columns, @links);
     while (my $res = $sth->fetchrow_hashref) {
@@ -391,8 +430,10 @@ sub _col_field_to_bool {
 
 =item $indexes = $dialect->build_indexes_from_db($table, %params)
 
-Introspects a table's indexes from C<pg_indexes>, parsing each index
-definition, and returns an arrayref of index specs.
+Introspects a table's indexes from the C<pg_index>/C<pg_attribute> catalogs,
+scoped to the table's schema (the C<table_schema> param, or the first
+C<search_path> schema containing the table), and returns an arrayref of index
+specs.
 
 =back
 
@@ -403,28 +444,169 @@ sub build_indexes_from_db {
     my ($table, %params) = @_;
 
     my $dbh = $self->dbh;
+    my $tschema = $params{table_schema} // $self->_table_schema($table);
 
+    # Read the catalogs instead of regex-parsing pg_indexes.indexdef, which
+    # breaks on quoted mixed-case index names. The generate_series join with
+    # indkey subscripting preserves column order and works back to PostgreSQL
+    # 9.3 (no unnest WITH ORDINALITY, no array_position). Expression entries
+    # have indkey 0, match no pg_attribute row, and are skipped.
     my $sth = $dbh->prepare(<<"    EOT");
-        SELECT indexname AS name,
-               indexdef  AS def
-          FROM pg_indexes
-         WHERE tablename = ?
-      ORDER BY name
+        SELECT ic.relname AS name,
+               am.amname  AS type,
+               CASE WHEN i.indisunique THEN 1 ELSE 0 END AS is_unique,
+               a.attname  AS column_name,
+               pg_get_indexdef(i.indexrelid) AS def
+          FROM pg_index i
+          JOIN pg_class      ic ON ic.oid = i.indexrelid
+          JOIN pg_class      tc ON tc.oid = i.indrelid
+          JOIN pg_namespace  n  ON n.oid  = tc.relnamespace
+          JOIN pg_am         am ON am.oid = ic.relam
+          JOIN generate_series(0, 31) s(i) ON s.i < i.indnatts
+          LEFT JOIN pg_attribute a ON a.attrelid = tc.oid AND a.attnum = i.indkey[s.i]
+         WHERE tc.relname = ?
+           AND n.nspname  = ?
+      ORDER BY ic.relname, s.i
     EOT
 
-    $sth->execute($table);
+    $sth->execute($table, $tschema);
 
-    my @out;
+    my (%seen, @out);
+    while (my $row = $sth->fetchrow_hashref) {
+        my $idx = $seen{$row->{name}};
+        unless ($idx) {
+            $idx = $seen{$row->{name}} = {name => $row->{name}, type => $row->{type}, columns => [], unique => $row->{is_unique} ? 1 : 0, definition => $row->{def}};
+            push @out => $idx;
+        }
+        push @{$idx->{columns}} => $row->{column_name} if defined $row->{column_name};
+    }
 
-    while (my ($name, $def) = $sth->fetchrow_array) {
-        $def =~ m/CREATE(?: (UNIQUE))? INDEX \Q$name\E ON \S+ USING ([^\(]+) \((.+)\)$/ or warn "Could not parse index: $def" and next;
-        my ($unique, $type, $col_list) = ($1, $2, $3);
-        my @cols = split /,\s*/, $col_list;
-        push @out => {name => $name, type => $type, columns => \@cols, unique => $unique ? 1 : 0};
-        $params{autofill}->hook(index => {index => $out[-1], table_name => $table, definition => $def});
+    for my $idx (@out) {
+        my $def = delete $idx->{definition};
+        $params{autofill}->hook(index => {index => $idx, table_name => $table, definition => $def});
     }
 
     return \@out;
+}
+
+=pod
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item $schemas = $dialect->_search_path_schemas
+
+Arrayref of schema names visible to the connection, in C<search_path>
+priority order (the session's temp schema first when one exists), excluding
+the system catalogs.
+
+=cut
+
+sub _search_path_schemas {
+    my $self = shift;
+
+    # current_schemas(true) includes the implicit schemas (the session's
+    # pg_temp_N first, then pg_catalog) ahead of the configured search_path,
+    # matching how PostgreSQL resolves unqualified names.
+    my $sth = $self->dbh->prepare("SELECT unnest(current_schemas(true))");
+    $sth->execute();
+
+    my @schemas;
+    while (my ($s) = $sth->fetchrow_array) {
+        next if $s eq 'pg_catalog' || $s eq 'information_schema';
+        push @schemas => $s;
+    }
+
+    return \@schemas;
+}
+
+=pod
+
+=item $schema_or_undef = $dialect->_table_schema($table)
+
+The first schema in C<search_path> order that contains the named table, or
+undef when none does.
+
+=cut
+
+sub _table_schema {
+    my $self = shift;
+    my ($table) = @_;
+
+    my $sth = $self->dbh->prepare(<<"    EOT");
+        SELECT 1
+          FROM pg_class     c
+          JOIN pg_namespace n ON n.oid = c.relnamespace
+         WHERE c.relname = ?
+           AND n.nspname = ?
+    EOT
+
+    for my $schema (@{$self->_search_path_schemas}) {
+        $sth->execute($table, $schema);
+        my ($found) = $sth->fetchrow_array;
+        $sth->finish;
+        return $schema if $found;
+    }
+
+    return undef;
+}
+
+=pod
+
+=item @idents = $dialect->_split_identifiers($list)
+
+Split a comma-separated identifier list from C<pg_get_constraintdef> output,
+stripping double quotes from each identifier.
+
+=cut
+
+sub _split_identifiers {
+    my $self = shift;
+    my ($list) = @_;
+    return map { $self->_unquote_identifier($_) } split /,\s*/, $list;
+}
+
+=pod
+
+=item $ident = $dialect->_unquote_identifier($ident)
+
+Strip surrounding double quotes (and unescape doubled inner quotes) from an
+identifier captured out of C<pg_get_constraintdef> output.
+
+=cut
+
+sub _unquote_identifier {
+    my $self = shift;
+    my ($ident) = @_;
+
+    return $ident unless defined $ident;
+
+    $ident =~ s/^\s+//;
+    $ident =~ s/\s+$//;
+    $ident =~ s/""/"/g if $ident =~ s/^"(.*)"$/$1/s;
+
+    return $ident;
+}
+
+=pod
+
+=item $table = $dialect->_referenced_table($target)
+
+The (unquoted) table name from a C<REFERENCES> target, dropping any schema
+qualification.
+
+=back
+
+=cut
+
+sub _referenced_table {
+    my $self = shift;
+    my ($target) = @_;
+
+    my @parts = $target =~ m/("(?:[^"]|"")*"|[^".]+)/g;
+
+    return $self->_unquote_identifier($parts[-1]);
 }
 
 ###############################################################################

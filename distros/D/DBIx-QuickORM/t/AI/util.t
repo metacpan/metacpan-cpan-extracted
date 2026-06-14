@@ -1,4 +1,4 @@
-use Test2::V0;
+use Test2::V0 '!meta', '!pass';
 use Scalar::Util qw/blessed/;
 
 # Pure-function tests for DBIx::QuickORM::Util. No database needed.

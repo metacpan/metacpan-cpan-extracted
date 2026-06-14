@@ -106,7 +106,9 @@ instead of a loose pile of utilities.
 
 - `Developer::Dashboard::DockerCompose`
   Resolves compose base files plus explicit project, service, addon, and mode overlays, env injection, and the final `docker compose` command.
-  It also discovers isolated service folders under the dashboard docker config root and exports `DDDC` for compose-time path references inside YAML.
+  It discovers isolated service folders from layered `config/docker` roots,
+  including project-local `./.developer-dashboard/config/docker`, and exports `DDDC` for
+  compose-time references to the runtime `config/docker` directory inside YAML.
 
 ## Runtime Model
 
@@ -188,8 +190,9 @@ Page source compatibility is explicit:
 - `dashboard cpan <Module...>` installs optional runtime modules into `./.developer-dashboard/local` and appends them to `./.developer-dashboard/cpanfile`, while keeping that support in the `dashboard` entrypoint and having saved Ajax workers infer `local/lib/perl5` directly from the active runtime root
 - `dashboard serve logs` exposes the combined Dancer2 and Starman runtime log stored in the dashboard log file, with `-n N` tailing and `-f` follow mode
 - `dashboard serve workers N` persists the default Starman worker count in config and auto-starts the web service when it is currently stopped; `--host HOST` and `--port PORT` steer that auto-start path, while `dashboard serve --workers N` and `dashboard restart --workers N` still allow one-off overrides
-- the editor view auto-submits the bookmark form on textarea change/blur instead of relying on a visible update button
-- the editor keeps a plain escaped source overlay with wrapping disabled so the visible text geometry stays identical to the real textarea during long bookmark edits
+- the editor view auto-submits once focus leaves the whole editor form instead of relying on a visible update button
+- the editor splits bookmark sections into separate visible blocks but still recomposes the canonical separator-based source into a hidden `instruction` field before save and play submits
+- each visible editor block keeps a plain escaped source overlay with wrapping disabled so the visible text geometry stays identical to the real textarea during long bookmark edits
 
 ## Environment Overrides
 

@@ -1,4 +1,4 @@
-/* C code produced by gperf version 3.0.4 */
+/* ANSI-C code produced by gperf version 3.1 */
 /* Command-line: gperf -tCcTonDE -K id -N _id3_frametype_lookup -s -3 -k '*' id3_frametype.gperf  */
 
 #if !((' ' == 32) && ('!' == 33) && ('"' == 34) && ('#' == 35) \
@@ -25,7 +25,7 @@
       && ('w' == 119) && ('x' == 120) && ('y' == 121) && ('z' == 122) \
       && ('{' == 123) && ('|' == 124) && ('}' == 125) && ('~' == 126))
 /* The character set is not based on ISO-646.  */
-error "gperf generated tables don't work with this execution character set. Please report a bug to <bug-gnu-gperf@gnu.org>."
+#error "gperf generated tables don't work with this execution character set. Please report a bug to <bug-gperf@gnu.org>."
 #endif
 
 #line 1 "id3_frametype.gperf"
@@ -284,7 +284,7 @@ FRAMETYPE(url,          url,      "Unknown URL link frame");
 FRAMETYPE(experimental, unknown,  "Experimental frame");
 FRAMETYPE(unknown,      unknown,  "Unknown frame");
 FRAMETYPE(obsolete,     unknown,  "Obsolete frame");
-/* maximum key range = 149, duplicates = 0 */
+/* maximum key range = 171, duplicates = 0 */
 
 #ifdef __GNUC__
 __inline
@@ -294,60 +294,50 @@ inline
 #endif
 #endif
 static unsigned int
-frametype_hash (str, len)
-     register const char *str;
-     register unsigned int len;
+frametype_hash (register const char *str, register size_t len)
 {
   static const unsigned char asso_values[] =
     {
-      156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-      156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-      156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-      156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-      156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-       47,   4,  13,  34, 156, 156, 156, 156, 156, 156,
-      156, 156, 156, 156, 156,  31,  63,   3,  15,   3,
-       24,  25,  10,  52,  69,   5,  23,  30,   1,   5,
+      178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
+      178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
+      178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
+      178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
+      178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
+       69,   4,  13,  47, 178, 178, 178, 178, 178, 178,
+      178, 178, 178, 178, 178,  31,  63,   3,  15,   3,
+       24,  25,  10,  52,  74,   5,  23,  30,   1,   5,
        10,  62,  20,   0,  28,  28,  22,  19,  25,  62,
-       10, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-      156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-      156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-      156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-      156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-      156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-      156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-      156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-      156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-      156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-      156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-      156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-      156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-      156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-      156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-      156, 156, 156, 156, 156, 156, 156, 156, 156, 156,
-      156, 156, 156, 156, 156, 156, 156
+       10, 178, 178, 178, 178, 178, 178, 178, 178, 178,
+      178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
+      178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
+      178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
+      178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
+      178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
+      178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
+      178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
+      178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
+      178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
+      178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
+      178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
+      178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
+      178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
+      178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
+      178, 178, 178, 178, 178, 178, 178, 178, 178, 178,
+      178, 178, 178, 178, 178, 178, 178
     };
   return asso_values[(unsigned char)str[3]+1] + asso_values[(unsigned char)str[2]] + asso_values[(unsigned char)str[1]] + asso_values[(unsigned char)str[0]];
 }
 
-#ifdef __GNUC__
-__inline
-#if defined __GNUC_STDC_INLINE__ || defined __GNUC_GNU_INLINE__
-__attribute__ ((__gnu_inline__))
-#endif
-#endif
 const struct id3_frametype *
-_id3_frametype_lookup (str, len)
-     register const char *str;
-     register unsigned int len;
+_id3_frametype_lookup (register const char *str, register size_t len)
 {
   enum
     {
-      TOTAL_KEYWORDS = 85,
+      TOTAL_KEYWORDS = 86,
       MIN_WORD_LENGTH = 4,
       MAX_WORD_LENGTH = 4,
       MIN_HASH_VALUE = 7,
-      MAX_HASH_VALUE = 155
+      MAX_HASH_VALUE = 177
     };
 
   static const struct id3_frametype wordlist[] =
@@ -438,8 +428,6 @@ _id3_frametype_lookup (str, len)
       {"TMOO", FRAME(text), "Mood"},
 #line 324 "id3_frametype.gperf"
       {"TRCK", FRAME(text), "Track number/position in set"},
-#line 320 "id3_frametype.gperf"
-      {"TPE4", FRAME(text), "Interpreted, remixed, or otherwise modified by"},
 #line 294 "id3_frametype.gperf"
       {"TDLY", FRAME(text), "Playlist delay"},
 #line 282 "id3_frametype.gperf"
@@ -462,8 +450,8 @@ _id3_frametype_lookup (str, len)
       {"TALB", FRAME(text), "Album/movie/show title"},
 #line 307 "id3_frametype.gperf"
       {"TLAN", FRAME(text), "Language(s)"},
-#line 317 "id3_frametype.gperf"
-      {"TPE1", FRAME(text), "Lead performer(s)/soloist(s)"},
+#line 320 "id3_frametype.gperf"
+      {"TPE4", FRAME(text), "Interpreted, remixed, or otherwise modified by"},
 #line 338 "id3_frametype.gperf"
       {"WCOP", FRAME(url),  "Copyright/legal information"},
 #line 309 "id3_frametype.gperf"
@@ -496,24 +484,28 @@ _id3_frametype_lookup (str, len)
       {"MLLT", FRAME(MLLT), "MPEG location lookup table"},
 #line 287 "id3_frametype.gperf"
       {"SYTC", FRAME(SYTC), "Synchronised tempo codes"},
-#line 350 "id3_frametype.gperf"
+#line 351 "id3_frametype.gperf"
       {"ZOBS", FRAME(ZOBS), "Obsolete frame"},
 #line 334 "id3_frametype.gperf"
       {"UFID", FRAME(UFID), "Unique file identifier"},
 #line 264 "id3_frametype.gperf"
       {"APIC", FRAME(APIC), "Attached picture"},
-#line 265 "id3_frametype.gperf"
-      {"ASPI", FRAME(ASPI), "Audio seek point index"},
+#line 317 "id3_frametype.gperf"
+      {"TPE1", FRAME(text), "Lead performer(s)/soloist(s)"},
 #line 304 "id3_frametype.gperf"
       {"TIT2", FRAME(text), "Title/songname/content description"},
 #line 286 "id3_frametype.gperf"
       {"SYLT", FRAME(SYLT), "Synchronised lyric/text"},
-#line 274 "id3_frametype.gperf"
-      {"MCDI", FRAME(MCDI), "Music CD identifier"},
+#line 265 "id3_frametype.gperf"
+      {"ASPI", FRAME(ASPI), "Audio seek point index"},
 #line 302 "id3_frametype.gperf"
       {"TIPL", FRAME(text), "Involved people list"},
 #line 305 "id3_frametype.gperf"
       {"TIT3", FRAME(text), "Subtitle/description refinement"},
+#line 274 "id3_frametype.gperf"
+      {"MCDI", FRAME(MCDI), "Music CD identifier"},
+#line 347 "id3_frametype.gperf"
+      {"GRP1", FRAME(text), "Content group description"},
 #line 345 "id3_frametype.gperf"
       {"WXXX", FRAME(WXXX), "User defined URL link frame"},
 #line 281 "id3_frametype.gperf"
@@ -524,27 +516,28 @@ _id3_frametype_lookup (str, len)
       {"TIT1", FRAME(text), "Content group description"}
     };
 
-  static const short lookup[] =
+  static const signed char lookup[] =
     {
       -1, -1, -1, -1, -1, -1, -1,  0, -1, -1, -1, -1, -1, -1,
       -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,  1, -1,
        2,  3, -1,  4, -1, -1, -1, -1,  5,  6,  7,  8, -1,  9,
       10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
       24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37,
-      38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
-      52, 53, -1, 54, 55, 56, -1, 57, 58, 59, 60, 61, 62, 63,
-      64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, -1, 75, -1,
-      76, 77, -1, -1, -1, 78, -1, -1, 79, 80, -1, -1, -1, -1,
-      -1, -1, -1, -1, -1, 81, -1, -1, -1, -1, 82, -1, -1, -1,
-      83, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
-      -1, 84
+      38, 39, 40, 41, 42, -1, 43, 44, 45, 46, 47, 48, 49, 50,
+      51, 52, -1, 53, 54, 55, -1, 56, 57, 58, 59, 60, 61, 62,
+      63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, -1, 74, -1,
+      75, 76, -1, 77, -1, -1, -1, -1, 78, 79, 80, -1, 81, -1,
+      -1, -1, -1, -1, -1, 82, -1, -1, -1, -1, 83, -1, -1, -1,
+      84, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+      -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+      -1, -1, -1, -1, -1, -1, -1, -1, -1, 85
     };
 
   if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
     {
-      register int key = frametype_hash (str, len);
+      register unsigned int key = frametype_hash (str, len);
 
-      if (key <= MAX_HASH_VALUE && key >= 0)
+      if (key <= MAX_HASH_VALUE)
         {
           register int index = lookup[key];
 

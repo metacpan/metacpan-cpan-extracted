@@ -8,16 +8,38 @@ Type::Guess - Infer data types from an array of scalars
 
   my @list = qw/a b cd efg hijk/;
   my $guess = Type::Guess->new(@list);
-  
+
   print $guess->type;       # Str
   print $guess->precision;  # 0
   print $guess->length;     # 4
-  print $guess->to_string;  # %-7s
+  print $guess->to_string;  # %-4s
+
+  # Use the object directly as a formatter
+  print $guess->($_) for @list;   # "a   ", "b   ", "cd  ", "efg ", "hijk"
+  print "$guess";                 # %-4s  (stringifies to format string)
+
+  # SQL column definitions
+  my $sql = Type::Guess->with_roles("+SQL::SQLite")->new(@list);
+  print $sql->to_sql;             # VARCHAR(4)
+
+  # DateTime detection
+  my $dt = Type::Guess->with_roles("+DateTime", "+SQL::Pg")->new(@dates);
+  print $dt->type;                # DateTime
+  print $dt->to_sql;              # TIMESTAMP
 
 =head1 DESCRIPTION
 
-Type::Guess analyzes an array of scalar values and determines the most appropriate data type.
-It provides type inference, precision estimation, and formatting options.
+Type::Guess analyses an array of scalar values and determines the most
+appropriate data type (C<Str>, C<Int>, or C<Num>). It also tracks precision,
+field width, and sign, and generates a C<sprintf>-style format string that
+can be used directly to format the original values consistently.
+
+The object overloads both stringification (C<"">) and the code dereference
+operator (C<&{}>), so it can be used as a format string or called directly
+as a formatting function.
+
+Additional roles extend the base detection to handle datetime values, Unicode
+strings, Type::Tiny integration, and SQL column definition generation.
 
 =head1 METHODS
 
@@ -25,135 +47,322 @@ It provides type inference, precision estimation, and formatting options.
 
   my $guess = Type::Guess->new(@list);
 
-Creates a new Type::Guess object based on the input list.
+Creates a new Type::Guess object by analysing the input list. Alternatively,
+a hashref of attribute values may be passed directly:
+
+  my $guess = Type::Guess->new({ type => "Int", length => 5 });
+
+=head2 analyse
+
+  my $guess = $class->analyse(@list);
+
+Analyses a list and returns a new Type::Guess object. Useful for reusing a
+configured class against multiple datasets.
+
+  my $class = Type::Guess->with_roles("+Unicode", "+SQL::Pg");
+  my $g1 = $class->analyse(@first_column);
+  my $g2 = $class->analyse(@second_column);
 
 =head2 type
 
   my $type = $guess->type;
+  $guess->type("Str");
 
-Returns the inferred type. Possible values include:
+Returns or sets the inferred type. Possible values are:
 
 =over 4
 
-=item * Str (String)
+=item * C<Str> (string)
 
-=item * Int (Integer)
+=item * C<Int> (integer)
 
-=item * Num (Floating point number)
+=item * C<Num> (floating point)
 
-=item * Other types based on roles
+=item * C<DateTime> when using the C<+DateTime> or C<+DateTime::Naive> role
+
+=item * A C<Type::Tiny> object when using the C<+Tiny> role
 
 =back
 
+Setting type to C<Str> restores C<length> to its originally detected value.
+
 =head2 precision
 
-  my $precision = $guess->precision;
+  my $p = $guess->precision;
+  $guess->precision(2);
 
-Returns the detected precision for numeric values. Defaults to 0 for integers.
+Returns or sets the number of decimal places for C<Num> values. Always
+returns 0 for non-C<Num> types.
 
 =head2 length
 
-  my $length = $guess->length;
+  my $len = $guess->length;
+  $guess->length(12);
 
-Returns the length of the longest string representation in the list.
+Returns or sets the total field width used in the format string. For C<Num>
+types this is derived from C<integer_chars> and C<precision>; setting it
+adjusts C<integer_chars> accordingly. Setting a value lower than the detected
+minimum is ignored with a warning.
 
 =head2 integer_chars
 
-  my $int_chars = $guess->integer_chars;
+  my $ic = $guess->integer_chars;
+  $guess->integer_chars(7);
 
-Returns the count of integer digits in numeric types.
+Returns or sets the number of digits in the integer part of numeric values.
 
 =head2 signed
 
-  my $signed = $guess->signed;
+  my $sign = $guess->signed;
 
-Returns true if negative values are detected.
+Returns C<"-"> if only negative values were detected, C<"+-"> if both
+positive and negative values were detected, or C<undef> if the data is
+unsigned. Always returns C<undef> for C<Str> types.
 
 =head2 to_string
 
   my $format = $guess->to_string;
 
-Returns a format string suitable for printf-style formatting.
+Returns a C<sprintf>-style format string for the detected type:
 
-=head2 sql
+  Str  ->  %-4s
+  Int  ->  %5i
+  Num  ->  %11.5f
 
-  my $sql_type = $guess->sql;
+If C<percentages> is true, the C<Num> format gets a trailing C<%%>:
 
-Returns the SQL equivalent type, such as "integer" or "float".
+  Num (%) ->  %7.1f%%
 
-=head2 precision($new_precision)
+If a custom C<format> has been set it is returned as-is.
 
-  $guess->precision(2);
+=head2 to_sql
 
-Sets the precision for floating point numbers.
+  my $col = $guess->to_sql;
 
-=head2 type($new_type)
+Returns a SQL column type string for the detected type. Requires a SQL
+dialect role to be composed — see L</SQL ROLES>. Croaks if called without
+a dialect role.
 
-  $guess->type("Str");
+=head2 format
 
-Forces a new type assignment.
+  $guess->format("%010.2f");
+
+Overrides the auto-generated format string. Once set, C<to_string> returns
+this value directly.
+
+=head2 as_hash
+
+  my $href = $guess->as_hash;
+
+Returns all attributes as a plain hashref. Can be passed back to C<new> to
+reconstruct an equivalent object:
+
+  my $clone = Type::Guess->new($guess->as_hash);
+
+=head2 with_roles
+
+  my $class = Type::Guess->with_roles("+Tiny");
+  my $class = Type::Guess->with_roles("+DateTime", "+SQL::Pg");
+
+Applies one or more roles to the class and returns the composed class.
+Role names prefixed with C<+> are expanded to C<Type::Guess::Role::*>.
+Requires L<Role::Tiny> 2.000001 or later.
+
+=head1 OVERLOADING
+
+Type::Guess overloads two operators:
+
+=over 4
+
+=item Stringification (C<"">)
+
+  print "$guess";   # prints the format string, e.g. "%-4s"
+
+=item Code dereference (C<&{}>)
+
+  my $formatted = $guess->($value);   # equivalent to sprintf $guess->to_string, $value
+
+This makes the object usable directly as a formatting function:
+
+  my @formatted = map { $guess->($_) } @list;
+
+=back
+
+=head1 READ-ONLY ATTRIBUTES
+
+The following attributes record the values detected at construction time and
+do not change when C<length>, C<precision>, or C<integer_chars> are
+subsequently adjusted. Attempting to set them issues a warning and has no
+effect.
+
+=over 4
+
+=item * C<length_ro>
+
+=item * C<precision_ro>
+
+=item * C<integer_chars_ro>
+
+=back
 
 =head1 ROLES
 
-Type::Guess supports additional roles for specialized type handling:
+=head2 +DateTime
 
-=head2 +Date
+  my $guess = Type::Guess->with_roles("+DateTime")->new(@dates);
 
-  my $guess = Type::Guess->with_roles("+Date")->new(@dates);
+Detects datetime values using L<DateTime::Format::Flexible> by default.
+Sets C<type> to C<"DateTime"> when the data matches. Requires
+L<DateTime::Format::Flexible> to be installed.
 
-Enables date recognition for values like YYYY-MM-DD.
+The parser can be changed via C<parser_class>:
+
+  my $class = Type::Guess->with_roles("+DateTime");
+  $class->parser_class("Strptime", '%Y-%m-%d', "parse_datetime");
+  my $guess = $class->new(@dates);
+
+C<parser_class> accepts up to three arguments: the format class name
+(expanded to C<DateTime::Format::*> if not fully qualified), an optional
+options list, and an optional method name (defaults to C<parse_datetime>).
+
+=head2 +DateTime::Naive
+
+  my $guess = Type::Guess->with_roles("+DateTime::Naive")->new(@dates);
+
+A self-contained datetime detector with no non-core dependencies. Uses a
+set of built-in patterns to recognise common date and datetime formats:
+
+  YYYY-MM-DD
+  DD-Mon-YYYY       (e.g. 26-Jan-2024)
+  YYYY-MM-DD HH:MM:SS
+  DD.MM.YYYY        (European dot-separated)
+  DD/MM/YYYY        (European slash-separated)
+
+Also adds a C<datetime_format> attribute containing the detected strftime
+format string:
+
+  print $guess->datetime_format;   # %Y-%m-%d
+
+Use C<+DateTime::Naive> when you want no external dependencies and your
+date formats are well-controlled. Use C<+DateTime> when you need to handle
+a wider variety of real-world date strings.
 
 =head2 +Unicode
 
-  my $guess = Type::Guess->with_roles("+Unicode")->new(@unicode_strings);
+  my $guess = Type::Guess->with_roles("+Unicode")->new(@strings);
 
-Handles multibyte characters correctly in formatting.
+Handles multibyte and wide characters correctly. Uses visual display width
+(via L<Text::VisualWidth::PP>) rather than byte or character count for
+C<length>, and L<Text::VisualPrintf> for formatting.
 
 =head2 +Tiny
 
   my $guess = Type::Guess->with_roles("+Tiny")->new(@list);
 
-Integrates with Type::Tiny for strict type validation.
+Integrates with L<Type::Tiny>. When this role is active, C<type> returns a
+C<Type::Tiny> object rather than a plain string, so you get
+C<$guess->type->name> instead of C<$guess->type>. A custom type list can be
+passed as a trailing hashref to C<new>:
+
+  use Type::Tiny;
+  my $Date = Type::Tiny->new(
+      name       => "Date",
+      constraint => sub { /^\d{4}-\d{2}-\d{2}$/ },
+  );
+  my $guess = Type::Guess->with_roles("+Tiny")->new(@list, { types => [$Date, Int, Num, Str] });
+
+Types are tried in order; the first type that satisfies the tolerance
+threshold wins.
+
+=head1 SQL ROLES
+
+SQL roles add a C<to_sql> method that returns a dialect-appropriate column
+type string based on the detected type and its attributes. Compose one SQL
+role per object. Combining C<+DateTime> or C<+DateTime::Naive> with a SQL
+role produces the correct datetime column type for that dialect.
+
+=head2 +SQL::SQLite
+
+  my $guess = Type::Guess->with_roles("+SQL::SQLite")->new(@list);
+  print $guess->to_sql;
+
+Type mapping:
+
+  Int              -> INTEGER
+  Num              -> FLOAT
+  Str (< 1024)     -> VARCHAR(n)
+  Str (>= 1024)    -> TEXT
+  DateTime         -> DATETIME
+
+SQLite does not enforce column width or type constraints at the storage
+level, but the declared types are useful for ORM compatibility.
+
+=head2 +SQL::Pg
+
+  my $guess = Type::Guess->with_roles("+SQL::Pg")->new(@list);
+  print $guess->to_sql;
+
+Type mapping:
+
+  Int (<=9 digits)  -> INTEGER
+  Int (>9 digits)   -> BIGINT
+  Num               -> DECIMAL(n,p)
+  Str (< 1024)      -> VARCHAR(n)
+  Str (>= 1024)     -> TEXT
+  DateTime          -> TIMESTAMP
+
+Postgres distinguishes C<TIMESTAMP> (no timezone) and
+C<TIMESTAMP WITH TIME ZONE>. Type::Guess emits C<TIMESTAMP> by default.
+If your application is timezone-aware, override C<to_sql> in a subclass
+or local role to return C<TIMESTAMP WITH TIME ZONE> for C<DateTime> types.
+
+Postgres has no C<UNSIGNED> modifier; the C<signed> attribute is detected
+but not reflected in the SQL output.
 
 =head1 CONFIGURATION
+
+Class-level settings that apply to all subsequent calls.
 
 =head2 tolerance
 
   Type::Guess->tolerance(0.1);
 
-Sets tolerance for non-compliant data.
+The fraction of values (0-1) permitted to fail the type check while still
+matching that type. Defaults to C<0>.
 
   Type::Guess->tolerance(0.25);
-
-  my $t = Type::Guess->new(1, 2, 3, "a");
-  # Int
+  my $t = Type::Guess->new(1, 2, 3, "a");  # Int  (1 in 4 fails = 25%)
 
   Type::Guess->tolerance(0);
-
-  my $t = Type::Guess->new(1, 2, 3, "a");
-  # Str
+  my $t = Type::Guess->new(1, 2, 3, "a");  # Str  (any failure disqualifies)
 
 =head2 skip_empty
 
-  Type::Guess->skip_empty(1);
+  Type::Guess->skip_empty(1);   # default
 
-When false, all values - empty or not - are checked. Defaults to true.
+When true (the default), empty strings are excluded before analysis.
+When false, empty strings are included and count against numeric type
+detection.
 
   Type::Guess->skip_empty(1);
-  $t = Type::Guess->new(1, 2, "", 3, 4);
-  # int
+  $t = Type::Guess->new(1, 2, "", 3, 4);  # Int  (empty string ignored)
 
   Type::Guess->skip_empty(0);
-  $t = Type::Guess->new(1, 2, "", 3, 4);
-  # Snt
+  $t = Type::Guess->new(1, 2, "", 3, 4);  # Str  (empty string included)
+
+=head2 encoding
+
+  Type::Guess->encoding("UTF-8");
+
+Sets the character encoding used when decoding input. Defaults to C<"">.
+Primarily used by the C<+Unicode> role.
 
 =head1 AUTHOR
 
-Your Name <scesano@cpan.org>
+Simone Cesano <scesano@cpan.org>
 
 =head1 LICENSE
 
 This module is licensed under the same terms as Perl itself.
 
 =cut
-

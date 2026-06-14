@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use feature qw/state/;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use Carp qw/confess croak carp/;
 use Sub::Util qw/set_subname/;
@@ -11,7 +11,10 @@ use List::Util qw/mesh/;
 use Scalar::Util qw/blessed/;
 use DBIx::QuickORM::Util qw{debug};
 
+use POSIX();
+use Scope::Guard();
 use Atomic::Pipe();
+use Cpanel::JSON::XS();
 
 use DBIx::QuickORM::STH();
 use DBIx::QuickORM::STH::Fork();
@@ -35,8 +38,10 @@ use Object::HashBase qw{
     +where
     +order_by
     +limit
+    +offset
     +fields
     +omit
+    +distinct
 
     +async
     +aside
@@ -142,12 +147,16 @@ The row this handle is bound to, if any.
 
 =item limit
 
+=item offset
+
 =item fields
 
 =item omit
 
-Query-composition state: WHERE clause, ORDER BY, LIMIT, fields to fetch, and
-fields to omit.
+=item distinct
+
+Query-composition state: WHERE clause, ORDER BY, LIMIT, OFFSET, fields to
+fetch, fields to omit, and the SELECT DISTINCT flag.
 
 =item async
 
@@ -208,7 +217,7 @@ C<fields> with C<omit>.
 =item $omit = $h->_normalize_omit($omit, $pk_fields)
 
 Coerce an C<omit> specification into a hashref and reject attempts to omit
-primary key fields.
+primary key fields. Returns undef when the specification is empty.
 
 =item $builder = $h->_sql_builder
 
@@ -248,27 +257,19 @@ sub init {
         $self->{+WHERE} = $self->sql_builder->qorm_where_for_row($row) if $self->_has_pk;
     }
 
-    if ($self->_has_pk && !$self->{+WHERE}) {
-        croak "You must provide a where clause or row before specifying a limit"     if $self->{+LIMIT};
-        croak "You must provide a where clause or row before specifying an order_by" if $self->{+ORDER_BY};
-    }
-
     my $fields = $self->{+FIELDS} //= $source->fields_to_fetch;
 
     if (my $omit = $self->{+OMIT}) {
         croak "Cannot mix 'omit' and a non-arrayref field specification ('$fields')" if ref($fields) ne 'ARRAY';
 
         my $pk_fields = $source->primary_key;
-        if ($omit = $self->_normalize_omit($self->{+OMIT}, $pk_fields)) {
-            if ($pk_fields || $omit) {
-                my %seen;
-                $fields = [grep { !$seen{$_}++ && !($omit && $omit->{$_}) } @{$pk_fields // []}, @$fields];
-            }
-
-            $self->{+FIELDS} = $fields;
-
-            if ($omit) { $self->{+OMIT} = $omit }
-            else       { delete $self->{+OMIT} }
+        if ($omit = $self->_normalize_omit($omit, $pk_fields)) {
+            my %seen;
+            $self->{+FIELDS} = [grep { !$seen{$_}++ && !$omit->{$_} } @{$pk_fields // []}, @$fields];
+            $self->{+OMIT}   = $omit;
+        }
+        else {
+            delete $self->{+OMIT};
         }
     }
 }
@@ -286,6 +287,8 @@ sub _normalize_omit {
     elsif (!$r)           { $omit =    {$omit => 1}                   } # Turn single into hash
     else                  { croak "$omit is not a valid 'omit' value" } # oops
     #>>>
+
+    return undef unless keys %$omit;
 
     $pk_fields //= $self->{+SOURCE}->primary_key or return $omit;
 
@@ -339,6 +342,9 @@ L<DBIx::QuickORM::Join::Row> objects.
 
 Shortcuts for C<< $h->join(type => $DIRECTION, @args) >>.
 
+C<cross_join> is special: a cross join has no C<ON> clause, so it takes a
+table name (or C<< table => $name >>) instead of a link.
+
 =back
 
 =cut
@@ -370,13 +376,32 @@ link against the source and returns a clone whose source is the resulting join.
 
 sub _join {
     my $self = shift;
-    my ($link, %params) = @_;
 
-    ($params{from}, $link) = ($1, $2) if !ref($link) && $link =~ m/^(.+)\:(.+)$/;
+    # An odd argument count means the first argument is the positional link
+    # (or table, for cross joins).
+    my ($link, %params);
+    if (@_ % 2) { ($link, %params) = @_ }
+    else        { %params = @_; $link = delete $params{link} }
 
     my $source = $self->{+SOURCE};
 
-    $link = $source->resolve_link($link, %params);
+    if (($params{type} // '') =~ m/^CROSS$/i) {
+        # A cross join has no ON clause, so no link is needed; the argument
+        # names the table to join.
+        $params{table} //= $link if defined $link;
+        croak "No table provided to cross_join()" unless defined $params{table};
+        $link = undef;
+    }
+    else {
+        croak "No link provided to join()"
+            unless defined($link) || defined($params{table}) || defined($params{alias});
+
+        # A 'from:link' prefix splits on the FIRST colon; aliases cannot
+        # contain colons but link names might.
+        ($params{from}, $link) = ($1, $2) if defined($link) && !ref($link) && $link =~ m/^(.+?)\:(.+)$/;
+
+        $link = $source->resolve_link($link, %params);
+    }
 
     my $join;
     if ($source->isa('DBIx::QuickORM::Join')) {
@@ -387,10 +412,11 @@ sub _join {
         $join = DBIx::QuickORM::Join->new(
             primary_source => $source,
             schema         => $self->{+CONNECTION}->schema,
+            connection     => $self->{+CONNECTION},
         );
     }
 
-    $join = $join->join(%params, link => $link);
+    $join = $join->join(%params, ($link ? (link => $link) : ()));
 
     return $self->clone(SOURCE() => $join, FIELDS() => $join->fields_to_fetch);
 }
@@ -511,6 +537,11 @@ You can specify the order_by using the C<order_by> key in a key/value pair.
 
 You can specify the limit using the C<limit> key in a key/value pair.
 
+=item offset => $OFFSET
+
+You can specify the offset using the C<offset> key in a key/value pair. An
+offset requires a limit to also be set by query time.
+
 =item fields => \@FIELDS
 
 You can specify the fields using the C<fields> key in a key/value pair.
@@ -518,6 +549,11 @@ You can specify the fields using the C<fields> key in a key/value pair.
 =item omit => \@FIELDS
 
 You can specify the omit using the C<omit> key in a key/value pair.
+
+=item distinct => $BOOL
+
+You can use the C<distinct> key and a boolean to toggle C<SELECT DISTINCT> on
+and off.
 
 =item async => $BOOL
 
@@ -693,11 +729,16 @@ sub handle {
     $flags{unknown_arg}    = sub { croak "$_[1] is not a recognized handle-attribute or table name" };
     $flags{row_and_where}  = sub { croak "Cannot provide both a 'where' and a 'row'" };
     $flags{row_and_source} = sub { croak "Cannot provide both a 'source' and a 'row'" };
-    $flags{bad_override}   = sub { my ($self, $key, @args) = @_; croak "Handle already has a '$key' set (" . (map { defined($_) ? ( (blessed($_) && $_->can('display')) ? $_->display : "'$_'" ) : 'undef'} @args) . ")" };
+    $flags{bad_override}   = sub { my ($self, $key, @args) = @_; croak "Handle already has a '$key' set (" . join(', ' => map { defined($_) ? ( (blessed($_) && $_->can('display')) ? $_->display : "'$_'" ) : 'undef'} @args) . ")" };
     $flags{allow_override} = 1;
 
     my %set;
-    while (my $arg = shift @_) {
+    my @deferred_tables;
+    while (@_) {
+        my $arg = shift @_;
+
+        croak "Received an undefined argument" unless defined $arg;
+
         if (my $ref = ref($arg)) {
             if (my $class = blessed($arg)) {
                 if ($arg->DOES('DBIx::QuickORM::Role::Source')) {
@@ -831,13 +872,31 @@ sub handle {
             next;
         }
 
-        if (my $src = $clone->{+CONNECTION}->source($arg, no_fatal => 1)) {
-            $flags{bad_override}->($clone, SOURCE() => $clone->{+SOURCE}, $src) if $clone->{+SOURCE} && !$flags{allow_override};
-            $clone->{+SOURCE} = $src;
+        # A bare string is a table name, which needs a connection to resolve.
+        # The connection may appear later in the argument list, so defer
+        # resolution until all arguments have been consumed.
+        push @deferred_tables => $arg;
+    }
+
+    for my $arg (@deferred_tables) {
+        my $con = $clone->{+CONNECTION} or croak "Cannot resolve '$arg' as a table name without a connection";
+
+        my $src = $con->source($arg, no_fatal => 1);
+        unless ($src) {
+            $flags{unknown_arg}->($clone, $arg);
             next;
         }
 
-        $flags{unknown_arg}->($clone, $arg, \@_);
+        if ($set{+ROW} && $clone->{+ROW}) {
+            my $s2 = $clone->{+ROW}->source;
+            $flags{row_and_source}->($clone) unless $src == $s2;
+        }
+        else {
+            $flags{bad_override}->($clone, SOURCE() => $clone->{+SOURCE}, $src) if $clone->{+SOURCE} && !$flags{allow_override};
+            $clone->{+SOURCE} = $src;
+        }
+
+        $set{+SOURCE}++;
     }
 
     my $new = bless($clone, $class);
@@ -892,6 +951,13 @@ them, such as L<DBD::SQlite>.
 =item $new_h = $h->data_only()
 
 The newly returned handle will return hashrefs instead of blessed row objects.
+
+=item $new_h = $h->distinct()
+
+=item $new_h = $h->distinct($bool)
+
+The newly returned handle will use C<SELECT DISTINCT> when fetching rows.
+Pass a boolean to toggle the flag in either direction.
 
 =item $new_h = $h->all_fields()
 
@@ -984,17 +1050,42 @@ sub data_only {
     return $self->clone(DATA_ONLY() => 1);
 }
 
+sub distinct {
+    my $self = shift;
+    croak "Must not be called in void context" unless defined wantarray;
+
+    if (@_) {
+        my ($val) = @_;
+        return $self->clone(DISTINCT() => $val ? 1 : 0);
+    }
+
+    return $self if $self->{+DISTINCT};
+
+    return $self->clone(DISTINCT() => 1);
+}
+
 sub all_fields {
     my $self = shift;
     croak "Must not be called in void context" unless defined wantarray;
     return $self->clone(FIELDS() => $self->{+SOURCE}->fields_list_all);
 }
 
-sub internal_txns            { $_[0]->{+INTERNAL_TRANSACTIONS} = $_[1] // 1; $_[0] }
-sub internal_transactions    { $_[0]->{+INTERNAL_TRANSACTIONS} = $_[1] // 1; $_[0] }
+sub internal_txns    { my $self = shift; $self->internal_transactions(@_) }
+sub no_internal_txns { my $self = shift; $self->no_internal_transactions(@_) }
 
-sub no_internal_txns         { $_[0]->{+INTERNAL_TRANSACTIONS} = defined($_[1]) ? $_[1] ? 0 : 1 : 0; $_[0] }
-sub no_internal_transactions { $_[0]->{+INTERNAL_TRANSACTIONS} = defined($_[1]) ? $_[1] ? 0 : 1 : 0; $_[0] }
+sub internal_transactions {
+    my $self = shift;
+    croak "Must not be called in void context" unless defined wantarray;
+    my $val = @_ ? $_[0] // 1 : 1;
+    return $self->clone(INTERNAL_TRANSACTIONS() => $val ? 1 : 0);
+}
+
+sub no_internal_transactions {
+    my $self = shift;
+    croak "Must not be called in void context" unless defined wantarray;
+    my $val = (@_ && defined $_[0]) ? ($_[0] ? 0 : 1) : 0;
+    return $self->clone(INTERNAL_TRANSACTIONS() => $val);
+}
 
 # Do these last to avoid conflicts with the operators
 {
@@ -1076,6 +1167,14 @@ handle that uses the new omitted fields.
 
 Can be used to get the limit of a handle, or to create a clone of the
 handle that uses the new limit.
+
+=item $offset = $h->offset()
+
+=item $new_h = $h->offset($offset)
+
+Can be used to get the offset of a handle, or to create a clone of the
+handle that uses the new offset. An offset is only valid in combination with a
+limit; executing a query with an offset but no limit throws an exception.
 
 =item $where = $h->where()
 
@@ -1162,6 +1261,13 @@ sub limit {
     croak "Must not be called in void context" unless defined wantarray;
     return $self->{+LIMIT} unless @_;
     return $self->clone(LIMIT() => $_[0]);
+}
+
+sub offset {
+    my $self = shift;
+    croak "Must not be called in void context" unless defined wantarray;
+    return $self->{+OFFSET} unless @_;
+    return $self->clone(OFFSET() => $_[0]);
 }
 
 sub where {
@@ -1438,23 +1544,43 @@ sub _make_forked_sth {
     undef $rh;
 
     my $json = Cpanel::JSON::XS->new->utf8(1)->convert_blessed(1)->allow_nonref(1);
-    my $dbh = $con->aside_dbh;
 
-    my ($sth, $res) = $self->_execute($dbh, $sql);
-    $wh->write_message($json->encode({result => $res}));
+    # Every message is an envelope with exactly one of these keys so the parent
+    # can tell rows apart from control frames: {result=>...} (always first),
+    # {row=>...} per row, then a terminal {done=>1} on success or {error=>...}
+    # on failure. The terminal frame lets the parent distinguish a clean end
+    # from a child that died mid-stream (which would otherwise look like EOF).
+    my $ok = eval {
+        my $dbh = $con->aside_dbh;
 
-    eval {
+        my ($sth, $res) = $self->_execute($dbh, $sql);
+        $wh->write_message($json->encode({result => $res}));
+
         if (my $on_ready = $params{on_ready}) {
             if (my $fetch = $on_ready->($dbh, $sth, $res, $sql)) {
                 while (my $row = $fetch->()) {
-                    $wh->write_message($json->encode($row));
+                    $wh->write_message($json->encode({row => $row}));
                 }
             }
         }
 
-        undef $wh;
+        $wh->write_message($json->encode({done => 1}));
         1;
-    } or do { warn $@; $guard->dismiss(); POSIX::_exit(1) };
+    };
+    my $err = $@;
+
+    unless ($ok) {
+        # Best-effort terminal error frame so the parent surfaces the failure
+        # instead of treating the truncated stream as a clean end. If even this
+        # write dies the scope guard still _exits, and the parent sees EOF with
+        # no terminal frame and reports a truncated stream.
+        eval { $wh->write_message($json->encode({error => "$err"})); 1 };
+        undef $wh;
+        $guard->dismiss();
+        POSIX::_exit(1);
+    }
+
+    undef $wh;
     $guard->dismiss();
     POSIX::_exit(0);
 }
@@ -1576,8 +1702,17 @@ ID formats.
 
 =item $row = $h->vivify(\%ROW_DATA)
 
-Create a row object witht he provided data. The Row will NOT be inserted into
-the database unless you call C<< $row->insert >> or C<< $row->save >>.
+Get a row object to work with for the provided data. If a row matching the
+data's primary key is already loaded, that existing row is returned as-is;
+otherwise a new row is created with the provided data. The Row will NOT be
+inserted into the database unless you call C<< $row->insert >> or
+C<< $row->save >>.
+
+This does not query the database and does not guarantee the row exists there.
+On a hit the provided data is not applied to the existing row (existing values
+win); a warning is emitted if that would silently drop differing data. To
+change a loaded row, fetch it and call C<< $row->update >>; to ensure a row
+exists in the database, use C<find_or_insert> or C<update_or_insert>.
 
 =back
 
@@ -1587,17 +1722,18 @@ sub by_id {
     my $id = pop;
     my $self = shift->handle(@_);
 
-    croak "Cannot call by_ids() on a handle with a where clause"    if $self->{+WHERE};
-    croak "Cannot call by_ids() on a handle with an associated row" if $self->{+ROW};
+    croak "Cannot call by_id() on a handle with a where clause"    if $self->{+WHERE};
+    croak "Cannot call by_id() on a handle with an associated row" if $self->{+ROW};
 
     my $source = $self->{+SOURCE};
+    my $pk_fields = $self->_has_pk or croak "Cannot call by_id() on a source that has no primary key";
 
     my $where;
     my $ref = ref($id);
     #<<<
-    if    ($ref eq 'HASH')  { $where = $id; $id = [ map { $where->{$_} } @{$source->primary_key} ] }
-    elsif ($ref eq 'ARRAY') { $where = +{ mesh($source->primary_key, $id) } }
-    elsif (!$ref)           { $id = [ $id ]; $where = +{ mesh($source->primary_key, $id) } }
+    if    ($ref eq 'HASH')  { $where = $id; $id = [ map { $where->{$_} } @$pk_fields ] }
+    elsif ($ref eq 'ARRAY') { $where = +{ mesh($pk_fields, $id) } }
+    elsif (!$ref)           { $id = [ $id ]; $where = +{ mesh($pk_fields, $id) } }
     #>>>
 
     croak "Unrecognized primary key format: $id" unless ref($id) eq 'ARRAY';
@@ -1655,7 +1791,9 @@ sub _builder_args {
         source   => $self->{+SOURCE},
         where    => $self->{+WHERE},
         limit    => $self->{+LIMIT},
+        offset   => $self->{+OFFSET},
         order_by => $self->{+ORDER_BY},
+        distinct => $self->{+DISTINCT},
         fields   => $self->fields,
         dialect  => $self->dialect,
     };
@@ -1802,7 +1940,9 @@ sub _insert {
 
     croak "Cannot insert rows using a handle with data_only set"   if $self->{+DATA_ONLY};
     croak "Cannot insert rows using a handle with a limit set"     if defined $self->{+LIMIT};
+    croak "Cannot insert rows using a handle with an offset set"   if defined $self->{+OFFSET};
     croak "Cannot insert rows using a handle with an order_by set" if defined $self->{+ORDER_BY};
+    croak "Cannot insert rows using a handle with distinct set"    if $self->{+DISTINCT};
 
     my $data;
     if (my $in = $self->{+TARGET}) {
@@ -1818,6 +1958,10 @@ sub _insert {
 
     croak "No data provided to insert" unless $data;
     croak "Refusing to insert an empty row" unless keys %$data;
+
+    # Defaults are added and generated columns removed below; work on a copy
+    # so the caller's hashref (or the row's pending data) is never mutated.
+    $data = { %$data };
 
     my $source  = $self->{+SOURCE};
     my $dialect = $self->dialect;
@@ -1842,7 +1986,7 @@ sub _insert {
 
     if ($has_pk && @$has_pk > 1 && !$has_ret) {
         croak "Database-Auto-Generated compound primary keys are not supported for databases that do not support 'returning on insert' functionality"
-            if grep { !$data->{$_} } @$has_pk;
+            if grep { !defined $data->{$_} } @$has_pk;
     }
 
     $builder_args->{insert} = $data;
@@ -1945,6 +2089,12 @@ sub delete {
 
     croak "Cannot delete rows using a handle with data_only set" if $self->{+DATA_ONLY};
 
+    # A bound row normally provides the WHERE clause via its primary key. With
+    # no primary key there is no WHERE at all and the delete would hit every
+    # row in the table.
+    croak "Cannot delete a row bound to a handle when its table has no primary key (no WHERE clause can be derived)"
+        if $self->{+ROW} && !$self->_has_pk;
+
     my $con = $self->{+CONNECTION};
     $con->pid_and_async_check;
 
@@ -1999,7 +2149,17 @@ sub delete {
 
     my $sth;
     if ($has_ret || $row) {
-        $sth = $self->_make_sth($sql, on_ready => $finish, no_rows => 1);
+        # A forked write maintains the parent cache in the parent at reap (via
+        # on_finish) using the bound row's data; it cannot stream RETURNING rows
+        # back through this path, so a bulk forked delete needs a bound row.
+        croak "Cannot do a forked delete without a specific row to delete"
+            if $self->is_forked && !$row;
+
+        $sth = $self->_make_sth(
+            $sql,
+            (($self->is_forked && $row) ? (on_finish => $finish) : (on_ready => $finish)),
+            no_rows => 1,
+        );
     }
     else {
         croak "Cannot do an async delete without a specific row to delete on a database that does not support 'returning on delete'" unless $sync;
@@ -2030,8 +2190,16 @@ sub update {
     $con->pid_and_async_check;
 
     croak "update() with data_only set is not currently supported"        if $self->{+DATA_ONLY};
-    croak "update() with a 'limit' clause is not currently supported"     if $self->{+LIMIT};
+    croak "update() with a 'limit' clause is not currently supported"     if defined $self->{+LIMIT};
+    croak "update() with an 'offset' clause is not currently supported"   if defined $self->{+OFFSET};
     croak "update() with an 'order_by' clause is not currently supported" if $self->{+ORDER_BY};
+    croak "update() with distinct set is not currently supported"         if $self->{+DISTINCT};
+
+    # A bound row normally provides the WHERE clause via its primary key. With
+    # no primary key there is no WHERE at all and the update would hit every
+    # row in the table.
+    croak "Cannot update a row bound to a handle when its table has no primary key (no WHERE clause can be derived)"
+        if $self->{+ROW} && !$self->_has_pk;
 
     my $row = $self->{+ROW};
     if ($changes) {
@@ -2063,16 +2231,9 @@ sub update {
 
     croak "Changes may not be empty" unless keys %$changes;
     my $do_cache          = $pk_fields && @$pk_fields && $con->state_does_cache;
-    my $changes_pk_fields = $pk_fields ? (grep { $changes->{$_} } @$pk_fields) : ();
+    my $changes_pk_fields = $pk_fields ? (grep { exists $changes->{$_} } @$pk_fields) : ();
 
     my $sql = $self->sql_builder->qorm_update(%$builder_args, update => $changes);
-
-    # No cache, or not cachable, just do the update
-    unless ($do_cache) {
-        my $sth = $self->_make_sth($sql, no_rows => 1);
-        return $sth unless $sync;
-        return;
-    }
 
     my $handle_row = sub {
         my ($row) = @_;
@@ -2089,8 +2250,26 @@ sub update {
 
         $new_pk = $changes_pk_fields ? [ map { $fetched->{$_} } @$pk_fields ] : undef;
 
-        $con->state_update_row(old_primary_key => $old_pk, new_primary_key => $new_pk, fetched => $fetched, source => $source);
+        # Pass the row through so its own state is updated; without it only
+        # the cache layer (when present) would see the change and the
+        # caller's row object would keep its stale stored/pending data.
+        $con->state_update_row(
+            old_primary_key => $old_pk,
+            new_primary_key => $new_pk,
+            fetched         => $fetched,
+            source          => $source,
+            (blessed($row) ? (row => $row) : ()),
+        );
     };
+
+    # No cache, or not cachable, just do the update (but still sync the bound
+    # row's state when there is one).
+    unless ($do_cache) {
+        my $sth = $self->_make_sth($sql, no_rows => 1);
+        $handle_row->($row) if $row;
+        return $sth unless $sync;
+        return;
+    }
 
     my $done = 0;
     my $rows;
@@ -2115,7 +2294,14 @@ sub update {
 
     my $sth;
     if ($row) {
-        $sth = $self->_make_sth($sql, on_ready => $finish, no_rows => 1);
+        # For a forked write the cache maintenance must run in the parent at
+        # reap, not in the child (whose updated cache is discarded), so pass it
+        # as on_finish; sync/async run it in-process via on_ready.
+        $sth = $self->_make_sth(
+            $sql,
+            ($self->is_forked ? (on_finish => $finish) : (on_ready => $finish)),
+            no_rows => 1,
+        );
     }
     else {
         croak "Cannot do an async update without a specific row to update" unless $sync;
@@ -2232,6 +2418,10 @@ true.
 
 Get the number of rows that the query would return.
 
+When the handle queries a join, or has the distinct flag set, this counts
+C<COUNT(DISTINCT pk)> over the (primary) source's primary key so that
+one-to-many joins do not inflate the count.
+
 =item $h->iterate(sub { my $row = shift; ... })
 
 Run the callback for each row found.
@@ -2344,11 +2534,61 @@ sub iterator {
 }
 
 sub count {
-    my $self = shift->_row_or_hashref(WHERE() => @_)->fields([\'COUNT(*) AS count']);
+    my $self = shift->_row_or_hashref(WHERE() => @_);
     croak "count() cannot be used on an async handle" unless $self->is_sync;
+
+    # The count expression is the only field: 'omit' reconciliation would
+    # prepend primary key fields to it, and a distinct flag belongs inside
+    # COUNT() rather than on the SELECT, so both are cleared on the clone.
+    my $expr = $self->_count_expression;
+    $self = $self->clone(FIELDS() => [\"$expr AS count"], OMIT() => undef, DISTINCT() => undef);
+
     my $sth = $self->_do_select();
     my $row = $sth->next or return undef;
     return $row->{count};
+}
+
+=pod
+
+=head1 PRIVATE METHODS
+
+=over 4
+
+=item $sql = $h->_count_expression
+
+The aggregate expression count() selects. C<COUNT(*)> normally;
+C<COUNT(DISTINCT pk)> over the (primary) source's primary key when the
+source is a join or the handle has the distinct flag set.
+
+=back
+
+=cut
+
+sub _count_expression {
+    my $self = shift;
+
+    my $source = $self->{+SOURCE};
+
+    my ($pk_source, $prefix);
+    if ($source->isa('DBIx::QuickORM::Join')) {
+        my $as = $source->order->[0];
+        $pk_source = $source->components->{$as}->{table};
+        $prefix    = "$as.";
+    }
+    elsif ($self->{+DISTINCT}) {
+        $pk_source = $source;
+        $prefix    = "";
+    }
+    else {
+        return 'COUNT(*)';
+    }
+
+    my $pk = $pk_source->primary_key;
+    croak "Cannot count distinct rows on a source without a primary key"        unless $pk && @$pk;
+    croak "Cannot count distinct rows on a source with a compound primary key"  if @$pk > 1;
+
+    my $db = $pk_source->field_db_name($pk->[0]);
+    return "COUNT(DISTINCT $prefix$db)";
 }
 
 sub iterate {

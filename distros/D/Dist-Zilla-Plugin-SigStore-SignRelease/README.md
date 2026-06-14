@@ -4,7 +4,7 @@ Dist::Zilla::Plugin::SigStore::SignRelease - Sign Release with SigStore
 
 # VERSION
 
-version 0.05
+version 0.06
 
 # SYNOPSIS
 

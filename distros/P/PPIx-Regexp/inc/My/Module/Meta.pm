@@ -26,7 +26,7 @@ sub add_to_cleanup {
 }
 
 sub author {
-    return 'Thomas R. Wyant, III F<wyant at cpan dot org>';
+    return 'Thomas R. Wyant, III F<harryfmudd at comcast dot net>';
 }
 
 sub build_requires {
@@ -54,7 +54,6 @@ sub distribution {
     return $self->{distribution};
 }
 
-
 sub license {
     return 'perl';
 }
@@ -68,9 +67,8 @@ sub meta_merge {
 	dynamic_config	=> 1,
 	resources	=> {
 	    bugtracker	=> {
-		web	=> 'https://rt.cpan.org/Public/Dist/Display.html?Name=PPIx-Regexp',
-		# web	=> 'https://github.com/trwyant/perl-PPIx-Regexp/issues',
-		mailto  => 'wyant@cpan.org',
+		web	=> 'https://github.com/trwyant/perl-PPIx-Regexp/issues',
+		mailto  => 'harryfmudd@comcast.net',
 	    },
 	    license	=> 'http://dev.perl.org/licenses/',
 	    repository	=> {
@@ -82,7 +80,6 @@ sub meta_merge {
 	@extra,
     };
 }
-
 
 sub module_name {
     return 'PPIx::Regexp';
@@ -339,17 +336,16 @@ information makes it into F<META.yml>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=PPIx-Regexp>,
-L<https://github.com/trwyant/perl-PPIx-Regexp/issues>, or in
+L<https://github.com/trwyant/perl-PPIx-Regexp/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III F<wyant at cpan dot org>
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010-2023, 2025 by Thomas R. Wyant, III
+Copyright (C) 2010-2023, 2025-2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

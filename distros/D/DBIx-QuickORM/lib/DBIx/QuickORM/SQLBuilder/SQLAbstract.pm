@@ -2,7 +2,7 @@ package DBIx::QuickORM::SQLBuilder::SQLAbstract;
 use strict;
 use warnings;
 
-our $VERSION = '0.000022';
+our $VERSION = '0.000023';
 
 use Carp qw/croak confess/;
 use Sub::Util qw/set_subname/;
@@ -79,8 +79,11 @@ sub new {
 
 Build a statement of the named kind for the given source. Each returns a
 hashref with C<statement>, C<bind> (an arrayref of per-field bind specs), and
-C<source>. A C<limit> param appends a C<LIMIT ?> clause. These methods are
-generated at compile time.
+C<source>. A C<limit> param appends a C<LIMIT ?> clause, and an C<offset>
+param extends it to C<LIMIT ? OFFSET ?> (an offset without a limit croaks,
+since not every dialect allows a bare OFFSET). A true C<distinct> param turns
+a C<SELECT> into C<SELECT DISTINCT>. These methods are generated at compile
+time.
 
 =cut
 
@@ -109,12 +112,24 @@ BEGIN {
                 ($stmt, @bind) = $self->$meth($source, @args);
             }
 
+            # Not every dialect supports a bare OFFSET (MySQL requires a LIMIT
+            # before it), so OFFSET is only emitted as part of "LIMIT ? OFFSET ?".
+            croak "Cannot use 'offset' without a 'limit'"
+                if defined($params{offset}) && !defined($params{limit});
+
+            $stmt =~ s/^(\s*SELECT)\b/$1 DISTINCT/i if $params{distinct};
+
             my $param = 1;
             @bind = map { my ($f, $v) = @{$_}; +{param => $param++, value => $v, type => 'field', field => $f} } @bind;
 
-            if (my $limit = $params{limit}) {
+            if (defined(my $limit = $params{limit})) {
                 $stmt .= " LIMIT ?";
                 push @bind => {param => $param++, value => $limit, type => 'limit'};
+
+                if (defined(my $offset = $params{offset})) {
+                    $stmt .= " OFFSET ?";
+                    push @bind => {param => $param++, value => $offset, type => 'offset'};
+                }
             }
 
             return {statement => $stmt, bind => \@bind, source => $source};
@@ -130,8 +145,10 @@ BEGIN {
 =item $sql = $builder->qorm_upsert(source => $source, insert => \%data, ...)
 
 Build an insert and append the dialect's upsert/conflict clause keyed on the
-source's primary key, with the non-key fields as the update set. Croaks if the
-source has no primary key.
+source's primary key, with the non-key fields as the update set. When every
+field belongs to the primary key a no-op assignment is used as the update set
+so the statement stays valid and still returns the row on conflict. Croaks if
+the source has no primary key.
 
 =cut
 
@@ -170,7 +187,17 @@ sub qorm_upsert {
             param => $counter++,
         };
     }
-    $conf .= " " . join(', ' => @inject) if @inject;
+    # When every field is part of the primary key there is nothing to update
+    # on conflict, but the conflict clause still needs an assignment (and
+    # 'DO NOTHING' would suppress the RETURNING row). Inject a no-op
+    # assignment instead. The MySQL-family clause ('ON DUPLICATE KEY UPDATE')
+    # needs VALUES() so MySQL still reports the row via last_insert_id.
+    unless (@inject) {
+        my $col = $pk_db->[0];
+        push @inject => $conf =~ m/ON DUPLICATE KEY UPDATE/i ? "$col = VALUES($col)" : "$col = $col";
+    }
+
+    $conf .= " " . join(', ' => @inject);
 
     $sql->{statement} = "$statement $conf $returning";
 
@@ -199,8 +226,10 @@ sub _insert_args {
     my $self = shift;
     my ($params) = @_;
 
-    confess "insert() with a 'limit' clause is not currently supported"     if $params->{limit};
+    confess "insert() with a 'limit' clause is not currently supported"     if defined $params->{limit};
+    confess "insert() with an 'offset' clause is not currently supported"   if defined $params->{offset};
     confess "insert() with an 'order_by' clause is not currently supported" if $params->{order_by};
+    confess "insert() with 'distinct' set is not currently supported"       if $params->{distinct};
 
     my $values = $params->{insert} // croak "'insert' is required";
     my $returning = $params->{returning};
@@ -214,8 +243,10 @@ sub _delete_args {
     my $self = shift;
     my ($params) = @_;
 
-    confess "delete() with a 'limit' clause is not currently supported"     if $params->{limit};
+    confess "delete() with a 'limit' clause is not currently supported"     if defined $params->{limit};
+    confess "delete() with an 'offset' clause is not currently supported"   if defined $params->{offset};
     confess "delete() with an 'order_by' clause is not currently supported" if $params->{order_by};
+    confess "delete() with 'distinct' set is not currently supported"       if $params->{distinct};
 
     my $where = $params->{where} // undef;
     my $returning = $params->{returning};
@@ -226,6 +257,11 @@ sub _delete_args {
 sub _update_args {
     my $self = shift;
     my ($params) = @_;
+
+    confess "update() with a 'limit' clause is not currently supported"     if defined $params->{limit};
+    confess "update() with an 'offset' clause is not currently supported"   if defined $params->{offset};
+    confess "update() with an 'order_by' clause is not currently supported" if $params->{order_by};
+    confess "update() with 'distinct' set is not currently supported"       if $params->{distinct};
 
     my $values    = $params->{update} or croak "'update' is required";
     my $returning = $params->{returning};

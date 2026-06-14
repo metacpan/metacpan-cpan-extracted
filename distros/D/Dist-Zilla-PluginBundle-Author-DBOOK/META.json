@@ -1,7 +1,7 @@
 {
    "abstract" : "A plugin bundle for distributions built by DBOOK",
    "author" : [
-      "Dan Book <dbook@cpan.org>"
+      "Dan Book <book.d.wit@proton.me>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version (undef), CPAN::Meta::Converter version 2.150013",
@@ -115,11 +115,11 @@
    "provides" : {
       "Dist::Zilla::MintingProfile::Author::DBOOK" : {
          "file" : "lib/Dist/Zilla/MintingProfile/Author/DBOOK.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.0.9"
       },
       "Dist::Zilla::PluginBundle::Author::DBOOK" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/DBOOK.pm",
-         "version" : "v1.0.8"
+         "version" : "v1.0.9"
       }
    },
    "release_status" : "stable",
@@ -135,11 +135,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#distzilla"
    },
-   "version" : "v1.0.8",
-   "x_contributors" : [
-      "Dan Book <grinnz@gmail.com>",
-      "Dan Book <grinnz@grinnz.com>"
-   ],
+   "version" : "v1.0.9",
    "x_generated_by_perl" : "v5.42.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.41",
    "x_spdx_expression" : "Artistic-2.0"
