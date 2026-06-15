@@ -1,0 +1,53 @@
+--- #YAML:1.0
+name                        : DBD-KingBase
+version                     : 3.10.12
+abstract                    : DBI king database interface
+author                      : H.Q.Wang
+
+license                     : perl
+distribution_type           : module
+dynamic_config              : 1
+
+requires:
+  DBI                       : 1.614
+  perl                      : 5.008001
+  version                   : 0
+build_requires:
+  DBI                       : 1.614
+  Test::More                : 0.88
+  Time::HiRes               : 0
+  version                   : 0
+configure_requires:
+  DBI                       : 1.614
+  version                   : 0
+recommends:
+  Cwd                       : 0
+  Encode                    : 0
+  File::Temp                : 0
+  Module::Signature         : 0.50
+
+provides:
+  DBD::KingBase:
+    file                    : KingBase.pm
+    version                 : 3.10.12
+  Bundle::DBD::KingBase:
+    file                    : lib/Bundle/DBD/KingBase.pm
+    version                 : 3.10.12
+
+keywords:
+  - KingBase
+  - DBI
+  - libkci
+  - dbdkingbase
+
+resources:
+  homepage                  : http://search.cpan.org/dist/DBD-KingBase/
+  license                   : http://dev.perl.org/licenses/
+  bugtracker                : http://rt.cpan.org/Public/Dist/Display.html?Name=DBD-KingBase
+  MailingList               : http://www.nntp.perl.org/group/perl.dbd.kingbase/
+
+meta-spec:
+  version                   : 1.4
+  url                       : http://module-build.sourceforge.net/META-spec-v1.4.html
+
+generated_by                : emacs

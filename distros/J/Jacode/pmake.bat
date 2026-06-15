@@ -16,17 +16,18 @@ perl -x -S $0 ${1+"$@"}
 exit
 #!perl
 #line 19
+package pmake;
 ######################################################################
 #
 # pmake - make of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
-$VERSIONE = '0.28';
-$VERSIONE = $VERSIONE;
+$PMAKE_BAT_VERSION = '0.37';
+$PMAKE_BAT_VERSION = $PMAKE_BAT_VERSION;
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
 use FindBin;
 use File::Path;
 use File::Copy;
@@ -46,12 +47,15 @@ C:\> pmake dist
 C:\> pmake ptar
 C:\> pmake xzvf
 C:\> pmake pwget
+C:\> pmake selfcheck
+C:\> pmake selfcheck --check1
+C:\> pmake selfcheck --check2
 END
     }
     elsif (1 or ($^O =~ /(?:solaris|linux)/i)) {
         die <<'END';
 
-usgae:
+usage:
 
 $ ./pmake.bat
 $ ./pmake.bat test
@@ -61,6 +65,9 @@ $ ./pmake.bat dist
 $ ./pmake.bat ptar
 $ ./pmake.bat xzvf
 $ ./pmake.bat pwget
+$ ./pmake.bat selfcheck
+$ ./pmake.bat selfcheck --check1
+$ ./pmake.bat selfcheck --check2
 
 END
     }
@@ -142,8 +149,18 @@ for my $target (@ARGV) {
     # make dist
     elsif ($target eq 'dist') {
 
+        # dist-time check flags (all ON by default)
+        my $dist_check1 = 1;
+        my $dist_check2 = 1;
+        my $dist_check3 = 1;
+        for my $arg (@ARGV) {
+            $dist_check1 = 0 if $arg eq '--no-check1';
+            $dist_check2 = 0 if $arg eq '--no-check2';
+            $dist_check3 = 0 if $arg eq '--no-check3';
+        }
+
         # your PAUSE ID here
-        my $author = q{ina <ina@cpan.org>};
+        my $author = q{ina <ina.cpan@gmail.com>};
 
         # get $name_as_filesystem
         open(FH_MANIFEST,'MANIFEST') || die "Can't open file: MANIFEST.\n";
@@ -161,8 +178,8 @@ for my $target (@ARGV) {
 
         # get $name_as_perlsyntax
         my $name_as_perlsyntax = $name_as_filesystem;
-        $name_as_perlsyntax =~ s#^lib/##;
-        $name_as_perlsyntax =~ s#\.(pl|pm)$##i;
+        $name_as_perlsyntax =~ s#^lib/(Char/)?##;
+        $name_as_perlsyntax =~ s#\.(pl|pm|bat)$##i;
         $name_as_perlsyntax =~ s#/#::#g;
         die "'NAME_AS_PERLSYNTAX' not found.\n" unless $name_as_perlsyntax;
 
@@ -207,13 +224,19 @@ for my $target (@ARGV) {
             File::Copy           2.02
             File::Path           1.0401
             FindBin              1.42
-            strict               1.01
+            IOas::CP932          0.06
+            IOas::CP932IBM       0.06
+            IOas::CP932NEC       0.06
+            IOas::CP932X         0.06
+            IOas::SJIS2004       0.06
+            Jacode4e::RoundTrip  2.13.81.8
+            UTF8::R2             0.05
         ));
         my %requires = (qw(
             perl                 5.005_03
         ));
         my %provides = ();
-        for my $file (grep /\.(pl|pm|t|bat)\z/i, @file) {
+        for my $file (grep m{\Alib/.*\.pm\z}i, @file) {
             if (open FILE, $file) {
                 while (<FILE>) {
                     chomp;
@@ -231,18 +254,46 @@ for my $target (@ARGV) {
             }
         }
         delete @requires{keys %provides};
+        if ($package eq 'Char') {
+            delete @requires{qw(
+                Ebig5hkscs
+                Ebig5plus
+                Egb18030
+                Egbk
+                Ehp15
+                Einformixv6als
+                Ekps9566
+                Euhc
+            )};
+            delete @provides{qw(
+                Esjis
+                Sjis
+            )};
+        }
+        delete $requires{'strict'};
+        delete $requires{'warnings'};
+        delete $requires{'vars'};
+        $requires{'ExtUtils::MakeMaker'} = '5.4302';
+
         #                                                12345678
         my $requires_as_makefile_pl = join "\n", map {qq{        '$_' => '$requires{$_}',}} sort keys %requires;
+
+        #                                                12345678901234567890
+        my $provides_as_makefile_pl = join ",\n", map {
+            my $f = $provides{$_};
+            qq{            '$_' => {\n                'file'    => '$f',\n                'version' => '$version',\n            }}
+        } sort keys %provides;
 
         # write Makefile.PL
         open(FH_MAKEFILEPL,'>Makefile.PL') || die "Can't open file: Makefile.PL.\n";
         binmode FH_MAKEFILEPL;
-        printf FH_MAKEFILEPL (<<'END', $package, $version, $abstract, $requires_as_makefile_pl, $author);
+        printf FH_MAKEFILEPL (<<'END', $package, $version, $abstract, $requires_as_makefile_pl, $author, $name_as_dist_on_url, $name_as_dist_on_url, $name_as_dist_on_url, $provides_as_makefile_pl);
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
+BEGIN { pop @INC if $INC[-1] eq '.' }
 use ExtUtils::MakeMaker;
 
-WriteMakefile(
+my %%args = (
     'NAME'      => q{%s},
     'VERSION'   => q{%s},
     'ABSTRACT'  => q{%s},
@@ -251,6 +302,39 @@ WriteMakefile(
     },
     'AUTHOR'    => q{%s},
 );
+
+# LICENSE was introduced in ExtUtils::MakeMaker 6.31 (2006).
+# Passing it to older versions produces an "is not a known parameter" warning
+# without failing, but we suppress the noise by checking the version.
+if ($ExtUtils::MakeMaker::VERSION >= 6.31) {
+    $args{LICENSE} = q{perl};
+}
+
+# MIN_PERL_VERSION (6.48) and META_MERGE (6.46) arrived together in the
+# same EUMM release cycle; guard them under the higher threshold (6.48)
+# so both are always either present or absent.
+if ($ExtUtils::MakeMaker::VERSION >= 6.48) {
+    $args{MIN_PERL_VERSION} = q{5.00503};
+    $args{META_MERGE} = {
+        'meta-spec' => { version => 2 },
+        'resources' => {
+            'license'    => [ 'http://dev.perl.org/licenses/' ],
+            'bugtracker' => {
+                'web' => 'https://github.com/ina-cpan/%s/issues',
+            },
+            'repository' => {
+                'url'  => 'https://github.com/ina-cpan/%s',
+                'web'  => 'https://github.com/ina-cpan/%s',
+                'type' => 'git',
+            },
+        },
+        'provides' => {
+%s
+        },
+    };
+}
+
+WriteMakefile(%%args);
 
 __END__
 END
@@ -267,7 +351,7 @@ END
         # How to fix
         # Take a look at the META.yml Spec at https://metacpan.org/pod/CPAN::Meta::History::Meta_1_4
         # (for version 1.4) or https://metacpan.org/pod/CPAN::Meta::Spec (for version 2),
-        # and change your META.yml accordingly. 
+        # and change your META.yml accordingly.
         #
         # How to escape from trap
         #
@@ -276,13 +360,13 @@ END
         #     url: http://module-build.sourceforge.net/META-spec-v1.4.html
 
         #                                      12     1234
-        my $provides_as_yml = join "\n", map {"  $_:\n    file: $provides{$_}"} sort keys %provides;
-        my $requires_as_yml = join "\n", map {"  $_: $requires{$_}"}            sort keys %requires;
+        my $provides_as_yml = join "\n", map {"  $_:\n    file: $provides{$_}\n    version: $version"} sort keys %provides;
+        my $requires_as_yml = join "\n", map {"  $_: $requires{$_}"}                                   sort keys %requires;
         #                                      12
 
         open(FH_METAYML,'>META.yml') || die "Can't open file: META.yml.\n";
         binmode FH_METAYML;
-        printf FH_METAYML (<<'END', $name_as_dist_on_url, $version, $abstract, $author, $requires_as_yml, $name_as_dist_on_url);
+        printf FH_METAYML (<<'END', $name_as_dist_on_url, $version, $abstract, $author, $pmake::PMAKE_BAT_VERSION, $requires_as_yml, $provides_as_yml, $name_as_dist_on_url, $name_as_dist_on_url);
 --- #YAML:1.0
 meta-spec:
   version: 1.4
@@ -293,13 +377,15 @@ abstract: %s
 author:
   - %s
 license: perl
-generated_by: pmake.bat
+generated_by: pmake.bat version %s
 requires:
 %s
-build_requires:
-  Test: 1.122
+minimum_perl_version: 5.00503
+provides:
+%s
 resources:
   license: http://dev.perl.org/licenses/
+  bugtracker: https://github.com/ina-cpan/%s/issues
   repository: https://github.com/ina-cpan/%s
 END
         close(FH_METAYML);
@@ -315,7 +401,7 @@ END
         # How to fix
         # Take a look at the META.json Spec at https://metacpan.org/pod/CPAN::Meta::History::Meta_1_4
         # (for version 1.4) or https://metacpan.org/pod/CPAN::Meta::Spec (for version 2),
-        # and change your META.json accordingly. 
+        # and change your META.json accordingly.
         #
         # How to escape from trap
         #
@@ -326,12 +412,12 @@ END
 
         #                                          1234567890123456
         my $requires_as_json = join ",\n", map {qq{                "$_" : "$requires{$_}"}}                            sort keys %requires;
-        my $provides_as_json = join ",\n", map {qq{        "$_" : {\n            "file" : "$provides{$_}"\n        }}} sort keys %provides;
+        my $provides_as_json = join ",\n", map {qq{        "$_" : {\n            "file" : "$provides{$_}",\n            "version" : "$version"\n        }}} sort keys %provides;
         #                                          12345678          123456789012                          12345678
 
         open(FH_METAJSON,'>META.json') || die "Can't open file: META.json.\n";
         binmode FH_METAJSON;
-        printf FH_METAJSON (<<'END', $name_as_dist_on_url, $version, $abstract, $author, $name_as_dist_on_url, $requires_as_json, $requires_as_json, $requires_as_json);
+        printf FH_METAJSON (<<'END', $name_as_dist_on_url, $version, $abstract, $author, $pmake::PMAKE_BAT_VERSION, $name_as_dist_on_url, $name_as_dist_on_url, $name_as_dist_on_url, $requires_as_json, $requires_as_json, $requires_as_json, $requires_as_json, $provides_as_json);
 {
     "name" : "%s",
     "version" : "%s",
@@ -340,7 +426,7 @@ END
         "%s"
     ],
     "dynamic_config" : 1,
-    "generated_by" : "pmake.bat",
+    "generated_by" : "pmake.bat version %s",
     "license" : [
         "perl_5"
     ],
@@ -353,8 +439,13 @@ END
         "license" : [
             "http://dev.perl.org/licenses/"
         ],
+        "bugtracker" : {
+            "web" : "https://github.com/ina-cpan/%s/issues"
+        },
         "repository" : {
-            "url" : "https://github.com/ina-cpan/%s"
+            "url"  : "https://github.com/ina-cpan/%s",
+            "web"  : "https://github.com/ina-cpan/%s",
+            "type" : "git"
         }
     },
     "prereqs" : {
@@ -372,7 +463,15 @@ END
             "requires" : {
 %s
             }
+        },
+        "test" : {
+            "requires" : {
+%s
+            }
         }
+    },
+    "provides" : {
+%s
     }
 }
 END
@@ -690,21 +789,21 @@ Definitions:
 
 -    "Package" refers to the collection of files distributed by the Copyright
      Holder, and derivatives of that collection of files created through textual
-     modification. 
+     modification.
 -    "Standard Version" refers to such a Package if it has not been modified,
      or has been modified in accordance with the wishes of the Copyright
-     Holder. 
+     Holder.
 -    "Copyright Holder" is whoever is named in the copyright or copyrights for
-     the package. 
+     the package.
 -    "You" is you, if you're thinking about copying or distributing this Package.
 -    "Reasonable copying fee" is whatever you can justify on the basis of
      media cost, duplication charges, time of people involved, and so on. (You
      will not be required to justify it to the Copyright Holder, but only to the
-     computing community at large as a market that must bear the fee.) 
+     computing community at large as a market that must bear the fee.)
 -    "Freely Available" means that no fee is charged for the item itself, though
      there may be fees involved in handling the item. It also means that
      recipients of the item may redistribute it under the same conditions they
-     received it. 
+     received it.
 
 1. You may make and give away verbatim copies of the source form of the
 Standard Version of this Package without restriction, provided that you duplicate
@@ -811,13 +910,55 @@ TO_CONTRIBUTE
         close FH_CONTRIBUTING;
         check_usascii('CONTRIBUTING');
 
+        # write SECURITY.md
+        open(FH_SECURITY,'>SECURITY.md') || die "Can't open file: SECURITY.md\n";
+        binmode FH_SECURITY;
+        print FH_SECURITY <<'TO_SECURITY';
+# Security Policy
+
+## Reporting a Vulnerability
+
+If you discover a security vulnerability in this distribution, please report
+it by e-mail to the author at ina.cpan@gmail.com.
+
+Do NOT open a public GitHub issue for security vulnerabilities.  Please use
+private e-mail so that a fix can be prepared before public disclosure.
+
+You can expect an acknowledgement within a few days.  If you do not receive
+a response within one week, please follow up.
+
+## Supported Versions
+
+Only the most recent release on CPAN is actively maintained.  Please
+upgrade to the latest version before reporting security issues.
+TO_SECURITY
+        close FH_SECURITY;
+        check_usascii('SECURITY.md');
+
+        # check source files in MANIFEST (lib/*.pm lib/*.pl t/*.t eg/*.pl bin/*.pl etc.)
+        _dist_check_sources(\@file, $dist_check1, $dist_check2);
+
+        # check the test suite for TAP plan sanity: exactly one plan line
+        # per file, plan count == number of ok/not-ok lines, and no failing
+        # tests. This runs t/*.t (and xt/*.t) in a child Perl, catching the
+        # defects that "perl t/foo.t" by hand hides but a real harness (and
+        # therefore CPAN Testers) exposes. Disable with --no-check3.
+        if ($dist_check3 and -f q{t/lib/INA_CPAN_Check.pm}) {
+            print STDERR "pmake dist: running test-suite plan self-check...\n";
+            my $rc = system($^X, q{-Ilib}, q{-It/lib}, q{-MINA_CPAN_Check},
+                            q{-e}, q{exit(INA_CPAN_Check::selfcheck_suite())});
+            if ($rc != 0) {
+                die "pmake dist aborted: test-suite plan self-check failed.\n";
+            }
+        }
+
         # make work directory
         my $dirname = (dirname($file[0]) eq 'bin') ? 'App' : dirname($file[0]);
         $dirname =~ tr#/#-#;
         my $basename = basename($file[0], '.pm','.pl','.bat');
         my $tardir = "$dirname-$basename-$version";
         $tardir =~ s#^lib-##;
-        rmtree($tardir,0,0);
+        rmtree($tardir, 0, 0);
 
         if ($^O =~ /(?:solaris|linux)/i) {
             for my $file (@file) {
@@ -865,7 +1006,7 @@ TO_CONTRIBUTE
                     copy($file, "$tardir/$file");
 
 #-----------------------------------------------------------------------------
-# Sunday December 21, 2008 07:38 PM 
+# Sunday December 21, 2008 07:38 PM
 # Fixing world writable files in tarball before upload to CPAN [ #38127 ]
 # http://use.perl.org/~bart/journal/38127 (dead link)
 # Fix CPAN uploads for world writable files
@@ -913,7 +1054,7 @@ TO_CONTRIBUTE
             syswrite FH_TAR, ($ZERO_BLOCK . $ZERO_BLOCK);
 
             close FH_TAR;
-            rmtree($tardir,0,0);
+            rmtree($tardir, 0, 0);
 
             # make *.tar.gz file
             my $gz = gzopen("$tardir.tar.gz", 'wb');
@@ -953,11 +1094,11 @@ TO_CONTRIBUTE
 #
 # ptar - tar of Perl Poor Tools
 #
-# Copyright (c) 2008, 2009, 2010, 2011, 2018, 2019, 2020, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2008, 2009, 2010, 2011, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 use strict;
-BEGIN { $INC{'warnings.pm'} = '' if $] < 5.006 }; use warnings; local $^W=1;
+BEGIN { if ($] < 5.006 && !defined(&warnings::import)) { $INC{'warnings.pm'} = 'stub'; eval 'package warnings; sub import {}' } } use warnings; local $^W=1;
 
 if (scalar(@ARGV) == 0) {
     die <<END;
@@ -999,7 +1140,7 @@ for my $gzfile (grep m/\.tar\.gz$/xmsi, @ARGV) {
         $gz->gzclose;
         close FH_TAR;
 
-        my $tar = Archive::Tar->new($tarfile,1);
+        my $tar = Archive::Tar->new($tarfile, 1);
         for my $file ($tar->list_files){
             if (-e $file) {
                 print STDERR "skip $file is already exists.\n";
@@ -1073,7 +1214,7 @@ END
                 $gz->gzclose;
                 close FH_TAR;
 
-                my $tar = Archive::Tar->new($tarfile,1);
+                my $tar = Archive::Tar->new($tarfile, 1);
                 for my $file ($tar->list_files){
                     if (-e $file) {
                         print STDERR "skip $file is already exists.\n";
@@ -1097,7 +1238,7 @@ END
 #
 # pwget - wget of Perl Poor Tools
 #
-# Copyright (c) 2011, 2018, 2019, 2020, 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2011, 2018, 2019, 2020, 2021, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 use Socket;
@@ -1192,6 +1333,22 @@ END
             close FH_WGETBAT;
             chmod 0755, 'pwget';
         }
+    }
+    # pmake selfcheck [--check1] [--check2]
+    elsif ($target eq 'selfcheck') {
+        my $do_check1 = 0;
+        my $do_check2 = 0;
+        for my $arg (@ARGV) {
+            $do_check1 = 1 if $arg eq '--check1';
+            $do_check2 = 1 if $arg eq '--check2';
+        }
+        # Default: both checks enabled when no flag is given
+        if (!$do_check1 && !$do_check2) {
+            $do_check1 = 1;
+            $do_check2 = 1;
+        }
+        _selfcheck($do_check1, $do_check2);
+        last;
     }
     else {
         warn "unknown target: $target.\n";
@@ -1313,6 +1470,556 @@ sub _runtests {
     }
 }
 
+######################################################################
+# selfcheck: Perl 5.5.3 compat (--check1) and coding style (--check2)
+#
+# These routines check pmake.bat itself.
+# All TAP harness, slurp, and scanner logic is embedded here
+# so that no external modules beyond core are required.
+######################################################################
+
+# --- Embedded TAP harness (no Test::Simple / Test::More) ---
+
+my ($SC_PLAN, $SC_RUN, $SC_FAIL) = (0, 0, 0);
+
+sub _sc_plan {
+    ($SC_PLAN, $SC_RUN, $SC_FAIL) = ($_[0], 0, 0);
+    print "1..$SC_PLAN\n" if 0;
+}
+
+sub _sc_ok {
+    my ($ok, $name) = @_;
+    $SC_RUN++;
+    $SC_FAIL++ unless $ok;
+    if (not $ok) {
+        print +($ok ? '' : 'not ') . "ok $SC_RUN"
+            . (defined $name && length $name ? " - $name" : '') . "\n";
+    }
+    return $ok;
+}
+
+sub _sc_diag {
+    for my $line (@_) {
+        print "# $line\n";
+    }
+}
+
+# --- File utilities ---
+
+sub _sc_slurp {
+    my ($path) = @_;
+    local *SC_FH;
+    open SC_FH, "< $path" or return '';
+    local $/;
+    my $c = <SC_FH>;
+    close SC_FH;
+    return defined $c ? $c : '';
+}
+
+sub _sc_slurp_lines {
+    my ($path) = @_;
+    local *SC_FH;
+    open SC_FH, "< $path" or return ();
+    my @lines = <SC_FH>;
+    close SC_FH;
+    return @lines;
+}
+
+# Mask here-document bodies, blanking each body line while keeping the
+# introducer and terminator lines so that line numbers are preserved.
+#
+# Knowledge carried over from Perl500503Syntax::OrDie: a here-doc body is
+# data, not code, and may legitimately contain post-5.005_03 example text
+# (<<>>, $+[N], //=, signatures, ...). Left unmasked, such text leaks into
+# the P/C/E/K scans and is wrongly reported. Two or more here-docs may
+# share one introducer line (e.g. "$_ = <<'A'; $x = <<'B';"), so every
+# sentinel is queued at its '<<' operator and all queued bodies are
+# consumed, in order, before the next introducer line is processed.
+#
+# Only genuine here-doc forms are recognized -- <<'TAG', <<"TAG" (space
+# allowed before the quote) and the adjacent bareword <<TAG whose TAG
+# starts with a letter or underscore. This deliberately ignores the
+# left-shift operator ($x << 2, $x <<= 1, $x << $y), which never starts a
+# here-doc. The indented <<~ form is post-5.005_03 and is not produced by
+# ina@CPAN code, so terminators are matched at column zero.
+sub _sc_mask_heredocs {
+    my ($text) = @_;
+    my @in    = split /\n/, $text, -1;
+    my @out   = ();
+    my @queue = ();
+    my $line;
+    for $line (@in) {
+        if (@queue) {
+            my $tag = $queue[0];
+            if ($line =~ /^\Q$tag\E\r?\z/) {
+                shift @queue;
+                push @out, $line;
+            }
+            else {
+                push @out, '';
+            }
+            next;
+        }
+        # Detect here-doc introducers on this line, in order. A '#' comment
+        # tail is removed first so a commented-out '<<WORD' is not mistaken
+        # for an introducer; quotes are left intact because the TAG itself
+        # may be quoted.
+        my $probe = $line;
+        $probe =~ s/\#.*\z//;
+        while ($probe =~ /<<(?:\s*'(\w+)'|\s*"(\w+)"|(\w+))/g) {
+            my $tag = defined $1 ? $1 : defined $2 ? $2 : $3;
+            if (defined $3) {
+                next unless $3 =~ /^[A-Za-z_]/;
+            }
+            push @queue, $tag;
+        }
+        push @out, $line;
+    }
+    return join "\n", @out;
+}
+
+# Strip here-doc bodies, __END__, POD, string literals, regexes, inline
+# comments from code.  Returns cleaned text suitable for pattern matching.
+# Here-doc bodies are masked first so that body text such as "__END__" or
+# "=pod" cannot derail the __END__ / POD strippers that follow.
+sub _sc_clean_code {
+    my ($text) = @_;
+    $text = _sc_mask_heredocs($text);
+    $text =~ s/\n__END__\b.*\z//s;
+    $text =~ s/^=[a-zA-Z].*?^=cut[ \t]*$//msg;
+    return $text;
+}
+
+# Scan cleaned code line-by-line; return list of {line=>N, text=>STR} hits.
+sub _sc_scan {
+    my ($text, $pattern) = @_;
+    my @hits;
+    my $lineno = 0;
+    for my $line (split /\n/, $text) {
+        $lineno++;
+        next if $line =~ /^\s*#/;
+        my $clean = $line;
+        $clean =~ s/'(?:[^'\\]|\\.)*'/''/g;
+        $clean =~ s/"(?:[^"\\]|\\.)*"/""/g;
+        # s///, m//, qr// are quote-like operators only when not preceded by
+        # an identifier character, '*', '&', ':' or "'": e.g. "keys/2/",
+        # "&s/...", "*s{...}", "Foo::s" and the apostrophe package separator
+        # "jcode's" must NOT be stripped as quote-like. (Knowledge carried
+        # over from Perl500503Syntax::OrDie.)
+        $clean =~ s{(?<![\w*&:'])(?:s|m|qr)/[^/]*/[^/]*/[gimsex]*}{}g;
+        $clean =~ s{/[^/]+/[gimsex]*}{}g;
+        $clean =~ s/#.*$//;
+        if ($clean =~ $pattern) {
+            push @hits, { line => $lineno, text => $line };
+        }
+    }
+    return @hits;
+}
+
+######################################################################
+# Check 1: Perl 5.005_03 compatibility (P1-P12)
+######################################################################
+
+sub _selfcheck_p1p12 {
+    my ($path, $code, $label) = @_;
+    my $guarded = ($code =~ /if\s*\(\s*\$\]\s*>=\s*5\./);
+
+    # P1: no bare 'use 5.006+'
+    _sc_ok($code !~ /^\s*use\s+5\.0*[6-9][0-9]*\b/m,
+        "$label P1: no bare use 5.006+");
+
+    # P2: 3-arg open guarded or absent
+    do {
+        # Scan per line, skipping comment lines and stripping quoted
+        # strings, so a 3-arg open() shown in a descriptive comment or
+        # quoted inside a diagnostic message is not mistaken for executable
+        # code. Once strings collapse to ''/"", a genuine 3-arg open still
+        # carries an empty mode-string between two commas
+        # (open($fh,'<',$f) -> open($fh,'',$f)), while a 2-arg open
+        # (open(FH,"<$file")) collapses to a single argument and is not
+        # flagged. (Masking discipline carried over from
+        # Perl500503Syntax::OrDie.)
+        my $has_3arg = 0;
+        for my $l (split /\n/, $code) {
+            next if $l =~ /^\s*#/;
+            my $s = $l;
+            $s =~ s/'(?:[^'\\]|\\.)*'/''/g;
+            $s =~ s/"(?:[^"\\]|\\.)*"/""/g;
+            $s =~ s/#.*$//;
+            if ($s =~ /\bopen\s*\(\s*(?:(?:my\s+)?\$\w+|[A-Z_][A-Z0-9_]*)\s*,\s*(?:''|"")\s*,/) {
+                $has_3arg = 1; last;
+            }
+        }
+        _sc_ok(!$has_3arg || $guarded,
+            "$label P2: 3-arg open guarded or absent");
+    };
+
+    # P3: open(my $fh...) guarded or absent
+    do {
+        # Scan per line, skipping comment lines and stripping quoted
+        # strings, so the checker's own descriptive comments and message
+        # strings are not mistaken for executable open(my $fh...) calls.
+        # (Masking discipline carried over from Perl500503Syntax::OrDie.)
+        my $has_lex = 0;
+        for my $l (split /\n/, $code) {
+            next if $l =~ /^\s*#/;
+            my $s = $l;
+            $s =~ s/'(?:[^'\\]|\\.)*'/''/g;
+            $s =~ s/"(?:[^"\\]|\\.)*"/""/g;
+            $s =~ s/#.*$//;
+            if ($s =~ /\bopen\s*[\(\s]\s*my\s+\$\w+/) { $has_lex = 1; last }
+        }
+        _sc_ok(!$has_lex || $guarded,
+            "$label P3: open(my \$fh...) guarded or absent");
+    };
+
+    # P4: use warnings guarded
+    _sc_ok($code !~ /^\s*use\s+warnings\s*;/m
+        || $code =~ /BEGIN\s*\{[^}]*warnings/,
+        "$label P4: use warnings guarded");
+
+    # P5: qr// informational (always pass)
+    _sc_ok(1, "$label P5: qr// informational (always pass)");
+
+    # P6: use parent/base guarded or absent
+    _sc_ok($code !~ /^\s*use\s+(?:parent|base)\b/m || $guarded,
+        "$label P6: use parent/base guarded or absent");
+
+    # P7: no bare 'our' declaration
+    _sc_ok($code !~ /^\s*our\s+[\$\@\%][A-Za-z]/m,
+        "$label P7: no bare 'our' declaration");
+
+    # P8: no //= operator (Perl 5.10+)
+    do {
+        # Scan per line with single/double-quoted strings and trailing
+        # comments removed so that "//=" appearing inside a string literal
+        # or a URL-like "://" is not mistaken for the 5.10 //= operator.
+        my $p8_fail = 0;
+        for my $p8_line (split /\n/, $code) {
+            next if $p8_line =~ /^\s*#/;
+            my $s = $p8_line;
+            $s =~ s/'(?:[^'\\]|\\.)*'/''/g;
+            $s =~ s/"(?:[^"\\]|\\.)*"/""/g;
+            $s =~ s/#.*$//;
+            # Strip quote-like regex operators whose delimiters are braces,
+            # brackets, parens or angles (m{...} qr{...} s{...}{...} m[...]
+            # m(...) m<...>) so a regex *pattern* such as m{//=} -- data,
+            # not an operator -- does not leak its text into the scan below.
+            # A bare /.../ is intentionally left alone: an empty-pattern
+            # match // is indistinguishable from the // of the //= operator,
+            # so stripping it would hide a real //=. (Masking discipline
+            # carried over from Perl500503Syntax::OrDie.)
+            $s =~ s/\b(?:m|qr|s)\s*\{[^{}]*\}(?:\s*\{[^{}]*\})?[a-z]*//g;
+            $s =~ s/\b(?:m|qr|s)\s*\[[^\[\]]*\](?:\s*\[[^\[\]]*\])?[a-z]*//g;
+            $s =~ s/\b(?:m|qr|s)\s*\([^()]*\)(?:\s*\([^()]*\))?[a-z]*//g;
+            $s =~ s/\b(?:m|qr|s)\s*<[^<>]*>(?:\s*<[^<>]*>)?[a-z]*//g;
+            next if $s =~ m{://};
+            # Built from single characters so this detector does not itself
+            # contain a literal defined-or-assignment token in its source.
+            if (index($s, '/' . '/' . '=') >= 0) { $p8_fail = 1; last }
+        }
+        _sc_ok(!$p8_fail,
+            "$label P8: no //= operator (Perl 5.10+)");
+    };
+
+    # P9: opendir(my $dh...) guarded or absent
+    do {
+        my $has_od_lex = 0;
+        for my $l (split /\n/, $code) {
+            next if $l =~ /^\s*#/;
+            my $s = $l;
+            $s =~ s/'(?:[^'\\]|\\.)*'/''/g;
+            $s =~ s/"(?:[^"\\]|\\.)*"/""/g;
+            $s =~ s/#.*$//;
+            if ($s =~ /\bopendir\s*[\(\s]+my\s+\$/) { $has_od_lex = 1; last }
+        }
+        _sc_ok(!$has_od_lex || $guarded,
+            "$label P9: opendir(my \$dh...) guarded or absent");
+    };
+
+    # P10: no bare say (Perl 5.10+)
+    _sc_ok($code !~ /^\s*say\s/m && $code !~ /[;{(]\s*say\s/m,
+        "$label P10: no bare say (Perl 5.10+)");
+
+    # P11: no state variable (Perl 5.10+)
+    _sc_ok($code !~ /\bstate\s+[\$\@\%]/m,
+        "$label P11: no state variable (Perl 5.10+)");
+
+    # P12: // defined-or guarded or absent
+    do {
+        # Mask single/double-quoted strings and trailing comments before
+        # scanning, so a literal "//" appearing inside a string (e.g. a
+        # diagnostic message such as "no defined-or // operator") is not
+        # mistaken for the 5.10 defined-or operator. (Masking discipline
+        # carried over from P8 and Perl500503Syntax::OrDie.)
+        my $p12_fail = 0;
+        for my $p12_line (split /\n/, $code) {
+            next if $p12_line =~ /^\s*#/;
+            my $s = $p12_line;
+            $s =~ s/'(?:[^'\\]|\\.)*'/''/g;
+            $s =~ s/"(?:[^"\\]|\\.)*"/""/g;
+            $s =~ s/#.*$//;
+            next if $s =~ /=~\s*[sm]?\//;
+            # split/grep/map are regex-introducing list operators: an empty
+            # pattern (as the first argument) immediately after one of them
+            # is a pattern, never the 5.10 defined-or operator. (Knowledge
+            # carried over from Perl500503Syntax::OrDie.)
+            next if $s =~ /\b(?:split|grep|map)\s*\/\//;
+            next if $s =~ m{://};
+            if ($s =~ m{\s//[^/=]}) { $p12_fail = 1; last }
+        }
+        _sc_ok(!$p12_fail || $guarded,
+            "$label P12: defined-or operator guarded or absent");
+    };
+}
+
+######################################################################
+# Check 2: ina@CPAN coding style (C-subset + E + K1-K3)
+######################################################################
+
+sub _selfcheck_style {
+    my ($path, $raw_text, $code, $label) = @_;
+
+    # C1: US-ASCII only (entire file, raw bytes)
+    do {
+        local *SC_ASCII_FH;
+        my $bad = 0;
+        if (open SC_ASCII_FH, "< $path") {
+            binmode SC_ASCII_FH;
+            while (<SC_ASCII_FH>) {
+                if (/[^\x00-\x7F]/) { $bad = 1; last }
+            }
+            close SC_ASCII_FH;
+        }
+        else {
+            $bad = 1;
+        }
+        _sc_ok(!$bad, "$label C1: US-ASCII only");
+    };
+
+    # C2: no trailing whitespace
+    do {
+        my @lines = split /\n/, $raw_text;
+        my @bad;
+        my $n = 0;
+        for my $line (@lines) {
+            $n++;
+            # A 0x20/0x09 byte at end of line may be the trailing byte of a
+            # double-byte (Shift_JIS/EUC-JP/...) character rather than real
+            # whitespace, so the byte pattern /[ \t]+$/ is unreliable on
+            # non-US-ASCII lines; skip them. (Knowledge carried over from
+            # Perl500503Syntax::OrDie; ina@CPAN sources are US-ASCII by the
+            # C1 house rule, so this only affects external multibyte files.)
+            next if $line =~ /[^\x00-\x7F]/;
+            push @bad, $n if $line =~ /[ \t]+\r?$/;
+        }
+        _sc_ok(!@bad,
+            "$label C2: no trailing whitespace"
+            . (@bad ? " (lines: @bad[0..(@bad<3?$#bad:2)])" : ''));
+    };
+
+    # C3: ends with newline
+    _sc_ok(length($raw_text) && substr($raw_text, -1) eq "\n",
+        "$label C3: ends with newline");
+
+    # E: no '} else/elsif' on same line
+    do {
+        my @hits = _sc_scan($code, qr/^\s*\}\s*els(?:e|if)\b/);
+        _sc_ok(!@hits,
+            "$label E: no '} else/elsif' on same line"
+            . (@hits ? " (lines: " . join(', ', map { $_->{line} } @hits[0..(@hits<3?$#hits:2)]) . ")" : ''));
+    };
+
+    # K1: comma followed by space
+    do {
+        my @k1_bad;
+        my $lineno = 0;
+        for my $raw_line (split /\n/, $code) {
+            $lineno++;
+            my $s = $raw_line;
+            $s =~ s/^\s*#.*$//; next unless $s =~ /\S/;
+            $s =~ s/'(?:[^'\\]|\\.)*'/''/g;
+            $s =~ s/"(?:[^"\\]|\\.)*"/""/g;
+            # Also strip q{} and qq{} literals (content may contain commas)
+            $s =~ s/\bqq\{[^}]*\}/""/g;
+            $s =~ s/\bq\{[^}]*\}/''/g;
+            $s =~ s{(?<![\w*&:'])(?:s|m|qr|split\s*/)[^/]*/[^/]*/[gimsex]*}{}g;
+            $s =~ s{/[^/]+/[gimsex]*}{}g;
+            $s =~ s/#.*$//;
+            # Allow comma immediately before $ (variable) or '' "" (empty string after strip)
+            # and before quote characters (residue of stripped strings)
+            if ($s =~ /,(?=[^\s\n\)\]\}\/'"\$])/) {
+                push @k1_bad, $lineno;
+            }
+        }
+        _sc_ok(!@k1_bad,
+            "$label K1: comma followed by space"
+            . (@k1_bad ? " (lines: @k1_bad[0..(@k1_bad<3?$#k1_bad:2)])" : ''));
+    };
+
+    # K2: \@array should be [ @array ]
+    do {
+        my @k2_bad;
+        my $lineno = 0;
+        for my $line (split /\n/, $code) {
+            $lineno++;
+            next if $line =~ /^\s*#/;
+            my $cl = $line;
+            $cl =~ s/'[^']*'//g; $cl =~ s/"[^"]*"//g;
+            $cl =~ s/#.*$//;
+            if ($cl =~ /(?:push|unshift|return|=)\s*\\\@\w/) {
+                push @k2_bad, $lineno;
+            }
+        }
+        _sc_ok(!@k2_bad,
+            "$label K2: use [ \@array ] instead of \\\@array"
+            . (@k2_bad ? " (lines: @k2_bad[0..(@k2_bad<3?$#k2_bad:2)])" : ''));
+    };
+
+    # K3: \%hash should be { %hash }  (exempt: \%env \%opts \%args)
+    do {
+        my $k3_exempt = 'env\b|opts\b|args\b';
+        my @k3_bad;
+        my $lineno = 0;
+        for my $line (split /\n/, $code) {
+            $lineno++;
+            next if $line =~ /^\s*#/;
+            my $cl = $line;
+            $cl =~ s/'[^']*'//g; $cl =~ s/"[^"]*"//g;
+            $cl =~ s/#.*$//;
+            if ($cl =~ /\\\%(?!$k3_exempt)\w+/) {
+                push @k3_bad, $lineno;
+            }
+        }
+        _sc_ok(!@k3_bad,
+            "$label K3: use { \%hash } instead of \\\%hash"
+            . (@k3_bad ? " (lines: @k3_bad[0..(@k3_bad<3?$#k3_bad:2)])" : ''));
+    };
+}
+
+######################################################################
+# _selfcheck: entry point called by 'pmake selfcheck'
+######################################################################
+
+######################################################################
+# _dist_check_sources: called from 'pmake dist' to check MANIFEST
+# source files with check1 (Perl 5.5.3 compat) and/or check2 (style).
+# Dies on any failure to abort dist.
+######################################################################
+
+sub _dist_check_sources {
+    my ($files_ref, $do_check1, $do_check2) = @_;
+    return unless $do_check1 || $do_check2;
+
+    # Target: lib/*.pm, lib/*.pl, t/*.t, t/lib/*.pm, xt/*.t, eg/*.pl, bin/*.pl, bin/*.pm
+    my @targets = grep {
+        /^lib\/.*\.(pm|pl)$/i
+        || /^t\/.*\.t$/i
+        || /^t\/lib\/.+\.pm$/i
+        || /^xt\/.*\.t$/i
+        || /^eg\/.*\.pl$/i
+        || /^bin\/.*\.(pl|pm)$/i
+    } @{$files_ref};
+
+    # Scope for the Jacode distribution. Unlike the mb house rule
+    # (US-ASCII sources), Jacode's sources are UTF-8: lib/jacode.pl
+    # mandates UTF-8 at its own runtime (line 2) and t/9020 verifies it.
+    # lib/jacode.pl is also the jcode.pl-derived core and carries the Ken
+    # Lunde CJKV byte tables (comma-packed -> K1) and historical POD
+    # (-> C2), and every t/*.t embeds a UTF-8 self-check (-> C1) and uses
+    # the older jcode.pl idiom (e.g. "} else {" -> E). These are
+    # established Jacode conventions, not defects; the test files carry
+    # their own dedicated quality checks (t/9020 encoding, t/9050 + t/9051
+    # POD, t/9030 warnings, t/9040 round-trip). So the ina@CPAN US-ASCII
+    # house-style scan is applied only to the small pure-ASCII wrapper
+    # lib/Jacode.pm. (Without this scope the UTF-8 core and every test
+    # false-fail C1 and abort an otherwise valid dist.)
+    @targets = grep {
+        !m{^lib/jacode\.pl$}i
+        && !m{^t/.*\.t$}i
+    } @targets;
+
+    @targets = grep { -f $_ } @targets;
+
+    return unless @targets;
+
+    my $total = scalar(@targets) * (($do_check1 ? 12 : 0) + ($do_check2 ? 7 : 0));
+    print STDERR "pmake dist: running selfcheck on " . scalar(@targets) . " source file(s)...\n";
+
+    $SC_PLAN = 0; $SC_RUN = 0; $SC_FAIL = 0;
+    _sc_plan($total);
+
+    for my $f (sort @targets) {
+        my $raw_text = _sc_slurp($f);
+        unless (length $raw_text) {
+            print STDERR "# WARNING: cannot read $f, skipping\n";
+            next;
+        }
+        my $code  = _sc_clean_code($raw_text);
+        my $label = $f;
+        _selfcheck_p1p12($f, $code, $label) if $do_check1;
+        _selfcheck_style($f, $raw_text, $code, $label) if $do_check2;
+    }
+
+    if ($SC_FAIL) {
+        printf STDERR ("pmake dist: selfcheck FAIL -- %d/%d tests failed.\n",
+            $SC_FAIL, $SC_RUN);
+        die "pmake dist aborted: source check failed.\n";
+    }
+    else {
+        printf STDERR ("pmake dist: selfcheck PASS -- %d/%d ok.\n",
+            $SC_RUN, $SC_RUN);
+    }
+}
+
+sub _selfcheck {
+    my ($do_check1, $do_check2) = @_;
+
+    # Resolve path to this script
+    my $path = $0;
+    # On Windows, perl -x -S sets $0 to the script name; use FindBin as fallback
+    unless (-f $path) {
+        $path = "$FindBin::RealBin/$FindBin::RealScript";
+    }
+    $path =~ s{\\}{/}g;
+
+    my $raw_text = _sc_slurp($path);
+    unless (length $raw_text) {
+        print "# Cannot read $path\n";
+        print "1..0 # SKIP cannot read script file\n";
+        return;
+    }
+    my $code = _sc_clean_code($raw_text);
+
+    my $label  = 'pmake.bat';
+    my $n_p1p12 = 12;    # P1-P12
+    my $n_style = 7;     # C1+C2+C3+E+K1+K2+K3
+
+    my $total = 0;
+    $total += $n_p1p12 if $do_check1;
+    $total += $n_style if $do_check2;
+
+    _sc_plan($total);
+
+    if ($do_check1) {
+        _sc_diag("--- Check 1: Perl 5.005_03 compatibility (P1-P12) ---");
+        _selfcheck_p1p12($path, $code, $label);
+    }
+    if ($do_check2) {
+        _sc_diag("--- Check 2: ina\@CPAN coding style (C1-C3, E, K1-K3) ---");
+        _selfcheck_style($path, $raw_text, $code, $label);
+    }
+
+    if ($SC_FAIL) {
+        printf("# Result: FAIL (%d/%d failed)\n", $SC_FAIL, $SC_RUN);
+        exit 1;
+    }
+    else {
+        printf("# Result: PASS (%d/%d ok)\n", $SC_RUN, $SC_RUN);
+        exit 0;
+    }
+}
+
 sub check_usascii {
     my($file) = @_;
     if (open(FILE,$file)) {
@@ -1346,6 +2053,18 @@ pmake - make of Perl Poor Tools
   pmake.bat ptar
   pmake.bat xzvf
   pmake.bat pwget
+  pmake.bat selfcheck
+  pmake.bat selfcheck --check1
+  pmake.bat selfcheck --check2
+
+=head1 ABSTRACT
+
+pmake.bat is a portable Perl-based build tool used across ina's CPAN
+distributions. It provides test, xtest, install, dist, ptar, xzvf, and
+pwget targets, requiring only core Perl modules.
+
+This distribution is the canonical unified source for pmake.bat, replacing
+the per-distribution copies formerly shipped inside each ina CPAN package.
 
 =head1 DEPENDENCIES
 
@@ -1353,7 +2072,7 @@ This software requires perl5.00503 or later.
 
 =head1 AUTHOR
 
-INABA Hitoshi E<lt>ina@cpan.orgE<gt> in a CPAN
+INABA Hitoshi E<lt>ina.cpan@gmail.comE<gt> in a CPAN
 
 This project was originated by INABA Hitoshi.
 

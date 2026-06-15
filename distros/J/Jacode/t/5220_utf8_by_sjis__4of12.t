@@ -2,7 +2,7 @@
 #
 # t/5220_utf8_by_sjis__4of12.t
 #
-# Copyright (c) 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2019 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 use strict;

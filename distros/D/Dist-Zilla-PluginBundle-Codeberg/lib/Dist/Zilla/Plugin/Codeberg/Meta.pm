@@ -1,9 +1,11 @@
-package Dist::Zilla::Plugin::Codeberg::Meta 2.0000;
+package Dist::Zilla::Plugin::Codeberg::Meta 2.0100;
 
 use Modern::Perl;
 use JSON::MaybeXS;
 use URL::Encode qw(url_encode_utf8);
 use Moose;
+
+our $AUTHORITY = 'cpan:GEEKRUTH';    # AUTHORITY
 
 extends 'Dist::Zilla::Plugin::Codeberg';
 with 'Dist::Zilla::Role::MetaProvider';
@@ -59,13 +61,12 @@ sub metadata {
 
    my $repo_name = $self->_get_repo_name;
    return {} if ( !$repo_name );
-   my $encoded_repo = url_encode_utf8($repo_name);
-
-   my $http = HTTP::Tiny->new;
+   my $encoded_repo = $repo_name;        # url_encode_utf8($repo_name);
+   my $http         = HTTP::Tiny->new;
 
    $self->log('Getting Codeberg repository info');
 
-   my $url = $self->api . "/projects/$encoded_repo";
+   my $url = $self->api . "/repos/$encoded_repo";
    $self->log_debug("Sending GET $url");
    my $response
       = $http->request( 'GET', $url, { headers => $self->_auth_headers } );
@@ -77,7 +78,7 @@ sub metadata {
 
    if ( !$offline && $self->fork && defined $repo->{forked_from_project} ) {
       my $parent = $repo->{forked_from_project}{path_with_namespace};
-      $url      = $self->api . '/projects/' . url_encode_utf8($parent);
+      $url      = $self->api . '/repos/' . url_encode_utf8($parent);
       $response = $http->request( 'GET', $url );
 
       $repo = $self->_check_response($response);
@@ -88,15 +89,15 @@ sub metadata {
 
    $html_url
       = $offline
-      ? "https://Codeberg.org/$repo_name"
-      : $repo->{web_url};
+      ? "https://codeberg.org/$repo_name"
+      : $repo->{url};
 
    $git_url
       = $offline
-      ? "git://Codeberg.org/$repo_name.git"
-      : $repo->{http_url_to_repo};
+      ? "git://git\@codeberg.org/$repo_name.git"
+      : $repo->{ssh_url};
 
-   if ( !$offline && $repo->{issues_enabled} == JSON->true() ) {
+   if ( !$offline && $repo->{has_issues} == JSON->true() ) {
       $bugtracker = "$html_url/-/issues";
    }
 
@@ -145,7 +146,7 @@ Dist::Zilla::Plugin::Codeberg::Meta - Add a Codeberg repo's info to META.{yml,js
 
 =head1 VERSION
 
-version 2.0000
+version 2.0100
 
 =head1 SYNOPSIS
 

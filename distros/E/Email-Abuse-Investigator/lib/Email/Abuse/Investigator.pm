@@ -14,7 +14,7 @@ use MIME::QuotedPrint qw( decode_qp );
 use MIME::Base64 qw( decode_base64 );
 use Object::Configure;
 use Params::Get;
-use Params::Validate::Strict;
+use Params::Validate::Strict 0.34;
 use Readonly;
 use Readonly::Values::Months;
 use Socket qw( inet_aton inet_ntoa AF_INET );
@@ -27,11 +27,11 @@ hosted URLs, and suspicious domains
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 
@@ -199,6 +199,9 @@ Readonly::Scalar my $DEFAULT_TIMEOUT   => 10;
 # Maximum role string length before truncation
 Readonly::Scalar my $ROLE_WRAP_LEN     => 66;
 
+# Maximum redirect hops to follow when resolving shortener/redirect-cloaker URLs
+Readonly::Scalar my $REDIRECT_MAX_HOPS => 3;
+
 # Brand names checked in lookalike-domain detection.
 # Overridable at runtime via Object::Configure.
 Readonly::Array my @LOOKALIKE_BRANDS => qw(
@@ -263,6 +266,8 @@ my %TRUSTED_DOMAINS = map { $_ => 1 } qw(
 	gmail.com googlemail.com yahoo.com outlook.com hotmail.com
 	google.com microsoft.com apple.com amazon.com
 	googlegroups.com groups.google.com
+	fonts.googleapis.com fonts.gstatic.com
+	ajax.googleapis.com maps.googleapis.com
 	w3.org
 	fedex.com ups.com dhl.com usps.com royalmail.com
 );
@@ -278,6 +283,29 @@ my %URL_SHORTENERS = map { $_ => 1 } qw(
 	shorturl.at bl.ink      smarturl.it  yourls.org   clicky.me
 	snip.ly     adf.ly      bc.vc        lnkd.in      fb.me
 	youtu.be
+);
+
+# Cloud object-stores and CDN hosting paths commonly abused to serve redirect
+# pages that hide the real phishing destination (same evasion as a URL shortener
+# but using legitimate cloud infrastructure to pass spam filters).
+# Exact-match hosts; suffix patterns are in @REDIRECT_HOST_SUFFIXES below.
+my %REDIRECT_HOSTS = map { $_ => 1 } qw(
+	storage.googleapis.com
+	blob.core.windows.net
+	pages.dev
+	firebaseapp.com
+	web.app
+);
+
+# Subdomain-suffix patterns for bucket-style hosting (e.g. mybucket.s3.amazonaws.com).
+# Checked by _is_redirect_cloaker() using a suffix match against the bare hostname.
+Readonly::Array my @REDIRECT_HOST_SUFFIXES => qw(
+	.s3.amazonaws.com
+	.s3-website.amazonaws.com
+	.cloudfront.net
+	.github.io
+	.firebaseapp.com
+	.web.app
 );
 
 # -----------------------------------------------------------------------
@@ -296,7 +324,8 @@ my %PROVIDER_ABUSE = (
 	'1e100.net'         => { email => 'abuse@google.com',      note => 'Google infrastructure' },
 	'blogspot.com'      => { email => 'abuse@google.com',      note => 'Blogger/Blogspot -- report via https://support.google.com/blogger/answer/76315' },
 	'blogger.com'       => { email => 'abuse@google.com',      note => 'Blogger platform abuse' },
-	'sites.google.com'  => { email => 'abuse@google.com',      note => 'Google Sites hosted content' },
+	'sites.google.com'        => { email => 'abuse@google.com',               note => 'Google Sites hosted content' },
+	'storage.googleapis.com'  => { email => 'google-cloud-compliance@google.com', note => 'Google Cloud Storage bucket abuse -- also report via https://support.google.com/code/go/gce_abuse_report' },
 	# Microsoft
 	'microsoft.com'     => { email => 'abuse@microsoft.com',   note => 'Also report via https://www.microsoft.com/en-us/wdsi/support/report-unsafe-site' },
 	'outlook.com'       => { email => 'abuse@microsoft.com',   note => 'Report Outlook spam: https://support.microsoft.com/en-us/office/report-phishing' },
@@ -861,6 +890,16 @@ are cached in the object and in the cross-message CHI cache.
 
 Only C<http://> and C<https://> URLs are extracted.  URL shortener hosts
 are included in the returned list (they are flagged by C<risk_assessment()>).
+
+When L<LWP::UserAgent> is available, URLs whose host is a known URL shortener
+or cloud-storage redirect cloaker (Google Cloud Storage C<storage.googleapis.com>,
+Azure Blob Storage C<blob.core.windows.net>, Cloudflare Pages C<pages.dev>,
+S3 buckets, CloudFront distributions, etc.) are automatically resolved by
+following HTTP 3xx redirects and HTML C<meta http-equiv="refresh"> or
+C<window.location> patterns up to C<$REDIRECT_MAX_HOPS> hops.  The resolved
+destination URL is added to the returned list alongside the original, so abuse
+contacts for the real phishing target are always reported even when the email
+body contains only an object-store redirect URL.
 
 =head3 API Specification
 
@@ -1595,11 +1634,12 @@ sub _risk_check_identity :Private {
 
 sub _risk_check_urls_and_domains :Private {
 	my ($self, $flag) = @_;
-	my (%shortener_seen, %url_host_seen);
+	my (%shortener_seen, %cloaker_seen, %url_host_seen);
 
 	for my $u ($self->embedded_urls()) {
 		# Skip trusted infrastructure -- these are not spam indicators
 		my $bare = lc $u->{host};
+		next unless defined($bare);
 		$bare =~ s/^www\.//;
 		next if $self->{trusted_domains}->{$bare};
 		next if $TRUSTED_DOMAINS{$bare};
@@ -1608,6 +1648,11 @@ sub _risk_check_urls_and_domains :Private {
 		if(($URL_SHORTENERS{$bare} || $self->{url_shorteners}->{$bare}) && !$shortener_seen{$bare}++) {
 			$flag->('MEDIUM', 'url_shortener',
 				"$u->{host} is a URL shortener -- the real destination is hidden");
+		}
+		# Cloud object-store / CDN used as a redirect cloaker
+		if ($self->_is_redirect_cloaker($bare) && !$cloaker_seen{$bare}++) {
+			$flag->('MEDIUM', 'redirect_cloaker',
+				"$u->{host} is a cloud storage or CDN host used as a redirect cloaker -- the real phishing destination is hidden behind a client-side redirect");
 		}
 		# Plain HTTP provides no encryption
 		if ($u->{url} =~ m{^http://}i && !$url_host_seen{ $u->{host} }++) {
@@ -1733,6 +1778,22 @@ sub abuse_report_text {
 			'';
 	}
 
+	# List every reported URL so the receiving abuse desk knows exactly
+	# which resources to investigate or suspend.
+	my @urls = $self->embedded_urls();
+	if (@urls) {
+		push @out, 'REPORTED URLs:';
+		for my $u (@urls) {
+			push @out, '  ' . _sanitise_output($u->{url});
+			my @meta;
+			push @meta, "host: $u->{host}"   if $u->{host};
+			push @meta, "IP: $u->{ip}"       if $u->{ip} && $u->{ip} ne '(unresolved)';
+			push @meta, "org: $u->{org}"     if $u->{org} && $u->{org} ne '(unknown)';
+			push @out, '    (' . join('  ', @meta) . ')' if @meta;
+		}
+		push @out, '';
+	}
+
 	# Email abuse contacts
 	my @contacts = $self->abuse_contacts();
 	if (@contacts) {
@@ -1804,8 +1865,10 @@ if not already cached.
 
 =head3 Notes
 
-The result is not independently cached; each call recomputes the contact
-list from the cached results of the underlying methods.
+The result is cached on the object; subsequent calls return the same list
+without repeating the contact-collection logic.  The underlying per-IP and
+per-domain lookups are themselves cached by C<originating_ip()>,
+C<embedded_urls()>, and C<mailto_domains()>.
 
 =head3 API Specification
 
@@ -1882,15 +1945,32 @@ sub _compute_abuse_contacts :Private {
 			} @ordered_roles;
 			my $joined = join(' and ', @display);
 
-			# Summarise if the merged string is too long to read
+			# Summarise if the merged string is too long to read.
+			# "URL host: hostname" entries are grouped by listing the actual
+			# hostnames so the summary is actionable (e.g. "URL host: a.example,
+			# b.example" rather than the unhelpful "URL host, URL host").
+			# All other role types fall back to stripping at the first [:(\d]
+			# boundary to produce a compact type label.
 			if (length($joined) > $ROLE_MAX_LEN) {
-				my @short;
-				for (@display) {
-					(my $s = $_) =~ s/[:(\d].*//;
-					$s =~ s/\s+$//;
-					push @short, $s;
+				my (@url_hosts, %seen_short, @short);
+				for my $r (@display) {
+					if ($r =~ /^URL host:\s*(.+)$/) {
+						push @url_hosts, $1;
+					} else {
+						(my $s = $r) =~ s/[:(\d].*//;
+						$s =~ s/\s+$//;
+						push @short, $s unless $seen_short{$s}++;
+					}
 				}
-				$joined = scalar(@display) . ' routes: ' . join(', ', @short);
+				my @parts;
+				if (@url_hosts) {
+					my $extra = @url_hosts > 3
+						? ' and ' . (@url_hosts - 3) . ' more' : '';
+					my @shown = @url_hosts > 3 ? @url_hosts[0..2] : @url_hosts;
+					push @parts, 'URL host: ' . join(', ', @shown) . $extra;
+				}
+				push @parts, @short;
+				$joined = scalar(@display) . ' routes: ' . join(', ', @parts);
 			}
 			$entry->{role} = $joined;
 			return;
@@ -2999,7 +3079,26 @@ sub _extract_and_resolve_urls :Private {
 	# Collect unique URLs from body
 	my @urls = grep { !$url_seen{$_}++ } $self->_extract_http_urls($combined);
 
-	# Extract unique hostnames for parallel DNS resolution
+	# For URL-shortener and redirect-cloaker hosts, follow the redirect chain to
+	# discover the real destination (e.g. GCS bucket → phishing landing page).
+	# Done before DNS resolution so that destination hostnames can be parallelised.
+	# _follow_redirect_chain() is a :Protected seam that handles LWP availability
+	# internally — do not guard this block with $HAS_LWP so the seam can be
+	# stubbed unconditionally in tests regardless of whether LWP is installed.
+	for my $url (@urls) {
+		my ($host) = $url =~ m{https?://([^/:?\s#]+)}i;
+		next unless $host;
+		my $bare = lc $host;
+		$bare =~ s/^www\.//;
+		next unless $URL_SHORTENERS{$bare}
+		         || ($self->{url_shorteners} && $self->{url_shorteners}{$bare})
+		         || $self->_is_redirect_cloaker($bare);
+		my $dest = $self->_follow_redirect_chain($url);
+		next unless defined $dest && !$url_seen{$dest}++;
+		push @urls, $dest;
+	}
+
+	# Extract unique hostnames for parallel DNS resolution (including redirect destinations)
 	my %hostname_needed;
 	for my $url (@urls) {
 		my ($host) = $url =~ m{https?://([^/:?\s#]+)}i;
@@ -3051,6 +3150,134 @@ sub _extract_and_resolve_urls :Private {
 		push @results, { url => $url, host => $host, %{ $host_cache{$host} } };
 	}
 	return \@results;
+}
+
+# _is_redirect_cloaker( $bare_host ) -> bool
+#
+# Purpose:
+#   Return true if $bare_host is a known cloud-storage or CDN host that is
+#   commonly abused to serve client-side redirect pages hiding the real
+#   phishing destination.  Checks the exact-match %REDIRECT_HOSTS table and
+#   the suffix patterns in @REDIRECT_HOST_SUFFIXES.
+#
+# Entry criteria:
+#   $bare_host -- lowercase hostname with any leading "www." already stripped.
+#
+# Exit status:
+#   Returns 1 (true) or empty string (false).
+
+sub _is_redirect_cloaker :Private {
+	my (undef, $host) = @_;
+	return 1 if $REDIRECT_HOSTS{$host};
+	for my $suffix (@REDIRECT_HOST_SUFFIXES) {
+		return 1 if length($host) > length($suffix)
+		         && substr($host, -length($suffix)) eq $suffix;
+	}
+	return '';
+}
+
+# _follow_redirect_chain( $url ) -> $final_url | undef
+#
+# Purpose:
+#   Follow up to $REDIRECT_MAX_HOPS HTTP hops for a given URL and return the
+#   final destination.  Detects HTTP 3xx Location: redirects, HTML
+#   <meta http-equiv="refresh" content="...url=..."> tags, and
+#   window.location.replace() / window.location.href JavaScript patterns.
+#   Used to expose the real phishing landing page hidden behind a cloud
+#   object-store redirect page (e.g. a GCS bucket containing only a
+#   meta-refresh pointing to the attacker-controlled domain).
+#
+# Entry criteria:
+#   $url  -- an https?:// URL string whose host has already been identified
+#             as a URL shortener or redirect cloaker.
+#   LWP::UserAgent must be installed ($HAS_LWP must be true).
+#
+# Exit status:
+#   Returns the first URL that differs from the input after following the
+#   chain, or undef if no redirect was found or LWP is unavailable.
+#   Never returns the input $url unchanged.
+#
+# Side effects:
+#   Up to $REDIRECT_MAX_HOPS HTTP GET requests.
+#   Successful result cached in the cross-message CHI cache keyed
+#   "redirect:<url>" to avoid re-fetching across messages.
+
+sub _follow_redirect_chain :Protected {
+	my ($self, $url) = @_;
+	return undef unless $HAS_LWP;
+
+	# Serve from cache when available
+	if ($_cache) {
+		my $cached = $_cache->get("redirect:$url");
+		return $cached if defined $cached;
+	}
+
+	# Dedicated no-follow UA so we can inspect each redirect hop manually.
+	# Stored separately from the RDAP UA ($self->{ua}) which needs auto-follow.
+	unless (defined $self->{_ua_nofollow}) {
+		my $ua = LWP::UserAgent->new(
+			timeout      => $self->{timeout},
+			agent        => "Email-Abuse-Investigator/$VERSION",
+			max_redirect => 0,
+		);
+		if ($HAS_CONN_CACHE) {
+			my $cc = LWP::ConnCache->new();
+			$cc->total_capacity(4);
+			$ua->conn_cache($cc);
+		}
+		$ua->env_proxy(1);
+		$self->{_ua_nofollow} = $ua;
+	}
+	my $ua = $self->{_ua_nofollow};
+
+	my $current = $url;
+	my $final;
+	for my $hop (1 .. $REDIRECT_MAX_HOPS) {
+		my $res = eval { $ua->get($current) };
+		last unless $res;
+
+		if ($res->is_redirect()) {
+			# HTTP 3xx: extract Location header
+			my $loc = $res->header('Location');
+			last unless defined $loc;
+
+			# Resolve relative Location URLs against the current base
+			if ($loc !~ m{^https?://}i) {
+				require URI;
+				$loc = URI->new_abs($loc, $current)->as_string();
+			}
+			$final   = $loc;
+			$current = $loc;
+
+		} elsif ($res->is_success()) {
+			# 2xx: inspect body for client-side redirect patterns
+			my $body = $res->decoded_content() // '';
+			my $dest;
+
+			# <meta http-equiv="refresh" content="N; url=https://...">
+			if ($body =~ m{<meta[^>]+http-equiv\s*=\s*["']?refresh["']?[^>]+
+			                content\s*=\s*["'][^"']*url\s*=\s*(https?://[^"'\s>]+)}xi) {
+				$dest = $1;
+			}
+			# window.location.replace("...") or window.location.href = "..."
+			elsif ($body =~ m{window\.location(?:\.replace\s*\(\s*|\.href\s*=\s*)
+			                   ["'](https?://[^"']+)["']}xi) {
+				$dest = $1;
+			}
+
+			last unless defined $dest;
+			$final   = $dest;
+			$current = $dest;
+
+		} else {
+			last;
+		}
+	}
+
+	# Cache for reuse across messages in this session
+	$_cache->set("redirect:$url", $final) if $_cache && defined $final;
+
+	return $final;
 }
 
 # _parallel_resolve_hosts( \%hostnames, \%cache )
@@ -3378,7 +3605,10 @@ sub _analyse_domain :Private {
 		# --- NS record -> DNS hosting ---
 		my $nsq = $res->search($domain, 'NS');
 		if ($nsq) {
-			my ($first) = grep { $_->type eq 'NS' } $nsq->answer;
+			# Sort alphabetically so DNS round-robin ordering never changes which
+		# nameserver we record -- both runs of the same domain always agree.
+		my ($first) = sort { $a->nsdname cmp $b->nsdname }
+		              grep { $_->type eq 'NS' } $nsq->answer;
 			if ($first) {
 				(my $ns_host = lc $first->nsdname) =~ s/\.$//;
 				$info{ns_host} = $ns_host;
@@ -4021,19 +4251,59 @@ sub _enrich_ip :Private {
 # Purpose:
 #   Return the value of the first header matching the given lower-cased
 #   header name.
-=head2 header_value
+=head2 header_value( $name )
 
 Returns the value of the first occurrence of a named header field, or
 C<undef> if the header is absent.  The name comparison is case-insensitive.
 
-=head3 API SPECIFICATION
+=head3 Usage
 
-  Input:  name => Str  (required) - header field name, e.g. 'Subject'
-  Output: Str | undef
+    my $subj = $analyser->header_value('Subject');
+    my $from  = $analyser->header_value('From');
+    my $msgid = $analyser->header_value('Message-ID');
 
-=head3 MESSAGES
+=head3 Arguments
 
-  (none - returns undef on missing header, never throws)
+=over 4
+
+=item C<$name> (string, required)
+
+The header field name, e.g. C<'Subject'>, C<'From'>, C<'X-Mailer'>.
+Comparison is case-insensitive.
+
+=back
+
+=head3 Returns
+
+The raw header value string (not decoded), or C<undef> if the named header
+is not present.  When the same header appears more than once, only the value
+of the first occurrence is returned.
+
+=head3 Side Effects
+
+None.  Header data is pre-parsed during C<parse_email()>.
+
+=head3 Notes
+
+Header values are returned verbatim, including any MIME encoded-word sequences
+(C<=?charset?B/Q?...?=>).  Pass the result through C<_decode_mime_words()>
+internally if human-readable output is needed.
+
+=head3 API Specification
+
+=head4 Input
+
+    {
+        name => { type => 'string', required => 1 },
+    }
+
+=head4 Output
+
+    { type => [ 'string', 'undef' ] }
+
+=head3 Messages
+
+None -- returns C<undef> on a missing header, never throws.
 
 =cut
 
@@ -4393,9 +4663,14 @@ The following are optional but strongly recommended:
 
     Net::DNS            -- enables MX, NS, AAAA record lookups
     LWP::UserAgent      -- enables RDAP (faster and richer than raw WHOIS)
-    HTML::LinkExtor     -- enables structural HTML link extraction
+                          and following redirect chains for URL shorteners
+                          and cloud-storage redirect cloakers
+    LWP::ConnCache      -- enables HTTP connection reuse (used with LWP::UserAgent)
+    HTML::LinkExtor     -- enables structural HTML link extraction with entity decoding
     CHI                 -- enables cross-message IP/domain result caching
     IO::Socket::IP      -- enables IPv6 WHOIS connections
+    Domain::PublicSuffix -- enables accurate eTLD+1 domain normalisation
+    AnyEvent::DNS       -- enables parallel DNS resolution for multiple URL hosts
 
 =head1 LIMITATIONS
 

@@ -29,5 +29,5 @@ resources:
   bugtracker: https://github.com/Apertur-dev/apertur-perl/issues
   homepage: https://apertur.ca
   repository: https://github.com/Apertur-dev/apertur-perl.git
-version: '0.02'
+version: '0.16'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

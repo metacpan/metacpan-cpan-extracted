@@ -29,17 +29,19 @@ developer to copy and paste into their code.
 
 # RECENT CHANGES
 
-Changes for version v0.6.4 (2026-04-08)
+Changes for version v0.6.5 (2026-06-15)
 
 - Documentation
-    - Removed separate INSTALL file.
-    - Fixed broken Changes file.
-    - Updated copyright year.
+    - Removed CONTRIBUTING.md due to changes in automation policy.
+    - Updated maintainer contact address.
 - Tests
     - Added more author tests.
-    - Author tests will be kept in the xt directory.
-- Other
-    - Added doap.xml metadata to the distribution.
+- Toolchain
+    - Include doap.xml in the git repo.
+    - Stop using deprecated Module::Signature to sign releases.
+    - Set the static install flag.
+    - Adjusted build prerequisites to be recommended instead of required.
+    - Sign distribution with SigStore.
 
 See the `Changes` file for more details.
 
@@ -123,7 +125,7 @@ See `CONTRIBUTING.md` for more information.
 
 # AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 # COPYRIGHT AND LICENSE
 

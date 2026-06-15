@@ -936,8 +936,11 @@ t/6005_getcode_euc.t
 t/6006_getcode_utf8.t
 t/9010_check_manifest.t
 t/9020_check_source_encoding.t
+t/9030_no_apostrophe_warning.t
+t/9040_roundtrip_invariant.t
 t/9050_pod_G11.t
 t/9051_pod_G12.t
+t/9060_perl4_baby_cart.t
 t/9080_cheatsheets.t
 doc/jacode_cheatsheet.BM.txt
 doc/jacode_cheatsheet.BN.txt

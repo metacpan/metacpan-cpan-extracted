@@ -1,7 +1,7 @@
 {
    "abstract" : "test text for mixed and potentially confusable Unicode scripts",
    "author" : [
-      "Robert Rothenberg <rrwo@cpan.org>"
+      "Robert Rothenberg <perl@rhizomnic.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
@@ -19,7 +19,7 @@
    "name" : "Test-MixedScripts",
    "prereqs" : {
       "build" : {
-         "requires" : {
+         "recommends" : {
             "ExtUtils::MakeMaker" : "7.22",
             "Module::Metadata" : "1.000015"
          }
@@ -33,11 +33,14 @@
          "requires" : {
             "Dist::Zilla::Plugin::UsefulReadme" : "v0.4.3",
             "ExtUtils::Manifest" : "1.68",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
             "Pod::Coverage::TrustPod" : "0",
             "Pod::Markdown::Github" : "0",
             "Pod::Wordlist" : "0",
             "Software::Security::Policy::Individual" : "0.10",
             "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
             "Test::DistManifest" : "0",
             "Test::EOF" : "0",
             "Test::EOL" : "0",
@@ -55,6 +58,7 @@
             "Test::Spelling" : "0.17",
             "Test::TrailingSpace" : "0.0203",
             "Test::Vars" : "0.015",
+            "Test::Version" : "1",
             "strict" : "0"
          }
       },
@@ -81,7 +85,9 @@
          "requires" : {
             "File::Spec" : "0",
             "FindBin" : "0",
-            "Module::Metadata" : "1.000015",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Module::Metadata" : "0",
             "Test2::Plugin::UTF8" : "0",
             "Test2::Tools::Exception" : "0",
             "Test2::V0" : "0",
@@ -93,7 +99,7 @@
    "provides" : {
       "Test::MixedScripts" : {
          "file" : "lib/Test/MixedScripts.pm",
-         "version" : "v0.6.4"
+         "version" : "v0.6.5"
       }
    },
    "release_status" : "stable",
@@ -107,10 +113,11 @@
          "web" : "https://github.com/robrwo/perl-Test-MixedScripts"
       }
    },
-   "version" : "v0.6.4",
+   "version" : "v0.6.5",
    "x_authority" : "cpan:RRWO",
    "x_generated_by_perl" : "v5.42.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.40",
-   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.42",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_static_install" : 1
 }
 

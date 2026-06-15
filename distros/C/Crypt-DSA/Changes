@@ -1,5 +1,15 @@
 Revision history for Perl extension Crypt-DSA
 
+1.21 -- Sun Jun 14 16:52:15 ADT 2026
+
+    - This module is now makred as deprecated.  Crypt-DSA-GMP is a possible replacement.
+    - Fixed CVE-2026-12205 key material reuse for multiple signing events
+    - SECURITY (CWE-323): sign() reused the DSA nonce k across signatures
+    (r and k^-1 were cached on the key and not regenerated), allowing
+    private-key recovery from two signatures over different messages. Now
+    generates a fresh nonce per signature. Keys used to sign more than
+    once with an affected version should be considered compromised.
+
 1.20 -- Fri May 15 19:00:36 ADT 2026
 
     - This module is now makred as deprecated.  Crypt-DSA-GMP is a possible replacement.

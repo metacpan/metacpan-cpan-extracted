@@ -4,7 +4,7 @@ require 5.008;
 use strict;
 use warnings;
 
-our $VERSION = '3.001000';
+our $VERSION = '3.002000';
 use Carp;
 use Symbol 'gensym', 'qualify_to_ref';    # For the 'any data type' hack
 use Fcntl qw( SEEK_SET SEEK_CUR );
@@ -2394,7 +2394,7 @@ Config::IniFiles - A module for reading .ini-style configuration files.
 
 =head1 VERSION
 
-version 3.001000
+version 3.002000
 
 =head1 SYNOPSIS
 

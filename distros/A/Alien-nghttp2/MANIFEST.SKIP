@@ -24,5 +24,8 @@
 # Exclude CLAUDE.md (internal dev docs only)
 ^CLAUDE\.md$
 
+# Exclude RELEASE.md (maintainer release checklist, not for distribution)
+^RELEASE\.md$
+
 # Avoid macOS metadata files
 \.DS_Store$

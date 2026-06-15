@@ -31,7 +31,7 @@ use constant {
 };
 
 
-our $VERSION = v0.29;
+our $VERSION = v0.30;
 
 my %_multiplicity_prefix = (
     total   => '4.1',
@@ -219,6 +219,7 @@ sub date {
 sub language {
     my ($pkg, $req, %opts) = @_;
     my $name;
+    my $identifier;
 
     require I18N::LangTags::List;
 
@@ -236,7 +237,12 @@ sub language {
     }
 
     $opts{displayname} //= $name;
-    return $pkg->generic(%opts);
+    $identifier = $pkg->generic(%opts);
+
+    $identifier->{id_cache} //= {};
+    $identifier->{id_cache}->{'d0a4c6e2-ce2f-4d4c-b079-60065ac681f1'} //= $req;
+
+    return $identifier;
 }
 
 
@@ -516,7 +522,7 @@ Data::Identifier::Generate - format independent identifier object
 
 =head1 VERSION
 
-version v0.29
+version v0.30
 
 =head1 SYNOPSIS
 

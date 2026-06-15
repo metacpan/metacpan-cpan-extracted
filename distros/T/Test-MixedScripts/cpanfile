@@ -15,14 +15,16 @@ requires "utf8" => "0";
 requires "warnings" => "0";
 
 on 'build' => sub {
-  requires "ExtUtils::MakeMaker" => "7.22";
-  requires "Module::Metadata" => "1.000015";
+  recommends "ExtUtils::MakeMaker" => "7.22";
+  recommends "Module::Metadata" => "1.000015";
 };
 
 on 'test' => sub {
   requires "File::Spec" => "0";
   requires "FindBin" => "0";
-  requires "Module::Metadata" => "1.000015";
+  requires "IO::Handle" => "0";
+  requires "IPC::Open3" => "0";
+  requires "Module::Metadata" => "0";
   requires "Test2::Plugin::UTF8" => "0";
   requires "Test2::Tools::Exception" => "0";
   requires "Test2::V0" => "0";
@@ -41,11 +43,14 @@ on 'configure' => sub {
 on 'develop' => sub {
   requires "Dist::Zilla::Plugin::UsefulReadme" => "v0.4.3";
   requires "ExtUtils::Manifest" => "1.68";
+  requires "IO::Handle" => "0";
+  requires "IPC::Open3" => "0";
   requires "Pod::Coverage::TrustPod" => "0";
   requires "Pod::Markdown::Github" => "0";
   requires "Pod::Wordlist" => "0";
   requires "Software::Security::Policy::Individual" => "0.10";
   requires "Test::CPAN::Changes" => "0.19";
+  requires "Test::CPAN::Meta" => "0";
   requires "Test::DistManifest" => "0";
   requires "Test::EOF" => "0";
   requires "Test::EOL" => "0";
@@ -63,5 +68,6 @@ on 'develop' => sub {
   requires "Test::Spelling" => "0.17";
   requires "Test::TrailingSpace" => "0.0203";
   requires "Test::Vars" => "0.015";
+  requires "Test::Version" => "1";
   requires "strict" => "0";
 };

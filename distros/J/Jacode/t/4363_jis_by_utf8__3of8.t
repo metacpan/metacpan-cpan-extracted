@@ -2,7 +2,7 @@
 #
 # t/4363_jis_by_utf8__3of8.t
 #
-# Copyright (c) 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2019 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 sub BEGIN {

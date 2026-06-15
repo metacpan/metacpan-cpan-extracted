@@ -75,21 +75,33 @@ sub image_encrypted {
         close $fh;
     }
 
-    my $mime_type = $options{mimeType} || $options{mime_type} || 'image/jpeg';
     my $encrypted = encrypt_image($data, $public_key);
 
-    my $payload = encode_json({
+    # The server's `default` encrypted mode reads a multipart upload, parses
+    # the file bytes as a JSON envelope (camelCase), then RSA-OAEP-SHA256
+    # decrypts. Send the envelope as a file part, mirroring the plain
+    # `image` multipart transport.
+    my $envelope = encode_json({
         encryptedKey  => $encrypted->{encrypted_key},
         iv            => $encrypted->{iv},
         encryptedData => $encrypted->{encrypted_data},
         algorithm     => $encrypted->{algorithm},
-        filename      => $filename,
-        mimeType      => $mime_type,
-        source        => $options{source} || 'sdk',
     });
 
+    my @multipart = (
+        file => [
+            undef,
+            'image.jpg.enc',
+            'Content-Type' => 'application/octet-stream',
+            Content        => $envelope,
+        ],
+    );
+
+    if ($options{source}) {
+        push @multipart, source => $options{source};
+    }
+
     my %headers = (
-        'Content-Type'     => 'application/json',
         'X-Aptr-Encrypted' => 'default',
     );
     if ($options{password}) {
@@ -98,8 +110,8 @@ sub image_encrypted {
 
     return $self->{http}->request(
         'POST', "/api/v1/upload/$uuid/images",
-        body    => $payload,
-        headers => \%headers,
+        multipart => \@multipart,
+        headers   => \%headers,
     );
 }
 

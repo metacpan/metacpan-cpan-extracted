@@ -3,7 +3,7 @@ package Apertur::SDK;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.16';
 
 use Apertur::SDK::HTTPClient;
 use Apertur::SDK::Resource::Sessions;

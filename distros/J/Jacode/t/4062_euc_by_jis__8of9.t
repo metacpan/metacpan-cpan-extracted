@@ -2,7 +2,7 @@
 #
 # t/4062_euc_by_jis__8of9.t
 #
-# Copyright (c) 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2019 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 sub BEGIN {

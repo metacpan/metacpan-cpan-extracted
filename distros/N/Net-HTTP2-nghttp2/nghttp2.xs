@@ -716,6 +716,14 @@ _new_server_xs(class, callbacks_hv, user_data, ...)
                 nghttp2_option_set_max_send_header_block_length(option, SvUV(*svp));
             }
 
+            if ((svp = hv_fetch(options_hv, "stream_reset_burst", 18, 0))) {
+                SV **rate_svp = hv_fetch(options_hv, "stream_reset_rate", 17, 0);
+                if (rate_svp) {
+                    nghttp2_option_set_stream_reset_rate_limit(
+                        option, (uint64_t)SvUV(*svp), (uint64_t)SvUV(*rate_svp));
+                }
+            }
+
             rv = nghttp2_session_server_new2(&ps->session, callbacks, ps, option);
             nghttp2_option_del(option);
         } else {

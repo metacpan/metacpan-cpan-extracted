@@ -1,3 +1,16 @@
+v0.30  2026-06-14Z
+    - Added experimental is_true(), is_false(), from_bool(),
+      register_namespace(), register_generator(), and register_type() to Data::Identifier::Util
+    - Added support for JSON::PP::Boolean, and JSON::XS::Boolean in new() via from
+    - Hardened some regex
+    - Deduplicate tagnames on tag creation
+    - Include tagnames for a number a well known tags in Data::Identifier
+    - Corrected typo
+    - Added experimental $id->null_to_undef
+    - Let language generator record the language tag
+    - Register all identifiers, even those of a non-well-known type
+    - Register namespaces passed to Data::Identifier->new()
+
 v0.29  2026-04-30Z
     - Updated documentation
     - Added support for unit generation

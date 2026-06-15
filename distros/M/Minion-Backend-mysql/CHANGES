@@ -1,5 +1,16 @@
 Revision history for Perl extension Minion::Backend::mysql.
 
+1.008     2026-06-14 20:35:21-05:00 America/Chicago
+
+  [Added]
+
+  - Added support for Minion 12, including scheduled tasks, minimum priority
+    dequeuing, task-limited dequeuing, and I'm sure there's other things (just
+    as I'm sure there're things that aren't working right)
+
+  NOTE: This release drops support for MySQL < 8.0.11 (released 2018-04-19).
+  Patches for supporting pre-8 MySQL are welcome.
+
 1.007     2025-11-30 20:37:06-06:00 America/Chicago
 
   [Fixed]

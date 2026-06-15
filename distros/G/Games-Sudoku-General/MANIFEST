@@ -10,8 +10,8 @@ inc/My/Module/Meta.pm
 inc/My/Module/Recommend.pm
 inc/My/Module/Recommend/Any.pm
 lib/Games/Sudoku/General.pm
-LICENSES/Artistic
-LICENSES/Copying
+LICENSE-Artistic
+LICENSE-GPL
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
@@ -22,6 +22,7 @@ README.MacOS
 README.MSWin32
 README.VMS
 script/sudokug
+SECURITY
 t/basic.t
 t/sudoku.t
 xt/author/changes.t

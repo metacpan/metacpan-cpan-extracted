@@ -1,5 +1,36 @@
 Revision history for Switch-Declare
 
+0.04    2026-06-14
+        - New patterns:
+          * `case FOO`             - a bareword naming an inlinable `use constant`
+            folds to its value at compile time and is classified like the literal
+            it holds (numeric -> ==, string -> eq; dispatch-eligible). Zero runtime
+            cost. Package-qualified constants (`Pkg::FOO`) are supported.
+          * `case == $x` / `case eq $x` - compare the topic against a runtime
+            scalar variable, naming the operator as in Perl itself: `==` is
+            numeric (looks_like_number-guarded on both sides), `eq` is string.
+            The operand is a plain scalar ($name or $Pkg::name), including `our`
+            and package globals. Both are undef/type-safe and warning-free.
+          * `case =~ $rx` - match the topic against a runtime pattern (a qr// or
+            a string) held in a scalar, complementing the compile-time /literal/
+            form. Undef-safe and warning-free. As a runtime membership test it
+            does not set capture variables ($1, @+); for captures use a predicate
+            arm, `case sub { $_[0] =~ $rx }`.
+
+0.03    2026-06-14
+        - New patterns:
+          * `case undef`           - matches an undefined topic.
+          * `case ref(TYPE)` / `ref`     - ref($topic) [eq "TYPE"]; bare = any ref.
+          * `case reftype(TYPE)` / `reftype` - underlying type, through blessing.
+          * `case isa(Class)`      - blessed object derived from Class (fast @ISA).
+        - Undef/type safety: every pattern is now warning-free. An undef topic
+          matches only `case undef` (else falls to default) instead of warning
+          and mis-matching `case 0`/`case ""`. Numeric patterns are guarded by
+          looks_like_number, so a non-numeric topic neither warns ("Argument
+          isn't numeric") nor mis-matches (`"one" == 0` was true; now it is not).
+        - The numeric guard is computed once per switch (hoisted), so numeric
+          switches run on par with an equivalently type-safe hand-written chain.
+
 0.02    2026-06-13
         - Fix load failure on perl 5.14-5.20.
 

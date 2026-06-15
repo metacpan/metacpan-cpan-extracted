@@ -6,6 +6,7 @@
 CVS/
 ^foo
 ^.git/
+^.github/
 ^.gitignore$
 ^Games-Sudoku-General
 ^Makefile$

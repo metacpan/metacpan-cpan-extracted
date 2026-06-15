@@ -18,7 +18,22 @@ use Carp;
 use Data::Identifier;
 use Data::Identifier::Generate;
 
-our $VERSION = v0.29;
+our $VERSION = v0.30;
+
+use constant {
+    BOOL_TRUE  => Data::Identifier->new(uuid => 'eb50b3dc-28be-4cfc-a9ea-bd7cee73aed5')->register,
+    BOOL_FALSE => Data::Identifier->new(uuid => '6d34d4a1-8fbc-4e22-b3e0-d50f43d97cb1')->register,
+};
+
+_update_tag(BOOL_TRUE,  46, 190, 'true');
+_update_tag(BOOL_FALSE, 45, 189, 'false');
+
+my @truths = (BOOL_TRUE,  qw(https://schema.org/True  http://schema.org/True),  Data::Identifier->new(wd => 'Q16751793'));
+my @falses = (BOOL_FALSE, qw(https://schema.org/False http://schema.org/False), Data::Identifier->new(wd => 'Q5432619'));
+
+foreach my $id (@truths, @falses) {
+    $id = Data::Identifier->new(from => $id)->register;
+}
 
 my $_DEFAULT_INSTANCE = __PACKAGE__->new;
 
@@ -197,6 +212,41 @@ sub new {
     croak 'Stray options passed' if scalar @opts;
 
     return bless {}, $pkg;
+}
+
+
+sub from_bool {
+    my ($self, $bool, @opts) = _normalise_args(@_);
+
+    croak 'Stray options passed' if scalar @opts;
+
+    return $bool ? BOOL_TRUE : BOOL_FALSE;
+}
+
+
+sub is_true {
+    my ($self, $identifier, @opts) = _normalise_args(@_);
+
+    croak 'Stray options passed' if scalar @opts;
+
+    foreach my $ref (@truths) {
+        return !!1 if $ref->eq($identifier);
+    }
+
+    return !!0;
+}
+
+
+sub is_false {
+    my ($self, $identifier, @opts) = _normalise_args(@_);
+
+    croak 'Stray options passed' if scalar @opts;
+
+    foreach my $ref (@falses) {
+        return !!1 if $ref->eq($identifier);
+    }
+
+    return !!0;
 }
 
 
@@ -558,6 +608,55 @@ sub render_unit_request {
     return $pkg->pack($template => Data::Identifier::Generate->generic(%opts));
 }
 
+
+sub register_namespace {
+    my ($self, $identifier, %opts) = _register_base(@_);
+
+    $identifier->uuid; # ensure we map to an UUID
+
+    croak 'Stray options passed' if scalar keys %opts;
+
+    return $identifier->register;
+}
+
+
+sub register_generator {
+    my ($self, $identifier, %opts) = _register_base(@_);
+
+    delete $opts{$_} foreach qw(namespace style type);
+    delete $opts{$_} foreach qw(native_case source_role up_relation for_type copy_tagnames native_ise_template);
+
+    croak 'Stray options passed' if scalar keys %opts;
+
+    return $identifier->register;
+}
+
+
+sub register_type {
+    my ($self, $identifier, %opts) = _register_base(@_);
+    my $uuid = $identifier->uuid; # ensure we map to an UUID
+
+    if (defined(my $validate = delete $opts{validate})) {
+        $identifier->{validate} //= $validate;
+    }
+
+    if (defined(my $namespace = delete $opts{namespace})) {
+        $identifier->{namespace} //= $self->register_namespace($namespace);
+    }
+
+    if (defined(my $null_value = delete $opts{null_value})) {
+        my $null = Data::Identifier->new(sid => 0);
+
+        $null->{id_cache}{$uuid} //= $null_value;
+
+        $null->register;
+    }
+
+    croak 'Stray options passed' if scalar keys %opts;
+
+    return $identifier->register;
+}
+
 # ---- Private helpers ----
 
 sub _normalise_args {
@@ -602,6 +701,44 @@ sub _load_well_known {
     };
 }
 
+sub _update_tag {
+    my ($identifier, $sid, $sni, $tagname) = @_;
+    my $id_cache = $identifier->{id_cache} //= {};
+
+    $id_cache->{Data::Identifier::WK_SID()} //= $sid if defined $sid;
+    $id_cache->{Data::Identifier::WK_SNI()} //= $sni if defined $sni;
+
+    if (defined $tagname) {
+        my %tagnames = map {$_ => undef} $tagname, $identifier->tagname(list => 1, default => [], no_defaults => 1);
+        $identifier->{tagname} = [keys %tagnames];
+    }
+
+    $identifier->register; # re-register
+
+    return $identifier;
+}
+
+# prepares arguments for register_*().
+# Removes any common arguments from %opts
+# does NOT call $identifier->register as register_*() might make additional changes that register needs to know about,
+# so doing it here would just mean to do it twice.
+sub _register_base {
+    my ($self, $identifier, %opts) = _normalise_args(@_);
+
+    $identifier = Data::Identifier->new(from => $identifier);
+
+    if (defined(my $displayname = delete $opts{displayname})) {
+        $identifier->{displayname} //= $displayname;
+    }
+
+    if (defined(my $tagname = delete $opts{tagname})) {
+        my %tagnames = map {$_ => undef} (ref $tagname ? @{$tagname} : $tagname), $identifier->tagname(list => 1, default => [], no_defaults => 1);
+        $identifier->{tagname} = [keys %tagnames];
+    }
+
+    return ($self, $identifier, %opts);
+}
+
 1;
 
 __END__
@@ -616,7 +753,7 @@ Data::Identifier::Util - format independent identifier object
 
 =head1 VERSION
 
-version v0.29
+version v0.30
 
 =head1 SYNOPSIS
 
@@ -644,6 +781,44 @@ This may or may not overlap with what L<Data::Identifier::Wellknown> registers.
 (since v0.23)
 
 Creates a new instance that can be used to call the different methods.
+
+=head2 from_bool
+
+    my Data::Identifier $identifier = $util->from_bool($bool);
+
+(experimental since v0.30)
+
+Returns a true or false as an identifier based on the passed boolean.
+The value is check for it's boolean value by perl's rules.
+
+=head2 is_true
+
+    my $bool = $util->is_true($identifier);
+
+(experimental since v0.30)
+
+Returns true if the given identifier represents true (not just a true-ish value).
+
+This implementation tries to support many different vocabularies.
+
+B<Note:>
+As this tests for true (not true-ish) values can be both not-true and not-false.
+
+See also:
+L</is_false>.
+
+=head2 is_false
+
+    my $bool = $util->is_false($identifier);
+
+(experimental since v0.30)
+
+Returns true if the identifier represents false (not just a false-ish value).
+
+All limitations and notes of L</is_true> also apply.
+
+See also:
+L</is_true>.
 
 =head2 pack
 
@@ -750,6 +925,87 @@ This might might support more values if L<Data::Identifier::Wellknown> is loaded
 and/or if a L<Data::TagMap> is given via L<Data::Identifier::Interface::Subobjects/so_attach>.
 
 See also L</parse_sirtx>.
+
+=head2 register_namespace
+
+    my Data::Identifier $identifier = $util->register_namespace($id, %opts);
+
+(experimental since v0.30)
+
+Registers a namespace by creating a L<Data::Identifier> object (unless one is already passed),
+updating it's values, and calling L<Data::Identifier/register> on it before returning.
+
+This function may also validate the passed values and update other global data structures.
+
+C<$id> is parsed as per C<from> in L<Data::Identifier/new>. However it must resolve to an UUID.
+
+The following options from L<Data::Identifier/new> are supported:
+C<displayname>,
+C<tagname>.
+
+Currently no options specific to namespaces are supported.
+
+B<Note:>
+This method is not suitable for use with L<constant>.
+However it is possible to register the Identifier as a constant and the use it with this method.
+For example:
+
+    use constant NS_INT => Data::Identifier->new(uuid => '5dd8ddbb-13a8-4d6c-9264-36e6dd6f9c99')->register;
+
+    Data::Identifier::Util->register_namespace(NS_INT, tagname => 'integer-namespace');
+
+=head2 register_generator
+
+    my Data::Identifier $identifier = $util->register_generator($id, %opts);
+
+(experimental since v0.30)
+
+Registers a generator the same way L</register_namespace> registers an namespace.
+All aspects of L</register_namespace> apply as well but for the fact that this method is used to register generators and the list of specific options.
+
+Currently the following options as known from L<Data::Identifier::Generate/generic> are accepted but ignored:
+C<namespace>,
+C<style>,
+C<type>.
+
+Also the following keys not yet supported by L<Data::Identifier::Generate/generic> are accepted but ignored:
+C<native_case>,
+C<source_role>,
+C<up_relation>,
+C<for_type>,
+C<copy_tagnames>,
+C<native_ise_template>.
+
+Future versions of this module may implement those options.
+
+=head2 register_type
+
+    my Data::Identifier $identifier = $util->register_type($id, %opts);
+
+(experimental since v0.30)
+
+Registers a type the same way L</register_namespace> registers an namespace.
+All aspects of L</register_namespace> apply as well but for the fact that this method is used to register types and the list of specific options.
+
+Currently the following type specific options are supported:
+
+=over
+
+=item C<validate>
+
+A regex that should be used to validate identifiers if this identifier is used as a type.
+
+=item C<namespace>
+
+The namespace used by a type. Must be a L<Data::Identifier> or an ISE. Must also resolve to an UUID.
+This method calls L</register_namespace> on the given namespace to ensure the namespace is correctly registered.
+
+=item C<null_value>
+
+The value that represents a null for the given identifier.
+It will be aliased to the null identifier.
+
+=back
 
 =head1 AUTHOR
 

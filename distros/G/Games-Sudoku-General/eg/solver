@@ -43,15 +43,19 @@ my $fh = $opt{demo} ? *DATA : *STDIN;
 
 my $puzzle = '';
 print "\nInput:\n";
-while (<$fh>) {
-    print;
-    next if m/^\s*$/ || m/^\s*#/;
-    my ($name, $value) = m/^\s*-set\s+(\S+)\s+(.*)/ or do {
-	$puzzle .= $_;
-	next;
-    };
-    chomp $value;
-    $su->set ($name, $value);
+{
+    local $_ = undef;	# while (<>) ... does not localize $_
+
+    while (<$fh>) {
+	print;
+	next if m/^\s*$/ || m/^\s*#/;
+	my ($name, $value) = m/^\s*-set\s+(\S+)\s+(.*)/ or do {
+	    $puzzle .= $_;
+	    next;
+	};
+	chomp $value;
+	$su->set ($name, $value);
+    }
 }
 
 $su->problem ($puzzle);

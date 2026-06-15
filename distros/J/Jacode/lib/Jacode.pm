@@ -5,10 +5,10 @@ package Jacode;
 #
 # https://metacpan.org/dist/Jacode
 #
-# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
-$VERSION = '2.13.4.33';
+$VERSION = '2.13.4.34';
 $VERSION = $VERSION;
 
 use 5.00503;

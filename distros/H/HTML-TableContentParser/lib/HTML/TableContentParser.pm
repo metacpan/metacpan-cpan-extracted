@@ -5,7 +5,7 @@ use warnings;
 
 use parent qw{ HTML::Parser };
 
-our $VERSION = '0.305';
+our $VERSION = '0.306';
 
 our $CLASSIC = 0;
 our $DEBUG = 0;
@@ -387,9 +387,8 @@ occupies three columns in the HTML table, but only two entries are made
 in the C<{cells}> value of the hash that represents this row.
 
 Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=HTML-TableContentParser>,
-L<https://github.com/trwyant/perl-HTML-TableContentParser/issues>, or in
-electronic mail to F<wyant at cpan dot org>.
+L<https://github.com/trwyant/perl-HTML-TableContentParser/issues> or in
+electronic mail to F<harryfmudd at comcast dot net>.
 
 =head1 SEE ALSO
 
@@ -410,17 +409,17 @@ CSS selectors.
 
 Simon Drabble  E<lt>sdrabble@cpan.orgE<gt>
 
-Thomas R. Wyant, III F<wyant at cpan dot org>
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2002 Simon Drabble
 
-Copyright (C) 2017-2021 Thomas R. Wyant, III
+Copyright (C) 2017-2022, 2026 Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

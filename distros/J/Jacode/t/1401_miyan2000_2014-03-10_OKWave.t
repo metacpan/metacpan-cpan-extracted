@@ -4,7 +4,7 @@ die "This file is not encoded in EUC-JP.\n" if q{дв} ne "\xa4\xa2";
 #
 # 1401_miyan2000_2014-03-10_OKWave.t
 #
-# Copyright (c) 2015, 2019 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2015, 2019 INABA Hitoshi <ina.cpan@gmail.com>
 #
 ######################################################################
 

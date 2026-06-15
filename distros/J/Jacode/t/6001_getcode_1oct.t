@@ -2,7 +2,7 @@
 #
 # t/6001_getcode_1oct.t
 #
-# Copyright (c) 2022 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2022 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 sub BEGIN {

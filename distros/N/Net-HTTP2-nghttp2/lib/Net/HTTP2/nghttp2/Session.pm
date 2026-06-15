@@ -17,6 +17,8 @@ sub new_server {
 
     # Session options (passed to nghttp2_option / nghttp2_session_server_new2)
     my $max_send_header_block_length = delete $args{max_send_header_block_length};
+    my $stream_reset_burst = delete $args{stream_reset_burst};
+    my $stream_reset_rate  = delete $args{stream_reset_rate};
 
     # Validate required callbacks
     for my $cb (qw(on_begin_headers on_header on_frame_recv)) {
@@ -27,6 +29,15 @@ sub new_server {
     my %options;
     $options{max_send_header_block_length} = $max_send_header_block_length
         if defined $max_send_header_block_length;
+
+    # Rapid Reset (CVE-2023-44487) RST_STREAM rate limit. burst and rate must be
+    # set together; they map to nghttp2_option_set_stream_reset_rate_limit.
+    if (defined $stream_reset_burst || defined $stream_reset_rate) {
+        croak "stream_reset_burst and stream_reset_rate must be set together"
+            unless defined $stream_reset_burst && defined $stream_reset_rate;
+        $options{stream_reset_burst} = $stream_reset_burst;
+        $options{stream_reset_rate}  = $stream_reset_rate;
+    }
 
     # Create the session via XS
     my $self = %options
@@ -243,6 +254,16 @@ Optional scalar passed to callbacks.
 =item settings
 
 Optional hashref of initial HTTP/2 settings.
+
+=item stream_reset_burst / stream_reset_rate
+
+Configure the incoming-C<RST_STREAM> rate limit (nghttp2's HTTP/2 Rapid Reset,
+CVE-2023-44487, mitigation). Both must be given together. They map to
+C<nghttp2_option_set_stream_reset_rate_limit(option, burst, rate)>: a token
+bucket of C<burst> tokens refilling at C<rate> tokens/second, one token per
+incoming C<RST_STREAM>. When the bucket is empty nghttp2 sends GOAWAY and tears
+down the connection. Omit both to use nghttp2's own defaults (burst 1000,
+rate 33). Requires nghttp2 >= 1.57.
 
 =back
 

@@ -10,7 +10,7 @@ use Crypt::DSA::Key;
 use Crypt::DSA::Signature;
 use Crypt::DSA::Util qw( bitsize bin2mp mod_inverse mod_exp makerandom );
 
-our $VERSION = '1.20'; #VERSION
+our $VERSION = '1.21'; #VERSION
 
 use vars qw( $VERSION );
 
@@ -44,8 +44,11 @@ sub sign {
     croak "Data too large for key size"
         if $dlen > $i || $dlen > 50;
 
-    $dsa->_sign_setup($key)
-        unless $key->kinv && $key->r;
+    # SECURITY: a DSA nonce (k) must NEVER be reused across signatures;
+    # two signatures sharing k disclose the private key. Always generate
+    # fresh r/kinv per signature -- do NOT reuse any values cached on the
+    # Key object from a previous sign().
+    $dsa->_sign_setup($key);
 
     my $m = bin2mp($dgst);
     my $xr = ($key->priv_key * $key->r) % $key->q;

@@ -8,7 +8,7 @@ use Crypt::URandom qw (urandom);
 use Fcntl;
 use Carp qw( croak );
 
-our $VERSION = '1.20'; #VERSION
+our $VERSION = '1.21'; #VERSION
 
 use vars qw( $VERSION @ISA @EXPORT_OK );
 use Exporter;

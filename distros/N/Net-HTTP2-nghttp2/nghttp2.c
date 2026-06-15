@@ -1182,6 +1182,14 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session__new_server_xs)
                 nghttp2_option_set_max_send_header_block_length(option, SvUV(*svp));
             }
 
+            if ((svp = hv_fetch(options_hv, "stream_reset_burst", 18, 0))) {
+                SV **rate_svp = hv_fetch(options_hv, "stream_reset_rate", 17, 0);
+                if (rate_svp) {
+                    nghttp2_option_set_stream_reset_rate_limit(
+                        option, (uint64_t)SvUV(*svp), (uint64_t)SvUV(*rate_svp));
+                }
+            }
+
             rv = nghttp2_session_server_new2(&ps->session, callbacks, ps, option);
             nghttp2_option_del(option);
         } else {
@@ -1205,7 +1213,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session__new_server_xs)
         RETVAL = sv_newmortal();
         sv_setref_pv(RETVAL, class, (void *)ps);
         SvREFCNT_inc(RETVAL);
-#line 1209 "nghttp2.c"
+#line 1217 "nghttp2.c"
 	RETVAL = sv_2mortal(RETVAL);
 	ST(0) = RETVAL;
     }
@@ -1222,10 +1230,10 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_DESTROY)
     {
 	SV *	self = ST(0)
 ;
-#line 750 "nghttp2.xs"
+#line 758 "nghttp2.xs"
         nghttp2_perl_session *ps;
-#line 1228 "nghttp2.c"
-#line 752 "nghttp2.xs"
+#line 1236 "nghttp2.c"
+#line 760 "nghttp2.xs"
         ps = (nghttp2_perl_session *)SvIV(SvRV(self));
         if (ps) {
             int i;
@@ -1251,7 +1259,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_DESTROY)
             if (ps->data_providers) free(ps->data_providers);
             Safefree(ps);
         }
-#line 1255 "nghttp2.c"
+#line 1263 "nghttp2.c"
     }
     XSRETURN_EMPTY;
 }
@@ -1268,15 +1276,15 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_mem_recv)
 ;
 	SV *	data = ST(1)
 ;
-#line 784 "nghttp2.xs"
+#line 792 "nghttp2.xs"
         nghttp2_perl_session *ps;
         STRLEN len;
         const char *buf;
         ssize_t rv;
-#line 1277 "nghttp2.c"
+#line 1285 "nghttp2.c"
 	int	RETVAL;
 	dXSTARG;
-#line 789 "nghttp2.xs"
+#line 797 "nghttp2.xs"
         ps = (nghttp2_perl_session *)SvIV(SvRV(self));
         buf = SvPVbyte(data, len);
 
@@ -1285,7 +1293,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_mem_recv)
             croak("nghttp2_session_mem_recv failed: %s", nghttp2_strerror((int)rv));
         }
         RETVAL = (int)rv;
-#line 1289 "nghttp2.c"
+#line 1297 "nghttp2.c"
 	XSprePUSH;
 	PUSHi((IV)RETVAL);
     }
@@ -1302,12 +1310,12 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_mem_send)
     {
 	SV *	self = ST(0)
 ;
-#line 805 "nghttp2.xs"
+#line 813 "nghttp2.xs"
         nghttp2_perl_session *ps;
         int rv;
-#line 1309 "nghttp2.c"
+#line 1317 "nghttp2.c"
 	SV *	RETVAL;
-#line 808 "nghttp2.xs"
+#line 816 "nghttp2.xs"
         ps = (nghttp2_perl_session *)SvIV(SvRV(self));
 
         /* Clear send buffer */
@@ -1325,7 +1333,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_mem_send)
         } else {
             RETVAL = newSVpvn("", 0);
         }
-#line 1329 "nghttp2.c"
+#line 1337 "nghttp2.c"
 	RETVAL = sv_2mortal(RETVAL);
 	ST(0) = RETVAL;
     }
@@ -1342,15 +1350,15 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_want_read)
     {
 	SV *	self = ST(0)
 ;
-#line 833 "nghttp2.xs"
+#line 841 "nghttp2.xs"
         nghttp2_perl_session *ps;
-#line 1348 "nghttp2.c"
+#line 1356 "nghttp2.c"
 	int	RETVAL;
 	dXSTARG;
-#line 835 "nghttp2.xs"
+#line 843 "nghttp2.xs"
         ps = (nghttp2_perl_session *)SvIV(SvRV(self));
         RETVAL = nghttp2_session_want_read(ps->session);
-#line 1354 "nghttp2.c"
+#line 1362 "nghttp2.c"
 	XSprePUSH;
 	PUSHi((IV)RETVAL);
     }
@@ -1367,15 +1375,15 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_want_write)
     {
 	SV *	self = ST(0)
 ;
-#line 845 "nghttp2.xs"
+#line 853 "nghttp2.xs"
         nghttp2_perl_session *ps;
-#line 1373 "nghttp2.c"
+#line 1381 "nghttp2.c"
 	int	RETVAL;
 	dXSTARG;
-#line 847 "nghttp2.xs"
+#line 855 "nghttp2.xs"
         ps = (nghttp2_perl_session *)SvIV(SvRV(self));
         RETVAL = nghttp2_session_want_write(ps->session);
-#line 1379 "nghttp2.c"
+#line 1387 "nghttp2.c"
 	XSprePUSH;
 	PUSHi((IV)RETVAL);
     }
@@ -1393,13 +1401,13 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_submit_settings)
 	SV *	self = ST(0)
 ;
 	HV *	settings_hv;
-#line 858 "nghttp2.xs"
+#line 866 "nghttp2.xs"
         nghttp2_perl_session *ps;
         nghttp2_settings_entry iv[16];
         int niv = 0;
         SV **svp;
         int rv;
-#line 1403 "nghttp2.c"
+#line 1411 "nghttp2.c"
 	int	RETVAL;
 	dXSTARG;
 
@@ -1416,7 +1424,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_submit_settings)
 		}
 	} STMT_END
 ;
-#line 864 "nghttp2.xs"
+#line 872 "nghttp2.xs"
         ps = (nghttp2_perl_session *)SvIV(SvRV(self));
 
         if ((svp = hv_fetch(settings_hv, "max_concurrent_streams", 22, 0))) {
@@ -1460,7 +1468,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_submit_settings)
             croak("nghttp2_submit_settings failed: %s", nghttp2_strerror(rv));
         }
         RETVAL = rv;
-#line 1464 "nghttp2.c"
+#line 1472 "nghttp2.c"
 	XSprePUSH;
 	PUSHi((IV)RETVAL);
     }
@@ -1482,7 +1490,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session__submit_response_with_body)
 	AV *	headers_av;
 	SV *	body = ST(3)
 ;
-#line 918 "nghttp2.xs"
+#line 926 "nghttp2.xs"
         nghttp2_perl_session *ps;
         nghttp2_nv *nva;
         size_t nvlen;
@@ -1491,7 +1499,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session__submit_response_with_body)
         I32 i;
         STRLEN body_len;
         char *body_ptr;
-#line 1495 "nghttp2.c"
+#line 1503 "nghttp2.c"
 	int	RETVAL;
 	dXSTARG;
 
@@ -1508,7 +1516,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session__submit_response_with_body)
 		}
 	} STMT_END
 ;
-#line 927 "nghttp2.xs"
+#line 935 "nghttp2.xs"
         ps = (nghttp2_perl_session *)SvIV(SvRV(self));
 
         /* Build name-value array from Perl array of arrayrefs */
@@ -1545,7 +1553,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session__submit_response_with_body)
             croak("nghttp2_submit_response failed: %s", nghttp2_strerror(rv));
         }
         RETVAL = rv;
-#line 1549 "nghttp2.c"
+#line 1557 "nghttp2.c"
 	XSprePUSH;
 	PUSHi((IV)RETVAL);
     }
@@ -1565,13 +1573,13 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session__submit_response_no_body)
 	int	stream_id = (int)SvIV(ST(1))
 ;
 	AV *	headers_av;
-#line 973 "nghttp2.xs"
+#line 981 "nghttp2.xs"
         nghttp2_perl_session *ps;
         nghttp2_nv *nva;
         size_t nvlen;
         int rv;
         I32 i;
-#line 1575 "nghttp2.c"
+#line 1583 "nghttp2.c"
 	int	RETVAL;
 	dXSTARG;
 
@@ -1588,7 +1596,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session__submit_response_no_body)
 		}
 	} STMT_END
 ;
-#line 979 "nghttp2.xs"
+#line 987 "nghttp2.xs"
         ps = (nghttp2_perl_session *)SvIV(SvRV(self));
 
         /* Build name-value array */
@@ -1621,7 +1629,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session__submit_response_no_body)
             croak("nghttp2_submit_response failed: %s", nghttp2_strerror(rv));
         }
         RETVAL = rv;
-#line 1625 "nghttp2.c"
+#line 1633 "nghttp2.c"
 	XSprePUSH;
 	PUSHi((IV)RETVAL);
     }
@@ -1640,20 +1648,20 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_resume_data)
 ;
 	int	stream_id = (int)SvIV(ST(1))
 ;
-#line 1020 "nghttp2.xs"
+#line 1028 "nghttp2.xs"
         nghttp2_perl_session *ps;
         int rv;
-#line 1647 "nghttp2.c"
+#line 1655 "nghttp2.c"
 	int	RETVAL;
 	dXSTARG;
-#line 1023 "nghttp2.xs"
+#line 1031 "nghttp2.xs"
         ps = (nghttp2_perl_session *)SvIV(SvRV(self));
         rv = nghttp2_session_resume_data(ps->session, stream_id);
         if (rv != 0 && rv != NGHTTP2_ERR_INVALID_ARGUMENT) {
             croak("nghttp2_session_resume_data failed: %s", nghttp2_strerror(rv));
         }
         RETVAL = rv;
-#line 1657 "nghttp2.c"
+#line 1665 "nghttp2.c"
 	XSprePUSH;
 	PUSHi((IV)RETVAL);
     }
@@ -1672,12 +1680,12 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_get_stream_user_data)
 ;
 	int	stream_id = (int)SvIV(ST(1))
 ;
-#line 1038 "nghttp2.xs"
+#line 1046 "nghttp2.xs"
         nghttp2_perl_session *ps;
         void *data;
-#line 1679 "nghttp2.c"
+#line 1687 "nghttp2.c"
 	SV *	RETVAL;
-#line 1041 "nghttp2.xs"
+#line 1049 "nghttp2.xs"
         ps = (nghttp2_perl_session *)SvIV(SvRV(self));
         data = nghttp2_session_get_stream_user_data(ps->session, stream_id);
         if (data) {
@@ -1685,7 +1693,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_get_stream_user_data)
         } else {
             RETVAL = &PL_sv_undef;
         }
-#line 1689 "nghttp2.c"
+#line 1697 "nghttp2.c"
 	RETVAL = sv_2mortal(RETVAL);
 	ST(0) = RETVAL;
     }
@@ -1706,19 +1714,19 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_set_stream_user_data)
 ;
 	SV *	data = ST(2)
 ;
-#line 1058 "nghttp2.xs"
+#line 1066 "nghttp2.xs"
         nghttp2_perl_session *ps;
         int rv;
-#line 1713 "nghttp2.c"
+#line 1721 "nghttp2.c"
 	int	RETVAL;
 	dXSTARG;
-#line 1061 "nghttp2.xs"
+#line 1069 "nghttp2.xs"
         ps = (nghttp2_perl_session *)SvIV(SvRV(self));
         /* Note: caller must ensure data SV survives */
         rv = nghttp2_session_set_stream_user_data(ps->session, stream_id,
                                                    SvOK(data) ? newSVsv(data) : NULL);
         RETVAL = rv;
-#line 1722 "nghttp2.c"
+#line 1730 "nghttp2.c"
 	XSprePUSH;
 	PUSHi((IV)RETVAL);
     }
@@ -1737,17 +1745,17 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_terminate_session)
 ;
 	int	error_code = (int)SvIV(ST(1))
 ;
-#line 1075 "nghttp2.xs"
+#line 1083 "nghttp2.xs"
         nghttp2_perl_session *ps;
         int rv;
-#line 1744 "nghttp2.c"
+#line 1752 "nghttp2.c"
 	int	RETVAL;
 	dXSTARG;
-#line 1078 "nghttp2.xs"
+#line 1086 "nghttp2.xs"
         ps = (nghttp2_perl_session *)SvIV(SvRV(self));
         rv = nghttp2_session_terminate_session(ps->session, error_code);
         RETVAL = rv;
-#line 1751 "nghttp2.c"
+#line 1759 "nghttp2.c"
 	XSprePUSH;
 	PUSHi((IV)RETVAL);
     }
@@ -1771,7 +1779,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session__submit_response_streaming)
 ;
 	SV *	cb_user_data = ST(4)
 ;
-#line 1095 "nghttp2.xs"
+#line 1103 "nghttp2.xs"
         nghttp2_perl_session *ps;
         nghttp2_nv *nva;
         size_t nvlen;
@@ -1779,7 +1787,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session__submit_response_streaming)
         nghttp2_perl_data_provider *dp;
         int rv;
         I32 i;
-#line 1783 "nghttp2.c"
+#line 1791 "nghttp2.c"
 	int	RETVAL;
 	dXSTARG;
 
@@ -1796,7 +1804,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session__submit_response_streaming)
 		}
 	} STMT_END
 ;
-#line 1103 "nghttp2.xs"
+#line 1111 "nghttp2.xs"
         ps = (nghttp2_perl_session *)SvIV(SvRV(self));
 
         /* Build name-value array from Perl array of arrayrefs */
@@ -1847,7 +1855,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session__submit_response_streaming)
             croak("nghttp2_submit_response failed: %s", nghttp2_strerror(rv));
         }
         RETVAL = rv;
-#line 1851 "nghttp2.c"
+#line 1859 "nghttp2.c"
 	XSprePUSH;
 	PUSHi((IV)RETVAL);
     }
@@ -1870,14 +1878,14 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_submit_data)
 ;
 	int	eof = (int)SvIV(ST(3))
 ;
-#line 1169 "nghttp2.xs"
+#line 1177 "nghttp2.xs"
         nghttp2_perl_session *ps;
         nghttp2_perl_data_provider *dp;
         int rv;
-#line 1878 "nghttp2.c"
+#line 1886 "nghttp2.c"
 	int	RETVAL;
 	dXSTARG;
-#line 1173 "nghttp2.xs"
+#line 1181 "nghttp2.xs"
         ps = (nghttp2_perl_session *)SvIV(SvRV(self));
 
         dp = find_data_provider(ps, stream_id);
@@ -1906,7 +1914,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_submit_data)
             croak("submit_data: resume failed: %s", nghttp2_strerror(rv));
         }
         RETVAL = 0;
-#line 1910 "nghttp2.c"
+#line 1918 "nghttp2.c"
 	XSprePUSH;
 	PUSHi((IV)RETVAL);
     }
@@ -1925,17 +1933,17 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_is_stream_deferred)
 ;
 	int	stream_id = (int)SvIV(ST(1))
 ;
-#line 1210 "nghttp2.xs"
+#line 1218 "nghttp2.xs"
         nghttp2_perl_session *ps;
         nghttp2_perl_data_provider *dp;
-#line 1932 "nghttp2.c"
+#line 1940 "nghttp2.c"
 	int	RETVAL;
 	dXSTARG;
-#line 1213 "nghttp2.xs"
+#line 1221 "nghttp2.xs"
         ps = (nghttp2_perl_session *)SvIV(SvRV(self));
         dp = find_data_provider(ps, stream_id);
         RETVAL = dp ? dp->deferred : 0;
-#line 1939 "nghttp2.c"
+#line 1947 "nghttp2.c"
 	XSprePUSH;
 	PUSHi((IV)RETVAL);
     }
@@ -1954,17 +1962,17 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session__clear_deferred)
 ;
 	int	stream_id = (int)SvIV(ST(1))
 ;
-#line 1225 "nghttp2.xs"
+#line 1233 "nghttp2.xs"
         nghttp2_perl_session *ps;
         nghttp2_perl_data_provider *dp;
-#line 1961 "nghttp2.c"
-#line 1228 "nghttp2.xs"
+#line 1969 "nghttp2.c"
+#line 1236 "nghttp2.xs"
         ps = (nghttp2_perl_session *)SvIV(SvRV(self));
         dp = find_data_provider(ps, stream_id);
         if (dp) {
             dp->deferred = 0;
         }
-#line 1968 "nghttp2.c"
+#line 1976 "nghttp2.c"
     }
     XSRETURN_EMPTY;
 }
@@ -1982,12 +1990,12 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session__new_client_xs)
 	HV *	callbacks_hv;
 	SV *	user_data = ST(2)
 ;
-#line 1241 "nghttp2.xs"
+#line 1249 "nghttp2.xs"
         nghttp2_perl_session *ps;
         nghttp2_session_callbacks *callbacks;
         int rv;
         SV **svp;
-#line 1991 "nghttp2.c"
+#line 1999 "nghttp2.c"
 	SV *	RETVAL;
 
 	STMT_START {
@@ -2003,7 +2011,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session__new_client_xs)
 		}
 	} STMT_END
 ;
-#line 1246 "nghttp2.xs"
+#line 1254 "nghttp2.xs"
         /* Allocate our wrapper structure */
         Newxz(ps, 1, nghttp2_perl_session);
 
@@ -2065,7 +2073,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session__new_client_xs)
         RETVAL = sv_newmortal();
         sv_setref_pv(RETVAL, class, (void *)ps);
         SvREFCNT_inc(RETVAL);
-#line 2069 "nghttp2.c"
+#line 2077 "nghttp2.c"
 	RETVAL = sv_2mortal(RETVAL);
 	ST(0) = RETVAL;
     }
@@ -2085,7 +2093,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session__submit_request_xs)
 	AV *	headers_av;
 	SV *	body_sv = ST(2)
 ;
-#line 1318 "nghttp2.xs"
+#line 1326 "nghttp2.xs"
         nghttp2_perl_session *ps;
         nghttp2_nv *nva;
         size_t nvlen;
@@ -2095,7 +2103,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session__submit_request_xs)
         int32_t stream_id;
         I32 i;
         STRLEN body_len = 0;
-#line 2099 "nghttp2.c"
+#line 2107 "nghttp2.c"
 	int	RETVAL;
 	dXSTARG;
 
@@ -2112,7 +2120,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session__submit_request_xs)
 		}
 	} STMT_END
 ;
-#line 1328 "nghttp2.xs"
+#line 1336 "nghttp2.xs"
         ps = (nghttp2_perl_session *)SvIV(SvRV(self));
 
         /* Build name-value array from Perl array of arrayrefs */
@@ -2187,7 +2195,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session__submit_request_xs)
         }
 
         RETVAL = stream_id;
-#line 2191 "nghttp2.c"
+#line 2199 "nghttp2.c"
 	XSprePUSH;
 	PUSHi((IV)RETVAL);
     }
@@ -2208,20 +2216,20 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_submit_rst_stream)
 ;
 	unsigned int	error_code = (unsigned int)SvUV(ST(2))
 ;
-#line 1412 "nghttp2.xs"
+#line 1420 "nghttp2.xs"
         nghttp2_perl_session *ps;
         int rv;
-#line 2215 "nghttp2.c"
+#line 2223 "nghttp2.c"
 	int	RETVAL;
 	dXSTARG;
-#line 1415 "nghttp2.xs"
+#line 1423 "nghttp2.xs"
         ps = (nghttp2_perl_session *)SvIV(SvRV(self));
         rv = nghttp2_submit_rst_stream(ps->session, NGHTTP2_FLAG_NONE, stream_id, error_code);
         if (rv != 0) {
             croak("nghttp2_submit_rst_stream failed: %s", nghttp2_strerror(rv));
         }
         RETVAL = rv;
-#line 2225 "nghttp2.c"
+#line 2233 "nghttp2.c"
 	XSprePUSH;
 	PUSHi((IV)RETVAL);
     }
@@ -2242,16 +2250,16 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_submit_ping)
 ;
 	SV *	opaque_data = ST(2)
 ;
-#line 1431 "nghttp2.xs"
+#line 1439 "nghttp2.xs"
         nghttp2_perl_session *ps;
         STRLEN len;
         const uint8_t *data;
         uint8_t flags;
         int rv;
-#line 2252 "nghttp2.c"
+#line 2260 "nghttp2.c"
 	int	RETVAL;
 	dXSTARG;
-#line 1437 "nghttp2.xs"
+#line 1445 "nghttp2.xs"
         ps = (nghttp2_perl_session *)SvIV(SvRV(self));
         flags = ack ? NGHTTP2_FLAG_ACK : NGHTTP2_FLAG_NONE;
 
@@ -2269,7 +2277,7 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_submit_ping)
             croak("nghttp2_submit_ping failed: %s", nghttp2_strerror(rv));
         }
         RETVAL = rv;
-#line 2273 "nghttp2.c"
+#line 2281 "nghttp2.c"
 	XSprePUSH;
 	PUSHi((IV)RETVAL);
     }
@@ -2290,20 +2298,20 @@ XS_EUPXS(XS_Net__HTTP2__nghttp2__Session_submit_window_update)
 ;
 	int	window_size_increment = (int)SvIV(ST(2))
 ;
-#line 1464 "nghttp2.xs"
+#line 1472 "nghttp2.xs"
         nghttp2_perl_session *ps;
         int rv;
-#line 2297 "nghttp2.c"
+#line 2305 "nghttp2.c"
 	int	RETVAL;
 	dXSTARG;
-#line 1467 "nghttp2.xs"
+#line 1475 "nghttp2.xs"
         ps = (nghttp2_perl_session *)SvIV(SvRV(self));
         rv = nghttp2_submit_window_update(ps->session, NGHTTP2_FLAG_NONE, stream_id, window_size_increment);
         if (rv != 0) {
             croak("nghttp2_submit_window_update failed: %s", nghttp2_strerror(rv));
         }
         RETVAL = rv;
-#line 2307 "nghttp2.c"
+#line 2315 "nghttp2.c"
 	XSprePUSH;
 	PUSHi((IV)RETVAL);
     }

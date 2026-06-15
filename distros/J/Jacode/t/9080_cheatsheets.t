@@ -10,7 +10,7 @@
 #   CS4  Header: language code appears in line 2 as "(XX)"
 #   CS5  Header: metacpan URL present
 #   CS6  Header: author credit "INABA Hitoshi"
-#   CS7  Header: author email "ina@cpan.org"
+#   CS7  Header: author email "ina.cpan@gmail.com"
 #   CS8  Install: "cpanm Jacode"
 #   CS9  Usage: "use Jacode"
 #   CS10 API: Jacode::convert
@@ -163,8 +163,8 @@ for my $lang (@LANG_CODES) {
     #------------------------------------------------------------------
     # CS7: author email
     #------------------------------------------------------------------
-    ok( $content =~ /ina\@cpan\.org/,
-        "$lang CS7  author email 'ina\@cpan.org' present" );
+    ok( $content =~ /ina\.cpan\@gmail\.com/,
+        "$lang CS7  author email 'ina.cpan\@gmail.com' present" );
 
     #------------------------------------------------------------------
     # CS8: install command
@@ -342,7 +342,7 @@ file hygiene (size, line count, line endings).
   CS4   Header line 2 contains (XX) language tag
   CS5   metacpan.org/dist/Jacode URL present
   CS6   Author "INABA Hitoshi" present
-  CS7   Author email ina@cpan.org present
+  CS7   Author email ina.cpan@gmail.com present
   CS8   Install command "cpanm Jacode" present
   CS9   "use Jacode" present
   CS10  Jacode::convert present

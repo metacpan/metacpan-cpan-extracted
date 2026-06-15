@@ -2,7 +2,7 @@
 #
 # t/4340_utf8_by_euc__7of9.t
 #
-# Copyright (c) 2019 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2019 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 sub BEGIN {

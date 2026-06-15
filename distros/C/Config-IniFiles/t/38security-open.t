@@ -1,4 +1,5 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
+
 # Regression test for the 2-arg open() in _make_filehandle.
 #
 # _make_filehandle is the open path behind the -file argument (new -> ReadConfig
@@ -9,9 +10,9 @@
 use strict;
 use warnings;
 
-use Config::IniFiles;
-use File::Temp qw( tempdir );
-use File::Spec;
+use Config::IniFiles ();
+use File::Temp       qw( tempdir );
+use File::Spec       ();
 use Test::More tests => 5;
 
 my $dir = tempdir( CLEANUP => 1 );
@@ -21,6 +22,8 @@ my $dir = tempdir( CLEANUP => 1 );
     my $marker = File::Spec->catfile( $dir, "pwned_read" );
     my $fh     = eval { Config::IniFiles->_make_filehandle("touch $marker |") };
     close $fh if $fh;
+
+    # TEST
     ok !-e $marker, "trailing-pipe payload does not execute a command";
 }
 
@@ -29,6 +32,8 @@ my $dir = tempdir( CLEANUP => 1 );
     my $marker = File::Spec->catfile( $dir, "pwned_write" );
     my $fh     = eval { Config::IniFiles->_make_filehandle("| touch $marker") };
     close $fh if $fh;
+
+    # TEST
     ok !-e $marker, "leading-pipe payload does not execute a command";
 }
 
@@ -40,6 +45,8 @@ my $dir = tempdir( CLEANUP => 1 );
     close $fh;
     my $made = eval { Config::IniFiles->_make_filehandle("> $victim") };
     close $made if $made;
+
+    # TEST
     is -s $victim, 15, "redirect payload does not truncate a file";
 }
 
@@ -50,6 +57,8 @@ my $dir = tempdir( CLEANUP => 1 );
     print $fh "x\n";
     close $fh;
     my $opened = eval { Config::IniFiles->_make_filehandle($real) };
+
+    # TEST
     ok $opened, "plain filename still opens as a file";
 }
 
@@ -62,5 +71,7 @@ my $dir = tempdir( CLEANUP => 1 );
     print $fh "x\n";
     close $fh;
     my $padded = eval { Config::IniFiles->_make_filehandle("$real\n") };
+
+    # TEST
     ok !$padded, "trailing whitespace is significant (filename not trimmed)";
 }

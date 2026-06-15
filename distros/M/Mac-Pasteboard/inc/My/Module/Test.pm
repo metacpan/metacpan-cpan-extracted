@@ -16,7 +16,7 @@ no if "$]" >= 5.020, feature => qw{ signatures };
 # This occurs in both inc/My/Module/Meta.pm and inc/My/Module/Test.pm
 use constant CAN_USE_UNICODE	=> "$]" >= 5.008004;
 
-our $VERSION = '0.105';
+our $VERSION = '0.106';
 
 our @EXPORT =		## no critic (ProhibitAutomaticExportation)
 qw{
@@ -296,20 +296,20 @@ done by C<goto &Test::More::is>.
 =head1 SUPPORT
 
 Support is by the author. Please file bug reports at
-L<https://github.com/trwyant/perl-Mac-Pasteboard/issues>, or in
+L<https://github.com/trwyant/perl-Mac-Pasteboard/issues> or in
 electronic mail to the author.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III F<wyant at cpan dot org>
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2024 by Thomas R. Wyant, III
+Copyright (C) 2013-2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

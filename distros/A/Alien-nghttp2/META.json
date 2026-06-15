@@ -33,6 +33,7 @@
             "Alien::Build::MM" : "0.32",
             "Alien::Build::Plugin::Build::CMake" : "0.99",
             "Alien::Build::Plugin::Download::GitHub" : "0",
+            "Alien::Build::Plugin::PkgConfig::Negotiate" : "1.53",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
@@ -61,7 +62,7 @@
          "web" : "https://github.com/jjn1056/Alien-nghttp2"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_alienfile" : {
       "generated_by" : "Alien::Build::MM version 2.84",
       "requires" : {

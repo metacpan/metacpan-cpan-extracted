@@ -31,22 +31,22 @@ name: Dist-Zilla-PluginBundle-Codeberg
 provides:
   Dist::Zilla::App::Command::codeberg:
     file: lib/Dist/Zilla/App/Command/codeberg.pm
-    version: '2.0000'
+    version: '2.0100'
   Dist::Zilla::Plugin::Codeberg:
     file: lib/Dist/Zilla/Plugin/Codeberg.pm
-    version: '2.0000'
+    version: '2.0100'
   Dist::Zilla::Plugin::Codeberg::Create:
     file: lib/Dist/Zilla/Plugin/Codeberg/Create.pm
-    version: '2.0000'
+    version: '2.0100'
   Dist::Zilla::Plugin::Codeberg::Meta:
     file: lib/Dist/Zilla/Plugin/Codeberg/Meta.pm
-    version: '2.0000'
+    version: '2.0100'
   Dist::Zilla::Plugin::Codeberg::Update:
     file: lib/Dist/Zilla/Plugin/Codeberg/Update.pm
-    version: '2.0000'
+    version: '2.0100'
   Dist::Zilla::PluginBundle::Codeberg:
     file: lib/Dist/Zilla/PluginBundle/Codeberg.pm
-    version: '2.0000'
+    version: '2.0100'
 requires:
   Carp: '0'
   Class::Load: '0'
@@ -69,7 +69,7 @@ requires:
   Try::Tiny: '0'
   URL::Encode: '0'
   perl: '5.012'
-version: '2.0000'
+version: '2.0100'
 x_author_pledge:
   version: 1
 x_authority: cpan:GEEKRUTH

@@ -574,7 +574,7 @@ use warnings;
 
 use Exporter qw{ import };
 
-our $VERSION = '0.027';
+our $VERSION = '0.028';
 our @EXPORT_OK = qw{
     SUDOKU_SUCCESS
     SUDOKU_NO_SOLUTION
@@ -1661,7 +1661,7 @@ element is the name of the constraint applied:
  ? = no constraint: generated in backtrack mode.
 
 See C<http://www.research.att.com/~gsf/sudoku/> and
-L<http://www.angusj.com/sudoku/hints.php> for fuller
+L<https://www.angusj.com/sudoku/hints.php> for fuller
 definitions of the constraints and how they are applied. The
 L<ACKNOWLEDGMENTS|/ACKNOWLEDGMENTS> section addresses why the former
 URL is not an actual POD link.
@@ -2441,9 +2441,10 @@ The X, Y, and W constraints (to use Glenn Fowler's terminology) are
 not yet handled. The package can solve puzzles that need these
 constraints, but it does so by backtracking.
 
+=head1 SUPPORT
+
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Games-Sudoku-General>,
-L<https://github.com/trwyant/perl-Games-Sudoku-General/issues>, or in
+L<https://github.com/trwyant/perl-Games-Sudoku-General/issues> or in
 electronic mail to the author.
 
 =head1 ACKNOWLEDGMENTS
@@ -2458,10 +2459,12 @@ a reference implementation for checking the solutions of standard Sudoku
 puzzles, and whose constraint taxonomy data set provided invaluable test
 data. Dr. Fowler has left AT&T, and the above link is no longer valid,
 but is retained for documentation, and for use in (e.g.) the Wayback
-Machine. Some of the material is available at L<http://gsf.cococlyde.org/>.
+Machine. Some of the material was available at
+C<http://gsf.cococlyde.org/>, but as of February 2 2024 this redirects
+to Google and requires a login.
 
 Angus Johnson, whose fulsome explanation at
-L<http://www.angusj.com/sudoku/hints.php> was a great help
+L<https://www.angusj.com/sudoku/hints.php> was a great help
 in understanding the mechanics of solving Sudoku puzzles.
 
 Ed Pegg, Jr, whose Mathematical Association of America C<Math Games>
@@ -2517,17 +2520,31 @@ L<https://metacpan.org/dist/Games-YASudoku>) also solves the standard
 9x9 version of the puzzle. In contrast to the other packages, this one
 represents the board as a list of cell/value pairs.
 
+The C<Games-Sudoku-PatternSolver> package by Steffen Heinrich (see
+L<https://metacpan.org/dist/Games-Sudoku-PatternSolver>) both solves and
+generates 9x9 Sudoku puzzles. Generated puzzles can be exported to HTML
+and played in a browser.
+
+The C<Games-Sudoku-Html> package by Steffen Heinrich (see
+L<https://metacpan.org/dist/Games-Sudoku-Html>) generates static web
+pages that allow you to play 9 x 9 Sudoku puzzles that have been
+previously composed.
+
+The C<Games-Sudoku-Pdf> package by Steffen Heinrich (see
+L<https://metacpan.org/dist/Games-Sudoku-Pdf>) generates PDF documents
+from 9 x 9 Sudoku puzzles that have been previously composed.
+
 =head1 AUTHOR
 
-Thomas R. Wyant, III (F<wyant at cpan dot org>)
+Thomas R. Wyant, III (F<harryfmudd at comcast dot net>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2005-2006, 2008, 2011-2022 by Thomas R. Wyant, III
+Copyright (C) 2005-2006, 2008, 2011-2022, 2024-2026 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

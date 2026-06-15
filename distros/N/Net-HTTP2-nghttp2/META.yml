@@ -6,7 +6,7 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   Test::More: '0.98'
 configure_requires:
-  Alien::nghttp2: '0'
+  Alien::nghttp2: '0.003'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
@@ -27,5 +27,5 @@ requires:
 resources:
   bugtracker: https://github.com/jjn1056/Net-HTTP2-nghttp2/issues
   repository: https://github.com/jjn1056/Net-HTTP2-nghttp2.git
-version: '0.007'
+version: '0.008'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

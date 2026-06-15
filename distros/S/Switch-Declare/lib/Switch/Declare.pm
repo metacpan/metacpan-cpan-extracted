@@ -4,7 +4,7 @@ use 5.014;
 use strict;
 use warnings;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 require XSLoader;
 XSLoader::load('Switch::Declare', $VERSION);
@@ -26,12 +26,20 @@ Switch::Declare - compile-time, lexically-scoped C<switch>/C<case>
 
 	# statement form
 	switch ($value) {
-		case 200           { handle_ok()    }   # numeric  -> ==
-		case "GET"         { handle_get()   }   # string   -> eq
-		case /^\d+$/       { all_digits()   }   # regex    -> =~
-		case [400 .. 499]  { client_error() }   # range    -> >= && <=
-		case ["a","b","c"] { in_set()       }   # list     -> membership
-		case \&is_weekend  { weekend()      }   # predicate-> $code->($topic)
+		case 200           { handle_ok()    }   # numeric   -> ==
+		case "GET"         { handle_get()   }   # string    -> eq
+		case /^\d+$/       { all_digits()   }   # regex     -> =~
+		case [400 .. 499]  { client_error() }   # range     -> >= && <=
+		case ["a","b","c"] { in_set()       }   # list      -> membership
+		case \&is_weekend  { weekend()      }   # predicate -> $code->($topic)
+		case ref(ARRAY)    { handle_aref()  }   # reference type (exact)
+		case reftype(HASH) { handle_href()  }   # underlying type (through blessing)
+		case isa("Plan")   { handle_plan()  }   # blessed object derived from class
+		case MAX_RETRIES   { exhausted()    }   # named constant (use constant)
+		case == $limit     { at_limit()     }   # numeric compare vs a variable
+		case eq $name      { named()        }   # string  compare vs a variable
+		case =~ $pattern   { matched()      }   # regex match vs a runtime pattern
+		case undef         { missing()      }   # the topic is undef
 		default            { fallback()     }
 	}
 
@@ -90,17 +98,89 @@ lexicals:
 	    default                     { "ok"   }
 	}
 
+=item * C<ref(TYPE)> matches when C<ref($topic) eq "TYPE"> - the usual
+C<ARRAY>/C<HASH>/C<CODE>/C<SCALAR>/C<Regexp>/... names, or a class name for
+exact-class dispatch (C<ref($obj) eq "My::Class">). Bare C<ref> matches any
+reference. C<TYPE> may be a bareword or a quoted string.
+
+=item * C<reftype(TYPE)> is like C<ref(TYPE)> but reports the B<underlying>
+reference type, seeing through blessing - so a blessed arrayref matches
+C<reftype(ARRAY)> (where C<ref(ARRAY)> would not). Bare C<reftype> matches any
+reference.
+
+=item * C<isa(Class)> matches a B<blessed object> derived from C<Class> (a fast
+C<@ISA> check). It does not match plain class-name strings or unblessed
+references, and never dies on a non-object. It is a direct C<@ISA> walk, so it
+does not invoke an overridden C<isa()>/C<DOES> method.
+
+=item * C<undef> matches when the topic is undefined (see L</Undef and type
+safety>).
+
+=item * a B<named constant> - a bareword naming an inlinable C<use constant>
+(optionally package-qualified, C<Pkg::FOO>) - is folded to its value at compile
+time and classified exactly like the literal it holds: a numeric constant
+compiles to C<==>, a string constant to C<eq> (and is dispatch-eligible). It
+costs nothing at runtime - C<case FOO> is byte-for-byte C<case 1>.
+
+=item * a B<variable comparison> C<== $x> or C<eq $x> compares the topic against
+a runtime scalar. Because a variable's type is unknown at compile time, the
+comparison operator is written out: C<== $x> is numeric (C<==>, C<looks_like_number>
+-guarded on both sides), C<eq $x> is string (C<eq>) - exactly as in Perl itself.
+The operand is a plain scalar (C<$name> or C<$Pkg::name>); both are undef-safe (an
+undef topic I<or> an undef/non-numeric variable simply does not match, and never
+warns):
+
+	my $limit = 100;
+	my $tag   = "draft";
+	switch ($value) {
+	    case == $limit { "at the limit" }
+	    case eq $tag   { "a draft"      }
+	    default        { "other"        }
+	}
+
+=item * a B<runtime regex match> C<=~ $rx> matches the topic against a pattern
+held in a scalar - a C<qr//> object (recommended) or a string used as a pattern.
+This complements the compile-time C<< /literal/ >> form for the case where the
+pattern is only known at run time. It is undef-safe (an undef topic or undef
+pattern simply does not match, without warning). Being a runtime match outside a
+real C<m//> op, it is a pure membership test and does B<not> set the capture
+variables (C<$1>, C<@+>); if you need captures from a variable pattern, use a
+predicate arm, C<< case sub { $_[0] =~ $rx } >>. The operand is a plain scalar
+(C<$name> or C<$Pkg::name>):
+
+	my $rx = qr/^\d{4}-\d{2}-\d{2}$/;
+	switch ($field) {
+	    case =~ $rx { "looks like a date" }
+	    default     { "something else"    }
+	}
+
 =back
 
-Range and list comparisons follow Perl's own C<==>/C<eq> rules per element, so
-a C<[1, 2, 3]> list (numeric elements) compared against a non-numeric topic
-warns under C<use warnings> exactly as the equivalent hand-written
-C<$x == 1 || $x == 2> would. Keep list/range element types consistent with the
-topic to avoid this.
+=head2 Undef and type safety
 
-Patterns are deliberately a small, predictable grammar of literals rather than
-arbitrary expressions, so classification is unambiguous and the emitted code is
-as tight as a hand-written conditional.
+Every pattern is undef and type-safe: a topic never produces a warning, and
+only matches a pattern the comparison is actually meaningful for.
+
+=over 4
+
+=item * An B<undef> topic matches only an explicit C<case undef>; otherwise it
+falls through to C<default>. It never warns, and it never accidentally matches
+C<case 0> or C<case "">.
+
+=item * A B<numeric> pattern (number literal, range, or numeric list element)
+matches only a topic that C<looks_like_number>. A non-numeric topic neither
+matches nor warns - so C<< switch("one") { case 1 {...} } >> is silent (and,
+unlike a hand-written C<< "one" == 0 >>, never mis-matches C<case 0>).
+
+=back
+
+This is a deliberate difference from a naive hand-written C<==>/C<eq> chain,
+which would warn (C<Use of uninitialized value>, C<Argument isn't numeric>) on
+the same inputs. C<Switch::Declare> behaves like a I<correctly guarded> chain.
+
+Patterns are deliberately a small, predictable grammar rather than arbitrary
+expressions, so classification is unambiguous and the emitted code is as tight
+as a hand-written conditional.
 
 =head1 PERFORMANCE
 
@@ -109,11 +189,20 @@ is no wrapper subroutine call per evaluation. The chain of C<case> tests lowers
 to a native conditional expression - the very same C<==>/C<eq>/C<=~>/bounds ops
 you would write by hand.
 
-For the common case - the scrutinee is a plain variable or constant and each arm
-is a single-expression block - the construct compiles to B<exactly> a hand-written
-C<if>/C<elsif> (ternary) chain: no temporary, no enclosing scope, no extra ops.
-In the bundled benchmark (C<xt/bench.pl>) C<switch> and the equivalent hand-rolled
-chain run within measurement noise of each other (0-2%).
+For a B<string>, regex, predicate, or reference switch over a plain variable or
+constant scrutinee with single-expression arms, the construct compiles to
+B<exactly> a hand-written C<if>/C<elsif> (ternary) chain: no temporary, no
+enclosing scope, no extra ops. In the bundled benchmark (C<xt/bench.pl>) these
+run within measurement noise of a hand-rolled chain (0-2%).
+
+A B<numeric> switch pays for its type safety (see L</Undef and type safety>):
+each numeric comparison is guarded by C<looks_like_number>, computed B<once> per
+evaluation and shared across the arms. It therefore runs on par with an
+I<equivalently guarded> hand-written chain (within ~3% in C<xt/bench.pl>), and
+roughly 40-45% slower than a naive I<unguarded> C<$x == N> chain - which is the
+cost of not warning or mis-matching on non-numeric input. If you know the topic
+is always numeric and want the last drop of speed, a string switch or a
+hand-rolled chain avoids the guard.
 
 =head2 Dispatch mode
 

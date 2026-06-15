@@ -29,7 +29,7 @@ diag $mysqld_version_info;
 
 my $dbh = DBI->connect($mysqld->dsn(dbname => 'test'));
 my $mysqld_version = $dbh->{mysql_serverversion};
-$mysqld_version >= 50605 or plan skip_all => 'Require at least MySQL 5.6.5';
+$mysqld_version >= 80011 or plan skip_all => 'Require at least MySQL 8.0.11';
 
 my $minion = Minion->new(mysql => dsn => $mysqld->dsn( dbname => 'test' ));
 $minion->reset;
@@ -40,9 +40,9 @@ subtest 'Nothing to repair' => sub {
 };
 
 subtest 'Migrate up and down' => sub {
-  is $minion->backend->mysql->migrations->active, 16, 'active version is 16';
+  is $minion->backend->mysql->migrations->active, 17, 'active version is 17';
   is $minion->backend->mysql->migrations->migrate(0)->active, 0, 'active version is 0';
-  is $minion->backend->mysql->migrations->migrate->active, 16, 'active version is 16';
+  is $minion->backend->mysql->migrations->migrate->active, 17, 'active version is 17';
 };
 
 subtest 'Register and unregister' => sub {
@@ -391,13 +391,133 @@ subtest 'Reset (locks)' => sub {
 
 subtest 'Reset (all)' => sub {
   $minion->lock('test', 3600);
+  $minion->schedule(reset_test => '0 4 * * *' => 'test');
   ok $minion->backend->list_jobs(0, 1)->{total},    'jobs';
   ok $minion->backend->list_locks(0, 1)->{total},   'locks';
   ok $minion->backend->list_workers(0, 1)->{total}, 'workers';
+  ok $minion->backend->list_schedules(0, 1)->{total}, 'schedules';
   $minion->reset({all => 1})->repair;
   ok !$minion->backend->list_jobs(0, 1)->{total},    'no jobs';
   ok !$minion->backend->list_locks(0, 1)->{total},   'no locks';
   ok !$minion->backend->list_workers(0, 1)->{total}, 'no workers';
+  ok !$minion->backend->list_schedules(0, 1)->{total}, 'no schedules';
+};
+
+subtest 'Schedules' => sub {
+  is $minion->list_schedules(0, 10)->{total}, 0, 'no schedules';
+  my $sid = $minion->schedule(daily => '0 4 * * *' => 'test');
+  ok $sid, 'schedule id returned';
+  my $info = $minion->list_schedules(0, 10)->{schedules}[0];
+  is $info->{name},     'daily',     'right name';
+  is $info->{cron},     '0 4 * * *', 'right cron';
+  is $info->{task},     'test',      'right task';
+  is $info->{queue},    'default',   'default queue';
+  is $info->{priority}, 0,           'default priority';
+  is $info->{paused},   0,           'not paused';
+  is $info->{last_job}, undef,       'never fired';
+  is $info->{last_run}, undef,       'no last run';
+  ok $info->{next_run} > time, 'next_run is in the future';
+
+  my $next1 = $info->{next_run};
+  $minion->schedule(daily => '0 4 * * *' => 'test');
+  is $minion->list_schedules(0, 10)->{schedules}[0]{next_run}, $next1, 'next_run unchanged for same cron';
+  $minion->schedule(daily => '30 5 * * *' => 'test2');
+  $info = $minion->list_schedules(0, 10)->{schedules}[0];
+  isnt $info->{next_run}, $next1,       'next_run recomputed';
+  is $info->{cron},       '30 5 * * *', 'cron updated';
+
+  ok $minion->pause_schedule('daily'), 'paused';
+  is $minion->list_schedules(0, 10)->{schedules}[0]{paused}, 1, 'is paused';
+  ok $minion->resume_schedule('daily'), 'resumed';
+  is $minion->list_schedules(0, 10)->{schedules}[0]{paused}, 0, 'not paused';
+  ok !$minion->pause_schedule('does_not_exist'),  'pause unknown returns false';
+  ok !$minion->resume_schedule('does_not_exist'), 'resume unknown returns false';
+
+  $minion->schedule(opts => '*/5 * * * *' => 'test' => [1, 2, 3] =>
+      {attempts => 3, expire => 600, lax => 1, notes => {kind => 'unit'}, priority => 5, queue => 'important'});
+  my ($got) = grep { $_->{name} eq 'opts' } @{$minion->list_schedules(0, 10)->{schedules}};
+  is $got->{attempts}, 3,           'attempts stored';
+  is $got->{expire},   600,         'expire stored';
+  is $got->{lax},      1,           'lax stored';
+  is $got->{priority}, 5,           'priority stored';
+  is $got->{queue},    'important', 'queue stored';
+  is_deeply $got->{notes}, {kind => 'unit'}, 'notes stored';
+  is_deeply $got->{args}, [1, 2, 3], 'args stored';
+
+  my $by_name = $minion->list_schedules(0, 10, {names => ['daily']});
+  is $by_name->{total},                                        1,       'one match';
+  is $by_name->{schedules}[0]{name},                           'daily', 'right name';
+  is $minion->list_schedules(0, 10, {ids => [$sid]})->{total}, 1,       'filter by id';
+
+  eval { $minion->schedule(bad => 'not a cron' => 'test') };
+  like $@, qr/Invalid cron/, 'invalid cron rejected';
+  is $minion->list_schedules(0, 10, {names => ['bad']})->{total}, 0, 'no row created on failure';
+
+  ok $minion->unschedule('daily'),  'removed';
+  ok $minion->unschedule('opts'),   'removed';
+  ok !$minion->unschedule('daily'), 'second remove returns false';
+  is $minion->list_schedules(0, 10)->{total}, 0, 'all gone';
+};
+
+subtest 'Dispatch schedules' => sub {
+  is_deeply $minion->dispatch_schedules, [], 'nothing due';
+
+  my $sid = $minion->schedule(due => '0 4 * * *' => 'test');
+  $minion->backend->mysql->db->query(q{UPDATE minion_schedules SET next_run = DATE_SUB(NOW(), INTERVAL 1 MINUTE) WHERE id = ?},
+    $sid);
+
+  my (@enqueue, @events);
+  $minion->on(enqueue               => sub { push @enqueue, $_[1] });
+  $minion->on(enqueue_from_schedule => sub { push @events,  [$_[1], $_[2]] });
+
+  my $dispatched = $minion->dispatch_schedules;
+  is scalar @$dispatched,    1,     'one dispatched';
+  is $dispatched->[0]{name}, 'due', 'right name';
+  ok $dispatched->[0]{job}, 'job id returned';
+  is scalar @enqueue, 1,                     'enqueue event fired';
+  is $enqueue[0],     $dispatched->[0]{job}, 'enqueue event has job id';
+  is scalar @events,  1,                     'enqueue_from_schedule event fired';
+  is $events[0][1],   'due',                 'enqueue_from_schedule has schedule name';
+  is $events[0][0],   $dispatched->[0]{job}, 'enqueue_from_schedule has job id';
+
+  my $info = $minion->list_schedules(0, 10, {ids => [$sid]})->{schedules}[0];
+  is $info->{last_job}, $dispatched->[0]{job}, 'last_job recorded';
+  ok $info->{last_run},        'last_run recorded';
+  ok $info->{next_run} > time, 'next_run advanced into the future';
+
+  is_deeply $minion->dispatch_schedules, [], 'no further dispatch';
+
+  $minion->backend->mysql->db->query(q{UPDATE minion_schedules SET next_run = DATE_SUB(NOW(), INTERVAL 1 HOUR) WHERE id = ?},
+    $sid);
+  my $before = $minion->stats->{inactive_jobs};
+  $minion->dispatch_schedules;
+  is $minion->stats->{inactive_jobs}, $before + 1, 'one make-up enqueue, not many';
+
+  $minion->backend->mysql->db->query(q{UPDATE minion_schedules SET next_run = DATE_SUB(NOW(), INTERVAL 1 MINUTE) WHERE id = ?},
+    $sid);
+  $minion->pause_schedule('due');
+  is_deeply $minion->dispatch_schedules, [], 'paused schedule skipped';
+  $minion->resume_schedule('due');
+  $minion->unschedule('due');
+};
+
+subtest 'Dispatch schedules with concurrent dispatchers' => sub {
+  my $sid = $minion->schedule(racy => '0 4 * * *' => 'test');
+  $minion->backend->mysql->db->query(q{UPDATE minion_schedules SET next_run = DATE_SUB(NOW(), INTERVAL 1 MINUTE) WHERE id = ?},
+    $sid);
+
+  my $blocker = $minion->backend->mysql->db;
+  my $tx      = $blocker->begin;
+  is $blocker->query(q{SELECT get_lock('minion.schedules', 0)})->array->[0], 1,
+    'blocker holds lock';
+  is_deeply $minion->dispatch_schedules, [], 'second dispatcher backs off';
+  $tx->commit;
+  $blocker->query(q{SELECT RELEASE_LOCK('minion.schedules')});
+
+  is scalar @{$minion->dispatch_schedules}, 1, 'fired after lock released';
+
+  $minion->unschedule('racy');
+  $minion->reset({all => 1});
 };
 
 subtest 'Stats' => sub {
@@ -409,6 +529,7 @@ subtest 'Stats' => sub {
   );
   $minion->add_task(fail => sub { die "Intentional failure!\n" });
   my $stats = $minion->stats;
+  is $stats->{workers},          0, 'no workers';
   is $stats->{active_workers},   0, 'no active workers';
   is $stats->{inactive_workers}, 0, 'no inactive workers';
   is $stats->{enqueued_jobs},    0, 'no enqueued jobs';
@@ -418,8 +539,11 @@ subtest 'Stats' => sub {
   is $stats->{inactive_jobs},    0, 'no inactive jobs';
   is $stats->{delayed_jobs},     0, 'no delayed jobs';
   is $stats->{active_locks},     0, 'no active locks';
+  is $stats->{schedules},        0, 'no schedules';
+  is $stats->{inactive_schedules}, 0, 'no paused schedules';
   ok $stats->{uptime},           'has uptime';
   my $worker = $minion->worker->register;
+  is $minion->stats->{workers}, 1, 'one worker';
   is $minion->stats->{inactive_workers}, 1, 'one inactive worker';
   $minion->enqueue('fail');
   is $minion->stats->{enqueued_jobs}, 1, 'one enqueued job';
@@ -428,6 +552,7 @@ subtest 'Stats' => sub {
   is $minion->stats->{inactive_jobs}, 2, 'two inactive jobs';
   ok my $job = $worker->dequeue(0), 'job dequeued';
   $stats = $minion->stats;
+  is $stats->{workers},        1, 'one worker';
   is $stats->{active_workers}, 1, 'one active worker';
   is $stats->{active_jobs},    1, 'one active job';
   is $stats->{inactive_jobs},  1, 'one inactive job';
@@ -448,6 +573,7 @@ subtest 'Stats' => sub {
   ok $worker->dequeue(0)->finish(['works']), 'job finished';
   $worker->unregister;
   $stats = $minion->stats;
+  is $stats->{workers},        0, 'no workers';
   is $stats->{active_workers},   0, 'no active workers';
   is $stats->{inactive_workers}, 0, 'no inactive workers';
   is $stats->{active_jobs},      0, 'no active jobs';
@@ -562,6 +688,10 @@ subtest 'List jobs' => sub {
   is $jobs->next->{task},      'fail', 'right task';
   is $jobs->next,  undef, 'no more results';
   is $jobs->total, 4,     'four jobs';
+
+  my @tasks;
+  $minion->jobs->each(sub { push @tasks, [shift->{task}, $_->{task}] });
+  is_deeply \@tasks, [['add', 'add'], ['fail', 'fail'], ['fail', 'fail'], ['fail', 'fail']], 'right structure';
 
   $jobs = $minion->jobs->fetch(2);
   is $jobs->options->{before}, undef,  'no before';
@@ -706,6 +836,28 @@ subtest 'Jobs with priority' => sub {
   is $job->info->{retries},  2, 'job has been retried twice';
   is $job->info->{priority}, 0, 'low priority';
   ok $job->finish, 'job finished';
+
+  $id = $minion->enqueue(add => [2, 6], {priority => 2});
+  ok !$worker->dequeue(0, {min_priority => 5});
+  ok !$worker->dequeue(0, {min_priority => 3});
+  ok $job = $worker->dequeue(0, {min_priority => 2});
+  is $job->id,               $id, 'right id';
+  is $job->info->{priority}, 2,   'expected priority';
+  ok $job->finish, 'job finished';
+  $minion->enqueue(add => [2, 8], {priority => 0});
+  $minion->enqueue(add => [2, 7], {priority => 5});
+  $minion->enqueue(add => [2, 8], {priority => -2});
+  ok !$worker->dequeue(0, {min_priority => 6});
+  ok $job = $worker->dequeue(0, {min_priority => 0});
+  is $job->info->{priority}, 5, 'expected priority';
+  ok $job->finish, 'job finished';
+  ok $job = $worker->dequeue(0, {min_priority => 0});
+  is $job->info->{priority}, 0, 'expected priority';
+  ok $job->finish, 'job finished';
+  ok !$worker->dequeue(0, {min_priority => 0});
+  ok $job = $worker->dequeue(0, {min_priority => -10});
+  is $job->info->{priority}, -2, 'expected priority';
+  ok $job->finish, 'job finished';
   $worker->unregister;
 };
 
@@ -736,6 +888,31 @@ subtest 'Delayed jobs' => sub {
   is $info->{retries}, 1, 'job has been retried once';
   ok $info->{delayed} > $info->{retried}, 'delayed timestamp';
   ok $minion->job($id)->remove, 'job has been removed';
+  $worker->unregister;
+};
+
+subtest 'Task limits' => sub {
+  my $id     = $minion->enqueue('foo');
+  my $id2    = $minion->enqueue('foo');
+  my $id3    = $minion->enqueue('bar');
+  my $id4    = $minion->enqueue('baz');
+  my $id5    = $minion->enqueue('bar');
+  my $worker = $minion->worker->register;
+  ok my $job = $worker->dequeue(0, {tasks => ['foo', 'bar', 'baz']}), 'job dequeued';
+  is $job->id, $id, 'right id';
+  ok $job->finish,                                   'job finished';
+  ok $job = $worker->dequeue(0, {tasks => ['bar']}), 'job dequeued';
+  is $job->id, $id3, 'right id';
+  ok $job->finish,                                          'job finished';
+  ok $job = $worker->dequeue(0, {tasks => ['bar', 'baz']}), 'job dequeued';
+  is $job->id, $id4, 'right id';
+  ok $job->finish,                                          'job finished';
+  ok $job = $worker->dequeue(0, {tasks => ['bar', 'baz']}), 'job dequeued';
+  is $job->id, $id5, 'right id';
+  ok $job->finish,                                                 'job finished';
+  ok $job = $worker->dequeue(0, {tasks => ['foo', 'bar', 'baz']}), 'job dequeued';
+  is $job->id, $id2, 'right id';
+  ok $job->finish, 'job finished';
   $worker->unregister;
 };
 
@@ -881,11 +1058,12 @@ subtest 'Nested data structures' => sub {
   is $job->info->{state}, 'finished', 'right state';
   ok $job->note(yada => ['works']), 'added metadata';
   ok !$minion->backend->note(-1, {yada => ['failed']}), 'not added metadata';
-  my $notes = {foo => [4, 5, 6], bar => {baz => [1, 2, 3]}, baz => 'yada', yada => ['works']};
+  my $pid   = $job->info->{notes}{minion_pid};
+  my $notes = {foo => [4, 5, 6], bar => {baz => [1, 2, 3]}, baz => 'yada', yada => ['works'], minion_pid => $pid};
   is_deeply $job->info->{notes}, $notes, 'right metadata';
   is_deeply $job->info->{result}, [{23 => 'testtesttest'}], 'right structure';
   ok $job->note(yada => undef, bar => undef), 'removed metadata';
-  $notes = {foo => [4, 5, 6], baz => 'yada'};
+  $notes = {foo => [4, 5, 6], baz => 'yada', minion_pid => $pid};
   is_deeply $job->info->{notes}, $notes, 'right metadata';
   $worker->unregister;
 };
@@ -1309,6 +1487,40 @@ subtest 'Custom task classes' => sub {
   $worker->unregister;
 };
 
+subtest 'perform_jobs/perform_jobs_in_foreground' => sub {
+  $minion->add_task(
+    record_pid => sub {
+      my $job = shift;
+      $job->finish({pid => $$});
+    }
+  );
+  $minion->add_task(perform_fails => sub { die 'Just a test' });
+
+  my $id = $minion->enqueue('record_pid');
+  $minion->perform_jobs;
+  my $job = $minion->job($id);
+  is $job->task,                  'record_pid', 'right task';
+  is $job->info->{state},         'finished',   'right state';
+  isnt $job->info->{result}{pid}, $$,           'different process id';
+
+  my $id2 = $minion->enqueue('record_pid');
+  my $id3 = $minion->enqueue('perform_fails');
+  my $id4 = $minion->enqueue('record_pid');
+  $minion->perform_jobs_in_foreground;
+  my $job2 = $minion->job($id2);
+  is $job2->task,                'record_pid', 'right task';
+  is $job2->info->{state},       'finished',   'right state';
+  is $job2->info->{result}{pid}, $$,           'same process id';
+  my $job3 = $minion->job($id3);
+  is $job3->task,          'perform_fails', 'right task';
+  is $job3->info->{state}, 'failed',        'right state';
+  like $job3->info->{result}, qr/Just a test/, 'right error';
+  my $job4 = $minion->job($id4);
+  is $job4->task,                'record_pid', 'right task';
+  is $job4->info->{state},       'finished',   'right state';
+  is $job4->info->{result}{pid}, $$,           'same process id';
+};
+
 subtest 'Foreground' => sub {
   my $id  = $minion->enqueue(test => [] => {attempts => 2});
   my $id2 = $minion->enqueue('test');
@@ -1353,6 +1565,7 @@ subtest 'Worker remote control commands' => sub {
   my @commands;
   $_->add_command(test_id => sub { push @commands, shift->id }) for $worker, $worker2;
   $worker->add_command(test_args => sub { shift and push @commands, [@_] })->register;
+  $worker2->add_command(test_status => sub { $_[0]->status->{test} = $_[1] });
   ok $minion->broadcast('test_id', [], [$worker->id]), 'sent command';
   ok $minion->broadcast('test_id', [], [$worker->id, $worker2->id]), 'sent command';
   $worker->process_commands->register;
@@ -1363,10 +1576,12 @@ subtest 'Worker remote control commands' => sub {
   ok $minion->broadcast('test_whatever'), 'sent command';
   ok $minion->broadcast('test_args', [23], []), 'sent command';
   ok $minion->broadcast('test_args', [1, [2], {3 => 'three'}], [$worker->id]), 'sent command';
+  ok $minion->broadcast('test_status', ['works']),                             'sent command';
   $_->process_commands for $worker, $worker2;
   is_deeply \@commands, [$worker->id, [23], [1, [2], {3 => 'three'}], $worker2->id], 'right structure';
+  is $worker2->status->{test}, 'works', 'right status';
   $_->unregister for $worker, $worker2;
-  ok !$minion->broadcast('test_id', []), 'command not sent';
+  ok !$minion->broadcast('test_id'), 'command not sent';
 };
 
 subtest 'Single process worker' => sub {
@@ -1397,6 +1612,16 @@ subtest 'Single process worker' => sub {
   is $job2->info->{state},    'failed',            'right state';
   like $job2->info->{result}, qr/Error: Bad job!/, 'right error';
 };
+
+subtest 'Worker command stores job PID in notes' => sub {
+  my $id = $minion->enqueue('add', [5, 6]);
+  $minion->perform_jobs;
+  my $info = $minion->job($id)->info;
+  is $info->{state}, 'finished', 'right state';
+  ok my $pid = $info->{notes}{minion_pid}, 'pid stored in notes';
+  isnt $pid, $$, 'different process id';
+};
+
 
 done_testing();
 

@@ -5,7 +5,7 @@ hosted URLs, and suspicious domains
 
 # VERSION
 
-Version 0.10
+Version 0.11
 
 # SYNOPSIS
 
@@ -325,6 +325,16 @@ are cached in the object and in the cross-message CHI cache.
 
 Only `http://` and `https://` URLs are extracted.  URL shortener hosts
 are included in the returned list (they are flagged by `risk_assessment()`).
+
+When [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) is available, URLs whose host is a known URL shortener
+or cloud-storage redirect cloaker (Google Cloud Storage `storage.googleapis.com`,
+Azure Blob Storage `blob.core.windows.net`, Cloudflare Pages `pages.dev`,
+S3 buckets, CloudFront distributions, etc.) are automatically resolved by
+following HTTP 3xx redirects and HTML `meta http-equiv="refresh"` or
+`window.location` patterns up to `$REDIRECT_MAX_HOPS` hops.  The resolved
+destination URL is added to the returned list alongside the original, so abuse
+contacts for the real phishing target are always reported even when the email
+body contains only an object-store redirect URL.
 
 ### API Specification
 
@@ -748,8 +758,10 @@ if not already cached.
 
 ### Notes
 
-The result is not independently cached; each call recomputes the contact
-list from the cached results of the underlying methods.
+The result is cached on the object; subsequent calls return the same list
+without repeating the contact-collection logic.  The underlying per-IP and
+per-domain lookups are themselves cached by `originating_ip()`,
+`embedded_urls()`, and `mailto_domains()`.
 
 ### API Specification
 
@@ -876,19 +888,55 @@ before output.
 
     { type => 'string' }
 
-## header\_value
+## header\_value( $name )
 
 Returns the value of the first occurrence of a named header field, or
 `undef` if the header is absent.  The name comparison is case-insensitive.
 
-### API SPECIFICATION
+### Usage
 
-    Input:  name => Str  (required) - header field name, e.g. 'Subject'
-    Output: Str | undef
+    my $subj = $analyser->header_value('Subject');
+    my $from  = $analyser->header_value('From');
+    my $msgid = $analyser->header_value('Message-ID');
 
-### MESSAGES
+### Arguments
 
-    (none - returns undef on missing header, never throws)
+- `$name` (string, required)
+
+    The header field name, e.g. `'Subject'`, `'From'`, `'X-Mailer'`.
+    Comparison is case-insensitive.
+
+### Returns
+
+The raw header value string (not decoded), or `undef` if the named header
+is not present.  When the same header appears more than once, only the value
+of the first occurrence is returned.
+
+### Side Effects
+
+None.  Header data is pre-parsed during `parse_email()`.
+
+### Notes
+
+Header values are returned verbatim, including any MIME encoded-word sequences
+(`=?charset?B/Q?...?=`).  Pass the result through `_decode_mime_words()`
+internally if human-readable output is needed.
+
+### API Specification
+
+#### Input
+
+    {
+        name => { type => 'string', required => 1 },
+    }
+
+#### Output
+
+    { type => [ 'string', 'undef' ] }
+
+### Messages
+
+None -- returns `undef` on a missing header, never throws.
 
 # ALGORITHM: DOMAIN INTELLIGENCE PIPELINE
 
@@ -1005,9 +1053,14 @@ The following are optional but strongly recommended:
 
     Net::DNS            -- enables MX, NS, AAAA record lookups
     LWP::UserAgent      -- enables RDAP (faster and richer than raw WHOIS)
-    HTML::LinkExtor     -- enables structural HTML link extraction
+                          and following redirect chains for URL shorteners
+                          and cloud-storage redirect cloakers
+    LWP::ConnCache      -- enables HTTP connection reuse (used with LWP::UserAgent)
+    HTML::LinkExtor     -- enables structural HTML link extraction with entity decoding
     CHI                 -- enables cross-message IP/domain result caching
     IO::Socket::IP      -- enables IPv6 WHOIS connections
+    Domain::PublicSuffix -- enables accurate eTLD+1 domain normalisation
+    AnyEvent::DNS       -- enables parallel DNS resolution for multiple URL hosts
 
 # LIMITATIONS
 

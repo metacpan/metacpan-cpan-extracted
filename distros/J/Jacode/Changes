@@ -1,5 +1,39 @@
 Revision history for this software.
 
+2.13.4.34 2026-06-15 00:00:00
+  - lib/jacode.pl: rewrite the UTF-8 source self-check on line 2 so that
+    it no longer uses perl 5 only syntax. The previous form embedded the
+    file name with the "baby cart" construct @{[__FILE__]}, which depends
+    on references (and __FILE__ interpolation) and therefore does NOT
+    parse on perl 4.036 -- it caused a compile-time failure that prevented
+    jacode.pl from loading at all on perl 4, contradicting the stated
+    "perl 4.036 through current perl 5" compatibility goal. The regular
+    expression that detects the encoding is unchanged (it still aborts
+    loading unless the file was saved as UTF-8); only the die message was
+    simplified to drop @{[...]} and __FILE__.
+  - add t/9060_perl4_baby_cart.t: static guard asserting that lib/jacode.pl
+    contains no @{[ ... ]} baby-cart construct (a perl 5 only idiom), so
+    this perl 4 incompatibility cannot silently return
+  - lib/jacode.pl: document the perl 4 safe self-check in POD
+    ("COMPATIBILITY AND WARNINGS" section)
+  - lib/jacode.pl: suppress the "Old package separator" deprecation
+    warning that the apostrophe (') separator triggers on Perl 5.38.0+.
+    The separator is kept for Perl 4.036 / 5.005_03 compatibility and is
+    NOT changed to "::". Two BEGIN blocks (gated on $] >= 5.038000, wrapped
+    in eval q{} so they stay inert on Perl 4 / 5.005_03) install a __WARN__
+    filter before, and restore the caller's handler after, the apostrophe
+    code is compiled. The filter drops only that one message and chains
+    every other warning through to the caller (fail-safe).
+  - add t/9030_no_apostrophe_warning.t: assert require/init emits no other
+    warning class, and that the apostrophe-separator warning does not leak
+    on Perl 5.38.0+
+  - add t/9040_roundtrip_invariant.t: assert X -> Y -> X round-trip identity
+    for jis/euc/sjis/utf8 over a hiragana/katakana/kanji/fullwidth/halfwidth/
+    punctuation corpus
+  - lib/jacode.pl: document the above warning suppression in POD
+    (new "COMPATIBILITY AND WARNINGS" section)
+  - created by INABA Hitoshi
+
 2.13.4.33 2026-04-15 00:00:00
   - add t/9080_cheatsheets.t: doc/ cheat sheet quality checks
   - add doc/jacode_cheatsheet.*.txt: Jacode quick reference in 21 languages

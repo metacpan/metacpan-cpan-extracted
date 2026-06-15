@@ -1,5 +1,99 @@
 Revision history for Email-Abuse-Investigator
 
+0.11	Sun Jun 14 20:02:44 EDT 2026
+
+  [Enhancements]
+
+  - abuse_report_text() now includes a REPORTED URLs section listing every
+    embedded HTTP/HTTPS URL with its resolved host, IP, and network org.
+    Previously the ISP-facing report body named the abuse contact but gave no
+    list of the reported URLs, leaving the receiving abuse desk with no
+    actionable detail.
+
+  - abuse_contacts() role summarisation now lists actual URL hostnames when
+    multiple URLs share the same abuse contact.  Previously the summary
+    collapsed all URL-host roles to the unhelpful string "URL host, URL host,
+    URL host, …".  The new format is "N routes: URL host: a.example,
+    b.example, c.example and 2 more", making the role string immediately
+    actionable for both the interactive prompt in submit_abuse_report and the
+    ABUSE CONTACTS line in the emailed report.
+
+  [Documentation]
+
+  - POD: corrected abuse_contacts() Notes section, which incorrectly stated
+    the result is not cached; the implementation caches it in $self->{_contacts}.
+
+  - POD: REQUIRED MODULES optional list now documents LWP::ConnCache (HTTP
+    connection reuse), Domain::PublicSuffix (eTLD+1 normalisation), and
+    AnyEvent::DNS (parallel DNS), which were wired up in the BEGIN block but
+    absent from the module documentation.
+
+  - POD: header_value() expanded from a stub to a full-standard-format entry
+    with Usage, Arguments, Returns, Side Effects, Notes, and API Specification
+    sections, matching the style of all other public methods.
+
+  [Bug Fixes]
+
+  - _analyse_domain() now sorts NS records alphabetically before selecting
+    the first nameserver, making report() output deterministic across DNS
+    round-robin orderings.  Previously two independent object instances
+    querying the same domain could receive NS records in different orders
+    and record different nameservers, causing spurious test failures.
+    Fixes https://github.com/nigelhorne/Email-Abuse-Investigator/issues/1
+
+  - Bumped the minimum verion of Params::Validate::Strict, so that fuzz.t works
+    with extreme integers
+
+  [Tests]
+
+  - t/locales.t: added stubs for the three previously-missing network seam
+    methods (_domain_whois, _raw_whois, _follow_redirect_chain) so no test
+    in this file makes a real network call.
+
+  - t/locales.t: output_locale_stable subtest now reuses a single object
+    instance and calls parse_email() twice (once per locale) rather than
+    creating two independent objects.  This eliminates cross-instance DNS
+    divergence as an additional guard alongside the NS sort fix above.
+
+  - t/integration.t: without_optionals() now calls Test::More::plan(skip_all)
+    when Test::Without::Module is not installed, so OD subtests appear as
+    proper skips in CI rather than failures ("No tests run!").
+
+  - Redirect-cloaker detection: the module now follows HTTP redirect chains for
+    URLs whose host is a known cloud object-store or CDN (Google Cloud Storage
+    storage.googleapis.com, Azure Blob Storage blob.core.windows.net, Cloudflare
+    Pages pages.dev, Firebase firebaseapp.com / web.app, S3 buckets, CloudFront
+    distributions, GitHub Pages).  Up to $REDIRECT_MAX_HOPS (3) hops are
+    followed, detecting HTTP 3xx Location: redirects, HTML <meta http-equiv=
+    "refresh"> tags, and window.location.replace() / window.location.href
+    JavaScript patterns.  The resolved destination URL is added to the
+    embedded_urls() list alongside the original, so abuse contacts for the real
+    phishing landing page are surfaced even when the email body contains only an
+    object-store redirect URL (a common spam-filter-bypass technique).
+    Requires LWP::UserAgent; silently skipped when unavailable.
+    New private structures: %REDIRECT_HOSTS, @REDIRECT_HOST_SUFFIXES,
+    $REDIRECT_MAX_HOPS constant; new :Protected seam _follow_redirect_chain();
+    new :Private helper _is_redirect_cloaker().
+
+  - New risk flag redirect_cloaker (MEDIUM weight) raised by risk_assessment()
+    when an embedded URL host is a cloud-storage or CDN redirect cloaker.
+    Separate from the existing url_shortener flag.
+
+  - Added storage.googleapis.com and googleapis.com to %PROVIDER_ABUSE with
+    abuse contact google-cloud-compliance@google.com and note pointing to
+    https://support.google.com/code/go/gce_abuse_report.
+
+  - t/integration.t: added Scenario 5b (cloud-storage redirect cloaker):
+    verifies that a GCS URL is followed to its phishing destination, that both
+    hosts appear in embedded_urls(), that redirect_cloaker is flagged, and that
+    abuse contacts for both Google Cloud and the final host are present.
+    _follow_redirect_chain() added to the install_stubs() harness as a new
+    :Protected seam, defaulting to sub { undef }.
+
+  - Overall test count: 968 tests across 18 files (unchanged count; Scenario 5b
+    adds 1 subtest with 6 assertions, integrated into the existing 49-scenario
+    block).
+
 0.10	Thu Jun 11 21:54:37 EDT 2026
 
   [Enhancements]
@@ -155,7 +249,8 @@ Revision history for Email-Abuse-Investigator
     - BOOL_NEGATE_596_2: new() always returns a distinct blessed object regardless
       of CHI cache state.
 
-  - Overall test count: 969 tests across 18 files (up from 920).
+  - Overall test count: 968 tests across 18 files (up from 920).
+
 
   [Code Quality]
 

@@ -4,7 +4,7 @@ die "This file is not encoded in UTF-2.\n" if q{あ} ne "\xe3\x81\x82";
 #
 # 1502_cinquecent_2012-10-21_OKWave.t
 #
-# Copyright (c) 2016, 2019 INABA Hitoshi <ina@cpan.org>
+# Copyright (c) 2016, 2019 INABA Hitoshi <ina.cpan@gmail.com>
 #
 ######################################################################
 

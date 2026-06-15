@@ -24,7 +24,7 @@ WriteMakefile(
     },
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '6.52',
-        'Alien::nghttp2'      => 0,
+        'Alien::nghttp2'      => '0.003',
     },
 
     # XS configuration
@@ -52,17 +52,22 @@ WriteMakefile(
 sub find_nghttp2 {
     my ($cflags, $libs);
 
-    # Try pkg-config first
+    # Try pkg-config first (require >= 1.57 for the stream-reset rate-limit API)
     if (my $pc = find_pkg_config()) {
-        $cflags = `$pc --cflags libnghttp2 2>/dev/null`;
-        $libs   = `$pc --libs libnghttp2 2>/dev/null`;
+        if (system("$pc --atleast-version=1.57.0 libnghttp2") == 0) {
+            $cflags = `$pc --cflags libnghttp2 2>/dev/null`;
+            $libs   = `$pc --libs libnghttp2 2>/dev/null`;
 
-        if ($? == 0 && $libs) {
-            chomp($cflags, $libs);
-            print "Found nghttp2 via pkg-config:\n";
-            print "  CFLAGS: $cflags\n";
-            print "  LIBS:   $libs\n";
-            return ($cflags, $libs);
+            if ($? == 0 && $libs) {
+                chomp($cflags, $libs);
+                print "Found nghttp2 (>=1.57) via pkg-config:\n";
+                print "  CFLAGS: $cflags\n";
+                print "  LIBS:   $libs\n";
+                return ($cflags, $libs);
+            }
+        }
+        else {
+            print "System libnghttp2 < 1.57.0; falling back to Alien::nghttp2\n";
         }
     }
 

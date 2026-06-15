@@ -19,7 +19,7 @@ my %module_build_args = (
     "Shlomi Fish <shlomif\@cpan.org>"
   ],
   "dist_name" => "Config-IniFiles",
-  "dist_version" => "3.001000",
+  "dist_version" => "3.002000",
   "license" => "perl",
   "module_name" => "Config::IniFiles",
   "recursive_test_files" => 1,

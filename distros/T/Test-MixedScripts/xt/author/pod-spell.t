@@ -17,4 +17,4 @@ Test
 confusable
 confusables
 lib
-rrwo
+perl

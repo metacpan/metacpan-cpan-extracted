@@ -7,14 +7,15 @@ eg/README
 inc/My/Module/Build.pm
 inc/My/Module/Meta.pm
 lib/Game/Life/Faster.pm
-LICENSES/Artistic
-LICENSES/Copying
+LICENSE-Artistic
+LICENSE-GPL
 Makefile.PL
 MANIFEST
 META.json
 META.yml
 README
 script/game-life-faster
+SECURITY
 t/basic.t
 t/game.t
 xt/author/changes.t

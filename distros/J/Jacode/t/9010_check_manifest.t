@@ -2,7 +2,7 @@
 #
 # t/9010_check_manifest.t - verify MANIFEST lists all expected files
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 # This file is encoded in UTF-8.

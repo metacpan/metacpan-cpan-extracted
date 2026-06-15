@@ -8,11 +8,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "test text for mixed and potentially confusable Unicode scripts",
-  "AUTHOR" => "Robert Rothenberg <rrwo\@cpan.org>",
-  "BUILD_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "7.22",
-    "Module::Metadata" => "1.000015"
-  },
+  "AUTHOR" => "Robert Rothenberg <perl\@rhizomnic.com>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -36,14 +32,16 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
     "FindBin" => 0,
-    "Module::Metadata" => "1.000015",
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
+    "Module::Metadata" => 0,
     "Test2::Plugin::UTF8" => 0,
     "Test2::Tools::Exception" => 0,
     "Test2::V0" => 0,
     "Test::More" => 0,
     "strict" => 0
   },
-  "VERSION" => "v0.6.4",
+  "VERSION" => "v0.6.5",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -53,13 +51,14 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Carp" => 0,
   "Exporter" => "5.57",
-  "ExtUtils::MakeMaker" => "7.22",
   "File::Basename" => 0,
   "File::Spec" => 0,
   "FindBin" => 0,
   "IO" => 0,
+  "IO::Handle" => 0,
+  "IPC::Open3" => 0,
   "List::Util" => 0,
-  "Module::Metadata" => "1.000015",
+  "Module::Metadata" => 0,
   "Test2::API" => "1.302200",
   "Test2::Plugin::UTF8" => 0,
   "Test2::Tools::Exception" => 0,

@@ -1,5 +1,6 @@
 Build.PL
 Changes
+CONTRIBUTING
 constant-c.inc
 constant-h.inc
 constant-xs.inc
@@ -12,8 +13,8 @@ inc/My/Module/Test.pm
 inc/trytypes.c
 lib/Mac/Pasteboard.pm
 lib/Mac/Pasteboard/Droplet.pod
-LICENSES/Artistic
-LICENSES/Copying
+LICENSE-Artistic
+LICENSE-GPL
 Makefile.PL
 MANIFEST
 MANIFEST.SKIP
@@ -25,6 +26,7 @@ pbl.h
 ppport.h
 README
 script/pbtool
+SECURITY
 t/basic.t
 t/copy.tx
 t/error.tx

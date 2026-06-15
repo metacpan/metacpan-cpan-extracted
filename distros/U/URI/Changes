@@ -1,5 +1,8 @@
 Revision history for URI
 
+5.35      2026-06-14 23:04:12Z
+    - Strip leading zeros from port numbers in canonical URIs (GH#69) (GH#162)
+
 5.34      2025-09-17 11:00:27Z
     - Add WebSocket (ws, wss) URI (GH#158) (david-dick)
 
@@ -748,7 +751,7 @@ Revision history for URI
    web spiders.
 
    URI::URL->new("foo", "bar")->base used to return
-   a "URI" object.  Now an URI::URL object is returned
+   a "URI" object.  Now a URI::URL object is returned
    instead.
 
    Deal properly with file:///-URIs.

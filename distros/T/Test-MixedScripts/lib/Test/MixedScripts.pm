@@ -20,7 +20,7 @@ use Test2::Util::DistFiles v0.2.0 qw( manifest_files is_perl_file );
 
 our @EXPORT_OK = qw( all_perl_files_scripts_ok file_scripts_ok );
 
-our $VERSION = 'v0.6.4';
+our $VERSION = 'v0.6.5';
 
 
 sub file_scripts_ok {
@@ -162,7 +162,7 @@ Test::MixedScripts - test text for mixed and potentially confusable Unicode scri
 
 =head1 VERSION
 
-version v0.6.4
+version v0.6.5
 
 =head1 SYNOPSIS
 
@@ -307,7 +307,7 @@ then see F<SECURITY.md> for instructions how to report security vulnerabilities.
 
 =head1 AUTHOR
 
-Robert Rothenberg <rrwo@cpan.org>
+Robert Rothenberg <perl@rhizomnic.com>
 
 =head1 COPYRIGHT AND LICENSE
 

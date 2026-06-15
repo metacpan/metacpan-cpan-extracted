@@ -1,6 +1,9 @@
 use alienfile;
 
-plugin 'PkgConfig' => 'libnghttp2';
+plugin 'PkgConfig' => (
+    pkg_name        => 'libnghttp2',
+    atleast_version => '1.57.0',
+);
 
 share {
     requires 'Alien::Build::Plugin::Build::CMake' => '0.99';

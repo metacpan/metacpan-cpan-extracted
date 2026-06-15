@@ -1,23 +1,24 @@
-#!/usr/bin/perl
+#! /usr/bin/env perl
 
 use strict;
 use warnings;
 
-use IO::All qw/ io /;
+use Path::Tiny qw/ path /;
 
 my ($version) =
     ( map { m{\$VERSION *= *'([^']+)'} ? ($1) : () }
-        io->file('lib/Config/IniFiles.pm')->getlines() );
+        path("./lib/Config/IniFiles/")->lines_utf8() );
 
 if ( !defined($version) )
 {
     die "Version is undefined!";
 }
 
-my @cmd = (
-    "git", "tag", "-m", "Tagging the Config-IniFiles release as $version",
-    "releases/$version",
-);
+my $DIST = "Config-IniFiles";
+my $TAG  = "releases/$version";
+
+my @cmd =
+    ( "git", "tag", "-m", "Tagging the $DIST release as $version", "$TAG", );
 
 print join( " ", map { /\s/ ? qq{"$_"} : $_ } @cmd ), "\n";
 exec(@cmd);

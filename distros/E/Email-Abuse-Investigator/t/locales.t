@@ -7,6 +7,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Test::Mockingbird qw(mock_scoped);
 use POSIX qw( ENOENT EACCES );
 
 use FindBin qw( $Bin );
@@ -31,13 +32,21 @@ Test body.
 END_EMAIL
 }
 
-# Disable any real network lookups
-no warnings 'redefine';
-*Email::Abuse::Investigator::_reverse_dns = sub { '(no reverse DNS)' };
-*Email::Abuse::Investigator::_resolve_host = sub { return () };
-*Email::Abuse::Investigator::_whois_ip = sub { return {} };
-*Email::Abuse::Investigator::_rdap_lookup = sub { return {} };
-use warnings 'redefine';
+# File-scope guard: keeps all seven network seam stubs active for the entire
+# test run; mock_scoped() auto-restores originals when $NETWORK_STUBS goes out
+# of scope, removing the need for manual 'no warnings redefine' boilerplate.
+# Net::DNS::Resolver->search() inside _analyse_domain is NOT a seam; the sort
+# fix in the module ensures deterministic NS selection despite DNS round-robin.
+my $NETWORK_STUBS = mock_scoped(
+	'Email::Abuse::Investigator',
+	_reverse_dns           => sub { '(no reverse DNS)' },
+	_resolve_host          => sub { return () },
+	_whois_ip              => sub { return {} },
+	_rdap_lookup           => sub { return {} },
+	_domain_whois          => sub { return undef },
+	_raw_whois             => sub { return undef },
+	_follow_redirect_chain => sub { return undef },
+);
 
 # ============================================================================
 # SECTION 1: Geographic / country-code checks
@@ -258,20 +267,32 @@ subtest 'posix_no_hardcoded_english_errno' => sub {
 
 subtest 'output_locale_stable' => sub {
 	# report() output must not change based on LC_ALL; all analyst text is
-	# hard-coded English, so switching locale should produce identical output.
+	# hard-coded English, so switching locale must produce identical output.
+	#
+	# We use a single object and call parse_email() + report() twice: once
+	# under each locale.  Using one object eliminates cross-instance DNS
+	# divergence — the CHI cache (or per-object cache) ensures domain lookups
+	# return the same data on the second parse.  The sort fix in _analyse_domain
+	# additionally guarantees deterministic NS selection even without CHI.
 	my $email = make_email_with_ip('91.198.174.42');
 
-	my $inv_en = Email::Abuse::Investigator->new();
-	$inv_en->parse_email($email);
-	local $ENV{LC_ALL} = 'en_US.UTF-8';
-	local $ENV{LANG}   = 'en_US.UTF-8';
-	my $report_en = $inv_en->report();
+	my $inv = Email::Abuse::Investigator->new();
 
-	my $inv_de = Email::Abuse::Investigator->new();
-	$inv_de->parse_email($email);
-	local $ENV{LC_ALL} = 'de_DE.UTF-8';
-	local $ENV{LANG}   = 'de_DE.UTF-8';
-	my $report_de = $inv_de->report();
+	my $report_en;
+	{
+		local $ENV{LC_ALL} = 'en_US.UTF-8';
+		local $ENV{LANG}   = 'en_US.UTF-8';
+		$inv->parse_email($email);
+		$report_en = $inv->report();
+	}
+
+	my $report_de;
+	{
+		local $ENV{LC_ALL} = 'de_DE.UTF-8';
+		local $ENV{LANG}   = 'de_DE.UTF-8';
+		$inv->parse_email($email);
+		$report_de = $inv->report();
+	}
 
 	is($report_en, $report_de,
 		'report() output is identical under en_US.UTF-8 and de_DE.UTF-8');

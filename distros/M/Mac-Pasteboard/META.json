@@ -1,10 +1,10 @@
 {
    "abstract" : "Manipulate Mac OS X pasteboards",
    "author" : [
-      "Tom Wyant (wyant at cpan dot org)"
+      "Tom Wyant (harryfmudd at comcast dot net)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4234",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -56,14 +56,14 @@
    "provides" : {
       "Mac::Pasteboard" : {
          "file" : "lib/Mac/Pasteboard.pm",
-         "version" : "0.105"
+         "version" : "0.106"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "wyant@cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Mac-Pasteboard"
+         "mailto" : "harryfmudd@comcast.net",
+         "web" : "https://github.com/trwyant/perl-Mac-Pasteboard/issues"
       },
       "license" : [
          "http://dev.perl.org/licenses/"
@@ -74,6 +74,6 @@
          "web" : "https://github.com/trwyant/perl-Mac-Pasteboard"
       }
    },
-   "version" : "0.105",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "0.106",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

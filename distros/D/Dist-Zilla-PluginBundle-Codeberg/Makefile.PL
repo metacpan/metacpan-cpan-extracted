@@ -55,7 +55,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "2.0000",
+  "VERSION" => "2.0100",
   "test" => {
     "TESTS" => "t/*.t t/tests/dist/zilla/app/command/*.t t/tests/dist/zilla/plugin/codeberg/*.t t/tests/dist/zilla/pluginbundle/*.t"
   }

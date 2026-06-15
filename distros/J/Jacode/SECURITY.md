@@ -1,27 +1,17 @@
 # Security Policy
 
-## Supported Versions
-
-| Version | Supported          |
-| ------- | ------------------ |
-| latest  | :white_check_mark: |
-| older   | :x:                |
-
 ## Reporting a Vulnerability
 
-To report a vulnerability, please send e-mail to ina@cpan.org.
+If you discover a security vulnerability in this distribution, please report
+it by e-mail to the author at ina.cpan@gmail.com.
 
-Do not report security vulnerabilities through public GitHub issues.
+Do NOT open a public GitHub issue for security vulnerabilities.  Please use
+private e-mail so that a fix can be prepared before public disclosure.
 
-You can expect a response within a few days. If the issue is confirmed,
-a patch will be released as soon as possible.
+You can expect an acknowledgement within a few days.  If you do not receive
+a response within one week, please follow up.
 
-## Notes
+## Supported Versions
 
-jacode.pl and Jacode.pm perform character encoding conversion only.
-They do not open network connections, execute external commands,
-or write to the filesystem during normal use.
-
-The only security-sensitive operation is the `open(FILE, $file)`
-call in the bundled pkf command (invoked when running jacode.pl
-directly as a script), which reads files named on the command line.
+Only the most recent release on CPAN is actively maintained.  Please
+upgrade to the latest version before reporting security issues.

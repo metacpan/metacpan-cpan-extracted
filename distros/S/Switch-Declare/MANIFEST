@@ -23,6 +23,12 @@ t/12-scope.t
 t/13-scrutinee.t
 t/14-recursion.t
 t/15-edge.t
+t/16-undef.t
+t/17-ref.t
+t/18-reftype.t
+t/19-isa.t
+t/20-numeric-guard.t
+t/21-const-var.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

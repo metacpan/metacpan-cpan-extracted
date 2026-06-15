@@ -6,7 +6,7 @@ do { my $x = {
                       },
        'runtime' => {
                       'requires' => {
-                                      'Minion' => '10.13',
+                                      'Minion' => '12.00',
                                       'Mojo::mysql' => '1.04',
                                       'Mojolicious' => '9.0',
                                       'perl' => '5.016'

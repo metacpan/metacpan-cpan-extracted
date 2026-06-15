@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Codeberg::Create 2.0000;
+package Dist::Zilla::Plugin::Codeberg::Create 2.0100;
 
 use Modern::Perl;
 use JSON::MaybeXS;
@@ -137,7 +137,7 @@ sub after_mint {
       ]
    );
 
-   my $url = $self->api . '/projects';
+   my $url = $self->api . '/repos';
    $content = encode_json($params);
    $headers->{'content-type'} = 'application/json';
    $self->log_debug("Sending POST $url");
@@ -207,7 +207,7 @@ Dist::Zilla::Plugin::Codeberg::Create - Create a new Codeberg repo on dzil new
 
 =head1 VERSION
 
-version 2.0000
+version 2.0100
 
 =head1 SYNOPSIS
 

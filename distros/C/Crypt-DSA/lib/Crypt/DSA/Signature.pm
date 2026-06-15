@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Carp qw( croak );
 
-our $VERSION = '1.20'; #VERSION
+our $VERSION = '1.21'; #VERSION
 #
 use vars qw{$VERSION};
 

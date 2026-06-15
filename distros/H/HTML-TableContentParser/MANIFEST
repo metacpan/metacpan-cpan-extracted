@@ -1,7 +1,8 @@
 Changes
+CONTRIBUTING
 lib/HTML/TableContentParser.pm
-LICENSES/Artistic
-LICENSES/Copying
+LICENSE-Artistic
+LICENSE-GPL
 Makefile.PL
 MANIFEST
 META.json
@@ -9,6 +10,7 @@ META.yml
 README
 t/basic.t
 t/parse.t
+SECURITY
 TODO
 xt/author/changes.t
 xt/author/critic.t

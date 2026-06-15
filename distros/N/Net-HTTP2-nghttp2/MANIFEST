@@ -23,6 +23,7 @@ t/18-tls-client.t
 t/19-extended-connect.t
 t/20-streaming-request.t
 t/21-submit-data.t
+t/22-rst-rate-limit.t
 t/lib/Test/HTTP2/Frame.pm
 t/lib/Test/HTTP2/HPACK.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)

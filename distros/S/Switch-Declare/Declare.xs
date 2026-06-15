@@ -4,6 +4,13 @@
 #include "ppport.h"  /* backports the OpSIBLING / OpLASTSIB_set op-tree macros to
                         perl 5.14-5.20 (added to core in 5.22) */
 
+/* pad_add_name_pvn was a 5.15.1 rename of pad_add_name; the 5.14 function has the
+ * identical (name, len, flags, typestash, ourstash) */
+#if PERL_VERSION < 16
+#  define pad_add_name_pvn(name, len, flags, typestash, ourstash) \
+       Perl_pad_add_name(aTHX_ (name), (len), (flags), (typestash), (ourstash))
+#endif
+
 #define MAX_ARMS 4096
 
 /* Previous keyword plugin in the chain. */
@@ -132,10 +139,21 @@ static SV *sd_lex_string(pTHX) {
 #define SDT_TEMP  0   /* stored once in pad temp `off` (do-block) */
 #define SDT_PAD   1   /* re-read scrutinee's own lexical at `off` */
 #define SDT_CONST 2   /* re-read a constant value */
+
+/* How the numeric looks_like_number($topic) guard is sourced. For a defined
+ * constant scrutinee it folds to a compile-time boolean; otherwise it is
+ * computed once into a pad temp and each numeric arm just reads that temp. */
+#define LLN_CONST 0   /* compile-time constant in `lln_const` */
+#define LLN_PAD   1   /* computed once into pad temp `lln_off` */
+
 typedef struct {
 	int        kind;
 	PADOFFSET  off;
 	SV        *sv;
+	int        lln_mode;   /* LLN_CONST or LLN_PAD */
+	int        lln_const;  /* folded looks_like_number value (LLN_CONST) */
+	PADOFFSET  lln_off;    /* pad temp holding the guard (LLN_PAD) */
+	int        lln_used;   /* a numeric arm referenced the LLN_PAD temp */
 } SDTopic;
 
 /* A fresh op yielding the topic value. */
@@ -149,6 +167,84 @@ static OP *sd_topic(pTHX_ SDTopic *t) {
 	}
 }
 
+/* ---- looks_like_number($topic) as a fast custom op ---------------------
+ * A numeric pattern (==, range, list) must only fire for a topic that really
+ * is a number. Without this, `switch("one") { case 1 {...} }` would warn
+ * ("Argument isn't numeric in numeric eq") and - worse - "one" == 0 would
+ * *match* a `case 0`. Guarding each numeric compare with looks_like_number()
+ * makes a non-numeric topic simply not match (and not warn), mirroring how an
+ * undef topic is handled. It compiles to a single custom op: no sub call, no
+ * module dependency. */
+static OP *sd_pp_looks_number(pTHX) {
+	dSP;
+	SV *sv = TOPs;
+	SETs(boolSV(sv && SvOK(sv) && looks_like_number(sv)));
+	RETURN;
+}
+
+static XOP sd_looks_number_xop;
+
+/* The raw  looks_like_number($topic)  custom op (one pp call, no sub call).
+ * Built as an OP_NULL unop (always accepted by newUNOP on every perl) then
+ * retyped to our registered custom op; newUNOP sets OPf_KIDS so op_free still
+ * reclaims the child topic op. */
+static OP *sd_looks_number_op(pTHX_ SDTopic *t) {
+	OP *o = newUNOP(OP_NULL, 0, sd_topic(aTHX_ t));
+	o->op_type   = OP_CUSTOM;
+	o->op_ppaddr = sd_pp_looks_number;
+	return o;
+}
+
+/* looks_like_number(OPERAND) over an arbitrary operand op (not just the topic).
+ * Used to guard a `case num $var` operand so a non-numeric $var neither matches
+ * nor warns - mirroring the topic guard. */
+static OP *sd_lln_raw(pTHX_ OP *operand) {
+	OP *o = newUNOP(OP_NULL, 0, operand);
+	o->op_type   = OP_CUSTOM;
+	o->op_ppaddr = sd_pp_looks_number;
+	return o;
+}
+
+/* The numeric guard expression used by each numeric arm. For a defined constant
+ * topic it folds to a compile-time boolean; otherwise the guard is computed once
+ * per switch (see the LLN_PAD prelude in sd_parse_switch) and each arm just reads
+ * that pad temp - so a switch with N numeric arms calls looks_like_number once,
+ * not N times. */
+static OP *sd_looks_number(pTHX_ SDTopic *t) {
+	if (t->lln_mode == LLN_CONST)
+		return newSVOP(OP_CONST, 0, boolSV(t->lln_const));
+	t->lln_used = 1;
+	{
+		OP *o = newOP(OP_PADSV, 0);
+		o->op_targ = t->lln_off;
+		return o;
+	}
+}
+
+/* ---- reftype($topic) as a fast custom op -------------------------------
+ * Like ref(), but reports the underlying type ("ARRAY"/"HASH"/...) even for a
+ * blessed reference, and undef for a non-reference. Used by the reftype(TYPE)
+ * pattern. Same OP_NULL->OP_CUSTOM construction as the looks_number op. */
+static OP *sd_pp_reftype(pTHX) {
+	dSP;
+	SV *sv = TOPs;
+	/* Like ref(), a non-reference yields a defined empty/false value (not
+	 * undef) so `reftype(TYPE)` compares as `"" eq "TYPE"` without warning and
+	 * bare `reftype` is simply false. */
+	SETs(SvROK(sv) ? sv_2mortal(newSVpv(sv_reftype(SvRV(sv), 0), 0))
+	               : &PL_sv_no);
+	RETURN;
+}
+
+static XOP sd_reftype_xop;
+
+static OP *sd_reftype_op(pTHX_ SDTopic *t) {
+	OP *o = newUNOP(OP_NULL, 0, sd_topic(aTHX_ t));
+	o->op_type   = OP_CUSTOM;
+	o->op_ppaddr = sd_pp_reftype;
+	return o;
+}
+
 /* When every arm maps a distinct string-literal key to a constant value (a
  * lookup table) and there are at least this many of them, the whole switch is
  * lowered to a single O(1) hash lookup against a compile-time constant hash
@@ -157,18 +253,32 @@ static OP *sd_topic(pTHX_ SDTopic *t) {
 
 /* What a case pattern was, for dispatch eligibility. */
 typedef struct {
-	int  str_key;   /* 1 if an exact string-literal pattern (eq) */
-	SV  *key;       /* the literal (owned) when str_key */
+	int  str_key;     /* 1 if an exact string-literal pattern (eq) */
+	SV  *key;         /* the literal (owned) when str_key */
+	int  is_undef;    /* 1 if the pattern was the `undef` keyword */
+	int  undef_safe;  /* 1 if the pattern can't match/warn on an undef topic */
 } SDPat;
 
 /* A fresh  $PKGHASH{ topic }  element op, where the hash is the package
  * variable named by `gv`. Referencing the hash through a GV (rather than an
  * op-constant hashref) keeps the dispatch table thread-safe: op constants are
- * cloned per-thread, which would dangle a reference to a shared HV. */
-static OP *sd_helem(pTHX_ GV *gv, SDTopic *t) {
+ * cloned per-thread, which would dangle a reference to a shared HV.
+ *
+ * When `sentinel` is non-NULL the topic may be undef, so the key is guarded as
+ *   defined($topic) ? $topic : SENTINEL
+ * with SENTINEL a string known not to be in the table - an undef topic then
+ * misses cleanly (-> default) instead of warning on an undef hash key. */
+static OP *sd_helem(pTHX_ GV *gv, SDTopic *t, SV *sentinel) {
 	OP *gvop  = newGVOP(OP_GV, 0, gv);
 	OP *deref = newUNOP(OP_RV2HV, OPf_REF, gvop);
-	return newBINOP(OP_HELEM, 0, deref, sd_topic(aTHX_ t));
+	OP *key;
+	if (sentinel)
+		key = newCONDOP(0, newUNOP(OP_DEFINED, 0, sd_topic(aTHX_ t)),
+		                sd_topic(aTHX_ t),
+		                newSVOP(OP_CONST, 0, newSVsv(sentinel)));
+	else
+		key = sd_topic(aTHX_ t);
+	return newBINOP(OP_HELEM, 0, deref, key);
 }
 
 /* Read a literal (number or string) into an OP_CONST, setting *is_num. */
@@ -186,9 +296,59 @@ static OP *sd_lex_literal(pTHX_ int *is_num) {
 	return NULL; /* not reached */
 }
 
-/* topic CMP const, where CMP is numeric (==/>=/<=) or string (eq/ge/le). */
+/* topic CMP const, where CMP is numeric (==/>=/<=) or string (eq/ge/le).
+ * Numeric comparisons are guarded by looks_like_number($topic) so a non-numeric
+ * topic never matches or warns; string comparisons (eq/ge/le) never warn and
+ * need no guard. */
 static OP *sd_cmp(pTHX_ SDTopic *t, int is_num, I32 numop, I32 strop, OP *konst) {
-	return newBINOP(is_num ? numop : strop, 0, sd_topic(aTHX_ t), konst);
+	OP *cmp = newBINOP(is_num ? numop : strop, 0, sd_topic(aTHX_ t), konst);
+	if (is_num)
+		cmp = newLOGOP(OP_AND, 0, sd_looks_number(aTHX_ t), cmp);
+	return cmp;
+}
+
+/* ---- $topic =~ PATTERN  as a fast custom op ----------------------------
+ * The `=~ $var` pattern matches the topic against a *runtime* pattern held in a
+ * scalar (a qr// or a string), so it cannot be compiled once at compile time
+ * like the `/literal/` form. Rather than hand-wire an OP_REGCOMP/OP_MATCH pair
+ * (fragile to thread correctly), it is a self-contained custom op in the same
+ * family as the looks_number / reftype ops: pop the pattern and the topic, run
+ * the match, push a boolean. A qr// operand reuses its compiled program; a bare
+ * string is compiled per evaluation (and freed). Both operands are guaranteed
+ * defined here - the pattern is guarded with defined() and an undef topic is
+ * guarded by the chain - so the match itself never warns. */
+static OP *sd_pp_rxmatch(pTHX) {
+	dSP;
+	SV *pat = POPs;
+	SV *str = TOPs;
+	bool matched = FALSE;
+	REGEXP *rx = SvRXOK(pat) ? SvRX(pat) : NULL;
+	int owned = 0;
+	if (!rx) { rx = pregcomp(pat, 0); owned = 1; }
+	if (rx) {
+		STRLEN len;
+		char *s = SvPV(str, len);
+		if (pregexec(rx, s, s + len, s, 0, str, 1))
+			matched = TRUE;
+		if (owned) ReREFCNT_dec(rx);
+	}
+	SETs(boolSV(matched));
+	RETURN;
+}
+
+static XOP sd_rxmatch_xop;
+
+/* topic and pattern are pushed by the two child ops; the custom op pops both.
+ * A native OP_MATCH cannot be built here - perl's pattern builders (pmruntime)
+ * are entangled with the parser's own pattern-lexing state and crash when driven
+ * from a keyword plugin - so this is a self-contained custom op. The trade-off
+ * is that it is a pure membership test: it sets no capture variables ($1, @+).
+ * For captures from a runtime pattern, use a predicate arm: case sub { $_[0] =~ $rx }. */
+static OP *sd_rxmatch_op(pTHX_ SDTopic *t, OP *patop) {
+	OP *o = newBINOP(OP_NULL, 0, sd_topic(aTHX_ t), patop);
+	o->op_type   = OP_CUSTOM;
+	o->op_ppaddr = sd_pp_rxmatch;
+	return o;
 }
 
 /* Build  CALLEE->( topic )  as an entersub. The OP_ENTERSUB checker inserts the
@@ -199,12 +359,113 @@ static OP *sd_predicate_call(pTHX_ OP *callee, SDTopic *t) {
 	return newUNOP(OP_ENTERSUB, OPf_STACKED, args);
 }
 
+/* Build  Switch::Declare::_isa($topic, "Class")  -> true iff the topic is a
+ * blessed object derived from Class (a fast @ISA check; see the XS _isa below).
+ * An entersub rather than a custom op keeps the two-argument call portable
+ * across the supported perls. */
+static OP *sd_isa_call(pTHX_ SDTopic *t, SV *klass) {
+	GV *gv   = gv_fetchpvs("Switch::Declare::_isa", GV_ADD, SVt_PVCV);
+	OP *cvop = newUNOP(OP_RV2CV, 0, newGVOP(OP_GV, 0, gv));
+	OP *args = op_append_elem(OP_LIST, sd_topic(aTHX_ t),
+	                          newSVOP(OP_CONST, 0, klass));
+	args = op_append_elem(OP_LIST, args, cvop);
+	return newUNOP(OP_ENTERSUB, OPf_STACKED, args);
+}
+
+/* Read an optional/required  ( NAME )  argument after a pattern keyword, where
+ * NAME is a package-qualified bareword (ARRAY, Foo::Bar) or a quoted string.
+ * Returns the name SV (caller owns) or NULL when there is no '('. */
+static SV *sd_lex_paren_arg(pTHX) {
+	I32 c;
+	SV *name;
+	lex_read_space(0);
+	if (lex_peek_unichar(0) != '(') return NULL;
+	lex_read_unichar(0);
+	lex_read_space(0);
+	c = lex_peek_unichar(0);
+	if (c == '"' || c == '\'')
+		name = sd_lex_string(aTHX);
+	else
+		name = sd_lex_subname(aTHX);
+	if (!name) croak("switch: expected a name inside (...)");
+	lex_read_space(0);
+	if (lex_peek_unichar(0) != ')') {
+		SvREFCNT_dec(name);
+		croak("switch: expected ')' after pattern argument");
+	}
+	lex_read_unichar(0);
+	return name;
+}
+
+/* A parsed scalar-variable operand for `case num $x` / `case str $x`. It is
+ * either an in-scope lexical (off != NOT_IN_PAD) or a package scalar (gv), and
+ * is rebuilt fresh by sd_var_op on each use so the operand can be referenced by
+ * both the type guard and the comparison without sharing an op. */
+typedef struct { PADOFFSET off; GV *gv; } SDVar;
+
+/* Hand-lex a plain scalar variable - the leading '$' is still unread. Restricted
+ * to a bare `$name` / `$Pkg::name` (no `[...]`/`{...}` element access) so the
+ * arm's opening `{` is never misparsed as a `$x{...}` hash subscript. */
+static void sd_lex_scalar_var(pTHX_ SDVar *v) {
+	SV *name, *withsig;
+	PADOFFSET off;
+	if (lex_peek_unichar(0) != '$')
+		croak("switch: expected a scalar variable ($name) after ==, eq, or =~");
+	lex_read_unichar(0);
+	name = sd_lex_subname(aTHX);
+	if (!name) croak("switch: expected a variable name after '$'");
+	withsig = newSVpvs("$");
+	sv_catsv(withsig, name);
+	off = pad_findmy_pvn(SvPVX(withsig), SvCUR(withsig), 0);
+	SvREFCNT_dec(withsig);
+	if (off != NOT_IN_PAD) {
+		/* An `our` variable has a pad entry, but the slot aliases a GV rather
+		 * than holding the value - reading it as a plain PADSV is wrong. Resolve
+		 * it to the package scalar it really is, qualified by the `our`'s own
+		 * stash so the lookup neither trips strict 'vars' nor guesses the wrong
+		 * package. */
+		PADNAME *pn = PadnamelistARRAY(PL_comppad_name)[off];
+		if (pn && PadnameIsOUR(pn)) {
+			HV *stash = PadnameOURSTASH(pn);
+			SV *q = newSVpvs("");
+			if (stash && HvNAME(stash))
+				sv_catpvf(q, "%s::", HvNAME(stash));
+			sv_catsv(q, name);
+			v->off = NOT_IN_PAD;
+			v->gv  = gv_fetchpv(SvPV_nolen(q), GV_ADD, SVt_PV);
+			SvREFCNT_dec(q);
+			SvREFCNT_dec(name);
+			return;
+		}
+		v->off = off;
+		v->gv  = NULL;
+	} else {
+		/* A plain package global: sd_lex_subname keeps any `Pkg::` qualifier, so
+		 * gv_fetchpv sees a qualified name and strict 'vars' stays satisfied. */
+		v->off = NOT_IN_PAD;
+		v->gv  = gv_fetchpv(SvPV_nolen(name), GV_ADD, SVt_PV);
+	}
+	SvREFCNT_dec(name);
+}
+
+/* A fresh op yielding the variable operand's value. */
+static OP *sd_var_op(pTHX_ SDVar *v) {
+	if (v->off != NOT_IN_PAD) {
+		OP *o = newOP(OP_PADSV, 0);
+		o->op_targ = v->off;
+		return o;
+	}
+	return newUNOP(OP_RV2SV, 0, newGVOP(OP_GV, 0, v->gv));
+}
+
 /* Parse one case PATTERN from the lexer and return its boolean condition op,
  * testing the topic. Fills *pat describing the pattern (for dispatch). */
 static OP *sd_parse_case_cond(pTHX_ SDTopic *t, SDPat *pat) {
 	I32 c = lex_peek_unichar(0);
 	pat->str_key = 0;
 	pat->key     = NULL;
+	pat->is_undef = 0;
+	pat->undef_safe = 0;
 
 	/* regex:  /PATTERN/flags  ->  native  topic =~ /PATTERN/flags
 	 * The pattern is compiled once, here at compile time, and bound to a
@@ -313,11 +574,121 @@ static OP *sd_parse_case_cond(pTHX_ SDTopic *t, SDPat *pat) {
 		}
 	}
 
-	/* inline predicate:  sub { ... }  ->  (sub { ... })->($topic) */
+	/* == $var : numeric comparison against a runtime scalar.
+	 * =~ $var : regex match against a runtime pattern (a qr// or string in a
+	 *           variable).  Because a variable's type/pattern is unknown at
+	 *           compile time, the operator is written out - `==` for numeric,
+	 *           `=~` for match (here); `eq` for string is a bareword, below. */
+	if (c == '=') {
+		SDVar v;
+		I32 c2;
+		lex_read_unichar(0);
+		c2 = lex_peek_unichar(0);
+		if (c2 == '=') {
+			lex_read_unichar(0);
+			lex_read_space(0);
+			sd_lex_scalar_var(aTHX_ &v);
+			/* looks_like_number($var) && looks_like_number($topic)
+			 *                          && $topic == $var  - undef-safe both sides. */
+			pat->undef_safe = 1;
+			return newLOGOP(OP_AND, 0,
+				sd_lln_raw(aTHX_ sd_var_op(aTHX_ &v)),
+				sd_cmp(aTHX_ t, 1, OP_EQ, OP_SEQ, sd_var_op(aTHX_ &v)));
+		}
+		if (c2 == '~') {
+			lex_read_unichar(0);
+			lex_read_space(0);
+			sd_lex_scalar_var(aTHX_ &v);
+			/* defined($var) && $topic =~ $var. An undef topic is guarded by the
+			 * chain (undef_safe = 0); guarding $var keeps an undef pattern from
+			 * warning (it simply does not match). */
+			pat->undef_safe = 0;
+			return newLOGOP(OP_AND, 0,
+				newUNOP(OP_DEFINED, 0, sd_var_op(aTHX_ &v)),
+				sd_rxmatch_op(aTHX_ t, sd_var_op(aTHX_ &v)));
+		}
+		croak("switch: expected '==' or '=~' in case comparison");
+	}
+
+	/* inline predicate:  sub { ... }  ->  (sub { ... })->($topic)
+	 * undef keyword:      undef       ->  !defined($topic)
+	 * ref / ref(TYPE):    ref($topic) [eq "TYPE"]
+	 * reftype / (TYPE):   reftype($topic) [eq "TYPE"]   (sees through blessing)
+	 * isa(Class):         blessed object derived from Class
+	 * eq $var:            $topic eq $var  (string compare vs a runtime scalar) */
 	if (isALPHA(c) || c == '_') {
-		SV *word   = sd_lex_read_ident(aTHX);
-		int is_sub = word && strEQ(SvPV_nolen(word), "sub");
-		if (word) SvREFCNT_dec(word);
+		/* read a possibly package-qualified bareword (so a constant may be
+		 * `Foo::BAR`); keyword names never contain '::' so they still match. */
+		SV *word       = sd_lex_subname(aTHX);
+		const char *wp = word ? SvPV_nolen(word) : "";
+		int is_sub     = strEQ(wp, "sub");
+		int is_undef   = strEQ(wp, "undef");
+		int is_ref     = strEQ(wp, "ref");
+		int is_reftype = strEQ(wp, "reftype");
+		int is_isa     = strEQ(wp, "isa");
+		int is_eq      = strEQ(wp, "eq");
+		/* Eagerly resolve the bareword as an inlinable constant while `word` is
+		 * still alive. cv_const_sv returns the value owned by the (persistent)
+		 * constant sub, so it stays valid after we release `word`. */
+		CV *cv         = word ? get_cvn_flags(SvPVX(word), SvCUR(word), 0) : NULL;
+		SV *const_val  = cv ? cv_const_sv(cv) : NULL;
+		char errbuf[128];
+		errbuf[0] = '\0';
+		if (word) {
+			my_strlcpy(errbuf, SvPV_nolen(word), sizeof(errbuf));
+			SvREFCNT_dec(word);
+		}
+		/* eq $var : string comparison against a runtime scalar. Honoured only
+		 * when a '$' actually follows, so a bareword `eq` otherwise falls through
+		 * to constant / error handling. (Its numeric sibling `== $var` is parsed
+		 * above, as it does not begin with a word character.) */
+		if (is_eq) {
+			lex_read_space(0);
+			if (lex_peek_unichar(0) == '$') {
+				SDVar v;
+				sd_lex_scalar_var(aTHX_ &v);
+				/* defined($var) && $topic eq $var. An undef topic is guarded by
+				 * the chain (undef_safe = 0), so a string variable matches
+				 * exactly like a string literal. */
+				pat->undef_safe = 0;
+				return newLOGOP(OP_AND, 0,
+					newUNOP(OP_DEFINED, 0, sd_var_op(aTHX_ &v)),
+					sd_cmp(aTHX_ t, 0, OP_EQ, OP_SEQ, sd_var_op(aTHX_ &v)));
+			}
+			/* no '$' - fall through to constant / error handling */
+		}
+		if (is_undef) {
+			pat->is_undef = 1;
+			pat->undef_safe = 1;
+			return newUNOP(OP_NOT, 0,
+				newUNOP(OP_DEFINED, 0, sd_topic(aTHX_ t)));
+		}
+		if (is_ref) {
+			/* ref($topic) [eq "TYPE"] - pure ops, never warns. */
+			SV *type = sd_lex_paren_arg(aTHX);
+			pat->undef_safe = 1;
+			if (!type)
+				return newUNOP(OP_REF, 0, sd_topic(aTHX_ t));
+			return newBINOP(OP_SEQ, 0,
+				newUNOP(OP_REF, 0, sd_topic(aTHX_ t)),
+				newSVOP(OP_CONST, 0, type));
+		}
+		if (is_reftype) {
+			/* reftype($topic) [eq "TYPE"] - underlying type, blessing aside. */
+			SV *type = sd_lex_paren_arg(aTHX);
+			pat->undef_safe = 1;
+			if (!type)
+				return sd_reftype_op(aTHX_ t);
+			return newBINOP(OP_SEQ, 0, sd_reftype_op(aTHX_ t),
+				newSVOP(OP_CONST, 0, type));
+		}
+		if (is_isa) {
+			SV *klass = sd_lex_paren_arg(aTHX);
+			if (!klass)
+				croak("switch: isa requires a class: case isa(Class)");
+			pat->undef_safe = 1;
+			return sd_isa_call(aTHX_ t, klass);
+		}
 		if (is_sub) {
 			I32 floor;
 			OP *body, *anon;
@@ -329,8 +700,23 @@ static OP *sd_parse_case_cond(pTHX_ SDTopic *t, SDPat *pat) {
 			anon  = newANONATTRSUB(floor, NULL, NULL, body);
 			return sd_predicate_call(aTHX_ anon, t);
 		}
-		croak("switch: unexpected bareword in case pattern (expected a number, "
-		      "string, /regex/, [range or list], \\&name, or sub {...})");
+		if (const_val) {
+			/* An inlinable constant (use constant FOO => ...) folds to its value
+			 * and is classified just like the literal it holds: a number compiles
+			 * to ==, anything with a string form to eq (dispatch-eligible). */
+			int cnum  = (SvIOK(const_val) || SvNOK(const_val)) && !SvPOK(const_val);
+			OP *konst = newSVOP(OP_CONST, 0, newSVsv(const_val));
+			if (cnum) {
+				pat->undef_safe = 1;
+			} else {
+				pat->str_key = 1;
+				pat->key     = newSVsv(const_val);
+			}
+			return sd_cmp(aTHX_ t, cnum, OP_EQ, OP_SEQ, konst);
+		}
+		croak("switch: unexpected bareword '%s' in case pattern (expected a number, "
+		      "string, /regex/, [range or list], \\&name, sub {...}, a constant, "
+		      "or == / eq $var)", errbuf);
 	}
 
 	/* scalar literal:  number -> ==,  string -> eq */
@@ -342,6 +728,9 @@ static OP *sd_parse_case_cond(pTHX_ SDTopic *t, SDPat *pat) {
 			 * this arm is eligible for dispatch-table lowering. */
 			pat->str_key = 1;
 			pat->key     = newSVsv(((SVOP *)konst)->op_sv);
+		} else {
+			/* numeric == is already looks_like_number-guarded: undef-safe. */
+			pat->undef_safe = 1;
 		}
 		return sd_cmp(aTHX_ t, is_num, OP_EQ, OP_SEQ, konst);
 	}
@@ -403,12 +792,14 @@ static OP *sd_parse_switch(pTHX) {
 	I32 c;
 	int all_simple = 1;    /* every block is a bare-expression `{ EXPR }` */
 	int dispatchable = 1;  /* every arm is (string key -> constant value) */
+	int topic_maybe_undef; /* scrutinee could be undef at run time */
 	SDTopic topic;
 	OP *assign;
 	OP *lhs;
 	OP *chain;
 	OP *seq;
 	OP *body;
+	OP *lln_prelude = NULL; /* `$lln = looks_like_number($topic)`, when hoisted */
 
 	/* switch ( EXPR ) */
 	lex_read_space(0);
@@ -451,6 +842,27 @@ static OP *sd_parse_switch(pTHX) {
 		topic.off  = pad_add_name_pvn(namebuf, (STRLEN)n, 0, NULL, NULL);
 	}
 
+	/* A constant scrutinee whose value is defined can never be undef at run
+	 * time, so its case tests need no undef guarding (and stay exactly as fast
+	 * as before). Any other scrutinee might be undef. */
+	topic_maybe_undef = !(topic.kind == SDT_CONST && SvOK(topic.sv));
+
+	/* Numeric guard sourcing: a defined constant topic folds looks_like_number
+	 * at compile time; otherwise it is computed once into a pad temp and shared
+	 * by every numeric arm (see the LLN_PAD prelude after the body is parsed). */
+	topic.lln_used = 0;
+	if (topic.kind == SDT_CONST && SvOK(topic.sv)) {
+		topic.lln_mode  = LLN_CONST;
+		topic.lln_const = looks_like_number(topic.sv) ? 1 : 0;
+	} else {
+		static unsigned long sd_lln_seq = 0;
+		char lbuf[64];
+		int ln = my_snprintf(lbuf, sizeof(lbuf),
+			"$_Switch_Declare_lln_%lu", sd_lln_seq++);
+		topic.lln_mode = LLN_PAD;
+		topic.lln_off  = pad_add_name_pvn(lbuf, (STRLEN)ln, 0, NULL, NULL);
+	}
+
 	/* { ... } */
 	lex_read_space(0);
 	if (lex_peek_unichar(0) != '{')
@@ -477,6 +889,16 @@ static OP *sd_parse_switch(pTHX) {
 				croak("switch: too many case arms");
 			lex_read_space(0);
 			cond = sd_parse_case_cond(aTHX_ &topic, &pat);
+			/* A value pattern that could match or warn on an undef topic
+			 * (string eq / regex / list / range) is guarded with defined($topic)
+			 * so undef can only be caught by an explicit `case undef` (or fall
+			 * through to default). Patterns that are already undef-safe - numeric
+			 * (looks_like_number-guarded), ref/reftype/isa, and undef itself -
+			 * skip the guard. The shared default stays the single chain tail. */
+			if (topic_maybe_undef && !pat.undef_safe)
+				cond = newLOGOP(OP_AND, 0,
+					newUNOP(OP_DEFINED, 0, sd_topic(aTHX_ &topic)),
+					cond);
 			lex_read_space(0);
 			if (lex_peek_unichar(0) != '{')
 				croak("switch: expected '{' after case pattern");
@@ -526,12 +948,23 @@ static OP *sd_parse_switch(pTHX) {
 		GV *gv = gv_fetchpvn(hashname, (STRLEN)hn, GV_ADD, SVt_PVHV);
 		HV *hv = GvHVn(gv);
 		int dup = 0, any_undef = 0;
+		/* If the topic could be undef, look it up under a guarded key so an
+		 * undef topic misses the table (-> default) instead of warning. The
+		 * sentinel is a binary string we treat as reserved; in the wildly
+		 * unlikely event a real key collides with it, fall back to the chain. */
+		SV *sentinel = topic_maybe_undef
+			? newSVpvn("\1\0Switch::Declare::undef-key\0\1", 28) : NULL;
 		for (i = 0; i < narms; i++) {
 			STRLEN klen;
 			const char *kpv = SvPV(keys[i], klen);
 			if (hv_exists(hv, kpv, klen)) { dup = 1; break; }
 			if (!SvOK(vals[i])) any_undef = 1;
 			(void)hv_store(hv, kpv, klen, newSVsv(vals[i]), 0);
+		}
+		if (!dup && sentinel) {
+			STRLEN sl;
+			const char *sp = SvPV(sentinel, sl);
+			if (hv_exists(hv, sp, sl)) dup = 1;
 		}
 		if (dup) {
 			hv_clear(hv);             /* duplicate keys: fall back to chain */
@@ -541,15 +974,16 @@ static OP *sd_parse_switch(pTHX) {
 			if (any_undef) {
 				/* a value can be undef, so a miss is indistinguishable from a
 				 * hit by definedness: test membership explicitly. */
-				OP *cond = newUNOP(OP_EXISTS, 0, sd_helem(aTHX_ gv, &topic));
-				chain = newCONDOP(0, cond, sd_helem(aTHX_ gv, &topic), deflt);
+				OP *cond = newUNOP(OP_EXISTS, 0, sd_helem(aTHX_ gv, &topic, sentinel));
+				chain = newCONDOP(0, cond, sd_helem(aTHX_ gv, &topic, sentinel), deflt);
 			} else {
 				/* all values are defined: one lookup, miss -> default via //. */
-				chain = newLOGOP(OP_DOR, 0, sd_helem(aTHX_ gv, &topic), deflt);
+				chain = newLOGOP(OP_DOR, 0, sd_helem(aTHX_ gv, &topic, sentinel), deflt);
 			}
 			/* the unused per-arm condition and block ops are now dead */
 			for (i = 0; i < narms; i++) { op_free(conds[i]); op_free(blocks[i]); }
 		}
+		if (sentinel) SvREFCNT_dec(sentinel);
 	}
 
 	/* Otherwise (or on fall-back), build the conditional chain right-to-left. */
@@ -563,14 +997,32 @@ static OP *sd_parse_switch(pTHX) {
 	for (i = 0; i < narms; i++)
 		if (keys[i]) SvREFCNT_dec(keys[i]);
 
+	/* If any numeric arm used the hoisted guard, build the one-time
+	 * `$lln = looks_like_number($topic)` that they all read. */
+	if (topic.lln_mode == LLN_PAD && topic.lln_used) {
+		OP *llhs = newOP(OP_PADSV, 0);
+		llhs->op_targ = topic.lln_off;
+		llhs->op_private |= OPpLVAL_INTRO;          /* my */
+		lln_prelude = newASSIGNOP(OPf_STACKED, llhs, 0,
+		                          sd_looks_number_op(aTHX_ &topic));
+	}
+
 	if (topic.kind != SDT_TEMP) {
 		if (topic.kind == SDT_CONST) SvREFCNT_dec(topic.sv);
-		if (all_simple)
+		if (!lln_prelude && all_simple)
 			/* Fastest path: a plain lexical/constant topic, and either a
 			 * dispatch lookup or a chain of bare `{ EXPR }` arms. The whole
 			 * switch is literally an expression - no temp, no scope, no
 			 * nextstate - as fast as hand-written code. */
 			return chain;
+		if (lln_prelude) {
+			/* Hoisted numeric guard over a plain lexical: wrap in a block that
+			 * computes $lln once, then runs the chain (which reads $lln). */
+			seq = op_append_list(OP_LINESEQ, newSTATEOP(0, NULL, lln_prelude),
+			                                 newSTATEOP(0, NULL, chain));
+			seq->op_flags |= OPf_PARENS;
+			return op_scope(seq);
+		}
 		/* Some arm is a multi-statement block (carries a nextstate). Wrap in a
 		 * single enter/leave (OPf_PARENS makes op_scope emit OP_LEAVE) so that
 		 * nextstate cannot reset the stack base of a surrounding expression. */
@@ -578,17 +1030,22 @@ static OP *sd_parse_switch(pTHX) {
 		return op_scope(chain);
 	}
 
-	/* General path: my $topic = SCRUTINEE; <body>, wrapped as a value-returning
-	 * block so the scrutinee is evaluated exactly once. OPf_PARENS forces
-	 * op_scope down its enter/leave path (OP_LEAVE) for a proper stack frame;
-	 * without it a bare OP_SCOPE lets the inner nextstate reset the stack base
-	 * and clobber a surrounding expression (e.g. N + switch(...)). */
+	/* General path: my $topic = SCRUTINEE; [my $lln = looks_like_number($topic);]
+	 * <body>, wrapped as a value-returning block so the scrutinee is evaluated
+	 * exactly once. OPf_PARENS forces op_scope down its enter/leave path
+	 * (OP_LEAVE) for a proper stack frame; without it a bare OP_SCOPE lets the
+	 * inner nextstate reset the stack base and clobber a surrounding expression
+	 * (e.g. N + switch(...)). */
 	lhs = newOP(OP_PADSV, 0);
 	lhs->op_targ = topic.off;
 	lhs->op_private |= OPpLVAL_INTRO;               /* my */
 	assign = newASSIGNOP(OPf_STACKED, lhs, 0, scrutinee);
-	seq = op_append_list(OP_LINESEQ, newSTATEOP(0, NULL, assign),
-	                                 newSTATEOP(0, NULL, chain));
+	seq = newSTATEOP(0, NULL, assign);
+	if (lln_prelude)
+		/* $lln computed after $topic is stored, before the chain reads it. */
+		seq = op_append_list(OP_LINESEQ, seq,
+		                     newSTATEOP(0, NULL, lln_prelude));
+	seq = op_append_list(OP_LINESEQ, seq, newSTATEOP(0, NULL, chain));
 	seq->op_flags |= OPf_PARENS;
 	body = op_scope(seq);
 
@@ -619,3 +1076,27 @@ PROTOTYPES: DISABLE
 BOOT:
 	sd_next_keyword_plugin = PL_keyword_plugin;
 	PL_keyword_plugin = sd_keyword_plugin;
+	XopENTRY_set(&sd_looks_number_xop, xop_name, "sd_looks_number");
+	XopENTRY_set(&sd_looks_number_xop, xop_desc, "Switch::Declare numeric topic guard");
+	XopENTRY_set(&sd_looks_number_xop, xop_class, OA_UNOP);
+	Perl_custom_op_register(aTHX_ sd_pp_looks_number, &sd_looks_number_xop);
+	XopENTRY_set(&sd_reftype_xop, xop_name, "sd_reftype");
+	XopENTRY_set(&sd_reftype_xop, xop_desc, "Switch::Declare reftype()");
+	XopENTRY_set(&sd_reftype_xop, xop_class, OA_UNOP);
+	Perl_custom_op_register(aTHX_ sd_pp_reftype, &sd_reftype_xop);
+	XopENTRY_set(&sd_rxmatch_xop, xop_name, "sd_rxmatch");
+	XopENTRY_set(&sd_rxmatch_xop, xop_desc, "Switch::Declare =~ match");
+	XopENTRY_set(&sd_rxmatch_xop, xop_class, OA_BINOP);
+	Perl_custom_op_register(aTHX_ sd_pp_rxmatch, &sd_rxmatch_xop);
+
+bool
+_isa(obj, klass)
+	SV *obj
+	SV *klass
+	CODE:
+		/* fast @ISA check: a blessed object derived from `klass`. sv_isobject
+		 * keeps plain strings/non-objects from matching; never dies. */
+		RETVAL = (sv_isobject(obj)
+		          && sv_derived_from(obj, SvPV_nolen(klass))) ? 1 : 0;
+	OUTPUT:
+		RETVAL

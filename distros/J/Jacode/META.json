@@ -1,12 +1,12 @@
 {
     "name" : "Jacode",
-    "version" : "2.13.4.33",
+    "version" : "2.13.4.34",
     "abstract" : "Perl program for Japanese character code conversion",
     "author" : [
-        "ina <ina@cpan.org>"
+        "ina <ina.cpan@gmail.com>"
     ],
     "dynamic_config" : 1,
-    "generated_by" : "pmake.bat",
+    "generated_by" : "pmake.bat version 0.37",
     "license" : [
         "perl_5"
     ],
@@ -19,55 +19,45 @@
         "license" : [
             "http://dev.perl.org/licenses/"
         ],
+        "bugtracker" : {
+            "web" : "https://github.com/ina-cpan/Jacode/issues"
+        },
         "repository" : {
-            "url" : "https://github.com/ina-cpan/Jacode"
+            "url"  : "https://github.com/ina-cpan/Jacode",
+            "web"  : "https://github.com/ina-cpan/Jacode",
+            "type" : "git"
         }
     },
     "prereqs" : {
         "build" : {
             "requires" : {
                 "ExtUtils::MakeMaker" : "5.4302",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "FindBin" : "1.42",
-                "Socket" : "0",
-                "lib" : "0",
-                "perl" : "5.00503",
-                "strict" : "1.01",
-                "vars" : "0",
-                "warnings" : "0"
+                "perl" : "5.00503"
             }
         },
         "configure" : {
             "requires" : {
                 "ExtUtils::MakeMaker" : "5.4302",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "FindBin" : "1.42",
-                "Socket" : "0",
-                "lib" : "0",
-                "perl" : "5.00503",
-                "strict" : "1.01",
-                "vars" : "0",
-                "warnings" : "0"
+                "perl" : "5.00503"
             }
         },
         "runtime" : {
             "requires" : {
                 "ExtUtils::MakeMaker" : "5.4302",
-                "File::Basename" : "2.6",
-                "File::Copy" : "2.02",
-                "File::Path" : "1.0401",
-                "FindBin" : "1.42",
-                "Socket" : "0",
-                "lib" : "0",
-                "perl" : "5.00503",
-                "strict" : "1.01",
-                "vars" : "0",
-                "warnings" : "0"
+                "perl" : "5.00503"
             }
+        },
+        "test" : {
+            "requires" : {
+                "ExtUtils::MakeMaker" : "5.4302",
+                "perl" : "5.00503"
+            }
+        }
+    },
+    "provides" : {
+        "Jacode" : {
+            "file" : "lib/Jacode.pm",
+            "version" : "2.13.4.34"
         }
     }
 }

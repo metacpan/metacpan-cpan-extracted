@@ -1,7 +1,7 @@
 ---
 abstract: 'Solve Sudoku and related puzzles'
 author:
-  - 'Tom Wyant (wyant at cpan dot org)'
+  - 'Tom Wyant (harryfmudd at comcast dot net)'
 build_requires:
   Test::More: '0.88'
 configure_requires:
@@ -13,7 +13,7 @@ configure_requires:
   strict: '0'
   warnings: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,7 +28,7 @@ no_index:
 provides:
   Games::Sudoku::General:
     file: lib/Games/Sudoku/General.pm
-    version: '0.027'
+    version: '0.028'
 requires:
   Carp: '0'
   Data::Dumper: '0'
@@ -40,8 +40,8 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Games-Sudoku-General
+  bugtracker: https://github.com/trwyant/perl-Games-Sudoku-General/issues
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Games-Sudoku-General.git
-version: '0.027'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.028'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

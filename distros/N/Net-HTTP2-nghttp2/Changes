@@ -1,5 +1,11 @@
 Revision history for Net-HTTP2-nghttp2
 
+0.008   2026-06-14
+        - Expose nghttp2_option_set_stream_reset_rate_limit via new_server's
+          stream_reset_burst / stream_reset_rate options (HTTP/2 Rapid Reset,
+          CVE-2023-44487, tuning). Requires nghttp2 >= 1.57.
+        - Enforce nghttp2 >= 1.57 on the Makefile.PL pkg-config path.
+
 0.007   2026-02-09
         - Expose NGHTTP2_ERR_TEMPORAL_CALLBACK_FAILURE constant (-521);
           returning this from on_header causes RST_STREAM on the

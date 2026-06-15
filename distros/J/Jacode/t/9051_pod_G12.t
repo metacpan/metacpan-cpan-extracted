@@ -2,7 +2,7 @@
 #
 # t/9051_pod_G12.t - Pod::Checker test (for Pod::Checker >= 1.60)
 #
-# Copyright (c) 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 ######################################################################
 
 # This file is encoded in UTF-8.

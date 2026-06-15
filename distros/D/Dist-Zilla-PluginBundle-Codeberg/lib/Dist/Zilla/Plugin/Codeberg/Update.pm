@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Codeberg::Update 2.0000;
+package Dist::Zilla::Plugin::Codeberg::Update 2.0100;
 
 use Modern::Perl;
 use Carp;
@@ -6,6 +6,8 @@ use JSON::MaybeXS;
 use Moose;
 use List::Util  qw(first);
 use URL::Encode qw(url_encode_utf8);
+
+our $AUTHORITY = 'cpan:GEEKRUTH';    # AUTHORITY
 extends 'Dist::Zilla::Plugin::Codeberg';
 with 'Dist::Zilla::Role::AfterRelease';
 
@@ -27,7 +29,8 @@ sub after_release {
 
    $self->log('Updating Codeberg repository info');
 
-   my $url = $self->api . '/projects/' . url_encode_utf8($repo_name);
+   my $url
+      = $self->api . '/repos/' . $repo_name;    # url_encode_utf8($repo_name);
 
    my $current = $self->_current_params($url);
    if (  $current
@@ -40,9 +43,9 @@ sub after_release {
    my $headers = $self->_auth_headers;
    $headers->{'content-type'} = 'application/json';
 
-   $self->log_debug("Sending PUT $url");
+   $self->log_debug("Sending PATCH $url");
    my $response = HTTP::Tiny->new->request(
-      'PUT', $url,
+      'PATCH', $url,
       {
          content => encode_json($params),
          headers => $headers,
@@ -80,7 +83,7 @@ Dist::Zilla::Plugin::Codeberg::Update - Update a Codeberg repo's info on release
 
 =head1 VERSION
 
-version 2.0000
+version 2.0100
 
 =head1 SYNOPSIS
 

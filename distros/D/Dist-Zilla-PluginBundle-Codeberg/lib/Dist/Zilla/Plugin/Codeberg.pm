@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Codeberg 2.0000;
+package Dist::Zilla::Plugin::Codeberg 2.0100;
 
 use Modern::Perl;
 use JSON::MaybeXS;
@@ -103,10 +103,9 @@ sub _auth_headers {
    my $self = shift;
 
    my $credentials = $self->_credentials;
-
-   my %headers = ();
+   my %headers     = ();
    if ( $credentials->{token} ) {
-      $headers{'PRIVATE-TOKEN'} = $credentials->{token};
+      $headers{'Authorization'} = 'token ' . $credentials->{token};
    }
 
    return \%headers;
@@ -195,7 +194,7 @@ Dist::Zilla::Plugin::Codeberg - Plugins to integrate Dist::Zilla with Codeberg
 
 =head1 VERSION
 
-version 2.0000
+version 2.0100
 
 =head1 DESCRIPTION
 

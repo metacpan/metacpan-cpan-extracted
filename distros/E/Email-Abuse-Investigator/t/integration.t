@@ -48,7 +48,8 @@ my %_ORIGINAL;
 BEGIN {
 	for my $fn (qw(
 		_reverse_dns  _resolve_host  _whois_ip
-		_domain_whois _raw_whois	 _rdap_lookup
+		_domain_whois _raw_whois     _rdap_lookup
+		_follow_redirect_chain
 	)) {
 		no strict 'refs';
 		$_ORIGINAL{$fn} = \&{ "Email::Abuse::Investigator::$fn" };
@@ -101,8 +102,77 @@ sub install_stubs {
 		: sub { $ov{domain_whois} // undef };
 
 	# These are never needed in integration tests (covered by the above)
-	*Email::Abuse::Investigator::_raw_whois   = sub { undef };
-	*Email::Abuse::Investigator::_rdap_lookup = sub { {} };
+	*Email::Abuse::Investigator::_raw_whois            = sub { undef };
+	*Email::Abuse::Investigator::_rdap_lookup          = sub { {} };
+
+	# Redirect-following: default to no-op (undef = no redirect found).
+	# Tests that exercise redirect chain behaviour supply their own stub via
+	# the 'follow_redirect' key.
+	*Email::Abuse::Investigator::_follow_redirect_chain = ref($ov{follow_redirect}) eq 'CODE'
+		? $ov{follow_redirect}
+		: sub { undef };
+}
+
+# ---------------------------------------------------------------------------
+# Helper: reload Email::Abuse::Investigator with named optional modules blocked.
+#
+# Mechanism:
+#   1. Blocks the named modules via Test::Without::Module so that any
+#      require() attempt for them fails during the forced reload.
+#   2. Saves and removes their %INC entries, then deletes the main module
+#      from %INC and force-requires it so its $HAS_* flags are re-evaluated
+#      with the missing dependencies.
+#   3. Executes $code — the caller is responsible for calling install_stubs()
+#      and restore_stubs() inside $code as usual.
+#   4. Unblocks the modules, restores %INC, and reloads the main module a
+#      second time so $HAS_* flags return to their original compile-time
+#      values for subsequent subtests.
+#
+# If Test::Without::Module is not installed each surrounding subtest is
+# declared skip_all so it appears as a proper skip rather than a failure.
+# ---------------------------------------------------------------------------
+sub without_optionals {
+	my ($blocked_ref, $code) = @_;
+
+	unless (eval { require Test::Without::Module; 1 }) {
+		Test::More::plan(skip_all => 'Test::Without::Module not installed');
+		return;
+	}
+
+	# Flush the global CHI Memory store before each OD test.  The module uses
+	# CHI->new(driver=>'Memory', global=>1), which shares a process-wide hash
+	# across all instances.  Without this flush, dom:/url:/whois_ip: entries
+	# written by earlier subtests survive the module reload and override the
+	# fresh stubs installed by the OD test, producing wrong field values.
+	eval {
+		require CHI;
+		CHI->new(driver => 'Memory', global => 1, expires_in => 3600)->clear();
+	};
+
+	# Save and purge %INC entries for every module we are about to block.
+	my %saved_inc;
+	for my $mod (@$blocked_ref) {
+		(my $key = "$mod.pm") =~ s{::}{/}g;
+		$saved_inc{$key} = delete $INC{$key};   # undef when module not installed
+	}
+
+	# Activate the blocker and force-reload the analyser module so that the
+	# eval{} probes inside its BEGIN block see the missing dependencies and
+	# set the corresponding $HAS_* flags to undef/false.
+	Test::Without::Module->import(@$blocked_ref);
+	delete $INC{'Email/Abuse/Investigator.pm'};
+	{ no warnings 'redefine'; require Email::Abuse::Investigator; }
+
+	$code->();
+
+	# Remove the block, restore %INC, and reload with full dependencies so
+	# that $HAS_* flags are correct for all subsequent subtests.
+	Test::Without::Module->unimport(@$blocked_ref);
+	for my $key (keys %saved_inc) {
+		$INC{$key} = $saved_inc{$key} if defined $saved_inc{$key};
+	}
+	delete $INC{'Email/Abuse/Investigator.pm'};
+	{ no warnings 'redefine'; require Email::Abuse::Investigator; }
 }
 
 # ---------------------------------------------------------------------------
@@ -536,6 +606,67 @@ subtest 'Scenario 5: URL shortener hides real destination' => sub {
 	# Report mentions the shortener warning
 	my $report = $a->report();
 	like $report, qr/URL SHORTENER/, 'URL SHORTENER warning in report';
+
+	restore_stubs();
+};
+
+# ---------------------------------------------------------------------------
+# Scenario 5b — Cloud-storage redirect cloaker (GCS bucket → phishing page)
+#
+# The email body contains only a GCS URL.  The GCS page hosts a meta-refresh
+# to the real phishing domain.  The module should follow the redirect and
+# surface both the GCS host and the final phishing host in embedded_urls(),
+# then flag redirect_cloaker for the GCS URL and report abuse contacts for
+# both parties.
+# ---------------------------------------------------------------------------
+subtest 'Scenario 5b: cloud-storage redirect cloaker resolved to phishing destination' => sub {
+	restore_stubs();
+	install_stubs(
+		rdns	=> 'mail.sender.example',
+		resolve => {
+			'storage.googleapis.com' => '142.250.80.112',
+			'www.phishingsite.example' => '198.51.100.99',
+		},
+		whois_ip => sub {
+			my (undef, $ip) = @_;
+			return { org => 'Google LLC',     abuse => 'google-cloud-compliance@google.com' }
+				if $ip eq '142.250.80.112';
+			return { org => 'Evil Hosting',   abuse => 'abuse@evilhost.example' };
+		},
+		domain_whois => undef,
+		follow_redirect => sub {
+			my (undef, $url) = @_;
+			return 'https://www.phishingsite.example/login?ref=123'
+				if $url =~ m{storage\.googleapis\.com};
+			return undef;
+		},
+	);
+
+	my $a = Email::Abuse::Investigator->new();
+	$a->parse_email(make_raw_email(
+		received => 'from sender (sender [91.198.174.1]) by mx.test',
+		body     => 'Click here: https://storage.googleapis.com/fakebucket/redirect',
+	));
+
+	my @urls  = $a->embedded_urls();
+	my %hosts = map { $_->{host} => 1 } @urls;
+
+	is scalar @urls, 2, 'two URLs found: GCS original + phishing destination';
+	ok $hosts{'storage.googleapis.com'},   'GCS host present';
+	ok $hosts{'www.phishingsite.example'}, 'phishing destination resolved and present';
+
+	# Risk assessment should flag the redirect cloaker
+	my $risk = $a->risk_assessment();
+	ok scalar(grep { $_->{flag} eq 'redirect_cloaker' } @{ $risk->{flags} }),
+		'redirect_cloaker flag raised for GCS host';
+
+	# Abuse contacts should include both Google and the phishing host's ISP
+	my @contacts  = $a->abuse_contacts();
+	my @addresses = map { $_->{address} } @contacts;
+	ok scalar(grep { defined $_ && /google-cloud-compliance/ } @addresses),
+		'Google Cloud abuse contact present';
+	ok scalar(grep { defined $_ && /evilhost\.example/       } @addresses),
+		'phishing host abuse contact present';
 
 	restore_stubs();
 };
@@ -2519,6 +2650,544 @@ subtest 'Scenario 42: all_domains() is idempotent and deduplicates URL+mailto ov
 		'overlap.example (URL host AND mailto domain) appears exactly once in all_domains()';
 
 	restore_stubs();
+};
+
+# ===========================================================================
+# Optional dependency graceful-degradation scenarios
+#
+# Each subtest uses without_optionals() to reload Email::Abuse::Investigator
+# with specific $HAS_* flags cleared, then verifies the module's observable
+# fallback behaviour through the public API only.
+#
+# Optional dependencies identified in the module:
+#   Net::DNS          — MX / NS record lookups for domains
+#   LWP::UserAgent    — RDAP enrichment + redirect-chain following
+#   LWP::ConnCache    — LWP connection keep-alive (auxiliary to LWP::UserAgent)
+#   HTML::LinkExtor   — Structural HTML link extraction (href/src/action attrs)
+#   CHI               — Cross-message in-process WHOIS/RDAP cache
+#   IO::Socket::IP    — IPv6-capable WHOIS socket (falls back to IO::Socket::INET)
+#   Domain::PublicSuffix — PSL-based eTLD+1 normalisation
+#   AnyEvent::DNS     — Parallel async DNS resolution
+# ===========================================================================
+
+# ---------------------------------------------------------------------------
+# OD-1: Without Net::DNS
+#
+# Net::DNS provides MX and NS lookups inside _analyse_domain().  Without it
+# the $HAS_NET_DNS guard prevents those lookups; the returned hashrefs must
+# have no mx_* or ns_* keys.  All other domain fields (web_ip, registrar,
+# etc.) still come from stubs and must remain present.
+# ---------------------------------------------------------------------------
+subtest 'OD-1: Without Net::DNS — mailto_domains() omits MX/NS keys, other fields intact' => sub {
+	without_optionals(['Net::DNS'], sub {
+		install_stubs(
+			rdns     => 'mx.test.example',
+			resolve  => { 'spammer.example' => '91.198.174.50' },
+			whois_ip => { org => 'Bad ISP', abuse => 'abuse@badisp.example', country => 'XX' },
+			domain_whois => sub {
+				my (undef, $dom) = @_;
+				return undef unless $dom eq 'spammer.example';
+				return "Registrar: EvilReg Inc\n"
+				     . "Registrar Abuse Contact Email: reg\@evilreg.example\n";
+			},
+		);
+
+		my $a = Email::Abuse::Investigator->new();
+		$a->parse_email(make_raw_email(
+			received => 'from bad (bad [91.198.174.50]) by mx.test',
+			from     => 'Phisher <crook@spammer.example>',
+			body     => 'Send money.',
+		));
+
+		my @doms = $a->mailto_domains();
+		ok scalar(@doms), 'mailto_domains() returns results without Net::DNS';
+
+		my ($d) = grep { $_->{domain} eq 'spammer.example' } @doms;
+		ok defined $d, 'spammer.example present in mailto_domains()';
+		diag('Domain hashref keys: ' . join(', ', sort keys %$d)) if $ENV{TEST_VERBOSE};
+
+		# MX keys must be absent — the $HAS_NET_DNS guard skips those lookups
+		ok !exists $d->{mx_host},  'no mx_host key without Net::DNS';
+		ok !exists $d->{mx_ip},    'no mx_ip key without Net::DNS';
+		ok !exists $d->{mx_org},   'no mx_org key without Net::DNS';
+		ok !exists $d->{mx_abuse}, 'no mx_abuse key without Net::DNS';
+
+		# NS keys must also be absent
+		ok !exists $d->{ns_host},  'no ns_host key without Net::DNS';
+		ok !exists $d->{ns_ip},    'no ns_ip key without Net::DNS';
+		ok !exists $d->{ns_org},   'no ns_org key without Net::DNS';
+		ok !exists $d->{ns_abuse}, 'no ns_abuse key without Net::DNS';
+
+		# Non-DNS fields still populated from stubs
+		is $d->{domain},          'spammer.example',      'domain field present';
+		is $d->{web_ip},          '91.198.174.50',        'web_ip from _resolve_host stub';
+		is $d->{registrar_abuse}, 'reg@evilreg.example',  'registrar_abuse from domain_whois stub';
+
+		# Module does not die and produces a report
+		my $report = $a->report();
+		ok defined $report && length($report), 'report() completes without Net::DNS';
+
+		restore_stubs();
+	});
+};
+
+# ---------------------------------------------------------------------------
+# OD-2: Without HTML::LinkExtor
+#
+# HTML::LinkExtor parses HTML attributes and returns decoded URLs (e.g.
+# &amp; → &).  Without it only the plain-text regex pass runs, which matches
+# the raw attribute value including HTML entities.
+#
+# Observable differences:
+#   • With LinkExtor:    2 URL entries for the same host (decoded + raw entity)
+#   • Without LinkExtor: 1 URL entry (raw entity form only)
+#   • The URL string found without LinkExtor contains the literal '&amp;'
+# ---------------------------------------------------------------------------
+subtest 'OD-2: Without HTML::LinkExtor — HTML entity URLs not decoded; count differs' => sub {
+	without_optionals(['HTML::LinkExtor'], sub {
+		install_stubs(
+			rdns    => 'mail.test.example',
+			resolve => { 'example.com' => '91.198.174.51' },
+			whois_ip => { org => 'Some ISP', abuse => 'abuse@someisp.example' },
+			domain_whois => undef,
+		);
+
+		# HTML-only email: the href contains HTML-entity-encoded parameters.
+		# The plain-text regex finds the raw attribute value (with &amp;).
+		# HTML::LinkExtor would also find the entity-decoded form (&).
+		my $html_body = '<a href="https://example.com/page?ref=1&amp;src=email">click</a>';
+		my $a = Email::Abuse::Investigator->new();
+		$a->parse_email(make_raw_email(
+			received => 'from bad (bad [91.198.174.51]) by mx.test',
+			ct       => 'text/html; charset=us-ascii',
+			body     => $html_body,
+		));
+
+		my @urls = $a->embedded_urls();
+		diag('URLs found: ' . join(', ', map { $_->{url} } @urls)) if $ENV{TEST_VERBOSE};
+
+		# Without LinkExtor only the plain-text-regex result is present
+		is scalar(@urls), 1,
+			'without HTML::LinkExtor: only plain-text regex result (raw entity form)';
+
+		like $urls[0]->{url}, qr/&amp;/,
+			'URL contains raw HTML entity &amp; (not decoded by LinkExtor)';
+
+		unlike $urls[0]->{url}, qr/ref=1&src=/,
+			'decoded form absent without HTML::LinkExtor';
+
+		is $urls[0]->{host}, 'example.com', 'host correctly extracted despite entity';
+
+		restore_stubs();
+	});
+};
+
+# With HTML::LinkExtor present the decoded form is ALSO found, giving 2 entries.
+# This subtest only runs when LinkExtor IS available.
+SKIP: {
+	skip 'HTML::LinkExtor not installed', 1 unless eval { require HTML::LinkExtor; 1 };
+
+	subtest 'OD-2b: With HTML::LinkExtor — entity-decoded AND raw-entity URLs both found' => sub {
+		restore_stubs();
+		install_stubs(
+			rdns    => 'mail.test.example',
+			resolve => { 'example.com' => '91.198.174.51' },
+			whois_ip => { org => 'Some ISP', abuse => 'abuse@someisp.example' },
+			domain_whois => undef,
+		);
+
+		my $html_body = '<a href="https://example.com/page?ref=1&amp;src=email">click</a>';
+		my $a = Email::Abuse::Investigator->new();
+		$a->parse_email(make_raw_email(
+			received => 'from bad (bad [91.198.174.51]) by mx.test',
+			ct       => 'text/html; charset=us-ascii',
+			body     => $html_body,
+		));
+
+		my @urls = $a->embedded_urls();
+		diag('URLs with LinkExtor: ' . join(', ', map { $_->{url} } @urls)) if $ENV{TEST_VERBOSE};
+
+		is scalar(@urls), 2,
+			'with HTML::LinkExtor: 2 URL entries — decoded and raw-entity forms';
+
+		my @decoded = grep { $_->{url} =~ /ref=1&src=/ } @urls;
+		my @raw     = grep { $_->{url} =~ /&amp;/     } @urls;
+		ok scalar(@decoded), 'decoded URL (& not &amp;) present with LinkExtor';
+		ok scalar(@raw),     'raw entity URL (&amp;) also present from plain-text regex';
+
+		restore_stubs();
+	};
+}
+
+# ---------------------------------------------------------------------------
+# OD-3: Without LWP::UserAgent (and LWP::ConnCache)
+#
+# LWP::UserAgent is required by _follow_redirect_chain() (redirect cloaker
+# resolution) and _rdap_lookup() (IP enrichment).  Without it:
+#   • _follow_redirect_chain() returns undef immediately ($HAS_LWP = false)
+#   • Redirect-cloaker URLs are found in embedded_urls() but their phishing
+#     destination is NOT appended — only the original cloud-storage URL appears.
+#
+# We capture the reloaded _follow_redirect_chain before install_stubs()
+# overwrites it with the default sub{undef}, then restore it so the real
+# no-LWP code path is exercised rather than the generic stub.
+# ---------------------------------------------------------------------------
+subtest 'OD-3: Without LWP::UserAgent — redirect cloaker not resolved, module stable' => sub {
+	without_optionals(['LWP::UserAgent', 'LWP::ConnCache'], sub {
+		# Capture the reloaded (no-LWP) implementation before install_stubs overwrites it
+		my $real_follow_redirect;
+		{ no strict 'refs'; $real_follow_redirect = \&Email::Abuse::Investigator::_follow_redirect_chain; }
+
+		install_stubs(
+			rdns    => 'mail.test.example',
+			resolve => { 'storage.googleapis.com' => '142.250.80.112' },
+			whois_ip => sub {
+				my (undef, $ip) = @_;
+				return { org => 'Google LLC', abuse => 'google-cloud-compliance@google.com' }
+					if $ip eq '142.250.80.112';
+				return {};
+			},
+			domain_whois => undef,
+		);
+
+		# Restore the real no-LWP _follow_redirect_chain so the $HAS_LWP=false
+		# code path is exercised, not the generic sub{undef} stub.
+		{ no warnings 'redefine';
+		  *Email::Abuse::Investigator::_follow_redirect_chain = $real_follow_redirect; }
+
+		my $a = Email::Abuse::Investigator->new();
+		$a->parse_email(make_raw_email(
+			received => 'from bad (bad [91.198.174.99]) by mx.test',
+			body     => 'Click: https://storage.googleapis.com/fakebucket/redir.html',
+		));
+
+		my @urls = $a->embedded_urls();
+		diag('URLs without LWP: ' . join(', ', map { $_->{host} } @urls)) if $ENV{TEST_VERBOSE};
+
+		# GCS URL is found (URL parsing does not require LWP)
+		is scalar(grep { $_->{host} eq 'storage.googleapis.com' } @urls), 1,
+			'redirect-cloaker URL present in embedded_urls() without LWP';
+
+		# Redirect not followed — only the one original URL
+		is scalar(@urls), 1,
+			'phishing destination absent: _follow_redirect_chain returns undef without LWP';
+
+		# Core pipeline methods are unaffected
+		my $origin = $a->originating_ip();
+		ok defined $origin, 'originating_ip() works without LWP';
+
+		my $risk = $a->risk_assessment();
+		ok defined $risk && defined $risk->{level}, 'risk_assessment() works without LWP';
+
+		# redirect_cloaker flag still raised (detection based on hostname, not HTTP)
+		ok scalar(grep { $_->{flag} eq 'redirect_cloaker' } @{ $risk->{flags} }),
+			'redirect_cloaker risk flag raised despite no LWP (detection is host-based)';
+
+		my $report = $a->report();
+		ok defined $report && length($report), 'report() completes without LWP';
+
+		restore_stubs();
+	});
+};
+
+# ---------------------------------------------------------------------------
+# OD-4: Without CHI
+#
+# CHI provides a cross-message in-process cache keyed on IP/domain.  Without
+# it each new object performs fresh lookups against the installed stubs.
+#
+# Observable test: switch the _whois_ip stub between two objects for the SAME
+# IP address.  Without CHI the second object sees ISP-Beta (its own fresh
+# stub), not ISP-Alpha cached from the first object.
+# ---------------------------------------------------------------------------
+subtest 'OD-4: Without CHI — cross-message cache absent, each object uses its own stubs' => sub {
+	without_optionals(['CHI'], sub {
+		# Object 1 — same IP resolves to ISP-Alpha
+		install_stubs(
+			rdns    => 'mail.alpha.example',
+			resolve => { 'phish.example' => '91.198.174.100' },
+			whois_ip => { org => 'ISP-Alpha', abuse => 'abuse@alpha.example' },
+			domain_whois => undef,
+		);
+
+		my $obj1 = Email::Abuse::Investigator->new();
+		$obj1->parse_email(make_raw_email(
+			received => 'from a (a [91.198.174.100]) by mx.test',
+			body     => 'Visit https://phish.example/',
+		));
+
+		my @urls1 = $obj1->embedded_urls();
+		my ($u1)  = grep { $_->{host} eq 'phish.example' } @urls1;
+		is $u1->{org}, 'ISP-Alpha', 'object 1 gets ISP-Alpha';
+
+		# Object 2 — same IP now resolves to ISP-Beta via a different stub
+		install_stubs(
+			rdns    => 'mail.beta.example',
+			resolve => { 'phish.example' => '91.198.174.100' },
+			whois_ip => { org => 'ISP-Beta', abuse => 'abuse@beta.example' },
+			domain_whois => undef,
+		);
+
+		my $obj2 = Email::Abuse::Investigator->new();
+		$obj2->parse_email(make_raw_email(
+			received => 'from b (b [91.198.174.100]) by mx.test',
+			body     => 'Visit https://phish.example/',
+		));
+
+		my @urls2 = $obj2->embedded_urls();
+		my ($u2)  = grep { $_->{host} eq 'phish.example' } @urls2;
+
+		# Without CHI: obj2 makes a fresh lookup and gets the current stub (ISP-Beta)
+		is $u2->{org}, 'ISP-Beta',
+			'without CHI: object 2 makes a fresh lookup and gets ISP-Beta (not cached ISP-Alpha)';
+
+		# Object 1 result is unchanged (per-object slot cache still active)
+		is $u1->{org}, 'ISP-Alpha', 'object 1 result unchanged after object 2 lookup';
+
+		# Both objects produce complete reports
+		ok length($obj1->report()), 'obj1 report() non-empty';
+		ok length($obj2->report()), 'obj2 report() non-empty';
+
+		restore_stubs();
+	});
+};
+
+# ---------------------------------------------------------------------------
+# OD-5: Without Domain::PublicSuffix
+#
+# Domain::PublicSuffix provides PSL-based eTLD+1 normalisation via
+# _registrable().  Without it the module falls back to a built-in heuristic
+# that handles common ccTLD second-level patterns (co.uk, com.au, etc.).
+#
+# Observable: a URL with a ccTLD+2 host (sub.bad.co.uk) is still found and
+# its eTLD+1 is correctly extracted as 'bad.co.uk' by the heuristic.
+# ---------------------------------------------------------------------------
+subtest 'OD-5: Without Domain::PublicSuffix — heuristic ccTLD normalisation still correct' => sub {
+	without_optionals(['Domain::PublicSuffix'], sub {
+		install_stubs(
+			rdns    => 'mail.test.example',
+			resolve => { 'sub.bad.co.uk' => '91.198.174.50' },
+			whois_ip => { org => 'UK ISP', abuse => 'abuse@ukisp.example' },
+			domain_whois => sub {
+				my (undef, $dom) = @_;
+				return undef unless $dom =~ /bad\.co\.uk/;
+				return "Registrar: UK Reg Ltd\n"
+				     . "Registrar Abuse Contact Email: abuse\@ukreg.example\n";
+			},
+		);
+
+		my $a = Email::Abuse::Investigator->new();
+		$a->parse_email(make_raw_email(
+			received => 'from bad (bad [91.198.174.50]) by mx.test',
+			body     => 'Visit https://sub.bad.co.uk/evil/',
+		));
+
+		my @urls = $a->embedded_urls();
+		my ($u)  = grep { $_->{host} eq 'sub.bad.co.uk' } @urls;
+		ok defined $u, 'ccTLD subdomain URL host found without Domain::PublicSuffix';
+
+		diag("org=$u->{org} abuse=$u->{abuse}") if $ENV{TEST_VERBOSE};
+		ok $u->{org},   'org populated via WHOIS stub';
+		ok $u->{abuse}, 'abuse contact populated';
+
+		# report() must not die and must mention the URL host
+		my $report = $a->report();
+		ok defined $report && length($report), 'report() completes without Domain::PublicSuffix';
+		like $report, qr/sub\.bad\.co\.uk/, 'URL host appears in report output';
+
+		restore_stubs();
+	});
+};
+
+# ---------------------------------------------------------------------------
+# OD-6: Without AnyEvent::DNS
+#
+# AnyEvent::DNS provides parallel async DNS resolution for multiple URL hosts.
+# Without it _parallel_resolve_hosts() is a no-op and resolution falls back
+# to a sequential per-host loop.  Results must be identical to the parallel path.
+# ---------------------------------------------------------------------------
+subtest 'OD-6: Without AnyEvent::DNS — sequential DNS fallback resolves all hosts correctly' => sub {
+	without_optionals(['AnyEvent::DNS', 'AnyEvent'], sub {
+		my %host_ip = (
+			'site1.example' => '91.198.174.10',
+			'site2.example' => '91.198.174.11',
+			'site3.example' => '91.198.174.12',
+		);
+
+		install_stubs(
+			rdns    => 'mail.test.example',
+			resolve => sub {
+				my (undef, $h) = @_;
+				return $host_ip{$h};
+			},
+			whois_ip => sub {
+				my (undef, $ip) = @_;
+				my ($last) = $ip =~ /(\d+)$/;
+				return { org => "ISP-$last", abuse => "abuse\@isp$last.example" };
+			},
+			domain_whois => undef,
+		);
+
+		my $a = Email::Abuse::Investigator->new();
+		$a->parse_email(make_raw_email(
+			received => 'from bad (bad [91.198.174.10]) by mx.test',
+			body     => 'Visit https://site1.example/ and https://site2.example/ '
+			          . 'and https://site3.example/ for spam.',
+		));
+
+		my @urls = $a->embedded_urls();
+		is scalar(@urls), 3,
+			'all 3 URLs resolved via sequential fallback without AnyEvent::DNS';
+
+		for my $host (sort keys %host_ip) {
+			my ($u) = grep { $_->{host} eq $host } @urls;
+			ok defined $u,            "$host found";
+			is $u->{ip}, $host_ip{$host}, "$host IP correct from sequential DNS";
+		}
+
+		restore_stubs();
+	});
+};
+
+# ---------------------------------------------------------------------------
+# OD-7: Without Net::DNS + LWP::UserAgent (combined pair)
+#
+# Tests the combined fallback: no MX/NS records AND no redirect following.
+# A redirect-cloaker URL in the body is found but not resolved; domain
+# results lack all MX/NS keys.
+# ---------------------------------------------------------------------------
+subtest 'OD-7: Without Net::DNS + LWP::UserAgent — combined fallback correct' => sub {
+	without_optionals(['Net::DNS', 'LWP::UserAgent', 'LWP::ConnCache'], sub {
+		# Capture the no-LWP _follow_redirect_chain before install_stubs replaces it
+		my $real_follow;
+		{ no strict 'refs'; $real_follow = \&Email::Abuse::Investigator::_follow_redirect_chain; }
+
+		install_stubs(
+			rdns    => 'mail.combined.example',
+			resolve => {
+				'storage.googleapis.com' => '142.250.80.112',
+				'sender.example'         => '91.198.174.55',
+			},
+			whois_ip => sub {
+				my (undef, $ip) = @_;
+				return { org => 'Google LLC', abuse => 'google-cloud-compliance@google.com' }
+					if $ip eq '142.250.80.112';
+				return { org => 'Sender ISP', abuse => 'abuse@senderisp.example' };
+			},
+			domain_whois => undef,
+		);
+
+		# Use the real no-LWP redirect implementation
+		{ no warnings 'redefine';
+		  *Email::Abuse::Investigator::_follow_redirect_chain = $real_follow; }
+
+		my $a = Email::Abuse::Investigator->new();
+		$a->parse_email(make_raw_email(
+			received => 'from bad (bad [91.198.174.55]) by mx.test',
+			from     => 'Phisher <crook@sender.example>',
+			body     => 'Click: https://storage.googleapis.com/bucket/page.html',
+		));
+
+		# Redirect not followed (no LWP)
+		my @urls = $a->embedded_urls();
+		is scalar(@urls), 1, 'only original GCS URL, no redirect destination (no LWP)';
+		is $urls[0]->{host}, 'storage.googleapis.com', 'GCS URL present';
+
+		# Domain results have no MX/NS (no Net::DNS)
+		my @doms = $a->mailto_domains();
+		my ($d)  = grep { $_->{domain} eq 'sender.example' } @doms;
+		ok defined $d, 'sender.example in mailto_domains()';
+		ok !exists $d->{mx_host}, 'no mx_host (no Net::DNS)';
+		ok !exists $d->{ns_host}, 'no ns_host (no Net::DNS)';
+
+		# Risk and report still work
+		my $risk = $a->risk_assessment();
+		ok defined $risk->{level}, 'risk_assessment() works in combined-fallback mode';
+		ok length($a->report()),   'report() produces output in combined-fallback mode';
+
+		restore_stubs();
+	});
+};
+
+# ---------------------------------------------------------------------------
+# OD-8: Without ALL optional dependencies
+#
+# Every $HAS_* flag is cleared.  The module must process a rich email and
+# return coherent results for every public method using only stubs for the
+# seven network seams.  This is the "bare minimum" baseline.
+# ---------------------------------------------------------------------------
+subtest 'OD-8: Without all optional deps — basic email analysis degrades gracefully' => sub {
+	without_optionals([qw(
+		Net::DNS  LWP::UserAgent  LWP::ConnCache  HTML::LinkExtor
+		CHI  IO::Socket::IP  Domain::PublicSuffix  AnyEvent::DNS  AnyEvent
+	)], sub {
+		install_stubs(
+			rdns    => 'mail.fallback.example',
+			resolve => { 'phishing.example' => '91.198.174.77' },
+			whois_ip => sub {
+				return { org => 'Phish Hosting Co', abuse => 'abuse@phishhost.example' };
+			},
+			domain_whois => sub {
+				my (undef, $dom) = @_;
+				return "Registrar: BadReg\n"
+				     . "Registrar Abuse Contact Email: reg\@badreg.example\n"
+				     if $dom eq 'phishing.example';
+				return undef;
+			},
+		);
+
+		my $a = Email::Abuse::Investigator->new();
+		$a->parse_email(make_raw_email(
+			received => 'from ext (ext [91.198.174.77]) by mx.test',
+			from     => 'Phisher <bad@phishing.example>',
+			reply_to => 'bad@phishing.example',
+			body     => 'Click https://phishing.example/lure and send cash.',
+		));
+
+		# originating_ip() — pure header parsing, no optional deps required
+		my $origin = $a->originating_ip();
+		ok defined $origin,              'originating_ip() works without any optional dep';
+		is $origin->{ip}, '91.198.174.77', 'correct IP extracted';
+
+		# embedded_urls() — no parallel DNS, no HTML linkextor, no RDAP, no redirect
+		my @urls = $a->embedded_urls();
+		ok scalar(@urls), 'embedded_urls() returns results without any optional dep';
+		my ($u) = grep { $_->{host} eq 'phishing.example' } @urls;
+		ok defined $u,        'phishing.example URL found';
+		ok !exists $u->{mx_host}, 'no mx_host enrichment without Net::DNS';
+
+		# mailto_domains() — no MX/NS keys
+		my @doms = $a->mailto_domains();
+		ok scalar(@doms), 'mailto_domains() returns results without any optional dep';
+		my ($d) = grep { $_->{domain} eq 'phishing.example' } @doms;
+		ok defined $d,        'phishing.example in mailto_domains()';
+		ok !exists $d->{mx_host}, 'no mx_host without Net::DNS';
+
+		# risk_assessment() — runs with reduced signal set
+		my $risk = $a->risk_assessment();
+		ok defined $risk,                   'risk_assessment() runs without optional deps';
+		ok defined $risk->{level},          'risk level present';
+		ok ref($risk->{flags}) eq 'ARRAY',  'flags arrayref present';
+
+		# abuse_contacts() — uses stubs, not optional deps
+		my @contacts = $a->abuse_contacts();
+		ok scalar(@contacts), 'abuse_contacts() returns results';
+
+		# all_domains() — union of URL hosts + mailto domains
+		my @all = $a->all_domains();
+		ok scalar(@all), 'all_domains() returns results';
+
+		# report() — full output, no crash
+		my $report = $a->report();
+		ok defined $report && length($report), 'report() produces non-empty output';
+		like $report, qr/91\.198\.174\.77/,    'originating IP in report';
+		like $report, qr/phishing\.example/,   'domain in report';
+
+		diag("Risk level: $risk->{level}") if $ENV{TEST_VERBOSE};
+		diag("Report length: " . length($report) . " chars") if $ENV{TEST_VERBOSE};
+
+		restore_stubs();
+	});
 };
 
 done_testing();

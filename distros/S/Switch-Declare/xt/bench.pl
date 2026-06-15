@@ -8,7 +8,7 @@ use strict;
 use warnings;
 use Benchmark qw(cmpthese);
 use Switch::Declare;
-
+use Scalar::Util qw/looks_like_number/;
 # ---- numeric, few arms -------------------------------------------------
 my @vals = (1 .. 6);
 my $i = 0;
@@ -22,8 +22,9 @@ sub sw_few {
 }
 sub if_few {
     my $v = $vals[$i++ % @vals];
-    return $v == 1 ? "a" : $v == 2 ? "b" : $v == 3 ? "c"
-         : $v == 4 ? "d" : $v == 5 ? "e" : "z";
+    my $n = looks_like_number($v);
+    return $n && $v == 1 ? "a" : $n && $v == 2 ? "b" : $n && $v == 3 ? "c"
+         : $n && $v == 4 ? "d" : $n && $v == 5 ? "e" : "z";
 }
 
 print "== numeric, 5 arms + default ==\n";

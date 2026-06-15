@@ -1,12 +1,12 @@
 package jacode;
-'有朋自遠方来不亦楽乎'=~/^\xE6\x9C\x89/ or die "Perl script '@{[__FILE__]}' must be UTF-8 encoding.\n";
+'有朋自遠方来不亦楽乎' =~ /^\xE6\x9C\x89/ or die "This jacode.pl must be saved in UTF-8 encoding.\n";
 ######################################################################
 #
 # jacode.pl - Perl program for Japanese character code conversion
 #
 # https://metacpan.org/dist/Jacode
 #
-# Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi <ina.cpan@gmail.com> in a CPAN
 #
 ######################################################################
 #
@@ -172,7 +172,7 @@ sub BEGIN {
 
 $support_jcode_package_too = 1;
 
-$VERSION = '2.13.4.33';
+$VERSION = '2.13.4.34';
 $VERSION = $VERSION;
 $rcsid = sprintf(q$Id: jacode.pl,v %s branched from jcode.pl,v 2.13 2000/09/29 16:10:05 utashiro Exp $, $VERSION);
 
@@ -191,6 +191,39 @@ $rcsid = sprintf(q$Id: jacode.pl,v %s branched from jcode.pl,v 2.13 2000/09/29 1
 # program, nkf. Speed of execution is not as fast as nkf, but reading
 # and understanding are very fast.
 ######################################################################
+
+# ---------------------------------------------------------------------
+# Suppress the modern-Perl "Old package separator" deprecation warning
+# that this file intentionally triggers (the apostrophe ' separator is
+# required for Perl 4.036 compatibility and must NOT be changed to ::).
+#
+# Mechanism: install a __WARN__ filter that drops only that one message
+# and chains every other warning through to the caller's handler. The
+# previous handler is restored by a second BEGIN block placed AFTER the
+# last apostrophe-separated name is compiled (just before sub jis_inout).
+# Save/restore is used (not local), because a BEGIN block's local would
+# unwind before the later apostrophe lines are compiled.
+#
+# Gated on $] >= 5.038000: the warning was introduced in Perl 5.38.0.
+# Older perls (including 4.036 / 5.005_03) never emit it, so the whole
+# block stays inert there. Wrapped in eval q{} so it is harmless even
+# where my/anonymous-sub/$SIG{__WARN__} would not parse.
+#
+# The filter matches the warning text; if a future perl reworded it the
+# message would simply reappear (fail-safe), never hide other warnings.
+# ---------------------------------------------------------------------
+BEGIN {
+    if ($] >= 5.038000) {
+        eval q{
+            $jacode::_saved_warn = $SIG{__WARN__};
+            $SIG{__WARN__} = sub {
+                my $msg = shift;
+                return if $msg =~ /Old package separator/;
+                $jacode::_saved_warn ? &{$jacode::_saved_warn}($msg) : print STDERR $msg;
+            };
+        };
+    }
+}
 
 if ($0 eq __FILE__) {
 
@@ -1335,6 +1368,17 @@ sub _init_jcode_alias {
 # Set escape sequences which should be put before and after Japanese
 # (JIS X0208) string
 #---------------------------------------------------------------------
+# ---------------------------------------------------------------------
+# Restore the caller's __WARN__ handler now that every apostrophe-
+# separated name above has been compiled. See the matching BEGIN block
+# before "if ($0 eq __FILE__)".
+# ---------------------------------------------------------------------
+BEGIN {
+    if ($] >= 5.038000) {
+        eval q{ $SIG{__WARN__} = $jacode::_saved_warn; };
+    }
+}
+
 sub jis_inout {
     $esc_0208 = shift || $esc_0208;
 
@@ -11433,6 +11477,33 @@ So we believe this software will be useful for DX (Digital Transformation) and I
 
 Running this software requires perl 4.036 or later.
 
+=head1 COMPATIBILITY AND WARNINGS
+
+For backward compatibility with perl 4.036 and 5.005_03, this software
+uses the historical C<'> package separator internally (for example
+C<&jacode'getcode> and C<*jcode'init>). This separator is intentional
+and is never changed to C<::>, because C<::> is not available on perl 4.
+
+On perl 5.38.0 and later, use of the C<'> separator emits an
+"Old package separator" deprecation warning. So that loading this
+software does not flood the caller with that message, jacode.pl installs
+a temporary C<$SIG{__WARN__}> filter while it is being compiled (gated on
+C<$] E<gt>= 5.038000>), drops only that one message, and then restores
+the caller's previous handler. Every other warning is passed through
+unchanged, and on perl older than 5.38.0 the mechanism stays completely
+inert. As a result you should normally see no warning from loading this
+software, and no action is required on your part.
+
+The filter matches the warning text; should a future perl reword the
+message, the warning would simply reappear (a safe failure) rather than
+any unrelated warning being suppressed.
+
+The UTF-8 source self-check at the top of this file (the regular
+expression that aborts loading if jacode.pl was not saved as UTF-8) is
+written without any perl 5 only syntax (no anonymous-array reference and
+no C<__FILE__> interpolation), so the check itself also compiles and runs
+on perl 4.036.
+
 =head1 DEFINITIONS
 
 To easy documentation, this document uses following words for encoding name.
@@ -12356,7 +12427,7 @@ This software is free software; you can redistribute it and/or modify it under t
 
 This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi L<ina@cpan.org> in a CPAN
+Copyright (c) 2010, 2011, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2022, 2023, 2026 INABA Hitoshi L<ina.cpan@gmail.com> in a CPAN
 
 The latest version of "jacode.pl" is available here:
 

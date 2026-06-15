@@ -29,6 +29,7 @@ executables
 Fowler's
 Guine
 filename
+Html
 Ishigaki
 Lite
 Kenichi
@@ -45,11 +46,13 @@ O'Neill
 OO
 pbcopy
 pbpaste
+Pdf
 Pegg
 quads
 quincunx
 Samurai
 square's
+Steffen
 sudoku
 sudokug
 SudokuTk

@@ -9,6 +9,7 @@ CVS/
 ^foo
 ^generated_files$
 ^.git/
+^.github/
 ^.gitignore$
 ^html/
 ^Mac-Pasteboard-

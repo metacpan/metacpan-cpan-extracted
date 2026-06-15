@@ -19,7 +19,7 @@ use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
 
-our $VERSION = v0.29;
+our $VERSION = v0.30;
 
 use constant {
     RE_UUID         => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}\z/,
@@ -57,7 +57,7 @@ use constant {
     NS_INT          => '5dd8ddbb-13a8-4d6c-9264-36e6dd6f9c99', # integer-namespace
     NS_DATE         => 'fc43fbba-b959-4882-b4c8-90a288b7d416', # gregorian-date-namespace
     NS_GTIN         => 'd95d8b1f-5091-4642-a6b0-a585313915f1', # gtin-namespace
-    NS_UNICODE_CP   => '132aa723-a373-48bf-a88d-69f1e00f00cf', # 'unicode-character-namespace'
+    NS_UNICODE_CP   => '132aa723-a373-48bf-a88d-69f1e00f00cf', # unicode-character-namespace
 };
 
 # Features:
@@ -82,16 +82,16 @@ my %well_known = (
     uri  => __PACKAGE__->new($well_known_uuid => WK_URI,    validate => RE_URI),
     sid  => __PACKAGE__->new($well_known_uuid => WK_SID,    validate => RE_UINT),
     sni  => __PACKAGE__->new($well_known_uuid => WK_SNI,    validate => RE_UINT),
-    wd   => __PACKAGE__->new($well_known_uuid => WK_WD,     validate => RE_QID,  namespace => NS_WD,   generate => 'id-based'),
-    fc   => __PACKAGE__->new($well_known_uuid => WK_FC,     validate => RE_QID,  namespace => NS_FC,   generate => 'id-based'),
-    gtin => __PACKAGE__->new($well_known_uuid => WK_GTIN,   validate => RE_GTIN, namespace => NS_GTIN, generate => 'id-based'),
+    wd   => __PACKAGE__->new($well_known_uuid => WK_WD,     validate => RE_QID,  generate => 'id-based'),
+    fc   => __PACKAGE__->new($well_known_uuid => WK_FC,     validate => RE_QID,  generate => 'id-based'),
+    gtin => __PACKAGE__->new($well_known_uuid => WK_GTIN,   validate => RE_GTIN, generate => 'id-based'),
     iban => __PACKAGE__->new($well_known_uuid => WK_IBAN),
     bic  => __PACKAGE__->new($well_known_uuid => WK_BIC),
     doi  => __PACKAGE__->new($well_known_uuid => WK_DOI,    validate => RE_DOI),
 
     # Unofficial, not part of public API:
     # Also used by Data::Identifier::Util!
-    unicodecp => __PACKAGE__->new($well_known_uuid => WK_UNICODE_CP, validate => RE_UNICODE, namespace => NS_UNICODE_CP, generate => 'id-based'),
+    unicodecp => __PACKAGE__->new($well_known_uuid => WK_UNICODE_CP, validate => RE_UNICODE, generate => 'id-based'),
 
     hdi  => __PACKAGE__->new($well_known_uuid => WK_HDI, validate => RE_UINT),
     udi  => __PACKAGE__->new($well_known_uuid => WK_UDI, validate => RE_UINT),
@@ -101,6 +101,20 @@ my %well_known = (
 my %registered;
 
 $_->register foreach values %well_known;
+
+# Refill with namespaces:
+{
+    my %ns = (
+        wd   => NS_WD,
+        fc   => NS_FC,
+        gtin => NS_GTIN,
+        unicodecp => NS_UNICODE_CP,
+    );
+
+    foreach my $wk (keys %ns) {
+        $well_known{$wk}->{namespace} //= Data::Identifier->new(ise => $ns{$wk})->register;
+    }
+}
 
 # Refill with sids:
 {
@@ -193,9 +207,9 @@ foreach my $ise (NS_WD, NS_INT, NS_DATE) {
     $identifier->register; # re-register
 }
 
-# Refill with displaynames
+# Refill with tagnames
 {
-    my %displaynames = (
+    my %tagnames = (
         WK_NULL()                               => 'null',
         WK_UUID()                               => 'uuid',
         WK_OID()                                => 'oid',
@@ -255,9 +269,9 @@ foreach my $ise (NS_WD, NS_INT, NS_DATE) {
         '5ec197c3-1406-467c-96c7-4b1a6ec2c5c9'  => 'minimum-multiplicity-generator',
     );
 
-    foreach my $ise (keys %displaynames) {
+    foreach my $ise (keys %tagnames) {
         my $identifier = __PACKAGE__->new(ise => $ise);
-        $identifier->{displayname} //= $displaynames{$ise};
+        $identifier->{tagname} //= [$tagnames{$ise}];
         $identifier->register; # re-register
     }
 }
@@ -362,6 +376,9 @@ sub new {
                 #       A future version might come up with some trick here.
                 $type = 'ise';
                 $id   = $id->ise;
+            } elsif ($id->isa('JSON::PP::Boolean') || $id->isa('JSON::XS::Boolean')) {
+                require Data::Identifier::Util;
+                return Data::Identifier::Util->from_bool($id);
             } else {
                 croak 'Unsupported input data';
             }
@@ -374,7 +391,7 @@ sub new {
     if (!ref($type) && $type eq 'ise') {
         croak 'Undefined identifier but type is ISE' unless defined $id;
 
-        if ($id =~ /^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/) { # allow less normalised form than RE_UUID
+        if ($id =~ /^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}\z/) { # allow less normalised form than RE_UUID
             $type = $well_known_uuid;
 
             # For bootstrap only.
@@ -392,7 +409,7 @@ sub new {
     }
 
     unless (ref $type) {
-        if ($type =~ /^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/) { # allow less normalised form than RE_UUID
+        if ($type =~ /^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}\z/) { # allow less normalised form than RE_UUID
             $type = $pkg->new(uuid => $type);
             $type->register;
         } elsif ($type eq 'wellknown') {
@@ -411,16 +428,16 @@ sub new {
     if ($type == ($well_known{uri} // 0)) {
         my $uri = $id.''; # force stringification
 
-        if ($uri =~ m#^urn:uuid:([0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12})$#) {
+        if ($uri =~ m#^urn:uuid:([0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12})\z#) {
             $id = $1;
             $type = $well_known_uuid;
-        } elsif ($uri =~ m#^urn:oid:([0-2](?:\.(?:0|[1-9][0-9]*))+)$#) {
+        } elsif ($uri =~ m#^urn:oid:([0-2](?:\.(?:0|[1-9][0-9]*))+)\z#) {
             $id = $1;
             $type = $well_known{oid};
-        } elsif ($uri =~ m#^https?://www\.wikidata\.org/entity/([QPL][1-9][0-9]*)$#) {
+        } elsif ($uri =~ m#^https?://www\.wikidata\.org/entity/([QPL][1-9][0-9]*)\z#) {
             $id = $1;
             $type = $well_known{wd};
-        } elsif ($uri =~ m#^https?://doi\.org/(10\..+)$#) {
+        } elsif ($uri =~ m#^https?://doi\.org/(10\..+)\z#) {
             $id = $1;
             $type = $well_known{doi};
         } elsif ($uri =~ m#^https?://uriid\.org/([^/]+)/[^/]+#) {
@@ -439,11 +456,11 @@ sub new {
     if ($type == ($well_known_uuid // 0)) {
         $id = lc($id); # normalise
     } elsif ($type == ($well_known{oid} // 0)) {
-        if ($id =~ /^2\.25\.([1-9][0-9]*)$/) {
+        if ($id =~ /^2\.25\.([1-9][0-9]*)\z/) {
             my $hex = Math::BigInt->new($1)->as_hex;
             $hex =~ s/^0x//;
             $hex = ('0' x (32 - length($hex))) . $hex;
-            $hex =~ s/^(.{8})(.{4})(.{4})(.{4})(.{12})$/$1-$2-$3-$4-$5/;
+            $hex =~ s/^(.{8})(.{4})(.{4})(.{4})(.{12})\z/$1-$2-$3-$4-$5/;
             $type = $well_known_uuid;
             $id = $hex;
         }
@@ -469,14 +486,16 @@ sub new {
     foreach my $key (qw(namespace generator)) {
         if (defined(my $v = $self->{$key})) {
             unless (ref $v) {
-                $self->{$key} = $pkg->new(from => $v);
+                $self->{$key} = $pkg->new(from => $v)->register;
             }
         }
     }
 
     if (defined(my $tagname = $opts{tagname})) {
+        my %tagnames;
         $tagname = [$tagname] unless ref $tagname;
-        $tagname = [grep {defined} @{$tagname}];
+        %tagnames = map {$_ => undef} grep {defined} @{$tagname};
+        $tagname = [keys %tagnames];
         if (scalar(@{$tagname})) {
             $self->{tagname} = $tagname;
         }
@@ -794,7 +813,7 @@ sub cmp {
             my $self_id = $self->id;
             my $other_id = $other->id;
 
-            if ((my ($sa, $sb) = $self_id =~ /^([^0-9]*)([0-9]+)$/) && (my ($oa, $ob) = $other_id =~ /^([^0-9]*)([0-9]+)$/)) {
+            if ((my ($sa, $sb) = $self_id =~ /^([^0-9]*)([0-9]+)\z/) && (my ($oa, $ob) = $other_id =~ /^([^0-9]*)([0-9]+)\z/)) {
                 my $r = $sa cmp $oa;
                 return $r if $r;
                 return $sb <=> $ob;
@@ -805,6 +824,23 @@ sub cmp {
     } else {
         return !defined($other);
     }
+}
+
+
+sub null_to_undef {
+    my ($self, @opts) = @_;
+
+    croak 'Stray options passed' if scalar @opts;
+
+    return undef unless defined $self;
+
+    unless (eval {$self->isa(__PACKAGE__)}) {
+        $self = __PACKAGE__->new(from => $self);
+    }
+
+    return undef if $self->eq('null');
+
+    return $self;
 }
 
 
@@ -872,7 +908,7 @@ sub register {
         $registered{$well_known{$type_name}->uuid}{$v} = $self;
     }
 
-    foreach my $extra (WK_SNI()) {
+    foreach my $extra (keys %{$self->{id_cache}}) {
         my $v = $self->{id_cache}{$extra} // next;
         $registered{$extra}{$v} = $self;
     }
@@ -1015,7 +1051,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.29
+version v0.30
 
 =head1 SYNOPSIS
 
@@ -1205,6 +1241,7 @@ An instance of L<File::FStore>. This option is currently ignored.
 
 A tagname or a list of tagnames (arrayref).
 Undefined elements are removed.
+Duplicates are removed (since v0.30).
 See L</tagname> for details.
 
 =back
@@ -1494,6 +1531,20 @@ If the all identifiers have the same type this method tries to be smart about or
 The order is the same for C<$a-E<gt>cmp($b)> as for C<- $b-E<gt>cmp($a)>.
 
 =back
+
+=head2 null_to_undef
+
+    my $identifier_or_undef = $identifier->null_to_undef; # $identifier must be non-undef
+    # or:
+    my $identifier_or_undef = Data::Identifier::null_to_undef($identifier); # $identifier can be undef
+
+(experimental since v0.30)
+
+Returns C<undef> if the identifier is C<undef> or represents a null value.
+Otherwise returns the identifier itself.
+
+If C<$identifier> is not an instance of this package is parsed as with C<from> in L</new>.
+In this case it's undefined if the orginal value or an instance of this package is returned.
 
 =head2 namespace
 

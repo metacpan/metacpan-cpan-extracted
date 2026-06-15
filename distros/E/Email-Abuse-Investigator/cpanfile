@@ -8,7 +8,7 @@ requires 'MIME::Base64';
 requires 'MIME::QuotedPrint';
 requires 'Object::Configure';
 requires 'Params::Get';
-requires 'Params::Validate::Strict', '0.33';
+requires 'Params::Validate::Strict', '0.34';
 requires 'Readonly::Values::Months';
 requires 'Socket';
 requires 'Sub::Private', '0.05';
@@ -27,10 +27,12 @@ on 'test' => sub {
 	requires 'POSIX';
 	requires 'Scalar::Util';
 	requires 'Test::DescribeMe';
+	requires 'Test::Mockingbird';
 	requires 'Test::Most';
 	requires 'Test::Needs';
 	requires 'Test::Returns';
 	requires 'Test::Which';
+	requires 'Test::Without::Module';
 };
 
 on 'develop' => sub {

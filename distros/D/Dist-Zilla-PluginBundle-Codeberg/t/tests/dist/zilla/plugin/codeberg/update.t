@@ -43,17 +43,17 @@ my @tests = (
       config       => { remote => 'origin' },
       log_messages => [
          '[Codeberg::Update] Updating Codeberg repository info',
-         '[Codeberg::Update] Sending GET https://codeberg.org/api/v1/projects/bob%2FMy-Stuff',
-         '[Codeberg::Update] Sending PUT https://codeberg.org/api/v1/projects/bob%2FMy-Stuff'
+         '[Codeberg::Update] Sending GET https://codeberg.org/api/v1/repos/bob/My-Stuff',
+         '[Codeberg::Update] Sending PATCH https://codeberg.org/api/v1/repos/bob/My-Stuff'
       ],
       errors           => match(qr/Error:/),
       expected_request => [
-         'PUT',
-         'https://codeberg.org/api/v1/projects/bob%2FMy-Stuff',
+         'PATCH',
+         'https://codeberg.org/api/v1/repos/bob/My-Stuff',
          {
             headers => {
                'content-type'  => 'application/json',
-               'PRIVATE-TOKEN' => 'AbC00ToKeN',
+               'Authorization' => 'token AbC00ToKeN',
             },
             content => json(
                {

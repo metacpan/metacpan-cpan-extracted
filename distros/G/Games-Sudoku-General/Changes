@@ -1,3 +1,21 @@
+0.028		2026-06-14	T. R. Wyant
+    Remove references to the RT bug tracking system.
+
+    Replace wyant@cpan.org with harryfmudd@comcast.net.
+
+    Repackage licenses so that GitHub can find them (maybe).
+    Thanks to Mikko Koivunalho (specifically his blog post
+    https://blogs.perl.org/users/mikko_koivunalho/2025/11/github-and-the-perl-license.html
+    for the how-to.
+
+    Add SECURITY policy.
+
+    Update SEE ALSO for Steffen Heinrich's display modules
+    Games::Sudoku::Html and Games::Sudoku::Pdf, and for
+    Games-Sudoku-PatternSolver,
+
+    Localize $_ before while (<>) ... loops in eg/solver.
+
 0.027		2022-04-05	T. R. Wyant
     Add CONTRIBUTING.
 

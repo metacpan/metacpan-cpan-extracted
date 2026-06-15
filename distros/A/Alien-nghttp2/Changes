@@ -1,5 +1,8 @@
 Revision history for Alien-nghttp2
 
+0.003  2026-06-14
+    - Require nghttp2 >= 1.57.0 (stream-reset rate-limit API).
+
 0.002  2026-03-17
     - Update distribution metadata for CPAN release.
     - Add release documentation and checklist files.

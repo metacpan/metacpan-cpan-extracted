@@ -10,6 +10,7 @@ set_spell_cmd('aspell list');
 add_stopwords(<DATA>);
 all_pod_files_spelling_ok( qw( bin lib ) );
 __DATA__
+198982749
 49699333
 Aas
 Adam
@@ -142,6 +143,7 @@ brainbuz
 brian
 capoeirab
 carnil
+copilot
 cryptographic
 data
 davewood

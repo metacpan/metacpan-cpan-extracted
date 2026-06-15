@@ -86,7 +86,7 @@
    "provides" : {
       "Config::IniFiles" : {
          "file" : "lib/Config/IniFiles.pm",
-         "version" : "3.001000"
+         "version" : "3.002000"
       }
    },
    "release_status" : "stable",
@@ -101,7 +101,7 @@
          "web" : "https://github.com/shlomif/perl-Config-IniFiles"
       }
    },
-   "version" : "3.001000",
+   "version" : "3.002000",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.042002"
