@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use FindBin qw($Bin $Script);
 
 my $who = ($ENV{REMOTE_USER} || die "Auth required\n")."\@$ENV{REMOTE_ADDR}";
 my $dir = $ENV{GIT_DIR} or die "GIT hook ENV malfunction!\n";
@@ -66,6 +67,7 @@ if (!$ENV{DEBUG}) {
 }
 
 my $ref = {};
+my $queue = $ENV{GIT_SERVER_WEBHOOK_QUEUE} || "$ENV{HOME}/.webhooks";
 if ($ENV{IPC}) {
     my $info = do {
         my $data = "";
@@ -97,7 +99,7 @@ if ($ENV{IPC}) {
     else {
         die localtime().": [$who] git-server: Unrecognized IPC transport: $info\n";
     }
-    my $config = $0 =~ m{(.*)/} ? `$1/configs 2>/dev/null` : `git config --list 2>/dev/null`;
+    my $config = `$Bin/configs 2>/dev/null`;
 
     # Check if pushed any branches
     if (local $_ = $ref and "HASH" eq ref and ($_->{operation} || "") eq "push" and $_ = $_->{refs}) {
@@ -118,6 +120,12 @@ if ($ENV{IPC}) {
         my $val = $3;
         $webhook->{$url}->{$directive} = $val;
     }
+    if (keys %$webhook) {
+        my @mk = ($queue);
+        push @mk, $1 while $mk[-1]=~m{^(.+)/} && !-e $1;
+        while (my $d = pop @mk) { mkdir $d, 0755 }
+        logger "Failed to create queue: [$queue] $!\n" if !-d $queue or !-w _;
+    }
     foreach my $url (sort keys %$webhook) {
         my $cfg = $webhook->{$url};
         # Default settings
@@ -126,82 +134,24 @@ if ($ENV{IPC}) {
             method => "post",
             transport => "json",
             %$cfg,
+            gitdir => $dir,
+            payload => $ref,
         };
-        my $method = "";
-        my $body = "";
-        my $content_type = "";
-        if ($cfg->{transport} =~ /^json$/i) {
-            $content_type = "application/json";
-            if (eval { require JSON }) {
-                $body = JSON->new->canonical->encode($ref)."\n";
-            }
-            elsif ($info =~ /^\s*\{/) {
-                $body = "$info\n";
-            }
-            else {
-                logger "Unable to load JSON.pm? $@\n$info";
-                next;
-            }
+        my $queuefile = "$queue/webhook-".(eval { require Time::HiRes; Time::HiRes::time() } or time())."-$$.queue";
+        my $event = eval { require JSON; JSON->new->canonical->encode($cfg)."\n"; } || eval { require Data::Dumper; $Data::Dumper::Sortkeys=1; Data::Dumper::Dumper($cfg); } || "";
+        # Queue event to ensure it still goes through in case of any temporary errors:
+        if ($event and open my $fh, ">>", "$queuefile.NEW") {
+            print $fh $event;
+            close $fh;
+            rename "$queuefile.NEW",$queuefile;
         }
         else {
-            logger "Unimplemented transport [$cfg->{transport}]";
-            next;
-        }
-        if ($cfg->{method} =~ /^post$/i) {
-            $method = "POST";
-        }
-        else {
-            logger "Unimplemented method [$cfg->{method}]";
-            next;
-        }
-        require IPC::Open3;
-        require Symbol;
-        my ($in,$out,$err) = (Symbol::gensym(),Symbol::gensym(),Symbol::gensym());
-        my $pid = eval {
-            IPC::Open3::open3($in, $out, $err, qw(curl -k -s -w \n%{http_code} --data-binary @- -X), $method, "-HContent-type:$content_type", $url);
-        };
-        if (!$pid) {
-            logger "webhook failed: ($!) ($@) $url\n";
-            next;
-        }
-        print $in $body;
-        close $in;
-        my $webhook_output = "";
-        while (<$out>) {
-            $webhook_output .= $_;
-        }
-        close $out;
-        my $webhook_error = "";
-        while (<$err>) {
-            $webhook_error .= $_;
-            logger "webhook err: $_";
-        }
-        close $err;
-        waitpid $pid, 0;
-        my $curl_exit_status = $? >> 8;
-        my $status_code = "600 CRASHED";
-        if ($webhook_output =~ s/\s*(\d+)\s*$/\n/) {
-            $status_code = $1;
-        }
-        if ($status_code !~ /^[23]\d\d$/ or $curl_exit_status or $webhook_error) {
-            logger "webhook hiccup: curl_status[$curl_exit_status] http_status[$status_code] output:$webhook_output".($webhook_error ? "\nwebhook errors: $webhook_error" : "");
-        }
-        if ($ref->{debug}) {
-            warn localtime().": [$who] git-server: DEBUG: webhook details:\n";
-            require Data::Dumper;
-            $Data::Dumper::Sortkeys=1 if !$Data::Dumper::Sortkeys;
-            warn Data::Dumper::Dumper({
-                WEBHOOK_ERROR_CODE => $curl_exit_status,
-                WEBHOOK_CFG => $cfg,
-                WEBHOOK_OUT => $webhook_output,
-                WEBHOOK_ERR => $webhook_error,
-                WEBHOOK_HTTP_STATUS => $status_code,
-                INFO => $ref,
-            });
+            logger "Freeze queue failure? URL[$url] FILE[$queuefile] ERR[$@][$!]\n$event";
         }
     }
 }
 
+# Log git operation to log.logfile:
 my $op = $ref->{operation} || $ENV{SSH_ORIGINAL_COMMAND} || "UNKNOWN OPERATION";
 my $allowed = !$ENV{GIT_PRE_EXIT_STATUS};
 if (my $crashed = $ref->{error_code}) {
@@ -251,4 +201,156 @@ else {
     logger $msg;
 }
 
+my $lock;
+my $queue_lock = "$queue/.lock";
+!-e $queue_lock and open $lock, ">>", $queue_lock and close $lock; # Create empty "touch" file
+if (!-e $queue_lock) {
+    warn localtime().": [$who] git-server: [$$] DEBUG: FAILED creating WebHooks lock file! [$queue_lock] $!\n";
+    exit;
+}
+if (!open $lock, "+<", $queue_lock) {
+    die localtime().": [$who] git-server: [$$] DEBUG: WebHooks lock file [$queue_lock] could not be opened! [$!]\n";
+}
+if (!eval {require Fcntl;1} or !flock $lock, (Fcntl::LOCK_EX()|Fcntl::LOCK_NB())) {
+    my $pid = eval { 0+<$lock> } or die localtime().": [$who] git-server: [$$] DEBUG: WebHooks failed to acquire naked lock? $! $@\n";
+    warn localtime().": [$who] git-server: [$$] DEBUG: WebHooks dequeuer already running by PID [$pid].\n"; # Great! Nothing for me to worry about.
+    close $lock;
+    exit;
+}
+
+$0 = "$Script - Running WebHooks";
+warn localtime().": [$who] git-server: [$$] DEBUG: Running post-action webhooks ...\n";
+print $lock "$$\n";
+truncate $lock, tell $lock;
+chdir $queue or die localtime().": [$who] git-server: [$$] DEBUG: Exclusively locked but unable to chdir? [$queue] $!\n";
+
+my $sent = 1;
+while ($sent) { # If any webhooks were sent, then keep trying until it's clean and quiet.
+    $sent = 0;
+    my $send_failures = 0;
+    opendir my $q, "." or die localtime().": [$who] git-server: [$$] DEBUG: Exclusively locked but unable to read queue directory? [$queue] $!\n";
+    my @events = readdir $q;
+    closedir $q;
+    delete $ENV{GIT_DIR};
+    my $total = @events-3 or last; # Ignore . and .. and .lock
+    my $progress = 0;
+    foreach my $file (sort @events) {
+        next if $file =~ /^\.(|\.|lock)$/;
+        $0 = "$Script - Running WebHooks: ".++$progress."/$total";
+        next if $file !~ /^webhook-.*\.queue$/;
+        my $f = "$queue/$file";
+        my $p = "$f.$$-RUNNING";
+        rename $f, $p or !warn localtime().": [$who] git-server: [$$] DEBUG: Rename Failed! [$f] $!\n" or next;
+        open $q, "+<", $p or open $q, "<", $p or !warn localtime().": [$who] git-server: [$$] DEBUG: Open Failed! [$f] $!\n" or next;
+        my $event = do { local $/ = ""; scalar <$q> };
+        if ($event =~ /^\s*\{/) {
+            # Must be JSON
+            $event = eval {
+                require JSON;
+                JSON->new->decode($event);
+            };
+        }
+        elsif ($event =~ /^\s*\$VAR1\s*=/) {
+            # Must be the silly Dumper
+            my $VAR1 = undef;
+            eval $event;
+            $event = $VAR1;
+        }
+        else {
+            # No idea what else it could be
+            warn localtime().": [$who] git-server: [$$] DEBUG: Unknown transport in queue file [$p]\n";
+            next;
+        }
+        if ("HASH" ne ref $event) {
+            warn localtime().": [$who] git-server: [$$] DEBUG: Unable to decode trigger info or unimplemented event type [$p] $@ $!\n";
+            next;
+        }
+        my $url = $event->{url} or !warn localtime().": [$who] git-server: [$$] DEBUG: Missing {url} target in event [$p]\n" or next;
+
+        local $ENV{GIT_DIR} = $event->{gitdir};
+        my $method = "";
+        my $body = "";
+        my $content_type = "";
+        $ref = $event->{payload};
+        if ($event->{transport} =~ /^json$/i) {
+            $content_type = "application/json";
+            if (eval { require JSON }) {
+                $body = JSON->new->canonical->encode($ref)."\n";
+            }
+            elsif ($ref =~ /^\s*\{/) {
+                $body = "$ref\n";
+            }
+            else {
+                rename $p, $f; # Hopefully JSON will work better later?
+                logger "Unable to load JSON.pm? Please install JSON and try again later. [$f]\n$@\n";
+                last;
+            }
+        }
+        else {
+            logger "Unimplemented transport [$event->{transport}]";
+            next;
+        }
+        if ($event->{method} =~ /^post$/i) {
+            $method = "POST";
+        }
+        else {
+            logger "Unimplemented method [$event->{method}]";
+            next;
+        }
+        require IPC::Open3;
+        require Symbol;
+        my ($in,$out,$err) = (Symbol::gensym(),Symbol::gensym(),Symbol::gensym());
+        my $pid = eval {
+            IPC::Open3::open3($in, $out, $err, qw(curl -k -s -w \n%{http_code} --data-binary @- -X), $method, "-HContent-type:$content_type", $url);
+        };
+        if (!$pid) {
+            logger "webhook failed: ($!) ($@) $url\n";
+            next;
+        }
+        print $in $body;
+        close $in;
+        my $webhook_output = "";
+        while (<$out>) {
+            $webhook_output .= $_;
+        }
+        close $out;
+        my $webhook_error = "";
+        while (<$err>) {
+            $webhook_error .= $_;
+            logger "webhook err: $_";
+        }
+        close $err;
+        waitpid $pid, 0;
+        my $curl_exit_status = $? >> 8;
+        my $status_code = "600 CRASHED";
+        if ($webhook_output =~ s/\s*(\d+)\s*$/\n/) {
+            $status_code = $1;
+        }
+        if ($status_code !~ /^[23]\d\d$/ or $curl_exit_status or $webhook_error) {
+            $send_failures++; # FAILED! Try again later.
+            rename $p, $f; # FAILED! Try again later.
+            logger "webhook hiccup: curl_status[$curl_exit_status] http_status[$status_code] output:$webhook_output".($webhook_error ? "\nwebhook errors: $webhook_error" : "");
+        }
+        else {
+            $sent++; # SUCCESS! Clear the queue file:
+            unlink $p;
+        }
+        warn localtime().": [$who] git-server: DEBUG: webhook details:\n";
+        require Data::Dumper;
+        $Data::Dumper::Sortkeys=1;
+        warn Data::Dumper::Dumper({
+            WEBHOOK_ERROR_CODE => $curl_exit_status,
+            WEBHOOK_CFG => $event,
+            WEBHOOK_OUT => $webhook_output,
+            WEBHOOK_ERR => $webhook_error,
+            WEBHOOK_HTTP_STATUS => $status_code,
+        });
+        sleep 1;
+    }
+    $0 = "$Script - Completed $sent of $total WebHooks".($send_failures ? " and $send_failures failed" : "");
+    # XXX: Would it be better to do some kind of better back-off the more times a webhook crashes?
+    sleep 2 + $sent + $send_failures * 10;
+}
+
+close $lock;
 exit;

@@ -112,7 +112,8 @@ if (chdir $working) {
         system "rm","-rf",$working;
         die localtime().": [$who] git-server: Aborting due to proxy repo configuration changes. Please try again.\n";
     }
-    warn localtime().": [$who] git-server: DEBUG: Working directory setup correctly.\n" if $ENV{DEBUG};
+    warn localtime().": [$who] git-server: DEBUG: Working directory setup correctly: $how\n" if $ENV{DEBUG};
+    exit 0 if $how eq "post-read"; # If everything is working properly, there will never be anything to do in the post-read phase. Don't waste time trying.
 }
 else {
     die localtime().": [$who] git-server: chdir $working: $!\n";
@@ -155,9 +156,11 @@ if (1) {
 
 my $tips = {};
 my $names = {};
+my $snapshot = "";
 foreach my $remote (@$remotes) {
     system "git fetch $remote --tags"; # Make sure to pull any new remote tags into workingdir
     $refs->{$remote} = remote_refs $remote if !defined $refs->{$remote};
+    $snapshot ||= $refs->{$remote};
     while ($refs->{$remote} =~ s{^(\w+)\s+refs/(\w+)/(\S+)\n?}{}m) {
         my $hash = $1;
         my $name = $3;
@@ -298,7 +301,11 @@ if (1) {
         close $fh;
     }
     elsif ($refs->{here} eq $refs->{$pick}) {
-        # One remote was synced successfully, but not all, so it's safe to try again. Do not remove "SYNCED" file in case everything was synced during pre-write phase.
+        # One remote was synced successfully, but not all, so it's safe to try again.
+        if ($snapshot ne $refs->{here} and -s ".git/SYNCED") {
+            warn localtime().": [$who] git-server: Clearing false SYNCED cache SIZE<".(-s ".git/SYNCED" or 0)."> since remote changes had to be synced locally.\nOLD:\n${snapshot}NEW:\n$refs->{here}" if $ENV{DEBUG};
+            unlink ".git/SYNCED";
+        }
         warn localtime().": [$who] git-server: DEBUG: Three-Way Proxy partially synced but not all proxies. Trying again ...\n" if $ENV{DEBUG};
         $ENV{XMODIFIERS} =~ s/^skip_proxy=.*\n?//gm; # Recursively sync, so do NOT skip_proxy this time.
         1 while $ENV{XMODIFIERS} =~ s/\n\n/\n/g;

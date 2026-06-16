@@ -2,7 +2,7 @@ package Crypt::OpenPGP::Constants;
 use strict;
 use warnings;
 
-our $VERSION = '1.19'; # VERSION
+our $VERSION = '1.20'; # VERSION
 
 our %CONSTANTS = (
     'PGP_PKT_PUBKEY_ENC' => 1,

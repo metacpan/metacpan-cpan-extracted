@@ -1,5 +1,15 @@
 Revision history for perl module CPAN::MetaCurator
 
+1.23  2026-06-15
+	- Rebuild the db.
+	- Rewrite the instructions in MetaCurator.pm
+
+1.22  2026-06-02
+	- Add Validate.pm, scripts/validate.tree.*.
+	- Escape HTML entities in Export.pm when generating "<a href='...'>xxx</a>".
+	- Rewrite parser in Export.pm.
+	- Add data/testing.topics.txt to contain a list of topics to process. Other topics are ignred.
+
 1.21  2026-05-29
 	- Fix handling of See Also when it is the only entry in the Topic. Eg: TheLanguageGuide.
 	- Rewrite some of the JSTree generation code in preparation of the whole re-write.

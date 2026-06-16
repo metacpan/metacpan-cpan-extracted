@@ -18,14 +18,17 @@ extends 'Business::GoCardless::Resource';
 
 =head1 ATTRIBUTES
 
+    authorisation_source
     created_at
     consent_parameters
     consent_type
     funds_settlement
     id
     links
+    mandate_type
     metadata
     next_possible_charge_date
+    next_possible_standard_ach_charge_date
     payments_require_approval
     reference
     scheme
@@ -35,14 +38,17 @@ extends 'Business::GoCardless::Resource';
 =cut
 
 has [ qw/
+    authorisation_source
     created_at
     consent_parameters
     consent_type
     funds_settlement
     id
     links
+    mandate_type
     metadata
     next_possible_charge_date
+    next_possible_standard_ach_charge_date
     payments_require_approval
     reference
     scheme
@@ -90,6 +96,9 @@ sub update {
     failed
     cancelled
     expired
+    consumed
+    blocked
+    suspended_by_payer
 
     if ( $Mandate->failed ) {
         ...
@@ -104,6 +113,9 @@ sub active                    { return shift->status eq 'active' }
 sub failed                    { return shift->status eq 'failed' }
 sub cancelled                 { return shift->status eq 'cancelled' }
 sub expired                   { return shift->status eq 'expired' }
+sub consumed                  { return shift->status eq 'consumed' }
+sub blocked                   { return shift->status eq 'blocked' }
+sub suspended_by_payer        { return shift->status eq 'suspended_by_payer' }
 
 =head1 Funds settlement checks on a mandate
 
@@ -114,6 +126,26 @@ sub expired                   { return shift->status eq 'expired' }
 
 sub is_managed { return shift->funds_settlement eq 'managed' }
 sub is_direct  { return shift->funds_settlement eq 'direct' }
+
+=head1 Mandate type checks on a mandate
+
+    is_bank_debit
+    is_instant
+    is_recurring
+    is_vrp_commercial
+    is_vrp_sweeping
+
+    if ( $Mandate->is_instant ) {
+        ...
+    }
+
+=cut
+
+sub is_bank_debit     { return ( shift->mandate_type // '' ) eq 'bank_debit' }
+sub is_instant        { return ( shift->mandate_type // '' ) eq 'instant' }
+sub is_recurring      { return ( shift->mandate_type // '' ) eq 'recurring' }
+sub is_vrp_commercial { return ( shift->mandate_type // '' ) eq 'vrp_commercial' }
+sub is_vrp_sweeping   { return ( shift->mandate_type // '' ) eq 'vrp_sweeping' }
 
 =head1 AUTHOR
 

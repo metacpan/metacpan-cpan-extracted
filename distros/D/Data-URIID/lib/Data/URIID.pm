@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2025 Philipp Schafft
+# Copyright (c) 2023-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -21,7 +21,7 @@ use Data::URIID::Service;
 
 use parent 'Data::Identifier::Interface::Known';
 
-our $VERSION = v0.20;
+our $VERSION = v0.21;
 
 my %names = (
     service => {
@@ -71,6 +71,7 @@ my %names = (
         'ruthede'           => '6c7dba44-dd07-4928-874e-f076e98cc96b', # ruthe.de
         'danbooru2chanjp'   => 'dac7a0ba-9090-4db7-bb94-373fabf98103', # danbooru.2chan.jp
         'sirtxkeepcoolorg'  => '0d7be696-accc-4d52-9cea-9c2362a57d62', # sirtx.keep-cool.org
+        'denkxweb-hessen'   => '05bbc5d4-b77f-48bb-b458-97ddc16ab48f', # denkxweb.denkmalpflege-hessen.de
     },
     type => {
         'uuid'                          => '8be115d2-dc2f-4a98-91e1-a6e3075cbc31',
@@ -127,6 +128,7 @@ my %names = (
         'ruthede-comic-post-identifier' => '2db1003d-dbf4-47bf-bfe4-7874c5bf0263',
         'danbooru2chanjp-post-identifier' => '6e3590b6-2a0c-4850-a71f-8ba196a52280',
         'danbooru2chanjp-tag'           => 'c5632c60-5da2-41af-8b60-75810b622756',
+        'denkxweb-hessen-identifier'    => '3b215e80-0df1-4b77-aa25-69df66db7b3b', # P1769
     },
     action => {
         #What about: search/lookup? list? content?
@@ -515,7 +517,7 @@ Data::URIID - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.20
+version v0.21
 
 =head1 SYNOPSIS
 
@@ -748,7 +750,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2023-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

@@ -16,7 +16,6 @@ git-server - Secure Git Server with more granular hooks capabilities than defaul
 
   Advanced Method:
   Set SHELL=/path/to/git-server (in /etc/passwd) and
-  Add /path/to/git-server to /etc/shells and
   Set "PermitUserEnvironment yes" (in /etc/ssh/sshd_config)
   Then use the following format in ~/.ssh/authorized_keys:
   environment="REMOTE_USER=user1" ssh-ed25519 AAAA_OAX+blah_pub__ user1@workstation
@@ -73,7 +72,7 @@ use warnings;
 use Cwd qw(abs_path);
 use FindBin qw($Bin);
 
-our $VERSION = "0.045";
+our $VERSION = "0.046";
 
 $SIG{PIPE} = sub { exit 1; };
 my $cmd = $ENV{SSH_ORIGINAL_COMMAND} ||= # Standard Method from ~/.ssh/authorized_keys: command="git-server REMOTE_USER=user1" # i.e., "git-upload-pack 'project'"

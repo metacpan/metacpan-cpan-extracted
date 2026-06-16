@@ -2,8 +2,7 @@
 00liesmich.pdf
 0_history.txt
 Changes
-KontoCheck.xs.old
-KontoCheck.xs.new
+KontoCheck.xs
 Makefile.PL
 MANIFEST
 ppport.h

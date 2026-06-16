@@ -150,13 +150,13 @@ sub call_api_once {
     }
 
     if ($self->{config}{debug}) {
-        $log->info("REQUEST: %s", $_request->as_string);
+        $self->_log("REQUEST: " . $_request->as_string);
     }
 
     my $_response = $self->{ua}->request($_request);
 
     if ($self->{config}{debug}) {
-        $log->debugf("RESPONSE: %s", $_response->as_string);
+        $self->_log("RESPONSE: " . $_response->as_string);
     }
        
     return $_response;
@@ -450,7 +450,7 @@ sub update_headers {
 sub update_params_for_auth {
     my ($self, $header_params) = @_;
     if ((defined $self->{config}{app_sid} && $self->{config}{app_sid} ne "") && (!defined $self->{config}{access_token} || $self->{config}{access_token} eq "")) {
-        my $_url = $self->{config}{auth_base_url} . "/connect/token";
+        my $_url = ($self->{config}{auth_base_url} // $self->{config}{base_url}) . "/connect/token";
         my $_request = POST($_url, {}, Content => 'grant_type=client_credentials&client_id='.$self->{config}{app_sid}.'&client_secret='.$self->{config}{app_key});
         my $_response = $self->{ua}->request($_request);
         unless ($_response->is_success) {
@@ -462,6 +462,15 @@ sub update_params_for_auth {
     }
     if (defined $self->{config}{access_token} && $self->{config}{access_token} ne "") {
         $header_params->{'Authorization'} = 'Bearer ' . $self->{config}{access_token};
+    }
+}
+
+sub _log {
+    my ($self, $message) = @_;
+    if (defined $self->{config}{logger}) {
+        $self->{config}{logger}->($message);
+    } else {
+        $log->debug($message);
     }
 }
 

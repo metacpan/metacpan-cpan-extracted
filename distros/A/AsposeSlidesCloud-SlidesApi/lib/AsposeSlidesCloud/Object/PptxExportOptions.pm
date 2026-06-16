@@ -157,6 +157,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'compression_level' => {
+    	datatype => 'string',
+    	base_name => 'CompressionLevel',
+    	description => 'The compression level used when saving the presentation document. Higher compression levels produce smaller files but require more processing time. The actual compression ratio depends on the content of the presentation. The default value is CompressionLevel.Level6.',
+    	format => '',
+    	read_only => '',
+    		},
     'refresh_thumbnail' => {
     	datatype => 'boolean',
     	base_name => 'RefreshThumbnail',
@@ -176,6 +183,7 @@ __PACKAGE__->swagger_types( {
     'format' => 'string',
     'conformance' => 'string',
     'zip64_mode' => 'string',
+    'compression_level' => 'string',
     'refresh_thumbnail' => 'boolean'
 } );
 
@@ -189,6 +197,7 @@ __PACKAGE__->attribute_map( {
     'format' => 'Format',
     'conformance' => 'Conformance',
     'zip64_mode' => 'Zip64Mode',
+    'compression_level' => 'CompressionLevel',
     'refresh_thumbnail' => 'RefreshThumbnail'
 } );
 

@@ -12,9 +12,13 @@ use DBI;
 use DBIx::Admin::CreateTable;
 use DBIx::Simple;
 
+use Data::Dumper::Concise; # For Dumper().
+
 use File::Spec;
 
 use Moo;
+
+use Text::CSV::Encoded;
 
 use Types::Standard qw/Any ArrayRef Bool HashRef Object Str/;
 
@@ -121,7 +125,7 @@ has time_option =>
 	required	=> 0,
 );
 
-our $VERSION = '1.21';
+our $VERSION = '1.23';
 
 # -----------------------------------------------
 
@@ -158,13 +162,6 @@ sub build_pad
 	{
 		$self -> logger -> info("Excluding metapackager table 'packages'");
 	}
-
-	# Modules.
-	# There is a db table called modules so we need another name for the hash
-	# where the keys are the names of the modules and the values are db ids.
-
-	$$pad{module_names}				= {};
-	$$pad{module_names}{$$_{name} }	= $$_{id} for (@{$$pad{modules} });
 
 	# Topics.
 	# There is a db table called topics so we need another name for the hash
@@ -287,19 +284,40 @@ sub init_metapackager_db
 
 } # End of init_metapackager_db.
 
-# --------------------------------------------------
+# -----------------------------------------------
 
-sub read_1_record
+sub read_csv_file
 {
-	my($self, $table_name, $id) = @_;
-	my($sql)	= "select * from $table_name where id = $id";
-	my($set)	= $self -> db -> query($sql) || die $self -> db -> error;
+	my($self, $path) = @_;
 
-	# Return a hashref.
+	my($csv) = Text::CSV::Encoded -> new
+	({
+		allow_whitespace	=> 1,
+		encoding_in			=> 'utf-8',
+		strict				=> 1,
+	});
 
-	return ${$set -> hashes}[0];
+	open(my $io, '<', $path) || die "Can't open($path): $!\n";
 
-} # End of read_1_record.
+	my(@column_names)	= $csv -> column_names($csv -> getline($io) );
+	my($count)			= 0;
+
+	my(@records);
+
+	for my $item (@{$csv -> getline_hr_all($io) })
+	{
+		$count++;
+
+		push @records, $$item{$column_names[0]};
+	}
+
+	close $io;
+
+	$self -> logger -> info("Read 1 heading + $count records from '$path'");
+
+	return [@records];
+
+} # End of read_csv_file.
 
 # --------------------------------------------------
 
@@ -339,6 +357,20 @@ sub read_metapackager_table
 	return $table_name;
 
 } # End of read_metapackager_table.
+
+# --------------------------------------------------
+
+sub read_1_record
+{
+	my($self, $table_name, $id) = @_;
+	my($sql)	= "select * from $table_name where id = $id";
+	my($set)	= $self -> db -> query($sql) || die $self -> db -> error;
+
+	# Return a hashref.
+
+	return ${$set -> hashes}[0];
+
+} # End of read_1_record.
 
 # --------------------------------------------------
 

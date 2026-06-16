@@ -6,8 +6,8 @@
     next;
 }
 
-## name bare block next labeled
-## failures 0
+## name bare block next labeled (still flagged - forbid ignores labels)
+## failures 1
 ## cut
 
 {
@@ -38,8 +38,8 @@
     redo;
 }
 
-## name bare block redo labeled
-## failures 0
+## name bare block redo labeled (still flagged - forbid ignores labels)
+## failures 1
 ## cut
 
 {
@@ -138,8 +138,8 @@ grep { redo; } @list;
     next if $x;
 }
 
-## name next EXPR form counts as labeled
-## failures 0
+## name next EXPR form still flagged (forbid ignores labels)
+## failures 1
 ## cut
 
 my $label = 'LOOP';
@@ -190,4 +190,70 @@ do {
 
 {
     next LOOP;    # labeled but bare_block forbid overrides
+}
+
+## name labeled while loop next safe
+## failures 0
+## cut
+
+ELEM:
+while (1) {
+    next ELEM;
+}
+
+## name sub block last labeled
+## failures 0
+## cut
+
+sub {
+    last LABEL;
+};
+
+## name sub block redo labeled (still flagged - forbid ignores labels)
+## failures 1
+## cut
+
+sub {
+    redo LABEL;
+};
+
+## name eval block last labeled
+## failures 0
+## cut
+
+eval { last LABEL; };
+
+## name eval block next labeled (still flagged - forbid ignores labels)
+## failures 1
+## cut
+
+eval { next LABEL; };
+
+## name map block last labeled
+## failures 0
+## cut
+
+map { last LABEL; } @list;
+
+## name map block next labeled (still flagged - forbid ignores labels)
+## failures 1
+## cut
+
+map { next LABEL; } @list;
+
+## name grep block redo labeled (still flagged - forbid ignores labels)
+## failures 1
+## cut
+
+grep { redo LABEL; } @list;
+
+## name bare block next labeled targets outer loop (safe)
+## failures 0
+## cut
+
+BAR:
+for my $x (@a) {
+    {
+        next BAR;
+    }
 }

@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Log-Report version 1.45.
+# This code is part of Perl distribution Log-Report version 1.46.
 # The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Log::Report::Message;{
-our $VERSION = '1.45';
+our $VERSION = '1.46';
 }
 
 
@@ -69,7 +69,7 @@ sub new($@)
 }
 
 # internal use only: to simplify __*p* functions
-sub _msgctxt($) {$_[0]->{_msgctxt} = $_[1]; $_[0]}
+sub _msgctxt($) { $_[0]->{_msgctxt} = $_[1]; $_[0] }
 
 
 sub clone(@)
@@ -123,7 +123,7 @@ sub taggedWith($)
 sub toString(;$)
 {	my ($self, $locale) = @_;
 
-	my $count   = $self->{_count} || 0;
+	my $count   = $self->{_count}   || 0;
 	$locale     = $self->{_lang} if $self->{_lang};
 	my $prepend = $self->{_prepend} // '';
 	my $append  = $self->{_append}  // '';
@@ -158,7 +158,6 @@ sub toString(;$)
 
 	$text;
 }
-
 
 
 my %tohtml = qw/  > gt   < lt   " quot  & amp /;
@@ -213,7 +212,6 @@ sub thaw($%)
 	delete $data{_lr_version};
 	$class->new(%data);
 }
-
 
 #--------------------
 

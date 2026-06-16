@@ -1,9 +1,8 @@
 package Crypt::OpenPGP;
 use strict;
 use warnings;
-use 5.008_001;
 
-our $VERSION = '1.19'; # VERSION
+our $VERSION = '1.20'; # VERSION
 
 use Crypt::OpenPGP::Constants qw( DEFAULT_CIPHER );
 use Crypt::OpenPGP::KeyRing;
@@ -13,8 +12,7 @@ use Crypt::OpenPGP::PacketFactory;
 use Crypt::OpenPGP::Config;
 use Crypt::OpenPGP::Util;
 
-use Crypt::OpenPGP::ErrorHandler;
-use base qw( Crypt::OpenPGP::ErrorHandler );
+use parent qw( Crypt::OpenPGP::ErrorHandler );
 
 use File::HomeDir;
 use File::Spec;
@@ -101,7 +99,10 @@ $Crypt::OpenPGP::Globals::Trim_trailing_ws = 1;
     );
 }
 
-sub version_string { __PACKAGE__ . ' ' . $VERSION }
+sub version_string {
+    no warnings 'uninitialized';
+    __PACKAGE__ . ' ' . __PACKAGE__->VERSION;
+}
 
 sub pubrings { $_[0]->{pubrings} }
 sub secrings { $_[0]->{secrings} }
@@ -259,7 +260,7 @@ sub sign {
         return $pgp->error( $pgp->errstr );
     my($cert, $data);
     require Crypt::OpenPGP::Signature;
-    unless ($data = $param{Data}) {
+    unless (defined($data = $param{Data})) {
         my $file = $param{Filename} or
             return $pgp->error("Need either 'Data' or 'Filename' to sign");
         $data = $pgp->_read_files($file) or return $pgp->error($pgp->errstr);
@@ -428,7 +429,7 @@ sub encrypt {
     my($data);
     require Crypt::OpenPGP::Cipher;
     require Crypt::OpenPGP::Ciphertext;
-    unless ($data = $param{Data}) {
+    unless (defined($data = $param{Data})) {
         my $file = $param{Filename} or
             return $pgp->error("Need either 'Data' or 'Filename' to encrypt");
         $data = $pgp->_read_files($file) or return $pgp->error($pgp->errstr);
@@ -757,11 +758,10 @@ sub _read_files {
     my $data = '';
     for my $file (@files) {
         $file ||= '';
-        local *FH;
-        open FH, $file or return $pgp->error("Error opening $file: $!");
-        binmode FH;
-        { local $/; $data .= <FH> }
-        close FH or warn "Warning: Got error closing $file: $!";
+        open (my $fh, '<', $file) or return $pgp->error("Error opening $file: $!");
+        binmode $fh;
+        { local $/; $data .= <$fh> }
+        close $fh or warn "Warning: Got error closing $file: $!";
     }
     $data;
 }

@@ -28,14 +28,14 @@ sub process
 
 # ------------------------------------------------
 
-say "export.as.tree.pl - Export cpan.metacurator.sqlite as HTML + jsTree\n";
+say "export.tree.pl - Export cpan.metacurator.sqlite as HTML + jsTree\n";
 
 my(%options);
 
 $options{help}				= 0;
 $options{home_path}			= "$ENV{HOME}/perl.modules/CPAN-MetaCurator";
 $options{include_packages}	= 0;
-$options{log_level}			= 'debug';
+$options{log_level}			= 'info';
 $options{output_path}		= 'html/cpan.metacurator.tree.html';
 my(%opts)					=
 (
@@ -63,7 +63,7 @@ __END__
 
 =head1 NAME
 
-export.as.tree.pl - Export cpan.metacurator.sqlite as HTML + jsTree
+export.tree.pl - Export cpan.metacurator.sqlite as HTML + jsTree
 
 =head1 SYNOPSIS
 

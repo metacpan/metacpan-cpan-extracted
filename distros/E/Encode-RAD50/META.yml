@@ -1,7 +1,7 @@
 ---
 abstract: 'Convert to and from the Rad50 character set'
 author:
-  - 'Tom Wyant (wyant at cpan dot org)'
+  - 'Tom Wyant (harryfmudd at comcast dot net)'
 build_requires:
   Test::More: '0.88'
 configure_requires:
@@ -10,7 +10,7 @@ configure_requires:
   strict: '0'
   warnings: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +25,7 @@ no_index:
 provides:
   Encode::RAD50:
     file: lib/Encode/RAD50.pm
-    version: '0.018'
+    version: '0.019'
 requires:
   Carp: '0'
   Encode: '0'
@@ -36,8 +36,8 @@ requires:
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Encode-RAD50
+  bugtracker: https://github.com/trwyant/perl-Encode-RAD50/issues
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Encode-RAD50.git
-version: '0.018'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.019'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -41,7 +41,6 @@ sub new {
 
 	# base_url
         $p{base_url} //= 'https://api.aspose.cloud';
-        $p{auth_base_url} //= 'https://api.aspose.cloud';
         $p{version} //= 'v3.0';
 
 	# class/static variables
@@ -50,6 +49,8 @@ sub new {
 	$p{debug} //= 0;
 	$p{allow_insecure_requests} //= 0;
 	$p{custom_headers} //= {};
+	# logger: optional code ref called with each debug message instead of Log::Any
+	# signature: sub { my ($message) = @_; ... }
 
 	return bless \%p => $self;
 }

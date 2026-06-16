@@ -23,6 +23,7 @@
       "runtime" : {
          "recommends" : {
             "Class::Load" : "0",
+            "Moo" : "0",
             "Moose" : "0",
             "Mouse" : "0",
             "Test::Exception" : "0"
@@ -44,7 +45,7 @@
    "provides" : {
       "Test::MockModule" : {
          "file" : "lib/Test/MockModule.pm",
-         "version" : "v0.185.2"
+         "version" : "v0.185.3"
       }
    },
    "release_status" : "stable",
@@ -60,6 +61,6 @@
          "url" : "git://github.com/geofffranks/test-mockmodule.git"
       }
    },
-   "version" : "v0.185.2",
+   "version" : "v0.185.3",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

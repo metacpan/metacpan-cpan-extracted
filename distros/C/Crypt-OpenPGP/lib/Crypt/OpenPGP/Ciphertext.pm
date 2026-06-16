@@ -2,15 +2,14 @@ package Crypt::OpenPGP::Ciphertext;
 use strict;
 use warnings;
 
-our $VERSION = '1.19'; # VERSION
+our $VERSION = '1.20'; # VERSION
 
 use Crypt::OpenPGP::Util;
 use Crypt::OpenPGP::Cipher;
 use Crypt::OpenPGP::Constants qw( DEFAULT_CIPHER
                                   PGP_PKT_ENCRYPTED
                                   PGP_PKT_ENCRYPTED_MDC );
-use Crypt::OpenPGP::ErrorHandler;
-use base qw( Crypt::OpenPGP::ErrorHandler );
+use parent qw( Crypt::OpenPGP::ErrorHandler );
 
 use constant MDC_TRAILER => chr(0xd3) . chr(0x14);
 

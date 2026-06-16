@@ -1,3 +1,9 @@
+v0.21  2026-06-16Z
+    - Added support for Denkxweb (Landesamt für Denkmalpflege Hessen)
+    - Updated database of well known IDs
+    - Added initial support for ni://-URLs [RFC 6920]
+    - Extract more data from Data::Identifier if available
+
 v0.20  2025-12-18Z
     - Improved documentation
     - Added most basic support to look up from a Data::TagDB::Tag

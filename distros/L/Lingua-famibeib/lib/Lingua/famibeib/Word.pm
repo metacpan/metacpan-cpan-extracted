@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Philipp Schafft
+# Copyright (c) 2025-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 use parent qw(Data::Identifier::Interface::Simple Data::Identifier::Interface::Subobjects);
 
@@ -45,6 +45,21 @@ my %_word_mora;
     my $i = 0;
     %_word_mora = map {$_ => $i++} @_word_mora;
 }
+
+my %_modifier_resets = (
+    eb => [qw(ib)],
+    ib => [qw(eb)],
+    ak => [qw(ek)],
+    ek => [qw(ak)],
+    ok => [qw(uk)],
+    uk => [qw(ok)],
+    al => [qw(il ol am em im)],
+    il => [qw(al ol am em im)],
+    ol => [qw(al il am em im)],
+    am => [qw(al il ol em im)],
+    em => [qw(al il ol am im)],
+    im => [qw(al il ol am em)],
+);
 
 my %_registered_by_string;
 my %_registered_by_uuid;
@@ -124,7 +139,7 @@ sub new {
     if ($type eq 'string') {
         $value = lc($value);
 
-        $value =~ s/^([bfklmst][aeiou])$/to$1ik/;
+        $value =~ s/^([bfklmst][aeiou])$/to$1al/;
 
         if ($value =~ /^[bfklmst][aeiou](?:[bfklmst][aeiou]|[aeiou][bfklmst])+\z/m) {
             my ($stem, $modifiers) = $value =~ /^((?:[bfklmst][aeiou])+)([aeiou][bfklmst].*)?\z/;
@@ -220,25 +235,10 @@ sub combine {
             if ($master_mora eq 'ab') {
                 $plural = $mod;
                 next;
-            } elsif ($master_mora eq 'eb') {
-                delete $mod{ib};
-            } elsif ($master_mora eq 'ib') {
-                delete $mod{eb};
+            }
 
-            } elsif ($master_mora eq 'if') {
-                delete $mod{of};
-            } elsif ($master_mora eq 'of') {
-                delete $mod{if};
-
-            } elsif ($master_mora eq 'ak') {
-                delete $mod{ek};
-            } elsif ($master_mora eq 'ek') {
-                delete $mod{ak};
-
-            } elsif ($master_mora eq 'ok') {
-                delete $mod{uk};
-            } elsif ($master_mora eq 'uk') {
-                delete $mod{ok};
+            if (defined(my $reset = $_modifier_resets{$master_mora})) {
+                delete $mod{$_} foreach @{$reset};
             }
 
             $mod{$master_mora} = $mod;
@@ -378,7 +378,7 @@ sub is_verb {
 
     croak 'Stray options passed' if scalar @opts;
 
-    return !!$self->get_modifier_by_master_mora('of', default => undef);
+    return !!$self->get_modifier_by_master_mora('ol', default => undef);
 }
 
 
@@ -396,7 +396,7 @@ sub is_application {
 
     croak 'Stray options passed' if scalar @opts;
 
-    return !!$self->get_modifier_by_master_mora('ik', default => undef);
+    return !!$self->get_modifier_by_master_mora('al', default => undef);
 }
 
 
@@ -455,7 +455,7 @@ Lingua::famibeib::Word - module to interact with the famibeib words
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -493,7 +493,7 @@ Currently the following types (C<$type>) are supported:
 (since v0.01)
 
 Constructs a word from an object.
-If the C<$value> should be a reference.
+C<$value> should be a reference.
 
 Currently references to the following types are supported:
 L<Data::Identifier>,
@@ -696,7 +696,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2025-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

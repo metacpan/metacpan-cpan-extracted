@@ -37,6 +37,7 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
+use AsposeSlidesCloud::Object::ParagraphFormat;
 use AsposeSlidesCloud::Object::ResourceUri;
 use AsposeSlidesCloud::Object::SmartArtNode;
 
@@ -134,6 +135,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'default_paragraph_format' => {
+    	datatype => 'ParagraphFormat',
+    	base_name => 'DefaultParagraphFormat',
+    	description => 'Default paragraph format for the node&#39;s text frame.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -142,7 +150,8 @@ __PACKAGE__->swagger_types( {
     'is_assistant' => 'boolean',
     'text' => 'string',
     'org_chart_layout' => 'string',
-    'paragraphs' => 'ResourceUri'
+    'paragraphs' => 'ResourceUri',
+    'default_paragraph_format' => 'ParagraphFormat'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -151,7 +160,8 @@ __PACKAGE__->attribute_map( {
     'is_assistant' => 'IsAssistant',
     'text' => 'Text',
     'org_chart_layout' => 'OrgChartLayout',
-    'paragraphs' => 'Paragraphs'
+    'paragraphs' => 'Paragraphs',
+    'default_paragraph_format' => 'DefaultParagraphFormat'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

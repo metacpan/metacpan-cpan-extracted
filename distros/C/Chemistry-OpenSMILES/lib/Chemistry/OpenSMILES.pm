@@ -1,15 +1,18 @@
 package Chemistry::OpenSMILES;
 
 # ABSTRACT: OpenSMILES format reader and writer
-our $VERSION = '0.12.3'; # VERSION
+our $VERSION = '0.12.4'; # VERSION
 
 use strict;
 use warnings;
 use 5.0100;
 
 use Chemistry::OpenSMILES::Stereo::Tables qw( @OH @TB );
+use Graph::MoreUtils qw( SSSR );
+use Graph::MoreUtils::SSSR;
 use Graph::Traversal::BFS;
 use List::Util qw( all any first max min none sum0 );
+use Set::Object qw( set );
 
 require Exporter;
 our @ISA = qw( Exporter );
@@ -17,6 +20,7 @@ our @EXPORT_OK = qw(
     %bond_order_to_symbol
     %bond_symbol_to_order
     %normal_valence
+    can_be_aromatic_ring
     can_unsprout_hydrogen
     clean_chiral_centers
     is_aromatic
@@ -34,6 +38,7 @@ our @EXPORT_OK = qw(
     is_single_bond
     is_triple_bond
     mirror
+    rings
     toggle_cistrans
     valence
 );
@@ -42,6 +47,7 @@ sub is_chiral($);
 sub is_chiral_planar($);
 sub is_chiral_tetrahedral($);
 sub mirror($);
+sub rings($@);
 sub toggle_cistrans($);
 
 our %normal_valence = (
@@ -73,6 +79,12 @@ our %bond_symbol_to_order = (
     '#' => 3,
     '$' => 4,
 );
+
+sub can_be_aromatic_ring
+{
+    my @atoms = @_;
+    return all { /^(Se|As|[BCNOPS])$/i } map { $_->{symbol} } @atoms;
+}
 
 sub can_unsprout_hydrogen
 {
@@ -379,6 +391,45 @@ sub mirror($)
     }
 }
 
+sub _order_rings
+{
+    my( $A, $B ) = @_;
+    return @$A <=> @$B if @$A <=> @$B;
+
+    for (0..$#$A) {
+        next unless $A->[$_]{number} <=> $B->[$_]{number};
+        return      $A->[$_]{number} <=> $B->[$_]{number};
+    }
+
+    return 0;
+}
+
+sub rings($@)
+{
+    my( $graph, $atom, $max_length ) = @_;
+    $max_length = 7 unless defined $max_length;
+
+    my @rings;
+    if( $atom ) {
+        @rings = Graph::MoreUtils::SSSR::detect_rings( $graph, $atom, undef, undef, $max_length );
+    } else {
+        @rings = SSSR( $graph, $max_length );
+    }
+
+    # Find unique rings
+    my %rings_by_name = map { join( '', @$_ ) => $_ } @rings;
+    my @rings_now;
+    for (@rings) {
+        my $name = join '', @$_;
+        next unless $rings_by_name{$name};
+        push @rings_now, $_;
+        delete $rings_by_name{$name};
+    }
+    @rings_now = sort { _order_rings( $a, $b ) } @rings_now;
+
+    return @rings_now;
+}
+
 sub toggle_cistrans($)
 {
     return $_[0] unless $_[0] =~ /^[\\\/]$/;
@@ -606,12 +657,21 @@ sub _validate($@)
              is_aromatic( $B ) &&
             !is_aromatic_bond( $moiety, $A, $B ) &&
              is_ring_bond( $moiety, $A, $B ) ) {
-            warn sprintf 'aromatic atoms %s(%d) and %s(%d) belong to same cycle, ' .
-                         'but the bond between them is not aromatic' . "\n",
-                         $A->{symbol},
-                         $A->{number},
-                         $B->{symbol},
-                         $B->{number};
+
+            my %A_rings = map { join( '', @$_ ) => $_ } rings( $moiety, $A );
+            my %B_rings = map { join( '', @$_ ) => $_ } rings( $moiety, $B );
+
+            my $common_rings = set( keys %A_rings ) * set( keys %B_rings );
+            for (map { $A_rings{$_} } @$common_rings) {
+                next unless can_be_aromatic_ring( @$_ );
+                warn sprintf 'aromatic atoms %s(%d) and %s(%d) belong to same cycle, ' .
+                             'but the bond between them is not aromatic' . "\n",
+                             $A->{symbol},
+                             $A->{number},
+                             $B->{symbol},
+                             $B->{number};
+                last;
+            }
         }
     }
 

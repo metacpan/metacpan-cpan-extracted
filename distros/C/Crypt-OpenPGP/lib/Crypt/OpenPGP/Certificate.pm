@@ -2,7 +2,7 @@ package Crypt::OpenPGP::Certificate;
 use strict;
 use warnings;
 
-our $VERSION = '1.19'; # VERSION
+our $VERSION = '1.20'; # VERSION
 
 use Crypt::OpenPGP::S2k;
 use Crypt::OpenPGP::Key::Public;
@@ -15,8 +15,7 @@ use Crypt::OpenPGP::Constants qw( DEFAULT_CIPHER
                                   PGP_PKT_SECRET_KEY
                                   PGP_PKT_SECRET_SUBKEY );
 use Crypt::OpenPGP::Cipher;
-use Crypt::OpenPGP::ErrorHandler;
-use base qw( Crypt::OpenPGP::ErrorHandler );
+use parent qw( Crypt::OpenPGP::ErrorHandler );
 
 {
     our %KEY_ALG = (
@@ -49,7 +48,7 @@ sub init {
         $cert->{version} = $param{Version} || 4;
         $cert->{key} = $key;
         our %KEY_ALG;
-        eval require Crypt::DSA if $KEY_ALG{$key->alg_id} eq 'DSA';
+        eval require Crypt::DSA::GMP if $KEY_ALG{$key->alg_id} eq 'DSA';
         $cert->{is_secret} = $key->is_secret;
         $cert->{is_subkey} = $param{Subkey} || 0;
         $cert->{timestamp} = time;
@@ -91,7 +90,7 @@ sub uid {
 sub public_cert {
     my $cert = shift;
     our %KEY_ALG;
-    eval require Crypt::DSA if $KEY_ALG{$cert->pk_alg} eq 'DSA';
+    eval require Crypt::DSA::GMP if $KEY_ALG{$cert->pk_alg} eq 'DSA';
     return $cert unless $cert->is_secret;
     my $pub = (ref $cert)->new;
     for my $f (qw( version timestamp pk_alg is_subkey )) {

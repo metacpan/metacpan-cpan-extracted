@@ -130,7 +130,7 @@ sub commit_details {
         }
         close $fh;
         waitpid($pid, 0);
-        @{ $hash->{files} } = sort {$a<=>$b} @{ $hash->{files} } if $hash->{files};
+        @{ $hash->{files} } = sort {$a cmp $b} @{ $hash->{files} } if $hash->{files};
     }
     if (my $s = $hash->{comment}) {
         $s =~ s{\s+}{ }g;

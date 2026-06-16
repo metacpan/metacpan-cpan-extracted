@@ -16,6 +16,8 @@ my %cases = (
     'CC(C)=[C@]=C(C)C' => undef,
 
     'c=12ccccc=1cccc2' => 'aromatic atoms c(0) and c(5) belong to same cycle, but the bond between them is not aromatic',
+    # From COD entry 7117537
+    'c1cccc2c1-c1c([Zn]2)cccc1' => undef,
 
     # COD entry 2230139, r176798, chemical name translated by OPSIN v2.8.0
     # The mentioned double bond gets its marker from another double bond

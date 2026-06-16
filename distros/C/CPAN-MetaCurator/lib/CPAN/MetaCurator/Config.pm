@@ -13,6 +13,8 @@ use Moo;
 
 use Types::Standard qw/ArrayRef HashRef Object Str/;
 
+use utf8;
+
 has config =>
 (
 	default		=> sub{return {} },
@@ -140,7 +142,7 @@ has visual_break =>
 	required	=> 0,
 );
 
-our $VERSION = '1.21';
+our $VERSION = '1.23';
 
 # -----------------------------------------------
 
@@ -154,6 +156,10 @@ sub init_config
 
 	$self -> config($config);
 	$self -> logger(Mojo::Log -> new(level => $self -> log_level, path => $$config{log_path}) );
+
+	# Fix me. Test UTF8 char handling.
+
+	$self -> logger -> info("Testing write of utf8 chars to logger. I ♥ Mojolicious\n");
 
 } # End of init_config.
 

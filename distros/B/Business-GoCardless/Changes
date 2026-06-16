@@ -1,5 +1,14 @@
 Revision history for Business-GoCardless
 
+0.45     2026-06-15
+        - Add mandate_type to Business::GoCardless::Mandate, with
+          is_bank_debit, is_instant, is_recurring, is_vrp_commercial,
+          and is_vrp_sweeping helper methods
+        - Add authorisation_source and next_possible_standard_ach_charge_date
+          attributes to Business::GoCardless::Mandate
+        - Add consumed, blocked, and suspended_by_payer status check methods
+          to Business::GoCardless::Mandate
+
 0.44     2024-08-26
         - Add consent_type to Business::GoCardless::Mandate
 

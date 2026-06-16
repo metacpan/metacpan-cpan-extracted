@@ -1,0 +1,17 @@
+Revision history for Template::Sluz
+
+0.9.1    2025-01-01
+    - Initial release
+    - Port of PHP sluz templating engine (Smarty-like syntax)
+    - Zero CPAN dependencies, requires Perl 5.16+
+    - Core features:
+        * Variable substitution {$var} with dot-notation ({$cust.first})
+        * Modifiers with pipes ({$var|strtoupper|substr:0,3})
+        * Default values via |default:"val"
+        * Custom modifier functions and expression blocks
+        * {if}/{elseif}/{else}/{/if} conditionals
+        * {foreach} with $__FOREACH_FIRST/LAST/INDEX
+        * {include} with variable passing
+        * {literal} blocks and {* comments *}
+        * Parent/child template inheritance
+        * PHP-compatible bracket syntax for arrays/hashes

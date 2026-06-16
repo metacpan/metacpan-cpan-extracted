@@ -71,7 +71,7 @@ use warnings;
 
 use parent qw{ Encode::Encoding };
 
-our $VERSION = '0.018';
+our $VERSION = '0.019';
 
 use Carp;
 use Encode qw{:fallback_all};
@@ -235,8 +235,7 @@ if the backslash is an invalid character. Requests for these fallback
 modes will be ignored, and the replacement character inserted.
 
 Support is by the author. Please file bug reports at
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Encode-RAD50>,
-L<https://github.com/trwyant/perl-Encode-RAD50/issues>, or in
+L<https://github.com/trwyant/perl-Encode-RAD50/issues> or in
 electronic mail to the author.
 
 =head1 SEE ALSO
@@ -255,19 +254,19 @@ Nora Narum, for helping with RSX CVT syntax.
 
 =head1 AUTHOR
 
-Thomas R. Wyant, III (F<wyant at cpan dot org>)
+Thomas R. Wyant, III (F<harryfmudd at comcast dot net>)
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2005-2007, 2011-2022 by Thomas R. Wyant, III
-(F<wyant at cpan dot org>). All rights reserved.
+Copyright 2005-2007, 2011-2023, 2026 by Thomas R. Wyant, III
+(F<harryfmudd at comcast dot net>). All rights reserved.
 
 PDP-11, RSTS-11, RSTS/E,  RSX-11, RSX-11M+, P/OS and RT-11 are
 trademarks of Hewlett-Packard Development Company, L.P.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text
-of the licenses in the directory LICENSES.
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
 
 This program is distributed in the hope that it will be useful, but
 without any warranty; without even the implied warranty of

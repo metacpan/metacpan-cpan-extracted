@@ -3,16 +3,16 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2014,2015,2016,2017,2018,2019,2020,2021,2023,2024,2025 Slaven Rezic. All rights reserved.
+# Copyright (C) 2014,2015,2016,2017,2018,2019,2020,2021,2023,2024,2025,2026 Slaven Rezic. All rights reserved.
 # This package is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
-# Mail: srezic@cpan.org
+# WWW: https://github.com/eserte/Map-Tube-Berlin
 #
 
 package Map::Tube::Berlin;
 
-$VERSION = '2025.1214';
+$VERSION = '2026.0615';
 
 =head1 NAME
 

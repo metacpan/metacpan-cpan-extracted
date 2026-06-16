@@ -25,15 +25,13 @@ has constants_csv_path =>
 	required	=> 0,
 );
 
-our $VERSION = '1.21';
+our $VERSION = '1.23';
 
 # -----------------------------------------------
 
 sub import_csv_file
 {
 	my($self, $csv, $path, $table_name, $col_name_1, $col_name_2) = @_;
-
-	$self -> logger -> info("Populating the '$table_name' table with import_csv_file()");
 
 	open(my $io, '<', $path) || die "Can't open($path): $!\n";
 
@@ -80,7 +78,7 @@ sub import_csv_file
 
 	close $io;
 
-	$self -> logger -> info("Stored $count records into table '$table_name'");
+	return $count;
 
 } # End of import_csv_file.
 
@@ -92,7 +90,7 @@ sub populate_all_tables
 
 	$self -> init_config;
 	$self -> init_db;
-	$self -> logger -> info('Populating all tables');
+	$self -> logger -> info('Populating some tables');
 
 	my($csv) = Text::CSV::Encoded -> new
 	({
@@ -106,7 +104,7 @@ sub populate_all_tables
 	$self -> populate_constants_table($csv);
 	$self -> populate_topics_table;
 
-	$self -> logger -> info('Populated all tables');
+	$self -> logger -> info('Populated some tables');
 	$self -> logger -> info('-' x 50);
 
 	# Return 0 for OK and 1 for error.
@@ -123,14 +121,12 @@ sub populate_constants_table
 	my($path)		= File::Spec -> catfile($self -> home_path, $self -> constants_csv_path);
 	my($table_name)	= 'constants';
 
+	$self -> logger -> info("Start populate_constants_table()");
 	$self -> get_table_column_names(true, $table_name); # Populates $self -> column_names.
-	$self -> import_csv_file($csv, $path, $table_name, 'name', 'value');
 
-	my($pad)				= $self -> pad; # For temporary use, during import.
-	$$pad{$table_name}		= $self -> read_table($table_name);
-	my($constants_count)	= $#{$$pad{$table_name} } + 1;
+	my($record_count) = $self -> import_csv_file($csv, $path, $table_name, 'name', 'value');
 
-	$self -> logger -> info("Finished populate_constants_table(). Stored $constants_count records into table '$table_name'");
+	$self -> logger -> info("Populated '$table_name'. Record count: $record_count");
 
 }	# End of populate_constants_table.
 
@@ -142,15 +138,17 @@ sub populate_topics_table
 	my($data)		= $self -> read_tiddlers_file;
 	my($record)		= {parent_id => 1, text => 'Root', title => 'MetaCurator'}; # Parent is self.
 	my($table_name)	= 'topics';
-	my($root_id)	= $self -> insert_hashref($table_name, $record);
+
+	$self -> logger -> info("Start populate_topics_table()");
 
 	# We have just populated the constants table, so read it to get the names of the special (TiddlyWiki) paragraphs.
 	# Typically: GettingStarted|MainMenu.
 
-	my($special_para_names);
-
+	my($root_id)		= $self -> insert_hashref($table_name, $record);
 	my($pad)			= $self -> pad; # For temporary use, during import.
 	$$pad{constants}	= $self -> read_table('constants');
+
+	my($special_para_names);
 
 	for my $row (@{$$pad{constants} })
 	{
@@ -189,9 +187,9 @@ sub populate_topics_table
 	}
 
 	$$pad{$table_name}	= $self -> read_table($table_name);
-	my($topic_count)	= $#{$$pad{$table_name} };
+	my($record_count)	= $#{$$pad{$table_name} };
 
-	$self -> logger -> info("Finished populate_topics_table(). Stored $topic_count records into table '$table_name'");
+	$self -> logger -> info("Populated '$table_name'. Record count: $record_count");
 
 } # End of populate_topics_table;
 

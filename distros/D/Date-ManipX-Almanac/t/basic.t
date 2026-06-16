@@ -5,7 +5,7 @@ use warnings;
 
 use Test2::V0;
 use Test2::Plugin::BailOnFail;
-use Test2::Tools::LoadModule;
+use Test2::Tools::LoadModule 0.008;
 
 load_module_ok 'Date::ManipX::Almanac::Lang';
 

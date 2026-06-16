@@ -23,10 +23,10 @@ $t->app->log->on(message => sub {
 
 
 for (1..2){
-    $t->post_ok('/QX-JSON-RPC' => json => { id => 1, service => 'default', method => 'ping'} )
+    $t->post_ok('/QX-JSON-RPC' => json => { jsonrpc => '2.0', id => 1, method => 'ping'} )
       ->status_is(200)
       ->content_type_is('application/json; charset=utf-8')
-      ->json_is({id => 1,result => "pong"});
+      ->json_is({jsonrpc => '2.0', id => 1, result => "pong"});
 
     $t->get_ok('/doc')
       ->content_like('/CallBackery::Index/')

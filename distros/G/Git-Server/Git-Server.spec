@@ -16,7 +16,7 @@
 
 name:      perl-Git-Server
 summary:   Git-Server - Secure Git Server with more granular hooks capabilities than default git.
-version:   0.045
+version:   0.046
 release:   1
 vendor:    Rob Brown <bbb@cpan.org>
 packager:  Arix International <cpan2rpm@arix.com>
@@ -132,15 +132,12 @@ find %{buildroot}%{_prefix}             \
 %defattr(-,root,root)
 
 %changelog
-* Tue May 12 2026 hookbot@almalinux9
-: Changes for v0.045  2026-05-12 03:00:00
- - Update webhookcallback.cgi to handle formats
-   like default GitLab or GitHub or Git-Server.
- - Compatibility fix for legacy strace <= 4.5.18.
- - Strip XMODIFIERS nothing lines for proxy.url.
- - Fix acl.restrictip malformed CIDR message.
- - Fix git-client DEBUG deadlock on git < 2.3.x.
- - git-deploy enhancements:
-   * Shim scan fix.
-   * Allow bootstrapped or relative invocation.
-   * Avoid blowing away local modifications.
+* Mon Jun 15 2026 hookbot@almalinux9
+: Changes for v0.046  2026-06-15 16:00:00
+ - Run WebHooks serially to reduce server load.
+ - Retry failed WebHooks for temporary hiccups.
+ - Improved progress proc-title.
+ - Handle relative git-client shim invocation.
+ - Various Doc and POD fixes.
+ - Don't crash git-deploy --identity with RegExp.
+ - Improved 3-Way proxy sync.

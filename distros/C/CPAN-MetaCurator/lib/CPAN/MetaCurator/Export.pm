@@ -12,13 +12,25 @@ use DateTime::Tiny;
 use File::Slurper 'read_lines';
 use File::Spec;
 
+use HTML::Escape 'escape_html';
+
+use Moo;
+
 use Syntax::Keyword::Match;
 
-use Types::Standard 'Enum';
+use Types::Standard qw/Str/;
+
+has test_topics_path =>
+(
+	default		=> sub{return '/tmp/test.topics.txt'},
+	is			=> 'rw',
+	isa			=> Str,
+	required	=> 0,
+);
 
 our %seen;
 
-our $VERSION = '1.21';
+our $VERSION = '1.23';
 
 # -----------------------------------------------
 
@@ -28,12 +40,6 @@ sub export_tree
 
 	$self -> init_config;
 	$self -> init_db;
-
-	say 'export_tree()';
-	say 'home_path:        ', $self -> home_path;
-	say 'include_packages: ', $self -> include_packages;
-	say 'log_level:        ', $self -> log_level;
-	say 'output_path:      ', $self -> output_path;
 
 	my($pad)					= $self -> build_pad;
 	my($header, $body, $footer)	= $self -> build_html($pad); # Returns templates.
@@ -50,9 +56,31 @@ sub export_tree
 	my(@divs);
 	my($item);
 	my($leaf_id, $lines_ref);
+	my(%wanted);
+
+	# Read data/testing.topics.txt for topic names to process. This just limits the output.
+	# See also data/special.topic.txt.
+
+	if (-e $self -> test_topics_path)
+	{
+		my($test_topics)	= $self -> read_csv_file($self -> test_topics_path);
+		$wanted{$_}			= true for (@$test_topics);
+	}
+
+	# If the file is empty, activate all topics.
+	# Fix me. Add file name & purpose to POD.
+
+	my(@keys) = keys %wanted;
+
+	for ($#keys == 0)
+	{
+		$wanted{$$_{title} } = true for (@{$$pad{topics} });
+	}
 
 	for my $topic (@{$$pad{topics} })
 	{
+		next if (! $wanted{$$topic{title} });
+
 		$self -> logger -> info("Topic: id: $$topic{id}. html_id: $$pad{topic_html_ids}{$$topic{title}}. title: $$topic{title}");
 
 		$leaf_id	= $$pad{topic_html_ids}{$$topic{title} };
@@ -86,6 +114,18 @@ sub export_tree
 
 	$self -> write_file($header, $body, $footer, $pad);
 	$self -> logger -> info("$_ count: $$pad{count}{$_}") for (sort keys %{$$pad{count} });
+
+=pod
+	# Modules.
+	# There is a db table called modules so we need another name for the hash
+	# where the keys are the names of the modules and the values are db ids.
+
+	$$pad{module_names}				= {};
+	$$pad{module_names}{$$_{name} }	= $$_{id} for (@{$$pad{modules} });
+	my($module_count)				= $#{$$pad{module_names} } + 1;
+
+	$self -> logger -> info("Records in the module table: $module_count");
+=cut
 
 	return 0;
 
@@ -151,130 +191,121 @@ sub parse_topic
 	my($line_id)						= $leaf_id;
 	my($index)							= -1;
 
+	$self -> logger -> debug("Topic: $$topic{title}. Line count: $#lines");
+
 	my(%button);
-	my($context);
 	my($description);
+	my(@extras);
 	my($href);
-	my($item, @items);
-	my($line);
+	my(%inside, $item, @items);
+	my($line, $line_count);
+	my($module);
 	my(%node_type);
+	my(@pre_pre);
+	my(@see_also);
 	my($token);
 
 	$button{extras}		= '';
 	$button{faq}		= '';
-	$button{pre_pre}	= "<span>&nbsp;&nbsp;</span><button id='toggle-btn'>[pre.../pre]</button>";
-	$button{see_also}	= "<button id='toggle-btn'>[See also]</button>";
-	my($context_enum)	= Enum['acronym', 'faq', 'module', 'pre_pre', 'see_also', 'text'];
+	$button{pre_pre}	= "<span>&nbsp;&nbsp;</span><button id='toggle-btn'>TBA: [pre.../pre]</button>";
+	$button{see_also}	= "<button id='toggle-btn'>TBA: [See also]</button>";
+	$inside{pre_pre}	= false;
+	$inside{see_also}	= false;
 
 	while ($index < $#lines)
 	{
 		$index++;
 
-		$line	= $lines[$index];
 		$item	= {href => '', id => ++$line_id, text => ''};
-		$token	= '';
+		$line	= $lines[$index];
+		$token	= ($line =~ /^o (.+)/) ? $1 : '';
 
-		if ($$topic{title} eq 'Acronyms')
-		{
-			$context = 'acronym';
+		$self -> logger -> debug("Processing line $index: <$line>. token: $token");
 
-			$self -> gather_statistics(\%node_type, $pad, $token, $topic);
-			$self -> logger -> debug("Topic: $$topic{title}. Acronym: $line");
-		}
-		elsif ($$topic{title} eq 'FAQ')
+		# $token ne '':
+		# a. See also
+		# b. An acronym
+		# Otherwise:
+		# c. A description
+		# d. A href
+		# e. <pre>
+		# f. </pre>
+
+		if ($token eq 'See also')
 		{
-			$context = 'faq';
+			$inside{see_also}	= true;
+			$$item{html}		= $button{see_also};
+			$$item{text}		= '';
+
+			push @items, $item;
 		}
-		elsif ($line =~ /^o See also:/)
+		elsif ($token)
 		{
-			$context = 'see_also';
-		}
-		elsif ( ($context eq 'see_also') && ($line =~ /^- /) )
-		{
-			# No change to context.
+			$description		= '';
+			$href				= '';
+			$inside{see_also}	= false;
+			$line_count			= 0;
+			$module				= $token;
+
+			# Fix me. Should be checking known modules.
+
+#			if ($$pad{module_names}{$token} && ! $seen{$token})
+			if (! $seen{$module})
+			{
+				$seen{$module} = $self -> insert_hashref('modules', {name => $module});
+
+				$self -> gather_statistics(\%node_type, $pad, $module, $topic);
+#				$self -> logger -> debug("Topic: $$topic{title}. Module: $token");
+			}
 		}
 		elsif ($line =~ /<pre>/)
 		{
-			$context = 'pre_pre';
+			# Fix me. What happens if there are 2 sets of <pre>...</pre> within 1 topic?
+
+			$inside{pre_pre}	= true;
+#			$$item{html}		= $button{pre_pre};
+#			$$item{text}		= '';
+#
+#			push @items, $item;
 		}
 		elsif ($line =~ m|</pre>|)
 		{
-			$context = 'text';
+			$inside{pre_pre} = false;
 		}
-		elsif ($line =~ /^o (.+)$/)
+		elsif ($inside{pre_pre})
 		{
-			$context	= 'module';
-			$token		= $1;
+			$$item{html}	= '';
+			$$item{text}	= $line;
 
-			if ($$pad{module_names}{$token} && ! $seen{$token})
-			{
-				$seen{$token} = $self -> insert_hashref('modules', {name => $token});
-
-				$self -> gather_statistics(\%node_type, $pad, $token, $topic);
-				$self -> logger -> debug("Topic: $$topic{title}. Module: $token");
-			}
+			push @pre_pre, $item;
 		}
 		else
 		{
-			$context = 'text';
+			$line_count++;
+
+			$token = ($line =~ /^- (.+)/) ? $1 : '';
+
+			if ($inside{see_also})
+			{
+				push@see_also, $token;
+			}
+			elsif ($line_count == 1)
+			{
+				$description = $token;
+			}
+			elsif ($line_count == 2)
+			{
+				$href			= $token;
+				$$item{html}	= "<span><a href = '" . escape_html($href) . "' target = '_blank'>$module - $description</a></span><span>.</span>";
+				$$item{text}	= '';
+
+				push @items, $item;
+			}
+			else
+			{
+				push @extras, $token,
+			}
 		}
-
-		match($context : eq)
-		{
-			case('acronym')
-			{
-				$token			= ($line =~ /^o (.+)$/) ? $1 : $line;
-				$description	= $lines[++$index]; substr($description, 0, 2) = '';	# Remove '^- '.
-				$href			= $lines[++$index]; substr($href, 0, 2) = '';			# "
-				$$item{html}	= "<span><a href = '$href' target = '_blank'>$token - $description</a></span><span>.</span>$button{extras}";
-				$$item{text}	= '';
-
-				push @items, $item;
-			}
-			case('faq')
-			{
-				$$item{html}	= '';
-				$$item{text}	= $line;
-
-				push @items, $item;
-			}
-			case('module')
-			{
-				# Do we have a standard 3 line entry or 3+ lines? Examples are from Acronyms.
-				#
-				# 3 line entry:
-				# o DKIM:
-				# - DomainKeys Identified Mail <- $index
-				# - https://en.wikipedia.org/wiki/DomainKeys_Identified_Mail
-				#
-				# 3+ line entry:
-				# o DMARC:
-				# - Domain-based Message Authentication, Reporting, and Conformance <- $index
-				# - https://en.wikipedia.org/wiki/DMARC
-				# - An email authentication protocol that helps protect domain owners and recipients from email spoofing, phishing, and other email-based attacks
-				# - https://datatracker.ietf.org/doc/html/draft-crocker-dmarc-bcp-03
-
-				$description	= $lines[++$index]; substr($description, 0, 2) = '';	# Remove '^- '.
-				$href			= $lines[++$index]; substr($href, 0, 2) = '';			# "
-				$$item{html}	= "<span><a href = '$href' target = '_blank'>$token - $description</a></span><span>.</span>$button{extras}";
-				$$item{text}	= '';
-
-				$self -> logger -> debug("href: $href");
-
-				push @items, $item;
-
-				#while ($lines[$index + 1] != /^o /){$index++}; # Skip empty line (up to next 'o ...').
-			}
-			case('see_also')
-			{
-			}
-			case('pre_pre')
-			{
-			}
-			case('text')
-			{
-			}
-		} # End match.
 	}
 
 	return [@items];

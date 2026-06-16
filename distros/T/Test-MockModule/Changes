@@ -1,3 +1,11 @@
+## 0.185.3 — 2026-06-15
+
+## What's Changed
+* Fix/93 moo meta no moose by @geofffranks in https://github.com/geofffranks/test-mockmodule/pull/94
+
+
+**Full Changelog**: https://github.com/geofffranks/test-mockmodule/compare/0.185.2...0.185.3
+
 ## 0.185.2 — 2026-05-29
 
 ## What's Changed

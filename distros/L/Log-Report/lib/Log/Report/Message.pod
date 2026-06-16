@@ -357,6 +357,17 @@ The returned HASH can be serialized safely with (for instance) YAML
 or JSON.  Then, it can be reconstructed from the de-serialized data.
 At the moment, all facts can be preserved.
 
+ -Option    --Default
+  serializer  undef
+
+=over 2
+
+=item serializer => 'JSON'|'Serial'|...
+
+In the future, the specific serializer may influence the frozen output.
+
+=back
+
 » example: to thaw a frozen
 
   my $clone = Log::Report::Message->thaw($msg->freeze);
@@ -704,8 +715,8 @@ In either case, the translation will be looked-up only once.
 
 =head1 SEE ALSO
 
-This module is part of Log-Report version 1.45,
-built on April 10, 2026. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Log-Report version 1.46,
+built on June 16, 2026. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

@@ -31,14 +31,14 @@ else{
    $define.=" -DINCLUDE_KONTO_CHECK_DE=0";
 }
 
-if($] >= 5.042){
-	print "use new KontoCheck.xs file\n";
-   system("cp KontoCheck.xs.new KontoCheck.xs");
-}
-else{
-	print "use old KontoCheck.xs file\n";
-   system("cp KontoCheck.xs.old KontoCheck.xs");
-}
+#if($] >= 5.042){
+#	print "use new KontoCheck.xs file\n";
+#   system("cp KontoCheck.xs.new KontoCheck.xs");
+#}
+#else{
+#	print "use old KontoCheck.xs file\n";
+#   system("cp KontoCheck.xs.old KontoCheck.xs");
+#}
 
 if($use_lx2l){
    system("if [[ ! -f konto_check-cfg.lx ]] ; then echo 'build konto_check-cfg.lx' ; lx2l -x konto_check-cfg.lxx ; fi ; lx2l -x pm.lxx");
@@ -307,8 +307,7 @@ sub write_makefile
 
 # the following dependencies are for my private build tool lx2l (a little esoteric ;-) )
       ($use_lx2l==1 ?
-      ( clean       => { FILES             => 'KontoCheck.xs lib/Business/KontoCheck.pm', },)
-	 : ( clean       => { FILES             => 'KontoCheck.xs', },)
+      ( clean       => { FILES             => 'lib/Business/KontoCheck.pm', },) : ()
   ),
       ($use_lx2l==1 ?
 		 ( depend     => {
@@ -320,10 +319,9 @@ sub write_makefile
                          'konto_check.c'      => "konto_check.lxx lib/Business/KontoCheck.pm META.yml retvals.h konto_check-cfg.lx \n\tlx2l -x \$< -ua1",
                          'konto_check-at.c'   => "konto_check-at.lxx konto_check-cfg.lx\n\tlx2l -x \$<",
                          'konto_check-at.h'   => "konto_check-at.lxx konto_check-cfg.lx\n\tlx2l -x \$< -uh",
-                         'KontoCheck.xs.old KontoCheck.xs.new' => "KontoCheck.lx lib/Business/KontoCheck.pm konto_check-cfg.lx\n\tlx2l o1 \$<\n\tlx2l n1 \$<",
+                         'KontoCheck.xs'      => "KontoCheck.lx lib/Business/KontoCheck.pm konto_check-cfg.lx\n\tlx2l m1 \$<",
                          'Makefile.PL'        => "makefile.lx konto_check-cfg.lx\n\tlx2l \$< -um",
-                       })
-    : ())
+                       }) : ())
   );
 }
 

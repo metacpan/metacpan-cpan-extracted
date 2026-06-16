@@ -2,7 +2,7 @@ package Crypt::OpenPGP::ErrorHandler;
 use strict;
 use warnings;
 
-our $VERSION = '1.19'; # VERSION
+our $VERSION = '1.20'; # VERSION
 
 our $ERROR;
 
@@ -29,8 +29,7 @@ Crypt::OpenPGP::ErrorHandler - Crypt::OpenPGP error handling
 =head1 SYNOPSIS
 
     package Foo;
-    use Crypt::OpenPGP::ErrorHandler;
-    use base qw( Crypt::OpenPGP::ErrorHandler );
+    use parent qw( Crypt::OpenPGP::ErrorHandler );
 
     sub class_method {
         my $class = shift;

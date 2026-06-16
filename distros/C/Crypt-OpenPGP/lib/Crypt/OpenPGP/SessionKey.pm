@@ -2,14 +2,13 @@ package Crypt::OpenPGP::SessionKey;
 use strict;
 use warnings;
 
-our $VERSION = '1.19'; # VERSION
+our $VERSION = '1.20'; # VERSION
 
 use Crypt::OpenPGP::Constants qw( DEFAULT_CIPHER );
 use Crypt::OpenPGP::Key::Public;
 use Crypt::OpenPGP::Util qw( mp2bin bin2mp bitsize );
 use Crypt::OpenPGP::Buffer;
-use Crypt::OpenPGP::ErrorHandler;
-use base qw( Crypt::OpenPGP::ErrorHandler );
+use parent qw( Crypt::OpenPGP::ErrorHandler );
 
 sub key_id { $_[0]->{key_id} }
 

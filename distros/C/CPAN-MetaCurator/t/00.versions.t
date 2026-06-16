@@ -21,7 +21,7 @@ use ExtUtils::MakeMaker;
 use File::Slurper;
 use File::Spec;
 use Getopt::Long;
-use HTML::Entities;
+use HTML::Escape;
 use HTML::TreeBuilder;
 use lib;
 use Log::Handler;

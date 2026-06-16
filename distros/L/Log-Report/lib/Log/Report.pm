@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Log-Report version 1.45.
+# This code is part of Perl distribution Log-Report version 1.46.
 # The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Log::Report;{
-our $VERSION = '1.45';
+our $VERSION = '1.46';
 }
 
 use base 'Exporter';
@@ -26,7 +26,7 @@ my $lrm = 'Log::Report::Message';
 
 ### if you change anything here, you also have to change Log::Report::Minimal
 my @make_msg   = qw/__ __x __n __nx __xn N__ N__n N__w __p __px __np __npx/;
-my @functions  = qw/report dispatcher try textdomain/;
+my @functions  = qw/report dispatcher try textdomain default_dispatcher_mode/;
 my @reason_functions = qw/trace assert info notice warning mistake error fault alert failure panic/;
 
 our @EXPORT_OK = (@make_msg, @functions, @reason_functions);
@@ -136,7 +136,7 @@ sub report($@)
 	if(my $disp_names = $message->to)
 	{	my %select = map +($_ => 1), ref $disp_names eq 'ARRAY' ? @$disp_names : $disp_names;
 		@disp = grep $select{$_->name}, @disp;
-		push @disp, $try if defined $try && $select{try};
+		push @disp, $try if defined $try && !$select{try};
 		@disp or return;
 	}
 
@@ -436,6 +436,12 @@ sub import(@)
 
 	### Log::Report options
 
+	if(my $msg_class = delete $opts{message_class})
+	{	$msg_class->isa($lrm)
+			or error __x"message_class {class} does not extend {base}", base => $lrm, class => $msg_class;
+		$lrm = $msg_class;
+	}
+
 	if(exists $opts{mode})
 	{	$default_mode = delete $opts{mode} || 0;
 		Log::Report::Dispatcher->defaultMode($default_mode);
@@ -458,12 +464,6 @@ sub import(@)
 		}
 	}
 
-	if(my $msg_class = delete $opts{message_class})
-	{	$msg_class->isa($lrm)
-			or error __x"message_class {class} does not extend {base}", base => $lrm, class => $msg_class;
-		$lrm = $msg_class;
-	}
-
 	$class->export_to_level(1+$to_level, undef, @export);
 
 	### Log::Report::Domain configuration
@@ -477,6 +477,9 @@ sub import(@)
 	{	error __x"no domain for configuration options in {fn} line {line}", fn => $fn, line => $linenr;
 	}
 }
+
+
+sub default_dispatcher_mode() { $default_mode }
 
 # deprecated, since we have a ::Domain object in 1.00
 sub translator($;$$$$)

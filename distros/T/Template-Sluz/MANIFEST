@@ -1,0 +1,21 @@
+AGENTS.md
+Changes
+lib/Template/Sluz.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README.md
+t/01-main.t
+t/tpls/child.stpl
+t/tpls/extra.stpl
+t/tpls/parent.stpl
+tpls/child.stpl
+tpls/extra.stpl
+tpls/parent.stpl
+example.pl
+bench.pl
+release-notes.md
+t/tpls/var_scope.stpl
+t/tpls/nested_inc.stpl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -2,14 +2,13 @@ package Crypt::OpenPGP::Signature;
 use strict;
 use warnings;
 
-our $VERSION = '1.19'; # VERSION
+our $VERSION = '1.20'; # VERSION
 
 use Crypt::OpenPGP::Digest;
 use Crypt::OpenPGP::Signature::SubPacket;
 use Crypt::OpenPGP::Key::Public;
 use Crypt::OpenPGP::Constants qw( DEFAULT_DIGEST );
-use Crypt::OpenPGP::ErrorHandler;
-use base qw( Crypt::OpenPGP::ErrorHandler );
+use parent qw( Crypt::OpenPGP::ErrorHandler );
 
 sub pkt_hdrlen { 2 }
 
@@ -157,7 +156,7 @@ sub parse {
         }
     }
     our %KEY_ALG;
-    eval require Crypt::DSA if $KEY_ALG{$sig->{pk_alg}} eq 'DSA'; 
+    eval require Crypt::DSA::GMP if $KEY_ALG{$sig->{pk_alg}} eq 'DSA'; 
     $sig->{chk} = $buf->get_bytes(2);
     ## XXX should be Crypt::OpenPGP::Signature->new($sig->{pk_alg})?
     my $key = Crypt::OpenPGP::Key::Public->new($sig->{pk_alg})

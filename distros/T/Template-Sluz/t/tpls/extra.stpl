@@ -1,0 +1,5 @@
+<h1>This is extra.stpl</h1>
+
+<p>{$number} is my favorite number</p>
+
+<div>e1ab49cf - {$secret}</div>

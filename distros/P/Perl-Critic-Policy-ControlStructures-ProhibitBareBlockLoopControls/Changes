@@ -1,5 +1,20 @@
 Revision history for Perl-Critic-Policy-ControlStructures-ProhibitBareBlockLoopControls
 
+0.05    2026-06-15
+    - Changed bare_block default from require_label to follow (defers to per-keyword defaults).
+    - Fixed labeled loop detection: labels are now skipped when identifying compound types.
+    - Added break-label targeting logic: labeled controls targeting an outer real loop
+      from a bare block are now permitted.
+    - Moved perlcriticrc to t/.perlcriticrc, configured via [Test::Perl::Critic].
+    - Repaired author-critic test violations (ASCII, labels, naming, qq, regex, no critic).
+    - Switched fixed-string regex patterns to constant hash lookups.
+
+0.04    2026-06-15
+    - Clarified the default policy in POD documentation with an effective defaults table
+    - Added examples for bare blocks inside real loops
+    - Added labeled "ok" examples for bare blocks
+    - Pod changes only
+
 0.03    2026-06-13
     - Adjust package name and hopefully cpan will index it
 0.02    2026-06-13

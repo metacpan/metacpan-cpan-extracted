@@ -3,9 +3,9 @@ package Crypt::OpenPGP::Buffer;
 use strict;
 use warnings;
 
-our $VERSION = '1.19'; # VERSION
+our $VERSION = '1.20'; # VERSION
 
-use base qw( Data::Buffer );
+use parent qw( Data::Buffer );
 
 use Crypt::OpenPGP::Util qw( bin2mp mp2bin bitsize );
 

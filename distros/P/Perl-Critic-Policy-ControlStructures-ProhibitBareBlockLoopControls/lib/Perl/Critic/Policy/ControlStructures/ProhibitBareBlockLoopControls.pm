@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package Perl::Critic::Policy::ControlStructures::ProhibitBareBlockLoopControls;
-$Perl::Critic::Policy::ControlStructures::ProhibitBareBlockLoopControls::VERSION = '0.03';
+$Perl::Critic::Policy::ControlStructures::ProhibitBareBlockLoopControls::VERSION = '0.05';
 use parent 'Perl::Critic::Policy';
 
 use Perl::Critic::Utils qw(:severities);
@@ -36,7 +36,7 @@ use constant FOLLOW => 'follow';
 
 # Block-level config names and defaults
 use constant BLOCK_CONFIG_DEFAULTS => {
-    'bare_block' => REQUIRE_LABEL,
+    'bare_block' => FOLLOW,
     'do_block'   => FORBID,
 };
 use constant BLOCK_CONFIG_NAMES => qw(do_block bare_block);
@@ -50,13 +50,18 @@ use constant BLOCK_NICKNAMES => {
     'sub'      => 'anonymous subroutine',
 };
 
+use constant BREAK_KEYWORDS => { map { $_ => 1 } qw(next last redo) };
+use constant LOOP_TYPES     => { map { $_ => 1 } qw(while until for foreach) };
+use constant CONDITIONAL_KEYWORDS =>
+    { map { $_ => 1 } qw(if unless while until for foreach when given not and or xor) };
+
 sub supported_parameters {
     my @params;
 
     for my $kw (PER_KEYWORD_NAMES) {
         push @params, {
             behavior       => 'string',
-            default_string => PER_KEYWORD_DEFAULTS->{$kw},
+            default_string => PER_KEYWORD_DEFAULTS->{$kw},               ## no critic (Modules::RequireExplicitInclusion)
             description    => qq{Policy for "$kw" in non-loop blocks},
             name           => $kw,
         };
@@ -65,7 +70,7 @@ sub supported_parameters {
     for my $name (BLOCK_CONFIG_NAMES) {
         push @params, {
             behavior       => 'string',
-            default_string => BLOCK_CONFIG_DEFAULTS->{$name},
+            default_string => BLOCK_CONFIG_DEFAULTS->{$name},            ## no critic (Modules::RequireExplicitInclusion)
             description    => qq{Override for "$name" blocks},
             name           => $name,
         };
@@ -83,7 +88,7 @@ sub _param {
 
     my $val = $self->{ '_' . $name };
 
-    return defined $val ? $val : PER_KEYWORD_DEFAULTS->{$name} // BLOCK_CONFIG_DEFAULTS->{$name};
+    return defined $val ? $val : PER_KEYWORD_DEFAULTS->{$name} // BLOCK_CONFIG_DEFAULTS->{$name};    ## no critic (Modules::RequireExplicitInclusion)
 }
 
 sub violates {
@@ -144,7 +149,7 @@ sub _break_keyword {
     return if !$first || !$first->isa('PPI::Token::Word');
 
     my $content = $first->content;
-    return if $content !~ m/^(?:next|last|redo)\z/;
+    return if !exists BREAK_KEYWORDS->{$content};    ## no critic (Modules::RequireExplicitInclusion)
 
     return $content;
 }
@@ -160,27 +165,41 @@ sub _find_offending_block {
         my $parent = $current->parent;
 
         if ( $parent && $parent->isa('PPI::Statement::Compound') ) {
-            my $type_elem = $parent->schild(0);
-            my $type      = $type_elem ? $type_elem->content : q();
+            my $type_elem;
+            for my $child ( $parent->children ) {
+                next if $child->isa('PPI::Token::Label');
+                next if $child->isa('PPI::Token::Whitespace');
+                next if $child->isa('PPI::Token::Comment');
+                next if $child->isa('PPI::Token::Pod');
+                $type_elem = $child;
+                last;
+            }
+            my $type = $type_elem ? $type_elem->content : q();
 
-            # Real loop — safe (first child is keyword like while/for)
+            # Real loop -- safe (first non-label child is keyword like while/for)
+            ## no critic (Modules::RequireExplicitInclusion)
             if (   $type_elem
                 && $type_elem->isa('PPI::Token::Word')
-                && $type =~ m/^(?:while|until|for|foreach)\z/ ) {
+                && exists LOOP_TYPES->{$type} ) {
                 return;
             }
 
-            # Bare block — first child is PPI::Structure::Block
+            # Bare block -- first non-label child is PPI::Structure::Block
             if ( $type_elem && $type_elem->isa('PPI::Structure::Block') ) {
+                return if _break_targets_loop( $elem, $parent );
                 return BLOCK_BARE;
             }
 
-            # if / unless / given / when — not a loop, keep walking
+            # if / unless / given / when -- not a loop, keep walking
             next ELEM;
         }
 
         my $class = _classify_block($current);
         return if !$class;
+
+        if ( $class eq BLOCK_BARE ) {
+            return if _break_targets_loop( $elem, $current );
+        }
 
         return $class;
     }
@@ -204,7 +223,7 @@ sub _classify_block {
         if ( $content eq 'sub' ) { return BLOCK_SUB; }
 
         my $check = $prev;
-        CHECK:
+        SCAN:
         while ($check) {
             if (   $check->isa('PPI::Token::Word')
                 && $check->content eq 'sub' ) {
@@ -214,7 +233,7 @@ sub _classify_block {
                 || $check->isa('PPI::Token::Prototype')
                 || $check->isa('PPI::Token::Operator') ) {
                 $check = $check->sprevious_sibling;
-                next CHECK;
+                next SCAN;
             }
             last CHECK;
         }
@@ -248,17 +267,76 @@ sub _has_label {
     return if @kids < 2;
     return if !$kids[0]->isa('PPI::Token::Word');
 
-    my $second = $kids[1];
+    my $second_kid = $kids[1];
 
-    if ( $second->isa('PPI::Token::Word') ) {
+    if ( $second_kid->isa('PPI::Token::Word') ) {
         return
-            if $second->content =~ m/^(?:if|unless|while|until|for|foreach|when|given|not|and|or|xor)\z/;
+            if exists CONDITIONAL_KEYWORDS->{ $second_kid->content };    ## no critic (Modules::RequireExplicitInclusion)
         return 1;
     }
 
-    if (   $second->isa('PPI::Token::Number')
-        || $second->isa('PPI::Token::Symbol') ) {
+    if (   $second_kid->isa('PPI::Token::Number')
+        || $second_kid->isa('PPI::Token::Symbol') ) {
         return 1;
+    }
+
+    return;
+}
+
+sub _break_label {
+    my ($elem) = @_;
+
+    my @kids =
+        grep { !$_->isa('PPI::Token::Whitespace') && !$_->isa('PPI::Token::Comment') && !$_->isa('PPI::Token::Pod') }
+        $elem->children;
+
+    return if @kids < 2;
+    return if !$kids[0]->isa('PPI::Token::Word');
+
+    my $second_kid = $kids[1];
+
+    if ( $second_kid->isa('PPI::Token::Word') ) {
+        my $content = $second_kid->content;
+        return if exists CONDITIONAL_KEYWORDS->{$content};    ## no critic (Modules::RequireExplicitInclusion)
+        return $content;
+    }
+
+    if (   $second_kid->isa('PPI::Token::Number')
+        || $second_kid->isa('PPI::Token::Symbol') ) {
+        return $second_kid->content;
+    }
+
+    return;
+}
+
+sub _break_targets_loop {
+    my ( $elem, $scope ) = @_;
+
+    my $label = _break_label($elem);
+    return if !$label;
+
+    my $current = $scope->parent;
+    while ( defined $current ) {
+        if ( $current->isa('PPI::Statement::Compound') ) {
+            my ( $has_label, $is_loop );
+            for my $child ( $current->children ) {
+                if ( $child->isa('PPI::Token::Label') ) {
+                    ( my $lc = $child->content ) =~ s/:\z//;
+                    $has_label = 1 if $lc eq $label;
+                }
+                next
+                    if $child->isa('PPI::Token::Label')
+                    || $child->isa('PPI::Token::Whitespace')
+                    || $child->isa('PPI::Token::Comment')
+                    || $child->isa('PPI::Token::Pod');
+                if ( $child->isa('PPI::Token::Word') ) {
+                    $is_loop = 1 if exists LOOP_TYPES->{ $child->content };    ## no critic (Modules::RequireExplicitInclusion)
+                }
+                last;
+            }
+            return 1 if $has_label && $is_loop;
+        }
+        $current = $current->parent;
     }
 
     return;
@@ -267,7 +345,7 @@ sub _has_label {
 sub _make_description {
     my ( $keyword, $block_type ) = @_;
 
-    my $nick = BLOCK_NICKNAMES->{$block_type} || 'non-loop block';
+    my $nick = BLOCK_NICKNAMES->{$block_type} || 'non-loop block';    ## no critic (Modules::RequireExplicitInclusion)
     return qq{'$keyword' in $nick};
 }
 
@@ -277,40 +355,40 @@ sub _make_explanation {
     if ( $block_type eq BLOCK_DO ) {
         return
               qq{"$keyword" inside a "do" block targets the nearest real loop }
-            . qq{--- "do" itself is not a loop. When no enclosing loop exists, }
-            . qq{this is a fatal error.};
+            . q{--- "do" itself is not a loop. When no enclosing loop exists, }
+            . q{this is a fatal error.};
     }
     if ( $block_type eq BLOCK_SUB ) {
         return
               qq{"$keyword" inside an anonymous subroutine targets the nearest }
-            . qq{enclosing real loop --- subroutines are not loops. Use an }
-            . qq{explicit label to target an outer loop.};
+            . q{enclosing real loop --- subroutines are not loops. Use an }
+            . q{explicit label to target an outer loop.};
     }
     if ( $block_type eq BLOCK_EVAL ) {
         return
               qq{"$keyword" inside an "eval" block targets the nearest }
-            . qq{enclosing real loop --- "eval" is not a loop. Use an }
-            . qq{explicit label to target an outer loop.};
+            . q{enclosing real loop --- "eval" is not a loop. Use an }
+            . q{explicit label to target an outer loop.};
     }
     if ( $block_type eq BLOCK_MAP_GREP ) {
         return
               qq{"$keyword" in a map/grep block skips to the next element }
-            . qq{rather than exiting the block. Use a "for" loop for }
-            . qq{clearer loop semantics.};
+            . q{rather than exiting the block. Use a "for" loop for }
+            . q{clearer loop semantics.};
     }
 
     # BLOCK_BARE
     if ( $effective eq FORBID ) {
         if ( $keyword eq 'redo' ) {
             return
-                  qq{"redo" in a bare block restarts the block indefinitely }
-                . qq{--- bare blocks execute only once. Use a "for" or }
-                . qq{"while" loop instead.};
+                  q{"redo" in a bare block restarts the block indefinitely }
+                . q{--- bare blocks execute only once. Use a "for" or }
+                . q{"while" loop instead.};
         }
         return
               qq{"$keyword" in a bare block just exits the block --- bare }
-            . qq{blocks execute only once. Use a "for" or "while" loop }
-            . qq{if you need iteration.};
+            . q{blocks execute only once. Use a "for" or "while" loop }
+            . q{if you need iteration.};
     }
 
     # REQUIRE_LABEL
@@ -331,31 +409,42 @@ Perl::Critic::Policy::ControlStructures::ProhibitBareBlockLoopControls - Prohibi
 
 =head1 VERSION
 
-version 0.03
+version 0.05
 
 =head1 DESCRIPTION
 
-Using C<next>, C<last>, or C<redo> inside blocks that are not real loops
-or where control flow is confusing
-(e.g. bare C<{}> blocks, C<do {}> blocks, anonymous subroutines, C<eval {}>,
-C<map>/C<grep> blocks) leads to confusing or buggy behaviour:
+This policy flags C<next>, C<last>, and C<redo> when used inside blocks that
+are not real loops or where control flow is confusing (bare C<{}> blocks,
+C<do {}> blocks, anonymous subroutines, C<eval {}>, C<map>/C<grep>).
+
+Why these blocks are problematic:
 
 =over
 
 =item * Bare C<{}> blocks are loops that execute once, so C<next> and C<last>
 both exit the block; C<next> additionally runs any attached C<continue> block.
 
-=item * C<do {}> blocks are I<not> loops — control keywords target the nearest
+=item * C<do {}> blocks are I<not> loops -- control keywords target the nearest
 enclosing real loop instead of the C<do> block itself.
 
 =item * Anonymous subroutines C<sub {}> and C<eval {}> are not loops either.
 
-=item * C<map {}> / C<grep {}> blocks are expression blocks — loop controls
+=item * C<map {}> / C<grep {}> blocks are expression blocks -- loop controls
 do not behave as expected.
 
 =back
 
+The default policy depends on both the keyword and the enclosing block type:
+
+    Keyword           bare C<{}>      C<do {}>
+    ------------------------------------------------
+    last              require_label   forbid
+    next              forbid          forbid
+    redo              forbid          forbid
+
 =head1 EXAMPLES
+
+The following examples illustrate the default configuration.
 
 =head2 Bare blocks (C<{ }>)
 
@@ -363,20 +452,45 @@ do not behave as expected.
         next;           # not ok
     }
 
+    FOO: {
+        next FOO;       # not ok
+    }
+
     {
         last;           # not ok
     }
 
-    {
-        last LOOP;      # ok
+    BAR: {
+        last BAR;       # ok
     }
 
     {
         redo;           # not ok
     }
 
-    {
-        redo LOOP;      # ok
+    BAZ: {
+        redo BAZ;       # not ok
+    }
+
+=head2 Bare blocks inside real loops
+
+    for my $x (@items) {
+        {
+            next;           # not ok
+        }
+    }
+
+    for my $x (@items) {
+        FOO: {
+            next FOO;       # not ok
+        }
+    }
+
+    BAR:
+    for my $x (@items) {
+        {
+            next BAR;       # ok  (targets the outer real loop)
+        }
     }
 
 =head2 C<do { }> blocks
@@ -386,7 +500,7 @@ do not behave as expected.
     };
 
     do {
-        last LOOP;      # not ok (label does not help — do is not a loop)
+        last LOOP;      # not ok (label does not help -- do is not a loop)
     };
 
 =head2 Anonymous subroutines (C<sub { }>)
@@ -432,13 +546,16 @@ Each keyword C<next>, C<last>, C<redo> can be set to one of:
 
 =over
 
-=item C<forbid> — always flag this keyword in non-loop blocks (default for
+=item C<forbid> -- always flag this keyword in non-loop blocks (default for
 C<next> and C<redo>)
 
-=item C<require_label> — flag unless the keyword has an explicit label
+=item C<require_label> -- flag unless the keyword has an explicit label
 (default for C<last>)
 
-=item C<allow> — do not check this keyword at all
+=item C<allow> -- do not check this keyword at all in non-loop blocks
+
+These per-keyword defaults apply when no block-type override is in effect
+(or the override is set to C<follow>; see below).
 
 =back
 
@@ -447,7 +564,7 @@ for specific block types:
 
 =over
 
-=item C<bare_block>: C<forbid>, C<require_label> (default), or C<follow>
+=item C<bare_block>: C<forbid>, C<require_label>, or C<follow> (default)
 per-keyword settings
 
 =item C<do_block>:  C<forbid> (default), C<require_label>, or C<follow>
@@ -456,18 +573,22 @@ per-keyword settings
 =back
 
 Bare blocks are real loops (they execute once), so labeled controls
-work correctly — C<require_label> is the default.  C<do> blocks are
-not loops at all, so controls are forbidden entirely by default;
-C<require_label> allows them when an outer loop is the intended target.
+work correctly.  The default is C<follow>, which defers to the per-keyword
+setting for each keyword: C<last> requires a label, C<next> and C<redo>
+are always flagged.  C<do> blocks are not loops at all, so controls are
+forbidden entirely by default; C<require_label> allows them when an outer
+loop is the intended target.
 
-Example F<.perlcriticrc>:
+Example F<perlcriticrc>:
 
     [ControlStructures::ProhibitBareBlockLoopControls]
     next        = forbid
     last        = require_label
     redo        = forbid
     do_block    = forbid
-    bare_block  = require_label
+    bare_block  = follow
+
+Note: This is the default configuration.
 
 =head1 SEE ALSO
 

@@ -1,3 +1,9 @@
+v0.03  2026-06-15Z
+    - Fixed modifier mora, somehow wrong ones got into the code base.
+      This will correct the parsing of verbs, adjectives, and applications.
+      This also supports personal, product, and preproduct forms.
+    - Improved documentation
+
 v0.02  2025-12-19Z
     - Added support to build and parse a number word
     - Fully implemented main verb calculation

@@ -8,7 +8,7 @@ with 'Dist::Zilla::Role::PluginBundle::Easy',
 use namespace::clean;
 use Data::Section -setup;
 
-our $VERSION = 'v1.0.9';
+our $VERSION = 'v1.0.10';
 
 sub configure {
 	my $self = shift;
@@ -34,6 +34,15 @@ sub configure {
 	my $irc = $self->payload->{irc} // '';
 	if (length $irc) {
 	  $self->add_plugins([MetaResources => { x_IRC => $irc }]);
+	}
+	my $irc_channel = $self->payload->{irc_channel} // '';
+	if (length $irc_channel) {
+		my $irc_network = $self->payload->{irc_network} // '';
+		my $irc_host = $self->payload->{irc_host} // '';
+		my %irc_config = (channel => $irc_channel);
+		$irc_config{network} = $irc_network if length $irc_network;
+		$irc_config{host} = $irc_host if length $irc_host;
+		$self->add_plugins([IRC => \%irc_config]);
 	}
 	
 	my @from_build = qw(LICENSE CONTRIBUTING.md META.json);
@@ -246,6 +255,26 @@ specified using config slicing.
  irc = irc://irc.perl.org/#distzilla
 
 Set the x_IRC resource metadata using L<Dist::Zilla::Plugin::MetaResources>.
+Deprecated; use L</"irc_channel">.
+
+=head2 irc_channel
+
+ irc_channel = distzilla
+
+Set the channel for IRC resource metadata using L<Dist::Zilla::Plugin::IRC>.
+
+=head2 irc_network
+
+ irc_network = perl
+
+Set the network for IRC resource metadata using L<Dist::Zilla::Plugin::IRC>.
+
+=head2 irc_host
+
+ irc_host = irc.perl.org
+
+Set the host for IRC resource metadata using L<Dist::Zilla::Plugin::IRC>.
+Only for IRC hosts that cannot be set via L</"irc_network">.
 
 =head2 pod_tests
 

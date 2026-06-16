@@ -2,11 +2,10 @@ package Crypt::OpenPGP::Plaintext;
 use strict;
 use warnings;
 
-our $VERSION = '1.19'; # VERSION
+our $VERSION = '1.20'; # VERSION
 
 use Crypt::OpenPGP::Buffer;
-use Crypt::OpenPGP::ErrorHandler;
-use base qw( Crypt::OpenPGP::ErrorHandler );
+use parent qw( Crypt::OpenPGP::ErrorHandler );
 
 sub new {
     my $class = shift;
@@ -20,7 +19,7 @@ sub mode { $_[0]->{mode} }
 sub init {
     my $pt = shift;
     my %param = @_;
-    if (my $data = $param{Data}) {
+    if (defined(my $data = $param{Data})) {
         $pt->{data} = $data;
         $pt->{mode} = $param{Mode} || 'b';
         $pt->{timestamp} = time;

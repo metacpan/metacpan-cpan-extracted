@@ -61,7 +61,7 @@
          "url" : "https://github.com/Test-More/test-more/"
       }
    },
-   "version" : "1.302221",
+   "version" : "1.302222",
    "x_breaks" : {
       "Log::Dispatch::Config::TestLog" : "<= 0.02",
       "Test2::Harness" : "<= 0.000013",

@@ -1,12 +1,10 @@
 package Crypt::OpenPGP::Key::Public::ElGamal;
 use strict;
 
-our $VERSION = '1.19'; # VERSION
+our $VERSION = '1.20'; # VERSION
 
 use Crypt::OpenPGP::Util qw( bitsize);
-use Crypt::OpenPGP::Key::Public;
-use Crypt::OpenPGP::ErrorHandler;
-use base qw( Crypt::OpenPGP::Key::Public Crypt::OpenPGP::ErrorHandler );
+use parent qw( Crypt::OpenPGP::Key::Public Crypt::OpenPGP::ErrorHandler );
 
 sub can_encrypt { 1 }
 sub abbrev { 'g' }

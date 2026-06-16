@@ -43,7 +43,7 @@
             "File::Slurper" : "0.014",
             "File::Spec" : "3.9",
             "Getopt::Long" : "2.57",
-            "HTML::Entities" : "3.83",
+            "HTML::Escape" : "1.11",
             "HTML::TreeBuilder" : "5.07",
             "Imager" : "1.029",
             "Imager::Color" : "1.015",
@@ -66,6 +66,7 @@
             "parent" : "0.242",
             "perl" : "v5.40.0",
             "strict" : "1.12",
+            "utf8" : "1.25",
             "warnings" : "1.58"
          }
       },
@@ -91,6 +92,6 @@
          "web" : "https://github.com/ronsavage/CPAN-MetaCurator"
       }
    },
-   "version" : "1.21",
+   "version" : "1.23",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

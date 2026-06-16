@@ -2,7 +2,7 @@ package Crypt::OpenPGP::KeyRing;
 use strict;
 use warnings;
 
-our $VERSION = '1.19'; # VERSION
+our $VERSION = '1.20'; # VERSION
 
 use Crypt::OpenPGP::Constants qw( PGP_PKT_USER_ID
                                   PGP_PKT_PUBLIC_KEY
@@ -12,8 +12,7 @@ use Crypt::OpenPGP::Constants qw( PGP_PKT_USER_ID
 use Crypt::OpenPGP::Buffer;
 use Crypt::OpenPGP::KeyBlock;
 use Crypt::OpenPGP::PacketFactory;
-use Crypt::OpenPGP::ErrorHandler;
-use base qw( Crypt::OpenPGP::ErrorHandler );
+use parent qw( Crypt::OpenPGP::ErrorHandler );
 
 sub new {
     my $class = shift;
@@ -26,12 +25,11 @@ sub init {
     my %param = @_;
     $ring->{_data} = $param{Data} || '';
     if (!$ring->{_data} && (my $file = $param{Filename})) {
-        local *FH;
-        open FH, $file or
+        open ( my $fh, "<", $file ) or
             return (ref $ring)->error("Can't open keyring $file: $!");
-        binmode FH;
-        { local $/; $ring->{_data} = <FH> }
-        close FH;
+        binmode $fh;
+        { local $/; $ring->{_data} = <$fh> }
+        close $fh;
     }
     if ($ring->{_data} =~ /^-----BEGIN/) {
         require Crypt::OpenPGP::Armour;

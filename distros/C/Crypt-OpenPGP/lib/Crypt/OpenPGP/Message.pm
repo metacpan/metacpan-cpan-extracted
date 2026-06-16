@@ -2,12 +2,11 @@ package Crypt::OpenPGP::Message;
 use strict;
 use warnings;
 
-our $VERSION = '1.19'; # VERSION
+our $VERSION = '1.20'; # VERSION
 
 use Crypt::OpenPGP::Buffer;
 use Crypt::OpenPGP::PacketFactory;
-use Crypt::OpenPGP::ErrorHandler;
-use base qw( Crypt::OpenPGP::ErrorHandler );
+use parent qw( Crypt::OpenPGP::ErrorHandler );
 
 sub new {
     my $class = shift;
@@ -22,12 +21,11 @@ sub init {
     $msg->{pieces} = [];
     $msg->{_data} = $param{Data} || '';
     if (!$msg->{_data} && (my $file = $param{Filename})) {
-        local *FH;
-        open FH, $file or
+        open ( my $fh, "<", $file ) or
             return (ref $msg)->error("Can't open message $file: $!");
-        binmode FH;
-        { local $/; $msg->{_data} = <FH> }
-        close FH;
+        binmode $fh;
+        { local $/; $msg->{_data} = <$fh> }
+        close $fh;
     }
     $msg->read or return;
     $msg;

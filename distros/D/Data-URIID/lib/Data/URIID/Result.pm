@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2025 Philipp Schafft
+# Copyright (c) 2023-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -34,7 +34,7 @@ use constant {
 use constant RE_UUID => qr/^[0-9a-fA-F]{8}-(?:[0-9a-fA-F]{4}-){3}[0-9a-fA-F]{12}$/;
 use constant RE_UINT => qr/^[1-9][0-9]*$/;
 
-our $VERSION = v0.20;
+our $VERSION = v0.21;
 
 use parent 'Data::URIID::Base';
 
@@ -162,6 +162,7 @@ my %best_services = (
     'fefe-blog-post-identifier'     => 'fefe',
     'ruthede-comic-post-identifier' => 'ruthede',
     'danbooru2chanjp-post-identifier' => 'danbooru2chanjp',
+    'denkxweb-hessen-identifier'    => 'denkxweb-hessen',
 );
 
 # Load extra services:
@@ -321,6 +322,9 @@ my %url_templates = (
     ],
     'sirtxkeepcoolorg' => [
         ['sirtx-numerical-identifier' => 'https://sirtx.keep-cool.org/lists.html#sni:%s', undef, [qw(info)]],
+    ],
+    'denkxweb-hessen' => [
+        ['denkxweb-hessen-identifier' => 'https://denkxweb.denkmalpflege-hessen.de/%u/', undef, [qw(info)]],
     ],
 );
 my %digest_url_templates = (
@@ -848,6 +852,15 @@ my %url_parser = (
                 return undef;
             }
         },
+        {
+            # https://denkxweb.denkmalpflege-hessen.de/8584/
+            host => 'denkxweb.denkmalpflege-hessen.de',
+            path => qr#^/([0-9]+)/\z#,
+            source => 'denkxweb-hessen',
+            type => 'denkxweb-hessen-identifier',
+            action => 'info',
+            id => \1,
+        },
     ],
 );
 
@@ -886,7 +899,7 @@ my %syntax = (
     'fefe-blog-post-identifier'     => qr/^[0-9a-f]{8}$/,
     'danbooru2chanjp-tag'           => qr/./,
     (map {'osm-'.$_ => RE_UINT} qw(node way relation)),
-    (map {$_        => RE_UINT} qw(e621-post-identifier e621-pool-identifier xkcd-num ngv-artist-identifier ngv-artwork-identifier find-a-grave-identifier libraries-australia-identifier nla-trove-people-identifier agsa-creator-identifier a-p-and-p-artist-identifier geonames-identifier small-identifier chat-0-word-identifier sirtx-numerical-identifier furaffinity-post-identifier notalwaysright-post-identifier ruthede-comic-post-identifier danbooru2chanjp-post-identifier)),
+    (map {$_        => RE_UINT} qw(e621-post-identifier e621-pool-identifier xkcd-num ngv-artist-identifier ngv-artwork-identifier find-a-grave-identifier libraries-australia-identifier nla-trove-people-identifier agsa-creator-identifier a-p-and-p-artist-identifier geonames-identifier small-identifier chat-0-word-identifier sirtx-numerical-identifier furaffinity-post-identifier notalwaysright-post-identifier ruthede-comic-post-identifier danbooru2chanjp-post-identifier denkxweb-hessen-identifier)),
 );
 
 my %fellig_tables = (
@@ -919,6 +932,16 @@ my %media_subtype_to_ext = (
     'video/matroska-3d'     => 'mkv',
     'video/ogg'             => 'ogv',
     'video/webm'            => 'webm',
+);
+
+my %ni_hashes = (
+    'sha-256'   => [43, 'sha-2-256'],
+    'sha-384'   => [64, 'sha-2-384'],
+    'sha-512'   => [86, 'sha-2-512'],
+    'sha3-224'  => [38, 'sha-3-224'],
+    'sha3-256'  => [43, 'sha-3-256'],
+    'sha3-384'  => [64, 'sha-3-384'],
+    'sha3-512'  => [86, 'sha-3-512'],
 );
 
 
@@ -1092,6 +1115,33 @@ sub _lookup_with_mode {
                 next if $done{$service};
                 $done{$service} = 1;
                 $self->_lookup_one($service, %opts);
+            }
+        }
+    }
+}
+
+sub _lookup__ni {
+    my ($self) = @_;
+    my URI $uri = $self->{uri};
+    my $path = $uri->path;
+    my %query = $uri->query_form;
+
+    if ($path =~ m#/([0-9a-z-]+);([0-9a-zA-Z_-]{38,86})\z# ) {
+        my ($algo, $hash) = ($1, $2);
+
+        if (defined(my $def = $ni_hashes{$algo})) {
+            if (length($hash) == $def->[0]) {
+                $hash = unpack('H*', MIME::Base64::decode_base64url($hash));
+
+                $self->_set;
+                $self->{primary}{digest} //= {};
+                $self->{primary}{digest}{$def->[1]} = $hash;
+
+                if (defined(my $ct = $query{ct})) {
+                    if ($ct =~ $syntax{'media-subtype-identifier'}) {
+                        $self->{primary}{media_subtype} //= $ct;
+                    }
+                }
             }
         }
     }
@@ -1829,7 +1879,7 @@ Data::URIID::Result - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.20
+version v0.21
 
 =head1 SYNOPSIS
 
@@ -2114,7 +2164,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2023-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

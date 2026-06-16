@@ -4327,6 +4327,7 @@ sub create_section {
 # @param int $slide_index Slide index. (required)
 # @param ShapeBase $dto Shape DTO. (optional)
 # @param int $shape_to_clone Optional index for clone shape instead of adding a new one. (optional)
+# @param int $clone_from_slide Optional index of the slide to clone the shape from. When set, shapeToClone refers to a shape on that slide. (optional)
 # @param int $position Position of the new shape in the list. Default is at the end of the list. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
@@ -4352,6 +4353,11 @@ sub create_section {
     'shape_to_clone' => {
         data_type => 'int',
         description => 'Optional index for clone shape instead of adding a new one.',
+        required => '0',
+    },
+    'clone_from_slide' => {
+        data_type => 'int',
+        description => 'Optional index of the slide to clone the shape from. When set, shapeToClone refers to a shape on that slide.',
         required => '0',
     },
     'position' => {
@@ -4419,6 +4425,11 @@ sub create_shape {
     # query params
     if (exists $args{'shape_to_clone'} && defined $args{'shape_to_clone'}) {
         $query_params->{'shapeToClone'} = $self->{api_client}->to_query_value($args{'shape_to_clone'});
+    }
+
+    # query params
+    if (exists $args{'clone_from_slide'} && defined $args{'clone_from_slide'}) {
+        $query_params->{'cloneFromSlide'} = $self->{api_client}->to_query_value($args{'clone_from_slide'});
     }
 
     # query params
@@ -5666,6 +5677,7 @@ sub create_special_slide_portion {
 # @param string $slide_type Slide type (master, layout or notes). (required)
 # @param ShapeBase $dto Shape DTO. (required)
 # @param int $shape_to_clone Optional index for clone shape instead of adding a new one. (optional)
+# @param int $clone_from_slide Optional index of the slide to clone the shape from. When set, shapeToClone refers to a shape on that slide. (optional)
 # @param int $position Position of the new shape in the list. Default is at the end of the list. (optional)
 # @param string $password Document password. (optional)
 # @param string $folder Document folder. (optional)
@@ -5696,6 +5708,11 @@ sub create_special_slide_portion {
     'shape_to_clone' => {
         data_type => 'int',
         description => 'Optional index for clone shape instead of adding a new one.',
+        required => '0',
+    },
+    'clone_from_slide' => {
+        data_type => 'int',
+        description => 'Optional index of the slide to clone the shape from. When set, shapeToClone refers to a shape on that slide.',
         required => '0',
     },
     'position' => {
@@ -5778,6 +5795,11 @@ sub create_special_slide_shape {
     # query params
     if (exists $args{'shape_to_clone'} && defined $args{'shape_to_clone'}) {
         $query_params->{'shapeToClone'} = $self->{api_client}->to_query_value($args{'shape_to_clone'});
+    }
+
+    # query params
+    if (exists $args{'clone_from_slide'} && defined $args{'clone_from_slide'}) {
+        $query_params->{'cloneFromSlide'} = $self->{api_client}->to_query_value($args{'clone_from_slide'});
     }
 
     # query params
@@ -26095,6 +26117,224 @@ sub highlight_shape_text {
 }
 
 #
+# import_chart_from_workbook
+#
+# Imports a chart from an Excel workbook and adds it to the slide.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $worksheet_name The name of the worksheet that contains the chart. (required)
+# @param File $document Excel workbook data. (optional)
+# @param string $chart_name The name of the chart. Required if chartIndex is not specified. (optional)
+# @param int $chart_index The zero-based index of the chart in the worksheet. Takes precedence over chartName. (optional)
+# @param double $x X coordinate of the chart (EMU). (optional, default to 0.0)
+# @param double $y Y coordinate of the chart (EMU). (optional, default to 0.0)
+# @param boolean $embed_all_workbook If true, the entire workbook is embedded; if false, only chart data. (optional, default to true)
+# @param string $workbook_path Storage path to the workbook. If omitted, the workbook must be uploaded as multipart form data. (optional)
+# @param string $workbook_storage Storage name for workbookPath. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Presentation folder. (optional)
+# @param string $storage Presentation storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'worksheet_name' => {
+        data_type => 'string',
+        description => 'The name of the worksheet that contains the chart.',
+        required => '1',
+    },
+    'document' => {
+        data_type => 'File',
+        description => 'Excel workbook data.',
+        required => '0',
+    },
+    'chart_name' => {
+        data_type => 'string',
+        description => 'The name of the chart. Required if chartIndex is not specified.',
+        required => '0',
+    },
+    'chart_index' => {
+        data_type => 'int',
+        description => 'The zero-based index of the chart in the worksheet. Takes precedence over chartName.',
+        required => '0',
+    },
+    'x' => {
+        data_type => 'double',
+        description => 'X coordinate of the chart (EMU).',
+        required => '0',
+    },
+    'y' => {
+        data_type => 'double',
+        description => 'Y coordinate of the chart (EMU).',
+        required => '0',
+    },
+    'embed_all_workbook' => {
+        data_type => 'boolean',
+        description => 'If true, the entire workbook is embedded; if false, only chart data.',
+        required => '0',
+    },
+    'workbook_path' => {
+        data_type => 'string',
+        description => 'Storage path to the workbook. If omitted, the workbook must be uploaded as multipart form data.',
+        required => '0',
+    },
+    'workbook_storage' => {
+        data_type => 'string',
+        description => 'Storage name for workbookPath.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Presentation folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'import_chart_from_workbook' } = { 
+    	summary => 'Imports a chart from an Excel workbook and adds it to the slide.',
+        params => $params,
+        returns => 'ShapeBase',
+        };
+}
+# @return ShapeBase
+#
+sub import_chart_from_workbook {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling import_chart_from_workbook");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling import_chart_from_workbook");
+    }
+
+    # verify the required parameter 'worksheet_name' is set
+    unless (exists $args{'worksheet_name'} && defined $args{'worksheet_name'} && $args{'worksheet_name'}) {
+      croak("Missing the required parameter 'worksheet_name' when calling import_chart_from_workbook");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/fromExcelChart';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'worksheet_name'} && defined $args{'worksheet_name'}) {
+        $query_params->{'worksheetName'} = $self->{api_client}->to_query_value($args{'worksheet_name'});
+    }
+
+    # query params
+    if (exists $args{'chart_name'} && defined $args{'chart_name'}) {
+        $query_params->{'chartName'} = $self->{api_client}->to_query_value($args{'chart_name'});
+    }
+
+    # query params
+    if (exists $args{'chart_index'} && defined $args{'chart_index'}) {
+        $query_params->{'chartIndex'} = $self->{api_client}->to_query_value($args{'chart_index'});
+    }
+
+    # query params
+    if (exists $args{'x'} && defined $args{'x'}) {
+        $query_params->{'x'} = $self->{api_client}->to_query_value($args{'x'});
+    }
+
+    # query params
+    if (exists $args{'y'} && defined $args{'y'}) {
+        $query_params->{'y'} = $self->{api_client}->to_query_value($args{'y'});
+    }
+
+    # query params
+    if (exists $args{'embed_all_workbook'} && defined $args{'embed_all_workbook'}) {
+        $query_params->{'embedAllWorkbook'} = $self->{api_client}->to_boolean_query_value($args{'embed_all_workbook'});
+    }
+
+    # query params
+    if (exists $args{'workbook_path'} && defined $args{'workbook_path'}) {
+        $query_params->{'workbookPath'} = $self->{api_client}->to_query_value($args{'workbook_path'});
+    }
+
+    # query params
+    if (exists $args{'workbook_storage'} && defined $args{'workbook_storage'}) {
+        $query_params->{'workbookStorage'} = $self->{api_client}->to_query_value($args{'workbook_storage'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
+    }
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ShapeBase', $response);
+    return $_response_object;
+}
+
+#
 # import_from_html
 #
 # Create presentation document from html.
@@ -26536,6 +26776,207 @@ sub import_shapes_from_svg {
         return;
     }
     my $_response_object = $self->{api_client}->deserialize('Shapes', $response);
+    return $_response_object;
+}
+
+#
+# import_table_from_workbook
+#
+# Imports a table from an Excel workbook and adds it to the slide.
+# 
+# @param string $name Document name. (required)
+# @param int $slide_index Slide index. (required)
+# @param string $worksheet_name The name of the worksheet that contains the table. (required)
+# @param string $cell_range The cell range that defines the table (e.g. \&quot;A1:D10\&quot;). (required)
+# @param File $document Excel workbook data. (optional)
+# @param double $x X coordinate of the table (EMU). (optional, default to 0.0)
+# @param double $y Y coordinate of the table (EMU). (optional, default to 0.0)
+# @param string $workbook_path Storage path to the workbook. If omitted, the workbook must be uploaded as multipart form data. (optional)
+# @param string $workbook_storage Storage name for workbookPath. (optional)
+# @param string $password Document password. (optional)
+# @param string $folder Presentation folder. (optional)
+# @param string $storage Presentation storage. (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => 'Document name.',
+        required => '1',
+    },
+    'slide_index' => {
+        data_type => 'int',
+        description => 'Slide index.',
+        required => '1',
+    },
+    'worksheet_name' => {
+        data_type => 'string',
+        description => 'The name of the worksheet that contains the table.',
+        required => '1',
+    },
+    'cell_range' => {
+        data_type => 'string',
+        description => 'The cell range that defines the table (e.g. \&quot;A1:D10\&quot;).',
+        required => '1',
+    },
+    'document' => {
+        data_type => 'File',
+        description => 'Excel workbook data.',
+        required => '0',
+    },
+    'x' => {
+        data_type => 'double',
+        description => 'X coordinate of the table (EMU).',
+        required => '0',
+    },
+    'y' => {
+        data_type => 'double',
+        description => 'Y coordinate of the table (EMU).',
+        required => '0',
+    },
+    'workbook_path' => {
+        data_type => 'string',
+        description => 'Storage path to the workbook. If omitted, the workbook must be uploaded as multipart form data.',
+        required => '0',
+    },
+    'workbook_storage' => {
+        data_type => 'string',
+        description => 'Storage name for workbookPath.',
+        required => '0',
+    },
+    'password' => {
+        data_type => 'string',
+        description => 'Document password.',
+        required => '0',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => 'Presentation folder.',
+        required => '0',
+    },
+    'storage' => {
+        data_type => 'string',
+        description => 'Presentation storage.',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'import_table_from_workbook' } = { 
+    	summary => 'Imports a table from an Excel workbook and adds it to the slide.',
+        params => $params,
+        returns => 'ShapeBase',
+        };
+}
+# @return ShapeBase
+#
+sub import_table_from_workbook {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'} && defined $args{'name'} && $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling import_table_from_workbook");
+    }
+
+    # verify the required parameter 'slide_index' is set
+    unless (exists $args{'slide_index'} && defined $args{'slide_index'}) {
+      croak("Missing the required parameter 'slide_index' when calling import_table_from_workbook");
+    }
+
+    # verify the required parameter 'worksheet_name' is set
+    unless (exists $args{'worksheet_name'} && defined $args{'worksheet_name'} && $args{'worksheet_name'}) {
+      croak("Missing the required parameter 'worksheet_name' when calling import_table_from_workbook");
+    }
+
+    # verify the required parameter 'cell_range' is set
+    unless (exists $args{'cell_range'} && defined $args{'cell_range'} && $args{'cell_range'}) {
+      croak("Missing the required parameter 'cell_range' when calling import_table_from_workbook");
+    }
+
+    # parse inputs
+    my $_resource_path = '/slides/{name}/slides/{slideIndex}/shapes/fromExcelTable';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('multipart/form-data');
+
+    # query params
+    if (exists $args{'worksheet_name'} && defined $args{'worksheet_name'}) {
+        $query_params->{'worksheetName'} = $self->{api_client}->to_query_value($args{'worksheet_name'});
+    }
+
+    # query params
+    if (exists $args{'cell_range'} && defined $args{'cell_range'}) {
+        $query_params->{'cellRange'} = $self->{api_client}->to_query_value($args{'cell_range'});
+    }
+
+    # query params
+    if (exists $args{'x'} && defined $args{'x'}) {
+        $query_params->{'x'} = $self->{api_client}->to_query_value($args{'x'});
+    }
+
+    # query params
+    if (exists $args{'y'} && defined $args{'y'}) {
+        $query_params->{'y'} = $self->{api_client}->to_query_value($args{'y'});
+    }
+
+    # query params
+    if (exists $args{'workbook_path'} && defined $args{'workbook_path'}) {
+        $query_params->{'workbookPath'} = $self->{api_client}->to_query_value($args{'workbook_path'});
+    }
+
+    # query params
+    if (exists $args{'workbook_storage'} && defined $args{'workbook_storage'}) {
+        $query_params->{'workbookStorage'} = $self->{api_client}->to_query_value($args{'workbook_storage'});
+    }
+
+    # query params
+    if (exists $args{'folder'} && defined $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if (exists $args{'storage'} && defined $args{'storage'}) {
+        $query_params->{'storage'} = $self->{api_client}->to_query_value($args{'storage'});
+    }
+
+    # header params
+    if ( exists $args{'password'}) {
+        $header_params->{':password'} = $self->{api_client}->to_header_value($args{'password'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'slide_index'}) {
+        my $_base_variable = "{" . "slideIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'slide_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    my $_body_data;
+    my $files = [];
+    if ( exists $args{'document'} && $args{'document'}) {
+        push(@$files, $args{'document'});
+    }
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $files);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('ShapeBase', $response);
     return $_response_object;
 }
 

@@ -47,8 +47,9 @@ my $builder = $class->new(
 		'Test::Warnings'      => 0,
 	},
 	# Moose, Mouse, Class::Load and Test::Exception are exercised ONLY by the
-	# t/moose_*.t and t/mouse_*.t MOP-integration tests added for GH #55. Each
-	# of those files opens with `eval { require Moose } or plan skip_all`, so
+	# t/moose_*.t and t/mouse_*.t MOP-integration tests added for GH #55, and
+	# Moo only by the t/moo_*.t tests added for GH #93. Each of those files
+	# opens with an `eval { require <Module> } or plan skip_all`, so
 	# the suite passes cleanly without them. They are therefore OPTIONAL, not
 	# required: declaring them as `recommends` keeps a plain
 	# `cpanm Test::MockModule` from dragging in two full Perl OO systems (GH #90).
@@ -65,6 +66,7 @@ my $builder = $class->new(
 		'Class::Load'         => 0,
 		'Moose'               => 0,
 		'Mouse'               => 0,
+		'Moo'                 => 0,
 	},
 
 	add_to_cleanup => [

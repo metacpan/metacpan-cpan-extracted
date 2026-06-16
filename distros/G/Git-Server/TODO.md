@@ -3,13 +3,6 @@ TODO
 
 Some features we need or want, plus some neat ideas that may not be too feasible to implement.
 
- - Sometimes, it's hard to discern which repo run-git-hooks is involved with, so it ought to update its proctitle to be something more useful. Right now, it can look something less useful like this:
-    git      3629420  0.9  0.0  36348  7104 ?        Ss   03:49   0:00  |       \_ /usr/bin/perl /usr/src/git-server/hooks/run-git-hooks -c git-upload-pack '/home/git/repo'
-    git      3629917  1.0  0.0  29868  6532 ?        S    03:49   0:00  |           \_ /usr/bin/perl /usr/src/git-server/hooks/pre-read
-    git      3629935  0.0  0.0  26328  5116 ?        S    03:49   0:00  |               \_ /usr/bin/perl /usr/src/git-server/hooks/configs
-    git      3629939  2.5  0.1  33276  7972 ?        S    03:49   0:00  |                   \_ /usr/bin/perl /home/git/bin/git config --list --null
-    git      3630007  6.0  0.1  33164  7956 ?        S    03:49   0:00  |                       \_ /usr/bin/perl /usr/local/bin/git config --list --local --show-origin --null
-
  - The pre-receive hook ought to default to BLOCK any changes if not running through git-server correctly.
 
  - If proxy fails with the default Forwarding Agent, try each public key individually to see if any of them work any better. (-i PUB -o IdentitiesOnly=yes? Cache winning reader PUBs? Brick over reader PUB with known writer PUBs?).
@@ -18,7 +11,15 @@ Some features we need or want, plus some neat ideas that may not be too feasible
 
  - Right now, if proxy.url detects remote [there] changes, then the local [here] repo is updated accordingly, even if connected with acl.readers or acl.deploy rights, and no {operation} "push" webhook is fired off and the push-notification is not triggered. This is definitely bad because the git-deploy clients will not be notified right away, as expected, so they will need to wait upto --max-delay seconds. This may also pose a security problem as these updates can bypass hooks and triggers. And this should be BLOCKED if {remote_user} does not have acl.writers permissions. If {remote_user} does have acl.writers permissions, then an appropriate {operation} "push" webhook, (with {refs} including all commits updated), ought to be fired off, either instead of or in addition to the original "push" or "pull" {operation} that triggered this Proxy Sync. And the push-notification should be triggered. Then local [here] proxy sync changes can behave more like any normal "push" without any cheater bypassing. Maybe this can be implemented with hooks/pre-receive to verify REMOTE_USER has acl.writers. Will pre-receive be hooked properly for these imported changes pushed from the .workingdir? Or maybe hooks/proxy can snapshot the REMOTE_USER permissions prior to jumping into the .workingdir, then BLOCK local changes if REMOTE_USER doesn't have acl.writers permissions. Or maybe both hooks/pre-receive and hooks/proxy? I'm hoping to avoid having to double SSH back to ssh://$USER@$SERVER_ADDR/repo using the SSH_AUTH_SOCK with "skip_proxy" to avoid infinite recursion, but maybe that's another way to implement it to really ensure all the "push" hooks are caught appropriately.
 
+ - Many SSH Servers are now defaulting NOT to AcceptEnv. So in case there isn't sufficient support, the SSH Client will fail with SendEnv. So consider using another transport mechanism instead of relying so much on XMODIFIERS. (On git >= 2.18, the GIT_USER_AGENT variable is provided via Git Protocol V2 and should be more reliable than XMODIFIERS for git-client or git-deploy to use, but I'm not sure how much information could even fit in there.)
+
+ - Instead of relying on SendEnv, git-verify should also use another mechanism to test the configuration. (Maybe another special commandline arg instead of relying on SendEnv?)
+
+ - The {client_git_version} does not include the actual git client version during most read operations if SSHD on the Git Server Host does not have "AcceptEnv GIT_PROTOCOL" enabled.
+
  - Add [log.verbosity] 0 or 1 or 2 feature to control level of messaging spewage to the git client.
+
+ - It would be nice if log.logfile could log more details about the client in case of ACL permission failures. Right now it just says "ACL pre-failure" but no {client_git_version}, no {server_git_version}, no {repo}, no {git_client_options}, no attempted {pull_branch}. (Would it help to run a dummy git emulator? Just spit back something like "0015agent=git/2.43.7\n0000" and quickly slurp in whatever the client says without allowing much blocking and without actually performing any of the requested operations.)
 
  - Trying to do "git config --descent { --unset <name> | --add <name> <value> }" doesn't work as expected.
 
@@ -36,8 +37,6 @@ Some features we need or want, plus some neat ideas that may not be too feasible
 
  - Add Support for HTTP protocol git read and write operations using Basic password Authorization (instead of only pubkeys over SSH protocol).
    * Design a way to support "git-deploy" feature via HTTP (through REMOTE_USER or DeployToken or URI flag or Special HTTP Header or PAT [Personal Access Token] or maybe some other mechanism). Allow client to specify max-delay seconds (default 90) in case nothing new is ready since last pull.
-
- - Investigate why unsynced proxy.url deletes a tag from the side that has the tag, but it ought to copy to the missing side.
 
  - Pre-Load GIT_OPTION_<optionname> also since GIT_OPTION_<N> is annoying to spin through every time just to find the option you want.
 
@@ -57,8 +56,6 @@ Some features we need or want, plus some neat ideas that may not be too feasible
    * Provide a seemless way to transport information between hooks.
      1. For example, the ability to export ENV variables from a PRE* hook to a POST* hook.
      2. Allow data in $git->stash to persist among all hooks where the $git object is the first argument passed to each custom block hook.
-
- - Investigate making git-deploy setup alias.deploy hook in case it's not in a cron path.
 
  - [webhook] features for callback:
    * Allow for WhiteList or BlackList filters to trigger webhook or ignore webhooks under certain conditions:

@@ -33,10 +33,10 @@ no_index:
 provides:
   Dist::Zilla::MintingProfile::Author::DBOOK:
     file: lib/Dist/Zilla/MintingProfile/Author/DBOOK.pm
-    version: v1.0.9
+    version: v1.0.10
   Dist::Zilla::PluginBundle::Author::DBOOK:
     file: lib/Dist/Zilla/PluginBundle/Author/DBOOK.pm
-    version: v1.0.9
+    version: v1.0.10
 requires:
   Data::Section: '0'
   Dist::Zilla: '0'
@@ -57,6 +57,7 @@ requires:
   Dist::Zilla::Plugin::Git::Push: '0'
   Dist::Zilla::Plugin::Git::Tag: '0'
   Dist::Zilla::Plugin::GithubMeta: '0'
+  Dist::Zilla::Plugin::IRC: '0'
   Dist::Zilla::Plugin::License: '0'
   Dist::Zilla::Plugin::MakeMaker: '0'
   Dist::Zilla::Plugin::MakeMaker::Awesome: '0'
@@ -95,11 +96,12 @@ requires:
   namespace::clean: '0'
   perl: '5.010'
 resources:
-  IRC: irc://irc.perl.org/#distzilla
+  IRC:
+    url: irc://irc.perl.org/#distzilla
   bugtracker: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Author-DBOOK/issues
   homepage: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Author-DBOOK
   repository: https://github.com/Grinnz/Dist-Zilla-PluginBundle-Author-DBOOK.git
-version: v1.0.9
+version: v1.0.10
 x_generated_by_perl: v5.42.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: Artistic-2.0

@@ -2,7 +2,7 @@ package CPAN::MetaPackager;
 
 use 5.36.0;
 
-our $VERSION = '1.01';
+our $VERSION = '1.03';
 
 #-------------------------------------------------
 
@@ -16,24 +16,27 @@ CPAN::MetaPackager - Manage the cpan.metapackager.sqlite database
 
 =head1 How to convert a package details file into an SQL db
 
-Notes:
-	a. My web host and I use case-sensitive file systems
-	b. The distro CPAN-MetaPackager-1.00.tgz ships with data/cpan.metapackager.sqlite
-		(15 Mb) which is the output of running scripts/build.db.sh
-	c. You will need your own copy of 02packages.details.txt.gz to run scripts/build.db.sh
-	d. 02packages.details.txt.gz contains 9 header lines & about 270,458 records
+=over
+=item My web host and I use case-sensitive file systems
+=item The distro CPAN-MetaPackager-1.00.tgz ships with data/cpan.metapackager.sqlite
+=item (15 Mb) which is the output of running scripts/build.db.sh
+=item You will need your own copy of 02packages.details.txt.gz to run scripts/build.db.sh
+=item 02packages.details.txt.gz contains 9 header lines & about 270,458 records
+=back
 
-Steps:
-	a. cd /tmp
-	b. wget https://www.cpan.org/modules/02packages.details.txt.gz
-	c. gunzip 02packages.details.txt.gz
-	d. Unpack the distro: tar xvf CPAN-MetaPackager-1.00.tgz
-	e. cd CPAN-MetaPackager
-	f. time scripts/build.db.sh (takes 67 mins on my Levono M70Q 'Tiny' desktop)
-	g. Output file: data/cpan.metapackager.sqlite
-
-Note:
-	a. CPAN::MetaCurator defaults to (optionally) reading /tmp/cpan.metapackager.sqlite
+=over
+=item cd /tmp
+=item Run: wget https://www.cpan.org/modules/02packages.details.txt.gz
+=item Run: gunzip 02packages.details.txt.gz
+=item Run: tar xvf CPAN-MetaPackager-1.00.tgz
+=item cd CPAN-MetaPackager
+=item The next command will take 104 minutes for 264,956 records on my Levono M70Q 'Tiny' desktop
+=item Run: time scripts/build.db.sh
+=item Output file: data/cpan.metapackager.sqlite
+=item cp data/cpan.metapackager.sqlite /tmp
+=item Run: git push
+=item Now run CPAN::MetaCurator. It defaults to (optionally) reading /tmp/cpan.metapackager.sqlite
+=back
 
 =head1 Machine-Readable Change Log
 

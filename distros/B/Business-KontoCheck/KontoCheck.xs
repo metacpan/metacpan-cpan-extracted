@@ -51,7 +51,7 @@ OUTPUT:
    RETVAL
 
 int
-kto_check_pz(pz,kto,blz=NULL)
+kto_check_pz(pz,kto,...)
    char *pz;
    char *kto;
 PREINIT:
@@ -120,7 +120,7 @@ void
 lut_cleanup()
 
 int
-lut_init(lut_name=NULL,required=DEFAULT_INIT_LEVEL,set=0)
+lut_init(...)
 PREINIT:
 
    char *lut_name;
@@ -159,7 +159,7 @@ OUTPUT:
    RETVAL
 
 int
-kto_check_init(lut_name,required=DEFAULT_INIT_LEVEL,set=0,incremental=0)
+kto_check_init(lut_name,...)
    char *lut_name
 PREINIT:
 
@@ -199,7 +199,7 @@ OUTPUT:
    RETVAL
 
 int
-lut_keine_iban_berechnung(inputname,outputname,set=0)
+lut_keine_iban_berechnung(inputname,outputname,...)
    char *inputname;
    char *outputname;
 PREINIT:
@@ -224,7 +224,7 @@ OUTPUT:
    RETVAL
 
 int
-generate_lut2(inputname,outputname,user_info=NULL,gueltigkeit=NULL,felder=-1,filialen=0,slots=0,lut_version=0,set=0)
+generate_lut2(inputname,outputname,...)
    char *inputname;
    char *outputname;
 PREINIT:
@@ -321,7 +321,7 @@ OUTPUT:
    r
    RETVAL
 
-int lut_multiple_i(blz,filiale,cnt,name,name_kurz,plz,ort,pan,bic,pz,nr,aenderung,loeschung,nachfolge_blz)
+int lut_multiple_i(blz,filiale,...)
 char *blz;
 int filiale;
 PREINIT:
@@ -378,7 +378,7 @@ OUTPUT:
    RETVAL
 
 const char *
-pz2str(pz,retval=NO_INIT)
+pz2str(pz,...)
    int pz;
 CODE:
    int ret;
@@ -393,7 +393,7 @@ OUTPUT:
    RETVAL
 
 int
-lut_blz_i(blz,offset=0,retval=NO_INIT)
+lut_blz_i(blz,...)
    char *blz;
 PREINIT:
    unsigned int offset;
@@ -432,7 +432,7 @@ OUTPUT:
 
 
 const char *
-lut_name_i(r,blz,zweigstelle=0,r1=NO_INIT)
+lut_name_i(r,blz,...)
    char *blz;
    int r;
 PREINIT:
@@ -457,7 +457,7 @@ OUTPUT:
 
 
 const char *
-lut_name_kurz_i(r,blz,zweigstelle=0,r1=NO_INIT)
+lut_name_kurz_i(r,blz,...)
    char *blz;
    int r;
 PREINIT:
@@ -482,7 +482,7 @@ OUTPUT:
 
 
 int
-lut_plz_i(r,blz,zweigstelle=0,r1=NO_INIT)
+lut_plz_i(r,blz,...)
    char *blz;
    int r;
 PREINIT:
@@ -507,7 +507,7 @@ OUTPUT:
 
 
 const char *
-lut_ort_i(r,blz,zweigstelle=0,r1=NO_INIT)
+lut_ort_i(r,blz,...)
    char *blz;
    int r;
 PREINIT:
@@ -532,7 +532,7 @@ OUTPUT:
 
 
 int
-lut_pan_i(r,blz,zweigstelle=0,r1=NO_INIT)
+lut_pan_i(r,blz,...)
    char *blz;
    int r;
 PREINIT:
@@ -557,7 +557,7 @@ OUTPUT:
 
 
 const char *
-lut_bic_i(r,blz,zweigstelle=0,r1=NO_INIT)
+lut_bic_i(r,blz,...)
    char *blz;
    int r;
 PREINIT:
@@ -582,7 +582,7 @@ OUTPUT:
 
 
 int
-lut_pz_i(r,blz,zweigstelle=0,r1=NO_INIT)
+lut_pz_i(r,blz,...)
    char *blz;
    int r;
 PREINIT:
@@ -607,7 +607,7 @@ OUTPUT:
 
 
 int
-lut_aenderung_i(r,blz,zweigstelle=0,r1=NO_INIT)
+lut_aenderung_i(r,blz,...)
    char *blz;
    int r;
 PREINIT:
@@ -632,7 +632,7 @@ OUTPUT:
 
 
 int
-lut_loeschung_i(r,blz,zweigstelle=0,r1=NO_INIT)
+lut_loeschung_i(r,blz,...)
    char *blz;
    int r;
 PREINIT:
@@ -657,7 +657,7 @@ OUTPUT:
 
 
 int
-lut_nachfolge_blz_i(r,blz,zweigstelle=0,r1=NO_INIT)
+lut_nachfolge_blz_i(r,blz,...)
    char *blz;
    int r;
 PREINIT:
@@ -682,7 +682,7 @@ OUTPUT:
 
 
 int
-lut_iban_regel_i(r,blz,zweigstelle=0,r1=NO_INIT)
+lut_iban_regel_i(r,blz,...)
    char *blz;
    int r;
 PREINIT:
@@ -708,7 +708,7 @@ OUTPUT:
 
 
 const char *
-bic_name_i(r,bic,zweigstelle=0,mode=0,r1=NO_INIT)
+bic_name_i(r,bic,...)
    char *bic;
    int r;
 PREINIT:
@@ -739,7 +739,7 @@ OUTPUT:
 
 
 const char *
-bic_name_kurz_i(r,bic,zweigstelle=0,mode=0,r1=NO_INIT)
+bic_name_kurz_i(r,bic,...)
    char *bic;
    int r;
 PREINIT:
@@ -770,7 +770,7 @@ OUTPUT:
 
 
 int
-bic_plz_i(r,bic,zweigstelle=0,mode=0,r1=NO_INIT)
+bic_plz_i(r,bic,...)
    char *bic;
    int r;
 PREINIT:
@@ -801,7 +801,7 @@ OUTPUT:
 
 
 const char *
-bic_ort_i(r,bic,zweigstelle=0,mode=0,r1=NO_INIT)
+bic_ort_i(r,bic,...)
    char *bic;
    int r;
 PREINIT:
@@ -832,7 +832,7 @@ OUTPUT:
 
 
 int
-bic_pan_i(r,bic,zweigstelle=0,mode=0,r1=NO_INIT)
+bic_pan_i(r,bic,...)
    char *bic;
    int r;
 PREINIT:
@@ -863,7 +863,7 @@ OUTPUT:
 
 
 const char *
-bic_bic_i(r,bic,zweigstelle=0,mode=0,r1=NO_INIT)
+bic_bic_i(r,bic,...)
    char *bic;
    int r;
 PREINIT:
@@ -894,7 +894,7 @@ OUTPUT:
 
 
 int
-bic_pz_i(r,bic,zweigstelle=0,mode=0,r1=NO_INIT)
+bic_pz_i(r,bic,...)
    char *bic;
    int r;
 PREINIT:
@@ -925,7 +925,7 @@ OUTPUT:
 
 
 int
-bic_aenderung_i(r,bic,zweigstelle=0,mode=0,r1=NO_INIT)
+bic_aenderung_i(r,bic,...)
    char *bic;
    int r;
 PREINIT:
@@ -956,7 +956,7 @@ OUTPUT:
 
 
 int
-bic_loeschung_i(r,bic,zweigstelle=0,mode=0,r1=NO_INIT)
+bic_loeschung_i(r,bic,...)
    char *bic;
    int r;
 PREINIT:
@@ -987,7 +987,7 @@ OUTPUT:
 
 
 int
-bic_nachfolge_blz_i(r,bic,zweigstelle=0,mode=0,r1=NO_INIT)
+bic_nachfolge_blz_i(r,bic,...)
    char *bic;
    int r;
 PREINIT:
@@ -1018,7 +1018,7 @@ OUTPUT:
 
 
 int
-bic_iban_regel_i(r,bic,zweigstelle=0,mode=0,r1=NO_INIT)
+bic_iban_regel_i(r,bic,...)
    char *bic;
    int r;
 PREINIT:
@@ -1050,7 +1050,7 @@ OUTPUT:
 
 
 const char *
-biq_name_i(r,idx,retval=NO_INIT)
+biq_name_i(r,idx,...)
    int r;
    int idx;
 CODE:
@@ -1069,7 +1069,7 @@ OUTPUT:
 
 
 const char *
-biq_name_kurz_i(r,idx,retval=NO_INIT)
+biq_name_kurz_i(r,idx,...)
    int r;
    int idx;
 CODE:
@@ -1088,7 +1088,7 @@ OUTPUT:
 
 
 int
-biq_plz_i(r,idx,retval=NO_INIT)
+biq_plz_i(r,idx,...)
    int r;
    int idx;
 CODE:
@@ -1107,7 +1107,7 @@ OUTPUT:
 
 
 const char *
-biq_ort_i(r,idx,retval=NO_INIT)
+biq_ort_i(r,idx,...)
    int r;
    int idx;
 CODE:
@@ -1126,7 +1126,7 @@ OUTPUT:
 
 
 int
-biq_pan_i(r,idx,retval=NO_INIT)
+biq_pan_i(r,idx,...)
    int r;
    int idx;
 CODE:
@@ -1145,7 +1145,7 @@ OUTPUT:
 
 
 const char *
-biq_bic_i(r,idx,retval=NO_INIT)
+biq_bic_i(r,idx,...)
    int r;
    int idx;
 CODE:
@@ -1164,7 +1164,7 @@ OUTPUT:
 
 
 int
-biq_pz_i(r,idx,retval=NO_INIT)
+biq_pz_i(r,idx,...)
    int r;
    int idx;
 CODE:
@@ -1183,7 +1183,7 @@ OUTPUT:
 
 
 int
-biq_aenderung_i(r,idx,retval=NO_INIT)
+biq_aenderung_i(r,idx,...)
    int r;
    int idx;
 CODE:
@@ -1202,7 +1202,7 @@ OUTPUT:
 
 
 int
-biq_loeschung_i(r,idx,retval=NO_INIT)
+biq_loeschung_i(r,idx,...)
    int r;
    int idx;
 CODE:
@@ -1221,7 +1221,7 @@ OUTPUT:
 
 
 int
-biq_nachfolge_blz_i(r,idx,retval=NO_INIT)
+biq_nachfolge_blz_i(r,idx,...)
    int r;
    int idx;
 CODE:
@@ -1240,7 +1240,7 @@ OUTPUT:
 
 
 int
-biq_iban_regel_i(r,idx,retval=NO_INIT)
+biq_iban_regel_i(r,idx,...)
    int r;
    int idx;
 CODE:
@@ -1260,7 +1260,7 @@ OUTPUT:
 
 
 const char *
-iban_name_i(r,iban,zweigstelle=0,retval=NO_INIT)
+iban_name_i(r,iban,...)
    char *iban;
    int r;
 PREINIT:
@@ -1285,7 +1285,7 @@ OUTPUT:
 
 
 const char *
-iban_name_kurz_i(r,iban,zweigstelle=0,retval=NO_INIT)
+iban_name_kurz_i(r,iban,...)
    char *iban;
    int r;
 PREINIT:
@@ -1310,7 +1310,7 @@ OUTPUT:
 
 
 int
-iban_plz_i(r,iban,zweigstelle=0,retval=NO_INIT)
+iban_plz_i(r,iban,...)
    char *iban;
    int r;
 PREINIT:
@@ -1335,7 +1335,7 @@ OUTPUT:
 
 
 const char *
-iban_ort_i(r,iban,zweigstelle=0,retval=NO_INIT)
+iban_ort_i(r,iban,...)
    char *iban;
    int r;
 PREINIT:
@@ -1360,7 +1360,7 @@ OUTPUT:
 
 
 int
-iban_pan_i(r,iban,zweigstelle=0,retval=NO_INIT)
+iban_pan_i(r,iban,...)
    char *iban;
    int r;
 PREINIT:
@@ -1385,7 +1385,7 @@ OUTPUT:
 
 
 const char *
-iban_bic_i(r,iban,zweigstelle=0,retval=NO_INIT)
+iban_bic_i(r,iban,...)
    char *iban;
    int r;
 PREINIT:
@@ -1410,7 +1410,7 @@ OUTPUT:
 
 
 int
-iban_pz_i(r,iban,zweigstelle=0,retval=NO_INIT)
+iban_pz_i(r,iban,...)
    char *iban;
    int r;
 PREINIT:
@@ -1435,7 +1435,7 @@ OUTPUT:
 
 
 int
-iban_aenderung_i(r,iban,zweigstelle=0,retval=NO_INIT)
+iban_aenderung_i(r,iban,...)
    char *iban;
    int r;
 PREINIT:
@@ -1460,7 +1460,7 @@ OUTPUT:
 
 
 int
-iban_loeschung_i(r,iban,zweigstelle=0,retval=NO_INIT)
+iban_loeschung_i(r,iban,...)
    char *iban;
    int r;
 PREINIT:
@@ -1485,7 +1485,7 @@ OUTPUT:
 
 
 int
-iban_nachfolge_blz_i(r,iban,zweigstelle=0,retval=NO_INIT)
+iban_nachfolge_blz_i(r,iban,...)
    char *iban;
    int r;
 PREINIT:
@@ -1510,7 +1510,7 @@ OUTPUT:
 
 
 int
-iban_iban_regel_i(r,iban,zweigstelle=0,retval=NO_INIT)
+iban_iban_regel_i(r,iban,...)
    char *iban;
    int r;
 PREINIT:
@@ -1696,7 +1696,7 @@ keep_raw_data(mode)
    int mode
 
 const char *
-current_lutfile_name_i(want_array,set,level,retval=NO_INIT)
+current_lutfile_name_i(want_array,...)
    int want_array;
 PREINIT:
 
@@ -1722,7 +1722,7 @@ OUTPUT:
 
 
 int
-lut_info_i(lut_name,want_array,info1,valid1,info2,valid2,lut_dir)
+lut_info_i(lut_name,...)
    char *lut_name;
 PREINIT:
 
@@ -1802,7 +1802,7 @@ OUTPUT:
    RETVAL
 
 int
-iban_check(iban,ret_kc=NULL)
+iban_check(iban,...)
    char *iban;
 PREINIT:
    int *ret,r;
@@ -1827,7 +1827,7 @@ OUTPUT:
    RETVAL
 
 int
-bic_check(bic,cnt=NO_INIT)
+bic_check(bic,...)
    char *bic;
 PREINIT:
    int cnt;
@@ -1849,7 +1849,7 @@ OUTPUT:
    RETVAL
 
 int
-lut_blocks(mode=0,lut_filename=NO_INIT,lut_blocks_ok=NO_INIT,lut_blocks_fehler=NO_INIT)
+lut_blocks(...)
 PREINIT:
 
    int mode;
@@ -1900,7 +1900,7 @@ OUTPUT:
    RETVAL
 
 int
-iban_gen_i(blz,kto,iban=NO_INIT,papier=NO_INIT,bic=NO_INIT,regel=NO_INIT,blz2=NO_INIT,kto2=NO_INIT,ret=NO_INIT)
+iban_gen_i(blz,kto,...)
    char *blz;
    char *kto;
 PREINIT:
@@ -1950,7 +1950,7 @@ OUTPUT:
    RETVAL
 
 const char*
-iban2bic_i(iban,ret=NO_INIT,blz=NO_INIT,kto=NO_INIT)
+iban2bic_i(iban,...)
    char *iban;
 PREINIT:
    char blz[16],kto[16];
@@ -1981,7 +1981,7 @@ ipi_check(zweck)
    char *zweck;
 
 int 
-ipi_gen_i(zweck,zweck_edv=NO_INIT,zweck_papier=NO_INIT)
+ipi_gen_i(zweck,...)
    char *zweck;
 PREINIT:
    char ipi_buffer[24],ipi_papier[32];
@@ -2000,7 +2000,7 @@ OUTPUT:
    RETVAL
 
 void
-lut_suche_volltext_i(want_array,search,retval=NO_INIT,uniq=-1,sort=-1)
+lut_suche_volltext_i(want_array,search,...)
    int want_array;
    char *search;
 PREINIT:
@@ -2082,7 +2082,7 @@ PPCODE:
    }
 
 void
-lut_suche_multiple_i(want_array,search,uniq=UNIQ_DEFAULT_PERL,such_cmd=NULL,ret=NO_INIT)
+lut_suche_multiple_i(want_array,search,...)
    int want_array;
    char *search;
 PREINIT:
@@ -2151,7 +2151,7 @@ PPCODE:
    }
 
 void
-lut_suche_c(want_array,art,retval=NO_INIT,uniq=-1,sort=-1,r1=NO_INIT)
+lut_suche_c(want_array,art,...)
    int want_array;
    int art;
 PREINIT:
@@ -2273,7 +2273,7 @@ PPCODE:
    }
 
 void
-lut_suche_i(want_array,art,blz1=NO_INIT,blz2=NO_INIT,retval=NO_INIT,uniq=-1,sort=-1)
+lut_suche_i(want_array,art,...)
    int want_array;
    int art;
 PREINIT:

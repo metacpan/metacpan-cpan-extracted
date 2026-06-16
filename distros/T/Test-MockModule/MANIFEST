@@ -26,6 +26,8 @@ t/main.t
 t/mock_all.t
 t/mock_strict.t
 t/mockmodule.t
+t/moo_basic.t
+t/moo_meta_for.t
 t/moose_around.t
 t/moose_immutable.t
 t/moose_meta_for.t

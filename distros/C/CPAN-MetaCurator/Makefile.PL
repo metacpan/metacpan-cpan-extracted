@@ -45,7 +45,7 @@ my(%params) =
 		'File::Slurper'				=> 0.014,
 		'File::Spec'				=> 3.90,
 		'Getopt::Long'				=> 2.57,
-		'HTML::Entities'			=> 3.83,
+		'HTML::Escape'				=> 1.11,
 		'HTML::TreeBuilder'			=> 5.07,
 		'Imager'					=> 1.029,
 		'Imager::Color'				=> 1.015,
@@ -66,6 +66,7 @@ my(%params) =
 		'Text::Balanced'			=> 2.07,
 		'Text::CSV::Encoded'		=> 0.25,
 		'Types::Standard'			=> 2.006000,
+		'utf8'						=> 1.25,
 		'warnings'					=> 1.58,
 	},
 	TEST_REQUIRES =>

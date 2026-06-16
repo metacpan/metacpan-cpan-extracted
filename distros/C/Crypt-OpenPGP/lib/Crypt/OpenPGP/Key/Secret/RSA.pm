@@ -2,14 +2,12 @@ package Crypt::OpenPGP::Key::Secret::RSA;
 use strict;
 use warnings;
 
-our $VERSION = '1.19'; # VERSION
+our $VERSION = '1.20'; # VERSION
 
 use Crypt::RSA::Key::Private;
 use Crypt::OpenPGP::Key::Public::RSA;
-use Crypt::OpenPGP::Key::Secret;
 use Crypt::OpenPGP::Util qw( bin2mp );
-use Crypt::OpenPGP::ErrorHandler;
-use base qw( Crypt::OpenPGP::Key::Secret Crypt::OpenPGP::ErrorHandler );
+use parent qw( Crypt::OpenPGP::Key::Secret Crypt::OpenPGP::ErrorHandler );
 
 sub secret_props { qw( d p q u ) }
 *sig_props = \&Crypt::OpenPGP::Key::Public::RSA::sig_props;

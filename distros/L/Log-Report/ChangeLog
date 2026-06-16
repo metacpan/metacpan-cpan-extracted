@@ -7,6 +7,15 @@ Mark Overmeer.
 TODO:
 	. connect to Message::Passing framework
 
+version 1.46: Tue 16 Jun 10:14:47 CEST 2026
+
+	Fixes:
+	- select specific dispatcher try.
+	  [Andy Berverley] github issue #21
+
+	Improvements:
+	- add Log::Report::default_dispatcher_mode()
+
 version 1.45: Fri 10 Apr 11:17:51 CEST 2026
 
 	Fixes:

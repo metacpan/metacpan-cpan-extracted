@@ -1,5 +1,6 @@
 Build.PL
 Changes
+CONTRIBUTING
 eg/cvt
 eg/irad50
 eg/r50asc
@@ -7,13 +8,14 @@ eg/README
 inc/My/Module/Build.pm
 inc/My/Module/Meta.pm
 lib/Encode/RAD50.pm
-LICENSES/Artistic
-LICENSES/Copying
+LICENSE-Artistic
+LICENSE-GPL
 Makefile.PL
 MANIFEST
 META.json
 META.yml
 README
+SECURITY
 t/basic.t
 xt/author/changes.t
 xt/author/critic.t

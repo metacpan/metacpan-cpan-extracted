@@ -1,4 +1,4 @@
-# This code is part of Perl distribution Log-Report version 1.45.
+# This code is part of Perl distribution Log-Report version 1.46.
 # The POD got stripped from this file by OODoc version 3.06.
 # For contributors see file ChangeLog.
 
@@ -10,7 +10,7 @@
 
 
 package Log::Report::Dispatcher;{
-our $VERSION = '1.45';
+our $VERSION = '1.46';
 }
 
 
@@ -103,7 +103,7 @@ sub type() { $_[0]->{type} }
 sub mode() { $_[0]->{mode} }
 
 #Please use C<dispatcher mode => $MODE;>
-sub defaultMode($) {$default_mode = $_[1]}
+sub defaultMode($) { $default_mode = $_[1] }
 
 # only to be used via Log::Report::dispatcher(mode => ...)
 # because requires re-investigating collective dispatcher needs

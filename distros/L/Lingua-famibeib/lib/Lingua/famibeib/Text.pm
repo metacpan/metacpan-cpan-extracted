@@ -18,7 +18,7 @@ use Lingua::famibeib::Word;
 use Lingua::famibeib::Fragment;
 use Lingua::famibeib::Sentence;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 use parent 'Data::Identifier::Interface::Subobjects';
 
@@ -130,7 +130,7 @@ Lingua::famibeib::Text - module to interact with the famibeib texts
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -215,7 +215,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2025-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

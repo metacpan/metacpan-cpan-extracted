@@ -2,13 +2,12 @@ package Crypt::OpenPGP::S2k;
 use strict;
 use warnings;
 
-our $VERSION = '1.19'; # VERSION
+our $VERSION = '1.20'; # VERSION
 
 use Crypt::OpenPGP::Buffer;
 use Crypt::OpenPGP::Digest;
-use Crypt::OpenPGP::ErrorHandler;
 use Crypt::OpenPGP::Util;
-use base qw( Crypt::OpenPGP::ErrorHandler );
+use parent qw( Crypt::OpenPGP::ErrorHandler );
 
 our %TYPES = (
     0 => 'Simple',
@@ -55,7 +54,7 @@ sub set_hash {
 }
 
 package Crypt::OpenPGP::S2k::Simple;
-use base qw( Crypt::OpenPGP::S2k );
+use parent qw( Crypt::OpenPGP::S2k );
 
 use Crypt::OpenPGP::Constants qw( DEFAULT_DIGEST );
 
@@ -85,7 +84,7 @@ sub save {
 }
 
 package Crypt::OpenPGP::S2k::Salted;
-use base qw( Crypt::OpenPGP::S2k );
+use parent qw( Crypt::OpenPGP::S2k );
 
 use Crypt::OpenPGP::Constants qw( DEFAULT_DIGEST );
 
@@ -118,7 +117,7 @@ sub save {
 }
 
 package Crypt::OpenPGP::S2k::Salt_Iter;
-use base qw( Crypt::OpenPGP::S2k );
+use parent qw( Crypt::OpenPGP::S2k );
 
 use Crypt::OpenPGP::Constants qw( DEFAULT_DIGEST );
 

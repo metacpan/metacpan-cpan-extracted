@@ -1,7 +1,7 @@
 name,value
 domain_name,savage.net.au
 encoding,:encoding(UTF-8)
-html_id_offset,10000
+html_id_offset,1
 logo_path,/assets/images/local/rons.logo.png
 page_name,cpan.metacurator.tree.html
 special_para_names,ChangeLog|GettingStarted|MainMenu|TableOfContents

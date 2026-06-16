@@ -87,7 +87,9 @@ use strict;
 use Cwd qw(abs_path);
 use IO::Handle; # For non-blocking
 
-our $VERSION = "0.045";
+our $VERSION = "0.046";
+
+my $full = abs_path $0 or die "$0: Not real?\n";
 
 # Locate the real "git" later in the $PATH (after myself)
 our $real_git = find_real_git();
@@ -96,13 +98,14 @@ our $real_git = find_real_git();
 our $HANDLE_STDERR = sub { open STDERR, ">", "/dev/null" };
 
 # Special $GIT_SSH shim to emulate $GIT_SSH_COMMAND behavior
-!$ENV{DEBUG} || git("--version") !~ /version\s+([\d.]+)\s*$/ || warn "DEBUG: [".abs_path($0)."] Faking GIT_SSH_COMMAND behavior for incompetent git $1\n"
+!$ENV{DEBUG} || git("--version") !~ /version\s+([\d.]+)\s*$/ || warn "DEBUG: [$full] Faking GIT_SSH_COMMAND behavior for incompetent git $1\n"
     and exec sh => -c => $ENV{GIT_SSH_COMMAND}.' "$@"' => ssh => @ARGV or die "exec: $!\n"
     if $0 eq ($ENV{GIT_SSH}||"") and $ENV{GIT_SSH_COMMAND}||="ssh";
 
 if ("@ARGV" =~ /^(-v|(?:--|)version)$/ and $real_git =~ m{^(.*/)}) {
     my $nextpath = $1;
     print "[git-client v$VERSION] $0 => ";
+    print "$full => " if $full ne $0;
     my $g;
     print $nextpath if open $g, "<", $real_git and $g = getc $g and $g ne "#";
     print git("--version");
@@ -148,7 +151,7 @@ sub pass_options {
     }
     $pull_branch = $1 if $op =~ /^(fetch|pull)$/ and $xmod !~ /^pull_branch=/m and git("branch") =~ m{^\* ([\w/\-.@]+)\s*$}m;
     push @options, "pull_branch=$pull_branch" if $pull_branch;
-    push @options, "client=".abs_path($0)."\@v$VERSION" if $xmod !~ /^client=/m;
+    push @options, "client=$0\@v$VERSION" if $xmod !~ /^client=/m;
     push @options, $xmod if $xmod;
     $ENV{XMODIFIERS} = join "\n", @options;
     $ENV{GIT_SSH_COMMAND} ||= git(qw[config core.sshCommand]) =~ /^(.+)/ ? $1 : "ssh";
@@ -160,6 +163,7 @@ sub find_real_git {
     my $myself = (stat $0)[1] or die "$0: Can't find my inode?\n";
     my $found_git = "";
     $ENV{GIT_CLIENT_TRIED} ||= $0;
+    $ENV{GIT_CLIENT_TRIED} .= "\n$full" if $0 ne $full;
     require File::Spec;
     foreach my $path (File::Spec->path) {
         my $try = "$path/git";

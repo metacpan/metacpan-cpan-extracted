@@ -9,10 +9,10 @@ Makefile.PL
 README
 cpanfile
 lib/Perl/Critic/Policy/ControlStructures/ProhibitBareBlockLoopControls.pm
+t/.perlcriticrc
 t/00-compile.t
 t/ControlStructures/ProhibitBareBlockLoopControls.run
 t/author-clean-namespaces.t
-t/author-critic.t
 t/author-distmeta.t
 t/author-eof.t
 t/author-eol.t

@@ -1,4 +1,4 @@
-# Copyright (c) 2023-2025 Philipp Schafft
+# Copyright (c) 2023-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -22,7 +22,7 @@ use Data::Identifier::Generate v0.25;
 use Data::URIID::Result;
 use Data::URIID::Colour;
 
-our $VERSION = v0.20;
+our $VERSION = v0.21;
 
 use parent 'Data::URIID::Base';
 
@@ -43,6 +43,7 @@ my $config_wikidata = {
         P1315  => 'nla-trove-people-identifier',
         P1566  => 'geonames-identifier',
         P1651  => 'youtube-video-identifier',
+        P1769  => 'denkxweb-hessen-identifier',
         P2041  => 'ngv-artist-identifier',
         P2949  => 'wikitree-person-identifier',
         P3916  => 'unesco-thesaurus-identifier',
@@ -421,7 +422,9 @@ sub _own_well_known {
                 {uuid => '2bffc55d-7380-454e-bd53-c5acd525d692', sid => 26, name => 'roaraudio-error-number'},
                 {uuid => 'f87a38cb-fd13-4e15-866c-e49901adbec5', sid => 27, name => 'small-identifier'},
                 {uuid => 'd2750351-aed7-4ade-aa80-c32436cc6030', sid => 28, name => 'also-has-role'},
-                # Unassigned: 29 - 31
+                {uuid => '11d8962c-0a71-4d00-95ed-fa69182788a8', sid => 29, name => 'also-has-comment'},
+                {uuid => '30710bdb-6418-42fb-96db-2278f3bfa17f', sid => 30, name => 'also-has-description'},
+                # Unassigned: 31
                 {uuid => '448c50a8-c847-4bc7-856e-0db5fea8f23b', sid => 32, name => 'final-file-encoding'},
                 {uuid => '79385945-0963-44aa-880a-bca4a42e9002', sid => 33, name => 'final-file-hash'},
                 {uuid => '3fde5688-6e34-45e9-8f33-68f079b152c8', sid => 34, name => 'SEEK_SET'},
@@ -437,7 +440,7 @@ sub _own_well_known {
                 {uuid => '6ad2c921-7a3e-4859-ae02-98e42522e2f8', sid => 44, name => 'forwards'},
                 {uuid => '6d34d4a1-8fbc-4e22-b3e0-d50f43d97cb1', sid => 45, name => 'false'},
                 {uuid => 'eb50b3dc-28be-4cfc-a9ea-bd7cee73aed5', sid => 46, name => 'true'},
-                # Unassigned: 47
+                {uuid => 'a7872dea-8912-5c23-b243-567c60e8bd1a', sid => 47, name => '-1'},
                 {uuid => 'dd8e13d3-4b0f-5698-9afa-acf037584b20', sid => 48, name => 'zero'},
                 {uuid => 'bd27669b-201e-51ed-9eb8-774ba7fef7ad', sid => 49, name => 'one'},
                 {uuid => '73415b5a-31fb-5b5a-bb82-8ea5eb3b12f7', sid => 50, name => 'two'},
@@ -510,11 +513,20 @@ sub _own_well_known {
                 {uuid => '2892c143-2ae7-48f1-95f4-279e059e7fc3', sid => 124, name => 'yellow'},
                 {uuid => '5c41829f-5062-4868-9c31-2ec98414c53d', sid => 125, name => 'orange'},
                 {uuid => 'c90acb33-b8ea-4f55-bd86-beb7fa5cf80a', sid => 126, name => 'savannah'},
-                # Unassigned: 127 - 131
+                # Unassigned: 127
+                {uuid => '7b177183-083c-4387-abd3-8793eb647373', sid => 128, name => 'none'},
+                {uuid => '4dc9fd07-7ef3-4215-8874-31d78ed55c22', sid => 129, name => 'append only'},
+                {uuid => '3877b2ef-6c77-423f-b15f-76508fbd48ed', sid => 130, name => 'random access'},
+                # Unassigned: 131
                 {uuid => 'caf11e36-d401-4521-8f10-f6b36125415c', sid => 132, name => 'icon'},
                 {uuid => 'e7330249-53b8-4dab-aa43-b5bfa331a8e5', sid => 133, name => 'thumbnail'},
                 {uuid => '2ec4a6b0-e6bf-40cd-96a2-490cbc8d6c4b', sid => 134, name => 'empty-set'},
-                # Unassigned: 135 - 143
+                {uuid => '99437f71-f1b5-4a50-8ecf-882b61b86b1e', sid => 135, name => 'final-file-charset'},
+                {uuid => '94a4ce85-dda0-433e-8b57-949a20606d7f', sid => 136, name => 'also-has-artist'},
+                {uuid => '50f70987-d0fb-4e9b-ae7f-52505948ec74', sid => 137, name => 'also-has-example'},
+                {uuid => 'ef90615f-6d94-4db0-b41b-d45b96d9d856', sid => 138, name => 'also-has-definition'},
+                # Unassigned: 139 - 142
+                {uuid => '807e485f-8b3a-5483-8bb5-d58648acaa8f', sid => 143, name => 'UTF-8'},
                 {uuid => 'be6d8e00-a6c1-5c44-8ffc-f7393e14aa23', sid => 144, name => 'three'},
                 {uuid => '79422b2c-b6f6-547f-949f-0cba44fa69b7', sid => 145, name => 'four'},
                 # Unassigned: 146 - 158
@@ -549,6 +561,13 @@ sub _own_well_known {
                 {uuid => '7c859f1d-693b-5070-a928-dfd051a4f93d', sid => 227, name => 'image/png'},
                 {uuid => '3970f481-591e-530a-b962-a2e87b2efde2', sid => 228, name => 'image/svg+xml'},
                 {uuid => '03e6c035-e046-5b7e-a016-55b51c4836ea', sid => 229, name => 'application/pdf'},
+                {uuid => '371b035f-45b7-5ba2-9d3e-811bf3b937bc', sid => 230, name => 'application/xml'},
+                # Unassigned: 231 - 232
+                {uuid => 'a8bb3d20-e983-5060-8c63-95b35e9ca56a', sid => 233, name => 'application/gzip'},
+                # Unassigned: 234 - 237
+                {uuid => '999e546d-8dfe-5961-aa5f-bf5cbd0a7037', sid => 238, name => 'application/ld+json'},
+                {uuid => 'c9e61b78-a0bd-5939-9aaa-8f0d08e5a4dc', sid => 239, name => 'application/json'},
+                # More assigned: 240 - ...
             ),
         },
         'sirtx-numerical-identifier' => {
@@ -807,6 +826,7 @@ sub _extra_lookup_services {
         'notalwaysright'        => ['notalwaysright-post-identifier'],
         'ruthede'               => ['ruthede-comic-post-identifier'],
         'danbooru2chanjp'       => ['danbooru2chanjp-post-identifier'],
+        'denkxweb-hessen'       => ['denkxweb-hessen-identifier'],
     }
 }
 
@@ -1016,6 +1036,15 @@ sub _offline_lookup__Data__Identifier {
 
         if (defined(my $displayname = $id->displayname(default => undef, no_defaults => 1))) {
             $attr{displayname} //= {'*' => $displayname};
+        }
+        if (defined(my $displaycolour = $id->displaycolour(default => undef, no_defaults => 1))) {
+            $attr{displaycolour} //= {'*' => $displaycolour};
+        }
+        if (defined(my $icon_text = $id->icontext(default => undef, no_defaults => 1))) {
+            $attr{icon_text} //= {'*' => $icon_text};
+        }
+        if (defined(my $description = $id->description(default => undef, no_defaults => 1))) {
+            $attr{description} //= {'*' => $description};
         }
 
         foreach my $type (qw(uuid oid uri sid)) {
@@ -1542,6 +1571,28 @@ sub _online_lookup__ruthede {
     return \%res;
 }
 
+sub _online_lookup__denkxweb_hessen {
+    my ($self, $result, %opts) = @_;
+    my $html = $self->_get_html($result->url(service => 'denkxweb-hessen', action => 'info')) // return undef;
+    my %attr;
+    my %res = (attributes => \%attr);
+    my %attr_map = (
+        kdname => 'displayname',
+    );
+
+    $attr{space_object} = {'*' => URI->new('http://www.wikidata.org/entity/Q2')}; # If it's on denkxweb.denkmalpflege-hessen.de it's on earth.
+
+    foreach my $html_id (keys %attr_map) {
+        foreach my $node (map {$_->content_list} $html->findnodes('/html/body//div[@id="'.$html_id.'"]')) {
+            $attr{$attr_map{$html_id}} = {'*' => $node};
+        }
+    }
+
+    $attr{description} = {'*' => join("\n\n", map {$_->content_list} $html->findnodes('/html/body//div[@id="beschr"]/p'))};
+
+    return \%res;
+}
+
 # --- Overrides for Data::URIID::Base ---
 
 sub displayname {
@@ -1567,7 +1618,7 @@ Data::URIID::Service - Extractor for identifiers from URIs
 
 =head1 VERSION
 
-version v0.20
+version v0.21
 
 =head1 SYNOPSIS
 
@@ -1812,7 +1863,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2023-2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2023-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

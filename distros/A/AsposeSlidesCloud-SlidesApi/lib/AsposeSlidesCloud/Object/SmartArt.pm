@@ -41,6 +41,7 @@ use AsposeSlidesCloud::Object::EffectFormat;
 use AsposeSlidesCloud::Object::FillFormat;
 use AsposeSlidesCloud::Object::Hyperlink;
 use AsposeSlidesCloud::Object::LineFormat;
+use AsposeSlidesCloud::Object::ParagraphFormat;
 use AsposeSlidesCloud::Object::ResourceUri;
 use AsposeSlidesCloud::Object::ShapeBase;
 use AsposeSlidesCloud::Object::SmartArtNode;
@@ -267,6 +268,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'default_paragraph_format' => {
+    	datatype => 'ParagraphFormat',
+    	base_name => 'DefaultParagraphFormat',
+    	description => 'Default paragraph format applied to all nodes. Write-only: not populated on read since there is no corresponding property at the SmartArt shape level in Aspose.Slides.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -293,7 +301,8 @@ __PACKAGE__->swagger_types( {
     'quick_style' => 'string',
     'color_style' => 'string',
     'nodes' => 'ARRAY[SmartArtNode]',
-    'is_reversed' => 'boolean'
+    'is_reversed' => 'boolean',
+    'default_paragraph_format' => 'ParagraphFormat'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -320,7 +329,8 @@ __PACKAGE__->attribute_map( {
     'quick_style' => 'QuickStyle',
     'color_style' => 'ColorStyle',
     'nodes' => 'Nodes',
-    'is_reversed' => 'IsReversed'
+    'is_reversed' => 'IsReversed',
+    'default_paragraph_format' => 'DefaultParagraphFormat'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

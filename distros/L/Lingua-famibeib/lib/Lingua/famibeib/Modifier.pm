@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Philipp Schafft
+# Copyright (c) 2025-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -13,7 +13,7 @@ use warnings;
 
 use Carp;
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 use parent qw(Data::Identifier::Interface::Simple Data::Identifier::Interface::Subobjects);
 
@@ -29,7 +29,7 @@ use overload (
 );
 
 my %_modifiers = (
-    (map {$_ => {max_repeat => 0, allow_word => undef}} qw(ab eb ib ub if of ak ek ik ok uk)),
+    (map {$_ => {max_repeat => 0, allow_word => undef}} qw(ab eb ib ub  af ef  ak ek ok uk  al il ol  am em im)),
 );
 
 $_modifiers{$_}{max_repeat} = 1 foreach qw(eb ib);
@@ -224,7 +224,7 @@ Lingua::famibeib::Modifier - module to interact with the famibeib word modifiers
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
@@ -254,7 +254,7 @@ Currently the following types (C<$type>) are supported:
 =item C<from>
 
 Constructs a word from an object.
-If the C<$value> should be a reference.
+C<$value> should be a reference.
 
 Currently references to the following types are supported:
 L<Data::Identifier>,
@@ -364,7 +364,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2025-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

@@ -1,0 +1,201 @@
+#!/usr/bin/env perl
+
+use 5.010;
+
+use strict;
+use warnings;
+
+use Getopt::Long 2.33 qw{ :config auto_version };
+use Pod::Usage;
+
+our $VERSION = '0.004';
+
+my %opt = (
+    n	=> ! -t STDOUT,
+);
+
+
+## VERBATIM EXPECT 2
+
+## VERBATIM CONFIGURE fatpack on App::cpanminus::fatscript
+
+## VERBATIM BEGIN App::cpanminus::fatscript
+use constant WIN32 => $^O eq 'MSWin32';
+## VERBATIM END
+
+GetOptions( \%opt,
+    qw{ cat|type=s n! verbose! },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) or pod2usage( { -verbose => 0 } );
+
+if ( $opt{cat} ) {
+    defined( my $cpanm_home = get_home() )
+	or die "Unable to determine cpanm home";
+    require File::Glob;
+    foreach my $path ( File::Glob::bsd_glob( "$cpanm_home/$opt{cat}" )) {
+	say '';
+	say $path;
+	open my $fh, '<', $path
+	    or die "Unable to open $path: $!";
+	print <$fh>;
+	close $fh;
+    }
+} elsif ( $opt{verbose} ) {
+
+    say 'WIN32 is ', WIN32 ? 'true' : 'false';
+
+    say '$HOME is ', def( $ENV{HOME} );
+
+    say '$USERPROFILE is ', def( $ENV{USERPROFILE} );
+
+    say '"$ENV{HOMEDRIVE}$ENV{HOMEPATH}" is ',
+	def( @ENV{ qw/ HOMEDRIVE HOMEPATH / } );
+
+    {
+	local $@ = undef;
+	eval {
+	    require File::HomeDir;
+	    say 'Using File::HomeDir version ', File::HomeDir->VERSION();
+	    my $my_home = File::HomeDir->my_home();
+	    say 'File::HomeDir->my_home() is ', def( $my_home );
+	    1;
+	} or say 'File::HomeDir not available';
+    }
+
+    check_dir( 'determine_home()', determine_home() );
+
+    say '$PERL_CPANM_HOME is ', def( $ENV{PERL_CPANM_HOME} );
+
+    check_dir( 'get_home()', get_home() );
+
+} elsif ( $opt{n} ) {
+    print get_home();
+} else {
+    say get_home();
+}
+
+sub check_dir {
+    my ( $name, $dir ) = @_;
+    if ( ! defined $dir ) {
+	say "$name is undef";
+    } elsif ( -d $dir ) {
+	say "$name is '$dir', which is a directory";
+    } elsif ( -e _ ) {
+	say "$name is '$dir', which is not a directory";
+    } else {
+	say "$name is '$dir', which does not exist";
+    }
+    return;
+}
+
+## VERBATIM BEGIN App::cpanminus::fatscript
+sub determine_home {
+    my $class = shift;
+
+    my $homedir = $ENV{HOME}
+      || eval { require File::HomeDir; File::HomeDir->my_home }
+      || join('', @ENV{qw(HOMEDRIVE HOMEPATH)}); # Win32
+
+    if (WIN32) {
+        require Win32; # no fatpack
+        $homedir = Win32::GetShortPathName($homedir);
+    }
+
+    return "$homedir/.cpanm";
+}
+## VERBATIM END
+
+sub def {
+    my @arg = @_;
+    foreach ( @arg ) {
+	defined
+	    or return 'undef';
+    }
+    local $" = '';
+    return "'@arg'";
+}
+
+sub get_home {
+    return $ENV{PERL_CPANM_HOME} || determine_home();
+}
+
+__END__
+
+=head1 TITLE
+
+cpanm_home - Determine location of cpanm home directory.
+
+=head1 SYNOPSIS
+
+ cpanm_home
+ cpanm_home --help
+ cpanm_home --version
+
+=head1 OPTIONS
+
+=head2 --cat
+
+ --cat "work/*/build.log"
+
+This option causes the specified file (relative to the F<cpanm> home
+directory) to be copied to standard out. All other options are ignored.
+Wild cards are permitted. This option will fail unless
+L<File::Glob|File::Glob> can be loaded.
+
+=head2 --help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -n
+
+If this Boolean option is asserted, the trailing new line is omitted
+from the cpanm home. This option is ignored if L<--verbose|/--verbose>
+is asserted.
+
+If the output is a TTY, the default is C<-non>; otherwise the default is
+C<-n>.
+
+=head2 --type
+
+This option is a synonym for L<--cat|/--cat>.
+
+=head2 --verbose
+
+If this Boolean option is asserted, the script displays the details of
+determining the F<cpanm> home.
+
+The default is C<--no-verbose>.
+
+=head2 --version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script is B<UNSUPPORTED> and may be changed or revoked at any
+time.
+
+This Perl script finds the F<cpanm> home directory. Its reason for
+existence is to try to figure out where it is on the GitHub action
+servers.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<harryfmudd at comcast dot net>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2022, 2026 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the files F<LICENSE-Artistic> and F<LICENSE-GPL>.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

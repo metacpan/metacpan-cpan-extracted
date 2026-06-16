@@ -10,7 +10,7 @@ run-git-hooks - Secure Git Server with more granular hooks capabilities than def
 
   Standard Method:
   With SHELL=/bin/bash, use the following format in ~/.ssh/authorized_keys:
-  command="~/git-server/gitserver REMOTE_USER=user1" ssh-ed25519 AAAA_OAX+blah_pub__ user1@workstation
+  command="/path/to/git-server REMOTE_USER=user1" ssh-ed25519 AAAA_OAX+blah_pub__ user1@workstation
 
    -- OR --
 
@@ -100,8 +100,9 @@ If it does not exist, then the git operation never ran.
 
 This post-write hook will always be executed regardless
 of the exit statuses of pre-write or the git operation.
-The post-write hook is meant primarily for notification
-and cannot affect the outcome of the git operation.
+The post-write hook is intended primarily for logging and
+push notification. But at this poine, the git operation
+has already completed, but it cannot affect or block it.
 
 =head2 hooks/git-shell
 
@@ -129,13 +130,16 @@ This library is free software; you can redistribute it and/or modify it under th
 use strict;
 use warnings;
 use Cwd qw(abs_path);
-use FindBin qw($RealBin);
+use FindBin qw($RealBin $Script);
 
-our $VERSION = "0.045";
+our $VERSION = "0.046";
 
 my $who = ($ENV{REMOTE_USER} || die "Auth required\n")."\@$ENV{REMOTE_ADDR}";
 $ENV{GIT_CONNECTED_EPOCH} ||= eval { require Time::HiRes; Time::HiRes::time() } || time;
 $ENV{GIT_SERVER_VERSION} = $VERSION;
+$ENV{GIT_SERVER_WEBHOOK_QUEUE} ||= "$ENV{HOME}/.local/share/webhookqueue";
+# Adjust PATH to look for the real git commands first:
+eval { require Config; `git --exec-path 2>/dev/null` =~ /^(.+)/ and $ENV{PATH} = "$1$Config::Config{path_sep}$ENV{PATH}" };
 
 my $git_op_hook = {
     "git-upload-pack" => "read", # i.e., clone, pull, fetch, ls-remote
@@ -153,6 +157,10 @@ die localtime().": [$who] git-server: Unexpected invocation.\n" unless $cmd;
 
 my $dir = $ENV{GIT_DIR} or die localtime().": [$who] git-server: Unable to determine repo!\n";
 die localtime().": [$who] git-server: You can't access '$1' git repository\n" if $dir =~ m{([^/]*\.workingdir)\b};
+
+my $title = "$Script - $who: $dir";
+$title =~ s{: \Q$ENV{HOME}/}{: };
+$0 = $title;
 
 my $bare = `git config core.bare 2>/dev/null`;
 if ($bare =~ /true/) {
@@ -207,6 +215,7 @@ else {
 }
 
 my $hook = $cmd =~ /^(git-[\w\-]+)/ && $git_op_hook->{$1} or die localtime().": [$who] git-server: Unimplemented operation!\n";
+$0 = "$title - pre-$hook";
 
 if (my $xmods = $ENV{XMODIFIERS}) {
     $cmd !~ /^git-receive-pack\b/ or
@@ -278,7 +287,7 @@ if ($actual_hooks ne $should_hooks) {
 }
 
 if (`git config --list` !~ /^acl\./m) {
-    warn localtime().": [$who] git-server: No [acl] found? Running: [git config acl.writer $ENV{REMOTE_USER}]\n";
+    warn localtime().": [$who] git-server: No [acl] found? Running: [git config acl.writers $ENV{REMOTE_USER}]\n";
     system "git config acl.writers $ENV{REMOTE_USER} 1>&2";
 }
 
@@ -299,6 +308,7 @@ if (-x $prog) {
 }
 
 my $git_failure = $pre_failure;
+$0 = "$title - $hook git operation";
 if (!$git_failure) {
     my $shell = "$ENV{GIT_HOOKS_PATH}/git-shell";
     $shell = "git-shell" unless -x $shell;
@@ -308,6 +318,7 @@ if (!$git_failure) {
 
 $prog = "$ENV{GIT_HOOKS_PATH}/post-$hook";
 my $post_failure = 0;
+$0 = "$title - post-$hook";
 if (-x $prog) {
     if ($cmd) {
         # Restore SSH_ORIGINAL_COMMAND in case the post hook wants it.
@@ -318,6 +329,7 @@ if (-x $prog) {
     }
 }
 
+$0 = "$title - post-$hook cleanup";
 if ($ENV{IPC}) {
     if ($ENV{DEBUG}) {
         warn localtime().": [$who] git-server: DEBUG: Leaving $ENV{IPC} intact\n";
@@ -331,11 +343,12 @@ if ($ENV{IPC}) {
         while (my $f = readdir $tmp) {
             next if $f !~ /^current-/; # Only wipe stuff that I made
             my $crusty = "$tmpdir/$f";
-            if ($ENV{DEBUG} && -M $crusty > 32) {
+            next if !lstat $crusty;
+            if ($ENV{DEBUG} && -M _ > 32) {
                 warn localtime().": [$who] git-server: Wiping crusty files: [$crusty] ...\n";
                 system "rm", "-rf", $crusty;
             }
-            elsif (-M $crusty > 62) {
+            elsif (-M _ > 62) {
                 # Silently wipe out old IPC files left over from DEBUG mode.
                 system "rm", "-rf", $crusty;
             }

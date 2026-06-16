@@ -1,5 +1,6 @@
 <lines>
   <line id="S1"      name="S1"      color="#DD6CA6" />
+  <line id="S15"     name="S15"     color="#DD6CA6" />
   <line id="S2"      name="S2"      color="#007B3D" />
   <line id="S3"      name="S3"      color="#0065AE" />
   <line id="S5"      name="S5"      color="#EE7202" />

@@ -228,7 +228,7 @@ use FindBin qw($Script $Bin);
 use Getopt::Long qw(GetOptions);
 use Fcntl qw(LOCK_EX LOCK_NB);
 
-our $VERSION = "0.045";
+our $VERSION = "0.046";
 
 my @invoked = ($0, @ARGV);
 my %initial_ENV = %ENV;
@@ -546,8 +546,10 @@ sub agentkeys {
         next if $pick !~ /\S/;
         my @found = $agentlist =~ /(.*\Q$pick\E.*)/g;
         push @found, $agentlist =~ /(.*\Q$pick\E.*)/ig  if !@found;
-        push @found, $agentlist =~ /(.*$pick.*)/g       if !@found;
-        push @found, $agentlist =~ /(.*$pick.*)/ig      if !@found;
+        eval {
+            push @found, $agentlist =~ /(.*$pick.*)/g   if !@found;
+            push @found, $agentlist =~ /(.*$pick.*)/ig  if !@found;
+        };
         (my $clue = $pick) =~ s/\W+//g;
         if ($clue ne $pick and $clue) {
             push @found, $agentlist =~ /(.*\Q$clue\E.*)/g   if !@found;
@@ -560,11 +562,13 @@ sub agentkeys {
             foreach my $agent_line (split /\n+/, $agentlist) {
                 (my $stripped = $agent_line) =~ s/[^\w\n]+//g;
                 push @found, $agent_line if $agent_line =~ /\Q$pick\E/i;
-                push @found, $agent_line if $agent_line =~ /$pick/i;
                 push @found, $agent_line if $clue and $agent_line =~ /\Q$clue\E/i;
                 push @found, $agent_line if $stripped =~ /\Q$pick/i;
-                push @found, $agent_line if $stripped =~ /$pick/i;
                 push @found, $agent_line if $clue and $stripped =~ /\Q$clue\E/i;
+                eval {
+                    push @found, $agent_line if $agent_line =~ /$pick/i;
+                    push @found, $agent_line if $stripped =~ /$pick/i;
+                };
             }
         }
         foreach my $m (@found) {

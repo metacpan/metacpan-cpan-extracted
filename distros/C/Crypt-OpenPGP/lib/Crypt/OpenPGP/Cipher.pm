@@ -2,11 +2,10 @@ package Crypt::OpenPGP::Cipher;
 use strict;
 use warnings;
 
-our $VERSION = '1.19'; # VERSION
+our $VERSION = '1.20'; # VERSION
 
 use Crypt::OpenPGP::CFB;
-use Crypt::OpenPGP::ErrorHandler;
-use base qw( Crypt::OpenPGP::ErrorHandler );
+use parent qw( Crypt::OpenPGP::ErrorHandler );
 
 our %ALG = (
     1 => 'IDEA',
@@ -79,7 +78,7 @@ package Crypt::OpenPGP::Cipher::IDEA;
 use strict;
 use warnings;
 
-use base qw( Crypt::OpenPGP::Cipher );
+use parent qw( Crypt::OpenPGP::Cipher );
 
 sub init {
     my $ciph = shift;
@@ -99,7 +98,7 @@ package Crypt::OpenPGP::Cipher::Blowfish;
 use strict;
 use warnings;
 
-use base qw( Crypt::OpenPGP::Cipher );
+use parent qw( Crypt::OpenPGP::Cipher );
 
 sub crypt_class { 'Crypt::Blowfish' }
 sub keysize { 16 }
@@ -109,7 +108,7 @@ package Crypt::OpenPGP::Cipher::DES3;
 use strict;
 use warnings;
 
-use base qw( Crypt::OpenPGP::Cipher );
+use parent qw( Crypt::OpenPGP::Cipher );
 
 sub crypt_class { 'Crypt::DES_EDE3' }
 sub keysize { 24 }
@@ -119,7 +118,7 @@ package Crypt::OpenPGP::Cipher::CAST5;
 use strict;
 use warnings;
 
-use base qw( Crypt::OpenPGP::Cipher );
+use parent qw( Crypt::OpenPGP::Cipher );
 
 sub crypt_class { ['Crypt::CAST5_PP', 'Crypt::CAST5'] }
 sub keysize { 16 }
@@ -129,7 +128,7 @@ package Crypt::OpenPGP::Cipher::Twofish;
 use strict;
 use warnings;
 
-use base qw( Crypt::OpenPGP::Cipher );
+use parent qw( Crypt::OpenPGP::Cipher );
 
 sub crypt_class { 'Crypt::Twofish' }
 sub keysize { 32 }
@@ -139,7 +138,7 @@ package Crypt::OpenPGP::Cipher::Rijndael;
 use strict;
 use warnings;
 
-use base qw( Crypt::OpenPGP::Cipher );
+use parent qw( Crypt::OpenPGP::Cipher );
 
 sub crypt_class { 'Crypt::Rijndael' }
 sub keysize { 16 }
@@ -149,7 +148,7 @@ package Crypt::OpenPGP::Cipher::Rijndael192;
 use strict;
 use warnings;
 
-use base qw( Crypt::OpenPGP::Cipher );
+use parent qw( Crypt::OpenPGP::Cipher );
 
 sub crypt_class { 'Crypt::Rijndael' }
 sub keysize { 24 }
@@ -159,7 +158,7 @@ package Crypt::OpenPGP::Cipher::Rijndael256;
 use strict;
 use warnings;
 
-use base qw( Crypt::OpenPGP::Cipher );
+use parent qw( Crypt::OpenPGP::Cipher );
 
 sub crypt_class { 'Crypt::Rijndael' }
 sub keysize { 32 }

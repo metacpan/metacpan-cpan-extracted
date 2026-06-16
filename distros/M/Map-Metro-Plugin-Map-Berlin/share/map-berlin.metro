@@ -40,6 +40,10 @@ Borgsdorf
 Lehnitz
 Oranienburg
 
+# S15
+Hauptbahnhof
+Wedding
+
 # S2
 Blankenfelde
 Mahlow
@@ -94,7 +98,6 @@ Ostbahnhof
 Jannowitzbrücke
 Alexanderplatz
 Hackescher Markt
-Hauptbahnhof
 Bellevue
 Tiergarten
 Zoologischer Garten
@@ -130,7 +133,6 @@ Westend
 Jungfernheide
 Beusselstr.
 Westhafen
-Wedding
 
 # S46
 Köllnische Heide
@@ -364,6 +366,7 @@ Schloßstr.
 --lines
 
 1001|S1|
+1015|S15|
 1002|S2|
 1025|S25|
 1026|S26|
@@ -519,6 +522,7 @@ Schloßstr.
 1003,1005,1007,1009|Hauptbahnhof|Bellevue
 5|Hauptbahnhof|Bundestag
 1003|Hauptbahnhof|Friedrichstr.
+1015|Hauptbahnhof|Wedding
 2|Hausvogteiplatz|Stadtmitte
 1009,1003|Heerstr.|Olympiastadion
 1005|Hegermühle|Strausberg
@@ -759,7 +763,7 @@ Schloßstr.
 1085|Waßmannsdorf|Flughafen BER
 1009|Waßmannsdorf|Schönefeld
 5|Weberwiese|Frankfurter Tor
-1041|Wedding|Gesundbrunnen
+1015,1041|Wedding|Gesundbrunnen
 6|Wedding|Leopoldplatz
 8|Weinmeisterstr.|Rosenthaler Platz
 1041|Westend|Jungfernheide

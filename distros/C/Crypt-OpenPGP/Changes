@@ -1,5 +1,29 @@
 Revision history for Perl module Crypt::OpenPGP
 
+1.20 -- Tue Jun 16 05:17:00 ADT 2026
+
+    [Changes since 1.19]
+    - Moved to Crypt::DSA::GMP
+    - Allow plaintext to be "false" @JRaspass
+    - Replace two argument open
+    - Several code improvements/modernizations @JRaspass
+
+    [Detailed Changelog]
+    - a2ea2fd Remove UploadToCPAN from Basic bundle
+    - 923efbc Replace Module::Signature signing with sigstore
+    - dbd497b Update security policy to 1.3.0
+    - 0ab388e Fixes #18 Replace Crypt::DSA with Crypt::DSA::GMP
+    - 8796dda Allow plaintext to be "false"
+    - f83ef65 Remove t/03-3des.t
+    - 7781030 Crypt::OpenPGP::Util - Avoid inheriting from Exporter
+    - 5907ed4 Move to cpm - tired of failures with no logs
+    - b41414a Add SECURITY.md based on 1.0.0 prod policy
+    - d5e9178 use three argument open
+    - 4a2b348 Replace "use base" with "use parent"
+    - 5705c55 Enable GitHub Actions
+    - ca8e129 v1.19
+    - 46eef52 (tag: 1.19) Add use warnings
+
 1.19 -- Sun Dec 22 19:19:35 AST 2024
 
     [Changes since 1.18]

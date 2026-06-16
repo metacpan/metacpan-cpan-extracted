@@ -1,4 +1,4 @@
-# Copyright (c) 2025 Philipp Schafft
+# Copyright (c) 2025-2026 Philipp Schafft
 
 # licensed under Artistic License 2.0 (see LICENSE file)
 
@@ -14,7 +14,7 @@ use warnings;
 use Carp;
 use List::Util qw(any);
 
-our $VERSION = v0.02;
+our $VERSION = v0.03;
 
 use parent 'Lingua::famibeib::Fragment';
 
@@ -133,13 +133,13 @@ Lingua::famibeib::Sentence - module to interact with the famibeib sentences
 
 =head1 VERSION
 
-version v0.02
+version v0.03
 
 =head1 SYNOPSIS
 
     use Lingua::famibeib::Sentence;
 
-This module implements a fragment that is a peroper well formed sentence.
+This module implements a fragment that is a proper well formed sentence.
 This is ensured at construction time.
 
 This module inherits from L<Lingua::famibeib::Fragment>.
@@ -202,7 +202,7 @@ Philipp Schafft <lion@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2025 by Philipp Schafft <lion@cpan.org>.
+This software is Copyright (c) 2025-2026 by Philipp Schafft <lion@cpan.org>.
 
 This is free software, licensed under:
 

@@ -6,7 +6,7 @@ use Scalar::Util qw/reftype refaddr weaken/;
 use Carp;
 use SUPER;
 # This is now auto-updated at release time by the github action
-$VERSION = '0.185.2';
+$VERSION = '0.185.3';
 
 our $GLOBAL_STRICT_MODE;
 
@@ -558,6 +558,11 @@ sub _meta_for {
 	return unless $package->can('meta');
 	my $meta = eval { $package->meta };
 	return unless ref $meta;
+	# Moo's ->meta returns a Moo::HandleMoose::FakeMetaClass whose ->isa lazily
+	# inflates a real Moose metaclass -- which throws when Moose isn't installed.
+	# Match it by exact ref (not ->isa) BEFORE the isa checks so inflation never
+	# fires; Moo classes fall back to plain symbol-table mocking. (GH #93)
+	return if ref($meta) eq 'Moo::HandleMoose::FakeMetaClass';
 	return $meta if $meta->isa('Class::MOP::Class');   # Moose
 	return $meta if $meta->isa('Mouse::Meta::Class');  # Mouse
 	return;

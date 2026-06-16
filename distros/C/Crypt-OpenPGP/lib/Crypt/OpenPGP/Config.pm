@@ -2,10 +2,9 @@ package Crypt::OpenPGP::Config;
 use strict;
 use warnings;
 
-our $VERSION = '1.19'; # VERSION
+our $VERSION = '1.20'; # VERSION
 
-use Crypt::OpenPGP::ErrorHandler;
-use base qw( Crypt::OpenPGP::ErrorHandler );
+use parent qw( Crypt::OpenPGP::ErrorHandler );
 
 sub new {
     my $class = shift;
@@ -31,11 +30,11 @@ sub set {
         my($compat, $cfg_file) = @_;
         my $class = join '::', __PACKAGE__, $compat;
         my $directives = $class->directives;
-        local(*FH, $_, $/);
+        local($_, $/);
         $/ = "\n";
-        open FH, $cfg_file or
+        open ( my $fh, "<", $cfg_file ) or
             return $cfg->error("Error opening file '$cfg_file': $!");
-        while (<FH>) {
+        while (<$fh>) {
             chomp;
             next if !/\S/ || /^#/;
             if (/^\s*([^\s=]+)(?:(?:(?:\s*=\s*)|\s+)(.*))?/) {
@@ -47,7 +46,7 @@ sub set {
                 $code->($cfg, $ref->[1], $val);
             }
         }
-        close FH;
+        close $fh;
     }
 }
 

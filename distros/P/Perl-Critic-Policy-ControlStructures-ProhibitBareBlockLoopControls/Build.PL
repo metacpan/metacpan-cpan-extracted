@@ -19,7 +19,7 @@ my %module_build_args = (
     "Dean Hamstead <dean\@fragfest.com.au>"
   ],
   "dist_name" => "Perl-Critic-Policy-ControlStructures-ProhibitBareBlockLoopControls",
-  "dist_version" => "0.03",
+  "dist_version" => "0.05",
   "license" => "mit",
   "module_name" => "Perl::Critic::Policy::ControlStructures::ProhibitBareBlockLoopControls",
   "recursive_test_files" => 1,

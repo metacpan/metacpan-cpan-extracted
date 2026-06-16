@@ -7,6 +7,7 @@ data/cpan.metacurator.sqlite
 data/cpan.metapackager.conf
 data/names.txt
 data/one.png
+data/special.topics.txt
 data/tiddlers.json
 html/cpan.metacurator.tree.html
 lib/CPAN/MetaCurator.pm
@@ -17,6 +18,7 @@ lib/CPAN/MetaCurator/Export.pm
 lib/CPAN/MetaCurator/HTML.pm
 lib/CPAN/MetaCurator/Import.pm
 lib/CPAN/MetaCurator/Search.pm
+lib/CPAN/MetaCurator/Validate.pm
 LICENSE
 LICENSE-Artistic-2.0
 LICENSE-GPL-3
@@ -37,6 +39,8 @@ scripts/read.tiddlers.pl
 scripts/text.balanced.pl
 scripts/tiddly2html.pl
 scripts/tiddly2text.pl
+scripts/validate.tree.pl
+scripts/validate.tree.sh
 scripts/zap.log.sh
 SECURITY.md
 t/00.versions.t

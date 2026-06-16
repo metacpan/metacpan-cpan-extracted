@@ -1,5 +1,14 @@
 Revision History for Git::Server
 
+0.046  2026-06-15 16:00:00
+ - Run WebHooks serially to reduce server load.
+ - Retry failed WebHooks for temporary hiccups.
+ - Improved progress proc-title.
+ - Handle relative git-client shim invocation.
+ - Various Doc and POD fixes.
+ - Don't crash git-deploy --identity with RegExp.
+ - Improved 3-Way proxy sync.
+
 0.045  2026-05-12 03:00:00
  - Update webhookcallback.cgi to handle formats
    like default GitLab or GitHub or Git-Server.

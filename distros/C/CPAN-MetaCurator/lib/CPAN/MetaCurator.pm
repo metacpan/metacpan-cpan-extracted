@@ -1,6 +1,6 @@
 package CPAN::MetaCurator;
 
-our $VERSION = '1.21';
+our $VERSION = '1.23';
 
 #-------------------------------------------------
 
@@ -17,6 +17,7 @@ CPAN::MetaCurator - Manage the cpan.metacurator.sqlite database
 Note: My web host and I use case-sensitive file systems.
 
 =head2 Prepare wikis
+
 =over
 =item cd ~/savage.net.au/
 =item Edit Perl.Wiki as desired. Includes updating the release date. Save to ~/Downloads/
@@ -26,6 +27,7 @@ Note: My web host and I use case-sensitive file systems.
 =back
 
 =head2 Export Perl.Wiki.html
+
 =over
 =item In the 'Tools' tab click 'export all'
 =item In the export menu click 'JSON format'. This creates ~/Downloads/tiddlers.json
@@ -35,28 +37,28 @@ Note: My web host and I use case-sensitive file systems.
 
 =head2 Rebuild Perl Wiki Tree
 
-Note: Optionally use sqlite database (15 Mb) from CPAN::MetaPackager
-
 =over
-=item Set env var with: INCLUDE_PACKAGES=1 if you have /tmp/cpan.metapackager.sqlite available & to 0 (default) otherwise
-=item Test with: echo $INCLUDE_PACKAGES
-=item Run scripts/build.db.sh to import tiddlers.json file into database data/cpan.metacurator.sqlite
-=item Run scripts/export.tree.sh to export CPAN::MetaCurator database to html/cpan.metacurator.tree.html
-=item git push
+=item Run: INCLUDE_PACKAGES=1 - if you have /tmp/cpan.metapackager.sqlite available & to 0 (default) otherwise
+=item Run: echo $INCLUDE_PACKAGES
+=item Run: scripts/build.db.sh - to import tiddlers.json file into database data/cpan.metacurator.sqlite
+=item Run: scripts/export.tree.sh - to export CPAN::MetaCurator database to html/cpan.metacurator.tree.html
+=item Run: git push
 =back
 
 =head2 Patch ~/savage.net.au/index.html
+
 =over
 =item cd ~/perl.modules/Local-Website
 =item Edit Local::Website::Util::PatchIndex's sub parser() if necessary
-=item Run scripts/parse.index.sh to patch ~/savage.net.au/index.html
-=item Backup new files: bu5.sh savage.net.au
-=item Backup new files: bu5.sh perl.modules
+=item Run: scripts/parse.index.sh - to patch ~/savage.net.au/index.html
+=item Run: bu5.sh savage.net.au
+=item Run: bu5.sh perl.modules
 =back
 
 =head2 Upload
+
 =over
-=item Upload Perl.Wiki.html, etc to savage.net.au
+=item Upload Perl.Wiki.html, cpan.metacurator.tree.html to savage.net.au/misc
 =item Upload index.html
 =item Log in to blogs.perl.org
 =item Post details of the uploads
